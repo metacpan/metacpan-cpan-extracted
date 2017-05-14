@@ -1,0 +1,20 @@
+Revision history for Perl extension QtGui.
+
+4.004 Mon Feb 04 2008
+	- add access to protected enums
+	- rewrite Makefile.PL
+	- fix bug in QListWidget
+
+4.003 Tue Jan 28 2008
+	- rewrite meta.yml amd manifest
+
+4.001 Mon Jan 28 2008
+	- fix bug with WId
+	- add examples/desktop/snapshot
+
+4.000 Sun Jan 26 2007 Vadim Likhota <vadim-lvv@yandex.ru>
+	- first release version
+
+0.001 Wed Jul 11 2007
+	- original version; created by h2xs 1.23 with options
+

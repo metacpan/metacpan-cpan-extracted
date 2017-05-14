@@ -12,7 +12,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <unistd.h>
 
 #define FORMAT_VERSION_MAJOR 0
 #define FORMAT_VERSION_MINOR 2
@@ -209,7 +208,13 @@ static void dump_optree(FILE *fh, const CV *cv, OP *o)
     }
   }
 
-  if(OP_CLASS(o) == OA_PMOP && o->op_type != OP_PUSHRE &&
+  if(OP_CLASS(o) == OA_PMOP &&
+#if (PERL_REVISION == 5) && ((PERL_VERSION > 25) || ((PERL_VERSION == 25) && (PERL_SUBVERSION >= 6)))
+     /* The OP_PUSHRE behaviour was moved to OP_SPLIT in 5.25.6 */
+     o->op_type != OP_SPLIT &&
+#else
+     o->op_type != OP_PUSHRE &&
+#endif
      (kid = PMOP_pmreplroot(cPMOPx(o))))
     dump_optree(fh, cv, kid);
 }

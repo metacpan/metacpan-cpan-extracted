@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by yyy (yyy) -->
+<!-- edited with XML Spy v4.4 alpha 1 U build Jun 28 2002 (http://www.xmlspy.com) by Altova (Altova) -->
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tsd="http://namespaces.softwareag.com/tamino/TaminoSchemaDefinition">
+	<xs:annotation>
+		<xs:appinfo>
+			<tsd:schemaInfo name="transfers">
+				<tsd:collection name="yuranz"/>
+				<tsd:doctype name="transfers">
+					<tsd:logical>
+						<tsd:content>closed</tsd:content>
+					</tsd:logical>
+				</tsd:doctype>
+			</tsd:schemaInfo>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:element name="transfers">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="transfer" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="client">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="number" type="xs:decimal"/>
+										<xs:element name="card" type="xs:string"/>
+										<xs:element name="sum" type="xs:decimal"/>
+									</xs:sequence>
+									<xs:attribute name="id" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="operator">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="acc">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="num" type="xs:string"/>
+												</xs:sequence>
+												<xs:attribute name="bank" type="xs:string" use="required"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="id" type="xs:string" use="required"/>
+									<xs:attribute name="sub" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="sum" type="xs:decimal"/>
+							<xs:element name="time" type="xs:decimal"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

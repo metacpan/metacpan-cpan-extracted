@@ -1,14 +1,11 @@
 package urpm::sys;
 
-# $Id: sys.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
 use warnings;
-use urpm::util;
+use urpm::util 'cat_';
 use urpm::msg;
 use POSIX ();
-
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
 
 
 =head1 NAME
@@ -33,9 +30,7 @@ typically from the inst.list or skip.list files.
 sub get_packages_list {
     my ($file, $o_extra) = @_;
     my @l = split(/,/, $o_extra || '');
-    if ($file && open(my $f, '<', $file)) {
-	push @l, <$f>;
-    }
+    push @l, cat_($file);
     [ grep { $_ } map {
 	chomp; s/#.*$//; s/^\s*//; s/\s*$//;
 	$_;
@@ -65,16 +60,6 @@ Find used mount point from a pathname
 sub find_a_mntpoint {
     my ($dir) = @_;
     _find_a_mntpoint($dir, {});
-}
-
-# deprecated
-sub find_mntpoints {
-    my ($dir, $infos) = @_;
-    if (my $entry = _find_a_mntpoint($dir, $infos)) {
-	$entry->{mntpoint};
-    } else {
-	();
-    }
 }
 
 sub read_mtab() { _read_fstab_or_mtab('/etc/mtab') }
@@ -176,21 +161,9 @@ sub proc_mounts() {
     @l;
 }
 
-
-=item first_free_loopdev()
-
-Returns the first unused loop device, or an empty string if none is found.
-
-=cut
-
-sub first_free_loopdev () {
-    my %loopdevs = map { $_ => 1 } grep { ! -d $_ } glob('/dev/loop*');
-    foreach (proc_mounts()) {
-	(our $dev) = split ' ';
-	delete $loopdevs{$dev} if $dev =~ m!^/dev/loop!;
-    }
-    my @l = keys %loopdevs;
-    @l ? $l[0] : '';
+sub proc_self_mountinfo() {
+    my @l = cat_('/proc/self/mountinfo') or warn "Can't read /proc/self/mountinfo: $!\n";
+    @l;
 }
 
 sub trim_until_d {
@@ -205,13 +178,13 @@ sub trim_until_d {
 
 =item check_fs_writable()
 
-Checks if the main filesystems are writeable for urpmi to install files in
+Checks if the main filesystems are writable for urpmi to install files in
 
 =cut
 
 sub check_fs_writable () {
-    foreach (proc_mounts()) {
-	(undef, our $mountpoint, undef, my $opts) = split ' ';
+    foreach (proc_self_mountinfo()) {
+	(undef, undef, undef, undef, our $mountpoint, my $opts) = split ' ';
 	if ($opts =~ /(?:^|,)ro(?:,|$)/ && $mountpoint =~ m!^(/|/usr|/s?bin)\z!) {
 	    return 0;
 	}
@@ -419,7 +392,6 @@ sub move_or_die {
 
 1;
 
-__END__
 
 =back
 

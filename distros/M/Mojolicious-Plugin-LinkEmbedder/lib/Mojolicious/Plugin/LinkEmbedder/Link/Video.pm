@@ -1,5 +1,24 @@
 package Mojolicious::Plugin::LinkEmbedder::Link::Video;
+
+=head1 NAME
+
+Mojolicious::Plugin::LinkEmbedder::Link::Video - Video URL
+
+=head1 DESCRIPTION
+
+This class inherit from L<Mojolicious::Plugin::LinkEmbedder::Link>.
+
+=cut
+
 use Mojo::Base 'Mojolicious::Plugin::LinkEmbedder::Link';
+
+=head1 METHODS
+
+=head2 to_embed
+
+TODO. (It returns a video tag for now)
+
+=cut
 
 sub to_embed {
   my $self = shift;
@@ -31,26 +50,10 @@ sub to_embed {
   );
 }
 
-1;
-
-=encoding utf8
-
-=head1 NAME
-
-Mojolicious::Plugin::LinkEmbedder::Link::Video - Video URL
-
-=head1 DESCRIPTION
-
-This class inherit from L<Mojolicious::Plugin::LinkEmbedder::Link>.
-
-=head1 METHODS
-
-=head2 to_embed
-
-TODO. (It returns a video tag for now)
-
 =head1 AUTHOR
 
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
+
+1;

@@ -38,6 +38,7 @@ $template->param(
     PORTAL_URL      => $portal_url,
     SKIN_PATH       => $portalPath . "skins",
     SKIN            => $skin,
+    SKIN_BG         => $portal->{portalSkinBackground},
     AUTH_ERROR      => $portal->error,
     AUTH_ERROR_TYPE => $portal->error_type,
     CHOICE_PARAM    => $portal->{authChoiceParam},

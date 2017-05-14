@@ -1,0 +1,122 @@
+# zxid/sg/liberty-idwsf-subs-ref-v1.0.sg
+# Slightly edited, 1.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-subs-ref-v1.0.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(subsref, urn:liberty:ssos:2006-08:ref)
+import(dst,  urn:liberty:dst:2006-08,liberty-idwsf-dst-v2.1.xsd)
+import(subs, urn:liberty:ssos:2006-08,liberty-idwsf-subs-v1.0.xsd)
+import(lu,   urn:liberty:util:2006-08,liberty-idwsf-utility-v2.0.xsd)
+
+Create         -> %subsref:CreateType
+CreateResponse -> %subsref:CreateResponseType
+Query          -> %subsref:QueryType
+QueryResponse  -> %subsref:QueryResponseType
+Modify         -> %subsref:ModifyType
+ModifyResponse -> %subsref:ModifyResponseType
+Delete         -> %subsref:DeleteType
+DeleteResponse -> %subsref:DeleteResponseType
+Notify         -> %subsref:NotifyType
+NotifyResponse -> %subsref:NotifyResponseType
+
+%SelectType:      base(xs:string) ;
+%TestOpType:      base(xs:string) ;
+%SortType:        base(xs:string) ;
+%TriggerType:     base(xs:string) ;
+%AggregationType: base(xs:string) ;
+%AppDataType:
+  subsref:Subscription*
+  ;
+
+%CreateType:	 base(dst:RequestType)
+  subsref:Subscription*
+  subsref:CreateItem+
+  subsref:ResultQuery*
+  ;
+
+CreateItem -> %subsref:CreateItemType
+%CreateItemType:
+  subsref:NewData?
+  &@dst:CreateItemAttributeGroup
+  ;
+NewData	 -> %subsref:AppDataType
+%CreateResponseType:	 base(subsref:DataResponseType) ;
+%DataResponseType:	 base(dst:DataResponseBaseType)
+  subsref:ItemData*
+  ;
+
+%QueryType:	 base(dst:RequestType)
+  subsref:TestItem*
+  subsref:QueryItem*
+  subsref:Subscription*
+  ;
+
+TestItem	 -> %subsref:TestItemType
+%TestItemType:	 base(dst:TestItemBaseType)
+  subsref:TestOp? -> %subsref:TestOpType
+  ;
+
+QueryItem	 -> %subsref:QueryItemType
+%QueryItemType:	 base(subsref:ResultQueryType)
+  &@dst:PaginationAttributeGroup
+  ;
+%QueryResponseType:	 base(dst:DataResponseBaseType)
+  lu:TestResult*
+  subsref:Data*
+  ;
+
+Data	 -> %subsref:DataType
+%DataType:	 base(subsref:ItemDataType)
+  &@dst:PaginationResponseAttributeGroup
+  ;
+
+%ModifyType:	 base(dst:RequestType)
+  subsref:Subscription*
+  subsref:ModifyItem+
+  subsref:ResultQuery*
+  ;
+ModifyItem	 -> %subsref:ModifyItemType
+%ModifyItemType:
+  subsref:Select?
+  subsref:NewData?
+  &@dst:ModifyItemAttributeGroup
+  ;
+%ModifyResponseType: base(subsref:DataResponseType) ;
+
+%DeleteType:	 base(dst:RequestType)
+  subsref:DeleteItem+
+  ;
+DeleteItem	 -> %subsref:DeleteItemType
+%DeleteItemType:     base(dst:DeleteItemBaseType)
+  subsref:Select?
+  ;
+%DeleteResponseType: base(lu:ResponseType) ;
+
+Select	 -> %subsref:SelectType
+ResultQuery	 -> %subsref:ResultQueryType
+%ResultQueryType:	 base(dst:ResultQueryBaseType)
+  subsref:Select?
+  subsref:Sort?	 -> %subsref:SortType
+  ;
+ItemData	 -> %subsref:ItemDataType
+%ItemDataType:	 base(subsref:AppDataType)
+  &@dst:ItemDataAttributeGroup
+  ;
+
+Subscription           -> %subsref:SubscriptionType
+%SubscriptionType:     base(subs:SubscriptionType)
+  subsref:ResultQuery*
+  subsref:Aggregation? -> %subsref:AggregationType
+  subsref:Trigger?     -> %subsref:TriggerType
+  ;
+
+%NotifyType:         base(dst:RequestType)
+  subsref:Notification*
+  &@subs:NotifyAttributeGroup
+  ;
+Notification         -> %subsref:NotificationType
+%NotificationType:   base(subs:NotificationType)
+  subsref:ItemData*
+  ;
+%NotifyResponseType: base(subs:NotifyResponseType) ;
+
+#EOF

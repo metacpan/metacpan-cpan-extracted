@@ -1,0 +1,142 @@
+libdma-misc-perl (1.01-3) unstable; urgency=low
+
+  * Forced to increment version because CPAN does not reprocess
+    an upload of the same version. This version exists to force
+    reprocessing with the Makefile.PL changes.
+
+ -- Dale Amon <amon@vnl.com>  Mon, 01 Sep 2008 11:27:29 +0100
+
+libdma-misc-perl (1.01-2) unstable; urgency=low
+
+  * Added dh_perl to rules and ${perl:Depends} to control file.
+  * Added dependencies to Makefile.PL
+
+ -- Dale Amon <amon@vnl.com>  Thu, 21 Aug 2008 01:51:59 +0100
+
+libdma-misc-perl (1.01-1) unstable; urgency=low
+
+  * Split up libdma once again, this time into a part with misc tools,
+    ie this package, and one with the old verison of Logger and friends.
+
+ -- Dale Amon <amon@vnl.com>  Thu, 14 Aug 2008 14:14:01 +0100
+
+libdma-base-perl (1.00-1) unstable; urgency=low
+
+  * Initial release. Combined numerous pre-release packages of
+    into one.
+
+ -- Dale Amon <amon@vnl.com>  Wed,  9 Apr 2008 13:03:50 +0100
+
+libdma-fsm-perl (0.02-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@vnl.com>  Sat,  2 Sep 2006 00:52:23 +0100
+
+libdma-fsm-perl (0.02-4) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@vnl.com>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdma-fsm-perl (0.02-3) unstable; urgency=low
+
+  * Moved master copy of docs to Specification document and then
+    reloaded pod section from it.
+
+  * Added bug fix to be able to print something for $lexeme when it 
+   is undef.
+
+ -- Dale Amon <amon@.vnl.com>  Sat, 28 Aug 2004 23:44:43 +0100
+
+libdma-fsm-perl (0.02-2) unstable; urgency=low
+
+  * Added TSTL action. This gets a new lexeme if the current
+    one is empty; otherwise it continues using the current
+    lexeme.
+
+ -- Dale Amon <amon@vnl.com>  Wed, 25 Aug 2004 11:15:09 +0100
+
+libdma-fsm-perl (0.02-1) unstable; urgency=low
+
+  * Modified so that lexical analyzer functions must return a two
+    element list, ($bool, $lexeme), where the boolean is the same
+    as the previous true/false return and the $lexeme allows the
+    parser to absorb part of an input lexeme and return the rest for
+    further processing.
+
+ -- Dale Amon <amon@vnl.com>  Tue, 24 Aug 2004 16:31:03 +0100
+
+libdma-fsm-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@vnl.com>  Fri, 21 Aug 2004 17:53:00 +0100
+
+libdma-isodate-perl (0.01-5) unstable; urgency=low
+
+  * Accidental second build...
+
+ -- Dale Amon <amon@vnl.com>  Sat,  2 Sep 2006 00:50:16 +0100
+
+libdma-isodate-perl (0.01-4) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@vnl.com>  Sat,  2 Sep 2006 00:48:50 +0100
+
+libdma-isodate-perl (0.01-3) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@vnl.com>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdma-isodate-perl (0.01-2) unstable; urgency=low
+
+  * Inserted a copy of the Class documentation from the Specification.
+
+ -- Dale Amon <amon@vnl.com>  Sat, 28 Aug 2004 23:18:16 +0100
+
+libdma-isodate-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@vnl.com>  Thu, 12 Aug 2004 13:02:00 +0100
+
+libdma-ldconfig-perl (0.01-2) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@vnl.com>  Sat,  2 Sep 2006 00:47:25 +0100
+
+libdma-ldconfig-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@vnl.com>  Fri, 5 Nov 2004 18:01:00 +0100
+
+libdma-version-perl (0.02-3) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@vnl.com>  Sat,  2 Sep 2006 00:44:26 +0100
+
+libdma-version-perl (0.02-2) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@vnl.com>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdma-version-perl (0.02-1) unstable; urgency=low
+
+  * Renamed Object parse method to setVersion; created Class
+    parse method just like the PageId one. Added docs from Specification.
+
+ -- Dale Amon <amon@vnl.com>  Sat, 28 Aug 2004 23:28:39 +0100
+
+libdma-version-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@vnl.com>  Thu, 12 Aug 2004 13:23:00 +0100
+

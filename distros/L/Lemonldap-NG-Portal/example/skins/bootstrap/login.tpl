@@ -53,6 +53,7 @@
             <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
             <input type="hidden" name="timezone" />
             <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="key">" />
+            <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
             <TMPL_IF NAME="standardform">
               <TMPL_INCLUDE NAME="standardform.tpl">
@@ -70,16 +71,18 @@
 
               <div class="form">
 
-                <TMPL_IF NAME="module">
-                  <img src="<TMPL_VAR NAME="SKIN_PATH">/common/<TMPL_VAR NAME="module">.png" alt="<TMPL_VAR NAME="module">" class="img-thumbnail" />
+                <TMPL_IF NAME="logoFile">
+                  <img src="<TMPL_VAR NAME="SKIN_PATH">/common/<TMPL_VAR NAME="logoFile">" alt="<TMPL_VAR NAME="module">" class="img-thumbnail" />
                 </TMPL_IF>
 
                 <TMPL_INCLUDE NAME="checklogins.tpl">
 
+                <div class="buttons">
                   <button type="submit" class="btn btn-success">
                     <span class="glyphicon glyphicon-log-in"></span>
                     <lang en="Connect" fr="Se connecter" />
                   </button>
+                </div>
 
               </div>
 
@@ -105,6 +108,7 @@
       <TMPL_VAR NAME="HIDDEN_INPUTS">
       <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <input type="hidden" name="timezone" />
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
       <TMPL_INCLUDE NAME="standardform.tpl">
     </form>
 
@@ -120,6 +124,7 @@
       <TMPL_VAR NAME="HIDDEN_INPUTS">
       <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <input type="hidden" name="timezone" />
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
       <TMPL_INCLUDE NAME="openidform.tpl">
     </form>
     </div>
@@ -134,6 +139,7 @@
       <TMPL_VAR NAME="HIDDEN_INPUTS">
       <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <input type="hidden" name="timezone" />
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
       <TMPL_INCLUDE NAME="yubikeyform.tpl">
     </form>
     </div>
@@ -148,6 +154,7 @@
       <TMPL_VAR NAME="HIDDEN_INPUTS">
       <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <input type="hidden" name="timezone" />
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
       <div class="form">
       <TMPL_IF NAME="module">
@@ -156,10 +163,12 @@
 
       <TMPL_INCLUDE NAME="checklogins.tpl">
 
+      <div class="buttons">
       <button type="submit" class="btn btn-success">
         <span class="glyphicon glyphicon-log-in"></span>&nbsp;
         <lang en="Connect" fr="Se connecter" />
       </button>
+      </div>
       </div>
 
     </form>

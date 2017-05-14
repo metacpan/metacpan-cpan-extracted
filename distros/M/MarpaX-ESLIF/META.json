@@ -120,15 +120,15 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v2.0.4"
+         "version" : "v2.0.10"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v2.0.4"
+         "version" : "v2.0.10"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v2.0.4"
+         "version" : "v2.0.10"
       }
    },
    "release_status" : "stable",
@@ -144,7 +144,7 @@
          "web" : "https://github.com/jddurand/c-marpaeslif"
       }
    },
-   "version" : "2.0.4",
+   "version" : "2.0.10",
    "x_authority" : "cpan:JDDPAUSE",
    "x_contributors" : [
       "Jeffrey Kegler <jeffreykegler@jeffreykegler.com>"

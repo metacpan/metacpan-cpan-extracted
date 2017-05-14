@@ -1,0 +1,490 @@
+<<if: ZXIDBOOK>>
+<<else: >>Apache Setup Receipe for ZXID
+#############################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<class: article!a4paper!!ZXID Apache 01>>
+<<cvsid: $Id: apache.pd,v 1.22 2009-11-14 22:44:43 sampo Exp $>>
+
+While I am not a guru in Apache set ups and others will do this much
+better, not to speak of the official documentation, I still find that
+to ensure initial success of the new installer, some help may be in order.
+
+Consider this receipe only one of many possible setups and not
+necessarily even the best. The receipe worked for me in August 2006. If
+you come much later, things may have changed.
+
+This Apache setup aims to illustrate
+
+* CGI invocation of zxid C binary
+* mod_php5 invocation of zxid.php
+* mod_perl invocation of zxid.pl
+* CGI invocation of zxid.pl (alternative to mod_perl)
+* Support mod_auth_saml
+
+If you are looking for mod_auth_saml specific instructions,
+please read <<link:../mod_auth_saml/mod_auth_saml.html: Apache with mod_auth_saml Receipe>>.
+
+For more general information about ZXID.org compilation or APIs start
+reading in <<link:../html/README.zxid.html: README.zxid>>.
+
+1 Architectural Overview
+========================
+
+<<doc-inc.pd>>
+<<htmlpreamble: <title>Apache Setup Receipe for ZXID</title><link type="text/css" rel=stylesheet href="zx.css"><body><h1>Apache Setup Receipe for ZXID</h1> >>
+
+<<dia: arch-zxid-apache:bg,fg: ZXID, via mod_auth_saml, adds to Apache httpd Single Sign-On (SSO), Attribute Broker, and XACML PEP Capabilities that can be used by existing static and dynamic content without alteration.>>
+<<newpage: >>
+
+2 Compiling from Source
+=======================
+
+<<fi: >>
+
+You may also install from binaries, but I feel the compilation
+route is only reliable way to have reproducible results.
+
+2.1 apache httpd-2.2.3
+----------------------
+
+Download from: http://httpd.apache.org/download.cgi
+
+For PHP it is critical that --enable-so is supplied as that seems to
+be the only documented (supported?) installation route.  PHP
+recommends (Aug 2006) against using Apache 2 threaded MPM. My stock
+perl does not support threads either, I guess the prefork MPM route is
+fine.
+
+  tar xvjf /t/httpd-2.2.3.tar.bz2
+  ./configure --prefix=/apps/apache/2.2.3 --with-mpm=prefork --enable-so --enable-cgi --disable-cgid --enable-ssl --with-ssl=/apps/openssl/std
+
+I got following configure error
+
+  checking for SSL_set_cert_store... no
+
+This seems to be documented as bug http://issues.apache.org/bugzilla/show_bug.cgi?id=39913,
+but no solution was known as of Aug 2006. Further investigation shows
+that httpd-2.2.3/modules/ssl/README has following
+
+   o per-directory SSLCACertificate{File,Path} is now thread-safe but
+     requires SSL_set_cert_store patch to OpenSSL
+
+but fails to provide the patch or give any hint as to how to obtain it.
+
+Apparently hacking the configure script to remove all references to
+the offending variable in question is the only way forward. Look at
+config.log to identify the places to hack. Iterate ./configure script
+until it works and then say
+
+  make
+
+A couple of linking failures dues to missing -lz happen. Just run the
+links manually, supplying the -lz flag. Sheesh, apache is supposed to be
+stable software.
+
+  make install
+
+2.2 perl-5.8.8
+--------------
+
+From http://ftp.funet.fi/pub/CPAN/src/
+
+This can be usually skipped if your stock perl is 5.8 series and nonthreaded
+and you are happy with prefork MPM. Try
+
+  perl -V:useithreads -V:usemultiplicity
+
+If it says
+
+  useithreads='undef';
+  usemultiplicity='undef';
+
+then its fine for using prefork MPM.
+
+To compile perl you would
+
+  ./Configure -prefix=/apps/perl/5.8.8 -des -Dusethreads -Doptimize='-g' -Dusedevel
+  make && make test && make install
+
+2.3 mod_perl-2.0.4
+------------------
+
+From http://perl.apache.org/dist/
+
+Install instructions: http://perl.apache.org/docs/2.0/user/install/install.html
+
+tar xvf /t/mod_perl-2.0.4.tar.gz
+
+  perl Makefile.PL MP_APXS=/apps/apache/std/bin/apxs MP_DEBUG=1
+  make
+  make test
+  # Seems to fail because wants to create core files and I do not let it to!
+  make install
+  # installs stuff to perl lib directory as well as apache modules directory
+
+You can read futher at http://perl.apache.org/docs/2.0/user/intro/start_fast.html
+
+<<ignore:
+[Sat Nov 14 12:13:55 2009] [error] [client 127.0.0.1] failed to resolve handler `ModPerl::Registry': Can't locate ModPerl/Registry.pm in @INC (@INC contains: /usr/local/lib/perl5/5.8.4/i686-linux /usr/local/lib/perl5/5.8.4 /usr/local/lib/perl5/site_perl/5.8.4/i686-linux /usr/local/lib/perl5/site_perl/5.8.4 /usr/local/lib/perl5/site_perl . /apps/apache/2.2.3) at (eval 2) line 3.\n
+>>
+
+2.4 php-5.1.6
+-------------
+
+From php.net
+
+Install instructions: http://www.php.net/manual/en/install.unix.apache2.php
+
+  ./configure --prefix=/apps/php/5.1.6 --with-apxs2=/apps/apache/std/bin/apxs --with-openssl=/apps/openssl/std --with-zlib --with-curl=/apps --enable-soap --with-libxml-dir=/apps
+  make
+  make install
+
+2.5 php-5.3.6
+-------------
+
+  EXTRA_LIBS="-lresolv" ./configure --prefix=/apps/php/5.3.6 --with-apxs2=/apps/apache/std/bin/apxs --with-openssl=/apps/openssl/std --with-zlib --with-curl=/apps --enable-soap --with-libxml-dir=/apps -with-mysql=shared
+  make
+  make install
+
+/home/navarrb/CPHP/source/php-5.3.1/ext/standard/dns.c:418: undefined reference to `__dn_expand'
+# Add -lresolv:  export EXTRA_LIBS="-lresolv" 
+
+3 Configuring Apache
+====================
+
+These configuration steps are to enable all ZXID Apache related functionality,
+including mod_auth_saml, mod_perl, mod_php, and CGI.
+
+* Allow zxid to be triggered as CGI (the trick is SetHandler inside <Location>)
+* Allow zxid.pl to be triggered by mod_perl. The trick is
+    AddHandler perl-script .pl
+    PerlResponseHandler ModPerl::Registry
+    PerlOptions +ParseHeaders
+* Allow zxid.php to be triggered by mod_php5. Trick is
+    AddType application/x-httpd-php .php .phtml
+* Enable the mod_auth_saml for some directories
+* Set port number and domain
+* Enable SSL operation
+
+Once you have edited the Apache config files, you say
+
+  /apps/apache/std/bin/apachectl restart
+  tail -f tmp/err-httpd &   # Apache errorlog, per configuration
+
+to get apache running. Below are the edits I applied to my apache
+config files (in /apps/apache/std/conf directory if you followed
+this receipe). It's a shame the apache config wizardry is so
+bloated that the diff does not fit on one page. Also distributions
+with an attitude tend to complicate apache configuration files
+further by pulverizing them in many files over many directories.
+Some of the known distribution locations
+
+  /etc/apache2/sites-available/default   # Ubuntu ca. 2009
+
+<<logoutput:
+diff -u /apps/apache/std/conf/httpd.conf.orig /apps/apache/std/conf/httpd.conf
+--- httpd.conf.orig     2006-08-31 19:23:42.000000000 -0400
++++ httpd.conf  2006-08-31 20:31:17.000000000 -0400
+@@ -37,7 +37,8 @@
+ # prevent Apache from glomming onto all bound IP addresses.
+ #
+ #Listen 12.34.56.78:80
+-Listen 80
++##Listen 80
++Listen 8080
+ 
+ #
+ # Dynamic Shared Object (DSO) Support
+@@ -51,6 +52,8 @@
+ # Example:
+ # LoadModule foo_module modules/mod_foo.so
+ #
++LoadModule perl_module modules/mod_perl.so
++LoadModule php5_module modules/libphp5.so
+ 
+ <IfModule !mpm_netware_module>
+ #
+@@ -98,7 +101,8 @@
+ # documents. By default, all requests are taken from this directory, but
+ # symbolic links and aliases may be used to point to other locations.
+ #
+-DocumentRoot "/apps/apache/2.2.3/htdocs"
++##DocumentRoot "/apps/apache/2.2.3/htdocs"
++DocumentRoot "/home/sampo/zxid"
+ 
+ #
+ # Each directory to which Apache has access can be configured with respect
+@@ -125,7 +129,8 @@
+ #
+ # This should be changed to whatever you set DocumentRoot to.
+ #
+-<Directory "/apps/apache/2.2.3/htdocs">
++##<Directory "/apps/apache/2.2.3/htdocs">
++<Directory "/home/sampo/zxid">
+     #
+     # Possible values for the Options directive are "None", "All",
+     # or any combination of:
+@@ -138,7 +143,13 @@
+     # http://httpd.apache.org/docs/2.2/mod/core.html#options
+     # for more information.
+     #
+-    Options Indexes FollowSymLinks
++    ##Options Indexes FollowSymLinks
++    Options All
++
++    AddHandler cgi-script .cgi
++    AddHandler perl-script .pl
++    PerlResponseHandler ModPerl::Registry
++    PerlOptions +ParseHeaders
+ 
+     #
+     # AllowOverride controls what directives may be placed in .htaccess files.
+@@ -155,6 +166,10 @@
+ 
+ </Directory>
+ 
++<Location "/zxid">
++SetHandler cgi-script
++</Location>
++
+ #
+ # DirectoryIndex: sets the file that Apache will serve if a directory
+ # is requested.
+@@ -180,14 +195,16 @@
+ # logged here.  If you *do* define an error logfile for a <VirtualHost>
+ # container, that host's errors will be logged there and not here.
+ #
+-ErrorLog logs/error_log
++##ErrorLog logs/error_log
++ErrorLog /home/sampo/zxid/tmp/err-httpd
+ 
+ #
+ # LogLevel: Control the number of messages logged to the error_log.
+ # Possible values include: debug, info, notice, warn, error, crit,
+ # alert, emerg.
+ #
+-LogLevel warn
++##LogLevel warn
++LogLevel debug
+ 
+ <IfModule log_config_module>
+     #
+@@ -209,13 +226,14 @@
+     # define per-<VirtualHost> access logfiles, transactions will be
+     # logged therein and *not* in this file.
+     #
+-    CustomLog logs/access_log common
++    ##CustomLog logs/access_log common
+ 
+     #
+     # If you prefer a logfile with access, agent, and referer information
+     # (Combined Logfile Format) you can use the following directive.
+     #
+     #CustomLog logs/access_log combined
++    CustomLog /home/sampo/zxid/tmp/log.httpd combined
+ </IfModule>
+ 
+ <IfModule alias_module>
+@@ -245,7 +263,7 @@
+     # client.  The same rules about trailing "/" apply to ScriptAlias
+     # directives as to Alias.
+     #
+-    ScriptAlias /cgi-bin/ "/apps/apache/2.2.3/cgi-bin/"
++    ##ScriptAlias /cgi-bin/ "/apps/apache/2.2.3/cgi-bin/"
+ 
+ </IfModule>
+ 
+@@ -303,7 +321,7 @@
+     #
+     AddType application/x-compress .Z
+     AddType application/x-gzip .gz .tgz
+-
++AddType application/x-httpd-php .php .phtml
+     #
+     # AddHandler allows you to map certain file extensions to "handlers":
+     # actions unrelated to filetype. These can be either built into the server
+@@ -394,7 +412,7 @@
+ #Include conf/extra/httpd-default.conf
+ 
+ # Secure (SSL/TLS) connections
+-#Include conf/extra/httpd-ssl.conf
++Include conf/extra/httpd-ssl.conf
+ #
+ # Note: The following must must be present to support
+ #       starting without SSL on platforms with no /dev/random equivalent
+
+diff -u httpd-ssl.conf.orig httpd-ssl.conf
+--- httpd-ssl.conf~     2006-08-31 18:24:09.000000000 -0400
++++ httpd-ssl.conf      2006-08-31 19:35:53.000000000 -0400
+@@ -22,9 +22,9 @@
+ # Manual for more details.
+ #
+ #SSLRandomSeed startup file:/dev/random  512
+-#SSLRandomSeed startup file:/dev/urandom 512
++SSLRandomSeed startup file:/dev/urandom 512
+ #SSLRandomSeed connect file:/dev/random  512
+-#SSLRandomSeed connect file:/dev/urandom 512
++SSLRandomSeed connect file:/dev/urandom 512
+ 
+ 
+ #
+@@ -34,7 +34,7 @@
+ # Note: Configurations that use IPv6 but not IPv4-mapped addresses need two
+ #       Listen directives: "Listen [::]:443" and "Listen 0.0.0.0:443"
+ #
+-Listen 443
++Listen 5443
+ 
+ ##
+ ##  SSL Global Context
+@@ -71,14 +71,16 @@
+ ## SSL Virtual Host Context
+ ##
+ 
+-<VirtualHost _default_:443>
++<VirtualHost _default_:5443>
+ 
+ #   General setup for the virtual host
+-DocumentRoot "/apps/apache/2.2.3/htdocs"
+-ServerName www.example.com:443
++##DocumentRoot "/apps/apache/2.2.3/htdocs"
++DocumentRoot "/home/sampo/zxid"
++##ServerName www.example.com:443
++ServerName sp1.zxidsp.org:443
+ ServerAdmin you@example.com
+-ErrorLog /apps/apache/2.2.3/logs/error_log
+-TransferLog /apps/apache/2.2.3/logs/access_log
++##ErrorLog /apps/apache/2.2.3/logs/error_log
++##TransferLog /apps/apache/2.2.3/logs/access_log
+ 
+ #   SSL Engine Switch:
+ #   Enable/Disable SSL for this virtual host.
+@@ -96,15 +98,16 @@
+ #   in mind that if you have both an RSA and a DSA certificate you
+ #   can configure both in parallel (to also allow the use of DSA
+ #   ciphers, etc.)
+-SSLCertificateFile /apps/apache/2.2.3/conf/server.crt
++##SSLCertificateFile /apps/apache/2.2.3/conf/server.crt
+ #SSLCertificateFile /apps/apache/2.2.3/conf/server-dsa.crt
++SSLCertificateFile /home/sampo/zxid/zxid.pem
+ 
+ #   Server Private Key:
+ #   If the key is not combined with the certificate, use this
+ #   directive to point at the key file.  Keep in mind that if
+ #   you've both a RSA and a DSA private key you can configure
+ #   both in parallel (to also allow the use of DSA ciphers, etc.)
+-SSLCertificateKeyFile /apps/apache/2.2.3/conf/server.key
++##SSLCertificateKeyFile /apps/apache/2.2.3/conf/server.key
+ #SSLCertificateKeyFile /apps/apache/2.2.3/conf/server-dsa.key
+ 
+ #   Server Certificate Chain:
+@@ -225,7 +228,7 @@
+ #   Per-Server Logging:
+ #   The home of a custom SSL log file. Use this when you want a
+ #   compact non-error SSL logfile on a virtual host basis.
+-CustomLog /apps/apache/2.2.3/logs/ssl_request_log \
+-          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
++#CustomLog /apps/apache/2.2.3/logs/ssl_request_log \
++#          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+ 
+ </VirtualHost>                                  
+>>
+
+4 Trying Out Apache
+===================
+
+Check sp1.zxidsp.org resolves
+
+  ping sp1.zxidsp.org
+
+Start Apache httpd using
+
+  apachectl restart
+
+or possibly some other distribution dependent way
+
+  apache2ctl restart
+  sudo invoke-rc.d apache2 restart   # Ubuntu ca. 2009
+
+<<ignore:
+/apps/apache/std/bin/apachectl restart
+https://sp1.zxidsp.org:5443/README.zxid
+>>
+
+At this stage you should observe carefully for any unresolved symbols
+or missing shared libraries (.so) (or dynamic link libraries, DLLs).
+If you see any, you need to resolve them, e.g. by setting LD_LIBRARY_PATH
+environment variable.
+
+Now, use browser to access following URLs to try your accomplishments out:
+
+1. https://sp1.zxidsp.org:5443/README.zxid tests (tests simple file access
+   and that the server works at all)
+2. https://sp1.zxidsp.org:5443/zxid?o=E (tests the SP CGI written in C)
+3. https://sp1.zxidsp.org:5443/zxid.pl?o=E (tests the SP mod_perl way)
+4. https://sp1.zxidsp.org:5443/zxid.php?o=E (tests the SP mod_php5 way)
+5. https://sp1.zxidsp.org:5443/protected/content.txt
+
+If any of the above does not work, be sure to inspect the apache
+logs (be sure to replace /home/sampo with whatever makes sense):
+
+  tail -f /home/sampo/zxid/tmp/err-httpd
+
+If you can't get any access at all, be sure you do not have the mini_httpd
+or some other process running on the same port.
+
+Also make sure the execute permission is set for any CGI scripts, e.g:
+
+  chmod a+x zxid.pl
+
+5 Debugging Apache Cores
+========================
+
+mod_auth_saml, mod_php, or mod_perl with Net::SAML can crash in C
+code. That can be debugged using this receipe. If using all three
+simultaneously, beware of version discrepancy: a newer module can pick
+up libzxid symbols from an older module. This leads to rather
+confusing "warning: Source file is more recent than executable."
+
+<<code:
+tail -f tmp/log.httpd &
+tail -f tmp/err-httpd &
+ulimit -c unlimited
+/apps/apache/std/bin/httpd -X    # Run Apache in single threaded debug mode
+gdb /apps/apache/std/bin/httpd /d/sampo/zxid/core
+>>
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+7 Conclusion
+============
+
+If you have any trouble, please do not hesitate to contact the author.
+
+<<htmlpreamble: <title>Apache Setup Receipe for ZXID</title><body bgcolor="#330033" text="#ffaaff" link="#ffddff" vlink="#aa44aa" alink="#ffffff"><font face=sans><h1>Apache Setup Receipe for ZXID</h1> >>
+<<EOF: >>
+
+grep ap_internal_redirect * */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*
+
+Apparent order of processing in Apache httpd-2.2.3
+
+tail -f tmp/log.httpd &
+tail -f tmp/err-httpd &
+/apps/apache/std/bin/apachectl restart
+https://sp1.zxidsp.org:5443/protected/content.txt
+https://s-idp.liberty-iop.org:8881/N
+
+ulimit -c unlimited
+/apps/apache/std/bin/httpd -X    # Run Apache in single threaded debug mode
+gdb /apps/apache/std/bin/httpd /d/sampo/zxid/core
+  
+Apache and cores:
+* http://www.cyberciti.biz/tips/configure-apache-web-server-for-core-dump.html
+* CoreDumpDirectory /tmp/cores
+* cat /proc/sys/kernel/core_pattern
+
+#SAMLTrustToken domain ENTERPRISE_  # Import attributes from an enterprise trust token
+
+
+<<fi: >>

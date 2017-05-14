@@ -1,5 +1,5 @@
 package Net::Stripe::Refund;
-$Net::Stripe::Refund::VERSION = '0.32';
+$Net::Stripe::Refund::VERSION = '0.33';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -15,7 +15,17 @@ has 'charge'              => (is => 'ro', isa => 'Maybe[Str]');
 has 'metadata'            => (is => 'ro', isa => 'Maybe[HashRef]');
 has 'reason'              => (is => 'ro', isa => 'Maybe[Str]');
 has 'receipt_number'      => (is => 'ro', isa => 'Maybe[Str]');
-has 'description'         => (is => 'ro', isa => 'Maybe[Str]');
+has 'status'              => (is => 'ro', isa => 'Maybe[Str]');
+has 'description'         => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    default => sub {
+        warn
+            "Use of Net::Stripe::Refund->description is deprecated and will be removed in the next Net::Stripe release";
+        return;
+    }
+);
 
 # Create only
 has 'refund_application_fee' => (is => 'ro', isa => 'Maybe[Bool|Object]');
@@ -42,7 +52,7 @@ Net::Stripe::Refund - represent a Refund object from Stripe
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 ATTRIBUTES
 

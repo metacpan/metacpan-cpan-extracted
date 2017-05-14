@@ -2,7 +2,6 @@ package Sidef::Perl::Perl {
 
     use 5.016;
     use Sidef::Types::Number::Number;
-    use Scalar::Util qw();
 
     sub new {
         bless {}, __PACKAGE__;
@@ -54,8 +53,7 @@ package Sidef::Perl::Perl {
             if (   $ref eq 'Math::BigFloat'
                 or $ref eq 'Math::BigInt'
                 or $ref eq 'Math::BigRat'
-                or $ref eq 'Math::BigInt::Lite'
-            ) {
+                or $ref eq 'Math::BigInt::Lite') {
                 return Sidef::Types::Number::Number->new($val->bstr);
             }
 
@@ -63,11 +61,10 @@ package Sidef::Perl::Perl {
                 return Sidef::Types::Number::Complex->new($val->Re, $val->Im);
             }
 
-            if ($ref eq 'Math::MPFR'
-            or $ref eq 'Math::GMPz'
-            or $ref eq 'Math::GMPq'
-            or $ref eq 'Math::MPC'
-            ) {
+            if (   $ref eq 'Math::MPFR'
+                or $ref eq 'Math::GMPz'
+                or $ref eq 'Math::GMPq'
+                or $ref eq 'Math::MPC') {
                 return Sidef::Types::Number::Number->new($val);
             }
 

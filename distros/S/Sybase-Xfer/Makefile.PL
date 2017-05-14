@@ -31,7 +31,7 @@ print "\n";
 WriteMakefile(NAME           => 'Sybase::Xfer',
               VERSION_FROM   => 'Xfer.pm',
               EXE_FILES      => ['sybxfer'],
-              PREREQ_PM      => { Sybase::DBlib => 0, 
+              PREREQ_PM      => { Sybase::CTlib => 0,
                                   Tie::IxHash   => 0,
                                   Getopt::Long  => 0 },
              )          

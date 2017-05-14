@@ -1,0 +1,18 @@
+Revision history for Perlanet-DBIx-Class
+
+0.02 Tue 8 Jun, 2010
+
+    * Added roles that post and feed result sets must consume:
+        - Perlanet::DBIx::Class::Role::FeedResultSet
+        - Perlanet::DBIx::Class::Role::PostResultSet
+
+    * Added automatic de-duplication of posts
+
+      The PostResultSet role now has a `has_post' method which is used
+      to determine if a post has already been saved to the database. You
+      are welcome to exclude this method and provide your own
+      implementation.
+
+0.01 Tue 8 Jun, 2010
+
+    * Initial version - very much subject to change

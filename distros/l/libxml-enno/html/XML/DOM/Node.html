@@ -381,13 +381,17 @@ Parameter entity references (e.g. %ent;) are not expanded.
 </DL><P>Each XML::DOM::Node generates the appropriate SAX callbacks (for the
 appropriate SAX handler.) Different SAX handlers can be plugged in to
 accomplish different things, e.g. <A HREF="../Checker.html">XML::Checker</A> would check the node 
-(currently only Document and Element nodes are supported), <A HREF="PerlSAX.html">XML::DOM::PerlSAX</A>
+(currently only Document and Element nodes are supported), <A HREF="../Handler/BuildDOM.html">XML::Handler::BuildDOM</A>
 would create a new DOM subtree (thereby, in essence, copying the Node)
 and in the near future, XML::Writer could print the node.
 All Perl SAX related work is still in flux, so this interface may change a 
 little.
 
 <P>See PerlSAX for the description of the SAX interface.
+
+<DT><A NAME="check_checker_"><STRONG><P>check ( [$checker] )
+
+</STRONG></A><DD>See descriptions for check() in <A HREF="Document.html">XML::DOM::Document</A> and <A HREF="Element.html">XML::DOM::Element</A>.
 
 <DT><A NAME="xql_XQL_OPTIONS_"><STRONG><P>xql ( @XQL_OPTIONS )
 
@@ -409,4 +413,9 @@ the 'Expr' keyword, so:
 </PRE><P>See <A HREF="../XQL/Query.html">XML::XQL::Query</A> for other available XQL_OPTIONS.
 See <A HREF="../XQL.html">XML::XQL</A> and <A HREF="../XQL/Tutorial.html">XML::XQL::Tutorial</A> for more info.
 
-</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:30 1999</FONT></I></BODY></HTML>
+<DT><A NAME="isHidden_"><STRONG><P>isHidden ()
+
+</STRONG></A><DD>Whether the node is hidden.
+See <A HREF="../DOM.html#_Hidden_Nodes_">Hidden Nodes</A> for details.
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:26 2000</FONT></I></BODY></HTML>

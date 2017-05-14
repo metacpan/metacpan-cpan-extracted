@@ -4,6 +4,7 @@ build_requires:
   Test::Base: 0.52
   Test::More: 0.42
   YAML: 0
+  YAML::Loader: 0
 distribution_type: module
 generated_by: Module::Install version 0.640
 license: perl
@@ -18,24 +19,34 @@ recommends:
   Config::INI::Simple: 0
   DBIx::Class::Schema: 0
   DB_File: 0
+  Data::ICal: 0
   Data::Serializer: 0
   Date::Parse: 0
   DateTime::Format::Epoch: 0
+  DateTime::Format::ICal: 0
+  DateTime::Format::Japanese: 0
   DateTime::Locale: 0
   Email::Address: 0
-  Encode::Detect: 0
+  Encode::Detect: 1
   File::Copy::Recursive: 0
+  File::Grep: 0
   Flickr::API: 0
-  HTML::RSSAutodiscovery: 0
+  HTML::FormatText: 0
   HTML::ResolveLink: 0.02
   HTML::Scrubber: 0
+  HTML::Tidy: 1.07
+  HTML::TokeParser: 0
+  HTML::TreeBuilder: 0
   HTML::TreeBuilder::XPath: 0
   HTTP::Cookies::Mozilla: 0
   Hatena::Keyword: 0
+  IP::Country: 0
   IPC::Run: 0
   Image::Info: 0
   JSON::Syck: 0.1
   KinoSearch: 0
+  Lingua::EN::Summarize: 0
+  Lingua::JA::Summarize::Extract: 0
   Lingua::ZH::HanDetect: 0
   List::Util: 0
   Locale::Language: 0
@@ -70,13 +81,16 @@ recommends:
   Text::Kakasi: 0
   Text::Language::Guess: 0
   Text::Markdown: 0
+  Text::Original: 0
   Text::WrapI18N: 0
   Time::Duration::Parse: 0
   URI::Find: 0
+  Unicode::Normalize: 0
   WWW::Babelfish: 0
   WWW::Mechanize: 0
-  WWW::Mixi: 0.46
+  WWW::Mixi: 0.48
   WebService::Bloglines: 0.11
+  WebService::YouTube: 0
   XML::Atom: 0.20
   XML::FOAF: 0
   XML::Feed: 0.09
@@ -85,14 +99,17 @@ recommends:
   XML::RSS::Liberal: 0
   XMLRPC::Lite: 0
   Xango: 1.04
+  YAML::Syck: 0
 requires: 
   Cache::Cache: 1.04
   Class::Accessor::Fast: 0
   Date::Parse: 0
-  DateTime: 0.29
+  DateTime: 0.35
   DateTime::Format::Mail: 0
   DateTime::Format::Strptime: 0
   DateTime::Format::W3CDTF: 0
+  DateTime::Locale: 0.32
+  DateTime::TimeZone: 0.56
   Digest::MD5: 0
   Encode: 2.1
   File::Find::Rule: 0
@@ -112,8 +129,8 @@ requires:
   XML::Atom: 0.23
   XML::Feed: 0.12
   XML::LibXML: 0
-  XML::RSS::LibXML: 0.2
+  XML::RSS::LibXML: 0.23
   YAML: 0.39
   perl: 5.8.1
 tests: t/*.t t/*/*.t t/*/*/*.t
-version: 0.7.11
+version: 0.7.17

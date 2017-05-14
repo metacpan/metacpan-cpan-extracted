@@ -1,0 +1,23 @@
+---
+abstract: 'Object model for Swagger schema files'
+author:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+build_requires:
+  File::Slurp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Swagger-Schema
+requires:
+  MooseX::DataModel: '0'
+resources:
+  bugtracker: https://github.com/pplu/swagger-schema-perl/issues
+  repository: https://github.com/pplu/swagger-schema-perl.git
+version: '1.00'
+x_serialization_backend: 'YAML::Tiny version 1.69'

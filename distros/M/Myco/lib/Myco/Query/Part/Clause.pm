@@ -1,7 +1,7 @@
 package Myco::Query::Part::Clause;
 
 ###############################################################################
-# $Id: Clause.pm,v 1.1.1.1 2004/11/22 19:16:02 owensc Exp $
+# $Id: Clause.pm,v 1.6 2006/03/19 19:34:08 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ###############################################################################
@@ -10,42 +10,34 @@ package Myco::Query::Part::Clause;
 
 Myco::Query::Part::Clause - a Myco entity class
 
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
-
 =head1 SYNOPSIS
 
   use Myco;
 
-  # Constructors. See Myco::Base::Entity for more.
-  my $obj = Myco::Query::Part::Clause->new;
+  # Constructors. See Myco::Entity for more.
+  my $clause = Myco::Query::Part::Clause->new( remote => '$person_remote_',
+                                               attr => 'last_name',
+                                               oper => 'eq',
+                                               param => 'Hancock' );
 
-  # Accessors.
-  my $value = $obj->get_fooattrib;
-  $obj->set_fooattrib($value);
+  my $stringified_clause = $clause->get_clause;
 
-  $obj->save;
-  $obj->destroy;
+  print "OK\n" if $stringified_clause eq
+    '$person_remote_->{last_name} eq Hancock';
+
+  # On second thought, I want anyone _not_ a 'Hancock'...
+  $clause->set_oper( 'ne' );
+
+  print "Better now\n" if $clause->get_clause =~ /ne Hancock$/;
 
 =head1 DESCRIPTION
 
-Blah blah blah... Blah blah blah... Blah blah blah...
-Blah blah blah blah blah... Blah blah...
+The clause is the basic building block of a Myco query. It encapsulates the
+perl-namespace remote object name (in the example above '$person_remote_',
+the object attribute name that our logic is operating on, the operator,
+and the paramater we're using. Full support for all types of parameters is
+offered, including scalars, objects, sets, etc. See L<Tangram> for an
+exhaustive discussion of these, as well as how to design a query.
 
 =cut
 
@@ -56,7 +48,7 @@ Blah blah blah blah blah... Blah blah...
 use warnings;
 use strict;
 use Myco::Exceptions;
-use Myco::Base::Entity::Meta;
+use Myco::Entity::Meta;
 
 ##############################################################################
 # Programatic Dependencies
@@ -123,7 +115,7 @@ our $opers = { 'eq' => { label => 'equal (string)',
 # Inheritance & Introspection
 ##############################################################################
 use base qw( Myco::Query::Part );
-my $md = Myco::Base::Entity::Meta->new
+my $md = Myco::Entity::Meta->new
   ( name => __PACKAGE__,
     ui => {
            displayname => sub {
@@ -150,7 +142,7 @@ my $md = Myco::Base::Entity::Meta->new
 =head1 COMMON ENTITY INTERFACE
 
 Constructor, accessors, and other methods -- as inherited from
-Myco::Base::Entity.
+Myco::Entity.
 
 =cut
 
@@ -269,11 +261,11 @@ $md->add_attribute( name => 'param',
 
 =head2 get_clause
 
-  Myco::Query::Part::Clause->get_clause;
+  my $stringified_clause = $clause->get_clause;
 
-Concatenates into a string cluase the atomic parts of a Myco::Query::Part::Clause.
-Accepts an argument a hash of parameters that are marked as optional in the
-::Query 'params' attribute.
+Concatenates into a string clause the atomic parts of a
+Myco::Query::Part::Clause. Accepts as an argument a hash of parameters that
+are marked as optional in the Myco::Query 'params' attribute.
 
 =cut
 
@@ -292,10 +284,9 @@ sub get_clause {
     # Abort right off if param looks like a remote variable name but isn't in
     # the remotes hash.
     my $param_isa_remote = $param =~ /^\$.*/;
-    # NO NEED TO BE FASCIST HERE
-#    Myco::Exception::Query::Clause->throw
-#        ( error => "param looks like a remote variable but isn't in the remotes hash - line ".__LINE__.': '.__PACKAGE__ )
-#          if $param_isa_remote && ! exists $remotes->{$param};
+    Myco::Exception::Query::Clause->throw
+        ( error => "param looks like a remote variable but isn't in the remotes hash - line ".__LINE__.': '.__PACKAGE__ )
+          if $param_isa_remote && ! exists $remotes->{$param};
 
     # Check if oper is an operator or a method
     my $isa_oper = $opers->{$oper}->{oper_meth} eq 'oper';
@@ -345,7 +336,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -354,10 +345,10 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Myco::Query::Part::Clause::Test|Myco::Query::Part::Clause::Test>,
-L<Myco::Base::Entity|Myco::Base::Entity>,
+L<Myco::Entity|Myco::Entity>,
 L<Myco|Myco>,
 L<Tangram|Tangram>,
 L<Class::Tangram|Class::Tangram>,
-L<mkentity|mkentity>
+L<myco-mkentity|mkentity>
 
 =cut

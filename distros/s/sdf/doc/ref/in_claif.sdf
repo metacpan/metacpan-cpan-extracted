@@ -1,0 +1,228 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Understanding Class Interfaces
+
+H2: Overview
+
+H3: General Syntax
+
+The general syntax for declaring and/or formatting a table of
+objects in the class is shown first.
+By convention, the filter is shown using the {{MAC:block}}
+and {{MAC:endblock}} macros, although filters can also be
+used with other macros, including {{MAC:include}} and {{MAC:execute}}.
+
+H3: Object Attributes
+
+The attributes supported for each class are listed in a table
+with the following columns:
+
+* {{Field}} - the field name
+* {{Category}} - {{key}}, {{mandatory}} or {{optional}}
+* {{Rule}} - the pattern, if any, used to validate the value.
+
+H2: Parameters
+
+H3: Overview
+
+All class filters support the set of parameters listed below.
+
+!block table
+Name       Type         Description
+data       boolean      define objects but do not display them
+cited      boolean      number these objects as the cited ones \
+                        (for [1] style references)
+root       string       string to prepend to Jump attribute, if any
+columns    string       comma-separated list of attributes to display in table
+style      string       table style to use (the default is {{plain}})
+compact    boolean      display in a compact table, (make cellpadding \
+                        and cellspacing both equal to zero)
+wide       boolean      use sidehead when formatting on paper
+headings   boolean      display the column headings
+where      string       filter the rows using the nominated expression
+sort       string       comma-separated list of columns to sort by
+colaligns  string       a comma-separated list of horizontal alignments  \
+                        values (Left, Center, Right) for columns; \
+                        alternatively, a single word containing the \
+                        letters L, C and R can be used for the value
+colvaligns string       a comma-separated list of vertical alignments  \
+                        values (Top, Middle, Bottom, Baseline) for columns; \
+                        alternatively, a single word containing the \
+                        letters T, M, B and L can be used for the value
+select     string       a comma-separated list of columns to display
+delete     string       a comma-separated list of columns to delete
+wrap       integer      number of logical rows to place on a physical row
+!endblock
+
+H2: Building the Columns
+
+H3: Using the columns Parameter
+
+The {{columns}} parameter is a comma-separated list of:
+
+E:   [tag":"]attribute["&"view]
+
+:where:
+
+* {{tag}} is a phrase style (or expression format)
+* {{attribute}} is the name of an attribute of the class
+* {{view}} is a view to apply to the object when looking up or
+  calculating that attribute (see {{SECT:Object Views}} below).
+
+To remember the syntax for applying an object view, think of C's
+bit-masking operator, &.
+
+Examples are given below:
+
+!block table
+Column          Description
+Code            output the Code attribute
+2:Code          output the Code using the 2 (emphasised) phrase style
+BUG:Code        output the Code using the BUG phrase style
+CONCISE:Date    output the Date attribute using the CONCISE format
+!endblock
+
+H3: Calculated Attributes
+
+Some class filters support calculated attributes, so the total set of
+attributes you can place in the {{columns}} parameter can be quite
+large. For example, for {{CLASS:references}}, an unknown attribute
+which is sequence of uppercase letters is assumed to be a file
+extension and the generated attribute is an icon providing a jump
+to that file, if any. For example, if a reference has a {{Jump}}
+attribute of {{xyz.html}}, then the PDF attribute is an image (pdf.gif)
+which provides a jump to {{xyz.pdf}}.
+
+H3: Object Views
+
+On some occasions, it can be very useful if the value placed in a column
+is a variation of an attribute, rather than the attribute itself.
+For example, the {{CLASS:references}} class supports an attribute
+called PS which is an image (postscript.gif) with a jump to {{xyz.ps}}
+(assuming the {{Jump}} attribute is {{xyz.html}}). But what if the
+PostScript file is in a different place to the HTML file? In this case,
+you need to use an object {{view}}.
+
+For example, the {{DOC: SDF Document Catalog}} provides access to
+SDF's documents in several formats:
+
+* PDF and PostScript, stored on SDF's web site
+* HTML, stored locally.
+
+This catalog was created by using the following {{columns}} parameter:
+
+>  columns='PDF&website,PS&website,DOC:Document,Date,Pages'
+
+where {{website}} is a file containing the following:
+
+>  prefix_Jump=http://www.mincom.com/mtr/sdf/
+
+The name of a view is either a file or a directory:
+
+* If the name of a view is a file, then the view
+  is loaded from that file. The format is a same
+  as a set of name-value pairs in an {{FMT:INI}} file.
+* If the name of a view is a directory, then a view
+  with {{prefix_Jump=name/}} is returned.
+
+Within a view, the parameters supported are:
+
+* {{prefix_xxx}} - prefix for attribute {{xxx}}
+* {{suffix_xxx}} - suffix for attribute {{xxx}}.
+
+Note: If it proves helpful, I'm happy to expand this list
+to include other types of parameters like {{default_xxx}} and
+{{value_xxx}}, say.
+
+
+H2: Filtering and Sorting
+
+H3: Filter Expressions
+
+The {{where}} attribute takes an expression which is evaluated
+for each record. Special symbols available are:
+
+!block table
+Symbol      Meaning
+$_          the current record
+$o{"xyz"}   the value of column xyz
+$var{"abc"} the value of variable abc
+!endblock
+
+For example:
+
+E: !define MODULE_CODE "XYZ"
+E: ...
+E: !include "../document.reg"; references; compact; \
+E:   where='$o{"Reference"} =~ /$var{"MODULE_CODE"}/'; \
+E:   columns="PS,REF:Reference,DOC:Document,CONCISE:Date"
+
+H3: Sorting
+
+{{sort}} takes a comma-separated list of column names to sort on.
+If no columns are specified, the data is sorted using
+all columns in the order in which they appear. All sorting
+is done alphabetically - numeric sorting is not supported.
+
+H3: Using the delete Parameter
+
+The {{delete}} parameter is particularly useful if you want to sort or
+filter a table (using the {{sort}} and {{where}} parameters, respectively)
+using columns which you don't want in the output. For example:
+
+!block verbatim
+  # Load the bug tracking module
+  !use "bugtrack"
+
+  # Display the open bugs, sorted by priority
+  H1: Open Defects
+  !include 'bugs.reg'; bugs; headings; \
+           columns='Code,BUGTITLE:Title,Status,Priority'; \
+           where='$o{"Status"} eq "Open"'; \
+           sort='Priority'; \
+           delete='Status'
+!endblock
+
+Note: The order of the parameters to a class filter are not
+important, although the order above best reflects the processing.
+
+In the case above, the {{columns}} parameter builds a data table
+which is then filtered and sorted. Note that the {{Status}}
+and {{Priority}} attributes are required in the columns as
+those attributes are required to do the filtering and sorting.
+However, as the heading tell the user that this is the table
+of open defects, we don't need/want the {{Status}} attribute
+in the output, so we delete it.
+
+H3: Filtering Using the catalog Macro
+
+Another way of building the table above is to use the {{MAC:catalog}}
+macro like this:
+
+!block verbatim
+  # Load the bug tracking module
+  !use "bugtrack"
+
+  # Load the bug data
+  !include 'bugs.reg'; bugs; data
+
+  # Display the open bugs, sorted by priority
+  H1: Open Defects
+  !catalog bugs 'Status:Open'; headings; \
+           columns='Code,BUGTITLE:Title,Priority'; \
+           sort='Priority'
+!endblock
+
+In this case, the filtering is done before the data reaches the
+class filter, so things are easier once the data has been loaded.

@@ -26,7 +26,11 @@ for my $case (@cases) {
     my ($name, $code, $desc) = @$case;
     scalar eval $code;
     my $exn = $@;
-    like($exn, qr/^(?: \QUsage: Ref::Util::$name(ref)\E
-                     | \QToo many arguments for Ref::Util::$name\E\b )/x,
-         $desc);
+    my @all_names =
+        ($name, map "$_\::$name", qw<Ref::Util Ref::Util::PP Ref::Util::XS>);
+    my $rx = join '|', (
+        (map "Too many arguments for $_\\b", @all_names),
+        (map "Usage: $_\\(ref\\)", @all_names),
+    );
+    like($exn, qr/^(?:$rx)/, $desc);
 }

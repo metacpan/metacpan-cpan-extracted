@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_SAML;
 our @ISA = qw(Lemonldap::NG::Portal::_SAML);
 
-our $VERSION = '1.4.2';
+our $VERSION = '1.9.9';
 
 ## @method void issuerDBInit()
 # Load and check SAML configuration
@@ -75,13 +75,10 @@ sub issuerForUnAuthUser {
         2 );
     my $saml_ars_url = $self->getMetaDataURL(
         "samlIDPSSODescriptorArtifactResolutionServiceArtifact");
-    my $saml_slo_url_relay_soap =
-      $self->{portal} . '/saml/relaySingleLogoutSOAP';
-    my $saml_slo_url_relay_post =
-      $self->{portal} . '/saml/relaySingleLogoutPOST';
-    my $saml_slo_url_relay_term =
-      $self->{portal} . '/saml/relaySingleLogoutTermination';
-    my $saml_att_soap_url = $self->getMetaDataURL(
+    my $saml_slo_url_relay_soap = '/saml/relaySingleLogoutSOAP';
+    my $saml_slo_url_relay_post = '/saml/relaySingleLogoutPOST';
+    my $saml_slo_url_relay_term = '/saml/relaySingleLogoutTermination';
+    my $saml_att_soap_url       = $self->getMetaDataURL(
         "samlAttributeAuthorityDescriptorAttributeServiceSOAP", 1 );
 
     # Get HTTP request informations to know
@@ -155,6 +152,10 @@ sub issuerForUnAuthUser {
 
             $self->lmLog( "$sp match $spConfKey SP in configuration", 'debug' );
 
+            # Store values in %ENV
+            $ENV{"llng_saml_sp"}        = $sp;
+            $ENV{"llng_saml_spconfkey"} = $spConfKey;
+
             # Do we check signature?
             my $checkSSOMessageSignature =
               $self->{samlSPMetaDataOptions}->{$spConfKey}
@@ -212,13 +213,6 @@ sub issuerForUnAuthUser {
             $self->{_proxiedMethod}      = $method;
             $self->{_proxiedRelayState}  = $relaystate;
             $self->{_proxiedArtifact}    = $artifact;
-
-            # Create a back link on SP displayed on login page
-            my $html =
-                "<a href=\""
-              . $self->referer() . "\">"
-              . $self->msg(PM_BACKTOSP) . "</a>";
-            $self->loginInfo($html);
 
             return PE_OK;
         }
@@ -310,6 +304,10 @@ sub issuerForUnAuthUser {
             }
 
             $self->lmLog( "$sp match $spConfKey SP in configuration", 'debug' );
+
+            # Store values in %ENV
+            $ENV{"llng_saml_sp"}        = $sp;
+            $ENV{"llng_saml_spconfkey"} = $spConfKey;
 
             # Do we check signature?
             my $checkSLOMessageSignature =
@@ -495,6 +493,10 @@ sub issuerForUnAuthUser {
             }
 
             $self->lmLog( "$sp match $spConfKey SP in configuration", 'debug' );
+
+            # Store values in %ENV
+            $ENV{"llng_saml_sp"}        = $sp;
+            $ENV{"llng_saml_spconfkey"} = $spConfKey;
 
             # Do we check signature?
             my $checkSLOMessageSignature =
@@ -1015,8 +1017,11 @@ sub issuerForUnAuthUser {
                         }
 
                         # SAML2 attribute value
-                        my $saml2value =
-                          $self->createAttributeValue($local_value);
+                        my $saml2value = $self->createAttributeValue(
+                            $local_value,
+                            $self->{samlSPMetaDataOptions}->{$spConfKey}
+                              ->{samlSPMetaDataOptionsForceUTF8}
+                        );
 
                         unless ($saml2value) {
                             $self->lmLog(
@@ -1279,6 +1284,18 @@ sub issuerForAuthUser {
                     );
                     return PE_SAML_SSO_ERROR;
                 }
+
+                # Force NameID Format
+                my $nameIDFormatKey =
+                  $self->{samlSPMetaDataOptions}->{$idp_initiated_spConfKey}
+                  ->{samlSPMetaDataOptionsNameIDFormat} || "email";
+                eval {
+                    $login->request()->NameIDPolicy()
+                      ->Format( $self->getNameIDFormat($nameIDFormatKey) );
+                };
+
+                # Force AllowCreate to TRUE
+                eval { $login->request()->NameIDPolicy()->AllowCreate(1); };
             }
 
             # Process authentication request
@@ -1338,6 +1355,18 @@ sub issuerForAuthUser {
             else {
                 $self->lmLog( "Message signature will not be checked",
                     'debug' );
+            }
+
+            # Force AllowCreate to TRUE for transient/persistent NameIDPolicy
+            if ( $login->request()->NameIDPolicy ) {
+                my $nif = $login->request()->NameIDPolicy->Format();
+                if (   $nif eq $self->getNameIDFormat("transient")
+                    or $nif eq $self->getNameIDFormat("persistent") )
+                {
+                    $self->lmLog( "Force AllowCreate flag in NameIDPolicy",
+                        'debug' );
+                    eval { $login->request()->NameIDPolicy()->AllowCreate(1); };
+                }
             }
 
             # Validate request
@@ -1634,7 +1663,9 @@ sub issuerForAuthUser {
                 foreach (@values) {
 
                     # SAML2 attribute value
-                    my $saml2value = $self->createAttributeValue($_);
+                    my $saml2value = $self->createAttributeValue( $_,
+                        $self->{samlSPMetaDataOptions}->{$spConfKey}
+                          ->{samlSPMetaDataOptionsForceUTF8} );
 
                     unless ($saml2value) {
                         $self->lmLog(
@@ -2283,11 +2314,11 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2009, 2010, 2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2009-2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2009, 2010, 2011, 2012, 2013 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2009-2016 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =item Copyright (C) 2010 by Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
 

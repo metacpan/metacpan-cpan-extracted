@@ -71,4 +71,20 @@ subtest 'insert object from raw json' => sub {
     is($row->fixed_class->flag,1,'boolean true');
 };
 
+subtest 'insert object with undef boolean' => sub {
+    my $obj = testlib::Object::Fixed->new({
+        text=>'Rumkugeln',
+        amount=>42,
+        flag=>undef
+    });
+
+    my $row = $schema->resultset('Test')->create({fixed_class=>$obj});
+    $id = $row->id;
+
+    my ($via_dbi) = $dbh->selectrow_array("select fixed_class from test where id = ?",undef, $id);
+    like($via_dbi,qr/"text":"Rumkugeln"/,'string');
+    like($via_dbi,qr/"flag":false/,'bool');
+};
+
+
 done_testing();

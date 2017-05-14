@@ -1,0 +1,58 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: topics Filter
+
+H2: Interface
+
+!filter_interface "topics"
+
+H2: Description
+
+The {{topics}} filter is used to include a set of sub-topics
+into a document. For [[PostScript]], this implies that the heading levels
+on topics included as sub-topics are adjusted accordingly.
+For [[HTML]] and Windows help files, this implies that hypertext jumps
+are inserted to the topics.
+
+This filter expects a table of data in {{FMT:TBL}} format.
+The only field typically provided is {{Topic}} - the name of the file
+containing the topic, excluding the {{.sdf}} extension. The other
+fields are used by SDF internally during the generation of HTML
+topics.
+
+The {{intro}} parameter can be used to specify SDF text to be
+output before the hypertext jumps. This text is not output for
+formats where the topics are simply included, e.g. PostScript.
+
+The {{noslide}} parameter stops the heading levels of the topics
+being slid down.
+
+The {{data}} parameter is used to specify that the table is topics
+data and no output should be generated. This parameter is used
+by SDF internally during the generation of HTML topics.
+
+H2: Examples
+
+!block example; lang='sdf'
+
+The subroutines are documented below.
+
+!block topics; intro='H2: Subroutines'
+Topic
+mysub1
+mysub2
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

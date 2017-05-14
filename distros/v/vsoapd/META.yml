@@ -1,0 +1,25 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         vsoapd
+version:      0.4.1
+version_from: sbin/vsoapd
+installdirs:  site
+requires:
+    Config:                        0
+    Config::IniFiles:              0
+    Digest::MD5:                   0
+    File::Path:                    0
+    FindBin:                       0
+    Getopt::Long:                  0
+    Pod::Usage:                    0
+    Regexp::Common:                0
+    SOAP::Lite:                    0.67
+    SOAP::Transport::HTTP:         0
+    Term::ReadKey:                 0
+    VUser::ACL:                    0
+    VUser::ExtHandler:             0.3.2
+    VUser::ExtLib:                 0
+    VUser::Log:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

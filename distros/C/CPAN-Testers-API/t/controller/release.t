@@ -208,68 +208,73 @@ subtest 'sanity check that items were inserted' => sub {
         or diag explain [ $rs->all ];
 };
 
-subtest 'all releases' => sub {
-    $t->get_ok( '/v1/release' )
-      ->status_is( 200 )
-      ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0..2] ] );
+subtest '/v1/release' => \&_test_api, '/v1';
+subtest '/v3/release' => \&_test_api, '/v3';
 
-    subtest 'since (disabled until optimized)' => sub {
-        $t->get_ok( '/v1/release?since=2016-08-20T00:00:00Z' )
-          ->status_is( 400 )
-          ->json_has( '/errors' )
-          ->or( sub { diag explain shift->tx->res->json } );
-    };
-};
-
-subtest 'by dist' => sub {
-    $t->get_ok( '/v1/release/dist/My-Dist' )
-      ->status_is( 200 )
-      ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0,1] ] );
-
-    subtest 'since' => sub {
-        $t->get_ok( '/v1/release/dist/My-Dist?since=2016-08-20T00:00:00Z' )
+sub _test_api( $base ) {
+    subtest 'all releases' => sub {
+        $t->get_ok( $base . '/release' )
           ->status_is( 200 )
-          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}[1] ] );
+          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0..2] ] );
+
+        subtest 'since (disabled until optimized)' => sub {
+            $t->get_ok( $base . '/release?since=2016-08-20T00:00:00Z' )
+              ->status_is( 400 )
+              ->json_has( '/errors' )
+              ->or( sub { diag explain shift->tx->res->json } );
+        };
     };
 
-    subtest 'dist not found' => sub {
-        $t->get_ok( '/v1/release/dist/NOT_FOUND' )
-          ->status_is( 404 )
-          ->json_is( {
-              errors => [ { message =>  'Distribution "NOT_FOUND" not found', 'path' => '/' } ],
-          } );
-    };
-};
-
-subtest 'by author' => sub {
-    $t->get_ok( '/v1/release/author/PREACTION' )
-      ->status_is( 200 )
-      ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0,2] ] );
-
-    subtest 'since' => sub {
-        $t->get_ok( '/v1/release/author/PREACTION?since=2016-08-20T00:00:00Z' )
+    subtest 'by dist' => sub {
+        $t->get_ok( $base . '/release/dist/My-Dist' )
           ->status_is( 200 )
-          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}[2] ] );
+          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0,1] ] );
+
+        subtest 'since' => sub {
+            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00Z' )
+              ->status_is( 200 )
+              ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}[1] ] );
+        };
+
+        subtest 'dist not found' => sub {
+            $t->get_ok( $base . '/release/dist/NOT_FOUND' )
+              ->status_is( 404 )
+              ->json_is( {
+                  errors => [ { message =>  'Distribution "NOT_FOUND" not found', 'path' => '/' } ],
+              } );
+        };
     };
 
-    subtest 'author not found' => sub {
-        $t->get_ok( '/v1/release/author/NOT_FOUND' )
-          ->status_is( 404 )
-          ->json_is( {
-              errors => [ { message =>  'Author "NOT_FOUND" not found', path => '/' } ],
-          } );
-    };
-};
+    subtest 'by author' => sub {
+        $t->get_ok( $base . '/release/author/PREACTION' )
+          ->status_is( 200 )
+          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0,2] ] );
 
-subtest 'input validation' => sub {
+        subtest 'since' => sub {
+            $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00Z' )
+              ->status_is( 200 )
+              ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}[2] ] );
+        };
 
-    subtest '"since" must be an ISO8601 date/time' => sub {
-        $t->get_ok( '/v1/release/dist/My-Dist?since=Sat Nov 19 14:18:40 2016' )
-          ->status_is( 400 )
-          ->json_has( '/errors' )
-          ->or( sub { diag explain shift->tx->res->json } );
+        subtest 'author not found' => sub {
+            $t->get_ok( $base . '/release/author/NOT_FOUND' )
+              ->status_is( 404 )
+              ->json_is( {
+                  errors => [ { message =>  'Author "NOT_FOUND" not found', path => '/' } ],
+              } );
+        };
     };
-};
+
+    subtest 'input validation' => sub {
+
+        subtest '"since" must be an ISO8601 date/time' => sub {
+            $t->get_ok( $base . '/release/dist/My-Dist?since=Sat Nov 19 14:18:40 2016' )
+              ->status_is( 400 )
+              ->json_has( '/errors' )
+              ->or( sub { diag explain shift->tx->res->json } );
+        };
+    };
+}
 
 done_testing;
 

@@ -5,7 +5,7 @@ use Panda::Time;
 use Panda::Date::Rel;
 use Panda::Date::Int;
 
-our $VERSION = '3.0.5';
+our $VERSION = '3.0.6';
 
 require Panda::XSLoader;
 Panda::XSLoader::bootstrap('Panda::Date', $VERSION);

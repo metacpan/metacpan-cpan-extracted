@@ -7,7 +7,7 @@
         <p>
         <label for="checkLogins">
             <input type="checkbox" id="checkLogins" name="checkLogins" <TMPL_IF NAME="ASK_LOGINS">checked</TMPL_IF>/>
-            <lang en="Check my last logins" fr="Voir mes dernières connexions"/>
+            <lang en="Check my last logins" fr="Voir mes derni&egrave;res connexions"/>
         </label>
         </p>
         </TMPL_IF>

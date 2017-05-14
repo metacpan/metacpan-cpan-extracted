@@ -1,0 +1,40 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 30-Aug-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: subsections Macro
+
+H2: Interface
+
+!macro_interface "subsections"
+
+H2: Description
+
+The {{subsections}} macro specifies the subsections in a topic.
+
+H2: Examples
+
+Typical usage is:
+
+E:   H1: MyApp
+E:   !subsections "Purpose,Usage,Description,Examples"
+
+In this case, the {{MAC:subsections}} macro changes the
+{{id}} generated for the headings listed to:
+
+E:   MyApp - {{heading}}
+
+For HTML, it will also generate a line of jumps to the headings.
+
+H2: Limitations & Future Directions
+
+{{html}} is currently the only target for which a jump line is generated.

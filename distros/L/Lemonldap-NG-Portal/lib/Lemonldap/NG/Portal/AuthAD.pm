@@ -7,7 +7,7 @@ package Lemonldap::NG::Portal::AuthAD;
 
 use strict;
 
-our $VERSION = '1.4.7';
+our $VERSION = '1.9.3';
 use Lemonldap::NG::Portal::Simple;
 use base qw(Lemonldap::NG::Portal::AuthLDAP);
 
@@ -119,9 +119,26 @@ sub authenticate {
 
     # Remember password if password reset needed
     $self->{oldpassword} = $self->{password}
-      if ( $res == PE_PP_CHANGE_AFTER_RESET );
+      if (
+        $res == PE_PP_CHANGE_AFTER_RESET
+        or (    $res == PE_PP_PASSWORD_EXPIRED
+            and $self->{ldapAllowResetExpiredPassword} )
+      );
 
     return $res;
+}
+
+## @method boolean stop
+# Define which error codes will stop Multi process
+# @param res error code
+# @return result 1 if stop is needed
+sub stop {
+    my ( $self, $res ) = @_;
+
+    return 1
+      if ( $res == PE_PP_PASSWORD_EXPIRED
+        or $res == PE_PP_CHANGE_AFTER_RESET );
+    return 0;
 }
 
 1;

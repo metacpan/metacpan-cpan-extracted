@@ -1,0 +1,29 @@
+
+=pod
+
+=head1 Request for Comments
+
+=head2 RFC 1: DBConnection or DBContext ?
+
+DBConnection is the module in EnsEMBL code to store the database information,
+such as host, dbname, etc;
+while DBContext is a BioPerl-DB module having the same function as
+DBConnection in EnsEMBL.
+However, the usage of these similar modules are different in these 2 systems.
+
+DBAdaptor in EnsEMBL inherits DBConnection, there is a IS_A relationship,
+while Bio::DB::BioDB owns DBContext and construct a HAS_A relationship.
+"As a very general remark, replacing containment (association) with inheritance
+is rarely a good idea; most of the time people refactor their code in 
+the opposite direction. - Hilmar"
+
+So I choose the DBContext style as the method grant Adaptor the database 
+access information.
+
+Date: Thu Jan 8, 2004
+
+=head2 RFC 2: Pattern of accessor name
+
+
+=cut
+

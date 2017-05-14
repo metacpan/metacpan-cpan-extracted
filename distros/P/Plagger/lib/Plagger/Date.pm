@@ -4,6 +4,7 @@ use base qw( DateTime );
 
 use Encode;
 use DateTime::Format::Strptime;
+use DateTime::TimeZone;
 use UNIVERSAL::require;
 
 sub rebless { bless $_[1], $_[0] }
@@ -20,22 +21,48 @@ sub parse {
     }
 
     my $dt = $module->parse_datetime($date) or return;
-
-    # If parsed datetime is floating, don't set timezone here. It should be "fixed" in caller plugins
-    unless ($dt->time_zone->is_floating) {
-        $dt->set_time_zone( Plagger->context->conf->{timezone} || 'local' );
-    }
-
     bless $dt, $class;
 }
 
 sub parse_dwim {
     my($class, $str) = @_;
 
-    require Date::Parse;
-    my $time = Date::Parse::str2time($str) or return;
+    return unless defined $str;
 
-    $class->from_epoch($time);
+    # check if it's Japanese
+    if ($str =~ /^(\x{5E73}\x{6210}|\x{662D}\x{548C}|\x{5927}\x{6B63}|\x{660E}\x{6CBB})/) {
+        eval { require DateTime::Format::Japanese };
+        if ($@) {
+            Plagger->context->log(warn => "requires DateTime::Format::Japanese to parse '$str'");
+            return;
+        }
+        return $class->parse( 'Japanese', encode_utf8($str) );
+    }
+
+    require Date::Parse;
+    my %p;
+    @p{qw( second minute hour day month year zone )} = Date::Parse::strptime($str);
+
+    unless (defined($p{year}) && defined($p{month}) && defined($p{day})) {
+        return;
+    }
+
+    $p{year} += 1900;
+    $p{month}++;
+
+    my $zone = delete $p{zone};
+    for (qw( second minute hour )) {
+        delete $p{$_} unless defined $p{$_};
+    }
+
+    my $dt = $class->new(%p);
+
+    if (defined $zone) {
+        my $tz = DateTime::TimeZone::offset_as_string($zone);
+        $dt->set_time_zone($tz);
+    }
+
+    $dt;
 }
 
 sub strptime {
@@ -58,8 +85,6 @@ sub now {
 sub from_epoch {
     my $class = shift;
     my %p = @_ == 1 ? (epoch => $_[0]) : @_;
-
-    $p{time_zone} = Plagger->context->conf->{timezone} || 'local';
     $class->SUPER::from_epoch(%p);
 }
 
@@ -109,7 +134,7 @@ Plagger::Date - DateTime subclass for Plagger
 
 =head1 DESCRIPTION
 
-This module subclasses DataTime for plagger's own needs.
+This module subclasses DateTime for plagger's own needs.
 
 =over
 
@@ -139,12 +164,12 @@ This module subclasses DataTime for plagger's own needs.
 
 =item format($format)
 
-Convience method.  Returns the datetime in the format
+Convenience method.  Returns the datetime in the format
 passed (either a formatter object or a blessed reference) 
 
 =item set_time_zone
 
-Overides default behavior to default to UTC if the passed
+Overrides default behavior to default to UTC if the passed
 time zone isn't a legal
 
 =item serialize

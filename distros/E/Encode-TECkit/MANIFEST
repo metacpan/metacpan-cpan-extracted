@@ -1,0 +1,13 @@
+MANIFEST
+MANIFEST.SKIP
+Make.PM
+Makefile.PL
+Setup.bat
+TECkit.xs
+academy.tec
+examples/txtconv.pl
+lib/Encode/TECkit.pm
+pmake.bat
+silipa93.tec
+test.pl
+typemap

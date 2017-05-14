@@ -1,0 +1,17 @@
+INSTALLATION OF Convert::Context
+
+To install the package, assure to have write permissions for you Perl 
+Library directories. Then do the lines:
+
+   perl Makefile.PL
+
+   make test
+
+And if the test is successful:
+
+   make install
+
+Have fun!
+
+Martin
+

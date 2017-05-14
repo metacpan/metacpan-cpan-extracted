@@ -1,0 +1,78 @@
+%%START_PERL%%
+#
+# contact-insert-genex.pl.in
+#    first version Tue Oct 24 14:13:45 MST 2000
+#    script for inserting contact entries for GeneX personal
+#
+my $VERSION = '$Id: contact-insert-genex.pl.in,v 1.5 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+
+use Bio::Genex qw(timestamp $SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_insert_sql);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::ExternalDatabase;
+
+my $infile;
+my $rc = GetOptions('file=s' => \$infile);
+
+my $USAGE = <<"EOU";
+usage: $0 --file=file_name
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parsefile($infile);
+
+my @contact_list = $DOC->getElementsByTagName('contact');
+
+
+# open up a writeable connection
+$Bio::Genex::USER = $SU_USERNAME;
+$Bio::Genex::PASSWORD = $SU_PASSWORD;
+$Bio::Genex::TRANSACTION = 1;	# do it in a transaction
+
+my $dbh = Bio::Genex::current_connection();
+my $curr_table = 'Contact';
+my $sql = create_insert_sql($dbh,$curr_table,['type',
+					      'contact_person',
+					      'contact_person_email',
+					      'contact_person_phone',
+					      'org_toll_free_phone',
+					      'url',
+					      'last_updated',
+					      'organization']);
+my $sth = $dbh->prepare($sql) || die $DBI::errstr;
+my $timeformat = '%r %A %B %d %Y'; 
+
+foreach my $con_db (@contact_list) {
+  assert_element($con_db,'contact');
+  my $type = $con_db->getAttribute('type');
+  my $contact_person = $con_db->getAttribute('contact_person');
+  my $contact_person_email = $con_db->getAttribute('contact_person_email');
+  my $contact_person_phone = $con_db->getAttribute('contact_person_phone');
+  my $url = 'http://www.ncgr.org/';
+  my $organization = 'National Center for Genome Resources';
+  my $org_toll_free_phone = '(800) 450-4954';
+  my $last_updated = timestamp();
+
+  $sth->execute($type,$contact_person,$contact_person_email,$contact_person_phone,
+		$org_toll_free_phone,$url,$last_updated,$organization
+	       ) || die $DBI::errstr;
+}
+
+$sth->finish();
+$dbh->commit();
+$dbh->disconnect();
+exit(0);

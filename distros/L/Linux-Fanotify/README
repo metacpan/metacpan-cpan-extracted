@@ -1,0 +1,34 @@
+Linux::Fanotify
+==================
+
+Interface for the Linux fanotify API.
+The fanotify API provides notification and interception of filesystem events.
+
+This perl module is documented in its perldoc (see perldoc Linux::Fanotify).
+The low level functions are documented in the fanotify(7), fanotify_init(2)
+and fanotify_mark(2) man pages; as of today (mid 2014), the relevant
+updates have not made their way into the distributions' man page packages,
+so you might want to visit the originals at
+https://www.kernel.org/doc/man-pages/
+instead.
+
+The "sample/" subdirectory of this distribution contains a few simple
+demonstrations of this module.
+
+Installation
+============
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+
+Copyright and licence
+=====================
+
+Copyright (C) Bastian Friedrich. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

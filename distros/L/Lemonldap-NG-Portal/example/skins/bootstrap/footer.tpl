@@ -1,7 +1,7 @@
   </div>
 
   <div id="footer">
-    <div class="containter">
+    <div class="container">
       <TMPL_INCLUDE NAME="customfooter.tpl">
     </div>
   </div>

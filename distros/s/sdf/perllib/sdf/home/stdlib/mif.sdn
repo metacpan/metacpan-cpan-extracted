@@ -1,0 +1,356 @@
+# $Id$
+#
+# >>Title::     MIF Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# The {{stdlib/mif.sdn}} module defines [[SDF]] configuration details for
+# generating [[MIF]] files.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Make MIF a restricted family of variables
+!restrict 'MIF'
+
+# Declare Frame document variables
+!block variables; family="MIF"; export
+Name                        Type            Rule
+COVER                       string
+PAGE_SIZE                   pagesize
+START_PAGE                  integer
+PAGE_NUM_STYLE              keyword         <Arabic|UCRoman|LCRoman|UCAlpha|LCAlpha>
+PAGE_POINT_STYLE            keyword         <Arabic|UCRoman|LCRoman|UCAlpha|LCAlpha>
+TWO_SIDES                   boolean
+PARITY                      keyword         <FirstLeft|FirstRight>
+PAGE_ROUNDING               keyword         <DeleteEmptyPages|MakePageCountEven|MakePageCountOdd|DontChangePageCount>
+FROZEN_PAGES                boolean
+SMART_QUOTES_ON             boolean
+SMART_SPACES_ON             boolean
+LINEBREAK_CHARS             string
+PUNCTUATION_CHARS           string
+MAX_INTER_LINE              dimension
+MAX_INTER_PGF               dimension
+F_NOTE_TAG                  string
+F_NOTE_MAX_H                dimension
+F_NOTE_RESTART              keyword         <PerPage|PerFlow>
+F_NOTE_START_NUM            integer
+F_NOTE_NUM_STYLE            keyword         <Arabic|UCRoman|LCRoman|UCAlpha|LCAlpha|Custom>
+F_NOTE_LABELS               string
+F_NOTE_ANCHOR_POS           keyword         <FNSuperscript|FNBaseline|FNSubscript>
+F_NOTE_ANCHOR_PREFIX        string
+F_NOTE_ANCHOR_SUFFIX        string
+F_NOTE_NUMBER_POS           keyword         <FNSuperscript|FNBaseline|FNSubscript>
+F_NOTE_NUMBER_PREFIX        string
+F_NOTE_NUMBER_SUFFIX        string
+TBL_F_NOTE_TAG              string
+TBL_F_NOTE_NUM_STYLE        keyword         <Arabic|UCRoman|LCRoman|UCAlpha|LCAlpha|Custom>
+TBL_F_NOTE_LABELS           string
+TBL_F_NOTE_ANCHOR_POS       keyword         <FNSuperscript|FNBaseline|FNSubscript>
+TBL_F_NOTE_ANCHOR_PREFIX    string
+TBL_F_NOTE_ANCHOR_SUFFIX    string
+TBL_F_NOTE_NUMBER_POS       keyword         <FNSuperscript|FNBaseline|FNSubscript>
+TBL_F_NOTE_NUMBER_PREFIX    string
+TBL_F_NOTE_NUMBER_SUFFIX    string
+CH_BAR_GAP                  dimension
+CH_BAR_WIDTH                dimension
+CH_BAR_POSITION             keyword         <LeftOfCol|RightOfCol|NearestEdge|FurthestEdge>
+CH_BAR_COLOR                string
+VIEW_ONLY_X_REF             keyword         <GotoBehavior|OpenBehavior|NotActive>
+VIEW_ONLY_SELECT            keyword         <No|Yes|UserOnly>
+VIEW_ONLY_WIN_BORDERS       boolean
+VIEW_ONLY_WIN_MENUBAR       boolean
+VIEW_ONLY_WIN_POPUP         boolean
+VIEW_ONLY_WIN_PALETTE       boolean
+LANGUAGE                    keyword
+SUPERSCRIPT_SIZE            number
+SUBSCRIPT_SIZE              number
+SMALL_CAPS_SIZE             number
+SUPERSCRIPT_SHIFT           number
+SUBSCRIPT_SHIFT             number
+!endblock
+
+# Declare Frame paragraph attributes
+!block paraattrs; family="mif"
+Name                Type            Rule
+UseNextTag          boolean
+NextTag             string
+FIndent             dimension
+LIndent             dimension
+RIndent             dimension
+Alignment           keyword         <LeftRight|Left|Center|Right>
+SpBefore            dimension
+SpAfter             dimension
+LineSpacing         keyword         <Fixed|Proportional|Floating>
+Leading             dimension
+Placement           keyword         <Anywhere|ColumnTop|PageTop|LPageTop|RPageTop>
+PlacementStyle      keyword         <Normal|RunIn|SideheadTop|SideheadFirstBaseline|SideheadLastBaseline|Straddle>
+RunInDefaultPunct   string
+WithPrev            boolean
+WithNext            boolean
+BlockSize           integer
+AutoNum             boolean
+NumFormat           string
+NumberFont          string
+NumAtEnd            boolean
+Hyphenate           boolean
+HyphenMaxLines      integer
+HyphenMinPrefix     integer
+HyphenMinSuffix     integer
+HyphenMinWord       integer
+LetterSpace         boolean
+MinWordSpace        integer
+OptWordSpace        integer
+MaxWordSpace        integer
+Language            keyword         <NoLanguage|USEnglish|UKEnglish|German|SwissGerman|French|CanadianFrench|Spanish|Catalan|Italian|Portuguese|Brazilian|Danish|Dutch|Norwegian|Nynorsk|Finnish|Swedish>
+TopSeparator        string
+BotSeparator        string
+CellAlignment       keyword         <Top|Middle|Bottom>
+CellMargins         LTRB
+CellLMarginFixed    boolean
+CellTMarginFixed    boolean
+CellRMarginFixed    boolean
+CellBMarginFixed    boolean
+TabStop             tabstop
+AcrobatLevel        integer
+NumTabs             integer
+Locked              boolean
+FIndentRelative     boolean
+FIndentOffset       dimension
+BotSepAtIndent      boolean
+BotSepOffset        dimension
+TopSepAtIndent      boolean
+TopSepOffset        dimension
+!endblock
+
+# Declare Frame phrase attributes
+!block phraseattrs; family="mif"; para="Font"
+Name            Type            Rule
+Family          string
+Angle           string
+Weight          string
+Var             string
+PostScriptName  string
+PlatformName    string
+Size            dimension
+Color           string          <Black|White|Red|Green|Blue|Yellow|Cyan|Magenta>
+Separation      integer
+Underlining     keyword         <FNoUnderlining|FSingle|FDouble|FNumeric>
+Overline        boolean
+Strike          boolean
+ChangeBar       boolean
+Position        keyword         <FNormal|FSuperscript|FSubscript>
+Outline         boolean
+Shadow          boolean
+PairKern        boolean
+Case            keyword         <FAsTyped|FSmallCaps|FLowercase|FUppercase>
+DX              dimension
+DY              dimension
+DW              dimension
+Locked          boolean
+!endblock
+
+# Declare Frame table parameters
+!block tableparams; family="mif"
+Name            Type            Rule
+LIndent         dimension
+RIndent         dimension
+SpBefore        dimension
+SpAfter         dimension
+Alignment       keyword         <Left|Center|Right|Inside|Outside>
+Placement       keyword         <Anywhere|ColumnTop|PageTop|LPageTop|RPageTop>
+BlockSize       integer
+CellMargins     LTRB
+TitlePlacement  keyword         <InHeader|InFooter|None>
+TitleGap        dimension
+NumByColumn     boolean
+ColumnRuling    string
+XColumnNum      integer
+XColumnRuling   string
+BodyRowRuling   string
+XRowRuling      string
+RulingPeriod    integer
+HFRowRuling     string
+SeparatorRuling string
+LRuling         string
+BRuling         string
+RRuling         string
+TRuling         string
+LastBRuling     boolean
+HFFill          integer
+HFColor         string
+HFSeparation    integer
+BodyFill        integer
+BodyColor       string
+BodySeparation  integer
+ShadeByColumn   boolean
+ShadePeriod     integer
+XFill           integer
+XColor          string
+XSeparation     integer
+AltShadePeriod  integer
+InitNumColumns  integer
+InitNumBodyRows integer
+InitNumFRows    integer
+InitNumHRows    integer
+!endblock
+
+# Declare Frame row parameters
+!block rowparams; family="mif"
+Name            Type            Rule
+WithNext        boolean
+WithPrev        boolean
+MinHeight       dimension
+MaxHeight       dimension
+Height          dimension
+Placement       keyword         <Anywhere|ColumnTop|PageTop|LPageTop|RPageTop>
+!endblock
+
+# Declare Frame cell parameters
+!block cellparams; family="mif"
+Name                Type            Rule
+Fill                integer
+Color               string
+LRuling             string
+BRuling             string
+RRuling             string
+TRuling             string
+Columns             integer
+Rows                integer
+AffectsColumnWidthA boolean
+Angle               integer         <0|90|180|270>
+!endblock
+
+# Mapping tables for attribute/parameter values
+!block script
+%mif_bool= (
+    '0',        'No',
+    '1',        'Yes',
+);
+%mif_align = (
+    '1',    'LeftRight',
+    'Full', 'LeftRight',
+);
+%mif_top = (
+    '0',        'Anywhere',
+    '1',        'PageTop',
+    'Page',     'PageTop',
+    'Column',   'ColumnTop',
+    'Left',     'LPageTop',
+    'Right',    'RPageTop',
+);
+%mif_wide = (
+    '0',        'Normal',
+    '1',        'Straddle',
+);
+%mif_ruling = (
+    'Vthin',     'Very Thin',
+);
+!endblock
+
+# Mapping of paragraph attributes
+!block paraattrs
+Name        To              Map         Attributes
+nopb                                    Placement='Anywhere'
+label       NumFormat                   AutoNum
+left        LIndent
+first       FIndent
+right       RIndent
+align       Alignment       %mif_align
+top         Placement       %mif_top
+keep_next   WithNext        %mif_bool
+keep_prev   WithPrev        %mif_bool
+sp_after    SpAfter
+sp_before   SpBefore
+wide        PlacementStyle  %mif_wide
+tabs        TabStop
+!endblock
+
+# Mapping of phrase attributes
+!block phraseattrs
+Name        To          Map         Attributes
+family      Family
+size        Size
+bold                                Weight='Bold'
+italics                             Angle='Oblique'
+underline                           Underlining='FSingle'
+changed     ChangeBar   %mif_bool
+color       Color
+!endblock
+
+# Cross-reference definitions
+!block targetobjects; type=Xref
+Name            Attributes
+pagenum         value='<$pagenum\>'
+paratext        value='<$paratext\>'
+paratag         value='<$paratag\>'
+paranum         value='<$paranum\>'
+paranumonly     value='<$paranumonly\>'
+section         value='section\x11 <$paranumonly\>, \xd2 <$paratext\>\xd3 , on page\x11 <$pagenum\>'
+!endblock
+
+# Handle book mode
+!if MIF_BOOK_MODE
+    # Start the front part
+    !output &'MifNewComponent('front')
+
+    # End the last component
+    !block end
+    !DOC_COMPONENT_END
+    !output '-'
+    !endblock
+
+    # Start a new component, when requested
+    !on paragraph '';; \
+        &'MifNewComponent($attr{'component'}) if $attr{'component'}
+
+    # Make each level 1 heading a component, unless it is already one
+    !on paragraph '[HAP]1';; \
+        if ($attr{'component'}) { \
+        } \
+        elsif (substr($style, 0, 1) eq 'H') {\
+            $attr{'component'} = 1; \
+        } \
+        elsif (substr($style, 0, 1) eq 'A') {\
+            $attr{'component'} = 'appendix'; \
+        } \
+        else { \
+            $attr{'component'} = $text; \
+        }
+!endif
+
+#
+# If we are generating html, we need paragraphs without
+# hypenation. Otherwise, the fm2html converter can sometimes
+# fail to highlight the whole jump text.
+#
+!if $var{'OPT_TARGET'} eq 'html'
+!on paragraph '';; $attr{'mif.Hyphenate'} = 0
+!endif
+
+# If we are generating text:
+# * minimise wrapping of example lines
+# * use * as the bullet character.
+!if $var{'OPT_TARGET'} eq 'txt'
+!on paragraph 'E'   ;; $style = 'E80'
+!on paragraph 'LU\d';; $attr{'label'} = '*\t'
+!endif
+
+# If we are generating Windows help:
+# * ignore PB tags (as page-breaks cause topic breaks)
+# * use plain headings.
+!if $var{'OPT_TARGET'} eq 'hlp'
+!on paragraph 'PB';; $style = 'N'
+!on paragraph '[HA]\d';; substr($style, 0, 1) = 'P'
+!endif

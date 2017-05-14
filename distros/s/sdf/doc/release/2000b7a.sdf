@@ -1,0 +1,36 @@
+H1: 2.000beta7a
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+The background colour of a table can now be set via the {{bgcolor}}
+parameter of the {{FILT:table}} filter.
+
+The COLOR_GREY variable is now supported.
+
+Headings at level 6 are now supported.
+
+The QSD front cover template now supports footers.
+(This is used within the MIMS documentation to show the
+MIMS version number.)
+
+H2: Fixes
+
+Text output (txt) works again.
+
+Memo title blocks are formatted correctly again.
+
+The HTML generation of Delphi documents now has the "Description"
+heading in it, as requested by John Benders. (Previously,
+the heading was removed for all non-hlp targets. It is
+now kept for all non-ps targets.)
+
+Topics mode now works for headings containing commas.
+
+The {{box}} table style is now available inside QSD templates.
+
+H2: Incompatibilities
+
+None.
+

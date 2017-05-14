@@ -9,14 +9,13 @@ use MooseX::MarkAsMethods ( autoclean => 1 );
 use Readonly;
 use File::Find;
 use Path::Class;
-use List::Util qw(first);
 
 use Pinto::Store;
 use Pinto::Config;
 use Pinto::Locker;
 use Pinto::Database;
+use Pinto::IndexCache;
 use Pinto::PackageExtractor;
-use Pinto::Locator::Multiplex;
 use Pinto::PrerequisiteWalker;
 use Pinto::Util qw(itis debug mksymlink throw);
 use Pinto::Types qw(Dir);
@@ -25,7 +24,7 @@ use version;
 
 #-------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-------------------------------------------------------------------------------
 
@@ -33,7 +32,7 @@ Readonly our $REPOSITORY_VERSION => 1;
 
 #-------------------------------------------------------------------------------
 
-with qw( Pinto::Role::UserAgent );
+with qw( Pinto::Role::FileFetcher );
 
 #-------------------------------------------------------------------------------
 
@@ -70,16 +69,12 @@ has store => (
 );
 
 
-has locator => (
+has cache => (
     is      => 'ro',
-    isa     => 'Pinto::Locator',
-    handles => [ qw(locate) ],
-    default => sub {
-        my $self = shift;
-        my $cache_dir = $self->config->cache_dir;
-        my $mux = Pinto::Locator::Multiplex->new(cache_dir => $cache_dir);
-        return $mux->assemble($self->config->sources_list) 
-    },
+    isa     => 'Pinto::IndexCache',
+    handles => [qw(locate)],
+    clearer => '_clear_cache',
+    default => sub { Pinto::IndexCache->new( repo => $_[0] ) },
     lazy    => 1,
 );
 
@@ -96,25 +91,18 @@ has locker => (
 
 
 sub get_stack {
-    my ( $self, $stack ) = @_;
-
-    my $got = $self->get_stack_maybe($stack)
-        or throw "Stack $stack does not exist";
-
-    return $got;
-}
-
-#-------------------------------------------------------------------------------
-
-
-sub get_stack_maybe {
-    my ( $self, $stack ) = @_;
+    my ( $self, $stack, %opts ) = @_;
 
     return $stack if itis( $stack, 'Pinto::Schema::Result::Stack' );
     return $self->get_default_stack if not $stack;
 
     my $where = { name => $stack };
-    return $self->db->schema->find_stack($where);
+    my $got_stack = $self->db->schema->find_stack($where);
+
+    throw "Stack $stack does not exist"
+        unless $got_stack or $opts{nocroak};
+
+    return $got_stack;
 }
 
 #-------------------------------------------------------------------------------
@@ -148,18 +136,6 @@ sub get_all_stacks {
 
 
 sub get_revision {
-    my ($self, $revision) = @_;
-
-    my $rev = $self->get_revision_maybe($revision)
-        or throw "No such revision $revision exists";
-
-    return $rev;
-}
-
-#-------------------------------------------------------------------------------
-
-
-sub get_revision_maybe {
     my ( $self, $revision ) = @_;
 
     return $revision if itis( $revision, 'Pinto::Schema::Result::Revision' );
@@ -182,32 +158,45 @@ sub get_revision_maybe {
 sub get_package {
     my ( $self, %args ) = @_;
 
-    my $target    = $args{target};
+    my $spec      = $args{spec};
     my $pkg_name  = $args{name};
     my $dist_path = $args{path};
-    my $schema    = $self->db->schema;
 
-    # Retrieve latest version of package that satisfies the target
-    if ($target) {
-        my $where = {name => $target->name};
-        return unless my @pkgs = $schema->search_package( $where )->with_distribution;
-        return unless my $latest = first { $target->is_satisfied_by($_->version) } reverse sort { $a <=> $b } @pkgs;
-        return $latest;
+    # Retrieve latest version of package that meets the spec
+    if ($spec) {
+        my $pkg_name = $spec->name;
+        my $version  = $spec->version;
+
+        my @pkgs = $self->db->schema->search_package( { name => $pkg_name } )->with_distribution;
+        my $latest = ( sort { $a <=> $b } @pkgs )[-1];
+
+        return $latest->version >= $spec->version ? $latest : ();
     }
 
     # Retrieve package from a specific distribution
     elsif ( $pkg_name && $dist_path ) {
+
         my ( $author, $archive ) = Pinto::Util::parse_dist_path($dist_path);
-        my $where = {'me.name' => $pkg_name, 'distribution.author' => $author, 'distribution.archive' => $archive};
-        return unless my @pkgs = $schema->search_package($where)->with_distribution;
-        return $pkgs[0];
+
+        my $where = {
+            'me.name'              => $pkg_name,
+            'distribution.author'  => $author,
+            'distribution.archive' => $archive
+        };
+
+        my @pkgs = $self->db->schema->search_package($where)->with_distribution;
+
+        return @pkgs ? $pkgs[0] : ();
     }
 
     # Retrieve latest version of package in the entire repository
     elsif ($pkg_name) {
+
         my $where = { name => $pkg_name };
-        return unless my @pkgs = $schema->search_package($where)->with_distribution;
-        return (reverse sort { $a <=> $b } @pkgs)[0];
+        my @pkgs = $self->db->schema->search_package($where)->with_distribution;
+
+        my $latest = ( sort { $a <=> $b } @pkgs )[-1];
+        return defined $latest ? $latest : ();
     }
 
     throw 'Invalid arguments';
@@ -219,15 +208,17 @@ sub get_package {
 sub get_distribution {
     my ( $self, %args ) = @_;
 
-    my $rs = $self->db->schema->distribution_rs->with_packages;
+    # Retrieve a distribution by DistSpec or PackageSpec
+    if ( my $spec = $args{spec} ) {
+        if ( itis( $spec, 'Pinto::DistributionSpec' ) ) {
+            my $author  = $spec->author;
+            my $archive = $spec->archive;
 
-    # Retrieve a distribution by target 
-    if ( my $target = $args{target} ) {
-        if ( itis( $target, 'Pinto::Target::Distribution' ) ) {
-            return $rs->find_by_author_archive( $target->author, $target->archive );
+            return $self->db->schema->distribution_rs->with_packages->find_by_author_archive( $author, $archive );
         }
-        elsif ( itis( $target, 'Pinto::Target::Package' ) ) {
-            return unless my $pkg = $self->get_package( target => $target );
+        elsif ( itis( $spec, 'Pinto::PackageSpec' ) ) {
+            my $pkg = $self->get_package( name => $spec->name );
+            return () if !defined($pkg) or $pkg->version < $spec->version;
             return $pkg->distribution;
         }
 
@@ -237,13 +228,15 @@ sub get_distribution {
     # Retrieve a distribution by its path (e.g. AUTHOR/Dist-1.0.tar.gz)
     elsif ( my $path = $args{path} ) {
         my ( $author, $archive ) = Pinto::Util::parse_dist_path($path);
-        return $rs->find_by_author_archive( $author, $archive );
+
+        return $self->db->schema->distribution_rs->with_packages->find_by_author_archive( $author, $archive );
     }
 
     # Retrieve a distribution by author and archive
     elsif ( my $author = $args{author} ) {
         my $archive = $args{archive} or throw "Must specify archive with author";
-        return $rs->find_by_author_archive( $author, $archive );
+
+        return $self->db->schema->distribution_rs->with_packages->find_by_author_archive( $author, $archive );
     }
 
     throw 'Invalid arguments';
@@ -255,8 +248,23 @@ sub get_distribution {
 sub ups_distribution {
     my ( $self, %args ) = @_;
 
-    return unless my $found = $self->locate( %args );
-    return $self->fetch_distribution( uri => $found->{uri} );
+    my $spec = $args{spec};
+    my $cascade = $args{cascade} || 0;
+    my $dist_url;
+
+    if ( Pinto::Util::itis( $spec, 'Pinto::PackageSpec' ) ) {
+        $dist_url = $self->locate( package => $spec->name, version => $spec->version, latest => $cascade );
+    }
+    elsif ( Pinto::Util::itis( $spec, 'Pinto::DistributionSpec' ) ) {
+        $dist_url = $self->locate( distribution => $spec->path );
+    }
+    else {
+        throw 'Invalid arguments';
+    }
+
+    throw "Cannot find $spec anywhere" if not $dist_url;
+
+    return $self->fetch_distribution( url => $dist_url );
 }
 
 #-------------------------------------------------------------------------------
@@ -315,19 +323,19 @@ sub add_distribution {
 sub fetch_distribution {
     my ( $self, %args ) = @_;
 
-    my $uri  = $args{uri};
-    my $path = $uri->path;
+    my $url  = $args{url};
+    my $path = $url->path;
 
     my $existing = $self->get_distribution( path => $path );
     throw "Distribution $existing already exists" if $existing;
 
     my ( $author, undef ) = Pinto::Util::parse_dist_path($path);
-    my $archive = $self->mirror_temporary( $uri );
+    my $archive = $self->fetch_temporary( url => $url );
 
     my $dist = $self->add_distribution(
         archive => $archive,
         author  => $author,
-        source  => $uri,
+        source  => $url
     );
     return $dist;
 }
@@ -442,7 +450,6 @@ sub svp_rollback {
 }
 
 #-------------------------------------------------------------------------------
-
 sub svp_release {
     my ( $self, $name ) = @_;
 
@@ -461,7 +468,7 @@ sub create_stack {
     my $stk_name = $args{name};
 
     throw "Stack $stk_name already exists"
-        if $self->get_stack_maybe( $stk_name );
+        if $self->get_stack( $stk_name, nocroak => 1 );
 
     my $root = $self->db->get_root_revision;
     my $stack = $self->db->schema->create_stack( { %args, head => $root } );
@@ -481,7 +488,7 @@ sub copy_stack {
     my $stack     = delete $args{stack};
     my $orig_name = $stack->name;
 
-    if ( my $existing = $self->get_stack_maybe( $copy_name ) ) {
+    if ( my $existing = $self->get_stack( $copy_name, nocroak => 1 ) ) {
         throw "Stack $existing already exists";
     }
 
@@ -502,7 +509,7 @@ sub rename_stack {
     my $stack    = delete $args{stack};
     my $old_name = $stack->name;
 
-    if (my $existing_stack = $self->get_stack_maybe( $new_name )) {
+    if (my $existing_stack = $self->get_stack( $new_name, nocroak => 1 )) {
         my $is_different_stack = lc $new_name ne lc $existing_stack->name;
         throw "Stack $new_name already exists" if $is_different_stack || $new_name eq $old_name;
     }
@@ -689,17 +696,8 @@ sub assert_sanity_ok {
 
     my $root_dir = $self->config->root_dir;
 
-    throw "Directory $root_dir does not exist"
-        unless -e $root_dir;
-
-    throw "$root_dir is not a directory"
-        unless -d $root_dir;
-
-    throw "Directory $root_dir is not readable by you"
-        unless -r $root_dir;
-
     throw "Directory $root_dir is not writable by you"
-        unless -w $root_dir;
+        unless -r $root_dir;
 
     throw "Directory $root_dir does not look like a Pinto repository"
         unless -e $self->config->db_file && -e $self->config->authors_dir;
@@ -712,7 +710,8 @@ sub assert_sanity_ok {
 sub clear_cache {
     my ($self) = @_;
 
-    $self->locator->refresh;    # Clears cache file from disk
+    $self->cache->clear_cache;    # Clears cache file from disk
+    $self->_clear_cache;          # Clears object from memory
 
     return $self;
 }
@@ -739,7 +738,7 @@ Pinto::Repository - Coordinates the database, files, and indexes
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 ATTRIBUTES
 
@@ -751,13 +750,15 @@ version 0.12
 
 =head2 store
 
-=head2 locator
+=head2 cache
 
 =head2 locker
 
 =head1 METHODS
 
-=head2 locate( target => );
+=head2 locate( package => );
+
+=head2 locate( distribution => );
 
 =head2 lock( $LOCK_TYPE )
 
@@ -769,24 +770,19 @@ version 0.12
 
 =head2 get_stack( $stack_object )
 
+=head2 get_stack( $stack_name_or_object, nocroak => 1 )
+
 Returns the L<Pinto::Schema::Result::Stack> object with the given
-C<$stack_name>.  If the argument is a L<Pinto::Schema::Result::Stack>, then it
-just returns that.  If there is no stack with such a name in the repository,
-throws an exception.  If you do not specify a stack name (or it is undefined)
-then you'll get whatever stack is currently marked as the default stack.
+C<$stack_name>.  If the argument is a L<Pinto::Schema::Result::Stack>,
+then it just returns that.  If there is no stack with such a name in the
+repository, throws an exception.  If the C<nocroak> option is true,
+than an exception will not be thrown and undef will be returned.  If
+you do not specify a stack name (or it is undefined) then you'll get
+whatever stack is currently marked as the default stack.
 
-The stack object will not be open for revision, so you will not be able to
-change any of the registrations for that stack.  To get a stack that you can
-modify, use C<open_stack>.
-
-=head2 get_stack_maybe()
-
-=head2 get_stack_maybe( $stack_name )
-
-=head2 get_stack_maybe( $stack_object )
-
-Same as C<get_stack> but simply returns undef if the stack does not exist
-rather than throwing an exception.
+The stack object will not be open for revision, so you will not be
+able to change any of the registrations for that stack.  To get a
+stack that you can modify, use C<open_stack>.
 
 =head2 get_default_stack()
 
@@ -809,98 +805,88 @@ last modification time).
 
 =head2 get_revision($commit)
 
-=head2 get_revision_maybe($commit)
+=head2 get_package( spec => $pkg_spec )
 
-=head2 get_package( target => $pkg_spec )
-
-Returns a L<Pinto:Schema::Result::Package> representing the latest version of
-the package in the repository with the same name as the package target B<and
-the same or higher version> as the package  spec.  See
-L<Pinto::Target::Package> for the definition of a package target.
+Returns a L<Pinto:Schema::Result::Package> representing the latest
+version of the package in the repository with the same name as
+the package spec B<and the same or higher version> as the package 
+spec.  See L<Pinto::PackageSpec> for the definition of a package
+spec.
 
 =head2 get_package( name => $pkg_name )
 
-Returns a L<Pinto:Schema::Result::Package> representing the latest version of
-the package in the repository with the given C<$pkg_name>.   If there is no
-such package with that name in the repository,  returns nothing.
+Returns a L<Pinto:Schema::Result::Package> representing the latest
+version of the package in the repository with the given C<$pkg_name>.  
+If there is no such package with that name in the repository, 
+returns nothing.
 
 =head2 get_package( name => $pkg_name, path => $dist_path )
 
-Returns the L<Pinto:Schema::Result::Package> with the given C<$pkg_name> that
-belongs to the distribution identified by  C<$dist_path>. If there is no such
-package in the repository,  returns nothing.
+Returns the L<Pinto:Schema::Result::Package> with the given
+C<$pkg_name> that belongs to the distribution identified by 
+C<$dist_path>. If there is no such package in the repository, 
+returns nothing.
 
-TODO: Consider making this a "maybe" function and the wrapping it with a
-version that throws exceptions if no match is found. See C<get_stack_maybe()>
-for an example.
+=head2 get_distribution( spec => $pkg_spec )
 
-=head2 get_distribution( target => $target )
+Given a L<Pinto::PackageSpec>, returns the L<Pinto::Schema::Result::Distribution>
+that contains the B<latest version of the package> in this repository with the same 
+name as the spec B<and the same or higher version as the spec>.  Returns nothing 
+if no such distribution is found.
 
-Given a L<Pinto::Target::Package>, returns the
-L<Pinto::Schema::Result::Distribution> that contains the B<latest version of
-the package> in this repository with the same  name as the target B<and the
-same or higher version as the target>.  Returns nothing  if no such
-distribution is found.
+=head2 get_distribution( spec => $dist_spec )
 
-Given a L<Pinto::Target::Distribution>, returns the
-L<Pinto::Schema::Result::Distribution> from this repository with the same
-author id and archive attributes as the target.   Returns nothing if no such
-distribution is found.
+Given a L<Pinto::DistributionSpec>, returns the L<Pinto::Schema::Result::Distribution>
+from this repository with the same author id and archive attributes as the spec.  
+Returns nothing if no such distribution is found.
 
 =head2 get_distribution( path => $dist_path )
 
-Given a distribution path, (for example C<AUTHOR/Dist-1.0.tar.gz> or
-C<A/AU/AUTHOR/Dist-1.0.tar.gz> returns the
-L<Pinto::Schema::Result::Distribution> from this repository that is
-identified by the author ID and archive file name in the path.  Returns
-nothing if no such distribution is found.
+Given a distribution path, (for example C<AUTHOR/Dist-1.0.tar.gz> or C<A/AU/AUTHOR/Dist-1.0.tar.gz>
+returns the L<Pinto::Schema::Result::Distribution> from this repository that is 
+identified by the author ID and archive file name in the path.  Returns nothing
+if no such distribution is found.
 
 =head2 get_distribution( author => $author, archive => $archive )
 
-Given an author id and a distribution archive file basename, returns the
+Given an author id and a distribution archive file basename, returns the 
 L<Pinto::Schema::Result::Distribution> from this repository with those
 attributes.  Returns nothing if no such distribution exists.
 
-TODO: Consider making this a "maybe" function and the wrapping it with a
-version that throws exceptions if no match is found. See C<get_stack_maybe()>
-for an example.
+=head2 ups_distribution( spec => $pkg_spec )
 
-=head2 ups_distribution( target => target )
+Given a L<Pinto::PackageSpec>, locates the distribution that contains the latest
+version of the package across all upstream repositories with the same name as 
+the spec, and the same or higher version as the spec.  If such distribution is
+found, it is fetched and added to this repository.  If it is not found,
+then an exception is thrown.
 
-Given a L<Pinto::Target::Package>, locates the distribution that contains the
-latest version of the package across all upstream repositories with the same
-name as  the target, and the same or higher version as the target.  If such
-distribution is found, it is fetched and added to this repository.  If it is
-not found, then an exception is thrown.
+=head2 ups_distribution( spec => $dist_spec )
 
-Given a L<Pinto::Target::Distribution>, locates the first distribution in any
-upstream repository with the same author and archive as the target.  If such
-distribution is found, it is fetched and added to this repository.  If it  is
-not found, then an exception is thrown.
-
-TODO: Consider making this a "maybe" function and the wrapping it with a
-version that throws exceptions if no match is found. See C<get_stack_maybe()>
-for an example.
+Given a L<Pinto::DistributionSpec>, locates the first distribution in any 
+upstream repository with the same author and archive as the spec.  If such 
+distribution is found, it is fetched and added to this repository.  If it 
+is not found, then an exception is thrown.
 
 =head2 add( archive => $path, author => $id )
 
-=head2 add( archive => $path, author => $id, source => $uri )
+=head2 add( archive => $path, author => $id, source => $url )
 
 Adds the distribution archive located on the local filesystem at
 C<$path> to the repository in the author directory for the author with
 C<$id>.  The packages provided by the distribution will be indexed,
 and the prerequisites will be recorded.  If the C<source> is
-specified, it must be the URI to the root of the repository where the
+specified, it must be the URL to the root of the repository where the
 distribution came from.  Otherwise, the C<source> defaults to
 C<LOCAL>.  Returns a L<Pinto::Schema::Result::Distribution> object
 representing the newly added distribution.
 
-=head2 fetch_distribution( uri => $uri )
+=head2 fetch_distribution( url => $url )
 
-Fetches a distribution archive from a remote URI and adds it to this
-repository.  The packages provided by the distribution will be indexed, and
-the prerequisites will be recorded.  Returns a
-L<Pinto::Schema::Result::Distribution> object representing the fetched
+Fetches a distribution archive from a remote URL and adds it to this
+repository.  The packages provided by the distribution will be
+indexed, and the prerequisites will be recorded.  Returns a
+L<Pinto::Schema::Result::Distribution> object representing the fetched 
 distribution.
 
 =head2 clean_files()
@@ -915,7 +901,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,9 @@
+TYPEMAP
+Car *	CAR_OBJ
+
+INPUT 
+CAR_OBJ
+      $var = (Car *)SvIV($arg);
+OUTPUT
+CAR_OBJ
+	sv_setiv($arg, (I32) $var);

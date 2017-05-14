@@ -20,9 +20,24 @@ according to the command-line options that were used:
 
 =over
 
-=item B<--help>
+=item B<-h>, B<-?>, B<--help>
 
-Prints a help message and exit (this is the same as B<-h> or B<-?>).
+Prints a help message and exit.
+
+=item B<-v>, B<--verbose>
+
+Activate verbose mode.
+
+
+=item B<--force>
+
+Continue when requesting packages that are not available.
+
+=back
+
+=head2 Operation Modes
+
+=over
 
 =item B<--list>
 
@@ -45,6 +60,175 @@ List available nodes for parallel installation (when using B<--parallel>).
 =item B<--list-aliases>
 
 List available parallel aliases.
+
+
+
+=back
+
+=head2 Package Selection
+
+=over
+
+=item B<--auto-select>
+
+Select all packages that can be upgraded, according to already installed
+packages and packages listed in various registered media.
+
+=item B<--auto-orphans>
+
+List orphans.
+
+=item B<--not-available>
+
+List packages that are not available on any media. This can help to find
+packages that are still installed but that are now obsolete because they
+have been removed from the current version of Mageia Linux.
+
+=item B<--no-recommends>
+
+With this option, urpmq will not require "recommended" packages.
+By default, urpmq will require (newly) recommended packages.
+
+=item B<--allow-recommends>
+
+With this option, urpmi will install "recommended" packages.
+This is useful if you have C<no-recommends> in urpmi.cfg.
+
+=item B<--keep>
+
+When some dependencies cannot be satisfied,
+change the selection of packages to try to keep existing packages instead
+of removing them. This behaviour generally rejects the upgrade of packages
+given on command line (or when using B<--auto-select>) when a dependency error
+occurs.
+
+=item B<-y>, B<--fuzzy>
+
+Disable fast search on exact package name; i.e. it will propose
+all packages matching the name partially, even if one of them matches exactly
+the specified name.
+
+=item B<-Y>
+
+Like B<-y>/B<--fuzzy>, but forces to match case-insensitively.
+
+=item B<-s>, B<--src> I<name>
+
+Search a source package
+matching I<name> and it will select all dependencies by default.
+
+=item B<--ignorearch>
+
+Allow to search packages whose architecture isn't compatible with the
+architecture of the host.
+
+=item B<-u>
+
+Deselect packages if a better version is already installed.
+
+=item B<-m>
+
+Equivalent to B<-du>.
+
+=item B<-a>
+
+Select all matches on command line; that's useful when one gives an
+incomplete package name and when using B<-f> or B<-r>.
+
+=item B<-c>
+
+If maximal closure is used, assume that a package listed may have wrong or
+not up-to-date dependencies. This causes more packages to be upgraded and
+may correct unresolved dependencies on the rpm database.
+
+
+=item B<-p>, B<--whatprovides>
+
+Search in provides to find package.
+
+=item B<--whatrequires>
+
+Reverse search to what requires the package given.
+
+=item B<--whatrequires-recursive>
+
+Reverse search to what requires recursively the package given
+(looking through virtual packages).
+
+=back
+
+=head2 Output Options
+
+=over
+
+
+=item B<-i>
+
+Prints useful information in human readable form, as for I<rpm -qi>.
+
+=item B<-g>
+
+Prints groups of each package listed.
+
+=item B<-r>
+
+Prints also version and release of each package listed.
+
+=item B<-f>
+
+Prints also version, release and arch of each package listed.
+
+=item B<-l>
+
+Lists files in packages.
+
+=item B<--changelog>
+
+Prints the package changelog.
+
+=item B<--conflicts>
+
+Prints the package conflicts.
+
+=item B<--obsoletes>
+
+Prints the package obsoletes.
+
+=item B<--provides>
+
+Prints the package provides.
+
+=item B<--requires>
+
+Prints the package requires.
+
+=item B<--recommends>
+
+Prints the package recommends.
+
+=item B<--sources>
+
+Prints source URLs (or file names) of all selected
+packages.
+
+=item B<--sourcerpm>
+
+Prints the sourcerpm of the package
+
+=item B<-S>, B<--summary>
+
+Prints concise information about the package.
+
+=item B<-d>, B<--requires-recursive>
+
+Print dependencies (maximal closure).
+
+
+=back
+
+=head2 Media Selection
+
+=over
 
 =item B<--update>
 
@@ -79,64 +263,6 @@ so on. Media which aren't listed are taken into account after the others.
 Use the specified synthesis file instead of the urpmi database for
 searching packages and resolving dependencies.
 
-=item B<--auto-select>
-
-Select all packages that can be upgraded, according to already installed
-packages and packages listed in various registered media.
-
-=item B<--auto-orphans>
-
-List orphans.
-
-=item B<--not-available>
-
-List packages that are not available on any media. This can help to find
-packages that are still installed but that are now obsolete because they
-have been removed from the current version of Mageia Linux.
-
-=item B<--no-suggests>
-
-With this option, urpmq will not require "suggested" packages. 
-By default, urpmq will require (newly) suggested packages.
-
-=item B<--allow-suggests>
-
-With this option, urpmi will install "suggested" packages. 
-This is useful if you have C<no-suggests> in urpmi.cfg.
-
-=item B<--keep>
-
-When some dependencies cannot be satisfied,
-change the selection of packages to try to keep existing packages instead
-of removing them. This behaviour generally rejects the upgrade of packages
-given on command line (or when using B<--auto-select>) when a dependency error
-occurs.
-
-=item B<--fuzzy>
-
-Disable fast search on exact package name; i.e. it will propose
-all packages matching the name partially, even if one of them matches exactly
-the specified name (this is the same as B<-y>).
-
-=item B<--src> I<name>
-
-Search a source package
-matching I<name> and it will select all dependencies by default.
-
-=item B<--sources>
-
-Prints source URLs (or file names) of all selected
-packages.
-
-=item B<--force>
-
-Continue when requesting packages that are not available.
-
-=item B<--ignorearch>
-
-Allow to search packages whose architecture isn't compatible with the
-architecture of the host.
-
 =item B<--parallel> I<alias>
 
 Activate distributed execution of urpmi to other machines (it is mandatory
@@ -156,6 +282,31 @@ will be used but urpmi configuration comes from normal system.
 
 Use the file system tree rooted for urpmi database and rpm install. Contrary
 to B<--root>, the urpmi configuration comes from the rooted tree.
+
+
+=item B<--use-distrib> I<directory>
+
+Configure urpmq on the fly from a distribution tree.
+
+=item B<--skip> I<pattern,...>
+
+You can specify a list of packages which installation should be skipped.
+You can also include patterns between //, just like in
+F</etc/urpmi/skip.list> (see urpmi.files(5)).
+
+=item B<--prefer> I<pattern,...>
+
+You can specify a list of packages which installation should be preferred
+(especially useful with B<--auto>).
+You can also include patterns between //, just like in
+F</etc/urpmi/prefer.list> (see urpmi.files(5)).
+
+
+=back
+
+=head2 Download Options
+
+=over
 
 =item B<--wget>
 
@@ -189,151 +340,17 @@ Use specified user and password to use for proxy authentication.
 Specifying B<--proxy-user=ask> will cause urpmq to prompt for a username
 and a password.
 
-=item B<--use-distrib> I<directory>
+=back
 
-Configure urpmq on the fly from a distribution tree.
+=head2 Debugging Options
+
+=over
 
 =item B<--env> I<directory>
 
 Use a different environment directly from a bug report to replay a bug.
 The argument is the same argument given to B<--bug> option.
 
-=item B<--skip> I<pattern,...>
-
-You can specify a list of packages which installation should be skipped.
-You can also include patterns between //, just like in
-F</etc/urpmi/skip.list> (see urpmi.files(5)).
-
-=item B<--prefer> I<pattern,...>
-
-You can specify a list of packages which installation should be preferred
-(especially useful with B<--auto>).
-You can also include patterns between //, just like in
-F</etc/urpmi/prefer.list> (see urpmi.files(5)).
-
-=item B<--wait-lock>
-
-If the urpmi or rpm db is busy, wait until it is available
-
-=item B<--changelog>
-
-Prints the package changelog.
-
-=item B<--conflicts>
-
-Prints the package conflicts.
-
-=item B<--obsoletes>
-
-Prints the package obsoletes.
-
-=item B<--provides>
-
-Prints the package provides.
-
-=item B<--requires>
-
-Prints the package requires.
-
-=item B<--suggests>
-
-Prints the package suggests.
-
-=item B<--sourcerpm>
-
-Prints the sourcerpm of the package
-
-=item B<--summary>
-
-Prints concise information about the package.
-
-=item B<--verbose>
-
-Activate verbose mode.
-
-=item B<-v>
-
-This is the same as B<--verbose>.
-
-=item B<-d>
-
-This is the same as B<--requires-recursive>.
-
-=item B<-u>
-
-Deselect packages if a better version is already installed.
-
-=item B<-m>
-
-Equivalent to B<-du>.
-
-=item B<-a>
-
-Select all matches on command line; that's useful when one gives an
-incomplete package name and when using B<-f> or B<-r>.
-
-=item B<-c>
-
-If maximal closure is used, assume that a package listed may have wrong or
-not up-to-date dependencies. This causes more packages to be upgraded and
-may correct unresolved dependencies on the rpm database.
-
-=item B<--requires-recursive>
-
-Print dependencies (maximal closure).
-
-=item B<--whatprovides>
-
-Search in provides to find package.
-
-=item B<--whatrequires>
-
-Reverse search to what requires the package given.
-
-=item B<--whatrequires-recursive>
-
-Reverse search to what requires recursively the package given
-(looking through virtual packages).
-
-=item B<-S>
-
-Same as B<--summary>.
-
-=item B<-y>
-
-This is the same as B<--fuzzy>.
-
-=item B<-Y>
-
-Like B<-y>, but forces to match case-insensitively.
-
-=item B<-s>
-
-This is the same as B<--src>.
-
-=item B<-p>
-
-This is the same as B<--whatprovides>.
-
-=item B<-i>
-
-Prints useful information in human readable form, as for I<rpm -qi>.
-
-=item B<-g>
-
-Prints groups of each package listed.
-
-=item B<-r>
-
-Prints also version and release of each package listed.
-
-=item B<-f>
-
-Prints also version, release and arch of each package listed.
-
-=item B<-l>
-
-Lists files in packages.
 
 =back
 

@@ -1,0 +1,142 @@
+# id-hrxml.sg  --  Authorative ID-HRXML 1.0 Service Schema
+# Author: Sampo Kellomaki (sampo@symlabs.com)
+# ID-HRXML is Liberty ID-WSF 2.0 based service for exchanging HR-XML data,
+# especially Candidate objects. It is standards based "transport" for HR-XML.
+# See also: hrxml-sampo.sg (Sampo's modified version of HR-XML schema)
+# http://www.w3.org/2001/03/webdata/xsv
+# $Id: id-hrxml.sg,v 1.2 2007-06-21 23:32:32 sampo Exp $
+
+target(idhrxml, urn:id-sis-idhrxml:2007-06:dst-2.1)
+import(dst,     urn:liberty:dst:2006-08,      liberty-idwsf-dst-v2.1.xsd)
+import(subs,    urn:liberty:ssos:2006-08,     liberty-idwsf-subs-v1.0.xsd)
+import(lu,      urn:liberty:util:2006-08,     liberty-idwsf-utility-v2.0.xsd)
+import(hrxml,   http://ns.hr-xml.org/2007-04-15, .xsd)
+
+Create         -> %idhrxml:CreateType
+CreateResponse -> %idhrxml:CreateResponseType
+Query          -> %idhrxml:QueryType
+QueryResponse  -> %idhrxml:QueryResponseType
+Modify         -> %idhrxml:ModifyType
+ModifyResponse -> %idhrxml:ModifyResponseType
+Delete         -> %idhrxml:DeleteType
+DeleteResponse -> %idhrxml:DeleteResponseType
+Notify         -> %idhrxml:NotifyType
+NotifyResponse -> %idhrxml:NotifyResponseType
+
+# Selection is done using XPath
+%SelectType: base(xs:string) ;
+
+%TestOpType:      base(idhrxml:SelectType) ;
+%SortType:        base(xs:string) ;
+%TriggerType:     base(xs:string) ;
+%AggregationType: base(xs:string) ;
+
+%AppDataType:
+  hrxml:Candidate?
+  idhrxml:Subscription?
+  ;
+
+%CreateType:          base(dst:RequestType)
+  idhrxml:Subscription*
+  idhrxml:CreateItem+
+  idhrxml:ResultQuery*
+  ;
+
+CreateItem            -> %idhrxml:CreateItemType
+%CreateItemType:
+  idhrxml:NewData?
+  &@dst:CreateItemAttributeGroup
+  ;
+
+NewData               -> %idhrxml:AppDataType
+
+%CreateResponseType:  base(idhrxml:DataResponseType) ;
+%DataResponseType:    base(dst:DataResponseBaseType)
+  idhrxml:ItemData*
+  ;
+
+%QueryType:      base(dst:RequestType)
+  idhrxml:TestItem*
+  idhrxml:QueryItem*
+  idhrxml:Subscription*
+  ;
+
+TestItem         -> %idhrxml:TestItemType
+%TestItemType:   base(dst:TestItemBaseType)
+  idhrxml:TestOp?    -> %idhrxml:TestOpType
+  ;
+
+QueryItem        -> %idhrxml:QueryItemType
+%QueryItemType:  base(idhrxml:ResultQueryType)
+  &@dst:PaginationAttributeGroup
+  ;
+
+%QueryResponseType:  base(dst:DataResponseBaseType)
+  dst:TestResult*
+  idhrxml:Data*
+  ;
+
+Data             -> %idhrxml:DataType
+%DataType:       base(idhrxml:ItemDataType)
+  &@dst:PaginationResponseAttributeGroup
+  ;
+
+%ModifyType:          base(dst:RequestType)
+  idhrxml:Subscription*
+  idhrxml:ModifyItem+
+  idhrxml:ResultQuery*
+  ;
+
+ModifyItem            -> %idhrxml:ModifyItemType
+%ModifyItemType:
+  idhrxml:Select?
+  idhrxml:NewData?
+  &@dst:ModifyItemAttributeGroup
+  ;
+
+%ModifyResponseType:  base(idhrxml:DataResponseType) ;
+
+%DeleteType:          base(dst:RequestType)
+  idhrxml:DeleteItem+
+  ;
+
+DeleteItem            -> %idhrxml:DeleteItemType
+%DeleteItemType:      base(dst:DeleteItemBaseType)
+  idhrxml:Select?
+  ;
+
+%DeleteResponseType:  base(lu:ResponseType) ;
+
+Select                -> %idhrxml:SelectType
+
+ResultQuery           -> %idhrxml:ResultQueryType
+%ResultQueryType:     base(dst:ResultQueryBaseType)
+  idhrxml:Select?
+  idhrxml:Sort?           -> %idhrxml:SortType
+  ;
+
+ItemData              -> %idhrxml:ItemDataType
+%ItemDataType:        base(idhrxml:AppDataType)
+  &@dst:ItemDataAttributeGroup
+  ;
+
+Subscription          -> %idhrxml:SubscriptionType
+%SubscriptionType:    base(subs:SubscriptionType)
+  idhrxml:ResultQuery*
+  idhrxml:Aggregation?    -> %idhrxml:AggregationType
+  idhrxml:Trigger?        -> %idhrxml:TriggerType
+  ;
+
+%NotifyType:          base(dst:RequestType)
+  idhrxml:Notification*
+  &@subs:NotifyAttributeGroup
+  ;
+
+Notification          -> %idhrxml:NotificationType
+%NotificationType:    base(subs:NotificationType)
+  idhrxml:ItemData*
+  ;
+
+%NotifyResponseType:  base(subs:NotifyResponseType) ;
+
+#EOF

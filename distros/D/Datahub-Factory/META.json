@@ -1,10 +1,10 @@
 {
    "abstract" : "A conveyor belt which transports data from a data source to a data sink.",
    "author" : [
-      "=over"
+      "Pieter De Praetere <pieter@packed.be>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,6 +36,9 @@
          }
       },
       "runtime" : {
+         "conflicts" : {
+            "LWP::Authen::Negotiate" : "0"
+         },
          "requires" : {
             "App::Cmd" : "0",
             "Catmandu" : "1.0304",
@@ -57,6 +60,7 @@
             "MooX::Role::Logger" : "0",
             "Ref::Util" : "0",
             "Sub::Exporter" : "0",
+            "Try::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "5.008005"
          }
@@ -79,12 +83,11 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "0.9",
+   "version" : "1.3",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
-      "Pieter De Praetere <pieter.de.praetere@helptux.be>",
-      "Pieter De Praetere <pieter@packed.be>"
+      "Pieter De Praetere <pieter.de.praetere@helptux.be>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

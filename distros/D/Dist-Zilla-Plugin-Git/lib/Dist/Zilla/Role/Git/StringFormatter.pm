@@ -9,7 +9,7 @@
 package Dist::Zilla::Role::Git::StringFormatter;
 # ABSTRACT: Provide a String::Formatter for commit messages
 
-our $VERSION = '2.041';
+our $VERSION = '2.042';
 
 use 5.008;
 use strict;
@@ -121,7 +121,7 @@ Dist::Zilla::Role::Git::StringFormatter - Provide a String::Formatter for commit
 
 =head1 VERSION
 
-version 2.041
+version 2.042
 
 =head1 DESCRIPTION
 
@@ -180,7 +180,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 (or L<bug-Dist-Zilla-Plugin-Git@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Git@rt.cpan.org>).
 
 There is also a mailing list available for users of this distribution, at
-L<http://www.listbox.com/subscribe/?list_id=139292>.
+L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.

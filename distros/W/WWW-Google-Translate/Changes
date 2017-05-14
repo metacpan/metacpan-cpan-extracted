@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW::Google::Translate.
 
+0.10  Fri May 12 23:09:47 2017
+    - added support for the 'model' parameter
+    - refinements to the caching support (and documenting it)
+    - updated POD
+
 0.09  Fri Jan 06 20:12:45 2017
     - updated POD 
 

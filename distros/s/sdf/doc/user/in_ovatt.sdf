@@ -1,0 +1,65 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Attributes
+
+H2: Introduction
+
+Attributes can be used to specify custom formatting, hypertext
+targets and jumps, indexing information, etc.
+For example:
+
+E:  Note[label='Important: ';size="16pt"]
+E:  Life is too short to drink bad wine.
+
+The result is:
+
+Note[label='Important: ';size="16pt"]
+Life is too short to drink bad wine.
+
+
+H2: Syntax
+
+Paragraphs and phrases can be given attributes via
+the syntax below:
+
+E:  style"["attributes"]" text
+
+where the syntax of {{attributes}} is:
+
+E:  name1["="expression1]";" name2["="expression2] ...
+
+If an attribute name is given without a value, the default value is 1.
+Like style names, attribute names are:
+
+* sequences of letters, digits and "_"
+* case-sensitive.
+
+
+H2: Commonly used attributes
+
+Some commonly used attributes are given below.
+
+!block table; groups
+Name            Purpose
+Paragraphs:
+label           prefix label (e.g. Note:)
+notoc           take this heading out of the table of contents
+Phrases:
+id              hypertext target tag
+jump            URL (Uniform Resource Locator) to jump to
+!endblock
+
+#Unlike style names, attribute names can be prefixed by a target name.
+#These target-specific attributes (e.g. mif.FontSize above) permit
+#tuning of the output for different targets.

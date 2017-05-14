@@ -1,0 +1,18 @@
+language: "perl"
+
+perl:
+  - "5.22"
+
+sudo: false
+
+before_install:
+    - git clone --branch 0.3.0 --depth=1 https://github.com/dpryan79/libBigWig.git
+    - cd libBigWig
+    - make prefix=$HOME/libBigWig install
+    - cd ..
+
+install:
+    - cpanm --installdeps --with-all-features .
+    - perl Build.PL --libbigwig=$HOME/libBigWig
+
+script: "./Build test"

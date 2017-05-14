@@ -1,0 +1,36 @@
+---
+abstract: 'Take in a file of proteins and predict functions using interproscan'
+author:
+  - 'Andrew J. Page <ap13@sanger.ac.uk>'
+build_requires:
+  Data::Dumper: 0
+  File::Slurp: 0
+  Moose::Role: 0
+  Test::Most: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131490'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-InterProScanWrapper
+requires:
+  Bio::SeqIO: 0
+  Cwd: 0
+  Exception::Class: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  LSF: 0
+  LSF::JobManager: 0
+  Moose: 0
+resources:
+  homepage: http://www.sanger.ac.uk/
+  repository: https://github.com/sanger-pathogens/Bio-InterProScanWrapper.git
+version: 1.133090

@@ -1,0 +1,22 @@
+1.001 -> 1.002
+
+If a log file was being continually replenished (e.g. if you're
+"tailing" /dev/ttyS0), the script would never terminate. This has now
+been fixed.
+
+1.002 -> 1.003
+
+Fixed broken dependencies on other modules.
+
+1.003 -> 1.004
+
+It appears that some forms of log rotation aren't the traditional
+rename+SIGHUP to the daemon, and the i-number doesn't change. Since
+only a change of i-number was checked, the logfile rotation wasn't
+noticed. The rotation check now includes a test to see if the logfile
+was truncated.
+
+Some clients increment counters past 2**32, and we were blindly
+passing these invalid values back as COUNTER32. Now we mask to 32 bits
+since these values are expected to wrap around.
+

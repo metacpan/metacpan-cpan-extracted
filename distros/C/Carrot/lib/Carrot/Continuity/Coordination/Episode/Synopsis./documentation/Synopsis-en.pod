@@ -1,0 +1,100 @@
+﻿=pod
+
+=head1 NAME
+
+Carrot::Continuity::Coordination::Episode::Synopsis - a punchy rough overview of Carrot::Continuity::Coordination::Episode
+
+=head1 SYNOPSIS
+
+	use Carrot::Continuity::Coordination::Episode;
+	use Carrot::Continuity::Coordination::Episode::Synopsis;
+
+	my $loop = Carrot::Continuity::Coordination::Episode::Loop->constructor;
+	my $callback = Event_Demo1->constructor($loop->allocate_control);
+	my @events = Carrot::Continuity::Coordination::Episode::Synopsis->recognize($callback,
+
+		'every 1 second',	# $callback->evt_time_periodic
+		'at hour 23',		# $callback->evt_time_wallclock
+		'in 20 seconds',	# $callback->evt_time_timeout
+		'm',			# $callback->evt_time_boundary
+		'SIGUSR1',		# $callback->evt_signal_usr1
+		sub { return((-e '/tmp/any.txt') ? 1 : 0) }
+					# $callback->evt_poll_edge_test1
+	);
+
+	$loop->run;
+
+	map($_->deactivate, @events);
+	exit(PDX_EXIT_SUCCESS);
+
+	BEGIN {
+	package Event_Demo1;
+	use POSIX ();
+
+	sub constructor	{ bless($_[1], $_[0]); } # instance holds the loop control
+
+	# standard event methods
+	sub evt_time_periodic	{ print STDERR "."; }
+	sub evt_time_wallclock	{ print STDERR "W"; }
+	sub evt_time_timeout	{ print STDERR "T"; kill(&POSIX::SIGUSR1, $PROCESS_ID); }
+	sub evt_time_boundary	{ print STDERR "B"; }
+	sub evt_signal_usr1	{ print STDERR "S\n"; ${$_[0]} = 0; }
+	sub evt_poll_edge_test1	{ print STDERR "P$_[1]"; }
+	}
+
+=head1 DESCRIPTION
+
+The purpose of the following example is to introduce Carrot::Continuity::Coordination::Episode with a fully functional piece of code. The class Carrot::Continuity::Coordination::Episode::Synopsis is shipped for this purpose only. Using the convenience method 'recognize' is not the style one would normally use Carrot::Continuity::Coordination::Episode, but an approximisation good enough. Four asynchronous events and one poll event are created in the following:
+
+The example above should print '...................T.S' to the screen, with a one second delay between each output. Create and remove the file /tmp/any.txt to see a P. The USR1 signal sets the loop control to zero, effectively terminating the show. If you want to see the W char, then adjust the 'at' time. Unblocked IO is not shown, because a meaningful example would lengthen the synopsis considerably.
+
+The package Event_Demo is required, because Carrot::Continuity::Coordination::Episode is about instances, not classes. The $demo instance holds a loop control (a trivial scalar ref) and provides the callback methods (default names).
+
+=head2 Public Interface
+
+Punchy means, there is action upon a simple string. However, there is not much point in formatting and then (one subroutine call later) parsing a simple string. Instead, directly pass the values you have to the specific interfaces.
+
+But there is nothing wrong with documenting the convenience interface. The first parameter is the instance to call back a hard-wired method name. The second parameter is recognized as follows:
+
+=over 8
+
+=item * B<Periodic time event> - 'every NUMBER UNIT'
+
+The target is periodically called from now onwards at times specified. Unit can be seconds, minutes, hours, days, and weeks. The first letter of each unit is sufficient and the singular word is also recognized. Example: 'every 1 s' or 'every 1 second' or 'every 1 seconds' all give the same result.
+
+=item * B<Timeout event> - 'in NUMBER UNIT'
+
+The target is called once at the time specified in relative form. Unit is the same as for periodic events. Example: 'in 3 hours'.
+
+=item * B<Wallclock time event> - 'at UNIT NUMBER UNIT NUMBER...'
+
+The target is called once at the time specified in absolute form. Note that the unit comes first for wallclock events. Names for units are second, minute, hour, day, and year. No abreviation, no plural. Example: 'at year 2010 month 2 day 12 hour 12 minute 30 second 05'. Default values are taken from the current date and time.
+
+=item * B<Signal event> - 'SIGname'
+
+The target is called each time the process receives the specified signal. For more about signals, see L<perlipc>. Example: 'SIGHUP'. Signals are not perfectly reliable with Carrot::Continuity::Coordination::Episode, try to avoid them.
+
+
+=item * B<IO_Unblocked event> - file handle
+
+The target is called when certain IO operations will not block. Mainly two individual methods are called on the instance: evt_io_unblocked_(read|write). You need to store the target instance, so that you can control the type of event to be delivered. Example: $target->fd_set_read; will cause a evt_io_unblocked_read method call once data is available for reading.
+
+=item * B<Generic event> - anything
+
+A placeholder, which is too generic to be useful. :)
+
+=back
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009, 2010 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

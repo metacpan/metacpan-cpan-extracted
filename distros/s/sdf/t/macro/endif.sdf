@@ -1,0 +1,20 @@
+# This file tests the endif if
+
+# Test an unexpected endif (should generate an error)
+!endif
+
+Some text.
+
+# Test an if will no matching endif (should generate an error)
+!if sdf
+
+Some text inside if xyz.
+
+!if sdf
+This is some text with
+several lines in
+it.
+
+And a few
+more.
+!endif

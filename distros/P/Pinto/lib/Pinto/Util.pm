@@ -7,11 +7,8 @@ use warnings;
 use version;
 use base qw(Exporter);
 
-use URI;
-use URI::file;
 use Carp;
 use DateTime;
-use File::Temp;
 use Path::Class;
 use Digest::MD5;
 use Digest::SHA;
@@ -21,11 +18,10 @@ use Readonly;
 
 use Pinto::Globals;
 use Pinto::Constants qw(:all);
-use Pinto::Types qw(DiffStyle);
 
 #-------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-------------------------------------------------------------------------------
 
@@ -38,7 +34,6 @@ Readonly our @EXPORT_OK => qw(
     current_username
     debug
     decamelize
-    default_diff_style
     indent_text
     interpolate
     is_blank
@@ -48,19 +43,17 @@ Readonly our @EXPORT_OK => qw(
     is_system_prop
     isa_perl
     itis
-    make_uri
     md5
     mksymlink
     mtime
     parse_dist_path
-    mask_uri_passwords
+    mask_url_passwords
     sha256
-    tempdir
     title_text
     throw
     trim_text
     truncate_text
-    user_palette
+    user_colors
     uuid
     whine
 );
@@ -74,7 +67,7 @@ sub throw {
     my ($error) = @_;
 
     # Rethrowing...
-    $error->throw if itis( $error, 'Pinto::Exception' );
+    die $error if itis( $error, 'Pinto::Exception' );    ## no critic (Carping)
 
     require Pinto::Exception;
     Pinto::Exception->throw( message => "$error" );
@@ -160,9 +153,9 @@ sub parse_dist_path {
 
 
 sub isa_perl {
-    my ($path_or_uri) = @_;
+    my ($path_or_url) = @_;
 
-    return $path_or_uri =~ m{ / perl-[\d.]+ \.tar \.(?: gz|bz2 ) $ }mx;
+    return $path_or_url =~ m{ / perl-[\d.]+ \.tar \.(?: gz|bz2 ) $ }mx;
 }
 
 #-------------------------------------------------------------------------------
@@ -421,13 +414,12 @@ sub uuid {
 #-------------------------------------------------------------------------------
 
 
-sub user_palette {
-    my $palette = $ENV{PINTO_PALETTE}
-        || $ENV{PINTO_COLORS} || $ENV{PINTO_COLOURS}; # For backcompat
+sub user_colors {
+    my $colors = $ENV{PINTO_COLORS} || $ENV{PINTO_COLOURS};
 
-    return $PINTO_DEFAULT_PALETTE if not $palette;
+    return $PINTO_DEFAULT_COLORS if not $colors;
 
-    return [ split m/\s* , \s*/x, $palette ];
+    return [ split m/\s* , \s*/x, $colors ];
 }
 
 #-------------------------------------------------------------------------------
@@ -453,63 +445,22 @@ sub is_not_blank {
 #-------------------------------------------------------------------------------
 
 
-sub mask_uri_passwords {
-    my ($uri) = @_;
+sub mask_url_passwords {
+    my ($url) = @_;
 
-    $uri =~ s{ (https?://[^:/@]+ :) [^@/]+@}{$1*password*@}gx;
+    $url =~ s{ (https?://[^:/@]+ :) [^@/]+@}{$1*password*@}gx;
 
-    return $uri;
+    return $url;
 }
 
 #-------------------------------------------------------------------------------
 
 
 sub is_remote_repo {
-    my ($uri) = @_;
+    my ($url) = @_;
 
-    return if not $uri;
-    return $uri =~ m{^https?://}x;
-}
-
-#-------------------------------------------------------------------------------
-
-sub tempdir {
-
-    return Path::Class::dir(File::Temp::tempdir(CLEANUP => 1));
-}
-
-
-#-------------------------------------------------------------------------------
-
-
-sub default_diff_style {
-
-    if (my $style = $ENV{PINTO_DIFF_STYLE}) {
-
-        throw "PINTO_DIFF_STYLE ($style) is invalid.  Must be one of (@PINTO_DIFF_STYLES)"
-            unless DiffStyle->check($style);
-
-        return $style;
-    }
-
-    return $PINTO_DIFF_STYLE_CONCISE;
-}
-
-#-------------------------------------------------------------------------------
-
-sub make_uri {
-    my ($it) = @_;
-
-    return $it
-        if itis( $it, 'URI' );
-
-    return URI::file->new( $it->absolute )
-        if itis( $it, 'Path::Class::File' );
-
-    return URI::file->new( file($it)->absolute )
-        if -e $it;
-
-    return URI->new($it);
+    return if not $url;
+    return $url =~ m{^https?://}x;
 }
 
 #-------------------------------------------------------------------------------
@@ -529,7 +480,7 @@ Pinto::Util - Static utility functions for Pinto
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 DESCRIPTION
 
@@ -574,15 +525,15 @@ C<$class>.
 
 =head2 parse_dist_path( $path )
 
-Parses a path like the ones you would see in a full URI to a
-distribution in a CPAN repository, or the URI fragment you would see
+Parses a path like the ones you would see in a full URL to a
+distribution in a CPAN repository, or the URL fragment you would see
 in a CPAN index.  Returns the author and file name of the
 distribution.  Subdirectories between the author name and the file
 name are discarded.
 
-=head2 isa_perl( $path_or_uri )
+=head2 isa_perl( $path_or_url )
 
-Return true if C<$path_or_uri> appears to point to a release of perl
+Return true if C<$path_or_url> appears to point to a release of perl
 itself.  This is based on some file naming patterns that I've seen in
 the wild.  It may not be completely accurate.
 
@@ -669,8 +620,8 @@ there is no newline, returns an empty string.
 
 =head2 truncate_text($string, $length, $elipses)
 
-Truncates the C<$string> and appends C<$elipses> if the C<$string> is
-longer than C<$length> characters.  C<$elipses> defaults to '...' if
+Truncates the C<$string> and appends C<$elipses> if the C<$string> is 
+longer than C<$length> characters.  C<$elipses> defaults to '...' if 
 not specified.
 
 =head2 decamelize($string)
@@ -699,11 +650,11 @@ Returns true if C<$string> is the name of a system property.
 Returns a UUID as a string.  Currently, the UUID is derived from
 random numbers.
 
-=head2 user_palette()
+=head2 user_colors()
 
-Returns a reference to an array containing the names of the colors pinto
-can use.  This can be influenced by setting the C<PINTO_PALETTE> environment
-variable.
+Returns a reference to an array containing the names of the colors pinto 
+can use.  This can be influenced by setting the C<PINTO_COLORS> or 
+C<PINTO_COLOURS> environment variables.
 
 =head2 is_blank($string)
 
@@ -713,15 +664,15 @@ Returns true if the string is undefined, empty, or contains only whitespace.
 
 Returns true if the string contains any non-whitespace characters.
 
-=head2 mask_uri_passwords($string)
+=head2 mask_url_passwords($string)
 
 Masks the parts the string that look like a password embedded in an http or
-https URI. For example, C<http://joe:secret@foo.com> would return
+https URL. For example, C<http://joe:secret@foo.com> would return 
 C<http://joe:*password*@foo.com>
 
 =head2 is_remote_repo {
 
-Returns true if the argument looks like a URI to a remote repository
+Returns true if the argument looks like a URL to a remote repository
 
 =head1 AUTHOR
 
@@ -729,7 +680,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

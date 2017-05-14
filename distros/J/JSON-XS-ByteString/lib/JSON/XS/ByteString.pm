@@ -8,7 +8,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encode_json encode_json_unblessed decode_json decode_json_safe);
-our $VERSION = 1.000005;
+our $VERSION = 1.000006;
 
 require XSLoader;
 XSLoader::load('JSON::XS::ByteString', $VERSION);

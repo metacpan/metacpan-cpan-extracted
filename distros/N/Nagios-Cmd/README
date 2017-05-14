@@ -1,0 +1,43 @@
+Nagios::Cmd
+------------------
+
+version 0.05
+released 02 December 2003
+
+Nagios::Cmd is a Perl module that provides a nice object oriented interface
+for submitting commands to Nagios' (http://www.nagios.org) command pipe.
+
+Consider this an alpha release, even though I'm already using it in production
+and it is fairly well tested.  Depending on feedback, the phase of the moon,
+and the alignment of Uranus with Sol, I may change the interface before
+I deem it a 1.0 release.
+
+PLEASE SEND ME FEEDBACK GOOD OR BAD SO I CAN MAKE IT 1.0 SOONER THAN LATER.
+Thank you.
+
+After unpacking the tarball, to install this module type:
+
+	perl Build.PL
+	./Build test
+	./Build install
+
+You may need to install Module::Build to get this up and running.  From what
+I've read of MakeMaker, Module::Build is the future, so just install it.
+If there is enough demand, I'll include a MakeMaker script, too.
+
+Prerequisites:	Module::Build
+
+COPYRIGHT (c) 2003 Al Tobey <tobeya@tobert.org>, all rights reserved.
+
+LICENSE - GPL ---------------------------------------------------------
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+

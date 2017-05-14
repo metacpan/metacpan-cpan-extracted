@@ -103,9 +103,9 @@ local $YAML::CompressSeries = 1
 +++ perl
 [
     'The',
-    {speed => 'quick', color => 'brown', &YAML::VALUE => 'fox'},
+    {speed => 'quick', color => 'brown', &YAML::Old::VALUE => 'fox'},
     'jumped over the',
-    {speed => 'lazy', &YAML::VALUE, 'dog'},
+    {speed => 'lazy', &YAML::Old::VALUE, 'dog'},
 ]
 +++ yaml
 ---

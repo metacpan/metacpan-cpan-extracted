@@ -1,0 +1,14 @@
+
+<!-- document created using XMLWriter 1.0b at Time 11:37:50 Date 11/1/2002 -->
+<PeopleDoc>
+  <Person>
+    <Addresses uid="101">
+      <Address type="office">
+        <Zip>45789</Zip>
+        <City>Ourtown</City>
+        <Street>123 State st</Street>
+        <State>IN</State>
+      </Address>
+    </Addresses>
+  </Person>
+</PeopleDoc>

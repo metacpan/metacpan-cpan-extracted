@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2016 by Dominique Dumont.
+# This software is Copyright (c) 2008-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::LeafEditor;
-$Config::Model::Tk::LeafEditor::VERSION = '1.361';
+$Config::Model::Tk::LeafEditor::VERSION = '1.362';
 use strict;
 use warnings;
 use Carp;
@@ -318,8 +318,20 @@ sub reset_value {
 sub exec_external_editor {
     my $cw = shift;
 
-    # the .pod suffix let the editor use the correct mode
-    my $pt = Path::Tiny->tempfile(SUFFIX => '.pod');
+    my @pt_args;
+
+    # ugly hack to use pod mode only for Model description parameter
+    # i.e. for Config::Model::Itself
+    my $leaf = $cw->{leaf};
+    if ($leaf->config_class_name =~ /^Itself/ and
+            $leaf->element_name =~ /description/
+        ) {
+        # the .pod suffix let the editor use the correct mode
+        @pt_args = (SUFFIX => '.pod');
+    }
+
+    my $pt = Path::Tiny->tempfile(@pt_args);
+
     die "Can't create Path::Tiny:$!" unless defined $pt;
     $pt->spew_utf8( $cw->{e_widget}->get( '1.0', 'end' ) );
 

@@ -1,0 +1,24 @@
+
+<html>
+
+  [% INCLUDE _header.tt2 title = "Edit ${TABLE.desc().0}" %]
+
+<body>
+
+  <h1>Edit [% TABLE.desc().0 %]</h1>
+  [% IF ROW.validationError() %]
+    <br>
+    Could not update [% TABLE.desc().0 %]. Please correct the errors
+    below and try again.
+    <br>
+  [% END %]
+
+  <form action="update" method="post">
+    [% FOREACH fName = TABLE.primaryKeys() %]
+    <input type="hidden" name="[% fName %]" value="[% ROW.$fName() %]">
+    [% END %]
+    [% INCLUDE _form.tt2 BUTTON_NAME='Update' %]
+  </form>
+
+</body>
+

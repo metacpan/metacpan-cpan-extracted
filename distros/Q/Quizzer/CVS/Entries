@@ -1,0 +1,31 @@
+/AutoSelect.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/BUGS/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Base.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/COPYING/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Changelog/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Config.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Element.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/FrontEnd.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/INSTALL/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/LICENSE/1.2/Sun Mar  3 09:43:03 2002//
+/Level.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Loader.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Log.pm/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Question.pm/1.2/Sun Mar  3 09:43:03 2002//
+/Quizzer/1.3/Sun Mar  3 09:43:03 2002//
+/Quizzer.tpl/1.2/Sun Mar  3 09:43:03 2002//
+/README/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/TODO/1.1.1.1/Wed Feb 27 08:28:14 2002//
+/Template.pm/1.2/Sun Mar  3 09:43:03 2002//
+D/Element////
+D/FrontEnd////
+D/docs////
+D/exercises////
+/Makefile/1.5/Mon Apr 22 12:56:41 2002//
+/quiz-interactive.txt/1.1/Sun Mar  3 09:43:03 2002//
+/quiz-sample.txt/1.1/Sun Mar  3 09:43:03 2002//
+/VERSION/1.5/Mon Apr 22 13:00:29 2002//
+/AUTHORS/1.3/Mon Apr 22 12:09:09 2002//
+/Quizzer.conf/1.2/Mon Apr 22 12:10:31 2002//
+/Quizzer.spec/1.7/Mon Apr 22 12:11:53 2002//
+/quiz-long.txt/1.2/Mon Apr 22 12:26:43 2002//

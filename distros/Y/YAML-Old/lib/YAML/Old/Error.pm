@@ -12,7 +12,7 @@ my ($error_messages, %line_adjust);
 
 sub format_message {
     my $self = shift;
-    my $output = 'YAML ' . $self->type . ': ';
+    my $output = 'YAML::Old ' . $self->type . ': ';
     my $code = $self->code;
     if ($error_messages->{$code}) {
         $code = sprintf($error_messages->{$code}, @{$self->arguments});
@@ -32,11 +32,9 @@ sub error_messages {
     $error_messages;
 }
 
-%$error_messages = map {s/^\s+//;$_} split "\n", <<'...';
+%$error_messages = map {s/^\s+//;s/\\n/\n/;$_} split "\n", <<'...';
 YAML_PARSE_ERR_BAD_CHARS
   Invalid characters in stream. This parser only supports printable ASCII
-YAML_PARSE_ERR_NO_FINAL_NEWLINE
-  Stream does not end with newline character
 YAML_PARSE_ERR_BAD_MAJOR_VERSION
   Can't parse a %s document with a 1.0 parser
 YAML_PARSE_WARN_BAD_MINOR_VERSION
@@ -69,6 +67,8 @@ YAML_DUMP_ERR_FILE_CONCATENATE
   Can't concatenate to YAML file %s
 YAML_DUMP_ERR_FILE_OUTPUT
   Couldn't open %s for output:\n%s
+YAML_DUMP_ERR_FILE_OUTPUT_CLOSE
+  Error closing %s:\n%s
 YAML_DUMP_ERR_NO_HEADER
   With UseHeader=0, the node must be a plain hash or array
 YAML_DUMP_WARN_BAD_NODE_TYPE
@@ -106,7 +106,7 @@ YAML_DUMP_ERR_BAD_REGEXP
 YAML_LOAD_ERR_BAD_MAP_ELEMENT
   Invalid element in map
 YAML_LOAD_WARN_DUPLICATE_KEY
-  Duplicate map key found. Ignoring.
+  Duplicate map key '%s' found. Ignoring.
 YAML_LOAD_ERR_BAD_SEQ_ELEMENT
   Invalid element in sequence
 YAML_PARSE_ERR_INLINE_MAP

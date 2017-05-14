@@ -1,0 +1,46 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Spotter" db_column="model_description" cv_table="SPT_ModelDescription">
+  <comment type="definition">This table provides the restricted vocabulary for the column model description in the table spotter and is used to describe the technology source for spotting the probe onto a surface- it is only relevant in array technologies	
+</comment>
+<term name="OmniGrid"
+        description="GeneMachines"/>
+<term name="ProSys"
+        description="Cartesian Technologies"/>
+<term name="PixSys"
+        description="Cartesian Technologies"/>
+<term name="MicroSys"
+        description="Cartesian Technologies"/>
+<term name="PegaSys_3000"
+        description="Cartesian Technologies"/>
+<term name="MGuide"
+        description="Brown Lab microarray, Western Technology, Newport, Dell,Teco Inc., McMasters see Brown Lab Homepage for additional parts and instructions"/>
+<term name="GeneChip"
+        description="Affymetrix"/>
+<term name="Arrayer"
+        description="DNA microarrayer by Affymetrix, was the
+GMS 417 before Affymetrix acquired Genetic Microsystems"/>
+<term name="FlexJet"
+        description="Rosetta"/>
+<term name="GMS"
+        description="The Genetic Microsystems 417, now owned and
+marketed by Affymetrix"/>
+<term name="Agilent_Inkjet"
+        description="Agilent Inkjet Technology"/>
+<term name="ScienceChips"
+        description="was BioTechnologies, is now GeneScan Europe"/>
+<term name="BioRobotics"
+        description="was BioTechnologies, is now GeneScan Europe"/>
+<term name="MicroGrid"
+        description="micro arrayer line from BioRobotics"/>
+<term name="BioGrid"
+        description="nylon membrane macro array from BioRobotics"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->
+<!--  LocalWords:  OmniGrid GeneMachines MGuide FlexJet Agilent
+ -->

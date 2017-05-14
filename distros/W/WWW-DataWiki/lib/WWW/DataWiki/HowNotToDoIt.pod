@@ -1,0 +1,642 @@
+=head1 NAME
+
+WWW::DataWiki::HowNotToDoIt - version 0
+
+=head1 SYNOPSIS
+
+  #!/usr/bin/perl
+
+  use 5.010;
+  use common::sense;
+
+  use CGI;
+  use CGI::Carp 'fatalsToBrowser';
+  use DateTime;
+  use DateTime::Format::HTTP;
+  use DateTime::Format::ISO8601;
+  use DateTime::Format::Strptime;
+  use Digest::MD5 qw[];
+  use HTTP::Negotiate qw[choose];
+  use PerlIO::gzip;
+
+  # Defer loading RDF::Trine until we need it, as it's quite big
+  # and we don't always need it.
+  sub use_Trine
+  {
+    local $@;
+    eval 'use RDF::TriN3;'
+      unless RDF::Trine::Model->can('new');
+    die $@ if $@;
+  }
+
+  # Defer loading RDF::Query until we need it, as it's quite big
+  # and we don't always need it.
+  sub use_Query
+  {
+    local $@;
+    eval 'use RDF::Query;'
+      unless RDF::Query->can('new');
+    die $@ if $@;
+  }
+
+  # Parse requested URI
+  our $CGI   = CGI->new;
+  our $PATH  = '/home/tai/vhosts/wiki.ontologi.es/Versions/';
+  our $URI   = 'http://wiki.ontologi.es/';
+  our $V_URI = 'http://wiki.ontologi.es/Versions/';
+  our $E_URI = 'http://buzzword.org.uk/2010/n3edit/?wiki=';
+  our $COMPACTDATE = DateTime::Format::Strptime->new(pattern=>'%Y%m%dT%H%M%SZ');
+  our ($SHORT,$DATE,$EXT) = split /\./, substr($CGI->path_info, 1);
+  our $NS    = undef;
+
+  our $namespaces = {
+    };
+
+  if ($SHORT =~ /^([a-z0-9-]+:)?([a-z][a-z0-9-]*[a-z0-9])$/)
+  {
+    ($NS,$SHORT) = ($1,$2);
+
+    if ($NS)
+    {
+      $NS =~ s/:$//;
+
+      die "Namespace $NS does not exist."
+        unless $namespaces->{ $NS };
+
+      $PATH = $namespaces->{ $NS }{'PATH'} ?
+        $namespaces->{ $NS }{'PATH'} :
+        ($PATH . $NS . '__');
+      $URI  = $namespaces->{ $NS }{'URI'} ?
+        $namespaces->{ $NS }{'URI'} :
+        ($URI . $NS . ':');
+      $V_URI= $namespaces->{ $NS }{'V_URI'} ?
+        $namespaces->{ $NS }{'V_URI'} :
+        ($V_URI . $NS . '__');
+      $E_URI= $namespaces->{ $NS }{'E_URI'} ?
+        $namespaces->{ $NS }{'E_URI'} :
+        ($E_URI . $NS . ':');
+
+      $NS .= ':';
+    }
+  }
+  else
+  {
+    die "Unsupported page name. Must use only lower alphanumeric, plus hyphen.";
+  }
+
+  if ($DATE =~ /[a-su-y]/i and $DATE !~ /^latest$/i)
+  {
+    $EXT  = $DATE;
+    $DATE = undef;
+  }
+  our @all_versions = sort
+    map { $_ =~ s!^.*/([^/]+)\.n3.gz$!$1!; $_; }
+    glob("${PATH}${SHORT}/*.n3.gz");
+
+  # This allows a greater degree of flexibility than CGI::header.
+  sub decent_headers
+  {
+    my (%headers) = @_;
+    
+    $headers{'Status'}        ||= '200 OK';
+    $headers{'Content-Type'}  ||= 'text/plain; charset=utf-8';
+    
+    my @keys = sort
+      {
+        {
+          'Status'        => 0 ,
+          'Content-Type'  => 10 ,
+        }->{$_} || 999
+      }
+      keys %headers;
+    
+    foreach my $h (@keys)
+    {
+      my @lines = (ref $headers{$h} eq 'ARRAY') ? @{ $headers{$h} } : ($headers{$h});
+      foreach my $line (@lines)
+      {
+        printf("%s: %s\r\n", $h, (
+          (ref $line eq 'ARRAY') ? (join ', ', @$line) : $line
+          ));
+      }
+    }
+    print "\r\n";
+  }
+
+  # HTTP 2xx/304 responses.
+  sub SendData
+  {
+    my ($data, $datetime, $variant, $headers, $skip304check) = @_;
+
+    $headers ||= {};
+    my %headers = %$headers;
+    
+    my $digest = Digest::MD5->new;
+    $digest->add($data);
+    my $etag = $NS.$SHORT."\@${datetime}.${variant}".'='.$digest->clone->hexdigest;
+    
+    my $format = {
+      'n3'        => 'text/n3; charset=utf-8',
+      'nt'        => 'text/plain; charset=utf-8',
+      'canonical' => 'text/plain; charset=utf-8',
+      'html'      => 'text/html; charset=utf-8',
+      'xhtml'     => 'application/xhtml+xml; charset=utf-8',
+      'turtle'    => 'text/turtle; charset=utf-8',
+      'rdf'       => 'application/rdf+xml; charset=utf-8',
+      'json'      => 'application/json',
+      }->{$variant} || 'application/octet-stream';
+    
+    $headers{'Content-Type'}     ||= $format;
+    $headers{'MS-Author-Via'}    ||= ['DAV','SPARQL'];
+    $headers{'Content-Base'}     ||= $URI.$SHORT;
+    $headers{'Content-Location'} ||= $URI.$SHORT.'.'.$datetime.'.'.$variant;
+    $headers{'Link'}             ||= [["<${URI}${SHORT}.latest>;rel=\"latest-version\""],
+                           ["<${V_URI}${SHORT}/>;rel=\"version-history\""],
+                           ["<${E_URI}${SHORT}>;rel=\"edit\";anchor=\"${URI}${SHORT}.latest\""]];
+    $headers{'Last-Modified'}    ||= DateTime::Format::HTTP->format_datetime(
+                              $COMPACTDATE->parse_datetime($datetime));
+    $headers{'ETag'}             ||= "\"$etag\"";
+    $headers{'Content-MD5'}      ||= $digest->b64digest.'==';
+    $headers{'Vary'}             ||= [[qw(Accept Accept-Datetime Accept-Encoding)]];
+    
+    unless ($skip304check)
+    {
+      my ($condition) = checkConditions($etag, $datetime);
+      if ($condition)
+      {
+        $headers{'Status'} = $condition;
+        $data = '';
+      }
+    }
+    
+    decent_headers(%headers);
+    print $data;
+    exit;
+  }
+
+  # HTTP 3xx/4xx/5xx responses.
+  sub SendError
+  {
+    my ($status, $body, $headers) = @_;
+
+  #  open my $elog, ">>${PATH}/e.log";
+  #  print $elog "$status >>>> $body\n";
+  #  close $elog;
+
+    $headers ||= {};
+    my %headers = %$headers;
+
+    $headers{'Status'}           ||= ($status || '599 Unspecified Error');
+    $headers{'Content-Type'}     ||= 'text/plain';
+    $headers{'MS]Author-Via'}    ||= ['SPARQL', 'DAV'];
+    
+    decent_headers(%headers);
+    print $body . "\n";
+    exit;
+  }
+
+  sub checkConditions
+  {
+    my ($etag, $datetime) = @_;
+    
+    if ($CGI->http('if_modified_since'))
+    {
+      my $ims = $COMPACTDATE->format_datetime(
+              DateTime::Format::HTTP->parse_datetime(
+                $CGI->http('if_modified_since')));
+      if ($ims ge $datetime)
+      {
+        return ('304 Not Modified', "Has not been modified since request If-Modified-Since header.");
+      }
+    }
+    
+    if ($CGI->http('if_unmodified_since'))
+    {
+      my $ims = $COMPACTDATE->format_datetime(
+              DateTime::Format::HTTP->parse_datetime(
+                $CGI->http('if_unmodified_since')));
+      if ($ims lt $datetime)
+      {
+        return ('412 Precondition Failed', "Has been modified since request If-Unmodified-Since header.");
+      }
+    }
+    
+    if ($CGI->http('if_none_match') =~ /^\s*\*\s*$/)
+    {
+      return '304 Not Modified';
+    }
+    elsif (length $CGI->http('if_none_match'))
+    {
+      my $header  = $CGI->http('if_none_match');
+      $header =~ s!W/\"!\"!g;  # not issuing any weak etags
+      $header =~ s/(^\s*\"|\"\s*$)//g;
+      my @matchers = split /\"\s+\"/, $header;
+      foreach my $m (@matchers)
+      {
+        if ($m eq $etag)
+        {
+          return ('304 Not Modified', "Matched tag $m in request If-None-Match header.");
+        }
+      }
+    }
+    
+    if ($CGI->http('if_match') =~ /^\s*\*\s*$/)
+    {
+      # continue
+    }
+    elsif (length $CGI->http('if_match'))
+    {
+      my $header  = $CGI->http('if_match');
+      $header =~ s!W/\"!\"!g;  # not issuing any weak etags
+      $header =~ s/(^\s*\"|\"\s*$)//g;
+      my @matchers = split /\"\s+\"/, $header;
+      foreach my $m (@matchers)
+      {
+        if ($m eq $etag)
+        {
+          return;
+        }
+      }
+      return ('412 Precondition Failed', "Tag $etag not matched in request If-Match header.");
+    }
+    
+    return;
+  }
+
+  # Handle PUT/POST
+  if ($CGI->request_method =~ /^(put|post)$/i)
+  {
+    SendError('405 Method Not Allowed', "Allowed: HEAD, GET. To PUT data, don't append datetime ($DATE) or format ($EXT) suffixes to the URL.")
+      if defined $DATE || (defined $EXT and $EXT ne 'n3');
+    
+    # We've been posted/put some content with a content-type.
+    my ($IN, $CT);
+    if ($CGI->request_method =~ /put/i)
+    {
+      $IN = $CGI->param('PUTDATA');
+      $CT = $CGI->content_type;
+    }
+    elsif ($CGI->request_method =~ /post/i and $CGI->content_type =~ /sparql.query/i)
+    {
+      $IN = $CGI->param('POSTDATA');
+      $CT = $CGI->content_type;
+    }
+    elsif($CGI->param('data'))
+    {
+      $IN = $CGI->param('data');
+      $CT = $CGI->param('format') || 'text/n3';
+    }
+    
+    my $olddata;
+    if (@all_versions)
+    {
+      my $oldversion = $all_versions[-1];
+      local $/ = undef;
+      open my $fh, "<:gzip", $PATH.$SHORT."/${oldversion}.n3.gz";
+      $olddata = <$fh>;
+      close $fh;
+      my $digest = Digest::MD5->new;
+      $digest->add($olddata);
+      my $oldetag = $NS.$SHORT."\@${oldversion}.n3".'='.$digest->clone->hexdigest;
+      my ($bail, $reason) = &checkConditions($oldetag, $oldversion);
+      
+      if ($bail)
+      {
+        SendError('412 Precondition Failed', $reason);
+      }
+    }
+    else
+    {
+      if ($CGI->http('if_match') =~ /^\s*\*\s*$/)
+      {
+        SendError('412 Precondition Failed', "'If-Match: *' in request header did not match, as no such resource exists.");
+      }
+    }
+    
+    &use_Trine;
+    
+    # Check it's a supported type.
+    my ($parser, $sparql);
+    given ($CT)
+    {
+      when (/turtle/i)     { $parser = RDF::Trine::Parser::Turtle->new; }
+      when (/n3/i)         { $parser = RDF::Trine::Parser::Notation3->new; }
+      when (/html/i)       { $parser = RDF::Trine::Parser::RDFa->new; }
+      when (/xml/i)        { $parser = RDF::Trine::Parser::RDFXML->new; }
+      when (/json/i)       { $parser = RDF::Trine::Parser::RDFJSON->new; }
+      when (/text.plain/i) { $parser = RDF::Trine::Parser::NTriples->new; }
+      when (/sparql.query/){ $sparql++; }
+      default
+      {
+        SendError("415 Unsupported Media Type ($CT)",
+          'Acceptable: text/turtle, text/n3, text/plain (i.e. N-Triples), application/xhtml+xml (i.e. XHTML+RDFa 1.0), application/rdf+xml and application/json (i.e. RDF/JSON).');
+      }
+    }
+    
+    # Check it's syntactically sound
+    my $model;
+    
+    if ($sparql)
+    {
+      # MS-Author-Via: SPARQL
+      &use_Query;
+      
+      # These are horrible hacks.
+      if (1 || $CGI->http('user-agent') =~ /firefox/i)
+      {
+        if ($IN =~ /^ \s* WHERE \s* { (.*) } \s* (INSERT|DELETE) \s* { (.*) } \s* $/six)
+          { $IN = "$2 { $3 } WHERE { $1 }"; }
+        $IN =~ s/INSERT/INSERT DATA/i
+          unless $IN =~ /WHERE/i || $IN =~ /INSERT\s+DATA/is;
+        $IN =~ s/DELETE/DELETE DATA/i
+          unless $IN =~ /WHERE/i || $IN =~ /DELETE\s+DATA/is;
+      }
+
+      $@ = undef;
+      eval {
+        $model = RDF::Trine::Model->temporary_model;
+        RDF::Trine::Parser::Notation3->new
+          ->parse_into_model($URI.$SHORT, $olddata, $model);
+        my $query = RDF::Query->new($IN,
+          { update=>1, load_data=>0, base=>$URI.$SHORT, lang=>'sparql11' });
+        die RDF::Query->error if defined RDF::Query->error;
+        $query->execute($model);
+      };
+      if ($@)
+      {
+        SendError('422 Unprocessable Entity', "$IN => ".$@);
+      }
+    }
+    else
+    {
+      $@ = undef;
+      eval {  
+        $model = RDF::Trine::Model->temporary_model;
+        $parser->parse_into_model($URI.$SHORT, $IN, $model);
+      };
+      if ($@)
+      {
+        SendError('422 Unprocessable Entity', $@);
+      }
+    }
+    
+    # We want to save as Notation 3, not whatever the hell
+    # format it was posted to us in.
+    my $best;
+    if (
+      defined $parser
+      and (
+        $parser->isa('RDF::Trine::Parser::Turtle')
+        or $parser->isa('RDF::Trine::Parser::Notation3')
+        or $parser->isa('RDF::Trine::Parser::NTriples')
+      )
+    )
+    {
+      # It's already some flavour of N3.
+      $best = $IN;
+    }
+    else
+    {
+      # Serialise to N3 (Turtle to be exact).
+      my $ser = RDF::Trine::Serializer::Turtle->new;
+      $best = $ser->serialize_model_to_string($model);
+    }
+    
+    # Save it!
+    my $now = DateTime->now(formatter=>$COMPACTDATE);
+    $now->set_time_zone('UTC');
+    mkdir $PATH.$SHORT
+      unless -d $PATH.$SHORT;
+    open my $fh, ">:gzip", $PATH.$SHORT."/${now}.n3.gz";
+    print $fh $best;
+    close $fh;
+    
+    # Respond.
+    SendData($best, "$now", "n3", {Status => ($olddata ? '200 OK' : '201 Created')}, 1);  
+  }
+
+  # Handle GET/HEAD and command-line usage
+  elsif ($CGI->request_method =~ /^(get|head|)$/i)
+  {
+    my ($chosen_version, $chosen_format);
+    
+    # BEGIN: Handle choosing version, including Accept-Datetime header.
+    {
+      unless (@all_versions)
+      {
+        SendError('404 Not Found', 'This page has not yet been created.');
+      }
+      
+      # If no date given in URI, but requested in Accept-Datetime
+      # header, then reformat that to the expected datetime format.
+      if ($CGI->http('accept_datetime') && !$DATE)
+      {
+        $DATE = $COMPACTDATE->format_datetime(
+          DateTime::Format::HTTP->parse_datetime(
+            $CGI->http('accept_datetime')));
+      }
+      
+      # if no date given, or latest version requested, find latest version.
+      if ($DATE =~ /^latest$/ || !$DATE)
+      {
+        $chosen_version = $all_versions[-1];
+        $chosen_version =~ s!^.*/([^/]+)\.n3.gz$!$1!;
+      }
+      # otherwise, find latest version that is no later than given date.
+      elsif ($DATE)
+      {
+        my $req_date = DateTime::Format::ISO8601->parse_datetime($DATE);
+        my $test = $COMPACTDATE->format_datetime($req_date);
+        my @candidates = 
+          sort
+          grep { $_ le $test }
+          @all_versions;
+        $chosen_version = (@candidates) ? $candidates[-1] : undef;
+      }
+      
+      # No appropriate version found.
+      if (! $chosen_version)
+      {
+        if ($CGI->http('accept_datetime'))
+        {
+          my $suggested_version = (@all_versions) ? $all_versions[0] : undef;
+          $suggested_version =~ s!^.*/([^/]+)\.n3.gz$!$1!;
+          
+          SendError('406 Not Acceptable',
+            "You requested Accept-Datetime:  ".$CGI->http('accept_datetime')."\n".
+            "Earliest available version:     ".DateTime::Format::HTTP->format_datetime($COMPACTDATE->parse_datetime($suggested_version))."\n"
+            );
+        }
+        else
+        {
+          SendError('303 See Other', "See ${URI}${SHORT}",
+            {-Location => $URI.$SHORT.($EXT?".${EXT}":'')});
+        }
+      }
+    }
+    # END: Handle choosing version, including Accept-Datetime header.
+    
+    # Choose format
+    my $chosen_format = $EXT || choose([
+      ['n3',       1.0,  'text/n3',     undef, 'utf-8'],
+      ['turtle',   0.6,  'text/turtle', undef, 'utf-8'],
+      ['nt',       0.6,  'text/plain',  undef, 'utf-8'],
+      ['json',     0.6,  'application/json',      undef, 'utf-8'],
+      ['rdf',      0.6,  'application/rdf+xml',   undef, 'utf-8'],
+      ['xhtml',    0.02, 'application/xhtml+xml', undef, 'utf-8'],
+      ['html',     0.01, 'text/html',   undef, 'utf-8'],
+      ]) || 'n3';
+    
+    # Handle requests for Gzipped Notation 3.
+    if ($chosen_format eq 'n3' and $CGI->http('Accept-Encoding')=~/gzip/i)
+    {
+      my $data;
+      {
+        local $/ = undef;
+        open my $fh, "<", $PATH.$SHORT."/${chosen_version}.n3.gz";
+        $data = <$fh>;
+        close $fh;
+      }
+      SendData($data, $chosen_version, $chosen_format, {'Content-Encoding' => 'gzip'});
+    }
+    
+    # Otherwise we're going to need to unzip the data...
+    my $data;
+    {
+      local $/ = undef;
+      open my $fh, "<:gzip", $PATH.$SHORT."/${chosen_version}.n3.gz";
+      $data = <$fh>;
+      close $fh;
+    }
+    
+    # Handle requests for uncompressed Notation 3.
+    if ($chosen_format eq 'n3')
+    {
+      SendData($data, $chosen_version, $chosen_format);
+    }
+    
+    &use_Trine;
+    
+    # Sometimes, if we've been requested for Turtle/NTriples, we might
+    # be able to get away with serving the Notation 3 as-is.
+    if ($chosen_format =~ m/^(nt|turtle)$/)
+    {
+      # check that by attempting to parse it with a non-N3 parser.
+      my $parser = $chosen_format eq 'nt' ?
+        RDF::Trine::Parser::NTriples->new :
+        RDF::Trine::Parser::Turtle->new;
+      eval {
+        my $tmpmodel = RDF::Trine::Model->temporary_model;
+        $parser->parse_into_model($URI.$SHORT, $data, $tmpmodel);
+      };
+      # No errors, so...
+      if (! $@)
+      {
+        SendData($data, $chosen_version, $chosen_format);
+      }
+    }
+    
+    # OK, we're going to need to reserialize the data...
+    my $sclass = 'RDF::Trine::Serializer::' . {
+      'rdf'       => 'RDFXML',
+      'json'      => 'RDFJSON',
+      'canonical' => 'NTriples::Canonical',
+      'turtle'    => 'Turtle',
+      'nt'        => 'NTriples',
+      }->{$chosen_format};
+    
+    if ($sclass eq 'RDF::Trine::Serializer::' or !$sclass->can('new'))
+    {
+      SendError('404 Not Found', "No variant of '/${NS}${SHORT}' found with suffix '.${EXT}'. Try '.n3'??")
+        unless ($chosen_format eq 'html' or $chosen_format eq 'xhtml');
+    }
+
+    my $parser = RDF::Trine::Parser::Notation3->new;
+    my $tmpmodel_n3 = RDF::Trine::Model->temporary_model;
+    $parser->parse_into_model($URI.$SHORT, $data, $tmpmodel_n3);
+    my $tmpmodel = RDF::Trine::Model->temporary_model;
+    my $iter = $tmpmodel_n3->as_stream;
+    while (my $st = $iter->next)
+    {
+      $tmpmodel->add_statement($st) if $st->rdf_compatible;
+    }
+
+    if ($chosen_format eq 'html' or $chosen_format eq 'xhtml')
+    {
+      {
+        local $@ = undef;
+        eval 'use RDF::RDFa::Generator;';
+        die $@ if $@;
+        eval 'use HTML::HTML5::Writer;';
+        die $@ if $@;
+      }
+      my $gen = RDF::RDFa::Generator->new(
+        base     => $URI.$SHORT,
+        safe_xml_literals => 1,
+        style    => 'HTML::Pretty',
+        );
+      my $dom = $gen->inject_document(<<TEMPLATE, $tmpmodel);
+  <html xmlns="http://www.w3.org/1999/xhtml">
+    <head profile="http://www.w3.org/1999/xhtml/vocab">
+      <title>Data Wiki: ${NS}${SHORT}</title>
+      <style type="text/css">
+        dt { font-weight: bold ; }
+        div[about] { border: 2px solid green; background: #dfd; padding: 1em; margin: 1em 0; }
+        img { float: right; }
+      </style>
+    </head>
+    <body>
+      <h1>${NS}${SHORT}</h1>
+      <p>This is a page of data on the wiki.ontologi.es Data Wiki.</p>
+      <h2>Data</h2>
+    </body>
+  </html>
+  TEMPLATE
+
+      if ($chosen_format eq 'html')
+      {
+        SendData(HTML::HTML5::Writer->new->document($dom), $chosen_version, $chosen_format);
+      }
+      else
+      {
+        SendData(HTML::HTML5::Writer->new(
+          markup  => 'xhtml',
+          doctype => HTML::HTML5::Writer->DOCTYPE_XHTML_RDFA
+          )->document($dom), $chosen_version, $chosen_format);
+      }
+    }
+    
+    $data = $sclass->new(
+      namespaces => $parser->{bindings}||{},  # little hack to retain prefixes.
+      style      => 'HTML::Pretty',
+      )->serialize_model_to_string($tmpmodel);
+    
+    SendData($data, $chosen_version, $chosen_format);
+  }
+
+  else
+  {
+    SendError('405 Method Not Allowed', "Allowed: HEAD, GET, PUT, POST.");
+  }
+
+=head1 SEE ALSO
+
+L<WWW::DataWiki>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2010-2011 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

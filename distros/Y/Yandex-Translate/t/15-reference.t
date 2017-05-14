@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use Yandex::Translate;
 
@@ -15,5 +15,4 @@ $html_element = $translator->get_yandex_technology_reference();
 is($html_element, '<a href="http://translate.yandex.com/">Powered by Yandex.Translate</a>', 'correct Yandex technology reference in English');
 $translator->set_ui('tr');
 $html_element = $translator->get_yandex_technology_reference();
-is($html_element, '<a href="http://translate.yandex.com.tr/">Tarafından desteklenmektedir Yandex.Translate</a>', 'correct Yandex technology reference in Turkish');
-
+is($html_element, '<a href="http://translate.yandex.com.tr/">Tarafından desteklenmektedir Yandex.Çeviri</a>', 'correct Yandex technology reference in Turkish');

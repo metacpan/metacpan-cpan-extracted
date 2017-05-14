@@ -10,9 +10,9 @@ build_requires:
   Tie::Hash: '0'
   Tie::Scalar: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,8 @@ requires:
   Tk::Menubutton: '0'
   Tk::ROText: '0'
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-ObjScanner
+  bugtracker: https://github.com/dod38fr/perl-tk-objscanner/issues
   homepage: https://github.com/dod38fr/perl-tk-objscanner
   repository: https://github.com/dod38fr/perl-tk-objscanner.git
-version: '2.016'
+version: '2.017'
+x_serialization_backend: 'YAML::Tiny version 1.70'

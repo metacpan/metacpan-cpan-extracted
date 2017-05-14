@@ -1,0 +1,27 @@
+---
+abstract: 'Generates exheres for perl modules'
+author:
+  - 'William Orr <will@worrbase.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::Perl::Critic: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exherbo-Packager
+requires:
+  DateTime: 0
+  File::Copy: 0
+  Getopt::Long: 0
+  MetaCPAN::API: 0
+  Ouch: 0
+  Pod::Usage: 0
+  YAML::Any: 0
+version: 1.133000

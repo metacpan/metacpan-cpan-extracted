@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/maketagcloud.pl
+bin/migrate_keywords_to_tags.pl
+dist.ini
+lib/MendeleySQLite.pm
+t/1.t
+t/test-data.db

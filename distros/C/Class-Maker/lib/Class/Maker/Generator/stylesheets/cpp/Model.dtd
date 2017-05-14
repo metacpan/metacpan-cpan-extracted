@@ -1,0 +1,50 @@
+<!ELEMENT class (info?, dependencies?, uses?,
+  parents?, methods?, properties?)
+>
+<!ATTLIST class
+  name NMTOKEN #REQUIRED
+  package NMTOKEN #IMPLIED
+>
+<!ELEMENT dependencies (dependency*)>
+<!ELEMENT dependency (#PCDATA)>
+<!ELEMENT uses (use*)>
+<!ELEMENT use (#PCDATA)>
+
+<!ELEMENT parents (parent*)>
+<!ELEMENT parent (#PCDATA)>
+<!ATTLIST parent
+  name NMTOKEN #REQUIRED
+  visibility (public | private) "public"
+>
+<!ELEMENT methods (method*)>
+<!ELEMENT method (info?, return?, params*, exceptions*)>
+<!ATTLIST method
+  name NMTOKEN #REQUIRED
+  type CDATA #REQUIRED
+  visibility (public | protected | private) "public"
+  modifier (virtual | static) ""
+  const (true | false) "false"
+>
+<!ELEMENT params (param*)>
+<!ELEMENT param (info?)>
+<!ATTLIST param
+  name NMTOKEN #REQUIRED
+  type CDATA #REQUIRED
+  default CDATA #IMPLIED
+>
+<!ELEMENT properties (property*)>
+<!ELEMENT property (info?)>
+<!ATTLIST property
+  name NMTOKEN #REQUIRED
+  type CDATA #REQUIRED
+  has_get (true | false) "true"
+  has_set (true | false) "true"
+  has_data (true | false) "true"
+  is_unique (true | false) "false"
+>
+<!ELEMENT info (#PCDATA)>
+
+<!ENTITY  amp "&#38;#38;" >
+<!ENTITY   lt "&#38;#60;" >
+<!ENTITY   gt "&#62;" >
+<!ENTITY quot "&#34;" >

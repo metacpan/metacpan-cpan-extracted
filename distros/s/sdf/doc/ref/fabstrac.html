@@ -1,0 +1,57 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: abstract Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fabout.html">Previous Topic</A> | <A HREF="faddress.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.3. abstract Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>abstract</STRONG>
+  ...
+  !endblock
+</PRE>
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>abstract</EM> filter is used to specify an abstract for a technical paper. This typically implies:</P>
+<UL>
+<LI>for <A HREF="http://www.adobe.com">PostScript</A>, the text is italics and indented from both margins
+<LI>for <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A>, the text is given an appropriate heading.</UL>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>A typical paper starts like this:</P>
+<PRE>
+<B>!init</B> OPT_STYLE=<TT>&quot;paper&quot;</TT>
+<B>!define</B> DOC_NAME <TT>&quot;Internet Management Tools&quot;</TT>
+<B>!define</B> DOC_AUTHOR <TT>&quot;I. M. Wise&quot;</TT>
+<B>!build_title</B>
+
+<B>!block</B> abstract
+The internet is out of control. This paper ...
+
+<I># more paragraphs go here</I>
+
+<B>!endblock</B>
+
+H1: Introduction
+
+<I># The interesting stuff goes here</I>
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fabout.html">Previous Topic</A> | <A HREF="faddress.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

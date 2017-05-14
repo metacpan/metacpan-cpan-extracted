@@ -44,6 +44,7 @@ Net::OAuth2::AuthorizationServer::ImplicitGrant - OAuth2 Resource Owner Implicit
     scopes          => $scopes_ref,
     redirect_uri    => $redirect_uri,
     user_id         => $user_id,      # optional
+	jwt_claims_cb   => sub { ... },   # optional, see jwt_claims_cb in Manual
   );
 
   # store access token

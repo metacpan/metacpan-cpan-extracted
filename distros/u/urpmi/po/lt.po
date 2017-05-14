@@ -1,42 +1,93 @@
-#
-# Latest versions of po files are at http://www.mandrivalinux.com/l10n/lt.php3
-#
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2000 Free Software Foundation, Inc.
-# Kęstutis Kružikas <DrKestas@takas.lt>, 2000.
-# Mykolas Norvaišas <Myka@centras.lt>, 1999-2001.
+# Copyright (C) YEAR Free Software Foundation, Inc.
 #
+# Translators:
+# Kęstutis Kružikas <DrKestas@takas.lt>, 2000
+# Moo, 2015-2016
+# Tomsonas, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: urpmi 3.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 19:38+0200\n"
-"PO-Revision-Date: 2005-08-18 23:34+0200\n"
-"Last-Translator: Arvydas Svirka <arvydas@arvis.lt>\n"
-"Language-Team: Lithuanian <komp_lt@konferencijos.lt>\n"
+"Project-Id-Version: Mageia\n"
+"POT-Creation-Date: 2014-09-13 21:15+0200\n"
+"PO-Revision-Date: 2016-09-14 13:18+0000\n"
+"Last-Translator: Tomsonas\n"
+"Language-Team: Lithuanian (http://www.transifex.com/MageiaLinux/mageia/"
+"language/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8-bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../gurpmi:32
+#: ../gurpm/RPMProgressDialog.pm:47
+#, c-format
+msgid "Distribution Upgrade"
+msgstr "Distribucijos atnaujinimas"
+
+#: ../gurpm/RPMProgressDialog.pm:47
+#, c-format
+msgid "Packages installation"
+msgstr "Paketų įdiegimas"
+
+#: ../gurpm/RPMProgressDialog.pm:128
+#, c-format
+msgid "Please wait..."
+msgstr "Prašome palaukti..."
+
+#: ../gurpm/RPMProgressDialog.pm:290
+#, c-format
+msgid "Verifying package signatures..."
+msgstr "Patvirtinami paketų parašai..."
+
+#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:107
+#, c-format
+msgid "Preparing..."
+msgstr "Ruošiamasi..."
+
+#: ../gurpm/RPMProgressDialog.pm:313
+#, c-format
+msgid "Removing package `%s' ..."
+msgstr "Šalinamas paketas `%s' ..."
+
+#: ../gurpm/RPMProgressDialog.pm:316
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Įdiegiamas paketas `%s' (%s/%s)..."
+
+#: ../gurpm/RPMProgressDialog.pm:345
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Atsiunčiamas paketas \"%s\"..."
+
+#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
+#, c-format
+msgid "Cancel"
+msgstr "Atšaukti"
+
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:453 ../urpm/download.pm:857
+#: ../urpm/get_pkgs.pm:278 ../urpm/media.pm:1126 ../urpm/media.pm:1647
+#: ../urpm/media.pm:1798
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "...atkūrimas nepavyko: %s"
+
+#: ../gurpmi:49
 #, c-format
 msgid "RPM installation"
 msgstr "RPM įdiegimas"
 
-#: ../gurpmi:46
+#: ../gurpmi:63
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
 msgstr ""
 
-#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
 #, c-format
 msgid "_Ok"
 msgstr "_Gerai"
 
-#: ../gurpmi:67
+#: ../gurpmi:84
 #, c-format
 msgid ""
 "You have selected a source package:\n"
@@ -48,16 +99,16 @@ msgid ""
 "\n"
 "What would you like to do?"
 msgstr ""
-"Jūs pasirinkote pradinį paketą:\n"
+"Jūs pasirinkote šaltinio paketą:\n"
 "\n"
 "%s\n"
 "\n"
-"Jūs, turbūt, nenorite jo įdiegti (paketo įdiegimas įgalins jus daryti "
-"pakeitimus jo išeities kodui ar kodą sudaryti).\n"
+"Jūs, turbūt, nenorėjote jo įdiegti savo kompiuteryje (paketo įdiegimas leis "
+"jums daryti pakeitimus jo pirminiam kodui, o tuomet jį kompiliuoti).\n"
 "\n"
-"Ką jūs darysite?"
+"Ką norėtumėte daryti?"
 
-#: ../gurpmi:75 ../gurpmi:86
+#: ../gurpmi:92 ../gurpmi:103
 #, c-format
 msgid ""
 "You are about to install the following software packages on your computer:\n"
@@ -66,13 +117,13 @@ msgid ""
 "\n"
 "Proceed?"
 msgstr ""
-"Jūs kompiuteryje ketinate įdiegti šiuos programinės įrangos paketus:\n"
+"Jūs ketinate kompiuteryje įdiegti šiuos programinės įrangos paketus:\n"
 "\n"
 "%s\n"
 "\n"
 "Tęsti?"
 
-#: ../gurpmi:81
+#: ../gurpmi:98
 #, c-format
 msgid ""
 "You are about to install the following software package on your computer:\n"
@@ -81,141 +132,125 @@ msgid ""
 "\n"
 "You may prefer to just save it. What is your choice?"
 msgstr ""
-"Jūs kompiuteryje ketinate įdiegti šį programinė įrangos paketą:\n"
+"Jūs į kompiuterį ketinate įdiegti šį programinės įrangos paketą:\n"
 "\n"
 "%s\n"
 "\n"
-"Jūs galite tiesiog jį išsaugoti. Koks jūsų pasirinkimas?"
+"Jūs galite pageidauti jį, tiesiog, išsaugoti Koks jūsų pasirinkimas?"
 
-#: ../gurpmi:99
+#: ../gurpmi:116
 #, c-format
 msgid "_Install"
 msgstr "Į_diegti"
 
-#: ../gurpmi:100
+#: ../gurpmi:117
 #, c-format
 msgid "_Save"
-msgstr "Iš_saugoti"
+msgstr "Į_rašyti"
 
-#: ../gurpmi:101 ../gurpmi2:197
+#: ../gurpmi:118 ../gurpmi2:173
 #, c-format
 msgid "_Cancel"
 msgstr "_Atšaukti"
 
-#: ../gurpmi:109
+#: ../gurpmi:126
 #, c-format
 msgid "Choose location to save file"
-msgstr "Pasirinkite vietą bylos išsaugojimui"
+msgstr "Pasirinkite vietą failo išsaugojimui"
 
-#: ../gurpmi.pm:41
+#: ../gurpmi:126 ../gurpmi2:119
+#, c-format
+msgid "Ok"
+msgstr "Gerai"
+
+#: ../gurpmi.pm:56
 #, c-format
 msgid "Options:"
-msgstr ""
+msgstr "Parinktys:"
 
-#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
-#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
 #, c-format
 msgid "  --help         - print this help message.\n"
 msgstr "  --help         - spausdinti šį pagalbos pranešimą.\n"
 
-#: ../gurpmi.pm:43 ../urpmi:74
+#: ../gurpmi.pm:58 ../urpmi:74
 #, c-format
 msgid ""
 "  --auto         - non-interactive mode, assume default answers to "
 "questions.\n"
 msgstr ""
 
-#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#: ../gurpmi.pm:59 ../urpmi:75 ../urpmq:48
 #, c-format
 msgid ""
 "  --auto-select  - automatically select packages to upgrade the system.\n"
 msgstr ""
 "  --auto-select  - automatiškai parinkti paketus sistemos atnaujinimui.\n"
 
-#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#: ../gurpmi.pm:60 ../urpme:46 ../urpmi:100 ../urpmq:64
 #, c-format
 msgid ""
 "  --force        - force invocation even if some packages do not exist.\n"
 msgstr "  --force        - vykdyti kreipimąsi, net jei nėra keleto paketų.\n"
 
-#: ../gurpmi.pm:46 ../urpmi:129
-#, fuzzy, c-format
+#: ../gurpmi.pm:61 ../urpmi:131
+#, c-format
 msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
 "                   (--no-verify-rpm disables it, default is enabled).\n"
 msgstr ""
-"  --verify-rpm   - prieš įdiegimą patikrinti rpm ženklą\n"
-"                   (--no-verify-rpm funkciją išjungia, standartiškai ji yra "
-"įjungta).\n"
 
-#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
 msgid "  --media        - use only the given media, separated by comma.\n"
 msgstr ""
 "  --media        - naudoti tik duotąsias laikmenas, atskirtas kableliu.\n"
 
-#: ../gurpmi.pm:49 ../urpmi:146
+#: ../gurpmi.pm:64 ../urpmi:147
 #, c-format
 msgid "  -p             - allow search in provides to find package.\n"
 msgstr "  -p             - paketo suradimui leisti paiešką pasiūlymuose.\n"
 
-#: ../gurpmi.pm:50 ../urpmi:147
+#: ../gurpmi.pm:65 ../urpmi:148
 #, c-format
 msgid "  -P             - do not search in provides to find package.\n"
 msgstr "  -P             - paketo suradimui paieškos pasiūlymuose neatlikti.\n"
 
-#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#: ../gurpmi.pm:66 ../urpmi:107 ../urpmq:67
 #, c-format
 msgid "  --root         - use another root for rpm installation.\n"
 msgstr "  --root         - rpm įdiegimui naudokite kitą pradinį.\n"
 
-#: ../gurpmi.pm:52 ../urpmi:131
-#, fuzzy, c-format
+#: ../gurpmi.pm:67 ../urpmi:133
+#, c-format
 msgid ""
 "  --test         - only verify if the installation can be achieved "
 "correctly.\n"
 msgstr ""
-"  --test         - patikrinti, ar įdiegimas gali būti įvykdytas teisingai.\n"
 
-#: ../gurpmi.pm:53 ../urpmi:71
-#, fuzzy, c-format
+#: ../gurpmi.pm:68 ../urpmi:71
+#, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested packages.\n"
 msgstr ""
-"  --searchmedia  - pareikalautų (arba atnaujintų) paketų paieškai naudokite "
-"tik duotąją laikmeną.\n"
 
-#: ../gurpmi.pm:96
-#, fuzzy, c-format
-msgid "No packages specified"
-msgstr "Išsaugoti paketų pasirinkimą"
-
-#: ../gurpmi2:55
+#: ../gurpmi.pm:115
 #, c-format
-msgid "Please wait..."
-msgstr "Palaukite..."
+msgid "No packages specified"
+msgstr ""
 
-#: ../gurpmi2:64
+#: ../gurpmi2:46
 #, c-format
 msgid "Must be root"
 msgstr "Turi būti pradinis"
 
-#: ../gurpmi2:71
-#, fuzzy, c-format
-msgid "Distribution Upgrade"
-msgstr "paskirstomas %s"
-
-#: ../gurpmi2:71
-#, fuzzy, c-format
-msgid "Packages installation"
-msgstr "Paketų įdiegimas..."
-
-#: ../gurpmi2:98
-#, fuzzy, c-format
+#: ../gurpmi2:76
+#, c-format
 msgid "Preparing packages installation..."
-msgstr "Paketų įdiegimas..."
+msgstr "Ruošiamas paketų įdiegimas..."
 
-#: ../gurpmi2:113 ../urpmi:505
+#: ../gurpmi2:91 ../urpmi:506
 #, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
@@ -224,156 +259,135 @@ msgstr ""
 "Pareikalautas paketas negali būti įdiegtas:\n"
 "%s"
 
-#: ../gurpmi2:121
-#, fuzzy, c-format
+#: ../gurpmi2:99
+#, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Vienas reikalautų paketų negali būti įdiegtas:\n"
-"%s\n"
-"Tęsti?"
 
-#: ../gurpmi2:156
+#: ../gurpmi2:119
 #, c-format
 msgid "Warning"
-msgstr "Dėmesio"
+msgstr "Dėmėsio"
 
-#: ../gurpmi2:156
-#, c-format
-msgid "Ok"
-msgstr "Gerai"
-
-#: ../gurpmi2:193
+#: ../gurpmi2:169
 #, c-format
 msgid " (to upgrade)"
 msgstr " (atnaujinti)"
 
-#: ../gurpmi2:194
+#: ../gurpmi2:170
 #, c-format
 msgid " (to install)"
 msgstr " (įdiegti)"
 
-#: ../gurpmi2:197
+#: ../gurpmi2:173
 #, c-format
 msgid "Package choice"
 msgstr "Paketų pasirinkimas"
 
-#: ../gurpmi2:198
+#: ../gurpmi2:174
 #, c-format
 msgid "One of the following packages is needed:"
 msgstr "Vienas iš šių paketų yra reikalingas."
 
-#: ../gurpmi2:223
+#: ../gurpmi2:204
 #, c-format
 msgid "_Abort"
 msgstr "_Nutraukti"
 
-#: ../gurpmi2:258
-#, fuzzy, c-format
+#: ../gurpmi2:239
+#, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Norint įdiegti kitus paketus, šie turi būti pašalinti:\n"
-"%s\n"
-"Tęsti?"
 
-#: ../gurpmi2:277 ../urpmi:605
-#, fuzzy, c-format
+#: ../gurpmi2:250 ../urpmi:615
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr "Bus panaudota %s papildomos disko vietos."
+
+#: ../gurpmi2:251 ../urpmi:616
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr "Bus atlaisvinta %s disko vietos."
+
+#: ../gurpmi2:252 ../urpmi:617
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr "Bus gauta %s paketų."
+
+#: ../gurpmi2:253 ../urpmi:618
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] "Tęsti vieno paketo diegimą?"
+msgstr[1] "Tęsti %d paketų diegimą?"
+msgstr[2] "Tęsti %d paketų diegimą"
+
+#: ../gurpmi2:259 ../urpmi:606
+#, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
-msgstr "Priklausomybių patenkinimui, bus įdiegtas šis paketas (%d MB)"
+msgstr "Kad būtų patenkintos priklausomybės, bus įdiegtas sekantis paketas:"
 
-#: ../gurpmi2:278 ../urpmi:606
-#, fuzzy, c-format
+#: ../gurpmi2:260 ../urpmi:607
+#, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
-msgstr "Priklausomybių patenkinimui, bus įdiegtas šis paketas (%d MB)"
+msgstr "Kad būtų patenkintos priklausomybės, bus įdiegti sekantys paketai:"
 
-#: ../gurpmi2:280
-#, fuzzy, c-format
-msgid "(%d package, %d MB)"
-msgid_plural "(%d packages, %d MB)"
-msgstr[0] "%d paketų"
-msgstr[1] "%d paketų"
-msgstr[2] "%d paketų"
-
-#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#: ../gurpmi2:270 ../urpm/main_loop.pm:467
 #, c-format
 msgid "unable to get source packages, aborting"
 msgstr "negaliu gauti pirminių paketų, nutraukiu"
 
-#: ../gurpmi2:320 ../urpm/install.pm:104
+#: ../gurpmi2:287 ../urpmi:634
 #, c-format
-msgid "Preparing..."
-msgstr "Ruošiamasi..."
-
-#: ../gurpmi2:326
-#, c-format
-msgid "Installing package `%s' (%s/%s)..."
-msgstr "Įdiegiamas paketas `%s' (%s/%s)..."
-
-#: ../gurpmi2:344 ../urpmi:633
-#, fuzzy, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "Įdėkite laikmeną, pavadintą \"%s\", į įrenginį [%s]"
+msgstr "Prašome įdėti laikmeną, pavadinimu \"%s\""
 
-#: ../gurpmi2:358
+#: ../gurpmi2:307
 #, c-format
-msgid "Downloading package `%s'..."
-msgstr "Parsiunčiamas paketas `%s'..."
+msgid "An error occurred:"
+msgstr "Įvyko klaida:"
 
-#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
-#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
-#: ../urpm/media.pm:1657
-#, c-format
-msgid "...retrieving failed: %s"
-msgstr "...atkūrimas nepavyko: %s"
-
-#: ../gurpmi2:387
+#: ../gurpmi2:319
 #, c-format
 msgid "_Done"
 msgstr "Baigta"
 
-#: ../gurpmi2:404 ../urpm/main_loop.pm:82
-#, fuzzy, c-format
+#: ../gurpmi2:336 ../urpm/main_loop.pm:82
+#, c-format
 msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
-msgstr "Įdiegimas nepavyko"
+msgstr ""
 
-#: ../gurpmi2:407
-#, fuzzy, c-format
+#: ../gurpmi2:339
+#, c-format
 msgid "You may want to update your urpmi database."
 msgstr ""
-"Įdiegimas nepavyko, trūksta kai kurių bylų:\n"
-"%s\n"
-"Jūs galite norėti atnaujinti urpmi duomenų bazę"
 
-#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
-#, fuzzy, c-format
+#: ../gurpmi2:343 ../urpm/main_loop.pm:288 ../urpm/main_loop.pm:580
+#, c-format
 msgid "Installation failed:"
-msgstr "Įdiegimas nepavyko"
+msgstr "Įdiegimas nepavyko:"
 
-#: ../gurpmi2:416
+#: ../gurpmi2:348
 #, c-format
 msgid "The package(s) are already installed"
 msgstr "Paketas(-ai) jau įdiegti"
 
-#: ../gurpmi2:418
+#: ../gurpmi2:350
 #, c-format
 msgid "Installation finished"
 msgstr "Įdiegimas baigtas"
 
-#: ../gurpmi2:419 ../urpme:165
-#, c-format
-msgid "removing %s"
-msgstr "pašalinama %s"
-
-#: ../gurpmi2:430 ../urpmi:691
+#: ../gurpmi2:363 ../urpmi:692
 #, c-format
 msgid "restarting urpmi"
 msgstr "iš naujo paleidžiama urpmi"
@@ -408,11 +422,11 @@ msgid "                    defaults to %s.\n"
 msgstr "                    standartinis yra %s.\n"
 
 #: ../rpm-find-leaves:21
-#, fuzzy, c-format
+#, c-format
 msgid "   -f             - output rpm full name (NVRA)\n"
-msgstr "  -g             - spausdinti grupes kartu su pavadinimu.\n"
+msgstr ""
 
-#: ../rurpmi:11 ../urpmi:265
+#: ../rurpmi:11 ../urpmi:266
 #, c-format
 msgid "Only superuser is allowed to install packages"
 msgstr "Paketus įdiegti leidžiama tik supervartotojui"
@@ -427,137 +441,137 @@ msgstr "urpmi paleidžiama apribota veiksena..."
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:110
-#, fuzzy, c-format
+#: ../urpm.pm:194
+#, c-format
 msgid "fail to create directory %s"
-msgstr "Klaidų ataskaitai negaliu sukurti katalogo [%s]"
+msgstr "nepavyko sukurti katalogo %s"
 
-#: ../urpm.pm:111
+#: ../urpm.pm:195
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr ""
 
-#: ../urpm.pm:135
-#, fuzzy, c-format
+#: ../urpm.pm:238
+#, c-format
 msgid "Can not download packages into %s"
-msgstr "Parsiunčiamas paketas `%s'..."
+msgstr ""
 
-#: ../urpm.pm:150
+#: ../urpm.pm:254
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr ""
 
-#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#: ../urpm.pm:255 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "%s naudojama specifinė aplinka\n"
 
-#: ../urpm.pm:313
+#: ../urpm.pm:423
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "negaliu atverti rpmdb"
 
-#: ../urpm.pm:327
+#: ../urpm.pm:442
 #, c-format
 msgid "invalid rpm file name [%s]"
-msgstr "netinkamas rpm bylos vardas [%s]"
+msgstr "netinkamas rpm failo vardas [%s]"
 
-#: ../urpm.pm:333
+#: ../urpm.pm:448
 #, c-format
 msgid "retrieving rpm file [%s] ..."
-msgstr "atkuriama rpm byla [%s] ..."
+msgstr "atkuriamas rpm failas [%s] ..."
 
-#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#: ../urpm.pm:450 ../urpm/get_pkgs.pm:276
 #, c-format
 msgid "...retrieving done"
 msgstr "...atkūrimas baigtas"
 
-#: ../urpm.pm:343
+#: ../urpm.pm:458
 #, c-format
 msgid "unable to access rpm file [%s]"
-msgstr "negaliu prieiti prie rpm bylos [%s]"
+msgstr "negaliu prieiti prie rpm failo [%s]"
 
-#: ../urpm.pm:348
-#, fuzzy, c-format
+#: ../urpm.pm:463
+#, c-format
 msgid "unable to parse spec file %s [%s]"
-msgstr "negaliu išnagrinėti \"%s\" byloje [%s]"
+msgstr ""
 
-#: ../urpm.pm:356
+#: ../urpm.pm:471
 #, c-format
 msgid "unable to register rpm file"
-msgstr "negaliu įregistruoti rpm bylos"
+msgstr "negaliu įregistruoti rpm failo"
 
-#: ../urpm.pm:358
+#: ../urpm.pm:473
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr ""
 
-#: ../urpm.pm:362
+#: ../urpm.pm:477
 #, c-format
 msgid "error registering local packages"
 msgstr "vietinių paketų registravimo klaida"
 
-#: ../urpm.pm:450
+#: ../urpm.pm:589
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Operacija yra draudžiama, kai dirbama apribotoje veiksenoje"
 
-#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "blogas tarpinio serverio deklaravimas komandinėje eilutėje\n"
 
-#: ../urpm/args.pm:306
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
-msgstr "urpmq: negaliu perskaityti rpm bylos \"%s\"\n"
+msgstr "urpmq: negaliu perskaityti rpm failo \"%s\"\n"
 
-#: ../urpm/args.pm:384
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr ""
 
-#: ../urpm/args.pm:385
-#, fuzzy, c-format
+#: ../urpm/args.pm:390
+#, c-format
 msgid "missing expression before %s"
-msgstr "Nėra ženklo (%s)"
+msgstr ""
 
-#: ../urpm/args.pm:391
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr ""
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr ""
 
-#: ../urpm/args.pm:404
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 
-#: ../urpm/args.pm:478
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr ""
 
-#: ../urpm/args.pm:501
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr ""
 
-#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr ""
 
-#: ../urpm/args.pm:515
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr ""
 
-#: ../urpm/args.pm:523
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -568,18 +582,18 @@ msgid ""
 "usage:\n"
 msgstr ""
 "%s versija %s\n"
-"Autorinės teisės (C) 1999-2005 Mandriva.\n"
+"%s\n"
 "Tai yra nemokama programa, kuri gali būti platinama pagal GNU GPL "
 "licenciją.\n"
 "\n"
 "naudojimas:\n"
 
-#: ../urpm/args.pm:529
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
-msgstr ""
+msgstr "Autorinės teisės (C) %s %s"
 
-#: ../urpm/bug_report.pm:67 ../urpmi:255
+#: ../urpm/bug_report.pm:67 ../urpmi:256
 #, c-format
 msgid "Copying failed"
 msgstr "Kopijavimas nepavyko"
@@ -597,198 +611,181 @@ msgid "Udisks daemon (udisks-daemon) is not running or not ready"
 msgstr ""
 
 #: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\" is not available"
-msgstr "laikmena \"%s\" neišrinkta"
+msgstr "laikmena \"%s\" yra neprieinama"
 
 #: ../urpm/cdrom.pm:218
 #, c-format
 msgid "unable to read rpm file [%s] from medium \"%s\""
-msgstr "negaliu perskaityti \"%2$s\" laikmenos rpm bylos [%1$s]"
+msgstr "nepavyksta perskaityti rpm failo [%s] iš laikmenos \"%s\""
 
-#: ../urpm/cfg.pm:82
-#, fuzzy, c-format
+#: ../urpm/cfg.pm:74
+#, c-format
 msgid "syntax error in config file at line %s"
-msgstr "nagaliu įrašyti konfigūracijos bylos [%s]"
+msgstr ""
 
-#: ../urpm/cfg.pm:115
-#, fuzzy, c-format
+#: ../urpm/cfg.pm:107
+#, c-format
 msgid "unable to read config file [%s]"
-msgstr "nagaliu įrašyti konfigūracijos bylos [%s]"
+msgstr ""
 
-#: ../urpm/cfg.pm:141
+#: ../urpm/cfg.pm:133
 #, c-format
 msgid "medium `%s' is defined twice, aborting"
 msgstr ""
 
-#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#: ../urpm/cfg.pm:249 ../urpm/media.pm:556
 #, c-format
 msgid "unable to write config file [%s]"
-msgstr "nagaliu įrašyti konfigūracijos bylos [%s]"
+msgstr "nagaliu įrašyti konfigūracijos failo [%s]"
 
-#: ../urpm/download.pm:95
+#: ../urpm/download.pm:93
 #, c-format
 msgid "%s is not available, falling back on %s"
 msgstr ""
 
-#: ../urpm/download.pm:178
+#: ../urpm/download.pm:169
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
 msgstr ""
 
-#: ../urpm/download.pm:208
+#: ../urpm/download.pm:199
 #, c-format
 msgid "Please enter your credentials for accessing proxy\n"
 msgstr ""
 
-#: ../urpm/download.pm:209
+#: ../urpm/download.pm:200
 #, c-format
 msgid "User name:"
 msgstr "Naudotojo vardas:"
 
-#: ../urpm/download.pm:209
+#: ../urpm/download.pm:200
 #, c-format
 msgid "Password:"
 msgstr "Slaptažodis:"
 
-#: ../urpm/download.pm:295
+#: ../urpm/download.pm:286
 #, c-format
 msgid "Unknown webfetch `%s' !!!\n"
 msgstr ""
 
-#: ../urpm/download.pm:303
+#: ../urpm/download.pm:294
 #, c-format
 msgid "%s failed: exited with signal %d"
 msgstr ""
 
-#: ../urpm/download.pm:304
+#: ../urpm/download.pm:295
 #, c-format
 msgid "%s failed: exited with %d"
 msgstr ""
 
-#: ../urpm/download.pm:338
-#, fuzzy, c-format
-msgid "copy failed"
-msgstr "Kopijavimas nepavyko"
-
-#: ../urpm/download.pm:344
-#, fuzzy, c-format
-msgid "wget is missing\n"
-msgstr "dėl trūkstamo %s"
-
-#: ../urpm/download.pm:411
-#, fuzzy, c-format
-msgid "curl is missing\n"
-msgstr "dėl trūkstamo %s"
-
-#: ../urpm/download.pm:547
+#: ../urpm/download.pm:329
 #, c-format
-msgid "curl failed: upload canceled\n"
+msgid "copy failed"
 msgstr ""
 
-#: ../urpm/download.pm:548
+#: ../urpm/download.pm:335
+#, c-format
+msgid "wget is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:402
+#, c-format
+msgid "curl is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:537
 #, c-format
 msgid "curl failed: download canceled\n"
 msgstr ""
 
-#: ../urpm/download.pm:583
+#: ../urpm/download.pm:572
 #, c-format
 msgid "rsync is missing\n"
 msgstr ""
 
-#: ../urpm/download.pm:651
+#: ../urpm/download.pm:640
 #, c-format
 msgid "ssh is missing\n"
 msgstr ""
 
-#: ../urpm/download.pm:670
+#: ../urpm/download.pm:659
 #, c-format
 msgid "prozilla is missing\n"
 msgstr ""
 
-#: ../urpm/download.pm:686
+#: ../urpm/download.pm:675
 #, c-format
 msgid "Couldn't execute prozilla\n"
 msgstr ""
 
-#: ../urpm/download.pm:696
-#, fuzzy, c-format
+#: ../urpm/download.pm:685
+#, c-format
 msgid "aria2 is missing\n"
-msgstr "dėl trūkstamo %s"
+msgstr ""
 
-#: ../urpm/download.pm:740
+#: ../urpm/download.pm:734
 #, c-format
 msgid "Failed to download %s"
 msgstr ""
 
-#: ../urpm/download.pm:835
+#: ../urpm/download.pm:829
 #, c-format
 msgid "        %s%% of %s completed, ETA = %s, speed = %s"
 msgstr ""
 
-#: ../urpm/download.pm:836
+#: ../urpm/download.pm:830
 #, c-format
 msgid "        %s%% completed, speed = %s"
 msgstr ""
 
-#: ../urpm/download.pm:921
-#, fuzzy, c-format
+#: ../urpm/download.pm:915
+#, c-format
 msgid "retrieving %s"
-msgstr "pašalinama %s"
+msgstr ""
 
-#: ../urpm/download.pm:932
-#, fuzzy, c-format
+#: ../urpm/download.pm:926
+#, c-format
 msgid "retrieved %s"
-msgstr "...atkūrimas nepavyko: %s"
+msgstr ""
 
-#: ../urpm/download.pm:994
+#: ../urpm/download.pm:989
 #, c-format
 msgid "unknown protocol defined for %s"
 msgstr "%s nurodytas nežinomas protokolas"
 
-#: ../urpm/download.pm:1008
+#: ../urpm/download.pm:1003
 #, c-format
 msgid "no webfetch found, supported webfetch are: %s\n"
 msgstr "nerasta webfetch, palaikomi webfetch yra: %s\n"
 
-#: ../urpm/download.pm:1023
+#: ../urpm/download.pm:1018
 #, c-format
 msgid "unable to handle protocol: %s"
 msgstr "negaliu valdyti protokolo: %s"
 
 #: ../urpm/get_pkgs.pm:29
-#, fuzzy, c-format
+#, c-format
 msgid "cleaning %s and %s"
-msgstr "iš %2$s įdiegiamas %1$s"
+msgstr ""
 
 #: ../urpm/get_pkgs.pm:141
 #, c-format
 msgid "package %s is not found."
 msgstr "paketas %s nerastas."
 
-#: ../urpm/get_pkgs.pm:277
+#: ../urpm/get_pkgs.pm:269
 #, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
-msgstr "rpm bylos atkuriamos iš laikmenos \"%s\"..."
+msgstr "gaunami rpm failai iš laikmenos \"%s\"..."
 
-#: ../urpm/install.pm:110
+#: ../urpm/install.pm:115 ../urpme:164
 #, c-format
-msgid "[repackaging]"
-msgstr ""
+msgid "removing %s"
+msgstr "pašalinama %s"
 
-#: ../urpm/install.pm:201
-#, c-format
-msgid ""
-"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
-msgstr ""
-"sukurta įdiegimo operacija %s (pašalinti=%d, įdiegti=%d, atnaujinti=%d)"
-
-#: ../urpm/install.pm:204
-#, c-format
-msgid "unable to create transaction"
-msgstr "negaliu sukurti operacijos"
-
-#: ../urpm/install.pm:229
+#: ../urpm/install.pm:215
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "iš delta-rpm paketo %s negaliu išarchyvuoti rpm"
@@ -799,99 +796,103 @@ msgid "unable to install package %s"
 msgstr "negaliu įdiegti paketo %s"
 
 #: ../urpm/install.pm:245
-#, fuzzy, c-format
+#, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "iš %2$s įdiegiamas %1$s"
+msgstr ""
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:311
-#, fuzzy, c-format
+#: ../urpm/install.pm:246 ../urpm/install.pm:374
+#, c-format
 msgid "removing %s failed: %s"
-msgstr "...atkūrimas nepavyko: %s"
+msgstr ""
 
-#: ../urpm/install.pm:292
-#, fuzzy, c-format
-msgid "Removing package %s"
-msgstr "pašalinamas paketas %s"
-
-#: ../urpm/install.pm:293
+#: ../urpm/install.pm:295
 #, c-format
 msgid "removing package %s"
 msgstr "pašalinamas paketas %s"
 
-#: ../urpm/install.pm:309
-#, fuzzy, c-format
-msgid "removing installed rpms (%s) from %s"
-msgstr "iš %2$s įdiegiamas %1$s"
+#: ../urpm/install.pm:341
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+"sukurta įdiegimo operacija %s (pašalinti=%d, įdiegti=%d, atnaujinti=%d)"
 
-#: ../urpm/install.pm:318
+#: ../urpm/install.pm:344
+#, c-format
+msgid "unable to create transaction"
+msgstr "negaliu sukurti operacijos"
+
+#: ../urpm/install.pm:372
+#, c-format
+msgid "removing installed rpms (%s) from %s"
+msgstr ""
+
+#: ../urpm/install.pm:381
 #, c-format
 msgid "More information on package %s"
 msgstr "Daugiau informacijos apie paketą %s"
 
-#: ../urpm/ldap.pm:44
+#: ../urpm/ldap.pm:42
 #, c-format
 msgid "Cannot create ldap cache directory"
 msgstr ""
 
-#: ../urpm/ldap.pm:46
+#: ../urpm/ldap.pm:48
 #, c-format
 msgid "Cannot write cache file for ldap\n"
 msgstr ""
 
-#: ../urpm/ldap.pm:181
+#: ../urpm/ldap.pm:177
 #, c-format
 msgid "No server defined, missing uri or host"
 msgstr ""
 
-#: ../urpm/ldap.pm:182
-#, fuzzy, c-format
+#: ../urpm/ldap.pm:178
+#, c-format
 msgid "No base defined"
-msgstr "Išsaugoti paketų pasirinkimą"
+msgstr ""
 
-#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
-#, fuzzy, c-format
+#: ../urpm/ldap.pm:188 ../urpm/ldap.pm:191
+#, c-format
 msgid "Cannot connect to ldap uri:"
-msgstr "Nepavyko paskirti spalvų lentelės įrašų"
+msgstr ""
 
 #: ../urpm/lock.pm:99
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked, process %d is already using it"
-msgstr "urpmi duomenų bazė užrakinta"
+msgstr "%s duomenų bazė yra užrakinta, ją jau naudoja procesas %d"
 
 #: ../urpm/lock.pm:101
 #, c-format
 msgid "%s database is locked (another program is already using it)"
-msgstr ""
+msgstr "%s duomenų bazė yra užrakinta (ją naudoja jau kita programa)"
 
 #: ../urpm/lock.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "urpmi duomenų bazė užrakinta"
+msgstr "%s duomenų bazė yra užrakinta. Laukiama..."
 
 #: ../urpm/lock.pm:116
-#, fuzzy, c-format
+#, c-format
 msgid "aborting"
-msgstr "Dėmesio"
+msgstr ""
 
 #: ../urpm/main_loop.pm:58
 #, c-format
 msgid "Retry?"
-msgstr ""
+msgstr "Bandyti dar kartą?"
 
 #: ../urpm/main_loop.pm:85
-#, fuzzy, c-format
+#, c-format
 msgid "You may need to update your urpmi database."
 msgstr ""
-"Įdiegimas nepavyko, trūksta kai kurių bylų:\n"
-"%s\n"
-"Jūs galite norėti atnaujinti urpmi duomenų bazę"
 
 #: ../urpm/main_loop.pm:89
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
-msgstr "Įdiegimas nepavyko"
+msgstr ""
 
 #: ../urpm/main_loop.pm:108
 #, c-format
@@ -902,9 +903,9 @@ msgid ""
 msgstr ""
 
 #: ../urpm/main_loop.pm:138
-#, fuzzy, c-format
+#, c-format
 msgid "The following package has bad signature"
-msgstr "Šie paketai turi netinkamus ženklus"
+msgstr ""
 
 #: ../urpm/main_loop.pm:139
 #, c-format
@@ -916,53 +917,53 @@ msgstr "Šie paketai turi netinkamus ženklus"
 msgid "Do you want to continue installation ?"
 msgstr "Ar norite tęsti įdiegimą ?"
 
-#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
-#: ../urpm/main_loop.pm:296
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:290
+#: ../urpm/main_loop.pm:298
 #, c-format
 msgid "Installation failed"
 msgstr "Įdiegimas nepavyko"
 
 #: ../urpm/main_loop.pm:159
-#, fuzzy, c-format
+#, c-format
 msgid "removing installed rpms (%s)"
-msgstr "iš %2$s įdiegiamas %1$s"
+msgstr ""
 
 #: ../urpm/main_loop.pm:185
 #, c-format
 msgid "Try to continue anyway?"
 msgstr ""
 
-#: ../urpm/main_loop.pm:234
+#: ../urpm/main_loop.pm:236
 #, c-format
 msgid "installing %s from %s"
 msgstr "iš %2$s įdiegiamas %1$s"
 
-#: ../urpm/main_loop.pm:236
+#: ../urpm/main_loop.pm:238
 #, c-format
 msgid "installing %s"
 msgstr "įdiegiama %s"
 
-#: ../urpm/main_loop.pm:243
+#: ../urpm/main_loop.pm:245
 #, c-format
 msgid "distributing %s"
 msgstr "paskirstomas %s"
 
-#: ../urpm/main_loop.pm:289
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:291
+#, c-format
 msgid "Try installation without checking dependencies?"
-msgstr "Pabandyti įdiegimą be priklausomybių tikrinimo? (t/N) "
+msgstr "Bandyti diegimą, netikrinant priklausomybių?"
 
-#: ../urpm/main_loop.pm:297
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:299
+#, c-format
 msgid "Try harder to install (--force)?"
-msgstr "Pabandyti įdiegimą priverstinai (--force)? (t/N) "
+msgstr ""
 
-#: ../urpm/main_loop.pm:490
+#: ../urpm/main_loop.pm:590
 #, c-format
 msgid "Packages are up to date"
 msgstr ""
 
-#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#: ../urpm/main_loop.pm:601 ../urpm/parallel.pm:299
 #, c-format
 msgid "Installation is possible"
 msgstr "Įdiegimas galimas"
@@ -970,279 +971,287 @@ msgstr "Įdiegimas galimas"
 #: ../urpm/md5sum.pm:55
 #, c-format
 msgid "warning: md5sum for %s unavailable in MD5SUM file"
-msgstr "įspėjimas: MD5SUM byloje negalima %s md5sum"
+msgstr "įspėjimas: MD5SUM faile negalima %s md5sum"
 
-#: ../urpm/media.pm:270
+#: ../urpm/media.pm:268
 #, c-format
 msgid "virtual medium \"%s\" should have a clear url, medium ignored"
 msgstr ""
 "virtualioji laikmena \"%s\" turėtų turėti aiškų url, laikmena ignoruojama"
 
-#: ../urpm/media.pm:272
+#: ../urpm/media.pm:270
 #, c-format
 msgid "unable to access list file of \"%s\", medium ignored"
-msgstr "negaliu prieiti prie \"%s\" list bylos, laikmena ignoruojama"
+msgstr "nepavyksta prieiti prie \"%s\" sąrašo failo, laikmena ignoruojama"
 
-#: ../urpm/media.pm:275
-#, fuzzy, c-format
+#: ../urpm/media.pm:273
+#, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
-msgstr "negaliu prieiti prie \"%s\" hdlist bylos, laikmena ignoruojama"
+msgstr ""
 
-#: ../urpm/media.pm:301
-#, fuzzy, c-format
+#: ../urpm/media.pm:299
+#, c-format
 msgid "trying to override existing medium \"%s\", skipping"
-msgstr "bandau praleisti esančią laikmeną \"%s\", vengiu"
+msgstr ""
 
-#: ../urpm/media.pm:517
+#: ../urpm/media.pm:515
 #, c-format
 msgid "failed to migrate removable device, ignoring media"
 msgstr ""
 
-#: ../urpm/media.pm:555
+#: ../urpm/media.pm:558
 #, c-format
 msgid "wrote config file [%s]"
-msgstr "įrašyta konfigūracijos byla [%s]"
+msgstr "įrašytas konfigūracijos failas [%s]"
 
-#: ../urpm/media.pm:598
+#: ../urpm/media.pm:649
 #, c-format
 msgid "Can't use parallel mode with use-distrib mode"
 msgstr "use-distrib veiksenai negaliu naudoti lygiagrečios veiksenos "
 
-#: ../urpm/media.pm:606
+#: ../urpm/media.pm:657
 #, c-format
 msgid "using associated media for parallel mode: %s"
 msgstr "naudojama susijusi laikmena lygiagrečiajai veiksenai: %s"
 
-#: ../urpm/media.pm:622
-#, fuzzy, c-format
+#: ../urpm/media.pm:673
+#, c-format
 msgid ""
 "--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
 "update, --use-distrib or --parallel"
 msgstr ""
-"--sintezė negali būti naudojama su --media, --excludemedia, --sortmedia, --"
-"update or --parallel"
 
-#: ../urpm/media.pm:731
+#: ../urpm/media.pm:786
+#, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr ""
+
+#: ../urpm/media.pm:795
+#, c-format
+msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
+msgstr ""
+
+#: ../urpm/media.pm:799
+#, c-format
+msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
+msgstr ""
+
+#: ../urpm/media.pm:827
 #, c-format
 msgid "Search start: %s end: %s"
 msgstr "Paieškos pradžia: %s pabaiga: %s"
 
-#: ../urpm/media.pm:748
+#: ../urpm/media.pm:844
 #, c-format
 msgid "skipping package %s"
 msgstr "praleidžiamas paketas %s"
 
-#: ../urpm/media.pm:764
+#: ../urpm/media.pm:860
 #, c-format
 msgid "would install instead of upgrade package %s"
 msgstr "bus įdiegtas vietoje atnaujinimo paketo %s"
 
-#: ../urpm/media.pm:840
+#: ../urpm/media.pm:943
 #, c-format
 msgid "medium \"%s\" already exists"
 msgstr "laikmena \"%s\" jau yra"
 
-#: ../urpm/media.pm:882
+#: ../urpm/media.pm:985
 #, c-format
 msgid "(ignored by default)"
 msgstr ""
 
-#: ../urpm/media.pm:888
-#, fuzzy, c-format
+#: ../urpm/media.pm:991
+#, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
-msgstr "iš laikmenos \"%s\" skaitomos antraštės"
+msgstr ""
 
-#: ../urpm/media.pm:894
-#, fuzzy, c-format
+#: ../urpm/media.pm:997
+#, c-format
 msgid "adding medium \"%s\""
-msgstr "pašalinama laikmena \"%s\""
+msgstr ""
 
-#: ../urpm/media.pm:918
-#, fuzzy, c-format
+#: ../urpm/media.pm:1021
+#, c-format
 msgid "failed to copy media.cfg to %s (%d)"
-msgstr "negaliu atverti rpmdb"
+msgstr ""
 
-#: ../urpm/media.pm:960
+#: ../urpm/media.pm:1092
 #, c-format
 msgid "directory %s does not exist"
 msgstr ""
 
-#: ../urpm/media.pm:968
+#: ../urpm/media.pm:1100
 #, c-format
 msgid "this location doesn't seem to contain any distribution"
 msgstr ""
 
-#: ../urpm/media.pm:992
-#, fuzzy, c-format
+#: ../urpm/media.pm:1124
+#, c-format
 msgid "unable to parse media.cfg"
-msgstr "negaliu atverti rpmdb"
+msgstr ""
 
-#: ../urpm/media.pm:995
-#, fuzzy, c-format
+#: ../urpm/media.pm:1127
+#, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
-msgstr "negaliu prieiti prie pirmojo įdiegimo laikmenos (nerasta hdlists byla)"
+msgstr ""
 
-#: ../urpm/media.pm:1016
+#: ../urpm/media.pm:1149
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1031
-#, fuzzy, c-format
-msgid "ignoring non-free medium `%s'"
-msgstr "ignoruojama laikmena %s"
-
-#: ../urpm/media.pm:1074
-#, fuzzy, c-format
+#: ../urpm/media.pm:1207
+#, c-format
 msgid "retrieving media.cfg file..."
-msgstr "atkuriama hdlists byla..."
+msgstr ""
 
-#: ../urpm/media.pm:1117
+#: ../urpm/media.pm:1250
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "bandoma išrinkti nesančią laikmeną \"%s\""
 
-#: ../urpm/media.pm:1120
+#: ../urpm/media.pm:1253
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "išrenkama daugialypė laikmena: %s"
 
-#: ../urpm/media.pm:1179
+#: ../urpm/media.pm:1312
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "pašalinama laikmena \"%s\""
 
-#: ../urpm/media.pm:1262
+#: ../urpm/media.pm:1403
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "laikmenai \"%s\" iš naujo konfigūruojama urpmi"
 
-#: ../urpm/media.pm:1296
+#: ../urpm/media.pm:1437
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...naujas konfigūravimas nepavyko"
 
-#: ../urpm/media.pm:1302
+#: ../urpm/media.pm:1443
 #, c-format
 msgid "reconfiguration done"
 msgstr "naujas konfigūravimas atliktas"
 
-#: ../urpm/media.pm:1318
+#: ../urpm/media.pm:1459
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1339
-#, fuzzy, c-format
+#: ../urpm/media.pm:1480
+#, c-format
 msgid "medium \"%s\" is up-to-date"
-msgstr "laikmena \"%s\" neišrinkta"
+msgstr ""
 
-#: ../urpm/media.pm:1350
+#: ../urpm/media.pm:1491
 #, c-format
 msgid "examining synthesis file [%s]"
-msgstr "tikrinama sintezės byla [%s]"
+msgstr "tikrinamas sintezės failas [%s]"
 
-#: ../urpm/media.pm:1370
+#: ../urpm/media.pm:1511
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
-msgstr "laikmenos \"%s\" sintezės bylos skaitymo problema"
+msgstr "laikmenos \"%s\" sintezės failo skaitymo problema"
 
-#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
-#, fuzzy, c-format
+#: ../urpm/media.pm:1524 ../urpm/media.pm:1619
+#, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "įrašoma laikmenos \"%s\" sąrašo byla"
+msgstr ""
 
-#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#: ../urpm/media.pm:1526 ../urpm/media.pm:1596 ../urpm/media.pm:1849
 #, c-format
 msgid "...copying failed"
 msgstr "...kopijavimas nepavyko"
 
-#: ../urpm/media.pm:1451
+#: ../urpm/media.pm:1592
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "kopijuojama \"%s\" aprašo byla..."
 
-#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#: ../urpm/media.pm:1594 ../urpm/media.pm:1623
 #, c-format
 msgid "...copying done"
 msgstr "...kopijavimas baigtas"
 
-#: ../urpm/media.pm:1484
+#: ../urpm/media.pm:1625
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
-msgstr "[%s] kopijavimas nepavyko (byla per daug maža)"
+msgstr "[%s] kopijavimas nepavyko (failas yra įtartinai mažas)"
 
-#: ../urpm/media.pm:1532
-#, fuzzy, c-format
+#: ../urpm/media.pm:1673
+#, c-format
 msgid "computing md5sum of retrieved source synthesis"
-msgstr "atkurtam hdlist (arba sintezei) skaičiuojama md5sum"
+msgstr ""
 
-#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
-#, fuzzy, c-format
+#: ../urpm/media.pm:1675 ../urpm/media.pm:2158
+#, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
-msgstr "[%s] kopijavimas nepavyko (md5sum neatitikimas)"
-
-#: ../urpm/media.pm:1549
-#, fuzzy, c-format
-msgid "genhdlist2 failed on %s"
-msgstr "tikrinama hdlist byla [%s]"
-
-#: ../urpm/media.pm:1559
-#, fuzzy, c-format
-msgid "comparing %s and %s"
-msgstr "iš %2$s įdiegiamas %1$s"
-
-#: ../urpm/media.pm:1589
-#, fuzzy, c-format
-msgid "invalid hdlist file %s for medium \"%s\""
-msgstr "laikmenai \"%s\" nerasta hdlist byla"
-
-#: ../urpm/media.pm:1615
-#, fuzzy, c-format
-msgid "copying MD5SUM file of \"%s\"..."
-msgstr "kopijuojama \"%s\" aprašo byla..."
-
-#: ../urpm/media.pm:1655
-#, fuzzy, c-format
-msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "netinkamas rpm bylos vardas [%s]"
-
-#: ../urpm/media.pm:1658
-#, fuzzy, c-format
-msgid "no metadata found for medium \"%s\""
-msgstr "laikmenai \"%s\" nerasta hdlist byla"
+msgstr ""
 
 #: ../urpm/media.pm:1690
-#, fuzzy, c-format
-msgid "retrieving source synthesis of \"%s\"..."
-msgstr "atkuriamas \"%s\" pirminis hdlist (arba zintezė)..."
+#, c-format
+msgid "genhdlist2 failed on %s"
+msgstr ""
+
+#: ../urpm/media.pm:1700
+#, c-format
+msgid "comparing %s and %s"
+msgstr ""
+
+#: ../urpm/media.pm:1730
+#, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1756
 #, c-format
-msgid "examining pubkey file of \"%s\"..."
-msgstr "tikrinama \"%s\" pubkey byla..."
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr ""
 
-#: ../urpm/media.pm:1768
+#: ../urpm/media.pm:1796
+#, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr ""
+
+#: ../urpm/media.pm:1799
+#, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr ""
+
+#: ../urpm/media.pm:1831
+#, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr ""
+
+#: ../urpm/media.pm:1897
+#, c-format
+msgid "examining pubkey file of \"%s\"..."
+msgstr "tikrinamas \"%s\" pubkey failas..."
+
+#: ../urpm/media.pm:1909
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...iš \"%2$s\" pubkey bylos importuotas raktas %1$s"
 
-#: ../urpm/media.pm:1772
+#: ../urpm/media.pm:1913
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
-msgstr "negaliu importuoti \"%s\" pubkey bylos"
+msgstr "negaliu importuoti \"%s\" pubkey failo"
 
-#: ../urpm/media.pm:1813
-#, fuzzy, c-format
+#: ../urpm/media.pm:1954
+#, c-format
 msgid "no synthesis file found for medium \"%s\""
-msgstr "laikmenai \"%s\" nerasta hdlist byla"
+msgstr ""
 
-#: ../urpm/media.pm:1846
-#, fuzzy, c-format
+#: ../urpm/media.pm:1987
+#, c-format
 msgid "updated medium \"%s\""
-msgstr "įtraukta laikmena %s"
+msgstr ""
 
-#: ../urpm/media.pm:1968
+#: ../urpm/media.pm:2152
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr ""
@@ -1263,87 +1272,87 @@ msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr ""
 
 #: ../urpm/mirrors.pm:305
-#, fuzzy, c-format
+#, c-format
 msgid "getting mirror list from %s"
-msgstr "iš [%s] skaitomos rpm bylos"
+msgstr ""
 
-#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#: ../urpm/msg.pm:75 ../urpmi:492 ../urpmi:510 ../urpmi:626
 #, c-format
 msgid "Nn"
 msgstr "Nn"
 
 #. -PO: Add here the keys which might be pressed in the "Yes"-case.
-#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#: ../urpm/msg.pm:76 ../urpme:38 ../urpmi.addmedia:133
 #, c-format
 msgid "Yy"
 msgstr "TtYy"
 
-#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#: ../urpm/msg.pm:101 ../urpme:158 ../urpmi.addmedia:136
 #, c-format
 msgid " (y/N) "
 msgstr " (t/N) "
 
-#: ../urpm/msg.pm:139
+#: ../urpm/msg.pm:130
 #, c-format
 msgid "Sorry, bad choice, try again\n"
 msgstr "Gaila, bet pasirinkimas blogas, pakartokite\n"
 
-#: ../urpm/msg.pm:170
-#, fuzzy, c-format
+#: ../urpm/msg.pm:161
+#, c-format
 msgid "Package"
-msgstr "Paketų pasirinkimas"
+msgstr ""
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Version"
-msgstr ""
+msgstr "Versija"
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Release"
-msgstr ""
+msgstr "Laida"
+
+#: ../urpm/msg.pm:161
+#, c-format
+msgid "Arch"
+msgstr "Arch"
 
 #: ../urpm/msg.pm:170
-#, fuzzy, c-format
-msgid "Arch"
-msgstr "Ieškoti"
-
-#: ../urpm/msg.pm:179
 #, c-format
-msgid "(suggested)"
+msgid "(recommended)"
+msgstr "(rekomenduojama)"
+
+#: ../urpm/msg.pm:185
+#, c-format
+msgid "medium \"%s\""
 msgstr ""
 
-#: ../urpm/msg.pm:194
-#, fuzzy, c-format
-msgid "medium \"%s\""
-msgstr "pašalinama laikmena \"%s\""
-
-#: ../urpm/msg.pm:194
+#: ../urpm/msg.pm:185
 #, c-format
 msgid "command line"
 msgstr ""
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "B"
-msgstr ""
+msgstr "B"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "KB"
 msgstr "KB"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "MB"
 msgstr "MB"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "GB"
 msgstr "GB"
 
-#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#: ../urpm/msg.pm:199 ../urpm/msg.pm:208
 #, c-format
 msgid "TB"
 msgstr "TB"
@@ -1353,8 +1362,8 @@ msgstr "TB"
 msgid "Marking %s as manually installed, it won't be auto-orphaned"
 msgstr ""
 
-#: ../urpm/orphans.pm:522
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:527
+#, c-format
 msgid ""
 "The following package:\n"
 "%s\n"
@@ -1363,19 +1372,19 @@ msgid_plural ""
 "The following packages:\n"
 "%s\n"
 "are now orphaned."
-msgstr[0] "Vienas iš šių paketų yra reikalingas."
-msgstr[1] "Vienas iš šių paketų yra reikalingas."
-msgstr[2] "Vienas iš šių paketų yra reikalingas."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: ../urpm/orphans.pm:525
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:530
+#, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] "Nėra ką pašalinti"
-msgstr[1] "Nėra ką pašalinti"
-msgstr[2] "Nėra ką pašalinti"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: ../urpm/orphans.pm:542
+#: ../urpm/orphans.pm:547
 #, c-format
 msgid ""
 "The following package:\n"
@@ -1394,12 +1403,12 @@ msgstr[2] ""
 #: ../urpm/parallel.pm:15
 #, c-format
 msgid "unable to parse \"%s\" in file [%s]"
-msgstr "negaliu išnagrinėti \"%s\" byloje [%s]"
+msgstr "negaliu išnagrinėti \"%s\" faile [%s]"
 
 #: ../urpm/parallel.pm:24
 #, c-format
 msgid "examining parallel handler in file [%s]"
-msgstr "tikrinama lygiagrečioji bylos [%s] tvarkyklė"
+msgstr "tikrinama lygiagrečioji failo [%s] doroklė"
 
 #: ../urpm/parallel.pm:35
 #, c-format
@@ -1417,31 +1426,31 @@ msgid "on node %s"
 msgstr ""
 
 #: ../urpm/parallel.pm:294
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed on node %s"
-msgstr "Įdiegimas nepavyko"
+msgstr ""
 
-#: ../urpm/parallel_ka_run.pm:58
+#: ../urpm/parallel_ka_run.pm:57
 #, c-format
 msgid "rshp failed, maybe a node is unreacheable"
 msgstr ""
 
-#: ../urpm/parallel_ka_run.pm:80
+#: ../urpm/parallel_ka_run.pm:79
 #, c-format
 msgid "mput failed, maybe a node is unreacheable"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:27
+#: ../urpm/parallel_ssh.pm:25
 #, c-format
 msgid "scp failed on host %s (%d)"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:39
+#: ../urpm/parallel_ssh.pm:37
 #, c-format
 msgid "cp failed on host %s (%d)"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:86
+#: ../urpm/parallel_ssh.pm:84
 #, c-format
 msgid ""
 "%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
@@ -1449,16 +1458,16 @@ msgid ""
 msgstr ""
 
 #: ../urpm/removable.pm:46
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access medium \"%s\"."
-msgstr "negaliu prieiti prie laikmenos \"%s\""
+msgstr ""
 
-#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:101
 #, c-format
 msgid "mounting %s"
 msgstr "prijungiama %s"
 
-#: ../urpm/removable.pm:117
+#: ../urpm/removable.pm:113
 #, c-format
 msgid "unmounting %s"
 msgstr "atjungiama %s"
@@ -1474,66 +1483,64 @@ msgid ""
 "urpmi was restarted, and the list of priority packages did change: %s vs %s"
 msgstr ""
 
-#: ../urpm/select.pm:217
+#: ../urpm/select.pm:220
 #, c-format
 msgid "No package named %s"
 msgstr "Nėra paketo, pavadinto %s"
 
-#: ../urpm/select.pm:219 ../urpme:113
+#: ../urpm/select.pm:222 ../urpme:112
 #, c-format
 msgid "The following packages contain %s: %s"
 msgstr "Šie paketai turi %s: %s"
 
-#: ../urpm/select.pm:221
+#: ../urpm/select.pm:224
 #, c-format
 msgid "You should use \"-a\" to use all of them"
 msgstr ""
 
-#: ../urpm/select.pm:368
-#, fuzzy, c-format
+#: ../urpm/select.pm:372
+#, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
-msgstr "Paketas(-ai) jau įdiegti"
+msgstr ""
 
-#: ../urpm/select.pm:600
-#, fuzzy, c-format
+#: ../urpm/select.pm:607
+#, c-format
 msgid "Package %s is already installed"
-msgstr "Paketas(-ai) jau įdiegti"
+msgstr "Paketas %s jau yra įdiegtas"
 
-#: ../urpm/select.pm:601
-#, fuzzy, c-format
+#: ../urpm/select.pm:608
+#, c-format
 msgid "Packages %s are already installed"
-msgstr "Paketas(-ai) jau įdiegti"
+msgstr "Paketai %s jau yra įdiegti"
 
-#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#: ../urpm/select.pm:625 ../urpm/select.pm:712
 #, c-format
 msgid "due to conflicts with %s"
 msgstr "dėl konfliktų su %s"
 
-#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#: ../urpm/select.pm:626 ../urpm/select.pm:706
 #, c-format
 msgid "due to unsatisfied %s"
 msgstr "dėl nepatenkinto %s"
 
-#: ../urpm/select.pm:625
+#: ../urpm/select.pm:632
 #, c-format
 msgid "trying to promote %s"
 msgstr "bandau paaukštinti %s"
 
-#: ../urpm/select.pm:626
+#: ../urpm/select.pm:633
 #, c-format
 msgid "in order to keep %s"
 msgstr "%s išlaikymui"
 
-#: ../urpm/select.pm:667
-#, fuzzy, c-format
+#: ../urpm/select.pm:674
+#, c-format
 msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"Šie paketai turi būti pašalinti tam, kad kitus būtų galima atnaujinti:\n"
-"%s"
 
-#: ../urpm/select.pm:668
+#: ../urpm/select.pm:675
 #, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
@@ -1542,12 +1549,12 @@ msgstr ""
 "Šie paketai turi būti pašalinti tam, kad kitus būtų galima atnaujinti:\n"
 "%s"
 
-#: ../urpm/select.pm:695
+#: ../urpm/select.pm:702
 #, c-format
 msgid "in order to install %s"
 msgstr "%s įdiegimui"
 
-#: ../urpm/select.pm:701
+#: ../urpm/select.pm:708
 #, c-format
 msgid "due to missing %s"
 msgstr "dėl trūkstamo %s"
@@ -1558,9 +1565,9 @@ msgid "Invalid signature (%s)"
 msgstr "Netinkamas ženklas (%s)"
 
 #: ../urpm/signature.pm:77
-#, fuzzy, c-format
+#, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
-msgstr "Šie paketai turi %s: %s"
+msgstr ""
 
 #: ../urpm/signature.pm:83
 #, c-format
@@ -1587,40 +1594,40 @@ msgstr ""
 msgid "Medium without key (%s)"
 msgstr ""
 
-#: ../urpm/sys.pm:225
+#: ../urpm/sys.pm:199
 #, c-format
 msgid "system"
 msgstr ""
 
-#: ../urpm/sys.pm:262
+#: ../urpm/sys.pm:236
 #, c-format
 msgid "You should restart your computer for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:264
+#: ../urpm/sys.pm:238
 #, c-format
 msgid "You should restart your session for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:266
+#: ../urpm/sys.pm:240
 #, c-format
 msgid "You should restart %s for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:404
-#, fuzzy, c-format
+#: ../urpm/sys.pm:378
+#, c-format
 msgid "Can't write file"
-msgstr "Įjungti ar išjungti bendrą naudojimąsi bylomis"
+msgstr ""
 
-#: ../urpm/sys.pm:404
-#, fuzzy, c-format
+#: ../urpm/sys.pm:378
+#, c-format
 msgid "Can't open file"
-msgstr "Kopijavimas nepavyko"
+msgstr ""
 
-#: ../urpm/sys.pm:417
-#, fuzzy, c-format
+#: ../urpm/sys.pm:391
+#, c-format
 msgid "Can't move file %s to %s"
-msgstr "Kopijavimas nepavyko"
+msgstr ""
 
 #: ../urpme:43
 #, c-format
@@ -1639,136 +1646,128 @@ msgstr ""
 "  --test         - tikrinti, jei pašalinimas negali būti tinkamai "
 "įvykdytas.\n"
 
-#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format
 msgid "  --parallel     - distributed urpmi across machines of alias.\n"
 msgstr "  --parallel     - urpmi paskirstomas po kompiuterius.\n"
 
-#: ../urpme:48 ../urpmi:138
-#, fuzzy, c-format
-msgid "  --repackage    - Re-package the files before erasing\n"
-msgstr "  --packager     - spausdinti žymens archyvatorių: archyvatorius.\n"
-
-#: ../urpme:49
+#: ../urpme:48
 #, c-format
 msgid "  --root         - use another root for rpm removal.\n"
 msgstr "  --root         - naudokite kitą pradinį (root) rpm pašalinimui.\n"
 
-#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
-#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
-#, fuzzy, c-format
+#: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
+#: ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
-msgstr "  --root         - rpm įdiegimui naudokite kitą pradinį.\n"
+msgstr ""
 
-#: ../urpme:51 ../urpmi:96
-#, fuzzy, c-format
+#: ../urpme:50 ../urpmi:96
+#, c-format
 msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
-msgstr "  --update       - atnaujinti tik atnaujinimo laikmenas.\n"
+msgstr ""
+
+#: ../urpme:51
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr ""
 
 #: ../urpme:52
-#, fuzzy, c-format
-msgid "  --noscripts    - do not execute package scriptlet(s).\n"
-msgstr "  --description  - spausdinti žymens aprašymą: aprašymas.\n"
-
-#: ../urpme:53
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
 "                   to (un)install a chroot with --root option.\n"
 msgstr ""
-"  --use-distrib  - konfigūruoti urpmi iš paskirstymo medžio on the fly "
-"metodu, naudinga\n"
-"                   įdiegti (pašalinti) chroot su --root parinktimi.\n"
 
-#: ../urpme:55 ../urpmi:149 ../urpmq:87
-#, fuzzy, c-format
+#: ../urpme:54 ../urpmi:150 ../urpmq:87
+#, c-format
 msgid "  --verbose, -v  - verbose mode.\n"
-msgstr "  --verbose      - verbose veiksena.\n"
+msgstr ""
 
-#: ../urpme:56
+#: ../urpme:55
 #, c-format
 msgid "  -a             - select all packages matching expression.\n"
 msgstr "  -a             - išrinkti visus paketus, atitinkančius išraišką.\n"
 
-#: ../urpme:71
+#: ../urpme:70
 #, c-format
 msgid "Only superuser is allowed to remove packages"
 msgstr "Paketus pašalinti gali tik supervartotojas"
 
-#: ../urpme:104
+#: ../urpme:103
 #, c-format
 msgid "unknown packages"
 msgstr "nežinomi paketai"
 
-#: ../urpme:104
+#: ../urpme:103
 #, c-format
 msgid "unknown package"
 msgstr "nežinomas paketas"
 
-#: ../urpme:119
-#, fuzzy, c-format
+#: ../urpme:118
+#, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] "paketo %s pašalinimas sugadins jūsų sistemą"
-msgstr[1] "paketo %s pašalinimas sugadins jūsų sistemą"
-msgstr[2] "paketo %s pašalinimas sugadins jūsų sistemą"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: ../urpme:124
+#: ../urpme:123
 #, c-format
 msgid "Nothing to remove"
 msgstr "Nėra ką pašalinti"
 
-#: ../urpme:141
-#, fuzzy, c-format
+#: ../urpme:140
+#, c-format
 msgid "No orphans to remove"
-msgstr "Nėra ką pašalinti"
+msgstr ""
 
-#: ../urpme:147
-#, fuzzy, c-format
+#: ../urpme:146
+#, c-format
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "Priklausomybių patenkinimui, šie paketai %d bus pašalinti (%d MB)"
-msgstr[1] "Priklausomybių patenkinimui, šie paketai %d bus pašalinti (%d MB)"
-msgstr[2] "Priklausomybių patenkinimui, šie paketai %d bus pašalinti (%d MB)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: ../urpme:152
-#, fuzzy, c-format
+#: ../urpme:151
+#, c-format
 msgid "(orphan package)"
 msgid_plural "(orphan packages)"
-msgstr[0] "nežinomas paketas"
-msgstr[1] "nežinomas paketas"
-msgstr[2] "nežinomas paketas"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: ../urpme:159
-#, fuzzy, c-format
+#: ../urpme:158
+#, c-format
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
-msgstr[0] "pašalinamas paketas %s"
-msgstr[1] "pašalinamas paketas %s"
-msgstr[2] "pašalinamas paketas %s"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: ../urpme:164
-#, fuzzy, c-format
+#: ../urpme:163
+#, c-format
 msgid "testing removal of %s"
-msgstr "išimamas įrenginys priimamas kaip \"%s\""
+msgstr ""
 
-#: ../urpme:181
+#: ../urpme:180
 #, c-format
 msgid "Removal failed"
 msgstr "Pašalinimas nepavyko"
 
-#: ../urpme:183
-#, fuzzy, c-format
+#: ../urpme:182
+#, c-format
 msgid "Removal is possible"
-msgstr "Pašalinimas nepavyko"
+msgstr ""
 
 #: ../urpmf:31
-#, fuzzy, c-format
+#, c-format
 msgid "  --version      - print this tool's version number.\n"
-msgstr "  --help         - spausdinti šį pagalbos pranešimą.\n"
+msgstr ""
 
-#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#: ../urpmf:32 ../urpmi:130 ../urpmq:78
 #, c-format
 msgid "  --env          - use specific environment (typically a bug report).\n"
 msgstr ""
@@ -1795,10 +1794,9 @@ msgstr ""
 "kableliu.\n"
 
 #: ../urpmf:38
-#, fuzzy, c-format
+#, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
 msgstr ""
-"  --synthesis    - vietoje urpmi duomenų bazės naudokite duotąją sintezę.\n"
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
 #, c-format
@@ -1828,10 +1826,9 @@ msgstr ""
 "  -i             - ignoruoti kiekvieno pavyzdžio raidžių dydžio skirtumus.\n"
 
 #: ../urpmf:44
-#, fuzzy, c-format
+#, c-format
 msgid "  -I             - honor case distinctions in patterns (default).\n"
 msgstr ""
-"  -i             - ignoruoti kiekvieno pavyzdžio raidžių dydžio skirtumus.\n"
 
 #: ../urpmf:45
 #, c-format
@@ -1869,10 +1866,9 @@ msgid "  !              - unary NOT.\n"
 msgstr "  !              - elementas NE.\n"
 
 #: ../urpmf:52
-#, fuzzy, c-format
+#, c-format
 msgid "  ( )            - left and right parentheses.\n"
 msgstr ""
-"  )              - dešinysis skliaustelis grupės išraiskos uždarymui.\n"
 
 #: ../urpmf:53
 #, c-format
@@ -1880,24 +1876,24 @@ msgid "List of tags:\n"
 msgstr ""
 
 #: ../urpmf:54
-#, fuzzy, c-format
+#, c-format
 msgid "  --qf           - specify a printf-like output format\n"
-msgstr "  -g             - spausdinti grupes kartu su pavadinimu.\n"
+msgstr ""
 
 #: ../urpmf:55
-#, fuzzy, c-format
+#, c-format
 msgid "                   example: '%%name:%%files'\n"
-msgstr "                    standartinis yra %s.\n"
+msgstr ""
 
 #: ../urpmf:56
-#, fuzzy, c-format
+#, c-format
 msgid "  --arch         - architecture\n"
-msgstr "  --url          - spausdinti žymens url: url.\n"
+msgstr ""
 
 #: ../urpmf:57
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildhost    - build host\n"
-msgstr "  --buildhost    - spausdinti žymens buildhost: build host.\n"
+msgstr ""
 
 #: ../urpmf:58
 #, c-format
@@ -1905,19 +1901,19 @@ msgid "  --buildtime    - build time\n"
 msgstr ""
 
 #: ../urpmf:59
-#, fuzzy, c-format
+#, c-format
 msgid "  --conffiles    - configuration files\n"
-msgstr "taikyti konfigūracijos bylos pakeitimus"
+msgstr ""
 
 #: ../urpmf:60
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - conflict tags\n"
-msgstr "  --conflicts    - spausdinti žymenų konfliktus: visi konfliktai.\n"
+msgstr ""
 
 #: ../urpmf:61
-#, fuzzy, c-format
+#, c-format
 msgid "  --description  - package description\n"
-msgstr "  --description  - spausdinti žymens aprašymą: aprašymas.\n"
+msgstr ""
 
 #: ../urpmf:62
 #, c-format
@@ -1925,90 +1921,89 @@ msgid "  --distribution - distribution\n"
 msgstr ""
 
 #: ../urpmf:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --epoch        - epoch\n"
-msgstr "  --epoch        - spausdinti žymenų laikotarpį: laikotarpis.\n"
+msgstr ""
 
 #: ../urpmf:64
-#, fuzzy, c-format
+#, c-format
 msgid "  --filename     - filename of the package\n"
-msgstr "  --name         - spausdinti tik paketų pavadinimus.\n"
+msgstr ""
 
 #: ../urpmf:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --files        - list of files contained in the package\n"
-msgstr "  -l             - paketo bylas sudėti į sąrašą.\n"
+msgstr ""
 
 #: ../urpmf:66
-#, fuzzy, c-format
+#, c-format
 msgid "  --group        - group\n"
-msgstr "  --group        - spausdinti žymenų grupę: grupė.\n"
+msgstr ""
 
 #: ../urpmf:67
-#, fuzzy, c-format
+#, c-format
 msgid "  --license      - license\n"
-msgstr "  --name         - spausdinti tik paketų pavadinimus.\n"
+msgstr ""
 
 #: ../urpmf:68
-#, fuzzy, c-format
+#, c-format
 msgid "  --name         - package name\n"
-msgstr "  --name         - spausdinti tik paketų pavadinimus.\n"
+msgstr ""
 
 #: ../urpmf:69
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - obsoletes tags\n"
-msgstr "  --obsoletes    - spausdinti pasenusius žymenis: visi pasenę.\n"
+msgstr ""
 
 #: ../urpmf:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --packager     - packager\n"
-msgstr "  --packager     - spausdinti žymens archyvatorių: archyvatorius.\n"
+msgstr ""
 
 #: ../urpmf:71
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - provides tags\n"
-msgstr "  --provides     - spausdinti: all provides.\n"
+msgstr ""
 
 #: ../urpmf:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - requires tags\n"
 msgstr ""
-"  --requires     - spausdinti žymenų pareikalavimus: visi pareikalavimai.\n"
 
 #: ../urpmf:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --size         - installed size\n"
-msgstr "  --size         - spausdinti žymenų dydį: dydis.\n"
+msgstr ""
 
 #: ../urpmf:74
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - source rpm name\n"
-msgstr "  --sourcerpm    - spausdinti žymens pirminį rpm: pirminis rpm.\n"
+msgstr ""
 
 #: ../urpmf:75
-#, fuzzy, c-format
-msgid "  --suggests     - suggests tags\n"
-msgstr "  --obsoletes    - spausdinti pasenusius žymenis: visi pasenę.\n"
+#, c-format
+msgid "  --recommends   - recommends tags\n"
+msgstr ""
 
 #: ../urpmf:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary      - summary\n"
-msgstr "  --summary, -S  - spausdinti suvestinę.\n"
+msgstr ""
 
 #: ../urpmf:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --url          - url\n"
-msgstr "  --url          - spausdinti žymens url: url.\n"
+msgstr ""
 
 #: ../urpmf:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --vendor       - vendor\n"
-msgstr "  --verbose      - verbose veiksena.\n"
+msgstr ""
 
 #: ../urpmf:79
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - the media in which the package was found\n"
-msgstr "  -l             - paketo bylas sudėti į sąrašą.\n"
+msgstr ""
 
 #: ../urpmf:80 ../urpmq:97
 #, c-format
@@ -2017,46 +2012,45 @@ msgstr ""
 "  -f             - spausdinimo versija, išleisti ir archyvuoti su "
 "pavadinimu.\n"
 
-#: ../urpmf:148
+#: ../urpmf:149
 #, c-format
 msgid "unterminated expression (%s)"
 msgstr ""
 
-#: ../urpmf:193
+#: ../urpmf:194
 #, c-format
 msgid "Incorrect format: you may use only one multi-valued tag"
 msgstr ""
 
-#: ../urpmf:286
-#, fuzzy, c-format
+#: ../urpmf:287
+#, c-format
 msgid "no hdlist available for medium \"%s\""
-msgstr "laikmenai \"%s\" nerasta hdlist byla"
+msgstr ""
 
-#: ../urpmf:293
-#, fuzzy, c-format
+#: ../urpmf:294
+#, c-format
 msgid "no synthesis available for medium \"%s\""
-msgstr "\"%s\" laikmenai sudaryta hdlist sintezės byla"
+msgstr ""
 
-#: ../urpmf:302
-#, fuzzy, c-format
+#: ../urpmf:303
+#, c-format
 msgid "no xml-info available for medium \"%s\""
-msgstr "įrašoma laikmenos \"%s\" sąrašo byla"
+msgstr ""
 
 #: ../urpmi:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --auto-update  - update media then upgrade the system.\n"
 msgstr ""
-"  --auto-select  - automatiškai parinkti paketus sistemos atnaujinimui.\n"
 
 #: ../urpmi:77
-#, fuzzy, c-format
+#, c-format
 msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
-msgstr "  --no-md5sum    - išjungti MD5SUM bylos tikrinimą.\n"
+msgstr ""
 
 #: ../urpmi:78
-#, fuzzy, c-format
+#, c-format
 msgid "    --force-key    - force update of gpg key.\n"
-msgstr "  --force-key    - vykdyti gpg key atnaujinimą.\n"
+msgstr ""
 
 #: ../urpmi:79
 #, c-format
@@ -2064,9 +2058,9 @@ msgid "  --auto-orphans - remove orphans without asking\n"
 msgstr ""
 
 #: ../urpmi:80 ../urpmq:52
-#, fuzzy, c-format
-msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
-msgstr "  --obsoletes    - spausdinti pasenusius žymenis: visi pasenę.\n"
+#, c-format
+msgid "  --no-recommends - do not auto select \"recommended\" packages.\n"
+msgstr ""
 
 #: ../urpmi:81
 #, c-format
@@ -2080,7 +2074,7 @@ msgstr ""
 #: ../urpmi:82
 #, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
-msgstr "  --no-install   - paketų neįdiegti (tik parsisiųsti)\n"
+msgstr "  --no-install   - paketų neįdiegti (tik atsisiųsti)\n"
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2110,15 +2104,14 @@ msgid "  --split-length - small transaction length, default is %d.\n"
 msgstr "  --split-length - trumpos operacijos ilgis, standartiškai yra %d.\n"
 
 #: ../urpmi:91
-#, fuzzy, c-format
+#, c-format
 msgid "  --fuzzy, -y    - impose fuzzy search.\n"
-msgstr "  --fuzzy        - paskirti neaiškią paiešką (toks pat kaip -y).\n"
+msgstr ""
 
 #: ../urpmi:92
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildrequires - install the buildrequires of the packages\n"
 msgstr ""
-"  --requires     - spausdinti žymenų pareikalavimus: visi pareikalavimai.\n"
 
 #: ../urpmi:93
 #, c-format
@@ -2138,10 +2131,17 @@ msgstr "  --noclean      - rpms iš cache neišvalyti.\n"
 #: ../urpmi:97
 #, c-format
 msgid ""
-"  --replacepkgs  - force installing packages which are already installed.\n"
+"  --downgrade    - downgrade a package from the version currently installed\n"
+"                   to the previously highest version\n"
 msgstr ""
 
 #: ../urpmi:99
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr ""
+
+#: ../urpmi:101
 #, c-format
 msgid ""
 "  --allow-nodeps - allow asking user to install packages without\n"
@@ -2150,7 +2150,7 @@ msgstr ""
 "  --allow-nodeps - leisti vartotojo paklausti dėl paketų be priklausomybių\n"
 "                   tikrinimo įdiegimo.\n"
 
-#: ../urpmi:101
+#: ../urpmi:103
 #, c-format
 msgid ""
 "  --allow-force  - allow asking user to install packages without\n"
@@ -2159,12 +2159,12 @@ msgstr ""
 "  --allow-force  - allow asking user to install packages without\n"
 "                   dependencies checking and integrity.\n"
 
-#: ../urpmi:103
-#, fuzzy, c-format
-msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
-msgstr "  --obsoletes    - spausdinti pasenusius žymenis: visi pasenę.\n"
+#: ../urpmi:105
+#, c-format
+msgid "  --allow-recommends - auto select \"recommended\" packages.\n"
+msgstr ""
 
-#: ../urpmi:107
+#: ../urpmi:109
 #, c-format
 msgid ""
 "  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
@@ -2174,66 +2174,66 @@ msgstr ""
 "medžio, naudinga \n"
 "                  įdiegti chroot su --root parinktimi.\n"
 
-#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:37
 #, c-format
 msgid "  --metalink     - generate and use a local metalink.\n"
 msgstr ""
 
-#: ../urpmi:110
+#: ../urpmi:112
 #, c-format
 msgid ""
 "  --download-all - download all needed packages before trying to install "
 "them\n"
 msgstr ""
 
-#: ../urpmi:111
+#: ../urpmi:113
 #, c-format
 msgid ""
 "  --downloader   - program to use to retrieve distant files. \n"
 "                   known programs: %s\n"
 msgstr ""
 
-#: ../urpmi:114
+#: ../urpmi:116
 #, c-format
 msgid "  --curl-options - additional options to pass to curl\n"
 msgstr ""
 
-#: ../urpmi:115
+#: ../urpmi:117
 #, c-format
 msgid "  --rsync-options- additional options to pass to rsync\n"
 msgstr ""
 
-#: ../urpmi:116
+#: ../urpmi:118
 #, c-format
 msgid "  --wget-options - additional options to pass to wget\n"
 msgstr ""
 
-#: ../urpmi:117
+#: ../urpmi:119
 #, c-format
 msgid "  --prozilla-options - additional options to pass to prozilla\n"
 msgstr ""
 
-#: ../urpmi:118
+#: ../urpmi:120
 #, c-format
 msgid "  --aria2-options - additional options to pass to aria2\n"
 msgstr ""
 
-#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:38
 #, c-format
 msgid "  --limit-rate   - limit the download speed.\n"
-msgstr "  --limit-rate   - apriboti parsiuntimo greitį.\n"
+msgstr "  --limit-rate   - apriboti atsiuntimo greitį.\n"
 
-#: ../urpmi:120
+#: ../urpmi:122
 #, c-format
 msgid ""
 "  --resume       - resume transfer of partially-downloaded files\n"
 "                   (--no-resume disables it, default is disabled).\n"
 msgstr ""
-"  --resume       - atnaujinti dalinai gautų bylų parsiuntimą\n"
-"                   (--no-resume išjungia funkciją, standartiškai ji yra "
+"  --resume       - atnaujinti dalinai gautų failų atsiuntimą\n"
+"                   (--no-resume išjungia funkciją, pagal numatymą ji yra "
 "išjungta).\n"
 
-#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
 #, c-format
 msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
@@ -2243,7 +2243,7 @@ msgstr ""
 "prievado numeris\n"
 "                   bus 1080 (formatas yra toks <proxyhost[:port]>).\n"
 
-#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
 #, c-format
 msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
@@ -2254,7 +2254,7 @@ msgstr ""
 "                   tarpiniame serveryje (formatas yra tkos<vartotojas:"
 "slaptažodis>).\n"
 
-#: ../urpmi:126
+#: ../urpmi:128
 #, c-format
 msgid ""
 "  --bug          - output a bug report in directory indicated by\n"
@@ -2263,49 +2263,47 @@ msgstr ""
 "  --bug          - išvesti klaidų ataskaitą kataloge, kuris nurodytas\n"
 "                   sekančiu argumentu.\n"
 
-#: ../urpmi:132
+#: ../urpmi:134
 #, c-format
 msgid "  --excludepath  - exclude path separated by comma.\n"
 msgstr "  --excludepath  - neįtraukti kelio, atskirto kableliu.\n"
 
-#: ../urpmi:133
+#: ../urpmi:135
 #, c-format
 msgid "  --excludedocs  - exclude doc files.\n"
-msgstr "  --excludedocs  - neįtraukti doc bylų.\n"
-
-#: ../urpmi:134
-#, fuzzy, c-format
-msgid "  --ignoresize   - don't verify disk space before installation.\n"
-msgstr ""
-"  --no-uninstall - niekada neklausiti dėl paketo pašalinimo, nutraukti "
-"įdiegimą.\n"
-
-#: ../urpmi:135
-#, fuzzy, c-format
-msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
-msgstr "  --url          - spausdinti žymens url: url.\n"
+msgstr "  --excludedocs  - neįtraukti doc failų.\n"
 
 #: ../urpmi:136
-#, fuzzy, c-format
-msgid "  --noscripts    - do not execute package scriptlet(s)\n"
-msgstr "  --description  - spausdinti žymens aprašymą: aprašymas.\n"
+#, c-format
+msgid "  --ignoresize   - don't verify disk space before installation.\n"
+msgstr ""
 
 #: ../urpmi:137
-#, fuzzy, c-format
-msgid "  --replacefiles - ignore file conflicts\n"
-msgstr "  --conflicts    - spausdinti žymenų konfliktus: visi konfliktai.\n"
+#, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr ""
+
+#: ../urpmi:138
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr ""
 
 #: ../urpmi:139
+#, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr ""
+
+#: ../urpmi:140
 #, c-format
 msgid "  --skip         - packages which installation should be skipped\n"
 msgstr "  --skip         - paketai, kurie neturi būti diegiami\n"
 
-#: ../urpmi:140
-#, fuzzy, c-format
-msgid "  --prefer       - packages which should be preferred\n"
-msgstr "  --skip         - paketai, kurie neturi būti diegiami\n"
-
 #: ../urpmi:141
+#, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr ""
+
+#: ../urpmi:142
 #, c-format
 msgid ""
 "  --more-choices - when several packages are found, propose more choices\n"
@@ -2314,71 +2312,71 @@ msgstr ""
 "  --more-choices - kai randama keletas paketų, vietoje standartinių\n"
 "                   leisti pasirinkti.\n"
 
-#: ../urpmi:143
-#, fuzzy, c-format
-msgid "  --nolock       - don't lock rpm db.\n"
-msgstr "  --noclean      - rpms iš cache neišvalyti.\n"
-
 #: ../urpmi:144
+#, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr ""
+
+#: ../urpmi:145
 #, c-format
 msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
 msgstr "  --strict-arch  - atnaujinti tik tokios pat architektūros paketus.\n"
 
-#: ../urpmi:145 ../urpmq:95
+#: ../urpmi:146 ../urpmq:95
 #, c-format
 msgid "  -a             - select all matches on command line.\n"
 msgstr "  -a             - komandinėje eilutėje išrinkti visus atitikimus.\n"
 
-#: ../urpmi:148
-#, fuzzy, c-format
+#: ../urpmi:149
+#, c-format
 msgid "  --quiet, -q    - quiet mode.\n"
-msgstr "  -q             - paslėptoji veiksena.\n"
-
-#: ../urpmi:150
-#, fuzzy, c-format
-msgid "  --debug        - very verbose mode.\n"
-msgstr "  --verbose      - verbose veiksena.\n"
+msgstr ""
 
 #: ../urpmi:151
 #, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr ""
+
+#: ../urpmi:152
+#, c-format
 msgid "  names or rpm files given on command line will be installed.\n"
 msgstr ""
-"  rpm bylos, kurių pavadinimai nurodyti komandinėje eilutėje, bus įdiegtos.\n"
+"  rpm failai, kurių pavadinimai nurodyti komandinėje eilutėje, bus įdiegti.\n"
 
-#: ../urpmi:179
+#: ../urpmi:180
 #, c-format
 msgid "Error: can't use --auto-select along with package list.\n"
 msgstr ""
 
-#: ../urpmi:186
+#: ../urpmi:187
 #, c-format
 msgid ""
 "Error: To generate a bug report, specify the usual command-line arguments\n"
 "along with --bug.\n"
 msgstr ""
 
-#: ../urpmi:216
-#, fuzzy, c-format
-msgid "You can't install binary rpm files when using --install-src"
-msgstr "Kas gali būti atlikta su dvejetainėmis bylomis naudojant --install-src"
-
 #: ../urpmi:217
+#, c-format
+msgid "You can't install binary rpm files when using --install-src"
+msgstr ""
+
+#: ../urpmi:218
 #, c-format
 msgid "You can't install spec files"
 msgstr ""
 
-#: ../urpmi:224
+#: ../urpmi:225
 #, c-format
 msgid "defaulting to --buildrequires"
 msgstr ""
 
-#: ../urpmi:229
+#: ../urpmi:230
 #, c-format
 msgid ""
 "please use --buildrequires or --install-src, defaulting to --buildrequires"
 msgstr ""
 
-#: ../urpmi:249
+#: ../urpmi:250
 #, c-format
 msgid ""
 "Directory [%s] already exists, please use another directory for bug report "
@@ -2387,12 +2385,12 @@ msgstr ""
 "Katalogas [%s] jau yra, klaidų ataskaitai naudokite kitą katalogą arba "
 "esantį ištrinkite"
 
-#: ../urpmi:250
+#: ../urpmi:251
 #, c-format
 msgid "Unable to create directory [%s] for bug report"
 msgstr "Klaidų ataskaitai negaliu sukurti katalogo [%s]"
 
-#: ../urpmi:271
+#: ../urpmi:272
 #, c-format
 msgid ""
 "Error: %s appears to be mounted read-only.\n"
@@ -2402,53 +2400,50 @@ msgstr ""
 "Operacijos vykdymui naudokite --allow-force"
 
 #. -PO: here format is "<package_name>: <summary> (to upgrade)"
-#: ../urpmi:425
-#, fuzzy, c-format
+#: ../urpmi:426
+#, c-format
 msgid "%s: %s (to upgrade)"
-msgstr " (atnaujinti)"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to upgrade)"
-#: ../urpmi:427
-#, fuzzy, c-format
+#: ../urpmi:428
+#, c-format
 msgid "%s (to upgrade)"
-msgstr " (atnaujinti)"
+msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to install)"
-#: ../urpmi:431
-#, fuzzy, c-format
+#: ../urpmi:432
+#, c-format
 msgid "%s: %s (to install)"
-msgstr " (įdiegti)"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to install)"
-#: ../urpmi:433
-#, fuzzy, c-format
+#: ../urpmi:434
+#, c-format
 msgid "%s (to install)"
-msgstr " (įdiegti)"
+msgstr ""
 
-#: ../urpmi:439
-#, fuzzy, c-format
+#: ../urpmi:440
+#, c-format
 msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
-msgstr "Priklausomybių patenkinimui, šie paketai %d bus pašalinti (%d MB)"
+msgstr ""
 
-#: ../urpmi:442
+#: ../urpmi:443
 #, c-format
 msgid "What is your choice? (1-%d) "
 msgstr "Koks Jūsų pasirinkimas? (1-%d)"
 
-#: ../urpmi:484
-#, fuzzy, c-format
+#: ../urpmi:485
+#, c-format
 msgid ""
 "The following package cannot be installed because it depends on packages\n"
 "that are older than the installed ones:\n"
 "%s"
 msgstr ""
-"Išvardyti paketai negali būti įdiegti, nes jie yra priklausomi nuo paketų,\n"
-"kurie yra senesni nei dabar įdiegti:\n"
-"%s"
 
-#: ../urpmi:486
+#: ../urpmi:487
 #, c-format
 msgid ""
 "The following packages can't be installed because they depend on packages\n"
@@ -2459,44 +2454,39 @@ msgstr ""
 "kurie yra senesni nei dabar įdiegti:\n"
 "%s"
 
-#: ../urpmi:492 ../urpmi:510
-#, fuzzy, c-format
+#: ../urpmi:493 ../urpmi:511
+#, c-format
 msgid ""
 "\n"
 "Continue installation anyway?"
-msgstr "Ar vis tiek tęsti?"
+msgstr ""
 
-#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#: ../urpmi:494 ../urpmi:512 ../urpmi:627 ../urpmi.addmedia:136
 #, c-format
 msgid " (Y/n) "
 msgstr " (T/n) "
 
-#: ../urpmi:504
-#, fuzzy, c-format
+#: ../urpmi:505
+#, c-format
 msgid ""
 "A requested package cannot be installed:\n"
 "%s"
 msgstr ""
-"Pareikalautas paketas negali būti įdiegtas:\n"
-"%s"
 
-#: ../urpmi:525
+#: ../urpmi:526
 #, c-format
 msgid "removing package %s will break your system"
 msgstr "paketo %s pašalinimas sugadins jūsų sistemą"
 
-#: ../urpmi:533
-#, fuzzy, c-format
+#: ../urpmi:534
+#, c-format
 msgid ""
 "The installation cannot continue because the following package\n"
 "has to be removed for others to be upgraded:\n"
 "%s\n"
 msgstr ""
-"Įdiegimas negali būti tęsiamas, nes šie paketai\n"
-"turi būti pašalinti, kad kitus būtų galima atnaujinti:\n"
-"%s\n"
 
-#: ../urpmi:535
+#: ../urpmi:536
 #, c-format
 msgid ""
 "The installation cannot continue because the following packages\n"
@@ -2507,71 +2497,48 @@ msgstr ""
 "turi būti pašalinti, kad kitus būtų galima atnaujinti:\n"
 "%s\n"
 
-#: ../urpmi:543
+#: ../urpmi:544
 #, c-format
 msgid "(test only, removal will not be actually done)"
 msgstr ""
 
-#: ../urpmi:562
-#, fuzzy, c-format
+#: ../urpmi:563
+#, c-format
 msgid ""
 "You must first call urpmi with --buildrequires to install the following "
 "dependencies:\n"
 "%s\n"
 msgstr ""
-"Išvardintų priklausomybių įdiegimiui jūs turite būti pradiniu:\n"
-"%s\n"
 
-#: ../urpmi:572
-#, fuzzy, c-format
+#: ../urpmi:573
+#, c-format
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
-msgstr[0] "Priklausomybių patenkinimui, šie paketai %d bus pašalinti (%d MB)"
-msgstr[1] "Priklausomybių patenkinimui, šie paketai %d bus pašalinti (%d MB)"
-msgstr[2] "Priklausomybių patenkinimui, šie paketai %d bus pašalinti (%d MB)"
-
-#: ../urpmi:596
-#, c-format
-msgid "WARNING: %s option is in use. Some strange problems may happen"
-msgstr ""
-
-#: ../urpmi:608
-#, c-format
-msgid "(test only, installation will not be actually done)"
-msgstr ""
-
-#: ../urpmi:614
-#, c-format
-msgid "%s of additional disk space will be used."
-msgstr ""
-
-#: ../urpmi:615
-#, c-format
-msgid "%s of disk space will be freed."
-msgstr ""
-
-#: ../urpmi:616
-#, c-format
-msgid "%s of packages will be retrieved."
-msgstr ""
-
-#: ../urpmi:617
-#, c-format
-msgid "Proceed with the installation of one package?"
-msgid_plural "Proceed with the installation of the %d packages?"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../urpmi:639
-#, fuzzy, c-format
+#: ../urpmi:597
+#, c-format
+msgid "WARNING: %s option is in use. Some strange problems may happen"
+msgstr ""
+"ĮSPĖJIMAS: yra naudojama %s parinktis. Gali atsirasti kai kurių keistų "
+"problemų"
+
+#: ../urpmi:609
+#, c-format
+msgid "(test only, installation will not be actually done)"
+msgstr ""
+
+#: ../urpmi:640
+#, c-format
 msgid "Press Enter when mounted..."
-msgstr "Kai būsite pasiruošę, paspauskite Enter..."
+msgstr ""
 
 #. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
 #: ../urpmi.addmedia:36
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: urpmi.addmedia [options] <name> <url>\n"
 "where <url> is one of\n"
@@ -2593,37 +2560,26 @@ msgid ""
 "\n"
 "and [options] are from\n"
 msgstr ""
-"naudojimas: urpmi.addmedia [parinktys] <pavadinimas> <url> [with "
-"<relative_path>]\n"
-"kur <url> vienas iš\n"
-"       [file:/]/<kelias> with <atitinkamu hdlist bylos pavadinimu>\n"
-"       ftp://<prisijungimas>:<slaptažodis>@<stotis>/<kelias> with "
-"<atitinkamu hdlist bylos pavadinimu>\n"
-"       ftp://<stotis>/<kelias> with <atitinkamu hdlist bylos pavadinimu>\n"
-"       http://<stotis>/<kelias> with <atitinkamu hdlist bylos pavadinimu>\n"
-"       removable://<kelias> with <atitinkamu hdlist bylos pavadinimu>\n"
-"\n"
-"ir [parinktys] yra iš\n"
 
 #: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
 #, c-format
 msgid "  --wget         - use wget to retrieve distant files.\n"
-msgstr "  --wget         - tolimų bylų atkūrimui naudokite wget.\n"
+msgstr "  --wget         - tolimų failų gavimui naudoti wget.\n"
 
 #: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
 #, c-format
 msgid "  --curl         - use curl to retrieve distant files.\n"
-msgstr "  --curl         - tolimų bylų atkūrimui naudokite curl.\n"
+msgstr "  --curl         - tolimų failų gavimui naudokite curl.\n"
 
 #: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
-msgstr "  --curl         - tolimų bylų atkūrimui naudokite curl.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:59 ../urpmi.update:36
-#, fuzzy, c-format
+#, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
-msgstr "  --curl         - tolimų bylų atkūrimui naudokite curl.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:66
 #, c-format
@@ -2641,9 +2597,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-synthesis - use synthesis file.\n"
-msgstr "  --probe-synthesis - bandyti surasti ir panaudoti sintezės bylą.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:71
 #, c-format
@@ -2651,11 +2607,9 @@ msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
 msgstr ""
 
 #: ../urpmi.addmedia:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-probe     - do not try to find any synthesis file.\n"
 msgstr ""
-"  --no-probe     - nebandyti surasti nei sintezes, nei\n"
-"                   hdlist bylų.\n"
 
 #: ../urpmi.addmedia:74
 #, c-format
@@ -2672,21 +2626,19 @@ msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
 msgstr ""
 
 #: ../urpmi.addmedia:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --all-media    - with --distrib, add every listed media\n"
-msgstr "  --list-media   - pateikti galimų laikmenų sąrašą.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
 msgstr ""
-"  --virtual      - sukurti nuolat atnaujinamą laikmeną,\n"
-"                   leidžiamas tiks toks protokolas file:// .\n"
 
 #: ../urpmi.addmedia:79 ../urpmi.update:44
 #, c-format
 msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
-msgstr "  --no-md5sum    - išjungti MD5SUM bylos tikrinimą.\n"
+msgstr "  --no-md5sum    - išjungti MD5SUM failų tikrinimą.\n"
 
 #: ../urpmi.addmedia:80
 #, c-format
@@ -2730,19 +2682,19 @@ msgid "Only superuser is allowed to add media"
 msgstr "Įtraukti laikmeną gali tik supervartotojas"
 
 #: ../urpmi.addmedia:119
-#, fuzzy, c-format
+#, c-format
 msgid "creating config file [%s]"
-msgstr "Bus sukurta konfigūracijos byla [%s]"
+msgstr ""
 
 #: ../urpmi.addmedia:120
 #, c-format
 msgid "Can't create config file [%s]"
-msgstr "Negaliu sukurti konfigūracijos bylos [%s]"
+msgstr "Negaliu sukurti konfigūracijos failo [%s]"
 
 #: ../urpmi.addmedia:128
-#, fuzzy, c-format
+#, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
-msgstr "nebūtina duoti <atitinkamas hdlist kelias> su --distrib"
+msgstr ""
 
 #: ../urpmi.addmedia:136
 #, c-format
@@ -2752,140 +2704,19 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
-#, fuzzy, c-format
+#, c-format
 msgid "unable to add medium"
-msgstr "negaliu prieiti prie laikmenos \"%s\""
+msgstr ""
 
 #: ../urpmi.addmedia:164
-#, fuzzy, c-format
+#, c-format
 msgid "<relative path of synthesis> missing\n"
-msgstr "<atitinkamas hdlist kelias> nėra\n"
+msgstr ""
 
 #: ../urpmi.addmedia:167
 #, c-format
 msgid "Can't use %s with remote medium"
 msgstr ""
-
-#: ../urpmi.recover:30
-#, c-format
-msgid "  --checkpoint   - set repackaging start now\n"
-msgstr ""
-
-#: ../urpmi.recover:31
-#, fuzzy, c-format
-msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
-msgstr "  --noclean      - rpms iš cache neišvalyti.\n"
-
-#: ../urpmi.recover:33
-#, fuzzy, c-format
-msgid ""
-"  --list         - list transactions since provided date/duration argument\n"
-msgstr "  --list-url     - pateikti galimų laikmenų ir jų url sąrašą.\n"
-
-#: ../urpmi.recover:34
-#, fuzzy, c-format
-msgid "  --list-all     - list all transactions in rpmdb (long)\n"
-msgstr "  --list-url     - pateikti galimų laikmenų ir jų url sąrašą.\n"
-
-#: ../urpmi.recover:35
-#, fuzzy, c-format
-msgid "  --list-safe    - list transactions since checkpoint\n"
-msgstr "  --list-url     - pateikti galimų laikmenų ir jų url sąrašą.\n"
-
-#: ../urpmi.recover:36
-#, c-format
-msgid ""
-"  --rollback     - rollback until specified date,\n"
-"                   or rollback the specified number of transactions\n"
-msgstr ""
-
-#: ../urpmi.recover:38
-#, fuzzy, c-format
-msgid "  --disable      - turn off repackaging\n"
-msgstr "  --name         - spausdinti tik paketų pavadinimus.\n"
-
-#: ../urpmi.recover:53
-#, c-format
-msgid "Invalid date or duration [%s]\n"
-msgstr ""
-
-#: ../urpmi.recover:61
-#, fuzzy, c-format
-msgid "Repackage directory not defined\n"
-msgstr "paketas %s nerastas."
-
-#: ../urpmi.recover:64
-#, fuzzy, c-format
-msgid "Can't write to repackage directory [%s]\n"
-msgstr "Klaidų ataskaitai negaliu sukurti katalogo [%s]"
-
-#: ../urpmi.recover:66
-#, fuzzy, c-format
-msgid "Cleaning up repackage directory [%s]...\n"
-msgstr "Klaidų ataskaitai negaliu sukurti katalogo [%s]"
-
-#: ../urpmi.recover:68
-#, c-format
-msgid "%d file removed\n"
-msgid_plural "%d files removed\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: ../urpmi.recover:78
-#, c-format
-msgid "Spurious command-line arguments [%s]\n"
-msgstr ""
-
-#: ../urpmi.recover:80
-#, c-format
-msgid "You can't specify --checkpoint and --rollback at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:82
-#, c-format
-msgid "You can't specify --checkpoint and --list at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:84
-#, c-format
-msgid "You can't specify --rollback and --list at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:86
-#, c-format
-msgid "You can't specify --disable along with another option"
-msgstr ""
-
-#: ../urpmi.recover:111
-#, c-format
-msgid "No transaction found since %s\n"
-msgstr ""
-
-#: ../urpmi.recover:126
-#, c-format
-msgid "You must be superuser to do this"
-msgstr ""
-
-#: ../urpmi.recover:139 ../urpmi.recover:205
-#, fuzzy, c-format
-msgid "Writing rpm macros file [%s]...\n"
-msgstr "atkuriama rpm byla [%s] ..."
-
-#: ../urpmi.recover:181
-#, fuzzy, c-format
-msgid "No rollback date found\n"
-msgstr "Nerastas bylų sąrašas\n"
-
-#: ../urpmi.recover:184
-#, c-format
-msgid "Rollback until %s...\n"
-msgstr ""
-
-#: ../urpmi.recover:191
-#, fuzzy, c-format
-msgid "Disabling repackaging\n"
-msgstr "  --name         - spausdinti tik paketų pavadinimus.\n"
 
 #: ../urpmi.removemedia:38
 #, c-format
@@ -2956,26 +2787,24 @@ msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
 msgstr "  --no-ignore    - neatnaujinti, laikmeną pažymėti kaip įgalintą.\n"
 
 #: ../urpmi.update:49
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
 msgstr ""
-"  --no-probe     - nebandyti surasti nei sintezes, nei\n"
-"                   hdlist bylų.\n"
 
 #: ../urpmi.update:50
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all enabled non-removable media.\n"
-msgstr "  -a             - išrinkti visas neišimamas laikmenas.\n"
+msgstr ""
 
 #: ../urpmi.update:51
-#, fuzzy, c-format
+#, c-format
 msgid "  -f             - force updating synthesis\n"
-msgstr "  -f             - vykdyti hdlist bylų sudarymą.\n"
+msgstr ""
 
 #: ../urpmi.update:52
-#, fuzzy, c-format
+#, c-format
 msgid "  -ff            - really force updating synthesis\n"
-msgstr "  -f             - vykdyti hdlist bylų sudarymą.\n"
+msgstr ""
 
 #: ../urpmi.update:69
 #, c-format
@@ -3077,14 +2906,14 @@ msgid "  --src          - next package is a source package (same as -s).\n"
 msgstr "  --src          - sekantis paketas yra pirminis (toks pat kaip -s).\n"
 
 #: ../urpmq:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
-msgstr "  --src          - sekantis paketas yra pirminis (toks pat kaip -s).\n"
+msgstr ""
 
 #: ../urpmq:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
-msgstr "  --url          - spausdinti žymens url: url.\n"
+msgstr ""
 
 #: ../urpmq:69
 #, c-format
@@ -3102,35 +2931,34 @@ msgid "  --changelog    - print changelog.\n"
 msgstr "  --changelog    - atspausdinti changelog.\n"
 
 #: ../urpmq:80
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - print conflicts.\n"
-msgstr "  --conflicts    - spausdinti žymenų konfliktus: visi konfliktai.\n"
+msgstr ""
 
 #: ../urpmq:81
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - print obsoletes.\n"
-msgstr "  --obsoletes    - spausdinti pasenusius žymenis: visi pasenę.\n"
+msgstr ""
 
 #: ../urpmq:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - print provides.\n"
-msgstr "  --provides     - spausdinti: all provides.\n"
+msgstr ""
 
 #: ../urpmq:83
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - print requires.\n"
 msgstr ""
-"  --requires     - spausdinti žymenų pareikalavimus: visi pareikalavimai.\n"
 
 #: ../urpmq:84
-#, fuzzy, c-format
-msgid "  --suggests     - print suggests.\n"
-msgstr "  --obsoletes    - spausdinti pasenusius žymenis: visi pasenę.\n"
+#, c-format
+msgid "  --recommends   - print recommends.\n"
+msgstr ""
 
 #: ../urpmq:85
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - print sourcerpm.\n"
-msgstr "  --sourcerpm    - spausdinti žymens pirminį rpm: pirminis rpm.\n"
+msgstr ""
 
 #: ../urpmq:86
 #, c-format
@@ -3138,11 +2966,11 @@ msgid "  --summary, -S  - print summary.\n"
 msgstr "  --summary, -S  - spausdinti suvestinę.\n"
 
 #: ../urpmq:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --requires-recursive, -d\n"
 "                   - query package dependencies.\n"
-msgstr "  -d             - išplėsti paketo priklausomybių užklausą.\n"
+msgstr ""
 
 #: ../urpmq:90
 #, c-format
@@ -3160,11 +2988,11 @@ msgstr ""
 "paketus).\n"
 
 #: ../urpmq:93
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatprovides, -p\n"
 "                   - search in provides to find package.\n"
-msgstr "  -p             - iškoti paketo suradimo pateiktyse.\n"
+msgstr ""
 
 #: ../urpmq:96
 #, c-format
@@ -3186,12 +3014,12 @@ msgstr ""
 #: ../urpmq:100
 #, c-format
 msgid "  -l             - list files in package.\n"
-msgstr "  -l             - paketo bylas sudėti į sąrašą.\n"
+msgstr "  -l             - paketo failus sudėti į sąrašą.\n"
 
 #: ../urpmq:101
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - equivalent to -du\n"
-msgstr "  -q             - paslėptoji veiksena.\n"
+msgstr ""
 
 #: ../urpmq:102
 #, c-format
@@ -3228,7 +3056,8 @@ msgstr ""
 #: ../urpmq:107
 #, c-format
 msgid "  names or rpm files given on command line are queried.\n"
-msgstr "  apklausiami komandinėje eilutėje duoti pavadinimai arba rpm bylos.\n"
+msgstr ""
+"  apklausiami komandinėje eilutėje duoti pavadinimai arba rpm failai.\n"
 
 #: ../urpmq:154
 #, c-format
@@ -3241,682 +3070,49 @@ msgid "--list-nodes can only be used with --parallel"
 msgstr "--list-mazgas gali būti naudojamas tik su --parallel"
 
 #: ../urpmq:231
-#, fuzzy, c-format
+#, c-format
 msgid "use -l to list files"
-msgstr "negaliu įrašyti \"%s\" sąrašo bylos"
+msgstr ""
 
-#: ../urpmq:416
-#, fuzzy, c-format
+#: ../urpmq:415
+#, c-format
 msgid "no xml info for medium \"%s\", only partial result for package %s"
 msgstr ""
-"Pastaba: kadangi nei viena surasta laikmena nenaudoja hdlists, urpmf negali "
-"išvesti jokio rezultato\n"
 
-#: ../urpmq:417
-#, fuzzy, c-format
+#: ../urpmq:416
+#, c-format
 msgid "no xml info for medium \"%s\", only partial result for packages %s"
 msgstr ""
-"Pastaba: kadangi nei viena surasta laikmena nenaudoja hdlists, urpmf negali "
-"išvesti jokio rezultato\n"
 
-#: ../urpmq:420
-#, fuzzy, c-format
+#: ../urpmq:419
+#, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for package %s"
 msgstr ""
-"Pastaba: kadangi nei viena surasta laikmena nenaudoja hdlists, urpmf negali "
-"išvesti jokio rezultato\n"
 
-#: ../urpmq:421
-#, fuzzy, c-format
+#: ../urpmq:420
+#, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr ""
-"Pastaba: kadangi nei viena surasta laikmena nenaudoja hdlists, urpmf negali "
-"išvesti jokio rezultato\n"
 
-#: ../urpmq:488
+#: ../urpmq:487
 #, c-format
 msgid "No changelog found\n"
 msgstr "Nerastas changelog\n"
 
 #: ../gurpmi.desktop.in.h:1
-#, fuzzy
 msgid "Software Installer"
-msgstr "Programinės įrangos įdiegimas"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:2
-#, fuzzy
 msgid "Graphical front end to install RPM files"
-msgstr "Grafinės sąsaja paketų įdiegimui"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpme version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme versija %s\n"
-#~ "Autorinės teisės (C) 1999-2005 Mandriva.\n"
-#~ "Tai yra nemokama programa, kuri gali būti platinama pagal GNU GPL "
-#~ "licenciją.\n"
-#~ "\n"
-#~ "naudojimas:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage: urpmf [options] pattern-expression\n"
-#~ msgstr ""
-#~ "urpmf versija %s\n"
-#~ "Autorinės teisės (C) 2002-2004 Mandriva.\n"
-#~ "Tai yra nemokama programa, kuri gali būti platinama pagal GNU GPL "
-#~ "licenciją.\n"
-#~ "\n"
-#~ "naudojimas:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmi.recover version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme versija %s\n"
-#~ "Autorinės teisės (C) 1999-2005 Mandriva.\n"
-#~ "Tai yra nemokama programa, kuri gali būti platinama pagal GNU GPL "
-#~ "licenciją.\n"
-#~ "\n"
-#~ "naudojimas:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmq version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmq versija %s\n"
-#~ "Autorinės teisės (C) 2000-2005 Mandriva.\n"
-#~ "Tai yra nemokama programa, kuri gali būti platinama pagal GNU GPL "
-#~ "licenciją.\n"
-#~ "\n"
-#~ "naudojimas:\n"
-
-#~ msgid ""
-#~ "Installation failed, some files are missing:\n"
-#~ "%s\n"
-#~ "You may want to update your urpmi database"
-#~ msgstr ""
-#~ "Įdiegimas nepavyko, trūksta kai kurių bylų:\n"
-#~ "%s\n"
-#~ "Jūs galite norėti atnaujinti urpmi duomenų bazę"
-
-#~ msgid "Cancel"
-#~ msgstr "Atšaukti"
-
-#, fuzzy
-#~ msgid "Cannot write DUDF file.\n"
-#~ msgstr "Įjungti ar išjungti bendrą naudojimąsi bylomis"
-
-#~ msgid ""
-#~ "  --sources      - give all source packages before downloading (root "
-#~ "only).\n"
-#~ msgstr ""
-#~ "  --sources      - parodyti visus pirminius paketus prieš juos "
-#~ "parsiunčiant (tik pradiniam).\n"
-
-#, fuzzy
-#~ msgid "due to already installed %s"
-#~ msgstr "Paketas(-ai) jau įdiegti"
-
-#~ msgid ""
-#~ "  --from         - use specified url for list of mirrors, the default is\n"
-#~ "                   %s\n"
-#~ msgstr ""
-#~ "  --from         - veidrodžių sąrašui naudoti nurodytus url, standartinis "
-#~ "yra\n"
-#~ "                   %s\n"
-
-#, fuzzy
-#~ msgid "examining %s file"
-#~ msgstr "tikrinama MD5SUM byla"
-
-#, fuzzy
-#~ msgid "found probed synthesis as %s"
-#~ msgstr "rastas ištirtas hdlist (arba sintezė) kaip %s"
-
-#~ msgid "  --update       - create an update medium.\n"
-#~ msgstr "  --update       - sukurti atnaujinimo laikmeną.\n"
-
-#, fuzzy
-#~ msgid "malformed URL: [%s]"
-#~ msgstr "blogai suformuotas įvedimas: [%s]"
-
-#, fuzzy
-#~ msgid "%d installation transaction failed"
-#~ msgid_plural "%d installation transactions failed"
-#~ msgstr[0] "%d įdiegimo operacijos nepavyko"
-#~ msgstr[1] "%d įdiegimo operacijos nepavyko"
-#~ msgstr[2] "%d įdiegimo operacijos nepavyko"
-
-#, fuzzy
-#~ msgid "Package %s can not be installed"
-#~ msgstr "Paketas(-ai) jau įdiegti"
-
-#~ msgid "Checking to remove the following packages"
-#~ msgstr "Tikrinami pašalintini sekantys paketai"
-
-#, fuzzy
-#~ msgid "%s database locked"
-#~ msgstr "urpmi duomenų bazė užrakinta"
-
-#, fuzzy
-#~ msgid "Unknown option %s"
-#~ msgstr "Nežinomas perspėjimas"
-
-#~ msgid "too many mount points for removable medium \"%s\""
-#~ msgstr "per daug išimamos laikmenos prijungimo taškų \"%s\""
-
-#~ msgid "Medium \"%s\" is an ISO image, will be mounted on-the-fly"
-#~ msgstr "Laikmena \"%s\" yra ISO atvaizdas, bus prijungta on-the-fly metodu"
-
-#~ msgid "using different removable device [%s] for \"%s\""
-#~ msgstr "naudojamas skirtingas išimamas įrenginys [%s] dėl \"%s\""
-
-#~ msgid "unable to retrieve pathname for removable medium \"%s\""
-#~ msgstr "negaliu išgauti kelio vardo išimamai laikmenai\"%s\""
-
-#, fuzzy
-#~ msgid "unable to mount the distribution medium"
-#~ msgstr "negaliu prieiti prie pirmojo įdiegimo laikmenos"
-
-#~ msgid ""
-#~ "unable to access medium \"%s\",\n"
-#~ "this could happen if you mounted manually the directory when creating the "
-#~ "medium."
-#~ msgstr ""
-#~ "negaliu prieiti prie laikmenos \"%s\",\n"
-#~ "tai galėjo atsitikti, jei, kurdami laikmeną, rankiniu būdu prijungėte "
-#~ "katalogą."
-
-#~ msgid "inconsistent medium \"%s\" marked removable but not really"
-#~ msgstr "nesuderinama laikmena \"%s\" pažymėta kaip išimama, bet tokia nėra"
-
-#~ msgid "  -c             - clean headers cache directory.\n"
-#~ msgstr "  -c             - išvalyti antraščių cache katalogą.\n"
-
-#~ msgid "virtual medium needs to be local"
-#~ msgstr "virtuali laikmena turi būti vietinė"
-
-#, fuzzy
-#~ msgid "unable to parse synthesis file of \"%s\""
-#~ msgstr "negaliu išnagrinėti \"%s\" hdlist bylos"
-
-#, fuzzy
-#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
-#~ msgstr "esančiam hdlist (arba sintezei) skaičiuojama md5sum"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
-#~ "ignored"
-#~ msgstr ""
-#~ "virtualioji laikmena \"%s\" neturėtų turėti hdlist ar list bylos, "
-#~ "laikmena ignoruojama"
-
-#, fuzzy
-#~ msgid "invalid hdlist name"
-#~ msgstr "netinkamas rpm bylos vardas [%s]"
-
-#~ msgid "unable to find list file for \"%s\", medium ignored"
-#~ msgstr "negaliu rasti sąrašo dėl \"%s\", laikmena ignoruojama"
-
-#, fuzzy
-#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
-#~ msgstr "bandoma išrinkti nesančią laikmeną \"%s\""
-
-#, fuzzy
-#~ msgid "\"synthesis\" should be set (medium \"%s\")"
-#~ msgstr "\"%s\" laikmenai sudaryta hdlist sintezės byla"
-
-#, fuzzy
-#~ msgid "unable to access list file of \"%s\""
-#~ msgstr "negaliu išnagrinėti \"%s\" hdlist bylos"
-
-#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
-#~ msgstr ""
-#~ "laikmena \"%s\" bando panaudoti ir jau naudojo hdlist, laikmena "
-#~ "ignoruojama"
-
-#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
-#~ msgstr ""
-#~ "laikmena \"%s\" bando panaudoti ir jau naudojo list, laikmena ignoruojama"
-
-#, fuzzy
-#~ msgid ""
-#~ "Note: no hdlist for medium \"%s\", unable to return any result for it"
-#~ msgstr ""
-#~ "Pastaba: kadangi nei viena surasta laikmena nenaudoja hdlists, urpmf "
-#~ "negali išvesti jokio rezultato\n"
-
-#~ msgid "performing second pass to compute dependencies\n"
-#~ msgstr "atliekamas antrasis priklausomybių skaičiavimo bandymas\n"
-
-#~ msgid "building hdlist [%s]"
-#~ msgstr "sudaromas hdlist [%s]"
-
-#~ msgid ""
-#~ "Unable to build synthesis file for medium \"%s\". Your hdlist file may be "
-#~ "corrupted."
-#~ msgstr ""
-#~ "Laikmenai \"%s\" negaliu sudaryti sintezės bylos. Jūsų hdlist byla gali "
-#~ "būti sugadinta."
-
-#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
-#~ msgstr "hdlist skaitymo arba \"%s\" laikmenos bylos sintezės problema"
-
-#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
-#~ msgstr "nukopijuotam hdlist (arba sintezei) skaičiuojama md5sum"
-
-#~ msgid "...retrieving failed: md5sum mismatch"
-#~ msgstr "...atkūrimas nepavyko: md5sum neatitikimas"
-
-#~ msgid "no rpm files found from [%s]"
-#~ msgstr "nerasta jokių rpm bylų iš [%s]"
-
-#~ msgid "unable to read rpm files from [%s]: %s"
-#~ msgstr "negaliu skaityti rpm bylų iš [%s]: %s"
-
-#~ msgid "no rpms read"
-#~ msgstr "neperskaityta jokių rpms"
-
-#~ msgid "reading headers from medium \"%s\""
-#~ msgstr "iš laikmenos \"%s\" skaitomos antraštės"
-
-#, fuzzy
-#~ msgid "    --probe-synthesis - use synthesis file.\n"
-#~ msgstr "  --probe-synthesis - bandyti surasti ir panaudoti sintezės bylą.\n"
-
-#, fuzzy
-#~ msgid "    --probe-hdlist - use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - bandyti surasti ir panaudoti hdlist bylą.\n"
-
-#~ msgid ""
-#~ "Note: since no media searched uses hdlists, urpmf was unable to return "
-#~ "any result\n"
-#~ msgstr ""
-#~ "Pastaba: kadangi nei viena surasta laikmena nenaudoja hdlists, urpmf "
-#~ "negali išvesti jokio rezultato\n"
-
-#~ msgid "You may want to use --name to search for package names.\n"
-#~ msgstr "Galbūt noresite naudoti --pavadinimas paketų pavadinimų paieškai.\n"
-
-#, fuzzy
-#~ msgid "  --probe-hdlist - use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - bandyti surasti ir panaudoti hdlist bylą.\n"
-
-#~ msgid "unable to update medium \"%s\"\n"
-#~ msgstr "negaliu atnaujinti laikmenos \"%s\"\n"
-
-#~ msgid "unable to create medium \"%s\"\n"
-#~ msgstr "negaliu sukurti laikmenos \"%s\"\n"
-
-#~ msgid "there are multiple packages with the same rpm filename \"%s\""
-#~ msgstr "tokį pat rpm bylos pavadinimą turi keletas paketų \"%s\""
-
-#~ msgid "unable to correctly parse [%s] on value \"%s\""
-#~ msgstr "negaliu teisingai išnagrinėti [%s] ties verte \"%s\""
-
-#~ msgid ""
-#~ "medium \"%s\" uses an invalid list file:\n"
-#~ "  mirror is probably not up-to-date, trying to use alternate method"
-#~ msgstr ""
-#~ "laikmena \"%s\" naudoja netinkamą list bylą:\n"
-#~ "  veidrodis tikriausiai yra negaliojantis, bandoma naudoti atsarginį "
-#~ "metodą"
-
-#~ msgid "medium \"%s\" does not define any location for rpm files"
-#~ msgstr "laikmena \"%s\" nenurodo vietos rpm byloms"
-
-#~ msgid "unrequested"
-#~ msgstr "nepareikalautas"
-
-#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
-#~ msgstr "įtraukiamas paketas %s (id=%d, eid=%d, atnaujinti=%d, byla=%s)"
-
-#~ msgid ""
-#~ "The following packages have bad signatures:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Do you want to continue installation ?"
-#~ msgstr ""
-#~ "Sekantys paketai turi blogus ženklus:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Ar norite tęsti įdiegimą ?"
-
-#, fuzzy
-#~ msgid "You need to be root to use --use-distrib"
-#~ msgstr "Kad galėtumėte dalintis katalogais, jūs turite būti atpažintas"
-
-#~ msgid "unable to remove package %s"
-#~ msgstr "negaliu pašalinti paketo %s"
-
-#~ msgid "No filelist found\n"
-#~ msgstr "Nerastas bylų sąrašas\n"
-
-#~ msgid ""
-#~ "  -P             - do not search in provides to find package (default).\n"
-#~ msgstr "  -P             - pasiūlymuose paketo neiškoti (standartinis).\n"
-
-#~ msgid "  -R             - reverse search to what requires package.\n"
-#~ msgstr "  -R             - atbulinė paieška to, kas reikalauja paketo.\n"
-
-#~ msgid ""
-#~ "  -RR            - extended reverse search (includes virtual packages).\n"
-#~ msgstr ""
-#~ "  -RR            - išplėstinė atbulinė paieška (apima ir virtualius "
-#~ "paketus).\n"
-
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed:\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "Priklausomybių patenkinimui, šie paketai %d turi būti įdiegti:\n"
-#~ "%s\n"
-
-#~ msgid "skipping media %s: no hdlist"
-#~ msgstr "laikmena %s praleidžiama: nėra hdlist"
-
-#, fuzzy
-#~ msgid "Installing packages on nodes..."
-#~ msgstr "Įdiegiamas paketas `%s' (%s/%s)..."
-
-#, fuzzy
-#~ msgid "Propagating synthesis to %s..."
-#~ msgstr "tikrinama sintezės byla [%s]"
-
-#, fuzzy
-#~ msgid "Distributing files to %s..."
-#~ msgstr "paskirstomas %s"
-
-#, fuzzy
-#~ msgid "Performing install on %s..."
-#~ msgstr "Paketų įdiegimas..."
-
-#, fuzzy
-#~ msgid "Preparing install on %s..."
-#~ msgstr "Paketų įdiegimas..."
-
-#~ msgid "  --probe-synthesis - try to find and use synthesis file.\n"
-#~ msgstr "  --probe-synthesis - bandyti surasti ir panaudoti sintezės bylą.\n"
-
-#~ msgid "  --probe-hdlist - try to find and use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - bandyti surasti ir panaudoti hdlist bylą.\n"
-
-#~ msgid "`with' missing for network media\n"
-#~ msgstr "`su' trūkstamas tinklo laikmenai\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "unknown options '%s'\n"
-#~ msgstr ""
-#~ "\n"
-#~ "nežinomos parinktys '%s'\n"
-
-#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
-#~ msgstr "negaliu rasti \"%s\" hdlist bylos, laikmena ignoruojama"
-
-#~ msgid "inconsistent list file for \"%s\", medium ignored"
-#~ msgstr "nesuderinama sąrašo byla dėl \"%s\", laikmena ignoruojama"
-
-#~ msgid "unable to inspect list file for \"%s\", medium ignored"
-#~ msgstr "negaliu patikrinti \"%s\" list bylos, laikmena ignoruojama"
-
-#~ msgid "there doesn't seem to be devices in the chroot in \"%s\""
-#~ msgstr "atrodo, kad nėra chroot įtaisų čia: \"%s\""
-
-#~ msgid "virtual medium \"%s\" is not local, medium ignored"
-#~ msgstr "virtuali laikmena \"%s\" nėra vietinė, laikmena ignoruojama"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
-#~ "medium ignored"
-#~ msgstr ""
-#~ "virtualioji laikmena \"%s\" turi turėti galiojantį pirminį hdlist arba "
-#~ "sintezę, laikmena ignoruojama"
-
-#~ msgid "copying source hdlist (or synthesis) of \"%s\"..."
-#~ msgstr "kopijuojamas \"%s\" pirminis hdlist (arba sintezė)..."
-
-#~ msgid "retrieval of source hdlist (or synthesis) failed"
-#~ msgstr "pirminio hdlist (arba sintezės) atkūrimas nepavyko"
-
-#~ msgid "file [%s] already used in the same medium \"%s\""
-#~ msgstr "byla [%s] jau naudota toje pačioje laikmenoje \"%s\""
-
-#~ msgid "nothing written in list file for \"%s\""
-#~ msgstr "nieko neįrašyta į \"%s\" sąrašo bylą"
-
-#~ msgid "found %d headers in cache"
-#~ msgstr "rastos %d antraštės iš cache"
-
-#~ msgid "removing %d obsolete headers in cache"
-#~ msgstr "pašalinamos %d pasenę antraštės iš cache"
-
-#~ msgid "using process %d for executing transaction"
-#~ msgstr "operacijos atlikimui naudojamas procesas %d"
-
-#~ msgid "  --norebuild    - don't try to rebuild hdlist if not readable.\n"
-#~ msgstr ""
-#~ "  --norebuild    - jei hdlist neperskaitomas, nebandyti jį atstatyti.\n"
-
-#~ msgid "The following package names were assumed: %s"
-#~ msgstr "Buvo priimti šie paketo pavadinimai: %s"
-
-#~ msgid "copying hdlists file..."
-#~ msgstr "kopijuojama hdlists byla..."
-
-#~ msgid "invalid hdlist description \"%s\" in hdlists file"
-#~ msgstr "hdlists byloje netinkamas hdlist aprašymas \"%s\""
-
-#~ msgid "Is this OK?"
-#~ msgstr "Ar taip gerai?"
-
-#~ msgid ""
-#~ "  --version      - use specified distribution version, the default is "
-#~ "taken\n"
-#~ "                   from the version of the distribution told by the\n"
-#~ "                   installed mandriva-release package.\n"
-#~ msgstr ""
-#~ "  --version      - naudoti nurodytą platinimo versiją, standartiškai "
-#~ "parenkama\n"
-#~ "                   įdiegto mandriva leidimo paketo nurodyta\n"
-#~ "                   platinimo versija.\n"
-
-#~ msgid ""
-#~ "  --arch         - use specified architecture, the default is arch of\n"
-#~ "                   mandriva-release package installed.\n"
-#~ msgstr ""
-#~ "  --arch         - naudoti nurodytą architektūrą, standartiškai paimama "
-#~ "įdiegto\n"
-#~ "                   mandriva paketo architektūra.\n"
-
-#~ msgid ""
-#~ "  --headers      - extract headers for package listed from urpmi db to\n"
-#~ "                   stdout (root only).\n"
-#~ msgstr ""
-#~ "  --headers      - išarchyvuoti antraštes paketams, kurie yra tarp urpmi "
-#~ "db ir\n"
-#~ "                   stdout (tik pradiniam).\n"
-
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed (%d MB)"
-#~ msgstr "Priklausomybių patenkinimui, bus įdiegti šie paketai %d (%d MB)"
-
-#~ msgid "installing %s\n"
-#~ msgstr "įdiegiama %s\n"
-
-#~ msgid ""
-#~ "Automatic installation of packages...\n"
-#~ "You requested installation of package %s\n"
-#~ msgstr ""
-#~ "Automatinis paketų įdiegimas...\n"
-#~ "Jūs pareikalavote įdiegti paketą %s\n"
-
-#~ msgid "%s: command not found\n"
-#~ msgstr "%s: komanda nerasta\n"
-
-#~ msgid ""
-#~ "Some package requested cannot be installed:\n"
-#~ "%s\n"
-#~ "Continue?"
-#~ msgstr ""
-#~ "Vienas reikalautų paketų negali būti įdiegtas:\n"
-#~ "%s\n"
-#~ "Tęsti?"
-
-#~ msgid ""
-#~ "The following packages have to be removed for others to be upgraded:\n"
-#~ "%s\n"
-#~ "Continue?"
-#~ msgstr ""
-#~ "Norint įdiegti kitus paketus, šie turi būti pašalinti:\n"
-#~ "%s\n"
-#~ "Tęsti?"
-
-#~ msgid "md5sum mismatch"
-#~ msgstr "md5sum neatitikimas"
-
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmf versija %s\n"
-#~ "Autorinės teisės (C) 2002-2004 Mandriva.\n"
-#~ "Tai yra nemokama programa, kuri gali būti platinama pagal GNU GPL "
-#~ "licenciją.\n"
-#~ "\n"
-#~ "naudojimas:\n"
-
-#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
-#~ msgstr ""
-#~ "  --synthesis    - naudoti duotąją sintezę vietoje urpmi duomenų bazės.\n"
-
-#~ msgid ""
-#~ "  --quiet        - do not print tag name (default if no tag given on "
-#~ "command\n"
-#~ "                   line, incompatible with interactive mode).\n"
-#~ msgstr ""
-#~ "  --quiet        - spausdinti žymens pavadinimą (standartinis, jei "
-#~ "komandinėje eilutėje\n"
-#~ "                   nėra nurodyto žymens, nesuderinamas su interaktyvia "
-#~ "veiksena).\n"
-
-#~ msgid "  --uniq         - do not print identical lines.\n"
-#~ msgstr "  --uniq         - nespausdinti identiškų eilučių.\n"
-
-#~ msgid "  --all          - print all tags.\n"
-#~ msgstr "  --all          - spausdinti visus žymenis.\n"
-
-#~ msgid "  --summary      - print tag summary: summary.\n"
-#~ msgstr "  --summary      - spausdinti žymenų suvestinę: suvestinė.\n"
-
-#~ msgid "  --description  - print tag description: description.\n"
-#~ msgstr "  --description  - spausdinti žymens aprašymą: aprašymas.\n"
-
-#~ msgid "  --buildhost    - print tag buildhost: build host.\n"
-#~ msgstr "  --buildhost    - spausdinti žymens buildhost: build host.\n"
-
-#~ msgid "  --provides     - print tag provides: all provides.\n"
-#~ msgstr "  --provides     - spausdinti: all provides.\n"
-
-#~ msgid "  --requires     - print tag requires: all requires.\n"
-#~ msgstr ""
-#~ "  --requires     - spausdinti žymenų pareikalavimus: visi "
-#~ "pareikalavimai.\n"
-
-#~ msgid "  --files        - print tag files: all files.\n"
-#~ msgstr "  --files        - spausdinti žymenų bylas: visos bylos.\n"
-
-#~ msgid "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
-#~ msgstr "  --obsoletes    - spausdinti pasenusius žymenis: visi pasenę.\n"
-
-#~ msgid ""
-#~ "  --env          - use specific environment (typically a bug\n"
-#~ "                   report).\n"
-#~ msgstr ""
-#~ "  --env          - naudoti specifinę aplinką (paprastai klaidos\n"
-#~ "                   pranešimas).\n"
-
-#~ msgid "  -i             - ignore case distinctions in every pattern.\n"
-#~ msgstr ""
-#~ "  -i             - ignoruoti kiekvieno pavyzdžio raidžių dydžio "
-#~ "skirtumus.\n"
-
-#~ msgid ""
-#~ "  -a             - binary AND operator, true if both expression are "
-#~ "true.\n"
-#~ msgstr ""
-#~ "  -a             - dvejetainis IR operatorius, teigiamas, jei abi "
-#~ "išraiškos yra teigiamos.\n"
-
-#~ msgid ""
-#~ "  -o             - binary OR operator, true if one expression is true.\n"
-#~ msgstr ""
-#~ "  -o             - dvejetainis ARBA operatorius, teigiamas, jei bent "
-#~ "viena išraiška yra teigiama.\n"
-
-#~ msgid "  !              - unary NOT, true if expression is false.\n"
-#~ msgstr ""
-#~ "  !              - elementas NE, teigiamas, jei išraiška yra neigiama.\n"
-
-#~ msgid "  (              - left parenthesis to open group expression.\n"
-#~ msgstr ""
-#~ "  (              - kairysis skliaustelis grupės išraiškos atidarymui.\n"
-
-#~ msgid "  )              - right parenthesis to close group expression.\n"
-#~ msgstr ""
-#~ "  )              - dešinysis skliaustelis grupės išraiskos uždarymui.\n"
-
-#~ msgid ""
-#~ "callback is:\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "atšaukimas yra:\n"
-#~ "%s\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "Continue?"
-#~ msgstr ""
-#~ "\n"
-#~ "Tęsti?"
-
-#~ msgid ""
-#~ "Some package requested cannot be installed:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Pareikalautas paketas negali būti įdiegtas:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "retrieving mirrors at %s ..."
-#~ msgstr "Tik root vartotojas gali įdiegti vietinius paketus"
+msgstr ""
+
+#: ../polkit/org.mageia.gurpmi2.policy.in.h:1
+msgid "Run Mageia Package Installer"
+msgstr ""
+
+#: ../polkit/org.mageia.gurpmi2.policy.in.h:2
+msgid "Authentication is required to run Mageia Package Installer"
+msgstr ""

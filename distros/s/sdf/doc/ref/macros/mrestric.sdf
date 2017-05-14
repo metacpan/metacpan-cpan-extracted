@@ -1,0 +1,40 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: restrict Macro
+
+H2: Interface
+
+!macro_interface "restrict"
+
+H2: Description
+
+The {{restrict}} macro declares a restricted family of variables.
+If a variable begins with a restricted prefix, then it must be
+declared via the {{FILT:define}} filter.
+
+This feature aims to catch errors caused by authors using
+a bad variable name. For example, if an author types
+
+E:   !define DOC_NAMe "My Document"
+
+but meant to type
+
+E:   !define DOC_NAME "My Document"
+
+then an error will be raised as DOC_NAMe is an unknown variable
+within the DOC family.
+
+H2: Examples
+
+#H2: Limitations & Future Directions

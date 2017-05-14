@@ -17,7 +17,7 @@ Response Base - Base object for view plugins
 
 =head1 DESCRIPTION
 
-This object should not be used directly, a new class should be created which inherits this one instead.
+This object should not be used directly, a new class should be created which inherits this one istead.
 
 All response plugins should override at least the display() method and they all a sub class of L<HTTP::Response>.
 
@@ -30,17 +30,15 @@ The module L<CGI::Mungo::Response> will load the specified response plugin on sc
 use strict;
 use warnings;
 use Carp;
-use base qw(HTTP::Response CGI::Mungo::Base CGI::Mungo::Log);
+use base qw(HTTP::Response CGI::Mungo::Base);
 #########################################################
 sub new{
 	my($class, $mungo) = @_;
-	if(!defined($mungo)){
-		confess("No mungo object given");
-	}
 	my $self = $class->SUPER::new(200, "OK");	#we dont care about the code or msg as they get removed later
 	$self->{'_mungo'} = $mungo;	#so we can access the mungo object FIXME
 	$self->{'_displayedHeader'} = 0;	#flag set on first output
 	bless $self, $class;
+	$self->__setEtag();
 	return $self;
 }
 #########################################################
@@ -82,6 +80,14 @@ sub _setDisplayedHeader{
 sub _getDisplayedHeader{
 	my $self = shift;
 	return $self->{'_displayedHeader'};
+}
+###########################################################
+sub __setEtag{
+	my $self = shift;
+	my $mungo = $self->getMungo();
+	my $etag = $mungo->createEtag();	
+	$self->header("ETag" => $etag);
+	return 1;
 }
 ###########################################################
 

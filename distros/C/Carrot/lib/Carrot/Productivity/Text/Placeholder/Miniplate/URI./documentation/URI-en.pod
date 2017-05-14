@@ -1,0 +1,56 @@
+﻿=pod
+
+=head1 NAME
+
+Carrot::Productivity::Text::Placeholder::Miniplate::URI - symbolic access to parts of an URI
+
+=head1 SYNOPSIS
+
+	$class_names->provide(
+		my $template_class = '::Productivity::Text::Placeholder::Template');
+
+	my $template = $template_class->constructor(
+		my $uri = '::URI');
+	$template->compile('Host: [=uri_host=]');
+
+	$uri->set_subject('http://www.perl.org/');
+	print ${$template->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+A proof-of-concept module.
+
+Carrot::Productivity::Text::Placeholder::Miniplate::URI provides the placeholders 'uri_(scheme|opaque|host|path|full)'.
+
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item subject($uri)
+
+Sets or gets the string representation of the URI.
+
+=item add_placeholder($template, $code_ref)
+
+Adds the $code_ref under the name of $template. $code_ref is executed and returns the current value to be substituted for $template.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

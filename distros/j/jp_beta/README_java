@@ -1,0 +1,132 @@
+/*JPERL Beta
+
+  PERL Access routines in Java
+
+  ---------------------------------------------------------------------
+  Copyright (c) 1998, S Balamurugan, Texas Instruments India.
+  All Rights Reserved.
+  ---------------------------------------------------------------------
+
+  Permission to  use, copy, modify, and  distribute this  software and
+  its documentation for  NON-COMMERCIAL  purposes and without fee   is
+  hereby granted provided that  this  copyright notice appears  in all
+  copies.  Please  refer LICENCE  for  further  important  copyright
+  and licensing information.
+
+  BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+  FOR  THE PROGRAM.  THE   PROGRAM IS  PROVIDED ON   AN "AS  IS" BASIS
+  WITHOUT  WARRANTY OF  ANY     KIND, EITHER EXPRESSED   OR   IMPLIED,
+  INCLUDING,  BUT   NOT   LIMITED  TO,   THE  IMPLIED   WARRANTIES  OF
+  MERCHANTABILITY AND FITNESS FOR  A PARTICULAR PURPOSE. THE AUTHOR OR
+  TEXAS INSTRUMENTS  SHALL NOT BE LIABLE FOR  ANY  DAMAGES SUFFERED BY
+  LICENSEE AS  A RESULT   OF  USING, MODIFYING OR   DISTRIBUTING  THIS
+  SOFTWARE OR ITS DERIVATIVES.
+
+  ---------------------------------------------------------------------*/
+
+jperl Beta interface
+====================
+
+   jp provides a set of methods to call PERL subroutines and pass parameters and
+   accept values
+
+   In the following methods, 'fname' can be a PERL function name like "foo",
+   or a fully qualified method name like "mypackage::foo". Do not use "()" in
+   calls. See main.java for examples.
+
+   Arguments :
+          All PLCall methods, take an Object array as argument. Valid Objects
+          are one of
+                  Integer
+                  Double
+                  Float
+                  String
+                  Long
+                  Short
+                  Hashtable
+                  Vector
+
+          Other types cause an IllegalArgumentException to be thrown.
+
+   Public methods
+          public jp(String perlfile) throws RuntimeException;
+          //Takes perlfilename as input. Throws exception on error.
+          //Only one instance of jp can be alive at a given time
+          
+          public void DebugOn();
+          //Turns debug on in native code.
+
+          public void DebugOff();
+          //Turns debug off in native code.
+
+          public String PLCallScalar(String fname) throws RuntimeExceptio;
+          //Calls PERL subroutine 'fname'. Returns scalar result from Perl
+          //Throws exception in case of error
+ 
+          public String PLCallScalar(String fname, Object[] args)
+                 throws RuntimeException,IllegalArgumentException
+          //Calls PERL subroutine 'fname'. 
+          //Passes arguments Object args[] to PERL subroutine. 
+          //Refer arguments for a list of valid arguments
+          //Returns scalar result from Perl
+          //Throws exception in case of error
+
+
+          public String[] PLCallArray(String fname, Object[] args)
+                 throws RuntimeException,IllegalArgumentException
+          //Calls PERL subroutine 'fname'. 
+          //Passes arguments Object args[] to PERL subroutine. 
+          //Refer arguments for a list of valid arguments
+          //Returns Array result from Perl as a an array of String
+          //Throws exception in case of error
+
+
+          public Hashtable PLCallHash(String fname, Object[] args)
+                 throws RuntimeException,IllegalArgumentException
+          //Calls PERL subroutine 'fname'. 
+          //Passes arguments Object args[] to PERL subroutine. 
+          //Refer arguments for a list of valid arguments
+          //Returns Hasharray from Perl as Object Hashtable
+          //Throws Runtime exception in case of error or odd number of arguments
+          //returned to Hashtable
+
+
+          public  native void IPLLoadLibrary(String libname) 
+                  throws RuntimeException;
+          // Internal routine available as public.
+          // Can be used to load additioal PERL modules at run time
+
+          public  native String[] IPLEval(String expression)
+                  throws RuntimeException;
+          // Internal routine available as public.
+          // Can be used to evaluate PERL expressions and return values
+          // example PLEval("$a = 'MyString'; $b = reverse($a); return ($a,$b);");
+
+    Points to Note
+       
+       1. All values are returned as String/String[]. 
+          It is left to the application to decide and convert the values
+       2. When Hashtable is returned, all values are stored as strings.
+       3. String can contain "" if nothing was returned from PERL. In case of
+          error in conversion from PERL Datastructure to JAVA, the string will
+          contain "(null)" as its value. All strings are guaranteed to be non
+          null
+       4. In case of PERL modules using dynamic libraries, 
+          an error will be reported.
+          Support for this will be added soon.
+       5. Flush STDIN/OUT in PERL, so that output of print in PERL is 
+          not buffered. This can be done by 
+          select((select(STDOUT),$| = 1)[0]);
+       6. Add the directory of libperl.so to your LD_LIBRARY_PATH
+       7. Data transfer mechanism from PERL to JAVA is restricted to those 
+          described above. In case of PERL taking complex data structures
+          like Hash of Hash, Array of Hash etc., a wrapper PERL function needs to
+          be written
+       8. In Perl returning non existant values causes "(null)" to be returned.
+          for example
+              sub foo { return ("Iam there",$nonexistent); }
+       9. If the PERL program exits or dies, control will not return to Java
+      10. Using Scalar return, when PERL returns a list causes an exception to
+          be thrown
+
+      This has been tested only with JDK 1.1.4 and Perl 5.002 modules on Solaris

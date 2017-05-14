@@ -1,25 +1,23 @@
 package Tk::TabbedForm;
 
 use Tk;
-
 use Tk::TabFrame;
 use Tk::Frame;
 
-use vars qw ($VERSION @ISA);
-
+use base qw (Tk::Derived Tk::Frame);
+use vars qw ($VERSION);
 use strict;
+use Carp;
 
-$VERSION = '0.98';
-
-@ISA = qw (Tk::Derived Tk::Frame);
+$VERSION = '0.01';
 
 Tk::Widget->Construct ('TabbedForm');
 
-*tabfont = \&TabFont;
-*Field = \&Item;
-*field = \&Item;
-*item = \&Item;
-*file = \&File;
+*tabfont = \&Tk::TabbedForm::TabFont;
+*Field = \&Tk::TabbedForm::Item;
+*field = \&Tk::TabbedForm::Item;
+*item = \&Tk::TabbedForm::Item;
+*file = \&Tk::TabbedForm::File;
 
 sub Populate
    {

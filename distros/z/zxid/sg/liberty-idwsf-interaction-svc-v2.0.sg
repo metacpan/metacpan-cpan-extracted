@@ -1,0 +1,80 @@
+# zxid/sg/liberty-idwsf-interaction-svc-v2.0.sg
+# Slightly edited, 14.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-interaction-svc-v2.0.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(is, urn:liberty:is:2006-08)
+import(lu, urn:liberty:util:2006-08,liberty-idwsf-utility-v2.0.xsd)
+import(ds, http://www.w3.org/2000/09/xmldsig#, http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+
+InteractionRequest	 -> %is:InteractionRequestType
+%InteractionRequestType:
+  is:Inquiry+
+  ds:KeyInfo?
+  @id?	 -> %xs:ID
+  @language?	 -> %xs:NMTOKENS
+  @maxInteractTime?	 -> %xs:integer
+  @signed?	 -> %xs:token
+  ;
+
+Inquiry	 -> %is:InquiryType
+%InquiryType:
+  is:Help?
+  is:Select*
+  is:Confirm* -> %is:InquiryElementType
+  is:Text*
+  @id?        -> %xs:ID
+  @title?     -> %xs:string
+  ;
+
+Help	 -> %is:HelpType
+%HelpType:
+  @label?	 -> %xs:string
+  @link?	 -> %xs:anyURI
+  @moreLink?	 -> %xs:anyURI
+  ;
+
+Hint	 -> %xs:string
+
+Select	 -> %is:SelectType
+%SelectType:	 base(is:InquiryElementType)
+  is:Item{2,unbounded}:
+      is:Hint?
+      @label?	 -> %xs:string
+      @value	 -> %xs:NMTOKEN
+      ;
+  @multiple?	 -> %xs:boolean  default (false)
+  ;
+
+Text	 -> %is:TextType
+%TextType:	 base(is:InquiryElementType)
+  @minChars?	 -> %xs:integer
+  @maxChars?	 -> %xs:integer
+  @format?	 -> %xs:string
+  ;
+
+%InquiryElementType:
+  is:Help?
+  is:Hint?
+  is:Label?	 -> %xs:normalizedString
+  is:Value?	 -> %xs:normalizedString
+  @name	 -> %xs:ID
+  ;
+
+InteractionResponse	 -> %is:InteractionResponseType
+%InteractionResponseType:
+  lu:Status
+  is:InteractionStatement* -> %is:InteractionStatementType
+  is:Parameter* -> %is:ParameterType
+  ;
+
+%InteractionStatementType:
+  is:Inquiry+
+  ds:Signature
+  ;
+
+%ParameterType:
+  @name	 -> %xs:ID
+  @value -> %xs:string
+  ;
+
+#EOF

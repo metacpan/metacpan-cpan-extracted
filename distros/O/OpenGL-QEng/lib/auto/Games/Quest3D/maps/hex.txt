@@ -1,0 +1,39 @@
+map 0 0 0 xsize=>50, zsize=>40, start=>[6,6,0];
+in_last;
+
+level 8 0 90 xsize=>45, zsize=>40, texture=>'ceiling_tile', y=>8;
+level 8 0 90 xsize=>45, zsize=>40, texture=>'carpet', y=>0;
+
+Wall  8  0   0 xsize=>45, texture=>'sand';
+Wall 53  0 270 xsize=>40, texture=>'sand';
+Wall 53 40 180 xsize=>45, texture=>'sand';
+Wall  8 40  90 xsize=>40, texture=>'sand';
+partof_last;
+opening 32 0 0;
+done;
+detector 2 6 0 visible=>1,
+ range=>3,
+ near_script=>"sub{
+                 $self->send_event('map','maps/new_quests.txt');
+                 $self->send_event('go',50,12,180);
+               }";
+
+Box 9.5 0.5 0 xsize=>3, ysize=>4, zsize=>1,
+    color=>['brown','black','black','black','black','black'],
+    texture=>'';
+
+CHex 13.0  5.0   0;
+CHex 13.0 15.9   0;
+CHex 13.0 26.8   0;
+CHex 33.0  5.0   0;
+CHex 33.0 15.9   0;
+CHex 33.0 26.8   0;
+CHex 28.0 21.0 180;
+CHex 28.0 31.9 180;
+CHex 48.0 21.0 180;
+CHex 48.0 31.9 180;
+
+level 0 2 0 xsize=>8, zsize=>8, texture=>'ceiling_tile', y=>8;
+level 0 2 0 xsize=>8, zsize=>8, texture=>'carpet',       y=>0;
+
+done;

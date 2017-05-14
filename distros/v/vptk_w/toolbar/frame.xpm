@@ -1,0 +1,28 @@
+/* XPM */
+static char * frame_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"20 17 5 1",
+/* colors */
+"  s None c None",
+". c #848284",
+"X c #C4C2C4",
+"o c #FCFE04",
+"O c #040204",
+/* pixels */
+"                    ",
+"                    ",
+"    ...........     ",
+"   .XoXoXoXoXoXO    ",
+"   .oXoXoXoXoXoO    ",
+"   .XoXoXoXoXoXO    ",
+"   .oXoXoXoXoXoO    ",
+"   .XoXoXoXoXoXO    ",
+"   .oXoXoXoXoXoO    ",
+"   .XoXoXoXoXoXO    ",
+"   .oXoXoXoXoXoO    ",
+"   .XoXoXoXoXoXO    ",
+"   .oXoXoXoXoXoO    ",
+"    OOOOOOOOOOO     ",
+"                    ",
+"                    ",
+"                    "};

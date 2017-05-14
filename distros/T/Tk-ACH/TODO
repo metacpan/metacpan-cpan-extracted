@@ -1,0 +1,13 @@
+
+o ptksh:
+
+   o With TRL Perl when using history the output
+     shown on screen is one key behind. (same in
+     perldl when tk is loaded with -tk)
+
+   o Tk::Pretty::Pretty may call itself recursivly
+
+	::_o bug: -labelPack return array ref that includes
+	-in with ref to frame -> to frame itself and so
+	it recurses on -labelPack
+

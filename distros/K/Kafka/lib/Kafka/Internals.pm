@@ -6,7 +6,7 @@ Kafka::Internals - Constants and functions used internally.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Internals> version 1.001013 .
+This documentation refers to C<Kafka::Internals> version 1.02 .
 
 =cut
 
@@ -18,7 +18,7 @@ use warnings;
 
 # ENVIRONMENT ------------------------------------------------------------------
 
-our $VERSION = '1.001013';
+our $VERSION = '1.02';
 
 use Exporter qw(
     import
@@ -29,6 +29,7 @@ our @EXPORT_OK = qw(
     $APIKEY_FETCH
     $APIKEY_OFFSET
     $APIKEY_METADATA
+    $APIKEY_APIVERSIONS
     $DEFAULT_RAISE_ERROR
     $MAX_CORRELATIONID
     $MAX_INT16
@@ -119,9 +120,16 @@ const our $APIKEY_LEADERANDISR                  => 4;   # Not used now
 # The numeric code that the ApiKey in the request take for the C<StopReplicaRequest> request type.
 const our $APIKEY_STOPREPLICA                   => 5;   # Not used now
 # The numeric code that the ApiKey in the request take for the C<OffsetCommitRequest> request type.
-const our $APIKEY_OFFSETCOMMIT                  => 6;   # Not used now
+const our $APIKEY_OFFSETCOMMIT                  => 8;   # Not used now
 # The numeric code that the ApiKey in the request take for the C<OffsetFetchRequest> request type.
-const our $APIKEY_OFFSETFETCH                   => 7;   # Not used now
+const our $APIKEY_OFFSETFETCH                   => 9;   # Not used now
+
+=head3 C<$APIKEY_APIVERSIONS>
+
+The numeric code that the C<ApiKey> in the request take for the C<ApiVersions> request type.
+
+=cut
+const our $APIKEY_APIVERSIONS                   => 18;
 
 # Important configuration properties
 
@@ -368,7 +376,7 @@ Vlad Marchenko
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016 by TrackingSoft LLC.
+Copyright (C) 2012-2017 by TrackingSoft LLC.
 
 This package is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. See I<perlartistic> at

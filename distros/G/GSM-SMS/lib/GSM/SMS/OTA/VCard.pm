@@ -10,7 +10,7 @@ require Exporter;
 @EXPORT = qw( OTAVcard_makestream
 			  OTAVcard_PORT );
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 use constant OTAVcard_PORT => 9204;
 

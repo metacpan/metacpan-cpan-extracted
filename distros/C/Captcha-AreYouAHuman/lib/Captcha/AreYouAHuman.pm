@@ -1,5 +1,5 @@
 package Captcha::AreYouAHuman;
-$VERSION = 0.00003;
+$VERSION = 0.00004;
 
 # Are You a Human Perl Integration Library
 # Copyright December 5, 2011  Are You a Human LLC
@@ -71,7 +71,7 @@ sub getPublisherHTML {
         my $server = $self->{"server"};
         my $publisher_key = $self->{"publisher_key"};
 
-	return "<div id='AYAH'></div><script src='https://" .
+	return "<div id='AYAH'></div><script  type='text/javascript' src='https://" .
 		$server . "/ws/script/"  . uri_escape($publisher_key) . 
 		"'></script>";
 }
@@ -350,7 +350,7 @@ Michele Beltrame.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 AreYouAHuman.com
+Copyright (c) 2011, 2012 AreYouAHuman.com
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl 5 itself. See L<perlartistic>.

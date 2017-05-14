@@ -1,7 +1,7 @@
 package Template::Flute::Iterator::Cache;
 
 use Moo;
-use Types::Standard qw/ArrayRef InstanceOf Int/;
+use MooX::Types::MooseLike::Base qw/ArrayRef InstanceOf Int/;
 
 use base 'Template::Flute::Iterator';
 
@@ -120,7 +120,7 @@ Stefan Hornburg (Racke), <racke@linuxia.de>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2014 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/Data/Classifier/NaiveBayes.pm
+lib/Data/Classifier/NaiveBayes/Tokenizer.pm
+t/00-use.t
+t/01-tokenizer.t
+t/02-classifier.t

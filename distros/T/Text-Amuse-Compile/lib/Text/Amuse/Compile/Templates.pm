@@ -716,6 +716,10 @@ sub latex {
 \usepackage{enumerate}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
+\def\hsout{\bgroup \ULdepth=-.55ex \ULset}
+% https://tex.stackexchange.com/questions/22410/strikethrough-in-section-title
+% Unclear if \protect \hsout is needed. Doesn't looks so
+\DeclareRobustCommand{\sout}[1]{\texorpdfstring{\hsout{#1}}{#1}}
 \usepackage{wrapfig}
 \usepackage{indentfirst}
 % remove the numbering
@@ -945,6 +949,10 @@ sub slides {
 \usepackage{enumerate}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
+\def\hsout{\bgroup \ULdepth=-.55ex \ULset}
+% https://tex.stackexchange.com/questions/22410/strikethrough-in-section-title
+% Unclear if \protect  \hsout is needed. Doesn't looks so
+\DeclareRobustCommand{\sout}[1]{\texorpdfstring{\hsout{#1}}{#1}}
 \usepackage{wrapfig}
 % remove the numbering
 \setcounter{secnumdepth}{-2}

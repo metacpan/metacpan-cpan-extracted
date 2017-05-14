@@ -1,0 +1,449 @@
+CvsWebEdit
+
+Installation Instructions
+-------------------------
+
+1) Install CVS. You can get it from cyclic.com
+2) Unpack the cvs-web tree to your machine. The files can go anywhere, for example, 
+   /usr/local/cvswebedit-v2.0/ is good on UNIX machines, c:\cvswebedit is good on
+   Windows.
+
+   On UNIX machines:
+	cd /usr/local
+	gzip -d cvswebedit-v2.0.tar.gz
+	tar xf cvswebedit-v2.0.tar
+
+   On Windows machines:
+	use Winzip, available from www.winzip.com, or anything that can unpack a .tar.gz
+        file. 
+
+3a) Configure the main http server configuration file, srm.conf
+   The most important thing to be done is to mark /cvs-web as a CGI bin directory 
+   and to tell the server that the content can be found wherever you unpacked 
+   the archive (ie. /usr/local/cvswebedit on UNIX). 
+
+   Additionally:
+	1) Map the cvs-web directory to a URL. By default,
+	   .htaccess files provide security and they
+	   also specify ExecCGI. All files to be 
+	   run by the webserver have the suffix .cgi. 
+	2) cvswebadmin can display the log files written by 
+	   cvswebedit. To do this, you need to map the 
+	   temporary directory (specified in 
+	   hostname-cvswebconfig.pl) as a URL 
+ 	3) Use the ScriptLog directive to tell Apache where
+ 	   to put it's CGI debug output to.
+
+  srm.conf:
+    # Add 'AddHandler cgi-script .cgi' to allow cgi for any .cgi file.
+    AddHandler cgi-script .cgi
+
+    # Map the installation directory
+    Alias /cvs-web/ /usr/local/cvswebedit/
+
+    # Map the log files directory, use any URL just as long as it matches 
+    # in cvswebconfig.pl
+    Alias /cve/ "c:/temp/"
+
+    # ScriptLog for debugging.
+    ScriptLog c:/temp/script.out
+
+3b) On Windows machines you also need to ensure your machine knows it's hostname, 
+   this can be done in httpd.conf.
+
+3c) If you want to later optimise the speed of the system, one thing you might
+   consider is using an access.conf file instead of .htaccess files (I've never
+   bothered)
+
+
+4) Copy etc/TEMPLATE-FILENAME files to etc/yourshorthostname-FILENAME.
+   In UNIX, yourshorthostname could be defined as 'basename `hostname`' 
+	e.g. for machine: my.yahoo.com, use filenames my-cvswebconfig.pl 
+		and my-cgi-style.pl
+
+5) Modify etc/yourshorthostname-cvswebconfig.pl to set 
+	$administrator 
+	$tempdir 
+	$installdir 
+	$installurl 
+	$cvsroot
+	$cvswebedit_dbg_url
+
+   The other settings probably won't need changing.
+
+5) Modify etc/htpasswd and etc/htgroup to reflect your preferences. 
+The reason the scripts are in different directories is so that the 
+permissioning is obvious and easy to configure. There is a group for each
+directory; the script you run in 6) is used to write .htaccess files
+NB. on Windows machines the passwords in htpasswd are in clear text
+rather than encrypted as on UNIX machines.
+
+5) Edit the userdb.txt file. These are the usernames that are allowed to
+use cvswebedit. The format is username:full name. Ideally, this list
+should be a group in etc/htgroup, but until I do that you have to
+duplicate the information. Sorry!
+
+6) Run the htaccessconfig.pl script. This will generate .htaccess files
+in each of the directories. BTW: I wanted to have just one .htaccess file at
+the top of the tree but the syntax guide supplied with Apache 1.3.1 says 
+I need to use the <DIRECTORY> directive, but the <DIRECTORY> directive
+cannot be used in .htaccess, it can be used only in access.conf. As not 
+everyone would have the authority to write to access.conf I settled 
+for using multiple .htaccess files, one per directory needing protecting.
+Let me know if you know how to do this using a single .htaccess file!
+
+7) [Unix only] Make sure the execute permissions are switched on for 
+all .cgi files. 
+To do this, run the following command in the top level cvs-web directory:
+	find . -name \*.cgi -exec chmod a+rx {} \;
+
+8) Revise *.cgi so the first line (#!/usr/local/bin/perl -s) points to
+the true location of perl at your site. On UNIX machines I tend to 
+use a symbolic link from /usr/local/bin/perl to perl's true location
+as the install directory varies between UNIXs.
+
+Incidentally, on my Windows 95 laptop, I installed perl in it's default
+location, ie. c:\perl\bin\perl.exe. As I didn't to have to edit my
+scripts before testing on UNIX machines, I made a c:\usr\local\bin
+directory and have copied the 8k perl.exe into this otherwise empty
+directory hierarchy. Now when Apache for Win32 comes across
+#!/usr/local/bin/perl in my scripts it successfully finds the exe. Perl
+looks for settings in the registry to know that libraries et al exist in
+c:\perl\.
+
+9) Optionally you can fetch a more recent copy of the modules that cvswebedit uses.
+   See 'External library usage' for instructions of how to do this.
+
+
+Directory Hierarchy
+-------------------
+
+(in the order that you will likely encounter them)
+
+/cvs-web/
+        etc/     - configuration files. 
+	   TEMPLATE-cvswebconfig.pl - Copy this to HOSTNAME-cvswebconfig.pl
+	   TEMPLATE-cgi-style.pl.   - Copy this to HOSTNAME-cgi-style.pl
+	   htpasswd                 - Use htpasswd to generate username:passwd files
+           htgroup                  - Use htgroup to generate groupname: user1 user2
+	   userdb                   - Edit by hand, format is 'username:Full Name'
+        read/ 
+	   cvsweb.cgi		- more or less Bill Fenner's script.
+        create/
+	   cvswebcreate.cgi	- called by cvsweb.cgi, this has a form a logic to 
+				  create files and directories. This directory will
+				  most likely in the future contain logic to delete 
+				  and rename files or directories as well.
+        edit/
+           cvswebedit.cgi	- called by cvsweb.cgi, this allows you to edit files
+				  in the CVS repository.
+        admin/
+           cvswebadmin.cgi	- this allows you to browse the log files written to
+				  by cvswebedit.cgi and cvsweb.cgi
+
+        lib/
+	   CGI/              - libraries from CPAN. 
+	   AuditLog.pm	     - library to record an audit trail
+	   Cgilog.pm         - library to record commands executed & output to browser
+	   cvswebconfig.pl   - used by *.cgi to pick up per-host configs.
+        icons/
+	   dir.gif	     - icon to indicate a directory in a listing
+	   text.gif	     - icon to indicate a text file in a listing
+	   back.gif	     - icon to indicate the previous file in a listing
+
+/docs/
+	README.txt           - this file
+	README.cgi-diffs.txt - a side by side diff of the two CGI libraries
+	README.fakeCGI.pm    - a copy of cvs-web/lib/CGI.pm
+	NOTES.txt            - some notes of mine.
+
+/tests/
+
+Descriptions of the four CGI scripts.
+-------------------------------------
+
+* cvsweb.cgi *
+
+I don't "own" cvsweb.cgi, this is the work of Bill Fenner. I needed to
+make alterations to cvsweb.cgi in order to put in hooks to call
+cvswebedit.cgi. In the most part I refer to "own" in terms of messing
+with the structure of the script, although to be honest, early on I did
+alter it to use the CGI modules, and to coerce 'strict'ness on it. I
+will probably stop cvsweb.cgi using CGI modules as Bill wasn't convinced
+that the overhead of loading CGI modules for this was worth it and it is
+his script.
+
+Until somebody (probably me) gets around to merging the changes made to
+Bill's version of cvsweb.pl into the version shipped with cvswebedit the
+versions will differ.
+
+* cvswebedit.cgi *
+
+cvswebedit.cgi is the script that provides editing of single files. 
+There is no provision for checking out of multiple files.
+
+	State machine
+
+Each file operates around its own state machine. Most commands operate
+on a file, the exceptions being show-status and show-usage, which
+are general.
+
+The two states are : locked and unlocked. 
+
+Two commands take you from unlocked to locked: lock-and-download &
+add-file.
+
+Four commands take you from locked to unlocked: discard-lock,
+upload-and-unlock, submit-text-changes and
+(break-lock, not implemented)
+
+Two commands leave the file in the locked state: upload-form and
+download-file.
+
+	The Locking Model
+
+The edit model is a lock based one based on CVS reserved check out
+scheme. The reason I opted for reserved locking was because I had the
+the requirement to be able to store and edit Microsoft Windows Word 
+files in the repository. As Word files are binary, CVS is not capable 
+of merging changes. A good improvement would be to provide the checking 
+in of files not previously locked; the challenge would be that it may be 
+tricky to determine on which version a user based their modifications.
+
+	The Staging Area
+
+cvswebedit.cgi maintains a staging area. The staging area, which by
+default is named cvsweb_upload, contains two directories: users-checkout
+and file-to-users. file-to-users acts as a database to hold the name 
+of the owner of each file currently checked out. There is a file for 
+every CVS file currently checked out, in addition to the username it 
+also contains a timestamp, and details about the remote user.
+
+The directory users-checkout contains the CVS directories that
+would be on the users machine if the files had been checked out using
+command line CVS. The top level directory contains a tree for each user
+with files checked out. The users-checkout and file-to-users directories 
+are created automatically. 
+
+* cvswebcreate.cgi *
+
+This script enables a permitted user to create empty files or
+directories in the repository. It uses an empty directory and 'cvs
+import' to do this. 
+
+* cvswebadmin.cgi *
+
+This script enables a permitted user to see the log files created by
+cvswebedit. If it runs but you get 'File not found', chances are that
+you haven't appropriately mapped the directories in srm.conf
+
+BUGS
+----
+
+Yup, cvswebedit has bugs. Here's some stuff I know about, if you know how
+to fix any of these, or have ideas for improvements, give me a shout.
+   - creating directories doesn't work
+
+   - creating filenames is definitely a gaping hole to allow people to 
+     run arbitrary commands with shell escapes, and to write over system
+     files. If you get nervous about this delete cvswebcreate.cgi until 
+     I fix it.
+
+   - there should be no caching on a lot of the pages.
+
+   - 
+Caveats
+-------
+
+userdb needs thinking about again. I added Apache username/passwd, but
+now the administrator has to manually ensure a one to one correspondence
+between htpasswd and userdb.txt
+
+I am using some really old versions of CPAN libraries (I ship these with
+cvswebedit). CGI.pm in particular is causing me a problem in cvswebcreate
+where, for some reason, CGI.pm is trying to use alarms. I am certain that
+this problem will go away when I use a later version.
+
+There may be other things; I tend to mark these with 'FIXME' and 'TODO' in the code.
+
+Security
+--------
+
+There are bound to be security issues with cvswebedit. Don't use it for
+anything critical. If you find security problems, please mail me
+(Martin.Cleaver@BCS.org.uk) and I shall endeavour to rectify them. Fixes
+to the problems gratefully received.
+
+Log Files
+---------
+
+cvswebedit and friends can be configured to write to all kinds of logs,
+including:
+
+  1) debug log - at strategic points in the code I write messages to say what decisions
+		 the script has made. This is probably only of interest to me or to 
+		 anyone testing for bits of functionality.
+
+		 The debug log can be configured to overwrite the file for every new
+		 request or to write to a new file every time. There is no process 
+		 to delete these debug files, so beware of generating hundreds of files.
+		 
+  2) audit log - The audit log function writes key messages about alterations made to
+		 the state of the CVS repository. This is rather useful. 
+
+
+In the previous version of cvswebedit, debug logging was enabled by default. 
+This is no longer the case.
+
+Features:
+--------
+
+Add files (And as binary) [Yes, new for August98]
+Delete files [No]
+Add a directory [Yes, new for August 98]
+Delete a directory [No]
+Launch a arbitrary CVS command.[No]
+Lock a file for edits (becomes owner) [Yes]
+Locking should be compatible with reserved checkouts scheme (ie. uses  cvs admin -l) [Yes]
+Owner can unlock a file after having done an edit [Yes]
+Owner can unlock a file after not having done an edit [Yes]
+Owner can download a further copy of a file checked out for edit [Yes]
+Only the HEAD revision can be locked for edits [Yes]
+Only the HEAD revision can be checked in.[Yes]
+Owner can see the version number of the file checked out and the proposed version number for the new version [No, not yet]
+When owner checks in file he is asked for a comment. The comment can be blank. [NO - MAJOR DEFICIENCY]
+The interface can be used to perform tagging.[No]
+Comments can be edited after submitted [No]
+CVS puts real user names in the cvs log [NO - MAJOR DEFICIENCY]
+Non-owner cannot unlock a file [Yes]
+Non-owner can see who has got the file out [Yes]
+No authentication is required; users can choose who they are based on a list of users. 
+    If user name is passed in by the web server then this overrides selection of user name by the user. If user name is not passed in by web server, user can choose user name by user=username parameter. 
+    If user name is still not passed in user name is set by cookie. [Yes, although authentication is now (August98) provided by default]
+When users first identify themselves a cookie is sent to the browser.[Yes]
+CVSwebedit will repeatedly prompt for a user name until one is provided. [Yes]
+Only recognised user names will be accepted. [Yes]
+User names are listed in a flat file on disk together with a fullname (first name, Surname alias). 
+    User names are usually used in listings. [Yes]
+All output sent to the browser is first sent to a log file. [Yes, via do_log]
+Diagnostics are saved.[Yes, new for August98]
+Long term logging is implemented [Yes, new for August98]
+All incorrect usages of cvsweb result in the usage page being shown.[Yes]
+All correct usages of cvsweb are listed on the usage page. [Yes]
+Users can tag and branch [no]
+
+
+External library usage
+----------------------
+   The libraries that cvswebedit use are
+   CGI-modules and CGI.pm, both of which are available from 
+   http://www.perl.com/CPAN/modules/by-category/15_World_Wide_Web_HTML_HTTP_CGI/
+
+   The CGI.pm distribution contains several files; currently I use only Cookie.pm 
+   and Carp.pm modules from CGI.pm, the rest of the functionality comes from CGI modules. 
+   Unfortunately, Cookie.pm is dependant on three functions (rearrange, escape & unescape)
+   from the file CGI.pm in the CGI.pm distribution. As the CGI modules are more modular
+   and faster to load, I generally favour their use over CGI.pm. To resolve the dependency
+   on CGI.pm I have supplied a minimal CGI.pm, cut down to hold only the three functions
+   that Cookie.pm needs.
+
+   If you decide to update the libraries, you need to do the following:
+	a) Check that there is a later version of the libraries. This cvswebedit
+   	   distribution contains a subset of the files from CGI.pm-2.42 (ie. Cookie & Carp)
+	   and all of the files from CGI-modules-2.76.
+	b) Save the lib/CGI.pm file - this is my cut down version, not the one supplied 
+	   with the CGI.pm library. 
+	c) Rename the directory lib/CGI to lib/CGI.old
+	d) Create a new directory lib/CGI and change permissions so all users can read the files
+	e) Unpack the CGI-modules archive and copy the CGI/*.pm files into lib/CGI.
+		You don't actually need MiniSvr.pm, but I include it anyway.
+	f) Unpack the CGI.pm archive and copy CGI/Carp.pm and CGI/Cookie.pm into lib/CGI.
+		Note that both CGI-modules and the CGI.pm distribution contain Carp.pm;
+		when I last checked CGI.pm had the more recent version.
+	g) Make sure that lib/CGI.pm is my cut down version and not the one from CGI.pm.
+		If you have lost it, a spare is in docs/README.fakeCGI.pm.txt
+	h) Make sure each of the scripts starts
+	i) Delete lib/CGI.old
+	j) If you are using Windows machines and CGI-modules version 2.76 or earlier,
+	   you need to comment out two lines that call 'alarm' in the routine 
+	   read_entity_body in Base.pm. When I asked Lincoln Stein, he said that these
+	   lines were only necessary for CGI::MiniSvr and cvswebedit does not use this.
+	   I comment this out in the distribution for all machines.
+
+Mostly for my own reference, I include a side-by-side diff of the two distributions.
+See README.cgi-diffs.txt.
+
+Library improvements
+--------------------
+
+VCS::CVS - there are pieces of code that wrap around CVS. It would be nice to 
+file these as a CPAN library. Alas, I have not the time!
+
+Thoughts
+--------
+ + I don't like cgi-style.pl. It would be better integrated into cvswebconfig.pl. Only 
+   cvsweb.cgi uses it anyway.
+
+ + The audit log isn't used enough.
+
+ + I wrote this in my spare time, an increasingly precious commodity. One goal of mine is 
+   to put cvswebedit under the control of cvswebedit and have the community of users maintain 
+   it.
+
+ + It would be good to integrate cvsweb with Fast CGI so that it ran 'in process' with the
+   Web Server. This is probably a high priority.
+
+ + I need to spend some time writing regression tests. 
+
+ + It probably works on more Web servers than Apache, but as Apache runs more than half
+   of the web servers in the world, it probably is not worth the effort trying to cater 
+   for others.
+
+ + I wanted to have a single .htaccess file; below is the configuration that I was 
+trying to use in /cvs-web/.htaccess. My hope was that this one file would be sufficient.
+
+
+<Files edit/*.cgi>
+  AuthName "CVSWeb - Edit Permission"
+  require group edit
+  Options ExecCGI
+</Files>
+
+<Files admin/*.cgi>
+  AuthName "CVSWeb - Admin Permission"
+  require group admin
+  Options ExecCGI
+</Files>
+
+<Files etc/*.cgi>
+  AuthName "CVSWeb - Admin Permission"
+  require group admin
+  Options ExecCGI
+</Files>
+
+<Files lib/*.cgi>
+  AuthName "CVSWeb - Admin Permission"
+  require group admin
+</Files>
+
+<Files icons/*.cgi>
+  # remove execute bit.
+  Options None
+</Files>
+
+I also tried this:
+
+<FilesMatch ^edit/.*\.cgi$>
+  AuthName "CVSWeb - Edit Permission"
+  require group edit
+  Options ExecCGI
+</FilesMatch>
+
+<FilesMatch ^read/.*\.cgi$>
+  AuthName "CVSWeb - Read Permission"
+  require group valid-user
+  Options ExecCGI
+</FilesMatch>
+
+- but that didn't work either.
+

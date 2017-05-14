@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More tests => 7;
 
+use lib '.';
 use t::lib::Child1 'hi';
 
 ok(t::lib::Child1->isa(t::lib::Child1::));

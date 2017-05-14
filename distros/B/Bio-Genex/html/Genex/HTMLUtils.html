@@ -1,0 +1,119 @@
+<HTML>
+<HEAD>
+<TITLE>HTMLUtils - a module for useful HTML utilities for Genex DBs</TITLE>
+<LINK REV="made" HREF="mailto:jasons@amadeus.avesthagen.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTMLUtils - a module for useful HTML utilities for Genex DBs</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use HTMLUtils;</PRE>
+<PRE>
+  %new_hash = post_process(%args);</PRE>
+<PRE>
+  $html_string = objs2table(HEADER=&gt;1, CGI=&gt;$cgi, OBJECTS=&gt;\@obj_list);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Methods for transforming information from a GeneX DB into HTML.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_post_process"><CODE>post_process($cgi,%args)</CODE></A></STRONG><BR>
+<DD>
+Begin to post-process information from a Genex table before writing it
+to an HTML table. In order to write HTML we use CGI.pm, so any calling
+routine must pass in the current CGI object.
+<P>Currently, <A HREF="#item_post_process"><CODE>post_process()</CODE></A> handles the following tasks:</P>
+<UL>
+<LI>
+Lookup foreign key values from the appropriate table.
+<P></P>
+<LI>
+Change the output of fkeys to be hyperlinks to the cgi script for that table type.
+<P></P>
+<LI>
+Modify URLs and email addresses to be active hyperlinks.
+<P></P>
+<LI>
+Filter out sensitive information such as login names and passwords.
+<P></P></UL>
+<P>For example, after generating a Genex object, we can create a
+hyperlinked HTML table output for that object by doing the following:</P>
+<PRE>
+    # we need a CGI object
+    my $q = new CGI;</PRE>
+<PRE>
+    my $object = Bio::Genex::Species-&gt;new(id=&gt;25);
+    foreach (@{Bio::Genex::Species-&gt;column_names()}) {
+      no strict 'refs';
+      $tmp_values{$_} = $object-&gt;$_;
+    }</PRE>
+<PRE>
+    # call post_process() to HTML'ize the values
+    %tmp_values = post_process($q,%tmp_values);</PRE>
+<PRE>
+    # make a header that's human readable
+    my @rows;
+    my @keys = keys %{Bio::Genex::Species-&gt;column2name()};
+    my @values = values %{Bio::Genex::Species-&gt;column2name()};
+    push(@rows,td([@values]));</PRE>
+<PRE>
+    # add the data in the same order of the header
+    push(@rows,td([@tmp_values{@keys}]));</PRE>
+<PRE>
+    # now contstruct the table, 
+    print $q-&gt;html_start(&quot;Information for Species: $object-&gt;primary_scientific_name&quot;);
+    print $q-&gt;table({-border=&gt;''},
+                    Tr(\@rows)  # Tr() distributes over an array reference
+                   );
+    print $q-&gt;html_end();</PRE>
+<DT><STRONG><A NAME="item_objs2table">objs2table(HEADER=&gt;1, CGI=&gt;$cgi, OBJECTS=&gt;\@obj_list)</A></STRONG><BR>
+<DD>
+Returns an HTML string encoding the list of objects as an HTML table
+rows using the $cgi object. Each attribute will be printed out as a
+separate column for each object. Before printing the value for each
+object the data will be fed through <A HREF="#item_post_process"><CODE>post_process()</CODE></A>.
+<P>The 'HEADER' parameter pair is optional and specifies that a human
+readable header row should be included as the first row of the table
+output.</P>
+<P><STRONG>NOTE</STRONG>: The returned string must still be wrapped by a $cgi-&gt;<CODE>table()</CODE>
+function call. This is so that the application can pass optional
+parameters to the table call.</P>
+<P><STRONG>CAUTION</STRONG>: it is assumed that all the objects in @obj_list are of
+the same class.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jason Stewart (<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

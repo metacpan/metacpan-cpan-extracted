@@ -35,7 +35,7 @@ if (! defined $WORKER) {
 }
 
 use vars qw($config $client $server);
-our $VERSION = do { my @r=(q$Revision: 8365 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r };
+our $VERSION = '0.11';
 
 if ($^W) {
     $VERSION = $VERSION;

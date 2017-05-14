@@ -1,0 +1,25 @@
+== Introduction ==
+
+Class::Methodist is a new class creation module that tries to occupy a
+middle ground between some of the early, simplistic class creators and
+the more recent (and considerably more elaborate) modules.  It grew up
+in actual use while constructing a large (15,000+ line) Perl program,
+so it's stayed closely in touch with reality.
+
+== Installation ==
+
+Class::Methodist requires the following modules as prerequisites:
+
+	Class::ISA
+	Class::Singleton
+	Test::Exception
+	Test::More
+
+Building and installation of Class::Methodist follows the Standard
+Four Steps (perl Makefile.PL; make; make test; make install).
+
+== Copyright Notice ==
+
+Copyright (c) 2006 by Tom Nurkkala. All rights reserved. This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

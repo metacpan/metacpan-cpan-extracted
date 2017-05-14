@@ -7,6 +7,11 @@ use Tk::Frame;
 use Tk;
 
 use base qw (Tk::Frame);
+use vars qw ($VERSION);
+use strict;
+use Carp;
+
+$VERSION = '0.03';
 
 Tk::Widget->Construct ('DockPort');
 
@@ -17,14 +22,13 @@ Tk::Widget->Construct ('DockPort');
 #=============================================================================#
 package Tk::DockFrame::Base;
 
-use strict;
-use Carp;
-
 use Tk::Toplevel;
 use Tk::Frame;
 use Tk;
 
 use base qw (Tk::Frame Tk::Toplevel);
+use strict;
+use Carp;
 
 Tk::Widget->Construct ('DockFrame::Base');
 
@@ -606,6 +610,10 @@ sub undock
 package Tk::DockFrame;
 
 use base ($^O eq 'MSWin32' ? qw (Tk::DockFrame::Win32) : qw (Tk::DockFrame::X11));
+
+use vars qw ($VERSION);
+
+$VERSION = '2.0';
 
 Tk::Widget->Construct ('DockFrame');
 

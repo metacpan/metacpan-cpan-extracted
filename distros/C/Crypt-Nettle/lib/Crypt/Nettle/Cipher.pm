@@ -57,6 +57,9 @@ module knows how to coax out of libnettle:
 
  my @modes = Crypt::Nettle::Cipher::modes_available();
 
+
+=head1 ENCRYPTION CONTEXT CREATION
+
 =head2 new($is_encrypt, $algo, $key, $mode, $iv)
 
 Create a new context for encryption:
@@ -92,13 +95,6 @@ twofish128, twofish192, twofish256.
 Every algorithm supports ECB, but some algorithms don't support some
 of the other modes.  I recommend sticking to AES if you can.
 
-=head2 is_encrypt()
-
-Returns non-zero if the object is an encryption cipher, or zero if the
-object is set up for decryption.
-
-  printf("Direction: %s\n", ($cipher->is_encrypt() ? 'encrypt' : 'decrypt'));
-
 =head2 copy()
 
 Copy an existing Crypt::Nettle::Cipher object, including its internal
@@ -107,6 +103,8 @@ state:
   my $new_cipher = $cipher->copy();
 
 On error, will return undefined.
+
+=head1 ENCRYPTION CONTEXT OPERATION
 
 =head2 process($data)
 
@@ -135,6 +133,15 @@ Process $data with the cipher object, overwriting $data with the result:
 Note that the length of $data must be an even multiple of
 $cipher->block_size().
 
+=head1 ENCRYPTION DETAILS
+
+=head2 is_encrypt()
+
+Returns non-zero if the object is an encryption cipher, or zero if the
+object is set up for decryption.
+
+  printf("Direction: %s\n", ($cipher->is_encrypt() ? 'encrypt' : 'decrypt'));
+
 =head2 name()
 
 Return the name of the encryption/decryption algorithm:
@@ -149,7 +156,9 @@ Returns a string representing the cipher block mode.
 
 =head2 key_size()
 
-Return the size (in bytes) of the key for a given algorithm:
+Return the size (in bytes) of the key for a given algorithm.  This can
+be called either on an encryption context, or just by passing the name
+of an algorithm to the module directly:
 
   printf("Key size: %d\n", $cipher->key_size());
 
@@ -159,7 +168,9 @@ or
 
 =head2 block_size()
 
-Return the block size (in bytes) of this encryption algorithm:
+Return the block size (in bytes) of this encryption algorithm.  This
+can be called either on an encryption context, or just by passing the
+name of an algorithm to the module directly:
 
   printf("Block size: %d\n", $cipher->block_size());
 

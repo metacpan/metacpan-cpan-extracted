@@ -1,0 +1,39 @@
+#----------------------------------------------------------------
+# Fix shell config options
+#----------------------------------------------------------------
+case `basename $SHELL` in
+	ksh)
+		set -o trackall
+		;;
+	bash)
+		shopt -u sourcepath
+		;;
+	zsh)
+		setopt   notify globdots pushdtohome autolist
+		setopt   recexact longlistjobs
+		setopt   histignoredups pushdsilent noclobber
+		setopt   extendedglob rcquotes
+		bindkey  -e
+		;;
+	sh )
+		;;
+esac
+#----------------------------------------------------------------
+# Standard functions
+#----------------------------------------------------------------
+module() {
+        eval `envy.pl $*`;
+	echo "*** Type 'envy' instead of module ***";
+}
+envy() {
+        eval `envy.pl $*`;
+}
+unenvy() {
+        eval `envy.pl -un $*`;
+}
+#----------------------------------------------------------------
+# Run custom shrc
+#----------------------------------------------------------------
+f=$ETOP/etc/login/shrc.site; test -f $f && . $f
+f=$HOME/.custom/.shrc; test -f $f && . $f
+f=$HOME/.custom/shrc; test -f $f && . $f

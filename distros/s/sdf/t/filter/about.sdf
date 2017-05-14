@@ -1,0 +1,28 @@
+# This file tests the about filter
+
+!block about
+H1: About This Manual
+
+H2: Purpose
+
+This manual provides an overview of ...
+
+Directions for ... are also provided.
+
+H2: Scope
+
+This manual contains:
+
+^ a summary of ...
++ an overview of ...
+
+The following documents may also be of interest:
+
+* abc
+* xyz
+
+!endblock
+
+H2: See Also
+
+The person next to you.

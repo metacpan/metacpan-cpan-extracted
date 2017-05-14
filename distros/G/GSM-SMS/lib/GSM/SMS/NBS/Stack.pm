@@ -2,7 +2,7 @@ package GSM::SMS::NBS::Stack;
 use GSM::SMS::PDU;
 use Data::Dumper;
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 # $__NBSSTACK_PRINT++;
 
@@ -25,14 +25,14 @@ sub new {
 
 # receive NBS/SMS messages
 sub receive {
-	my ($self, $ref_oa, $ref_msg, $ref_timestamp, $ref_transport, $ref_port, $block) =@_;
+	my ($self, $ref_oa, $ref_msg, $ref_timestamp, $ref_transport, $ref_port, $block, $ref_csca) =@_;
 
 	my ($stack) = $self->{STACK};
 	my $t = $self->{TRANSPORT};
 
 	$self->_prt( "entering receive" );
 
- 	while ($self->_complete_message_on_stack($stack, $ref_oa, $ref_msg, $ref_timestamp, $ref_transport, $ref_port)) {	
+ 	while ($self->_complete_message_on_stack($stack, $ref_oa, $ref_msg, $ref_timestamp, $ref_transport, $ref_port, $ref_csca)) {	
 		
 		$self->_prt( "CHECK\n" );
 
@@ -59,8 +59,8 @@ sub receive {
 }
 
 sub _complete_message_on_stack {
-	my ($self, $stack, $ref_oa, $ref_msg, $ref_timestamp, $ref_transport, $ref_port) = @_;
-	my ($message, $complete, $msisdn, $timestamp, $transport, $port);
+	my ($self, $stack, $ref_oa, $ref_msg, $ref_timestamp, $ref_transport, $ref_port, $ref_csca) = @_;
+	my ($message, $complete, $msisdn, $timestamp, $transport, $port, $csca);
 	my ($oa_del, $dg_del);
 
 	$self->_prt( "IN ($stack)\n" );
@@ -92,6 +92,7 @@ sub _complete_message_on_stack {
 				$message= $decoded_pdu->{'TP-UD'};
 				$timestamp= $decoded_pdu->{'TP-SCTS'};
 				$transport  = $decoded_pdu->{'XTRA-TRANSPORT'};
+				$csca = $decoded_pdu->{'TP-SCN'};
 			}	
 
 			if ($decoded_pdu && $decoded_pdu->{'TP-DPORT'}) {
@@ -123,6 +124,7 @@ sub _complete_message_on_stack {
 				$message 	= $decoded_pdu->{'TP-UD'};
 				$timestamp 	= $decoded_pdu->{'TP-SCTS'};
 				$transport  = $decoded_pdu->{'XTRA-TRANSPORT'};
+				$csca = $decoded_pdu->{'TP-SCN'};
 				$complete++;
 			}
 			last if ($complete);
@@ -136,6 +138,7 @@ sub _complete_message_on_stack {
 		$$ref_timestamp = $timestamp;
 		$$ref_transport = $transport;
 		$$ref_port = $port;
+		$$ref_csca = $csca if ref($ref_csca);
 
 		# delete reference
 		$self->_prt( "delete $oa_del, $dg_del :::::>>>>> ".$stack->{$oa_del}->{$dg_del}->{Fragments}->[1]->{'TP-UD'} );
@@ -146,7 +149,6 @@ sub _complete_message_on_stack {
 	}
 	return -1;
 }
-
 
 sub _place_message_on_stack {
 	my ($self, $stack, $msg, $transport) = @_;

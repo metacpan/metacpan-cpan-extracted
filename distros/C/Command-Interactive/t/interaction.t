@@ -9,7 +9,9 @@ use Test::NoWarnings;
 use Test::Exception;
 use Command::Interactive;
 
-my $default = Command::Interactive::Interaction->new({expected_string => 'foo',});
+my $default = Command::Interactive::Interaction->new({
+    expected_string => 'foo',
+});
 
 is($default->expected_string,            'foo',    'Expected string is copied correctly');
 is($default->response,                   undef,    'Default response is undef');
@@ -31,10 +33,10 @@ throws_ok(
 );
 
 my $wopr = Command::Interactive::Interaction->new({
-        expected_string            => 'Would you like to play a (game|match)\?',
-        expected_string_is_regex   => 1,
-        response                   => 'yes',
-        send_newline_with_response => 0,
+    expected_string            => 'Would you like to play a (game|match)\?',
+    expected_string_is_regex   => 1,
+    response                   => 'yes',
+    send_newline_with_response => 0,
 });
 
 is($wopr->type,                    'regex', 'Correct type for expected_string_is_regex');

@@ -1,0 +1,63 @@
+Template: quiz/domanda1
+Title: Prima domanda
+Type: select
+Choices: ls -l, ls -w, ls, Nessuna
+Level: low
+Description: Quale di queste linee di comando permette di visualizzare anche i file nascosti?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: Nessuna
+
+Template: quiz/domanda2
+Type: String
+Level: high
+Description: Scrivere il comando per creare un filesystem di tipo ext2 sulla prima partizione del disco slave del secondo controller IDE.
+Description-de: XXXXXXX XXXXXXX XXXXXXX.
+Answer: mke2fs /dev/hdd1
+
+Template: quiz/domanda3
+Type: select
+Level: medium
+Description: Quale di queste linee di comando non serve a nulla nella compilazione del kernel?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: make config, make menuconfig, make newconfig, make oldconfig
+Answer: make newconfig
+
+Template: quiz/domanda4
+Type: multiselect
+Level: critical
+Description: Quali di queste estensioni di file caratterizzano (di solito...) archivi compressi?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: .tar.gz, .bak, .Z, .exe, .bz2
+Answer: .tar.gz, .Z, .bz2
+
+Template: quiz/domanda5
+Type: select
+Level: low
+Description: Uno di questi e' fuori posto. Di chi si tratta?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: Alessandro Rubini, Richard Stallmann, Bill Gates, Alan Cox
+Answer: Alessandro Rubini
+Explanation: E' di madre lingua italiana ...
+
+Template: quiz/domanda6
+Type: select
+Level: high
+Choices: "rwxr-xr-x", "rwxrwx-rx", "--x-w-r--", "rwxr-xr--"
+Description: A quale di questi permessi, espressi in forma simbolica, corrisponde il modo 0754?
+Answer: "rwxr-xr--"
+
+Template: quiz/domanda7
+Type: multiselect
+Level: high
+Choices: cp --rec /tmp/* /var, cp -dpR /tmp/* /var, cp /tmp/*/* /var, cp -a /tmp/* /var
+Description: Selezionare tutti i modi per copiare ricorsivamente tutti i file e le sottodirectory che si trovano in /tmp nella directory /var.
+Answer: cp -dpR /tmp/* /var, cp -a /tmp/* /var
+
+Template: quiz/domanda8
+Type: String
+Level: high
+Description: Qual'e' il comando piu' veloce per scompattare l'archivio file001.tar.gz (usate meno caratteri possibile!)?
+extended_description: *** Suggerimento: per ogni opzione che scrivete pensate se e' veramente necessaria! ***
+Answer: tar zxf file001.tar.gz
+Answer2: tar xzf file001.tar.gz
+

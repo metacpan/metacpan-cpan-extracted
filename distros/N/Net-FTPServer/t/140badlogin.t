@@ -1,16 +1,8 @@
-#!/usr/bin/perl -w
-
-# $Id: 140badlogin.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 2;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
-
-BEGIN {
-  plan tests => 2;
-}
 
 use Net::FTPServer::InMem::Server;
 
@@ -47,3 +39,5 @@ ok (/^530/);
 
 print OUTFD0 "QUIT\r\n";
 $_ = <INFD1>;
+
+__END__

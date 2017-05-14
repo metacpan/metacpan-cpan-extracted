@@ -1,0 +1,23 @@
+---
+abstract: 'Create a Release Tag Before Building the Distribution.'
+author:
+  - 'Stirling Westrup <swestrup@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Git-Tag-ForRelease
+requires:
+  Dist::Zilla::Role::AfterRelease: 0
+  Dist::Zilla::Role::BeforeBuild: 0
+  Dist::Zilla::Role::VersionProvider: 0
+  Git: 0
+  Moose: 0
+  Perl::Version: 0
+  perl: 5.006
+version: v0.05

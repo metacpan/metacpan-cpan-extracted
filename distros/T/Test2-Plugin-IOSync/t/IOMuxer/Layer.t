@@ -1,10 +1,7 @@
 use Test2::Bundle::Extended -target => 'Test2::Plugin::IOMuxer::Layer';
 use File::Temp qw/tempfile/;
 
-{
-    no warnings 'redefine';
-    *Test2::Plugin::IOMuxer::Layer::time = sub() { 12345 };
-}
+BEGIN { *JSON = Test2::Plugin::IOMuxer::Layer->can('JSON') }
 
 use ok $CLASS;
 ok($INC{'Test2/Plugin/OpenFixPerlIO.pm'}, "Loaded OpenFixPerlIO");
@@ -42,27 +39,14 @@ is(
 );
 
 like(
-    [<$mh>],
+    [map { JSON->new->decode($_) } <$mh>],
     [
-        qr{^START-TEST2-SYNC-\d+: 12345\n$},
-        qr{^This is a test\n$},
-        qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
-        qr{^START-TEST2-SYNC-\d+: 12345\n$},
-        qr{^This is a\n$},
-        qr{^multi-line test\n$},
-        qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
-        qr{^START-TEST2-SYNC-\d+: 12345\n$},
-        qr{^This is a no line-end test 1\n$},
-        qr{^-STOP-TEST2-SYNC-\d+: 12345\n$},
-        qr{^START-TEST2-SYNC-\d+: 12345\n$},
-        qr{^This is a no line-end test 2\n$},
-        qr{^-STOP-TEST2-SYNC-\d+: 12345\n$},
-        qr{^START-TEST2-SYNC-\d+: 12345\n$},
-        qr{^\n$},
-        qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
-        qr{^START-TEST2-SYNC-\d+: 12345\n$},
-        qr{^This is the final test\n$},
-        qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
+        {buffer => "This is a test\n"},
+        {buffer => "This is a\nmulti-line test\n"},
+        {buffer => "This is a no line-end test 1"},
+        {buffer => "This is a no line-end test 2"},
+        {buffer => "\n"},
+        {buffer => "This is the final test\n"},
     ],
     "Got all lines as expected, with markers in mux file"
 );

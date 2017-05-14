@@ -1,0 +1,8 @@
+This could be extended to a global lock system:
+
+    lock_socket($PORT, [$LOCAL_ADDRESS, [$REMOTE_ADDRESS]]);
+
+One could run a lock server at $REMOTE_ADDRESS:$PORT, that only accepts
+a single connection at a time. If a local process specifies
+$REMOTE_ADDRESS it first attempts to get a local lock like normal, then
+uses the same socket to connect to the lock server port remotely.

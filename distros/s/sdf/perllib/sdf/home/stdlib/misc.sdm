@@ -1,0 +1,159 @@
+# $Id$
+#
+# >>Title::     Miscellaneous Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 02-Apr-96 tjh     SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+!define TEST "0"
+
+# backwards compatible stuff to get things going quickly!
+!define SQUISH_ON  "squish on"
+!define SQUISH_OFF "squish off"
+!define KEEP_ON    "keep on"
+!define KEEP_OFF   "keep off"
+!define HYPHEN_ON  "hyphen on"
+!define HYPHEN_OFF "hyphen off"
+
+!block script
+
+@_squish_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'state      symbol      toggle      <on|off|true|false|yes|no|toggle>',
+    'params     rest        _NULL_          ',
+);
+sub squish_Macro {
+    local(%arg) = @_;
+    local($state,$paratags);
+    local(@text);
+
+    $state=$arg{'state'};
+    $paratags='';
+
+    # Ian is certainly going to change the following code --tjh
+
+    # I want to support the following (and probably allow nesting!)
+    # !squish on       <= default of just lists
+    # !squish on ; H1  <= just H1
+    # !squish on ;     <= all paragraphs
+
+    if ($arg{'params'}) {
+      if ( $arg{'params'} =~ /;/ ) {
+	  ($crap,$paratags) = split(/\s*;\s*/,$arg{'params'});
+      } else {
+	  $paratags = 'LU\d|L\d';
+      }
+    } else {
+      $paratags = 'LU\d|L\d';
+    }
+
+    #print STDERR "SQUISH STATE=\"$state\" PARA=\"$paratags\" ARGS" . $arg{'params'} . "\n";
+
+    # add in the macro stuff here ...
+    if ($state eq 'on') {
+	push(@text,"!on paragraph '$paratags' ; __squish_filter; \$attr{'mif.SpAfter'} = '0 pt'; \$attr{'mif.SpBefore'} = '0 pt'");
+    } elsif ($state eq 'off') {
+	push(@text,'!off paragraph __squish_filter');
+    } else {
+	&'AppMsg("error", "squish \"$state\" not yet implemented");
+	return ();
+    }
+
+    #print STDERR "Squish:\n" . join("\n",@text) . "\n";
+
+    return (@text);
+}
+
+@_keep_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'state      symbol      toggle      <on|off|true|false|yes|no|toggle>'
+);
+sub keep_Macro {
+    local(%arg) = @_;
+    local($state);
+    local(@text);
+
+    $state=$arg{'state'};
+
+    # add in the macro stuff here ...
+    if ($state eq 'on') {
+	push(@text,'!on paragraph ; __keep_filter; $attr{"mif.WithNext"}="1"');
+    } elsif ($state eq 'off') {
+	push(@text,'!off paragraph __keep_filter');
+    } else {
+	&'AppMsg("error", "keep \"$state\" not yet implemented");
+	return ();
+    }
+    return (@text);
+}
+
+@_hyphen_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'state      symbol      toggle      <on|off|true|false|yes|no|toggle>'
+);
+sub hyphen_Macro {
+    local(%arg) = @_;
+    local($state);
+    local(@text);
+
+    $state=$arg{'state'};
+
+    # add in the macro stuff here ...
+    if ($state eq 'off') {
+        push(@text,'!on paragraph ; __hyphen_filter; $attr{"mif.Hyphenate"}="0"; ');
+    } elsif ($state eq 'on') {
+	push(@text,'!off paragraph __hyphen_filter');
+    } else {
+	&'AppMsg("error", "hyphen \"$state\" not yet implemented");
+	return ();
+    }
+    return (@text);
+}
+
+!endblock
+
+
+!if TEST
+
+H1: hi there
+
+* asd as dasd
+* asd as d asd
+
+!squish on 
+Bulletted list
+* alkasjdklasjdla
+* asldkjaslkdjasd
+!squish off
+
+!squish on ; H1
+H1: JUST H1's squished
+
+H2: not squished
+!squish off
+
+!squish on ; 
+H1: squished
+Everything squished
+
+* asdasd
+* asdasdasdasd
+!squish off
+
+
+!endif
+

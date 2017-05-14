@@ -135,7 +135,7 @@ else {
     print $portal->header('text/html; charset=utf-8');
     print $portal->start_html;
     print 'Error: ' . $portal->error . '<br />';
-    print '<form method="post" action="' . $ENV{SCRIPTNAME} . '">';
+    print '<form method="post" action="' . $ENV{SCRIPT_NAME} . '">';
     print '<input type="hidden" name="url" value="' . $portal->get_url . '" />';
     print 'Login : <input name="user" /><br />';
     print

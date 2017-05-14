@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+package eng2kor;
+# ABSTRACT: App::eng2kor CLI
+
+
+use strict;
+use warnings;
+use utf8;
+use Encode qw/encode decode/;
+use Pod::Usage;
+use Getopt::Long;
+use Acme::eng2kor;
+
+if ( $^O =~ m/MSWin32/i ) { # for Windows
+    binmode STDIN,  ':encoding(euc-kr)';
+    binmode STDOUT, ':encoding(euc-kr)';
+    @ARGV = map { decode( 'euc-kr', $_ ) } @ARGV;
+} else {
+    binmode STDIN,  ':encoding(UTF-8)';
+    binmode STDOUT, ':encoding(UTF-8)';
+    @ARGV = map { decode( 'utf8', $_ ) } @ARGV;
+}
+
+my %options;
+GetOptions( \%options, "--src=s", "--dst=s", "--reverse", "--help", "--list" );
+pod2usage( 0, -noperldoc => 1 ) if $options{help};
+my $src = $options{src} || $ENV{E2K_SRC} || 'en';
+my $dst = $options{dst} || $ENV{E2K_DST} || 'ko';
+($src, $dst) = ($dst, $src) if $options{reverse};
+die "src - ENV{E2K_SRC}: $src\ndst - ENV{E2K_DST}: $dst\n" if $options{list};
+my $app = Acme::eng2kor->new(src => $src, dst => $dst);
+unshift @ARGV, join '', <STDIN> if @ARGV == 0;
+for my $word (@ARGV) {
+    print "\e[7m$word\e[m\n";
+    $app->translate($word);
+    print "\t", $app->translated, "\n";
+}
+
+
+1;
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+eng2kor - App::eng2kor CLI
+
+=head1 VERSION
+
+version v0.0.2
+
+=head1 SYNOPSIS
+
+	eng2kor [--help|-h] [--list|-l] [--src|-s] [--dst|-d] [--reverse|-r] ARGS...
+	    --help, -h        show this message
+	    --list, -l        show set src and dst
+	    --src, -s         source lang, default 'en', but you can change default via ENV{E2K_SRC}
+	    --dst, -d         destination lang, default 'ko', but you can change default via ENV{E2K_DST}
+	    --reverse, -r     swap 'src' and 'dst'
+
+	see below command for more detail.
+	$ perldoc -t eng2kor
+	$ perldoc -t Acme::eng2kor
+
+	### example
+	eng2kor -h                                                          # show help message
+	eng2kor -l                                                          # show set src and dst
+	eng2kor english                                                     # English to Korean
+	eng2kor hello world                                                 # multiple
+	eng2kor "this is a sentence"                                        # sentence
+	eng2kor --src=ko --dst=en 안녕하세요                                # Korean to English
+	eng2kor -s ja こんにちは                                            # Japanese to Korean
+	eng2kor -r 안녕하세요                                               # swap 'src' and 'dst'
+	echo "word" | eng2kor                                               # use STDIN to ARG
+
+	### add below line to your .vimrc
+	set keywordprg=eng2kor                                              # type 'Shift + k' on a word what you find.
+	map <C-e> :!eng2kor                                                 # type 'Ctrl + e'
+
+=head1 SEE ALSO
+
+* L<Acme::eng2kor>
+
+=head1 AUTHOR
+
+hshong <hshong@perl.kr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by hshong.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

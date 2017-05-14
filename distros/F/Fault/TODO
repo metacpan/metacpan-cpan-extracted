@@ -1,0 +1,136 @@
+=================
+Fault::Logger
+
+* FAULT: add an arg_check_isglob to Fault::Logger, or at least some
+  check that can identify whether a ref is or is not a valid file
+  handle.
+  [DMA20080728-?]
+
+	* needed in NotePad class
+	  [DMA20080728-?]
+
+* I may not be sufficiently cleansing filename and some other input
+  strings. I need to do a security audit.
+  [DMA20080506-?]
+
+* The Msg object is collecting error information I am not yet
+  logging anywhere.
+  [DMA20080507-?]
+
+* Since I am now saving the previous Msg object, I can in theory
+  retrieve pretty much everything about the last fault/log call.
+  I would have to extend the user API, either more methods here
+  or one method to return the message object and then suggest
+  'releasing' that API to the wild instead of keeping it internal
+  and changeable.
+  [DMA20080507-?]
+
+* I may want to split much of the general perldoc documentation 
+  out of here and into a dummy Fault.pm package.
+  [DMA20080508-?]
+
+=================
+Fault::Notepad
+
+* fprint needs a fault check for a glob argument.
+  [DMA20080723-?]
+
+* could add accept either Msg object or a string?
+  [DMA20080723-?]
+
+* Perhaps allow indexed access.
+  [DMA20080723-?]
+
+* Objects are intentionally unclearable and uneraseable. Write
+  a Fault::Notepad::Erasable subclass.
+  [DMA20080723-?]
+
+* Perhaps add an iterator.
+  [DMA20080724-?]
+
+=================
+Fault::Msg
+
+* FAULT: see if any of the errors I have noted for MAPDigital are in
+  Faults and if so fix and update it.
+  [DMA20080728-?]
+
+	* FAULT: how could I generate a null message through Msg->new?
+	  [DMA20080728-?]
+
+* I do not yet have any way to dump the list of errors.
+  [DMA20080723-?]
+
+* Impliment digital signature code. 
+  [DMA20080723-?]
+
+	* One might even chain the signatures so that any change of 
+	  any prior line invalidates the entire chain of data after 
+	  it.
+	  [DMA20080723-?]
+
+=================
+Fault::Delegate::DB
+
+* Can I do more checking on the execute calls? 
+  [DMA20080418-?]
+
+* The host argument is not used. Dbh does not support
+  multiple or non-local db's.
+  [DMA20080418-?]
+
+* I need to exercise this code under the multiprocessing config
+  again to make sure none of the changes caused a problem.
+  [DMA20080418-?]
+
+* There is probably no point in preparing the statement handles
+  as I cannot use the efficiencies of reusing them due to the
+  multiprocessing problem. I have left it this way because in the
+  long run the problem will go away and I will someday be able to
+  just re-use handles and have as many of them as I want.
+  [DMA20080418-?]
+
+* I only handle MySQL at present. Someday I should see about 
+  generalizing that.
+  [DMA20080418-?]
+
+* LOGGER: I should try to detect if mysql is not installed:
+  DBI connect('dbname','user',...) failed: 
+  Can't connect to local MySQL server through socket 
+	'/var/run/mysqld/mysqld.sock' (2) 
+  	at /usr/share/perl/5.8/Fault/Dbh.pm 
+  [DMA20080418-?]
+
+* It would be nice if I could automatically create the log and
+  fault tables and anything else needed if they do not exist
+  when I attempt to initialize for the first time.
+  [DM20080508-?]
+
+=================
+Fault::Delegate::SimpleHttp
+
+* It would be nice if initfaults got retried if it failed. I am
+  just returning an empty list in that case, but that means I
+  will never get synced up if the web logger was down when this
+  program started and then came on line *later*. Worst case is
+  that the remote user will have to clear some faults manually or
+  wait until this program is started up at a time when the web
+  logger is functioning.
+  [DMA20080416-?]
+
+* A sample set of cgi scripts implimenting the protocol would be
+  useful to potential users.
+  [DMA20080508-?]
+
+* Perhaps add a flag to show it failed? But the results must be
+  used at the Logger level so this does not entirely solve the
+  problem.
+  [DMA20080503-?]
+
+=================
+Fault::Delegate::Syslog
+
+* Is it possible to succeed opening the syslog and then fail to log 
+  a msg?
+  [DMA20080508-?]
+

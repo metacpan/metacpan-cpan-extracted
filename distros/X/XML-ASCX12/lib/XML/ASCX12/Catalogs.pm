@@ -67,11 +67,26 @@ conditional structure.
 This is a reference to an array hash.  The array contains the looping
 rules on a per-catalog basis.
 
+=item $IS_CHILD
+
+
+This is a reference to a hash of hashes. It is not used with all Catalogs.
+The hash contains all the the parent (current loop) and child (next segment)
+loop rules on a per-catalog basis. Returns one of three possible values:
+
+  Undef - exit current loop (next segment not valid child)
+  True (1) - segment is valid child for current loop 
+  false (0) - segment begins new loop within current loop
+
+The false response corresponds to the $LOOPNEST functionality. But some
+Catalogs can create loop patterns that $LOOPNEST alone was unable to
+unravel. Leaving $IS_CHILD undefined will default to using just $LOOPNEST.
 =back
 
 =cut
 
 our $LOOPNEST;
+our $IS_CHILD;
 
 =head1 PUBLIC STATIC METHODS
 
@@ -132,6 +147,41 @@ sub load_catalog($)
     # XXX so they can become part of the library for everyone's
     # XXX benefit!
     #
+    elsif ($_[1] eq '175')
+    {
+        #
+        # CATALOG 175 - Court Notice
+        #
+	push @{$LOOPNEST->{ST}}, qw(CDS);
+	push @{$LOOPNEST->{CDS}}, qw(CED);
+	push @{$LOOPNEST->{CED}}, qw(LM NM1);
+	#
+	# Close loop unless next seqment is a legal loop or child
+	# $IS_CHILD->{parent}->{child} = value;
+	$IS_CHILD->{ISA}->{ISA} = '0';
+	$IS_CHILD->{ISA}->{GS} = '0';
+	$IS_CHILD->{ISA}->{IEA} = '1';
+	$IS_CHILD->{GS}->{ST} = '0';
+	$IS_CHILD->{GS}->{GE} = '1';
+	$IS_CHILD->{ST}->{BGN} = '1';
+	$IS_CHILD->{ST}->{SE} = '1';
+	$IS_CHILD->{ST}->{CDS} = '0';
+	$IS_CHILD->{CDS}->{LS} = '1';
+	$IS_CHILD->{CDS}->{LE} = '1';
+	$IS_CHILD->{CDS}->{CED} = '0';
+	$IS_CHILD->{CED}->{DTM} = '1';
+	$IS_CHILD->{CED}->{REF} = '1';
+	$IS_CHILD->{CED}->{CDS} = '1';
+	$IS_CHILD->{CED}->{MSG} = '1';
+	$IS_CHILD->{CED}->{LM} = '0';
+	$IS_CHILD->{LM}->{LQ} = '1';
+	$IS_CHILD->{CED}->{NM1} = '0';
+	$IS_CHILD->{NM1}->{N2} = '1';
+	$IS_CHILD->{NM1}->{N3} = '1';
+	$IS_CHILD->{NM1}->{N4} = '1';
+	$IS_CHILD->{NM1}->{REF} = '1';
+	$IS_CHILD->{NM1}->{PER} = '1';
+    }
     else
     {
         croak "Catalog \"$_[0]\" has not been defined!";

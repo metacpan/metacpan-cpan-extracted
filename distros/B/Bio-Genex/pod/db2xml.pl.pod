@@ -1,0 +1,86 @@
+=head1 NAME
+
+B<db2xml.pl>: a script for export data from a Genex DB as a Gene
+Expression Markup Language (GeneXML) file
+
+=head1 SYNOPSIS
+
+  db2xml.pl --cb=outfile_name --user=name --password=passw [options]
+
+  db2xml.pl --exp=exp_id --user=name --password=passw [options]
+
+=head1 DESCRIPTION
+
+db2xml.pl has two primary uses: exporting control bundles for the
+curation tool using the --cb option, and exporting experiment sets
+for download using the --exp option.
+
+=head1 OPTIONS
+
+=head2 Required Options
+
+=over 4
+
+=item --cb=filename.xml
+
+Specifies that the curationtool control bundle should be written to
+the file 'filename.xml'. The output will first be run through
+XMLUtils::pretty_print() to format the output to be more
+human-readable. This option is mutually exclusive with the --exp
+option. Depending on which other options are used, other supporting
+XML files may be written as well (array layout, user sequence feature,
+or canonical sequence feature).
+
+=item --exp=$exp_id
+
+Specifies that the experiment set whose primary key is $exp_id should
+be exported as GeneXML. The spot data for each E<lt>arrayE<gt> will be
+written to a separate external file. May be used multiple times on the
+command line to specify that multiple experiment sets should be
+exported. For example:
+
+  db2xml.pl --exp=23 --exp=25 --user=jes --password=foo
+
+B<NOTE>: This option is not fully functional and should be approached
+with caution.
+
+=item --user=$login_name
+
+=item --password=$password
+
+Retrieves the entry for $login_name from the UserSec table and matches
+the supplied $password against it. It will cause a not-so-graceful
+error if the password doesn\'t match.
+
+=back
+
+
+=head2 Optional Options
+
+=over 4
+
+=item --species=$spc_id 
+
+Used for control bundle export. Specifies that species whose primary key is $spc_id should be included in the export file. This option may be included multiple times on the command line to specify multiple species. For example:
+
+  db2xml.pl --cb=output.xml --user=jes --password=foo --species=4 --species=8
+
+=back
+
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Jun 19 00:43:39 MDT 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

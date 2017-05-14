@@ -1,0 +1,44 @@
+=head2 Mon Oct  3 22:47:38 2016: C<Module> L<Sub::Uplevel|Sub::Uplevel>
+
+=over 4
+
+=item *
+
+C<installed into: /home/defc0n/Acme-Sort-Sleep/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.2600>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Oct  3 22:47:39 2016: C<Module> L<Test::Exception|Test::Exception>
+
+=over 4
+
+=item *
+
+C<installed into: /home/defc0n/Acme-Sort-Sleep/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

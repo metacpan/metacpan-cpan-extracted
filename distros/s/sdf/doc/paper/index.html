@@ -1,0 +1,1815 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: The SDF Document Development System</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<H1>The SDF Document Development System</H1>
+<ADDRESS>Ian Clatworthy (<A HREF="mailto:ianc@mincom.com">ianc@mincom.com</A>), Research Architect, <A HREF="http://www.mincom.com">Mincom Pty Ltd</A></ADDRESS>
+<ADDRESS>27 October 1998</ADDRESS>
+<BR CLEAR="All">
+<!-- TOC -->
+<HR>
+<H2>Table of Contents</H2>
+<UL>
+<A HREF="#Abstract">Abstract</A>
+<BR>
+<A HREF="#Overview">1. Overview</A><UL>
+<A HREF="#Introduction">1.1. Introduction</A>
+<BR>
+<A HREF="#A Sample SDF Document">1.2. A Sample SDF Document</A>
+<BR>
+<A HREF="#A Brief Explanation">1.3. A Brief Explanation</A>
+<BR>
+<A HREF="#Generating Output Formats">1.4. Generating Output Formats</A>
+<BR>
+<A HREF="#Requirements">1.5. Requirements</A>
+<BR>
+<A HREF="#Architecture">1.6. Architecture</A></UL>
+<BR>
+<A HREF="#Alternative Systems">2. Alternative Systems</A><UL>
+<A HREF="#WYSIWYG Tools">2.1. WYSIWYG Tools</A>
+<BR>
+<A HREF="#SGML/XML">2.2. SGML/XML</A>
+<BR>
+<A HREF="#POD">2.3. POD</A></UL>
+<BR>
+<A HREF="#Language Overview">3. Language Overview</A><UL>
+<A HREF="#Basic Concepts">3.1. Basic Concepts</A>
+<BR>
+<A HREF="#Paragraphs">3.2. Paragraphs</A>
+<BR>
+<A HREF="#Special styles">3.3. Special styles</A>
+<BR>
+<A HREF="#Phrases">3.4. Phrases</A>
+<BR>
+<A HREF="#Types vs Classes">3.5. Types vs Classes</A>
+<BR>
+<A HREF="#Special Phrases">3.6. Special Phrases</A>
+<BR>
+<A HREF="#Macros">3.7. Macros</A>
+<BR>
+<A HREF="#Variables">3.8. Variables</A>
+<BR>
+<A HREF="#Formats">3.9. Formats</A>
+<BR>
+<A HREF="#Document styles">3.10. Document styles</A>
+<BR>
+<A HREF="#Filters">3.11. Filters</A>
+<BR>
+<A HREF="#Attributes">3.12. Attributes</A></UL>
+<BR>
+<A HREF="#Web Publishing Features">4. Web Publishing Features</A><UL>
+<A HREF="#Centralised Hypertext Management">4.1. Centralised Hypertext Management</A>
+<BR>
+<A HREF="#Rule-based Hypertext Generation">4.2. Rule-based Hypertext Generation</A>
+<BR>
+<A HREF="#Embedded Perl Scripting">4.3. Embedded Perl Scripting</A>
+<BR>
+<A HREF="#Inline HTML">4.4. Inline HTML</A></UL>
+<BR>
+<A HREF="#Other Special Features">5. Other Special Features</A><UL>
+<A HREF="#Modules and Libraries">5.1. Modules and Libraries</A>
+<BR>
+<A HREF="#Reusable Topics">5.2. Reusable Topics</A>
+<BR>
+<A HREF="#Conditional Text">5.3. Conditional Text</A>
+<BR>
+<A HREF="#Extracting Documentation">5.4. Extracting Documentation</A>
+<BR>
+<A HREF="#Programming Language Support">5.5. Programming Language Support</A>
+<BR>
+<A HREF="#Multiple Looks">5.6. Multiple Looks</A></UL>
+<BR>
+<A HREF="#Other Issues">6. Other Issues</A><UL>
+<A HREF="#Why should I use SDF">6.1. Why should I use SDF?</A>
+<BR>
+<A HREF="#Converting Documents to SDF">6.2. Converting Documents to SDF</A>
+<BR>
+<A HREF="#Further Information">6.3. Further Information</A></UL>
+<BR>
+<A HREF="#Summary">7. Summary</A>
+<BR>
+<A HREF="#Credits">Credits</A>
+<BR>
+<A HREF="#Trademarks">Trademarks</A></UL>
+<!-- ENDTOC -->
+<HR>
+<H1><A NAME="Abstract">Abstract</A></H1>
+<P><EM>SDF (Simple Document Format) is a freely available document development system which generates high quality outputs in a variety of formats from a single source. The output formats supported include HTML, PostScript, PDF, man pages, POD, LaTeX, SGML, MIF, RTF, Windows help and plain text.</EM></P>
+<P><EM>SDF documents are simple to create and maintain, minimising the time spent on documentation. In particular, SDF directly supports the creation and maintenance of large, on-line documentation systems (including intranets) via centralised hypertext management and rule-based hypertext generation.</EM></P>
+<P><EM>SDF has been completely developed in <A HREF="http://www.perl.com/perl/index.html">Perl</A>, a popular and highly portable scripting language. Like Perl, SDF is freely available for commercial and non-commercial use.</EM></P>
+<HR>
+<H1><A NAME="Overview">1. Overview</A></H1>
+<H2><A NAME="Introduction">1.1. Introduction</A></H2>
+<P><A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> is a document publishing system which aims to solve some common problems that many software organisations encounter with documentation:</P>
+<OL>
+<LI>How do we support multiple formats (and produce high quality output for each)?
+<LI>How do we reduce the time it takes to create documents?
+<LI>How do we maintain a large on-line documentation system?
+<LI>How can we generate and easily maintain hypertext links?
+<LI>How do we keep the documentation up to date with the code?
+<LI>How can we centrally manage corporate formatting standards?</OL>
+<P>The basic design principles are:</P>
+<OL>
+<LI>Documents should be specified in a <EM>logical</EM> manner.
+<LI>Make common things easy.
+<LI>Give power users full control when they need it.
+<LI>The architecture should be open and easy to extend.</OL>
+<P>The key feature of SDF is the division of responsibility:</P>
+<UL>
+<LI><EM>content</EM> is supplied as text files or generated where feasible
+<LI><EM>formatting</EM> is generally implied by the semantics of the content or supplied by rules or external templates.</UL>
+<P>SDF consists of the following key components:</P>
+<UL>
+<LI><EM>SDF</EM> - <EM>Simple Document Format</EM>, a text format for defining documents
+<LI><A HREF="../ref/sdf.html">sdf</A> - a utility for converting SDF files to other formats.</UL>
+<P>Unlike SGML, XML, HTML and many other markup languages, the SDF language has been designed to be <EM>author-friendly</EM>, rather than <EM>parser-friendly</EM>. As a result, most SDF documents look quite similar to plain text email, making them easy-to-write and easy-to-read.</P>
+<H2><A NAME="A Sample SDF Document">1.2. A Sample SDF Document</A></H2>
+<P>A sample SDF document is shown below:</P>
+<PRE>
+    # Build the title
+    !define DOC_NAME           &quot;GalaxyBuilder&quot;
+    !define DOC_TYPE           &quot;Discussion Paper&quot;
+    !define DOC_AUTHOR         &quot;Joe Bloggs&quot;
+    !build_title
+    
+    H1: Introduction
+    
+    After extensive market research, I believe there is
+    an excellent opportunity for us to develop software
+    for the I&lt;galaxy construction industry&gt;. Potential
+    customers include:
+    
+    * NASA
+    * European Community
+    * China
+    * Japan.
+    
+    Note: The proposed name of the software package to be
+    developed is [[DOC_NAME]]. If you want to suggest a
+    better name, send email to {{EMAIL:joe@bloggs.com}}.
+    
+    H2: Software Requirements
+    
+    The key requirements are:
+    
+    ^ support for the design and simulation of galaxies
+      containing up to:
+      - 1000 large planets, or
+      - 5000 small planets
+    + the package needs to be easy to use
+    + the package needs to be well documented.
+    
+    H2: Project Team
+    
+    Exploding galaxies will be B&lt;very&gt; bad for business,
+    so we need the best team possible for this project:
+    
+    !block table
+    Person          Role
+    Mary Jones      Project Manager
+    Hans Blass      Architect
+    Bill Smith      Software Engineer
+    !endblock
+</PRE>
+<H2><A NAME="A Brief Explanation">1.3. A Brief Explanation</A></H2>
+<P>Comments begin with a # character as the first non-whitespace character on a line.</P>
+<P>Macros are embedded commands which begin with a ! as the first non-whitespace character on a line. The <A HREF="../ref/mdefine.html">define</A> macro is used to set variables. The value of a variable can be embedded in paragraph text  by using the [[...]] syntax.</P>
+<P>The DOC_NAME and DOC_TYPE variables are used by the <A HREF="../ref/mbuild_t.html">build_title</A> macro which creates:</P>
+<UL>
+<LI>a cover page (or two) for paper-based outputs
+<LI>a title header for online outputs.</UL>
+<P>Paragraphs can be tagged in different ways. For the vast majority of SDF documents, the only tags used are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+H1:
+</TD>
+<TD>
+level 1 heading
+</TD>
+</TR>
+<TR>
+<TD>
+H2:
+</TD>
+<TD>
+level 2 heading
+</TD>
+</TR>
+<TR>
+<TD>
+*
+</TD>
+<TD>
+item in level 1 bulleted list
+</TD>
+</TR>
+<TR>
+<TD>
+-
+</TD>
+<TD>
+item in level 2 bulleted list
+</TD>
+</TR>
+<TR>
+<TD>
+^
+</TD>
+<TD>
+first item in level 1 ordered list
+</TD>
+</TR>
+<TR>
+<TD>
++
+</TD>
+<TD>
+next item in level 1 ordered list
+</TD>
+</TR>
+<TR>
+<TD>
+&gt;
+</TD>
+<TD>
+fixed-width, verbatim text
+</TD>
+</TR>
+<TR>
+<TD>
+Note:
+</TD>
+<TD>
+note
+</TD>
+</TR>
+</TABLE>
+
+<P>Phrases can also be tagged in several ways. Any phrase can be tagged using the syntax:</P>
+<PRE>
+  {{XYZ:...}}
+</PRE>
+<P>where XYZ is the tag. For single, uppercase character tags like I (Italics) and B (Bold), POD-style syntax is also supported:</P>
+<PRE>
+  X&lt;...&gt;
+</PRE>
+<P>where X is the tag.</P>
+<P>Tables can be specified using the <A HREF="../ref/ftable.html">table</A> filter, typically in combination with the <A HREF="../ref/mblock.html">block</A> and <A HREF="../ref/mendbloc.html">endblock</A> macros. The first row is the headings. Remaining rows are data.</P>
+<H2><A NAME="Generating Output Formats">1.4. Generating Output Formats</A></H2>
+<P>The <A HREF="../ref/sdf.html">sdf</A> command is used to convert SDF to other formats. The general syntax is:</P>
+<PRE>
+   sdf [options] file ...
+</PRE>
+<P>If an extension is not given (and a file is not found with that name), an extension of <EM>sdf</EM> is assumed.</P>
+<P>The most commonly used option is the -2 option. For example, to convert <TT>mydoc.sdf</TT> to HTML and PostScript, the respective commands are:</P>
+<PRE>
+   sdf -2html mydoc
+   sdf -2ps mydoc
+</PRE>
+<P>These commands create files called <TT>mydoc.html</TT> and <TT>mydoc.ps</TT> respectively.</P>
+<P>To convert <TT>mydoc.sdf</TT> to a set of HTML topics, the command is:</P>
+<PRE>
+   sdf -2topics mydoc
+</PRE>
+<P>This creates the following files:</P>
+<UL>
+<LI><EM>mydoc.html</EM> - the table of contents
+<LI><EM>mydoc_1.html</EM> - the first topic
+<LI><EM>mydoc_2.html</EM> - the second topic.</UL>
+<P>By default, topics are created whenever a level 1 heading is encountered or a file is explicitly included. The -n option can be used to specify a different level for splitting into topics, e.g.</P>
+<PRE>
+  sdf -2topics -n2 mydoc
+</PRE>
+<H2><A NAME="Requirements">1.5. Requirements</A></H2>
+<P>SDF requires the following:</P>
+<UL>
+<LI><A HREF="http://www.perl.com/perl/index.html">Perl</A> 5.003 or later
+<LI>for generating PostScript, the freely available <A HREF="http://www.oasis.leo.org/perl/scripts/textproc/pod2ps.dsc.html">pod2ps</A> program or <A HREF="http://www.xs4all.nl/~cg/sgmltools/">SGML-Tools</A> and <EM>LaTeX</EM> packages. Alternatively, you need a word processor which can import MIF or RTF (<A HREF="http://www.adobe.com">Adobe</A>'s <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> 5.x is preferred)
+<LI>for generating PDF, <A HREF="http://www.adobe.com">Adobe</A>'s <A HREF="http://www.adobe.com/prodindex/acrobat/">Acrobat</A>
+<LI>for generating <A HREF="http://www.microsoft.com/windows">Windows</A> Help files, a help compiler (e.g. hcp.exe).</UL>
+<H2><A NAME="Architecture">1.6. Architecture</A></H2>
+<P>The architecture of SDF is given in the diagram below.</P>
+<P><IMG SRC="sdfarch.gif"></P>
+<HR>
+<H1><A NAME="Alternative Systems">2. Alternative Systems</A></H1>
+<H2><A NAME="WYSIWYG Tools">2.1. WYSIWYG Tools</A></H2>
+<P>WYSIWYG (<EM>What-You-See-Is-What-You-Get</EM>) tools are great for creating small to medium-sized:</P>
+<UL>
+<LI>World Wide Web documents (i.e. <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A>), <EM>or</EM>
+<LI>paper-based documents (i.e. <A HREF="http://www.adobe.com">PostScript</A>), <EM>or</EM>
+<LI><A HREF="http://www.microsoft.com/windows">Windows</A> help files.</UL>
+<P>However, the WYSIWYG approach is inefficient when it comes to creating and maintaining large documentation systems, particularly if you want high quality paper-based <EM>and</EM> on-line outputs.</P>
+<P>The reasons are:</P>
+<OL>
+<LI>WYSIWYG is meaningless when it comes to supporting multiple formats. For example:<UL>
+<LI>paper documents are formatted on fixed-size pages; on-line documents are formatted as topics displayed in user-sized windows</UL><UL>
+<LI>different browsers may display a given HTML document differently.</UL>
+<LI>For good-looking results, the <EM>formatting rules</EM> need to be tuned for each format. For example, a certain phrase may be:<UL>
+<LI>a hypertext jump within HTML</UL><UL>
+<LI>emphasised using italics for paper-based formats</UL><UL>
+<LI>a pop-up window within Windows help.</UL>
+<LI>The <EM>content</EM> often needs to be tuned for each format. For example, you may wish to describe a given procedure in different ways:<UL>
+<LI>in detail for a paper-based document</UL><UL>
+<LI>terse for on-line help.</UL>
+<LI>Centralised management of formatting rules and hypertext generation is essential for minimising the cost and maximising the quality of a large documentation system. By making it too easy for individual authors to customise formatting, WYSIWYG tools often make it harder for workgroups to centrally manage formatting!</OL>
+<P>Nevertheless, WYSIWYG tools are often used in combination with SDF when they save time. For example, diagrams can be created in most packages and imported into SDF documents.</P>
+<H2><A NAME="SGML/XML">2.2. SGML/XML</A></H2>
+<P>The SGML/XML approach of specifying documents semantically is an extremely powerful one and SDF uses the same approach whenever possible. However, as SDF does not use document <EM>structure</EM> rules and DTDs, it is much simpler than SGML. SDF is also more readable than SGML, so high-cost authoring tools are not needed on every desktop, making SDF much cheaper to implement than SGML.</P>
+<P>Like SDF, XML has built on SGML's good ideas but minimised the overall complexity. However, XML has retained SGML's unfriendly appearance.</P>
+<H2><A NAME="POD">2.3. POD</A></H2>
+<P>In many ways, the system closest to SDF is POD (Plain Old Documentation) which is widely used in the <A HREF="http://www.perl.com/perl/index.html">Perl</A> community. Like SDF, POD:</P>
+<UL>
+<LI>is simple, readable and free
+<LI>supports a large number of output formats
+<LI>supports <EM>literate programming</EM> (i.e. POD documentation can be directly embedded in Perl scripts and libraries)
+<LI>is built on Perl.</UL>
+<P>Currently, SDF has several advantages over POD:</P>
+<OL>
+<LI>SDF supports more features, e.g.:<UL>
+<LI>tables</UL><UL>
+<LI>figures</UL><UL>
+<LI>formatting within example text</UL><UL>
+<LI>filters, macros and variables (see <A HREF="#Language Overview">Language Overview</A> below).</UL>
+<LI>SDF is more extensible as sites can add their own:<UL>
+<LI>paragraph and phrase styles</UL><UL>
+<LI>paragraph and phrase attributes</UL><UL>
+<LI>filters, macros, etc.</UL></OL>
+<P>Furthermore, versions 2.000beta10 and later of SDF are POD friendly:</P>
+<UL>
+<LI>POD can be <EM>converted</EM> to SDF and vice versa
+<LI>SDF can be <EM>nested</EM> inside POD and vice versa
+<LI>SDF is largely upwardly compatible with POD in terms of syntax and functionality.</UL>
+<P>As a result, POD users can use SDF or migrate to SDF when POD isn't powerful enough. Refer to <A HREF="../podusers/index.html">SDF for POD Users</A> for further details.</P>
+<HR>
+<H1><A NAME="Language Overview">3. Language Overview</A></H1>
+<H2><A NAME="Basic Concepts">3.1. Basic Concepts</A></H2>
+<P>The basic concepts within SDF documents are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Concept</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+paragraph
+</TD>
+<TD>
+one or more lines of text
+</TD>
+</TR>
+<TR>
+<TD>
+phrase
+</TD>
+<TD>
+a section of text within a paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+style
+</TD>
+<TD>
+the type of a document, paragraph, phrase or table (e.g. H1)
+</TD>
+</TR>
+<TR>
+<TD>
+macro
+</TD>
+<TD>
+a command embedded in a document (e.g. !define)
+</TD>
+</TR>
+<TR>
+<TD>
+variable
+</TD>
+<TD>
+a named value (e.g. DOC_NAME)
+</TD>
+</TR>
+<TR>
+<TD>
+filter
+</TD>
+<TD>
+a rule to use when processing certain sections of text (e.g. table)
+</TD>
+</TR>
+<TR>
+<TD>
+attribute
+</TD>
+<TD>
+a named parameter of a paragraph, phrase or filter (e.g. jump)
+</TD>
+</TR>
+<TR>
+<TD>
+expression
+</TD>
+<TD>
+a literal or expression to evaluate (e.g. &quot;Ian Clatworthy&quot;).
+</TD>
+</TR>
+</TABLE>
+
+<P>Further details about these are given below.</P>
+<H2><A NAME="Paragraphs">3.2. Paragraphs</A></H2>
+<P>Paragraphs have the following format:</P>
+<PRE>
+   line1
+   ...
+   lineN
+</PRE>
+<P>Leading and trailing whitespace on lines is generally ignored. Paragraphs are separated by:</P>
+<UL>
+<LI>blank lines
+<LI><EM>comment lines</EM> - first non-whitespace character is &quot;#&quot;
+<LI><EM>macros</EM> - first non-whitespace character is &quot;!&quot; or &quot;=&quot;.</UL>
+<P>For normal paragraphs, simply specify the text on one or more lines. For example:</P>
+<PRE>
+   I like products which are simple to use and
+   do what I expect. We should encourage engineers
+   to design more products with these qualities.
+</PRE>
+<P>A paragraph can be given a style using the following syntax:</P>
+<PRE>
+   style&quot;:&quot;line1
+   ...
+   lineN
+</PRE>
+<P>Some commonly-used paragraph styles are:</P>
+<TABLE BORDER ALIGN='Center'>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+N
+</TD>
+<TD>
+normal paragraph (the default)
+</TD>
+</TR>
+<TR>
+<TD>
+H1 .. H6
+</TD>
+<TD>
+chapter heading at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+A1 .. A6
+</TD>
+<TD>
+appendix heading at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+P1 .. P6
+</TD>
+<TD>
+plain heading at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+Note
+</TD>
+<TD>
+a single paragraph note
+</TD>
+</TR>
+<TR>
+<TD>
+E
+</TD>
+<TD>
+fixed-width (example) text
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+   Note: Life is too short to drink bad wine.
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Life is too short to drink bad wine.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H2><A NAME="Special styles">3.3. Special styles</A></H2>
+<P>For certain styles, the following syntax is also supported:</P>
+<PRE>
+   special_style line1
+   ...
+   lineN
+</PRE>
+<P>The special styles available are:</P>
+<TABLE BORDER ALIGN='Center'>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+&gt;
+</TD>
+<TD>
+fixed-width, verbatim paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+. .. ......
+</TD>
+<TD>
+paragraph or plain list item at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+* .. ******
+</TD>
+<TD>
+unordered list at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+- .. -----
+</TD>
+<TD>
+unordered list at level 2-6
+</TD>
+</TR>
+<TR>
+<TD>
+&amp; .. &amp;&amp;&amp;&amp;&amp;&amp;
+</TD>
+<TD>
+enumerated list at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+^ .. ^^^^^^
+</TD>
+<TD>
+first entry in an ordered list at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
++ .. ++++++
+</TD>
+<TD>
+next entry in an ordered list at level 1-6
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+^ fruits:
+  - peach
+  - banana
++ vegetables:
+  - potato
+  - carrots.
+</PRE>
+<P>The result is:</P>
+<OL>
+<LI>fruits:<UL>
+<LI>peach</UL><UL>
+<LI>banana</UL>
+<LI>vegetables:<UL>
+<LI>potato</UL><UL>
+<LI>carrots.</UL></OL>
+<H2><A NAME="Phrases">3.4. Phrases</A></H2>
+<P>A <EM>phrase</EM> is a section of text within a paragraph enclosed in the symbols {{ and }}. Like paragraphs, phrases are optionally tagged with a style.</P>
+<P>The commonly-used phrase styles are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+<TD>
+<STRONG>Sample Output</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Emphasis:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+1
+</TD>
+<TD>
+1st level emphasis (default)
+</TD>
+<TD>
+<EM>emphasis 1</EM>
+</TD>
+</TR>
+<TR>
+<TD>
+2
+</TD>
+<TD>
+2nd level emphasis
+</TD>
+<TD>
+<STRONG>emphasis 2</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+3
+</TD>
+<TD>
+3rd level emphasis
+</TD>
+<TD>
+<U>emphasis 3</U>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Formatting:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+N
+</TD>
+<TD>
+normal
+</TD>
+<TD>
+some normal text
+</TD>
+</TR>
+<TR>
+<TD>
+I
+</TD>
+<TD>
+italic
+</TD>
+<TD>
+<I>some italic text</I>
+</TD>
+</TR>
+<TR>
+<TD>
+B
+</TD>
+<TD>
+bold
+</TD>
+<TD>
+<B>some bold text</B>
+</TD>
+</TR>
+<TR>
+<TD>
+U
+</TD>
+<TD>
+underline
+</TD>
+<TD>
+<U>some underline text</U>
+</TD>
+</TR>
+<TR>
+<TD>
+EX
+</TD>
+<TD>
+example
+</TD>
+<TD>
+<TT>some example text</TT>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Types:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+EMAIL
+</TD>
+<TD>
+email address
+</TD>
+<TD>
+<A HREF="mailto:ianc@mincom.com">ianc@mincom.com</A>
+</TD>
+</TR>
+<TR>
+<TD>
+F (or FILE)
+</TD>
+<TD>
+Filename
+</TD>
+<TD>
+<TT>myfile.sdf</TT>
+</TD>
+</TR>
+<TR>
+<TD>
+SECT
+</TD>
+<TD>
+Section
+</TD>
+<TD>
+<A HREF="#Paragraphs">Paragraphs</A>
+</TD>
+</TR>
+<TR>
+<TD>
+URL
+</TD>
+<TD>
+Uniform Resource Locator
+</TD>
+<TD>
+<A HREF="http://www.mincom.com">http://www.mincom.com</A>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Classes:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC
+</TD>
+<TD>
+document title
+</TD>
+<TD>
+<A HREF="../user/ug_sdf.html">SDF User Guide</A>
+</TD>
+</TR>
+<TR>
+<TD>
+REF
+</TD>
+<TD>
+reference (document code)
+</TD>
+<TD>
+<A HREF="../user/ug_sdf.html">MTR-SDF-0002</A>
+</TD>
+</TR>
+<TR>
+<TD>
+ORG
+</TD>
+<TD>
+organisation
+</TD>
+<TD>
+<A HREF="http://www.mincom.com">Mincom</A>
+</TD>
+</TR>
+<TR>
+<TD>
+PRD
+</TD>
+<TD>
+product
+</TD>
+<TD>
+<A HREF="http://www.mincom.com/mims">MIMS</A>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Specials:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+E (or CHAR)
+</TD>
+<TD>
+escape (i.e. special character)
+</TD>
+<TD>
+&#169; 
+</TD>
+</TR>
+<TR>
+<TD>
+S
+</TD>
+<TD>
+spaces are non-breaking
+</TD>
+<TD>
+section&nbsp; 2.1
+</TD>
+</TR>
+<TR>
+<TD>
+IMPORT
+</TD>
+<TD>
+name of a figure to import
+</TD>
+<TD>
+<IMG SRC="key.gif">
+</TD>
+</TR>
+</TABLE>
+
+<P>For single character, uppercase phrase styles, POD's [A-Z]&lt;..&gt; syntax can be used. For example:</P>
+<PRE>
+E:  I&lt;Please&gt; reply to {{EMAIL:customer@xyz.com}} quickly.
+</PRE>
+<P>The result is:</P>
+<P><I>Please</I> reply to <A HREF="mailto:customer@xyz.com">customer@xyz.com</A> quickly.</P>
+<P>This example also illustrates the advantage of specifying documents in a <EM>logical</EM> manner:</P>
+<UL>
+<LI>when generating PostScript, the EMAIL style is mapped to italics
+<LI>when generating HTML, the EMAIL style is mapped to a 'mailto' Uniform Resource Locator (URL).</UL>
+<H2><A NAME="Types vs Classes">3.5. Types vs Classes</A></H2>
+<P>A <EM>type</EM> (e.g. EMAIL) simply marks a phrase as a logical entity. Rules may be defined for processing (e.g. generating hypertext) for these types. Refer to <A HREF="#Rule-based Hypertext Generation">Rule-based Hypertext Generation</A>, later.</P>
+<P>A <EM>class</EM> (e.g. DOC) is a special kind of type where the entity must be a member of a predefined set. As a result, SDF can validate the entry name, lookup a hypertext jump and do other clever things (like replace the text with a longer name).</P>
+<P>Rules can also be defined for processing classes, although hypertext jumps are often defined for each entity in the tables which define the known entities. Refer to <A HREF="#Centralised Hypertext Management">Centralised Hypertext Management</A>, later.</P>
+<H2><A NAME="Special Phrases">3.6. Special Phrases</A></H2>
+<P>Special phrases are used for entering things like:</P>
+<UL>
+<LI>special symbols (like {{)
+<LI>special characters (like &ouml;)
+<LI>images within paragraph text
+<LI>the current page number in the header or footer.</UL>
+<H2><A NAME="Macros">3.7. Macros</A></H2>
+<P>A <EM>macro</EM> is a command which can be embedded within SDF. Macros begin with an exclamation mark (!) or equals sign (=) as the first non-whitespace character on a line. !-style macros terminate at the end of the line, unless explicitly continued using a backslash character at the end of the line. =-style macros terminate at the next blank line (ala POD).</P>
+<P>Some examples are:</P>
+<PRE>
+  !define DOC_NAME   &quot;The SDF Document Development System&quot;
+  !define DOC_AUTHOR &quot;Ian Clatworthy&quot;
+  !build_title
+</PRE>
+<P>Some commonly-used macros are:</P>
+<TABLE BORDER ALIGN='Center'>
+<TR>
+<TD>
+<STRONG>Macro</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+init <EM>variables</EM>
+</TD>
+<TD>
+initialise variables
+</TD>
+</TR>
+<TR>
+<TD>
+define <EM>variable</EM> [<EM>expression</EM>]
+</TD>
+<TD>
+set a variable's value
+</TD>
+</TR>
+<TR>
+<TD>
+build_title
+</TD>
+<TD>
+build a title page
+</TD>
+</TR>
+<TR>
+<TD>
+block <EM>filter</EM>
+</TD>
+<TD>
+begin a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+endblock
+</TD>
+<TD>
+end a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+include <EM>file</EM>[; <EM>filter</EM>]
+</TD>
+<TD>
+include another file
+</TD>
+</TR>
+<TR>
+<TD>
+import <EM>file</EM>[; <EM>parameters</EM>]
+</TD>
+<TD>
+import a figure
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Variables">3.8. Variables</A></H2>
+<P>A <EM>variable</EM> is a named value. Document-wide settings are controlled in SDF using variables. Likewise, authors can define and access their own variables. In either case, the value of a variable can be referenced in a paragraph by delimiting it with the special symbols [[ and ]].</P>
+<P>For example:</P>
+<PRE>
+  !define MY_EMAIL 'abc@xyz.com'
+  My electronic mail address is [[MY_EMAIL]].
+</PRE>
+<P>The result is:</P>
+<P>My electronic mail address is abc@xyz.com.</P>
+<P>Some commonly used system variables are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_NAME
+</TD>
+<TD>
+the title, excluding the type (e.g. SDF)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TYPE
+</TD>
+<TD>
+the title type (e.g. User Guide)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_AUTHOR
+</TD>
+<TD>
+the author
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOC
+</TD>
+<TD>
+the number of heading levels in the table of contents
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_START
+</TD>
+<TD>
+the time processing of the document started
+</TD>
+</TR>
+</TABLE>
+
+<P>The <A HREF="../ref/mdefine.html">define</A> macro is usually used to set variables. However, variables beginning with OPT_ need to be set before processing of the document begins. The <A HREF="../ref/minit.html">init</A> macro is used on the top line of a document to set these variables. For example:</P>
+<PRE>
+   !init OPT_STYLE=&quot;manual&quot;
+</PRE>
+<H2><A NAME="Formats">3.9. Formats</A></H2>
+<P>As the value of date-time variables is the number of seconds since January 1, 1970, a <EM>format</EM> is typically applied to them when they are embedded in text. For example:</P>
+<PRE>
+  The date is [[DATE:DOC_START]].
+</PRE>
+<P>The predefined formats available include:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+FULL
+</TD>
+<TD>
+complete date-time format
+</TD>
+</TR>
+<TR>
+<TD>
+TIME
+</TD>
+<TD>
+time only
+</TD>
+</TR>
+<TR>
+<TD>
+DATE
+</TD>
+<TD>
+date only
+</TD>
+</TR>
+<TR>
+<TD>
+CONCISE
+</TD>
+<TD>
+concise date only
+</TD>
+</TR>
+<TR>
+<TD>
+YEAR
+</TD>
+<TD>
+4-digit year
+</TD>
+</TR>
+</TABLE>
+
+<P>New formats can be created and the definitions of existing formats can be changed. Furthermore, a format can be applied to any variable (or embedded Perl expression), although the date-time formats are obviously only useful when applied to date-time values.</P>
+<H2><A NAME="Document styles">3.10. Document styles</A></H2>
+<P>The general type of an document can be controlled by either:</P>
+<UL>
+<LI>initialising the OPT_STYLE variable on the top line of a document
+<LI>using <A HREF="../ref/sdf.html">sdf</A>'s -s option (which overrides the <A HREF="../ref/minit.html">init</A> macro).</UL>
+<P>The available document styles include:</P>
+<TABLE BORDER ALIGN='Center'>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>General:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+document
+</TD>
+<TD>
+a normal document
+</TD>
+</TR>
+<TR>
+<TD>
+manual
+</TD>
+<TD>
+a manual
+</TD>
+</TR>
+<TR>
+<TD>
+paper
+</TD>
+<TD>
+a technical paper
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Administration:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+fax
+</TD>
+<TD>
+a facsimile
+</TD>
+</TR>
+<TR>
+<TD>
+memo
+</TD>
+<TD>
+a memorandum
+</TD>
+</TR>
+<TR>
+<TD>
+minutes
+</TD>
+<TD>
+minutes of a meeting
+</TD>
+</TR>
+</TABLE>
+
+<P>It is relatively simple to create new document styles by inheriting details from an existing one.</P>
+<H2><A NAME="Filters">3.11. Filters</A></H2>
+<P>A <EM>filter</EM> controls how a block of text is interpreted. The text is usually delimited by <A HREF="../ref/mblock.html">block</A> and <A HREF="../ref/mendbloc.html">endblock</A> macros.</P>
+<P>For example, tables are usually defined via the <A HREF="../ref/ftable.html">table</A> filter:</P>
+<PRE>
+!block table
+Option  Description
+-h      display help
+-o      specify the output extension
+!endblock
+</PRE>
+<P>The result is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+-h
+</TD>
+<TD>
+display help
+</TD>
+</TR>
+<TR>
+<TD>
+-o
+</TD>
+<TD>
+specify the output extension
+</TD>
+</TR>
+</TABLE>
+
+<P>Other macros also support filters. These include:</P>
+<UL>
+<LI><A HREF="../ref/minclude.html">include</A> - include text from another file
+<LI><A HREF="../ref/mexecute.html">execute</A> - include the output of a system command.</UL>
+<P>Some of the commonly-used filters are:</P>
+<TABLE BORDER ALIGN='Center'>
+<TR>
+<TD>
+<STRONG>Filter</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftable.html">table</A>
+</TD>
+<TD>
+the lines are a table in SDF's <A HREF="../ref/fmt_tbl.html">TBL</A> format
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fexample.html">example</A>
+</TD>
+<TD>
+the lines are example paragraphs
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftitle.html">title</A>
+</TD>
+<TD>
+used to build a title block for memos, faxes, etc.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftopics.html">topics</A>
+</TD>
+<TD>
+include files as sub-topics
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fappendi.html">appendix</A>
+</TD>
+<TD>
+replace H1 styles with A1, etc.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fplain.html">plain</A>
+</TD>
+<TD>
+replace H1 styles with P1, etc.
+</TD>
+</TR>
+</TABLE>
+
+<P>For example, the following macro includes another SDF file and formats it as an appendix:</P>
+<PRE>
+   !include &quot;tips.sdf&quot;; appendix
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <A HREF="../ref/fappendi.html">appendix</A> and <A HREF="../ref/fplain.html">plain</A> filters enable authors to construct topics without needing to worry about how those topics will be used, e.g. a topic may be a chapter in one document and an appendix in another!
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H2><A NAME="Attributes">3.12. Attributes</A></H2>
+<P>Paragraphs and phrases can be given attributes via the syntax:</P>
+<PRE>
+  style&quot;[&quot;attributes&quot;]&quot; text
+</PRE>
+<P>where the syntax of <EM>attributes</EM> is:</P>
+<PRE>
+  name1[&quot;=&quot;expression1]&quot;;&quot; name2[&quot;=&quot;expression2] ...
+</PRE>
+<P>Attributes are used for specifying custom formatting, hypertext targets and jumps, indexing information, etc.</P>
+<P>Some commonly used attributes are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Paragraphs:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+align
+</TD>
+<TD>
+Left, Right, Center, or Full (i.e. justified)
+</TD>
+</TR>
+<TR>
+<TD>
+notoc
+</TD>
+<TD>
+take this heading out of the table of contents
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Phrases:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+family
+</TD>
+<TD>
+font family
+</TD>
+</TR>
+<TR>
+<TD>
+size
+</TD>
+<TD>
+font size
+</TD>
+</TR>
+<TR>
+<TD>
+id
+</TD>
+<TD>
+hypertext target tag
+</TD>
+</TR>
+<TR>
+<TD>
+jump
+</TD>
+<TD>
+URL (Uniform Resource Locator) to jump to
+</TD>
+</TR>
+</TABLE>
+
+<P>For convenience, phrase attributes can be applied to paragraphs.</P>
+<P>For example:</P>
+<PRE>
+  N[align=Center;size='12pt']
+  Life is too short to drink bad wine.
+</PRE>
+<P>The result is:</P>
+<P ALIGN="Center">Life is too short to drink bad wine.</P>
+<HR>
+<H1><A NAME="Web Publishing Features">4. Web Publishing Features</A></H1>
+<H2><A NAME="Centralised Hypertext Management">4.1. Centralised Hypertext Management</A></H2>
+<P>SDF has a generic object management feature which enables:</P>
+<OL>
+<LI>the definition of objects in configuration files
+<LI>the use of those objects in documents.</OL>
+<P>For example, a configuration file may have the following declaration of <A HREF="../ref/cproduct.html">products</A>:</P>
+<PRE>
+  !block products; data
+  Name     Jump
+  SDF      http://www.mincom.com/mtr/sdf/
+  MIMS     http://www.mincom.com/mims/
+  !endblock
+</PRE>
+<P>If an object with a <EM>Jump</EM> attribute is specified in a document, SDF will automatically include a hypertext jump to the appropriate place. For example, the objects above could be specified in a document like this (PRD is the style used to specify a product object):</P>
+<PRE>
+  The user documentation for {{PRD:MIMS}} is now
+  produced using {{PRD:SDF}}.
+</PRE>
+<P>SDF has built-in support for the following classes of objects:</P>
+<OL>
+<LI>references/documents
+<LI>terms/definitions
+<LI>organisations
+<LI>products.</OL>
+<P>Additional classes of objects can be easily added, so workgroups can centrally manage all sorts of URLs: mail addresses, FTP sites and so on.</P>
+<H2><A NAME="Rule-based Hypertext Generation">4.2. Rule-based Hypertext Generation</A></H2>
+<P>SDF provides a generic, rule-based feature called <EM>event processing</EM> for automating tasks like hypertext generation, index generation and custom formatting.</P>
+<P>The <A HREF="../ref/mon.html">on</A> macro allows you to execute an arbitrary piece of Perl code when an event occurs during document conversion. Its syntax is:</P>
+<PRE>
+ !on <EM>type</EM> <EM>pattern</EM>; [<EM>id</EM>]; <EM>action</EM>
+</PRE>
+<P>where:</P>
+<UL>
+<LI><EM>type</EM> specifies the event type
+<LI><EM>pattern</EM> is a Perl regular expression string, anchored at both ends, which specifies which styles (or names) the action is to be executed for
+<LI><EM>id</EM> is optionally used to name an event for later disabling via the <A HREF="../ref/moff.html">off</A> macro
+<LI><EM>action</EM> is the block of Perl code to execute.</UL>
+<P>The types supported and the Perl symbols available in the respective actions include:</P>
+<TABLE BORDER ALIGN='Center'>
+<TR>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Symbols</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+paragraph
+</TD>
+<TD>
+$style, $text, %attr, &amp;ParaPrepend, &amp;ParaAppend
+</TD>
+</TR>
+<TR>
+<TD>
+phrase
+</TD>
+<TD>
+$style, $text, %attr
+</TD>
+</TR>
+<TR>
+<TD>
+macro
+</TD>
+<TD>
+$name, $args
+</TD>
+</TR>
+<TR>
+<TD>
+filter
+</TD>
+<TD>
+$name, $params
+</TD>
+</TR>
+<TR>
+<TD>
+table
+</TD>
+<TD>
+$style, %param
+</TD>
+</TR>
+</TABLE>
+
+<P>Some examples are:</P>
+<PRE>
+  <I># Make every heading a hypertext target named itself</I>
+  <B>!on</B> paragraph <TT>'H\d'</TT>;; $attr{'id'} = $text
+
+  <I># If the target is HTML, add a line above level 1 headings</I>
+  <B>!if</B> $var{'OPT_TARGET'} eq <TT>'html'</TT>
+  <B>!on</B> paragraph <TT>'H1'</TT>;; &amp;PrependText(<TT>&quot;Line:&quot;</TT>)
+  <B>!endif</B>
+</PRE>
+<H2><A NAME="Embedded Perl Scripting">4.3. Embedded Perl Scripting</A></H2>
+<P>As systems built by embedding scripts within HTML are typically easier to customise than systems build by generating HTML from scripts, embedded scripting is now a well established web-publishing solution.</P>
+<P>Likewise, Perl embedded in SDF can be a powerful combination providing this same flexibility with some additional benefits:</P>
+<UL>
+<LI>SDF is arguably easier to read than HTML
+<LI>the information can be published in several formats.</UL>
+<P>To embed a block of Perl code, the <A HREF="../ref/fscript.html">script</A> filter is used. For example:</P>
+<PRE>
+    !block script
+    for $i ('a' .. 'z') {
+        print &quot;$i&quot;;
+    }
+    !endblock
+</PRE>
+<P>To embed an expression within paragraph text, the [[..]] syntax is used. For example:</P>
+<PRE>
+  Hello [[&quot;wor&quot; . &quot;ld&quot;]]
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>If the expression is a single word, it is assumed to be a variable name, otherwise the expression is treated as a Perl expression.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>For single line scripts, the <A HREF="../ref/mscript.html">script</A> macro can be used. For example:</P>
+<PRE>
+  !script $next_version = $var{'VERSION'} + 1
+</PRE>
+<P>As shown above, SDF variables are available within Perl expressions via the <EM>var</EM> associative array.</P>
+<H2><A NAME="Inline HTML">4.4. Inline HTML</A></H2>
+<P>As HTML is constantly evolving and contains features which SDF doesn't explicitly support (e.g. frames), it is occasionally necessary to directly embed native HTML. To do this, use the <A HREF="../ref/finline.html">inline</A> filter. For example:</P>
+<PRE>
+    !block inline
+    &lt;P&gt;
+    My name is &lt;B&gt;Bill&lt;/B&gt;.
+    !endblock
+</PRE>
+<P>Inlined HTML is ignored when PostScript is being generated. Likewise, if text for another format is inlined (by using the <EM>target</EM> parameter to the <EM>inline</EM> filter, say), it is ignored when HTML is generated.</P>
+<P>If you want to use embedded expressions (enclosed in [[ and ]]) and macros within the inline text, add the <EM>expand</EM> parameter like this:</P>
+<PRE>
+    # If the SHOW_DATE variable is true, show the date, otherwise the time
+    !block inline; expand
+        !if SHOW_DATE
+            &lt;P&gt;
+            The date is [[DATE:DOC_START]].
+        !else
+            &lt;P&gt;
+            The time is [[TIME:DOC_START]].
+        !endif
+    !endblock
+</PRE>
+<P>Likewise, you can use the INLINE phrase style within a paragraph to embed HTML within a paragraph. For example:</P>
+<PRE>
+  My name is {{INLINE:&lt;B&gt;Bill&lt;/B&gt;}}.
+</PRE>
+<HR>
+<H1><A NAME="Other Special Features">5. Other Special Features</A></H1>
+<P>SDF supports a number of special features which collectively make it useful for building large documentation systems like intranets and software manuals.</P>
+<P>These features are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Feature</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#Modules and Libraries">Modules and Libraries</A>
+</TD>
+<TD>
+an extensible way of packaging and reusing configuration information
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#Reusable Topics">Reusable Topics</A>
+</TD>
+<TD>
+topics can be defined without needing to know how they are used
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#Conditional Text">Conditional Text</A>
+</TD>
+<TD>
+inclusion and exclusion of certain text
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#Extracting Documentation">Extracting Documentation</A>
+</TD>
+<TD>
+extraction of documentation embedded in source code
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#Programming Language Support">Programming Language Support</A>
+</TD>
+<TD>
+attractive formatting of source code
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#Multiple Looks">Multiple Looks</A>
+</TD>
+<TD>
+packaged document-wide presentation styles
+</TD>
+</TR>
+</TABLE>
+
+<P>Further details about these are given below.</P>
+<H2><A NAME="Modules and Libraries">5.1. Modules and Libraries</A></H2>
+<P>A <EM>module</EM> is a normal SDF document which contains reusable information. As SDF has an open architecture, a module can provide:</P>
+<UL>
+<LI>new paragraph and phrase styles
+<LI>new paragraph and phrase attributes
+<LI>new macros
+<LI>new filters
+<LI>declarations of objects
+<LI>formatting rules.</UL>
+<P>A <EM>library</EM> is a directory containing modules with a common theme. Importantly, a library can <EM>inherit</EM> information from other libraries, making it easy to:</P>
+<OL>
+<LI>create new libraries, and
+<LI>maximise the reuse of configuration information.</OL>
+<H2><A NAME="Reusable Topics">5.2. Reusable Topics</A></H2>
+<P>Documentation systems can be developed as a set of topics, where each topic uses H-style headings, starting at H1. A topic does not generally need to know how it will be used - each document including a given topic can:</P>
+<UL>
+<LI>&quot;slide&quot; the headings levels up or down as needed
+<LI>change the heading styles as needed.</UL>
+<P>For example:</P>
+<PRE>
+ !include &quot;types.sdf&quot;
+
+ H1: Subroutines
+ !block topics
+ Topic
+ create
+ delete
+ update
+ !endblock
+
+ !include &quot;errors.sdf&quot;; appendix
+</PRE>
+<P>In this example, the results are:</P>
+<OL>
+<LI><EM>types.sdf</EM> will be included into the document unmodified
+<LI>the documentation for each subroutine (<EM>create.sdf</EM>, <EM>delete.sdf</EM> and <EM>delete.sdf</EM>) will be included as sub-sections in the <EM>Subroutines</EM> chapter, and the heading levels will be modified accordingly
+<LI><EM>errors.sdf</EM> will be included as an appendix.</OL>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Providing tabular data to a filter is a common idiom in SDF. In this case, the only column provided is the <EM>Topic</EM> column.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H2><A NAME="Conditional Text">5.3. Conditional Text</A></H2>
+<P>Sections of text can be conditionally included or excluded using the following macros:</P>
+<PRE>
+   !if condition
+   !elsif condition
+   !else
+   !endif
+</PRE>
+<P>These macros allow you to tune the output for different audiences and different target formats.</P>
+<H2><A NAME="Extracting Documentation">5.4. Extracting Documentation</A></H2>
+<P>Software documentation can be embedded within comments in source code (and text-based data files) and extracted by the <A HREF="../ref/sdfget.html">sdfget</A> utility. The name, order and formatting of extracted sections can be controlled via <EM>report</EM> files.</P>
+<P>Consider the following scenarios:</P>
+<UL>
+<LI>a <EM>User Guide</EM> may need to extract sections called <EM>Purpose</EM>, <EM>Description</EM> and <EM>Examples</EM>
+<LI>a <EM>Technical Reference</EM> may need to extract sections called <EM>Internal Architecture</EM> and <EM>Maintenance Tips</EM>.</UL>
+<P>Creating the necessary reports and mapping the extraction commands to SDF macros is relatively easy.</P>
+<H2><A NAME="Programming Language Support">5.5. Programming Language Support</A></H2>
+<P>Blocks of source code can be nicely formatted via the <EM>lang</EM> parameter to the <A HREF="../ref/fexample.html">example</A> filter. For example:</P>
+<PRE>
+!block example; lang='Perl'
+sub hello {
+    local($planet) = @_;
+
+    # Output a nice message
+    print &quot;hello $planet!\n&quot;;
+}
+!endblock
+</PRE>
+<P>If SDF encounters an unknown filter which is defined as a programming language, the example filter is implicit. Therefore, the above example can be simplified to:</P>
+<PRE>
+!block Perl
+sub hello {
+    local($planet) = @_;
+
+    # Output a nice message
+    print &quot;hello $planet!\n&quot;;
+}
+!endblock
+</PRE>
+<P>In either case, the result is:</P>
+<PRE>
+<B>sub</B> hello {
+    <B>local</B>($planet) = @_;
+
+    <I># Output a nice message</I>
+    <B>print</B> <TT>&quot;hello $planet!\n&quot;</TT>;
+}
+</PRE>
+<P>There is built-in support for numerous languages, including Perl, C, C++, Java, Delphi and CORBA IDL. New language definitions can be easily added (<CMD>vgrind</CMD> definitions are used).</P>
+<P>Pretty printing of source code is directly supported by <A HREF="../ref/sdf.html">sdf</A>'s -P option. For example:</P>
+<PRE>
+  sdf -2ps -Psh myscript
+  sdf -2ps -P myapp.c
+  sdf -2ps -P -N5 mylib.pl
+</PRE>
+<P>The language to use can be specified as a parameter. The default language is derived from the extension of the file. The -N option adds line numbers at the frequency given.</P>
+<H2><A NAME="Multiple Looks">5.6. Multiple Looks</A></H2>
+<P>The overall appearance of an document can be controlled by either:</P>
+<UL>
+<LI>initialising the OPT_LOOK variable on the top line of a document
+<LI>using <A HREF="../ref/sdf.html">sdf</A>'s -k option (which overrides the <A HREF="../ref/minit.html">init</A> macro).</UL>
+<P>The available looks include:</P>
+<UL>
+<LI><EM>simple</EM> - the default look, useful for general documentation
+<LI><EM>fancy</EM> - a look suitable for user documentation
+<LI><EM>infomap</EM> - a look based on Information Mapping&#153; 
+<LI><EM>overhead</EM> - a look suitable for overhead transparencies.</UL>
+<P>It is relatively simple to create new looks by inheriting details from an existing one.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>At this time (January 98), multiple looks are currently only supported for paper documentation generated via FrameMaker. Multiple look support will hopefully be added to other SDF output drivers during 1998.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H1><A NAME="Other Issues">6. Other Issues</A></H1>
+<H2><A NAME="Why should I use SDF">6.1. Why should I use SDF?</A></H2>
+<P>The common reasons for using <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> are:</P>
+<OL>
+<LI>it provides a single-source solution for high quality <A HREF="http://www.adobe.com">PostScript</A>, <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A>, <A HREF="http://www.microsoft.com/windows">Windows</A> help, etc.
+<LI>it saves time
+<LI>it is highly portable
+<LI>it is free.</OL>
+<H3><A NAME="High quality outputs from a single source">6.1.1. High quality outputs from a single source</A></H3>
+<P>As <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> can be used to specify a <EM>logical</EM> definition of a document, it is reasonably good at maintaining quality across the different output formats it supports.</P>
+<H3><A NAME="Saving time">6.1.2. Saving time</A></H3>
+<P>SDF often saves time in a number of ways:</P>
+<OL>
+<LI>developers can focus on document content and leave the formatting to SDF, i.e. minimal effort is required for good formatting
+<LI>developers can use their favorite text editor, rather than switching between two different tools for source code and documents
+<LI>documentation can be extracted or generated from source code
+<LI>hypertext can be automatically generated using <EM>event processing</EM> or <EM>object management</EM>.</OL>
+<H3><A NAME="High portability">6.1.3. High portability</A></H3>
+<P>SDF documents are plain text files which can be created on any platform. The underlying technology is <EM>Perl</EM>, a highly portable scripting language available on all commonly used platforms.</P>
+<H3><A NAME="SDF is free">6.1.4. SDF is free</A></H3>
+<P>SDF is freely available for commercial and non-commercial use. However, like most software packages, there are costs to be considered when using SDF. These include:</P>
+<OL>
+<LI>training costs
+<LI>the cost of coverting existing documents, if you wish to do this.</OL>
+<H2><A NAME="Converting Documents to SDF">6.2. Converting Documents to SDF</A></H2>
+<P>For POD documents, SDF contains a <CMD>pod2sdf</CMD> conversion program.</P>
+<P>For other formats, the easiest way to convert existing documents is usually to convert them to plain text and add the necessary markup. For <A HREF="http://www.microsoft.com/msword/default.htm">Word</A> users, an RTF-to-SDF converter is available.</P>
+<P>In any case, remember that:</P>
+<OL>
+<LI>most document formats are <EM>physical</EM> markup languages, and
+<LI>the main benefits of SDF come from specifying <EM>logical</EM> documents.</OL>
+<P>Therefore, regardless of what conversion tools you use, expect to do some manual changes.</P>
+<H2><A NAME="Further Information">6.3. Further Information</A></H2>
+<P>The <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> home page URL is <A HREF="http://www.mincom.com/mtr/sdf">http://www.mincom.com/mtr/sdf</A>. From the home page, you can:</P>
+<UL>
+<LI>download the latest software, documentation and templates
+<LI>browse the <A HREF="http://www.mincom.com/mtr/sdf/faq/faq.html">FAQ</A>
+<LI>report defects
+<LI>suggest enhancements
+<LI>visit the <A HREF="http://www.mincom.com/mtr/sdf/resources/index.html">SDF Resource Center</A>.</UL>
+<P>SDF is also available using anonymous ftp. The URL of the base directory is <A HREF="ftp://ftp.mincom.com/pub/mtr/sdf">ftp://ftp.mincom.com/pub/mtr/sdf</A>. The latest release is available in a variety of formats.</P>
+<P>The following mailing lists are available:</P>
+<UL>
+<LI><A HREF="mailto:sdf-users@mincom.com">sdf-users@mincom.com</A> - for general questions
+<LI><A HREF="mailto:sdf-bugs@mincom.com">sdf-bugs@mincom.com</A> - for reporting bugs and fixes.</UL>
+<P>To subscribe to these lists, send email to <A HREF="mailto:sdf-users-request@mincom.com">sdf-users-request@mincom.com</A> and/or <A HREF="mailto:sdf-bugs-request@mincom.com">sdf-bugs-request@mincom.com</A> for instructions on using <EM>factotum</EM>, the majordomo variant that manages these lists. In short, send email to <A HREF="mailto:factotum@mincom.com">factotum@mincom.com</A> with a message body of <EM>subscribe sdf-users</EM> or <EM>subscribe sdf-bugs</EM>.</P>
+<HR>
+<H1><A NAME="Summary">7. Summary</A></H1>
+<P>By using a logical document approach, where content and formatting are largely separated, SDF delivers high-quality Web-based and paper documentation from a single source. Importantly, the SDF language is easier for (most!) humans to read and write than alternatives like SGML or XML.</P>
+<P>In addition, SDF lowers the cost of document production by providing a number of features for managing large documentation systems. These features include:</P>
+<OL>
+<LI>rule-based hypertext generation, index generation and formatting
+<LI>centralised hypertext management
+<LI>an extensible way of packaging and reusing configuration information
+<LI>reusable topics
+<LI>conditional text, and
+<LI>extraction of documentation embedded in source code.</OL>
+<P>If all else fails, Perl scripts can be directly embedded in SDF documents to generate the output required!</P>
+<P>Finally, as SDF is freely available to everyone, the costs associated with using SDF are relatively low.</P>
+<HR>
+<H1><A NAME="Credits">Credits</A></H1>
+<P>Thanks to Tim Hudson (<A HREF="mailto:tjh@cryptsoft.com">tjh@cryptsoft.com</A>) for being SDF's biggest fan. Tim has assisted in design, fixed bugs, added features, promoted SDF to many of its current user base and generally helped with SDF whenever time permitted. Thanks also to Chris Moran (<A HREF="mailto:chris.moran@mincom.com">chris.moran@mincom.com</A>) for maintaining the <A HREF="http://www.mincom.com/mtr/sdf">SDF Home Page</A>, assisting in design, reviewing documents, etc. Many other <A HREF="http://www.mincom.com">Mincom</A> colleagues have assisted with SDF, particularly David Cox and Craig Willis. Thanks to everyone involved.</P>
+<P>Thanks also to my former <EM>Leeds and Northrup Australia</EM> colleagues, particularly Tom Beale, Craig Gibbings and Greg Birnie, for inspiring my initial interest in <EM>literate programming</EM>.</P>
+<P>The initial version of the <EM>mif2rtf</EM> program is Copyright 1992 by Convex Computer Corporation, Richardson, Texas. (The full copyright notice and permission notice is included in the SDF distribution.)</P>
+<HR>
+<H1><A NAME="Trademarks">Trademarks</A></H1>
+<P><A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A>, <A HREF="http://www.frame.com">FrameViewer</A>, <A HREF="http://www.adobe.com/prodindex/acrobat/">Acrobat</A>, <A HREF="http://www.adobe.com">PDF</A> and <A HREF="http://www.adobe.com">PostScript</A> are trademarks of <A HREF="http://www.adobe.com">Adobe Systems Incorporated</A>.</P>
+<P><A HREF="http://www.borland.com/Product/Lang/delphi2/">Delphi</A> is a trademark of <A HREF="http://www.borland.com">Borland International, Incorporated</A>.</P>
+<P><A HREF="http://www.microsoft.com/windows">Windows</A> is a trademark of <A HREF="http://www.microsoft.com">Microsoft Corporation</A>.</P>
+<HR>
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

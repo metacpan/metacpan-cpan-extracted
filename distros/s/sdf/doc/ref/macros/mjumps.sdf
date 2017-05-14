@@ -1,0 +1,33 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1998, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 25-Oct-98 ianc    SDF 2.000beta1
+# -----------------------------------------------------------------------
+#
+
+H1: jumps Macro
+
+H2: Interface
+
+!macro_interface "jumps"
+
+H2: Description
+
+The {{jumps}} macro generates lines of jumps to headings.
+
+H2: Examples
+
+Typical usage is:
+
+E:   !jumps "Purpose,Usage,,Description,Examples"
+
+This will create two jump lines: the first has {{Purpose}} and {{Usage}};
+the second has {{Description}} and {{Examples}}.
+
+#H2: Limitations & Future Directions

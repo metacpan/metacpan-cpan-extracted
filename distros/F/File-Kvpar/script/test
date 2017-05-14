@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Kvpar;
+
+usage() if @ARGV != 1;
+my $file = shift;
+
+my $kv = File::Kvpar->new('+<', $file);
+
+my $head = $kv->head;
+my @tail = $kv->tail;
+
+$kv->reset->write($head, @tail);
+

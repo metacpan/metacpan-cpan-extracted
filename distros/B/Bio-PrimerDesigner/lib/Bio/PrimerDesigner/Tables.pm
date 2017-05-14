@@ -1,6 +1,6 @@
-# $Id: Tables.pm,v 1.9 2004/03/04 23:23:38 kclark Exp $
-
 package Bio::PrimerDesigner::Tables;
+
+# $Id: Tables.pm 9 2008-11-06 22:48:20Z kyclark $
 
 =pod
 
@@ -18,11 +18,13 @@ design and e-PCR results for web applications.
 =cut
 
 use strict;
+use warnings;
+use Readonly;
+
+Readonly our 
+    $VERSION => sprintf "%s", q$Revision: 24 $ =~ /(\d+)/;
 
 use base 'Class::Base';
-
-use vars '$VERSION';
-$VERSION = sprintf "%d.%02d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/;
 
 # -------------------------------------------------------------------
 sub info_table {
@@ -332,13 +334,13 @@ passed the image URL.
 
 =head1 AUTHOR
 
-Copyright (C) 2003-2008 Sheldon McKay E<lt>mckays@cshl.eduE<gt>.
+Copyright (C) 2003-2009 Sheldon McKay E<lt>mckays@cshl.eduE<gt>.
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; version 2.
+the Free Software Foundation; version 3 or any later version.
 
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -347,7 +349,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 
 =head1 SEE ALSO

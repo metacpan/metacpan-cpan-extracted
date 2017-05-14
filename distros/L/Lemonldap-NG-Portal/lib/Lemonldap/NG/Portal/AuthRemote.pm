@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::_Remote;
 use Lemonldap::NG::Portal::Simple;
 use base qw(Lemonldap::NG::Portal::_Remote);
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.9.1';
 
 *authInit = *Lemonldap::NG::Portal::_Remote::init;
 
@@ -147,9 +147,9 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2009-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2009, 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2009-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

@@ -10,7 +10,7 @@ use Carp;
 use IO::Handle;
 use IO::Zlib;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 has fh              => ( is => 'rw' );
 has mode            => ( is => 'rw', default => '<' );
@@ -71,10 +71,13 @@ before BUILD => sub {
 
   confess "use either file, fh or file_or_fh" . Dumper $args
     if ( $self->fh && $args->{file} );
-  $args->{file} //= $args->{file_or_fh} if($args->{file_or_fh});
+
   # open file
   if ( $args->{file} ) {
-    my ( $fh, $was_open ) = open_on_demand( $args->{file}, $self->mode );
+    $self->fh( scalar open_on_demand( $args->{file}, $self->mode ) );
+    $self->_fh_was_open(0);
+  } elsif ( $args->{file_or_fh} ) {
+    my ( $fh, $was_open ) = open_on_demand( $args->{file_or_fh}, $self->mode );
     $self->fh($fh);
     $self->_fh_was_open($was_open);
   } else {

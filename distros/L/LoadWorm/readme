@@ -1,0 +1,79 @@
+
+WHAT IS IT?
+
+The LoadWorm is a tool to load a website with programmed requests, and to
+record the resultant performance, from a web client's perspective.  It can
+also be used for various investigative purposes, such as validation of the
+website, or discovering all the referrers to a page, etc. I have already
+used it to discover faults that have lead to a major re-architecting here
+at SaveSmart commercial site(s). It runs, unaltered, on Unix and Win32
+(tested on Solaris 2.4, Linux, and WinNT 4.0).
+
+This is an application, written in Perl, that uses LWP, LWP::Parallel,
+sockets (lots of them!), and Tk, so there is plenty to get your hands onto
+here. The pod will tell you how to operate it.
+
+
+
+INSTALLATION
+ 
+To install LoadWorm, all you do is the usual
+
+perl Makefile.PL
+make
+make install
+
+There is no 'make test', yet.  If LWP and Tk work, then LoadWorm should work.
+
+'make install' will install LoadWorm.pm in the site/ directory of perl.  You
+will find the working components of the LoadWorm ("loadworm.pl", "loadmaster.pl",
+loadslave.pl) in your current directory.  You will find an example "loadworm.cfg"
+configuration file in the ./eg/ directory.
+
+
+
+DEPENDENCIES
+
+LoadWorm depends on the following modules for it's function.
+
+Perl 5.004 (thanks, Larry!)
+
+LWP from libwww-perl-5_20
+
+LWP::Parallel from ParallelUserAgent-2.30 (thanks to Marc Langheinrich!)
+
+Tk from Tk402_003
+
+Time::Local and Time::HiRes for Unix OS.
+
+Win32 for Win32 OS.
+
+And various core Perl modules, including 
+    English, File::Path, File::Copy, Socket, Carp, FileHandle, Sys::Hostname.
+
+
+
+
+AUTHOR: Glenn Wood, C<glenwood@alumni.caltech.edu>
+
+Copyright 1997-1998 SaveSmart, Inc.  All rights reserved.
+Released under the Perl Artistic License.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+#---------------------------------------------------------------------#
+( $VERSION ) = sprintf("%d.%02d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/)
+===========================================================================================
+HISTORY
+
+01.05.18 Version 1.02 - return after long hiatus; improved release process; no other changes.
+98.11.14 Version 0.12 - make dist without the \015's
+98.06.30 Version 0.11
+98.06.30 Implemented Makefile.PL
+98.06.30 Restored AnyURL.pm, into eg/.
+98.06.30 Improved version calculation.
+98.06.27 Renamed LoadWorm.pm - the package is named "LoadWorm".
+
+98.06.23 Version 0.10 uploaded to CPAN.
+98.06.23 AnyURL.pm removed; caused problems with proper CPAN distribution.

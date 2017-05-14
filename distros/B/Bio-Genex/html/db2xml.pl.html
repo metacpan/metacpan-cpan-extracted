@@ -1,0 +1,113 @@
+<HTML>
+<HEAD>
+<TITLE>NAME</TITLE>
+<LINK REV="made" HREF="mailto:jasons@amadeus.avesthagen.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#required options">Required Options</A></LI>
+		<LI><A HREF="#optional options">Optional Options</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#last updated">LAST UPDATED</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P><STRONG>db2xml.pl</STRONG>: a script for export data from a Genex DB as a Gene
+Expression Markup Language (GeneXML) file</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  db2xml.pl --cb=outfile_name --user=name --password=passw [options]</PRE>
+<PRE>
+  db2xml.pl --exp=exp_id --user=name --password=passw [options]</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>db2xml.pl has two primary uses: exporting control bundles for the
+curation tool using the --cb option, and exporting experiment sets
+for download using the --exp option.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<P>
+<H2><A NAME="required options">Required Options</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_%2D%2Dcb%3Dfilename%2Exml">--cb=filename.xml</A></STRONG><BR>
+<DD>
+Specifies that the curationtool control bundle should be written to
+the file 'filename.xml'. The output will first be run through
+XMLUtils::pretty_print() to format the output to be more
+human-readable. This option is mutually exclusive with the --exp
+option. Depending on which other options are used, other supporting
+XML files may be written as well (array layout, user sequence feature,
+or canonical sequence feature).
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2Dexp%3D%24exp_id">--exp=$exp_id</A></STRONG><BR>
+<DD>
+Specifies that the experiment set whose primary key is $exp_id should
+be exported as GeneXML. The spot data for each &lt;array&gt; will be
+written to a separate external file. May be used multiple times on the
+command line to specify that multiple experiment sets should be
+exported. For example:
+<PRE>
+  db2xml.pl --exp=23 --exp=25 --user=jes --password=foo</PRE>
+<P><STRONG>NOTE</STRONG>: This option is not fully functional and should be approached
+with caution.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2Duser%3D%24login_name">--user=$login_name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%2D%2Dpassword%3D%24password">--password=$password</A></STRONG><BR>
+<DD>
+Retrieves the entry for $login_name from the UserSec table and matches
+the supplied $password against it. It will cause a not-so-graceful
+error if the password doesn\'t match.
+<P></P></DL>
+<P>
+<H2><A NAME="optional options">Optional Options</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_%2D%2Dspecies%3D%24spc_id">--species=$spc_id</A></STRONG><BR>
+<DD>
+Used for control bundle export. Specifies that species whose primary key is $spc_id should be included in the export file. This option may be included multiple times on the command line to specify multiple species. For example:
+<PRE>
+  db2xml.pl --cb=output.xml --user=jes --password=foo --species=4 --species=8</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Please send bug reports to <A HREF="mailto:genex@ncgr.org">genex@ncgr.org</A></P>
+<P>
+<HR>
+<H1><A NAME="last updated">LAST UPDATED</A></H1>
+<P>Mon Jun 19 00:43:39 MDT 2000 by <A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jason E. Stewart (<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

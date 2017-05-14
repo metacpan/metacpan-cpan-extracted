@@ -66,8 +66,8 @@ sub parse
     local $_Start = $uh->{Start};
     local $_End = $uh->{End};
     local $_Char = $uh->{Char};
-    local $_Element = $uh->{Element};
-    local $_Attlist = $uh->{Attlist};
+    local $_Element = $uh->{'Element'};
+    local $_Attlist = $uh->{'Attlist'};
     local $_Doctype = $uh->{Doctype};
     local $_Unparsed = $uh->{Unparsed};
     local $_Notation = $uh->{Notation};
@@ -82,6 +82,85 @@ sub parse
     local $_EndOfDoc = 0;
     
     $self->SUPER::parse (@_);
+}
+
+my $LWP_USER_AGENT;
+sub set_LWP_UserAgent	# static
+{
+    $LWP_USER_AGENT = shift;
+}
+
+sub load_URL		# static
+{
+    my ($url, $lwp_user_agent) = @_;
+    my $result;
+
+    # Read the file from the web with LWP.
+    #
+    # Note that we read in the entire file, which may not be ideal
+    # for large files. LWP::UserAgent also provides a callback style
+    # request, which we could convert to a stream with a fork()...
+    
+    my $response;
+    eval
+    {
+	use LWP::UserAgent;
+	
+	my $ua = $lwp_user_agent;
+	unless (defined $ua)
+	{
+	    unless (defined $LWP_USER_AGENT)
+	    {
+		$LWP_USER_AGENT = LWP::UserAgent->new;
+		
+		# Load proxy settings from environment variables, i.e.:
+		# http_proxy, ftp_proxy, no_proxy etc. (see LWP::UserAgent(3))
+		# You need these to go thru firewalls.
+		$LWP_USER_AGENT->env_proxy;
+	    }
+	    $ua = $LWP_USER_AGENT;
+	}
+	my $req = new HTTP::Request 'GET', $url;
+	$response = $LWP_USER_AGENT->request ($req);
+	$result = $response->content;
+    };
+    if ($@)
+    {
+	die "Couldn't load URL [$url] with LWP: $@";
+    }
+    if (!$result)
+    {
+	my $message = $response->as_string;
+	die "Couldn't load URL [$url] with LWP: $message";
+    }
+    return $result;
+}
+
+sub parsefile
+{
+    my $self = shift;
+    my $url = shift;
+
+    # Any other URL schemes?
+    if ($url =~ /^(https?|ftp|wais|gopher|file):/)
+    {
+	my $xml = load_URL ($url, $self->{LWP_UserAgent});
+	my $result;
+	eval
+	{
+	    # Parse the result of the HTTP request
+	    $result = $self->parse ($xml, @_);
+	};
+	if ($@)
+	{
+	    die "Couldn't parsefile [$url]: $@";
+	}
+	return $result;
+    }
+    else
+    {
+	return $self->SUPER::parsefile ($url, @_);
+    }
 }
 
 sub Init
@@ -173,11 +252,11 @@ sub Doctype
 	    # External DTD...
 	    
 	    #?? I'm not sure if we should die here or keep going?	    
-	    $dtd = load_DTD ($sysid);
+	    $dtd = load_DTD ($sysid, $expat->{LWP_UserAgent});
 	}
 	elsif ($pubid)
 	{
-	    $dtd = load_DTD ($pubid);
+	    $dtd = load_DTD ($pubid, $expat->{LWP_UserAgent});
 	}
     }
 
@@ -276,7 +355,7 @@ sub fail_add_context	# static
 
 sub load_DTD		# static
 {
-    my ($sysid) = @_;
+    my ($sysid, $lwp_user_agent) = @_;
 
     # See if it is defined in the %URI_MAP
     # (Public IDs are stored here, e.g. "-//W3C//DTD HTML 4.0//EN")
@@ -297,38 +376,18 @@ sub load_DTD		# static
 	    {
 		if ($ENV{'SGML_SEARCH_PATH'}) 
 		{
-		    die "Couldn't find external DTD <$relative_sysid> in SGML_SEARCH_PATH ($ENV{'SGML_SEARCH_PATH'})";
+		    die "Couldn't find external DTD [$relative_sysid] in SGML_SEARCH_PATH ($ENV{'SGML_SEARCH_PATH'})";
 		}
 		else 
 		{
-		    die "Couldn't find external DTD <$relative_sysid>, may be you should set SGML_SEARCH_PATH";
+		    die "Couldn't find external DTD [$relative_sysid], may be you should set SGML_SEARCH_PATH";
 		}
 	    }
 	}
 	$sysid = "file:$sysid";
     }
-    my $dtd;
-    my $response;
 
-    eval
-    {
-	use LWP::UserAgent;
-	my $ua = LWP::UserAgent->new();
-	my $req = new HTTP::Request 'GET', $sysid;
-	$response = $ua->request($req);
-	$dtd = $response->content;
-    };
-    if ($@) 
-    {
-	die "Couldn't read external DTD <$sysid>: $@";
-    }
-
-    if (!$dtd) 
-    {
-	my $message = $response->as_string();
-	die ("Couldn't get external DTD <$sysid> with LWP ($message)");
-    }
-    return $dtd;
+    return load_URL ($sysid, $lwp_user_agent);
 }
 
 sub map_uri			# static
@@ -434,6 +493,8 @@ XML::Checker::Parser - an XML::Parser that validates at parse time
 
 =head1 DESCRIPTION
 
+XML::Checker::Parser extends L<XML::Parser>
+
 I hope the example in the SYNOPSIS says it all, just use 
 L<XML::Checker::Parser> as if it were an XML::Parser. 
 See L<XML::Parser> for the supported (expat) options.
@@ -453,16 +514,51 @@ with:
 
  $parser = new XML::Checker::Parser (SkipExternalDTD => 1, SkipInsignifWS => 1);
 
-The constructor takes the same parameters as L<XML::Parser> with two additions,
-the SkipExternalDTD and SkipInsignifWS properties.
+The constructor takes the same parameters as L<XML::Parser> with the following additions:
+
+=over 4
+
+=item SkipExternalDTD
 
 By default, it will try to load external DTDs using LWP. You can disable this
 by setting SkipExternalDTD to 1. See L<External DTDs|"External DTDs"> for details.
+
+=item SkipInsignifWS
 
 By default, it will treat insignificant whitespace as regular Char data.
 By setting SkipInsignifWS to 1, the user Char handler will not be called
 if insignificant whitespace is encountered. 
 See L<XML::Checker/INSIGNIFICANT_WHITESPACE> for details.
+
+=item LWP_UserAgent
+
+When calling parsefile() with a URL (instead of a filename) or when loading
+external DTDs, we use LWP to download the
+remote file. By default it will use a L<LWP::UserAgent> that is created as follows:
+
+ use LWP::UserAgent;
+ $LWP_USER_AGENT = LWP::UserAgent->new;
+ $LWP_USER_AGENT->env_proxy;
+
+Note that L<env_proxy> reads proxy settings from your environment variables, 
+which is what I need to do to get thru our firewall. 
+If you want to use a different LWP::UserAgent, you can either set
+it globally with:
+
+ XML::Checker::Parser::set_LWP_UserAgent ($my_agent);
+
+or, you can specify it for a specific XML::Checker::Parser by passing it to 
+the constructor:
+
+ my $parser = new XML::Checker::Parser (LWP_UserAgent => $my_agent);
+
+Currently, LWP is used when the filename (passed to parsefile) starts with one of
+the following URL schemes: http, https, ftp, wais, gopher, or file 
+(followed by a colon.) If I missed one, please let me know. 
+
+The LWP modules are part of libwww-perl which is available at CPAN.
+
+=back
 
 =head1 External DTDs
 

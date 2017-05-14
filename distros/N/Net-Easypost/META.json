@@ -4,7 +4,7 @@
       "Mark Allen <mrallen1@yahoo.com>, Hunter McMillen <mcmillhj@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,12 +21,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Hash::Merge::Simple" : "0.051",
+            "HTTP::Tiny" : "0.054",
             "IO::Socket::SSL" : "1.962",
-            "JSON" : "2.90",
+            "JSON::MaybeXS" : "1.003009",
             "Mojolicious" : "4.66",
             "Moo" : "1.004002",
             "Types::Standard" : "0.040",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.014"
          }
       }
@@ -44,6 +45,7 @@
          "web" : "https://github.com/mcmillhj/Net-Easypost"
       }
    },
-   "version" : "0.18"
+   "version" : "0.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

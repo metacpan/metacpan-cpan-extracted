@@ -9,7 +9,7 @@ configure_requires:
   File::Spec: '0'
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +18,10 @@ name: Number-Phone-FR
 provides:
   Number::Phone::FR:
     file: lib/Number/Phone/FR.pm
-    version: '0.08'
+    version: '0.09'
   Number::Phone::FR::Full:
     file: lib/Number/Phone/FR/Full.pm
-    version: '0.0815091'
+    version: '0.0917109'
   Number::Phone::FR::Simple:
     file: lib/Number/Phone/FR.pm
 requires:
@@ -34,4 +34,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-Phone-FR
   homepage: https://github.com/dolmen/p5-Number-Phone-FR
   repository: https://github.com/dolmen/p5-Number-Phone-FR.git
-version: '0.0815091'
+version: '0.0917109'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

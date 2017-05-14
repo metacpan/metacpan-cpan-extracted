@@ -1,0 +1,10 @@
+<%INIT>
+return unless $session{'CurrentUser'}->HasRight( Object=> RT->System, Right => 'SuperUser');
+
+my $tools = Menu->child('admin')->child('tools');
+
+my $rights = $tools->child( rights_inspector =>
+    title => loc('Rights Inspector'),
+    path  => '/Admin/RightsInspector/',
+);
+</%INIT>

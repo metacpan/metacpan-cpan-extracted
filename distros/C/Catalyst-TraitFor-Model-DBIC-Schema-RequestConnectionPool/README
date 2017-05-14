@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-TraitFor-Model-DBIC-Schema-RequestConnectionPool,
+version 0.1000:
+
+  Create a schema for each unique calling context, defined by your model
+
+This software is copyright (c) 2012 by Gareth Kirwan.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

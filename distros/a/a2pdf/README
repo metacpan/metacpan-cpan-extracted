@@ -1,0 +1,25 @@
+NAME
+  a2pdf - converts ASCII text to PDF format, with optional
+  page/line numbering and Perl syntax highlighting
+
+INSTALLATION
+  Unzip and untar the archive, cd to the distribution
+  directory and enter the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+USAGE
+  a2pdf [options] input.txt >output.pdf
+  Options are described in the main a2pdf documentation
+
+DEPENDENCIES
+  Requires the PDF::API2 module, and optionally Perl::Tidy
+  to perform Perl syntax highlighting
+
+AUTHOR
+  Written by Jon Allen (JJ) <jj@jonallen.info>
+  http://perl.jonallen.info/projects/a2pdf
+

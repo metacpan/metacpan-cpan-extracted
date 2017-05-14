@@ -1,0 +1,464 @@
+#!/usr/local/bin/perl
+#
+# $Id: archie_gateway,v 1.5 1995/06/23 20:30:50 bossert Exp $
+# File: archie_gateway
+# Desc: WWW to Archie gateway
+# By:   Greg Bossert (bossert@noc.rutgers.edu)
+#       <http://www-ns.rutgers.edu/~bossert/index.html>
+#
+# Copyright (c) 1995 Greg Bossert. All rights reserved.
+# This program is free software; you can redistribute it
+# and/or modify it under the same terms as Perl itself.
+#
+# The latest version of this gateway is available
+# at <http://www-ns.rutgers.edu/doc/archie/>
+#
+# Thanks to Martijn Koster and his ArchiePlex gateway for ideas!
+# See <http://web.nexor.co.uk/archie.html> for a list of Archie
+# servers on the Web.
+#
+# This gateway requires the Archie.pm module, available at the above FTP
+# site.  This module makes direct Prospero queries, instead of using the
+# archie command-line client, which makes it faster (no forks) and much
+# more robust.
+###########################################################################
+###########################################################################
+# configuration variables -- set these as you see fit.
+#    NOTE:  Please set the default server $ag_server to your nearest 
+#    server.  Ours (archie.rutgers.edu) is struggling to keep up as it is!
+#    Thanks.
+###########################################################################
+
+### default parameters for archie request ###
+$ag_timeout = 600;              # timeout in seconds to wait for response
+$ag_max_hits = 40;              # maximum number of matches from archie
+$ag_nice = 'Standard';          # priority of request
+$ag_user = 'www';               # user name sent to archie server
+$ag_server = 'archie.rutgers.edu'; # default server hostname
+$ag_match = 'subcase';          # default search type
+
+### mapping of niceness terms to value ####
+%ag_niceness = ('Urgent' => 0, 
+		'Standard' => 500, 
+		'Medium' =>1000,
+		'Low' => 30000);
+
+### list of archie servers ###
+@ag_servers = ('archie.rutgers.edu',
+	       'archie.ans.net',
+	       'archie.sura.net',
+	       'archie.unl.edu',
+	       'archie.mcgill.ca',
+	       'archie.funet.fi',
+	       'archie.au',
+	       'archie.doc.ic.ac.uk',
+	       'archie.wide.ad.jp',
+	       'archie.ncu.edu.tw',
+	       'archie.unit.no');
+
+### translate internal strings for pretty responses ###
+$description{'host'}      = "Host";
+$description{'date'}      = "Date";
+$description{'exact'}     = "Exact";
+$description{'substring'} = "Substring";
+$description{'subcase'}   = "Case Insensitive Substring";
+$description{'regexp'}    = "Regular Expression";
+
+### my credit ###
+$ag_credits = '<P><EM>Archie</EM> gateway $Revision: 1.5 $ by Greg Bossert</P>';
+
+###########################################################################
+# HTML config -- the following site-specific variables are used
+#    to build the HTML form and responses.  Edit them to fit your
+#    server and style. $archie_blurb goes at the top of the request
+#    form.  My version is a hopeless attempt to stop people from
+#    making requests like 'sex' or 'pictures' -- you may want to
+#    subsitute a simple description of Archie.
+###########################################################################
+
+### standard HTML header ###
+$html_header = <<"EOQ";
+<IMG SRC="/doc-images/logos/ns_net_bar.gif" ALT="Rutgers University Network Services">
+EOQ
+
+### standard HTML footer ###
+$html_footer = <<"EOQ";
+<P><A HREF="/ns-www.html"><EM>ns-www\@www-ns.rutgers.edu</EM></A></P>
+EOQ
+
+### Archie blurb ###
+$archie_blurb = <<"EOQ";
+<P><EM>Archie</EM> locates files, usually software, available for
+public FTP access.</P>
+
+<P><IMG SRC="/doc-images/icons/bang_arrow_icon.gif" ALT="NOTE:">
+<EM>Archie</EM> is not a generic tool for finding things on the Web.
+Vague, general Search Strings, such as "binary", "jpeg", "WWW", etc.,
+<STRONG>will not work</STRONG>.  If you are not searching a specific
+file, please try a different service, such as 
+<A HREF="http://www.w3.org/hypertext/DataSources/bySubject/Overview.html">
+The Virtual Library</A> or <A HREF="http://www.yahoo.com/">Yahoo</A>.
+Thanks.</P>
+
+<P><IMG SRC="/doc-images/icons/bang_arrow_icon.gif" ALT="NOTE:">
+<EM>Archie</EM> is a very popular service, and frequently becomes
+overloaded.  If your search fails or times out, try the following:</P>
+
+<UL> 
+<LI> Read the note above.  Archie will <STRONG>not</STRONG> find WWW files, nor
+will it search for general types of files, such as JPEG images.
+<LI> Select a different Archie server.
+<LI> Use an exact match
+<LI> For non-exact matches, provide a longer or more specific Search Term.
+<LI> Try again later.
+</UL>
+
+EOQ
+
+###########################################################################
+# main
+###########################################################################
+### include the Archie 
+use Archie;
+
+### force flushing to output ###
+$| = 1;
+
+$SIG{'TERM'} = 'sig_handler';
+$SIG{'INT'} = 'sig_handler';
+
+### httpd sets the environment variable QUERY_STRING to the query ###
+### if there is no query, return the forms page ###
+if( $ENV{"QUERY_STRING"} eq "" ) 
+{
+    &ag_form();
+}
+else
+{
+    %ag_args = &parse_form( $ENV{'QUERY_STRING'} );
+
+    ### if there are no parsed args, it's an old-style ISINDEX query ###
+    @keys = keys( %ag_args );
+    if( $#keys < 0 )
+    {
+        $ag_args{'searchterm'} = $ENV{'QUERY_STRING'};
+    }
+
+    if( !defined($ag_args{'searchterm'}) || $ag_args{'searchterm'} eq '' ) {
+        &ag_error('No search term!  \
+Please enter a search term on the search form');
+    }
+    else {
+        &ag_data( %ag_args );
+    }
+}
+
+exit;
+### end of main ###
+
+###########################################################################
+# parse_form -- Parses the query data returned by an html form, and expands
+#     any escaped characters.  The data is in the form: 
+#     name=value&name=value&name=value...
+# 
+# args:
+#       $query_data: 
+# returns:
+#       %out: associative array of name/value pairs
+###########################################################################
+sub parse_form 
+{
+    my($query_data) = @_;
+    my($pair, $name, $value, %out);
+    
+    ### convert escaped chars to ascii ###
+    $query_data  =~ s/%([\da-f]{1,2})/pack(C,hex($1))/eig;
+    
+    foreach $pair ( split( '&', $query_data ) )
+    {
+        ($name, $value) = split( '=', $pair );
+        $out{$name} = $value;
+    }
+    
+    return( %out );
+}
+
+###########################################################################
+# ag_data -- makes the archie request, formats the response as HTML, and 
+#    sends it to the http server via STDOUT.
+#
+# uses:
+#       %archie_args: hash of args as returned from the archie form:
+#          'server' => archie server
+#          'match' => type of match = 
+#                     'exact' | 'substring' | 'subcase' | 'regexp'
+#          'order' => order of results = 'date' | 'host'
+#          'nice' => 'Urgent' | 'Standard' | 'Medium' | 'Low'
+# returns: none
+###########################################################################
+sub ag_data {
+    my($niceness);
+
+    ### set defaults (useful if the query came from an ISINDEX) ###
+    if( !defined( $ag_args{'server'} ) ) {
+        $ag_args{'server'} = $ag_server;
+    }
+    if( !defined( $ag_args{'match'} ) ) {
+        $ag_args{'match'} = $ag_match;
+    }
+    if( !defined( $ag_args{'nice'} ) ) {
+        $ag_args{'nice'} = $ag_nice;
+    }
+
+    $niceness = $ag_niceness{$ag_args{'nice'}};
+
+    ### call the archie library ###
+    @results = &Archie::archie_request($ag_args{'server'}, $ag_args{'match'}, 
+                                       'date', $ag_max_hits, $niceness, 
+                                       $ag_user, $ag_timeout, 
+                                       $ag_args{'searchterm'});
+
+    if ($Archie::ArchieErr) {
+        if( $Archie::ArchieErr =~ /No responses/ ) {
+            &ag_error('Sorry, your query has timed out.  \
+Please read the tips on the request form and try a different query.');
+        }
+        else {
+            &ag_error("Internal Error: $Archie::ArchieErr");
+        }
+        return;
+    }
+
+    ### print head of page ###
+    &ag_html_head('Archie Search Results');
+    print <<"EOQ";
+
+<P>Results from <EM>$description{$ag_args{'match'}}</EM> search on
+<EM>$ag_args{'server'}</EM> for <EM>$ag_args{'searchterm'}</EM>:</P>
+<HR>
+EOQ
+
+    foreach $result (@results) {
+
+        ### convert date ###
+        my($year, $month, $day, $hour, $min, $sec, $zone) = 
+            ($result->{'lastmod'} =~ /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(.*)/);
+
+        if ($zone eq 'Z') {
+            $zone = 'GMT';
+        }
+
+        @month_array = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+
+        $date = "$year $month_array[$month] $day $hour:$min:$sec $zone";
+
+        ### if it is a new host... ###
+        if ($result->{'host'} ne $lasthost) 
+        {
+            ### ...end the list for the previous host... ###
+            print "</UL>\n" if $lasthost;
+            
+            ### and start the list for the new host ###
+            print "<H2><A HREF=\"ftp://$result->{'host'}/\">$result->{'host'}</A></H2>";
+            print "<UL>\n";
+            
+            $lasthost = $result->{'host'};
+        }
+        
+        ### is it a directory? ###
+        if ($result->{'type'} =~ /Dir/) {
+            print "<LI>Directory <A HREF=\"ftp://$result->{'host'}$result->{'dir'}\">$result->{'dir'}</A>\n";
+	    print "<UL>";
+	    print "<LI>Last Changed: <EM>$date</EM>\n";
+	    print "</UL>";
+        }
+        #### nope, it's a file ###
+        else {
+            ### split path from file ###
+            my(@path_bits) = split('/', $result->{'dir'});
+            $file = pop(@path_bits);
+            $location = join('/', @path_bits);
+
+            ### format size ###
+            $result->{'size'} =~ /(\d+)/;
+            $sizestr = int($1 / 1000) . "K" if ($1 > 1000);
+            $sizestr = int($1 / 1000000) . "M" if ($1 > 1000000);
+
+            ### and print it ###
+            print "<LI>File ";
+            print "<A HREF=\"ftp://$result->{'host'}$result->{'dir'}\">$file</A>\n";
+	    print "<UL>";
+            print "<LI>Size: <EM>$result->{'size'} ($sizestr) Bytes</EM>\n";
+	    print "<LI>Last Changed: <EM>$date</EM>\n";
+            print "<LI>Location: <EM><A HREF=\"ftp://$result->{'host'}$location/\">$location/</A></EM>\n";
+	    print "</UL>";
+        }
+    }
+
+    ### if there is a lasthost, end its list ###
+    if( $lasthost ) {
+        print "</UL>\n";
+    }
+    
+    ### print tail of page ###
+    &ag_html_tail;
+}
+
+###########################################################################
+# ag_html_tail -- Print the bottom of the HTML page. $html_footer is
+#   defined at top of file -- make sure you edit it for your site 
+#
+# args: none
+# returns: none
+###########################################################################
+sub ag_html_tail
+{
+    print <<"EOQ";
+<HR>
+$html_footer
+$ag_credits 
+</BODY>
+</HTML>
+EOQ
+}
+
+###########################################################################
+# ag_html_head -- Print the top of the HTML page. $html_header is
+#   defined at top of file -- make sure you edit it for your site 
+#
+# args:
+#    $title: text for title and header
+# returns: none
+###########################################################################
+sub ag_html_head
+{
+    my($title) = @_;
+
+    print <<"EOQ";
+Content-type:  text/html
+
+<!doctype html public \"-//IETF//DTD HTML //EN//2.0\">
+<HTML>
+<HEAD>
+<TITLE>$title</TITLE>
+</HEAD>
+<BODY>
+$html_header
+<H1>$title</H1>
+<HR>
+
+EOQ
+}
+
+###########################################################################
+# ag_error -- Builds and send an error message to the client.
+# args:
+#    $error_text: what it says
+# returns: none
+###########################################################################
+sub ag_error
+{
+    my($error_text) = @_;
+
+    &ag_html_head('Archie Search Results: Error');
+
+    print <<"EOQ";
+<P>Results from <EM>$description{$ag_args{'match'}}</EM> search on
+<EM>$ag_args{'server'}</EM> for <EM>$ag_args{'searchterm'}</EM>:</P>
+<HR>
+
+<P><EM>Sorry, there was an error:</EM></P>
+<P>$error_text</P>
+EOQ
+
+    &ag_html_tail();
+}
+
+###########################################################################
+# ag_form -- Builds and sends the request form to the client.  I'm not
+#    giving options for order (sorting by most recent date is simply the
+#    most useful) or for max hits -- add these if you you choose.  I'm 
+#    selecting "Urgent" as the default niceness, since any other value
+#    never returns on archie.rutgers.edu ;)
+#
+# args: none
+# returns: none
+###########################################################################
+sub ag_form
+{
+    &ag_html_head('Archie Request Form');
+
+    ### defined at top of file -- make sure you edit it for your site ###
+    print $archie_blurb;
+
+    print <<"EOQ";
+<HR>
+
+<FORM ACTION="http://www-ns.rutgers.edu/htbin/archie">
+
+<P><STRONG>Archie Server to use:</STRONG>
+
+<SELECT NAME="server">
+EOQ
+
+    ### print server list ###
+    foreach $serv (@ag_servers) {
+	if ($serv eq @ag_servers[0]) {
+	    ### select first server ###
+	    print "<OPTION SELECTED> $serv\n";
+	}
+	else {
+	    print "<OPTION> $serv\n";
+	}
+    }
+
+    print <<"EOQ";
+</SELECT></P>
+
+<DL>
+<DT> <STRONG>Search by:</STRONG>
+<DD><INPUT TYPE="radio" NAME="match" VALUE="substring"> Looking for Search Term in File Names (Ignore UPPER/lowercase)
+<DD><INPUT TYPE="radio" NAME="match" VALUE="subcase"> Looking for Search Term in File Names (Pay attention to UPPER/lowercase)
+<DD><INPUT TYPE="radio" NAME="match" VALUE="regexp"> Looking for Search Term in File Names using Regular Expressions
+<DD><INPUT TYPE="radio" NAME="match" VALUE="exact" CHECKED> Looking for Exact Match
+</DL>
+
+<P><STRONG>Priority:</STRONG>
+<SELECT NAME="nice">
+<OPTION SELECTED>Urgent
+<OPTION>Standard
+<OPTION>Medium
+<OPTION>Low
+</SELECT></P>
+
+<P><STRONG>Search Term:</STRONG> <INPUT TYPE="text" NAME="searchterm"></P>
+
+<P><INPUT TYPE="submit" VALUE="Start Search">
+<INPUT TYPE="reset" VALUE="Reset Values"></P>
+
+<P><EM>Please note that the Archie server may take several minutes to
+complete its search.</EM></P>
+
+</FORM>
+EOQ
+
+    &ag_html_tail();
+}
+
+###########################################################################
+# sig_handler -- catch 'quit it already' signals
+#
+# args: signal
+# returns: none
+###########################################################################
+sub sig_handler {
+    my($sig) = @_;
+
+    &Archie::archie_cancel();
+    exit;
+}
+
+###########################################################################
+# end of file archie
+###########################################################################

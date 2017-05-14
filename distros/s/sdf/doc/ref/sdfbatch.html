@@ -1,0 +1,304 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: sdfbatch - Batch Processing Utility</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdfapi.html">Previous Topic</A> | <A HREF="sdfcli.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="sdfbatch">11.4. sdfbatch - Batch Processing Utility</A></H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P><A HREF="../ref/sdfbatch.html">sdfbatch</A> is a preprocessor for <CMD>fmbatch</CMD>, <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A>'s command-line driven batch processing utility.</P>
+<HR>
+<H2><A NAME="Usage">Usage</A></H2>
+<PRE>
+usage  : sdfbatch [+alias] [-h[help]] [-f fmt_file]
+         [-F fmt_what] [-u] [-p[print_doc]]
+         [-P paper_size] [-s[save_ext]]
+         [-S save_fmt] [-n] [-t timeout]
+         frame_file ...
+purpose: generate fmbatch input file
+version: 2.000    (SDF 2.001beta1)
+</PRE>
+<P>The options are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_h">-h</A>
+</TD>
+<TD>
+display help on options
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_f">-f</A>
+</TD>
+<TD>
+formats file
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_F">-F</A>
+</TD>
+<TD>
+formats to import
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_u">-u</A>
+</TD>
+<TD>
+update documents
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_p">-p</A>
+</TD>
+<TD>
+print documents
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_P">-P</A>
+</TD>
+<TD>
+paper size name
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_s">-s</A>
+</TD>
+<TD>
+save extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_S">-S</A>
+</TD>
+<TD>
+save file format
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_n">-n</A>
+</TD>
+<TD>
+output the batch file (instead of calling fmbatch)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfbatch_t">-t</A>
+</TD>
+<TD>
+timeout for printer driver to generate ps
+</TD>
+</TR>
+</TABLE>
+
+<P>The aliases are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Alias</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+fm2ps
+</TD>
+<TD>
+convert Frame files to PostScript
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>Given a set of <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> documents, <A HREF="../ref/sdfbatch.html">sdfbatch</A> can be used to:</P>
+<UL>
+<LI>change the formatting of the documents (ala <EM>Use Formats From</EM>)
+<LI>update the documents (i.e. cross-references, etc.)
+<LI>print the documents
+<LI>save the documents in a nominated file format</UL>
+<P><A NAME="sdfbatch_h">The -h option provides help. If it is specified without a parameter, a brief description of each option is displayed. To display the attributes for an option, specify the option letter as a parameter.</A></P>
+<P><A NAME="sdfbatch_f">To change formatting, use the -f option to specify the file to import the formats from. The -F option can be used to specify what formats are imported. The argument to the -F option is a set of the characters in the table below.</A></P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Character</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+p
+</TD>
+<TD>
+Paragraph formats
+</TD>
+</TR>
+<TR>
+<TD>
+f
+</TD>
+<TD>
+Font formats
+</TD>
+</TR>
+<TR>
+<TD>
+l
+</TD>
+<TD>
+Page layouts
+</TD>
+</TR>
+<TR>
+<TD>
+c
+</TD>
+<TD>
+Cross references
+</TD>
+</TR>
+<TR>
+<TD>
+v
+</TD>
+<TD>
+Variables
+</TD>
+</TR>
+<TR>
+<TD>
+r
+</TD>
+<TD>
+Reference page contents
+</TD>
+</TR>
+<TR>
+<TD>
+t
+</TD>
+<TD>
+Table formats
+</TD>
+</TR>
+<TR>
+<TD>
+x
+</TD>
+<TD>
+Conditional text
+</TD>
+</TR>
+<TR>
+<TD>
+k
+</TD>
+<TD>
+Color
+</TD>
+</TR>
+<TR>
+<TD>
+m
+</TD>
+<TD>
+math
+</TD>
+</TR>
+<TR>
+<TD>
+B
+</TD>
+<TD>
+Preserve manual page breaks
+</TD>
+</TR>
+<TR>
+<TD>
+O
+</TD>
+<TD>
+Preserve other formatting overrides
+</TD>
+</TR>
+</TABLE>
+
+<P>By default, all formats are imported.</P>
+<P><A NAME="sdfbatch_u">To update documents, use the -u option.</A></P>
+<P><A NAME="sdfbatch_p"> </A>To print documents, use the -p option. If a parameter is not provided, the file will be printed to the default printer. To print to a <A HREF="http://www.adobe.com">PostScript</A> file, specify the &quot;file&quot; keyword as the parameter. Alternatively, the parameter is the name of a <EM>print settings</EM> file.</P>
+<P><A NAME="sdfbatch_P"> </A>When generating a <A HREF="http://www.adobe.com">PostScript</A> file, the paper size can be specified using the -P option. The default value is <EM>global</EM>. The paper size name is actually mapped to a <EM>print settings</EM> file called <EM>paper_size</EM>.<EM>fmver</EM> in the <TT>stdlib</TT> library directory. <EM>fmver</EM> is typically either fm4 or fm5, depending on which version of FrameMaker you are using.</P>
+<P><A NAME="sdfbatch_s">To save documents, use the -s option. By default, this saves each file. To change the extension, supply an argument to the -s option.</A></P>
+<P><A NAME="sdfbatch_S">To specify a different format, use the -S option. Possible values are:</A></P>
+<UL>
+<LI>m - MIF
+<LI>a - line-oriented ASCII
+<LI>t - paragraph-oriented ASCII
+<LI>d - Frame document
+<LI>l - View-Only Frame document
+<LI>- - file's current format [default]</UL>
+<P>Take care with the file extension - any existing files will be replaced without warning.</P>
+<P><A NAME="sdfbatch_n">The -n option causes the generated <CMD>fmbatch</CMD> file to be output. i.e. fmbatch is not called. This option is useful for debugging.</A></P>
+<P><A NAME="sdfbatch_t">The -t option enables the user to tune the time-out used when waiting for the print driver to generate a PostScript file. The default value is 300 seconds (i.e. 5 minutes).</A></P>
+<P>A combination of the f, u, p and s options can be supplied if more that one operation is required per file. For example, you may wish to import formats and then save the resultant file. For each file, the operations are always done in the following order:</P>
+<OL>
+<LI>formatting
+<LI>updating
+<LI>printing
+<LI>saving</OL>
+<P><A NAME="sdfbatch_F"> </A><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Not all of the values documented for the -F and -S options may be supported in Frame versions before 4.0 and additional values may be supported in future versions. As such, the values supplied to these options are simply embedded in the generated <A HREF="../ref/sdfbatch.html">sdfbatch</A> file. i.e. no checking is done on the value. This behaviour is considered a feature.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>To format and print a set of files:</P>
+<PRE>
+        sdfbatch -fmyfmts.doc -p *.doc
+</PRE>
+<P>To convert mif files to binary files:</P>
+<PRE>
+        sdfbatch -sdoc -Sd *.mif
+</PRE>
+<P>To copy Frame variables from a file to a set of files:</P>
+<PRE>
+        sdfbatch -fvariable.mif -Fv -s *.doc
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdfapi.html">Previous Topic</A> | <A HREF="sdfcli.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

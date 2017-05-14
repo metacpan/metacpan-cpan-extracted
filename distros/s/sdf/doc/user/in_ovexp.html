@@ -1,0 +1,62 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Expressions</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovatt.html">Previous Topic</A> | <A HREF="in_parag.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>2.8. Expressions</H1>
+<HR>
+<H2><A NAME="Introduction">2.8.1. Introduction</A></H2>
+<P>Expressions are used in several places within <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> including:</P>
+<UL>
+<LI>attribute values
+<LI>macro argument values
+<LI>filter parameter values
+<LI>evaluation within paragraph text.</UL>
+<P>The value of an expression can be placed into a paragraph by delimiting it with the special symbols [[ and ]]. For example:</P>
+<PRE>
+   The current file is [[DOC_FILE]].
+</PRE>
+<HR>
+<H2><A NAME="Types of expressions">2.8.2. Types of expressions</A></H2>
+<P>An expression is either:</P>
+<UL>
+<LI>an <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> variable name (e.g. DOC_AUTHOR)
+<LI>a <A HREF="http://www.perl.com/perl/index.html">Perl</A> expression.</UL>
+<P>If an expression is a single word, it is the value of a variable. Otherwise, it is evaluated as a Perl expression. A Perl expression is typically one of the following:</P>
+<UL>
+<LI>a numeric literal (e.g. <E>213</E>)
+<LI>a string literal (e.g. <E>&quot;User Guide&quot;</E>)
+<LI>a subroutine call (e.g. <E>length(&quot;User Guide&quot;)</E>).</UL>
+<HR>
+<H2><A NAME="Accessing variables within Perl expressions">2.8.3. Accessing variables within Perl expressions</A></H2>
+<P>Within a <A HREF="http://www.perl.com/perl/index.html">Perl</A> expression, <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> variables are available via the <EM>var</EM> associative array. The syntax used by <A HREF="http://www.perl.com/perl/index.html">Perl</A> for accessing a value within an associative array is:</P>
+<PRE>
+  &quot;$&quot; array_name &quot;{&quot; string_index &quot;}&quot;
+</PRE>
+<P>Some examples are:</P>
+<OL>
+<LI>get the length of the DOC_AUTHOR variable:</OL>
+<PRE>
+      length($var{'DOC_AUTHOR'})
+</PRE>
+<OL>
+<LI>concatenate the document name and type:</OL>
+<PRE>
+      &quot;$var{'DOC_NAME'} $var{'DOC_TYPE'}&quot;
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovatt.html">Previous Topic</A> | <A HREF="in_parag.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

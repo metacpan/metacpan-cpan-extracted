@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="UserSequenceFeature" db_column="usf_type" cv_table="USF_Type">
+  <comment type="definition">Referred to in the User Sequence Feature Table to describe the type of entity deposited in a spot	
+</comment>
+<term name="serial_orf_name"
+        description=""/>
+<term name="gene_name"
+        description=""/>
+<term name="clone_name"
+        description=""/>
+<term name="est_name"
+        description=""/>
+<term name="b_number"
+        description=""/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

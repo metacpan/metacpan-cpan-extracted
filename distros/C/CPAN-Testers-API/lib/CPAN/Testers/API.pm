@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.006';
+our $VERSION = '0.008';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -98,9 +98,16 @@ sub startup ( $app ) {
     $r->websocket( '/v1/upload/dist/:dist' )->to( 'Upload#feed' );
     $r->websocket( '/v1/upload/author/:author' )->to( 'Upload#feed' );
 
+    $r->websocket( '/v3/upload' )->to( 'Upload#feed' );
+    $r->websocket( '/v3/upload/dist/:dist' )->to( 'Upload#feed' );
+    $r->websocket( '/v3/upload/author/:author' )->to( 'Upload#feed' );
 
     $app->plugin( OpenAPI => {
-        url => dist_file( 'CPAN-Testers-API' => 'api.json' ),
+        url => dist_file( 'CPAN-Testers-API' => 'v1.json' ),
+        allow_invalid_ref => 1,
+    } );
+    $app->plugin( OpenAPI => {
+        url => dist_file( 'CPAN-Testers-API' => 'v3.json' ),
         allow_invalid_ref => 1,
     } );
     $app->helper( schema => sub { shift->app->schema } );
@@ -167,7 +174,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -259,6 +266,12 @@ L<http://www.cpantesters.org>
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Breno G. de Oliveira
+
+Breno G. de Oliveira <garu@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

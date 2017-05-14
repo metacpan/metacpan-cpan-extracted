@@ -1,0 +1,228 @@
+package Serial;
+
+##########################################################################
+# sub Serial
+#
+# This file is an example "special" subroutine that goes with the
+# MsqlCGI Package.  an element with the "serial" flag will grab a number
+# from a "serial number file".  It can be used to help automate the
+# process of creating a unique Primary Key.
+#
+# Note, It does some simple file locking to try to ward off clobbering of
+# files and changes.  See the comments in &LockFile() for more.
+#
+# This file is part of the MsqlCGI Package, Copyright 1996 Alex Tang and
+# CICNet, Inc.
+##########################################################################
+
+
+$lockFile = "/tmp/MsqlCGI.serial.lock";
+$counterFile = "$main::pluginDir/serial.data";
+$sleepMax = 10;
+
+
+########################################################################
+# CreateQueryPart_Create and Serial_Special_CreateQueryPart_Modify 
+#
+# These functions have no purpose because no special processing is needed
+# when converting a serial number to part of a MSQL query string.  Both
+# functions just return the value as is.
+########################################################################
+sub CreateQueryPart_Create {
+  local ( $tableInfo, $pData, $value ) = @_;
+  return ( $value );
+}
+
+sub CreateQueryPart_Modify {
+  local ( $tableInfo, $pData, $value ) = @_;
+  return ( $value );
+}
+
+########################################################################
+# ConvertValue
+#
+# This displays the serial number data.  There really isn't any need for
+# this, so we'll just return the value.  Since it's a numeric value, we
+# don't need to continue with the ConvertValue processing.
+########################################################################
+sub ConvertValue {
+  local ( $value, $pData ) = @_;
+  return ( $value, 0 );
+}
+
+########################################################################
+# sub CreateCGIString
+#
+# This is the function that gets called when a field has the "special"
+# field declared as "serial".  It basically gets increments a serial
+# number that's stored in a file.  It uses the dbhost, dbname, fieldName,
+# and the element's dataName as to figure out which number to increment.
+# This way, we can use one data file for all of the serial numbers.
+# (hmmm.this may be bad for resource contention if this script gets used a
+# lot.)
+########################################################################
+sub CreateCGIString {
+  local ( $tableInfo, $pData, $type, $value ) = @_;
+  $matchString = "$tableInfo->{'dbHost'}-" . 
+  		 "$tableInfo->{'dbName'}-" .
+  		 "$tableInfo->{'tableName'}-" .
+		 "$pData->{'fieldName'}";
+
+
+	# We really only care about creating a unique number when we
+	# create the field...otherwise we just return the value.
+  if  ( $type eq "CREATE" ) {
+
+	# Get the serial number from the file.
+    $nSerial = &GetNewSerialNumber ( $tableInfo, $pData, $counterFile, $matchString );
+    &main::DPrint 
+	( "in Special Serial, CreateCGIString, new Serial is $nSerial" );
+
+    if ( $pData->{'modFieldWhenCreate'} ) {
+      $strCGI = <<EOF;
+        <input type=text name=$pData->{'fieldName'} value="$nSerial">
+EOF
+    } else {
+      $strCGI = <<"      EOF";
+     	<input type=hidden name=$pData->{'fieldName'} value=$nSerial>
+      EOF
+      if ( $pData->{'dispFieldWhenCreate'} ) {
+	$strCGI .= "$nSerial"
+      }
+    } 
+  } elsif ( $type eq "SEARCH" ) {
+    return ( "", "_MsqlCGI_Defer" );
+
+  } else {
+    return ( "", "$value" );
+  }
+
+  return ( "", $strCGI );
+}
+
+##########################################################################
+# LockFile
+#
+# This creates a lock file based upon the name of the file we're trying to
+# lock.  It tests to see if the lock file exists, and if the process that
+# owns the lock file is still around.  It will try $sleepMax times at 1 second
+# intervals and then fail.  
+#
+# If we can grab the lock, We write our PID into the file to claim
+# ownership.
+#
+# There is a DEFINITE Race condition here.  But for this program, it's not
+# that big of a deal.
+##########################################################################
+sub LockFile {
+  ( $fileName ) = @_;
+  $lockFile = substr ( $fileName, 1 );
+  $lockFile =~ s/\//./g;
+  $lockFile = "/tmp/$lockFile.lock";
+
+  $nCount = 0;
+  while ( -e $lockFile ) {
+    sleep ( 1 );
+    if ( $nCount++ == $sleepMax ) {
+      &main::Error ( "Coulnd't get lock" );
+    }
+
+    $otherPID = `cat $lockFile`;
+    chomp ( $otherPID );
+
+    open ( PS, "ps -e |" );
+    $found = 0;
+    while ( <PS> ) {
+      /^\s*(\d*)/;
+      $found = 1 if ( $1 == $otherPID );
+    }
+
+	# if PID isn't found, it's a vagrant process so try to unlink
+	# file.
+    if ( ! $found ) {
+      unlink $lockFile || &main::Error ( "Couldn't unlink lock file" );
+    }
+  }
+  open ( LOCK, ">$lockFile" ) || &main::Error ( "Couldn't create lock file");
+  print LOCK "$$";
+  close ( LOCK );
+
+    
+}
+
+##########################################################################
+# UnlockFile
+#
+# Unlock the named file, by removing the lock file.
+# It makes sure that we own the lock file just in case.  
+##########################################################################
+sub UnlockFile {
+  ( $fileName ) = @_;
+  $lockFile = substr ( $fileName, 1 );
+  $lockFile =~ s/\//./g;
+  $lockFile = "/tmp/$lockFile.lock";
+
+  if ( -e $lockFile ) {
+    $otherPID = `cat $lockFile`;
+    chomp ( $otherPID );
+
+    if ( $otherPID == $$ ) {
+      unlink ( $lockFile ) || &main::Error ( "Couldn't remove our lock file");
+    }
+  }
+}
+
+
+########################################################################
+# GetNewSerialNumber
+#
+# This function grabs the serial number from the given file.  It uses
+# matchString to figure out which number to get/increment.  It uses
+# LockFile and UnlockFile to try to make sure that we don't clobber each
+# other's files.
+#
+# Version $0.02, it uses a dbm file to store the data.  Instead of a flat
+# file.
+########################################################################
+sub GetNewSerialNumber {
+  my ( $tableInfo, $pData, $counterFile, $matchString ) = @_;
+
+  $field = $pData->{'fieldName'};
+  $table = $tableInfo->{'TableName'};
+
+  $dbh = &MsqlCGI::SetupMsqlConnection ( $tableInfo );
+
+  &LockFile ( $counterFile );
+
+  dbmopen ( %element, "$counterFile", 0644 );
+
+  $nSerial = $element{$matchString};
+  do {
+    $nSerial++;
+    &main::DPrint ( "Trying New serial Number $nSerial" );
+    $query = <<"    EOF";
+	SELECT $field
+	FROM   $table
+	WHERE  $field = $nSerial
+    EOF
+    &main::DPrint ( "Query is: <pre>$query</pre>" );
+    $sth = $dbh->Query ( $query ) || 
+    	&main::Error ( "Failed Query in GetNewSerialNumber: MsqlError is: 
+			$Msql::db_errstr" );
+    $nRows = $sth->numrows;
+  } while ( $nRows );
+
+  $element{$matchString} = $nSerial;
+
+  dbmclose ( %element);
+
+  &main::DPrint ( "New Serial Number is: $nSerial" );
+
+  &UnlockFile ( $counterFile );
+
+  return $nSerial;
+}
+
+1;
+
+

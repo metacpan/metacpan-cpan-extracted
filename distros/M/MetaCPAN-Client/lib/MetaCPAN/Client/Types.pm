@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Types;
 # ABSTRACT: type checking helper class
-$MetaCPAN::Client::Types::VERSION = '2.012000';
+$MetaCPAN::Client::Types::VERSION = '2.014000';
 use Type::Tiny      ();
 use Types::Standard ();
 use Ref::Util qw< is_ref >;
@@ -37,7 +37,7 @@ MetaCPAN::Client::Types - type checking helper class
 
 =head1 VERSION
 
-version 2.012000
+version 2.014000
 
 =head1 METHODS
 

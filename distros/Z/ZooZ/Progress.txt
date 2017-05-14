@@ -1,0 +1,145 @@
+TODO:
+-----
+- Proper License.
+- Perhaps even a sample walk-through.
+
+IDEAS:
+------
+- Animate opening/closing of hierarchy views to give user an indication
+  of the change. My implementation sucked!
+
+NICE-TO-HAVES:
+--------------
+- Make sure all the supported widgets have options in ZooZ::Options.pm.
+- Undo/Redo.
+- Callbacks need to have arguments.
+- Bindings tab in the Widget Properties Dialog and a way to define bindings.
+- Most widely used options of selected object in ToolBar.
+- Menu-builder.
+- ZooZ application icon.
+- Support for more widgets and user-defined non-standard widgets.
+  Users should be able to "register" their own widgets.
+- Support for special widgets like Notebooks.
+- Move Settings Tab to a separate Toplevel accessible via menu.
+- Settings:
+  * Default borderwidth, col/row weights.
+  * Colors?
+  * AutoSave Interval?
+  * Confirm widget deletion.
+  * Auto-hints via the info drop-down window??
+- Installation procedure.
+- Specifying homedir.
+- Ability to insert rows/cols. This will rather be the ability to shift
+  everything by one row/col instead of adding new rows/cols.
+- Before closing, check for unsaved projects (make it smart).
+- Nicer fonts.
+- Easier way to debug problems.
+- Document each file properly.
+- Ability to set MW attributes like title/bg/fg/etc ..
+- Ability to change option database directly (via optionAdd).
+- Add support for Pane.
+- Enhance IDE to include debugger. Or at least a syntax verifier.
+- Have Callbacks, Fonts and variables be project specific.
+- make Project::loadWidget call Project::dropWidget instead of code dup.
+- Drag & Drop in tree, or some other sort of copy/paste.
+- XMLify projects??
+- Fix dumpPerlPM to reuse code from dumpPerl instead of code dup.
+- Better icons for configuring the row/cols.
+
+DONE:
+-----
+- Help. Just a README.
+- Warnings pop up a dialog that can be turned off ..
+- Project.pm re-write from scratch!
+- Integrated Tk::CodeText into callback editing code. It will revert
+  to Tk::Text if CodeText is not installed.
+- Better indication of what level is currently being edited.
+- Proper support for all widget configuration options like -command, -textvariable, etc ..
+- Button to apply placement options for other widgets in same row/col.
+- Scrollbars nicely handled.
+- Adjusters not supported.
+- Remove main NoteBook. Make each project have a separate notebook and each
+  page will display each hierarchy.
+- Forms.pm/Callbacks.pm/Options.pm/etc are UGLY!!!! Re-write.
+- Vars need to have initial values.
+- Change current ToolBar into menu.
+- New Projects get added to a drop-down list or menu list.
+  Selecting a project displays it.
+- Way to access vars/callbacks/fonts/etc .. independently.
+- Make all widgets accessible via a global hash
+  for users to use in callbacks. (%ZWIDGETS)
+- Way to include images.
+- Saving/Loading projects.
+- Closing projects.
+- Dump ALL callbacks, ALL vars.
+- More standard widget icons.
+- Direct warnings to log file.
+- Splash screen.
+- When dumping code and projects, only dump attributes that changed.
+- Dumping valid Perl code.
+- Double clicking a container opens up the configuration window AND
+  opens up the hierarchy view of the container.
+- Dump images properly. Dump image definitions.
+- All data shared within a project should go into one {SHARED} hash.
+- Change all DIE()s to Dialogs.
+- Renaming projects and widgets.
+- Dump .pm in addition to .pl. Package GUI into a mega widget.
+- Attempting to drop a widget on a container opens up the hierarchy view
+  of the container.
+- Borderwidths in preview are set to 1. In the dumped code, it is 2. FIX.
+
+Requirements:
+-------------
+- Tk 804.
+- Tk::ToolBar
+
+Optional:
+---------
+- Tk::CodeText - requires Syntax::Highlight::Perl.
+
+Limitations:
+------------
+- No support for Adjuster.
+- All subroutines and variables are in package main.
+- Only var types supported are scalar/array/hash.
+- Images supported are GIF, BMP, PPM and PGM.
+
+RC1-TODO:
+---------
+
+RC1-DONE:
+---------
+- Make Tk::CodeText really optional.
+- Fixed bug where two canvases can be visible at the same time.
+
+
+RC2-TODO:
+---------
+- Drag/Drop. Relegated to "nice to have".
+
+RC2-DONE:
+---------
+- Close a project and try to open one, and you get errors.
+- The save/dump have to be changed.
+  If the project wasn't saved before, call saveAs
+    else just save without prompting for file name.
+  If the project hasn't been dumped before, call dumpAs
+    else just dump without prompting for file name.
+- Labels that have single quotes will create problems in dumped Perl
+  because they are quoted using single quotes. Use q{} instead.
+  Ended up escaping any quotes in the string instead.
+- Labels with -text '0' aren't properly loaded from project file.
+- Menu shortcuts ..
+- Allow unbinding of variables/callbacks to options.
+- Make fonts persistent like images and variables.
+  This works now, but need to dump out the fonts in Perl code too.
+- Resize Tree.
+- -textvariable for optionmenu is weird.
+- Change font dialog and display in Properties window.
+- Project name is changeable via new browseEntry widget.
+- Allow persistent change of Project/widget names.
+
+WILL-NOT-DO:
+------------
+- Allow deletion of variables and callbacks. The reason is that I have to
+  make sure that what is deleted is not bound to anything. Major PITA.

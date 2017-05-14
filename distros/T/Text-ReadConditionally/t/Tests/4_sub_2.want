@@ -1,0 +1,5 @@
+Line 1
+After sub definition
+After call in .if 0
+Line in sub1
+After sub1 called

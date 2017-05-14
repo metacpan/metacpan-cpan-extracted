@@ -66,7 +66,8 @@ sub notify {
         }
     }
 
-    my $body = $self->templatize('gmail_notify.tt', { feed => $feed });
+    my $encoding = $self->conf->{encoding} || 'utf-8';
+    my $body = $self->templatize('gmail_notify.tt', { feed => $feed, encoding => $encoding });
 
     my $cfg = $self->conf;
     $context->log(info => "Sending $subject to $cfg->{mailto}");
@@ -86,8 +87,8 @@ sub notify {
     $msg->replace("X-Mailer" => "Plagger/$Plagger::VERSION");
 
     $msg->attach(
-        Type => 'text/html; charset=utf-8',
-        Data => encode("utf-8", $body),
+        Type => "text/html; charset=$encoding",
+        Data => encode($encoding, $body, Encode::FB_HTMLCREF),
         Encoding => 'quoted-printable',
     );
 
@@ -105,6 +106,7 @@ sub notify {
                 User     => $route->{username},
                 Password => $route->{password},
                 Port     => $route->{port} || 587,
+                Timeout  => $route->{timeout} || 300,
             ];
             $msg->send_by_smtp_tls(@{ $self->{tls_args} });
         } elsif ($route->{via} eq 'sendmail') {
@@ -154,6 +156,11 @@ sub prepare_enclosures {
         my $msg = shift;
 
         for my $enclosure (grep $_->local_path, $entry->enclosures) {
+            if (!-e $enclosure->local_path) {
+                Plagger->context->log(warning => $enclosure->local_path . " doesn't exist. Skip");
+                next;
+            }
+
             my %param = (
                 Type => $enclosure->type,
                 Path => $enclosure->local_path,
@@ -270,7 +277,7 @@ This plugin creates HTML emails and sends them to your Gmail mailbox.
 
 =item mailto
 
-Your email address to send updatess to. Required.
+Your email address to send updates to. Required.
 
 =item mailfrom
 

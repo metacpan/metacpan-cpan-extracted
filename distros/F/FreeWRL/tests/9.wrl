@@ -1,0 +1,38 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+Shape {geometry Box { }
+appearance Appearance { material Material { diffuseColor 0.8 0 0.8} } }
+
+Transform {
+translation 2 0 0 
+children [
+	Shape {geometry Sphere { }
+	appearance Appearance { material Material { diffuseColor 0.8 0 0} } }
+]
+}
+
+DEF TS TimeSensor { loop TRUE cycleInterval 6 }
+
+DEF POS PositionInterpolator {key [0 0.3 0.6 1] keyValue [
+	0 0 0 0 0 10 0 5 5 0 0 0]}
+
+DEF TR Transform {
+translation 0 0 00
+children [
+DEF TR Transform {
+	children [
+		Viewpoint {
+			fieldOfView 1.0
+		}
+	]
+}
+]
+}
+
+ROUTE TS.fraction_changed TO POS.set_fraction
+ROUTE POS.value_changed TO TR.translation

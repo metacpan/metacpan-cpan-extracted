@@ -5,7 +5,7 @@ use JSON::Parse;
 use XML::Feed;
 use File::HomeDir;
 
-our $VERSION = '0.70'; # This is the overall version for the entire
+our $VERSION = '0.73'; # This is the overall version for the entire
 # package, so should probably be updated even when the other modules are
 # touched.
 
@@ -33,7 +33,7 @@ sub new {
     if ( $api eq 'download' ) {
         $api_url = 'http://sourceforge.net/projects';
     } else {
-        $api_url = 'http://sourceforge.net/api';
+        $api_url = 'http://sourceforge.net/rest';
     }
 
     my $self = bless(
@@ -127,6 +127,7 @@ sub call {
     }
 
     if ( $format eq 'rss' ) {
+
         $r = { entries => [] };
 
         my $feed;
@@ -146,13 +147,16 @@ sub call {
             }
         }
     } else {
+
         my $json = get($url);
+
         eval { $r = JSON::Parse::json_to_perl($json); };
         if ( $@ ) {
             warn $@;
             return { entries => [] };
         }
     }
+
     return $r;
 }
 

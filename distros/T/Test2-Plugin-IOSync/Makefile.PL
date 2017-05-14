@@ -22,7 +22,10 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302084",
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.000005",
+  "TEST_REQUIRES" => {
+    "Test2::Bundle::Extended" => "0.000070"
+  },
+  "VERSION" => "0.000007",
   "test" => {
     "TESTS" => "t/*.t t/IOEvents/*.t t/IOMuxer/*.t"
   }
@@ -33,6 +36,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "PerlIO" => 0,
   "Test2::API" => "1.302084",
+  "Test2::Bundle::Extended" => "0.000070",
   "Time::HiRes" => 0
 );
 

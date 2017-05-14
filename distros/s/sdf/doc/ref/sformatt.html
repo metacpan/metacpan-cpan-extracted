@@ -1,0 +1,322 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: FormatTime</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_sub.html">Parent Topic</A> | <A HREF="sfindfil.html">Previous Topic</A> | <A HREF="sprepend.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>12.4. FormatTime</H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P>This routine is used to format a date-time quantity into a human readable form.</P>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<PRE>
+  $result = &amp;FormatTime($fmt, $var);
+</PRE>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The first parameter is either a format string or the name of a variable containing a format string. The second parameter is the name of the variable to be formatted. The variable's value is a number of seconds since January 1, 1970.</P>
+<P>The building blocks used in the format strings are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+<TD>
+<STRONG>Example</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$day
+</TD>
+<TD>
+day number in month
+</TD>
+<TD>
+6 or 22
+</TD>
+</TR>
+<TR>
+<TD>
+$day0
+</TD>
+<TD>
+day number in month zero-padded
+</TD>
+<TD>
+06 or 22
+</TD>
+</TR>
+<TR>
+<TD>
+$month
+</TD>
+<TD>
+month name
+</TD>
+<TD>
+January
+</TD>
+</TR>
+<TR>
+<TD>
+$smonth
+</TD>
+<TD>
+abbreviated month name
+</TD>
+<TD>
+Jan
+</TD>
+</TR>
+<TR>
+<TD>
+$monthnum
+</TD>
+<TD>
+month number (1..12)
+</TD>
+<TD>
+6 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$monthnum0
+</TD>
+<TD>
+month number zero-padded (01..12)
+</TD>
+<TD>
+06 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$year
+</TD>
+<TD>
+year
+</TD>
+<TD>
+1995
+</TD>
+</TR>
+<TR>
+<TD>
+$syear
+</TD>
+<TD>
+abbreviated year
+</TD>
+<TD>
+95
+</TD>
+</TR>
+<TR>
+<TD>
+$weekday
+</TD>
+<TD>
+weekday name
+</TD>
+<TD>
+Monday
+</TD>
+</TR>
+<TR>
+<TD>
+$sweekday
+</TD>
+<TD>
+abbreviated weekday name
+</TD>
+<TD>
+Mon
+</TD>
+</TR>
+<TR>
+<TD>
+$hour
+</TD>
+<TD>
+hour (1..24)
+</TD>
+<TD>
+6 or 14
+</TD>
+</TR>
+<TR>
+<TD>
+$hour0
+</TD>
+<TD>
+hour zero-padded (01..24)
+</TD>
+<TD>
+06 or 14
+</TD>
+</TR>
+<TR>
+<TD>
+$shour
+</TD>
+<TD>
+hour (1..12)
+</TD>
+<TD>
+6 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$shour0
+</TD>
+<TD>
+hour zero-padded (01..12)
+</TD>
+<TD>
+06 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$ampm
+</TD>
+<TD>
+am or pm
+</TD>
+<TD>
+am
+</TD>
+</TR>
+<TR>
+<TD>
+$AMPM
+</TD>
+<TD>
+AM or PM
+</TD>
+<TD>
+PM
+</TD>
+</TR>
+<TR>
+<TD>
+$minute
+</TD>
+<TD>
+minute (0..59)
+</TD>
+<TD>
+0 or 42
+</TD>
+</TR>
+<TR>
+<TD>
+$minute0
+</TD>
+<TD>
+minute zero-padded (00..59)
+</TD>
+<TD>
+00 or 42
+</TD>
+</TR>
+<TR>
+<TD>
+$second
+</TD>
+<TD>
+second (0..59)
+</TD>
+<TD>
+0 or 42
+</TD>
+</TR>
+<TR>
+<TD>
+$second0
+</TD>
+<TD>
+second zero-padded (00..59)
+</TD>
+<TD>
+00 or 42
+</TD>
+</TR>
+</TABLE>
+
+<P>Commonly used formats are defined in the variables given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+FMT_FULL
+</TD>
+<TD>
+$day $month $year, $hour:$minute0.$second0
+</TD>
+</TR>
+<TR>
+<TD>
+FMT_TIME
+</TD>
+<TD>
+$hour:$minute0.$second0
+</TD>
+</TR>
+<TR>
+<TD>
+FMT_DATE
+</TD>
+<TD>
+$day $month $year
+</TD>
+</TR>
+<TR>
+<TD>
+FMT_CONCISE
+</TD>
+<TD>
+$day0-$smonth-$syear
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>To format the 'last modified' date-time for a document:</P>
+<PRE>
+   &amp;FormatTime('FMT_FULL', 'DOC_MODIFIED')
+</PRE>
+<P>To format the year when conversion started (for copyright reasons, say):</P>
+<PRE>
+   &amp;FormatTime('$year', 'DOC_START')
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_sub.html">Parent Topic</A> | <A HREF="sfindfil.html">Previous Topic</A> | <A HREF="sprepend.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

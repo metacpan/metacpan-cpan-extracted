@@ -5,6 +5,6 @@
 		"input.scss"
 	],
 	"sourcesContent": [],
-	"mappings": "AAAA,UAAU,CACN,UAAU,CAAC;EACP,OAAO,EAAE,IAAK,GACjB",
+	"mappings": "AACI,UAAU,CAAC,UAAU,CAAV;EACP,OAAO,EAAE,IAAK,GADN",
 	"names": []
 }

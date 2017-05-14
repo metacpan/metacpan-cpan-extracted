@@ -43,7 +43,7 @@ my $obj = new_ok Something(), [[1]];
 is($output, <<"EXPECTED");
 package @{[ Something() ]};
 use Moo;
-has foo => ('is' => 'ro','isa' => sub { "DUMMY" });
+has foo => ('is' => 'ro','isa' => 'ScalarLike');
 sub announce_foo { ... }
 sub FIELDS { ... }
 sub TYPE { ... }
@@ -74,7 +74,7 @@ $obj = new_ok SomethingElse(), [[1]];
 like($output, qr{package Something::Else});
 like($output, qr{with qw.Local::Role.});
 like($output, qr{print \$self->foo});
-like($output, qr{looks_like_number});
+#like($output, qr{looks_like_number});
 
 {
 	local $ENV{PERL_MOOX_STRUCT_TRACE} = 1;

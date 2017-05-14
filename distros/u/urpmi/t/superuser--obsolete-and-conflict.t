@@ -29,10 +29,12 @@ sub test1 {
     urpmi('a');
     check_installed_names('a');
 
-    test_urpmi("b c", sprintf(<<'EOF', urpm::cfg::get_arch()));
+    my $arch = urpm::cfg::get_arch();
+    test_urpmi("b c", sprintf(<<'EOF', $arch, $arch));
       1/2: c
       2/2: b
 removing package a-1-1.%s
+      1/1: removing a-1-1.%s
 EOF
     check_installed_and_remove('b', 'c');
 }

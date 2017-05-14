@@ -1,0 +1,121 @@
+%%START_PERL%%
+
+use Carp;
+use strict;
+%%GENEX_EXTRALIBS%%
+use CGI qw(:standard :html3);
+use CGI::Carp qw(fatalsToBrowser);
+
+use Bio::Genex;
+use Bio::Genex::DBUtils qw(assert_table_defined);
+
+# set up the global connection variables for Bio::Genex::connect()
+my $www_server = '%%WWWHOST%%';
+my $cgi_bin = '%%GENEX_URL_EXAMPLE%%';
+
+# get the connection
+my $dbh = Bio::Genex::current_connection();
+
+assert_table_defined($dbh,'Species');
+
+use Bio::Genex::Species;
+my @species = Bio::Genex::Species->get_all_objects();
+my @species = map {[$_->spc_pk(),$_->primary_scientific_name()]} @species;
+
+my (%labels,@values);
+
+print header,
+  start_html(-title => 'GeneX Curation Tool Login'),
+  h1({-align=>'CENTER'},'GeneX Curation Tool Login');
+
+print start_multipart_form(-action=>"$cgi_bin/control-bundle.pl", 
+			   -method=>'POST');
+
+if (param) {
+  print hidden(-name=>'DEBUG',-value=>1) if param('DEBUG');
+}
+
+print b("Login Name: "), 
+  textfield(-name=>'login',
+	    -value=>'',
+	    -size=>24,
+	    -maxlength=>24),
+  p();
+
+print b("Password: "),
+  password_field(-name=>'password',
+		 -value=>'',
+		 -size=>12,
+		 -maxlength=>12),
+  p();
+
+print hr({-noshade=>1, 
+	     -size=>5});
+
+print p('Choose the species you want to retrieve'), br();
+
+
+foreach (@species) {
+  $labels{"$_->[0]"} = $_->[1];
+}
+
+@values = sort keys %labels;
+print scrolling_list(-name =>'species',
+		     -multiple=>1, 
+		     -size=>7,
+		     -labels=>\%labels,
+		     -value=>\@values,
+		    );
+
+print hr({-noshade=>1, 
+	     -size=>5});
+
+print p(b("When you are donepress the button below to login."));
+
+print table({-cols=>3,
+		 -align=>'CENTER',
+		},
+		Tr([td([submit(-name=>"LOGIN",
+			       -value=>'Login to GeneX')]),
+		   ])
+	       );
+
+print end_form;
+print end_html;
+
+__END__
+
+=head1 NAME
+
+B<curation-tool-login.pl>: a CGI script for downloading a Gene Expression
+Markup Language (GeneXML) control bundle file to the curation tool.
+
+=head1 SYNOPSIS
+
+  curation-tool-login.pl
+
+=head1 DESCRIPTION
+
+This CGI script takes no CGI parameters. It provides a login field and
+a password and a multi-select list for choosing species for
+download. It calls control-bundle.pl when the button is clicked.
+
+=head1 BUGS
+
+It will not provide a graceful error if the user and password field do
+not match.
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Jun 19 00:43:39 MDT 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

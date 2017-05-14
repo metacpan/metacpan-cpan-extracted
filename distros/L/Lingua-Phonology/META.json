@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "B::Deparse" : "0.63",
-            "Parse::RecDescent" : "1",
+            "Parse::RecDescent" : "< 1.967",
             "XML::Simple" : "2.08"
          }
       }

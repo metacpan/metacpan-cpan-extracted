@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::PluginBundle::MANWAR
 
+0.08  Fri May 12 19:10:00 2017
+      - Updated pod and removed duplicate entries.
+
 0.07  Tue Dec 27 20:50:00 2016
       - Bumped version as pause indexer failed.
 

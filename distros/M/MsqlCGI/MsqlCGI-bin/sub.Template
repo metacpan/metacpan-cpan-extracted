@@ -1,0 +1,364 @@
+###########################################################################
+# Template.
+#
+# This file contains functions which process templates.  See the web page:
+#  	http://petrified.cic.net/MsqlCGI/Templates.html
+# for more information about templates in general.
+#
+# Author: Alex Tang <altitude@cic.net>
+# Copyright 1996, CICNet, Inc and Alex Tang.  All Rights Reserved.
+############################################################################
+
+package Template;
+
+
+#############################################################################
+# DoTemplate
+#
+# This function reads in a template file, and prints it out to the screen.
+# It will perform substitutions on the file as documented in
+# http://petrified.cic.net/MsqlCGI/Templates.html
+#
+# The parameters passed are: 
+#  1- the name of the template file that's to be read and printed
+#  2- a reference to a tableInfo structure
+#  3- a reference to the tData structure.
+#############################################################################
+sub DoTemplate {
+  my ( $templateFile, $type, $sth ) = @_;
+
+  $templateFile = &MsqlCGI::ConvertFileName 
+  	( $templateFile, $main::tableInfo->{'TemplateDir'} );
+   
+  &main::DPrint ( "Template File: $templateFile" );
+
+  local ( *TEMPLATE );
+  open ( TEMPLATE, $templateFile ) ||
+      &main::Error ( "Couldn't open up template file: " .  $templateFile );
+  
+      # setup some variables that we may need
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+  $date = sprintf ( "%02d/%02d/%02d", $mon + 1, $mday, $year + 1900 );
+  $time = sprintf ( "%d:%02d:%02d", $hour, $min, $sec );
+  if ( ( $type eq "PRELIMINARY_RESULTS" ) ||
+       ( $type eq "DISPLAY_RECORD" ) ) {
+    $nRows = $sth->numrows;
+  }
+  &main::DPrint ( "Header is:" .  \*TEMPLATE );
+  while ( <TEMPLATE> ) {
+    next if ( /^\s*<!--\s*##/ );
+    s/(.?)(\$DBHost\b)/$1 eq '\\' ? $2 : $1 . $main::tableInfo->{DBHost} /ge;
+    s/(.?)(\$DBPort\b)/$1 eq '\\' ? $2 : $1 . $main::tableInfo->{DBPort} /ge;
+    s/(.?)(\$DBName\b)/    $1 eq '\\' ? $2 : 
+    	$1 .  $main::tableInfo->{DBName} /ge;
+    s/(.?)(\$TableName\b)/$1 eq '\\' ? $2 : 
+    	$1 . $main::tableInfo->{TableName} /ge;
+    s/(.?)(\$date\b)/$1 eq '\\' ? $2 : $1 . $date /ge;
+    s/(.?)(\$time\b)/$1 eq '\\' ? $2 : $1 . $time /ge;
+
+    s/(.?)(\$HTMLHeader\b)/$1 eq '\\' ? $2 : 
+    	$1 . &GetHTMLHeader()/ge;
+
+    if ( $type ne "HTML_FOOTER" ) {
+      s/(.?)(\$HTMLFooter\b)/$1 eq '\\' ? $2 : 
+	  $1 . &GetHTMLFooter()/ge;
+
+      s/(.?)(\$CGIHeader\b)/$1 eq '\\' ? $2 : 
+	  $1 . &DoCGIHeader ( $type )/ge;
+
+      s/(.?)(\$CGIFooter\b)/$1 eq '\\' ? $2 : 
+	  $1 . &DoCGIFooter ( $type, $sth )/ge;
+
+      s/(.?)(\$StandardAction\b)/$1 eq '\\' ? $2 :
+	  $1 . &DoStandardAction ( $type, $sth )/ge;
+    }
+
+	# The next set of statements checks for tokens that are only good
+	# for CERTAIN HTML pages.
+
+    if ( $type eq "OPERATIONS_MENU" ) {
+	# These tokens are only good with the OperationsMenuTemplate
+      s/(.?)(\$CreateRecordButton\b)/$1 eq '\\' ? $2 :
+	  $1 . &OpsMenu::DoRecordCreateSetup()/ge;
+      s/(.?)(\$SearchRecordButton\b)/$1 eq '\\' ? $2 :
+	  $1 . &OpsMenu::DoRecordSearchSetup()/ge;
+
+	# These tokens are only good with the RecordSearchTemplate
+    } elsif ( $type eq "SEARCH" ) {
+      s/(.?)(\$FieldSearch\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 : 
+	  $1 . &RecordSearchSetup::DoCreateSearchField 
+		  ( $3 )/ge;
+      s/(.?)(\$FieldSearchOptions\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 : 
+	  $1 . &RecordSearchSetup::SearchOption ( $3 )/ge;
+      s/(.?)(\$FieldDescription\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 : 
+	  $1 . &MsqlCGI::GetElementValue ( $3, "description", ) /ge;
+
+
+	# If we're in a PRELIMINARY_RESULTS template, check for the
+	# $Start_Repetitive_Section token and do the repetitive section.
+    } elsif ( $type eq "PRELIMINARY_RESULTS" ) {
+      s/^(.?)(\$Start_Repetitive_Section\b)/$1 eq '\\' ? $2 :
+	  $1 . &PreliminaryResults::RepetitiveSection 
+	        ( \*TEMPLATE )/ge;
+      s/(.?)(\$TotalRecords\b)/$1 eq '\\' ? $2 : $1 . $nRows /ge;
+
+
+
+	# If we're in a Display template, check for the
+	# $Start_Repetitive_Section token and do the repetitive section.
+    } elsif ( $type eq "DISPLAY_RECORD" ) {
+      s/^(.?)(\$Start_Repetitive_Section\b)/$1 eq '\\' ? $2 :
+	  $1 . &RecordDisplay::RepetitiveSection 
+	        ( \*TEMPLATE )/ge;
+      s/(.?)(\$TotalRecords\b)/$1 eq '\\' ? $2 : $1 . $nRows /ge;
+
+
+
+    } elsif ( $type eq "RECORD_CREATE_SETUP" ) {
+      s/(.?)(\$FieldEntry\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 : 
+	  $1 . &MsqlCGI::CreateCGIString 
+	  	( $main::tData->[&MsqlCGI::GetElementStructNumber($3)],
+		  "CREATE" )/ge;
+
+
+    } elsif ( $type eq "RECORD_MODIFY_SETUP" ) {
+      s/(.?)(\$FieldEntry\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 : 
+          $1 . &RecordModifySetup::CreateCGIString ( $sth, $3 )/ge;
+
+    } elsif ( $type eq "RECORD_MODIFY_SUCCESS" ) {
+      s/(.?)(\$ViewRecordButton\b)/$1 eq '\\' ? $2 :
+	  $1 . &RecordModifyProcess::DoCGIFooter ( $sth )/ge;
+      s/(.?)(\$CGIFooter\b)/$1 eq '\\' ? $2 :
+	  $1 . &RecordModifyProcess::DoCGIFooter ( $sth )/ge;
+
+    } elsif ( $type eq "RECORD_CREATE_SUCCESS" ) {
+      s/(.?)(\$ViewRecordButton\b)/$1 eq '\\' ? $2 :
+	  $1 . &RecordCreateProcess::DoCGIFooter ( $sth )/ge;
+      s/(.?)(\$CGIFooter\b)/$1 eq '\\' ? $2 :
+	  $1 . &RecordCreateProcess::DoCGIFooter ( $sth )/ge;
+
+    } elsif ( $type eq "ERROR" ) {
+      s/(.?)(\$ErrorMessage\b)/$1 eq '\\' ? $2 :
+	  $1 . &Error::PrintErrorMessage/ge;
+
+
+    }
+
+	  
+    print;
+  }
+}
+
+############################################################################
+# DoStandardAction
+#
+# This calls the standard action for each page.  This allows the user to
+# change how the top and bottom of the page looks, and let MsqlCGI use
+# it's own internal procedures to layout the data.
+############################################################################
+sub DoStandardAction {
+  my ( $templateType, $sth ) = @_;
+  &main::DPrint  ("In DoStandardAction: $type is: $templateType" );
+  if ( $templateType eq "SEARCH" ) {
+    return &RecordSearchSetup::DoRecordFindSetup();
+
+  } elsif ( $templateType eq "PRELIMINARY_RESULTS" ) {
+    return &PreliminaryResults::DoStandardAction ( $sth );
+
+  } elsif ( $templateType eq "OPERATIONS_MENU" ) {
+    return &OpsMenu::DoStandardAction ( $sth );
+
+  } elsif ( $templateType eq "DISPLAY_RECORD" ) {
+    return &RecordDisplay::DoStandardAction ( $sth );
+
+  } elsif ( $templateType eq "RECORD_CREATE_SUCCESS" ) {
+    return &RecordCreateProcess::DoStandardAction ( $sth );
+
+  } elsif ( $templateType eq "RECORD_MODIFY_SUCCESS" ) {
+    return &RecordModifyProcess::DoStandardAction ( $sth );
+
+  } elsif ( $templateType eq "ERROR" ) {
+    return &MsqlCGI_Error::DoStandardAction ( $sth );
+
+  } elsif ( $templateType eq "RECORD_CREATE_SETUP" ) {
+    return &RecordCreateSetup::DoStandardAction ( $sth );
+
+  } elsif ( $templateType eq "RECORD_MODIFY_SETUP" ) {
+    return &RecordModifySetup::DoStandardAction ( $sth );
+
+  } else {
+    &main::Error ( "In Template::DoStandardAction().  Sorry, I didn't
+                    understand the type: $templateType." );
+
+  }
+}
+
+#############################################################################
+# GetHTMLHeader
+#############################################################################
+sub GetHTMLHeader {
+  return <<"  EOF";
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+    <html>
+    <head>
+      <title>MsqlCGI</title>
+    </head>
+
+    <h2 align=center>MsqlCGI</h2>
+  EOF
+}
+
+#############################################################################
+# GetHTMLFooter
+#############################################################################
+sub GetHTMLFooter {
+  &main::DPrint ( $main::tableInfo->{'HTMLFooterFile'} );
+  if ( $main::tableInfo->{'HTMLFooterFile'} ) {
+    $file = &MsqlCGI::ConvertFileName ( $main::tableInfo->{'HTMLFooterFile'},
+      $main::tableInfo->{'TemplateDir'} );
+    &main::DPrint ( "Footer file is: $file" );
+    if ( -e $file ) {
+      return &DoTemplate ( $file, "HTML_FOOTER", $sth );
+    }
+  } 
+
+  $MsqlCGI_Icon = "$main::docURL/images/MsqlCGI-Icon.gif";
+  $MsqlFuel_Icon = "$main::docURL/images/msql-pwr2.gif";
+  return <<"  EOF";
+  <p>
+
+	<!-- Start of Standard Footer.
+
+	     You can edit this footer as you wish.  The only requirement
+	     is that you have the icons/links for mSQL and MsqlCGI -->
+
+<hr size=5>
+  <a
+  href="$main::msqlCGIProg/?_MsqlCGI_defFile=$main::in{'_MsqlCGI_defFile'}">
+  Go back to the Operations Page.  </a>
+
+
+
+
+<center>
+  <table border>
+    <tr>
+      <td>
+	<table bgcolor="#fff2d9" cellspacing=0 cellpadding=0 
+	       border=0>
+	  <tr>
+	    <td width=50%><font color="#000000" size=-1><center>This database 
+		utility is <br>
+		<a href="http://petrified.cic.net/MsqlCGI/">Using:
+		MsqlCGI.<br>
+		<img border=0 src="$main::msqlCGIIconURL"></center>
+		</font></td>
+	    <td width=50%><font color=#000000" size=-1><center>This database 
+		is<br>
+		<a href="http://Hughes.com.au/">Powered by MiniSQL.<br><img 
+		border=0 src="$main::miniSQLIconURL"></center></font>
+	    </td>
+	  </tr>
+	</table>
+      </td>
+    </tr>
+  </table>
+</center>
+
+<!--
+<hr>
+<center>
+  <table border cellspacing=0>
+    <tr>
+      <td>
+	<table>
+	  <tr>
+	    <td width=50%><font size=-1><center><a 
+		href="http://petrified.cic.net/MsqlCGI/"><img border=0 
+		src="/MsqlCGI/images/MsqlCGI-Icon.gif" 
+		alt="This database utility is brought to you by 
+		MsqlCGI."></center></font></td>
+	    <td width=50%><font size=-1><center><a 
+		href="http://Hughes.com.au/"><img border=0
+		src="images/msql-pwr2.gif" 
+		alt="This database is Powered by 
+		     MiniSQL."></center></font></td>
+	  </tr>
+	</table>
+      </td>
+    </tr>
+  </table>
+</center>
+-->
+
+	  <!-- End Standard Footer -->
+  EOF
+}
+
+
+#############################################################################
+# GetCGIHeader
+#
+# We've setup this function to use the global variable: $main::CONFIG_FILE
+#############################################################################
+sub GetCGIHeader {
+  ( $request ) = @_;
+  return <<"  EOF";        
+        <!--Always must send this hidden info: Action Type and Table
+            Definition file -->
+    <form method="$main::formType" action="$main::msqlCGIProg">
+    <input type=hidden name="_MsqlCGI_actionReq" value="$request">
+    <input type=hidden name="_MsqlCGI_defFile" value="$main::CONFIG_FILE">
+  EOF
+}
+
+
+sub DoCGIHeader {
+  my ( $templateType ) = @_;
+  if ( $templateType eq "SEARCH" ) {
+    return &RecordSearchSetup::DoCGIHeader ();
+  
+  } elsif ( $templateType eq "PRELIMINARY_RESULTS" ) {
+    return &PreliminaryResults::DoCGIHeader();
+
+  } elsif ( $templateType eq "RECORD_CREATE_SETUP" ) {
+    return &GetCGIHeader ( "RecCreateReq" );
+
+  } elsif ( $templateType eq "RECORD_MODIFY_SETUP" ) {
+    return &RecordModifySetup::DoCGIHeader();
+
+  } elsif ( $templateType eq "RECORD_MODIFY_SUCCESS" ) {
+    return &GetCGIHeader ( "RecActions" );
+
+  } else {
+    return "\$CGIHeader";
+  }
+}
+    
+sub DoCGIFooter {
+  my ( $templateType, $sth ) = @_;
+  $strSubmit = "Submit Query";
+  $strReset = "Clear Form";
+  if ( $templateType eq "PRELIMINARY_RESULTS" ) {
+    return &PreliminaryResults::DoCGIFooter ( $sth );
+
+  } elsif ( $templateType eq "DISPLAY_RECORD" ) {
+    return &RecordDisplay::DoCGIFooter ( $sth );
+
+  } elsif ( $templateType eq "SEARCH" ) {
+    $strSubmit = "Search For Records";
+
+  }
+  return <<"  EOF";
+    <center>
+      <input type=submit value="$strSubmit">
+      <input type=reset value="$strReset">
+    </center>
+    </form>
+  EOF
+}
+
+
+
+
+1;

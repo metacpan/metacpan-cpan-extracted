@@ -1,0 +1,90 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: inline Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fhlp_win.html">Previous Topic</A> | <A HREF="flangdef.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.18. inline Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>inline</STRONG>[; parameters]
+  ...
+  !endblock
+</PRE>
+<P>The parameters are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+target
+</TD>
+<TD>
+string
+</TD>
+<TD>
+&lt;\w+&gt;
+</TD>
+</TR>
+<TR>
+<TD>
+expand
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>inline</EM> filter is used to pass a section of text directly to a target documentation system.</P>
+<P>The <EM>target</EM> parameter is used to specify which target system the nominated text is to be passed to. The default target is <EM>html</EM>.</P>
+<P>The <EM>expand</EM> parameter can be used to request expansion of SDF expressions (enclosed in [[ and ]]) within the text.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>To embed <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A> within an SDF document:</P>
+<PRE>
+<B>!block</B> inline
+  add arbitrary HTML here ...
+<B>!endblock</B>
+</PRE>
+<P>SDF expressions can be expand like this:</P>
+<PRE>
+<B>!define</B> VERB <TT>&quot;is&quot;</TT>
+...
+<B>!block</B> inline; expand
+&lt;P&gt;
+This HTML [[VERB]] expanded.
+<B>!endblock</B>
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fhlp_win.html">Previous Topic</A> | <A HREF="flangdef.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

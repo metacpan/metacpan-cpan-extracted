@@ -6,7 +6,7 @@ use Chart::Plotly::Trace::Attribute::Error_y;
 use Chart::Plotly::Trace::Attribute::Line;
 use Chart::Plotly::Trace::Attribute::Marker;
 
-our $VERSION = '0.011';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 sub TO_JSON {
     my $self = shift;
@@ -153,7 +153,7 @@ Chart::Plotly::Trace::Scatter
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

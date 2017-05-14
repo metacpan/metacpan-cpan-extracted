@@ -52,8 +52,8 @@ sub Display {
 	$action =~ s/\-/\_/g; $action =~ s/^Action\_//;
 	$mod =~ s/\::/\//g; $mod .= '.pm';
 	$item =~ s/^[^\:]\:://g; $item = $item . "_Menu";
-	$value = $hurl . '?module=' . URI::Escape::uri_escape($mod)
-	    . '#' . URI::Escape::uri_escape($action || $item); 
+	$value = $hurl . '?module=' . CGI->escape($mod)
+	    . '#' . CGI->escape($action || $item); 
     }
     $form->AddHTML('<tr><td><a href="' . $value . '">' . HTML::Entities::encode_entities($self->{'descr'} || 'Help') . '</a></td></tr>'); 
 }

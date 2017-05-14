@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/prolix
+dist.ini
+lib/App/Prolix.pm
+lib/App/Prolix/MooseHelpers.pm
+t/01-suppress.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+weaver.ini

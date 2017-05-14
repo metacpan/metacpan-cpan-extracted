@@ -1,7 +1,7 @@
 package Myco::Constants::Test;
 
 ###############################################################################
-# $Id: Test.pm,v 1.1.1.1 2004/11/22 19:16:05 owensc Exp $
+# $Id: Test.pm,v 1.4 2006/03/19 19:34:08 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ###############################################################################
@@ -12,25 +12,17 @@ Myco::Constants::Test -
 
 unit tests for features of Myco::Constants
 
-=head1 VERSION
-
-$Revision: 1.1.1.1 $
-
-=cut
-
-our $VERSION = (qw$Revision: 1.1.1.1 $ )[-1];
-
 =head1 DATE
 
-$Date: 2004/11/22 19:16:05 $
+$Date: 2006/03/19 19:34:08 $
 
 =head1 SYNOPSIS
 
  cd $MYCO_DISTRIB/bin
  # run tests.  '-m': test just in-memory behavior
- ./testrun [-m] Myco::Constants::Test
+ ./myco-testrun [-m] Myco::Constants::Test
  # run tests, GUI style
- ./tktestrun Myco::Constants::Test
+ ./tkmyco-testrun Myco::Constants::Test
 
 =head1 DESCRIPTION
 
@@ -51,8 +43,8 @@ use warnings;
 # This class tests features of:
 my $class = 'Myco::Constants';
 
-# It may be helpful to number tests... use testrun's -d flag to view
-#   test-specific debug output (see example tests, testrun)
+# It may be helpful to number tests... use myco-testrun's -d flag to view
+#   test-specific debug output (see example tests, myco-testrun)
 use constant DEBUG => $ENV{MYCO_TEST_DEBUG} || 0;
 
 ##############################################################################
@@ -60,8 +52,8 @@ use constant DEBUG => $ENV{MYCO_TEST_DEBUG} || 0;
 ##############################################################################
 my %test_parameters =
   (
-   skip_persistence => 1,     # skip persistence tests?  (defaults to false)
-   standalone => 1,           # don't compile Myco entity classes
+   skip_persistence => 0,     # skip persistence tests?  (defaults to false)
+   standalone => 0,           # don't compile Myco entity classes
   );
 
 ##############################################################################
@@ -155,7 +147,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -165,7 +157,7 @@ it under the same terms as Perl itself.
 
 L<Myco::Constants|Myco::Constants>,
 L<Myco::Test::EntityTest|Myco::Test::EntityTest>,
-L<testrun|testrun>,
-L<tktestrun|tktestrun>,
+L<myco-testrun|testrun>,
+L<tkmyco-testrun|tktestrun>,
 L<Test::Unit::TestCase|Test::Unit::TestCase>,
-L<mkentity|mkentity>
+L<myco-mkentity|mkentity>

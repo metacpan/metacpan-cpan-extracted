@@ -1,0 +1,24 @@
+#!../../perl
+#
+# this program takes the functions prototypes given as input and
+# outputs a .cli file guessing for the I, O, and IO for each parameter
+# notice that you should change the second line of code to match
+# the format of your prototype.  
+#
+# Fernando Trias, Aug 1993
+
+while(<>) {
+  ($v,$n,$p)=/(\S+)\s+(\S+)\s+A..(.*)...\n/;
+  print "CASE $v $n\n";
+  $p =~ s/\s//g; 
+  @n=split(',',$p);
+  foreach $o (0..@n-1) {
+	 $i="I ";
+	 $i="I " if $n[$o] eq "int";
+	 $i="IO" if $n[$o] eq "char*";
+	 $i="O " if $n[$o] eq "int*";
+  print "$i $n[$o] parm$o\n";
+  }
+  print "END\n\n";
+}
+

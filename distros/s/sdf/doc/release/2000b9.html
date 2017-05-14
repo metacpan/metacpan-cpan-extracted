@@ -1,0 +1,168 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta9</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b9a.html">Previous Topic</A> | <A HREF="2000b8a.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>7. 2.000beta9</H1>
+<P ALIGN="Left"><A HREF="#2.000beta9 - Enhancements">Enhancements</A> | <A HREF="#2.000beta9 - Fixes">Fixes</A> | <A HREF="#2.000beta9 - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000beta9 - Enhancements">7.1. Enhancements</A></H2>
+<H3><A NAME="Overview">7.1.1. Overview</A></H3>
+<P>The <EM>contrib</EM> directory now contains an SDF mode for Emacs and a rudimentary RTF to SDF converter. Like other things in the <EM>contrib</EM> directory, these are unsupported but may be useful.</P>
+<P>The other enhancements are:</P>
+<UL>
+<A HREF="2000b9.html#Improved documentation">Improved documentation</A>
+<BR>
+<A HREF="2000b9.html#Improved text tables">Improved text tables</A>
+<BR>
+<A HREF="2000b9.html#New filters">New filters</A>
+<BR>
+<A HREF="2000b9.html#Citation support">Citation support.</A></UL>
+<P>Further details are provided below.</P>
+<H3><A NAME="Improved documentation">7.1.2. Improved documentation</A></H3>
+<P>The documentation has been improved in a number of ways:</P>
+<OL>
+<LI>The <A HREF="../user/ug_sdf.html">SDF User Guide</A> has been revised and updated.
+<LI>The <A HREF="../guru/gg_sdf.html">SDF Guru Guide</A> now has a chapter on extending SDF.
+<LI>The manuals provided with SDF now have an index.
+<LI>The <EM>SDF 2.000 Migration Guide</EM> is no longer provided in the standard distribution (as it is only useful for SDF 1.x users within <A HREF="http://www.mincom.com">Mincom</A>).</OL>
+<H3><A NAME="Improved text tables">7.1.3. Improved text tables</A></H3>
+<P>Thanks to Tim MacKenzie (<A HREF="mailto:Tim.MacKenzie@fulcum.com.au">Tim.MacKenzie@fulcum.com.au</A>): tables output in txt format have been improved:</P>
+<UL>
+<LI>all cells are now word wrapped (not just the last one in each row)
+<LI>cell alignment is now supported
+<LI>Line paragraph styles within cells are now supported
+<LI>heading underlining has been improved.</UL>
+<H3><A NAME="New filters">7.1.4. New filters</A></H3>
+<P>Thanks to Tim Hudson (<A HREF="mailto:tjh@cryptsoft.com">tjh@cryptsoft.com</A>), a number of new filters are now available:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>built-in:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+nofill
+</TD>
+<TD>
+format a set of lines
+</TD>
+</TR>
+<TR>
+<TD>
+simple
+</TD>
+<TD>
+generic filter for building other filters
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>defines.sdm:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+product_defines
+</TD>
+<TD>
+define products and variables for each
+</TD>
+</TR>
+<TR>
+<TD>
+section_defines
+</TD>
+<TD>
+define section names as variables
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>testcase.sdm:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+testcases
+</TD>
+<TD>
+collect testcases from A3s into a table at the end of document
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Citation support">7.1.5. Citation support</A></H3>
+<P>References can now be easily numbered and the numbers can be inserted in paragraph text. The new features which make this possible are:</P>
+<UL>
+<LI>the references class now supports a <EM>Cite</EM> attribute which produces a string of the form [n]
+<LI>the REF phrase style now supports a <EM>cite</EM> attribute which inserts the reference number using the syntax [n].</UL>
+<P>For example:</P>
+<PRE>
+H1: References
+
+!include &quot;doc.reg&quot;; references; columns='Cite,Document'
+
+H1: Some heading
+
+Refer to {{REF[cite]ABC}} and {{REF[cite]ME2}}.
+</PRE>
+<P>If you want to put the reference table at the back of the document, it is necessary to forward declare which documents will be cited by using the <EM>cited</EM> parameter of the <A HREF="../ref/creferen.html">references</A> filter. The table of cited references can then be built later by using the <A HREF="../ref/mcatalog.html">catalog</A> macro. For example:</P>
+<PRE>
+!include &quot;doc.reg&quot;; references; cited
+
+H1: Some heading
+
+Refer to {{REF[cite]ABC}} and {{REF[cite]ME2}}.
+
+H1: References
+
+!catalog references 'cited'; columns='Cite,Document'
+</PRE>
+<HR>
+<H2><A NAME="2.000beta9 - Fixes">7.2. Fixes</A></H2>
+<P>FrameMaker 4.x compatibility has been improved thanks to a patch from Tim MacKenzie (<A HREF="mailto:Tim.MacKenzie@fulcum.com.au">Tim.MacKenzie@fulcum.com.au</A>).</P>
+<P>The document control section (on the inside of the front cover) of project documents has been improved. (In fact, it is now much easier to customise output of the <A HREF="../ref/mbuild_t.html">build_title</A> macro.)</P>
+<P>The <A HREF="../ref/fabout.html">about</A> filter was fixed to work better with documents formatted using the <EM>infomap</EM> look.</P>
+<P>For Windows 3.x/MS-DOS users:</P>
+<UL>
+<LI>the sdftest.bat file has been fixed
+<LI>the sdfget.bat file has been added.</UL>
+<P>Date formatting for years &gt;= 2000 has been fixed.</P>
+<HR>
+<H2><A NAME="2.000beta9 - Incompatibilities">7.3. Incompatibilities</A></H2>
+<P>None.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b9a.html">Previous Topic</A> | <A HREF="2000b8a.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

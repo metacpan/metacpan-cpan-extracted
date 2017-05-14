@@ -1,0 +1,26 @@
+table.sdf warning, block on 97: unable to find image 'foo.ps'
+LAST 3,2
+CELL[0,0]=Name
+LAST 3,2
+CELL[0,1]=Jump
+LAST 3,2
+CELL[0,2]=Rubbish
+LAST 3,2
+CELL[1,0]=product1
+LAST 3,2
+CELL[1,1]=url1
+LAST 3,2
+CELL[1,2]=x
+LAST 3,2
+CELL[2,0]=product2
+LAST 3,2
+CELL[2,1]=url2
+LAST 3,2
+CELL[2,2]=y
+LAST 3,2
+CELL[3,0]=product3
+LAST 3,2
+CELL[3,1]=url3
+LAST 3,2
+CELL[3,2]=z
+AT END OF TABLE

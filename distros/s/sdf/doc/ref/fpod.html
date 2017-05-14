@@ -1,0 +1,78 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: pod Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fplain.html">Previous Topic</A> | <A HREF="fquote.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.24. pod Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>pod</STRONG>[; parameters]
+  ...
+  !endblock
+</PRE>
+<P>The parameters are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+main
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>pod</EM> filter is used to nest POD text within an SDF document.</P>
+<P>The <EM>main</EM> parameter is used to specify that the first paragraph after &quot;=head1 NAME&quot; is the document name. This parameter is used internally by the <A HREF="../ref/sdf.html">sdf</A> program when it needs to convert a POD document to another format.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>Some examples are:</P>
+<PRE>
+    <I># Insert some pod</I>
+    <B>!block</B> pod
+    A normal POD paragraph.
+
+        And some verbatim text.
+    <B>!endblock</B>
+
+    <I># Get pod from a file</I>
+    <B>!include</B> <TT>&quot;perlre.pod&quot;</TT>; pod
+
+    <I># Get pod from standard output</I>
+    <B>!execute</B> <TT>&quot;getpod 'hello.c'&quot;</TT>; pod
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fplain.html">Previous Topic</A> | <A HREF="fquote.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

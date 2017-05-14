@@ -39,8 +39,8 @@ lib/Config/Model/Tk/icons/viewmag.png
 lib/Config/Model/Tk/icons/wizard.png
 lib/Config/Model/TkUI.pm
 t/author-pod-syntax.t
-t/big_model.pm
 t/config-model-ui.t
 t/config-model-wizard.t
+t/lib/Config/Model/models/Master.pl
 t/pod.t
 weaver.ini

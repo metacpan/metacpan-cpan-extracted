@@ -1,0 +1,42 @@
+---
+abstract: 'Log every role use in every phase executed.'
+author:
+  - 'Stirling Westrup <swestrup@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-ReportPhase
+requires:
+  Data::Dumper: 0
+  Dist::Zilla::Role::AfterBuild: 0
+  Dist::Zilla::Role::AfterMint: 0
+  Dist::Zilla::Role::AfterRelease: 0
+  Dist::Zilla::Role::BeforeArchive: 0
+  Dist::Zilla::Role::BeforeBuild: 0
+  Dist::Zilla::Role::BeforeMint: 0
+  Dist::Zilla::Role::BeforeRelease: 0
+  Dist::Zilla::Role::BuildRunner: 0
+  Dist::Zilla::Role::ConfigDumper: 0
+  Dist::Zilla::Role::FileFinder: 0
+  Dist::Zilla::Role::FileGatherer: 0
+  Dist::Zilla::Role::FileMunger: 0
+  Dist::Zilla::Role::FilePruner: 0
+  Dist::Zilla::Role::InstallTool: 0
+  Dist::Zilla::Role::MetaProvider: 0
+  Dist::Zilla::Role::MintingProfile: 0
+  Dist::Zilla::Role::ModuleMaker: 0
+  Dist::Zilla::Role::PrereqSource: 0
+  Dist::Zilla::Role::Releaser: 0
+  Dist::Zilla::Role::ShareDir: 0
+  Dist::Zilla::Role::TestRunner: 0
+  Dist::Zilla::Role::VersionProvider: 0
+  Moose: 0
+  Moose::Autobox: 0
+  perl: 5.006
+version: 0.03

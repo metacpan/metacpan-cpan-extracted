@@ -1,0 +1,55 @@
+#-------------------------------------------------------
+#
+# $Id: README,v 1.7 1997/05/20 20:09:37 mergl Exp $
+#
+#-------------------------------------------------------
+
+
+DESCRIPTION:
+------------
+
+This is version 0.3 of Apache::Mysql.pm. You should really use Apache::DBI - this is an old module which is no longer supported or required. 
+
+The database access the connection to the database is established. It 
+remains open for the lifetime of the httpd and supersedes the time consuming connect 
+and disconnect with standard CGI for every database access. For further information 
+and limitations read the module documentation. 
+
+This module requires the use of mod_perl for Apache.
+
+INSTALLATION:
+-------------
+
+1.   perl Makefile.PL
+2.   make
+4.   make install
+
+
+
+IF YOU HAVE PROBLEMS:
+---------------------
+
+Please send comments and bug-reports to <njensen@habaneros.com>
+
+Please include the output of perl -v,
+           and the output of perl -V,
+in your bug-report.
+
+
+
+FURTHER INFORMATION:
+--------------------
+
+Apache   by Apache Group    http://www.apache.org/
+
+mod_perl by Doug MacEachern <dougm@osf.org>
+                            http://www.osf.org/~dougm/apache/
+
+MySQL and mysqlperl by Michael (Monty) Widenius <monty@tcx.se>
+			    http://www.tcx.se
+
+
+
+   Neil Jensen <njensen@habaneros.com>                       April 26, 1998
+
+---------------------------------------------------------------------------

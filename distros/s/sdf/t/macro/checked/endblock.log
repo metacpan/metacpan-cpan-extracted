@@ -1,0 +1,2 @@
+endblock.sdf error, macro on 4: endblock macro not expected
+endblock.sdf error, EOF at 20: !endblock missing for !block on line 9

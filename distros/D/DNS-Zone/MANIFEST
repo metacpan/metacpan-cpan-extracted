@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+README
+lib/DNS/Zone.pm
+lib/DNS/Zone/File.pm
+lib/DNS/Zone/File/Default.pm
+lib/DNS/Zone/Label.pm
+lib/DNS/Zone/Record.pm
+t/01_require.t
+t/02_zonefile.t
+t/data/zonemaster.org

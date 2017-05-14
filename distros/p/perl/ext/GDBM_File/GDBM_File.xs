@@ -1,3 +1,5 @@
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -5,12 +7,14 @@
 #include <gdbm.h>
 #include <fcntl.h>
 
+#define fetch_key 0
+#define store_key 1
+#define fetch_value 2
+#define store_value 3
+
 typedef struct {
 	GDBM_FILE 	dbp ;
-	SV *    filter_fetch_key ;
-	SV *    filter_store_key ;
-	SV *    filter_fetch_value ;
-	SV *    filter_store_value ;
+	SV *    filter[4];
 	int     filtering ;
 	} GDBM_File_type;
 
@@ -21,7 +25,13 @@ typedef datum datum_key_copy;
 
 #define GDBM_BLOCKSIZE 0 /* gdbm defaults to stat blocksize */
 
+#if defined(GDBM_VERSION_MAJOR) && defined(GDBM_VERSION_MINOR) \
+    && GDBM_VERSION_MAJOR > 1 || \
+    (GDBM_VERSION_MAJOR == 1 && GDBM_VERSION_MINOR >= 9)
+typedef void (*FATALFUNC)(const char *);
+#else
 typedef void (*FATALFUNC)();
+#endif
 
 #ifndef GDBM_FAST
 static int
@@ -40,6 +50,7 @@ static void
 output_datum(pTHX_ SV *arg, char *str, int size)
 {
 	sv_setpvn(arg, str, size);
+#	undef free
 	free(str);
 }
 
@@ -53,6 +64,11 @@ output_datum(pTHX_ SV *arg, char *str, int size)
 #define gdbm_setopt(db,optflag,optval,optlen) not_here("gdbm_setopt")
 #endif
 
+static void
+croak_string(const char *message) {
+    Perl_croak_nocontext("%s", message);
+}
+
 #include "const-c.inc"
 
 MODULE = GDBM_File	PACKAGE = GDBM_File	PREFIX = gdbm_
@@ -60,20 +76,19 @@ MODULE = GDBM_File	PACKAGE = GDBM_File	PREFIX = gdbm_
 INCLUDE: const-xs.inc
 
 GDBM_File
-gdbm_TIEHASH(dbtype, name, read_write, mode, fatal_func = (FATALFUNC)croak)
+gdbm_TIEHASH(dbtype, name, read_write, mode)
 	char *		dbtype
 	char *		name
 	int		read_write
 	int		mode
-	FATALFUNC	fatal_func
 	CODE:
 	{
 	    GDBM_FILE  	dbp ;
 
 	    RETVAL = NULL ;
-	    if ((dbp =  gdbm_open(name, GDBM_BLOCKSIZE, read_write, mode, fatal_func))) {
-	        RETVAL = (GDBM_File)safemalloc(sizeof(GDBM_File_type)) ;
-    	        Zero(RETVAL, 1, GDBM_File_type) ;
+	    if ((dbp =  gdbm_open(name, GDBM_BLOCKSIZE, read_write, mode,
+	       	     	          (FATALFUNC) croak_string))) {
+	        RETVAL = (GDBM_File)safecalloc(1, sizeof(GDBM_File_type)) ;
 		RETVAL->dbp = dbp ;
 	    }
 	    
@@ -91,8 +106,14 @@ gdbm_close(db)
 void
 gdbm_DESTROY(db)
 	GDBM_File	db
+	PREINIT:
+	int i = store_value;
 	CODE:
 	gdbm_close(db);
+	do {
+	    if (db->filter[i])
+		SvREFCNT_dec(db->filter[i]);
+	} while (i-- > 0);
 	safefree(db);
 
 #define gdbm_FETCH(db,key)			gdbm_fetch(db->dbp,key)
@@ -164,30 +185,10 @@ filter_fetch_key(db, code)
 	GDBM_File	db
 	SV *		code
 	SV *		RETVAL = &PL_sv_undef ;
+	ALIAS:
+	GDBM_File::filter_fetch_key = fetch_key
+	GDBM_File::filter_store_key = store_key
+	GDBM_File::filter_fetch_value = fetch_value
+	GDBM_File::filter_store_value = store_value
 	CODE:
-	    DBM_setFilter(db->filter_fetch_key, code) ;
-
-SV *
-filter_store_key(db, code)
-	GDBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_store_key, code) ;
-
-SV *
-filter_fetch_value(db, code)
-	GDBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_fetch_value, code) ;
-
-SV *
-filter_store_value(db, code)
-	GDBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_store_value, code) ;
-
+	    DBM_setFilter(db->filter[ix], code);

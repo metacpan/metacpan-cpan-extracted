@@ -1,0 +1,58 @@
+
+=head1 NAME
+
+LEGO::NXT::Manual::Plugins - Using and creating plugins for LEGO::NXT.
+
+=head1 OVERVIEW
+
+Plugins are useful for when you are writing a script and you need to add some
+extra functionality to your L<LEGO::NXT> object.
+
+The plugin system for L<LEGO::NXT> is very simplistic and relys completely on
+Perl's OO design.  The syntax of loading a plugin was inspired by L<DBIx::Class>.
+
+To use a plugin all you have to do is pass the plugin's name, minus the LEGO::NXT::
+bit, to the use statment.  So, for example, if you wanted to use the
+LEGO::NXT::Scorpion plugin you would:
+
+  use LEGO::NXT qw( Scorpion );
+
+This then extends the LEGO::NXT class to have all of the methods of the
+LEGO::NXT::Scorpion class.
+
+=head1 CURRENT PLUGINS
+
+None at the moment!
+
+=head1 WRITING PLUGINS
+
+Writing your own plugin is very simple.  Just write a standard perl class, there
+are no requirements.  Likely you will want to "use base(LEGO::NXT);" and/or one of
+the existing plugins.
+
+A good way to get started is to look at the source of an existing plugin.
+
+=head1 SUBCLASSING
+
+Rather than using the plugin system you could instead subclass LEGO::NXT and
+whatever other modules you want.  This gives you the ability to add your own
+custom methods to the LEGO::NXT object that apply only to your particular
+situation.
+
+  package MyNXT;
+  
+  use base qw( LEGO::NXT LEGO::NXT::Scorpion );
+  use LEGO::NXT::Constants;
+  
+  ...
+  1;
+
+Then in your script:
+
+  use MyNXT;
+  my $nxt = MyNXT->new();
+
+=head1 AUTHOR
+
+Aran Deltac <bluefeet@cpan.org>
+

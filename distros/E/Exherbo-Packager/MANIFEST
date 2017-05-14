@@ -1,0 +1,15 @@
+Build.PL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+bin/ex-packer
+dist.ini
+lib/Exherbo/Packager.pm
+t/01-use-ok.t
+t/02-critic.t
+t/03-packager.t
+t/config.yml
+t/input.1

@@ -1,0 +1,61 @@
+﻿=pod
+
+=head1 NAME
+
+Carrot::Productivity::Text::Placeholder::Miniplate::Counter - counts execution of placeholder substitution
+
+=head1 SYNOPSIS
+
+	$class_names->provide(
+		my $template_class = '::Productivity::Text::Placeholder::Template');
+
+	my $template = $template_class->constructor(
+		my $counter = '::Counter');
+	$template->compile('Counter: [=counter=]');
+
+	print ${$template->execute()}, "<-\n";
+	print ${$template->execute()}, "<-\n";
+	$counter->reset;
+	print ${$template->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Carrot::Productivity::Text::Placeholder::Miniplate::Counter provides the placeholder 'counter'. Increments the counter each time 'execute' is called.
+
+
+=head1 METHOD REFERENCE (API)
+
+The design goal was a simple and robust API with a straightforward implementation, respecting all limitations of Perl 5. $obj refers to a Carrot::Productivity::Text::Placeholder instance.
+
+=over 8
+
+=item reset
+
+Resets the counter to one.
+
+=item add_placeholder($template, $code_ref)
+
+Adds the $code_ref under the name of $template. $code_ref is executed and returns the current value to be substituted for $template.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+Carrot::Productivity::Text::Placeholder was part of a bigger software project and has recently been separated. However, the style of the code should be good enough for an initial release.
+
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

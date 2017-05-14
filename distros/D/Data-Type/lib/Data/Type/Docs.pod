@@ -1,0 +1,94 @@
+=head1 NAME
+
+Data::Type::Docs - the manual overview
+
+=head1 MANUALS
+
+=over 3
+
+=item L<Data::Type::Docs::FAQ>
+
+Frequently asked questions.
+
+=item L<Data::Type::Docs::FOP>
+
+Frequently occuring problems.
+
+=item L<Data::Type::Docs::Howto>
+
+Point to point recipes how to get things done.
+
+=item L<Data::Type::Docs::RFC>
+
+Exact API description. Startpoint for datatype developers.
+
+=back
+
+=head1 NAVIGATION
+
+First read the following paragraphs and then you may start study the L<Data::Type> API.
+
+=head1 CONCEPTS & TERMINOLOGY
+
+Because the subject is so stuffed with uncommon or not entry level 'keywords', here a short list of what is what.
+
+=head2 I<facade> or I<wrapper>
+
+Sometimes classes have a weird API (of course, because personal taste). Unfortunately the logic behind is highly usefull (thats what CPAN is strong in) and you want invest time to rework everything. Then you can write a I<cleaner> API for that class that just use the original class in it. Or this may be usefull to easily switch the "worker" class behind your newly one (thats a facade then).
+
+=head2 I<exception>
+
+Not the strongest point of perl5. But there are some modules on CPAN which try to do the best to emulate exception handling. The one with the nicest syntactic sugar is L<Error>. I derived an inheritable version with L<Class::Maker::Exception> which is readily available within L<Data::Type>. 
+
+=head2 I<valuetype>
+
+A candidate value is tested whether it fits within in a certain range of values (the B<value space>). The I<thing/objects/class/package> that represents and implements the logic of the B<value space> is the B<valuetype>.
+
+=head2 I<datatype>
+
+This is something more abstract. Within this documentation i refer to datatypes, but mostly mean valuetypes. From a practical point of view one could propagate that a datatype excels over a valuetype when it has the ability to be C<cast()>ed from one datatype into another. Some say a datatype should relate to physical boundaries of the computer (like bits, bytes, etc.). In fact the old datatypes were more usefull for a compilers optimizer then for the programmer.
+
+[Note] Apocalypse 6 (Larry Wall) and Synopsis 6 (Damian Conway, Allison Randal) issue this intensivly.
+
+=head2 I<facet>
+
+A B<value space> can contain many facets. Facets are the building blocks of any B<value space>. Matching a regex, beeing not C<undef>, the size of a string can be a facet. Sticking to this concept, you have high level of code reuse and it helps to debug problem during testing a value against a B<value space>. Because many B<datatypes> share a common set of characterstics, facets can be reused. The implementation of the C<summary()> function requires facets (L<summary()|Data::Type/"$scalar = summary( $value, @types )">).
+
+=head2 I<anonymous> or I<private facet>
+
+The implemention of C<summary> required use of facets. Even they rediculously easy. For this you should create I<anonymous facets> or I<private facets>. There name should start with '__'. Example:
+
+ {
+   package Data::Type::Object::email;
+
+   {
+     package Data::Type::Facet::__email;
+   
+   }
+
+   sub test : method
+   {
+      Data::Type::ok( 1, Data::Type::Facet::__email() );
+   }
+ }
+
+[Note] I really recommend this.
+
+=head2 I<filter>
+
+This is just a cleanser. It reformats or removes insignficant parts of the initial value. Like stripping whitespaces or modifying cases. There are some fundamental within L<Data::Type::Filer>.
+
+=head2 I<collection>
+
+Within this distribution a collection is just a namespace. They reside undes C<Data::Type::Collection::<name>>. They group certain datatypes into a homogeneous collection with an unified interface and behaviour. It has also a common prefix for the datatype qualification i.e. Datatypes belonging to the C<W3C> collection begin with C<W3C::>. With C<use Data::Type ':all +W3C'> (note: unimplemented yet) you can load additional collections which arent loaded by default (Only the 'Std' collection is loaded by default).
+
+
+=head1 CONTACT
+
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+
+=head1 AUTHOR
+
+Murat Uenalan, <muenalan@cpan.org>
+
+

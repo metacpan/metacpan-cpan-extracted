@@ -17,7 +17,7 @@ SchedulerDriver::SchedulerDriver(const FrameworkInfo& framework,
                                  const Credential& credential,
                                  ProxyScheduler* proxyScheduler)
 : proxyScheduler_(proxyScheduler),
-  driver_(new MesosSchedulerDriver(proxyScheduler_, framework, master, credential))
+  driver_(new MesosSchedulerDriver(proxyScheduler_, framework, master))
 {
 
 }
@@ -59,15 +59,15 @@ Status SchedulerDriver::requestResources(const std::vector<Request>& requests)
 }
 
 Status SchedulerDriver::launchTasks(const std::vector<OfferID>& offerIds,
-                                    const std::vector<TaskInfo>& tasks,
-                                    const Filters& filters)
+                           const std::vector<TaskInfo>& tasks,
+                           const Filters& filters)
 {
     return status_ = driver_->launchTasks(offerIds, tasks, filters);
 }
 
 Status SchedulerDriver::launchTask(const OfferID& offerId,
-                                   const std::vector<TaskInfo>& tasks,
-                                   const Filters& filters)
+                           const std::vector<TaskInfo>& tasks,
+                           const Filters& filters)
 {
     return status_ = driver_->launchTasks(offerId, tasks, filters);
 }
@@ -78,7 +78,7 @@ Status SchedulerDriver::killTask(const TaskID& taskId)
 }
 
 Status SchedulerDriver::declineOffer(const OfferID& offerId,
-                                     const Filters& filters)
+                            const Filters& filters)
 {
     return status_ = driver_->declineOffer(offerId, filters);
 }
@@ -89,8 +89,8 @@ Status SchedulerDriver::reviveOffers()
 }
 
 Status SchedulerDriver::sendFrameworkMessage(const ExecutorID& executorId,
-                                             const SlaveID& slaveId,
-                                             const std::string& data)
+                                    const SlaveID& slaveId,
+                                    const std::string& data)
 {
     return status_ = driver_->sendFrameworkMessage(executorId, slaveId, data);
 }

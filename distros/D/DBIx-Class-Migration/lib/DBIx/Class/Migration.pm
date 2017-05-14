@@ -1,11 +1,12 @@
 package DBIx::Class::Migration;
 
-our $VERSION = "0.044";
+our $VERSION = "0.058";
+$VERSION = eval $VERSION;
 
 use Moose;
-use JSON::XS;
+use JSON::MaybeXS qw(JSON);
 use File::Copy 'cp';
-use File::Spec::Functions 'catdir', 'catfile';
+use File::Spec::Functions 'catdir', 'catfile', 'updir';
 use File::Path 'mkpath', 'remove_tree';
 use DBIx::Class::Migration::Types 'LoadableClass', 'LoadableDBICSchemaClass';
 use Class::Load 'load_class';
@@ -20,11 +21,20 @@ has db_sandbox_class => (
 
 has db_sandbox => (is=>'ro', lazy_build=>1);
 
+has db_sandbox_dir => (is=>'ro', predicate=>'has_db_sandbox_dir', isa=>'Str');
+
 has db_sandbox_builder_class => (
   is => 'ro',
-  default => 'DBIx::Class::Migration::TargetDirSandboxBuilder',
   isa => LoadableClass,
+  lazy_build => 1,
   coerce=>1);
+
+  sub _build_db_sandbox_builder_class {
+    my $self = shift;
+    return $self->has_db_sandbox_dir ? 
+      'DBIx::Class::Migration::SandboxDirSandboxBuilder' : 
+        'DBIx::Class::Migration::TargetDirSandboxBuilder';
+  }
 
 has db_sandbox_builder => (is=>'ro', lazy_build=>1);
 
@@ -234,7 +244,7 @@ sub _sets_data_from_sources {
 }
 
 sub _create_all_fixture_config_from_sources {
-  JSON::XS->new->pretty(1)->encode({
+  JSON->new->pretty(1)->encode({
     "belongs_to" => { "fetch" => 0 },
     "has_many" => { "fetch" => 0 },
     "might_have" => { "fetch" => 0 },
@@ -324,10 +334,11 @@ sub drop_tables {
     foreach my $source ($schema->sources) {
       my $table = $schema->source($source)->name;
       print "Dropping table $table\n";
+      my $tableq = $schema->storage->dbh->quote_identifier($table);
       if(ref($schema->storage) =~m/Pg$/) {
-        $schema->storage->dbh->do("drop table $table CASCADE");
+        $schema->storage->dbh->do("drop table $tableq CASCADE");
       } else {
-        $schema->storage->dbh->do("drop table $table");
+        $schema->storage->dbh->do("drop table $tableq");
       }
     }
   });
@@ -356,8 +367,8 @@ sub _prepare_fixture_data_dir {
   return $fixture_conf_dir;
 }
 
-sub build_dbic_fixtures {
-  my $dbic_fixtures = (my $self = shift)->dbic_fixture_class;
+sub build_dbic_fixtures_init_args {
+  my $self = shift;
   my $version = $self->dbic_dh->version_storage_is_installed ?
     $self->dbic_dh->database_version : do {
       print "Since this database is not versioned, we will assume version ";
@@ -369,12 +380,15 @@ sub build_dbic_fixtures {
 
   print "Reading configurations from $conf_dir\n";
 
-  my $init_args = {
+  return {
     config_dir => $conf_dir,
     debug => ($ENV{DBIC_MIGRATION_DEBUG}||0),
     %{$self->dbic_fixtures_extra_args}};
+}
 
-  $dbic_fixtures->new($init_args);
+sub build_dbic_fixtures {
+  my $dbic_fixtures = (my $self = shift)->dbic_fixture_class;
+  $dbic_fixtures->new($self->build_dbic_fixtures_init_args);
 }
 
 sub _schema_from_database {
@@ -397,7 +411,7 @@ sub dump_named_sets {
     directory_template => sub {
       my ($fixture, $params, $set) = @_;
       $set =~s/\.json//;
-      my $fixture_conf_dir = $fixture->config_dir->parent->subdir($set);
+      my $fixture_conf_dir = catfile($fixture->config_dir,updir,$set);
       mkpath($fixture_conf_dir)
         unless -d $fixture_conf_dir;
       return $fixture_conf_dir;
@@ -416,7 +430,7 @@ sub dump_all_sets {
     directory_template => sub {
       my ($fixture, $params, $set) = @_;
       $set =~s/\.json//;
-      my $fixture_conf_dir = $fixture->config_dir->parent->subdir($set);
+      my $fixture_conf_dir = catfile($fixture->config_dir,updir,$set);
       mkpath($fixture_conf_dir)
         unless -d $fixture_conf_dir;
       return $fixture_conf_dir;
@@ -427,7 +441,7 @@ sub dump_all_sets {
 sub delete_named_sets {
   my ($self, @sets) = @_;
   my $fixtures = $self->build_dbic_fixtures;
-  my @paths = map { $fixtures->config_dir->parent->subdir($_) } @sets;
+  my @paths = map { catfile($fixtures->config_dir,updir,$_) } @sets;
   foreach my $path (@paths) {
     $self->_delete_path($path);
   }
@@ -437,7 +451,7 @@ sub delete_named_sets {
     my ($self, $path) = @_;
     return unless -d $path;
     print "Deleting $path \n";
-    $path->rmtree;
+    remove_tree($path);
   }
 
 
@@ -480,7 +494,7 @@ sub diagram {
   my $dimension = int sqrt($number_tables * 13);
   my $trans = SQL::Translator->new(
     parser => 'SQL::Translator::Parser::DBIx::Class',
-    parser_args => { package => $self->schema },
+    parser_args => { dbic_schema => $self->schema },
     producer => 'GraphViz',
     producer_args => {
       skip_tables => 'dbix_class_deploymenthandler_versions',
@@ -527,7 +541,9 @@ before [qw/install upgrade downgrade/], sub {
   my ($self, @args) = @_;
   %ENV = (
     %ENV,
-    DBIC_MIGRATION_FIXTURES_OBJ => $self->build_dbic_fixtures,
+    DBIC_MIGRATION_FIXTURES_CLASS => $self->dbic_fixture_class,
+    DBIC_MIGRATION_FIXTURES_INIT_ARGS => JSON::MaybeXS->new->encode($self->build_dbic_fixtures_init_args),
+#    DBIC_MIGRATION_FIXTURES_OBJ => $self->build_dbic_fixtures,
     DBIC_MIGRATION_SCHEMA_CLASS => $self->schema_class,
     DBIC_MIGRATION_TARGET_DIR => $self->target_dir,
     DBIC_MIGRATION_FIXTURE_DIR => catdir($self->target_dir, 'fixtures', $self->dbic_dh->schema_version),
@@ -537,6 +553,20 @@ before [qw/install upgrade downgrade/], sub {
       $self->dbic_dh->version_storage_is_installed ? $self->dbic_dh->database_version : 0),
   );
 };
+
+# We need to explicitly disconnect so that we can properly
+# shutdown some databases (like Postgresql) without generating
+# errors in cleanup.  Basically if we don't disconnect we often
+# end up with blocking commands running on the server at the time
+# we are trying to shut it down.
+
+sub DEMOLISH {
+  my $self = shift;
+  return unless $self->has_schema && $self->schema;
+  if(my $storage = $self->schema->storage) {
+    $storage->disconnect;
+  }
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -602,7 +632,7 @@ L<DBIx::Class::DeploymentHandler> and L<DBIx::Class::Fixtures>, along with
 a standard tutorial, to give you a simple and straightforward approach to
 solving the problem of how to best create database versions, migrations and
 testing data.  Additionally it builds on tools like L<Test::mysqld> and
-L<Test::postgresql> along with L<DBD::Sqlite> in order to assist you in quickly
+L<Test::PostgreSQL> along with L<DBD::Sqlite> in order to assist you in quickly
 creating a local development database sandbox.  It offers some integration
 points to testing your database, via tools like L<Test::DBIx::Class> in order to
 make testing your database driven logic less painful.  Lastly, we offer some
@@ -659,7 +689,7 @@ an array which can be sent to L<DBIx::Class::Schema/connect>.
 This defaults to L<DBIx::Class::Migration::SqliteSandbox>.  Currently we have
 support for MySQL and Postgresql via L<DBIx::Class::Migration::MySQLSandbox>
 and L<DBIx::Class::Migration::PgSandbox>, but you will need to side install
-L<Test::mysqld> and L<Test::postgresql> (In other words you'd need to add
+L<Test::mysqld> and L<Test::PostgreSQL> (In other words you'd need to add
 these C<Test::*> namespace modules to your C<Makefile.PL> or C<dist.ini>).
 
 =head2 db_sandbox
@@ -903,6 +933,25 @@ distribution root.  This is generally the community supported place for non
 code data, but if you have huge fixture sets you might wish to place them in
 an alternative location.
 
+=head3 OPTIONAL: Specify a db_sandbox_dir
+
+Be default if you allow for a local database sandbox (as you might during early
+development and you don't want to work to make a database) that sandbox gets
+built in the 'target_dir'.  Since other bits in the target_dir are probably
+going to be in your project repository and the sandbox generally isnt, you 
+might wish to build the sandbox in an alternative location.  This setting
+allows that:
+
+    use DBIx::Class::Migration;
+    my $migration = DBIx::Class::Migration->new(
+      schema_class => 'MyApp::Schema',
+      schema_args => [@connect_info],
+      db_sandbox_dir => '~/opt/database-sandbox',
+    );
+
+This then gives you a nice totally standalone database sandbox which you can
+reuse for other projects, etc.
+
 =head3 OPTIONAL: Specify dbic_dh_args
 
 Optionally, you can specify additional arguments to the constructor for the
@@ -1103,7 +1152,7 @@ sets of data.  Lastly, thanks to the L<DBIx::Class> cabal for all the work done
 in making the L<DBIx::Class> ORM so amazingly powerful.
 
 Additionally thanks to the creators / maintainers for L<Test::mysqld> and
-L<Test::postgresql>, which made it easy to create developer level sandboxes for
+L<Test::PostgreSQL>, which made it easy to create developer level sandboxes for
 these popular open source databases.
 
 As usual, thanks to the L<Moose> cabal for making Perl programming fun and
@@ -1136,11 +1185,11 @@ missed you.
 L<DBIx::Class::DeploymentHandler>, L<DBIx::Class::Fixtures>, L<DBIx::Class>,
 L<DBIx::Class::Schema::Loader>, L<Moose>, L<DBIx::Class::Migration::Script>,
 L<DBIx::Class::Migration::Population>, L<dbic-migration>, L<SQL::Translator>,
-L<Test::mysqld>, L<Test::postgresql>.
+L<Test::mysqld>, L<Test::PostgreSQL>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2013-2015, John Napiorkowski L<email:jjnapiork@cpan.org>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

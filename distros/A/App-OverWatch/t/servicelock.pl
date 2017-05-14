@@ -6,9 +6,6 @@ use utf8;
 use Test::More;
 use Test::Exception;
 
-use App::OverWatch;
-use App::OverWatch::ServiceLock;
-
 binmode Test::More->builder->output, ":encoding(UTF-8)";
 binmode Test::More->builder->failure_output, ":encoding(UTF-8)"; 
 binmode Test::More->builder->todo_output, ":encoding(UTF-8)";

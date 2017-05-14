@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::UserDBWebID;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.3.0';
+our $VERSION = '1.9.1';
 
 ## @apmethod int userDBInit()
 # Check if authentication module is WebID

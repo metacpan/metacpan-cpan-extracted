@@ -1,0 +1,8 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+bin/cpans
+dist.ini
+lib/App/metacpansearch.pm

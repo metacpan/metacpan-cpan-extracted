@@ -22,6 +22,12 @@ OAV*    T_OAV
 OHV*    T_OHV
 OIO*    T_OIO
 
+string           T_STRING
+std::string      T_STRING
+panda::string    T_STRING
+string_view      T_STRING_VIEW
+std::string_view T_STRING_VIEW
+
 ######################################################################
 OUTPUT
 
@@ -165,6 +171,12 @@ T_OEXT_HV : T_OEXT
 
 T_OWRAPPER
     ${ $basetype ||= $type; \""; }
+    
+T_STRING
+    sv_setpvn((SV*)$arg, $var.data(), $var.length());
+
+T_STRING_VIEW
+    sv_setpvn((SV*)$arg, $var.data(), $var.length());
 
 ######################################################################
 INPUT
@@ -304,3 +316,13 @@ T_OWRAPPER
             "$arg = $cast_op(($basetype)$arg_base);"
         );
     }
+
+T_STRING
+  { STRLEN __${var}_len;
+    const char* __${var}_buf = SvPV($arg, __${var}_len);
+    $var.assign(__${var}_buf, __${var}_len); }
+    
+T_STRING_VIEW
+  { STRLEN __${var}_len;
+    const char* __${var}_buf = SvPV($arg, __${var}_len);
+    $var = decltype($var)(__${var}_buf, __${var}_len); }

@@ -3,39 +3,42 @@ abstract: 'Curate a repository of Perl modules'
 author:
   - 'Jeffrey Ryan Thalhammer <jeff@stratopan.com>'
 build_requires:
-  Apache::Htpasswd: '0'
-  Capture::Tiny: '0'
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  File::Temp: '0'
-  FindBin: '0'
-  HTTP::Body: '0'
-  HTTP::Response: '0'
-  HTTP::Server::PSGI: '0'
-  IO::Handle: '0'
-  IPC::Open3: '0'
-  Module::Build: '0.4005'
-  Module::Build::CleanInstall: '0.05'
-  Module::Faker::Dist: '0.014'
-  Plack::Test: '0'
-  Test::Builder::Module: '0'
-  Test::Exception: '0'
-  Test::File: '0'
-  Test::LWP::UserAgent: '0.018'
-  Test::More: '0.96'
-  Test::TCP: '0'
-  lib: '0'
-  perl: '5.008'
+  Apache::Htpasswd: 0
+  Capture::Tiny: 0
+  English: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  FindBin: 0
+  HTTP::Body: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  HTTP::Server::PSGI: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.4005
+  Module::Build::CleanInstall: 0.05
+  Module::Faker::Dist: 0.014
+  Plack::Test: 0
+  Test::Builder::Module: 0
+  Test::Exception: 0
+  Test::File: 0
+  Test::LWP::UserAgent: 0.018
+  Test::More: 0
+  Test::TCP: 0
+  Test::Warn: 0
+  lib: 0
+  perl: 5.008
 configure_requires:
-  Module::Build: '0.4005'
-  Module::Build::CleanInstall: '0.05'
-  perl: '5.006'
+  Module::Build: 0.4005
+  Module::Build::CleanInstall: 0.05
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Pinto
 no_index:
   directory:
@@ -48,526 +51,471 @@ no_index:
 provides:
   App::Pinto:
     file: lib/App/Pinto.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command:
     file: lib/App/Pinto/Command.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::add:
     file: lib/App/Pinto/Command/add.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::clean:
     file: lib/App/Pinto/Command/clean.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::copy:
     file: lib/App/Pinto/Command/copy.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::default:
     file: lib/App/Pinto/Command/default.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::delete:
     file: lib/App/Pinto/Command/delete.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::diff:
     file: lib/App/Pinto/Command/diff.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::help:
     file: lib/App/Pinto/Command/help.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::init:
     file: lib/App/Pinto/Command/init.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::install:
     file: lib/App/Pinto/Command/install.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::kill:
     file: lib/App/Pinto/Command/kill.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::list:
     file: lib/App/Pinto/Command/list.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::lock:
     file: lib/App/Pinto/Command/lock.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::log:
     file: lib/App/Pinto/Command/log.pm
-    version: '0.12'
-  App::Pinto::Command::look:
-    file: lib/App/Pinto/Command/look.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::manual:
     file: lib/App/Pinto/Command/manual.pm
-    version: '0.12'
-  App::Pinto::Command::merge:
-    file: lib/App/Pinto/Command/merge.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::migrate:
     file: lib/App/Pinto/Command/migrate.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::new:
     file: lib/App/Pinto/Command/new.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::nop:
     file: lib/App/Pinto/Command/nop.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::pin:
     file: lib/App/Pinto/Command/pin.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::props:
     file: lib/App/Pinto/Command/props.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::pull:
     file: lib/App/Pinto/Command/pull.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::register:
     file: lib/App/Pinto/Command/register.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::rename:
     file: lib/App/Pinto/Command/rename.pm
-    version: '0.12'
-  App::Pinto::Command::reset:
-    file: lib/App/Pinto/Command/reset.pm
-    version: '0.12'
-  App::Pinto::Command::revert:
-    file: lib/App/Pinto/Command/revert.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::roots:
     file: lib/App/Pinto/Command/roots.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::stacks:
     file: lib/App/Pinto/Command/stacks.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::statistics:
     file: lib/App/Pinto/Command/statistics.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::thanks:
     file: lib/App/Pinto/Command/thanks.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::unlock:
     file: lib/App/Pinto/Command/unlock.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::unpin:
     file: lib/App/Pinto/Command/unpin.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::unregister:
     file: lib/App/Pinto/Command/unregister.pm
-    version: '0.12'
-  App::Pinto::Command::update:
-    file: lib/App/Pinto/Command/update.pm
-    version: '0.12'
+    version: 0.097
   App::Pinto::Command::verify:
     file: lib/App/Pinto/Command/verify.pm
-    version: '0.12'
+    version: 0.097
   Pinto:
     file: lib/Pinto.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action:
     file: lib/Pinto/Action.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Add:
     file: lib/Pinto/Action/Add.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Clean:
     file: lib/Pinto/Action/Clean.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Copy:
     file: lib/Pinto/Action/Copy.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Default:
     file: lib/Pinto/Action/Default.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Delete:
     file: lib/Pinto/Action/Delete.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Diff:
     file: lib/Pinto/Action/Diff.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Install:
     file: lib/Pinto/Action/Install.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Kill:
     file: lib/Pinto/Action/Kill.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::List:
     file: lib/Pinto/Action/List.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Lock:
     file: lib/Pinto/Action/Lock.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Log:
     file: lib/Pinto/Action/Log.pm
-    version: '0.12'
-  Pinto::Action::Look:
-    file: lib/Pinto/Action/Look.pm
-    version: '0.12'
-  Pinto::Action::Merge:
-    file: lib/Pinto/Action/Merge.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::New:
     file: lib/Pinto/Action/New.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Nop:
     file: lib/Pinto/Action/Nop.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Pin:
     file: lib/Pinto/Action/Pin.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Props:
     file: lib/Pinto/Action/Props.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Pull:
     file: lib/Pinto/Action/Pull.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Register:
     file: lib/Pinto/Action/Register.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Rename:
     file: lib/Pinto/Action/Rename.pm
-    version: '0.12'
-  Pinto::Action::Reset:
-    file: lib/Pinto/Action/Reset.pm
-    version: '0.12'
-  Pinto::Action::Revert:
-    file: lib/Pinto/Action/Revert.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Roots:
     file: lib/Pinto/Action/Roots.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Stacks:
     file: lib/Pinto/Action/Stacks.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Statistics:
     file: lib/Pinto/Action/Statistics.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Unlock:
     file: lib/Pinto/Action/Unlock.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Unpin:
     file: lib/Pinto/Action/Unpin.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Unregister:
     file: lib/Pinto/Action/Unregister.pm
-    version: '0.12'
-  Pinto::Action::Update:
-    file: lib/Pinto/Action/Update.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Action::Verify:
     file: lib/Pinto/Action/Verify.pm
-    version: '0.12'
+    version: 0.097
   Pinto::ArchiveUnpacker:
     file: lib/Pinto/ArchiveUnpacker.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Chrome:
     file: lib/Pinto/Chrome.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Chrome::Net:
     file: lib/Pinto/Chrome/Net.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Chrome::Term:
     file: lib/Pinto/Chrome/Term.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Config:
     file: lib/Pinto/Config.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Constants:
     file: lib/Pinto/Constants.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Database:
     file: lib/Pinto/Database.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Difference:
     file: lib/Pinto/Difference.pm
-    version: '0.12'
+    version: 0.097
   Pinto::DifferenceEntry:
-    file: lib/Pinto/DifferenceEntry.pm
-    version: '0.12'
+    file: lib/Pinto/Difference.pm
+    version: 0.097
+  Pinto::DistributionSpec:
+    file: lib/Pinto/DistributionSpec.pm
+    version: 0.097
   Pinto::Exception:
     file: lib/Pinto/Exception.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Globals:
     file: lib/Pinto/Globals.pm
-    version: '0.12'
-  Pinto::IndexReader:
-    file: lib/Pinto/IndexReader.pm
-    version: '0.12'
+    version: 0.097
+  Pinto::IndexCache:
+    file: lib/Pinto/IndexCache.pm
+    version: 0.097
   Pinto::IndexWriter:
     file: lib/Pinto/IndexWriter.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Initializer:
     file: lib/Pinto/Initializer.pm
-    version: '0.12'
-  Pinto::Locator:
-    file: lib/Pinto/Locator.pm
-    version: '0.12'
-  Pinto::Locator::Mirror:
-    file: lib/Pinto/Locator/Mirror.pm
-    version: '0.12'
-  Pinto::Locator::Multiplex:
-    file: lib/Pinto/Locator/Multiplex.pm
-    version: '0.12'
-  Pinto::Locator::Stratopan:
-    file: lib/Pinto/Locator/Stratopan.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Locker:
     file: lib/Pinto/Locker.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Migrator:
     file: lib/Pinto/Migrator.pm
-    version: '0.12'
+    version: 0.097
   Pinto::ModlistWriter:
     file: lib/Pinto/ModlistWriter.pm
-    version: '0.12'
+    version: 0.097
   Pinto::PackageExtractor:
     file: lib/Pinto/PackageExtractor.pm
-    version: '0.12'
+    version: 0.097
+  Pinto::PackageSpec:
+    file: lib/Pinto/PackageSpec.pm
+    version: 0.097
   Pinto::PrerequisiteWalker:
     file: lib/Pinto/PrerequisiteWalker.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Remote:
     file: lib/Pinto/Remote.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Remote::Action:
     file: lib/Pinto/Remote/Action.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Remote::Action::Add:
     file: lib/Pinto/Remote/Action/Add.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Remote::Action::Install:
     file: lib/Pinto/Remote/Action/Install.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Remote::Result:
     file: lib/Pinto/Remote/Result.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Repository:
     file: lib/Pinto/Repository.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Result:
     file: lib/Pinto/Result.pm
-    version: '0.12'
+    version: 0.097
   Pinto::RevisionWalker:
     file: lib/Pinto/RevisionWalker.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Role::Committable:
     file: lib/Pinto/Role/Committable.pm
-    version: '0.12'
+    version: 0.097
+  Pinto::Role::FileFetcher:
+    file: lib/Pinto/Role/FileFetcher.pm
+    version: 0.097
   Pinto::Role::Installer:
     file: lib/Pinto/Role/Installer.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Role::PauseConfig:
     file: lib/Pinto/Role/PauseConfig.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Role::Plated:
     file: lib/Pinto/Role/Plated.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Role::Puller:
     file: lib/Pinto/Role/Puller.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Role::Schema::Result:
     file: lib/Pinto/Role/Schema/Result.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Role::Transactional:
     file: lib/Pinto/Role/Transactional.pm
-    version: '0.12'
-  Pinto::Role::UserAgent:
-    file: lib/Pinto/Role/UserAgent.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema:
     file: lib/Pinto/Schema.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::Result::Ancestry:
     file: lib/Pinto/Schema/Result/Ancestry.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::Result::Distribution:
     file: lib/Pinto/Schema/Result/Distribution.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::Result::Package:
     file: lib/Pinto/Schema/Result/Package.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::Result::Prerequisite:
     file: lib/Pinto/Schema/Result/Prerequisite.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::Result::Registration:
     file: lib/Pinto/Schema/Result/Registration.pm
-    version: '0.12'
+    version: 0.097
+  Pinto::Schema::Result::RegistrationChange:
+    file: lib/Pinto/Schema/Result/RegistrationChange.pm
+    version: 0.097
   Pinto::Schema::Result::Revision:
     file: lib/Pinto/Schema/Result/Revision.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::Result::Stack:
     file: lib/Pinto/Schema/Result/Stack.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::ResultSet::Distribution:
     file: lib/Pinto/Schema/ResultSet/Distribution.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::ResultSet::Package:
     file: lib/Pinto/Schema/ResultSet/Package.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Schema::ResultSet::Registration:
     file: lib/Pinto/Schema/ResultSet/Registration.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Server:
     file: lib/Pinto/Server.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Server::Responder:
     file: lib/Pinto/Server/Responder.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Server::Responder::Action:
     file: lib/Pinto/Server/Responder/Action.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Server::Responder::File:
     file: lib/Pinto/Server/Responder/File.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Server::Router:
     file: lib/Pinto/Server/Router.pm
-    version: '0.12'
-  Pinto::Shell:
-    file: lib/Pinto/Shell.pm
-    version: '0.12'
+    version: 0.097
+  Pinto::SpecFactory:
+    file: lib/Pinto/SpecFactory.pm
+    version: 0.097
   Pinto::Statistics:
     file: lib/Pinto/Statistics.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Store:
     file: lib/Pinto/Store.pm
-    version: '0.12'
-  Pinto::Target:
-    file: lib/Pinto/Target.pm
-    version: '0.12'
-  Pinto::Target::Distribution:
-    file: lib/Pinto/Target/Distribution.pm
-    version: '0.12'
-  Pinto::Target::Package:
-    file: lib/Pinto/Target/Package.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Types:
     file: lib/Pinto/Types.pm
-    version: '0.12'
+    version: 0.097
   Pinto::Util:
     file: lib/Pinto/Util.pm
-    version: '0.12'
+    version: 0.097
 requires:
-  App::Cmd: '0.323'
-  App::Cmd::Command::help: '0'
-  App::Cmd::Setup: '0'
-  Archive::Extract: '0.68'
-  Archive::Tar: '0'
-  Authen::Simple::Passwd: '0'
-  CPAN::Checksums: '0'
-  CPAN::DistnameInfo: '0'
-  CPAN::Meta: '0'
-  CPAN::Meta::Requirements: '0'
-  Carp: '0'
-  Class::Load: '0'
-  Cwd: '0'
-  Cwd::Guard: '0'
-  DBD::SQLite: '1.33'
-  DBIx::Class: '0.08200'
-  DBIx::Class::Core: '0'
-  DBIx::Class::ResultSet: '0'
-  DBIx::Class::Schema: '0'
-  DateTime: '0'
-  DateTime::TimeZone: '0'
-  DateTime::TimeZone::Local::Unix: '0'
-  DateTime::TimeZone::OffsetOnly: '0'
-  Devel::StackTrace: '0'
-  Digest::MD5: '0'
-  Digest::SHA: '0'
-  Dist::Metadata: '0.926'
-  Encode: '0'
-  Exporter: '0'
-  File::Copy: '0'
-  File::Find: '0'
-  File::HomeDir: '0'
-  File::NFSLock: '0'
-  File::Spec: '0'
-  File::Temp: '0'
-  File::Which: '0'
-  Getopt::Long: '0'
-  HTTP::Date: '0'
-  HTTP::Request::Common: '0'
-  HTTP::Status: '0'
-  IO::File: '0'
-  IO::Handle: '0'
-  IO::Interactive: '0'
-  IO::Pipe: '0'
-  IO::Prompt: '0'
-  IO::Select: '0'
-  IO::String: '0'
-  IO::Zlib: '0'
-  JSON: '0'
-  JSON::PP: '2.27103'
-  LWP::UserAgent: '0'
-  List::MoreUtils: '0'
-  List::Util: '0'
-  Module::CoreList: '5.20160720'
-  Module::Metadata: '1.000031'
-  Moose: '0'
-  Moose::Role: '0'
-  MooseX::Aliases: '0'
-  MooseX::ClassAttribute: '0.27'
-  MooseX::Configuration: '0'
-  MooseX::MarkAsMethods: '0'
-  MooseX::NonMoose: '0'
-  MooseX::SetOnce: '0'
-  MooseX::StrictConstructor: '0'
-  MooseX::Types: '0'
-  MooseX::Types::Moose: '0'
-  Path::Class: '0'
-  Path::Class::Dir: '0'
-  Path::Class::File: '0'
-  Plack: '1.0028'
-  Plack::MIME: '0'
-  Plack::Middleware::Auth::Basic: '0'
-  Plack::Request: '0'
-  Plack::Response: '0'
-  Plack::Runner: '0'
-  Pod::Usage: '0'
-  Proc::Fork: '0'
-  Proc::Terminator: '0'
-  Readonly: '0'
-  Router::Simple: '0'
-  Scalar::Util: '0'
-  Starman: '0.3014'
-  String::Format: '0'
-  Term::ANSIColor: '2.02'
-  Term::EditorEdit: '0'
-  Throwable::Error: '0.200005'
-  Try::Tiny: '0'
-  URI: '0'
-  URI::Escape: '3.31'
-  URI::file: '0'
-  UUID::Tiny: '0'
-  Variable::Magic: '0.57'
-  base: '0'
-  overload: '0'
-  perl: '5.008'
-  strict: '0'
-  utf8: '0'
-  version: '0'
-  warnings: '0'
+  App::Cmd::Command::help: 0
+  App::Cmd::Setup: 0
+  Archive::Extract: 0.68
+  Archive::Tar: 0
+  Authen::Simple::Passwd: 0
+  CPAN::Checksums: 0
+  CPAN::DistnameInfo: 0
+  CPAN::Meta: 0
+  Carp: 0
+  Class::Load: 0
+  Cwd: 0
+  Cwd::Guard: 0
+  DBD::SQLite: 1.33
+  DBIx::Class: 0.08200
+  DBIx::Class::Core: 0
+  DBIx::Class::ResultSet: 0
+  DBIx::Class::Schema: 0
+  DateTime: 0
+  DateTime::TimeZone: 0
+  DateTime::TimeZone::Local::Unix: 0
+  DateTime::TimeZone::OffsetOnly: 0
+  Devel::StackTrace: 0
+  Digest::MD5: 0
+  Digest::SHA: 0
+  Dist::Metadata: 0.924
+  Encode: 0
+  Exporter: 0
+  File::Copy: 0
+  File::Find: 0
+  File::HomeDir: 0
+  File::NFSLock: 0
+  File::Spec: 0
+  File::Temp: 0
+  File::Which: 0
+  Getopt::Long: 0
+  HTTP::Date: 0
+  HTTP::Request::Common: 0
+  IO::File: 0
+  IO::Handle: 0
+  IO::Interactive: 0
+  IO::Pipe: 0
+  IO::Prompt: 0
+  IO::Select: 0
+  IO::String: 0
+  IO::Zlib: 0
+  JSON: 0
+  JSON::PP: 2.27103
+  LWP::UserAgent: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Module::CoreList: 3.03
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Aliases: 0
+  MooseX::ClassAttribute: 0.27
+  MooseX::Configuration: 0
+  MooseX::MarkAsMethods: 0
+  MooseX::NonMoose: 0
+  MooseX::SetOnce: 0
+  MooseX::StrictConstructor: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  Package::Locator: 0.010
+  Path::Class: 0
+  Path::Class::Dir: 0
+  Path::Class::File: 0
+  Plack: 1.0028
+  Plack::MIME: 0
+  Plack::Middleware::Auth::Basic: 0
+  Plack::Request: 0
+  Plack::Response: 0
+  Plack::Runner: 0
+  Pod::Usage: 0
+  Proc::Fork: 0
+  Proc::Terminator: 0
+  Readonly: 0
+  Router::Simple: 0
+  Scalar::Util: 0
+  Starman: 0.3014
+  String::Format: 0
+  Term::ANSIColor: 2.02
+  Term::EditorEdit: 0
+  Throwable::Error: 0.200005
+  Try::Tiny: 0
+  URI: 0
+  UUID::Tiny: 0
+  base: 0
+  overload: 0
+  perl: 5.008
+  strict: 0
+  utf8: 0
+  version: 0
+  warnings: 0
 resources:
   bugtracker: https://github.com/thaljef/Pinto/issues
   homepage: https://metacpan.org/module/Pinto
   repository: git://github.com/thaljef/Pinto.git
-version: '0.12'
+version: 0.097
 x_contributors:
   - 'BenRifkah Bergsten-Buret <mail.spammagnet+github@gmail.com>'
   - 'Boris Däppen <bdaeppen.perl@gmail.com>'
-  - 'Chris Kirke <chris.kirke@gmail.com>'
   - 'Cory G Watson <gphat@onemogin.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
-  - 'Florian Ragwitz <rafl@debian.org>'
   - 'Glenn Fowler <cebjyre@cpan.org>'
   - 'Jakob Voss <jakob@nichtich.de>'
-  - 'Jeffrey Ryan Thalhammer <jeff@thaljef.org>'
-  - 'Kahlil (Kal) Hodgson <kahlil.hodgson@dealmax.com.au>'
+  - 'Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Michael G. Schwern <schwern@pobox.com>'
-  - 'Michael Jemmeson <mjemmeson@cpan.org>'
-  - 'Mike Raynham <mike.raynham@spareroom.co.uk>'
-  - 'Nikolay Martynov <mar.kolya@gmail.com>'
   - 'Oleg Gashev <oleg@gashev.net>'
   - 'Steffen Schwigon <ss5@renormalist.net>'
   - 'Tommy Stanton <tommystanton@gmail.com>'
   - 'Wolfgang Kinkeldei <wolfgang@kinkeldei.de>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-  - 'brian d foy <brian.d.foy@gmail.com>'
   - 'hesco <hesco@campaignfoundations.com>'
   - 'popl <popl_likes_to_code@yahoo.com>'

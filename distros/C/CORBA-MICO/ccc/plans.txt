@@ -1,0 +1,5 @@
+ Name service browser/editor.
+ Interactive method invocation for remote objects.
+ IR browser: export to DIA: improved version. 
+ Another OMG services explorers.
+ IR browser: editting capabilities: adding/deleting/modifying of IR entries.

@@ -1,0 +1,5 @@
+NAME
+    Win32-ASP-DB - an object-oriented framework for developing database front-ends using ASP and PerlScript
+
+The Win32-ASP-DB framework makes it much easier to deploy robust, full-featured database front-ends that include widespread business logic.  The framework makes extensive use of Perl's object-oriented support, including the flexibility built into that
+support which allows it to be extended.

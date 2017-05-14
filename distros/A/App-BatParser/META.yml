@@ -1,0 +1,32 @@
+---
+abstract: 'Parse DOS .bat and .cmd files'
+author:
+  - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
+build_requires:
+  English: '0'
+  Module::Build: '0.28'
+  Path::Tiny: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  utf8: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-BatParser
+requires:
+  Moose: '0'
+  Regexp::Grammars: '1.000'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pablrod/App-BatParser/issues
+  homepage: https://github.com/pablrod/App-BatParser
+  repository: https://github.com/pablrod/App-BatParser.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

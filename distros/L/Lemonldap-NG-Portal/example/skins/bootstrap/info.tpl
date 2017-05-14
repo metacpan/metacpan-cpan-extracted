@@ -7,6 +7,7 @@
     <TMPL_IF NAME="CHOICE_VALUE">
       <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
     </TMPL_IF>
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
     <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title"><lang en="Information" fr="Information"/></h3>
@@ -29,7 +30,11 @@
         </button>
       </div>
   </form>
-  <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+  <!-- //if:jsminified
+    <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.min.js"></script>
+  //else -->
+    <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+  <!-- //endif -->
 
 </div>
 

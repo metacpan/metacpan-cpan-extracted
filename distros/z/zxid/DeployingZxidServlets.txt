@@ -1,0 +1,147 @@
+Deploying the ZXID filter and ZXID servlet to provide SSO to your web application
+#################################################################################
+<<author: 20101020, v0.1, Stijn Lievens>>
+
+> N.B. The approach described here is more modern than
+> zxidsrvlet.java + zxidappdemo.java approach documented
+> elsewhere.
+
+We assume that you have a web application running inside a servlet container
+like Tomcat for which you would like to provide SSO capability.
+
+1. Required Files
+
+   The following files are needed:
+
+   ZxidServlet.class:: the actual ZXID servlet which calls out to the native library 
+   ZxidSSOFilter.class:: a simple filter which just checks whether a session has already
+       been established or not. If this is not the case the the user is
+       redirected to the ZxidServlet which will establish the session.
+   libzxidnji.so:: the native library
+   zxidjava.jar:: Java glue (XXX describe here)
+
+2. Directory Layout 
+
+   Below, we show the relevant parts of the web application directory
+   structure. Application specific portions (i.e. your servlets and JSPs
+   are not shown.)
+
+     your-webapp
+       |
+       +-- WEB-INF 
+            |
+            +-- web.xml  -- The deployment descriptor of the application   
+            +-- classes  -- The classes by your web application 
+            |    |
+            |    +-- org
+            |         |
+            |         +-- zxid
+            |              |
+            |              +-- ZxidServlet.class
+            |              `-- ZxidSSOFilter.class
+            |
+            +-- lib      -- The libraries used
+                 |
+                 +-- libzxidjni.so
+                 `-- zxidjava.jar
+
+3. The Deployment Descriptor (aka web.xml)
+
+   In the deployment descriptor (web.xml) you need to do this at the very least:
+
+   a. Configure the SSO servlet.
+
+      This is done as follows:
+
+        <servlet>
+          <servlet-name>sso</servlet-name>
+          <servlet-class>org.zxid.ZxidServlet</servlet-class>
+          <init-param>
+            <param-name>zxid-configuration</param-name>
+            <param-value>zxid-configuration-here</param-value>
+          </init-param>
+        </servlet>
+
+      Of course, you are free to change the servlet's name to whatever you want.
+
+      The zxid configuration should be in query string format, but the & symbols
+      should be encoded as '&amp;' thus e.g.
+
+        <param-value>
+          URL=https://your.host.here:8443/your-webapp/sso&amp;PATH=/var/zxid
+        </param-value>
+
+      The recommended minimum configuration items are
+
+      URL:: Absolutely necessary. This is used to form EntityID and SAML end-points. This
+          has to match your domain name, port number, and local path as configured
+          at the web server level.
+
+      NICE_NAME:: Highly recommended. This human readable string is often shown
+          in the user interface and you +do not+ want the default value.
+
+      ORG_NAME:: Recommended. Affects your certificate and metadata.
+
+      ORG_LOCALITY:: Recommended. Affects your certificate and metadata.
+
+      ORG_STATE:: Recommended. Affects your certificate and metadata.
+
+      ORG_COUNTRY:: Recommended. Affects your certificate and metadata.
+
+      Please note that you can also put the configuration options in configuration
+      file at path /var/zxid/zxid.conf (default path unless you set configuration
+      option PATH). For further information, please consult zxid-conf.pd or zxidconf.h.
+
+   b. Next you have to put in a mapping from a path to the actual servlet
+      so that it gets invoked when this path is requested. This is done
+      as follows:
+
+        <servlet-mapping>
+          <servlet-name>sso</servlet-name>
+          <url-pattern>/sso</url-pattern>
+        </servlet-mapping>
+
+      The servlet name must match the one you used above.
+
+   c. You also need to define the SSO filter. This is done as follows:
+
+        <filter>
+          <filter-name>sso-filter</filter-name>
+          <filter-class>org.zxid.ZxidSSOFilter</filter-class>
+          <init-param>
+            <param-name>sso-location</param-name>
+            <param-value>sso</param-value>
+          </init-param>
+        </filter>
+
+      Note that the default value for sso-location is actually sso so you
+      wouldn't need to specify it here. The name of this parameter must match
+      (bar the leading slash) the url-pattern you specified in the servlet-mapping
+      for the SSO servlet.
+
+   d. Finally, you need to enable the sso-filter (probably as the first filter) 
+      for any part of your web application that shouldn't be accessible without
+      a valid session.
+
+      As an example suppose you want to protect the entire web application,
+      then you would write the following filter-mapping:
+
+        <filter-mapping>
+          <filter-name>sso-filter</filter-name>
+          <url-pattern>/*</url-pattern>
+        </filter-mapping>
+
+4. Limitations
+
+   Note that the SSO filter only checks whether a session has been established.
+   As such the ZXID servlet is only invoked once (upon session creation). As such
+   this setup cannot be used to check whether the user is allowed access to the
+   requested resource. For this, an additional filter would be needed.
+
+5. Warning
+
+   You will need to make sure that automatic session creation is turned off 
+   in the unprotected part of your webapplication as not doing so would result
+   in the filter thinking that a session has indeed been established.
+
+END

@@ -11,7 +11,7 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =cut
 
-our $VERSION = '0.15';    ## VERSION
+our $VERSION = '0.16';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -127,9 +127,9 @@ sub set {
     my $name     = shift;
     my $value    = shift;
     my $rec_date = shift;
-    my $archive  = shift;
+    my $archive  = shift // 1;
+    my $ttl      = shift // $self->ttl;
 
-    $archive //= 1;    #default to true
     die "Recorded date is undefined" unless $rec_date;
     die "Recorded date is not a Date::Utility object" if ref $rec_date ne 'Date::Utility';
     die "Cannot store undefined values in Chronicle!" unless defined $value;
@@ -145,7 +145,7 @@ sub set {
     $writer->publish($key, $value) if $self->publish_on_set;
     $writer->set(
         $key => $value,
-        $self->ttl ? ('EX' => $self->ttl) : ());
+        $ttl ? ('EX' => $ttl) : ());
     $writer->exec;
 
     $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;

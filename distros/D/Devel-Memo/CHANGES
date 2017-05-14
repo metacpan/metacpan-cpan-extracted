@@ -1,0 +1,6 @@
+-*- Outline -*-
+
+* 0.004
+
+Minor unnecessary dependency in test script. Thanks to Larry W. Virden
+<lvirden@cas.org>.

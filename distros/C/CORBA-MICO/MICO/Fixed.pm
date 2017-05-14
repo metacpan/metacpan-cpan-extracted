@@ -1,17 +1,13 @@
 package CORBA::Fixed;
-
-# Perl5.004 and earlier complain about $self->{s}, so we use
-# $self->{'s'} throughout (ugly...)
+use Math::BigInt;
 
 use overload 
-    '+' => \&add,
-    '-' => \&subtract,
-    '*' => \&mul,
-    '/' => \&div,
-    '<=>' => \&compare,
-    '""' => \&stringify;
-
-require Math::BigInt;
+     '+' => \&add,
+     '-' => \&subtract,
+     '*' => \&mul,
+     '/' => \&div,
+     '<=>' => \&compare,
+     '""' => \&stringify;
 
 sub _construct {
     my ($class, $value, $scale) = @_;
@@ -28,7 +24,7 @@ sub from_string {
     my ($leading,$rest) = $str =~ /^(\s*[+-]?\d+)(?:\.(\d+)*)?/;
 
     if (!defined $leading) {
-	return CORBA::Fixed->_construct(0,0);
+	return CORBA::Fixed->_construct(new Math::BigInt("0"),0);
     } else {
 	$rest = defined $rest ? $rest : "";
         $str = $leading.$rest;
@@ -47,7 +43,6 @@ sub from_string {
 
 sub new {
     my ($class, $v, $scale) = @_;
-
     CORBA::Fixed->_construct (Math::BigInt->new($v), $scale);
 }
 
@@ -62,10 +57,12 @@ sub add {
     
     if ($a->{'s'} > $b->{'s'}) {
 	$s = $a->{'s'};
-	$v = $a->{v} + ($b->{v}.("0" x ($a->{'s'} - $b->{'s'})));
+        my $z = $b->{v}->copy;
+	$v = $a->{v} + ($z->blsft($a->{'s'} - $b->{'s'},10));
     } else {
 	$s = $b->{'s'};
-	$v = $b->{v} + ($a->{v}.("0" x ($b->{'s'} - $a->{'s'})));
+        my $z = $a->{v}->copy;
+	$v = $b->{v} + ($z->blsft($b->{'s'} - $a->{'s'},10));
     }
 
     CORBA::Fixed->_construct ($v, $s);
@@ -84,16 +81,14 @@ sub subtract {
     
     my ($v, $s);
 
-    {
-	local $^W = 0;		# BigInt.pm problems
-
-	if ($a->{'s'} > $b->{'s'}) {
-	    $s = $a->{'s'};
-	    $v = $a->{v} - ($b->{v}.("0" x ($a->{'s'} - $b->{'s'})));
-	} else {
-	    $s = $b->{'s'};
-	    $v = ($a->{v}.("0" x ($b->{'s'} - $a->{'s'}))) - $b->{v};
-	}
+    if ($a->{'s'} > $b->{'s'}) {
+        $s = $a->{'s'};
+        my $z = $b->{v}->copy;
+        $v = $a->{v} - ($z->blsft($a->{'s'} - $b->{'s'},10));
+    } else {
+        $s = $b->{'s'};
+        my $z = $a->{v}->copy;
+        $v = ($z->blsft($b->{'s'} - $a->{'s'},10)) - $b->{v};
     }
     CORBA::Fixed->_construct ($v, $s);
 }
@@ -110,9 +105,13 @@ sub compare {
     }
     
     if ($a->{'s'} > $b->{'s'}) {
-	$a->{v} <=> ($b->{v}.("0" x ($a->{'s'} - $b->{'s'})));
+        my $z = $b->{v}->copy;
+        $z->blsft($a->{'s'} - $b->{'s'},10);
+	$a->{v} <=> $z;
     } else {
-	($a->{v}.("0" x ($b->{'s'} - $a->{'s'}))) <=> $b->{v};
+        my $z = $a->{v}->copy;
+        $z->blsft($b->{'s'} - $a->{'s'},10);
+	$z <=> $b->{v};
     }
 }
 
@@ -133,10 +132,6 @@ sub div {
 	$b = CORBA::Fixed->from_string($b);
     }
 
-    if ($reverse) {
-	($a, $b) = ($b, $a);
-    }
-    
     # calculate to 31 places
 
     my $s = ($a->{'s'} - $b->{'s'});
@@ -144,17 +139,14 @@ sub div {
     my $v1 = $a->{v};
     my $v2 = $b->{v};
 
-    my $pad = (31 - (length($v1) - length($v2)));
+    my $pad = 31 - $v1->length - $v2->length;
 
     if ($pad > 0) {
-	$v1 = new Math::BigInt ($v1.("0" x $pad));
+        $v1->blsft( $pad, 10 );
 	$s += $pad;
     }
 
-    {
-	local $^W = 0;		# BigInt.pm problems
-        CORBA::Fixed->_construct ($v1/$v2, $s);
-    }
+    CORBA::Fixed->_construct ($v1/$v2, $s);
 }
 
 # Turn the number into a form suitable for turning into a 
@@ -163,28 +155,13 @@ sub div {
 sub to_digits {
     my ($self, $ndigits, $scale) = @_;
 
-    my $value = $self->{v};
-    my $vstr = "$value";
-    
-    if ($self->{'s'} > $scale) {
-	my $rest = substr($vstr, -($self->{'s'} - $scale));
-	substr($vstr, -($self->{'s'} - $scale)) = "";
-
-	# Banker's rounding
-	if (length ($rest) > 0) {
-	    my $half = new Math::BigInt ("5".('0' x (length ($rest)-1)));
-	    $rest = new Math::BigInt ($rest);
-	    $value = new Math::BigInt ($vstr);
-
-	    if ($rest == $half) {
-		$vstr = "" . new Math::BigInt ($value + ((substr($vstr,-1) % 2) ? 1 : 0));
-	    } else {
-		$vstr = "" . new Math::BigInt ($value + (($rest < $half) ? 0 : 1));
-	    }
-	}
+    my $value = $self->{v}->copy;
+    if( $self->{'s'} <= $scale ) {
+        $value->blsft( $scale - $self->{'s'}, 10 );
     } else {
-	$vstr .= '0' x ($scale - $self->{'s'});
+        $value->brsft( $self->{'s'} - $scale, 10 );
     }
+    my $vstr = (($value->sign eq '+') ? '+' : '') . $value->bstr();
 
     # pad or truncate to the requested number of digits
     my $len = length ($vstr) - 1;
@@ -193,13 +170,12 @@ sub to_digits {
     } else {
        return substr($vstr,0,1) . substr($vstr,-$ndigits);
     }
-
 }
 
 sub stringify {
     my $self = shift;
 
-    my $vstr = "$self->{v}";
+    my $vstr = $self->{v}->bstr();
     my $scale = $self->{'s'};
 
     if ($scale > 0) {
@@ -207,7 +183,6 @@ sub stringify {
     } else {
        return $vstr . ('0' x -$scale);
     }
-
 }
 
 1;

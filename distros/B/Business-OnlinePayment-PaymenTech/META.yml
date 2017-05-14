@@ -1,25 +1,26 @@
---- #YAML:1.0
-name:               Business-OnlinePayment-PaymenTech
-version:            2.05
-abstract:           Chase Paymentech backend for Business::OnlinePayment
+---
+abstract: 'Chase Paymentech backend for Business::OnlinePayment'
 author:
-    - Mark Wells <mark@freeside.biz>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Mark Wells <mark@freeside.biz>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Business::OnlinePayment:  3
-    Business::OnlinePayment::HTTPS:  0
-    Test::More:           0
-    XML::Simple:          0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-PaymenTech
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::OnlinePayment: '3'
+  Business::OnlinePayment::HTTPS: '0'
+  Test::More: '0'
+  XML::Simple: '0'
+version: '2.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

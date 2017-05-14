@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::Base";
 
-our $VERSION = "0.051";
+our $VERSION = "0.052";
 
 =head1 NAME
 
@@ -376,7 +376,8 @@ sub prepare_proc_cpuinfo {
     my $self = shift;
 
     if (open my $pci, "<", "/proc/cpuinfo") {
-	chomp ($self->{__proc_cpuinfo} = [<$pci>]);
+	chomp (my @pci = <$pci>);
+	$self->{__proc_cpuinfo} = \@pci;
 	close $pci;
 	return 1;
 	}

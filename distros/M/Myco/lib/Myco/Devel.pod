@@ -1,0 +1,388 @@
+=head1 NAME
+
+Myco::Devel - myco Developer's Guide.
+
+=head1 DESCRIPTION
+
+This guide is intended for developers wanting to build applications with myco.
+You should have a decent grasp of the Perl programming language, or else a
+solid grasp of another programming language (C, PHP, etc.). Familiarity with
+Object Oriented Programming (OOP) techniques and test-first methodology of
+developing programs (such as outlined in the "eXtreme Programming" method)
+also go a long way toward writing sound applications, and making the best use
+of features offered in myco.
+
+Our goal in this manual is to write and run a small application based on the
+myco framework.
+
+Most likely, you will also be functioning as your own sysadmin. If so, please
+consult the L<Myco System Administration Guide|Myco::Admin> for how-tos on 
+installing Perl, PostresSQL, module dependencies, myco-deploying the database,
+etc. This document will repeat some of the details from the Admin guide along
+the way.
+
+Also note that the assumption running through this guide that you're working on
+some variant of Unix or Linux. This is just to Keep It Simple Stupid. Nothing
+would thrill us more than to see widespread Windows myco-deployments of myco. Please
+hit the mailing list or the myco blog (L<http://www.mycohq.com/>) if you are
+attempting such a thing and run into trouble.
+
+=head1 Myco::App::Guitar - first myco entity class!
+
+The simplest way to get started, after completing L<installation|Myco::Admin>
+and L<initial configuration|Myco::Admin/"Deploying the Database"> of myco, is
+to utilize L<myco-mkentity> to create a new Myco entity class and its companion
+test class. Depending on how you like to structure your module files and what
+testing framework you like to use (L<myco-mkentity> and L<myco-testrun> currently use
+L<Test::Class|Test::Class> with L<Test::Unit|Test::Unit>), this may not suit you. But for this guide,
+it'll have to do :)
+
+First, be sure that you've set a couple environment variables. Assuming you've
+downloaded and untarred/unzipped the myco distribution into your home
+directory and renamed it just 'myco', in C<sh> or C<bash>:
+
+  export MYCO_ROOT=/usr/home/yourhomedir/myco
+
+In C<csh> or C<tcsh>:
+
+  setenv MYCO_ROOT /usr/home/yourhomedir/myco
+
+Put it in your .bashrc or .cshrc for permanence, if you like. Now navigate
+there:
+
+  cd $MYCO_ROOT
+
+Now, after contemplating the object you'd like to model in your class and the
+name you want to give to it, run C<myco-mkentity>:
+
+  ./bin/myco-mkentity Myco::App::Guitar
+
+Though you can name your class anything, a good place to start is to park it
+within the Myco perl namespace, making use of the 'App' area. This has been
+historically used as a collection point or sandbox for developing myco
+applications. Anyway, using C<myco-mkentity> requires you to do it this way.
+
+You can now poke around your new class file:
+
+   vi lib/Myco/App/Guitar.pm
+
+and your companion test class file:
+
+   vi test/Myco/App/Guitar/Test.pm
+
+Once you're satisfied its all there, give the test a whirl!
+
+  % ./bin/myco-testrun Myco::App::Guitar::Test
+  ......
+  Time:  0 wallclock secs ( 0.01 usr +  0.01 sys =  0.02 CPU)
+
+By default, your new test class will not test for persistence bahavior:
+
+  skip_persistence => 1 # in the %test_parameters hash of your test class
+
+This is desirable, since its entirely possible that you want to simply use the
+myco framework to write classes to work in-memory only, and not persist as
+objects in a database. In this case, you'd proceed to write your code, but all
+attributes would be of a transient nature. But in most cases - such as now -
+you'll want to utilize persistence. So turn persistence testing on:
+
+  skip_persistence => 0
+
+and run the test again. It should crash and burn, ending like this:
+
+  !!!FAILURES!!!
+  Test Results:
+  Run: 6, Failures: 0, Errors: 3
+
+So, we now want to configure your class in the myco framework to be
+persistent, so that these six initial persistence tests will pass.
+
+The Guitar.pm module file generated my L<myco-mkentity> provides two dummy
+attributes (fooattrib and barattrib) to get persistence started. This should
+suffice to prove that persistence will work. One thing you might want to do
+before remyco-deploying the database is to specify your own DB table name. In the
+L<Myco::Entity::Meta|Myco::Entity::Meta> object creation near the top of the
+class, setting the database table name:
+
+  tangram => { table => 'guitar', }
+
+You can leave it commented out, too - table name will be generated
+automatically for your class when we myco-recycle the database, as long as you add
+your class' name to the SCHEMA_ENTITY_CLASSES array in the schema hash in
+myco.conf:
+
+  	      SCHEMA_ENTITY_CLASSES => [
+					qw(
+                                            Myco::App::Guitar
+					  )
+				       ],
+
+If you ran the installation tests, myco.conf will have been created for you
+based on your responses to questions about your environment. If not, copy the
+file L<myco.conf-dist|conf/myco.conf-dist> to myco.conf and flesh it out.
+Regardless you need to add the name of your entity class yourself at this
+point.
+
+Now myco-deploy the new class to the database...
+
+  ./bin/myco-deploy
+
+...looking for output indicating that your 'guitar' table was created...
+
+  guitar myco-deployed
+  Schema Deployed
+
+...and run the test again:
+
+  ./bin/myco-testrun Myco::App::Guitar::Test
+
+All six basic entity tests should have passed. If you're suspicious that
+something should have failed, then you must be a test-first coder! Seriously,
+testing is good to do in parellel with (or, better, anterior to) writing your
+code. But myco's testing framework utilizes inheritance and other OO virtues to
+automate all the repetitious object persistence and entity class testing you'd
+normally have to do for each case. This means that, when you just want to
+model, in our case, a basic guitar and its attributes, you really don't have to
+write test code for it - its built into the framework!
+
+But before we flesh Guitar.pm. First we'll replace the stock attributes with
+ones more guitar-ish. Try these on for size:
+
+  $md->add_attribute(name => 'make',
+	             type => 'int',
+                     values => [0..3],
+                     value_labels => {
+                                      0 => 'Gibson',
+                                      1 => 'Fender',
+                                      2 => 'Paul Reed Smith',
+                                      3 => 'Ibanez',
+                                     },
+                    );
+
+  $md->add_attribute(name => 'model',
+	             type => 'string',
+                    );
+
+Simple, right? Here we're outlining the make/model with a L<Tangram> integer
+and string data type, respectively. Here's one more:
+
+  $md->add_attribute( name => 'strings',
+	  	      type => 'flat_array',
+		      tangram_options => { table => 'guitar_strings', },
+		    );
+
+The last one may seem silly, since most guitars have six strings, but let's not
+forget about the guitar's poor cousin - the bass guitar, or various
+bastardizations like the seven-string, twelve-string or 'Chapman Stick' :)
+
+There's many ways to model your attributes (TIMTOWDI), including using sets of
+objects, etc. Myco is tightly bound to the L<Tangram|Tangram> data mapping
+framework, so best to consult its documentation for more info. See
+L<Tangram::Type|Tangram::Type> for more on the data types available for
+persistification. Here we're modeling strings as a perl array.
+
+Now get rid of any references to those dummy attributes, 'fooattrib' and
+'barattrib' in Guitar.pm and its Test.pm file:
+
+In Line 70 of your Test.pm change this:
+
+   simple_accessor => 'foottrib',
+
+to this:
+
+   simple_accessor => 'make',
+
+As the comment above says, C<simple_accessor> is "A scalar attribute that can
+be used for testing". You can further flesh out the C<%test_parameters> hash to
+have the test framework automatically run your new attributes through the
+gauntlet. This can be very useful (even necessary) for objects that have
+required attributes using complex data types. But that's not the case with our
+current example.
+
+Since our data schema has changed, let's myco-recycle the database!
+
+  ./bin/myco-recycle
+
+Again you'll see output to the effect that your guitar table was remyco-deployed.
+
+=head1 Building a guitar
+
+Now, let's write a simple perl script to build our very own guitar!
+
+  #!/usr/bin/perl -w
+  use strict;
+
+  use Myco;
+
+  # Get database connection paramters from myco.conf - very handy!
+  use Myco::Config qw(:database);
+  Myco->db_connect(DB_DSN, DB_USER, DB_PASSWORD);
+
+  # Make it a Fender!
+  my $guitar = Myco::App::Guitar->new( make => 1 );
+
+  print "Its a guitar!\n" if ref $guitar eq 'Myco::App::Guitar';
+
+  $guitar->set_make(0);              # Changed my mind, now its a Gibson
+  $guitar->set_model('Les Paul');
+  my @strings = qw(B E A D G B E);   # Seven strings - rare!
+  $guitar->set_strings( \@strings );
+
+  my $id = $guitar->save; 
+
+  print "The Tangram OID for your new guitar is: $id\n" if $id;
+
+  # Do a myco/tangram query
+  my $guitar_ = Myco->remote('Myco::App::Guitar');
+  my @results = Myco->select( $guitar_, $guitar_->{model} eq 'Les Paul' );
+
+  print "Guitar was saved and selected!\n"
+      if $results[0]->id == $id;
+
+  $guitar->destroy;
+
+  Myco->db_disconnect;
+
+
+=head1 Creating reusable queries in myco
+
+One extremely sexy feature of myco is the ability to model (and store
+persistently) the behavior of a Tangram query object. This is accomplished by
+specifying as metadata the information you'd normally use to write a Tangram
+query in raw perl code - things such as attribute names, remote objects,
+boolean operators used to join clauses of the query together, and even the
+various methods L<Tangram::Expr|Tangram::Expr> used for the different Tangram
+data types.
+
+You saw how our query was done in just two lines in the above example. Not much
+need to elaborate on that. However, when writing queries that involve many
+and more complex attributes such as object sets, optional filter clauses, etc.,
+these queries can quickly become monstrous. Building an abstract query
+specification as a L<Myco::Entity::Meta::Query|Myco::Entity::Meta::Query>
+object is the best way to save yourself a lot of coding later on in your
+application.
+
+So, let's rewrite our above example in a slightly different way (just to prove
+TMTOWTDI), while also replacing our simple two line query with one that can do
+a little more, but this time as a query spec in Guitar.pm.
+
+Find the commented section - "Query Specifications" - near the top of
+Guitar.pm. Let's build our query spec here:
+
+  my $queries = sub {
+
+     my $md = shift; # Metadata object
+
+     $md->add_query( name => 'Test Guitar Query',
+                     remotes => { '$guitar_' => 'Myco::App::Guitar', },
+                     result_remote => '$guitar_',
+                     params => {
+			         param_make => [ qw($guitar_ make) ],
+			         param_model => [ qw($guitar_ model 1) ],
+			         param_string => [ qw($guitar_ strings 1) ],
+			       },
+                     filter => {
+                                 parts => [
+					    { remote => '$guitar_',
+                                              attr => 'make',
+                                              oper => 'eq',
+                                              param => 'param_last',
+					      part_join_oper => '&', },
+					    { remote => '$guitar_',
+                                              attr => 'model',
+                                              oper => 'eq',
+                                              param => 'param_model',
+					      part_join_oper => '&', },
+					    { remote => '$guitar_',
+                                              attr => 'strings',
+                                              oper => 'includes',
+                                              param => 'param_string' },
+                                          ],
+			       },
+                   );
+  };
+
+We specify our query inside an anonymous subroutine. This is so we can create
+as many for our class as we like, and so it can more easily be passed to
+the L<Myco::Entity::Meta|Myco::Entity::Meta> method, C<activate_class>. While
+we're at it, let's do that. Find the method call at the bottom of Guitar.pm:
+
+  $md->activate_class( queries => $queries );
+
+For a full account of this structure, see
+L<Myco::QueryTemplate|Myco::QueryTemplate>. A couple of things to note in
+passing are the C<params> hash, which specifies the remote
+object containing the attribute, the actual attribute name, as well as a
+boolean flag to indicate that a param is optional. So, in this query, only the
+first param is required. The C<params> hash is keyed by the attribute alias
+we'll use it comes time to actually run the query and pass in the params. To
+illustrate that you can use any descriptive alias you like, I've prepended
+each hash key in C<params> with a C<param_>. You could've also call these three
+params 'foo_1', 'foo_2', and 'foo_3', though that would be a bit obscure :)
+Most often you'd just key this hash with the actual attribute names. Just
+remember that only the hash values in the array will be used to construct the query.
+
+No let's let's rewrite our script:
+
+  #!/usr/bin/perl -w
+  use strict;
+
+  use Myco;
+
+  use Myco::Config qw(:database);
+  Myco->db_connect(DB_DSN, DB_USER, DB_PASSWORD);
+
+  my $guitar = Myco::App::Guitar->new( make => 0,
+				       model => 'Stratocaster',
+				       strings => [qw(E A B C D E F G)] );
+  my $id = $guitar->save;
+
+  print "The Tangram OID for your new guitar is: $id\n" if $id;
+
+  # Let's dig into the metadata to get our query
+  my $class_metadata = Myco::App::Guitar->introspect;
+  my $queries = $class_metadata->get_queries;
+
+  my $guitar_query = $queries->{'Test Guitar Query'};
+  my $its_a_myco_query = ref $guitar_query eq 'Myco::Entity::Meta::Query';
+  print "Its a query!\n" if $its_a_myco_query;
+
+  my %run_params = ( param_make => '1',
+	  	     param_model => 'Stratocaster',
+		     param_string => 'B' );
+
+  my @results = $guitar_query->run_query( %run_params );
+
+  print "Guitar was saved and selected!\n"
+    if $results[0]->id == $id;
+
+Pretty cool! When you're just starting out doing Tangram queries, a method that
+you might find helpful is C<get_filter_string> in
+L<Myco::QueryTemplate|Myco::QueryTemplate>.
+
+For instance, this...
+
+  print $guitar_query->get_filter_string( \%params );
+
+...should yield this:
+
+  $guitar_->{make} == $params{param_make} & $guitar_->{model} eq $params{param_model} & $guitar_->{strings}->includes($params{param_string})
+
+For another working query example, see the
+L<sample entity|Myco::Entity::SampleEntity> included with the myco base
+distribution.
+
+=head1 Conclusion
+
+There's a ton more you can do with myco, though this guide should provide you
+with a good start. Cheers, and let us know how you like myco!
+
+=head1 AUTHOR
+
+Ben Sommer <ben@mycohq.com>
+
+=head1 SEE ALSO
+
+L<Myco|Myco>, L<Myco::Admin|Myco::Admin>
+
+=cut

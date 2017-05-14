@@ -6,7 +6,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Test::More tests => 55;
+use Test::More tests => 58;
 
 use English qw( -no_match_vars ) ;
 use Config;
@@ -87,6 +87,7 @@ is( $PROGRAM_NAME, $0, '$PROGRAM_NAME' );
 is( $BASETIME, $^T, '$BASETIME' );
 
 is( $PERL_VERSION, $^V, '$PERL_VERSION' );
+is( $OLD_PERL_VERSION, $], '$OLD_PERL_VERSION' );
 is( $DEBUGGING, $^D, '$DEBUGGING' );
 
 is( $WARNING, 0, '$WARNING' );
@@ -99,7 +100,7 @@ ok( $SYSTEM_FD_MAX >= 2, '$SYSTEM_FD_MAX should be at least 2' );
 is( $INPLACE_EDIT, '.inplace', '$INPLACE_EDIT' );
 
 'aabbcc' =~ /(.{2}).+(.{2})(?{ 9 })/;
-is( $LAST_PAREN_MATCH, 'cc', '$LAST_PARENT_MATCH' );
+is( $LAST_PAREN_MATCH, 'cc', '$LAST_PAREN_MATCH' );
 is( $LAST_REGEXP_CODE_RESULT, 9, '$LAST_REGEXP_CODE_RESULT' );
 
 is( $LAST_MATCH_START[1], 0, '@LAST_MATCH_START' );
@@ -157,6 +158,16 @@ use English qw( -no_match_vars ) ;
 main::ok( !$PREMATCH, '$PREMATCH disabled' );
 main::ok( !$MATCH, '$MATCH disabled' );
 main::ok( !$POSTMATCH, '$POSTMATCH disabled' );
+
+
+# Check that both variables change when localized.
+{
+    local $LIST_SEPARATOR = "wibble";
+    ::is $", 'wibble', '$" changes when $LIST_SEPARATOR is localized';
+
+    local $" = 'frooble';
+    ::is $LIST_SEPARATOR, 'frooble';
+}
 
 __END__
 This is a line.

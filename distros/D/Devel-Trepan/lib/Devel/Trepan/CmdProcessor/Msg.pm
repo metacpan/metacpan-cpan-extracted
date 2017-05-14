@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2012 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2012, 2015 Rocky Bernstein <rocky@cpan.org>
 # I/O related command processor methods
 
 use warnings;
@@ -104,12 +104,32 @@ sub safe_rep($$) {
     Devel::Trepan::Util::safe_repr($str, $self->{settings}{maxstring});
 }
 
+sub bolden($$) {
+    my($self, $message) = @_;
+    if ($self->{settings}{highlight} && $HAVE_TERM_ANSIColor) {
+        return $message = color('bold') . $message . color('reset');
+    } else {
+	return $message
+    }
+}
+
+sub underline($$) {
+    my($self, $message) = @_;
+    if ($self->{settings}{highlight} && $HAVE_TERM_ANSIColor) {
+        return $message = color('underscore') . $message . color('reset');
+    } else {
+	return $message
+    }
+}
+
 sub section($$;$) {
     my($self, $message, $opts) = @_;
     $opts ||= {};
     $message = $self->safe_rep($message) unless $self->{opts}{unlimited};
     if ($self->{settings}{highlight} && $HAVE_TERM_ANSIColor) {
-        $message = color('bold') . $message . color('reset');
+        $message = $self->bolden($message);
+    } else {
+	$message .= "\n" . '-' x length($message);
     }
     $self->{interfaces}[-1]->msg($message);
 }

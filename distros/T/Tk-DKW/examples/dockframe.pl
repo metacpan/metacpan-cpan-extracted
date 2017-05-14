@@ -6,22 +6,23 @@ use Tk::DockFrame;
 use Tk;
 
 my $l_MainWindow = Tk::MainWindow->new();
-my $l_Text = $l_MainWindow->Text ('-background' => 'white');
 my $l_Counter = 0;
-my @l_DockPort;
 
-for (my $l_Index = 0; $l_Index < 3; ++$l_Index)
-   {
-    push (@l_DockPort, $l_MainWindow->DockPort());
-    $l_Text->pack (-expand => 'true', -fill => 'both', '-side' => 'top') if ($l_Index == 2);
-    $l_DockPort [$#l_DockPort]->pack (-expand => 'false', '-fill' => 'x');
-   }
+my @l_DockPort =
+  (
+   $l_MainWindow->DockPort()->pack ('-fill' => 'x', '-side' => 'top', '-anchor' => 'nw'),
+   $l_MainWindow->DockPort()->pack ('-fill' => 'x', '-side' => 'top', '-anchor' => 'nw'),
+   $l_MainWindow->DockPort()->pack ('-fill' => 'x', '-side' => 'top', '-anchor' => 'nw'),
+   $l_MainWindow->DockPort()->pack ('-fill' => 'x', '-side' => 'bottom', '-anchor' => 'sw'),
+  );
 
-foreach my $l_Text ('This is a very long test string', 'This is a test', 'This is really nothing', 'Drag me')
+my $l_Text = $l_MainWindow->Text ('-background' => 'white')->pack ('-fill' => 'both', '-side' => 'top');
+
+foreach my $l_Caption ('Dock Frame 1', 'Dock Frame 2', 'Dock Frame 3', 'Dock Frame 4')
    {
     my $l_Dockable = $l_MainWindow->DockFrame ($l_Counter <= $#l_DockPort ? ('-dock' => $l_DockPort [$l_Counter++]) : ());
 
-    my $l_Label = $l_Dockable->Label ('-text' => $l_Text);
+    my $l_Label = $l_Dockable->Label ('-text' => $l_Caption);
 
     $l_Label->pack
        (

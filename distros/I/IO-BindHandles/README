@@ -1,0 +1,121 @@
+NAME
+    IO::BindHandles - Bind a set of handles for buffered tunneling
+
+VERSION
+    version 0.006
+
+SYNOPSIS
+    Simple usage:
+
+      use IO::BindHandles;
+      # connect $r1 to $w1 and $r2 to $w2
+      my $bh = IO::BindHandles->new(
+        handles => [
+          $r1, $w1, # read from $r1, write to $w1
+          $r2, $w2, # read from $r2, write to $r2
+        ]
+      );
+  
+      # block until the handles close themselves
+      $bh->loop;
+
+    More complex scenario with non-blocking calls
+
+      # connect STDIN and STDOUT to a socket in non-blocking way
+      $socket->blocking(0);
+      STDIN->blocking(0);
+      STDOUT->blocking(0);
+      my $bh = IO::BindHandles->new(
+        timeout => 0, # non-blocking
+        handles => [
+          *STDIN, $socket,  # read from STDIN, write to socket
+          $socket, *STDOUT, # read from socket, write to STDOUT
+        ]
+      );
+  
+      # do it in an explicit unblocking loop
+      while (1) {
+        $bh->rwcycle;
+        # do something else that takes some time
+        my $cond = do_something_else();
+        # you can check if the bind is still valid
+        last if $cond && $bh->bound;
+      }
+
+DESCRIPTION
+    This module implements a buffered tunneling between a set of arbitrary
+    IO handles. It basically implements a select loop on a set of handles,
+    reading and writing from them using an internal buffer.
+
+    This replicates what a dup or fdopen call would do when you can't
+    actually do it, i.e.: attach STDIN/STDOUT to a socket or attach two
+    different sockets toguether.
+
+    This module doesn't perform any low-level operation on the handles, so
+    it should support any IO::Handle that is supported by IO::Select.
+
+METHODS
+  new(timeout => $val, handles => [ $h1, $h2 ])
+    Initializes a new BindHandles instance. The timeout value defaults to
+    0.5. The handles argument receives an arrayref with pairs of handles.
+    Each pair represents a binding between a read and a write handle.
+
+    You can pass as many handle pairs as you want, and you can even use the
+    same handle for a read and a write role. But you should not use the same
+    handle for more then one read or one write operation.
+
+    Future versions of this module might support "read one write many",
+    "read many write one" or even "read many write many". Contact me if you
+    think this features are important and I might even implement it.
+
+    This method will call autoflush(1) on all handles.
+
+  loop()
+    Blocking loop to consume all read handles and write the data to their
+    bound handles until they are no longer bound, i.e.: when the remote
+    socket is closed.
+
+    In order to avoid consuming all the CPU, this method will override the
+    timeout configuration to 0.1 if it is set to 0.
+
+  bound()
+    Checks if there are still bound handles. It will return false when no
+    more write handles are open or when read handles close without any write
+    buffer left. This can be used as a "while" condition.
+
+    It returns the number of valid bindings.
+
+  rwcycle()
+    Selects handles ready to read, write or with exceptions and act
+    accordingly. The select might block according to the configured timeout
+    value.
+
+    This method will close handles in the following situations:
+
+    *   When a read operation returns undef or 0 it will close the read
+        handle. It will also close the write handle if there are no contents
+        in the related write buffer.
+
+    *   When a write operation returns undef or 0 it will close both the
+        read and write handle.
+
+    *   When an exception is detected in one handle, it will close it. It
+        will also close the bound handle unless the exception hapenned in
+        the read handle and there are contents in the write buffer.
+
+  timeout
+    Accessor for the timeout value.
+
+BUGS
+    Please submit all bugs regarding IO::BindHandles to
+    bug-io-bindhandles@rt.cpan.org
+
+AUTHOR
+    Daniel Ruoso <daniel@ruoso.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Daniel Ruoso.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

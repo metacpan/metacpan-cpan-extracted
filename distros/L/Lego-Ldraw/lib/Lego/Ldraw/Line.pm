@@ -14,6 +14,7 @@ use YAML;
 use Lego::Ldraw;
 use Data::Dumper;
 use Math::MatrixReal;
+use Math::Trig;
 use File::Basename;
 
 my $line_formats = [
@@ -333,6 +334,17 @@ sub transform {
   }
 }
 
+sub rotate {
+  my $self = shift;
+  my ($axis, $degrees) = @_;
+  return unless $self->type;
+
+  my $x = $self->_transform_matrix();
+  my $r = $self->_rotate_matrix($axis, $degrees);
+  $self->_transform_matrix($x * $r);
+  return $self;
+}
+
 #######################################################################
 # other stuff
 #######################################################################
@@ -382,6 +394,8 @@ sub _transform_matrix {
 		  qw(c f i), undef,
 		  qw(x y z), undef);
 
+    # update each field in order with
+    # the matrix' value
     $matrix->each( sub { 
 		     my $field = shift @fields;
 		     return unless $field;
@@ -398,6 +412,44 @@ sub _transform_matrix {
 		   ];
     return $matrix;
   }
+}
+
+sub _rotate_matrix {
+  my $self = shift;
+  my ($axis, $degrees) = @_;
+  my $rad = deg2rad($degrees);
+  my $matrix = Math::MatrixReal->new(4, 4);
+
+  for ($axis) {
+    /^x$/ && do {
+      $matrix->[0] = [
+		      [ 1, 0, 0, 0 ],
+		      [ 0, cos($rad), sin($rad), 0 ],
+		      [ 0, -sin($rad), cos($rad), 0 ],
+		      [ 0, 0, 0, 1 ]
+		     ];
+    };
+    /^y$/ && do {
+      $matrix->[0] = [
+		      [cos($rad), 0, -sin($rad), 0],
+		      [0, 1, 0, 0],
+		      [sin($rad), 0, cos($rad), 0],
+		      [0, 0, 0, 1],
+		     ];
+    };
+    /^z$/ && do {
+      $matrix->[0] = [
+		      [ cos($rad), sin($rad), 0, 0 ],
+		      [ -sin($rad), cos($rad), 0, 0 ],
+		      [0, 0, 1, 0],
+		      [0, 0, 0, 1]
+		     ];
+    };
+  }
+
+  return $matrix;
+
+
 }
 
 ###############################################################

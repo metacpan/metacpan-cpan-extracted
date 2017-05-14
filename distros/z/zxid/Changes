@@ -1,0 +1,702 @@
+# zxid/Changes
+# $Id: Changes,v 1.39 2010-01-08 02:10:09 sampo Exp $
+# Change log, minor credits, release history, and To do list (TODO)
+
+Usual suspects: zxid.user@lists.unh.edu
+
+mini_httpd: server does not support RFC 5746, see CVE-2009-3555
+
+To Do: User+Passwd --> Authorization Required
+
+To do:
+    - Wishlist of built-in attributes
+      1. HTTP method (GET, POST, HEAD, etc.)
+      2. Full URL including the hostname part (currently only local URL is passed)
+      3. Indication of which virtual server
+      4. If SOAP, the name of the first direct child element of the SOAP Body
+      5. Any SOAP Action header, from SOAP message or from HTTP header.
+    - (Local) logout should either return to referer, or to configurable page
+    - Depend logging in validate, az response, emit logging in decorate, azreq
+    - Static linking, dynamic linking libzxid
+    - IdP initiated SLO
+    - IdP should include URL for correcting information
+    - Add persona support to IdP
+    - Add attribute editor support to IdP
+
+    - Support Danish profiles: http://digitaliser.dk/resource/516724
+    - Support http://saml2int.org/ (interoperability profile and club)
+
+    - Rule names by URN or URL to be logged to ab
+    - mod_auth_saml_ws module
+    - Using Apache frontend todo TAS3 for java apps
+    - PDS with DITA (OASIS)
+    - Partial XML parsing: stop after header
+      - Header removal / unwrapping vs. header extraction, but still passing through
+    - Pentaho investigation, use dwh as the backing store of the PDS
+    - The FEDUSERNAME attribute should include both succinct EntityID
+      and the persistent pseudonym. Also, make mail interface for this
+      to work (run a script that fishes the stuff out).
+
+To do from EIC 2012:
+    - Scopes in AuthnRequests
+    - SAML2INT.org profiles, including branding icons
+    = http://openidtest.uninett.no/connect-provider
+    - http://tinyurl.com/umav1
+    - osis.idcommons.net
+    - Chat April 25: http://tinyurl.com/umachat
+
+Regarding mod_perl stability: I would assume most of that has to do
+with underlying memory allocator. All allocation activity in zxid code
+goes through zx_alloc() (in zxlib.c:55). I should fix zx_alloc() to use it.
+Anyway, all this is in place to ensure that you could replace malloc()
+with an alternative allocator, such as Apache pool allocator.
+
+In playing with allocators, important caveat: OpenSSL has similar
+vectorable allocator. You should use same allocator for OpenSSL and
+ZXID (and perl). libcurl documentation is not entirely clear regarding
+its allocator usage, but I assume it uses malloc() so that would be
+yet another worry.
+
+https://idp.testshib.org/idp/shibboleth
+
+Google Apps Integration
+http://code.google.com/googleapps/domain/sso/saml_reference_implementation.html
+Here are example docs for SimpleSAMLPHP, or Shibboleth:
+* http://simplesamlphp.org/docs/1.5/simplesamlphp-googleapps
+* https://shibboleth.usc.edu/docs/google-apps/
+
+    - SP attr token: special attribute at IdP. The token is issued by the SP to
+      pass in reliable way attributes to SP. Signed to tie to pseudonym.
+    - Use SAML2 a7n as "sticky policy" envelope, standardizing some attribute names to convey metadata such as acceptable use or purpose, obligations, right-of-access-correction-and-deletion-URL, and the authorative source.
+    - zxcot should have idpdimd listing mode
+    - zxpasswd should have user federation listing mode
+    - zxid_pw_authn() should not report scary error when checking .ykspent in not spent case
+    - zxid_select_tgt() (?)
+    - X509 attr certs (some code is in place, but does not work correctly)
+    - Use post screen as confirmation screen, option for federation confirmation question
+    - Config option for redirection after SLO
+    - WSP_LOCALPDP_OBL_REQ processing
+    - WSC_LOCALPDP_OBL_ACCEPT processing
+    - IdP: Display Relay State in hopes of giving user more context
+    - IdP: Interpret the attribute request authn ctx query string approach and show
+      to the user what attributes were requested by the SP.
+    - IdP: If SP does not specify attribute list, display "SP did not request any
+      specific attributes. Only authentication and default attributes will be sent."
+    - AuthnReq QS option for SP to request that consent is explicitly seeked
+    - AuthnReq QS option for SP to request that attribute list is not shown up front
+    - Consider removing zx_scan_pi_or_comment() from most tags, only leaving for top level.
+    - Show whether SP wants a persistent or transient, or some other type of Id for the user.
+    - Clarify signature validation error codes, e.g. <SignedInfo> canon fail vs. bad cert
+    - Instantiation of declared prefix that only appears in innards of the XML (e.g. xs)
+    - Merge Jeroen's mega patch
+    - Idea: authorization through interaction service, get it logged to audit trail as evidence
+    - Idea: discovery and consent questions up-front in the beginning of the business process
+    - Improve 2 factor authn: the pin should be a hashed password
+    - Paper scratch list based OTP
+    - Coordinates based authn (challenge response)
+    - Changing QR code based OTP
+    - AuthnCtx comparison or matching
+    - Proxy IdP AuthnCtx, RequesterID mapping
+    - Config option to turn off audience restriction
+    - U-Prove (https://connect.microsoft.com/site1188  /t/U-Prove_CTP_R2_Whitepaper.pdf) support
+    - Idemix support http://www.zurich.ibm.com/security/idemix/
+    - AuthnSvc (AS) should check caller credential, in addition to the login credential, see comment on AS_ENA in zxidconf.h
+    - Add support for multiple $ separated button_url's, see zxidmeta.c:zxid_org_desc()
+    - IdP CDC registration support: in IdP login screen, display 1x1.gif from the CDC domain
+    - Per SP User Data Key (udk) support (generated by IdP on per SP basis, distinct from
+      pseudonym, and used by SP to encrypt and decrypt the SP local data about user. SP pledges
+      by policy to not store the udk anywhere locally. Thus SP will be able to handle
+      udk only when it has received it during session from the IdP (or discovery?) (solve
+      problem of it being kept in audit trail, such as in logged signed message)
+    - Slow mode: pause for 2 seconds on every web service call and offer user
+      opportunity to interact
+    - Delegation to job coaches
+    - Distressed authentication, persona selection at authentication by using prefix (pin)
+    - Support BrowserID https://developer.mozilla.org/en-US/docs/persona
+    - BUG: Passing qs args in RelayState
+    - BANGBANG_PAT to enable bang bang expansion of outputs, even in mini_httpd_zxid
+    - Expected namespaces feature for effective suppression of warnings about payload namespaces
+    - mod_auth_saml: Apache 2.4 does not recognize authentication as having happened
+    - l0 causes pr_ix == 0 error at zxidpsso.c:196, at least on Marcin's machine
+    - Upgrade zxid_psobj_enc() and zxid_psobj_dec() to AES256GCM
+
+No authentication done but request not allowed without authentication for Authentication not configured?
+
+zxid-1.42:: 27.2.2016
+    - Ran through full test suite
+    - Made signature and hash algorithms more configurable
+
+zxid-1.41:: 18.12.2015
+    - applied patch from soconnor, perceptyx, including detection of
+      signature algorithm from certificate. --Sampo
+
+zxid-1.40:: 8.6.2015
+    - Fixed bug relating to unset HTTP Action header (manifested as segv inside libcurl)
+
+zxid-1.39:: 1.6.2015
+    - Upgrade cipher suites to aes-256-gcm and RSA-OAEP
+    - Added PIN+Yubikey two factor authentication
+    - Added mobile pairing authentication
+
+zxid-1.38:: 11.4.2015
+    - Added UNIX_GRP_AZ_MAP
+    - Added special case handling of protocol urls based on BURL
+
+zxid-1.30:: 19.2.2015
+    - UMA and OAUTH work
+    - Fixed Action header detection in the non-XML body case
+    - NOT RELEASED YET
+
+zxid-1.22:: 9.10.2014
+    - Added to Local PDP multivalued role attribute matching
+
+zxid-1.21:: 27.5.2014
+    - Changed "http://www.w3.org/2005/03/addressing/role/anonymous" to "http://www.w3.org/2005/08/addressing/anonymous" to be better WSA spec compliant. Seems Liberty SOAP binding has an error in this.
+    - Omitted ReplyTo SOAP header whose value is anonymous
+    - Added OPTIONAL_LOGIN_PAT feature
+    - Added redirafter feature for local IdP logins (e.g. zxidatsel.pl)
+    - Added partial mime multipart support
+    - Added to zxid_httpd Range support (for download resume)
+    - Improved nth progessing in zxid_find_epr()
+    - Added feature to stop parsing after end of first top level tag has been seen.
+    
+zxid-1.20:: 11.12.2013
+    - Fixed segv on bad decrypt and improved error messages
+    - Fixed ordering of Header and Body in zxid_call() with inputs already containing elements
+    - Added WSC_ACTION_HDR option to control the SOAP header <a:Action>
+    - Added SOAP_ACTION_HDR option to control the HTTP header SOAPAction
+
+zxid-1.19:: 8.12.2013
+    - Fixed setting ses and ptm cookies in mod_auth_saml redirect and internal content cases
+    - Added OPT_INCLUDE and INCLUDE features to config file parsing
+    - Added and documented REM, ECHO, INFO, WARN, and DIE config options
+    - Support config file [SECTION] headers (introduced by opening square braket) as comments
+    - Added support for PRAGMA config option
+    - Cleaned up so valgrind does not complain
+    - Fixed XML parser boundary condition with read 1 past end (found by valgrind)
+    - Changed URL to BURL (Base URL)
+    - Fixed setting Action header in the case that SOAP Body does not begin with tag
+    - Added EPR ranking in discovery
+
+zxid-1.18:: 20.11.2013
+    - More bug fixing in mini_httpd_zxid
+    - Generalized redir_to_content and moved it to zxid_simple()
+    - Moved defaultqs feature feature to zxid_simple()
+    - Added %d expansion for VURL
+    - Port mini_httpd to mingw
+    - Refactored mini_httpd to zxid_httpd
+
+zxid-1.17:: 16.11.2013
+    - More bug fixing in mini_httpd_zxid
+
+zxid-1.16:: 11.11.2013
+    - Remodelled the Makefile
+    - Tested TARGET=xmingw64 builds
+    - Fixed some SOAP header ordering bugs
+    - Fixed handling of NULL returns in Net::SAML module
+    - Fixed serious bugs in mini_httpd_zxid
+
+zxid-1.15:: 26.10.2013
+    - Added wsp_pat option
+    - Added mini_httpd_zxid (derived from original by Jeff Poskanzer, see acme.com)
+    - Improved error reporting of the credential (assertion) expired situation
+
+zxid-1.13:: 14.3.2013
+    - Added language/skin dependent templates
+
+zxid-1.12:: 21.11.2012
+    - Added sketchy kqueue support based on FreeBSD man page, but did not test
+    - Fixed compile errors and warnings on MacOS per Michael Dondrup at uni.no
+    - Added better obligations support
+
+zxid-1.11:: 30.9.2012
+    - Added audit bus infrastructure (not yet universally propagated)
+    - Added simplistic yubikey 2 factor authentication (pin+yubikey)
+    - Fixed templ query string arg, enabling tabbed UI to work
+    - Audit bus receipt confirmation signature bus-confirm: B64FORSIGNEDRECEIPT
+    - Added PTM support
+
+zxid-1.10:: 21.4.2012
+    - Added support for OAUTH2 / OpenID-Connect1 Minimal / Basic Profile (both RP and IdP) (the support is still very preliminary)
+    - Adapted SAML2 metadata to support OAUTH2, using Binding="urn:zxid:OAUTH:2.0:bindings:HTTP-Redirect" (OAUTH2-REDIR)
+    - Corrected the OrganizationURL to be absolute
+    - VPATH and VURL processing tweaks
+    - Improved error reporting in zxididp and zxidhlo
+    - Eliminate coordinates from the end of the branding login buttons
+    - Added use of ZXIDConf <init-param> (you define it in web.xml) to servlets
+    - Refactored virtual hosting code in zxidwspleaf.java and zxidwspdemo.java
+    - Added -r option to zxdecode for decoding encrypted messages from the audit trail
+    - Fixed buffer overrun by one in processing zxid_simple() POST
+    - Obsoleted PATH=/var/zxid/idp convention. From now on, just use /var/zxid/ or VPATH for IdP
+
+zxid-1.06:: 10.12.2011
+    - Merged improvements (CDC, sol8x86, free functions, mem leak fixes) by grubba@@grubba.org from git://github.com/grubba/zxid.git
+    - Added VURL for virtual hosting
+    - Added support for OrganizationURL as button_url for branding buttons (per symlabs-saml-displayname-2008.pdf submitted to OASIS SSTC)
+    - Deleted ORG_URL config option. Use BUTTON_URL instead.
+
+zxid-1.05:: 7.12.2011
+    - Added DEBUG and DEBUG_LOG options to manipulate debug level from config file
+
+zxid-1.04:: 5.12.2011
+    - Added VPATH for virtual hosting support, documented ZXID_CONF environment variable
+
+zxid-1.03:: 12.8.2011
+    - Fixed timestamp generation in pep call
+
+zxid-1.02:: 22.7.2011
+    - Fixed a file name folding bug that could lead to failure to discover a service
+    - Added curl_easy_reset() to zxid_http_post_raw(), reportedly fixing a segv
+
+zxid-1.01:: 21.6.2011
+    - Added to zxidhlo a possibility of giving CONF using -D at compile time
+    - Fixed long int argument to %d warnings (happened with x86_64 architecture build)
+    - Fixed null pointer check in zxid_extract_body()
+    - improved error reporting to show cwd in vopen_fd_from_path()
+    - Fixed mod_auth_saml to add to the cookies, not to replace them (replacement caused apps behind it to misbehave)
+
+zxid-1.0:: 31.5.2011
+    - Promoted to 1.0 status
+
+zxid-0.83:: 11.3.2011
+    - Fixed ordering of EPRs returned by zxid_get_epr() to always to be same as with zxid_find_epr().
+    - Made private key reading more robust by tolerating omission of RSA or DSA designation
+
+zxid-0.82:: 10.3.2011
+    - Added Proxy IdP support
+    - Fixed supplying Destination attribute in AuthnReq, restoring Shib compatibility
+    - Fixed artifact binding on SP
+    - Fixed XML crash due to malformed close tag
+    - Tinkered with order of SOAP headers to silence some warnings
+
+zxid-0.81:: 8.3.2011
+    - Eliminate empty valued and duplicate attributes from XACML requests
+    - Fixed return value of zxid_az() family to be null upon deny.
+
+zxid-0.80:: 2.3.2011
+    - Fixed out of memory in zxidwsc.c caused by malformed fault input.
+
+zxid-0.79:: 1.3.2011
+    - Enhanced zxidhlo to show attributes
+    - Added ability comment out AAMAP directives
+    - Fixed timegm bug
+
+zxid-0.78:: 23.2.2011
+    - Fixed processing (by ignoring it) of whitespace in metadata (and elsewhere)
+    - Improved fault handing in zxid_call()
+    - Fixed segv caused by other side returning illegal XML in zxid_call()
+
+zxid-0.77:: 16.2.2011
+    - upgraded for php-5.3 support (patch from Jeroen Asselman)
+    - Improved -at handling in zxpasswd
+    - curl_easy_reset() patch from Jeroen Asselman (fixes crash on Win32)
+    - Applied zxid_saml2_map_nid_fmt() patch by Cal Heldenbrand
+    - Robustified error processing in cases where encryption certificate is missing
+    - Fixed NAMEID_ENC=0 missing a NameID element (TAS3 bug #493, found by Stijn)
+    - Fixed IdP crash due to null pointer in zx_alloc() (TAS3 bug #494, found by Stijn)
+
+zxid-0.76:: 26.1.2011
+    - Added error checks
+    - Fixed ordering of RelatesTo header
+    - Fixed leakage of unknown namespaces to decoder
+    - Made memory allocators really use function pointers
+
+zxid-0.75:: 24.1.2011
+    - MINGW fixes
+    - User supplied MessageID duplicate fix
+    - Fixed XML encoding of empty namespace prefixes
+    - Fixed Brian's ordering problem (risaris-bad.xml)
+
+zxid-0.74:: 22.1.2011
+    - Changed 0 to fileno(stdin) in calls to read_all_fd() for better Windows portability
+    - Included Axis2ZXIDModule.zip
+    - Added Trust PDP call to discovery
+    - Added Credentials and Privacy Negotiation capability to discovery
+
+zxid-0.73:: 19.12.2010
+    - Added ssoa7n and tgta7n attributes (TAS3 feature req #484)
+    - Added optional sessionwide idpsesid attribute (TAS3 feature req #419)
+    - Added IDWSF SOAP headers to discovery and as responses
+    - Fixed a problem with copy_file(). This could cause lost audit trail when copy instead of deletion was chosen on platform that does not use links.
+    - Fixed element ordering in zxcot generated EPRs
+    - Added IdP side AAMAP capability to transform attributes, including a7n wrap
+    - Each credential as its own a7n
+    - Added <ns:foo/> close tag tail optimization to encoder, controlled by c->enc_tail_opt flag
+    - Added preliminary DSA support
+    - Crude and preliminary X509 attribute cert support
+    - Fixed excessive content-length in CGI output
+    - Fixed XML valued attributes (TAS3 bug #385)
+    - If generic XML content is seen as attribute value, it should be reserialized as safe_base64 so it can be returned to app layer as attribute (e.g. via LDIF).
+    - Added MessageID and RelatesTo headers to discovery queries.
+    - Test coverage 63%
+
+zxid-0.72:: 5.12.2010
+    - Major rewrite: Eliminated SO encoders entirely, enhancing WO encoder to do their job
+    - Sort unknown attributes wrt known attributes in enc
+
+zxid-0.71:: 22.11.2010
+    - Moved back to global elems hash, but with separate namespace hash
+    - Created elem descriptors that hang from elem hash buckets
+    - Optimized the decoders to be elem descriptor and function pointer driven
+    - Changed NEW contructors to macros
+
+zxid-0.70:: 13.11.2010
+    - zxdecode: assertion decode and decryption support
+    - zxdecode: sha1 validation without sig validation using -s -s
+    - Fix canonicalization of attribute names with namespace prefixes
+    - Fix detection of namespace of an XML attribute, see t/shib-a7n2.xml
+    - Some optimizations based on gcov and gprof
+    - Moved to per namespace elem hashes and namespace hash
+    - Fairly complete re-engineering/re-factoring of the generated enc/dec code
+    - Fix SO encoder
+    - Added more test cases
+
+zxid-0.69:: 20.10.2010
+    - Added DeployingZxidServlets.txt, ZxidSSOFilter.java, and ZxidServlet.java by Stijn Lievens
+    - Added missing file zxidjava/zxidtok.java
+
+zxid-0.68:: 18.10.2010
+    - zxpasswd hash problems fixed
+    - Pairwise session indexes (encrypt master index and SP entid with IdP sym key)
+    - Primitive support for passing identity token in XACML request
+
+zxid-0.67:: 13.10.2010
+    - Fixed buffer bugs introduced by removal of ZXID_MAX_USER limit
+
+zxid-0.66:: 12.10.2010
+    - zxpasswd: be tolerant of newline in input
+    - Add to IdP metadata the NameIDMapping end point
+    - Removed ZXID_MAX_USER limit from .at files. Removed many other limits, too.
+    - Added zxid_epr_set_token() and other accessor functions
+    - Fixed Solaris support (unwarranted -o option to ar)
+
+zxid-0.65:: 10.10.2010
+    - zxididp: added ID Mapper (to be used by Delegation Service)
+    - zxididp: added some aspects of People Service (to be used by Delegation Service)
+    - zxididp: added SSOS
+    - Added zxid_map_identity_token()
+    - Added zxid_set_delegated_discovery_epr()
+    - Added psobj encryption for privacy preservation of people referenced by ObjectIDs
+    - Added zxid_attach_sol1_usage_directive()
+    - Added WSC_LOCALPDP_OBL_PLEDGE config option
+    - Added WSP_LOCALPDP_OBL_REQ config option
+    - Added WSP_LOCALPDP_OBL_EMIT config option
+    - Added WSC_LOCALPDP_OBL_ACCEPT config option
+    - Shortened the before and after slops from 1 day to about 2 hours
+    - Improved zxid_get_fault_status() by adding a first level status code
+    - Added -at option to zxpasswd
+    - Fixed zxpasswd -l directory listing
+    - zxid_simple():: Added handler for resolving invitation
+    - Templatized idp selection
+    - Templatized POST screen
+    - WIN32CL (MSVC CL compiler) port can now create zxidjni.dll, callable from Java on Windows
+    - Fixed truncated log bug (premature nul termination) in zxlog.
+    - Added CANON_INOPT=1 option to ignore InclusiveNamespaces/@PrefixList as needed to work around Shib 2.1.5 IdP bug
+    - Added patch  by Eric Rybinski for XML ENC padding problem reported by Sampo as OpenSSL bug 1067 back in 2005.
+    - Changed treatment of InclusiveNamespaces PrefixList to be more tolerant of undefined prefixes
+    - Fixed mktime(3) timezone bug, found by Cal
+zxid-0.64:: 16.9.2010
+    - Improved WIN32CL (MSVC CL compiler) port
+    - Added extern "C" markers to headers to force C calling convention even in C++, promoting binary compatibility of libraries
+    - zxcall: added sso only mode
+    - zxcall: added discovery only mode and iteration option
+    - zxcall: added EPR cache and session listing mode -s SID -l
+    - Added Unix crypt hash to zxpasswd and zxid_pw_authn()
+    - Added zxid_get_fault_status() method
+    - Renamed struct zx_e_Fault_s to zxid_fault (for cleaner Java Class generation)
+    - Added mockpdp.pl
+    - Improved (fixed?) compatibility with SiteMinder version is R12 SP1 CR3 based on CRNL canonicalization analysis by Steve Kinzler
+zxid-0.63:: 29.7.2010
+    - Added mandatory attribute contactType to Contact element in metadata
+    - Supply AuthnInstant
+    - Removed sed(1) dependency
+    - Improved win32cl target
+    - Added SubjectConfirmation
+    - Added possibility of using nested EncryptedKey (Shib 2010) instead of RetrievalMethod
+    - Added Recipient hint in sibling EncryptedKey case. This is sufficient to get Shib 2010 working.
+    - Added SubjectConfirmationData fields to support bearer subject confirmation method
+    - Added RelayState field decoding to POST profile
+    - Added double quote detection inside RelayState value
+    - Store authentication instant in session and use it in zxid_mk_an_stmt()
+    - Reworked/created az_base() family of functions to incorporate ideas from patch by Stijn Lievens
+    - Make nested EncryptedKey a config option
+    - Added support for fedusername and urn:oid:1.3.6.1.4.1.5923.1.1.1.6 (aka eduPersonPrincipalName)
+    - Tweaked the az requests to separate ses az from resource az (TAS3 bug #381)
+zxid-0.62:: 1.7.2010
+    - Fix IdP authentication template (runaway HTML comment)
+zxid-0.61:: 25.6.2010
+    - Fixed a crash in case NOSIG_FATAL and indeed no sig
+zxid-0.60:: 23.6.2010
+    - TAS3 package version number synchronization
+zxid-0.59:: 22.6.2010
+    - Added zxcot -m to generate our own metadata (previously only available using WKL method)
+    - Fixed segv on signature validation when wsc_meta is missing, but NOSIG_FATAL=0
+    - Improved zxidcot.pl with metadata and registration listings
+    - Tightened cgi parsing to check lengths of options (avoids false detection)
+    - Add Az calls to zxid_wsp_validate() and zxid_wsp_decorate()
+zxid-0.58:: 25.5.2010
+    - Make add-envelope processing more tolerant of different namespaces
+    - Added SOAP fault and tas3:Status
+    - Improved XML parse error formatting 
+    - Fixed seg fault in zxid_wsc_prepare() in case the EPR lacks Metadata
+    - Do proper signature validation in zxid_wsp_validate() and zxid_wsc_validate_resp_env()
+    - Do proper timestamp check in zxid_wsp_validate() and zxid_wsc_validate_resp_env()
+    - Added RelatesTo correlation check in  zxid_wsc_validate_resp_env()
+    - Added concept of current fault and current tas3 status
+    - Added accessor functions for faults and tas3 status
+    - Added local PDP call to all 4 web service call control points
+    - Added remote PDP call to all 4 web service call control points
+zxid-0.57:: 18.5.2010
+    - Introduced .jar and .war as std binary distribution items
+    - Check for empty PDP_URL and disable Az in that case
+    - Added to session localpath, tgtpath, sespath so that application layer can uses ZXID storage for its own purposes.
+    - Fixed SSO failure case
+    - Added to session sigres and ssores.
+    - Added SP local attribute authority, see zxid_ses_to_pool()
+    - Added local EPR feature to SP local attribute authority, i.e. upon SSO local EPRs get copied to the new session's EPR cache (see zxid_copy_user_eprs_to_ses())
+zxid-0.56:: 14.5.2010
+    - Re-tested Windows compile
+zxid-0.55:: 26.4.2010
+    - Fixes in zxididp code
+zxid-0.54:: 22.4.2010
+    - Add ability to absorb multiple EntityDescriptor elements from EntitiesDescriptor, as often happens in Shibboleth federations
+    - Fixed an infinite loop in zxcot -n -a
+    - Removed from zxid.h unused functions zxid_idp_soap_dispatch(), zxid_idp_soap_parse(), zxid_sha1_file(). Reported by Eric Rybski
+zxid-0.53:: 23.3.2010
+    - Fixed case where last item (null return) of cached multi discovery would trigger yet another discovery
+    - Added logging of the issued discovery messages
+    - Feature improvements to zxidappdemo.java
+    - Added ENA_PG and coverage targets to the Makefile (current coverage 47%)
+    - Process session in validate
+    - Added more Shibboleth metadata extensions. I claim Shibboleth metadata parses w/o warnings.
+    - Added SAML idp-discovery extention to metadata
+    - Changed templating system for IdP an page (other pages may be changed later to use the same)
+    - Added zxidnewuser.pl and other IdP mangement web GUI scripts
+    - Added zxid_wsc_prepare_call() and zxid_wsc_valid_resp() APIs, see zxidwscprepdemo.java for usage
+zxid-0.52:: 15.2.2010
+    - Log session create and destroy
+    - Relax error checking in SLO: missing NameID ok if sesix supplied
+    - Better session populate in zxid_wsp_validate()
+    - Fixed virtual host (URL autodetect) code in zxidwspdemo.java
+zxid-0.51:: 15.2.2010
+    - LOAD_COT_CACHE=file feature. The cache is concatenation of the metadata of CoT
+    - Change zxid_az() to return string containing XACML obligations
+    - Eliminate UI clutter: show_tech config flag with default off
+    - Thread safety: cf->ipport, key loading, cf->curl, cf->cot
+    - Thread safety: decoding contexts
+zxid-0.50:: 9.2.2010
+    - Fixed missing prefix in case of unknown tag/namespace
+    - Fixed ordering of unknown tags
+    - Added beginnings of a test suite, see zxtest.pl
+    - Added WSP tool: zxidwspcgi
+zxid-0.49:: 1.2.2010
+    - Added AuthnSvc client and zxcall tool, which allows shellscript wsc
+    - The zxcall tool also allows shell script az
+    - Removed arbitrary 64KB limits from metadata, SOAP, and EPR processing. Now dynamically reallocated as needed.
+    - Added zxid_ses_to_{ldif|json|qs}() family of functions
+    - Added zxid_add_attr_to_ses() and zxid_add_qs_to_ses()
+zxid-0.48:: 18.1.2010
+    - Fixed reversed WO rendering of parsed unknown elements
+    - Definititve path sanity fix for zxcot -bs
+    - Fixed ses check in case of no ses in zxid_cache_epr()
+    - Fixed iterations other than n==1 in zxid_get_epr()
+    - Added in zxiddi ability to compare ProviderID to EPR Address
+zxid-0.47:: 14.1.2010
+    - Refactored zxcot to support -bs
+    - Fixed recursive bootstrap infinite recursion and defined policy re recursive bootstrap level
+zxid-0.46:: 13.1.2010
+    - Moved project under git at zxidrepo, still learning.
+    - Fixed nameid memory allocation problem
+    - Added missing Java files to manifest
+zxid-0.45:: 7.1.2010
+    - Fixed error handling when unable to decrypt an assertion
+    - Fixed mod_auth_saml redirect_to_content when no relay state
+    - Do proper signing in zxid_wsf_call() and zxid_wsp_decorate()
+zxid-0.44:: 16.12.2009
+    - Fixed transient always on bug
+    - Fixed memory free bug in case where defederation is not supported
+zxid-0.43:: 29.11.2009
+    - Fix PHP support for zxid_wsp_validate() and zxid_wsp_decorate()
+    - Renamed hexdec to zx_hexdec to avoid risking conflicts
+zxid-0.42:: 22.11.2009
+    - Added service file name computator: zxcot -n -b <epr.xml
+    - Expose assertion path
+    - zxid_call() reengineering
+    - Added support for urn:mace:shibboleth:metadata:1.0
+    - Added support for TAS3 Credentials and Simple Obligations Language (SOL)
+    - Added zxid_wsp_validate() and zxid_wsp_decorate()
+    - zxidhrxmlwsc and zxidhrxmlwsp tested to work
+zxid-0.41:: 20.11.2009
+    - Yubikey support in zxiduser.c and zxpasswd
+    - config dump screen (o=d)
+    - OpenSSL_add_all_algorithms() fix from Stefan @ Koblenz
+    - di_Query support
+    - ID-WSF 2.0 AuthnSvc support
+    - Bootstrap support, improved
+    - SAML2 IdP support with attributes and bootstraps
+    - zxid-idp.pd documentation
+    - Added 403 Denied error response to SSO servlet (zxidsrvlet.java)
+    - Various bug fixes to zxididp and zxidjava
+    - First winbin release in long time (zxid-0.41-win32-bin.zip)
+zxid-0.40:: 14.11.2009
+    - Shib2 interop testing
+    - XACML cd1 support (sending policies in request)
+    - Populate both OID and FriendlyName variants of attributes from assertion
+    - Extensively tested java servlet configuration with zxidjni.az()
+    - Greatly improved zxid-java.pd documentation
+    - Fixed and tested mod_php configuration with zxid_az()
+    - Fixed and tested mod_perl configuration with Net::SAML::az()
+    - Retested mod_auth_saml
+zxid-0.39:: 5.11.2009
+    - Added zxidsrvlet and zxidappdemo
+zxid-0.38:: 16.10.2009
+    - Added better integrated zxidsrvlet
+zxid-0.36:: 14.10.2009
+    - Added building war files (from Brian Reynolds <leitrim_94@yahoo.com>)
+    - Removed duplicate cn from Auto-Cert generated self signed certs and CSRs
+    - Fixed gcc 4.2 specific compile problem re cast as lvalue (thanks Brian)
+zxid-0.35:: 11.10.2009
+    - fixed Solaris compile problems
+zxid-0.34:: 17.9.2009
+    - Added TAS3 package targets for Java and PHP
+zxid-0.33:: 9.9.2009
+    - Removed Apache check from default make
+    - Continued refactoring README.zxid to separate documents
+    - Changed configuration file reading so that config file is (re)read
+      whenever PATH is supplied, but not if PATH is supplied in file itself.
+    - Added dummy PDP
+    - Added zxcot tool
+    - Fixed zxdecode tool and added html parsing support
+    - Added xml-pretty.pl tool
+    - Added Auto-Cert feature to generate self signed certificates on the fly
+    - Added optional HMAC chaning code to the log format (but not implementation)
+    - Added attribute broker and PEP features
+    - Fixed relay state handling in mod_auth_saml so you land on right protected content page
+    - Added support for zxid_simple() returing JSON or Query String in addition to traditional LDIF
+    - Added preliminary and incomplete CARML support (see Identity Governance Framework - IGF)
+    - Fixed innumerous bugs in mod_auth_saml
+    - Added setting REMOTE_USER to mod_auth_saml
+zxid-0.32:: 25.3.2009
+    - Fixed Java compile
+zxid-0.31:: 15.11.2008
+    - Fixed validation of signatures in redirect binding
+    - Added logging of relied upon information in redirect binding
+    - Fixed memory leak in SLO and MNI
+    - Refactored dispatch functions so CGI and others use same code
+    - Fixed redirect binding signature validation
+zxid-0.30:: 28.9.2008
+    - Fixed some type warnings
+    - Fixed core dump in mod_auth_saml  without query string
+    - Fixed redirect hack to cope with the query string
+zxid-0.29:: 24.9.2008
+    - Fixed bug in redirect hack
+    - Added ANON_OK
+    - Added REQUIRED_AUTHNCTX
+    - Added IDP_SEL_PAGE
+    - Debugged and tested the mod_auth_saml Real World Example
+zxid-0.28:: 18.9.2008
+    - Fixed some Apache documentation issues
+    - Added redirect hack to allow mapping imposed URLs to ZXID native URLs)
+zxid-0.27:: 17.9.2008
+    - Added BSDmakefile hack, suggested by Slaven Rezic (slaven at rezic.de)
+    - Added NON_STANDARD_ENTITYID option
+    - Added precheck to quickly check main compliation and linking problems
+zxid-0.26:: 9.5.2008
+    - Fixed Auto-CoT bug due to form field name conflict
+    - Added missing .java files to Manifest
+zxid-0.25:: 17.4.2008
+    - Added support for SAML POST-SimpleSign binding
+    - Added preliminary draft support for Orange Personal APIs
+    - Added default-cot - ship metadata for some IdPs
+    - Updated documentation about joining OpenLiberty.org
+zxid-0.24:: 22.2.2008
+    - Added mod_auth_saml
+    - Many fixes from testing against commercial products
+zxid-0.23:: 12.10.2007
+    - Support MNI to change NameID
+    - Support EncryptedID on outbound traffic (MNI, SLO)
+zxid-0.22:: 10.10.2007
+    - Added log levels 1 and 2
+    - Added @Destination handling
+    - Ensured preservation of whitespace in XML parsing and exc-xml-canon
+    - Fixed alphabetization of attributes in exc-xml-canon
+    - Added signing ArtifactResolve, LogoutRequest, and ManageNameIDRequest over SOAP
+    - Improved handling of empty ns prefix for XML attributes
+    - Print source IP to logs
+zxid-0.21:: 8.10.2007
+    - Fixed missing Content-type header, reported by Damien Laniel <dlaniel@@entrouvert_com>
+    - Segregated prototypes that use va_list to zxidnoswig.h to avoid problem on Redhat
+    - Created cygwin target
+    - Changed the USE_LOCK handling to allow dummy on cygwin
+    - Fixed MGMT auto flag
+    - Fixed handling of InclusiveNamespaces/@PrefixList
+zxid-0.20:: 1.10.2007
+    - EncryptedAssertion, EncryptedAttribute, and EncryptedID support
+    - Fixed signing of redirect URLs
+    - Fixed indigestion over processing instructions and comments
+    - Fixed encoding of attribute namespaces
+    - Added xs and xsi namespaces
+    - Fixed lookup of attribute tokens without namespace (mismatching id symptom)
+zxid-0.19:: 11.8.2007
+    - fixed php support
+    - bug and documentation fixes
+zxid-0.18:: 17.7.2007
+    - Added HR-XML WSC and WSP support
+    - Much stabilization of ID-WSF code
+zxid-0.17:: 6.3.2007
+    - bug fixes
+zxid-0.16:: 4.3.2007
+    - Added ID-DAP support
+    - Added ID-MM7 support
+    - Added Contact Book support
+    - Added Geo Location support
+    - Added People Service support
+    - Added ID Mapping support
+    - Added Authentication Service support
+    - Added DST and Subscriptions support
+    - Added XACML2 support
+    - Added WS-Trust 1.3 support
+zxid-0.15:: 22.2.2007
+    - JAVAC_FLAGS tweak to avoid insufficient heap from Sean Doyle
+    - Fixed zxid_fed_mgmt_cf() unimplemented warning
+    - Documented fix for __init_array_start linking problem
+    - Annotated sources with call graph information, added call-anal.pl
+zxid-0.14:: 21.2.2007
+    - zxidhlo.java and Tomcat example perfected
+zxid-0.13:: 20.2.2007
+    - Java interface cleanup
+    - Mac compile fixes
+    - minor bug fixes
+zxid-0.12:: 10.2.2007
+    - WSF bootstrap handling
+    - rework of session system
+    - bug fixes
+zxid-0.11:: 1.2.2007
+    - MinGW DLL fixes
+zxid-0.10:: 31.1.2007
+    - MinGW DLL production works
+zxid-0.9:: 26.1.2007
+    - fixed compilation
+    - preliminary Windows support using MinGW
+zxid-0.8:: 1.12.2006
+    - Improved signature checking
+    - New logging infrastructure, document logging
+    - Support config files, document the format
+zxid-0.7:: 25.9.2006
+    - WO encoding with namespace support
+    - First cut of XMLDSIG validation (very early signing, too)
+    - Fixes to PHP, mod_php, Perl, and mod_perl support
+zxid-0.6:: 18.9.2006
+    - PHP support, including mod_php
+zxid-0.5:: 15.9.2006
+    - Encoders and decoders for ID-WSF and ID-FF (various versions)
+zxid-0.4:: 4.9.2006
+    - mod_perl/Net::SAML SP
+zxid-0.3:: Late Ago 2005
+    - First fully functional release
+zxid-0.2:: Ago 2005
+    - SAML 2.0 encoders and decoders, metadata import works
+zxid-0.1:: Ago 2005
+    - Project founded.
+
+# EOF

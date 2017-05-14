@@ -1,0 +1,57 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# Test changing the colorinterpolator
+
+
+Group {
+children [
+	DEF TOS TouchSensor {
+	}
+	Shape {
+	 geometry Box { }
+	 appearance Appearance { material DEF MAT Material { } }
+	}
+]
+}
+
+DEF TS TimeSensor {
+	cycleInterval 2.5
+	enabled TRUE
+	loop TRUE
+}
+
+DEF CI ColorInterpolator {
+	key [0 0.5 1]
+	keyValue [0 0 0 1 1 1 0 0 0]
+}
+
+DEF SCR Script {
+	url "javascript: function change(val,time) {
+		if(toggle) {
+			toggle = false;
+			colors = new MFColor(
+				new SFColor(1,0,0),
+				new SFColor(0,0,1),
+				new SFColor(1,0,0));
+		} else {
+			toggle = true;
+			colors = new MFColor(
+				new SFColor(1,1,0),
+				new SFColor(0,1,1),
+				new SFColor(1,1,0));
+		}
+	}
+	"
+	eventIn SFTime change
+	eventOut MFColor colors
+	field SFBool toggle FALSE
+}
+
+ROUTE TOS.touchTime TO SCR.change
+ROUTE TS.fraction_changed TO CI.set_fraction
+ROUTE SCR.colors TO CI.keyValue
+ROUTE CI.value_changed TO MAT.diffuseColor

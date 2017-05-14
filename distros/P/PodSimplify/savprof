@@ -1,0 +1,14 @@
+Total Elapsed Time =    7.11 Seconds
+  User+System Time =    7.11 Seconds
+%Time Seconds     #Calls sec/call Name
+ 26.3   1.870          1   1.8700 Simplify::parse
+ 25.8   1.840       4266   0.0004 main::dumpout
+ 20.9   1.490        773   0.0019 Simplify::form
+ 13.9   0.990       1748   0.0006 main::CODE(0xf8b00)
+ 4.36   0.310        524   0.0006 Simplify::gettext
+ 2.95   0.210        262   0.0008 Simplify::firstword
+ 1.69   0.120         55   0.0022 Simplify::chopup
+ 0.00   0.000          1   0.0000 DynaLoader::import
+ 0.00   0.000          2   0.0000 Exporter::import
+ 0.00   0.000          2   0.0000 Exporter::export
+ 0.00   0.000          1   0.0000 lib::import

@@ -1,34 +1,16 @@
 package Myco::QueryTemplate;
 
 ###############################################################################
-# $Id: QueryTemplate.pm,v 1.1.1.1 2004/11/22 19:16:01 owensc Exp $
+# $Id: QueryTemplate.pm,v 1.6 2006/02/27 22:55:55 sommerb Exp $
 ###############################################################################
 
 =head1 NAME
 
 Myco::QueryTemplate - a Myco template class
 
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
-
 =head1 DESCRIPTION
 
-A template class for Myco::Base::Entity::Meta::Query.
+A template class for L<Myco::Query|Myco::Query> and L<Myco::Entity::Meta::Query|Myco::Entity::Meta::Query>. Provides full encapsulation of Tangram Query object construction and manipulation.
 
 =cut
 
@@ -40,9 +22,9 @@ use warnings;
 use strict;
 use Myco::Exceptions;
 use CGI;
-use Myco::Base::Entity::Meta;
-use Myco::Base::Entity::Meta::Attribute;
-use Myco::Base::Entity::Meta::Attribute::UI;
+use Myco::Entity::Meta;
+use Myco::Entity::Meta::Attribute;
+use Myco::Entity::Meta::Attribute::UI;
 use Myco::Query::Part::Filter;
 use Myco::Query::Part::Clause;
 
@@ -51,14 +33,14 @@ use Myco::Query::Part::Clause;
 ##############################################################################
 use constant FILTER => 'Myco::Query::Part::Filter';
 use constant CLAUSE => 'Myco::Query::Part::Clause';
-use constant ATTR_META => 'Myco::Base::Entity::Meta::Attribute';
-use constant UI_META => 'Myco::Base::Entity::Meta::Attribute::UI';
+use constant ATTR_META => 'Myco::Entity::Meta::Attribute';
+use constant UI_META => 'Myco::Entity::Meta::Attribute::UI';
 
 ##############################################################################
 # Inheritance & Introspection
 ##############################################################################
 use base qw( Class::Tangram );
-my $md = Myco::Base::Entity::Meta->new( name => __PACKAGE__ );
+my $md = Myco::Entity::Meta->new( name => __PACKAGE__ );
 
 ##############################################################################
 # Constructor, etc.
@@ -67,7 +49,7 @@ my $md = Myco::Base::Entity::Meta->new( name => __PACKAGE__ );
 =head1 COMMON ENTITY INTERFACE
 
 Constructor, accessors, and other methods -- as inherited from
-Myco::Base::Entity.
+Myco::Entity.
 
 =cut
 
@@ -292,9 +274,9 @@ sub add_remotes {
 
   my $filter_string = $query->get_filter_string;
 
-A wrapper method around Myco::Query::Part::Filter->get_combined_parts. Works on
-the filter attribute. Accepts as an argument the same hash of parameters passed
-to run_query.
+A wrapper method around Myco::Query::Part::Filter->get_combined_parts. Works
+on the filter attribute. Accepts as an argument the same hash of parameters
+passed to run_query.
 
 =cut
 
@@ -436,7 +418,7 @@ sub get_ref_params {
 
   my $cgi_widget = $query->get_closure( 'first_name' );
 
-Get an appropriate CGI widget for a given param. Leverages L<Myco::Base::Entity::Meta::Attribute::UI|Myco::Base::Entity::Meta::Attribute::UI>.
+Get an appropriate CGI widget for a given param. Leverages L<Myco::Entity::Meta::Attribute::UI|Myco::Entity::Meta::Attribute::UI>.
 
 =cut
 

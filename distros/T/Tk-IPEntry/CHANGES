@@ -1,0 +1,65 @@
+----------------------------
+Revision : 1.8
+Date : 2002/12/11 15:54:36
+Author : 'xpix'
+State : 'Exp'
+Lines : +56 -4
+Description :
+* add range function
+
+----------------------------
+Revision : 1.7
+Date : 2002/12/10 18:30:35
+Author : 'xpix'
+State : 'Exp'
+Lines : +32 -10
+Description :
+* add Interface from Net::IP
+* add the new HexEntry Widget
+! better error Routine (with caller)
+
+----------------------------
+Revision : 1.6
+Date : 2002/12/2 15:39:4
+Author : 'xpix'
+State : 'Exp'
+Lines : +352 -326
+Description :
+! remove dos LF
+
+----------------------------
+Revision : 1.5
+Date : 2002/11/19 17:53:39
+Author : 'xpix'
+State : 'Exp'
+Lines : +23 -6
+Description :
+* allow empty Ip-Number
+! Delimeter incorrect in get routine
+
+----------------------------
+Revision : 1.3
+Date : 2002/11/1 17:31:3
+Author : 'xpix'
+State : 'Exp'
+Lines : +198 -198
+Description :
+nothing, reformat
+
+----------------------------
+Revision : 1.2
+Date : 2002/10/1 17:10:21
+Author : 'xpix'
+State : 'Exp'
+Lines : +9 -5
+Description :
+*** empty log message ***
+
+----------------------------
+Revision : 1.1
+Date : 2002/9/20 3:27:6
+Author : 'xpix'
+State : 'Exp'
+Lines : +0 0
+Description :
+! Name changed

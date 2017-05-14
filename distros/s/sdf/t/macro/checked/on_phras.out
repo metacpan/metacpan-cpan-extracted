@@ -1,0 +1,7 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Some text including a {{MYTYPE[]mytype Object}} and another {{B[]bold Object}}.
+N[orig_style='N']Some more text including a {{U[jump='#mytype object']mytype Object}} and another {{B[]bold Object}}.
+N[orig_style='N']Yet another {{U[jump='#object']Object}}.
+H2[orig_style='H2']{{U[jump='#A Heading which is a MYTYPE']A Heading which is a MYTYPE}}
+N[orig_style='N']Hello {{1[]world}}1. I hope you are {{B[]really {{U[]well}}2}}3 today.

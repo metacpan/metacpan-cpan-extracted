@@ -1,4 +1,5 @@
 all-knowing-dns.conf
+Changes
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -15,8 +16,11 @@ lib/App/AllKnowingDNS/Zone.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+MYMETA.json
+MYMETA.yml
 script/all-knowing-dns
 t/001-parse-config.t
 t/002-util.t
 t/003-config.t
 t/004-handler.t
+t/005-same-domain.t

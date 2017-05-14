@@ -1,0 +1,110 @@
+#!perl
+use strict;
+use Getopt::Std;
+use Errno;
+use Config::IniFiles;
+
+use Arc::Server;
+use Arc::Connection::Server;
+
+$SIG{CHLD} = 'IGNORE';
+
+my %args;
+
+getopts("d:F:p:vP:",\%args) || usage("Wrong parameter construction.");
+
+$args{F} = $Arc::ConfigPath."/arcxd.conf" unless $args{F};
+usage("Configuration file ($args{F}) not found.") unless -e $args{F};
+
+my $cf;
+(print @Config::IniFiles::errors or exit 1) unless $cf = new Config::IniFiles(-file => $args{F});
+
+my %log;
+$log{loglevel} = $args{d} ? $args{d} : $cf->val("logging","level",7);
+$log{logdestination} = $args{d} ? 'stderr' :$cf->val("logging","destination",'syslog');
+
+my %def;
+$def{server} = {};
+
+my $prop = $def{server};
+$prop->{port} = [split(/,/,$args{p} ? $args{p} : $cf->val("arcd","port",$Arc::DefaultPort))];
+$prop->{host} = $cf->val("arcd","host",0);
+
+$prop->{max_requests} = $cf->val("arcd","max_requests");
+$prop->{min_servers} = $cf->val("arcd","min_servers");
+$prop->{max_servers} = $cf->val("arcd","max_servers");
+$prop->{max_spare_servers} = $cf->val("arcd","max_spare_servers");
+$prop->{min_spare_servers} = $cf->val("arcd","min_spare_servers");
+$prop->{pid_file} = $args{P} ? $args{P} : $cf->val("arcd","pid_file",$Arc::DefaultPIDFile);
+$prop->{background} = $args{d} ? undef : 1;
+
+unless (open(FH,">".$prop->{pid_file})) {
+	die "will not be able to create PID file ".$prop->{pid_file};
+}
+close(FH);
+
+my $cmds = {};
+foreach ($cf->Parameters("commands")) {
+	$cmds->{$_} = $cf->val("commands",$_);
+	verbout("adding possible command:",$_);
+}
+
+verbout("Available SASL mechanisms:",join(",",$cf->val("arcd","sasl_mechanisms")));
+verbout("Loglevel:",$log{loglevel});
+verbout("Logdest:",$log{logdestination});
+verbout("Listenport:",join(",",@{$prop->{port}}));
+verbout("Forking into background.") unless $args{d};
+verbout("Using $Arc::Copyright.");
+verbout("Contact: $Arc::Contact.");
+verbout("Service: ",$cf->val("main","service"));
+verbout("PID-file: ",$prop->{pid_file});
+
+my $arc = new Arc::Server(
+	%def,
+	%log,
+
+	connection_vars => {
+		%log,
+		timeout => $cf->val("main","timeout"),
+		sasl_mechanisms => [$cf->val("arcd","sasl_mechanisms")],
+		commands => $cmds,
+		service => $cf->val("main","service"),
+	}
+
+);
+
+if (my $msg = $arc->IsError()) {
+	err($msg);
+	exit 1;
+}
+
+$arc->Start();
+
+sub verbout
+{
+	err("verbose:",@_) if $args{v};
+}
+
+sub err
+{
+	print STDERR join(" ",@_),"\n";
+	1;
+}
+sub usage
+{
+	my $msg = shift;
+	print STDERR <<EOT;
+$msg
+$0 -d <loglevel> -F <config file> -p <listenport> -v
+
+  -d <loglevel>    loglevel (see man Arc) and do not fork into backgroup
+  -p <port>        port the server shall listen on
+  -P <pid_file>    PID file
+  -F <config file> specify the config file, where the server finds information
+  -v               produce some extra output (from this executable)
+
+$Arc::Copyright
+$Arc::Contact
+EOT
+	exit 1;
+}

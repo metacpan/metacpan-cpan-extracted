@@ -1,0 +1,125 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: sdngen - SDF Tuning File Generator</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdftest.html">Previous Topic</A> | <A HREF="prn2ps.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="sdngen">11.8. sdngen - SDF Tuning File Generator</A></H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P><A HREF="../ref/sdngen.html">sdngen</A> extracts SDF template information from a <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> template.</P>
+<HR>
+<H2><A NAME="Usage">Usage</A></H2>
+<PRE>
+usage  : sdngen [-h[help]] [-o[out_ext]]
+         [-l[log_ext]] [-p para_root] [-f font_root]
+         [-t tbl_root] [-e existing_template]
+         file ...
+purpose: generate an SDF template from a Frame one
+version: 2.000    (SDF 2.001beta1)
+</PRE>
+<P>The options are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdngen_h">-h</A>
+</TD>
+<TD>
+display help on options
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdngen_o">-o</A>
+</TD>
+<TD>
+output file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdngen_l">-l</A>
+</TD>
+<TD>
+log file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdngen_p">-p</A>
+</TD>
+<TD>
+default parent for a paragraph format
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdngen_f">-f</A>
+</TD>
+<TD>
+default parent for a font format
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdngen_t">-t</A>
+</TD>
+<TD>
+default parent for a table format
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdngen_e">-e</A>
+</TD>
+<TD>
+existing template file
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P><A NAME="sdngen_h">The -h option provides help. If it is specified without a parameter, a brief description of each option is displayed. To display the attributes for an option, specify the option letter as a parameter.</A></P>
+<P><A NAME="sdngen_o">By default, generated output goes to standard output. To direct output to a file per input file, use the -o option to specify an extension for output files. If the -o option is specified without a parameter, an extension of <EM>out</EM> is assumed.</A></P>
+<P><A NAME="sdngen_l">Likewise, error messages go to standard error by default. Use the -l option to create a log file per input file. If the -l option is specified without a parameter, an extension of <EM>log</EM> is assumed.</A></P>
+<P><A NAME="sdngen_p">The -p option can be used to specify the root paragraph format from which others are derived. The default paragraph root is <EM>Body</EM>.</A></P>
+<P><A NAME="sdngen_f">The -f option can be used to specify the root font (i.e. phrase) format from which others are derived. The default font root is <EM>Emphasis</EM>.</A></P>
+<P><A NAME="sdngen_t">The -t option can be used to specify the root table format from which others are derived. The default table root is <EM>Format A</EM>.</A></P>
+<P>As formats often appear in families (e.g. Heading1, Heading2, etc.), <EM>sdngen</EM> will use the (alphabetically) previous format as the parent if it makes a better parent (i.e. there are less differences) than the default one.</P>
+<P><A NAME="sdngen_e">If a template already exists, it can be specified using the -e option. In this case, <EM>sdngen</EM> will get as much information as it can from that file including:</A></P>
+<UL>
+<LI>the root format for each type
+<LI>the order of formats within a type
+<LI>the parent for each format.</UL>
+<P>Within each type, formats which are unknown in the existing template are output after those that are known.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>To generate an SDF tuning file file:</P>
+<PRE>
+     sdngen -osdn mytemplate.mif
+</PRE>
+<P>This will create a template file called <TT>mytemplate.sdn</TT>.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdftest.html">Previous Topic</A> | <A HREF="prn2ps.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

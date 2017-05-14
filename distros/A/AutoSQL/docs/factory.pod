@@ -1,0 +1,30 @@
+
+=pod
+
+=head1 MODULE FACTORY
+
+Introduction to ModuleFactory and AdaptorFactory
+
+=head2 Overview
+
+ModuleFactory has the knowledge of Schema.
+
+For ModuleFactory::make_virtual_module and AdaptorFactory::make_object_adaptor, they generate the module according to
+the type in schema, and return the generated module's name.
+
+ make_object_adaptor        -- a module
+ _make_only_fetch_method    -- method(s)
+
+
+=head2 Code Example
+
+ sub make_module {
+     my ($self, $type)=@_;
+
+ sub make_method {
+     my ($self, $model)=@_;
+     my ($self, $val)=@_;
+
+
+=cut
+

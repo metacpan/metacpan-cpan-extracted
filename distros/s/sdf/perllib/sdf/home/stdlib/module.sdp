@@ -1,0 +1,110 @@
+# $Id$
+#
+# >>Title::     Module Filter Plug-In
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 14-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# This plug-in provides an [[SDF]] filter called {{module}} which
+# generates reference documentation for an [[SDF]] module.
+#
+# >>Description::
+#
+# >>Limitations::
+
+# >>Resources::
+#
+# >>Implementation::
+#
+
+
+# This is the filter which does the work
+@_module_FilterParams = ();
+sub module_Filter {
+    local(*text, %param) = @_;
+#   local();
+
+    # Build the document after the module has been loaded
+    push(@text, "!build_module_reference");
+}
+
+
+# This macro gets called at the end of the module
+sub build_module_reference_Macro {
+    return (split("\n", <<End_Of_Sdf));
+
+    # Build the title page
+    !define DOC_NAME    DOC_SHORT
+    !define DOC_TYPE    "Reference"
+    !define DOC_STATUS  ""
+    !build_title
+
+    # The first chapter is the extracted stuff
+    !getdoc DOC_SHORT
+
+    # Build the objects chapter
+    !build_objects_chapter
+End_Of_Sdf
+}
+
+
+# This gets called to generate a chapter for the objects
+@_build_objects_chapter_MacroArgs = ();
+sub build_objects_chapter_Macro {
+    local(%arg) = @_;
+    local(@text);
+    local($class);
+    local(@objects, $obj, $cname, $oname, $rest);
+    local($heading, $field);
+
+    # Build the chapter heading
+    push(@text, "H1: Classes & Objects");
+
+    # Generate a sub-section for each class
+    for $class (sort keys %_class) {
+        next unless $class =~ /^\w+$/;
+
+        # Get the list of objects, if any
+        @objects = ();
+        for $obj (sort keys %obj_name) {
+            ($cname, $oname, $rest) = split($;, $obj);
+            next if defined($rest);
+            next if $cname ne $class;
+            push(@objects, $oname);
+        }
+
+        # Build the sub-section
+        if (@objects) {
+            # Format a heading
+            $heading = $class;
+            substr($heading, 0, 1) =~ tr/a-z/A-Z/;
+            push(@text, "H2: $heading");
+
+            # Add the objects
+            $field = $_class{$class,'name_fld'};
+            push(@text, "!block $class");
+            push(@text, "$field");
+            push(@text, @objects);
+            push(@text, "!endblock");
+        }
+    }
+
+    # If there were no objects, delete the chapter
+    if (scalar(@text) == 1) {
+        @text = ();
+    }
+
+    # Return result
+    return @text;
+}
+
+# package return value
+1;

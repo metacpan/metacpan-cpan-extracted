@@ -22,10 +22,10 @@ if ($err) {
 } else {
   system("git update-index -q --ignore-submodules --refresh 2>/dev/null");
   if ( system("git diff-files --quiet --ignore-submodules 2>/dev/null") ) {
-    $ref .= ", uncommitted changes";
+    $ref .= ",dirty";
   }
   if ( system("git diff-index --cached --quiet --ignore-submodules HEAD -- 2>/dev/null") ) {
-    $ref .= ", staged changes";
+    $ref .= ",staged";
   }
   say $fh "\\newcommand{\\gitinfo}{$ref}";
   say $fh "\\newcommand{\\gitinfofancy}{v. $ref}";

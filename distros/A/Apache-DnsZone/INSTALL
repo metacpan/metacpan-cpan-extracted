@@ -10,7 +10,7 @@ Get the latest apache from http://httpd.apache.org/dist/httpd/
 (This assumes Apache 1.3.20 and mod_perl 1.25)
 $ tar -zxf apache_1.3.20.tar.gz
 $ tar -zxf mod_perl-1.25.tar.gz
-$ cd mod_perl-1.25.tar.gz
+$ cd mod_perl-1.25.tar.gz
 $ perl Makefile.PL \
     DO_HTTPD=1 \
     APACHE_SRC=../apache_1.3.20 \
@@ -33,7 +33,7 @@ http://www.cpan.org/authors/id/J/JI/JIMW/libapreq-0.31_03.tar.gz
 
 To install DnsZone:
 
-$ perl Makefile.PL
+$ perl Makefile.PL
 $ make
 $ make install
 

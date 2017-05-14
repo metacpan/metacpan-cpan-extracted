@@ -1,0 +1,35 @@
+# This file tests line numbering in messages
+
+Hello
+world
+
+UNKNOWNP[unknownp]Some text with an
+{{N[unknown]unknown attribute}} and [[unknown_var]] on the second and
+{{UNKNOWN:unknown object}} on the third
+line.
+
+!macro badstuff
+H0: Heading with a bad level
+
+Some text with an
+{{WXYZ:unknown tag}}.
+!endmacro
+
+!badstuff
+
+BADP[badp]Some more text with a
+{{N[bad]bad attribute}} on the second and
+{{BAD:bad object}} on the third
+line.
+
+# Try bad stuff inside a block
+!block appendix
+H0: Heading with a bad level
+
+Some text with an
+{{WXYZ:unknown tag}}.
+
+H9: Another heading with a bad level
+!endblock
+
+!badstuff

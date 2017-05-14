@@ -1,0 +1,27 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: build_title Macro
+
+H2: Interface
+
+!macro_interface "build_title"
+
+H2: Description
+
+The {{build_title}} macro create a title page or section for
+documents and papers.
+
+H2: Examples
+
+#H2: Limitations & Future Directions

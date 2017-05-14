@@ -1,0 +1,50 @@
+﻿=pod
+
+=head1 NAME
+
+Carrot::Productivity::Text::Placeholder::Miniplate::Generic - a basket to be filled with placeholders
+
+=head1 SYNOPSIS
+
+	$class_names->provide(
+		my $template_class = '::Productivity::Text::Placeholder::Template');
+
+	my $template = $template_class->constructor(
+		my $generic = '::Generic');
+	$generic->add_placeholder('some_value', sub { return(time()%86400) });
+
+	$template->compile('Some value: [=some_value=]');
+	print ${$template->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Carrot::Productivity::Text::Placeholder::Miniplate::Generic provides no placeholders by default. Any sense has to be added via add_placeholder (see below). Keep in mind that the placeholders have to be added before compilation.
+
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item add_placeholder($template, $code_ref)
+
+Adds the $code_ref under the name of $template. $code_ref is executed and returns the current value to be substituted for $template.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

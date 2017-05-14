@@ -1,0 +1,15 @@
+MANIFEST
+README
+Changes
+META.yml
+Build.PL
+Makefile.PL
+client.pl
+client.conf
+lib/Net/RVP.pm
+lib/Net/RVP/Server.pm
+lib/Net/RVP/Session.pm
+lib/Net/RVP/Sink.pm
+lib/Net/RVP/User.pm
+docs/draft-calsyn-rvp-01.txt
+docs/RVP_specification.txt

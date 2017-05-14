@@ -1,11 +1,13 @@
 #ifndef TCONV_CONFIG_H
 #define TCONV_CONFIG_H
 
-#cmakedefine C_INLINE @C_INLINE@
-#cmakedefine C_INLINE_IS_INLINE @C_INLINE_IS_INLINE@
-#cmakedefine C_VA_COPY @C_VA_COPY@
-#cmakedefine TCONV_HAVE_ICU   @TCONV_HAVE_ICU@
-#cmakedefine TCONV_HAVE_ICONV @TCONV_HAVE_ICONV@
+#cmakedefine C_INLINE                     @C_INLINE@
+#cmakedefine C_INLINE_IS_INLINE           @C_INLINE_IS_INLINE@
+#cmakedefine C_VA_COPY                    @C_VA_COPY@
+#cmakedefine TCONV_HAVE_ICU               @TCONV_HAVE_ICU@
+#cmakedefine TCONV_HAVE_ICONV             @TCONV_HAVE_ICONV@
+#cmakedefine ICONV_CAN_TRANSLIT           @ICONV_CAN_TRANSLIT@
+#cmakedefine ICONV_CAN_IGNORE             @ICONV_CAN_IGNORE@
 
 #ifndef __cplusplus
 #  ifndef C_INLINE

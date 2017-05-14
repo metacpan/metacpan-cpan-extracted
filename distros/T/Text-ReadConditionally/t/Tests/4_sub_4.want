@@ -1,0 +1,12 @@
+Line 1
+After subroutine definition
+Sub a line 1
+a0=one num args=2
+done sub a
+Sub a line 1
+a0=un num args=4
+done sub a
+Sub a line 1
+a0=ein num args=1
+done sub a
+EOF

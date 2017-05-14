@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+README
+SetDualVar.pm
+SetDualVar.xs
+test.pl

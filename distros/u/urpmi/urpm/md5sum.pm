@@ -1,7 +1,7 @@
-package urpm::md5sum; # $Id: md5sum.pm 265136 2010-01-22 12:10:01Z misc $
+package urpm::md5sum;
 
 use strict;
-use urpm::util;
+use urpm::util qw(cat_ file_size);
 use urpm::msg;
 
 
@@ -100,7 +100,6 @@ sub compute {
 
 1;
 
-__END__
 
 =back
 

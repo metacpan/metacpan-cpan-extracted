@@ -1,5 +1,5 @@
 package Net::Easypost::Label;
-$Net::Easypost::Label::VERSION = '0.18';
+$Net::Easypost::Label::VERSION = '0.19';
 use Moo;
 with qw(Net::Easypost::Resource);
 
@@ -101,7 +101,7 @@ Net::Easypost::Label
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

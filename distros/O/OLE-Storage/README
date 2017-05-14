@@ -1,0 +1,88 @@
+
+Hello!
+
+Welcome to OLE-Storage-0.386.tar.gz
+
+A perl 5 distribution of a Structured Storage interface. 
+
+
+To be found at: 
+
+   http://wwwwbs.cs.tu-berlin.de/~schwartz/perl/
+
+   http://www.cs.tu-berlin.de/~schwartz/perl/
+
+
+Further requirements:
+
+You need the modules "Unicode::Map" and "Startup.pm", both available
+at the address above.
+
+
+What is Structured Storage?
+
+It's the binary data format of standard Microsoft Windows OLE documents. 
+Hitherto it was only safe to deal with Windows documents at Windows
+operating systems. OLE::Storage is an interface for all operating systems.
+
+
+What does OLE::Storage?
+
+It gives access to the raw data streams of documents, that are done by
+e.g. Microsoft Word or Star Word. Further more, OLE::PropertySet gives 
+access to PropertySets as they are defined e.g. in those OLE documents. 
+
+
+What can you do with OLE::Storage?
+
+If you have to deal with binary documents done at MS Windows platforms,
+but your locale machine is not, you might use it as developing tool. Apart
+from this, the distribution contains some utilities:
+
+lhalw   
+   converts MS Word 6+ documents to plain text. (But Word 8 
+   is not fully supported)
+
+herbert
+   Converts simple MS Excel documents to HTML.
+
+lls
+   Lists the document's structure, saves its streams.
+
+ldat
+   Lists document's properties. It can be used to look who created a 
+   document when.
+
+lclean
+   Lists and removes the trash sections from documents.
+
+mkWinwordIndex
+   Creates a HTML index for your Office files.
+
+
+Has it something to do with LAOLA?
+
+Laola was the former name of this distribution. The name came up as follows.
+On the one hand Laola is a little bit similar to OLE. I wanted to have it
+similar, because an often used name for Structured Storage documents is "OLE
+documents". On the other hand the name should be different from OLE to show,
+that the modules are standalone and have no contact at all to Microsoft's
+OLE interfaces.
+
+
+Module list
+
+OLE::Storage is settled in CPAN's module list at category 7:
+
+OLE::
+::Storage          aupO  Structured Storage / OLE document interface
+::PropertySet      aupO  Property Set interface
+
+
+Comments welcome! 
+
+Contact: schwartz@cs.tu-berlin.de
+
+
+Yours, Martin 
+

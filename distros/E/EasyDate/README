@@ -1,0 +1,89 @@
+NAME
+
+	easyDate - A easy Interface For Date Objects;
+
+SYNOPSIS
+
+	use easyDate;
+	
+	my $obj = new easyDate(21,07,2005);
+	my $newObj = new easyDate;
+
+
+	$newObj->setDate(1,1,2005);
+	$newObj->day(15);
+	$newObj->mon(12);
+
+	$result = &easyDate::compare($obj,$newObj);
+	
+	unless ($result) { print "Objects are equal!"; }
+
+	$newObj = &easyDate::get_tDate;
+
+	$newObj->print;	
+
+
+DESCRIPTION
+
+	This module provides a fairly easy interface for creating and
+	using date objects. 
+
+METHODS
+
+	new
+		Returns a new easyDate object. It can 
+		takes three arguments: The day, the month and the year.
+
+
+	day[day], mon[mon], year[year]
+		Get/Set method for date parameters.
+
+
+	setDate(day,mon,year)
+		Set method for all parameters..
+
+
+	print
+		Print all parameters.
+
+
+	get_daysnum(month, year)
+		Return number of days in received M-Y (month,year)
+
+
+	get_tDate()
+		Get current (localtime based) date.
+
+
+	compare(object1,object2)
+		Compares two date object and returns 
+			-1 - if first received object is less than second.
+			0  - if objects are equal.
+			1  - if first received object is more than second.
+
+	seconds(obj);
+		Convert received object's parameters (date) to
+		seconds.
+
+
+	monMinus(obj), monPlus(obj)
+		Return current month of received object minus/plus 1. 
+
+
+INSTALLATION
+
+	Just download the file to whatever location you like and use it in
+	your scripts.
+
+BUGS
+
+	Not known.
+
+AUTHOR
+
+	Dmitry Sagaev - <zurik@mail.ru>
+
+SEE ALSO
+
+	* Time::Local
+

@@ -11,7 +11,7 @@ use base 'Class::Accessor::Fast';
 use Exporter 'import';
 use Module::Load;
 
-use version; our $VERSION = qv("2.0")->numify;
+use version; our $VERSION = qv("2.01")->numify;
 our @EXPORT = qw(
   flood_check
   flood_storage
@@ -158,6 +158,25 @@ sub register_attempt {
     return $is_overrated;
 }
 
+sub forget_attempts {
+    my $self = shift;
+    my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
+    my @configs      = @{ $self->{limits}{$limit} };
+    my $is_overrated = $self->is_user_overrated(@_);
+    foreach my $config (@configs) {
+        my $prefix = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
+        my $queue  = $self->backend_name->new(
+            {
+                storage => $self->storage,
+                expires => $config->{period},
+                prefix  => $prefix
+            }
+        );
+        $queue->clear;
+    }
+    return $is_overrated;
+}
+
 1;
 
 __END__
@@ -255,19 +274,19 @@ flood_storage().
 Creates new object. $cache can be Cache::Memcached or Cache::Memcached::Fast object.
 
 
-=item register_attempt( $identifier )
+=item register_attempt( $limit_type, $identifier )
 
 Increments attempt counter for $identifier.
 
-=item forget_attempts( $identifier )
+=item forget_attempts( $limit_type, $identifier )
 
 Sets attempt counter to zero
 
-=item get_attempt_count( $identifier )
+=item get_attempt_count( $limit_type, $identifier )
 
 Returns count of attempts
 
-=item is_user_overrated( $identifier )
+=item is_user_overrated( $limit_type, $identifier )
 
 If user have reached his limits returns time to unlocking in seconds. Otherwise returns 0
 

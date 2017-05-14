@@ -16,11 +16,7 @@
 #endif
 
 #ifndef UNDER_CE
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#  include <sys/utime.h>
-#else
-#  include <utime.h>
-#endif
+#include <sys/utime.h>
 #endif
 
 /*
@@ -127,10 +123,8 @@ DllExport  void		win32_seekdir(DIR *dirp, long loc);
 DllExport  void		win32_rewinddir(DIR *dirp);
 DllExport  int		win32_closedir(DIR *dirp);
 
-#ifndef USE_WIN32_RTL_ENV
 DllExport  char*	win32_getenv(const char *name);
 DllExport  int		win32_putenv(const char *name);
-#endif
 
 DllExport  unsigned 	win32_sleep(unsigned int);
 DllExport  int		win32_times(struct tms *timebuf);
@@ -179,15 +173,6 @@ END_EXTERN_C
 #undef utime
 #undef uname
 #undef wait
-
-#ifdef __BORLANDC__
-#undef ungetc
-#undef getc
-#undef putc
-#undef getchar
-#undef putchar
-#undef fileno
-#endif
 
 #define stderr				win32_stderr()
 #define stdout				win32_stdout()
@@ -332,12 +317,10 @@ END_EXTERN_C
 #undef crypt
 #define crypt(t,s)		win32_crypt(t,s)
 
-#ifndef USE_WIN32_RTL_ENV
 #undef getenv
 #define getenv win32_getenv
 #undef putenv
 #define putenv win32_putenv
-#endif
 
 #endif /* WIN32IO_IS_STDIO */
 #endif /* WIN32IOP_H */

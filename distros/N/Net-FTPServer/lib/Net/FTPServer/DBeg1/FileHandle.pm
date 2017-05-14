@@ -18,8 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: FileHandle.pm,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 =pod
 
 =head1 NAME
@@ -30,11 +28,7 @@ Net::FTPServer::DBeg1::FileHandle - The full FTP server personality
 
   use Net::FTPServer::DBeg1::FileHandle;
 
-=head1 DESCRIPTION
-
 =head1 METHODS
-
-=over 4
 
 =cut
 
@@ -191,8 +185,6 @@ sub delete
 
 __END__
 
-=back 4
-
 =head1 AUTHORS
 
 Richard Jones (rich@annexia.org).
@@ -204,6 +196,6 @@ London, SW6 3EG, UK
 
 =head1 SEE ALSO
 
-L<Net::FTPServer(3)>, L<perl(1)>
+C<Net::FTPServer(3)>, C<perl(1)>
 
 =cut

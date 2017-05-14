@@ -411,13 +411,17 @@ Default handler when one of the above is not specified
 Each XML::DOM::Node generates the appropriate SAX callbacks (for the
 appropriate SAX handler.) Different SAX handlers can be plugged in to
 accomplish different things, e.g. L<XML::Checker> would check the node 
-(currently only Document and Element nodes are supported), L<XML::DOM::PerlSAX>
+(currently only Document and Element nodes are supported), L<XML::Handler::BuildDOM>
 would create a new DOM subtree (thereby, in essence, copying the Node)
 and in the near future, XML::Writer could print the node.
 All Perl SAX related work is still in flux, so this interface may change a 
 little.
 
 See PerlSAX for the description of the SAX interface.
+
+=item check ( [$checker] )
+
+See descriptions for check() in L<XML::DOM::Document> and L<XML::DOM::Element>.
 
 =item xql ( @XQL_OPTIONS )
 
@@ -438,5 +442,10 @@ is identical to:
 
 See L<XML::XQL::Query> for other available XQL_OPTIONS.
 See L<XML::XQL> and L<XML::XQL::Tutorial> for more info.
+
+=item isHidden ()
+
+Whether the node is hidden.
+See L<Hidden Nodes|XML::DOM/_Hidden_Nodes_> for details.
 
 =back

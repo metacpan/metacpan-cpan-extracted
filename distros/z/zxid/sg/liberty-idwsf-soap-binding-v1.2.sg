@@ -1,0 +1,53 @@
+# zxid/sg/liberty-idwsf-disco-svc-v1.2.sg
+# Slightly edited, 14.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-soap-binding-v1.2.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(b12, urn:liberty:sb:2003-08)
+import(e, http://schemas.xmlsoap.org/soap/envelope/, http://schemas.xmlsoap.org/soap/envelope/)
+include(liberty-idwsf-utility-v1.1.xsd)
+
+%CorrelationType:
+  @messageID       -> %xs:string   # %IDType
+  @refToMessageID? -> %xs:string   # %IDType
+  @timestamp       -> %xs:dateTime
+  @id?             -> %xs:ID
+  @e:mustUnderstand?
+  @e:actor?
+  ;
+Correlation -> %b12:CorrelationType
+
+%ProviderType:
+  @providerID     -> %xs:anyURI
+  @affiliationID? -> %xs:anyURI
+  @id?            -> %xs:ID
+  @e:mustUnderstand?
+  @e:actor?
+  ;
+Provider -> %b12:ProviderType
+
+%ProcessingContextType:	 base(xs:anyURI)
+  @id?	 -> %xs:ID
+  @e:mustUnderstand?
+  @e:actor?
+  ;
+ProcessingContext -> %b12:ProcessingContextType
+
+%ConsentType:
+  @uri        -> %xs:anyURI
+  @timestamp? -> %xs:dateTime
+  @id?        -> %xs:ID
+  @e:mustUnderstand?
+  @e:actor?
+  ;
+Consent -> %b12:ConsentType
+
+%UsageDirectiveType:
+  any+  ns(##other)  processContents(lax)
+  @id?	 -> %xs:ID
+  @ref	 -> %xs:IDREF
+  @e:mustUnderstand?
+  @e:actor?
+  ;
+UsageDirective -> %b12:UsageDirectiveType
+
+#EOF

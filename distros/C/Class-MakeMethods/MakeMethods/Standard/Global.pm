@@ -108,7 +108,7 @@ sub scalar {
 	$data = shift;
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -219,7 +219,7 @@ sub array {
 	return array_splicer( $data, @_ );
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -319,7 +319,7 @@ sub hash {
 	wantarray ? %$data : $data;
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -389,7 +389,7 @@ sub object {
 	$data;
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################

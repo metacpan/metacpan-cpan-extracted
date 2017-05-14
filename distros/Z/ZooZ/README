@@ -1,0 +1,95 @@
+NAME
+    ZooZ.pl - A Perl/Tk GUI builder in pure Perl/Tk.
+
+SYNOPSIS
+        % perl ZooZ.pl
+
+DESCRIPTION
+    ZooZ is a GUI builder for Perl/Tk written in pure Perl/Tk. It has the
+    following features:
+
+    *   Intuitive interface.
+
+    *   Support for a wide variety of widgets.
+
+    *   Ability to save/load projects.
+
+    *   Ability to dump stand-alone Perl code.
+
+    *   Ability to dump code as a Perl module in the form of a Perl/Tk mega
+        widget.
+
+    *   Includes a simple IDE for defining variables and subroutines.
+
+STATUS AND LIMITATIONS
+    ZooZ is an on-going effort, and will probably stay so for a long time.
+    At this stage, though, I consider it to be very usable. There are some
+    major limitations though. For a comprehensive list of missing features,
+    you can look at the Progress.txt file that comes in the root directory
+    of the distribution. If you think there is something else that should be
+    included in that file, then drop me a note.
+
+REQUIREMENTS
+    To run ZooZ, you need Tk804, which in turn needs Perl 5.8 or better. I
+    will probably support Tk800 sometime in the future, in which case any
+    Perl5 version will be supported.
+
+    In addition Tk::ToolBar is required. Again, I will probably make this
+    optional in a future release.
+
+OPTIONAL COMPONENTS
+    Tk::CodeText is optional. If present it will be used in the simple IDE
+    to highlight user-entered Perl code. If missing, a regular Tk::Text will
+    be used.
+
+TIPS
+    *   You can create a project, then save the code as a Perl Module with a
+        .pm extension. This will create a composite mega widget, with the
+        same name as your project, but with any non-alphanumeric characters
+        switched to underscores. For example, "Project 1.5" will be changed
+        to "Project_1_5". You can then use this in a larger program as a
+        regular widget.
+
+        For example, if you dumped your module into myMod.pm, and your
+        project was called "Project 1.5", then you would do this in your
+        main code:
+
+            use myMod;
+            my $project = $parent->Project_1_5->pack;
+
+        Note also that the mega widget will Advertise() every widget in your
+        project. So, if your project had a canvas called Canvas1, you can
+        access it like this:
+
+            my $cv = $project->Subwidget('Canvas1');
+
+    *   ZooZ automatically defines a hash called *%ZWIDGETS* that holds the
+        project's widgets. This allows the user to access any widget inside
+        of a callback via *$ZWIDGETS{WidgetName}* where WidgetName is the
+        name of the widget.
+
+    *   You can click on the row and column numbers to configure their
+        properties.
+
+    *   If you want a row or column to take up more space than it currently
+        does, then increase its greediness. Remember that widgets are
+        confined to the space of the grids they occupy.
+
+BUGS
+    You tell me! If you think you found a bug, or you want to discuss
+    anything ZooZ-related, then please drop me a note at
+    *aqumsieh@cpan.org*.
+
+ACKNOWLEDGEMENTS
+    I'm indebted to everyone on comp.lang.perl.tk for constructive comments
+    and bug reports. Many people also emailed me with bugs and suggestions.
+    It is much appreciated.
+
+COPYRIGHTS
+    Copyright 2004-2005 - Ala Qumsieh.
+
+    This program is distributed under the same terms as Perl itself.
+
+    The use of the Camel image with the topic of Perl is a trademark of
+    O'Reilly Media, Inc. Used with permission.
+

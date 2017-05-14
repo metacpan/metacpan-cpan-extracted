@@ -1,0 +1,48 @@
+# This file tests the example filter
+
+Some text before.
+
+# Test a simple example
+!block example
+#
+# A header
+#
+  Some example
+    text.
+  Back to indent of 2.
+!endblock
+
+Some middle text.
+
+# Test normal (non-pure) blocks
+!block example
+  Some [[more]]
+    {{example}} text.
+!endblock
+
+# Test pure blocks
+!block example; pure
+  Some [[more]]
+  {{example}} text.
+!endblock
+
+# Test the skipheader parameter
+!block example; skipheader
+# $Id$
+# A header will an RCS-Id line at the top
+#
+  Yet another block of
+{{example}} text.
+!endblock
+
+# Test wide blocks
+!block example
+123456789a 23456789b 23456789c 23456789d 23456789e 23456789f 23456789g 23456789h
+123456789A 23456789B 23456789C 23456789D 23456789E 23456789F 23456789G 23456789H
+!endblock
+!block example; wide
+123456789a 23456789b 23456789c 23456789d 23456789e 23456789f 23456789g 23456789h
+123456789A 23456789B 23456789C 23456789D 23456789E 23456789F 23456789G 23456789H
+!endblock
+
+Some text after.

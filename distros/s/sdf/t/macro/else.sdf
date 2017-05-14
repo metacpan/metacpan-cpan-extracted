@@ -1,0 +1,16 @@
+# This file tests the else macro
+
+Some starting text.
+
+# Test an unexpected else (should generate an error)
+!else
+
+Some middle text.
+!if abc
+Inside abc.
+!endif
+
+# Test another unexpected else (should generate an error)
+!else
+
+Some ending text.

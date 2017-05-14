@@ -104,3 +104,4 @@
                 - name: hash_total
                   min: 1
                   max: 10
+

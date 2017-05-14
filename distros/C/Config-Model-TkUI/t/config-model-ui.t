@@ -10,8 +10,9 @@ use Config::Model::TkUI;
 use Config::Model ;
 use Log::Log4perl qw(:easy) ;
 
-
 use strict;
+
+use lib 't/lib';
 
 sub test_all {
     my ($mw, $delay,$test_ref) = @_ ;
@@ -49,7 +50,6 @@ my $cmu ;
 
 my $inst = $model->instance (
     root_class_name => 'Master',
-    model_file => 't/big_model.pm',
     instance_name => 'test1',
     root_dir   => 'wr_data',
     on_message_cb => sub { $cmu->show_message(@_) ;}

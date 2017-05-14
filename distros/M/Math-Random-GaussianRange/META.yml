@@ -1,0 +1,25 @@
+---
+abstract: 'Given a range, generate a set of random numbers normally distributed.'
+author:
+  - 'Spiros Denaxas <s.denaxas@gmail.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Random-GaussianRange
+requires:
+  Carp: 0
+  Exporter: 0
+  Math::Random: 0
+  Statistics::Basic: 0
+  base: 0
+  strict: 0
+  warnings: 0
+version: 0.003

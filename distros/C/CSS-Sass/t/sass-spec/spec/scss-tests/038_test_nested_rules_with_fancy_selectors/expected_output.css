@@ -1,9 +1,6 @@
 foo .bar {
-  a: b;
-}
+  a: b; }
 foo :baz {
-  c: d;
-}
+  c: d; }
 foo bang:bop {
-  e: f;
-}
+  e: f; }

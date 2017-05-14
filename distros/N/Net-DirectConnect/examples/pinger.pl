@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#$Id: pinger.pl 793 2011-06-17 16:51:17Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/pinger.pl $
+#$Id: pinger.pl 990 2012-12-28 20:35:04Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/pinger.pl $
 
 =head1 NAME
 
@@ -53,8 +53,7 @@ Net::DirectConnect->new(
     my $dc = ref $_[0] ? shift : {};
     psmisc::printlog shift(), "[$dc->{'number'}]", @_,;
   },
-  'handler' => { 
-    
+  'handler' => {
     INF => sub {
       my $dc  = shift;
       my $dst = shift @{ $_[0] };

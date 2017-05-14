@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2015 Rocky Bernstein <rocky@cpan.org>
 use strict;
 use Exporter;
 use warnings;
@@ -76,7 +76,7 @@ sub min($$) {
 sub current_source_text(;$)
 {
     my ($self, $opts) = @_;
-    $opts = {max_continue => 5} unless defined $opts;
+    $opts = {maxlines => 5} unless defined $opts;
     my $filename    = $self->{frame}{file};
     my $line_number = $self->{frame}{line};
     my $text        = (getline($filename, $line_number, $opts)) || '';
@@ -157,7 +157,7 @@ sub print_location($;$)
     my ($self,$opts) = @_;
     $opts = {
         output => $self->{settings}{highlight},
-        max_continue => 5,
+        max_continue => $self->{settings}{lines},
     } unless defined $opts;
     my $loc  = $self->format_location;
     $self->msg(${loc});
@@ -178,17 +178,18 @@ sub source_location_info($)
     my $filename = $self->{frame}{file};
     my $line_number = $self->line() || 0;
 
-    my $op_addr = '';
+    my $op_addr_str = '';
+    $self->{op_addr} = undef;
     if ($self->{settings}{displayop}) {
 	my $frame_index = $self->{frame_index};
 	if ($DB::OP_addr && $frame_index == 0) {
-	    $op_addr = sprintf " \@0x%x", $DB::OP_addr;
-	} elsif ($DB::HAVE_MODULE{'Devel::Callsite'} eq 'call_level_param') {
+	    $self->{op_addr} = $DB::OP_addr;
+	} else {
 	    my $skip = DB::caller_levels_skip();
 	    my $addr = Devel::Callsite::callsite($frame_index + $skip);
-	    $op_addr = sprintf(" \@0x%x", $addr)
-		if defined $addr and $addr > 0;
+	    $self->{op_addr} = $addr if defined $addr and $addr > 0;
 	}
+	$op_addr_str = sprintf(" \@0x%x", $self->{op_addr}) if $self->{op_addr}
     }
     if (filename_is_eval($filename)) {
 	### FIXME: put this all into DB::LineCache
@@ -209,18 +210,18 @@ sub source_location_info($)
 		    }
 		}
 		unless (defined($string)) {
-		    return "${filename}:${line_number}$op_addr";
+		    return "${filename}:${line_number}$op_addr_str";
 		}
                 my $try_filename = map_script($filename, $string);
 		$filename = $try_filename if defined($try_filename);
             }
             return $self->filename() .
-                " remapped $filename:$line_number$op_addr";
+                " remapped $filename:$line_number$op_addr_str";
         }
     }
     $canonic_filename = $self->canonic_file($self->filename(), 0)
 	|| $filename;
-    return "${canonic_filename}:${line_number}$op_addr";
+    return "${canonic_filename}:${line_number}$op_addr_str";
 }
 
 unless (caller()) {

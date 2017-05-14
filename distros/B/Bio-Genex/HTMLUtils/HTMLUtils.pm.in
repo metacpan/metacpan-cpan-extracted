@@ -1,0 +1,532 @@
+#
+# HTMLUtils.pm
+#   a module for useful database utilities
+#
+package Bio::Genex::HTMLUtils;
+
+use strict;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $SERVER $CGIURL $DEBUG $PARAMS $SCRIPT);
+use Carp;
+use DBI;
+use CGI qw(:standard);
+
+use Bio::Genex;
+
+require Exporter;
+
+=head1 NAME
+
+HTMLUtils - a module for useful HTML utilities for Genex DBs
+
+=head1 SYNOPSIS
+
+  use HTMLUtils;
+
+  %new_hash = post_process(%args);
+
+  $html_string = objs2table(HEADER=>1, CGI=>$cgi, OBJECTS=>\@obj_list);
+
+=head1 DESCRIPTION
+
+Methods for transforming information from a GeneX DB into HTML.
+
+=cut
+
+@ISA = qw(Exporter);
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+@EXPORT_OK = qw();
+
+@EXPORT = qw(post_process objs2table);
+
+$CGIURL = '%%GENEX_URL_EXAMPLE%%';
+$PARAMS = undef;
+$DEBUG = 0;
+$SCRIPT = undef;
+
+$VERSION = '0.03';
+
+=pod
+
+
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item post_process($cgi,%args)
+
+Begin to post-process information from a Genex table before writing it
+to an HTML table. In order to write HTML we use CGI.pm, so any calling
+routine must pass in the current CGI object.
+
+Currently, C<post_process()> handles the following tasks:
+
+=over 4 
+
+=item *
+
+Lookup foreign key values from the appropriate table.
+
+=item *
+
+Change the output of fkeys to be hyperlinks to the cgi script for that table type.
+
+=item *
+
+Modify URLs and email addresses to be active hyperlinks.
+
+=item *
+
+Filter out sensitive information such as login names and passwords.
+
+
+=back
+
+
+
+
+
+For example, after generating a Genex object, we can create a
+hyperlinked HTML table output for that object by doing the following:
+
+    # we need a CGI object
+    my $q = new CGI;
+
+    my $object = Bio::Genex::Species->new(id=>25);
+    foreach (@{Bio::Genex::Species->column_names()}) {
+      no strict 'refs';
+      $tmp_values{$_} = $object->$_;
+    }
+
+    # call post_process() to HTML'ize the values
+    %tmp_values = post_process($q,%tmp_values);
+
+    # make a header that's human readable
+    my @rows;
+    my @keys = keys %{Bio::Genex::Species->column2name()};
+    my @values = values %{Bio::Genex::Species->column2name()};
+    push(@rows,td([@values]));	
+
+    # add the data in the same order of the header
+    push(@rows,td([@tmp_values{@keys}]));	
+
+    # now contstruct the table, 
+    print $q->html_start("Information for Species: $object->primary_scientific_name");
+    print $q->table({-border=>''},
+	  	    Tr(\@rows)	# Tr() distributes over an array reference
+		   );
+    print $q->html_end();
+
+
+=cut
+
+sub post_process {
+  my ($cgi,%args) = @_;
+  my $dbh = Bio::Genex::current_connection();
+
+  # set a sane default for the global parameters
+  $SCRIPT = 'fetch_table.pl' 
+    unless defined $SCRIPT;
+
+  # now process each of the keys individually
+  foreach (keys %args) {
+    # get around the ugly HTML table default
+    my $space = '&nbsp;';
+    $args{$_} = $space unless defined $args{$_} && $args{$_} !~ m/^\s*$/;
+
+    if (/^login$/ || /^password$/) {
+      # we do not show login names or passwords
+      $args{$_} = '&nbsp;';
+      next;
+    }
+
+    my $pkey = $args{$_};
+    next unless defined $pkey;
+    next if $pkey eq $space;
+
+    if (/email$/) {
+      # assume for now it's a correct email address
+      $args{$_} = $cgi->a({-href=>"mailto:$pkey"},$pkey);
+      next;
+    }
+    if (/url/) {
+      # assume for now it's a correct email address
+      $args{$_} = $cgi->a({-href=>"$pkey"},$pkey);
+      next;
+    }
+
+    next unless /^(us_fk|
+		  owner_us_fk|
+		  gs_fk|
+		  smp_fk|
+		  amg_fk|
+		  spc_fk|
+		  al_fk|
+		  primary_es_fk|
+		  es_fk|
+		  am_fk|
+		  image_anal_sw_fk|
+		  spotter_sw_fk|
+		  scan_sw_fk|
+		  ratio_am_fk|
+		  con_fk|
+		  provider_con_fk|
+		  prt_fk|
+		  ef_fk|
+		  tl_fk|
+		  scn_fk|
+		  sptr_fk|
+		  ams_fk|
+		  als_fk|
+		  db_name|
+		  al_fk|
+		  smp_fk|
+		  image_anal_sw_fk|
+		  scan_sw_fk|
+		  scn_fk)$/x;
+
+    # the following all create hyperlinks to other tables
+
+    $PARAMS = "&DEBUG=$DEBUG&AccessionNumber=$pkey&dbname=$Bio::Genex::DBNAME"
+      unless defined $PARAMS;
+
+    # now postprocess the key
+    my ($text,$table);
+    my $error = 0;
+    if (/con_fk$/) {
+      $table = 'Contact';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $contact = Bio::Genex::Contact->new(id=>$pkey);
+      unless (defined $contact) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text =  $contact->contact_person();
+      # Use the organization if no contact person is specified
+      $text =  $contact->organization() unless defined $text;
+    } elsif (/^(owner_us_fk|us_fk)$/) {
+      $table = 'UserSec';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      # we don't show login's so we use the 'contact_person' field of
+      # the associated Bio::Genex::Contact object
+      my $user = Bio::Genex::UserSec->new(id=>$pkey);
+      unless (defined $user) {
+	$error = 1;
+	goto ERROR;
+      }
+      if (defined $user->con_obj && $user->con_obj->isa('Genex::Contact')) {
+	$text = $user->con_obj->contact_person();
+      } else {
+	$text = 'Not Available';
+      }
+    } elsif (/spc_fk/) {
+      $table = 'Species';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $species = Bio::Genex::Species->new(id=>$pkey);
+      unless (defined $species) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $species->primary_scientific_name();
+    } elsif (/al_fk/) {
+      $table = 'ArrayLayout';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $layout = Bio::Genex::ArrayLayout->new(id=>$pkey);
+      unless (defined $layout) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $layout->name();
+    } elsif (/^scn_fk$/) {
+      $table = 'Scanner';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $scnr_db = $class->new(id=>$pkey);
+      unless (defined $scnr_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $scnr_db->model_description();
+    } elsif (/^ef_fk$/) {
+      $table = 'ExperimentFactors';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $ef_db = $class->new(id=>$pkey);
+      unless (defined $ef_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $ef_db->es_obj->name() . ':' .$ef_db->factor_name();
+    } elsif (/^als_fk$/) {
+      $table = 'AL_Spots';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $als_db = $class->new(id=>$pkey);
+      unless (defined $als_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $als_db->al_obj->name() . ':' .$als_db->spot_identifier();
+    } elsif (/^ams_fk$/) {
+      $table = 'AM_Spots';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $ams_db = $class->new(id=>$pkey);
+      unless (defined $ams_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      my $spot_name;
+      if (defined $ams_db->usf_obj) {
+	$spot_name = $ams_db->usf_obj->usf_name();
+      } else {
+	$spot_name = $ams_db->ams_pk();
+      }
+      $text = $ams_db->am_obj->name() . ':' . $spot_name;
+    } elsif (/^sptr_fk$/) {
+      $table = 'Spotter';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $sptr_db = $class->new(id=>$pkey);
+      unless (defined $sptr_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $sptr_db->model_description();
+    } elsif (/^(image_anal_sw_fk|spotter_sw_fk|scan_sw_fk)$/) {
+      $table = 'Software';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $sw_db = $class->new(id=>$pkey);
+      unless (defined $sw_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $sw_db->name();
+    } elsif (/^tl_fk$/) {
+      $table = 'TreatmentLevel';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $tl_db = $class->new(id=>$pkey);
+      unless (defined $tl_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $tl_db->name();
+    } elsif (/^(primary_es_fk|es_fk)$/) {
+      $table = 'ExperimentSet';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $es_db = $class->new(id=>$pkey);
+      unless (defined $es_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $es_db->name();
+    } elsif (/^db_name$/) {
+      $table = 'ExternalDatabase';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $db = $class->new(id=>$pkey);
+      unless (defined $db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $db->name();
+    } elsif (/^(ratio_am_fk|am_fk)$/) {
+      $table = 'ArrayMeasurement';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $am_db = $class->new(id=>$pkey);
+      unless (defined $am_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $am_db->name();
+    } elsif (/^smp_fk$/) {
+      $table = 'Sample';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $smp_db = $class->new(id=>$pkey);
+      unless (defined $smp_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      # what do we do about Sample???
+      $text = $smp_db->strain();
+    } elsif (/^prt_fk$/) {
+      $table = 'Protocol';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $prt_db = $class->new(id=>$pkey);
+      unless (defined $prt_db) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $prt_db->title();
+    } elsif (/gs_fk/) {
+      $table = 'GroupSec';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $group = Bio::Genex::GroupSec->new(id=>$pkey);
+      unless (defined $group) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $group->group_name();
+    } elsif (/cit_fk/) {
+      $table = 'Citation';
+      my $class = 'Bio::Genex::' . $table;
+      eval "require $class";
+      die "$@" if $@;
+      my $citation = Bio::Genex::Citation->new(id=>$pkey);
+      unless (defined $citation) {
+	$error = 1;
+	goto ERROR;
+      }
+      $text = $citation->title();
+    }
+
+    #
+    # This is the format line. If you want to change the output, 
+    #   change it here
+    #
+    $args{$_} = $cgi->a({-href=>"$CGIURL/$SCRIPT?table=${table}$PARAMS"}, 
+			$text . "($pkey)");
+
+  ERROR: if ($error) {
+      warn ("HTMLUtils::post_process: no $table for $pkey");
+      next;
+    }
+    undef $PARAMS;
+  }
+  # need to reset these global values
+  undef $SCRIPT;
+  return %args;
+}
+
+=item objs2table(HEADER=>1, CGI=>$cgi, OBJECTS=>\@obj_list)
+
+Returns an HTML string encoding the list of objects as an HTML table
+rows using the $cgi object. Each attribute will be printed out as a
+separate column for each object. Before printing the value for each
+object the data will be fed through C<post_process()>.
+
+The 'HEADER' parameter pair is optional and specifies that a human
+readable header row should be included as the first row of the table
+output.
+
+B<NOTE>: The returned string must still be wrapped by a $cgi->table()
+function call. This is so that the application can pass optional
+parameters to the table call.
+
+B<CAUTION>: it is assumed that all the objects in @obj_list are of
+the same class.
+
+=cut
+
+sub objs2table {
+  my %args = @_;
+  my $cgi = $args{CGI};
+  die "Must specify a CGI object" 
+    unless defined $cgi;
+  die "Not a valid CGI object" 
+    unless ref($cgi) eq 'CGI';
+  die "Must specify an object list" 
+    unless exists $args{OBJECTS};
+  die "Object list must be an array reference" 
+    unless ref($args{OBJECTS}) eq 'ARRAY';
+  my @objects = @{$args{OBJECTS}};
+  my $HEADER = $args{HEADER};
+
+  my @rows;
+
+  my %name2column = %{$objects[0]->name2column()};
+  my @column_names = @{$objects[0]->column_names()};
+  
+  #
+  # sort the names so the output is in a determined order
+  my @column_copy = sort keys %name2column;
+  
+  if (defined $HEADER) {
+    # make a header element. 
+    push(@rows,$cgi->th(\@column_copy));
+  }
+
+  # Add the table data rows. We do this by looping over the object
+  # list and pulling the information from each object's data methods
+  # and make a table of the results.
+  foreach my $object (@objects) {
+    my %tmp_values;
+
+    # since we're going to loop over all the attributes,
+    # we first retrieve all the data for this object from the DB
+    $object->fetch();
+
+    # now extract the data from the object
+    foreach (@column_names) {
+      no strict 'refs';
+      $tmp_values{$_} = $object->$_();
+    }
+
+    # call post_process() to HTML'ize the values
+    %tmp_values = post_process($cgi,%tmp_values);
+
+    # add the new row to the table. The columns are chosen in the
+    # order that they appear in the header, which is why we loop over
+    # @column_copy, and do reverse name lookup using $name2column{$_}
+    my @values;
+    foreach (@column_copy) {
+      push(@values,$tmp_values{$name2column{$_}});
+    }
+    push(@rows,$cgi->td(\@values));	
+  }
+  my $string = $cgi->Tr(\@rows);
+  return $string;
+}
+
+# Autoload methods go after =cut, and are processed by the autosplit program.
+
+1;
+__END__
+
+=pod
+
+
+
+=back
+
+
+
+=head1 AUTHOR
+
+Jason Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

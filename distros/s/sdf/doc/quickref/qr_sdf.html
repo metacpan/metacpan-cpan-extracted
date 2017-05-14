@@ -1,0 +1,7527 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Quick Reference</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<H1>SDF Quick Reference</H1>
+<ADDRESS>MTR-SDF-0003.002 (Draft)</ADDRESS>
+<ADDRESS>Ian Clatworthy</ADDRESS>
+<ADDRESS>27 October 1998</ADDRESS>
+<BR CLEAR="All">
+<!-- TOC -->
+<HR>
+<H2>Table of Contents</H2>
+<UL>
+<A HREF="#SDF - The Package">1. SDF - The Package</A><UL>
+<A HREF="#Programs">1.1. Programs</A>
+<BR>
+<A HREF="#File Extension Conventions">1.2. File Extension Conventions</A></UL>
+<BR>
+<A HREF="#sdf - The Program">2. sdf - The Program</A><UL>
+<A HREF="#Command-line Options">2.1. Command-line Options</A>
+<BR>
+<A HREF="#Useful Command Lines">2.2. Useful Command Lines</A>
+<BR>
+<A HREF="#Target Formats">2.3. Target Formats</A>
+<BR>
+<A HREF="#Document Styles">2.4. Document Styles</A>
+<BR>
+<A HREF="#Looks">2.5. Looks</A>
+<BR>
+<A HREF="#Page Sizes">2.6. Page Sizes</A>
+<BR>
+<A HREF="#Reports">2.7. Reports</A>
+<BR>
+<A HREF="#Pre-filters">2.8. Pre-filters</A></UL>
+<BR>
+<A HREF="#SDF - The Language">3. SDF - The Language</A><UL>
+<A HREF="#Concepts and Conventions">3.1. Concepts and Conventions</A>
+<BR>
+<A HREF="#Paragraph Styles">3.2. Paragraph Styles</A>
+<BR>
+<A HREF="#Paragraph Attributes">3.3. Paragraph Attributes</A>
+<BR>
+<A HREF="#Phrase Styles">3.4. Phrase Styles</A>
+<BR>
+<A HREF="#Phrase Attributes">3.5. Phrase Attributes</A>
+<BR>
+<A HREF="#Escapes">3.6. Escapes</A>
+<BR>
+<A HREF="#Macros">3.7. Macros</A>
+<BR>
+<A HREF="#Filters">3.8. Filters</A>
+<BR>
+<A HREF="#Figures">3.9. Figures</A>
+<BR>
+<A HREF="#Tables">3.10. Tables</A>
+<BR>
+<A HREF="#Classes">3.11. Classes</A>
+<BR>
+<A HREF="#Document Variables/Macros">3.12. Document Variables/Macros</A>
+<BR>
+<A HREF="#Option Variables">3.13. Option Variables</A>
+<BR>
+<A HREF="#Page Layout Variables">3.14. Page Layout Variables</A>
+<BR>
+<A HREF="#Miscellaneous Variables/Macros">3.15. Miscellaneous Variables/Macros</A>
+<BR>
+<A HREF="#Programming Languages">3.16. Programming Languages</A>
+<BR>
+<A HREF="#Colours">3.17. Colours</A>
+<BR>
+<A HREF="#Expression Formats">3.18. Expression Formats</A>
+<BR>
+<A HREF="#Modules">3.19. Modules</A>
+<BR>
+<A HREF="#Book Components">3.20. Book Components</A>
+<BR>
+<A HREF="#Event Processing">3.21. Event Processing</A></UL></UL>
+<!-- ENDTOC -->
+<HR>
+<H1><A NAME="SDF - The Package">1. SDF - The Package</A></H1>
+<H2><A NAME="Programs">1.1. Programs</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+sdf
+</TD>
+<TD>
+convert <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> files to other formats
+</TD>
+</TR>
+<TR>
+<TD>
+sdfapi
+</TD>
+<TD>
+extract the <EM>Application Programming Interface</EM> from source code
+</TD>
+</TR>
+<TR>
+<TD>
+sdfbatch
+</TD>
+<TD>
+generate <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> batch files
+</TD>
+</TR>
+<TR>
+<TD>
+sdfcli
+</TD>
+<TD>
+extract the <EM>Command Line Interface</EM> from a utility
+</TD>
+</TR>
+<TR>
+<TD>
+sdfget
+</TD>
+<TD>
+extract documentation embedded in source code
+</TD>
+</TR>
+<TR>
+<TD>
+sdftest
+</TD>
+<TD>
+execute SDF regression tests
+</TD>
+</TR>
+<TR>
+<TD>
+sdngen
+</TD>
+<TD>
+build an SDF tuning module from a FrameMaker template
+</TD>
+</TR>
+<TR>
+<TD>
+fm2ps
+</TD>
+<TD>
+convert FrameMaker files to PostScript (a wrapper for <A HREF="../ref/sdfbatch.html">sdfbatch</A>)
+</TD>
+</TR>
+<TR>
+<TD>
+pod2sdf
+</TD>
+<TD>
+convert POD to SDF
+</TD>
+</TR>
+<TR>
+<TD>
+poddiff
+</TD>
+<TD>
+compare POD files and report differences
+</TD>
+</TR>
+<TR>
+<TD>
+prn2ps
+</TD>
+<TD>
+convert Windows PostScript to Unix PostScript
+</TD>
+</TR>
+</TABLE>
+
+<P>Environment variables used are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+SDFBIN
+</TD>
+<TD>
+on MS-DOS/Windows systems, the directory containing SDF's scripts, (e.g. c:\sdf\bin\)
+</TD>
+</TR>
+<TR>
+<TD>
+SDFOPTS
+</TD>
+<TD>
+options always used by <A HREF="../ref/sdf.html">sdf</A> (e.g. -Yc:\mysdflib)
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="File Extension Conventions">1.2. File Extension Conventions</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Ext.</STRONG>
+</TD>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Usage</STRONG>
+</TD>
+<TD>
+<STRONG>Ext.</STRONG>
+</TD>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Usage</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+ini
+</TD>
+<TD>
+INI
+</TD>
+<TD>
+configuration file
+</TD>
+<TD>
+sde
+</TD>
+<TD>
+SDF
+</TD>
+<TD>
+SDF end module
+</TD>
+</TR>
+<TR>
+<TD>
+sdf
+</TD>
+<TD>
+SDF
+</TD>
+<TD>
+normal SDF file
+</TD>
+<TD>
+sdg
+</TD>
+<TD>
+SDG
+</TD>
+<TD>
+<A HREF="../ref/sdfget.html">sdfget</A> report
+</TD>
+</TR>
+<TR>
+<TD>
+sdl
+</TD>
+<TD>
+SDF
+</TD>
+<TD>
+SDF locale
+</TD>
+<TD>
+sdm
+</TD>
+<TD>
+SDF
+</TD>
+<TD>
+SDF module
+</TD>
+</TR>
+<TR>
+<TD>
+sdn
+</TD>
+<TD>
+SDF
+</TD>
+<TD>
+SDF tuning module
+</TD>
+<TD>
+sdo
+</TD>
+<TD>
+TBL
+</TD>
+<TD>
+SDF object register
+</TD>
+</TR>
+<TR>
+<TD>
+sdp
+</TD>
+<TD>
+Perl
+</TD>
+<TD>
+SDF plug-in
+</TD>
+<TD>
+sdr
+</TD>
+<TD>
+Perl
+</TD>
+<TD>
+SDF report
+</TD>
+</TR>
+<TR>
+<TD>
+sds
+</TD>
+<TD>
+SDF
+</TD>
+<TD>
+SDF style module
+</TD>
+<TD>
+sdt
+</TD>
+<TD>
+HTML
+</TD>
+<TD>
+SDF template
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H1><A NAME="sdf - The Program">2. sdf - The Program</A></H1>
+<H2><A NAME="Command-line Options">2.1. Command-line Options</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Long name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+-2
+</TD>
+<TD>
+--format
+</TD>
+<TD>
+the output format you want
+</TD>
+</TR>
+<TR>
+<TD>
+-a
+</TD>
+<TD>
+--parameters
+</TD>
+<TD>
+parameters for the pre-filter
+</TD>
+</TR>
+<TR>
+<TD>
+-c
+</TD>
+<TD>
+--config
+</TD>
+<TD>
+configuration library
+</TD>
+</TR>
+<TR>
+<TD>
+-d
+</TD>
+<TD>
+--driver
+</TD>
+<TD>
+format driver - default is expand
+</TD>
+</TR>
+<TR>
+<TD>
+-f
+</TD>
+<TD>
+--flag
+</TD>
+<TD>
+define flags (flag xxx maps to variable DOC_XXX)
+</TD>
+</TR>
+<TR>
+<TD>
+-h
+</TD>
+<TD>
+--help
+</TD>
+<TD>
+display help on options or a single option
+</TD>
+</TR>
+<TR>
+<TD>
+-k
+</TD>
+<TD>
+--look
+</TD>
+<TD>
+look library
+</TD>
+</TR>
+<TR>
+<TD>
+-l
+</TD>
+<TD>
+--log_ext
+</TD>
+<TD>
+log file extension (default is log)
+</TD>
+</TR>
+<TR>
+<TD>
+-n
+</TD>
+<TD>
+--split_level
+</TD>
+<TD>
+heading level to autosplit into topics
+</TD>
+</TR>
+<TR>
+<TD>
+-o
+</TD>
+<TD>
+--out_ext
+</TD>
+<TD>
+output file extension (default is out)
+</TD>
+</TR>
+<TR>
+<TD>
+-p
+</TD>
+<TD>
+--prefilter
+</TD>
+<TD>
+pre-filter input file from each argument
+</TD>
+</TR>
+<TR>
+<TD>
+-r
+</TD>
+<TD>
+--report
+</TD>
+<TD>
+report to pre-filter the input with
+</TD>
+</TR>
+<TR>
+<TD>
+-s
+</TD>
+<TD>
+--style
+</TD>
+<TD>
+style of document
+</TD>
+</TR>
+<TR>
+<TD>
+-t
+</TD>
+<TD>
+--target
+</TD>
+<TD>
+logical target format
+</TD>
+</TR>
+<TR>
+<TD>
+-u
+</TD>
+<TD>
+--uses
+</TD>
+<TD>
+modules to use
+</TD>
+</TR>
+<TR>
+<TD>
+-v
+</TD>
+<TD>
+--verbose
+</TD>
+<TD>
+verbose mode
+</TD>
+</TR>
+<TR>
+<TD>
+-w
+</TD>
+<TD>
+--width
+</TD>
+<TD>
+width for text-based outputs
+</TD>
+</TR>
+<TR>
+<TD>
+-y
+</TD>
+<TD>
+--post_filter
+</TD>
+<TD>
+filter to post-filter the output with
+</TD>
+</TR>
+<TR>
+<TD>
+-z
+</TD>
+<TD>
+--post_process
+</TD>
+<TD>
+list of post processing actions to do
+</TD>
+</TR>
+<TR>
+<TD>
+-D
+</TD>
+<TD>
+--variable
+</TD>
+<TD>
+define variables
+</TD>
+</TR>
+<TR>
+<TD>
+-H
+</TD>
+<TD>
+--head_level
+</TD>
+<TD>
+initial heading level
+</TD>
+</TR>
+<TR>
+<TD>
+-I
+</TD>
+<TD>
+--include_path
+</TD>
+<TD>
+search path for include files, templates, etc.
+</TD>
+</TR>
+<TR>
+<TD>
+-L
+</TD>
+<TD>
+--locale
+</TD>
+<TD>
+locale
+</TD>
+</TR>
+<TR>
+<TD>
+-N
+</TD>
+<TD>
+--line_numbers
+</TD>
+<TD>
+number lines in pretty-printed source code
+</TD>
+</TR>
+<TR>
+<TD>
+-P
+</TD>
+<TD>
+--plang
+</TD>
+<TD>
+pre-filter as a programming language
+</TD>
+</TR>
+<TR>
+<TD>
+-S
+</TD>
+<TD>
+--page_size
+</TD>
+<TD>
+page size for paper documents
+</TD>
+</TR>
+<TR>
+<TD>
+-T
+</TD>
+<TD>
+--trace_levels
+</TD>
+<TD>
+debugging trace levels
+</TD>
+</TR>
+<TR>
+<TD>
+-Y
+</TD>
+<TD>
+--library_path
+</TD>
+<TD>
+path to search for libraries and modules
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Useful Command Lines">2.2. Useful Command Lines</A></H2>
+<P>Generate format xxx for mydoc.sdf:</P>
+<PRE>
+       sdf -2xxx mydoc
+</PRE>
+<P>Generate PDF via a FrameMaker book (on Unix):</P>
+<PRE>
+       sdf -2book -zpdf mydoc
+</PRE>
+<P>Generate a man page:</P>
+<PRE>
+       sdf -2man mydoc | nroff -man &gt; mydoc.1
+</PRE>
+<P>Spell check a document:</P>
+<PRE>
+       sdf mydoc | spell
+</PRE>
+<P>Pretty-print lang source code in format xxx:</P>
+<PRE>
+       sdf -2xxx -Plang mysource
+       sdf -2xxx -P mysource.lang
+       sdf -2xxx -P -N5 mysource.lang   (with line numbering)
+</PRE>
+<P>Generate reference documentation in format xxx for mymod.sdm:</P>
+<PRE>
+       sdf -2xxx mymod.sdm
+</PRE>
+<P>Generate format xxx for a table:</P>
+<PRE>
+       sdf -2xxx mydata.tbl
+       sdf -2xxx -aformat='15,75,10' mydata.tbl
+</PRE>
+<P>Generate format xxx for a MIMS topic, chapter or specification:</P>
+<PRE>
+       sdf -2xxx +mt mydoc
+       sdf -2xxx +mc mydoc
+       sdf -2xxx +ms mydoc
+</PRE>
+<H2><A NAME="Target Formats">2.3. Target Formats</A></H2>
+<P>The format naming conventions are:</P>
+<UL>
+<LI><EM>xxx</EM> - generate (logical) format xxx
+<LI><EM>xxx_yyy</EM> - generate format xxx via yyy
+<LI><EM>xxx_</EM> - generate format xxx directly.</UL>
+<P><A HREF="../ref/sdf.html">sdf</A>'s -2 option is used to specify the target format.</P>
+<H3><A NAME="Logical Formats">2.3.1. Logical Formats</A></H3>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Maps to</STRONG>
+</TD>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Maps to</STRONG>
+</TD>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Maps to</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+_dir
+</TD>
+<TD>
+html_dir
+</TD>
+<TD>
+book
+</TD>
+<TD>
+ps_fmbook
+</TD>
+<TD>
+doc
+</TD>
+<TD>
+doc_fm
+</TD>
+</TR>
+<TR>
+<TD>
+dvi
+</TD>
+<TD>
+dvi_sgml
+</TD>
+<TD>
+expand
+</TD>
+<TD>
+sdf_expand
+</TD>
+<TD>
+fvo
+</TD>
+<TD>
+fvo_fm
+</TD>
+</TR>
+<TR>
+<TD>
+hlp
+</TD>
+<TD>
+hlp_mif
+</TD>
+<TD>
+html
+</TD>
+<TD>
+html_
+</TD>
+<TD>
+htx
+</TD>
+<TD>
+htx_
+</TD>
+</TR>
+<TR>
+<TD>
+info
+</TD>
+<TD>
+info_sgml
+</TD>
+<TD>
+latex
+</TD>
+<TD>
+latex_sgml
+</TD>
+<TD>
+lyx
+</TD>
+<TD>
+lyx_sgml
+</TD>
+</TR>
+<TR>
+<TD>
+man
+</TD>
+<TD>
+man_pod
+</TD>
+<TD>
+mf6
+</TD>
+<TD>
+mf6_
+</TD>
+<TD>
+mif
+</TD>
+<TD>
+mif_
+</TD>
+</TR>
+<TR>
+<TD>
+pdf
+</TD>
+<TD>
+pdf_mif
+</TD>
+<TD>
+pod
+</TD>
+<TD>
+pod_
+</TD>
+<TD>
+ps
+</TD>
+<TD>
+ps_fm
+</TD>
+</TR>
+<TR>
+<TD>
+raw
+</TD>
+<TD>
+sdf_raw
+</TD>
+<TD>
+rtf
+</TD>
+<TD>
+rtf_fm
+</TD>
+<TD>
+sgml
+</TD>
+<TD>
+sgml_
+</TD>
+</TR>
+<TR>
+<TD>
+topics
+</TD>
+<TD>
+html_topics
+</TD>
+<TD>
+txt
+</TD>
+<TD>
+txt_
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Explicit Formats">2.3.2. Explicit Formats</A></H3>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Generates</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+doc_fm
+</TD>
+<TD>
+Frame binary format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+dvi_sgml
+</TD>
+<TD>
+DVI format via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+fvo_fm
+</TD>
+<TD>
+FrameViewer format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+hlp_mif
+</TD>
+<TD>
+Windows Help input files via MIF
+</TD>
+</TR>
+<TR>
+<TD>
+html_
+</TD>
+<TD>
+a HTML document
+</TD>
+</TR>
+<TR>
+<TD>
+html_dir
+</TD>
+<TD>
+an SDF directory in HTML
+</TD>
+</TR>
+<TR>
+<TD>
+html_fm
+</TD>
+<TD>
+a HTML document via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+html_topics
+</TD>
+<TD>
+HTML topics
+</TD>
+</TR>
+<TR>
+<TD>
+htx_
+</TD>
+<TD>
+MIMS HTX format
+</TD>
+</TR>
+<TR>
+<TD>
+info_sgml
+</TD>
+<TD>
+GNU info format via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+latex_pod
+</TD>
+<TD>
+LaTeX format via POD
+</TD>
+</TR>
+<TR>
+<TD>
+latex_sgml
+</TD>
+<TD>
+LaTeX format via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+lyx_sgml
+</TD>
+<TD>
+a LyX file via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+man_pod
+</TD>
+<TD>
+Man page format via POD
+</TD>
+</TR>
+<TR>
+<TD>
+mf6_
+</TD>
+<TD>
+MIMS F6 help format
+</TD>
+</TR>
+<TR>
+<TD>
+mif_
+</TD>
+<TD>
+Frame MIF format
+</TD>
+</TR>
+<TR>
+<TD>
+pdf_mif
+</TD>
+<TD>
+PostScript and PDF via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+pod_
+</TD>
+<TD>
+POD format
+</TD>
+</TR>
+<TR>
+<TD>
+ps_fm
+</TD>
+<TD>
+PostScript via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+ps_fmbook
+</TD>
+<TD>
+PostScript via a FrameMaker book
+</TD>
+</TR>
+<TR>
+<TD>
+ps_pod
+</TD>
+<TD>
+PostScript via POD
+</TD>
+</TR>
+<TR>
+<TD>
+ps_sgml
+</TD>
+<TD>
+PostScript via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+rtf_fm
+</TD>
+<TD>
+RTF format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+rtf_mif
+</TD>
+<TD>
+RTF format via MIF
+</TD>
+</TR>
+<TR>
+<TD>
+rtf_sgml
+</TD>
+<TD>
+RTF format via SGML format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf_expand
+</TD>
+<TD>
+expanded SDF
+</TD>
+</TR>
+<TR>
+<TD>
+sdf_raw
+</TD>
+<TD>
+raw SDF
+</TD>
+</TR>
+<TR>
+<TD>
+sgml_
+</TD>
+<TD>
+SGML format
+</TD>
+</TR>
+<TR>
+<TD>
+txt_
+</TD>
+<TD>
+plain text format
+</TD>
+</TR>
+<TR>
+<TD>
+txt_fm
+</TD>
+<TD>
+plain text format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+txt_pod
+</TD>
+<TD>
+plain text format via POD
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Document Styles">2.4. Document Styles</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+document
+</TD>
+<TD>
+normal document (default)
+</TD>
+<TD>
+fax
+</TD>
+<TD>
+fascimile
+</TD>
+</TR>
+<TR>
+<TD>
+listing
+</TD>
+<TD>
+program listing
+</TD>
+<TD>
+manual
+</TD>
+<TD>
+user manual
+</TD>
+</TR>
+<TR>
+<TD>
+memo
+</TD>
+<TD>
+memorandum
+</TD>
+<TD>
+minutes
+</TD>
+<TD>
+minutes of a meeting
+</TD>
+</TR>
+<TR>
+<TD>
+newslettr
+</TD>
+<TD>
+newsletter
+</TD>
+<TD>
+paper
+</TD>
+<TD>
+technical paper
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Looks">2.5. Looks</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+fancy
+</TD>
+<TD>
+look useful for manuals
+</TD>
+</TR>
+<TR>
+<TD>
+infomap
+</TD>
+<TD>
+Information Mapping&#153; 
+</TD>
+</TR>
+<TR>
+<TD>
+overhead
+</TD>
+<TD>
+look useful for overhead transparencies
+</TD>
+</TR>
+<TR>
+<TD>
+plain
+</TD>
+<TD>
+alias for <EM>simple</EM>
+</TD>
+</TR>
+<TR>
+<TD>
+simple
+</TD>
+<TD>
+look useful for normal documents
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Page Sizes">2.6. Page Sizes</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Width</STRONG>
+</TD>
+<TD>
+<STRONG>Height</STRONG>
+</TD>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Width</STRONG>
+</TD>
+<TD>
+<STRONG>Height</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+global
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+A3
+</TD>
+<TD>
+29.7cm
+</TD>
+<TD>
+42.0cm
+</TD>
+</TR>
+<TR>
+<TD>
+A4
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+29.7cm
+</TD>
+<TD>
+A5
+</TD>
+<TD>
+14.8cm
+</TD>
+<TD>
+21.0cm
+</TD>
+</TR>
+<TR>
+<TD>
+B4
+</TD>
+<TD>
+25.7cm
+</TD>
+<TD>
+36.4cm
+</TD>
+<TD>
+B5
+</TD>
+<TD>
+17.6cm
+</TD>
+<TD>
+25.0cm
+</TD>
+</TR>
+<TR>
+<TD>
+letter
+</TD>
+<TD>
+8.5in
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+legal
+</TD>
+<TD>
+8.5in
+</TD>
+<TD>
+14.0in
+</TD>
+</TR>
+<TR>
+<TD>
+tabloid
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+17.0in
+</TD>
+</TR>
+</TABLE>
+
+<P>Rotated sizes are named with an appended R (e.g. A4R).</P>
+<H2><A NAME="Reports">2.7. Reports</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+sdf_dir
+</TD>
+<TD>
+generate a directory tree of nested SDF documents
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Pre-filters">2.8. Pre-filters</A></H2>
+<P>Files with extensions matching a pre-filter name or alias have the name filter applied.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Aliases</STRONG>
+</TD>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Aliases</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+table
+</TD>
+<TD>
+tbl
+</TD>
+<TD>
+template
+</TD>
+<TD>
+sdt
+</TD>
+</TR>
+<TR>
+<TD>
+module
+</TD>
+<TD>
+sdm
+</TD>
+<TD>
+pod
+</TD>
+<TD>
+pm,PL
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H1><A NAME="SDF - The Language">3. SDF - The Language</A></H1>
+<H2><A NAME="Concepts and Conventions">3.1. Concepts and Conventions</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Term</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+paragraph
+</TD>
+<TD>
+the basic building block of documents
+</TD>
+</TR>
+<TR>
+<TD>
+phrase
+</TD>
+<TD>
+a section of text delimited by {{ and }} within a paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+style
+</TD>
+<TD>
+the type of a document, paragraph, phrase or table (e.g. H1)
+</TD>
+</TR>
+<TR>
+<TD>
+attribute
+</TD>
+<TD>
+a property of a paragraph or phrase (e.g. jump)
+</TD>
+</TR>
+<TR>
+<TD>
+macro
+</TD>
+<TD>
+a command embedded in a document (e.g. !define)
+</TD>
+</TR>
+<TR>
+<TD>
+variable
+</TD>
+<TD>
+a named value (e.g. DOC_NAME)
+</TD>
+</TR>
+<TR>
+<TD>
+block
+</TD>
+<TD>
+a section of text enclosed by <A HREF="../ref/mblock.html">block</A> and <A HREF="../ref/mendbloc.html">endblock</A> macros
+</TD>
+</TR>
+<TR>
+<TD>
+filter
+</TD>
+<TD>
+a rule to use when processing blocks or files (e.g. table)
+</TD>
+</TR>
+<TR>
+<TD>
+module
+</TD>
+<TD>
+a file containing reusable information
+</TD>
+</TR>
+<TR>
+<TD>
+library
+</TD>
+<TD>
+a directory containing modules
+</TD>
+</TR>
+</TABLE>
+
+<P>For variables, the general conventions are:</P>
+<UL>
+<LI>lower-case for special symbols (e.g. tm)
+<LI>edit-case for commonly used objects (e.g. Mincom)
+<LI>upper-case for other variables (e.g. DOC_NAME).</UL>
+<P>The general conventions for other symbols are:</P>
+<UL>
+<LI>upper-case for paragraph and phrase styles
+<LI>lower-case for other names.</UL>
+<H2><A NAME="Paragraph Styles">3.2. Paragraph Styles</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A1 .. A6
+</TD>
+<TD>
+appendix heading at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+Addr
+</TD>
+<TD>
+line in an address
+</TD>
+</TR>
+<TR>
+<TD>
+E
+</TD>
+<TD>
+example
+</TD>
+</TR>
+<TR>
+<TD>
+E80
+</TD>
+<TD>
+example at least 80 characters per line
+</TD>
+</TR>
+<TR>
+<TD>
+FA
+</TD>
+<TD>
+figure anchor
+</TD>
+</TR>
+<TR>
+<TD>
+FOOTER
+</TD>
+<TD>
+page footer (in header/footer only)
+</TD>
+</TR>
+<TR>
+<TD>
+FT
+</TD>
+<TD>
+figure title
+</TD>
+</TR>
+<TR>
+<TD>
+GL
+</TD>
+<TD>
+glossary entry (term and definition are tab separated)
+</TD>
+</TR>
+<TR>
+<TD>
+GLD
+</TD>
+<TD>
+definition in a glossary
+</TD>
+</TR>
+<TR>
+<TD>
+GLT
+</TD>
+<TD>
+term in a glossary
+</TD>
+</TR>
+<TR>
+<TD>
+H1 .. H6
+</TD>
+<TD>
+normal heading at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+HEADER
+</TD>
+<TD>
+page header (in header/footer only)
+</TD>
+</TR>
+<TR>
+<TD>
+KN
+</TD>
+<TD>
+normal paragraph - keep with next
+</TD>
+</TR>
+<TR>
+<TD>
+KP
+</TD>
+<TD>
+normal paragraph - keep with previous
+</TD>
+</TR>
+<TR>
+<TD>
+L1 .. L6
+</TD>
+<TD>
+paragraph (or plain list item) at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+Line
+</TD>
+<TD>
+horizontal line
+</TD>
+</TR>
+<TR>
+<TD>
+LF1 .. LF6
+</TD>
+<TD>
+first entry in an ordered list at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+LI1 .. LI6
+</TD>
+<TD>
+enumerated list item at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+LN1 .. LN6
+</TD>
+<TD>
+next entry in an ordered list at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+LU1 .. LU6
+</TD>
+<TD>
+unordered list at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+N
+</TD>
+<TD>
+normal paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+NB
+</TD>
+<TD>
+note begin
+</TD>
+</TR>
+<TR>
+<TD>
+NE
+</TD>
+<TD>
+note end
+</TD>
+</TR>
+<TR>
+<TD>
+NV
+</TD>
+<TD>
+name value
+</TD>
+</TR>
+<TR>
+<TD>
+Note
+</TD>
+<TD>
+a single paragraph note
+</TD>
+</TR>
+<TR>
+<TD>
+P1 .. P6
+</TD>
+<TD>
+plain heading at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+PB
+</TD>
+<TD>
+page break
+</TD>
+</TR>
+<TR>
+<TD>
+Sign
+</TD>
+<TD>
+signature
+</TD>
+</TR>
+<TR>
+<TD>
+V
+</TD>
+<TD>
+verbatim (example with no embedded symbols)
+</TD>
+</TR>
+</TABLE>
+
+<P>Special styles (implicitly terminated) are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+&gt;
+</TD>
+<TD>
+verbatim paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+. .. ......
+</TD>
+<TD>
+paragraph (or plain list item) at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+* .. ******
+</TD>
+<TD>
+unordered list at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+- .. -----
+</TD>
+<TD>
+unordered list at level 2..6
+</TD>
+</TR>
+<TR>
+<TD>
+^ .. ^^^^^^
+</TD>
+<TD>
+first entry in an ordered list at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
++ .. ++++++
+</TD>
+<TD>
+next entry in an ordered list at level 1..6
+</TD>
+</TR>
+<TR>
+<TD>
+&amp; .. &amp;&amp;&amp;&amp;&amp;&amp;
+</TD>
+<TD>
+labelled list item at level 1..6
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Paragraph Attributes">3.3. Paragraph Attributes</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+align
+</TD>
+<TD>
+string
+</TD>
+<TD>
+alignment of paragraph within text column (1, Full, Left, Right, Center)
+</TD>
+</TR>
+<TR>
+<TD>
+component
+</TD>
+<TD>
+string
+</TD>
+<TD>
+start a component within a book (see <A HREF="#Book Components">Book Components</A>)
+</TD>
+</TR>
+<TR>
+<TD>
+first
+</TD>
+<TD>
+string
+</TD>
+<TD>
+indent of first line (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+in
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+list indent level (for examples only)
+</TD>
+</TR>
+<TR>
+<TD>
+keep_next
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+keep this paragraph with the next one
+</TD>
+</TR>
+<TR>
+<TD>
+keep_prev
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+keep this paragraph with the previous one
+</TD>
+</TR>
+<TR>
+<TD>
+label
+</TD>
+<TD>
+string
+</TD>
+<TD>
+label for this paragraph (e.g. &quot;Tip:&quot;)
+</TD>
+</TR>
+<TR>
+<TD>
+left
+</TD>
+<TD>
+string
+</TD>
+<TD>
+left indent (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+noevents
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+do not do event processing on this paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+nopb
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+do not force this paragraph onto a new page
+</TD>
+</TR>
+<TR>
+<TD>
+notoc
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+do not put this in the table of contents
+</TD>
+</TR>
+<TR>
+<TD>
+noid
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+do not auto-generate an id for this paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+obj
+</TD>
+<TD>
+string
+</TD>
+<TD>
+format as the nominated phrase
+</TD>
+</TR>
+<TR>
+<TD>
+orig_style
+</TD>
+<TD>
+string
+</TD>
+<TD>
+original style (useful in event processing)
+</TD>
+</TR>
+<TR>
+<TD>
+out_style
+</TD>
+<TD>
+string
+</TD>
+<TD>
+output style to use
+</TD>
+</TR>
+<TR>
+<TD>
+right
+</TD>
+<TD>
+string
+</TD>
+<TD>
+right indent (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+sp_after
+</TD>
+<TD>
+string
+</TD>
+<TD>
+space after this paragraph (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+sp_before
+</TD>
+<TD>
+string
+</TD>
+<TD>
+space before this paragraph (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+tabs
+</TD>
+<TD>
+string
+</TD>
+<TD>
+comma-separated list of tabstops
+</TD>
+</TR>
+<TR>
+<TD>
+text
+</TD>
+<TD>
+string
+</TD>
+<TD>
+display the value instead of the existing text
+</TD>
+</TR>
+<TR>
+<TD>
+top
+</TD>
+<TD>
+string
+</TD>
+<TD>
+place paragraph on a new page (1, 0, Page, Column, Left, Right)
+</TD>
+</TR>
+<TR>
+<TD>
+wide
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+span the side-head
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Phrase Styles">3.4. Phrase Styles</A></H2>
+<P>Leading whitespace is not removed for styles marked with (*).</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+1
+</TD>
+<TD>
+1st level emphasis
+</TD>
+</TR>
+<TR>
+<TD>
+2
+</TD>
+<TD>
+2nd level emphasis
+</TD>
+</TR>
+<TR>
+<TD>
+3
+</TD>
+<TD>
+3rd level emphasis
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+as-is
+</TD>
+</TR>
+<TR>
+<TD>
+B
+</TD>
+<TD>
+bold
+</TD>
+</TR>
+<TR>
+<TD>
+C
+</TD>
+<TD>
+source code (*)
+</TD>
+</TR>
+<TR>
+<TD>
+CHAR
+</TD>
+<TD>
+escape/special character
+</TD>
+</TR>
+<TR>
+<TD>
+CMD
+</TD>
+<TD>
+command
+</TD>
+</TR>
+<TR>
+<TD>
+E
+</TD>
+<TD>
+escape/special character
+</TD>
+</TR>
+<TR>
+<TD>
+EMAIL
+</TD>
+<TD>
+email address
+</TD>
+</TR>
+<TR>
+<TD>
+EX
+</TD>
+<TD>
+example text (*)
+</TD>
+</TR>
+<TR>
+<TD>
+F
+</TD>
+<TD>
+filename
+</TD>
+</TR>
+<TR>
+<TD>
+FILE
+</TD>
+<TD>
+filename
+</TD>
+</TR>
+<TR>
+<TD>
+I
+</TD>
+<TD>
+italic
+</TD>
+</TR>
+<TR>
+<TD>
+IMPORT
+</TD>
+<TD>
+figure
+</TD>
+</TR>
+<TR>
+<TD>
+INLINE
+</TD>
+<TD>
+embedded target format
+</TD>
+</TR>
+<TR>
+<TD>
+JUMP
+</TD>
+<TD>
+same as URL
+</TD>
+</TR>
+<TR>
+<TD>
+L
+</TD>
+<TD>
+POD link
+</TD>
+</TR>
+<TR>
+<TD>
+N
+</TD>
+<TD>
+normal
+</TD>
+</TR>
+<TR>
+<TD>
+S
+</TD>
+<TD>
+text with non-breaking spaces (*)
+</TD>
+</TR>
+<TR>
+<TD>
+SECT
+</TD>
+<TD>
+(jump to) document section
+</TD>
+</TR>
+<TR>
+<TD>
+ST
+</TD>
+<TD>
+strong emphasis
+</TD>
+</TR>
+<TR>
+<TD>
+SUB
+</TD>
+<TD>
+subscript
+</TD>
+</TR>
+<TR>
+<TD>
+SUP
+</TD>
+<TD>
+superscript
+</TD>
+</TR>
+<TR>
+<TD>
+U
+</TD>
+<TD>
+underline
+</TD>
+</TR>
+<TR>
+<TD>
+URL
+</TD>
+<TD>
+Uniform Resource Locator
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+POD index entry
+</TD>
+</TR>
+<TR>
+<TD>
+Y
+</TD>
+<TD>
+symbol (e.g. subroutine)
+</TD>
+</TR>
+<TR>
+<TD>
+Z
+</TD>
+<TD>
+zero width character (ala POD)
+</TD>
+</TR>
+</TABLE>
+
+<P>The following styles are only supported in headers/footers:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PAGECOUNT
+</TD>
+<TD>
+highest page number
+</TD>
+</TR>
+<TR>
+<TD>
+PAGENUM
+</TD>
+<TD>
+current page number
+</TD>
+</TR>
+<TR>
+<TD>
+PARALAST
+</TD>
+<TD>
+text of last paragraph on page with the nominated style
+</TD>
+</TR>
+<TR>
+<TD>
+PARANUM
+</TD>
+<TD>
+paragraph number (e.g. Appendix A)
+</TD>
+</TR>
+<TR>
+<TD>
+PARANUMONLY
+</TD>
+<TD>
+paragraph number only (e.g. A)
+</TD>
+</TR>
+<TR>
+<TD>
+PARASHORT
+</TD>
+<TD>
+value of <EM>short</EM> attribute of paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+PARATEXT
+</TD>
+<TD>
+paragraph text (e.g. Hardware requirements)
+</TD>
+</TR>
+</TABLE>
+
+<P>The <EM>PARA*</EM> tags require a comma separated list of paragraph styles to be nominated as the text of the phrase, e.g. {{PARATEXT:H1,A1,P1}}.</P>
+<H2><A NAME="Phrase Attributes">3.5. Phrase Attributes</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+bold
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+enable bold
+</TD>
+</TR>
+<TR>
+<TD>
+changed
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+enable change bars
+</TD>
+</TR>
+<TR>
+<TD>
+color
+</TD>
+<TD>
+string
+</TD>
+<TD>
+text colour (Black, White, Red, Green, Blue, Yellow, Cyan, Magenta)
+</TD>
+</TR>
+<TR>
+<TD>
+doc
+</TD>
+<TD>
+string
+</TD>
+<TD>
+for SECT, the name of the document containing the section
+</TD>
+</TR>
+<TR>
+<TD>
+expand
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+expand object from short to long name
+</TD>
+</TR>
+<TR>
+<TD>
+family
+</TD>
+<TD>
+string
+</TD>
+<TD>
+font family
+</TD>
+</TR>
+<TR>
+<TD>
+id
+</TD>
+<TD>
+string
+</TD>
+<TD>
+identifier for this phrase (used by jumps)
+</TD>
+</TR>
+<TR>
+<TD>
+index
+</TD>
+<TD>
+string
+</TD>
+<TD>
+indexing specification string (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+index_type
+</TD>
+<TD>
+string
+</TD>
+<TD>
+index type (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+italics
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+enable italics
+</TD>
+</TR>
+<TR>
+<TD>
+jump
+</TD>
+<TD>
+string
+</TD>
+<TD>
+URL to jump to
+</TD>
+</TR>
+<TR>
+<TD>
+short
+</TD>
+<TD>
+string
+</TD>
+<TD>
+text to display in header/footer when PARASHORT used
+</TD>
+</TR>
+<TR>
+<TD>
+shrink
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+shrink object from long to short name
+</TD>
+</TR>
+<TR>
+<TD>
+size
+</TD>
+<TD>
+string
+</TD>
+<TD>
+font size
+</TD>
+</TR>
+<TR>
+<TD>
+text
+</TD>
+<TD>
+string
+</TD>
+<TD>
+display the value instead of the existing text
+</TD>
+</TR>
+<TR>
+<TD>
+underline
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+enable underline
+</TD>
+</TR>
+<TR>
+<TD>
+verbatim
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+ignore embedded symbols within this paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+xref
+</TD>
+<TD>
+string
+</TD>
+<TD>
+cross-referencing information (future)
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Escapes">3.6. Escapes</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Output</STRONG>
+</TD>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Output</STRONG>
+</TD>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Output</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+2[
+</TD>
+<TD>
+[[
+</TD>
+<TD>
+2]
+</TD>
+<TD>
+]]
+</TD>
+<TD>
+2{
+</TD>
+<TD>
+{{
+</TD>
+</TR>
+<TR>
+<TD>
+2}
+</TD>
+<TD>
+}}
+</TD>
+<TD>
+Aacute
+</TD>
+<TD>
+&Aacute;
+</TD>
+<TD>
+aacute
+</TD>
+<TD>
+&aacute;
+</TD>
+</TR>
+<TR>
+<TD>
+Acirc
+</TD>
+<TD>
+&Acirc;
+</TD>
+<TD>
+acirc
+</TD>
+<TD>
+&acirc;
+</TD>
+<TD>
+AElig
+</TD>
+<TD>
+&AElig;
+</TD>
+</TR>
+<TR>
+<TD>
+aelig
+</TD>
+<TD>
+&aelig;
+</TD>
+<TD>
+Agrave
+</TD>
+<TD>
+&Agrave;
+</TD>
+<TD>
+agrave
+</TD>
+<TD>
+&agrave;
+</TD>
+</TR>
+<TR>
+<TD>
+amp
+</TD>
+<TD>
+&amp;
+</TD>
+<TD>
+Aring
+</TD>
+<TD>
+&Aring;
+</TD>
+<TD>
+aring
+</TD>
+<TD>
+&aring;
+</TD>
+</TR>
+<TR>
+<TD>
+Atilde
+</TD>
+<TD>
+&Atilde;
+</TD>
+<TD>
+atilde
+</TD>
+<TD>
+&atilde;
+</TD>
+<TD>
+Auml
+</TD>
+<TD>
+&Auml;
+</TD>
+</TR>
+<TR>
+<TD>
+auml
+</TD>
+<TD>
+&auml;
+</TD>
+<TD>
+bullet
+</TD>
+<TD>
+.
+</TD>
+<TD>
+c
+</TD>
+<TD>
+&#169; 
+</TD>
+</TR>
+<TR>
+<TD>
+Ccedil
+</TD>
+<TD>
+&Ccedil;
+</TD>
+<TD>
+ccedil
+</TD>
+<TD>
+&ccedil;
+</TD>
+<TD>
+cent
+</TD>
+<TD>
+&cent; 
+</TD>
+</TR>
+<TR>
+<TD>
+dagger
+</TD>
+<TD>
+^
+</TD>
+<TD>
+doubledagger
+</TD>
+<TD>
+#
+</TD>
+<TD>
+Eacute
+</TD>
+<TD>
+&Eacute;
+</TD>
+</TR>
+<TR>
+<TD>
+eacute
+</TD>
+<TD>
+&eacute;
+</TD>
+<TD>
+Ecirc
+</TD>
+<TD>
+&Ecirc;
+</TD>
+<TD>
+ecirc
+</TD>
+<TD>
+&ecirc;
+</TD>
+</TR>
+<TR>
+<TD>
+Egrave
+</TD>
+<TD>
+&Egrave;
+</TD>
+<TD>
+egrave
+</TD>
+<TD>
+&egrave;
+</TD>
+<TD>
+emdash
+</TD>
+<TD>
+--
+</TD>
+</TR>
+<TR>
+<TD>
+emspace
+</TD>
+<TD>
+&nbsp; 
+</TD>
+<TD>
+endash
+</TD>
+<TD>
+-
+</TD>
+<TD>
+enspace
+</TD>
+<TD>
+&nbsp; 
+</TD>
+</TR>
+<TR>
+<TD>
+Euml
+</TD>
+<TD>
+&Euml;
+</TD>
+<TD>
+euml
+</TD>
+<TD>
+&euml;
+</TD>
+<TD>
+gt
+</TD>
+<TD>
+&gt;
+</TD>
+</TR>
+<TR>
+<TD>
+Iacute
+</TD>
+<TD>
+&Iacute;
+</TD>
+<TD>
+iacute
+</TD>
+<TD>
+&iacute;
+</TD>
+<TD>
+Icirc
+</TD>
+<TD>
+&Icirc;
+</TD>
+</TR>
+<TR>
+<TD>
+icirc
+</TD>
+<TD>
+&icirc;
+</TD>
+<TD>
+Igrave
+</TD>
+<TD>
+&Igrave;
+</TD>
+<TD>
+igrave
+</TD>
+<TD>
+&igrave;
+</TD>
+</TR>
+<TR>
+<TD>
+Iuml
+</TD>
+<TD>
+&Iuml;
+</TD>
+<TD>
+iuml
+</TD>
+<TD>
+&iuml;
+</TD>
+<TD>
+lbrace
+</TD>
+<TD>
+{
+</TD>
+</TR>
+<TR>
+<TD>
+lbracket
+</TD>
+<TD>
+[
+</TD>
+<TD>
+lt
+</TD>
+<TD>
+&lt;
+</TD>
+<TD>
+nbdash
+</TD>
+<TD>
+-
+</TD>
+</TR>
+<TR>
+<TD>
+nbspace
+</TD>
+<TD>
+<EM>non-breaking space</EM>
+</TD>
+<TD>
+nl
+</TD>
+<TD>
+<EM>newline</EM>
+</TD>
+<TD>
+Ntilde
+</TD>
+<TD>
+&Ntilde;
+</TD>
+</TR>
+<TR>
+<TD>
+ntilde
+</TD>
+<TD>
+&ntilde;
+</TD>
+<TD>
+Oacute
+</TD>
+<TD>
+&Oacute;
+</TD>
+<TD>
+oacute
+</TD>
+<TD>
+&oacute;
+</TD>
+</TR>
+<TR>
+<TD>
+Ocirc
+</TD>
+<TD>
+&Ocirc;
+</TD>
+<TD>
+ocirc
+</TD>
+<TD>
+&ocirc;
+</TD>
+<TD>
+Ograve
+</TD>
+<TD>
+&Ograve;
+</TD>
+</TR>
+<TR>
+<TD>
+ograve
+</TD>
+<TD>
+&ograve;
+</TD>
+<TD>
+Oslash
+</TD>
+<TD>
+&Oslash;
+</TD>
+<TD>
+oslash
+</TD>
+<TD>
+&oslash;
+</TD>
+</TR>
+<TR>
+<TD>
+Otilde
+</TD>
+<TD>
+&Otilde;
+</TD>
+<TD>
+otilde
+</TD>
+<TD>
+&otilde;
+</TD>
+<TD>
+Ouml
+</TD>
+<TD>
+&Ouml;
+</TD>
+</TR>
+<TR>
+<TD>
+ouml
+</TD>
+<TD>
+&ouml;
+</TD>
+<TD>
+pound
+</TD>
+<TD>
+&#163; 
+</TD>
+<TD>
+quot
+</TD>
+<TD>
+&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+r
+</TD>
+<TD>
+&#174; 
+</TD>
+<TD>
+rbrace
+</TD>
+<TD>
+}
+</TD>
+<TD>
+rbracket
+</TD>
+<TD>
+]
+</TD>
+</TR>
+<TR>
+<TD>
+tab
+</TD>
+<TD>
+<EM>tab</EM>
+</TD>
+<TD>
+tm
+</TD>
+<TD>
+&#153; 
+</TD>
+<TD>
+Uacute
+</TD>
+<TD>
+&Uacute;
+</TD>
+</TR>
+<TR>
+<TD>
+uacute
+</TD>
+<TD>
+&uacute;
+</TD>
+<TD>
+Ucirc
+</TD>
+<TD>
+&Ucirc;
+</TD>
+<TD>
+ucirc
+</TD>
+<TD>
+&ucirc;
+</TD>
+</TR>
+<TR>
+<TD>
+Ugrave
+</TD>
+<TD>
+&Ugrave;
+</TD>
+<TD>
+ugrave
+</TD>
+<TD>
+&ugrave;
+</TD>
+<TD>
+Uuml
+</TD>
+<TD>
+&Uuml;
+</TD>
+</TR>
+<TR>
+<TD>
+uuml
+</TD>
+<TD>
+&uuml;
+</TD>
+<TD>
+yen
+</TD>
+<TD>
+&#165; 
+</TD>
+<TD>
+yuml
+</TD>
+<TD>
+&yuml;
+</TD>
+</TR>
+</TABLE>
+
+<P>For convenience, variables are provided for: amp, bullet, c, cent, dagger, doubledagger, emdash, endash, emspace, enspace, nbdash, nbspace, nbsp, nl, pound, r, reg, tab, tm, yen.</P>
+<H2><A NAME="Macros">3.7. Macros</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+back
+</TD>
+<TD>
+ends a list (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+begin
+</TD>
+<TD>
+begin target-specific output (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+block
+</TD>
+<TD>
+begin a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+build_title
+</TD>
+<TD>
+build a title page
+</TD>
+</TR>
+<TR>
+<TD>
+catalog
+</TD>
+<TD>
+build a catalog from objects already loaded
+</TD>
+</TR>
+<TR>
+<TD>
+class
+</TD>
+<TD>
+define a class of objects
+</TD>
+</TR>
+<TR>
+<TD>
+clear
+</TD>
+<TD>
+reset text wrapping around a figure
+</TD>
+</TR>
+<TR>
+<TD>
+continued
+</TD>
+<TD>
+continue a heading from a previous page
+</TD>
+</TR>
+<TR>
+<TD>
+cut
+</TD>
+<TD>
+ignore text until an = is found at the start of a line (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+default
+</TD>
+<TD>
+set a variable (if not already set)
+</TD>
+</TR>
+<TR>
+<TD>
+define
+</TD>
+<TD>
+set a variable
+</TD>
+</TR>
+<TR>
+<TD>
+else
+</TD>
+<TD>
+begin alternative section
+</TD>
+</TR>
+<TR>
+<TD>
+elseif
+</TD>
+<TD>
+same as elsif
+</TD>
+</TR>
+<TR>
+<TD>
+elsif
+</TD>
+<TD>
+begin a conditional section
+</TD>
+</TR>
+<TR>
+<TD>
+end
+</TD>
+<TD>
+end target-specific output (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+end_topic
+</TD>
+<TD>
+mark the end of a topic
+</TD>
+</TR>
+<TR>
+<TD>
+endblock
+</TD>
+<TD>
+end a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+endif
+</TD>
+<TD>
+end conditional text
+</TD>
+</TR>
+<TR>
+<TD>
+endmacro
+</TD>
+<TD>
+end a macro definition
+</TD>
+</TR>
+<TR>
+<TD>
+execute
+</TD>
+<TD>
+include output from a command
+</TD>
+</TR>
+<TR>
+<TD>
+export
+</TD>
+<TD>
+export a variable to the format driver (and/or mark it for later exporting)
+</TD>
+</TR>
+<TR>
+<TD>
+for
+</TD>
+<TD>
+insert target-specific output (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+getcli
+</TD>
+<TD>
+extract command-line interface information
+</TD>
+</TR>
+<TR>
+<TD>
+getcode
+</TD>
+<TD>
+extract source code (i.e. non-documentation) from a file
+</TD>
+</TR>
+<TR>
+<TD>
+getdoc
+</TD>
+<TD>
+extract documentation embedded in source code
+</TD>
+</TR>
+<TR>
+<TD>
+head<EM>n</EM>
+</TD>
+<TD>
+level <EM>n</EM> heading (n = 1 .. 6) (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+if
+</TD>
+<TD>
+begin conditional text
+</TD>
+</TR>
+<TR>
+<TD>
+import
+</TD>
+<TD>
+import an external object (e.g. figure)
+</TD>
+</TR>
+<TR>
+<TD>
+include
+</TD>
+<TD>
+include another file
+</TD>
+</TR>
+<TR>
+<TD>
+inherit
+</TD>
+<TD>
+inherit entities from a library
+</TD>
+</TR>
+<TR>
+<TD>
+init
+</TD>
+<TD>
+initialise variables (before loading configuration files)
+</TD>
+</TR>
+<TR>
+<TD>
+insert
+</TD>
+<TD>
+call a macro
+</TD>
+</TR>
+<TR>
+<TD>
+item
+</TD>
+<TD>
+label an item in a list (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+jumps
+</TD>
+<TD>
+generate lines of jumps to headings
+</TD>
+</TR>
+<TR>
+<TD>
+line
+</TD>
+<TD>
+change message parameters
+</TD>
+</TR>
+<TR>
+<TD>
+macro
+</TD>
+<TD>
+begin a macro definition
+</TD>
+</TR>
+<TR>
+<TD>
+message
+</TD>
+<TD>
+output a message during execution
+</TD>
+</TR>
+<TR>
+<TD>
+off
+</TD>
+<TD>
+disable processing previously specified
+</TD>
+</TR>
+<TR>
+<TD>
+on
+</TD>
+<TD>
+specify processing for an event
+</TD>
+</TR>
+<TR>
+<TD>
+output
+</TD>
+<TD>
+dynamically change the output file used
+</TD>
+</TR>
+<TR>
+<TD>
+over
+</TD>
+<TD>
+begins a list (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+perlapi
+</TD>
+<TD>
+extract API information from a <A HREF="http://www.perl.com/perl/index.html">Perl</A> library
+</TD>
+</TR>
+<TR>
+<TD>
+pod
+</TD>
+<TD>
+does nothing (from POD)
+</TD>
+</TR>
+<TR>
+<TD>
+restrict
+</TD>
+<TD>
+declare a restricted family of variables
+</TD>
+</TR>
+<TR>
+<TD>
+script
+</TD>
+<TD>
+execute a line of <A HREF="http://www.perl.com/perl/index.html">Perl</A>
+</TD>
+</TR>
+<TR>
+<TD>
+slide_down
+</TD>
+<TD>
+decrease heading levels (e.g. H2 -&gt; H3)
+</TD>
+</TR>
+<TR>
+<TD>
+slide_up
+</TD>
+<TD>
+increase heading levels (e.g. H2 -&gt; H1)
+</TD>
+</TR>
+<TR>
+<TD>
+subsections
+</TD>
+<TD>
+specify the subsections for a topic
+</TD>
+</TR>
+<TR>
+<TD>
+undef
+</TD>
+<TD>
+clear a variable
+</TD>
+</TR>
+<TR>
+<TD>
+use
+</TD>
+<TD>
+load a library module
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Filters">3.8. Filters</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Filter</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+about
+</TD>
+<TD>
+about section of a document
+</TD>
+</TR>
+<TR>
+<TD>
+abstract
+</TD>
+<TD>
+the abstract for a paper
+</TD>
+</TR>
+<TR>
+<TD>
+address
+</TD>
+<TD>
+an address
+</TD>
+</TR>
+<TR>
+<TD>
+appendix
+</TD>
+<TD>
+change headings to appendix style
+</TD>
+</TR>
+<TR>
+<TD>
+ascii_graphic
+</TD>
+<TD>
+fixed-width text, wide enough for ASCII graphics
+</TD>
+</TR>
+<TR>
+<TD>
+box
+</TD>
+<TD>
+surround a region of text with a box
+</TD>
+</TR>
+<TR>
+<TD>
+center
+</TD>
+<TD>
+centre a region
+</TD>
+</TR>
+<TR>
+<TD>
+changed
+</TD>
+<TD>
+mark a block of text as changed
+</TD>
+</TR>
+<TR>
+<TD>
+chapter
+</TD>
+<TD>
+chapter of a document (does nothing)
+</TD>
+</TR>
+<TR>
+<TD>
+comment
+</TD>
+<TD>
+ignore text
+</TD>
+</TR>
+<TR>
+<TD>
+datestrings
+</TD>
+<TD>
+define strings used in dates
+</TD>
+</TR>
+<TR>
+<TD>
+default
+</TD>
+<TD>
+provide defaults for a block of variables
+</TD>
+</TR>
+<TR>
+<TD>
+define
+</TD>
+<TD>
+define a block of variables
+</TD>
+</TR>
+<TR>
+<TD>
+end
+</TD>
+<TD>
+process text at the end
+</TD>
+</TR>
+<TR>
+<TD>
+example
+</TD>
+<TD>
+fixed-width text (e.g. source code)
+</TD>
+</TR>
+<TR>
+<TD>
+front
+</TD>
+<TD>
+front section of a document
+</TD>
+</TR>
+<TR>
+<TD>
+glossary
+</TD>
+<TD>
+glossary section of document (alias for plain)
+</TD>
+</TR>
+<TR>
+<TD>
+hlp_header
+</TD>
+<TD>
+table of jumps at the top of a help topic
+</TD>
+</TR>
+<TR>
+<TD>
+hlp_window
+</TD>
+<TD>
+contents of a help popup window
+</TD>
+</TR>
+<TR>
+<TD>
+inline
+</TD>
+<TD>
+embed text into target format (e.g. <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A>)
+</TD>
+</TR>
+<TR>
+<TD>
+langdefs
+</TD>
+<TD>
+define vgrind-like language definitions
+</TD>
+</TR>
+<TR>
+<TD>
+namevalues
+</TD>
+<TD>
+format a set of name-value pairs (e.g. as used in a title block)
+</TD>
+</TR>
+<TR>
+<TD>
+nofill
+</TD>
+<TD>
+a set of lines
+</TD>
+</TR>
+<TR>
+<TD>
+note
+</TD>
+<TD>
+a note
+</TD>
+</TR>
+<TR>
+<TD>
+plain
+</TD>
+<TD>
+change headings to plain style
+</TD>
+</TR>
+<TR>
+<TD>
+pod
+</TD>
+<TD>
+embedded POD
+</TD>
+</TR>
+<TR>
+<TD>
+quote
+</TD>
+<TD>
+a quotation
+</TD>
+</TR>
+<TR>
+<TD>
+script
+</TD>
+<TD>
+execute text as a <A HREF="http://www.perl.com/perl/index.html">Perl</A> script
+</TD>
+</TR>
+<TR>
+<TD>
+sdf
+</TD>
+<TD>
+apply arbitrary phrase attributes to text
+</TD>
+</TR>
+<TR>
+<TD>
+sections
+</TD>
+<TD>
+paragraphs are sections
+</TD>
+</TR>
+<TR>
+<TD>
+simple
+</TD>
+<TD>
+generic filter for building others
+</TD>
+</TR>
+<TR>
+<TD>
+table
+</TD>
+<TD>
+tabular data
+</TD>
+</TR>
+<TR>
+<TD>
+template
+</TD>
+<TD>
+alias for inline with <EM>expand</EM> set to true
+</TD>
+</TR>
+<TR>
+<TD>
+title
+</TD>
+<TD>
+title block for a memo, fax or minutes
+</TD>
+</TR>
+<TR>
+<TD>
+topics
+</TD>
+<TD>
+include a set of sub-topics
+</TD>
+</TR>
+<TR>
+<TD>
+verbatim
+</TD>
+<TD>
+fixed-width text, ignoring embedded symbols
+</TD>
+</TR>
+</TABLE>
+
+<P><A HREF="#Classes">Classes</A> and <A HREF="#Programming Languages">Programming Languages</A> can also be used as filters.</P>
+<H2><A NAME="Figures">3.9. Figures</A></H2>
+<P>Extension search rules:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>When generating</STRONG>
+</TD>
+<TD>
+<STRONG>The search order is</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PostScript
+</TD>
+<TD>
+epsi, eps, wmf, mif, gif
+</TD>
+</TR>
+<TR>
+<TD>
+HTML
+</TD>
+<TD>
+jpeg, jpg, png, gif
+</TD>
+</TR>
+<TR>
+<TD>
+Windows Help
+</TD>
+<TD>
+bmp
+</TD>
+</TR>
+</TABLE>
+
+<P><A HREF="../ref/mimport.html">import</A> macro parameters:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+alt
+</TD>
+<TD>
+alternate text to display (ala HTML)
+</TD>
+</TR>
+<TR>
+<TD>
+align
+</TD>
+<TD>
+alignment (Left, Center, Right, Inner, Outer)
+</TD>
+</TR>
+<TR>
+<TD>
+base
+</TD>
+<TD>
+the prefix to prepend to the figure pathname to get the location needed for the HTML output
+</TD>
+</TR>
+<TR>
+<TD>
+border
+</TD>
+<TD>
+the border width in pixels
+</TD>
+</TR>
+<TR>
+<TD>
+height
+</TD>
+<TD>
+explicit height measurement (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+jump
+</TD>
+<TD>
+the URL to jump to
+</TD>
+</TR>
+<TR>
+<TD>
+listitem
+</TD>
+<TD>
+the list indent level (e.g. 1)
+</TD>
+</TR>
+<TR>
+<TD>
+mif_figure
+</TD>
+<TD>
+the tag before the figure in the MIF source (only needed if more than one figure in the MIF file)
+</TD>
+</TR>
+<TR>
+<TD>
+position
+</TD>
+<TD>
+vertical position (Below, Top, Bottom)
+</TD>
+</TR>
+<TR>
+<TD>
+title
+</TD>
+<TD>
+figure caption
+</TD>
+</TR>
+<TR>
+<TD>
+wide
+</TD>
+<TD>
+figure straddles the side head area of the page
+</TD>
+</TR>
+<TR>
+<TD>
+width
+</TD>
+<TD>
+explicit width measurement (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+wrap_text
+</TD>
+<TD>
+wrap text around a figure (ignored for HTML)
+</TD>
+</TR>
+</TABLE>
+
+<P>Default conversion rules (from <TT>sdf.ini</TT>):</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>When generating</STRONG>
+</TD>
+<TD>
+<STRONG>Create</STRONG>
+</TD>
+<TD>
+<STRONG>From</STRONG>
+</TD>
+<TD>
+<STRONG>Using the command</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+html
+</TD>
+<TD>
+gif
+</TD>
+<TD>
+eps
+</TD>
+<TD>
+ps2gif -crop $source
+</TD>
+</TR>
+<TR>
+<TD>
+html
+</TD>
+<TD>
+gif
+</TD>
+<TD>
+ps
+</TD>
+<TD>
+ps2gif -crop $source
+</TD>
+</TR>
+<TR>
+<TD>
+html
+</TD>
+<TD>
+gif
+</TD>
+<TD>
+prn
+</TD>
+<TD>
+prn2ps -ops $source; ps2gif -crop $base.ps; rm $base.ps
+</TD>
+</TR>
+<TR>
+<TD>
+ps
+</TD>
+<TD>
+eps
+</TD>
+<TD>
+ps
+</TD>
+<TD>
+ps2epsi $source $dest
+</TD>
+</TR>
+<TR>
+<TD>
+ps
+</TD>
+<TD>
+eps
+</TD>
+<TD>
+prn
+</TD>
+<TD>
+prn2ps -ops $source; ps2epsi $base.ps $dest; rm $base.ps
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Tables">3.10. Tables</A></H2>
+<P><A HREF="../ref/ftable.html">table</A> filter parameters:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+align
+</TD>
+<TD>
+alignment of table: one of Left, Center, Right, Inner, Outer
+</TD>
+</TR>
+<TR>
+<TD>
+bgcolor
+</TD>
+<TD>
+background colour for a table (HTML only)
+</TD>
+</TR>
+<TR>
+<TD>
+bmargin
+</TD>
+<TD>
+default bottom margin for table cells (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+cellpadding
+</TD>
+<TD>
+padding size for table cells (HTML only)
+</TD>
+</TR>
+<TR>
+<TD>
+cellspacing
+</TD>
+<TD>
+spacing size between table cells (HTML only)
+</TD>
+</TR>
+<TR>
+<TD>
+colaligns
+</TD>
+<TD>
+a comma-separated list of horizontal alignments values (Left, Center, Right) for columns; alternatively, a single word containing the letters L, C and R
+</TD>
+</TR>
+<TR>
+<TD>
+coltags
+</TD>
+<TD>
+a comma-separated list of phrase styles to apply to columns
+</TD>
+</TR>
+<TR>
+<TD>
+colvaligns
+</TD>
+<TD>
+a comma-separated list of vertical alignments values (Top, Middle, Bottom, Baseline) for columns; alternatively, a single word containing the letters T, M, B and L
+</TD>
+</TR>
+<TR>
+<TD>
+delete
+</TD>
+<TD>
+a comma-separated list of columns to delete
+</TD>
+</TR>
+<TR>
+<TD>
+footings
+</TD>
+<TD>
+the number of footing rows at the end of the table
+</TD>
+</TR>
+<TR>
+<TD>
+format
+</TD>
+<TD>
+a comma-separated list of column width specifications; alternatively, a single number where each digit represents 10% of the space available to the table
+</TD>
+</TR>
+<TR>
+<TD>
+groups
+</TD>
+<TD>
+pattern of group-style rows (default is /:$/)
+</TD>
+</TR>
+<TR>
+<TD>
+headings
+</TD>
+<TD>
+the number of heading rows at the top of the table
+</TD>
+</TR>
+<TR>
+<TD>
+landscape
+</TD>
+<TD>
+display the table in landscape mode (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+listitem
+</TD>
+<TD>
+the list indent level (e.g. 1) of this table
+</TD>
+</TR>
+<TR>
+<TD>
+lmargin
+</TD>
+<TD>
+default left margin for table cells (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+narrow
+</TD>
+<TD>
+if set, the table will only be as wide as required; otherwise the table will span the available space
+</TD>
+</TR>
+<TR>
+<TD>
+niceheadings
+</TD>
+<TD>
+set to 0 to disable _ to space conversion in headings
+</TD>
+</TR>
+<TR>
+<TD>
+nocalcs
+</TD>
+<TD>
+set to 0 to disable calculation processing within a table
+</TD>
+</TR>
+<TR>
+<TD>
+noheadings
+</TD>
+<TD>
+suppress headings in output
+</TD>
+</TR>
+<TR>
+<TD>
+objects
+</TD>
+<TD>
+alias for coltags (coltags is preferred)
+</TD>
+</TR>
+<TR>
+<TD>
+oncell
+</TD>
+<TD>
+Perl code to execute for each cell (internal use only!)
+</TD>
+</TR>
+<TR>
+<TD>
+parseline
+</TD>
+<TD>
+column headings parsing line (if not the first row in the text)
+</TD>
+</TR>
+<TR>
+<TD>
+placement
+</TD>
+<TD>
+vertical placement of table: one of Float, Pagetop, Columntop, Lefttop, Righttop (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+rmargin
+</TD>
+<TD>
+default right margin for table cells (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+select
+</TD>
+<TD>
+a comma-separated list of columns to display
+</TD>
+</TR>
+<TR>
+<TD>
+sort
+</TD>
+<TD>
+a comma-separated list of columns to sort the data rows by
+</TD>
+</TR>
+<TR>
+<TD>
+style
+</TD>
+<TD>
+overall look of the table (columns, rows, grid, plain, shade)
+</TD>
+</TR>
+<TR>
+<TD>
+tags
+</TD>
+<TD>
+alias for coltags (coltags is preferred)
+</TD>
+</TR>
+<TR>
+<TD>
+title
+</TD>
+<TD>
+table caption
+</TD>
+</TR>
+<TR>
+<TD>
+tmargin
+</TD>
+<TD>
+default top margin for table cells (MIF only)
+</TD>
+</TR>
+<TR>
+<TD>
+type
+</TD>
+<TD>
+alias for style (style is preferred)
+</TD>
+</TR>
+<TR>
+<TD>
+where
+</TD>
+<TD>
+an expression to filter the data rows with
+</TD>
+</TR>
+<TR>
+<TD>
+wide
+</TD>
+<TD>
+table straddles the side head area of the page
+</TD>
+</TR>
+<TR>
+<TD>
+wrap
+</TD>
+<TD>
+the number of data rows to display in a physical row
+</TD>
+</TR>
+</TABLE>
+
+<P>Column width specifications:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+30pt
+</TD>
+<TD>
+an exact size (other supported units are cm, mm, &quot; and in)
+</TD>
+</TR>
+<TR>
+<TD>
+30%
+</TD>
+<TD>
+a percentage of the size available
+</TD>
+</TR>
+<TR>
+<TD>
+30
+</TD>
+<TD>
+a percentage of the size available (% is implicit)
+</TD>
+</TR>
+<TR>
+<TD>
+10-20
+</TD>
+<TD>
+dynamic size between 10% and 20% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+-20
+</TD>
+<TD>
+dynamic size between 0% and 20% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+10-
+</TD>
+<TD>
+dynamic size between 10% and 100% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+-
+</TD>
+<TD>
+dynamic size between 0% and 100% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+3*
+</TD>
+<TD>
+3 units of the remaining space
+</TD>
+</TR>
+<TR>
+<TD>
+*
+</TD>
+<TD>
+same as 1*
+</TD>
+</TR>
+</TABLE>
+
+<P>= can be used in place of - to get equalised column widths.</P>
+<P>Cell attributes:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+align
+</TD>
+<TD>
+horizontal alignment (Left, Center, Right)
+</TD>
+</TR>
+<TR>
+<TD>
+angle
+</TD>
+<TD>
+angle of text (0, 90, 180, 270)
+</TD>
+</TR>
+<TR>
+<TD>
+bgcolor
+</TD>
+<TD>
+background colour of cell
+</TD>
+</TR>
+<TR>
+<TD>
+bruling
+</TD>
+<TD>
+ruling setting for bottom of cell
+</TD>
+</TR>
+<TR>
+<TD>
+cols
+</TD>
+<TD>
+the number of columns this cell spans (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+fill
+</TD>
+<TD>
+background colour fill % (100, 90, 70, 50, 30, 10, 3)
+</TD>
+</TR>
+<TR>
+<TD>
+lruling
+</TD>
+<TD>
+ruling setting for left of cell
+</TD>
+</TR>
+<TR>
+<TD>
+nowrap
+</TD>
+<TD>
+disable word wrap for this cell
+</TD>
+</TR>
+<TR>
+<TD>
+paratag
+</TD>
+<TD>
+paragraph style to apply to cell text (future)
+</TD>
+</TR>
+<TR>
+<TD>
+rows
+</TD>
+<TD>
+the number of rows this cell spans (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+rruling
+</TD>
+<TD>
+ruling setting for right of cell
+</TD>
+</TR>
+<TR>
+<TD>
+sdf
+</TD>
+<TD>
+treat the cell text as SDF (rather than as phrase text)
+</TD>
+</TR>
+<TR>
+<TD>
+tag
+</TD>
+<TD>
+phrase tag to apply to cell text
+</TD>
+</TR>
+<TR>
+<TD>
+truling
+</TD>
+<TD>
+ruling setting for top of cell
+</TD>
+</TR>
+<TR>
+<TD>
+valign
+</TD>
+<TD>
+vertical alignment (Top, Middle, Bottom, Baseline)
+</TD>
+</TR>
+</TABLE>
+
+<P>Permitted ruling values: <EM>Vthin</EM>, <EM>Thin</EM>, <EM>Medium</EM>, <EM>Thick</EM>, <EM>Double</EM>.</P>
+<H2><A NAME="Classes">3.11. Classes</A></H2>
+<P>Data fields for the predefined classes are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Field</STRONG>
+</TD>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>organisations:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Name
+</TD>
+<TD>
+ORG
+</TD>
+<TD>
+organisation name
+</TD>
+</TR>
+<TR>
+<TD>
+Long
+</TD>
+<TD>
+ORGN
+</TD>
+<TD>
+long form of organisation name
+</TD>
+</TR>
+<TR>
+<TD>
+Jump
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+URL for organisation
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>products:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Name
+</TD>
+<TD>
+PRD
+</TD>
+<TD>
+product name
+</TD>
+</TR>
+<TR>
+<TD>
+Jump
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+URL for product
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>references:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Reference
+</TD>
+<TD>
+REF
+</TD>
+<TD>
+document code
+</TD>
+</TR>
+<TR>
+<TD>
+Document
+</TD>
+<TD>
+DOC
+</TD>
+<TD>
+document title
+</TD>
+</TR>
+<TR>
+<TD>
+Jump
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+URL for document
+</TD>
+</TR>
+<TR>
+<TD>
+Version
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+version number
+</TD>
+</TR>
+<TR>
+<TD>
+Status
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+status (e.g. Draft, Review or Final)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>terms:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Term
+</TD>
+<TD>
+TERM
+</TD>
+<TD>
+term, acronym or abbreviation
+</TD>
+</TR>
+<TR>
+<TD>
+Description
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+explanation
+</TD>
+</TR>
+<TR>
+<TD>
+Jump
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+URL for term
+</TD>
+</TR>
+</TABLE>
+
+<P>The REFNUMONLY tag can be used to mark a REF phrase where only the trailing number is output.</P>
+<P>Calculated fields for the <A HREF="../ref/creferen.html">references</A> class:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+XXX
+</TD>
+<TD>
+if a matching xxx file is found, an image which jumps to that file
+</TD>
+</TR>
+<TR>
+<TD>
+Cite
+</TD>
+<TD>
+a string of the form [n]
+</TD>
+</TR>
+<TR>
+<TD>
+Date
+</TD>
+<TD>
+the date of the html file
+</TD>
+</TR>
+<TR>
+<TD>
+Pages
+</TD>
+<TD>
+the number of pages in the PostScript document
+</TD>
+</TR>
+<TR>
+<TD>
+Printdoc
+</TD>
+<TD>
+an image which launches the <TT>/cgi-bin/printdoc/</TT> CGI script
+</TD>
+</TR>
+<TR>
+<TD>
+Printer
+</TD>
+<TD>
+alias for Printdoc
+</TD>
+</TR>
+</TABLE>
+
+<P>Parameters of class filters:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+cited
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+number these objects as the cited ones (for [1] style references)
+</TD>
+</TR>
+<TR>
+<TD>
+colaligns
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of horizontal alignments  values (Left, Center, Right) for columns; alternatively, a single word containing the letters L, C and R can be used for the value
+</TD>
+</TR>
+<TR>
+<TD>
+columns
+</TD>
+<TD>
+string
+</TD>
+<TD>
+comma-separated list of attributes to display in table
+</TD>
+</TR>
+<TR>
+<TD>
+colvaligns
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of vertical alignments  values (Top, Middle, Bottom, Baseline) for columns; alternatively, a single word containing the letters T, M, B and L can be used for the value
+</TD>
+</TR>
+<TR>
+<TD>
+compact
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+display in a compact table, (make cellpadding data       boolean      define objects but do not display them
+</TD>
+</TR>
+<TR>
+<TD>
+delete
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of columns to delete
+</TD>
+</TR>
+<TR>
+<TD>
+headings
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+display the column headings
+</TD>
+</TR>
+<TR>
+<TD>
+root
+</TD>
+<TD>
+string
+</TD>
+<TD>
+string to prepend to Jump attribute, if any
+</TD>
+</TR>
+<TR>
+<TD>
+select
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of columns to display
+</TD>
+</TR>
+<TR>
+<TD>
+sort
+</TD>
+<TD>
+string
+</TD>
+<TD>
+comma-separated list of columns to sort by
+</TD>
+</TR>
+<TR>
+<TD>
+style
+</TD>
+<TD>
+string
+</TD>
+<TD>
+table style to use (the default is <EM>plain</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+&nbsp;
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+and cellspacing both equal to zero)
+</TD>
+</TR>
+<TR>
+<TD>
+variables
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+define a variable for each object; the variable name is derived from the object name with underscores replacing non-alphanumeric characters
+</TD>
+</TR>
+<TR>
+<TD>
+where
+</TD>
+<TD>
+string
+</TD>
+<TD>
+filter the rows using the nominated expression
+</TD>
+</TR>
+<TR>
+<TD>
+wide
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+use sidehead when formatting on paper
+</TD>
+</TR>
+<TR>
+<TD>
+wrap
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+number of logical rows to place on a physical row
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Document Variables/Macros">3.12. Document Variables/Macros</A></H2>
+<H3><A NAME="Controls">Controls</A></H3>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_ADMIN_LOGO
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logo to use in administration document styles
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_ADMIN_LOGO_BASE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+base directory for DOC_ADMIN_LOGO
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_APPROVE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+person approving the document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_APPROVE2
+</TD>
+<TD>
+string
+</TD>
+<TD>
+2nd person approving the document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_APPROVE3
+</TD>
+<TD>
+string
+</TD>
+<TD>
+3rd person approving the document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_AUTHOR
+</TD>
+<TD>
+string
+</TD>
+<TD>
+author of document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_AUTHOR2
+</TD>
+<TD>
+string
+</TD>
+<TD>
+2nd author of document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_AUTHOR3
+</TD>
+<TD>
+string
+</TD>
+<TD>
+3rd author of document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_CODE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+document code (*)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COMPONENT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+current component type within a book
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COMPONENT_LOGO
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logo to use for components within a book
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COVER
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logical name of the cover page to use (e.g. original, project, manual, paper)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_DISTRIBUTION
+</TD>
+<TD>
+string
+</TD>
+<TD>
+document distribution
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_HTML_LOGO
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logo to use in HTML output
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_HTML_LOGO_BASE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+base directory for HTML_LOGO
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_IX
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build an index
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOF
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build a list of figures
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOF_TITLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+list of figures title
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOGO
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logo to use for document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOGO_BASE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+base directory for DOC_LOGO
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOT
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build a list of tables
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOT_TITLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+list of tables title
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_MANUAL_LOGO
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logo to use when generating paper manuals
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_NAME
+</TD>
+<TD>
+string
+</TD>
+<TD>
+document name, e.g. &quot;SDF 2.000&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_OWNER
+</TD>
+<TD>
+string
+</TD>
+<TD>
+person or company owning the copyright
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_PRODUCT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+for man pages, the center string in the header
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_PROJECT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+orginating project of document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_SECTION
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+for man pages, the section number
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_STATUS
+</TD>
+<TD>
+string
+</TD>
+<TD>
+status of document (*)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TITLE_LOGO
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logo used in the title of a PostScript document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOC
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+table of contents level
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOC_GRAPHIC
+</TD>
+<TD>
+string
+</TD>
+<TD>
+graphic to include in TOC title
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOC_TITLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+table of contents title
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOPIC_LOGO
+</TD>
+<TD>
+string
+</TD>
+<TD>
+logo to use in HTML topics mode output
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOPIC_LOGO_BASE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+base directory for DOC_TOPIC_LOGO
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TWO_SIDES
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build a two-sided document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TYPE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+document type, e.g. &quot;User Guide&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_URL
+</TD>
+<TD>
+string
+</TD>
+<TD>
+URL of document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_VERSION
+</TD>
+<TD>
+string
+</TD>
+<TD>
+version number of document (*)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Macros:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COMPONENT_BEGIN
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+hook to initialise things before book component processing begins
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COMPONENT_END
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+hook to finalise things after book component processing ends
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_OFFICES
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+for manuals, the text to put after the inside front cover
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_RECIPIENTS
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+table of controlled copy recipients
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TRADEMARKS
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+text specifying trademarks used in document
+</TD>
+</TR>
+</TABLE>
+
+<P>If the variables marked with (*) are not defined, <A HREF="../ref/mbuild_t.html">build_title</A> sets them using the references data, if possible.</P>
+<H3><A NAME="Information">Information</A></H3>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_BASE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the base (filename) of the current document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COLUMN_WIDTH
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+width of a text column (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_DIR
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the directory of the current document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_EXT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the extension of the current document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_FULL_WIDTH
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+width of text area including the side-head (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_ID
+</TD>
+<TD>
+string
+</TD>
+<TD>
+combination of DOC_CODE and DOC_VERSION
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_ID_SEP
+</TD>
+<TD>
+string
+</TD>
+<TD>
+separator used within DOC_ID
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_MODIFIED
+</TD>
+<TD>
+datetime
+</TD>
+<TD>
+the most recent modification time of files visited so far
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_PAGE_HEIGHT
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+height of page (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_PAGE_WIDTH
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+width of page (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_PATH
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the full pathname of the current document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_SHORT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the base and extension of the current document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_START
+</TD>
+<TD>
+datetime
+</TD>
+<TD>
+the time document conversion started
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TEXT_HEIGHT
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+height of text area (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TEXT_WIDTH
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+width of text area available for text columns (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TITLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+combination of DOC_NAME and DOC_TYPE
+</TD>
+</TR>
+<TR>
+<TD>
+MODIFIED_DATE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+alias for DATE:DOC_MODIFIED
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>File:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+FILE_BASE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+base part of current filename (e.g. <EM>mydoc</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+FILE_DIR
+</TD>
+<TD>
+string
+</TD>
+<TD>
+directory of current filename (e.g. <EM>/doc/sdf</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+FILE_EXT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+extension of current filename (e.g. <EM>sdf</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+FILE_MODIFIED
+</TD>
+<TD>
+datetime
+</TD>
+<TD>
+time when this file was last modified
+</TD>
+</TR>
+<TR>
+<TD>
+FILE_PATH
+</TD>
+<TD>
+string
+</TD>
+<TD>
+current pathname (e.g. <EM>/doc/sdf/mydoc.sdf</EM>)
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Option Variables">3.13. Option Variables</A></H2>
+<P>These variables (except OPT_NOBARS) give the values of command-line options. Variables marked with a (*) can be set via the <A HREF="../ref/minit.html">init</A> macro on the top line of a document:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_CONFIG
+</TD>
+<TD>
+string
+</TD>
+<TD>
+configuration library (*)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_DRIVER
+</TD>
+<TD>
+string
+</TD>
+<TD>
+name of driver used to convert documents
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_EXT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+output extension
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_HEAD_LEVEL
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+level to start headings at
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_LOCALE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+locale
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_LOOK
+</TD>
+<TD>
+string
+</TD>
+<TD>
+look (*)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_NOBARS
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+disable change bars (*)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_NUMBER
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+line numbering fequency
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_PAGE_SIZE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+page size setting (default is <EM>global</EM>) (*)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_PP_xxx
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+set if xxx post-processing requested
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_REPORT
+</TD>
+<TD>
+string
+</TD>
+<TD>
+report to run
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_SPLIT_LEVEL
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+level to split headings at for topics mode
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_STYLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+document style (*)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_TARGET
+</TD>
+<TD>
+string
+</TD>
+<TD>
+target format
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_WIDTH
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+width for txt output (default is 70) (*)
+</TD>
+</TR>
+</TABLE>
+
+<P>These variables can only be set within look libraries:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_BORDERS
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+high-level header/footer border control (0=none; 1=above footer,below header; 2=above footer,above &amp; below header)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_COLUMNS
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+number of columns in text area (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_COLUMN_GAP
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+gap between columns in text area
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_COMPONENT_COVER
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+give book components a cover page
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_HEADINGS
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+size in lines (0..4) of headers/footers (Note: for values 2..4, header size is 2)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_IX_COLUMNS
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+number of columns in text area in the index (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_IX_COLUMN_GAP
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+gap between columns in text area in the index
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_IX_SIDEHEAD_GAP
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+width between side-head and text area in the index
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_IX_SIDEHEAD_WIDTH
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+width of side-head in the index
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_LIST_INDENT
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+size of each list indent in points
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_BOTTOM
+</TD>
+<TD>
+string
+</TD>
+<TD>
+size of margin below the footer, if any
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_INNER
+</TD>
+<TD>
+string
+</TD>
+<TD>
+size of inner margin
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_OUTER
+</TD>
+<TD>
+string
+</TD>
+<TD>
+size of outer margin
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_TOP
+</TD>
+<TD>
+string
+</TD>
+<TD>
+size of margin above the header, if any
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_NUMBER_PER_COMPONENT
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+number figures, etc. per component
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_SIDEHEAD_GAP
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+width between side-head and first text column
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_SIDEHEAD_WIDTH
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+width of side-head
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Page Layout Variables">3.14. Page Layout Variables</A></H2>
+<P>Page variables can only be set within look libraries.</P>
+<P>Page tags:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Page</STRONG>
+</TD>
+<TD>
+<STRONG>Usage</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+FIRST
+</TD>
+<TD>
+the first page in the document
+</TD>
+</TR>
+<TR>
+<TD>
+RIGHT
+</TD>
+<TD>
+the page used for single-sided documents and the right hand side of double-sided documents
+</TD>
+</TR>
+<TR>
+<TD>
+LEFT
+</TD>
+<TD>
+the left hand side of double-sided documents; ignored for single-sided documents
+</TD>
+</TR>
+</TABLE>
+
+<P>In the table below, <EM>frl</EM> is either:</P>
+<UL>
+<LI>FIRST, RIGHT or LEFT, or
+<LI><EM>COMPONENT</EM>_<EM>FRL</EM> where:<UL>
+<LI><EM>COMPONENT</EM> is the name of the component in upper-case (refer to <A HREF="#Book Components">Book Components</A>)
+<LI><EM>FRL</EM> is FIRST, RIGHT or LEFT.</UL></UL>
+<P>If a component does not have a component-specific macro/variable defined, then the generic macro/variable is used.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_BACKGROUND
+</TD>
+<TD>
+string
+</TD>
+<TD>
+background image name
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_FOOTER_BORDER
+</TD>
+<TD>
+string
+</TD>
+<TD>
+border specification
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_FOOTER_GAP
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+gap between text area and footer area
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_FOOTER_HEIGHT
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+height of footer area
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_FOOTER_INNERn
+</TD>
+<TD>
+string
+</TD>
+<TD>
+inner text of line n (0..3) of footer
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_FOOTER_CENTERn
+</TD>
+<TD>
+string
+</TD>
+<TD>
+centre text of line n (0..3) of footer
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_FOOTER_OUTERn
+</TD>
+<TD>
+string
+</TD>
+<TD>
+outer text of line n (0..3) of footer
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_HEADER_BORDER
+</TD>
+<TD>
+string
+</TD>
+<TD>
+border specification
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_HEADER_GAP
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+gap between header area and text area
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_HEADER_HEIGHT
+</TD>
+<TD>
+dimension
+</TD>
+<TD>
+height of header area
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_HEADER_INNERn
+</TD>
+<TD>
+string
+</TD>
+<TD>
+inner text of line n (1..2) of header
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_HEADER_CENTERn
+</TD>
+<TD>
+string
+</TD>
+<TD>
+centre text of line n (1..2) of header
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>frl</EM>_HEADER_OUTERn
+</TD>
+<TD>
+string
+</TD>
+<TD>
+outer text of line n (1..2) of header
+</TD>
+</TR>
+</TABLE>
+
+<P>When <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> is being used to generate <A HREF="http://www.adobe.com">PostScript</A>, the background image name is mapped to a master page called <EM>backgrnd</EM> within a file called <EM>backgrnd</EM>.mif. At the moment, objects from the master page (excluding TextRects) are directly transferred to the generated MIF file. This means that objects in the lower right hand corner of an A4 master page will not will be positioned nicely if the paper size is changed to A5, say.</P>
+<P>A <EM>border specification</EM> string is a comma-separated list of attributes which collectively describe the border. The format of each attribute is name[=value]. The supported attributes are:</P>
+<UL>
+<LI><EM>top</EM> - a line above the area
+<LI><EM>bottom</EM> - a line below the area
+<LI><EM>box</EM> - a box around the area
+<LI><EM>radius</EM> - for a box, the radius of the corner.</UL>
+<P>For <EM>top</EM>, <EM>bottom</EM> and <EM>box</EM>, the value of the attribute is the line width in points.</P>
+<H2><A NAME="Miscellaneous Variables/Macros">3.15. Miscellaneous Variables/Macros</A></H2>
+<H3><A NAME="Controls">Controls</A></H3>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Processing:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DEFAULT_LOCALE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default OPT_LOCALE (set in <TT>sdf.ini</TT>)
+</TD>
+</TR>
+<TR>
+<TD>
+DEFAULT_LOOK
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default OPT_LOOK (set in <TT>sdf.ini</TT>)
+</TD>
+</TR>
+<TR>
+<TD>
+DEFAULT_TAB_SIZE
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+default tab size (initially 8)
+</TD>
+</TR>
+<TR>
+<TD>
+DEFAULT_TABLE_STYLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default style for tables (initially <EM>columns</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+DEFAULT_XREF_STYLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default style for cross-references (initially <EM>sections</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Link expansion formats:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+FORMAT_LINK_PAGE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default is: the $page manpage
+</TD>
+</TR>
+<TR>
+<TD>
+FORMAT_LINK_PAGE_ENTRY
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default is: the $entry entry in the $page manpage
+</TD>
+</TR>
+<TR>
+<TD>
+FORMAT_LINK_PAGE_SECTION
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default is: the section on &quot;$sect&quot; in the $page manpage
+</TD>
+</TR>
+<TR>
+<TD>
+FORMAT_LINK_SECTION
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default is: the section on &quot;$sect&quot;
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Information">Information</A></H3>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Package:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+SDF
+</TD>
+<TD>
+phrase
+</TD>
+<TD>
+PRD:SDF
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_BUGS
+</TD>
+<TD>
+phrase
+</TD>
+<TD>
+EMAIL:sdf-bugs@mincom.com
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_FTP
+</TD>
+<TD>
+string
+</TD>
+<TD>
+URL for SDF's FTP site
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_HOME
+</TD>
+<TD>
+string
+</TD>
+<TD>
+library/configuration directory
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_USERS
+</TD>
+<TD>
+phrase
+</TD>
+<TD>
+EMAIL:sdf-users@mincom.com
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_VERSION
+</TD>
+<TD>
+string
+</TD>
+<TD>
+product version string (e.g. 2.000 beta1)
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_WWW
+</TD>
+<TD>
+string
+</TD>
+<TD>
+URL for SDF's home page
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Macros for default.sdg:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_DESCRIPTION_POST
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+finalisation after <EM>Description</EM>
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_DESCRIPTION_PRE
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+initialisation before <EM>Description</EM>
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_OPT_HELP
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+text explaining help option
+</TD>
+</TR>
+<TR>
+<TD>
+SDF_OPT_STD
+</TD>
+<TD>
+macro
+</TD>
+<TD>
+text explaining standard options
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Old macro names:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+BUILD_TITLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+provided for backwards-compatibility
+</TD>
+</TR>
+<TR>
+<TD>
+END_TOPIC
+</TD>
+<TD>
+string
+</TD>
+<TD>
+provided for backwards-compatibility
+</TD>
+</TR>
+<TR>
+<TD>
+SLIDE_DOWN
+</TD>
+<TD>
+string
+</TD>
+<TD>
+provided for backwards-compatibility
+</TD>
+</TR>
+<TR>
+<TD>
+SLIDE_UP
+</TD>
+<TD>
+string
+</TD>
+<TD>
+provided for backwards-compatibility
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Programming Languages">3.16. Programming Languages</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Language</STRONG>
+</TD>
+<TD>
+<STRONG>Names</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+C
+</TD>
+<TD>
+c
+</TD>
+</TR>
+<TR>
+<TD>
+C++
+</TD>
+<TD>
+c++, cpp, hpp, cc, h
+</TD>
+</TR>
+<TR>
+<TD>
+COBOL
+</TD>
+<TD>
+cobol
+</TD>
+</TR>
+<TR>
+<TD>
+CORBA IDL
+</TD>
+<TD>
+idl
+</TD>
+</TR>
+<TR>
+<TD>
+FORTRAN
+</TD>
+<TD>
+fortran, f77, fc, f, for
+</TD>
+</TR>
+<TR>
+<TD>
+Java
+</TD>
+<TD>
+java
+</TD>
+</TR>
+<TR>
+<TD>
+MIMS COBOL
+</TD>
+<TD>
+mimscobol, pcom, precom
+</TD>
+</TR>
+<TR>
+<TD>
+Object Pascal
+</TD>
+<TD>
+delphi, pascal, pas, int
+</TD>
+</TR>
+<TR>
+<TD>
+Perl
+</TD>
+<TD>
+perl, pl, pm, sdp, sdr
+</TD>
+</TR>
+<TR>
+<TD>
+Python
+</TD>
+<TD>
+python, jpython, py
+</TD>
+</TR>
+<TR>
+<TD>
+Simple Document Format
+</TD>
+<TD>
+sdf, sdm, sds, sdn, sdl, sde
+</TD>
+</TR>
+<TR>
+<TD>
+Unix shell
+</TD>
+<TD>
+sh
+</TD>
+</TR>
+<TR>
+<TD>
+Unix c-shell
+</TD>
+<TD>
+csh
+</TD>
+</TR>
+</TABLE>
+
+<P>Language names are case insensitive.</P>
+<H2><A NAME="Colours">3.17. Colours</A></H2>
+<P>For PS (i.e. MIF) generation, the supported colour values are <EM>Black</EM>, <EM>White</EM>, <EM>Red</EM>, <EM>Green</EM>, <EM>Blue</EM>, <EM>Yellow</EM>, <EM>Cyan</EM> and <EM>Magenta</EM>. If a different colour is specified, it is ignored.</P>
+<P>For HTML generation, any of the HTML colours names (including those supported for PS generation) or the &quot;#rrggbb&quot; form can be used. Useful variables are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_WHITE
+</TD>
+<TD>
+'ffffff'
+</TD>
+<TD>
+COLOR_BLACK
+</TD>
+<TD>
+'000000'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_RED
+</TD>
+<TD>
+'ff0000'
+</TD>
+<TD>
+COLOR_GREEN
+</TD>
+<TD>
+'00ff00'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_BLUE
+</TD>
+<TD>
+'0000ff'
+</TD>
+<TD>
+COLOR_YELLOW
+</TD>
+<TD>
+'ffff00'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_MAGENTA
+</TD>
+<TD>
+'ff00ff'
+</TD>
+<TD>
+COLOR_CYAN
+</TD>
+<TD>
+'00ffff'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_GREY
+</TD>
+<TD>
+'c0c0c0'
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Expression Formats">3.18. Expression Formats</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Strings:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+LOWER
+</TD>
+<TD>
+convert a string to lowercase
+</TD>
+</TR>
+<TR>
+<TD>
+LOWER1
+</TD>
+<TD>
+convert the first character to lowercase
+</TD>
+</TR>
+<TR>
+<TD>
+UPPER
+</TD>
+<TD>
+convert a string to uppercase
+</TD>
+</TR>
+<TR>
+<TD>
+UPPER1
+</TD>
+<TD>
+convert the first character to uppercase
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Dates:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+CONCISE
+</TD>
+<TD>
+alias for FORMAT_SDATE
+</TD>
+</TR>
+<TR>
+<TD>
+DATE
+</TD>
+<TD>
+format to a date only
+</TD>
+</TR>
+<TR>
+<TD>
+DATETIME
+</TD>
+<TD>
+format to a complete date-time format
+</TD>
+</TR>
+<TR>
+<TD>
+FULL
+</TD>
+<TD>
+alias for FORMAT_DATETIME
+</TD>
+</TR>
+<TR>
+<TD>
+SDATE
+</TD>
+<TD>
+format to a concise date only
+</TD>
+</TR>
+<TR>
+<TD>
+TIME
+</TD>
+<TD>
+format to a time only
+</TD>
+</TR>
+<TR>
+<TD>
+YEAR
+</TD>
+<TD>
+format to a 4-digit year
+</TD>
+</TR>
+</TABLE>
+
+<P>Expression format XXX can be changed/defined via the FORMAT_XXX variable.</P>
+<H2><A NAME="Modules">3.19. Modules</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+bugtrack
+</TD>
+<TD>
+extensions for bug tracking
+</TD>
+</TR>
+<TR>
+<TD>
+defines
+</TD>
+<TD>
+simplified product declaration/definition
+</TD>
+</TR>
+<TR>
+<TD>
+delphi
+</TD>
+<TD>
+extensions for delphi 1.x documentation
+</TD>
+</TR>
+<TR>
+<TD>
+misc
+</TD>
+<TD>
+miscellaneous goodies
+</TD>
+</TR>
+<TR>
+<TD>
+objects
+</TD>
+<TD>
+IT-related objects
+</TD>
+</TR>
+<TR>
+<TD>
+testcase
+</TD>
+<TD>
+extensions for test case documentation
+</TD>
+</TR>
+<TR>
+<TD>
+usecases
+</TD>
+<TD>
+extensions for Use Case documentation
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Book Components">3.20. Book Components</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+front
+</TD>
+<TD>
+the cover component
+</TD>
+</TR>
+<TR>
+<TD>
+pretoc
+</TD>
+<TD>
+components before the contents
+</TD>
+</TR>
+<TR>
+<TD>
+toc
+</TD>
+<TD>
+the table of contents
+</TD>
+</TR>
+<TR>
+<TD>
+lof
+</TD>
+<TD>
+the list of figures
+</TD>
+</TR>
+<TR>
+<TD>
+lot
+</TD>
+<TD>
+the list of tables
+</TD>
+</TR>
+<TR>
+<TD>
+prechapter
+</TD>
+<TD>
+components before the chapters
+</TD>
+</TR>
+<TR>
+<TD>
+chapter
+</TD>
+<TD>
+a normal chapter
+</TD>
+</TR>
+<TR>
+<TD>
+appendix
+</TD>
+<TD>
+an appendix
+</TD>
+</TR>
+<TR>
+<TD>
+preix
+</TD>
+<TD>
+components before the index
+</TD>
+</TR>
+<TR>
+<TD>
+ix
+</TD>
+<TD>
+the index
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Event Processing">3.21. Event Processing</A></H2>
+<P>Supported symbols within actions:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Symbols</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+paragraph
+</TD>
+<TD>
+$style, $text, %attr, &amp;PrependText, &amp;AppendText, $level, $prev_style, $prev_text, %prev_attr
+</TD>
+</TR>
+<TR>
+<TD>
+phrase
+</TD>
+<TD>
+$style, $text, %attr, $append
+</TD>
+</TR>
+<TR>
+<TD>
+macro
+</TD>
+<TD>
+$name, $args
+</TD>
+</TR>
+<TR>
+<TD>
+filter
+</TD>
+<TD>
+$name, $params
+</TD>
+</TR>
+<TR>
+<TD>
+table
+</TD>
+<TD>
+$style, %param
+</TD>
+</TR>
+</TABLE>
+
+<P>Special symbol meanings:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>paragraph:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+&amp;PrependText
+</TD>
+<TD>
+a subroutine to add paragraphs before this one
+</TD>
+</TR>
+<TR>
+<TD>
+&amp;AppendText
+</TD>
+<TD>
+a subroutine to add paragraphs after this one
+</TD>
+</TR>
+<TR>
+<TD>
+$level
+</TD>
+<TD>
+the current heading level (<EM>before</EM> this paragraph)
+</TD>
+</TR>
+<TR>
+<TD>
+$prev_style
+</TD>
+<TD>
+the style of the previous paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+$prev_text
+</TD>
+<TD>
+the text of the previous paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+%prev_attr
+</TD>
+<TD>
+the attributes of the previous paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>phrase:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$append
+</TD>
+<TD>
+text to append onto the end of the phrase
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

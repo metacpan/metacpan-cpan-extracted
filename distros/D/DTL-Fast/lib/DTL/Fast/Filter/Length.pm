@@ -1,8 +1,10 @@
 package DTL::Fast::Filter::Length;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Filter';
 
-$DTL::Fast::FILTER_HANDLERS{'length'} = __PACKAGE__;
+$DTL::Fast::FILTER_HANDLERS{length} = __PACKAGE__;
 
 #@Override
 sub filter
@@ -12,7 +14,7 @@ sub filter
     my $value = shift;  # value
     shift;  # context
 
-    if( ref $value eq 'ARRAY' )
+    if (ref $value eq 'ARRAY')
     {
         $value = scalar @$value;
     }
@@ -20,7 +22,7 @@ sub filter
     {
         $value = length( $value // '' );
     }
-    
+
     return $value;
 }
 

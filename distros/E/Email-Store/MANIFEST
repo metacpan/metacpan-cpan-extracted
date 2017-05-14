@@ -12,6 +12,8 @@ t/08limit.t
 t/attach-test
 t/date-test
 t/date-test2
+t/pod.t
+t/pod-coverage.t
 t/troublesome
 t/mailman-test
 lib/Email/Store/Attachment.pm
@@ -23,4 +25,6 @@ lib/Email/Store/Entity/Correlator/Trivial.pm
 lib/Email/Store/List.pm
 lib/Email/Store/Mail.pm
 lib/Email/Store.pm
-META.yml                                Module meta-data (added by MakeMaker)
+LICENSE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

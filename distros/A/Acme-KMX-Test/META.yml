@@ -1,0 +1,31 @@
+---
+abstract: 'Testing package'
+author:
+  - 'KMX <kmx@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.132510'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-KMX-Test
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - Pokus1.pm.PL
+    - Pokus2.pm.PL
+provides:
+  Acme::KMX::Pokus1:
+    file: Pokus1.pm.PL
+  Acme::KMX::Pokus2:
+    file: Pokus2.pm.PL
+  Acme::KMX::Test:
+    file: lib/Acme/KMX/Test.pm
+requires: {}
+version: 0.013

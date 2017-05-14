@@ -1,0 +1,10 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Variable xyz is 42. Variable abc is My favorite station.
+N[orig_style='N']Variable my_xyz is . Variable my_abc is .
+N[orig_style='N']Variable xyz is 42. Variable abc is My favorite station.
+N[orig_style='N']Variable my_xyz is 23. Variable my_abc is Alpha Beta Gamma.
+__object[Name='xyz';value=17]Variable
+__object[Name='abc';value='My favorite 3 letters']Variable
+N[orig_style='N']Variable xyz is 17. Variable abc is My favorite 3 letters.
+N[orig_style='N']Variable my_xyz is 23. Variable my_abc is Alpha Beta Gamma.

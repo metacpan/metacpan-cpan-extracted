@@ -1,0 +1,24 @@
+module mod {
+
+   /* This is a very small demo
+      for the perl module CORBA::IDLtree */
+
+   enum enum_t { zero, one };
+
+   typedef short arr_t[3][4];
+
+   struct stru_t {
+      boolean b;
+      double d;
+      enum_t e;
+      arr_t a;
+   };
+      
+   interface ifc {
+
+      void mymeth (in stru_t s);
+
+   };
+
+};
+

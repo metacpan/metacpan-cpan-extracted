@@ -1,0 +1,14 @@
+Build.PL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Scalar/Boolean.pm
+lib/Scalar/Boolean/Tie.pm
+lib/Scalar/Boolean/VM.pm
+lib/Scalar/Boolean/Value.pm
+t/00.load.t
+t/01.app.t

@@ -405,4 +405,8 @@ The C<GENERICSTACK_GET_CUSTOMP> macro is in particulary very convenient if you w
 
 =back
 
+=item Sequence points
+
+This generic stack implementation supports indices that are I<expressions>. The side-effect is that it is recommended to not use more than one generic stack macro on the same stack in statements where the order of execution is undefined. Basically, this mean: use one generic stack macro at a time for a given stack.
+
 =back

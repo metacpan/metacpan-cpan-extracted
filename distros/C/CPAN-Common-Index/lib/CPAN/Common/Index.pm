@@ -5,7 +5,7 @@ use warnings;
 package CPAN::Common::Index;
 # ABSTRACT: Common library for searching CPAN modules, authors and distributions
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Carp ();
 
@@ -152,7 +152,7 @@ CPAN::Common::Index - Common library for searching CPAN modules, authors and dis
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -318,7 +318,7 @@ called by application code.  By default, it does nothing.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/CPAN-Common-Index/issues>.
+at L<https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -326,9 +326,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/dagolden/CPAN-Common-Index>
+L<https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index>
 
-  git clone https://github.com/dagolden/CPAN-Common-Index.git
+  git clone https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index.git
 
 =head1 AUTHOR
 
@@ -336,9 +336,13 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Helmut Wollmersdorfer Kenichi Ishigaki Tatsuhiko Miyagawa
+=for stopwords David Golden Helmut Wollmersdorfer Kenichi Ishigaki Shoichi Kaji Tatsuhiko Miyagawa
 
 =over 4
+
+=item *
+
+David Golden <xdg@xdg.me>
 
 =item *
 
@@ -347,6 +351,10 @@ Helmut Wollmersdorfer <helmut@wollmersdorfer.at>
 =item *
 
 Kenichi Ishigaki <ishigaki@cpan.org>
+
+=item *
+
+Shoichi Kaji <skaji@cpan.org>
 
 =item *
 

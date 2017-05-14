@@ -1,0 +1,187 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use POSIX qw(LC_NUMERIC);
+use Error qw(:try);
+
+use Gtk2 '1.140';
+#use CORBA::MICO ids => [ 'IDL:omg.org/CORBA:1.0' => undef ];
+use CORBA::MICO;
+
+use CORBA::MICO::IRRoot;
+use CORBA::MICO::NCRoot;
+
+use CORBA::MICO::Misc qw(status_line_create);
+use CORBA::MICO::IR;
+use CORBA::MICO::NC;
+use CORBA::MICO::BGQueue;
+use CORBA::MICO::CMenu;
+
+use strict;
+
+#--------------------------------------------------------------------
+# Global variables
+#--------------------------------------------------------------------
+my $skip_names='(CORBA[:\/])';
+$skip_names = '';
+
+my $bg_sched;        # scheduler for background processing
+my $nc_browser;
+
+# Gtk variables
+my $topwindow;       # toplevel window
+
+#--------------------------------------------------------------------
+# Signal handlers
+#--------------------------------------------------------------------
+sub destroy_window {
+  my($widget, $windowref, $ref1) = @_;
+  $$windowref = undef;
+  $$ref1 = undef;
+  return 0;
+}
+#--------------------------------------------------------------------
+sub destroy_exit {
+  my $args = shift;
+  #destroy_window(@$args);
+  Gtk2->main_quit();
+  return 0;
+}
+
+#--------------------------------------------------------------------
+# Notebook: page selected signal
+sub notebook_switch_page {
+  my ($notebook, $page, $page_num, $page_object) = @_;
+  #print "notebook_switch_page\n";
+  #$page_object->prepare();
+  activate_object($notebook, $page_object, $page_num);
+}
+
+#--------------------------------------------------------------------
+# Activate page object: called when corresponding page becomes active
+sub activate_object {
+  my ($notebook, $object, $page_num) = @_;
+  if( not defined($page_num) or
+      $notebook->page_num($object->widget()) == $page_num ) {
+    $object->prepare();
+    $object->activate();
+    $bg_sched->set_active_object($object);
+  }
+}
+
+#--------------------------------------------------------------------
+$| = 1;
+Gtk2->set_locale();
+Gtk2->init();
+POSIX::setlocale(LC_NUMERIC, 'POSIX');
+
+# Create toplevel window
+$topwindow = new Gtk2::Window('toplevel');
+$topwindow->set_title('Corba Control Center: Interface repository');
+$topwindow->realize();
+
+# create status line
+my $status_line = status_line_create();
+
+# create menu
+my $menu = new CORBA::MICO::CMenu($topwindow);
+$menu->add_item('', '/File/_Quit',  '<control>Q', sub { Gtk2->main_quit(); });
+
+# Initialize MICO, get IR
+#push (@ARGV, '-ORBIfaceRepoAddr', 'inet:127.0.0.1:8888');
+#push (@ARGV, '-ORBConfFile', '/home/pr/.micorc');
+#$ENV{MICORC} = '/home/pr/.micorc';
+my $orb = CORBA::ORB_init("mico-local-orb");
+my $root_poa = $orb->resolve_initial_references("RootPOA");
+my $root_ir = $orb->resolve_initial_references("InterfaceRepository");
+my $irref = $orb->object_to_string($root_ir);
+if( CORBA::is_nil($root_ir) ) {
+  warn "Could not bind to Interface Repository\n";
+  exit(1);
+}
+
+eval { $orb->preload('IDL:omg.org/CORBA:1.0'); };
+if( $@ ) {
+  warn "Could not preload 'IDL:omg.org/CORBA:1.0'\n";
+} 
+
+my $root_nc;
+try {
+  $root_nc = $orb->resolve_initial_references("NameService");
+}
+catch CORBA::Exception with {
+  undef $root_nc;
+  warn "Could not bind to Name Service: $_[0]\n";
+};
+
+if( defined($root_nc) ) {
+  my $nsmod = $root_ir->lookup_name('CosNaming', 1, 'dk_Module', 1);
+  if( @$nsmod == 0 ) {
+    warn "Name Service will not be supported so as module CosNaming was not found in IR\n";
+    undef $root_nc;
+  }
+}
+
+# Create notebook
+my $notebook = new Gtk2::Notebook();
+$notebook->show();
+
+# Vertical box: menu + notebook + status line
+my $vbox = new Gtk2::VBox;
+$topwindow->add($vbox);
+$vbox->pack_start($menu->widget(), 0, 0, 0);
+$vbox->pack_start($notebook, 1, 1, 0);
+$vbox->pack_start($status_line, 0, 0, 0);
+$vbox->show_all();
+
+# create background queue scheduler
+$bg_sched = new CORBA::MICO::BGQueue(20);
+
+# create IR browser
+my $ir_browser = new CORBA::MICO::IR($root_ir, $topwindow,
+                                     $status_line, $bg_sched, $menu);
+# Create Label and add IR page to the notebook
+my $ir_bookmark_label = Gtk2::Label->new("Interface Repository");
+$ir_bookmark_label->show();
+my $ir_widget = $ir_browser->widget();
+$notebook->append_page($ir_widget, $ir_bookmark_label);
+$notebook->signal_connect('switch-page', \&notebook_switch_page, $ir_browser);
+
+# create NC browser
+if( $root_nc ) {
+  $nc_browser = new CORBA::MICO::NC($orb, $root_nc, $ir_browser, $topwindow, 
+                                       $status_line, $bg_sched, $menu);
+
+  # Create Label and add NS page to the notebook
+  my $nc_bookmark_label = Gtk2::Label->new("Name Service");
+  $nc_bookmark_label->show();
+  my $nc_widget = $nc_browser->widget();
+  $notebook->append_page($nc_widget, $nc_bookmark_label);
+  $notebook->signal_connect('switch-page', \&notebook_switch_page, $nc_browser);
+}
+
+# add last item to menu
+$menu->add_item('', '/Help/_About', undef, sub {});
+
+# termination
+$topwindow->signal_connect(destroy=>\&destroy_exit,
+                           [\$topwindow, \$ir_browser]);
+
+activate_object($notebook, $ir_browser, $notebook->page_num($ir_widget));
+
+$topwindow->show_all();
+Gtk2->main();
+$bg_sched->close();
+$menu->close();
+$ir_browser->close();
+$nc_browser->close() if defined $nc_browser;
+undef $notebook;
+undef $vbox;
+undef $ir_widget;
+undef $bg_sched;
+undef $menu;
+undef $nc_browser;
+undef $ir_browser;
+undef $topwindow;

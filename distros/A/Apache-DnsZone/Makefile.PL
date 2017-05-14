@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 1.9 2001/05/22 18:36:47 thomas Exp $
+# $Id: Makefile.PL,v 1.10 2001/06/21 21:20:22 thomas Exp $
 package Apache::DnsZone;
 
 use ExtUtils::MakeMaker;
@@ -21,6 +21,7 @@ WriteMakefile(
 		  'CGI::FastTemplate' => 1.09,
 		  'MLDBM' => 0,
                   'GDBM_File' => 0,
+                  'Net::IP' => 0
 	      },
               'clean' => { 'FILES' => '*.xs*, lang/DnsZoneLang' }
 );

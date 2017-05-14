@@ -1,0 +1,15 @@
+0.03      2015-10-22 15:31:10+02:00 Europe/Paris
+
+    * Documentation updates.
+
+0.02      2015-10-22 15:20:18+02:00 Europe/Paris
+
+    * New API (this breaks 0.01), cleaner and lighter interface. No more need
+      for the final instruction "declare_probability_routes", better design.
+      Idea by veryrusty, after a little lunch brainstomring session with sawyer
+      and pokki.
+      (Alexis Sukrieh).
+
+0.01      2015-10-21 12:42:15+02:00 Europe/Paris
+
+    * initial release (Alexis Sukrieh)

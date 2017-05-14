@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::AuthYubikey;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.9.1';
 our $yubikeyInitDone;
 
 BEGIN {
@@ -178,7 +178,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2011-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

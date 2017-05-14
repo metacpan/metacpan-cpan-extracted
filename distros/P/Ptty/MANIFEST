@@ -1,0 +1,9 @@
+AutoConf
+COPYING
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Ptty.pm
+Ptty.xs
+os_stuff.h
+try

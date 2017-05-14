@@ -1,0 +1,96 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="organ_type" cv_table="SMP_OrganType">
+  <comment type="definition">This table provides the restricted vocabulary for the column organ type in the table Sample and is to describe an organ from which a sample was derived, from complex multicellular differentiated species only
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. Although not
+currently implemented, it will regulate the visibility of other
+details of the sample screen.</comment>   
+<term name="all"
+        description="all organs were pooled together"/>
+<term name="heart"
+        description="only relevant in animals"/>
+<term name="liver"
+        description="only relevant in animals"/>
+<term name="ovary"
+        description="only relevant in animals"/>
+<term name="testis"
+        description="only relevant in animals"/>
+<term name="uterus"
+        description="only relevant in animals"/>
+<term name="brain"
+        description="only relevant in animals"/>
+<term name="stomach"
+        description="only relevant in animals"/>
+<term name="kidney"
+        description="only relevant in animals"/>
+<term name="intestine"
+        description="only relevant in animals"/>
+<term name="pancreas"
+        description="only relevant in animals"/>
+<term name="central_nervous_system"
+        description="only relevant in animals"/>
+<term name="stamen"
+        description="only relevant in plants"/>
+<term name="pistil"
+        description="only relevant in plants"/>
+<term name="leaf"
+        description="only relevant in plants"/>
+<term name="flower"
+        description="only relevant in plants"/>
+<term name="root"
+        description="only relevant in plants"/>
+<term name="petiole"
+        description="only relevant in plants"/>
+<term name="stem"
+        description="only relevant in plants"/>
+<term name="pedicel"
+        description="only relevant in plants"/>
+<term name="plumule"
+        description="only relevant in plants"/>
+<term name="fruit"
+        description="only relevant in plants"/>
+<term name="pericarp"
+        description="only relevant in plants"/>
+<term name="placenta"
+        description="relevant in plants and animals"/>
+<term name="anther"
+        description="only relevant in plants"/>
+<term name="style"
+        description="only relevant in plants"/>
+<term name="filament"
+        description="only relevant in plants"/>
+<term name="stigma"
+        description="only relevant in plants"/>
+<term name="sepals"
+        description="only relevant in plants"/>
+<term name="petals"
+        description="only relevant in plants"/>
+<term name="seed"
+        description="only relevant in plants"/>
+<term name="seedling"
+        description="only relevant in plants"/>
+<term name="cotyledon"
+        description="only relevant in plants"/>
+<term name="hypocotyl"
+        description="only relevant in plants"/>
+<term name="epicotyl"
+        description="only relevant in plants"/>
+<term name="coleoptile"
+        description="only relevant in plants"/>
+<term name="awn"
+        description="only relevant in plants"/>
+<term name="lemma"
+        description="only relevant in plants"/>
+<term name="glume"
+        description="only relevant in plants"/>
+<term name="palea"
+        description="only relevant in plants"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

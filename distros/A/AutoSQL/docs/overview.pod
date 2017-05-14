@@ -1,0 +1,72 @@
+=pod
+
+Such a *big* project cannot come without docs, since it cannot be explained 
+within a paragraph.
+
+First of all, I need to make these common sense in black-and-white,
+for avoiding the misunderstanding.
+
+=head1 What is in a Type?
+
+=head2 What is a slot and what is a child?
+
+A slot here means a primitive type of data, such as integer, text string, etc, 
+that which can be stored in a column directly.
+You can think of it as your own fresh. 
+For example, the type of Person has slots such as first_name and last_name.
+The alias is also the slot of Person, since it is just a list of text.
+However, alias is in another kind of concept described later.
+
+While a child is different in the sense that it is of other Types, 
+such as Email means to Person.
+
+=head2 scalar or list
+
+Whatever it is slot or a child, an element of a Type should be a fixed attribute
+that whether there is only one in a Type or many.
+
+For instance, a Person, in most cases, has only one first_name and last_name, 
+while he/she may have many aliases unofficially that you maned him. 
+The first_name and last_name are scalar attributes, 
+and the aliases is a list attribute.
+
+=head2 plural
+
+Noted that you should use the plural form of the attribute at appropriate places.
+But first of all, you need to specify and use the plural form correctly. 
+This system is pretending to be simple, that it just know to append a 's' at 
+the tail of a noun simply. While it is your job to teach it to map, say, 
+'alias' to 'alias' and 'fish' to 'fish'. No worries it is simple.
+
+=head2 summary
+
+Any combination of attribute type and attribute scalar is considered as 
+reasonable and cared for by this system.
+
+=head1 Table relationship
+
+If you generalize the relationship between database tables, there are 3 kinds
+
+=over 4
+
+=item * No relationship
+
+The two tables are strangers to each other.
+
+=item * Social relationship
+
+Friends are usually OK with each other and never bother others' business.
+
+The joint table is intent to bridge the friends. The each ids of the parties
+are the columns of the joint table, natually.
+
+=item * Family relationship
+
+Mainly, parent-children relationship is usually seen in the table schema, 
+which I mean 'foreign key' issue.
+
+=back
+
+
+=cut
+

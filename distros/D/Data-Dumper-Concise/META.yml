@@ -1,28 +1,32 @@
 ---
 abstract: 'Less indentation and newlines plus sub deparsing'
 author:
-  - 'mst - Matt S. Trout <mst@shadowcat.co.uk>'
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.2501, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Data::Dumper::Concise
+  version: '1.4'
 name: Data-Dumper-Concise
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  perl: 5.6.0
+  Data::Dumper: '0'
+  Exporter: '0'
+  perl: '5.006'
 resources:
-  homepage: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Data-Dumper-Concise.git;a=summary
-  license: http://dev.perl.org/licenses/
-  repository: git://git.shadowcat.co.uk/p5sagit/Data-Dumper-Concise
-version: '2.022'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dumper-Concise
+  repository: https://github.com/p5sagit/Data-Dumper-Concise.git
+version: '2.023'
+x_contributors:
+  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
+  - 'Matt S Trout <matthewt@hercule.scsys.co.uk>'
+  - 'Karen Etheridge <ether@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

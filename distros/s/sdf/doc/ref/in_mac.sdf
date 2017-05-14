@@ -1,0 +1,137 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Macros
+
+H2: Overview
+
+The macros available are summarised below.
+
+!block table; tags="MAC"; groups
+Name                Purpose
+General:
+build_title         build a title page
+block               begin a block of text
+endblock            end a block of text
+include             include another file
+execute             include output from a command
+Variables:
+init                initialise variables (before loading configuration files)
+define              set a variable
+default             set a variable (if not already set)
+undef               clear a variable
+export              export a variable to the format driver (and/or mark it for later exporting)
+restrict            declare a restricted family of variables
+Figures:
+import              import an external object (e.g. figure)
+clear               reset text wrapping around a figure
+Libraries:
+inherit             inherit entities from a library
+use                 load a library module
+Macros:
+macro               begin a macro definition
+endmacro            end a macro definition
+insert              call a macro
+Classes:
+class               define a class of objects
+catalog             build a catalog from objects already loaded
+Conditional text:
+if                  begin conditional text
+elsif               begin a conditional section
+else                begin alternative section
+endif               end conditional text
+elseif              same as elsif
+Event processing:
+on                  specify processing for an event
+off                 disable processing previously specified
+File processing:
+output              dynamically change the output file used
+script              execute a line of [[Perl]]
+message             output a message during execution
+line                change message parameters
+slide_down          decrease heading levels (e.g. H2 -> H3)
+slide_up            increase heading levels (e.g. H2 -> H1)
+Extraction:
+getdoc              extract documentation embedded in source code
+getcode             extract source code (i.e. non-documentation) from a file
+getcli              extract command-line interface information
+perlapi             extract API information from a [[Perl]] library
+Miscellaneous:
+jumps               generates lines of jumps
+subsections         specify the subsections for a topic
+continued           continue a heading from a previous page
+end_topic           mark the end of a topic
+!endblock
+
+Further details on these are provided below.
+
+# Define the help to be placed after each macro interface
+!macro MACRO_INTERFACE_END
+See {{SECT:Understanding Macro Interfaces}}, if necessary.
+!endmacro
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'HTML_TOPICS_MODE'} || $var{'HTML_SUBTOPICS_MODE'}
+    # do nothing
+!elsif $var{'OPT_TARGET'} eq 'html' || $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!block topics
+Topic
+macros/mblock
+macros/mbuild_t
+macros/mcatalog
+macros/mclass
+macros/mclear
+macros/mcontinu
+macros/mdefault
+macros/mdefine
+macros/melse
+macros/melseif
+macros/melsif
+macros/mend_top
+macros/mendbloc
+macros/mendif
+macros/mendmacr
+macros/mexecute
+macros/mexport
+macros/mgetcli
+macros/mgetcode
+macros/mgetdoc
+macros/mif
+macros/mimport
+macros/minclude
+macros/minherit
+macros/minit
+macros/minsert
+macros/mjumps
+macros/mline
+macros/mmacro
+macros/mmessage
+macros/moff
+macros/mon
+macros/moutput
+macros/mperlapi
+macros/mrestric
+macros/mscript
+macros/mslide_d
+macros/mslide_u
+macros/msubsect
+macros/mundef
+macros/muse
+!endblock
+
+!if !($var{'HTML_TOPICS_MODE'} || $var{'HTML_SUBTOPICS_MODE'})
+!off paragraph h2top
+!endif

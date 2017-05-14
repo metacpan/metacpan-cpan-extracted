@@ -44,6 +44,12 @@ $Wizard::Elem::Select::HTML::VERSION = '0.01';
 sub Display {
     my($self, $wiz, $form, $state) = @_;
     $self->SUPER::Display($wiz, $form, $state);
+
+    my $hurl = $form->HelpUrl() || 'gethelp.ep';
+    my $mod = ref($state); $mod =~ s/\::/\//g; $mod .= '.pm';
+    my $item = "item_" . $self->{'name'}; $item =~ s/\-/\_/g;
+    $hurl .= "?module=" . CGI->escape($mod) . "#" . CGI->escape($item);
+
     my $options = $self->{'options'};
     my $name = $self->{'name'};
     my $value = $self->{'value'};
@@ -64,7 +70,7 @@ sub Display {
 	$str .= '<option' . (($opt eq $value) ? ' SELECTED ' : '')  . '>' 
 	      . HTML::Entities::encode_entities($opt) . "\n";
     }
-    $str .= '</SELECT></td></tr>';
+    $str .= '</SELECT></td><td><a href="' . $hurl . '">Help</a></td></tr>';
     $form->AddHTML($str);
 }
 

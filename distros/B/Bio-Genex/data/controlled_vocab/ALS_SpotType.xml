@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="AL_Spots" db_column="spot_type" cv_table="ALS_SpotType">
+<comment type="definition">This control table is used by the AL_Spots table to describe the generic type of the sequence feature        	
+</comment>
+<term name="sequence_feature"
+        description="The spot is of the type sequence feature"/>
+<term name="blank"
+        description="The spot is being used to determine background"/>
+<term name="control_dna"
+        description="The spot is being used for one of a number of types of control"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

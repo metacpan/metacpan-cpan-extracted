@@ -1,0 +1,278 @@
+#####################################################################
+# package RecordDisplay
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to Acting upon a record.
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package RecordDisplay;
+
+
+#####################################################################
+# sub DoRecDisplay
+#
+# This function displays a set of entries to the user.  Basically, all it
+# does is format the text for nice output.  
+#####################################################################
+sub DoRecDisplay {
+  local ( $dbh, $priKeys ) = @_;
+
+  $query = &RecActions::CreateExplicitQuery ( "SELECT", $priKeys );
+
+  &main::DPrint ( "Doing Query: <pre>$query</pre>" );
+  $sth = $dbh->Query ( $query ) || 
+  	&main::Error ( "Query Failed in DoRecDisplay. $Msql::db_errstr" );
+  
+  $nRows = $sth->numrows;
+  $nCols = $sth->numfields;
+
+  
+  if ( $main::tableInfo->{'RecordDisplayTemplate'} ) {
+    &Template::DoTemplate ( $main::tableInfo->{'RecordDisplayTemplate'}, 
+    		  "DISPLAY_RECORD", $sth );
+    return;
+  } else {
+    print &DoStandardAction ( $sth );
+    print &Template::GetHTMLFooter();
+  }
+}
+
+#####################################################################
+# Do the standard action for this
+#####################################################################
+sub DoStandardAction {
+  my ( $sth ) = @_;
+  my ( $strRet ) = "";
+  &main::DPrint ( "In DoStandardAction..." );
+  $nRows = $sth->numrows;
+
+  for ( $nCount = 0; $nCount < $nRows; $nCount++ ) {
+    &main::DPrint ( "Doign Record Number $nCount" );
+  $strRet .= <<"  EOF";
+<table border>
+  <tr>
+    <td>
+      <table cellspacing=0>
+	<tr>
+	  <th width=10%>Field Name</th>
+	  <th width=5%>&nbsp;</th>
+	  <th align=left width=85%>Data</th>
+	</tr>
+	<tr>
+	  <td colspan=3><hr></td>
+	</tr>
+
+  EOF
+
+    $sth->DataSeek ( $nCount ) || 
+    	&main::Error ( "Failed DataSeek ( $nCount ). $Msql::db_errstr" );
+    
+    ( @arr = $sth->FetchRow() ) || 
+    	&main::Error ( "Failed FetchRow for row $nCount. $Msql::db_errstr" );
+
+    for ( $nFieldCount = 0; $nFieldCount <= $#{$main::tData}; $nFieldCount++ ) {
+      if ( $main::tData->[$nFieldCount]->{'dispFieldWhenDisplay'} ) {
+	$strValue = &MsqlCGI::ConvertValue 
+			( $arr[$nFieldCount], $main::tData->[$nFieldCount] );
+        $strRet .= <<"        EOF";
+	<tr>
+	  <td><font size=-1>$main::tData->[$nFieldCount]->{'description'}:</font></td>
+	  <td><b>$strValue&nbsp;</b></td>
+	</tr>
+	<tr>
+	  <td colspan=3><hr size=1></td>
+	</tr>
+
+        EOF
+      }
+
+    }
+    $strRet .= <<"    EOF";
+	  <tr>
+	    <td align=center colspan=2>
+    EOF
+    $strRet .= &DoCGIFooter ( $sth );
+    $strRet .= <<"    EOF";
+	    </td>
+	  </tr>
+    EOF
+    $strRet .= <<"    EOF";
+      </table>
+    </td>
+  </tr>
+</table>
+<p>
+    EOF
+  }
+  return $strRet;
+}
+
+#####################################################################
+# DoCGIFooter.  
+#
+# This function is called either interanlly, or from a Template's
+# "$CGIFooter" token.  This function sets up the CGI footer function
+# buttons When displaying a record.  There are two possible buttons on the
+# page: a "Modify" and "Delete" button.
+#####################################################################
+sub DoCGIFooter {
+  local ( $sth ) = @_;
+  local ( $strRet );
+
+	# Now we're setting up the Buttons at the bottom of the page that
+	# will display the "Modify This Record" and "Delete This Record"
+	# at the end of each displayed record.
+  if ( ( $main::tableInfo->{'AllowModify'} ) || 
+       ( $main::tableInfo->{'AllowDelete'} ) ) {
+    $strRet .= &DoCGIHeader ();
+
+    $strRet .= <<"    EOF";
+	    <input type=hidden name="_MsqlCGI_priKey" 
+		   value="$arr[$main::tableInfo->{'priKeyArrNum'}]">
+    EOF
+
+    if ( $main::tableInfo->{'AllowModify'} ) {
+      $strRet .= <<"      EOF";
+	      <input type=submit name="_MsqlCGI_recAction" 
+	      	     value="Modify This Record">
+      EOF
+    }
+
+    if ( $main::tableInfo->{'AllowDelete'} ) {
+      $strRet .= <<"      EOF";
+	      <input type=submit name="_MsqlCGI_recAction" 
+	      	     value="Delete This Record">
+      EOF
+    }
+
+    $strRet .= <<"    EOF";
+      </form>
+    EOF
+  }
+  return $strRet;
+}
+
+
+##########################################################################
+# DoCGIHeader
+# 
+# Setup the header for the Record Find screen.  This is called internally
+# by DoRecordFindSetup or by a $CGIHeader token in the
+# preliminarySearchTemplate.
+##########################################################################
+sub DoCGIHeader {
+    return  &Template::GetCGIHeader ( "RecActions" );
+}
+
+############################################################################
+# Repetitive Section.
+#
+# This is the "repetitive section" processor for the
+# DisplayTemplate.  
+#
+# The prelim results template is the only template that has the capability
+# of having multiple "repeating sections".  These sections are the summary
+# output.  We're making the template have a "start" block (the token:
+# "$Start_Repetitive_Section") and an "end" token: (the token:
+# "$End_Repetitive_Section") which defines the summary section.  
+#
+# Processing of the repetitive section is as follows:
+#  1: we read all the lines between the summary section into an array
+#     of strings.  While reading, we'll perform substitutions which are
+#     not RECORD Specific.  (date, time, database, tcp port, etc...)
+#  2: We get the data from the database
+#  3: For each of the records returned:
+#    3a: run through the array of strings and perform whatever
+#        substitutions on the RECORD SPecific data which are necessary.
+#        The results are concatinated to a string..
+#  4: Return the string.
+############################################################################
+sub RepetitiveSection {
+  ( $filePtr ) = @_;
+  local ( $strRet ) = 
+  $strRet = "<pre>Start, $filePtr<br>\n" if ( $main::debug );
+  $continue = 1;
+  $nCount = 0;
+  $priKeyArrNum = $main::tableInfo->{'priKeyArrNum'};
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+  $date = sprintf ( "%02d/%02d/%02d", $mon + 1, $mday, $year + 1900 );
+  $time = sprintf ( "%d:%02d:%02d", $hour, $min, $sec );
+  &main::DPrint ( "<b>In RepetitiveSection, $file</b>" );
+  $nRows = $sth->numrows;
+
+	# This reads the section in until we get the
+	# "$End_Repetitive_Section" token is seen.
+  do {
+    $nCount++;
+    $_ = <$filePtr>;
+    if ( $_ eq undef ) {
+      $msg = <<"      EOF";
+	The template file: for the PreliminaryResults page had a
+	"\$Start_Repetitive_Section" token but no corresponding
+	"\$End_Repetitive_Section".  Please check the syntax of the
+	template file.
+      EOF
+      &main::Error ( $msg );
+    }
+    s/(.?)(\$DBHost\b)/$1 eq '\\' ? $2 : $1 . $main::tableInfo->{DBHost} /ge;
+    s/(.?)(\$DBPort\b)/$1 eq '\\' ? $2 : $1 . $main::tableInfo->{DBPort} /ge;
+    s/(.?)(\$DBName\b)/    $1 eq '\\' ? $2 : 
+    	$1 .  $main::tableInfo->{DBName} /ge;
+    s/(.?)(\$TableName\b)/$1 eq '\\' ? $2 : 
+    	$1 . $main::tableInfo->{TableName} /ge;
+    s/(.?)(\$date\b)/$1 eq '\\' ? $2 : $1 . $date /ge;
+    s/(.?)(\$time\b)/$1 eq '\\' ? $2 : $1 . $time /ge;
+    s/(.?)(\$FieldDescription\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 :
+      $1 . &MsqlCGI::GetElementValue ( $3, "description", $main::tData) /ge;
+    s/(.?)(\$Total\b)/$1 eq '\\' ? $2 : $1 . $nRows /ge;
+
+    $_ =~ /^(.?)(\$End_Repetitive_Section\b)/;
+    if ( ( $1 ne '\\' ) && ( $2 eq "\$End_Repetitive_Section" ) ) {
+      $continue = 0;
+    } else {
+      push @strList, $_;
+    }
+  } while ( $continue );
+
+  	# Loop through the records we've got, get the data, and perform
+	# the substitutions. 
+  for ( $nRowCount = 0; $nRowCount < $nRows; $nRowCount++ ) {
+    $sth->DataSeek ( $nRowCount );
+    ( @arr = $sth->FetchRow() ) || 
+    	&main::Error ( "Error Fetching Row $nRowCount" );
+
+    foreach $str ( @strList ) {
+      	# We have to create a second variable here because if we modify
+	# "$str", it will modify the fields in the array...Definitely not
+	# what we want.
+      $strReplace = $str;
+      $strReplace =~ s/(.?)(\$Count\b)/$1 eq '\\' ? $2 : $1 . $nRowCount /ge;
+      $strReplace =~ s/(.?)(\$CGIFooter\b)/$1 eq '\\' ? $2 : 
+      	$1 .  &DoCGIFooter ( $sth )/ge;
+		 
+      $strReplace =~ s/(.?)(\$FieldValue\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 :
+         $1 . &DisplayValue ( $3, \@arr )/ge;
+
+      $strRet .= $strReplace;
+    }
+  }
+  $strRet .= "</pre>" if ( $main::debug );
+  return $strRet;
+}
+
+############################################################################
+# This just displays the value given the name of a field.  It's only here
+# to clean up how the code looks.
+############################################################################
+sub DisplayValue {
+  ( $fieldName, $fieldArray ) = @_;
+  $fieldNum = &MsqlCGI::GetElementStructNumber ( $fieldName );
+  local ( $strRet ) = &MsqlCGI::ConvertValue ( $fieldArray->[$fieldNum] );
+  return $strRet;
+}
+
+
+1;

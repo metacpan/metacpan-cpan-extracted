@@ -1,0 +1,27 @@
+---
+abstract: 'Ability based authorization for Catalyst (using only Roles)'
+author:
+  - 'Matthias Dietrich <perl@rainboxx.de>'
+build_requires:
+  Catalyst::Authentication::User: 0
+  Test::Exception: 0
+  Test::More: 0
+  base: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Authorization-RoleAbilities
+requires:
+  Catalyst::Exception: 0
+  Catalyst::Plugin::Authorization::Roles: 0
+  Moose: 0
+  Scalar::Util: 0
+  Set::Object: 0
+version: 0.003

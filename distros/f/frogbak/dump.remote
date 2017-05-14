@@ -1,0 +1,221 @@
+#!/bin/csh -fx
+
+set file = $1
+set date1 = "$2"
+set date2 = "$3"
+set dumplevel = $4
+set os = $5
+set compress = $6
+
+alias bomb 'echo "\!*" > /tmp/zz$$ ; sh -c "cat /tmp/zz$$ 1>&2" ; rm -f /tmp/zz$$; exit 1'
+
+switch ("$os") 
+	case solaris:
+		if (-e /etc/vfstab) then
+			set fstab = /etc/vfstab
+		else
+			if (-e /etc/fstab) then
+				set fstab = /etc/fstab
+			else
+				bomb "cannot find fstab or equiv."
+			endif
+		endif
+		awk '/^\/dev/ && $4 == "ufs" {print $1" ="$3"="}' $fstab > /tmp/dodump$$
+		set dumpdate_format = "-32"
+		set etcdump
+		breaksw
+	case dostar:
+		# gtar on a dos partition 
+		set gtar = tar
+		set dosfs 
+		breaksw
+	case linux:
+	case targtar:
+		# gtar
+		set gtar = tar
+		breaksw
+	case gtar:
+		set gtar = gtar
+		breaksw
+	case hpux:
+	case hp-ux:
+		if (-e /etc/checklist) then
+			set fstab = /etc/checklist
+		else
+			if (-e /etc/fstab) then
+				set fstab = /etc/fstab
+			else
+				bomb "cannot find fstab or equiv."
+			endif
+		endif
+		awk '/^\/dev/ && $3 == "hfs" {print $1" ="$2"="}' $fstab > /tmp/dodump$$
+		alias /usr/ucb/mail /usr/bin/mailx
+		set dumpdate_format = ""
+		set etcdump
+		breaksw
+	case mach:
+	case ultrix:
+		awk -F: '/dev/{print $1" ="$2"="}' /etc/fstab > /tmp/dodump$$
+		set dumpdate_format = "-16"
+		set etcdump
+		breaksw
+	case sunos:
+	case sony:
+		awk '/^\/dev/{print $1" ="$2"="}' /etc/fstab > /tmp/dodump$$
+		set dumpdate_format = "-16"
+		set etcdump
+		breaksw
+	case freebsd:
+	case netbsd:
+		set dump = /sbin/dump
+		set smartdump
+		breaksw
+	case xenix:
+		set bincpio
+		breaksw
+	case domain:
+		set etcwbak
+		breaksw
+	default:
+		bomb "UNKNOWN operating system: $os"
+		breaksw
+endsw
+
+if ($?etcdump) then
+
+	grep =$file= /tmp/dodump$$ >/tmp/dodump2.$$
+	if ($status != 0) then
+		bomb "CANNOT LOCATE FILESYSTEM: $file"
+		exit 1
+	endif
+	set a = `cat /tmp/dodump2.$$`
+	if ($#a != 2) then
+		bomb "CANNOT PARSE FILESYSTEM: $a, $#a, $file"
+		exit 1
+	endif
+	set filesys = $a[1]
+	set rfilesys = `echo $filesys | sed s,dev/,dev/r,`
+
+	if ($dumplevel > 0) then
+		if (-e /etc/dumpdates.orig) then 
+			/usr/ucb/mail -s "file /etc/dumpdates.orig -- should not have existed." root < /etc/dumpdates.orig >& /dev/null
+			/bin/rm -f /etc/dumpdates.orig
+		endif
+		onintr replace_dumpdates
+		if (-e /etc/dumpdates) then
+			set moveddds
+			mv -f /etc/dumpdates /etc/dumpdates.orig
+		endif
+		if (-e /etc/dumpdates) then
+			bomb "CANNOT MOVE ASIDE /etc/dumpdates"
+			exit 1
+		endif
+		awk 'BEGIN{printf "%'$dumpdate_format's 5 %s\n", "'"$rfilesys"'", "'"$date2"'"}'  >/etc/dumpdates /dev/null
+			
+		set x = `cat /etc/dumpdates`
+		set xx = "$x"
+		if (! -e /etc/dumpdates) then
+			bomb "COULD NOT CREATE /etc/dumpdates"
+		endif
+
+		set dl = 6 dumpdates
+	else
+		set dl = 0
+	endif
+
+	if (! -e /etc/dumpdates) then
+		touch /etc/dumpdates
+	endif
+
+	#(echo "beginning level $dl dump of `hostname`:$file...."  | wall) &
+
+	switch ("$os") 
+	case solaris:
+		/usr/sbin/ufsdump bf$dl 20 - $rfilesys
+		breaksw
+	case hp-ux:
+	case sony:
+	case ultrix:
+	case sunos:
+		/etc/dump bf$dl 20 - $rfilesys
+		breaksw
+	default:
+		/etc/dump sdbf$dl 2000 1000000 2 - $rfilesys
+		breaksw
+	endsw
+
+	#(echo "finished `hostname`:$file dump." | wall) &
+
+	if ($?dumpdates && $?moveddds) then
+		rm /etc/dumpdates
+		if (-e /etc/dumpdates) then
+			bomb "COULD NOT REMOVE /etc/dumpdates"
+		endif
+		mv -f /etc/dumpdates.orig /etc/dumpdates
+		if (! -e /etc/dumpdates) then
+			bomb "COULD NOT RESTORE /etc/dumpdates"
+		endif
+		unset moveddds
+	endif
+endif
+
+if ($?smartdump) then
+	if ($dumplevel == 0) then
+		$dump 0f - $file
+	else
+		$dump 0fT - "$date2" $file
+	endif
+endif
+
+if ($?etcwbak) then
+	if ($dumplevel == 0) then
+		set dl = "-full"
+	else
+		set dl = "-af $date1"
+	endif
+	/com/wbak -stdout $dl -pdtu $file
+endif
+
+if ($?bincpio) then
+	# cd to $file so find can use . to create relative pathnames
+	cd $file
+	# this heads off "Bad Hertz value" message in stream from tophat
+	setenv HZ 60
+	if ($dumplevel == 0) then
+		/bin/find . -mount -depth -print | /bin/cpio -oc
+	else
+		set stamp = `echo $date1 | sed -e 's/[^0-9]//g'`
+		set stamp = `echo $stamp | sed -e 's/\(..\)\(.*\)/\2\1/'`
+		touch $stamp /tmp/stamp$$
+		set dl = "-newer /tmp/stamp$$"
+		/bin/find . -mount -depth $dl -print | /bin/cpio -oc
+	endif
+endif
+
+if ($?gtar) then
+	if ($compress) then
+		set c = "--compress --block-compress"
+	else
+		set c = ""
+	endif
+	if ($dumplevel == 0) then
+		$gtar $c -c -V "full:	$file	`date`" \
+			--atime-preserve -l -S --totals -G -f - $file
+	else 
+		$gtar $c -c -V "incr:	$file	$date2 through `date`" \
+			--newer "$date2" \
+			--atime-preserve -l -S --totals -G -f - $file
+	endif
+endif
+
+cleanup:
+
+	if (-e /etc/dumpdates.orig && $?dumpdates && $?moveddds) then
+		/bin/rm -f /etc/dumpdates
+		mv /etc/dumpdates.orig /etc/dumpdates
+	endif
+
+	/bin/rm -f /tmp/dodump$$ /tmp/dodump2.$$ /tmp/stamp$$
+
+
+exit 0

@@ -1,0 +1,79 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: FindFile
+
+H2: Purpose
+
+This routine is used to search for include files, imported objects,
+configuration modules and templates.
+
+H2: Interface
+
+E:  $fullname = &FindFile($filename, $image);
+
+H2: Description
+
+If {{filename}} is not found, {{fullname}} should be an empty string.
+If the file is found, the pathname of the file is returned,
+otherwise the empty string is returned. If {{image}} is true,
+a target-specific set of extensions is searched for,
+complete with implicit image format conversion.
+
+H2: Examples
+
+The default implementation is:
+
+!block example; wide; lang="Perl"
+sub FindFile {
+    local($filename, $image) = @_;
+    local($fullname);
+
+    # Get the list of directories to search
+    use Cwd;
+    my @dirs = ('.');
+    my $dir = $var{'DOC_DIR'};
+    push(@dirs, $dir) if $dir ne cwd();
+    push(@dirs, @include_path, "$'sdf_lib/stdlib", $'sdf_lib);
+
+    # Do the search
+    if ($image) {
+        my $context = $var{'OPT_TARGET'};
+        my @exts = @{$'SDF_IMAGE_EXTS{$context} || $'SDF_IMAGE_EXTS{'ps'}};
+        return &'NameFindOrGenerate($filename, \@dirs, \@exts, $context);
+    }
+    else {
+        return &'NameFind($filename, @dirs);
+    }
+}
+!endblock
+
+In order to tightly integrate [[SDF]] with certain development
+environments, it is occasionally necessary to override this routine
+in a configuration module. For example:
+
+!block example
+!block script
+sub FindFile {
+    local($filename, $image) = @_;
+    local($fullname);
+
+    # Search using our SCM
+    $fullname = &'SearchSCM($filename, $image);
+
+    # Return result
+    return $fullname;
+}
+!endblock
+!endblock
+

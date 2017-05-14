@@ -1,0 +1,85 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Indexes
+
+H2: Marking Entries
+
+Index entries are specified by using the {{OATTR:index}} object attribute.
+If a value is omitted, the text of the phrase is used.
+For example, the following are equivalent:
+
+V:  {{CMD[index="mycmd"]mycmd}} is useful for many things.
+V:  {{CMD[index]mycmd}} is useful for many things.
+
+Note: The {{OATTR:index}} attribute is only supported by {{mif}} format.
+The value is mapped to index marker text using the notation
+defined in chapter 23/24 (for [[FrameMaker]] 5.x/4.x respectively)
+of {{Using FrameMaker}}.
+
+Commonly used index formats are outlined below.
+
+!block table
+Format      Description
+abc         add an entry called {{abc}}
+abc:xyz     add an entry called {{xyz}} under {{abc}}
+abc;def     add entries called {{abc}} and {{def}}
+!endblock
+
+NB: To include an actual semi-colon within an [[SDF]] attribute value,
+you need to specify two semi-colons. For example:
+
+V:To install {{PRD[index="myApp;;install:myApp"]myApp}}, ...
+NE:
+
+H2: Index Types
+
+Different index types can be specified using the {{index_type}} attribute.
+For example:
+
+V:{{[index;index_type="author"]Joe Bloggs}} is famous for ...
+
+The default index type is {{standard}}. Other types supported are:
+
+* comment
+* subject
+* author.
+
+H2: Setting FrameMaker Markers
+
+A numeric value can also be specified (0..25) for the {{index_type}}
+attribute. The value maps directly to a [[FrameMaker]] marker type.
+The most commonly used marker numbers are 0 and 1 which
+correspond to the {{$marker1}} and {{$marker2}}
+building blocks of headers and footers.
+
+The following example indirectly sets the first footer line in QSD books
+while defining a level 2 heading:
+
+V:  H2: Policy Standard {{N[index_type=0]QSDS0036}}
+
+H2: Generating an Index
+
+To generate an index, set the {{DOC_IX}} variable.
+For example:
+
+E:  sdf -b -DDOC_IX ...
+
+Note: Index generation is only supported when {{CMD:sdf}} is
+used in "book mode".
+
+To generate other types of indexes, it is currently necessary
+to use [[FrameMaker]].
+See Chapter 23/24 of {{Using FrameMaker}} for details.
+
+!end_topic

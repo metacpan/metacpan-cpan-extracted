@@ -1,20 +1,36 @@
-#!/ms/dist/perl5/bin/perl5.005
+#!/ms/dist/perl5/bin/perl5.6
 #
-# $Id: sybxfer,v 1.6 2000/11/12 18:05:36 spragues Exp $
+# $Id: sybxfer,v 1.11 2001/04/30 02:59:18 spragues Exp spragues $
 #
 #
 #driver script for Sybase::Xfer.pm
 #
 #
-
-   use lib '/ms/dist/dart/perl/modules';
-
 #modules
    use Sybase::Xfer;
    
 #init it
-   my $xf = new Sybase::Xfer(@ARGV);
+   my $xf = Sybase::Xfer->new(@ARGV, -sybxfer=>1) or exit 1;
+
 
 #run it
-   exit $xf->xfer();
+   my %rs = $xf->xfer(-return=>'HASH');
+
+#now to set the shell return code. It only has unsigned 
+#0-255 capability. ie. no negative numbers.  Therefore, to 
+#remove possible ambiguity we'll translate all postive return
+#codes to 4 and take the absolute value of the negative ones
+#and pass that back to the shell.
+#
+#so, in effect, sybxfer has these return codes
+#   0  = success
+#   1  = unrecoverable error
+#   2  = interrupt
+#   3  = timeout
+#   4  = success w/some rows failed to transfer
+#
+#and can be read as =0 implies success w/o a hitch, != 0 didn't go
+#perfectly.
+
+   exit ($rs{scalar_return} > 0 ? 4 : abs $rs{scalar_return});
 

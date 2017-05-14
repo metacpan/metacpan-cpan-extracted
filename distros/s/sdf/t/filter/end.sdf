@@ -1,0 +1,15 @@
+# This file tests the end filter
+
+Some text before.
+
+!block end
+Some text inside.
+!endblock
+
+Some middle text.
+
+!block end
+Some more text inside.
+!endblock
+
+Some text after.

@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: urpme 271299 2010-11-21 15:54:30Z peroyvind $
 
 #- Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
@@ -38,14 +37,13 @@ my $yesexpr =
   N("Yy");
 
 sub usage() {
-    print urpm::args::copyright('urpme', [ '1999-2010', 'Mandriva' ], [ '2012', 'Mageia' ])
+    print urpm::args::copyright('urpme', [ '1999-2010', 'Mandriva' ], [ '2012-2013', 'Mageia' ])
    . N("  --help         - print this help message.
 ") . N("  --auto         - automatically select a package in choices.
 ") . N("  --auto-orphans - remove orphans
 ") . N("  --test         - verify if the removal can be achieved correctly.
 ") . N("  --force        - force invocation even if some packages do not exist.
 ") . N("  --parallel     - distributed urpmi across machines of alias.
-") . N("  --repackage    - Re-package the files before erasing
 ") . N("  --root         - use another root for rpm removal.
 ") . N("  --urpmi-root   - use another root for urpmi db & rpm installation.
 ") . N("  --justdb       - update only the rpm db, not the filesystem.
@@ -156,7 +154,7 @@ if ($urpm->{options}{auto} || $env) {
     $test and print STDOUT $msg;
 } elsif ($parallel || @toremove > @cmdline_pkgs_to_remove) {
     print STDOUT $msg;
-    $force || message_input_(P("Remove %d package?", "Remove %d packages?", scalar(@toremove), scalar(@toremove)) . N(" (y/N) "), boolean => 1) =~ /[$yesexpr]/ or exit 0;
+    $force || message_input(P("Remove %d package?", "Remove %d packages?", scalar(@toremove), scalar(@toremove)) . N(" (y/N) "), boolean => 1) =~ /[$yesexpr]/ or exit 0;
 }
 
 print($test ? 

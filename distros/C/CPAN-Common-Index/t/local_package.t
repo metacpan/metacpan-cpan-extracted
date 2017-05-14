@@ -7,15 +7,16 @@ use Test::Deep '!blessed';
 use Test::Fatal;
 
 use Cwd qw/getcwd/;
-use Path::Tiny;
+use File::Spec;
+use File::Temp ();
 
 use lib 't/lib';
 use CommonTests;
 
 my $cwd          = getcwd;
-my $cache        = Path::Tiny->tempdir;
-my $localgz      = path(qw/t CUSTOM mypackages.gz/);
-my $local        = path(qw/t CUSTOM uncompressed/);
+my $cache        = File::Temp::tempdir(CLEANUP => 1, TMPDIR => 1);
+my $localgz      = File::Spec->catfile(qw/t CUSTOM mypackages.gz/);
+my $local        = File::Spec->catfile(qw/t CUSTOM uncompressed/);
 my $packages     = "mypackages";
 my $uncompressed = "uncompressed";
 
@@ -68,21 +69,21 @@ subtest "constructor tests" => sub {
 subtest 'refresh and unpack index files' => sub {
     my $index = new_local_index;
 
-    ok( !path( $cache, $packages )->exists, "$packages not in cache" );
+    ok( !-e File::Spec->catfile( $cache, $packages ), "$packages not in cache" );
 
     ok( $index->refresh_index, "refreshed index" );
 
-    ok( path( $cache, $packages )->exists, "$packages in cache" );
+    ok( -e File::Spec->catfile( $cache, $packages ), "$packages in cache" );
 };
 
 subtest 'refresh and unpack uncompressed index files' => sub {
     my $index = new_uncompressed_local_index;
 
-    ok( !path( $cache, $uncompressed )->exists, "$uncompressed not in cache" );
+    ok( !-e File::Spec->catfile( $cache, $uncompressed ), "$uncompressed not in cache" );
 
     ok( $index->refresh_index, "refreshed index" );
 
-    ok( path( $cache, $uncompressed )->exists, "$uncompressed in cache" );
+    ok( -e File::Spec->catfile( $cache, $uncompressed ), "$uncompressed in cache" );
 };
 
 # XXX test that files in cache aren't overwritten?

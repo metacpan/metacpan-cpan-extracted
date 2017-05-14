@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More tests => 4;
 
+use lib '.';
 use t::lib::Mother 'hello';
 
 ok(t::lib::Mother->can('import'));

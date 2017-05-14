@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               GSM-SMS
+version:            0.163
+abstract:           Perl Modules For Smart Messaging
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dumper:    0
+    File::Path:      0
+    File::stat:      0
+    File::Temp:      0
+    HTTP::Request:   0
+    Image::Magick:   0
+    Log::Agent:      0
+    LWP::Simple:     0
+    LWP::UserAgent:  0
+    MIME::Base64:    0
+    Test::More:      0
+    URI::Escape:     0
+    URI::URL:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

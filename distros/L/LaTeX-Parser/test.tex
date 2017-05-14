@@ -1,0 +1,26 @@
+% Modifying this file might make some of the test for LaTeX::Parser break.
+\documentclass{letter}
+\begin{document}
+\newcommand{\email}[1]{$\langle$\texttt{#1}$\rangle$}
+
+\name{Sven Heinicke}
+\address{\fromname\\
+	 Baltimore, MD\\
+	 \email{sven@zen.org}}
+
+\signature{\fromname}
+
+\begin{letter}{Some Person\\
+               123 Some Place\\
+               Somewhere, ST  45678-9012}
+
+\opening{Dear Some Person:}
+
+Sorry to bother you but I needed to send somebody a letter to test my
+new Perl package.  I hope it doesn't bother you to much.
+
+\closing{Apologeticly,}
+
+\end{letter}
+
+\end{document}

@@ -1,16 +1,14 @@
 package Tk::ProgressIndicator;
 
 use Tk;
-
 use Tk::Frame;
 
-use vars qw ($VERSION @ISA);
-
+use base qw (Tk::Derived Tk::Frame);
+use vars qw ($VERSION);
 use strict;
+use Carp;
 
-$VERSION = '1.01';
-
-@ISA = qw (Tk::Derived Tk::Frame);
+$VERSION = '0.02';
 
 Tk::Widget->Construct ('ProgressIndicator');
 

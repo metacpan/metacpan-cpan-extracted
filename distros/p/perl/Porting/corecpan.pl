@@ -8,7 +8,7 @@ use strict;
 use Getopt::Std;
 use ExtUtils::MM_Unix;
 use lib 'Porting';
-use Maintainers qw(get_module_files %Modules);
+use Maintainers qw(get_module_files reload_manifest %Modules);
 use Cwd;
 
 use List::Util qw(max);
@@ -44,7 +44,7 @@ our $opt_h and usage;
 our $opt_t;
 
 my @sources = @ARGV ? @ARGV : '.';
-die "Too many directories speficied without -t option\n"
+die "Too many directories specified without -t option\n"
     if @sources != 1 and ! $opt_t;
 
 @sources = map {
@@ -75,22 +75,31 @@ foreach my $source (@sources) {
     my $olddir = getcwd();
     chdir $srcdir or die "chdir $srcdir: $!\n";
 
+    # load the MANIFEST file in the new directory
+    reload_manifest;
+
     for my $dist (sort keys %Modules) {
 	next unless $Modules{$dist}{CPAN};
 	for my $file (get_module_files($dist)) {
-	    next if $file !~ /\.pm\z/ or $file =~ m{^t/} or $file =~ m{/t/};
+	    next if $file !~ /(\.pm|_pm.PL)\z/
+			or $file =~ m{^t/} or $file =~ m{/t/};
 	    my $vcore = '!EXIST';
 	    $vcore = MM->parse_version($file) // 'undef' if -f $file;
+
+	    # get module name from filename to lookup CPAN version
 	    my $module = $file;
+	    $module =~ s/\_pm.PL\z//;
 	    $module =~ s/\.pm\z//;
 	    # some heuristics to figure out the module name from the file name
-	    $module =~ s{^(lib|ext)/}{}
-		and $1 eq 'ext'
-		and ( $module =~ s{^(.*)/lib/\1\b}{$1},
-		      $module =~ s{(\w+)/\1\b}{$1},
-		      $module =~ s{^Encode/encoding}{encoding},
-		      $module =~ s{^MIME/Base64/QuotedPrint}{MIME/QuotedPrint},
-		      $module =~ s{^List/Util/lib/Scalar}{Scalar},
+	    $module =~ s{^(lib|ext|dist|cpan)/}{}
+		and $1 =~ /(?:ext|dist|cpan)/
+		and (
+		      # ext/Foo-Bar/Bar.pm
+		      $module =~ s{^(\w+)-(\w+)/\2$}{$1/lib/$1/$2},
+		      # ext/Encode/Foo/Foo.pm
+		      $module =~ s{^(Encode)/(\w+)/\2$}{$1/lib/$1/$2},
+		      $module =~ s{^[^/]+/}{},
+		      $module =~ s{^lib/}{},
 		    );
 	    $module =~ s{/}{::}g;
 	    my $vcpan = $cpanversions{$module} // 'undef';
@@ -109,7 +118,7 @@ my @labels = ((map $_->[1], @sources), 'CPAN' );
 if ($opt_t) {
     my %changed;
     my @fields;
-    for my $dist (sort keys %results) {
+    for my $dist (sort { lc $a cmp lc $b } keys %results) {
 	for my $file (sort keys %{$results{$dist}}) {
 	    my @versions = @{$results{$dist}{$file}}{@labels};
 	    for (0..$#versions) {
@@ -132,7 +141,7 @@ if ($opt_t) {
     my $field_total;
     $field_total += $_ + 1 for @fields;
 
-    for my $dist (sort keys %results) {
+    for my $dist (sort { lc $a cmp lc $b } keys %results) {
 	next unless $changed{$dist};
 	print " " x $field_total, " $dist\n";
 	for my $file (sort keys %{$results{$dist}}) {
@@ -145,12 +154,13 @@ if ($opt_t) {
     }
 }
 else {
-    for my $dist (sort keys %results) {
-	print "Module $dist...\n";
+    for my $dist (sort { lc $a cmp lc $b } keys %results) {
+	my $distname_printed = 0;
 	for my $file (sort keys %{$results{$dist}}) {
-	    my ($vcpan, $vcore) = @{$results{$dist}{$file}}{@labels};
+	    my ($vcore, $vcpan) = @{$results{$dist}{$file}}{@labels};
 	    if (our $opt_v or $vcore ne $vcpan) {
-		print "    $file: core=$vcore, cpan=$vcpan\n";
+		print "\n$dist ($Modules{$dist}{MAINTAINER}):\n" unless ($distname_printed++);
+		print "\t$file: core=$vcore, cpan=$vcpan\n";
 	    }
 	}
     }

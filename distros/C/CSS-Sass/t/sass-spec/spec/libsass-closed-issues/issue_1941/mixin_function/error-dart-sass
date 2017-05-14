@@ -1,4 +1,0 @@
-Error: Mixins may not contain function declarations.
-  @function nested() {
-  ^^^^^^^^^^^^^^^^^^
-  /sass/spec/libsass-issues/issue_1941/mixin_function/input.scss 2:3

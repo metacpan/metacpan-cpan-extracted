@@ -1,0 +1,163 @@
+
+	BeanCounter -- A stock portfolio performance monitoring tool
+
+
+1. Introduction
+
+   Ever wondered what happened to your portfolio on a day the market moved
+   500 points?  Ever wondered what your portfolio returned over the last
+   (odd) period?  Ever wondered if there was a simple cron job to report
+   portfolio changes on a daily basis?  Ever wondered if you could database
+   the (public) price, volume, ... info on dozens of stocks for further 
+   analysis?
+
+   BeanCounter does all this, and provides a convenient command-line tool as
+   well as a Perl library that can be used by other applications.
+
+   Beancounter support stocks from exchanges in the US, Canada, Britain,
+   France, Germany, Italy, Singapore, Taiwan, Thailand, HongKong... as well
+   as Australia and New Zealand. Tested patches for other markets are always
+   welcome. US mutual funds are supported, as are foreign exchange rates and
+   some precious metals.
+
+   This is still somewhat beta in the sense that the command-line options and
+   function interfaces might change. The (initial) release number is kept low
+   intenionally. However, similar code has been working here since the fall
+   of 1998. 
+
+
+2. How to get started
+
+   You need Perl and PostgreSQL, or MySQL (as of version 0.4.0). Plus a host
+   of Perl modules such as DBI (Database independent interface) with either
+   the DBD ODBC or the DBD Postgres driver (i.e. DBD-Pg) or the DBD Mysql 
+   driver, LWP networking as well as Date::Manip and Statistics::Descriptive.
+   All of this is readily available for Debian; or else in source code at
+   www.postgresql.org and www.cpan.org. 
+
+   Upon opening the .tar.gz archive, run 
+
+	$ perl Makefile.PL
+	$ make install
+
+   and everything should be fine. Run
+
+   	$ beancounter --help
+
+   for a quick check.
+
+   Run 'setup_beancounter' to create the new database and tables, and to have
+   them filled with example data. This even runs a first portfolio report on
+   the (example) portfolio. The 'setup_beancounter' script has a few sanity
+   checks to ensure that Postgres (or MySQL) is running, that the current
+   user is a valid database user, that it is not called by root, and that the
+   database hasn't already been created. 
+
+
+3. How to use it
+
+   Beancounter's --help options shows the main functionality. This currently
+   comprised the following operations:
+
+   o "addindex index sym1 sym2 ..." fills the indices table with info on 
+     stocks comprising a market index.
+   
+   o "addportfolio sym1:nb1:fx sym2:nb:fx ..." fills the portfolio table with
+     the specified quantities (eg 'nb1' or 'nb2' in the example above) of the
+     specified stocks. Additional attributes of the holding can be specified
+     as well. These are 'type' in which one could store the tax
+     classification of a retirement account, eg 'rrsp' in Canada or '401k' in
+     the USA, 'holder' which can carry the name of the account holder so that
+     one could e.g. differentiate between spousal accounts, 'cost' which 
+     stores the purchase price and 'purchasedate' for the time of the purchase.
+   
+   o "addstock sym1 sym2 ..." to  add one (or several) stock(s) to the
+     database by filling both the 'stockinfo' table with general company and 
+     stock info, as well as the `stockprices' table with the most recent
+     price data. Its purpose is to initialise the database for new stocks.
+
+   o "backpopulate sym1 sym2 ..." backpopulates the database for one (or 
+     several) stock(s). It can be used to extend the database with historic 
+     prices. Limiting dates can be supplied via the --fromdate and --todate
+     arguments. 
+
+   o "dailyjob" which combines 'update' and 'dayendreport'
+
+   o "dayendreport" runs a report summarising day-over-day changes
+
+   o "destroydb" removes the database entirely with not further warning.
+
+   o "plreport" runs an end-of-day profit/loss report on the portfolio.
+      It can be run automatically by cron(8) via an entry in crontab(5) 
+      such as 
+	 15 17 * * 1-5	  beancounter update && beancounter plreport
+     It can be run from cron(8) just after 'daily_update.pl'.
+
+   o "risk" runs an risk analysis with parametric Value-at-Risk (VaR) 
+     calculated via the standard Delta method (a.k.a. RiskMetric (TM)),
+     a non-parametric VaR (using the 1% quantile) as well as marginal VaR
+     analysis.
+
+   o "quote sym1 sym2 ..." retrieves price info from the Web and displays
+     it without touching the database. This is useful for verifying a stock
+     symbol as well the network status.
+
+   o "status" computes a holdings value and (annualized) return summary 
+     which also shows how long a stock has been held.
+ 
+   o "update" updates the database with day-end information. It can be run
+     automatically by cron(8) via an entry in crontab(5) such as 
+		 15 17 * * 1-5	  beancounter update 
+     (but also see about combining this with a call to beacounter plreport')
+
+   o "warranty" shows a brief statement about the GNU General Public License
+
+   The shell script 'setup_beancounter' initialises the database, creates the
+   tables and fills them with initial data.
+
+   The shell script 'update_beancounter' changes, if necessary, the database
+   table to bring an older (0.1.*) installation up to speed.
+
+
+5. To Do
+
+   More error checking. More performance analytics. More markets. More
+   documentation. Maybe a GUI.
+
+   See the TODO file.
+
+
+6. Disclaimer (taken straight from the GPL)
+
+				 NO WARRANTY
+
+     11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+   FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
+   OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+   PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+   OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
+   TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
+   PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
+   REPAIR OR CORRECTION.
+
+     12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+   WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+   REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+   INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
+   OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
+   TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
+   YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
+   PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGES.
+
+
+   In short: if it breaks, you can keep the pieces.  This is Free Software,
+   use it as you see fit, but don't come running or screaming if it doesn't
+   work as intended. 
+
+
+
+Dirk Eddelbuettel <edd@debian.org>
+
+$Id: README,v 1.6 2001/10/12 01:47:53 edd Exp edd $

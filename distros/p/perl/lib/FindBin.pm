@@ -59,21 +59,6 @@ workaround was to force the C<BEGIN> block to be executed again:
   delete $INC{'FindBin.pm'};
   require FindBin;
 
-=head1 KNOWN BUGS
-
-If perl is invoked as
-
-   perl filename
-
-and I<filename> does not have executable rights and a program called
-I<filename> exists in the users C<$ENV{PATH}> which satisfies both B<-x>
-and B<-T> then FindBin assumes that it was invoked via the
-C<$ENV{PATH}>.
-
-Workaround is to invoke perl as
-
- perl ./filename
-
 =head1 AUTHORS
 
 FindBin is supported as part of the core perl distribution. Please send bug
@@ -96,7 +81,6 @@ use Carp;
 require 5.000;
 require Exporter;
 use Cwd qw(getcwd cwd abs_path);
-use Config;
 use File::Basename;
 use File::Spec;
 
@@ -104,7 +88,7 @@ use File::Spec;
 %EXPORT_TAGS = (ALL => [qw($Bin $Script $RealBin $RealScript $Dir $RealDir)]);
 @ISA = qw(Exporter);
 
-$VERSION = "1.49";
+$VERSION = "1.51";
 
 
 # needed for VMS-specific filename translation
@@ -146,30 +130,6 @@ sub init
     }
    else
     {
-     my $dosish = ($^O eq 'MSWin32' or $^O eq 'os2');
-     unless(($script =~ m#/# || ($dosish && $script =~ m#\\#))
-            && -f $script)
-      {
-       my $dir;
-       foreach $dir (File::Spec->path)
-        {
-        my $scr = File::Spec->catfile($dir, $script);
-
-        # $script can been found via PATH but perl could have
-        # been invoked as 'perl file'. Do a dumb check to see
-        # if $script is a perl program, if not then keep $script = $0
-        #
-        # well we actually only check that it is an ASCII file
-        # we know its executable so it is probably a script
-        # of some sort.
-        if(-f $scr && -r _ && ($dosish || -x _) && -s _ && -T _)
-         {
-          $script = $scr;
-          last;
-         }
-       }
-     }
-
      croak("Cannot find current script '$0'") unless(-f $script);
 
      # Ensure $script contains the complete path in case we C<chdir>

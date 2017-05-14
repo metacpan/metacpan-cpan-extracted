@@ -1,0 +1,13 @@
+﻿#sub header_x_forwarded_host {	return($_[THIS]->by_name('X-Forwarded-Host')); }
+#sub header_x_forwarded_server {return($_[THIS]->by_name('X-Forwarded-Server')); }
+#sub header_x_wap_profile {	return($_[THIS]->by_name('X-Wap-Profile')); }
+#sub header_x_wap_profile_diff {return($_[THIS]->by_name('X-Wap-Profile-Diff')); }
+sub header_x_debug
+# /type method
+# /effect ""
+# //parameters
+# //returns
+#	?
+{
+	return($_[THIS]->by_name('X-Debug'));
+}

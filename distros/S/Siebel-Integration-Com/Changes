@@ -1,0 +1,9 @@
+Revision history for Siebel-Integration-Com
+
+0.01    Jan 2013
+        First version, released on an unsuspecting world.
+
+0.02		March 2013
+				Fixed a number of document defects
+				Added Strict to test.t
+				Added additional testing details

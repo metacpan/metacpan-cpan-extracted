@@ -1,0 +1,43 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Language overview
+
+H2: Basic concepts
+
+The basic concepts within SDF documents are:
+
+!block table
+Concept     Description
+paragraph   one or more lines of text
+phrase      a section of text within a paragraph
+style       the type of a document, paragraph, phrase or table (e.g. H1)
+macro       a command embedded in a document (e.g. !define)
+variable    a named value (e.g. DOC_NAME)
+filter      a rule to use when processing certain sections of text (e.g. table)
+attribute   a named parameter of a paragraph, phrase or filter (e.g. jump)
+expression  a literal or expression to evaluate (e.g. "Ian Clatworthy").
+!endblock
+
+Further details about these are given below.
+
+!block topics
+Topic
+in_ovpar
+in_ovphr
+in_ovmac
+in_ovvar
+in_ovflt
+in_ovatt
+in_ovexp
+!endblock

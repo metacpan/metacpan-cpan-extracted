@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+lib/File/Find/Rule/TTMETA.pm
+README
+t/basic.t
+t/data/one.tt
+t/data/three.tt
+t/data/two.tt
+t/load.t
+t/oo.t
+t/regex.t

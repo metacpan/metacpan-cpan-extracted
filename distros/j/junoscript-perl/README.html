@@ -1,0 +1,1014 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Juniper Networks, Inc. - JUNOScript README</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta name="PROGRAMMER" content="Robert Campbell">
+
+<style type="text/css">
+A:Active {color: #cc9900;}
+A:Hover {color: #996633;}
+A:Link {color: #003399;}
+A:Visited {color: #666666;}
+
+h3 {font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 14pt;}
+p {font-family: Arial, Helvetica, sans-serif; font-size: 11pt;}
+tt {font-size: 10pt; font-family: courier;}
+.bcopy {font-family: Arial, Helvetica, sans-serif; font-size: 11pt;}
+.footer {font-family: Arial, Helvetica, sans-serif; font-size: 9pt;}
+.l2 {font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 13pt;}
+.l3 {font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 11pt;}
+.nav {color: #003399; font-size: 8pt; font-family: Arial, Helvetica, sans-serif;}
+ul {list-style-type: square;}
+.bullet {font-size: 12px;}
+</style>
+
+</head>
+
+<body bgcolor="#ffffff" topmargin="6" leftmargin="6" marginwidth="6" marginheight="6">
+
+<img src="./banner_logo.gif" border="0" width="139" height="45" />
+
+
+<h3>JUNOScript API README</h3>
+
+<p class="footer">Version 6.4I0</p>
+
+<br />
+<span class="l2">Contents</span>
+
+<ul class="bcopy">
+<span class="bullet"><li></span><a href="#abstract">Abstract</a></li>
+<span class="bullet"><li></span><a href="#documents">Documents</a></li>
+<span class="bullet"><li></span><a href="#platforms">Supported Platforms</a></li>
+<span class="bullet"><li></span><a href="#downloads">Downloads</a></li>
+<span class="bullet"><li></span><a href="#installation">Installation</a></li>
+<span class="bullet"><li></span><a href="#examples">Running the Examples</a></li>
+<span class="bullet"><li></span><a href="#perl">Installation of perl</a></li>
+<span class="bullet"><li></span><a href="#example_perlmod">Installation of Perl Modules Required by Examples</a></li>
+<span class="bullet"><li></span><a href="#faq">FAQ</a></li>
+<span class="bullet"><li></span><a href="#dependencies">Dependencies</a></li>
+<span class="bullet"><li></span><a href="#support">Support</a></li></ul>
+
+<br />
+<hr noshade="noshade" size="1" width="100%" />
+
+<p>
+<span class="l2">Abstract</span><br />
+
+<p>
+Each Juniper Networks router running JUNOS Internet software release 4.3B2 or later supports the JUNOScript API. The JUNOScript API is an XML application that Juniper 
+Networks routers use to exchange information with client applications.</span>
+
+<p>
+Because JUNOScript is an XML application, you can leverage the myriad Perl modules in the public domain to ease the development of client applications that monitor and configure Juniper Networks routers.  There are many 
+modules in CPAN (http://www.cpan.org) and other Perl source repositories that provide ways to manipulate XML data (for example, XML::Parser, and XML::DOM modules).</p>
+
+<p>
+The JUNOS::Device module provides an object-oriented interface for 
+communicating with the JUNOScript server so you can start using the 
+JUNOScript API quickly and easily. There are several modules in this 
+library but client applications directly invoke the Device object only. 
+When the client application creates a JUNOS::Device object, it specifies 
+a router name and the login name to use when accessing  the router 
+(which determines the client application's access level).
+</p>
+
+<p>
+The following code segment shows how to use the JUNOS::Device object to request information from a Juniper Networks router. This example invokes the query called get_chassis_inventory. For a list of valid queries and the corresponding arguments, invoke  the command <tt>man JUNOS::Device</tt> after completing the installation.
+</p>
+
+<pre>
+<b># Step 1</b>: set up the query
+
+my $query = &quot;get_chassis_inventory&quot;;
+my %queryargs = ( detail =&gt; 1 );
+
+
+<b># Step 2:</b> Create a JUNOScript Device object
+
+my %deviceinfo = (
+ access =&gt; &quot;telnet&quot;,
+ login =&gt; &quot;johndoe&quot;,
+ password =&gt; &quot;secret&quot;,
+ hostname =&gt; &quot;router11&quot;
+ );
+ my $jnx = new JUNOS::Device(%deviceinfo);
+
+ unless ( ref $jnx ) {
+ 	die &quot;ERROR: Failed to create device\n&quot;;
+ } 
+
+
+<b># Step 3:</b> connect to the Juniper Networks router
+
+ unless ( $jnx-&gt;connect() ) {
+ 	die &quot;ERROR: Failed to connect\n&quot;;
+ }
+
+
+<b> # Step 4:</b> send the query and receive a XML::DOM object
+
+ my $res = $jnx-&gt;$query( %queryargs );
+
+ unless ( ref $res ) {
+ 	die &quot;ERROR: Failed to execute command\n&quot;;
+ }
+
+
+<b># Step 5:</b> check for error
+
+ my $err = $res-&gt;getFirstError();
+
+ if ($err) {
+ 	print STDERR &quot;ERROR: $deviceinfo{'hostname'} - &quot;, $err-&gt;{message}, &quot;\n&quot;;
+ } else {
+
+
+<b># Step 6:</b> do something with the result, just traverse through
+# the $res (an XML::DOM object) and do what you need to do.
+ }
+
+<b># Step 7:</b> always close the session &amp; connection when you're done
+$jnx-&gt;request_end_session();
+$jnx-&gt;disconnect();
+</pre>
+
+<!-----------------------------------  ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="documents">&nbsp;</a>
+
+<p>
+<span class="l2">Documents</span><br />
+
+<p>
+The following documents are available at <a href="http://www.juniper.net/beta"> http://www.juniper.net/beta</a> for the beta release and
+<a href="http://www.juniper.net/support">http://www.juniper.net/support</a> for
+final release of each version of the JUNOS Internet software.</p>
+
+<ul class="bcopy">
+<span class="bullet"><li></span>JUNOScript API Guide</li>
+<span class="bullet"><li></span>JUNOScript API Reference</li>
+</ul>
+
+<p>
+The following classes provide perldoc to describe their interfaces.  Run <tt>man &lt;class&gt;</tt> after the
+<a href="#installation"> installation</a> is complete.</p>
+<ul class="bcopy">
+<span class="bullet"><li></span>JUNOS::Device</li>
+<span class="bullet"><li></span>JUNOS::Response</li>
+</ul>
+
+<!-----------------------------------  ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="platforms">&nbsp;</a>
+
+<p>
+<span class="l2">Supported Platforms</span><br />
+
+<p>
+The current version of this module has been tested on the following platforms. Later releases may support additional platforms.</p>
+
+<ul class="bcopy">
+<span class="bullet"><li></span>FreeBSD 4.2</li>
+<span class="bullet"><li></span>Solaris 2.7 and 2.8</li>
+<span class="bullet"><li></span> Redhat Linux 7.1</li></ul>
+
+
+<!----------------------------------- ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="downloads">&nbsp;</a>
+
+<p>
+<span class="l2">Downloads</span><br />
+
+<p>
+Client Perl applications can communicate with the JUNOScript server either via Telnet, SSH or SSL.  SSH and SSL available only in the domestic distribution.
+</p>
+
+<p>
+To download the publicly available <b>Telnet-only</b> version of the JUNOScript Perl Client, perform the following steps:
+</p>
+
+<ol class="bcopy">
+<span class="bullet"><li></span>
+Access the Juniper Networks Web site at <a href="http://www.juniper.net/support">http://www.juniper.net/beta</a> (for beta software) or <a href="http://www.juniper.net/support">http://www.juniper.net/support</a> (for final release software).
+</li>
+<span class="bullet"><li></span>
+Click on the link labeled "JUNOScript API Software" on the left.
+</li>
+<span class="bullet"><li></span>
+Click on the link labeled "JUNOScript API Client" to download the JUNOS::Device distribution in gzip format.
+</li>
+<span class="bullet"><li></span>
+Click on the link "JUNOScript API Client Prerequisites" to download the distribution containing the C libraries and Perl modules required by 
+JUNOS::Device and its samples.
+</li>
+</ol>
+
+<p>
+To download the domestic version of the JUNOScript Perl Client (which supports both <b>Telnet, SSH and SSL</b>), perform the following steps: 
+</p>
+
+<ol class="bcopy">
+<span class="bullet"><li></span>
+Access the Juniper Networks Web site at <a href="http://www.juniper.net/support">http://www.juniper.net/beta</a> (for beta software) or <a href="http://www.juniper.net/support">http://www.juniper.net/support</a> (for final release software).
+</li>
+<span class="bullet"><li></span>
+Click on the link labeled "JUNOS Internet Software (Canada and U.S)" on the left.
+</li>
+<span class="bullet"><li></span>
+Click on the link labeled "JUNOScript API Client" under the latest release to download the JUNOS::Device distribution in gzip format.
+</li>
+<span class="bullet"><li></span>
+Click on the link "JUNOScript API Client Prerequisites" under the latest release to download the distribution containing the C libraries and Perl modules required by 
+JUNOS::Device and its samples.
+</li>
+</ol>
+
+
+<!----------------------------------- ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="installation">&nbsp;</a>
+
+<p>
+<span class="l2">Installation</span>
+
+	<ol class="bcopy"><b>Instructions for UNIX Systems</b><br /><br />
+	<span class="bullet"><li></span>Make sure perl is installed. If necessary, see <a href="#perl">Installation of Perl</a>.
+	
+	<br /><br />
+	<tt>% which perl<br />
+	% perl -v</tt>
+	
+	<br /><br />
+	The JUNOScript Perl Client requires perl version 5.0004 or later.  Verify that you are running that version of the perl executable.  If not, check your PATH or install the latest release of perl. 
+	<br /><br />
+	<span class="bullet"><li></span>
+	Download the JUNOScript gzip archive from the Juniper Networks website.
+	The archive is named <tt>junoscript-<i>n.n</i>-<i>type</i>.tar.gz</tt>, where 
+	<tt><i>n.n</i></tt> is a release code such as 5.1 and 
+	<tt><i>type</i></tt> is either <tt>export</tt> or <tt>domestic</tt>. For 
+	instructions, see <a href="#downloads">Download</a>.<br />&nbsp;
+	</li>
+	
+	<span class="bullet"><li></span>
+	Unzip and untar the archive.
+	<br />
+	<br /> 
+	On FreeBSD and Linux systems:
+	<br /> 
+	<tt>% tar zxf junoscript-<i>n.n</i>-<i>type</i>.tar.gz</tt> 
+	<br />
+	<br /> 
+	On Solaris systems:
+	<br />
+	<tt>% gzip -dc junoscript-<i>n.n</i>-<i>type</i>.tar.gz | tar xf -</tt>
+	<br />&nbsp;
+	</li>
+	
+	<span class="bullet"><li></span>
+	Change to the JUNOScript directory.
+	<br />
+	<tt>% cd junoscript-<i>n.n</i></tt>
+	<br />&nbsp;
+	</li>
+	
+	<span class="bullet"><li></span>
+	Download the gzip archive of the prerequisite library and modules from
+	the Juniper Networks Web site in a directory called <tt>prereqs</tt>,  
+	<b>which must be directly under the <tt>junoscript-<i>n.n</i></tt> directory</b>.
+	The archive is named 
+	<tt>junoscript-prereqs-<i>n.n</i>-<i>type</i>.tar.gz</tt> where
+        <tt><i>n.n</i></tt> is a release code such as 5.1 and
+        <tt><i>type</i></tt> is either <tt>export</tt> or <tt>domestic</tt>. For instructions, 
+	see <a href="#downloads">Download</a>.
+	<br />&nbsp;
+	</li>
+	
+	<span class="bullet"><li></span>
+	Unzip and untar the archive.
+	<br />
+	<br />
+	On FreeBSD and Linux systems:
+	<br />
+	<tt>[/my/junoscript-<i>n.n</i>]% tar zxf </tt>
+    	<tt>junoscript-prereqs-<i>n.n</i>-type.tar.gz</tt>
+	<br />
+	<br />
+	On Solaris systems:
+	<br />
+	<tt>[/my/junoscript-<i>n.n</i>]% gzip -dc junoscript-prereqs-<i>n.n</i>-type.tar.gz | tar xf -</tt>
+	<br />&nbsp;
+	</li>
+	
+	<span class="bullet"><li></span>
+	Install the required C binaries and Perl modules. If you wish to 
+	install the required files in your private directory instead of the 
+	standard directory, you can use the <tt>-install_directory</tt> option to 
+	specify your private installation directory. The standard directory 
+	is the installation directory configured in the perl executable.  
+	Usually, the standard directory is <tt>/usr/lib</tt> or <tt>/usr/local/lib</tt>, and
+	you'll need root privilege to install modules in these directories.
+	<br />
+	<br />
+	<i>If installing modules under the standard directory (normally /usr/local/lib and you'll need root privilege):</i>
+	<br />
+	<tt>[/my/junoscript-<i>n.n</i>]% perl install-prereqs.pl -force</tt>
+	<br />
+	<br />
+	<i>Installing modules under your own private directory</i> (see <a href="#notes01">notes</a> below):<br />
+	<tt>[/my/junoscript-<i>n.n</i>]% setenv PERL5LIB /my/private/directory/lib<br /></tt>
+	<tt>[/my/junoscript-<i>n.n</i>]% setenv MANPATH "$MANPATH/:$PERL5LIB/../man" <br /></tt>
+	<tt>[/my/junoscript-<i>n.n</i>]% setenv PATH "$PATH/:$PERL5LIB/../bin" <br /></tt>
+	<tt>[/my/junoscript-<i>n.n</i>]% perl install-prereqs.pl -install_directory $PERL5LIB -force</tt>
+	
+	<br />
+	<br />
+	As the <tt>install-prereqs.pl</tt> script installs the last few modules, 
+	it prompts you for input. Simply following the instructions and 
+	accept default responses whenever they are offered. The only 
+	exception is during installation of the SSH module: here you 
+	must choose one of the cipher packages supported by the JUNOScript 
+	server-- DES, DES3 or Blowfish. 
+	<br />
+	<br />
+	The option <tt>-force</tt> forces <tt>install-prereqs.pl</tt> to install 
+	a module even if an older version already exists or <tt>make test</tt>
+	fails. For more information on the <tt>install-prereqs.pl</tt> options, type 
+	<tt>perl install-prereqs.pl -help</tt>.<br />&nbsp;</li>
+	
+	<span class="bullet"><li></span>
+	Create JUNOS::Device makefile.
+	
+	<br /><br />
+	<i>If installing JUNOS::Device under the standard directory (it's normally /usr/local/lib):</i><br />
+	<tt>[/my/junoscript-<i>n.n</i>]% perl Makefile.PL</tt>
+	
+	<br /><br />
+	<i>If installing JUNOS::Device under your own private directory:</i><br />
+	<tt>[/my/junoscript-<i>n.n</i>]% perl Makefile.PL LIB=$PERL5LIB INSTALLMAN3DIR=$PERL5LIB/../man/man3</tt><br />&nbsp;
+
+	</li>
+	
+	<span class="bullet"><li></span>
+
+	Test and install the JUNOS::Device module.
+	
+	<br /><br />
+	<tt>[/my/junoscript-<i>n.n</i>]% make<br />
+	[/my/junoscript-<i>n.n</i>]% make test<br />
+	[/my/junoscript-<i>n.n</i>]% make install</tt><br />&nbsp;
+
+	</li>
+	
+	</ol>
+
+
+<p>
+<a name="notes01">Notes</a> for private directory installation:</p>
+
+<ul class="bcopy">
+<span class="bullet"><li></span>
+
+If you are installing the JUNOScript modules in a private directory, 
+remember to set <tt>PERL5LIB</tt>, <tt>MANPATH</tt>, and <tt>PATH</tt> 
+environment variables
+before installing the Perl modules and running the examples.  
+If the <tt>PERL5LIB</tt> variable is set, perl will first look 
+for Perl modules in the 
+specified directory before looking in the standard directory.  (If you're
+using sh, ksh or bash, use <tt>EXPORT</tt> instead of <tt>setenv</tt>.)
+<br />
+<br />
+<tt>
+% setenv MANPATH "$MANPATH/:$PERL5LIB/../man"
+<br />
+% man JUNOS::Device
+<br />
+% setenv PATH "$PATH/:$PERL5LIB/../bin"
+<br />
+% which xsltproc
+</tt>
+
+<br />&nbsp;
+
+</li>
+</ul>
+
+
+<!----------------------------------- ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="examples">&nbsp;</a>
+
+<p>
+<span class="l2">Running the Sample Scripts </span><br />
+
+<p>
+The JUNOScript Perl distribution includes sample scripts that demonstrate how to use JUNOScript to retrieve and change the configuration of a Juniper Networks router. The samples reside in the 
+<tt>junoscript-<i>n.n</i>/examples</tt> directory.</p>
+
+<p>
+<span class="l3">Reading configuration: Chassis Inventory</span><br />
+
+This example sends a <tt>&lt;get-chassis-information&gt;</tt> request to the Juniper Networks router and displays the result to the standard output. Depending on the 
+command line option, it uses XSLT to display the result in plain text, HTML, or raw XML. The purpose of this example is to show the power and flexibility of combining the 
+JUNOScript and XSLT.</p>
+
+<ol class="bcopy">
+<span class="bullet"><li></span>Change directory to <tt>examples/get_chassis_inventory</tt>.<br />
+<tt>[/my/junoscript-<i>n.n</i>]% cd examples/get_chassis_inventory</tt><br />&nbsp;</li>
+
+<span class="bullet"><li></span>Run the script <tt>get_chassis_inventory.pl</tt>.<br />
+<tt>[/my/junoscript-<i>n.n</i>/examples/get_chassis_inventory]% perl get_chassis_inventory.pl [-d] [-o &lt;outputfile&gt;]
+[-x &lt;xslfile&gt;] [-m &lt;access&gt;] 
+[-l &lt;login&gt;] [-p &lt;password&gt;] &lt;router&gt;</tt></li></ol>
+
+
+<p>
+<span class="l3"><i>Example:</i></span><br />
+
+<tt>[/my/junoscript-<i>n.n</i>/examples/get_chassis_inventory]% perl get_chassis_inventory.pl router11<br />
+login: johndoe<br />
+password:</tt></p>
+
+<p>
+<span class="l3"><i>Where:</i></span><br />
+
+<tt>-d</tt><br />
+Optional. The default is debug off. If this flag is present, all debugging statements from the JUNOS modules will be sent to standard output.</p>
+
+<p>
+-x &lt;xslfile&gt;<br />
+-o &lt;outputfile&gt;<br />
+Optional.&nbsp; If &lt;xslfile&gt; is specified, the &lt;xslfile&gt; is used for rendering the output.&nbsp;
+If &lt;xslfile&gt; is
+not specified, xsl/chassis_inventory_csv.xsl is used by default.&nbsp; You can
+use any of the three XSL files (csv, html, and xml) or create your own.&nbsp; If 
+&lt;outputfile&gt; is specified, the transformation will be put into &lt;outputfile&gt;. If &lt;outputfile&gt; is not specified,
+the result will be displayed on the standard output.&nbsp;</p>
+
+<p>
+<tt>-m &lt;access&gt;</tt><br />
+Optional. The default value is <tt>telnet</tt>. It specifies which transport should be used to communicate with the Juniper Networks router. The valid values are 
+<tt>ssh</tt>, <tt>ssl</tt>, <tt>clear-text</tt>, and <tt>telnet</tt>.</p>
+
+<p>
+<tt>-l &lt;login&gt;<br />
+-p &lt;password&gt;</tt><br />
+The login identity and password to use when accessing the Juniper Networks router. The login identity must already exist in the router configuration and must have at least 
+read privilege on the router. (Configure the login account by using the CLI command <tt>set system login user</tt>.) If these arguments are not provided on the command 
+line, the user will be prompted to enter the information.</p>
+
+<p>
+<tt>&lt;router&gt;</tt><br />
+The host name or IP address of the router.</p>
+
+<p>
+<span class="l3">Changing configuration: Load Configuration</span><br />
+
+This example simply selects one of <tt>set_login_user_foo.xml</tt> or <tt>set_login_class_bar.xml</tt>as the example configuration to load. They are included in the 
+<tt>requests</tt> directory. There you will see the XML files containing the RPC requests. You can put your own configuration file in the <tt>requests</tt> directory and 
+have load_configuration load it in the target router for you. The purpose of this example is to show you how simple it is to change your router configuration using 
+JUNOScript. See JUNOScript API Reference for the detail description of the configuration you can submit via JUNOScript.</p>
+
+<ol class="bcopy">
+<span class="bullet"><li></span>Change directory to <tt>examples/load_configuration<br />
+[/my/junoscript-<i>n.n</i>]% cd examples/load_configuration</tt><br />&nbsp;</li>
+
+<span class="bullet"><li></span>Run the <tt>load_configuration.pl</tt> script<br />
+<tt>[/my/junoscript-<i>n.n</i>/examples/load_configuration]% perl load_configuration.pl [-d]
+[-t] [-a &lt;action&gt;] [-m &lt;access&gt;] [-l &lt;login&gt;] [-p &lt;password&gt;] &lt;request&gt; 
+&lt;router&gt;</tt></li></ol>
+
+
+<p>
+<span class="l3"><i>Example:</i></span><br />
+
+<tt>[/my/junoscript-<i>n.n</i>/examples/load_configuration]% perl load_configuration.pl
+requests/set_login_user_foo.xml router11<br />
+login: johndoe<br />
+password:</tt></p>
+
+<p>
+<span class="l3"><i>Where:</i></span><br />
+
+<tt>-d</tt><br />
+Optional. The default is debug off. If this flag is present, all debugging statements from the JUNOS modules will be sent to standard output.</p>
+
+<p><tt>-t</tt><br />
+Optional. The default value is <tt>xml</tt>. If specified, the configuration in
+the request file is <tt>text</tt>, not <tt>xml</tt>.</p>
+
+<p><tt>-a &lt;action&gt;</tt><br />
+Optional. The default value is <tt>merge</tt>. It specifies which load action to
+take.&nbsp; The valid values are <tt>merge, override, and replace.</tt></p>
+
+<p>
+<tt>-m &lt;access&gt;</tt><br />
+Optional. The default value is <tt>telnet</tt>. It specifies which transport should be used to communicate with the Juniper Networks router. The valid values are 
+<tt>ssh</tt>, <tt>ssl</tt>, <tt>clear-text</tt>, and <tt>telnet</tt>.</p>
+
+<p>
+<tt>-l &lt;login&gt;<br />
+-p &lt;password&gt;</tt><br />
+The login identity and password to use when accessing the Juniper Networks router. The login identity must already exist in the router configuration and must have at least 
+read privilege on the router. (Configure the login account by using the CLI command <tt>set system login user</tt>.) If these arguments are not provided on the command 
+line, the user will be prompted to enter the information.</p>
+
+<p>
+<tt>&lt;request&gt;</tt><br />
+Specify the name of the configuration file to be loaded. The configuration files included with the example are <tt>set_login_user_foo.xml</tt> and 
+<tt>set_login_class_bar.xml</tt>, both of which reside in the <tt>requests</tt> directory.&nbsp;
+If -t is specified, the configuration in this file should be in text format.</p>
+
+
+<p>
+Example of configuration file content in xml format:</p>
+<pre>
+                 &lt;configuration&gt;
+                     &lt;system&gt;
+                         &lt;host-name&gt;my-host-name&lt;/host-name&gt;
+                     &lt;/system&gt;
+                 &lt;/configuration&gt;
+
+Example of configuration file content in text format:</pre>
+<pre>
+                 &lt;configuration-text&gt;
+                     system {
+                         host-name my-host-name;
+                     }
+                 &lt;/configuration-text&gt;
+</pre>
+
+
+<p>
+<tt>&lt;router&gt;</tt><br />
+The host name or IP address of the router.</p>
+
+<p>
+<span class="l3">Router Diagnostics: Diagnose BGP</span><br />
+
+This example retrieves the BGP summary from a Juniper Networks router and displays key information on the unestablished peers. It shows how useful diagnostic tools can be 
+written using JUNOScript.&nbsp;&nbsp;</p>
+
+<p>
+You also have an option to render the output in plain text or DHTML (it allows
+you to dynamically sort any column) using XSL.&nbsp; The output is saved in a
+file named &lt;router&gt;.xml which is the concatenation of the &lt;get-bgp-summary-information&gt;
+responses on all of the BGP peers for the target router.&nbsp; Take a look at
+this XML file if you wish to write your own XSL file to render the output.</p>
+
+<ol class="bcopy">
+<span class="bullet"><li></span>Change directory to <tt>examples/diagnose_bgp.<br />
+[/my/junoscript-<i>n.n</i>]% cd examples/diagnose_bgp</tt><br />&nbsp;</li>
+
+<span class="bullet"><li></span>Run the <tt>diagnose_bgp.pl</tt> script.<br />
+ <tt>[/my/junoscript-<i>n.n</i>/examples/diagnose_bgp]% perl diagnose_bgp.pl [-d] [-m &lt;access&gt;] [-l &lt;login&gt;] [-p &lt;password&gt;]
+-x &lt;xslfile&gt; -o &lt;outputfile&gt; &lt;router&gt;</tt></li></ol>
+
+
+<p>
+<span class="l3"><i>Example:</i></span><br />
+
+<tt>[/my/junoscript-<i>n.n</i>/examples/diagnose_bgp]% perl diagnose_bgp.pl -x xsl/html.xsl
+-o router11.html router11<br />
+ login: johndoe<br />
+ password:</tt></p>
+
+<p>
+<span class="l3"><i>Where:</i></span><br />
+
+<tt>-d</tt><br />
+Optional. The default is debug off. If this flag is present, all debugging statements from the JUNOS modules will be sent to standard output.</p>
+
+<p>
+<tt>-m &lt;access&gt;</tt><br />
+Optional. The default value is <tt>telnet</tt>. It specifies which transport should be used to communicate with the Juniper Networks router. The valid values are 
+<tt>ssh</tt>, <tt>ssl</tt>, <tt>clear-text</tt>, and <tt>telnet</tt>.</p>
+
+<p>
+<tt>-l &lt;login&gt;<br />
+-p &lt;password&gt;</tt><br />
+The login identity and password to use when accessing the Juniper Networks router. The login identity must already exist in the router configuration and must have at least 
+read privilege on the router. (Configure the login account by using the CLI command <tt>set system login user</tt>.) If these arguments are not provided on the command 
+line, the user will be prompted to enter the information.<br />
+<br />
+-x &lt;xslfile&gt;<br />
+-o &lt;outputfile&gt;<br />
+Optional.&nbsp; If &lt;xslfile&gt; is specified, the &lt;xslfile&gt; is used for rendering the output.&nbsp; If &lt;xslfile&gt; is
+not specified, xsl/text.xsl is used by default.&nbsp; You can use any of the
+three XSL files (text, html, and dhtml) or create your own.&nbsp; If 
+&lt;outputfile&gt; is specified, the transformation will be put into &lt;outputfile&gt;. If &lt;outputfile&gt; is not specified,
+the result will be displayed on the standard output.&nbsp;</p>
+
+<p>
+<tt>&lt;router&gt;</tt><br />
+The host name or IP address of the router.</p>
+
+<p>
+<span class="l3">XML &lt;-&gt; RDB scrambler/descrambler</span><br />
+
+<p>
+<span class="l3"><i>Additional Dependencies:</i></span><br />
+
+The installation section above does not install modules required by this 
+example. It is mainly because a Relational Database must be installed 
+before the required Perl modules can be installed successfully. We keep 
+this installation separate so you can run the other examples without 
+having to worry about installing and running the RDB.</p>
+
+<p>
+This example uses MySQL as its relational database, hence you must first 
+install the MySQL database. The version we have tested this example with 
+is 3.23. Simply go to <a href="http://mysql.com/downloads/mysql-3.23.html">
+http://mysql.com/downloads/mysql-3.23.html</a> to download the stable 
+release of the MySQL database. Then follow the installation instructions 
+in <tt>Docs/manual.html</tt> after you ungzip and untar the MySQL archive.</p>
+
+<p>
+Check whether all the Perl modules required by this example are installed.</p>
+
+	<blockquote class="bcopy">
+	<tt>[/my/junoscript-<i>n.n</i>]% perl required-mod.pl RDB</tt>
+	</blockquote>
+
+<p>
+If any of the following Perl modules is not installed, you must install it 
+before running this example. See <a href="#example_perlmod">Installation 
+of Perl Modules Required by Examples</a>.</p>
+
+<p>
+<span class="l3"><i>Description:</i></span><br />
+
+These scripts convert a Juniper Networks XML configuration retrieved via the <tt>get_config.pl</tt> script into a set of relational database tables, populate the tables 
+with data from the XML file, extract data from those tables, and transform it back into XML format. No other functionality is provided. The SQL output by the 
+<tt>make_tables.pl</tt> script is pretty generic SQL and has been tested to work with MySQL on FreeBSD 4.2. It should also work with other RDB products if you install the 
+DBD module for your RDB.</p>
+
+<p>
+Before running the example, edit the <tt>$DSN</tt> value in <tt>common.pm</tt> to reflect your configuration.</p>
+
+<p>
+The scripts perform the following functions:</p>
+
+<ul class="bcopy">
+<span class="bullet"><li></span><tt>get_config.pl</tt>utilizes JUNOScript to retrieve an XML-encoding of a given router's configuration.<br />&nbsp;</li>
+
+<span class="bullet"><li></span><tt>make_tables.pl</tt>, given an XML file on the command line, writes to standard output SQL statements (table creates &amp; inserts) that 
+allow this XML file to be stored in a relational database<br />&nbsp;</li>
+
+<span class="bullet"><li></span><tt>pop_tables.pl</tt>, given an XML file on the command line, populates the tables with data from the XML file.<br />&nbsp;</li>
+
+<span class="bullet"><li></span><tt>unpop_tables.pl</tt>, given the name of the 'root' XML element, creates an XML file from the data in the relational database.</li></ul>
+
+
+<p>
+Perform the following steps:</p>
+
+<ol class="bcopy">
+<span class="bullet"><li></span>Run the <tt>get_config.pl</tt> script against a Juniper Networks router to obtain an XML rendering of its configuration.<br />&nbsp;</li>
+
+<span class="bullet"><li></span>Run the <tt>make_tables.pl</tt> script, specifying the name of the XML configuration file on the command line. Redirect the standard output 
+to the file <tt>tables.xml</tt>.<br />&nbsp;</li>
+
+<span class="bullet"><li></span>Transfer the <tt>tables.xml</tt> file into MySQL to create the table structure.<br />&nbsp;</li>
+
+<span class="bullet"><li></span>Run the <tt>pop_tables.pl</tt> script, specifying the name of the XML configuration file on the command line. The MySQL tables will be 
+populated.<br />&nbsp;</li>
+
+<span class="bullet"><li></span>Your router configuration is now in your relational database!<br />&nbsp;</li>
+
+<span class="bullet"><li></span>Run the <tt>unpop_tables.pl</tt> script, specifying <tt>jun_configuration</tt> and the primary key outputted by <tt>pop_tables.pl</tt> on 
+the command line. Redirect standard output to <tt>config.xml</tt> to transform the data into XML format again, making it suitable to be passed back to the router for 
+re-configuration.</li></ol>
+
+
+<p>
+Here's a concrete example:</p>
+
+	<ol class="bcopy">
+	<span class="bullet"><li></span>Change directory to <tt>examples/RDB<br />
+	[/my/junoscript-<i>n.n</i>]% cd examples/RDB</tt><br />&nbsp;</li>
+	
+	<span class="bullet"><li></span>Get an XML-ized Juniper Networks router configuration file:<br />
+	<tt>[/my/junoscript-<i>n.n</i>/examples/RDB]% perl get_config.pl -m ssh -l someuser -p somepass . myrouter.acme.com</tt>
+	
+	<br /><br />
+	This will store that router's configuration as XML in the current directory as a file called <tt>myrouter.acme.com.xmlconfig</tt>.<br />&nbsp;</li>
+	
+	<span class="bullet"><li></span>Create the database tables:<br />
+	<tt>[/my/junoscript-<i>n.n</i>/examples/RDB]% perl make_tables.pl myrouter.acme.com.xmlconfig &gt; tables.xml</tt><br />&nbsp;</li>
+	
+	<span class="bullet"><li></span>Set up your MySQL database and import tables. Here the database is called <tt>JUN_TEST</tt>.
+		<ol>
+		<span class="bullet"><li></span>Edit <tt>DSN</tt> value in the file <tt>common.pm</tt> to reflect your database name</li>
+		<span class="bullet"><li></span><tt>[/my/junoscript-<i>n.n</i>/examples/RDB]% mysqladmin create JUN_TEST</tt></li>
+		<span class="bullet"><li></span><tt>[/my/junoscript-<i>n.n</i>/examples/RDB]% mysql JUN_TEST &lt; tables.xml</tt><br />&nbsp;</li></ol>
+	</li>
+	
+	<span class="bullet"><li></span>Populate tables in the database.<br />
+	<tt>[/my/junoscript-<i>n.n</i>/examples/RDB]% perl pop_tables.pl myrouter.acme.com.xmlconfig</tt>
+	
+	<br /><br />
+	pop_tables.pl displays the exact command to type for step 7, it includes the primary key to identify the configuration.<br />&nbsp;</li>
+	
+	<span class="bullet"><li></span>Use RDB tools to manipulate the data as desired.<br />&nbsp;</li>
+	
+	<span class="bullet"><li></span>Regenerate XML from your database:<br />
+	<tt>[/my/junoscript-<i>n.n</i>/examples/RDB]% perl unpop_tables.pl jun_configuration 1 &gt; config.xml</tt></li></ol>
+
+
+<!-----------------------------------  ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="perl">&nbsp;</a>
+
+<p class="l2">Installation of PERL</p>
+
+<ol class="bcopy"><b>UNIX</b>
+<span class="bullet"><li></span>Retrieve the perl source package (http://cpan.org/src/stable.tar.gz)<br />&nbsp;</li>
+
+<span class="bullet"><li></span>Install the stable.tar.gz.
+
+<br /><br />
+FreeBSD and Linux:<br />
+<tt>% tar zxf</tt> stable.tar.gz
+
+<br /><br />
+Solaris:<br />
+<tt>% gzip -dc</tt> stable.tar.gz <tt>| tar xf -</tt>
+
+<br /><br />
+Follow instruction in perl-5.6.1/INSTALL to install perl. You can make your private directory the standard directory for installation, then the perl executables and any 
+Perl modules you install will automatically go to the directory you specified. Otherwise, take the defaults and the executables and modules will be installed under 
+/usr/local.</li></ol>
+
+
+<!-----------------------------------  ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="example_perlmod">&nbsp;</a>
+
+<p>
+<span class="l2">Installation of Perl Modules Required by Examples</span>
+
+<p>
+You can tell install-prereqs.pl to install only the modules required by JUNOS::Device or by a specific example. By default install-prereqs.pl install all required modules 
+for JUNOS::Device, get_chassis_inventory.pl, load_configuration.pl and diagnose_bgp.pl. The RDB installation is kept separate because it required the installation of a RDB. 
+This section shows you how to specify which set of modules to install.</p>
+
+	<ol class="bcopy"><b>UNIX</b>
+	<span class="bullet"><li></span>Go to the junoscript directory.<br />
+	<tt>% cd junoscript-<i>n.n</i></tt><br />&nbsp;</li>
+	
+	<span class="bullet"><li></span>Install the Perl modules required by the specific example. If you wish to install the required files in your private directory instead 
+	of the standard directory, you can use the -install_directory option to specify your private installation directory. The standard directory is the installation 
+	directory configured in the perl executable.
+	
+	<br /><br />
+	<i>Installing modules under the standard directory (it's normally /usr/local/lib and you'll need root privilege):</i><br />
+	<tt>[/my/junoscript-<i>n.n</i>]% perl install-prereqs.pl -used_by &lt;example&gt; -force</tt>
+	
+	<br /><br />
+	<i>Installing modules under your own private directory</i> (see <a href="#notes02">notes</a> below):<br />
+	<tt>[/my/junoscript-<i>n.n</i>]% setenv PERL5LIB /my/private/directory/lib<br />
+	[/my/junoscript-<i>n.n</i>]% perl install-prereqs.pl -used_by &lt;example&gt; -install_directory $PERL5LIB -force</tt>
+	
+	<br /><br />
+	Where &lt;example&gt; is get_chassis_inventory, load_configuration, RDB, diagnose_bgp, or JUNOS::Device. If the -used_by option is not used, the default is to install 
+	all required modules except those required by RDB. The reason required modules for RDB is not part of the default installation is because it requires an RDB being 
+	installed first.
+	
+	<br /><br />
+	When install-prereqs.pl is installing Term::ReadKey, it will prompt user for inputs.
+	
+	<br /><br />
+	The option -force forces install-prereqs.pl to install the module even if an older version already exists or 'make test' fails. For more information on the 
+	install-prereqs.pl options, type 'perl install-prereqs.pl -help'.</li></ol>
+
+
+<p>
+<a name="notes02">Notes</a> for private directory installation:</p>
+
+<ul class="bcopy">
+<span class="bullet"><li></span>Remember to set PERL5LIB before installation of the Perl modules and running the examples. PERL5LIB is an environment variable, it can be 
+set to a colon-separated list of directories. If set, perl will first look for Perl modules in the PERL5LIB directories before looking in the standard directory. The 
+instruction above uses the csh syntax for setting environment variable. For sh, ksh and bash, use EXPORT PERL5LIB=/my/private/directory/lib.<br />&nbsp;</li>
+</ul>
+
+
+<!-----------------------------------  ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="dependencies">&nbsp;</a>
+
+<p>
+<span class="l2">Dependencies</span><br />
+
+<p>
+When you run the install script, you'll see the list of C libraries, 
+executables, and Perl modules required by JUNOS::Device and its examples.
+The only module that the install script does not address is the mysql
+distribution.  To run the RDB example, you must first install mysql
+before running the installation for RDB.
+</p>
+<p>
+If you wish to find out what are missing dependencies on your system without running the install script, you can run the following commands.
+</p>
+<p>
+<ul><tt>perl required-mod.pl</tt></ul>
+<br />
+<br />
+
+<!-----------------------------------  ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="faq">&nbsp;</a>
+
+<p>
+<span class="l2">FAQ</span>
+
+<ol class="bcopy"><b>Installation</b><br /><br />
+
+<span class="bullet"><li></span>
+The installation of Math::Pari failed. When I looked into the 
+Math-Pari-&lt;version&gt;.log, it complaint about an illegal '<tt>as</tt>' 
+option -P is used.
+<br />
+<br />
+Check the versions of your <tt>gcc</tt> and <tt>as</tt>, using '<tt>as -V</tt>'
+and '<tt>gcc -v</tt>'. We recommend that you use gcc version 2.8.1 or higher 
+and <tt>as</tt> 5.0 or higher.
+<br />
+<br />
+Also make sure your <tt>PATH</tt> is set correctly so the 
+<tt>/usr/ccs/bin/as</tt> is used not <tt>/usr/local/bin/as</tt>.
+<br />
+<br />
+</li>
+
+<span class="bullet"><li></span>
+The installation of MIME::Base64, HTML::Parser, ... failed.&nbsp; When
+I looked into the log files, they all complaint about 'ssh: cc not found'.<br>
+<br />
+Run 'perl -V' to find out what are the compiler and linker options your perl
+executable was built with.&nbsp; The c compiler configured in perl is 'cc'
+and you only have 'gcc' installed on your system, you'll need to reinstall
+your perl (See <a href="#perl">Installation of perl</a>) with the correct c compiler.  This can happen if perl was
+installed on a different system and got copied over.
+<br />
+<br />
+If you have the same c compiler as what's configured in perl then check
+your PATH envioronment variable, maybe you don't have the path to the
+c compiler there.
+<br />
+<br />
+</li>
+
+<span class="bullet"><li></span>
+Problems installing under FreeBSD 4.3 and X11R6.5.1.
+<br />
+<br />
+Try installing JUNOScript on FreeBSD 4.3 with the stock X11, there may be
+conflicts between X11R6.5.1 and the prerequisite modules.
+<br />
+<br />
+</li>
+</ol>
+<ol class="bcopy"><b>Runtime</b><br /><br />
+
+<span class="bullet"><li></span>
+When I tried to display the DHTML output of diagnose_bgp.pl on a browser, 
+a blank screen is displayed or the fonts are too big.
+<br />
+<br />
+Make sure you can access the Javascript sorttable.js, it should be under
+the js directory one level below the dynamic html file.  For example,
+let's say you have run 
+<tt>'perl diagnose_bgp.pl  -x xsl/dhtml.xsl -o diagnose_bgp_dhtml.html router11'</tt>.  
+If you copy the output file to some other directory,
+make sure you also copy the js directory.
+<br />
+<br />
+<pre>
+<tt>
+% ls -R
+diagnose_bgp_dhtml.html        js/
+
+./js:
+sorttable.js
+</tt>
+</pre>
+If sorttable.js is not the problem, remove the following line from the
+DHTML file.&nbsp; Some versions of browsers do not like the &lt;meta&gt; info
+generated by the XSLT processor.
+<br />
+<br />
+- &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<br />
+<br />
+</li>
+
+<span class="bullet"><li></span>
+When I tried to transform a JUNOScript response with my XSL file, the 
+data wasn't rendered properly.
+<br />
+<br />
+JUNOScript responses use default namespace, something XSLT 1.0 does not deal
+with very well.&nbsp; The XSL file must declare the default namespace
+explicitly if it is used in the XML data that it transforms.&nbsp; All of the
+XSL files provided with the examples contain the declaration so you should use
+them as examples for your own XSL files.&nbsp; This problem is addressed by
+XSLT 2.0.
+<br />
+<br />
+This topic is discussed in 
+<a href="http://www.vbxml.com/people/bosley/defaultns.asp">http://www.vbxml.com/people/bosley/defaultns.asp</a>.
+<br />
+<br />
+</li>
+
+<span class="bullet"><li></span>
+I got 'syntax error' after setting an argument with type TOGGLE to 0.  For example:
+<br />
+<br />
+<tt>$res = get_chassis_inventory(detail => 0);</tt>
+<br />
+<br />
+The syntax error is returned because 0 is an invalid input for the argument.  
+The safest way is to omit the argument.  For example:
+<br />
+<br />
+<tt>$res = get_chassis_inventory();</tt>
+<br />
+<br />
+</li>
+
+</ol>
+
+
+  <p>&nbsp;
+<p>
+
+
+<!-----------------------------------  ----------------------------------->
+
+<br />&nbsp;<a href="#"><img src="to_topg.gif" alt="Back to Top" border="0" width="62" height="13" /></a>
+<a name="support">&nbsp;</a>
+
+<p>
+<span class="l2">Support</span><br />
+
+<p>
+If you have problems with this JUNOS package, please e-mail <a href="mailto:support@juniper.net">support@juniper.net</a>. We are looking forward to hearing from you.</p>
+
+
+<p class="footer">
+Juniper Networks is registered in the U.S. Patent and Trademark Office and in other countries as a trademark of Juniper Networks, Inc. Internet Processor, Internet 
+Processor II, JUNOS, JUNOScript, M5, M10, M20, M40, M160, and its corporate, product, and service logos are trademarks of Juniper Networks, Inc. All other trademarks, 
+service marks, registered trademarks, or registered service marks are the property of their respective owners. Use of any Juniper Networks trademarks in a manner that is 
+likely to cause confusion among its customers or disparages/discredits Juniper Networks is strictly prohibited.</p>
+
+<p align="center" class="footer">
+Copyright &copy; 2001, Juniper Networks, Inc. All Rights Reserved</a>.</p>
+
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

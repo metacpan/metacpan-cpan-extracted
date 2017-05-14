@@ -1,0 +1,47 @@
+/* XPM */
+static char *Image2[] = {
+/* width height num_colors chars_per_pixel */
+"    28    27        6            1",
+/* colors */
+". c #000000",
+"# c #848400",
+"a c #848484",
+"b c #c6c6c6",
+"c c #ffff00",
+"d c None",
+/* pixels */
+"dddddddddddddddddddddddddddd",
+"dddddddddddddddddddddddddddd",
+"ddaaaaaaaaaaaaaaaa.ddddddddd",
+"ddabbbbbbbbbbbbbba.ddddddddd",
+"ddabbbaaaaaaadbbba.ddddddddd",
+"ddabbba.....bdbbba.ddddddddd",
+"ddabbba.dddbbdbbba.ddddddddd",
+"ddabbba.ddb.bdbbba.ddddddddd",
+"ddabbba..b.dbaaaaa.ddddddddd",
+"ddabbba.d.ddadddb..ddddddddd",
+"ddabbba.##bbaaaaa..daadddddd",
+"ddabbbd#cd..adbaa...cd.ddddd",
+"ddabbbb#dcd#adbaa.#cdc.ddddd",
+"ddabbbb.#dcdadbaa.cdc#.ddddd",
+"ddabbba.#dd.adbaa..cd#.ddddd",
+"ddab####cd.dadbaa.d.cd...ddd",
+"ddab#cdcdcd.adbaa..cdcdcd.dd",
+"ddab.####dcd......cdc.###.dd",
+"ddab.###.#dcdcdcdcdc#.###.dd",
+"ddab.##.cdc..#cd#..dcd.##.dd",
+"ddabb..##c.###dc.###d#...ddd",
+"dd.....#c.####cd.#####..dddd",
+"ddddddd#c.#..###...###.ddddd",
+"ddddddd#c..dd###.dd.##.ddddd",
+"dddddddd..ddd.##.ddd..dddddd",
+"ddddddddddddd....ddddddddddd",
+"dddddddddddddddddddddddddddd"
+};
+SIMPLE  =                    T                                                  
+BITPIX  =                    8                                                  
+NAXIS   =                    2                                                  
+NAXIS1  =                   28                                                  
+NAXIS2  =                   27                                                  
+HISTORY Written by XV 3.10a                                                     
+END                                                                             

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Auth-Sticky.t
+lib/Auth/Sticky.pm

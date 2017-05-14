@@ -44,7 +44,7 @@ use LaTeX::Encode;
 use LaTeX::Table;
 
 
-our $VERSION = '3.11';           # Update "=head1 VERSION" below!!!!
+our $VERSION = '3.12';           # Update "=head1 VERSION" below!!!!
 our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
 our $ERROR   = '';
 our $FILTER  = 'latex';
@@ -237,7 +237,7 @@ Template::Plugin::Latex - Template Toolkit plugin for Latex
 
 =head1 VERSION
 
-This documentation refers to C<Template::Plugin::Latex> version 3.11
+This documentation refers to C<Template::Plugin::Latex> version 3.12
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 Decision::Markov - Markov models for decision analysis
 
-    Copyright (c) 1998-2002 Alan Schwartz <alansz@uic.edu>. All rights reserved.
+    Copyright (c) 1998-2003 Alan Schwartz <alansz@uic.edu>. All rights reserved.
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
@@ -24,6 +24,7 @@ INSTALLATION
     make install
 
 REVISION HISTORY
+    0.03    March 2003 - Fixed error in discount factor computations.
     0.02    Sept  2002 - Test script improvements
     0.01    March 1988 - Initial concept.
 

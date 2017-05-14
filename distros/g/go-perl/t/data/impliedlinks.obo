@@ -1,0 +1,40 @@
+format-version: 1.2
+date: 10:12:2006 11:37
+saved-by: cjm
+auto-generated-by: OBO-Edit <unable to determine>
+default-namespace: test
+
+[Term]
+id: A
+name: A
+is_a: B ! B
+relationship: part_of C {implied=true} ! C
+relationship: part_of D {implied=true} ! D
+relationship: part_of E {implied=true} ! E
+
+[Term]
+id: B
+name: B
+relationship: part_of C ! C
+relationship: part_of D {implied=true} ! D
+relationship: part_of E {implied=true} ! E
+
+[Term]
+id: C
+name: C
+is_a: D ! D
+is_a: E {implied=true} ! E
+
+[Term]
+id: D
+name: D
+is_a: E ! E
+
+[Term]
+id: E
+name: E
+
+[Typedef]
+id: part_of
+name: part_of
+

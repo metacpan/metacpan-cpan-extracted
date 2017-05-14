@@ -1,0 +1,170 @@
+<HTML><HEAD><TITLE>XML::Handler::Composer - Another XML printer/writer/generator</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::Handler::Composer - Another XML printer/writer/generator
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><P>use XML::Handler::Composer;
+
+<P>my $composer = new XML::Handler::Composer ( [OPTIONS] );
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::Handler::Composer is similar to XML::Writer, XML::Handler::XMLWriter,
+XML::Handler::YAWriter etc. in that it generates XML output.
+
+<P>This implementation may not be fast and it may not be the best solution for
+your particular problem, but it has some features that may be missing in the
+other implementations:
+
+<DL><LI>Supports every output encoding that <A HREF="../UM.html">XML::UM</A> supports
+
+<P><A HREF="../UM.html">XML::UM</A> supports every encoding for which there is a mapping file 
+in the <A>XML::Encoding</A> distribution.
+
+<DT><A NAME="_Pretty_printing_"><STRONG><P>* Pretty printing
+
+</STRONG></A><DD>When used with <A HREF="../Filter/Reindent.html">XML::Filter::Reindent</A>.
+
+<DT><A NAME="_Fine_control_over_which_kind_of_quotes_are_used_"><STRONG><P>* Fine control over which kind of quotes are used
+
+</STRONG></A><DD>See options below.
+
+<DT><A NAME="_Supports_PerlSAX_interface_"><STRONG><P>* Supports PerlSAX interface
+
+</STRONG></A></DL><P><HR><H1><A NAME="Constructor_Options">Constructor Options
+
+</A></H1><DL><DT><A NAME="_EndWithNewline_Default_1_"><STRONG><P>* EndWithNewline (Default: 1)
+
+</STRONG></A><DD>Whether to print a newline at the end of the file (i.e. after the root element)
+
+<DT><A NAME="_Newline_Default_undef_"><STRONG><P>* Newline (Default: undef)
+
+</STRONG></A><DD>If defined, which newline to use for printing.
+(Note that XML::Parser etc. convert newlines into "\x0A".)
+
+<P>If undef, newlines will not be converted and XML::Handler::Composer will
+use "\x0A" when printing.
+
+<P>A value of "\n" will convert the internal newlines into the platform
+specific line separator.
+
+<P>See the PreserveWS option in the characters event (below) for finer control
+over when newline conversion is active.
+
+<DT><A NAME="_DocTypeIndent_Default_a_Newline_and_2_spaces_"><STRONG><P>* DocTypeIndent (Default: a Newline and 2 spaces)
+
+</STRONG></A><DD>Newline plus indent that is used to separate lines inside the DTD.
+
+<DT><A NAME="_IndentAttList_Default_8_spaces_"><STRONG><P>* IndentAttList (Default: 8 spaces)
+
+</STRONG></A><DD>Indent used when printing an &lt;!ATTLIST&gt; declaration that has more than one
+attribute definition, e.g.
+
+<PRE> &lt;!ATTLIST my_elem
+        attr1 CDATA "foo"
+        attr2 CDATA "bar"
+ &gt;
+
+</PRE><DT><A NAME="_Quote_Default_XMLDecl_Attr_Entity_SystemLiteral_"><STRONG><P>* Quote (Default: { XMLDecl =&gt; '"', Attr =&gt; '"', Entity =&gt; '"', SystemLiteral =&gt; '"' })
+
+</STRONG></A><DD>Quote contains a reference to a hash that defines which quoting characters 
+to use when printing XML declarations (XMLDecl), attribute values (Attr), 
+&lt;!ENTITY&gt; values (Entity) and system/public literals (SystemLiteral) 
+as found in &lt;!DOCTYPE&gt;, &lt;!ENTITY&gt; declarations etc.
+
+<DT><A NAME="_PrintDefaultAttr_Default_0_"><STRONG><P>* PrintDefaultAttr (Default: 0)
+
+</STRONG></A><DD>If 1, prints attribute values regardless of whether they are default 
+attribute values (as defined in &lt;!ATTLIST&gt; declarations.)
+Normally, default attributes are not printed.
+
+<DT><A NAME="_Encoding_Default_undef_"><STRONG><P>* Encoding (Default: undef)
+
+</STRONG></A><DD>Defines the output encoding (if specified.) 
+Note that future calls to the xml_decl() handler may override this setting
+(if they contain an Encoding definition.)
+
+<DT><A NAME="_EncodeUnmapped_Default_XML_UM_encode_unmapped_dec_"><STRONG><P>* EncodeUnmapped (Default: \&amp;XML::UM::encode_unmapped_dec)
+
+</STRONG></A><DD>Defines how Unicode characters not found in the mapping file (of the 
+specified encoding) are printed. 
+By default, they are converted to decimal entity references, like '&amp;#123;'
+
+<P>Use \&amp;XML::UM::encode_unmapped_hex for hexadecimal constants, like '&amp;#xAB;'
+
+<DT><A NAME="_Print_Default_sub_print___which_prints_to_stdout_"><STRONG><P>* Print (Default: sub { print @_ }, which prints to stdout)
+
+</STRONG></A><DD>The subroutine that is used to print the encoded XML output.
+The default prints the string to stdout.
+
+</DL><P><HR><H1><A NAME="Method_get_compressed_element_suffix_event_">Method: get_compressed_element_suffix ($event)
+
+</A></H1><P>Override this method to support the different styles for printing
+empty elements in compressed notation, e.g. &lt;p/&gt;, &lt;p&gt;&lt;/p&gt;, &lt;p /&gt;, &lt;p&gt;.
+
+<P>The default returns "/&gt;", which results in &lt;p/&gt;.
+Use " /&gt;" for XHTML style elements or "&gt;" for certain HTML style elements.
+
+<P>The $event parameter is the hash reference that was received from the
+start_element() handler.
+
+<P><HR><H1><A NAME="Extra_PerlSAX_event_information">Extra PerlSAX event information
+
+</A></H1><P>XML::Handler::Composer relies on hints from previous SAX filters to
+format certain parts of the XML. 
+These SAX filters (e.g. XML::Filter::Reindent) pass extra information by adding
+name/value pairs to the appropriate PerlSAX events (the events themselves are 
+hash references.)
+
+<DL><DT><A NAME="_entity_reference_Parameter_1_"><STRONG><P>* entity_reference: Parameter =&gt; 1
+
+</STRONG></A><DD>If Parameter is 1, it means that it is a parameter entity reference. 
+A parameter entity is referenced with %ent; instead of &amp;ent; and the
+entity declaration starts with &lt;!ENTITY % ent ...&gt; instead of &lt;!ENTITY ent ...&gt;
+
+<P>NOTE: This should be added to the PerlSAX interface!
+
+<DT><A NAME="_start_element_end_element_Compress_1_"><STRONG><P>* start_element/end_element: Compress =&gt; 1
+
+</STRONG></A><DD>If Compress is 1 in both the start_element and end_element event, the element
+will be printed in compressed form, e.g. &lt;a/&gt; instead of &lt;a&gt;&lt;/a&gt;.
+
+<DT><A NAME="_start_element_PreserveWS_1_"><STRONG><P>* start_element: PreserveWS =&gt; 1
+
+</STRONG></A><DD>If newline conversion is active (i.e. Newline was defined in the constructor),
+then newlines will *NOT* be converted in text (character events) within this
+element.
+
+<DT><A NAME="_attlist_decl_First_MoreFollow_"><STRONG><P>* attlist_decl: First, MoreFollow
+
+</STRONG></A><DD>The First and MoreFollow options can be used to force successive &lt;!ATTLIST&gt;
+declarations for the same element to be merged, e.g.
+
+<PRE> &lt;!ATTLIST my_elem
+        attr1 CDATA "foo"
+        attr2 CDATA "bar"
+        attr3 CDATA "quux"
+ &gt;
+
+</PRE><P>In this example, the attlist_decl event for foo should contain
+(First =&gt; 1, MoreFollow =&gt; 1) and the event for bar should contain 
+(MoreFollow =&gt; 1). The quux event should have no extra info.
+
+<P>'First' indicates that the event is the first of a sequence.
+'MoreFollow' indicates that more events will follow in this sequence.
+
+<P>If neither option is set by the preceding PerlSAX filter, each attribute
+definition will be printed as a separate &lt;!ATTLIST&gt; line.
+
+</DL><P><HR><H1><A NAME="CAVEATS">CAVEATS
+
+</A></H1><P>This code is highly experimental! 
+It has not been tested well and the API may change.
+
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
+&lt;<I>enno@att.com</I>&gt;. 
+
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:31 2000</FONT></I></BODY></HTML>

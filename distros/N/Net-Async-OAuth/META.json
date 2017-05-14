@@ -1,0 +1,71 @@
+{
+   "abstract" : "Basic OAuth support for async code",
+   "author" : [
+      "Tom Molesworth <TEAM@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-OAuth",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.014000"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Mojibake" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "List::UtilsBy" : "0",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "URI::Escape" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-async-oauth at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-OAuth"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-Async-OAuth/"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

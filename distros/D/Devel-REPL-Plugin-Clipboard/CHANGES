@@ -1,0 +1,87 @@
+==================================================
+Changes from 2012-11-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2013-11-07 19:35:43 +0000
+------------------------------------------
+
+  Change: 7cceeae70862b731d02d36fe116d6885f0d7eaa8
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 13:35:17 +0000
+
+    Bump version 
+
+  Change: 9808db9437db1dcfb3d229078f9138c734830cfd
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 13:34:09 +0000
+
+    Proper fix for undef values in join
+
+    Previous fix was // on the array, instead need to check each element. 
+
+------------------------------------------
+version 0.003 at 2013-11-07 19:11:22 +0000
+------------------------------------------
+
+  Change: 13cdc300af728ba75e3d81d9301b680ca4f11e48
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 13:11:22 +0000
+
+    New version 
+
+  Change: f8894f1abca21d48f4debaed98317e5c2cba814c
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 13:02:48 +0000
+
+    Rid MXAH since deprecated and not even used
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=86643 
+
+  Change: 79fe46806be463d57932c9613b57f16a302689d5
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 12:59:05 +0000
+
+    Alright... keep the README 
+
+------------------------------------------
+version 0.002 at 2013-11-07 18:57:46 +0000
+------------------------------------------
+
+  Change: facf75293b3e4b09e643204b39502a00871e8b29
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 12:57:46 +0000
+
+    Ignore README since generated 
+
+  Change: e4479db72eb4620676df13a1e7eb9aaf1632b652
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 12:53:18 +0000
+
+    Avoid warning for join of undef value 
+
+  Change: e916a8d057be22fa060e364561086a43cac23bb7
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-11-07 12:48:46 +0000
+
+    Use Term::ANSIColor to do colorstrip 
+
+------------------------------------------
+version 0.001 at 2013-02-27 03:37:15 +0000
+------------------------------------------
+
+  Change: 0c72b9fb64445d61120f6b4378c0c73384bbe494
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-02-26 21:37:15 +0000
+
+    Add README from POD 
+
+  Change: 510769d36825bddeb2324d70bde1787fda8ee34f
+  Author: Steve Nolte <iam@stevenolte.com>
+  Date : 2013-02-26 21:16:17 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

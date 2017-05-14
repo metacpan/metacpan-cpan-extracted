@@ -1,0 +1,86 @@
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:15683
+Return-Path: <p5sm@nospam.tumnus.net>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 61380 invoked by uid 76); 9 Apr 2004 11:22:43 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Fri, 09 Apr 2004 04:22:43 -0700
+Received: (qmail 499 invoked by uid 225); 9 Apr 2004 11:22:41 -0000
+Delivered-To: daily-build-reports@perl.org
+Received: (qmail 495 invoked by alias); 9 Apr 2004 11:22:41 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Fri, 09 Apr 2004 04:22:40 -0700
+Received: (qmail 61341 invoked by uid 1005); 9 Apr 2004 11:22:39 -0000
+Delivered-To: perlmail-smokers-reports@onion.perl.org
+Received: (qmail 61338 invoked by uid 76); 9 Apr 2004 11:22:39 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Fri, 09 Apr 2004 04:22:39 -0700
+Received: (qmail 486 invoked by uid 225); 9 Apr 2004 11:22:37 -0000
+Delivered-To: smokers-reports@perl.org
+Received: (qmail 482 invoked by alias); 9 Apr 2004 11:22:37 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from mtagate6.uk.ibm.com (HELO mtagate6.uk.ibm.com) (195.212.29.139)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Fri, 09 Apr 2004 04:22:34 -0700
+Received: from d06nrmr1307.portsmouth.uk.ibm.com (d06nrmr1307.portsmouth.uk.ibm.com [9.149.38.129])
+	by mtagate6.uk.ibm.com (8.12.10/8.12.10) with ESMTP id i39BMVMN176676;
+	Fri, 9 Apr 2004 11:22:31 GMT
+Received: from python.tdc.nl.ibm.com (python.tdc.nl.ibm.com [9.142.50.14])
+	by d06nrmr1307.portsmouth.uk.ibm.com (8.12.10/NCO/VER6.6) with ESMTP id i39BMVfZ292502;
+	Fri, 9 Apr 2004 12:22:31 +0100
+Received: from buffel.africa.tdc ([10.6.16.50] helo=localhost)
+	by python.tdc.nl.ibm.com with smtp (Exim 3.36 #1 (Debian))
+	id 1BBu5e-0004WM-00; Fri, 09 Apr 2004 13:22:30 +0200
+Content-transfer-encoding: quoted-printable
+Mime-version: 1.0
+Cc: campo@tumnus.net
+Subject: Smoke [5.8.4] 22661 FAIL(Xc) AIX 5.1.0.0/ML05/32 (PPC/32/1 cpu)
+Content-type: text/plain; charset="iso-8859-1"
+To: Perl Smoke Test Reports <smokers-reports@perl.org>
+Date: Fri, 9 Apr 2004 13:21 +0200
+Message-ID: <E1BBu5e-0004WM-00@python.tdc.nl.ibm.com>
+Approved: news@nntp.perl.org
+From: p5sm@nospam.tumnus.net (P5sm Aix51 Gcc33)
+
+Automated smoke report for 5.8.4 patch 22661
+buffel: PPC_604 (PPC/32/1 cpu)
+    on        AIX - 5.1.0.0/ML05/32
+    using     gcc-3.3.2 version 3.3.2
+    smoketime 1 day 1 hour 1 minute (average 2 hours 5 minutes)
+
+Summary: FAIL(Xc)
+
+O =3D OK  F =3D Failure(s), extended report at the bottom
+X =3D Failure(s) under TEST but not under harness
+? =3D still running or test results not (yet) available
+Build failures during:       - =3D unknown or N/A
+c =3D Configure, m =3D make, M =3D make (after miniperl), t =3D make test-p=
+rep
+
+   22661     Configuration (common) -Dcc=3Dgcc-3.3.2
+----------- ---------------------------------------------------------
+O O O O=20=20=20=20=20
+O O O O     -Duse64bitint
+c - c -     -Duselongdouble
+O O O O     -Duseithreads
+O X O O     -Duseithreads -Duse64bitint
+c - c -     -Duseithreads -Duselongdouble
+| | | +----- PERLIO =3D perlio -DDEBUGGING
+| | +------- PERLIO =3D stdio  -DDEBUGGING
+| +--------- PERLIO =3D perlio
++----------- PERLIO =3D stdio
+
+
+Failures:
+[perlio] -Dcc=3Dgcc-3.3.2 -Duseithreads -Duse64bitint
+Inconsistent test results (between TEST and harness):
+    ../ext/Time/HiRes/t/HiRes.t.............FAILED at test 14
+
+--=20
+Report by Test::Smoke v1.18_65 (Reporter v0.011) running on perl 5.8.0
+

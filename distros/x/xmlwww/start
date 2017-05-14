@@ -1,0 +1,10 @@
+#!/bin/sh
+
+rm -f www-xml.pid
+
+if [ "$1" == "-r" ] ; then
+    rm -f www-xml.log
+fi
+
+./www-xml.pl
+

@@ -1,0 +1,17 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	11	644	1103070911	1304122775	Makeppfile
+# This verifies that wildcards finally do match filenames containing comma.
+# They didn't because that used to get interpreted as argument separators.
+# Test that this is no longer the case.
+
+# Cygwin lowercases and thus wildcard sorts differently
+X := $(makeperl sort map lc, qw'$(wildcard *)')
+
+$(phony default): x
+
+x:
+	&echo $(join $(X),1 2 3 4) -o $@
+###	D	755	1103070976	1103070920	answers
+###	1	644	1103070920	1304122786	answers/x
+answers1 makeppfile2 x,y3 4
+###	0	644	1103070741	1304122791	x,y

@@ -1,5 +1,7 @@
 package DTL::Fast::Expression::Operator::Binary::Ne;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Expression::Operator::Binary::Eq';
 
 $DTL::Fast::OPS_HANDLERS{'!='} = __PACKAGE__;

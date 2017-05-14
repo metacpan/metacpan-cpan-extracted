@@ -1,0 +1,204 @@
+#6.6:should simplify (visible) 
+ifeq ($(and ${VAR1},${VAR2},y),y)
+# 6.6 (V)
+endif
+
+
+# unifdef+ test for makefiles
+# with -D FOO -D D1=1 -D D2=1 -DX=x -U BAR -U U1 -D E= -I t\test2.mak
+
+
+#do not simplify (neither expression resolved):
+ifeq 'xxx' 'xxx'
+# 1.1 (V)
+else
+# 1.1 (V)
+endif
+
+#do not simplify (neither expression resolved):
+ifeq "xxx" 'xxx'
+# 1.2 (V)
+else
+# 1.2 (V)
+endif
+
+#do not simplify (neither expression resolved):
+ifeq (xxx,xxx)
+# 1.3 (V)
+else
+# 1.3 (V)
+endif
+
+#do not simplify (neither expression resolved):
+ifeq (xxx,xyy)
+# 1.4 (V)
+else
+# 1.4 (V)
+endif
+
+
+# simplify (FOO defined)
+#1.5 (V)
+
+# do not simplify (BAR unknown)
+#1.6 (V)
+
+# simplify (U1 undefined)
+#1.7 (V)
+
+# simplify (E is defined, but empty...)
+#1.8 (V)
+
+# simplify (FOO defined)
+#1.9 (V)
+
+# do not simplify (VAR1 unknown)
+ifndef VAR1
+#1.10 (V)
+else
+#1.10 (V)
+endif
+
+# simplify (U1 undefined)
+#1.11 (V)
+
+# simplify (E is defined, but empty...)
+#1.12 (V)
+
+
+
+# PART 2: with variables:
+
+#simplify:
+# 2.1 (V)
+
+#simplify:
+# 2.2 (V)
+
+#simplify:
+# 2.3 (V)
+
+#simplify:
+# 2.4 (V)
+
+#simplify:
+# 2.5 (V)
+
+#simplify:
+# 2.6 (V)
+
+#simplify:
+# 2.6 (V)
+
+#do not simplify:
+ifeq '$(VAR1)x' "${VAR2}"
+# 2.6 (V)
+else
+# 2.6 (V)
+endif
+
+
+# PART3: catination:
+
+#simplify:
+# 3.1 (V)
+
+# should not simplify -- $D is unknown...
+ifeq 'x$D1' "x1"
+# 3.2 (V)
+else
+# 3.2 (V)
+endif
+
+#simplify:
+# 3.3 (V)
+
+#do not simplify:
+ifeq 'abc$(VAR1)y' "a$(VAR2)"
+# 3.4 (V)
+else
+# 3.4 (V)
+endif
+
+#do not simplify:
+ifeq 'a$(VAR1)y' "abc${VAR2}"
+# 3.5 (V)
+else
+# 3.5 (V)
+endif
+
+#simplify (cannot match due to prefix):
+# 3.6 (V)
+
+# PART 4: else clauses:
+
+# should simplify (2,3,4 visible)
+ifdef VAR1
+# 4.1 (v2)
+else ifeq ($Y,x)
+# 4.1 (V3)
+else
+# 4.1 (V4)
+endif
+
+# should simplify (3 visible)
+# 4.2 (V3)
+
+# should simplify (2,3 visible)
+ifeq (1,$(SSS))
+# 4.8 (V2)
+else
+# 4.8 (V3)
+endif
+
+# should simplify (1,2,4 visible)
+ifdef VAR1
+# 4.9 (V1)
+else ifndef VAR2
+# 4.9 (V2)
+else
+# 4.9 (V4)
+endif
+
+
+# PART 5: functions (or)
+
+#5.1: should simplify 
+# 5.1 (V)
+
+#5.2: should simplify 
+# 5.2 (V)
+
+#5.3: should simplify 
+# 5.3 (V)
+
+#5.4: should simplify 
+# 5.4 (V)
+
+#5.5: should simplify  
+# 5.5 (V)
+
+#5.6: should simplify (visible, but ${BAR} removed as its undefined) 
+ifeq ($(or ${VAR1},${VAR2}),y)
+# 5.6 (V)
+endif
+
+
+# PART 6: functions (and)
+
+#6.1: should simplify (not visible) 
+
+#6.2:should simplify (not visible) 
+
+#6.3:should simplify (visible) 
+# 6.3 (V)
+
+#6.4:should simplify (visible) 
+# 6.4 (V)
+
+#6.5:should simplify (not visible) 
+
+#6.6:should simplify (visible) 
+ifeq ($(and ${VAR1},${VAR2},y),y)
+# 6.6 (V)
+endif

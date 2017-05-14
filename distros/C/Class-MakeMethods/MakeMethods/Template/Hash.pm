@@ -21,13 +21,6 @@ sub generic {
       'hash_delete' => q{ delete _VALUE_ },
       'hash_exists' => q{ exists _VALUE_ },
     },
-    'modifier' => {
-      # XXX the below doesn't work because modifiers can't have params,
-      # although interfaces can... Either add support for default params
-      # in modifiers, or else move this to another class.
-      # X Should there be a version which uses caller() instead of target_class?
-      'class_keys' => { 'hash_key' => '"*{target_class}::*{name}"' },
-    }
   }
 }
 

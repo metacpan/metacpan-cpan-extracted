@@ -1,0 +1,37 @@
+Thr Aug 17 1999   Brian Dunford-Shore <brian@ibc.wustl.edu>
+
+ o  Release 1.00  Initial Release
+ o  Release 1.10  Fixed more support for views
+	          (Code changes are thanks to Fyodor Krasnov, Zenon N.S.P.).
+                  Fixed 'Next Entry' bug.
+ o  Release 1.50  Fixed datetime field search functionality.
+                  Fixed logon failure screen.
+                  Fixed multiple field parameter handling.
+                  Added frame (windows) per PQ Edit of a table.
+                  Added a 'View Search Set' for an overview window.
+                  Added pk_value for passing a tab delimited tuple for
+                       specifying the record to edit.  Must have a value for
+                       each of the primary key fields (or all fields if there
+                       is no primary key).
+                  Added passing pq_* and pqsearch_* through the login screen
+                       (so that PQ Edit can be called from other pages to edit
+                       a particular record but still have logon validation).
+                  Added alpha level support for mSQL using DBI.
+                  Added dumping out parameters if pqdebug=1.
+                  Added javascript Help on Search button for help window.
+                  Added auto_field blank field replacement mechanisms
+                       for inserts and updates.
+                  Added replace_field field replacement mechanisms
+                       for inserts and updates.
+                  Added readonly fields.
+                  Implemented nondisplay fields.
+ o  Release 1.60  Added 'login' parameter for user-less/password-less login.
+                  Added 'label_match' parameter to allow specifying matches
+                  for picking database field to use as pulldown list labels
+                  and added to possibilities for matching.
+ o  Release 1.61  Added expires now to content header to disable browser
+                  caching.
+ o  Release 1.62  Fixed Makefile.PL to not check for Sybase related modules.
+ o  Release 1.63  Install fix.
+ o  Release 1.64  Added forcing a browser window to focus when it is the target.
+ o  Release 1.7   Added support for PostgreSQL (Pg) database server.

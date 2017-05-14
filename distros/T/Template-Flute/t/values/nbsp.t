@@ -10,9 +10,9 @@ use utf8;
 use Test::More tests => 10;
 
 my $builder = Test::More->builder;
-binmode $builder->output,         ":encoding(utf-8)";
-binmode $builder->failure_output, ":encoding(utf-8)";
-binmode $builder->todo_output,    ":encoding(utf-8)";
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
 
 
 use Template::Flute;

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+package horris;
+# ABSTRACT: App::Horris::CLI runner
+
+
+use App::Horris::CLI;
+App::Horris::CLI->run;
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+horris - App::Horris::CLI runner
+
+=head1 VERSION
+
+version v0.1.2
+
+=head1 SYNOPSIS
+
+    horris
+
+=head1 AUTHOR
+
+hshong <hshong@perl.kr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by hshong.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

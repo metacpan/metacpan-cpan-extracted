@@ -1,0 +1,36 @@
+<tmpl_include header.tmpl>
+
+<tmpl_var form_start>
+<input class="<tmpl_var styleclass>_button" type="submit" value="Show" /> for last <tmpl_var field_for_last> days
+<tmpl_var form_end>
+
+<table>
+	<thead>
+		<th>DateTime</th>
+		<th>Number</th>
+		<th>Card</th>
+		<th>Transfer sum</th>
+		<th>Old sum</th>
+		<th>New sum</th>
+	</thead>
+	<tbody>
+		<tmpl_loop transfers><tr>
+			<td><tmpl_var time></td>
+			<td><tmpl_var number></td>
+			<td><tmpl_var card></td>
+			<td class="num"><tmpl_var sum></td>
+			<td class="num"><tmpl_var old_sum></td>
+			<td class="num"><tmpl_var new_sum></td>
+		</tr></tmpl_loop>
+	</tbody>
+	<tfoot>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td class="num"><tmpl_var transfers_sum></td>
+		<td></td>
+		<td></td>
+	</tfoot>
+</table>
+
+<tmpl_include footer.tmpl>

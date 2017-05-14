@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl
+#
+# getprice -- this script does not run.
+#
+
+use Fame;
+
+$dbname = "parker \\\$PRC_TARGET/prc";
+
+$db = new Fame::DB $dbname;
+if (! $db) {
+  print "Error [",$Fame::HLI::status,"] opening $dbname\n";
+  exit(1);
+}
+
+$day = "5jan95";
+@tickers = qw(IBM,DEC,MSFT);
+
+foreach (@tickers) {
+  ($price) = $db->Read("$_.CLOSE", $day, $day);
+  printf "%s\t%s\n", $_, $price;
+}

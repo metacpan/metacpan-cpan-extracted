@@ -23,7 +23,7 @@ use Carp;
 use Log::Agent;
 use File::Temp qw( tempfile );
 
-$VERSION = '0.2';
+$VERSION = "0.161";
 
 {
 	my %_attrs = (
@@ -141,8 +141,8 @@ sub ping {
 sub get_info {
 	my ($self) = @_;
 
-	my $revision = '$Revision: 1.1.1.1 $';
-	my $date = '$Date: 2002/10/15 20:53:38 $';
+	my $revision = '$Revision: 1.2 $';
+	my $date = '$Date: 2003/01/11 14:16:34 $';
 
 print <<EOT;
 File transport $VERSION

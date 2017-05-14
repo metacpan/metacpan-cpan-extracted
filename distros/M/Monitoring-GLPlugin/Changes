@@ -1,3 +1,31 @@
+* 2016-11-29 2.3.7
+  add JUNIPER-MIB
+* 2016-11-21 2.3.6
+  add RMON-MIB
+* 2016-10-24 2.3.5
+  add Liebert-Mibs
+* 2016-10-24 2.3.4
+  fix host-resource-mib for mode supportedmibs
+  add mode bulkwalk
+  add NET-SNMP-MIB detector
+* 2016-10-11 2.3.3.1
+  bugfix in get_request, do not cache invalid responses
+* 2016-10-08 2.3.3
+  add CISCOSB*
+  add ARISTA-ENTITY-SENSOR-MIB
+  add ENTITY-STATE-MIB
+* 2016-09-28 2.3.2.2
+  update MANIFEST
+* 2016-09-28 2.3.2.1
+  fix WebGraph-Thermo-Hygro-Barometer-US-MIB id
+* 2016-09-28 2.3.2
+  add US_AN1GRAPH_BARO_MIB_134
+* 2016-08-17 2.3.1
+  add UCD-DISKIO-MIB
+* 2016-08-12 2.3.0.2
+  add extra-opts test
+* 2016-08-01 2.3.0.1
+  bugfix in valdiff with lookback
 * 2016-07-21 2.3
   add --extra-opts
 * 2016-07-12 2.2.01

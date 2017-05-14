@@ -6,7 +6,7 @@ use XML::LibXML::Reader;
 use Catmandu::PNX;
 use feature 'state';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moo;
 use namespace::clean;
@@ -22,7 +22,7 @@ sub _build_pnx {
 
 sub generator {
     my ($self) = @_;
-
+    $self->{encoding} = ':raw';
     sub {
         state $reader = XML::LibXML::Reader->new(IO => $self->fh);
 

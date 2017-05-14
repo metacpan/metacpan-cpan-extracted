@@ -1,0 +1,8 @@
+CHANGES
+IPEntry.pm
+MANIFEST			This list of files
+Makefile.PL
+README
+demos/test.pl
+demos/test_ipv6.pl
+t/00_test.t

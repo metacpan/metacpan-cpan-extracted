@@ -1,0 +1,29 @@
+#!/usr/local/bin/perl5 -I./blib -I../blib -w
+
+require Net::NIS;
+
+($stat, $dom) = Net::NIS::yp_get_default_domain();
+
+print "stat: $stat, dom: $dom\n";
+
+($stat, $out) = Net::NIS::yp_match($dom, "passwd.byname", "rik");
+
+die "stat=$stat" if $stat;
+
+print "out: $out\n";
+
+($stat, $key, $val) = Net::NIS::yp_first($dom, "passwd.byname");
+while(! $stat)
+{
+  print "stat: $stat, key: $key, val: $val\n";
+  ($stat, $key, $val) = Net::NIS::yp_next($dom, "passwd.byname", $key);
+}
+
+($stat, $data) = Net::NIS::yp_all($dom, "passwd.byname");
+
+print "stat: $stat\n";
+
+foreach $key (keys %{$data})
+{
+  print "key: $key, val: $data->{$key}\n";
+}

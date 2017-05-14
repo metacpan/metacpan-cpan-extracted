@@ -1,0 +1,298 @@
+#!/usr/bin/perl -w
+# vim: set sw=4 si et:
+#
+# schnapp - show the best dividend yield of your stocks
+#
+# Copyright 2002-2005 by Mathias Weidner
+#
+# Licensed under GPL2, look at end of file for details.
+#
+# Use 'perldoc schnapp' to view the manpage
+# or  'pod2man schnapp > schnapp.1' to create a manpage file for *roff
+#
+use strict;
+$ENV{PATH} = join ":", qw(/bin /usr/bin);
+$|++;
+
+use Getopt::Long;
+use Finance::BeanCounter;
+
+# global variables:
+my $RCS_VERSION   = '$Id: schnapp,v 1.3 2005/02/10 21:26:27 mathias Exp $';
+my $db_min_schema = "0.6.0";    # minimum version of the database that we need
+
+use vars qw($help $index $debug $verbose $version
+  $fxarg $datearg $prevdatearg
+  $rcfile $extrafx $updatedate $type $max
+  $dbsystem $dbname $fxupdate);
+
+#
+my $rcfile = $ENV{HOME} . "/.beancounterrc";
+($prevdatearg, $datearg, $fxupdate, $max) = ("6 month ago", "today", 1, 10);
+
+my %options = (
+    "help"    => \$help,
+    "index=s" => \$index,
+    "max=i"   => \$max,
+    "type=s"  => \$type,
+    "version" => \$version,
+);
+
+GetOptions(%options) || die "ERROR: No such option. -help for help\n";
+&help    if ($help);
+&version if ($version);
+
+my $command = shift @ARGV;
+
+my %Config = GetConfig(
+    $rcfile,     $debug,    $verbose, $fxarg,    $extrafx,
+    $updatedate, $dbsystem, $dbname,  $fxupdate, $command
+);
+
+my $dbh = ConnectToDb();
+if (TestInsufficientDatabaseSchema($dbh, $db_min_schema)) {
+    warn "Database schema is not current. Please run
+          'update_beancounter'\n";
+}
+else {
+    schnapp();
+}
+CloseDB($dbh);
+
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+sub schnapp
+{
+    my $stocks = select_stocks();
+    my $portfl = select_portfolio();
+    my $count  = 1;
+    printf("Nr. %-10s %-10s %-20s %-6s %-6s %-5s %-5s %-6s\n",
+        "Date", "Symbol", "Name", "Low", "High", "Div", "Divr", "Shares");
+    my $sort = sub {
+        return -1 if (not defined $stocks->{$b}->{divr});
+        return 1  if (not defined $stocks->{$a}->{divr});
+        return ($stocks->{$b}->{divr} <=> $stocks->{$a}->{divr});
+    };
+    foreach my $sym (sort $sort keys %{$stocks}) {
+        if ($count <= $max or $portfl->{$sym}) {
+            printf(
+                "%3i %-10s %-10s %-20s %6.2f %6.2f %5.2f %5.2f %6i\n",
+                $count,
+                $stocks->{$sym}->{date},
+                $sym,
+                $stocks->{$sym}->{name},
+                $stocks->{$sym}->{day_low},
+                $stocks->{$sym}->{day_high},
+                $stocks->{$sym}->{div},
+                $stocks->{$sym}->{divr},
+                $portfl->{$sym} ? $portfl->{$sym}->{shares} : 0
+            );
+        }
+        $count++;
+    }
+}    # schnapp()
+
+sub select_stocks
+{
+    my $sqli = <<EOSQL;
+        select sp.date as date
+               ,dividend as div,dividend / day_low * 100 as divr
+               ,day_low,day_high,volume
+               ,si.symbol as symbol,name
+          from stockprices as sp,stockinfo as si,indices as ix,tmp
+         where ix.symbol     = si.symbol
+           and si.symbol     = sp.symbol
+           and sp.symbol     = tmp.symbol
+           and sp.date       = tmp.date
+           and ix.stockindex = ?
+EOSQL
+    my $sql = <<EOSQL;
+        select sp.date as date
+               ,dividend as div,dividend / day_low * 100 as divr
+               ,day_low,day_high,volume
+               ,si.symbol as symbol,name
+          from stockprices as sp,stockinfo as si,tmp
+         where si.symbol     = sp.symbol
+           and sp.symbol     = tmp.symbol
+           and sp.date       = tmp.date
+EOSQL
+    $dbh->do('create temporary table tmp (symbol varchar(12),date date)');
+    $dbh->do(
+        'insert into tmp
+                         select symbol, max(date)
+                           from stockprices group by symbol'
+    );
+    my $sth;
+    if ($index) {
+        $sth = $dbh->prepare($sqli);
+        $sth->execute($index);
+    }
+    else {
+        $sth = $dbh->prepare($sql);
+        $sth->execute();
+    }
+    my $stocks = $sth->fetchall_hashref('symbol');
+    $dbh->do('drop table tmp');
+    return $stocks;
+}    # select_stocks()
+
+sub select_portfolio
+{
+    my $sql = <<EOSQL;
+        select symbol,shares from portfolio
+EOSQL
+    my $sqlt = <<EOSQL;
+        select symbol,shares from portfolio
+         where type = ?
+EOSQL
+    my $sth;
+    if ($type) {
+        $sth = $dbh->prepare($sqlt);
+        $sth->execute($type);
+    }
+    else {
+        $sth = $dbh->prepare($sql);
+        $sth->execute();
+    }
+    my $portfolio = $sth->fetchall_hashref('symbol');
+    return $portfolio;
+}    # select_portfolio()
+
+sub version
+{
+    print <<EOV;
+schnapp - show the best dividend yield of your stocks
+Version: $RCS_VERSION
+EOV
+    exit(0);
+}    # version()
+
+sub help
+{
+    print <<EOH;
+schnapp - show the best dividend yield of your stocks
+
+Usage:
+    schnapp [options]
+
+Options:
+    --help        show this help and exit
+    --index=index limit investigated stocks to index
+    --max=count   limit display to the first count stocks
+    --type=type   limit the stocks from portfolio to type
+    --version     show version and exit
+EOH
+    exit;
+}
+__END__ 
+
+=head1 NAME
+
+schnapp - show the best dividend yield of your stocks
+
+=head1 SYNOPSIS
+
+ schnapp [--help]
+ schnapp [--index=i] [--max=count] [--type=t]
+
+=head1 DESCRIPTION
+
+This programs looks at your beancounter database, takes the last
+prices and the dividend from B<stockprices> and B<stockinfo> and
+finally shows you a list of stocks ordered by descending dividend
+yield.
+
+The I<dividend yield> is determined by dividing the C<dividend> from
+table B<stockinfo> by C<day_low> from table B<stockprices> and
+multiplying the result with 100 for each stock.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+A short message listing the purpose and the options of the program.
+
+=item B<--index>=I<index>
+
+You may limit the stocks which will be investigated to a certain stock
+index that must be known in beancounter (see C<beancounter addindex ...>
+in the L<beancounter> manual).
+
+=item B<--max>=I<count>
+
+You may limit the count of stocks that will be displayed.
+
+The program lists I<count> stocks with descending dividend yield and
+thereafter only those stocks that are in the portfolio.
+
+=item B<--type>=I<type>
+
+You may limit the stocks of your portfolio which will be displayed to
+I<type>. This relates to the type in the beancounter portfolio. See
+the L<beancounter> manpage.
+
+=item B<--version>
+
+Shows the version and exits.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<$HOME>
+
+The value of the environment variable C<$HOME> is used to determine
+the location of the B<beancounter> configuration file.
+
+=item C<$PATH>
+
+The environment variable C<$PATH> is set to C</bin:/usr/bin>.
+
+=back
+
+=head1 FILES
+
+=head2 B<$HOME/.beancounterrc>
+
+The configuration file for B<beancounter> is used to get access to the
+database.
+
+=head1 NOTES
+
+This program uses the database filled by your daily run of
+C<beancounter update> but takes only the last dates of each stock.
+It determines automatically the last date when beancounter updated the
+stockprices.
+
+=head1 SEE ALSO
+
+L<beancounter(1p)>
+
+=head1 AUTHOR
+
+Copyright 2002-2005 by Mathias Weidner
+
+=head1 COPYRIGHT AND LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=head1 HISTORY
+
+ 2005-02-10 mw Copyright, License, Manpage, Option '--version'
+ 2002       mw Initial Version

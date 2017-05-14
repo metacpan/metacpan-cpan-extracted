@@ -4,10 +4,10 @@
 ## card.
 ####
 
-package IPDevice::CiscoRouter::Card;
+package IPDevice::IPDevice::CiscoRouter::Card;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(IPDevice::RouterBase::Card);
+@ISA = qw(IPDevice::IPDevice::RouterBase::Card);
 
 $VERSION = 0.01;
 
@@ -17,12 +17,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-IPDevice::CiscoRouter::Card
+IPDevice::IPDevice::CiscoRouter::Card
 
 =head1 SYNOPSIS
 
- use IPDevice::CiscoRouter::Card;
- my $card = new IPDevice::CiscoRouter::Card;
+ use IPDevice::IPDevice::CiscoRouter::Card;
+ my $card = new IPDevice::IPDevice::CiscoRouter::Card;
  $card->module(1)->interface(2)->set_encapsulation('ppp');
 
 =head1 DESCRIPTION
@@ -33,7 +33,7 @@ card.
 =head1 CONSTRUCTOR AND METHODS
 
 This class provides, in addition to all methods from
-L<IPDevice::RouterBase::Card|IPDevice::RouterBase::Card>, the following methods.
+L<IPDevice::IPDevice::RouterBase::Card|IPDevice::IPDevice::RouterBase::Card>, the following methods.
 
 =head2 set_l3engine($name)
 

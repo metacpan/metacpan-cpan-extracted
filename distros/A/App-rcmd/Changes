@@ -1,0 +1,22 @@
+0.005     2017-04-28 08:07:25+00:00 UTC
+
+    - add ReadmeAnyFromPod to dist.ini
+    - update docs
+
+0.004     2017-04-28 07:43:04+00:00 UTC
+
+    - Add (Dist::Zilla::Plugin::)NextRelease to dist.ini
+    - Add @Git to dist.ini (http://dzil.org/tutorial/vcs-git.html)
+    - Add (Dist::Zilla::Plugin::Git::)NextVersion to dist.ini
+
+0.003     2017-04-26
+
+    - Add Changes (this) file
+
+0.002     2017-04-26
+
+    - Improve docs
+
+0.001     2017-04-25
+
+    - Genesis

@@ -1,0 +1,18 @@
+---
+abstract: 'perl module implementing Markov Cluster Algorithm using PDL'
+author:
+  - 'Pinkhas Nisanov <pinkhas@nisanov.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120530'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-MCL
+requires:
+  Mouse: 0.92
+  PDL: 2.4.10
+version: 0.004

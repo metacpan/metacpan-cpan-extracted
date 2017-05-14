@@ -581,20 +581,15 @@ static inline marpaESLIF_grammar_t *_marpaESLIF_bootstrap_check_grammarp(marpaES
 static inline marpaESLIF_symbol_t *_marpaESLIF_bootstrap_check_meta_by_namep(marpaESLIF_t *marpaESLIFp, marpaESLIF_grammar_t *grammarp, char *asciinames, short createb)
 /*****************************************************************************/
 {
-  static const char   *funcs   = "_marpaESLIF_bootstrap_check_meta_by_namep";
-  marpaESLIF_symbol_t *symbolp = NULL;
-  marpaESLIF_meta_t   *metap   = NULL;
+  static const char   *funcs        = "_marpaESLIF_bootstrap_check_meta_by_namep";
+  genericStack_t      *symbolStackp = grammarp->symbolStackp;
+  marpaESLIF_symbol_t *symbolp      = NULL;
+  marpaESLIF_meta_t   *metap        = NULL;
   marpaESLIF_symbol_t *symbol_i_p;
   int                  i;
 
-  for (i = 0; i < GENERICSTACK_USED(grammarp->symbolStackp); i++) {
-#ifndef MARPAESLIF_NTRACE
-    /* Should never happen */
-    if (! GENERICSTACK_IS_PTR(grammarp->symbolStackp, i)) {
-      continue;
-    }
-#endif
-    symbol_i_p = GENERICSTACK_GET_PTR(grammarp->symbolStackp, i);
+  for (i = 0; i < GENERICSTACK_USED(symbolStackp); i++) {
+    MARPAESLIF_INTERNAL_GET_SYMBOL_FROM_STACK(marpaESLIFp, symbol_i_p, symbolStackp, i);
     if (symbol_i_p->type != MARPAESLIF_SYMBOL_TYPE_META) {
       continue;
     }
@@ -642,7 +637,8 @@ static inline marpaESLIF_symbol_t *_marpaESLIF_bootstrap_check_meta_by_namep(mar
 static inline short _marpaESLIF_bootstrap_search_terminal_by_descriptionb(marpaESLIF_t *marpaESLIFp, marpaESLIF_grammar_t *grammarp, marpaESLIF_terminal_type_t terminalType, marpaESLIF_bootstrap_utf_string_t *stringp, marpaESLIF_symbol_t **symbolpp)
 /*****************************************************************************/
 {
-  marpaESLIF_symbol_t   *symbolp = NULL;
+  genericStack_t        *symbolStackp = grammarp->symbolStackp;
+  marpaESLIF_symbol_t   *symbolp      = NULL;
   marpaESLIF_symbol_t   *symbol_i_p;
   int                    i;
   marpaESLIF_terminal_t *terminalp;
@@ -665,14 +661,8 @@ static inline short _marpaESLIF_bootstrap_search_terminal_by_descriptionb(marpaE
     goto err;
   }
 
-  for (i = 0; i < GENERICSTACK_USED(grammarp->symbolStackp); i++) {
-#ifndef MARPAESLIF_NTRACE
-    /* Should never happen */
-    if (! GENERICSTACK_IS_PTR(grammarp->symbolStackp, i)) {
-      continue;
-    }
-#endif
-    symbol_i_p = GENERICSTACK_GET_PTR(grammarp->symbolStackp, i);
+  for (i = 0; i < GENERICSTACK_USED(symbolStackp); i++) {
+    MARPAESLIF_INTERNAL_GET_SYMBOL_FROM_STACK(marpaESLIFp, symbol_i_p, symbolStackp, i);
     if (symbol_i_p->type != MARPAESLIF_SYMBOL_TYPE_TERMINAL) {
       continue;
     }
@@ -3078,7 +3068,7 @@ static short _marpaESLIF_bootstrap_G1_action_single_symbol_4b(void *userDatavp, 
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }
-  if (! _marpaESLIFRecognizer_regex_matcherb(marpaESLIFRecognizerp, marpaESLIFp->stringModifiersp, bytep, bytel, 1 /* eofb */, &rci, &marpaESLIFValueResult)) {
+  if (! _marpaESLIFRecognizer_terminal_matcherb(marpaESLIFRecognizerp, marpaESLIFp->stringModifiersp, bytep, bytel, 1 /* eofb */, &rci, &marpaESLIFValueResult)) {
     goto err;
   }
   if (rci == MARPAESLIF_MATCH_OK) {
@@ -5169,7 +5159,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }
-  if (! _marpaESLIFRecognizer_regex_matcherb(marpaESLIFRecognizerp, marpaESLIFp->regexModifiersp, bytep, bytel, 1 /* eofb */, &rci, &marpaESLIFValueResult)) {
+  if (! _marpaESLIFRecognizer_terminal_matcherb(marpaESLIFRecognizerp, marpaESLIFp->regexModifiersp, bytep, bytel, 1 /* eofb */, &rci, &marpaESLIFValueResult)) {
     goto err;
   }
   if (rci == MARPAESLIF_MATCH_OK) {
@@ -5282,7 +5272,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }
-  if (! _marpaESLIFRecognizer_regex_matcherb(marpaESLIFRecognizerp, marpaESLIFp->characterClassModifiersp, bytep, bytel, 1 /* eofb */, &rci, &marpaESLIFValueResult)) {
+  if (! _marpaESLIFRecognizer_terminal_matcherb(marpaESLIFRecognizerp, marpaESLIFp->characterClassModifiersp, bytep, bytel, 1 /* eofb */, &rci, &marpaESLIFValueResult)) {
     goto err;
   }
   if (rci == MARPAESLIF_MATCH_OK) {

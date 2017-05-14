@@ -3,9 +3,7 @@ use FindBin qw($Bin);
 
 # $Id: Makefile.PL 8365 2006-04-10 23:08:42Z vfelix $
 
-# This script is used to build and install the HTC modules.
-# For example, if you wish to install to /usr/local/scratch/perl_htc
-# you would issue the following commmands:
+# This script is used to build and install the Grid::Request modules.
 
 #  perl Makefile.PL
 #  make
@@ -29,8 +27,9 @@ WriteMakefile(
                        Exception::Class => 1.23,
                        File::Path       => 1.0403,
                        File::Temp       => 0.12,
-                       File::Which      => 0,
+                       File::Which      => 0.05,
                        FindBin          => 0,
+                       IO::Capture      => 0.05,
                        IO::Scalar       => 2.104,
                        Log::Log4perl    => 1.08,
                        Sys::Hostname    => 1.1,

@@ -37,13 +37,13 @@ is equivalent to the original path for all systems but VMS.
 
 package File::Basename;
 
-# A bit of juggling to insure that C<use re 'taint';> always works, since
 # File::Basename is used during the Perl build, when the re extension may
-# not be available.
+# not be available, but we only actually need it if running under tainting.
 BEGIN {
-  unless (eval { require re; })
-    { eval ' sub re::import { $^H |= 0x00100000; } ' } # HINT_RE_TAINT
-  import re 'taint';
+  if (${^TAINT}) {
+    require re;
+    re->import('taint');
+  }
 }
 
 
@@ -54,7 +54,7 @@ our(@ISA, @EXPORT, $VERSION, $Fileparse_fstype, $Fileparse_igncase);
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(fileparse fileparse_set_fstype basename dirname);
-$VERSION = "2.77";
+$VERSION = "2.85";
 
 fileparse_set_fstype($^O);
 
@@ -64,22 +64,22 @@ fileparse_set_fstype($^O);
 =item C<fileparse>
 X<fileparse>
 
-    my($filename, $directories, $suffix) = fileparse($path);
-    my($filename, $directories, $suffix) = fileparse($path, @suffixes);
-    my $filename                         = fileparse($path, @suffixes);
+    my($filename, $dirs, $suffix) = fileparse($path);
+    my($filename, $dirs, $suffix) = fileparse($path, @suffixes);
+    my $filename                  = fileparse($path, @suffixes);
 
-The C<fileparse()> routine divides a file path into its $directories, $filename
+The C<fileparse()> routine divides a file path into its $dirs, $filename
 and (optionally) the filename $suffix.
 
-$directories contains everything up to and including the last
+$dirs contains everything up to and including the last
 directory separator in the $path including the volume (if applicable).
 The remainder of the $path is the $filename.
 
      # On Unix returns ("baz", "/foo/bar/", "")
      fileparse("/foo/bar/baz");
 
-     # On Windows returns ("baz", "C:\foo\bar\", "")
-     fileparse("C:\foo\bar\baz");
+     # On Windows returns ("baz", 'C:\foo\bar\', "")
+     fileparse('C:\foo\bar\baz');
 
      # On Unix returns ("", "/foo/bar/baz/", "")
      fileparse("/foo/bar/baz/");
@@ -91,11 +91,11 @@ portion is removed and becomes the $suffix.
      # On Unix returns ("baz", "/foo/bar/", ".txt")
      fileparse("/foo/bar/baz.txt", qr/\.[^.]*/);
 
-If type is non-Unix (see C<fileparse_set_fstype()>) then the pattern
+If type is non-Unix (see L</fileparse_set_fstype>) then the pattern
 matching for suffix removal is performed case-insensitively, since
 those systems are not case-sensitive when opening existing files.
 
-You are guaranteed that C<$directories . $filename . $suffix> will
+You are guaranteed that C<$dirs . $filename . $suffix> will
 denote the same location as the original $path.
 
 =cut
@@ -170,7 +170,7 @@ sub fileparse {
     }
   }
 
-  # Ensure taint is propgated from the path to its pieces.
+  # Ensure taint is propagated from the path to its pieces.
   $tail .= $taint;
   wantarray ? ($basename .= $taint, $dirpath .= $taint, $tail)
             : ($basename .= $taint);
@@ -215,7 +215,7 @@ sub basename {
   my($path) = shift;
 
   # From BSD basename(1)
-  # The basename utility deletes any prefix ending with the last slash `/'
+  # The basename utility deletes any prefix ending with the last slash '/'
   # character present in string (after first stripping trailing slashes)
   _strip_trailing_sep($path);
 
@@ -250,10 +250,10 @@ C<fileparse()>.
 Only on VMS (where there is no ambiguity between the file and directory
 portions of a path) and AmigaOS (possibly due to an implementation quirk in
 this module) does C<dirname()> work like C<fileparse($path)>, returning just the
-$directories.
+$dirs.
 
     # On VMS and AmigaOS
-    my $directories = dirname($path);
+    my $dirs = dirname($path);
 
 When using Unix or MSDOS syntax this emulates the C<dirname(1)> shell function
 which is subtly different from how C<fileparse()> works.  It returns all but

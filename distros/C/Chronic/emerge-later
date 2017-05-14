@@ -1,0 +1,45 @@
+#!/usr/bin/perl -sw 
+##
+## emerge-later
+##
+## Author: Vipul Ved Prakash <mail@vipul.net>.
+## $Id: emerge-later,v 1.3 2005/04/26 07:28:26 hackworth Exp $
+## User manual located under docs/emerge-later.pod
+## 
+
+$chrontab   ||= '/etc/chrontab';
+$email      ||= "$ENV{USER}\@$ENV{HOSTNAME}";
+$constraint ||= "Inactivity, 1200";
+
+unless ($ARGV[0]) { 
+    print "Syntax: $0 package\n";
+    exit 1;
+}
+
+unless (-e $chrontab) { 
+    print "Couldn't find $chrontab.\n";
+    exit 1;
+}
+
+# Check to see if chronicd is running.
+
+my $processes = join '', `ps ax`;
+unless ($processes =~ /chronicd/) { 
+    print STDERR "Warning: chronicd is not running.\n"
+}
+
+# Write the chrontab entry. 
+
+ open CHRONTAB, ">>$chrontab" or die "Unable to open $chrontab: $!\n";
+print CHRONTAB "constraint = $constraint; only_once = 1; ";
+print CHRONTAB "notify = $email; " if $email;
+print CHRONTAB "command = \"emerge $ARGV[0]\"; ";
+print CHRONTAB "\n";
+
+# Now HUP the chronicd. Ideally we should HUP the chronicd that
+# is reading the specified chrontab. We should be able to
+# discover this using /var/run hints that are not yet supported.
+
+system "killall -HUP chronicd";
+exit 0;
+

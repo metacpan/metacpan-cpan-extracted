@@ -1,5 +1,5 @@
 package Net::Easypost::PostOnBuild;
-$Net::Easypost::PostOnBuild::VERSION = '0.18';
+$Net::Easypost::PostOnBuild::VERSION = '0.19';
 use Moo::Role;
 
 sub BUILD {}
@@ -38,19 +38,19 @@ Net::Easypost::PostOnBuild
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
-=head1 NAME 
+=head1 NAME
 
 =head1 METHODS
 
-=over 4 
+=over 4
 
-=item BUILD 
+=item BUILD
 
-After the Net::Easypost::Resource has been constructure, sends a POST to the Easypost 
+After the Net::Easypost::Resource has been constructure, sends a POST to the Easypost
 service for the type of Net::Easypost::Resource being constructed to get a valid ID
 
 =item serialize

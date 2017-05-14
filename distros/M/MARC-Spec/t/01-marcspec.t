@@ -18,7 +18,7 @@ $subspec->right($cmp);
 $subspec->operator('=');
 
 # Parsed MARCspec as right subterm
-$subspec->left(MARC::Spec->parse('245$b'));
+$subspec->left(MARC::Spec::parse('245$b'));
 
 # new Field
 my $field = MARC::Spec::Field->new('245');
@@ -34,8 +34,8 @@ $field->add_subspec($subspec);
 
 # creating more subspecs
 my $subspecs = [
-    MARC::Spec::Subspec->new( {right=> MARC::Spec->parse('245$e')} ),
-    MARC::Spec::Subspec->new( {right => MARC::Spec->parse('245$f')} )
+    MARC::Spec::Subspec->new( {right=> MARC::Spec::parse('245$e')} ),
+    MARC::Spec::Subspec->new( {right => MARC::Spec::parse('245$f')} )
 ];
 
 # and adding more subspecs
@@ -44,8 +44,8 @@ $field->add_subspecs($subspecs);
 # creating lot more subspecs
 my $or_subspecs = [
     [
-        MARC::Spec::Subspec->new( {right=> MARC::Spec->parse('245$g')} ),
-        MARC::Spec::Subspec->new( {right => MARC::Spec->parse('245$h')} )
+        MARC::Spec::Subspec->new( {right=> MARC::Spec::parse('245$g')} ),
+        MARC::Spec::Subspec->new( {right => MARC::Spec::parse('245$h')} )
     ]
 ];
 

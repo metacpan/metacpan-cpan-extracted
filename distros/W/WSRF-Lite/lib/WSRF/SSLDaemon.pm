@@ -1,4 +1,4 @@
-# $Id: SSLDaemon.pm,v 1.4 2005-12-21 12:27:20 zzcgumk Exp $
+# $Id: SSLDaemon.pm,v 1.1 2012-09-20 13:39:13 ubuntu Exp $
 #
 
 use strict;
@@ -64,7 +64,7 @@ to the I<IO::Socket::INET> base class.
 
 use vars qw($VERSION @ISA $PROTO $DEBUG);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/);
 
 use IO::Socket::INET qw(AF_INET INADDR_ANY inet_ntoa);
 use IO::Socket::SSL qw(debug4);

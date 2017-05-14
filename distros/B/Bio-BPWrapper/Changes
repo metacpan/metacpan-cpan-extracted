@@ -1,5 +1,40 @@
 Revision history for Bio::BPWrappers
 
+1.11 2016-07-01:
+
+- Another attempt to mollify smokers
+
+1.10 2016-07-01:
+
+- Adjust testing for MSWin yet again
+- More doc improvements
+
+1.08 2016-06-30:
+
+- Canonicalize biotree -llt output
+- More doc updates
+
+1.07 2016-06-30:
+
+- More complete documentation
+- Address GNUMakefile testing issues on CPANTesters
+
+1.06 2016-06-29:
+
+- Canonicalize bioaln --avpid floating point values
+- Convert links from rocky to bioperl github namespace
+- Start documenting Bio::BPWrapper::SeqManipulations
+- Changes to decrease likelihood automated test failures
+- misc doc changes
+
+1.05 2016-06-28:
+
+- Try to addess OSX testing problems:
+  test using long options
+- Start package documentation:
+  Bio::BPWrapper::AlnManipulations
+- improve/standardize command-line documentation
+
 1.04 2016-06-02:
 
 - revise bioaln documentation

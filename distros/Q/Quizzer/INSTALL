@@ -1,0 +1,11 @@
+Prerequisites: perl, of course
+
+INSTALLING it
+
+make install
+
+RUNNING it
+
+Quizzer <path_to_quizfile>
+
+Try the sample quiz included in the distribution archive.

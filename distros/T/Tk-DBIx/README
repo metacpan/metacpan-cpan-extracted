@@ -1,0 +1,22 @@
+Tk::DBIx:*
+============================
+
+Megawidgets to display a table tree, table column or table plain.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+All rights reserved (c) 2003 by  Frank (xpix) Herrmann. This program is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+
+ 

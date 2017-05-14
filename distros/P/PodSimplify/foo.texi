@@ -1,0 +1,643 @@
+\input texinfo      @c -*-texinfo-*-
+@c %**start of header
+@setfilename foo.texi
+@settitle Foo
+@c %**end of header
+@node Top, Foo, (dir), (dir)
+@comment node-name,next,prev,up
+
+@menu
+* more:: more about foo.
+@end menu
+@unnumberedsec NAME
+perlvar @minus{} Perl predefined variables
+
+@unnumberedsec DESCRIPTION
+@unnumberedsubsec Predefined Names
+The following names have special meaning to Perl. Most of the punctuational
+names have reasonable mnemonics, or analogues in one of the shells.
+Nevertheless, if you wish to use the long variable names, you just need to
+say
+
+
+@example
+use English;
+@end example
+@noindent
+at the top of your program. This will alias all the short names to the long
+names in the current package. Some of them even have medium names,
+generally borrowed from @strong{awk}.
+
+To go a step further, those variables that depend on the currently selected
+filehandle may instead be set by calling an object method on the
+FileHandle object. (Summary lines below for this contain the word HANDLE.)
+First you must say
+
+
+@example
+use FileHandle;
+@end example
+@noindent
+after which you may use either
+
+
+@example
+method HANDLE EXPR
+@end example
+@noindent
+or
+
+
+@example
+HANDLE->method(EXPR)
+@end example
+@noindent
+Each of the methods returns the old value of the FileHandle attribute. The
+methods each take an optional EXPR, which if supplied specifies the new
+value for the FileHandle attribute in question. If not supplied, most of
+the methods do nothing to the current value, except for
+@emph{autoflush()}, which will assume a 1 for you, just to be different.
+
+A few of these variables are considered "read@minus{}only". This means that
+if you try to assign to this variable, either directly or indirectly
+through a reference, you'll raise a run@minus{}time exception.
+
+@table @asis
+@comment Setting self@{index-prefix@} to variables
+@defvar $ARG
+@defvarx $_
+The default input and pattern@minus{}searching space. The following pairs
+are equivalent:
+
+
+@example
+while (<>) @{...@}    # only equivalent in while!
+while ($_ = <>) @{...@}
+@end example
+@noindent
+
+@example
+/^Subject:/
+$_ =~ /^Subject:/
+@end example
+@noindent
+
+@example
+tr/a-z/A-Z/
+$_ =~ tr/a-z/A-Z/
+@end example
+@noindent
+
+@example
+chop
+chop($_)
+@end example
+@noindent
+(Mnemonic: underline is understood in certain operations.)
+
+@end defvar
+@defvar $<@emph{digit}>
+Contains the subpattern from the corresponding set of parentheses in the
+last pattern matched, not counting patterns matched in nested blocks that
+have been exited already. (Mnemonic: like \digit.) These variables are all
+read@minus{}only.
+
+@end defvar
+@defvar $MATCH
+@defvarx $&
+The string matched by the last successful pattern match (not counting any
+matches hidden within a BLOCK or @emph{eval()} enclosed by the current
+BLOCK). (Mnemonic: like & in some editors.) This variable is
+read@minus{}only.
+
+@end defvar
+@defvar $PREMATCH
+@defvarx $`
+The string preceding whatever was matched by the last successful pattern
+match (not counting any matches hidden within a BLOCK or eval enclosed by
+the current BLOCK). (Mnemonic: ` often precedes a quoted string.) This
+variable is read@minus{}only.
+
+@end defvar
+@defvar $POSTMATCH
+@defvarx $'
+The string following whatever was matched by the last successful pattern
+match (not counting any matches hidden within a BLOCK or @emph{eval()}
+enclosed by the current BLOCK). (Mnemonic: ' often follows a quoted
+string.) Example:
+
+
+@example
+$_ = 'abcdefghi';
+/def/;
+print "$`:$&:$'\n";         # prints abc:def:ghi
+@end example
+@noindent
+This variable is read@minus{}only.
+
+@end defvar
+@defvar $LAST_PAREN_MATCH
+@defvarx $+
+The last bracket matched by the last search pattern. This is useful if you
+don't know which of a set of alternative patterns matched. For example:
+
+
+@example
+/Version: (.*)|Revision: (.*)/ && ($rev = $+);
+@end example
+@noindent
+(Mnemonic: be positive and forward looking.) This variable is
+read@minus{}only.
+
+@end defvar
+@defvar $MULTILINE_MATCHING
+@defvarx $*
+Set to 1 to do multiline matching within a string, 0 to tell Perl that it
+can assume that strings contain a single line, for the purpose of
+optimizing pattern matches. Pattern matches on strings containing multiple
+newlines can produce confusing results when @code{$*} is 0. Default is 0.
+(Mnemonic: * matches multiple things.) Note that this variable only
+influences the interpretation of @code{^} and @code{$}. A literal newline
+can be searched for even when @code{$* == 0}.
+
+Use of @code{$*} is deprecated in Perl 5.
+
+@end defvar
+@defvar input_line_number HANDLE EXPR
+@defvarx $INPUT_LINE_NUMBER
+@defvarx $NR
+@defvarx $.
+The current input line number of the last filehandle that was read. An
+explicit close on the filehandle resets the line number. Since
+@code{&lt;&gt;} never does an explicit close, line numbers increase across
+ARGV files (but see examples under @emph{eof()}). Localizing @code{$.} has
+the effect of also localizing Perl's notion of "the last read filehandle".
+(Mnemonic: many programs use "." to mean the current line number.)
+
+@end defvar
+@defvar input_record_separator HANDLE EXPR
+@defvarx $INPUT_RECORD_SEPARATOR
+@defvarx $RS
+@defvarx $/
+The input record separator, newline by default. Works like @strong{awk}'s
+RS variable, including treating blank lines as delimiters if set to the
+null string. You may set it to a multicharacter string to match a
+multi@minus{}character delimiter. Note that setting it to @code{"\n\n"}
+means something slightly different than setting it to @code{""}, if the
+file contains consecutive blank lines. Setting it to @code{""} will treat
+two or more consecutive blank lines as a single blank line. Setting it to
+@code{"\n\n"} will blindly assume that the next input character belongs to
+the next paragraph, even if it's a newline. (Mnemonic: / is used to
+delimit line boundaries when quoting poetry.)
+
+
+@example
+undef $/;
+$_ = <FH>;          # whole file now here
+s/\n[ \t]+/ /g;
+@end example
+@noindent
+@end defvar
+@defvar autoflush HANDLE EXPR
+@defvarx $OUTPUT_AUTOFLUSH
+@defvarx $|
+If set to nonzero, forces a flush after every write or print on the
+currently selected output channel. Default is 0. Note that STDOUT will
+typically be line buffered if output is to the terminal and block buffered
+otherwise. Setting this variable is useful primarily when you are
+outputting to a pipe, such as when you are running a Perl script under rsh
+and want to see the output as it's happening. (Mnemonic: when you want
+your pipes to be piping hot.)
+
+@end defvar
+@defvar output_field_separator HANDLE EXPR
+@defvarx $OUTPUT_FIELD_SEPARATOR
+@defvarx $OFS
+@defvarx $,
+The output field separator for the print operator. Ordinarily the print
+operator simply prints out the comma separated fields you specify. In
+order to get behavior more like @strong{awk}, set this variable as you
+would set @strong{awk}'s OFS variable to specify what is printed between
+fields. (Mnemonic: what is printed when there is a , in your print
+statement.)
+
+@end defvar
+@defvar output_record_separator HANDLE EXPR
+@defvarx $OUTPUT_RECORD_SEPARATOR
+@defvarx $ORS
+@defvarx $\
+The output record separator for the print operator. Ordinarily the print
+operator simply prints out the comma separated fields you specify, with no
+trailing newline or record separator assumed. In order to get behavior
+more like @strong{awk}, set this variable as you would set @strong{awk}'s
+ORS variable to specify what is printed at the end of the print.
+(Mnemonic: you set @code{$\} instead of adding \n at the end of the print.
+Also, it's just like /, but it's what you get "back" from Perl.)
+
+@end defvar
+@defvar $LIST_SEPARATOR
+@defvarx $"
+This is like @code{$,} except that it applies to array values interpolated
+into a double@minus{}quoted string (or similar interpreted string).
+Default is a space. (Mnemonic: obvious, I think.)
+
+@end defvar
+@defvar $SUBSCRIPT_SEPARATOR
+@defvarx $SUBSEP
+@defvarx $;
+The subscript separator for multi@minus{}dimensional array emulation. If
+you refer to a hash element as
+
+
+@example
+$foo@{$a,$b,$c@}
+@end example
+@noindent
+it really means
+
+
+@example
+$foo@{join($;, $a, $b, $c)@}
+@end example
+@noindent
+But don't put
+
+
+@example
+@@foo@{$a,$b,$c@}      # a slice--note the @@
+@end example
+@noindent
+which means
+
+
+@example
+($foo@{$a@},$foo@{$b@},$foo@{$c@})
+@end example
+@noindent
+Default is "\034", the same as SUBSEP in @strong{awk}. Note that if your
+keys contain binary data there might not be any safe value for @code{$;}.
+(Mnemonic: comma (the syntactic subscript separator) is a
+semi@minus{}semicolon. Yeah, I know, it's pretty lame, but @code{$,} is
+already taken for something more important.)
+
+Consider using "real" multi@minus{}dimensional arrays in Perl 5.
+
+@end defvar
+@defvar $OFMT
+@defvarx $#
+The output format for printed numbers. This variable is a
+half@minus{}hearted attempt to emulate @strong{awk}'s OFMT variable. There
+are times, however, when @strong{awk} and Perl have differing notions of
+what is in fact numeric. Also, the initial value is %.20g rather than
+%.6g, so you need to set @code{$#} explicitly to get @strong{awk}'s value.
+(Mnemonic: # is the number sign.)
+
+Use of @code{$#} is deprecated in Perl 5.
+
+@end defvar
+@defvar format_page_number HANDLE EXPR
+@defvarx $FORMAT_PAGE_NUMBER
+@defvarx $%
+The current page number of the currently selected output channel.
+(Mnemonic: % is page number in @strong{nroff}.)
+
+@end defvar
+@defvar format_lines_per_page HANDLE EXPR
+@defvarx $FORMAT_LINES_PER_PAGE
+@defvarx $=
+The current page length (printable lines) of the currently selected output
+channel. Default is 60. (Mnemonic: = has horizontal lines.)
+
+@end defvar
+@defvar format_lines_left HANDLE EXPR
+@defvarx $FORMAT_LINES_LEFT
+@defvarx $@minus{}
+The number of lines left on the page of the currently selected output
+channel. (Mnemonic: lines_on_page @minus{} lines_printed.)
+
+@end defvar
+@defvar format_name HANDLE EXPR
+@defvarx $FORMAT_NAME
+@defvarx $~
+The name of the current report format for the currently selected output
+channel. Default is name of the filehandle. (Mnemonic: brother to
+@code{$^}.)
+
+@end defvar
+@defvar format_top_name HANDLE EXPR
+@defvarx $FORMAT_TOP_NAME
+@defvarx $^
+The name of the current top@minus{}of@minus{}page format for the currently
+selected output channel. Default is name of the filehandle with _TOP
+appended. (Mnemonic: points to top of page.)
+
+@end defvar
+@defvar format_line_break_characters HANDLE EXPR
+@defvarx $FORMAT_LINE_BREAK_CHARACTERS
+@defvarx $:
+The current set of characters after which a string may be broken to fill
+continuation fields (starting with ^) in a format. Default is @samp{"
+\n@minus{}"}, to break on whitespace or hyphens. (Mnemonic: a "colon" in
+poetry is a part of a line.)
+
+@end defvar
+@defvar format_formfeed HANDLE EXPR
+@defvarx $FORMAT_FORMFEED
+@defvarx $^L
+What formats output to perform a formfeed. Default is \f.
+
+@end defvar
+@defvar $ACCUMULATOR
+@defvarx $^A
+The current value of the @emph{write()} accumulator for @emph{format()}
+lines. A format contains @emph{formline()} commands that put their result
+into @code{$^A}. After calling its format, @emph{write()} prints out the
+contents of @code{$^A} and empties. So you never actually see the contents
+of @code{$^A} unless you call @emph{formline()} yourself and then look at
+it. See {L:{ARRAY(0xdec84):}} and {L:{ARRAY(0xded08):}}.
+
+@end defvar
+@defvar $CHILD_ERROR
+@defvarx $?
+The status returned by the last pipe close, backtick (@code{``}) command,
+or @emph{system()} operator. Note that this is the status word returned by
+the @emph{wait()} system call, so the exit value of the subprocess is
+actually (@code{$? &gt;&gt; 8}). Thus on many systems, @code{$? & 255}
+gives which signal, if any, the process died from, and whether there was a
+core dump. (Mnemonic: similar to @strong{sh} and @strong{ksh}.)
+
+@end defvar
+@defvar $OS_ERROR
+@defvarx $ERRNO
+@defvarx $!
+If used in a numeric context, yields the current value of errno, with all
+the usual caveats. (This means that you shouldn't depend on the value of
+@code{$!} to be anything in particular unless you've gotten a specific
+error return indicating a system error.) If used in a string context,
+yields the corresponding system error string. You can assign to @code{$!}
+in order to set @emph{errno} if, for instance, you want @code{$!} to
+return the string for error @emph{n}, or you want to set the exit value
+for the @emph{die()} operator. (Mnemonic: What just went bang?)
+
+@end defvar
+@defvar $EVAL_ERROR
+@defvarx $@@
+The Perl syntax error message from the last @emph{eval()} command. If null,
+the last @emph{eval()} parsed and executed correctly (although the
+operations you invoked may have failed in the normal fashion). (Mnemonic:
+Where was the syntax error "at"?)
+
+Note that warning messages are not collected in this variable. You can,
+however, set up a routine to process warnings by setting
+@code{$SIG}@{__WARN__@} below.
+
+@end defvar
+@defvar $PROCESS_ID
+@defvarx $PID
+@defvarx $$
+The process number of the Perl running this script. (Mnemonic: same as
+shells.)
+
+@end defvar
+@defvar $REAL_USER_ID
+@defvarx $UID
+@defvarx $<
+The real uid of this process. (Mnemonic: it's the uid you came @emph{FROM},
+if you're running setuid.)
+
+@end defvar
+@defvar $EFFECTIVE_USER_ID
+@defvarx $EUID
+@defvarx $>
+The effective uid of this process. Example:
+
+
+@example
+$< = $>;       # set real to effective uid
+($<,$>) = ($>,$<);  # swap real and effective uid
+@end example
+@noindent
+(Mnemonic: it's the uid you went @emph{TO}, if you're running setuid.)
+Note: @code{$&lt;} and @code{$&gt;} can only be swapped on machines
+supporting @emph{setreuid()}.
+
+@end defvar
+@defvar $REAL_GROUP_ID
+@defvarx $GID
+@defvarx $(
+The real gid of this process. If you are on a machine that supports
+membership in multiple groups simultaneously, gives a space separated list
+of groups you are in. The first number is the one returned by
+@emph{getgid()}, and the subsequent ones by @emph{getgroups()}, one of
+which may be the same as the first number. (Mnemonic: parentheses are used
+to @emph{GROUP} things. The real gid is the group you @emph{LEFT}, if
+you're running setgid.)
+
+@end defvar
+@defvar $EFFECTIVE_GROUP_ID
+@defvarx $EGID
+@defvarx $)
+The effective gid of this process. If you are on a machine that supports
+membership in multiple groups simultaneously, gives a space separated list
+of groups you are in. The first number is the one returned by
+@emph{getegid()}, and the subsequent ones by @emph{getgroups()}, one of
+which may be the same as the first number. (Mnemonic: parentheses are used
+to @emph{GROUP} things. The effective gid is the group that's @emph{RIGHT}
+for you, if you're running setgid.)
+
+Note: @code{$&lt;}, @code{$&gt;}, @code{$(} and @code{$)} can only be set
+on machines that support the corresponding @emph{set[re][ug]@emph{id()}}
+routine. @code{$(} and @code{$)} can only be swapped on machines
+supporting @emph{setregid()}.
+
+@end defvar
+@defvar $PROGRAM_NAME
+@defvarx $0
+Contains the name of the file containing the Perl script being executed.
+Assigning to @code{$0} modifies the argument area that the @emph{ps(1)}
+program sees. This is more useful as a way of indicating the current
+program state than it is for hiding the program you're running. (Mnemonic:
+same as @strong{sh} and @strong{ksh}.)
+
+@end defvar
+@defvar $[
+The index of the first element in an array, and of the first character in a
+substring. Default is 0, but you could set it to 1 to make Perl behave
+more like @strong{awk} (or Fortran) when subscripting and when evaluating
+the @emph{index()} and @emph{substr()} functions. (Mnemonic: [ begins
+subscripts.)
+
+As of Perl 5, assignment to @code{$[} is treated as a compiler directive,
+and cannot influence the behavior of any other file. Its use is
+discouraged.
+
+@end defvar
+@defvar $PERL_VERSION
+@defvarx $]
+The string printed out when you say @code{perl -v}. It can be used to
+determine at the beginning of a script whether the perl interpreter
+executing the script is in the right range of versions. If used in a
+numeric context, returns the version + patchlevel / 1000. Example:
+
+
+@example
+# see if getc is available
+($version,$patchlevel) =
+         $] =~ /(\d+\.\d+).*\nPatch level: (\d+)/;
+print STDERR "(No filename completion available.)\n"
+         if $version * 1000 + $patchlevel < 2016;
+@end example
+@noindent
+or, used numerically,
+
+
+@example
+warn "No checksumming!\n" if $] < 3.019;
+@end example
+@noindent
+(Mnemonic: Is this version of perl in the right bracket?)
+
+@end defvar
+@defvar $DEBUGGING
+@defvarx $^D
+The current value of the debugging flags. (Mnemonic: value of
+@samp{@minus{}D} switch.)
+
+@end defvar
+@defvar $SYSTEM_FD_MAX
+@defvarx $^F
+The maximum system file descriptor, ordinarily 2. System file descriptors
+are passed to @emph{exec()}ed processes, while higher file descriptors are
+not. Also, during an @emph{open()}, system file descriptors are preserved
+even if the @emph{open()} fails. (Ordinary file descriptors are closed
+before the @emph{open()} is attempted.) Note that the
+close@minus{}on@minus{}exec status of a file descriptor will be decided
+according to the value of @code{$^F} at the time of the open, not the time
+of the exec.
+
+@end defvar
+@defvar $INPLACE_EDIT
+@defvarx $^I
+The current value of the inplace@minus{}edit extension. Use @code{undef} to
+disable inplace editing. (Mnemonic: value of @samp{@minus{}i} switch.)
+
+@end defvar
+@defvar $PERLDB
+@defvarx $^P
+The internal flag that the debugger clears so that it doesn't debug itself.
+You could conceivable disable debugging yourself by clearing it.
+
+@end defvar
+@defvar $BASETIME
+@defvarx $^T
+The time at which the script began running, in seconds since the epoch
+(beginning of 1970). The values returned by the @samp{@minus{}M},
+@samp{@minus{}A} and @samp{@minus{}C} filetests are based on this value.
+
+@end defvar
+@defvar $WARNING
+@defvarx $^W
+The current value of the warning switch, either TRUE or FALSE. (Mnemonic:
+related to the @samp{@minus{}w} switch.)
+
+@end defvar
+@defvar $EXECUTABLE_NAME
+@defvarx $^X
+The name that the Perl binary itself was executed as, from C's
+@code{argv[0]}.
+
+@end defvar
+@defvar $ARGV
+contains the name of the current file when reading from <>.
+
+@end defvar
+@defvar @@ARGV
+The array @code{@@ARGV} contains the command line arguments intended for
+the script. Note that @code{$#ARGV} is the generally number of arguments
+minus one, since @code{$ARGV[0]} is the first argument, @emph{NOT} the
+command name. See @code{$0} for the command name.
+
+@end defvar
+@defvar @@INC
+The array @code{@@INC} contains the list of places to look for Perl scripts
+to be evaluated by the @code{do EXPR}, @code{require}, or @code{use}
+constructs. It initially consists of the arguments to any @samp{@minus{}I}
+command line switches, followed by the default Perl library, probably
+"/usr/local/lib/perl", followed by ".", to represent the current
+directory.
+
+@end defvar
+@defvar %INC
+The hash @code{%INC} contains entries for each filename that has been
+included via @code{do} or @code{require}. The key is the filename you
+specified, and the value is the location of the file actually found. The
+@code{require} command uses this array to determine whether a given file
+has already been included.
+
+@end defvar
+@defvar $ENV@{expr@}
+The hash @code{%ENV} contains your current environment. Setting a value in
+@code{ENV} changes the environment for child processes.
+
+@end defvar
+@defvar $SIG@{expr@}
+The hash @code{%SIG} is used to set signal handlers for various signals.
+Example:
+
+
+@example
+sub handler @{       # 1st argument is signal name
+    local($sig) = @@_;
+    print "Caught a SIG$sig--shutting down\n";
+    close(LOG);
+    exit(0);
+@}
+@end example
+@noindent
+
+@example
+$SIG@{'INT'@} = 'handler';
+$SIG@{'QUIT'@} = 'handler';
+...
+$SIG@{'INT'@} = 'DEFAULT';    # restore default action
+$SIG@{'QUIT'@} = 'IGNORE';    # ignore SIGQUIT
+@end example
+@noindent
+The @code{%SIG} array only contains values for the signals actually set
+within the Perl script. Here are some other examples:
+
+
+@example
+$SIG@{PIPE@} = Plumber;       # SCARY!!
+$SIG@{"PIPE"@} = "Plumber";   # just fine, assumes main::Plumber
+$SIG@{"PIPE"@} = \&Plumber;   # just fine; assume current Plumber
+$SIG@{"PIPE"@} = Plumber();   # oops, what did Plumber() return??
+@end example
+@noindent
+The one marked scary is problematic because it's a bareword, which means
+sometimes it's a string representing the function, and sometimes it's
+going to call the subroutine call right then and there! Best to be sure
+and quote it or take a reference to it. *Plumber works too. See
+{L:{ARRAY(0xdee64):}}.
+
+Certain internal hooks can be also set using the @code{%SIG} hash. The
+routine indicated by @code{$SIG}@{__WARN__@} is called when a warning
+message is about to be printed. The warning message is passed as the first
+argument. The presence of a __WARN__ hook causes the ordinary printing of
+warnings to STDERR to be suppressed. You can use this to save warnings in
+a variable, or turn warnings into fatal errors, like this:
+
+
+@example
+local $SIG@{__WARN__@} = sub @{ die $_[0] @};
+eval $proggie;
+@end example
+@noindent
+The routine indicated by @code{$SIG}@{__DIE__@} is called when a fatal
+exception is about to be thrown. The error message is passed as the first
+argument. When a __DIE__ hook routine returns, the exception processing
+continues as it would have in the absence of the hook, unless the hook
+routine itself exits via a goto, a loop exit, or a die.
+
+@end defvar
+@bye

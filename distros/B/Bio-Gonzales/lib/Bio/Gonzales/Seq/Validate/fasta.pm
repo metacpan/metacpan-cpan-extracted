@@ -8,7 +8,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 #no use yet
 our %alphabets = (
@@ -78,7 +78,7 @@ sub validate {
   my %seen;
 
   while (<$fh>) {
-    if ( !$is_dos && /\r\n/ ) {
+    if ( $. == 1 && /\r\n/ ) {
       $is_dos = 1;
       $self->_add_error( 0, "File seems to be in DOS format" );
     }
@@ -109,7 +109,7 @@ sub validate {
       if (/^>([^\s]+)/) {
         $self->_add_error( $., "ID is very long: " . $self->_shorten_seq($1) )
           if ( length($1) > 50 );
-        $self->_add_error( $., "ID is ambiguous. $1" )
+        $self->_add_error( $., "ID is ambiguous." )
           if ( exists $seen{$1} );
         $seen{$1} = 1;
       } elsif (/^>\s*$/) {
@@ -153,14 +153,10 @@ sub validate {
       }
       undef $header;
     } else {
-      $self->_add_error( $., " ERROR IN THE SCRIPT" );
+      $self->_add_error( $., " ERROR IM SCRPT " );
     }
   }
-  if ( keys %{ $self->_error_cache } > 0 ) {
-    return $self->_error_cache;
-  } else {
-    return;
-  }
+  return $self->_error_cache;
 }
 
 sub _add_error {

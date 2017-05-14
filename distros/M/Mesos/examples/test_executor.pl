@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 package TestExecutor;
-use Mesos::Messages;
 use Moo;
+use strict;
+use warnings;
 extends 'Mesos::Executor';
+use Mesos::Messages;
 
 sub launchTask {
     my ($self, $driver, $task) = @_;

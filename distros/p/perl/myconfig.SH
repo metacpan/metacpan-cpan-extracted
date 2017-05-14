@@ -1,3 +1,5 @@
+#!/bin/sh
+
 case $PERL_CONFIG_SH in
 '')
 	if test -f config.sh; then TOP=.;
@@ -28,22 +30,22 @@ $startsh
 # Note that the text lines /^Summary of/ .. /^\s*$/ are copied into Config.pm.
 cat <<'!NO!SUBS!'
 Summary of my $package (revision $revision $version_patchlevel_string) configuration:
+  $git_commit_id_title $git_commit_id$git_ancestor_line
   Platform:
     osname=$osname, osvers=$osvers, archname=$archname
     uname='$myuname'
     config_args='$config_args'
     hint=$hint, useposix=$useposix, d_sigaction=$d_sigaction
-    usethreads=$usethreads use5005threads=$use5005threads useithreads=$useithreads usemultiplicity=$usemultiplicity
-    useperlio=$useperlio d_sfio=$d_sfio uselargefiles=$uselargefiles usesocks=$usesocks
-    use64bitint=$use64bitint use64bitall=$use64bitall uselongdouble=$uselongdouble
+    useithreads=$useithreads, usemultiplicity=$usemultiplicity
+    use64bitint=$use64bitint, use64bitall=$use64bitall, uselongdouble=$uselongdouble
     usemymalloc=$usemymalloc, bincompat5005=undef
   Compiler:
     cc='$cc', ccflags ='$ccflags',
     optimize='$optimize',
     cppflags='$cppflags'
     ccversion='$ccversion', gccversion='$gccversion', gccosandvers='$gccosandvers'
-    intsize=$intsize, longsize=$longsize, ptrsize=$ptrsize, doublesize=$doublesize, byteorder=$byteorder
-    d_longlong=$d_longlong, longlongsize=$longlongsize, d_longdbl=$d_longdbl, longdblsize=$longdblsize
+    intsize=$intsize, longsize=$longsize, ptrsize=$ptrsize, doublesize=$doublesize, byteorder=$byteorder, doublekind=$doublekind
+    d_longlong=$d_longlong, longlongsize=$longlongsize, d_longdbl=$d_longdbl, longdblsize=$longdblsize, longdblkind=$longdblkind
     ivtype='$ivtype', ivsize=$ivsize, nvtype='$nvtype', nvsize=$nvsize, Off_t='$lseektype', lseeksize=$lseeksize
     alignbytes=$alignbytes, prototype=$prototype
   Linker and Libraries:

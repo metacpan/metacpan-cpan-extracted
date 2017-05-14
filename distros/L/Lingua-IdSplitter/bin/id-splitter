@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+# PODNAME: id-splitter
+# ABSTRACT: command line interface to Lingua::IdSplitter
+
+use warnings;
+use strict;
+
+use Lingua::IdSplitter;
+use Getopt::Long;
+
+my ($s, $h, $e, @ds);
+GetOptions(
+    "soft"         => \$s,
+    "hard"         => \$h,
+    "explain"      => \$e,
+    "dictionary=s" => \@ds,
+  );
+
+my $id = shift;
+
+unless ($id) {
+  print "Usage: conc-isplitter [-e] [-s] [-h] [-d <file>] <id>\n\nOptions:\n",
+    "  -s -- soft split\n",
+      "  -h -- hard split\n",
+        "  -e -- explain\n",
+          "  -d <file> -- include dictionaries\n";
+  exit;
+}
+
+my @default_ds = qw/abbreviations acronyms/;
+my $splitter = Lingua::IdSplitter->new(@ds, @default_ds);
+
+my @result;
+if ($h) {
+  @result = $splitter->hard_split($id);
+}
+elsif ($s) {
+  @result = $splitter->soft_split($id);
+}
+else {
+  @result = $splitter->split($id);
+}
+
+# pretty print result
+my @pp;
+foreach (@result) {
+  if ($_->{s} eq $_->{t}) {
+    push @pp, $_->{t};
+  }
+  else {
+    push @pp, "$_->{t}(<-$_->{s})";
+  }
+}
+my $str = join(',', @pp) . "\n";
+$str =~ s/\//,/g;  # FIXME -- dictionaries that use / as separator
+print $str;
+
+
+# print explain if requested
+if ($e) {
+  print $splitter->explain;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+id-splitter - command line interface to Lingua::IdSplitter
+
+=head1 VERSION
+
+version 0.03
+
+=head1 AUTHOR
+
+Nuno Carvalho <smash@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014-2015 by Project Natura <natura@natura.di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

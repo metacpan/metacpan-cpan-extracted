@@ -1,6 +1,6 @@
 use Test::More;
+use Modern::Perl '2010';
 use lib 'lib';
-use v5.10;
 
 BEGIN
 {

@@ -290,13 +290,8 @@ sub logconfig {
 
   my $changed = 0;
 
-  #these declarations silence complaints
-  $stanza ||= '';
-  my $mangle = _mangle_package($class) || '';
-  my $lcf = $logconfig{$class} || '';
-
   #initialize the logger, stanza doesn't exist for this package yet
-  if($stanza eq $mangle){
+  if($stanza eq _mangle_package($class)){
     $changed = 1;
     my $pack = $class;
     $pack =~ s/::/./g;
@@ -314,7 +309,7 @@ sub logconfig {
     $stanza = sprintf($logformat, $pack, @slots );
 
   #got a new  stanza, reinitialize the logger
-  } elsif(defined($stanza) and !ref($stanza) and $stanza ne $lcf){
+  } elsif(defined($stanza) and !ref($stanza) and $stanza ne $logconfig{$class}){
 
     $changed = 2;
   }

@@ -2,12 +2,12 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = ('../lib', 'lib');
+    $INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
-print "1..59\n";
+print "1..84\n";
 
-my $thisperl = quotemeta sprintf "v%vd", $^V;
 # Can't require test.pl, as we're testing the use/require mechanism here.
 
 my $test = 1;
@@ -22,6 +22,8 @@ sub _ok {
 	$result = $got ne $expected;
     } elsif ($type eq 'like') {
 	$result = $got =~ $expected;
+    } elsif ($type eq 'ok') {
+	$result = not not $got;
     } else {
 	die "Unexpected type '$type'$name";
     }
@@ -37,7 +39,7 @@ sub _ok {
 	} else {
 	    print "not ok $test\n";
 	}
-	my @caller = caller(2);
+	my @caller = caller(1);
 	print "# Failed test at $caller[1] line $caller[2]\n";
 	print "# Got      '$got'\n";
 	if ($type eq 'is') {
@@ -46,6 +48,8 @@ sub _ok {
 	    print "# Expected not '$expected'\n";
 	} elsif ($type eq 'like') {
 	    print "# Expected $expected\n";
+	} elsif ($type eq 'ok') {
+	    print "# Expected a true value\n";
 	}
     }
     $test = $test + 1;
@@ -61,6 +65,29 @@ sub is ($$;$) {
 sub isnt ($$;$) {
     _ok ('isnt', @_);
 }
+sub ok($;$) {
+    _ok ('ok', shift, undef, @_);
+}
+
+eval "use 5";           # implicit semicolon
+is ($@, '');
+
+eval "use 5;";
+is ($@, '');
+
+eval "{use 5}";         # [perl #70884]
+is ($@, '');
+
+eval "{use 5   }";      # [perl #70884]
+is ($@, '');
+
+# new style version numbers
+
+eval q{ use v5.5.630; };
+is ($@, '');
+
+eval q{ use 10.0.2; };
+like ($@, qr/^Perl v10\.0\.2 required/);
 
 eval "use 5.000";	# implicit semicolon
 is ($@, '');
@@ -69,13 +96,28 @@ eval "use 5.000;";
 is ($@, '');
 
 eval "use 6.000;";
-like ($@, qr/Perl v6\.0\.0 required \(did you mean v6\.000\?\)--this is only $thisperl, stopped/);
+like ($@, qr/Perl v6\.0\.0 required--this is only \Q$^V\E, stopped/);
 
 eval "no 6.000;";
 is ($@, '');
 
 eval "no 5.000;";
-like ($@, qr/Perls since v5\.0\.0 too modern--this is $thisperl, stopped/);
+like ($@, qr/Perls since v5\.0\.0 too modern--this is \Q$^V\E, stopped/);
+
+eval "use 5.6;";
+like ($@, qr/Perl v5\.600\.0 required \(did you mean v5\.6\.0\?\)--this is only \Q$^V\E, stopped/);
+
+eval "use 5.8;";
+like ($@, qr/Perl v5\.800\.0 required \(did you mean v5\.8\.0\?\)--this is only \Q$^V\E, stopped/);
+
+eval "use 5.9;";
+like ($@, qr/Perl v5\.900\.0 required \(did you mean v5\.9\.0\?\)--this is only \Q$^V\E, stopped/);
+
+eval "use 5.10;";
+like ($@, qr/Perl v5\.100\.0 required \(did you mean v5\.10\.0\?\)--this is only \Q$^V\E, stopped/);
+
+eval "use 5.11;";
+like ($@, qr/Perl v5\.110\.0 required \(did you mean v5\.11\.0\?\)--this is only \Q$^V\E, stopped/);
 
 eval sprintf "use %.6f;", $];
 is ($@, '');
@@ -85,105 +127,123 @@ eval sprintf "use %.6f;", $] - 0.000001;
 is ($@, '');
 
 eval sprintf("use %.6f;", $] + 1);
-like ($@, qr/Perl v6.\d+.\d+ required--this is only $thisperl, stopped/);
+like ($@, qr/Perl v6.\d+.\d+ required--this is only \Q$^V\E, stopped/);
 
 eval sprintf "use %.6f;", $] + 0.00001;
-like ($@, qr/Perl v5.\d+.\d+ required--this is only $thisperl, stopped/);
+like ($@, qr/Perl v5.\d+.\d+ required--this is only \Q$^V\E, stopped/);
 
-{ use lib }	# check that subparse saves pending tokens
+# check that "use 5.11.0" (and higher) loads strictures
+eval 'use 5.11.0; ${"foo"} = "bar";';
+like ($@, qr/Can't use string \("foo"\) as a SCALAR ref while "strict refs" in use/);
+# but that they can be disabled
+eval 'use 5.11.0; no strict "refs"; ${"foo"} = "bar";';
+is ($@, "");
+# and they are properly scoped
+eval '{use 5.11.0;} ${"foo"} = "bar";';
+is ($@, "");
+eval 'no strict; use 5.012; ${"foo"} = "bar"';
+is $@, "", 'explicit "no strict" overrides later ver decl';
+eval 'use strict; use 5.01; ${"foo"} = "bar"';
+like $@, qr/^Can't use string/,
+    'explicit use strict overrides later use 5.01';
+eval 'use strict "subs"; use 5.012; ${"foo"} = "bar"';
+like $@, qr/^Can't use string/,
+    'explicit use strict "subs" does not stop ver decl from enabling refs';
+eval 'use 5.012; use 5.01; ${"foo"} = "bar"';
+is $@, "", 'use 5.01 overrides implicit strict from prev ver decl';
+eval 'no strict "subs"; use 5.012; ${"foo"} = "bar"';
+ok $@, 'no strict subs allows ver decl to enable refs';
+eval 'no strict "subs"; use 5.012; $nonexistent_pack_var';
+ok $@, 'no strict subs allows ver decl to enable vars';
+eval 'no strict "refs"; use 5.012; fancy_bareword';
+ok $@, 'no strict refs allows ver decl to enable subs';
+eval 'no strict "refs"; use 5.012; $nonexistent_pack_var';
+ok $@, 'no strict refs allows ver decl to enable subs';
+eval 'no strict "vars"; use 5.012; ${"foo"} = "bar"';
+ok $@, 'no strict vars allows ver decl to enable refs';
+eval 'no strict "vars"; use 5.012; ursine_word';
+ok $@, 'no strict vars allows ver decl to enable subs';
 
-local $lib::VERSION = 1.0;
 
-eval "use lib 0.9";
+{ use test_use }	# check that subparse saves pending tokens
+
+use test_use { () };
+is ref $test_use::got[0], 'HASH', 'use parses arguments in term lexing cx';
+
+local $test_use::VERSION = 1.0;
+
+eval "use test_use 0.9";
 is ($@, '');
 
-eval "use lib 1.0";
+eval "use test_use 1.0";
 is ($@, '');
 
-eval "use lib 1.01";
+eval "use test_use 1.01";
 isnt ($@, '');
 
-
-eval "use lib 0.9 qw(fred)";
+eval "use test_use 0.9 qw(fred)";
 is ($@, '');
 
-if ($^O eq 'MacOS') {
-    is($INC[0], ":fred:");
-} else {
-    is($INC[0], "fred");
-}
+is("@test_use::got", "fred");
 
-eval "use lib 1.0 qw(joe)";
+eval "use test_use 1.0 qw(joe)";
 is ($@, '');
 
+is("@test_use::got", "joe");
 
-if ($^O eq 'MacOS') {
-    is($INC[0], ":joe:");
-} else {
-    is($INC[0], "joe");
-}
-
-
-eval "use lib 1.01 qw(freda)";
+eval "use test_use 1.01 qw(freda)";
 isnt($@, '');
 
-if ($^O eq 'MacOS') {
-    isnt($INC[0], ":freda:");
-} else {
-    isnt($INC[0], "freda");
-}
+is("@test_use::got", "joe");
 
 {
-    local $lib::VERSION = 35.36;
-    eval "use lib v33.55";
+    local $test_use::VERSION = 35.36;
+    eval "use test_use v33.55";
     is ($@, '');
 
-    eval "use lib v100.105";
-    like ($@,  qr/lib version 100\.105 required--this is only version 35\.3/);
+    eval "use test_use v100.105";
+    like ($@, qr/test_use version v100.105.0 required--this is only version v35\.360\.0/);
 
-    eval "use lib 33.55";
+    eval "use test_use 33.55";
     is ($@, '');
 
-    eval "use lib 100.105";
-    like ($@, qr/lib version 100\.105 required--this is only version 35\.3/);
+    eval "use test_use 100.105";
+    like ($@, qr/test_use version 100.105 required--this is only version 35.36/);
 
-    local $lib::VERSION = '35.36';
-    eval "use lib v33.55";
+    local $test_use::VERSION = '35.36';
+    eval "use test_use v33.55";
     like ($@, '');
 
-    eval "use lib v100.105";
-    like ($@, qr/lib version 100\.105 required--this is only version 35\.36/);
+    eval "use test_use v100.105";
+    like ($@, qr/test_use version v100.105.0 required--this is only version v35\.360\.0/);
 
-    eval "use lib 33.55";
+    eval "use test_use 33.55";
     is ($@, '');
 
-    eval "use lib 100.105";
-    like ($@, qr/lib version 100\.105 required--this is only version 35\.36/);
+    eval "use test_use 100.105";
+    like ($@, qr/test_use version 100.105 required--this is only version 35.36/);
 
-    local $lib::VERSION = v35.36;
-    eval "use lib v33.55";
+    local $test_use::VERSION = v35.36;
+    eval "use test_use v33.55";
     is ($@, '');
 
-    eval "use lib v100.105";
-    like ($@, qr/lib v100\.105 required--this is only v35\.36/);
+    eval "use test_use v100.105";
+    like ($@, qr/test_use version v100.105.0 required--this is only version v35\.36\.0/);
 
-    eval "use lib 33.55";
+    eval "use test_use 33.55";
     is ($@, '');
 
-    eval "use lib 100.105";
-    like ($@, qr/lib version 100\.105 required--this is only version 35\.036/);
+    eval "use test_use 100.105";
+    like ($@, qr/test_use version 100.105 required--this is only version v35.36/);
 }
 
 
 {
     # Regression test for patch 14937: 
     #   Check that a .pm file with no package or VERSION doesn't core.
-    open F, ">xxx$$.pm" or die "Cannot open xxx$$.pm: $!\n";
-    print F "1;\n";
-    close F;
-    eval "use lib '.'; use xxx$$ 3;";
-    like ($@, qr/^xxx$$ defines neither package nor VERSION--version check failed at/);
-    unlink "xxx$$.pm";
+    # (git commit 2658f4d9934aba5f8b23afcc078dc12b3a40223)
+    eval "use test_use_14937 3";
+    like ($@, qr/^test_use_14937 defines neither package nor VERSION--version check failed at/);
 }
 
 my @ver = split /\./, sprintf "%vd", $^V;
@@ -195,6 +255,11 @@ foreach my $index (-3..+3) {
 	    if ($index < 0) {
 		# Jiggle one of the parts down
 		--$parts[-$index - 1];
+		if ($parts[-$index - 1] < 0) {
+		    # perl's version number ends with '.0'
+		    $parts[-$index - 1] = 0;
+		    $parts[-$index - 2] -= 2;
+		}
 	    } else {
 		# Jiggle one of the parts up
 		++$parts[$index - 1];
@@ -212,7 +277,7 @@ foreach my $index (-3..+3) {
 	if ($index > 0) {
 	    # The future
 	    like ($@,
-		  qr/Perl $v_version required--this is only $thisperl, stopped/,
+		  qr/Perl $v_version required--this is only \Q$^V\E, stopped/,
 		  "use $version");
 	} else {
 	    # The present or past
@@ -223,7 +288,7 @@ foreach my $index (-3..+3) {
 	if ($index <= 0) {
 	    # The present or past
 	    like ($@,
-		  qr/Perls since $v_version too modern--this is $thisperl, stopped/,
+		  qr/Perls since $v_version too modern--this is \Q$^V\E, stopped/,
 		  "no $version");
 	} else {
 	    # future

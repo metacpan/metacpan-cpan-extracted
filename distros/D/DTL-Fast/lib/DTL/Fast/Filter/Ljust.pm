@@ -1,8 +1,10 @@
 package DTL::Fast::Filter::Ljust;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Filter::Center';
 
-$DTL::Fast::FILTER_HANDLERS{'ljust'} = __PACKAGE__;
+$DTL::Fast::FILTER_HANDLERS{ljust} = __PACKAGE__;
 
 #@Override
 sub adjust

@@ -4,10 +4,9 @@ package Command::Interactive;
 use strict;
 use warnings;
 
-our $VERSION = 1.4;
+our $VERSION = '1.21';
 
 use Moose;
-
 
 =head1 NAME
 
@@ -21,7 +20,7 @@ This module can be used to invoke both interactive and non-interactive commands 
     use Carp;
 
     # Simple, non-interactive usage
-    my $result1 = Command::Interactive->new->run("cp foo /tmp/");
+    my $result = Command::Interactive->new->run("cp foo /tmp/");
     croak "Could not copy foo to /tmp/: $result!" if($result);
 
     # Interactive usage supports output parsing
@@ -31,12 +30,13 @@ This module can be used to invoke both interactive and non-interactive commands 
         response        => 'secret',
     });
 
+    my $my_logging_fh;
     my $command = Command::Interactive->new({
         echo_output    => 1,
         output_stream  => $my_logging_fh,
         interactions   => [ $password_prompt ],
     });
-    my $restart_result = $command->run("ssh user@somehost 'service apachectl restart'");
+    my $restart_result = $command->run("ssh user\@somehost 'service apachectl restart'");
     if($restart_result)
     {
         warn "Couldn't restart server!";
@@ -265,13 +265,13 @@ sub _run_via_expect {
 
             if ($occurrences->[$match_position] > $i->max_allowed_occurrences) {
                 $result =
-                    "Got string '$matched_string', which matched expected $type '"
-                  . $i->expected_string
-                  . "'. This was occurrence #"
-                  . $occurrences->[$match_position]
-                  . ", which exceeds the specified limit of "
-                  . $i->max_allowed_occurrences
-                  . " occurrence(s) set for this $type";
+                      "Got string '$matched_string', which matched expected $type '"
+                    . $i->expected_string
+                    . "'. This was occurrence #"
+                    . $occurrences->[$match_position]
+                    . ", which exceeds the specified limit of "
+                    . $i->max_allowed_occurrences
+                    . " occurrence(s) set for this $type";
                 last EXPECT_READ;
             }
             if ($i->response) {
@@ -329,7 +329,6 @@ sub _generate_interaction_list {
     my $expect_array         = [];
     my $indexed_interactions = [];
 
-    my $counter;
     foreach my $i (@{$self->interactions}) {
         push @$expect_array, '-re' if ($i->expected_string_is_regex);
         push @$expect_array, $i->expected_string;
@@ -370,16 +369,14 @@ sub _log {
     my $self    = shift;
     my $message = shift;
 
-    my $result;
-
     if ($self->debug_logfile) {
         my $f = IO::File->new(">>" . $self->debug_logfile);
         croak("Could not open debugging log file " . $self->debug_logfile) unless ($f);
-        my $result = $f->print(map { POSIX::strftime("[%Y-%m-%dT%H:%M:%SZ] $_\n", gmtime) } split(/[\r\n]/, $message));
+        $f->print(map { POSIX::strftime("[%Y-%m-%dT%H:%M:%SZ] $_\n", gmtime) } split(/[\r\n]/, $message));
         $f->close;
     }
 
-    return $result;
+    return;
 }
 
 no Moose;

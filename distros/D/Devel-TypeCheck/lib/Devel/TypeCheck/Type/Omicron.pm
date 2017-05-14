@@ -296,8 +296,12 @@ sub append {
 
     $that = $env->find($that);
 
+    if ($that->isa("Devel::TypeCheck::Type::Var")) {
+	$that = $env->unify($that, $env->genOmicron());
+    }
+
     if ($that->is(Devel::TypeCheck::Type::VAR())) {
-	$that = $env->unify($that, $env->freshKappa);
+	$that = $env->unify($that, $env->freshKappa());
 	return undef if (!defined($that));
     }
 

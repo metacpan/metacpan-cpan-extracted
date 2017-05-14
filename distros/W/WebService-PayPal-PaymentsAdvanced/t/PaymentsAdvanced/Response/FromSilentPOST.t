@@ -9,6 +9,7 @@ use Test::Fatal;
 use lib 't/lib';
 use Util;
 
+## no critic (RequireExplicitInclusion)
 my $ppa = Util::mocked_ppa;
 
 # What happens if the params contain only garbage?

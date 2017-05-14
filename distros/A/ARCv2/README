@@ -1,0 +1,34 @@
+ARCv2 (see Arc.pm for current version)
+=====
+
+INSTALLATION
+
+To install this module type the following:
+
+IMPORTANT: Due the automatic generation of the pod-files, first of all
+you have to run:
+   make -C docs
+
+This is a workaround until I'll have a better idea.
+
+Then to install
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+It is possible to add default value argumenting it to perl Makefile.PL:
+
+e.g.
+
+perl Makefile.PL --ConfigPath=/etc/arcx --DefaultPort=4242 --DefaultHost=arcdserv
+
+Maybe this makes rpm & deb handling easier.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-5 Patrick Boettcher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

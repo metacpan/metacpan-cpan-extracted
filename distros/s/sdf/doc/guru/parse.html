@@ -1,0 +1,195 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: parse.pl - Simple Document Format Library</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="misc.html">Previous Topic</A> | <A HREF="table.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="parse.pl">2.6. parse.pl - Simple Document Format Library</A></H1>
+<HR>
+<H2><A NAME="Purpose">2.6.1. Purpose</A></H2>
+<P>This library provides support for handling <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> files.</P>
+<HR>
+<H2><A NAME="Interface">2.6.2. Interface</A></H2>
+<PRE>
+require &quot;parse.pl&quot;;
+
+%<A HREF="#parse_SDF_IMAGE_EXTS">SDF_IMAGE_EXTS</A> = ...
+
+%<A HREF="#parse_sdf_driver">sdf_driver</A> = ...
+
+%<A HREF="#parse_sdf_report">sdf_report</A> = ...
+
+%<A HREF="#parse_sdf_pagesize">sdf_pagesize</A> = ...
+
+$<A HREF="#parse_sdf_subtopic_cnt">sdf_subtopic_cnt</A> = ...
+
+$<A HREF="#parse_sdf_fmext">sdf_fmext</A> = ...
+
+@<A HREF="#parse_sdf_include_path">sdf_include_path</A> = ...
+
+@<A HREF="#parse_sdf_library_path">sdf_library_path</A> = ...
+
+$<A HREF="#parse_sdf_lib">sdf_lib</A> = ...
+
+@<A HREF="#parse_sdf_if_start">sdf_if_start</A> = ...
+
+@<A HREF="#parse_sdf_if_now">sdf_if_now</A> = ...
+
+@<A HREF="#parse_sdf_if_yet">sdf_if_yet</A> = ...
+
+@<A HREF="#parse_sdf_if_else">sdf_if_else</A> = ...
+
+$<A HREF="#parse_sdf_block_start">sdf_block_start</A> = ...
+
+$<A HREF="#parse_sdf_block_type">sdf_block_type</A> = ...
+
+@<A HREF="#parse_sdf_block_text">sdf_block_text</A> = ...
+
+%<A HREF="#parse_sdf_block_param">sdf_block_param</A> = ...
+
+@<A HREF="#parse_sdf_tbl_start">sdf_tbl_start</A> = ...
+
+@<A HREF="#parse_sdf_tbl_state">sdf_tbl_state</A> = ...
+
+@<A HREF="#parse_sdf_end">sdf_end</A> = ...
+
+$<A HREF="#parse_sdf_cutting">sdf_cutting</A> = ...
+
+$<A HREF="#parse_sdf_sections">sdf_sections</A> = ...
+
+@<A HREF="#parse_sdf_book_files">sdf_book_files</A> = ...
+
+@<A HREF="#parse_sdf_report_names">sdf_report_names</A> = ...
+
+&amp;<A HREF="#parse_SdfLoadDrivers">SdfLoadDrivers</A>(@table);
+
+&amp;<A HREF="#parse_SdfLoadPageSizes">SdfLoadPageSizes</A>(@table);
+
+($success, @records) =
+&amp;<A HREF="#parse_SdfFetch">SdfFetch</A>($file);
+
+@records =
+&amp;<A HREF="#parse_SdfParse">SdfParse</A>(@sdf_strs);
+
+@result =
+&amp;<A HREF="#parse_SdfConvert">SdfConvert</A>(*p_sdf, $target, *uses, %convert_var);
+
+&amp;<A HREF="#parse_SdfInit">SdfInit</A>(*var);
+
+($text, $style, %attr) =
+&amp;<A HREF="#parse_SdfNextPara">SdfNextPara</A>(*sdf);
+
+($text, %attr) =
+&amp;<A HREF="#parse_SdfParseCell">SdfParseCell</A>($cell);
+
+($sect_type, $text, $style, %attr) =
+&amp;<A HREF="#parse_SdfNextSection">SdfNextSection</A>(*para, *state);
+
+$pts =
+&amp;<A HREF="#parse_SdfPoints">SdfPoints</A>($measure);
+
+$pts =
+&amp;<A HREF="#parse_SdfVarPoints">SdfVarPoints</A>($name);
+
+$info =
+&amp;<A HREF="#parse_SdfPageInfo">SdfPageInfo</A>($page, $attr, $category);
+
+$sdf =
+&amp;<A HREF="#parse_SdfJoin">SdfJoin</A>($style, $text, %attr);
+
+%attrs =
+&amp;<A HREF="#parse_SdfAttrSplit">SdfAttrSplit</A>($attrs);
+
+$attrtext =
+&amp;<A HREF="#parse_SdfAttrJoin">SdfAttrJoin</A>(*attr, $sep);
+
+$attrtext =
+&amp;<A HREF="#parse_SdfAttrJoinSorted">SdfAttrJoinSorted</A>(*attr, $sep);
+
+&amp;<A HREF="#parse_SdfAttrClean">SdfAttrClean</A>(*attr);
+
+&amp;<A HREF="#parse_SdfAttrMap">SdfAttrMap</A>(*attr, $target, *map_to, *map_map, *map_attrs, $defaults);
+
+($width, $height) =
+&amp;<A HREF="#parse_SdfSizeGraphic">SdfSizeGraphic</A>($file);
+
+@result =
+&amp;<A HREF="#parse_SdfColPositions">SdfColPositions</A>($columns, $format, $margin);
+
+$prefix =
+&amp;<A HREF="#parse_SdfHeadingPrefix">SdfHeadingPrefix</A>($type, $level);
+
+$exit_code =
+&amp;<A HREF="#parse_SdfSystem">SdfSystem</A>($cmd);
+
+&amp;<A HREF="#parse_SdfBatch">SdfBatch</A>($flags);
+
+&amp;<A HREF="#parse_SdfDelete">SdfDelete</A>($file);
+
+&amp;<A HREF="#parse_SdfBookClean">SdfBookClean</A>($ext);
+
+&amp;<A HREF="#parse_SdfRenamePS">SdfRenamePS</A>($xx);
+
+</PRE>
+<HR>
+<H2><A NAME="Description">2.6.3. Description</A></H2>
+<P>The following symbols are occasionally accessed from other modules but aren't really for public consumption:</P>
+<P><STRONG><A NAME="parse_SDF_IMAGE_EXTS">SDF_IMAGE_EXTS</A></STRONG>, <STRONG><A NAME="parse_sdf_if_start">sdf_if_start</A></STRONG>, <STRONG><A NAME="parse_sdf_if_now">sdf_if_now</A></STRONG>, <STRONG><A NAME="parse_sdf_if_yet">sdf_if_yet</A></STRONG>, <STRONG><A NAME="parse_sdf_if_else">sdf_if_else</A></STRONG>, <STRONG><A NAME="parse_sdf_block_start">sdf_block_start</A></STRONG>, <STRONG><A NAME="parse_sdf_block_type">sdf_block_type</A></STRONG>, <STRONG><A NAME="parse_sdf_block_text">sdf_block_text</A></STRONG>, <STRONG><A NAME="parse_sdf_block_param">sdf_block_param</A></STRONG>, <STRONG><A NAME="parse_sdf_tbl_start">sdf_tbl_start</A></STRONG>, <STRONG><A NAME="parse_sdf_tbl_state">sdf_tbl_state</A></STRONG>, <STRONG><A NAME="parse_sdf_end">sdf_end</A></STRONG>, <STRONG><A NAME="parse_sdf_cutting">sdf_cutting</A></STRONG>, <STRONG><A NAME="parse_sdf_sections">sdf_sections</A></STRONG>, <STRONG><A NAME="parse_sdf_book_files">sdf_book_files</A></STRONG>, <STRONG><A NAME="parse_sdf_report_names">sdf_report_names</A></STRONG>, <STRONG><A NAME="parse_SdfSystem">SdfSystem</A></STRONG>, <STRONG><A NAME="parse_SdfBatch">SdfBatch</A></STRONG>, <STRONG><A NAME="parse_SdfDelete">SdfDelete</A></STRONG>, <STRONG><A NAME="parse_SdfBookClean">SdfBookClean</A></STRONG>, <STRONG><A NAME="parse_SdfRenamePS">SdfRenamePS</A></STRONG>.</P>
+<P><STRONG><A NAME="parse_sdf_driver">sdf_driver</A></STRONG> is a lookup table of valid format drivers. This table is build by <STRONG><A NAME="parse_SdfLoadDrivers">SdfLoadDrivers</A></STRONG>.</P>
+<P><STRONG><A NAME="parse_sdf_report">sdf_report</A></STRONG> is a lookup table of valid reports. This table is build by <STRONG><A NAME="parse_SdfLoadReports">SdfLoadReports</A></STRONG>.</P>
+<P><STRONG><A NAME="parse_sdf_pagesize">sdf_pagesize</A></STRONG> is a lookup table of valid page sizes. This table is build by <STRONG><A NAME="parse_SdfLoadPageSizes">SdfLoadPageSizes</A></STRONG>.</P>
+<P><STRONG><A NAME="parse_sdf_subtopic_cnt">sdf_subtopic_cnt</A></STRONG> is the counter of subtopics left during topics mode processing.</P>
+<P><STRONG><A NAME="parse_sdf_fmext">sdf_fmext</A></STRONG> is the extension of FrameMaker template files. Typically values are 'fm5' and 'fm4'.</P>
+<P><STRONG><A NAME="parse_sdf_include_path">sdf_include_path</A></STRONG> contains the list of directories searched for to find files specified in <EM>include</EM> macros. <STRONG><A NAME="parse_sdf_library_path">sdf_library_path</A></STRONG> contains the list of directories searched for to find libraries and modules. In both cases, the current directory and the document's directory are searched before these directories and <STRONG><A NAME="parse_sdf_lib">sdf_lib</A></STRONG> is searched last of all.</P>
+<P><STRONG><A NAME="parse_SdfLoadDrivers">SdfLoadDrivers</A></STRONG> loads a configuration table of drivers. The columns are:</P>
+<UL>
+<LI><EM>Name</EM> - the driver name
+<LI><EM>Library</EM> - the library containing the subroutine
+<LI><EM>Subroutine</EM> - the subroutine name.</UL>
+<P>Call this routine before calling <STRONG><A NAME="parse_SdfConvert">SdfConvert</A></STRONG>.</P>
+<P><STRONG><A NAME="parse_SdfLoadPageSizes">SdfLoadPageSizes</A></STRONG> loads a configuration table of page sizes.</P>
+<P><STRONG><A NAME="parse_SdfFetch">SdfFetch</A></STRONG> inputs an <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> file, ready for <STRONG><A NAME="parse_SdfConvert">SdfConvert</A></STRONG> (i.e. ready conversion to another format). It returns 1 if the file is opened successfully.</P>
+<P><STRONG><A NAME="parse_SdfParse">SdfParse</A></STRONG> prepares an array of SDF strings for <STRONG><A NAME="parse_SdfConvert">SdfConvert</A></STRONG> (i.e. for conversion to another format).</P>
+<P><STRONG><A NAME="parse_SdfConvert">SdfConvert</A></STRONG> converts a list of sdf records to a list of target format paragraphs. The input records to this routine are usually read in by <STRONG><A NAME="parse_SdfFetch">SdfFetch</A></STRONG>. The output records are typically output to a file, separated by newlines. <EM>%convert_var</EM> is the initial set of variables.</P>
+<P><STRONG><A NAME="parse_SdfInit">SdfInit</A></STRONG> initialises global data used during the conversion process.</P>
+<P><STRONG><A NAME="parse_SdfNextPara">SdfNextPara</A></STRONG> gets the next paragraph from an SDF buffer. Format drivers use this routine to process buffers. <EM>@sdf</EM> is the buffer which is updated ready for another call to this routine.</P>
+<P><STRONG><A NAME="parse_SdfParseCell">SdfParseCell</A></STRONG> parses an SDF cell into its components.</P>
+<P><STRONG><A NAME="parse_SdfNextSection">SdfNextSection</A></STRONG> gets the next section of a paragraph. Format drivers use this routine to process paragraphs. <EM>$para</EM> is the paragraph text which is updated ready for another call to this routine. <EM>$state</EM> is a state variable which this routines uses to help it keep state. <EM>sect_type</EM> is one of:</P>
+<UL>
+<LI><EM>string</EM> - a string normal paragraph text
+<LI><EM>phrase</EM> - a phrase
+<LI><EM>phrase_end</EM> - end of a phrase
+<LI><EM>special</EM> - a special phrase (e.g. CHAR, IMPORT, etc.)
+<LI>an empty string - end of paragraph</UL>
+<P>For a string, <EM>text</EM> is the string, <EM>style</EM> and <EM>attr</EM> are empty. At the end of a phrase, <EM>text</EM>, <EM>style</EM> and <EM>attr</EM> are empty.</P>
+<P><STRONG><A NAME="parse_SdfPoints">SdfPoints</A></STRONG> converts a measurement to points. This is required for calculations involving measurements.</P>
+<P><STRONG><A NAME="parse_SdfVarPoints">SdfVarPoints</A></STRONG> converts an variable to points.</P>
+<P><STRONG><A NAME="parse_SdfPageInfo">SdfPageInfo</A></STRONG> returns information about a page.</P>
+<P><STRONG><A NAME="parse_SdfJoin">SdfJoin</A></STRONG> formats a style, text and attributes into a paragraph.</P>
+<P><STRONG><A NAME="parse_SdfAttrSplit">SdfAttrSplit</A></STRONG> parses a string of attributes into a set of name-value pairs.</P>
+<P><STRONG><A NAME="parse_SdfAttrJoin">SdfAttrJoin</A></STRONG> formats a set of name-value pairs (%attr) into a string. <EM>sep</EM> is the separator to use between attributes. The default separator is semi-colon.</P>
+<P><STRONG><A NAME="parse_SdfAttrJoinSorted">SdfAttrJoinSorted</A></STRONG> formats a set of name-value pairs (%attr) into a string where the attributes are sorted by name. <EM>sep</EM> is the separator to use between attributes. The default separator is semi-colon.</P>
+<P><STRONG><A NAME="parse_SdfAttrClean">SdfAttrClean</A></STRONG> removes target-specific attributes (for other targets) from a set of attributes. However, if the driver is 'raw', all attributes are kept.</P>
+<P><STRONG><A NAME="parse_SdfAttrMap">SdfAttrMap</A></STRONG> maps a set of attributes using the configuration tables <EM>%map_to</EM>, <EM>%map_map</EM> and <EM>%map_attrs</EM>. <EM>$defaults</EM> is a string of default attributes. This routine is used by format drivers to merge user-supplied attributes with those in 'attribute' and 'style' configuration tables.</P>
+<P><STRONG><A NAME="parse_SdfSizeGraphic">SdfSizeGraphic</A></STRONG> returns the <EM>width</EM> and <EM>height</EM> of a graphic stored in <EM>file</EM>. Zero is returned for both values if the size could not be extracted. File types currently supported are EPSI, PICT, GIF and PCX.</P>
+<P><STRONG><A NAME="parse_SdfColPositions">SdfColPositions</A></STRONG> returns a list of column positions given a total number of columns, a format attribute and a right margin.</P>
+<P><STRONG><A NAME="parse_SdfHeadingPrefix">SdfHeadingPrefix</A></STRONG> returns the prefix for the next heading. <EM>type</EM> is H, A or P and <EM>level</EM> is the heading level.</P>
+<HR>
+<H2><A NAME="Limitations and future directions">2.6.4. Limitations and future directions</A></H2>
+<P>Append/Prepend is not implemented for macros - is it needed for them?</P>
+<P><STRONG>SdfBookConvert</STRONG> currently generates (Unix) shell scripts. It should be generalised to support other operating systems?</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="misc.html">Previous Topic</A> | <A HREF="table.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,20 @@
+# to get upated wsdl
+wget http://outlook.office365.com/EWS/Services.wsdl --user "you@yourdomain" --password 'ur_s3krit'
+wget http://outlook.office365.com/EWS/Messages.xsd  --user "you@yourdomain" --password 'ur_s3krit'
+wget http://outlook.office365.com/EWS/Types.xsd     --user "youyour@domain" --password 'ur_s3krit'
+
+# get version (e.g. Exchange2013_SP1) from:
+grep version= Messages.xsd | perl -pe 's/.*"(.*?)".*/$1/'
+
+# rename files
+mv Services.wsdl $VERSION-ews-services.wsdl
+mv Messages.xsd  $VERSION-ews-messages.xsd
+mv Types.xsd     $VERSION-ews-types.xsd
+
+# specify version in constructor
+my $ews = Office365::EWS::Client->new({
+    server         => 'outlook.office365.com',
+    username       => 'you@yourdomain',
+    password       => 'ur_s3krit',
+    server_version => 'Exchange2013_SP1',
+})

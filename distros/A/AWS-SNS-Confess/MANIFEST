@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.markdown
+dist.ini
+lib/AWS/SNS/Confess.pm
+lib/AWS/SNS/Confess.pm~
+t/basic.t
+t/basic.t~
+t/integration.t
+t/integration.t~

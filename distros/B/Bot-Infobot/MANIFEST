@@ -1,0 +1,14 @@
+bin/infobot
+bin/infobot-import
+lib/Bot/Infobot.pod
+lib/Bot/Infobot/Config.pm
+lib/Bot/Infobot/Importer/DBM.pm
+lib/Bot/Infobot/Importer/DBI.pm
+lib/Bot/Infobot/Importer/Factpack.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Build.PL
+Makefile.PL
+test.pl
+Changes

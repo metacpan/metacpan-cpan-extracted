@@ -6,7 +6,7 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(Rtttl2Midi); 
-$VERSION = 0.1;
+$VERSION = "0.161";
 
 $rtl_name  = "";
 %rtl_props = ();

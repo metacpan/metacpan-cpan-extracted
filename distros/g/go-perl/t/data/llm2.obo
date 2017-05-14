@@ -1,0 +1,93 @@
+format-version: 1.2
+date: 23:09:2005 14:37
+saved-by: cjm
+auto-generated-by: Obol
+default-namespace: gene_ontology
+remark: cdefs for GO
+id-mapping: has_participant OBO_REL:has_participant
+id-mapping: located_in OBO_REL:located_in
+id-mapping: develops_from OBO_REL:derives_from
+id-mapping: sensu OBOL:sensu
+id-mapping: has_quality OBOL:has_quality
+id-mapping: during OBOL:during
+id-mapping: directly_involves_anatomical OBOL:directly_involves_anatomical
+
+[Term]
+id: GO:0008150
+name: biological_process
+namespace: biological_process
+def: "A phenomenon marked by changes that lead to a particular result, mediated by one or more gene products." []
+
+[Term]
+id: GO:0050896
+name: response to stimulus
+namespace: biological_process
+def: "A change in state or activity of a cell or an organism (in terms of movement, secretion, enzyme production, gene expression, etc.) as a result of a stimulus." []
+is_a: GO:0008150     ! biological_process
+
+[Term]
+id: GO:0007610
+name: behavior
+namespace: biological_process
+def: "The specific actions or reactions of an organism in response to external or internal stimuli. Patterned activity of a whole organism in a manner dependent upon some combination of that organism's internal state and external conditions." []
+synonym: "behavioral response to stimulus" [] exact
+synonym: "behaviour" [] exact
+synonym: "behavioural response to stimulus" [] exact
+is_a: GO:0050896     ! response to stimulus
+
+[Term]
+id: GO:0007626
+name: locomotory behavior
+namespace: biological_process
+def: "The specific movement from place to place of an organism in response to external or internal stimuli. Locomotion of a whole organism in a manner dependent upon some combination of that organism's internal state and external conditions." []
+synonym: "locomotion in response to stimulus" [] exact
+synonym: "locomotory behavioral response to stimulus" [] exact
+synonym: "locomotory behaviour" [] exact
+synonym: "locomotory behavioural response to stimulus" [] exact
+is_a: GO:0007610     ! behavior
+
+[Term]
+id: GO:0008345
+name: larval locomotory behavior
+namespace: biological_process
+is_a: GO:0007626     ! locomotory behavior
+is_a: GO:0030537     ! larval behavior
+intersection_of: GO:0007626 {namespace=foo}
+intersection_of: during FBdv:00005336 {namespace=foo}
+
+[Term]
+id: GO:0030537
+name: larval behavior
+namespace: biological_process
+def: "Behavior in a larval form of an organism, an immature organism that must undergo metamorphosis to assume adult characteristics." []
+synonym: "larval behaviour" [] exact
+synonym: "larval behavior (sensu Drosophila)" [] narrow
+synonym: "larval behavior (sensu Insecta)" [] narrow
+is_a: GO:0007610     ! behavior
+comment: See also the biological process term 'behavior ; GO:0007610'.
+intersection_of: GO:0007610             {namespace=foo}
+intersection_of: during FBdv:00005336   {namespace=foo}
+
+[Typedef]
+id: part_of
+name: part_of
+xref: OBO_REL:part_of
+
+[Typedef]
+id: bzz
+name: bzz
+
+[Typedef]
+id: foo
+name: foo
+namespace: gene_ontology
+xref: OBO_REL:foo
+
+[Typedef]
+id: X:Y
+name: XY
+
+[Typedef]
+id: Y:Z
+name: YZ
+namespace: yz

@@ -73,11 +73,11 @@ sub post_to_mt {
 
 __END__
 
-=head1
+=head1 NAME
 
 Plagger::Plugin::Publish::MT - Post feeds to Movable Type
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
   - module: Publish::MT
     config:
@@ -109,7 +109,7 @@ Your blog's ID number.
 
 =head2 title
 
-You can specifiy the title of new entry which will be defaults to
+You can specify the title of new entry which will be defaults to
 title of the feed.
 
 =head1 AUTHOR

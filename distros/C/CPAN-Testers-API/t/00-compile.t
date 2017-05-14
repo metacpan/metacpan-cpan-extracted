@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CPAN/Testers/API.pm',
     'CPAN/Testers/API/Base.pm',
     'CPAN/Testers/API/Controller/Release.pm',
+    'CPAN/Testers/API/Controller/Report.pm',
     'CPAN/Testers/API/Controller/Upload.pm'
 );
 

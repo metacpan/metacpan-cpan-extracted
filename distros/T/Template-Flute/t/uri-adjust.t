@@ -33,37 +33,19 @@ my @tests = (
     {html => q{<html><body><a href="{{link.url}}" class="">{{link.name}}</a></body></html>},
      spec => q{<specification></specification>},
      uri => URI->new('/t/', 'http'),
-     match => qr{<a class="" href="/t/\{\{link.url\}\}">\{\{link.name\}\}</a>},
+     match => qr{<a class="" href="/t/{{link.url}}">{{link.name}}</a>},
     },
     # link elements without href attributes
     {html => q{<html><body><a class="">{{link.name}}</a></body></html>},
      spec => q{<specification></specification>},
      uri => URI->new('/t/', 'http'),
-     match => qr{<a class="">\{\{link.name\}\}</a>},
+     match => qr{<a class="">{{link.name}}</a>},
     },
     # stylesheets
     {html => q{<html><head><link href="/css/main.css" rel="stylesheet"></head></html>},
      spec => q{<specification></specification>},
      uri => URI->new('/t/', 'http'),
      match => qr{link href="/t/css/main.css"},
-    },
-    {
-     html => q{<html><body><form action="/post">Log in</form></body></html>},
-     spec => q{<specification></specification>},
-     uri => URI->new("https://test.org:5000/mount/"),
-     match => qr{<form action="https://test.org:5000/mount/post">Log in</form>},
-    },
-    {
-     html => q{<html><body><form action="https://test.org:3000/post">Log in</form></body></html>},
-     spec => q{<specification></specification>},
-     uri => URI->new("https://test.org:5000/mount/"),
-     match => qr{<form action="https://test.org:3000/post">Log in</form>},
-    },
-    {
-     html => q{<html><body><a href="mailto:racke@linuxia.de">Mail</a></body></html>},
-     spec => q{<specification></specification>},
-     uri => URI->new("https://test.org:5000/mount/"),
-     match => qr{<a href="mailto:racke\@linuxia.de">},
     },
 );
 
@@ -78,6 +60,8 @@ for my $t (@tests) {
     #isa_ok($tf, 'Template::Flute');
     
     my $out = $tf->process;
-    like $out, $t->{match};
+    
+    ok ($out =~ /$t->{match}/)
+        || diag "Out: $out.";
 }
 

@@ -8,7 +8,7 @@ use Time::HiRes;
 use base 'Forks::Queue';
 use 5.010;    #  using  // //=  operators
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -141,6 +141,12 @@ sub new {
             carp "Forks::Queue::new: 'list' option must be an array ref";
         }
     }
+
+    if ($opts{remote}) {
+        require Net::Objwrap;
+        Net::Objwrap::wrap($opts{remote},$self);
+    }
+    
     return $self;
 }
 
@@ -183,11 +189,19 @@ sub DESTROY {
 sub _read_header {
     my ($self) = @_;
     Carp::cluck "unsafe _read_header" unless $self->{_locked};
-    seek $self->{_fh}, 0, 0;
     local $/ = EOL;
-    chomp(my $h = readline($self->{_fh}));
+    my $h = "";
+    if ($self->{_DESTROY}) {
+        no warnings 'closed';
+        seek $self->{_fh}, 0, 0;
+        $h = readline($self->{_fh}) // "";
+        chomp($h);
+    } else {
+        seek $self->{_fh}, 0, 0;
+        chomp($h = readline($self->{_fh}));
+    }
     if (!$h && $self->{_DESTROY}) {
-        print STDERR "_read_header aborted: in DESTROY $$\n";
+#       print STDERR "_read_header aborted: in DESTROY $$\n";
         return;
     }
 #    return if !$h && $self->{_DESTROY};
@@ -226,9 +240,12 @@ sub _write_header {
         $headerstr = jsonize($header);
     }
 
-    seek $self->{_fh}, 0, 0;
-    print {$self->{_fh}} $headerstr,EOL;
-    $DEBUG && print STDERR "$$ updated header $headerstr\n";
+    eval {
+        no warnings;
+        seek $self->{_fh}, 0, 0;
+        print {$self->{_fh}} $headerstr,EOL;
+        $DEBUG && print STDERR "$$ updated header $headerstr\n";
+    };
 }
 
 sub _notify {
@@ -456,7 +473,7 @@ sub _SLEEP {
     my $self = shift;
     # my $tid = threads->self;
     my $n = sleep($Forks::Queue::SLEEP_INTERVAL || 1);
-    Carp::cluck("LONG SLEEP \$n=$n") if $n > 10;
+    #Carp::cluck("LONG SLEEP \$n=$n") if $n > 10;
     return $n;
 }
 
@@ -998,10 +1015,11 @@ sub limit :lvalue {
 }
 
 sub _DUMP {
-    my $self = CORE::shift;
-    open my $fhdump, '<', $self->{file};
-    print STDERR <$fhdump>;
-    close $fhdump;
+    my ($self,$fh_dump) = @_;
+    $fh_dump ||= *STDERR;
+    open my $fh_qdata, '<', $self->{file};
+    print {$fh_dump} <$fh_qdata>;
+    close $fh_qdata;
 }
 
 sub __is_nfs {
@@ -1059,7 +1077,7 @@ Forks::Queue::File - file-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.06
+0.08
 
 =head1 SYNOPSIS
 

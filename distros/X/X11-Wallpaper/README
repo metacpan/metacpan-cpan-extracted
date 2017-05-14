@@ -1,0 +1,61 @@
+NAME
+    X11::Wallpaper - set X11 wallpaper using best available helper program
+
+VERSION
+    version 1.1
+
+SYNOPSIS
+      use X11::Wallpaper qw(set_wallpaper);
+      set_wallpaper( "./foo.jpg", {
+        mode => 'full',   # default, or: aspect, center, tile
+        setter => 'feh',  # override setter
+        display => ':0.0' # override X display
+      } );
+
+      my @cmd = set_wallaper_command(...); # just give me the command
+
+DESCRIPTION
+    This module provides an interface for setting the background on X11
+    systems, by recruiting a suitable helper script (feh, Esetroot,
+    hsetroot, chbg, xli etc.) and providing appropriate options.
+
+METHODS
+  set_wallpaper($image_path, %args)
+    Sets $image_path as the desktop wallpaper. The following args are
+    supported:
+
+    mode
+        May be 'full' (fullscreen, stretched to fit - the default), 'tile',
+        'center' (do not stretch) or 'aspect' (fullscreen, preserving aspect
+        ratio). For the latter two options, the background for any borders
+        around the image is set to black.
+
+    setter
+        Manually specify the program to use, e.g. 'qiv', provided it is in
+        this module's dictionary of commands.
+
+    display
+        Override the X display to use, e.g. ':0.0'. Otherwise defaults to
+        the value of the DISPLAY environment variable.
+
+  @cmd = set_wallpaper_command($image_path, %args)
+    As with "set_wallpaper", except returns the command (as a list of
+    arguments) instead of executing it.
+
+CREDITS
+    Inspired by the "awsetbg" shell script by Julian Danjou, which in turn
+    is derived from "fbsetbg" by Han Boetes.
+
+TODO
+    Skip the middle man and code against the X11 libraries directly. But
+    that wouldn't be quite as portable...
+
+AUTHOR
+    Richard Harris <RJH@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Richard Harris.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

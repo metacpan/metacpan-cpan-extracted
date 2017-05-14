@@ -7,8 +7,6 @@ Name: buildroot
 Version: 1
 Release: 1
 License: x
-Group: x
-Url: x
 
 %description
 x
@@ -16,7 +14,6 @@ x
 %package sub
 
 Summary: x
-Group: x
 Version: 2
 Release: 2
 

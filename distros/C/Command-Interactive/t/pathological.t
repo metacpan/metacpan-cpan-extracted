@@ -18,10 +18,15 @@ throws_ok(
 );
 
 my $cmd = Command::Interactive->new({
-        interactions      => [Command::Interactive::Interaction->new({expected_string => 'You win!',}),],
+        interactions => [
+            Command::Interactive::Interaction->new({
+                    expected_string => 'You win!',
+                }
+            ),
+        ],
         always_use_expect => 1,
         timeout           => 1
-});
+    });
 is($cmd->run("sleep 100"), "Got TIMEOUT from Expect (timeout=1 seconds)", "Capture timeout");
 
 1;

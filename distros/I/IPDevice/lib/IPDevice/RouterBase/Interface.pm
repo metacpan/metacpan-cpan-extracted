@@ -4,12 +4,12 @@
 ## interface.
 ####
 
-package RouterBase::Interface;
-use RouterBase::Atom;
-use RouterBase::LogicalInterface;
+package IPDevice::RouterBase::Interface;
+use IPDevice::RouterBase::Atom;
+use IPDevice::RouterBase::LogicalInterface;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom RouterBase::LogicalInterface);
+@ISA = qw(IPDevice::RouterBase::Atom IPDevice::RouterBase::LogicalInterface);
 
 $VERSION = 0.01;
 
@@ -19,12 +19,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::Interface
+IPDevice::RouterBase::Interface
 
 =head1 SYNOPSIS
 
- use RouterBase::Interface;
- my $interface = new RouterBase::Interface(name => '0/1/2');
+ use IPDevice::RouterBase::Interface;
+ my $interface = new IPDevice::RouterBase::Interface(name => '0/1/2');
  $interface->set_ip('192.168.0.1', '255.255.255.252');
  $interface->set_encapsulation('ppp');
  
@@ -34,7 +34,7 @@ RouterBase::Interface
 
 This module provides routines for storing informations regarding an IP router
 interface. If you have a logical interface, use the
-L<RouterBase::LogicalInterface|RouterBase::LogicalInterface> implementation
+L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface> implementation
 instead.
 
 =head1 CONSTRUCTOR AND METHODS
@@ -161,14 +161,14 @@ sub get_crc {
 
 =head2 unit()
 
-Returns the L<RouterBase::LogicalInterface|RouterBase::LogicalInterface> with
+Returns the L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface> with
 the given number. If it does not exist yet, it will be created.
 
 =cut
 sub unit {
   my($self, $unit) = @_;
   return $self->{units}->{$unit} if $self->{units}->{$unit};
-  $self->{units}->{$unit} = new RouterBase::LogicalInterface(name => $unit);
+  $self->{units}->{$unit} = new IPDevice::RouterBase::LogicalInterface(name => $unit);
   $self->{units}->{$unit}->set_toplevel($self->toplevel);
   $self->{units}->{$unit}->set_parent($self->parent);
   return $self->{units}->{$unit};
@@ -177,10 +177,10 @@ sub unit {
 
 =head2 foreach_unit($func, $data)
 
-Walks through all L<RouterBase::LogicalInterface|RouterBase::LogicalInterface>
+Walks through all L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface>
 calling the function $func. Args passed to $func are:
 
-I<$unit>: The L<RouterBase::LogicalInterface|RouterBase::LogicalInterface>.
+I<$unit>: The L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped.
@@ -190,7 +190,7 @@ sub foreach_unit {
   my($self, $func, %data) = @_;
   for my $unitno (sort {$a <=> $b} keys %{$self->{units}}) {
     my $unit = $self->{units}->{$unitno};
-    #print "DEBUG: RouterBase::Interface::foreach_unit(): Unit $unitno\n";
+    #print "DEBUG: IPDevice::RouterBase::Interface::foreach_unit(): Unit $unitno\n";
     return FALSE if !$func->($unit, %data);
   }
   return TRUE;

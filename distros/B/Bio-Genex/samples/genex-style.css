@@ -1,0 +1,19 @@
+H1 {
+	font-size: 50pt;
+	alignment: center;
+	color: blue;
+}
+
+H2 {
+	font-size: 30pt;
+	font-style: italic;
+}
+
+P {
+	font-size: 12;
+	font-family: serif;
+	alignment: left;
+	indent: 20pt;
+}
+
+

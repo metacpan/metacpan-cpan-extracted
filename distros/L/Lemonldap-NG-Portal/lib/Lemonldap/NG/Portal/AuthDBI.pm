@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Simple;
 use base qw(Lemonldap::NG::Portal::_WebForm Lemonldap::NG::Portal::_DBI);
 use strict;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.9.1';
 our $initDone;
 
 BEGIN {

@@ -1,0 +1,121 @@
+%%START_PERL%%
+my $VERSION = '$Id: security-insert.pl.in,v 1.4 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+use XML::DOM;
+
+use Bio::Genex qw($SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_insert_sql fetch_last_id);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::UserSec;
+use Bio::Genex::GroupSec;
+
+my $infile;
+my $rc = GetOptions('file=s' => \$infile, 
+#		    'group=s' => \$group,
+		   );
+
+my $USAGE = <<"EOU";
+usage: $0 --file=file_name group_name
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+die "Must specify group\n$USAGE" unless scalar @ARGV;
+
+#
+# open up a writeable connection ==> we do this before we
+#  call get_objects()
+#
+$Bio::Genex::USER = $SU_USERNAME;
+$Bio::Genex::PASSWORD = $SU_PASSWORD;
+$Bio::Genex::TRANSACTION = 1;	# do it in a transaction
+my $dbh = Bio::Genex::current_connection();
+
+# it is a pain to get a white-space containing string of @ARGV
+my $group_name = join(' ',@ARGV);
+# get rid of delimiting quotes
+$group_name =~ s/\'//g;
+$group_name =~ s/\"//g;
+my @groups = Bio::Genex::GroupSec->get_objects({column=>'group_name',
+					   value=>"$group_name"},
+					  'ALL');
+
+# get_objects() returns a list, 
+# and we need the list to only contain a single element
+die "Found more than one contact entry for $group_name" 
+  if scalar @groups > 1;
+die "No groups for $group_name" 
+  if scalar @groups < 1;
+
+# we need the pkey for later
+my $gs_pk = $groups[0]->gs_pk();
+
+# get the list of <contact>'s from the XML
+my $PARSER = XML::DOM::Parser->new();
+my $DOC = $PARSER->parsefile($infile);
+my @contact_list = $DOC->getElementsByTagName('contact');
+
+#
+# set up the insert SQL
+#
+my $us_table = 'UserSec';
+my $us_sql = create_insert_sql($dbh,$us_table,['con_fk',
+					      'login',
+					      'password']);
+my $us_sth = $dbh->prepare($us_sql) || die $DBI::errstr;
+
+my $gl_table = 'GroupLink';
+my $gl_sql = create_insert_sql($dbh,$gl_table,['us_fk',
+					       'gs_fk']);
+my $gl_sth = $dbh->prepare($gl_sql) || die $DBI::errstr;
+
+# loop through the entries and insert the data in the DB
+foreach my $con_db (@contact_list) {
+  assert_element($con_db,'contact');
+  
+  # retrieve the contact entry
+  my $contact_person_email = $con_db->getAttribute('contact_person_email');
+  my @contacts = Bio::Genex::Contact->get_objects({column=>'contact_person_email',
+					      value=>"$contact_person_email"},
+					     'ALL');
+
+  # get_objects() returns a list, 
+  # and we need the list to only contain a single element
+  die "Found more than one contact entry for $contact_person_email" 
+    if scalar @contacts > 1;
+  die "No contacts for $contact_person_email" 
+    if scalar @contacts < 1;
+  my $con_db = $contacts[0];
+
+  my @users = Bio::Genex::UserSec->get_objects({column=>'con_fk',
+					   value=>$con_db->con_pk},
+					  'ALL');
+  my $us_pk;
+  # we check to see if the user is already defined
+  if (scalar @users) {
+    $us_pk = $users[0]->us_pk();
+  } else {
+    # add the entry in the UserSec table
+    $contact_person_email =~ /^(\w+)\@/;
+    my $login = $1;
+    my $password = $login;
+
+    $us_sth->execute($con_db->con_pk,$login,$password) || die $DBI::errstr;
+    $us_pk = fetch_last_id($dbh,$us_table);
+  }
+
+  # add the entry to the proper group in the GroupLink table
+  $gl_sth->execute($us_pk,$gs_pk);
+}
+
+$us_sth->finish();
+$gl_sth->finish();
+$dbh->commit();
+$dbh->disconnect();
+exit(0);

@@ -2,7 +2,7 @@ Changes
 lib/Package/Base.pm
 lib/Package/Base/Devel.pm
 lib/Package/Install.pm
-lib/Package/Configure.pm
+lib/Package/Install/Configure.pm
 Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)

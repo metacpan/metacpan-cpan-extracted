@@ -1,68 +1,31 @@
 package Mesos::Test::Utils;
 use strict;
 use warnings;
-use Cwd qw(abs_path);
-use File::Basename qw(dirname);
-use Mesos::Types qw(ExecutorInfo FrameworkInfo);
-use Time::HiRes qw(alarm);
-use Try::Tiny;
+use Mesos::Messages;
+use Mesos::Test::Scheduler;
+use Mesos::Test::Executor;
 use parent 'Exporter';
-our @EXPORT = qw(
-    root
-    test_executor
-    test_framework
-    test_master
-    timeout
-);
+our @EXPORT = qw(test_master test_framework test_scheduler test_executor);
+our @EXPORT_OK = @EXPORT;
 
-our $_ROOT;
-sub root {
-    $_ROOT //= do {
-        my $current_dir = abs_path(dirname __FILE__);
-        (my $root = $current_dir) =~ s#/t/.*?$##;
-        $root;
-    };
-}
 
-sub test_executor {
-    my ($command) = @_;
-    $command //= "/bin/echo perl test executor";
-    return ExecutorInfo->new({
-        executor_id => {value => 'default'},
-        command     => {value => $command},
-    });
+sub test_master {
+    return $ENV{TEST_MESOS_MASTER} || '127.0.0.1:5050';
 }
 
 sub test_framework {
-    my ($name) = @_;
-    $name //= 'Test Framework (Perl)';
-    FrameworkInfo->new({
-        user => $ENV{USER},
-        name => $name,
+    return Mesos::FrameworkInfo->new({
+        user => 'Mesos_test_user',
+        name => 'Mesos_test_name',
     });
 }
 
-sub test_master {
-    $ENV{MESOS_TEST_MASTER} // 'localhost:5050';
+sub test_scheduler {
+    return Mesos::Test::Scheduler->new;
 }
 
-sub timeout (&;$) {
-    my ($code, $time) = @_;
-    my $timeout = "TIMEOUT\n";
-
-    my $timedout;
-    try {
-        local $SIG{ALRM} = sub { die $timeout };
-        alarm($time // 1);
-        $code->();
-        alarm(0);
-    } catch {
-        die $_ unless /^$timeout/;
-        $timedout++;
-    };
-    alarm(0);
-
-    return !!$timedout;
+sub test_executor {
+    return Mesos::Test::Executor->new;
 }
 
 1;

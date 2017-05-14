@@ -9,14 +9,14 @@
 ## no critic (RequireUseStrict, RequireUseWarnings)
 package Riak::Light::Driver;
 {
-    $Riak::Light::Driver::VERSION = '0.12';
+    $Riak::Light::Driver::VERSION = '0.052';
 }
 ## use critic
 
 use English qw( -no_match_vars );
 use Riak::Light::Connector;
 use Moo;
-use Types::Standard -types;
+use MooX::Types::MooseLike::Base qw<Num Str Int Bool Object>;
 
 # ABSTRACT: Riak Driver, deal with the binary protocol
 
@@ -46,7 +46,7 @@ sub perform_request {
 }
 
 sub read_response {
-    my ($self) = @_;
+    my $self     = shift;
     my $response = $self->connector->read_response()
       or return $self->_parse_error();
     $self->_parse_response($response);
@@ -74,25 +74,15 @@ Riak::Light::Driver - Riak Driver, deal with the binary protocol
 
 =head1 VERSION
 
-version 0.12
+version 0.052
 
 =head1 DESCRIPTION
 
   Internal class
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Tiago Peczenyj <tiago.peczenyj@gmail.com>
-
-=item *
-
-Damien Krotkine <dams@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

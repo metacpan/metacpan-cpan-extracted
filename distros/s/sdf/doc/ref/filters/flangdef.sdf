@@ -1,0 +1,30 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: langdefs Filter
+
+H2: Interface
+
+!filter_interface "langdefs"
+
+H2: Description
+
+The {{langdefs}} filter is used to configure programming language
+properties used by SDF's pretty-printing support. The contents
+is one or more {{CMD:vgrind}} definitions.
+
+H2: Examples
+
+See {{FILE:langdefs.sdm}} within SDF's {{FILE:stdlib}} directory.
+
+#H2: Limitations & Future Directions

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-Auth-BrowserID,
+version 0.0.7:
+
+  Plack Middleware to integrate with Mozilla Persona (Auth by email)
+
+This software is copyright (c) 2013 by J. Bolila.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

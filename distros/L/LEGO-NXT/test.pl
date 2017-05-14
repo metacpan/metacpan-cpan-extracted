@@ -1,4 +1,5 @@
 use LEGO::NXT;
+use LEGO::NXT::Constants qw(:DEFAULT);
 use Data::Dumper;
 use Net::Bluetooth;
 use strict;
@@ -11,12 +12,12 @@ die "No Bluetooth Address Specified!\n" if !$addr;
 $| = 1;
 
 my $res;
-my $bt = new NXT($addr,$port);
+my $bt = LEGO::NXT->new($addr,$port);
 
-$res = $bt->play_sound_file($Nxt::RET, 0,'! Attention.rso');
+$res = $bt->play_sound_file($NXT_RET, 0,'! Attention.rso');
 print Dumper($res);
 
-$res  = $bt->get_battery_level($Nxt::RET);
+$res  = $bt->get_battery_level($NXT_RET);
 print Dumper($res);
 
 exit;

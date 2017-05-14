@@ -1,0 +1,323 @@
+# zxid/sg/lib-id-sis-cb-proto.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: lib-id-sis-cb-proto.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+# N.B. The data format for Contact Book is vCard (i.e. not XML)
+
+target(cb, urn:liberty:id-sis-cb:2004-10)
+#import(ds, http://www.w3.org/2000/09/xmldsig#,http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd)
+ns(cdm, urn:liberty:cb:conceptual-data-model:2004-10)
+ns(sa,  urn:oasis:names:tc:SAML:2.0:assertion)
+
+#include(lib-svc-dst.xsd)
+
+ResourceID -> %di12:ResourceIDType
+EncryptedResourceID -> %di12:EncryptedResourceIDType
+
+&ResourceIDGroup: 
+  cb:ResourceID?
+  cb:EncryptedResourceID?
+  ;
+
+ChangeFormat:	 enum( ChangedElements CurrentElements ) ;
+@changeFormat:	 enum( ChangedElements CurrentElements All ) ;
+
+ItemData	 -> %cb:ItemDataType
+%ItemDataType:
+  cb:Card*
+  any*
+  @id?	 -> %xs:ID
+  @itemIDRef?	 -> %xs:string  # %IDReferenceType
+  @notSorted?:	 enum( Now Never ) ;
+  @cb:changeFormat?
+  ;
+
+Query	 -> %cb:QueryType
+%QueryType:
+  &cb:ResourceIDGroup?
+  cb:Subscription*
+  cb:QueryItem*:	 base(cb:ItemSelectionType)
+    @count?	 -> %xs:nonNegativeInteger
+    @offset?	 -> %xs:nonNegativeInteger  default (0)
+    @setID?	 -> %xs:string  # %IDType
+    @setReq?:	 enum( Static DeleteSet ) ;
+    ;
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+QueryResponse	 -> %cb:QueryResponseType
+%QueryResponseType:
+  cb:Status
+  cb:Data*:
+    cb:Card*
+    any*
+    @id?	 -> %xs:ID
+    @itemIDRef?	 -> %xs:string  # %IDReferenceType
+    @notSorted?: enum( Now Never ) ;
+    @cb:changeFormat?
+    @remaining?	 -> %xs:integer
+    @nextOffset? -> %xs:nonNegativeInteger  default (0)
+    @setID?	 -> %xs:string  # %IDType
+    ;
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @itemIDRef?	 -> %xs:string  # %IDReferenceType
+  @timeStamp?	 -> %xs:dateTime
+  ;
+
+Create	 -> %cb:CreateType
+%CreateType:
+  &cb:ResourceIDGroup?
+  cb:Subscription*
+  cb:CreateItem+:
+    cb:NewData?:
+      cb:Card*
+      any*
+      ;
+    @id?	 -> %xs:ID
+    @itemID?	 -> %xs:string  # %IDType
+    @objectType?	 -> %xs:NCName
+    ;
+  cb:ItemSelection*
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+CreateResponse	 -> %cb:ResponseType
+
+%ResponseType:
+  cb:Status
+  cb:ItemData*
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @timeStamp?	 -> %xs:dateTime
+  @any
+  ;
+
+Delete	 -> %cb:DeleteType
+%DeleteType:
+  &cb:ResourceIDGroup?
+  cb:DeleteItem+:
+    cb:Select?	 -> %cb:SelectType
+    @id?	 -> %xs:ID
+    @itemID?	 -> %xs:string  # %IDType
+    @notChangedSince?	 -> %xs:dateTime
+    @objectType?	 -> %xs:NCName
+    @predefined?	 -> %xs:string
+    ;
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+DeleteResponse	 -> %cb:DeleteResponseType
+%DeleteResponseType:
+  cb:Status
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+Modify	 -> %cb:ModifyType
+%ModifyType:
+  &cb:ResourceIDGroup?
+  cb:Subscription*
+  cb:Modification+:
+    cb:Select?	 -> %SelectType
+    cb:NewData?:
+      cb:Card*
+      any*
+      @any
+      ;
+    @id?	 -> %xs:ID
+    @itemID?	 -> %xs:string  # %IDType
+    @notChangedSince?	 -> %xs:dateTime
+    @objectType?	 -> %xs:NCName
+    @overrideAllowed?	 -> %xs:boolean  default (0)
+    ;
+  cb:ItemSelection*
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+ModifyResponse	 -> %cb:ResponseType
+
+%NotifyToType:
+  cb:SecurityMechID*	 -> %xs:anyURI
+  cb:Credential*:
+    sa:Assertion?   # Sampo
+    any*  processContents(lax)
+    @notOnOrAfter?	 -> %xs:dateTime
+    ;
+  cb:Endpoint?	 -> %xs:anyURI
+  @id?	 -> %xs:ID
+  ;
+
+Subscription:
+  cb:ItemSelection*
+  cb:RefItem*:
+    @subscriptionID?	 -> %xs:string  # %IDType
+    @ItemIDRef	 -> %xs:string  # %IDReferenceType
+    ;
+  cb:NotifyTo?	 -> %cb:NotifyToType
+  cb:NotifyAdminTo?	 -> %cb:NotifyToType
+  cb:Aggregation?	 -> %cb:AggregationType
+  cb:Trigger?	 -> %cb:TriggerType
+  cb:Extension*
+  @starts?	 -> %xs:dateTime
+  @expires?	 -> %xs:dateTime
+  @id?	 -> %xs:ID
+  @subscriptionID	 -> %xs:string  # %IDType
+  @includeData?:	 enum( Yes No YesWithCommonAttributes ) ;
+  @any
+  ;
+
+Notify	 -> %cb:NotifyType
+%NotifyType:
+  cb:Notification*
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @timeStamp?	 -> %xs:dateTime
+  @any
+  ;
+
+NotifyResponse	 -> %cb:NotifyResponseType
+%NotifyResponseType:
+  cb:Status
+  cb:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+Notification:
+  cb:ItemData*
+  @id?	 -> %xs:ID
+  @subscriptionID	 -> %xs:string  # %IDType
+  @expires?	 -> %xs:dateTime
+  @endReason?	 -> %xs:anyURI
+  ;
+
+#include(lib-svc-dst-dt.xsd)
+
+@id	 -> %xs:string  # %IDType
+@modificationTime	 -> %xs:dateTime
+&@commonAttributes: 
+  @cb:id?
+  @cb:modificationTime?
+  ;
+@ACC	 -> %xs:anyURI
+@ACCTime	 -> %xs:dateTime
+@modifier	 -> %xs:string     #%md:entityIDType
+&@leafAttributes: 
+  &@cb:commonAttributes
+  @cb:ACC?
+  @cb:ACCTime?
+  @cb:modifier?
+  ;
+@script	 -> %xs:anyURI
+&@localizedLeafAttributes: 
+  &@leafAttributes
+  @xml:lang
+  @cb:script?
+  ;
+@refreshOnOrAfter	 -> %xs:dateTime
+@destroyOnOrAfter	 -> %xs:dateTime
+%DSTLocalizedString:	 base(xs:string)
+  &@cb:localizedLeafAttributes
+  ;
+%DSTString:	 base(xs:string)
+  &@cb:leafAttributes
+  ;
+%DSTInteger:	 base(xs:integer)
+  &@cb:leafAttributes
+  ;
+%DSTURI:	 base(xs:anyURI)
+  &@cb:leafAttributes
+  ;
+%DSTDate:	 base(xs:date)
+  &@cb:leafAttributes
+  ;
+%DSTMonthDay:	 base(xs:gMonthDay)
+  &@cb:leafAttributes
+  ;
+
+### Contact Book Protocol
+
+Card -> %cb:CardType
+%cardType:
+  cb:CharData*
+  cdm:vCard*
+  any*  processContents(lax)  # ns(##other)
+  @cb:format
+  ;
+
+@format -> %xs:anyURI
+
+charData -> %cb:charDataType
+%charDataType: base(xs:string) ;
+
+%SelectType: base(xs:string)  # the string is a restricted XPATH
+  @cb:format?
+  ;
+
+%SortType:
+  cb:By+
+  ;
+
+By -> %cb:ByType
+%ByType:
+  @cb:sortAlg?
+  @cb:sortWeight?
+  ;
+
+@sortAlg: enum( asc desc ) ;
+@sortWeight -> %xs:number
+
+&@typeAttributes: 
+  &@localizedLeafAttributes
+  @cb:group?
+  ;
+
+@group -> %xs:string
+
+ReportUsage -> %cb:ReportUsageType
+%ReportUsageType:
+  &cb:ResourceIDGroup?
+  cdm:CARDID
+  cb:UsageType*
+  @id? -> %xs:ID
+  ;
+
+UsageType -> %cb:UsageTypeType
+%UsageTypeType:	 base(cb:DSTURI)
+  @success? -> %xs:boolean  default (1)
+  ;
+
+ReportUsageResponse -> %cb:ReportUsageResponseType
+%ReportUsageResponseType:
+  cb:Status
+  @id? -> %xs:ID
+  ;
+
+ItemSelection -> %cb:ItemSelectionType
+%ItemSelectionType: base(xs:string)  # the string is a restricted XPATH
+  @cb:format?
+  ;
+
+Status      -> %cb:StatusType
+%StatusType:
+  cb:Status*
+  @code     -> %xs:string
+  @ref?     -> %xs:string  # gl:IDReferenceType
+  @comment? -> %xs:string
+  ;
+
+Extension:
+  any*
+  @any?
+  ;
+
+#EOF

@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 02316e715865daf2fe90ab98c5caeee6c28deb66 LICENSE
+SHA1 12752884ec4f55452c33c340b01d521d735c1bb2 MANIFEST
+SHA1 1730d96eb18f15209e80bcc527898060fd1e9f3d META.yml
+SHA1 7203d75843c7744a67fc6ea631cb7fed519dea97 Makefile.PL
+SHA1 c11180b86f5669b7c8935933a690dd7b4cfb7d49 README
+SHA1 3b4477ffaec65a0f621ad8d9b106538397e048a1 dist.ini
+SHA1 89392dc5c652dc08b76f87fab47de347c24be749 lib/UAV/Pilot/ArdupilotProtocol.pm
+SHA1 1ca60057ecceb510d5a5adf431bc55dbf283b486 lib/UAV/Pilot/ArdupilotProtocol/Packet.pm
+SHA1 3e7cbc0756991ae5a4493e888731ed857ede4f02 lib/UAV/Pilot/ArdupilotProtocol/Packet/Ack.pm
+SHA1 fc5b98c94d1010722a39ad8351fc86f19b779bd6 lib/UAV/Pilot/ArdupilotProtocol/Packet/Heartbeat.pm
+SHA1 d82b7c887fcc67750b15aa970c49c6a840599577 lib/UAV/Pilot/ArdupilotProtocol/Packet/RadioMaxes.pm
+SHA1 5714a00b5251e728229ac93ae75de76b70a68c71 lib/UAV/Pilot/ArdupilotProtocol/Packet/RadioMins.pm
+SHA1 4aa5949ca5bec8220351ba643f4bb32d44218c78 lib/UAV/Pilot/ArdupilotProtocol/Packet/RadioOutputs.pm
+SHA1 ab2b7d0f9c2233e1cb86a53f5cbd934ef4e3a722 lib/UAV/Pilot/ArdupilotProtocol/Packet/RadioTrims.pm
+SHA1 1846e937d85b057fa9bcf2dfe8a94820c577b3bb lib/UAV/Pilot/ArdupilotProtocol/Packet/RequestStartupMessage.pm
+SHA1 2a54be7dc016899d31734ccc3ea4810de6195189 lib/UAV/Pilot/ArdupilotProtocol/Packet/StartupMessage.pm
+SHA1 f35a7661ccf7870c0ec89be95beef6d3cfdc1f3a lib/UAV/Pilot/ArdupilotProtocol/PacketFactory.pm
+SHA1 212ff5e5cd071ed0641ed35719998fe47c333e58 t/001_load.t
+SHA1 303512c7832d730af19a94928367bac1a3483c48 t/002_pod.t
+SHA1 c668ef914f84b4061d1ce1b42d9a8e4f965abc2a t/010_packet.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTcA4eAAoJECopd2kHmJp0mOoH/3zHmqoJWihdDV/r7aO1haSr
+5fNfXrYu/CQHW9+yNbLs/KDm0YoUtqrYu8lw0yGAzLiN14ICTObKCQoDnTGfR4hk
+qRUPmJOnCoeWzMjyI2x6b3aq+DWYfn6a2KhI8uINPfEUCN/jH6/i1XEONam4t8x2
+DHqa9K+Yc+PdvG9AcGbrMI6YJaxkgHF+NPbo8fM0EUnMjusNYPxARqvdgXcjsWJD
+SQOMLLa8O0W79Tijb7j6P+0pd1MQCiGDBr03Y/hVQZ6Kv2t9cJ5QZM9KaRzLZtxB
+8xvCXAMcdocbifm4ka/O/KziitA4LFstC+BUlDQQuq/h6nJgyu2M3W1pxEiDb6w=
+=GRBd
+-----END PGP SIGNATURE-----

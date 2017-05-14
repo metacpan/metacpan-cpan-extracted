@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.09'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,10 +21,10 @@ no_index:
 provides:
   BankAccount::Validator::UK:
     file: lib/BankAccount/Validator/UK.pm
-    version: '0.28'
+    version: '0.29'
   BankAccount::Validator::UK::Rule:
     file: lib/BankAccount/Validator/UK/Rule.pm
-    version: '0.28'
+    version: '0.29'
 requires:
   File::Share: '0.25'
   Moo: '2.000000'
@@ -33,5 +33,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/BankAccount-Validator-UK.git
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

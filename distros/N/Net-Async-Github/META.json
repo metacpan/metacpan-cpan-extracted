@@ -1,0 +1,84 @@
+{
+   "abstract" : "support for L<https://github.com>'s REST API with L<IO::Async>",
+   "author" : [
+      "Tom Molesworth <TEAM@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-Github",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.014000"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Mojibake" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Async::SSL" : "0.19",
+            "Net::Async::HTTP" : "0.41"
+         },
+         "requires" : {
+            "Cache::LRU" : "0.04",
+            "Dir::Self" : "0",
+            "File::ShareDir" : "1.102",
+            "Future" : "0.34",
+            "IO::Async::Notifier" : "0.71",
+            "JSON::MaybeXS" : "1.003008",
+            "Log::Any" : "1.045",
+            "Path::Tiny" : "0.098",
+            "Ryu::Async" : "0.002",
+            "Syntax::Keyword::Try" : "0.04",
+            "Time::Moment" : "0.41",
+            "URI" : "1.71",
+            "URI::Template" : "0.22",
+            "indirect" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-async-github at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-Github"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-Async-Github/"
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

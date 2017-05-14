@@ -1,9 +1,10 @@
 use warnings; no warnings 'redefine';
 use English qw( -no_match_vars );
+use B;
 
 =pod
 
-=head2 backtrace(skip[,count,scan_for_DB])
+=head2 tbacktrace(skip[,count,scan_for_DB])
 
 Collect the traceback information available via C<caller()>.  Some
 filtering and cleanup of the data is done.
@@ -50,7 +51,7 @@ C<evaltext> - eval text if we are in an eval.
 
 # NOTE: this routine needs to be in package DB for us to be able to pick up the
 # subroutine args.
-sub backtrace($;$$$) {
+sub tbacktrace($;$$$) {
     my ($self, $skip, $count, $scan_for_DB_sub) = @_;
     $skip = 0 unless defined($skip);
     $count = 1e9 unless defined($count);
@@ -63,6 +64,7 @@ sub backtrace($;$$$) {
 
     my $i=0;
     if ($scan_for_DB_sub) {
+	no warnings qw(once uninitialized);  # For $DB::event
         my $db_fn = ($DB::event eq 'post-mortem') ? 'catch' : 'DB';
 	# Warning: There is a bug caller that lists DB:DB as the function
 	# name rather than the name the debugged program may have been in
@@ -74,8 +76,10 @@ sub backtrace($;$$$) {
         }
     }
 
+    $scan_for_DB_sub = $i;
     $count += $i;
-    # print "++count: $count, i $i\n";
+    # print "++count: $count, i $i $DB::event\n"; # XX debug
+    $i -= 2 if $DB::event eq 'call';
 
     my ( @a, $args_ary );
     my @callstack = ();
@@ -94,7 +98,9 @@ sub backtrace($;$$$) {
            ($pkg, $file, $line, $fn, $hasargs, $wantarray, $evaltext,
 	    $is_require) = caller($i))
     {
-        ## print "++file: $file, line $line $fn\n" if $DB::DEBUGME;
+	my $addr = Devel::Callsite::callsite($i);
+
+        ## print "++file: $file, line $line $fn\n"; # XX if $DB::DEBUGME;
         $i++;
         next if $pkg eq 'DB' && ($fn eq 'sub' || $fn eq 'lsub' ||
 				 $file =~ m{Devel/Trepan/DB/Sub\.pm$});
@@ -138,7 +144,7 @@ sub backtrace($;$$$) {
         # If $wantarray is false, this is scalar ($) context.
         # If neither, $wantarray isn't defined. (This is apparently a 'can't
         # happen' trap.)
-        $wantarray = $wantarray ? '@' : ( defined $wantarray ? "\$" : '.' );
+        $wantarray = $wantarray ? '@' : ( defined $wantarray ? '$' : '.' );
 
         # if the sub has args ($hasargs true), make an anonymous array of the
         # dumped args.
@@ -170,6 +176,7 @@ sub backtrace($;$$$) {
         # Stick the collected information into @callstack a hash reference.
         push(@callstack,
              {
+                 addr      => $addr,
                  args      => $args_ary,
                  evaltext  => $evaltext,
                  file      => $file,
@@ -184,18 +191,38 @@ sub backtrace($;$$$) {
         # last if $signal;
     } ## end for ($i = $skip ; $i < ...
 
+    ## use Data::Printer; Data::Printer::p @callstack; # XXX
+
     # The function and args for the stopped line is DB::DB,
     # but we want it to be the function and args of the last call.
+    # Se we need to adjust those in @callstack.
     # And the function and args for the file and line that called us
     # should also be the prior function and args.
     if ($scan_for_DB_sub) {
-        for (my $i=1; $i <= $#callstack; $i++) {
-            $callstack[$i-1]->{args} = $callstack[$i]->{args};
-            $callstack[$i-1]->{fn} = $callstack[$i]->{fn};
-        }
-        $callstack[$i]{args} = undef;
-        $callstack[$i]{fn}   = undef;
+	my $len = @callstack;
+	if ($len) {
+	    for (my $i=1; $i < $len; $i++) {
+		$callstack[$i-1]->{args} = $callstack[$i]->{args};
+		$callstack[$i-1]->{fn} = $callstack[$i]->{fn};
+		$callstack[$i-1]->{wantarray} = $callstack[$i]->{wantarray};
+	    }
+	    # $callstack[$len]->{args} = undef;
+	    # $callstack[$len]->{fn}   = undef;
+	}
     }
+
+    if ($DB::event eq 'call') {
+        unshift @callstack, {
+    	    addr      => $DB::addr,
+    	    file      => $DB::filename,
+    	    fn        => $DB::subroutine,
+    	    line      => $DB::lineno,
+    	    pkg       => $DB::package,
+	    args      => $DB::hasargs,
+    	    wantarray => $DB::wantarray ? $DB::wantarray : '',
+    	};
+    }
+    # use Data::Printer; Data::Printer::p @callstack;
 
     @callstack;
 }
@@ -204,24 +231,24 @@ unless (caller) {
     require Data::Dumper;
     import Data::Dumper;
     $DB::frame = 0;
-    our @callstack = backtrace(undef,undef,undef,0);
+    our @callstack = tbacktrace(undef,undef,undef,0);
     our $sep = '-' x 20 . "\n";
     # print Dumper(@callstack), "\n";
     # print $sep;
     sub five {
-        @callstack = backtrace(undef,undef,undef,0);
+        @callstack = tbacktrace(undef,undef,undef,0);
         print Dumper(@callstack), "\n";
         print $sep;
-        @callstack = backtrace(undef,1,undef,0);
+        @callstack = tbacktrace(undef,1,undef,0);
         print Dumper(@callstack), "\n";
         print $sep;
-        @callstack = backtrace(1,0,undef,0);
+        @callstack = tbacktrace(1,0,undef,0);
         print Dumper(@callstack), "\n";
         print $sep;
         5;
     }
     my $five = five();
-    # $five = eval "@callstack = backtrace(undef, undef, undef, 0)";
+    # $five = eval "@callstack = tbacktrace(undef, undef, undef, 0)";
     # print Dumper(@callstack), "\n";
     print $sep;
     $five = eval "five";

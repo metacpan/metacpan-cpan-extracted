@@ -3,13 +3,11 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = ('../lib');
-    unless ($^O eq "cygwin") {
-	print "1..0 # skipped: cygwin specific test\n";
-	exit 0;
-    }
+    require './test.pl';
+    skip_all('cygwin specific test') unless $^O eq 'cygwin';
 }
 
-use Test::More tests => 16;
+plan(tests => 16);
 
 is(Cygwin::winpid_to_pid(Cygwin::pid_to_winpid($$)), $$,
    "perl pid translates to itself");
@@ -43,24 +41,27 @@ chdir($pwd);
 is(Cygwin::win_to_posix_path($winpath, 1), "/", "win to absolute posix path");
 
 my $mount = join '', `/usr/bin/mount`;
-$mount =~ m|on /usr/bin type .+ \((\w+mode)[,\)]|m;
-my $binmode = $1 eq 'binmode';
+$mount =~ m|on /usr/bin type .+ \((\w+)[,\)]|m;
+my $binmode = $1 =~ /binmode|binary/;
 is(Cygwin::is_binmount("/"),  $binmode ? 1 : '', "check / for binmount");
 
 my $rootmnt = Cygwin::mount_flags("/");
-ok($binmode ? ($rootmnt =~ /,binmode/) : ($rootmnt =~ /,textmode/), "check / mount_flags");
+ok($binmode ? ($rootmnt =~ /,(binmode|binary)/) : ($rootmnt =~ /,textmode/), "check / mount_flags");
 is(Cygwin::mount_flags("/cygdrive") =~ /,cygdrive/,  1, "check cygdrive mount_flags");
 
 # Cygdrive mount prefix
 my @flags = split(/,/, Cygwin::mount_flags('/cygdrive'));
 my $prefix = pop(@flags);
-ok($prefix, "cygdrive mount prefix = " . (($prefix) ? $prefix : '<none>'));
-chomp(my $prefix2 = `df | grep -i '^c: ' | cut -d% -f2 | xargs`);
-$prefix2 =~ s/\/c$//i;
-if (! $prefix2) {
-    $prefix2 = '/';
+ok($prefix, "cygdrive mount prefix  = " . (($prefix) ? $prefix : '<none>'));
+my $prefix2 = readlink "/proc/cygdrive";
+unless ($prefix2) {
+    # fallback to old Cygwin, the drive need not actually exist, so
+    # this will always work (but might return the wrong prefix if the
+    # user re-mounted C:\
+    chomp($prefix2 = `cygpath C:`);
+    $prefix2 = substr($prefix2, 0, -1-(length($prefix2)>2));
 }
-is($prefix, $prefix2, 'cygdrive mount prefix');
+is($prefix, $prefix2, 'cygdrive mount prefix2 = ' . $prefix2);
 
 my @mnttbl = Cygwin::mount_table();
 ok(@mnttbl > 0, "non empty mount_table");

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/NET-IPFilter.t
+lib/NET/IPFilter.pm

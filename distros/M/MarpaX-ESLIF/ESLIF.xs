@@ -186,7 +186,7 @@ static void                            marpaESLIF_recognizerContextInit(pTHX_ SV
 static void                            marpaESLIF_valueContextInit(pTHX_ SV *Perl_MarpaX_ESLIF_Recognizerp, SV *Perl_valueInterfacep, MarpaX_ESLIF_Value_t *MarpaX_ESLIF_Valuep);
 static void                            marpaESLIF_paramIsGrammarv(pTHX_ SV *sv);
 static void                            marpaESLIF_paramIsEncodingv(pTHX_ SV *sv);
-static void                            marpaESLIF_paramIsLoggerInterfacev(pTHX_ SV *sv);
+static short                           marpaESLIF_paramIsLoggerInterfaceOrUndefv(pTHX_ SV *sv);
 static void                            marpaESLIF_paramIsRecognizerInterfacev(pTHX_ SV *sv);
 static void                            marpaESLIF_paramIsValueInterfacev(pTHX_ SV *sv);
 static short                           marpaESLIF_representation(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp);
@@ -1067,11 +1067,15 @@ static void marpaESLIF_paramIsEncodingv(pTHX_ SV *sv)
 }
 
 /*****************************************************************************/
-static void marpaESLIF_paramIsLoggerInterfacev(pTHX_ SV *sv)
+static short marpaESLIF_paramIsLoggerInterfaceOrUndefv(pTHX_ SV *sv)
 /*****************************************************************************/
 {
-  static const char *funcs = "marpaESLIF_paramIsLoggerInterfacev";
+  static const char *funcs = "marpaESLIF_paramIsLoggerInterfaceOrUndefv";
   int                type  = marpaESLIF_getTypei(aTHX_ sv);
+
+  if ((type & UNDEF) == UNDEF) {
+    return 0;
+  }
 
   if ((type & OBJECT) != OBJECT) {
     MARPAESLIF_CROAK("Logger interface must be an object");
@@ -1086,6 +1090,8 @@ static void marpaESLIF_paramIsLoggerInterfacev(pTHX_ SV *sv)
   if (! marpaESLIF_canb(aTHX_ sv, "critical"))  MARPAESLIF_CROAK("Logger interface must be an object that can do \"critical\"");
   if (! marpaESLIF_canb(aTHX_ sv, "alert"))     MARPAESLIF_CROAK("Logger interface must be an object that can do \"alert\"");
   if (! marpaESLIF_canb(aTHX_ sv, "emergency")) MARPAESLIF_CROAK("Logger interface must be an object that can do \"emergency\"");
+
+  return 1;
 }
 
 /*****************************************************************************/
@@ -1194,8 +1200,6 @@ static char *marpaESLIF_sv2byte(pTHX_ SV *svp, char **bytepp, size_t *bytelp, sh
     }
   } else {
     if (warnIsFatalb) {
-      MARPAESLIF_WARNF("SvPV() returned {pointer,length}={%p,%ld}", strings, (unsigned long) len);
-    } else {
       MARPAESLIF_CROAKF("SvPV() returned {pointer,length}={%p,%ld}", strings, (unsigned long) len);
     }
   }
@@ -1258,9 +1262,10 @@ CODE:
   static const char *funcs = "MarpaX::ESLIF::new";
   MarpaX_ESLIF       MarpaX_ESLIFp;
   marpaESLIFOption_t marpaESLIFOption;
+  short              loggerInterfaceIsObjectb = 0;
 
   if(items > 1) {
-    marpaESLIF_paramIsLoggerInterfacev(aTHX_ Perl_loggerInterfacep = ST(1));
+    loggerInterfaceIsObjectb = marpaESLIF_paramIsLoggerInterfaceOrUndefv(aTHX_ Perl_loggerInterfacep = ST(1));
   }
 
   Newx(MarpaX_ESLIFp, 1, MarpaX_ESLIF_t);
@@ -1271,7 +1276,7 @@ CODE:
   /* ------------- */
   /* genericLogger */
   /* ------------- */
-  if (Perl_loggerInterfacep != &PL_sv_undef) {
+  if (loggerInterfaceIsObjectb) {
     MarpaX_ESLIFp->Perl_loggerInterfacep = SvREFCNT_inc(Perl_loggerInterfacep);
     MarpaX_ESLIFp->genericLoggerp        = genericLogger_newp(marpaESLIF_genericLoggerCallbackv,
                                                               MarpaX_ESLIFp->Perl_loggerInterfacep,
@@ -2063,7 +2068,7 @@ eventOnOff(Perl_MarpaX_ESLIF_Recognizer, symbol, eventTypes, onOff)
   bool                    onOff;
 CODE:
   static const char     *funcs = "MarpaX::ESLIF::Recognizer::eventOnOff";
-  SSize_t                avsizel = av_len(eventTypes);
+  SSize_t                avsizel = av_len(eventTypes) + 1;
   SSize_t                aviteratol;
   marpaESLIFEventType_t  eventSeti  = MARPAESLIF_EVENTTYPE_NONE;
 
@@ -2095,7 +2100,7 @@ CODE:
     }
   }
 
-  if (! marpaESLIFRecognizer_event_onoffb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, (char *) symbol, eventSeti, onOff ? 1 : 0)) {
+  if (! marpaESLIFRecognizer_event_onoffb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, symbol, eventSeti, onOff ? 1 : 0)) {
     MARPAESLIF_CROAKF("marpaESLIFRecognizer_event_onoffb failure, %s", strerror(errno));
   }
 

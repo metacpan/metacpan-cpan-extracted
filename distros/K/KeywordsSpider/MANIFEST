@@ -1,0 +1,12 @@
+Build.PL
+lib/KeywordsSpider.pm
+lib/KeywordsSpider/Core.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/allowed_test
+t/Core.t
+t/export_test
+t/keywords_test
+t/KeywordsSpider.t
+t/output_test

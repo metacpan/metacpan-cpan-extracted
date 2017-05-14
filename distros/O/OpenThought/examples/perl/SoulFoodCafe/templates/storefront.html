@@ -1,0 +1,73 @@
+<head>
+  <title>Soul Food Cafe (an OpenThought demo)</title>
+  <style> input.menu-button {width:125px} </style>
+  <script src="/OpenThought.js"></script>
+</head>
+
+<body bgcolor="#cccccc"
+     onLoad="OpenThought.CallUrl('index.pl', 'run_mode=get_menu', '_session_id=<tmpl_var name="session_id">');">
+<form name="hooah">
+<br/>
+  <table bgcolor="#666666" align="center" width="550" cellpadding="2">
+  <tr><td>
+  <table  bgcolor="#999999" align="center" cellspacing="4" cellpadding="4" width="100%" border="0">
+    <tr>
+      <td colspan=3>
+        <center><h2>Soul Food Cafe</h2></center>
+      </td>
+    <tr>
+      <td width="40%" align="center">
+         &nbsp;&nbsp;Menu<br/><br/>
+        <select name="menu" size="6"
+           onChange="OpenThought.CallUrl('index.pl', 'menu', 'run_mode=get_info',
+                             '_session_id=<tmpl_var name="session_id">')">
+        </select>
+      </td>
+      <td width="20%" align="center">
+        <a href="#" onclick="javascript:OpenThought.CallUrl('index.pl',
+                                           'run_mode=get_menu', '_session_id=<tmpl_var name="session_id">')">(refresh)</a>
+        <br/><br/>
+
+        <input class="menu-button" type="button" value="Add Item -->"
+                   onClick="OpenThought.CallUrl('index.pl',
+                                           'menu', 'run_mode=add_item', '_session_id=<tmpl_var name="session_id">')">
+        <br/><br/>
+        <input class="menu-button" type="button" value="<-- Remove Item"
+                   onClick="OpenThought.CallUrl('index.pl',
+                                           'dinner', 'run_mode=remove_item', '_session_id=<tmpl_var name="session_id">')">
+      </td>
+      <td width="40%" align="center">
+         &nbsp;&nbsp;Dinner will be:<br/><br/>
+        <select name="dinner" size="6">
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=2>
+        <b>Description: </b><span id="info">(no item selected)</span>
+        <br/>
+        <font size="-2">&nbsp;</font><br/>
+        <b>Cost:</b> $<span id="cost">0.00</span>
+      </td>
+      <td>
+        <b>Total Cost:</b> $<span id="total_cost">0.00</span>
+        <br/><br/>
+        <input class="menu-button" type="button" value="Checkout"
+            onClick="OpenThought.CallUrl('index.pl', 'run_mode=check_order', '_session_id=<tmpl_var name="session_id">')">
+      </td>
+    </tr>
+  </table>
+  </td></tr></table>
+</form>
+<table border="0" width="350" align="center">
+  <tr>
+    <td>
+      <p><font size="-1">The Soul Food Cafe is a demo of the <a
+        href="http://openthought.net">OpenThought Application Environment.</a>          It may be related to the <a
+        href="http://www.blues.squidly.org/script/script07.html#soul-food">Soul Food Cafe</a> found in the <a href="http://blues.squidly.org/">Blues Brothers
+Film</a>.
+      </font></p>
+    </td>
+  </tr>
+</table>
+</body>

@@ -1,0 +1,9 @@
+0.3 - 20 May 2008
+   - DESTROY now supports the Class::Std::Fast's objec cache facility
+   - added dependency on Class::Std::Fast 0.0.8
+
+0.2 - 18 May 2008
+   - added XS version of DESTROY
+
+0.1 - 16 May 2008
+   - initial version

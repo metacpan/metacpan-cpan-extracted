@@ -26,7 +26,7 @@ B<Egad!> You astound me, Brain!
 EOPOD
 
 is($results, <<'EOHTML', "simple B<> code");
-<p><b>Egad!</b> You astound me, Brain!</p>
+<p><strong>Egad!</strong> You astound me, Brain!</p>
 
 EOHTML
 
@@ -40,7 +40,7 @@ $parser->parse_string_document(<<'EOPOD');
 EOPOD
 
 is($results, <<'EOHTML', "B<> in literal code");
-<pre><code>  literal code with <b>bold</b> characters
+<pre><code>  literal code with <strong>bold</strong> characters
   and some more lines, to test.</code></pre>
 
 EOHTML

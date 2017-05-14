@@ -1,0 +1,58 @@
+PDL-Graphics-ColorSpace
+
+Does color space conversions such as RGB to XYZ and Lab to LCH. Derived from Graphics::ColorObject but since it's implemented in C and PDL, it runs *much* faster.
+
+
+DEPENDENCIES
+
+PDL
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PDL::Graphics::ColorSpace
+
+Please email author for questions regarding color conversions in this module. Please email PDL mailing list for general questions regarding PDL
+	http://pdl.perl.org/?page=mailing-lists
+
+Please file bugs or requests at
+	https://github.com/maggiexyz/PDL-Graphics-ColorSpace
+
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=PDL-Graphics-ColorSpace
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/PDL-Graphics-ColorSpace
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/PDL-Graphics-ColorSpace
+
+    Search CPAN
+        http://search.cpan.org/dist/PDL-Graphics-ColorSpace/
+
+
+LICENSE AND COPYRIGHT
+
+~~~~~~~~~~~~ ~~~~~ ~~~~~~~~ ~~~~~ ~~~ `` ><(((">
+
+Copyright (C) 2012 Maggie J. Xiong <maggiexyz+github@gmail.com>
+
+Original work sponsored by Shutterstock, LLC L<http://www.shutterstock.com/>
+
+All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.

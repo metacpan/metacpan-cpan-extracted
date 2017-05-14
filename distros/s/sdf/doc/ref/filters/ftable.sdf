@@ -1,0 +1,101 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: table Filter
+
+H2: Interface
+
+!filter_interface "table"
+
+H2: Description
+
+The {{table}} filter specifies a table in {{FMT:TBL}} format.
+A brief description of each parameter is given below.
+A tutorial-style introduction to SDF's table features is
+also provided in the {{DOC:SDF User Guide}}.
+
+!block table
+Parameter     Description
+align         alignment of table: one of Left, Center, Right, Inner, Outer
+bgcolor       background colour for a table (HTML only)
+bmargin       default bottom margin for table cells (MIF only)
+cellpadding   padding size for table cells (HTML only)
+cellspacing   spacing size between table cells (HTML only)
+colaligns     a comma-separated list of horizontal alignments \
+              values (Left, Center, Right) for columns; \
+              alternatively, a single word containing the letters L, C and R
+coltags       a comma-separated list of phrase styles to apply to columns
+colvaligns    a comma-separated list of vertical alignments \
+              values (Top, Middle, Bottom, Baseline) for columns; \
+              alternatively, a single word containing the letters T, M, B and L
+delete        a comma-separated list of columns to delete
+footings      the number of footing rows at the end of the table
+format        a comma-separated list of column width specifications; \
+              alternatively, a single number where each digit represents \
+              10% of the space available to the table
+groups        pattern of group-style rows (default is /:$/)
+headings      the number of heading rows at the top of the table
+landscape     display the table in landscape mode (MIF only)
+listitem      the list indent level (e.g. 1) of this table
+lmargin       default left margin for table cells (MIF only)
+narrow        if set, the table will only be as wide as required; \
+              otherwise the table will span the available space
+niceheadings  set to 0 to disable _ to space conversion in headings
+nocalcs       set to 0 to disable calculation processing within a table
+noheadings    suppress headings in output
+objects       alias for coltags (coltags is preferred)
+oncell        Perl code to execute for each cell (internal use only!)
+parseline     column headings parsing line (if not the first row in the text)
+placement     vertical placement of table: one of Float, Pagetop, Columntop, \
+              Lefttop, Righttop (MIF only)
+rmargin       default right margin for table cells (MIF only)
+select        a comma-separated list of columns to display
+sort          a comma-separated list of columns to sort the data rows by
+style         overall look of the table
+tags          alias for coltags (coltags is preferred)
+title         table caption
+tmargin       default top margin for table cells (MIF only)
+type          alias for style (style is preferred)
+where         an expression to filter the data rows with
+wide          table straddles the side head area of the page
+wrap          the number of data rows to display in a physical row
+!endblock
+
+H2: Examples
+
+A typical table is:
+
+!block example; lang='sdf'
+!block table; format=55; style="grid"; groups; title="Diary"
+Time_of_day     Appointment
+Morning:
+10:00           Dentist
+12:00           Lunch with friends
+Afternoon:
+15:00           Meeting on SDF
+!endblock
+!endblock
+
+The result is:
+
+!block table; format=55; style="grid"; groups; title="Diary"
+Time_of_day     Appointment
+Morning:
+10:00           Dentist
+12:00           Lunch with friends
+Afternoon:
+15:00           Meeting on SDF
+!endblock
+
+#H2: Limitations & Future Directions
+

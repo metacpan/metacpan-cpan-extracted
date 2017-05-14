@@ -1,3 +1,53 @@
+	* (version 1.28)
+	* Boulder::Store fixes from Aaron Wangberg
+Mon Feb  4 17:52:03 EST 2002
+	* (Version 1.27)
+	* Batch entrez queries work again using semi-published, semi-private interface
+	  The problem with the published interface is there's no way to pass a list of
+	  Genbank ACCESSION numbers, just GI numbers.  So I have to use the XML demo.
+	* Patches from Michael Peterson to fix BLAST parsing.
+	
+Thu Jan 24 14:21:02 EST 2002
+	* (Version 1.26)
+	* Partial fix for Entrez retrieval, but Entrez queries don't work :-(
+	
+2001-12-28  Lincoln Stein <lstein@cshl.org>
+	* (version 1.25)
+	* fixed GB_Stone bugs that prevented parsing of some of the feature fields
+	* fixed Boulder/Genbank bugs that prevented parsing of some newer genbank
+	entries that use the ORIGIN field.
+	* fixed problems parsing genomic entries that contain gaps.
+	
+2001-06-14  Lincoln Stein  <lstein@cshl.org>
+	* (version 1.24)
+	* Fixed bugs introduced into 1.23 version when parsing
+		Boulder::Genbank records from Entrez
+
+2001-06-13  Lincoln Stein  <lstein@cshl.org>
+	* (version 1.23)
+	* Boulder::Genbank now correctly handles sequences that
+	 	use whitespace to represent gaps
+
+2001-06-11  Lincoln Stein  <lstein@cshl.org>
+	* (version 1.22)
+	* now reports BatchEntry errors to standard error
+	* patch from Will Fitzhugh to correct problems with Yank accessor
+
+2001-03-09 Lincoln Stein  <lstein@cshl.org>
+	* (version 1.21)
+	* fixed loop termination problem in Boulder::Genbank
+	
+2000-07-13  Lincoln Stein  <lstein@formaggio.cshl.org>
+	* (version 1.20)
+	* Fixes to Boulder::Genbank provided by Lester Hui.
+	  Now  handles repeated multivalued features better.
+
+2000-06-08  Lincoln Stein  <lstein@cshl.org>
+
+	* Fixed Boulder::Blast::NCBI parsing error that caused it to miss some HSPs
+	* Fixed Boulder::Blast::{NCBI,WU} treatment of % identity -- had been returning
+	  identity as a fraction of 1 rather than a percentage (as documented)
+
 1999-12-02  Lincoln Stein  <lstein@cshl.org>
 
 	* Fixed parameter bug in File accessor for Boulder::Genbank.

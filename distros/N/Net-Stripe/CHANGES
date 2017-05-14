@@ -1,10 +1,60 @@
 ==================================================
-Changes from 2016-04-29 00:00:00 +0000 to present.
+Changes from 2016-05-11 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.32 at 2017-04-29 13:59:37 +0000
+version 0.33 at 2017-05-11 21:27:56 +0000
 -----------------------------------------
+
+  Change: 523cf60d3d4f53a9b49180a86c18f7e4fc674354
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-05-02 23:25:52 +0000
+
+    Merge pull request #81 from fheyer/fix_refund
+
+    Refund: removed description, added status attr 
+
+  Change: 546c906b7e00c2a964ca382e594c503ece256658
+  Author: Florian Heyer <info@heyer-it.de>
+  Date : 2017-05-02 12:29:19 +0000
+
+    added deprecation warning for attr description 
+
+  Change: af246bf4579b8dad25b6de258eaec1e0c7e7d0d3
+  Author: Florian Heyer <info@heyer-it.de>
+  Date : 2017-05-02 11:19:09 +0000
+
+    added test 
+
+  Change: e484f0311c2c1a863d1aefce5b7248f669644b80
+  Author: Florian Heyer <info@heyer-it.de>
+  Date : 2017-05-02 11:10:59 +0000
+
+    Merge branch 'master' of https://github.com/lukec/stripe-perl into
+    fix_refund 
+
+  Change: 5d7fa8b059ca147a0529978cbb3312287b3e291e
+  Author: Florian Heyer <info@heyer-it.de>
+  Date : 2017-04-30 13:16:45 +0000
+
+    Refund: removed description, added status attr
+
+    field description does not exist in Stripe API doc, status was
+    missing see https://stripe.com/docs/api#refunds for reference 
+
+  Change: b977c4f4f805ff0642ea11e07b4111481115195e
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-04-29 22:54:24 +0000
+
+    Merge pull request #67 from choroba/master
+
+    Fail a test if the invalid currency isn't reported 
+
+  Change: 3b9ffb7f4e2fba2e49a09e3631ba2ee0888de389
+  Author: E. Choroba <choroba@matfyz.cz>
+  Date : 2017-04-29 23:28:28 +0000
+
+    Fail a test if the invalid currency isn't reported 
 
   Change: df6b654759e4ec7943466223cfeaae105f69e9c6
   Author: Andrew Solomon <andrew@geekuni.com>

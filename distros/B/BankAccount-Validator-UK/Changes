@@ -1,5 +1,10 @@
 Revision history for BankAccount::Validator::UK
 
+0.29  2017-05-11T19:55:00:+01:00
+      - Addition of new sorting codes. (v4.20)
+      - Updated the valacdos.txt dated 12th Jun'2017.
+      - Added support for Clear Bank and HSBC.
+
 0.28  2017-01-28T20:35:00:+01:00
       - Addition of new sorting codes. (v4.10)
       - Updated the valacdos.txt dated 6th Mar'2017.

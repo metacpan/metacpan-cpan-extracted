@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+package Bio::AssemblyImprovement::Bin::ScaffoldWithSSpace;
+# ABSTRACT: Given an assembly and some reads in fastq format, try and scaffold the assembly.
+# PODNAME: scaffold_with_sspace
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use File::Path qw(make_path);
+use Cwd;
+use Bio::AssemblyImprovement::Scaffold::SSpace::PreprocessInputFiles;
+use Bio::AssemblyImprovement::Scaffold::SSpace::Iterative;
+use Bio::AssemblyImprovement::Validate::Executable;
+use Bio::AssemblyImprovement::Util::OrderContigsByLength;
+
+my ( $assembly_file, $forward_reads_file, $reverse_reads_file, $insert_size, $threads, $scaffolder_exec, $debug,$output_directory, $help );
+
+GetOptions(
+    'a|assembly=s'        => \$assembly_file,
+    'f|forward_fastq=s'   => \$forward_reads_file,
+    'r|reverse_fastq=s'   => \$reverse_reads_file,
+    'i|insert_size=i'     => \$insert_size,
+    't|threads=i'		  => \$threads,
+    's|scaffolder_exec=s' => \$scaffolder_exec,
+    'd|debug'             => \$debug,
+    'o|output_directory=s' => \$output_directory,
+    'h|help'              => \$help,
+);
+
+( defined($assembly_file) && defined($forward_reads_file) && defined($reverse_reads_file) && ( -e $assembly_file ) && ( -e $forward_reads_file ) && ( -e $reverse_reads_file ) && !$help ) or die <<USAGE;
+Usage: scaffold_with_sspace [options]
+Take in an assembly in FASTA format and reads in FASTQ format, then iteratively scaffold with SSPACE.
+
+# outputs a file called contigs.scaffolded.fa
+scaffold_with_sspace -a contigs.fa -f 123_1.fastq -r 123_2.fastq 
+
+# use two threads (default 1)
+scaffold_with_sspace -a contigs.fa -f 123_1.fastq -r 123_2.fastq -t 2
+
+# Gzipped input files are accepted
+scaffold_with_sspace -a contigs.fa.gz -f 123_1.fastq.gz -r 123_2.fastq.gz
+
+# Insert size defaults to 250 if not specified
+scaffold_with_sspace -a contigs.fa -f 123_1.fastq -r 123_2.fastq -i 3000
+
+# This help message
+scaffold_with_sspace -h
+
+USAGE
+
+$debug           ||= 0;
+$insert_size     ||= 250;
+$threads		 ||= 1;
+$scaffolder_exec ||= '/software/pathogen/external/apps/usr/local/SSPACE-BASIC-2.0_linux-x86_64/SSPACE_Basic_v2.0.pl';
+$scaffolder_exec = 'SSPACE_Basic_v2.0.pl' unless(Bio::AssemblyImprovement::Validate::Executable->new()->does_executable_exist($scaffolder_exec));
+$output_directory ||= getcwd();
+make_path($output_directory);
+
+my @input_files = ( $forward_reads_file, $reverse_reads_file );
+
+my $preprocess_input_files = Bio::AssemblyImprovement::Scaffold::SSpace::PreprocessInputFiles->new(
+    input_files    => \@input_files,
+    input_assembly => $assembly_file
+);
+my $process_input_files_tmp_dir_obj = $preprocess_input_files->_temp_directory_obj();
+
+my $iterative_scaffolding = Bio::AssemblyImprovement::Scaffold::SSpace::Iterative->new(
+    input_files     => $preprocess_input_files->processed_input_files,
+    input_assembly  => $preprocess_input_files->processed_input_assembly,
+    insert_size     => $insert_size,
+    threads			=> $threads,
+    scaffolder_exec => $scaffolder_exec,
+    debug           => $debug,
+    output_base_directory => $output_directory
+)->run();
+
+# sort contigs by length
+my $scaffolding_output = $iterative_scaffolding->final_output_filename;
+my $order_contigs = Bio::AssemblyImprovement::Util::OrderContigsByLength->new( input_filename  => $scaffolding_output );
+$order_contigs->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+scaffold_with_sspace - Given an assembly and some reads in fastq format, try and scaffold the assembly.
+
+=head1 VERSION
+
+version 1.160490
+
+=head1 SYNOPSIS
+
+Given an assembly and some reads in fastq format, try and scaffold the assembly. Do multiple iterations with different values, and cleanup all intermediate files.
+
+   # outputs a file called contigs.scaffolded.fa
+   scaffold_with_sspace -a contigs.fa -f 123_1.fastq -r 123_2.fastq 
+
+   # use two threads (default 1)
+   scaffold_with_sspace -a contigs.fa -f 123_1.fastq -r 123_2.fastq -t 2
+   
+   # Gzipped input files are accepted
+   scaffold_with_sspace -a contigs.fa.gz -f 123_1.fastq.gz -r 123_2.fastq.gz
+
+   # Insert size defaults to 250 if not specified
+   scaffold_with_sspace -a contigs.fa -f 123_1.fastq -r 123_2.fastq -i 3000
+
+   # This help message
+   scaffold_with_sspace -h
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

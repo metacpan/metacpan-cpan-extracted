@@ -22,9 +22,10 @@ Class to deal with the current page request
 
 use strict;
 use warnings;
-use CGI;
+use CGI::Minimal;
 use Carp;
 use Data::Dumper;
+use Digest::SHA1;
 #########################################################
 
 =head2 new()
@@ -133,6 +134,26 @@ sub getHeader{
 	}
 	return $value;
 }
+####################################################
+
+=pod
+
+=head2 getDigest()
+
+	$request->getDigest()
+
+Returns a digest of the request parameters.
+
+=cut
+
+####################################################
+sub getDigest{
+	my $self = shift;
+	my $params = $self->getParameters();
+	my $sha1 = Digest::SHA1->new();
+	$sha1->add($self->__stringfy($params));
+	return $sha1->hexdigest();	
+}
 #########################################
 sub _setParameters{
 	my $self = shift;
@@ -147,7 +168,7 @@ sub _setParameters{
 sub __getCgi{
 	my $self = shift;
 	if(!$self->{'__cgi'}){
-		$self->{'__cgi'} = CGI->new();	#create a new cgi object
+		$self->{'__cgi'} = CGI::Minimal->new();	#create a new cgi object
 	}
 	return $self->{'__cgi'};
 }

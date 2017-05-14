@@ -1,0 +1,175 @@
+#!/usr/local/bin/perl
+# $Id$
+$VERSION{'PUBLIC'} = '2.000';
+$VERSION{''.__FILE__} = '$Revision$';
+#
+# >>Title::     API Extraction Utility
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{CMD:sdfapi}} extracts {{Application Programming Interface}} information
+# from ([[Perl]]) source code.
+#
+# >>Description::
+# !SDF_OPT_STD
+#
+# The format of the output can be controlled using the -f option.
+# Supported formats are {{std}} and {{concise}}. The default is {{std}}.
+# {{std}} format is:
+#
+# E:require "abc.pl";
+# E:
+# E:$myvar = ...
+# E:
+# E:$result =
+# E:&myfunc($myparams);
+#
+# {{concise}} format has fewer blank lines and uses 1 line per symbol.
+#
+# A comma-separated list of symbol types to output can be specified
+# using the -s option. Supported symbol types are:
+#
+# * {{sub}} - subroutines
+# * {{var}} - variables
+#
+# The default is to extract all symbols.
+#
+# The -p option is used to extract only a subset of the symbols.
+# If not supplied, the pattern is symbols beginning with a letter.
+# If supplied without an option, the pattern defaults to all symbols.
+# If perl libraries use the coding convention that symbols beginning
+# with underscore are private, then -p_ can be used to extract the
+# private symbols.
+#
+# The -j option can be used to request SDF-style hypertext jumps
+# be added for each symbol. The jump target is {{lib_sym}} where:
+#
+# * {{lib}} is the library name
+# * {{sym}} is the symbol name.
+#
+# >>Limitations::
+# The only language currently supported is [[Perl]].
+#
+# It would be useful to extract messages from the scripts too.
+# This would require a new utility called {{sdfmsg}} say,
+# which searched through the source (including libraries) for
+# {{Y:AppMsg}} and {{Y:AppExit}} calls.
+#
+# Internally, it may be better to implement formats via routines.
+# This would give better control over output. e.g. it would be up to
+# the routine to decide if it wanted to output the 'require' header.
+#
+# >>Resources::
+#
+# >>Implementation::
+#
+
+require "sdf/app.pl";
+require "sdf/apiperl.pl";
+
+########## Initialisation ##########
+
+# Table of formatting tags
+# (update %PERLIF_RULE if you change this)
+@PERLIF_FMT = ('std', 'concise');
+
+# Tables of formatting rules. Each format needs 3 rules:
+#
+# * var - variable format
+# * proc - routine with no result (i.e. procedure)
+# * func - routine with result (i.e. function).
+#
+%PERLIF_RULE = (
+    "std.var",      '"${prefix}$name = ...\n\n"',
+    "std.proc",     '"${prefix}$name($params);\n\n"',
+    "std.func",     '"$result =\n${prefix}$name($params);\n\n"',
+    "concise.var",  '"${prefix}$name = ...\n"',
+    "concise.proc", '"${prefix}$name($params);\n"',
+    "concise.func", '"$result = ${prefix}$name($params);\n"',
+);
+
+# define configuration
+%app_config = (
+    'libdir',   'sdf/home',
+);
+
+# define options
+push(@app_option, (
+    #'Name|Spec|Help',
+    'fmt_tag|STR-@PERLIF_FMT;std|output format tag',
+    'pattern|STR;^[A-Za-z];|only symbols matching pattern',
+    'sym_type|STRLIST-("sub","var")|only symbols of these types',
+    'jumps|BOOL|add SDF-style hypertext jumps from each symbol',
+));
+
+# handle options
+&AppInit('file ...', 'extract the API from a (perl) library', 'SDF') ||
+  &AppExit();
+
+########## Processing ##########
+
+sub argProcess {
+    local($perl_file) = @_;
+#   local();
+
+    # Fetch File
+    ($ok_perl, @perl) = &PerlFetch($perl_file);
+    unless ($ok_perl) {
+        &AppMsg('abort', "error fetching perl file '$perl_file'");
+        return;
+    }
+
+    # Get perl symbols
+    @symbol = &PerlSymbols(*perl, $pattern, @sym_type);
+
+    # Find longest strings (optionally used in routine formatting)
+    $max_name = 0;
+    $max_result = 0;
+    $max_params = 0;
+    for $symbol (@symbol) {
+        ($sym_type, $name, $result, $params) = split(/:/, $symbol);
+        next unless $sym_type eq 'sub';
+        $len = length($name);
+        $max_name = $len if $len > $max_name;
+        $len = length($result);
+        $max_result = $len if $len > $max_result;
+        $len = length($params);
+        $max_params = $len if $len > $max_params;
+    }
+
+    # Output the header unless a subset requested
+    if (scalar(@sym_type) == 0) {
+        ($dir, $base, $ext) = &NameSplit($perl_file);
+        printf "require \"%s\";\n\n", &NameJoin('', $base, $ext);
+    }
+
+    # Output symbols
+    for $symbol (@symbol) {
+        ($sym_type, $name, $result, $params) = split(/:/, $symbol);
+        if ($sym_type eq 'sub') {
+            $sym_type = $result ? 'func' : 'proc';
+            $prefix = '&';
+        }
+        else {
+            $name =~ s/^(.)//;
+            $prefix = $1;
+        }
+        $action = $PERLIF_RULE{"$fmt_tag.$sym_type"};
+        if ($jumps) {
+            $action =~ s/\$name/{{N[jump='#\${base}_\$name']\$name}}/;
+        }
+        print eval $action;
+    }
+}
+
+&AppProcess('argProcess');
+&AppExit();

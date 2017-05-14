@@ -2,7 +2,7 @@ package AI::MicroStructure::foo;
 use strict;
 use AI::MicroStructure::Locale;
 our @ISA = qw( AI::MicroStructure::Locale );
-our $VERSION = '1.001';
+our $VERSION = '0.20';
 __PACKAGE__->init();
 1;
 

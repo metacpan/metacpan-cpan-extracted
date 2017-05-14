@@ -4,7 +4,7 @@
 package Net::Frame::Layer::DNS;
 use strict; use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Net::Frame::Layer qw(:consts :subs);
 use Exporter;

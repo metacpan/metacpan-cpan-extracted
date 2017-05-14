@@ -43,6 +43,7 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Code::TidyAll" => "0.56";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";

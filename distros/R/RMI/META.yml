@@ -1,0 +1,28 @@
+---
+abstract: 'Remote Method Invocation with transparent proxies v0.07'
+author:
+  - 'Scott Smith <sakoht@cpan.org>'
+build_requires:
+  App::Prove: 0
+  Test::More: 0.86
+configure_requires:
+  ExtUtils::MakeMaker: 6.48
+distribution_type: module
+generated_by: 'Module::Install version 0.81'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RMI
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Carp: 0
+  IO::Socket: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.008000

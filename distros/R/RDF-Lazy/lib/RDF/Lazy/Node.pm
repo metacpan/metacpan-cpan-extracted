@@ -1,6 +1,11 @@
-package RDF::Lazy::Node;
 use strict;
 use warnings;
+package RDF::Lazy::Node;
+{
+  $RDF::Lazy::Node::VERSION = '0.081';
+}
+#ABSTRACT: A node in a lazy RDF graph
+
 
 use RDF::Lazy::Literal;
 use RDF::Lazy::Resource;
@@ -92,11 +97,18 @@ sub _autoload {
 }
 
 1;
-__END__
+
+
+
+=pod
 
 =head1 NAME
 
 RDF::Lazy::Node - A node in a lazy RDF graph
+
+=head1 VERSION
+
+version 0.081
 
 =head1 DESCRIPTION
 
@@ -211,4 +223,19 @@ in a template is an example of a "RDFPath" language):
     $x->foaf_knows(':')   # any resource
     ...
 
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
+
+
+__END__
+

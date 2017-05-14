@@ -1,8 +1,3 @@
-3.19 (2017-01-04)
-  - add SUPPORT by irc
-    the official IRC channel #object-simple on irc.perl.org
-  - remove DEPRECATED class_attr and dual_attr method
-    These methods was planed to removed at 2017-01-01.
 3.1801 (2016-09-12)
   - fix and improve document.
 3.18 (2016-09-10)

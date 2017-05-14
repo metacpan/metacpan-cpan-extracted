@@ -1,0 +1,37 @@
+---
+abstract: 'Conclave Ontology Toolkit'
+author:
+  - 'Nuno Carvalho <smash@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  File::Touch: '0'
+  Test::File: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Conclave-OTK
+requires:
+  Data::Dumper: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  LWP::UserAgent: '0'
+  Path::Tiny: '0'
+  RDF::Query: '0'
+  RDF::Trine: '0'
+  RDF::Trine::Model: '0'
+  RDF::Trine::Parser: '0'
+  RDF::Trine::Serializer::RDFXML: '0'
+  RDF::Trine::Store::Memory: '0'
+  Template: '0'
+  Template::Provider: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.01'

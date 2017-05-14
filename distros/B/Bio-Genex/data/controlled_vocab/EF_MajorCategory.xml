@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ExperimentFactors" db_column="major_category" cv_table="EF_MajorCategory">
+  <comment type="definition">This table supplies the restricted vocabulary for the column major category in the table Experimental Factor and describes those variables in the experiment not considered to be the treatment		
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They are not
+currently implemented but are likely to be soon.</comment>
+<term name="methodological_factor"
+        description="variations in the methods and procedures used to prepare reagents like RNA and cDNA"/>
+<term name="biological_factor"
+        description="variations in the way an organism was treated,
+such as environmental stress like heat shock and cold shock"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

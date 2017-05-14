@@ -21,7 +21,7 @@ no_index:
 provides:
   Yandex::Translate:
     file: lib/Yandex/Translate.pm
-    version: 1.000005
+    version: 1.001
 recommends:
   HTML::Entities: 3.69
   HTTP::Tiny: 0.070
@@ -35,4 +35,5 @@ requires:
   URI::Escape: 0
 resources:
   repository: https://fossil.falseking.site/dir?ci=tip&type=tree
-version: 1.000005
+version: 1.001
+

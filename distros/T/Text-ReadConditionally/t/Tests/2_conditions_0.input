@@ -1,0 +1,9 @@
+.# Title: Simple If
+.#
+.# Tests: .if
+.#
+First line
+.if 1
+Always true line
+.fi
+END

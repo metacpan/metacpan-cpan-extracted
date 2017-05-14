@@ -1,0 +1,77 @@
+<<if: ZXIDBOOK>>
+<<else: >>MediaWiki Setup Receipe for ZXID
+################################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: mediawiki-zxid.pd,v 1.2 2009-08-25 16:22:44 sampo Exp $>>
+
+1 Mediawiki Support
+===================
+
+<<fi: >>
+
+MediaWiki supports the SAML identity protocol so you can
+use your identity by supplying IdP URL to authenticate
+and log nto MediaWiki! SAML support was added by
+Sampo Kellomaki (sampo@iki.fi) and uses the zxid.org
+SSO library.
+
+This receipe is accurate as of Jan 2007, zxid-0.8 and MediaWiki-1.9.0
+
+Consider this receipe only one of many possible setups and not
+ncessarily even the best. The receipe worked for me in August 2006. If
+you come much later, things may have changed.
+
+This Apache setup aims to illustrate
+
+* mod_php5 invocation of zxid inside MediaWiki
+
+1.1 Prerequisites
+-----------------
+
+1. PHP (version 5 recommended)
+
+2. zxid base and mod_ssl dependency: openssl-0.9.8d from http://openssl.org,
+   usually what comes with your Linux distribution is OK
+
+3. Apache with mod_ssl and mod_php,
+   see <<link:apache.html: Apache Setup Receipe for ZXID>>
+
+4. zxid base dependency: libcurl from http://curl.haxx.se/, usually
+   what comes with your Linux distribution is OK
+
+5. zxid base, e.g. http://zxid.org/zxid-0.8.tgz
+
+     tar xvzf zxid-0.8.tgz
+     cd zxid-0.8
+     make dep
+     make
+
+6. zxid for PHP (part of zxid base)
+
+     make phpzxid
+     make phpzxid_install  # Possibly as root
+
+1.2 Building MediaWiki
+----------------------
+
+1. Get MediaWiki from mediawiki.org
+
+1.3 Trying It Out
+-----------------
+
+Use browser to access following URLs to try your accomplishments out:
+
+1. https://sp1.zxidsp.org:8443/README.zxid tests (tests simple file access
+   and that the server works at all)
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+<<htmlpreamble: <title>Apache Setup Receipe for ZXID</title><body bgcolor="#330033" text="#ffaaff" link="#ffddff" vlink="#aa44aa" alink="#ffffff"><font face=sans><h1>Apache Setup Receipe for ZXID</h1> >>
+<<EOF: >>
+
+Note: janrain.diff is about 1078 lines.
+
+http://www.mediawiki.org/wiki/Category:Extensions
+
+<<fi: >>

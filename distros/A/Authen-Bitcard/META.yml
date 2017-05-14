@@ -1,27 +1,29 @@
---- #YAML:1.0
-name:               Authen-Bitcard
-version:            0.87
-abstract:           Bitcard authentication verification
+---
+abstract: 'Bitcard authentication verification'
 author:
-    - Ask Bjoern Hansen <ask@develooper.com>
-license:            unknown
-distribution_type:  module
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+build_requires:
+  Test::More: 0
 configure_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Class::ErrorHandler:  0
-    Digest::SHA1:         0
-    HTTP::Status:         0
-    LWP::UserAgent:       0
-    Math::BigInt:         0
-    MIME::Base64:         0
-    Test::More:           0
-    URI:                  1.22
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.48
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.101670'
+license: apache
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-Bitcard
+requires:
+  Class::ErrorHandler: 0
+  Digest::SHA: 0
+  HTTP::Status: 0
+  JSON: 2.12
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Math::BigInt: 0
+  URI: 1.22
+resources:
+  homepage: http://search.cpan.org/dist/Authen-Bitcard/
+  repository: http://git.develooper.com/bitcard-perl-api.git
+version: 0.90

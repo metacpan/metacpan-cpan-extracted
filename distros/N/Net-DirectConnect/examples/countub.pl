@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#my $Id = '$Id: countub.pl 787 2011-05-25 21:41:28Z pro $';
+#my $Id = '$Id: countub.pl 990 2012-12-28 20:35:04Z pro $';
 
 =copyright
 counting users-bytes from dchub for mrtg or cacti (snmpd)

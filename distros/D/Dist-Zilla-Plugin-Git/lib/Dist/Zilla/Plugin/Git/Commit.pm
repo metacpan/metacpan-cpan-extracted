@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Commit;
 # ABSTRACT: Commit dirty files
 
-our $VERSION = '2.041';
+our $VERSION = '2.042';
 
 use namespace::autoclean;
 use File::Temp           qw{ tempfile };
@@ -127,7 +127,7 @@ Dist::Zilla::Plugin::Git::Commit - Commit dirty files
 
 =head1 VERSION
 
-version 2.041
+version 2.042
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 (or L<bug-Dist-Zilla-Plugin-Git@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Git@rt.cpan.org>).
 
 There is also a mailing list available for users of this distribution, at
-L<http://www.listbox.com/subscribe/?list_id=139292>.
+L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.

@@ -1,0 +1,1041 @@
+
+        +==========================================================+
+        |                                                          |
+        |                                                          |
+        |            AdminMisc extension for Win32 Perl            |
+        |                                                          |
+        |                                                          |
+        |              -----------------------------               |
+        |                                                          |
+        |              by Dave Roth <rothd@roth.net>               |
+        |                                                          |
+        |                                                          |
+        |  Copyright (c) 1996-1998 Dave Roth. All rights reserved. |
+        |     Courtesy of Roth Consulting                          |
+        |     http://www.roth.net/consult                          |
+        +==========================================================+
+
+
+      ---------------------------------------------------------------------
+                              CHECK OUT THE FAQ!!!
+
+                      HTTP://WWW.ROTH.NET/PERL/ADMINMISC/
+      ---------------------------------------------------------------------
+
+
+Following in tradition...
+                 ********************************************
+                *                                            *
+                *    Use under GNU General Public License    *
+                *                                            *
+                *          Details can be found at:          *
+                *    http://www.gnu.org/copyleft/gpl.html    *
+                *                                            *
+                 ********************************************
+
+        ----------------------------------------------------------------
+NOTICE: I do not guarantee ANYTHING with this package. If you use it you
+        are doing so AT YOUR OWN RISK! I may or may not support this
+        depending on my time schedule.
+        ----------------------------------------------------------------
+        
+        
+    
+BENEFITS
+    What is the deal with this?
+    - This will allow you to manage user's dial in priviliges
+    - You can administrate RAS servers and connections.
+    - You can retrieve information about individual RAS connections.
+
+
+KNOWN PROBLEMS:
+    What known problems does this thing have?
+    - None thus far.
+
+
+HOW TO INSTALL:
+    - IF you are using the ActiveState version of Win32 Perl:
+        a) Copy the ADMINMISC.PM file into the directory perl\lib\win32\
+        b) Rename the file ADMINMISC_XXX.PLL to ADMINMISC.PLL
+        c) Make a directory: perl\lib\auto\win32\adminmisc\
+        d) Copy the ADMINMISC.PLL file into the directory in step c
+
+    - IF you are using the core distribution of Win32 Perl:
+        a) Copy the ADMINMISC.PM file into the directory perl\lib\site\win32\
+        b) Rename the file ADMINMISC_CORE.DLL to ADMINMISC.DLL
+        c) Make a directory: perl\lib\site\auto\win32\ADMINMISC\
+        d) Copy the ADMINMISC.DLL file into the directory in step c
+
+    That is it!
+
+
+
+PARSE EXCEPTIONS:
+    If you are lucky enough to get a parse exception when you use this
+    extension then that means that the particular build of this extension is
+    not compatible with your build of Win32 Perl. What you need to do is
+    download a compatible build of the extension from our FTP site.
+    The way you do this is first discovering your Win32 Perl build by using
+    the following command:
+        perl -v
+    There will be a build number listed. Next download the updated version
+    of this extension for that build number. You will need the one which
+    either matches your build number or is the closest smaller build number.
+    For example there are builds for 307 and 311. If you are using Win32 Perl
+    build 313 you would download the extension built for 311 (since 311 and
+    313 are compatible). However if you have Win32 Perl build 310 you would
+    download the 307 build (builds 307 - 310 are all compatible).
+
+    Crazy, eh? I am hoping that the builds will cease to change the way
+    extensions are managed so we don't have this build breaking anymore. :)
+
+
+GENERAL USE:
+===========
+
+  CreateProcessAsUser($CommandString [, $DefaultDirectory])
+    This creates a new process $CommandString starting in the $DefaultDirectory
+    (optional). The new process will be running under the account of the
+    currently impersonated user (LogonAsUser()).
+    There has been problems with this under NT 4.0 when the impersonated user
+    is not an Administrator.
+    Returns: -1 if failure otherwise the return is the OS createprocess result.
+
+  DelEnvVar($Name [, $Type [, $Timeout]])
+    This will delete an environmental variable $Name.
+    Thi affect of this function will be seen globally, not only the currently running
+    process.
+	If $Timeout is specified then the function will wait up to $Timeout seconds
+	for other applications to become aware that the environment has changed. If
+	the function timesout some applications may not be aware of the variable 
+	changes.
+
+    If $Type is specified it can be one of:
+        ENV_SYSTEM........Specifies that $Name will be a system environmental
+                          variable. (default if $Type is not specified)
+        ENV_USER..........Specifies that $Name will be a user environemental
+                          variable.
+    This function is the equivalent to setting an environental variable in the
+    control panel's system applet.
+
+    NOTE: Your script will not see the new value. For that you should set $ENV{xxx}.
+
+    Returns:
+        1 if deleting the variable was successful
+        0 if not successful
+
+  DNSCache([1|0])
+    Sets the local DNS cache on (1) or off (0). If nothing is specified it
+    only returns the current state of the DNS cache.
+    Returns: 1 local DNS cache is active.
+             0 local DNS cache is not active.
+
+  DNSCacheCount()
+    Returns the current number of cached elements. This can not exceed the
+    value of DNSCacheSize.
+    Returns: Current number of cached elements.
+
+  DNSCacheSize([$Size])
+    Sets the local DNS cache size to $Size elements (or name/ip associations).
+    If nothing is specified then it only returns the current size of the cache.
+    NOTE: If a number is specified then the cache will be reset and every
+          thing in it will be lost.
+    NOTE: The size could be anything. Don't make it too large for memory and
+          speed sake.
+    The default size is 600.
+    Returns: Current size of the DNS cache.
+
+  ExitWindows($Flag)
+    This will start the exit windows process.
+    $Flag can be one of the following:
+        EWX_LOGOFF......Log the user off. Applications will be told to quite so
+                        you may be prompted to save files.
+        EWX_POWEROFF....Force the system to shutdown and power off. The system
+                        must support poweroff. (NT: calling process must have
+                        the SE_SHUTDOWN_NAME privilege)
+        EWX_REBOOT......Shut down the system and reboot the computer. (NT:
+                        calling process must have the SE_SHUTDOWN_NAME
+                        privilege)
+        EWX_SHUTDOWN....Shut down the system but don't reboot. (NT: calling
+                        process must have the SE_SHUTDOWN_NAME privilege)
+
+    The following flag can be logically ORed with one of the above flags:
+        EWX_FORCE.......Log the user off. Applications will be forced to exit
+                        without saving. This is a hostile way to force a
+                        log off.
+
+    Returns:
+        non zero value if successful
+        0 if unsuccessful
+
+  GetComputerName()
+    This will return the name of the computer.
+
+    Returns:
+        Computer's name if successful
+        undef if not successful
+
+  GetDC()
+    This will return a Domain Controler of the domain $Domain.
+    If $Domain is empty then use default domain is assumed.
+    $Domain can be either an NT domain or an NT computer.
+    Example:
+        GetDC("ENGINEERING");
+        GetDC("\\\\Server1");
+        GetDC("//Server1");
+
+    Returns:
+        name of a DC for the sepecified domain if successful
+        undef if unsuccessful
+
+  GetDrives([$Type])
+    This will return an array of drive roots. If no parameters are passed
+    then the list will be all drives (cdroms, floppy, fixed, net, etc.).
+    If you specify $Type the list will only contain drive roots that are
+    of the specified type.
+    The types are:
+        DRIVE_FIXED
+        DRIVE_REMOVABLE
+        DRIVE_REMOTE
+        DRIVE_CDROM
+        DRIVE_RAMDISK
+    Returns: nothing if unsuccessful
+             array if successful
+
+
+  GetDriveGeometry($Drive)
+    This will return an array consisting of drive information in the following
+    order:
+        Sectors per Cluster
+        Bytes per Sector
+        Number of free clusters
+        Total number of clusters
+    If an UNC is used instead of $Drive then it must end with a backslash as
+    in:
+        \\server\share\
+
+    Returns:
+        array if successful
+        nothing if unsuccessful
+
+  GetDriveSpace($Drive)
+    This will return an array consisting of the total drive capacity and the
+    available space on the drive.
+    Drives need to be specified as a root such as "c:\" or "a:\" (notice
+    the need to specify the root directory not just the drive letter).
+    NOTE: The values returned may not be accurate if you are running on a
+    Windows 95 OSR 1 machine due to a bug in the OS. This was fixed with OSR 2.
+    If an UNC is used instead of $Drive then it must end with a backslash as
+    in:
+        \\server\share\
+
+    Returns:
+        array ($Total, $Free) if successful
+        nothing if unsuccessful
+
+  GetDriveType($Drive)
+    This will return an integer relating to a drive type of the root $Drive.
+    Drives need to be specified as a root such as "c:\" or "a:\" (notice
+    the need to specify the root directory).
+    The types are:
+        DRIVE_FIXED
+        DRIVE_REMOVABLE
+        DRIVE_REMOTE
+        DRIVE_CDROM
+        DRIVE_RAMDISK
+    If an error occurs a 0 will be returned and if the type could not be
+    determined (maybe a a disk is not in the drive) then a 1 will return,
+    otherwise type drive type will return.
+    Returns:
+        0 if unsuccessful
+        1 if unable to determine
+        drive type if successful
+
+  GetEnvVar($Name [, $Type])
+    This will return the value of the environmental variable $Name.
+    If $Type is specified it can be one of:
+        ENV_SYSTEM........Specifies that $Name will be a system environmental
+                          variable. (default if $Type is not specified)
+        ENV_USER..........Specifies that $Name will be a user environemental
+                          variable.
+
+    Returns:
+        value of the environmental variable if successful
+        undef if not successful
+
+  GetFileInfo($File, \%Info)
+    This will return a 1 if there is information available for the file $File.
+    If the function is successful then the hash %Info will be populated with
+    file information that is available on that file. Information returned in
+    the hash include copyright, company, original filename, etc.
+
+    Returns:
+        1 if successful
+        0 if not successful
+
+  GetGroups( $GroupType, \@List )
+    This will, if successful, populate the @List array with the names of the 
+    user groups that match the group type $GroupType.
+    $GroupType can be one of the following constants:
+        GROUP_TYPE_ALL...........All group types (local and global)
+        GROUP_TYPE_LOCAL.........Just local groups
+        GROUP_TYPE_GLOBAL........Just global groups
+
+    Returns:
+        1 if successful
+        0 if not successful
+
+  GetHostAddress($DNS_Name)
+  gethostbyname($DNS_Name)
+  GetHostName($IP_Address)
+  gethostbyaddr($IP_Address)
+    These four functions are the same but go by different names for the sake
+    of sanity. You can freely mix and match any of these.
+    Providing either an IP address or a DNS name it will return the opposite
+    of what you provided or return a 0 if it fails.
+    Returns: IP address, DNS name if successful.
+             0 if failure.
+
+  GetIdInfo()
+    This will return an array with the following information (in order):
+        Process ID (PID)............The process ID (PID).
+        Thread ID (TID).............The Thread ID (TID).
+        Priority Class for PID......The priority of the process.
+                                    **Currently Broken**
+        Thread Priority.............The priority of the thread.
+                                    **Currently Broken**
+        Command Line................The command line used to start the process.
+
+    Returns:
+        array if successful
+
+  GetLogonName()
+    This will return the name of the user this account is logged on as. This is
+    NOT necessarily the same as the account the perl script is running under.
+    An account can log on as another user (known as "impersonating" another
+    account).
+    Returns: Name that the current account is logged in as.
+
+  GetMemoryInfo()
+    This will return a hash of memory related information.  Returned
+    values are:
+        Load.................Current load on memory (in percentages)
+
+    Returns: nothing if unsuccessful
+             hash if successful
+
+  GetPDC($Domain)
+    This will return the Primary Domain Controler of the domain $Domain.
+    If $Domain is empty then use default domain is assumed.
+    $Domain can be either an NT domain or an NT computer.
+    Example:
+        GetPDC("ENGINEERING");
+        GetPDC("\\\\Server1");
+        GetPDC("//Server1");
+
+    Returns:
+        name of the PDC for the sepecified domain if successful
+        undef if unsuccessful
+
+  GetProcessorInfo()
+    This will return a hash of processor related information. Returned
+    values are:
+        OEMID................OEM identifier
+        NumOfProcessors......Number of microprocessors installed
+        ProcessorType........Type of microprocessor
+        ProcessorLevel.......Level of microprocessor (eg. 4=486,
+                             5=Pentium [586], 6=Pentium Pro)
+        ProcessorRevision....Revision of microprocessor
+        PageSize.............Paged memory size (how much memory is paged
+                             to disk at one time)
+    Returns: nothing if unsuccessful
+             hash if successful
+
+  GetStdHandle($Handle)
+    This will return the win32 handle to the standard handle specified in
+    $Handle.
+    Possible options for $Handle are:
+        STD_INPUT_HANDLE
+        STD_OUTPUT_HANDLE
+        STD_ERROR_HANDLE
+
+    Returns:
+        Win32 handle if successful
+        undef if unsuccessful
+
+  GetTOD($Server)
+    This will retrieve the time of day from the computer $Server. If $Server
+    is empty then the current computer is used.
+    The return value is in the same format that time() returns.
+
+    Returns:
+        value if successful
+        undef if not successful
+
+  GetVolumeInfo( $Drive )
+    This will return a hash of drive volume information for the $Drive drive.
+    $Drive must be a root directory such as "c:\\" or "x:/".  $Drive may be a UNC.
+    Returned keys are:
+	    Volume...............The volume label for the drive.
+		Serial...............The serial number for the drive (in decimal)
+		MaxFileNameLength....The max number of chars a file name can be for drive.
+		SystemFlag...........System flags which can be combination of:
+            FS_CASE_IS_PRESERVED....The case of filenames are stored on the disk.
+                                    (for example DOS makes file names uppercase)
+            FS_CASE_SENSITIVE ......File system supports case sensitive filenames.
+            FS_UNICODE_STORED_ON_DISK...File system supports unicode filenames.
+            FS_PERSISTENT_ACLS......File System saves and enforces access control
+                                    lists (aka file permissions)
+            FS_FILE_COMPRESSION ....File system supports file based compression.
+            FS_VOL_IS_COMPRESSED....Volume is compressed (as in using DoubleSpace).
+         FileSystemName.......The name of the format of the drive (eg. NTFS, FAT)
+    Returns: nothing if unsuccessful
+             hash if successful
+
+
+  GetWinVersion()
+    This will return a hash of windows versions. Returned values are:
+        Major................Major version.
+        Minor................Minor version.
+                             (Windows version = Major.Minor as
+                             in 3.51)
+        Build................Build number
+        Platform.............Platform of OS (Win32s, Win_95 or Win_NT)
+        CSD..................Service Pack number (if any)
+    Returns: nothing is unsuccessful
+             hash if successful
+
+  LogoffAsUser([1|0])
+    This will log the current account out from an "impersonated" account if
+    the current account is indeed impersonating another account.
+    If a non 0 parameter is passed then the the logoff is forced, that is,
+    you can force the impersonation to end even if LogonAsUser() was not called.
+    Returns: always returns 1
+
+  LogonAsUser($Domain, $User, $Password [, $LogonType)
+    This will log the current account on under a different account. The account
+    to log on under will be in the domain $Domain, user $User with the password
+    $Password.
+    If $Domain is Null ('') then the $User is assumed to be in the domain in which
+    the account is running.
+    $LogonType is by default (if not specified) LOGON32_LOGON_INTERACTIVE but
+    can be any valid logon type (eg. LOGON32_LOGON_BATCH).
+    Returns: 0 if unsuccessfull
+             1 if successfull
+
+  ReadINI($File [, $Section [, $Key]])
+    This will return either a scalar containing the value of $Key from the
+    $Section section of the INI file $File or an array of all Keys .
+    If $Key is empty then an array is returned containing all of the keys of
+    the section $Section.
+    If $Section is empty then an array is returned containing all of the
+    sections in the INI file $File.
+
+    Returns:
+        array if $Section or $Key are empty and the function is successful
+        scalar if successful
+        nothing if unsuccessful
+
+  RenameUser($Server, $User, $NewUser)
+    This will rename the user account $User to $NewUser. All groups will
+    reflect the new name.
+    The command will be sent to $Server to be processed. If $Server is a
+    domain name then it will find the PDC for that domain.  If $Server is
+    a computer name in the format of \\server or //server then it will
+    execute the command on that computer.  If $Server is blank then it will
+    be run on the local machine.
+
+    Returns:
+        1 if successful
+        0 if not successful
+
+  ScheduleAdd($Machine, $Time, $DOM, $DOW, $Flags, $Command)
+    This will schedule $Command to run at $Time on the day of the month
+    determined by the bitmask $DOM and the day of the week determined by
+    the bitmask $DOW.
+    The scheduled job will be added with the flags specified in $Flags.
+    $DOM........A bitmask where each bit represents a day of the month.
+                For example: 2**4 | 2**17 would represent the 4th and 17th.
+    $DOW........A bitmask where each bit represents a day of the week
+                starting with Monday as bit 0. The following constants are
+                defined:
+                MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+                These constants can be ORed together.
+    $Flags......A bitmask representing flags:
+                JOB_RUN_PERIODICALLY....The job will run on every DOW and DOM
+                                        scheduled. If this bit is not set then
+                                        the job will run once for each DOM and
+                                        DOW set.
+                JOB_ADD_CURRENT_DATE....The job will run at the next $Time. If
+                                        the $Time has already passed it will
+                                        schedule to run at $Time tomorrow.
+                JOB_EXEC_ERROR..........This bit is set when the last time
+                                        the particular job ran it errored.
+                                        This is a read only bit.
+                JOB_RUNS_TODAY..........This bit is set when the job's time
+                                        has yet to pass for the current day.
+                                        This is set even if the job is not
+                                        scheduled to run on the current day.
+                JOB_NONINTERACTIVE......This bit is set if the job will not
+                                        run allowing for interaction with
+                                        the desktop.
+
+    $Command....This is any command that will be run.
+
+    Returns:
+        job number if successful
+        undef if not successful
+
+
+  ScheduleDel($Machine, $JobNumber [, $MaxJobNumber])
+    This will delete the job number $JobNumber on the machine $Machine.
+    If the third parameter is specified all jobs between and including
+    $JobNumber and $MaxJobNumber will be deleted.
+
+    Returns:
+        1 if successful
+        0 if not successful
+
+  ScheduleGet($Machine, $JobNumber, \%JobInfo)
+    This will retrieve information about a particular scheduled job
+    on $Machine.  The information is stored in the hash %JobInfo.
+
+    Returns:
+        1 if successful
+        0 if not successful
+
+  ScheduleList($Machine [, \%List])
+    This will return the total number of jobs scheduled to run on $Machine.
+    If a hash reference is specified as a second parameter then a hash of
+    hashes will be populated with information about each job.
+
+    Returns:
+        total number of jobs if successful
+        undef if not successful
+
+  SetComputerName($Name)
+    This will set the computer name to $Name.
+    This can have serious implications the computer exists in a domain.
+    ** USE THIS WITH CAUTION!!! **
+
+    Returns:
+        Computer's new name if successful
+        undef if not successful
+
+  SetEnvVar($Name, $Value [, $Type [, $Timeout]])
+    This will set an environmental variable $Name to $Value.  This function will
+    set the variable (creating it if $Name does not exist).
+    The new value will be set globally so all applications will be able to use
+    it, unlike setting $ENV{xxx} -- which sets the variable for the current
+    process and any children it spawns afterwards.
+	If $Timeout is specified then the function will wait up to $Timeout seconds
+	for other applications to become aware that the environment has changed. If
+	the function timesout some applications may not be aware of the variable 
+	changes.
+
+
+    If $Type is specified it can be one of:
+        ENV_SYSTEM........Specifies that $Name will be a system environmental
+                          variable. (default if $Type is not specified)
+        ENV_USER..........Specifies that $Name will be a user environemental
+                          variable.
+
+    This function is the equivalent to setting an environental variable in the
+    control panel's system applet.
+
+    NOTE: Your script will not see the new value. For that you should set $ENV{xxx}.
+
+    Returns:
+        1 if setting the variable was successful
+        0 if not successful
+
+  SetPassword($Server, $User, $Password)
+    This will set the user $User password to $Password.
+    This assumes that the calling process has administrative rights on the
+    target server/domain.
+    Limitations on accounts may restrict the setting of passwords, for example,
+    setting a password to empty ('') may be restricted if blank passwords are
+    not allowed in the domain.
+
+    Returns:
+        1 if successful
+        0 if not successful
+
+  SetVolumeLabel( $Drive, $Label )
+    This will set the label of the volume $Drive.  $Drive is a root string
+    such as "c:\\" or "x:/".  It can *NOT* be a UNC.
+
+    Returns:
+         1 if successful
+         0 if not successful
+
+  UserChangePassword($Domain, $User, $OldPassword, $NewPassword)
+    This will change the password for the user $User in domain $Domain ($Domain
+    could be a server instead) from $OldPassword to $NewPassword.
+    If $Domain is Null ('') then the $User is assumed to be in the domain in which
+    the account is running.
+    If $User is Null ('') then the account to be changed is assumed to be the
+    account which the perl script is executing under.
+    Returns: 0 if password was NOT changed
+             1 if password was changed
+
+  UserCheckPassword($Domain, $User, $Password)
+    This will verify whether or not $Password is the correct password for
+    $User on the domain $Domain ($Domain could be a server instead).
+    If $Domain is Null ('') then the $User is assumed to be in the domain in which
+    the account is running.
+    If $User is Null ('') then the account to be changed is assumed to be the
+    account which the perl script is executing under.
+    account is running.
+    Returns: 0 if password is incorrect
+             1 if password is correct
+
+  UserGetAttributes($Server, $UserName, $UserFullName, $Password, $PasswordAge,
+                    $Privilege, $HomeDir, $Comment, $Flags, $ScriptPath)
+    This performs the same functino as the original UserGetAttributes()
+    with the addition that it adds the ability to get the user's Full Name
+    ($UserFullName).
+    Returns: 0 if unsuccessfull
+             1 if successfull
+
+  UserSetAttributes($Server, $UserName, $UserFullName, $Password, $PasswordAge,
+                  $Privilege, $HomeDir, $Comment, $Flags, $ScriptPath)
+    This performs the same function as the original UserSetAttributes()
+    with the addition that it adds the ability to set the user's Full Name
+    ($UserFullName).
+    Returns: 0 if unsuccessfull
+             1 if successfull
+
+
+  UserGetMiscAttributes($Domain, $User, \%Attributes)
+    This will return a hash of attributes and values. The attributes are the
+    attributes associated with the NT User account $User in the domain $Domain.
+    If $Domain is empty then the current domain is assumed.
+    Returns: 0 if unsuccessful
+             1 if successful
+    **For details of attributes see end of this file.
+
+  UserSetMiscAttributes($Domain, $User, $Attrib, $Value [, $Attrib2, $Value2]...)
+    This will set a particular attribute $Attrib to be $Value for the NT
+    user account $User in domain $Domain. If $Domain is empty then the current
+    domain is assumed.
+    Returns: 0 if unsuccessful
+             1 if successful
+    **For details of attributes see end of this file.
+
+  WriteINI($File, $Section, $Key, $Value)
+    This will write the value $Value to the key $Key in the section $Section
+    of the INI file $File.
+    If $Value is empty then the key $Key is removed.
+    If $Key is empty then all keys are removed from the section $Section.
+    If $Section is empty then all sections are removed from the INI file $File.
+
+    returns:
+        1 if successful
+        undef if unsuccessful
+
+
+  CreateProcess()
+    This is the exact same as CreateProcessAsUser() but it does not require
+    someone to have logged on (impersonated) using the LogonAsUser() function.
+
+  CreateProcessAsUser($CommandString [, $DefaultDirectory] [, %Config])
+    This will create a process that will be running under the account that
+    you are impersonating with LogonAsUser().
+        $CommandString......The full command line of the processes to run.
+        $DefaultDirectory...The default directory that the process runs in.
+        %Config.............A hash of values that specify a configuration
+                            the process is to run with.
+
+    The %Config hash can consist of any of the following:
+        Title...............The title of the processes window.
+        Desktop.............A virtual desktop. Leave this blank if you are not
+                            familiar with it. The default is "winsta0\default".
+        X...................The X coordinate of the upper left corner of the
+                            processes window.
+        Y...................The Y corrdinate of the upper left corner of the
+                            processes window.
+        XSize...............The width of the processes window (in pixels).
+        YSize...............The height of the processes window (in pixels).
+        XBuffer.............Number of chars the X buffer should be. This
+                            applies only to console applications.
+        YBuffer.............Number of chars to Y buffer should be. This applies
+                            only to console applications.
+        Fill................The color to fill the window. This applies only to
+                            console applications.
+                            Possible values can be logically ORed together:
+                                BACKGROUND_RED
+                                BACKGROUND_BLUE
+                                BACKGROUND_GREEN
+                                BACKGROUND_INTENSITY
+                                FOREGROUND_RED
+                                FOREGROUND_GREEN
+                                FOREGROUND_BLUE
+                                FOREGROUND_INTENSITY
+        Priority............The priority to run the process under. It can
+                            use one of the following:
+                                HIGH_PRIORITY_CLASS
+                                IDLE_PRIORITY_CLASS
+                                NORMAL_PRIORITY_CLASS
+                                REALTIME_PRIORITY_CLASS
+        Flags...............Flags specifying process startup options. Some of
+                            these can be logically ORed together:
+                                CREATE_DEFAULT_ERROR_MODE
+                                CREATE_NEW_CONSOLE
+                                CREATE_NEW_PROCESS_GROUP
+                                CREATE_SEPARATE_WOW_VDM
+                                CREATE_SUSPENDED
+                                CREATE_UNICODE_ENVIRONMENT
+                                DEBUG_PROCESS
+                                DEBUG_ONLY_THIS_PROCESS
+                                DETACHED_PROCESS;
+        ShowWindow..........State of the processes window during startup.
+                            Possible values:
+                                SW_HIDE
+                                SW_MAXIMIZE
+                                SW_MINIMIZE
+                                SW_RESTORE
+                                SW_SHOW
+                                SW_SHOWDEFAULT
+                                SW_SHOWMAXIMIZED
+                                SW_SHOWMINIMIZED
+                                SW_SHOWMINNOACTIVE
+                                SW_SHOWNA
+                                SW_SHOWNOACTIVATE
+                                SW_SHOWNORMAL
+        StdInput
+        StdOutput
+        StdError............Specifies which handle to use for standard IN, OUT
+                            and ERROR. If one of these is specified *ALL MUST*
+                            be specified.
+                            You can use GetStdHandle() to retrieve the handle
+                            for the current standard handle.
+        Inherit.............Specifies to inherit file handles.
+        Directory...........Specifies a default directory. This is the same
+                            attribute as the $DefaultDirectory.
+
+    This function requires the calling process to have the following rights
+    assigned:
+        Privilege          Display Name
+        ------------------------------------------------------
+        SeTcbPrivilege     Act as part of the operating system
+        SeAssignPrimary    Replace a process level token
+        SeIncreaseQuota    Increase quotas
+
+    returns
+        the process id (PID) if successful
+        undef if unsuccessful
+
+
+  ============================================================
+  ====  Misc Attribute List
+  ============================================================
+    The following attributes are used with the UserGet/SetMiscAttributes()
+    method:
+    user_name
+        Specifies the name of the user account. This is a read only value and
+        can not be set by this function.
+
+    user_password
+        Specifies a one-way encrypted LAN Manager 2.x-compatible password. This
+        is not shown due to the Win32 API. It is here for backward compatibility
+        with LAN Manager. For all practicle purposes this attribute is ignored.
+        This can not be set by this function.
+
+    user_password_age
+        Specifies the number of seconds elapsed since the password attribute was
+        last changed. The NetUserAdd and NetUserSetInfo functions ignore this
+        attribute. This is a read only value and can not be set by this
+        function.
+
+    user_priv
+        One of three values specifying the level of privilege assigned the
+        user account. For the NetUserAdd function, this attribute must be
+        USER_PRIV_USER. This is a read only value and can not be set by this
+        function. This can be one of the following values:
+           Value                Meaning
+           -------------------  -------
+           USER_PRIV_GUEST      Guest
+           USER_PRIV_USER       User
+           USER_PRIV_ADMIN      Administrator
+
+    user_home_dir
+        The path of the home directory for the user specified.
+
+    user_comment
+        The user account comment.
+
+    user_flags
+        Contains values that determine several features. This attribute can be
+        any of the following values:
+           Value                Meaning
+           -------------------  -------
+           UF_SCRIPT            The logon script executed. This value must be
+                                set for LAN Manager 2.0 or Windows NT.
+
+           UF_ACCOUNTDISABLE    The user's account is disabled.
+
+
+           UF_HOMEDIR_REQUIRED  The home directory is required. This value is
+                                ignored in Windows NT.
+
+           UF_PASSWD_NOTREQD    No password is required.
+
+           UF_PASSWD_CANT_CHANGE The user cannot change the password
+
+           UF_LOCKOUT           The account is currently locked out. This value
+                                can be cleared to unlock a previously locked
+                                account.
+                                This value, however, cannot be used to lock a
+                                previously locked account.
+
+           UF_DONT_EXPIRE_PASSWD Represents the password, which should never
+                                 expire on the account. This value is valid
+                                 only for Windows NT.
+
+           The following values describe the account type. Only one value can
+           be set. This is a read only value.
+
+           UF_NORMAL_ACCOUNT    This is a default account type that represents
+                                a typical user.
+
+           UF_TEMP_DUPLICATE_ACCOUNT This is an account for users whose primary
+                                account is in another domain. This account
+                                provides user access to this domain, but
+                                not to any domain that trusts this domain.
+                                The User Manager refers to this account
+                                type as a local user account.
+
+           UF_WORKSTATION_TRUST_ACCOUNT This is a computer account for a
+                                Windows NT Workstation or Windows NT Server
+                                that is a attribute of this domain.
+
+           UF_SERVER_TRUST_ACCOUNT This is a computer account for a Windows
+                                NT Backup Domain Controller that is a attribute
+                                of this domain.
+
+           UF_INTERDOMAIN_TRUST_ACCOUNT This is a permit to trust account for
+                                a Windows NT domain that trusts other domains.
+
+    user_script_path
+        The path of the user's logon script, .CMD, .EXE, or .BAT file.
+
+    user_auth_flags
+        Specifies an unsigned long integer that contains values that specify
+        the user's operator privileges.
+        This is a read only value and should *NOT* be changed.
+        The value is based on the local group attributeship.
+            If the user is a attribute of Print Operations, AF_OP_PRINT is set.
+            If the user is a attribute of Server Operations, AF_OP_SERVER is set.
+            If the user is a attribute of the Account Operations, AF_OP_ACCOUNTS
+            is set.
+            AF_OP_COMM is never set.
+
+            This attribute can be one of the following values:
+
+            Value                Meaning
+            -------------------  -------
+            AF_OP_PRINT          The print operator privilege is enabled.
+            AF_OP_COMM           The communiations operator privilege is enabled.
+            AF_OP_SERVER         The server operator privilege is enabled.
+            AF_OP_ACCOUNTS       The accounts operator privilege is enabled.
+
+    user_full_name
+        The full name of the user.
+
+    user_usr_comment
+        The user comment.
+
+    user_parms
+        This is set aside for use by applications. This string can be a null
+        string, or it can have any number of characters before the terminating
+        null character. Microsoft products use this attribute to store user
+        configuration information. Do not modify this information.
+
+    user_workstations
+        The names of workstations from which the user can log on. As many as
+        eight workstations can be specified; the names must be separated by
+        commas (,). A null string indicates that there is no restriction.
+        To disable logons from all workstations to this account, set the
+        UF_ACCOUNTDISABLE value in the flags attribute.
+
+    user_last_logon
+        Specifies when the last logon occurred. This value is stored as the
+        number of seconds elapsed since 00:00:00, January 1, 1970.
+        This attribute is read only.
+        This attribute is maintained separately on each Backup Domain Controller
+        in the domain. To get an accurate value, each BDC in the domain must
+        be queried, and the largest value is used.
+
+    user_last_logoff
+        Specifies when the last logoff occurred. This value is stored as the
+        number of seconds elapsed since 00:00:00, January 1, 1970. A value of
+        zero means that the last logoff time is unknown.
+        This attribute is read only.
+        in NetUserAdd and NetUserSetInfo calls.
+        This attribute is maintained separately on each Backup Domain Controller
+        in the domain. To get an accurate value, each BDC in the domain must be
+        queried and the largest value is used.
+
+    user_acct_expires
+        Specifies when the account will expire. This value is stored as the
+        number of seconds elapsed since 00:00:00, January 1, 1970. A value
+        of TIMEQ_FOREVER indicates that the account never expires.
+
+    user_max_storage
+        Specifies the maximum amount of disk space the user can use. Use the
+        value specified in USER_MAXSTORAGE_UNLIMITED to use all available disk
+        space.
+
+    user_units_per_week
+        Specifies the number of equal-length time units into which the week is
+        divided. This attribute uses these time units to compute the length of the
+        bit string in the USER_LOGON_HOURS attribute. This value must be
+        UNITS_PER_WEEK for LAN Manager 2.0.
+        This attribute is read only.
+        For Windows NT services, the units must be one of the following:
+            SAM_DAYS_PER_WEEK,
+            SAM_HOURS_PER_WEEK, or
+            SAM_MINUTES_PER_WEEK.
+
+    user_logon_hours
+        Points to a 21-byte (168 bits) bit string that specifies the times during
+        which the user can log on. Each bit represents a unique hour in the week.
+        The first bit (bit 0, word 0) is Sunday, 0:00 to 0:59; the second bit
+        (bit 1, word 0) is Sunday, 1:00 to 1:59; and so on.
+        If this attribute is null (null, not zero) when used with
+        UserSetMiscAttributes() means that no change is to be made.
+
+    user_bad_pw_count
+        Specifies the number of times the user tried to log on to this account
+        using an incorrect password. A value of 0xFFFFFFFF indicates that the
+        value is unknown.
+        This attribute is read only.
+        This attribute is maintained separately on each Backup Domain Controller
+        in the domain. To get an accurate value, each BDC in the domain must be
+        queried, and the largest value is used.
+
+    user_num_logons
+        Counts the number of successful times the user tried to log on to this
+        account. A value of 0xFFFFFFFF indicates that the value is unknown.
+        This attribute is read only.
+        This attribute is maintained separately on each Backup Domain Controller
+        in the domain. To get an accurate value, each BDC in the domain must be
+        queried, and the attribute uses the sum of the values.
+
+    user_logon_server
+        The name of the server to which logon requests are sent. Servernames
+        should be preceded by two backslashes (\\). When a servername is
+        represented by an asterisk (\\*), the logon request can be handled by
+        any logon server. A null string indicates that requests are sent to the
+        domain controller.
+        This attribute is read only.
+        For Windows NT Servers, UserGetMiscAttributes() will return \\*.
+
+    user_country_code
+        The country code for the user's language of choice. Windows NT does not
+        use the country code.
+
+    user_code_page
+        The code page for the user's language of choice. Windows NT does not
+        use the code page.
+
+
+
+History:
+
+    - 971022 roth
+        - Added several functions:
+            GetDrives()
+            GetDriveType()
+            GetDriveSpace()
+            GetDriveGeometry()
+            GetProcessorInfo()
+            GetMemoryInfo()
+            GetWinVersion()
+            WriteINI()
+            ReadINI()
+            ExitWindows()
+            GetIdInfo()
+            GetDC()
+            GetPDC()
+            GetStdHandle()
+            SetPassword()
+            GetTOD()
+            RenameUser()
+            ScheduleAdd()
+            ScheduleDel()
+            ScheduleList()
+            ScheduleGet()
+            GetFileInfo()
+            GetEnvVar()
+            SetEnvVar()
+            DelEnvVar()
+        - Modified the following function:
+            CreateProcessAsUser()
+
+    - 971102 roth
+        - Fix applied to GetDriveSpace() to return values greater than
+          4,294,967,295 (0xffffffff). The original GetDriveSpace() returned
+          32 bit unsigned values. Thanks to Scott Bleasdell <bleasdes@kochind.com>
+          for pointing this out.
+
+    -971103 roth
+	    - Added timeout value for EnvSetVar() and EnvDelVar(). This prevents
+	      the function from waiting forever if an application is hanging 
+	      during the broadcast that the environment has changed.
+
+    - 980212 roth
+        - ScheduleAdd() now supports passing a time in the following formats:
+            - 24 hour string formats:
+                - hh:mm:ss
+                - hh:mm
+            - 12 hour string formats:
+                - hh:mm:ss am|pm
+                - hh:mm am|pm
+
+            - minutes from midnight
+            - seconds from midnight
+            - seconds from the epoch (Jan 1, 1970 -- as in the time() function)
+
+        - Fix applied to GetDriveSpace() to return 64 bit values. The original
+          GetDriveSpace() returned 32 bit unsigned values (no larger
+          than 4,294,967,295 (0xffffffff)).
+
+        - Added timeout value for EnvSetVar() and EnvDelVar(). This prevents
+          the function from waiting forever if an application is hanging
+          during the broadcast that the environment has changed.
+
+    - 980223 roth
+	     - Fixed bug in ReadINI() and WriteINI() where "" was never allowed
+	       as a section, key or data value. Now "" is passed through exactly
+	       as "". To sepecify that ReadINI or WriteINI should apply to every
+	       section or key pass either an undef or leave off the parameter 
+	       altogether:
+	           @Keys = ReadINI("File.ini", "Section1", undef);
+		        is the same as
+		        @Keys = ReadINI("File.ini", "Section1");
+	       Thanks to Tom Heady.
+    
+	- 980331 roth
+        - The undocumented function Exist() has been removed.  It is not required 
+		  any longer since the Perl exist test (-e $Path) now works on UNC roots.
+
+
+    - 980425 roth
+	    - Added GetVolumeInfo() and SetVolumeLabel.  I would like to add a
+	      SetVolumeSerial() but I can not find a simple/quick way of doing 
+	      this.
+
+    - 980511 roth
+        - Added GetGroups().
+
+    - 980610 roth
+        - Fixed UserSetMiscAttributes(). The last update broke it so it would not
+          actually update the attributes but reported that it was successful.
+        - Added CreateProcess().
+        - Added patches to ReadINI() and GetFileInfo() from 
+          Jutta Klebe <jmk@exc.bybyte.de>.
+          - GetFileInfo() now returns two additional keys in it's hash:
+            - LangID: language id for the file (yields 0x0409 for US english)
+            - Language: language name e.g. "English (United States)"

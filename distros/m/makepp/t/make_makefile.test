@@ -1,0 +1,34 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	3	644	1290955743	1290955952	makepp_test_script.pl
+# Check that the makefile gets rebuilt, but that its dep does not issue a dup rule warning.
+makepp;
+n_files "n_files", sub { die if /warning: I became aware of the rule/ };
+###	9	644	1164352851	1290955502	Makefile
+#
+# This is an out-of-date makefile which gets replaced.
+#
+$(phony all): a
+
+a:
+	&touch $(output)
+
+include Make_Makefile
+###	7	644	1164352913	1290955503	Makefile_source
+#
+# This is the real makefile, which replaces the out-of-date version
+#
+$(phony all): a b
+
+a b:
+	&touch $(outputs)
+###	5	644	1164352913	1290955505	Make_Makefile
+Makefile: Makefile.in
+	  &cp $< $@
+
+Makefile.in: Makefile_source Make_Makefile
+	  &cat $(inputs) -o $@
+###	D	755	1067451876	965613096	answers
+###	0	644	1067451876	1169482133	answers/a
+###	0	644	1067451876	1169482265	answers/b
+###	1	644	1067451876	1190053860	answers/n_files
+4 1 0

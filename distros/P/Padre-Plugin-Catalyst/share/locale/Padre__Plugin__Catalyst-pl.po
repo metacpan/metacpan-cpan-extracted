@@ -2,7 +2,7 @@
 # Cezary Morga <cm@therek.net>, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: padre-plugin-catalyst\n"
+"Project-Id-Version: Padre-Plugin-Catalyst\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-30 15:40-0300\n"
 "PO-Revision-Date: 2009-06-03 17:22+0200\n"

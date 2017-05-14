@@ -32,13 +32,14 @@ disclaimers of warranty.
 =cut
 
 use strict;
+use File::Basename;
 use Stone;
 use Boulder::Stream;
 use Carp;
 use vars qw($VERSION @ISA);
 @ISA = 'Boulder::Blast';
 
-$VERSION = 1.00;
+$VERSION = 1.02;
 
 sub _read_record {
   my $self = shift;
@@ -52,10 +53,13 @@ sub _read_record {
   my $line;
   do { 
     $line = <$fh>;
-  } until $line=~/^Query=\s+(\S+)/;
+  } until ($line && $line=~/^Query=/);
   
-  croak "Couldn't find query line!" unless $1;
-  $stone->insert(Blast_query => $1);
+  if ($line && $line =~ /^Query=\s+(\S+)/) {
+    $stone->insert(Blast_query => $1);
+  } else {
+    croak "Couldn't find query line!";
+  }
 
   do { 
     $line = <$fh>;
@@ -81,7 +85,12 @@ sub _read_record {
 
   # Now we should be pointing at statistics
   while (<$fh>) {
-    $stone->insert(Blast_db       => $1) if /Database: (.*)/;
+    if (/Database: (.*)/) {
+      my $db = $1;
+      $stone->insert(Blast_db => $db);
+      $stone->insert(Blast_db_title => basename($db));
+    }
+    # in case match title, overwrite previous setting of Blast_db_title
     $stone->insert(Blast_db_title => $1) if /Title: (.*)/;
     $stone->insert(Blast_db_date  => $1) if /Posted date:\s+(.*)/;
     last if /Lambda/;
@@ -143,7 +152,7 @@ sub parse_hits {
 
     $done    = /^\s+Database/; # here's how we get out of the loop
     $new_hit = /^>(\S+)/;
-    $new_hsp = $accession && /Score = ([\d.]+) bits \((\S+)\)/;
+    $new_hsp = $accession && /Score\s+=\s+([\d.e+]+)\s+bits\s+\((\S+)\)/;
 
     # hit a new HSP section
     if ( $done || $new_hit || $new_hsp ) {
@@ -220,8 +229,8 @@ sub parse_hits {
     }
     
     if (/Identities = \S+ \((\d+)%?\)/) {
-      my $idn = $1 * 0.01;
-      $hsp->insert(Identity => $idn);
+      my $idn = $1;
+      $hsp->insert(Identity => "$idn%");
       $ident = $idn > $ident ? $idn : $ident;
     }
 
@@ -230,7 +239,7 @@ sub parse_hits {
     $hsp->insert(Frame => $1)       if /Frame =\s+([^,]+)/;
 
     # process the query sequence
-    if (/^Query:\s+(\d+)\s+(\S+)\s+(\d+)/) {
+    if (/^Query:\s+(\d+)\s*(\S+)\s+(\d+)/) {
       $qstart ||= $1;
       $qend = $3;
       $query .= $2;
@@ -238,7 +247,7 @@ sub parse_hits {
     }
 
     # process the target sequence
-    if (/^Sbjct:\s+(\d+)\s+(\S+)\s+(\d+)/) {
+    if (/^Sbjct:\s+(\d+)\s*(\S+)\s+(\d+)/) {
       $tstart ||= $1;
       $tend     = $3;
       $target  .= $2;

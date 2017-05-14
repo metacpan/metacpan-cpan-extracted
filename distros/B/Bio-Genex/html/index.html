@@ -1,0 +1,140 @@
+<HTML><HEAD><TITLE>Genex.pm</TITLE>
+</HEAD><BODY>
+<H1>The Genex.pm Distribution</H1>
+<P>Welcome to Genex.pm, I hope you enjoy your visit.
+</P>
+
+<H1>Introduction</H1>
+<P>
+Genex.pm is a Perl module to enable bioinformatics researchers to
+access a GeneX gene expression database (DB) via Perl. It provides an
+application programmers interface (API) consisting of <A
+HREF="#table_classes">table classes</A> and <A
+HREF="#utility_classes">utility classes</A>, and it also comes with a
+<A HREF="tutorial.html">tutorial</A> and a number of example <A
+HREF="scripts.html">scripts</A> to help researchers write their own
+tools.
+
+<H1>Table Classes</H1>
+<A NAME="table_classes"></A> 
+<P>
+
+The majority of the modules included in the Genex.pm distribution
+provide access to a single table in the Genex DB. 
+
+The purpose of the <A HREF="#table_classes">table classes</A> is to
+simplify accessing information from the DB by shielding many of the
+DB's underlying details from the developer. 
+
+<P> The table classes can be divided into three logical groups:
+<UL>
+  <LI> Main data table classes
+  <UL>
+    <LI> <A HREF="AL_Spots.html">AL_Spots.pm</A>,
+    <LI> <A HREF="AM_Group.html">AM_Group.pm</A>,
+    <LI> <A HREF="AM_Spots.html">AM_Spots.pm</A>,
+    <LI> <A HREF="ArrayLayout.html">ArrayLayout.pm</A>,
+    <LI> <A HREF="ArrayMeasurement.html">ArrayMeasurement.pm</A>,
+    <LI> <A HREF="CanonicalSequenceFeature.html">CanonicalSequenceFeature.pm</A>,
+    <LI> <A HREF="Chromosome.html">Chromosome.pm</A>,
+    <LI> <A HREF="Citation.html">Citation.pm</A>,
+    <LI> <A HREF="Contact.html">Contact.pm</A>,
+    <LI> <A HREF="ContactType.html">ContactType.pm</A>,
+    <LI> <A HREF="ExperimentFactors.html">ExperimentFactors.pm</A>,
+    <LI> <A HREF="ExperimentSet.html">ExperimentSet.pm</A>,
+    <LI> <A HREF="ExternalDatabase.html">ExternalDatabase.pm</A>,
+    <LI> <A HREF="GroupSec.html">GroupSec.pm</A>,
+    <LI> <A HREF="Protocol.html">Protocol.pm</A>,
+    <LI> <A HREF="Sample.html">Sample.pm</A>,
+    <LI> <A HREF="Scanner.html">Scanner.pm</A>,
+    <LI> <A HREF="Software.html">Software.pm</A>,
+    <LI> <A HREF="Species.html">Species.pm</A>,
+    <LI> <A HREF="Spotter.html">Spotter.pm</A>,
+    <LI> <A HREF="TreatmentLevel.html">TreatmentLevel.pm</A>,
+    <LI> <A HREF="Treatment_AMs.html">Treatment_AMs.pm</A>,
+    <LI> <A HREF="UserCanonicalLink.html">UserCanonicalLink.pm</A>,
+    <LI> <A HREF="UserSec.html">UserSec.pm</A>,
+    <LI> <A HREF="UserSequenceFeature.html">UserSequenceFeature.pm</A>,
+  </UL>
+  <LI> Linking table classes
+  <UL>
+    <LI> <A HREF="AM_FactorValues.html">AM_FactorValues.pm</A>,
+    <LI> <A HREF="AM_SuspectSpots.html">AM_SuspectSpots.pm</A>,
+    <LI> <A HREF="BlastHits.html">BlastHits.pm</A>,
+    <LI> <A HREF="CSF_ExternalDBLink.html">CSF_ExternalDBLink.pm</A>,
+    <LI> <A HREF="CitationLink.html">CitationLink.pm</A>,
+    <LI> <A HREF="GroupLink.html">GroupLink.pm</A>,
+    <LI> <A HREF="HotSpots.html">HotSpots.pm</A>,
+    <LI> <A HREF="RelatedCSF.html">RelatedCSF.pm</A>,
+    <LI> <A HREF="SampleProtocols.html">SampleProtocols.pm</A>,
+    <LI> <A HREF="SpotLink.html">SpotLink.pm</A>,
+    <LI> <A HREF="TL_FactorValues.html">TL_FactorValues.pm</A>,
+    <LI> <A HREF="USF_ExternalDBLink.html">USF_ExternalDBLink.pm</A>,
+  </UL>
+  <LI> Controlled vocabulary table classes
+  <UL>
+    <LI> <A HREF="ALS_SpotType.html">ALS_SpotType.pm</A>,
+    <LI> <A HREF="AL_Coating.html">AL_Coating.pm</A>,
+    <LI> <A HREF="AL_DefaultSpotConcUnits.html">AL_DefaultSpotConcUnits.pm</A>,
+    <LI> <A HREF="AL_IdentifierCode.html">AL_IdentifierCode.pm</A>,
+    <LI> <A HREF="AL_Medium.html">AL_Medium.pm</A>,
+    <LI> <A HREF="AL_TechnologyType.html">AL_TechnologyType.pm</A>,
+    <LI> <A HREF="AM_EquationType.html">AM_EquationType.pm</A>,
+    <LI> <A HREF="AM_SpotMeasurementUnits.html">AM_SpotMeasurementUnits.pm</A>,
+    <LI> <A HREF="AM_Type.html">AM_Type.pm</A>,
+    <LI> <A HREF="CSF_Type.html">CSF_Type.pm</A>,
+    <LI> <A HREF="ControlledVocab.html">ControlledVocab.pm</A>,
+    <LI> <A HREF="EF_MajorCategory.html">EF_MajorCategory.pm</A>,
+    <LI> <A HREF="EF_MinorCategory.html">EF_MinorCategory.pm</A>,
+    <LI> <A HREF="ES_QuantitySeriesType.html">ES_QuantitySeriesType.pm</A>,
+    <LI> <A HREF="ES_TreatmentType.html">ES_TreatmentType.pm</A>,
+    <LI> <A HREF="HS_ThresholdType.html">HS_ThresholdType.pm</A>,
+    <LI> <A HREF="PRT_Type.html">PRT_Type.pm</A>,
+    <LI> <A HREF="SCN_ModelDescription.html">SCN_ModelDescription.pm</A>,
+    <LI> <A HREF="SMP_AgeUnits.html">SMP_AgeUnits.pm</A>,
+    <LI> <A HREF="SMP_DevelopmentStageName.html">SMP_DevelopmentStageName.pm</A>,
+    <LI> <A HREF="SMP_DevelopmentStageUnits.html">SMP_DevelopmentStageUnits.pm</A>,
+    <LI> <A HREF="SMP_GeneticStatus.html">SMP_GeneticStatus.pm</A>,
+    <LI> <A HREF="SMP_OrganType.html">SMP_OrganType.pm</A>,
+    <LI> <A HREF="SMP_OrganismIntactness.html">SMP_OrganismIntactness.pm</A>,
+    <LI> <A HREF="SMP_PrimaryCellType.html">SMP_PrimaryCellType.pm</A>,
+    <LI> <A HREF="SMP_SexMatingType.html">SMP_SexMatingType.pm</A>,
+    <LI> <A HREF="SMP_TissueType.html">SMP_TissueType.pm</A>,
+    <LI> <A HREF="SPC_CellStructure.html">SPC_CellStructure.pm</A>,
+    <LI> <A HREF="SPC_GeneralClassification.html">SPC_GeneralClassification.pm</A>,
+    <LI> <A HREF="SPC_Generalclassification.html">SPC_Generalclassification.pm</A>,
+    <LI> <A HREF="SPT_ModelDescription.html">SPT_ModelDescription.pm</A>,
+    <LI> <A HREF="SPT_ModelName.html">SPT_ModelName.pm</A>,
+    <LI> <A HREF="SW_Name.html">SW_Name.pm</A>,
+    <LI> <A HREF="SW_Type.html">SW_Type.pm</A>,
+    <LI> <A HREF="USF_Type.html">USF_Type.pm</A>,
+  </UL>
+</UL>
+<H1>Utility Classes</H1>
+<A NAME="utility_classes"></A> 
+
+Many of the mundane needs of developers working with a Genex DB have
+been simplified by adding commonly used functions to helper
+modules. 
+
+<P>
+See the individual modules for more details:
+<UL>
+  <LI> <A HREF="Genex.html">Genex.pm</A> itself, which contains helper
+functions for connecting to a GeneX DB, and
+  <LI> <A HREF="DBUtils.html">DBUtils.pm</A>, which contains helper
+functions for retrieving and storing data in a GeneX DB, and
+  <LI> <A HREF="HTMLUtils.html">HTMLUtils.pm</A>, which contains
+helper functions for converting information to HTML.
+  <LI> <A HREF="XMLUtils.html">XMLUtils.pm</A>, which contains
+helper functions for converting information to XML.
+</UL></P>
+
+<H3>Author and Copyright</H3>
+<P>
+This module and its documentation were written by Jason E. Stewart
+(<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>), and all the material
+is copyright &copy; 2000 the <A HREF="http://www.ncgr.org/">National
+Center for Genome Resources</A>.</P>
+
+</BODY></HTML>

@@ -1,86 +1,111 @@
-# $Id: Rule.pm,v 1.2 2002/09/17 21:14:01 ology Exp $
+# $Id: Rule.pm,v 1.1.1.1 2004/11/22 17:52:11 root Exp $
 
-# POE::Framework::MIDI::Rule - a baseclass for all rules to inherit from
 package POE::Framework::MIDI::Rule;
 use strict;
-my $VERSION = '0.1a';
+use vars qw($VERSION); $VERSION = '0.02';
 
-sub new
-{
-	my($self,$class) = ({},shift);
-	bless $self,$class;
-	$self->{cfg} = shift or die __PACKAGE__ . " needs a config hashref";	
-	die $self->usage
-	unless ($self->{cfg}->{context});
-	$self->{params} = $self->{cfg}->{params};
-	
-	return $self;
+sub new {
+    my ($self, $class) = ({}, shift);
+    bless $self, $class;
+    my %params = @_;
+
+    $self->{cfg} = \%params or die __PACKAGE__ . ' needs some config info';
+
+    die "no context set" unless $self->{cfg}{context};
+    die "invalid context $self->{cfg}->{context}" 
+    	unless ($self->{cfg}->{context} eq 'bar' or $self->{cfg}->{context} eq 'event'); 
+
+    $self->{params} = $self->{cfg}{params};
+
+    return $self;
 }
 
-sub usage
-{
-	return 'oh dear. TODO: what does useage look like?';
+sub usage {
+    return 'Oh dear. TODO: What does usage look like?';
 }
 
-sub context
-{
-	my $self = shift;
-	# just in case we want to support on the fly context changes....
-	my $new_context = shift;
-	$new_context ? $self->{cfg}->{context} = $new_context : return $self->{cfg}->{context};		
+# just in case we want to support on the fly context changes...
+sub context {
+    my ($self, $new_context) = @_;
+
+    $new_context
+        ? $self->{cfg}{context} = $new_context
+        : return $self->{cfg}{context};
 }
 
-sub type
-{
-	my $self = shift;
-	my $new_type = shift;
-	$new_type ? $self->{cfg}->{type} = $new_type : return $self->{cfg}->{type};	
+sub type {
+    my ($self, $new_type) = @_;
+
+    $new_type
+        ? $self->{cfg}{type} = $new_type
+        : return $self->{cfg}{type};
 }
 
-sub params
-{
-	my $self = shift;
-	return $self->{cfg}->{params};	
+sub params {
+    my $self = shift;
+    return $self->{cfg}{params};
 }
 
 1;
 
+__END__
+
 =head1 NAME
 
-POE::Framework::MIDI::Rule
+POE::Framework::MIDI::Rule - A rule object to compare events
+
+=head1 ABSTRACT
 
 =head1 DESCRIPTION
 
-A rule object to compare some events to. 
+A rule object to compare events.
 
-=head1 USAGE
+=head1 SYNOPSIS
 
-my $rule = new POE::Framework::MIDI::Rule({ package => 'POE::Framework::MIDI::Rule::MyRule'});
-my $matchvalue = $rule->test(@events); # it matches, or doesn't, or partially does
+  $rule = new POE::Framework::MIDI::Rule({
+      package => 'POE::Framework::MIDI::Rule::MyRule'
+  });
 
+  # it matches, or doesn't, or partially does
+  $matchvalue = $rule->test(@events);
 
-=head1 BUGS
+=head1 PUBLIC METHODS
 
-=head1 SUPPORT
+=head2 new()
 
-=head1 AUTHOR
+=head2 usage()
 
-	Steve McNabb
-	CPAN ID: JUSTSOMEGUY
-	steve@justsomeguy.com
-	http://justsomeguy.com/code/POE/POE-Framework-MIDI 
+=head2 context()
 
-=head1 COPYRIGHT
+=head2 params()
 
-Copyright (c) 2002 Steve McNabb. All rights reserved.
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=head1 TO DO
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+Oh my.  What does usage() look like?
 
 =head1 SEE ALSO
 
-perl(1). POE.  Perl-MIDI
+L<POE>
+
+L<http://justsomeguy.com/code/POE/POE-Framework-MIDI>
+
+=head1 AUTHOR
+
+Primary: Steve McNabb E<lt>steve@justsomeguy.comE<gt>
+
+CPAN ID: SMCNABB
+
+Secondary: Gene Boggs E<lt>cpan@ology.netE<gt>
+
+CPAN ID: GENE
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Steve McNabb. All rights reserved.
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file 
+included with this module.
 
 =cut

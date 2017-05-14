@@ -1,0 +1,16 @@
+Sun Sep  8 19:35:13 2002
+------------------------
+
+version 1.01
+Juerd pointed out that multiple 'use' of Acme::Intraweb would
+result in multiple coderefs in @INC, so I added a check to
+prevent that.
+Also he pointed out that doing an 'eval "use $module"' would
+potentially load it twice. So rather than having perl do a 'use'
+for us, we now track down the module in @INC ourselves and hand
+back the proper filehandle.
+
+Sat Sep  7 23:23:40 2002
+------------------------
+
+version 1.00

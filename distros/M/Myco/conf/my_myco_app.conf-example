@@ -1,0 +1,10 @@
+############################################################
+# Example configuration include file for myco applications #
+# See Config::General for syntax rules                     #
+############################################################
+
+<doodads>
+    DOODAD1 = "yo!"
+    DOODAD2 = "doo!"
+    DOODAD3 = "dad!"
+</doodads>

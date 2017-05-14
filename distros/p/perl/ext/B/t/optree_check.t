@@ -1,19 +1,16 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/B/t');
-    } else {
-	unshift @INC, 't';
-	push @INC, "../../t";
-    }
+    unshift @INC, 't';
     require Config;
     if (($Config::Config{'extensions'} !~ /\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
-    # require 'test.pl'; # now done by OptreeCheck
+    if (!$Config::Config{useperlio}) {
+        print "1..0 # Skip -- need perlio to walk the optree\n";
+        exit 0;
+    }
 }
 
 use OptreeCheck;
@@ -29,13 +26,12 @@ cmdline args in 'standard' way across all clients of OptreeCheck.
 
 =cut
 
-my $tests = 5 + 15 + 16 * $gOpts{selftest};	# pass()s + $#tests
-plan tests => $tests;
-
-SKIP: {
-    skip "no perlio in this build", $tests
-    unless $Config::Config{useperlio};
-
+plan tests =>     11 # REGEX TEST HARNESS SELFTEST
+		+  3 # TEST FATAL ERRS
+		+ 11 # TEST -e \$srcCode
+		+  5 # REFTEXT FIXUP TESTS
+		+  5 # CANONICAL B::Concise EXAMPLE
+		+ 16 * $gOpts{selftest}; # XXX I don't understand this - DAPM
 
 pass("REGEX TEST HARNESS SELFTEST");
 
@@ -93,7 +89,7 @@ if (1) {
 		      expect	=> '',
 		      expect_nt	=> '');
     };
-    like($@, /no '\w+' golden-sample found/, "empty expectations prevented");
+    like($@, qr/no '\w+' golden-sample found/, "empty expectations prevented");
     
     $@='';
     eval {
@@ -104,7 +100,7 @@ if (1) {
 		      expect_nt	=> "\n",
 		      expect	=> "\n");
     };
-    like($@, /no '\w+' golden-sample found/,
+    like($@, qr/whitespace only reftext found for '\w+'/,
 	 "just whitespace expectations prevented");
 }
     
@@ -153,11 +149,11 @@ checkOptree ( name	=> 'fixup nextstate (in reftext)',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate( NOTE THAT THIS CAN BE ANYTHING ) v:>,<,%
-# 2  <0> padsv[$a:54,55] M/LVINTRO
+# 2  <0> padsv[$a:54,55] sM/LVINTRO
 # 3  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 54 optree_concise.t:84) v:>,<,%
-# 2  <0> padsv[$a:54,55] M/LVINTRO
+# 2  <0> padsv[$a:54,55] sM/LVINTRO
 # 3  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
@@ -168,11 +164,11 @@ checkOptree ( name	=> 'fixup opcode args',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 56 optree_concise.t:96) v:>,<,%
-# 2  <0> padsv[$a:56,57] M/LVINTRO
+# 2  <0> padsv[$a:56,57] sM/LVINTRO
 # 3  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 56 optree_concise.t:96) v:>,<,%
-# 2  <0> padsv[$a:56,57] M/LVINTRO
+# 2  <0> padsv[$a:56,57] sM/LVINTRO
 # 3  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
@@ -183,7 +179,6 @@ checkOptree ( name	=> 'canonical example w -basic',
 	      bcopts	=> '-basic',
 	      code	=>  sub{$a=$b+42},
 	      crossfail => 1,
-	      debug	=> 1,
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 7  <1> leavesub[1 ref] K/REFC,1 ->(end)
@@ -228,8 +223,3 @@ EOT_EOT
 # 6  <2> sassign sKS/2
 # 7  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
-
-} # skip
-
-__END__
-

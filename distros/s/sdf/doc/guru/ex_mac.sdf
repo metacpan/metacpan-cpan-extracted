@@ -1,0 +1,207 @@
+H1: Creating New Macros
+
+H2: Using Event Processing
+
+SDF's event processing feature makes it easy to create
+a new macro from an existing one. For example, the
+following line makes {{image}} an alias for the
+{{MAC:import}} macro:
+
+E:!on macro 'image';; $name='import'
+
+The new macro can then be used as follows:
+
+E:!image 'mylogo'
+
+H2: Using !macro and !endmacro
+
+The {{MAC:macro}} and {{MAC:endmacro}} macros are useful for
+creating simple macros. For example, if you have a block of text
+which is regularly repeated, you can make it a macro like this:
+
+!block example; pure
+!macro RealSoonNow
+Note: This feature will be implemented real soon now.
+The documentation below is the proposed design.
+Any feedback on the design should be forwarded to
+{{EMAIL:bill}} as soon as possible.
+!endmacro
+!endblock
+
+See the {{FILE:stdlib/macros.sdm}} file within the SDF distribution
+for more examples of macro definitions.
+
+H2: Using Perl
+
+For complicated macros including those requiring arguments,
+Perl subroutines can be used to implement the logic and
+build the SDF text to be inserted, if any.
+
+An SDF macro called {{xxx}} is mapped to a Perl subroutine
+called {{xxx}}_Macro within the SDF_USER package.
+The subroutine has the following interface:
+
+E:       @text = xxx_Macro(%arg);
+
+:where:
+
+* @text is the SDF to be inserted when this macro is called
+* %arg is the set of arguments (name-value pairs).
+
+For example, a Perl implementation of the RealSoonNow macro is:
+
+!block example; pure
+!block script
+sub RealSoonNow_Macro {
+    local(%arg) = @_;
+    local(@text);
+
+    @text = (
+      'Note: This feature will be implemented real soon now.',
+      'The documentation below is the proposed design.',
+      'Any feedback on the design should be forwarded to',
+      '{{EMAIL:bill}} as soon as possible.');
+    return @text;
+}
+!endblock
+!endblock
+
+Note: The {{FILT:script}} filter makes it easy to embed
+Perl code within an SDF document. (The code is executed within
+the SDF_USER package.)
+
+The {{FILE:perllib/sdf/macros.pl}} file within the SDF distribution
+contains lots of examples of macros implemented as Perl subroutines.
+
+H2: Adding Arguments
+
+If a macro is implemented as a Perl subroutine, arguments can
+be declared in a Perl array called _{{xxx}}_MacroArgs.
+The array is a table in {{FMT:TBL}} format which contains
+the following fields:
+
+!block table
+Field   Description
+Name    The argument name
+Type    The argument type
+Default The default value, if any
+Rule    The argument validation rule, if any
+!endblock
+
+For example, the RealSoonNow macro can be generalised so that
+the person to contact is an optional argument.
+
+!block example; pure
+!block script
+@_RealSoonNow_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'contact    string      bill',
+);
+sub RealSoonNow_Macro {
+    local(%arg) = @_;
+    local(@text);
+
+    @text = (
+      'Note: This feature will be implemented real soon now.',
+      'The documentation below is the proposed design.',
+      'Any feedback on the design should be forwarded to',
+      '{{EMAIL:' . $arg{'contact'} . '}} as soon as possible.');
+    return @text;
+}
+!endblock
+!endblock
+
+H2: Argument Types
+
+The supported set of argument types are:
+
+!block table; groups
+Type            Description
+Common:
+string          a string
+integer         an integer
+boolean         either 1 or 0
+Special:
+symbol          a symbolic name
+filter          a filter name
+rest            the rest of the arguments
+eventid         an event tag
+condition       a logical expression
+!endblock
+
+The special types are needed for some of SDF's built-in
+macros including {{MAC:define}}, {{MAC:include}}, {{MAC:on}}
+and {{MAC:if}} - they are rarely needed for normal macros.
+
+H2: Default Values
+
+For default values within argument tables:
+
+* the empty string means there is no default
+* the symbol _NULL_ means the default is the empty string.
+
+For example, the arguments for the {{MAC:include}} macros
+are declared as shown below:
+
+!block example
+@_include_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'filename   string',
+    'filter     filter      sdf',
+    'params     rest        _NULL_',
+);
+!endblock
+
+H2: Rules
+
+If you wish, arguments can be validated using a rule.
+Rules are either:
+
+!block sections
+* Patterns
+* General Perl Expressions.
+!endblock
+
+H2: Patterns
+
+A {{pattern}} is a Perl regular expression which the argument
+value is matched against. Patterns are enclosed in angle brackets
+to differentiate them from normal Perl expressions.
+Typical patterns are given in the table below.
+
+!block table
+Pattern     Explanation
+<\w+>       one or more characters in A-Z, a-z, 0-9 and '_'
+<\d{4}>     a 4 digit number
+<on|off>    a string which is either "on" or "off"
+<XMIT-.*>   a string which begins with "XMIT-"
+!endblock
+
+H2: General Perl Expressions
+
+More complex rules are required when:
+
+* the regular expression does not apply to the whole value
+* the regular expression is case-insensitive.
+
+In these cases, a general Perl expression can be used as the rule.
+Within the expression, $_ is the value of the argument.
+Examples are:
+
+!block table
+Expression      Explanation
+/\d/            a digit exists somewhere in the string
+/^(on|off)$/i   value is either "on" or "off" (case insensitive)
+!endblock
+
+!block note
+A pattern is simply a short-hand notation for the general
+Perl expression below:
+
+E:	/^(pattern)$/
+
+Pattern notation is provided as it makes rules easier
+to read and write. (Pattern-style validation typically covers
+80% or more of validation rules so improving the readability of
+patterns has a large impact on the overall readability.)
+!endblock

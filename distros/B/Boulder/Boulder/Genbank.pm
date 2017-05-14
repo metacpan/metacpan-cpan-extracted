@@ -7,14 +7,15 @@ use Carp;
 use vars qw(@ISA $VERSION);
 @ISA = qw(Boulder::Stream);
 
-$VERSION = 1.01;
+$VERSION = 1.10;
 
 # Hard-coded defaults - must modify for your site
 use constant YANK            =>  '/usr/local/bin/yank';
 
-# used by Entrez accessor, may need to change in the future
+#use constant BATCH_URI => '/cgi-bin/Entrez/qserver.cgi/result';
+#use constant BATCH_URI => '/htbin-post/Entrez/query';
 use constant HOST      => 'www.ncbi.nlm.nih.gov';
-use constant BATCH_URI => '/cgi-bin/Entrez/qserver.cgi/result';
+use constant BATCH_URI => '/IEB/ToolBox/XML/xbatch.cgi';
 
 # Genbank entry parsing constants
 # (may need to adjust!)
@@ -84,6 +85,16 @@ Genbank-format records.  It returns Genbank entries in L<Stone>
 format, allowing easy access to the various fields and values.
 Boulder::Genbank is a descendent of Boulder::Stream, and provides a
 stream-like interface to a series of Stone objects.
+
+>> IMPORTANT NOTE <<
+
+As of January 2002, NCBI has changed their Batch Entrez interface.  I
+have modified Boulder::Genbank so as to use a "demo" interface, which
+fixes things, but this isn't guaranteed in the long run.
+
+I have written to NCBI, and they may fix this -- or they may not.
+
+>> IMPORTANT NOTE <<
 
 Access to Genbank is provided by three different I<accessors>, which
 together give access to remote and local Genbank databases.  When you
@@ -167,6 +178,8 @@ new() takes the following arguments:
 
 	-accessor	Name of the accessor to use
 	-fetch		Parameters to pass to the accessor
+        -proxy          Path to an HTTP proxy, used when using
+                         the Entrez accessor over a firewall.
 
 Specify the accessor to use with the B<-accessor> argument.  If not
 specified, it defaults to B<Entrez>. 
@@ -249,16 +262,24 @@ selected from the following list:
   m  MEDLINE
   p  Protein
   n  Nucleotide
-  t  3-D structure
-  c  Genome
+  s  Popset
+
+=item B<-proxy>
+
+An HTTP proxy to use.  For example:
+
+   -proxy => http://www.firewall.com:9000
+
+If you think you need this, get the correct URL from your system
+administrator.
 
 =back
 
 As an example, here's how to search for ESTs from Oryza sativa that
-have been entered or modified since January 12, 1999.
+have been entered or modified since 1999.
 
   my $gb = new Boulder::Genbank( -accessor=>Entrez, 
-				 -query=>'Oryza sativa[Organism] AND EST[Keyword] AND 1999/01/12[Modification date]', 
+				 -query=>'Oryza sativa[Organism] AND EST[Keyword] AND 1999[MDAT]', 
                                  -db   => 'n'   
                                 });
 
@@ -369,6 +390,11 @@ Stone with keys "a", "c", "t" and "g".  Example:
      my $G = $s->Basecount->G;
      my $T = $s->Basecount->T;
      print "GC content is ",($G+$C)/($A+$C+$G+$T),"\n";
+
+=item Blob
+
+The entire flatfile record as an unparsed chunk of text (a "blob").
+This is a handy way of reassembling the record for human inspection.
 
 =item Comment
 
@@ -524,7 +550,7 @@ L<Boulder>, L<Boulder::Blast>
 
 Lincoln Stein <lstein@cshl.org>.
 
-Copyright (c) 1997 Lincoln D. Stein
+Copyright (c) 1997-2000 Lincoln D. Stein
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  See DISCLAIMER.txt for
@@ -695,8 +721,8 @@ sub new {
 
     if ($parameters[0]=~/^-/) {
 	%parameters = @parameters;
-	$self->{accessor}=$parameters{'-accessor'} || 'Entrez';
-	$self->{OUT}=$parameters{'-out'} || \*STDOUT;
+	$self->{accessor}  = $parameters{'-accessor'} || 'Entrez';
+	$self->{OUT}       = $parameters{'-out'} || \*STDOUT;
 	$self->{format}    = $parameters{'-format'};
     } else {
 	$self->{accessor}='Entrez';
@@ -758,7 +784,17 @@ sub parse {
       }
       next;
     }
-      
+
+    # special case for the VERSION
+    if ($line=~/^VERSION/) {
+      my @vernid = split(/\s+/,$line);
+      my ($junk,$tmp)=split(/:/,$vernid[2]);
+      $vernid[2]='g'.$tmp;
+      $self->_addToStone('Version',$vernid[1],$s,\%ok);
+      $self->_addToStone('Nid',$vernid[2],$s,\%ok);
+      next;
+    }
+ 
     # special case for the features table
     if ($line=~/^FEATURES/..$line=~/^ORIGIN/) {
       undef $keyword;
@@ -768,19 +804,22 @@ sub parse {
 	next;
       }
 
-      if ($line=~/BASE COUNT|ORIGIN/) {
+      if ($line =~ /^(BASE COUNT|ORIGIN)/) {
 	push(@features,$feature) if $feature;
 	$self->_addFeaturesToStone(\@features,_trim($'),$s,\%ok) if @features;
-	undef @features; undef $feature;
-	next if $line =~ /BASE COUNT/;
+	undef @features; 
+	undef $feature;
+	next if $line =~ /^BASE COUNT/;
 
 	# special case for the sequence itself
 	if ($line=~/^ORIGIN/) {
+	  # next line added by Luca Toldo
+	  $self->_addToStone('Blob',$record,$s,\%ok);
 	  $self->_addToStone($key,$accumulated,$s,\%ok) if $key;
 	  last;
 	}
       }
-    
+
       my($featurelabel) = _trim(substr($line,$FEATURECOL,$FEATUREVALCOL-$FEATURECOL));
       my($featurevalue) = _trim(substr($line,$FEATUREVALCOL));
       if ($featurelabel) {
@@ -789,7 +828,6 @@ sub parse {
       } else {
 	$feature->{'value'} .= $featurevalue;
       }
-      
       next;
     }
     
@@ -806,8 +844,14 @@ sub parse {
     $key = $keyword if $keyword;
   }
   
-  my ($sequence)=$record=~/\nORIGIN.*\n([\s\S]+)/;
-  $sequence=~s/[\s0-9-]+//g;  # remove white space
+  my($sequence) = $record=~/\nORIGIN[^\n]*\n(.+)\\?\\?/s;
+
+#  $sequence=~s/[\s0-9-]+//g;  # remove white space and numbers
+#  $sequence =~ s/^\s*\d+\s//mg;  # remove leading numbers and whitespace
+#  $sequence =~ s/(\S{1,10}) /$1/g; # remove spacer
+  $sequence =~ s/^.{9,10}//mg;    # remove leading numbers and whitespace
+  $sequence =~ s/(.{10}) /$1/g; # remove spacers
+  $sequence =~ s/\n//g;
   $self->_addToStone('Sequence',$sequence,$s,\%ok);
   return $s;
 }
@@ -861,10 +905,11 @@ sub _addFeaturesToStone {
 	# now add the features
 	my($f) = new Stone;
 	foreach (@$features) {
+	    my($p) = new Stone;	      
 	    my($q) = $_->{'value'};
 	    my($label) = _canonicalize($_->{'label'});
 	    my($position) = $q=~m!^([^/\s]+)!;
-	    my @qualifiers = $q=~m@/(\w+)=(.+?)(?=\"|/\w+=)@g;  # slower but ?better
+	    my @qualifiers = $q=~m@/(\w+)=(.+?)(?=\"|/\w+=|$)@g;  # slower but ?better
 	    my %qualifiers;
 	    while (my($key,$value) = splice(@qualifiers,0,2)) {
 	      $value =~ s/^\s*\"//; # trim off extra space and quotes
@@ -872,9 +917,11 @@ sub _addFeaturesToStone {
 	      $value =~ s/^\s+//; # trim off extra space and quotes
 	      $value =~ s/\s+$//;
 	      $value =~ s/\s+//g if uc($key) eq 'TRANSLATION';  # get rid of spaces in protein translation
-	      $qualifiers{_canonicalize($key)} = $value;
-	    }
-	    $f->insert($label=>new Stone('Position'=>$position,%qualifiers));
+	      $p->insert(_canonicalize($key)=>$value);	      
+	    }						
+	    $p->insert('Position'=>$position);
+	    $f->insert($label=>$p);
+	    undef $p;	       
 	}
 	$stone->insert('Features',$f);
     }
@@ -910,14 +957,14 @@ sub new {
     my($package,$param) = @_;
     croak "Yank::new(): need at least one Genbank acccession number" unless $param;
     croak "Yank::new(): yank executable not found" unless -x $YANK;
-    $param->{fetch} ||= $param->{param};  # for backward compatibility
-    $param->{fetch} || croak "Provide list of accession numbers to yank";
-    my @accession = @{$param->{fetch}};
+    $param->{-fetch} ||= $param->{-param};  # for backward compatibility
+    $param->{-fetch} || croak "Provide list of accession numbers to yank";
+    my @accession = @{$param->{-fetch}};
     my $tmpfile = "/usr/tmp/yank$$";
     open (TMP,">$tmpfile") || croak "Yank::new(): couldn't open tmpfile $tmpfile for write: $!";
     print TMP join("\n",@accession),"\n";
     close TMP;
-    open(YANK,"$YANK < $tmpfile |") || croak "Yank::new(): couldn't open pipe from yank: $!";
+    open(YANK,"$YANK -b < $tmpfile |") || croak "Yank::new(): couldn't open pipe from yank: $!";
     return bless {'tmpfile'=>$tmpfile,'fh'=>\*YANK},$package;
 }
 
@@ -965,7 +1012,8 @@ sub fetch_next {
     local($/)="//\n";
     my $line;
     my $fh = $self->{'fh'};
-    chomp($line = <$fh>);
+    $line = <$fh>;
+    chomp $line if $line;
     return $line;
 }
 
@@ -973,10 +1021,17 @@ package Entrez;
 use Carp;
 use vars '@ISA';
 use IO::Socket;
+use CGI 'escape';
+
+# used by Entrez accessor, may need to change in the future
+use constant  ENTREZ_HOST => 'www.ncbi.nlm.nih.gov';
+use constant  QUERY_URI   => '/entrez/utils/pmqty.fcgi';
+use constant  BATCH_URI   => '/entrez/utils/pmfetch.fcgi';
+use constant  XBATCH_URI => '/IEB/ToolBox/XML/xbatch.cgi';
 
 use constant PROTO => 'HTTP/1.0';
 use constant CRLF  => "\r\n";
-use constant MAX_ENTRIES => 19_000;
+use constant MAX_ENTRIES => 10_000;
 
 @ISA=qw(GenbankAccessor);
 
@@ -984,17 +1039,24 @@ sub new {
     my($package,$param) = @_;
     croak "Entrez::new(): usage [list of accession numbers] or {args => values}" 
       unless $param;
-    my $self = {};
+    my $self = bless {},ref($package) || $package;
 
     $self->{query}     = $param->{-query};
     $self->{accession} = $param->{-fetch} || $param->{-param};
     $self->{db}        = $param->{-db} || 'n';
     $self->{format}    = $param->{-format} || 'stone';
+    $self->{proxy}     = $param->{-proxy};
+    $self->{limit}     = $param->{-limit};
 
-    croak "Must provide a 'query' or 'accession' argument" unless $self->{query} || $self->{accession} ;
-    $self->{accession} = [ @{$self->{accession}} ]
-      if $self->{accession} and ref $self->{accession}; # copy array to avoid munging caller's variable
-    return bless $self,$package;
+    if ($self->{query}) {
+      $self->{accession} = $self->get_accessions($self->{query});
+    } elsif ($self->{accession}) {
+      my @accessions = ref $self->{accession} ? @{$self->{accession}} : ($self->{accession});
+      $self->{accession} = \@accessions;
+    } else {
+      croak "Must provide a 'query' or 'accession' argument" unless $self->{query} || $self->{accession} ;
+    }
+    $self;
 }
 
 sub fetch_next {
@@ -1019,13 +1081,15 @@ sub fetch_next {
       if (my $data = $self->_getline) {
 	$self->_cleanup(\$data);
 	return $data;
+      } elsif (!$self->{accession} || @{$self->{accession}} == 0) {  # nothing more to do
+	return;
       }
     }
 
     die "Must provide either a list of accession numbers or an Entrez query"
       unless $self->{accession} || $self->{query};
 
-    return unless $self->_request;
+    return unless $self->get_entries;
 
     my $data = $self->_getline;
     $self->_cleanup(\$data);
@@ -1041,15 +1105,104 @@ sub _cleanup {
   substr($$d,0,0)='>' unless $$d =~/^>/;
 }
 
-sub _request {
+sub get_accessions {
   my $self = shift;
-  my $format = $self->{format};
+  my $query = shift;
+  my $sock    = $self->_build_connection(ENTREZ_HOST) or return;
+
+  # bug here: assume that the server will give us everything when we ask for 1 billion entries
+  my $request = $self->_build_post(ENTREZ_HOST,
+				   QUERY_URI,
+				   undef,
+				   sprintf("db=%s&dispmax=%d&report=gen&mode=text&tool=boulder&term=%s",$self->db,$self->limit, escape($query)));
+
+  print $sock $request;
+  my $status = $self->_read_header($sock);
+  return unless $status == 200;
+
+  local $/ = ' ';
+  my $line = $sock->getline;
+  chomp $line;
+  warn "*** ENTREZ: $line ***" unless $line =~ /^\d+$/;
+  my @accessions = $line;
+  while (defined ($line = $sock->getline)) {
+    chomp $line;
+    push @accessions,$line;
+  }
+  return \@accessions;
+}
+
+sub db {
+  my $self = shift;
+  my $db = $self->{db} || 'n';
+  my $translated = { m => 'medline',
+		     p => 'protein',
+		     n => 'nucleotide',
+		     s => 'popset' }->{$db};
+  $translated || $db;
+}
+
+# BUG: one billion = infinity
+sub limit {
+  shift->{limit} || 1_000_000_000;
+}
+
+sub _build_connection {
+  my $self = shift;
+  my $host = shift;
+  my ($hostent,$peer,$peerport);
+
+  if (my $proxy = $self->{proxy}) {
+    $proxy =~ m!^http://([^/]+)/?! or return;
+    $hostent = $1;
+  } else {
+    $hostent = $host;
+  }
+  
+  ($peer,$peerport) = split(':',$hostent);
+  $peerport ||= 'http(80)';
+
   my $sock = IO::Socket::INET->new(
-				   PeerAddr => Boulder::Genbank::HOST,
-				   PeerPort => 'http(80)',
+				   PeerAddr => $peer,
+				   PeerPort => $peerport,
 				   Proto    => 'tcp'
 				  );
-  return unless $sock;
+
+  $sock;
+}
+
+sub _build_post {
+  my $self = shift;
+  my ($host,$uri,$type,$param) = @_;
+
+  my $path = $self->{proxy} ? "http://$host$uri" : $uri;
+  $type ||= 'application/x-www-form-urlencoded';
+  my $length = length($param);
+  my $request = join (CRLF,
+		      "POST $path ".PROTO,
+		      "User-agent: Mozilla/5.0 [en] (PalmOS)",
+		      "Content-Type: $type",
+		      "Content-Length: $length",
+		      CRLF
+		      );
+  $request.$param;
+}
+
+sub _read_header {
+  my $self = shift;
+  my $sock = shift;
+  local $/ = CRLF.CRLF;
+  my $header = $sock->getline;
+  return 500 unless $header;
+  return 500 unless $header =~ /^HTTP\/[\d.]+ (\d+)/;
+  $1;
+}
+
+sub get_entries {
+  my $self = shift;
+  my $format = $self->{format};
+
+  my $sock = $self->_build_connection(ENTREZ_HOST) or return;
 
   # create the multipart form...
   my $db = $self->{'db'};
@@ -1062,7 +1215,8 @@ sub _request {
 		'LIST_ORG'     => '(None)',
 		'QUERY'        => "$self->{query}\r\n",
 		'SAVETO'       => 'YES',
-		'NOHEADER'     => 'YES');
+		'NOHEADER'     => 'YES',
+	       );
 
   my @records = map {qq(Content-Disposition: form-data; name="$_"\r\n\r\n$canned{$_}\r\n)} keys %canned;
 
@@ -1075,13 +1229,13 @@ sub _request {
   }
 
   my $content = "$boundary\r\n" . join("$boundary\r\n",@records) . "$boundary--\r\n";
-  
-  print $sock "POST ",Boulder::Genbank::BATCH_URI," ",PROTO,CRLF;
-  print $sock "User-agent: Mozilla/5.0 [en] (PalmOS)",CRLF;
-  print $sock "Content-Type: multipart/form-data; boundary=$boundary",CRLF;
-  print $sock "Content-Length: ",length $content,CRLF,CRLF;
 
-  print $sock $content;
+  my $request = $self->_build_post(ENTREZ_HOST,
+				   XBATCH_URI,
+				   "multipart/form-data; boundar=$boundary",
+				   $content);
+
+  print $sock $request;
 
   local($/) = CRLF . CRLF;
 
@@ -1102,7 +1256,12 @@ sub _request {
     }
     delete $self->{query};
     $self->{accession} = \@accessions;
-    return $self->_request; # horrible recursion here!
+    return $self->get_entries; # horrible recursion here!
+  } else {
+    while ($line =~ /(\*\*\*\* |WARNING: |ERROR: )(.+)/) {
+      warn "**** GENBANK $1: $2\n";
+      $line = $sock->getline;
+    }
   }
   $self->{bufferedline} = $line;
   if ($format eq 'fasta') {

@@ -3,7 +3,7 @@ package Tie::Array;
 use 5.006_001;
 use strict;
 use Carp;
-our $VERSION = '1.03';
+our $VERSION = '1.06';
 
 # Pod documentation after __END__ below.
 
@@ -128,10 +128,10 @@ Tie::Array - base class for tied arrays
     sub FETCH { ... }
     sub FETCHSIZE { ... }
 
-    sub STORE { ... }        # mandatory if elements writeable
-    sub STORESIZE { ... }    # mandatory if elements can be added/deleted
-    sub EXISTS { ... }       # mandatory if exists() expected to work
-    sub DELETE { ... }       # mandatory if delete() expected to work
+    sub STORE { ... }       # mandatory if elements writeable
+    sub STORESIZE { ... }   # mandatory if elements can be added/deleted
+    sub EXISTS { ... }      # mandatory if exists() expected to work
+    sub DELETE { ... }      # mandatory if delete() expected to work
 
     # optional methods - for efficiency
     sub CLEAR { ... }
@@ -152,9 +152,9 @@ Tie::Array - base class for tied arrays
 
     package main;
 
-    $object = tie @somearray,Tie::NewArray;
-    $object = tie @somearray,Tie::StdArray;
-    $object = tie @somearray,Tie::NewStdArray;
+    $object = tie @somearray,'Tie::NewArray';
+    $object = tie @somearray,'Tie::StdArray';
+    $object = tie @somearray,'Tie::NewStdArray';
 
 
 
@@ -276,9 +276,6 @@ Returns a list of the original I<length> elements at I<offset>.
 There is no support at present for tied @ISA. There is a potential conflict
 between magic entries needed to notice setting of @ISA, and those needed to
 implement 'tie'.
-
-Very little consideration has been given to the behaviour of tied arrays
-when C<$[> is not default value of zero.
 
 =head1 AUTHOR
 

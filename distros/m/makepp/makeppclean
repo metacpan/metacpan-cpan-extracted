@@ -1,0 +1,237 @@
+#!/usr/bin/perl -w
+# $Id: makeppclean,v 1.22 2012/05/23 18:30:17 pfeiffer Exp $
+
+package Mpp;
+
+use strict;
+
+use POSIX ();
+
+#
+# Exiting
+#
+# Do this early, because the END block defined below shall be the first seen
+# by perl, such that it is the last executed.  It leaves the process via
+# POSIX::_exit, so that no expensive garbage collection of Mpp::Files occurs.
+# All other places can use die or normal exit.  If you define additional END
+# blocks in any module, you must take care to not reset $?.
+#
+END {
+  close STDOUT; close STDERR;
+  POSIX::_exit $?;
+}
+
+our $datadir;
+BEGIN {
+  our $VERSION = '@VERSION@';
+#@@setdatadir
+#
+# Find the location of our data directory that contains the auxiliary files.
+# This is normally built into the program by install.pl, but if makepp hasn't
+# been installed, then we look in the directory we were run from.
+#
+  $datadir = $0;		# Assume it's running from the same place that
+				# we're running from.
+  unless( $datadir =~ s@/[^/]+$@@ ) { # No path specified?
+				# See if we can find ourselves in the path.
+    foreach( split( /:/, $ENV{'PATH'} ), '.' ) {
+				# Add '.' to the path in case the user is
+				# running it with "perl makepp" even if
+				# . is not in his path.
+      if( -d "$_/Mpp" ) {	# Found something we need?
+	$datadir = $_;
+	last;
+      }
+    }
+  }
+  $datadir or die "makepp: can't find library files\n";
+
+  $datadir = eval "use Cwd; cwd . '/$datadir'"
+    if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+#@@
+  unshift @INC, $datadir;
+}
+
+use Mpp::Utils;
+use File::Path qw(rmtree);
+use Mpp::File;
+use Mpp::FileOpt;
+use Mpp::Text ();
+
+
+my $verbose;
+
+sub print_msg {
+  foreach my $str (@_, ($_[-1] =~ /\n\z/) ? () : "\n") {
+    my $str_to_print = $str;
+    ref $str_to_print and $str_to_print = absolute_filename $str;
+    print STDERR $str_to_print;
+  }
+}
+sub print_error {
+  print STDERR "$Mpp::progname: error: ";
+  &print_msg;
+}
+
+sub print_warning {
+  print STDERR "$Mpp::progname: warning: ";
+  &print_msg;
+}
+sub print_log {
+  &print_msg if $verbose;
+}
+
+my $n_files_removed = 0;
+my $recurse;
+
+sub perform(&) {
+  my $code = $_[0];
+  eval { &$code; };
+
+  if ($@) {			# Did we die() somehow?
+    print_error $@;		# Print the error message.
+    close STDOUT; close STDERR;	# Flush these too, or else we'll have problems.
+    exit 1;
+  }
+
+  if( $verbose ) {
+    print "$Mpp::progname: $n_files_removed file" . ($n_files_removed == 1 ? '' : 's') . " removed\n";
+  } elsif( !$n_files_removed ) {
+    print "$Mpp::progname: no files removed\n";
+  }
+
+  exit 0;
+}
+
+my @info_strings;		# Our deletion criteria.
+my @deletable;			# Files must be first remembered for deletion,
+				# because if we deleted them right away, and
+				# then later found a symlink to one, that might
+				# no longer have a checkable build info.
+my( $dirs, @deletable_dirs );
+my( $logs, $meta );		# delete only logs or metafiles under .makepp
+
+sub deletable {
+  return 1 if -l &Mpp::File::build_info_fname && !-e _; # Stale inter-build-cache symlink?
+  defined and return 1
+    for Mpp::File::build_info_string $_[0], @info_strings;
+  if( $_[0]{TEMP_BUILD_INFO} ) { # Stale symlink?
+    return if $_[0]{TEMP_BUILD_INFO}{SYMLINK} ne (readlink &Mpp::File::absolute_filename or '');
+    defined and return 1
+      for @{$_[0]{TEMP_BUILD_INFO}}{@info_strings};
+  }
+  $_[0]{NAME} =~ /^\.makepp_(?:log|testfile)/; # Always clean leftovers.
+}
+
+sub remove_if_built_file {
+  if( &deletable ) {
+    if( &is_dir ) {
+      unshift @deletable_dirs, $_[0];
+    } else {
+      print_log "Removing ", $_[0];
+      ++$n_files_removed;
+      push @deletable, &relative_filename, &Mpp::File::build_info_fname;
+    }
+    unless( exists $_[0]{'..'}{xMAKEPP_DELETABLE} ) { # Remember to check .makepp later.
+      undef $_[0]{'..'}{xMAKEPP_DELETABLE};
+      my $makepp = file_info $Mpp::File::build_info_subdir, $_[0]{'..'};
+      unshift @deletable_dirs, $makepp if is_dir $makepp;
+    }
+  }
+}
+
+my $keep_src_info;
+sub remove_contents_if_built {
+  my( $dinfo ) = @_;
+  &Mpp::File::read_directory;
+  my $has_build_info;
+  for my $name (keys %{$dinfo->{DIRCONTENTS}}) {
+    my $finfo = $dinfo->{DIRCONTENTS}{$name};
+    if( $name eq $Mpp::File::build_info_subdir ) {
+      $has_build_info = 1;
+      if( $meta ) {
+	++$n_files_removed;
+      } elsif( $logs and is_dir $finfo ) {
+	Mpp::File::read_directory $finfo;
+	for my $rm ( @{$finfo->{DIRCONTENTS}}{grep /^log(?!.*\.mk$)/s, keys %{$finfo->{DIRCONTENTS}}} ) {
+	  print_log "Removing ", $rm;
+	  ++$n_files_removed;
+	  push @deletable, relative_filename $rm;
+	}
+      }
+      next;
+    }
+    remove_if_built_file $finfo if @info_strings;
+    remove_contents_if_built( $finfo ) if $recurse and is_dir $finfo;
+  }
+  unshift @deletable_dirs, $dinfo if $dirs && $has_build_info;
+  unless( $keep_src_info ) { # Remember to check .makepp later.
+    my $makepp = file_info $Mpp::File::build_info_subdir, $dinfo;
+    if( is_dir $makepp ) {
+      unless( exists $dinfo->{xMAKEPP_DELETABLE} ) {
+	undef $dinfo->{xMAKEPP_DELETABLE};
+	unshift @deletable_dirs, $makepp;
+      }
+      undef $makepp->{xDELETABLE}; # Delete unconditionally.
+    }
+  }
+}
+
+perform {
+  Mpp::Text::getopts
+    ['b', qr/(?:only[-_]?)?(?:build[-_]?)?cache[-_]?(?:link|file)s/, undef, 0,
+     sub { push @info_strings, 'LINKED_TO_CACHE' }],
+
+    ['d', qr/(?:ampty[-_]?)?director(?:ies|y)/, \$dirs],
+
+    ['k', qr/(?:keep|leave)[-_]?src[-_]?info/, \$keep_src_info],
+
+    ['l', qr/(?:only[-_]?)?logs?/, \$logs],
+
+    ['m', qr/(?:only[-_]?)?meta|makepp/, \$meta],
+
+    ['R', qr/(?:only[-_]?)?repository[-_]?links/, undef, 0,
+     sub {push @info_strings, 'FROM_REPOSITORY' }],
+    ['r', qr/recurs(?:iv)?e/, \$recurse],
+
+    [qw(v verbose), \$verbose],
+
+    splice @Mpp::Text::common_opts;
+
+  if( $meta && $keep_src_info ) {
+    print_error "-m|--only-meta contradicts -k|--keep-src-info";
+    exit 1;
+  }
+
+  if( @info_strings || $logs ) {
+    $keep_src_info = 1;		# Actually keep all other infos.
+  } elsif( !$meta ) {
+    @info_strings = qw(BUILD_SIGNATURE FROM_REPOSITORY);
+  }
+  if( @ARGV ) {
+    for my $arg (@ARGV) {
+      my $finfo = file_info $arg;
+      remove_if_built_file $finfo;
+      remove_contents_if_built $finfo if is_dir $finfo;
+    }
+  } else {
+    remove_contents_if_built file_info '.';
+  }
+  unlink @deletable;	# Perform the bulk of the work.
+  for( @deletable_dirs ) {
+    unless( exists $_->{xDELETABLE} ) { # Must check if empty.
+      $_->{DIRCONTENTS} = {};	# Maybe lots deleted w/o telling Mpp::File.
+      Mpp::File::read_directory $_; # Check what is still left.
+      delete $_->{DIRCONTENTS}{$Mpp::File::build_info_subdir};
+      next if keys %{$_->{DIRCONTENTS}}; # There are other files left.
+    }
+    print_log "Removing ", $_, '/' if $meta || $_->{NAME} ne $Mpp::File::build_info_subdir;
+    rmtree relative_filename $_;
+  }
+};
+
+__DATA__
+[option ...] [path ...]
+
+All named files, and all files in named directories, that were generated by
+makepp are removed.  Path defaults to '.'.  Valid options are:

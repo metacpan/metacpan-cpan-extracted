@@ -12,55 +12,35 @@ use Bio::Gonzales::Util::Cerial;
 use Bio::Gonzales::Util::Development::File;
 use Data::Visitor::Callback;
 use Bio::Gonzales::Util::Log;
-use Data::Printer {
-  indent         => 2,
-  colored        => '0',
-  use_prototypes => 0,
-  rc_file        => '',
-};
-
+use Data::Printer;
 use POSIX;
 
 use 5.010;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
-has '_config_key_cache' => ( is => 'rw', default => sub { {} } );
-has '_nfi_cache'        => ( is => 'rw', default => sub { {} } );
-has 'analysis_version'  => ( is => 'rw', builder => '_build_analysis_version' );
+has 'analysis_version' => ( is => 'rw', builder    => '_build_analysis_version' );
 has '_substitute_conf' => ( is => 'rw', lazy_build => 1 );
 has 'config'           => ( is => 'rw', lazy_build => 1 );
-has 'merge_av_config'  => ( is => 'rw', default    => 1 );
 has 'log'              => ( is => 'rw', builder    => '_build_log' );
-has 'config_file'      => ( is => 'rw', default    => 'gonz.conf.yml' );
-has 'analysis_name' => (is => 'rw', lazy_build => 1);
-
-sub _build_analysis_name {
-  my ($self) = @_;
-
-  return (File::Spec->splitdir(File::Spec->rel2abs('.')))[-1]
-}
 
 sub _build_analysis_version {
   my ($self) = @_;
 
-  my $av;
   if ( $ENV{ANALYSIS_VERSION} ) {
-    $av = $ENV{ANALYSIS_VERSION};
+    return $ENV{ANALYSIS_VERSION};
   } elsif ( -f 'av' ) {
-    $av = ( slurpc('av') )[0];
+    return ( slurpc('av') )[0];
   } else {
     carp "using current dir as output dir";
-    $av = '.';
+    return '.';
   }
-  return _prepare_av($av);
 }
 
 sub _build__substitute_conf {
   my ($self) = @_;
 
   my %subs = (
-    an      => sub { return $self->analysis_name },
     av      => sub { return $self->analysis_version },
     path_to => sub { return $self->path_to(@_) },
     data    => sub { return $self->path_to('data') },
@@ -94,64 +74,38 @@ sub _build_log {
 sub _build_config {
   my ($self) = @_;
 
-  my $conf;
-  my $conf_f = $self->config_file;
-  if ( -f $conf_f ) {
-    $conf = yslurp($conf_f);
-  $conf //= {};
-
-    confess "configuration file >> $conf_f << is not a hash/dictionary structure"
-      if ( ref $conf ne 'HASH' );
-    $self->log->info("reading >> $conf_f <<");
-    $self->_substitute_conf->visit($conf);
+  my $data;
+  if ( -f 'gonz.conf.yml' ) {
+    $data = yslurp('gonz.conf.yml');
+  } elsif ( -f 'gonzconf.yml' ) {
+    $data = yslurp('gonzconf.yml');
+  } elsif ( -f 'iof.yml' ) {
+    $data = yslurp('iof.yml');
+  } elsif ( -f 'io_files.yml' ) {
+    $data = thaw_file('io_files.yml');
+  } elsif ( -f 'iof.json' ) {
+    $data = jslurp('iof.json');
+  } else {
+    confess "io file not found";
   }
-
-  my $av_conf_f = join( ".", $self->analysis_version, "conf", "yml" );
-  if ( $self->merge_av_config && $av_conf_f !~ /^\./ && -f $av_conf_f ) {
-
-    my $av_conf = yslurp($av_conf_f);
-    confess "configuration file >> $av_conf_f << is not a hash/dictionary structure"
-      if ( ref $av_conf ne 'HASH' );
-
-    $self->log->info("reading >> $av_conf_f <<");
-    $self->_substitute_conf->visit($av_conf);
-
-    $conf = { %$conf, %$av_conf };
-  }
-  return $conf;
+  $self->_substitute_conf->visit($data);
+  return $data;
 }
 
 sub BUILD {
   my ($self) = @_;
 
   my $av = $self->analysis_version;
-
-  $self->log->info("invoked ($av)")    # if a script is run, log it
-    if ( !$ENV{GONZLOG_SILENT} );
-}
-
-around 'analysis_version' => sub {
-  my $orig = shift;
-  my $self = shift;
-
-  return $self->$orig()
-    unless @_;
-
-  return $self->$orig( _prepare_av(shift) );
-};
-
-sub _prepare_av {
-  my $av = shift;
-  if ( !$av ) {
-    return '.';
-  } elsif ( $av =~ /^[-A-Za-z_.0-9]+$/ ) {
-    mkdir $av unless ( -d $av );
-  } else {
+  unless ( $av && $av =~ /^[-A-Za-z_.0-9]+$/ ) {
     carp "analysis version not or not correctly specified, variable contains: " . ( $av // 'nothing' );
     carp "using current dir as output dir";
-    return '.';
+    $self->analysis_version('.');
+  } else {
+    mkdir $av unless ( -d $av );
   }
-  return $av;
+
+  $self->log->info("invoked")    # if a script is run, log it
+    if ( !$ENV{GONZLOG_SILENT} );
 }
 
 sub av { shift->analysis_version(@_) }
@@ -162,11 +116,7 @@ sub nfi {
   my $self = shift;
 
   my $f = $self->_nfi(@_);
-
-  # only log it once per filename
-  $self->log->info("(nfi) > $f <")
-    unless ( $self->_nfi_cache->{$f}++ );
-
+  $self->log->info("(nfi) > $f <");
   return $f;
 }
 
@@ -187,26 +137,23 @@ sub conf {
       if ( exists( $data->{$k} ) ) {
         $data = $data->{$k};
       } else {
-        $self->log->fatal_confess("$k not found in gonzconf");
+        confess "$k not found in gonzconf";
       }
     } elsif ( $r && $r eq 'ARRAY' ) {
       if ( exists( $data->[$k] ) ) {
         $data = $data->[$k];
       } else {
-        $self->log->fatal_confess("$k not found in gonzconf");
+        confess "$k not found in gonzconf";
       }
     } else {
-      $self->log->fatal_confess("$k not found in gonzconf");
+      confess "$k not found in gonzconf";
     }
   }
   if (@keys) {
-    my $k = join( " ", @keys );
-    $self->log->info( "(gonzconf) > " . $k . " <", p($data) )
-      unless ( $self->_config_key_cache->{ '_' . $k }++ );
+    $self->log->info( "(gonzconf) > " . join( " ", @keys  ) . " <", p($data) );
 
   } else {
-    $self->log->info( "(gonzconf) dump", p($data) )
-      unless ( $self->_config_key_cache->{'_'}++ );
+    $self->log->info( "(gonzconf) dump", p($data) );
   }
   return $data;
 }
@@ -217,7 +164,7 @@ sub path_to {
   my $home = Bio::Gonzales::Util::Development::File::find_root(
     {
       location => '.',
-      dirs     => [ '.git', 'analysis', ],
+      dirs     => [ '.git', 'analysis', 'doc', ],
       files    => ['Makefile']
     }
   );

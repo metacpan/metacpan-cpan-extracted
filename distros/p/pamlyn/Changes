@@ -1,0 +1,6 @@
+Revision history for Perl extension YN00.
+
+0.01  Mon Jun 14 13:49:53 2004
+	- original version; created by h2xs 1.23 with options
+		-X -n YN00
+

@@ -1,0 +1,205 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: sdfget - Documentation Extraction Utility</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdfcli.html">Previous Topic</A> | <A HREF="sdftest.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="sdfget">11.6. sdfget - Documentation Extraction Utility</A></H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P><A HREF="../ref/sdfget.html">sdfget</A> extracts documentation embedded in source code.</P>
+<HR>
+<H2><A NAME="Usage">Usage</A></H2>
+<PRE>
+usage  : sdfget [-h[help]] [-o[out_ext]]
+         [-l[log_ext]] [-g get_rule] [-r[rpt_file]]
+         [-s scope] [-i] file ...
+purpose: extract documentation embedded in source code
+version: 2.000    (SDF 2.001beta1)
+</PRE>
+<P>The options are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfget_h">-h</A>
+</TD>
+<TD>
+display help on options
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfget_o">-o</A>
+</TD>
+<TD>
+output file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfget_l">-l</A>
+</TD>
+<TD>
+log file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfget_g">-g</A>
+</TD>
+<TD>
+rule to use to get documentation
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfget_r">-r</A>
+</TD>
+<TD>
+report file
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfget_s">-s</A>
+</TD>
+<TD>
+scope of documentation to be extracted
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfget_i">-i</A>
+</TD>
+<TD>
+only output lines not extracted
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P><A NAME="sdfget_h">The -h option provides help. If it is specified without a parameter, a brief description of each option is displayed. To display the attributes for an option, specify the option letter as a parameter.</A></P>
+<P><A NAME="sdfget_o">By default, generated output goes to standard output. To direct output to a file per input file, use the -o option to specify an extension for output files. If the -o option is specified without a parameter, an extension of <EM>out</EM> is assumed.</A></P>
+<P><A NAME="sdfget_l">Likewise, error messages go to standard error by default. Use the -l option to create a log file per input file. If the -l option is specified without a parameter, an extension of <EM>log</EM> is assumed.</A></P>
+<P>The <EM>get-rule</EM> nominates the formatting of the embedded documentation to be extracted. All currently defined get-rules assume the documentation is in comment blocks in one of the following formats:</P>
+<PRE>
+ &gt;&gt;section_title1::
+ text of section 1, line 1
+ text of section 1, line ..
+
+ &gt;&gt;section_title2::
+ text of section 2, line 1
+ text of section 2, line ..
+ &gt;&gt;END::
+
+ &gt;&gt;section_title3:: text of section 3
+</PRE>
+<P>The first form is most commonly used. In this format, the text in a section extends until the end of the current &quot;comment block&quot; or the start of the next section, whichever comes first. The second form (i.e. explicitly specifying where the section ends) is useful if you wish to add some normal comments (i.e. non-documentation) which you do not want extracted. If the text is short, the third form can be used. Regardless of the format, if a section is found which is already defined, the text of the section is concatenated onto the existing text. This permits the documentation for each entity to be specified immediately above where it is defined in the source code.</P>
+<P><A NAME="sdfget_g">The -g option specifies the <EM>get-rule</EM> to use. The available get-rules differ on the prefix expected at the front of each line as shown below. <EM>perl</EM> is the default get-rule.</A></P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+<TD>
+<STRONG>Prefix</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+perl
+</TD>
+<TD>
+#
+</TD>
+</TR>
+<TR>
+<TD>
+cpp
+</TD>
+<TD>
+//
+</TD>
+</TR>
+<TR>
+<TD>
+c
+</TD>
+<TD>
+* or /*
+</TD>
+</TR>
+<TR>
+<TD>
+fortran
+</TD>
+<TD>
+c (with 5 preceding spaces)
+</TD>
+</TR>
+<TR>
+<TD>
+eiffel
+</TD>
+<TD>
+--
+</TD>
+</TR>
+</TABLE>
+
+<P>Within C code, a trailing space is required after the characters above. For other languages, a trailing space is optional. Within FORTRAN code, the &quot;c&quot; character must be preceded by exactly 5 spaces. For other languages, zero or more whitespace characters are permitted before the characters above.</P>
+<P>For example, embedded documentation within C code looks like:</P>
+<PRE>
+ /* &gt;&gt;Purpose::
+  * This library provides a high level interface
+  * to commonly used network services.
+  */
+</PRE>
+<P><A NAME="sdfget_r">A report can be specified using the -r option. Reports provide a mechanism for:</A></P>
+<UL>
+<LI>selectively extracting sections, and
+<LI>rudimentary reformatting (e.g. to <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A>)</UL>
+<P>If no report is specified, all sections are output in the following format:</P>
+<PRE>
+ section_title1
+ section_text1
+
+ section_title2
+ section_text2
+</PRE>
+<P>If -r is specified on its own, <TT>default.sdg</TT> is assumed. This report selects the set of sections (within the <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> documentation standards) which form the user documentation and formats them into <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A>. Details on the report format are specified below. Reports are searched for in the current directory, then in the <EM>stdlib</EM> directory within SDF's library directory.</P>
+<P><A NAME="sdfget_s">The -s option can be used to specify the scope of the documentation to be extracted. (This is an experimental feature and may change so most users should avoid using it.)</A></P>
+<P><A NAME="sdfget_i">The -i option outputs only those lines which the get-rule did not match. This option is useful for extracting non-documentation from a file to give just the code.</A></P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The -r option is ignored if -i is specified.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>To extract the user documentation from a <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> application written in C++ (<CMD>xyz</CMD>, say) and save it into <TT>xyz.sdf</TT>:</P>
+<PRE>
+      sdfget -gcpp -r -osdf xyz.cpp
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdfcli.html">Previous Topic</A> | <A HREF="sdftest.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

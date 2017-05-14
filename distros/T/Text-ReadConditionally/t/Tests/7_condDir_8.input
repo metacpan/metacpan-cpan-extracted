@@ -1,0 +1,62 @@
+.# Title: Condition that is a .include - top level & in sub
+.# NewOpt: PipeOK 1
+.#
+.# This needs to be tested several ways due to implementation subtleties:
+.# In line and in a sub
+.# .if vs .unless vs .elseif
+.# .while vs .until vs .for
+.# .sub vs the built in directives: .include .read .test
+.# Nested vs top level loops & straight ifs
+.# In various combinations.
+.#
+.# This is used in 7_condDir_8.inc
+.let incCnt := 5
+.#
+.include 7_condDir_8.inc 12
+.echo _ = '\v{_}'
+
+Test .if .include
+.if .include 7_condDir_8.inc 22
+.echo Expected: The include returned \v{_}
+.else
+.echo Error: did not expect this line, _=\v{_}
+.fi
+After if
+
+Test .while .include
+.while .include 7_condDir_8.inc 0
+.echo In while returned \v{_}
+.done
+
+.let incCnt := 5
+Test .for .include
+.for ;; .include 7_condDir_8.inc 0 ;;
+.echo In for returned \v{_}
+.done
+
+.#
+.#
+.#
+.sub a
+Test .if .read
+.include -s echo | echo How now brown cow
+.if .read -s echo line
+.echo Read line: '\v{line}' - EOF = \v{_EOF}
+.else
+Error: did not read line
+.fi
+After if
+
+Test .if .read - expect EOF
+.if .read -s echo line
+Unexpected Read line: \v{line}
+.else
+.echo Expected read EOF - \v{_EOF}
+.fi
+
+.close -s echo
+.done
+.#
+.a
+.#
+EOF

@@ -1,0 +1,30 @@
+/* XPM */
+static char * labframe_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"20 17 7 1",
+/* colors */
+"  s None c None",
+". c #AEAEAE",
+"X c #000000",
+"o c #848284",
+"O c #FCFEFC",
+"+ c #FCFE04",
+"@ c #040204",
+/* pixels */
+"                    ",
+"     .........      ",
+"     .XXXXXXX.      ",
+"     .........      ",
+"    ooooooooooo     ",
+"   oO+O+O+O+O+O@    ",
+"   o+O+O+O+O+O+@    ",
+"   oO+O+O+O+O+O@    ",
+"   o+O+O+O+O+O+@    ",
+"   oO+O+O+O+O+O@    ",
+"   o+O+O+O+O+O+@    ",
+"   oO+O+O+O+O+O@    ",
+"   o+O+O+O+O+O+@    ",
+"    @@@@@@@@@@@     ",
+"                    ",
+"                    ",
+"                    "};

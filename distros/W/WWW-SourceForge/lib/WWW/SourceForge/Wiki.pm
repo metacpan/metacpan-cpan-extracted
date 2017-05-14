@@ -29,7 +29,7 @@ sub new {
     my $proj_obj = WWW::SourceForge::Project->new( name => $proj_name );
     
     # Must be an Allura project for this to work
-    if ( $proj_obj->type == 10 ) {
+    if ( $proj_obj->type && ( $proj_obj->type == 10 ) ) {
 
         # API URL
         $self->{url_prefix} = $baseurl . $proj_obj->shortdesc() . '/wiki/';

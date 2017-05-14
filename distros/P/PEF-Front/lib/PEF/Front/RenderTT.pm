@@ -105,6 +105,9 @@ sub handler {
 				if ($response->{result} eq 'OK' && $cache_attr) {
 					set_cache("ajax:$cache_key", $response, $cache_attr->{expires});
 				}
+				if (exists $response->{answer_data} and ref $response->{answer_data}) {
+					$response = $response->{answer_data};
+				}
 			}
 		}
 		return $response;

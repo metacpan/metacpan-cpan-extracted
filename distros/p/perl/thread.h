@@ -8,7 +8,7 @@
  *
  */
 
-#if defined(USE_5005THREADS) || defined(USE_ITHREADS)
+#if defined(USE_ITHREADS)
 
 #if defined(VMS)
 #include <builtins.h>
@@ -40,9 +40,6 @@
 #      define NEED_PTHREAD_INIT
 #      define PTHREAD_CREATE_JOINABLE (1)
 #    endif
-#    ifdef __OPEN_VM
-#      define pthread_addr_t void *
-#    endif
 #    ifdef OEMVS
 #      define pthread_addr_t void *
 #      define pthread_create(t,a,s,d)        pthread_create(t,&(a),s,d)
@@ -65,7 +62,7 @@
 #      define pthread_mutexattr_init(a) pthread_mutexattr_create(a)
 #      define pthread_mutexattr_settype(a,t) pthread_mutexattr_setkind_np(a,t)
 #    endif
-#    if defined(DJGPP) || defined(__OPEN_VM) || defined(OEMVS)
+#    if defined(DJGPP) || defined(OEMVS)
 #      define PTHREAD_ATTR_SETDETACHSTATE(a,s) pthread_attr_setdetachstate(a,&(s))
 #      define YIELD pthread_yield(NULL)
 #    endif
@@ -94,13 +91,13 @@
 #  endif
 #endif
 
-#ifdef DGUX
-#  define THREAD_CREATE_NEEDS_STACK (32*1024)
-#endif
-
 #ifdef __VMS
   /* Default is 1024 on VAX, 8192 otherwise */
-#  define THREAD_CREATE_NEEDS_STACK (32*1024)
+#  ifdef __ia64
+#    define THREAD_CREATE_NEEDS_STACK (48*1024)
+#  else
+#    define THREAD_CREATE_NEEDS_STACK (32*1024)
+#  endif
 #endif
 
 #ifdef I_MACH_CTHREADS
@@ -156,7 +153,7 @@
 #define THREAD_RET_CAST(x)	((any_t) x)
 
 #define DETACH(t)		cthread_detach(t->self)
-#define JOIN(t, avp)		(*(avp) = (AV *)cthread_join(t->self))
+#define JOIN(t, avp)		(*(avp) = MUTABLE_AV(cthread_join(t->self)))
 
 #define PERL_SET_CONTEXT(t)	cthread_set_data(cthread_self(), t)
 #define PERL_GET_CONTEXT	cthread_data(cthread_self())
@@ -211,10 +208,18 @@
     } STMT_END
 #  endif
 
+#  ifdef PERL_TSA_ACTIVE
+#    define perl_pthread_mutex_lock(m) perl_tsa_mutex_lock(m)
+#    define perl_pthread_mutex_unlock(m) perl_tsa_mutex_unlock(m)
+#  else
+#    define perl_pthread_mutex_lock(m) pthread_mutex_lock(m)
+#    define perl_pthread_mutex_unlock(m) pthread_mutex_unlock(m)
+#  endif
+
 #  define MUTEX_LOCK(m) \
     STMT_START {						\
 	int _eC_;						\
-	if ((_eC_ = pthread_mutex_lock((m))))			\
+	if ((_eC_ = perl_pthread_mutex_lock((m))))			\
 	    Perl_croak_nocontext("panic: MUTEX_LOCK (%d) [%s:%d]",	\
 				 _eC_, __FILE__, __LINE__);	\
     } STMT_END
@@ -222,7 +227,7 @@
 #  define MUTEX_UNLOCK(m) \
     STMT_START {						\
 	int _eC_;						\
-	if ((_eC_ = pthread_mutex_unlock((m))))			\
+	if ((_eC_ = perl_pthread_mutex_unlock((m))))			\
 	    Perl_croak_nocontext("panic: MUTEX_UNLOCK (%d) [%s:%d]",	\
 				 _eC_, __FILE__, __LINE__);	\
     } STMT_END
@@ -339,7 +344,7 @@
 #  define ALLOC_THREAD_KEY \
     STMT_START {						\
 	if (pthread_key_create(&PL_thr_key, 0)) {		\
-            write(2, STR_WITH_LEN("panic: pthread_key_create failed\n")); \
+            PERL_UNUSED_RESULT(write(2, STR_WITH_LEN("panic: pthread_key_create failed\n"))); \
 	    exit(1);						\
 	}							\
     } STMT_END
@@ -367,66 +372,10 @@
 #  define THREAD_RET_CAST(p)	((void *)(p))
 #endif /* THREAD_RET */
 
-#if defined(USE_5005THREADS)
-
-/* Accessor for per-thread SVs */
-#  define THREADSV(i) (thr->threadsvp[i])
-
-/*
- * LOCK_SV_MUTEX and UNLOCK_SV_MUTEX are performance-critical. Here, we
- * try only locking them if there may be more than one thread in existence.
- * Systems with very fast mutexes (and/or slow conditionals) may wish to
- * remove the "if (threadnum) ..." test.
- * XXX do NOT use C<if (PL_threadnum) ...> -- it sets up race conditions!
- */
-#  define LOCK_SV_MUTEX		MUTEX_LOCK(&PL_sv_mutex)
-#  define UNLOCK_SV_MUTEX	MUTEX_UNLOCK(&PL_sv_mutex)
-#  define LOCK_STRTAB_MUTEX	MUTEX_LOCK(&PL_strtab_mutex)
-#  define UNLOCK_STRTAB_MUTEX	MUTEX_UNLOCK(&PL_strtab_mutex)
-#  define LOCK_CRED_MUTEX	MUTEX_LOCK(&PL_cred_mutex)
-#  define UNLOCK_CRED_MUTEX	MUTEX_UNLOCK(&PL_cred_mutex)
-#  define LOCK_FDPID_MUTEX	MUTEX_LOCK(&PL_fdpid_mutex)
-#  define UNLOCK_FDPID_MUTEX	MUTEX_UNLOCK(&PL_fdpid_mutex)
-#  define LOCK_SV_LOCK_MUTEX	MUTEX_LOCK(&PL_sv_lock_mutex)
-#  define UNLOCK_SV_LOCK_MUTEX	MUTEX_UNLOCK(&PL_sv_lock_mutex)
-
-/* Values and macros for thr->flags */
-#define THRf_STATE_MASK	7
-#define THRf_R_JOINABLE	0
-#define THRf_R_JOINED	1
-#define THRf_R_DETACHED	2
-#define THRf_ZOMBIE	3
-#define THRf_DEAD	4
-
-#define THRf_DID_DIE	8
-
-/* ThrSTATE(t) and ThrSETSTATE(t) must only be called while holding t->mutex */
-#define ThrSTATE(t) ((t)->flags & THRf_STATE_MASK)
-#define ThrSETSTATE(t, s) STMT_START {		\
-	(t)->flags &= ~THRf_STATE_MASK;		\
-	(t)->flags |= (s);			\
-	DEBUG_S(PerlIO_printf(Perl_debug_log,	\
-			      "thread %p set to state %d\n", (t), (s))); \
-    } STMT_END
-
-typedef struct condpair {
-    perl_mutex	mutex;		/* Protects all other fields */
-    perl_cond	owner_cond;	/* For when owner changes at all */
-    perl_cond	cond;		/* For cond_signal and cond_broadcast */
-    Thread	owner;		/* Currently owning thread */
-} condpair_t;
-
-#define MgMUTEXP(mg) (&((condpair_t *)(mg->mg_ptr))->mutex)
-#define MgOWNERCONDP(mg) (&((condpair_t *)(mg->mg_ptr))->owner_cond)
-#define MgCONDP(mg) (&((condpair_t *)(mg->mg_ptr))->cond)
-#define MgOWNER(mg) ((condpair_t *)(mg->mg_ptr))->owner
-
-#endif /* USE_5005THREADS */
-
 #  define LOCK_DOLLARZERO_MUTEX		MUTEX_LOCK(&PL_dollarzero_mutex)
 #  define UNLOCK_DOLLARZERO_MUTEX	MUTEX_UNLOCK(&PL_dollarzero_mutex)
 
-#endif /* USE_5005THREADS || USE_ITHREADS */
+#endif /* USE_ITHREADS */
 
 #ifndef MUTEX_LOCK
 #  define MUTEX_LOCK(m)
@@ -464,46 +413,6 @@ typedef struct condpair {
 #  define COND_DESTROY(c)
 #endif
 
-#ifndef LOCK_SV_MUTEX
-#  define LOCK_SV_MUTEX
-#endif
-
-#ifndef UNLOCK_SV_MUTEX
-#  define UNLOCK_SV_MUTEX
-#endif
-
-#ifndef LOCK_STRTAB_MUTEX
-#  define LOCK_STRTAB_MUTEX
-#endif
-
-#ifndef UNLOCK_STRTAB_MUTEX
-#  define UNLOCK_STRTAB_MUTEX
-#endif
-
-#ifndef LOCK_CRED_MUTEX
-#  define LOCK_CRED_MUTEX
-#endif
-
-#ifndef UNLOCK_CRED_MUTEX
-#  define UNLOCK_CRED_MUTEX
-#endif
-
-#ifndef LOCK_FDPID_MUTEX
-#  define LOCK_FDPID_MUTEX
-#endif
-
-#ifndef UNLOCK_FDPID_MUTEX
-#  define UNLOCK_FDPID_MUTEX
-#endif
-
-#ifndef LOCK_SV_LOCK_MUTEX
-#  define LOCK_SV_LOCK_MUTEX
-#endif
-
-#ifndef UNLOCK_SV_LOCK_MUTEX
-#  define UNLOCK_SV_LOCK_MUTEX
-#endif
-
 #ifndef LOCK_DOLLARZERO_MUTEX
 #  define LOCK_DOLLARZERO_MUTEX
 #endif
@@ -530,11 +439,5 @@ typedef struct condpair {
 #endif
 
 /*
- * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: t
- * End:
- *
- * ex: set ts=8 sts=4 sw=4 noet:
+ * ex: set ts=8 sts=4 sw=4 et:
  */

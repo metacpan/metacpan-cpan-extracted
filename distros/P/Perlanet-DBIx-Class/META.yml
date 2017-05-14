@@ -1,0 +1,21 @@
+---
+abstract: 'Aggregate posts in a database using DBIx::Class'
+author:
+  - 'Oliver Charles <oliver@ocharles.org.uk>'
+build_requires:
+  DBD::SQLite: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101550, CPAN::Meta::Converter version 2.101461'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perlanet-DBIx-Class
+requires:
+  DBIx::Class: 0
+  MooseX::Types: 0
+  Perlanet: 0
+version: 0.02

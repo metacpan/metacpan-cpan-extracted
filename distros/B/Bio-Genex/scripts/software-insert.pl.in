@@ -1,0 +1,152 @@
+%%START_PERL%%
+#
+# software-insert.pl.in
+#    first version Tue Oct 24 14:13:45 MST 2000
+#    script for inserting software entries into genex DB
+#
+my $VERSION = '$Id: software-insert.pl.in,v 1.5 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+
+use Bio::Genex qw($SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_insert_sql create_select_sql);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::ExternalDatabase;
+
+my $infile;
+my $UPDATE = 0;
+my $rc = GetOptions('file=s' => \$infile, 'update' => \$UPDATE);
+
+my $USAGE = <<"EOU";
+usage: $0 --file=file_name  --update
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parsefile($infile);
+
+my @software_list = $DOC->getElementsByTagName('software');
+
+use constant SW_IMAGE   => 'image_analysis';
+use constant SW_SPOTTER => 'spotter';
+use constant SW_SCANNER => 'scanner';
+use constant CON_IMAGE   => 'software_image_analysis';
+use constant CON_SPOTTER => 'software_spotter';
+use constant CON_SCANNER => 'software_scanner';
+
+# open up a writeable connection
+$Bio::Genex::DBNAME = 'genex';
+$Bio::Genex::USER = $SU_USERNAME;
+$Bio::Genex::PASSWORD = $SU_PASSWORD;
+$Bio::Genex::TRANSACTION = 1;	# do it in a transaction
+
+my $dbh = Bio::Genex::current_connection();
+my $curr_table = 'Software';
+my $timeformat = '%r %A %B %d %Y'; 
+
+print STDERR scalar @software_list, " Softwares to insert\n";
+
+foreach my $soft_node (@software_list) {
+  assert_element($soft_node,'software');
+
+  my $type = $soft_node->getAttribute('type');
+  error("Couldn't find type for node: " . $soft_node->toString()) 
+    unless $type ne '';
+  my $name = $soft_node->getAttribute('name');
+  error("Couldn't find name for node: " . $soft_node->toString()) 
+    unless $name ne '';
+  my $version = $soft_node->getAttribute('version');
+  error("Couldn't find version for node: " . $soft_node->toString()) 
+    unless $version ne '';
+  my $contact = $soft_node->getAttribute('contact');
+  error("Couldn't find contact for node: " . $soft_node->toString()) 
+    unless $contact ne '';
+
+  my $con_type;
+  if ($type eq SW_IMAGE) {
+    $con_type = CON_IMAGE;
+  } elsif ($type eq SW_SCANNER) {
+    $con_type = CON_SCANNER;
+  } elsif ($type eq SW_SPOTTER) {
+    $con_type = CON_SPOTTER;
+  }
+  my $WHERE = "type='$con_type' AND " .
+              "(contact_person LIKE '%$contact%' OR " .
+              " organization LIKE '%$contact%')";
+  my $sql = create_select_sql($dbh,
+			      COLUMNS=>['con_pk'],
+			      FROM=>['Contact'],
+			      WHERE=>$WHERE
+			     );
+  my $con_fk = $dbh->selectall_arrayref($sql);
+  error("couldn't get contact for node: " . $soft_node->toString(), $sql)
+    if $dbh->err;
+  # extract the value from the array of arrays
+  $con_fk = $con_fk->[0][0];
+  error("couldn't get contact for node: " . $soft_node->toString(), $sql)
+    unless defined $con_fk;
+
+  my %attributes = ('name'=>$name,
+		    'type'=>$type,
+		    'version'=>$version,
+		    'con_fk'=>$con_fk,
+		   );
+
+  if ($UPDATE) {
+    print STDERR "Updating software $name\n";
+
+    my $sql = create_select_sql($dbh,
+		FROM=>[$curr_table],
+		COLUMNS=>['sw_pk'],
+		WHERE=>"name='$name'"
+			       );
+    my $sw_pk = $dbh->selectall_arrayref($sql);
+    error("couldn't SELECT software for node: " . $soft_node->toString(), $sql)
+      if $dbh->err;
+    # extract the value from the array of arrays
+    $sw_pk = $sw_pk->[0][0];
+    error("couldn't get software for node: " . $soft_node->toString(), $sql)
+      unless $sw_pk;
+
+    foreach my $key (keys %attributes) {
+      $sql = "UPDATE $curr_table set $key=? WHERE sw_pk=$sw_pk";
+      my $sth = $dbh->prepare($sql);
+      error("couldn't prepare update SQL", $sql)
+	if $dbh->err;
+      $sth->execute($attributes{$key});
+      error("couldn't execute update SQL for <$key>=<$attributes{$key}>", 
+	    $sql, $sth)	if $dbh->err;
+    }
+  } else {
+    print STDERR "Inserting software $name\n";
+
+    my $sql = create_insert_sql($dbh,$curr_table,\%attributes);
+    $dbh->do($sql);
+    error("couldn't insert record for node: " . $soft_node->toString(), $sql)
+      if $dbh->err;
+  }
+}
+
+# $dbh->commit();
+$dbh->rollback();
+$dbh->disconnect();
+exit(0);
+
+sub error {
+  my ($error,$sql) = @_;
+  $error .= ", SQL=<$sql>, DBI=<$DBI::errstr>" if defined $sql;
+  $dbh->rollback();
+  $dbh->disconnect();
+  die "$error\n";
+}

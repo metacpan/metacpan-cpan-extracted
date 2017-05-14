@@ -1,0 +1,6 @@
+Makefile.PL
+supertag
+MANIFEST
+lib/Audio/SuperTag/Plugin/FLAC.pm
+lib/Audio/SuperTag/Plugin/MP3.pm
+lib/Audio/SuperTag/Plugin.pm

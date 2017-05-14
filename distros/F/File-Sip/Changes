@@ -1,0 +1,16 @@
+0.003     2014-03-23 16:52:22CET+0100 Europe/Paris
+
+    * Use an array instead of a hash for the internal index to reduce memory
+      usage (up to 20x less memory consuming than File::Slurp with big files,
+      which is 5 times better than previous versions, see README.pod).
+
+0.002     2014-03-21 10:18:54CET+0100 Europe/Paris
+
+    * Provide a README.pod with Dist::Zilla::Plugin::ReadmeAnyFromPod
+
+0.001     2014-03-21 10:11:26CET+0100 Europe/Paris
+
+    * GitHub #1: reference File::Slurp::Tiny instead of File::Slurp
+      (Alexis Sukrieh)
+    * Initital version of File::Scan with test (slurp_line)
+      (Alexis Sukrieh, Bin Shu)

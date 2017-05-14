@@ -1,0 +1,45 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Document Variables
+
+H2: Purpose
+
+These variables are related to the document [[SDF]] is
+currently processing.
+
+H2: Interface
+
+!block table; groups; format=325
+Name                Type        Purpose
+Control:
+DOC_TOC             integer     table of contents level
+DOC_TWO_SIDES       boolean     build a two-sided document
+Book controls:
+DOC_LOF             boolean     build a list of figures
+DOC_LOT             boolean     build a list of tables
+DOC_IX              boolean     build an index
+Information:
+DOC_PATH            string      the full pathname of the current document
+DOC_DIR             string      the directory of the current document
+DOC_BASE            string      the base (filename) of the current document
+DOC_EXT             string      the extension of the current document
+DOC_SHORT           string      the base and extension of the current document
+DOC_START           datetime    the time document conversion started
+DOC_MODIFIED        datetime    the most recent modification time of files visited so far
+!endblock
+
+#H2: Description
+
+
+!end_topic

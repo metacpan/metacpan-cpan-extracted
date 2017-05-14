@@ -1,0 +1,84 @@
+%%START_PERL%% -wT
+#
+# File: samples/pass-invalid-login.pl
+#
+# This script displays an invalid login page. This page includes entry fields
+# for user name and password that are then submitted back to the 
+# pass-auth-login.pl script. It this script is passed a user login name
+# field, the value will be placed into the login name field of the entry 
+# field.
+
+# Programmer: Jason E. Stewart (jes@ncgr.org)
+
+# script copyright (C) 2000 by NCGR.
+# All Rights Reserved
+
+use strict;
+%%GENEX_EXTRALIBS%%
+
+use CGI qw(:standard);
+
+# Clean up the enviroment for Taint mode
+$ENV{PATH} = "/bin:/usr/bin";
+delete @ENV{ 'IFS','CDPATH','ENV','BASH_ENV' };
+
+$|++;
+
+my $username = "#";
+
+# See if there are any CGI parameters provided. 
+if (param) {
+  # Extract and validate the parameters if provided.
+  # Note that I allow only alpha characters (both upper and
+  # lower case) and numeric digits.
+
+  ($username)   = param('User_Name') =~ /^([a-zA-Z_0-9]+)$/;
+} else {
+  # Get the parameters from the command line
+  # Note that I allow only alpha characters (both upper and
+  # lower case) and numeric digits.
+
+  (my $Field, my $RawUser, my $Rest) = split /=/, $ARGV[0];
+  ($username)  = $RawUser =~ /^([a-zA-Z_0-9]+)$/;
+}
+
+# Display the input form
+print <<EofHTML;
+Content-type: text/html
+
+<html><head><title>Login Error!</title></head>
+<body bgcolor=#ffffff>
+<div align=center>
+<h1> Login Failed!</h1>
+Please try again:<br>
+<form action=./pass-auth-login.pl method=post>	
+<table>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> Login Name:</td>
+    <td><input type=text name=User_Name size=20 maxlength=20 value="$username"></td>
+  </tr>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> Password:</td>
+    <td><input type=password name=Password size=20 maxlength=20></td>
+  </tr>
+  <tr>
+    <td colspan=3 align=center>
+      <input type=submit value=\"Login to GeneX\">
+    </td>
+  </tr>
+</table>
+</div>
+<hr>
+<div align=center>
+<font size=-2>
+Copyright &copy; 2000<br>by NCGR<br>All Rights Reserved
+</font>
+</div>
+</body></html>
+
+EofHTML
+
+
+

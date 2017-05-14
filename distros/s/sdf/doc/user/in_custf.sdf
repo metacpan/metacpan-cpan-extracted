@@ -1,0 +1,135 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Custom Formatting
+
+H2: Overview
+
+One of the nice things about [[SDF]] is that system administrators
+can control the formatting of documents via templates.
+This has two major advantages:
+
+^ document authors can focus on content
++ by default, documents have a consistent format.
+
+However, there are occasions when authors need to override the
+default formatting conventions. Custom formatting is supported
+for documents, paragraphs and phrases.
+
+H2: Custom Document Formatting
+
+Document formatting can be controlled by setting variables.
+The commonly used ones are given below.
+
+!block table
+Name                Type        Purpose
+DOC_TOC             integer     table of contents level
+DOC_LOF             boolean     build a list of figures
+DOC_LOT             boolean     build a list of tables
+DOC_IX              boolean     build an index
+DOC_TWO_SIDES       boolean     build a two-sided document
+!endblock
+
+For example, to create a two-sided document,
+add this line to your document:
+
+E:  !define DOC_TWO_SIDES
+
+H2: Custom Paragraph Formatting
+
+Paragraph formatting can be controlled by setting attributes.
+The commonly used ones are given below.
+
+!block table
+Name            Purpose
+label           prefix label (e.g. Note:)
+top             either Page (the default), Column, LPage or RPage
+left            left margin indent (in points)
+first           first line indent (in points)
+right           right margin indent (in points)
+justify         either Full, Left, Right or Center
+!endblock
+
+For example, to start a paragraph at the top of a page:
+
+E: H3[top] Other Issues
+
+To indent a paragraph 1 inch from both margins:
+
+E: [left='1in'; right='1in'] This paragraph will be indented from
+E: both margins by 1 inch.
+
+The result is:
+
+[left='1in'; right='1in'] This paragraph will be indented from
+both margins by 1 inch.
+
+H2: Custom Phrase Formatting
+
+Phrase formatting can be controlled by setting attributes.
+The commonly used ones are given below.
+
+!block table
+Name            Purpose
+family          font family
+size            font size
+color           text colour
+bold            enable bold
+italics         enable italics
+underline       enable underline
+changed         enable change bars
+!endblock
+
+For example, to change the size of a phrase to 11.5 points:
+
+V:  I love {{N[size=11.5]custom formatting}}.
+
+The result is:
+
+I love {{N[size=11.5]custom formatting}}.
+
+
+H2: Applying Phrase Attributes to Paragraphs
+
+Phrase attributes can also be used for paragraphs.
+For example, to add a change bar to a paragraph:
+
+E:  [changed] This paragraph has a change bar.
+
+The result is:
+
+[changed] This paragraph has a change bar.
+
+
+H2: sdf Blocks
+
+Attributes can be applied to a block of text by using the {{FILT:sdf}}
+filter. For example:
+
+!block example; pure
+!block sdf; size='8pt'; bold; align='Center'
+This paragraph has custom formatting:
+
+* and so does this.
+!endblock
+!endblock
+
+The result is:
+
+!block sdf; size='8pt'; bold; align='Center'
+This paragraph has custom formatting:
+
+* and so does this.
+!endblock
+
+!end_topic

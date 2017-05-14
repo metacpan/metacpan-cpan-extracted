@@ -1,0 +1,47 @@
+#!/nw/dist/prod/bin/perl -w
+
+use strict;
+use vars qw($running_under_some_shell);
+use Envy::DB 2.19;
+
+my $db = Envy::DB->new(\%ENV);
+my ($loaded, $dimen) = $db->quick_status();
+
+my %dmap;
+my $dlen= length 'DIMENSION';
+for my $d (keys %$dimen) {
+    # must be one-to-one mapping
+    $dmap{ $dimen->{$d} } = $d;
+    $dlen = length $d if $dlen < length $d;
+}
+
+my $elen=0;
+my @all = sort keys %$loaded;
+for (@all) { $elen = length $_ if length $_ > $elen }
+
+my $maxlevel=0;
+my $fmt = '  %-'.$dlen."s | %s %s\n";
+
+sub show {
+    my ($m, $level) = @_;
+    my $dim = exists $dmap{$m}? $dmap{$m} : '';
+    printf($fmt, $dim, ' 'x($level*4), $m);
+    for my $k (@all) {
+	next if $loaded->{$k} ne $m;
+	show($k, $level+1);
+    }
+}
+
+
+my $dspace = ' '.'-'x($dlen+2).'+';
+print $dspace.('-'x(75-length $dspace))."\n";
+printf $fmt, 'DIMENSION', '', 'ENVIED';
+print $dspace.('-'x(75-length $dspace))."\n";
+
+for my $seniority (0..30) {  # should be dynamic XXX
+    for my $m (@all) {
+	next if $loaded->{$m} ne $seniority;
+	show($m, 0);
+    }
+}
+print $dspace.('-'x(75-length $dspace))."\n";

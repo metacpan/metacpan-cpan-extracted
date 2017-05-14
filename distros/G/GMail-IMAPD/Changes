@@ -7,5 +7,9 @@ Nov 19 2005
 Nov 21 2005
  - Added CacheDBH support
 
-Jan 19 2005
+Jan 19 2006
  - Fixed Gmail.pm to work with new Google authentication
+
+Mar 31 2006
+-  Incorporate new Mail::Webmail::Gmail
+

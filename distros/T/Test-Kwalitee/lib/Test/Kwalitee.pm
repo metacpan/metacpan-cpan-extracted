@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Kwalitee; # git description: v1.24-3-gf4a2dae
+package Test::Kwalitee; # git description: v1.25-7-g7ffcea4
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Test the Kwalitee of a distribution before you release it
 # KEYWORDS: testing tests kwalitee CPANTS quality lint errors critic
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 use Cwd ();
 use Test::Builder 0.88;
@@ -45,8 +45,8 @@ sub kwalitee_ok
         # Please DO NOT enable this test to run for users, as it can fail
         # unexpectedly as parts of the toolchain changes!
         unless $ENV{_KWALITEE_NO_WARN} or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING}
-            #or (caller)[1] =~ m{^\./xt}
-            or ((caller)[0]->isa(__PACKAGE__) and (caller(1))[1] =~ m{^\./xt});
+            or (caller)[1] =~ m{^(?:\.[/\\])?xt\b}
+            or ((caller)[0]->isa(__PACKAGE__) and (caller(1))[1] =~ m{^(?:\.[/\\])?xt\b});
 
     my @run_tests = grep { /^[^-]/ } @tests;
     my @skip_tests = map { s/^-//; $_ } grep { /^-/ } @tests;
@@ -137,7 +137,7 @@ Test::Kwalitee - Test the Kwalitee of a distribution before you release it
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

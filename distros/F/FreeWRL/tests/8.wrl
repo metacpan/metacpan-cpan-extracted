@@ -1,0 +1,203 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# PROTO+ROUTE+Script + Mouse (click on the arrows)
+
+PROTO Arrow [
+	field SFVec3f loc 0 0 0
+	field SFRotation orient 0 1 0 0
+	field SFNode appearance Appearance { material Material { } }
+	eventOut SFTime touchTime 
+]
+{
+Transform {
+translation IS loc
+children [
+Transform {
+rotation IS orient
+children [
+	TouchSensor {
+		touchTime IS touchTime
+	}
+	Shape {
+	 appearance IS appearance
+	 geometry Box { size 1 0.3 0.3 }
+	}
+	Transform {
+		translation 0.5 0 0
+		children [
+		Transform {
+			rotation 0 0 1 0.78 
+			children [
+				Shape {
+				 appearance IS appearance
+				 geometry Box { size 0.3 0.3 0.3 }
+				}
+			]
+		}
+		]
+	}
+]
+}
+]
+}
+}
+
+PROTO ArrBox [
+	field SFColor boxColor 1 1 1
+]
+{
+Group {
+children [
+Transform {
+ children [
+ 	DEF A1 Arrow { loc -4 0 0 appearance DEF AAPP 
+		Appearance {
+			material Material {
+				# emissiveColor 1 0 0
+				diffuseColor 1 0 0
+			}
+		}}
+ 	DEF A2 Arrow { loc 4 0 0 orient 0 0 1 3.14 
+		appearance USE AAPP}
+
+DEF BT Transform {
+ translation 2 0 0
+ children [
+ 	Shape {
+		appearance Appearance { material Material {
+			diffuseColor IS boxColor
+		} }
+		geometry Box {size 1 1 1}
+	}
+ ]
+}
+ ]
+}
+
+DEF TS TimeSensor {
+	cycleInterval 3
+	loop FALSE
+}
+
+
+DEF SCR Script {
+	eventIn SFTime startTimeLeft
+	eventIn SFTime startTimeRight
+	eventOut SFTime startTime
+	eventIn SFBool busy
+	field SFBool isBusy FALSE
+	field SFBool left TRUE
+	field SFNode interp 
+		DEF PI PositionInterpolator {
+			key [0 0.2 0.4 0.6 0.8 1] 
+			keyValue [0 0 0 
+				  0 0 0
+				  0 0 0
+				  0 0 0
+ 				  0 0 0
+				   0 0 0]
+		}
+	url [
+	# xxx1: $t = "this", tied object
+	"javascript:
+		function busy(val,time) { isBusy = busy }
+		function startTimeLeft(val,time) {
+			// if(!isBusy && left) {
+			if(left) {
+				interp.keyValue = new MFVec3f(
+				 new SFVec3f(-2,0,0),
+				 new SFVec3f(-0.5,0,0),
+				 new SFVec3f(0.5,0,0),
+				 new SFVec3f(1.2,0,0),
+				 new SFVec3f(1.7,0,0),
+				 new SFVec3f(2,0,0)
+				);
+				startTime = val;
+				left = !left;
+			}
+		}
+		function startTimeRight(val,time) {
+			// if(!isBusy && !left) {
+			if(!left) {
+				interp.keyValue = new MFVec3f(
+				 new SFVec3f(2,0,0),
+				 new SFVec3f(0.5,0,0),
+				 new SFVec3f(-0.5,0,0),
+				 new SFVec3f(-1.2,0,0),
+				 new SFVec3f(-1.7,0,0),
+				 new SFVec3f(-2,0,0)
+				);
+				startTime = val;
+				left = !left;
+			}
+		}
+	"
+#	"perl_tjl_xxx1:
+#		startTimeLeft => sub {
+#			print 'SCRIPT_INSIDE LEFT:',$t->{left},'X, INTERP: ',$t->{interp},'\n';
+#			if(!$t->{busy} && $t->{left}) {
+#				# xxx1 uses tied hashes
+#				$t->{interp}{RFields}{keyValue} = [
+#					[-2, 0, 0 ],
+#					 [ -0.5, 0, 0], 
+#					 [ 0.5, 0, 0],
+#					  [1.2, 0, 0],
+#					  [1.7, 0, 0],
+#					   [2, 0, 0]
+#					];
+#				$t->{startTime} = $t->{startTimeLeft};
+#				$t->{left} = !$t->{left};
+#			}
+#		},
+#		startTimeRight => sub {
+#			print 'SCRIPT_INSIDERIGHT LEFT:',$t->{left},'X, INTERP: ',$t->{interp},'\n';
+#			if(!$t->{busy} && !$t->{left}) {
+#				$t->{interp}{RFields}{keyValue} = [
+#					[2, 0, 0 ],
+#					 [ 0.5, 0, 0], 
+#					 [ -0.5, 0, 0],
+#					  [-1.2, 0, 0],
+#					  [-1.7, 0, 0],
+#					   [-2, 0, 0]
+#				];
+#				$t->{startTime} = $t->{startTimeRight};
+#				$t->{left} = !$t->{left};
+#			}
+#		}
+#	"
+	]
+}
+
+]
+}
+
+ROUTE TS.isActive TO SCR.busy
+ROUTE A1.touchTime TO SCR.startTimeLeft
+ROUTE A2.touchTime TO SCR.startTimeRight
+ROUTE SCR.startTime TO TS.startTime
+ROUTE TS.fraction_changed TO PI.set_fraction
+ROUTE PI.value_changed TO BT.translation
+}
+
+
+Transform {
+# rotation -1 1 0 1.0
+scale 0.5 0.5 0.5
+ children [
+ArrBox {}
+Transform {
+	translation 1 1 1
+	children [
+		ArrBox {boxColor 0 0 1
+		}
+	]
+}
+]
+}
+
+
+

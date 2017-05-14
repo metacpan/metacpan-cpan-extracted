@@ -1,20 +1,43 @@
 Revision history for Padre-Plugin-CSS
 
+0.14   2010.12.06
+        Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.13   2010.10.29
+        Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.12   2010.10.27
+        t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.11   2010.10.26
+        Switched to Dist::Zilla (AZAWAWI)
+        Added compatibility with the latest Padre (AZAWAWI)
+
+0.10    2010.08.20
+        Add context help with very basic data in a yaml file (SZABGAB)
+        Renamed to the new Padre 0.43 PO naming scheme (azawawi)
+        Autocompletition support (CHORNY)
+        compatibility to latest Padre version (ZENOG)
+        Italian translation (SBLANDIN)
+        Use keyword list from css.yml for autocompletition (CHORNY)
+        Links to CSS 2.1 specs (CHORNY)
+        Tool to extract list of CSS properties (CHORNY)
+
 0.08    2009.05.31
-    removed taint mode for tests, which lead to some fails (jquelin)
+        Removed taint mode for tests, which lead to some fails (jquelin)
 
 0.07    2009.05.26
-    Added translations:
-		Chinese (Traditional) translation (BLUET)
-		Arabic (azawawi)
-		Spanish (brunov)
+        Added translations:
+        - Chinese (Traditional) translation (BLUET)
+        - Arabic (azawawi)
+        - Spanish (brunov)
     
 0.06    2009.05.18
-	added translations:
-	- French (jquelin)
-	- Polish (therek)
-    - Brazilian portuguese (garu)
-    - Chinese Simpified (fayland)
+        Added translations:
+        - French (jquelin)
+        - Polish (therek)
+        - Brazilian portuguese (garu)
+        - Chinese Simpified (fayland)
 
 0.05    2009.2.1
         for Padre 0.26
@@ -30,4 +53,3 @@ Revision history for Padre-Plugin-CSS
 
 0.01    Date/time
         First version, released on an unsuspecting world.
-

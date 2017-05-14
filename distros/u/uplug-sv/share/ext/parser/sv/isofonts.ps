@@ -1,0 +1,17 @@
+% File isofonts.ps
+%
+% Enables dot-generated PostScript files to use isolatin fonts (acents, etc).
+
+% Use:
+%
+% dot -Tps -Gfontname=latin1 -l isofonts.ps <dot-file>
+
+% Definition of an iso-latin-1 Font (other fonts can be added here).
+
+/Helvetica-Oblique findfont
+dup length  dict begin
+  { 1 index /FID ne {def}{pop pop} ifelse} forall
+  /Encoding ISOLatin1Encoding def
+  currentdict
+  end
+/latin1 exch definefont pop

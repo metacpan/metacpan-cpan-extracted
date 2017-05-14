@@ -1,0 +1,11 @@
+#!/usr/local/bin/perl -w
+
+BEGIN { unshift(@INC, "../blib", "./blib"); }
+require Net::NISPlus::Table;
+
+$test = Net::NISPlus::Table->new("test");
+foreach ('j'..'m')
+{
+  print "modifying key=$_\n";
+  $test->modify({'key' => $_},{'value' => 'rik'});
+}

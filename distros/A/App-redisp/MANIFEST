@@ -7,7 +7,6 @@ bin/redisp
 dist.ini
 lib/App/redisp.pm
 lib/App/redisp/Commands.pm
-lib/App/redisp/EvalWithLexicals.pm
 misc/cmds.pl
 t/01.load.t
 t/release-pod-coverage.t

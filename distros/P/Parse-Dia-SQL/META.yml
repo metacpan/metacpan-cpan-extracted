@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
 keywords:
   - Parse
   - Dia
@@ -43,6 +43,7 @@ requires:
   File::Temp: '0'
   Getopt::Long: '0'
   HTML::Lint: '0'
+  IO::All: '0'
   IO::Uncompress::Gunzip: '0'
   Log::Log4perl: '0'
   POSIX: '0'
@@ -52,4 +53,5 @@ requires:
   XML::DOM: '0'
 resources:
   repository: https://github.com/aff/Parse-Dia-SQL
-version: '0.29'
+version: '0.30'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,33 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+activate_main
+	An error occurred while activating script containing the main routine.
+	Script: %s
+
+require_preferred
+	It's easier and safer just to call 'require Carrot;'
+	in a BEGIN block in main. 'Use' is for pragmas.
+
+# some universal messages
+syscall_related
+	%s: %s: %s
+
+named_file_operation
+	Error while operating on a file.
+	File name: '%s'
+
+file_not_found
+	A file wasn't found.
+	File: '%s'
+
+file_not_writable
+	A file isn't writable.
+	File: '%s'
+
+hash_key_missing
+	A key is missing in a hash.
+	Key: '%s'
+	Hash name: '%s'

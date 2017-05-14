@@ -1,0 +1,71 @@
+fameperl
+
+1.0  8/93 Public Domain
+
+The first vesion was developed for perl 4.036 at the Federal Reserve to 
+facilitate importing data into FAME and extracting data.  Implemented 
+most C HLI functions.  The code was written using the h2c and h2i 
+programs and a modified version of "mus".
+
+1.1  Public Domain
+
+Modified utilities to handle missing values and sometimes strings.  
+Changed source code to use "cliperl" so that most of the same source code
+can be used for perl and tcl.
+
+1.2  12/94 Public Domain
+
+Ported to perl 5.000 and added support for FAME 7.5.  Last public
+domain version available from the Federal Reserve.
+
+2.0  9/95
+
+Ported to perl5.001.  Added object-oriented utilitites and a 
+TIEHASH interface.  Wrote "pod" documentation.
+
+2.0a  9/95
+
+Bug fixes.  Reorganized Fame package into two packages: 
+Fame::HLI, Fame::DB.  Added Fame::LANG package.
+
+10/2/95  First alpha distribution.
+10/4/95  Change syntax of Fame::DB::new to be just like TIEHASH.
+11/15/95 Add general support for DATE values in HLI utilities.
+         Fix cfmdati bug (make datstr output).
+5/7/96   Clean up fame.c.
+6/27/96  Remove autosplit support and make other changes
+         to the make process so it works with perl5.003.
+11/19/96 Set $len in DB.pm (lines 207-211)
+
+2.0b 1/97
+
+1/8/97   Fix bug in cfmsatt and famewrite with ND, NA, NC.
+1/14/97  Fix bug in LANG::exec.
+3/30/97  Remove PERL_SRC in Makefile.PL, add h2ph to dist.
+4/1/97   Add more Solaris-friendly support.
+
+2.0c 5/97
+
+5/18/97  Fix famewrite and fameread error status
+5/20/97  Fix problem with $Fame::HLI::status
+5/20/97  Fixed a couple of minor memory leaks
+
+2.0d 5/97
+
+5/20/97  Use test.pl instead of fame.test for testing
+5/21/97  Fix small bug with LANG::exec (David Blob)
+6/26/97  Check for correct cppstdin; compile with 5.004
+7/5/97   Add some MS Windows support
+7/8/97   Check for 5.003 binary compatability in 5.004
+7/23/97  Add DATE support to fameread and famewrite (D. Heffernan)
+7/23/97  Restructure fame.c to add STRING support
+7/23/97  Fix $Fame::HLI::status/version core dump!
+
+2.1 11/97
+
+7/28/97  Add STRING support to fameread/write
+7/29/97  Add check for not overwriting read-only values
+         This means you can pass constants for input/output variables
+9/25/97  Add dual K&C and ANSI C prototypes so that program can
+         compile on CC, gcc, cc and Visual C++.
+11/1/97  Add Windows NT support

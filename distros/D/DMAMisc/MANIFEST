@@ -1,0 +1,18 @@
+MANIFEST
+Changes
+README.perl
+COPYING
+TODO
+TODONE
+Version
+licenses/Artistic
+licenses/BSD
+licenses/LGPL-2.1
+Makefile.PL
+lib/DMA/FSM.pm
+lib/DMA/ISODate.pm
+lib/DMA/ldconfig.pm
+lib/DMA/Version.pm
+t/load.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

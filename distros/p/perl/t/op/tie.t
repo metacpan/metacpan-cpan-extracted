@@ -11,28 +11,13 @@
 
 chdir 't' if -d 't';
 @INC = '../lib';
-$ENV{PERL5LIB} = "../lib";
+require './test.pl';
 
 $|=1;
 
-undef $/;
-@prgs = split /^########\n/m, <DATA>;
+run_multiple_progs('', \*DATA);
 
-require './test.pl';
-plan(tests => scalar @prgs);
-for (@prgs){
-    ++$i;
-    my($prog,$expected) = split(/\nEXPECT\n/, $_, 2);
-    print("not ok $i # bad test format\n"), next
-        unless defined $expected;
-    my ($testname) = $prog =~ /^# (.*)\n/m;
-    $testname ||= '';
-    $TODO = $testname =~ s/^TODO //;
-    $results =~ s/\n+$//;
-    $expected =~ s/\n+$//;
-
-    fresh_perl_is($prog, $expected, {}, $testname);
-}
+done_testing();
 
 __END__
 
@@ -42,6 +27,8 @@ tie %h, Tie::StdHash;
 untie %h;
 EXPECT
 ########
+# SKIP ?!defined &DynaLoader::boot_DynaLoader && !eval 'require base'
+# (skip under miniperl if base.pm is not in lib/ yet)
 
 # standard behaviour, without any extra references
 use Tie::Hash ;
@@ -288,12 +275,13 @@ EXPECT
 0
 ########
 #
-# FETCH freeing tie'd SV
+# FETCH freeing tie'd SV still works
 sub TIESCALAR { bless [] }
-sub FETCH { *a = \1; 1 }
+sub FETCH { *a = \1; 2 }
 tie $a, 'main';
 print $a;
 EXPECT
+2
 ########
 
 #  [20020716.007] - nested FETCHES
@@ -337,7 +325,7 @@ sub FETCH {
 }
 package main;
 tie $a->{foo}, "Foo", $a, "foo";
-$a->{foo}; # access once
+my $s = $a->{foo}; # access once
 # the hash element should not be tied anymore
 print defined tied $a->{foo} ? "not ok" : "ok";
 EXPECT
@@ -370,7 +358,7 @@ EXPECT
 # Test case from perlmonks by runrig
 # http://www.perlmonks.org/index.pl?node_id=273490
 # "Here is what I tried. I think its similar to what you've tried
-#  above. Its odd but convienient that after untie'ing you are left with
+#  above. Its odd but convenient that after untie'ing you are left with
 #  a variable that has the same value as was last returned from
 #  FETCH. (At least on my perl v5.6.1). So you don't need to pass a
 #  reference to the variable in order to set it after the untie (here it
@@ -447,6 +435,35 @@ EXPECT
 ok
 ########
 
+# [perl #948] cannot meaningfully tie $,
+package TieDollarComma;
+
+sub TIESCALAR {
+     my $pkg = shift;
+     return bless \my $x, $pkg;
+}
+
+sub STORE {
+    my $self = shift;
+    $$self = shift;
+    print "STORE set '$$self'\n";
+}
+
+sub FETCH {
+    my $self = shift;
+    print "<FETCH>";
+    return $$self;
+}
+package main;
+
+tie $,, 'TieDollarComma';
+$, = 'BOBBINS';
+print "join", "things", "up\n";
+EXPECT
+STORE set 'BOBBINS'
+join<FETCH>BOBBINSthings<FETCH>BOBBINSup
+########
+
 # test SCALAR method
 package TieScalar;
 
@@ -477,12 +494,16 @@ package main;
 tie my %h => "TieScalar";
 $h{key1} = "val1";
 $h{key2} = "val2";
-print scalar %h, "\n";
+print scalar %h, "\n"
+    if %h; # this should also call SCALAR but implicitly
 %h = ();
-print scalar %h, "\n";
+print scalar %h, "\n"
+    if !%h; # this should also call SCALAR but implicitly
 EXPECT
 SCALAR
+SCALAR
 2/2
+SCALAR
 SCALAR
 0
 ########
@@ -555,13 +576,42 @@ print $h.$h;
 EXPECT
 01
 ########
+# SKIP ? $IS_EBCDIC
+# skipped on EBCDIC because "2" | "8" is 0xFA (not COLON as it is on ASCII),
+# which isn't representable in this file's UTF-8 encoding.
+# Bug 53482 (and maybe others)
+
 sub TIESCALAR { my $foo = $_[1]; bless \$foo, $_[0] }
 sub FETCH { ${$_[0]} }
-tie my $x, "main", 2;
-tie my $y, "main", 8;
-print $x | $y;
+tie my $x1, "main", 2;
+tie my $y1, "main", 8;
+print $x1 | $y1;
+print $x1 | $y1;
+tie my $x2, "main", "2";
+tie my $y2, "main", "8";
+print $x2 | $y2;
+print $x2 | $y2;
 EXPECT
-10
+1010::
+########
+# Bug 36267
+sub TIEHASH  { bless {}, $_[0] }
+sub STORE    { $_[0]->{$_[1]} = $_[2] }
+sub FIRSTKEY { my $a = scalar keys %{$_[0]}; each %{$_[0]} }
+sub NEXTKEY  { each %{$_[0]} }
+sub DELETE   { delete $_[0]->{$_[1]} }
+sub CLEAR    { %{$_[0]} = () }
+$h{b}=1;
+delete $h{b};
+print scalar keys %h, "\n";
+tie %h, 'main';
+$i{a}=1;
+%h = %i;
+untie %h;
+print scalar keys %h, "\n";
+EXPECT
+0
+0
 ########
 # Bug 37731
 sub foo::TIESCALAR { bless {value => $_[1]}, $_[0] }
@@ -588,3 +638,838 @@ sub TIEHASH { bless [], 'main' }
 }
 print "tied\n" if tied %h;
 EXPECT
+########
+# RT 20727: PL_defoutgv is left as a tied element
+sub TIESCALAR { return bless {}, 'main' }
+
+sub STORE {
+    select($_[1]);
+    $_[1] = 1;
+    select(); # this used to coredump or assert fail
+}
+tie $SELECT, 'main';
+$SELECT = *STDERR;
+EXPECT
+########
+# RT 23810: eval in die in FETCH can corrupt context stack
+
+my $file = 'rt23810.pm';
+
+my $e;
+my $s;
+
+sub do_require {
+    my ($str, $eval) = @_;
+    open my $fh, '>', $file or die "Can't create $file: $!\n";
+    print $fh $str;
+    close $fh;
+    if ($eval) {
+	$s .= '-ERQ';
+	eval { require $pm; $s .= '-ENDE' }
+    }
+    else {
+	$s .= '-RQ';
+	require $pm;
+    }
+    $s .= '-ENDRQ';
+    unlink $file;
+}
+
+sub TIEHASH { bless {} }
+
+sub FETCH {
+    # 10 or more syntax errors makes yyparse croak()
+    my $bad = q{$x+;$x+;$x+;$x+;$x+;$x+;$x+;$x+;$x+$x+;$x+;$x+;$x+;$x+;;$x+;};
+
+    if ($_[1] eq 'eval') {
+	$s .= 'EVAL';
+	eval q[BEGIN { die; $s .= '-X1' }];
+	$s .= '-BD';
+	eval q[BEGIN { $x+ }];
+	$s .= '-BS';
+	eval '$x+';
+	$s .= '-E1';
+	$s .= '-S1' while $@ =~ /syntax error at/g;
+	eval $bad;
+	$s .= '-E2';
+	$s .= '-S2' while $@ =~ /syntax error at/g;
+    }
+    elsif ($_[1] eq 'require') {
+	$s .= 'REQUIRE';
+	my @text = (
+	    q[BEGIN { die; $s .= '-X1' }],
+	    q[BEGIN { $x+ }],
+	    '$x+',
+	    $bad
+	);
+	for my $i (0..$#text) {
+	    $s .= "-$i";
+	    do_require($txt[$i], 0) if $e;;
+	    do_require($txt[$i], 1);
+	}
+    }
+    elsif ($_[1] eq 'exit') {
+	eval q[exit(0); print "overshot eval\n"];
+    }
+    else {
+	print "unknown key: '$_[1]'\n";
+    }
+    return "-R";
+}
+my %foo;
+tie %foo, "main";
+
+for my $action(qw(eval require)) {
+    $s = ''; $e = 0; $s .= main->FETCH($action); print "$action: s0=$s\n";
+    $s = ''; $e = 1; eval { $s .= main->FETCH($action)}; print "$action: s1=$s\n";
+    $s = ''; $e = 0; $s .= $foo{$action}; print "$action: s2=$s\n";
+    $s = ''; $e = 1; eval { $s .= $foo{$action}}; print "$action: s3=$s\n";
+}
+1 while unlink $file;
+
+$foo{'exit'};
+print "overshot main\n"; # shouldn't reach here
+
+EXPECT
+eval: s0=EVAL-BD-BS-E1-S1-E2-S2-S2-S2-S2-S2-S2-S2-S2-S2-S2-R
+eval: s1=EVAL-BD-BS-E1-S1-E2-S2-S2-S2-S2-S2-S2-S2-S2-S2-S2-R
+eval: s2=EVAL-BD-BS-E1-S1-E2-S2-S2-S2-S2-S2-S2-S2-S2-S2-S2-R
+eval: s3=EVAL-BD-BS-E1-S1-E2-S2-S2-S2-S2-S2-S2-S2-S2-S2-S2-R
+require: s0=REQUIRE-0-ERQ-ENDRQ-1-ERQ-ENDRQ-2-ERQ-ENDRQ-3-ERQ-ENDRQ-R
+require: s1=REQUIRE-0-RQ
+require: s2=REQUIRE-0-ERQ-ENDRQ-1-ERQ-ENDRQ-2-ERQ-ENDRQ-3-ERQ-ENDRQ-R
+require: s3=REQUIRE-0-RQ
+########
+# RT 8857: STORE incorrectly invoked for local($_) on aliased tied array
+#          element
+
+sub TIEARRAY { bless [], $_[0] }
+sub TIEHASH  { bless [], $_[0] }
+sub FETCH { $_[0]->[$_[1]] }
+sub STORE { $_[0]->[$_[1]] = $_[2] }
+
+
+sub f {
+    local $_[0];
+}
+tie @a, 'main';
+tie %h, 'main';
+
+foreach ($a[0], $h{a}) {
+    f($_);
+}
+# on failure, chucks up 'premature free' etc messages
+EXPECT
+########
+# RT 5475:
+# the initial fix for this bug caused tied scalar FETCH to be called
+# multiple times when that scalar was an element in an array. Check it
+# only gets called once now.
+
+sub TIESCALAR { bless [], $_[0] }
+my $c = 0;
+sub FETCH { $c++; 0 }
+sub FETCHSIZE { 1 }
+sub STORE { $c += 100; 0 }
+
+
+my (@a, %h);
+tie $a[0],   'main';
+tie $h{foo}, 'main';
+
+my $i = 0;
+my $x = $a[0] + $h{foo} + $a[$i] + (@a)[0];
+print "x=$x c=$c\n";
+EXPECT
+x=0 c=4
+########
+# Bug 68192 - numeric ops not calling mg_get when tied scalar holds a ref
+sub TIESCALAR { bless {}, __PACKAGE__ };
+sub STORE {};
+sub FETCH {
+ print "fetching... "; # make sure FETCH is called once per op
+ 123456
+};
+my $foo;
+tie $foo, __PACKAGE__;
+my $a = [1234567];
+$foo = $a;
+print "+   ", 0 + $foo, "\n";
+print "**  ", $foo**1, "\n";
+print "*   ", $foo*1, "\n";
+print "/   ", $foo*1, "\n";
+print "%   ", $foo%123457, "\n";
+print "-   ", $foo-0, "\n";
+print "neg ", - -$foo, "\n";
+print "int ", int $foo, "\n";
+print "abs ", abs $foo, "\n";
+print "==  ", 123456 == $foo, "\n";
+print "<   ", 123455 < $foo, "\n";
+print ">   ", 123457 > $foo, "\n";
+print "<=  ", 123456 <= $foo, "\n";
+print ">=  ", 123456 >= $foo, "\n";
+print "!=  ", 0 != $foo, "\n";
+print "<=> ", 123457 <=> $foo, "\n";
+EXPECT
+fetching... +   123456
+fetching... **  123456
+fetching... *   123456
+fetching... /   123456
+fetching... %   123456
+fetching... -   123456
+fetching... neg 123456
+fetching... int 123456
+fetching... abs 123456
+fetching... ==  1
+fetching... <   1
+fetching... >   1
+fetching... <=  1
+fetching... >=  1
+fetching... !=  1
+fetching... <=> 1
+########
+# Ties returning overloaded objects
+{
+ package overloaded;
+ use overload
+  '*{}' => sub { print '*{}'; \*100 },
+  '@{}' => sub { print '@{}'; \@100 },
+  '%{}' => sub { print '%{}'; \%100 },
+  '${}' => sub { print '${}'; \$100 },
+  map {
+   my $op = $_;
+   $_ => sub { print "$op"; 100 }
+  } qw< 0+ "" + ** * / % - neg int abs == < > <= >= != <=> <> >
+}
+$o = bless [], overloaded;
+
+sub TIESCALAR { bless {}, "" }
+sub FETCH { print "fetching... "; $o }
+sub STORE{}
+tie $ghew, "";
+
+$ghew=undef; 1+$ghew; print "\n";
+$ghew=undef; $ghew**1; print "\n";
+$ghew=undef; $ghew*1; print "\n";
+$ghew=undef; $ghew/1; print "\n";
+$ghew=undef; $ghew%1; print "\n";
+$ghew=undef; $ghew-1; print "\n";
+$ghew=undef; -$ghew; print "\n";
+$ghew=undef; int $ghew; print "\n";
+$ghew=undef; abs $ghew; print "\n";
+$ghew=undef; 1 == $ghew; print "\n";
+$ghew=undef; $ghew<1; print "\n";
+$ghew=undef; $ghew>1; print "\n";
+$ghew=undef; $ghew<=1; print "\n";
+$ghew=undef; $ghew >=1; print "\n";
+$ghew=undef; $ghew != 1; print "\n";
+$ghew=undef; $ghew<=>1; print "\n";
+$ghew=undef; <$ghew>; print "\n";
+$ghew=\*shrext; *$ghew; print "\n";
+$ghew=\@spled; @$ghew; print "\n";
+$ghew=\%frit; %$ghew; print "\n";
+$ghew=\$drile; $$ghew; print "\n";
+EXPECT
+fetching... +
+fetching... **
+fetching... *
+fetching... /
+fetching... %
+fetching... -
+fetching... neg
+fetching... int
+fetching... abs
+fetching... ==
+fetching... <
+fetching... >
+fetching... <=
+fetching... >=
+fetching... !=
+fetching... <=>
+fetching... <>
+fetching... *{}
+fetching... @{}
+fetching... %{}
+fetching... ${}
+########
+# RT 51636: segmentation fault with array ties
+
+tie my @a, 'T';
+@a = (1);
+print "ok\n"; # if we got here we didn't crash
+
+package T;
+
+sub TIEARRAY { bless {} }
+sub STORE    { tie my @b, 'T' }
+sub CLEAR    { }
+sub EXTEND   { }
+
+EXPECT
+ok
+########
+# RT 8438: Tied scalars don't call FETCH when subref is dereferenced
+
+sub TIESCALAR { bless {} }
+
+my $fetch = 0;
+my $called = 0;
+sub FETCH { $fetch++; sub { $called++ } }
+
+tie my $f, 'main';
+$f->(1) for 1,2;
+print "fetch=$fetch\ncalled=$called\n";
+
+EXPECT
+fetch=2
+called=2
+########
+# tie mustn't attempt to call methods on bareword filehandles.
+sub IO::File::TIEARRAY {
+    die "Did not want to invoke IO::File::TIEARRAY";
+}
+fileno FOO; tie @a, "FOO"
+EXPECT
+Can't locate object method "TIEARRAY" via package "FOO" at - line 5.
+########
+#
+# STORE freeing tie'd AV
+sub TIEARRAY  { bless [] }
+sub STORE     { *a = []; 1 }
+sub STORESIZE { }
+sub EXTEND    { }
+tie @a, 'main';
+$a[0] = 1;
+EXPECT
+########
+#
+# CLEAR freeing tie'd AV
+sub TIEARRAY  { bless [] }
+sub CLEAR     { *a = []; 1 }
+sub STORESIZE { }
+sub EXTEND    { }
+sub STORE     { }
+tie @a, 'main';
+@a = (1,2,3);
+EXPECT
+########
+#
+# FETCHSIZE freeing tie'd AV
+sub TIEARRAY  { bless [] }
+sub FETCHSIZE { *a = []; 100 }
+sub STORESIZE { }
+sub EXTEND    { }
+sub STORE     { }
+tie @a, 'main';
+print $#a,"\n"
+EXPECT
+99
+########
+#
+# [perl #86328] Crash when freeing tie magic that can increment the refcnt
+
+eval { require Scalar::Util } or print("ok\n"), exit;
+
+sub TIEHASH {
+    return $_[1];
+}
+*TIEARRAY = *TIEHASH;
+
+sub DESTROY {
+    my ($tied) = @_;
+    my $b = $tied->[0];
+}
+
+my $a = {};
+my $o = bless [];
+Scalar::Util::weaken($o->[0] = $a);
+tie %$a, "main", $o;
+
+my $b = [];
+my $p = bless [];
+Scalar::Util::weaken($p->[0] = $b);
+tie @$b, "main", $p;
+
+# Done setting up the evil data structures
+
+$a = undef;
+$b = undef;
+print "ok\n";
+
+EXPECT
+ok
+########
+#
+# Localising a tied COW scalar should not make it read-only.
+
+sub TIESCALAR { bless [] }
+sub FETCH { __PACKAGE__ }
+sub STORE {}
+tie $x, "";
+"$x";
+{
+    local $x;
+    $x = 3;
+}
+print "ok\n";
+EXPECT
+ok
+########
+#
+# Nor should it be impossible to tie COW scalars that are already PVMGs.
+
+sub TIESCALAR { bless [] }
+$x = *foo;        # PVGV
+undef $x;         # downgrade to PVMG
+$x = __PACKAGE__; # PVMG + COW
+tie $x, "";       # bang!
+
+print STDERR "ok\n";
+
+# However, one should not be able to tie read-only glob copies, which look
+# a bit like kine internally (FAKE + READONLY).
+$y = *foo;
+Internals::SvREADONLY($y,1);
+tie $y, "";
+
+EXPECT
+ok
+Modification of a read-only value attempted at - line 16.
+########
+#
+# And one should not be able to tie read-only COWs
+for(__PACKAGE__) { tie $_, "" }
+sub TIESCALAR {bless []}
+EXPECT
+Modification of a read-only value attempted at - line 3.
+########
+
+# Similarly, read-only regexps cannot be tied.
+sub TIESCALAR { bless [] }
+$y = ${qr//};
+Internals::SvREADONLY($y,1);
+tie $y, "";
+
+EXPECT
+Modification of a read-only value attempted at - line 6.
+########
+
+# tied() should still work on tied scalars after glob assignment
+sub TIESCALAR {bless[]}
+sub FETCH {*foo}
+sub f::TIEHANDLE{bless[],f}
+tie *foo, "f";
+tie $rin, "";
+[$rin]; # call FETCH
+print ref tied $rin, "\n";
+print ref tied *$rin, "\n";
+EXPECT
+main
+f
+########
+
+# (un)tie $glob_copy vs (un)tie *$glob_copy
+sub TIESCALAR { print "TIESCALAR\n"; bless [] }
+sub TIEHANDLE{ print "TIEHANDLE\n"; bless [] }
+sub FETCH { print "never called\n" }
+$f = *foo;
+tie *$f, "";
+tie $f, "";
+untie $f;
+print "ok 1\n" if !tied $f;
+() = $f; # should not call FETCH
+untie *$f;
+print "ok 2\n" if !tied *foo;
+EXPECT
+TIEHANDLE
+TIESCALAR
+ok 1
+ok 2
+########
+
+# RT #8611 mustn't goto outside the magic stack
+sub TIESCALAR { warn "tiescalar\n"; bless [] }
+sub FETCH { warn "fetch()\n"; goto FOO; }
+tie $f, "";
+warn "before fetch\n";
+my $a = "$f";
+warn "before FOO\n";
+FOO:
+warn "after FOO\n";
+EXPECT
+tiescalar
+before fetch
+fetch()
+Can't find label FOO at - line 4.
+########
+
+# RT #8611 mustn't goto outside the magic stack
+sub TIEHANDLE { warn "tiehandle\n"; bless [] }
+sub PRINT { warn "print()\n"; goto FOO; }
+tie *F, "";
+warn "before print\n";
+print F "abc";
+warn "before FOO\n";
+FOO:
+warn "after FOO\n";
+EXPECT
+tiehandle
+before print
+print()
+Can't find label FOO at - line 4.
+########
+
+# \&$tied with $tied holding a reference before the fetch (but not after)
+sub ::72 { 73 };
+sub TIESCALAR {bless[]}
+sub STORE{}
+sub FETCH { 72 }
+tie my $x, "main";
+$x = \$y;
+\&$x;
+print "ok\n";
+EXPECT
+ok
+########
+
+# \&$tied with $tied holding a PVLV glob before the fetch (but not after)
+sub ::72 { 73 };
+sub TIEARRAY {bless[]}
+sub STORE{}
+sub FETCH { 72 }
+tie my @x, "main";
+my $elem = \$x[0];
+$$elem = *bar;
+print &{\&$$elem}, "\n";
+EXPECT
+73
+########
+
+# \&$tied with $tied holding a PVGV glob before the fetch (but not after)
+local *72 = sub { 73 };
+sub TIESCALAR {bless[]}
+sub STORE{}
+sub FETCH { 72 }
+tie my $x, "main";
+$x = *bar;
+print &{\&$x}, "\n";
+EXPECT
+73
+########
+
+# Lexicals should not be visible to magic methods on scope exit
+BEGIN { unless (defined &DynaLoader::boot_DynaLoader) {
+    print "HASH\nHASH\nARRAY\nARRAY\n"; exit;
+}}
+use Scalar::Util 'weaken';
+{ package xoufghd;
+  sub TIEHASH { Scalar::Util::weaken($_[1]); bless \$_[1], xoufghd:: }
+  *TIEARRAY = *TIEHASH;
+  DESTROY {
+     bless ${$_[0]} || return, 0;
+} }
+for my $sub (
+    # hashes: ties before backrefs
+    sub {
+        my %hash;
+        $ref = ref \%hash;
+        tie %hash, xoufghd::, \%hash;
+        1;
+    },
+    # hashes: backrefs before ties
+    sub {
+        my %hash;
+        $ref = ref \%hash;
+        weaken(my $x = \%hash);
+        tie %hash, xoufghd::, \%hash;
+        1;
+    },
+    # arrays: ties before backrefs
+    sub {
+        my @array;
+        $ref = ref \@array;
+        tie @array, xoufghd::, \@array;
+        1;
+    },
+    # arrays: backrefs before ties
+    sub {
+        my @array;
+        $ref = ref \@array;
+        weaken(my $x = \@array);
+        tie @array, xoufghd::, \@array;
+        1;
+    },
+) {
+    &$sub;
+    &$sub;
+    print $ref, "\n";
+}
+EXPECT
+HASH
+HASH
+ARRAY
+ARRAY
+########
+
+# Localising a tied variable with a typeglob in it should copy magic
+sub TIESCALAR{bless[]}
+sub FETCH{warn "fetching\n"; *foo}
+sub STORE{}
+tie $x, "";
+local $x;
+warn "before";
+"$x";
+warn "after";
+EXPECT
+fetching
+before at - line 8.
+fetching
+after at - line 10.
+########
+
+# tied returns same value as tie
+sub TIESCALAR{bless[]}
+$tyre = \tie $tied, "";
+print "ok\n" if \tied $tied == $tyre;
+EXPECT
+ok
+########
+
+# tied arrays should always be AvREAL
+$^W=1;
+sub TIEARRAY{bless[]}
+sub {
+  tie @_, "";
+  \@_; # used to produce: av_reify called on tied array at - line 7.
+}->(1);
+EXPECT
+########
+
+# [perl #67490] scalar-tying elements of magic hashes
+sub TIESCALAR{bless[]}
+sub STORE{}
+tie $ENV{foo}, '';
+$ENV{foo} = 78;
+delete $ENV{foo};
+tie $^H{foo}, '';
+$^H{foo} = 78;
+delete $^H{foo};
+EXPECT
+########
+
+# [perl #35865, #43011] autovivification should call FETCH after STORE
+# because perl does not know that the FETCH would have returned the same
+# thing that was just stored.
+
+# This package never likes to take ownership of other people’s refs.  It
+# always makes its own copies.  (For simplicity, it only accepts hashes.)
+package copier {
+    sub TIEHASH { bless {} }
+    sub FETCH   { $_[0]{$_[1]} }
+    sub STORE   { $_[0]{$_[1]} = { %{ $_[2] } } }
+}
+tie my %h, copier::;
+$h{i}{j} = 'k';
+print $h{i}{j}, "\n";
+EXPECT
+k
+########
+
+# [perl #8931] FETCH for tied $" called an odd number of times.
+use strict;
+my $i = 0;
+sub A::TIESCALAR {bless [] => 'A'}
+sub A::FETCH {print ++ $i, "\n"}
+my @a = ("", "", "");
+
+tie $" => 'A';
+"@a";
+
+$i = 0;
+tie my $a => 'A';
+join $a, 1..10;
+EXPECT
+1
+1
+########
+
+# [perl #9391] return value from 'tied' not discarded soon enough
+use warnings;
+tie @a, 'T';
+if (tied @a) {
+untie @a;
+}
+
+sub T::TIEARRAY { my $s; bless \$s => "T" }
+EXPECT
+########
+
+# NAME Test that tying a hash does not leak a deleted iterator
+# This produced unbalanced string table warnings under
+# PERL_DESTRUCT_LEVEL=2.
+package l {
+    sub TIEHASH{bless[]}
+}
+$h = {foo=>0};
+each %$h;
+delete $$h{foo};
+tie %$h, 'l';
+EXPECT
+########
+
+# NAME EXISTS on arrays
+sub TIEARRAY{bless[]};
+sub FETCHSIZE { 50 }
+sub EXISTS { print "does $_[1] exist?\n" }
+tie @a, "";
+exists $a[1];
+exists $a[-1];
+$NEGATIVE_INDICES=1;
+exists $a[-1];
+EXPECT
+does 1 exist?
+does 49 exist?
+does -1 exist?
+########
+
+# Crash when using negative index on array tied to non-object
+sub TIEARRAY{bless[]};
+${\tie @a, ""} = undef;
+eval { $_ = $a[-1] }; print $@;
+eval { $a[-1] = '' }; print $@;
+eval { delete $a[-1] }; print $@;
+eval { exists $a[-1] }; print $@;
+
+EXPECT
+Can't call method "FETCHSIZE" on an undefined value at - line 5.
+Can't call method "FETCHSIZE" on an undefined value at - line 6.
+Can't call method "FETCHSIZE" on an undefined value at - line 7.
+Can't call method "FETCHSIZE" on an undefined value at - line 8.
+########
+
+# Crash when reading negative index when NEGATIVE_INDICES stub exists
+sub NEGATIVE_INDICES;
+sub TIEARRAY{bless[]};
+sub FETCHSIZE{}
+tie @a, "";
+print "ok\n" if ! defined $a[-1];
+EXPECT
+ok
+########
+
+# Assigning vstrings to tied scalars
+sub TIESCALAR{bless[]};
+sub STORE { print ref \$_[1], "\n" }
+tie $x, ""; $x = v3;
+EXPECT
+VSTRING
+########
+
+# [perl #27010] Tying deferred elements
+$\="\n";
+sub TIESCALAR{bless[]};
+sub {
+    tie $_[0], "";
+    print ref tied $h{k};
+    tie $h{l}, "";
+    print ref tied $_[1];
+    untie $h{k};
+    print tied $_[0] // 'undef';
+    untie $_[1];
+    print tied $h{l} // 'undef';
+    # check that tied and untie do not autovivify
+    # XXX should they autovivify?
+    tied $_[2];
+    print exists $h{m} ? "yes" : "no";
+    untie $_[2];
+    print exists $h{m} ? "yes" : "no";
+}->($h{k}, $h{l}, $h{m});
+EXPECT
+main
+main
+undef
+undef
+no
+no
+########
+
+# [perl #78194] Passing op return values to tie constructors
+sub TIEARRAY{
+    print \$_[1] == \$_[1] ? "ok\n" : "not ok\n";
+};
+tie @a, "", "$a$b";
+EXPECT
+ok
+########
+
+# Scalar-tied locked hash keys and copy-on-write
+use Tie::Scalar;
+tie $h{foo}, Tie::StdScalar;
+tie $h{bar}, Tie::StdScalar;
+$h{foo} = __PACKAGE__; # COW
+$h{bar} = 1;       # not COW
+# Moral equivalent of Hash::Util::lock_whatever, but miniperl-compatible
+Internals::SvREADONLY($h{foo},1);
+Internals::SvREADONLY($h{bar},1);
+print $h{foo}, "\n"; # should not croak
+# Whether the value is COW should make no difference here (whether the
+# behaviour is ultimately correct is another matter):
+local $h{foo};
+local $h{bar};
+print "ok\n" if (eval{ $h{foo} = 1 }||$@) eq (eval{ $h{bar} = 1 }||$@);
+EXPECT
+main
+ok
+########
+# SKIP ? $::IS_EBCDIC
+# skipped on EBCDIC because different from ASCII and results vary depending on
+# code page
+
+# &xsub and goto &xsub with tied @_
+use Tie::Array;
+tie @_, Tie::StdArray;
+@_ = "\xff";
+&utf8::encode;
+printf "%x\n", $_ for map ord, split //, $_[0];
+print "--\n";
+@_ = "\xff";
+& {sub { goto &utf8::encode }};
+printf "%x\n", $_ for map ord, split //, $_[0];
+EXPECT
+c3
+bf
+--
+c3
+bf
+########
+
+# Defelem pointing to nonexistent element of tied array
+
+use Tie::Array;
+# This sub is called with a deferred element.  Inside the sub, $_[0] pros-
+# pectively points to element 10000 of @a.
+sub {
+  tie @a, "Tie::StdArray";  # now @a is tied
+  $#a = 20000;  # and FETCHSIZE/AvFILL will now return a big number
+  $a[10000] = "crumpets\n";
+  $_ = "$_[0]"; # but defelems don't expect tied arrays and try to read
+                # AvARRAY[10000], which crashes
+}->($a[10000]);
+print
+EXPECT
+crumpets
+########
+
+# tied() in list assignment
+
+sub TIESCALAR : lvalue {
+    ${+pop} = bless [], shift;
+}
+tie $t, "", \$a;
+$a = 7;
+($a, $b) = (3, tied $t);
+print "a is $a\n";
+print "b is $b\n";
+EXPECT
+a is 3
+b is 7

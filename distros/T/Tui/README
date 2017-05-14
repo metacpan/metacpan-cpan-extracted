@@ -1,0 +1,47 @@
+Welcome to Tui, a Text user interface
+
+Description
+
+This toolkit provides a pretty rich set of widgets which you can use to 
+build text-mode programs with a 'Gui-like' appearance. It is object 
+oriented in design.
+
+Copyright
+
+This program is free software, you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+Prerequisites
+
+You'll need perl 5 for this, I've only tested it with 5.004 and 5.005. 
+You'll need the Curses module by Milliam Setzer, I've used version 1.02.
+
+Installation
+
+Just copying it to your site_perl directory would do it, but if you just 
+want to look at it or don't have the right permissions, you could leave it 
+in the current directory. There is no compiling involved, it's just perl.
+ 
+ 
+Demo program
+
+There is a program tuidemo which shows the capabilities of the toolkit. In 
+the module itself there is a lot of pod documentation, use perldoc Tui to 
+view it.
+
+Future plans
+
+- clean up a lot of code
+- tui builder (with code generation)
+- navigation with cursor keys
+- extension to the editor widget
+
+And anything you ask me for I'll try to put in there
+
+Contact
+
+You can contact me at ronald@ronaldlens.com or visit my homepage at 
+http://www.ronaldlens.com. The 'official' Tui homepage is at
+http://www.ronaldlens.com/tui/tui.html.
+
+

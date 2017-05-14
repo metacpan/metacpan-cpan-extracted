@@ -1,4 +1,4 @@
-#!./perl
+#!./perl -T
 
 BEGIN {
     chdir 't' if -d 't';
@@ -47,8 +47,10 @@ sub numify { 0 + "${$_[0]}" }	# Not needed, additional overhead
 package main;
 
 $| = 1;
-use Test::More tests => 557;
+BEGIN { require './test.pl'; require './charset_tools.pl' }
+plan tests => 5215;
 
+use Scalar::Util qw(tainted);
 
 $a = new Oscalar "087";
 $b= "$a";
@@ -129,7 +131,7 @@ $b++;
 
 is(ref $b, "Oscalar");
 is($a, "087");
-is($b, "88");
+is($b, "89");
 is(ref $a, "Oscalar");
 
 package Oscalar;
@@ -140,7 +142,7 @@ $b++;
 
 is(ref $b, "Oscalar");
 is($a, "087");
-is($b, "90");
+is($b, "91");
 is(ref $a, "Oscalar");
 
 $b=$a;
@@ -265,11 +267,12 @@ is("$aI", "xx");
 is($aI, "xx");
 is("b${aI}c", "_._.b.__.xx._.__.c._");
 
-# Here we test blessing to a package updates hash
+# Here we test that both "no overload" and
+# blessing to a package update hash
 
 eval "package Oscalar; no overload '.'";
 
-is("b${a}", "_.b.__.xx._");
+is("b${a}", "bxx");
 $x="1";
 bless \$x, Oscalar;
 is("b${a}c", "bxxc");
@@ -289,20 +292,20 @@ like($@, qr/no method found/);
 
 eval "package Oscalar; sub comple; use overload '~' => 'comple'";
 
-$na = eval { ~$a };		# Hash was not updated
-like($@, qr/no method found/);
+$na = eval { ~$a };
+is($@, '');
 
 bless \$x, Oscalar;
 
 $na = eval { ~$a };		# Hash updated
-warn "`$na', $@" if $@;
+warn "'$na', $@" if $@;
 ok !$@;
 is($na, '_!_xx_!_');
 
 $na = 0;
 
-$na = eval { ~$aI };		# Hash was not updated
-like($@, qr/no method found/);
+$na = eval { ~$aI };
+is($@, '');
 
 bless \$x, OscalarI;
 
@@ -314,8 +317,8 @@ is($na, '_!_xx_!_');
 
 eval "package Oscalar; sub rshft; use overload '>>' => 'rshft'";
 
-$na = eval { $aI >> 1 };	# Hash was not updated
-like($@, qr/no method found/);
+$na = eval { $aI >> 1 };
+is($@, '');
 
 bless \$x, OscalarI;
 
@@ -361,6 +364,13 @@ is(($aII << 3), '_<<_087_<<_');
 }
 is($int, 9);
 is($out, 1024);
+is($int, 9);
+{
+  BEGIN { overload::constant 'integer' => sub {$int++; shift()+1}; }
+  eval q{$out = 42};
+}
+is($int, 10);
+is($out, 43);
 
 $foo = 'foo';
 $foo1 = 'f\'o\\o';
@@ -594,8 +604,7 @@ is($c, "bareword");
   }
   sub TIESCALAR { my $pack = shift; $pack->new(@_) }
   sub FETCH { shift }
-  sub nop {  }		# Around a bug
-  sub vars { my $p = shift; tie($_, $p), $_->nop foreach @_; }
+  sub vars { my $p = shift; tie($_, $p) foreach @_; }
   sub STORE { 
     my $obj = shift; 
     $#$obj = 1; 
@@ -698,13 +707,7 @@ is($c, "bareword");
   sub iter { my ($x) = @_; return undef if $$x < 0; return $$x--; }
 }
 
-# XXX iterator overload not intended to work with CORE::GLOBAL?
-if (defined &CORE::GLOBAL::glob) {
-  is('1', '1');
-  is('1', '1');
-  is('1', '1');
-}
-else {
+{
   my $iter = iterator->new(5);
   my $acc = '';
   my $out;
@@ -933,25 +936,42 @@ unless ($aaa) {
 }
 
 {
-    # check the `$_[0]' is not an overloadable type warning
+    # check the '$_[0]' is not an overloadable type warning
     my $a = "" ;
     local $SIG{__WARN__} = sub {$a = $_[0]} ;
     $x = eval ' overload::constant "fred" => sub {} ; ' ;
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "fred" => sub {} ; ' ;
-    like($a, qr/^`fred' is not an overloadable type at/);
+    like($a, qr/^'fred' is not an overloadable type at/);
 }
 
 {
-    # check the `$_[1]' is not a code reference warning
+    # check the '$_[1]' is not a code reference warning
     my $a = "" ;
     local $SIG{__WARN__} = sub {$a = $_[0]} ;
     $x = eval ' overload::constant "integer" => 1; ' ;
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "integer" => 1; ' ;
-    like($a, qr/^`1' is not a code reference at/);
+    like($a, qr/^'1' is not a code reference at/);
+}
+
+{
+    # check the invalid argument warning [perl #74098]
+    my $a = "" ;
+    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    $x = eval ' use overload "~|_|~" => sub{} ' ;
+    eval ' no overload "~|_|~" ' ;
+    is($a, "");
+    use warnings 'overload' ;
+    $x = eval ' use overload "~|_|~" => sub{} ' ;
+    like($a, qr/^overload arg '~\|_\|~' is invalid at \(eval \d+\) line /,
+	'invalid arg warning');
+    undef $a;
+    eval ' no overload "~|_|~" ' ;
+    like($a, qr/^overload arg '~\|_\|~' is invalid at \(eval \d+\) line /,
+	'invalid arg warning');
 }
 
 {
@@ -1099,18 +1119,6 @@ like ($@, qr/zap/);
 }
 
 {
-    package Numify;
-    use overload (qw(0+ numify fallback 1));
-
-    sub new {
-	my $val = $_[1];
-	bless \$val, $_[0];
-    }
-
-    sub numify { ${$_[0]} }
-}
-
-{
     package perl31793;
     use overload cmp => sub { 0 };
     package perl31793_fb;
@@ -1125,14 +1133,26 @@ like ($@, qr/zap/);
     like(overload::StrVal(sub{1}),    qr/^CODE\(0x[0-9a-f]+\)$/);
     like(overload::StrVal(\*GLOB),    qr/^GLOB\(0x[0-9a-f]+\)$/);
     like(overload::StrVal(\$o),       qr/^REF\(0x[0-9a-f]+\)$/);
-    like(overload::StrVal(qr/a/),     qr/^Regexp=SCALAR\(0x[0-9a-f]+\)$/);
+    like(overload::StrVal(qr/a/),     qr/^Regexp=REGEXP\(0x[0-9a-f]+\)$/);
     like(overload::StrVal($o),        qr/^perl31793=ARRAY\(0x[0-9a-f]+\)$/);
     like(overload::StrVal($of),       qr/^perl31793_fb=ARRAY\(0x[0-9a-f]+\)$/);
     like(overload::StrVal($no),       qr/^no_overload=ARRAY\(0x[0-9a-f]+\)$/);
 }
 
-# These are all check that overloaded values rather than reference addresses
-# are what is getting tested.
+{
+    package Numify;
+    use overload (qw(0+ numify fallback 1));
+
+    sub new {
+	my $val = $_[1];
+	bless \$val, $_[0];
+    }
+
+    sub numify { ${$_[0]} }
+}
+
+# These all check that overloaded values, rather than reference addresses,
+# are what are getting tested.
 my ($two, $one, $un, $deux) = map {new Numify $_} 2, 1, 1, 2;
 my ($ein, $zwei) = (1, 2);
 
@@ -1172,6 +1192,117 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     like('x:a:=', qr/x$a=$/);
     like('x:a:a:=', qr/x$a$a=$/);
 
+}
+
+{
+    {
+        package QRonly;
+        use overload qr => sub { qr/x/ }, fallback => 1;
+    }
+    {
+        my $x = bless [], "QRonly";
+
+        # like tries to be too clever, and decides that $x-stringified
+        # doesn't look like a regex
+        ok("x" =~ $x, "qr-only matches");
+        ok("y" !~ $x, "qr-only doesn't match what it shouldn't");
+        ok("x" =~ /^(??{$x})$/, "qr-only with ?? matches");
+        ok("y" !~ /^(??{$x})$/, "qr-only with ?? doesn't match what it shouldn't");
+        ok("xx" =~ /x$x/, "qr-only matches with concat");
+        like("$x", qr/^QRonly=ARRAY/, "qr-only doesn't have string overload");
+
+        my $qr = bless qr/y/, "QRonly";
+        ok("x" =~ $qr, "qr with qr-overload uses overload");
+        ok("y" !~ $qr, "qr with qr-overload uses overload");
+	ok("x" =~ /^(??{$qr})$/, "qr with qr-overload with ?? uses overload");
+	ok("y" !~ /^(??{$qr})$/, "qr with qr-overload with ?? uses overload");
+        is("$qr", "".qr/y/, "qr with qr-overload stringify");
+
+        my $rx = $$qr;
+        ok("y" =~ $rx, "bare rx with qr-overload doesn't overload match");
+        ok("x" !~ $rx, "bare rx with qr-overload doesn't overload match");
+        ok("y" =~ /^(??{$rx})$/, "bare rx with qr-overload with ?? doesn't overload match");
+        ok("x" !~ /^(??{$rx})$/, "bare rx with qr-overload with ?? doesn't overload match");
+        is("$rx", "".qr/y/, "bare rx with qr-overload stringify");
+    }
+    {
+        package QRandSTR;
+        use overload qr => sub { qr/x/ }, q/""/ => sub { "y" };
+    }
+    {
+        my $x = bless [], "QRandSTR";
+        ok("x" =~ $x, "qr+str uses qr for match");
+        ok("y" !~ $x, "qr+str uses qr for match");
+        ok("xx" =~ /x$x/, "qr+str uses qr for match with concat");
+        is("$x", "y", "qr+str uses str for stringify");
+
+        my $qr = bless qr/z/, "QRandSTR";
+        is("$qr", "y", "qr with qr+str uses str for stringify");
+        ok("xx" =~ /x$x/, "qr with qr+str uses qr for match");
+
+        my $rx = $$qr;
+        ok("z" =~ $rx, "bare rx with qr+str doesn't overload match");
+        is("$rx", "".qr/z/, "bare rx with qr+str doesn't overload stringify");
+    }
+    {
+        package QRany;
+        use overload qr => sub { $_[0]->(@_) };
+
+        package QRself;
+        use overload qr => sub { $_[0] };
+    }
+    {
+        my $rx = bless sub { ${ qr/x/ } }, "QRany";
+        ok("x" =~ $rx, "qr overload accepts a bare rx");
+        ok("y" !~ $rx, "qr overload accepts a bare rx");
+
+        my $str = bless sub { "x" }, "QRany";
+        ok(!eval { "x" =~ $str }, "qr overload doesn't accept a string");
+        like($@, qr/^Overloaded qr did not return a REGEXP/, "correct error");
+
+        my $oqr = bless qr/z/, "QRandSTR";
+        my $oqro = bless sub { $oqr }, "QRany";
+        ok("z" =~ $oqro, "qr overload doesn't recurse");
+
+        my $qrs = bless qr/z/, "QRself";
+        ok("z" =~ $qrs, "qr overload can return self");
+    }
+    {
+        package STRonly;
+        use overload q/""/ => sub { "x" };
+
+        package STRonlyFB;
+        use overload q/""/ => sub { "x" }, fallback => 1;
+    }
+    {
+        my $fb = bless [], "STRonlyFB";
+        ok("x" =~ $fb, "qr falls back to \"\"");
+        ok("y" !~ $fb, "qr falls back to \"\"");
+
+        my $nofb = bless [], "STRonly";
+        ok("x" =~ $nofb, "qr falls back even without fallback");
+        ok("y" !~ $nofb, "qr falls back even without fallback");
+    }
+}
+
+{
+    my $twenty_three = 23;
+    # Check that constant overloading propagates into evals
+    BEGIN { overload::constant integer => sub { 23 } }
+    is(eval "17", $twenty_three);
+}
+
+{
+    # Check readonliness of constants, whether shared hash key
+    # scalars or no (brought up in bug #109744)
+    BEGIN { overload::constant integer => sub { "main" }; }
+    eval { ${\5} = 'whatever' };
+    like $@, qr/^Modification of a read-only value attempted at /,
+	'constant overloading makes read-only constants';
+    BEGIN { overload::constant integer => sub { __PACKAGE__ }; }
+    eval { ${\5} = 'whatever' };
+    like $@, qr/^Modification of a read-only value attempted at /,
+	'... even with shared hash key scalars';
 }
 
 {
@@ -1218,6 +1349,46 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     ok(!$b, "Expect overloaded boolean");
     ok(!$a, "Expect overloaded boolean");
 }
+
+{
+    package Flrbbbbb;
+    use overload
+	bool	 => sub { shift->{truth} eq 'yes' },
+	'0+'	 => sub { shift->{truth} eq 'yes' ? '1' : '0' },
+	'!'	 => sub { shift->{truth} eq 'no' },
+	fallback => 1;
+
+    sub new { my $class = shift; bless { truth => shift }, $class }
+
+    package main;
+
+    my $yes = Flrbbbbb->new('yes');
+    my $x;
+    $x = 1 if $yes;			is($x, 1);
+    $x = 2 unless $yes;			is($x, 1);
+    $x = 3 if !$yes;			is($x, 1);
+    $x = 4 unless !$yes;		is($x, 4);
+
+    my $no = Flrbbbbb->new('no');
+    $x = 0;
+    $x = 1 if $no;			is($x, 0);
+    $x = 2 unless $no;			is($x, 2);
+    $x = 3 if !$no;			is($x, 3);
+    $x = 4 unless !$no;			is($x, 3);
+
+    $x = 0;
+    $x = 1 if !$no && $yes;		is($x, 1);
+    $x = 2 unless !$no && $yes;		is($x, 1);
+    $x = 3 if $no || !$yes;		is($x, 1);
+    $x = 4 unless $no || !$yes;		is($x, 4);
+
+    $x = 0;
+    $x = 1 if !$no || !$yes;		is($x, 1);
+    $x = 2 unless !$no || !$yes;	is($x, 1);
+    $x = 3 if !$no && !$yes;		is($x, 1);
+    $x = 4 unless !$no && !$yes;	is($x, 4);
+}
+
 {
     use Scalar::Util 'weaken';
 
@@ -1232,11 +1403,11 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     $obj = bless do {my $a; \$a}, 'Shklitza';
     $ref = $obj;
 
-    is ($obj, "CLiK KLAK");
-    is ($ref, "CLiK KLAK");
+    is ("$obj", "CLiK KLAK");
+    is ("$ref", "CLiK KLAK");
 
     weaken $ref;
-    is ($ref, "CLiK KLAK");
+    is ("$ref", "CLiK KLAK");
 
     bless $obj, 'Ksshfwoom';
 
@@ -1281,7 +1452,7 @@ foreach my $op (qw(<=> == != < <= > >=)) {
 }
 
 {
-    # comparison operators with nomethod
+    # comparison operators with nomethod (bug 41546)
     my $warning = "";
     my $method;
 
@@ -1325,6 +1496,21 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     is($method, 'cmp');
     like($warning, qr/isn't numeric/, 'cmp should return number');
 
+}
+
+{
+    # nomethod called for '!' after attempted fallback
+    my $nomethod_called = 0;
+
+    package nomethod_not;
+    use overload nomethod => sub { $nomethod_called = 'yes'; };
+
+    package main;
+    my $o = bless [], 'nomethod_not';
+    my $res = ! $o;
+
+    is($nomethod_called, 'yes', "nomethod() is called for '!'");
+    is($res, 'yes', "nomethod(..., '!') return value propagates");
 }
 
 {
@@ -1404,7 +1590,7 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     is($m+$m, 2*$num_val, 'numifies to usual reference value');
     is(0-$m, -$num_val, 'numifies to usual reference value');
     is(1*$m, $num_val, 'numifies to usual reference value');
-    is($m/1, $num_val, 'numifies to usual reference value');
+    is(int($m/1), $num_val, 'numifies to usual reference value');
     is($m%100, $num_val%100, 'numifies to usual reference value');
     is($m**1, $num_val, 'numifies to usual reference value');
 
@@ -1415,7 +1601,7 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     is($aref+$aref, 2*$num_val, 'ref addition');
     is(0-$aref, -$num_val, 'subtraction of ref');
     is(1*$aref, $num_val, 'multiplicaton of ref');
-    is($aref/1, $num_val, 'division of ref');
+    is(int($aref/1), $num_val, 'division of ref');
     is($aref%100, $num_val%100, 'modulo of ref');
     is($aref**1, $num_val, 'exponentiation of ref');
 }
@@ -1435,5 +1621,1209 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     is($x, $o, "copy constructor falls back to assignment (postinc)");
     is($y, $o, "copy constructor falls back to assignment (preinc)");
 }
+
+# only scalar 'x' should currently overload
+
+{
+    package REPEAT;
+
+    my ($x,$n, $nm);
+
+    use overload
+	'x'        => sub { $x++; 1 },
+	'0+'       => sub { $n++; 1 },
+	'nomethod' => sub { $nm++; 1 },
+	'fallback' => 0,
+    ;
+
+    my $s = bless {};
+
+    package main;
+
+    my @a;
+    my $count = 3;
+
+    ($x,$n,$nm) = (0,0,0);
+    @a = ((1,2,$s) x $count);
+    is("$x-$n-$nm", "0-0-0", 'repeat 1');
+
+    ($x,$n,$nm) = (0,0,0);
+    @a = ((1,$s,3) x $count);
+    is("$x-$n-$nm", "0-0-0", 'repeat 2');
+
+    ($x,$n,$nm) = (0,0,0);
+    @a = ((1,2,3) x $s);
+    is("$x-$n-$nm", "0-1-0", 'repeat 3');
+}
+
+
+
+# RT #57012: magic items need to have mg_get() called before testing for
+# overload. Lack of this means that overloaded values returned by eg a
+# tied array didn't call overload methods.
+# We test here both a tied array and scalar, since the implementation of
+# tied  arrays (and hashes) is such that in rvalue context, mg_get is
+# called prior to executing the op, while it isn't for a tied scalar.
+# We also check that return values are correctly tainted.
+# We try against two overload packages; one has all expected methods, the
+# other uses only fallback methods.
+
+{
+
+    # @tests holds a list of test cases. Each elem is an array ref with
+    # the following entries:
+    #
+    #  * the value that the overload method should return
+    #
+    #  * the expression to be evaled. %s is replaced with the
+    #       variable being tested ($ta[0], $ts, or $plain)
+    #
+    #  * a string listing what functions we expect to be called.
+    #       Each method appends its name in parentheses, so "(=)(+)" means
+    #       we expect the copy constructor and then the add method to be
+    #       called.
+    #
+    #  * like above, but what should be called for the fallback-only test
+    #      (in this case, nomethod() identifies itself as "(NM:*)" where *
+    #      is the op).  If this value is undef, fallback tests are skipped.
+    #
+    #  * An array ref of expected counts of calls to FETCH/STORE.
+    #      The first three values are:
+    #         1. the expected number of FETCHs for a tied array
+    #         2. the expected number of FETCHs for a tied scalar
+    #         3. the expected number of STOREs
+    #       If there are a further three elements present, then
+    #       these represent the expected counts for the fallback
+    #       version of the tests. If absent, they are assumed to
+    #       be the same as for the full method test
+    #
+    #  * Under the taint version of the tests,  whether we expect
+    #       the result to be tainted (for example comparison ops
+    #       like '==' don't return a tainted value, even if their
+    #       args are.
+    my @tests;
+
+    my %subs;
+    my $funcs;
+    my $use_int;
+
+    BEGIN {
+	# A note on what methods to expect to be called, and
+	# how many times FETCH/STORE is called:
+	#
+	# Mutating ops (+=, ++ etc) trigger a copy ('='), since
+	# the code can't distinguish between something that's been copied:
+	#    $a = foo->new(0); $b = $a; refcnt($$b) == 2
+	# and overloaded objects stored in ties which will have extra
+	# refcounts due to the tied_obj magic and entries on the tmps
+	# stack when returning from FETCH etc. So we always copy.
+
+	# This accounts for a '=', and an extra STORE.
+	# We also have a FETCH returning the final value from the eval,
+	# plus a FETCH in the overload subs themselves: ($_[0][0])
+	# triggers one. However, tied aggregates have a mechanism to prevent
+	# multiple fetches between STOREs, which means that the tied
+	# hash skips doing a FETCH during '='.
+
+	for (qw(+ - * / % ** << >> & | ^)) {
+	    my $op = $_;
+	    $op = '%%' if $op eq '%';
+	    my $e = "%s $op= 3";
+	    $subs{"$_="} = $e;
+	    # ARRAY  FETCH: initial,        sub+=, eval-return,
+	    # SCALAR FETCH: initial, sub=,  sub+=, eval-return,
+	    # STORE:        copy, mutator
+	    push @tests, [ 18, $e, "(=)($_=)", "(=)(NM:$_=)", [ 3, 4, 2 ], 1 ];
+
+	    $subs{$_} =
+		"do { my \$arg = %s; \$_[2] ? (3 $op \$arg) : (\$arg $op 3) }";
+	    # ARRAY  FETCH: initial
+	    # SCALAR FETCH: initial eval-return,
+	    push @tests, [ 18, "%s $op 3", "($_)", "(NM:$_)", [ 1, 2, 0 ], 1 ];
+	    push @tests, [ 18, "3 $op %s", "($_)", "(NM:$_)", [ 1, 2, 0 ], 1 ];
+	}
+
+	# these use string fallback rather than nomethod
+	for (qw(x .)) {
+	    my $op = $_;
+	    my $e = "%s $op= 3";
+	    $subs{"$_="} = $e;
+	    # For normal case:
+	    #   ARRAY  FETCH: initial,        sub+=, eval-return,
+	    #   SCALAR FETCH: initial, sub=,  sub+=, eval-return,
+	    #          STORE: copy, mutator
+	    # for fallback, we just stringify, so eval-return and copy skipped
+
+	    push @tests, [ 18, $e, "(=)($_=)", '("")',
+			    [ 3, 4, 2,     2, 3, 1 ], 1 ];
+
+	    $subs{$_} =
+		"do { my \$arg = %s; \$_[2] ? (3 $op \$arg) : (\$arg $op 3) }";
+	    # ARRAY  FETCH: initial
+	    # SCALAR FETCH: initial eval-return,
+	    # with fallback, we just stringify, so eval-return skipped,
+	    #    but an extra FETCH happens in sub"", except for 'x',
+	    #    which passes a copy of the RV to sub"", avoiding the
+	    #    second FETCH
+
+	    push @tests, [ 18, "%s $op 3", "($_)", '("")',
+			    [ 1, 2, 0,     1, ($_ eq '.' ? 2 : 1), 0 ], 1 ];
+	    next if $_ eq 'x'; # repeat only overloads on LHS
+	    push @tests, [ 18, "3 $op %s", "($_)", '("")',
+			    [ 1, 2, 0,     1, 2, 0 ], 1 ];
+	}
+
+	for (qw(++ --)) {
+	    my $pre  = "$_%s";
+	    my $post = "%s$_";
+	    $subs{$_} = $pre;
+	    push @tests,
+		# ARRAY  FETCH: initial,        sub+=, eval-return,
+		# SCALAR FETCH: initial, sub=,  sub+=, eval-return,
+		# STORE:        copy, mutator
+		[ 18, $pre, "(=)($_)(\"\")", "(=)(NM:$_)(\"\")", [ 3, 4, 2 ], 1 ],
+		# ARRAY  FETCH: initial,        sub+=
+		# SCALAR FETCH: initial, sub=,  sub+=
+		# STORE:        copy, mutator
+		[ 18, $post, "(=)($_)(\"\")", "(=)(NM:$_)(\"\")", [ 2, 3, 2 ], 1 ];
+	}
+
+	# For the non-mutator ops, we have a initial FETCH,
+	# an extra FETCH within the sub itself for the scalar option,
+	# and no STOREs
+
+	for (qw(< <= >  >= == != lt le gt ge eq ne)) {
+	    my $e = "%s $_ 3";
+	    $subs{$_} = $e;
+	    push @tests, [ 3, $e, "($_)", "(NM:$_)", [ 1, 2, 0 ], 0 ];
+	}
+	for (qw(<=> cmp)) {
+	    my $e = "%s $_ 3";
+	    $subs{$_} = $e;
+	    push @tests, [ 3, $e, "($_)", "(NM:$_)", [ 1, 2, 0 ], 1 ];
+	}
+	for (qw(atan2)) {
+	    my $e = "$_ %s, 3";
+	    $subs{$_} = $e;
+	    push @tests, [ 18, $e, "($_)", "(NM:$_)", [ 1, 2, 0 ], 1 ];
+	}
+	for (qw(cos sin exp abs log sqrt int ~)) {
+	    my $e = "$_(%s)";
+	    $subs{$_} = $e;
+	    push @tests, [ 1.23, $e, "($_)",
+		    ($_ eq 'int' ? '(0+)' : "(NM:$_)") , [ 1, 2, 0 ], 1 ];
+	}
+	for (qw(!)) {
+	    my $e = "$_(%s)";
+	    $subs{$_} = $e;
+	    push @tests, [ 1.23, $e, "($_)", '(0+)', [ 1, 2, 0 ], 0 ];
+	}
+	for (qw(-)) {
+	    my $e = "$_(%s)";
+	    $subs{neg} = $e;
+	    push @tests, [ 18, $e, '(neg)', '(NM:neg)', [ 1, 2, 0 ], 1 ];
+	}
+	my $e = '(%s) ? 1 : 0';
+	$subs{bool} = $e;
+	push @tests, [ 18, $e, '(bool)', '(0+)', [ 1, 2, 0 ], 0 ];
+
+	# note: this is testing unary qr, not binary =~
+	$subs{qr} = '(qr/%s/)';
+	push @tests, [ "abc", '"abc" =~ (%s)', '(qr)', '("")', [ 1, 2, 0 ], 0 ];
+	push @tests, [ chr 256, 'chr(256) =~ (%s)', '(qr)', '("")',
+	                                                  [ 1, 2, 0 ], 0 ];
+
+	$e = '"abc" ~~ (%s)';
+	$subs{'~~'} = $e;
+	push @tests, [ "abc", $e, '(~~)', '(NM:~~)', [ 1, 1, 0 ], 0 ];
+
+	$subs{'-X'} = 'do { my $f = (%s);'
+		    . '$_[1] eq "r" ? (-r ($f)) :'
+		    . '$_[1] eq "e" ? (-e ($f)) :'
+		    . '$_[1] eq "f" ? (-f ($f)) :'
+		    . '$_[1] eq "l" ? (-l ($f)) :'
+		    . '$_[1] eq "t" ? (-t ($f)) :'
+		    . '$_[1] eq "T" ? (-T ($f)) : 0;}';
+	# Note - we don't care what these file tests return, as
+	# long as the tied and untied versions return the same value.
+	# The flags below are chosen to test all uses of tryAMAGICftest_MG
+	for (qw(r e f l t T)) {
+	    push @tests, [ 'TEST', "-$_ (%s)", '(-X)', '("")', [ 1, 2, 0 ], 0 ];
+	}
+
+	$subs{'${}'} = '%s';
+	push @tests, [ do {my $s=99; \$s}, '${%s}', '(${})', undef, [ 1, 1, 0 ], 0 ];
+
+	# we skip testing '@{}' here because too much of this test
+	# framework involves array dereferences!
+
+	$subs{'%{}'} = '%s';
+	push @tests, [ {qw(a 1 b 2 c 3)}, 'join "", sort keys %%{%s}',
+			'(%{})', undef, [ 1, 1, 0 ], 0 ];
+
+	$subs{'&{}'} = '%s';
+	push @tests, [ sub {99}, 'do {&{%s} for 1,2}',
+			    '(&{})(&{})', undef, [ 2, 2, 0 ], 0 ];
+
+	our $RT57012A = 88;
+	our $RT57012B;
+	$subs{'*{}'} = '%s';
+	push @tests, [ \*RT57012A, '*RT57012B = *{%s}; our $RT57012B',
+		'(*{})', undef, [ 1, 1, 0 ], 0 ];
+
+	my $iter_text = ("some random text\n" x 100) . $^X;
+	open my $iter_fh, '<', \$iter_text
+	    or die "open of \$iter_text gave ($!)\n";
+	$subs{'<>'} = '<$iter_fh>';
+	push @tests, [ $iter_fh, '<%s>', '(<>)', undef, [ 1, 1, 0 ], 1 ];
+	push @tests, [ $iter_fh,
+		      'local *CORE::GLOBAL::glob = sub {}; eval q|<%s>|',
+		      '(<>)', undef, [ 1, 1, 0 ], 1 ];
+
+	# eval should do tie, overload on its arg before checking taint */
+	push @tests, [ '1;', 'eval q(eval %s); $@ =~ /Insecure/',
+		'("")', '("")', [ 1, 2, 0 ], 0 ];
+
+
+	for my $sub (keys %subs) {
+	    no warnings 'experimental::smartmatch';
+	    my $term = $subs{$sub};
+	    my $t = sprintf $term, '$_[0][0]';
+	    my $e ="sub { \$funcs .= '($sub)'; my \$r; if (\$use_int) {"
+		. "use integer; \$r = ($t) } else { \$r = ($t) } \$r }";
+	    $subs{$sub} = eval $e;
+	    die "Compiling sub gave error:\n<$e>\n<$@>\n" if $@;
+	}
+    }
+
+    my $fetches;
+    my $stores;
+
+    package RT57012_OV;
+
+    use overload
+	%subs,
+	"="   => sub { $funcs .= '(=)';  bless [ $_[0][0] ] },
+	'0+'  => sub { $funcs .= '(0+)'; 0 + $_[0][0] },
+	'""'  => sub { $funcs .= '("")'; "$_[0][0]"   },
+	;
+
+    package RT57012_OV_FB; # only contains fallback conversion functions
+
+    use overload
+	"="   => sub { $funcs .= '(=)';  bless [ $_[0][0] ] },
+	'0+'  => sub { $funcs .= '(0+)'; 0 + $_[0][0] },
+	'""'  => sub { $funcs .= '("")'; "$_[0][0]"   },
+	"nomethod" => sub {
+			$funcs .= "(NM:$_[3])";
+			my $e = defined($_[1])
+				? $_[3] eq 'atan2'
+				    ? $_[2]
+				       ? "atan2(\$_[1],\$_[0][0])"
+				       : "atan2(\$_[0][0],\$_[1])"
+				    : $_[2]
+					? "\$_[1] $_[3] \$_[0][0]"
+					: "\$_[0][0] $_[3] \$_[1]"
+				: $_[3] eq 'neg'
+				    ? "-\$_[0][0]"
+				    : "$_[3](\$_[0][0])";
+			my $r;
+			no warnings 'experimental::smartmatch';
+			if ($use_int) {
+			    use integer; $r = eval $e;
+			}
+			else {
+			    $r = eval $e;
+			}
+			::diag("eval of nomethod <$e> gave <$@>") if $@;
+			$r;
+		    }
+
+	;
+
+    package RT57012_TIE_S;
+
+    my $tie_val;
+    sub TIESCALAR { bless [ bless [ $tie_val ], $_[1] ] }
+    sub FETCH     { $fetches++; $_[0][0] }
+    sub STORE     { $stores++;  $_[0][0] = $_[1] }
+
+    package RT57012_TIE_A;
+
+    sub TIEARRAY  { bless [] }
+    sub FETCH     { $fetches++; $_[0][0] }
+    sub STORE     { $stores++;  $_[0][$_[1]] = $_[2] }
+
+    package main;
+
+    for my $test (@tests) {
+	my ($val, $sub_term, $exp_funcs, $exp_fb_funcs,
+	    $exp_counts, $exp_taint) = @$test;
+
+	my $tainted_val;
+	{
+	    # create tainted version of $val (unless its a ref)
+	    my $t = substr($^X,0,0);
+	    my $t0 = $t."0";
+	    my $val1 = $val; # use a copy to avoid stringifying original
+	    $tainted_val = ref($val1) ? $val :
+			($val1 =~ /^[\d\.]+$/) ? $val+$t0 : $val.$t;
+	}
+	$tie_val = $tainted_val;
+
+	for my $int ('', 'use integer; ') {
+	    $use_int = ($int ne '');
+	    my $plain = $tainted_val;
+	    my $plain_term = $int . sprintf $sub_term, '$plain';
+	    my $exp = do {no warnings 'experimental::smartmatch'; eval $plain_term };
+	    diag("eval of plain_term <$plain_term> gave <$@>") if $@;
+	    is(tainted($exp), $exp_taint,
+			"<$plain_term> taint of expected return");
+
+	    for my $ov_pkg (qw(RT57012_OV RT57012_OV_FB)) {
+		next if $ov_pkg eq 'RT57012_OV_FB'
+			and  not defined $exp_fb_funcs;
+		my ($exp_fetch_a, $exp_fetch_s, $exp_store) =
+		    ($ov_pkg eq 'RT57012_OV' || @$exp_counts < 4)
+			? @$exp_counts[0,1,2]
+			: @$exp_counts[3,4,5];
+
+		tie my $ts, 'RT57012_TIE_S', $ov_pkg;
+		tie my @ta, 'RT57012_TIE_A';
+		$ta[0]    = bless [ $tainted_val ], $ov_pkg;
+		my $oload = bless [ $tainted_val ], $ov_pkg;
+
+		for my $var ('$ta[0]', '$ts', '$oload',
+			    ($sub_term eq '<%s>' ? '${ts}' : ())
+		) {
+
+		    $funcs = '';
+		    $fetches = 0;
+		    $stores = 0;
+
+		    my $res_term  = $int . sprintf $sub_term, $var;
+		    my $desc =  "<$res_term> $ov_pkg" ;
+		    my $res = do { no warnings 'experimental::smartmatch'; eval $res_term };
+		    diag("eval of res_term $desc gave <$@>") if $@;
+		    # uniquely, the inc/dec ops return the original
+		    # ref rather than a copy, so stringify it to
+		    # find out if its tainted
+		    $res = "$res" if $res_term =~ /\+\+|--/;
+		    is(tainted($res), $exp_taint,
+			    "$desc taint of result return");
+		    is($res, $exp, "$desc return value");
+		    my $fns =($ov_pkg eq 'RT57012_OV_FB')
+				? $exp_fb_funcs : $exp_funcs;
+		    if ($var eq '$oload' && $res_term !~ /oload(\+\+|--)/) {
+			# non-tied overloading doesn't trigger a copy
+			# except for post inc/dec
+			$fns =~ s/^\(=\)//;
+		    }
+		    is($funcs, $fns, "$desc methods called");
+		    next if $var eq '$oload';
+		    my $exp_fetch = ($var eq '$ts') ?
+			    $exp_fetch_s : $exp_fetch_a;
+		    is($fetches, $exp_fetch, "$desc FETCH count");
+		    is($stores, $exp_store, "$desc STORE count");
+
+		}
+
+	    }
+	}
+    }
+}
+
+# Test overload from the main package
+fresh_perl_is
+ '$^W = 1; use overload q\""\ => sub {"ning"}; print bless []',
+ 'ning',
+  { switches => ['-wl'], stderr => 1 },
+ 'use overload from the main package'
+;
+
+{
+    package blessed_methods;
+    use overload '+' => sub {};
+    bless overload::Method __PACKAGE__,'+';
+    eval { overload::Method __PACKAGE__,'+' };
+    ::is($@, '', 'overload::Method and blessed overload methods');
+}
+
+{
+    # fallback to 'cmp' and '<=>' with heterogeneous operands
+    # [perl #71286]
+    my $not_found = 'no method found';
+    my $used = 0;
+    package CmpBase;
+    sub new {
+        my $n = $_[1] || 0;
+        bless \$n, ref $_[0] || $_[0];
+    }
+    sub cmp {
+        $used = \$_[0];
+        (${$_[0]} <=> ${$_[1]}) * ($_[2] ? -1 : 1);
+    }
+
+    package NCmp;
+    use parent '-norequire', 'CmpBase';
+    use overload '<=>' => 'cmp';
+
+    package SCmp;
+    use parent '-norequire', 'CmpBase';
+    use overload 'cmp' => 'cmp';
+
+    package main;
+    my $n = NCmp->new(5);
+    my $s = SCmp->new(3);
+    my $res;
+
+    eval { $res = $n > $s; };
+    $res = $not_found if $@ =~ /$not_found/;
+    is($res, 1, 'A>B using A<=> when B overloaded, no B<=>');
+
+    eval { $res = $s < $n; };
+    $res = $not_found if $@ =~ /$not_found/;
+    is($res, 1, 'A<B using B<=> when A overloaded, no A<=>');
+
+    eval { $res = $s lt $n; };
+    $res = $not_found if $@ =~ /$not_found/;
+    is($res, 1, 'A lt B using A:cmp when B overloaded, no B:cmp');
+
+    eval { $res = $n gt $s; };
+    $res = $not_found if $@ =~ /$not_found/;
+    is($res, 1, 'A gt B using B:cmp when A overloaded, no A:cmp');
+
+    my $o = NCmp->new(9);
+    $res = $n < $o;
+    is($used, \$n, 'A < B uses <=> from A in preference to B');
+
+    my $t = SCmp->new(7);
+    $res = $s lt $t;
+    is($used, \$s, 'A lt B uses cmp from A in preference to B');
+}
+
+{
+    # Combinatorial testing of 'fallback' and 'nomethod'
+    # [perl #71286]
+    package NuMB;
+    use overload '0+' => sub { ${$_[0]}; },
+        '""' => 'str';
+    sub new {
+        my $self = shift;
+        my $n = @_ ? shift : 0;
+        bless my $obj = \$n, ref $self || $self;
+    }
+    sub str {
+        no strict qw/refs/;
+        my $s = "(${$_[0]} ";
+        $s .= "nomethod, " if defined ${ref($_[0]).'::(nomethod'};
+        my $fb = ${ref($_[0]).'::()'};
+        $s .= "fb=" . (defined $fb ? 0 + $fb : 'undef') . ")";
+    }
+    sub nomethod { "${$_[0]}.nomethod"; }
+
+    # create classes for tests
+    package main;
+    my @falls = (0, 'undef', 1);
+    my @nomethods = ('', 'nomethod');
+    my $not_found = 'no method found';
+    for my $fall (@falls) {
+        for my $nomethod (@nomethods) {
+            my $nomethod_decl = $nomethod
+                ? $nomethod . "=>'nomethod'," : '';
+            eval qq{
+                    package NuMB$fall$nomethod;
+                    use parent '-norequire', qw/NuMB/;
+                    use overload $nomethod_decl
+                    fallback => $fall;
+                };
+        }
+    }
+
+    # operation and precedence of 'fallback' and 'nomethod'
+    # for all combinations with 2 overloaded operands
+    for my $nomethod2 (@nomethods) {
+        for my $nomethod1 (@nomethods) {
+            for my $fall2 (@falls) {
+                my $pack2 = "NuMB$fall2$nomethod2";
+                for my $fall1 (@falls) {
+                    my $pack1 = "NuMB$fall1$nomethod1";
+                    my ($test, $out, $exp);
+                    eval qq{
+                            my \$x = $pack1->new(2);
+                            my \$y = $pack2->new(3);
+                            \$test = "\$x" . ' * ' . "\$y";
+                            \$out = \$x * \$y;
+                        };
+                    $out = $not_found if $@ =~ /$not_found/;
+                    $exp = $nomethod1 ? '2.nomethod' :
+                         $nomethod2 ? '3.nomethod' :
+                         $fall1 eq '1' && $fall2 eq '1' ? 6
+                         : $not_found;
+                    is($out, $exp, "$test --> $exp");
+                }
+            }
+        }
+    }
+
+    # operation of 'fallback' and 'nomethod'
+    # where the other operand is not overloaded
+    for my $nomethod (@nomethods) {
+        for my $fall (@falls) {
+            my ($test, $out, $exp);
+            eval qq{
+                    my \$x = NuMB$fall$nomethod->new(2);
+                    \$test = "\$x" . ' * 3';
+                    \$out = \$x * 3;
+                };
+            $out = $not_found if $@ =~ /$not_found/;
+            $exp = $nomethod ? '2.nomethod' :
+                $fall eq '1' ? 6
+                : $not_found;
+            is($out, $exp, "$test --> $exp");
+
+            eval qq{
+                    my \$x = NuMB$fall$nomethod->new(2);
+                    \$test = '3 * ' . "\$x";
+                    \$out = 3 * \$x;
+                };
+            $out = $not_found if $@ =~ /$not_found/;
+            is($out, $exp, "$test --> $exp");
+        }
+    }
+}
+
+# since 5.6 overloaded <> was leaving an extra arg on the stack!
+
+{
+    package Iter1;
+    use overload '<>' => sub { 11 };
+    package main;
+    my $a = bless [], 'Iter1';
+    my $x;
+    my @a = (10, ($x = <$a>), 12);
+    is ($a[0], 10, 'Iter1: a[0]');
+    is ($a[1], 11, 'Iter1: a[1]');
+    is ($a[2], 12, 'Iter1: a[2]');
+    @a = (10, ($x .= <$a>), 12);
+    is ($a[0],   10, 'Iter1: a[0] concat');
+    is ($a[1], 1111, 'Iter1: a[1] concat');
+    is ($a[2],   12, 'Iter1: a[2] concat');
+}
+
+# Some tests for error messages
+{
+    package Justus;
+    use overload '+' => 'justice';
+    eval {"".bless[]};
+    ::like $@, qr/^Can't resolve method "justice" overloading "\+" in p(?x:
+                  )ackage "Justus" at /,
+      'Error message when explicitly named overload method does not exist';
+
+    package JustUs;
+    our @ISA = 'JustYou';
+    package JustYou { use overload '+' => 'injustice'; }
+    "JustUs"->${\"(+"};
+    eval {"".bless []};
+    ::like $@, qr/^Stub found while resolving method "\?{3}" overloadin(?x:
+                  )g "\+" in package "JustUs" at /,
+      'Error message when sub stub is encountered';
+}
+
+{
+    # check that the right number of stringifications
+    # and the correct un-utf8-ifying happen on regex compile
+    package utf8_match;
+    my $c;
+    use overload '""' => sub { $c++; $_[0][0] ? "^\x{100}\$" : "^A\$"; };
+    my $o = bless [0], 'utf8_match';
+
+    $o->[0] = 0;
+    $c = 0;
+    ::ok("A" =~  "^A\$",	"regex stringify utf8=0 ol=0 bytes=0");
+    ::ok("A" =~ $o,		"regex stringify utf8=0 ol=1 bytes=0");
+    ::is($c, 1,			"regex stringify utf8=0 ol=1 bytes=0 count");
+
+    $o->[0] = 1;
+    $c = 0;
+    ::ok("\x{100}" =~ "^\x{100}\$",
+				"regex stringify utf8=1 ol=0 bytes=0");
+    ::ok("\x{100}" =~ $o,	"regex stringify utf8=1 ol=1 bytes=0");
+    ::is($c, 1,			"regex stringify utf8=1 ol=1 bytes=0 count");
+
+    use bytes;
+
+    $o->[0] = 0;
+    $c = 0;
+    ::ok("A" =~  "^A\$",	"regex stringify utf8=0 ol=0 bytes=1");
+    ::ok("A" =~ $o,		"regex stringify utf8=0 ol=1 bytes=1");
+    ::is($c, 1,			"regex stringify utf8=0 ol=1 bytes=1 count");
+
+    $o->[0] = 1;
+    $c = 0;
+    ::ok(main::byte_utf8a_to_utf8n("\xc4\x80") =~ "^\x{100}\$",
+				"regex stringify utf8=1 ol=0 bytes=1");
+    ::ok(main::byte_utf8a_to_utf8n("\xc4\x80") =~ $o,	"regex stringify utf8=1 ol=1 bytes=1");
+    ::is($c, 1,			"regex stringify utf8=1 ol=1 bytes=1 count");
+
+
+}
+
+# [perl #40333]
+# overload::Overloaded should not use a ->can designed for autoloading.
+# This example attempts to be as realistic as possible.  The o class has a
+# default singleton object, but can have instances, too.  The proxy class
+# represents proxies for o objects, but class methods delegate to the
+# singleton.
+# overload::Overloaded used to return incorrect results for proxy objects.
+package proxy {
+    sub new { bless [$_[1]], $_[0] }
+    sub AUTOLOAD {
+       our $AUTOLOAD =~ s/.*:://;
+       &_self->$AUTOLOAD;
+    }
+    sub can      { SUPER::can{@_} || &_self->can($_[1]) }
+    sub _self { ref $_[0] ? $_[0][0] : $o::singleton }
+}
+package o     { use overload '""' => sub { 'keck' };
+                sub new { bless[], $_[0] }
+                our $singleton = o->new; }
+ok !overload::Overloaded(new proxy new o),
+ 'overload::Overloaded does not incorrectly return true for proxy classes';
+
+# Another test, based on the type of explosive test class for which
+# perl #40333 was filed.
+{
+    package broken_can;
+    sub can {}
+    use overload '""' => sub {"Ahoy!"};
+
+    package main;
+    my $obj = bless [], 'broken_can';
+    ok(overload::Overloaded($obj));
+}
+
+sub eleventative::cos { 'eleven' }
+sub twelvetative::abs { 'twelve' }
+sub thirteentative::abs { 'thirteen' }
+sub fourteentative::abs { 'fourteen' }
+@eleventative::ISA = twelvetative::;
+{
+    my $o = bless [], 'eleventative';
+    eval 'package eleventative; use overload map +($_)x2, cos=>abs=>';
+    is cos $o, 'eleven', 'overloading applies to object blessed before';
+    bless [], 'eleventative';
+    is cos $o, 'eleven',
+      'ovrld applies to previously-blessed obj after other obj is blessed';
+    $o = bless [], 'eleventative';
+    *eleventative::cos = sub { 'ten' };
+    is cos $o, 'ten', 'method changes affect overloading';
+    @eleventative::ISA = thirteentative::;
+    is abs $o, 'thirteen', 'isa changes affect overloading';
+    bless $o, 'fourteentative';
+    @fourteentative::ISA = 'eleventative';
+    is abs $o, 'fourteen', 'isa changes can turn overloading on';
+}
+
+# no overload "fallback";
+{ package phake;
+  use overload fallback => 1, '""' => sub { 'arakas' };
+  no overload 'fallback';
+}
+$a = bless [], 'phake';
+is "$a", "arakas",
+    'no overload "fallback" does not stop overload from working';
+ok !eval { () = $a eq 'mpizeli'; 1 },
+    'no overload "fallback" resets fallback to undef on overloaded class';
+{ package ent; use overload fallback => 0, abs => sub{};
+  our@ISA = 'huorn';
+  package huorn;
+  use overload fallback => 1;
+  package ent;
+  no overload "fallback"; # disable previous declaration
+}
+$a = bless [], ent::;
+is eval {"$a"}, overload::StrVal($a),
+    'no overload undoes fallback declaration completetly'
+ or diag $@;
+
+# inherited fallback
+{
+ package pervyy;
+ our @ISA = 'vtoryy';
+ use overload "abs" =>=> sub {};
+ package vtoryy;
+ use overload fallback => 1, 'sin' =>=> sub{}
+}
+$a = bless [], pervyy::;
+is eval {"$a"}, overload::StrVal($a),
+ 'fallback is inherited by classes that have their own overloading'
+ or diag $@;
+
+# package separators in method names
+{
+ package mane;
+ use overload q\""\ => "bear::strength";
+ use overload bool  => "bear'bouillon";
+}
+@bear::ISA = 'food';
+sub food::strength { 'twine' }
+sub food::bouillon { 0 }
+$a = bless[], mane::;
+is eval { "$a" }, 'twine', ':: in method name' or diag $@;
+is eval { !$a  },   1,      "' in method name" or diag $@;
+
+# [perl #113050] Half of CPAN assumes fallback is under "()"
+{
+  package dodo;
+  use overload '+' => sub {};
+  no strict;
+  *{"dodo::()"} = sub{};
+  ${"dodo::()"} = 1;
+}
+$a = bless [],'dodo';
+is eval {"$a"}, overload::StrVal($a), 'fallback is stored under "()"';
+
+# [perl #47119]
+{
+    my $context;
+
+    {
+        package Splitter;
+        use overload '<>' => \&chars;
+
+        sub new {
+            my $class = shift;
+            my ($string) = @_;
+            bless \$string, $class;
+        }
+
+        sub chars {
+            my $self = shift;
+            my @chars = split //, $$self;
+            $context = wantarray;
+            return @chars;
+        }
+    }
+
+    my $obj = Splitter->new('bar');
+
+    $context = 42; # not 1, '', or undef
+
+    my @foo = <$obj>;
+    is($context, 1, "list context (readline list)");
+    is(scalar(@foo), 3, "correct result (readline list)");
+    is($foo[0], 'b', "correct result (readline list)");
+    is($foo[1], 'a', "correct result (readline list)");
+    is($foo[2], 'r', "correct result (readline list)");
+
+    $context = 42;
+
+    my $foo = <$obj>;
+    ok(defined($context), "scalar context (readline scalar)");
+    is($context, '', "scalar context (readline scalar)");
+    is($foo, 3, "correct result (readline scalar)");
+
+    $context = 42;
+
+    <$obj>;
+    ok(!defined($context), "void context (readline void)");
+
+    $context = 42;
+
+    my @bar = <${obj}>;
+    is($context, 1, "list context (glob list)");
+    is(scalar(@bar), 3, "correct result (glob list)");
+    is($bar[0], 'b', "correct result (glob list)");
+    is($bar[1], 'a', "correct result (glob list)");
+    is($bar[2], 'r', "correct result (glob list)");
+
+    $context = 42;
+
+    my $bar = <${obj}>;
+    ok(defined($context), "scalar context (glob scalar)");
+    is($context, '', "scalar context (glob scalar)");
+    is($bar, 3, "correct result (glob scalar)");
+
+    $context = 42;
+
+    <${obj}>;
+    ok(!defined($context), "void context (glob void)");
+}
+{
+    my $context;
+
+    {
+        package StringWithContext;
+        use overload '""' => \&stringify;
+
+        sub new {
+            my $class = shift;
+            my ($string) = @_;
+            bless \$string, $class;
+        }
+
+        sub stringify {
+            my $self = shift;
+            $context = wantarray;
+            return $$self;
+        }
+    }
+
+    my $obj = StringWithContext->new('bar');
+
+    $context = 42;
+
+    my @foo = "".$obj;
+    ok(defined($context), "scalar context (stringify list)");
+    is($context, '', "scalar context (stringify list)");
+    is(scalar(@foo), 1, "correct result (stringify list)");
+    is($foo[0], 'bar', "correct result (stringify list)");
+
+    $context = 42;
+
+    my $foo = "".$obj;
+    ok(defined($context), "scalar context (stringify scalar)");
+    is($context, '', "scalar context (stringify scalar)");
+    is($foo, 'bar', "correct result (stringify scalar)");
+
+    $context = 42;
+
+    "".$obj;
+
+    is($context, '', "scalar context (stringify void)");
+}
+{
+    my ($context, $swap);
+
+    {
+        package AddWithContext;
+        use overload '+' => \&add;
+
+        sub new {
+            my $class = shift;
+            my ($num) = @_;
+            bless \$num, $class;
+        }
+
+        sub add {
+            my $self = shift;
+            my ($other, $swapped) = @_;
+            $context = wantarray;
+            $swap = $swapped;
+            return ref($self)->new($$self + $other);
+        }
+
+        sub val { ${ $_[0] } }
+    }
+
+    my $obj = AddWithContext->new(6);
+
+    $context = $swap = 42;
+
+    my @foo = $obj + 7;
+    ok(defined($context), "scalar context (add list)");
+    is($context, '', "scalar context (add list)");
+    ok(defined($swap), "not swapped (add list)");
+    is($swap, '', "not swapped (add list)");
+    is(scalar(@foo), 1, "correct result (add list)");
+    is($foo[0]->val, 13, "correct result (add list)");
+
+    $context = $swap = 42;
+
+    @foo = 7 + $obj;
+    ok(defined($context), "scalar context (add list swap)");
+    is($context, '', "scalar context (add list swap)");
+    ok(defined($swap), "swapped (add list swap)");
+    is($swap, 1, "swapped (add list swap)");
+    is(scalar(@foo), 1, "correct result (add list swap)");
+    is($foo[0]->val, 13, "correct result (add list swap)");
+
+    $context = $swap = 42;
+
+    my $foo = $obj + 7;
+    ok(defined($context), "scalar context (add scalar)");
+    is($context, '', "scalar context (add scalar)");
+    ok(defined($swap), "not swapped (add scalar)");
+    is($swap, '', "not swapped (add scalar)");
+    is($foo->val, 13, "correct result (add scalar)");
+
+    $context = $swap = 42;
+
+    my $foo = 7 + $obj;
+    ok(defined($context), "scalar context (add scalar swap)");
+    is($context, '', "scalar context (add scalar swap)");
+    ok(defined($swap), "swapped (add scalar swap)");
+    is($swap, 1, "swapped (add scalar swap)");
+    is($foo->val, 13, "correct result (add scalar swap)");
+
+    $context = $swap = 42;
+
+    $obj + 7;
+
+    ok(!defined($context), "void context (add void)");
+    ok(defined($swap), "not swapped (add void)");
+    is($swap, '', "not swapped (add void)");
+
+    $context = $swap = 42;
+
+    7 + $obj;
+
+    ok(!defined($context), "void context (add void swap)");
+    ok(defined($swap), "swapped (add void swap)");
+    is($swap, 1, "swapped (add void swap)");
+
+    $obj = AddWithContext->new(6);
+
+    $context = $swap = 42;
+
+    my @foo = $obj += 7;
+    ok(defined($context), "scalar context (add assign list)");
+    is($context, '', "scalar context (add assign list)");
+    ok(!defined($swap), "not swapped and autogenerated (add assign list)");
+    is(scalar(@foo), 1, "correct result (add assign list)");
+    is($foo[0]->val, 13, "correct result (add assign list)");
+    is($obj->val, 13, "correct result (add assign list)");
+
+    $obj = AddWithContext->new(6);
+
+    $context = $swap = 42;
+
+    my $foo = $obj += 7;
+    ok(defined($context), "scalar context (add assign scalar)");
+    is($context, '', "scalar context (add assign scalar)");
+    ok(!defined($swap), "not swapped and autogenerated (add assign scalar)");
+    is($foo->val, 13, "correct result (add assign scalar)");
+    is($obj->val, 13, "correct result (add assign scalar)");
+
+    $obj = AddWithContext->new(6);
+
+    $context = $swap = 42;
+
+    $obj += 7;
+
+    ok(defined($context), "scalar context (add assign void)");
+    is($context, '', "scalar context (add assign void)");
+    ok(!defined($swap), "not swapped and autogenerated (add assign void)");
+    is($obj->val, 13, "correct result (add assign void)");
+
+    $obj = AddWithContext->new(6);
+
+    $context = $swap = 42;
+
+    my @foo = ++$obj;
+    ok(defined($context), "scalar context (add incr list)");
+    is($context, '', "scalar context (add incr list)");
+    ok(!defined($swap), "not swapped and autogenerated (add incr list)");
+    is(scalar(@foo), 1, "correct result (add incr list)");
+    is($foo[0]->val, 7, "correct result (add incr list)");
+    is($obj->val, 7, "correct result (add incr list)");
+
+    $obj = AddWithContext->new(6);
+
+    $context = $swap = 42;
+
+    my $foo = ++$obj;
+    ok(defined($context), "scalar context (add incr scalar)");
+    is($context, '', "scalar context (add incr scalar)");
+    ok(!defined($swap), "not swapped and autogenerated (add incr scalar)");
+    is($foo->val, 7, "correct result (add incr scalar)");
+    is($obj->val, 7, "correct result (add incr scalar)");
+
+    $obj = AddWithContext->new(6);
+
+    $context = $swap = 42;
+
+    ++$obj;
+
+    ok(defined($context), "scalar context (add incr void)");
+    is($context, '', "scalar context (add incr void)");
+    ok(!defined($swap), "not swapped and autogenerated (add incr void)");
+    is($obj->val, 7, "correct result (add incr void)");
+}
+
+# [perl #113010]
+{
+    {
+        package OnlyFallback;
+        use overload fallback => 0;
+    }
+    {
+        my $obj = bless {}, 'OnlyFallback';
+        my $died = !eval { "".$obj; 1 };
+        my $err = $@;
+        ok($died, "fallback of 0 causes error");
+        like($err, qr/"\.": no method found/, "correct error");
+    }
+
+    {
+        package OnlyFallbackUndef;
+        use overload fallback => undef;
+    }
+    {
+        my $obj = bless {}, 'OnlyFallbackUndef';
+        my $died = !eval { "".$obj; 1 };
+        my $err = $@;
+        ok($died, "fallback of undef causes error");
+        # this one tries falling back to stringify before dying
+        like($err, qr/"""": no method found/, "correct error");
+    }
+
+    {
+        package OnlyFallbackTrue;
+        use overload fallback => 1;
+    }
+    {
+        my $obj = bless {}, 'OnlyFallbackTrue';
+        my $val;
+        my $died = !eval { $val = "".$obj; 1 };
+        my $err = $@;
+        ok(!$died, "fallback of 1 doesn't cause error")
+            || diag("got error of $err");
+        like($val, qr/^OnlyFallbackTrue=HASH\(/, "stringified correctly");
+    }
+}
+
+{
+    # Making Regexp class overloaded: avoid infinite recursion.
+    # Do this in a separate process since it, well, overloads Regexp!
+    fresh_perl_is(
+	<<'EOF',
+package Regexp;
+use overload q{""} => sub {$_[0] };
+package main;
+my $r1 = qr/1/;
+my $r2 = qr/ABC$r1/;
+print $r2,"\n";
+EOF
+	'(?^:ABC(?^:1))',
+	{ stderr => 1 },
+	'overloaded REGEXP'
+    );
+}
+
+{
+    # RT #121362
+    # splitting the stash HV while rebuilding the overload cache gave
+    # valgrind errors. This test code triggers such a split. It doesn't
+    # actually test anything; its just there for valgrind to spot
+    # problems.
+
+    package A_121362;
+
+    sub stringify { }
+    use overload '""' => 'stringify';
+
+    package B_121362;
+    our @ISA = qw(A_121362);
+
+    package main;
+
+    my $x = bless { }, 'B_121362';
+
+    for ('a'..'z') {
+        delete $B_121362::{stringify}; # delete cache entry
+        no strict 'refs';
+        *{"B_121362::$_"}  = sub { };  # increase size of %B_121362
+        my $y = $x->{value};       # trigger cache add to %B_121362
+    }
+    pass("RT 121362");
+}
+
+package refsgalore {
+    use overload
+	'${}' => sub { \42  },
+	'@{}' => sub { [43] },
+	'%{}' => sub { { 44 => 45 } },
+	'&{}' => sub { sub { 46 } };
+}
+{
+    use feature 'postderef';
+    tell myio; # vivifies *myio{IO} at compile time
+    use constant ioref => bless *myio{IO}, refsgalore::;
+    is ioref->$*, 42, '(overloaded constant that is not a scalar ref)->$*';
+    is ioref->[0], 43, '(ovrld constant that is not an array ref)->[0]';
+    is ioref->{44}, 45, "(ovrld const that is not a hash ref)->{key}";
+    is ioref->(), 46, '(overloaded constant that is not a sub ref)->()';
+}
+
+package xstack { use overload 'x' => sub { shift . " x " . shift },
+                              '""'=> sub { "xstack" } }
+is join(",", 1..3, scalar((bless([], 'xstack')) x 3, 1), 4..6),
+  "1,2,3,1,4,5,6",
+  '(...)x... in void cx with x overloaded [perl #121827]';
+
+package bitops {
+    our @o;
+    use overload do {
+	my %o;
+	for my $o (qw(& | ^ ~ &. |. ^. ~. &= |= ^= &.= |.= ^.=)) {
+	    $o{$o} = sub {
+		::ok !defined $_[3], "undef (or nonexistent) arg 3 for $o";
+		push @o, $o, scalar @_, $_[4]//'u';
+		$_[0]
+	    }
+	}
+	%o, '=' => sub { bless [] };
+    }
+}
+{
+    use experimental 'bitwise';
+    my $o = bless [], bitops::;
+    $_ = $o & 0;
+    $_ = $o | 0;
+    $_ = $o ^ 0;
+    $_ = ~$o;
+    $_ = $o &. 0;
+    $_ = $o |. 0;
+    $_ = $o ^. 0;
+    $_ = ~.$o;
+    $o &= 0;
+    $o |= 0;
+    $o ^= 0;
+    $o &.= 0;
+    $o |.= 0;
+    $o ^.= 0;
+    # elems are in triplets: op, length of @_, numeric? (1/u for y/n)
+    is "@bitops::o", '& 5 1 | 5 1 ^ 5 1 ~ 5 1 &. 3 u |. 3 u ^. 3 u ~. 3 u ' 		   . '&= 5 1 |= 5 1 ^= 5 1 &.= 3 u |.= 3 u ^.= 3 u',
+       'experimental "bitwise" ops'
+}
+package bitops2 {
+    our @o;
+    use overload
+	 nomethod => sub { push @o, $_[3], scalar @_, $_[4]//'u'; $_[0] },
+	'=' => sub { bless [] };
+}
+{
+    use experimental 'bitwise';
+    my $o = bless [], bitops2::;
+    $_ = $o & 0;
+    $_ = $o | 0;
+    $_ = $o ^ 0;
+    $_ = ~$o;
+    $_ = $o &. 0;
+    $_ = $o |. 0;
+    $_ = $o ^. 0;
+    $_ = ~.$o;
+    $o &= 0;
+    $o |= 0;
+    $o ^= 0;
+    $o &.= 0;
+    $o |.= 0;
+    $o ^.= 0;
+    # elems are in triplets: op, length of @_, numeric? (1/u for y/n)
+    is "@bitops2::o", '& 5 1 | 5 1 ^ 5 1 ~ 5 1 &. 4 u |. 4 u ^. 4 u ~. 4 u ' 		    . '&= 5 1 |= 5 1 ^= 5 1 &.= 4 u |.= 4 u ^.= 4 u',
+       'experimental "bitwise" ops with nomethod'
+}
+
+{ # undefining the overload stash -- KEEP THIS TEST LAST
+    package ant;
+    use overload '+' => 'onion';
+    $_ = \&overload::nil;
+    undef %overload::;
+    ()=0+bless[];
+    ::ok(1, 'no crash when undefining %overload::');
+}
+
 
 # EOF

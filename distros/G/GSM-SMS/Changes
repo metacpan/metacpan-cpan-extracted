@@ -1,5 +1,54 @@
 Revision history for Perl extension GSM::SMS.
 
+0.163 Tue Jul 19 17:54:00 CEST 2011
+    - Documentation change upon request.
+
+0.162 Fri Jan  2 19:35:46 PST 2004
+	- An bugfix release with some old bugs fixed. This is the last of the
+	  0.16X seriesn as 0.17X is being build for WAP Push and preliminary
+	  MMS support.
+
+	Sat Jul  5 16:47:57 PDT 2003
+	- Fixed the transport.conf files. Changed '-' to '_' as a word separator.
+	  Thanks to Grzegorz Wioniewski for pointing this one out.
+
+	Tue Apr  8 00:17:18 PDT 2003
+	- Changed the acl for the File transport by default. It now expects an 
+	  msisdn starting with 555. Otherwise it would eat up all the outgoing
+	  request when using a default install.
+	- GSM::SMS::NBS::receive now supports the reporting of a CSCA. This is just
+	  a quick hack. Work is underway to rewrite PDU.pm and the Stack.pm in such
+	  a way that all fields of the incoming PDU and complete message can be
+	  reached.
+
+	Wed Feb  5 00:21:55 PST 2003
+	- It seems that the background issue of the images is related to the
+	  new release of ImageMagick, which seems to invert some monochrome
+	  images with no apparent reason. I solved this  by extending the test 
+	  cases and take in account a normal and an inverted image.
+	- I merged Marcel Brouillet's patch for the background of images. Black is
+	  now always background, white is foreground.
+
+
+0.161	Sat Jan 11 15:21:17 PST 2003
+	- Now I set the version of all modules to the one specified in the
+	  Makefile.PL before release (make setversion). 
+
+	Thu Jan  9 22:56:16 PST 2003
+	- t/5* tests now correctly set the image format to gif.
+	- lib/GSM/SMS/OTA/Bitmap.pm now sets the fore and background color
+	  explicitly, as it seemed that on some systems the logos would be inverted.
+	  (Thanks Marcel Brouillet for finding this bug)
+	- lib/GSM/SMS/OTA/PictureMessage.pm now puts the correct length of the
+	  text data in the stream (Thanks Daniel Podlejski for sending me a fix).
+
+	Mon Dec 30 03:14:04 PST 2002
+	- AT+CREG can return a 5 on success (roaming), Serial.pm now supports this.
+	  (pointed out by Scott Guthery)
+	- RTTTL can contain the values P, C, C#, D, D#, E, F, F#, G, G#, A, A#, H.
+	  GSM::SMS::OTA::RTTTL::OTARTTTL_check() now uses these values. (Thanks Philip
+	  Yara for pointing this out).
+
 0.160 Tue Dec 24 00:36:06 PST 2002
 	- Win32 compatibility for GSM::SMS, Win32 defaults in configuration
 	- Autogenerating README

@@ -8,40 +8,31 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    require './test.pl';
+    set_up_inc('../lib');
 }
 
 use Config;
-require './test.pl'; # for runperl()
-
-print "1..187\n";
-
-my $test = 1;
-sub test (&) {
-  my $ok = &{$_[0]};
-  print $ok ? "ok $test\n" : "not ok $test\n";
-  printf "# Failed at line %d\n", (caller)[2] unless $ok;
-  $test++;
-}
 
 my $i = 1;
 sub foo { $i = shift if @_; $i }
 
 # no closure
-test { foo == 1 };
+is(foo, 1);
 foo(2);
-test { foo == 2 };
+is(foo, 2);
 
 # closure: lexical outside sub
 my $foo = sub {$i = shift if @_; $i };
 my $bar = sub {$i = shift if @_; $i };
-test {&$foo() == 2 };
+is(&$foo(), 2);
 &$foo(3);
-test {&$foo() == 3 };
+is(&$foo(), 3);
 # did the lexical change?
-test { foo == 3 and $i == 3};
+is(foo, 3, 'lexical changed');
+is($i, 3, 'lexical changed');
 # did the second closure notice?
-test {&$bar() == 3 };
+is(&$bar(), 3, 'second closure noticed');
 
 # closure: lexical inside sub
 sub bar {
@@ -51,10 +42,10 @@ sub bar {
 
 $foo = bar(4);
 $bar = bar(5);
-test {&$foo() == 4 };
+is(&$foo(), 4);
 &$foo(6);
-test {&$foo() == 6 };
-test {&$bar() == 5 };
+is(&$foo(), 6);
+is(&$bar(), 5);
 
 # nested closures
 sub bizz {
@@ -69,14 +60,14 @@ sub bizz {
 }
 $foo = bizz();
 $bar = bizz();
-test {&$foo() == 7 };
+is(&$foo(), 7);
 &$foo(8);
-test {&$foo() == 8 };
-test {&$bar() == 7 };
+is(&$foo(), 8);
+is(&$bar(), 7);
 
 $foo = bizz(9);
 $bar = bizz(10);
-test {&$foo(11)-1 == &$bar()};
+is(&$foo(11)-1, &$bar());
 
 my @foo;
 for (qw(0 1 2 3 4)) {
@@ -84,25 +75,21 @@ for (qw(0 1 2 3 4)) {
   $foo[$_] = sub {$i = shift if @_; $i };
 }
 
-test {
-  &{$foo[0]}() == 0 and
-  &{$foo[1]}() == 1 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 3 and
-  &{$foo[4]}() == 4
-  };
+is(&{$foo[0]}(), 0);
+is(&{$foo[1]}(), 1);
+is(&{$foo[2]}(), 2);
+is(&{$foo[3]}(), 3);
+is(&{$foo[4]}(), 4);
 
 for (0 .. 4) {
   &{$foo[$_]}(4-$_);
 }
 
-test {
-  &{$foo[0]}() == 4 and
-  &{$foo[1]}() == 3 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 1 and
-  &{$foo[4]}() == 0
-  };
+is(&{$foo[0]}(), 4);
+is(&{$foo[1]}(), 3);
+is(&{$foo[2]}(), 2);
+is(&{$foo[3]}(), 1);
+is(&{$foo[4]}(), 0);
 
 sub barf {
   my @foo;
@@ -114,25 +101,21 @@ sub barf {
 }
 
 @foo = barf();
-test {
-  &{$foo[0]}() == 0 and
-  &{$foo[1]}() == 1 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 3 and
-  &{$foo[4]}() == 4
-  };
+is(&{$foo[0]}(), 0);
+is(&{$foo[1]}(), 1);
+is(&{$foo[2]}(), 2);
+is(&{$foo[3]}(), 3);
+is(&{$foo[4]}(), 4);
 
 for (0 .. 4) {
   &{$foo[$_]}(4-$_);
 }
 
-test {
-  &{$foo[0]}() == 4 and
-  &{$foo[1]}() == 3 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 1 and
-  &{$foo[4]}() == 0
-  };
+is(&{$foo[0]}(), 4);
+is(&{$foo[1]}(), 3);
+is(&{$foo[2]}(), 2);
+is(&{$foo[3]}(), 1);
+is(&{$foo[4]}(), 0);
 
 # test if closures get created in optimized for loops
 
@@ -141,25 +124,21 @@ for my $n ('A'..'E') {
     $foo{$n} = sub { $n eq $_[0] };
 }
 
-test {
-  &{$foo{A}}('A') and
-  &{$foo{B}}('B') and
-  &{$foo{C}}('C') and
-  &{$foo{D}}('D') and
-  &{$foo{E}}('E')
-};
+ok(&{$foo{A}}('A'));
+ok(&{$foo{B}}('B'));
+ok(&{$foo{C}}('C'));
+ok(&{$foo{D}}('D'));
+ok(&{$foo{E}}('E'));
 
 for my $n (0..4) {
     $foo[$n] = sub { $n == $_[0] };
 }
 
-test {
-  &{$foo[0]}(0) and
-  &{$foo[1]}(1) and
-  &{$foo[2]}(2) and
-  &{$foo[3]}(3) and
-  &{$foo[4]}(4)
-};
+ok(&{$foo[0]}(0));
+ok(&{$foo[1]}(1));
+ok(&{$foo[2]}(2));
+ok(&{$foo[3]}(3));
+ok(&{$foo[4]}(4));
 
 for my $n (0..4) {
     $foo[$n] = sub {
@@ -168,19 +147,17 @@ for my $n (0..4) {
 		   };
 }
 
-test {
-  $foo[0]->()->(0) and
-  $foo[1]->()->(1) and
-  $foo[2]->()->(2) and
-  $foo[3]->()->(3) and
-  $foo[4]->()->(4)
-};
+ok($foo[0]->()->(0));
+ok($foo[1]->()->(1));
+ok($foo[2]->()->(2));
+ok($foo[3]->()->(3));
+ok($foo[4]->()->(4));
 
 {
     my $w;
     $w = sub {
 	my ($i) = @_;
-	test { $i == 10 };
+	is($i, 10);
 	sub { $w };
     };
     $w->(10);
@@ -221,6 +198,7 @@ test {
 	# a naked block, or another named sub
 	for $within (qw!foreach naked other_sub!) {
 
+	  my $test = curr_test();
 	  # Here are a number of variables which show what's
 	  # going on, in a way.
 	  $nc_attempt = 0+		# Named closure attempted
@@ -256,22 +234,15 @@ END_MARK_ONE
 
 	  $code .=  <<"END_MARK_TWO" if $nc_attempt;
     return if index(\$msg, 'will not stay shared') != -1;
-    return if index(\$msg, 'may be unavailable') != -1;
+    return if index(\$msg, 'is not available') != -1;
 END_MARK_TWO
 
 	  $code .= <<"END_MARK_THREE";		# Backwhack a lot!
     print "not ok: got unexpected warning \$msg\\n";
 } }
 
-{
-    my \$test = $test;
-    sub test (&) {
-      my \$ok = &{\$_[0]};
-      print \$ok ? "ok \$test\n" : "not ok \$test\n";
-      printf "# Failed at line %d\n", (caller)[2] unless \$ok;
-      \$test++;
-    }
-}
+require './test.pl';
+curr_test($test);
 
 # some of the variables which the closure will access
 \$global_scalar = 1000;
@@ -425,10 +396,11 @@ END
 	    }
 
 	    # Here's the test:
+	    my $desc = "$inner_type $where_declared $within $inner_sub_test";
 	    if ($inner_type eq 'anon') {
-	      $code .= "test { &\$anon_$test == $expected };\n"
+	      $code .= "is(&\$anon_$test, $expected, '$desc');\n"
 	    } else {
-	      $code .= "test { &named_$test == $expected };\n"
+	      $code .= "is(&named_$test, $expected, '$desc');\n"
 	    }
 	    $test++;
 	  }
@@ -487,14 +459,20 @@ END
 	    { local $/; open IN, $errfile; $errors = <IN>; close IN }
 	  }
 	  print $output;
+	  curr_test($test);
 	  print STDERR $errors;
+	  # This has the side effect of alerting *our* test.pl to the state of
+	  # what has just been passed to STDOUT, so that if anything there has
+	  # failed, our test.pl will print a diagnostic and exit uncleanly.
+	  unlike($output, qr/not ok/, 'All good');
+	  is($errors, '', 'STDERR is silent');
 	  if ($debugging && ($errors || $? || ($output =~ /not ok/))) {
 	    my $lnum = 0;
 	    for $line (split '\n', $code) {
 	      printf "%3d:  %s\n", ++$lnum, $line;
 	    }
 	  }
-	  printf "not ok: exited with error code %04X\n", $? if $?;
+	  is($?, 0, 'exited cleanly') or diag(sprintf "Error code $? = 0x%X", $?);
 	  print '#', "-" x 30, "\n" if $debugging;
 
 	}	# End of foreach $within
@@ -506,7 +484,7 @@ END
 # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
 BEGIN { $vanishing_pad = sub { eval $_[0] } }
 $some_var = 123;
-test { $vanishing_pad->( '$some_var' ) == 123 };
+is($vanishing_pad->('$some_var'), 123, 'RT #9535');
 
 # ... and here's another coredump variant - this time we explicitly
 # delete the sub rather than using a BEGIN ...
@@ -515,7 +493,7 @@ sub deleteme { $a = sub { eval '$newvar' } }
 deleteme();
 *deleteme = sub {}; # delete the sub
 $newvar = 123; # realloc the SV of the freed CV
-test { $a->() == 123 };
+is($a->(), 123, 'RT #9535');
 
 # ... and a further coredump variant - the fixup of the anon sub's
 # CvOUTSIDE pointer when the middle eval is freed, wasn't good enough to
@@ -528,7 +506,7 @@ $a = eval q(
     ]
 );
 @a = ('\1\1\1\1\1\1\1') x 100; # realloc recently-freed CVs
-test { $a->() == 123 };
+is($a->(), 123, 'RT #9535');
 
 # this coredumped on <= 5.8.0 because evaling the closure caused
 # an SvFAKE to be added to the outer anon's pad, which was then grown.
@@ -540,14 +518,14 @@ sub {
     $a = [ 99 ];
     $x->();
 }->();
-test {1};
+pass();
 
 # [perl #17605] found that an empty block called in scalar context
 # can lead to stack corruption
 {
     my $x = "foooobar";
     $x =~ s/o//eg;
-    test { $x eq 'fbar' }
+    is($x, 'fbar', 'RT #17605');
 }
 
 # DAPM 24-Nov-02
@@ -557,14 +535,12 @@ test {1};
 {
     my $x = 1;
     sub fake {
-		test { sub {eval'$x'}->() == 1 };
-	{ $x;	test { sub {eval'$x'}->() == 1 } }
-		test { sub {eval'$x'}->() == 1 };
+		is(sub {eval'$x'}->(), 1, 'RT #18286');
+	{ $x;	is(sub {eval'$x'}->(), 1, 'RT #18286'); }
+		is(sub {eval'$x'}->(), 1, 'RT #18286');
     }
 }
 fake();
-
-# undefining a sub shouldn't alter visibility of outer lexicals
 
 {
     $x = 1;
@@ -572,14 +548,14 @@ fake();
     sub tmp { sub { eval '$x' } }
     my $a = tmp();
     undef &tmp;
-    test { $a->() == 2 };
+    is($a->(), 2,
+       "undefining a sub shouldn't alter visibility of outer lexicals");
 }
 
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
 sub Watch::new { bless [ $_[1], $_[2] ], $_[0] }
 sub Watch::DESTROY { ${$_[0][0]} .= $_[0][1] }
-
 
 # bugid 1028:
 # nested anon subs (and associated lexicals) not freed early enough
@@ -595,25 +571,50 @@ sub linger {
 {
     my $watch = '1';
     linger(\$watch);
-    test { $watch eq '12' }
+    is($watch, '12', 'RT #1028');
 }
 
-require "./test.pl";
+# bugid 10085
+# obj not freed early enough
 
-curr_test(182);
+sub linger2 { 
+    my $obj = Watch->new($_[0], '2');
+    sub { sub { $obj } };
+}   
+{
+    my $watch = '1';
+    linger2(\$watch);
+    is($watch, 12, 'RT #10085');
+}
 
-# Because change #19637 was not applied to 5.8.1.
-SKIP: { skip("tests not in 5.8.", 3) }
+# bugid 16302 - named subs didn't capture lexicals on behalf of inner subs
 
-$test= 185;
+{
+    my $x = 1;
+    sub f16302 {
+	sub {
+	    is($x, 1, 'RT #16302');
+	}->();
+    }
+}
+f16302();
+
+# The presence of an eval should turn cloneless anon subs into clonable
+# subs - otherwise the CvOUTSIDE of that sub may be wrong
+
+{
+    my %a;
+    for my $x (7,11) {
+	$a{$x} = sub { $x=$x; sub { eval '$x' } };
+    }
+    is($a{7}->()->() + $a{11}->()->(), 18);
+}
 
 {
    # bugid #23265 - this used to coredump during destruction of PL_maincv
    # and its children
 
-    my $progfile = "b23265.pl";
-    open(T, ">$progfile") or die "$0: $!\n";
-    print T << '__EOF__';
+    fresh_perl_is(<< '__EOF__', "yxx\n", {stderr => 1}, 'RT #23265');
         print
             sub {$_[0]->(@_)} -> (
                 sub {
@@ -626,23 +627,18 @@ $test= 185;
             , "\n"
         ;
 __EOF__
-    close T;
-    my $got = runperl(progfile => $progfile);
-    test { chomp $got; $got eq "yxx" };
-    END { 1 while unlink $progfile }
 }
 
 {
     # bugid #24914 = used to coredump restoring PL_comppad in the
     # savestack, due to the early freeing of the anon closure
 
-    my $got = runperl(stderr => 1, prog => 
-'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; eval{$f->()}; print qq(ok\n)'
-    );
-    test { $got eq "ok\n" };
+    fresh_perl_is('sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; eval{$f->()}; print qq(ok\n)',
+		  "ok\n", {stderr => 1}, 'RT #24914');
 }
 
-# After newsub is redefined outside the BEGIN, it's CvOUTSIDE should point
+
+# After newsub is redefined outside the BEGIN, its CvOUTSIDE should point
 # to main rather than BEGIN, and BEGIN should be freed.
 
 {
@@ -654,5 +650,165 @@ __EOF__
 	sub newsub {};
 	$x = bless {}, 'X';
     }
-    test { $flag == 1 };
+    is($flag, 1);
 }
+
+sub f {
+    my $x;
+    format ff =
+@
+$r = \$x
+.
+}
+
+{
+    fileno ff;
+    write ff;
+    my $r1 = $r;
+    write ff;
+    my $r2 = $r;
+    isnt($r1, $r2,
+	 "don't copy a stale lexical; create a fresh undef one instead");
+}
+
+# test PL_cv_has_eval.  Any anon sub that could conceivably contain an
+# eval, should be marked as cloneable
+
+{
+
+    my @s;
+    push @s, sub {  eval '1' } for 1,2;
+    isnt($s[0], $s[1], "cloneable with eval");
+    @s = ();
+    push @s, sub { use re 'eval'; my $x; s/$x/1/; } for 1,2;
+    isnt($s[0], $s[1], "cloneable with use re eval");
+    @s = ();
+    push @s, sub { s/1/1/ee; } for 1,2;
+    isnt($s[0], $s[1], "cloneable with //ee");
+}
+
+# [perl #89544]
+{
+   sub trace::DESTROY {
+       push @trace::trace, "destroyed";
+   }
+
+   my $outer2 = sub {
+       my $a = bless \my $dummy, trace::;
+
+       my $outer = sub {
+	   my $b;
+	   my $inner = sub {
+	       undef $b;
+	   };
+
+	   $a;
+
+	   $inner
+       };
+
+       $outer->()
+   };
+
+   my $inner = $outer2->();
+   is "@trace::trace", "destroyed",
+      'closures only close over named variables, not entire subs';
+}
+
+# [perl #113812] Closure prototypes with no CvOUTSIDE (crash caused by the
+#                fix for #89544)
+do "./op/closure_test.pl" or die $@||$!;
+is $closure_test::s2->()(), '10 cubes',
+  'cloning closure proto with no CvOUTSIDE';
+
+# Also brought up in #113812: Even when being cloned, a closure prototype
+# might have its CvOUTSIDE pointing to the wrong thing.
+{
+    package main::113812;
+    $s1 = sub {
+	my $x = 3;
+	$s2 = sub {
+	    $x;
+	    $s3 = sub { $x };
+	};
+    };
+    $s1->();
+    undef &$s1; # frees $s2's prototype, causing the $s3 proto to have its
+                # CvOUTSIDE point to $s1
+    ::is $s2->()(), 3, 'cloning closure proto whose CvOUTSIDE has changed';
+}
+
+# This should never emit two different values:
+#     print $x, "\n";
+#     print sub { $x }->(), "\n";
+# This test case started to do just that in commit 33894c1aa3e
+# (5.10.1/5.12.0):
+sub mosquito {
+    my $x if @_;
+    return if @_;
+
+    $x = 17;
+    is sub { $x }->(), $x, 'closing over stale var in 2nd sub call';
+}
+mosquito(1);
+mosquito;
+# And this case in commit adf8f095c588 (5.14):
+sub anything {
+    my $x;
+    sub gnat {
+	$x = 3;
+	is sub { $x }->(), $x,
+	    'closing over stale var before 1st sub call';
+    }
+}
+gnat();
+
+# [perl #114018] Similar to the above, but with string eval
+sub staleval {
+    my $x if @_;
+    return if @_;
+
+    $x = 3;
+    is eval '$x', $x, 'eval closing over stale var in active sub';
+    return # 
+}
+staleval 1;
+staleval;
+
+# [perl #114888]
+# Test that closure creation localises PL_comppad_name properly.  Usually
+# at compile time a BEGIN block will localise PL_comppad_name for use, so
+# pp_anoncode can mess with it without any visible effects.
+# But inside a source filter, it affects the directly enclosing compila-
+# tion scope.
+SKIP: {
+    skip_if_miniperl("no XS on miniperl (for source filters)");
+    fresh_perl_is <<'    [perl #114888]', "ok\n", {stderr=>1},
+	use strict;
+	BEGIN {
+	    package Foo;
+	    use Filter::Util::Call;
+	    sub import { filter_add( sub {
+		my $status = filter_read();
+		sub { $status };
+		$status;
+	    })}
+	    Foo->import
+	}
+	my $x = "ok\n";	# stores $x in the wrong padnamelist
+	print $x;	# cannot find it - strict violation
+    [perl #114888]
+        'closures in source filters do not interfere with pad names';
+}
+
+sub {
+    my $f;
+    sub test_ref_to_unavailable {
+	my $ref = \$f;
+        $$ref = 7;
+        is $f, 7, 'taking a ref to unavailable var should not copy it';
+    }
+};
+test_ref_to_unavailable();
+
+done_testing();

@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Release;
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 # ABSTRACT: Query the per-release summary testers data
 
 #pod =head1 SYNOPSIS
@@ -18,16 +18,7 @@ our $VERSION = '0.005';
 #pod
 #pod =head1 SEE ALSO
 #pod
-#pod =over
-#pod
-#pod =item L<DBIx::Class::ResultSet>
-#pod
-#pod =item L<CPAN::Testers::Schema>
-#pod
-#pod =item L<http://github.com/cpan-testers/cpantesters-project>
-#pod
-#pod For an overview of how the CPANTesters project works, and for information about
-#pod project goals and to get involved.
+#pod L<DBIx::Class::ResultSet>, L<CPAN::Testers::Schema>
 #pod
 #pod =cut
 
@@ -86,7 +77,7 @@ CPAN::Testers::Schema::ResultSet::Release - Query the per-release summary tester
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -126,16 +117,7 @@ ISO8601 date.
 
 =head1 SEE ALSO
 
-=over
-
-=item L<DBIx::Class::ResultSet>
-
-=item L<CPAN::Testers::Schema>
-
-=item L<http://github.com/cpan-testers/cpantesters-project>
-
-For an overview of how the CPANTesters project works, and for information about
-project goals and to get involved.
+L<DBIx::Class::ResultSet>, L<CPAN::Testers::Schema>
 
 =head1 AUTHORS
 

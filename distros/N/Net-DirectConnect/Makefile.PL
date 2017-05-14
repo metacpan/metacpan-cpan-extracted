@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use ExtUtils::MakeMaker;
 #See lib/ExtUtils/MakeMaker.pm for details of how to influence
 #the contents of the Makefile that is written.
@@ -13,7 +14,14 @@ use ExtUtils::MakeMaker;
     'IO::Compress::Bzip2'           => 0,    #preparing filelists
     'DBI'                           => 0,
     'DBD::SQLite'                   => 0,
-    'Net::DirectConnect::TigerHash' => 0,
+    #'Net::DirectConnect::TigerHash' => 0,
+    'Crypt::RHash'                  => 0,
+    'IO::Socket::IP'                => 0,
+    #'IO::Socket::INET6'             => 0,
+    #'Socket6'                       => 0,
+    'IO::Socket::SSL' => 0,
+    'JSON'            => 0,
+    'JSON::XS'        => 0,
   },
   NORECURS  => 1,
   EXE_FILES => [qw(examples/dcshare examples/dcget examples/dchub)],
@@ -43,7 +51,9 @@ sub MY::postamble {
 
 fullclean: distclean veryclean
 	rm -f \$(DISTNAME)-*.tar.gz *.bak *.old *.core MANIFEST README
-	rm -Rf p5-Net-DirectConnect TigerHash lib/Net/DirectConnect/pslib/*.js lib/Net/DirectConnect/pslib/*.css lib/Net/DirectConnect/pslib/psweb.pm
+	rm -fr p5-Net-DirectConnect TigerHash lib/Net/DirectConnect/pslib/*.js lib/Net/DirectConnect/pslib/*.css
+
+# lib/Net/DirectConnect/pslib/psweb.pm
 
 prerelease:
 

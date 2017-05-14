@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Kvpar;
+
+usage() if @ARGV == 0;
+my $cond = shift;
+my ($k, $v) = split /=/, $cond, 2;
+
+my $kvout = File::Kvpar->new(\*STDOUT);
+
+foreach my $f (@ARGV) {
+    my $kv = File::Kvpar->new($f);
+    foreach my $e ($kv->elements) {
+        if (defined $e->{$k} && $e->{$k} eq $v) {
+            $kvout->write($e);
+        }
+    }
+}

@@ -9,14 +9,14 @@ package Lemonldap::NG::Portal::_Choice;
 use Lemonldap::NG::Portal::Simple;
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.4.9';
+our $VERSION = '1.9.3';
 
 ## @cmethod Lemonldap::NG::Portal::_Choice new(Lemonldap::NG::Portal::Simple portal)
 # Constructor
 # @param $portal Lemonldap::NG::Portal::Simple object
 # @return new Lemonldap::NG::Portal::_Choice object
 sub new {
-    my ( $class, $portal ) = splice @_;
+    my ( $class, $portal ) = @_;
 
     # Create object with portal parameter
     my $self = bless { p => $portal }, $class;
@@ -63,7 +63,7 @@ sub new {
         if ($samlForce) {
             $portal->lmLog( "SAML is a forced choice", 'debug' );
             $portal->{_authChoice} = 'forcedSAML';
-            $portal->{authChoiceModules}->{'forcedSAML'} = 'SAML|SAML|Null';
+            $portal->{authChoiceModules}->{'forcedSAML'} = 'SAML;SAML;Null';
         }
 
     }
@@ -72,7 +72,8 @@ sub new {
 
     # Find modules associated to authChoice
     my ( $auth, $userDB, $passwordDB ) =
-      split( /\|/, $portal->{authChoiceModules}->{ $portal->{_authChoice} } );
+      split( /[;\|]/,
+        $portal->{authChoiceModules}->{ $portal->{_authChoice} } );
 
     if ( $auth and $userDB and $passwordDB ) {
 
@@ -114,7 +115,7 @@ sub new {
 # @param type 0 for authentication, 1 for userDB, 2 for passworDB
 # @return Lemonldap::NG::Portal error code returned by method $sub
 sub try {
-    my ( $self, $sub, $type ) = splice @_;
+    my ( $self, $sub, $type ) = @_;
 
     # Default behavior in no choice
     unless ( defined $self->{modules} ) {
@@ -191,7 +192,7 @@ sub _buildAuthLoop {
 
         # Find modules associated to authChoice
         my ( $auth, $userDB, $passwordDB, $url ) =
-          split( /\|/, $self->{authChoiceModules}->{$_} );
+          split( /[;\|]/, $self->{authChoiceModules}->{$_} );
 
         if ( $auth and $userDB and $passwordDB ) {
 
@@ -212,6 +213,14 @@ sub _buildAuthLoop {
             $self->lmLog( "Display type $displayType for module $auth",
                 'debug' );
             $optionsLoop->{$displayType} = 1;
+
+            # If displayType is logo, check if key.png is available
+            if (
+                -e $self->getApacheHtdocsPath . "/skins/common/" . $_ . ".png" )
+            {
+                $optionsLoop->{logoFile} = $_ . ".png";
+            }
+            else { $optionsLoop->{logoFile} = $auth . ".png"; }
 
             # Register item in loop
             push @authLoop, $optionsLoop;

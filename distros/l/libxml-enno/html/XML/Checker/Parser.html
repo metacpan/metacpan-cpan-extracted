@@ -30,7 +30,9 @@
 
 </PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
 
-</A></H1><P>I hope the example in the SYNOPSIS says it all, just use 
+</A></H1><P>XML::Checker::Parser extends <A HREF="../Parser.html">XML::Parser</A>
+
+<P>I hope the example in the SYNOPSIS says it all, just use 
 <A HREF="Parser.html">XML::Checker::Parser</A> as if it were an XML::Parser. 
 See <A HREF="../Parser.html">XML::Parser</A> for the supported (expat) options.
 
@@ -49,18 +51,49 @@ from XML::Parser. All you should have to do is replace:
 
 </A></H1><PRE> $parser = new XML::Checker::Parser (SkipExternalDTD =&gt; 1, SkipInsignifWS =&gt; 1);
 
-</PRE><P>The constructor takes the same parameters as <A HREF="../Parser.html">XML::Parser</A> with two additions,
-the SkipExternalDTD and SkipInsignifWS properties.
+</PRE><P>The constructor takes the same parameters as <A HREF="../Parser.html">XML::Parser</A> with the following additions:
 
-<P>By default, it will try to load external DTDs using LWP. You can disable this
+<DL><DT><A NAME="SkipExternalDTD_"><STRONG><P>SkipExternalDTD
+
+</STRONG></A><DD>By default, it will try to load external DTDs using LWP. You can disable this
 by setting SkipExternalDTD to 1. See <A HREF="#External_DTDs">External DTDs</A> for details.
 
-<P>By default, it will treat insignificant whitespace as regular Char data.
+<DT><A NAME="SkipInsignifWS_"><STRONG><P>SkipInsignifWS
+
+</STRONG></A><DD>By default, it will treat insignificant whitespace as regular Char data.
 By setting SkipInsignifWS to 1, the user Char handler will not be called
 if insignificant whitespace is encountered. 
 See <A HREF="../Checker.html#INSIGNIFICANT_WHITESPACE">XML::Checker/INSIGNIFICANT_WHITESPACE</A> for details.
 
-<P><HR><H1><A NAME="External_DTDs">External DTDs
+<DT><A NAME="LWP_UserAgent_"><STRONG><P>LWP_UserAgent
+
+</STRONG></A><DD>When calling parsefile() with a URL (instead of a filename) or when loading
+external DTDs, we use LWP to download the
+remote file. By default it will use a <A>LWP::UserAgent</A> that is created as follows:
+
+<PRE> use LWP::UserAgent;
+ $LWP_USER_AGENT = LWP::UserAgent-&gt;new;
+ $LWP_USER_AGENT-&gt;env_proxy;
+
+</PRE><P>Note that <A>env_proxy</A> reads proxy settings from your environment variables, 
+which is what I need to do to get thru our firewall. 
+If you want to use a different LWP::UserAgent, you can either set
+it globally with:
+
+<PRE> XML::Checker::Parser::set_LWP_UserAgent ($my_agent);
+
+</PRE><P>or, you can specify it for a specific XML::Checker::Parser by passing it to 
+the constructor:
+
+<PRE> my $parser = new XML::Checker::Parser (LWP_UserAgent =&gt; $my_agent);
+
+</PRE><P>Currently, LWP is used when the filename (passed to parsefile) starts with one of
+the following URL schemes: http, https, ftp, wais, gopher, or file 
+(followed by a colon.) If I missed one, please let me know. 
+
+<P>The LWP modules are part of libwww-perl which is available at CPAN.
+
+</DL><P><HR><H1><A NAME="External_DTDs">External DTDs
 
 </A></H1><P>XML::Checker::Parser will try to load and parse external DTDs that are 
 referenced in DOCTYPE definitions unless you set the <B>SkipExternalDTD</B>
@@ -165,4 +198,4 @@ the same encoding as the orignal XML document.
 <P><HR><H1><A NAME="SEE_ALSO">SEE ALSO
 
 </A></H1><P><A HREF="../Checker.html">XML::Checker</A> (<A HREF="../Checker.html#SEE_ALSO">XML::Checker/SEE_ALSO</A>), <A HREF="../Parser.html">XML::Parser</A>
-<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:21 1999</FONT></I></BODY></HTML>
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:16 2000</FONT></I></BODY></HTML>

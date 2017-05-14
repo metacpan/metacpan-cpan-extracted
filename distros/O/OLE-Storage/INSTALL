@@ -1,0 +1,25 @@
+
+To install the package, assure to have write permissions for you Perl 
+Library directories. Then do the lines:
+
+   perl Makefile.PL
+
+   make install
+
+This will install the Laola:: module hierarchy to your system and also
+the demo programs:
+
+   lclean  - cleans trash out of OLE docs
+   ldat    - lists PropertySets in OLE docs
+   lhalw   - converts MS Word 6+ docs to text
+   lls     - lists file structure of OLE docs
+
+If you need assure where to install executables, library files and manpages, 
+install the distribution with the PREFIX option, like:
+
+   perl Makefile.PL PREFIX=/usr/local/
+
+   make install
+
+Martin
+

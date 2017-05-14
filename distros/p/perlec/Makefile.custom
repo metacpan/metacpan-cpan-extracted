@@ -1,0 +1,67 @@
+# -----------------------------------------------------------------------------
+# Makefile for perlec.
+# -----------------------------------------------------------------------------
+# Mastering programmed by YAMASHINA Hio
+#
+# Copyright 2007 YAMASHINA Hio
+# -----------------------------------------------------------------------------
+# $Id$
+# -----------------------------------------------------------------------------
+
+DISTNAME=perlec
+VERSION=0.08
+DISTVERNAME=$(DISTNAME)-$(VERSION)
+
+PERLRUN=perl
+PERL_CCOPTS=$(shell $(PERLRUN) -MExtUtils::Embed -e ccopts)
+PERL_CCLDOPTS=$(shell $(PERLRUN) -MExtUtils::Embed -e ccopts -e ldopts)
+PERL_ARCHLIB=$(shell $(PERLRUN) -MConfig -e 'print $$Config{archlib}')/CORE
+
+CFLAGS=-Wall -g -O0 -I$(PERL_CCOPTS)
+
+DLLD_Linux=gcc -shared -fPIC
+DLLD_Darwin=cc -bundle -undefined dynamic_lookup -fPIC 
+DLLD=$(DLLD_$(shell uname -s))
+
+# -----------------------------------------------------------------------------
+# all, clean, test, install, docs.
+#
+all: perlec.a perlec.so
+
+install: all
+	cp -f perlec.a perlec.so perlec.h $(PERL_ARCHLIB)/
+
+clean:
+	rm -rf perlec.so perlec.o perlec.a
+
+test: all
+	@echo no tests.
+
+# -----------------------------------------------------------------------------
+# build rules.
+#
+
+perlec.so: perlec.c perlec.h
+	$(DLLD) $(CFLAGS) perlec.c -o $@ $(PERL_CCLDOPTS)
+
+perlec.a: perlec.c perlec.h
+	$(CC) $(CFLAGS) perlec.c -c $(PERL_CCOPTS)
+	$(AR) r perlec.a perlec.o
+
+# perlre_test
+perlre_test: perlec.c example/perlre_test.c
+	$(CC) $(CFLAGS) example/perlre_test.c perlec.c -I. $(PERL_CCLDOPTS) -o $@
+
+# -----------------------------------------------------------------------------
+# dist.
+#
+dist:
+	rm -rf $(DISTVERNAME) $(DISTVERNAME).tar $(DISTVERNAME).tar.gz
+	$(PERLRUN) -MExtUtils::Manifest=manicopy,maniread -e 'manicopy(maniread(), "$(DISTVERNAME)")'
+	tar cvf $(DISTVERNAME).tar $(DISTVERNAME)
+	gzip --best $(DISTVERNAME).tar
+	rm -rf $(DISTVERNAME)
+
+# -----------------------------------------------------------------------------
+# End of File.
+# -----------------------------------------------------------------------------

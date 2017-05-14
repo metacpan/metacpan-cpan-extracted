@@ -1,0 +1,61 @@
+H1: 2.000beta9a
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+A series of LOGO_BASE variables have been introduced so that
+the browser-time location of HTML images can be different
+to the compile-time location. For example, by defining:
+
+E:!define DOC_LOGO      "mylogo"
+E:!define DOC_LOGO_BASE "/images/"
+
+the URL of the logo image will be "/images/mylogo.gif".
+
+New aliases have been introduced to make it easier to
+rebuild topics (+mt) and chapters (+mc) in the MIMS documentation.
+For example, to build the PostScript for the MIMS topic called
+3201_msm200a.sdf, the command is:
+
+E:       sdf -2ps +mt 3201_msm200a
+
+H2: Fixes
+
+Perl 5.004 introduced a warning about an odd number of elements
+in a hash list which previous versions of SDF occasionally triggered.
+The cause of the warning has now been fixed.
+
+The {{label}} parameter on the {{FILT:note}} filter now works.
+
+Some minor documentation corrections have been made. In particular,
+the URL for the Ultimate editor is now correct.
+
+Lines now appear above and below notes in HTML.
+
+H2: Incompatibilities
+
+The {{FILT:box}} filter has been changed to do what people expect.
+The old behaviour is available by adding the {{lines}} parameter.
+
+H2: Future Incompatibilities!
+
+The {{B:next}} version of SDF is probably going to be (almost)
+upwardly compatible with Perl5's POD format. As a result,
+the = character will be a multi-line macro invocation,
+rather than being a shorthand for E:. If you are currently
+using =, please replace it with E: in preparation for the
+next release.
+
+Making SDF upwardly compatible with POD will undoubtedly
+introduce a few other incompatibility problems. However,
+I'll do what I can to minimise these. The goal is to make
+it possible to use SDF for Perl5 module documentation when
+POD is not sufficient.
+
+If you have any feedback on the idea of making SDF upwardly
+compatible with POD, send some email to the SDF users
+mailing list ({{EMAIL:sdf-users@mincom.com}}).
+
+This release will also be the last one supporting Perl 4.036.
+Future releases will require Perl 5.

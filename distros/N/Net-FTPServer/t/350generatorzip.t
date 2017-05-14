@@ -1,16 +1,8 @@
-#!/usr/bin/perl -w
-
-# $Id: 350generatorzip.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
-
-BEGIN {
-  plan tests => 75;
-}
 
 # Skip all tests if Archive::Zip, Compress::Zlib doesn't exist, or if
 # 'unzip' executable is not in the path.
@@ -19,11 +11,11 @@ eval "use Compress::Zlib";
 unless (exists $INC{"Archive/Zip.pm"} && exists $INC{"Compress/Zlib.pm"} &&
 	on_path ("unzip"))
   {
-    for (my $i = 0; $i < 75; ++$i) {
-      skip ("missing support for ZIP files", 1);
-    }
+    plan skip_all => "missing support for ZIP files";
     exit 0;
   }
+
+plan tests => 75;
 
 use Net::FTPServer::InMem::Server;
 
@@ -298,3 +290,5 @@ sub on_path
       }
     0;
   }
+
+__END__

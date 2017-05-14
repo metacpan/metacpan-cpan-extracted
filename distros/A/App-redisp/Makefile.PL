@@ -4,31 +4,32 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Perl redis shell',
-  'AUTHOR' => 'David Leadbeater <dgl@dgl.cx>',
-  'BUILD_REQUIRES' => {},
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+  "ABSTRACT" => "Perl redis shell",
+  "AUTHOR" => "David Leadbeater <dgl\@dgl.cx>",
+  "BUILD_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'App-redisp',
-  'EXE_FILES' => [
-    'bin/redisp'
+  "DISTNAME" => "App-redisp",
+  "EXE_FILES" => [
+    "bin/redisp"
   ],
-  'LICENSE' => 'unrestricted',
-  'NAME' => 'App::redisp',
-  'PREREQ_PM' => {
-    'Data::Dump' => '0',
-    'Moo' => '0',
-    'Tie::Redis' => '0'
+  "LICENSE" => "unrestricted",
+  "NAME" => "App::redisp",
+  "PREREQ_PM" => {
+    "Data::Dump" => 0,
+    "Eval::WithLexicals" => "1.002",
+    "Moo" => 0,
+    "Tie::Redis" => 0
   },
-  'VERSION' => '0.11',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.13",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 

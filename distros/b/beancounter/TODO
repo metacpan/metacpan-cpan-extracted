@@ -1,0 +1,102 @@
+
+* stock splits
+  [ idempotent backpopulation, which is done in 0.5.0, eases this a little ] 
+
+* annualised returns
+  [was done in status command, currently turned off; probably needs another
+   switch to allow a date after which we annualise, say a year]
+  [turned back on again]
+
+* clean up code
+
+* more error checking on calls to DBI et al
+
+* read more info from the rc file ~/.beancounterrc such as host, 
+  port, user, ... 
+  [ mostly done; this grows organically on an as-needed basis ]
+
+* allow "restrictions" on beancounter operations, eg do a portfolio update at
+  13:00 EST with the restriction of doing it only for shares with currencies
+  that are GBP or EUR (or SEK or DKK ...) to get the European market
+  [ done in 0.2.0, also added 'extrafx' argument ]
+
+* there is buglet that rears its head when a stock is added to portfolio 
+  during business hours as its current price is also added for that day ...
+  which creates a conflict when that stock is later updated during the normal
+  update. This is difficult to circumvent as we don't want to reinvent
+  cron within beancounter. Either we do update for the current day (as we do
+  now, which has the problem) or don't (in which case we might never get that
+  datum if we updated after the daily cron run)
+  [ cf below on idempotent operations, should no longer be an issue ]
+
+* fx quotes are currently retrieved via Yahoo from the Philadelphia exchange
+  -- but that means no quotes are available on US holidays. 
+
+* We also have no access to historical FX data for backpopulation
+  [ as of 0.6.0 we do, albeit at a grizzly two-decimals precision ]
+
+* there is also a plain error somewhere as eg a DEM based portfolio sees a
+  return even though a EUR traded stock didn't move -- can't really happen
+  as DEM/EUR rates are fixed. Maybe add an crosscurrency table/hash and do
+  no ask Yahoo! if cross-rate known 
+  [ not an issue if portfolio is reported in EUR ]
+
+* Yahoo seems to return bad date information every now and then. A
+  "scrubbing" between retrieval and databasing might help: we can check if
+  other data points for the same exchange have a different date and then use
+  this as an override. Might be overkill.
+  [ partly done; now have --forcedate option ]
+
+* Allow for cash holdings
+  [ partly done; needs support for adding/changing/deleting positions ]
+
+* Options (.X) volume adjustment (ie an option contract is over 100 shares)
+
+* MySQL support
+  [ added in 0.4.0 following Mathias' patch with the initial MySQL schema ]
+
+* Beancounterrc manual page
+  [ there is an updated section in the beancounter(1) manual page ]
+
+* Idempotent operation, ie call update several times a day
+  [ added in 0.4.0 based on Mathias' patch ]
+
+* Versioning of db schema, ie add new table "version" with one column
+  and maybe a date
+
+* update_beancounter needs to reflect the post-0.3.1 table changes
+  [ done, tested against 0.1.1, 0.3.0 and 0.3.1 (with PostgreSQL) ]
+
+* beancounter regression test data set, data "feeding" program and test 
+  routines
+  [ Mathias is looking into this ]
+
+* updates for stocks in stockinfo but not in portfolio; maybe via an option
+  to update (eg --fullupdate)
+  [ done in 0.4.0 via rewriting of the symbol selection SQL query ]
+
+* new command for partial deletes (ie from portfolio, but leave stockinfo and
+  stockprices). Or maybe make partial delete the default, and only nuke from
+  stockinfo/stockprices if --purge option given
+
+* GUI:
+  -- one choice would be via perl/Tk [ but IMHO Tk's canvas widget is too
+     primitive ]
+  -- another via R's (www.r-project.org) tcltk package; R's advanced graphics
+     and analysis functions could shine there [ have prototypes ]
+  -- web-based via mod_perl [ Mathias' suggestion ]
+
+* (really distant wishlist feature) build portfolio up from stock trades, 
+  have analysis driven from transactions
+
+* new columns "soldprice","solddate" to compute returns on completed 
+  transactions
+ 
+* suppress noisy error messages when we have not enough data for the risk 
+  report
+
+* added 'active' boolean field to stockinfo
+  [ done in 0.5.0 ]
+
+* restrictions don't aggregate right if they only "partly" hit a holding
+  (eg holding a stock in two accounts, blocking one --> still get total)

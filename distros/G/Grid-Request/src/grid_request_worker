@@ -3,6 +3,7 @@
 use strict;
 use Data::Dumper;
 use Grid::Request::HTC;
+use Grid::Request::JobFormulator;
 use Log::Log4perl qw(:easy);
 use Config::IniFiles;
 use Sys::Hostname;
@@ -51,67 +52,25 @@ if (! defined $task_id || $task_id <= 0) {
 $logger->info("Task id for this worker: $task_id");
 
 # an array of arrays for all the parameters to invoke
-my @arg_groups = ();
-foreach my $param (@mw_params) {
-    $logger->debug(qq|Processing parameter "$param"|);
-    my $arg_ref = get_arguments_for_param($task_id, $block_size, $param);
-    # Continue building our array of arrays.
-    push (@arg_groups, $arg_ref);
-}
-# Chop all the arg_groups according to the group with the smallest size
-@arg_groups = limit_arguments(\@arg_groups);
-execute($executable, \@arg_groups);
+my @invocations = $jb->formulate($block_size, $, @mw_params);
+@invocations = splice_task_invocations(\@invocations);
+execute(\@invocations);
 
 #############################################################################
 
-sub limit_arguments {
-    my $arg_group_ref = shift;
-    my @arg_groups = @$arg_group_ref;
-    # Chop all the arg_groups according to the group with the smallest size
-    my $min;
-    foreach my $group (@arg_groups) {
-        # $group is an array ref here
-        my $current_size = scalar(@$group);
-        if (defined $min) {
-            if ($current_size < $min) {
-                $min = $current_size;
-            }
-        } else {
-            $min = $current_size;
-        }
-    }
-    $logger->debug("Determined that the number of times we can iterate with these arguments is $min.");
-
-    # Now that we know the minimum size, we can limit each group
-    my @limited_groups;
-    my $group_number = 0;
-    foreach my $group (@arg_groups) {
-        $group_number++;
-        my $size = scalar(@$group);
-        if ($size > $min) {
-            # Okay, this group is too big. Cut it down to size
-            $logger->debug("Cutting argument group number $group_number down to $min from $size.");
-            # Change teh array size by assigning to $#ARRAY
-            my @lesser = @$group;
-            $#lesser = $min - 1;
-            $group = \@lesser;
-        }
-        push (@limited_groups, $group);
-    }
-    return wantarray ? @limited_groups : \@limited_groups;
+sub splice_task_invocations {
 }
 
 sub execute {
     $logger->debug("In execute.");
-    my ($executable, $arg_group_ref) = @_;
+    my ($arg_group_ref) = @_;
     my ($success, $failed) = (0,0);
     my $count = 0;
 
     my $group_size = scalar @$arg_group_ref;
-    $logger->debug("The number of arguments each invocation of $executable will have: $group_size");
+    $logger->debug("The number of arguments each command invocation of will have: $group_size");
 
     if ( $group_size > 0 ) {
-
         # Length of the various argument arrays should all be the same, so we'll just use
         # the length of the first one.
         my $arg_length = scalar(@{ $arg_group_ref->[0] });
@@ -120,11 +79,12 @@ sub execute {
         for (my $arg_index = 0; $arg_index < $arg_length; $arg_index++) {
             $count++;
 
-            my @exec = ($executable);
+            my @exec = ();
 
             for (my $group_index = 0; $group_index < $group_size; $group_index++) {
                 my $arg = $arg_group_ref->[$group_index]->[$arg_index];
 
+                # TODO: This should be done in the JobFormulator formulate() method
                 # Replace $(Index) with the task id.
                 $arg =~ s/\$\(Index\)/$task_id/g;
                 
@@ -241,116 +201,4 @@ sub validate_mw_params {
             $logger->logdie("Invalid MW parameter encountered: \"$param\"");
         }
     }
-}
-
-sub get_arguments_for_param {
-    my ($task_id, $blocksize, $param) = @_;
-    my $arg_ref;
-    my ($type, $value, $key) = split(/$MW_PARAM_DELIMITER/, $param);
-    $type = uc($type);
-    
-    # This should be dynamic. Dynamically load a module that computes the array
-    # at runtime.
-    if ($type eq "PARAM") {
-        # So for PARAM type arguments, there will only be 2 fields, like so:
-        # param:string because there is nothing to iterate over. Therefore, the
-        # $key should be undef and is ignored.
-        my @args;
-        # TODO: There is some clever way to do this (x $blocksize), it just escapes
-        # me right now
-        for (my $arg_index = 0; $arg_index < $blocksize; $arg_index++) {
-            push (@args, $value);
-        }
-        $arg_ref = \@args;
-    } elsif ($type eq "DIR") {
-        $arg_ref = get_dir_args($value, $key, $task_id, $blocksize);
-    } elsif ($type eq "FILE") {
-        $arg_ref = get_file_args($value, $key, $task_id, $blocksize);
-    } else {
-        # TODO: Throw an exception
-        # Possibly, try a dynamic load of a module
-        $logger->logdie("Unrecognized parameter type of \"$type\".");
-    }
-
-    return $arg_ref;
-}
-
-sub get_dir_args {
-    my ($dir, $key, $task_id, $blocksize) = @_;
-
-    my @args = ();
-
-    # Read all the files in the directory into an array. Then take
-    # the appropriate slice of the array according to our block size
-    # and our task id. Then cycle through those filenames and replace
-    # any tokens in the $key, then push that resultant argument to
-    # the @args array.
-
-    opendir(DIR, $dir) || $logger->logdie("Cannot open directory $dir: $!");
-    my @files = grep { /^[^\.]/ && -f "$dir/$_" } readdir(DIR);
-    closedir DIR;
-    $logger->debug("Finished scanning directory $dir");
-
-    @files = sort(@files);
-    $logger->debug("Files scanned: ", sub { Dumper(\@files) } );
-
-    my $offset = $block_size * ($task_id - 1);
-    if ($offset + $blocksize > scalar(@files) - 1) {
-        $logger->info("This worker appears to be the last since it doesn't have a full compliment of tasks.");
-    }
-
-    if ($offset > scalar(@files) - 1) {
-        $logger->logdie("Insufficent number of files scanned for this worker.");
-    } else {
-        my @files_to_use = splice(@files, $offset, $block_size);
-        $logger->debug("Files to use for this worker: ", sub { Dumper(\@files_to_use) } );
-        foreach my $file (@files_to_use) {
-            $logger->debug(qq|Using file: "$file"|);
-            my $final_arg = $key;
-            $final_arg =~ s/\$\(Name\)/$file/g;
-            push (@args, $final_arg);
-        }
-    }
-    $logger->info("Total number of files to use: " . scalar(@args));
-
-    return \@args;
-}
-
-sub get_file_args {
-    my ($file, $key, $task_id, $blocksize) = @_;
-
-    my @args = ();
-
-    # Open the file specified by the param, drop down to the first line
-    # that should be included according to the blocksize and task id.
-    # Then read $blocksize lines into an array. cycle through these
-    # lines that were pulled and replace any tokens in the $key and
-    # push that resultant argument to the @args array.
-    $logger->info("About to open $file");
-    my $lines_to_skip = $blocksize * ($task_id - 1);
-    $logger->debug("Number of lines to skip down: $lines_to_skip.");
-
-    open (FILE, "<", $file) or die "Unable to open $file for reading.";
-
-    # Skip down to where we should start reading (if we need to skip anything).
-    if ($lines_to_skip > 0) {
-        my $skipped = 0;
-        while ($skipped < $lines_to_skip) {
-            <FILE>;
-            $skipped++;
-        }
-    }
-
-    # Read the lines that this worker should be processing.
-    for (my $valid_count = 0; $valid_count < $blocksize; $valid_count++) {
-        last if eof FILE;
-        my $valid_line = <FILE>;
-        chomp($valid_line);
-        $logger->debug(qq|Using line: "$valid_line"|);
-        my $final_arg = $key;
-        $final_arg =~ s/\$\(Name\)/$valid_line/g;
-        push (@args, $final_arg);
-    } 
-    close FILE or die "Unable to close $file.";
-    return \@args;
 }

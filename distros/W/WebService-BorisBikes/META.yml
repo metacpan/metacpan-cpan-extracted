@@ -1,0 +1,27 @@
+---
+abstract: 'Provides a Perl interface to the London Cycle Hire Scheme.'
+author:
+  - 'Victor Houston <victorhouston@gmail.com>'
+build_requires:
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-BorisBikes
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  GIS::Distance::Lite: 0
+  Geo::Postcode: 0
+  LWP::Simple: 0
+  Perl6::Slurp: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  XML::Simple: 0
+version: 0.14

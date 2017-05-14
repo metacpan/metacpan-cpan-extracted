@@ -1,0 +1,288 @@
+/*
+ * CORBA C language mapping tests
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Author: Phil Dawes <philipd@users.sourceforge.net>
+ *
+ * Minor commenting-out for parsing with perl module CORBA::IDLtree 
+ *  by: Oliver Kellogg <okellogg@users.sourceforge.net>
+ */
+
+#pragma prefix "orbit"
+
+module test {
+	const char CONST_CHAR = 't';
+	const short CONST_SHORT = 0x1234;
+	const long CONST_LONG = 0x12345678;
+	const long long CONST_LONG_LONG = 0x12345678;
+	const string CONST_STRING = "ConstString";
+	const float CONST_FLOAT = 1234.56;
+	const double CONST_DOUBLE = 1234.5678;
+	const long double CONST_LONG_DOUBLE = 1234.567891;
+	const boolean CONST_BOOLEAN = TRUE;
+	enum Soup { veggie, chicken, tomato, oxtail }; 
+	const Soup FAVORITE_SOUP = veggie; 
+	const Soup HORRIBLE_SOUP = oxtail; 
+
+	// Forward declarations
+	interface BasicServer;
+  
+	interface StructServer;
+	interface SequenceServer;
+	interface UnionServer;
+	interface ArrayServer;
+	interface AnyServer;
+	interface BaseServer;
+	interface B1;
+	interface B2;
+	interface DerivedServer;
+	interface TransientObj;
+	interface ContextServer;
+	interface DeadReferenceObj;
+	interface PingPongServer;
+
+	interface TestFactory {
+		BasicServer getBasicServer();
+		StructServer getStructServer();
+		string getStructServerIOR();
+		SequenceServer getSequenceServer();
+		UnionServer getUnionServer();
+		ArrayServer getArrayServer();
+		AnyServer getAnyServer();
+		ContextServer getContextServer();
+		oneway void segv (in string when);
+		BaseServer getBaseServer();
+		DerivedServer getDerivedServer();
+		BaseServer getDerivedServerAsBaseServer();
+		B2 getDerivedServerAsB2();
+		TransientObj createTransientObj();
+		DeadReferenceObj createDeadReferenceObj();
+		PingPongServer createPingPongServer ();
+		void noOp ();
+	};
+
+	interface DeadReferenceObj {
+		void test ();
+	};
+
+	interface TransientObj {
+		void remove();
+	};
+
+	struct FixedLengthStruct {
+		short a;
+	};
+  
+	struct VariableLengthStruct {
+		string a;
+	};
+
+	struct StructAny {
+		string a;
+		any    b;
+	};
+
+	struct CompoundStruct {
+		VariableLengthStruct a;
+	};
+
+	struct ObjectStruct {
+		DerivedServer serv;
+	};
+
+	typedef sequence<string> StrSeq;
+	typedef sequence<string> AnotherStrSeq;
+	typedef sequence<CompoundStruct,2> BoundedStructSeq;
+	typedef sequence<long,2> BoundedLongSeq;
+	typedef sequence<long> LongSeq;
+	typedef sequence<StrSeq> StrSeqSeq;
+	typedef sequence<any> AnySeq;
+
+	struct StructWithSequenceInIt {
+		StrSeqSeq theSeq;
+	};
+
+
+	interface SequenceServer {
+		StrSeq opStrSeq(in StrSeq inArg, inout StrSeq inoutArg, out StrSeq outArg);
+		BoundedStructSeq opBoundedStructSeq(in BoundedStructSeq inArg,
+						    inout BoundedStructSeq inoutArg,
+						    out BoundedStructSeq outArg);
+	};
+  
+	enum AnEnum { 
+		ENUM_IN,
+ 		ENUM_INOUT_IN,
+		ENUM_INOUT_OUT,
+		ENUM_OUT,
+		ENUM_RETN
+	};
+
+	exception SimpleException {
+	};
+  
+	exception TestException {
+	  string reason;
+	  long number;
+	  LongSeq aseq;
+	  TestFactory factory;
+	};
+
+	const long SequenceLen = 4;
+
+	typedef long LongArray[SequenceLen];
+	typedef string StrArray[SequenceLen];
+	typedef string StrArrayMultiDimensional[SequenceLen][3][5];
+	typedef VariableLengthStruct VariableLengthStructArray[SequenceLen];
+
+	interface ArrayServer {
+		LongArray opLongArray(in LongArray inArg, inout LongArray inoutArg, out LongArray outArg);
+		StrArray opStrArray(in StrArray inArg, inout StrArray inoutArg, out StrArray outArg);
+	};
+  
+	interface BasicServer {
+		attribute string foo;
+		readonly attribute long bah;
+		string opString(in string inArg, inout string inoutArg, out string outArg);
+		long opLong(in long inArg, inout long inoutArg, out long outArg);
+		long long opLongLong(in long long inArg, inout long long inoutArg, out long long outArg);
+		float opFloat (in float inArg, inout float inoutArg, out float outArg);
+		double opDouble (in double inArg, inout double inoutArg, out double outArg);
+		long double opLongDouble (in long double inArg, inout long double inoutArg, out long double outArg);
+		AnEnum opEnum(in AnEnum inArg, inout AnEnum inoutArg, out AnEnum outArg);
+		void opException() raises(TestException);
+		oneway void opOneWay(in string inArg);
+		void noImplement ();
+		void testLargeStringSeq (in StrSeq seq);
+	};
+
+	interface StructServer : BasicServer {
+		FixedLengthStruct opFixed       (in FixedLengthStruct       inArg, 
+						 inout FixedLengthStruct    inoutArg,
+						 out FixedLengthStruct      outArg);
+		VariableLengthStruct opVariable (in VariableLengthStruct    inArg, 
+						 inout VariableLengthStruct inoutArg,
+						 out VariableLengthStruct   outArg);
+		CompoundStruct opCompound       (in CompoundStruct          inArg, 
+						 inout CompoundStruct       inoutArg,
+						 out CompoundStruct         outArg);
+		oneway void    opObjectStruct   (in ObjectStruct            inArg);
+		StructAny opStructAny           ();
+	};
+
+	interface BaseServer {
+		long opPolymorphic();
+		attribute string attribPolymorphic;
+	};
+
+	// diamond of death, + an additional single inheritance level
+	interface B1 : BaseServer {
+        };
+	interface B2 : BaseServer {
+        };
+	interface C1 : B1,B2 {
+        };
+
+	interface DerivedServer : C1 {
+        };
+
+	union FixedLengthUnion switch (char) {
+	case 'a': long x;
+	case 'b': char y;
+	case 'c': 
+	case 'd': boolean z;
+	case 'e': FixedLengthStruct v;
+	};
+
+	union VariableLengthUnion switch (long) {
+	case 1: long x;
+	default: long w;
+	case 2: string y;
+	case 3: 
+	case 4: boolean z;
+	case 5: VariableLengthStruct a;
+	case 6: StrSeq b;
+	case 7: FixedLengthUnion c;
+	case 8: StrArray d;
+	};
+
+	// union EnumUnion switch (enum Colour { red, green, blue })
+        // Commented out for CORBA::IDLtree.
+        // (I can't believe anybody would seriously write that !)
+        enum Colour { red, green, blue };
+	union EnumUnion switch (Colour) {
+	case red: long x;
+	case blue: boolean y;
+	};
+
+	union BooleanUnion switch(boolean) {
+	// case 0:  This is not good, let's try stronger typing:
+        case FALSE:
+	        VariableLengthStruct x;
+	// case 1:  This is not good, let's try stronger typing:
+	case TRUE:
+		string y;
+	};
+
+	typedef string StrArray2[20];
+
+	union ArrayUnion switch(unsigned short) {
+	case 22: StrArray2 d;
+	};
+
+	typedef sequence <VariableLengthUnion> unionSeq;
+
+	interface UnionServer {
+		FixedLengthUnion opFixed (in FixedLengthUnion    inArg, 
+					  inout FixedLengthUnion inoutArg,
+					  out FixedLengthUnion   outArg);
+
+		VariableLengthUnion opVariable (in VariableLengthUnion    inArg, 
+						inout VariableLengthUnion inoutArg,
+						out VariableLengthUnion   outArg);
+
+		EnumUnion opMisc (in unionSeq     inSeq,
+				  in BooleanUnion inArg,
+				  out ArrayUnion  outArg);
+	};
+
+	interface AnyServer {
+		any opAnyStrSeq();
+		any opAnyLong(in any inArg, inout any inoutArg, out any outArg);
+		any opAnyString(in any inArg, inout any inoutArg, out any outArg);
+		any opAnyStruct(in any inArg, inout any inoutArg, out any outArg);
+		TypeCode opTypeCode(in TypeCode inArg, inout TypeCode inoutArg, out TypeCode outArg);
+	};
+
+	interface ContextServer {
+		Object opWithContext(in Object inArg, inout Object inoutArg, out Object outArg)
+                // Commented out for CORBA::IDLtree.
+                // (Haven't felt it worthwhile yet. Prove me wrong :)
+                //      context ("foo", "bar")
+                ;
+	};
+
+	interface PingPongServer {
+		oneway void opSleep  (in string large_string);
+		oneway void opOneWay (in long l);
+		long        pingPong (in PingPongServer replyTo,
+				      in long idx);
+		void        set      (in PingPongServer reg,
+				      in string         name);
+		Object      get      (in string         name);
+	};
+};
+

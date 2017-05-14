@@ -1,0 +1,259 @@
+# zxid/sg/access_control-xacml-2.0-policy-schema-os.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: access_control-xacml-2.0-policy-schema-os.sg,v 1.3 2007-08-10 19:19:10 sampo Exp $
+
+target(xa, urn:oasis:names:tc:xacml:2.0:policy:schema:os)
+
+PolicySet -> %xa:PolicySetType
+%PolicySetType:
+  xa:Description?
+  xa:PolicySetDefaults?
+  xa:Target
+  xa:PolicySet?
+  xa:Policy?
+  xa:PolicySetIdReference?
+  xa:PolicyIdReference?
+  xa:CombinerParameters?
+  xa:PolicyCombinerParameters?
+  xa:PolicySetCombinerParameters?
+  xa:Obligations?
+  @PolicySetId -> %xs:anyURI
+  @Version?    -> %xa:VersionType  # default (1.0)
+  @PolicyCombiningAlgId -> %xs:anyURI
+  ;
+
+CombinerParameters -> %xa:CombinerParametersType
+%CombinerParametersType:
+  xa:CombinerParameter*
+  ;
+
+CombinerParameter -> %xa:CombinerParameterType
+%CombinerParameterType:
+  xa:AttributeValue
+  @ParameterName -> %xs:string
+  ;
+
+RuleCombinerParameters -> %xa:RuleCombinerParametersType
+%RuleCombinerParametersType: base(xa:CombinerParametersType)
+  @RuleIdRef -> %xs:string
+  ;
+
+PolicyCombinerParameters -> %xa:PolicyCombinerParametersType
+%PolicyCombinerParametersType: base(xa:CombinerParametersType)
+  @PolicyIdRef -> %xs:anyURI
+  ;
+
+PolicySetCombinerParameters -> %xa:PolicySetCombinerParametersType
+%PolicySetCombinerParametersType: base(xa:CombinerParametersType)
+  @PolicySetIdRef -> %xs:anyURI
+  ;
+
+PolicySetIdReference -> %xa:IdReferenceType
+
+PolicyIdReference -> %xa:IdReferenceType
+
+PolicySetDefaults -> %xa:DefaultsType
+
+PolicyDefaults -> %xa:DefaultsType
+
+%DefaultsType:
+  xa:XPathVersion
+  ;
+
+XPathVersion -> %xs:anyURI
+
+%IdReferenceType:    base(xs:anyURI)
+  @Version?          -> %xa:VersionMatchType
+  @EarliestVersion?  -> %xa:VersionMatchType
+  @LatestVersion?    -> %xa:VersionMatchType
+  ;
+
+%VersionType: base(xs:string) ;
+
+%VersionMatchType: base(xs:string) ;
+
+Policy -> %xa:PolicyType
+%PolicyType:
+  xa:Description?
+  xa:PolicyDefaults?
+  xa:Target
+  xa:CombinerParameters?
+  xa:RuleCombinerParameters?
+  xa:VariableDefinition?
+  xa:Rule?
+  xa:Obligations?
+  @PolicyId            -> %xs:anyURI
+  @Version?            -> %xa:VersionType  # default (1.0)
+  @RuleCombiningAlgId  -> %xs:anyURI
+  ;
+
+Description -> %xs:string
+
+Rule -> %xa:RuleType
+%RuleType:
+  xa:Description?
+  xa:Target?
+  xa:Condition?
+  @RuleId -> %xs:string
+  @Effect -> %xa:EffectType
+  ;
+
+%EffectType: enum( Permit Deny ) ;
+
+Target -> %xa:TargetType
+%TargetType:
+  xa:Subjects?
+  xa:Resources?
+  xa:Actions?
+  xa:Environments?
+  ;
+
+Subjects -> %xa:SubjectsType
+%SubjectsType:
+  xa:Subject+
+  ;
+
+Subject -> %xa:SubjectType
+%SubjectType:
+  xa:SubjectMatch+
+  ;
+
+Resources -> %xa:ResourcesType
+%ResourcesType:
+  xa:Resource+
+  ;
+
+Resource -> %xa:ResourceType
+%ResourceType:
+  xa:ResourceMatch+
+  ;
+
+Actions -> %xa:ActionsType
+%ActionsType:
+  xa:Action+
+  ;
+
+Action -> %xa:ActionType
+%ActionType:
+  xa:ActionMatch+
+  ;
+
+Environments -> %xa:EnvironmentsType
+%EnvironmentsType:
+  xa:Environment+
+  ;
+
+Environment -> %xa:EnvironmentType
+%EnvironmentType:
+  xa:EnvironmentMatch+
+  ;
+
+SubjectMatch -> %xa:SubjectMatchType
+%SubjectMatchType:
+  xa:AttributeValue
+  xa:SubjectAttributeDesignator?
+  xa:AttributeSelector?
+  @MatchId -> %xs:anyURI
+  ;
+
+ResourceMatch	 -> %xa:ResourceMatchType
+%ResourceMatchType:
+  xa:AttributeValue
+  xa:ResourceAttributeDesignator?
+  xa:AttributeSelector?
+  @MatchId	 -> %xs:anyURI
+  ;
+
+ActionMatch	 -> %xa:ActionMatchType
+%ActionMatchType:
+  xa:AttributeValue
+  xa:ActionAttributeDesignator?
+  xa:AttributeSelector?
+  @MatchId	 -> %xs:anyURI
+  ;
+
+EnvironmentMatch	 -> %xa:EnvironmentMatchType
+%EnvironmentMatchType:
+  xa:AttributeValue
+  xa:EnvironmentAttributeDesignator?
+  xa:AttributeSelector?
+  @MatchId	 -> %xs:anyURI
+  ;
+
+VariableDefinition	 -> %xa:VariableDefinitionType
+%VariableDefinitionType:
+  xa:Expression
+  @VariableId	 -> %xs:string
+  ;
+
+Expression -> %xa:ExpressionType
+ExpressionType: base(xs:string);  # abstract type, used as a substitutionGroup
+
+VariableReference -> %xa:VariableReferenceType
+%VariableReferenceType:  base(xa:ExpressionType)
+  @VariableId            -> %xs:string
+  ;
+
+AttributeSelector        -> %xa:AttributeSelectorType
+%AttributeSelectorType:  base(xa:ExpressionType)
+  @RequestContextPath    -> %xs:string
+  @DataType              -> %xs:anyURI
+  @MustBePresent?        -> %xs:boolean  default (false)
+  ;
+
+ResourceAttributeDesignator    -> %xa:AttributeDesignatorType
+ActionAttributeDesignator      -> %xa:AttributeDesignatorType
+EnvironmentAttributeDesignator -> %xa:AttributeDesignatorType
+%AttributeDesignatorType:      base(xa:ExpressionType)
+  @AttributeId                 -> %xs:anyURI
+  @DataType                    -> %xs:anyURI
+  @Issuer?                     -> %xs:string
+  @MustBePresent?              -> %xs:boolean  default (false)
+  ;
+
+SubjectAttributeDesignator        -> %xa:SubjectAttributeDesignatorType
+%SubjectAttributeDesignatorType:  base(xa:AttributeDesignatorType)
+  @SubjectCategory?               -> %xs:anyURI  # default (urn:oasis:names:tc:xa:1.0:subject-category:access-subject)
+  ;
+
+AttributeValue        -> %xa:AttributeValueType
+%AttributeValueType:  base(xa:ExpressionType)
+  any*  processContents(lax)
+  @DataType -> %xs:anyURI
+  @any?  # ns(##any)
+  ;
+
+Function       -> %xa:FunctionType
+%FunctionType: base(xa:ExpressionType)
+  @FunctionId  -> %xs:anyURI
+  ;
+
+Condition -> %xa:ConditionType
+%ConditionType:
+  xa:Expression
+  ;
+
+Apply             -> %xa:ApplyType
+%ApplyType:       base(xa:ExpressionType)
+  xa:Expression*
+  @FunctionId     -> %xs:anyURI
+  ;
+
+Obligations       -> %xa:ObligationsType
+%ObligationsType:
+  xa:Obligation+
+  ;
+
+Obligation        -> %xa:ObligationType
+%ObligationType:
+  xa:AttributeAssignment*
+  @ObligationId   -> %xs:anyURI
+  @FulfillOn      -> %xa:EffectType
+  ;
+
+AttributeAssignment        -> %xa:AttributeAssignmentType
+%AttributeAssignmentType:  base(xa:AttributeValueType)
+  @AttributeId             -> %xs:anyURI
+  ;
+
+#EOF

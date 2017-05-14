@@ -1,7 +1,7 @@
 /* WIN32.H
  *
  * (c) 1995 Microsoft Corporation. All rights reserved.
- * 		Developed by hip communications inc., http://info.hip.com/info/
+ * 		Developed by hip communications inc.
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -10,7 +10,48 @@
 #define  _INC_WIN32_PERL5
 
 #ifndef _WIN32_WINNT
-#  define _WIN32_WINNT 0x0400     /* needed for TryEnterCriticalSection() etc. */
+#  define _WIN32_WINNT 0x0500     /* needed for CreateHardlink() etc. */
+#endif
+
+/* Win32 only optimizations for faster building */
+#ifdef PERL_IS_MINIPERL
+/* this macro will remove Winsock only on miniperl, PERL_IMPLICIT_SYS and
+ * makedef.pl create dependencies that will keep Winsock linked in even with
+ * this macro defined, even though sockets will be umimplemented from a script
+ * level in full perl
+ */
+#  define WIN32_NO_SOCKETS
+/* less I/O calls during each require */
+#  define PERL_DISABLE_PMC
+
+/* unnecessery for miniperl to lookup anything from an "installed" perl */
+#  define WIN32_NO_REGISTRY
+
+/* allow minitest to work */
+#  define PERL_TEXTMODE_SCRIPTS
+#endif
+
+#ifdef WIN32_NO_SOCKETS
+#  undef HAS_SOCKET
+#  undef HAS_GETPROTOBYNAME
+#  undef HAS_GETPROTOBYNUMBER
+#  undef HAS_GETPROTOENT
+#  undef HAS_GETNETBYNAME
+#  undef HAS_GETNETBYADDR
+#  undef HAS_GETNETENT
+#  undef HAS_GETSERVBYNAME
+#  undef HAS_GETSERVBYPORT
+#  undef HAS_GETSERVENT
+#  undef HAS_GETHOSTBYNAME
+#  undef HAS_GETHOSTBYADDR
+#  undef HAS_GETHOSTENT
+#  undef HAS_SELECT
+#  undef HAS_IOCTL
+#  undef HAS_NTOHL
+#  undef HAS_HTONL
+#  undef HAS_HTONS
+#  undef HAS_NTOHS
+#  define WIN32SCK_IS_STDSCK
 #endif
 
 #if defined(PERL_IMPLICIT_SYS)
@@ -22,9 +63,6 @@
 #  ifdef PERL_GLOBAL_STRUCT
 #    error PERL_GLOBAL_STRUCT cannot be defined with PERL_IMPLICIT_SYS
 #  endif
-#  define win32_get_privlib PerlEnv_lib_path
-#  define win32_get_sitelib PerlEnv_sitelib_path
-#  define win32_get_vendorlib PerlEnv_vendorlib_path
 #endif
 
 #ifdef __GNUC__
@@ -41,22 +79,73 @@
 
 
 /* Define DllExport akin to perl's EXT,
- * If we are in the DLL or mimicing the DLL for Win95 work round
- * then Export the symbol,
+ * If we are in the DLL then Export the symbol,
  * otherwise import it.
  */
 
 /* now even GCC supports __declspec() */
-
-#if defined(PERLDLL) || defined(WIN95FIX)
-#define DllExport
-/*#define DllExport __declspec(dllexport)*/	/* noises with VC5+sp3 */
+/* miniperl has no reason to export anything */
+#if defined(PERL_IS_MINIPERL) && !defined(UNDER_CE) && defined(_MSC_VER)
+#  define DllExport
 #else
-#define DllExport __declspec(dllimport)
+#  if defined(PERLDLL)
+#    define DllExport __declspec(dllexport)
+#  else
+#    define DllExport __declspec(dllimport)
+#  endif
+#endif
+
+/* The Perl APIs can only be called directly inside the perl5xx.dll.
+ * All other code has to import them.  By declaring them as "dllimport"
+ * we tell the compiler to generate an indirect call instruction and
+ * avoid redirection through a call thunk.
+ *
+ * The XS code in the re extension is special, in that it redefines
+ * core APIs locally, so don't mark them as "dllimport" because GCC
+ * cannot handle this situation.
+ */
+#if !defined(PERLDLL) && !defined(PERL_EXT_RE_BUILD)
+#  ifdef __cplusplus
+#    define PERL_CALLCONV extern "C" __declspec(dllimport)
+#    ifdef _MSC_VER
+#      define PERL_CALLCONV_NO_RET extern "C" __declspec(dllimport) __declspec(noreturn)
+#    endif
+#  else
+#    define PERL_CALLCONV __declspec(dllimport)
+#    ifdef _MSC_VER
+#      define PERL_CALLCONV_NO_RET __declspec(dllimport) __declspec(noreturn)
+#    endif
+#  endif
+#else /* MSVC noreturn support inside the interp */
+#  ifdef _MSC_VER
+#    define PERL_CALLCONV_NO_RET __declspec(noreturn)
+#  endif
+#endif
+
+#ifdef _MSC_VER
+#  define PERL_STATIC_NO_RET __declspec(noreturn) static
+#  define PERL_STATIC_INLINE_NO_RET __declspec(noreturn) PERL_STATIC_INLINE
 #endif
 
 #define  WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+/*
+ * Bug in winbase.h in mingw-w64 4.4.0-1 at least... they
+ * do #define GetEnvironmentStringsA GetEnvironmentStrings and fail
+ * to declare GetEnvironmentStringsA.
+ */
+#if defined(__MINGW64__) && defined(GetEnvironmentStringsA) && !defined(UNICODE)
+#ifdef __cplusplus
+extern "C" {
+#endif
+#undef GetEnvironmentStringsA
+WINBASEAPI LPCH WINAPI GetEnvironmentStringsA(VOID);
+#define GetEnvironmentStrings GetEnvironmentStringsA
+#ifdef __cplusplus
+}
+#endif
+#endif
 
 #ifdef   WIN32_LEAN_AND_MEAN		/* C file is NOT a Perl5 original. */
 #define  CONTEXT	PERL_CONTEXT	/* Avoid conflict of CONTEXT defs. */
@@ -114,44 +203,24 @@ struct utsname {
 #define  DOSISH		1		/* no escaping our roots */
 #define  OP_BINARY	O_BINARY	/* mistake in in pp_sys.c? */
 
-/* Define USE_SOCKETS_AS_HANDLES to enable emulation of windows sockets as
- * real filehandles. XXX Should always be defined (the other version is untested) */
-#define USE_SOCKETS_AS_HANDLES
-
 /* read() and write() aren't transparent for socket handles */
-#define PERL_SOCK_SYSREAD_IS_RECV
-#define PERL_SOCK_SYSWRITE_IS_SEND
+#ifndef WIN32_NO_SOCKETS
+#  define PERL_SOCK_SYSREAD_IS_RECV
+#  define PERL_SOCK_SYSWRITE_IS_SEND
+#endif
+
+#ifdef WIN32_NO_REGISTRY
+/* the last _ in WIN32_NO_REGISTRY_M_ is like the _ in aTHX_ */
+#  define WIN32_NO_REGISTRY_M_(x)
+#else
+#  define WIN32_NO_REGISTRY_M_(x) x,
+#endif
 
 #define PERL_NO_FORCE_LINK		/* no need for PL_force_link_funcs */
 
-/* Define USE_FIXED_OSFHANDLE to fix MSVCRT's _open_osfhandle() on W95.
-   It now uses some black magic to work seamlessly with the DLL CRT and
-   works with MSVC++ 4.0+ or GCC/Mingw32
-	-- BKS 1-24-2000
-   Only use this fix for VC++ 6.x or earlier (and for GCC, which we assume
-   uses MSVCRT.DLL). Later versions use MSVCR70.dll, MSVCR71.dll, etc, which
-   do not require the fix. */
-#if (defined(_M_IX86) && _MSC_VER >= 1000 && _MSC_VER <= 1200) || defined(__MINGW32__)
-#define USE_FIXED_OSFHANDLE
-#endif
-
-/* Define PERL_WIN32_SOCK_DLOAD to have Perl dynamically load the winsock
-   DLL when needed. Don't use if your compiler supports delayloading (ie, VC++ 6.0)
-	-- BKS 5-29-2000 */
-#if !(defined(_M_IX86) && _MSC_VER >= 1200)
-#define PERL_WIN32_SOCK_DLOAD
-#endif
 #define ENV_IS_CASELESS
 
 #define PIPESOCK_MODE	"b"		/* pipes, sockets default to binmode */
-
-#ifndef VER_PLATFORM_WIN32_WINDOWS	/* VC-2.0 headers don't have this */
-#define VER_PLATFORM_WIN32_WINDOWS	1
-#endif
-
-#ifndef FILE_SHARE_DELETE		/* VC-4.0 headers don't have this */
-#define FILE_SHARE_DELETE		0x00000004
-#endif
 
 /* access() mode bits */
 #ifndef R_OK
@@ -170,37 +239,11 @@ struct utsname {
 
 /* Compiler-specific stuff. */
 
-#ifdef __BORLANDC__		/* Borland C++ */
-
-#if (__BORLANDC__ <= 0x520)
-#define _access access
-#define _chdir chdir
-#endif
-
-#define _getpid getpid
-#define wcsicmp _wcsicmp
-#include <sys/types.h>
-
-#ifndef DllMain
-#define DllMain DllEntryPoint
-#endif
-
-#pragma warn -8004	/* "'foo' is assigned a value that is never used" */
-#pragma warn -8008	/* "condition is always true/false" */
-#pragma warn -8012	/* "comparing signed and unsigned values" */
-#pragma warn -8027	/* "functions containing %s are not expanded inline" */
-#pragma warn -8057	/* "parameter 'foo' is never used" */
-#pragma warn -8060	/* "possibly incorrect assignment" */
-#pragma warn -8066	/* "unreachable code" */
-#pragma warn -8071	/* "conversion may lose significant digits" */
-#pragma warn -8080	/* "'foo' is declared but never used" */
-
-/* Borland C thinks that a pointer to a member variable is 12 bytes in size. */
-#define PERL_MEMBER_PTR_SIZE	12
-
-#define isnan		_isnan
-
-#endif
+/* VC uses non-standard way to determine the size and alignment if bit-fields */
+/* MinGW will compile with -mms-bitfields, so should use the same types */
+#define PERL_BITFIELD8  unsigned char
+#define PERL_BITFIELD16 unsigned short
+#define PERL_BITFIELD32 unsigned int
 
 #ifdef _MSC_VER			/* Microsoft Visual C++ */
 
@@ -210,19 +253,44 @@ typedef long		gid_t;
 typedef unsigned short	mode_t;
 #endif
 
-#pragma  warning(disable: 4102)	/* "unreferenced label" */
-
-/* Visual C thinks that a pointer to a member variable is 16 bytes in size. */
-#define PERL_MEMBER_PTR_SIZE	16
-
-#define isnan		_isnan
+#if _MSC_VER < 1800
+#define isnan		_isnan	/* Defined already in VC++ 12.0 */
+#endif
+#ifdef UNDER_CE /* revisit what function this becomes celib vs corelibc, prv warning here*/
+#  undef snprintf
+#endif
 #define snprintf	_snprintf
 #define vsnprintf	_vsnprintf
 
-#if _MSC_VER < 1300
-/* VC6 has broken NaN semantics: NaN == NaN returns true instead of false */
-#define NAN_COMPARE_BROKEN 1
+/* on VC2003, msvcrt.lib is missing these symbols */
+#if _MSC_VER >= 1300 && _MSC_VER < 1400
+#  pragma intrinsic(_rotl64,_rotr64)
 #endif
+
+#  pragma warning(push)
+#  pragma warning(disable:4756;disable:4056)
+PERL_STATIC_INLINE
+double S_Infinity() {
+    /* this is a real C literal which can get further constant folded
+       unlike using HUGE_VAL/_HUGE which are data symbol imports from the CRT
+       and therefore can not by folded by VC, an example of constant
+       folding INF is creating -INF */
+    return (DBL_MAX+DBL_MAX);
+}
+#  pragma warning(pop)
+#  define NV_INF S_Infinity()
+
+/* selectany allows duplicate and unused data symbols to be removed by
+   VC linker, if this were static, each translation unit will have its own,
+   usually unused __PL_nan_u, if this were plain extern it will cause link
+   to fail due to multiple definitions, since we dont know if we are being
+   compiled as static or DLL XS, selectany simply always works, the cost of
+   importing __PL_nan_u across DLL boundaries in size in the importing DLL
+   will be more than the 8 bytes it will take up being in each XS DLL if
+   that DLL actually uses __PL_nan_u */
+extern const __declspec(selectany) union { unsigned __int64 __q; double __d; }
+__PL_nan_u = { 0x7FF8000000000000UI64 };
+#  define NV_NAN ((NV)__PL_nan_u.__d)
 
 #endif /* _MSC_VER */
 
@@ -235,7 +303,9 @@ typedef long		gid_t;
 #endif
 #define flushall	_flushall
 #define fcloseall	_fcloseall
+#ifndef isnan
 #define isnan		_isnan	/* ...same libraries as MSVC */
+#endif
 
 #ifndef _O_NOINHERIT
 #  define _O_NOINHERIT	0x0080
@@ -255,14 +325,11 @@ typedef long		gid_t;
 #  endif
 #endif
 
-#endif /* __MINGW32__ */
-
-/* both GCC/Mingw32 and MSVC++ 4.0 are missing this, so we put it here */
 #ifndef CP_UTF8
 #  define CP_UTF8	65001
 #endif
 
-/* compatibility stuff for other compilers goes here */
+#endif /* __MINGW32__ */
 
 #ifndef _INTPTR_T_DEFINED
 typedef int		intptr_t;
@@ -278,6 +345,7 @@ START_EXTERN_C
 
 /* For UNIX compatibility. */
 
+#ifdef PERL_CORE
 extern  uid_t	getuid(void);
 extern  gid_t	getgid(void);
 extern  uid_t	geteuid(void);
@@ -285,14 +353,16 @@ extern  gid_t	getegid(void);
 extern  int	setuid(uid_t uid);
 extern  int	setgid(gid_t gid);
 extern  int	kill(int pid, int sig);
-extern  int	killpg(int pid, int sig);
 #ifndef USE_PERL_SBRK
 extern  void	*sbrk(ptrdiff_t need);
 #  define HAS_SBRK_PROTO
 #endif
 extern	char *	getlogin(void);
 extern	int	chown(const char *p, uid_t o, gid_t g);
+#if !defined(__MINGW64_VERSION_MAJOR) || __MINGW64_VERSION_MAJOR < 4
 extern  int	mkstemp(const char *path);
+#endif
+#endif
 
 #undef	 Stat
 #define  Stat		win32_stat
@@ -330,23 +400,21 @@ typedef struct {
 } child_IO_table;
 
 DllExport void		win32_get_child_IO(child_IO_table* ptr);
+DllExport HWND		win32_create_message_window(void);
+DllExport int		win32_async_check(pTHX);
 
-#ifndef USE_SOCKETS_AS_HANDLES
-extern FILE *		my_fdopen(int, char *);
-#endif
 extern int		my_fclose(FILE *);
-extern int		my_fstat(int fd, Stat_t *sbufptr);
-extern char *		win32_get_privlib(const char *pl);
-extern char *		win32_get_sitelib(const char *pl);
-extern char *		win32_get_vendorlib(const char *pl);
-extern int		IsWin95(void);
-extern int		IsWinNT(void);
+extern char *		win32_get_privlib(WIN32_NO_REGISTRY_M_(const char *pl) STRLEN *const len);
+extern char *		win32_get_sitelib(const char *pl, STRLEN *const len);
+extern char *		win32_get_vendorlib(const char *pl, STRLEN *const len);
 
 #ifdef PERL_IMPLICIT_SYS
 extern void		win32_delete_internal_host(void *h);
 #endif
 
-extern char *		staticlinkmodules[];
+extern int		win32_get_errno(int err);
+
+extern const char * const		staticlinkmodules[];
 
 END_EXTERN_C
 
@@ -360,12 +428,8 @@ typedef  char *		caddr_t;	/* In malloc.c (core address). */
 
 #ifdef MYMALLOC
 #define EMBEDMYMALLOC	/**/
-/* #define USE_PERL_SBRK	/**/
-/* #define PERL_SBRK_VIA_MALLOC	/**/
-#endif
-
-#if defined(PERLDLL) && !defined(PERL_CORE)
-#define PERL_CORE
+/* #define USE_PERL_SBRK	/ **/
+/* #define PERL_SBRK_VIA_MALLOC	/ **/
 #endif
 
 #ifdef PERL_TEXTMODE_SCRIPTS
@@ -378,17 +442,23 @@ typedef  char *		caddr_t;	/* In malloc.c (core address). */
  * Now Win32 specific per-thread data stuff
  */
 
+/* Leave the first couple ids after WM_USER unused because they
+ * might be used by an embedding application, and on Windows
+ * version before 2000 we might end up eating those messages
+ * if they were not meant for us.
+ */
+#define WM_USER_MIN     (WM_USER+30)
+#define WM_USER_MESSAGE (WM_USER_MIN)
+#define WM_USER_KILL    (WM_USER_MIN+1)
+#define WM_USER_MAX     (WM_USER_MIN+1)
+
 struct thread_intern {
     /* XXX can probably use one buffer instead of several */
     char		Wstrerror_buffer[512];
     struct servent	Wservent;
     char		Wgetlogin_buffer[128];
-#    ifdef USE_SOCKETS_AS_HANDLES
     int			Winit_socktype;
-#    endif
-#    ifdef HAVE_DES_FCRYPT
     char		Wcrypt_buffer[30];
-#    endif
 #    ifdef USE_RTL_THREAD_API
     void *		retv;	/* slot for thread return value */
 #    endif
@@ -396,18 +466,22 @@ struct thread_intern {
     WORD               Wshowwindow;
 };
 
-#ifdef USE_5005THREADS
-#  ifndef USE_DECLSPEC_THREAD
-#    define HAVE_THREAD_INTERN
-#  endif /* !USE_DECLSPEC_THREAD */
-#endif /* USE_5005THREADS */
-
 #define HAVE_INTERP_INTERN
 typedef struct {
     long	num;
     DWORD	pids[MAXIMUM_WAIT_OBJECTS];
     HANDLE	handles[MAXIMUM_WAIT_OBJECTS];
 } child_tab;
+
+#ifdef USE_ITHREADS
+typedef struct {
+    long	num;
+    DWORD	pids[MAXIMUM_WAIT_OBJECTS];
+    HANDLE	handles[MAXIMUM_WAIT_OBJECTS];
+    HWND	message_hwnds[MAXIMUM_WAIT_OBJECTS];
+    char        sigterm[MAXIMUM_WAIT_OBJECTS];
+} pseudo_child_tab;
+#endif
 
 #ifndef Sighandler_t
 typedef Signal_t (*Sighandler_t) (int);
@@ -422,18 +496,16 @@ struct interp_intern {
     child_tab *	children;
 #ifdef USE_ITHREADS
     DWORD	pseudo_id;
-    child_tab *	pseudo_children;
+    pseudo_child_tab * pseudo_children;
 #endif
     void *	internal_host;
-#ifndef USE_5005THREADS
     struct thread_intern	thr_intern;
-#endif
+    HWND        message_hwnd;
     UINT	timerid;
     unsigned 	poll_count;
     Sighandler_t sigtable[SIG_SIZE];
+    bool sloppystat;
 };
-
-DllExport int win32_async_check(pTHX);
 
 #define WIN32_POLL_INTERVAL 32768
 #define PERL_ASYNC_CHECK() if (w32_do_async || PL_sig_pending) win32_async_check(aTHX)
@@ -451,46 +523,29 @@ DllExport int win32_async_check(pTHX);
 #define w32_num_pseudo_children		(w32_pseudo_children->num)
 #define w32_pseudo_child_pids		(w32_pseudo_children->pids)
 #define w32_pseudo_child_handles	(w32_pseudo_children->handles)
+#define w32_pseudo_child_message_hwnds	(w32_pseudo_children->message_hwnds)
+#define w32_pseudo_child_sigterm	(w32_pseudo_children->sigterm)
 #define w32_internal_host		(PL_sys_intern.internal_host)
 #define w32_timerid			(PL_sys_intern.timerid)
+#define w32_message_hwnd		(PL_sys_intern.message_hwnd)
 #define w32_sighandler			(PL_sys_intern.sigtable)
 #define w32_poll_count			(PL_sys_intern.poll_count)
 #define w32_do_async			(w32_poll_count++ > WIN32_POLL_INTERVAL)
-#ifdef USE_5005THREADS
-#  define w32_strerror_buffer	(thr->i.Wstrerror_buffer)
-#  define w32_getlogin_buffer	(thr->i.Wgetlogin_buffer)
-#  define w32_crypt_buffer	(thr->i.Wcrypt_buffer)
-#  define w32_servent		(thr->i.Wservent)
-#  define w32_init_socktype	(thr->i.Winit_socktype)
-#  define w32_use_showwindow	(thr->i.Wuse_showwindow)
-#  define w32_showwindow	(thr->i.Wshowwindow)
-#else
-#  define w32_strerror_buffer	(PL_sys_intern.thr_intern.Wstrerror_buffer)
-#  define w32_getlogin_buffer	(PL_sys_intern.thr_intern.Wgetlogin_buffer)
-#  define w32_crypt_buffer	(PL_sys_intern.thr_intern.Wcrypt_buffer)
-#  define w32_servent		(PL_sys_intern.thr_intern.Wservent)
-#  define w32_init_socktype	(PL_sys_intern.thr_intern.Winit_socktype)
-#  define w32_use_showwindow	(PL_sys_intern.thr_intern.Wuse_showwindow)
-#  define w32_showwindow	(PL_sys_intern.thr_intern.Wshowwindow)
-#endif /* USE_5005THREADS */
+#define w32_strerror_buffer	(PL_sys_intern.thr_intern.Wstrerror_buffer)
+#define w32_getlogin_buffer	(PL_sys_intern.thr_intern.Wgetlogin_buffer)
+#define w32_crypt_buffer	(PL_sys_intern.thr_intern.Wcrypt_buffer)
+#define w32_servent		(PL_sys_intern.thr_intern.Wservent)
+#define w32_init_socktype	(PL_sys_intern.thr_intern.Winit_socktype)
+#define w32_use_showwindow	(PL_sys_intern.thr_intern.Wuse_showwindow)
+#define w32_showwindow	(PL_sys_intern.thr_intern.Wshowwindow)
+#define w32_sloppystat	(PL_sys_intern.sloppystat)
 
 #ifdef USE_ITHREADS
-#  define PERL_WAIT_FOR_CHILDREN \
-    STMT_START {							\
-	if (w32_pseudo_children && w32_num_pseudo_children) {		\
-	    long children = w32_num_pseudo_children;			\
-	    WaitForMultipleObjects(children,				\
-				   w32_pseudo_child_handles,		\
-				   TRUE, INFINITE);			\
-	    while (children)						\
-		CloseHandle(w32_pseudo_child_handles[--children]);	\
-	}								\
-    } STMT_END
+void win32_wait_for_children(pTHX);
+#  define PERL_WAIT_FOR_CHILDREN win32_wait_for_children(aTHX)
 #endif
 
-#if defined(USE_FIXED_OSFHANDLE) || defined(PERL_MSVCRT_READFIX)
 #ifdef PERL_CORE
-
 /* C doesn't like repeat struct definitions */
 #if defined(__MINGW32__) && (__MINGW32_MAJOR_VERSION>=3)
 #undef _CRTIMP
@@ -499,6 +554,20 @@ DllExport int win32_async_check(pTHX);
 #define _CRTIMP __declspec(dllimport)
 #endif
 
+
+/* VV 2005 has multiple ioinfo struct definitions through VC 2005's release life
+ * VC 2008-2012 have been stable but do not assume future VCs will have the
+ * same ioinfo struct, just because past struct stability. If research is done
+ * on the CRTs of future VS, the version check can be bumped up so the newer
+ * VC uses a fixed ioinfo size.
+ */
+#if ! (_MSC_VER < 1400 || (_MSC_VER >= 1500 && _MSC_VER <= 1700) \
+  || defined(__MINGW32__))
+/* size of ioinfo struct is determined at runtime */
+#  define WIN32_DYN_IOINFO_SIZE
+#endif
+
+#ifndef WIN32_DYN_IOINFO_SIZE
 /*
  * Control structure for lowio file handles
  */
@@ -508,8 +577,30 @@ typedef struct {
     char pipech;    /* one char buffer for handles opened on pipes */
     int lockinitflag;
     CRITICAL_SECTION lock;
+/* this struct definition breaks ABI compatibility with
+ * not using, cl.exe's native VS version specitfic CRT. */
+#  if _MSC_VER >= 1400 && _MSC_VER < 1500
+#    error "This ioinfo struct is incomplete for Visual C 2005"
+#  endif
+/* VC 2005 CRT has at least 3 different definitions of this struct based on the
+ * CRT DLL's build number. */
+#  if _MSC_VER >= 1500
+#    ifndef _SAFECRT_IMPL
+    /* Not used in the safecrt downlevel. We do not define them, so we cannot
+     * use them accidentally */
+    char textmode : 7;/* __IOINFO_TM_ANSI or __IOINFO_TM_UTF8 or __IOINFO_TM_UTF16LE */
+    char unicode : 1; /* Was the file opened as unicode? */
+    char pipech2[2];  /* 2 more peak ahead chars for UNICODE mode */
+    __int64 startpos;      /* File position that matches buffer start */
+    BOOL utf8translations; /* Buffer contains translations other than CRLF*/
+    char dbcsBuffer;       /* Buffer for the lead byte of dbcs when converting from dbcs to unicode */
+    BOOL dbcsBufferUsed;   /* Bool for the lead byte buffer is used or not */
+#    endif
+#  endif
 } ioinfo;
-
+#else
+typedef intptr_t ioinfo;
+#endif
 
 /*
  * Array of arrays of control structures for lowio files.
@@ -531,15 +622,22 @@ EXTERN_C _CRTIMP ioinfo* __pioinfo[];
  * Access macros for getting at an ioinfo struct and its fields from a
  * file handle
  */
-#define _pioinfo(i) (__pioinfo[(i) >> IOINFO_L2E] + ((i) & (IOINFO_ARRAY_ELTS - 1)))
-#define _osfhnd(i)  (_pioinfo(i)->osfhnd)
-#define _osfile(i)  (_pioinfo(i)->osfile)
-#define _pipech(i)  (_pioinfo(i)->pipech)
+#ifdef WIN32_DYN_IOINFO_SIZE
+#  define _pioinfo(i) ((intptr_t *) \
+     (((Size_t)__pioinfo[(i) >> IOINFO_L2E])/* * to head of array ioinfo [] */\
+      /* offset to the head of a particular ioinfo struct */ \
+      + (((i) & (IOINFO_ARRAY_ELTS - 1)) * w32_ioinfo_size)) \
+   )
+/* first slice of ioinfo is always the OS handle */
+#  define _osfhnd(i)  (*(_pioinfo(i)))
+#else
+#  define _pioinfo(i) (__pioinfo[(i) >> IOINFO_L2E] + ((i) & (IOINFO_ARRAY_ELTS - 1)))
+#  define _osfhnd(i)  (_pioinfo(i)->osfhnd)
+#endif
 
 /* since we are not doing a dup2(), this works fine */
-#define _set_osfhnd(fh, osfh) (void)(_osfhnd(fh) = (intptr_t)osfh)
-#endif
-#endif
+#  define _set_osfhnd(fh, osfh) (void)(_osfhnd(fh) = (intptr_t)osfh)
+#endif /* PERL_CORE */
 
 /* IO.xs and POSIX.xs define PERLIO_NOT_STDIO to 1 */
 #if defined(PERL_EXT_IO) || defined(PERL_EXT_POSIX)
@@ -547,26 +645,7 @@ EXTERN_C _CRTIMP ioinfo* __pioinfo[];
 #endif
 #define PERLIO_NOT_STDIO 0
 
-#include "perlio.h"
-
-/*
- * This provides a layer of functions and macros to ensure extensions will
- * get to use the same RTL functions as the core.
- */
-#include "win32iop.h"
-
 #define EXEC_ARGV_CAST(x) ((const char *const *) x)
-
-#if !defined(ECONNABORTED) && defined(WSAECONNABORTED)
-#define ECONNABORTED WSAECONNABORTED
-#endif
-#if !defined(ECONNRESET) && defined(WSAECONNRESET)
-#define ECONNRESET WSAECONNRESET
-#endif
-#if !defined(EAFNOSUPPORT) && defined(WSAEAFNOSUPPORT)
-#define EAFNOSUPPORT WSAEAFNOSUPPORT
-#endif
-/* Why not needed for ECONNREFUSED? --abe */
 
 DllExport void *win32_signal_context(void);
 #define PERL_GET_SIG_CONTEXT win32_signal_context()

@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  List::MoreUtils: '0'
+  PDLA::Core: '0'
+  PDLA::IO::Misc: '0'
+configure_requires:
+  PDLA::Core: '0'
+  PDLA::IO::Misc: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0529, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDLA-IO-GD
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::MoreUtils: '0'
+  PDLA::Core: '0'
+  PDLA::IO::Misc: '0'
+resources:
+  repository: git://github.com/PDLPorters/pdla-io-gd
+version: '2.013006'
+

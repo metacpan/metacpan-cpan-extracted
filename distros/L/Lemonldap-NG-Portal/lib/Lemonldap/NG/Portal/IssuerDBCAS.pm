@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::_CAS;
 use base qw(Lemonldap::NG::Portal::_CAS Lemonldap::NG::Portal::_LibAccess);
 use URI;
 
-our $VERSION = '1.4.9';
+our $VERSION = '1.9.8';
 
 ## @method void issuerDBInit()
 # Nothing to do
@@ -58,6 +58,11 @@ sub issuerForUnAuthUser {
         $self->setHiddenFormValue( 'service', $service );
         $self->setHiddenFormValue( 'renew',   $renew );
         $self->setHiddenFormValue( 'gateway', $gateway );
+
+        # Set values in %ENV
+        $ENV{"llng_cas_service"} = $service;
+        $ENV{"llng_cas_renew"}   = $renew;
+        $ENV{"llng_cas_gateway"} = $gateway;
 
         # Gateway
         if ( $gateway eq 'true' ) {
@@ -433,10 +438,22 @@ sub issuerForUnAuthUser {
 
         $self->lmLog( "Get username $username", 'debug' );
 
+        # Get attributes [CAS 3.0]
+        my $attributes = {};
+        if ( defined $self->{casAttributes} ) {
+            foreach my $casAttribute ( keys %{ $self->{casAttributes} } ) {
+                my $localSessionValue =
+                  $localSession->data->{ $self->{casAttributes}->{$casAttribute}
+                  };
+                $attributes->{$casAttribute} = $localSessionValue
+                  if defined $localSessionValue;
+            }
+        }
+
         # Return success message
         $self->deleteCasSession($casServiceSession);
         $self->returnCasServiceValidateSuccess( $username,
-            $casProxyGrantingTicketIOU, $proxies );
+            $casProxyGrantingTicketIOU, $proxies, $attributes );
 
         # We should not be there
         return PE_ERROR;
@@ -829,7 +846,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2010, 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

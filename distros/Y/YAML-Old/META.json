@@ -1,30 +1,30 @@
 {
    "abstract" : "Old YAML.pm Legacy Code",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "YAML-Old",
    "no_index" : {
       "directory" : [
+         "example",
          "inc",
          "t",
-         "xt",
-         "example"
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -39,7 +39,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::YAML" : "0.99"
+            "Test::More" : "0.88",
+            "Test::YAML" : "1.05"
          }
       }
    },
@@ -55,6 +56,7 @@
          "web" : "https://github.com/ingydotnet/yaml-old-pm"
       }
    },
-   "version" : "1.07"
+   "version" : "1.23",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

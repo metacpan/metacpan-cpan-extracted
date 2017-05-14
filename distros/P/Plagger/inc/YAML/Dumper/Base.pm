@@ -32,6 +32,9 @@ field offset => [];
 field headless => 0;
 field blessed_map => {};
 
+# Global Options are an idea taken from Data::Dumper. Really they are just
+# sugar on top of real OO properties. They make the simple Dump/Load API
+# easy to configure.
 sub set_global_options {
     my $self = shift;
     $self->spec_version($YAML::SpecVersion)
@@ -106,4 +109,4 @@ sub bless {
 
 __END__
 
-#line 134
+#line 137

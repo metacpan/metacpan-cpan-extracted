@@ -1,8 +1,5 @@
 # Miscellaneous stuff
 
-/sassc
-/sass-spec
-
 VERSION
 .DS_Store
 .sass-cache
@@ -12,20 +9,18 @@ VERSION
 .cproject
 .project
 .settings/
-*.db
-*.aps
 
 # Configuration stuff
 
-GNUmakefile.in
-GNUmakefile
+Makefile.in
 /aclocal.m4
 /autom4te.cache/
-/src/config.h
+/config.h
 /config.h.in
 /config.log
 /config.status
 /configure
+include/
 /libtool
 /m4/libtool.m4
 /m4/ltoptions.m4
@@ -41,9 +36,8 @@ GNUmakefile
 /script/ltmain.sh
 /script/missing
 /script/test-driver
-/src/stamp-h1
-/src/Makefile.in
-/src/Makefile
+/stamp-h1
+src/Makefile
 libsass/*
 
 # Build stuff
@@ -55,7 +49,6 @@ libsass/*
 *.a
 *.suo
 *.sdf
-*.opendb
 *.opensdf
 a.out
 libsass.js
@@ -69,17 +62,13 @@ bin/*
 .deps/
 .libs/
 win/bin
-*.user
-win/*.db
 
 # Final results
 
 sassc++
 libsass.la
-src/support/libsass.pc
+support/libsass.pc
 
 # Cloned testing dirs
 sassc/
 sass-spec/
-
-installer/

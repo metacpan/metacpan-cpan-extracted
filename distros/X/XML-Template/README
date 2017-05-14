@@ -1,0 +1,318 @@
+                                 XML::Template
+                                     v3.20
+
+       Copyright (c) 2002-2003 Jonathan A. Waxman.  All rights reserved.
+
+             This is free software; you can redistribute it and/or
+                modify it under the same terms as Perl itself.
+
+
+OVERVIEW
+--------
+
+XML::Template is an X(HT)ML-based document processing framework written in
+Perl designed specifically for constructing web sites and web
+applications. The essential framework of XML::Template provides XML
+document parsing and caching services; scalar, array, and nested
+variables; and XPath support.  Plug-in modules written in Perl may be
+easily added to extend the available tag set using XML namespace
+conventions.  XML::Template comes with numerous standard plug-in modules
+including modules for variable iteration, conditionals, exception
+handling, and performing abstract database queries and iterations.
+
+The intention of XML::Template is to provide a simple and consistent
+framework for developing dynamic web sites and web applications entirely
+in XHTML.  There are many excellent options available that can
+approximately do this;  however, at the time I started writing this, I was
+unable to find anything that offered exactly what I wanted and what
+XML::Template provides.  Even today, I am still unsatisfied with all the
+other alternatives, but that is another discussion.
+
+Because of its modularity, no particular design strategy or tagset is
+imposed on the user, however, the standard modules that come with
+XML::Template provide suggestive design elements.  In particular, special
+attention is given to database integration and modular design strategies.
+
+XML::Template comes with a web site administrator and content management
+application, siteadmin, designed entirely using the XML::Template
+framework and standard modules. It offers a powerful example of the kind
+of web application that XML::Template can be used to create.
+
+
+FEATURES
+--------
+
+o Written entirely in Perl.
+o Highly modular and extensible design.
+o Templates are converted to Perl code and cached to files resulting in 
+  extremely fast performance.
+o Supports scalar, array, nested (hash), and XPath variables and variable 
+  subroutines.
+o Support variable tags.  This feature allows variable substitution in 
+  an actual tagname itself, so the tag that gets used can be defined 
+  dynamically.
+o Easy to extend the tagset using XML namespace conventions.
+o Highly configurable via system-wide and host-specific XML configuration 
+  files.  Multiple virtual hosts and data sources can be defined.  
+  Namespace configuration supports alternate attribute parsers, attribute 
+  type checking, nested and "related" tag specification, and body content 
+  attributes.
+o Standard modules include support for conditionals, mail, exceptions, 
+  file inclusion and IO, variables, variable and abstract iterators, 
+  forms, and DBI database queries.  The database modules include support 
+  for data items, groups, XHTML blocks, and users.
+o Special attention given to database support - very little if any SQL is 
+  necessary to perform the most common kinds of database queries.  
+  Related database table queries are supported using the concept of 
+  related namespaces.
+o Exception handling and exception XHTML template support.
+
+
+INSTALLATION
+------------
+
+The latest version of XML::Template can be obtained from:
+
+  http://www.cpan.org/modules/by-module/XML-Template/
+
+See INSTALL for detailed installation instructions.
+
+
+BRIEF TUTORIAL
+--------------
+
+1.  X(HT)ML
+-----------
+
+XML Specification: http://www.w3.org/TR/REC-xml
+XML in 10 Points: http://www.w3.org/XML/1999/XML-in-10-points
+XHTML Specification: http://www.w3.org/TR/xhtml1/
+
+XML::Template is an X(HT)ML framework for developing dynamic web sites and 
+applications written entirely in Perl.  The format of XML::Template 
+documents is entirely XML.  XML::Template provides the basic XML document 
+parsing and caching services.
+
+2.  Namespaces
+--------------
+
+Specification: http://www.w3.org/TR/REC-xml-names/
+
+XML namespaces provides the means by which the tag set available to an
+XML::Template document is extended.  The details of the namespace are
+defined in the XML::Template configuration file.  For instance, here is an 
+example namespace definition from an XML::Template configuration file:
+
+  <namespaces>
+    <namespace name="http://syrme.net/xml-template/test/v1">
+      <prefix>test</prefix>
+      <title>Test</title>
+      <description>Test elements.</description>
+      <module>XML::Template::Element::Test</module>
+      <element name="testel1">
+        <content>empty</content>
+        <attrib name="testatt1">
+          <required>yes</required>
+          <parse>no</parse>
+          <type>^\d+$</type>
+        </attrib>
+      </element>
+      <element name="test2">
+        <nestedin name="test"/>
+        <attrib name="testatt2">
+          <parser>XML::Template::Parser::TestAtt2</parser>
+        </attrib>
+      </element>
+    </namespace>
+  </namespaces>
+
+The configuration defines variious attributes of the namespace, such as
+the description and the actual Perl module that provides the
+implementation.  You can also define optional attributes and constraints
+on the elements in the namespace and on the attributes of the elements.  
+More detailed documentation is provides in the sample configuration file 
+that comes with the XML::Template distribution, or in the POD document 
+XML::Template::xml-template.conf.
+
+Here's an example of an XML::Template document that uses the above 
+namespace:
+
+  <xml xmlns:test="http://syrme.net/xml-template/test/v1">
+    <font size="-1">
+      The following are elements from the <kbd>test</kbd> namespace:
+    </font>
+
+    <p/>
+    <test:testel1 testatt1="123456789">
+      <test:testel2 testatt2="This is testatt2"/>
+    </test:testel1>
+  </xml>
+
+3.  XML::Template Variables
+---------------------------
+
+XML::Template provides scalar, array, nested, and XPath variables.  
+Additionally, subroutines can be defined which operate on variable values.
+
+Scalar Variables
+----------------
+
+Scalar variables are simple variables that contain a single value.  They 
+look like this: ${<varname>}, where <varname> is the name of the scalar 
+variable.  For instance,
+
+  <xml>
+    The value of the variable named <kbd>name</kbd>: ${name}
+  </xml>
+
+To set the value of a scalar variable, you need to use the set element 
+from the var namespace:
+
+  <xml xmlns:var="http://syrme.net/xml-template/var/v1">
+    <var:set name="name">Jonathan Waxman</var:set>
+  </xml>
+
+Array Variables
+---------------
+
+Array variables contain a sequence or array of values.  They look like:  
+${<varname>[<index>]}, where <varname> is the name of the array 
+variable and <index> is an integer index.  For instance,
+
+  <xml>
+    First name: ${names[0]}<br/>
+    Second name: ${names[1]}<br/>
+    Third name: ${names[2]}<br/>
+    Fourth name: ${names[3]}
+    ...
+  </xml>
+  
+To set an array variable, you need to use the set and element elements of
+the var namespace:
+
+  <xml xmlns:var="http://syrme.net/xml-template/var/v1">
+    <var:set name="names">
+      <var:element>Goose</var:element>
+      <var:element>Kristina Clair</var:element>
+      <var:element>Josh Marcus</var:element>
+      <var:element>Jonathan Waxman</var:element>
+    </var:set>
+  </xml>
+
+Nested Variables
+----------------
+
+A nested variable is a named variable nested in another named variable.  
+They look like: ${<varname1>.<varname2>}, where <varname2> is the name of 
+the variable nested within the variable named <varname1>.  Variables can 
+be nested to an arbitrary depth.  For instance,
+
+  <xml>
+    First name: ${name.first}<br/>
+    Last name: ${name.last}<br/>
+    Street address: ${name.address.street}
+  </xml>
+
+To set a nest variable, you need to use the name and element elements from 
+the var namespace:
+
+  <xml xmlns:var="http://syrme.net/xml-template/var/v1">
+    <var:set name="name">
+      <var:element name="first">Jonathan</var:element>
+      <var:element name="last">Waxman</var:element>
+      <var:element name="address">
+        <var:element name="street">123 Street Road</var:element>
+      </var:element>
+    </var:set>
+  </xml>
+
+XPath Variables
+---------------
+
+An XPath variable is a variable that extracts a part of an XML document 
+using an XPath query.  They look like: ${<varname>/<xpath>}, where 
+<varname> is the name of the variable that contains the XML document and 
+<xpath> is an XPath query.
+
+Suppose you set the value of a variable to some XML:
+
+  <set xmlns="http://syrme.net/xml-template/var/v1"
+       name="xml">
+    <person username="jowaxman">
+      <firstname>Jonathan</firstname>
+      <lastname>Waxman</lastname>
+      <address>
+        <street>123 Street Road</street>
+        <city>Philadelphia</city>
+      </address>
+    </person>
+  </set>
+
+You can access different parts of the XML document stored in the variable 
+"xml" using XPath expressions.  Some examples:
+
+  ${xml/person[@username="jowaxman"/firstname}
+  ${xml/person/@username}
+
+Mixed Variables
+---------------
+
+You can mix all the different variable types.  You can also use 
+variables inside of variables.  For instance,
+
+  <xml>
+    ${person[${index}].xml/info[@type="personal"]}
+    ${person.${names[1]}.address}
+  </xml>
+
+If a variable name contains "." or "/", you can either backslash them, or
+surround the text they are embedded within by curly braces.  This is
+especially useful if the variable name comes from another variable.  For
+instance,
+
+  <xml>
+    ${person.Jonathan\.Waxman.address}<br/>
+    ${person.{Jon/athan.Waxman}.address}<br/>
+    ${person.{${name}}.address}
+  </xml>
+
+Subroutines
+-----------
+
+Subroutines can be defined to operate on the values of variables.  They
+look like: ${<varname>}.<subroutine> or ${<varname>}.<subroutine>
+(<params>), where <varname> is some variable, <subroutine> is the
+subroutine name, and <params> is an optional comma-separated list of
+parameters to the subroutine.  For instance,
+
+<xml xmlns:cond="http://syrme.net/xml-template/cond/v1"
+     xmlns:var="http://syrme.net/xml-template/var/v1">
+  <cond:if cond="${date}.defined">
+    Today's date: ${date}.format ("%D %T")
+  </conf:if>
+
+  ${array}.push ("element")
+  last element: ${array}.pop
+</xml>
+
+Subroutines are defined in the XML::Template configuration file.  Here is 
+an example:
+
+  <subroutines>
+    <subroutine name="defined">
+      <description>Whether a value is defined.</description>
+      <module>XML::Template::Util</module>
+    </subroutine>
+    <subroutine name="format">
+      <description>Format a date.</description>
+      <module>XML::Template::Util</module>
+    </subroutine>
+    <subroutine name="push">
+      <description>Push onto an array.</description>
+      <module>XML::Template::Element::Var</module>
+    </subroutine>
+    <subroutine name="pop">
+      <description>Pop off an array.</description>
+      <module>XML::Template::Element::Var</module>
+    </subroutine>
+  </subroutines>

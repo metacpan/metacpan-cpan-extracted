@@ -1,0 +1,168 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: A simple example</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_insta.html">Previous Topic</A> | <A HREF="in_gsgen.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.3. A simple example</H1>
+<HR>
+<H2><A NAME="A sample SDF document">1.3.1. A sample SDF document</A></H2>
+<P>A sample SDF document is shown below:</P>
+<PRE>
+# Build the title
+!define DOC_NAME           &quot;GalaxyBuilder&quot;
+!define DOC_TYPE           &quot;Discussion Paper&quot;
+!define DOC_AUTHOR         &quot;Joe Bloggs&quot;
+!build_title
+
+H1: Introduction
+
+After extensive market research, I believe there is
+an excellent opportunity for us to develop software
+for the I&lt;galaxy construction industry&gt;. Potential
+customers include:
+
+* NASA
+* European Community
+* China
+* Japan.
+
+Note: The proposed name of the software package to be
+developed is [[DOC_NAME]]. If you want to suggest a
+better name, send email to {{EMAIL:joe@bloggs.com}}.
+
+H2: Software Requirements
+
+The key requirements are:
+
+^ support for the design and simulation of galaxies
+  containing up to:
+  - 1000 large planets, or
+  - 5000 small planets
++ the package needs to be easy to use
++ the package needs to be well documented.
+
+H2: Project Team
+
+Exploding galaxies will be B&lt;very&gt; bad for business,
+so we need the best team possible for this project:
+
+!block table
+Person          Role
+Mary Jones      Project Manager
+Hans Blass      Architect
+Bill Smith      Software Engineer
+!endblock
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>This document (called <TT>mydoc.sdf</TT>) is provided in the <TT>doc/paper</TT> directory of the SDF distribution.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="A brief explanation">1.3.2. A brief explanation</A></H2>
+<P>Comments begin with a # character as the first non-whitespace character on a line.</P>
+<P>Macros are embedded commands which begin with a ! as the first non-whitespace character on a line. The <A HREF="../ref/mdefine.html">define</A> macro is used to set variables. The value of a variable can be embedded in paragraph text  by using the [[...]] syntax.</P>
+<P>The DOC_NAME and DOC_TYPE variables are used by the <A HREF="../ref/mbuild_t.html">build_title</A> macro which creates:</P>
+<UL>
+<LI>a cover page (or two) for paper-based outputs
+<LI>a title header for online outputs.</UL>
+<P>Paragraphs can be tagged in different ways. For the vast majority of SDF documents, the only tags used are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+H1:
+</TD>
+<TD>
+level 1 heading
+</TD>
+</TR>
+<TR>
+<TD>
+H2:
+</TD>
+<TD>
+level 2 heading
+</TD>
+</TR>
+<TR>
+<TD>
+*
+</TD>
+<TD>
+item in level 1 bulleted list
+</TD>
+</TR>
+<TR>
+<TD>
+-
+</TD>
+<TD>
+item in level 2 bulleted list
+</TD>
+</TR>
+<TR>
+<TD>
+^
+</TD>
+<TD>
+first item in level 1 ordered list
+</TD>
+</TR>
+<TR>
+<TD>
++
+</TD>
+<TD>
+next item in level 1 ordered list
+</TD>
+</TR>
+<TR>
+<TD>
+&gt;
+</TD>
+<TD>
+fixed-width, verbatim text
+</TD>
+</TR>
+<TR>
+<TD>
+Note:
+</TD>
+<TD>
+note
+</TD>
+</TR>
+</TABLE>
+
+<P>Phrases can also be tagged in several ways. Any phrase can be tagged using the syntax:</P>
+<PRE>
+  {{XYZ:...}}
+</PRE>
+<P>where XYZ is the tag. For single, uppercase character tags like I (Italics) and B (Bold), POD-style syntax is also supported:</P>
+<PRE>
+  X&lt;...&gt;
+</PRE>
+<P>where X is the tag.</P>
+<P>Tables can be specified using the <A HREF="../ref/ftable.html">table</A> filter, typically in combination with the <A HREF="../ref/mblock.html">block</A> and <A HREF="../ref/mendbloc.html">endblock</A> macros. The first row is the headings. Remaining rows are data.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_insta.html">Previous Topic</A> | <A HREF="in_gsgen.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

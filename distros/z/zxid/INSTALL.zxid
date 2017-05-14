@@ -1,0 +1,215 @@
+INSTALL.zxid
+============
+$Id: INSTALL.zxid,v 1.42 2016-02-27 13:36:33 sampo Exp $
+
+Quick
+-----
+
+  make         # beware of need to specify TARGET if not linux; or edit localconf.mk
+  make all     # all bindings beyond C (perl, php, Java, mod_auth_saml for Apache httpd)
+  make install
+
+These instructions are for the impatient. See 
+<<link:html/zxid-install.html: ZXID Compilation and Installation>>
+aka zxid-install.pd for the complete story.
+
+If you want to try ZXID out immediately, we recommend compiling the
+library and examples and installing one of the examples as a CGI
+script in an existing web server.
+
+Install Packages for Your Distribution
+--------------------------------------
+
+TBD (*** WIP)
+
+    # Redhat derived systems
+    yum install zxid
+
+  or
+
+    # Debian derived systems
+    apt-get install zxid
+
+Move to section "Configuration and Canned Demo", below.
+
+Compilation from Source
+-----------------------
+
+Download and extract the source
+
+  wget http:/zxid.org/zxid-1.42.tgz   # Check for newer version, please
+  tar xvzf zxid-1.42.tgz
+  cd zxid-1.42
+
+Compile all packages (C, perl, php, Java, and apache httpd interfaces)
+
+  # N.B.  There is no configure script. The Makefile works for all
+  #       supported platforms by provision of correct TARGET option.
+
+  make all                # Compile for ix86 Linux (default), all bindings
+  make all TARGET=sol8    # Compile for Solaris
+  make all TARGET=macosx  # Compile for MacOS X (ix86 tested)
+  make all TARGET=xmingw  # Cross compile Windows binaries using Linux
+
+  # If errors, see section "Compilation Problems", below, and zxid-faq.pd
+
+  make install
+  ln -s /var/zxid/1.42 /var/zxid/std   # Change to match actual release
+  export PATH=/var/zxid/std/bin:$PATH
+
+Move to section "Configuration and Canned Demo", below.
+
+Configuration and Canned Demo
+-----------------------------
+
+For detailed configuration reference, please see
+<<link:html/zxid-conf.html: ZXID Configuration Reference>> aka
+zxid-conf.pd
+
+For canned demo you need an IdP and a SP. Here's how:
+
+  export PATH=/var/zxid/std/bin:$PATH   # if not already done
+
+  zxcot -dirs                # For the SP
+  echo NICE_NAME=Your SP Branding             >/var/zxid/zxid.conf
+  echo ORG_NAME=Your Organization             >>/var/zxid/zxid.conf
+  echo ORG_URL=http://your.org/               >>/var/zxid/zxid.conf
+  echo URL=http://sp1.zxidsp.org:8443/zxidhlo >>/var/zxid/zxid.conf
+
+  zxcot -dirs /var/zxid/idp/  # For the IdP
+  echo NICE_NAME=Your IdP Branding            >/var/zxid/idp/zxid.conf
+  echo ORG_NAME=Your IdP Organization         >>/var/zxid/idp/zxid.conf
+  echo ORG_URL=http://youridp.org/            >>/var/zxid/idp/zxid.conf
+  echo URL=http://idp1.zxid.org:8443/zxididp  >>/var/zxid/idp/zxid.conf
+
+In the above, the configuration files for SP and IdP were created. Some
+configuration options are actually set in the source code of the respective
+applications. In the config files you MUST set
+
+NICE_NAME:: Used for user interface purposes (displayed to user) to identify the site.
+ORG_NAME::  The name of the legal entity responsible for the site, shown to user.
+ORG_URL::   Institutional web site of the legal entity, shown to user.
+URL::       Entity Id of the web site. For demo, set them as shown (often set in source).
+
+Running
+-------
+
+  cp zxidhlo* <webroot>/
+  # configure and start your web server to recognize zxidhlo a CGI, e.g.
+  mini_httpd -p 8443 -c 'zxid*' -S -E zxid.pem
+
+  # Edit your /etc/hosts to contain (on Windows C:\Windows\System32\etc\hosts)
+  127.0.0.1       localhost sp1.zxidcommon.org sp1.zxidsp.org
+
+  # Point your browser to (zxid_simple() API version)
+  https://sp1.zxidsp.org:8443/zxidhlo?o=E
+  https://sp1.zxidsp.org:8443/zxidhlo.pl?o=E       # Perl version
+  https://sp1.zxidsp.org:8443/zxidhlo.php?o=E      # PHP version
+  https://sp1.zxidsp.org:8443/zxidhlo-java.sh?o=E  # Java version
+
+  # Find an IdP to test with and configure it...
+  # ... e.g. download from http://symlabs.com/Products/SFIAM.html
+
+See zxid-install.pd for actual tutorial out-of-box experience.
+
+Compilation Problems
+--------------------
+
+See also: zxid-faq.pd  (*** also in zxid-faq.pd)
+
+* Makefile tries to compile a bunch of check programs early in the
+  compilation to detect common problems with missing headers (include
+  files) and missing libraries.
+
+* If the checks fail, you need to adjust the -I and -L flags in Makefile
+  variables CINC and LIBS (around lines 136 and 149).
+
+* Else you can create localconf.mk file (recommended), that will be
+  included by the main Makefile, and put your modifications there.
+
+* If you have difficulty in finding the headers and libraries (or whether
+  a package is installed at all), try the following commands
+
+    find / -name 'stdio.h'
+    find / -name 'libc.*'
+    find / -name 'zlib.h'
+    find / -name 'libz.*'
+    find / -name 'opensslv.h'
+    find / -name 'libssl.*'
+    find / -name 'libcrypto.*'
+    find / -name 'curlver.h'
+    find / -name 'libcurl.*'
+    find / -name 'ap_release.h'
+    find / -name 'apr_version.h'
+    find / -name 'libapr-1.*'
+    find / -name 'servlet-api.jar'
+
+  If you find more than one of any of the above, you need to be extra
+  careful about which one you use.
+
+* ZXID dependency libraries are libcurl, openssl (libssl, libcrypto), and zlib
+
+  If the prerequisite libaries - libz, libssl, libcrypto, and libcurl
+  - are genuinely missing, you should either compile them yourself, or
+  install dev packages of those libraries from your distribution.
+
+* Usually you can use the versions that are supplied with your distribution.
+  However in this case you MUST install also the headers. Usually these
+  are called "development" packages. For example
+
+    # Redhat derived systems
+    yum install gcc                # Usually installs libc and libz headers
+    yum install openssl-devel
+    yum install curl-devel
+
+  or
+
+    # Debian derived systems
+    apt-get install gcc            # Usually installs libc and libz headers
+    apt-get install openssl-devel
+    apt-get install curl-devel
+
+  If all else fails, compile the dependencies
+  from source.
+
+* zxid assumes openssl, libcurl, Java, and Apache to be installed
+  in the locations where source distributions of those packages
+  install them in their default configuration (e.g. /usr/local/ssl,
+  /usr/local/httpd, etc.)
+
+* Many distributions (e.g. Ubuntu, Redhat, SUSE, ...) choose to install
+  those libraries in different places, thus requiring distribution
+  specific edits to localconf.mk, see the find(1) commands above.
+
+    echo 'CURL_ROOT=/usr'    >>localconf.mk
+    echo 'OPENSSL_ROOT=/usr' >>localconf.mk
+
+* The make all command attempts to build all language bindings and
+  Apache module. If you do not need all bindings, you can build
+  only the part relevant to you (and avoid errors irrelevant to you):
+
+    make                    # Compile C library for ix86 Linux (default)
+
+    make apachezxid         # optional: compile mod_auth_saml Apache module
+    make apachezxid_install # optional: install mod_auth_saml.so
+
+    make samlmod            # optional: compile Net::SAML perl module
+    make samlmod_install    # optional: install Net::SAML
+
+    make phpzxid            # optional: compile php_zxid PHP extension
+    make phpzxid_install    # optional: install php_zxid.so
+
+    make javazxid           # optional: compile libzxidjni
+    make javazxid_install   # optional: install libzxidjni.so and zxidjni.class
+
+
+Trouble Shooting
+----------------
+
+  # N.B2: We distribute some generated files. If they are missing, you need
+  #       to regenerate them: make cleaner; make dep ENA_GEN=1
+
+  make dir                # Creates /var/zxid hierarchy
+
+
+--Sampo

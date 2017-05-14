@@ -1,16 +1,8 @@
-#!/usr/bin/perl -w
-
-# $Id: 310defaults.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 1;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
-
-BEGIN {
-  plan tests => 1;
-}
 
 use Net::FTPServer::InMem::Server;
 
@@ -75,3 +67,5 @@ my $ok = 1;
 
 # Old STDIN, STDOUT now restored.
 ok ($ok);
+
+__END__

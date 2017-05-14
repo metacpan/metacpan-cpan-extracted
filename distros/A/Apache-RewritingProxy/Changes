@@ -1,5 +1,103 @@
-Revision history for Perl extension Apache::RefererBlock.
+----------------------------
+revision 1.13
+date: 2000/01/08 18:30:12;  author: khhaga01;  state: Exp;  lines: +1 -3
+Miscellaneous cleanup.  This is pretty much version 0.7 of this guy.
+Subclassing works.  Cookies work well.  Redirects work seemingly
+perfectly.
+----------------------------
+revision 1.12
+date: 2000/01/08 18:04:37;  author: khhaga01;  state: Exp;  lines: +51 -20
 
+RewritingProxy can now be subclassed and other handlers written.
+See the README file in the eg directory for an attempt at an explanation
+of how to do it.
+
+JavaScript is handled better. RewritingProxy gets the right scripts
+when someone uses <script src=...> in a document.
+
+Regex handling is improved again.
+
+Forms handling works better.
+----------------------------
+revision 1.11
+date: 1999/12/28 20:59:48;  author: khhaga01;  state: Exp;  lines: +12 -3
+Referer now acts as it is supposed to.
+User-Agent is also sent correctly.
+
+Still some problems getting all cookies from the remote server.
+The HTTP::Cookies stuff doesn't seem to be finding all of the cookies
+sent to the proxy server.
+----------------------------
+revision 1.10
+date: 1999/12/28 20:37:22;  author: khhaga01;  state: Exp;  lines: +56 -18
+Made lots of changes to the texthandler area.  I am trying to
+find a simple way to enable someone else to subclass RewritingProxy
+and provide their own textHandler method to parse the text content
+differently.  Once that has been accomplished, imageHandler and
+linkHandler will naturally follow quite soon.
+
+The convoluted regexes escaping special chars in urls have been
+all consolidated into one little subroutine.
+
+Cookies are still written to a text file in an attempt to find out
+why not all of them are stored.
+
+REFERER is not being proxied properly.  REFERER is being sent as the
+REFERER the client sees.  This needs to be fixed soon.  Should be fixed before
+the next commit.
+----------------------------
+revision 1.9
+date: 1999/12/27 17:04:19;  author: khhaga01;  state: Exp;  lines: +0 -5
+Took out the part of the cookie code that named the
+cookie nnnnnnnnnnnn where the n's are part of the IP address.
+The problem was that 136.165.1.128 would share a cookie jar with
+136.165.11.28 and that would be bad.
+----------------------------
+revision 1.8
+date: 1999/12/14 19:39:53;  author: khhaga01;  state: Exp;  lines: +32 -25
+Fixed a number of bugs relating to special characters such as
+(,*,+,),% being in the url being parsed.
+
+Fixed a problem I had parsing some sites with a huge first line of
+text.  I wasn't printing out the headers properly and that line was
+ignored.  I only noticed it when the first line was huge.
+
+Still missing any handling of cookies set in the Meta HTTP-Equiv tag.
+----------------------------
+revision 1.7
+date: 1999/12/13 20:54:43;  author: khhaga01;  state: Exp;  lines: +25 -13
+Fixed the Documentation to reflect the other modules that are needed.
+Apache::Util
+Apache::Table
+are really needed for this thing to work.  The Makefile will need to
+reflect this also.
+----------------------------
+revision 1.6
+date: 1999/12/13 20:40:58;  author: khhaga01;  state: Exp;  lines: +47 -42
+Added Tim DiLauro's suggestions to fix the hardcoded
+<Location > bug.  Basically this means that one can specify any
+<Location Foo> Directive when configuring RewritingProxy and it should now
+work.
+
+Also added plenty of stuff to make cookies work a little better.
+
+I fixed the version numbering to be consistent with the numbers under which
+these files are being uploaded to CPAN.  This is really 0.5.  THere
+had been some version cornfusion since I had cvs dump its own version
+tag into the file.  Bad move.
+----------------------------
+revision 1.5
+date: 1999/12/08 22:43:48;  author: khhaga01;  state: Exp;  lines: +114 -7
+Added bunches of code to build a cookie database on the server.  This
+database stays there and the client is sent one cookie with the name of
+the file.  When a request is made, the proxy sends only the cookies
+that should go to the remote web server.  This works somewhat but is
+not 100% and is not very elegant.  The file locking for the cookie
+database file is very primitive.
+----------------------------
+revision 1.4
+date: 1999/11/05 20:13:20;  author: khhaga01;  state: Exp;  lines: +3 -1
+*** empty log message ***
 ----------------------------
 revision 1.3
 date: 1999/11/05 20:10:28;  author: khhaga01;  state: Exp;  lines: +32 -2

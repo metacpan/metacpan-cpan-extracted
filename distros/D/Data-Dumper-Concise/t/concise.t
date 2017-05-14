@@ -11,6 +11,7 @@ my $dd = Data::Dumper->new([])
                      ->Deparse(1)
                      ->Quotekeys(0)
                      ->Sortkeys(1);
+$dd->Trailingcomma(1) if $dd->can('Trailingcomma');
 
 foreach my $to_dump (
   [ { foo => "bar\nbaz", quux => sub { "fleem" }  } ],
@@ -26,6 +27,8 @@ foreach my $to_dump (
     local $Data::Dumper::Deparse = 1;
     local $Data::Dumper::Quotekeys = 0;
     local $Data::Dumper::Sortkeys = 1;
+    no warnings 'once'; # in case Trailingcomma option is unknown in this DD
+    local $Data::Dumper::Trailingcomma = 1;
     Data::Dumper::Dumper(@$to_dump);
   };
 
@@ -36,4 +39,7 @@ foreach my $to_dump (
 
 my $out = DumperF { "arr: $_[0] str: $_[1]" } [qw(wut HALP)], "gnarl";
 
-is($out, qq{arr: [\n  "wut",\n  "HALP"\n]\n str: "gnarl"\n}, 'DumperF works!');
+like($out, qr{^arr: \[\n  "wut",\n  "HALP",?\n\]\n str: "gnarl"\n\z}, 'DumperF works!');
+
+like(Dumper([1..3]), qr/,\s*]\s*$/, 'trailing comma enabled')
+    if $dd->can('Trailingcomma');

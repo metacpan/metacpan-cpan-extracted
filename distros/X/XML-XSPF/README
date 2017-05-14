@@ -1,4 +1,4 @@
-XML-XSPF version 0.7
+XML-XSPF version 0.7.1
 =====================
 
 The README is used to introduce the module and provide instructions on
@@ -34,7 +34,7 @@ XML::Writer
 COPYRIGHT AND LICENCE
 
 Copyright (c) 2006 Dan Sully & Slim Devices, Inc. All rights reserved. 
-Copyright (c) 2006-2008 Dan Sully. All rights reserved. 
+Copyright (c) 2006-2009 Dan Sully. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

@@ -490,6 +490,8 @@ It's worth having a look at...
 
 =head1 RUNNING TESTS
 
+=head2 Setup and configuration
+
 First off, please review the C<t/README> file for the GPIO pins we use for the
 test physical configuration, and set up the Pi according to the
 L<unit test diagram|https://stevieb9.github.io/rpi-wiringpi/breadboard/brewbuild_test_platform_bb.jpg>.
@@ -503,6 +505,53 @@ across all of its platforms:
 There are a couple of test files that require root privileges, but we handle
 this internally by re-running the file with C<sudo> enabled. This allows all
 tests but these couple to be run as a standard user.
+
+=head2 Automated with L<Test::BrewBuild>
+
+L<Test::BrewBuild> has some special features specifically to facilitate the
+automatic testing of this distribution while on a Raspberry Pi, with provisions
+that allow you to display the last test run results on an LCD if desired.
+
+First, on the Pi you're running, you need to set the C<PI_BOARD> environment
+variable to ensure all tests run. I set this to C<1> in C</etc/environment>.
+
+First, install C<Test::BrewBuild>. Then, start the C<bbtester> software in the
+background:
+
+    bbtester start -a
+
+The above C<bbtester> command string will only trigger a test build if the local
+repository commit checksum differs from the remote. To bypass this check and
+execute a test run every cycle regardless if the checksums differ or not, send
+in the C<--csum|-c> flag to C<bbtester>:
+
+    bbtester start -a --c
+
+Next, run a C<bbdispatch> run against the local tester in C<--auto> mode. The
+C<-a> flag with no parameters runs continuously, sleeping for a default of 60
+seconds between runs. Simply send in an integer value that represents a certain
+number of runs if desired.
+
+    bbdispatch -r https://github.com/stevieb9/rpi-wiringpi -a
+
+To use the LCD functionality which displays the last date/time that a test run
+succeeded, along with the last commit tested and it's result (PASS/FAIL), set
+up an environment variable that contains a comma-separated list of GPIO pin
+numbers that the LCD is connected to:
+
+    export BB_RPI_LCD=5,6,4,17,27,22
+
+...which represents LCD pins:
+
+    RS, E, D4, D5, D6, D7
+
+To make it work. I set this one in C</etc/environment> as well. You then need to
+restart the dispatcher with the C<--rpi> or the equivalent C<-R> flag:
+
+    bbdispatch -r https://github.com/stevieb9/rpi-wiringpi -a 0 --rpi
+
+The C<--rpi> flag is rather hidden (but it *is* documented subtly), as this is
+a feature that most likely I'll be the only consumer of.
 
 =head1 AUTHOR
 

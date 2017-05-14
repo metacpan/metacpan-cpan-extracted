@@ -1,0 +1,42 @@
+# .login - csh generic startup file
+#
+# Do the absoluete minimum to set $ETOP with envy.pl and
+# then proceed to $ETOP/.../login.part2, etc.
+
+#INITIAL_ENV#
+
+if (! $?HOME) then
+    echo "PANIC: HOME is not set"; exit
+endif
+
+test -s $HOME/.custom/startup.name && set startup = `cat $HOME/.custom/startup.name`
+test -s $HOME/.custom/startup && set startup = `cat $HOME/.custom/startup`
+if (! $?startup) set startup = "#STARTUP#"
+
+set ENVY_CONTEXT=STARTUP
+set ENVY=#ENVY.PL#
+test -x $ENVY || echo Envy not found at ${ENVY}: PANIC
+
+$ENVY -csh load $startup > /tmp/mod.$$
+source /tmp/mod.$$
+if ($?debug) cat /tmp/mod.$$
+/bin/rm /tmp/mod.$$
+
+if (! $?ETOP) then
+  setenv ETOP #ETOP#
+  echo "Environment variable ETOP not set in '$startup'"
+  echo "Defaulting to $ETOP..."
+endif
+
+alias safe_symlink 'test -f \!:2 && test \! -h \!:2 && mv \!:2 \!:2.bak.$$; /bin/rm -f \!:2 ; ln -s \!:1 \!:2'
+
+#SAFE_SYMLINK#
+
+test -d $HOME/.custom || mkdir $HOME/.custom
+
+alias maybe_touch_file 'test -f \!:1 || touch \!:1'
+maybe_touch_file $HOME/.custom/startup
+maybe_touch_file $HOME/.custom/login
+maybe_touch_file $HOME/.custom/cshrc
+
+source $ETOP/etc/login/login.part2

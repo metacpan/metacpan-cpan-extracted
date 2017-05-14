@@ -1,0 +1,264 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+
+use warnings;
+use strict;
+
+# Copyright (c) 2006 Randy Smith
+# $Id: vsoapd,v 1.8 2007/09/21 14:18:47 perlstalker Exp $
+
+our $VERSION = "0.4.1";
+
+use Pod::Usage;
+use Getopt::Long qw(:config require_order);
+use FindBin;
+use Config::IniFiles;
+use SOAP::Lite;
+use Data::Dumper;
+
+use utf8;
+our $DEBUG = 0;
+our $c_sec = 'vsoapd';
+
+BEGIN {
+
+    our @etc_dirs = (
+                      "$FindBin::Bin/../etc",   "$FindBin::Bin",
+                      "$FindBin::Bin/..",       "$FindBin::Bin/vuser",
+                      "$FindBin::Bin/../vuser", "$FindBin::Bin/../etc/vuser",
+                      '/usr/local/etc',         '/usr/local/etc/vuser',
+                      '/etc',                   '/etc/vuser',
+    );
+}
+
+use vars qw(@etc_dirs);
+
+use lib ( map { "$_/extensions" } @etc_dirs );
+use lib ( map { "$_/lib" } @etc_dirs );
+
+use VUser::ExtLib qw(:config);
+use VUser::ExtHandler;
+use VUser::SOAP;
+use VUser::Log qw(:levels);
+use VUser::SOAP::Dispatcher;
+
+## Get signal names
+use Config;
+defined $Config{sig_name} || die "No sigs?";
+my ( %signo, @signame, $i );
+$i = 0;
+foreach my $name ( split( ' ', $Config{sig_name} ) ) {
+    $signo{$name} = $i;
+    $signame[$i] = $name;
+    $i++;
+}
+
+## Load the config file
+my $config_file;
+my $result = GetOptions( "config=s" => \$config_file,
+                         "debug|d+" => \$DEBUG
+                        );
+
+if ( defined $config_file ) {
+    die "FATAL: config file: $config_file not found" unless ( -e $config_file );
+} else {
+    for my $etc_dir (@etc_dirs) {
+        if ( -e "$etc_dir/vuser.conf" ) {
+            $config_file = "$etc_dir/vuser.conf";
+            last;
+        }
+    }
+}
+
+if ( not defined $config_file ) {
+    die "Unable to find a vuser.conf file in "
+      . join( ", ", @etc_dirs ) . ".\n";
+}
+
+my %cfg;
+tie %cfg, 'Config::IniFiles', ( -file => $config_file );
+
+our $log = VUser::Log->new(\%cfg, 'vsoapd');
+
+if (not $DEBUG) {
+    # Only load the debug from the config file if we haven't turned
+    # debugging on from the cmd line    
+    $DEBUG = VUser::ExtLib::strip_ws($cfg{'vuser'}{'debug'}) || 0;
+    $DEBUG = VUser::ExtLib::check_bool($DEBUG) unless $DEBUG =~ /^\d+$/;
+}
+my $debug = $DEBUG;
+
+print "vsoapd $VERSION\n" if $debug;
+
+## Start/Stop/Restart the server
+my $pid_file = VUser::ExtLib::strip_ws($cfg{vsoapd}{'pid file'});
+$pid_file = '/var/run/vsoapd.pid' unless $pid_file;
+
+my $cmd = shift;
+if (not defined $cmd or $cmd eq 'start') {
+} elsif ($cmd eq 'stop') {
+    my $old_pid = get_old_pid($pid_file);
+    $log->log(LOG_NOTICE, "Stopping vsoapd ($old_pid)");
+    print "Sending signal $signo{INT} to pid $old_pid\n" if $debug;
+    kill $signo{INT}, $old_pid;
+    unlink $pid_file;
+    exit;
+} elsif ($cmd eq 'restart') {
+    my $old_pid = get_old_pid($pid_file);
+    $log->log(LOG_NOTICE, "Restarting vsoapd ($old_pid)");
+    kill $signo{INT}, $old_pid;
+} else {
+    die "Unknown command $cmd\n";
+}
+
+# We will be the child after daemonize() is called.
+my $pid = daemonize();
+if ($pid != 0) {
+    open PID, ">$pid_file" or die "Can't write to PID file: $!\n";
+    print PID $pid;
+    close PID;
+    
+    # We don't fork in debug mode so don't exit here.
+    exit unless $debug;
+}
+
+## Start the SOAP handler here
+VUser::SOAP::init(\%cfg);
+my $transport = strip_ws($cfg{$c_sec}{transport});
+
+# The plan is to support multiple transports running at the same
+# time. How feasible that will be remains to be seen.
+my @transports = split (' ', $transport);
+my @daemons = ();
+foreach my $trans (@transports) {
+    my $module = "VUser::SOAP::Transport::$trans";
+    eval "require $module;";
+    die "Unable to load transport $trans\n" if $@;
+    
+    no strict 'refs';
+    $log->log(LOG_INFO, "Attempting to start transport $trans");
+    my $daemon = $module->new(\%cfg);
+    # We may need a custom serializer :-/
+    $daemon->serializer->register_ns('urn:/VUser', 'tns');
+    $daemon->action('urn:/VUser');
+    $daemon->objects_by_reference(qw(VUser::SOAP::Dispatcher));
+    $daemon->dispatch_with({'urn:/VUser' => 'VUser::SOAP::Dispatcher'});
+    #$daemon->dispatch_to('VUser::SOAP::Dispatcher');
+    $log->log(LOG_DEBUG, "$trans uri: ".$daemon->myuri);
+    
+    if ($debug) {
+        $log->log(LOG_DEBUG, "$trans Dispatch table");
+        $log->log(LOG_DEBUG, Dumper $daemon->dispatch_with());
+	$log->log(LOG_DEBUG, Dumper $daemon->dispatch_to());
+    }
+    push @daemons, $daemon;
+}
+
+# This will probably do really stupid things if more than one
+# transport was choosen. There should probably be a fork here.
+# Lazy hack to skip the multiple transport issue.
+$daemons[0]->handle;
+
+## Cleanup after ourself
+unlink $pid_file or warn "Unable to remove $pid_file: $!\n";
+VUser::SOAP::cleanup();
+
+sub daemonize
+{
+    my $pid = $$;
+
+    return $pid if $DEBUG; # Don't daemonize if we're in debug mode.
+
+    if ($pid = fork) {
+	   $SIG{CHLD} = "INGORE";
+	   # exit;
+    } elsif ($pid == 0) {
+    } else {
+	   die "Unable to daemonize: $!";
+    }
+
+    return $pid;
+}
+
+sub get_old_pid
+{
+    my $file = shift;
+    my $pid = undef;
+    open (PID, $file) or die "Unable to get pid. vsoapd not running? $!\n";
+    $pid  = <PID>;
+    close PID;
+    return $pid;
+}
+
+__END__
+
+=head1 NAME
+
+vsoapd - vuser SOAP daemon.
+
+=head1 SYNOPSIS
+
+vsoapd [--config=/path/to/vuser.conf] [start|restart|stop]
+
+=head1 OPTIONS
+
+=head1 DESCRIPTION
+
+=head1 CONFIGURATION
+
+ [vsoapd]
+ # The transport SOAP will use.
+ # Supported transports: HTTP
+ transport = HTTP
+ 
+ # When enabled, vsoapd requires that any SOAP clients authenticate
+ # before using the services provided.
+ # Disabling this option will also disable all ACLs.
+ require authentication = yes
+ 
+ # Used when creating the authentication ticket when
+ # 'require authentication', above, is enable.
+ digest key = something really hard to guess
+ 
+ # The time before a ticket expires in minutes.
+ # Ignored if 'require authentication' is disabled.
+ ticket lifetime = 10
+ 
+ # Path to pid file
+ pid file = /var/run/vsoapd.pid
+ 
+ # The URL for the client to access the vsoapd service.
+ # This is used when generating the WSDL with gen-wsdl.pl
+ location = http://localhost:8000/
+ 
+See also the configuration for vuser.
+
+=head1 BUGS
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Randy Smith <perlstalker@vuser.org>
+
+=head1 LICENSE
+ 
+ This file is part of vsoapd.
+ 
+ vsoapd is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ vsoapd is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with vsoapd; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+=cut

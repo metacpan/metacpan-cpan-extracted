@@ -8,7 +8,7 @@ use vars qw($VERSION $AUTOLOAD $Fetchlast);
 use overload  '""' => 'toString',
 	      'fallback' =>' TRUE';
 
-$VERSION = '1.15';
+$VERSION = '1.30';
 require 5.004;
 
 =head1 NAME
@@ -652,13 +652,14 @@ sub get {
     my($self,$key,$index) = @_;
     return $self->index($key) if $key=~/[.\[\]]/;
 
-    $index = '' unless defined $index;
-    return $self->get_last($key) if $index eq '#' || $index == -1 ;
-    if ($index eq '?') {
+    if (defined $index) {
+      return $self->get_last($key) if $index eq '#' || $index == -1;
+      if ($index eq '?') {
 	my $size = scalar(@{$self->{$key}});
 	return $self->{$key}->[rand($size)];
+      }
+      return $self->{$key}->[$index] if $index ne '';
     }
-    return $self->{$key}->[$index] if $index ne '';
 
     if (wantarray) {
       return @{$self->{$key}} if $self->{$key};
@@ -718,17 +719,21 @@ sub cursor {
 
 # Convert a stone into a straight hash
 sub to_hash {
-    my ($self) = shift;
-    my ($key,%result);
-    foreach $key (keys %$self) {
-	next if substr($key,0,1) eq '.';
-	my ($value,@values);
-	foreach $value (@{$self->{$key}}) {
-	    push(@values,ref($value) ? { $value->to_hash() } : $value);
-	}
-	$result{$key} = @values > 1 ? [@values] : $values[0];
+  my ($self) = shift;
+  my ($key,%result);
+  foreach $key (keys %$self) {
+    next if substr($key,0,1) eq '.';
+    my ($value,@values);
+    foreach $value (@{$self->{$key}}) {
+      # NG 00-10-04 changed to convert values with .name into those names
+      # NG 00-10-04 and to convert recursive results to HASH ref
+      push(@values,!ref($value)? $value:
+	   defined ($value->{'.name'})? $value->{'.name'}:
+	   {$value->to_hash()});
     }
-    return %result;
+    $result{$key} = @values > 1 ? [@values] : $values[0];
+  }
+  return %result;
 }
 
 # Search for a particular tag and return it using a breadth-first search
@@ -775,11 +780,12 @@ sub _index {
     }
     
     foreach (@value) {
-	if (@indices) {
-	    push @results,&_index($_,@indices) if $_->isa('Stone') && !exists($_->{'.name'});
-	} else{
-	    push @results,$_;
-	}
+      next unless ref $_;
+      if (@indices) {
+	push @results,&_index($_,@indices) if $_->isa('Stone') && !exists($_->{'.name'});
+      } else{
+	push @results,$_;
+      }
     }
     return wantarray ? @results : $results[0];
 }

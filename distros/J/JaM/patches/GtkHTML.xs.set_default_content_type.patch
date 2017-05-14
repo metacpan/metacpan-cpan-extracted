@@ -1,0 +1,16 @@
+*** GtkHTML.xs	Sun Aug 19 13:14:03 2001
+--- GtkHTML.xs.patched	Sun Aug 19 13:13:59 2001
+***************
+*** 223,228 ****
+--- 223,233 ----
+  	Gtk::Gdk::Color color
+  
+  void
++ gtk_html_set_default_content_type (html, content_type)
++ 	Gtk::HTML	html
++ 	char		*content_type
++ 
++ void
+  gtk_html_enable_debug (html, debug)
+  	Gtk::HTML	html
+  	bool	debug

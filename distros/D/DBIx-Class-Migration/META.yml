@@ -3,45 +3,48 @@ abstract: 'Tools to make migrating your DBIx::Class databases easier'
 author:
   - 'John Napiorkowski <jjnapiork@cpan.org>'
 build_requires:
-  File::Path: 0
-  File::Spec::Functions: 0
-  Test::Most: 0
-  Test::Requires: 0
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  Test::Most: '0.34'
+  Test::Requires: '0.08'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Class-Migration
+no_index:
+  directory:
+    - examples
 requires:
-  Class::Load: 0
-  Config::MySQL: 0.02
-  DBD::SQLite: 1.35
-  DBIx::Class::DeploymentHandler: 0.002100
-  DBIx::Class::Fixtures: 1.001016
-  DBIx::Class::Schema::Loader: 0.07017
-  Devel::PartialDump: 0
-  File::Copy: 0
-  File::Path: 0
-  File::ShareDir::ProjectDistDir: 0.003001
-  File::Spec: 0
-  File::Temp: 0
-  JSON::XS: 2.32
-  Moose: 0
-  MooseX::Attribute::ENV: 0.02
-  MooseX::Getopt: 0.45
-  MooseX::Traits::Pluggable: 0
-  MooseX::Types: 0
-  MooseX::Types::LoadableClass: 0
-  Pod::Parser: 1.51
-  SQL::Translator: 0.11010
-  Text::Brew: 0
-  version: 0.77
+  Class::Load: '0.22'
+  Config::MySQL: '0.02'
+  DBD::SQLite: '1.46'
+  DBIx::Class::DeploymentHandler: '0.002215'
+  DBIx::Class::Fixtures: '1.001028'
+  DBIx::Class::Schema::Loader: '0.07042'
+  Devel::PartialDump: '0.17'
+  File::Copy: '0'
+  File::Path: '0'
+  File::ShareDir::ProjectDistDir: '1.000004'
+  File::Spec: '0'
+  File::Temp: '0'
+  JSON::MaybeXS: '0'
+  Moose: '2.1403'
+  MooseX::Attribute::ENV: '0.02'
+  MooseX::Getopt: '0.68'
+  MooseX::Traits::Pluggable: '0.12'
+  MooseX::Types: '0.45'
+  MooseX::Types::LoadableClass: '0.013'
+  Pod::Parser: '1.63'
+  SQL::Translator: '0.11021'
+  Text::Brew: '0.02'
+  version: '0.9912'
 resources:
   bugtracker: https://github.com/jjn1056/DBIx-Class-Migration/issues
   homepage: https://github.com/jjn1056/DBIx-Class-Migration
   repository: https://github.com/jjn1056/DBIx-Class-Migration.git
-version: 0.044
+version: '0.058'

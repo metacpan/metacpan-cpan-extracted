@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use utf8;
+use Acme::eng2kor;
+use Test::More tests => 7;
+my $app;
+ok( $app = Acme::eng2kor->new, 'create new instance');
+is( $app->src, 'en', 'src default');
+is( $app->dst, 'ko', 'dst default');
+$app->text('hello');
+is( $app->text, 'hello', 'set text correct');
+$app->src('ko');
+$app->dst('en');
+is( $app->src, 'ko', 'src changed corrently');
+is( $app->dst, 'en', 'dst changed corrently');
+$app->src('en');
+$app->dst('ko');
+$app->translate;
+like( $app->translated, qr/안녕/, 'translated' );

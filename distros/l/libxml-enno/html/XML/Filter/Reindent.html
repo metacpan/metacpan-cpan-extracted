@@ -1,0 +1,111 @@
+<HTML><HEAD><TITLE>XML::Filter::Reindent - Reformats whitespace for pretty printing XML</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::Filter::Reindent - Reformats whitespace for pretty printing XML
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> use XML::Handler::Composer;
+ use XML::Filter::Reindent;
+
+</PRE><PRE> my $composer = new XML::Handler::Composer (%OPTIONS);
+ my $indent = new XML::Filter::Reindent (Handler =&gt; $composer, %OPTIONS);
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::Filter::Reindent is a sub class of <A HREF="DetectWS.html">XML::Filter::DetectWS</A>.
+
+<P>XML::Filter::Reindent can be used as a PerlSAX filter to reformat an
+XML document before sending it to a PerlSAX handler that prints it
+(like <A HREF="../Handler/Composer.html">XML::Handler::Composer</A>.)
+
+<P>Like <A HREF="DetectWS.html">XML::Filter::DetectWS</A>, it detects ignorable whitespace and blocks of
+whitespace characters in certain places. It uses this information and
+information supplied by the user to determine where whitespace may be
+modified, deleted or inserted. 
+Based on the indent settings, it then modifies, inserts and deletes characters
+and ignorable_whitespace events accordingly.
+
+<P>This is just a first stab at the implementation.
+It may be buggy and may change completely!
+
+<P><HR><H1><A NAME="Constructor_Options">Constructor Options
+
+</A></H1><DL><DT><A NAME="_Handler_"><STRONG><P>* Handler
+
+</STRONG></A><DD>The PerlSAX handler (or filter) that will receive the PerlSAX events from this 
+filter.
+
+<DT><A NAME="_Tab_Default_one_space_"><STRONG><P>* Tab (Default: one space)
+
+</STRONG></A><DD>The number of spaces per indent level for elements etc. in document content.
+
+<DT><A NAME="_Newline_Default_x0A_"><STRONG><P>* Newline (Default: "\x0A")
+
+</STRONG></A><DD>The newline to use when re-indenting. 
+The default is the internal newline used by <A HREF="../Parser.html">XML::Parser</A>, <A HREF="../DOM.html">XML::DOM</A> etc.,
+and should be fine when used in combination with <A HREF="../Handler/Composer.html">XML::Handler::Composer</A>.
+
+</DL><P><HR><H1><A NAME="_self_indent_children_start_element_event_">$self-&gt;indent_children ($start_element_event)
+
+</A></H1><P>This method determines whether children of a certain element
+may be reformatted. 
+The default implementation checks the PreserveWS parameter of the specified
+start_element event and returns 0 if it is set or MAYBE otherwise.
+The value MAYBE (2) indicates that further investigation is needed, e.g.
+by examining the element contents. A value of 1 means yes, indent the
+child nodes, no further investigation is needed.
+
+<P>NOTE: the PreserveWS parameter is set by the parent class, 
+<A HREF="DetectWS.html">XML::Filter::DetectWS</A>, when the element or one of its ancestors has
+the attribute xml:space="preserve".
+
+<P>Override this method to tweak the behavior of this class.
+
+<P><HR><H1><A NAME="_self_indent_element_start_element_event_parent_says_indent_">$self-&gt;indent_element ($start_element_event, $parent_says_indent)
+
+</A></H1><P>This method determines whether a certain element may be re-indented. 
+The default implementation returns the value of the $parent_says_indent
+parameter, which was set to the value returned by indent_children for the
+parent element. In other words, the element will be re-indented if the
+parent element allows it.
+
+<P>Override this method to tweak the behavior of this class.
+I'm not sure how useful this hook is. Please provide feedback!
+
+<P><HR><H1><A NAME="Current_Implementation">Current Implementation
+
+</A></H1><P>The current implementation puts all incoming Perl SAX events in a queue for
+further processing. When determining which nodes should be re-indented,
+it sometimes needs information from previous events, hence the use of the 
+queue.
+
+<P>The parameter (Compress =&gt; 1) is added to 
+matching start_element and end_element events with no events in between
+This indicates to an XML printer that a compressed notation can be used, 
+e.g &lt;foo/&gt;.
+
+<P>If an element allows reformatting of its contents (xml:space="preserve" was 
+not active and indent_children returned MAYBE), the element
+contents will be reformatted unless it only has one child node and that
+child is a regular text node (characters event.) 
+In that case, the element will be printed as &lt;foo&gt;text contents&lt;/foo&gt;.
+
+<P>If you want element nodes with just one text child to be reindented as well,
+simply override indent_children to return 1 instead of MAYBE (2.)
+
+<P>This behavior may be changed or extended in the future.
+
+<P><HR><H1><A NAME="CAVEATS">CAVEATS
+
+</A></H1><P>This code is highly experimental! 
+It has not been tested well and the API may change.
+
+<P>The code that detects blocks of whitespace at potential indent positions
+may need some work.
+
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
+&lt;<I>enno@att.com</I>&gt;. 
+
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:30 2000</FONT></I></BODY></HTML>

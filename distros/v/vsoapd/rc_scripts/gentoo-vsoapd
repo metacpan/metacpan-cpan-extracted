@@ -1,0 +1,19 @@
+#!/sbin/runscript
+# Copyright 2005 Randy Smith <perlstalker@amigo.net>
+# $Id: gentoo-vsoapd,v 1.1 2006/09/25 22:54:16 perlstalker Exp $
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting vsoapd"
+	$PREFIX/sbin/vsoapd start 2>&1 >/dev/null
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping vsoapd"
+	$PREFIX/sbin/vsoapd stop 2>&1 >/dev/null
+	eend $?
+}

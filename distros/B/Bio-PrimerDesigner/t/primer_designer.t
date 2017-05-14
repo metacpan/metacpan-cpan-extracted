@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: primer_designer.t,v 1.6 2004/02/19 22:54:58 sheldon Exp $
+# $Id: primer_designer.t 16 2008-11-07 02:44:52Z kyclark $
 
 #
 # Tests for "Bio::PrimerDesigner" module.
@@ -10,6 +10,7 @@ use strict;
 my $OS_name = $^O;
 
 use Test::More; 
+
 if ($OS_name =~ /n[iu]x|darwin/i) {
    plan tests => 22;
 }
@@ -17,26 +18,25 @@ else {
    plan tests => 20;
 }
 
-
 use_ok( 'Bio::PrimerDesigner' );
 
 my $pd = Bio::PrimerDesigner->new;
-isa_ok( $pd, 'Bio::PrimerDesigner' );
 
-#my $OS_name = $^O;
+isa_ok( $pd, 'Bio::PrimerDesigner' );
 
 #
 # Check defaults.
 #
-#my $def_url = 'dev.wormbase.org/db/seq/primer_designer.cgi';
-#is( $pd->url, $def_url, qq[Default url is "$def_url"] );
 isa_ok( $pd->program, 'Bio::PrimerDesigner::primer3' );
 
 #
 # Non-unix tests
 #
 if ( $OS_name !~ /n[iu]x|darwin/ ) {
-    is( $pd->method, 'remote', 'Default method for non-unix-like OS is "remote"' );
+    is( 
+        $pd->method, 'remote', 'Default method for non-unix-like OS is "remote"'
+    );
+
     is( $pd->binary_path, '', qq[Default binary path for non-unix is ""] );
     
     #

@@ -1,5 +1,5 @@
 package Class::Util ;
-$VERSION = 2.40 ;
+$VERSION = 2.21 ;
 use 5.006_001 ;
 use strict ;
   
@@ -26,9 +26,8 @@ use strict ;
    ; my $r = eval "require $_;"
    ; if ($@)
       { (my $c = $_.'.pm') =~ s|\b::\b|/|g
-      ; no strict 'refs'
       ; croak $@ if $@ !~ /^Can't locate $c in \@INC/
-                    || not grep { /[^:][^:]\z/ } keys %{$_.'::'}
+                    || not defined %{$_.'::'}
       }
    ; $r
    }
@@ -93,7 +92,7 @@ __END__
 
 Class::Util - Class utility functions
 
-=head1 VERSION 2.40
+=head1 VERSION 2.21
 
 Included in OOTools 2.21 distribution.
 

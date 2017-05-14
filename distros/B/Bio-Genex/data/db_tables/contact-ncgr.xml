@@ -1,0 +1,146 @@
+<contact_list>
+<contact
+  type="experiment_set_provider"
+  contact_person="Carol Harger"
+  contact_person_email="cah@ncgr.org"
+  contact_person_phone="(505) 995-4419"
+/>
+<contact
+  type="developer"
+  contact_person="Andrew Farmer"
+  contact_person_email="adf@ncgr.org"
+  contact_person_phone="(505) 995-4464"
+/>
+<contact
+  type="test_user"
+  contact_person="Bill Barber"
+  contact_person_email="wmb@ncgr.org"
+  contact_person_phone="(505) 995-4471"
+/>
+<contact
+  type="test_user"
+  contact_person="Bill Beavis"
+  contact_person_email="wdb@ncgr.org"
+  contact_person_phone="(505) 995-4412"
+/>
+<contact
+  type="test_user"
+  contact_person="Bill Camp"
+  contact_person_email="wcc@ncgr.org"
+  contact_person_phone="(505) 995-4413"
+/>
+<contact
+  type="test_user"
+  contact_person="Brad Ross"
+  contact_person_email="bcr@ncgr.org"
+  contact_person_phone="(505) 995-4454"
+/>
+<contact
+  type="developer"
+  contact_person="Carol Harger"
+  contact_person_email="cah@ncgr.org"
+  contact_person_phone="(505) 995-4419"
+/>
+<contact
+  type="developer"
+  contact_person="Forrest Black"
+  contact_person_email="cfb@ncgr.org"
+  contact_person_phone="(505) 995-4479"
+/>
+<contact
+  type="test_user"
+  contact_person="Frank LaFond"
+  contact_person_email="fdl@ncgr.org"
+  contact_person_phone="(505) 995-4434"
+/>
+<contact
+  type="developer"
+  contact_person="Greg Colello"
+  contact_person_email="gdc@ncgr.org"
+  contact_person_phone="(505) 995-4457"
+/>
+<contact
+  type="developer"
+  contact_person="Harry Mangalam"
+  contact_person_email="hjm@ncgr.org"
+  contact_person_phone="(949) 856-2847"
+/>
+<contact
+  type="developer"
+  contact_person="Jiaye Zhou"
+  contact_person_email="jz@ncgr.org"
+  contact_person_phone="(505) 995-4426"
+/>
+<contact
+  type="developer"
+  contact_person="John Utsey"
+  contact_person_email="jpu@ncgr.org"
+  contact_person_phone="(505) 995-4477"
+/>
+<contact
+  type="developer"
+  contact_person="Karen A. Schlauch"
+  contact_person_email="kas@ncgr.org"
+  contact_person_phone="(505) 995-4415"
+/>
+<contact
+  type="developer"
+  contact_person="Kevin Garwood"
+  contact_person_email="klg@ncgr.org"
+  contact_person_phone="(505) 995-4438"
+/>
+<contact
+  type="test_user"
+  contact_person="Kimberly Bodelson"
+  contact_person_email="ksb@ncgr.org"
+  contact_person_phone="(505) 995-4424"
+/>
+<contact
+  type="developer"
+  contact_person="Lonny Montoya"
+  contact_person_email="lxm@ncgr.org"
+  contact_person_phone="(505) 995-4460"
+/>
+<contact
+  type="test_user"
+  contact_person="Maria Harrison"
+  contact_person_email="mjh@ncgr.org"
+  contact_person_phone="(505) 995-4427"
+/>
+<contact
+  type="developer"
+  contact_person="Mark Waugh"
+  contact_person_email="mew@ncgr.org"
+  contact_person_phone="(505) 995-4446"
+/>
+<contact
+  type="test_user"
+  contact_person="Muriel Taylor"
+  contact_person_email="mat@ncgr.org"
+  contact_person_phone="(505) 995-4441"
+/>
+<contact
+  type="test_user"
+  contact_person="Stephen Joseph"
+  contact_person_email="scj@ncgr.org"
+  contact_person_phone="(505) 995-4404"
+/>
+<contact
+  type="developer"
+  contact_person="Todd Peterson"
+  contact_person_email="tfp@ncgr.org"
+  contact_person_phone="(505) 995-4417"
+/>
+<contact
+  type="developer"
+  contact_person="William Anderson"
+  contact_person_email="wxa@ncgr.org"
+  contact_person_phone="(505) 995-4453"
+/>
+<contact
+  type="developer"
+  contact_person="Jason Stewart"
+  contact_person_email="jes@ncgr.org"
+  contact_person_phone="(505) 255-8271"
+/>
+</contact_list>

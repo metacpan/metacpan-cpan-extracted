@@ -1,0 +1,11 @@
+COPYRIGHT
+MANIFEST
+Makefile.PL
+PRSG.pm
+PRSG.pod
+PRSG.xs
+examples/prsg_driver.pl
+prsg.c
+prsg.h
+test.pl
+typemap

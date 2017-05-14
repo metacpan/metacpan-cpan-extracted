@@ -1,17 +1,18 @@
 #!./perl -w
 
 # Tests for the command-line switches:
-# -0, -c, -l, -s, -m, -M, -V, -v, -h, -i and all unknown
+# -0, -c, -l, -s, -m, -M, -V, -v, -h, -i, -E and all unknown
 # Some switches have their own tests, see MANIFEST.
 
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
+    require Config; import Config;
 }
 
-BEGIN { require "./test.pl"; }
+BEGIN { require "./test.pl";  require "./loc_tools.pl"; }
 
-plan(tests => 66);
+plan(tests => 115);
 
 use Config;
 
@@ -22,7 +23,7 @@ $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
 
 my $r;
 my @tmpfiles = ();
-END { unlink @tmpfiles }
+END { unlink_all @tmpfiles }
 
 # Tests for -0
 
@@ -105,6 +106,31 @@ SWTEST
 	&& $r !~ /\bblock 5\b/,
 	'-c'
     );
+}
+
+SKIP: {
+    skip 'locales not available', 1 unless locales_enabled('LC_ALL');
+
+    my $tempdir = tempfile;
+    mkdir $tempdir, 0700 or die "Can't mkdir '$tempdir': $!";
+
+    local $ENV{'LC_ALL'} = 'C'; # Keep the test simple: expect English
+    local $ENV{LANGUAGE} = 'C';
+    setlocale(LC_ALL, "C");
+
+    # Win32 won't let us open the directory, so we never get to die with
+    # EISDIR, which happens after open.
+    require Errno;
+    import Errno qw(EACCES EISDIR);
+    my $error  = do {
+        local $! = $^O eq 'MSWin32' ? &EACCES : &EISDIR; "$!"
+    };
+    like(
+        runperl( switches => [ '-c' ], args  => [ $tempdir ], stderr => 1),
+        qr/Can't open perl script.*$tempdir.*\Q$error/s,
+        "RT \#61362: Cannot syntax-check a directory"
+    );
+    rmdir $tempdir or die "Can't rmdir '$tempdir': $!";
 }
 
 # Tests for -l
@@ -193,34 +219,42 @@ SWTESTPM
     is( $r, "<$package><foo><bar>", '-m with import parameters' );
     push @tmpfiles, $filename;
 
+  {
+    local $TODO = '';  # these work on VMS
+
     is( runperl( switches => [ '-MTie::Hash' ], stderr => 1, prog => 1 ),
 	  '', "-MFoo::Bar allowed" );
 
     like( runperl( switches => [ "-M:$package" ], stderr => 1,
-		   prog => 'die "oops"' ),
+		   prog => 'die q{oops}' ),
 	  qr/Invalid module name [\w:]+ with -M option\b/,
           "-M:Foo not allowed" );
 
     like( runperl( switches => [ '-mA:B:C' ], stderr => 1,
-		   prog => 'die "oops"' ),
+		   prog => 'die q{oops}' ),
 	  qr/Invalid module name [\w:]+ with -m option\b/,
           "-mFoo:Bar not allowed" );
 
     like( runperl( switches => [ '-m-A:B:C' ], stderr => 1,
-		   prog => 'die "oops"' ),
+		   prog => 'die q{oops}' ),
 	  qr/Invalid module name [\w:]+ with -m option\b/,
           "-m-Foo:Bar not allowed" );
 
     like( runperl( switches => [ '-m-' ], stderr => 1,
-		   prog => 'die "oops"' ),
+		   prog => 'die q{oops}' ),
 	  qr/Module name required with -m option\b/,
   	  "-m- not allowed" );
 
     like( runperl( switches => [ '-M-=' ], stderr => 1,
-		   prog => 'die "oops"' ),
+		   prog => 'die q{oops}' ),
 	  qr/Module name required with -M option\b/,
   	  "-M- not allowed" );
+  }  # disable TODO on VMS
 }
+is runperl(stderr => 1, prog => '#!perl -m'),
+   qq 'Too late for "-m" option at -e line 1.\n', '#!perl -m';
+is runperl(stderr => 1, prog => '#!perl -M'),
+   qq 'Too late for "-M" option at -e line 1.\n', '#!perl -M';
 
 # Tests for -V
 
@@ -260,12 +294,19 @@ SWTESTPM
 
 {
     local $TODO = '';   # these ones should work on VMS
-
-    my $v = sprintf "%vd", $^V;
-    like( runperl( switches => ['-v'] ),
-	  qr/This is perl, v$v built for $Config{archname}.+Copyright.+Larry Wall.+Artistic License.+GNU General Public License/s,
-          '-v looks okay' );
-
+    # there are definitely known build configs where this test will fail
+    # DG/UX comes to mind. Maybe we should remove these special cases?
+  SKIP:
+    {
+        skip "Win32 miniperl produces a default archname in -v", 1
+	  if $^O eq 'MSWin32' && is_miniperl;
+        my $v = sprintf "%vd", $^V;
+        my $ver = $Config{PERL_VERSION};
+        my $rel = $Config{PERL_SUBVERSION};
+        like( runperl( switches => ['-v'] ),
+	      qr/This is perl 5, version \Q$ver\E, subversion \Q$rel\E \(v\Q$v\E(?:[-*\w]+| \([^)]+\))?\) built for \Q$Config{archname}\E.+Copyright.+Larry Wall.+Artistic License.+GNU General Public License/s,
+              '-v looks okay' );
+    }
 }
 
 # Tests for -h
@@ -281,15 +322,29 @@ SWTESTPM
 
 # Tests for switches which do not exist
 
-foreach my $switch (split //, "ABbEGgHJjKkLNOoQqRrYyZz123456789_")
+foreach my $switch (split //, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
 {
     local $TODO = '';   # these ones should work on VMS
 
     like( runperl( switches => ["-$switch"], stderr => 1,
-		   prog => 'die "oops"' ),
+		   prog => 'die q{oops}' ),
 	  qr/\QUnrecognized switch: -$switch  (-h will show valid options)./,
           "-$switch correctly unknown" );
 
+    # [perl #104288]
+    like( runperl( stderr => 1, prog => "#!perl -$switch" ),
+	  qr/^Unrecognized switch: -$switch  \(-h will show valid (?x:
+	     )options\) at -e line 1\./,
+          "-$switch unrecognised on #! line" );
+}
+
+# Tests for unshebangable switches
+for (qw( e f x E S V )) {
+    $r = runperl(
+	stderr   => 1,
+	prog     => "#!perl -$_",
+    );
+    is $r, "Can't emulate -$_ on #! line at -e line 1.\n","-$_ on #! line";
 }
 
 # Tests for -i
@@ -297,7 +352,7 @@ foreach my $switch (split //, "ABbEGgHJjKkLNOoQqRrYyZz123456789_")
 {
     local $TODO = '';   # these ones should work on VMS
 
-    sub do_i_unlink { 1 while unlink("file", "file.bak") }
+    sub do_i_unlink { unlink_all("file", "file.bak") }
 
     open(FILE, ">file") or die "$0: Failed to create 'file': $!";
     print FILE <<__EOF__;
@@ -325,7 +380,58 @@ __EOF__
     is(join(":", @bak),
        "foo yada dada:bada foo bing:king kong foo",
        "-i backup file");
+
+    my $out1 = runperl(
+        switches => ['-i.bak -p'],
+        prog     => 'exit',
+        stderr   => 1,
+        stdin    => "1\n",
+    );
+    is(
+        $out1,
+        "-i used with no filenames on the command line, reading from STDIN.\n",
+        "warning when no files given"
+    );
+    my $out2 = runperl(
+        switches => ['-i.bak -p'],
+        prog     => 'exit',
+        stderr   => 1,
+        stdin    => "1\n",
+        args     => ['file'],
+    );
+    is($out2, "", "no warning when files given");
 }
+
+# Tests for -E
+
+$TODO = '';  # the -E tests work on VMS
+
+$r = runperl(
+    switches	=> [ '-E', '"say q(Hello, world!)"']
+);
+is( $r, "Hello, world!\n", "-E say" );
+
+
+$r = runperl(
+    switches	=> [ '-E', '"no warnings q{experimental::smartmatch}; undef ~~ undef and say q(Hello, world!)"']
+);
+is( $r, "Hello, world!\n", "-E ~~" );
+
+$r = runperl(
+    switches	=> [ '-E', '"no warnings q{experimental::smartmatch}; given(undef) {when(undef) { say q(Hello, world!)"}}']
+);
+is( $r, "Hello, world!\n", "-E given" );
+
+$r = runperl(
+    switches    => [ '-nE', q("} END { say q/affe/") ],
+    stdin       => 'zomtek',
+);
+is( $r, "affe\n", '-E works outside of the block created by -n' );
+
+$r = runperl(
+    switches	=> [ '-E', q("*{'bar'} = sub{}; print 'Hello, world!',qq|\n|;")]
+);
+is( $r, "Hello, world!\n", "-E does not enable strictures" );
 
 # RT #30660
 

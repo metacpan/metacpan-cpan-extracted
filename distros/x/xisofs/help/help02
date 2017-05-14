@@ -1,0 +1,1 @@
+This field should contain the full pathname of the file to which the iso9660 filesystem image should be written. Eg. /home/module.img

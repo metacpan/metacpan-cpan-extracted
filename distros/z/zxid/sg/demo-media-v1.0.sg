@@ -1,0 +1,82 @@
+# demo-media-v1.0.sg
+# $Id: demo-media-v1.0.sg,v 1.2 2007-08-10 19:19:10 sampo Exp $
+
+target(demomed, urn:x-demo:me:2006-01)
+import(lu, urn:liberty:util:2006-08, liberty-idwsf-utility-v2.0.xsd)
+
+StoreObjectRequest	 -> %demomed:StoreObjectRequestType
+%StoreObjectRequestType:
+  demomed:Object+	 -> %demomed:ObjectType
+  ;
+
+StoreObjectResponse	 -> %demomed:StoreObjectResponseType
+%StoreObjectResponseType:
+  lu:Status
+  demomed:ObjectStoreInfo*	 -> %demomed:ObjectStoreInfoType
+  ;
+
+GetObjectListRequest	 -> %demomed:GetObjectListRequestType
+%GetObjectListRequestType:
+  demomed:ObjectSearchParm	 -> %demomed:ObjectSearchParmType
+  ;
+
+GetObjectListResponse	 -> %demomed:GetObjectListResponseType
+%GetObjectListResponseType:
+  lu:Status
+  demomed:ObjectInfo*	 -> %demomed:ObjectInfoType
+  ;
+
+GetObjectRequest	 -> %demomed:GetObjectRequestType
+%GetObjectRequestType:
+  demomed:ObjectID+	 -> %xs:string
+  ;
+
+GetObjectResponse	 -> %demomed:GetObjectResponseType
+%GetObjectResponseType:
+  lu:Status
+  demomed:ObjectData*	 -> %demomed:ObjectDataType
+  ;
+
+DeleteObjectRequest	 -> %demomed:DeleteObjectRequestType
+%DeleteObjectRequestType:
+  demomed:ObjectID+	 -> %xs:string
+  ;
+
+DeleteObjectResponse	 -> %demomed:DeleteObjectResponseType
+%DeleteObjectResponseType:
+  lu:Status
+  demomed:Count	 -> %xs:integer
+  ;
+
+%ObjectType:
+  demomed:ObjectInfo	 -> %demomed:ObjectInfoType
+  demomed:ObjectData	 -> %demomed:ObjectDataType  # was %xs:base64Binary
+  @reqID	 -> %xs:string
+  ;
+
+%ObjectInfoType:
+  demomed:Dir	 -> %xs:string
+  demomed:Name	 -> %xs:string
+  demomed:Type	 -> %xs:string
+  demomed:Created	 -> %xs:dateTime
+  demomed:Comment?	 -> %xs:string
+  @objectID?	 -> %xs:string
+  ;
+
+%ObjectDataType:	 base(xs:base64Binary)
+  @objectID?	 -> %xs:string
+  ;
+
+%ObjectSearchParmType:
+  demomed:Dir?	 -> %xs:string
+  demomed:Name?	 -> %xs:string
+  demomed:Type?	 -> %xs:string
+  demomed:objectID?	 -> %xs:string
+  ;
+
+%ObjectStoreInfoType:
+  @storeRef	 -> %xs:string
+  @objectID	 -> %xs:string
+  ;
+
+#EOF

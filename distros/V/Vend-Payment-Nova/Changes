@@ -1,0 +1,9 @@
+Revision history for Perl extension Vend::Payment::Nova.
+
+01-13-2009 - Version 1.02
+    - Joseph Montanez reports that Nova might (rarely) return 'APPROVAL' instead of 'APPROVED'.
+03-17-2011 - Version 1.03
+    - added 'use strict;' -- an oversight, but didn't require any further changes. :-)
+    - some formatting changes, and made a DEBUG constant
+    - added VERSION to Makefile.PL
+

@@ -3,6 +3,10 @@
 package    #hide from cpan
   Net::DirectConnect::nmdc;
 use strict;
+no strict qw(refs);
+use warnings "NONFATAL" => "all";
+no warnings qw(uninitialized);
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use utf8;
 #use Time::HiRes qw(time sleep);
 use Data::Dumper;    #dev only
@@ -11,7 +15,6 @@ use Net::DirectConnect;
 #use Net::DirectConnect::clicli;
 #use Net::DirectConnect::http;
 #use Net::DirectConnect::httpcli;
-no warnings qw(uninitialized);
 our $VERSION = ( split( ' ', '$Revision: 594 $' ) )[1];
 use base 'Net::DirectConnect';
 
@@ -75,20 +78,17 @@ sub init {
     charset_protocol => 'cp1251',
   );
   $self->{$_} = $_{$_} for keys %_;
-  #$self->log('dev', 'chPROTO:',$self->{'charset_protocol'});
-  #print 'adc init now=',Dumper $self;
-  #$self->{'periodic'}{ __FILE__ . __LINE__ } = sub { $self->cmd( 'search_buffer', ) if $self->{'socket'}; };
-  #http://www.dcpp.net/wiki/index.php/LockToKey :
+#$self->log('dev', 'chPROTO:',$self->{'charset_protocol'});
+#print 'adc init now=',Dumper $self;
+#$self->{'periodic'}{ __FILE__ . __LINE__ } = sub {      my $self = shift if ref $_[0]; $self->cmd( 'search_buffer', ) if $self->{'socket'}; };
+#http://www.dcpp.net/wiki/index.php/LockToKey :
   $self->{'lock2key'} ||= sub {
     my $self = shift if ref $_[0];
     #return $self->{lock};
     my ($lock) = @_;
     #$self->{'log'}->( 'dev', 'making lock from', $lock );
-
-    $lock = Encode::encode $self->{charset_protocol}, $lock if $self->{charset_protocol};
+    $lock = Encode::encode $self->{charset_protocol}, $lock, Encode::FB_WARN if $self->{charset_protocol};
     #$self->{'log'}->( 'dev', 'making lock from2:', $lock );
-
-
     my @lock = split( //, $lock );
     my $i;
     my @key = ();
@@ -105,7 +105,6 @@ sub init {
     local $_ = join( '', @key );
     $_ = Encode::decode $self->{charset_protocol}, $_ if $self->{charset_protocol};
     return $_;
-
   };
   $self->{'tag'} ||= sub {
     my $self = shift;
@@ -155,7 +154,10 @@ sub init {
   };
   $self->{'make_hub'} ||= sub {
     my $self = shift if ref $_[0];
-    $self->{'hub_name'} ||= $self->{'host'} . ( ( $self->{'port'} and $self->{'port'} != 411 ) ? ':' . $self->{'port'} : '' );
+    $self->{'hub_name'} ||=
+      $self->{'host'};    # . ( ( $self->{'port'} and $self->{'port'} != 411 ) ? ':' . $self->{'port'} : '' );
+    $self->{'hub_name'} =~ s/:411$//;
+    #$self->log('dev', $self->{'hub_name'});
   },;
 }
 1;

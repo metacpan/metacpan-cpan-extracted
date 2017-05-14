@@ -1,0 +1,208 @@
+Revision history for Perl extension Class::Maker.
+
+0.01  Tue Jun  4 05:20:50 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -a -n Class::Maker
+
+0.02  18.06.2002 22:31
+	- Fixed a bug in Class::Maker::Examples::Array which lead
+	to failure of other cpan module SQL::Generator
+
+0.03 19.06.2002 23:07
+	- Added private field: All privat attributes are automatically
+	prefixed with an '_' (This feature wasn't working before).
+
+0.04 26.06.2002 00:57
+	- Added a couple of very usefull Example:: objects.
+
+0.05_01 01.07.2002 00:49
+	- changed the usage of Class::Maker::Fields::_make_method()
+	- now supporting '<attr>' syntax in the attribute section for
+	making these attribute fields private (Inspired by Terrence
+	Brannon). Example:
+
+	attributes =>
+	{
+		scalar => [qw(name address <internal> age)],
+
+		array => [qw(friends <pattri> visits)],
+	}
+
+	Result: 'internal' and 'pattri' are privat (as if the were
+	written into an private => { } attribute section. Also the
+	reflection is modified after this.
+
+	TODO: the brackets should include multiple attribute values,
+	like qw(one <two three four> five) , should make two, three,
+	four private.
+	This bracket-private feature should work only in public and
+	attributes fields.
+
+0.05_02 01.07.2002 00:49
+
+	- compilation failed on Class::Maker::Example::* classes fixed.
+
+0.05_03 04.07.2002 03:18
+
+	- updated dependencies (Data::Verify)
+
+0.05_04 05.07.2002 18:49
+
+	- swapped the examples into a seperate dist, because of main-
+	tanance problems (Should be available at CPAN under
+	Class::Maker:::Examples).
+
+0.05_05 06.07.2002 01:43
+
+=head1 find
+
+	- added 'find' function to Class::Maker::Reflection
+
+	find (Returns a snapshot-aref to all instances (objects) of a class in a given package)
+
+0.05_06 21.07.2002 00:35
+
+	- class field 'default' is working now
+
+		#!perl
+
+		Class::Maker::class
+		{
+			isa => [qw( Something )],
+
+			public =>
+			{
+				string => [qw( name desc )],
+			},
+
+			default =>
+			{
+				name => 'Role Name',
+
+				desc => 'Role Descrition',
+
+				xxx => 'DEFAULTS TO XXX',
+			},
+		};
+
+		my $role = Human::Role->new( );
+
+		__END__
+
+		Even we called an empty 'new' we got
+
+		$role->name eq 'Role Name'
+
+		$role->desc eq 'Role Description'
+
+		and
+
+		Something->xxx( 'DEFAULTS TO XXX' ) is called
+
+		which may be an accessor or a function/method that does anything.
+
+	- Class::Maker::Reflection::reflect() now returns all reflections of the
+	@ISA classes as a href. This will be a ie. "Class::Maker::Reflex" object in future.
+	Also it better sync's the ->{isa} class fields with the real @ISA.
+	Additionally non Class::Maker classes can be introspected, so they will have at least information
+	in the 'isa' and 'methods' fields.
+
+	{
+		package Human::Role::Simple;
+
+		@ISA = qw(Human::Role);
+
+		sub new : method
+		{
+			my $this = shift;
+
+			return $this->SUPER::new( name => $_[0] );
+		}
+	}
+
+	$reflex =
+	(
+		'Human::Role::Simple' =>
+		{
+			'isa' => [ 'Human::Role' ],
+
+			'methods' => [ 'new' ].
+		}
+	)
+
+0.05_09 27.07.2002 10:40
+
+	- attribute handlers (accessors) are now in "Class::Maker::Basic::Handler::Attributes". Therefore
+	if new accessors types are into that package (see _make_method in Maker.pm).
+
+	- 'attribute' field is now obsolete ! Now only private/public/protected are allowed.
+
+0.05_10 01.09.2002 16:14
+
+	- Class::Maker::Basic::Constructor new() supports cloning (use args for clone modification).
+
+		$new_obj = Pkg::Name->new( name => 'name', email => 'email@server.org' );
+
+		$clone_obj = $new_obj->new( name => 'othername' );
+
+0.05_12 29.9.2002 18:53
+
+	- Added explicitly
+	
+		use attributes;
+		
+	to Maker.pm because under perl5.8.0 it seems to be needed.
+
+0.5.14
+
+   - Class::Maker::Exception added. See pod.
+
+0.5.15
+
+	* package Class::Maker::Basic::Handler::Attributes
+		-- now handlers are using "Delegation" to methods
+			- get() 
+			- set() 
+			- init()   called from 'new' (or 'default' field) constructor
+			- reset() 
+			
+		This now eases the interception via hooks and also makes things more transparent.	
+
+		Example exploit of that:
+		
+		use Hook::Heckle;
+		
+		foreach my $method ( qw(max text) )
+		{
+			Hook::Heckle->new( victim => $method, post => sub { my $this = shift; print "Model is informing observers of '$method' change\n" and $_[0]->notify_observers( 'update', $method ) if $_[1]; @_ }, sub { @_ } );
+		}
+
+	* class->_arginit (if exists) is called before anything with @_ happens to the constructor ('new').	
+		-- it received \@_ and should do changes in place.
+
+0.5.17
+
+	* Bug in lvalue attribute handler (default) fixed
+
+		because C<return $val; this doesn't work, don't say "return">
+
+	* Class::Maker::Types::Array, t/20_10_...
+
+	fixed bug in _calc( ) which caused wrong calculation of intersection() when identical/copy array elements were present in an array. 
+	Solved' by unique'ing all elements prior calculation.
+
+	amended get_where_regexp(). Now supports more flexible arguments: call methods with args.
+
+	* Documented a feature where ^[.|*] in the class name creates a subpackage but code functionality was not existant. Re-introduced that feature.
+
+0.5.97
+	* new( "Parent::method" => 100 ) is now working again. It checks for '::' pieces and forwards them now correctly
+	as implemented in the Basic/Constructor.pm.
+
+	* $Class::Maker::explicit is now working again. Now should be not defined on a class-basis, but globally (as early as possible). You may have a look
+	  at t/30_explicit.t for an example of the syntax. You cannot use the explicit notation in the basic new() constructor anymore, as it produces over-explicit names
+	  in the $this hash. This could be handled by testing it, but seems not feasible yet.
+	* new( ) is now handling the default => { } definitions more precise, so it inits them according to inheritance series, so that all parents default definitions are
+	  applied, while the children override the defaults of their parents. Notably, the default values are already accessible in the _preinit standard method.
+	
+	

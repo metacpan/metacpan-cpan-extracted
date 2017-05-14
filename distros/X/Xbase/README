@@ -1,0 +1,43 @@
+Module: Xbase.pm					Date: 01/23/1996
+Version: 1.07
+Author Source: http://eewww.eng.ohio-state.edu/~pereira/software/xbase/
+Author Address: pereira@ee.eng.ohio-state.edu
+
+This is a module for perl 5 that allows easy xbase like access to xbase DBF
+files and Foxpro IDX (index) and FPT (memo) files.
+
+To install this module. Make sure you are in the directory that this README
+file is in and type:
+
+	perl Makefile.PL
+	make install
+
+*********************************************************
+*** USERS OF OLD VERSIONS PLEASE NOTE THE NAME CHANGE ***
+*** You will have to modify existing scripts to use   ***
+*** Xbase instead of xbase.                           ***
+*********************************************************
+
+This name change was done to make it consistent with the naming
+convention for perl modules in the Modules List.
+
+If you want to install the module in a private directory then take a look
+at the documentation to find out how.
+
+The documentation for Xbase is in the Xbase.pm file itself. You can use
+pod2man or pod2html that come with perl to generate the format you like.
+
+	pod2man Xbase.pm > Xbase.man
+
+		-or-
+
+	pod2html Xbase.pm > Xbase.html
+
+The install step above installs the man page automatically.
+
+I have included a "Powered by Xbase.pm" logo (xbasei.gif) that you
+might find amusing. Use it at your web sites if you use the
+module. :-)
+
+-Pratap Pereira
+

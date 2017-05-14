@@ -1,0 +1,157 @@
+Changes
+=======
+
+0.51 - 17 Mar 2007
+   - More docs.
+   - Typo reported by Jun Kuriyama
+   - Work with Senna >= 1.0.0
+
+0.50 - 27 Aug 2006
+   - Release 0.50
+   - No code change from 0.50_04.
+
+0.50_04 - 24 Aug 2006
+   - Add missing test file
+   - Revamp Senna::Snippet API. Look ma, it works!
+
+0.50_03 - 21 Aug 2006
+   - Fix selected usage of sen_record_info() to use sen_sym_info()
+   - Fix silly reversed if-else condition
+   - Add tests
+
+0.50_02 - 20 Aug 2006
+   - Fix silly typo bug in Senna::Index->open (fix by yappo)
+   - Fix other silly typos
+   - Fix Makefile.PL (to certain extent).
+     For some reason I can no longer compile with the default setup,
+     and so I need to perform ugly hacks, such as copying "typemap" and
+     "Senna.xs" to different locations. Should you need to re-compile
+     this module after running Makefile.PL once, make sure to re-run
+     Makefile.PL to make sure things work
+
+0.50_01 - 18 Aug 2006
+   * WARNING! This release breaks backward compatibility! *
+   - Revamp API to match that of libsenna 0.8.0.
+   - Bump up version to 0.50 to make it clear we're doing something new.
+   - We no longer support libsenna versions prior to 0.8.0.
+   - Constants are now located at Senna::Constants
+   - Deprecated
+      Senna::Cursor
+      Senna::Result
+   - Add new modules:
+      Senna::Constants
+      Senna::OptArg::Select
+      Senna::OptArg::Sort
+      Senna::Query
+      Senna::RC
+      Senna::Records
+      Senna::Record
+      Senna::Set
+      Senna::Snippet
+      Senna::Sym
+      Senna::Values
+
+0.12 - 02 Apr 2006
+   - Fix how sv2senna_key() works. Previous versions of senna didn't quite
+     check for errornous keys, but it brought out some bugs. 
+     (This module was tested against rev 109)
+   - Cleanup some of the C code
+   - Partially apply patch from http://nomadscafe.jp/tmp/Senna-0.11.patch.
+
+0.11 - 30 Jan 2006
+   - Adopt to recent senna, which changed the semantics of sen_records_next();
+   - Require Senna > 0.3.0 (warning: as of this writing, libsenna hasn't
+     updated it's version number -- but you can use anything above
+     revision number 73)
+
+0.10 - 15 Nov 2005
+   - Only run POD tests for disttest
+   - Require minimum version 0.3.0 for libsenna, due to some API changes
+   - t/01-sanity.t failed due to the fact that new libsenna made some 
+     enhancements in the checks in the underlying mechanism
+   - t/02-morph.t failed due to the fact that new libsenna does a more
+     wide search in sen_index_sel()
+
+0.09 - 09 Nov 2005
+   - Add POD tests
+   - Add new docs
+
+0.08 - 05 Aug 2005
+   - Further tweak on Build.PL / Makefile.PL.
+
+0.07_02 - 03 Aug @005
+   - Fix del(): mixup in the order of execution. 
+   - I don't know what this is, but M::B chokes on second attempt to
+     build the XS code if lib/Senna.c exists. work around it.
+
+0.07_01 - 02 Aug 2005
+   - Fix rt #133933. This was caused by a hoopla between the senna
+     developer and myself wrt the understanding of sen_index_info().
+     This release works, but I wish to change it back to something saner,
+     if libsenna can be fixed.
+   - Change object from hash based to scalar based
+   - Remove redundunt calls from Perl to XS
+   - Add more error checks. Things will croak more now.
+   - Add Build.PL, because I want Senna.pm to display a proper
+     license when uploaded to CPAN.
+
+0.07 - 29 Jun 2005
+   - Fix calling get_*_state_hv() so that it uses aTHX_ properly.
+     Pointed out by Lyo Kato
+
+0.06 - 23 Jun 2005
+   - Require senna that has senna-cfg. This will make life much easier for
+     people reporting errors and such. (As of this writing, it requires
+     the latest senna release from subversion)
+   - Change Makefile.PL accordingly
+   - add Senna::Cursor->as_list()
+   - Senna::Index and Senna::Cursor was leaking memory. Fixed.
+
+0.05 - 20 Jun 2005
+   - Integer keys fix again. This time check at the cursor level, too
+   - Fix the return value from replace()
+
+0.04 - 20 Jun 2005
+   - No code change. For some reason the test directory had been wiped
+     from MANIFEST, and therefore it was not included in the distribution
+
+0.03 - 20 Jun 2005
+   - Integer keys were not handled properly (I misread the Senna source),
+     and it was causing segfaults. This has been fixed.
+
+0.02 - 06 Jun 2005
+   - Doc tweaks.
+   - Check return values.
+   - This be 0.02.
+
+0.02_05 - 06 Jun 2005
+   - Add t/02-morph.t and t/03-ngram.t. Patch by Jun Kuriyama
+   - Revise some return value codes.
+   - Doc tweaks
+
+0.02_04 - 04 Jun 2005
+   - Fix segfaults when Senna::Cursor has no results.
+     Reported by Jun Kuriyama
+
+0.02_03 - 31 May 2005
+   - *** Incompatible Change ***
+     Senna::Index->create now takes key_size argument
+   - Add SEN_VARCHAR_KEY, SEN_INT_KEY and SEN_ENC_* constants
+   - Add encoding(), key_size(), initial_n_segments(), and flags()
+     (note that you will need a very recent version of senna)
+
+0.02_02 - 30 May 2005
+   - Start mucking with new API
+   - Add Senna::Index ->remove
+   - Change semantics of Senna::Cursor 
+   - Add Senna::Cursor->hits
+
+0.02_01 - 11 Apr 2005
+   - Apply patch from Hiroyuki Oyama (work with latest senna API)
+   - No longer use Senna::Index->new(). Use open() and create() instead.
+   - Export flags from Senna.pm
+   - TODO: Design API around new Senna API
+   - TODO: More tests, examples
+
+0.01
+  - Initial version

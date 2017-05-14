@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::MailReset;
 use strict;
 use warnings;
 
-our $VERSION = '1.4.5';
+our $VERSION = '1.9.8';
 
 use Lemonldap::NG::Portal::Simple qw(:all);
 use base qw(Lemonldap::NG::Portal::SharedConf Exporter);
@@ -48,7 +48,7 @@ use POSIX qw(strftime);
 #   - passwordDBFinish
 # @return 1 if all is OK
 sub process {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Process subroutines
     $self->{error} = PE_OK;
@@ -76,7 +76,7 @@ sub process {
 # Load SMTP methods
 # @return Lemonldap::NG::Portal constant
 sub smtpInit {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     eval { use base qw(Lemonldap::NG::Portal::_SMTP) };
 
@@ -92,7 +92,7 @@ sub smtpInit {
 # Get mail from form or from mail_token
 # @return Lemonldap::NG::Portal constant
 sub extractMailInfo {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     if ( $self->{captcha_mail_enabled} ) {
         eval { $self->initCaptcha(); };
@@ -192,13 +192,13 @@ sub extractMailInfo {
 # Search for user using UserDB module
 # @return Lemonldap::NG::Portal constant
 sub getMailUser {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     my $error = $self->getUser();
 
     if ( $error == PE_USERNOTFOUND or $error == PE_BADCREDENTIALS ) {
         $self->_sub('userDBFinish');
-        return PE_MAILNOTFOUND;
+        return PE_MAILCONFIRMOK;
     }
 
     return $error;
@@ -208,7 +208,7 @@ sub getMailUser {
 # Create mail session and store token
 # @return Lemonldap::NG::Portal constant
 sub storeMailSession {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Skip this step if confirmation was already sent
     return PE_OK
@@ -254,7 +254,7 @@ sub storeMailSession {
 # Send confirmation mail
 # @return Lemonldap::NG::Portal constant
 sub sendConfirmationMail {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Skip this step if user clicked on the confirmation link
     return PE_OK if $self->{mail_token};
@@ -336,10 +336,10 @@ sub sendConfirmationMail {
     $body =~ s/\$expMailDate/$self->{expMailDate}/g;
     $body =~ s/\$expMailTime/$self->{expMailTime}/g;
     $body =~ s/\$url/$url/g;
-    $body =~ s/\$(\w+)/decode("utf8",$self->{sessionInfo}->{$1})/ge;
+    $body =~ s/\$(\w+)/$self->{sessionInfo}->{$1}/ge;
 
     # Send mail
-    return PE_MAILERROR
+    return PE_MAILCONFIRMOK
       unless $self->send_mail( $self->{mailAddress}, $subject, $body, $html );
 
     PE_MAILCONFIRMOK;
@@ -349,7 +349,7 @@ sub sendConfirmationMail {
 # Change the password or generate a new password
 # @return Lemonldap::NG::Portal constant
 sub changePassword {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Check if user wants to generate the new password
     if ( $self->param('reset') ) {
@@ -378,7 +378,9 @@ sub changePassword {
 
     # Modify the password
     $self->{portalRequireOldPassword} = 0;
+    $self->{user} = $self->{mail};
     my $result = $self->modifyPassword();
+    $self->{user} = undef;
 
     # Mail token can be used only one time, delete the session if all is ok
     if ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
@@ -408,7 +410,7 @@ sub changePassword {
 # Send mail containing the new password
 # @return Lemonldap::NG::Portal constant
 sub sendPasswordMail {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Get mail address
     unless ( $self->{mailAddress} ) {
@@ -446,7 +448,7 @@ sub sendPasswordMail {
     # Replace variables in body
     my $password = $self->{newpassword};
     $body =~ s/\$password/$password/g;
-    $body =~ s/\$(\w+)/decode("utf8",$self->{sessionInfo}->{$1})/ge;
+    $body =~ s/\$(\w+)/$self->{sessionInfo}->{$1}/ge;
 
     # Send mail
     return PE_MAILERROR
@@ -523,13 +525,13 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2010, 2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2010-2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by Sandro Cazzaniga, E<lt>cazzaniga.sandro@gmail.comE<gt>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2010, 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2015 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =item Copyright (C) 2011 by Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
 

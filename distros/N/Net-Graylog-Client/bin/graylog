@@ -152,7 +152,7 @@ graylog - Command line script to send data to a Graylog2 server
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 
@@ -176,6 +176,14 @@ adds some defaults.
 * each message gets a uuid
 
 * a server field will be reinterpreseted as a host field, a default of hostname() will be added if needed
+
+=head1 NAME
+
+graylog - Command line script to send data to a Graylog2 server
+
+=head1 VERSION
+
+version 0.3
 
 =head1 NAME
 
@@ -244,6 +252,17 @@ Kevin Mulholland <moodfarm@cpan.org>
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2014 by Kevin Mulholland.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+Kevin Mulholland <moodfarm@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by James Lavoy.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

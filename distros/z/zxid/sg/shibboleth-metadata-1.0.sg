@@ -1,0 +1,17 @@
+# zxid/sg/shibboleth-metadata-1.0.sg
+# 22.11.2009, slightly edited, Sampo Kellomaki (sampo@iki.fi)
+# $Id$
+
+target(shibmd, urn:mace:shibboleth:metadata:1.0)
+import(ds, http://www.w3.org/2000/09/xmldsig#, xmldsig-core-schema.xsd)
+
+Scope:	 base(xs:string)
+  @regexp?	 -> %xs:boolean  default (false)
+  ;
+KeyAuthority:
+  ds:KeyInfo+
+  @VerifyDepth?	 -> %xs:unsignedByte  default (1)
+  @any
+  ;
+
+#EOF

@@ -1,13 +1,16 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 use strict 'vars';
+use lib '..','../blib/lib','.','./blib/lib';
 use Boulder::Stream;
 use Boulder::Genbank;
 use Getopt::Long;
 use Text::Abbrev;
-my ($ACCESSOR,$DELAY,$FIRST);
+my ($ACCESSOR,$DELAY,$FIRST,$BOULDER,$DB);
 
 GetOptions('accessor=s' => \$ACCESSOR,
+	   'boulder'     =>\$BOULDER,
+	   'db=s'        => \$DB,
 	   'delay=i'     => \$DELAY) || die <<USAGE;
 Usage: $0 [options] [accession] [accession] ...
 
@@ -16,15 +19,25 @@ numbers.  If no accession numbers are present on the
 command line, or if the magic "-" argument is given,
 will read accession numbers from standard in.
 
-Outputs a series of Boulder records for each accession
+Outputs a series of Genbank records for each accession
 number.
 
 Options:
   -accessor <Entrez|Yank>  Use the Entrez|Yank methods
                             for retrieving records.
-  -delay    <seconds>      Seconds to sleep between retrievals (10)
+  -boulder                  Return boulder format file
+  -db                       Database
+  -delay    <seconds>       Seconds to sleep between retrievals (10)
 
 Options may be abbreviated, i.e. -acc E
+
+Database specifiers:
+  m  MEDLINE
+  p  Protein
+  n  Nucleotide
+  t  3-D structure
+  c  Genome
+
 USAGE
 ;
 
@@ -54,14 +67,20 @@ if ($from_stdin) {
   }
 }
 
+$DB ||= 'n';
+
 my $stream = new Boulder::Stream;
-my $gb = new Boulder::Genbank(-accessor=>$accessor,-fetch=>\@accession_numbers)
+my $gb = new Boulder::Genbank(-accessor=>$accessor,-fetch=>\@accession_numbers,-db=>$DB)
   || die "Couldn't open new Boulder::Genbank object";
 my $count;
 while (1) {
   last if $count++ > @accession_numbers;
   next unless my $s = $gb->get;
   sleep $DELAY if $FIRST++ && $DELAY > 0;
-  $stream->put($s);
+  unless ($BOULDER) {
+    print $s->Blob,"//\n";
+  } else {
+    $stream->put($s);
+  }
 }
 

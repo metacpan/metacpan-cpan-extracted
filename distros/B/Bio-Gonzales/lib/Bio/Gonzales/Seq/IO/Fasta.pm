@@ -12,7 +12,7 @@ use Bio::Gonzales::Util::File;
 
 use Carp;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 around BUILDARGS => sub {
   my $orig  = shift;
@@ -37,7 +37,7 @@ sub BUILD {
 
   if ( not defined $firstline ) { carp "FASTA file is empty\n"; return $self }
 
-  if ( $firstline !~ s/^>\s*// ) { confess "Not FASTA formatted: >>$firstline<<\n"; }
+  if ( $firstline !~ s/^>// ) { confess "Not FASTA formatted: >>$firstline<<\n"; }
 
   push @{ $self->_cached_records }, $firstline;
 }
@@ -58,7 +58,7 @@ sub next_seq {
   my $lines_read = 0;
   while ( defined( my $line = $fhi->() ) ) {
     $lines_read++;
-    if ( $line =~ s/^>\s*// ) {
+    if ( $line =~ s/^>// ) {
       push @{ $self->_cached_records }, $line;
       last;
     }

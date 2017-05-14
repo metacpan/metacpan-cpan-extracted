@@ -1,0 +1,74 @@
+$Id: README,v 1.4 2004/06/04 22:17:56 hackworth Exp $
+
+
+                               Chronic 
+            A constraints-based, opportunistic scheduler 
+                     in the spirit of ``cron''
+
+
+Introduction
+
+    Chronic is a constraints-based, opportunistic, application-level
+    scheduler. Unlike cron, that schedules according to a time
+    specification, Chronic schedules tasks when specified constraints are
+    met. In other words, Chronic schedules during a window of opportunity
+    when the circumstances are favorable.
+
+    The original motivation for Chronic was for me to be able to schedule
+    high-impact, recurring tasks like updatedb, emerge rsync, webalizer
+    when I was away from the computer, and my computer mostly idling. This
+    proved to be useful enough to abstract the notion of a "constraint"
+    and build an opportunistic scheduler that schedules according to
+    combinations of arbitrary constraints. The current version of Chronic
+    natively contains the following constraints: System Inactivity, Disk
+    I/O & Load Average. Other constraints planned for new future include:
+    Network IO activity, cron (which emulates cron), and existence of new
+    files under a directory.
+
+
+Availability 
+
+    Chronic is distributed through CPAN (http://cpan.org) and through
+    SourceForge (http://sourceforge.net/projects/chronic/)
+
+    The latest development version can be checked out of SourceForge 
+    CVS.
+
+
+Installation
+
+    Chronic is written in Perl and requires a recent version of perl5
+    interpreter. If you are not running a stone age unix, a perl5
+    interpreter should already be installed on your system. Otherwise, 
+    you can find one at http://www.cpan.org.
+
+    Follow the following instructions to build and install Chronic.
+
+        tar zxvf Chronic-v.vv.tar.gz 
+        cd Chronic-v.vv
+        perl Makefile.PL
+        make
+        make test
+        su 
+        make install
+
+    ``chronicd'' should now be installed on your system.
+
+
+Usage 
+
+    See the chronicd manpage, or perlpod docs/chronicd.pod
+
+
+Author
+
+    Vipul Ved Prakash <mail@vipul.net>
+
+
+License 
+
+    Chronic is distributed under the Artistic License. See ARTISTIC
+    for details.
+
+
+

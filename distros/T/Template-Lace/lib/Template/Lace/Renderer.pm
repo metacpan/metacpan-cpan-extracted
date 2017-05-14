@@ -5,6 +5,25 @@ use Scalar::Util;
 
 has [qw(model dom components)] => (is=>'ro', required=>1);
 
+sub call {
+  my ($self, $proto, @args) = @_;
+  if(ref($proto)||'' eq 'CODE') {
+    return $proto->($self->model, $self->dom, @args);
+  } elsif($proto) {
+    return $self->model->$proto($self->dom, @args);
+  }
+}
+
+sub call_at {
+  my ($self, $css, $proto, @args) = @_;
+  my $dom = $self->dom->at($css);
+  if(ref($proto)||'' eq 'CODE') {
+    return $proto->($self->model, $dom, @args);
+  } elsif($proto) {
+    return $self->model->$proto($dom, @args);
+  }
+}
+
 sub render {
   my $self = shift;
   my $rendered_dom = $self->get_processed_dom
@@ -130,6 +149,43 @@ Template::Lace::Renderer
 
 Renderer for the model.  Not really end user aimed.  See L<Template::Lace>
 for main overview.
+
+=head1 METHODS
+
+This class defines the following public methods
+
+=head2 call
+
+Allows you to have the renderer 'call' a method into the model, with the current
+DOM.  Takes either a coderef or a string (that must be the name of a method in the
+model.  Example:
+
+    $renderer->call(sub {
+      my ($model, $dom) = @_;
+      $model->add_debug($dom);
+    }, @args);
+
+    $renderer->call('add_debug', @args);
+
+Are both the same as
+
+   $renderer
+     ->model
+     ->add_debug($renderer->dom, @args);
+
+You might find this is a useful shortcut (or not).
+
+=head2 call_at
+
+Basically similar to L</call> except allows you to specify a CSS match to
+set the DOM.
+
+    $renderer->call_at('#debug','add_debug', @args);
+
+Is basically a shortcut for:
+
+    my $dom = $renderer->dom->at('#debug);
+   $renderer->model->add_debug($dom, @args);
 
 =head1 SEE ALSO
  

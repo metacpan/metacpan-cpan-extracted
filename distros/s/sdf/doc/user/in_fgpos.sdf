@@ -1,0 +1,84 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Positioning a Figure
+
+H2: Horizontal Alignment
+
+The alignment of a figure can be specified using the {{align}}
+attribute of the {{MAC:import}} macro.
+The supported values are:
+
+!block table
+Align   Description
+Center  centered within the region (the default)
+Left    left side of region
+Right   right side of region
+Inner   inner side of region for double sided documents (otherwise Left)
+Outer   outer side of region for double sided documents (otherwise Right)
+!endblock
+
+For example:
+
+E:  !import "my_graph"; align=Left
+
+H2: Wide Figures
+
+By default, figures are aligned within the main text area.
+To align a figure within the full text area (i.e. including the side-head),
+use the {{wide}} attribute.
+For example:
+
+E:  !import "my_graph"; align=Left; wide
+
+H2: Figures Within a List
+
+To align a figure with a given list indent, use the {{listitem}} attribute.
+For example:
+
+E:  * The graphs are impressive:
+E:    - savings per year
+E:    !import "my_graph"; listitem=2
+
+H2: Vertical Positioning
+
+The vertical position of a figure can be specified via the {{position}}
+attribute. The supported values are:
+
+!block table
+Position    Description
+Below       below the current paragraph (the default)
+Top         top of the current column/page
+Bottom      bottom of the current column/page
+!endblock
+
+For example:
+
+E:   !import "my_logo"; position=Bottom; align=Right
+
+H2: Wrapping Text Around a Figure
+
+To wrap text around a figure, set the {{wrap_text}} attribute.
+For example:
+
+E:    !import "my_graph"; wrap_text
+
+!block note
+When generating HTML, text can be wrapped around a figure but unfortunately,
+the rules are quite different:
+
+^ The wrap_text attribute has no affect.
++ Text is implicitly wrapped if the {{align}} attribute is set
+  to Left or Right.
++ The wrapping must be explicitly disabled using the {{MAC:clear}} macro.
+!endblock

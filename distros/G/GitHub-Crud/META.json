@@ -1,0 +1,52 @@
+{
+   "abstract" : "Create, Read, Update, Delete files on GitHub",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GitHub-Crud",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "2017.505",
+            "Digest::SHA1" : "0",
+            "JSON" : "0",
+            "MIME::Base64" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "GitHub::Crud" : {
+         "file" : "lib/GitHub/Crud.pm",
+         "version" : "2017.512"
+      },
+      "GitHub::Crud::Response" : {
+         "file" : "lib/GitHub/Crud.pm"
+      },
+      "GitHub::Crud::Response::Data" : {
+         "file" : "lib/GitHub/Crud.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2017.512"
+}

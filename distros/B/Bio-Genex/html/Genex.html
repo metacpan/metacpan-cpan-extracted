@@ -1,0 +1,226 @@
+<HTML>
+<HEAD>
+<TITLE>Genex - Perl extension for processing data from a GeneX DB</TITLE>
+<LINK REV="made" HREF="mailto:jasons@amadeus.avesthagen.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#class variables">CLASS VARIABLES</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#internal functions">INTERNAL FUNCTIONS</A></LI>
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Genex - Perl extension for processing data from a GeneX DB</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Bio::Genex;</PRE>
+<PRE>
+  # call with args to affect a single connection
+  $dbh = Bio::Genex::current_connection(USER=&gt;'foo', PASSWORD=&gt;'bar');
+  $dbh = Bio::Genex::_connect(DBNAME=&gt;'test');</PRE>
+<PRE>
+  # reset the global variables to affect the default parameters 
+  #   for *all* connections
+  $Bio::Genex::USER        = 'foo';
+  $Bio::Genex::PASSWORD    = 'foobar';
+  $Bio::Genex::TRANSACTION = 1;</PRE>
+<PRE>
+  $dbh = Bio::Genex::current_connection();
+  $dbh = Bio::Genex::_connect();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Genex module is the gateway to the enitre Genex.pm suite of tools
+for accessing data in a GeneX DB. By itself it consists of two
+utilities for connecting to a GeneX DB, the caching method
+<A HREF="#item_current_connection"><CODE>current_connection()</CODE></A> and the non-caching utility function
+<A HREF="#item__connect"><CODE>_connect()</CODE></A>.</P>
+<P>The rest of the suite consists of utility modules and table
+modules. Most scripts which utilize Genex.pm are likely to include not
+only Genex itself, but also the helper modules, and one or more table
+modules.</P>
+See the main <A HREF="index.html">index</A> for more information.<P>
+<HR>
+<H1><A NAME="class variables">CLASS VARIABLES</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%Bio::Genex::TABLE2CLASS">%Bio::Genex::TABLE2CLASS</A></STRONG><BR>
+<DD>
+A hash table that maps DB table names their respective class names in
+the Genex hierarchy.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_current_connection">current_connection(%args);</A></STRONG><BR>
+<DD>
+<P>Genex caches a single database handle.  Calling
+<A HREF="#item_current_connection"><CODE>current_connection()</CODE></A> will call <A HREF="#item__connect"><CODE>Bio::Genex::_connect()</CODE></A> if a connection
+has not yet been established or if the current connection parameters
+differ from the arguments passed into <A HREF="#item_current_connection"><CODE>current_connection()</CODE></A>. Calling
+<CODE>disconnect()</CODE> on the handle will invalidate the cache, and a
+subsequent call to <A HREF="#item_current_connection"><CODE>current_connection()</CODE></A> will create a new database
+handle.</P>
+<P>Current accepted connection arguments:
+   USER
+   PASSWORD
+   DBNAME
+   HOST
+   PORT
+   DBMS
+   LOCAL
+   TRANSACTION</P>
+<P><CODE>USER</CODE> and <CODE>PASSWORD</CODE> are the DB username and password, not the
+Unix ones.  <CODE>HOST</CODE> and <CODE>PORT</CODE> are used only if <CODE>LOCAL</CODE> is
+FALSE. if <CODE>LOCAL</CODE> is TRUE, the connection will be made to a DB on the
+local machine.</P>
+<P>If no arguments are passed, the connection parameters will default to
+the following global variables. Changing the value of one of these
+variables will affect *all* connections made from within the
+application (even by those made by Genex.pm library methods). The
+current default connection parameters are:</P>
+<PRE>
+   $Bio::Genex::USER        = 'readonly';
+   $Bio::Genex::PASSWORD    = 'readonly';
+   $Bio::Genex::DBNAME      = 'genex';
+   $Bio::Genex::HOST        = 'localhost';
+   $Bio::Genex::PORT        = '5432';
+   $Bio::Genex::DBMS        = 'Pg';
+   $Bio::Genex::LOCAL       = 1;
+   $Bio::Genex::TRANSACTION = 0;</PRE>
+<P><STRONG>WARNING:</STRONG> These variables are <STRONG>global!!!</STRONG> This may have unforseen 
+consequences.</P>
+<P>return value: a reference of type <CODE>Bio::Genex::Connect</CODE>, which is a wrapper 
+around <CODE>DBI::db</CODE> (a DBI database handle).</P>
+</DL>
+<P>
+<HR>
+<H1><A NAME="internal functions">INTERNAL FUNCTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item__connect">_connect(%args);</A></STRONG><BR>
+<DD>
+<P>This method is heavily depricated and should only be used if it is
+necessary to connect to more than one DB in a session, otherwise
+<A HREF="#item_current_connection"><CODE>Bio::Genex::current_connection()</CODE></A> should <STRONG>always</STRONG> be used. This method
+respects the same connection parameters and global variables as
+<A HREF="#item_current_connection"><CODE>current_connection()</CODE></A>.</P>
+<P>return value: a reference of type <CODE>Bio::Genex::Connect</CODE>, which is a wrapper 
+around <CODE>DBI::db</CODE> (a DBI database handle).</P>
+<DT><STRONG><A NAME="item_undefined">undefined($object,$attribute_name);</A></STRONG><BR>
+<DD>
+<STRONG>FOR INTERNAL USE ONLY</STRONG>.
+<P>This method is the magic behind delayed fetching of attributes. Call
+it at your own risk, or better yet, don\'t call it, let Genex.pm call it for you.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Bio::Genex::Connect - Perl extension to DBI::db</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Bio::Genex;</PRE>
+<PRE>
+  # to start a connection
+  $dbh = Bio::Genex::current_connection(%args);</PRE>
+<PRE>
+  # to test a connection
+  my $db_name = $dbh-&gt;db_name();
+  my $db_host = $dbh-&gt;db_host();
+  my $db_port = $dbh-&gt;db_port();
+  my $dbms = $dbh-&gt;dbms();
+  my $user = $dbh-&gt;user();
+  my $transaction = $dbh-&gt;transaction();
+  my $hash_ref = $dbh-&gt;tables();</PRE>
+<PRE>
+  # any DBI::db methods also work
+  my $sql = $dbh-&gt;quote($gnarly_string);
+  my $sth = $dbh-&gt;prepare($sql);</PRE>
+<PRE>
+  # any DBI::db attributes also work
+  $dbh-&gt;{Taint} = 1;</PRE>
+<PRE>
+  # to cancel a connection, and set $dbh == undef
+  $dbh-&gt;disconnect();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Bio::Genex::Connect module is a private class used by Genex.pm.  The
+main purpose of this class is to protect against users accidentally
+calling <CODE>disconnect()</CODE> on a database handle that is being cached by
+Genex.pm.</P>
+<P>Therefore the class defines a method, <CODE>disconnect()</CODE> that invalidates
+the database handle cache before calling &lt;DBI::disconnect()&gt;. For
+convenience, the class also provides helper methods for accessing
+attributes about the connection, <A HREF="#item_dbms"><CODE>dbms()</CODE></A>, <A HREF="#item_db_name"><CODE>db_name()</CODE></A>,
+<A HREF="#item_db_host"><CODE>db_host()</CODE></A>, <A HREF="#item_db_port"><CODE>db_port()</CODE></A>, <A HREF="#item_user"><CODE>user()</CODE></A>, and <A HREF="#item_transaction"><CODE>transaction()</CODE></A>.</P>
+<P>The <CODE>tables()</CODE> method is a cache of the tables known to exist for this
+DB handle.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_dbms"><CODE>dbms()</CODE></A></STRONG><BR>
+<DD>
+Returns the type of database management system to which the database
+handle is currently connected.
+<P></P>
+<DT><STRONG><A NAME="item_db_name"><CODE>db_name()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of database to which the database handle is currently
+connected.
+<P></P>
+<DT><STRONG><A NAME="item_db_host"><CODE>db_host()</CODE></A></STRONG><BR>
+<DD>
+Returns the hostname of the computer to which the database handle is
+currently connected. It returns 'localhost' if it is a LOCAL connection.
+<P></P>
+<DT><STRONG><A NAME="item_db_port"><CODE>db_port()</CODE></A></STRONG><BR>
+<DD>
+Returns the port number to which the database handle is currently
+connected. It returns undef if it is a LOCAL connection.
+<P></P></DL>
+<DL>
+<DT><STRONG><A NAME="item_user"><CODE>user()</CODE></A></STRONG><BR>
+<DD>
+Returns the username which the database handle is currently connected as.
+<P></P></DL>
+<DL>
+<DT><STRONG><A NAME="item_transaction"><CODE>transaction()</CODE></A></STRONG><BR>
+<DD>
+Returns the true if the DB handle is in a transaction.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jason E. Stewart (<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><CODE>perl(1)</CODE></P>
+
+</BODY>
+
+</HTML>

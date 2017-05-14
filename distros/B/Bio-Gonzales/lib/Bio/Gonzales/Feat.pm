@@ -8,27 +8,10 @@ use List::MoreUtils qw/zip/;
 use Data::Dumper;
 use Storable qw(dclone);
 use Scalar::Util qw/refaddr/;
-use Bio::Gonzales::Seq::Util qw/strand_convert/;
 
 our $QUIET_MODE;
 
-our $ATTR_ESCAPE_RE = qr/([\x00-\x1F\x7F%&\=;,])/;
-
-our %FIXED_ATTRIBUTE_NAMES = (
-  ID            => 1,
-  Parent        => 2,
-  Target        => 3,
-  Name          => 4,
-  Alias         => 5,
-  Gap           => 6,
-  Derives_from  => 7,
-  Dbxref        => 9,
-  Ontology_term => 10,
-  Is_circular   => 11,
-  Note          => 99,
-);
-
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 extends 'Bio::Gonzales::MiniFeat';
 
@@ -36,20 +19,6 @@ has [qw/seq_id start end strand/] => ( is => 'rw', required => 1 );
 
 has [qw/phase score /] => ( is => 'rw' );
 
-sub as_hash {
-  my $self = shift;
-  return {
-    seq_id     => $self->seq_id,
-    source     => $self->source,
-    type       => $self->type,
-    attributes => $self->attributes,
-    start      => $self->start,
-    end        => $self->end,
-    strand     => $self->strand,
-    phase      => $self->phase,
-    score      => $self->score,
-  };
-}
 
 sub scf_id { return shift->seq_id(@_); }
 
@@ -57,17 +26,17 @@ sub length { return $_[0]->end - $_[0]->start + 1 }
 
 sub begin { return shift->start(@_) }
 
-sub Convert_strand { strand_convert(@_) }
+our %STRAND_CHAR_TABLE = (
+  '+' => 1,
+  '-' => -1,
+  '.' => 0,
+  -1  => '-',
+  1   => '+',
+  0   => '.',
+);
 
-sub switch_coords {
-  my $self = shift;
+sub Convert_strand { return $STRAND_CHAR_TABLE{ $_[-1] } }
 
-  my ( $b, $e ) = ( $self->start, $self->end );
-  $self->start($e);
-  $self->end($b);
-
-  return $self;
-}
 
 sub sort_subfeats {
   my ($self) = @_;
@@ -76,51 +45,6 @@ sub sort_subfeats {
   $self->subfeats( \@sf );
 }
 
-sub to_gff3 {
-  my ( $self, $escape_whitespace_everywhere ) = @_;
-
-  my $strand = strand_convert( $self->strand );
-
-  my $attributes = $self->attributes;
-  #sort the attributes
-  my @attr_names = sort { ( $FIXED_ATTRIBUTE_NAMES{$a} || 98 ) <=> ( $FIXED_ATTRIBUTE_NAMES{$b} || 98 ) }
-    keys %$attributes;
-
-  my @groups;
-  for my $a (@attr_names) {
-    my @escaped_v;
-    for my $v ( @{ $attributes->{$a} } ) {
-      unless ( defined($v) ) {
-        carp "The attribute " . $a . " of feature " . $self->id . " has uninitialized values";
-        $v = '';
-      }
-
-      $v =~ s/$ATTR_ESCAPE_RE/sprintf("%%%02X",ord($1))/ge;
-      $v =~ s/ /%20/g if ( $escape_whitespace_everywhere && $a ne 'Target' );
-      push @escaped_v, $v;
-    }
-
-    if ( $a eq 'Target' ) {
-      for my $v (@escaped_v) {
-        if ( $v =~ /^"?(.*?)\s+(\d+\s+\d+(?:\s+[-.+])?)\s*"?$/ ) {
-          my ( $tid, $rest ) = ( $1, $2 );
-          $tid =~ s/ /%20/g;
-          $v = join " ", $tid, $rest;
-        }
-      }
-    }
-
-    $a =~ s/$ATTR_ESCAPE_RE/sprintf("%%%02X",ord($1))/ge;
-
-    push @groups, $a . '=' . join( ',', @escaped_v );
-  }
-
-  return join( "\t",
-    $self->seq_id, $self->source, $self->type,
-    $self->start,  $self->end,    $self->score // '.',
-    $strand, $self->phase // '.', join( ';', @groups ) )
-    . "\n";
-}
 __PACKAGE__->meta->make_immutable;
 
 1;

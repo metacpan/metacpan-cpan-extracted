@@ -6,7 +6,7 @@ Kafka::Connection - Object interface to connect to a kafka cluster.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Connection> version 1.001013 .
+This documentation refers to C<Kafka::Connection> version 1.02 .
 
 =cut
 
@@ -20,7 +20,7 @@ use warnings;
 
 our $DEBUG = 0;
 
-our $VERSION = '1.001013';
+our $VERSION = '1.02';
 
 use Exporter qw(
     import
@@ -87,6 +87,7 @@ use Kafka qw(
     $ERROR_NOT_ENOUGH_REPLICAS
     $ERROR_NOT_ENOUGH_REPLICAS_AFTER_APPEND
     $ERROR_REBALANCE_IN_PROGRESS
+    $ERROR_UNSUPPORTED_VERSION
 
     $ERROR_CANNOT_BIND
     $ERROR_CANNOT_GET_METADATA
@@ -110,12 +111,14 @@ use Kafka qw(
     $RETRY_BACKOFF
     $SEND_MAX_ATTEMPTS
 );
+
 use Kafka::Exceptions;
 use Kafka::Internals qw(
     $APIKEY_FETCH
     $APIKEY_METADATA
     $APIKEY_OFFSET
     $APIKEY_PRODUCE
+    $APIKEY_APIVERSIONS
     $MAX_CORRELATIONID
     $MAX_INT32
     debug_level
@@ -125,14 +128,17 @@ use Kafka::Internals qw(
 use Kafka::IO;
 use Kafka::Protocol qw(
     $BAD_OFFSET
+    $IMPLEMENTED_APIVERSIONS
     decode_fetch_response
     decode_metadata_response
     decode_offset_response
     decode_produce_response
+    decode_api_versions_response
     encode_fetch_request
     encode_metadata_request
     encode_offset_request
     encode_produce_request
+    encode_api_versions_request
 );
 
 #-- declarations ---------------------------------------------------------------
@@ -208,6 +214,10 @@ my %protocol = (
     "$APIKEY_METADATA"  => {
         decode                  => \&decode_metadata_response,
         encode                  => \&encode_metadata_request,
+    },
+    "$APIKEY_APIVERSIONS"  => {
+        decode                  => \&decode_api_versions_response,
+        encode                  => \&encode_api_versions_request,
     },
 );
 
@@ -385,6 +395,23 @@ Optional, default value is 100.
 Defines maximum number of last non-fatal errors that we keep in log. Use method L</nonfatal_errors> to
 access those errors.
 
+=item C<dont_load_supported_api_versions =E<gt> $boolean>
+
+Optional, default value is 0 (false).
+
+If set to false, when communicating with a broker, the client will
+automatically try to find out the best version numbers to use for each of the
+API endpoints.
+
+If set to true, the client will always use
+C<$Kafka::Protocol::DEFAULT_APIVERSION> as API version.
+
+=item C<api_versions_refresh_delay_sec =E<gt> $positive_integer>
+
+Optional, default value is 60 (1 minute).
+
+The delay after which the client will refresh the supported API versions.
+
 =back
 
 =cut
@@ -401,6 +428,8 @@ sub new {
         RETRY_BACKOFF           => $RETRY_BACKOFF,
         AutoCreateTopicsEnable  => 0,
         MaxLoggedErrors         => 100,
+        dont_load_supported_api_versions => 0,
+        api_versions_refresh_delay_sec => 60,
     }, $class;
 
     while ( @args ) {
@@ -496,6 +525,109 @@ sub get_known_servers {
     my ( $self ) = @_;
 
     return keys %{ $self->{_IO_cache} };
+}
+
+sub _get_api_versions {
+    my ( $self, $server ) = @_;
+
+    my $server_metadata = $self->{_IO_cache}->{$server};
+    defined $server_metadata
+      or die "Fatal error: server '$server' is unknown in IO cache, which should not happen";
+
+    # if we have cached data, just use it
+    defined $server_metadata->{_api_versions}
+      and return $server_metadata->{_api_versions};
+
+    # no cached data. Initialize empty one
+    my $server_api_versions = $server_metadata->{_api_versions} = {};
+
+    # use empty data if client doesn't want to detect API versions
+    $self->{dont_load_supported_api_versions}
+      and return $server_api_versions;
+
+    # call the server and try to get the supported API versions
+    my $api_versions = [];
+    try {
+        # The ApiVersions API endpoint is only supported on Kafka versions >
+        # 0.10.0.0 so this call may fail. We simply ignore this failure and
+        # carry on.
+        $api_versions = $self->_get_supported_api_versions($server);
+    };
+
+    foreach my $element (@$api_versions) {
+        # we want to choose which api version to use for each API call. We
+        # try to use the max version that the server supports, with
+        # fallback to the max version the protocol implements. If it's
+        # lower than the min version the kafka server supports, we set it
+        # to -1. If thie API endpoint is called, it'll die.
+        my $kafka_min_version = $element->{MinVersion};
+        my $kafka_max_version = $element->{MaxVersion};
+        my $api_key = $element->{ApiKey};
+        my $implemented_max_version = $IMPLEMENTED_APIVERSIONS->{$api_key} // -1;
+        my $version = $kafka_max_version;
+        $version > $implemented_max_version
+          and $version = $implemented_max_version;
+        $version < $kafka_min_version
+          and $version = -1;
+        $server_api_versions->{$api_key} = $version;
+    }
+
+    return $server_api_versions;
+}
+
+
+# Returns the list of supported API versions. This is not really. *Warning*,
+# this call works only against Kafka 1.10.0.0
+
+sub _get_supported_api_versions {
+    my ( $self, $broker ) = @_;
+
+    my $CorrelationId = _get_CorrelationId();
+    my $decoded_request = {
+        CorrelationId   => $CorrelationId,
+        ClientId        => q{},
+        ApiVersion => 0,
+    };
+    say STDERR format_message( '[%s] apiversions request: %s',
+            scalar( localtime ),
+            $decoded_request,
+        ) if $self->debug_level;
+    my $encoded_request = $protocol{ $APIKEY_APIVERSIONS }->{encode}->( $decoded_request );
+
+    my $encoded_response_ref;
+
+    # receive apiversions. We use a code block because it's actually a loop where
+    # you can do last.
+    {
+        $self->_connectIO( $broker )
+          or last;
+        my $sent = $self->_sendIO( $broker, $encoded_request )
+          or last;
+        $encoded_response_ref = $self->_receiveIO( $broker );
+    }
+
+    unless ( $encoded_response_ref ) {
+        # NOTE: it is possible to repeat the operation here
+        $self->_error( $ERROR_CANNOT_RECV );
+    }
+
+    my $decoded_response = $protocol{ $APIKEY_APIVERSIONS }->{decode}->( $encoded_response_ref );
+    say STDERR format_message( '[%s] apiversions response: %s',
+            scalar( localtime ),
+            $decoded_response,
+        ) if $self->debug_level;
+    ( defined( $decoded_response->{CorrelationId} ) && $decoded_response->{CorrelationId} == $CorrelationId )
+        # FATAL error
+        or $self->_error( $ERROR_MISMATCH_CORRELATIONID );
+    my $ErrorCode = $decoded_response->{ErrorCode};
+
+    # we asked a Kafka < 0.10 ( in this case the call is not
+    # implemented and it dies
+    $ErrorCode == $ERROR_NO_ERROR
+      or $self->_error($ErrorCode);
+
+    my $api_versions = $decoded_response->{ApiVersions};
+    return $api_versions;
 }
 
 =head3 C<get_metadata( $topic )>
@@ -670,19 +802,23 @@ sub receive_response_to_request {
 
     $request->{CorrelationId} = _get_CorrelationId() unless exists $request->{CorrelationId};
 
-    my $encoded_request = $protocol{ $api_key }->{encode}->( $request, $compression_codec );
-
     say STDERR format_message( '[%s] compression_codec=%s, request=%s',
         scalar( localtime ),
         $compression_codec,
         $request,
     ) if $self->debug_level;
 
-    my( $ErrorCode, $partition_data );
+    my( $ErrorCode, $partition_data, $io_error );
 
     my $attempt = 0;
+    # we save the original api version of the request, because in the attempt
+    # loop we might be trying different brokers which may support different api
+    # versions.
+    my $original_request_api_version = $request->{ApiVersion};
     ATTEMPT: while ( ++$attempt <= ( $self->{SEND_MAX_ATTEMPTS} // 1 ) ) {
         $ErrorCode = $ERROR_NO_ERROR;
+        undef $io_error;
+
         # hash metadata could be updated
         my $leader = $self->{_metadata}->{ $topic_name }->{ $partition }->{Leader};
         next ATTEMPT unless defined $leader;
@@ -696,14 +832,25 @@ sub receive_response_to_request {
 
         # Send a request to the leader
         if ( $self->_connectIO( $server ) ) {
+
+            # we can connect to this leader, so let's detect the api versions
+            # it and use whatever it supports, except if the request forces us
+            # to use an api version. Warning, the version might end up being
+            # undef if detection against the Kafka server failed, or if
+            # dont_load_supported_api_versions is true. However the Encoder
+            # code knows how to handle it.
+            $request->{ApiVersion} = $original_request_api_version // $self->_get_api_versions($server)->{$api_key};
+            my $encoded_request = $protocol{ $api_key }->{encode}->( $request, $compression_codec );
+
             unless ( $self->_sendIO( $server, $encoded_request ) ) {
-                $ErrorCode = $self->_io_error_code( $server );
-                $ErrorCode = $ERROR_CANNOT_SEND if $ErrorCode == $ERROR_NO_ERROR;
+                $io_error = $self->_io_error( $server );
+                $ErrorCode = $io_error ? $io_error->code : $ERROR_CANNOT_SEND;
                 $self->_closeIO( $server, 1 );
             }
         }
         else {
-            $ErrorCode = $ERROR_CANNOT_BIND;
+            $io_error = $self->_io_error( $server );
+            $ErrorCode = $io_error ? $io_error->code : $ERROR_CANNOT_BIND;
         }
 
         if ( $ErrorCode != $ERROR_NO_ERROR ) {
@@ -745,7 +892,7 @@ sub receive_response_to_request {
 
                     # Should not be allowed to re-send data on the next attempt
                     # FATAL error
-                    $self->_error( $ErrorCode, $self->_io_error( $server ), request => $request );
+                    $self->_error( $ErrorCode, "no ack for request", io_error => $self->_io_error( $server ), request => $request );
                     last ATTEMPT;
                 } else {
                     $ErrorCode = $ERROR_CANNOT_RECV;
@@ -754,13 +901,15 @@ sub receive_response_to_request {
                 }
             }
             if ( length( $$encoded_response_ref ) > 4 ) {   # MessageSize => int32
-                $response = $protocol{ $api_key }->{decode}->( $encoded_response_ref );
+                # we also pass the api version that was used for the request,
+                # so that we know how to decode the response
+                $response = $protocol{ $api_key }->{decode}->( $encoded_response_ref, $request->{ApiVersion} );
                 say STDERR format_message( '[%s] response: %s',
                         scalar( localtime ),
                         $response,
                     ) if $self->debug_level;
             } else {
-                $self->_error( $ERROR_RESPONSEMESSAGE_NOT_RECEIVED, format_message("response length=%s", length( $$encoded_response_ref ) ), request => $request );
+                $self->_error( $ERROR_RESPONSEMESSAGE_NOT_RECEIVED, format_message("response length=%s", length( $$encoded_response_ref ) ), io_error => $self->_io_error( $server ), request => $request );
             }
         }
 
@@ -809,9 +958,9 @@ sub receive_response_to_request {
 
     # FATAL error
     if ( $ErrorCode ) {
-        $self->_error( $ErrorCode, format_message( "topic='%s'%s", $topic_data->{TopicName}, $partition_data ? ", partition = ".$partition_data->{Partition} : '' ), request => $request );
+        $self->_error( $ErrorCode, format_message( "topic='%s'%s", $topic_data->{TopicName}, $partition_data ? ", partition = ".$partition_data->{Partition} : '' ), request => $request, io_error => $io_error );
     } else {
-        $self->_error( $ERROR_UNKNOWN_TOPIC_OR_PARTITION, format_message( "topic='%s', partition=%s", $topic_name, $partition ), request => $request );
+        $self->_error( $ERROR_UNKNOWN_TOPIC_OR_PARTITION, format_message( "topic='%s', partition=%s", $topic_name, $partition ), request => $request, io_error => $io_error );
     }
 
     return;
@@ -1195,14 +1344,11 @@ sub _on_io_error {
 
 sub _io_error {
     my( $self, $server ) = @_;
-    my $server_data = $self->{_IO_cache}->{ $server } or return;
-    return $server_data->{error};
-}
-
-sub _io_error_code {
-    my( $self, $server ) = @_;
-    my $error = $self->_io_error( $server );
-    return $error ? $error->code : $ERROR_NO_ERROR;
+    my $error;
+    if( my $server_data = $self->{_IO_cache}->{ $server } ) {
+        $error = $server_data->{error};
+    }
+    return $error;
 }
 
 # connects to a server (host:port or [IPv6_host]:port)
@@ -1455,9 +1601,11 @@ Sergiy Zuban
 
 Vlad Marchenko
 
+Damien Krotkine
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016 by TrackingSoft LLC.
+Copyright (C) 2012-2017 by TrackingSoft LLC.
 
 This package is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. See I<perlartistic> at

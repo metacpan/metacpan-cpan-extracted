@@ -1,0 +1,28 @@
+/* XPM */
+static char *redo[] = {
+/* width height ncolors chars_per_pixel */
+"17 17 4 1",
+/* colors */
+". c #FCFEFC",
+"  s None c None",
+"X c #7C7E7C",
+"o c #040204",
+/* pixels */
+"                 ",
+"                 ",
+"     ooooo  oo   ",
+"   oo.....oo.oX  ",
+"  o..........oX  ",
+"  o..oooo....oX  ",
+" o..oXXXo....oX  ",
+" o..oX o.....oX  ",
+" o..oX oooooooX  ",
+" o..oX  XXXoXXX  ",
+" o..oX    o.o    ",
+"  o..ooooo..oX   ",
+"  o........oXX   ",
+"   oo.....oXX    ",
+"     oooooXX     ",
+"      XXXXX      ",
+"                 "
+};

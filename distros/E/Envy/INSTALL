@@ -1,0 +1,147 @@
+=head1 NAME
+
+Envy - A comprehensive multi-dimensional environment manager
+
+=head1 SYNOPSIS
+
+Unfortunately, installation takes a bit more work beyond simply typing
+'make'.  Big returns can involve negotiating big obstacles.  :-/
+
+=head1 TRIAL
+
+To try envy, you need to determine the type of your login shell.  In
+the Unix world, there are mainly two types of shells.  You can find
+out which one you have with:
+
+  echo $SHELL
+
+The following covers installation for most shells:
+
+=over 4
+
+=item * SH, KSH, BASH, ZSH, Etc.
+
+   envy() { eval `envy.pl $*`; }
+
+=item * CSH, TCSH, Etc.
+
+   alias envy 'envy.pl -csh \!* > /tmp/t$$; source /tmp/t$$; /bin/rm -f /tmp/t$$'
+
+=back
+
+Now type 'envy help' and take a look around the menus.
+
+Full installation is not exactly straightforward because to achieve
+the greatest benefit, you'll need to let envy manage your system-wide
+login scripts.
+
+=head1 FULL INSTALLATION
+
+=head2 WHY AM I GOING THROUGH ALL THIS HELL?
+
+Because envy could solve some of your long standing, tenacious
+problems!
+
+=over 4
+
+=item * REUSE
+
+Envy allows the centralization of configuration files.  When new
+versions of software come out, it is easy to globally publish new
+configuration files for a gradual, controlled migration.  Instead of
+being locked into backward compatibility, you can gently nudge users
+towards change.
+
+=item * CHOICE
+
+Each user can customize their environment exactly to the degree they
+prefer instead of being forced into a global environment or
+splintering into an entirely custom (home directory based :-) setup.
+
+=item * DEPENDENCIES
+
+Envy makes dependencies between packages explicit and visible.
+
+=item * STARTING APPLICATIONS
+
+The 'launche' script makes it easy to isolate application from their
+configuration and log usage.
+
+=item * CRON JOBS
+
+Cron jobs will no longer fail unexpectedly due to missing or mistaken
+environment variables.  The 'launche' script mimics the precise
+execution environment for crontab so test runs are a breeze.
+
+=back
+
+=head2 CONFIGURATION
+
+Before you 'make install', be sure to customize ./Conf.pm.
+
+=over 4
+
+=item * $prefix
+
+This will default to the same place where perl is installed.
+
+=item * %env0
+
+These variables are hardcoded into various scripts.  You should keep
+the minimum environment necessary to run envy.
+
+=item * @path
+
+On startup, envy will search these paths to find the $startup envy.
+
+=item * $startup
+
+You'll need to write a startup .env file to set up the initial login
+environment.  At a minimum, you'll need to set $ENVY_PATH.
+$ENVY_PATH is a colin separated list of paths where envy searches for
+.env files.  You may also like to require a few other envies by default.
+
+=back
+
+=head2 SCRIPTS
+
+To determine how to modify your global startup scripts (profile,
+login) see the examples in etc/login.  You should be able to cut &
+paste to get things going.  The minimum you'll need is the following
+in profile:
+
+  eval `/full/path/to/envy.pl load $startup`
+
+or in login:
+
+  $ENVY -csh load $startup > /tmp/mod.$$
+  source /tmp/mod.$$
+  if ($?debug) cat /tmp/mod.$$
+  /bin/rm /tmp/mod.$$
+
+where $startup is replaced with the appropriate envy for your site.
+You'll also need the envy function/alias as mentioned in the TRIAL
+section (above).
+
+=head1 FUTURE DIRECTION
+
+Envy is written entirely in perl and is designed to be used as a
+library as well as a command-line tool.  One possible project is a
+graphical front end to help navigate the environment.  Also see the
+TODO file.
+
+=head1 SUPPORT
+
+Send email to envy@listbox.com.
+
+=head1 SEE ALSO
+
+For a comparison of unix shells:
+
+  http://www.faqs.org/faqs/unix-faq/shell/shell-differences/index.html
+
+And for why you should *not* do shell programming in csh:
+
+  http://www.faqs.org/faqs/unix-faq/shell/csh-whynot/
+
+=cut

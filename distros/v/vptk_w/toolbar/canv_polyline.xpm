@@ -1,0 +1,30 @@
+/* XPM */
+static char *subwidget[] = {
+/* width height ncolors chars_per_pixel */
+"19 19 4 1",
+/* colors */
+". c #FCFEFC",
+"  s None c None",
+"X c #0000FF",
+"o c #040204",
+/* pixels */
+"                   ",
+"                   ",
+" ooo               ",
+"    oooo           ",
+"        ooooo      ",
+"             ooooo ",
+"                o  ",
+"  oo           o   ",
+"    oo         o   ",
+"      oo      o    ",
+"      o       o    ",
+"     o       o     ",
+"    o        o     ",
+"   o        o      ",
+"  oooooooooo       ",
+"                   ",
+"                   ",
+"                   ",
+"                   "
+};

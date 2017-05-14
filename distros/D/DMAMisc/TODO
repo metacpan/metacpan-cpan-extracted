@@ -1,0 +1,63 @@
+=================
+Version
+
+- In the new method it would be nice if I could confirm they really are 
+  format or gre strings!
+  [DMA 20040831 - ?]
+
+=================
+ISODate
+
+- I could easily add the ability to assign start,mid,end so each month of
+  the year has a unique name in terms of quarter. eg mid-Q1
+  [DMA 20021207 - ?]
+
+- TO BE IMPLIMENTED:
+  June 21 or 22 summer solstice
+  Sept 22 or 23 autumnal equinox
+  Dec 21 or 22   winter solstice
+  March 20 or 21 vernal or spring equinox
+  [DMA 20021207 - ?]
+
+- new_formatted class method. This is a good place to use Time::ParseDate
+  [DMA 20021207 - ?]
+
+- new_formatted class method. There is no way to specify utc here
+  [DMA 20021207 - ?]
+
+- new_formatted class method. PERHAPS ADD A date only new function for
+  format {Y...}MMDD
+  [DMA 20021207 - ?]
+
+- Class methods SHORTCOMINGS: perhaps add a date only new method; no
+  way to specify UTC even if you know it.
+  [DMA 20021207 - ?]
+
+- Class methods. There is currently not sufficient bounds checking of 
+  dates to make sure they are possible dates.
+  [DMA 20021207 - ?]
+
+- I may wish to rewrite parts of this Class to use lazy evaluation.
+  [DMA 20021207 - ?]
+
+- I need to support the ISO 8601 week numbering
+  [DMA 20021207 - ?]
+
+- I may in the future want to add the ability to translate dates from 
+  my address book and logs from the US 2 digit year format (mm/dd/yy)
+  to the International Date Format with 4 digit year I have now 
+  standardized on.
+  [DMA 20021207 - ?]
+
+- These values are not checked for limits or that the day of the month
+  exists in that month and year.
+    ($havedate,$havetime,$y2k,
+     $yr,$mon,$day,$hr,$min,$sec) = $self->_isodate($str);
+  Later on fill this in so it handles other formats
+    if (!$havedate) {return undef;}
+  [DMA 20021207 - ?]
+
+- DMALIB: the standard package HTTP::Date has str2iso and
+  iso2str methods which might be useable to simplify my
+  own Date object.
+  [DMA 20080817 - ?]

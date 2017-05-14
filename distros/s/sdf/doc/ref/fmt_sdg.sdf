@@ -1,0 +1,50 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: SDG Format
+
+H2: Purpose
+
+SDG files are used to format information extracted from source code
+by {{CMD:sdfget}}.
+
+H2: Description
+
+An SDG is a table of {{Key-Format}} pairs. For example:
+
+E:     Key     Format
+E:     -       "Key\t\tDescription\n"
+E:     *       sprintf("%-15.15s\t%s\n", $key, $data)
+
+The first line specifies the layout of the table and is required.
+An item is only printed if it has a description.
+The {{Key}} field can be one of the following:
+
+* an item name
+* a minus (-) character, indicating free text
+* an asterix (*) character, indicating all remaining items
+
+The {{Format}} field is a Perl expression. {{$key}} and {{$data}}
+are used to indicate the key and description of the current
+item respectively. Other available symbols are:
+
+* {{$dir}} - directory component of current file
+* {{$base}} - base component of current file
+* {{$ext}} - extension component of current file
+* {{$short}} - base & extension components of current file
+
+H2: Examples
+
+The SDG file used to format topics within the SDF documentation is:
+
+!include "stdlib/default.sdg"; example; skipheader; pure

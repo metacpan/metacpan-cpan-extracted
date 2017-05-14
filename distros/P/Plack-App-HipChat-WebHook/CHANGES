@@ -1,0 +1,41 @@
+==================================================
+Changes from 2005-01-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2015-01-19 12:26:04 +0000
+------------------------------------------
+
+  Change: a3e5a7d89e75a55b6e2ade5287c8c96c49aed579
+  Author: Chris Hughes <chris-git@fysh.org>
+  Date : 2015-01-19 00:43:41 +0000
+
+    POD/email updates 
+
+  Change: e59f520ffdafa2075b3914d7ecdb953550945303
+  Author: Chris Hughes <chris-git@fysh.org>
+  Date : 2015-01-19 00:39:59 +0000
+
+    Typo fix 
+
+  Change: 854ef0dc3189ef0e2498126ef94634a361fcdf6a
+  Author: Chris Hughes <chris-git@fysh.org>
+  Date : 2015-01-19 00:39:31 +0000
+
+    First version 
+
+  Change: 8b9e5e2fb0669d8a4e6cd881e37e6d3da0a9a18c
+  Author: Chris Hughes <chris-git@fysh.org>
+  Date : 2015-01-19 00:37:33 +0000
+
+    Update gitignore 
+
+  Change: 9b58abf9bb35ade8e0ed72e4a207d35ae06a3daa
+  Author: Chris <chris@fysh.org>
+  Date : 2015-01-18 22:57:31 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

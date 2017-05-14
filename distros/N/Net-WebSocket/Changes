@@ -13,7 +13,13 @@ Revision history for Perl module Net::WebSocket
 0.021 Thu Mar 23 2017
 - Remove stray Call::Always usage in tests
 
-0.03
+0.022 Sat Apr 22 2017
+- Remove stray Try::Tiny dependency
+
+0.023 Sat Apr 22 2017
+- Fix another test dependency.
+
+0.03 Wed May 3 2017
 - BREAKING: Endpoint’s “out” parameter must now be an instance of
   IO::Framed::Write (or implement the same behavior).
 
@@ -32,7 +38,8 @@ Revision history for Perl module Net::WebSocket
 - BREAKING: I’ve removed the before_send_control_frame() handler.
 
 - Net::WebSocket::Parser now instantiates the “target” frame class object,
-  not the base Net::WebSocket::Frame class.
+  not the base Net::WebSocket::Frame class. So there’s no more of the
+  AUTOLOAD shenanigans of before.
 
 - Removed the Bytes::Random::Secure::Tiny dependency. It doesn’t seem we
   really need cryptographically strong random numbers for masking or
@@ -54,3 +61,6 @@ Revision history for Perl module Net::WebSocket
 
 - Shell server demo now included. Hook it up to a nice JavaScript terminal
   emulator like xterm.js, and impress all your friends. :)
+
+0.031 Tue May 9 2017
+- Sync documentation with 0.03 API changes

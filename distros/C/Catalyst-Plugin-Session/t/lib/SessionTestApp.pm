@@ -1,34 +1,38 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 package SessionTestApp;
-use Catalyst qw/Session Session::Store::Dummy Session::State::Cookie/;
+use Catalyst qw/Session Session::Store::Dummy Session::State::Cookie Authentication/;
 
 use strict;
 use warnings;
 
-sub login : Global {
-    my ( $self, $c ) = @_;
-    $c->session;
-    $c->res->output("logged in");
-}
+__PACKAGE__->config('Plugin::Session' => {
+        # needed for live_verify_user_agent.t; should be harmless for other tests
+        verify_user_agent => 1,
+        verify_address => 1,
+    },
 
-sub logout : Global {
-    my ( $self, $c ) = @_;
-    $c->res->output(
-        "logged out after " . $c->session->{counter} . " requests" );
-    $c->delete_session("logout");
-}
-
-sub page : Global {
-    my ( $self, $c ) = @_;
-    if ( $c->session_is_valid ) {
-        $c->res->output("you are logged in, session expires at " . $c->session_expires);
-        $c->session->{counter}++;
-    }
-    else {
-        $c->res->output("please login");
-    }
-}
+    'Plugin::Authentication' => {
+        default => {
+            credential => {
+                class => 'Password',
+                password_field => 'password',
+                password_type => 'clear'
+            },
+            store => {
+                class => 'Minimal',
+                users => {
+                    bob => {
+                        password => "s00p3r",
+                    },
+                    william => {
+                        password => "s3cr3t",
+                    },
+                },
+            },
+        },
+    },
+);
 
 __PACKAGE__->setup;
 

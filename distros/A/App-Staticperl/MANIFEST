@@ -1,0 +1,22 @@
+README
+Changes
+COPYING
+Makefile.PL
+
+bin/staticperl
+
+eg/httpd
+
+build
+staticperl.sh
+make-install-make.sh
+patch-postinstall.sh
+mkbundle
+staticperl.pod
+Staticperl.pm
+
+t/01_vollwaesche.t
+
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

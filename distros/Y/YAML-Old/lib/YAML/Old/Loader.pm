@@ -5,6 +5,7 @@ extends 'YAML::Old::Loader::Base';
 
 use YAML::Old::Loader::Base;
 use YAML::Old::Types;
+use YAML::Old::Node;
 
 # Context constants
 use constant LEAF       => 1;
@@ -34,9 +35,7 @@ sub _parse {
     $self->line(0);
     $self->die('YAML_PARSE_ERR_BAD_CHARS')
       if $self->stream =~ /$ESCAPE_CHAR/;
-    $self->die('YAML_PARSE_ERR_NO_FINAL_NEWLINE')
-      if length($self->stream) and
-         $self->{stream} !~ s/(.)\n\Z/$1/s;
+    $self->{stream} =~ s/(.)\n\Z/$1/s;
     $self->lines([split /\x0a/, $self->stream, -1]);
     $self->line(1);
     # Throw away any comments or blanks before the header (or start of
@@ -227,7 +226,7 @@ sub _parse_qualifiers {
             $self->die('YAML_PARSE_ERR_MANY_IMPLICIT') if $implicit;
             $implicit = 1;
         }
-        elsif ($preface =~ s/^\&([^ ,:]+)\s*//) {
+        elsif ($preface =~ s/^\&([^ ,:]*)\s*//) {
             $token = $1;
             $self->die('YAML_PARSE_ERR_BAD_ANCHOR')
               unless $token =~ /^[a-zA-Z0-9]+$/;
@@ -235,7 +234,7 @@ sub _parse_qualifiers {
             $self->die('YAML_PARSE_ERR_ANCHOR_ALIAS') if $alias;
             $anchor = $token;
         }
-        elsif ($preface =~ s/^\*([^ ,:]+)\s*//) {
+        elsif ($preface =~ s/^\*([^ ,:]*)\s*//) {
             $token = $1;
             $self->die('YAML_PARSE_ERR_BAD_ALIAS')
               unless $token =~ /^[a-zA-Z0-9]+$/;
@@ -288,10 +287,10 @@ sub _parse_explicit {
         }
     }
     # This !perl/@Foo and !perl/$Foo are deprecated but still parsed
-    elsif ($YAML::Old::TagClass->{$explicit} ||
+    elsif ($YAML::TagClass->{$explicit} ||
            $explicit =~ m{^perl/(\@|\$)?([a-zA-Z](\w|::)+)$}
           ) {
-        $class = $YAML::Old::TagClass->{$explicit} || $2;
+        $class = $YAML::TagClass->{$explicit} || $2;
         if ($class->can('yaml_load')) {
             require YAML::Old::Node;
             return $class->yaml_load(YAML::Old::Node->new($node, $explicit));
@@ -320,7 +319,7 @@ sub _parse_explicit {
 sub _parse_mapping {
     my $self = shift;
     my ($anchor) = @_;
-    my $mapping = {};
+    my $mapping = $self->preserve ? YAML::Old::Node->new({}) : {};
     $self->anchor2node->{$anchor} = $mapping;
     my $key;
     while (not $self->done and $self->indent == $self->offset->[$self->level]) {
@@ -356,7 +355,7 @@ sub _parse_mapping {
         $self->_parse_next_line(COLLECTION);
         my $value = $self->_parse_node();
         if (exists $mapping->{$key}) {
-            $self->warn('YAML_LOAD_WARN_DUPLICATE_KEY');
+            $self->warn('YAML_LOAD_WARN_DUPLICATE_KEY', $key);
         }
         else {
             $mapping->{$key} = $value;
@@ -378,7 +377,16 @@ sub _parse_seq {
         else {
             $self->die('YAML_LOAD_ERR_BAD_SEQ_ELEMENT');
         }
-        if ($self->preface =~ /^(\s*)(\w.*\:(?: |$).*)$/) {
+
+        # Check whether the preface looks like a YAML mapping ("key: value").
+        # This is complicated because it has to account for the possibility
+        # that a key is a quoted string, which itself may contain escaped
+        # quotes.
+        my $preface = $self->preface;
+        if ( $preface =~ /^ (\s*) ( \w .*?               \: (?:\ |$).*) $/x  or
+             $preface =~ /^ (\s*) ((') (?:''|[^'])*? ' \s* \: (?:\ |$).*) $/x or
+             $preface =~ /^ (\s*) ((") (?:\\\\|[^"])*? " \s* \: (?:\ |$).*) $/x
+           ) {
             $self->indent($self->offset->[$self->level] + 2 + length($1));
             $self->content($2);
             $self->level($self->level + 1);
@@ -446,6 +454,11 @@ sub _parse_inline {
             $node = $self->_parse_inline_simple();
         }
         $node = $self->_parse_implicit($node) unless $explicit;
+
+        if ($self->numify and defined $node and not ref $node and length $node
+            and $node =~ m/\A-?(?:0|[1-9][0-9]*)?(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?\z/) {
+            $node += 0;
+        }
     }
     if ($explicit) {
         $node = $self->_parse_explicit($node, $explicit);
@@ -472,13 +485,13 @@ sub _parse_inline_mapping {
 
     $self->die('YAML_PARSE_ERR_INLINE_MAP')
       unless $self->{inline} =~ s/^\{\s*//;
-    while (not $self->{inline} =~ s/^\s*\}//) {
+    while (not $self->{inline} =~ s/^\s*\}\s*//) {
         my $key = $self->_parse_inline();
         $self->die('YAML_PARSE_ERR_INLINE_MAP')
           unless $self->{inline} =~ s/^\: \s*//;
         my $value = $self->_parse_inline();
         if (exists $node->{$key}) {
-            $self->warn('YAML_LOAD_WARN_DUPLICATE_KEY');
+            $self->warn('YAML_LOAD_WARN_DUPLICATE_KEY', $key);
         }
         else {
             $node->{$key} = $value;
@@ -499,7 +512,7 @@ sub _parse_inline_seq {
 
     $self->die('YAML_PARSE_ERR_INLINE_SEQUENCE')
       unless $self->{inline} =~ s/^\[\s*//;
-    while (not $self->{inline} =~ s/^\s*\]//) {
+    while (not $self->{inline} =~ s/^\s*\]\s*//) {
         my $value = $self->_parse_inline();
         push @$node, $value;
         next if $self->inline =~ /^\s*\]/;
@@ -562,7 +575,7 @@ sub _parse_implicit {
     return $value if $value eq '';
     return undef if $value =~ /^~$/;
     return $value
-      unless $value =~ /^[\@\`\^]/ or
+      unless $value =~ /^[\@\`]/ or
              $value =~ /^[\-\?]\s/;
     $self->die('YAML_PARSE_ERR_BAD_IMPLICIT', $value);
 }
@@ -630,7 +643,10 @@ sub _parse_next_line {
     $self->die('YAML_EMIT_ERR_BAD_LEVEL') unless defined $offset;
     shift @{$self->lines};
     $self->eos($self->{done} = not @{$self->lines});
-    return if $self->eos;
+    if ($self->eos) {
+        $self->offset->[$level + 1] = $offset + 1;
+        return;
+    }
     $self->{line}++;
 
     # Determine the offset for a new leaf node
@@ -646,7 +662,7 @@ sub _parse_next_line {
         else {
             # First get rid of any comments.
             while (@{$self->lines} && ($self->lines->[0] =~ /^\s*#/)) {
-                $self->lines->[0] =~ /^( *)/ or die;
+                $self->lines->[0] =~ /^( *)/;
                 last unless length($1) <= $offset;
                 shift @{$self->lines};
                 $self->{line}++;
@@ -671,7 +687,8 @@ sub _parse_next_line {
             return;
         }
         else {
-            $self->lines->[0] =~ /^( *)\S/ or die;
+            $self->lines->[0] =~ /^( *)\S/ or
+                $self->die('YAML_PARSE_ERR_NONSPACE_INDENTATION');
             if (length($1) > $offset) {
                 $self->offset->[$level+1] = length($1);
             }

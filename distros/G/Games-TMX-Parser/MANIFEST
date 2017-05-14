@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/compute_path.pl
+eg/tiles.png
+eg/tower_defense.png
+eg/tower_defense.tmx
+eg/towers.png
+lib/Games/TMX/Parser.pm
+t/Games-TMX-Parser.t

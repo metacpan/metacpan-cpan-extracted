@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-EnsureLatestPerl
+
+0.002     2017-05-13 09:24:06Z
+          - actually support DZIL_ANY_PERL override variable
+
+0.001     2017-05-12 08:25:52Z
+          - Initial release.

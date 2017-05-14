@@ -1,0 +1,30 @@
+---
+name: AudioFile-Info-Ogg-Vorbis-Header-PurePerl
+version: 1.05
+author:
+  - 'Dave Cross, E<lt>dave@dave.org.ukE<gt>'
+abstract: |-
+  Perl extension to get
+  info from Ogg Vorbis files.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  AudioFile::Info: 0
+  Ogg::Vorbis::Header::PurePerl: 0
+  YAML: 0
+  perl: 5.6.0
+build_requires:
+  Module::Build: 0
+dynamic_config: 1
+provides:
+  AudioFile::Info::Build:
+    file: lib/AudioFile/Info/Build.pm
+    version: 16
+  AudioFile::Info::Ogg::Vorbis::Header::PurePerl:
+    file: lib/AudioFile/Info/Ogg/Vorbis/Header/PurePerl.pm
+    version: 17
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,53 @@
+
+=head1 OVERVIEW
+
+
+
+=head1 DEVELOPMENT NOTE
+
+=head2 ObjectAdaptor::Store
+
+'_insert' method is to store the corresponding object. However, in many cases,
+only knowing the object itself is not enough, while the some referent objects,
+in SQL term, foreign keys, are required.
+
+the interface of this method is shown below,
+
+  sub _insert {
+      my ($self, $obj, $fks)=@_;
+
+lkjasd
+
+=over 2
+
+=item '$obj' is the object you want to store.
+
+=item '$fks' is the hash reference, with keys of foreign key name and values as the
+foreign key ids or referent objects.
+
+=back
+
+The order of store
+
+=over 2
+
+=item 1 Shared children, like Location to Person
+
+=item 2 the object itself.
+
+=item 3 Others after getting the dbID
+
+=over 4
+
+=item * asdlkjasfl
+
+=item * lkajsldkfj
+
+=back
+
+
+=back
+
+
+
+=cut

@@ -1,0 +1,23 @@
+---
+abstract: 'the main module of the AnnualCal distribution'
+author:
+  - 'Elliot Winston <exw@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wx-App-AnnualCal
+requires:
+  Date::Calc: 6.3
+  Readonly: 1.03
+  Wx: 0.990
+  Wx::App: 0
+  Wx::Grid: 0
+  perl: 5.010
+version: 0.92

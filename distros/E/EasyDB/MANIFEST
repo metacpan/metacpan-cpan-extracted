@@ -1,0 +1,11 @@
+Changes
+EasyDB.pm
+EasyDB/Query/Delete.pm
+EasyDB/Query/Insert.pm
+EasyDB/Query/Select.pm
+EasyDB/Query/Update.pm
+EasyDB/Util.pm
+License
+MANIFEST
+Makefile.PL
+README

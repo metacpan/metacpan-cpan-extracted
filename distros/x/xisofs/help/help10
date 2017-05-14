@@ -1,0 +1,1 @@
+Allow full 32 character filenames. Normally the ISO9660 filename will be in an 8.3 format which is compatable with MS-DOS, even though the ISO9660 standard allows filenames of upto 32 characters. If you use this option, the disc may be difficult to use on a MS-DOS system, but this comes in handy on other systems (such as the Amiga). Use with caution.

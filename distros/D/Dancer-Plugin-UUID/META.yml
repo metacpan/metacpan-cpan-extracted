@@ -1,0 +1,32 @@
+---
+abstract: 'Maintain unique identifiers for each visitor of the application.'
+author:
+  - 'Alexis Sukrieh <sukria@gmail.com>'
+build_requires:
+  DDP: '0'
+  Dancer::Test: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-UUID
+requires:
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  Data::UUID: '0'
+  Digest::SHA1: '0'
+  feature: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sukria/Dancer-Plugin-UUID/issues
+  homepage: https://github.com/sukria/Dancer-Plugin-UUID/wiki
+  repository: git://github.com/sukria/Dancer-Plugin-UUID.git
+version: '0.004'

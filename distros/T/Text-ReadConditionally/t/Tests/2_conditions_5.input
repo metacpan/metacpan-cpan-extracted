@@ -1,0 +1,10 @@
+.# Title: Unless followed by elseif
+First line
+.unless 1
+Not displayed
+.elseif 1
+Is displayed
+.else
+Neither displayed
+.fi
+Last line

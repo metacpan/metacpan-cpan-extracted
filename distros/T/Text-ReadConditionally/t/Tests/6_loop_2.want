@@ -1,0 +1,18 @@
+Outer loop i = 1 .. 3
+In while i = 1
+Inner loop j = 1, 2
+In until i = 1 j = 1
+In until i = 1 j = 2
+End of outer. (while) i = 1
+In while i = 2
+Inner loop j = 1, 2
+In until i = 2 j = 1
+In until i = 2 j = 2
+End of outer. (while) i = 2
+In while i = 3
+Inner loop j = 1, 2
+In until i = 3 j = 1
+In until i = 3 j = 2
+End of outer. (while) i = 3
+After end of Look
+EOF

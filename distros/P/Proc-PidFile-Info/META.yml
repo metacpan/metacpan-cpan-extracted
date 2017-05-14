@@ -1,0 +1,15 @@
+---
+abstract: 'gather proces info from PID files'
+author:
+  - 'Christian-Rolf Gruen <kixx@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Proc-PidFile-Info
+version: 0.02

@@ -1,10 +1,2 @@
-\bCVS\b
-\bdist\b
-~$
-\.old$
-\.bak$
-\.backup$
-\.err$
-^tmp
-^notes
-^_
+Makefile$
+\.svn

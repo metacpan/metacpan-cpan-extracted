@@ -1,0 +1,5 @@
+<a href="foo">
+<a foo bar baz href=test bar>
+<a href="http://www.csh.rit.edu/~psionic/../foo/../barbaz/fizzle/../WEEE">
+<a href="http://www.csh.rit.edu/../../../">
+

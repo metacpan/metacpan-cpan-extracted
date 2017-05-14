@@ -1,0 +1,83 @@
+Revision history for Perl extension ARCv2.
+
+1.05- Tue Mar 22 2005
+	- fixed authentication/decryption problem, which lead to
+	  staling connections when the client thought it is authenticated,
+	  but the server doesn't know that
+	- correct the exit-code handling in the arcx-client-script
+	- another patch by Tony Fraser (ACLs, CheckCmd for the Server-Connection)
+	- command-server-mapping-file for arcx-client-script
+
+1.04  Tue Jan 04 2005
+	- Fixed timeout again
+	- command error handling improved, passed to the client separatly now
+
+1.03  Tue Dec 02 2004
+	- Documentation has to be created
+	- line feed when command sprays an error (thanks to Wolfgang Friebel)
+	- pid file
+	- removed errornous white space
+
+1.02  Tue Nov 02 2004
+	- corrected a typo (forgot a $) (thanks to Tony Fraser)
+	- added a member-variable to allow changable server connection type
+	  this makes extending Arc::Connection::Server more easier to use it then
+	  with Arc::Server (suggested by Tony Fraser, thanks)
+	- timeout behaviour for command connection fixed (thanks to Wolfgang Friebel)
+	- workaround bug regarding asynchonous sasl-encryption within one connection
+
+1.01  Wed Jul 28 2004
+	- commandconnection is now using IO::Select for accepting
+	- added init.d script for solaris
+
+1.00  Wed Jul 28 2004
+    - change the loglevel behaviour
+	- ported the server to Net::Server::PreFork
+	- encrypted protocol connection (new protocol version)
+    - added PBConfig for easier Makefile.PL
+    - Missing dependencies fix
+	- fix documentation for arcx (thanks to Andreas Haupt)
+
+
+0.06  Mon Mar 08 2004
+    - Solaris make fix
+
+0.05  Wed Mar 03 2004
+    - changed instance to object in documentation
+	- heavy documentation update (thanks to Wolfgang Friebel for reading
+	  all this pages)
+	- deadlock fixed in when the client uses the same object to reconnect
+	  (arcx)
+	- arcx reconnects automatically when lost connection during a session
+	- small bug in Put command
+	- put all .pm file in lib/
+
+0.04  Tue Jan 27 2004
+	- Added the raw pod documentation to the package. The installation
+	  process will now build the pod when running perl Makefile.PL.
+	- Updating Documentation (for arcx and arcxd).
+	- Removed some debug statements. (also known as 'code cleanup').
+	- Added the IP*PORT parameter to SASL *_new function, KERBEROS_V4
+	  is possible now (depends on Authen::SASL::Cyrus 0.10)
+	- removed the CheckAcl method from the Command class, since there
+	  is apparently no need for it.
+
+0.03  Fri Jan 23 2004
+	- Documentation improvements (reimplemented members are hidden)
+	- Name for ARCv2 command line interface (arcx, arcxd) 01/23/2004
+		- Arc Extended
+	- Makefile.PL improvements
+	- default values for host, path and port during Makefile.PL
+	- first DESY Zeuthen production release.
+
+0.02  Thu Jan 22 2004
+	- removed Config::IniFiles from Arc classes
+	- improved signal handling
+	- added client and server scripts, to be
+	  able to use the client and start the server
+	  from command line
+	- documentation
+	- structured internal variable access
+
+0.01  Tue Dec  9 16:46:42 2003
+	- original version; created by h2xs 1.22 with options

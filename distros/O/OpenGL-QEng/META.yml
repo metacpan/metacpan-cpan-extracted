@@ -1,0 +1,31 @@
+---
+abstract: ~
+author:
+  - 'John D. Overmars <F<overmars@jdovermarsa.com>>,'
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: Perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: OpenGL-QEng
+no_index:
+  directory:
+    - QEng
+    - auto
+    - html
+    - Attic
+    - maps
+    - images
+    - inc
+    - t
+requires:
+  File::ShareDir: 0
+  Image::Magick: 6.3.5
+  Math::Trig: 0
+  OpenGL: 0.54
+  OpenGL::Image: 0
+version: 0.27

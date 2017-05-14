@@ -1,0 +1,87 @@
+# $Id$
+#
+# >>Title::     Common Objects Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{objects.sdm}} defines objects commonly referenced in [[SDF]]
+# documents.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Commonly referenced organisations
+!block organisations; data
+Name            Long                                    Jump
+Adobe           Adobe Systems Incorporated              http://www.adobe.com
+Apple           Apple Computer, Incorporated            http://www.apple.com
+Borland         Borland International, Incorporated     http://www.borland.com
+DEC             Digital Equipment Corporation           http://www.dec.com
+Frame           Frame International                     http://www.frame.com
+HP              Hewlett Packard                         http://www.hp.com
+IBM             International Business Machines         http://www.ibm.com
+Mincom          Mincom Pty Ltd                          http://www.mincom.com
+Microsoft       Microsoft Corporation                   http://www.microsoft.com
+OMG             Object Management Group                 http://www.omg.org
+SUN             Sun Microsystems Computer Corporation   http://www.sun.com
+X/Open          X/Open Company Ltd                      http://www.xopen.org
+!endblock
+
+# Make them variables too
+!define Adobe           "{{ORG:Adobe}}"
+!define Apple           "{{ORG:Apple}}"
+!define Borland         "{{ORG:Borland}}"
+!define DEC             "{{ORG:DEC}}"
+!define Frame           "{{ORG:Frame}}"
+!define HP              "{{ORG:HP}}"
+!define IBM             "{{ORG:IBM}}"
+!define Mincom          "{{ORG:Mincom}}"
+!define Microsoft       "{{ORG:Microsoft}}"
+!define OMG             "{{ORG:OMG}}"
+!define SUN             "{{ORG:SUN}}"
+!define X_Open          "{{ORG:X/Open}}"
+
+# Commonly referenced products
+# (Thanks to Chris Moran for most of the Jump values.)
+!block products; data
+Name            Jump
+CORBA           http://www.omg.org/corba.htm
+Delphi          http://www.borland.com/Product/Lang/delphi2/
+FrameMaker      http://www.frame.com/PRODUCTS/Products.doc.html
+FrameViewer     http://www.frame.com
+HTML            http://www.w3.org/hypertext/WWW/MarkUp/
+Java            http://java.sun.com/
+MIMS            http://www.mincom.com/mims
+Perl            http://www.perl.com/perl/index.html
+PostScript      http://www.adobe.com
+SimpleDoc       http://www.mincom.com/mtr/simpledoc/
+Unix            http://www.cis.ohio-state.edu/hypertext/faq/usenet/unix-faq/faq/top.html
+Windows         http://www.microsoft.com/windows
+Word            http://www.microsoft.com/msword/default.htm
+!endblock
+
+# Make them variables too
+!define CORBA           "{{PRD:CORBA}}"
+!define Delphi          "{{PRD:Delphi}}"
+!define FrameMaker      "{{PRD:FrameMaker}}"
+!define FrameViewer     "{{PRD:FrameViewer}}"
+!define HTML            "{{PRD:HTML}}"
+!define Java            "{{PRD:Java}}"
+!define MIMS            "{{PRD:MIMS}}"
+!define Perl            "{{PRD:Perl}}"
+!define PostScript      "{{PRD:PostScript}}"
+!define SimpleDoc       "{{PRD:SimpleDoc}}"
+!define Unix            "{{PRD:Unix}}"
+!define Windows         "{{PRD:Windows}}"
+!define Word            "{{PRD:Word}}"

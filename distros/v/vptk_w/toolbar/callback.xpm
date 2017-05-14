@@ -1,0 +1,30 @@
+/* XPM */
+static char *callback[] = {
+/* width height ncolors chars_per_pixel */
+"17 17 6 1",
+/* colors */
+"x c #FCFE04",
+". c #C4C6C4",
+"X c #CC0204",
+"o c #646264",
+"O c #040204",
+"  s None c None",
+/* pixels */
+"XXx              ",
+" XXx             ",
+"  XXx            ",
+"   XXx   x       ",
+"ooooXXxoXxoooooo ",
+"oXX.XXXXXx.....O ",
+"o.XXXXXXXx.....O ",
+"o.OOOXXXxOOOO..O ",
+"o......XXx.....O ",
+"o.OOO.OOxxO.OO.O ",
+"o..............O ",
+"o.OOOOO.OOOO...O ",
+"o..............O ",
+"o.OOO.OOOO.O...O ",
+"o..............O ",
+"oOOOOOOOOOOOOOOO ",
+"                 "
+};

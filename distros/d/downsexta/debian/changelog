@@ -1,0 +1,17 @@
+libdownsexta-perl (0.2-2~morago1) raring; urgency=low
+
+  * Se corrigen errores en los ejemplos y ficheros de ayuda
+
+ -- Hugo Morago Martín <morago@ono.com>  Wed, 24 Jul 2013 23:02:48 +0200
+
+libdownsexta-perl (0.2-1~morago1) raring; urgency=low
+
+  * Se añade al módulo SextaXML la funcionalidad de obtener los videos divididos en partes
+
+ -- Hugo Morago Martín <morago@ono.com>  Wed, 24 Jul 2013 22:07:34 +0200
+
+libdownsexta-perl (0.2~morago1) raring; urgency=low
+
+  * Initial release
+
+ -- Hugo Morago Martín <morago@ono.com>  Tue, 23 Jul 2013 08:08:28 +0200

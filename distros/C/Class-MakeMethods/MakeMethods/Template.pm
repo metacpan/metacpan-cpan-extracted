@@ -109,25 +109,19 @@ sub _expand_definition {
 sub _describe_definition {
   my $mm_def = shift;
   
-  my $def_type = "$mm_def->{template_class}:$mm_def->{template_name}";
-  warn "----\nMethods info for $def_type:\n";
+  warn qq|----\nMethods info for $mm_def->{template_class}:$mm_def->{template_name}:\n|;
   if ( $mm_def->{interface} ) {
-    warn join '', "Templates: \n", map {
-	"  $_: " . _describe_value($mm_def->{interface}{$_}) . "\n"
-      } keys %{$mm_def->{interface}};
+    warn join '', qq|Templates: \n|,
+      ( map qq|  $_: | . (ref($mm_def->{interface}{$_}) 
+	? join(', ', %{$mm_def->{interface}{$_}}) 
+	: $mm_def->{interface}{$_}) . qq|\n|, keys %{$mm_def->{interface}} ) ;
   }
   if ( $mm_def->{modifier} ) {
-    warn join '', "Modifiers: \n", map {
-	"  $_: " . _describe_value($mm_def->{modifier}{$_}) . "\n"
-      } keys %{$mm_def->{modifier}};
+    warn join '', qq|Modifiers: \n|,
+      ( map qq|  $_: | . (ref($mm_def->{modifier}{$_}) 
+	? join(', ', @{$mm_def->{modifier}{$_}}) 
+	: $mm_def->{modifier}{$_}) . qq|\n|, keys %{$mm_def->{modifier}} ) ;
   }
-}
-
-sub _describe_value {
-  my $value = $_[0];
-  ref($value) eq 'ARRAY' ? join(', ', @$value) :
-  ref($value) eq 'HASH'  ? join(', ', %$value) : 
-				      "$value";
 }
 
 ########################################################################
@@ -150,7 +144,7 @@ sub make_methods {
   
   # Our return value is the accumulated list of method-name => method-sub pairs
   my @methods; 
-
+  
   while (scalar @_) {
 
     ### PARSING ### Requires: $mm_def, $defaults, @_
@@ -221,7 +215,7 @@ sub make_methods {
       _diagnostic('make_unsupported', $m_name);
     }
     _diagnostic('debug_declaration', join(', ', map { defined $_ ? $_ : '(undef)' } %$m_info) );
-
+    
     ### INITIALIZATION ### Requires: $mm_def, $defaults, $m_info
     
     my $interface = (
@@ -233,11 +227,6 @@ sub make_methods {
       ( $interface->{-params} ? %{$interface->{-params}} : () ),
       %$m_info 
     );
-
-    
-    # warn "Actual: " . Dumper( $m_info );
-
-
     # Expand * and *{...} strings.
     foreach (grep defined $m_info->{$_}, keys %$m_info) {
       $m_info->{$_} =~ s/\*(?:\{([^\}]+)?\})?/ $m_info->{ $1 || 'name' } /ge
@@ -313,60 +302,6 @@ _behavior_builder( $mm_def, $behavior, $m_info );
   }
   
   return @methods;
-}
-
-# I'd like for the make_methods() sub to be simpler, and to take advantage
-# of the standard _get_declarations parsing provided by the superclass.
-# Sadly the below doesn't work, due to a few order-of-operations peculiarities 
-# of parsing interfaces and modifiers, and their associated default paramters.
-# Perhaps it might work if the processing of --options could be overridden with
-# a callback sub, so that interfaces and their params can be parsed in order.
-sub _x_get_declarations {	
-  my $mm_def = shift;
-
-  my @declarations = $mm_def::SUPER->_get_declarations( @_ );
-
-  # use Data::Dumper;
-  # warn "In: " . Dumper( \@_ );
-  # warn "Auto: " . Dumper( \@declarations );
-
-  my %interface_cache;
-
-  while (scalar @declarations) {
-    
-    my $m_info = shift @declarations;
-
-    # Parse interfaces and modifiers
-    my @specials = grep $_, split '--', ( delete $m_info->{'--'} || '' );
-    foreach my $special ( @specials ) {
-      if ( exists $mm_def->{'interface'}{$special} ) {
-	# --interface
-	$m_info->{'interface'} = $special;
-      
-      } elsif ( exists $mm_def->{'modifier'}{$special} ) {
-	# --modifier
-	$m_info->{'modifier'} .= 
-			  ( $m_info->{'modifier'} ? ' ' : '' ) . "-$special";
-      
-      } elsif ( exists $mm_def->{'behavior'}{$special} ) {
-	# --behavior as shortcut for single-method interface
-	$m_info->{'interface'} = $special;
-      
-      } else {
-	_diagnostic('make_bad_modifier', $mm_def->{'name'}, "--$special");
-      }
-    }
-
-    my $interface = (
-	$interface_cache{ $m_info->{'interface'} } 
-	  ||= _interpret_interface( $mm_def, $m_info->{'interface'} )
-    );
-    $m_info = { %$m_info, %{$interface->{-params}} } if $interface->{-params};
-
-    _diagnostic('debug_declaration', join(', ', map { defined $_ ? $_ : '(undef)' } %$m_info) );
-    
-    # warn "Updated: " . Dumper( $m_info );
-  }
 }
 
 ########################################################################
@@ -467,7 +402,7 @@ sub _behavior_builder {
   
   if ( ! ref $builder ) {
     # If we've got a text template, pass it off for interpretation.
-    my $code = ( ! $Class::MakeMethods::Utility::DiskCache::DiskCacheDir ) ?
+    my $code = ( ! $Class::MakeMethods::Template::DiskCache::DiskCacheDir ) ?
       _interpret_text_builder($mm_def, $core_behavior, $builder, @modifiers) 
     : _disk_cache_builder($mm_def, $core_behavior, $builder, @modifiers);
     
@@ -492,7 +427,7 @@ sub _behavior_builder {
 ########################################################################
 
 sub _interpret_text_builder {
-  require Class::MakeMethods::Utility::TextBuilder;
+  require Class::MakeMethods::Template::TextBuilder;
   
   my ( $mm_def, $name, $code, @modifiers ) = @_;
   
@@ -519,7 +454,7 @@ sub _interpret_text_builder {
 	'_SUB_ATTRIBS_' => '',
   };
   
-  my $result = Class::MakeMethods::Utility::TextBuilder::text_builder($code,
+  my $result = Class::MakeMethods::Template::TextBuilder::text_builder($code,
 								       @exprs);
   
   my $modifier_string = join(' ', map "-$_", @modifiers);
@@ -532,10 +467,10 @@ sub _interpret_text_builder {
 }
 
 sub _disk_cache_builder { 
-  require Class::MakeMethods::Utility::DiskCache;
+  require Class::MakeMethods::Template::DiskCache;
   my ( $mm_def, $core_behavior, $builder, @modifiers ) = @_;
   
-  Class::MakeMethods::Utility::DiskCache::disk_cache( 
+  Class::MakeMethods::Template::DiskCache::disk_cache( 
     "$mm_def->{template_class}::$mm_def->{template_name}", 
     join('.', $core_behavior, @modifiers),
     \&_interpret_text_builder, ($mm_def, $core_behavior, $builder, @modifiers)
@@ -978,7 +913,7 @@ A substitution-based "macro language" is used to assemble code strings. This hap
 
 There are numerous examples of this within the Generic interface and its subclasses; for examples, look at the following methods: Universal:generic, Generic:scalar, Hash:generic, and Hash:scalar.
 
-See L<Class::MakeMethods::Utility::TextBuilder> for more information.
+See L<Class::MakeMethods::Template::TextBuilder> for more information.
 
 
 =head2 Template Definitions
@@ -1236,11 +1171,11 @@ Example: The following safely declares a new version of Hash:scalar with the des
 
 To enable disk caching of generated code, create an empty directory and pass it to the DiskCache package:
 
-  use Class::MakeMethods::Utility::DiskCache qw( /my/code/dir );
+  use Class::MakeMethods::Template::DiskCache qw( /my/code/dir );
 
 This has a mixed effect on performance, but has the notable advantage of letting you view the subroutines that are being generated by your templates.
 
-See L<Class::MakeMethods::Utility::DiskCache> for more information.
+See L<Class::MakeMethods::Template::DiskCache> for more information.
 
 
 =head1 SEE ALSO
@@ -1248,8 +1183,5 @@ See L<Class::MakeMethods::Utility::DiskCache> for more information.
 See L<Class::MakeMethods> for general information about this distribution. 
 
 See L<Class::MakeMethods::Examples> for some illustrations of what you can do with this package.
-
-For distribution, installation, support, copyright and license 
-information, see L<Class::MakeMethods::Docs::ReadMe>.
 
 =cut

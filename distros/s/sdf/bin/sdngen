@@ -1,0 +1,308 @@
+#!/usr/local/bin/perl
+# $Id$
+$VERSION{'PUBLIC'} = '2.000';
+$VERSION{''.__FILE__} = '$Revision$';
+#
+# >>Title::     SDF Tuning File Generator
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 18-Jan-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{CMD:sdngen}} extracts SDF template information from a [[FrameMaker]]
+# template.
+#
+# >>Description::
+# !SDF_OPT_STD
+#
+# The -p option can be used to specify the root paragraph format from
+# which others are derived. The default paragraph root is {{Body}}.
+#
+# The -f option can be used to specify the root font (i.e. phrase) format
+# from which others are derived. The default font root is {{Emphasis}}.
+#
+# The -t option can be used to specify the root table format from
+# which others are derived. The default table root is {{Format A}}.
+#
+# As formats often appear in families (e.g. Heading1, Heading2,
+# etc.), {{sdngen}} will use the (alphabetically) previous format as
+# the parent if it makes a better parent (i.e. there are less differences)
+# than the default one.
+#
+# If a template already exists, it can be specified using the -e option.
+# In this case, {{sdngen}} will get as much information as it can from
+# that file including:
+#
+# * the root format for each type
+# * the order of formats within a type
+# * the parent for each format.
+#
+# Within each type, formats which are unknown in the existing template
+# are output after those that are known.
+#
+# >>Examples::
+# To generate an SDF tuning file file:
+#
+# V:     sdngen -osdn mytemplate.mif
+#
+# This will create a template file called {{FILE:mytemplate.sdn}}.
+#
+# >>Limitations::
+#
+
+require "sdf/app.pl";
+require "sdf/parse.pl";
+require "sdf/tomif.pl";
+
+########## Initialisation ##########
+
+# define configuration
+%app_config = (
+    'libdir',   'sdf/home',
+);
+
+# define options
+push(@app_option, (
+    #'Name|Spec|Help',
+    'para_root|STR;Body|default parent for a paragraph format',
+    'font_root|STR;Emphasis|default parent for a font format',
+    'tbl_root|STR;Format A|default parent for a table format',
+    'existing_template|STR|existing template file',
+));
+
+# handle options
+&AppInit('file ...', 'generate an SDF template from a Frame one', 'SDF') ||
+  &AppExit();
+
+# initialise the lookup tables loaded when a template already exists
+%objects = ();
+%parents = ();
+
+# if a template already exists, get as many details as we can from it
+if ($existing_template ne '') {
+
+    # Open the file
+    unless(open(EXISTING, $existing_template)) {
+        &AppExit("fatal", "unable to open existing template '$existing_template'");
+    }
+
+    # Scan the template for useful information
+    while (<EXISTING>) {
+        next unless /^\s*\!targetobject\s+/;
+        ($type, $name, $parent) = split(/\s*\;\s*/, $');
+        $type =~ s/^\s*["']//;
+        $type =~ s/["']\s*$//;
+        $name =~ s/^\s*["']//;
+        $name =~ s/["']\s*$//;
+        $parent =~ s/^\s*["']//;
+        $parent =~ s/["']\s*$//;
+
+        # Save the information
+        $parents{$type,$name} = $parent;
+        if ($objects{$type} eq '') {
+            $objects{$type} = $name;
+            $para_root = $name if $type eq 'Para';
+            $font_root = $name if $type eq 'Phrase';
+            $tbl_root  = $name if $type eq 'Table';
+        }
+        else {
+            $objects{$type} .= "\000$name";
+        }
+    }
+    close(EXISTING);
+}
+
+
+########## Support routines ##########
+
+sub ConvertCatalogToSdf {
+    local($type, $root, *catalog, *known_objects, *known_parents, *my_attr_list) = @_;
+#   local();
+    local(@names, @known_names, %known, @ordered_names);
+    local(@attr_list);
+    local(%root_attrs);
+    local($name, $parent, %attrs, %parent_attrs);
+    local($prev, %prev_attrs);
+    local(%prev_diff, %root_diff, %this_diff);
+    local($prev_diff_cnt, $root_diff_cnt);
+    local($obj_cnt, $attr_cnt, $diff_cnt, $diff_avg);
+
+    # Check that the catalog is not empty
+    @names = sort keys %catalog;
+    $obj_cnt = scalar(@names);
+    unless ($obj_cnt) {
+        &AppMsg("object", "NO $type formats found");
+        return;
+    }
+
+    # Check that the root object exists
+    if (!defined($catalog{$root})) {
+        &AppMsg("warning", "root $type '$root' not found (using '$names[0]' instead)");
+        $root = shift(@names);
+    }
+
+    # Get the attributes of the root object
+    %root_attrs = &_MifAttrSplit($catalog{$root});
+
+    # Output the root
+    print "# Define the root '$type' format\n";
+    &OutputTargetObject($type, $root, '', *root_attrs);
+
+    # Decide on the attribute list to use
+    @attr_list = @my_attr_list ? @my_attr_list : sort keys %root_attrs;
+
+    # If there are known objects, output them first
+    @known_names = split(/\000/, $known_objects{$type});
+    if (@known_names) {
+        %known = ();
+        grep($known{$_}++, @known_names);
+        @ordered_names = @known_names;
+        for $name (@names) {
+            push(@ordered_names, $name) unless $known{$name};
+        }
+    }
+    else {
+        @ordered_names = @names;
+    }
+
+    # Analyse and output the non-root formats
+    print "\n# Define the other '$type' formats\n";
+    %prev_attrs = ();
+    $prev = '';
+    $diff_cnt = 0;
+    for $name (@ordered_names) {
+
+        # Skip the root
+        next if $name eq $root;
+
+        # If the list includes names from an existing template,
+        # the object might not exist in the catalog, so skip it
+        next if $catalog{$name} eq '';
+
+        # Get the attributes
+        %attrs = &_MifAttrSplit($catalog{$name});
+
+        # Get the parent and the attribute differences
+        $parent = $known_parents{$type,$name};
+        if ($parent ne '') {
+            %parent_attrs = &_MifAttrSplit($catalog{$parent});
+            %this_diff = &DiffAttrs(*attrs, *parent_attrs, *attr_list);
+        }
+        else {
+            # Decide on the best parent
+            %root_diff = &DiffAttrs(*attrs, *root_attrs, *attr_list);
+            %prev_diff = &DiffAttrs(*attrs, *prev_attrs, *attr_list);
+            $root_diff_cnt = scalar(keys %root_diff);
+            $prev_diff_cnt = scalar(keys %prev_diff);
+            if ($root_diff_cnt < $prev_diff_cnt) {
+                $parent = $root;
+                %this_diff = %root_diff;
+            }
+            else {
+                $parent = $prev;
+                %this_diff = %prev_diff;
+            }
+        }
+        
+        # Output the object
+        &OutputTargetObject($type, $name, $parent, *this_diff);
+
+        # Collect some stats
+        $diff_cnt += scalar(keys %this_diff);
+    }
+    continue {
+        # Save away the previous attributes and name
+        %prev_attrs = %attrs;
+        $prev = $name;
+    }
+
+    # Output some basic stats
+    $attr_cnt = scalar(@attr_list);
+    $diff_avg = sprintf("%.1f", $diff_cnt/($obj_cnt - 1));
+    &AppMsg("object", "$obj_cnt $type formats, $attr_cnt attrs each," .
+      " average difference is $diff_avg");
+}
+
+sub OutputTargetObject {
+    local($type, $name, $parent, *attrs) = @_;
+#   local();
+    local($attr, $value);
+
+    # Print the macro header
+    $parent = " \"$parent\"" if $parent ne '';
+    print "!targetobject \"$type\"; \"$name\";$parent";
+    
+    # Print the attributes, if any
+    for $attr (sort keys %attrs) {
+        $value = &FormatValue($attrs{$attr});
+        print "; \\\n  $attr=$value";
+    }
+    print "\n\n";
+}
+
+sub FormatValue {
+    local($value) = @_;
+    local($result);
+
+    # Integers and enumerated values are fine as is
+    # Values with " are enclosed in '', otherwise
+    # the value is enclosed in "".
+    if ($value =~ /^\d+$/ || $value =~ /^[A-Z][a-z]+$/) {
+        return $value;
+    }
+    elsif ($value =~ /["\\]/) {
+        return "'$value'";
+    }
+    else {
+        return '"' . $value . '"';
+    }
+}
+
+sub DiffAttrs {
+    local(*nv1, *nv2, *name_list) = @_;
+    local(%diff);
+    local($name);
+
+    # Check the empty set first
+    return %nv1 unless %nv2;
+
+    # Find the differences
+    %diff = ();
+    for $name (@name_list) {
+        $diff{$name} = $nv1{$name} unless $nv1{$name} eq $nv2{$name};
+    }
+
+    # Return result
+    return %diff;
+}
+
+########## Processing ##########
+
+sub argProcess {
+    local($ARGV) = @_;
+#   local();
+
+    # Fetch the template
+    unless (&_MifFetchTemplate($ARGV)) {
+        &AppMsg("abort", "unable to fetch MIF template '$ARGV'");
+        return;
+    }
+
+    # Convert the MIF catalogs into an SDF template
+    &ConvertCatalogToSdf('Para',   $para_root, *_mif_tpl_paras, *objects,
+      *parents, *MIF_PARA_ATTRS);
+    &ConvertCatalogToSdf('Phrase', $font_root, *_mif_tpl_fonts, *objects,
+      *parents, *MIF_FONT_ATTRS);
+    &ConvertCatalogToSdf('Table',  $tbl_root,  *_mif_tpl_tbls, *objects,
+      *parents);
+}
+
+&AppProcess('argProcess');
+&AppExit();

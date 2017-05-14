@@ -49,6 +49,7 @@ Net::OAuth2::AuthorizationServer::PasswordGrant - OAuth2 Resource Owner Password
     type            => 'access', # one of: access, refresh
     redirect_uri    => $redirect_uri,
     user_id         => $user_id,      # optional
+	jwt_claims_cb   => sub { ... },   # optional, see jwt_claims_cb in Manual
   );
 
   # store access token

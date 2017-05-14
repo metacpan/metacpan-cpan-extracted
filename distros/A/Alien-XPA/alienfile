@@ -1,0 +1,31 @@
+#! perl
+
+use strict;
+use warnings;
+
+use alienfile;
+use Path::Tiny;
+
+plugin PkgConfig => 'xpa';
+
+share {
+
+    plugin Download =>
+      ( url => 'https://github.com/ericmandel/xpa/archive/v2.1.18.tar.gz' );
+
+    plugin Extract => 'tar.gz';
+
+    patch ['%{patch} -p1 < %{.install.patch}/v2.1.18.diffs'];
+    patch sub {
+        my ( $build ) = @_;
+
+        # Makefile.in uses INSTALL_ROOT instead of DESTDIR
+        path( 'Makefile.in' )->edit_lines(
+            sub {
+                s/^INSTALL_ROOT\s*=\s*$//;
+                s/INSTALL_ROOT/DESTDIR/g;
+            } );
+    };
+
+    plugin 'Build::Autoconf' => ();
+};

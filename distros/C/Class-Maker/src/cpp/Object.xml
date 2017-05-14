@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+
+<class name="Object">
+  <info>The root of the class hierarchy.</info>
+  <methods>
+    <method name="Load" type="void" modifier="virtual">
+    </method>
+    <method name="Save" type="void" modifier="virtual" const="true">
+    </method>
+  </methods>
+</class>

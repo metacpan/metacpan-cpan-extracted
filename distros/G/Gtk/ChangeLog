@@ -1,0 +1,40 @@
+
+0.1.16		Fri Apr  3, 1998	Kenneth Albanowski
+
+	Uses gtk-0.99.8:
+
+		Primarily fixes substantial bug with boot_ invocation.
+
+0.1.14		Sun Feb 22, 1998	Kenneth Albanowski
+
+	Uses gtk-0.99.3:
+	
+		Adaptions to gtk-0.99.3, nothing major.
+
+0.1.13		Tue Jan 13, 1998	Kenneth Albanowski
+
+	Uses gtk-0.99.2:
+	
+		Reorganized code to break each modules into separate .xs files. 
+		Should not break when a widget isn't present, if the .h file is
+		removed along with the library.
+
+0.1.12		Sun Dec 14, 1997	Kenneth Albanowski
+
+	Uses gtk-971109:
+	
+		Adds missing Atoms.pm file.
+		
+		Adds widget creation (the ability to create new Gtk widgets from
+		Perl). This is still mostly busted, look in widget.pl for a possibly
+		comprehensible example. (Signals are completely busted.)
+
+0.1.11		Wed Nov 19, 1997	Kenneth Albanowski
+
+	Uses gtk-971025:
+	
+		Adds gtk_selection handling (Owen Taylor, thanks!) to Gtk.pm and
+		test.pl.
+		
+		Adds Gtk::Atom module to allow tied-hash access to atoms via
+		%Gtk::Atom.

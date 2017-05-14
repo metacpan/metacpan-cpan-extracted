@@ -1,0 +1,6 @@
+
+if [ -x "/tmp/compile-tcsh-test/tcsh-6.10.00/tcsh" ]; then
+	exit 0;
+else
+	exit 1;
+fi

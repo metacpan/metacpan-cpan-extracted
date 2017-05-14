@@ -1,0 +1,29 @@
+$Id: TODO,v 1.29 2001/11/15 22:26:02 joern Exp $
+
+Known bugs:
+-----------
+- attachments of sent mails (in the Sent folder) are taken from
+  the local drive on access, instead of extracting them from
+  the mail. throws an exception, if the local file doesn't
+  exist anymore.
+- escape html entities of ASCII mails
+- wenn in einem folder ungelesene mails sind, und in einem
+  subfolder von diesem auch (z.B. Loggin / Postmaster), dann
+  wird auch der parent folder auf unread gesetzt, wenn im child folder
+  alles unread ist
+
+This is my actual TODO list:
+----------------------------
+- place to before cc headers on outgoing mails
+- mail header: <td valign="top">
+- show mail path in advanced search result
+- mark a selection of mails as read
+- make browser application configurable
+- check RFC:
+  - which charset should be used when replying mail?
+- make user configuration dialog look nice
+- set focus to the subjects list after clicking on a folder
+- multiple file selection for attachments
+- save mail with ctrl+s as temp. draft, so mails can
+  survive system crashes (which are really seldom, but
+  it's a cool feature at all ;)

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,10 @@ requires:
   File::Spec::Unix: '0'
   LWP::UserAgent: '5.835'
   URI: '1.56'
-  YAML::Syck: '1.15'
+  YAML::XS: '0.64'
   perl: v5.6.0
 resources:
   homepage: https://github.com/bingos/cpan-recent-uploads
   repository: https://github.com/bingos/cpan-recent-uploads.git
-version: '0.10'
+version: '0.12'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,278 @@
+=pod
+
+=head1 NAME
+
+NexposeSimpleXML::Parser - Parse NeXpose scan data with Perl
+
+=head1 VERSION
+
+This document describes the latest version of NexposeSimpleXML::Parser.
+
+=head1 SYNOPSIS
+
+ my $nxp = new NexposeSimpleXML::Parser;
+
+ my $parser = $nxp->parse_file('test1.xml');
+    #a NexposeSimpleXML::Parser Object
+
+ my @host = $parser->get_all_hosts();
+    #an Array of NexposeSimpleXML::Parser::Host Objects
+
+ my $host1 = $hosts[0];
+ 
+ my @services = $host1->get_all_services();
+    #an Array of NexposeSimpleXML::Parser::Host::Service Objects
+ 
+ my $service1 = $services[0];
+
+ my @vulnerabilities = $host1->get_all_vulnerabilities();
+    #an Array of NexposeSimpleXML::Parser::Vulnerabilities Objects for 
+    #the host OS. 
+ 
+    or
+
+ my @vulnerabilities = $service1->get_all_vulnerabilities();
+    #an Array of NexposeSimpleXML::Parser::Vulnerabilities Objects for 
+    #this service. 
+ 
+ my $vulnerability1 = $vulnerabilities[0];
+
+ my @references = $$vulnerability1->get_all_references();
+    #an Array of NexposeSimpleXML::Parser::References Objects for this 
+    #specific vulnerability. 
+ 
+I<For a full listing of methods see the documentation corresponding to each object.>
+
+=head1 DESCRIPTION
+
+
+=head1 OVERVIEW
+
+
+ NexposeSimpleXML::Parser			-- Core parser
+ |
+ +--NexposeSimpleXML::Parser::Session           -- NeXpose scan session information
+ |
+ +--NexposeSimpleXML::Parser::Vulnerabilitiy    -- Vulnerability information
+ |
+ +--NexposeSimpleXML::Parser::Reference         -- Reference for vulnerability data
+ |
+ +--NexposeSimpleXML::Parser::Fingerprint       -- Fingerprint information (os or service)
+ |  
+ +--NexposeSimpleXML::Parser::Host              -- General host information
+ |  |
+ |  |--NexposeSimpleXML::Parser::Service        -- Port information
+ |  |  |
+
+
+=head1 METHODS
+
+=head2 NexposeSimpleXML::Parser
+
+The main idea behind the core modules is, you will first parse the
+scan data then extract the information. Therefore, you should run
+parse_file or parse_scan then the you can use any of the get_*
+methods.
+
+=over 4
+
+=item B<parse_file($xml_file)>
+
+Parse a NeXpose SimpleXML file. 
+
+=item B<get_session()>
+
+Obtain the NexposeSimpleXML::Parser::Session object which contains the session scan information.
+
+=item B<get_all_hosts()>
+
+Obtain an Array of NexposeSimpleXML::Parser::Host objects which contain host information.
+
+=back
+
+=head2 NexposeSimpleXML::Parser::Session
+
+This object contains the scan session information of the NeXpose scan.
+
+=over 4
+
+
+=item B<generated()>
+
+Returns the timestamp the report was generated.
+
+=back
+
+=head2 NexposeSimpleXML::Parser::Host
+
+This object contains the information for a host.
+
+=over 4
+
+=item B<address()>
+
+Returns a string which contains the ip of this host.
+
+=item B<get_all_services()>
+
+Returns an array of NexposeSimpleXML::Parser::Host::Service objects, which represent
+the services that this host has open.
+
+=item B<get_port($port)>
+
+Obtain a NexposeSimpleXML::Parser::Host::Service object which contains the service information.
+
+=item B<get_all_ports()>
+
+Obtain an Array of NexposeSimpleXML::Parser::Host::Service objects which contain port information.
+
+=item B<get_fingerprint()>
+
+Obtain a NexposeSimpleXML::Parser::Fingerprint object which contain the fingerprint of the OS for this host.
+
+=back
+
+=head2 NexposeSimpleXML::Parser::Fingerprint
+
+This object contains the fingerprint details for the OS or service.
+
+=over 4
+
+=item B<certainty()>
+
+Returns a string which contains the certainty of this fingerprint.
+
+=item B<description()>
+
+Returns a string which contains the description this fingerprint. Example of an OS fingerprint: Ubuntu Linux 8.10
+
+=item B<vendor()>
+
+Returns a string which contains the vendor this fingerprint. Example of an OS fingerprint: Ubuntu
+
+
+=item B<family()>
+
+Returns a string which contains the family of this fingerprint. Example of an OS fingerprint: Linux
+
+=item B<product()>
+
+Returns a string which contains the product of this fingerprint. Example of an OS fingerprint: Linux
+
+=item B<version()>
+
+Returns a string which contains the version of this fingerprint. Example of an OS fingerprint: 8.10
+
+
+=item B<device_class()>
+
+Returns a string which contains the device_class of this fingerprint. This is undef for a service fingerprint.
+
+=item B<arch()>
+
+Returns a string which contains the arch of this fingerprint. This is undef for a service fingerprint. Exampleo of an OS fingerprint: x86_64
+
+=back
+
+=head2 NexposeSimpleXML::Parser::Host::Service
+
+This object contains the information for a port.
+
+=over 4
+
+=item B<name()>
+
+Returns a string which contains the service name.
+
+=item B<protocol()>
+
+Returns a string which contains the protocol.
+
+=item B<port()>
+
+Returns a string which contains the port number.
+
+=item B<get_all_vulnerabilities()>
+
+Returns an Array of NexposeSimpleXML::Parser::Vulnerability objects which contain information about the vulnerabilities for this service.
+
+=item B<get_fingerprint()>
+
+Obtain a NexposeSimpleXML::Parser::Fingerprint object which contain the fingerprint of the service.
+
+=back
+
+=head2 NexposeSimpleXML::Parser::Vulnerability
+
+This object contains the information for vulnerability.
+
+=over 4
+
+=item B<id()>
+
+Returns the id of this vulnerability.
+
+=item B<response_code()>
+
+Returns the response code. This can be VE or VV. VE means 'vulnerable exploited'. VV means 'vulnerable version'.
+
+=item B<get_all_references()>
+
+Returns an Array of NexposeSimpleXML::Parser::Reference objects which contain reference details for the vulnerability.
+
+=back 
+
+=head2 NexposeSimpleXML::Parser::Reference
+
+This object contains the reference details for a vulnerability.
+
+=over 4
+
+=item B<id()>
+
+Returns the id of this reference.
+
+=item B<type()>
+
+Returns the type of the reference. Example: cve 
+
+=back 
+
+=head1 EXAMPLES
+
+
+Here is an example of parsing an XML file using NexposeSimpleXML::Parser:
+
+ my $nxp = new NexposeSimpleXML::Parser;
+
+ my $parser = $nxp->parse_file('test1.xml');
+
+ foreach my $h ( $parser->get_all_hosts() ){
+     print "ip: " . $h->address . "\n";
+     foreach my $s ( $h->get_all_services() ) {
+         print "port: " . $s->port . "\n";
+         print "name: " . $s->name . "\n";
+         print "protocol: " . $s->protocol . "\n";
+     }   
+     print "---\n";
+ }   
+
+=head1 SEE ALSO
+
+ XML::LibXML and Object::InsideOut
+ 
+
+=head1 AUTHOR
+
+Joshua D. Abraham, S<E<lt>jabra AT spl0it DOT orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010 Joshua D. Abraham. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

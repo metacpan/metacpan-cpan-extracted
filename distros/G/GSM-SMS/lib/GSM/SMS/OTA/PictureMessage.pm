@@ -66,7 +66,7 @@ sub OTAPictureMessage_makestream {
 	# image
 	$stream .= sprintf( "%02X", 2 );
 	my $bitmap_stream = GSM::SMS::OTA::Bitmap::OTABitmap_makestream( $width, $height, 1, $bitmap );
-	$stream .= sprintf( "%04X", length($bitmap_stream) );
+	$stream .= sprintf( "%04X", length($bitmap_stream) / 2 );
 	$stream .= sprintf( "%02X", 0 );
 	$stream .= $bitmap_stream;
 

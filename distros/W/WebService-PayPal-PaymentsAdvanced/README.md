@@ -4,7 +4,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 # VERSION
 
-version 0.000021
+version 0.000022
 
 # SYNOPSIS
 
@@ -170,6 +170,11 @@ to `true`.
 Create a secure token which you can use to create a hosted form uri.  Returns a
 [WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::SecureToken) object.
 
+The first parameter holds the key/value parameters for the request. The second
+parameter is optional and holds parameters to the underlying
+[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::SecureToken) object, which is
+useful to set attributes such as `retry_attempts` and `retry_callback`.
+
     use WebService::PayPal::PaymentsAdvanced;
     my $payments = WebService::PayPal::PaymentsAdvanced->new(...);
 
@@ -232,7 +237,9 @@ methods to learn which method the customer paid with.  Both methods return a
 Generic method to post arbitrary params to PayPal.  Requires a `HashRef` of
 parameters and returns a [WebService::PayPal::PaymentsAdvanced::Response](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response)
 object.  Any lower case keys will be converted to upper case before this
-response is sent.
+response is sent. The second parameter is an optional `HashRef`. If provided,
+it defines attributes to pass to the
+[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::SecureToken) object.
 
     use WebService::PayPal::PaymentsAdvanced;
     my $payments = WebService::PayPal::PaymentsAdvanced->new(...);
@@ -339,20 +346,27 @@ Returns a response object.
 The official [Payflow Gateway Developer Guide and
 Reference](https://developer.paypal.com/docs/classic/payflow/integration-guide/)
 
+# SUPPORT
+
+Bugs may be submitted through [https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues](https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues).
+
 # AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 # CONTRIBUTORS
 
+- Andy Jack <ajack@maxmind.com>
 - Dave Rolsky <drolsky@maxmind.com>
 - Greg Oschwald <goschwald@maxmind.com>
 - Mark Fowler <mark@twoshortplanks.com>
+- Mateu X Hunter <mhunter@maxmind.com>
 - Olaf Alders <oalders@maxmind.com>
+- William Storey <wstorey@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc.
+This software is copyright (c) 2017 by MaxMind, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

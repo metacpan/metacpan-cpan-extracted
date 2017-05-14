@@ -1,0 +1,3 @@
+#!/usr/bin/perl
+use Acme::Time::Asparagus;
+print veggietime() . "\n";

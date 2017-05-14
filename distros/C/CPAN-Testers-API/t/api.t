@@ -15,6 +15,9 @@ subtest 'can get OpenAPI document' => sub {
     $t->get_ok( '/v1' )
         ->status_is( 200 )
         ->header_like( 'Content-Type' => qr{^application/json} );
+    $t->get_ok( '/v3' )
+        ->status_is( 200 )
+        ->header_like( 'Content-Type' => qr{^application/json} );
 };
 
 done_testing;

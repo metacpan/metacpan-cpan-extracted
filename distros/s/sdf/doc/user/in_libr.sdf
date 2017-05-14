@@ -1,0 +1,58 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Modules and Libraries
+
+H2: Modules
+
+[[SDF]] can be extended by using {{modules}}. A module is a normal
+[[SDF]] file which typically contains reusable entities like {{macros}},
+{{filters}} and {{styles}}. Modules are loaded by the {{MAC:use}}
+macro. For example:
+
+E:   !use "delphi"
+
+By convention, modules are given the {{sdm}} extension. The {{MAC:use}}
+macro adds this extension if none is provided. Modules can also be
+loaded by using {{CMD:sdf}}'s -u option.
+
+H2: Libraries
+
+A collection of related modules can be placed into a {{library}}
+which is simply a subdirectory under the {{sdf/home}} directory on
+Perl's library path.
+Libraries can be loaded by the {{MAC:inherit}} macro which
+essentially does the following:
+
+^ appends the matching directory onto the {{include path}}
++ loads the matching {{main module}}.
+
+For example:
+
+E:   !inherit "images"
+
+^ appends sdf/home/images onto the include path
++ loads the sdf/home/images/images.sdm module.
+
+H2: The Configuration Library
+
+After loading the standard library ({{stdlib}}), [[SDF]] loads
+the configuration library, if any. This is typically specified
+via the {{VAR:OPT_CONFIG}} variable being initialised on the top
+line of the file via the {{MAC:init}} macro. It can also be set via
+{{CMD:sdf}}'s -c option.
+
+While {{CMD:sdf}} only supports a single configuration library,
+additonal libraries can be loaded via the {{MAC:inherit}} macro.
+Furthermore, a library can inherit things from other libraries,
+making it easy to create new ones.

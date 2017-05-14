@@ -1,0 +1,43 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+
+# One green sphere
+Transform {
+	translation -2 0 0
+	children [
+		Shape {
+			geometry Sphere { }
+			appearance Appearance {material Material {diffuseColor 0 0.8 0}}
+		}
+	]
+}
+
+# Small purple sphere
+Transform {
+	translation 0 0 0
+	children [
+		Shape {
+			geometry Sphere { radius 0.5 }
+			appearance Appearance {material Material {diffuseColor 0.4 0 0.4}}
+		}
+	]
+}
+
+# Textured sphere
+Transform {
+	translation 2 0 0
+	children [
+		Shape {
+			geometry Sphere { }
+			appearance Appearance {
+				texture ImageTexture {url "tex.jpg"}
+			}
+		}
+	]
+}
+

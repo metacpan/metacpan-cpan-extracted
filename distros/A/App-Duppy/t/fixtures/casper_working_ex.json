@@ -1,0 +1,13 @@
+{
+    "auto-exit": false,
+    "concise": false,
+    "fail-fast": false,
+    "includes": ["t/fixtures/inc.js"],
+    "log-level": "debug",
+    "no-colors": false,
+    "paths": ["t/fixtures/main.js", "t/fixtures/main2.js"],
+    "post": ["t/fixtures/post.js"],
+    "pre": ["t/fixtures/pre.js"],
+    "verbose": true,
+    "xunit": "results.xml"
+}

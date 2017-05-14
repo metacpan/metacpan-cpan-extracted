@@ -1,0 +1,138 @@
+#####################################################################
+# package RecActions
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to Acting upon a record.
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package RecActions;
+
+#####################################################################
+# sub DoRecAction
+#
+# Figure out what to do with the data.  Either modify, delete, or display
+# the data.
+#####################################################################
+sub main::DoRecAction {
+
+  if ( $main::in{'_MsqlCGI_priKey'} eq undef ) {
+    &main::Error ( "Sorry, you must select a record.  Go back to the
+    previous screen and click on the button that's to the left of the
+    record." );
+  }
+
+  @priKeys = split ( /\0/, $main::in{'_MsqlCGI_priKey'} );
+  $nEntries = $#priKeys + 1;
+
+  	# Setup DB connection, and get the statement handle.  It's goingt
+	# to be the same for all three actions.  We'll pass the sth into
+	# the function...
+  $dbh = &MsqlCGI::SetupMsqlConnection ();
+
+  	# this is calling the display function.  
+  if ( $main::in{'_MsqlCGI_recAction'} =~ /^display/i ) {
+    &RecordDisplay::DoRecDisplay 
+    	( $dbh, \@priKeys );
+
+
+  	# this is setting up the modify function.  It displays the data to
+	# the user in a CGI form.
+  } elsif ( $main::in{'_MsqlCGI_recAction'} =~ /^modify/i ) {
+
+    	# Check to make sure that delete's are allowed.  This shouldn't
+	# really be necessary but we're doing it to make sure someone
+	# doesn't try to mess with us.
+    if ( ! $main::tableInfo->{'AllowModify'} ) {
+      &main::Error ( "Sorry, Record Modification is not allowed." );
+    }
+
+    if ( $nEntries != 1 ) {
+      &main::Error ( "Sorry, you can't modify more than one entry at a time.
+      Please go back and try again." );
+    }
+    &RecordModifySetup::DoRecModifySetup ( $dbh, \@priKeys );
+
+
+	# Setup the delete function.  This one is easy...
+  } elsif ( $main::in{'_MsqlCGI_recAction'} =~ /^delete/i ) {
+
+    	# Check to make sure that delete's are allowed.  This shouldn't
+	# really be necessary but we're doing it to make sure someone
+	# doesn't try to mess with us.
+    if ( ! $main::tableInfo->{'AllowDelete'} ) {
+      &main::Error ( "Sorry, Deleting records is not allowed." );
+    }
+    &RecordDeleteProcess::DoRecDelete ( $dbh, \@priKeys );
+
+  }
+
+}
+
+
+
+#####################################################################
+# sub CreateExplicitQuery
+#
+# This function creates the Explicit Query.  it takes an array of primary
+# keys as it's input, and then creates a query based on those keys.  The
+# other 2 parameters are the tableInfo struct and the tableData struct.
+# We use these data structures to figure out the name and type of the
+# primary key (so we can properly cretate the query.)
+#
+# This function returns the query.
+#####################################################################
+sub CreateExplicitQuery {
+  local ( $type, $priKey ) = @_;
+
+	# We do either a "SELECT" or a "DELETE" depending on the $type
+	# variable.
+  if ( $type !~ /(^SELECT|DELETE)$/i ) {
+    &main::Error ( "In CreateExplicitQuery: type must be SELECT or DELETE");
+  }
+
+	# the start of the query is the only thing that's different.  If
+	# it's a "select", it goes "SELECT * ...", but when it's a delete
+	# the query starts "DELETE ..." (no *)
+  if ( $type =~ /^select$/i ) {
+    local $query = "\t$type\t*\n";
+  } else {
+    local $query = "\t$type\n";
+  }
+
+  $query .= <<EOF;
+	FROM 	$main::tableInfo->{'TableName'}
+	WHERE	
+EOF
+
+	# We need to figure out which  element is the primary key, and
+	# what type it is.  The type info is necessary so we get the
+	# apostrophe's right in the query.
+  $priKeyName = $main::tData->[$main::tableInfo->{'priKeyArrNum'}]->{'fieldName'};
+  $priKeyType = $main::tData->[$main::tableInfo->{'priKeyArrNum'}]->{'fieldType'};
+
+  &main::DPrint ( "Primary Key Name is: $priKeyName, with type $priKeyType" );
+  	
+	# Now loop through all the primary keys we have and create a query
+	# which is going to return only the data for those keys
+  for ( $nCount = 0; $nCount <= $#{$priKey}; $nCount++ ) {
+
+    $priKey->[$nCount] = &MsqlCGI::StrToQueryStr 
+    	( $priKey->[$nCount], $priKeyType, "SEARCH" );
+
+    &main::DPrint ( "<b>PrinmaryKey Type is : $priKeyType</b>" );
+    $query .= ( ! $nCount ) ? 
+    	"\t  \t$priKeyName = $priKey->[$nCount]\n" : 
+	"\tOR\t$priKeyName = $priKey->[$nCount]\n" ;
+  }
+  #&main::DPrint ( "The query is: <pre>$query</pre>" );
+  return $query;
+	
+}
+
+
+  
+
+1;

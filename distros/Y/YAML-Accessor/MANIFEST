@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/YAML/Accessor.pm
+testdata/testdata.yaml
+TODO
+META.yml
+t/00_use.t
+t/01_constructor.t
+t/02_accessors.t
+t/03_sub_accessors.t
+t/04_mutate.t
+MANIFEST.SKIP
+META.json                                Module JSON meta-data (added by MakeMaker)

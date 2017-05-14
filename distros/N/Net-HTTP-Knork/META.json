@@ -1,0 +1,59 @@
+{
+   "abstract" : "Lightweight implementation of Spore specification",
+   "author" : [
+      "Emmanuel Peroumalnaïk"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-HTTP-Knork",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Method::Modifiers" : "0",
+            "DDP" : "0",
+            "Data::Rx" : "0",
+            "File::ShareDir" : "0",
+            "HTTP::Response" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Sub::Install" : "0",
+            "Subclass::Of" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/peroumal1/net-http-knork/issues"
+      },
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://bitbucket.org/peroumal1/net-http-knork",
+         "web" : "https://bitbucket.org/peroumal1/net-http-knork"
+      }
+   },
+   "version" : "0.20"
+}
+

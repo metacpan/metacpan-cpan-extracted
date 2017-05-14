@@ -1,0 +1,18 @@
+Changes for MooseX-Role-Parameterized
+
+0.05 2012-11-14
+    Fill in missing buckets
+    Finish commenting out the code
+
+0.04 2012-11-14
+    Better documentation
+    Use Sub::Exporter to get quantize() automatically
+
+0.03 2012-11-14
+    Documentation
+
+0.02 2012-11-14
+    Packaging fixes
+
+0.01 2012-11-14
+    Initial release

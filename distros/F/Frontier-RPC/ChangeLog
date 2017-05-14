@@ -1,0 +1,154 @@
+2002-08-02  Ivan Kohler <ivan-frontier-rpc@420.am>
+
+	* lib/Frontier/RPC2.pm: added repr subroutine for String datatype
+	so that an explicity-specified String type encodes < > & and "
+
+	* MANIFEST: added docs/make-rel
+
+2002-08-02  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* docs/make-rel: added
+
+	* README: changed mirror location to SourceForge; added notes for
+ 	Apache::XMLRPC and Frontier::Responder.
+
+2001-04-25  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Frontier/Daemon.pm (new): return $self; submitted by Aaron
+	E. Ross <ross@coreference.com>
+
+2001-04-23  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* docs/changes.xml, docs/changes.xsl: added
+
+	* COPYING: updated to clarify "same terms as Perl"
+
+	* README: note that some required modules are now included in Perl
+	distribution.
+
+2001-04-09  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Frontier/RPC2.pm: change all $self to $expat in XML::Parser
+	callbacks; noted by Terry Triplett
+
+2001-01-26  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST: add lib/Frontier/Responder.pm
+
+2000-11-08  Ken MacLeod  <ken@localhost.localdomain>
+
+	* lib/Frontier/RPC2.pm: for base64(), note that user must use
+	MIME::Base64; noted by Marc Singer <elf@buici.com>
+
+	* lib/Frontier/Responder.pm: added; submitted by Joe Johnston
+	<jjohn@oreilly.com>
+
+	* lib/Apache/XMLRPC.pm: added POD and tweaks; submitted by Tim
+	Peoples <tep@colltech.com>
+
+2000-09-27  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Frontier/Daemon.pm (new): add use_objects
+
+	* lib/Frontier/RPC2.pm (decode): copy use_objects to new parser
+	(die, init, start, end, char, final): change $self to $expat to
+	make clear what's going on
+	(_item): serialize blessed array and hash references as <array>
+	and <struct>s
+
+2000-09-26  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Frontier/RPC2.pm (end): support <int> as a 'use_objects'
+	value
+
+2000-06-01  Ken MacLeod  <ken@localhost.localdomain>
+
+	* examples/validator1-daemon.pl: added
+
+	* lib/Frontier/RPC2.pm (boolean, double, int): added type checking
+	submitted by Nick Bauman
+
+	* README: added contributors
+
+	* lib/Apache/XMLRPC.pm: added
+
+1999-11-20  Ken MacLeod  <ken@jess>
+
+	* examples/cli-xml-rpc.pl, examples/example-cli-input: added
+
+	* lib/Frontier/Client.pm, lib/Frontier/RPC2.pm: added Integer,
+	Float, and String objects; merge code from Nick Bauman
+
+1999-10-11  Ken MacLeod  <ken@jess>
+
+	* lib/Frontier/RPC2.pm (new): define encoding_ as "" if not present
+
+1999-10-07  Ken MacLeod  <ken@jess>
+
+	* lib/Frontier/RPC2.pm (end): zero `may_get_cdata' flag after use
+
+1999-09-02  Ken MacLeod  <ken@jess>
+
+	* lib/Frontier/Client.pm (new): support key, value pairs or hash
+	add encoding, debug, and proxy options
+
+	* lib/Frontier/RPC2.pm (new): support key, value pairs or hash
+	add encoding option
+
+1999-05-24  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* lib/Frontier/RPC2.pm (start): fix <value> defaulting to string
+
+1999-04-13  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* Makefile.PL: add a PREREQ_PM for XML::Parser
+
+	* lib/Frontier/RPC2.pm (serve): fix reused name in same scope
+	(_scalar): use different technique for checking for int, double,
+	string
+
+	* lib/Frontier/Client.pm (call): use $1 instead of \1
+
+1999-02-02  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/Frontier/RPC2.pm: fixed nested hashes by relayering encoding
+	(_item): added
+	(_params): added
+	(base64, boolean, date_time): added shortcuts
+
+1999-01-28  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/Frontier/Daemon.pm (serve): moved to RPC2.pm
+
+1999-01-25  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/Frontier/Client.pm: added boolean, date, and base64 shortcuts
+
+	* lib/Frontier/RPC2.pm: added boolean, date, and base64 data types
+
+1999-01-19  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* README: updated required Perl modules, mailing lists, added QUICK USAGE GUIDE
+
+	* examples/states-client.pl: added
+
+	* lib/Frontier/RPC2.pm (decode): changed to newer XML::Parser call style
+	(die): user newer XML::Parser line numbering
+	(start): call Frontier::RPC2::die because $self is now an Expat instance
+
+1998-07-27  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Frontier/RPC2.pm (start, end): add <name> tag for named
+	params
+
+	* lib/Frontier/Daemon.pm (new): add Content-Type header
+
+	* lib/Frontier/Client.pm (new): change `host', `port' to `url'
+	(new): add Content-Type header
+
+	* examples/rpc-client.pl: change HOST[:PORT] to URL
+	use `dumpvar' to dump result
+
+1998-04-13  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* release 0.01

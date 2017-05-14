@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Frame::Layer::DNS.
 
+1.05 Tue May  9 17:48:36 EST 2017
+   - CNAME getLength fixed
+
 1.04 Mon Mar  4 17:48:36 EST 2013
    - Fixed case where rdlength == 0 in RR.pm.
 

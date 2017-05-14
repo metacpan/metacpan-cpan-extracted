@@ -1,6 +1,6 @@
 package GSM::SMS::NBS::Frame;
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 sub new {
     my $proto = shift;

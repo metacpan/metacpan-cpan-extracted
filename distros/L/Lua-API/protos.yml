@@ -1,0 +1,403 @@
+--- luaL_checklong
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+attr: {}
+func: checklong
+fwrap: wrap_checklong
+inputs:
+  - narg
+lua_funcname: luaL_checklong
+outputs: []
+proto: 'long luaL_checklong (lua_State *L, int narg);'
+structname: checklong_S
+type: long
+--- luaL_checktype
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: int t
+    name: t
+    type: int
+    xsdef: int t
+attr: {}
+func: checktype
+fwrap: wrap_checktype
+inputs:
+  - narg
+  - t
+lua_funcname: luaL_checktype
+outputs: []
+proto: 'void luaL_checktype (lua_State *L, int narg, int t);'
+structname: checktype_S
+type: void
+--- luaL_checkany
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+attr: {}
+func: checkany
+fwrap: wrap_checkany
+inputs:
+  - narg
+lua_funcname: luaL_checkany
+outputs: []
+proto: 'void luaL_checkany (lua_State *L, int narg);'
+structname: checkany_S
+type: void
+--- luaL_argcheck
+---
+args:
+  - cdef: int cond
+    name: cond
+    type: int
+    xsdef: int cond
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: const char *extramsg
+    name: extramsg
+    type: const char *
+    xsdef: const char * extramsg
+attr: {}
+func: argcheck
+fwrap: wrap_argcheck
+inputs:
+  - cond
+  - narg
+  - extramsg
+lua_funcname: luaL_argcheck
+outputs: []
+proto: 'void luaL_argcheck (lua_State *L, int cond, int narg, const char *extramsg);'
+structname: argcheck_S
+type: void
+--- luaL_checkint
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+attr: {}
+func: checkint
+fwrap: wrap_checkint
+inputs:
+  - narg
+lua_funcname: luaL_checkint
+outputs: []
+proto: 'int luaL_checkint (lua_State *L, int narg);'
+structname: checkint_S
+type: int
+--- luaL_argerror
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: const char *extramsg
+    name: extramsg
+    type: const char *
+    xsdef: const char * extramsg
+attr: {}
+func: argerror
+fwrap: wrap_argerror
+inputs:
+  - narg
+  - extramsg
+lua_funcname: luaL_argerror
+outputs: []
+proto: 'int luaL_argerror (lua_State *L, int narg, const char *extramsg);'
+structname: argerror_S
+type: int
+--- luaL_optinteger
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: lua_Integer d
+    name: d
+    type: lua_Integer
+    xsdef: lua_Integer d
+attr: {}
+func: optinteger
+fwrap: wrap_optinteger
+inputs:
+  - narg
+  - d
+lua_funcname: luaL_optinteger
+outputs: []
+proto: 'lua_Integer luaL_optinteger (lua_State *L, int narg, lua_Integer d);'
+structname: optinteger_S
+type: lua_Integer
+--- luaL_checklstring
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: size_t *l
+    name: l
+    type: size_t *
+    xsdef: size_t & l = NO_INIT
+attr: {}
+func: checklstring
+fwrap: wrap_checklstring
+inputs:
+  - narg
+lua_funcname: luaL_checklstring
+outputs:
+  - l
+proto: 'const char *luaL_checklstring (lua_State *L, int narg, size_t *l);'
+structname: checklstring_S
+type: const char *
+--- luaL_checkoption
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: const char *def
+    name: def
+    type: const char *
+    xsdef: const char * def
+  - cdef: const char * const * lst
+    name: lst
+    type: const char *const
+    xsdef: const char * const * lst
+attr: {}
+func: checkoption
+fwrap: wrap_checkoption
+inputs:
+  - narg
+  - def
+  - lst
+lua_funcname: luaL_checkoption
+outputs: []
+proto: 'int luaL_checkoption (lua_State *L, int narg, const char *def, const char *const lst[]);'
+structname: checkoption_S
+type: int
+--- luaL_optint
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: int d
+    name: d
+    type: int
+    xsdef: int d
+attr: {}
+func: optint
+fwrap: wrap_optint
+inputs:
+  - narg
+  - d
+lua_funcname: luaL_optint
+outputs: []
+proto: 'int luaL_optint (lua_State *L, int narg, int d);'
+structname: optint_S
+type: int
+--- luaL_checkudata
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: const char *tname
+    name: tname
+    type: const char *
+    xsdef: const char * tname
+attr: {}
+func: checkudata
+fwrap: wrap_checkudata
+inputs:
+  - narg
+  - tname
+lua_funcname: luaL_checkudata
+outputs: []
+proto: 'void *luaL_checkudata (lua_State *L, int narg, const char *tname);'
+structname: checkudata_S
+type: void *
+--- luaL_checkstring
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+attr: {}
+func: checkstring
+fwrap: wrap_checkstring
+inputs:
+  - narg
+lua_funcname: luaL_checkstring
+outputs: []
+proto: 'const char *luaL_checkstring (lua_State *L, int narg);'
+structname: checkstring_S
+type: const char *
+--- luaL_optlong
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: long d
+    name: d
+    type: long
+    xsdef: long d
+attr: {}
+func: optlong
+fwrap: wrap_optlong
+inputs:
+  - narg
+  - d
+lua_funcname: luaL_optlong
+outputs: []
+proto: 'long luaL_optlong (lua_State *L, int narg, long d);'
+structname: optlong_S
+type: long
+--- luaL_optlstring
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: const char *d
+    name: d
+    type: const char *
+    xsdef: const char * d
+  - cdef: size_t *l
+    name: l
+    type: size_t *
+    xsdef: size_t & l = NO_INIT
+attr: {}
+func: optlstring
+fwrap: wrap_optlstring
+inputs:
+  - narg
+  - d
+lua_funcname: luaL_optlstring
+outputs:
+  - l
+proto: 'const char *luaL_optlstring (lua_State *L, int narg, const char *d, size_t *l);'
+structname: optlstring_S
+type: const char *
+--- luaL_typerror
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: const char *tname
+    name: tname
+    type: const char *
+    xsdef: const char * tname
+attr: {}
+func: typerror
+fwrap: wrap_typerror
+inputs:
+  - narg
+  - tname
+lua_funcname: luaL_typerror
+outputs: []
+proto: "int luaL_typerror (lua_State *L, int narg, const char *tname);\n"
+structname: typerror_S
+type: int
+--- luaL_optstring
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: const char *d
+    name: d
+    type: const char *
+    xsdef: const char * d
+attr: {}
+func: optstring
+fwrap: wrap_optstring
+inputs:
+  - narg
+  - d
+lua_funcname: luaL_optstring
+outputs: []
+proto: 'const char *luaL_optstring (lua_State *L, int narg, const char *d);'
+structname: optstring_S
+type: const char *
+--- luaL_checknumber
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+attr: {}
+func: checknumber
+fwrap: wrap_checknumber
+inputs:
+  - narg
+lua_funcname: luaL_checknumber
+outputs: []
+proto: 'lua_Number luaL_checknumber (lua_State *L, int narg);'
+structname: checknumber_S
+type: lua_Number
+--- luaL_optnumber
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+  - cdef: lua_Number d
+    name: d
+    type: lua_Number
+    xsdef: lua_Number d
+attr: {}
+func: optnumber
+fwrap: wrap_optnumber
+inputs:
+  - narg
+  - d
+lua_funcname: luaL_optnumber
+outputs: []
+proto: 'lua_Number luaL_optnumber (lua_State *L, int narg, lua_Number d);'
+structname: optnumber_S
+type: lua_Number
+--- luaL_checkinteger
+---
+args:
+  - cdef: int narg
+    name: narg
+    type: int
+    xsdef: int narg
+attr: {}
+func: checkinteger
+fwrap: wrap_checkinteger
+inputs:
+  - narg
+lua_funcname: luaL_checkinteger
+outputs: []
+proto: 'lua_Integer luaL_checkinteger (lua_State *L, int narg);'
+structname: checkinteger_S
+type: lua_Integer

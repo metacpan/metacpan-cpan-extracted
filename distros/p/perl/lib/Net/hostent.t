@@ -14,7 +14,7 @@ BEGIN {
     {
 	plan skip_all => "Test uses Socket, Socket not built";
     }
-    if ($^O eq 'MacOS' || ($^O eq 'irix' && $Config{osvers} == 5)) {
+    if ($^O eq 'irix' && $Config{osvers} == 5) {
 	plan skip_all => "Test relies on resolution of localhost, fails on $^O ($Config{osvers})";
     }
 }
@@ -33,6 +33,10 @@ sub DIE {
 use Socket;
 
 my $h = gethost('localhost');
+SKIP: {
+skip "Can't resolve localhost and you don't have /etc/hosts", 6
+    if (!defined($h) && !-e '/etc/hosts');
+
 ok(defined $h,  "gethost('localhost')") ||
   DIE("Can't continue without working gethost: $!");
 
@@ -88,4 +92,5 @@ SKIP: {
         ok( !$in_alias );
         print "# " . $h->name . " " . join (",", @{$h->aliases}) . "\n";
     }
+}
 }

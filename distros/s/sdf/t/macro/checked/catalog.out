@@ -1,0 +1,16 @@
+__tuning[]
+__endtuning[]
+__table[format='1*';style='plain']1
+__row[]Body
+__cell[cols=1;rows=1]
+N[orig_style='N']{{THING[jump='j1']ABC}}
+__row[]Body
+__cell[cols=1;rows=1]
+N[orig_style='N']{{THING[jump='j2']DEF}}
+__endtable[]
+N[orig_style='N']Testing masking ...
+__table[format='1*';style='plain']1
+__row[]Body
+__cell[cols=1;rows=1]
+N[orig_style='N']{{THING[jump='j1']ABC}}
+__endtable[]

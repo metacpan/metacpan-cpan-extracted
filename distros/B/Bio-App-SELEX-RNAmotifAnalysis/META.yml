@@ -1,0 +1,25 @@
+---
+abstract: 'Cluster SELEX sequences and calculate their structures'
+author:
+  - 'Christopher Bottoms <molecules@cpan.org>'
+build_requires:
+  Data::Section: 0
+  File::Slurp: 0
+  Test::LongString: 0
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-App-SELEX-RNAmotifAnalysis
+requires:
+  Config::Tiny: 0
+  Getopt::Long::Descriptive: 0
+  List::MoreUtils: 0
+  Text::LevenshteinXS: 0.03
+  autodie: 2.0
+version: 0.0095

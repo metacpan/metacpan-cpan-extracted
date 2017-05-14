@@ -1,0 +1,40 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: address Filter
+
+H2: Interface
+
+!filter_interface "address"
+
+H2: Description
+
+The {{address}} filter is used to format an address.
+This typically implies:
+
+* for [[PostScript]], the paragraphs have no space between them
+* for [[HTML]], the paragraphs are given ADDRESS tags.
+
+H2: Examples
+
+A typical letter starts like this:
+
+!block example; lang='sdf'
+!block address
+Mr I.M. Lucky
+13 Horseshoe Drive
+Brisbane Q 4001
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

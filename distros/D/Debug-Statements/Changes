@@ -1,0 +1,6 @@
+1.000  12/16/14  initial release
+1.001  12/17/14  POD
+1.002  12/18/14  fixed minor Windows bugs (bypassed `ps`, ls() `ls -l` => `dir`)
+1.003  12/19/14  fixed bug in Windows .t, updated POD, added Changes file
+1.004  12/22/14  POD
+

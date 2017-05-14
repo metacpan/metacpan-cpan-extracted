@@ -27,6 +27,8 @@ XML::Checker ERROR-159: unspecified value for #REQUIRED attribute [second_id]
 	Context: Element q, Attr second_id
 XML::Checker ERROR-130: invalid NMTOKEN [1bad nmtoken]
 	Context: Element n, Attr nmtoken
+XML::Checker ERROR-103: undefined attribute [bad_idref]
+	Context: Element bad_id
 XML::Checker ERROR-131: invalid ID [1bad_default_id]
 	Context: Element bad_id, Attr bad_default_id
 XML::Checker ERROR-132: invalid IDREF [1bad_default_idref]
@@ -41,6 +43,8 @@ XML::Checker ERROR-132: invalid IDREF [1bad_default_idref]
 	Context: Element bad_id, Attr bad_default_idref
 XML::Checker ERROR-132: invalid IDREF [1bad_default_idrefs]
 	Context: Element bad_id, Attr bad_default_idrefs
+XML::Checker ERROR-103: undefined attribute [bad_ent]
+	Context: Element bad_ent
 XML::Checker ERROR-133: invalid ENTITY name [1bad_default_ent]
 	Context: Element bad_ent, Attr bad_default_ent
 XML::Checker ERROR-102: undefined unparsed ENTITY [1bad_default_ent]

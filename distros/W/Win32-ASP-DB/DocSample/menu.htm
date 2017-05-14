@@ -1,0 +1,57 @@
+<html>
+
+<head>
+<base target="main">
+<title></title>
+</head>
+
+<body>
+
+<table border="0" width="136">
+  <tr>
+    <td nowrap width="132"><a href="Documents/new.asp">New Doc</a></td>
+  </tr>
+  <tr>
+    <td nowrap height="10" width="132"></td>
+  </tr>
+  <tr>
+    <td nowrap width="132"><form NAME="GetDocID" METHOD="GET">
+      <div align="right"><p>Doc ID: <input TYPE="text" NAME="DocID" SIZE="5"><br>
+      <input TYPE="BUTTON" VALUE="View"
+      ONCLICK="this.form.action='Documents/view.asp'; this.form.submit();"> <input TYPE="BUTTON"
+      VALUE="Edit" ONCLICK="this.form.action='Documents/edit.asp'; this.form.submit();"> </p>
+      </div>
+    </form>
+    </td>
+  </tr>
+  <tr>
+    <td nowrap height="10" width="132"></td>
+  </tr>
+  <tr>
+    <td nowrap width="132">View Docs:</td>
+  </tr>
+  <tr>
+    <td nowrap width="132"><table border="0">
+      <tr>
+        <td width="8" nowrap></td>
+        <td nowrap><a href="Documents/query.asp?title=All%20Documents">All</a></td>
+      </tr>
+      <tr>
+        <td width="8" nowrap></td>
+        <td nowrap><a href="Documents/query.asp?constraint=Locked=1&amp;title=Locked%20Documents">Locked</a></td>
+      </tr>
+    </table>
+    </td>
+  </tr>
+  <tr>
+    <td nowrap height="10" width="132"></td>
+  </tr>
+  <tr>
+    <td nowrap width="132"><a href="login.asp">Login</a></td>
+  </tr>
+  <tr>
+    <td nowrap width="132"><a href="logoff.asp">Logoff</a></td>
+  </tr>
+</table>
+</body>
+</html>

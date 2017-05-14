@@ -1,0 +1,21 @@
+0.0095 Updated installation instructions to specify that Text::LevenshteinXS should be installed before Bio::App::SELEX::RNAmotifAnalysis.
+
+0.0094 Removed glitchy alternative installation script and corresponding instructions.
+       Due to abundant CPAN Tester fail reports, trying using "#!/usr/bin/env perl" for all shebang lines. (Found this as Michael Schwern's suggested default Perl shebang at http://stackoverflow.com/questions/2791954/what-should-i-use-for-a-perl-scripts-shebang-line/2792076#2792076).
+
+0.0093 Explicitly added NAME section in POD (thanks NeilB!). Also, I previously forgot to mention that the shebang lines in the tests were all changed to "#!/bin/env perl" to hopefully fix accidental use of the system perl by the tests (Thanks ANDK!). 
+
+0.0092 Added back dependency on Getopt::Long::Descriptive (Sorry, I didn't notice it was being used by a sub-module).
+
+0.0091 Updated Changes file
+
+0.0090 New Feature: Sequence identifier now has edit distance from cluster reference sequence included as a fourth number in the identifier (e.g. for the identifier 2.3.1.5, the corresponding sequence has an edit distance of 5 from the reference sequence). 
+    Bug Fixes: Fixed bug that would prevent sequences from being added to a cluster after the maximum number of clusters had been found.  Removed spurious dependency on Getopt::Long::Descriptive
+
+0.0089 Fixed formatting of publication reference
+
+0.0088 Fixed bug in output of cluster file (clusters.txt)
+
+0.0085 Documented incompatibilities with Windows, BSD, Sun/Solaris, and SGI.
+
+0.0084 Initial public release

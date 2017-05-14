@@ -1,0 +1,79 @@
+#######################################################################
+# Error
+#
+# Print out an error message.  The parameter given is a text error code.
+# All Erorrs are fatal (they will always Exit).
+# Variables used: 
+#    $main::cgi, If this is set to 1, we'll do a CGI type of error.
+#    Otherwise, we assume we're a shell and print to STDERR.
+#######################################################################
+package MsqlCGI_Error;
+sub main::Error {
+  local ( $msg ) = @_;
+  
+  	# we're converting the filename first so we can make sure that the
+	# error file exists.  It'd be a chicken an egg problem if the
+	# error template got messed up.
+  if ( $main::tableInfo->{'ErrorTemplate'} ) {
+    $errorFile = &MsqlCGI::ConvertFileName 
+  	( $main::tableInfo->{'ErrorTemplate'}, 
+	  $main::tableInfo->{'TemplateDir'} );
+    if ( -e $errorFile ) {
+      &Template::DoTemplate ( $errorFile, "ERROR",
+      		  $main::tableInfo, $main::tData, undef );
+      exit ( 1 );
+    }
+  } 
+
+
+  $strTitle = ( $main::errorTitle ) ? $main::errorTitle : 
+	      "Sorry, There was a problem";
+  $strH1 = ( $main::errorH1 ) ? $main::errorH1 : 
+	   "Sorry, Your form was not processed.";
+  $strText = ( $main::errorText ) ? $main::errorText : 
+	   "I'm sorry. Your form was not processed due to an error.";
+
+  print <<"  EOF";
+  <title>$strTitle</title>
+  <h1 align=center>$strH1</h1>
+
+  $strText  The error message is:
+  <p>
+
+  <blockquote><b>
+  $msg
+  </b></blockquote><p>
+
+  Please <a href="$ENV{'HTTP_REFERER'}">return to the page to try
+  again,</a> or send mail to the 
+  <a href="mailto:$main::webmaster">Webmaster.
+  </a><p>
+  EOF
+  exit ( 1 );
+}
+
+###########################################################################
+# DoStandardAction
+#
+# This function is used in conjunction with a HTML template.  It does the
+# "Standard Action" for the Error function.  The STandard action is just
+# to print out the error message.  We're using somewhat of a hack here
+# because since the variable "$msg" is being passed to &main::Error(),
+# we're using it as a "local" varaible.
+###########################################################################
+sub DoStandardAction {
+  ( $sth ) = @_;
+  $strRet = <<"  EOF";
+  The Error Message is: 
+  <blockquote>
+    <b>$msg</b>
+  </blockquote>
+
+  EOF
+}
+
+sub ErrorMessage {
+  return $msg;
+}
+
+1;

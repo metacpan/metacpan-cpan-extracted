@@ -1,0 +1,28 @@
+# This file tests the slide_up and slide_down macros
+
+!macro sometext
+H2: Heading 2
+H3: Heading 3
+!endmacro
+
+!sometext
+
+# Try sliding down one level
+H1: Before
+!slide_down
+!sometext
+!slide_up
+H1: After
+
+!sometext
+
+# Try sliding down two levels
+H1: Before
+!slide_down
+!slide_down
+!sometext
+!slide_up
+!slide_up
+H1: After
+
+!sometext

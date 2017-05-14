@@ -1,0 +1,10 @@
+Revision history for App-elsquid
+
+0.15      2016-07-12 23:18:15+02:00 Europe/Berlin
+  - Less aggressive domain blacklisting
+
+0.14      2016-05-25 22:58:02+02:00 Europe/Berlin
+  - Fixed wrong hash access that led to faulty output of squid conf snippet 
+
+0.12      2016-05-25 16:27:50+02:00 Europe/Berlin
+  - Initial release

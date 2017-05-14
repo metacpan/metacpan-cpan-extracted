@@ -1,5 +1,186 @@
 The latest, HTML version of this document is always available at http://plagger.org/trac.cgi/wiki/PlaggerChangeLog
 
+== 0.7.17 (2006/12/04) ==
+
+=== Core ===
+
+ * Summary::Simple: Fix HTML extraction so it respect attributes (nikc)
+ * Force stringify ID in safe_id
+ * Namespace::MediaRSS: Try mrss namespace with and without the trailing slash
+
+=== New Plugins ===
+
+ * Filter::HTMLTidy: use HTML::Tidy to scrub HTML document
+
+=== Plugins Updates ===
+
+ * CustomFeed::Debug: reuse feed object to work with SmartFeed
+ * Publish::Planet: update template to use Plagger::Text
+ * Filter::EntryFullText: grab TITLE from HTML if there's no title set 
+ * CustomFeed::Simple: make URLs extracted with XPath absolute
+ * Subscription::HatenaGroup: use Plagger::FeedParser rather than XML::Feed
+ * CustomFeed::YouTube: update regexp (mizzy)
+ * Subscription::LivedoorReader: don't use strip_html
+ * Publish::Excel: don't use strip_html
+ * CustomFeed::Simple: don't set title if it's already set in Subscription (typester)
+ * Publish::Feed: added taguri_base config
+ * Bundle::Planet: pass URI domain to taguri_base
+ * Filter::DegradeYouTube: update regexp
+ * CustomFeed::Mailman: updated regexp to work with wrapped subject
+ * Publish::Gmail: added timeout config for mailroute when used with SMTP-TLS
+
+== 0.7.16 (2006/11/26) ==
+
+=== Core ===
+
+ * Plagger::Date->parse_dwim now supports Japanese date format
+ * $plugin->load_assets ignore .svn directory by default
+ * update DateTime and DateTime::Locale dependencies
+
+=== New Plugins ===
+
+ * Summary::Japanese: Summary generator using Lingua::JA::Summarize::Japanese::Extract (miyagawa, ko)
+ * Summary::AppleScript: Summary generator using MacOSX summary service (otsune)
+ * Filter::DegradeYoutube: degrade YouTube embed video HTML (tokuhirom)
+
+=== Plugins Updates ===
+
+ * Filter::EntryFullText: Update patterns for Slashdot.jp, pmachine
+ * Filter::TruePermalink: added ?fr=rdf (otsune)
+ * CustomFeed::POP3: Made it more liberal to parse Date: header
+ * Filter::Babelfish: Fixed bug around Plagger::Text
+ * Filter::HatenaDiaryKeywordUnlink: Support annonymous diary (kentaro)
+ * CustomFeed::Mixi: reworked regular expression to work with site updates. Now image links are added to enlcousres
+ * CustomFeed::Debug: Allow "entries" key. Auto set type on enclosures if not set.
+ * Filter::EntryFullText: support Japanese date format per Plagger::Date updates
+ * Subscription::Bloglines: 'dont_use_notifier_api' to work around Notifer API bug
+ * Fitler::2chRSSContent: work around with s2ch.net URL changes
+ * Notify::IRC: Update defaulte templates colors (typester)
+ * CustomFeed::Mixi: bumped WWW::Mixi deps
+ * CustomFeed::MixiDiarySearch: HTML updates
+ * Filter::EntryFullText: XPath support now works with non-Node element (nikc)
+ * Publish::Feed: fixed bugs that it emits empty category tags and nobody author elemen
+
+== 0.7.15 (2006/11/01) ==
+
+=== Core ===
+
+ * bump up Encode::Detect dependency so it's easier to install
+ 
+=== New Plugins ===
+
+ * Summary::GetSen: Use GetSen web service to get summary
+
+=== Plugins Updates ===
+
+ * CustomFeed::YouTube: Update queries unencoded in YAML (mizzy)
+ * Summary::Simple: Get the first sentence if it's plain text 
+ * Filter::StripRSSAd: support pheedo variant ads, RSScache.com
+ * Publish::Gmail: now allows non-UTF8 encoding by setting 'encoding' 
+ * CustomFeed::Mixi: Updated regular expression to keep up with the site updates
+ * Publish::Maildir: fixed enclosure bugs
+ * Filter::Markdown: fixed configuration pass bug
+ * Filter::GuessTimeZoneByDomain: bump up DateTime::TimeZone requirement
+ * Publish::Gmail: don't die if enclosure URL is not found and thus not saved in the local
+ * CustomFeed::Script: added SSL expire example code
+ * Subscriptoin::Planet: Update Google Blog search to use Japanese version
+ * Filter::EntryFullText: show debug message if YAML mandatory key is not found
+ * Publish::Feed: fixed a critical bug that the content is always b64 encoded
+
+== 0.7.14 (2006/10/17) ==
+
+=== Core ===
+
+ * include YAML::Loader in inc
+ * Introduced new spell typo checker Test::Spelling
+ * Merged hackathon-summary for a pluggable summary generation
+ * Added Plagger::Text object for title, author, entry, summary and body
+ * Better html2text function using HTML::TreeBuilder and (optional) HTML::FormatText
+ * Plagger::Date parse* method now doesn't set Timezones by default
+ * Move namespecific parsing logic into Namespace::* plugins
+
+=== New Plugins ===
+ 
+ * Summary::Auto: Auto-extract summaries
+ * Summary::Simple: Default summary extractor using regular expression
+ * Summary::English: Wrapper for Lingua::EN::Summarize
+ * Summary::HatenaBookmark: Extract summary using Hatena Bookmark
+ * Summary::TextOriginal: Wrapper for Text::Original
+ * Summary::TrackbackRDF: Extract summary from Trackback RDF data
+ * Filter::GuessTimeZoneByDomain: guess timezones of entry using URL domains
+ * Filter::ForceTimeZone: force timezone regardless of they're UTC/Olson/Floating
+ * Namespace::HatenaFotolife: Hatena fotolife module handler
+ * Namespace::ApplePhotocast: Apple Photocast module handler
+ * Namespace::MediaRSS: Media RSS module handler
+ * Bundle::Defaults: Default plugins loader
+ * Filter::Kansai: Converts Japanese text body to Kansai Dialect
+
+=== Plugins Updates ===
+
+ * Notify::UpdatePing: support weblogUpdates.extendedPing #419
+ * Notify::OpenBrowser: support FreeBSD
+ * Filter::EntryFullText: fixed bad regular expressons in stage6
+ * CustomFeed::Script: load YAML output as Unicode
+ * Publish::iCal: better Timezone handling. requires DateTime::Format::ICal
+ * Filter::FloatingDateTime: use config 'timezone' if set
+ * CustomFeed::Mixi: support my diary and calendar (otsune)
+ * Filter::HatenaBookmarkUsersCount: Iterate links so that it support 50+ URLs
+ * 
+
+
+== 0.7.13 (2006/10/09) ==
+
+=== Core ===
+
+ * Example of Kwalify schema file in examples/schema.yaml
+ * Dumpes template path in Plagger::Template for debug-aid
+
+=== New Plugins ===
+
+ * Filter::LivedoorClipUsersCount: get livedoor Clip users count via API (otsune)
+ * CustomFeed::Script: Call script via shell to get the feed as RSS/Atom or YAML (miyagawa)
+ * Publish::iCal: Simple Feed to iCal generator (miyagawa, kentaro)
+ * Notify::OpenBrowser: Open updated entries in a browser, cross-platform. (kazeburo, miyagawa, youpy)
+
+=== Plugins Updates ===
+
+ * Publish::CHTML: workaround for symlinks in Win32 (charsbar)
+ * Publish::2chdat: Fixed typo and added escape for <> in the content
+ * CustomFeed::AmazonAssociateReportJP: Fixed follow_link (otsune)
+ * Notify::UpdatePing: Wrap ping sending code to trap errors (otsune)
+ * Publish::MT: fixed POD
+ * Publish::Palmdoc: Fixed UTF-8 error on feed title (cheebow)
+ * Subscription::PingServer: Fixed unused dependency
+ * Filter::FindEnclosures: Added stage6 and dailymotion assets (taro)
+ * CustomFeed::Frepa: Updated regular expression to deal with site updates (nipotan)
+ * Publish::PDF: Added 'html.tt' template which was missing
+ * Publish::PDF: now accepts 'filename' as a parameter
+
+== 0.7.12 (2006/09/15) ==
+
+=== Core ===
+
+ * [Backward Incompatible] Updated $feed->id implementation to return unique ID
+ * Requires XML::RSS::LibXML 0.23
+ * allow '-' as a config name to read from STDIN
+ 
+=== New Plugins ===
+
+ * Search::Grep: Search engine using flat file and grep (ko)
+ * Filter::UnicodeNormalize: Normalize entry body using Unicode::Normalize (otsune)
+ 
+=== Plugins Updates ===
+
+ * Misc plugins updates to use Plagger::Util filename_for
+ * Subscription::LivedoorReader: modified_on can be null
+ * BloglinesContentNormalize: hack space before empty elements
+ * Rule::URLBL: fixed bug with non-HTTP URLs
+ * Filter::StripRSSAd: Update for Bloglines
+ * CustomFeed::Simple: Support XPath based link extraction
+ * Publish::CHTML: use id_safe for safe feed ID generation
+ * Filter::EntryFullText: support XPath with custom_feed_follow_xpath
+ * Filter::TruePermalink: Don't die if it detects infinite reditrection loop
+
 == 0.7.11 (2006/08/30) ==
 
 === Core ===
@@ -17,6 +198,7 @@ The latest, HTML version of this document is always available at http://plagger.
 
 === Plugins Updates ===
 
+ * Publish::Feed: fixed RSS 2.0 webMaster validity problem
  * Search::Rast: moved some code to plugin.init. updated document
  * Subscription::XPath: Accept non-absolute link as well
  * Filter::StripRSSAd: some spacing fix for bloglines nasty content updates

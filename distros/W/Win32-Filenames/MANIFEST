@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Win32/Filenames.pm
+t/00-load.t
+t/01-validate.t
+t/02-sanitize.t

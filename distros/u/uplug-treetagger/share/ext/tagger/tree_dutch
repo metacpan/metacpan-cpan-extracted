@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Set these paths appropriately
+ROOT=${UPLUGSHARE}/ext/tree-tagger
+BIN=$ROOT/bin
+CMD=$ROOT/cmd
+LIB=$ROOT/lib
+
+OPTIONS="-token -lemma -sgml"
+
+TAGGER=${BIN}/tree-tagger
+TOKENIZER=${CMD}/tokenize.pl
+ABBR_LIST=${LIB}/dutch-abbreviations
+PARFILE=${LIB}/dutch.par
+
+$TOKENIZER -a $ABBR_LIST $* |
+$TAGGER $OPTIONS $PARFILE

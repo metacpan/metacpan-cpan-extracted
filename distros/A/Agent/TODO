@@ -1,0 +1,17 @@
+----------------------
+Agent Perl - Todo List
+----------------------
+
+These are some things that need to be done.  Feel free to tackle these
+problems and send me the patches. ;-)
+
+    -	embedded support KQML/KIF (in progress)
+    -	More Agent::Transport's  (SMTP? HTTP? IPC? ...)
+    -	embedded support for PGP signatures & encryption.
+    -	PPM's for ActivePerl?
+    -	Logfile option?
+
+
++---
+ Steve Purkis
+ October 27, 1998

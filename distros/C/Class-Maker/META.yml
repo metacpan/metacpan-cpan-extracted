@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Class-Maker
+version:             0.06
+abstract:            classes, reflection, schemas, serialization, attribute- and multiple inheritance
+license:             ~
+author:              
+    - muenalan@cpan.org
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Algorithm::FastPermute:        0.05
+    Array::Compare:                1.03
+    Data::Dumper:                  0
+    Error:                         0.15
+    IO::Extended:                  0
+    XML::LibXSLT:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

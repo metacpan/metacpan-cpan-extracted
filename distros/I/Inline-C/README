@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Inline::C version 0.76.
+    This document describes Inline::C version 0.77.
 
 DESCRIPTION
 
@@ -580,7 +580,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2000-2015. Ingy döt Net.
+    Copyright 2000-2017. Ingy döt Net.
 
     Copyright 2008, 2010-2014. Sisyphus.
 

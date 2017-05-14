@@ -1,0 +1,123 @@
+# zxid/sg/liberty-idwsf-interaction-svc-v1.2.sg
+# Slightly edited, 14.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-interaction-svc-v1.1.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(is12, urn:liberty:is:2003-08)
+import(di12, urn:liberty:disco:2003-08, liberty-idwsf-disco-svc-v1.2.xsd)
+import(e,    http://schemas.xmlsoap.org/soap/envelope/, http://schemas.xmlsoap.org/soap/envelope/)
+import(ds,   http://www.w3.org/2000/09/xmldsig#,http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+#include(liberty-idwsf-utility-v1.1.xsd)
+
+UserInteraction -> %is12:UserInteractionHeaderType
+%UserInteractionHeaderType:
+  is12:InteractionService? -> %di12:ResourceOfferingType
+  @id?              -> %xs:ID
+  @interact?        -> %xs:QName  default (is12:interactIfNeeded)
+  @language?        -> %xs:NMTOKENS
+  @redirect?        -> %xs:boolean  default (0)
+  @maxInteractTime? -> %xs:integer
+  @e:actor?
+  @e:mustUnderstand?
+  ;
+
+RedirectRequest	 -> %is12:RedirectRequestType
+%RedirectRequestType:
+  @redirectURL	 -> %xs:anyURI
+  ;
+
+ResourceID -> %di12:ResourceIDType
+
+EncryptedResourceID -> %di12:EncryptedResourceIDType
+
+&ResourceIDGroup: 
+  is12:ResourceID | is12:EncryptedResourceID
+  ;
+
+InteractionRequest	 -> %is12:InteractionRequestType
+%InteractionRequestType:
+  &is12:ResourceIDGroup?
+  is12:Inquiry+
+  ds:KeyInfo?
+  @id?              -> %xs:ID
+  @language?        -> %xs:NMTOKENS
+  @maxInteractTime? -> %xs:integer
+  @signed?          -> %xs:token
+  ;
+
+Inquiry         -> %is12:InquiryType
+%InquiryType:
+  is12:Help?
+  is12:Select*
+  is12:Confirm* -> %is12:InquiryElementType
+  is12:Text*
+  @id?          -> %xs:ID
+  @title?       -> %xs:string
+  ;
+
+Help         -> %is12:HelpType
+%HelpType:
+  @label?    -> %xs:string
+  @link?     -> %xs:anyURI
+  @moreLink? -> %xs:anyURI
+  ;
+
+Hint	 -> %xs:string
+
+Select           -> %is12:SelectType
+%SelectType:     base(is12:InquiryElementType)
+    is12:Item{2,unbounded}:
+      is12:Hint?
+      @label?	 -> %xs:string
+      @value	 -> %xs:NMTOKEN
+      ;
+  @multiple?	 -> %xs:boolean  default (false)
+  ;
+
+Text         -> %is12:TextType
+%TextType:   base(is12:InquiryElementType)
+  @minChars? -> %xs:integer
+  @maxChars? -> %xs:integer
+  @format?   -> %xs:string
+  ;
+
+%InquiryElementType:
+  is12:Help?
+  is12:Hint?
+  is12:Label? -> %xs:normalizedString
+  is12:Value? -> %xs:normalizedString
+  @name       -> %xs:ID
+  ;
+
+InteractionResponse          -> %is12:InteractionResponseType
+%InteractionResponseType:
+  is12:Status
+  is12:InteractionStatement* -> %is12:InteractionStatementType
+  is12:Parameter*            -> %is12:ParameterType
+  ;
+
+%InteractionStatementType:
+  is12:Inquiry+
+  ds:Signature
+  ;
+
+%ParameterType:
+  @name  -> %xs:ID
+  @value -> %xs:string
+  ;
+
+# From liberty-idwsf-utility-v1.1.sg
+
+Status   -> %is12:StatusType
+%StatusType:
+  is12:Status*
+  @code     -> %xs:QName
+  @ref?     -> %xs:string
+  @comment? -> %xs:string
+  ;
+
+Extension        -> %is12:extensionType
+%extensionType:
+  any+  ns(##other)  processContents(lax)
+  ;
+
+#EOF

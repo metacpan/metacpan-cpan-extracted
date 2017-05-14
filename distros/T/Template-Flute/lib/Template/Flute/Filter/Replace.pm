@@ -21,7 +21,7 @@ Template::Flute::Filter::Replace - Substitutes literal text in a string.
 =head1 DESCRIPTION
 
 The replace filter locates a substring within a string and substitutes
-each occurrence with another string.
+each occurence with another string.
 
 =head1 METHODS
 
@@ -66,7 +66,7 @@ Stefan Hornburg (Racke), <racke@linuxia.de>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2012-2014 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

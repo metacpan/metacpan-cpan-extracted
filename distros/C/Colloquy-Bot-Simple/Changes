@@ -1,0 +1,28 @@
+Version 1.07 - 6rd February 2006
+    + Added passthrough of various options to the superclass.
+
+    + Fixed some parsing logic for different message types.
+
+    + Modified Makefile.PL to be aware of automated testing
+      environment variable and default to no to send usage
+      information.
+
+
+Version 1.06 - 2nd February 2006
+    + Fixed bugs with parsing of text lines. Added finer
+      grained output in the $event hash reference returned
+      to the event handler code.
+
+
+Version 1.04 - 1st February 2006
+    + Fixed to allow commands (NoCommands was left in the code
+      by accident).
+
+    + $event->{args} now includes the command (first argument).
+
+    + Fixed typo in POD.
+
+
+Version 1.03 - 1st Janurary 2006
+    + Initial release.
+

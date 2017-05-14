@@ -7,7 +7,7 @@ use Chart::Plotly::Trace::Attribute::Marker;
 use Chart::Plotly::Trace::Attribute::Xbins;
 use Chart::Plotly::Trace::Attribute::Ybins;
 
-our $VERSION = '0.011';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 sub TO_JSON {
     my $self = shift;
@@ -115,7 +115,7 @@ Chart::Plotly::Trace::Histogram
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

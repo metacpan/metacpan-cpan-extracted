@@ -4,7 +4,7 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "artistic_2"
    ],
@@ -19,32 +19,10 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Type::Tiny" : "1.000006"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Carp" : "0",
-            "Combine::Keys" : "0.04",
-            "Moo" : "0",
-            "MooX::ReturnModifiers" : "0.03",
-            "perl" : "5.006"
-         }
-      }
-   },
    "provides" : {
       "MooX::ValidateSubs" : {
          "file" : "lib/MooX/ValidateSubs.pm",
-         "version" : "0.10"
+         "version" : "1.00"
       },
       "MooX::ValidateSubs::Role" : {
          "file" : "lib/MooX/ValidateSubs/Role.pm"
@@ -58,6 +36,5 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-ValidateSubs"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.00"
 }

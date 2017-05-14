@@ -1,0 +1,52 @@
+{
+  'module' => {
+    'name' => 'Swedish POS tagging + chunking',
+    'submodules' => [
+        '$UplugSystem/pre/sv/tagTnT',
+        '$UplugSystem/pre/sv/bea'
+    ],
+    'submodule names' => [
+        'Swedish tagger (TnT)',
+        "Swedish chunker (Bea's parser)"
+    ],
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This is the pre-processing module for English
+  corpora. It includes a basic XML markup tool, a general sentence
+  splitter, the <a href="http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html">TreeTagger</a> for English which also does tokenization
+  and lemmatization, the English tagger from the 
+  <a href="http://grok.sourceforge.net/">Grok system</a>,  and
+  shallow parser from the <a href="http://grok.sourceforge.net/">Grok
+  system</a>.',
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'status' => 'tok'
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'chunk'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=en)'
+	  },
+       },
+  }
+}

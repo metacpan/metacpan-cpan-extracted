@@ -1,0 +1,8 @@
+
+create gg file
+Run orthoml
+parse results of orthomcl
+back propagate to gff files?
+
+
+orthomcl.pl --mode 3 --blast_file results.out --gg_file clustered.faa.all.gg

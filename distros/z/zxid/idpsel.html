@@ -1,0 +1,37 @@
+<title>ZXID SP SSO: Choose IdP</title>
+<link type="text/css" rel=stylesheet href="idpsel.css"><body bgcolor=white>
+<h1 class=zxtop>ZXID SP Federated SSO (user NOT logged in, no session)</h1>
+<form method=get action="!!URL">
+<div class=zxerr>!!ERR</div><div class=zxmsg>!!MSG</div><div class=zxdbg>!!DBG</div>
+
+<h3>Login Using New IdP</h3>
+
+<i>A new IdP is one whose metadata we do not have yet. We need to know
+the IdP URL (aka Entity ID) in order to fetch the metadata using the
+well known location method. You will need to ask the adminstrator of
+the IdP to tell you what the EntityID is.</i>
+<p>IdP URL <input name=e size=60><input type=submit name=l0 value=" Login "><br>
+
+Entity ID of this SP (click on the link to fetch the SP metadata): <a href="!!EID">!!EID</a>
+
+<p>!!IDP_LIST
+
+<h3>Technical options</h3>
+
+<input type=checkbox name=fc value=1 checked> Create federation, NID Format:
+<select name=fn>
+<option value=prstnt>Persistent
+<option value=trnsnt>Transient
+<option value="">(none)
+</select><br>
+
+<!-- ZXID built-in defaults, see zxidconf.h and zxid-conf.pd for explanation -->
+<input type=hidden name=fr value="!!FR">
+<input type=hidden name=fq value="">
+<input type=hidden name=fy value="">
+<input type=hidden name=fa value="">
+<input type=hidden name=fm value="">
+<input type=hidden name=fp value=0>
+<input type=hidden name=ff value=0>
+</form>
+<div class=zxbot><a class=zx href="http://zxid.org/">zxid.org</a>, !!VERSION</div>

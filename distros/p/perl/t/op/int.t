@@ -3,96 +3,83 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
+    require './test.pl';
+    require Config;
 }
 
-print "1..14\n";
+plan 17;
 
 # compile time evaluation
 
-if (int(1.234) == 1) {print "ok 1\n";} else {print "not ok 1\n";}
+my $test1_descr = 'compile time evaluation 1.234';
+if (int(1.234) == 1) {pass($test1_descr)} else {fail($test1_descr)}
 
-if (int(-1.234) == -1) {print "ok 2\n";} else {print "not ok 2\n";}
+my $test2_descr = 'compile time evaluation -1.234';
+if (int(-1.234) == -1) {pass($test2_descr)} else {fail($test2_descr)}
 
 # run time evaluation
 
 $x = 1.234;
-if (int($x) == 1) {print "ok 3\n";} else {print "not ok 3\n";}
-if (int(-$x) == -1) {print "ok 4\n";} else {print "not ok 4\n";}
+cmp_ok(int($x), '==', 1, 'run time evaluation 1');
+cmp_ok(int(-$x), '==', -1, 'run time evaluation -1');
 
 $x = length("abc") % -10;
-print $x == -7 ? "ok 5\n" : "# expected -7, got $x\nnot ok 5\n";
+cmp_ok($x, '==', -7, 'subtract from string length');
 
 {
+    my $fail;
     use integer;
     $x = length("abc") % -10;
     $y = (3/-10)*-10;
-    print $x+$y == 3 && abs($x) < 10 ? "ok 6\n" : "not ok 6\n";
+    ok($x+$y == 3, 'x+y equals 3') or ++$fail;
+    ok(abs($x) < 10, 'abs(x) < 10') or ++$fail;
+    if ($fail) {
+	diag("\$x == $x", "\$y == $y");
+    }
 }
 
-# check bad strings still get converted
-
 @x = ( 6, 8, 10);
-print "not " if $x["1foo"] != 8;
-print "ok 7\n";
+cmp_ok($x["1foo"], '==', 8, 'check bad strings still get converted');
 
-# check values > 32 bits work.
+# 4,294,967,295 is largest unsigned 32 bit integer
 
 $x = 4294967303.15;
 $y = int ($x);
-
-if ($y eq "4294967303") {
-  print "ok 8\n"
-} else {
-  print "not ok 8 # int($x) is $y, not 4294967303\n"
-}
+is($y, "4294967303", 'check values > 32 bits work');
 
 $y = int (-$x);
 
-if ($y eq "-4294967303") {
-  print "ok 9\n"
-} else {
-  print "not ok 9 # int($x) is $y, not -4294967303\n"
-}
+is($y, "-4294967303", 'negative value more than maximum unsigned 32 bit value');
 
 $x = 4294967294.2;
 $y = int ($x);
 
-if ($y eq "4294967294") {
-  print "ok 10\n"
-} else {
-  print "not ok 10 # int($x) is $y, not 4294967294\n"
-}
+is($y, "4294967294", 'floating point value slightly less than the largest unsigned 32 bit');
 
 $x = 4294967295.7;
 $y = int ($x);
 
-if ($y eq "4294967295") {
-  print "ok 11\n"
-} else {
-  print "not ok 11 # int($x) is $y, not 4294967295\n"
-}
+is($y, "4294967295", 'floating point value slightly more than largest unsigned 32 bit');
 
 $x = 4294967296.11312;
 $y = int ($x);
 
-if ($y eq "4294967296") {
-  print "ok 12\n"
-} else {
-  print "not ok 12 # int($x) is $y, not 4294967296\n"
-}
+is($y, "4294967296", 'floating point value more than largest unsigned 32 bit');
 
 $y = int(279964589018079/59);
-if ($y == 4745162525730) {
-  print "ok 13\n"
-} else {
-  print "not ok 13 # int(279964589018079/59) is $y, not 4745162525730\n"
-}
+cmp_ok($y, '==', 4745162525730, 'compile time division, result of about 42 bits');
 
 $y = 279964589018079;
 $y = int($y/59);
-if ($y == 4745162525730) {
-  print "ok 14\n"
-} else {
-  print "not ok 14 # int(279964589018079/59) is $y, not 4745162525730\n"
-}
+cmp_ok($y, '==', 4745162525730, 'run time divison, result of about 42 bits');
 
+SKIP:
+{   # see #126635
+    my $large;
+    $large = eval "0xffff_ffff" if $Config::Config{ivsize} == 4;
+    $large = eval "0xffff_ffff_ffff_ffff" if $Config::Config{ivsize} == 8;
+    $large or skip "Unusual ivsize", 1;
+    for my $x ($large, -1) {
+        cmp_ok($x, "==", int($x), "check $x == int($x)");
+    }
+}

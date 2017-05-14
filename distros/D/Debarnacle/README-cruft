@@ -1,0 +1,72 @@
+cruft
+=====
+
+Some preliminary notes:
+
+    * This is a pre release version! Be careful, and take its results
+      with a grain of salt.
+
+    * cruft does not make any assumptions about the things you may have
+      in places like /usr/local, /var/tmp, /tmp, or any local mount-
+      points. cruft uses explanation programs from /etc/cruft/explain
+      to determine which files are meant to be on the system. To cover
+      all of /usr/local, create a script like:
+
+             #!/bin/sh
+             find /usr/local
+
+      in the directory /etc/cruft/explain/ called, eg, usr_local. It
+      needs to be executable.
+
+    * If you have any suggestions on how to improve cruft, or if you
+      make a /usr/lib/cruft/filters/* file for another package, please
+      mail me the results for inclusion in a future release.
+
+
+And some notes on how it works, and what it does:
+
+
+cruft is a program to look over your system for anything that shouldn't
+be there, but is; or for anything that should be there, but isn't.
+
+The basis for most of its comparisons is dpkg's installed database
+(found in /var/lib/dpkg/info), but it also knows about such things as
+the alternatives database, ext2fs lost+found directories, home 
+directories, and takes care to avoid complaining about most of the 
+deliberately variable directories, such as /usr/local and /usr/src.
+
+cruft does its work by first building up lists of all the files that
+should be on the system, by querying the various databases on the system.
+It puts these files into /var/spool/cruft/expl_foobar. This can be thought
+of as a list of all the files whose existence is explained by "foobar".
+
+Having done so, it then produces a list of all the files on all
+mounted file systems (except proc), in /var/spool/cruft/file_* (to be
+precise: file_root for /, file_in_mount for /mount, and for nested
+mountpoints, file_in_mount_point for /mount/point).
+
+A few intricacies also need to be handled throughout the above.
+Firstly, we'd like to treat two files as the same if they have the
+same name and are in the same directory, but we'd like to consider, eg
+/usr/bin/X11/app and /usr/X11R6/bin/app. We thus filter all our
+explanations through canonical to get rid of symlinks in the path.
+
+We also need to take care of files that aren't included in packages
+themselves, but which are instead generated in pre and postinst's, or
+at runtime. We do this by matching files against shell-patterns in the
+.extrafiles lists of packages and files in /etc/cruft/filters/*.
+
+Having done all this, we then compare the filenames in expl_* and
+file_*, to determine any files that appear in one group but not the
+other. These listing are separated into /var/spool/cruft/miss_foobar
+(for files that foobar expected, but that didn't appear), and
+/var/spool/cruft/unex_in_mount (for files mounted on "mount" that
+weren't explained by anything).
+
+Finally, we list the contents of miss_* and unex_* in a moderately
+human readable form that we dump onto stdout.
+
+And that's about it.
+
+--
+Anthony Towns <ajt@debian.org>

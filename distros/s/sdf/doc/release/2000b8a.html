@@ -1,0 +1,147 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta8a</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b9.html">Previous Topic</A> | <A HREF="2000b8.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>8. 2.000beta8a</H1>
+<P ALIGN="Left"><A HREF="#2.000beta8a - Enhancements">Enhancements</A> | <A HREF="#2.000beta8a - Fixes">Fixes</A> | <A HREF="#2.000beta8a - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000beta8a - Enhancements">8.1. Enhancements</A></H2>
+<H3><A NAME="Overview">8.1.1. Overview</A></H3>
+<P>The enhancements are:</P>
+<UL>
+<LI><A HREF="2000b8a.html#List formatting changes">List formatting changes</A>
+<LI><A HREF="2000b8a.html#Multiple records per row in a table">Multiple records per row in a table</A>
+<LI><A HREF="2000b8a.html#Programming languages filters">Programming languages filters</A>
+<LI><A HREF="2000b8a.html#Dynamic filter loading">Dynamic filter loading</A>
+<LI><A HREF="2000b8a.html#Variable access in where attributes">Variable access in where attributes</A>
+<LI><A HREF="2000b8a.html#Generalised file extensions for references columns">Generalised file extensions for references columns</A>
+<LI><A HREF="2000b8a.html#New images">New images</A>
+<LI><A HREF="2000b8a.html#Class value functions">Class value functions</A>
+<LI><A HREF="2000b8a.html#Component directory files">Component directory files</A>
+<LI><A HREF="2000b8a.html#The catalog macro">The catalog macro</A>
+<LI><A HREF="2000b8a.html#MIMS specific formats">MIMS specific formats</A>
+<LI><A HREF="2000b8a.html#Reporting">Reporting.</A></UL>
+<P>Further details are provided below.</P>
+<H3><A NAME="List formatting changes">8.1.2. List formatting changes</A></H3>
+<P>Following readability feedback:</P>
+<UL>
+<LI>the default list item indent has been reduced to 18 points
+<LI>the size of bullets has been increased
+<LI>dashes are now used for 2nd level list items (and 4th and 6th).</UL>
+<H3><A NAME="Multiple records per row in a table">8.1.3. Multiple records per row in a table</A></H3>
+<P>The <A HREF="../ref/ftable.html">table</A> filter now supports the <EM>wrap</EM> attribute which puts multiple physical records into a single row. The wrap attribute is also supported by class filters.</P>
+<P>This feature is useful for producing online HTML indexes.</P>
+<H3><A NAME="Programming languages filters">8.1.4. Programming languages filters</A></H3>
+<P>If a filter matches the name of a programming language, the text is formatted as an example in that language, e.g.</P>
+<PRE>
+!block C
+int i;
+!endblock
+</PRE>
+<P>is now implicitly:</P>
+<PRE>
+!block example; lang='C'
+int i;
+!endblock
+</PRE>
+<H3><A NAME="Dynamic filter loading">8.1.5. Dynamic filter loading</A></H3>
+<P>If a filter is not found, SDF now looks for a file called <EM>filter_name</EM>.sdp and dynamically loads the filter from that file if it can. See the <TT>stdlib/module.sdp</TT> file for an example.</P>
+<H3><A NAME="Variable access in where attributes">8.1.6. Variable access in where attributes</A></H3>
+<P>Variables can now be accessed in the where attribute of the <A HREF="../ref/ftable.html">table</A> filter and class filters. For example:</P>
+<PRE>
+ !define MODULE_CODE &quot;XYZ&quot;
+ ...
+ !include &quot;../document.reg&quot;; references; compact; \
+   where='$o{&quot;Reference&quot;} =~ /$var{&quot;MODULE_CODE&quot;}/'; \
+   columns=&quot;PS,REF:Reference,DOC:Document,CONCISE:Date&quot;
+</PRE>
+<H3><A NAME="Generalised file extensions for references columns">8.1.7. Generalised file extensions for references columns</A></H3>
+<P>If a reference attribute is all uppercase (e.g. TXT), a clickable image for a file with that (lowercase) extension (e.g. mydoc.txt) is generated, using an image matching the extension name (e.g. txt.gif). Likewise, an all uppercase attribute with a leading underscore (e.g. _DIR) generates an image for a HTML file with that suffix (e.g. mydoc_dir.html) using an image matching the extension name (e.g. dir.gif).</P>
+<P>This feature has been added so that SDF doesn't need to be extended every time a new file type needs to be included in a document catalog.</P>
+<H3><A NAME="New images">8.1.8. New images</A></H3>
+<P>The following images have been added to the images library:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>File</STRONG>
+</TD>
+<TD>
+<STRONG>Comments</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+dir.gif
+</TD>
+<TD>
+for _dir.html files (see below)
+</TD>
+</TR>
+<TR>
+<TD>
+htx.gif
+</TD>
+<TD>
+for <A HREF="http://www.mincom.com/mims">MIMS</A> .htx files
+</TD>
+</TR>
+<TR>
+<TD>
+mf6.gif
+</TD>
+<TD>
+for <A HREF="http://www.mincom.com/mims">MIMS</A> F6 help files
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Class value functions">8.1.9. Class value functions</A></H3>
+<P>Calculation functions can now be defined for a class. (Previously, calculation functions were only supported for an attribute-class combination.)</P>
+<P>This feature is used to support arbitary file extensions for the references class (see above).</P>
+<H3><A NAME="Component directory files">8.1.10. Component directory files</A></H3>
+<P>As large documents often contain lots of topics, SDF now provides an option for generating a HTML file which displays the topic directory tree for a document.</P>
+<P>The command is:</P>
+<PRE>
+   sdf -2_dir mydoc
+</PRE>
+<P>This creates a file called mydoc_dir.html. A web browser can then be used to view the topic hierarchy and view the SDF files used to build a document.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Once a browser has downloaded an SDF file, it is easy to load it into your preferred editor. However, if you wish to change the master copy of an SDF file, you will need to save your changes to the appropriate location (on the server, say).
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="The catalog macro">8.1.11. The catalog macro</A></H3>
+<P>The new catalog macro can be used to build a catalog of loaded objects. Filtering is provided on the name making it easy to produce online HTML indexes.</P>
+<H3><A NAME="MIMS specific formats">8.1.12. MIMS specific formats</A></H3>
+<P>The following output formats are now supported:</P>
+<UL>
+<LI><EM>mf6</EM> - <A HREF="http://www.mincom.com/mims">MIMS</A> F6 help
+<LI><EM>htx</EM> - <A HREF="http://www.mincom.com/mims">MIMS</A> HTX files.</UL>
+<H3><A NAME="Reporting">8.1.13. Reporting</A></H3>
+<P>SDF now supports a generalised mechanism for producing a report on an SDF file. See the <TT>stdlib/sdf_dir.sdr</TT> report file for an example.</P>
+<P>This feature is used to support the -2_dir option (see above).</P>
+<HR>
+<H2><A NAME="2.000beta8a - Fixes">8.2. Fixes</A></H2>
+<P>The word wrapping algorithm used by txt format has been fixed so that really long words (e.g. URLs) that don't fit on any line no longer wrap onto the next line unless doing so is better that leaving the word on the current line.</P>
+<P>Formatting of title blocks for txt format is better.</P>
+<P>The label attribute now works for headings in txt format.</P>
+<P>The objects attribute for the <A HREF="../ref/ftable.html">table</A> filter has been added back in as an alias for the coltags attribute.</P>
+<HR>
+<H2><A NAME="2.000beta8a - Incompatibilities">8.3. Incompatibilities</A></H2>
+<P>The changes to list formatting mean that documents with lists will be formatted differently, e.g. a given document might have page breaks in different places.</P>
+<P>The SDF logo images are now named sdflogo.gif and sdflogo.bmp, rather than sdf.gif and sdf.bmp.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b9.html">Previous Topic</A> | <A HREF="2000b8.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

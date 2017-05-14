@@ -7,17 +7,20 @@ use overload '""' => 'toString',
 
 use Bio::Root::Root;
 use Bio::Das::Util;  # for rearrange
+use Bio::LocationI;
 
 # we follow the SeqFeatureI interface but don't actually need
 # to load it.
 use Bio::SeqFeatureI;
-@ISA = qw(Bio::Root::Root Bio::SeqFeatureI Bio::PrimarySeqI);
-$VERSION = '0.90';
+
+@ISA = qw(Bio::Root::Root Bio::SeqFeatureI Bio::PrimarySeqI Bio::LocationI);
+
+$VERSION = '0.91';
 
 # aliases for Ace::Sequence::Feature compatibility
 *subtype   = \&method;
 *segments  = *sub_seqFeature = \&get_SeqFeatures;
-*display_id= *info      = *display_name   = \&label;
+*display_id= *info      = \&label;
 *seq_id    = \&refseq;
 *make_link = \&link;
 *desc      = \&description;
@@ -73,6 +76,11 @@ sub length {my $self = shift; $self->stop-$self->start+1}
 
 sub refseq { shift->segment->refseq }
 
+sub display_name {
+    my $self = shift;
+    return $self->label || $self->group_label || $self->id;
+}
+
 sub id {
   my $self = shift;
   my $d = $self->{id};
@@ -93,6 +101,46 @@ sub notes {
   @{$self->{note}};
 }
 
+sub attributes {
+  my $self = shift;
+  if (@_) {
+    return $self->each_tag_value(@_);
+  } else {
+    return $self->{attributes} ? %{$self->{attributes}} : ();
+  }
+}
+
+sub has_tag     {
+  my $self = shift;
+  my $tag = shift;
+  return exists $self->{attributes}{$tag};
+}
+
+sub all_tags {
+  my $self = shift;
+  return keys %{$self->{attributes}};
+}
+
+sub add_tag_value {
+  my $self = shift;
+  my ($tag_name,@tag_values) = @_;
+  push @{$self->{attributes}{$tag_name}},@tag_values;
+}
+
+sub remove_tag {
+  my $self = shift;
+  my $tag_name = shift;
+  delete $self->{attributes}{$tag_name};
+}
+
+sub each_tag_value {
+  my $self = shift;
+  my $tag  = shift;
+  my $value = $self->{attributes}{$tag} or return;
+  return CORE::ref $value ? @{$self->{attributes}{$tag}}
+                          : $self->{attributes}{$tag};
+}
+
 sub note {
   my $self = shift;
   my $d = $self->{note};
@@ -102,7 +150,12 @@ sub note {
 
 sub add_note {
   my $self = shift;
-  push @{$self->{note}},shift;
+  my ($tag,$value) = @_;
+  if (defined $tag) {
+    push @{$self->{attributes}{$tag}},$value;
+  } else {
+    push @{$self->{note}},$value;
+  }
 }
 
 sub target {
@@ -148,7 +201,7 @@ sub method {
 sub category {
   my $self = shift;
   my $type = $self->type or return;
-  eval {$type->category} || $type->method;
+  return eval {$type->category}||'';
 }
 
 sub reference {
@@ -176,6 +229,28 @@ sub phase {
   my $d = $self->{phase};
   $self->{phase} = shift if @_;
   $d;
+}
+
+sub parent_id {
+    my $self = shift;
+    my $d    = $self->{parent};
+    $self->{parent} = shift if @_;
+    $d;
+}
+
+sub child_ids {
+    my $self = shift;
+    my $d    = ($self->{children} ||= []);
+    $self->{children} = shift if @_;
+    return @$d;
+}
+
+sub add_child_id {
+    my $self  = shift;
+    my $child = shift;
+
+    $self->{children} ||= [];
+    push @{$self->{children}},$child;
 }
 
 sub group {
@@ -353,11 +428,6 @@ sub source      {
   my ($method,$source) = split ':',$type;
   return $source;
 }
-sub has_tag     { undef         }
-sub all_tags    {
-  my $self = shift;
-  return ($self->primary_tag,$self->source_tag);
-}
 sub gff_string {
   my $self = shift;
   return join "\t",(
@@ -379,6 +449,59 @@ sub _cmp {
   my $a = $self->toString;
   ($a,$b) = ($b,$a) if $reversed;
   $a cmp $b;
+}
+
+sub is_remote {
+  1;
+}
+
+sub location {
+  my $self = shift;
+  require Bio::Location::Split unless Bio::Location::Split->can('new');
+  my $location;
+  if (my @segments = $self->segments) {
+    $location = Bio::Location::Split->new();
+    foreach (@segments) {
+      $location->add_sub_Location($_);
+    }
+  } else {
+    $location = $self;
+  }
+  $location;
+}
+
+sub each_Location {
+  my $self = shift;
+  require Bio::Location::Simple unless Bio::Location::Simple->can('new');
+  if (my @segments = $self->segments) {
+    return map {
+    Bio::Location::Simple->new(-start  => $_->start,
+                                   -end    => $_->end,
+                              -strand => $_->strand);
+    } @segments;
+  } else {
+    return Bio::Location::Simple->new(-start  => $self->start,
+                                      -end    => $self->end,
+                                      -strand => $self->strand);
+  }
+}
+
+sub location_string {
+  my $self = shift;
+  my @segments = $self->segments or return $self->to_FTstring;
+  join ',',map {$_->to_FTstring} @segments;
+}
+
+sub coordinate_policy {
+  require Bio::Location::WidestCoordPolicy unless Bio::Location::WidestCoordPolicy->can('new');
+  return Bio::Location::WidestCoordPolicy->new();
+}
+
+sub name            {
+  my $self = shift;
+  my $d    = $self->{name};
+  $self->{name} = shift if @_;
+  $d;
 }
 
 1;
@@ -539,6 +662,15 @@ the link.
 =item $note = $feature->note([$newnote])
 
 Get or set the human-readable note associated with the feature.
+
+=item $feature->each_tag_value()
+=item $feature->all_tags()
+=item $feature->add_tag_value()
+=item $feature->remove_tag()
+=item $feature->attributes()
+
+The tag* methods work just like they do in Bio::SeqFeatureI. The
+attributes() method follows the conventions in Bio::DB::SeqFeature.
 
 =item $target = $feature->target
 

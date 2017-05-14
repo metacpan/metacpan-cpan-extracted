@@ -1,13 +1,10 @@
 package urpm::cfg;
 
-# $Id: cfg.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
 use warnings;
-use urpm::util;
+use urpm::util qw(any cat_ partition output_safe quotespace unquotespace);
 use urpm::msg 'N';
-
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
 
 =head1 NAME
 
@@ -66,13 +63,7 @@ sub get_arch () { _init_arch_release(); $arch }
 sub get_release () { _init_arch_release(); $release }
 
 sub get_host () {
-    my $h;
-    if (open my $f, '/proc/sys/kernel/hostname') {
-	$h = <$f>;
-	close $f;
-    } else {
-	$h = $ENV{HOSTNAME} || `/bin/hostname`;
-    }
+    my $h = cat_('/proc/sys/kernel/hostname') || $ENV{HOSTNAME} || `/bin/hostname`;
     chomp $h;
     $h;
 }
@@ -104,7 +95,7 @@ sub expand_line {
     return $line;
 }
 
-my $no_para_option_regexp = 'update|ignore|synthesis|noreconfigure|no-suggests|no-media-info|static|virtual|disable-certificate-check';
+my $no_para_option_regexp = 'update|ignore|synthesis|noreconfigure|no-recommends|no-suggests|no-media-info|static|virtual|disable-certificate-check';
 
 sub load_config_raw {
     my ($file, $b_norewrite) = @_;
@@ -172,8 +163,12 @@ sub load_config_raw {
 	} elsif (/^(hdlist|synthesis)$/) {
 	    # ignored, kept for compatibility
 	} elsif (/^($no_para_option_regexp)$/) {
+	    my $opt = $1;
+	    if ($opt =~ s/no-suggests/no-recommends/) { # COMPAT
+	        warn "WARNING: --no-suggests is deprecated. Use --no-recommends instead\n" if s/no-suggests/no-recommends/; # COMPAT
+	    }
 	    #- positive flags
-	    $block->{$1} = 1;
+	    $block->{$opt} = 1;
 	} elsif (my ($no, $k, $v) =
           /^(no-)?(
 	    verify-rpm
@@ -186,7 +181,6 @@ sub load_config_raw {
 	    |keep
 	    |ignoresize
 	    |auto
-	    |repackage
 	    |strict-arch
 	    |nopubkey
 	    |resume)(?:\s*:\s*(.*))?$/x
@@ -260,7 +254,6 @@ sub dump_config_raw {
 
 1;
 
-__END__
 
 =back
 

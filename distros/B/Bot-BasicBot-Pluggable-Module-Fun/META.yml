@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name: Bot-BasicBot-Pluggable-Module-Fun
+version: 0.9
+author: Simon Wistow <simon@thegestalt.org>
+abstract: |-
+  various quirky but ultimately useless plugins for Bot::BasicBot::Pluggable
+license: perl
+requires:
+  Acme::Magic8Ball: 1.1
+  Bot::BasicBot::Pluggable: 0.5
+  Games::Dice: 0
+  Lingua::Translate: 0
+  Math::Trig: 0
+  Test::More: 0
+provides:
+  Bot::BasicBot::Pluggable::Module::Botsnack:
+    file: lib/Bot/BasicBot/Pluggable/Module/Botsnack.pm
+  Bot::BasicBot::Pluggable::Module::Dice:
+    file: lib/Bot/BasicBot/Pluggable/Module/Dice.pm
+  Bot::BasicBot::Pluggable::Module::Excuse:
+    file: lib/Bot/BasicBot/Pluggable/Module/Excuse.pm
+  Bot::BasicBot::Pluggable::Module::Insult:
+    file: lib/Bot/BasicBot/Pluggable/Module/Insult.pm
+  Bot::BasicBot::Pluggable::Module::Magic8Ball:
+    file: lib/Bot/BasicBot/Pluggable/Module/Magic8Ball.pm
+  Bot::BasicBot::Pluggable::Module::Nickometer:
+    file: lib/Bot/BasicBot/Pluggable/Module/Nickometer.pm
+  Bot::BasicBot::Pluggable::Module::Summon:
+    file: lib/Bot/BasicBot/Pluggable/Module/Summon.pm
+  Bot::BasicBot::Pluggable::Module::Zippy:
+    file: lib/Bot/BasicBot/Pluggable/Module/Zippy.pm
+generated_by: Module::Build version 0.25

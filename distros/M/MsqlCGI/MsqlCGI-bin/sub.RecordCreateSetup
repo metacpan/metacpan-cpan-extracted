@@ -1,0 +1,123 @@
+#####################################################################
+# package RecordCreateSetup
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to Creating a new record...
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package RecordCreateSetup;
+
+#####################################################################
+# sub RecCreateSetup.  
+#
+# This function sets up the form which allows a user to create a new
+# record.
+#####################################################################
+sub DoRecCreateSetup {
+  &main::DPrint ( "In RecordCreateSetup::DoRecCreateSetup" );
+
+  if ( $main::tableInfo->{'RecordCreateSetupTemplate'} ) {
+    &Template::DoTemplate ( $main::tableInfo->{'RecordCreateSetupTemplate'}, 
+    			    "RECORD_CREATE_SETUP", $sth );
+  } else {
+    print <<"    EOF";
+      <title>MsqlCGI: Create a New Record</title>
+      <h2>MsqlCGI: Create a New Record</h2>
+
+      From this screen, you can create a new record.  Please fill in all
+      of the pertinent information, and then click on the "Create Record"
+      button below.
+
+    EOF
+
+    print &DoStandardAction 
+    	( "RECORD_CREATE_SETUP", $sth );
+    
+    print &Template::GetHTMLFooter();
+  }
+}
+
+#####################################################################
+# DoStandardAction
+#
+# This sets up a table with a row for every field that we can enter data
+# into.  
+#####################################################################
+sub DoStandardAction {
+  my ( $type, $sth ) = @_;
+  my ( $strRet ) = "";
+
+  print &Template::GetCGIHeader ( "RecCreateReq" );
+  $strRet .= <<"  EOF";
+  <table border>
+  <tr>
+  <td>
+    <table width=100%>
+      <tr>
+	<th width=10%>Field</th>
+	<th width=5%>&nbsp;</th>
+	<th align=left width=85%>Data</th>
+      </tr>
+
+  EOF
+
+  for ( $nFieldCount = 0; $nFieldCount <= $#{$main::tData}; $nFieldCount++ ) {
+    ( $unused, $strData ) = &MsqlCGI::CreateCGIString
+      ( $main::tData->[$nFieldCount], "CREATE",
+      $main::tData->[$nFieldCount]->{'defaultValue'} );
+
+    if ( $main::tData->[$nFieldCount]->{'dispFieldWhenCreate'} ) {
+      $strRet .= <<"      EOF";
+	<tr>
+	  <td><font size=-1>$main::tData->[$nFieldCount]->{'description'}
+	      </font></td>
+	  <td>&nbsp;</td>
+	  <td>$strData</td>
+	</tr>
+	<tr>
+	  <td colspan=3><hr></td>
+	</tr>
+
+      EOF
+    } else {
+      $strRet .= <<"      EOF";
+	  $strData
+      EOF
+    }
+  }
+  $strRet .= <<"  EOF";
+    </table>
+  </td>
+  </tr>
+  </table>
+    <center>
+  EOF
+
+  $strRet .= DoCGIFooter ();
+
+  $strRet .= <<"  EOF";
+    </center>
+  EOF
+
+
+
+  return $strRet;
+}
+
+#####################################################################
+# DoCGIFooter.
+#
+# This prints the "Create Record" button as well as a reset form button.
+#####################################################################
+sub DoCGIFooter {
+  return <<"  EOF";
+      <input type=submit value="Create Record">
+      <input type=reset value="Clear All Fields">
+  EOF
+
+}
+
+1;    

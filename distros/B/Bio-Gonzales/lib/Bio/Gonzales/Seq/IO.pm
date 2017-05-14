@@ -9,17 +9,16 @@ use Bio::Gonzales::Seq::IO::Fasta;
 use Data::Dumper;
 use Bio::Gonzales::Util::File qw/open_on_demand/;
 use Bio::Gonzales::Util qw/flatten/;
-use Bio::Gonzales::Seq;
 
 use base 'Exporter';
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 @EXPORT      = qw(faslurp faspew fasubseq faiterate);
 %EXPORT_TAGS = ();
 @EXPORT_OK   = qw(fahash);
 
-our $WIDTH = $Bio::Gonzales::Seq::WIDTH;
+our $WIDTH = 80;
 
 our $SEQ_FORMAT = 'all';
 
@@ -154,8 +153,17 @@ sub faspew {
   return;
 }
 
+sub format_seq_string {
+  my ($str) = @_;
 
-sub format_seq_string {return Bio::Gonzales::Seq::Format_seq_string($_[0], $WIDTH); }
+  if ( defined $str && length($str) > 0 ) {
+    $str =~ tr/ \t\n\r//d;            # Remove whitespace and numbers
+    $str =~ s/\d+//g;
+    $str =~ s/(.{1,$WIDTH})/$1\n/g;
+    return $str;
+  }
+}
+
 
 1;
 __END__

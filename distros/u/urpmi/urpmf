@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: urpmf 271299 2010-11-21 15:54:30Z peroyvind $
 
 #- Copyright (C) 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
@@ -26,7 +25,7 @@ use urpm::msg;
 use urpm::media;
 
 sub usage() {
-    print urpm::args::copyright('urpmf', [ '2002-2010', 'Mandriva' ], [ '2011-2012', 'Mageia' ])
+    print urpm::args::copyright('urpmf', [ '2002-2010', 'Mandriva' ], [ '2011-2013', 'Mageia' ])
    . N("  --help         - print this help message.
 ") . N("  --version      - print this tool's version number.
 ") . N("  --env          - use specific environment (typically a bug report).
@@ -72,7 +71,7 @@ sub usage() {
 ") . N("  --requires     - requires tags
 ") . N("  --size         - installed size
 ") . N("  --sourcerpm    - source rpm name
-") . N("  --suggests     - suggests tags
+") . N("  --recommends   - recommends tags
 ") . N("  --summary      - summary
 ") . N("  --url          - url
 ") . N("  --vendor       - vendor
@@ -97,6 +96,7 @@ my %tags_per_media_info = (
     group
     obsoletes
     provides
+    recommends
     requires
     size
     suggests
@@ -177,7 +177,7 @@ if ($qf eq '%name:%files') {
 
 
 my $multitag = '';
-my %multitags = map { $_ => 1 } qw(conffiles conflicts files obsoletes provides requires suggests);
+my %multitags = map { $_ => 1 } qw(conffiles conflicts files obsoletes provides requires recommends suggests);
 my %usedtags;
 
 (my $proto = $qf) =~ s/%([-\d]*)(\w+)/%${1}s/g;

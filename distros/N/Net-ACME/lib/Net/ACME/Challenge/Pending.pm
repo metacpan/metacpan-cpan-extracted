@@ -15,20 +15,11 @@ see C<Net::ACME::Challenge>.
 Note that HTTP requests have some “helper” logic in the subclass
 C<Net::ACME::Challenge::Pending::http_01>.
 
-=head1 METHODS
-
-=head2 $OBJ->make_key_authz( JWK_HR )
-
-JWK_HR is a hashref representation of the ACME registration key’s public JWK.
-
-Returns a string to use as key authorization for the challenge.
-
 =cut
 
 use strict;
 use warnings;
 
-use Net::ACME::Crypt ();
 use Net::ACME::Utils ();
 
 sub new {
@@ -55,11 +46,9 @@ sub type {
 }
 
 sub make_key_authz {
-    my ( $self, $pub_jwk_hr ) = @_;
+    my ( $self, $jwk ) = @_;
 
-    my $eval_err = $@;
-
-    my $jwk_thumbprint = Net::ACME::Crypt::get_jwk_thumbprint( $pub_jwk_hr );
+    my $jwk_thumbprint = Net::ACME::Utils::get_jwk_thumbprint($jwk);
 
     return "$self->{'_token'}.$jwk_thumbprint";
 }

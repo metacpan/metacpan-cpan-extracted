@@ -1,0 +1,33 @@
+Changes
+ignore.txt
+lib/Net/Amazon/EMR.pm
+lib/Net/Amazon/EMR/AddInstanceGroupsResult.pm
+lib/Net/Amazon/EMR/BootstrapActionConfig.pm
+lib/Net/Amazon/EMR/BootstrapActionDetail.pm
+lib/Net/Amazon/EMR/Coercions.pm
+lib/Net/Amazon/EMR/DescribeJobFlowsResult.pm
+lib/Net/Amazon/EMR/HadoopJarStepConfig.pm
+lib/Net/Amazon/EMR/InstanceGroupConfig.pm
+lib/Net/Amazon/EMR/InstanceGroupDetail.pm
+lib/Net/Amazon/EMR/InstanceGroupModifyConfig.pm
+lib/Net/Amazon/EMR/JobFlowDetail.pm
+lib/Net/Amazon/EMR/JobFlowExecutionStatusDetail.pm
+lib/Net/Amazon/EMR/JobFlowInstancesConfig.pm
+lib/Net/Amazon/EMR/JobFlowInstancesDetail.pm
+lib/Net/Amazon/EMR/KeyValue.pm
+lib/Net/Amazon/EMR/PlacementType.pm
+lib/Net/Amazon/EMR/Role/AttrHash.pm
+lib/Net/Amazon/EMR/RunJobFlowResult.pm
+lib/Net/Amazon/EMR/ScriptBootstrapActionConfig.pm
+lib/Net/Amazon/EMR/StepConfig.pm
+lib/Net/Amazon/EMR/StepDetail.pm
+lib/Net/Amazon/EMR/StepExecutionStatusDetail.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/02_live.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

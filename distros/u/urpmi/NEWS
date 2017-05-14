@@ -1,3 +1,341 @@
+Version 8.106 - 6 December 2016
+
+- skip kernel-firmware-nonfree too when considering real kernels
+  Thus preventing kernel-firmware-nonfree being falsely detected as an orphan
+  package (mga#12361)
+
+Version 8.105 - 20 October 2016
+
+- adapt testsuite to rpm-4.13.0~rc2
+
+Version 8.104 - 15 October 2016
+
+- fix more Getopt::Long breakages (drop the "gnu_compat" option)
+
+Version 8.103 - 11 July 2016
+
+- fix reporting progress with newer aria2 (mga#16500)
+- fix Getopt::Long 4.60+ breakages (mga#17923)
+- s/suggests/recommends/ in bash completion
+
+Version 8.102 - 14 April 2016
+
+- add --deploops & --debug-librpm to bash completion
+- unset LD_PRELOAD in chroot (eg: for eatmydata)
+- use new "elem" callback
+  (need URPM >= 5.07)
+
+Version 8.101 - 9 October 2015
+
+- prefer http mirrors when using a mirrorlist, this avoids selecting an rsync
+  mirror which prevents aria2 from being used
+
+Version 8.10 - 9 October 2015
+
+- fix urpm::bug_report (mga#16925)
+
+Version 8.09 - 4 September 2015
+
+- fix urpm::parallel
+
+Version 8.08 - 4 September 2015
+
+- fix installing /sbin/*
+  (regression with perl-5.22's ExtUtils-MakeMaker now wrapping $(...) )
+- fix perl_checker checking
+
+Version 8.07 - 3 September 2015
+
+- aria2 downloading:
+  o fix using a proxy without an auth user (mga#11265)
+- library:
+  o fix unmarking packages as potential orphans when downgrading (mga#16149)
+  o fix Term::ReadKey warnings when output is redirected
+- testsuite:
+  o misc enhancements & cleanups
+  o fix tests for ignored faillure for %pre{,un}, %pretrans
+    (was ignored since rpm-4.9.0)
+  o test that %pretrans do fail installtion (needs rpm-4.13)
+
+Version 8.06 - 18 May 2015
+
+- updated translations
+
+Version 8.05 - 18 March 2015
+
+- gurpmi:
+  o install perl-Glib-Object-Introspection as priority upgrades prior to restart
+
+Version 8.04 - 26 February 2015
+
+- always display the right package name on errors (mga#15032)
+
+Version 8.03 - 1 January 2015
+
+- enhanced doc
+
+Version 8.02 - 25 November 2014
+
+- gurpmi:
+  o fix --auto not working anymore (mga#14565)
+    (regression introduced in 7.32)
+
+Version 8.01 - 9 October 2014
+
+- revert "bump split-length from 8 to 50"
+
+Version 8.00 - 13 September 2014
+
+- rpm-4.12 support:
+  o adapt to URPM-5.00
+  o rename 'no_suggests' parameter as 'no_recommends'
+  o rename '--allow-suggests' option as '--allow-recommends'
+  o rename '--no-suggests' option as '--no-recommends'
+  o rename '--suggests' option as '--recommends'
+
+Version 7.32 - 5 September 2014
+
+- add some missing methods, allows to do urpmf --qf '%sourcerpm:%requires'
+- bump split-length from 8 to 50
+  improves installing gnome in a chroot from 14m to 11m
+- update bash completion
+- gurpmi:
+  o fix crashing when choosing to save file
+  o fix segfaulting when managing exceptions
+  o report crashes through drakbug
+- fix some warnings with perl 5.20
+
+Version 7.31 - 24 January 2014
+
+- do not exec pkexec but run it so it has a parent process to fix double fork
+  issues mga#11184 mga#12364
+- gurpmi:
+  o fix garbaged UTF-8 in file name arguments (mga#12407)
+
+Version 7.30 - 5 December 2013
+
+- convert from gtk2 to gtk3
+
+Version 7.29 - 3 December 2013
+
+- use /proc/self/mountinfo for ro filesystem checks mga#11319
+- polkit: only use pkexec when not already root
+
+Version 7.28 - 5 November 2013
+
+- library:
+  o fix parsing download progress with rsync >= 3.10
+- urpmi:
+  o add support for --deploops option (needs URPM-4.29+)
+
+Version 7.27.5 - 13 October 2013, by Colin Guthrie
+
+- use polkit for authorisation (mga#11125)
+
+Version 7.27.4 - 4 October 2013, by Thierry Vignaud
+
+- library:
+  o adapt to perl-5.18
+  o prevent disabling removing orphan if we failed to detect running kernel
+    version
+
+Version 7.27.3 - 30 May 2013, by Thierry Vignaud
+
+- library:
+  o revert fix for mga#10254 in previous release
+    (the bug was in media.cfg, mga#10335)
+
+Version 7.27.2 - 24 May 2013, by Thierry Vignaud
+
+- library:
+  o ensure priority updates are installed in a single transaction
+  o fix wrongly enabling backports/testing for tainted/nonfree when
+    such packages are already installed (mga#10254)
+
+Version 7.27.1 - 17 May 2013, by Thierry Vignaud
+
+- library:
+  o really auto enable tainted media if needed when adding distrib media
+
+Version 7.27 - 17 May 2013, by Thierry Vignaud
+
+- gurpmi2:
+  o like urpmi/rpmdrake/drakx, display all errors at once at end
+    instead of forcing users to click in order to continue
+    transactions (mga#6086)
+  o do not popup errors at end in auto mode
+- library (mga#8368, #8379 & #9758):
+  o enable to see if nonfree/tainted packages are installed
+  o auto enable nonfree/tainted media if needed when adding distrib media
+
+Version 7.26 - 2 May 2013, by Thierry Vignaud
+
+- gurpmi2:
+  o sort package list
+- library:
+  o fix displaying removed package name in gurpmi/rpmdrake (mga#9545)
+
+Version 7.25 - 21 April 2013, by Thierry Vignaud
+
+- library:
+  o enable rpmdrake to not use modal dialogs (mga#9646)
+  o fix leaving read locks on rpmdb (mga#9248)
+
+Version 7.24 - 18 April 2013, by Thierry Vignaud
+
+- library:
+  o display exceptions that happened while downloading (mga#9529)
+- urpmi:
+  o fix package count when a package has a %pretrans scriptlet
+
+Version 7.23 - 21 March 2013, by Thierry Vignaud
+
+- library:
+  o enable to report packages signature checking in global progress bar dialog
+- gurpmi2:
+  o improved layout:
+    * only the package list needs a scrolling bar
+    * always display space information
+  o display the addionnal space that will be used and the amount of downloaded
+    packages instead of the total size of the packages (like urpmi)
+  o fix return value (mga#9519)
+  o report packages signature checking in global progress bar dialog
+
+Version 7.22 - 21 March 2013, by Thierry Vignaud
+
+- library:
+  o account for packages to erase in gurpm progress bar
+  o enable to have a cancel button in global progress bar dialog
+- gurpmi2:
+  o enable to cancel downloads
+  o fix setting download callback
+
+Version 7.21 - 21 March 2013, by Thierry Vignaud
+
+- library:
+  o restore main_window when global progress bar dialog is deleted
+
+Version 7.20 - 19 March 2013, by Thierry Vignaud
+
+- library:
+  o drop 'callback_report_uninst' now that 'callback_uninst' enables to get
+    erasure progress
+  o enable rpmdrake/gurpm/drakx to pass their own callbacks for erasure
+    progress & errors
+  o enhanced doc
+  o revert 'fixing (g)urpmi --auto-select --update defaulting to all media when
+    there're no update media (#1024)' as it break looking for deps in other media
+    with --update (mga#2317)
+- gurpmi:
+  o split global progress bar widget for rpmdrake (mga#778)
+  o show removed packages in progress too
+  o support exceptions in callback in main wrapper too
+  o support other distros which do not handle exceptions in gtk+ callbacks
+  o use new exception management
+
+Version 7.19 - 9 February 2013, by Thierry Vignaud
+
+- add basic support for --downgrade (mga#6655)
+
+Version 7.18 - 9 February 2013, by Thierry Vignaud
+
+- keep a separate counter for erasures
+
+Version 7.17 - 5 February 2013, by Thierry Vignaud
+
+- fix counting for erasures
+- restore quiet behavior for erasures when not in verbose mode
+
+Version 7.16 - 3 February 2013, by Thierry Vignaud
+
+- add basic support for detecting I/O error
+- display erasure progress too
+
+Version 7.15.2 - 16 January 2013, by Thierry Vignaud
+
+- update translations
+
+Version 7.15.1 - 18 December 2012, by Thierry Vignaud
+
+- library:
+  o fix retrieving rpm version with stable rpm
+
+Version 7.15 - 17 December 2012, by Thierry Vignaud
+
+- library:
+  o do not show empty information from README* with --justdb
+  o fix retrieving rpm version with beta versions
+
+Version 7.14 - 13 December 2012, by Thierry Vignaud
+
+- library:
+  o associate media_cfg data to media when adding them
+
+Version 7.13 - 4 December 2012, by Thierry Vignaud
+
+- library speedups when looking up packages:
+  o do not attempt fuzzy matching if not requested
+- urpmq:
+  o do not allow substring matching with --fuzzy (mga#2953)
+
+Version 7.12.1 - 4 December 2012, by Thierry Vignaud
+
+- urpmi:
+  o fix missing logs (mga#6755)
+
+Version 7.12 - 2 December 2012, by Thierry Vignaud
+
+- library:
+  o fix an incomplete message
+  o fix --download-all (mga#8272)
+    (broken by "make --use-distrib works as user" in 7.9)
+
+Version 7.11.1 - 17 November 2012, by Thierry Vignaud
+
+- fix installing delta rpms
+
+Version 7.11 - 16 November 2012, by Thierry Vignaud
+
+- library:
+  o fix installing delta rpms (it never worked before)
+  o fix computing kernel orphans when running kernel is not the latest
+
+Version 7.10 - 17 October 2012, by Thierry Vignaud
+
+- do not offer to remove DKMS modules for current kernel (mga#5092)
+- aria2 downloading:
+  o do not use aria2 deprecated option (Sam Bailey, mga#7781)
+  o reenable aria2 + metalink for downloading metadata by default (mdv)
+  o tune aria2 download parameters for faster and more reliable options (mdv)
+  o suppress aria2's printing of summaries to avoid it confusing urpmi parsing
+    the output (mdv, mga#7776)
+
+Version 7.9 - 11 October 2012, by Thierry Vignaud
+
+- drop again urpmi.recover 
+  (no more possible since rpm 4.6 which doesn't handle --repackage)
+- drop --repackage option (non working since 2009)
+- gurpmi:
+  o add scrollbar for long one liner messages (mga#5118)
+  o wrap big messages (mga#5118)
+- library:
+  o enhanced doc
+- urpm[fq]:
+  o make --use-distrib works as user (mga#1225)
+
+Version 7.8.3 - 04 October 2012, by Thierry Vignaud
+
+- fix urpmq --whatrequires regression introduced in 7.8.2 (#7706)
+
+Version 7.8.2 - 26 September 2012
+
+- adapt to URPM-4.15
+- remove long deprecated & unused functions
+
+Version 7.8.1 - 8 September 2012
+
+- fix urpmq -h (mga#7390)
+
 Version 7.8 - 7 September 2012
 
 - add urpm::check_cache_dir() for mgaonline (mga#6083)
@@ -62,7 +400,7 @@ Version 7.0 - 8 June 2012
 - adapt to rpm-4.10.0
 - enhance man pages caption (inspirated by mdv)
 - fix testsuite regressions
-- o make 'basename' option work again for rpmdrake
+- make 'basename' option work again for rpmdrake
 - urpmi:
   o do not try to run gmessage as gtkdialogs is not packaged in Mga
   o drop support for --gui (no more used by drakx)
@@ -76,7 +414,7 @@ Version 6.48.1 - 23 April 2012
 
 - urpmi:
   o do not print orphans message when no package is orphan (mga#4715)
-- kill mdv reference in man pages (#5277)
+- kill mdv reference in man pages (mga#5277)
 
 Version 6.48 - 26 March 2012
 

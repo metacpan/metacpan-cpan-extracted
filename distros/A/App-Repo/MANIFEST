@@ -1,0 +1,11 @@
+Makefile.PL
+Changes
+repo
+lib/App/Repo.pm
+lib/App/Repo/CydiaIcon.png
+lib/App/Repo/Daemon.pm
+lib/App/Repo/Agent.pm
+MANIFEST
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

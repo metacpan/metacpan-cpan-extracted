@@ -1,0 +1,27 @@
+# $Id$
+#
+# >>Title::	Infomap Look
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 09-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{infomap}} is an [[SDF]] look for user documentation.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# To remove the header/footer borders, uncomment the line below
+#!default OPT_BORDERS 0
+
+# Inherit the simple look
+!inherit "look/simple"

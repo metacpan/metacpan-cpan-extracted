@@ -1,3 +1,48 @@
+Version 1.17 Tue Jun 29 15:42:08 EDT 2010
+	* Improved stylesheet generation: fixed a bug involving memoization of 
+	the glyph() routine that was returning the wrong glyph in some circumstances.
+	
+Version 1.16 Mon Jun 21 13:32:56 EDT 2010
+	* Fixed aggregation of groups so that type of parent is correct. This
+	fixes gbrowse client issues.
+	
+Version 1.15 Fri Jun 11 12:37:46 EDT 2010, 
+	* Skip some regression tests because test server not currently running.
+	
+Version 1.14
+	* When the Bio::Graphics render() method is called, the stylesheet will be cached
+	for a (hard-coded) five minute period. This makes subsequent operations faster.
+	
+Wed Aug 26 17:56:08 EDT 2009
+	* Support part of DAS/1.6
+	* Fix stylesheet bugs
+	* Aggregators no longer needed for most common cases
+Thu Jun  4 17:55:47 EDT 2009 (version 1.11)
+	* Support DAS/1.5E
+2008-05-28    Lincoln Stein  <lstein@cshl.org> (version 1.09)
+	* Fixed bugs in the render() method which prevented stylesheet
+	instructions for label and bumping to be ignored in some cases.
+	
+2008-05-19    Lincoln Stein  <lstein@cshl.org> (version 1.08)
+	* Fixed regression tests to be less sensitive to wormbase data changes.
+	
+2008-02-27  Lincoln Stein  <lstein@cshl.org> (version 1.07)
+	* Support LocationI interface, to prevent clashes with recent bioperl.
+
+2007-09-06  Lincoln Stein  <lstein@cshl.org> (version 1.06)
+	* Quenched "redefined subroutine" warning.
+
+2007-09-06  Lincoln Stein  <lstein@cshl.org> (version 1.05)
+	* When aggregators are in use, the features request now fetches
+	  both aggregator component and aggregator method name.
+	  This fixes an ambiguity in how such composite features should be handled by
+	  the server.
+	* The note parsing functionality now accepts TYPED notes: <NOTE tag="dbxref">www.jax.org</NOTE>.
+	  These get turned into bioperl-style tags, which in turn can be read using each_tag_value(), etc.
+
+2006-09-15  Lincoln Stein  <lstein@cshl.org>
+	* Added support for proxies at init time.
+
 2005-08-24  Lincoln Stein  <lstein@cshl.edu>
 	* Minor tweak to API to work more nicely with gbrowse.
 

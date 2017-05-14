@@ -1,0 +1,142 @@
+=head1 NAME
+
+PPI::Prettify - A Perl HTML pretty printer to use with Google prettify CSS
+skins, no JavaScript required!
+
+=head1 VERSION
+
+version 0.07
+
+=head1 SYNOPSIS
+
+    use PPI::Prettify 'prettify';
+
+    my $codeSample = q! # get todays date in Perl
+                        use Time::Piece;
+                        print Time::Piece->new;
+                      !;
+
+    my $html = prettify({ code => $codeSample });
+
+    # every Perl token wrapped in a span e.g. for "use PPI::Prettify;":
+        <span class="kwd">use</span>
+        <span class="pln"> </span>
+        <span class="atn">PPI::Prettify</span>
+        <span class="pln">;</span>
+
+    my $htmlDebug = prettify({ code => $codeSample, debug => 1 });
+    # with PPI::Token class, e.g. for "use PPI::Prettify;":
+        <span class="kwd" title="PPI::Token::Function">use</span>
+        <span class="pln" title="PPI::Token::Whitespace"> </span>
+        <span class="atn" title="PPI::Token::Word">PPI::Prettify</span>
+        <span class="pln" title="PPI::Token::Structure">;</span>
+
+=head1 DESCRIPTION
+
+This module takes a string Perl code sample and returns the tokens of the code
+surrounded with <span> tags. The class attributes are the same used by the
+L<prettify.js|https://code.google.com/p/google-code-prettify/>. Using
+L<PPI::Prettify> you can generate the prettified code for use in webpages
+without using JavaScript but you can use all L<the CSS
+skins|https://google-code-prettify.googlecode.com/svn/trunk/styles/index.html>
+developed for prettify.js. Also, because this module uses L<PPI::Document> to
+tokenize the code, it's more accurate than prettify.js.
+
+L<PPI::Prettify> exports prettify() and the $MARKUP_RULES hashref which is used
+to match PPI::Token classes to the class attribute given to that token's <span>
+tag. You can modify $MARKUP_RULES to tweak the mapping if you require it.
+
+I wrote an article with more detail about the module for:
+L<PerlTricks.com|http://perltricks.com/article/60/2014/1/13/Display-beautiful-Perl-code-in-HTML-without-JavaScript>.
+
+=head1 MOTIVATION
+
+I wanted to generate marked-up Perl code without using JavaScript for
+L<PerlTricks.com|http://perltricks.com>. I was dissatisfied with prettify.js as
+it doesn't always tokenize Perl correctly and won't run if the user has
+disabled JavaScript. I considered L<PPI::HTML> but it embeds the CSS in the
+generated code, and I wanted to use the same markup class attributes as
+prettify.js so I could reuse the existing CSS developed for it.
+
+=head1 BUGS AND LIMITATIONS
+
+=over 4
+
+=item *
+
+What constitutes a function and a keyword is somewhat arbitrary in Perl.
+L<PPI::Prettify> mostly uses L<B::Keywords> to help distinguish functions and
+keywords. However, some words such as "if", "my" and "BEGIN" are given a
+special class of "PPI::Token::KeywordFunction" which can be overridden in
+$MARKUP_RULES, should you wish to display these as keywords instead of
+functions.
+
+=item *
+
+This module does not yet process Perl code samples with heredocs correctly.
+
+=item *
+
+Line numbering needs to be added.
+
+=back
+
+=head1 SUBROUTINES/METHODS
+
+=head2 prettify
+
+Takes a hashref consisting of $code and an optional debug flag. Every Perl code
+token is given a <span> tag that corresponds to the tags used by Google's
+prettify.js library. If debug => 1, then every token's span tag will be given a
+title attribute with the value of the originating PPI::Token class. This can
+help if you want to override the mappings in $MARKUP_RULES. See L</SYNOPSIS>
+for examples.
+
+=head2 getExampleHTML
+
+Returns an HTML document as a string with built-in CSS to demo the syntax
+highlighting capabilites of PPI::Prettify. At the command line:
+
+    $ perl -MPPI::Prettify -e 'print PPI::Prettify::getExampleHTML()' > example.html
+
+=head1 INTERNAL FUNCTIONS
+
+=head2 _decorate
+
+Iterates through the tokens of a L<PPI::Document>, marking up each token with a
+<span> tag.
+
+=head2 _to_html
+
+Marks up a token with a span tag with the appropriate class attribute and the
+PPI::Token class.
+
+=head2 _determine_token
+
+Determines the PPI::Token type.
+
+=head1 REPOSITORY
+
+L<https://github.com/sillymoose/ppi-prettify>
+
+=head1 SEE ALSO
+
+L<PPI::HTML> is another prettifier for Perl code samples that allows the
+embedding of CSS directly into the HTML generation.
+
+=head1 THANKS
+
+Thanks to Adam Kennedy for developing L<PPI::Document>, without which this
+module would not be possible.
+
+=head1 AUTHOR
+
+David Farrell <sillymoos@cpan.org> L<PerlTricks.com|http://perltricks.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by David Farrell.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+

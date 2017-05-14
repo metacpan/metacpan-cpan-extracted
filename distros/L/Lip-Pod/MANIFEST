@@ -1,0 +1,8 @@
+lib/Lip/Pod.pm
+lip2pod
+Makefile.PL
+MANIFEST
+README
+t/hello.t
+t/hello.pod
+t/regression.t

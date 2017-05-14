@@ -1,11 +1,13 @@
 use warnings;
 use Data::Dumper;
 use Test::More;
+use Bio::Gonzales::Util::YAML;
 use Bio::Gonzales::Util qw/slice/;
-use Bio::Gonzales::Util::Cerial;
-
 
 BEGIN {
+  eval "use Bio::Perl";
+  plan skip_all => "bioperl equired for testing" if $@;
+
   eval "use Bio::SeqIO::fastq";
 
   use_ok('Bio::Gonzales::Seq::IO::fastq');
@@ -14,7 +16,7 @@ BEGIN {
 my $o = Bio::Gonzales::Seq::IO::fastq->new( variant => 'solexa' );
 #my $t = Bio::SeqIO::fastq->new(-variant => 'solexa');
 #freeze_file("t/Bio-Gonzales-Seq-IO-fastq.solexa.ref.cache.yml", { slice(\%{$t}, qw/phred_int2chr phred_fp2chr sol2phred qual_start qual_end qual_offset chr2qual qual2chr/)});
-my $cache = yslurp('t/Bio-Gonzales-Seq-IO-fastq.solexa.ref.cache.yml');
+my $cache = thaw_file('t/Bio-Gonzales-Seq-IO-fastq.solexa.ref.cache.yml');
 
 {
   my %c2q;
@@ -50,24 +52,8 @@ my $cache = yslurp('t/Bio-Gonzales-Seq-IO-fastq.solexa.ref.cache.yml');
 }
 
 {
-  # format floating point keys. Some platforms might get a slightly different
-  # result, so round the numbers. (fp2chr means floating point to character)
-
-  my $phred_fp2chr_raw =  $o->cache->{phred_fp2chr};
-
-  my %phred_fp2chr_got;
-  while(my ($fp, $chr) = each %$phred_fp2chr_raw) { $phred_fp2chr_got{sprintf("%.6f", $fp)} = $chr }
-
-  my %phred_fp2chr_exp;
-  while(my ($fp, $chr) = each %{$cache->{phred_fp2chr}}) { $phred_fp2chr_exp{sprintf("%.6f", $fp)} = $chr }
-
-
-  unless(is_deeply( \%phred_fp2chr_got, \%phred_fp2chr_exp)) {
-    diag "GOT OUTPUT:";
-    diag Dumper \%phred_fp2chr_raw;
-    diag "EXPECTED OUTPUT:";
-    diag Dumper $cache->{phred_fp2chr};
-  }
+  my %phred_fp2chr = %{ $o->cache->{phred_fp2chr} };
+  is_deeply( \%phred_fp2chr, $cache->{phred_fp2chr} );
 }
 
 #phred_int2chr

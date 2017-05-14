@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Test/MockObject/Extra.pm
+t/lib/Dummy.pm
+t/main.t

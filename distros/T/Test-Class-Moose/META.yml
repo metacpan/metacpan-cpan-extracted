@@ -12,7 +12,7 @@ build_requires:
   Test2::Tools::Class: '0'
   Test2::Tools::Compare: '0'
   Test2::Tools::Subtest: '0'
-  Test::More: '1.302059'
+  Test::More: '1.302015'
   Test::Requires: '0'
   Test::Warnings: '0'
   lib: '0'
@@ -28,73 +28,73 @@ name: Test-Class-Moose
 provides:
   Test::Class::Moose:
     file: lib/Test/Class/Moose.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::AttributeRegistry:
     file: lib/Test/Class/Moose/AttributeRegistry.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::CLI:
     file: lib/Test/Class/Moose/CLI.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Config:
     file: lib/Test/Class/Moose/Config.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Deprecated:
     file: lib/Test/Class/Moose/Deprecated.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Executor::Parallel:
     file: lib/Test/Class/Moose/Executor/Parallel.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Executor::Sequential:
     file: lib/Test/Class/Moose/Executor/Sequential.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Load:
     file: lib/Test/Class/Moose/Load.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Report:
     file: lib/Test/Class/Moose/Report.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Report::Class:
     file: lib/Test/Class/Moose/Report/Class.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Report::Instance:
     file: lib/Test/Class/Moose/Report/Instance.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Report::Method:
     file: lib/Test/Class/Moose/Report/Method.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Report::Time:
     file: lib/Test/Class/Moose/Report/Time.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Role:
     file: lib/Test/Class/Moose/Role.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Role::AutoUse:
     file: lib/Test/Class/Moose/Role/AutoUse.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Role::CLI:
     file: lib/Test/Class/Moose/Role/CLI.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Role::Executor:
     file: lib/Test/Class/Moose/Role/Executor.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Role::HasTimeReport:
     file: lib/Test/Class/Moose/Role/HasTimeReport.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Role::ParameterizedInstances:
     file: lib/Test/Class/Moose/Role/ParameterizedInstances.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Role::Reporting:
     file: lib/Test/Class/Moose/Role/Reporting.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Runner:
     file: lib/Test/Class/Moose/Runner.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Tutorial:
     file: lib/Test/Class/Moose/Tutorial.pm
-    version: '0.82'
+    version: '0.83'
   Test::Class::Moose::Util:
     file: lib/Test/Class/Moose/Util.pm
-    version: '0.82'
+    version: '0.83'
 recommends:
   Parallel::ForkManager: v0.7.6
 requires:
@@ -125,7 +125,6 @@ requires:
   Test2::AsyncSubtest: '0.000018'
   Test2::IPC: '0'
   Test2::Tools::AsyncSubtest: '0'
-  Test::More: '1.302059'
   Test::Most: '0'
   Try::Tiny: '0'
   namespace::autoclean: '0'
@@ -136,7 +135,7 @@ resources:
   bugtracker: https://github.com/test-class-moose/test-class-moose/issues
   homepage: http://metacpan.org/release/Test-Class-Moose/
   repository: git://github.com/test-class-moose/test-class-moose.git
-version: '0.82'
+version: '0.83'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -311,7 +310,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.052'
+      version: '0.053'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -329,7 +328,7 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.052'
+      version: '0.053'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: '@DROLSKY/Test::Pod::Coverage::Configurable'
@@ -483,7 +482,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@DROLSKY/Test::Version'
@@ -496,7 +495,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -677,7 +676,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '0.85'
@@ -689,7 +688,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -714,7 +713,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.041'
@@ -736,7 +735,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -749,11 +748,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.82
+          tag: v0.83
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -767,7 +766,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.041'
@@ -796,7 +795,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -810,7 +809,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.7.4
+          'git --version': 2.11.0
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.041'

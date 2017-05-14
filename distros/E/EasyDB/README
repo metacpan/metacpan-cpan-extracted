@@ -1,0 +1,69 @@
+EasyDB.pm
+
+Gaby Vanhegan - 2/5/2001
+
+About
+-----
+
+This is the EasyDB suite of modules.  It is the final year project of
+Gaby Vanhegan for a BSc Information Systems.
+
+What is EasyDB?
+---------------
+
+EasyDB allows people with no knowledge of SQL to use a database.  The user
+only needs to know:
+
+	- A username/password that they can connect to the database with
+	- The name of the machine that the database is stored on
+	- The name of the database they are connecting to
+
+It is also helpful to know:
+
+	- The name of the table you want to work with
+	- How that table is structured
+
+In order to be able to use EasyDB you must have the DBI and DBD::mysql
+Perl modules installed.  These can be found at:
+
+http://search.cpan.org
+
+What Can I Do With EasyDB?
+--------------------------
+
+There are four things you can do in this release:
+
+1. Find data in a table
+
+This is done using the find function:
+
+	$db->find->criteria( [search criteria] );
+	my @array	= @{ $db->find->as_array() };
+	my %hash	= %{ $db->find->as_hash() };
+
+2. Add new data to a table
+
+This is done using the add function:
+
+	$db->add->data(	Name => 'Barry',
+			Age  => '21' );
+
+3. Change data in the table
+
+This is achieved using the change function
+
+	$db->change->criteria( Age => '21' );
+	$db->change->to( Age => '22' );
+
+4. Delete data from the table
+
+Using the delete function
+
+	$db->delete->criteria( Age => '<= 15' );
+	$db->delete->now();
+
+There are a number of utility functions that these functions have but
+you should read the man page to find out more.
+
+In this release only MySQL databases are supported but other systems
+will be supported in later releases.

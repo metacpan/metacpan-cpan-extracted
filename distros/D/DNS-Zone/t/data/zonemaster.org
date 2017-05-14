@@ -1,0 +1,28 @@
+$TTL 86400
+$ORIGIN zonemaster.org
+
+; zonemaster.org
+@               IN SOA    ns.seicom.net. hostmaster.seicom.net. (
+                          2002012900 ;Serial
+                          28800 ;Refresh
+                          7200 ;Retry
+                          604800 ;Expire
+                          86400 ;Minimum
+                )
+
+                IN NS     ns.seicom.net.
+                IN NS     noc.seicom.net.
+                IN MX     200 hq.seicom.net.
+                IN MX     300 gate.seicom.net.
+
+; wildcards
+*               IN MX     200 hq.seicom.net.
+                IN MX     300 gate.seicom.net.
+
+localhost       IN A      127.0.0.1
+                IN MX     200 hq.seicom.net.
+                IN MX     300 gate.seicom.net.
+
+www             IN A      195.254.62.36
+                IN MX     200 hq.seicom.net.
+                IN MX     300 gate.seicom.net.

@@ -1,0 +1,12 @@
+DB: 'domain.sk/twig.html' 'null'
+
+DB: domain.sk domain2.sk
+
+NOT matching referrer=http://domain2.sk, website=http://domain.sk
+DB: another-domain.sk/twig.html null
+
+DB: another-domain.sk/twig.html http://trala.sk
+
+number of DB records: 4
+number of spidered websites: 2
+number of alerted websites: 2

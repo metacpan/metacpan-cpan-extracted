@@ -1,0 +1,26 @@
+MANIFEST
+Changes
+README.perl
+COPYING
+TODO
+TODONE
+Version
+licenses/Artistic
+licenses/BSD
+licenses/LGPL-2.1
+Makefile.PL
+lib/File/Spec/BaseParse.pm
+lib/File/Spec/DatedPage.pm
+lib/File/Spec/Dated.pm
+lib/File/Spec/PublicationPage.pm
+lib/Document/LogFile.pm
+lib/Document/Members.pm
+lib/Document/NotesFile.pm
+lib/Document/PageId.pm
+lib/Document/PageIterator.pm
+lib/Document/TocFile.pm
+lib/Document/Toc.pm
+lib/Document/Directory.pm
+t/load.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

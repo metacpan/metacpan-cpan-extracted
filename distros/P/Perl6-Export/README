@@ -1,9 +1,4 @@
-==============================================================================
-                   Release of version 0.07 of Perl6::Export
-==============================================================================
-
-
-Perl6/Export version 0.01
+Perl6::Export version 0.009
 =========================
 
 This module prototypes the Perl 6 'exported' and 'exportable' traits
@@ -46,20 +41,3 @@ Copyright (C) 2003 Damian Conway
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
-
-
-==============================================================================
-
-CHANGES IN VERSION 0.07
-
-
-	- Minor doc bug fix
-
-
-==============================================================================
-
-AVAILABILITY
-
-Perl6::Export has been uploaded to the CPAN
-
-==============================================================================

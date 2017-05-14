@@ -1,0 +1,50 @@
+<html>
+<head>
+	<link rel="stylesheet" href="<tmpl_var static_dir>/s.css" type="text/css">
+	<title>WWW-XML</title>
+</head>
+<body>
+<div class="www_xml_header">
+<tmpl_if u_id>
+	Welcome, <tmpl_var u_fname> <tmpl_var u_sname>! <small><a href="?action=logout">Log out</a></small>
+<tmpl_else>
+	<tmpl_if register>
+		<a href="?action=login">Introduce yourself</a>, or register!
+	<tmpl_else>
+		Introduce yourself, or <a href="?action=register">register</a>!
+	</tmpl_if>
+</tmpl_if>
+</div>
+<tmpl_if u_id><div class="www_xml_userbar"><nobr>
+	<a href="?action=home"<tmpl_if action_home> class="xml_www_here"</tmpl_if>>Home</a>&nbsp;
+	<a href="?action=cards"<tmpl_if action_cards> class="xml_www_here"</tmpl_if>>Cards</a>&nbsp;
+	<a href="?action=numbers"<tmpl_if action_numbers> class="xml_www_here"</tmpl_if>>Numbers</a>&nbsp;
+	<a href="?action=pay"<tmpl_if action_pay> class="xml_www_here"</tmpl_if>>Pay</a>&nbsp;
+	<a href="?action=history"<tmpl_if action_history> class="xml_www_here"</tmpl_if>>Payment history</a>&nbsp;
+</nobr></div>
+</tmpl_if>
+
+<div class="www_xml_main">
+
+<tmpl_if submit_success>
+	<p class="www_xml_success">
+		OK
+	</p>
+</tmpl_if>
+
+<tmpl_if submit_error>
+	<tmpl_loop submit_error>
+		<p class="www_xml_error">
+			<tmpl_var text>
+		</p>
+	</tmpl_loop>
+</tmpl_if>
+
+<tmpl_if submit_warning>
+	<tmpl_loop submit_warning>
+		<p class="www_xml_warning">
+			<tmpl_var text>
+		</p>
+	</tmpl_loop>
+</tmpl_if>
+

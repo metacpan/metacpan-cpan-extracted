@@ -1,0 +1,50 @@
+HISTORY
+=======
+
+xisofs v1.3
+-----------
+
+New Features:
+  + Used Bubble help instead of balloon help. More reliable.
+  + Added auto search for perl executable in install script
+  + Added support for cdrecord v1.5
+  + Enhanced Console Window's handling of CR characters
+
+oops:
+  - 4 xpm files had binary rubbish on the end (Added by XV). Removed.
+  - Fixed problem with selection of CD writer software
+
+xisofs v1.2
+-----------
+
+New Features:
+  + Added support for cdrecord v1.4
+  + Updated installation script.
+
+oops:
+  - Didn't correctly append iso9660 image to cdwrite command line. Fixed.
+
+
+xisofs v1.1
+-----------
+
+New Features:
+  + Added support for cdwrite 2.0
+  + Added icon bar with balloon help
+  + Added status bar
+
+
+xisofs v1.0
+-----------
+
+This was the initial version, written to make mkisofs easier to use.
+
+Features:
+  + GUI Interface via Perl/Tk 400.202
+  + Supports all mkisofs parameters
+  + Allows Defaults of fields to be saved
+  + Allows 'projects' to save loaded/saved
+  + Context sensitive help for most items by B3 clicking
+
+Last Updated : 5th October, 1997
+Steve Sherwood (pariah@netcomuk.co.uk)

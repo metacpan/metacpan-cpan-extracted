@@ -1,0 +1,29 @@
+# This file tests blocks
+
+# a simple block
+!block example
+Hello world.
+
+How are
+you?
+!endblock
+
+# nested blocks where the inner one is executed
+!block sdf
+H1: Heading 1
+!block example
+Name    Value
+xyz     42
+abc     "My favorite station"
+!endblock 
+H2: Heading 2
+!endblock 
+
+# nested blocks where the inner one is NOT executed
+!block example
+!block define
+Name    Value
+xyz     42
+abc     "My favorite station"
+!endblock 
+!endblock 

@@ -1,0 +1,10 @@
+TYPEMAP
+Senna::Index        T_PTROBJ
+sen_encoding        T_ENUM
+sen_sel_mode        T_ENUM
+sen_sort_mode       T_ENUM
+sen_rc              T_ENUM
+sen_rec_unit        T_ENUM
+sen_id              T_U_INT
+sen_sel_operator    T_ENUM
+sen_snip_mapping    T_PRTOBJ

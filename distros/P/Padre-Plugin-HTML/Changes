@@ -1,5 +1,24 @@
 Revision history for Padre-Plugin-HTML
 
+0.14   2010.12.06
+        Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.13   2010.10.29
+        Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.12   2010.10.27
+        t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.11   2010.10.26
+        Switched to Dist::Zilla (AZAWAWI)
+        Added compatibility with the latest Padre (AZAWAWI)
+        Added Arabic translation (AZAWAWI)
+
+0.10    2010.08.25
+        compatibility with latest Padre (CHORNY)
+        link to 'HTML 4.01 Specification' (CHORNY)
+        Padre::Document::HTML => Padre::Plugin::HTML::Document (CHORNY)
+
 0.09    2009.05.31
         removed taint mode for test, leading to build failure (jquelin)
 

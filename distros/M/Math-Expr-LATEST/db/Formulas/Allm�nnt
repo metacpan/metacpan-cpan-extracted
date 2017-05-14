@@ -1,0 +1,36 @@
+Name: Div1
+VL: inv(a*b)
+HL: inv(a)*inv(b)
+
+Name: DblInv
+VL: inv(inv(a))
+HL: a
+TrivBack: 1
+
+Name: Div3
+VL: b/b
+HL: 1
+
+Name: Mult1
+VL: 1*a
+HL: a
+TrivBack: 1
+
+Name: MultAss
+VL: a*b+c*b
+HL: (a+c)*b
+
+Name: AddSqrt
+VL: sqrt(a)^2
+HL: a
+TrivBack: 1
+
+Name: Sub1
+VL: a-a
+HL: 0
+
+Name: AddZero
+VL: a+0
+HL: a
+TrivBack: 1
+

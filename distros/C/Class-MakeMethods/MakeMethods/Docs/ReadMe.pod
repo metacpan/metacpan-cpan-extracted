@@ -5,27 +5,27 @@ Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods
 
 =head1 DESCRIPTION
 
-This is an updated release of Class::MakeMethods, for distribution through
-CPAN.
-
-This distribution includes the Class::MakeMethods::Template and
-Class::MakeMethods::Emulator modules which were packaged sepearately in some
-previous releases.
+This is an updated release of Class::MakeMethods, for distribution
+through CPAN. This release includes the Class::MakeMethods::Template
+and Class::MakeMethods::Emulator modules which were previously
+distributed separately.
 
 
 =head1 MOTIVATION
 
-By passing arguments to "use Class::MakeMethods ..." statements, you can
-select from a library of hundreds of common types of methods, which are
-dynamically installed as subroutines in your module, simplifying the code
-for your class.
+Here's the "elevator pitch" for this module:
+
+  By passing arguments to "use Class::MakeMethods ..." statements,
+  you can select from a library of hundreds of common types of
+  methods, which are dynamically generated and installed as
+  subroutines in your module, simplifying the code for your class.
 
 
 =head1 DISTRIBUTION AND INSTALLATION
 
 =head2 Version
 
-This is Class::MakeMethods v1.010, intended for general use.
+This is Class::MakeMethods v1.009, intended for general use.
 
 This module's CPAN registration should read:
 
@@ -57,9 +57,8 @@ Perl version 5.6 or later.
 
 =item *
 
-Some third-party tests used to check the compliance of Emulator modules
-require Test::More and will be automatically skipped on machines which do
-not have this installed.
+Some tests for the Emulator modules require Test::More and will be
+automatically skipped on machines which do not have this installed.
 
 =back
 
@@ -147,7 +146,7 @@ http://testers.cpan.org/show/Class-MakeMethods.html
 
 =back
 
-=head1 SUPPORT
+=head1 BUGS AND SUPPORT
 
 =head2 Release Status
 
@@ -165,6 +164,13 @@ Additional features have been outlined for future development, but
 the intent is support these by adding more options to the declaration
 interface, while maintaining backward compatibility.
 
+=head2 Known Problems
+
+It does not appear to be possible to assign subroutine names to
+closures within Perl. As a result, debugging output from Carp and
+similar sources will show all generated methods as "ANON()" rather
+than "YourClass::methodname()".
+
 See L<Class::MakeMethods::Docs::ToDo> for other outstanding issues
 and development plans.
 
@@ -175,7 +181,7 @@ free to contact the author at the below address. Although there is
 no formal support program, I do attempt to answer email promptly. 
 
 I would be particularly interested in any suggestions towards
-improving the documentation and correcting any Perl-version or platform
+improving the documentation, correcting any Perl-version or platform
 dependencies, as well as general feedback and suggested additions.
 
 Bug reports that contain a failing test case are greatly appreciated,

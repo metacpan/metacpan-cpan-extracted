@@ -1,0 +1,18 @@
+0.03 -> 0.04
+- Added an "answer2" field for handling cases in which the user can write
+down an answer in two ways
+- Added an "explanation" field that can be used to explain answers that are
+not so self-evident.
+- Spec file corrected (it didn't have perl files ...)
+
+0.02 -> 0.03
+- Added the spec file
+
+0.01 -> 0.02
+- Added support for multiple languages (now it e de)
+- Separated administrative templates from quiz templates (/etc/Quizzer.tpl)
+- Makefile modified
+- Added a config file in /etc/Quizzer.conf where frontend and level options
+are specified
+- Separated Loader.pm from Quizzer
+- Some change in documentation

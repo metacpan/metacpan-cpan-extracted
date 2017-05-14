@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use strict;
+use HTTP::Handle;
+
+my $hd = HTTP::Handle->new();
+my $STRINGREGEX=q!(?:"([^"]*)"|'([^']*)'|([^\s>]+))!;
+
+$hd->url($ARGV[0] || "http://www.google.com");
+
+$hd->connect();
+my $fd = $hd->fd();
+
+undef $/;
+
+my $source = <$fd>;
+#my $source = <STDIN>;
+$source =~ s/<!--.*?-->//sg;
+
+while ($source =~ s/(<a\s+(?:[^>]+\s+)*href=$STRINGREGEX[^>]*>)//s) {
+	my $link = $2 || $3 || $4;
+	#print "Tag: $1\n";
+	$link =~ m!^(https?://[^/]+)?(/?.*$)!;
+	my ($base,$path) = ($1, $2);
+	$path =~ s%([^/]+/)?\.\./?%$1%g;
+
+	$link = (($base) ? $base : '') . $path;
+	print "Link: $link\n";
+}

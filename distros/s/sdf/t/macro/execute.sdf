@@ -1,0 +1,4 @@
+# This file tests the include macro
+
+# Try a command which should give the same result under Unix and DOS
+!execute "echo execute.sdf"; example

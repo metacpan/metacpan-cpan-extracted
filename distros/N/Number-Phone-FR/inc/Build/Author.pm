@@ -83,7 +83,7 @@ sub _fetch
     $ua->env_proxy;
     my $rsp = $ua->get($url, ':content_file' => $file);
     die "$file: @{[ $rsp->status_line ]}\n" unless $rsp->is_success;
-    my $t = HTTP::Date::str2time($rsp->header('Last-Modified'));
+    my $t = HTTP::Date::str2time($rsp->header('Last-Modified')) // time;
     utime $t, $t, $file;
 
     my @t = localtime($t);
@@ -114,7 +114,7 @@ sub ACTION_fetch
     $self->_fetch('https://extranet.arcep.fr/portail/LinkClick.aspx?fileticket=Qov2Ms0K3nI%3d&tabid=217&portalid=0&mid=850', GELNUM);
     $self->_fetch('https://extranet.arcep.fr/portail/LinkClick.aspx?fileticket=PBA1WK-wnOU%3d&tabid=217&portalid=0&mid=850', MAJNUM);
     $self->_fetch('https://extranet.arcep.fr/portail/LinkClick.aspx?fileticket=du7yxSdf91o%3d&tabid=217&portalid=0&mid=850', MAJSDT);
-    $self->_fetch('https://libphonenumber.googlecode.com/svn/trunk/resources/geocoding/fr/33.txt', 'libphonenumber-33.txt');
+    $self->_fetch('https://raw.githubusercontent.com/googlei18n/libphonenumber/master/resources/geocoding/fr/33.txt', 'libphonenumber-33.txt');
     return 1;
 }
 

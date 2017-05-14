@@ -1,0 +1,254 @@
+=encoding utf8
+
+=head1 NAME
+
+   Catalyst::View::Semantic - L<Template::Semantic> view for L<Catalyst>
+
+=head1 SYNOPSIS
+
+    package MyApp::View::Semantic;
+    use Moose;
+    extends 'Catalyst::View::Semantic';
+
+    sub wrap {
+        my ($self, $c, $result) = @_;
+        $self->layout( layout => { body => $result }, $c->stash )->as_string;
+    }
+
+    __PACKAGE__->meta->make_immutable;
+    1;
+
+setup end action in Root
+
+    sub auto : Private {
+        my ($self, $c) = @_;
+        $c->stash( js => [], css => [], jscode => '' );
+    }
+
+    sub end : ActionClass('RenderView') {
+        my ($self, $c) = @_;
+        return if $c->response->status > 200 || $c->response->body;
+        unshift $c->stash->{css}, 'bootstrap.min'; # add default css
+        unshift $c->stash->{js}, 'vendor/prototype'; # add default js
+        $c->forward('View::Semantic', []);
+    }
+
+in controller's action 
+
+    $c->stash( view => { a => [ map {
+        '.' => $_->name,
+        '@href' => $_->url
+    } $rs->all ] });
+
+create your layout as root/template/layout.html
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Page Title</title>
+        <link href="" rel="stylesheet" />
+        <script src=""> </script>
+        <script type="application/x-javascript">
+            //<![CDATA[
+            Event.observe(document, 'dom:loaded', function() {
+                /*code*/
+            });
+            //]]>
+        </script>
+    </head>
+    <body> </body>
+    </html>
+
+
+=head1 DESCRIPTION
+
+    This is L<Catalyst> view class for L<Template::Semantic> with some useful methods like html layout and pager, but feel free to extend it with your own functions. Check the L<Template::Semantic::Cookbook>.
+
+=head1 ATTRIBUTES
+
+=head1 METHODS
+
+=head2 new($definiton, %params)
+
+$definition is a 3 element arrayref of arrayrefs - [[@levels], [@durations], [@curves]]
+
+%params can provide additional params such C<is_hold>,C<is_morph>,C<morpher>,C<is_fold_over>,C<is_wrap_neg>
+
+if nothing specified, than random normalized envelope will be created, but you can provide C<border_level> param to define levels at begin/end
+
+=head2 at($pos)
+
+get value at specified position, position can be out of envelope duration, so it will hold or wrap or fold according configuration [arameters C<is_hold>, C<is_fold_over> and C<is_wrap_neg>
+
+=head2 static
+
+returns static evaluator (i.e. coderef) with current envelope object settings
+
+=head2 table($size)
+
+returns lookup table (i.e. list of values) of specified size(default = 1024) which represents current form of the envelope
+
+=head2 is_morph(0|1)
+
+get/set flag which turns on value morphing inside segment before applying curving and scaling. default = 0
+
+=head2 morpher(sub {...})
+
+get/set morpher, default morpher is a C<sub { sin(PI/2*$_[0]) ** 2 }> which smoothes envelope, morpher recieves value from 0 to 1 and should also has same output range
+
+=head2 is_hold(0|1)
+
+when this flag is turned on than C<at> method and static evaluator with out-of-duration argument will return boundary levels. default = 0
+
+=head2 is_fold_over(0|1)
+
+when this flag is turned on and C<is_hold> is turned off than C<at> argument greater than envelope duration will be folded around envelope duration insted of wraping. default = 0
+
+=head2 is_wrap_neg(0|1)
+
+when this flag is turned on and C<is_hold> is turned off than C<at> argument < 0 will be wraped around envelope insted of folding. default = 0
+
+=head2 segments
+
+returns number of segments
+
+=head2 duration
+
+returns total envelope duration
+
+=head2 normalize_duration
+
+scale segment durations, so total duration becomes 1
+
+=head2 def
+
+returns current envelope definition (see C<new> method)
+
+=head2 levels(@new_levels)
+
+get/set envelope levels, if setting than provided list must have equal length to levels specified in initial definition (i.e. C<segments + 1>) 
+
+=head2 level($pos, [$level])
+
+get/set level at position
+
+=head2 durs([@new_durs])
+
+same as C<levels>, but get/sets durations for segments
+
+=head2 dur($pos, [$level])
+
+get/set dur at position
+
+=head2 curves([@new_curves])
+
+same as durs, but for curves
+
+=head2 curve($pos, [$level])
+
+get/set curvative at position
+
+=head2 border_level([$begin,$end])
+
+should be in range [0,1], can be array ref or single value for equal levels at begin/end of envelope
+
+this will work only when passed to constructor to create random envelope, e.g.
+
+   Math::SegmentedEnvelope->new(border_level => [0.5,0.2])
+
+=head1 FUNCTIONS
+
+=over
+
+=item env(constructor params)
+
+handy function which will construct object from passed params, e.g.
+
+   use Math::SegmentedEnvelope 'env';
+   my @arr = map { env } 0..9; # @arr now contains 10 random envelope objects
+
+alternatively you can use modules such as L<aliased>, L<as>
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item Plot
+
+   use PDL::Graphics::Prima::Simple;
+   use Math::SegmentedEnvelope;
+   my $e = Math::SegmentedEnvelope->new(is_morph => 1);
+   my $t = $e->table(4096);
+   line_plot($t);
+   
+=item Interpolate
+
+   use PDL;
+   interpolate(rand(4095), sequence(4096), pdl($t)); # interpolate at random position 
+
+=item Animation
+
+   use AnyEvent; # and/or Coro
+   my $e = Math::SegmentedEnvelope->new(is_morph => 1);
+   my $v = 0; # some property
+   my $w = AE::timer(0, 1/60, sub { # refresh $v with 60Hz rate
+        state $s = $e->static; # get static evaluator
+        state $started = AE::now;
+        $v = $s->(AE::now - $started); # or $e->at(..) if $e can be altered somewhere
+   });
+   my $k = AE::timer(10, 0, sub { undef $w }); # kill previous timer after 10secs
+   my $i = AE::idle(sub { ... }); # animate $v using OpenGL, SDL and etc..
+   AE::cv->recv;
+
+
+=item visual representation of arbitrary definition
+
+      Math::SegmentedEnvelope->new([[0,1,0.5,0],[0.5,0.5,1],[-3,1/3,4]], is_morph => 1)
+
+=begin HTML
+ 
+<p><img src="http://i.imgur.com/Dsqaq.png" width="478" height="263" alt="envelope example" /></p>
+ 
+=end HTML
+
+=back
+
+=head1 SUPPORT
+
+=over
+
+=item * GitHub
+ 
+L<http://github.com/vividsnow/Math-SegmentedEnvelope>
+ 
+=item * Search MetaCPAN
+ 
+L<https://metacpan.org/module/Math::SegmentedEnvelope>
+ 
+=back
+ 
+=head1 ACKNOWLEDGEMENTS
+ 
+L<SuperCollider|https://supercollider.sourceforge.net>, L<Moo>
+ 
+=head1 AUTHOR
+ 
+Yegor Korablev <egor@cpan.org>
+ 
+=head1 LICENSE
+ 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+ 
+=head1 SEE ALSO
+ 
+L<PDL>, L<Math::Fractal::Noisemaker>, L<Math::NumSeq>, L<Math::PlanePath>, L<OpenGL>, L<SDL>, L<AnyEvent>
+
+=head1 TODO
+
+blending,stacking,duration scaling,delaying,inverting and some common predefined envelopes
+more docs,tests and examples
+ 
+=cut

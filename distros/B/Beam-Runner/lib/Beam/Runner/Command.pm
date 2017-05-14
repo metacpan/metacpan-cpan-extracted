@@ -1,5 +1,5 @@
 package Beam::Runner::Command;
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 # ABSTRACT: Main command handler delegating to individual commands
 
 #pod =head1 SYNOPSIS
@@ -40,7 +40,7 @@ Beam::Runner::Command - Main command handler delegating to individual commands
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

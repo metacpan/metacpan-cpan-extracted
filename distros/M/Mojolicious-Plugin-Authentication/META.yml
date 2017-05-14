@@ -20,15 +20,26 @@ name: Mojolicious-Plugin-Authentication
 provides:
   Mojolicious::Plugin::Authentication:
     file: lib/Mojolicious/Plugin/Authentication.pm
-    version: '1.31'
+    version: '1.32'
 requires:
   Mojo::Base: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/benvanstaveren/Mojolicious-Plugin-Authentication/issues
-  homepage: http://search.cpan.org/dist/Mojolicious-Plugin-Authentication/
+  bugtracker: https://gitlab.com/benvanstaveren/Mojolicious-Plugin-Authentication/issues
   repository: git://github.com/benvanstaveren/Mojolicious-Plugin-Authentication.git
-version: '1.31'
+version: '1.32'
+x_contributors:
+  - 'Carlos Ramos <carragom@gmail.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Doug Bell <preaction@cpan.org>'
+  - 'Edward Wildgoose <cpan@wildgooses.com>'
+  - 'Hernan Lopes <hernan@cpan.org>'
+  - 'Jose Joaquin Atria <jjatria@cpan.org>'
+  - 'Karpich Dmitry <meettya@cpan.org>'
+  - 'Kartik Thakore <kthakore@cpan.org>'
+  - 'Mirko Westermeier <mirko@westermeier.de>'
+  - 'Roman F. <romanf@cpan.org>'
+  - 'Terrence Brannon <tbone@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

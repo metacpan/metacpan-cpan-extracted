@@ -1,0 +1,7 @@
+Quizzer program itself and all the test set distributed along with the
+program, are copyright (C) 2002 Stefano Corsi <ippo@madeinlinux.com>.
+
+All .pm modules are derived from the perl modules that were originally 
+written by Joey Hess <joey@kitenet.net> for his debconf program. 
+
+Everything is distributed under the terms of the GPL v2 license.

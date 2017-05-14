@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Simple;
 use MIME::Base64;
 use SOAP::Lite;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.9.1';
 our $initDone;
 
 BEGIN {

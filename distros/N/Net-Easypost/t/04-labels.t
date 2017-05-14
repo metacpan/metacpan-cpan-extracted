@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Net::Easypost;
+use Net::Easypost::CustomsInfo;
+use Net::Easypost::CustomsItem;
 use Net::Easypost::Label;
 use Net::Easypost::Shipment;
 use Test::Exception;
@@ -85,19 +87,39 @@ subtest 'LabelSave' => sub {
       weight => 10.0,
    );
 
-   my $shipment = Net::Easypost::Shipment->new(
-      to_address   => $to,
-      from_address => $from,
-      parcel       => $parcel,
+   my $customs_info = Net::Easypost::CustomsInfo->new(
+       customs_signer   => 'Steve Brule',
+       contents_type    => 'merchandise',
+       restriction_type => 'none',
+       customs_certify  => 1,
+       eel_ppc          => 'NOEEI 30.37(a)',
+       customs_items => [
+	   Net::Easypost::CustomsItem->new(
+	       code             => '111111',
+	       description	=> 'T-Shirt',
+	       quantity		=> 1,
+	       weight		=> 5,
+	       value		=> 10,
+	       hs_tariff_number => '123456',
+	       origin_country	=> 'US',
+	   )
+       ]
    );
 
-   my $ezpost = Net::Easypost->new( 
+   my $shipment = Net::Easypost::Shipment->new(
+       to_address   => $to,
+       from_address => $from,
+       parcel       => $parcel,
+       customs_info => $customs_info,
+   );
+
+   my $ezpost = Net::Easypost->new(
       access_code => 'Ao0vbSp2P0cbEhQd8HjEZQ'
    );
 
    my $label = $ezpost->buy_label($shipment, ('rate' => 'lowest'));
-   lives_ok { 
-      $label->save; 
+   lives_ok {
+      $label->save;
    } 'Saving a label lives ok';
 
    ok(-e $label->filename, 'Label image written correctly');

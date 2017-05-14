@@ -7,7 +7,7 @@ use parent 'WiringPi::API';
 
 use RPi::WiringPi::Constant qw(:all);
 
-our $VERSION = '2.3612';
+our $VERSION = '2.3613';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;

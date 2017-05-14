@@ -1,5 +1,9 @@
 Revision history for App::FatPacker::Simple
 
+0.08  2017-05-10 18:22:15 CEST
+
+    - Allow *.pl files to be fatpacked (#8 ccakes)
+
 0.07  2016-02-27 20:23:06 JST
 
     - Introduce --exclude-strip option (#5, #7 by glensc)

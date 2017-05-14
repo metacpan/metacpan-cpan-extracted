@@ -1,0 +1,2685 @@
+#!/usr/bin/perl -w
+
+# this script create perl XS files from qt4 headers
+
+
+# problems & todo:
+# ? operator= and operator[]
+# todo qpair
+# todo use std::string
+# todo strint(xxx, ...)
+# todo use C lvalue (  int &fn(); )
+# what do with QWidget in QtCore ? error ?
+# QMetaType ???
+
+
+
+# output internal info
+my $print_def = '';
+my $prenormalize = '';
+my $pars_param2 = '';
+my $add_out = 0;
+
+
+print "\n=====================================================================\n";
+
+our %redefine; # create list for __ to ::
+our %std_type;
+our %classes;
+our %complex_type;
+#our %typemaps;
+our %defined;
+our %replaces; # for typedef
+
+
+our $qtmaj = 4;
+our $qtmin = 2;
+{
+	open FF, "grep QT_VERSION_STR $prefix/QtCore/qglobal.h |" or die "Can not open QtCore/qglobal.h\n";
+	my $vv = <FF>;
+	chomp($vv);
+	if ( $vv =~ /QT_VERSION_STR +"(\d+)\.(\d+)\.(\d+)"/ ) {
+	print "found: $1 $2 $3\n";
+		die "Need Qt >= 4.2.0\n" unless $qtmaj == $1 and $qtmin <= $2;
+		$qtmaj = $1;
+		$qtmin = $2;
+	}
+	else {
+		die "Can not check QT_VERSION\n";
+	}
+	close FF;
+}
+print "found Qt ver = $qtmaj $qtmin\n";
+
+
+require 'create_qtpm' if $pkgs eq 'QtCore';
+require 'module_list';
+
+
+open TM, ">typemap";
+print TM "TYPEMAP\n";
+
+
+if ( $pkgs eq 'QtCore' ) {
+	$defined{'__cplusplus'} = 1;
+	if ( $ENV{'HOSTTYPE'} eq 'i386' ) {
+		$defined{'__i386__'} = 1;
+	}
+	elsif ( $ENV{'HOSTTYPE'} eq 'x86_64' ) {
+		$defined{'__x86_64__'} = 1;
+	}
+	$defined{'__linux__'} = 1;
+	$defined{'__linux'} = 1;
+	open FF, "gcc --version | grep GCC |";
+	my $gcc_ver = <FF>;
+	close FF;
+	chomp($gcc_ver);
+	my ($gvmaj, $gvmin, $gvp) = (4, 0, 0);
+	if ( $gcc_ver =~ /\(GCC\) *(\d+)\.(\d+)\.(\d+) / ) {
+		($gvmaj, $gvmin, $gvp) = ($1, $2, $3);
+	}
+	$defined{'__GNUC__'} = 1;
+	if ( $gvmaj == 2 ) {
+		$defined{'__GNUC__ == 2'} = 1;
+	}
+	elsif ( $gvmaj == 3 ) {
+		$defined{'__GNUC__ == 3'} = 1;
+		$defined{'__GNUC__ - 0 == 3'} = 1;
+	}
+	elsif ( $gvmaj == 4 ) {
+		$defined{'__GNUC__ - 0 > 3'} = 1;
+		$defined{'__GNUC__ == 4'} = 1;
+	}
+	elsif ( $gvmaj > 4 ) { # ???
+	$defined{'__GNUC__ > 4'} = 1;
+	}
+	$defined{'__GNUC_MINOR__ >= 1'} = 1 if $gvmin >= 1;
+	$defined{'__GNUC_MINOR__ - 0 >= 2'} =1 if $gvmin >= 2;
+	$defined{'__GNUC_MINOR__ < 3'} = 1 if $gvmin < 3;
+	$defined{'__GNUC_MINOR__ <= 7'} = 1 if $gvmin <= 7;
+	$defined{'__GNUC_MINOR__ <= 95'} = 1 if $gvmin <= 95;
+	$defined{'QT_NO_DEBUG'} = 1;
+	#$defined{'Q_CC_GNU'} = 1;
+	#$defined{'Q_OS_LINUX'} = 1;
+	#$defined{'Q_OS_UNIX'} = 1;
+	$defined{'QT_LSB'} = 1;
+	#$defined{'QT3_SUPPORT'} = 0;
+	$defined{'QT_NO_MEMBER_TEMPLATES'} = 1;
+	$defined{'__INSURE__'} = 1; # ???
+	#$defined{'Q_WS_X11'} = 1;
+	$defined{'zzZ'} = 1; # for parse #if
+
+
+	$std_type{'char'} = 1;		#$typemaps{'char'} = 'T_CHAR';
+	$std_type{'char *'} = 1;		#$typemaps{'char *'} = 'T_PV';
+	$std_type{'char **'} = 1;
+	print TM "char **\tT_PACKED\n";
+	$std_type{'uchar'} = 1;		#$typemaps{'uchar'} = 'T_U_CHAR';
+	printf TM "%s\tT_U_CHAR\n", 'uchar';
+	#$std_type{'wchar_t *'}++;	$typemaps{'wchar_t'} = 'T_WCHAR';
+
+	$std_type{'short'} = 2;		#$typemaps{'short'} = 'T_SHORT';
+	$std_type{'int'} = 2;		#$typemaps{'int'} = 'T_INT';
+	$std_type{'long'} = 2;		#$typemaps{'long'} = 'T_LONG';
+	$std_type{'qint64'} = 2;	#$typemaps{'qint64'} = 'T_LONG';
+	printf TM "%s\tT_LONG\n", 'qint64';
+
+	$std_type{'ushort'} = 3;		#$typemaps{'ushort'} = 'T_U_SHORT';
+	printf TM "%s\tT_U_SHORT\n", 'ushort';
+	$std_type{'uint'} = 3;			#$typemaps{'uint'} = 'T_U_INT';
+	printf TM "%s\tT_U_INT\n", 'uint';
+	$std_type{'ulong'} = 3;			#$typemaps{'ulong'} = 'T_U_LONG';
+	printf TM "%s\tT_U_LONG\n", 'ulong';
+	$std_type{'quint64'} = 3;		#$typemaps{'quint64'} = 'T_U_LONG';
+	printf TM "%s\tT_U_LONG\n", 'quint64';
+
+	$std_type{'float'} = 4;			#$typemaps{'float'} = 'T_FLOAT';
+	$std_type{'double'} = 4;		#$typemaps{'double'} = 'T_DOUBLE';
+
+	$std_type{'void'} = 5;
+	$std_type{'void *'} = 5;
+	$std_type{'FILE *'} = 5;		#$typemaps{'FILE *'} = 'T_STDIO';
+
+	$std_type{'bool'} = 6;		#$typemaps{'bool'} = 'T_BOOL';
+
+	#	$std_type{enum} = 7
+
+	$classes{'QEventPrivate'}{base} = '';
+	$classes{'QEventPrivate'}{module} = '';
+	$classes{'QEventPrivate'}{fnc} = 0;
+	$classes{'QEventPrivate'}{dest} = 0;
+	$classes{'QEventPrivate'}{obj} = 0;
+	print TM "QEventPrivate *\tO_OBJECT\n";
+
+}
+elsif ( $pkgs eq 'QtGui' ) {
+	open FF, "std_type.core" or die "Can not open std_type: $!\n";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split ';', $str_h;
+		$std_type{$strs[0]} = $strs[1];
+	}
+	close FF;
+
+	open FF, "classes.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split ';', $str_h;
+		$classes{$strs[0]}{module} = $strs[1];
+		$classes{$strs[0]}{obj} = $strs[2];
+		$classes{$strs[0]}{base} = $strs[3];
+		$classes{$strs[0]}{dest} = $strs[4];
+		$classes{$strs[0]}{abst} = $strs[5];
+	}
+	close FF;
+
+	open FF, "classes_enum.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split /;/, $str_h;
+		$classes{$strs[0]}{enums}{$strs[1]}{$strs[2]} = $strs[3];
+	}
+	close FF;
+
+	open FF, "classes_sin_enum.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split /;/, $str_h;
+		$classes{$strs[0]}{sin_enums}{$strs[1]} = $strs[2];
+	}
+	close FF;
+
+	open FF, "subclasses.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split /;/, $str_h;
+		$classes{$strs[0]}{subclass}{$strs[1]} = $strs[2];
+	}
+	close FF;
+
+	open FF, "classes_fn_ptr.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split /;/, $str_h;
+		$classes{$strs[0]}{fn_ptr}{$strs[1]} = $strs[2];
+	}
+	close FF;
+
+	open FF, "complex_type.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split ';', $str_h;
+		$complex_type{$strs[0]} = $strs[1];
+	}
+	close FF;
+
+	open FF, "defined.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split ';', $str_h;
+		$defined{$strs[0]} = $strs[1];
+	}
+	close FF;
+
+	open FF, "redefine.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+	my @strs = split ';', $str_h;
+	$redefine{$strs[0]}++;
+	}
+	close FF;
+
+	open FF, "replaces.core";
+	while ( my $str_h = <FF> ) {
+		chomp $str_h;
+		my @strs = split ';', $str_h;
+		$replaces{$strs[0]} = $strs[1];
+	}
+	close FF;
+
+
+#    $classes{'_XDisplay'}{base} = '';
+#    $classes{'_XDisplay'}{module} = '';
+#    $classes{'_XDisplay'}{fnc} = 0;
+#    $classes{'_XDisplay'}{dest} = 0;
+#    $classes{'_XDisplay'}{obj} = 0;
+#    print TM "_XDisplay *\tO_OBJECT\n";
+#    $classes{'_XGC'}{base} = '';
+#    $classes{'_XGC'}{module} = '';
+#    $classes{'_XGC'}{fnc} = 0;
+#    $classes{'_XGC'}{dest} = 0;
+#    $classes{'_XGC'}{obj} = 0;
+#    print TM "_XGC *\tO_OBJECT\n";
+#    $classes{'_XRegion'}{base} = '';
+#    $classes{'_XRegion'}{module} = '';
+#    $classes{'_XRegion'}{fnc} = 0;
+#    $classes{'_XRegion'}{dest} = 0;
+#    $classes{'_XRegion'}{obj} = 0;
+#    print TM "_XRegion *\tO_OBJECT\n";
+#    $std_type{'_XEvent'}++ ; # todo
+#    print TM "_XEvent *\tT_PTRREF\n";
+	$defined{'Q_WS_X11'} = 0; # todo
+
+
+	$classes{'QTextEngine'}{base} = '';
+	$classes{'QTextEngine'}{module} = '';
+	$classes{'QTextEngine'}{fnc} = 0;
+	$classes{'QTextEngine'}{dest} = 0;
+	$classes{'QTextEngine'}{obj} = 0;
+	print TM "QTextEngine *\tO_OBJECT\n";
+	$classes{'QTextDocumentPrivate'}{base} = '';
+	$classes{'QTextDocumentPrivate'}{module} = '';
+	$classes{'QTextDocumentPrivate'}{fnc} = 0;
+	$classes{'QTextDocumentPrivate'}{dest} = 0;
+	$classes{'QTextDocumentPrivate'}{obj} = 0;
+	print TM "QTextDocumentPrivate *\tO_OBJECT\n";
+	$classes{'QTextCursorPrivate'}{base} = '';
+	$classes{'QTextCursorPrivate'}{module} = '';
+	$classes{'QTextCursorPrivate'}{fnc} = 0;
+	$classes{'QTextCursorPrivate'}{dest} = 0;
+	$classes{'QTextCursorPrivate'}{obj} = 0;
+	print TM "QTextCursorPrivate *\tO_OBJECT\n";
+	$classes{'QWindowSurface'}{base} = '';
+	$classes{'QWindowSurface'}{module} = '';
+	$classes{'QWindowSurface'}{fnc} = 0;
+	$classes{'QWindowSurface'}{dest} = 0;
+	$classes{'QWindowSurface'}{obj} = 0;
+	print TM "QWindowSurface *\tO_OBJECT\n";
+
+}
+
+
+create_qt_pm() if $pkgs eq 'QtCore';
+
+
+my (%operators1, %operators2, %operators3, %operators4, %ops);
+$operators1{'operator=='} = 'op_eq';         $ops{'op_eq'} = '==';
+$operators1{'operator!='} = 'op_ne';         $ops{'op_ne'} = '!=';
+$operators1{'operator<'} = 'op_lt';          $ops{'op_lt'} = '<';
+$operators1{'operator<='} = 'op_le';         $ops{'op_le'} = '<=';
+$operators1{'operator>'} = 'op_gt';          $ops{'op_gt'} = '>';
+$operators1{'operator>='} = 'op_ge';         $ops{'op_ge'} = '>=';
+$operators2{'operator+'} = 'op_plus';        $ops{'op_plus'} = '+';
+$operators2{'operator-'} = 'op_minus';       $ops{'op_minus'} = '-';
+$operators2{'operator*'} = 'op_multi';       $ops{'op_multi'} = '*';
+$operators2{'operator/'} = 'op_div';         $ops{'op_div'} = '/';
+$operators2{'operator&'} = 'op_and';         $ops{'op_and'} = '&';
+$operators2{'operator|'} = 'op_or';          $ops{'op_or'} = '|';
+$operators2{'operator^'} = 'op_xor';         $ops{'op_xor'} = '^';
+$operators3{'operator+='} = 'op_plus_eq';    $ops{'op_plus_eq'} = '+=';
+$operators3{'operator-='} = 'op_minus_eq';   $ops{'op_minus_eq'} = '-=';
+$operators3{'operator*='} = 'op_multi_eq';   $ops{'op_multi_eq'} = '*=';
+$operators3{'operator/='} = 'op_div_eq';     $ops{'op_div_eq'} = '/=';
+$operators3{'operator&='} = 'op_and_eq';     $ops{'op_and_eq'} = '&=';
+$operators3{'operator|='} = 'op_or_eq';      $ops{'op_or_eq'} = '|=';
+$operators3{'operator^='} = 'op_xor_eq';     $ops{'op_xor'} = '^=';
+$operators3{'operator<<'} = 'op_in';         $ops{'op_in'} = '<<';
+$operators3{'operator>>'} = 'op_out';        $ops{'op_out'} = '>>';
+$operators4{'operator='} = 'copy_of_class';
+$operators4{'operator[]'} = 'element';
+$operators4{'operator~'} = 'dest';
+$operators4{'operator!'} = 'op_not';
+
+
+
+
+my $inc_perl = <<_INCL_PERL_;
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#ifdef __cplusplus
+}
+#endif
+
+_INCL_PERL_
+
+my $undef_for_stl = <<_UNDEF_;
+
+#ifdef do_open
+#undef do_open
+#endif
+#ifdef do_close
+#undef do_close
+#endif
+
+_UNDEF_
+
+
+
+our ( @modules, %modules );
+Core_module_list() if $pkgs eq 'QtCore';
+Gui_module_list() if $pkgs eq 'QtGui';
+
+
+#my $pk = "Qt::";
+#my $pm_path = "Qt/";
+
+
+foreach my $module ( @modules ) {
+	print "== $module ==\n";
+	my $incl = $prefix.'/';
+	#my $incl = '/usr/include/QtCore/';
+	$modules{$module} =~ /(?:^|:)(Qt(?:Core|Gui)\/[0-9a-z.]+)$/;
+	open FH, $incl.$1 or die "Can not open for read file ".$incl.$1."\n";
+	my $c = 0;          # class counter
+	my $int_c = 0;      #internal class counter
+	my $int_c_flag = 0; # if > 0 => now in internal class
+	open FXS, ">$module.xs" or die "Can not create file $module.xs\n";
+	open FPM, '>lib/Qt/'.$module.'.pm' or die "Can not create file Qt/".$module."\n";
+	my $comment = 1;
+	my %curr_defines;
+	my @ifdef;
+	$ifdef[0] = "xxx";
+	my $level_def = $#ifdef;
+	my $visible_def = 1;
+	my $open_class = 0;
+	my @curr_class;
+	my $public = 0;
+	my @class_func;
+	#my @class_enums;
+	#my %enums_body;
+	my @func_counts;
+	my %func_types; # save types for search doubles
+	my $to_next = '';
+	my $frnd = 0;
+	my $static_fn = 0;
+	my $const_fn = 0;
+	my $virt = 0;
+	my @plugs;
+	my $end_xs = '';
+
+	print FXS $inc_perl;
+	print FXS $undef_for_stl;
+	print FXS "#define QT3_SUPPORT\n" if $defined{'QT3_SUPPORT'};
+	print FXS "#define QT_NO_MEMBER_TEMPLATES\n" if $defined{'QT_NO_MEMBER_TEMPLATES'};
+	print FXS "#define qdoc\n" if $module eq 'QObject' and $defined{'qdoc'};
+	{
+		my @hs = split ':', $modules{$module};
+		for ( @hs ) {
+			print FXS "#include <".$_.">\n";
+		}
+	}
+	print FXS "\n#include \"redef.h\"\n";
+	print FXS "#include \"common.h\"\n\n";
+
+	while ( my $str_h = <FH> ) {
+		chomp $str_h;
+		# comments
+		$str_h = $1 if $str_h =~ /^(.+)\/\/.*/;
+		$str_h =~ s/\/\*.+\*\// /g;
+		$comment = 1 if $str_h =~ /^ *\/\*/;
+		if ( $str_h =~ /\*\// ) {
+			$comment = 0;
+			$str_h =~ s/^.*\*\// /;
+		}
+		next if $comment;
+		next if $str_h =~ /^ *\/\//;
+		next if $str_h =~ /^\s*$/;
+		$str_h =~ s/\s+$//;
+		$str_h =~ s/ +/ /g;
+
+		if ( $to_next and $to_next =~ /^#/ ) {
+			$str_h = $to_next.' '.$str_h;
+			$to_next = '';
+		}
+		print "1: '$str_h'\n" if $module eq $print_def;
+
+		# preprocessor
+		if ( $str_h =~ /^#/ and $str_h =~ /\\$/ ) {
+			chop $str_h;
+			$to_next = $str_h;
+			next;
+		}
+		$str_h =~ s/\s+/ /g;
+		$str_h =~ s/^# */#/g;
+		$str_h =~ s/#ifdef ([0-9A-Za-z_]+)/#if defined($1)/;
+		$str_h =~ s/#ifndef ([0-9A-Za-z_]+)/#if !defined($1)/;
+		print "2: '$str_h'\n" if $module eq $print_def;
+		if ( $str_h =~ /^#if (.+)$/ or $str_h =~ /^#elif (.+)$/ ) {
+			my $qq = $1;
+			my $els_def = 0;
+			$els_def = 1 if $str_h =~ /^#elif/;
+			print "#??? els = $els_def, level_def = $level_def, visible_def = $visible_def\n" if $module eq $print_def;
+			if ( not $els_def and ( $level_def < $#ifdef or $visible_def <= 0 ) ) {
+				push @ifdef, $qq;
+				next;
+			}
+			elsif ( $els_def and ( $level_def < $#ifdef or $visible_def < 0 ) ) {
+				next;
+			}
+			elsif ( $els_def and  $visible_def > 0 ) {
+				$visible_def = -1;
+				next;
+			}
+			if ( $module eq $print_def ) {
+				if ( $els_def ) {
+					print "#elsif"; }
+				else {
+					print "#if"; }
+				print ": '$qq'\n";
+			}
+			my $rr = $qq;
+			$rr =~ s/defined\( ?([0-9A-Za-z_]+) ?\)/defined[$1]/g;
+			$rr = '('.$rr.')';
+			print "###replaced $rr\n" if $module eq $print_def;
+			while ( $rr =~ /\(([^()]+)\)/ ) {
+				my $xx = 0;
+				my $tt = $1;
+				$tt =~ s/^ +//;
+				$tt =~ s/ +$//;
+				print "  tt = '$tt'\n" if $module eq $print_def;
+				for my $ww ( split / \|\| /, $tt ) {
+					print "    ww = '$ww'\n" if $module eq $print_def;
+					my $yy = 1;
+					for my $ee ( split / && /, $ww ) {
+						print "      ee = '$ee'\n" if $module eq $print_def;
+						if ( $ee =~ /^defined\[([0-9A-Za-z_]+)\]/ ) {
+							if ( $defined{$1} ) {
+								$yy = 1; }
+							else {
+								$yy = 0; }
+						}
+						elsif ( $ee =~ /^!defined\[([0-9A-Za-z_]+)\]/ ) {
+							if ( $defined{$1} ) {
+								$yy = 0; }
+							else {
+								$yy = 1; }
+						}
+						else {
+							if ( $defined{$ee} ) {
+								$yy = 1; }
+							else {
+								$yy = 0; }
+						}
+						last unless $yy;
+					}
+					$xx = 1 if $yy == 1;
+					last if $xx;
+				}
+				if ( $xx ) {
+					$rr =~ s/\([^()]+\)/defined[zzZ]/; }
+				else {
+					$rr =~ s/\([^()]+\)/!defined[zzZ]/; }
+			}
+			my $zz = 1;
+			$zz = 0 if $rr =~ /^!/;
+			if ( $els_def ) {
+				$ifdef[$#ifdef] = $qq;
+			}
+			else {
+				push @ifdef, $qq;
+				$level_def = $#ifdef;
+			}
+			if ( $zz ) {
+				$visible_def = 1 ;
+				print "## + $qq \n" if $module eq $print_def;
+			}
+			else {
+				$visible_def = 0;
+				print "## X $qq\n" if $module eq $print_def;
+			}
+			print "### v = $visible_def\n" if $module eq $print_def;
+			next;
+		}
+		if ( $str_h =~ /^#else/ ) {
+			if ( $level_def < $#ifdef ) {
+				next;
+			}
+			elsif ( $visible_def > 0 ) {
+				$visible_def = -1;
+			}
+			elsif ( $visible_def == 0 ) {
+				$visible_def = 1;
+			}
+			print "## else $ifdef[$#ifdef]\n" if $module eq $print_def;
+			print "### v = $visible_def\n" if $module eq $print_def;
+			next;
+		}
+		if ( $str_h =~ /^#endif/ ) {
+			my $def = '';
+			if ( $level_def < $#ifdef ) {
+				$def = pop @ifdef;
+				next;
+			}
+			else {
+				$def = pop @ifdef;
+				$visible_def = 1;
+				$level_def = $#ifdef;
+			}
+			print "## end $def\n" if $module eq $print_def;
+			next;
+		}
+		next if $level_def < $#ifdef or $visible_def <= 0;
+		if ( $str_h =~ /^#define ([0-9A-Za-z_]+)/ ) {
+			$defined{$1} = 1;
+			#print "## def $1\n";
+		}
+		$defined{$1} = 0 if $str_h =~ /^#undef ([0-9A-Za-z_]+)/;
+		next if $str_h =~ /^#/; # pre
+
+		if ( $to_next ) {
+			$str_h = $to_next.' '.$str_h;
+			$to_next = '';
+		}
+		else {
+			$frnd = 0;
+			$static_fn = 0;
+			$const_fn = 0;
+			$virt = 0;
+		}
+		$str_h =~ s/,/, /g;
+		$str_h =~ s/ ,/,/g;
+		$str_h =~ s/ +/ /g;
+		$str_h =~ s/^ //;
+		next if $str_h =~ /wchar/i or $str_h =~ /wstring/i; # ???
+		next if $str_h =~ /QTSMF/; # todo
+		next if $str_h =~ /\bva_list\b/; # todo
+		next if $str_h =~ /std::string/; #todo
+		next if $pkgs eq 'QtCore' and ( $str_h =~ /iterator/i or $str_h =~ /reference/i ); # ???
+		next if $str_h =~ /QAbstractFileEngineHandler/; # ???
+		next if $str_h =~ /\.{3}/; # todo
+		next if $module eq 'QMetaObject' and $str_h =~ /Guard/; # todo
+		next if $module eq 'QObject' and $str_h =~ /QObjectData/; #todo
+		next if $pkgs eq 'QtCore' and $str_h =~ /QWidget.*; *$/; # error ?
+		next if $module eq 'QCoreApplication' and $str_h =~ /QPostEventList/; # not found QPostEventList
+		next if $module eq 'QString' and $str_h =~ /\bNull/;
+		next if $module eq 'QTemporaryFile' and $str_h =~ /OpenMode/; # conflict 2 'open()'
+		next if $str_h =~ /^ *friend +(class|struct)/;
+		next if $str_h =~ /^typedef/ and ( $str_h =~ /int8;/ or $str_h =~ /int16;/ or $str_h =~ /int32;/ or $str_h =~ /longlong;/ or $str_h =~ /long qint64;/ or $str_h =~ /qreal;/ or $str_h =~ /uchar;/ or $str_h =~ /ushort/ or $str_h =~ /uint/ or $str_h =~ /ulong/);
+		$str_h =~ s/unsigned char/uchar/g;
+		$str_h =~ s/unsigned int/uint/g;
+		$str_h =~ s/qint8/char/g;
+		$str_h =~ s/quint8/uchar/g;
+		$str_h =~ s/qint16/short/g;
+		$str_h =~ s/quint16/ushort/g;
+		$str_h =~ s/qint32/int/g;
+		$str_h =~ s/quint32/uint/g;
+		$str_h =~ s/qlonglong/qint64/g;
+		$str_h =~ s/qulonglong/quint64/g;
+		$str_h =~ s/\bsigned short/short/g;
+		$str_h =~ s/unsigned short/ushort/g;
+		$str_h =~ s/\bsigned int/int/g;
+		$str_h =~ s/unsigned int/uint/g;
+		$str_h =~ s/\bsigned long/long/g;
+		$str_h =~ s/unsigned long/ulong/g;
+		$str_h =~ s/qreal/double/g;
+		#if ( $defined{'Q_WS_X11'} ) { todo
+			$str_h =~ s/\bQt::HANDLE/ulong/g;
+			$str_h =~ s/\bWId\b/ulong/g;
+		#}
+		#else {
+		#	$str_h =~ s/\bQt::HANDLE/void */;
+		#}
+		$str_h =~ s/(QList|QVector|QHash|QMap|QPair) +</$1</;
+		for my $rpl ( keys %replaces ) {
+			while ( $str_h =~ s/\b$rpl\b/$replaces{$rpl}/g ) {
+				#print " repl $rpl\n";
+			}
+		}
+		if ( $str_h =~ /^typedef/ ) {
+			#print " ttt '$str_h'\n";
+			my $unkn = 1;
+			if ( $str_h =~ /^typedef (?:(?:struct|union) )?([0-9A-Za-z_]+) (\*?[0-9A-Za-z_]+);$/ and not $open_class ) {
+				my ($qq, $ww) = ($1, $2);
+				my $ptr = 0;
+				if ( $ww =~ /^\*/ ) {
+					$ptr = 1;
+					$ww =~ s/^\*//;
+				}
+				#print " in typedef = '$qq'\n";
+				if ( $std_type{$qq} or $classes{$qq} ) {
+					$replaces{$ww} = $qq;
+					$replaces{$ww} .= ' *' if $ptr;
+					$unkn = 0;
+				}
+			}
+			elsif ( $str_h =~ /^typedef (Q[A-Za-z]+<[A-Za-z_]+(?: ?\*)?>) ([0-9A-Za-z_]+);$/ ) {
+				my ($qq, $ww) = ($1, $2);
+				if ( $qq =~ /<([A-Za-z]+) ?\*?>/ and ($std_type{$1} or $classes{$1} ) ) {
+					$replaces{$ww} = $qq;
+		    			$unkn = 0;
+				}
+			}
+			elsif ( $str_h =~ /^typedef (Q[A-Za-z]+<[A-Za-z_]+, ?[A-Za-z_]+(?: ?\*)?>) ([0-9A-Za-z_]+);$/ ) { #  and not $open_class
+				my ($qq, $ww) = ($1, $2);
+				#print " in typedef = '$qq'\n";
+				if ( $qq =~ /<([A-Za-z_]+), ?([A-Za-z_]+)(?: ?\*)?>/ and ($std_type{$1} or $classes{$1} ) and ($std_type{$2} or $classes{$2} ) ) {
+					$replaces{$ww} = $qq;
+					$unkn = 0;
+				}
+			}
+			elsif ( $str_h =~ /^typedef [A-Za-z]+ ?\*? ?\(\*([A-Za-z_]+)\)\(.*\);$/ ) { # fn_ptr
+				my $fn = $1;
+				if ( $open_class ) {
+					$redefine{'#define '.$curr_class[$c].'__'.$fn.' '.$curr_class[$c].'::'.$fn}++;
+					$classes{$curr_class[$c]}{fn_ptr}{$fn}++;
+					$fn = $curr_class[$c].'::'.$fn;
+				}
+				$std_type{$fn}++;
+				print TM "$fn\tT_PTRREF\n";
+				#print "  fn ptr: '$fn'\n";
+				$unkn = 0;
+			}
+			elsif (  $str_h =~ /^typedef [A-Za-z]+ \(([A-Za-z]+)::\*([A-Za-z_]+)\)\(.+\);$/  ) {  # fn_ptr
+				my ($cl, $fn) = ($1, $2);
+				$std_type{$fn}++;
+				print TM "$fn\tT_PTRREF\n";
+				#print "  fn ptr: '$fn'\n";
+				$unkn = 0;
+			}
+			if ( $unkn ) {
+				print "??? td: '$str_h'\n";
+			}
+			next;
+		}
+		next if $str_h =~ /Q_DUMMY_COMPARISON_OPERATOR/; # #ifndef Q_FULL_TEMPLATE_INSTANTIATION in qglobal.h
+		$str_h =~ s/Q_CORE_EXPORT //;
+		$str_h =~ s/Q_GUI_EXPORT //;
+		if ( $str_h eq 'template <typename T>' or $str_h eq 'template<typename Enum>' or $str_h eq 'template <class T>' ) {
+			$to_next = $str_h;
+			next;
+		}
+		next if $str_h =~ /_XEvent/; # todo
+		next if $str_h =~ /_XDisplay/; # todo
+		print "3: '$str_h'\n" if $module eq $prenormalize;
+		if ( $str_h =~ /^class ([0-9A-Za-z_]+);$/ ) {
+			unless ( $classes{$1} ) {
+				$classes{$1}{base} = '';
+				$classes{$1}{module} = '';
+				$classes{$1}{fnc} = 0;
+				$classes{$1}{dest} = 0;
+				$classes{$1}{obj} = 0;
+			}
+			next;
+		}
+		if ( $str_h =~ /^(class|struct) ([0-9A-Za-z]+)(?: ?: public ([0-9A-Za-z_<>]+)(?:, public ([0-9A-Za-z_<>]+))?)? ?\{$/ ) {
+			next if $2 eq 'QIconEngineFactoryInterfaceV2' or $2 eq 'QIconEnginePluginV2'; # in h-file: "Qt 5: remove version 2"
+			my $tp = $1; #type
+			my $cl = $2; #class
+			my $bs = ''; #"Qt"; #base class
+			$bs = $3 if $3;
+			$bs .= ','.$4 if $4;
+			$bs = '' if $bs =~ /\</;
+			if ( not $open_class ) {
+				$c++;
+				$open_class = 1;
+				$curr_class[$c] = $cl;
+				printf TM "%s *\tO_OBJECT\n", "$cl";
+				undef $classes{$cl};
+				$classes{$cl}{module} = $module;
+				$classes{$cl}{obj} = 0;
+				$public = 0;
+				$public = 1 if $tp eq 'struct';
+				$classes{$cl}{base} = $bs;
+				$classes{$cl}{fnc} = 0; # function counter
+				$classes{$cl}{dest} = -1; # not found destructor
+				$classes{$cl}{abst} = ''; # abstract class
+				if ( $bs ) {
+					foreach my $bs0 ( split /,/, $bs ) {
+						$classes{$cl}{abst} .= $classes{$bs0}{abst} if $classes{$bs0}{abst};
+						if ( $classes{$cl}{prot_enum} ) {
+							$classes{$cl}{prot_enum} .= '+'.$classes{$bs0}{prot_enum}; }
+						else {
+							$classes{$cl}{prot_enum} = $classes{$bs0}{prot_enum};
+						}
+					}
+
+				}
+				$virt_class = 0;
+				print " = $cl =\n";
+			}
+			elsif ( $public ) { # internal class
+				$int_c++;
+				$redefine{'#define '.$curr_class[$c].'__'.$cl.' '.$curr_class[$c].'::'.$cl}++;
+				$classes{$curr_class[$c]}{subclass}{$cl}++;
+				my $fullcl = $curr_class[$c].'::'.$cl;
+				$c += $int_c;
+				$curr_class[$c] = $fullcl;
+				printf TM "%s *\tO_OBJECT\n", "$fullcl";
+				$int_c_flag++;
+				$public = 0;
+				$public = 1 if $tp eq 'struct';
+				undef $classes{$fullcl};
+				$classes{$fullcl}{module} = $module;
+				$classes{$fullcl}{base} = $bs;
+				$classes{$fullcl}{fnc} = 0;
+				$classes{$fullcl}{dest} = -1;
+				$classes{$fullcl}{abst} = ''; # abstract class
+				if ( $bs ) {
+					foreach my $bs0 ( split /,/, $bs ) {
+						$classes{$fullcl}{abst} .= $classes{$bs0}{abst} if $classes{$bs0}{abst};
+					}
+				}
+				print " = $fullcl =\n";
+			}
+			print " base: $bs\n"  if $module eq $prenormalize;
+			#print " open class: c = $c \n";
+			next;
+		}
+		if ( $str_h =~ /^(class|struct) (?:Q_CORE_EXPORT |Q_GUI_EXPORT )?([A-Za-z]+)(?: ?: public [A-Za-z_<>]+(?:, public [0-9A-Za-z_<>]+)?)?$/ ) {
+			$to_next = $str_h.' ';
+			next;
+		}
+		if ( $str_h =~ /^(class|struct) (?:Q_CORE_EXPORT |Q_GUI_EXPORT )?([A-Za-z]+)/ and not $str_h =~ /;$/ ) {
+			$to_next = $str_h.' ';
+			next;
+		}
+		if ( $str_h =~ /virtual / ) {
+			$virt = 1;
+			$str_h =~ s/virtual //;
+		}
+		if ( $virt and $str_h =~ /= 0;$/ ) {
+			$str_h =~ s/ ?= 0;$/;/;
+			$virt = -1;
+			#$classes{$curr_class[$c]}{abst} = 1;
+			$object_class = 0;
+			$virt_class = 1;
+			#$classes{$curr_class[$c]}{obj} = 0;
+		};
+		if ( $open_class and $str_h =~ /^public( Q_SLOTS)?:$/ ) {
+			$public = 1;
+			print "   open public\n" if $module eq $prenormalize;
+			next;
+		}
+		if ( $open_class and $str_h =~ /^(Q_SIGNALS|private( Q_SLOTS)?):$/ ) {
+			$public = 0;
+			print "   close public\n"  if $module eq $prenormalize;
+			next;
+		}
+		if ( $open_class and $str_h =~ /^protected( Q_SLOTS)?:$/ ) {
+			$public = -1;
+			print "   open protected\n"  if $module eq $prenormalize;
+			next;
+		}
+		if ( $open_class and not $public and $str_h =~ /\{/ ) {
+			my $opn = ( $str_h =~ tr/{/{/ );
+			my $clse = ( $str_h =~ tr/}/}/ );
+			if ( $opn != $clse ) {
+				$to_next = $str_h;
+				next;
+			};
+		}
+		if ( $open_class and $str_h =~ /^}(?: [A-Z_]+)?;$/ ) {
+			if ( $int_c_flag ) {
+				$int_c_flag--;
+				$c -= $int_c;
+				$public = 1;
+				#print " close class: c = $c \n";
+				next;
+			}
+			else {
+				while ( $int_c >= 0 ) {
+					my %counts;
+					$virt_class = 1 if $classes{$curr_class[$c]}{abst};
+					if ( $virt_class ) {
+						print "abstract class; fn: ".$classes{$curr_class[$c]}{abst}."\n" if $pars_param2 eq $module;
+						$object_class = 0;
+					}
+					if ( $object_class ) {
+						if ( $module eq 'QCoreApplication' or $module eq 'QApplication' ) {
+							print FXS "\nstatic int pargc;\nstatic char ** pargv;\n";
+						}
+						print FXS "\n\nclass Perl$curr_class[$c] : public $curr_class[$c]\n{\npublic:\n";
+						foreach my $cl ( @{$class_func[$c]} ) {
+							if ( not $cl->{type} ) {  # constructor
+								print FXS "    Perl".$cl->{name}."(const char *stringdata, const uint *data";
+								print FXS ", ".$cl->{orig_param} if $cl->{orig_param};
+								print FXS ");\n";
+							}
+						}
+						print FXS "private:\n" unless ( $classes{$curr_class[$c]}{dest} );
+						print FXS "    ~Perl".$curr_class[$c]."();\n\n";
+						print FXS "public:\n";
+						print FXS "    const QMetaObject staticMetaObject;\n";
+						print FXS "    virtual const QMetaObject *metaObject() const;\n";
+						print FXS "    virtual void *qt_metacast(const char *);\n";
+						print FXS "    virtual int qt_metacall(QMetaObject::Call, int, void **);\n\n";
+						print FXS "    const char *qt_meta_stringdata_Perl".$curr_class[$c].";\n";
+						print FXS "    const uint *qt_meta_data_Perl".$curr_class[$c].";\n";
+						print FXS "    void signls(int _id, void **_a);\n";
+						print FXS "    void slts(int _id, void **_a);\n//protected or virtual functions\n";
+						if ( $classes{$curr_class[$c]}{prot_enum} ) {
+							foreach my $enum ( split /\+/, $classes{$curr_class[$c]}{prot_enum} ) {
+								print FXS "    using ".$enum."; // enum\n";
+								if ( $enum =~ /[0-9A-Za-z]+::([0-9A-Za-z]+)/ ) {
+									$redefine{'#define Perl'.$curr_class[$c].'__'.$1.' Perl'.$curr_class[$c].'::'.$1}++;
+									$std_type{'Perl'.$curr_class[$c].'::'.$1} = 7;
+									printf TM "%s\tT_ENUM\n", "Perl$curr_class[$c]::$1";
+								}
+							}
+						}
+						my %func_counts;
+						foreach my $cl ( @{$class_func[$c]} ) {
+							if ( ( $cl->{protected} or $cl->{virt} ) and $cl->{type} ) {
+								#print FXS "    ";
+								if ( $cl->{virt} ) {
+									#print FXS "virtual " if $cl->{virt};
+									print FXS "    virtual $$cl{type}";
+									#print FXS $$cl{type};
+									print FXS "*" if $cl->{lnk} == 2 ;
+									print FXS "&" if $cl->{lnk} == 3 ;
+									print FXS " $$cl{orig_name}($$cl{orig_param})";
+									unless ( $cl->{virt} ) {
+										print FXS " { return $curr_class[$c]::$$cl{orig_name}(";
+										if ( $cl->{param} ) {
+											my @prm = split ',', $cl->{param};
+											my $j = 0;
+											for ( @prm ) {
+												if ( $j ) {
+													print FXS ', '; }
+												else {
+													$j = 1;
+												}
+												/([0-9A-Za-z_]+)( ?=.+)?$/;
+												print FXS "$1";
+											}
+										}
+										print FXS "); }\n";
+									}
+									else {
+										print FXS ";\n";
+									}
+								}
+								else {
+									print FXS "    using ".$curr_class[$c]."::".$cl->{orig_name}.";\n" unless $func_counts{$cl->{orig_name}};
+									$func_counts{$cl->{orig_name}}++;
+								}
+							}
+						}
+						print FXS "};\n\n";
+						print FXS "namespace PerlQt4 {\n";
+						print FXS "    const QMetaObject get", $curr_class[$c], "MetaObject(const char *stringdata, const uint *data) {\n";
+						print FXS "        const QMetaObject qmo = { { &".$curr_class[$c]."::staticMetaObject, stringdata, data, 0 } };\n";
+						print FXS "        return qmo;\n    };\n};\n\n";
+						foreach my $cl ( @{$class_func[$c]} ) {
+							if ( not $cl->{type} ) {  # constructor
+								print FXS "Perl".$cl->{name}."::Perl".$cl->{name}."(const char *stringdata, const uint *data";
+								if ( $cl->{orig_param} ) {
+									my $parm = $cl->{orig_param};
+									$parm =~ s/ ?= ?[^,]+//g;
+									print FXS ", $parm";
+								}
+								print FXS ")\n : ".$cl->{name}."(";
+								if ( $cl->{param} ) {
+									my @prm = split ',', $cl->{param};
+									my $j = 0;
+									for ( @prm ) {
+										if ( $j ) {
+											print FXS ', '; }
+										else {
+											$j = 1;
+										}
+										/([0-9A-Za-z_]+)( ?=.+)?$/;
+										print FXS "$1";
+									}
+								}
+								print FXS "),\n   qt_meta_stringdata_Perl", $curr_class[$c], "(stringdata),";
+								print FXS " qt_meta_data_Perl", $curr_class[$c], "(data),\n";
+								print FXS "   staticMetaObject( PerlQt4::get", $curr_class[$c], "MetaObject(stringdata, data))\n{\n};\n\n";
+							}
+						}
+						print FXS "Perl".$curr_class[$c]."::~Perl".$curr_class[$c]."()\n{\n";
+						print FXS "    delete [] qt_meta_stringdata_Perl".$curr_class[$c].";\n";
+						print FXS "    delete [] qt_meta_data_Perl".$curr_class[$c].";\n";
+						print FXS "};\n\n"; # if ( $classes{$curr_class[$c]}{dest} );
+						print FXS "void Perl$curr_class[$c]::signls(int _id, void **_a)\n{\n";
+						print FXS "    QMetaObject::activate(this, &staticMetaObject, _id, _a);\n};\n\n";
+						print FXS "const QMetaObject *Perl".$curr_class[$c]."::metaObject() const\n{\n";
+						print FXS "    return &staticMetaObject;\n}\n\n";
+						print FXS "void Perl".$curr_class[$c]."::slts(int _id, void **_a)\n{\n";
+						print FXS "    common_slots(_id, _a, qt_meta_stringdata_Perl", $curr_class[$c], ", qt_meta_data_Perl", $curr_class[$c], ", (void *)this, \"Qt::".$curr_class[$c]."::slots\");\n";
+						print FXS "}\n";
+						print FXS "void *Perl".$curr_class[$c]."::qt_metacast(const char *_clname)\n{\n";
+						print FXS "    if (!_clname) return 0;\n";
+						print FXS "    if (!strcmp(_clname, qt_meta_stringdata_Perl".$curr_class[$c]."))\n";
+						print FXS "        return static_cast<void*>(const_cast< Perl".$curr_class[$c]."*>(this));\n";
+						print FXS "    return $curr_class[$c]::qt_metacast(_clname);\n}\n\n";
+						print FXS "int Perl".$curr_class[$c]."::qt_metacall(QMetaObject::Call _c, int _id, void **_a)\n{\n";
+						print FXS "    _id = $curr_class[$c]::qt_metacall(_c, _id, _a);\n";
+						print FXS "    if (_id < 0)\n";
+						print FXS "        return _id;\n";
+						print FXS "    if ( qt_meta_data_Perl", $curr_class[$c], "[4] > 0 ) {\n";
+						print FXS "        if (_c == QMetaObject::InvokeMetaMethod) {\n";
+						print FXS "            if ( _id >= 0 and _id < qt_meta_data_Perl", $curr_class[$c], "[4] ) {\n";
+						print FXS "                if ( qt_meta_data_Perl", $curr_class[$c], "[14 + 5 *_id] == 0x05 )\n";
+						print FXS "                    signls(_id, _a);\n";
+						print FXS "                else\n";
+						print FXS "                    slts(_id, _a);\n            }\n";
+						print FXS "            _id -= qt_meta_data_Perl", $curr_class[$c], "[4];\n        }\n    }\n";
+						print FXS "    return _id;\n}\n\n";
+					} # $object_class
+					$end_xs .= "\nMODULE = Qt::".$module."\t\tPACKAGE = Qt::";
+					$end_xs .= $curr_class[$c]."\n\n";
+					$end_xs .= "PROTOTYPES: DISABLE\n\n";
+					#print '    prot_enum: '.$classes{$curr_class[$c]}{prot_enum}."\n";
+					LABEL1:
+					foreach my $cl ( @{$class_func[$c]} ) {
+						next if $cl->{skip};
+						next if not $cl->{type} and $virt_class;
+						if ( $cl->{protected} and not $object_class ) {
+							$cl->{skip} = 1;
+							next;
+						}
+						my $str_fn = "";
+						my $code = 0;
+						my $multi_fn = 0;
+						if ( $func_counts[$c]{$cl->{orig_name}} > 1 or $cl->{param} =~ /=/ ) {
+							$multi_fn = 1;
+							$code++;
+						}
+						my @fn_list;
+						if ( $multi_fn ) {
+							my $first_type = $cl->{type};
+							foreach my $icl ( @{$class_func[$c]} ) {
+								if ( $icl->{orig_name} eq $cl->{orig_name} and not $icl->{skip} and not ( $icl->{protected} and not $object_class ) ) {
+									push @fn_list, $icl;
+									$icl->{skip} = 1;
+									$multi_fn = 2 if $first_type ne $icl->{type};
+								}
+							}
+						}
+						else {
+							push @fn_list, $cl;
+						}
+						$cl->{tmpl} = 0;
+						print "    ", $cl->{name} if $pars_param2 eq $module;
+						my $repl_for_int_class = '';
+						if ( $cl->{type} and not $std_type{$cl->{type}} and not $classes{$cl->{type}} and not $complex_type{$cl->{type}} ) {
+							print "\n" if $pars_param2 eq $module;
+							print "!!! unknown output type '$cl->{type}'\n";
+							next;
+						}
+						if ( $multi_fn == 2 ) {
+							$str_fn .= "SV *\n";
+						}
+						elsif ( not $cl->{type} ) {  # constructor
+							$code++;
+							$str_fn .= "SV *\n";
+							$repl_for_int_class = $cl->{name} if $cl->{name} ne $curr_class[$c];
+							$cl->{name} = 'new';
+						}
+						else {
+							$str_fn .= 'const ' if $cl->{const} and ($cl->{type} eq 'char *' or $cl->{lnk}) and not $classes{$cl->{type}};
+							if ( $cl->{lnk} and $std_type{$cl->{type}} ) {
+								# todo use C lvalue (  int &fn() )
+								next;
+							}
+							if ( $classes{$cl->{type}} ) {
+								$str_fn .= "SV *\n";
+								$code++;
+							}
+							elsif ( $cl->{lnk} ) {
+								$str_fn .= $cl->{type}." *\n";
+								$code++;
+							}
+							else {
+								$str_fn .= $cl->{type}."\n";
+							}
+						}
+						print " <- '$$cl{type}'\n"  if $pars_param2 eq $module;
+						print "  ->  ", $cl->{name}, "  "  if $pars_param2 eq $module;
+						if ( not $cl->{type} ) {
+							$str_fn .= $cl->{name}.'(';
+							$str_fn .= 'AV *signal_av_ref, AV *slot_av_ref' if $object_class;
+							$str_fn .= ', ' if $object_class and ( $cl->{param} or $multi_fn);
+						}
+						elsif ( $cl->{st} ) {
+							$str_fn .= 'st_'.$cl->{name}.'(';
+							$code++;
+						}
+						else {
+							$str_fn .= "Perl" if $object_class;
+							$str_fn .= $curr_class[$c].'::' if not $cl->{frnd};
+							$str_fn .= $cl->{name}.'(';
+						}
+    					$str_fn .= "...)\n" if $multi_fn;
+						foreach my $icl ( @fn_list ) {
+							# $icl->{skip} = 1;
+							if ( $icl->{param} =~ /\<.+,.+\>/ ) { # warning!!! for only ONE replace
+								$icl->{param} =~ s/(.+)\<(.+), (.+)>/$1_$2__$3/;
+							}
+							my @par = split ',', $icl->{param};
+							s/^ *// foreach ( @par );
+							s/ *$// foreach ( @par );
+							my @pars;
+							my $j = 0;
+							$icl->{def} = 0;
+							for ( $icl->{pars} = "" ; $par[$j] ; $j++ ) {
+								print "\n        '$par[$j]' => "  if $pars_param2 eq $module;
+								$pars[$j]{lnk} = 0;
+								$pars[$j]{list} = 0;
+								$pars[$j]{const} = 0;
+								$pars[$j]{out} = 0;
+								my $u = 0;
+								if ( $par[$j] =~ /^unsigned/ ) {
+									$par[$j] =~ s/^unsigned (.*)$/$1/;
+									$u = 1;
+								}
+								my $t_ptr = 0;
+								if ( $par[$j] =~ / \*>/ ) {
+									$par[$j] =~ s/ \*>/*>/;
+									$t_ptr = 1;
+								}
+								$par[$j] =~ /^(\S+)(?: ?([0-9A-Za-z_<>;:&*\[\]]+))?( = .+)?$/;
+								($pars[$j]{tp}, $pars[$j]{dt}, $pars[$j]{def}) = ($1, $2, $3); # (type, data, default)
+								$pars[$j]{tp} = 'unsigned '.$pars[$j]{tp} if $u;
+								if ( $pars[$j]{tp} =~ /\bchar/ and $pars[$j]{dt} =~ /^\*\*/ ) {
+									$pars[$j]{tp} .= ' **';
+									$pars[$j]{dt} =~ s/^\*\*(.*)$/$1/;
+								}
+								if ( $pars[$j]{tp} =~ /\bchar/ and $pars[$j]{dt} =~ /^\*([a-z]+)\[\]$/  ) {
+									$pars[$j]{dt} =$1;
+									$pars[$j]{tp} .= ' **';
+								}
+								if ( ($pars[$j]{tp} =~ /\bchar/ or $pars[$j]{tp} =~ /\bwchar_t/ or $pars[$j]{tp} =~ /\bvoid/ or $pars[$j]{tp} =~ /\bFILE/) and $pars[$j]{dt} =~ /^\*/ ) {
+									$pars[$j]{tp} .= ' *';
+									$pars[$j]{dt} =~ s/^\*(.*)$/$1/;
+								}
+								if ( $t_ptr ) {
+									$pars[$j]{tp} =~ s/\*>/ *>/;
+								}
+								$pars[$j]{tp} = $curr_class[$c] if $repl_for_int_class and $repl_for_int_class eq $pars[$j]{tp};
+								print " tp:'", $pars[$j]{tp}, "'" if $pars[$j]{tp} and $pars_param2 eq $module;
+								print " dt:'", $pars[$j]{dt}, "'" if $pars[$j]{dt} and $pars_param2 eq $module;
+								print " def:'", $pars[$j]{def}, "'" if $pars[$j]{def} and $pars_param2 eq $module;
+								$icl->{pars} .= ', ' if $j;
+								unless ( $pars[$j]{dt} ) {
+									$pars[$j]{dt} = "data$j";
+								}
+								my $bb = $pars[$j]{tp};
+								my $bbb = $bb;
+								if ( $bb =~ /^(?:QList|QVector)<([0-9A-Za-z_]+)(?: ?\*)?>$/ ) {
+									$bb = $1;
+								}
+								if ( not $std_type{$bb} and not $classes{$bb} and  not $pars[$j]{list} ) {
+									my @bss;
+									$bss[0] = $curr_class[$c];
+									while ( $bss[0] =~ /::/ ) {
+										$bss[0] =~ /^(.+)::[0-9A-Za-z_]+$/;
+										unshift @bss, $1;
+									}
+									FIND_IN_NAME: while ( scalar(@bss) > 0 ) {
+										$bs = shift @bss;
+										print " search type $bb in $bs\n"  if $module eq 'QString';
+										for my $rr ( keys %{$classes{$bs}{enums}} ) {
+											if ( $bb eq $rr ) {
+												$bbb = $bs.'::'.$bb;
+												last FIND_IN_NAME;
+											}
+										}
+										for my $rr ( keys %{$classes{$bs}{sin_enums}} )  {
+											if ( $bb eq $rr ) {
+												$bbb = $bs.'::'.$bb;
+												my $pp = $classes{$bs}{sin_enums}{$rr};
+												last FIND_IN_NAME;
+											}
+										}
+										for my $rr ( keys %{$classes{$bs}{subclass}}, keys %{$classes{$bs}{fn_ptr}} )  {
+											if ( $bb eq $rr ) {
+												$bbb = $bs.'::'.$bb;
+												last FIND_IN_NAME;
+											}
+										}
+										unshift @bss, split /,/, $classes{$bs}{base} if $classes{$bs}{base};
+									}
+									#print "* $bb -> $bbb *";
+									$pars[$j]{tp} =~ s/$bb/$bbb/;
+								}
+								if ( $object_class and $classes{$curr_class[$c]}{prot_enum} ) {
+									my $tp = $pars[$j]{tp};
+									if ( $classes{$curr_class[$c]}{prot_enum} =~ /$tp/ ) {
+										my $tp2 = 'Perl'.$curr_class[$c];
+										$tp =~ /^[0-9A-Za-z]+::([0-9A-Za-z]+)$/;
+										$pars[$j]{tp} = $tp2.'::'.$1;
+									}
+								}
+								if ( $pars[$j]{tp} =~ /^(Q[A-Za-z]+)<([A-Za-z:]+)>/ and not $complex_type{$pars[$j]{tp}} ) {
+									my ($xx, $zz) = ($1, $2);
+									if ( $std_type{$zz} and ( $std_type{$zz} == 2 or $std_type{$zz} == 6 or $std_type{$zz} == 7 ) and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+										$complex_type{$pars[$j]{tp}} = 2;
+										print TM $pars[$j]{tp}."\tT_AV_INT\n";
+									}
+									elsif ( $std_type{$zz} and $std_type{$zz} == 3 and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+										$complex_type{$pars[$j]{tp}} = 3;
+										print TM $pars[$j]{tp}."\tT_AV_UINT\n";
+									}
+									elsif ( $std_type{$zz} and $std_type{$zz} == 4 and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+										$complex_type{$pars[$j]{tp}} = 4;
+										print TM $pars[$j]{tp}."\tT_AV_FLOAT\n";
+									}
+									elsif ( $classes{$zz} and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+										$complex_type{$pars[$j]{tp}} = 10;
+										print TM $pars[$j]{tp}."\tT_AV_OBJ\n";
+									}
+								}
+								if ( $pars[$j]{tp} =~ /^(Q[A-Za-z]+)<([A-Za-z:]+) \*>/ and not $complex_type{$pars[$j]{tp}} ) {
+									my ($xx, $zz) = ($1, $2);
+									if ( $classes{$zz} and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+										$complex_type{$pars[$j]{tp}} = 11;
+										print TM $pars[$j]{tp}."\tT_AV_OBJPTR\n";
+									}
+								}
+								$pars[$j]{dt} = 'argc' if $pars[$j]{dt} =~ /argc/; # for not use IN_OUT
+								if ( $pars[$j]{dt} =~ /^&/ ) {
+									if ( $std_type{$pars[$j]{tp}} ) {
+										$pars[$j]{out} = 1;
+										$code++;
+									}
+									elsif ( $complex_type{$pars[$j]{tp}} ) {
+										$pars[$j]{out} = 2;
+										$code++;
+									}
+									else {
+										$pars[$j]{lnk} = 1;
+										$code++;
+									}
+									if ( $pars[$j]{dt} =~ /^&$/ ) {
+										if ( $std_type{$pars[$j]{tp}} ) {
+											$pars[$j]{dt} = "data$j"; }
+										else {
+											$pars[$j]{dt} = "\L$pars[$j]{tp}\E$j"; }
+									}
+									else {
+										$pars[$j]{dt} =~ s/&//; }
+								}
+								if ( $pars[$j]{dt} =~ /^\*/ ) {
+									$pars[$j]{lnk} = 2;
+									if ( $pars[$j]{dt} =~ /^\*$/ ) {
+										$pars[$j]{dt} = "\L$pars[$j]{tp}\E$j"; }
+									else {
+										$pars[$j]{dt} =~ s/^\*//; }
+										if ( $std_type{$pars[$j]{tp}} ) {
+											$pars[$j]{out} = 2;
+											$pars[$j]{lnk} = 0;
+										};
+								}
+								if ( not $std_type{$pars[$j]{tp}} and not $classes{$pars[$j]{tp}} and not $complex_type{$pars[$j]{tp}} and not $pars[$j]{list} ) {
+									print "\n" if $pars_param2 eq $module;
+									print "!!! unknown type '$pars[$j]{tp}'\n";
+									next LABEL1 ;
+								}
+								if ( not $std_type{$pars[$j]{tp}} and not $pars[$j]{lnk} and not $complex_type{$pars[$j]{tp}} and not $pars[$j]{list} ) {
+									$pars[$j]{lnk} = 1;
+									$code++;
+								}
+								$icl->{pars} .= "IN_OUT " if $pars[$j]{out};
+								$icl->{pars} .= $pars[$j]{tp}.' ';
+								$icl->{pars} .= '*' if $pars[$j]{lnk};
+								$icl->{pars} .= $pars[$j]{dt};
+								if ( $pars[$j]{def} ) {
+									$icl->{pars} .= $pars[$j]{def};
+									$icl->{def}++;
+								}
+							}
+							print "\n" if $pars_param2 eq $module;
+							$end_xs .= $str_fn;
+							undef $str_fn;
+							unless ( $multi_fn ) {
+								$end_xs .= $icl->{pars}.")\n";
+							}
+							if ( $object_class and $icl->{virt} and $icl->{type} ) {
+								print FXS $icl->{type};
+								print FXS "*" if $icl->{lnk} == 2 ;
+								print FXS "&" if $icl->{lnk} == 3 ;
+								print FXS " Perl".$curr_class[$c]."::$$icl{orig_name}(";
+								if ( $icl->{orig_param} ) {
+									my $parm = $icl->{orig_param};
+									$parm =~ s/ ?= ?[^,]+//g;
+									print FXS $parm;
+								}
+								print FXS ")\n{\n";
+								print FXS "    static int not_use = 1;\n";
+								print FXS "    if ( not_use ) {\n";
+								print FXS "        not_use = 0;\n\n";
+								print FXS "        dSP;\n";
+								print FXS "        int count;\n" if $icl->{type} ne 'void';
+								print FXS "        SV * ret_flag;\n";
+								print FXS "        ENTER;\n        SAVETMPS;\n";
+								print FXS "        ret_flag = sv_2mortal(newSViv(0));\n\n";
+								print FXS "        PUSHMARK(SP);\n";
+								print FXS "        XPUSHs(sv_2mortal(newSViv(PTR2IV(this))));\n";
+								print FXS "        XPUSHs(sv_2mortal(newSVpv(\"".$icl->{name}."\", 0)));\n";
+								print FXS "        XPUSHs(ret_flag);\n";
+								for ( my $j = 0 ; $pars[$j] ; ++$j ) {
+									if ( $std_type{$pars[$j]{tp}} == 6 ) {
+										print FXS "        XPUSHs(sv_2mortal(boolSV(".$pars[$j]{dt}.")));\n";
+									}
+									elsif ( $std_type{$pars[$j]{tp}} == 2 or $std_type{$pars[$j]{tp}} == 7 ) {
+										print FXS "        XPUSHs(sv_2mortal(newSViv((IV)".$pars[$j]{dt}.")));\n";
+									}
+									elsif ( $std_type{$pars[$j]{tp}} == 3 ) {
+										print FXS "        XPUSHs(sv_2mortal(newSVuv((UV)".$pars[$j]{dt}.")));\n";
+									}
+									elsif ( $std_type{$pars[$j]{tp}} == 4 ) {
+										print FXS "        XPUSHs(sv_2mortal(newSVnv(".$pars[$j]{dt}.")));\n";
+									}
+									elsif ( $std_type{$pars[$j]{tp}} == 1 ) {
+										print FXS "        XPUSHs(sv_2mortal(newSVpv(".$pars[$j]{dt}.", 0)));\n";
+									}
+									elsif ( $classes{$pars[$j]{tp}} and $pars[$j]{lnk} ) { # $pars[$j]{lnk} == 2
+										print FXS "        XPUSHs(sv_2mortal(class2pobj(PTR2IV(";
+										print FXS "&" if $pars[$j]{lnk} == 1;
+										print FXS $pars[$j]{dt}."), \"Qt::".$pars[$j]{tp}."\", 0)));\n";
+										if ( $classes{$pars[$j]{tp}}{module} ) {
+											$classes{$curr_class[$c]}{use_class}{$classes{$pars[$j]{tp}}{module}}++  if $classes{$pars[$j]{tp}}{module} ne $module;
+										}
+										else {
+											print "!!! need module ".$pars[$j]{tp}." for virt fn $$icl{orig_name} (1)\n";
+										}
+									}
+									elsif ( $classes{$pars[$j]{tp}} ) {
+										print FXS "        XPUSHs(sv_2mortal(class2pobj(PTR2IV(new ".$pars[$j]{tp}."(".$pars[$j]{dt}.")), \"Qt::".$pars[$j]{tp}."\", 1)));\n";
+										if ( $classes{$pars[$j]{tp}}{module} ) {
+											$classes{$curr_class[$c]}{use_class}{$classes{$pars[$j]{tp}}{module}}++ if $classes{$pars[$j]{tp}}{module} ne $module;
+										}
+										else {
+											print "!!! need module ".$pars[$j]{tp}." for virt fn in $$icl{orig_name} (2)\n";
+										}
+									}
+									elsif ( $complex_type{$pars[$j]{tp}} == 11 ) {
+										$pars[$j]{tp} =~ /^Q[A-Za-z]+<([0-9A-Za-z]+) \* ?>/;
+										my $class = $1;
+										print FXS "        {\n";
+										print FXS "                AV *av = newAV();\n";
+										print FXS "                int asize = ".$pars[$j]{dt}.".size();\n";
+										print FXS "                for ( int i = 0 ; i < asize ; ++i ) {\n";
+										print FXS "                        $class *clv = ".$pars[$j]{dt}.".at(i);\n";
+										print FXS "                        SV *rhv = newSV(0);\n";
+										print FXS "                        rhv = class2pobj(PTR2IV(clv), \"Qt::$class\", 0);\n";
+										print FXS "                        av_push(av, rhv);\n";
+										print FXS "                };\n";
+										print FXS "                XPUSHs(sv_2mortal(newRV_noinc((SV*)av)));\n";
+										print FXS "        }\n";
+									}
+									else {
+										print "!!! not found input type ".$pars[$j]{tp}." for virtual function ".$icl->{orig_param}."()\n";
+									}
+								}
+								print FXS "        PUTBACK;\n\n";
+								if ( $icl->{type} eq 'void' ) {
+									print FXS "        call_pv(\"Qt::".$curr_class[$c]."::_virt_fn\", G_DISCARD);\n";
+									print FXS "        int ret_flag0 = SvIV(ret_flag);\n";
+									print FXS "        FREETMPS;\n        LEAVE;\n\n";
+								}
+								else {
+									print FXS "        count = call_pv(\"Qt::".$curr_class[$c]."::_virt_fn\", G_SCALAR);\n\n";
+									print FXS "        if ( count != 1 )\n";
+									print FXS "            croak(\"error call virtual notify()\");\n\n";
+									print FXS "        SPAGAIN;\n";
+									if ( $std_type{$icl->{type}} == 1 or $std_type{$icl->{type}} == 6 or $classes{$icl->{type}} ) {
+										print FXS "        SP -= count;\n";
+										print FXS "        I32 ax = (SP - PL_stack_base) + 1;\n";
+									}
+									print FXS "        ".$icl->{type}." ";
+									print FXS "*" if $icl->{lnk};
+									print FXS "RETVAL = ";
+									if ( $std_type{$icl->{type}} == 6 ) {
+										print FXS "(bool)SvTRUE(ST(0));\n";
+									}
+									elsif ( $std_type{$icl->{type}} == 2 or $std_type{$icl->{type}} == 3 or $std_type{$icl->{type}} == 7 ) {
+										print FXS "(".$icl->{type}.")POPi;\n";
+									}
+									elsif ( $std_type{$icl->{type}} == 4 ) {
+										print FXS "(".$icl->{type}.")POPn;\n";
+									}
+									elsif ( $icl->{type} eq 'char' or $icl->{type} eq 'uchar' ) {
+										print FXS "(".$icl->{type}.")*SvPV_nolen(ST(0));\n";
+									}
+									elsif ( $std_type{$icl->{type}} == 1 ) {
+										print FXS "(".$icl->{type}.")SvPV_nolen(ST(0));\n";
+									}
+									elsif ( $classes{$icl->{type}} ) {
+										print FXS "INT2PTR(".$icl->{type}."*, pobj2class(ST(0), \"".$icl->{type}."\", \"virtual Qt::".$curr_class[$c]."::".$icl->{orig_name}."\", \"".$icl->{type}."\"));\n";
+										print FXS "        if ( RETVAL == NULL )\n";
+										print FXS "            croak(\"error call virtual ".$icl->{orig_name}."(), ignore it.\");\n";
+										if ( $classes{$icl->{type}}{module} ) {
+											$classes{$curr_class[$c]}{use_class}{$classes{$icl->{type}}{module}}++ if $classes{$icl->{type}}{module} ne $module;
+										}
+										else {
+											print "!!! need module ".$pars[$j]{tp}." for virt fn in $$icl{orig_name} (3)\n";
+										}
+									}
+									else {
+										print "!!! not fount virtual REVTAL type\n";
+									}
+									print FXS "        PUTBACK;\n\n";
+									print FXS "        int ret_flag0 = SvIV(ret_flag);\n";
+									print FXS "        FREETMPS;\n        LEAVE;\n\n";
+								}
+								print FXS "        not_use = 1;\n";
+								print FXS "        if ( ret_flag0 == 0 )\n";
+								print FXS "            return";
+								if ( $icl->{type} ne 'void' ) {
+									print FXS " *" if $icl->{lnk} and $icl->{lnk} != 2;
+									print FXS " RETVAL";
+								}
+								print FXS ";\n    }\n";
+								print FXS "\n    ";
+								if ( $icl->{type} ne 'void' ) {
+									print FXS "return " ;
+								}
+								print FXS "$curr_class[$c]::$$icl{orig_name}(";
+								if ( $icl->{param} ) {
+									my @prm = split ',', $icl->{param};
+									my $j = 0;
+									for ( @prm ) {
+										if ( $j ) {
+											print FXS ', '; }
+										else {
+											$j = 1;
+										}
+										/([0-9A-Za-z_]+)( ?=.+)?$/;
+										print FXS "$1";
+									}
+								}
+								print FXS ");\n";
+								print FXS "}\n\n";
+							}
+							if ( $code or $icl->{op} ) {
+								for ( my $m = scalar(@pars) - $icl->{def} ; $m <= scalar(@pars) ; $m++ ) {
+									if ( $multi_fn ) {
+										my $ii = $m;
+										$ii++ if $icl->{type};
+										$ii-- if $cl->{st};
+										my $oconst = 0;
+										$oconst = 1 if not $icl->{type} and $object_class;
+										$ii += 2 if $oconst;
+										$end_xs .= "  CASE: items == ".$ii;
+										for ( my $j = 0 ; $j < $m ; $j++ ) {
+											my $jj = $j;
+											$jj++ if $icl->{type};
+											$jj-- if $cl->{st};
+											$jj += 2 if $oconst;
+											if ( $pars[$j]{tp} eq 'char **' ) {
+												$end_xs .= ' && SvROK(ST('.$jj.')) && not sv_isobject(ST('.$jj.')) && (SvTYPE(SvRV(ST('.$jj.'))) == SVt_PVAV) '; }
+											elsif ( $std_type{$pars[$j]{tp}} == 4 ) {
+												$end_xs .= ' && SvNOK(ST('.$jj.')) '; }
+											elsif ( $std_type{$pars[$j]{tp}} == 2 or $std_type{$pars[$j]{tp}} == 3 or $std_type{$pars[$j]{tp}} == 6 or $std_type{$pars[$j]{tp}} == 7 ) {
+												# $end_xs .= ' && ( SvIOK(ST('.$ii.')) || SvUOK(ST('.$ii.')) )'; ???
+												$end_xs .= ' && SvIOK(ST('.$jj.')) '; }
+											elsif ( $std_type{$pars[$j]{tp}} ) {
+												$end_xs .= ' && SvPOK(ST('.$jj.')) '; }
+											elsif ( $classes{$pars[$j]{tp}} ) {
+												$end_xs .= ' && sv_derived_from(ST('.$jj.'),"Qt::'.$pars[$j]{tp}.'") && (SvTYPE(SvRV(ST('.$jj.'))) == SVt_PVHV) '; }
+											elsif ( $complex_type{$pars[$j]{tp}} and $complex_type{$pars[$j]{tp}} < 20 ) {
+												$end_xs .= ' && SvROK(ST('.$jj.')) && not sv_isobject(ST('.$jj.')) && (SvTYPE(SvRV(ST('.$jj.'))) == SVt_PVAV) '; }
+											elsif ( $complex_type{$pars[$j]{tp}} > 20 or $complex_type{$pars[$j]{tp}} < 30 ) {
+												$end_xs .= ' && SvROK(ST('.$jj.')) && not sv_isobject(ST('.$jj.')) && (SvTYPE(SvRV(ST('.$jj.'))) == SVt_PVHV)';
+											}
+										}
+										$end_xs .= "\n";
+										$end_xs .= "    PREINIT:\n" if $m > 0 or $oconst;
+										if ( $oconst ) {
+											$end_xs .= "        char sss[2048] = \"Perl".$curr_class[$c]."\\0\";\n";
+											$end_xs .= "        int fn;\n        char *stringdata;\n        uint *data;\n";
+										}
+										for ( my $j = 0 ; $j < $m ; $j++ ) {
+											my $jj = $j;
+											$jj++ if $icl->{type};
+											$jj-- if $cl->{st};
+											$jj += 2 if $oconst;
+											$end_xs .= '        '.$pars[$j]{tp}.' ';
+											$end_xs .= '*' if $pars[$j]{lnk};
+											$end_xs .= $pars[$j]{dt};
+											if ( $pars[$j]{tp} eq 'char **' ) {
+												$end_xs .= ' = XS_unpack_charPtrPtr(ST('.$jj.'))'; }
+											elsif ( $std_type{$pars[$j]{tp}} == 6 ) {
+												$end_xs .= ' = (bool)SvTRUE(ST('.$jj.'))'; }
+											elsif ( $std_type{$pars[$j]{tp}} == 4 ) {
+												$end_xs .= ' = ('.$pars[$j]{tp}.')SvNV(ST('.$jj.'))'; }
+											elsif ( $std_type{$pars[$j]{tp}} == 2 or $std_type{$pars[$j]{tp}} == 3 or $std_type{$pars[$j]{tp}} == 7 ) {
+												$end_xs .= ' = ('.$pars[$j]{tp}.')SvIV(ST('.$jj.'))'; }
+											elsif ( $pars[$j]{tp} eq 'char' or $pars[$j]{tp} eq 'uchar'  ) {
+												$end_xs .= ' = ('.$pars[$j]{tp}.')*SvPV_nolen(ST('.$jj.'))'; }
+											elsif ( $std_type{$pars[$j]{tp}} ) {
+												$end_xs .= ' = ('.$pars[$j]{tp}.')SvPV_nolen(ST('.$jj.'))'; }
+												$end_xs .= ' /* '.$pars[$j]{def}.' */ ' if $pars[$j]{def};
+												$end_xs .= ";\n";
+										}
+									}
+									elsif ( not $cl->{type} and $object_class ) {
+										$end_xs .= "    PREINIT:\n        char sss[2048] = \"Perl".$curr_class[$c]."\\0\";\n";
+										$end_xs .= "        int fn;\n        char *stringdata;\n        uint *data;\n";
+									}
+									$end_xs .= "    CODE:\n";
+									$end_xs .= '        printf("new '.$curr_class[$c].'\n");'."\n" if $add_out and not $cl->{type};
+									if ( not $cl->{type} and ( $curr_class[$c] eq 'QCoreApplication' or $curr_class[$c] eq 'QApplication' ) ) {
+										$end_xs .= "        pargc = argc;\n";
+										$end_xs .= "        pargv = argv;\n";
+									}
+									if ( $multi_fn == 2 and $icl->{type} ne 'void' or $classes{$icl->{type}} ) {
+										$end_xs .= '        ';
+										$end_xs .= 'const ' if $icl->{const} and ($icl->{type} eq 'char *' or $icl->{lnk});
+										if ( $icl->{type} ) {
+											$end_xs .= $icl->{type}; }
+										else {
+											$end_xs .= $curr_class[$c]." *";
+										}
+										$end_xs .= " *" if $icl->{lnk};
+										$end_xs .= " out_data;\n"
+									}
+									elsif ( not $icl->{type} ) {
+										$end_xs .= "        $curr_class[$c] * out_data;\n";
+									}
+									if ( $multi_fn and $m > 0 ) {
+										for ( my $j = 0 ; $j < $m ; $j++ ) {
+											my $jj = $j;
+											$jj++ if $cl->{type};
+											$jj-- if $cl->{st};
+											$jj += 2 if not $cl->{type} and $object_class;
+											if ( $classes{$pars[$j]{tp}} ) {
+												$end_xs .= '        '.$pars[$j]{dt}.' = INT2PTR('.$pars[$j]{tp}.'*, pobj2class(ST('.$jj.'), "'.$pars[$j]{tp}.'", "Qt::'.$curr_class[$c].'::'.$cl->{orig_name}.'", "'.$pars[$j]{dt}.'"));'."\n";
+												$end_xs .= "        if ( ".$pars[$j]{dt}." == NULL )\n";
+												$end_xs .= "                XSRETURN_UNDEF;\n";
+											}
+											elsif ( $complex_type{$pars[$j]{tp}} ) {
+												if ( $complex_type{$pars[$j]{tp}} == 3 ) { # T_AV_UINT
+													my ($ar, $ar_type) = ($pars[$j]{tp} =~ /(Q[A-Za-z]+)\<(.+)\>/);
+													$end_xs .= "        {\n";
+													$end_xs .= "                AV *av = (AV*)SvRV( ST(".$jj.") );\n";
+													$end_xs .= "                while ( av_len(av) > -1 ) {\n";
+													$end_xs .= "                        SV * rhv = av_pop(av);\n";
+													$end_xs .= "                        $ar_type clv = ( $ar_type )SvUV(rhv);\n";
+													$end_xs .= "                        ".$pars[$j]{dt}." << clv;\n";
+													$end_xs .= "                }\n";
+													$end_xs .= "        }\n";
+												}
+												elsif ( $complex_type{$pars[$j]{tp}} == 4 ) { # T_AV_FLOAT
+													my ($ar, $ar_type) = ($pars[$j]{tp} =~ /(Q[A-Za-z]+)\<(.+)\>/);
+													$end_xs .= "        {\n";
+													$end_xs .= "                AV *av = (AV*)SvRV( ST(".$jj.") );\n";
+													$end_xs .= "                while ( av_len(av) > -1 ) {\n";
+													$end_xs .= "                        SV * rhv = av_pop(av);\n";
+													$end_xs .= "                        $ar_type clv = ( $ar_type )SvNV(rhv);\n";
+													$end_xs .= "                        ".$pars[$j]{dt}." << clv;\n";
+													$end_xs .= "                }\n";
+													$end_xs .= "        }\n";
+												}
+												elsif ( $complex_type{$pars[$j]{tp}} == 10 ) { # T_AV_OBJ
+													my ($ar, $ar_class) = ($pars[$j]{tp} =~ /(Q[A-Za-z]+)\<(.+)\>/);
+													$end_xs .= "        {\n";
+													$end_xs .= "                AV *av = (AV*)SvRV( ST(".$jj.") );\n";
+													$end_xs .= "                while ( av_len(av) > -1 ) {\n";
+													$end_xs .= "                        SV * rhv = av_pop(av);\n";
+													$end_xs .= '                        '.$ar_class.' * clv = INT2PTR('.$ar_class.'*, pobj2class(rhv, "'.$ar_class.'", "Qt::'.$curr_class[$c].'::'.$cl->{orig_name}.'", "AV['.$ar_class.']"));'."\n";
+													$end_xs .= "                        if ( clv == NULL )\n";
+													$end_xs .= "                                XSRETURN_UNDEF;\n";
+													$end_xs .= "                        ".$pars[$j]{dt}." << *clv;\n";
+													$end_xs .= "                }\n";
+													$end_xs .= "        }\n";
+												}
+												elsif  ( $complex_type{$pars[$j]{tp}} == 11 ) { # T_AV_OBJPTR
+													my ($ar, $ar_class) = ($pars[$j]{tp} =~ /(Q[A-Za-z]+)\<(.+) \*\>/);
+													$end_xs .= "        {\n";
+													$end_xs .= "                AV *av = (AV*)SvRV( ST(".$jj.") );\n";
+													$end_xs .= "                while ( av_len(av) > -1 ) {\n";
+													$end_xs .= "                        SV * rhv = av_pop(av);\n";
+													$end_xs .= '                        '.$ar_class.' * clv = INT2PTR('.$ar_class.'*, pobj2class(rhv, "'.$ar_class.'", "'.$curr_class[$c].'::'.$cl->{orig_name}.'", "AV['.$ar_class.']"));'."\n";
+													$end_xs .= "                        if ( clv == NULL )\n";
+													$end_xs .= "                                XSRETURN_UNDEF;\n";
+													$end_xs .= "                        ".$pars[$j]{dt}." << clv;\n";
+													$end_xs .= "                }\n";
+													$end_xs .= "        }\n";
+												}
+												elsif ( $complex_type{$pars[$j]{tp}} == 22 ) { # T_HV_OBJ_OBJ
+													my ($hash, $kcl, $vcl) = ($pars[$j]{tp} =~ /(Q[A-Za-z]+)/g);
+													$end_xs .= "        {\n";
+													$end_xs .= "            HV *hv = (HV*)SvRV( ST(".$jj.") );\n";
+													$end_xs .= "            if ( hv_iterinit(hv) ) {\n";
+													$end_xs .= "                while ( HE *he = hv_iternext(hv) ) {\n";
+													$end_xs .= "                        SV *key = HeSVKEY(he);\n";
+													$end_xs .= "                        SV *val = HeVAL(he);\n";
+													$end_xs .= '                        '.$kcl.' *clk = INT2PTR('.$kcl.'*, pobj2class(key, "'.$kcl.'", "Qt::'.$curr_class[$c].'::'.$cl->{orig_name}.'", "HV{'.$kcl.'}"));'."\n";
+													$end_xs .= "                        if ( clk == NULL )\n";
+													$end_xs .= "                                XSRETURN_UNDEF;\n";
+													$end_xs .= '                        '.$vcl.' *clv = INT2PTR('.$vcl.'*, pobj2class(val, "'.$vcl.'", "Qt::'.$curr_class[$c].'::'.$cl->{orig_name}.'", "HV{'.$vcl.'}"));'."\n";
+													$end_xs .= "                        if ( clv == NULL )\n";
+													$end_xs .= "                                XSRETURN_UNDEF;\n";
+													$end_xs .= "                        ".$pars[$j]{dt}.".insert(*clk, *clv);\n";
+													$end_xs .= "                }\n";
+													$end_xs .= "            }\n";
+													$end_xs .= "        }\n";
+												}
+												else {
+													print "!!! not found INPUT for ".$pars[$j]{tp}."\n";
+												}
+											}
+										}
+									}
+									my $retval = 'RETVAL';
+									$retval = 'out_data' if $multi_fn == 2 or $classes{$icl->{type}} or not $icl->{type};
+									if ( $icl->{lnk} == 1 ) {
+										$end_xs .= "        ".$retval." = new ".$icl->{type}."( ";
+										if ( $cl->{st} ) {
+											$end_xs .= $curr_class[$c].'::'.$cl->{orig_name}."( "; }
+										elsif ( $cl->{frnd} ) {
+											$end_xs .= $cl->{orig_name}."( "; }
+										else {
+											$end_xs .= 'THIS->'.$cl->{orig_name}."( "; }
+									}
+									elsif ( $icl->{lnk} == 3 ) {
+										$end_xs .= "        ".$retval." = &( THIS->".$cl->{orig_name}."( "; }
+									elsif ( $icl->{type} eq 'void' and $cl->{st} ) {
+										$end_xs .= '        '.$curr_class[$c].'::'.$cl->{orig_name}."( "; }
+									elsif ( $icl->{type} eq 'void' and $cl->{frnd} ) {
+										$end_xs .= '        '.$cl->{orig_name}."( "; }
+									elsif ( $icl->{type} eq 'void' ) {
+										$end_xs .= '        THIS->'.$cl->{orig_name}."( "; }
+									elsif ( not $icl->{type} and $object_class ) {
+										$end_xs .= "        fn = create_meta_data(sss, signal_av_ref, slot_av_ref, &stringdata, &data);\n";
+										$end_xs .= "        ".$retval." = new Perl".$icl->{orig_name}."( stringdata, data";
+									}
+									elsif ( not $icl->{type} ) {
+										$end_xs .= "        ".$retval." = new ".$curr_class[$c]."( "; }
+									elsif ( $cl->{st} ) {
+										$end_xs .= "        ".$retval." = ";
+										$end_xs .= 'Perl' if $object_class;
+										$end_xs .= $curr_class[$c]."::".$cl->{orig_name}."( ";
+									}
+									elsif ( $cl->{frnd} ) {
+										$end_xs .= "        ".$retval." = ".$cl->{orig_name}."( "; }
+									else {
+										$end_xs .= "        ".$retval." = THIS->".$cl->{orig_name}."( ";
+									}
+									for ( my $j = 0 ; $j < $m ; $j++ ) {
+										$end_xs .= ', ' if $j > 0 or not $icl->{type} and $object_class;
+										if ( $pars[$j]{dt} eq 'argv' and ($module eq 'QCoreApplication' or $module eq 'QApplication') ) {
+											$end_xs .= 'pargv'; }
+										elsif ( $pars[$j]{dt} eq 'argc' and ($module eq 'QCoreApplication' or $module eq 'QApplication') ) {
+											$end_xs .= 'pargc'; }
+										else {
+											$end_xs .= '*' if $pars[$j]{lnk} == 1;
+											$end_xs .= '&' if $pars[$j]{out} == 2 and $std_type{$pars[$j]{tp}};
+											$end_xs .= $pars[$j]{dt};
+										}
+									}
+									$end_xs .= " )" if $icl->{lnk} == 1 or $icl->{lnk} == 3;
+									$end_xs .= " );\n";
+									if ( $multi_fn ) {
+										for ( my $j = 0 ; $j < $m ; $j++ ) {
+											my $jj = $j;
+											$jj++ if $cl->{type};
+											$jj-- if $cl->{st};
+											if ( $pars[$j]{out} and $std_type{$pars[$j]{tp}} ) {
+												if ( $pars[$j]{tp} eq 'char' or $pars[$j]{tp} eq 'uchar' ) {
+													$end_xs .= "        sv_setpvn(ST(".$jj."), (char *)&".$pars[$j]{dt}.", 1);\n"; }
+												elsif ( $std_type{$pars[$j]{tp}} == 1 ) {
+													$end_xs .= "        sv_setpv((SV*)ST(".$jj."), ".$pars[$j]{dt}.");\n"; }
+												elsif ( $std_type{$pars[$j]{tp}} == 2 or $std_type{$pars[$j]{tp}} == 6 or $std_type{$pars[$j]{tp}} == 7 ) {
+													$end_xs .= "        sv_setiv(ST(".$jj."), (IV)".$pars[$j]{dt}.");\n"; }
+												elsif ( $std_type{$pars[$j]{tp}} == 3 ) {
+													$end_xs .= "        sv_setuv(ST(".$jj."), (UV)".$pars[$j]{dt}.");\n"; }
+												elsif ( $std_type{$pars[$j]{tp}} == 4 ) {
+													$end_xs .= "        sv_setnv(ST(".$jj."), (NV)".$pars[$j]{dt}.");\n"; }
+												else {
+													$end_xs .= "        sv_setpv((SV*)ST(".$jj."), ".$pars[$j]{dt}.");\n";
+													print "??? ".$pars[$j]{tp}."\n";
+												}
+												$end_xs .= "        SvSETMAGIC(ST(".$jj."));\n";
+											}
+										}
+									}
+									my $type = $icl->{type};
+									$type = $curr_class[$c] unless $type;
+									if ( $multi_fn == 2 ) {
+										if ( $type eq 'void' ) {
+											$end_xs .= "        XSRETURN_UNDEF;\n"; }
+										elsif ( $std_type{$type} == 6 ) {
+											$end_xs .= "        RETVAL = boolSV(out_data);\n"; }
+										elsif ( $std_type{$type} == 2 or $std_type{$type} == 7 ) {
+											$end_xs .= "        RETVAL = newSViv((IV)out_data);\n"; }
+										elsif ( $std_type{$type} == 3  ) {
+											$end_xs .= "        RETVAL = newSVuv((UV)out_data);\n"; }
+										elsif ( $std_type{$type} == 4 ) {
+											$end_xs .= "        RETVAL = newSVnv(out_data);\n"; }
+										elsif ( $std_type{$type} ) {
+											$end_xs .= "        RETVAL = newSVpv(out_data, 0)\n;"; }
+										elsif ( $classes{$type} and ( $icl->{lnk} == 2 or $icl->{lnk} == 3 ) ) {
+											$end_xs .= '        RETVAL = class2pobj(PTR2IV(out_data), "Qt::'.$type.'", 0);'."\n"; }
+										elsif ( $classes{$type} ) {
+											$end_xs .= '        RETVAL = class2pobj(PTR2IV(out_data), "Qt::'.$type.'", 1);'."\n";
+										}
+										$end_xs .= "    OUTPUT:\n        RETVAL\n" if $type ne 'void';
+									}
+									elsif ( $type ne 'void' ) {
+										if ( $classes{$type} and ( $icl->{lnk} == 2 or $icl->{lnk} == 3 ) ) {
+											$end_xs .= '        RETVAL = class2pobj(PTR2IV(out_data), "Qt::'.$type.'", 0);'."\n"; }
+										elsif ( $classes{$type} ) {
+											$end_xs .= '        RETVAL = class2pobj(PTR2IV(out_data), "Qt::'.$type.'", 1);'."\n"; }
+										elsif ( not $type ) {
+											$end_xs .= '        RETVAL = class2pobj(PTR2IV(out_data), "Qt::'.$curr_class[$c].'", 1);'."\n";
+										}
+										$end_xs .= "    OUTPUT:\n        RETVAL\n";
+									}
+								}
+							}
+							$icl->{param_detail} = \@pars;
+		    				$end_xs .= "\n\n" unless $multi_fn;
+						} # @fn_list
+						if ( $multi_fn ) {
+							$end_xs .= "  CASE:\n";
+							$end_xs .= "    CODE:\n";
+							$end_xs .= '        warn( "Qt::'.$curr_class[$c].'::'.$cl->{orig_name}.'() -- Error in parameters" );'."\n";
+							$end_xs .= "        XSRETURN_UNDEF;\n\n\n";
+						}
+					} # @{$class_func[$c]}
+					if ( $object_class ) {
+						$end_xs .= "void\n";
+						$end_xs .= "Perl".$curr_class[$c]."::signls(int _id, AV *av_type, AV *av_data)\n";
+						$end_xs .= "    CODE:\n";
+						$end_xs .= "        {\n";
+						$end_xs .= "            int i = av_len(av_type) + 1, j = 1;\n";
+						$end_xs .= "            void *_a[i];\n";
+						$end_xs .= "            _a[0] = 0;\n";
+						$end_xs .= "            while ( av_len(av_type) > -1 && av_len(av_data) > -1 ) {\n";
+						$end_xs .= "                SV *sv1 = av_shift(av_type);\n";
+						$end_xs .= "                SV *sv2 = av_shift(av_data);\n";
+						$end_xs .= "                if ( sv1 != NULL ) {\n";
+						$end_xs .= "                    char *sg1 = (char *)SvPV_nolen( sv1 );\n";
+						#print FXS '                    printf("signal type: %s\n", sg1);'."\n"; #!!!
+						$end_xs .= '                    if ( !strcmp("int", sg1) ) {'."\n";
+						$end_xs .= "                        int sg2 = (int)SvIV( sv2 );\n";
+						$end_xs .= "                        _a[j] = const_cast<void*>(reinterpret_cast<const void*>(&sg2));\n";
+						$end_xs .= "                    }\n";
+						$end_xs .= '                    else if ( !strcmp("uint", sg1) ) {'."\n";
+						$end_xs .= "                        int sg2 = (uint)SvUV( sv2 );\n";
+						$end_xs .= "                        _a[j] = const_cast<void*>(reinterpret_cast<const void*>(&sg2));\n";
+						$end_xs .= "                    }\n";
+						$end_xs .= '                    else if ( !strcmp("double", sg1) ) {'."\n";
+						$end_xs .= "                        double sg2 = (double)SvNV( sv2 );\n";
+						$end_xs .= "                        _a[j] = const_cast<void*>(reinterpret_cast<const void*>(&sg2));\n";
+						$end_xs .= "                    }\n";
+						$end_xs .= "                    else {\n";
+						$end_xs .= "                        char *sg2 = (char *)SvPV_nolen( sv2 );\n";
+						$end_xs .= "                        _a[j] = const_cast<void*>(reinterpret_cast<const void*>(&sg2));\n";
+						$end_xs .= "                    }\n";
+						$end_xs .= "                    j++;\n";
+						$end_xs .= "                }\n";
+						$end_xs .= "            }\n";
+						$end_xs .= "            if ( av_len(av_type) > -1 || av_len(av_data) > -1 )\n";
+						$end_xs .= '                Perl_croak(aTHX_ "Mismatch data and data types");'."\n";
+						$end_xs .= "            THIS->signls(_id, _a);\n";
+						$end_xs .= "        }\n\n\n";
+					}
+					if ( $classes{$curr_class[$c]}{dest} and not $virt_class  ) { # or $object_class
+						$end_xs .= "void\n";
+						$end_xs .= "Perl" if $object_class;
+						$end_xs .= $curr_class[$c]."::DESTROY()\n";
+						$end_xs .= "    CODE:\n";
+						$end_xs .= "        SV **ssv = hv_fetch((HV*)SvRV(ST(0)), \"_del\", 4, 0);\n";
+						$end_xs .= "        if ( SvIV(*ssv) ) {\n";
+						if ( $object_class ) {
+							$end_xs .= "            if ( (THIS->QObject::children()).size() > 0 ) {\n";
+							$end_xs .= "                printf(\"del query ".$curr_class[$c]."\\n\");\n" if $add_out;
+							$end_xs .= "                THIS->deleteLater();\n";
+							$end_xs .= "            }\n";
+							$end_xs .= "            else {\n";
+						}
+						$end_xs .= "                printf(\"del ".$curr_class[$c]."\\n\");\n" if $add_out;
+						$end_xs .= "                delete THIS;\n";
+						$end_xs .= "            };\n" if $object_class;
+						$end_xs .= "        };\n\n\n";
+					}
+					$object_class = 0;
+					$virt_class = 0;
+					$int_c--;
+					$c++;
+					print " end class $curr_class[$c] : c = $c \n" if $pars_param2 eq $module;
+				} # while $int_c >= 0
+				$c--;
+				$int_c = 0;
+				print " end classes c = $c \n" if $pars_param2 eq $module;
+				%func_types = ();
+				@plugs = ();
+				$public = 0;
+				$open_class = 0;
+				next;
+			} # !int_c_flag
+		} # $open_class and $str_h =~ /^ *\}; *$/
+		next unless $open_class;
+		if ( $str_h =~ /^Q_OBJECT *$/ ) { # and $curr_class[$c] ne 'QWidget'
+			if ( $pkgs eq 'QtCore' or $pkgs eq 'QtGui' and $module ne 'QClipboard' and $module ne 'QColorDialog' and $module ne 'QFontDialog' and $module ne 'QInputDialog' and $module ne 'QSessionManager' ) {
+				$object_class = 1;
+				print TM 'Perl'.$curr_class[$c]." *\tO_OBJECT\n";
+				$classes{$curr_class[$c]}{obj} = 1;
+			}
+			next;
+		}
+		if ( $str_h =~ /^ *(virtual +)?(inline +)?~[0-9A-Za-z_]+\(/ ) {
+			# print "    destructor\n";
+			if ( $public ) {
+				$classes{$curr_class[$c]}{dest} = 1;
+			}
+			else {
+				$classes{$curr_class[$c]}{dest} = 0;
+			}
+		}
+		next unless $public;
+		$str_h =~ s/\s+/ /g;
+		$str_h =~ s/&/ &/g;
+		$str_h =~ s/& /&/g;
+		$str_h =~ s/\*/ */g;
+		$str_h =~ s/\* /*/g;
+		$str_h =~ s/^(.*operator) +([=!<>&*].*)$/$1$2/ if ( $str_h =~ /operator / );
+		$str_h =~ s/^(.*operator[=!<>&*]+) *(\(.+)$/$1$2/ if ( $str_h =~ /operator[=!<>&*]+ +\(/ );
+		$str_h =~ s/=/ = /g unless $str_h =~ /operator/;
+		$str_h =~ s/\s+/ /g;
+		$str_h =~ s/^ //;
+		if ( $str_h =~ /^Q_DECLARE_FLAGS/ ) {
+			$str_h =~ /^Q_DECLARE_FLAGS ?\(([0-9A-Za-z_]+), ([0-9A-Za-z_]+)\)$/;
+			my ($flag1, $flag2) = ($1, $2);
+			unless ( $std_type{$curr_class[$c].'::'.$flag2} ) {
+				print "??? undef enum ", $curr_class[$c].'::'.$flag2, "\n";
+			}
+			unless ( $std_type{$curr_class[$c].'::'.$flag1} ) {
+				$std_type{$curr_class[$c].'::'.$flag1} = 7;
+				printf TM "%s\tT_ENUM\n", $curr_class[$c].'::'.$flag1;
+				#$class_enums[$c]{$flag1} = $class_enums[$c]{$flag2} if $class_enums[$c]{$flag2};
+				#$class_enums[$c]{$flag1}{orig} = 0;
+				$redefine{'#define '.$curr_class[$c].'__'.$flag1.' '.$curr_class[$c].'::'.$flag1}++;
+				$classes{$curr_class[$c]}{sin_enums}{$flag1} = $flag2;
+				#print " add enum $flag1\n";
+			}
+			next;
+		};
+		next if $str_h =~ /Q_DECLARE_PRIVATE/; # todo
+		next if $str_h =~ /^using [A-Za-z<>]+::[A-Za-z]+; ?$/;
+		if ( $str_h =~ /^union/ ) { # ???
+			if ( $str_h =~ /^union [A-Za-z_]+ \{.*\}(?: [A-Za-z_]+)?;/ ) {
+				#print "??? $str_h\n";
+			}
+			else {
+				$to_next = $str_h;
+			}
+			next;
+		}
+		$str_h =~ s/^enum \{ Type/enum Type { Type/ if $module eq 'QGraphicsItem';
+		if ( $str_h =~ /^enum/ ) {
+			print "$str_h \n"  if $module eq $prenormalize;
+			if ( $str_h =~ /^enum (?:[0-9A-Za-z_]+ )?\{/ and $str_h =~ /\};$/ ) {
+				if ( $str_h =~ /^enum ([0-9A-Za-z_]+) \{ ?\b(.+)\b ?\};$/ ) {
+					my ($enum_name, $enum_body) = ($1, $2);
+					if ( $public == -1 ) {
+						if ( $classes{$curr_class[$c]}{prot_enum} ) {
+							$classes{$curr_class[$c]}{prot_enum} .= '+'.$curr_class[$c].'::'.$enum_name; }
+						else {
+							$classes{$curr_class[$c]}{prot_enum} = $curr_class[$c].'::'.$enum_name;
+						}
+					}
+					$redefine{'#define '.$curr_class[$c].'__'.$enum_name.' '.$curr_class[$c].'::'.$enum_name}++;
+					$std_type{$curr_class[$c].'::'.$enum_name} = 7;
+					printf TM "%s\tT_ENUM\n", "$curr_class[$c]::$enum_name";
+					$enum_body =~ s/ ,/,/g;
+					#print " enum $enum_name:\n$enum_body\n" if $module eq '';
+					my @enms = split ', ', $enum_body;
+					my $enm_cnt = -1;
+					foreach my $enm ( @enms ) {
+						if ( $enm =~ /(\S+)(?: ?= ?(\S+(?: \| \S+)*))?/ ) {
+							my $qq = $1;
+							my $ww = $2;
+							$ww = 0 if $module eq 'QDataStream' and $2 eq 'QSysInfo::BigEndian'; #plug, todo
+							$ww = 1 if $module eq 'QDataStream' and $2 eq 'QSysInfo::LittleEndian';
+							if ( defined $2 ) {
+								#print "in enum 0: $ww\n" if $module eq $prenormalize;
+								if ( $ww =~ /^[0-9]+$/ ) {
+									$enm_cnt = $ww;
+								}
+								elsif ( $ww=~ /^0x\w+$/ ) {
+									$enm_cnt = hex $ww;
+								}
+								elsif ( defined $classes{$curr_class[$c]}{all_enums}{$ww} ) {
+									$enm_cnt = $classes{$curr_class[$c]}{all_enums}{$ww};
+								}
+								elsif ( $ww =~ /[0-9A-Za-z_]+ +\|/ ) {
+									my @sd = split /\|/, $ww;
+									$enm_cnt = 0;
+									foreach my $ee ( @sd ) {
+										$ee =~ s/^\s*(\S+)\s*$/$1/;
+										#print "in enum 1: $ee\n" if $module eq $prenormalize;
+										if ( $ee =~ /^0x\w+$/ ) {
+											$enm_cnt |= hex $ee;
+										}
+										elsif ( defined $classes{$curr_class[$c]}{all_enums}{$ee} ) {
+											$enm_cnt += $classes{$curr_class[$c]}{all_enums}{$ee};
+										}
+										else {
+											print " enum ??? undef $ee \n";
+										}
+				    				}
+								}
+							}
+							else {
+			        				$enm_cnt++; }
+							# print "$qq = $enm_cnt\n"  if $module eq 'QFont';
+							$classes{$curr_class[$c]}{enums}{$enum_name}{$qq} = $enm_cnt;
+							$classes{$curr_class[$c]}{all_enums}{$qq} = $enm_cnt;
+						}
+						else {
+							print "enum ??? '$enum_name' - '$enm'\n";
+						}
+					};
+				}
+				else {
+					print "  enum ??? '$str_h'\n";
+				}
+			}
+			else {
+				$to_next = $str_h;
+			}
+			next;
+		}
+		my $opn = ( $str_h =~ tr/(/(/ );
+		my $clse = ( $str_h =~ tr/)/)/ );
+		if ( $opn != $clse ) {
+			$to_next = $str_h;
+			next;
+		}
+		$str_h =~ s/explicit //;
+		$frnd = 1 if $str_h =~ s/friend //;
+		$static_fn = 1 if $str_h =~ s/static //; # !!!
+		$str_h =~ s/inline //;
+		$str_h =~ s/Q_CORE_EXPORT_INLINE //;
+		$str_h =~ s/QT_MOC_COMPAT //;
+		$str_h =~ s/QT3_SUPPORT //;
+		$str_h =~ s/QT3_SUPPORT_CONSTRUCTOR //;
+		$str_h =~ s/QT_ASCII_CAST_WARN //;
+		$str_h =~ s/QT_ASCII_CAST_WARN_CONSTRUCTOR //;
+		$str_h =~ s/QT_FASTCALL //;
+		$str_h =~ s/QT_DEPRECATED //;
+		$str_h =~ s/ QT_DEPRECATED//;
+		$str_h =~ s/\s+;/;/;
+		$str_h =~ s/ Q_REQUIRED_RESULT;/;/;
+		$opn = ( $str_h =~ tr/{/{/ );
+		$clse = ( $str_h =~ tr/}/}/ );
+		if ( $opn == $clse ) {
+			$str_h =~ s/^([^{}]+){.*}/$1;/;
+		}
+		$str_h =~ s/ +;+/;/;
+
+		my $orig_param = "";
+		if ( $str_h =~ /^[^(]+\((.+)\)[^)]*$/ ) {
+			$orig_param = $1;
+		}
+		$const_fn = 1 if $str_h =~ /^ ?const/;
+		$str_h =~ s/const //g;
+		$str_h =~ s/\) ?const/)/;
+		$str_h =~ s/\) ?: ?[0-9A-Za-z_<>]+\(.+\)(, [0-9A-Za-z_<>]+)*;$/);/;
+		$str_h =~ s/ \(/(/;
+		if ( $str_h =~ /((\w+)::(\w+))/ ) {
+			my $qq = "#define $2__$3 $1";
+			unless ( $redefine{$qq} ) {
+				$redefine{$qq}++;
+			}
+		}
+		#next if $module eq 'QLayout' and $str_h eq 'void setGeometry(QRect &) = 0;'; # bug ???
+		next if $str_h =~ /^~[0-9A-Za-z_]+\(\).*;$/;
+		print "4: '$str_h'\n" if $module eq $prenormalize;
+		if (( $str_h =~ /^operator .*;$/ or $str_h =~ /operator=\(.*;$/ or $str_h =~ /operator\[\].*;$/ or $str_h =~ /operator~\(.*;$/ or $str_h =~ /operator!\(.*;$/ or $str_h =~ /operator(\+\+|--)/ ) and not $str_h =~ /{/) {
+			#print "??? $str_h\n";
+			next;
+		}
+		if ( not $str_h =~ /{/ and $str_h =~ /^(?:([A-Za-z0-9_:]+(?:\<.+\>)?) )?(\S+)\((.+)?\);+$/ ) {
+			my ($qq, $ww, $ee) = ($1, $2, $3);
+			$qq = "" unless $qq;
+			$ee = "" unless $ee;
+			$ee =~ s/\(/ (/g;
+			next if $qq =~ /ucs2/i or $qq =~ /ucs4/i or $ee =~ /ucs2/i or $ee =~ /ucs4/i;
+			next if $ee =~ /Private/;
+			# plugs
+			if ( $pkgs eq 'QtCore' ) {
+				next if $module eq 'QObject' and ( $ww eq 'connect' or $ww eq 'disconnect' ) and not $static_fn; # problem with call static/not static function
+				$qq =~ s/bool/void/ if $module eq 'QBitArray' and $ww =~ /fill/; # todo
+				$ee =~ s/= QString/= &QString/ if not $qq and $curr_class[$c] eq 'QSettings'; # ???
+				$virt = 0 if $module eq 'QTranslator' and $ww eq 'translate';
+			}
+			elsif ( $pkgs eq 'QtGui' ) {
+				next if ( $curr_class[$c] eq 'QAccessibleApplication' or $curr_class[$c] eq 'QAccessibleWidget' or $curr_class[$c] eq 'QAccessibleWidgetEx' ) and $ww =~ /navigate/;
+				next if $module eq 'QFileDialog' and $ee =~ /QFileDialogArgs/; # ??? not found
+				next if $module eq 'QGraphicsScene' and $ww eq 'drawItems'; # todo: *items[], options[]
+				next if $module eq 'QGraphicsView' and $ww eq 'drawItems'; # todo: *items[], options[]
+				next if $module eq 'QGridLayout' and $ww eq 'addItem' and $public == -1;
+				next if $module eq 'QSound' and $ww eq 'play' and $static_fn; # conflict slot play() with static play(filename)
+				if ( not $qq ) {
+					if ( $module eq 'QApplication') {
+						$ee =~ s/= QT_VERSION/qtver = QT_VERSION/;
+						$orig_param =~ s/= QT_VERSION/qtver = QT_VERSION/;
+					}
+					elsif ( $curr_class[$c] eq 'QLineEdit' ) {
+						$ee =~ s/QString &,/QString &str,/;
+						$orig_param =~ s/QString &,/QString &str,/;
+					}
+					elsif ( $curr_class[$c] eq 'QListWidgetItem' ) {
+						$ee =~ s/= Type/= QListWidgetItem::Type/;
+						$orig_param =~ s/= Type/= QListWidgetItem::Type/;
+					}
+				}
+				elsif ( $module eq 'QDialog' and $ww eq 'done' ) {
+					$ee =~ s/int/int data0/;
+					$orig_param =~ s/int/int data0/;
+				}
+				elsif ( $module eq 'QErrorMessage' and $ww eq 'done' ) {
+					$ee =~ s/int/int data0/;
+					$orig_param =~ s/int/int data0/;
+				}
+				elsif ( $module eq 'QSplitter' and $ww eq 'closestLegalPosition' ) {
+					$ee =~ s/int, int/int data0, int data1/;
+					$orig_param =~ s/int, int/int data0, int data1/;
+				}
+				elsif ( $module eq 'QWidget' ) {
+					if ( $ww eq 'heightForWidth' ) {
+						$ee =~ s/int/int h4w/;
+						$orig_param =~ s/int/int h4w/;
+					}
+					elsif ( $ww eq 'create' ) {
+						$ee =~ s/WId = 0/WId wid = 0/;
+						$orig_param =~ s/WId = 0/WId wid = 0/;
+					}
+					elsif ( $ww eq 'enabledChange' or $ww eq 'windowActivationChange' ) {
+						$ee =~ s/bool/bool ch/;
+						$orig_param =~ s/bool/bool ch/;
+					}
+				}
+			}
+			if ( $ee and not $ee =~ /</ ) {
+				#print "ee '$ee'\n" if $module eq 'QWidget';
+				my @prm = split /,/, $ee;
+				s/^ *// foreach ( @prm );
+				s/ *$// foreach ( @prm );
+				my $m = 0;
+				for ( ; $prm[$m] ; ++$m ) {
+					my $repl0 = $prm[$m];
+					$repl0 =~ s/ ?=*//;
+					#print "repl0 '$repl0'\n" if $module eq 'QWidget';
+					if ( $repl0 =~ /^Q([A-Za-z]+) \*$/ ) {
+						my $repl1 = $repl0."\L$1\E$m";
+						$repl0 = "Q".$1." ";
+						#print "repl1 '$repl0' -> '$repl1'\n" if $module eq 'QWidget';
+						$ee =~ s/$repl0\*/$repl1/;
+						$orig_param =~ s/$repl0\*/$repl1/;
+						#print "new ee '$ee'\n" if $module eq 'QWidget';
+					}
+					elsif ( $repl0 =~ /^Q([A-Za-z]+) \&$/ ) {
+						my $repl1 = $repl0."\L$1\E$m";
+						$ee =~ s/$repl0/$repl1/;
+						$orig_param =~ s/$repl0/$repl1/;
+					}
+					elsif ( $repl0 =~ /^(?:Q|Q[A-Za-z]+::)?([A-Z][A-Za-z]+)$/ ) {
+						my $repl1 = $repl0." \L$1\E$m";
+						$ee =~ s/$repl0/$repl1/;
+						$orig_param =~ s/$repl0/$repl1/;
+						#print "new ee '$ee'\n" if $module eq 'QAccessible2';
+					}
+				}
+			}
+			if ( $qq eq 'char' and $ww =~ /^\*\*/ ) {
+				$qq = 'char **';
+				$ww =~ s/^\*\*//;
+			}
+			if ( $qq eq 'char' and $ww =~ /^\*/ ) {
+				$qq = 'char *';
+				$ww =~ s/^\*//;
+			}
+			if ( $qq eq 'wchar_t' and $ww =~ /^\*/ ) {
+				$qq = 'wchar_t *';
+				$ww =~ s/^\*//;
+			}
+			my $vv = $ww;
+			$vv =~ s/\* ?//;
+			$vv =~ s/\& ?//;
+			if ( $virt < 0 ) {
+				$classes{$curr_class[$c]}{abst} .= $vv.':' unless $classes{$curr_class[$c]}{abst} =~ /\b$vv:/ ;
+				next;
+			}
+			elsif ( $classes{$curr_class[$c]}{abst} =~ /\b$vv:/ ) {
+				$classes{$curr_class[$c]}{abst} =~ s/\b$vv://;
+			}
+			my $m = $c-$int_c;
+			my $j = $classes{$curr_class[$c]}{fnc};
+			if ( $qq ) {
+				my $bb = $qq;
+				my $bbb = $qq;
+				if ( $qq =~ /^(Q[A-Za-z]+)<([0-9A-Za-z_]+)(?: ?\*)?>$/ and ( $1 eq 'QList' or $1 eq 'QVector' ) ) {
+					$bb = $2;
+				}
+				if ( not $std_type{$bb} and not $classes{$bb} and not $complex_type{$bb} ) {
+					#print " will found $qq ( $bb )\n";
+					my @bss;
+					$bss[0] = $curr_class[$c];
+					while ( $bss[0] =~ /::/ ) {
+						$bss[0] =~ /^(.+)::[0-9A-Za-z_]+$/;
+						unshift @bss, $1;
+					}
+					FIND_OUT_NAME: while ( scalar(@bss) > 0 ) {
+						$bs = shift @bss;
+						#print " search out type $bb in $bs\n";
+						for my $rr ( keys %{$classes{$bs}{enums}}, keys %{$classes{$bs}{sin_enums}}, keys %{$classes{$bs}{subclass}}, keys %{$classes{$bs}{fn_ptr}} ) {
+							if ( $bb eq $rr ) {
+								$bbb = $bs.'::'.$bb;
+								last FIND_OUT_NAME;
+							}
+						}
+						unshift @bss, split /,/, $classes{$bs}{base} if $classes{$bs}{base};
+					}
+					#print " found $bbb\n";
+					$qq =~ s/$bb/$bbb/;
+				}
+			}
+			my ($aa, $ss, $dd);
+			if ( $str_h =~ /^FILE \*/ ) {
+				$aa = 'FILE *'; }
+			else {
+				$aa = $qq;
+				$aa =~ s/([0-9A-Za-z]+)/$1/;
+			}
+			# print "'$aa'";
+			$ss = $ww;
+			if ( $ss =~ /(operator\S+)/ ) {
+				$ss = $1; }
+			elsif ( $ss =~ /([0-9A-Za-z_]+)/ ) {
+				$ss = $1; }
+			else {
+				$ss = "";
+			}
+			# print " '$ss'";
+			my @rr;
+			if ( $ee ) {
+				@rr = split ',', $ee;
+				foreach my $tt ( @rr ) {
+					if ( $tt =~ /^ *char \*/ ) {
+						$tt = 'char *'; }
+					elsif ( $tt =~ /^ *FILE \*/ ) {
+						$tt = 'FILE *'; }
+					else {
+						$tt = $1 if $tt =~ /^ *([0-9A-Za-z_:<>]+)&?( \S+)/;
+					}
+				}
+				# print " '$_'" foreach @rr;
+			}
+			# print "\n";
+			if ( $func_types{$ss} ) { # found other function with with name
+				# print "found\n";
+				my @prm;
+				$prm[0] = $aa;
+				for my $k ( 0 .. $#rr ) {
+					$prm[$k+1] = $rr[$k]; }
+				my $flag = 0; # 0 - not found (add new func), 1 - replace, -1 - not change, 2 - eq => -1
+				my $ff;
+				for my $l ( 0 .. $#{$func_types{$ss}} ) {
+					$ff = $l;
+					if ( scalar(@{$func_types{$ss}[$l]{param}}) == scalar(@prm)  ) {
+						# print "prm ==\n";
+						for my $k ( 0 .. $#prm ) {
+							if ( $std_type{$prm[$k]} and $std_type{$prm[$k]} == 2 and $std_type{$func_types{$ss}[$l]{param}[$k]} and $std_type{$func_types{$ss}[$l]{param}[$k]} == 2 ) {
+								if ( $func_types{$ss}[$l]{param}[$k] eq $prm[$k] ) {
+									$flag = 2 unless $flag;
+									# print "  dig ==\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'int' and $prm[$k] eq 'short' or
+								$func_types{$ss}[$l]{param}[$k] eq 'int' and $prm[$k] eq 'long' or
+								$func_types{$ss}[$l]{param}[$k] eq 'int' and $prm[$k] eq 'qint64' or
+								$func_types{$ss}[$l]{param}[$k] eq 'qint64' and $prm[$k] eq 'short' or
+								$func_types{$ss}[$l]{param}[$k] eq 'qint64' and $prm[$k] eq 'long' ) {
+									print "  (int 1 -> -1)" if $flag == 1;
+									$flag = -1;
+									# print "  dig -1\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'short' and $prm[$k] eq 'int' or
+								$func_types{$ss}[$l]{param}[$k] eq 'long' and $prm[$k] eq 'int' or
+								$func_types{$ss}[$l]{param}[$k] eq 'qint64' and $prm[$k] eq 'int' or
+								$func_types{$ss}[$l]{param}[$k] eq 'short' and $prm[$k] eq 'qint64' or
+								$func_types{$ss}[$l]{param}[$k] eq 'long' and $prm[$k] eq 'qint64' ) {
+									print "  (int -1 -> 1)" if $flag == -1;
+									$flag = 1;
+									# print "  dig +1\n";
+								}
+								else {
+									print "  int ??? '$ss' :", $func_types{$ss}[$l]{param}[$k], " & $prm[$k]\n";
+								}
+							} # $std_type{$prm[$k]} and $std_type{$prm[$k]} == 2 and ....
+							elsif (  $std_type{$prm[$k]} and $std_type{$prm[$k]} == 3 and $std_type{$func_types{$ss}[$l]{param}[$k]} and $std_type{$func_types{$ss}[$l]{param}[$k]} == 3  ) {
+								if ( $func_types{$ss}[$l]{param}[$k] eq $prm[$k] ) {
+									$flag = 2 unless $flag;
+									# print "  dig ==\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'uint' and $prm[$k] eq 'ushort' or
+								$func_types{$ss}[$l]{param}[$k] eq 'uint' and $prm[$k] eq 'ulong' or
+								$func_types{$ss}[$l]{param}[$k] eq 'uint' and $prm[$k] eq 'quint64' or
+								$func_types{$ss}[$l]{param}[$k] eq 'quint64' and $prm[$k] eq 'ushort' or
+								$func_types{$ss}[$l]{param}[$k] eq 'quint64' and $prm[$k] eq 'ulong' ) {
+									print "  (uint 1 -> -1)" if $flag == 1;
+									$flag = -1;
+									# print "  dig -1\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'ushort' and $prm[$k] eq 'uint' or
+								$func_types{$ss}[$l]{param}[$k] eq 'ulong' and $prm[$k] eq 'uint' or
+								$func_types{$ss}[$l]{param}[$k] eq 'quint64' and $prm[$k] eq 'uint' or
+								$func_types{$ss}[$l]{param}[$k] eq 'ushort' and $prm[$k] eq 'quint64' or
+								$func_types{$ss}[$l]{param}[$k] eq 'ulong' and $prm[$k] eq 'quint64' ) {
+									print "  (uint -1 -> 1)" if $flag == -1;
+									$flag = 1;
+									# print "  dig +1\n";
+								}
+								else {
+									print "  int ??? $ss :", $func_types{$ss}[$l]{param}[$k], " & $prm[$k]\n";
+								}
+							} # $std_type{$prm[$k]} and $std_type{$prm[$k]} == 3 and ....
+							elsif (  $std_type{$prm[$k]} and $std_type{$prm[$k]} == 4 and $std_type{$func_types{$ss}[$l]{param}[$k]} and $std_type{$func_types{$ss}[$l]{param}[$k]} == 4  ) {
+								if ( $func_types{$ss}[$l]{param}[$k] eq $prm[$k] ) {
+									$flag = 2 unless $flag;
+									# print "  dig ==\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'double' and $prm[$k] eq 'float' ) {
+									print "  (uint 1 -> -1)" if $flag == 1;
+									$flag = -1;
+									# print "  dig -1\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'float' and $prm[$k] eq 'double' ) {
+									print "  (uint -1 -> 1)" if $flag == -1;
+									$flag = 1;
+									# print "  dig +1\n";
+								}
+								else {
+									print "  double ??? $ss :", $func_types{$ss}[$l]{param}[$k], " & $prm[$k]\n";
+								}
+							} # $std_type{$prm[$k]} and $std_type{$prm[$k]} == 3 and ....
+							elsif ( $prm[$k] =~ /char/ and $func_types{$ss}[$l]{param}[$k] =~ /char/ ) {
+								# print "  char\n";
+								if ( $func_types{$ss}[$l]{param}[$k] eq $prm[$k] ) {
+									$flag = 2 unless $flag;
+									# print "  char ==\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'char *' and $prm[$k] eq 'char' or
+								$func_types{$ss}[$l]{param}[$k] eq 'char' and $prm[$k] eq 'uchar' ) {
+									print "  (char 1 -> -1)" if $flag == 1;
+									$flag = -1;
+									# print "  char -1\n";
+								}
+								elsif ( $func_types{$ss}[$l]{param}[$k] eq 'char' and $prm[$k] eq 'char *' or
+								$func_types{$ss}[$l]{param}[$k] eq 'uchar' and $prm[$k] eq 'char' ) {
+									print "  (char -1 -> 1)" if $flag == 1;
+									$flag = 1;
+									# print "  char +1\n";
+								}
+								else {
+									print "char ??? '$ss' : ", $func_types{$ss}[$l]{param}[$k], " &  $prm[$k] \n";
+								}
+							}
+							elsif ( $prm[$k] eq $func_types{$ss}[$l]{param}[$k] ) {
+								# print "  ==\n";
+								$flag = 2 unless $flag;
+							}
+							else { # not eq
+								# print "  !=\n";
+								$flag = 0;
+								last;
+							}
+						} # for my $k ( 0 .. $#prm )
+					} # if scalar(@{$func_types{$ss}[$l]{param}}) == scalar(@prm)
+					#else {
+					#    print "prm !=\n";
+					#}
+					last if $flag;
+				} # for my $l ( 0 .. $#{$func_types{$ss}} )
+				# print "  end flag = $flag\n";
+				# 0 - not found (add new func), 1 - replace, -1 - not change, 2 - eq => -1
+				$flag = -1 if $flag == 2;
+				if ( $flag > 0 ) {
+					$j = $func_types{$ss}[$ff]{num};
+					$func_types{$ss}[$ff]{param} = \@prm;
+					# print " replace\n\n";
+				}
+				elsif ( $flag < 0 ) {
+					# print " skip\n\n";
+					next;
+				}
+				else {
+					# print " new\n\n";
+					$ff++;
+					$func_types{$ss}[$ff]{num} = $j;
+					$func_types{$ss}[$ff]{param} = \@prm;
+				}
+			}
+			else { # not $func_types{$ss}
+				$func_types{$ss}[0]{num} = $j;
+				$func_types{$ss}[0]{param}[0] = $aa;
+				for ( my $k = 0 ; $rr[$k] ; $k++ ) {
+					$func_types{$ss}[0]{param}[$k+1] = $rr[$k];
+				}
+			}
+			# print "j = $j\n";
+	    		if ( $qq =~ /^(Q[A-Za-z]+)<([A-Za-z:]+)>/ and not $complex_type{$qq} ) {
+				my ($xx, $zz) = ($1, $2);
+				#print "  zz = $zz\n";
+				if ( $std_type{$zz} and ( $std_type{$zz} == 2 or $std_type{$zz} == 6 or $std_type{$zz} == 7 ) and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+					$complex_type{$qq} = 2;
+					print TM "$qq\tT_AV_INT\n";
+				}
+				elsif ( $std_type{$zz} and $std_type{$zz} == 3 and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+					$complex_type{$qq} = 3;
+					print TM "$qq\tT_AV_UINT\n";
+				}
+				elsif ( $std_type{$zz} and $std_type{$zz} == 4 and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+					$complex_type{$qq} = 4;
+					print TM "$qq\tT_AV_FLOAT\n";
+				}
+#				elsif ( $std_type{$zz} and $std_type{$zz} == 7 and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+#					$complex_type{$qq} = 7;
+#					print TM "$qq\tT_AV_ENUM\n";
+#				}
+				elsif ( $classes{$zz} and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+					$complex_type{$qq} = 10;
+					print TM "$qq\tT_AV_OBJ\n";
+				}
+			}
+			if ( $qq =~ /^(Q[A-Za-z]+)<([A-Za-z]+) \*>/ and not $complex_type{$qq} ) {
+				my ($xx, $zz) = ($1, $2);
+				if ( $classes{$zz} and ( $xx eq 'QList' or $xx eq 'QVector' ) ) {
+					$complex_type{$qq} = 11;
+					print TM "$qq\tT_AV_OBJPTR\n";
+				}
+			}
+			if ( $qq =~ /^(Q[A-Za-z]+)<([A-Za-z]+), ([A-Za-z]+)>/ and not $complex_type{$qq} ) {
+				my ($xx, $yy, $zz) = ($1, $2, $3);
+				if ( $std_type{$yy} and $std_type{$yy} == 2 and $classes{$zz} and ($xx eq 'QMap' or $xx eq 'QHash' ) ) {
+					$complex_type{$qq} = 21;
+					my $rr = $xx.'_'.$yy.'__'.$zz;
+					$complex_type{$rr} = 21;
+					$redefine{'#define '.$rr.' '.$qq}++;
+					print TM "$qq\tT_HV_INT_OBJ\n";
+					print TM "$rr\tT_HV_INT_OBJ\n";
+				}
+				elsif ( $classes{$yy} and $classes{$zz} and ($xx eq 'QMap' or $xx eq 'QHash' ) ) {
+					$complex_type{$qq} = 22;
+					my $rr = $xx.'_'.$yy.'__'.$zz;
+					$complex_type{$rr} = 22;
+					$redefine{'#define '.$rr.' '.$qq}++;
+					print TM "$qq\tT_HV_OBJ_OBJ\n";
+					print TM "$rr\tT_HV_OBJ_OBJ\n";
+				}
+			}
+			if ( $qq =~ /^(Q[A-Za-z]+)<([A-Za-z]+), ([A-Za-z]+) ?\*>/ and not $complex_type{$qq} ) {
+				my ($xx, $yy, $zz) = ($1, $2, $3);
+				if ( $std_type{$yy} and $classes{$zz} and ($xx eq 'QMap' or $xx eq 'QHash' ) ) {
+					$complex_type{$qq} = 23;
+					my $rr = $xx.'_'.$yy.'__'.$zz;
+					$complex_type{$rr} = 23;
+					$redefine{'#define '.$rr.' '.$qq}++;
+					print TM "$qq\tT_HV_UINT_OBJPTR\n";
+					print TM "$rr\tT_HV_UINT_OBJPTR\n";
+				}
+			}
+			if ( $classes{$qq} and $ww =~ /^&/  ) {
+				$ww =~ s/&//;
+				$class_func[$c][$j]{lnk} = 3;
+			}
+			elsif ( $complex_type{$qq} and $ww =~ /^&/ ) {
+				$ww =~ s/&//;
+			}
+			elsif ( $qq =~ /&$/ or $ww =~ /^&/ ) {
+				$qq =~ s/&//;
+				$ww =~ s/&//;
+				$class_func[$c][$j]{lnk} = 1;
+			}
+			elsif ( $ww =~ /^\*/ ) {
+				$ww =~ s/\*//;
+				$class_func[$c][$j]{lnk} = 2;
+			}
+			else {
+				$class_func[$c][$j]{lnk} = 0;
+			}
+
+			#print "lnk ".$class_func[$c][$j]{lnk}."\n"  if $module eq 'QDataStream';
+			$class_func[$c][$j]{orig_name} = $ww;
+			if ( $operators1{$ww} ) {
+				$class_func[$c][$j]{name} = $operators1{$ww};
+				$class_func[$c][$j]{op_name} = $operators1{$ww};
+				$class_func[$c][$j]{op} = 1;
+			}
+			elsif ( $operators2{$ww} ) {
+				$class_func[$c][$j]{name} = $operators2{$ww};
+				$class_func[$c][$j]{op_name} = $operators2{$ww};
+				$class_func[$c][$j]{lnk} = 1;
+				$class_func[$c][$j]{op} = 2;
+			}
+			elsif ( $operators3{$ww} ) {
+				$class_func[$c][$j]{name} = $operators3{$ww};
+				$class_func[$c][$j]{op_name} = $operators3{$ww};
+				$qq = "void";
+				$class_func[$c][$j]{op} = 3;
+				$class_func[$c][$j]{lnk} = 0;
+			}
+			else {
+				$class_func[$c][$j]{name} = $ww;
+				$class_func[$c][$j]{op} = 0;
+			}
+			$class_func[$c][$j]{st} = 0;
+			$class_func[$c][$j]{st} = 1 if $static_fn;
+			$class_func[$c][$j]{const} = 0;
+			$class_func[$c][$j]{const} = 1 if $const_fn;
+			$class_func[$c][$j]{frnd} = 0;
+			$class_func[$c][$j]{frnd} = 1 if $frnd;
+			$class_func[$c][$j]{virt} = 0;
+			$class_func[$c][$j]{virt} = 1 if $virt;
+			$class_func[$c][$j]{protected} = 0;
+			$class_func[$c][$j]{protected} = 1 if $public == -1;
+			#print "frnd = ", $class_func[$c][$j]{frnd}, "\n" if $module eq 'QSize';
+			$class_func[$c][$j]{type} = $qq;
+			$class_func[$c][$j]{param} = $ee;
+			$class_func[$c][$j]{orig_param} = $orig_param;
+			if ( $classes{$qq} and $const_fn and not defined($complex_type{'const '.$qq}) ) {
+				$complex_type{'const '.$qq} = 1;
+				print TM "const $qq *\tO_OBJECT\n";
+			}
+			$class_func[$c][$j]{lnk} = 1 if ( $class_func[$c][$j]{type} and not $class_func[$c][$j]{lnk} and not $std_type{$class_func[$c][$j]{type}} and not $complex_type{$class_func[$c][$j]{type}} );
+			$class_func[$c][$j]{skip} = 0;
+			if ( $classes{$curr_class[$c]}{fnc} == $j ) {
+				$func_counts[$c]{$ww}++;
+				$classes{$curr_class[$c]}{fnc}++;
+			}
+		} # $str_h =~ /...
+		elsif ( $str_h =~ /^([0-9A-Za-z_:]+) ([0-9A-Za-z_\[\]*]+)( : \w+)?;$/ ) { # todo: write get/set
+			unless ( $std_type{$1} or $std_type{$curr_class[$c-$int_c].'::'.$1} or $classes{$1} ) {
+				print "??? '$str_h' => '$1' '$2', curr_class $curr_class[$c], base ".$curr_class[$c-$int_c]."\n";
+			}
+			#else { print "+++ '$str_h'\n"; }
+		}
+		elsif ( $str_h =~ /^(?:([0-9A-Za-z_&:]+(?:\<.+\>)?) )?(\S+)\(/
+		and ( $str_h =~ /{/ and not $str_h =~ /} ?$/ or not $str_h =~ /\) ?;$/ ) ) {
+	        	$to_next = $str_h;
+		}
+		else {
+			print "???? '$str_h'\n";
+		}
+	} # $str_h = <FH>
+
+	print FXS $end_xs;
+	print FXS "MODULE = Qt::".$module."\t\tPACKAGE = Qt::".$module."\n\n" if $module ne $curr_class[$c];
+
+	print FPM "# This file generated automaticaly from Qt4 header file\n";
+	print FPM "package Qt::".$module.";\n\n";
+	print FPM "use 5.008;\n";
+	print FPM "use strict;\n";
+	print FPM "use warnings;\n\n";
+	if ( $pkgs eq 'QtCore' ) {
+		print FPM "use QtCore;\n";
+		print FPM "QtCore::bootstrap_subpackage '".$module."';\n\n";
+	}
+	elsif ( $pkgs eq 'QtGui' ) {
+		print FPM "use QtGui;\n";
+		print FPM "QtGui::bootstrap_subpackage '".$module."';\n\n";
+	}
+	print FPM "our %sigsl;\n\n\n";
+	for ( my $i = 1 ; $i <= $c ; $i++ ) {
+		print FPM "package Qt::".$curr_class[$i].";\n\n";
+		print FPM "use Carp 'croak';\n";
+		print FPM "require Exporter;\n";
+		print FPM "our \@ISA = qw(Exporter";
+		for my $ss ( split /,/, $classes{$curr_class[$i]}{base} ) {
+			$classes{$curr_class[$i]}{use_class}{$ss}++ if ( $ss and not $ss =~ /Q(Vector|Stack|LinkedList|List|Queue|Map|Hash|Set|Cache|Pair)</  and $classes{$ss}{module} ne $classes{$curr_class[$i]}{module} );
+			print FPM ' Qt::'.$ss if ( $ss and not $ss =~ /Q(Vector|Stack|LinkedList|List|Queue|Map|Hash|Set|Cache|Pair)</ );
+		}
+		print FPM ");\n\n";
+
+		#for my $ss ( split /,/, $classes{$curr_class[$i]}{base} ) {
+		#	$classes{$curr_class[$i]}{use_class}{$ss}++ if ( $ss and not $ss =~ /Q(Vector|Stack|LinkedList|List|Queue|Map|Hash|Set|Cache|Pair)/ );
+			#print FPM "use Qt::".$ss.";\n" if ( $ss and not $ss =~ /Q(Vector|Stack|LinkedList|List|Queue|Map|Hash|Set|Cache|Pair)/ );
+		#}
+		for my $ss ( keys %{$classes{$curr_class[$i]}{use_class}} ) {
+			print FPM "use Qt::".$ss.";\n";
+		}
+
+		print FPM "\nour \@EXPORT = qw(".$curr_class[$i];
+		#print FPM ' $qApp' if $curr_class[$i] eq 'QApplication';
+		print FPM ' $qApp' if $curr_class[$i] eq 'QCoreApplication' or $curr_class[$i] eq 'QApplication';
+		print FPM ");\n\n";
+
+		if ( $module eq $curr_class[$i] and $c > 1 ) {
+			print FPM 'sub import {', "\n";
+			print FPM "    my \$caller = scalar(caller);\n";
+			print FPM '    eval "package $caller;';
+			for ( my $cc = 1 ; $cc <= $c ; $cc++ ) {
+				print FPM " Qt::", $curr_class[$cc], '->import;' if $module ne $curr_class[$cc]; }
+			print FPM "\";\n";
+			print FPM '    goto &Exporter::import;', "\n";
+			print FPM "}\n\n";
+		}
+
+		foreach my $en ( keys %{$classes{$curr_class[$i]}{enums}} ) {
+			print FPM "# enum $en\n";
+			foreach my $enb ( keys %{$classes{$curr_class[$i]}{enums}{$en}} ) {
+				print FPM "use constant $enb => ".$classes{$curr_class[$i]}{enums}{$en}{$enb}.";\n";
+			}
+		}
+		print FPM "\n";
+
+		if ( $classes{$curr_class[$i]}{obj} ) {
+			print FPM "our \$qApp;\n" if $curr_class[$i] eq 'QCoreApplication';
+			print FPM "our \%classes;\n\n" if $curr_class[$i] eq 'QObject';
+		}
+
+		print FPM "sub $curr_class[$i] {\n";
+		print FPM "    return \$qApp if \$qApp;\n" if $curr_class[$i] eq 'QCoreApplication' or $curr_class[$i] eq 'QApplication';
+		print FPM "    shift \@_ if ( \$_[0] and ( not ref(\$_[0]) and \$_[0] eq 'Qt::", $curr_class[$i], "' or ref(\$_[0]) eq 'Qt::", $curr_class[$i], "' ));\n";
+		print FPM "    my \$class = 'Qt::", $curr_class[$i], "';\n";
+		if ( $classes{$curr_class[$i]}{obj} ) {
+			print FPM "    my \@signals;\n";
+			print FPM "    my \@slots;\n";
+			print FPM "    my \%sg;\n";
+			print FPM "    if ( scalar(\@_) >= 2 and ref(\$_[0]) eq 'ARRAY' and ref(\$_[1]) eq 'ARRAY' ) {\n";
+			print FPM "        \@signals = \@{\$_[0]};\n";
+			print FPM "        shift \@_;\n";
+			print FPM "        s/ //g foreach \@signals;\n";
+			print FPM "        \@slots = \@{\$_[0]};\n";
+			print FPM "        shift \@_;\n";
+			print FPM "        s/ //g foreach \@slots;\n";
+			print FPM "        my \$i = 0;\n";
+			print FPM "        for my \$j ( \@signals ) {\n";
+			print FPM "            \$sg{\$j} = \$i;\n";
+			print FPM "            \$i++;\n";
+			print FPM "        };\n";
+			print FPM "    }\n";
+		}
+		print FPM "    my \$argv = shift;\n" if $module eq "QCoreApplication" or $module eq 'QApplication';
+		if ( $module eq "QCoreApplication" or $module eq 'QApplication' ) {
+			print FPM '    my $this = new(\@signals, \@slots, scalar(@{$argv}), $argv, @_ );'."\n";
+		}
+		else {
+			print FPM '    my $this = new(';
+			print FPM ' \@signals, \@slots,' if $classes{$curr_class[$i]}{obj};
+			printf FPM " \@_ );\n";
+		}
+		print FPM '    croak("Error in parameters at '.$curr_class[$i].'( )\n") unless $this;', "\n";
+		if ( $classes{$curr_class[$i]}{obj} ){
+			print FPM "    my \$r = Qt::QObject::save_cl(\$this);\n";
+			print FPM '    $this->{sigsl} = \%sg;'."\n";
+		}
+		print FPM "    \$qApp = \$this;\n" if $curr_class[$i] eq 'QCoreApplication' or $curr_class[$i] eq 'QApplication';
+		print FPM "    return \$this;\n";
+		print FPM "}\n\n";
+
+		if ( $classes{$curr_class[$i]}{obj} ) {
+#			print FPM "sub AUTOLOAD {\n";
+#			print FPM "    return '_not_found';\n";
+#			print FPM "}\n\n";
+			if ( $curr_class[$i] eq 'QObject' ) {
+				print FPM "sub save_cl {\n";
+				print FPM '    my $this = shift;'."\n";
+				print FPM '    $classes{$this->{_ptr}} = $this;'."\n";
+				print FPM "}\n\n";
+				print FPM "sub get_cl {\n";
+				print FPM '    return $classes{$_[0]};'."\n";
+				print FPM "}\n\n";
+			}
+			print FPM "sub slots {\n";
+			print FPM "    my \$_ptr = shift;\n";
+			print FPM "    my \$this = Qt::QObject::get_cl(\$_ptr);\n";
+			print FPM "    my \$func = shift;\n";
+			#print FPM '    printf "perl slots: %x : %s \n", $class, $func;'."\n"; # !!!
+			#print FPM '    print "          $_ \n" for @_;'."\n"; # !!!
+			print FPM "    \$this->\$func(\@_);\n";
+			print FPM "}\n\n";
+			print FPM "sub emit {\n";
+			print FPM "    my \$this = shift;\n";
+			print FPM "    my \$signal = shift;\n";
+			print FPM "    my \@data;\n";
+			print FPM "    my \$i = 0;\n";
+			print FPM "    for ( ; defined(\$_[\$i]) ; \$i++ ) {\n";
+			print FPM "        \$data[\$i] = \$_[\$i];\n";
+			print FPM "    };\n";
+			print FPM "    \$signal =~ s/ //g;\n";
+			print FPM "    my \@tps;\n";
+			print FPM '    $signal =~ /^[0-9A-Za-z_]+\(([a-z,*]*)\)$/;'."\n";
+			print FPM "    \@tps = split ',', \$1 if \$1;\n";
+			#print FPM '    print "perl emit : $signal\n";'."\n"; # !!!
+			#print FPM '    print "          $_ \n" for @data;'."\n"; # !!!
+			print FPM '    signls($this, $this->{sigsl}{$signal}, \@tps, \@data);'."\n";
+			print FPM "}\n\n";
+			print FPM "sub _virt_fn {\n";
+			print FPM "    my \$this = Qt::QObject::get_cl(\$_[0]);\n";
+			print FPM "    my \$func = \$_[1];\n";
+			print FPM "    my \@in_data;\n";
+			print FPM "    my \$i = 3;\n";
+			print FPM "    for ( ; defined \$_[\$i] ; ++\$i ) {\n";
+			print FPM "        push \@in_data, \$_[\$i];\n    }\n";
+			print FPM "    my \$out_data = eval { \$this->\$func(\@in_data); };\n";
+#			print FPM "    if ( \$retval eq '_not_found' ) {;\n";
+			print FPM "    if ( \$\@ ) {\n";
+			print FPM "        ++\$_[2];\n";
+			print FPM "        print \$\@;\n" if $add_out;
+			print FPM "        return 0;\n    }\n";
+			print FPM "    return \$out_data;\n";
+			print FPM "}\n\n";
+		}
+
+		print FPM "use overload\n";
+		my %opers;
+		foreach my $cl ( @{$class_func[$i]} ) {
+			if ( $cl->{op} and not $opers{$cl->{op_name}} ) {
+				$opers{$cl->{op_name}}++;
+				if ( $operators1{$cl->{orig_name}} ) {
+					print FPM "    '$ops{$$cl{op_name}}' => sub { return if \$_[3]; return $$cl{op_name} (\$_[0], \$_[1] ); },\n";
+				}
+				elsif ( $operators2{$cl->{orig_name}} ) {
+					print FPM "    '$ops{$$cl{op_name}}' => sub { return $$cl{op_name} ( \$_[0], \$_[1] ); },\n";
+				}
+				elsif ( $operators3{$cl->{orig_name}} ) {
+					print FPM "    '$ops{$cl->{op_name}}' => sub { $$cl{op_name} ( \$_[0], \$_[1] ); return \$_[0]; },\n";
+				}
+				else {
+					print "error in operator\n";
+				}
+			}
+		}
+		print FPM "    '=' => sub { \$_[0] },\n";
+		print FPM "    '\"\"' => sub { \$_[0] };\n\n";
+
+		my %fn_cnt;
+		foreach my $cl ( @{$class_func[$i]} ) {
+			if ( $cl->{st} and not $fn_cnt{$cl->{name}} ) {
+				$fn_cnt{$cl->{name}}++;
+				print FPM "sub $$cl{name} {\n";
+				print FPM '    shift if ref $_[0] and  $_[0]->isa("Qt::'.$curr_class[$i].'");'."\n    ";
+				print FPM "return " if $cl->{type} ne 'void';
+				print FPM "st_".$cl->{name}."( \@_ );\n";
+				print FPM "}\n\n";
+			}
+		}
+
+		print FPM "\n";
+	} # for $i <= $c
+
+	close FH;
+	close FXS;
+
+	print FPM "package Qt::".$module.";\n\n1;\n";
+	close FPM;
+
+} # @modules
+
+close TM;
+
+
+
+
+
+
+
+open FDEF, ">redef.h" or die "Can not open for write file redef.h\n";
+print FDEF "#ifndef REDEF_H\n";
+print FDEF "#define REDEF_H\n\n";
+for ( sort keys %redefine ) {
+	print FDEF "$_\n"; }
+print FDEF "\n#endif // REDEF_H\n";
+close FDEF;
+
+my $ext;
+if ( $pkgs eq 'QtCore' ) {
+	$ext = 'core';
+}
+elsif ( $pkgs eq 'QtGui' ) {
+	$ext = 'gui';
+}
+
+open FF , ">std_type.$ext" or die "Can not open for write file std_type\n";
+for my $st ( sort keys %std_type ) {
+	print FF $st.';'.$std_type{$st}."\n";
+}
+close FF;
+
+open FF, ">classes.$ext" or die "Can not open for write file classes\n";
+open FF2, ">classes_enum.$ext" or die "Can not open for write file classes_enum\n";
+open FF3, ">classes_sin_enum.$ext" or die "Can not open for write file classes_sin_enum\n";
+open FF4, ">subclasses.$ext" or die "Can not open for write file subclasses\n";
+open FF5, ">classes_fn_ptr.$ext" or die "Can not open for write file classes_fn_ptr\n";
+for my $cl ( sort keys %classes ) {
+	print FF $cl.';'.$classes{$cl}{module}.';'.$classes{$cl}{obj}.';'.$classes{$cl}{base}.';'.$classes{$cl}{dest}.';'. $classes{$cl}{abst}."\n";
+	for my $en ( sort keys %{$classes{$cl}{enums}} ) {
+		for my $enb ( sort keys %{$classes{$cl}{enums}{$en}} ) {
+			print FF2 $cl.';'.$en.';'.$enb.';'.$classes{$cl}{enums}{$en}{$enb}."\n";
+		}
+	}
+	for my $sen ( sort keys %{$classes{$cl}{sin_enums}} ) {
+		print FF3 $cl.';'.$sen.';'.$classes{$cl}{sin_enums}{$sen}."\n";
+	}
+	for my $scl ( sort keys %{$classes{$cl}{subclass}} ) {
+		print FF4 $cl.';'.$scl.';'.$classes{$cl}{subclass}{$scl}."\n";
+	}
+	for my $clfp ( sort keys %{$classes{$cl}{fn_ptr}} ) {
+		print FF5 $cl.';'.$clfp.';'.$classes{$cl}{fn_ptr}{$clfp}."\n";
+	}
+}
+close FF;
+close FF2;
+close FF3;
+close FF4;
+close FF5;
+
+open FF, ">complex_type.$ext" or die "Can not open for write file complex_type\n";
+for my $ct ( sort keys %complex_type ) {
+	print FF $ct.';'.$complex_type{$ct}."\n";
+}
+close FF;
+
+open FF, ">defined.$ext" or die "Can not open for write file defined\n";
+for my $df ( sort keys %defined ) {
+	print FF $df.';'.$defined{$df}."\n";
+}
+close FF;
+
+open FF, ">redefine.$ext" or die "Can not open for write file redefine\n";
+for my $rd ( sort keys %redefine ) {
+	print FF $rd.';'.$defined{$rd}."\n";
+}
+close FF;
+
+open FF, ">replaces.$ext" or die "Can not open for write file replaces\n";
+for my $rp ( sort keys %replaces ) {
+	print FF $rp.';'.$replaces{$rp}."\n";
+}
+close FF;
+
+1;
+

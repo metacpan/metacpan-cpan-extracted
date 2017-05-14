@@ -1,8 +1,0 @@
-Revision history for Perl extension QFont.
-
-0.03  Wed Apr 16 12:58:05 1997
-	- simplified constructor
-
-0.01  Tue Mar  4 18:53:54 1997
-	- original version; created by h2xs 1.18
-

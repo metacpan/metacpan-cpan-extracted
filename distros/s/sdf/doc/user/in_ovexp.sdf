@@ -1,0 +1,65 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Expressions
+
+
+H2: Introduction
+
+Expressions are used in several places within [[SDF]] including:
+
+* attribute values
+* macro argument values
+* filter parameter values
+* evaluation within paragraph text.
+
+The value of an expression can be placed into a paragraph
+by delimiting it with the special symbols E<2[> and E<2]>.
+For example:
+
+V:   The current file is [[DOC_FILE]].
+
+
+H2: Types of expressions
+
+An expression is either:
+
+* an [[SDF]] variable name (e.g. DOC_AUTHOR)
+* a [[Perl]] expression.
+
+If an expression is a single word, it is the value of
+a variable. Otherwise, it is evaluated as a Perl expression.
+A Perl expression is typically one of the following:
+
+* a numeric literal (e.g. {{E:213}})
+* a string literal (e.g. {{E:"User Guide"}})
+* a subroutine call (e.g. {{E:length("User Guide")}}).
+
+
+H2: Accessing variables within Perl expressions
+
+Within a [[Perl]] expression, [[SDF]] variables are available
+via the {{var}} associative array. The syntax used by [[Perl]]
+for accessing a value within an associative array is:
+
+E:  "$" array_name "{" string_index "}"
+
+Some examples are:
+
+^ get the length of the DOC_AUTHOR variable:
+
+E:      length($var{'DOC_AUTHOR'})
+
++ concatenate the document name and type:
+
+E:      "$var{'DOC_NAME'} $var{'DOC_TYPE'}"

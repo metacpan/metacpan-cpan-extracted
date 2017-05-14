@@ -1,0 +1,54 @@
+xml_grep2
+
+  grep XML files looking for specific elements
+
+  This tool mimics the behavior of grep as much as possible, while using
+  XPath to select nodes in XML files
+
+INSTALLATION
+
+To install this tool, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+This tool depends on the following Perl modules: 
+  XML::LibXML
+  File::Find::Rule
+  Getopt::Long
+  Pod::Usage
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::xml_grep2
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-xml_grep2
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-xml_grep2
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-xml_grep2
+
+    Search CPAN
+        http://search.cpan.org/dist/App-xml_grep2/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 mirod
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

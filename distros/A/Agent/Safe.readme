@@ -1,0 +1,46 @@
+------------
+Safe Support
+------------
+
+Agent now fully supports the Safe module.  There are some drawbacks to using
+Safe, however.  This file explains the issues at hand.
+
+NOTE: Please Don't let this disuade you from using Safe - it is very useful.
+
+
+use()
+-----
+It seems Safe does not like to use() complicated modules.  I don't know why,
+and I don't have the time to figure out why.  If someone could be kind
+enough to figure this one out for me I'd appreciate it;  until then, if
+you want your agents to work in a Safe compartment, don't try to use() any
+complex extensions (ie: Agent :).
+
+
+Functionality
+-------------
+When using Safe, one limits the actions a piece of code may perform.  In
+order to allow code to do things that you know are ok, but Safe doesn't
+(such as reading from a database, as opposed to reading any file in the
+system)  you have to share code with the Safe Compartment.  This is
+obviously tedious, not to mention dangerous if you screw it up.
+
+
+Summary
+-------
+
+As a side effect of the above points, an agent that tries to 'store' itself
+will have difficulties doing so unless you've shared the Agent:: namespace
+with it.  And any agent that tries to communicate won't be able to unless
+Agent::Message and Agent::Transport & co have also been shared.
+
+It would be much nicer if I could solve all your problems by writing some
+magic code that would solve all your problems.  Unfortunately I have better
+things to do (like giving myself swirlies :), so I give you the standard
+CAVEAT EMPTOR:
+
+	The Safe module itself is only as secure as you make it!
+
++---
+ Steve Purkis
+ October 2, 1998

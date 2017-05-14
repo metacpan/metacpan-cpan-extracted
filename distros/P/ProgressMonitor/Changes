@@ -1,0 +1,103 @@
+Revision history for ProgressMonitor
+
+0.01    2006-11-27
+        First version.
+
+0.02	2007-03-20
+		Added the setMessage method and associated configuration options for
+		the various monitors.
+
+0.03	2007-03-21
+        Minor fixes to adjust the tar building (my gnuwin32 tar creates weird
+        permissions in the archive).
+
+0.04	2007-03-23
+		Replaced wipeAtEnd with atEndStrategy
+		Clear any message when ending
+
+0.05	2007-03-27
+		Made the Null monitor a singleton
+		Made passMessageToParent default to 0 and parentTicks to 1
+		Made it allowable to skip calling prepare() and go directly to begin()
+		The messageFiller can be blank/undef, causing partial overlay
+		Minor help text changes
+		messageStart/EndOverlayFields are now 1 based indices.
+
+0.06	2007-04-05
+		- Fixed a loophole; if maxwidth not set we must fall back to hardcoded
+		  79 unless the Term::Size... stuff returns something worthwhile
+		- Added a convenience subMonitor method to the interface; makes it
+		  cleaner to instantiate a SubTask monitor
+		- Added a setErrorMessage method and associated support
+		- Fixed bug where the Bar never indicated empty progress when it was
+		  blank
+		- Mumbo jumbo with getting stuff printed right when backspacing 
+		  before or after - 'backspaceAfterRender'
+		  
+0.07	2007-04-11
+		- Added a clone method to progressmonitors
+		- made sure error messages are cleaned from ws
+		- set[Error]Message msgs are no longer mangled, but passed right through
+		- a msg is passed through as-is if messageStrategy is newline (message filler applied though...should it?)
+		
+0.08	2007-04-23
+		- It's possible to call 'end' directly if no work is needed at all
+		  This signals 'completion' of the monitor.
+		- Avoid treating a 'begin(0)' the same as 'begin()'
+		- Division by zero in some fields when totalTicks is explicitly '0'.
+		
+0.09	2007-05-09
+		- When using an overlay message on a field shorter than the msg, the
+		  rendition became longer than its maxwidth
+		  
+0.10	2007-05-21
+		- Removed the setting of ticks == totalTicks at 'end'
+
+0.11	2007-05-25
+		- Added a new message strategy - 'overlay_newline'.
+		
+0.12	2007-05-25
+		- When streaming a msg with \n at the end, no need to bs then.
+
+0.20	2007-06-08
+		- changing the setMessage API, to enable setting 'delayed' messages
+		  i.e. 'set message on next tick' etc.
+
+0.21	2007-06-08
+		- the newline message strategy now better handles embedded/trailing \n
+		  characters.
+		- new strategy 'overlay_honor_newline'
+		
+0.22	2007-06-11
+		- when overlaying a message, make sure to restrict it to field size,
+		  except when a newline will be printed
+
+0.23	2007-06-14
+		- added the Dynamic field.
+
+0.24	2007-11-09
+		- Made end() autocomplete ticks.
+
+0.26	2008-05-21
+		- Rendering bs after as default exposed a subtle problem when running
+		in putty; after a setErrorMessage (with implicit newlines), bs was
+		printed anyway causing output to be overwritten
+		
+0.27	2008-05-21
+		- Silly mistake, bug for 0.26 fixed in file not part of this tree...redone.
+		
+0.28	2008-08-28
+		- Added a way to change the text in a Fixed field.
+
+0.30	2008-08-28
+		- Added a way to change the text in a Dynamic field.
+
+0.31	(clearly dropped the ball on this ver, must retrack and see what I did)
+
+0.32	2010-06-11
+		Unsure what happened...all versions were removed on CPAN and to be able to
+		upload again, I have to bump the version number. No change from 0.31 (which,
+		as I mention above has an undocumented change from 0.30).
+
+0.33	2010-06-14
+		Bumping to try to get an acceptable format for the PAUSE indexer. No changes.

@@ -1,0 +1,68 @@
+format-version: 1.2
+date: 22:01:2008 11:41
+saved-by: Tanya Berardini
+auto-generated-by: OBO-Edit 1.101
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+default-namespace: gene_ontology
+remark: cvs version: $Revision: 1.1 $
+
+[Term]
+id: GO:0000001
+name: mitochondrion inheritance
+namespace: biological_process
+def: "The distribution of mitochondria, including the mitochondrial genome, into daughter cells after mitosis or meiosis, mediated by interactions between mitochondria and the cytoskeleton." [GOC:mcc, PMID:10873824, PMID:11389764]
+synonym: "mitochondrial inheritance" EXACT []
+is_a: GO:0048308 ! organelle inheritance
+is_a: GO:0048311 ! mitochondrion distribution
+
+[Term]
+id: GO:0000002
+name: mitochondrial genome maintenance
+namespace: biological_process
+def: "The maintenance of the structure and integrity of the mitochondrial genome; includes replication and segregation of the mitochondrial chromosome." [GOC:ai, GOC:vw]
+is_a: GO:0007005 ! mitochondrion organization and biogenesis
+
+[Term]
+id: GO:0000003
+name: reproduction
+namespace: biological_process
+alt_id: GO:0019952
+alt_id: GO:0050876
+def: "The production by an organism of new individuals that contain some portion of their genetic material inherited from that organism." [GOC:go_curators, GOC:isa_complete, ISBN:0198506732 "Oxford Dictionary of Biochemistry and Molecular Biology"]
+subset: goslim_generic
+subset: goslim_pir
+subset: goslim_plant
+subset: gosubset_prok
+synonym: "reproductive physiological process" EXACT []
+is_a: GO:0008150 ! biological_process
+
+[Term]
+id: GO:0000005
+name: ribosomal chaperone activity
+namespace: molecular_function
+def: "OBSOLETE. Assists in the correct assembly of ribosomes or ribosomal subunits in vivo, but is not a component of the assembled ribosome when performing its normal biological function." [GOC:jl, PMID:12150913]
+comment: This term was made obsolete because it refers to a class of gene products and a biological process rather than a molecular function.
+is_obsolete: true
+consider: GO:0042254
+consider: GO:0051082
+
+[Term]
+id: GO:0000006
+name: high affinity zinc uptake transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: Zn2+(out) = Zn2+(in), probably powered by proton motive force. In high affinity transport the transporter is able to bind the solute even if it is only present at very low concentrations." [TC:2.A.5.1.1]
+is_a: GO:0005385 ! zinc ion transmembrane transporter activity
+
+[Term]
+id: GO:0000007
+name: low-affinity zinc ion transmembrane transporter activity
+namespace: molecular_function
+def: "Catalysis of the transfer of a solute or solutes from one side of a membrane to the other according to the reaction: Zn2+ = Zn2+, probably powered by proton motive force. In low affinity transport the transporter is able to bind the solute only if it is present at very high concentrations." [GOC:mtg_transport, ISBN:0815340729]
+is_a: GO:0005385 ! zinc ion transmembrane transporter activity

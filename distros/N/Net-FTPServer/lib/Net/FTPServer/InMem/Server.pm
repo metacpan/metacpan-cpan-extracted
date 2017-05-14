@@ -18,8 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: Server.pm,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 =pod
 
 =head1 NAME
@@ -28,7 +26,7 @@ Net::FTPServer::InMem::Server - Store files in local memory
 
 =head1 SYNOPSIS
 
-  inmem-ftpd [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
+  inmem-ftpd.pl [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
 
 =head1 DESCRIPTION
 
@@ -39,8 +37,6 @@ is used mainly for automatic testing in the test suites (see the
 C<t/> directory in the distribution).
 
 =head1 METHODS
-
-=over 4
 
 =cut
 
@@ -113,19 +109,6 @@ sub root_directory_hook
 
 __END__
 
-=back 4
-
-=head1 FILES
-
-  /etc/ftpd.conf
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/FileHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Handle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/InMem/Server.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/InMem/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/InMem/FileHandle.pm
-
 =head1 AUTHORS
 
 Richard Jones (rich@annexia.org).
@@ -137,6 +120,6 @@ London, SW6 3EG, UK
 
 =head1 SEE ALSO
 
-L<Net::FTPServer(3)>.
+C<Net::FTPServer(3)>.
 
 =cut

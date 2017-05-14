@@ -1,0 +1,103 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Overview
+
+H2: Features
+
+SDF supports a range of features related to figures:
+
+* figures can be imported in a variety of formats including:
+  - EPS - Encapsulated PostScript
+  - WMF - Windows MetaFile
+  - MIF - Maker Interchange Format
+  - GIF - Graphics Interchange Format
+  - JPEG - JPEG File Interchange Format
+  - PNG - Portable Network Graphic Format
+  - BMP - Windows Bitmap Format
+
+* logos can be easily added to title pages and online headers
+* figure positioning can be controlled
+* text can be wrapped around figures.
+
+H2: Importing Figures Into SDF Documents
+
+The {{MAC:import}} macro is usually used to import a figure.
+The syntax is:
+
+E:  !import "filename" {{1:[; parameters]}}
+
+For example:
+
+E:  !import "sdfarch"
+
+H2: Importing a Figure Into Paragraph Text
+
+To import a figure into the middle of a paragraph,
+the IMPORT phrase style is used.
+The syntax is:
+
+!block example; pure
+    {{IMPORT:filename}}, or
+    {{IMPORT[parameters]filename}}
+!endblock
+
+For example:
+
+!block example; pure
+Please visit our {{IMPORT:new}} web site!
+!endblock
+
+H2: Figure Extensions
+
+It is generally best {{not}} to specify an extension for the filename
+containing the figure, as SDF will then use the best format it can find.
+The search rules are:
+
+!block table
+When_generating     The_search_order_is
+PostScript          epsi, eps, wmf, mif, gif
+HTML                jpeg, jpg, png, gif
+Windows Help        bmp
+!endblock
+
+So a GIF file is all that is necessary if you are generating
+PostScript and HTML. However, if SDF finds an EPS file when it
+is generating PostScript, it will use that instead.
+
+H2: Adding Logos
+
+The default implementations of the {{MAC:build_title}} macro,
+{{FILT:title}} filter and HTML header macros provide an easy
+way to add a company logo: by defining variables.
+The variables are:
+
+!block table
+Variable            Description
+DOC_LOGO            the default logo
+DOC_TITLE_LOGO      used in the title of a PostScript document
+DOC_ADMIN_LOGO      used in the title of a PostScript admin. document
+DOC_HTML_LOGO       used in the title of a HTML document
+DOC_TOPIC_LOGO      used in the header of a HTML topic
+DOC_MANUAL_LOGO     used on the front cover of a PostScript manual
+DOC_COMPONENT_LOGO  used on the cover of each chapter in a PostScript manual
+!endblock
+
+In each case, the value of the variable is the filename
+containing the figure.
+
+If a given logo variable is not set, DOC_LOGO is used if it is set.
+Therefore, a company logo can be added to most SDF documents by
+simply defining DOC_LOGO is a configuration module (or library)
+which is loaded into every SDF document via the {{MAC:use}} (or
+{{MAC:inherit}}) macro.

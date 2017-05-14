@@ -1,0 +1,18 @@
+.# Title: Subroutine, args
+Line 1
+.# Define sub a
+.sub a
+Sub a line 1
+.# The sub arguments in the array _ARGS, get the first and how many arguments
+.let a0 := _ARGS[0]; na := count(_ARGS)
+.eval a0=\v{a0} num args=\v{na}
+done sub a
+.done
+.#
+After subroutine definition
+.#
+.# Run the sub
+.a one two
+.a un deux trois quatre
+.a ein
+EOF

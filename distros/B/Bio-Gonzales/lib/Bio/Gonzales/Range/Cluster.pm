@@ -9,7 +9,7 @@ use 5.010;
 use Bio::Gonzales::Range::Util qw/overlaps/;
 use Carp;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 has clusters         => ( is => 'rw', default => sub { [] }, clearer => 1 );
 has _current_cluster => ( is => 'rw', default => sub { [] }, clearer => 1 );

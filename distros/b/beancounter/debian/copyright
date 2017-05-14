@@ -1,0 +1,16 @@
+This is the Debian GNU/Linux version of the beancounter stock portfolio
+performance monitoring program.
+
+This package was both written and put together for Debian by Dirk
+Eddelbuettel <edd@debian.org>. The sources can also be obtained from 
+	http://dirk.eddelbuettel.com/code/beancounter.html
+
+Copyright (C) 1998 - 2009  Dirk Eddelbuettel
+
+License: GPL-2
+
+On a Debian GNU/Linux system, the GPL-2 license is included
+in the file /usr/share/common-licenses/GPL-2.
+
+
+

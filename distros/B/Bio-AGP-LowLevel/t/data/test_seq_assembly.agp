@@ -1,0 +1,5 @@
+# made up agp file to test sequence assembly
+assembly_test	1	50	1	F	test1	1	50	+
+assembly_test	51	67	2	F	test4	20	36	-
+assembly_test	68	73	3	F	test3	1	6	-
+assembly_test	74	87	4	F	test2	7	20	+

@@ -1,5 +1,8 @@
 Revision history for Perl extension JSON::XS::ByteString.
 
+1.0.6 2017.5.12
+    Degenerate looped data point to NULL when generating JSON strings.
+
 1.0.5 2017.4.26
     Avoid "</" by "<\/" in the generated JSON strings.
 

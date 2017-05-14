@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Data::Floid;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+my $dir = '.';
+GetOptions(
+    'd=s' => \$dir,
+) or usage();
+
+usage() if !@ARGV;
+
+my $floid = Data::Floid->new($dir);
+foreach (@ARGV) {
+    my $id = $floid->mint($_);
+    print $id, "\n";
+}

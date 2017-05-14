@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# extract the tarball from the git repo as it stands.
+
+VERSION=$(head -n1 Changelog | sed 's/.*(//' | sed 's/).*//')
+NAME="Crypt-Nettle-$VERSION"
+TARGET="../$NAME.tar.gz"
+
+if [ -e "$TARGET" ] ; then
+   printf "target %s appears to already exist.\n" "$TARGET"
+   exit 1
+fi
+
+if [ -z "$(git tag -l "$NAME" )" ] ; then
+    printf "No tag '%s' exists.\n" "$NAME"
+    exit 1
+fi
+git archive --format=tar --prefix="$NAME/" "$NAME" | gzip -9 > "$TARGET" || rm -f "$TARGET"
+ln -sf "$(basename "$TARGET")" "../libcrypt-nettle-perl_$VERSION.orig.tar.gz"
+

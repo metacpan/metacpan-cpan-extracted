@@ -1,44 +1,91 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
 #
-# Latest versions of po files are at http://www.mandrivalinux.com/l10n/wa.php3
-#
-# translation of urpmi-wa.po to Walon
-# Translation file of Mandriva Linux graphic install
-# Copyright (C) 1999 Mandriva
-# Pablo Saratxaga <pablo@mandrakesoft.com>, 1999-2000,2003.
-# Lorint Hendschel <LorintHendschel@skynet.be>, 1999, 2002,2003.
-# Pablo Saratxaga <pablo@walon.org>, 2003, 2004.
-#
+# Translators:
+# Lorint Hendschel <LorintHendschel@skynet.be>, 1999,2002-2003
+# Pablo Saratxaga <pablo@walon.org>, 2003-2004
 msgid ""
 msgstr ""
-"Project-Id-Version: urpmi 3.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 19:38+0200\n"
-"PO-Revision-Date: 2004-08-08 20:26+0200\n"
-"Last-Translator: Pablo Saratxaga <pablo@walon.org>\n"
-"Language-Team: Walloon <linux-wa@walon.org>\n"
-"Language: \n"
+"Project-Id-Version: Mageia\n"
+"POT-Creation-Date: 2014-09-13 21:15+0200\n"
+"PO-Revision-Date: 2016-06-27 23:05+0000\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Walloon (http://www.transifex.com/MageiaLinux/mageia/language/"
+"wa/)\n"
+"Language: wa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.0.2\n"
-"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../gurpmi:32
+#: ../gurpm/RPMProgressDialog.pm:47
+#, c-format
+msgid "Distribution Upgrade"
+msgstr "Metaedje a djoû del distribucion"
+
+#: ../gurpm/RPMProgressDialog.pm:47
+#, c-format
+msgid "Packages installation"
+msgstr "Astalaedje des pacaedjes"
+
+#: ../gurpm/RPMProgressDialog.pm:128
+#, c-format
+msgid "Please wait..."
+msgstr "Tårdjîz on pô s' i vos plait..."
+
+#: ../gurpm/RPMProgressDialog.pm:290
+#, c-format
+msgid "Verifying package signatures..."
+msgstr "Verifiaedje des sinateures des pacaedjes..."
+
+#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:107
+#, c-format
+msgid "Preparing..."
+msgstr "Dj' aprestêye..."
+
+#: ../gurpm/RPMProgressDialog.pm:313
+#, c-format
+msgid "Removing package `%s' ..."
+msgstr "Dji oistêye li pacaedje «%s»..."
+
+#: ../gurpm/RPMProgressDialog.pm:316
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Dj' astale li pacaedje «%s» (%s/%s)..."
+
+#: ../gurpm/RPMProgressDialog.pm:345
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Dj' aberwetêye li pacaedje «%s»..."
+
+#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
+#, c-format
+msgid "Cancel"
+msgstr "Rinoncî"
+
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:453 ../urpm/download.pm:857
+#: ../urpm/get_pkgs.pm:278 ../urpm/media.pm:1126 ../urpm/media.pm:1647
+#: ../urpm/media.pm:1798
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "...l' aberwetaedje a fwait berwete: %s"
+
+#: ../gurpmi:49
 #, c-format
 msgid "RPM installation"
 msgstr "Astalaedje do pacaedje"
 
-#: ../gurpmi:46
+#: ../gurpmi:63
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
 msgstr "Aroke: dji n' a savou trover l' fitchî %s, dj' arestêye l' operåcion"
 
-#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
 #, c-format
 msgid "_Ok"
 msgstr "'l est bon"
 
-#: ../gurpmi:67
+#: ../gurpmi:84
 #, c-format
 msgid ""
 "You have selected a source package:\n"
@@ -59,7 +106,7 @@ msgstr ""
 "\n"
 "Cwè voloz vs fé?"
 
-#: ../gurpmi:75 ../gurpmi:86
+#: ../gurpmi:92 ../gurpmi:103
 #, c-format
 msgid ""
 "You are about to install the following software packages on your computer:\n"
@@ -74,7 +121,7 @@ msgstr ""
 "\n"
 "Estoz vs d' acoird?"
 
-#: ../gurpmi:81
+#: ../gurpmi:98
 #, c-format
 msgid ""
 "You are about to install the following software package on your computer:\n"
@@ -89,38 +136,43 @@ msgstr ""
 "\n"
 "Motoit vos vloz djusse li schaper. Cwè tchoezixhoz vs?"
 
-#: ../gurpmi:99
+#: ../gurpmi:116
 #, c-format
 msgid "_Install"
 msgstr "_Astaler"
 
-#: ../gurpmi:100
+#: ../gurpmi:117
 #, c-format
 msgid "_Save"
 msgstr "_Schaper"
 
-#: ../gurpmi:101 ../gurpmi2:197
+#: ../gurpmi:118 ../gurpmi2:173
 #, c-format
 msgid "_Cancel"
 msgstr "_Rinoncî"
 
-#: ../gurpmi:109
+#: ../gurpmi:126
 #, c-format
 msgid "Choose location to save file"
 msgstr "Tchoezixhoz l' plaece wice schaper l' fitchî"
 
-#: ../gurpmi.pm:41
+#: ../gurpmi:126 ../gurpmi2:119
+#, c-format
+msgid "Ok"
+msgstr "'l est bon"
+
+#: ../gurpmi.pm:56
 #, c-format
 msgid "Options:"
 msgstr ""
 
-#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
-#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
 #, c-format
 msgid "  --help         - print this help message.\n"
 msgstr "  --help         - mostere ci messaedje d' aidance chal.\n"
 
-#: ../gurpmi.pm:43 ../urpmi:74
+#: ../gurpmi.pm:58 ../urpmi:74
 #, c-format
 msgid ""
 "  --auto         - non-interactive mode, assume default answers to "
@@ -129,7 +181,7 @@ msgstr ""
 "  --auto         - môde nén eteractif, supôze li prémetowe valixhance po "
 "totes les kesses.\n"
 
-#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#: ../gurpmi.pm:59 ../urpmi:75 ../urpmq:48
 #, c-format
 msgid ""
 "  --auto-select  - automatically select packages to upgrade the system.\n"
@@ -137,7 +189,7 @@ msgstr ""
 "  --auto-select  - tchoezi otomaticmint les pacaedjes pol metaedje a djoû\n"
 "                   do sistinme.\n"
 
-#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#: ../gurpmi.pm:60 ../urpme:46 ../urpmi:100 ../urpmq:64
 #, c-format
 msgid ""
 "  --force        - force invocation even if some packages do not exist.\n"
@@ -145,7 +197,7 @@ msgstr ""
 "  --force        - foirci, minme si des pacaedjes k' i gn a n' egzistèt "
 "nén.\n"
 
-#: ../gurpmi.pm:46 ../urpmi:129
+#: ../gurpmi.pm:61 ../urpmi:131
 #, c-format
 msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
@@ -154,31 +206,31 @@ msgstr ""
 "  --verify-rpm   - verifyî li sinateure rpm divant d' astaler.\n"
 "                   (--no-verify-rpm po n' nén l' fé, prémetou=verifyî).\n"
 
-#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
 msgid "  --media        - use only the given media, separated by comma.\n"
 msgstr ""
 "  --media        - eployî rén k' les sopoirts dinés, separés pa des comas.\n"
 
-#: ../gurpmi.pm:49 ../urpmi:146
+#: ../gurpmi.pm:64 ../urpmi:147
 #, c-format
 msgid "  -p             - allow search in provides to find package.\n"
 msgstr ""
 "  -p             - fé des rcweraedjes ezès aloyances po trover on pacaedje.\n"
 
-#: ../gurpmi.pm:50 ../urpmi:147
+#: ../gurpmi.pm:65 ../urpmi:148
 #, c-format
 msgid "  -P             - do not search in provides to find package.\n"
 msgstr ""
 "  -P             - èn nén fé des rcweraedjes ezès aloyances po trover\n"
 "                   on pacaedje.\n"
 
-#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#: ../gurpmi.pm:66 ../urpmi:107 ../urpmq:67
 #, c-format
 msgid "  --root         - use another root for rpm installation.\n"
 msgstr "  --root         - eployî ene ôte raecene po l' astalaedje des rpm.\n"
 
-#: ../gurpmi.pm:52 ../urpmi:131
+#: ../gurpmi.pm:67 ../urpmi:133
 #, c-format
 msgid ""
 "  --test         - only verify if the installation can be achieved "
@@ -187,44 +239,29 @@ msgstr ""
 "  --test         - verifyî si l' astalaedje si pout fé comifåt disk' al "
 "fén.\n"
 
-#: ../gurpmi.pm:53 ../urpmi:71
+#: ../gurpmi.pm:68 ../urpmi:71
 #, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested packages.\n"
 msgstr ""
 "  --searchmedia  - eployî rén k' les sopoirts dinés po cweri les pacaedjes.\n"
 
-#: ../gurpmi.pm:96
+#: ../gurpmi.pm:115
 #, c-format
 msgid "No packages specified"
 msgstr "Nou pacaedje di scpecifyî"
 
-#: ../gurpmi2:55
-#, c-format
-msgid "Please wait..."
-msgstr "Tårdjîz on pô s' i vos plait..."
-
-#: ../gurpmi2:64
+#: ../gurpmi2:46
 #, c-format
 msgid "Must be root"
 msgstr "Vos dvoz esse root"
 
-#: ../gurpmi2:71
-#, fuzzy, c-format
-msgid "Distribution Upgrade"
-msgstr "dji distribouwe %s"
-
-#: ../gurpmi2:71
-#, fuzzy, c-format
-msgid "Packages installation"
-msgstr "Astalaedje do pacaedje..."
-
-#: ../gurpmi2:98
+#: ../gurpmi2:76
 #, c-format
 msgid "Preparing packages installation..."
 msgstr "Dj' aprestêye les pacaedjes po l' astalaedje..."
 
-#: ../gurpmi2:113 ../urpmi:505
+#: ../gurpmi2:91 ../urpmi:506
 #, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
@@ -233,7 +270,7 @@ msgstr ""
 "Sacwants pacaedjes dimandés n' polèt nén esse astalés:\n"
 "%s"
 
-#: ../gurpmi2:121
+#: ../gurpmi2:99
 #, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
@@ -244,42 +281,37 @@ msgstr ""
 "%s\n"
 "Continouwer tot l' minme avou l' astalaedje?"
 
-#: ../gurpmi2:156
+#: ../gurpmi2:119
 #, c-format
 msgid "Warning"
 msgstr "Adviertixhmint"
 
-#: ../gurpmi2:156
-#, c-format
-msgid "Ok"
-msgstr "'l est bon"
-
-#: ../gurpmi2:193
+#: ../gurpmi2:169
 #, c-format
 msgid " (to upgrade)"
 msgstr " (a mete a djoû)"
 
-#: ../gurpmi2:194
+#: ../gurpmi2:170
 #, c-format
 msgid " (to install)"
 msgstr " (a-z astaler)"
 
-#: ../gurpmi2:197
+#: ../gurpmi2:173
 #, c-format
 msgid "Package choice"
 msgstr "Tchoezixhaedje des pacaedjes"
 
-#: ../gurpmi2:198
+#: ../gurpmi2:174
 #, c-format
 msgid "One of the following packages is needed:"
 msgstr "I gn a mezåjhe d' onk des pacaedjes ki shuvèt:"
 
-#: ../gurpmi2:223
+#: ../gurpmi2:204
 #, c-format
 msgid "_Abort"
 msgstr "_Rinoncî"
 
-#: ../gurpmi2:258
+#: ../gurpmi2:239
 #, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
@@ -291,98 +323,88 @@ msgstr ""
 "%s\n"
 "Continouwer tot l' minme avou l' astalaedje?"
 
-#: ../gurpmi2:277 ../urpmi:605
+#: ../gurpmi2:250 ../urpmi:615
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr "%s di pus vont esse ocupés sol deure plake."
+
+#: ../gurpmi2:251 ../urpmi:616
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr "%s vont esse liberés sol deure plake."
+
+#: ../gurpmi2:252 ../urpmi:617
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr "%s di pacaedjes vont esse aberwetés."
+
+#: ../gurpmi2:253 ../urpmi:618
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gurpmi2:259 ../urpmi:606
 #, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
 msgstr "Po satisfyî les aloyaedjes, li pacaedje aloyî ki shût va esse astalé:"
 
-#: ../gurpmi2:278 ../urpmi:606
+#: ../gurpmi2:260 ../urpmi:607
 #, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
 msgstr "Po satisfyî les aloyaedjes, les pacaedjes shuvants vont esse astalés"
 
-#: ../gurpmi2:280
-#, c-format
-msgid "(%d package, %d MB)"
-msgid_plural "(%d packages, %d MB)"
-msgstr[0] "(%d pacaedje, %d Mo)"
-msgstr[1] "(%d pacaedjes, %d Mo)"
-
-#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#: ../gurpmi2:270 ../urpm/main_loop.pm:467
 #, c-format
 msgid "unable to get source packages, aborting"
 msgstr "dji n' a savou prinde les pacaedjes sourdants, dji lai toumer"
 
-#: ../gurpmi2:320 ../urpm/install.pm:104
+#: ../gurpmi2:287 ../urpmi:634
 #, c-format
-msgid "Preparing..."
-msgstr "Dj' aprestêye..."
-
-#: ../gurpmi2:326
-#, c-format
-msgid "Installing package `%s' (%s/%s)..."
-msgstr "Dj' astale li pacaedje «%s» (%s/%s)..."
-
-#: ../gurpmi2:344 ../urpmi:633
-#, fuzzy, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "S' i vs plait metoz li sopoirt lomé «%s» el éndjin [%s]"
+msgstr "Metoz l' sopoirt lomé «%s» dins l' lijheu"
 
-#: ../gurpmi2:358
+#: ../gurpmi2:307
 #, c-format
-msgid "Downloading package `%s'..."
-msgstr "Dj' aberwetêye li pacaedje «%s»..."
+msgid "An error occurred:"
+msgstr "Åk n' a nén stî:"
 
-#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
-#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
-#: ../urpm/media.pm:1657
-#, c-format
-msgid "...retrieving failed: %s"
-msgstr "...l' aberwetaedje a fwait berwete: %s"
-
-#: ../gurpmi2:387
+#: ../gurpmi2:319
 #, c-format
 msgid "_Done"
 msgstr "_Fwait"
 
-#: ../gurpmi2:404 ../urpm/main_loop.pm:82
-#, fuzzy, c-format
+#: ../gurpmi2:336 ../urpm/main_loop.pm:82
+#, c-format
 msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
-msgstr "L' astalåcion a fwait berwete:"
-
-#: ../gurpmi2:407
-#, fuzzy, c-format
-msgid "You may want to update your urpmi database."
 msgstr ""
-"L' astalaedje a fwait berwete, sacwants fitchîs mankèt:\n"
-"%s\n"
-"Vos dvrîz motoit mete a djoû li båze di dnêyes urpmi."
 
-#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
+#: ../gurpmi2:339
+#, c-format
+msgid "You may want to update your urpmi database."
+msgstr "Vos dvrîz motoit mete a djoû li båze di dnêyes urpmi."
+
+#: ../gurpmi2:343 ../urpm/main_loop.pm:288 ../urpm/main_loop.pm:580
 #, c-format
 msgid "Installation failed:"
 msgstr "L' astalåcion a fwait berwete:"
 
-#: ../gurpmi2:416
+#: ../gurpmi2:348
 #, c-format
 msgid "The package(s) are already installed"
 msgstr "tot a ddja stî astalé"
 
-#: ../gurpmi2:418
+#: ../gurpmi2:350
 #, c-format
 msgid "Installation finished"
 msgstr "L' astalåcion a fini"
 
-#: ../gurpmi2:419 ../urpme:165
-#, c-format
-msgid "removing %s"
-msgstr "dji oistêye li pacaedje %s"
-
-#: ../gurpmi2:430 ../urpmi:691
+#: ../gurpmi2:363 ../urpmi:692
 #, c-format
 msgid "restarting urpmi"
 msgstr "renondant urpmi"
@@ -422,7 +444,7 @@ msgstr "                    li prémetou est %s.\n"
 msgid "   -f             - output rpm full name (NVRA)\n"
 msgstr "  -f             - håyner l' no etir do rpm (NVRA).\n"
 
-#: ../rurpmi:11 ../urpmi:265
+#: ../rurpmi:11 ../urpmi:266
 #, c-format
 msgid "Only superuser is allowed to install packages"
 msgstr "Seulmint li super-uzeu a l' droet d' astaler des pacaedjes"
@@ -437,137 +459,138 @@ msgstr "Enondant urpmi e môde rastrindou..."
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:110
-#, fuzzy, c-format
+#: ../urpm.pm:194
+#, c-format
 msgid "fail to create directory %s"
-msgstr "dji n' sai askepyî l' ridant [%s] po fé des rapoirts di bug"
+msgstr "dji n' sai askepyî l' ridant %s"
 
-#: ../urpm.pm:111
+#: ../urpm.pm:195
 #, c-format
 msgid "invalid owner for directory %s"
-msgstr ""
+msgstr "prôpietaire nén valide pol ridant %s"
 
-#: ../urpm.pm:135
-#, fuzzy, c-format
+#: ../urpm.pm:238
+#, c-format
 msgid "Can not download packages into %s"
-msgstr "Dj' aberwetêye li pacaedje «%s»..."
+msgstr "Dji n' sait aberweter les pacaedjes eviè %s"
 
-#: ../urpm.pm:150
+#: ../urpm.pm:254
 #, c-format
 msgid "Environment directory %s does not exist"
-msgstr ""
+msgstr "Li ridant d' evironmint %s n' egzistêye nén"
 
-#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#: ../urpm.pm:255 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "eployant on evironmint specifike so %s\n"
 
-#: ../urpm.pm:313
+#: ../urpm.pm:423
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "dji n' sai drovi l' båze rpmdb"
 
-#: ../urpm.pm:327
+#: ../urpm.pm:442
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "no d' fitchî rpm nén valåbe [%s]"
 
-#: ../urpm.pm:333
+#: ../urpm.pm:448
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "aberwetaedje di fitchî rpm [%s]..."
 
-#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#: ../urpm.pm:450 ../urpm/get_pkgs.pm:276
 #, c-format
 msgid "...retrieving done"
 msgstr "...l' aberwetaedje a stî comifåt"
 
-#: ../urpm.pm:343
+#: ../urpm.pm:458
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "dji n' sai aveur accès å fitchî rpm [%s]"
 
-#: ../urpm.pm:348
+#: ../urpm.pm:463
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "dji n' sai analijhî l' fitchî spec «%s» [%s]"
 
-#: ../urpm.pm:356
+#: ../urpm.pm:471
 #, c-format
 msgid "unable to register rpm file"
 msgstr "dji n' sai redjîstrer l' fitchî rpm"
 
-#: ../urpm.pm:358
+#: ../urpm.pm:473
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Årtchitecteure nén copatibe pol rpm [%s]"
 
-#: ../urpm.pm:362
+#: ../urpm.pm:477
 #, c-format
 msgid "error registering local packages"
 msgstr "åk n' a nén stî tot-z eredjistrant les pacaedjes locås"
 
-#: ../urpm.pm:450
+#: ../urpm.pm:589
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Ciste operåcion ci n' est nén possibe e môde rastrindou"
 
-#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "måle declaråcion do procsi sol roye di comande\n"
 
-#: ../urpm/args.pm:306
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: dji n' sai lére li fitchî rpm «%s»\n"
 
-#: ../urpm/args.pm:384
-#, fuzzy, c-format
+#: ../urpm/args.pm:389
+#, c-format
 msgid "unexpected expression %s"
-msgstr "Patrons po les ratourneures:\n"
+msgstr "ratourneure nén ratindowe %s"
 
-#: ../urpm/args.pm:385
-#, fuzzy, c-format
+#: ../urpm/args.pm:390
+#, c-format
 msgid "missing expression before %s"
-msgstr "I manke li sinateure (%s)"
+msgstr "i manke ene ratourneure divant %s"
 
-#: ../urpm/args.pm:391
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
-msgstr ""
+msgstr "ratourneure nén ratindowe %s (motoit eployîz -a ou -o ?)"
 
-#: ../urpm/args.pm:395
-#, fuzzy, c-format
+#: ../urpm/args.pm:400
+#, c-format
 msgid "no expression to close"
-msgstr "Patrons po les ratourneures:\n"
+msgstr "nole ratourneure po clôre"
 
-#: ../urpm/args.pm:404
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
+"urpmf ratind ene erîlêye ratourneure (regexp). vos dvrîz eployî «--literal»"
 
-#: ../urpm/args.pm:478
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "li ridant po candjî d' raecene (chroot) n' egzistêye nén"
 
-#: ../urpm/args.pm:501
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Dji n' sai eployî %s sins %s"
 
-#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Dji n' sai eployî %s avou %s"
 
-#: ../urpm/args.pm:515
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Pår trop d' årgumints\n"
 
-#: ../urpm/args.pm:523
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -584,12 +607,12 @@ msgstr ""
 "\n"
 "Po s' è siervi:\n"
 
-#: ../urpm/args.pm:529
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Copyright © %s pa %s"
 
-#: ../urpm/bug_report.pm:67 ../urpmi:255
+#: ../urpm/bug_report.pm:67 ../urpmi:256
 #, c-format
 msgid "Copying failed"
 msgstr "Li copiaedje a fwait berwete"
@@ -616,152 +639,147 @@ msgstr "li sopoirt «%s» n' est nén disponibe"
 msgid "unable to read rpm file [%s] from medium \"%s\""
 msgstr "dji n' sai lére li fitchî rpm [%s] foû do sopoirt «%s»"
 
-#: ../urpm/cfg.pm:82
+#: ../urpm/cfg.pm:74
 #, c-format
 msgid "syntax error in config file at line %s"
 msgstr "aroke di sintacse el fitchî d' apontiaedje al roye %s"
 
-#: ../urpm/cfg.pm:115
+#: ../urpm/cfg.pm:107
 #, c-format
 msgid "unable to read config file [%s]"
 msgstr "dji n' sai lére li fitchî d' apontiaedje [%s]"
 
-#: ../urpm/cfg.pm:141
+#: ../urpm/cfg.pm:133
 #, c-format
 msgid "medium `%s' is defined twice, aborting"
 msgstr "li sopoirt «%s» est defini deus côps, dji lai toumer"
 
-#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#: ../urpm/cfg.pm:249 ../urpm/media.pm:556
 #, c-format
 msgid "unable to write config file [%s]"
 msgstr "dji n' sai scrire li fitchî d' apontiaedje [%s]"
 
-#: ../urpm/download.pm:95
+#: ../urpm/download.pm:93
 #, c-format
 msgid "%s is not available, falling back on %s"
 msgstr "%s n' est nén la, dji rtchai so %s"
 
-#: ../urpm/download.pm:178
+#: ../urpm/download.pm:169
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
 msgstr ""
 
-#: ../urpm/download.pm:208
+#: ../urpm/download.pm:199
 #, c-format
 msgid "Please enter your credentials for accessing proxy\n"
 msgstr "Dinez vos informåcions po-z aveur accès å procsi\n"
 
-#: ../urpm/download.pm:209
+#: ../urpm/download.pm:200
 #, c-format
 msgid "User name:"
 msgstr "No d' uzeu:"
 
-#: ../urpm/download.pm:209
+#: ../urpm/download.pm:200
 #, c-format
 msgid "Password:"
 msgstr "Sicret:"
 
-#: ../urpm/download.pm:295
+#: ../urpm/download.pm:286
 #, c-format
 msgid "Unknown webfetch `%s' !!!\n"
 msgstr ""
 
-#: ../urpm/download.pm:303
+#: ../urpm/download.pm:294
 #, c-format
 msgid "%s failed: exited with signal %d"
 msgstr "%s a fwait berwete: sinå di rexhowe %d"
 
-#: ../urpm/download.pm:304
+#: ../urpm/download.pm:295
 #, c-format
 msgid "%s failed: exited with %d"
 msgstr "%s a fwait berwete: côde di rexhowe %d"
 
-#: ../urpm/download.pm:338
+#: ../urpm/download.pm:329
 #, c-format
 msgid "copy failed"
 msgstr "li copiaedje a fwait berwete"
 
-#: ../urpm/download.pm:344
+#: ../urpm/download.pm:335
 #, c-format
 msgid "wget is missing\n"
 msgstr "wget n' est nén la\n"
 
-#: ../urpm/download.pm:411
+#: ../urpm/download.pm:402
 #, c-format
 msgid "curl is missing\n"
 msgstr "curl n' est nén la\n"
 
-#: ../urpm/download.pm:547
-#, fuzzy, c-format
-msgid "curl failed: upload canceled\n"
-msgstr "curl a fwait berwete: aberwetaedje nén fwait\n"
-
-#: ../urpm/download.pm:548
+#: ../urpm/download.pm:537
 #, c-format
 msgid "curl failed: download canceled\n"
 msgstr "curl a fwait berwete: aberwetaedje nén fwait\n"
 
-#: ../urpm/download.pm:583
+#: ../urpm/download.pm:572
 #, c-format
 msgid "rsync is missing\n"
 msgstr "rsync n' est nén la\n"
 
-#: ../urpm/download.pm:651
+#: ../urpm/download.pm:640
 #, c-format
 msgid "ssh is missing\n"
 msgstr "ssh n' est nén la\n"
 
-#: ../urpm/download.pm:670
+#: ../urpm/download.pm:659
 #, c-format
 msgid "prozilla is missing\n"
 msgstr "prozilla n' est nén la\n"
 
-#: ../urpm/download.pm:686
+#: ../urpm/download.pm:675
 #, c-format
 msgid "Couldn't execute prozilla\n"
 msgstr "Dji n' sai enonder prozilla\n"
 
-#: ../urpm/download.pm:696
-#, fuzzy, c-format
+#: ../urpm/download.pm:685
+#, c-format
 msgid "aria2 is missing\n"
-msgstr "prozilla n' est nén la\n"
+msgstr "aria2 n' est nén la\n"
 
-#: ../urpm/download.pm:740
+#: ../urpm/download.pm:734
 #, c-format
 msgid "Failed to download %s"
 msgstr ""
 
-#: ../urpm/download.pm:835
+#: ../urpm/download.pm:829
 #, c-format
 msgid "        %s%% of %s completed, ETA = %s, speed = %s"
 msgstr "        %s%% di %s di fwait, ETA = %s, radisté = %s"
 
-#: ../urpm/download.pm:836
+#: ../urpm/download.pm:830
 #, c-format
 msgid "        %s%% completed, speed = %s"
 msgstr "        %s%% di fwait, radisté = %s"
 
-#: ../urpm/download.pm:921
+#: ../urpm/download.pm:915
 #, c-format
 msgid "retrieving %s"
 msgstr "prindant %s"
 
-#: ../urpm/download.pm:932
+#: ../urpm/download.pm:926
 #, c-format
 msgid "retrieved %s"
 msgstr "%s a stî pris"
 
-#: ../urpm/download.pm:994
+#: ../urpm/download.pm:989
 #, c-format
 msgid "unknown protocol defined for %s"
 msgstr "protocole nén cnoxhou defini po %s"
 
-#: ../urpm/download.pm:1008
+#: ../urpm/download.pm:1003
 #, c-format
 msgid "no webfetch found, supported webfetch are: %s\n"
 msgstr "nou aberweteu waibe di trové, les cis sopoirtés sont: %s\n"
 
-#: ../urpm/download.pm:1023
+#: ../urpm/download.pm:1018
 #, c-format
 msgid "unable to handle protocol: %s"
 msgstr "dji n' sai manaedjî l' protocole: %s"
@@ -776,30 +794,17 @@ msgstr "netiaedje di %s et %s"
 msgid "package %s is not found."
 msgstr "li pacaedje %s n' a nén stî trové."
 
-#: ../urpm/get_pkgs.pm:277
+#: ../urpm/get_pkgs.pm:269
 #, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
 msgstr "aberwetaedje des fitchîs rpms do sopoirt «%s»..."
 
-#: ../urpm/install.pm:110
+#: ../urpm/install.pm:115 ../urpme:164
 #, c-format
-msgid "[repackaging]"
-msgstr ""
+msgid "removing %s"
+msgstr "dji oistêye li pacaedje %s"
 
-#: ../urpm/install.pm:201
-#, c-format
-msgid ""
-"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
-msgstr ""
-"ahivé ene transaccion po l' astalaedje so %s (oister=%d, astaler=%d, mete a "
-"djoû=%d)"
-
-#: ../urpm/install.pm:204
-#, c-format
-msgid "unable to create transaction"
-msgstr "dji n' sai ahiver ene transaccion"
-
-#: ../urpm/install.pm:229
+#: ../urpm/install.pm:215
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "dji n' sai saetchî èn rpm foû do pacaedje delta-rpm %s"
@@ -810,64 +815,72 @@ msgid "unable to install package %s"
 msgstr "dji n' sai astaler l' pacaedje %s"
 
 #: ../urpm/install.pm:245
-#, fuzzy, c-format
+#, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "oistaedje des rpms astalés (%s) a pårti di %s"
+msgstr "oistaedje d' on cron rpm (%s) a pårti di %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:311
-#, fuzzy, c-format
+#: ../urpm/install.pm:246 ../urpm/install.pm:374
+#, c-format
 msgid "removing %s failed: %s"
-msgstr "...l' aberwetaedje a fwait berwete: %s"
+msgstr "li oistaedje di %s a fwait berwete: %s"
 
-#: ../urpm/install.pm:292
-#, fuzzy, c-format
-msgid "Removing package %s"
-msgstr "dji oistêye li pacaedje %s"
-
-#: ../urpm/install.pm:293
+#: ../urpm/install.pm:295
 #, c-format
 msgid "removing package %s"
 msgstr "dji oistêye li pacaedje %s"
 
-#: ../urpm/install.pm:309
+#: ../urpm/install.pm:341
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+"ahivé ene transaccion po l' astalaedje so %s (oister=%d, astaler=%d, mete a "
+"djoû=%d)"
+
+#: ../urpm/install.pm:344
+#, c-format
+msgid "unable to create transaction"
+msgstr "dji n' sai ahiver ene transaccion"
+
+#: ../urpm/install.pm:372
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "oistaedje des rpms astalés (%s) a pårti di %s"
 
-#: ../urpm/install.pm:318
+#: ../urpm/install.pm:381
 #, c-format
 msgid "More information on package %s"
 msgstr "Pus di racsegnes sol pacaedje %s"
 
-#: ../urpm/ldap.pm:44
+#: ../urpm/ldap.pm:42
 #, c-format
 msgid "Cannot create ldap cache directory"
 msgstr "Dji n' sai fé l' ridant d' muchete pol LDAP"
 
-#: ../urpm/ldap.pm:46
+#: ../urpm/ldap.pm:48
 #, c-format
 msgid "Cannot write cache file for ldap\n"
 msgstr "Dji n' sai scrire on fitchî d' muchete pol LDAP\n"
 
-#: ../urpm/ldap.pm:181
+#: ../urpm/ldap.pm:177
 #, c-format
 msgid "No server defined, missing uri or host"
 msgstr "Nou sierveu d' defini, i manke l' URI ou l' lodjoe"
 
-#: ../urpm/ldap.pm:182
+#: ../urpm/ldap.pm:178
 #, c-format
 msgid "No base defined"
 msgstr "Nole båze di defineye"
 
-#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#: ../urpm/ldap.pm:188 ../urpm/ldap.pm:191
 #, c-format
 msgid "Cannot connect to ldap uri:"
 msgstr "Dji n' mi sai raloyî å LDAP a l' URI:"
 
 #: ../urpm/lock.pm:99
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked, process %d is already using it"
-msgstr "båze di dnêyes %s serêye"
+msgstr ""
 
 #: ../urpm/lock.pm:101
 #, c-format
@@ -875,34 +888,33 @@ msgid "%s database is locked (another program is already using it)"
 msgstr ""
 
 #: ../urpm/lock.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "båze di dnêyes %s serêye"
+msgstr ""
 
 #: ../urpm/lock.pm:116
-#, fuzzy, c-format
+#, c-format
 msgid "aborting"
-msgstr "Adviertixhmint"
+msgstr ""
 
 #: ../urpm/main_loop.pm:58
 #, c-format
 msgid "Retry?"
-msgstr ""
+msgstr "Rissayî?"
 
 #: ../urpm/main_loop.pm:85
-#, fuzzy, c-format
+#, c-format
 msgid "You may need to update your urpmi database."
 msgstr ""
-"L' astalaedje a fwait berwete, sacwants fitchîs mankèt:\n"
-"%s\n"
-"Vos dvrîz motoit mete a djoû li båze di dnêyes urpmi."
 
 #: ../urpm/main_loop.pm:89
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
-msgstr "L' astalåcion a fwait berwete:"
+msgstr ""
+"L' astalåcion a fwait berwete, crons rpms:\n"
+"%s"
 
 #: ../urpm/main_loop.pm:108
 #, c-format
@@ -927,53 +939,53 @@ msgstr "Les pacaedjes ki shuvèt ont ene mwaijhe sinateure"
 msgid "Do you want to continue installation ?"
 msgstr "Voloz vs continouwer avou l' astalaedje?"
 
-#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
-#: ../urpm/main_loop.pm:296
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:290
+#: ../urpm/main_loop.pm:298
 #, c-format
 msgid "Installation failed"
 msgstr "L' astalåcion a fwait berwete"
 
 #: ../urpm/main_loop.pm:159
-#, fuzzy, c-format
+#, c-format
 msgid "removing installed rpms (%s)"
-msgstr "oistaedje des rpms astalés (%s) a pårti di %s"
+msgstr "oistaedje des rpms astalés (%s)"
 
 #: ../urpm/main_loop.pm:185
 #, c-format
 msgid "Try to continue anyway?"
-msgstr ""
+msgstr "Sayî tot l' minme di continouwer?"
 
-#: ../urpm/main_loop.pm:234
+#: ../urpm/main_loop.pm:236
 #, c-format
 msgid "installing %s from %s"
 msgstr "dj' astale %s a pårti di %s"
 
-#: ../urpm/main_loop.pm:236
+#: ../urpm/main_loop.pm:238
 #, c-format
 msgid "installing %s"
 msgstr "dj' astale %s"
 
-#: ../urpm/main_loop.pm:243
+#: ../urpm/main_loop.pm:245
 #, c-format
 msgid "distributing %s"
 msgstr "dji distribouwe %s"
 
-#: ../urpm/main_loop.pm:289
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:291
+#, c-format
 msgid "Try installation without checking dependencies?"
-msgstr "Sayî d' astaler sin verifyî les aloyaedjes? (o/N) "
+msgstr ""
 
-#: ../urpm/main_loop.pm:297
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:299
+#, c-format
 msgid "Try harder to install (--force)?"
-msgstr "Sayî d' astaler co pus foirt (--force)? (o/N) "
+msgstr "Sayî pus foirt l' astalaedje (--force)?"
 
-#: ../urpm/main_loop.pm:490
+#: ../urpm/main_loop.pm:590
 #, c-format
 msgid "Packages are up to date"
 msgstr "Les pacaedjes sont-st a djoû"
 
-#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#: ../urpm/main_loop.pm:601 ../urpm/parallel.pm:299
 #, c-format
 msgid "Installation is possible"
 msgstr "L' astalaedje est possibe"
@@ -984,50 +996,51 @@ msgid "warning: md5sum for %s unavailable in MD5SUM file"
 msgstr ""
 "adviertixhmint: li verifiaedje md5sum po %s n' si trove nén e fitchî MD5SUM"
 
-#: ../urpm/media.pm:270
+#: ../urpm/media.pm:268
 #, c-format
 msgid "virtual medium \"%s\" should have a clear url, medium ignored"
 msgstr ""
 "li forveyou sopoirt «%s» duvreut aveur ene hårdêye valide, dji passe houte "
 "do sopoirt"
 
-#: ../urpm/media.pm:272
+#: ../urpm/media.pm:270
 #, c-format
 msgid "unable to access list file of \"%s\", medium ignored"
 msgstr ""
 "dji n' sai aveur li fitchî di djivêye di «%s», dji passe houte do sopoirt"
 
-#: ../urpm/media.pm:275
-#, fuzzy, c-format
+#: ../urpm/media.pm:273
+#, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
-msgstr "dji n' sai aveur li fitchî hdlist di «%s», dji passe houte do sopoirt"
+msgstr ""
+"dji n' sai aveur li fitchî di sinteze di «%s», dji passe houte do sopoirt"
 
-#: ../urpm/media.pm:301
+#: ../urpm/media.pm:299
 #, c-format
 msgid "trying to override existing medium \"%s\", skipping"
 msgstr "dji saye di passer houte do sopoirt «%s», dji passe houte"
 
-#: ../urpm/media.pm:517
+#: ../urpm/media.pm:515
 #, c-format
 msgid "failed to migrate removable device, ignoring media"
 msgstr ""
 
-#: ../urpm/media.pm:555
+#: ../urpm/media.pm:558
 #, c-format
 msgid "wrote config file [%s]"
 msgstr "sicrijhaedje do fitchî d' apontiaedje [%s]"
 
-#: ../urpm/media.pm:598
+#: ../urpm/media.pm:649
 #, c-format
 msgid "Can't use parallel mode with use-distrib mode"
 msgstr "Dji n' sai eployî li môde paralele avou l' môde «use-distrib»"
 
-#: ../urpm/media.pm:606
+#: ../urpm/media.pm:657
 #, c-format
 msgid "using associated media for parallel mode: %s"
 msgstr "eployaedje do sopoirt assocyî å môde paralele: %s"
 
-#: ../urpm/media.pm:622
+#: ../urpm/media.pm:673
 #, c-format
 msgid ""
 "--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
@@ -1036,236 +1049,244 @@ msgstr ""
 "--synthesis èn pout nén esse eployî avou --media, --excludemedia, --"
 "sortmedia, --update, --use-distrib ou --parallel"
 
-#: ../urpm/media.pm:731
+#: ../urpm/media.pm:786
+#, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr "dj' ignore li sopoirt nén libe «%s»"
+
+#: ../urpm/media.pm:795
+#, c-format
+msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
+msgstr ""
+
+#: ../urpm/media.pm:799
+#, c-format
+msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
+msgstr ""
+
+#: ../urpm/media.pm:827
 #, c-format
 msgid "Search start: %s end: %s"
 msgstr "Cweraedje kimincî: %s fini: %s"
 
-#: ../urpm/media.pm:748
+#: ../urpm/media.pm:844
 #, c-format
 msgid "skipping package %s"
 msgstr "dji passe houte do pacaedje %s"
 
-#: ../urpm/media.pm:764
+#: ../urpm/media.pm:860
 #, c-format
 msgid "would install instead of upgrade package %s"
 msgstr "dji va-st astaler purade ki mete a djoû l' pacaedje %s"
 
-#: ../urpm/media.pm:840
+#: ../urpm/media.pm:943
 #, c-format
 msgid "medium \"%s\" already exists"
 msgstr "li sopoirt «%s» egzistêye dedja"
 
-#: ../urpm/media.pm:882
+#: ../urpm/media.pm:985
 #, c-format
 msgid "(ignored by default)"
 msgstr "(ignoré come prémetowe dujhance)"
 
-#: ../urpm/media.pm:888
+#: ../urpm/media.pm:991
 #, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
 msgstr "radjoutant l' sopoirt «%s» divant l' sopoirt då lon «%s»"
 
-#: ../urpm/media.pm:894
+#: ../urpm/media.pm:997
 #, c-format
 msgid "adding medium \"%s\""
 msgstr "radjoutaedje do sopoirt «%s»"
 
-#: ../urpm/media.pm:918
-#, fuzzy, c-format
+#: ../urpm/media.pm:1021
+#, c-format
 msgid "failed to copy media.cfg to %s (%d)"
-msgstr "dji n' sai analijhî l' fitchî media.cfg"
+msgstr "dji n' sai copyî media.cfg eviè %s (%d)"
 
-#: ../urpm/media.pm:960
-#, fuzzy, c-format
+#: ../urpm/media.pm:1092
+#, c-format
 msgid "directory %s does not exist"
-msgstr "li ridant po candjî d' raecene (chroot) n' egzistêye nén"
+msgstr "li ridant %s n' egzistêye nén"
 
-#: ../urpm/media.pm:968
+#: ../urpm/media.pm:1100
 #, c-format
 msgid "this location doesn't seem to contain any distribution"
 msgstr "i shonne ki cist eplaeçmint la n' a nole distribucion"
 
-#: ../urpm/media.pm:992
+#: ../urpm/media.pm:1124
 #, c-format
 msgid "unable to parse media.cfg"
 msgstr "dji n' sai analijhî l' fitchî media.cfg"
 
-#: ../urpm/media.pm:995
+#: ../urpm/media.pm:1127
 #, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
 "dji n' a savou trover l' sopoirt d' astalaedje (nou fitchî media.cfg di "
 "trové)"
 
-#: ../urpm/media.pm:1016
+#: ../urpm/media.pm:1149
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1031
-#, fuzzy, c-format
-msgid "ignoring non-free medium `%s'"
-msgstr "dj' ignore li sopoirt «%s»"
-
-#: ../urpm/media.pm:1074
+#: ../urpm/media.pm:1207
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "aberwetaedje do fitchî media.cfg..."
 
-#: ../urpm/media.pm:1117
+#: ../urpm/media.pm:1250
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "dji saye di tchoezi l' sopoirt «%s» ki n' egzistêye nén"
 
-#: ../urpm/media.pm:1120
+#: ../urpm/media.pm:1253
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "dji tchoezixh des sopoirts multipes: %s"
 
-#: ../urpm/media.pm:1179
+#: ../urpm/media.pm:1312
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "dji bodje li sopoirt «%s»"
 
-#: ../urpm/media.pm:1262
+#: ../urpm/media.pm:1403
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "rapontiaedje d' urpmi pol sopoirt «%s»"
 
-#: ../urpm/media.pm:1296
+#: ../urpm/media.pm:1437
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...li rapontiaedje a fwait berwete"
 
-#: ../urpm/media.pm:1302
+#: ../urpm/media.pm:1443
 #, c-format
 msgid "reconfiguration done"
 msgstr "li rapontiaedje a stî fwait"
 
-#: ../urpm/media.pm:1318
+#: ../urpm/media.pm:1459
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1339
+#: ../urpm/media.pm:1480
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "li sopoirt «%s» est a djoû"
 
-#: ../urpm/media.pm:1350
+#: ../urpm/media.pm:1491
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "corwaitaedje do fitchî d' sinteze [%s]"
 
-#: ../urpm/media.pm:1370
+#: ../urpm/media.pm:1511
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "åk n' a nén stî tot lijhant li fitchî di sinteze do sopoirt «%s»"
 
-#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
+#: ../urpm/media.pm:1524 ../urpm/media.pm:1619
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "dji copeye [%s] pol sopoirt «%s»..."
 
-#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#: ../urpm/media.pm:1526 ../urpm/media.pm:1596 ../urpm/media.pm:1849
 #, c-format
 msgid "...copying failed"
 msgstr "...li copiaedje a fwait berwete"
 
-#: ../urpm/media.pm:1451
+#: ../urpm/media.pm:1592
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "copiaedje do fitchî di discrijhaedjes di «%s»..."
 
-#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#: ../urpm/media.pm:1594 ../urpm/media.pm:1623
 #, c-format
 msgid "...copying done"
 msgstr "...li copiaedje a stî comifåt"
 
-#: ../urpm/media.pm:1484
+#: ../urpm/media.pm:1625
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr ""
 "li copeye di [%s] a fwait berwete (li fitchî est pår pitit ki s' end est "
 "bizåre)"
 
-#: ../urpm/media.pm:1532
-#, fuzzy, c-format
+#: ../urpm/media.pm:1673
+#, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr ""
-"dji carcule li md5sum do fitchî «hdlist» (ou del sinteze) ki vént d' esse "
-"aberweté"
 
-#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
-#, fuzzy, c-format
+#: ../urpm/media.pm:1675 ../urpm/media.pm:2158
+#, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
-msgstr "li copeye di [%s] a fwait berwete (li md5sum ni corespond nén)"
+msgstr ""
 
-#: ../urpm/media.pm:1549
-#, fuzzy, c-format
+#: ../urpm/media.pm:1690
+#, c-format
 msgid "genhdlist2 failed on %s"
-msgstr "corwaitaedje do fitchî hdlist [%s]"
+msgstr ""
 
-#: ../urpm/media.pm:1559
-#, fuzzy, c-format
+#: ../urpm/media.pm:1700
+#, c-format
 msgid "comparing %s and %s"
-msgstr "netiaedje di %s et %s"
+msgstr "comparaedje etur %s et %s"
 
-#: ../urpm/media.pm:1589
+#: ../urpm/media.pm:1730
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "fitchî hdlist %s nén valide pol sopoirt «%s»"
 
-#: ../urpm/media.pm:1615
-#, fuzzy, c-format
-msgid "copying MD5SUM file of \"%s\"..."
-msgstr "copiaedje do fitchî di discrijhaedjes di «%s»..."
-
-#: ../urpm/media.pm:1655
-#, fuzzy, c-format
-msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "no d' fitchî rpm nén valåbe [%s]"
-
-#: ../urpm/media.pm:1658
-#, fuzzy, c-format
-msgid "no metadata found for medium \"%s\""
-msgstr "nou fitchî hdlist di trové pol sopoirt «%s»"
-
-#: ../urpm/media.pm:1690
-#, fuzzy, c-format
-msgid "retrieving source synthesis of \"%s\"..."
-msgstr "aberwetaedje do sourdant «hdlist» (ou del sinteze) po «%s»..."
-
 #: ../urpm/media.pm:1756
+#, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr "copiaedje do fitchî MD5SUM di «%s»..."
+
+#: ../urpm/media.pm:1796
+#, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr "fitchî MD5SUM nén valåve (aberweté di %s)"
+
+#: ../urpm/media.pm:1799
+#, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr "nole meta-dnêye di trovêye pol sopoirt «%s»"
+
+#: ../urpm/media.pm:1831
+#, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr "aberwetaedje do sourdant sinteze di «%s»..."
+
+#: ../urpm/media.pm:1897
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "corwaitaedje do fitchî avou l' clé publike da «%s»..."
 
-#: ../urpm/media.pm:1768
+#: ../urpm/media.pm:1909
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...aberwetaedje del clé %s do fitchî di clés publikes da «%s»"
 
-#: ../urpm/media.pm:1772
+#: ../urpm/media.pm:1913
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "dji n' sai aberweter li clé publike da «%s»"
 
-#: ../urpm/media.pm:1813
-#, fuzzy, c-format
+#: ../urpm/media.pm:1954
+#, c-format
 msgid "no synthesis file found for medium \"%s\""
-msgstr "nou fitchî hdlist di trové pol sopoirt «%s»"
+msgstr "nou fitchî di sintez di trové pol sopoirt «%s»"
 
-#: ../urpm/media.pm:1846
+#: ../urpm/media.pm:1987
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "sopoirt «%s» metou a djoû"
 
-#: ../urpm/media.pm:1968
+#: ../urpm/media.pm:2152
 #, c-format
 msgid "retrieval of [%s] failed"
-msgstr ""
+msgstr "l' aberwetaedje di [%s] a fwait berwete"
 
 #: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
 #, c-format
@@ -1283,87 +1304,87 @@ msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr ""
 
 #: ../urpm/mirrors.pm:305
-#, fuzzy, c-format
+#, c-format
 msgid "getting mirror list from %s"
-msgstr "lijhant les fitchîs rpm foû di [%s]"
+msgstr ""
 
-#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#: ../urpm/msg.pm:75 ../urpmi:492 ../urpmi:510 ../urpmi:626
 #, c-format
 msgid "Nn"
 msgstr "Nn"
 
 #. -PO: Add here the keys which might be pressed in the "Yes"-case.
-#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#: ../urpm/msg.pm:76 ../urpme:38 ../urpmi.addmedia:133
 #, c-format
 msgid "Yy"
 msgstr "OoAaYyWw"
 
-#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#: ../urpm/msg.pm:101 ../urpme:158 ../urpmi.addmedia:136
 #, c-format
 msgid " (y/N) "
 msgstr " (o/N) "
 
-#: ../urpm/msg.pm:139
+#: ../urpm/msg.pm:130
 #, c-format
 msgid "Sorry, bad choice, try again\n"
 msgstr "Mwaijhe tchuze, sayîz co ene feye\n"
 
-#: ../urpm/msg.pm:170
-#, fuzzy, c-format
+#: ../urpm/msg.pm:161
+#, c-format
 msgid "Package"
-msgstr "Tchoezixhaedje des pacaedjes"
+msgstr "Pacaedje"
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Version"
-msgstr ""
+msgstr "Modêye"
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Release"
 msgstr ""
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Arch"
-msgstr ""
+msgstr "Årtch."
 
-#: ../urpm/msg.pm:179
+#: ../urpm/msg.pm:170
 #, c-format
-msgid "(suggested)"
+msgid "(recommended)"
 msgstr ""
 
-#: ../urpm/msg.pm:194
-#, fuzzy, c-format
+#: ../urpm/msg.pm:185
+#, c-format
 msgid "medium \"%s\""
-msgstr "radjoutaedje do sopoirt «%s»"
+msgstr "sopoirt «%s»"
 
-#: ../urpm/msg.pm:194
+#: ../urpm/msg.pm:185
 #, c-format
 msgid "command line"
-msgstr ""
+msgstr "roye di cmande"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "B"
 msgstr "o"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "KB"
 msgstr "Ko"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "MB"
 msgstr "Mo"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "GB"
 msgstr "Go"
 
-#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#: ../urpm/msg.pm:199 ../urpm/msg.pm:208
 #, c-format
 msgid "TB"
 msgstr "To"
@@ -1373,8 +1394,8 @@ msgstr "To"
 msgid "Marking %s as manually installed, it won't be auto-orphaned"
 msgstr ""
 
-#: ../urpm/orphans.pm:522
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:527
+#, c-format
 msgid ""
 "The following package:\n"
 "%s\n"
@@ -1383,17 +1404,23 @@ msgid_plural ""
 "The following packages:\n"
 "%s\n"
 "are now orphaned."
-msgstr[0] "I gn a mezåjhe d' onk des pacaedjes ki shuvèt:"
-msgstr[1] "I gn a mezåjhe d' onk des pacaedjes ki shuvèt:"
+msgstr[0] ""
+"Li pacaedje shuvant:\n"
+"%s\n"
+"est asteure ôrfulin."
+msgstr[1] ""
+"Les pacaedjes shuvants:\n"
+"%s\n"
+"sont-st asteure ôrfulins."
 
-#: ../urpm/orphans.pm:525
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:530
+#, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] "Rén a oister"
-msgstr[1] "Rén a oister"
+msgstr[0] "Motoit l' vôrîz vs oister."
+msgstr[1] "Moitoit les vôrîz vs oister."
 
-#: ../urpm/orphans.pm:542
+#: ../urpm/orphans.pm:547
 #, c-format
 msgid ""
 "The following package:\n"
@@ -1434,31 +1461,31 @@ msgid "on node %s"
 msgstr ""
 
 #: ../urpm/parallel.pm:294
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed on node %s"
-msgstr "L' astalåcion a fwait berwete"
+msgstr ""
 
-#: ../urpm/parallel_ka_run.pm:58
+#: ../urpm/parallel_ka_run.pm:57
 #, c-format
 msgid "rshp failed, maybe a node is unreacheable"
 msgstr ""
 
-#: ../urpm/parallel_ka_run.pm:80
+#: ../urpm/parallel_ka_run.pm:79
 #, c-format
 msgid "mput failed, maybe a node is unreacheable"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:27
+#: ../urpm/parallel_ssh.pm:25
 #, c-format
 msgid "scp failed on host %s (%d)"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:39
+#: ../urpm/parallel_ssh.pm:37
 #, c-format
 msgid "cp failed on host %s (%d)"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:86
+#: ../urpm/parallel_ssh.pm:84
 #, c-format
 msgid ""
 "%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
@@ -1466,16 +1493,16 @@ msgid ""
 msgstr ""
 
 #: ../urpm/removable.pm:46
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access medium \"%s\"."
 msgstr "dji n' sai aveur accès å sopoirt «%s»"
 
-#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:101
 #, c-format
 msgid "mounting %s"
 msgstr "dji monte %s"
 
-#: ../urpm/removable.pm:117
+#: ../urpm/removable.pm:113
 #, c-format
 msgid "unmounting %s"
 msgstr "dji dismonte %s"
@@ -1491,57 +1518,57 @@ msgid ""
 "urpmi was restarted, and the list of priority packages did change: %s vs %s"
 msgstr ""
 
-#: ../urpm/select.pm:217
+#: ../urpm/select.pm:220
 #, c-format
 msgid "No package named %s"
 msgstr "Nou pacaedje lomé %s"
 
-#: ../urpm/select.pm:219 ../urpme:113
+#: ../urpm/select.pm:222 ../urpme:112
 #, c-format
 msgid "The following packages contain %s: %s"
 msgstr "Les pacaedjes ki shuvèt ont å dvins %s: %s"
 
-#: ../urpm/select.pm:221
+#: ../urpm/select.pm:224
 #, c-format
 msgid "You should use \"-a\" to use all of them"
 msgstr ""
 
-#: ../urpm/select.pm:368
-#, fuzzy, c-format
+#: ../urpm/select.pm:372
+#, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
-msgstr "Les pacaedjes %s èn polèt nén esse astalés"
+msgstr ""
 
-#: ../urpm/select.pm:600
+#: ../urpm/select.pm:607
 #, c-format
 msgid "Package %s is already installed"
 msgstr "Li pacaedje %s a ddja stî astalé"
 
-#: ../urpm/select.pm:601
+#: ../urpm/select.pm:608
 #, c-format
 msgid "Packages %s are already installed"
 msgstr "Les pacaedjes %s ont ddja stî astalés"
 
-#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#: ../urpm/select.pm:625 ../urpm/select.pm:712
 #, c-format
 msgid "due to conflicts with %s"
 msgstr "cåze di conflits avou %s"
 
-#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#: ../urpm/select.pm:626 ../urpm/select.pm:706
 #, c-format
 msgid "due to unsatisfied %s"
 msgstr "cåze di %s ki n' est nén satisfyî"
 
-#: ../urpm/select.pm:625
+#: ../urpm/select.pm:632
 #, c-format
 msgid "trying to promote %s"
 msgstr "dji saye di promouvwer %s"
 
-#: ../urpm/select.pm:626
+#: ../urpm/select.pm:633
 #, c-format
 msgid "in order to keep %s"
 msgstr "po wårder %s"
 
-#: ../urpm/select.pm:667
+#: ../urpm/select.pm:674
 #, c-format
 msgid ""
 "The following package has to be removed for others to be upgraded:\n"
@@ -1550,7 +1577,7 @@ msgstr ""
 "Li pacaedje shuvant a mezåjhe d' esse oisté po des ôtes esse metous a djoû:\n"
 "%s"
 
-#: ../urpm/select.pm:668
+#: ../urpm/select.pm:675
 #, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
@@ -1560,12 +1587,12 @@ msgstr ""
 "djoû:\n"
 "%s"
 
-#: ../urpm/select.pm:695
+#: ../urpm/select.pm:702
 #, c-format
 msgid "in order to install %s"
 msgstr "po-z astaler %s"
 
-#: ../urpm/select.pm:701
+#: ../urpm/select.pm:708
 #, c-format
 msgid "due to missing %s"
 msgstr "cåze di %s ki n' est nén la"
@@ -1576,9 +1603,9 @@ msgid "Invalid signature (%s)"
 msgstr "Sinateure nén valide (%s)"
 
 #: ../urpm/signature.pm:77
-#, fuzzy, c-format
+#, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
-msgstr "Les pacaedjes ki shuvèt ont å dvins %s: %s"
+msgstr ""
 
 #: ../urpm/signature.pm:83
 #, c-format
@@ -1605,40 +1632,40 @@ msgstr ""
 msgid "Medium without key (%s)"
 msgstr ""
 
-#: ../urpm/sys.pm:225
+#: ../urpm/sys.pm:199
 #, c-format
 msgid "system"
 msgstr ""
 
-#: ../urpm/sys.pm:262
+#: ../urpm/sys.pm:236
 #, c-format
 msgid "You should restart your computer for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:264
+#: ../urpm/sys.pm:238
 #, c-format
 msgid "You should restart your session for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:266
+#: ../urpm/sys.pm:240
 #, c-format
 msgid "You should restart %s for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:404
-#, fuzzy, c-format
+#: ../urpm/sys.pm:378
+#, c-format
 msgid "Can't write file"
-msgstr "Dji n' sai ahiver l' fitchî d' apontiaedje [%s]"
+msgstr ""
 
-#: ../urpm/sys.pm:404
-#, fuzzy, c-format
+#: ../urpm/sys.pm:378
+#, c-format
 msgid "Can't open file"
-msgstr "Li copiaedje a fwait berwete"
+msgstr ""
 
-#: ../urpm/sys.pm:417
-#, fuzzy, c-format
+#: ../urpm/sys.pm:391
+#, c-format
 msgid "Can't move file %s to %s"
-msgstr "Dji n' sai eployî %s avou %s"
+msgstr ""
 
 #: ../urpme:43
 #, c-format
@@ -1656,40 +1683,35 @@ msgstr ""
 msgid "  --test         - verify if the removal can be achieved correctly.\n"
 msgstr "  --test         - verifyî si l' oistaedje si pout fé comifåt.\n"
 
-#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format
 msgid "  --parallel     - distributed urpmi across machines of alias.\n"
 msgstr ""
 "  --parallel     - distribouwaedje di l' ovraedje d' urpmi so\n"
 "                   so sacwantès éndjoles defineyes come alias.\n"
 
-#: ../urpme:48 ../urpmi:138
-#, c-format
-msgid "  --repackage    - Re-package the files before erasing\n"
-msgstr "  --repackage    - Rifé l' pacaedje divant d' disfacer.\n"
-
-#: ../urpme:49
+#: ../urpme:48
 #, c-format
 msgid "  --root         - use another root for rpm removal.\n"
 msgstr "  --root         - eployî ene ôte raecene po l' oistaedje des rpm.\n"
 
-#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
-#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
+#: ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
 #, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
 msgstr "  --urpmi-root   - eployî ene ôte raecene po l' astalaedje des rpm.\n"
 
-#: ../urpme:51 ../urpmi:96
-#, fuzzy, c-format
+#: ../urpme:50 ../urpmi:96
+#, c-format
 msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
-msgstr "  --update       - mete a djoû rén kel sopoirt di metaedje a djoû.\n"
+msgstr ""
 
-#: ../urpme:52
+#: ../urpme:51
 #, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s).\n"
 msgstr "  --noscripts    - èn nén enonder les scripes do pacaedje.\n"
 
-#: ../urpme:53
+#: ../urpme:52
 #, c-format
 msgid ""
 "  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
@@ -1699,96 +1721,92 @@ msgstr ""
 "                   distribucion, ahessåve po (diz)astaler on sistinme\n"
 "                   chroot avou l' tchuze «--root».\n"
 
-#: ../urpme:55 ../urpmi:149 ../urpmq:87
+#: ../urpme:54 ../urpmi:150 ../urpmq:87
 #, c-format
 msgid "  --verbose, -v  - verbose mode.\n"
 msgstr "  --verbose, -v  - môde badjawe.\n"
 
-#: ../urpme:56
+#: ../urpme:55
 #, c-format
 msgid "  -a             - select all packages matching expression.\n"
 msgstr ""
 "  -a             - tchoezi tos les pacaedjes ki corespondèt al ratourneure.\n"
 
-#: ../urpme:71
+#: ../urpme:70
 #, c-format
 msgid "Only superuser is allowed to remove packages"
 msgstr "Seulmint li super-uzeu a l' droet d' oister des pacaedjes"
 
-#: ../urpme:104
+#: ../urpme:103
 #, c-format
 msgid "unknown packages"
 msgstr "pacaedjes nén cnoxhous"
 
-#: ../urpme:104
+#: ../urpme:103
 #, c-format
 msgid "unknown package"
 msgstr "pacaedje nén cnoxhou"
 
-#: ../urpme:119
-#, fuzzy, c-format
+#: ../urpme:118
+#, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] "oister li pacaedje %s va spiyî vosse sistinme"
-msgstr[1] "oister li pacaedje %s va spiyî vosse sistinme"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpme:124
+#: ../urpme:123
 #, c-format
 msgid "Nothing to remove"
 msgstr "Rén a oister"
 
-#: ../urpme:141
-#, fuzzy, c-format
+#: ../urpme:140
+#, c-format
 msgid "No orphans to remove"
-msgstr "Rén a oister"
+msgstr ""
 
-#: ../urpme:147
-#, fuzzy, c-format
+#: ../urpme:146
+#, c-format
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
 msgstr[0] ""
-"Po satisfyî les aloyaedjes, les %d pacaedjes ki shuvèt vont esse disastalés "
-"(%d Mo)"
 msgstr[1] ""
-"Po satisfyî les aloyaedjes, les %d pacaedjes ki shuvèt vont esse disastalés "
-"(%d Mo)"
 
-#: ../urpme:152
-#, fuzzy, c-format
+#: ../urpme:151
+#, c-format
 msgid "(orphan package)"
 msgid_plural "(orphan packages)"
-msgstr[0] "pacaedje nén cnoxhou"
-msgstr[1] "pacaedje nén cnoxhou"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpme:159
+#: ../urpme:158
 #, c-format
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
 msgstr[0] "Oister %d pacaedje?"
 msgstr[1] "Oister %d pacaedjes?"
 
-#: ../urpme:164
-#, fuzzy, c-format
+#: ../urpme:163
+#, c-format
 msgid "testing removal of %s"
-msgstr "dji prind li bodjåve sopoirt come «%s»"
+msgstr ""
 
-#: ../urpme:181
+#: ../urpme:180
 #, c-format
 msgid "Removal failed"
 msgstr "Li oistaedje a fwait berwete"
 
-#: ../urpme:183
-#, fuzzy, c-format
+#: ../urpme:182
+#, c-format
 msgid "Removal is possible"
-msgstr "Li oistaedje a fwait berwete"
+msgstr ""
 
 #: ../urpmf:31
 #, c-format
 msgid "  --version      - print this tool's version number.\n"
 msgstr "  --version      - mostere li modêye do programe.\n"
 
-#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#: ../urpmf:32 ../urpmi:130 ../urpmq:78
 #, c-format
 msgid "  --env          - use specific environment (typically a bug report).\n"
 msgstr ""
@@ -1817,11 +1835,9 @@ msgstr ""
 "separêyes pa des comas.\n"
 
 #: ../urpmf:38
-#, fuzzy, c-format
+#, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
 msgstr ""
-"  --synthesis    - eployî l' fitchî d' sinteze diné purade kel\n"
-"                   båze di dnêyes d' urpmi.\n"
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
 #, c-format
@@ -1971,9 +1987,9 @@ msgid "  --group        - group\n"
 msgstr "  --group        - li groupe do pacaedje.\n"
 
 #: ../urpmf:67
-#, fuzzy, c-format
+#, c-format
 msgid "  --license      - license\n"
-msgstr "  --name         - li no do pacaedje.\n"
+msgstr ""
 
 #: ../urpmf:68
 #, c-format
@@ -2013,11 +2029,9 @@ msgid "  --sourcerpm    - source rpm name\n"
 msgstr "  --sourcerpm    - no do fitchî src.rpm sourdant.\n"
 
 #: ../urpmf:75
-#, fuzzy, c-format
-msgid "  --suggests     - suggests tags\n"
+#, c-format
+msgid "  --recommends   - recommends tags\n"
 msgstr ""
-"  --obsoletes    - les vîs pacaedjes (avou ds ôtès nos) replaecîs pa ci-"
-"chal.\n"
 
 #: ../urpmf:76
 #, c-format
@@ -2046,31 +2060,31 @@ msgstr ""
 "  -f             - mostere li modêye et release, eyet l' årtchitecteure avou "
 "l' no.\n"
 
-#: ../urpmf:148
-#, fuzzy, c-format
+#: ../urpmf:149
+#, c-format
 msgid "unterminated expression (%s)"
-msgstr "Patrons po les ratourneures:\n"
+msgstr ""
 
-#: ../urpmf:193
+#: ../urpmf:194
 #, c-format
 msgid "Incorrect format: you may use only one multi-valued tag"
 msgstr ""
 "Cogne nén comifåt: vos n' poloz eployî k' ene seule etike multi-valixhances"
 
-#: ../urpmf:286
-#, fuzzy, c-format
+#: ../urpmf:287
+#, c-format
 msgid "no hdlist available for medium \"%s\""
-msgstr "nou fitchî hdlist di trové pol sopoirt «%s»"
+msgstr ""
 
-#: ../urpmf:293
-#, fuzzy, c-format
+#: ../urpmf:294
+#, c-format
 msgid "no synthesis available for medium \"%s\""
-msgstr "dji fwai li fitchî d' sinteze hdlist pol sopoirt «%s»"
+msgstr ""
 
-#: ../urpmf:302
-#, fuzzy, c-format
+#: ../urpmf:303
+#, c-format
 msgid "no xml-info available for medium \"%s\""
-msgstr "dji screye li fitchî d' djivêye («list») pol sopoirt «%s»"
+msgstr "pont d' info xml pol sopoirt «%s»"
 
 #: ../urpmi:76
 #, c-format
@@ -2093,11 +2107,9 @@ msgid "  --auto-orphans - remove orphans without asking\n"
 msgstr ""
 
 #: ../urpmi:80 ../urpmq:52
-#, fuzzy, c-format
-msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
+#, c-format
+msgid "  --no-recommends - do not auto select \"recommended\" packages.\n"
 msgstr ""
-"  --obsoletes    - les vîs pacaedjes (avou ds ôtès nos) replaecîs pa ci-"
-"chal.\n"
 
 #: ../urpmi:81
 #, c-format
@@ -2144,9 +2156,9 @@ msgid "  --fuzzy, -y    - impose fuzzy search.\n"
 msgstr "  --fuzzy, -y    - foirci des cweraedjes rishonnants.\n"
 
 #: ../urpmi:92
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildrequires - install the buildrequires of the packages\n"
-msgstr "  --requires     - tot çou k' i gn a mezåjhe po l' pacaedje.\n"
+msgstr ""
 
 #: ../urpmi:93
 #, c-format
@@ -2168,10 +2180,17 @@ msgstr "  --noclean      - wårder el muchete les pacaedjes rpm nén eployîs.\n
 #: ../urpmi:97
 #, c-format
 msgid ""
-"  --replacepkgs  - force installing packages which are already installed.\n"
+"  --downgrade    - downgrade a package from the version currently installed\n"
+"                   to the previously highest version\n"
 msgstr ""
 
 #: ../urpmi:99
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr ""
+
+#: ../urpmi:101
 #, c-format
 msgid ""
 "  --allow-nodeps - allow asking user to install packages without\n"
@@ -2180,7 +2199,7 @@ msgstr ""
 "  --allow-nodeps - permete k' on dimande a l' uzeu s' i vout astaler\n"
 "                   les pacaedjes sins verifyî les aloyances.\n"
 
-#: ../urpmi:101
+#: ../urpmi:103
 #, c-format
 msgid ""
 "  --allow-force  - allow asking user to install packages without\n"
@@ -2190,14 +2209,12 @@ msgstr ""
 "                   les pacaedjes sins verifyî les aloyances nerén\n"
 "                   l' etegrité.\n"
 
-#: ../urpmi:103
-#, fuzzy, c-format
-msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
+#: ../urpmi:105
+#, c-format
+msgid "  --allow-recommends - auto select \"recommended\" packages.\n"
 msgstr ""
-"  --obsoletes    - les vîs pacaedjes (avou ds ôtès nos) replaecîs pa ci-"
-"chal.\n"
 
-#: ../urpmi:107
+#: ../urpmi:109
 #, c-format
 msgid ""
 "  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
@@ -2207,56 +2224,56 @@ msgstr ""
 "                   distribucion, ahessåve po-z astaler on sistinme chroot\n"
 "                   avou l' tchuze «--root».\n"
 
-#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:37
 #, c-format
 msgid "  --metalink     - generate and use a local metalink.\n"
 msgstr ""
 
-#: ../urpmi:110
+#: ../urpmi:112
 #, c-format
 msgid ""
 "  --download-all - download all needed packages before trying to install "
 "them\n"
 msgstr ""
 
-#: ../urpmi:111
+#: ../urpmi:113
 #, c-format
 msgid ""
 "  --downloader   - program to use to retrieve distant files. \n"
 "                   known programs: %s\n"
 msgstr ""
 
-#: ../urpmi:114
+#: ../urpmi:116
 #, c-format
 msgid "  --curl-options - additional options to pass to curl\n"
 msgstr "  --curl-options - tchuzes di rawete a passer a «curl»\n"
 
-#: ../urpmi:115
+#: ../urpmi:117
 #, c-format
 msgid "  --rsync-options- additional options to pass to rsync\n"
 msgstr "  --rsync-options - tchuzes di rawete a passer a «rsync»\n"
 
-#: ../urpmi:116
+#: ../urpmi:118
 #, c-format
 msgid "  --wget-options - additional options to pass to wget\n"
 msgstr "  --wget-options - tchuzes di rawete a passer a «wget»\n"
 
-#: ../urpmi:117
+#: ../urpmi:119
 #, c-format
 msgid "  --prozilla-options - additional options to pass to prozilla\n"
 msgstr "  --prozilla-options - tchuzes di rawete a passer a «prozilla»\n"
 
-#: ../urpmi:118
-#, fuzzy, c-format
+#: ../urpmi:120
+#, c-format
 msgid "  --aria2-options - additional options to pass to aria2\n"
-msgstr "  --prozilla-options - tchuzes di rawete a passer a «prozilla»\n"
+msgstr "  --aria2-options - tchuzes di rawete a passer a «aria2»\n"
 
-#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:38
 #, c-format
 msgid "  --limit-rate   - limit the download speed.\n"
 msgstr "  --limit-rate   - limiter li roedeu di l' aberwetaedje.\n"
 
-#: ../urpmi:120
+#: ../urpmi:122
 #, c-format
 msgid ""
 "  --resume       - resume transfer of partially-downloaded files\n"
@@ -2266,17 +2283,17 @@ msgstr ""
 "ont\n"
 "                   stî djokés (--no-resume po nel nén fé, prémetou=nén fé).\n"
 
-#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
 #, c-format
 msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
 "                   to be 1080 by default (format is <proxyhost[:port]>).\n"
 msgstr ""
 "  --proxy        - eployî li procsi HTTP dné, li prémetou pôrt si nén dné\n"
-"                   est 1080 (li cogne pol tchuze est <lodjoeprocsi[:pôrt]"
-">).\n"
+"                   est 1080 (li cogne pol tchuze est <lodjoeprocsi[:"
+"pôrt]>).\n"
 
-#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
 #, c-format
 msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
@@ -2286,7 +2303,7 @@ msgstr ""
 "                   l' otintifiaedje sol procsi (li cogne est <uzeu:"
 "sicret>).\n"
 
-#: ../urpmi:126
+#: ../urpmi:128
 #, c-format
 msgid ""
 "  --bug          - output a bug report in directory indicated by\n"
@@ -2295,50 +2312,50 @@ msgstr ""
 "  --bug          - sicrire on rapoirt di bug dins l' ridant dné come\n"
 "                   årgumint djusse après.\n"
 
-#: ../urpmi:132
+#: ../urpmi:134
 #, c-format
 msgid "  --excludepath  - exclude path separated by comma.\n"
 msgstr "  --excludepath  - tchimins separés pa des comas, a n' nén foyter.\n"
 
-#: ../urpmi:133
+#: ../urpmi:135
 #, c-format
 msgid "  --excludedocs  - exclude doc files.\n"
 msgstr "  --excludedocs  - èn nén astaler les fitchîs d' documintåcion.\n"
 
-#: ../urpmi:134
+#: ../urpmi:136
 #, c-format
 msgid "  --ignoresize   - don't verify disk space before installation.\n"
 msgstr ""
 "  --ignoresize   - èn nén loukî s' i gn a del plaece assez dvant d' "
 "astaler.\n"
 
-#: ../urpmi:135
+#: ../urpmi:137
 #, c-format
 msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
 msgstr ""
 "  --ignorearch   - permete l' astalaedje di rpms d' ôtès årtchitecteures.\n"
 
-#: ../urpmi:136
+#: ../urpmi:138
 #, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s)\n"
 msgstr "  --noscripts    - èn nén enonder les scripres do pacaedje.\n"
 
-#: ../urpmi:137
-#, fuzzy, c-format
-msgid "  --replacefiles - ignore file conflicts\n"
-msgstr "  --conflicts    - les conflits avou ds ôtes pacaedjes ou modêyes.\n"
-
 #: ../urpmi:139
+#, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr ""
+
+#: ../urpmi:140
 #, c-format
 msgid "  --skip         - packages which installation should be skipped\n"
 msgstr "  --skip         - pacaedjes k' i fåt passer houte et n' nén astaler\n"
 
-#: ../urpmi:140
-#, fuzzy, c-format
-msgid "  --prefer       - packages which should be preferred\n"
-msgstr "  --skip         - pacaedjes k' i fåt passer houte et n' nén astaler\n"
-
 #: ../urpmi:141
+#, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr ""
+
+#: ../urpmi:142
 #, c-format
 msgid ""
 "  --more-choices - when several packages are found, propose more choices\n"
@@ -2347,73 +2364,73 @@ msgstr ""
 "  --more-choices - cwand sacwants pacaedjes sont trovés, propoze pus di\n"
 "                   tchuzes ki les prémetowes.\n"
 
-#: ../urpmi:143
+#: ../urpmi:144
 #, c-format
 msgid "  --nolock       - don't lock rpm db.\n"
 msgstr "  --nolock       - èn nén serer l' båze di dnêyes rpm.\n"
 
-#: ../urpmi:144
+#: ../urpmi:145
 #, c-format
 msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
 msgstr ""
 "  --strict-arch  - mete a djoû seulmint les pacaedjes pol minme "
 "årtchitecteure.\n"
 
-#: ../urpmi:145 ../urpmq:95
+#: ../urpmi:146 ../urpmq:95
 #, c-format
 msgid "  -a             - select all matches on command line.\n"
 msgstr "  -a             - eployî --all-matches pol roye di comande.\n"
 
-#: ../urpmi:148
+#: ../urpmi:149
 #, c-format
 msgid "  --quiet, -q    - quiet mode.\n"
 msgstr "  --quiet, -q    - môde taijheu.\n"
 
-#: ../urpmi:150
-#, fuzzy, c-format
-msgid "  --debug        - very verbose mode.\n"
-msgstr "  --verbose      - môde badjawe.\n"
-
 #: ../urpmi:151
+#, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr "  --debug        - môde foirt badjawe.\n"
+
+#: ../urpmi:152
 #, c-format
 msgid "  names or rpm files given on command line will be installed.\n"
 msgstr "  les nos ou fitchîs rpm dinés sol roye di cmande seront-st astalés.\n"
 
-#: ../urpmi:179
+#: ../urpmi:180
 #, c-format
 msgid "Error: can't use --auto-select along with package list.\n"
 msgstr ""
 
-#: ../urpmi:186
+#: ../urpmi:187
 #, c-format
 msgid ""
 "Error: To generate a bug report, specify the usual command-line arguments\n"
 "along with --bug.\n"
 msgstr ""
 
-#: ../urpmi:216
+#: ../urpmi:217
 #, c-format
 msgid "You can't install binary rpm files when using --install-src"
 msgstr ""
 "Vos n' poloz nén astaler des pacaedjes rpm binaires avou «--install-src»"
 
-#: ../urpmi:217
+#: ../urpmi:218
 #, c-format
 msgid "You can't install spec files"
 msgstr ""
 
-#: ../urpmi:224
+#: ../urpmi:225
 #, c-format
 msgid "defaulting to --buildrequires"
 msgstr ""
 
-#: ../urpmi:229
+#: ../urpmi:230
 #, c-format
 msgid ""
 "please use --buildrequires or --install-src, defaulting to --buildrequires"
 msgstr ""
 
-#: ../urpmi:249
+#: ../urpmi:250
 #, c-format
 msgid ""
 "Directory [%s] already exists, please use another directory for bug report "
@@ -2422,12 +2439,12 @@ msgstr ""
 "Li ridant [%s] egzistêye dedja, eployîz è èn ôte po les rapoirts di bugs, "
 "oudonbén disfacez l'."
 
-#: ../urpmi:250
+#: ../urpmi:251
 #, c-format
 msgid "Unable to create directory [%s] for bug report"
 msgstr "dji n' sai askepyî l' ridant [%s] po fé des rapoirts di bug"
 
-#: ../urpmi:271
+#: ../urpmi:272
 #, c-format
 msgid ""
 "Error: %s appears to be mounted read-only.\n"
@@ -2437,44 +2454,42 @@ msgstr ""
 "Eployîz --allow-force po foircî l' operåcion."
 
 #. -PO: here format is "<package_name>: <summary> (to upgrade)"
-#: ../urpmi:425
+#: ../urpmi:426
 #, c-format
 msgid "%s: %s (to upgrade)"
 msgstr "%s: %s (a mete a djoû)"
 
 #. -PO: here format is "<package_name> (to upgrade)"
-#: ../urpmi:427
+#: ../urpmi:428
 #, c-format
 msgid "%s (to upgrade)"
 msgstr "%s (a mete a djoû)"
 
 #. -PO: here format is "<package_name>: <summary> (to install)"
-#: ../urpmi:431
+#: ../urpmi:432
 #, c-format
 msgid "%s: %s (to install)"
 msgstr "%s: %s (a-z astaler)"
 
 #. -PO: here format is "<package_name> (to install)"
-#: ../urpmi:433
+#: ../urpmi:434
 #, c-format
 msgid "%s (to install)"
 msgstr "%s (a-z astaler)"
 
-#: ../urpmi:439
-#, fuzzy, c-format
+#: ../urpmi:440
+#, c-format
 msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
 msgstr ""
-"Po satisfyî les aloyaedjes, les %d pacaedjes ki shuvèt vont esse disastalés "
-"(%d Mo)"
 
-#: ../urpmi:442
+#: ../urpmi:443
 #, c-format
 msgid "What is your choice? (1-%d) "
 msgstr "Ké tchoezixhoz vs? (1-%d) "
 
-#: ../urpmi:484
+#: ../urpmi:485
 #, c-format
 msgid ""
 "The following package cannot be installed because it depends on packages\n"
@@ -2485,7 +2500,7 @@ msgstr ""
 "d' ôtes pacaedjes ki sont pus vîs kel ci k' est astalé:\n"
 "%s"
 
-#: ../urpmi:486
+#: ../urpmi:487
 #, c-format
 msgid ""
 "The following packages can't be installed because they depend on packages\n"
@@ -2496,7 +2511,7 @@ msgstr ""
 "d' ôtes pacaedjes ki sont pus vîs k' les cis k' sont astalés:\n"
 "%s"
 
-#: ../urpmi:492 ../urpmi:510
+#: ../urpmi:493 ../urpmi:511
 #, c-format
 msgid ""
 "\n"
@@ -2505,12 +2520,12 @@ msgstr ""
 "\n"
 "Voloz vs tot l' minme continouwer l' astalaedje?"
 
-#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#: ../urpmi:494 ../urpmi:512 ../urpmi:627 ../urpmi.addmedia:136
 #, c-format
 msgid " (Y/n) "
 msgstr " (O/n) "
 
-#: ../urpmi:504
+#: ../urpmi:505
 #, c-format
 msgid ""
 "A requested package cannot be installed:\n"
@@ -2519,12 +2534,12 @@ msgstr ""
 "On pacaedje dimandé n' pout nén esse astalé:\n"
 "%s"
 
-#: ../urpmi:525
+#: ../urpmi:526
 #, c-format
 msgid "removing package %s will break your system"
 msgstr "oister li pacaedje %s va spiyî vosse sistinme"
 
-#: ../urpmi:533
+#: ../urpmi:534
 #, c-format
 msgid ""
 "The installation cannot continue because the following package\n"
@@ -2535,7 +2550,7 @@ msgstr ""
 "a mezåjhe d' esse oisté po des ôtes esse metous a djoû:\n"
 "%s\n"
 
-#: ../urpmi:535
+#: ../urpmi:536
 #, c-format
 msgid ""
 "The installation cannot continue because the following packages\n"
@@ -2546,73 +2561,45 @@ msgstr ""
 "ont mezåjhe d' esse oistés po des ôtes esse metous a djoû:\n"
 "%s\n"
 
-#: ../urpmi:543
+#: ../urpmi:544
 #, c-format
 msgid "(test only, removal will not be actually done)"
 msgstr "(c' est seulmint ene saye, li dizastalaedje n' est nén fwait)"
 
-#: ../urpmi:562
-#, fuzzy, c-format
+#: ../urpmi:563
+#, c-format
 msgid ""
 "You must first call urpmi with --buildrequires to install the following "
 "dependencies:\n"
 "%s\n"
 msgstr ""
-"Vos dvoz esse root po-z astaler les aloyances shuvantes:\n"
-"%s\n"
 
-#: ../urpmi:572
-#, fuzzy, c-format
+#: ../urpmi:573
+#, c-format
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
 msgstr[0] ""
-"Po satisfyî les aloyaedjes, les %d pacaedjes ki shuvèt vont esse disastalés "
-"(%d Mo)"
 msgstr[1] ""
-"Po satisfyî les aloyaedjes, les %d pacaedjes ki shuvèt vont esse disastalés "
-"(%d Mo)"
 
-#: ../urpmi:596
+#: ../urpmi:597
 #, c-format
 msgid "WARNING: %s option is in use. Some strange problems may happen"
 msgstr ""
 
-#: ../urpmi:608
+#: ../urpmi:609
 #, c-format
 msgid "(test only, installation will not be actually done)"
 msgstr "(c' est seulmint ene saye, l' astalaedje n' est nén fwait)"
 
-#: ../urpmi:614
+#: ../urpmi:640
 #, c-format
-msgid "%s of additional disk space will be used."
-msgstr ""
-
-#: ../urpmi:615
-#, c-format
-msgid "%s of disk space will be freed."
-msgstr ""
-
-#: ../urpmi:616
-#, c-format
-msgid "%s of packages will be retrieved."
-msgstr ""
-
-#: ../urpmi:617
-#, fuzzy, c-format
-msgid "Proceed with the installation of one package?"
-msgid_plural "Proceed with the installation of the %d packages?"
-msgstr[0] "Continouwer avou l' astalaedje d' on pacaedje? (%d Mo)"
-msgstr[1] "Continouwer avou l' astalaedje d' on pacaedje? (%d Mo)"
-
-#: ../urpmi:639
-#, fuzzy, c-format
 msgid "Press Enter when mounted..."
-msgstr "Tapez so «enter» cwand c' est fwait..."
+msgstr ""
 
 #. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
 #: ../urpmi.addmedia:36
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: urpmi.addmedia [options] <name> <url>\n"
 "where <url> is one of\n"
@@ -2634,15 +2621,6 @@ msgid ""
 "\n"
 "and [options] are from\n"
 msgstr ""
-"po s' è siervi: urpmi.addmedia [tchuzes] <etikete> <hårdêye>\n"
-"li <hårdêye> pout esse ene etur:\n"
-"       [file:/]/<tchimin>\n"
-"       ftp://<login>:<sicret>@<lodjoe>/<tchimin>\n"
-"       ftp://<lodjoe>/<tchimin>\n"
-"       http://<lodjoe>/<tchimin>\n"
-"       removable://<tchimin>\n"
-"\n"
-"et les [tchuzes] possibes sont\n"
 
 #: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
 #, c-format
@@ -2660,9 +2638,9 @@ msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
 msgstr "  --prozilla     - eployî prozilla po-z aberweter les fitchî då lon.\n"
 
 #: ../urpmi.addmedia:59 ../urpmi.update:36
-#, fuzzy, c-format
+#, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
-msgstr "  --curl         - eployî curl po-z aberweter les fitchî då lon.\n"
+msgstr "  --aria2        - eployî aria2 po-z aberweter les fitchî då lon.\n"
 
 #: ../urpmi.addmedia:66
 #, c-format
@@ -2690,10 +2668,9 @@ msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
 msgstr ""
 
 #: ../urpmi.addmedia:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-probe     - do not try to find any synthesis file.\n"
 msgstr ""
-"  --no-probe     - èn nén sayî di trover on fitchî di sinteze ou «hdlist».\n"
 
 #: ../urpmi.addmedia:74
 #, c-format
@@ -2715,11 +2692,9 @@ msgid "  --all-media    - with --distrib, add every listed media\n"
 msgstr "  --all-media   - avou --distrib, radjoute tos les sopoirts dinés.\n"
 
 #: ../urpmi.addmedia:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
 msgstr ""
-"  --virtual      - ahiver on forveyou sopoirt ki sont tofer a djoû,\n"
-"                   rén ki l' protocole «file://» est permetou.\n"
 
 #: ../urpmi.addmedia:79 ../urpmi.update:44
 #, c-format
@@ -2778,10 +2753,9 @@ msgid "Can't create config file [%s]"
 msgstr "Dji n' sai ahiver l' fitchî d' apontiaedje [%s]"
 
 #: ../urpmi.addmedia:128
-#, fuzzy, c-format
+#, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
 msgstr ""
-"nén mezåjhe di dner li <tchmin relatif pol fitchî hdlist> avou --distrib"
 
 #: ../urpmi.addmedia:136
 #, c-format
@@ -2791,146 +2765,19 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
-#, fuzzy, c-format
+#, c-format
 msgid "unable to add medium"
-msgstr "dji n' sai aveur accès å sopoirt «%s»"
+msgstr "dji n' sai radjouter l' sopoirt"
 
 #: ../urpmi.addmedia:164
-#, fuzzy, c-format
+#, c-format
 msgid "<relative path of synthesis> missing\n"
-msgstr "i manke li tchmin relatif pol fitchî hdlist\n"
+msgstr ""
 
 #: ../urpmi.addmedia:167
 #, c-format
 msgid "Can't use %s with remote medium"
 msgstr ""
-
-#: ../urpmi.recover:30
-#, c-format
-msgid "  --checkpoint   - set repackaging start now\n"
-msgstr ""
-
-#: ../urpmi.recover:31
-#, c-format
-msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
-msgstr ""
-"  --noclean      - èn nén netyî l' ridant do rfijhaedje des pacaedjes\n"
-
-#: ../urpmi.recover:33
-#, fuzzy, c-format
-msgid ""
-"  --list         - list transactions since provided date/duration argument\n"
-msgstr ""
-"  --list-safe    - djivêye di totes les transaccions dispoy li pont "
-"d' verifiaedje\n"
-
-#: ../urpmi.recover:34
-#, c-format
-msgid "  --list-all     - list all transactions in rpmdb (long)\n"
-msgstr ""
-"  --list-all     - djivêye di totes les transaccions pol rpmdb (end a "
-"bråmint).\n"
-
-#: ../urpmi.recover:35
-#, c-format
-msgid "  --list-safe    - list transactions since checkpoint\n"
-msgstr ""
-"  --list-safe    - djivêye di totes les transaccions dispoy li pont "
-"d' verifiaedje\n"
-
-#: ../urpmi.recover:36
-#, c-format
-msgid ""
-"  --rollback     - rollback until specified date,\n"
-"                   or rollback the specified number of transactions\n"
-msgstr ""
-
-#: ../urpmi.recover:38
-#, c-format
-msgid "  --disable      - turn off repackaging\n"
-msgstr "  --disable      - dismete li rfijhaedje des pacaedjes\n"
-
-#: ../urpmi.recover:53
-#, c-format
-msgid "Invalid date or duration [%s]\n"
-msgstr ""
-
-#: ../urpmi.recover:61
-#, c-format
-msgid "Repackage directory not defined\n"
-msgstr "Li ridant pol rifjhaedje des pacaedjes n' est nén defini\n"
-
-#: ../urpmi.recover:64
-#, fuzzy, c-format
-msgid "Can't write to repackage directory [%s]\n"
-msgstr "dji n' sai askepyî l' ridant [%s] po fé des rapoirts di bug"
-
-#: ../urpmi.recover:66
-#, fuzzy, c-format
-msgid "Cleaning up repackage directory [%s]...\n"
-msgstr "dji n' sai askepyî l' ridant [%s] po fé des rapoirts di bug"
-
-#: ../urpmi.recover:68
-#, c-format
-msgid "%d file removed\n"
-msgid_plural "%d files removed\n"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../urpmi.recover:78
-#, c-format
-msgid "Spurious command-line arguments [%s]\n"
-msgstr ""
-
-#: ../urpmi.recover:80
-#, c-format
-msgid "You can't specify --checkpoint and --rollback at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:82
-#, c-format
-msgid "You can't specify --checkpoint and --list at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:84
-#, c-format
-msgid "You can't specify --rollback and --list at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:86
-#, c-format
-msgid "You can't specify --disable along with another option"
-msgstr ""
-
-#: ../urpmi.recover:111
-#, c-format
-msgid "No transaction found since %s\n"
-msgstr ""
-
-#: ../urpmi.recover:126
-#, c-format
-msgid "You must be superuser to do this"
-msgstr "Vos dvoz esse «root» po pleur fé çoula"
-
-#: ../urpmi.recover:139 ../urpmi.recover:205
-#, c-format
-msgid "Writing rpm macros file [%s]...\n"
-msgstr "Sicrijhaedje do fitchî des macros rpm [%s]...\n"
-
-#: ../urpmi.recover:181
-#, fuzzy, c-format
-msgid "No rollback date found\n"
-msgstr "Nole djivêye di fitchîs di trovêye\n"
-
-#: ../urpmi.recover:184
-#, c-format
-msgid "Rollback until %s...\n"
-msgstr ""
-
-#: ../urpmi.recover:191
-#, fuzzy, c-format
-msgid "Disabling repackaging\n"
-msgstr "  --disable      - dismete li rfijhaedje des pacaedjes\n"
 
 #: ../urpmi.removemedia:38
 #, c-format
@@ -3002,29 +2849,26 @@ msgstr ""
 "  --no-ignore    - èn nén mete a djoû, mårker l' sopoirt come en alaedje.\n"
 
 #: ../urpmi.update:49
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
 msgstr ""
-"  --probe-rpms   - èn nén eployî «synthesis»/«hdlist», mins les rpm direk.\n"
+"  --probe-rpms    - èn nén eployî les fitchîs di sinteze, mins les rpm "
+"directumint.\n"
 
 #: ../urpmi.update:50
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all enabled non-removable media.\n"
-msgstr "  -a             - tchoezi tos les sopoirts nén bodjåves.\n"
+msgstr "  -a             - tchoezi tos les sopoirts nén bodjåves en alaedje.\n"
 
 #: ../urpmi.update:51
-#, fuzzy, c-format
+#, c-format
 msgid "  -f             - force updating synthesis\n"
-msgstr ""
-"  -f             - foirci l' metaedje a djoû des fitchîs «hdlist/"
-"synthesis».\n"
+msgstr "  -f             - foircî l' metaedje a djoû del sinteze\n"
 
 #: ../urpmi.update:52
-#, fuzzy, c-format
+#, c-format
 msgid "  -ff            - really force updating synthesis\n"
-msgstr ""
-"  -f             - foirci l' metaedje a djoû des fitchîs «hdlist/"
-"synthesis».\n"
+msgstr "  -ff             - vormint foircî l' metaedje a djoû del sinteze\n"
 
 #: ../urpmi.update:69
 #, c-format
@@ -3128,9 +2972,9 @@ msgstr ""
 "                   (parey ki -s).\n"
 
 #: ../urpmq:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
-msgstr "  --src, -s      - li pacaedje shuvant est on pacaedje sourdant.\n"
+msgstr "  --sources      - håyner les URLs sourdant des pacaedjes tchoezis\n"
 
 #: ../urpmq:65
 #, c-format
@@ -3153,36 +2997,34 @@ msgid "  --changelog    - print changelog.\n"
 msgstr "  --changelog    - håyner li djournå des candjmints.\n"
 
 #: ../urpmq:80
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - print conflicts.\n"
-msgstr "  --conflicts    - les conflits avou ds ôtes pacaedjes ou modêyes.\n"
+msgstr "  --conflicts    - håyner les conflits.\n"
 
 #: ../urpmq:81
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - print obsoletes.\n"
 msgstr ""
-"  --obsoletes    - les vîs pacaedjes (avou ds ôtès nos) replaecîs pa ci-"
-"chal.\n"
+"  --obsoletes    - håyner les vîs pacaedjes (avou ds ôtès nos) replaecîs pa "
+"ci-chal.\n"
 
 #: ../urpmq:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - print provides.\n"
-msgstr "  --provides     - tot çou k' est ahessî på pacaedje.\n"
+msgstr "  --provides     - håyner tot çou k' est ahessî på pacaedje.\n"
 
 #: ../urpmq:83
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - print requires.\n"
-msgstr "  --requires     - tot çou k' i gn a mezåjhe po l' pacaedje.\n"
+msgstr "  --requires     - håyner tot çou k' i gn a mezåjhe po l' pacaedje.\n"
 
 #: ../urpmq:84
-#, fuzzy, c-format
-msgid "  --suggests     - print suggests.\n"
+#, c-format
+msgid "  --recommends   - print recommends.\n"
 msgstr ""
-"  --obsoletes    - les vîs pacaedjes (avou ds ôtès nos) replaecîs pa ci-"
-"chal.\n"
 
 #: ../urpmq:85
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - print sourcerpm.\n"
 msgstr "  --sourcerpm    - no do fitchî src.rpm sourdant.\n"
 
@@ -3192,12 +3034,13 @@ msgid "  --summary, -S  - print summary.\n"
 msgstr "  --summary, -S  - håyner l' rascourti.\n"
 
 #: ../urpmq:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --requires-recursive, -d\n"
 "                   - query package dependencies.\n"
 msgstr ""
-"  -d             - sitinde li cweraedje åzès aloyances des pacaedjes.\n"
+"  --requires-recursive, -d\n"
+"                   - ricweraedje des aloyances do pacaedje.\n"
 
 #: ../urpmq:90
 #, c-format
@@ -3217,12 +3060,13 @@ msgstr ""
 "pacaedjes).\n"
 
 #: ../urpmq:93
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatprovides, -p\n"
 "                   - search in provides to find package.\n"
 msgstr ""
-"  -p             - permete les rcweraedjes ezès aloyances po trover on "
+"  --whatprovides, -p\n"
+"                   - fé des rcweraedjes ezès aloyances po trover on "
 "pacaedje.\n"
 
 #: ../urpmq:96
@@ -3305,36 +3149,29 @@ msgstr "--list-nodes pout esse eployî seulmint avou --parallel"
 msgid "use -l to list files"
 msgstr ""
 
-#: ../urpmq:416
-#, fuzzy, c-format
+#: ../urpmq:415
+#, c-format
 msgid "no xml info for medium \"%s\", only partial result for package %s"
 msgstr ""
-"pont d' fitchî «hdlist» pol sopoirt «%s», i n' a k' on rzultat parciel pol "
-"pacaedje %s"
 
-#: ../urpmq:417
-#, fuzzy, c-format
+#: ../urpmq:416
+#, c-format
 msgid "no xml info for medium \"%s\", only partial result for packages %s"
 msgstr ""
-"pont d' fitchî «hdlist» pol sopoirt «%s», i n' a k' on rzultat parciel po "
-"les pacaedjes %s"
 
-#: ../urpmq:420
-#, fuzzy, c-format
+#: ../urpmq:419
+#, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for package %s"
 msgstr ""
-"pont d' fitchî «hdlist» pol sopoirt «%s», i n' a nou rzultat pol pacaedje %s"
 
-#: ../urpmq:421
-#, fuzzy, c-format
+#: ../urpmq:420
+#, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr ""
-"pont d' fitchî «hdlist» pol sopoirt «%s», i n' a nou rzultat po les "
-"pacaedjes %s"
 
-#: ../urpmq:488
+#: ../urpmq:487
 #, c-format
 msgid "No changelog found\n"
 msgstr "Nou djournå des candjmints di trové\n"
@@ -3347,362 +3184,10 @@ msgstr "Astaleu di programes"
 msgid "Graphical front end to install RPM files"
 msgstr "Ene eterface grafike po-z astaler des pacaedjes RPM"
 
-#~ msgid ""
-#~ "urpme version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme modêye %s\n"
-#~ "%s\n"
-#~ "Çouci est on libe programe et pout esse cossemé so les termes del licince "
-#~ "GPL.\n"
-#~ "\n"
-#~ "Po s' è siervi:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage: urpmf [options] pattern-expression\n"
-#~ msgstr ""
-#~ "urpmf modêye %s\n"
-#~ "%s\n"
-#~ "Çouci est on libe programe et pout esse cossemé so les termes del licince "
-#~ "GPL.\n"
-#~ "\n"
-#~ "Po s' è siervi: urpmf [tchuzes] erîlêye-ratourneure\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmi.recover version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmi.recover modêye %s\n"
-#~ "%s\n"
-#~ "Çouci est on libe programe et pout esse cossemé so les termes del licince "
-#~ "GPL.\n"
-#~ "\n"
-#~ "Po s' è siervi:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmq version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmq modêye %s\n"
-#~ "%s\n"
-#~ "Çouci est on libe programe et pout esse cossemé so les termes del licince "
-#~ "GPL.\n"
-#~ "\n"
-#~ "Po s' è siervi:\n"
-
-#~ msgid ""
-#~ "Installation failed, some files are missing:\n"
-#~ "%s\n"
-#~ "You may want to update your urpmi database"
-#~ msgstr ""
-#~ "L' astalaedje a fwait berwete, sacwants fitchîs mankèt:\n"
-#~ "%s\n"
-#~ "Vos dvrîz motoit mete a djoû li båze di dnêyes urpmi."
-
-#~ msgid "Cancel"
-#~ msgstr "Rinoncî"
-
-#, fuzzy
-#~ msgid "Cannot write DUDF file.\n"
-#~ msgstr "Dji n' sai ahiver l' fitchî d' apontiaedje [%s]"
-
-#~ msgid ""
-#~ "  --sources      - give all source packages before downloading (root "
-#~ "only).\n"
-#~ msgstr ""
-#~ "  --sources      - diner tos les pacaedjes sourdant divant d' aberweter\n"
-#~ "                   (èn pout esse fwait ki pa root).\n"
-
-#, fuzzy
-#~ msgid "due to already installed %s"
-#~ msgstr "Li pacaedje %s a ddja stî astalé"
-
-#~ msgid ""
-#~ "  --from         - use specified url for list of mirrors, the default is\n"
-#~ "                   %s\n"
-#~ msgstr ""
-#~ "  --from         - eployî li dnêye hårdêye pol djivêye des muroes,\n"
-#~ "                   li prémetowe hårdêye est %s\n"
-
-#~ msgid "Updating media...\n"
-#~ msgstr "Metant a djoû les sopoirts...\n"
-
-#~ msgid "examining %s file"
-#~ msgstr "corwaitaedje do fitchî %s"
-
-#, fuzzy
-#~ msgid "found probed synthesis as %s"
-#~ msgstr "«hdlist» (ou sinteze) ki vént d' esse sayî trové come «%s»"
-
-#~ msgid "  --update       - create an update medium.\n"
-#~ msgstr "  --update       - fé on sopoirt di metaedje a djoû.\n"
-
-#~ msgid "malformed URL: [%s]"
-#~ msgstr "crombe hårdêye: [%s]"
-
-#, fuzzy
-#~ msgid "%d installation transaction failed"
-#~ msgid_plural "%d installation transactions failed"
-#~ msgstr[0] ""
-#~ "I gn a-st avou %d transaccions d' astalaedje k' ont fwait berwete"
-#~ msgstr[1] ""
-#~ "I gn a-st avou %d transaccions d' astalaedje k' ont fwait berwete"
-
-#~ msgid "Package %s can not be installed"
-#~ msgstr "Li pacaedje %s èn pout nén esse astalé"
-
-#~ msgid "Checking to remove the following packages"
-#~ msgstr "Verifiaedje po oister les pacaedjes ki shuvèt"
-
-#~ msgid "%s database locked"
-#~ msgstr "båze di dnêyes %s serêye"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --auto         - non-interactive mode, assume default answers to "
-#~ "questions.    --auto\n"
-#~ msgstr ""
-#~ "  --auto         - môde nén eteractif, supôze li prémetowe valixhance po "
-#~ "totes les kesses.\n"
-
-#~ msgid "Unknown option %s"
-#~ msgstr "Tchuze nén cnoxhowe %s"
-
-#~ msgid "too many mount points for removable medium \"%s\""
-#~ msgstr "trop di ponts di montaedje pol sopoirt bodjåve «%s»"
-
-#~ msgid "Medium \"%s\" is an ISO image, will be mounted on-the-fly"
-#~ msgstr "Li sopoirt «%s» est ene imådje ISO, i serè monté al volêye"
-
-#~ msgid "using different removable device [%s] for \"%s\""
-#~ msgstr "eployant èn éndjin bodjåve diferin [%s] po «%s»"
-
-#~ msgid "unable to retrieve pathname for removable medium \"%s\""
-#~ msgstr "dji n' sai aveur li tchmin pol sopoirt bodjåve «%s»"
-
-#~ msgid "unable to mount the distribution medium"
-#~ msgstr "dji n' a savou monter l' sopoirt d' astalaedje del distribucion"
-
-#~ msgid ""
-#~ "unable to access medium \"%s\",\n"
-#~ "this could happen if you mounted manually the directory when creating the "
-#~ "medium."
-#~ msgstr ""
-#~ "dji n' sai acceder å sopoirt «%s»,\n"
-#~ "çoula pout ariver metans si vos avoz monté al mwin li ridant divant di "
-#~ "radjouter l' sopoirt d' astalaedje."
-
-#~ msgid "inconsistent medium \"%s\" marked removable but not really"
-#~ msgstr ""
-#~ "sopoirt «%s» nén cowerant, metou come bodjåve mins nel est nén vormint"
-
-#~ msgid "  -c             - clean headers cache directory.\n"
-#~ msgstr "  -c             - netyî l' ridant muchete des tiestires.\n"
-
-#~ msgid "virtual medium needs to be local"
-#~ msgstr "les forveyous sopoirts divént esse locås"
-
-#, fuzzy
-#~ msgid "unable to parse synthesis file of \"%s\""
-#~ msgstr "dji n' sai analijhî li fitchî hdlist di «%s»"
-
-#~ msgid "found %d rpm headers in cache, removing %d obsolete headers"
-#~ msgstr ""
-#~ "dj' a trové %d tiestires rpm e muchete, dji oistêye %d tiestires obsoletes"
-
-#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
-#~ msgstr ""
-#~ "carculaedje do md5sum do fitchî «hdlist» (ou del sinteze) k' egzistêye "
-#~ "dedja [%s]"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
-#~ "ignored"
-#~ msgstr ""
-#~ "li forveyou sopoirt «%s» èn doet nén aveur defini di fitchî hdlist ou di "
-#~ "djivêye des fitchîs, dji passe houte do sopoirt"
-
-#~ msgid "invalid hdlist name"
-#~ msgstr "no d' fitchî «hdlist» nén valide"
-
-#~ msgid "unable to find list file for \"%s\", medium ignored"
-#~ msgstr ""
-#~ "dji n' sai trover li fitchî di djivêye di «%s», dji passe houte do sopoirt"
-
-#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
-#~ msgstr "«synthesis» èn divreut nén esse defini (sopoirt «%s»)"
-
-#~ msgid "\"synthesis\" should be set (medium \"%s\")"
-#~ msgstr "«synthesis» divreut esse defini (sopoirt «%s»)"
-
-#~ msgid "unable to access list file of \"%s\""
-#~ msgstr "dji n' sai aveur li fitchî hdlist di «%s»"
-
-#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
-#~ msgstr ""
-#~ "li sopoirt «%s» saye d' eployî on fitchî hdlist dedja eployî, dji passe "
-#~ "houte do sopoirt"
-
-#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
-#~ msgstr ""
-#~ "li sopoirt «%s» saye d' eployî ene djivêye dedja eployeye, dji passe "
-#~ "houte do sopoirt"
-
-#~ msgid "wrote %s"
-#~ msgstr "dj' a scrît %s"
-
-#~ msgid ""
-#~ "Note: no hdlist for medium \"%s\", unable to return any result for it"
-#~ msgstr ""
-#~ "Note: pont d' fitchî hdlist pol sopoirt «%s», nén moyén di rtourner des "
-#~ "rzultats"
-
-#~ msgid "performing second pass to compute dependencies\n"
-#~ msgstr "dji fwait l' deujhinme passe po carculer les aloyances\n"
-
-#~ msgid "building hdlist [%s]"
-#~ msgstr "dji fwai l' fitchî hdlist [%s]"
-
-#~ msgid ""
-#~ "Unable to build synthesis file for medium \"%s\". Your hdlist file may be "
-#~ "corrupted."
-#~ msgstr ""
-#~ "Dji n' a savou fé l' fitchî d' sinteze pol sopoirt «%s». Motoit ki vosse "
-#~ "fitchî hdlist est cron."
-
-#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
-#~ msgstr ""
-#~ "åk n' a nén stî tot léjhant li fitchî hdlist ou di sinteze do sopoirt «%s»"
-
-#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
-#~ msgstr ""
-#~ "carculaedje do fitchî «hdlist» (ou del sinteze) ki vént d' esse copyî"
-
-#~ msgid "...retrieving failed: md5sum mismatch"
-#~ msgstr "...l' aberwetaedje a fwait berwete: li md5sum ni corespond nén"
-
-#~ msgid "no rpm files found from [%s]"
-#~ msgstr "nou fitchî rpm di trové foû di [%s]"
-
-#~ msgid "unable to read rpm files from [%s]: %s"
-#~ msgstr "dji n' sai lére les fitchîs rpm foû di [%s]: %s"
-
-#~ msgid "no rpms read"
-#~ msgstr "nou rpm di léjhou"
-
-#~ msgid "reading headers from medium \"%s\""
-#~ msgstr "dji lét les tiestires do sopoirt «%s»"
-
-#~ msgid "    --probe-synthesis - use synthesis file.\n"
-#~ msgstr "    --probe-synthesis - eployî les fitchîs di sinteze.\n"
-
-#~ msgid "    --probe-hdlist - use hdlist file.\n"
-#~ msgstr "    --probe-hdlist - eployî fitchî «hdlist».\n"
-
-#~ msgid ""
-#~ "Note: since no media searched uses hdlists, urpmf was unable to return "
-#~ "any result\n"
-#~ msgstr ""
-#~ "Note: come nou sopoirt des cis cwerous n' eploye des hdlist, urpmf n' a "
-#~ "nén savou rtourner des rzultats\n"
-
-#~ msgid "You may want to use --name to search for package names.\n"
-#~ msgstr ""
-#~ "Motoit vos vôrîz eployî «--name» po fé on cweraedje sol no des "
-#~ "pacaedjes.\n"
-
-#~ msgid "  --probe-hdlist - use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - eployî l' fitchî «hdlist».\n"
-
-#~ msgid "unable to update medium \"%s\"\n"
-#~ msgstr "dji n' pout mete a djoû l' sopoirt «%s»\n"
-
-#~ msgid "unable to create medium \"%s\"\n"
-#~ msgstr "dji n' pout radjouter l' sopoirt «%s»\n"
-
-#~ msgid "there are multiple packages with the same rpm filename \"%s\""
-#~ msgstr "i gn a pus d' on pacaedje avou l' minme no d' fitchî rpm «%s»"
-
-#~ msgid "unable to correctly parse [%s] on value \"%s\""
-#~ msgstr "dji n' sai analijhî comifåt [%s] pol valixhance «%s»"
-
-#~ msgid "(retry as root?)"
-#~ msgstr "(risayî come root?)"
-
-#~ msgid ""
-#~ "medium \"%s\" uses an invalid list file:\n"
-#~ "  mirror is probably not up-to-date, trying to use alternate method"
-#~ msgstr ""
-#~ "li sopoirt «%s» eploye ene crombe djivêye di fitchîs:\n"
-#~ "  probåblumint ki l' muroe n' est nén a djoû, dji saye ene ôte metôde"
-
-#~ msgid "medium \"%s\" does not define any location for rpm files"
-#~ msgstr "li sopoirt «%s» èn definixh nou eplaeçmint po les fitchîs rpm"
-
-#~ msgid "unrequested"
-#~ msgstr "nén dmandé"
-
-#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
-#~ msgstr ""
-#~ "dji radjoute li pacaedje %s (id=%d, eid=%d, metaedje a djoû=%d, fitchîs="
-#~ "%s)"
-
-#~ msgid ""
-#~ "The following packages have bad signatures:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Do you want to continue installation ?"
-#~ msgstr ""
-#~ "Les pacaedjes ki shuvèt ont ene mwaijhe sinateure:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Voloz vs continouwer avou l' astalaedje?"
-
-#~ msgid "You need to be root to use --use-distrib"
-#~ msgstr "Vos dvoz esse root po pleur eployî «--use-distrib»"
-
-#~ msgid "unable to remove package %s"
-#~ msgstr "dji n' sai oister l' pacaedje %s"
-
-#~ msgid "Proceed with the installation of the %d package? (%d MB)"
-#~ msgid_plural "Proceed with the installation of the %d packages? (%d MB)"
-#~ msgstr[0] "Continouwer avou l' astalaedje d' %d pacaedje? (%d Mo)"
-#~ msgstr[1] "Continouwer avou l' astalaedje di %d pacaedjes? (%d Mo)"
-
-#~ msgid "No filelist found\n"
-#~ msgstr "Nole djivêye di fitchîs di trovêye\n"
-
-#~ msgid "(%d packages, %d MB)"
-#~ msgstr "(%d pacaedjes, %d Mo)"
-
-#~ msgid ""
-#~ "  -P             - do not search in provides to find package (default).\n"
-#~ msgstr ""
-#~ "  -P             - èn nén permete les rcweraedjes ezès aloyances po "
-#~ "trover\n"
-#~ "                   on pacaedje (prémetou).\n"
-
-#~ msgid "  -R             - reverse search to what requires package.\n"
-#~ msgstr ""
-#~ "  -R             - fé l' ricweraedje å rviè, so çou k' a mezåjhe do "
-#~ "pacaedje.\n"
+#: ../polkit/org.mageia.gurpmi2.policy.in.h:1
+msgid "Run Mageia Package Installer"
+msgstr ""
+
+#: ../polkit/org.mageia.gurpmi2.policy.in.h:2
+msgid "Authentication is required to run Mageia Package Installer"
+msgstr ""

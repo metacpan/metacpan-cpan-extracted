@@ -1,6 +1,6 @@
 package XML::XSPF;
 
-# $Id: XSPF.pm 19 2006-05-08 17:31:11Z dsully $
+# $Id$
 
 use strict;
 use base qw(XML::XSPF::Base);
@@ -14,7 +14,7 @@ use XML::Writer;
 
 use XML::XSPF::Track;
 
-our $VERSION  = '0.7';
+our $VERSION  = '0.7.1';
 
 our %defaults = (
 	'version' => 1,
@@ -517,9 +517,7 @@ sub _validateLinkElement {
 }
 
 sub _isValidURI {
-	my $uri = shift;
-
-	return if $uri =~ /[^a-z0-9\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\.\-\_\~]/i;
+	return if $_[0] =~ /[^a-z0-9\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\.\-\_\~\%]/i;
 	return 1;
 }
 
@@ -622,7 +620,7 @@ Dan Sully E<lt>daniel | at | cpan.orgE<gt> & Slim Devices, Inc.
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2006 Dan Sully & Slim Devices, Inc. All rights reserved. 
-Copyright (c) 2006-2008 Dan Sully. All rights reserved. 
+Copyright (c) 2006-2009 Dan Sully. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

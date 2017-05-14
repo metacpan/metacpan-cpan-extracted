@@ -1,0 +1,163 @@
+%%START_PERL%%
+
+use Carp;
+use strict;
+
+%%GENEX_EXTRALIBS%%
+use CGI qw/:standard :html3 :Carp/; # LS's CGI thingie
+use CGI::Carp qw(fatalsToBrowser);
+use DBI;              # and the DBI module
+use Bio::Genex qw(timestamp);
+use Bio::Genex::DBUtils;
+use Bio::Genex::ControlledVocab;
+use Bio::Genex::HTMLUtils qw(objs2table);
+
+
+# *** NOTE ***
+# even though we potentially use all of the other Bio::Genex::* classes
+# they are imported using an 'eval "require $class"' later on in the file
+# instead of being declared explicitly up front
+
+# ============  Executive / Important Decisions  ==========================
+my $current_time = timestamp();
+
+# vars for generating URLs, local temp storage
+my $www_server = '%%WWWHOST%%';
+my $cgi_bin = '%%GENEX_URL_EXAMPLE%%';
+
+# ======= Start composing HTML page =====
+my $q = new CGI;
+
+print $q->header();
+ 
+# ===============  Get the params from the Web Page via CGI  ==============
+my $DEBUG = 0;
+my $pkey = 'ALL';
+my $table = 'Chromosome';
+my $pkey_link;
+my (%columns,%column2name,%name2column,@column_names);
+
+if (param) {
+  $pkey = param('AccessionNumber') if defined param('AccessionNumber');
+  $DEBUG = param('DEBUG') if defined param('DEBUG');
+  $table = param('table') if defined param('table');
+  $Bio::Genex::DBNAME = param('dbname') if defined param('dbname');
+  $pkey_link = param('PKEY_LINK');
+}
+
+# start a connection using the default parameters
+my $dbh = Bio::Genex::current_connection();
+
+# ==========  Got all params, now do something useful with them ============
+# translate table names into properly capitalized class names
+if (exists $Bio::Genex::TABLE2CLASS{$table}) {
+  $table =  $Bio::Genex::TABLE2CLASS{$table};
+}
+my $title = "$table Entries Retrieved from GeneX on host: $Bio::Genex::HOST, in DB: $Bio::Genex::DBNAME";
+print $q->start_html($title), 
+  $q->h2($title);
+
+# we set up a hash of the controlled vocabulary tables
+# these have already been include with Bio::Genex::ControlledVocab
+my %vocabs = map {$_ , 1} Bio::Genex::ControlledVocab->get_vocabs();
+
+#
+# Set up some useful aliases
+#
+my @objects;
+my $class = 'Bio::Genex::' . $table;
+my $pkey_name;
+unless (exists $vocabs{$table}) {
+  # we use this to temporarily relax the strict pragma
+  # to use symbolic references
+  no strict 'refs';
+  # from the require man page:
+    # In other words, if you try this:
+    # 
+    #         require Foo::Bar;    # a splendid bareword 
+    # 
+    # The require function will actually look for the "Foo/Bar.pm"
+    # file in the directories specified in the `@INC' array.
+    # 
+    # But if you try this:
+    # 
+    #         $class = 'Foo::Bar';
+    #         require $class;      # $class is not a bareword
+    #     #or
+    #         require "Foo::Bar";  # not a bareword because of the ""
+    # 
+    # The require function will look for the "Foo::Bar" file in the
+    # @INC array and will complain about not finding "Foo::Bar" there.
+    # In this case you can do:
+    # 
+    #         eval "require $class";
+  eval "require $class";
+
+  # back to our regularily scheduled strictness
+}
+
+if ($@) {
+  # the eval didn't work, so we'll do something nice
+  print $q->h1("Error: $table not found, please try a different table");
+  print $q->end_html;
+  exit(0);
+}
+
+#
+# Grab the list of objects from the DB
+#
+if ($pkey eq 'ALL') {
+  no strict 'refs';
+  $ {$class . '::LIMIT'} = 100;	# an upper bound for the table length
+  push(@objects, $class->get_all_objects());
+} else {
+  my @args = (id=>$pkey);
+  if ($class->linking_table) {
+    croak "$class is a linking table.\nYou must specify a PKEY_LINK parameter to view an individual row in this table" unless defined $pkey_link;
+    push(@args,pkey_link=>$pkey_link);
+  }
+  push(@objects, $class->new(@args));
+}
+
+if ($DEBUG) {
+  print $q->table({-border => ''},
+		  caption('Values of CGI parameters'),
+		  Tr([th(['parameter name','parameter value']),
+		      td(['AccessionNumber', $pkey]),
+		      td(['DEBUG', $DEBUG]),
+		      td(['table', $table]),
+		      td(['dbname', $Bio::Genex::DBNAME]),
+		     ])
+		 );
+}
+
+#
+# Make the output
+#
+if (scalar @objects > 0) {
+  my $response = "Your query returned " . scalar @objects . " $table entr";
+  
+  # check for good grammar
+  if (scalar @objects > 1) {
+    $response .= 'ies';
+  } else {
+    $response .= 'y';
+  }
+
+  print $q->h3($response);
+
+  my $html = objs2table(HEADER=>1,CGI=>$q,OBJECTS=>\@objects);
+  
+  # now contstruct the table, 
+  print $q->table({-border=>''}, $html);
+} else {
+  if ($pkey eq 'ALL') {
+    print $q->h2("Sorry this table has no values");
+  } else {
+    print $q->h2("Sorry, no values were located");
+  }
+}
+
+print $q->hidden({-name=>'DEBUG',-value=>$DEBUG});
+print $q->hidden({-name=>'dbname',-value=>$Bio::Genex::DBNAME});
+print $q->end_html;

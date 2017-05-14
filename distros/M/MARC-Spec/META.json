@@ -64,7 +64,7 @@
          "web" : "https://github.com/MARCspec/MARC-Spec"
       }
    },
-   "version" : "0.1.4",
+   "version" : "1.0.0",
    "x_contributors" : [
       "Carsten Klee <cKlee@users.noreply.github.com>",
       "Mirko Tietgen <mirko@abunchofthings.net>"

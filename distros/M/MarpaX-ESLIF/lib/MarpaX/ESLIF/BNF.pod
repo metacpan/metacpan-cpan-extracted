@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 2.0.4
+version 2.0.10
 
 =head1 DESCRIPTION
 
@@ -264,31 +264,15 @@ Transformed to the symbol name for which the event is triggered.
 
 =item C<:discard[on]>
 
-Hook that is disabling C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discardb(1)>. Not propagated.
+Hook that is disabling C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discardb(1)>. Not propagated. Take care, this is a permanent setting.
 
 =item C<:discard[off]>
 
-Hook that is enabling C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discardb(0)>. Not propagated.
+Hook that is enabling C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discardb(0)>. Not propagated. Take care, this is a permanent setting.
 
 =back
 
-Please note that the C<:discard[on]> and C<:discard[off]> events will I<never> happen if you use the grammar's C<parse()> method, the later is I<always> disabling any event. Therefore, if you grammar relies on recognizer's hooks, you will have to use the following workflow:
-
-  my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $recognizerInterface);
-  $eslifRecognizer->scan();
-  while ($eslifRecognizer->isCanContinue) {
-    $eslifRecognizer->resume();
-  }
-
-  my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $valueInterface);
-  $eslifValue->value;
-  $valueInterface->getResult;
-
-Please remark that if you grammar I<only> have internal events, then there is no need to call C<$eslifRecognizer->resume()> -;
-
-instead of a single:
-
-  $eslifGrammar->parse($recognizerInterface, $valueInterface);
+Please note that the C<:discard[on]> and C<:discard[off]> events will I<always> happen if specified in the grammar, at any level of parsing, regardless if you the grammar's C<parse()> method. This is because these are internal events, not visible by the user.
 
 =item * Event initializers
 

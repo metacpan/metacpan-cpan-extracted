@@ -1,16 +1,20 @@
 package Geo::Coder::List;
 
+use warnings;
+use strict;
+
 =head1 NAME
 
-Geo::Coder::List - Provide lots of backends for HTML::GoogleMaps::V3
+Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
+our %locations;
 
 =head1 SYNOPSIS
 
@@ -40,10 +44,24 @@ sub new {
 
 Add an encoder to list of encoders.
 
-	use Geo::Coder::List;
-	use Geo::Coder::GooglePlaces;
+    use Geo::Coder::List;
+    use Geo::Coder::GooglePlaces;
+    # ...
+    my $list = Geo::Coder::List->new()->push(Geo::Coder::GooglePlaces->new());
 
-	my $list = Geo::Coder::List->new()->push(Geo::Coder::GooglePlaces->new());
+Different encoders can be preferred for different locations.
+For example this code uses geocode.ca for Canada and US addresses,
+and OpenStreetMap for other places:
+
+    my $geocoderlist = new_ok('Geo::Coder::List')
+        ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => new_ok('Geo::Coder::CA') })
+        ->push(new_ok('Geo::Coder::OSM'));
+
+    # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
+    my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
+    # Only uses Geo::Coder::OSM
+    $location = $geocoderlist->geocode('10 Downing St, London, UK');
+
 =cut
 
 sub push {
@@ -74,15 +92,22 @@ sub geocode {
 
 	my $location = $params{'location'};
 
-	if(!defined($location)) {
-		return;
-	}
+	return unless(defined($location));
+	return unless(length($location) > 0);
 
 	if((!wantarray) && (my $rc = $locations{$location})) {
+		delete $rc->{'geocoder'};
 		return $rc;
 	}
 
-	foreach my $geocoder(@{$self->{geocoders}}) {
+	foreach my $g(@{$self->{geocoders}}) {
+		my $geocoder = $g;
+		if(ref($g) eq 'HASH') {
+			my $regex = $g->{'regex'};
+			if($location =~ $regex) {
+				$geocoder = $g->{'geocoder'};
+			}
+		}
 		my @rc;
 		eval {
 			# e.g. over QUERY LIMIT with this one
@@ -105,21 +130,55 @@ sub geocode {
 					# Bing
 					$location->{geometry}{location}{lat} = $location->{point}->{coordinates}[0];
 					$location->{geometry}{location}{lng} = $location->{point}->{coordinates}[1];
+				} elsif($location->{latt}) {
+					# geocoder.ca
+					$location->{geometry}{location}{lat} = $location->{latt};
+					$location->{geometry}{location}{lng} = $location->{longt};
 				}
-
 			}
+			$location->{geocoder} = $geocoder;
 		}
 
 		if(scalar(@rc)) {
 			if(wantarray) {
 				return @rc;
 			}
-			$locations{$location} = $rc[0];
-			return $rc[0];
+			if(length($rc[0])) {
+				$locations{$location} = $rc[0];
+				return $rc[0];
+			}
+		}
+	}
+	undef;
+}
+
+=head2 ua
+
+Accessor method to set the UserAgent object used internally by each of the geocoders. You
+can call I<env_proxy> for example, to get the proxy information from
+environment variables:
+
+    my $ua = LWP::UserAgent->new();
+    $ua->env_proxy(1);
+    $geocoder->ua($ua);
+
+Note that unlike Geo::Coders, there is no read method, since that would be pointless.
+
+=cut
+
+sub ua {
+	my $self = shift;
+
+	if(my $ua = shift) {
+		foreach my $g(@{$self->{geocoders}}) {
+			my $geocoder = $g;
+			if(ref($g) eq 'HASH') {
+				$geocoder = $g->{'geocoder'};
+			}
+			$geocoder->ua($ua);
 		}
 	}
 }
-
 
 =head1 AUTHOR
 
@@ -145,7 +204,6 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Geo::Coder::List
 
-
 You can also look for information at:
 
 =over 4
@@ -167,7 +225,6 @@ L<http://cpanratings.perl.org/d/Geo-Coder-List>
 L<http://search.cpan.org/dist/Geo-Coder-List/>
 
 =back
-
 
 =head1 LICENSE AND COPYRIGHT
 

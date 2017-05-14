@@ -1,0 +1,34 @@
+zmq_ctx_t *	T_PTROBJ_MG
+zmq_msg_t *	T_PTROBJ_MG
+zmq_sock_t *	T_PTROBJ_MG
+zmq_sock_err	T_ERRORCODE
+
+OUTPUT
+T_ERRORCODE
+	if($var != 0){
+	    SET_BANG;
+	    switch(_ERRNO) {
+	        case EPROTONOSUPPORT:
+	            croak("The requested transport protocol is not supported");
+	        case ENOCOMPATPROTO:
+	            croak("The requested transport protocol is not compatible with the socket type");
+	        case EADDRINUSE:
+	            croak("The requested address is already in use");
+	        case EADDRNOTAVAIL:
+	            croak("The requested address was not local");
+	        case ENODEV:
+	            croak("The requested address specified a nonexistent interface");
+	        case ETERM:
+	            croak("The 0MQ context accociated with the specified socket was terminated");
+	        case EFAULT:
+	            croak("The provided socket was not valid");
+                case EINVAL:
+                    croak("Invalid argument");
+                case EINTR:
+                    croak("Interrupted by syscall");
+                case EAGAIN:
+                    croak("The operation would block, and no-block mode was requested.");
+	        default:
+	            croak("Unknown socket error");
+	    }
+	}

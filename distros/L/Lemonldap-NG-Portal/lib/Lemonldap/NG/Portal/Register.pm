@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::Register;
 use strict;
 use warnings;
 
-our $VERSION = '1.4.5';
+our $VERSION = '1.9.1';
 
 use Lemonldap::NG::Portal::Simple qw(:all);
 use base qw(Lemonldap::NG::Portal::SharedConf Exporter);
@@ -44,7 +44,7 @@ use POSIX qw(strftime);
 #  - registerDBFinish
 # @return 1 if all is OK
 sub process {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Process subroutines
     $self->{error} = PE_OK;
@@ -70,7 +70,7 @@ sub process {
 # Load SMTP methods
 # @return Lemonldap::NG::Portal constant
 sub smtpInit {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     eval { use base qw(Lemonldap::NG::Portal::_SMTP) };
 
@@ -86,7 +86,7 @@ sub smtpInit {
 # Get info from form or from register_token
 # @return Lemonldap::NG::Portal constant
 sub extractRegisterInfo {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     if ( $self->{captcha_register_enabled} ) {
         eval { $self->initCaptcha(); };
@@ -194,7 +194,7 @@ sub extractRegisterInfo {
 # If the user already exists, register is forbidden
 # @return Lemonldap::NG::Portal constant
 sub getRegisterUser {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     $self->{mail} = $self->{registerInfo}->{mail};
 
@@ -215,7 +215,7 @@ sub getRegisterUser {
 # Create register session and store token
 # @return Lemonldap::NG::Portal constant
 sub storeRegisterSession {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Skip this step if confirmation was already sent
     return PE_OK
@@ -262,7 +262,7 @@ sub storeRegisterSession {
 # Send confirmation mail
 # @return Lemonldap::NG::Portal constant
 sub sendConfirmationMail {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Skip this step if user clicked on the confirmation link
     return PE_OK if $self->{register_token};
@@ -345,7 +345,7 @@ sub sendConfirmationMail {
 # Create the account
 # @return Lemonldap::NG::Portal constant
 sub registerUser {
-    my ($self) = splice @_;
+    my ($self) = @_;
     my $result;
 
     # Check mail is still unused
@@ -409,7 +409,7 @@ sub registerUser {
 # Send mail containing a temporary password
 # @return Lemonldap::NG::Portal constant
 sub sendRegisterMail {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Build mail content
     my $subject = $self->{registerDoneSubject};
@@ -447,7 +447,7 @@ __END__
 
 =encoding utf8
 
-Lemonldap::NG::Portal::Register - Regsiter a new user
+Lemonldap::NG::Portal::Register - Register a new user
 
 =head1 SYNOPSIS
 
@@ -499,9 +499,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2010, 2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2010, 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2015, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

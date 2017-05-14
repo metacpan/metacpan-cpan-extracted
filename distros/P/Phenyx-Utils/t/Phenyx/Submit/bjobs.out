@@ -1,0 +1,5 @@
+JOBID   USER    STAT  QUEUE      FROM_HOST   EXEC_HOST   JOB_NAME   SUBMIT_TIME
+850380  phenyx  DONE  priority   frt         2*cpt114    *le from / Mar 17 12:13
+                                             2*cpt125
+850381  phenyx  RUN   priority   frt         2*cpt113    *le from / Mar 17 12:18
+                                             2*cpt118

@@ -1,0 +1,149 @@
+#!/usr/local/bin/perl -w
+
+BEGIN { unshift(@INC, "../blib/lib", "./blib/lib", "../blib/arch"); }
+use Net::NISPlus::Directory;
+use Net::NISPlus::Table;
+use Getopt::Std;
+
+# -a|A  Add entries to a NIS+ table.  The difference between the lowercase
+#       `a' and the uppercase `A' is in the treatment of preexisting
+#       entries. The entry's contents are specified by the column=value
+#       pairs on the command line. Note: Values for all columns must be
+#       specified when adding entries to a table.
+#
+#       Normally, NIS+ reports an error if an attempt is made to add
+#       an entry to a table that would overwrite an entry that already
+#       exists. This prevents multiple parties from adding duplicate
+#       entries and having one of them get overwritten. If you wish to
+#       force the add, the uppercase `A' specifies that the entry is
+#       to be added, even if it already exists. This is analogous to a
+#       modify operation on the entry.
+#
+# -c    Create a table named tablename in the namespace. The table that
+#       is created must have at least one column and at least one column
+#       must be searchable.
+#
+# -d tablename
+#       Destroy the table named tablename. The table that is
+#       being destroyed must be empty. The table's contents can be
+#       deleted with the -R option below.
+#
+# -e|E  Edit the entry in the table that is specified by indexdname.
+#       indexdname must uniquely identify a single entry. It is possible
+#       to edit the value in a column that would change the indexed name
+#       of an entry.
+#
+#       The change (colname=value) may affect other entries in the
+#       table if the change results in an entry whose indexed name is
+#       different from indexedname and which matches that of another
+#       existing entry. In this case, the -e option will fail and an
+#       error will be reported. The -E option will force the replacement
+#       of the existing entry by the new entry (effectively removing two
+#       old entries and adding a new one).
+#
+# -m    A synonym for -E. This option has been superseded by the -E option.
+#
+# -r|R  Remove entries from a table. The entry is specified by either a
+#       series of column=value pairs on the command line, or an indexed
+#       name that is specified as entryname. The difference between the
+#       interpretation of the lowercase `r' versus the uppercase `R'
+#       is in the treatment of non-unique entry specifications. Normally
+#       the NIS+ server will disallow an attempt to remove an entry when
+#       the search criterion specified for that entry resolves to more
+#       than one entry in the table. However, it is sometimes desirable
+#       to remove more than one entry, as when you are attempting to
+#       remove all of the entries from a table. In this case, using the
+#       uppercase `R' will force the NIS+ server to remove all entries
+#       matching the passed search criterion. If that criterion is null
+#       and no column values specified, then all entries in the table
+#       will be removed.
+#
+# -u    Update attributes of a table. This allows the concatenation path
+#       (-p), separation character (specified with the (-s)), column
+#       access rights, and table type string (-t) of a table to be
+#       changed. Neither the number of columns, nor the columns that are
+#       searchable may be changed.
+#
+# -D defaults
+#       When creating objects, this option specifies a
+#       different set of defaults to be used during this operation. The
+#       defaults string is a series of tokens separated by colons. These
+#       tokens represent the default values to be used for the generic
+#       object properties. All of the legal tokens are described below.
+#
+# -p path
+#       When creating or updating a table, this option specifies the
+#       table's search path. When a nis_list() function is invoked, the
+#       user can specify the flag FOLLOW_PATH to tell the client library
+#       to continue searching tables in the table's path if the search
+#       criteria used does not yield any entries. The path consists of
+#       an ordered list of table names, separated by colons. The names
+#       in the path must be fully qualified.
+#
+# -s sep
+#       When creating or updating a table, this option specifies
+#       the table's separator character. The separator character is used
+#       by niscat(1) when displaying tables on the standard output. Its
+#       purpose is to separate column data when the table is in ASCII
+#       form. The default value is a space.
+#
+# -t type
+#       When updating a table, this option specifies the table's type string.
+
+chop($os=`uname -r`);
+$style = 1 if $os eq "5.3";
+$style = 1 if $os eq "5.4";
+$style = 2 if $os eq "5.5";
+$style = 2 if $os eq "5.5.1";
+
+$usage="usage:  nistbladm [-D defaults] -c [-p path] [-s sep] type\n";
+$usage.="                colname=[flags][,access] ... tablename\n";
+$usage.="        nistbladm -u [-p path] [-s sep] [-t type] [colname=access ...] tablename\n";
+$usage.="        nistbladm -d tablename\n";
+$usage.="        nistbladm [-D defaults] -a|A colname=val ... tablename\n";
+$usage.="        nistbladm [-D defaults] -a|A indexedname\n";
+$usage.="        nistbladm -e|E colname=val ... indexedname\n" if $style == 2;
+$usage.="        nistbladm -m colname=val ... indexedname\n";
+$usage.="        nistbladm -r|R [colname=val ...] tablename\n";
+$usage.="        nistbladm -r|R indexedname\n";
+
+getopts("XD:cp:s:udaAmrR") if $style == 1;
+getopts("XD:cp:s:udaAeEmrR") if $style == 2;
+
+print "#ARGV = $#ARGV\n" if $opt_X;
+print "os = $os\n" if $opt_X;
+
+# Remove
+if ($opt_R || $opt_r)
+{
+  die $usage if ($opt_d || $opt_a || $opt_A || $opt_e || $opt_E || $opt_m ||
+    $opt_u || $opt_c);
+  my $table = pop;
+  if ($table =~ /^\[/)
+  {
+    if ($#ARGV > -1) { die $usage; };
+    my $ind = $table; $ind =~ s/.*(\[.*\]).*/$1/;
+    $table =~ s/.*]\s*,//;
+    $table = Net::NISPlus::Table->new($table);
+    $table->remove($ind) if $opt_r;
+    $table->removem($ind) if $opt_R;
+    exit;
+  };
+  my %srch;
+  foreach $cond (@ARGV)
+  {
+    my($key,$value) = split(/=/, $cond, 2);
+    $srch{$key} = $value;
+  };
+  $table = Net::NISPlus::Table->new($table);
+  $table->remove(\%srch) if $opt_r;
+  $table->removem(\%srch) if $opt_R;
+  exit;
+};
+
+die $usage;
+
+sub nevercalled
+{
+  $opt_u = $opt_A = $opt_E = $opt_a = $opt_c = $opt_d = $opt_e = $opt_m = 0;
+}

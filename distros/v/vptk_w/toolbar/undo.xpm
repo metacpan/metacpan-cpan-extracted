@@ -1,0 +1,29 @@
+/* XPM */
+static char *undo[] = {
+/* width height ncolors chars_per_pixel */
+"17 17 5 1",
+/* colors */
+"  s None c None",
+". c #FCFEFC",
+"X c #C4C6C4",
+"o c #848684",
+"O c #040204",
+/* pixels */
+"                 ",
+"                 ",
+"  OO  OOOOO      ",
+"  O.OO.....OO    ",
+"  O..........O   ",
+"  O....OOOO..Oo  ",
+"  O....OoooO..O  ",
+"  O.....O  O..Oo ",
+"  OOOOOOOo O..Oo ",
+"   oOooooo O..Oo ",
+"   O.O     O..Oo ",
+"   O..OOOOO..Ooo ",
+"    O........Oo  ",
+"     O.....OOoo  ",
+"      OOOOOoo    ",
+"       ooooo     ",
+"                 "
+};

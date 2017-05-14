@@ -1,0 +1,9 @@
+# This file tests the comment filter
+
+Some text before.
+
+!block comment
+Some text inside.
+!endblock
+
+Some text after.

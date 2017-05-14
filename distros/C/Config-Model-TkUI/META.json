@@ -32,7 +32,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Model" : "2.084",
+            "Config::Model" : "2.095",
             "Config::Model::ObjTreeScanner" : "0",
             "Log::Log4perl" : "1.11",
             "Path::Tiny" : "0",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/dod38fr/config-model-tk-ui"
       }
    },
-   "version" : "1.361",
+   "version" : "1.362",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

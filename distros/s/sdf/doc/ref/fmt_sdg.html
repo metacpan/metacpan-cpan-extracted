@@ -1,0 +1,59 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: SDG Format</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_fmt.html">Parent Topic</A> | <A HREF="fmt_ini.html">Previous Topic</A> | <A HREF="fmt_tbl.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>4.3. SDG Format</H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P>SDG files are used to format information extracted from source code by <A HREF="../ref/sdfget.html">sdfget</A>.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>An SDG is a table of <EM>Key-Format</EM> pairs. For example:</P>
+<PRE>
+     Key     Format
+     -       &quot;Key\t\tDescription\n&quot;
+     *       sprintf(&quot;%-15.15s\t%s\n&quot;, $key, $data)
+</PRE>
+<P>The first line specifies the layout of the table and is required. An item is only printed if it has a description. The <EM>Key</EM> field can be one of the following:</P>
+<UL>
+<LI>an item name
+<LI>a minus (-) character, indicating free text
+<LI>an asterix (*) character, indicating all remaining items</UL>
+<P>The <EM>Format</EM> field is a Perl expression. <EM>$key</EM> and <EM>$data</EM> are used to indicate the key and description of the current item respectively. Other available symbols are:</P>
+<UL>
+<LI><EM>$dir</EM> - directory component of current file
+<LI><EM>$base</EM> - base component of current file
+<LI><EM>$ext</EM> - extension component of current file
+<LI><EM>$short</EM> - base &amp; extension components of current file</UL>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>The SDG file used to format topics within the SDF documentation is:</P>
+<PRE>
+Key             Format
+Title           &quot;H1[id=\&quot;$short\&quot;] $short - $data\n\n&quot;
+Purpose         &quot;H2: $key\n\n$data\n\n&quot;
+Interface       &quot;H2: $key\n\n$data\n\n&quot;
+-               &quot;!SDF_DESCRIPTION_PRE\n&quot;
+Description     &quot;H2: $key\n\n$data\n\n&quot;
+-               &quot;!SDF_DESCRIPTION_POST\n&quot;
+Examples        &quot;H2: $key\n\n$data\n\n&quot;
+Limitations     &quot;H2: Limitations and future directions\n\n$data\n\n&quot;
+-               &quot;!SDF_DEFAULT_END\n&quot;
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_fmt.html">Parent Topic</A> | <A HREF="fmt_ini.html">Previous Topic</A> | <A HREF="fmt_tbl.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

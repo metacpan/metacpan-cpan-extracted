@@ -1,5 +1,12 @@
 Changelog for Beam-Runner
 
+0.010     2017-05-13 10:34:53+02:00 Europe/Paris
+
+    [Fixed]
+
+    - Fix dependency on Beam::Service. Assuming people will pull that in
+      via Beam::Wire is problematic. Thanks @jberger!
+
 0.009     2017-05-08 14:23:56-05:00 America/Chicago
 
     [Added]

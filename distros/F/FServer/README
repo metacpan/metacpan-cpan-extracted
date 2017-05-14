@@ -1,0 +1,47 @@
+Font Renderer Demo V1.0
+by Jean-Philippe Durrios
+
+  1 List of files
+  2 Instructions
+  3 Tips
+  4 Contact
+
+1) List of files
+  test.pl
+  FServer.pl
+  README
+  fonts/standard.flf
+  fonts/lean.flf
+  font/bulbhead.flf
+  fonts/fuzzy.flf
+  font/trek.flf
+  font/bubble.flf
+
+2) Instructions
+
+I always wanted to make thos cool
+signatures on my emails, so I decied
+to develop my own Font Server using
+the free font files available on the
+Internet for the Figlet Server.
+
+To run the script use 'perl test.pl'.
+The script will prompt you for a text,
+enter whatever string (try to keep it
+under 10 chars).
+Then type in the font of your choice:
+standard, lean, bublhead, fuzzy, trek,
+or bubble (the script will use 
+standard as the defalt font).
+
+3) Tips
+
+Type 'perl test.pl > file.txt' if you
+want to save the output as a text file,
+and use it as a signature for your email.
+
+4) Contact
+
+Jean-Philippe Durrios
+jpdurrios@yahoo.com
+www.durrios.com

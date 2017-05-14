@@ -2,8 +2,19 @@ package Test::Smoke::Database::Display;
 
 # Test::Smoke::Database::Display - 
 # Copyright 2003 A.Barbet alian@alianwebserver.com.  All rights reserved.
-# $Date: 2003/08/19 10:37:24 $
+# $Date: 2004/04/19 17:50:09 $
 # $Log: Display.pm,v $
+# Revision 1.9  2004/04/19 17:50:09  alian
+# fix on warnings
+#
+# Revision 1.8  2003/11/07 17:34:25  alian
+# Change display at import
+#
+# Revision 1.7  2003/09/16 15:41:50  alian
+#  - Update parsing to parse 5.6.1 report
+#  - Change display for lynx
+#  - Add top smokers
+#
 # Revision 1.6  2003/08/19 10:37:24  alian
 # Release 1.14:
 #  - FORMAT OF DATABASE UPDATED ! (two cols added, one moved).
@@ -46,7 +57,7 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-$VERSION = ('$Revision: 1.6 $ ' =~ /(\d+\.\d+)/)[0];
+$VERSION = ('$Revision: 1.9 $ ' =~ /(\d+\.\d+)/)[0];
 
 use vars qw/$debug $verbose/;
 
@@ -67,6 +78,7 @@ sub new   {
   $self->{CGI} = $indexer->{opts}->{cgi};
   $self->{DB} = $indexer->{DB};
   $limite = $indexer->{opts}->{limit};
+  $ENV{SCRIPT_NAME}='localhost' if !$ENV{SCRIPT_NAME};
   return $self;
 }
 
@@ -89,18 +101,18 @@ sub header_html(\%) {
     (-style=>{'src'=>"$u/smokedb.css"}, -title=>"perl-current smoke results");
   $buf.= <<EOF;
  <div class=menubar><table width="100%"><tr><td class=links>&nbsp;
-   <a class=m href="$ENV{SCRIPT_NAME}">Home</a> &nbsp;|&nbsp;
-   <a class=m href="$ENV{SCRIPT_NAME}?filter=1">Filter</a> &nbsp;|&nbsp;
-   <a class=m href="$ENV{SCRIPT_NAME}?last=1">Last report</a> &nbsp;|&nbsp;
-   <a class=m href="$ENV{SCRIPT_NAME}?last=1;want_smoke=1">Last smoke</a> &nbsp;|&nbsp;
+   <a class=m href="$ENV{SCRIPT_NAME}">Home</a>&nbsp;|&nbsp;
+   <a class=m href="$ENV{SCRIPT_NAME}?filter=1">Filter</a>&nbsp;|&nbsp;
+   <a class=m href="$ENV{SCRIPT_NAME}?last=1">Last report</a>&nbsp;|&nbsp;
+   <a class=m href="$ENV{SCRIPT_NAME}?last=1;want_smoke=1">Last smoke</a>&nbsp;|&nbsp;
    <a class=m href="$ENV{SCRIPT_NAME}?failure=1">
-  Last failures</a> &nbsp;|&nbsp;
+  Last failures</a>&nbsp;|&nbsp;
    <a class=m href="$ENV{SCRIPT_NAME}?smokers=1">
-  Smokers</a> &nbsp;|&nbsp;
-   <a class=m href="$u/FAQ.html">FAQ</a> &nbsp;|&nbsp;
-   <a class=m href="$u/0.html">Stats</a> &nbsp;|&nbsp;
-   <a class=m href="http://qa.perl.org">About</a> &nbsp;|&nbsp;
-   <a class=m href="mailto:alian\@cpan.org">Author</a> &nbsp;|&nbsp;
+  Smokers</a>&nbsp;|&nbsp;
+   <a class=m href="$u/FAQ.html">FAQ</a>&nbsp;|&nbsp;
+   <a class=m href="$u/0.html">Stats</a>&nbsp;|&nbsp;
+   <a class=m href="http://qa.perl.org">About</a>&nbsp;|&nbsp;
+   <a class=m href="mailto:alian\@cpan.org">Author</a>&nbsp;|&nbsp;
 </td><td align=right></td></tr></table>
 </div>
 <h1>Perl-current smoke results</h1>
@@ -229,13 +241,17 @@ sub display(\%$$$$$$) {
 	       $$ref{$os}{$osver}{$ar}{$cc}{$ccver}{$smoke}{matrix}
 	      );
 	    my $id = $$ref{$os}{$osver}{$ar}{$cc}{$ccver}{$smoke}{id};
-	    # debut des tableaux erreurs et details
-	    my $de = "\n<a name=\"$id\"></a> <table width=\"80%\" class=\"box\">".
-	      Tr(th({-colspan=>5},"$os $osver $ar $cc $ccver smoke patch $smoke"));
 	    # Matrice
 	    my $matrixe;
 	    my $y=0;
-	    my @ltmp = split(/\|/, $matrix);
+	    my @ltmp = split(/\|/, $matrix || " ");
+
+	    # debut des tableaux erreurs et details
+	    my $de = "\n<a name=\"$id\"></a> <table width=\"600\" class=\"box\">".
+	      Tr(th({-colspan=> (2 + $#ltmp) },
+		    "$os $osver $ar $cc $ccver smoke patch $smoke")).
+	      Tr(th({-colspan=> (2 + $#ltmp) },
+		    '<a target="_blank" href="http://nntp.x.perl.org/group/perl.daily-build.reports/'.$id.'">Original report</a>'));
 	    foreach (@ltmp) {
 	      $matrixe.="<tr><td align=right>$_</td>".("<td>_</td>"x$y++).
 		("<td>|</td>"x($#ltmp-$y+2))."</tr>";
@@ -356,27 +372,47 @@ EOF
 sub smokers {
   my $self = shift;
   my $ref = $self->db->read_smokers;
-      print STDERR Data::Dumper->Dump([$ref]);
-  my $buf=Tr(th(cw("Author", 23)), th(cw("Os",15)), th(cw("Os version",15)),
-	     th(cw("Architecture",15)), th(cw("Cc",15)), th(cw("Cc version",15)));
+#      print STDERR Data::Dumper->Dump([$ref]);
+  my $buf=Tr(th(cw("Author", 28)), th(cw("Os",7)), th(cw("Os version",16)),
+	     th(cw("Architecture",10)), th(cw("Cc",15)),
+	     th(cw("Cc version",15)), th(cw("Nb smoke",3)));
   my $i=0;
+
+  # List of config in last 6 month
   # Tab author
   foreach my $author (keys %$ref) {
-    my $bu;
+    my ($bu);
     my $aa = $author;
     $aa=~s/\@/ at /g;
+    my ($os, $osver);
     # Tab config
-    foreach my $conf (@{$ref->{$author}}) {
-      $bu = $bu ? td(cw(undef, 23)) : td(cw($aa, 23));
+    foreach (@{$ref->{$author}}) {
+      $bu = $bu ? td(cw(undef, 28)) : td(cw($aa, 28));
       # tab specs
-      foreach (@$conf) {
-	$bu.=td(cw($_, 15));
-      }
+      $bu.=td(cw(($_->[0] eq $os ? " " : $_->[0]), 7)).
+	   td(cw(($_->[1] eq $osver ? " " : $_->[1]), 16)).
+	   td(cw($_->[2], 10)).td(cw($_->[3], 15)).
+           td(cw($_->[4], 15)). td(cw($_->[5], 3));
+      ($os, $osver)  = ($_->[0], $_->[1]);
       $buf.=Tr({-class=>'mod'.$i%2},$bu)."\n";
     }
     $i++;
   }
-  return h2("Smokers in last 6 month").table({-class => 'box'}, $buf);
+  $buf = h2("Smokers in last 6 month").
+    table({-class => 'box', -border=>1}, $buf);
+
+  # top 20 smokers
+  $ref = $self->db->read_top_smokers(20);
+  my $bu;
+  $buf.=h2("Top 20 smokers since beginning");
+  foreach (@$ref) {
+    my $author = shift @$_;
+    $author=~s/\@/ at /g;
+    $bu.=Tr({-class=>'mod'.$i++%2}, td($author), td($_->[0]));
+  }
+  $buf.=table({-class => 'box', -border=> 1},
+	      Tr(th(cw("Author")), th(cw("Nb smoke"))), $bu);
+  return $buf
 }
 
 #------------------------------------------------------------------------------
@@ -385,7 +421,7 @@ sub smokers {
 sub cw($$) {
   my ($word, $size)= @_;
   $size = 10 if !$size;
-  return $word.("&nbsp;" x ($size - length($word)));
+  return ($word || "").("&nbsp;" x ($size - ($word ? length($word) :0 )));
 }
 
 #------------------------------------------------------------------------------
@@ -461,7 +497,7 @@ Return the main HTML screen with summary
 
 =head1 VERSION
 
-$Revision: 1.6 $
+$Revision: 1.9 $
 
 =head1 AUTHOR
 

@@ -1,5 +1,21 @@
 Revision history for Perl extension Test::Smoke::Database.
 
+1.17  2004/04/14 22:37:47  alian
+ - parse 1.19 style reports
+ - remove -Uuseperlio for blead
+ - display Test::Smoke::Database version in cgi
+ - display address of cgi at end of run
+ - change url for eg of cgi in pod doc
+
+1.16  2003/11/07 17:42:22  alian
+ - Remove warnings at import & at graph creation
+ - Change some html for nice display
+
+1.15  2003/09/16 15:41:50  alian
+ - Update parsing to parse 5.6.1 report
+ - Change display for lynx
+ - Add top smokers
+
 1.14  2003/08/19 10:37:24  alian
  - FORMAT OF DATABASE UPDATED ! (two cols added, one moved).
  - Add a 'version' field to filter/parser (Eg: All perl-5.8.1 report)

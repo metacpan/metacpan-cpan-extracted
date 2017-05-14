@@ -1,0 +1,21 @@
+POST https://wwwcie.ups.com/ups.app/xml/AV
+
+<?xml version='1.0' standalone='yes'?>
+<AddressValidationRequest>
+  <Address>
+    <City>Bad Place</City>
+    <CountryCode>US</CountryCode>
+    <PostalCode>998877</PostalCode>
+    <ResidentialAddressIndicator></ResidentialAddressIndicator>
+    <StateProvinceCode>NY</StateProvinceCode>
+  </Address>
+  <Request>
+    <RequestAction>AV</RequestAction>
+    <TransactionReference>
+      <CustomerContext>Net::UPS</CustomerContext>
+      <XpciVersion>1.0001</XpciVersion>
+    </TransactionReference>
+  </Request>
+</AddressValidationRequest>
+
+<?xml version="1.0"?><AddressValidationResponse><Response><TransactionReference><CustomerContext>Net::UPS</CustomerContext><XpciVersion>1.0001</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><AddressValidationResult><Rank>1</Rank><Quality>0.7160</Quality><Address><City>BURDEN LAKE</City><StateProvinceCode>NY</StateProvinceCode></Address><PostalCodeLowEnd>12018</PostalCodeLowEnd><PostalCodeHighEnd>12018</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>2</Rank><Quality>0.7160</Quality><Address><City>PINE LAKE</City><StateProvinceCode>NY</StateProvinceCode></Address><PostalCodeLowEnd>12032</PostalCodeLowEnd><PostalCodeHighEnd>12032</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>3</Rank><Quality>0.7160</Quality><Address><City>W SAND LAKE</City><StateProvinceCode>NY</StateProvinceCode></Address><PostalCodeLowEnd>12196</PostalCodeLowEnd><PostalCodeHighEnd>12196</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>4</Rank><Quality>0.7160</Quality><Address><City>WHALEY LAKE</City><StateProvinceCode>NY</StateProvinceCode></Address><PostalCodeLowEnd>12531</PostalCodeLowEnd><PostalCodeHighEnd>12531</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>5</Rank><Quality>0.7160</Quality><Address><City>BRANT LAKE</City><StateProvinceCode>NY</StateProvinceCode></Address><PostalCodeLowEnd>12815</PostalCodeLowEnd><PostalCodeHighEnd>12815</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>6</Rank><Quality>0.7160</Quality><Address><City>EAGLE LAKE</City><StateProvinceCode>NY</StateProvinceCode></Address><PostalCodeLowEnd>12883</PostalCodeLowEnd><PostalCodeHighEnd>12883</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>7</Rank><Quality>0.7160</Quality><Address><City>AFTON LAKE</City><StateProvinceCode>NY</StateProvinceCode></Address><PostalCodeLowEnd>13730</PostalCodeLowEnd><PostalCodeHighEnd>13730</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>8</Rank><Quality>0.7059</Quality><Address><City>WOODLAKE</City><StateProvinceCode>CA</StateProvinceCode></Address><PostalCodeLowEnd>93286</PostalCodeLowEnd><PostalCodeHighEnd>93286</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>9</Rank><Quality>0.7059</Quality><Address><City>UPPER LAKE</City><StateProvinceCode>CA</StateProvinceCode></Address><PostalCodeLowEnd>95485</PostalCodeLowEnd><PostalCodeHighEnd>95485</PostalCodeHighEnd></AddressValidationResult><AddressValidationResult><Rank>10</Rank><Quality>0.7059</Quality><Address><City>BITTER LAKE</City><StateProvinceCode>WA</StateProvinceCode></Address><PostalCodeLowEnd>98177</PostalCodeLowEnd><PostalCodeHighEnd>98177</PostalCodeHighEnd></AddressValidationResult></AddressValidationResponse>

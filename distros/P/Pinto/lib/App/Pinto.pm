@@ -11,7 +11,7 @@ use Pinto::Util qw(is_remote_repo);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ sub global_opt_spec {
 
     return (
         [ 'root|r=s'           => 'Path to your repository root directory' ],
-        [ 'color|colour!'      => 'Colorize any output (negatable)' ],
+        [ 'no-color|no-colour' => 'Do not colorize any output' ],
         [ 'password|p=s'       => 'Password for server authentication' ],
         [ 'quiet|q'            => 'Only report fatal errors' ],
         [ 'username|u=s'       => 'Username for server authentication' ],
@@ -37,16 +37,6 @@ sub pinto {
 
         $global_options->{root} ||= $ENV{PINTO_REPOSITORY_ROOT}
             || $self->usage_error('Must specify a repository root');
-
-        # Discard password and username arguments if this is not a
-        # remote repository.  StrictConstrutor will not allow them.
-        delete @{$global_options}{qw(username password)}
-            if not is_remote_repo($global_options->{root});
-
-        # Disable color if STDOUT is not a tty, unless it has already been
-        # explicitly enabled. For example: pinto --color ls | less -R
-        $global_options->{color} = 0 if ($ENV{PINTO_NO_COLOR} or not -t STDOUT)
-            and not defined $global_options->{color};
 
         $global_options->{password} = $self->_prompt_for_password
             if defined $global_options->{password} and $global_options->{password} eq '-';
@@ -99,7 +89,7 @@ App::Pinto - Command-line driver for Pinto
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 SYNOPSIS
 
@@ -117,7 +107,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

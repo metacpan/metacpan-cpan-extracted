@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 # Test the FIle transport ...
 

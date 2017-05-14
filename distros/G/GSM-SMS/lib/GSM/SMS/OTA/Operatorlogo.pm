@@ -10,7 +10,7 @@ require  Exporter;
 		OTAOperatorlogo_fromfile
 		); 
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 use constant OTAOperatorlogo_PORT => 5506;
 

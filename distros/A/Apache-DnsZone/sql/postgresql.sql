@@ -4,7 +4,7 @@ create table languages (
   id serial not null,
   lang char(2) not null,
   language varchar(255) not null,
-  abbrev char(2) not null,
+  abbrev char(5) not null,
   primary key (id)
 );
 
@@ -14,6 +14,7 @@ insert into languages (lang, language, abbrev) values ('dk','Dansk','da');
 insert into languages (lang, language, abbrev) values ('it','Italiano','it');
 insert into languages (lang, language, abbrev) values ('fr','Fran&ccedil;ais','fr');
 insert into languages (lang, language, abbrev) values ('se','Svenska','sv');
+insert into languages (lang, language, abbrev) values ('br','Portuguese Brazil','pt-BR');
 
 create table users (
   id serial not null,
@@ -50,9 +51,11 @@ create table soa (
 create table rec_count (
   domain integer not null,
   A_count integer not null,
+  AAAA_count integer not null,
   CNAME_count integer not null,
   MX_count integer not null,
   NS_count integer not null,
+  PTR_count integer not null,
   TXT_count integer not null,
   foreign key (domain) references domains (id)
 );
@@ -62,6 +65,17 @@ create table records_A (
   domain integer not null,
   name varchar(255) not null,
   address varchar(16) not null,
+  ttl int not null,
+  rec_lock int default 0 null,
+  primary key (id),
+  foreign key (domain) references domains (id)
+);
+
+create table records_AAAA (
+  id serial not null,
+  domain integer not null,
+  name varchar(255) not null,
+  address varchar(39) not null,
   ttl int not null,
   rec_lock int default 0 null,
   primary key (id),
@@ -96,6 +110,17 @@ create table records_NS (
   domain integer not null,
   name varchar(255) not null,
   nsdname varchar(255) not null,
+  ttl int not null,
+  rec_lock int default 0 null,
+  primary key (id),
+  foreign key (domain) references domains (id)
+);
+
+create table records_PTR (
+  id serial not null,
+  domain integer not null,
+  name varchar(255) not null,
+  ptrdname varchar(255) not null,
   ttl int not null,
   rec_lock int default 0 null,
   primary key (id),

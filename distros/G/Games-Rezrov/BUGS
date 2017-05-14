@@ -1,0 +1,22 @@
+BUGS
+
+Seriously, use a real interpreter like Frotz if you're playing
+anything other than a classic Infocom game.
+
+o Timed input is not (yet?) implemented
+
+o Apple OS X terminal woes:
+  Copy a termcap file (see http://catb.org/~esr/terminfo/) to
+  /etc/termcap to get the termcap-based interface to work (I don't know
+  why Apple doesn't install this file on their systems).  Also, try
+  setting your TERM variable to "xterm" rather than "vt100".
+
+o I don't think the sonar scope in Seastalker will work (this is the
+  only version 3 game that splits the screen).  I'd appreciate a
+  savegame made just before using it so I can try it.
+
+o ReadLine support:
+   - doesn't work with preloaded line input.
+   - virulently incompatible with Curses module.
+   - Not sure if there's anything I can do about these.
+

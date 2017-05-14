@@ -1,7 +1,10 @@
-package RDF::Lazy::Literal;
-use v5.10;
-use strict;
+﻿use strict;
 use warnings;
+package RDF::Lazy::Literal;
+{
+  $RDF::Lazy::Literal::VERSION = '0.081';
+}
+#ABSTRACT: Literal node in a RDF::Lazy graph
 
 use base 'RDF::Lazy::Node';
 use Scalar::Util qw(blessed);
@@ -15,7 +18,7 @@ our $LANGTAG = qr/^(([a-z]{2,8}|[a-z]{2,3}-[a-z]{3})(-[a-z0-9_]+)?-?)$/i;
 sub new {
     my $class   = shift;
     my $graph   = shift || RDF::Lazy->new;
-    my $literal = shift // '';
+    my $literal = shift;
 
     my ($language, $datatype) = @_;
 
@@ -44,7 +47,7 @@ sub lang {
     my $lang = $self->trine->literal_value_language;
     return $lang if not @_ or not $lang;
 
-    my $xxx = lc(shift || "");
+    my $xxx = shift || "";
     $xxx =~ s/_/-/g;
     return unless $xxx =~ $LANGTAG;
 
@@ -60,9 +63,9 @@ sub datatype {
     my $type = $self->graph->resource( $self->trine->literal_datatype );
     return $type unless @_ and $type;
 
-    foreach (@_) {
-        my $t = $self->graph->uri( $_ );
-        return 1 if $t->is_resource and $t->str eq $type->str;
+    foreach my $t (@_) {
+        $t = $self->graph->uri( $t );
+        return 1 if $t->is_resource and $t eq $type;
     }
 
     return;
@@ -81,11 +84,18 @@ sub _autoload {
 }
 
 1;
+
+
 __END__
+=pod
 
 =head1 NAME
 
 RDF::Lazy::Literal - Literal node in a RDF::Lazy graph
+
+=head1 VERSION
+
+version 0.081
 
 =head1 DESCRIPTION
 
@@ -122,4 +132,16 @@ Can also be used to checks whether the datatype matches, for instance:
 
     $node->datatype('xsd:integer','xsd:double');
 
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
+

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#$Id: watch.pl 787 2011-05-25 21:41:28Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/watch.pl $
+#$Id: watch.pl 990 2012-12-28 20:35:04Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/watch.pl $
 
 =readme
 
@@ -33,7 +33,7 @@ my $dc = Net::DirectConnect->new(
         #print join ' ', $msg, @_, "\n";
         $dc->say( $msg, @_ );    #print with console encoding
         },
-      } qw(welcome chatline To)
+    } qw(welcome chatline To)
   },
 );
 while ( $dc->active() ) { $dc->work(); }

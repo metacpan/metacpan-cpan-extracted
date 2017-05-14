@@ -7,7 +7,7 @@ use Carp qw( croak );
 # Provide a ->Dumper method
 use Data::Dumper 'Dumper';
 
-our $VERSION = '0.2';
+our $VERSION = '0.11';
 
 sub new {
 	my $class = shift;
@@ -51,19 +51,6 @@ sub service {
 	$self->{service};
 	
 }
-
-sub token {
-    my $self = shift;
-    $self->{token} = shift if @_;
-    return $self->{token};
-}
-
-sub origin {
-    my $self = shift;
-    $self->{origin} = shift if @_;
-    return $self->{origin};
-}
-
 
 sub TO_JSON {
 	## really should be the canonical identity

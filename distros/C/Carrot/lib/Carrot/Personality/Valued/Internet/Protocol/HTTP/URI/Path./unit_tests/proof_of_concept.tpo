@@ -1,0 +1,16 @@
+Creating a test plan at Thu Aug 14 20:27:22 2014.
+Scheduling a total of 5 tests.
+Reported result #1 [X] slash.
+Reported result #2 [X] index.
+Reported result #3 [X] directory.
+Reported result #4 [X] slash.
+Reported result #5 [X] path.
+Reported result #6 [X] path with query.
+Reported result #7 [ ] fail.
+Summary of test results at Thu Aug 14 20:27:22 2014
+*----------+---------+---------+---------*
+| Reported | Success | Failure | Missing |
++----------+---------+---------+---------+
+|       7  |      6  |     1   |    -2   |
+*----------+---------+---------+---------*
+Error code: 1

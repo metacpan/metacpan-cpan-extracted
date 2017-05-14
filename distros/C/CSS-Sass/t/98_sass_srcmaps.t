@@ -5,13 +5,6 @@ use warnings;
 
 my (@dirs, @tests);
 
-use Test::More;
-
-# disabled for now, unreliable
-plan(skip_all => 'Disabled');
-
-__DATA__
-
 BEGIN
 {
 
@@ -35,9 +28,12 @@ BEGIN
 
 }
 
+use Test::More;
+
+
 if (eval { require OCBNET::SourceMap; 1 })
 {
-	plan(tests => 2 + @tests * 2);
+	plan(tests => 1 + @tests * 2);
 }
 else
 {
@@ -45,7 +41,6 @@ else
 }
 
 use_ok('OCBNET::SourceMap');
-use_ok('OCBNET::SourceMap::V3');
 
 use CSS::Sass qw(SASS_STYLE_NESTED);
 
@@ -57,10 +52,12 @@ sub read_file
 	binmode $fh; return <$fh>;
 }
 
+use File::chdir;
+
 foreach my $test (@tests)
 {
 
-	chdir $test->[0];
+	local $CWD =$test->[0];
 
 	my $input_file = $test->[1];
 	my $config_file = 'config';
@@ -114,12 +111,7 @@ foreach my $test (@tests)
 					$cur = $smap_cur->{'mappings'}->[$i]->[$n]; ++$n;
 				}
 				# check if we have found it
-				# unless ($cur) { print STDERR "\n", $stats->{'output_string'}, "\n"; }
-				# unless ($cur) { print STDERR $stats->{'source_map_string'}, "\n"; }
-				unless ($cur) {
-					warn "input    ", $srcmap, "\n";
-					warn "expected ", $stats->{'source_map_string'}, "\n";
-				return fail($test->[0] . "/" . $srcmap_file); }
+				unless ($cur) { return fail($test->[0] . "/" . $srcmap_file); }
 			}
 			++ $i;
 			$n = 0;

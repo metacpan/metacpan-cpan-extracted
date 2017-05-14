@@ -1,0 +1,49 @@
+---
+abstract: 'Automated annotation of assemblies'
+author:
+  - 'Andrew J. Page <ap13@sanger.ac.uk>'
+build_requires:
+  Data::Dumper: 0
+  Env::Path: 0
+  File::Find: 0
+  File::Slurp: 0
+  Moose::Role: 0
+  Test::Most: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-AutomatedAnnotation
+requires:
+  Bio::Perl: 0
+  Bio::PrimarySeq: 0
+  Bio::SearchIO: 0
+  Bio::Seq: 0
+  Bio::SeqFeature::Generic: 0
+  Bio::SeqIO: 0
+  Bio::Tools::GFF: 0
+  Cwd: 0
+  Exception::Class: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Temp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  List::Util: 0
+  Moose: 0
+  POSIX: 0
+  Scalar::Util: 0
+  Text::CSV: 0
+  Time::Piece: 0
+  Time::Seconds: 0
+  XML::Simple: 0
+  warnings: 0
+resources:
+  homepage: http://www.sanger.ac.uk/
+  repository: https://github.com/sanger-pathogens/Bio-AutomatedAnnotation.git
+version: 1.133090

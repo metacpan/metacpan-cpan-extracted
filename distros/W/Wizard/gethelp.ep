@@ -1,8 +1,6 @@
-<html>
-</html>
 <ep-perl>
 {
-	my $cgi = $self->{'cgi'};
+	my $cgi = $_->{'cgi'};
 	my $mod = $cgi->param('module');
 	my $module = '';
 	if($mod =~ /^(.*)$/) {
@@ -11,12 +9,11 @@
 	require $module; 
 	my $file = $INC{$module};
 	$file =~ s/\.pm$/\.pod/;
-	my $htmlout = '';
 	if(-f $file) {
-	    $htmlout = `cd /tmp; /usr/bin/pod2html $file`;
+	    `cd /tmp; /usr/bin/pod2html $file`;
 	} else {
-	    $htmlout = "No such file: $file";
+	    "<html><head><title>Error: Missing docs</title>\n"
+	    . " <h1>Error:
 	}
-	$htmlout;
-}	
+}
 </ep-perl>

@@ -1,0 +1,15 @@
+---
+abstract: 'Magnetic Stripe parser'
+author:
+  - 'Frederico Recsky <cartas@frederico.me>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Card-Magnetic
+version: '0.003'

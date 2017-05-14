@@ -61,7 +61,7 @@ $parser->parse_string_document(<<'EOPOD');
 EOPOD
 
 is($results, <<'EOHTML', "a table with a title");
-<i>Table: An Example Table</i>
+<p><em>Table: An Example Table</em></p>
 <table>
 
 <tr>
@@ -158,7 +158,7 @@ $parser->parse_string_document(<<'EOPOD');
 EOPOD
 
 is($results, <<'EOHTML', "get rid of table type info");
-<i>Table: An Example Table</i>
+<p><em>Table: An Example Table</em></p>
 <table>
 
 <tr>

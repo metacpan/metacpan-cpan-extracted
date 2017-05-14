@@ -50,15 +50,15 @@ sub Display {
     my $item = "item_" . $self->{'name'}; $item =~ s/\-/\_/g;
     foreach my $key (keys %$self) {
 	my $keystr = $key; $keystr =~ tr/a-z/A-Z/;
-	$attrstr .= ' ' . $keystr . '="' 
-	         . HTML::Entities::encode_entities($self->{$key}) . '" '; 
+	$attrstr .= ' ' . $keystr . '="'
+	         . HTML::Entities::encode_entities($self->{$key}) . '" ';
     }
 
 
     $form->AddHTML('<tr><td>' . HTML::Entities::encode_entities($self->{'descr'})
 		   . '</td><td><input ' . $attrstr . '></td><td><a href="'
-		   . $hurl . '?module=' . URI::Escape::uri_escape($mod)
-		   . '#' . URI::Escape::uri_escape($item) . '">Help'
+		   . $hurl . '?module=' . CGI->escape($mod)
+		   . '#' . CGI->escape($item) . '">Help'
 		   . '</a></td></tr>');
 }
 

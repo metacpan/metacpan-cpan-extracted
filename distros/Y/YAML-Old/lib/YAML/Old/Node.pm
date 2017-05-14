@@ -67,8 +67,7 @@ sub keys {
 }
 
 #==============================================================================
-package
-yaml_scalar;
+package yaml_scalar;
 
 @yaml_scalar::ISA = qw(YAML::Old::Node);
 
@@ -94,8 +93,7 @@ sub STORE {
 }
 
 #==============================================================================
-package
-yaml_sequence;
+package yaml_sequence;
 
 @yaml_sequence::ISA = qw(YAML::Old::Node);
 
@@ -135,8 +133,7 @@ sub undone {
 *undone; # XXX Must implement before release
 
 #==============================================================================
-package
-yaml_mapping;
+package yaml_mapping;
 
 @yaml_mapping::ISA = qw(YAML::Old::Node);
 

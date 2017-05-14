@@ -1,0 +1,86 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Table Styles
+
+H2: The style Attribute
+
+The look of a table is controlled by the {{style}} attribute.
+For example:
+
+E:!block table; style="rows"
+E:Name   Phone
+E:Bill   123 4567
+E:Joe    789 1234
+E:Mary   584 3333
+E:!endblock
+
+The result is:
+
+!block table; style="rows"
+Name    Phone
+Bill    123 4567
+Joe     789 1234
+Mary    584 3333
+!endblock
+
+The other styles available are shown below.
+
+H2: columns
+
+!block table; style="columns"
+Name    Phone
+Bill    123 4567
+Joe     789 1234
+Mary    584 3333
+!endblock
+
+H2: plain
+
+!block table; style="plain"
+Name    Phone
+Bill    123 4567
+Joe     789 1234
+Mary    584 3333
+!endblock
+
+H2: grid
+
+!block table; style="grid"
+Name    Phone
+Bill    123 4567
+Joe     789 1234
+Mary    584 3333
+!endblock
+
+H2: shade
+
+!block table; style="shade"
+Name    Phone
+Bill    123 4567
+Joe     789 1234
+Mary    584 3333
+!endblock
+
+H2: Changing the Default Table Style
+
+The default style is {{columns}}. This can be changed via the
+{{VAR:DEFAULT_TABLE_STYLE}} variable. For example:
+
+E:  !define DEFAULT_TABLE_STYLE "grid"
+E:  # the default table style is now grid ...
+
+H2: Creating New Table Styles
+
+New table styles can be defined.
+See {{Extending SDF}} in the {{DOC:SDF Guru Guide}} for details.

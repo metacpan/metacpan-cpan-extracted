@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2015 Rocky Bernstein <rocky@cpan.org>
 use warnings; no warnings 'redefine';
 use rlib '../../../..';
 
@@ -45,7 +45,9 @@ Print value of expression I<Perl-expression> each time the program stops.
 If what you want to do is evaluate a Perl expression or statement once
 rather than every time the program stops, see C<eval>.
 
-See also C<undisplay>, C<enable>, C<disable>.
+See also L<C<undisplay>|<Devel::Trepan::CmdProcessor::Command::Undisplay>,
+L<C<enable>|<Devel::Trepan::CmdProcessor::Command::Enable>,  and
+L<C<disable>|<Devel::Trepan::CmdProcessor::Command::Disable>
 =cut
 HELP
 
@@ -72,8 +74,8 @@ sub run($$) {
 unless (caller) {
     require Devel::Trepan::CmdProcessor::Mock;
     my $proc = Devel::Trepan::CmdProcessor::Mock::setup();
-    # my $cmd = __PACKAGE__->new($proc);
-    # $cmd->run([$NAME]);
+    my $cmd = __PACKAGE__->new($proc);
+    $cmd->run([$NAME]);
 }
 
 1;

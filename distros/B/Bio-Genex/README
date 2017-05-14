@@ -1,0 +1,109 @@
+Bio::Genex -- Perl extension for querying a GeneX gene expression DB
+
+   $Id: README,v 1.4 2001/01/26 10:22:04 jes Exp $
+
+LEGAL HOOP JUMPING
+==================
+
+Copyright (c) 2000 National Center for Genome Resources. 
+All rights reserved.  
+
+This package is free software. It is distributed under the terms of
+the Lesser GNU Public License (see LICENSE for details).
+
+The authors of this software make no claims as to the performance or
+reliability of this product. Use it at your own risk. If you find it
+helpful, We're very happy for you, if not, don't hold us responsible.
+
+WHAT
+====
+This module provides a perl API to NCGR's GeneX gene expression DB. It
+provides a number of classes for manipulating expression data in a
+genex database, helper utilities, and example code. Please see the
+doc/ subdirectory for more information.
+
+PREREQUISITES
+=============
+This module requires the following other Perl modules not included
+with the statndard distribution:
+
+   CGI      - used by most cgi scripts
+   XML::DOM - used by the GeneXML utils
+   DBI      - used by everything (this *is* a gene expression DATABASE ;-) 
+   DBD::Pg  - for the default Postgres installation
+   GD       - (optional, currently only used by draw-map.pl)
+
+These modules must be installed *before* attempting to install
+Genex.pm. They can be installed individually, or by installing
+Bundle::Genex. 
+
+INSTALL
+=======
+
+Unpack the GeneX distribution tar file anywhere you choose, with a
+command such as the following:
+
+   $ tar zxvf Genex-X.Y.Z.tar.gz
+
+Configuring
+-----------
+For Genex.pm to be useful, you must have already installed a working
+GeneX server on your system. In order for Genex.pm to properly
+configure itself, it must find the Genex/Config.pm that was installed
+with the rest of the GeneX perl modules. Since the Genex/Config.pm was
+likely installed in the private Genex lib directory, you will need to
+be sure that it is in your Perl lib path. To ensure this, include the
+GeneX lib dir in your PERL5LIB:
+
+   $ export PERL5LIB=/var/lib/genex/perl5:$PERL5LIB
+
+Substitute in the proper directory for /var/lib/genex/perl5
+
+As with most perl modules the next step is:
+
+   $ perl Makefile.PL
+
+This will use the Genex/Config.pm to determing the installation
+information that is necessary for GeneX to run properly on your
+machine.
+
+After configuration, run the regression tests to see if things were
+configured properly
+
+   $ make test 
+
+Finally, if all looks good, install it.
+
+   $ make install
+
+RUNNING
+=======
+After installing the package, you should be able to investigate the DB
+with the following URL's (just substitute in the values that you
+supplied for CGIURL and WWWHOST for your installation).
+
+  http://$WWWHOST/$CGIURL/genex/samples/query-intro.pl
+
+AUTHOR INFO
+===========
+Jason E. Stewart (jes@ncgr.org || jason@openinformatics.com)
+Jiaye Zhou (jz@ncgr.org || zebra@inztro.com)
+
+SEE ALSO
+========
+For more general information about the GeneX system:
+
+http://genex.ncgr.org/         -- the NCGR GeneX home page
+
+http://genex.sourceforge.net/  -- the GeneX distribution home page
+
+BUG REPORTS
+===========
+Please send bug reports to genex@ncgr.org
+
+
+### *** emacs file mode definition ***
+### Local Variables: 
+### mode:text
+### mode:filladapt
+### End: 

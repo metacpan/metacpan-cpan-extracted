@@ -62,7 +62,7 @@ by special-casing C<get_session_data> and C<store_session_data> for that
 key format, in order to ease the implementation of
 C<delete_expired_sessions>.
 
-The only assurance stores are requred to make is that given
+The only assurance stores are required to make is that given
 
     $c->store_session_data( $x, $y );
 
@@ -102,7 +102,7 @@ are not checked, and are assumed to be OK. Missing values are not errors.
 =head2 Auto-Expiry on the Backend
 
 Storage plugins are encouraged to use C<< $c->session_expires >>, C<<
-$c->config->{session}{expires} >>, or the storage of the
+$c->config('Plugin::Session' => { expires => $val }) >>, or the storage of the
 C<expires:$sessionid> key to perform more efficient expiration, but only
 for the key prefixes C<session>, C<flash> and C<expires>.
 
@@ -114,6 +114,18 @@ Note that session store that use this approach may leak disk space,
 since nothing will actively delete an expired session. The
 C<delete_expired_sessions> method is there so that regularly scheduled
 maintenance scripts can give your backend the opportunity to clean up.
+
+=head2 Early Finalization
+
+By default the main session plugin will finalize during body finalization
+which ensures that all controller code related to the session has completed.
+However some storage plugins may wish to finalize earlier, during header
+finalization.  For example a storage that saved state in a client cookie
+would wish this.  If a storage plugin wants to finalize early it should set
+$c->_needs_early_session_finalization to true.  Please note that if you
+do this in a storage plugin, you should warn users not to attempt to change
+or add session keys if you use a streaming or socket interface such as
+$c->res->write, $c->res->write_fh or $c->req->io_fh.
 
 =cut
 

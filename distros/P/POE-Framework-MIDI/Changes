@@ -1,8 +1,34 @@
 Revision history for Perl extension POE::Framework::MIDI.
 
-0.01  Sat Jan 11 11:24:45 2003
-	- original version; created by ExtUtils::ModuleMaker 0.204
-	This is the first public release.
-	
-	
+0.1  - Original release to CPAN - pretty crufty.
+
+0.2  Sun May 25 2003
+    - Cleaned up POD.
+    - Restructured distribution files.
+    - Fixed rule code and eliminated assorted impediments.
+    - Built testing code.
+    - Moved Gene's Rule::Contour module into another distribution to contain
+      rules - it'll be called POE::Framework::MIDI::Rules  (using the P:F:M:Rule 
+      namespace).  This is a damn cool rule, but I decided it would keep things
+      simpler if only a few simple example rules were included.  
+      Same deal will go with transformations when they exist.
+      
+0.3  02 July 2004
+    - oops - forgot to make dist.  This should work better 
+
+0.4 12 July 2004 - typo correction
+
+0.5  26 July - added 'data' to Musician - internal musician data 'cookie'
+
+    
+0.6  27 July - fixed stupid makefile error re Class::MethodMaker
+
+0.7 05 Feb 2005 - added pod test
+
+0.8 05 Feb 2005 - a few bugs went up on 0.7 - oopsie.  
+
+0.9 19 March 2005 - removed calls to deprecated 'POE::Session->new' and replaced
+them with POE::Session->spawn
+
+ 
 

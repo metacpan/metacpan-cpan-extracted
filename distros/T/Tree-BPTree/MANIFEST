@@ -1,11 +1,19 @@
-Build.PL			The Module::Build script
+benchmark.pl			Some simple benchmark tests.
 Changes				The change log
-lib/Tree/BPTree.pm	The B+ tree implementation module
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Tree/BPTree.pm		The B+ tree implementation module
+Makefile.PL
 MANIFEST			This file
 META.yml			The module metadata
-README				Read this first!
-benchmark.pl			Some simple benchmark tests.
 prof.pl				Script used for generating profiler information.
+README				Read this first!
 t/cursor_delete.t		Test of the cursor delete() method
 t/cursors.t			Test of the new_cursor and each($cursor) methods
 t/delete.t			Test of the delete method

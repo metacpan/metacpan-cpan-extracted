@@ -1,0 +1,109 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Attributes</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovflt.html">Previous Topic</A> | <A HREF="in_ovexp.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>2.7. Attributes</H1>
+<HR>
+<H2><A NAME="Introduction">2.7.1. Introduction</A></H2>
+<P>Attributes can be used to specify custom formatting, hypertext targets and jumps, indexing information, etc. For example:</P>
+<PRE>
+  Note[label='Important: ';size=&quot;16pt&quot;]
+  Life is too short to drink bad wine.
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Important: </STRONG>Life is too short to drink bad wine.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Syntax">2.7.2. Syntax</A></H2>
+<P>Paragraphs and phrases can be given attributes via the syntax below:</P>
+<PRE>
+  style&quot;[&quot;attributes&quot;]&quot; text
+</PRE>
+<P>where the syntax of <EM>attributes</EM> is:</P>
+<PRE>
+  name1[&quot;=&quot;expression1]&quot;;&quot; name2[&quot;=&quot;expression2] ...
+</PRE>
+<P>If an attribute name is given without a value, the default value is 1. Like style names, attribute names are:</P>
+<UL>
+<LI>sequences of letters, digits and &quot;_&quot;
+<LI>case-sensitive.</UL>
+<HR>
+<H2><A NAME="Commonly used attributes">2.7.3. Commonly used attributes</A></H2>
+<P>Some commonly used attributes are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Paragraphs:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+label
+</TD>
+<TD>
+prefix label (e.g. Note:)
+</TD>
+</TR>
+<TR>
+<TD>
+notoc
+</TD>
+<TD>
+take this heading out of the table of contents
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Phrases:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+id
+</TD>
+<TD>
+hypertext target tag
+</TD>
+</TR>
+<TR>
+<TD>
+jump
+</TD>
+<TD>
+URL (Uniform Resource Locator) to jump to
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovflt.html">Previous Topic</A> | <A HREF="in_ovexp.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,96 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Headings
+
+H2: Chapter Headings
+
+Headings are specified using the tags H1 .. H6:
+
+* H1 is a chapter heading
+* H2 .. H6 are sub headings
+
+The actual presentation of H-style headings (e.g. numbered or unnumbered)
+is decided by the target format and document style.
+
+H2: Other Headings
+
+The following heading tags are also supported:
+
+* A1 .. A6 - headings in {{Appendices}}
+* P1 .. P6 - headings in {{plain}} sections (e.g. Glossary)
+
+P-style headings are always unnumbered so are commonly used in memos.
+
+In normal documents, it is often unnecessary to use A-style or
+P-style tags. The preferred approach is to:
+
+* store each section in a file using H-style headings
+* convert the heading style using the {{FILT:appendix}} or {{FILT:plain}}
+  filter as the file is being imported.
+
+For example:
+
+E:  !include "budget.sdf"; appendix
+
+Using this approach, sections can easily be reused in different ways
+in different documents.
+
+H2: Generating a Table of Contents
+
+A table of contents can be generated from the heading paragraphs.
+All types of heading tags (i.e. H, A and P) are included.
+The depth of the table of contents is specified by the {{VAR:DOC_TOC}} variable.
+For example, to generate a table of contents including headings
+up to and including level 4:
+
+E:   doccvt -o -DDOC_TOC=4 mydoc.sdf
+
+Note: For normal documents, the {{MAC:build_title}}
+macro defaults this variable to 3.
+
+Individual headings can be excluded from the table of contents
+by specifying the {{PATTR:notoc}} attribute. For example:
+
+E:   H3[notoc] Yet Another Heading
+
+See {{SECT:Attributes}} for further details on attribute syntax.
+
+H2: Controlling Page Breaks
+
+Generally speaking, page breaks are controlled by rules associated
+with heading tags. For example:
+
+* for documents, memos and faxes, each level 1 heading starts a new page
+* for manuals, each level 1 heading starts a new chapter and
+  each level 2 heading typically starts a new page.
+
+The {{PATTR:top}} paragraph attribute can be used to position
+a paragraph at the top of the next page. For example:
+
+E:  H3[top] Abc Module
+
+Page breaks can also be explicitly specified using the PB tag.
+For example:
+
+E:  text on one page.
+E:  PB:
+E:  H3: Another Section
+
+Note:
+[[SDF]] is designed to be a {{logical markup language}}.
+While it is sometimes necessary to explicitly specify page breaks
+in order to get the layout you want, doing so can reduce the portability
+of your document to different styles, page sizes and target formats.
+
+!end_topic

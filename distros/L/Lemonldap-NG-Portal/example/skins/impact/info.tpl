@@ -13,6 +13,7 @@
       <TMPL_IF NAME="CHOICE_VALUE">
       <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
       </TMPL_IF>
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
       <div id="content-all-info">
         <TMPL_VAR NAME="MSG">
       </div>
@@ -28,7 +29,11 @@
     </div>
   </div>
  
-  <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+  <!-- //if:jsminified
+    <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.min.js"></script>
+  //else -->
+    <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+  <!-- //endif -->
 
 <TMPL_INCLUDE NAME="footer.tpl">
 

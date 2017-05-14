@@ -1,0 +1,4 @@
+name = Authn SSO
+description =  Drupal module to match Apache mod_auth_saml (see zxid.org). This module will also work with HTTP Basic Auth (or anything that sets REMOTE_USER) configured at Apache httpd.conf level.
+core = 7.x
+package = zzz

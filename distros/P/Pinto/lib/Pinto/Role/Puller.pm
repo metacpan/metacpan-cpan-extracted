@@ -3,16 +3,14 @@
 package Pinto::Role::Puller;
 
 use Moose::Role;
-use MooseX::Types::Moose qw(ArrayRef Bool Str);
+use MooseX::Types::Moose qw(Bool);
 use MooseX::MarkAsMethods ( autoclean => 1 );
 
-use List::MoreUtils qw(any);
-
-use Pinto::Util qw(throw whine);
+use Pinto::Util qw(throw);
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -39,24 +37,6 @@ has pin => (
     default => 0,
 );
 
-has force => (
-    is      => 'ro',
-    isa     => Bool,
-    default => 0,
-);
-
-has skip_missing_prerequisite => (
-    is        => 'ro',
-    isa       => ArrayRef[Str],
-    default   => sub { [] },
-);
-
-has skip_all_missing_prerequisites => (
-    is        => 'ro',
-    isa       => Bool,
-    default   => 0,
-);
-
 has with_development_prerequisites => (
     is      => 'ro',
     isa     => Bool,
@@ -78,23 +58,20 @@ sub pull {
 
     my $target = $args{target};
     my $stack  = $self->stack;
-
-    my $did_register         = 0;
-    my $did_register_prereqs = 0;
     my $dist;
 
     if ( $target->isa('Pinto::Schema::Result::Distribution') ) {
         $dist = $target;
     }
-    elsif ( $target->isa('Pinto::Target::Distribution') ) {
+    elsif ( $target->isa('Pinto::DistributionSpec') ) {
         $dist = $self->find( target => $target );
     }
-    elsif ( $target->isa('Pinto::Target::Package') ) {
+    elsif ( $target->isa('Pinto::PackageSpec') ) {
 
         my $tpv = $stack->target_perl_version;
         if ( $target->is_core( in => $tpv ) ) {
             $self->warning("Skipping $target: included in perl $tpv core");
-            return (undef, 0, 0); # Nothing was pulled
+            return;
         }
 
         $dist = $self->find( target => $target );
@@ -103,10 +80,10 @@ sub pull {
         throw "Illeagal arguments";
     }
 
-    $did_register = $dist->register( stack => $stack, pin => $self->pin, force => $self->force );
-    $did_register_prereqs = $self->do_recursion( start => $dist ) if $self->recurse;
+    $dist->register( stack => $stack, pin => $self->pin );
+    $self->do_recursion( start => $dist ) if $self->recurse;
 
-    return ($dist, $did_register, $did_register_prereqs);
+    return $dist;
 }
 
 #-----------------------------------------------------------------------------
@@ -120,21 +97,14 @@ sub find {
     my $dist;
     my $msg;
 
-    if ( $dist = $stack->get_distribution( target => $target ) ) {
+    if ( $dist = $stack->get_distribution( spec => $target ) ) {
         $msg = "Found $target on stack $stack in $dist";
     }
-    elsif ( $dist = $stack->repo->get_distribution( target => $target ) ) {
+    elsif ( $dist = $stack->repo->get_distribution( spec => $target ) ) {
         $msg = "Found $target in $dist";
     }
-    elsif ( $dist = $stack->repo->ups_distribution( target => $target, cascade => $self->cascade ) ) {
+    elsif ( $dist = $stack->repo->ups_distribution( spec => $target, cascade => $self->cascade ) ) {
         $msg = "Found $target in " . $dist->source;
-    }
-    elsif ( $self->should_skip_missing_prerequisite($target) ) {
-        whine "Cannot find $target anywhere.  Skipping it";
-        return;
-    }
-    else {
-        throw "Cannot find $target anywhere";
     }
 
     $self->chrome->show_progress;
@@ -151,27 +121,23 @@ sub do_recursion {
     my $dist  = $args{start};
     my $stack = $self->stack;
 
-    my %last_seen;
-    my $did_register = 0;
-
+    my %latest;
     my $cb = sub {
         my ($prereq) = @_;
 
-        my $target   = $prereq->as_target;
-        my $pkg_name = $target->name;
-        my $pkg_vers = $target->version;
+        my $pkg_name = $prereq->package_name;
+        my $pkg_vers = $prereq->package_version;
 
         # version sees undef and 0 as equal, so must also check definedness
         # when deciding if we've seen this version (or newer) of the package
-        return if defined( $last_seen{$pkg_name} ) && $target->is_satisfied_by( $last_seen{$pkg_name} );
+        return if defined( $latest{$pkg_name} ) && $pkg_vers <= $latest{$pkg_name};
 
-        return if not my $dist = $self->find( target => $target );
+        # I think the only time that we won't see a $dist here is when
+        # the prereq resolves to a perl (i.e. its a core-only module).
+        return if not my $dist = $self->find( target => $prereq->as_spec );
 
-        $did_register += $dist->register( stack => $stack, force => $self->force);
-
-        # Record the most recent version of the packages that has
-        # been registered, so we don't need to find it again.
-        $last_seen{$_->name} = $_->version for $dist->packages;
+        $dist->register( stack => $stack );
+        $latest{$pkg_name} = $pkg_vers;
 
         return $dist;
     };
@@ -190,18 +156,7 @@ sub do_recursion {
 
     while ( $walker->next ) { };    # Just want the callback side effects
 
-    return $did_register;
-}
-
-#-----------------------------------------------------------------------------
-
-sub should_skip_missing_prerequisite {
-    my ($self, $target) = @_;
-
-    return 1 if $self->skip_all_missing_prerequisites;
-    return 0 unless my @skips = @{ $self->skip_missing_prerequisite };
-    return 1 if any { $target->name eq $_ } @skips;
-    return 0;
+    return $self;
 }
 
 #-----------------------------------------------------------------------------
@@ -221,7 +176,7 @@ Pinto::Role::Puller - Something pulls packages to a stack
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -229,7 +184,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

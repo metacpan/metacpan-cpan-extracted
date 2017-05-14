@@ -1,0 +1,314 @@
+# $Id$
+#
+# >>Title::	Covers Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 07-Jan-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{covers}} contains the definitions of SDF's pre-defined cover pages.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# This is needed for the hyphenation macros
+# (which should probably be predefined via stdlib.sdm)
+!use "misc"
+
+# Define the "original" cover page
+!macro build_original_cover
+
+    # Request a table of contents
+    !default DOC_TOC 3
+
+    # Build the cover contents
+    !build_original_cover_top
+    !build_original_cover_approval
+    #PB:
+    !if $macro{'DOC_RECIPIENTS'}
+    !build_original_cover_inside
+    !endif
+!endmacro
+
+!macro build_original_cover_top
+    !default DOC_TITLE_LOGO $var{'DOC_LOGO'}
+    !if DOC_TITLE_LOGO
+        DDist: {{IMPORT[align=Left;wrap_text][[DOC_TITLE_LOGO]]}}[[DOC_DISTRIBUTION]]
+    !else
+        DDist: [[DOC_DISTRIBUTION]]
+    !endif
+    DProj: [[DOC_PROJECT]]
+    DName: [[DOC_NAME]]
+    DType: [[DOC_TYPE]]
+    !if DOC_STATUS
+        DStat: ([[DOC_STATUS]])
+    !endif
+    !if DOC_ID
+        DCode: [[DOC_ID]]
+    !else
+        DSkip: 
+    !endif
+    !if $macro{'DOC_RECIPIENTS'}
+        DCopy: _____
+    !else
+        DSkip: 
+    !endif
+    DSkip: 
+    DSkip: 
+    !if DOC_AUTHOR
+        #dActn: PREPARED BY:
+        DAuth: [[DOC_AUTHOR]]
+    !endif
+    !if DOC_AUTHOR2
+        DAuth: [[DOC_AUTHOR2]]
+    !endif
+    !if DOC_AUTHOR3
+        DAuth: [[DOC_AUTHOR3]]
+    !endif
+!endmacro
+
+!macro build_original_cover_approval
+    !if DOC_APPROVE
+        DActn: APPROVED BY:
+        DAppr: [[DOC_APPROVE]]
+    !endif
+    !if DOC_APPROVE2
+        DAppr: [[DOC_APPROVE2]]
+    !endif
+    !if DOC_APPROVE3
+        DAppr: [[DOC_APPROVE3]]
+    !endif
+!endmacro
+
+!macro build_original_cover_inside
+    P2[top;notoc]Copyright
+
+    Copyright [[c]] [[_DOC_YEAR]], [[DOC_OWNER]]
+
+    All rights reserved.
+
+    No part of this document may be reproduced, transferred, sold, or 
+    otherwise disposed of, without the written permission
+    of [[DOC_OWNER]].
+
+    This document was generated using [[SDF]] [[SDF_VERSION]].
+
+    P2[notoc]Document control
+
+    This document is deemed to be controlled only as long as
+    the project to which it relates is active. Controlled printed
+    copies have a {{2:red}} {{Copy number}} on the front cover and
+    will be distributed to each of the people (numbered) below.
+    A copy number of "*" indicates that the person will only be
+    notified by email of updates to the document.
+
+    !DOC_RECIPIENTS
+
+    Once the project is completed or terminated, this document will revert
+    to an uncontrolled document status. No further advice will be
+    provided, and each recipient may either destroy the document or mark
+    it as obsolete and retain it for future personal reference.
+!endmacro
+
+
+# Define the "project" cover page
+!macro build_project_cover
+
+    # Request a table of contents
+    !default DOC_TOC 3
+
+    # Remove the front footer
+    !define PAGE_FIRST_FOOTER_CENTER1 ''
+
+    # Build the cover contents
+    !hyphen off
+    !build_project_cover_top
+    !build_project_cover_approval
+    !build_project_cover_copyright
+    !hyphen on
+    #PB:
+    !if $macro{'DOC_RECIPIENTS'}
+    !build_project_cover_inside
+    !endif
+!endmacro
+
+!macro build_project_cover_top
+!default DOC_TITLE_LOGO $var{'DOC_LOGO'}
+!if DOC_TITLE_LOGO
+N[sp_after="50pt"]{{IMPORT[align=Right;wrap_text][[DOC_TITLE_LOGO]]}}
+!else
+N[sp_after="50pt"]
+!endif
+!block sdf; align='Center'; size="18pt"; bold; wide
+N: [[DOC_PROJECT]]
+E:
+N: [[DOC_NAME]]
+N: [[DOC_TYPE]]
+E:
+N: [[UPPER:DOC_STATUS]]
+!endblock
+
+# Document attributes
+!define _format $var{'DOC_PAGE_WIDTH'} < 576 ? '40,60' : '25,75'
+N[sp_before="20pt"]
+!block table; noheadings; tags="B"; style="box"; format=_format; wide
+Name            Value
+Document Id:    [[DOC_ID]]
+URL:            [[DOC_URL]]
+Author:         [[DOC_AUTHOR]]
+Effective Date: [[DATE:DOC_MODIFIED]]
+!if $macro{'DOC_RECIPIENTS'}
+Copy Number:    ____
+!else
+                {{EX: }}
+!endif
+!endblock
+!endmacro
+
+!macro build_project_cover_approval
+!if DOC_APPROVE2
+N[sp_before="10pt"]
+!block table; noheadings; tags="B,N,B"; style="plain"; format='25,45,10,20'; wide
+Name            Value                               Name2       Value2
+Authorised:     ___________________________         Date:       __________
+                {{N[size='8pt'][[DOC_APPROVE]]}}
+{{EX: }}
+Authorised:     ___________________________         Date:       __________
+                {{N[size='8pt'][[DOC_APPROVE2]]}}
+!endblock
+!elsif DOC_APPROVE
+N[sp_before="10pt"]
+!block table; noheadings; tags="B,N,B"; style="plain"; format='25,45,10,20'; wide
+Name            Value                               Name2       Value2
+Authorised:     ___________________________         Date:       __________
+                {{N[size='8pt'][[DOC_APPROVE]]}}
+!endblock
+N[sp_before="10pt"]
+!else
+N[sp_before="50pt"]
+!endif
+!endmacro
+
+!macro build_project_cover_copyright
+N[sp_before="10pt"]
+!if $macro{'DOC_COPYRIGHT'}
+!block sdf; align='Center'; wide
+!DOC_COPYRIGHT
+!endblock
+!else
+!block sdf; align='Center'; wide; bold; sp_before=0; sp_after=0; size='10pt'
+N: COPYRIGHT
+N: Copyright [[c]] [[_DOC_YEAR]], [[DOC_OWNER]]
+N: All rights reserved.
+E:
+N: This document and all related documentation is the property of
+[[DOC_OWNER]] and may not be sold, transferred or otherwise
+disposed of without the written permission of the owners.
+E:
+N: COMMERCIAL IN CONFIDENCE
+!endblock
+!endif
+!endmacro
+
+!macro build_project_cover_inside
+
+    P2[top;notoc]Document control
+
+    P3[notoc] Copy numbers
+
+    This document is deemed to be controlled only as long as
+    the project to which it relates is active. Controlled printed
+    copies have a {{red}} copy number on the front cover and
+    will be distributed to each of the people below.
+    A copy number of "*" indicates that the person will only be
+    notified by E-mail of updates to the document.
+
+    P3[notoc] Recipients
+
+    !DOC_RECIPIENTS
+
+    P3[notoc] At completion of project
+
+    Once the project is completed or terminated, this document will revert
+    to an uncontrolled document status. No futher advice will be
+    provided, and each recipient can either destroy the document or mark
+    it as obsolete and retain it for future personal reference.
+
+    P3[notoc] Tools
+
+    This document was generated using [[SDF]] [[SDF_VERSION]].
+!endmacro
+
+
+# Define the "manual" cover page
+!macro build_manual_cover
+
+    # Request a table of contents
+    !default DOC_TOC 3
+
+    # Build the cover contents
+    !build_manual_cover_top
+    !build_manual_cover_inside
+!endmacro
+
+!macro build_manual_cover_top
+    [align=Right;family=Helvetica;size="33pt"] [[DOC_TITLE]]
+    !default DOC_MANUAL_LOGO $var{'DOC_LOGO'}
+    !if DOC_MANUAL_LOGO
+        {{IMPORT[align=Right;position=Bottom][[DOC_MANUAL_LOGO]]}}
+    !endif
+
+    # Put the project name in the footer
+    !define PAGE_FIRST_FOOTER_INNER0  '[[DOC_PROJECT]]'
+!endmacro
+
+!macro build_manual_cover_inside
+    P3[top;notoc]Copyright
+
+    !if $macro{'DOC_COPYRIGHT'}
+    !DOC_COPYRIGHT
+    !else
+    Copyright [[c]] [[_DOC_YEAR]], [[DOC_OWNER]]
+
+    All rights reserved.
+
+    No part of this document may be reproduced, transferred, sold, or 
+    otherwise disposed of, without the written permission
+    of the owner.
+    !endif
+
+    P3[notoc]Trademarks
+
+    !if $macro{'DOC_TRADEMARKS'}
+    !DOC_TRADEMARKS
+    !else
+    All the trademarks mentioned in this document are the property of
+    their respective owners.
+    !endif
+
+    P3[notoc]Tools
+
+    !if $macro{'DOC_TOOLS'}
+    !DOC_TOOLS
+    !else
+    This document was generated using [[SDF]] [[SDF_VERSION]].
+    !endif
+
+!endmacro
+
+# Define the "paper" cover page
+!macro build_paper_cover
+!define DOC_TOC 0
+P1[align='Center'] [[DOC_TITLE]]
+N[align='Center']   {{[[DOC_AUTHOR]]}}
+E:
+!endmacro

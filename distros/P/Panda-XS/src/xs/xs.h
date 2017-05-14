@@ -12,10 +12,11 @@ extern "C" {
 #include "ppport.h"
 
 #include <algorithm_perlsafe> // safe c++11 compilation
+#include <exception>
 #include <panda/cast.h>
 #include <panda/refcnt.h>
-
-#include <pthread.h>
+#include <panda/string.h>
+#include <panda/string_view.h>
 
 typedef SV OSV;
 typedef HV OHV;
@@ -32,6 +33,15 @@ typedef IO OIO;
 #  define hv_deletehek(hv, hek, flags) \
     hv_common((hv), NULL, HEK_KEY(hek), HEK_LEN(hek), HEK_UTF8(hek), (flags)|HV_DELETE, NULL, HEK_HASH(hek))
 #endif
+
+#define PXS_TRY(code) {                                                                       \
+    try { code; }                                                                             \
+    catch (const std::exception& err) { croak_sv(xs::error_sv(err)); }                        \
+    catch (const char* err)           { croak_sv(newSVpv(err, 0)); }                          \
+    catch (const std::string& err)    { croak_sv(newSVpvn(err.data(), err.length())); }       \
+    catch (const panda::string& err)  { croak_sv(newSVpvn(err.data(), err.length())); }       \
+    catch (...)                       { croak_sv(newSVpvs("unknown c++ exception thrown")); } \
+}
 
 #define XS_HV_ITER(hv,code) {                                                       \
     STRLEN hvmax = HvMAX(hv);                                                       \
@@ -210,6 +220,7 @@ inline AV* call_method_av (pTHX_ SV* obj, const char* name, STRLEN len, SV** arg
 
 bool register_package (pTHX_ const char* module, const char* source_module);
 void inherit_package  (pTHX_ const char* module, const char* parent);
+SV*  error_sv         (const std::exception& err);
 
 class XSBackref : public virtual panda::RefCounted {
     public:
@@ -236,6 +247,18 @@ class XSBackref : public virtual panda::RefCounted {
 inline int32_t refcnt_get (const panda::RefCounted* var) { return var->refcnt(); }
 inline void    refcnt_inc (const panda::RefCounted* var) { var->retain(); }
 inline void    refcnt_dec (const panda::RefCounted* var) { var->release(); }
+
+inline panda::string sv2string (pTHX_ SV* svstr) {
+    STRLEN len;
+    char* ptr = SvPV(svstr, len);
+    return panda::string(ptr, len);
+}
+
+inline std::string_view sv2string_view (pTHX_ SV* svstr) {
+    STRLEN len;
+    char* ptr = SvPV(svstr, len);
+    return std::string_view(ptr, len);
+}
 
 }
 

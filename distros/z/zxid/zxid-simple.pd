@@ -1,0 +1,1152 @@
+<<if: ZXIDBOOK>>
+<<else: >>ZXID Simple API
+###############
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-simple.pd,v 1.12 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-SIMP 01>>
+<<define: ZXDOC=ZXID Simple API>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks and aims at implementing all popular
+federation and ID Web Services protocols. Other more general
+documents are available, here we document the "simple" API
+which is good for most Single Sign-On use cases. Other APIs
+described elsewhere may be more appropriate for other use cases.
+The ZXID Simple API is the most stable API available for the SSO
+functionality.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+The ZXID library provides two main APIs: the Simple and the Raw. The
+ZXID Simple API is meant to get you going with minimal understanding about
+SAML or SSO. It tries to encapsulate as much of the control flow as
+possible. You only need to learn this API, not the underlying protocol.
+
+If you do not want to program or learn any API at all, you should look
+at the Apache module <<link:../mod_auth_saml/mod_auth_saml.html: mod_auth_saml>>
+which will, in 80% of the cases, give all the benefits with the minimal
+effort of just configuring your web server.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+<<htmlpreamble: <title>ZXID Simple API</title><link type="text/css" rel=stylesheet href="zx.css"><body><h1>ZXID Simple API</h1> >>
+
+2 ZXID Simple API Tutorial
+==========================
+
+<<fi: >>
+
+2.1 Hello World SSO
+-------------------
+
+Consider the following "Hello World" SSO CGI example in C<<footnote: zxidhlo.c
+in the source distribution is an actually usable example program. You should
+also look at its cousins zxidhlo.php and zxidhlo.pl>>
+(the zxid_simple() API is available in all language bindings):
+
+  01 #include <zx/zxid.h>
+  02 #define CONF "PATH=/var/zxid/&URL=https://sp1.zxidsp.org:8443/zxid"
+  03 void main() {
+  04   char* res = zxid_simple(CONF, 0, 255);
+  05   switch (res[0]) {
+  06   case 'd': /* Logged in case */
+  07     my_parse_ldif(res);
+  08     my_render_content();
+  09     exit(0);
+  10   default:
+  11     ERR("Unknown zxid_simple() response(%s)", res);
+  12   }
+  13 }
+
+What happens here:
+
+1. The CGI script calls zxid_simple() to handle SAML protocol
+   according to the configuration
+
+2. The last argument with value 255 tells zxid_simple()
+   to automatically handle redirections, login screen and
+   any other protocol interaction needed to make SSO happen.
+
+3. If zxid_simple() returns, we have either succeeded in SSO
+   or we have failed (all other cases are handled internally
+   by zxid_simple() which calls exit(2) so it never returns).
+
+4. In the success case, zxid_simple() returns an LDIF
+   entry (as a nul terminated C string) describing the SSO and
+   the attributes received. For example
+
+     dn: idpnid=Pa45XAs2332SDS2asFs,affid=https://idp.demo.com/idp.xml
+     objectclass: zxidsession
+     affid: https://idp.demo.com/idp.xml
+     idpnid: Pa45XAs2332SDS2asFs
+     authnctxlevel: password
+     sesid: S12aF3Xi4A
+     cn: Joe Doe
+
+2.1.1 Attributes Returned in the SSO
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the returned LDIF entry some attributes, such as ~cn~, are as they
+came from the IdP (you need to consult your IdP configuration and
+documentation to alter them). Other attributes are always created by
+zxid_simple(), albeit sometimes based on values received from the
+IdP. They have the following meaning:
+
+dn:: LDAP distinguished name (part of LDIF format). Always first.
+
+objectclass:: Part of LDIF format.
+
+eid:: The Entity ID of the SP
+
+issuer:: The Entity ID of the authority that issued SSO assertion.
+
+affid:: Specifies which IdP was used for SSO. More accurately, this describes the
+    affiliation namespace in which the ~idpnid~ and ~tgtnid~ attributes are meaningful.
+
+idpinfo:: Human readable description of which IdP was used.
+
+idpnid:: The federated ID, or pseudonym (IdP assigned NameID) of the user performing action
+
+nidfmt:: The format (category) of value returned in idpnid. P=persistent
+
+localpath:: Path to acting user's local account directory. The application can create its own
+    user specific files here. Please note that the directory may not be automatically
+    created.
+
+ssoa7npath:: Path to the raw data of the Single Sign-On assertion in the local audit trail
+
+tgtnid:: The federated ID, or pseudonym (IdP assigned NameID) of the
+    user targeted by the action. This indicates the resource owner.
+
+tgtfmt:: The format (category) of value returned in tgtnid. P=persistent
+
+tgta7npath:: Path to the raw data of the target identity assertion in the local audit trail
+
+tgtpath:: Path to targetted user's local account directory. The application can create its own
+    user specific files here. Please note that the directory may not be automatically
+    created.
+
+authnctxlevel:: Rough indication of how IdP authenticated user
+
+sesid:: Session ID, as may be stored in cookie or used for
+    file name in the session cache (/var/zxid/ses)
+
+sespath:: Directory corresponding to local ZXID session. This may
+    allow your application to access the raw data behind the ZXID session,
+    or it could allow you to add new data to the session. However, beware
+    that just altering the files in this directory may not be enough
+    to update values cached in memory. If session backend is not filesystem,
+    the contents of this attribute may be URI appropriate for accessing
+    the session, or this attribute may not be populated at all.
+
+sigres:: Signature validation error code, if any. 0=OK. For other
+    codes see ZXSIG_* definitions in the source.
+
+ssores:: Error code for most recent operation. 0=OK
+
+setcookie:: If this field is not empty and not equal to '-' (single dash),
+    then the controlling application should take the necessary actions
+    to set the cookie as specified. Namely, the controlling application
+    should create 'Set-Cookie' HTTP response header whose value is the value
+    of the +setcookie+ field. How this is done is environment dependent.
+
+cookie:: The ZXIDSES (or other, as configured) cookie value. For reference.
+
+tgt_*:: Any attribute starting by "tgt_" refers to the target identity
+    and was retrieved from local attribute authority (typically a user
+    specific directory inside /var/zxid/user, see ~tgtpath~).
+    They are prefixed so that their provenance is clear. SP administrator
+    can add these attributes by editing tgtpath/.bs/.at file, which is in LDIF format.
+
+    It is also possible to define SP site global attributes in /var/zxid/user/.all/.bs/.at
+    file, in LDIF format. Since these are common to all users of SP, there is
+    no prefix.
+
+local_*:: Any attribute starting by "local_" refers to the acting user's identity
+    and was retrieved from local attribute authority (typically a user
+    specific directory inside /var/zxid/user, see ~localpath~).
+    They are prefixed so that their provenance is clear. SP administrator
+    can add these attributes by editing localpath/.bs/.at file, which is in LDIF format.
+
+cn:: Common Name. This attribute just exemplifies how any
+    additional attributes the IdP may have set will appear.
+    Typically the LDAP attribute names are used.
+
+fedusername:: pseudonym@idpdomain, for example: FXyysxhM4F6d3DIwrtoiFdi0i@zxidp.org
+
+    The ~fedusername~ attribute is a helper for the SP web sites that
+    are fixated on the notion of needing a username and/or requiring
+    the username to look like an email. By packaging the psedonym this
+    way it is easy to get them to work with minimal modification.
+
+    N.B. Although it looks like an email address, it is not. Do not try
+    sending mail to it (unless you hack your mailserver to understand it).
+
+urn:oid:1.3.6.1.4.1.5923.1.1.1.6:: pseudonym@idpdomain (aka ~eduPersonPrincipalName~)
+
+    This is essentially the same as ~fedusername~, but it seems in some
+    shibboleth federations this is the right attribute name. At least
+    protectnetwork.org works this way.
+
+<<ignore:
+http://www.protectnetwork.org/support/policies/attribute-release-policy
+>>
+
+The ~dn~ line will always be the first. All other lines may appear
+in any order. String representation of LDIF was chosen
+as it is easy to parse in most programming languages.
+
+<<ignore: Some people have advocated JSON representation and it indeed seems
+reasonable. But there is no compelling argument why it would be better
+than LDIF. It clearly is better for JavaScript programs, but it is
+more complicated for most other scripting languages. Keep the feedback coming.>>
+
+2.1.2 Configuration Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** This section also appears in zxid-conf.pd)
+
+The zxid_simple() can be configured in the following ways (later
+ways can override earlier ones).
+
+1. Built in default configuration
+2. Configuration file, usually /var/zxid/zxid.conf, if any
+3. Configuration string passed as first argument.
+   While configuration string can override all
+   other options (i.e. it is processed last), the
+   PATH specification is parsed before the configuration
+   file is looked up.
+
+Turns out that often the default configuration modified
+by the configurations string is all you need - you do not
+need to prepare configuration file.
+
+See section "Configuring and Running" for complete list of
+configuration options, but generally it is
+sufficient to specify only a handful:
+
+PATH:: Where files are kept and configuration file is found.
+URL:: The URL of the SP
+CDC_URL:: The Common Domain URL (optional, if omitted
+    the Common Domain Cookie processing is disabled)
+
+2.1.3 AUTO options (auto flags)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** This section also appears in zxid-conf.pd)
+
+The ~auto_flags~ argument allows you to control which
+operations should be performed automatically and
+which should be passed to the calling application,
+see "Gaining More Control" section, below, for
+full description of this case.
+
+> N.B. ~auto_flags~ are specified in code rather than in configuration
+> file (/var/zxid/zxid.conf) because their correct values are highly
+> dependent on the surrounding program that calls zxid_simple(), i.e.
+> changing them wihtou changing the surroundiing program does not make
+> sense. Their correct seetting is a programmer decision, not a sysadmin
+> decision.
+
+The auto options can be added together.
+
+<<table: zxid_simple() AUTO options
+Dec   Hex    Symbol              Description
+===== ====== =================== ===========================================
+    1   0x01 ZXID_AUTO_EXIT      Call exit(), 0=return "n", even if auto CGI
+    2   0x02 ZXID_AUTO_REDIR     Automatic. handle redirects, assume CGI (calls exit(2))
+    4   0x04 ZXID_AUTO_SOAPC     SOAP response handling, content gen
+    8   0x08 ZXID_AUTO_SOAPH     SOAP response handling, header gen
+   16   0x10 ZXID_AUTO_METAC     Metadata response handling, content gen
+   32   0x20 ZXID_AUTO_METAH     Metadata response handling, header gen
+   64   0x40 ZXID_AUTO_LOGINC    IdP select / Login page handling, content gen
+  128   0x80 ZXID_AUTO_LOGINH    IdP select / Login page handling, header gen
+  256  0x100 ZXID_AUTO_MGMTC     Management page handling, content gen
+  512  0x200 ZXID_AUTO_MGMTH     Management page handling, header gen
+ 1024  0x400 ZXID_AUTO_FORMF     In idp list and mgmt screen, generate form fields
+ 2048  0x800 ZXID_AUTO_FORMT     In idp list & mgmt screen, wrap in <form> tag.
+ 4095  0xfff ZXID_AUTO_ALL       Enable all automatic CGI behaviour.
+ 4096 0x1000 ZXID_AUTO_DEBUG     Enable debugging output to stderr.
+ 8192 0x2000 ZXID_AUTO_OFMTQ     Output Format Query String
+16384 0x4000 ZXID_AUTO_OFMTJ     Output Format JSON
+>>
+
+If the AUTO_REDIR flag is true, the LOCATION header is sent to stdout
+and exit(0) may be called, depending on the AUTO_NOEXIT flag.
+
+The SOAP, META, LOGIN, and MGMT flags follow convention:
+
+  HC
+  00  No automation. Only action letter is returned ("e"=login, "b"=meta, etc.)
+  01  Content, not wrapped in headers, is returned as a string
+  10  Headers and content is returned as a string
+  11  Headers and content are sent to stdout, CGI style and
+      exit(0) may be called, depending on AUTO_EXIT. Otherwise "n" is returned.
+
+Whether exit(0) is called in 11 case depends on ZXID_AUTO_NOEXIT flag.
+
+How much HTML is generated for Login page and Mgmt page in 01 (content only)
+mode depends on AUTO_PAGE and AUTO_FORM flags
+
+  TF
+  00  reserved / nothing is generated
+  01  Only form fields (but not form tag itself) are generated.
+  10  Complete form is generated
+  11  Whole page is generated (best support)
+
+The output format in the successful SSO case depends on Output
+Format (OFMT) bits as follows
+
+  JQ
+  00  LDIF (default)
+  01  Query String
+  10  JSON
+  11  No output (usually used if attributes are picked from session)
+
+2.1.4 Configuration options for customizing HTML
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** This section also appears in zxid-conf.pd)
+
+When whole page is generated, some templating information is taken
+from the configuration.
+
+IDP_SEL_TEMPL_FILE:: Path for Template for IdP Selecton Page. Default "idpsel.html".
+    This file, which you can edit for customization, is used as template to
+    render the IdP selection page on the SP side. If the file does not exist,
+    the value of IDP_SEL_TEMPL configuration option is used as template.
+    By default idpsel.html uses idpsel.css as stylesheet. You can make many
+    kinds of customization just by editing this stylesheet.
+
+IDP_SEL_TEMPL:: Template for IdP Authentication Page that is used if the
+    path does not work. This is really meant to be the last resort. The default
+    value of this page is the compiled in template "ZXID SP SSO: Choose IdP".
+
+IDP_LIST_METH:: Choose the method for rendeing IdP list.
+    0 = popup menu, 1 = buttons,
+    2 = branded image buttons (not implemented as of 20100922)
+
+IDP_SEL_PAGE::  IdP Selector Page URL
+   If the IDP_SEL_TEMPL_FILE or IDP_SEL_TEMPL, above, is not sufficient for
+   your customization needs, you can provide URL to page of your own design.
+   This page will receive as query string argument the relay state.
+   0 (zero) disables.
+
+You can set several rather technical configuration options by editing
+the IdP selection template and adding (hidden) form fields. You may
+want to hardwire these or allow user to set them
+
+fc:: Create federation (AllowCreate flag)
+fn:: Name ID format
+    prstnt:: Persistent (pseudonym)
+    trnsnt:: Transient, temporary pseudonym
+
+Technical parameters that the site administrator
+should decide and set. Usually hidden form fields in the template:
+
+fq:: Affiliation ID (usually empty)
+fy:: Consent obtained by SP for the federation or SSO
+    empty:: No statement about consent
+    urn:liberty:consent:obtained:: Has been obtained (unspecified way)
+    urn:liberty:consent:obtained:prior:: Obtained prior to present
+        transaction, e.g. user signed terms and conditions of service
+    urn:liberty:consent:obtained:current:implicit:: Consent
+        is implicit in the situation where user came to invoke service
+    urn:liberty:consent:obtained:current:explicit:: Obtained explicitly
+    urn:liberty:consent:unavailable:: Consent can not be obtained
+    urn:liberty:consent:inapplicable:: Obtaining consent is not
+        relevant for the SP or service.
+fa:: Authentication Context (strength of authentication) needed by the SP
+fm:: Matching rule for authentication strength (usually empty, IdP decides)
+fp:: Forbid IdP from interacting with the user (IsPassive flag)
+ff:: Request reauthentication of user (ForceAuthn flag)
+
+2.2 Gaining More Control
+------------------------
+
+The fully automated interface works well for CGI deployment
+but probably is not appropriate in more complex situations.
+You can use zxid_simple() without automation and prevent
+it from accessing the system layer too directly. Consider
+
+  01 #define CONF "PATH=/var/zxid/&URL=https://sp1.zxidsp.org:8443/zxid"
+  02 int main() {
+  03   char* res;
+  04   res = zxid_simple(CONF, getenv("QUERY_STRING"), 0);
+  05   switch (res[0]) {
+  06   case 'L': printf("%s", res); exit(0);  /* Redirect */
+  07   case 'C': printf("%s", res); exit(0);  /* Content-type + content */
+  08   case '<': printf("Content-Type: text/html\r\n\r\n%s", res); exit(0);
+  09   case 'n': exit(0);
+  10   case 'b': my_send_metadata();
+  11   case 'e': my_render_login_screen();
+  12   case 'd': /* Logged in case */
+  13     my_parse_ldif(res);
+  14     my_render_content();
+  15     exit(1);
+  16   default:
+  17     ERR("Unknown zxid_simple() response(%s)", res);
+  18   }
+  19 }
+
+Here we specify zero as ~auto_flags~, thus all automation is
+disabled. This means that the res can take more varied
+shape and the calling application has to be prepared
+to handle them. The different cases are distinguished by
+the first character of the res string:
+
+L:: Redirection request (L as in Location header). The
+    full contents of the res is the redirection request,
+    ready to be printed to stdout of a CGI. If you want
+    to handle the redirection some other way, you can
+    parse the string to extract the URL and do your thing.
+    This res is only returned if you did not
+    set ZXID_AUTO_REDIR.
+
+    Example:
+
+      Location: https://sp1.zxidsp.org:8443/zxid?o=C
+
+C:: Content with Content-type header. The res is ready
+    to be printed to the stdout of a CGI, but if you
+    want to handle it some other way, you can parse
+    the res to extract the header and the actual body.
+
+    Example:
+
+      CONTENT-TYPE: text/html
+      
+      <title>Login page</title>
+      ...
+
+    Example (metadata):
+
+      CONTENT-TYPE: text/xml
+      
+      <m:EntityDescriptor>
+      ...
+
+Less than ("<"):: Content without headers. This could
+    be HTML content for login page or metadata XML.
+    To know which (and set content type correctly),
+    you would have to parse the content. This res
+    format is only applicable if you did not specify
+    ZXID_AUTO_CTYPE (but did specify ZXID_AUTO_CONTENT).
+
+n:: Do nothing. The operation was somehow handled internally
+    but the exit(2) was not called (e.g. ZXID_AUTO_SOAP
+    was NOT specified). The application should NOT attempt
+    generating any output.
+
+b:: Indication that the application should send SP
+    metadata to the client. This res is only returned
+    if you did not set ZXID_AUTO_META.
+
+c:: Indication that the application should send SP
+    CARML declaration to the client. This res is only returned
+    if you did not set ZXID_AUTO_META.
+
+e:: Indication that the application should display the
+    IdP selection page. Application may use zxid_idp_list()
+    to render the IdP selection area. This res is only returned
+    if you did not set ZXID_AUTO_CONTENT.
+
+a:: Indication that the application should display the
+    authentication page (usually this happens on IdP).
+
+d:: Indication that SSO has been completed or that there
+    was an existing valid session in place. The res is an
+    LDIF entry containing attributes that describe the
+    SSO or session. See "Hello World" section for
+    description of the LDIF data.
+
+    Usually your application would parse the attributes
+    and then render its application specific content.
+    If you want to render the SSO management form (with
+    logout and defederate buttons), you can call
+    zxid_fed_mgmt().
+
+Open curly ("{"):: SSO completed, if JSON output was
+    chosen. Processing should be same as for "d".
+
+z:: Authorization failure. Application MUST NOT display
+    protected content. Instead, it should offer user
+    interface where the user can understand what happened
+    and possibly gain the extra credentials needed.
+
+Asterisk ("*"):: Although any unknown letter should be
+    interpreted as an error, we follow convention
+    of prefixing errors with an asterisk ("*").
+
+2.3 Some Generalization and Optimizations
+-----------------------------------------
+
+(*** also in zxid-php.pd)
+
+The simplest APIs are easy to use and suitable for CGIs where the
+program is restarted anew every time. However in situations where the
+script engine stays alive persistently, it is wasteful to reparse (and
+reallocate) the configuration every time. Consider following PHP
+snippet designed to be used with mod_php:
+
+  01 # Put this in the PHP initialization (it only needs to run once)
+  02 dl("php_zxid.so");
+  03 $conf = "PATH=/var/zxid/&URL=https://sp1.zxidsp.org:8443/zxiddemo.php";
+  04 $cf = zxid_new_conf_to_cf($conf);
+  05 <?   # For every page that is accessed
+  06 $qs = $_SERVER['REQUEST_METHOD'] == 'GET'
+  07       ? $_SERVER['QUERY_STRING']
+  08       : file_get_contents('php://input');
+  09 $res = zxid_simple_cf($cf, -1, $qs, null, 0x1800);
+  10 switch (substr($res, 0, 1)) {
+  11 case 'L': header($res); exit;  # Redirect
+  12 case 'n': exit;   # already handled
+  13 case 'b': my_send_metadata();
+  14 case 'e': my_render_login_screen();
+  15 case 'd': break;  # Logged in case -- fall through
+  16 default:  error_log("Unknown zxid_simple() res(%s)", res); exit;
+  17 }
+  18 # *** Parse the LDIF in $res into a hash of attributes (see zxidhlo.php)
+  19 
+  20 ?>
+  21 <html><title>Protected content, logged in as <$=$attr['cn']$></title>
+  22 ...
+  23 </html>
+  24 <?
+  25 function my_render_login_screen()
+  26 {
+  27 ?>
+  28 <html><title>Please Login Using IdP</title>
+  29 ...
+  30 <?=zxid_idp_select_cf($cf, null, 0x1800)?>
+  31 ...</html>
+  32 <? exit; }?>
+
+Notes
+
+1. Line 4 creates a system-wide configuration object that is later
+   used by the other API calls
+2. On line 9 we call zxid_simple_cf() with the created object. The
+   second and third argument specify a buffer or string that contains
+   the CGI form data to parse. This may come from ~QUERY_STRING~ of a
+   GET request or from HTTP body of a POST request, as determined
+   on line 8. The -1 means the length of the data should be
+   determined using strlen(3), i.e. C string nul termination.
+   The ~auto_flags == 0x1800~ enables form tag wrapping and debug
+   prints, but otherwise automation is disabled.
+3. Since automation was disabled, we need to handle several
+   cases of possible outcomes from zxid_simple_cf(), on lines 10-17.
+4. From line 18 onwards we handle the login successful or already
+   logged in case. First we split the LDIF entry into a hash
+   so that we can access the attributes easily (e.g. ~cn~ on line 20).
+5. On line 30 we call zxid_idp_list_cf() to create the form
+   for choosing which IdP to use for login (remember that
+   ~auto_flags == 0xc0~ enabled the form wrapper). As can be
+   seen the same configuration object, ~$cf~, is used through out.
+
+2.4 Java Servlet Example Using Tomcat
+-------------------------------------
+
+(*** also in zxid-java.pd)
+
+Consider
+
+  01 import zxidjava.*;
+  02 import java.io.*;
+  03 import javax.servlet.*;
+  04 import javax.servlet.http.*;
+  05 public class zxidhlo extends HttpServlet {
+  06   static { System.loadLibrary("zxidjni"); }
+  07   static final String conf
+  08     = "PATH=/var/zxid/&URL=http://sp1.zxidsp.org:8080/zxidservlet/zxidHLO";
+  09   public void do_zxid(HttpServletRequest req, HttpServletResponse res, String qs)
+  10                       throws ServletException, IOException {
+  11     String ret = zxidjni.simple(conf, qs, 0xd54);
+  12     switch (ret.charAt(0)) {
+  13     case 'L':  /* Redirect: ret == "LOCATION: urlCRLF2" */
+  14       res.sendRedirect(ret.substring(10, ret.length() - 4));
+  15       return;
+  16     case '<':
+  17       switch (ret.charAt(1)) {
+  18       case 's':  /* <se:  SOAP envelope */
+  19       case 'm':  /* <m20: metadata */
+  20         res.setContentType("text/xml");
+  21         break;
+  22       default:
+  23         res.setContentType("text/html");
+  24       break;
+  25       }
+  26       res.setContentLength(ret.length());
+  27       res.getOutputStream().print(ret);
+  28       break;
+  29     case 'd': /* Logged in case */
+  30       //my_parse_ldif(ret);
+  31       res.setContentType("text/html");
+  32       res.getOutputStream().print(zxidjni.fed_mgmt(conf, sesid, 0xd54));
+  33       break;
+  34     default:
+  35       System.err.print("Unknown zxid_simple() response:");
+  36       System.err.print(ret);
+  37     }
+  38   }
+  39   public void doGet(HttpServletRequest req, HttpServletResponse res)
+  40                     throws ServletException, IOException {
+  41     // LECP/ECP PAOS header checks
+  42     do_zxid(req, res, req.getQueryString());
+  43   }
+  44   public void doPost(HttpServletRequest req, HttpServletResponse res)
+  45                      throws ServletException, IOException {
+  46     String qs;
+  47     int len = req.getContentLength();
+  48     byte[] b = new byte[len];
+  49     int got = req.getInputStream().read(b, 0, len);
+  50     qs = new String(b, 0, got);
+  51     do_zxid(req, res, qs);
+  52   }
+  53 }
+
+2.5 Samma på Perl
+-----------------
+
+See also zxid-perl.pd
+
+<<logoutput:
+01 use Net::SAML;
+02 $| = 1; undef $/;  # Flush pipes, read all in at once
+03 $url = "http://sp.tas3.pt:8082/zxidhlo.pl";  # Edit to match your conf
+04 $conf = "PATH=/var/zxid/&URL=$url";
+05 $cf = Net::SAML::new_conf_to_cf($conf);
+06 $qs = $ENV{'QUERY_STRING'};
+07 $qs = <STDIN> if $qs =~ /o=P/;
+08 $res = Net::SAML::simple_cf($cf, -1, $qs, undef, 0x1828);
+09 $op = substr($res, 0, 1);
+10 if ($op eq 'L' || $op eq 'C') { print $res; exit; } # LOCATION (Redir) or CONTENT
+11 if ($op eq 'n') { exit; } # already handled
+12 if ($op eq 'e') { my_render_idpsel_screen(); exit; }
+13 if ($op ne 'd') { die "Unknown Net::SAML::simple() res($res)"; }
+14
+15 ($sid) = $res =~ /^sesid: (.*)$/m;  # Extract a useful attribute from SSO output
+16
+17 print <<HTML
+18 CONTENT-TYPE: text/html
+19
+20 <title>ZXID perl HLO SP Mgmt & Protected Content</title>
+21 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+22 <link type="text/css" rel=stylesheet href="idpsel.css">
+23 <body bgcolor=white><font face=sans>
+24
+25 <h1>ZXID SP Perl HLO Management & Protected Content (user logged in, session active)</h1>
+26 sesid: $sid
+27 HTML
+28     ;
+29 print Net::SAML::fed_mgmt_cf($cf, undef, -1, $sid, 0x1900);
+30 exit;
+31
+32 sub my_render_idpsel_screen {  # Replaces traditional login screen
+33     print <<HTML;
+34 CONTENT-TYPE: text/html
+35
+36 <title>ZXID SP PERL HLO SSO IdP Selection</title>
+39 <body bgcolor=white><font face=sans>
+40 <h1>ZXID SP Perl HLO Federated SSO IdP Selection (user NOT logged in, no session.)</h1>
+41 <form method=get action="zxidhlo.pl">
+42
+43 <h3>Login Using New IdP</h3>
+44
+45 <i>A new IdP is one whose metadata we do not have yet. We need to know
+46 the Entity ID in order to fetch the metadata using the well known
+47 location method. You will need to ask the adminstrator of the IdP to
+48 tell you what the EntityID is.</i>
+49
+50 <p>IdP URL <input name=e size=60><input type=submit name=l2 value=" Login ">
+51 HTML
+52 ;
+53     print Net::SAML::idp_list_cf($cf, undef, 0x1c00);   # Get the IdP selection form
+54     print <<HTML;
+55 <h3>CoT configuration parameters your IdP may need to know</h3>
+56
+57 Entity ID of this SP: <a href="$url?o=B">$url?o=B</a> (Click on the link to fetch SP metadata.)
+58
+59 <input type=hidden name=fc value=1><input type=hidden name=fn value=prstnt>
+60 <input type=hidden name=fq value=""><input type=hidden name=fy value="">
+61 <input type=hidden name=fa value=""><input type=hidden name=fm value="">
+62 <input type=hidden name=fp value=0><input type=hidden name=ff value=0>
+63
+64 </form><hr><a href="http://zxid.org/">zxid.org</a>
+65 HTML
+66     ;
+67 }
+>>
+
+This example only demonstrates SSO.
+
+Lines 1-5 set up the configuration. See zxid-conf.pd for guidance.
+
+ll.6-7 reads in the CGI input the perl way.
+
+l.8 runs the SAML engine of ZXID. The engine will return result that
+is processed below. The magic constant 0x1828 sets some flags, see
+zxid-simple.pd for explanation. This explanation may be especially relevant
+if you plan to run as mod_perl process rather than as a CGI. With
+these flags you could eliminate the need to render the IdP selection
+screen.
+
+ll.9-13: interpret the return value. l.10 deals with parts of SAML
+protocol that need redirect or content. l.12 deals with rendering the
+IdP selection screen. This screen replaces the traditional login
+screen in most applications.
+
+l.15 demonstrates how to extract attributes from the return value. The ret
+is formatted as LDIF so it is very easy to parse with perl.
+
+ll.17-30 render the "protected content". Most protected content should
+contain also Single Logout button. This is accomplished on l.29.
+Protected content is where your normal application after SSO lives.
+You can rely in ZXID session mechanism and just show the content,
+or you could bootstrap your application's session mechanism here.
+
+ll.32-67 render the "idp selection" screen. This could have been
+automatically generated has the flags to Net::SAML::simple_cf()
+been different (see zxid-simple.pd for explanation).
+
+As can be seen, the most central logic for SSO is only about 10 lines. The
+rest is user interface.
+
+2.6 Shell Script API
+--------------------
+
+Any Bourne shell (Unix shell) shell script can be converted
+to a SAML SSO enabled CGI script using zxidsimple(1) helper
+utility executable. The program simply wraps the zxid_simple()
+API function so that the inputs can be provided as command line arguments,
+or in case of ~qs~ as stdin, and the output is returned on stdout.
+
+Synopsis
+
+   zxidsimple -o ldif CONF AUTO_FLAGS <cgi-input
+
+Typical usage (see also zxidhlo.sh):
+
+  01 CONF="PATH=/var/zxid/&URL=https://sp1.zxidsp.org:8443/zxidhlo.sh"
+  02 ./zxidsimple -o /tmp/zxidhlo.sh.$$ $CONF 4094 || exit;
+  03 IFS="
+  04 "
+  05 res=`cat /tmp/zxidhlo.sh.$$`
+  06 case "$res" in
+  07 dn*)                     # SSO successful case
+  08   for x in $res; do
+  09     case "$x" in
+  10     sesid:*)  SID=${x##*sesid: } ;;
+  11     idpnid:*) NID=${x##*idpnid: } ;;
+  12     cn:*)     CN=${x##*cn: } ;;
+  13     esac
+  14   done
+  15   ;;
+  16   *) echo "ERROR($res)" >>/tmp/hlo.err; exit ;;
+  17 esac
+  18
+  19 cat << EOF
+  20 Content-Type: text/html
+  21
+  22 <title>ZXID HELLO SP Mgmt (Logged In)</title>
+  23 <h1>ZXID HELLO SP Management (user $CN logged in, session active)</h1>
+  24 <form method=post action="zxidhlo.sh?o=P">
+  25 <input type=hidden name=s value="$SID">
+  26 <input type=submit name=gl value=" Local Logout ">
+  27 <input type=submit name=gr value=" Single Logout (Redir) ">
+  28 </form>
+  29 EOF
+
+The zxidsimple(1) utility will return exit value 1 if it
+handled a SAML protocol operation (by outputting to stdout
+whatever was appropriate). The shell script
+should not do any further processing and just exit.
+
+If the exit value is 0 (success) then SSO has been done. Since the
+attributes from the SAML assertion are usually interesting, you can
+capture them to a temporary file using the -o option.
+
+First we split the result of the backtick into a list on (literal)
+newline. Then we process the list with for loop and look with case
+for the interesting attributes and capture them into local variables.
+
+Finally the protected content page is output.
+
+3 ZXID Simple Form Fields
+=========================
+
+The ZXID cgi interface assumes certain hardwired form field
+names. These are not configurable (and there is no intent to make them
+configurable). The cgi fields may appear either in query string (GET
+method) or as POST content (though depending on your programming
+environment and language, you may need to read the POST data in
+yourself prior to calling zxid_simple()).
+
+3.1 Common Fields
+-----------------
+
+These fields appear often in requests and have universal meaning.
+
+o:: Operation. In particular o=P means that form uses POST method.
+s:: Session ID
+RelayState:: SAML 2.0 mandated field name for relay state
+SAMLart:: SAML 2.0 mandated field name for SAML artifact
+SAMLResponse:: SAML 2.0 mandated field name for SAML response,
+    especially in POST profile
+SAMLRequest:: SAML 2.0 mandated field name for SAML request
+SigAlg:: SAML 2.0 mandated field name for signature algorithm in
+    redirect binding
+Signature:: SAML 2.0 mandated field name for signature in redirect binding
+
+3.2 IdP Selection (Login) Screen
+--------------------------------
+
+These are typically embdedded (hidden) or visible fields of the IdP Selection
+screen.
+
+u:: User (local login)
+p:: Password (local login)
+c:: Common Domain Cookie
+e:: Entity ID (manual entry field)
+d:: Entity ID (from popup or radio box)
+i:: Protocol index
+l1:: Login using artifact profile (same as i=1)
+l2:: Login using POST profile (same as i=2)
+l1EID:: Login using specified IdP (artifact profile), same as e=EID&i=1
+l2EID:: Login using specified IdP (POST profile), same as e=EID&i=2
+fc:: Allow Create flag
+fp:: IsPassive flag
+ff:: Force Authentication flag
+fn:: NameID format
+fq:: Affiliation ID
+fy:: Consent field
+fm:: Matching rule
+fa:: Authentication Context Class
+fr:: Relay State (usually used to convey the page that originally initiated the SSO)
+
+Please understand that a significant part of any SSO configuration
+is realized via f* fields, which will typically be hidden
+fields in the IdP selection form. Some of these configuration
+options can not be set or overridden from the configuration file.
+You must provide them as (hidden) fields of the HTML form.
+
+The ~DEFAULTQS~ option often will emulate the IdP Selection
+form submission and set some f* options.
+
+The IdP selection form (aka Login) screen can be implemented, using
+the above documented form interface, in many ways as following
+examples illustrate.
+
+*Example IdP Selection Form: Popup menu method*
+
+***
+
+*Example IdP Selection Form: Separate IdP buttons method*
+
+  <form method=post
+    action="http://sp1.zxidsp.org:8080/zxidservlet/zxidHLO?o=P">
+  <h3>Login Using New IdP</h3>
+  <p>IdP URL <input name=e size=80>
+      <input type=submit name=l1 value=" Login (A2) ">
+      <input type=submit name=l2 value=" Login (P2) "><br>
+
+  <h3>Login Using Known IdP</h3>
+  <input type=submit name="l1https://a-idp.liberty-iop.org:8881/idp.xml"
+         value=" Login to https://a-idp.liberty-iop.org:8881/idp.xml (A2) ">
+  <input type=submit name="l2https://a-idp.liberty-iop.org:8881/idp.xml"
+         value=" Login to https://a-idp.liberty-iop.org:8881/idp.xml (P2) ">
+
+  <h3>Technical options</h3>
+  <input type=checkbox name=fc value=1 checked> Create federation,
+     NID Format: <select name=fn>
+                   <option value=prstnt>Persistent
+                   <option value=trnsnt>Transient
+                   <option value="">(none)
+                 </select><br>
+
+  <input type=hidden name=fq value="">
+  <input type=hidden name=fy value="">
+  <input type=hidden name=fa value="">
+  <input type=hidden name=fm value="">
+  <input type=hidden name=fp value=0>
+  <input type=hidden name=ff value=0>
+  </form>
+
+*Example IdP Selection Form: IdP links method*
+
+***
+
+3.3 Single Logout and Federation Management
+-------------------------------------------
+
+Following fields typically appear in form implementing
+logout button. You will usually need to embed them to
+your application's screens where logout button or link
+appears. Typically you would include one of them
+and teh <<tt: s>> argument in the query string.
+
+gl:: Local Logout
+gr:: Single Logout using redirection
+gs:: Single Logout using SOAP
+gt:: NameID Managment (redirect)
+gu:: NameID Management (SOAP)
+
+*Example Management Form*
+
+  <form method=post action="zxid?o=P">
+  <input type=hidden name=s  value="!!sid">
+  <input type=submit name=gl value=" Local Logout ">
+  <input type=submit name=gr value=" Single Logout (Redir) ">
+  <input type=submit name=gs value=" Single Logout (SOAP) ">
+  <input type=submit name=gt value=" Defederate (Redir) ">
+  <input type=submit name=gu value=" Defederate (SOAP) ">
+  </form>
+
+3.4 Login Button Abreviations
+-----------------------------
+
+Sometimes you will see in the IdP Selection screen a small
+abbreviation like "(A2)". This indicates the protocol binding that
+will be used (if supported in metadata). The button without such
+legend will automatically pick binding that is best among
+available. If both POST and artifact are available, it will pick
+artifact.
+
+  A2 = SAML 2.0 Artifact Profile
+  P2 = SAML 2.0 POST Profile
+  '' = SAML 2.0 POST Simple Sign
+  A12 = Liberty ID-FF 1.2 Artifact Profile
+  P12 = Liberty ID-FF 1.2 POST Profile
+  A1 = Bare SAML 1.x Artifact Profile
+  P1 = Base SAML 1.x POST Profile
+  A0 = WS-Federation Artifact Profile
+  P0 = WS-Federation POST Profile
+
+3.5 ZXID IdP Login Screen Form Fields
+-------------------------------------
+
+> N.B. The IdP functionality is not fully developed as of Nov 2008.
+
+  <form method=post action="zxididp?o=P">
+  <input type=hidden name=s  value="!!sid">
+  <input name=au>
+  <input type=password name=ap>
+  <input type=submit name=alp value=" Login ">
+  <input type=submit name=gl value=" Local Logout ">
+  <input type=submit name=gr value=" Single Logout (Redir) ">
+  <input type=submit name=gs value=" Single Logout (SOAP) ">
+  <input type=submit name=gt value=" Defederate (Redir) ">
+  <input type=submit name=gu value=" Defederate (SOAP) ">
+  </form>
+
+
+<<ignore:
+18 ZXID SP
+==========
+
+*** warning: not checked lately, may be wrong!
+
+< <table: ZXID SP URLs
+URL          Description
+============ =======================================================
+/zxid        Same as o=M. Main convenience entry point
+/zxid?o=M    SSO with CDC; or management if already logged in
+/zxid?o=C    Common Domain Cookie (CDC) reader, usually under common domain host name.
+/zxid?o=E    SSO after CDC read; or management if already logged in.
+/zxid?o=P    HTTP POST end point. Used for forms and last part of POST profile SSO.
+/zxid?o=Q    HTTP binding (POST or redirect) request end point (e.g. SLO, MNI).
+/zxid?o=S    SOAP end point (HTTP POST)
+/zxid?o=B    Get SP metadata (or combined SP and IdP metadata if proxying).
+> >
+>>
+
+4 ZXID Simple API Reference
+===========================
+
+See also <<link:ref/html/index.html:Function reference>>
+
+4.1 Creating Configuration Object
+---------------------------------
+
+<<logoutput:
+int zxid_conf_to_cf_len(struct zxid_conf* cf, int conf_len, char* conf);
+struct zxid_conf* zxid_new_conf_to_cf(char* conf);
+>>
+
+4.2 zxid_simple() main protocol dispatch
+----------------------------------------
+
+<<logoutput:
+/* Simple handler that assumes the configuration has already been read in.
+ * The memory for result is grabbed from ZX_ALLOC(), usually malloc(3)
+ * and is "given" away to the caller, i.e. caller must free it. The
+ * return value is LDIF of attributes in success case.
+ * res_len, if non-null, will receive the length of the response. */
+
+/* Process simple configuration and then call simple handler. Strings
+ * are length + pointer (no C string nul termination needed). */
+
+char* zxid_simple_cf(struct zxid_conf* cf, int qs_len, char* qs, int* res_len, int auto_flags);
+char* zxid_simple_len(int conf_len, char* conf, int qs_len, char* qs, int* res_len, int auto_flags);
+char* zxid_simple(char* conf, char* qs, int auto_flags);
+>>
+
+4.3 Generating Login Screen
+---------------------------
+
+<<logoutput:
+/* ------------ zxid_idp_list() ------------ */
+
+char* zxid_idp_list_cf_cgi(struct zxid_conf* cf, struct zxid_cgi* cgi, int* res_len, int auto_flags)
+char* zxid_idp_list_cf(struct zxid_conf* cf, int* res_len, int auto_flags)
+char* zxid_idp_list_len(int conf_len, char* conf, int* res_len, int auto_flags)
+char* zxid_idp_list(char* conf, int auto_flags)
+
+struct zx_str* zxid_idp_select_zxstr_cf_cgi(struct zxid_conf* cf, struct zxid_cgi* cgi, int auto_flags)
+
+struct zx_str* zxid_idp_select_zxstr_cf(struct zxid_conf* cf, int auto_flags)
+char* zxid_idp_select_cf(struct zxid_conf* cf, int* res_len, int auto_flags)
+char* zxid_idp_select_len(int conf_len, char* conf, int* res_len, int auto_flags)
+char* zxid_idp_select(char* conf, int auto_flags)
+
+struct zx_str* zxid_ses_to_ldif(struct zxid_conf* cf, struct zxid_ses* ses)
+
+char* zxid_simple_render_ses(struct zxid_conf* cf, struct zxid_ses* ses, int* res_len, int auto_flags)
+
+static char* zxid_simple_show_meta(struct zxid_conf* cf, struct zxid_cgi* cgi, int* res_len, int auto_flags)
+
+/* NULL return means the not logged in processing is needed, see zxid_simple_no_ses_cf() */
+
+char* zxid_simple_ses_active_cf(struct zxid_conf* cf, struct zxid_cgi* cgi, struct zxid_ses* ses, int* res_len, int auto_flags)
+
+char* zxid_simple_no_ses_cf(struct zxid_conf* cf, struct zxid_cgi* cgi, struct zxid_ses* ses, int* res_len, int auto_flags)
+>>
+
+4.4 Generating HTML for Logout button or Management Screens
+-----------------------------------------------------------
+
+<<logoutput:
+char* zxid_fed_mgmt_cf(struct zxid_conf* cf, int* res_len, int sid_len, char* sid, int auto_flags)
+char* zxid_fed_mgmt_len(int conf_len, char* conf, int* res_len, char* sid, int auto_flags)
+char* zxid_fed_mgmt(char* conf, char* sid, int auto_flags)
+>>
+
+4.5 Explicitly Calling PEP (which makes SOAP/XACML call to PDP)
+---------------------------------------------------------------
+
+Although a simple PEP functionality is built-in to zxid_simple() API
+through configuration options like ~PEPMAP~, LOCALPDP_* family, and
+~PDP_URL~, it is sometimes desirable to implement a Policy Enforcement
+Point (PEP) at application layer where full particluars of the request or
+response are available. To assist in this, the simple API provides
+authorization client, which we term PEP because at protocol layer it
+is a XACML PEP, which your application code can call to implement the
+protocols specifics of calling a PDP. However, your own code still needs to
+implement the actual enforcement or filtering logic.
+
+4.5.1 zxid_az(conf, qs, sesid)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+conf:: the configuration will need to have ~PEPMAP~ and ~PDP_URL~ options
+    set according to your situation.
+
+qs:: if supplied, any CGI variables are imported to session
+    environment as attributes (according to ~INMAP~). Format is
+    CGI Query String.
+
+sesid:: attributes are obtained from the session, if supplied (see also
+    CGI). The session ID is supplied as a string. If none is
+    supplied, then session will be entirely defined by the CGI
+    attributes.
+
+returns:: 0 if deny (for any reason, e.g. indeterminate), or 1 if permit
+
+This function calls underlying zxid_pep_az_soap() with the difference
+that it is possible to import attributes to the session via CGI string.
+
+The XACML request is constructed by applying ~PEPMAP~ configuration
+to the attributes in the session. For this to work, the ~PEPMAP~ MUST
+have ~subj~, ~rsrc~, and ~act~ stanzas and should have ~env~ stanza
+if you have environment attributes to pass. See zxid-conf.pd for
+further information and default values.
+
+*Variants*
+
+  zxid_az_cf(cf, qs, sesid)
+
+The configuration is received as binary object, usually obtained from
+zxid_conf_to_cf_len(). This avoids reparsing configuration in case
+multiple calls are made. Typically the same configuration object
+might have been used with zxid_simple_cf().
+
+  zxid_az_cf_ses(cf, qs, ses)
+
+Both configuration and session are supplied as binary objects,
+such as may have been received from zxid_conf_to_cf_len()
+and zxid_alloc_ses() as used with zxid_simple_cf_ses().
+
+*Example Pseudocode*
+
+  cf = zxid_new_conf();
+  ses = zxid_alloc_ses(cf);
+  ret = zxid_simple_cf_ses(cf, 0, $QUERY_STRING, ses, 0, 0x1800);
+  if (ret =~ /^d/) {
+    perr "SSO ok, now checking authorization";
+    if (zxid_az(cf, "", ses))
+      perr "Permit, add code to deliver application content";
+    else
+      perr "Deny, send back an error";
+  }
+
+4.5.2 zxid_pep_az_soap() - Underlying PEP Function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The simple PEP is based on this function:
+
+  int zxid_pep_az_soap(struct zxid_conf* cf, struct zxid_cgi* cgi, struct zxid_ses* ses)
+
+In particular
+
+cf:: the configuration will need to have ~PEPMAP~ and ~PDP_URL~ options
+    set according to your situation.
+
+cgi:: if non-null, will resceive error and status codes
+
+ses:: all attributes are obtained from the session. You may wish
+    to add additional attributes that are not known by SSO.
+
+returns:: 0 if deny (for any reason, e.g. indeterminate), or 1 if permit
+
+The XACML request is constructed by applying ~PEPMAP~ configuration
+to the attributes in the session. 
+
+5 Miscellaneous Function Documentation
+======================================
+
+<<img: meta-fetch: Relevant parts of the call graph for metadata fetching.>>
+
+<<ignore:
+
+Some OAuth APIs to look at
+
+http://wiki.oauth.net/w/page/OAuth-2
+http://developer.cliqset.com/api#TOC-OAuth-2.0-Overview
+http://www.dailymotion.com/doc/api
+
+>>
+
+<<if: ZXIDBOOK>>
+<<else: >>
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

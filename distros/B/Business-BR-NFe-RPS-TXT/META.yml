@@ -1,0 +1,25 @@
+---
+abstract: 'Gerar arquivo de envio de RPS em lote baseado no sistema de nota fiscal paulistana.'
+author:
+  - 'Renato Cron <renato@aware.com.br>'
+build_requires:
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-BR-NFe-RPS-TXT
+requires:
+  Carp: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://github.com/renatoaware/perl-business-br-nfe-txt/issues
+  repository: git://github.com/renatoaware/perl-business-br-nfe-txt.git
+version: 0.0124

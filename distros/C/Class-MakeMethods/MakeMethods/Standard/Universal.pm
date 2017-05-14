@@ -80,7 +80,7 @@ sub no_op {
   map { 
     my $method = $_;
     $method->{name} => sub { }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -134,7 +134,7 @@ sub abstract {
       my $class = ref($self) ? "a " . ref($self) . " object" : $self;
       croak("The $method->{name} method is abstract and can not be called on $class");
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -179,7 +179,7 @@ sub call_methods {
 	$self->$key( shift ) 
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 
@@ -224,7 +224,7 @@ sub join_methods {
       @values = grep { defined and length } @values if ( $method->{skip_blanks} );
       join $joiner, @values;
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -267,7 +267,7 @@ sub alias {
       
       $self->$t_method(@t_args, @_);
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -320,7 +320,7 @@ sub delegate {
       
       $obj->$m_method(@m_args, @_);
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################

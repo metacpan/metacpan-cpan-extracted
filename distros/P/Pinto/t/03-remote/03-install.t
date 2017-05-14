@@ -6,7 +6,6 @@ use warnings;
 use Test::More;
 use Test::File;
 use Test::Exception;
-use File::Temp;
 use Path::Class qw(dir);
 use Capture::Tiny qw(capture_stderr);
 
@@ -15,15 +14,8 @@ use Pinto::Remote;
 use lib 't/lib';
 use Pinto::Server::Tester;
 use Pinto::Constants qw($PINTO_MINIMUM_CPANM_VERSION);
-use Pinto::Tester::Util qw(has_cpanm);
-use Pinto::Util qw(tempdir);
+use Pinto::Tester::Util qw(make_dist_archive has_cpanm);
 
-#------------------------------------------------------------------------------
-# To prevent mucking with user's ~/.cpanm. See GH #170.
-local $ENV{PERL_CPANM_HOME} = tempdir->stringify();
-
-# To prevent failures due to a proxy. See GH #202.
-local $ENV{no_proxy} = "localhost";
 #------------------------------------------------------------------------------
 
 plan skip_all => "Need cpanm $PINTO_MINIMUM_CPANM_VERSION or newer"
@@ -32,8 +24,6 @@ plan skip_all => "Need cpanm $PINTO_MINIMUM_CPANM_VERSION or newer"
 #------------------------------------------------------------------------------
 
 my $t = Pinto::Server::Tester->new->start_server;
-plan skip_all => "Can't open connection to $t" unless $t->can_connect;
-
 $t->populate('JOHN/DistA-1 = PkgA~1 & PkgB~1');
 $t->populate('PAUL/DistB-1 = PkgB~1 & PkgC~1');
 $t->populate('MARK/DistC-1 = PkgC~1');
@@ -45,13 +35,11 @@ subtest 'Install from default stack' => sub {
     my $p5_dir     = dir( $sandbox, qw(lib perl5) );
     my %cpanm_opts = ( cpanm_options => { q => undef, L => $sandbox->dirname } );
     my $remote     = Pinto::Remote->new( root => $t->server_url );
-    my $result;
 
-    capture_stderr {
-        $result = $remote->run( Install => ( targets => ['PkgA'], %cpanm_opts ) );
+    my $stderr = capture_stderr {
+        $remote->run( Install => ( targets => ['PkgA'], %cpanm_opts ) );
     };
 
-    is $result->was_successful, 1;
     file_exists_ok( $p5_dir->file('PkgA.pm') );
     file_exists_ok( $p5_dir->file('PkgB.pm') );
     file_exists_ok( $p5_dir->file('PkgC.pm') );
@@ -68,13 +56,11 @@ subtest 'Install from named stack' => sub {
     my $p5_dir     = dir( $sandbox, qw(lib perl5) );
     my %cpanm_opts = ( cpanm_options => { q => undef, L => $sandbox->dirname } );
     my $remote     = Pinto::Remote->new( root => $t->server_url );
-    my $result;
 
-    capture_stderr {
-        $result = $remote->run( Install => ( targets => ['PkgA'], stack => 'dev', %cpanm_opts ) );
+    my $stderr = capture_stderr {
+        $remote->run( Install => ( targets => ['PkgA'], stack => 'dev', %cpanm_opts ) );
     };
 
-    is $result->was_successful, 1;
     file_exists_ok( $p5_dir->file('PkgA.pm') );
     file_exists_ok( $p5_dir->file('PkgB.pm') );
     file_exists_ok( $p5_dir->file('PkgC.pm') );
@@ -88,14 +74,10 @@ subtest 'Install a missing target' => sub {
     my $p5_dir     = dir( $sandbox, qw(lib perl5) );
     my %cpanm_opts = ( cpanm_options => { q => undef, L => $sandbox->dirname } );
     my $remote     = Pinto::Remote->new( root => $t->server_url );
-    my $result;
 
-    capture_stderr {
-        $result = $remote->run( Install => { targets => ['PkgZ'], %cpanm_opts } );
+    my $stderr = capture_stderr {
+        throws_ok { $remote->run( Install => { targets => ['PkgZ'], %cpanm_opts } ) } qr/Installation failed/;
     };
-
-    is $result->was_successful, 0;
-    like $result, qr/Installation failed/;
 };
 
 #------------------------------------------------------------------------------
@@ -115,7 +97,7 @@ subtest 'Install a dist with an unusual author id' => sub {
     my %cpanm_opts = ( cpanm_options => { q => undef, L => $sandbox->dirname } );
     my $remote     = Pinto::Remote->new( root => $t->server_url );
 
-    capture_stderr {
+    my $stderr = capture_stderr {
         $remote->run( Install => ( targets => ['FOO-22/DistA-1.tar.gz'], %cpanm_opts ) );
         $remote->run( Install => ( targets => ['FO/DistB-1.tar.gz'], %cpanm_opts ) );
     };

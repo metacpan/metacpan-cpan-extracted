@@ -17,14 +17,13 @@ INTRODUCTION
     GSM support software.
 
     You can do the same on linux using the AT command emaulator from the
-    gnokii project (the gnokii.org manpage when using these special phones.
+    gnokii project (gnokii.org when using these special phones.
 
     More generic options are the M20 from Siemens and the A1 or A2 from
     Falcom.
 
-    A good start is to read the docs for the GSM::SMS::NBS manpage. This
-    class is a facade for the rest of the package and provides easy to use
-    methods.
+    A good start is to read the docs for GSM::SMS::NBS. This class is a
+    facade for the rest of the package and provides easy to use methods.
 
     (Upcoming) When using EMS, you can use the L>GSM::SMS::EMS> package.
 
@@ -37,6 +36,7 @@ INTRODUCTION
     VCard
     OTA Configuration for WAP phones
     PictureMessage
+
     More are on their way, as is support for EMS.
 
 NEW IN THIS RELEASE
@@ -46,6 +46,7 @@ NEW IN THIS RELEASE
     More docs
     Better error reporting
     Configuration wizard update
+
     Look in the 'Changes' file for a complete review and credits.
 
 PREREQUISITES
@@ -57,6 +58,7 @@ PREREQUISITES
     LWP
     Device::SerialPort or Win32::SerialPort
     Log::Agent
+
     Note: Device::SerialPort and Win32::SerialPort are only necessary when
     using serial transport.
 

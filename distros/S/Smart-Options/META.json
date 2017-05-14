@@ -70,7 +70,7 @@
    "provides" : {
       "Smart::Options" : {
          "file" : "lib/Smart/Options.pm",
-         "version" : "0.06"
+         "version" : "0.061"
       },
       "Smart::Options::Declare" : {
          "file" : "lib/Smart/Options/Declare.pm"
@@ -87,7 +87,7 @@
          "web" : "https://github.com/kan/p5-smart-options"
       }
    },
-   "version" : "0.06",
+   "version" : "0.061",
    "x_contributors" : [
       "hayajo <hayajo@cpan.org>",
       "Takuji Nishibayashi <takuji31@gmail.com>",

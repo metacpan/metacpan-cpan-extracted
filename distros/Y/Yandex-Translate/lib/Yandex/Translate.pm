@@ -15,7 +15,7 @@ use URI::Escape qw{uri_escape_utf8};
 # of ExtUtils::MakeMaker->WriteMakefile() will accurately detect $VERSION.
 #
 my
-$VERSION = '1.000005';
+$VERSION = '1.001';
 
 #
 # See https://tech.yandex.ru/translate/doc/dg/concepts/api-overview-docpage/
@@ -42,14 +42,14 @@ my %valid_default_ui = map { $_ => 1 } qw{ en ru tr };
 # otherwise, set it to English.
 #
 (my $default_ui = setlocale(LC_CTYPE) || 'en') =~ s/_.*$//;
-$default_ui = 'en' if ($default_ui ne 'ru' || $default_ui ne 'tr');
+$default_ui = 'en' if (!exists $valid_default_ui{$default_ui});
 
 sub new
 {
     my $class = shift;
     my $self = {
         _key_        => shift,
-        _text_       => uri_escape_utf8(shift),
+        _text_       => shift,
         _from_lang_  => shift,
         _to_lang_    => shift,
         _ui_         => shift || $default_ui,
@@ -57,11 +57,13 @@ sub new
         _format_     => shift,
         _options_    => shift,
         _base_       => 'https://translate.yandex.net/api/v1.5/tr.json',
-        _post_       => undef
+        _post_       => undef,
+	_http_       => HTTP::Tiny->new
     };
 
-    bless $self, $class;
-    return $self;
+    $self->{_text_} = uri_escape_utf8($self->{_text_}) if (defined $self->{_text_});
+
+    return bless $self, $class;
 }
 
 sub set_key
@@ -88,9 +90,11 @@ sub set_default_ui
 sub get_langs_list
 {
     my $self = shift;
+    die "You must set API key\n" if (not defined $self->{ _key_ });
+    
     my $query = '/getLangs?';
     $self->{_post_} = 'key='.$self->{_key_}.'&ui='.$self->{_ui_};
-    my $response = HTTP::Tiny->new->get($self->{_base_} . $query  . $self->{_post_});
+    my $response = $self->{_http_}->get($self->{_base_} . $query  . $self->{_post_});
 
     die "Invalid API key\n" if ($response->{status} eq '401');
     die "Blocked API key\n" if ($response->{status} eq '402');
@@ -123,10 +127,13 @@ sub set_hint
 sub detect_lang
 {
     my $self = shift;
+    die "You must set API key\n" if (not defined $self->{ _key_ });
+    die "You must set Text\n" if (not defined $self->{ _text_ });
+
     my $query = '/detect?';
     $self->{_post_} = 'key='.$self->{_key_}.'&text='.$self->{_text_};
     $self->{_post_} .= '&hint='.join(',', @{ $self->{_hint_} }) if (defined $self->{_hint_});
-    my $response = HTTP::Tiny->new->get($self->{_base_} . $query  . $self->{_post_});
+    my $response = $self->{_http_}->get($self->{_base_} . $query  . $self->{_post_});
 
     die "Invalid API key\n" if ($response->{status} eq '401');
     die "Blocked API key\n" if ($response->{status} eq '402');
@@ -166,12 +173,17 @@ sub set_options
 sub translate
 {
     my $self = shift;
+    die "You must set API key\n" if (not defined $self->{ _key_ });
+    die "You must set Text\n" if (not defined $self->{ _text_ });
+    die "You must set source lang\n" if (not defined $self->{ _from_lang_ });
+    die "You must set destination lang\n" if (not defined $self->{ _to_lang_ });
+
     my $query = '/translate?';
     my $lang = (defined $self->{_from_lang_}) ? $self->{_from_lang_}.'-'.$self->{_to_lang_} : $self->{_to_lang_};
     $self->{_post_} = 'key='.$self->{_key_}.'&text='.$self->{_text_}.'&lang='.$lang;
     $self->{_post_} .= '&format='.$self->{_format_} if (defined $self->{_format_});
     $self->{_post_} .= '&options='.$self->{_options_} if (defined $self->{_options_});
-    my $response = HTTP::Tiny->new->get($self->{_base_} . $query  . $self->{_post_});
+    my $response = $self->{_http_}->get($self->{_base_} . $query  . $self->{_post_});
 
     die "Invalid API key\n" if ($response->{status} eq '401');
     die "Blocked API key\n" if ($response->{status} eq '402');
@@ -199,6 +211,7 @@ sub translate
 # See §2.7 of Terms of Use of API Yandex.Translate Service
 # at https://yandex.com/legal/translate_api/
 #
+
 sub get_yandex_technology_reference
 {
     my ( $self, $attribute ) = @_;
@@ -224,7 +237,7 @@ sub get_yandex_technology_reference
         my %yandex_text = (
             ru => 'Переведено сервисом Яндекс.Переводчик',
             en => 'Powered by Yandex.Translate',
-	    tr => 'Tarafından desteklenmektedir Yandex.Translate',
+	    tr => 'Tarafından desteklenmektedir Yandex.Çeviri',
         );
         my $yandex_url = (exists $yandex_url{$self->{_ui_}}) ? $yandex_url{$self->{_ui_}} : $yandex_url{$default_ui};
         my $yandex_text = (exists $yandex_text{$self->{_ui_}}) ? $yandex_text{$self->{_ui_}} : $yandex_text{$default_ui};
@@ -244,10 +257,11 @@ Yandex::Translate - a simple API for Yandex.Translate
 
 =head1 VERSION
 
-version 1.000005
+version 1.001
 
 =head1 SYNOPSIS
 
+    use utf8; #It is require
     use Yandex::Translate;
 
     my $tr = Yandex::Translate->new;
@@ -364,7 +378,7 @@ For example, French would be given as C<fr>.
     $tr->set_default_ui('ru');
 
 This method is used to set the default user interface language (string).
-Either C<ru> (Russian) or C<en> (English) can be given.
+Either C<ru> (Russian) or C<en> (English) or C<tr> (Turkish)  can be given.
 
 =head2 set_hint
 
@@ -444,7 +458,7 @@ L<https://fossil.falseking.site/ticket>
 This is open source software. The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://fossil.falseking.site/dir?ci=cdaf55ce8487865d&name=Yandex-Translate&type=tree>
+L<https://fossil.falseking.site/dir?ci=tip&type=tree>
 
 =head1 AUTHORS
 
@@ -468,3 +482,4 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+

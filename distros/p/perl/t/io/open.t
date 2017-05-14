@@ -9,10 +9,8 @@ BEGIN {
 $|  = 1;
 use warnings;
 use Config;
-$Is_VMS = $^O eq 'VMS';
-$Is_MacOS = $^O eq 'MacOS';
 
-plan tests => 108;
+plan tests => 156;
 
 my $Perl = which_perl();
 
@@ -76,10 +74,7 @@ my $afile = tempfile();
 
     unlink($afile);
 }
-
-SKIP: {
-    skip "open -| busted and noisy on VMS", 3 if $Is_VMS;
-
+{
     ok( open(my $f, '-|', <<EOC),     'open -|' );
     $Perl -e "print qq(a row\\n); print qq(another row\\n)"
 EOC
@@ -88,10 +83,7 @@ EOC
     is( scalar @rows, 2,                '       readline, list context' );
     ok( close($f),                      '       close' );
 }
-
-SKIP: {
-    skip "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS;
-
+{
     ok( open(my $f, '|-', <<EOC),     'open |-' );
     $Perl -pe "s/^not //"
 EOC
@@ -113,6 +105,15 @@ EOC
 ok( !eval { open my $f, '<&', $afile; 1; },    '<& on a non-filehandle' );
 like( $@, qr/Bad filehandle:\s+$afile/,          '       right error' );
 
+ok( !eval { *some_glob = 1; open my $f, '<&', *some_glob; 1; },    '<& on a non-filehandle glob' );
+like( $@, qr/Bad filehandle:\s+some_glob/,          '       right error' );
+
+{
+    use utf8;
+    use open qw( :utf8 :std );
+    ok( !eval { use utf8; *ǡﬁlḛ = 1; open my $f, '<&', *ǡﬁlḛ; 1; },    '<& on a non-filehandle glob' );
+    like( $@, qr/Bad filehandle:\s+ǡﬁlḛ/u,          '       right error' );
+}
 
 # local $file tests
 {
@@ -172,9 +173,7 @@ ok( -s $afile < 20,                     '       -s' );
     unlink($afile);
 }
 
-SKIP: {
-    skip "open -| busted and noisy on VMS", 3 if $Is_VMS;
-
+{
     ok( open(local $f, '-|', <<EOC),  'open local $f, "-|", ...' );
     $Perl -e "print qq(a row\\n); print qq(another row\\n)"
 EOC
@@ -184,9 +183,7 @@ EOC
     ok( close($f),                      '       close' );
 }
 
-SKIP: {
-    skip "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS;
-
+{
     ok( open(local $f, '|-', <<EOC),  'open local $f, "|-", ...' );
     $Perl -pe "s/^not //"
 EOC
@@ -236,12 +233,15 @@ like( $@, qr/Bad filehandle:\s+$afile/,          '       right error' );
 
     # used to try to open a file [perl #17830]
     ok( open(my $stdin,  "<&", fileno STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $!;
+
+    fileno(STDIN) =~ /(.)/;
+    ok open($stdin, "<&", $1), 'open ... "<&", $magical_fileno',
+	||  _diag $!;
 }
 
 SKIP: {
     skip "This perl uses perlio", 1 if $Config{useperlio};
-    skip "miniperl cannot be relied on to load %Errno"
-	if $ENV{PERL_CORE_MINITEST};
+    skip_if_miniperl("miniperl can't rely on loading %Errno", 1);
     # Force the reference to %! to be run time by writing ! as {"!"}
     skip "This system doesn't understand EINVAL", 1
 	unless exists ${"!"}{EINVAL};
@@ -271,7 +271,7 @@ SKIP: {
 
     open($fh1{k}, "TEST");
     gimme($fh1{k});
-    like($@, qr/<\$fh1{...}> line 1\./, "autoviv fh package helem");
+    like($@, qr/<\$fh1\{...}> line 1\./, "autoviv fh package helem");
 
     my @fh2;
     open($fh2[0], "TEST");
@@ -281,7 +281,12 @@ SKIP: {
     my %fh3;
     open($fh3{k}, "TEST");
     gimme($fh3{k});
-    like($@, qr/<\$fh3{...}> line 1\./, "autoviv fh lexical helem");
+    like($@, qr/<\$fh3\{...}> line 1\./, "autoviv fh lexical helem");
+
+    local $/ = *F;  # used to cause an assertion failure
+    gimme($fh3{k});
+    like($@, qr/<\$fh3\{...}> chunk 2\./,
+	'<...> line 1 when $/ is set to a glob');
 }
     
 SKIP: {
@@ -322,3 +327,163 @@ fresh_perl_is(
 
 eval { open $99, "foo" };
 like($@, qr/Modification of a read-only value attempted/, "readonly fh");
+# But we do not want that exception applying to close(), since it does not
+# modify the fh.
+eval {
+   no warnings "uninitialized";
+   # make sure $+ is undefined
+   "a" =~ /(b)?/;
+   close $+
+};
+is($@, '', 'no "Modification of a read-only value" when closing');
+
+# [perl#73626] mg_get wasn't run on the pipe arg
+
+{
+    package p73626;
+    sub TIESCALAR { bless {} }
+    sub FETCH { "$Perl -e 1"}
+
+    tie my $p, 'p73626';
+
+    package main;
+
+    ok( open(my $f, '-|', $p),     'open -| magic');
+}
+
+# [perl #77492] Crash when stringifying a glob, a reference to which has
+#               been opened and written to.
+fresh_perl_is(
+    '
+      open my $fh, ">", \*STDOUT;
+      print $fh "hello";
+     "".*STDOUT;
+      print "ok";
+      close $fh;
+      unlink \*STDOUT;
+    ',
+    'ok', { stderr => 1 },
+    '[perl #77492]: open $fh, ">", \*glob causes SEGV');
+
+# [perl #77684] Opening a reference to a glob copy.
+SKIP: {
+    skip_if_miniperl("no dynamic loading on miniperl, so can't load PerlIO::scalar", 1);
+    my $var = *STDOUT;
+    open my $fh, ">", \$var;
+    print $fh "hello";
+    is $var, "hello", '[perl #77684]: open $fh, ">", \$glob_copy'
+        # when this fails, it leaves an extra file:
+        or unlink \*STDOUT;
+}
+
+# check that we can call methods on filehandles auto-magically
+# and have IO::File loaded for us
+SKIP: {
+    skip_if_miniperl("no dynamic loading on miniperl, so can't load IO::File", 3);
+    is( $INC{'IO/File.pm'}, undef, "IO::File not loaded" );
+    my $var = "";
+    open my $fh, ">", \$var;
+    ok( eval { $fh->autoflush(1); 1 }, '$fh->autoflush(1) lives' );
+    ok( $INC{'IO/File.pm'}, "IO::File now loaded" );
+}
+
+sub _117941 { package _117941; open my $a, "TEST" }
+delete $::{"_117941::"};
+_117941();
+pass("no crash when open autovivifies glob in freed package");
+
+# [perl #117265] check for embedded nul in pathnames, allow ending \0 though
+{
+    my $WARN;
+    local $SIG{__WARN__} = sub { $WARN = shift };
+    my $temp = tempfile();
+    my $temp_match = quotemeta $temp;
+
+    # create the file, so we can check nothing actually touched it
+    open my $temp_fh, ">", $temp;
+    close $temp_fh;
+    ok(utime(time()-10, time(), $temp), "set mtime to a known value");
+    ok(chmod(0666, $temp), "set mode to a known value");
+    my ($final_mode, $final_mtime) = (stat $temp)[2, 9];
+
+    my $fn = "$temp\0.invalid";
+    my $fno = bless \(my $fn2 = "$temp\0.overload"), "OverloadTest";
+    is(open(I, $fn), undef, "open with nul in pathnames since 5.18 [perl #117265]");
+    like($WARN, qr/^Invalid \\0 character in pathname for open: $temp_match\\0\.invalid/,
+         "warn on embedded nul"); $WARN = '';
+    is(open(I, $fno), undef, "open with nul in pathnames since 5.18 [perl #117265] (overload)");
+    like($WARN, qr/^Invalid \\0 character in pathname for open: $temp_match\\0\.overload/,
+         "warn on embedded nul"); $WARN = '';
+
+    is(chmod(0444, $fn), 0, "chmod fails with \\0 in name");
+    like($WARN, qr/^Invalid \\0 character in pathname for chmod: $temp_match\\0\.invalid/,
+         "also on chmod"); $WARN = '';
+
+    is(chmod(0444, $fno), 0, "chmod fails with \\0 in name (overload)");
+    like($WARN, qr/^Invalid \\0 character in pathname for chmod: $temp_match\\0\.overload/,
+         "also on chmod"); $WARN = '';
+
+    is (glob($fn), undef, "glob fails with \\0 in name");
+    like($WARN, qr/^Invalid \\0 character in pattern for glob: $temp_match\\0\.invalid/,
+         "also on glob"); $WARN = '';
+
+    is (glob($fno), undef, "glob fails with \\0 in name (overload)");
+    like($WARN, qr/^Invalid \\0 character in pattern for glob: $temp_match\\0\.overload/,
+         "also on glob"); $WARN = '';
+
+    {
+        no warnings 'syscalls';
+        $WARN = '';
+        is(open(I, $fn), undef, "open with nul with no warnings syscalls");
+        is($WARN, '', "ignore warning on embedded nul with no warnings syscalls");
+    }
+
+    SKIP: {
+        if (is_miniperl && !eval 'require Errno') {
+            skip "Errno not built yet", 8;
+        }
+        require Errno;
+        import Errno 'ENOENT';
+        # check handling of multiple arguments, which the original patch
+        # mis-handled
+        $! = 0;
+        is (unlink($fn, $fn), 0, "check multiple arguments to unlink");
+        is($!+0, &ENOENT, "check errno");
+        $! = 0;
+        is (chmod(0644, $fn, $fn), 0, "check multiple arguments to chmod");
+        is($!+0, &ENOENT, "check errno");
+        $! = 0;
+        is (utime(time, time, $fn, $fn), 0, "check multiple arguments to utime");
+        is($!+0, &ENOENT, "check errno");
+        SKIP: {
+            skip "no chown", 2 unless $Config{d_chown};
+            $! = 0;
+            is(chown(-1, -1, $fn, $fn), 0, "check multiple arguments to chown");
+            is($!+0, &ENOENT, "check errno");
+        }
+    }
+
+    is (unlink($fn), 0, "unlink fails with \\0 in name");
+    like($WARN, qr/^Invalid \\0 character in pathname for unlink: $temp_match\\0\.invalid/,
+         "also on unlink"); $WARN = '';
+
+    is (unlink($fno), 0, "unlink fails with \\0 in name (overload)");
+    like($WARN, qr/^Invalid \\0 character in pathname for unlink: $temp_match\\0\.overload/,
+         "also on unlink"); $WARN = '';
+
+    ok(-f $temp, "nothing removed the temp file");
+    is((stat $temp)[2], $final_mode, "nothing changed its mode");
+    is((stat $temp)[9], $final_mtime, "nothing changes its mtime");
+}
+
+# [perl #125115] Dup to closed filehandle creates file named GLOB(0x...)
+{
+    ok(open(my $fh, "<", "TEST"), "open a handle");
+    ok(close $fh, "and close it again");
+    ok(!open(my $fh2,  ">&", $fh), "should fail to dup the closed handle");
+    # clean up if we failed
+    unlink "$fh";
+}
+
+package OverloadTest;
+use overload '""' => sub { ${$_[0]} };

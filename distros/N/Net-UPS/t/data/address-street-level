@@ -1,0 +1,24 @@
+POST https://wwwcie.ups.com/ups.app/xml/XAV
+
+<?xml version='1.0' standalone='yes'?>
+<AddressValidationRequest>
+  <AddressKeyFormat>
+    <AddressLine>233 W 49th St</AddressLine>
+    <BuildingName>Pearl Hotel</BuildingName>
+    <ConsigneeName>John Doe</ConsigneeName>
+    <CountryCode>US</CountryCode>
+    <PoliticalDivision1>NY</PoliticalDivision1>
+    <PoliticalDivision2>New York</PoliticalDivision2>
+    <PostcodePrimaryLow>10019</PostcodePrimaryLow>
+  </AddressKeyFormat>
+  <Request>
+    <RequestAction>XAV</RequestAction>
+    <RequestOption>3</RequestOption>
+    <TransactionReference>
+      <CustomerContext>Net::UPS</CustomerContext>
+      <XpciVersion>1.0001</XpciVersion>
+    </TransactionReference>
+  </Request>
+</AddressValidationRequest>
+
+<?xml version="1.0"?><AddressValidationResponse><Response><TransactionReference><CustomerContext>Net::UPS</CustomerContext><XpciVersion>1.0001</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><ValidAddressIndicator/><AddressClassification><Code>1</Code><Description>Commercial</Description></AddressClassification><AddressKeyFormat><AddressClassification><Code>1</Code><Description>Commercial</Description></AddressClassification><AddressLine>233 W 49TH ST</AddressLine><Region>NEW YORK NY 10019-7404</Region><PoliticalDivision2>NEW YORK</PoliticalDivision2><PoliticalDivision1>NY</PoliticalDivision1><PostcodePrimaryLow>10019</PostcodePrimaryLow><PostcodeExtendedLow>7404</PostcodeExtendedLow><CountryCode>US</CountryCode></AddressKeyFormat></AddressValidationResponse>

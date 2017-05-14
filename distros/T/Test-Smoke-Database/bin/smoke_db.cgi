@@ -2,8 +2,8 @@
 #
 # cgi interface for database build with module Test::Smoke::Database
 # Copyright 200x A.Barbet alian@alianwebserver.com.  All rights reserved.
-# $Date: 2003/08/19 10:37:24 $
-# $Revision: 1.6 $
+# $Date: 2004/04/14 22:34:37 $
+# $Revision: 1.7 $
 #
 
 use CGI qw/:standard -no_xhtml/;
@@ -62,5 +62,6 @@ sub main {
     elsif (param("failure")) { print h2("Failures"),$$fail,"\n"; }
     else { print $$summary,"\n";}
   }
-  print end_html;
+  print hr,"Done with Test::Smoke::Database $Test::Smoke::Database::VERSION",
+    end_html;
 }

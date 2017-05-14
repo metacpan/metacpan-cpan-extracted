@@ -1,6 +1,8 @@
-README
-MANIFEST
 Changes
+MANIFEST
 Makefile.PL
+README
 RewritingProxy.pm
-
+eg/README
+eg/ChefProxy.pm
+eg/SpellingProxy.pm

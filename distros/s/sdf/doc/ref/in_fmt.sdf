@@ -1,0 +1,43 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: File Formats
+
+H2: Overview
+
+The file formats used are summarised below.
+
+!block table; tags="FMT"
+Name      Purpose
+INI       defines initialisation data
+SDG       defines formatting rules for {{CMD:sdfget}}
+TBL       defines a table
+!endblock
+
+Further details on these are provided below.
+
+Note: {{sdm}}, {{sds}} and {{sdn}} files are normal [[SDF]] files used for
+normal modules, style modules and tuning modules respectively.
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!block topics
+Topic
+fmt_ini
+fmt_sdg
+fmt_tbl
+!endblock
+!off paragraph h2top

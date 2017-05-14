@@ -1,5 +1,13 @@
 Revision history for Business-OnlinePayment-PaymenTech
 
+2.07    Thu May 11 11:30:16 PDT 2017
+        - update URLs from paymentech.net to chasepaymentech.com
+
+2.06    unreleased
+        - throw a fatal exception on non-decline problems, per B:OP
+          notes_for_module_writers_v3
+        - failure_status support
+
 2.05    Mon Jan 14 19:07:14 PST 2013
         - pass AVScountryCode
 

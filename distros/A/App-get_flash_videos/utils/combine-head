@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+#
+# get_flash_videos -- download all the Flash videos off a web page
+#
+#   http://code.google.com/p/get-flash-videos/
+#
+# Copyright 2009, zakflash and MonsieurVideo
+#
+# This file includes various perl modules, see their original source for their
+# copyright and license terms.
+
+use HTTP::Cookies ();
+use HTTP::Config ();
+use HTTP::Request::Common ();
+use LWP::Protocol::http ();
+use XML::Simple ();
+use WWW::Mechanize::Link ();
+
+1;

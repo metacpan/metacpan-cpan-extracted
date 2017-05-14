@@ -1,0 +1,80 @@
+NAME
+    Colloquy::Bot::Simple - Simple robot interface for Colloquy
+
+SYNOPSIS
+     use Colloquy::Bot::Simple qw(daemonize);
+      
+ # Create a connection
+     my $talker = Colloquy::Bot::Simple->new(
+              host => '127.0.0.1',
+              port => 1236,
+              username => 'MyBot',
+              password => 'topsecret',
+         );
+     
+ # Daemonize in to the background
+     daemonize("/tmp/MyBot.pid","quiet");
+     
+ # Execute callback on speech and "alarm" every 60 seconds
+     $talker->listenLoop(\&event_callback, 60);
+
+     # Tidy up and finish
+     $talker->quit();
+     exit;
+     
+ sub event_callback {
+         my $talker = shift;
+         my $event = @_ % 2 ? { alarm => 1 } : { @_ };
+     
+     if (exists $event->{alarm}) {
+             print "Callback called as ALARM interrupt handler\n";
+             # ... go check an RSS feed for new news items to inform
+             #     your users about or something else nice maybe ...?
+     
+     } elsif (lc($event->{command}) eq 'hello') {
+             $talker->whisper(
+                     (exists $event->{list} ? $event->{list} : $event->{person}),
+                     "Hi there $event->{person}"
+                 );
+     
+     } elsif ($event->{msgtype} eq 'TELL') {
+             $talker->whisper($event->{person}, 'Pardon?');
+         }
+     
+     # Return boolean false to continue the listenLoop
+         return 0;
+     }
+
+DESCRIPTION
+    A very simple robot interface to connect and interact with a Colloquy
+    talker, based upon Chatbot::TalkerBot.
+
+METHODS
+  new
+  daemonize
+  listenLoop
+  say
+  whisper
+  quit
+TODO
+    Write some decent POD.
+
+SEE ALSO
+    Chatbot::TalkerBot, Parse::Colloquy::Bot, Bundle::Colloquy::BotBot2
+
+VERSION
+    $Id: Simple.pm 518 2006-05-29 11:32:23Z nicolaw $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+COPYRIGHT
+    Copyright 2006 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

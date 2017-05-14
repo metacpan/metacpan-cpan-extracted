@@ -1,0 +1,65 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: note Filter
+
+H2: Interface
+
+!filter_interface "note"
+
+H2: Description
+
+The {{note}} filter is used to specify a note.
+The {{label}} parameter can be used to specify a label.
+The default label is "Note:".
+
+H2: Examples
+
+!block example
+!block note; label='Example:'
+And some text inside
+
+a multi-line note
+!endblock
+!endblock
+
+The result is:
+
+!block note; label='Example:'
+And some text inside
+
+a multi-line note
+!endblock
+
+If you want the label to have a line to itself,
+leave the first line blank like this:
+
+!block example
+!block note
+
+And some more text inside
+
+another multi-line note
+!endblock
+!endblock
+
+The result is:
+
+!block note
+
+And some more text inside
+
+another multi-line note
+!endblock
+
+#H2: Limitations & Future Directions

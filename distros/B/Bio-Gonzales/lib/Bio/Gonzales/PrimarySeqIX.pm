@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Bio::Gonzales::Tools::SeqMask;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 sub Bio::PrimarySeqI::clone {
     my ($self) = @_;

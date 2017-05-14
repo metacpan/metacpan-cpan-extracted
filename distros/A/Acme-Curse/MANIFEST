@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Acme/Curse.pm
+MANIFEST			This list of files
+t/01-pod.t
+t/02-pod-coverage.t
+t/basic.t
+Makefile.PL
+README
+META.yml

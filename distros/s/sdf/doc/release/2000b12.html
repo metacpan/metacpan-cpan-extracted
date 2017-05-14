@@ -1,0 +1,205 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta12</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000.html">Previous Topic</A> | <A HREF="2000b11.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>3. 2.000beta12</H1>
+<P ALIGN="Left"><A HREF="#2.000beta12 - Enhancements">Enhancements</A> | <A HREF="#2.000beta12 - Fixes">Fixes</A> | <A HREF="#2.000beta12 - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000beta12 - Enhancements">3.1. Enhancements</A></H2>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <EM>sdf2...</EM> wrapper scripts are no longer provided - use the -2 option of the <A HREF="../ref/sdf.html">sdf</A> command instead.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>The major enhancements are:</P>
+<UL>
+<A HREF="2000b12.html#Output format naming rationalisation">Output format naming rationalisation</A>
+<BR>
+<A HREF="2000b12.html#Automatic figure format conversion">Automatic figure format conversion</A>
+<BR>
+<A HREF="2000b12.html#Better HTML customisation and documentation">Better HTML customisation and documentation</A>
+<BR>
+<A HREF="2000b12.html#New output formats">New output formats</A>
+<BR>
+<A HREF="2000b12.html#Locales">Locales</A>
+<BR>
+<A HREF="2000b12.html#Template processing">Template processing</A>
+<BR>
+<A HREF="2000b12.html#Paragraph text is now the default output">Paragraph text is now the default output</A>
+<BR>
+<A HREF="2000b12.html#Post filtering">Post filtering</A></UL>
+<P>The minor enhancements are:</P>
+<UL>
+<LI>when include files and figures are searched for, the directory containing the document is now searched after the current directory
+<LI>a Perl document catalog is now included (<TT>perl/catalog.sdf</TT>)
+<LI>generation of non-MIF outputs is now slightly faster.</UL>
+<P>Further details on the major enhancements are provided below.</P>
+<H3><A NAME="Output format naming rationalisation">3.1.1. Output format naming rationalisation</A></H3>
+<P>As SDF occasionally provides several ways to generate an output:</P>
+<UL>
+<LI>a convention has been introduced for output format names (i.e. the parameter to the -2 option)
+<LI>a mapping table has been added to <TT>sdf.ini</TT> so that sites can customise the mapping from logical format names to actual format names.</UL>
+<P>As a result, it is now easy to change <TT>sdf.ini</TT> so that PostScript generation (i.e. <EM>-2ps</EM>) is via POD format rather than via FrameMaker, say. Furthermore, regardless of the default setup for PostScript generation:</P>
+<UL>
+<LI>PostScript via FrameMaker can be explicitly requested via <EM>-2ps_fm</EM>, and
+<LI>PostScript via POD can be explicitly requested via <EM>-2ps_pod</EM>.</UL>
+<P>Generally speaking, a name of <EM>xxx_yyy</EM> means format <EM>xxx</EM> via <EM>yyy</EM>. Likewise, a name of <EM>xxx_</EM> means format <EM>xxx</EM> directly.</P>
+<H3><A NAME="Automatic figure format conversion">3.1.2. Automatic figure format conversion</A></H3>
+<P>As requested (many years ago, in fact), SDF will now automatically convert figure formats for you if it needs to. In particular, if you have a <EM>prn</EM> file on the search path, <A HREF="../ref/sdf.html">sdf</A> will convert it to <EM>gif</EM> for HTML and <EM>eps</EM> for PostScript. Likewise, if you have an <EM>eps</EM> for PostScript, sdf will convert this to <EM>gif</EM> when you generate HTML.</P>
+<P>Creating a <EM>prn</EM> file as a easy as printing to a PostScript file from most Windows apps including MS-Office and Rational Rose. As a result, figure management should no longer be the hassle its been in the past.</P>
+<P>The conversion rules are stored in <TT>bin/sdf.ini</TT>. Feel free to have a look and/or forward me any additions/enhancements to the rules. One of the rules uses a new program supplied in SDF called <CMD>prn2ps</CMD>. This new command makes the output from a Windows 95/NT &quot;print PostScript to a file&quot; command acceptable to Ghostscript's <CMD>ps2epsi</CMD>.</P>
+<H3><A NAME="Better HTML customisation and documentation">3.1.3. Better HTML customisation and documentation</A></H3>
+<P>A large number of HTML customisation features already existed, but were poorly documented. The new customisation features in this release are:</P>
+<UL>
+<LI>HTML_PRE_HEADER/HTML_POST_FOOTER support
+<LI>HTML_TEXT_* support
+<LI>HTML_SECTION_LEVEL/HTML_PRE_SECTION support.</UL>
+<P>See the new tutorial titled <A HREF="../genhtml/index.html">Generating HTML Using SDF</A> for details.</P>
+<H3><A NAME="New output formats">3.1.4. New output formats</A></H3>
+<P>SDF can now be converted to SGML like this:</P>
+<PRE>
+  sdf -2sgml mydoc.sdf
+</PRE>
+<P>By default, the <EM>linuxdoc</EM> DTD is used. Alternatively, the SGML_DTD variable can be used to change the DTD to <EM>qwertz</EM>, say, like this:</P>
+<PRE>
+  !define SGML_DTD &quot;qwertz&quot;
+</PRE>
+<P>If <EM>SGML-Tools</EM> 1.02 or later is installed, you can also generate the formats given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Command</STRONG>
+</TD>
+<TD>
+<STRONG>Output format</STRONG>
+</TD>
+<TD>
+<STRONG>Via</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+sdf -2latex_sgml
+</TD>
+<TD>
+LaTeX
+</TD>
+<TD>
+SGML-Tools
+</TD>
+</TR>
+<TR>
+<TD>
+sdf -2dvi_sgml
+</TD>
+<TD>
+DVI
+</TD>
+<TD>
+SGML-Tools and LaTeX
+</TD>
+</TR>
+<TR>
+<TD>
+sdf -2ps_sgml
+</TD>
+<TD>
+PostScript
+</TD>
+<TD>
+SGML-Tools and LaTeX
+</TD>
+</TR>
+<TR>
+<TD>
+sdf -2rtf_sgml
+</TD>
+<TD>
+RTF
+</TD>
+<TD>
+SGML-Tools
+</TD>
+</TR>
+<TR>
+<TD>
+sdf -2info_sgml
+</TD>
+<TD>
+GNU info
+</TD>
+<TD>
+SGML-Tools
+</TD>
+</TR>
+<TR>
+<TD>
+sdf -2lyx_sgml
+</TD>
+<TD>
+LyX
+</TD>
+<TD>
+SGML-Tools
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Locales">3.1.5. Locales</A></H3>
+<P>SDF now has better support for non-English languages via locales. The -L option of the <A HREF="../ref/sdf.html">sdf</A> command can be used to specify a locale. The default locale name is specified in <TT>sdf.ini</TT>. Locale naming follows POSIX conventions (i.e. language_country), so the locale name for American english is <EM>en_us</EM>. The information for each locale is stored in the <TT>locale</TT> directory, so you'll need to have to look in there to see what locales are available. (As the default locale can be set in <TT>sdf.ini</TT>, this isn't as ugly as it first sounds.)</P>
+<P>At the moment, a locale file simply contains a list of language specific strings, although it should ultimately be extended to support localisation of date and time formats. Feel free to send me new locales so I can include them in future versions of SDF.</P>
+<H3><A NAME="Template processing">3.1.6. Template processing</A></H3>
+<P>SDF can now also be used as a generic template processor, i.e. you can create C source, say, with ! macros and [[..]] expressions within it and use <A HREF="../ref/sdf.html">sdf</A> to process it. For example, if you have a file called <TT>xx.sdt</TT> like this:</P>
+<PRE>
+    !if DATE
+        &lt;P&gt;
+        The date is [[DATE:DOC_START]].
+    !else
+        &lt;P&gt;
+        The time is [[TIME:DOC_START]].
+    !endif
+</PRE>
+<P>you can process it like this:</P>
+<PRE>
+  sdf xx.sdt | less
+  sdf -DDATE xx.sdt | less
+</PRE>
+<P>If the file doesn't have a <EM>sdt</EM> extension, you need to specify template processing like this:</P>
+<PRE>
+  sdf -ptemplate myskel.cpp | less
+</PRE>
+<H3><A NAME="Paragraph text is now the default output">3.1.7. Paragraph text is now the default output</A></H3>
+<P>If you run the <A HREF="../ref/sdf.html">sdf</A> program on a file without giving a target, the text of each paragraph is output. Therefore, you can now do things like:</P>
+<P>sdf mydoc.sdf | spell -b</P>
+<H3><A NAME="Post filtering">3.1.8. Post filtering</A></H3>
+<P>It is now possible to post filter the output of a format driver before the results are written to disk. The -y option of the <A HREF="../ref/sdf.html">sdf</A> command can now be used to specify a post filter name. A post filter called <EM>xxx</EM> maps to a routine called <EM>xxx_PostFilter</EM> in the file <TT>perllib/sdf/post_xxx.pl</TT>.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>This feature is only useful for SDF developers who want to create a new output format which is very simliar to an existing one.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="2.000beta12 - Fixes">3.2. Fixes</A></H2>
+<P>Heading numbering in HTML and text outputs should be fixed now.</P>
+<P>The file and line number in messages should generally be right now. Certain filters may still lead to incorrect line numbers being reported, but messages containing '$fullname', line number 0 or -1 should no longer appear.</P>
+<P>Man page generation now works again. Previously, <CMD>pod2man</CMD> fell over unless a DOC_PROJECT and DOC_RELEASE was defined.</P>
+<P>MIMS HTX and F6 Help formats should be working correctly now. The MIMS_CLIENT_CODE variable must now be specified on the command line when generating MIMS F6 help.</P>
+<P>The APIs for SDF's Perl libraries are now present again in the <A HREF="../guru/gg_sdf.html">SDF Guru Guide</A>.</P>
+<HR>
+<H2><A NAME="2.000beta12 - Incompatibilities">3.3. Incompatibilities</A></H2>
+<P>The <EM>sdf2...</EM> wrapper scripts are no longer provided - use the -2 option of the <A HREF="../ref/sdf.html">sdf</A> command instead.</P>
+<P>Given the rationalisation of output format naming, some of the previously used names (e.g. fmrtf, sgmllatex) have been changed. If the <A HREF="../ref/sdf.html">sdf</A> command complains about an unknown alias, have a look in <TT>sdf.ini</TT> to see what the new name is.</P>
+<P>The interface to <EM>FindFile</EM>, a subroutine which some users override to integrate SDF into their CM system, has changed. See the <EM>FindFile</EM> documentation for details.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000.html">Previous Topic</A> | <A HREF="2000b11.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

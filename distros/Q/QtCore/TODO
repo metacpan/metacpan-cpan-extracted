@@ -1,0 +1,5 @@
+- perl QtSvg, QtXml, QtOpenGL
+- port to win (ActiveState+mingw)
+- perl/KDE4
+- Support QtDesigner
+- Rewrite all examples from Qt4 doc

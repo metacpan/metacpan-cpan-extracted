@@ -1,0 +1,24 @@
+---
+abstract: 'Rewrite your code to use Ref::Util'
+author:
+  - 'Sawyer X'
+build_requires:
+  Test::More: '0.92'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ref-Util-Rewriter
+requires:
+  Exporter: '0'
+  List::Util: '0'
+  PPI: '0'
+  Safe::Isa: '0'
+resources:
+  bugtracker: https://github.com/xsawyerx/ref-util-rewriter/issues
+  repository: git://github.com/xsawyerx/ref-util-rewriter.git
+version: '0.003'

@@ -1,0 +1,11 @@
+ChangeLog
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Log/Dispatch/MongoDB.pm
+t/000-load.t
+t/001-basic.t
+weaver.ini

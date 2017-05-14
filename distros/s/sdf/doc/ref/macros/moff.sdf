@@ -1,0 +1,38 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: off Macro
+
+H2: Interface
+
+!macro_interface "off"
+
+H2: Description
+
+The {{off}} macro disables an event.
+
+# Topics mode doesn't currently handle cross-document section jumps
+# so we need to explicitly specify the jump. :-(
+!if $var{'HTML_TOPICS_MODE'} || $var{'HTML_SUBTOPICS_MODE'}
+See {{A[jump=$var{'SDF_ROOT'}.'user/in_event.html'] Event Processing}}
+in the {{DOC:SDF User Guide}} for further details.
+!else
+See {{SECT[doc='SDF User Guide'] Event Processing}}
+in the {{DOC:SDF User Guide}} for further details.
+!endif
+
+H2: Examples
+
+To be completed ...
+
+#H2: Limitations & Future Directions

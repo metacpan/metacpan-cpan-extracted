@@ -37,11 +37,13 @@ You may have to re-read this entire section a few times...
 =head3 Unicode
 
 B<Unicode> is a character set with room for lots of characters. The ordinal
-value of a character is called a B<code point>. 
+value of a character is called a B<code point>.   (But in practice, the
+distinction between code point and character is blurred, so the terms often
+are used interchangeably.)
 
-There are many, many code points, but computers work with bytes, and a byte can
-have only 256 values. Unicode has many more characters, so you need a method
-to make these accessible.
+There are many, many code points, but computers work with bytes, and a byte has
+room for only 256 values.  Unicode has many more characters than that,
+so you need a method to make these accessible.
 
 Unicode is encoded using several competing encodings, of which UTF-8 is the
 most used. In a Unicode encoding, multiple subsequent bytes can be used to
@@ -54,8 +56,8 @@ the same thing, but they're not. There are more Unicode encodings, but much of
 the world has standardized on UTF-8. 
 
 UTF-8 treats the first 128 codepoints, 0..127, the same as ASCII. They take
-only one byte per character. All other characters are encoded as two or more
-(up to six) bytes using a complex scheme. Fortunately, Perl handles this for
+only one byte per character. All other characters are encoded as two to
+four bytes using a complex scheme. Fortunately, Perl handles this for
 us, so we don't have to worry about this.
 
 =head3 Text strings (character strings)
@@ -63,9 +65,6 @@ us, so we don't have to worry about this.
 B<Text strings>, or B<character strings> are made of characters. Bytes are
 irrelevant here, and so are encodings. Each character is just that: the
 character.
-
-Text strings are also called B<Unicode strings>, because in Perl, every text
-string is a Unicode string.
 
 On a text string, you would do things like:
 
@@ -180,7 +179,8 @@ data.)
 
 =head1 Q and A (or FAQ)
 
-After reading this document, you ought to read L<perlunifaq> too. 
+After reading this document, you ought to read L<perlunifaq> too, then
+L<perluniintro>.
 
 =head1 ACKNOWLEDGEMENTS
 

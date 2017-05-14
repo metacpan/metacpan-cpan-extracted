@@ -1,10 +1,10 @@
 {
-   "abstract" : "Declarative stored procedure <-> object mappings for",
+   "abstract" : "Declarative stored procedure <-> object mappings for the PGObject Framework",
    "author" : [
       "Chris Travers <chris.travers@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "bsd"
    ],
@@ -37,5 +37,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.00.001"
+   "version" : "v1.00.002"
 }

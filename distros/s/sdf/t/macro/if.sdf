@@ -1,0 +1,80 @@
+# This file tests conditional text
+
+# Test the if section
+!define CITY 'Brisbane'
+!if &Var("CITY") eq 'Brisbane'
+Monday's weather will be fine and hot
+with an afternoon thunderstorm.
+!else
+No information for Monday.
+!endif
+
+# Test the else section
+!define CITY 'Sydney'
+!if &Var("CITY") eq 'Brisbane'
+Tuesday's weather will be fine and hot
+with an afternoon thunderstorm.
+!else
+No information for Tuesday.
+!endif
+
+# Test the elsif section
+!define CITY 'Sydney'
+!if &Var("CITY") eq 'Brisbane'
+Wednesday's weather will be fine and hot
+with an afternoon thunderstorm.
+!elsif &Var("CITY") eq 'Sydney'
+Sydney will be fine on Wednesday.
+!else
+No information for Wednesday.
+!endif
+
+# Test the if section when an elsif is present
+!define CITY 'Brisbane'
+!if &Var("CITY") eq 'Brisbane'
+Thursday's weather will be fine and hot
+with an afternoon thunderstorm.
+!elsif &Var("CITY") eq 'Sydney'
+Sydney will be fine on Thursday.
+!else
+No information for Thursday.
+!endif
+
+# Test the else section when an elsif is present
+!define CITY 'Melbourne'
+!if &Var("CITY") eq 'Brisbane'
+Friday's weather will be fine and hot
+with an afternoon thunderstorm.
+!elsif &Var("CITY") eq 'Sydney'
+Sydney will be fine on Friday.
+!else
+No information for Friday.
+!endif
+
+# Test nested stuff - if inside an if
+!define abc
+!define xyz
+!if  abc
+Inside abc.
+!if xyz
+Inside xyz
+!else
+Else part of xyz.
+!endif
+!else
+Else part of abc.
+!endif
+
+# Test nested stuff - else inside an if
+!define abc
+!define xyz 0
+!if  abc
+Inside abc.
+!if xyz
+Inside xyz
+!else
+Else part of xyz.
+!endif
+!else
+Else part of abc.
+!endif

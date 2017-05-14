@@ -1,0 +1,31 @@
+/* XPM */
+static char * button_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"20 20 5 1",
+/* colors */
+"  s None c None",
+". c #FCFEFC",
+"X c #040204",
+"o c #C4C2C4",
+"O c #848284",
+/* pixels */
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"    ............X   ",
+"    .ooooooooooOX   ",
+"    .ooooooooooOX   ",
+"    .ooooooooooOX   ",
+"    .ooooooooooOX   ",
+"    .ooooooooooOX   ",
+"    .OOOOOOOOOOOX   ",
+"    XXXXXXXXXXXXX   ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    "};

@@ -1,0 +1,125 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: example Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fend.html">Previous Topic</A> | <A HREF="ffront.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.14. example Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>example</STRONG>[; parameters]
+  ...
+  !endblock
+</PRE>
+<P>The parameters are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+skipheader
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+lang
+</TD>
+<TD>
+string
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+wide
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+listitem
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+pure
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>example</EM> filter is used to specify a section of fixed-width text. Unlike the <A HREF="../ref/fverbati.html">verbatim</A> filter, embedded SDF symbols (like {{) are relevant.</P>
+<P>The <EM>skipheader</EM> parameter is useful when an external file is being included as an example, but you do not want the header comment in the example. The <EM>lang</EM> parameter, if any, is used to determine the commenting conventions. If no language is specified, comments are assumed to start with a # and be terminated by the end of line.</P>
+<P>The <EM>lang</EM> parameter can be used to pretty-print programming languages. In practice, this means:</P>
+<UL>
+<LI>comments are output in italics
+<LI>keywords are output in bold.</UL>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <A HREF="../ref/flangdef.html">langdefs</A> filter is used to configure the information the pretty-printing feature needs to know. A large number of languages are predefined in the <TT>stdlib/langdefs.sdm</TT> file.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>The <EM>wide</EM> parameter can be used to ensure that at least 80 characters are output on a line before it is wrapped.</P>
+<P>The <EM>listitem</EM> parameter can be used to specify that this block of text is part of a list. The value is the logical indent of the list (e.g. 1, 2, etc.).</P>
+<P>The <EM>pure</EM> parameter can be used to escape special SDF symbols (like {{) embedded within the text.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<PRE>
+
+<I># Include myfile.c but exclude the copyright, revision history, etc.</I>
+<B>!include</B> <TT>&quot;myfile.c&quot;</TT>; example; skipheader; lang=<TT>'c'</TT>
+
+<I># Pretty-print the same file</I>
+<B>!include</B> <TT>&quot;myfile.c&quot;</TT>; example; wide; lang=<TT>'c'</TT>
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fend.html">Previous Topic</A> | <A HREF="ffront.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

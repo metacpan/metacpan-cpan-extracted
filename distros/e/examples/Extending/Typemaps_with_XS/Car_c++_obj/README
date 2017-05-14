@@ -1,0 +1,5 @@
+To build
+
+perl Makefile.PL
+make CC=CC
+make test

@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+package Bio::VertRes::Config::Main::VirusRnaSeqExpression;
+
+# ABSTRACT: Create config scripts to map and run the rna seq expression pipeline
+# PODNAME: virus_rna_seq_expression
+
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+use Bio::VertRes::Config::CommandLine::VirusRnaSeqExpression;
+
+Bio::VertRes::Config::CommandLine::VirusRnaSeqExpression->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+virus_rna_seq_expression - Create config scripts to map and run the rna seq expression pipeline
+
+=head1 VERSION
+
+version 1.133090
+
+=head1 SYNOPSIS
+
+Create config scripts to map and run the rna seq expression pipeline
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

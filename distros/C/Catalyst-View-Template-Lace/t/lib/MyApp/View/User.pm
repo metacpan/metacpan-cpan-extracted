@@ -24,6 +24,7 @@ sub template {q[
         <dt>Motto</dt>
         <dd id='motto'>MOTTO</dd>
       </dl>
+      <catalyst-response action='/snips/display' at='body' />
     </body>
   </html>
 ]}

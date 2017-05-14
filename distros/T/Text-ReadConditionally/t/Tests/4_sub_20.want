@@ -1,0 +1,12 @@
+Line 1
+After sub1 def
+Sub1 line 1
+After calling sub1
+Sub2 line 1
+va = va 1
+Sub3 line 1
+sub3 va = va 1
+sub3 va = va 2
+sub3 va = va 3
+va = va 1
+EOF

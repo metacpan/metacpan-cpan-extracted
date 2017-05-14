@@ -1,0 +1,38 @@
+#!/usr/local/bin/perl -w
+# $Id: table.export,v 1.3 1997/05/05 21:44:55 rik Exp $
+
+BEGIN { unshift(@INC, "../blib", "./blib"); }
+
+use Net::NISPlus::Table;
+use Data::Dumper;
+
+my($map) = shift;
+my($filename) = shift;
+
+if ($filename)
+{
+  open(DUMP, ">$filename") || die "can't open $filename\n";
+  select DUMP;
+};
+$me = Net::NISPlus::Table->new($map);
+$info = $me->info();
+$create = [$info->{owner}, $info->{group}, $info->{flags},
+  $info->{access}, $info->{ta_type}, ord($info->{ta_sep}),
+  $info->{ta_path}, []];
+foreach $col ($[..$#{@{$info->{'ta_cols'}}})
+{
+  push(@{$create->[$#{@{$create}}]}, [$info->{ta_cols}->[$col], 
+    $info->{'ta_cols_flags'}->{$info->{'ta_cols'}->[$col]},
+    $info->{'ta_cols_rights'}->{$info->{'ta_cols'}->[$col]}]);
+}
+print Data::Dumper->Dump([$info, $create],
+  ['info', 'create']);
+$arr = [];
+foreach $ent ($me->list(1))
+{
+  push(@{$arr}, $ent->info());
+# table is no use exported
+  delete $arr->[$#{@$arr}]->{'table'};
+}
+print Data::Dumper->Dump([$arr], ['entinfo']);
+print Data::Dumper->Dump([[$me->list()]], ['entries']);

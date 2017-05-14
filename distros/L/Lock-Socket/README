@@ -1,0 +1,4 @@
+Lock::Module
+------------
+
+This is a Perl module for inter-process locking using sockets.

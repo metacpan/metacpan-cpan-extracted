@@ -1,0 +1,34 @@
+WWW-CMS version 0.86
+=======================
+
+WWW-CMS is an OOP-based, drop-in templating / CMS system for CGI,
+mod_perl, or FCGI applications.
+Developers are encouraged to submit ideas and/or patches to
+shellshark at shellshark dot net.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  strict
+  warnings
+  POSIX
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Bryce Porter
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

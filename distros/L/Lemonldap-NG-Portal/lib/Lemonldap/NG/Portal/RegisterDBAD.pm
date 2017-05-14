@@ -14,7 +14,7 @@ use Unicode::String qw(utf8);
 # Insert new user
 # @result Lemonldap::NG::Portal constant
 sub createUser {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     my $name =
       ucfirst $self->{registerInfo}->{firstname} . " "
@@ -50,7 +50,7 @@ sub createUser {
 # Search if login is already in use
 # @result 0 if login is used, 1 else
 sub isLoginUsed {
-    my ( $self, $login ) = splice @_;
+    my ( $self, $login ) = @_;
 
     my $mesg = $self->ldap->search(
         base   => $self->{ldapBase},

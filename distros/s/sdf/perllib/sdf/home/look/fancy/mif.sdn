@@ -1,0 +1,293 @@
+# $Id$
+#
+# >>Title::	Fancy MIF Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 15-May-98 ianc    Commented out generated list headings
+# 01-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# This template provides the mif objects required for the fancy look.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Change the base font size
+!default _BASE_SIZE 11.5
+
+# Change the default list indent (1 cm)
+!default OPT_LIST_INDENT 28.3
+
+# Inherit what we can from the simple look
+!use "look/simple/mif.sdn"
+
+################ Override the heading paragraph formats ###################
+
+!targetobject "Para"; "h2_Heading"; "b0_Body"; \
+  AcrobatLevel=4; \
+  BlockSize=3; \
+  BotSeparator="H2 Below"; \
+  FontFamily=Helvetica; \
+  FontSize="18.0 pt"; \
+  FontWeight=Bold; \
+  Leading="2.0 pt"; \
+  Placement="PageTop"; \
+  PlacementStyle=Straddle; \
+  SpAfter="8.0 pt"; \
+  SpBefore="12.0 pt"; \
+  WithNext=Yes
+
+!targetobject "Para"; "h3_Heading"; "h2_Heading"; \
+  AcrobatLevel=7; \
+  BotSeparator="H3 Below"; \
+  FontSize="16.0 pt"; \
+  Placement=Anywhere; \
+  SpAfter="10.0 pt"; \
+  SpBefore="25.0 pt"
+
+!targetobject "Para"; "h4_Heading"; "h3_Heading"; \
+  AcrobatLevel=10; \
+  BotSeparator="H4 Below"; \
+  FontSize="12.0 pt"; \
+  PlacementStyle=Normal; \
+  SpAfter="5.0 pt"; \
+  SpBefore="20.0 pt"
+
+!targetobject "Para"; "h5_Heading"; "h4_Heading"; \
+  AcrobatLevel=13; \
+  BlockSize=2; \
+  BotSeparator=""; \
+  SpAfter="8.0 pt"; \
+  SpBefore="12.0 pt"
+
+# Appendix and plain headings look the same as normal headings for levels 2 ..
+!targetobject "Para"; "a2_Appendix"; "h2_Heading"
+!targetobject "Para"; "a3_Appendix"; "h3_Heading"
+!targetobject "Para"; "a4_Appendix"; "h4_Heading"
+!targetobject "Para"; "a5_Appendix"; "h5_Heading"
+!targetobject "Para"; "p2_PlainHeading"; "h2_Heading"
+!targetobject "Para"; "p3_PlainHeading"; "h3_Heading"
+!targetobject "Para"; "p4_PlainHeading"; "h4_Heading"
+!targetobject "Para"; "p5_PlainHeading"; "h5_Heading"
+
+# NoTOC versions for headings excluding from the contents
+!targetobject "Para"; "h1_HeadingNoTOC"; "h1_Heading"; AcrobatLevel=0
+!targetobject "Para"; "h2_HeadingNoTOC"; "h2_Heading"; AcrobatLevel=0
+!targetobject "Para"; "h3_HeadingNoTOC"; "h3_Heading"; AcrobatLevel=0
+!targetobject "Para"; "h4_HeadingNoTOC"; "h4_Heading"; AcrobatLevel=0
+!targetobject "Para"; "h5_HeadingNoTOC"; "h5_Heading"; AcrobatLevel=0
+!targetobject "Para"; "a1_AppendixNoTOC"; "a1_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "a2_AppendixNoTOC"; "a2_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "a3_AppendixNoTOC"; "a3_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "a4_AppendixNoTOC"; "a4_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "a5_AppendixNoTOC"; "a5_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "p1_PlainHeadingNoTOC"; "p1_PlainHeading"; AcrobatLevel=0
+!targetobject "Para"; "p2_PlainHeadingNoTOC"; "p2_PlainHeading"; AcrobatLevel=0
+!targetobject "Para"; "p3_PlainHeadingNoTOC"; "p3_PlainHeading"; AcrobatLevel=0
+!targetobject "Para"; "p4_PlainHeadingNoTOC"; "p4_PlainHeading"; AcrobatLevel=0
+!targetobject "Para"; "h5_PlainHeadingNoTOC"; "p5_PlainHeading"; AcrobatLevel=0
+
+
+############# Override the generated list paragraph formats ################
+
+#!targetobject "Para"; "h1_HeadingTOC"; "b0_Body"; \
+#  BlockSize=1; \
+#  FIndent='0.5"'; \
+#  FontPairKern=0; \
+#  FontSize="11.5 pt"; \
+#  HyphenMinPrefix=2; \
+#  HyphenMinSuffix=2; \
+#  Hyphenate=Yes; \
+#  LIndent='0.625"'; \
+#  MaxWordSpace=125; \
+#  MinWordSpace=75; \
+#  PlacementStyle=Straddle; \
+#  RIndent='0.246"'; \
+#  SpAfter="0.0 pt"; \
+#  SpBefore="4.0 pt"; \
+#  TabStop="$var{'_TABR'}/Right/. "
+#
+#!targetobject "Para"; "h2_HeadingTOC"; "h1_HeadingTOC"; \
+#  BlockSize=2; \
+#  FIndent='0.75"'; \
+#  LIndent='0.875"'; \
+#  SpBefore="0.0 pt"
+#
+#!targetobject "Para"; "h3_HeadingTOC"; "h2_HeadingTOC"; \
+#  BlockSize=1; \
+#  FIndent='1.0"'; \
+#  LIndent='1.125"'
+#
+#!targetobject "Para"; "h4_HeadingTOC"; "h3_HeadingTOC"; \
+#  BlockSize=2; \
+#  FIndent='0.0"'; \
+#  FontPairKern=Yes; \
+#  LIndent='0.0"'; \
+#  MaxWordSpace=110; \
+#  MinWordSpace=90; \
+#  RIndent='0.0"'; \
+#  SpBefore="2.0 pt"; \
+#  TabStop="1.0in,$var{'_TABR'}/Right/. "
+#
+#!targetobject "Para"; "h5_HeadingTOC"; "h4_HeadingTOC"; \
+#  TabStop="1.25in,$var{'_TABR'}/Right/. "
+#
+#!targetobject "Para"; "a1_AppendixTOC"; "h1_HeadingTOC"
+#!targetobject "Para"; "a2_AppendixTOC"; "h2_HeadingTOC"
+#!targetobject "Para"; "a3_AppendixTOC"; "h3_HeadingTOC"
+#!targetobject "Para"; "a4_AppendixTOC"; "h4_HeadingTOC"
+#!targetobject "Para"; "a5_AppendixTOC"; "h5_HeadingTOC"
+#
+#!targetobject "Para"; "p1_PlainHeadingTOC"; "h1_HeadingTOC"
+#!targetobject "Para"; "p2_PlainHeadingTOC"; "h2_HeadingTOC"
+#!targetobject "Para"; "p3_PlainHeadingTOC"; "h3_HeadingTOC"
+#!targetobject "Para"; "p4_PlainHeadingTOC"; "h4_HeadingTOC"
+#!targetobject "Para"; "p5_PlainHeadingTOC"; "h5_HeadingTOC"
+
+################ Other paragraph formats overrides ###################
+
+!targetobject "Para"; "gh_GlossaryHeading"; "b0_Body"; \
+  FontFamily=Helvetica; \
+  FontWeight=Bold; \
+  PlacementStyle="SideheadTop"; \
+  SpAfter="8.0 pt"; \
+  SpBefore="16.0 pt"; \
+  TabStop='0.5",1.0",1.5",2.0",2.5",3.0"'; \
+  WithNext=Yes
+
+!targetobject "Para"; "gl_Glossary"; "b0_Body"; \
+  FontFamily=Helvetica; \
+  FontSize="10.0 pt"; \
+  Hyphenate=Yes; \
+  LIndent='1.5"'; \
+  SpAfter="2.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop='1.5"'
+
+
+################ Look specific paragraph formats ###################
+
+!targetobject "Para"; "LFI left footer inside"; "b0_Body"; \
+  Alignment=Right; \
+  BlockSize=1; \
+  FontFamily=Helvetica; \
+  FontPairKern=0; \
+  FontSize="7.0 pt"; \
+  HyphenMinPrefix=2; \
+  HyphenMinSuffix=2; \
+  Hyphenate=Yes; \
+  MaxWordSpace=125; \
+  MinWordSpace=75; \
+  SpAfter="0.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop='2.85453"/Center,5.70905"/Right'
+
+!targetobject "Para"; "LFO left footer outside"; "LFI left footer inside"; \
+  Alignment=Left; \
+  FontSize="10.0 pt"; \
+  FontWeight=Bold
+
+!targetobject "Para"; "LH1 left header 1"; "LFO left footer outside"; \
+  FontPairKern=Yes; \
+  FontSize="12.0 pt"; \
+  SpAfter="6.0 pt"
+
+!targetobject "Para"; "LH2 left header 2"; "LH1 left header 1"; \
+  FontSize="11.5 pt"; \
+  FontWeight=Regular; \
+  SpAfter="0.0 pt"
+
+!targetobject "Para"; "RFI right footer inside"; "LH2 left header 2"; \
+  FontPairKern=0; \
+  FontSize="7.0 pt"
+
+!targetobject "Para"; "RFO right footer outside"; "RFI right footer inside"; \
+  Alignment=Right; \
+  FontSize="10.0 pt"; \
+  FontWeight=Bold
+
+!targetobject "Para"; "RH1 right header 1"; "RFO right footer outside"; \
+  FontPairKern=Yes; \
+  FontSize="12.0 pt"; \
+  SpAfter="6.0 pt"
+
+!targetobject "Para"; "RH2 right header 2"; "RH1 right header 1"; \
+  FontSize="11.5 pt"; \
+  FontWeight=Regular; \
+  SpAfter="0.0 pt"
+
+!targetobject "Para"; "ed_EndDocument"; "b0_Body"; \
+  BotSeparator="End Section"; \
+  FIndent='1.0"'; \
+  FontFamily=Helvetica; \
+  FontSize="9.0 pt"; \
+  LIndent='1.0"'; \
+  Leading="4.0 pt"; \
+  SpBefore="0.0 pt"; \
+  WithPrev=Yes
+
+
+################ Reference page frames ###################
+
+!targetobject "Frame"; "End Section";; \
+  Width=481; \
+  Height=23; \
+  Objects=\
+'  <PolyLine \
+   <Pen 3>\
+   <Overprint No>\
+   <NumPoints 2>\
+   <Point  320.1221 pt 11.232 pt>\
+   <Point  3.4351 pt 11.232 pt>\
+  > # end of PolyLine\
+  <Polygon \
+   <Pen 0>\
+   <Overprint No>\
+   <NumPoints 6>\
+   <Point  332.6069 pt 5.3381 pt>\
+   <Point  335.4768 pt 10.309 pt>\
+   <Point  332.6069 pt 15.2805 pt>\
+   <Point  326.867 pt 15.2805 pt>\
+   <Point  323.9971 pt 10.309 pt>\
+   <Point  326.867 pt 5.3381 pt>\
+  > # end of Polygon'
+
+!targetobject "Frame"; "H2 Below";; \
+  Height=14;\
+  Pen=3; \
+  PenWidth=3.0; \
+  LineLength=DOC_FULL_WIDTH
+
+!targetobject "Frame"; "H3 Below";; \
+  Height=8;\
+  Pen=3; \
+  PenWidth=0.25; \
+  LineLength=DOC_FULL_WIDTH
+
+!targetobject "Frame"; "H4 Below";; \
+  Height=8;\
+  PenWidth=0.1; \
+  LineLength=DOC_FULL_WIDTH
+
+!targetobject "Frame"; "Note Above";; \
+  Height=17;\
+  Pen=4; \
+  PenWidth=0.5; \
+  LineY=6; \
+  LineLength=DOC_FULL_WIDTH
+
+!targetobject "Frame"; "Note Below";; \
+  Height=17;\
+  Pen=4; \
+  PenWidth=0.5; \
+  LineY=6; \
+  LineLength=DOC_FULL_WIDTH

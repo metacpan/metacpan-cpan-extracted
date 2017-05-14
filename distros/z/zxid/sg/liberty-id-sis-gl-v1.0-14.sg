@@ -1,0 +1,509 @@
+# zxid/sg/liberty-id-sis-gl-v1.0-14.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-id-sis-gl-v1.0-14.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+# N.B. The ID Geo Location Service is based on OMA Mobile Location Protocol (MLP)
+
+target(gl, urn:liberty:id-sis-gl:2005-07)
+ns(sa, urn:oasis:names:tc:SAML:2.0:assertion)
+
+#include(lib-svc-dst.xsd)
+
+ResourceID -> %di12:ResourceIDType
+EncryptedResourceID -> %di12:EncryptedResourceIDType
+
+&ResourceIDGroup: 
+  gl:ResourceID?
+  gl:EncryptedResourceID?
+  ;
+
+ChangeFormat:	 enum( ChangedElements CurrentElements ) ;
+@changeFormat:	 enum( ChangedElements CurrentElements All ) ;
+
+ItemData	 -> %gl:ItemDataType
+%ItemDataType:
+  any*
+  @id?	 -> %xs:ID
+  @itemIDRef?	 -> %xs:string  # %IDReferenceType
+  @notSorted?:	 enum( Now Never ) ;
+  @gl:changeFormat?
+  ;
+
+Query	 -> %gl:QueryType
+%QueryType:
+  &gl:ResourceIDGroup?
+  gl:Subscription*
+  gl:QueryItem*:	 base(gl:ItemSelectionType)
+    @count?	 -> %xs:nonNegativeInteger
+    @offset?	 -> %xs:nonNegativeInteger  default (0)
+    @setID?	 -> %xs:string  # %IDType
+    @setReq?:	 enum( Static DeleteSet ) ;
+    ;
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+QueryResponse	 -> %gl:QueryResponseType
+%QueryResponseType:
+  gl:Status
+  gl:Data*:
+    any*
+    @id?	 -> %xs:ID
+    @itemIDRef?	 -> %xs:string  # %IDReferenceType
+    @notSorted?: enum( Now Never ) ;
+    @gl:changeFormat?
+    @remaining?	 -> %xs:integer
+    @nextOffset? -> %xs:nonNegativeInteger  default (0)
+    @setID?	 -> %xs:string  # %IDType
+    ;
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @itemIDRef?	 -> %xs:string  # %IDReferenceType
+  @timeStamp?	 -> %xs:dateTime
+  ;
+
+Create	 -> %gl:CreateType
+%CreateType:
+  &gl:ResourceIDGroup?
+  gl:Subscription*
+  gl:CreateItem+:
+    gl:NewData?:
+      any*
+      ;
+    @id?	 -> %xs:ID
+    @itemID?	 -> %xs:string  # %IDType
+    @objectType?	 -> %xs:NCName
+    ;
+  gl:ItemSelection*
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+CreateResponse	 -> %gl:ResponseType
+
+%ResponseType:
+  gl:Status
+  gl:ItemData*
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @timeStamp?	 -> %xs:dateTime
+  @any
+  ;
+
+Delete	 -> %gl:DeleteType
+%DeleteType:
+  &gl:ResourceIDGroup?
+  gl:DeleteItem+:
+    gl:Select?	 -> %gl:SelectType
+    @id?	 -> %xs:ID
+    @itemID?	 -> %xs:string  # %IDType
+    @notChangedSince?	 -> %xs:dateTime
+    @objectType?	 -> %xs:NCName
+    @predefined?	 -> %xs:string
+    ;
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+DeleteResponse	 -> %gl:DeleteResponseType
+%DeleteResponseType:
+  gl:Status
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+Modify	 -> %gl:ModifyType
+%ModifyType:
+  &gl:ResourceIDGroup?
+  gl:Subscription*
+  gl:Modification+:
+    gl:Select?	 -> %SelectType
+    gl:NewData?:
+      any*
+      @any
+      ;
+    @id?	 -> %xs:ID
+    @itemID?	 -> %xs:string  # %IDType
+    @notChangedSince?	 -> %xs:dateTime
+    @objectType?	 -> %xs:NCName
+    @overrideAllowed?	 -> %xs:boolean  default (0)
+    ;
+  gl:ItemSelection*
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+ModifyResponse	 -> %gl:ResponseType
+
+%NotifyToType:
+  gl:SecurityMechID*	 -> %xs:anyURI
+  gl:Credential*:
+    sa:Assertion?   # Sampo
+    any*  processContents(lax)
+    @notOnOrAfter?	 -> %xs:dateTime
+    ;
+  gl:Endpoint?	 -> %xs:anyURI
+  @id?	 -> %xs:ID
+  ;
+
+Subscription:
+  gl:ItemSelection*
+  gl:RefItem*:
+    @subscriptionID?	 -> %xs:string  # %IDType
+    @ItemIDRef	 -> %xs:string  # %IDReferenceType
+    ;
+  gl:NotifyTo?	 -> %gl:NotifyToType
+  gl:NotifyAdminTo?	 -> %gl:NotifyToType
+  gl:Aggregation?	 -> %gl:AggregationType
+  gl:Trigger?	 -> %gl:TriggerType
+  gl:Extension*
+  @starts?	 -> %xs:dateTime
+  @expires?	 -> %xs:dateTime
+  @id?	 -> %xs:ID
+  @subscriptionID	 -> %xs:string  # %IDType
+  @includeData?:	 enum( Yes No YesWithCommonAttributes ) ;
+  @any
+  ;
+
+Notify	 -> %gl:NotifyType
+%NotifyType:
+  gl:Notification*
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @timeStamp?	 -> %xs:dateTime
+  @any
+  ;
+
+NotifyResponse	 -> %gl:NotifyResponseType
+%NotifyResponseType:
+  gl:Status
+  gl:Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+Notification:
+  gl:ItemData*
+  @id?	 -> %xs:ID
+  @subscriptionID	 -> %xs:string  # %IDType
+  @expires?	 -> %xs:dateTime
+  @endReason?	 -> %xs:anyURI
+  ;
+
+#include(lib-svc-dst-dt.xsd)
+
+@id	 -> %xs:string  # %IDType
+@modificationTime	 -> %xs:dateTime
+&@commonAttributes: 
+  @gl:id?
+  @gl:modificationTime?
+  ;
+@ACC	 -> %xs:anyURI
+@ACCTime	 -> %xs:dateTime
+@modifier	 -> %xs:string     #%md:entityIDType
+&@leafAttributes: 
+  &@gl:commonAttributes
+  @gl:ACC?
+  @gl:ACCTime?
+  @gl:modifier?
+  ;
+@script	 -> %xs:anyURI
+&@localizedLeafAttributes: 
+  &@leafAttributes
+  @xml:lang
+  @gl:script?
+  ;
+@refreshOnOrAfter	 -> %xs:dateTime
+@destroyOnOrAfter	 -> %xs:dateTime
+%DSTLocalizedString:	 base(xs:string)
+  &@gl:localizedLeafAttributes
+  ;
+%DSTString:	 base(xs:string)
+  &@gl:leafAttributes
+  ;
+%DSTInteger:	 base(xs:integer)
+  &@gl:leafAttributes
+  ;
+%DSTURI:	 base(xs:anyURI)
+  &@gl:leafAttributes
+  ;
+%DSTDate:	 base(xs:date)
+  &@gl:leafAttributes
+  ;
+%DSTMonthDay:	 base(xs:gMonthDay)
+  &@gl:leafAttributes
+  ;
+
+### Geo Location Service
+
+%SortType:	 base(xs:EmptyType) ;
+%TypeType:	 base(xs:EmptyType) ;
+%SelectType:
+  gl:AreaComparison*:
+    gl:CivilData*
+    gl:shape*
+    gl:Extension*
+    @itemID?	 -> %xs:string  # %IDType
+    @returnLocation?	 -> %xs:boolean  default (false)
+    ;
+  gl:eqop?:
+    gl:resp_req?:
+      @type? -> %xs:string  default (DELAY_TOL)
+      ;
+    gl:ll_acc?	 -> %xs:float
+    gl:hor_acc?	 -> %xs:float
+    gl:alt_acc?
+    gl:max_loc_age?	 -> %xs:integer
+    gl:Extension?
+    ;
+  gl:geoinfo?:
+    gl:CoordinateReferenceSystem?:
+      gl:Identifier:
+        gl:code	 -> %xs:string
+        gl:codeSpace	 -> %xs:string
+        gl:edition	 -> %xs:string
+        ;
+      ;
+    gl:CivilData?
+    gl:shape?
+    gl:speed?
+    gl:alt?
+    gl:direction?
+    gl:Heading?
+    gl:Extension?
+    ;
+  gl:loc_type?:
+    @type?	 -> %xs:string  default (CURRENT)
+    ;
+  gl:prio?:
+    @type?	 -> %xs:string  default (NORMAL)
+    ;
+  gl:Extension?
+  ;
+
+%ComparisonResultType:	 enum( true false unknown ) ;
+
+ComparisonResult:	 base(gl:ComparisonResultType)
+  @ItemIDRef?	 -> %xs:string  # %IDReferenceType
+  ;
+
+%TriggerType:
+  gl:Granularity?	 -> %xs:positiveInteger
+  gl:Interval?	 -> %xs:duration
+  gl:ms_action?:
+    @type	 -> %xs:string
+    ;
+  gl:ChangeArea*:
+    gl:CivilData*
+    gl:shape*
+    gl:Extension* 
+    @event	 -> %xs:string
+    ;
+  gl:Extension?
+  ;
+
+TriggerReason	 -> %xs:string
+
+pd:
+  gl:time?	 -> %xs:dateTime
+  gl:CivilData?
+  gl:shape?
+  gl:alt
+  gl:alt_acc?
+  gl:speed?
+  gl:direction?
+  gl:Heading?
+  gl:lev_conf?	 -> %xs:float
+  gl:Extension?
+  @gl:ACC?
+  ;
+
+shape:
+  gl:Point?
+  gl:LineString?
+  gl:Polygon?
+  gl:Box?
+  gl:CircularArea?
+  gl:CircularArcArea?
+  gl:EllipticalArea?
+  gl:GeometryCollection?
+  gl:MultiLineString?
+  gl:MultiPoint?
+  gl:MultiPolygon?
+  gl:Extension?
+  ;
+
+Box:
+  gl:coord+
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+CircularArcArea:
+  gl:coord
+  gl:inRadius
+  gl:outRadius
+  gl:startAngle
+  gl:stopAngle
+  gl:angularUnit?
+  gl:distanceUnit?
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+CircularArea:
+  gl:coord
+  gl:radius
+  gl:distanceUnit?
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+EllipticalArea:
+  gl:coord
+  gl:angle
+  gl:semiMajor
+  gl:semiMinor
+  gl:angularUnit
+  gl:distanceUnit?
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+GeometryCollection:
+  gl:shape+
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+LineString:
+  gl:coord+
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+LinearRing:
+  gl:coord{3,unbounded}
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+MultiLineString:
+  gl:LineString+
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+MultiPoint:
+  gl:Point+
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+MultiPolygon:
+  gl:Polygon?
+  gl:Box?
+  gl:CircularArea?
+  gl:CircularArcArea?
+  gl:EllipticalArea?
+  @gid?	 -> %xs:ID
+  @srsName? -> %xs:string
+  ;
+
+Point:
+  gl:coord
+  @gid?	 -> %xs:ID
+  @srsName? -> %xs:string
+  ;
+
+Polygon:
+  gl:outerBoundaryIs
+  gl:innerBoundaryIs*
+  @gid?	 -> %xs:ID
+  @srsName?	 -> %xs:string
+  ;
+
+X	 -> %xs:string
+Y	 -> %xs:string
+Z	 -> %xs:string
+angle	 -> %xs:string
+angularUnit	 -> %xs:string
+
+coord:
+  gl:X
+  gl:Y?
+  gl:Z?
+  ;
+
+distanceUnit	 -> %xs:string
+inRadius	 -> %xs:string
+
+innerBoundaryIs:
+  gl:LinearRing
+  ;
+
+outRadius	 -> %xs:string
+
+outerBoundaryIs:
+  gl:LinearRing
+  ;
+
+radius	 -> %xs:string
+semiMajor	 -> %xs:string
+semiMinor	 -> %xs:string
+startAngle	 -> %xs:string
+stopAngle	 -> %xs:string
+alt	 -> %xs:float
+alt_acc	 -> %xs:float
+speed	 -> %xs:float
+direction	 -> %xs:float
+Heading	 -> %xs:float
+
+CivilData	 -> %gl:CivilDataType
+%CivilDataType:
+  gl:PostalAddress?	 -> %xs:string
+  gl:LPostalAddress*	 -> %gl:LocalizedString
+  gl:PostalCode?	 -> %xs:string
+  gl:L?	 -> %xs:string
+  gl:LL*	 -> %gl:LocalizedString
+  gl:St?	 -> %xs:string
+  gl:LSt*	 -> %gl:LocalizedString
+  gl:C?	 -> %xs:string
+  gl:MNC?	 -> %xs:string
+  gl:Extension?
+  ;
+
+%LocalizedString:	 base(xs:string)
+  @xml:lang
+  @gl:script?
+  ;
+
+esrd:	 base(xs:string)
+  @type? -> %xs:string
+  ;
+
+esrk:	 base(xs:string)
+  @type? -> %xs:string
+  ;
+
+ItemSelection -> %gl:ItemSelectionType
+%ItemSelectionType: base(gl:SelectType) ;
+
+Status      -> %gl:StatusType
+%StatusType:
+  gl:Status*
+  @code     -> %xs:string
+  @ref?     -> %xs:string  # gl:IDReferenceType
+  @comment? -> %xs:string
+  ;
+
+Extension:
+  any*
+  @any?
+  ;
+
+#EOF

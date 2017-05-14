@@ -1,0 +1,14 @@
+Revision history for Perl extension FB::Statify.
+
+0.01  Thu Feb 19 16:43:10 2015
+	- Module launched
+		
+0.02  Thu Feb 19 16:43:10 2015
+	- POD description fix
+
+1.03  Thu Feb 19 16:43:10 2015
+	- Tests restruct
+	-Rename "FB::Statify => Facebook::Statify"
+
+1.04 
+	-Rename back "Facebook::Statify => FB::Statify" due to ownership permissions.

@@ -1,0 +1,9 @@
+[Term]
+id: MP:0000554
+name: abnormal carpal bone morphology
+def: "any structural anomaly of the nine nodular bones of the joint between the forelimb bones and the front paws/hands consisting of the scapholunar, triangular, greater multiangular, lesser multiangular, capitate, hamate, centrale and the sesamoids" [Anatomy of the Rat:Greene EC_Hafner Publishing Co_1935, Stedman's Medical Dictionary_27th edition:ISBN 0-683-40008-8]
+comment: Note that the bony structure of the human and rodent carpals are different.
+synonym: "abnormal carpal bone" EXACT []
+synonym: "abnormal carpus" EXACT []
+synonym: "abnormal wrist" EXACT []
+is_a: MP:0002115 ! abnormal skeleton extremities morphology

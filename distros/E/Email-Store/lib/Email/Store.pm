@@ -6,7 +6,7 @@ require Email::Store::DBI;
 use UNIVERSAL::require;
 use vars qw(%only $VERSION);
 
-$VERSION = '0.24';
+$VERSION = '0.257';
 
 sub import { 
     shift; 
@@ -15,12 +15,19 @@ sub import {
     my %args   = ( search_path => [ "Email::Store" ] );
 
     if ( defined $_[0] && ref($_[0]) eq 'HASH' ) {
-            my $opts = shift;
-            if (exists $opts->{'only'}) {
-                $only{"Email::Store::$_"} = 1 for @{$opts->{'only'}};
-                $args{'only'} = [ keys %only ];                
-            }
-    } 
+      my $opts = shift;
+      for my $arg (qw(only except)) {
+        my %arg_plugin;
+        if (exists $opts->{$arg}) {
+          for my $name (@{$opts->{$arg}}) {
+            $name = "Email::Store::$name" unless $name =~ /::/;
+            $arg_plugin{$name} = 1
+          }
+          $args{$arg} = [ keys %arg_plugin ];
+          %only = %arg_plugin if $arg eq 'only';
+        }
+      }
+    }
 
     require Module::Pluggable::Ordered;
     Module::Pluggable::Ordered->import(%args);

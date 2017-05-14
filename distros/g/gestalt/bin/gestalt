@@ -1,0 +1,342 @@
+#!/usr/bin/perl
+
+# TODO: (in priority order)
+
+# Also, see if a top-level Makefile.PL can be built so that the user can have
+# the option of using 'perl Makefile.PL' or ./configure
+
+# Should make it run against MySQL too, although I'm not sure how many of the
+# constructs are accessible through the DBI. I know you cannot get comments,
+# but you might/might not be able to get at foreign keys/constraints.
+# The user can always fill these in by hand, or they can just use a "propper"
+# database.
+
+# Could probably make the generation of Makefile.am files a bit nicer
+# Its a bit of a mess but its OK for now.
+
+use Template;
+use DBI;
+use DB::Table;
+
+# Used in debugging
+use Carp qw(cluck);
+use Data::Dumper;
+
+use Getopt::Long;
+use strict;
+
+my ($database, $host, $username, $password, $help, $appName, $emailAddress);
+my ($templatePath, $outputPath, @buildComponents, $build, $overwrite);
+
+# some defaults
+$appName      = 'mySpiffyApp';
+$emailAddress = 'bradley-cpan@kitefamily.co.uk';
+$host         = '127.0.0.1';
+$templatePath = '@PREFIX@/share/gestalt';
+
+GetOptions('database=s'      => \$database,
+           'host=s'          => \$host,
+           'username=s'      => \$username,
+           'password=s'      => \$password,
+           'help'            => \$help,
+           'app-name=s'      => \$appName,
+           'email-address=s' => \$emailAddress,
+           'template-path=s' => \$templatePath,
+           'output-path=s'   => \$outputPath,
+           'generate=s'      => \@buildComponents,
+           'overwrite'       => \$overwrite);
+
+foreach my $c (@buildComponents)
+{
+    if ($c ne 'controller' && $c ne 'model' && $c ne 'view' && $c ne 'build')
+    {
+        $help = 1;
+    }
+    $build->{$c} = 1;
+}
+
+# Default to build everything.
+unless ($build->{'controller'} || $build->{'model'} || $build->{'view'} || $build->{'build'})
+{
+    $build->{'controller'} = 1;
+    $build->{'model'}      = 1;
+    $build->{'view'}       = 1;
+    $build->{'build'}      = 1;
+}
+
+$outputPath ||= $appName || 'output';
+
+if (defined ($help) || !defined ($database))
+{
+    print <<"EOF";
+Usage:
+
+$0 --database <db_name> --username <username> --password <password>
+  [ --app-name <name> ] [ --email-address <addr> ]
+  [ --template-path <path> ] [ --output-path <path> ]
+  [ --generate controller|model|view|build ] [--generate controller|model|view|build]
+  [ --overwrite ]
+
+This application is designed to connect to the database specified, and based on the
+schema found there-in, will generate a model, controller, view, and the build-files
+which represent the schema within the database.
+
+By default, the controller, model, view and build files are all generated, however,
+you may use the --generate option to restrict which components are generated, eg:
+
+    $0 [other options] --generate controller --generate model
+
+will only generate the controller and model components.
+
+Existing files will not be overwritten unless the --overwrite parameter is set.
+
+Other options: --help        This screen
+
+EOF
+
+    exit 1;
+}
+
+my $dbh = DBI->connect("dbi:Pg:dbname=$database;host=$host", $username, $password) || die "Could not connect to database: " . $DBI::errstr;
+
+my $tableSth = $dbh->table_info(undef, undef, undef, "TABLE");
+
+my @tables;
+while (my $t = $tableSth->fetchrow_hashref)
+{
+    if ($t->{'TABLE_TYPE'} eq 'TABLE' && $t->{'TABLE_SCHEM'} eq 'public')
+    {
+        push @tables, DB::Table->_init($dbh, $t->{'TABLE_NAME'});
+    }
+}
+
+system("mkdir -p $outputPath/DB/Table");
+system("mkdir -p $outputPath/DB/Table/Row");
+system("mkdir -p $outputPath/Apache/Request/Controller");
+
+my $template = new Template({INCLUDE_PATH => $templatePath});
+
+print "Processing Templates...\n";
+
+if ($build->{'build'})
+{
+    processTemplate('Makefile.PL', {moduleName => 'DB'},              'DB/Makefile.PL');
+    processTemplate('Makefile.PL', {moduleName => 'DB::Table'},       'DB/Table/Makefile.PL');
+    processTemplate('Makefile.PL', {moduleName => 'DB::Table::Row'},  'DB/Table/Row/Makefile.PL');
+    processTemplate('Makefile.PL', {moduleName => 'Apache'},          'Apache/Makefile.PL');
+    processTemplate('Makefile.PL', {moduleName => 'Apache::Request'}, 'Apache/Request/Makefile.PL');
+    processTemplate('Makefile.PL', {moduleName => 'Apache::Request::Controller'},
+                    'Apache/Request/Controller/Makefile.PL');
+}
+
+if ($build->{'view'})
+{
+    system("mkdir -p $outputPath/templates");
+    if ($overwrite)
+    {
+        system("cp -R -i --reply=yes $templatePath/templates/*.tt2 $outputPath/templates/");
+    }
+    else
+    {
+        system("cp -R -i --reply=no $templatePath/templates/*.tt2 $outputPath/templates/");
+    }
+
+    system("mkdir -p $outputPath/html");
+    if ($overwrite)
+    {
+        system("cp -R -i --reply=yes $templatePath/html/* $outputPath/html/");
+    }
+    elsif (-d "$outputPath/html")
+    {
+        system("cp -R -i --reply=no $templatePath/html/* $outputPath/html/");
+    }
+}
+
+my @tableNames;
+foreach my $table (@tables)
+{
+    my $moduleName = ucfirst(lc($table->{'tableName'}));
+    $table->{'moduleName'} = $moduleName;
+    my $text = Dumper($table);
+    $text =~ s/\$VAR1\s+\=\s*//g;
+
+    system("mkdir -p $outputPath/DB/Table/$moduleName"); 
+    system("mkdir -p $outputPath/DB/Table/Row/$moduleName"); 
+    system("mkdir -p $outputPath/Apache/Request/Controller/$moduleName");
+
+    if ($build->{'build'})
+    {
+        processTemplate('Makefile.PL', {moduleName => "DB::Table::$moduleName"},
+                        "DB/Table/$moduleName/Makefile.PL");
+        processTemplate('Makefile.PL', {moduleName => "DB::Table::Row::$moduleName"},
+                        "DB/Table/Row/$moduleName/Makefile.PL");
+        processTemplate('Makefile.PL', {moduleName => "Apache::Request::Controller::$moduleName"},
+                        "Apache/Request/Controller/$moduleName/Makefile.PL");
+        processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                        EMAIL     => "$emailAddress",
+                                        tableName => $moduleName,
+                                        ROW       => 1},
+                        "DB/Table/Row/$moduleName/Makefile.am");
+        processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                        EMAIL     => "$emailAddress",
+                                        tableName => $moduleName,
+                                        TABLE     => 1},
+                        "DB/Table/$moduleName/Makefile.am");
+        processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                        EMAIL     => "$emailAddress",
+                                        tableName => $moduleName,
+                                        CONTROLLER => 1},
+                        "Apache/Request/Controller/$moduleName/Makefile.am");
+        processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                        EMAIL     => "$emailAddress",
+                                        tableName => $moduleName,
+                                        TEMPLATE  => 1},
+                        "templates/$moduleName/Makefile.am");
+    }
+
+    if ($build->{'model'})
+    {
+        processTemplate('Table.pm', {DATA => $text, TABLE => $table},
+                        "DB/Table/$moduleName/$moduleName.pm");
+        processTemplate('Row.pm', {TABLE => $table},
+                        "DB/Table/Row/$moduleName/$moduleName.pm");
+    }
+
+    if ($build->{'controller'})
+    {
+        processTemplate('Controller.pm', {TABLE => $table},
+                        "Apache/Request/Controller/$moduleName/$moduleName.pm");
+    }
+
+    if ($build->{'view'})
+    {
+        system("mkdir -p $outputPath/templates/$moduleName");
+        foreach my $t (qw(show.tt2 list.tt2 edit.tt2 create.tt2))
+        {
+            if (-e "$outputPath/templates/$moduleName/$t" && $overwrite)
+            {
+                system("rm -f $outputPath/templates/$moduleName/$t");
+            }
+            if (!-e "$outputPath/templates/$moduleName/$t")
+            {
+                system("ln -s ../$t $outputPath/templates/$moduleName/$t");
+            }
+        }
+    }
+    push @tableNames, $moduleName;
+}
+
+if ($build->{'build'})
+{
+    processTemplate('configure.in', {APP_NAME => $appName,
+                                     EMAIL    => $emailAddress,
+                                     TABLES   => \@tableNames},
+                    'configure.in');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    TOP_LEVEL => 1},
+                    'Makefile.am');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    DB        => 1},
+                    'DB/Makefile.am');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    APACHE    => 1},
+                    'Apache/Makefile.am');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    REQUEST       => 1},
+                    'Apache/Request/Makefile.am');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    ROW       => 1,
+                                    BASE      => 1},
+                    'DB/Table/Row/Makefile.am');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    TABLE     => 1,
+                                    BASE      => 1},
+                    'DB/Table/Makefile.am');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    BASE      => 1,
+                                    CONTROLLER => 1},
+                    'Apache/Request/Controller/Makefile.am');
+
+    processTemplate('Makefile.am', {APP_NAME  => "$appName",
+                                    EMAIL     => "$emailAddress",
+                                    TABLES    => \@tableNames,
+                                    BASE      => 1,
+                                    TEMPLATE => 1},
+                    'templates/Makefile.am');
+
+    processTemplate('appConfig.cfg.in', {APP_NAME => "$appName",
+                                         EMAIL    => $emailAddress,
+                                         TABLES   => \@tableNames,
+                                         DATABASE_NAME => $database,
+                                         DATABASE_HOST => $host,
+                                         DATABASE_USERNAME => $username,
+                                         DATABASE_PASSWORD => $password},
+                    "$appName.cfg.in");
+
+    processTemplate('appSpec.in', {APP_NAME => "$appName",
+                                   EMAIL    => $emailAddress,
+                                   TABLES   => \@tableNames},
+                    "$appName.spec.in");
+
+    processTemplate('apache.conf.in', {APP_NAME => "$appName",
+                                       EMAIL    => $emailAddress,
+                                       TABLES   => \@tableNames},
+                    "$appName.apache.conf.in");
+
+    processTemplate('appStartup.pl.in', {APP_NAME => "$appName",
+                                         EMAIL    => $emailAddress,
+                                         TABLES   => \@tableNames},
+                    "$appName.pl.in");
+
+    foreach my $f (qw(NEWS README AUTHORS ChangeLog bootstrap))
+    {
+        processTemplate($f,   {APP_NAME => "$appName",
+                               EMAIL    => $emailAddress,
+                               TABLES   => \@tableNames,
+                               DATABASE_NAME => $database,
+                               DATABASE_HOST => $host,
+                               DATABASE_USERNAME => $username,
+                               DATABASE_PASSWORD => $password},
+                        $f);
+    }
+}
+
+system("chmod +x $outputPath/bootstrap");
+
+exit 0;
+
+sub processTemplate
+{
+    my $input  = shift;
+    my $data   = shift;
+    my $output = shift;
+
+    if ((-f "$outputPath/$output" && $overwrite) || (!-f "$outputPath/$output"))
+    {
+        $template->process($input, $data, "$outputPath/$output") || die $template->error;
+        print "$outputPath/$output\n";
+    }
+}
+
+

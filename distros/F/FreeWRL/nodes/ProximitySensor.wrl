@@ -1,0 +1,34 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+WorldInfo {
+	title "Test"
+	info ["VRML Model of a test", "Foo"]
+}
+DEF VP Viewpoint {
+}
+DEF TIMER TimeSensor {cycleInterval 6 startTime 0 stopTime 1 enabled TRUE loop TRUE}
+DEF COL ColorInterpolator {key [0, 0.3, 0.6, 1] keyValue [
+	1 0 0, 0 1 0, 0 0 1, 1 0 0]}
+	 
+  DEF COLUMN Shape {
+   appearance DEF CYAPP Appearance {material DEF MAT Material {diffuseColor 0.5 1 1
+	ambientIntensity 0.5 specularColor 1 1 1 }}
+   geometry DEF CYL Cylinder {radius 1.25 height 7.5 top FALSE bottom FALSE}
+  }
+
+ROUTE TIMER.fraction_changed TO COL.set_fraction
+ROUTE COL.value_changed TO MAT.diffuseColor
+ROUTE COL.value_changed TO MAT.specularColor
+
+DEF PS ProximitySensor {
+	size 20 20 20
+}
+
+ROUTE PS.enterTime TO TIMER.startTime
+ROUTE PS.exitTime TO TIMER.stopTime
+

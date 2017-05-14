@@ -2,8 +2,8 @@
 
 use Test::More 0.88;
 BEGIN {
-    if ( $] < 5.010 ) {
-        plan skip_all => 'This test requires Perl version 5.010';
+    if ( $] < 5.010000 ) {
+        plan skip_all => 'This test requires Perl version 5.010000';
     }
 }
 use Test::Code::TidyAll 0.24;

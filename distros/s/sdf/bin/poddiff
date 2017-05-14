@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl
+
+use Pod::Diff;
+use strict;
+
+my $USAGE =
+    "usage: poddiff file1 file2\n" .
+    " or    poddiff file1 ... dir\n";
+
+# Check the usage
+if (scalar(@ARGV) < 2) {
+    print $USAGE;
+    exit 1;
+}
+
+# Handle the directory case
+elsif (-d $ARGV[$#ARGV]) {
+    my $dir = pop(@ARGV);
+    my $file1;
+    my $file2;
+    my @diff;
+    for $file1 (@ARGV) {
+        $file2 = "$dir/$file1";
+        @diff = pod_diff_files($file1, $file2);
+        print "$file1: " . scalar(@diff) . " paragraphs differ\n";
+        if (@diff) {
+            print join("\n", @diff), "\n";
+        }
+    }
+}
+
+# Handle the simple case
+elsif (scalar(@ARGV) == 2) {
+    my @diff = POD::Diff::pod_diff_files(@ARGV);
+    if (@diff) {
+        print scalar(@diff) . " paragraphs differ\n";
+        print join("\n", @diff), "\n";
+    }
+}
+else {
+    print $USAGE;
+    exit 1;
+}
+
+# Print some statistics
+pod_diff_print_stats(\*STDOUT);

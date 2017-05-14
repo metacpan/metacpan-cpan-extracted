@@ -1,11 +1,13 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
+use strict;
 use Convert::Ethiopic;
 use Convert::Ethiopic::System;
-use Convert::Ethiopic::Cstocs;
 use Getopt::Std;
 
-$default_lang  = $amh;
+# use diagnostics;
+
+my $default_lang  = $amh;
 
 sub usage
 {
@@ -41,20 +43,20 @@ EOF
 
 sub print_version
 {
-	print STDERR "This is edate version $Ethiopic::VERSION.\n";
+	print STDERR "This is edate version $Convert::Ethiopic::VERSION.\n";
 }
 
 
 sub SetLC
 {
-local ($LCInfo) = $WITHUTF8;
-local (%options);
+my ($LCInfo) = $WITHUTF8;
+my (%options);
 
 	getopts ('a,hdynq?/l:', \%options);
 
 	usage if ( $options{'?'} );
 
-	local ($lang) = ( $options{l} ) 
+	my ($lang) = ( $options{l} ) 
 	              #   Assume either Tigrigna or Amharic for now.
 	              ? ( ( $options{l} =~ /ti/ ) ? $tir : $amh )
 	              : $default_lang

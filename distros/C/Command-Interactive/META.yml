@@ -1,26 +1,32 @@
 ---
-abstract: unknown
+abstract: 'handles interactive (and non-interactive) process invocation'
 author:
-  - 'binary.com <perl@binary.com>'
+  - 'binary.com <BINARY@cpan.org>'
 build_requires:
-  Test::Exception: 0
-  Test::NoWarnings: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::NoWarnings: '0'
+  perl: '5.014000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Command-Interactive
-no_index:
-  directory:
-    - t
-    - inc
 requires:
-  Expect: 0
-  List::Util: 1.33
-  Moose: 0
-  perl: 5.006
+  Expect: '0'
+  Moose: '0'
+  perl: '5.014000'
 resources:
-  repository: https://github.com/binary-com/perl-command-interactive.git
-version: 1.4
+  bugtracker: https://github.com/binary-com/perl-command-interactive/issues
+  repository: git://github.com/binary-com/perl-command-interactive.git
+version: '1.21'
+x_serialization_backend: 'YAML::Tiny version 1.69'

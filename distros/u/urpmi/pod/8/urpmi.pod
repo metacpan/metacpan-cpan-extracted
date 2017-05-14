@@ -55,9 +55,27 @@ example when the ftp archive changes) use C<urpmi.update>.
 
 =over
 
-=item B<--help>
+=item B<-h>, B<-?>, B<--help>
 
-Prints a help message and exit (this is the same as B<-h> or B<-?>).
+Prints a help message and exit.
+
+=item B<--force>
+
+Assume yes on all questions.
+
+=item B<-q>, B<--quiet>
+
+Quiet mode: when calling rpm no upgrade status is printed.
+
+=item B<-v>, B<--verbose>
+
+Proposes a verbose mode with various messages.
+
+=back
+
+=head2 Media Selection
+
+=over
 
 =item B<--media> I<media1,...,mediaN>
 
@@ -92,9 +110,19 @@ Use the specified synthesis file instead of the urpmi database for
 searching packages and resolving dependencies. This option is mostly
 designed for internal use.
 
-=item B<--auto>
+=item B<--use-distrib> I<directory>
 
-Install all required dependencies without asking.
+Configure urpmi on the fly from a distrib tree, useful to install a chroot
+with the B<--root> option. See the description of the B<--distrib> option
+in the C<urpmi.addmedia> manpage.
+
+
+
+=back
+
+=head2 Operation Modes
+
+=over
 
 =item B<--auto-select>
 
@@ -110,6 +138,90 @@ C<urpmi.update>.
 =item B<--auto-orphans>
 
 Remove all orphans without asking (see also C<urpme --auto-orphans>)
+
+
+=back
+
+=head2 Package Selection
+
+=over
+
+=item B<--auto>
+
+Install all required dependencies without asking.
+
+
+=item B<-y>, B<--fuzzy>
+
+Disable fast search on exact package name; that means that urpmi will
+propose all packages matching part of the name, even if one of them
+matches exactly the specified name.
+
+=item B<--buildrequires>
+
+Select all the C<BuildRequires> of the wanted source packages.
+(You can also install the build dependencies read directly from an rpm spec file.)
+
+=item B<--install-src>
+
+Install only the source package (that is, no binary packages will be
+installed). You don't need to be root to use this option (if you have
+write access to your rpm build top directory).
+
+
+=item B<--no-recommends>
+
+With this option, urpmi will not install "recommended" packages.
+By default, urpmi will install (newly) recommended packages.
+
+=item B<--allow-recommends>
+
+With this option, urpmi will install "recommended" packages.
+This is useful if you have C<no-recommends> in urpmi.cfg.
+
+
+=item B<--strict-arch>
+
+Upgrade only packages if the newer version has the same architecture as
+the one installed. Mostly useful on machines that support several
+architectures (32 and 64 bit).
+
+=item B<-a>
+
+If multiple packages match the given substring, install them all.
+
+=item B<-p>
+
+Allow search in provides to find the package (this is the default).
+
+=item B<-P>
+
+Do not search in provides to find package (this is the opposite of B<-p>).
+
+
+=item B<--skip> I<pattern,...>
+
+You can specify a list of packages which installation should be skipped.
+You can also include patterns between //, just like in
+F</etc/urpmi/skip.list> (see urpmi.files(5)).
+
+=item B<--prefer> I<pattern,...>
+
+You can specify a list of packages which installation should be preferred
+(especially useful with B<--auto>).
+You can also include patterns between //, just like in
+F</etc/urpmi/prefer.list> (see urpmi.files(5)).
+
+=item B<--more-choices>
+
+When several packages are found, propose more choices than the default.
+
+
+=back
+
+=head2 Package Processing
+
+=over
 
 =item B<--no-md5sum>
 
@@ -148,23 +260,6 @@ Split urpmi's operation in small transactions of at
 least I<count> packages. The default is 8 and setting this value to 0 just
 disables splitting in small transactions.
 
-=item B<--fuzzy>
-
-Disable fast search on exact package name; that means that urpmi will
-propose all packages matching part of the name, even if one of them
-matches exactly the specified name (this is the same as B<-y>).
-
-=item B<--buildrequires>
-
-Select all the C<BuildRequires> of the wanted source packages. 
-(You can also install the build dependencies read directly from an rpm spec file.)
-
-=item B<--install-src>
-
-Install only the source package (that is, no binary packages will be
-installed). You don't need to be root to use this option (if you have
-write access to your rpm build top directory).
-
 =item B<--clean>
 
 Remove all packages from the cache in directory F</var/cache/urpmi/rpms>.
@@ -174,39 +269,13 @@ Remove all packages from the cache in directory F</var/cache/urpmi/rpms>.
 Do not remove any package from the cache in directory
 F</var/cache/urpmi/rpms>.
 
-=item B<--force>
-
-Assume yes on all questions.
-
-=item B<--quiet>
-
-Quiet mode: when calling rpm no upgrade status is printed.
-
-=item B<--verbose>
-
-Proposes a verbose mode with various messages.
-
-=item B<--debug>
-
-Proposes a very verbose mode.
-
-=item B<--debug-librpm>
-
-Proposes a very verbose mode (similar to rpm -vv)
-
-=item B<--no-suggests>
-
-With this option, urpmi will not install "suggested" packages. 
-By default, urpmi will install (newly) suggested packages.
-
-=item B<--allow-suggests>
-
-With this option, urpmi will install "suggested" packages. 
-This is useful if you have C<no-suggests> in urpmi.cfg.
-
 =item B<--justdb>
 
 Update only the database, not the filesystem.
+
+=item B<--downgrade>
+
+Force installing the packages even though they are already installed.
 
 =item B<--replacepkgs>
 
@@ -229,15 +298,65 @@ this case.
 When used when B<--auto>, do not suppress all questions, but still ask the
 user for medium changes (e.g. insertion of CD-ROMs).
 
-=item B<--parallel> I<alias>
 
-Activate distributed execution of urpmi to other machines (it is mandatory
-that urpmi is installed, but it is not necessary to have media defined on
-any machines). I<alias> defines which extension module is to be used by
-urpmi (currently, C<urpmi-parallel-ka-run> or C<urpmi-parallel-ssh> are
-available) and which machines should be updated. This alias is defined in
-the file F</etc/urpmi/parallel.cfg> as described in the L<urpmi.files>
-manpage.
+=item B<--download-all> I<dest-dir>
+
+By default, urpmi will download packages when they are needed. This can be 
+problematic when connection failures happen during a big upgrade. When this
+option is set, urpmi will first download all the needed packages and proceed
+to install them if it managed to download them all. You can optionally 
+specify a directory where the files should be downloaded (default is /var/cache/urpmi which could be too small to hold all the files).
+
+
+=item B<--verify-rpm>
+
+=item B<--no-verify-rpm>
+
+Activate or deactivate rpm signature checking. It's activated by default,
+and can be overridden in global configuration.
+
+=item B<--test>
+
+Test the installation of packages but do not actually install anything or
+modify the system. (That's the same as C<rpm --test>).
+
+=item B<--excludepath> I<string>
+
+Do not install files of which the
+names begin with the given I<string> (same as C<rpm --excludepath>).
+
+=item B<--excludedocs>
+
+Do not install documents files (same as C<rpm --excludedocs>).
+
+=item B<--ignorearch>
+
+Allow to install packages whose architecture does not match the
+architecture of the host. This is equivalent to C<rpm --ignorearch>.
+
+=item B<--ignoresize>
+
+Don't check file systems for sufficient disk space before installation.
+This is equivalent to C<rpm --ignoresize>.
+
+=item B<--noscripts>
+
+Don't execute the scriptlets.
+This is equivalent to C<rpm --noscripts>.
+
+=item B<--replacefiles>
+
+Ignore file conflicts.
+This is equivalent to C<rpm --replacefiles>.
+
+
+
+
+=back
+
+=head2 Database Options
+
+=over
 
 =item B<--root> I<directory>
 
@@ -251,23 +370,35 @@ system.
 Use the file system tree rooted for urpmi database and rpm install. Contrary
 to B<--root>, the urpmi configuration comes from the rooted tree.
 
-=item B<--use-distrib> I<directory>
+=item B<--nolock>
 
-Configure urpmi on the fly from a distrib tree, useful to install a chroot
-with the B<--root> option. See the description of the B<--distrib> option
-in the C<urpmi.addmedia> manpage.
+Don't lock urpmi and rpm db. This can be useful in conjunction with
+B<--root>.
 
-=item B<--download-all> I<dest-dir>
+=item B<--wait-lock>
 
-By default, urpmi will download packages when they are needed. This can be 
-problematic when connection failures happen during a big upgrade. When this
-option is set, urpmi will first download all the needed packages and proceed
-to install them if it managed to download them all. You can optionally 
-specify a directory where the files should be downloaded (default is /var/cache/urpmi which could be too small to hold all the files).
+If the urpmi or rpm db is busy, wait until it is available
+
+
+=back
+
+=head2 Download Options
+
+=over
+
+=item B<--parallel> I<alias>
+
+Activate distributed execution of urpmi to other machines (it is mandatory
+that urpmi is installed, but it is not necessary to have media defined on
+any machines). I<alias> defines which extension module is to be used by
+urpmi (currently, C<urpmi-parallel-ka-run> or C<urpmi-parallel-ssh> are
+available) and which machines should be updated. This alias is defined in
+the file F</etc/urpmi/parallel.cfg> as described in the L<urpmi.files>
+manpage.
 
 =item B<--downloader> I<program name>
 
-Use a specific program for downloading distant files via http or ftp. 
+Use a specific program for downloading distant files via http or ftp.
 By default curl is used if available, or wget instead.
 
 =item B<--curl-options> I<'options'>
@@ -307,6 +438,24 @@ Use specified user and password to use for proxy authentication.
 Specifying B<--proxy-user=ask> will cause urpmi to prompt for a username
 and a password.
 
+=back
+
+=head2 Debugging Options
+
+=over
+
+=item B<--debug>
+
+Proposes a very verbose mode.
+
+=item B<--debug-librpm>
+
+Proposes a very verbose mode (similar to rpm -vv)
+
+=item B<--deploops>
+
+Print warnings when packages cannot be ordered properly due to dependancy loops.
+
 =item B<--bug> I<directory>
 
 Create a bug report in I<directory>. You have to send a compressed archive
@@ -318,114 +467,6 @@ reproduced. See L</"BUG REPORTS"> below.
 Use a different environment directly from a bug report to replay a bug.
 The argument is the same argument given to B<--bug> option.
 
-=item B<--verify-rpm>
-
-=item B<--no-verify-rpm>
-
-Activate or deactivate rpm signature checking. It's activated by default,
-and can be overriden in global configuration.
-
-=item B<--test>
-
-Test the installation of packages but do not actually install anything or
-modify the system. (That's the same as C<rpm --test>).
-
-=item B<--excludepath> I<string>
-
-Do not install files of which the
-names begin with the given I<string> (same as C<rpm --excludepath>).
-
-=item B<--excludedocs>
-
-Do not install documents files (same as C<rpm --excludedocs>).
-
-=item B<--ignorearch>
-
-Allow to install packages whose architecture does not match the
-architecture of the host. This is equivalent to C<rpm --ignorearch>.
-
-=item B<--ignoresize>
-
-Don't check file systems for sufficient disk space before installation.
-This is equivalent to C<rpm --ignoresize>.
-
-=item B<--repackage>
-
-Save previous state of upgraded packages; in other words, save the old
-rpms (usually in F</var/spool/repackage>, but you can override this with
-an rpm macro.) This is equivalent to providing the B<--repackage> flag to
-rpm.
-
-I<Note:> if you use C<urpmi.recover> to set up a repackage policy, you
-don't need this option, because C<urpmi.recover> will globally override
-the appropriate rpm macro that enables repacking of all rpm transactions
-system-wide.
-
-=item B<--noscripts>
-
-Don't execute the scriptlets.
-This is equivalent to C<rpm --noscripts>.
-
-=item B<--replacefiles>
-
-Ignore file conflicts.
-This is equivalent to C<rpm --replacefiles>.
-
-=item B<--skip> I<pattern,...>
-
-You can specify a list of packages which installation should be skipped.
-You can also include patterns between //, just like in
-F</etc/urpmi/skip.list> (see urpmi.files(5)).
-
-=item B<--prefer> I<pattern,...>
-
-You can specify a list of packages which installation should be preferred
-(especially useful with B<--auto>).
-You can also include patterns between //, just like in
-F</etc/urpmi/prefer.list> (see urpmi.files(5)).
-
-=item B<--more-choices>
-
-When several packages are found, propose more choices than the default.
-
-=item B<--nolock>
-
-Don't lock urpmi and rpm db. This can be useful in conjunction with
-B<--root>.
-
-=item B<--wait-lock>
-
-If the urpmi or rpm db is busy, wait until it is available
-
-=item B<--strict-arch>
-
-Upgrade only packages if the newer version has the same architecture as
-the one installed. Mostly useful on machines that support several
-architectures (32 and 64 bit).
-
-=item B<-a>
-
-If multiple packages match the given substring, install them all.
-
-=item B<-p>
-
-Allow search in provides to find the package (this is the default).
-
-=item B<-P>
-
-Do not search in provides to find package (this is the opposite of B<-p>).
-
-=item B<-y>
-
-This is the same as B<--fuzzy>.
-
-=item B<-q>
-
-This is the same as B<--quiet>.
-
-=item B<-v>
-
-This is the same as B<--verbose>.
 
 =back
 
@@ -521,7 +562,7 @@ Some packages couldn't be installed or upgraded
 
 =head1 BUG REPORTS
 
-If you find a bug in urpmi please report it using the command :
+If you find a bug in urpmi please report it using the command:
 
     urpmi --bug bug_name_as_directory <other arguments>
 
@@ -538,6 +579,12 @@ be resolved. For sending the report, make a tarball of this directory and
 send it directly to the current maintainer with a description of what you
 think is wrong.
 
+=head1 CONTRIBUTING
+
+One can find the git repository / version-control repository (VCS) here:
+
+L<http://gitweb.mageia.org/software/rpm/urpmi/> .
+
 =head1 AUTHOR
 
 Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
@@ -546,7 +593,7 @@ FranE<ccedil>ois Pons, Rafael Garcia-Suarez
 =head1 SEE ALSO
 
 urpmi.addmedia(8), urpmi.update(8), urpmi.removemedia(8), urpme(8),
-urpmf(8), urpmq(8), urpmi.cfg(5), urpmi.files(5), urpmi.recover(8).
+urpmf(8), urpmq(8), urpmi.cfg(5), urpmi.files(5).
 
 =cut
 

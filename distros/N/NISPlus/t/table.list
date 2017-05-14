@@ -1,0 +1,54 @@
+#!/usr/local/bin/perl -w
+
+BEGIN { unshift(@INC, "../blib", "./blib"); }
+require Net::NISPlus::Directory;
+require Net::NISPlus::Table;
+
+$dir = Net::NISPlus::Directory->new();
+
+foreach ($dir->list())
+{
+  print $_, "\n";
+  $table = Net::NISPlus::Table->new("$_");
+  if ($table)
+  {
+    $info = $table->info();
+    print "  Table information\n";
+    foreach $a (keys %{$info})
+    {
+      if (ref($info->{$a}) eq "HASH")
+      {
+        print "    $a\n";
+        foreach $b (keys %{$info->{$a}})
+        {
+          if ($a eq "ta_cols_rights")
+          {
+            print "      $b\t$info->{$a}->{$b} (",
+              Net::NISPlus::rights2str($info->{$a}->{$b}), ")\n";
+          }
+          else
+          {
+            print "      $b\t$info->{$a}->{$b}\n";
+          }
+        }
+      }
+      else
+      {
+        if ($a eq "access")
+        {
+          print "    $a\t$info->{$a} (",
+              Net::NISPlus::rights2str($info->{$a}), ")\n";
+        }
+        else
+        {
+          print "    $a\t$info->{$a}\n";
+        }
+      }
+    }
+    print "  Table contents\n";
+    foreach ($table->list())
+    {
+      print "    ", join(":", @{$_}), "\n";
+    }
+  }
+}

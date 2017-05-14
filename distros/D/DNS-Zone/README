@@ -1,0 +1,85 @@
+DNS::Zone V0.85
+===============
+
+DNS::Zone is a collection of Perl modules which provide an
+abstraction of name service zones as well as server specific
+adaptors for concrete file representations.
+
+The modules origin is the ZoneMaster project which make heavy
+use of the module for comprehensive zone file management. Go to
+http://www.zonemaster.org for further information.
+
+
+Prerequisits
+------------
+
+As Perl is available in version 5.8.0 now and because version
+5.6.0 is already over two years old, I decided to have the
+latter one as the minimum required version. Older versions are
+no longer supported.
+
+
+Installation
+------------
+
+You install DNS::Zone as you would install any perl module library,
+by running these command:
+
+If you have CPAN.pm installed and are connected to the Internet
+
+   perl -MCPAN -e shell
+   > install DNS::Zone
+   
+or even
+
+   perl -MCPAN -e 'install DNS::Zone'
+   
+otherwise
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+Documentation
+-------------
+
+See lib/DNS/Zone.pm for an overview of the library. Documentation is 
+included in all modules. These are normally converted to manual 
+pages and installed as part of the "make install" process.  You should 
+also be able to use the 'perldoc' utility to extract and read 
+documentation from the module files directly.
+
+
+Support
+-------
+
+Feel free to send mail directly to author with your questions, comments,
+suggestions, bug reports and complaints. 
+
+
+Availability
+------------
+
+You can download DNS::Zone from CPAN at
+
+   http://www.cpan.org/authors/id/W/WO/WOLF/
+
+
+Copyright
+---------
+
+Copyright (C)2001-2003 Andy Wolf. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+Author
+------
+
+Andy Wolf <zonemaster@users.sourceforge.net>
+
+
+$Id: README,v 1.1 2003/02/02 16:30:39 awolf Exp $

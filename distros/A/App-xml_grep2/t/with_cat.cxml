@@ -1,0 +1,8 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE doc [
+<!ELEMENT doc (e1, e2)>
+<!ELEMENT e1 (#PCDATA)>
+<!ELEMENT e2 (#PCDATA)>
+<!ENTITY c PUBLIC "-//xml_grep2//Entity test//EN" "http://no_server_here.foo/with_cat.ent">
+]>
+<doc><s1>&c;</s1><s2>no ent</s2></doc>

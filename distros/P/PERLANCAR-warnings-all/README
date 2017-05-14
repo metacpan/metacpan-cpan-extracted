@@ -1,0 +1,16 @@
+SYNOPSIS
+
+     use PERLANCAR::warnings::all;
+
+    is equivalent to:
+
+     use warnings 'all';
+
+    but with less code and startup overhead.
+
+DESCRIPTION
+
+    Just an experimental module (probably silly).
+
+    Some notes: the bits depend on the perl used when building the dist.
+

@@ -369,6 +369,69 @@ CLASS METHODS
             my $record = Catmandu->importer('JSON', file => \$json)->to_array()
         }
 
+ define_importer
+
+    Configure a new named importer.
+
+        Catmandu->define_importer(books => CSV => (fields => 'title,author,publisher'));
+        Catmandu->importer(books => (file => 'mybooks.csv'))->each(sub {
+            my $book = shift;
+            say $book->{title};
+        });
+    
+        # this is equivalent to
+    
+        Catmandu->config->{importer}{books} = {
+            package => 'CSV',
+            options => {
+                fields => 'title,author,publisher',
+            },
+        }
+
+ define_exporter
+
+    Configure a new named exporter.
+
+        Catmandu->define_exporter('books', 'CSV', fix => 'capitalize(title)');
+        my $csv = Catmandu->export_to_string({title => 'nexus'}, 'books');
+    
+        # this is equivalent to
+    
+        Catmandu->config->{exporter}{books} = {
+            package => 'CSV',
+            options => {
+                fix => 'capitalize(title)',
+            },
+        }
+
+ define_store
+
+    Configure a new named store.
+
+        Catmandu->define_store(mydb => MongoDB => (database_name => 'mydb'));
+        Catmandu->store->bag('books')->get(1234);
+    
+        # this is equivalent to
+    
+        Catmandu->config->{store}{mydb} = {
+            package => 'MongoDB',
+            options => {
+                database_name => 'mydb',
+            },
+        }
+
+ define_fixer
+
+    Configure a new named fixer.
+
+        Catmandu->define_fixer('cleanup', [
+            'trim(title)',
+            'capitalize(title)',
+            'remove_field(junk)',
+            # ...
+        ]);
+        Catmandu->fixer('cleanup')->fix($record);
+
 EXPORTS
 
     config
@@ -511,6 +574,20 @@ CONTRIBUTORS
     Dave Sherohman, dave.sherohman at ub.lu.se
 
     Jakob Voss, nichtich at cpan.org
+
+    Snorri Briem, snorri.briem at ub.lu.se
+
+    Johann Rolschewski, jorol at cpan.org
+
+    Pieter De Praetere, pieter.de.praetere at helptux.be
+
+    Doug Bell
+
+    Upsana, me at upasana.me
+
+    Stefan Weil
+
+    Tom Hukins
 
 QUESTIONS, ISSUES & BUG REPORTS
 

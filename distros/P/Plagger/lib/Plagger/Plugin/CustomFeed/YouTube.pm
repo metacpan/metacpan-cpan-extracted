@@ -5,6 +5,8 @@ use base qw( Plagger::Plugin );
 
 use Plagger::Enclosure;
 use Plagger::UserAgent;
+use URI;
+use Encode;
 
 sub register {
     my($self, $context) = @_;
@@ -24,23 +26,33 @@ sub load {
 sub aggregate {
     my($self, $context, $args) = @_;
 
-    my $q = $self->conf->{query};
-    $q =~ s/\s/\+/g;
-
+    my $url  = URI->new('http://youtube.com/results');
     my $file = $self->cache->path_to('youtube_search_result.html');
+    my $query = $self->conf->{query};
 
-    $context->log( info => 'Getting YouTube search results for ' . $self->conf->{query} );
+    $query = encode('UTF-8', $query) unless $context->conf->{no_decode_utf8};
+
+    $context->log( info => 'Getting YouTube search results for ' . $query );
 
     my $ua = Plagger::UserAgent->new;
 
     my $feed = Plagger::Feed->new;
     $feed->type('youtubesearch');
-    $feed->title('YouTube Search - ' . $self->conf->{query});
+    $feed->title("YouTube Search - $query");
 
     my $page = $self->conf->{page} || 1;
     my $sort = $self->conf->{sort} || 'video_date_uploaded';
+
     for ( 1 .. $page ){
-        my $res = $ua->mirror("http://youtube.com/results?search_type=search_videos&search_query=$q&search_sort=$sort&search_category=0&page=$_" => $file);
+        $url->query_form(
+            search_type     => 'search_videos',
+            search_query    => $query,
+            search_sort     => $sort,
+            search_category => 0,
+            page            => $_,
+        );
+
+        my $res = $ua->mirror( $url->as_string => $file );
 
         if($res->is_error){
             $context->log( error => $res->status );
@@ -55,7 +67,7 @@ sub aggregate {
             # get title
             m!<div class="vtitle">!
                 and $title_flag = 1;
-            m!<a href="/watch\?v=([^"]+)">(.+)</a>!
+            m!<a href="/watch\?v=([^"]+)"[^>]+>(.+)</a>!
                 and do {
                     if($title_flag){
                         $data->{title} = $2;
@@ -63,23 +75,31 @@ sub aggregate {
                         $title_flag = 0;
                     }
                 };
-            m!<img src="(http://[\w-]*static\d+(.[\w-]+)?\.youtube.com/[^">]+/[12].jpg)" class="vimg120" />!
+            # get image url
+            m!<img src="(http://[\w-]*static\d+(.[\w-]+)?\.youtube.com/[^">]+/[12].jpg)" border="0" class="vimg120" />!
                 and $data->{image}->{url} = $1;
+            # get description
             m!<div class="vdesc">!
-                and $data->{description} = <$fh>;
+                and do {
+                    <$fh>;
+                    $data->{description} = <$fh>;
+                };
+            # get tags
             m!<div class="vtagLabel">Tags:</div>!
                 and $tag_flag = 1;
-            m!(<a href="/results\?search_type=.*)!
+            m!(<a href="/results\?search_query=.*)!
                 and do {
                     if($tag_flag){
                         $data->{tags} = $1;
                         $tag_flag = 0;
                     }
                 };
-            m!profile\?user=([^"]+)!
+            # get author
+            m!From:</span> <a href="/user/[^>]+">([^<]+)</a>!
+                and $data->{author} = $1;
+            m/<!-- end vEntry -->/
                 and do {
                     $context->log( info => 'Got ' . $data->{title});
-                    $data->{author} = $1;
                     my $entry = Plagger::Entry->new;
                     $entry->title($data->{title});
                     $entry->link('http://youtube.com/watch?v=' . $data->{id});
@@ -93,7 +113,7 @@ sub aggregate {
                     $entry->author($data->{author});
 
                     # tags
-                    while( $data->{tags} =~ /<a href="\/results\?search_type=[^"]+" class="dg">([^<]+)<\/a>/gms){
+                    while( $data->{tags} =~ /<a href="\/results\?search_query=[^"]+" class="dg">([^<]+)<\/a>/gms){
                         $entry->add_tag($1);
                     }
 
@@ -116,7 +136,6 @@ sub aggregate {
 
                     if ($video_url) {
                         my $video_id = ( $video_url =~ /video_id=(\w+)/ )[0];
-
                         my $enclosure = Plagger::Enclosure->new;
                         $enclosure->url( URI->new($video_url) );
                         $enclosure->type('video/x-flv');
@@ -162,7 +181,7 @@ Specify search query.
 
 =item sort
 
-Set sort condition. Available condisions are below. Default is video_date_uploaded.
+Set sort condition. Available conditions are below. Default is video_date_uploaded.
 
   relevance
   video_date_uploaded

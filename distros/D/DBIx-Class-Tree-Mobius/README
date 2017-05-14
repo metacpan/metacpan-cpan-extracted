@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-Tree-Mobius,
+version 0.212:
+
+  Manage trees of data using the Möbius encoding (nested intervals with continued fraction)
+
+This software is copyright (c) 2011 by Valentin D Guillois.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -5,7 +5,10 @@ about pod in pod/perlpod.pod or the short summary in the INSTALL file.
 
 =head1 NAME
 
-README.BS2000 - building and installing Perl for BS2000.
+perlbs2000 - building and installing Perl for BS2000.
+
+B<This document needs to be updated, but we don't know what it should say.
+Please email comments to L<perlbug@perl.org|mailto:perlbug@perl.org>.>
 
 =head1 SYNOPSIS
 
@@ -206,7 +209,7 @@ Perl, that it should use the native IO layer:
 
 Now your IO would be ASCII on ASCII partitions and EBCDIC on EBCDIC
 partitions.  See the documentation of PerlIO (without C<Encode::>!)
-for further posibilities.
+for further possibilities.
 
 =head1 AUTHORS
 
@@ -218,13 +221,13 @@ L<INSTALL>, L<perlport>.
 
 =head2 Mailing list
 
-If you are interested in the VM/ESA, z/OS (formerly known as OS/390)
+If you are interested in the z/OS (formerly known as OS/390)
 and POSIX-BC (BS2000) ports of Perl then see the perl-mvs mailing list.
 To subscribe, send an empty message to perl-mvs-subscribe@perl.org.
 
 See also:
 
-    http://lists.perl.org/showlist.cgi?name=perl-mvs
+    http://lists.perl.org/list/perl-mvs.html
 
 There are web archives of the mailing list at:
 

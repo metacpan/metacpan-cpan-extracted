@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         perlec
+version:      0.08
+version_from: perlec.h
+installdirs:  site
+author:       YAMASHINA Hio <hio@cpan.org>
+abstract: perl easy call interface
+license: perl
+#requires:
+#build_requires:
+no_index:
+  directory:
+    - t
+
+distribution_type: module
+generated_by: scratch
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html

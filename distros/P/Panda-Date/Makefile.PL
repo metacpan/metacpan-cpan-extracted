@@ -7,12 +7,12 @@ write_makefile(
     ABSTRACT_FROM => 'lib/Panda/Date.pod',
     PREREQ_PM     => {
         'Panda::Export' => 0,
-        'Panda::Time'   => '3.1.0', # refactored interface
+        'Panda::Time'   => '3.1.2',
     },
     SRC           => 'src',
     INC           => '-Isrc',
     TYPEMAPS      => 'typemap',
-    BIN_DEPS      => ['Panda::Time', 'Panda::Lib'],
+    BIN_DEPS      => ['Panda::Time', 'CPP::panda::lib'],
     BIN_SHARE     => {
         INCLUDE  => {'src' => '/'},
         TYPEMAPS => {'typemap' => ''},

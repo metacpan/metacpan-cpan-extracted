@@ -25,6 +25,7 @@ WriteMakefile(
         'File::ShareDir::Install' => 0.11,
 		'Try::Tiny'       => 0.12,
 		'Socket::Linux'   => 0.01,
+		'File::ShareDir::Install' => 0.10,
     },
     TEST_REQUIRES => {
         'Test::File::ShareDir' => 1.001001,

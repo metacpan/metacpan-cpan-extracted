@@ -1,0 +1,11 @@
+0.9
+    - Added unit tests
+    - Bugfix for SitemapBuilder->_urls_slice
+    
+0.02
+    - Added two methods to BigSitemap.pm for complete interface compatibility with Sitemap.pm
+        - sitemap
+        - sitemap_as_xml
+        
+0.01      
+    - Initial Release

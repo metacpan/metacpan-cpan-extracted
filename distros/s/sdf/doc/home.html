@@ -1,0 +1,191 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<HEAD>
+<TITLE>SDF - The Author-friendly Markup Language</TITLE>
+<META name="description"
+content="A free documentation tool for generating HTML, PostScript,
+Windows Help, PDF, LaTeX, man pages, SGML, RTF, MIF, POD, GNU info
+and plain text, all from a single source. Minimises time and effort
+by supporting rule-based generation of hypertext, formatting,
+indexing, etc. The SDF language is easy to read, powerful and
+easy to embed in most programming languages.">
+<META name="keywords" content="word processing, desktop publishing,
+literate programming, embedded documentation, Perl, Delphi, C, C++,
+Java, FrameMaker, authoring, intranet, free software">
+
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- some whitespace at the top of the doc -->
+<P>
+
+<!-- The 95% size tries to give a reasonable right margin -->
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="95%">
+
+<TR>
+    <TD VALIGN=TOP ALIGN=RIGHT WIDTH="20%"><IMG SRC="sdfbig.gif" ALT=""></TD>
+    <!-- this empty table column gives a reasonable margin between the
+    headings and the text  -->
+    <TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+    <TD VALIGN=TOP><B>
+    <!-- The TT enclosures around _each_ line is necessary to get around
+    a bug in Mosaic, which forgets the TT directive after a BR (but only
+    inside a table).  Sigh.  -->
+    <TT><FONT SIZE=+3>S</FONT> <FONT SIZE=+2>i m p l e</FONT></TT>&nbsp;<BR>
+    <TT><FONT SIZE=+3>D</FONT> <FONT SIZE=+2>o c u m e n t</FONT></TT>&nbsp;<BR>
+    <TT><FONT SIZE=+3>F</FONT> <FONT SIZE=+2>o r m a t</FONT></TT>&nbsp;<BR>
+    </B>
+    </TD>
+    </TR>
+
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+
+<TR>
+    <TD VALIGN=TOP ALIGN=RIGHT WIDTH="20%">
+    <B><FONT SIZE=+1>What is it&nbsp;?</FONT></B></TD>
+    <TD></TD>
+    <TD COLSPAN=2>
+    SDF is a freely available documentation system designed and developed by
+    <A HREF="mailto:ianc@mincom.com">Ian Clatworthy</A>, with help from
+    many others.
+    Based on a simple, readable markup language,
+    SDF generates high quality output in multiple formats, all 
+    derived from a single document source.
+    Supported output formats include HTML, PostScript, PDF, man pages,
+    POD, LaTeX, SGML, MIMS HTX and F6 help, MIF, RTF,
+    Windows help and plain text.
+    If you want to:
+    <P><IMG SRC="sqbull.gif" ALT="*">&nbsp;
+    publish documents or reports on the Web or in multiple formats
+    <BR><IMG SRC="sqbull.gif" ALT="*">&nbsp;
+    maintain a large documentation suite using rule-based formatting and
+    hypertext generation
+    <BR><IMG SRC="sqbull.gif" ALT="*">&nbsp;
+    embed documentation in source code or pretty print source code
+    <P>
+    then SDF may be for you.
+    </TD>
+    </TR>
+
+<TR><TD>&nbsp;</TD></TR>
+
+<TR>
+    <TD VALIGN=TOP ALIGN=RIGHT WIDTH="20%">
+    <B><FONT SIZE=+1>What does it<BR>need to run&nbsp;?</FONT></B></TD>
+    <TD></TD>
+    <TD COLSPAN=2>
+    <IMG SRC="sqbull.gif" ALT="*">
+    &nbsp; <A HREF="http://www.perl.com/perl/">Perl</A> 5.003 or later.<BR>
+    <IMG SRC="sqbull.gif" ALT="*">
+    &nbsp; For generating PostScript, the freely available
+    <A HREF="http://www.oasis.leo.org/perl/scripts/textproc/pod2ps.dsc.html">pod2ps</A>
+     program or <A HREF="http://www.xs4all.nl/~cg/sgmltools/">SGML-Tools</A>
+     and LaTeX packages. Alternatively, you need
+    a word processor which can import MIF or RTF -
+    <A HREF="http://www.adobe.com">Adobe's</A>
+    <A HREF="http://www.adobe.com/prodindex/framemaker/main.html">FrameMaker</A>
+    is preferred.<BR>
+    <IMG SRC="sqbull.gif" ALT="*">
+    &nbsp; For generating PDF,
+    <A HREF="http://www.adobe.com">Adobe's</A>
+    <A HREF="http://www.adobe.com/prodindex/acrobat/">Acrobat</A>
+    is recommended.<BR>
+    <IMG SRC="sqbull.gif" ALT="*">
+    &nbsp; For generating Windows Help files, a help compiler is required.
+    </TD>
+    </TR>
+
+<TR><TD>&nbsp;</TD></TR>
+
+<TR>
+    <TD VALIGN=TOP ALIGN=RIGHT WIDTH="20%">
+    <B><FONT SIZE=+1>Where can I<BR>get it&nbsp;?</FONT></B></TD>
+    <TD></TD>
+    <TD COLSPAN=2>
+    The current version is <B>2.001beta1</B>, released 29-Oct-98.<BR>
+    You can download the latest release from
+    <A HREF="http://www.mincom.com/mtr/sdf/download.html">
+             http://www.mincom.com/mtr/sdf/download.html</A>
+    in a variety of formats.
+    <A HREF="http://www.mincom.com/mtr/sdf/templates/">SDF templates</A> are also available.
+    </TD>
+    </TR>
+
+<TR><TD>&nbsp;</TD></TR>
+
+<TR>
+    <TD VALIGN=TOP ALIGN=RIGHT WIDTH="20%">
+    <B><FONT SIZE=+1>Support&nbsp;?</FONT></B></TD>
+    <TD></TD>
+    <TD COLSPAN=2>
+    An on-line
+    <A HREF="http://www.mincom.com/mtr/sdf/bugs/index.html">bug database</A>
+    provides information on known bugs and requested enhancements.
+    Any problems with the software or the documentation can be reported to
+    the mailing list
+    <A HREF="mailto:sdf-bugs@mincom.com">sdf-bugs@mincom.com</A>.
+    For general queries, mail
+    <A HREF="mailto:sdf-users@mincom.com">sdf-users@mincom.com</A>.
+    To subscribe to either list, send a message to 
+    <A HREF="mailto:factotum@mincom.com">factotum@mincom.com</A>
+    with <I>subscribe sdf-bugs</I> or <I>subscribe sdf-users</I>
+    as the message body.
+    </TD>
+    </TR>
+
+<TR><TD>&nbsp;</TD></TR>
+
+<TR>
+    <TD VALIGN=TOP ALIGN=RIGHT WIDTH="20%">
+    <B><FONT SIZE=+1>More Info</FONT></B></TD>
+    <TD></TD>
+    <!-- Don't ask me why this should be 10% .. 30% _should_ be the right
+    value but this is _far_ too wide for Netscape .. sigh .. -->
+    <TD VALIGN=TOP WIDTH="10%">
+    <IMG SRC="sqbull.gif" ALT="*">
+    &nbsp; <A HREF="catalog.html">Document Catalog</A><BR>
+    <IMG SRC="sqbull.gif" ALT="*">
+    &nbsp; <A HREF="faq/index.html">Frequently Asked Questions</A><BR>
+    <IMG SRC="sqbull.gif" ALT="*">
+    &nbsp; <A HREF="paper/sdfintro.html">Overview Paper</A><BR>
+    </TD>
+    <TD VALIGN=TOP>
+<!--
+    <IMG SRC="sqbull.gif" ALT="*"> &nbsp;
+    <A HREF="samples/">Sample Showcase</A><BR>
+    <IMG SRC="sqbull.gif" ALT="*"> &nbsp;
+    <A HREF="resources/">Resource Center</A><BR>
+    <IMG SRC="sqbull.gif" ALT="*"> &nbsp;
+    <A HREF="news/">Latest News</A><BR>
+-->
+    <IMG SRC="sqbull.gif" ALT="*"> &nbsp;
+    <A HREF="http://www.mincom.com/mtr/sdf/samples/">Sample Showcase</A><BR>
+    <IMG SRC="sqbull.gif" ALT="*"> &nbsp;
+    <A HREF="http://www.mincom.com/mtr/sdf/resources/">Resource Center</A><BR>
+    <IMG SRC="sqbull.gif" ALT="*"> &nbsp;
+    <A HREF="http://www.mincom.com/mtr/sdf/news/">Latest News</A><BR>
+    <!-- This padding with non-breaking spaces makes the current table cell
+    a little wider, thereby fooling Mosaic (which doesn't support the WIDTH
+    attribute in TABLEs) into allocating more space for us.  If this is
+    removed, then the current cell, which contains a narrow column of text,
+    will force the table overall to appear crunched.  -->
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </TD>
+    </TR>
+
+<TR><TD>&nbsp;</TD></TR>
+
+</TABLE>
+<CENTER>
+Questions about these pages?
+Send some mail to
+<A HREF="mailto:sdf-bugs@mincom.com">sdf-bugs@mincom.com</A>.
+</CENTER>
+
+</BODY>
+
+</HTML>

@@ -1,14 +1,13 @@
 ---
 global:
+  fix_meta_yml_modules:
+    - HTTP::Request::AsCGI
   fix_module_name:
     - from: Template::Toolkit
       to:   Template
-    - from: Class::Classgen::classgen
-      to: Class::Classgen::Attribute
   fix_package_depends: []
   no_depends:
     - module: mod_perl
-    - module: IO::Compress
   skip_name_resolve_modules: []
 modules:
   - module: IO::Compress

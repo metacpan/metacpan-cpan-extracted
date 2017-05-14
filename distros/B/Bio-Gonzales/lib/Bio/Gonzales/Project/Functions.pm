@@ -9,85 +9,27 @@ use 5.010;
 use File::Spec::Functions qw/catfile/;
 use Bio::Gonzales::Project;
 use Carp;
-use Bio::Gonzales::Util::Cerial;
-use Parallel::ForkManager;
 
 use base 'Exporter';
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
-@EXPORT
-  = qw(catfile nfi analysis_version path_to analysis_path gonzlog gonzconf iof gonzc gonzl gonz_iterate gonzsys analysis_name);
+@EXPORT      = qw(catfile nfi $ANALYSIS_VERSION path_to analysis_path gonzlog gonzconf iof $GONZLOG);
 %EXPORT_TAGS = ();
 @EXPORT_OK   = qw();
 
-sub _bgp {
-  state $bgp = Bio::Gonzales::Project->new();
-}
+my $bgp = Bio::Gonzales::Project->new();
 
-sub analysis_version { _bgp->analysis_version(@_) }
-sub path_to          { _bgp->path_to(@_) }
-sub nfi              { _bgp->nfi(@_) }
-sub iof              { _bgp->conf(@_) }
-sub gonzconf         { _bgp->conf(@_) }
-sub gonzc            { _bgp->conf(@_) }
-sub analysis_path    { _bgp->analysis_path(@_) }
-sub analysis_name    { _bgp->analysis_name(@_) }
+our $ANALYSIS_VERSION = $bgp->analysis_version;
+our $GONZLOG          = $bgp->log;
 
-sub gonzlog { confess "deprecated call syntax, use gonzlog->info" if ( @_ > 0 && $_[0] ); _bgp->log() }
-sub gonzl   { confess "deprecated call syntax, use gonzl->info"   if ( @_ > 0 && $_[0] ); _bgp->log() }
+sub path_to       { $bgp->path_to(@_) }
+sub gonzlog       { $bgp->log() }
+sub nfi           { $bgp->nfi(@_) }
+sub iof           { $bgp->conf(@_) }
+sub gonzconf      { $bgp->conf(@_) }
+sub analysis_path { $bgp->analysis_path(@_) }
 
-sub gonzsys {
-  _bgp->log->info( "(exec) > " . join( " ", @_ ) . " <" );
-  system(@_) == 0 or confess "system failed: $?";
-}
-
-sub gonz_iterate {
-  my ( $src, $code, $conf ) = @_;
-  $conf->{processes} //= 4;
-  my $data;
-  my $ref_type = ref($src);
-  if ( !$ref_type || ( $ref_type ne 'ARRAY' && $ref_type ne 'HASH' ) ) {
-    $data = jslurp($src);
-  } else {
-    $data = $src;
-  }
-
-  if ( $conf->{test} ) {
-    $code = sub { say jfreeze( \@_ ); return };
-  }
-
-  my $pm = Parallel::ForkManager->new( $conf->{processes} );
-
-  my @result_all;
-  $pm->run_on_finish(
-    sub {
-      my ( $pid, $exit_code, $ident, $exit_signal, $core_dump, $res ) = @_;
-
-      if ( defined($res) && @$res > 0 ) {
-        push @result_all, $res;
-      }
-    }
-  );
-
-  if ( ref($data) eq 'ARRAY' ) {
-    for ( my $i = 0; $i < @$data; $i++ ) {
-      $pm->start and next;    # do the fork
-      my $res = $code->( $i, $data->[$i] );
-      $pm->finish( 0, $res );    # do the exit in the child process
-    }
-    $pm->wait_all_children;
-  } elsif ( ref($data) eq 'HASH' ) {
-    for my $k ( keys %$data ) {
-      $pm->start and next;       # do the fork
-      my $res = $code->( $k, $data->{$k} );
-      $pm->finish( 0, $res );    # do the exit in the child process
-    }
-    $pm->wait_all_children;
-
-  }
-  return \@result_all;
-}
 1;
 
 __END__

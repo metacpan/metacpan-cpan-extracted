@@ -1,0 +1,342 @@
+#!perl -w
+
+
+use strict;
+use Bot::Infobot::Config qw( parse_config save_config );
+use Text::CSV;
+use Data::Dumper;
+use Module::Pluggable require => 1, search_path => "Bot::Infobot::Importer", sub_name => 'importers';
+
+
+die "You must pass at least a DSN\n" unless @ARGV;
+
+my %config = parse_config ( 'infobot.conf' );
+
+
+my $name         = $config{store}->{type} || 'Storable';
+
+    
+my $store_class  = "Bot::BasicBot::Pluggable::Store::${name}";
+
+eval "require $store_class";
+die "Couldn't load $store_class - $@\n" if $@;
+
+$store_class->import;
+
+my $store = $store_class->new( %{$config{store}} ); 
+
+
+
+$|++;
+
+# sort out the importer class
+my $importer;
+for my $class (importers()) {
+	my $sub = $class->can('handle');
+    if ($sub && $sub->(@ARGV)) {
+        $importer = $class->new(@ARGV);
+        last;
+    }
+}
+
+die "Couldn't find a importer to handle - ".join(" ",@ARGV)."\n"
+    unless $importer;
+
+=head1 NAME
+
+infobot_import - import an old infobot brain into new infrastructure 
+
+=head1 SYNOPSIS
+
+    infobot-import dsn [user [password]]
+
+=head1 USAGE
+
+If you're using a stock infobot then changing to the directory where the 
+bot stores its config. There should be files lying around like 
+<botname>-is.(dir|pag). Then do :
+
+    infobot-import <botname>
+
+If it's a modified infobot using the DBI backend then doing something 
+like
+
+    infobot-import dbi:mysql:<dbname> <username> <password>
+
+should work.
+
+You can also import factoids from factpacks such as the ones at
+
+    http://www.infobot.org/snapshots/factpacks/
+
+by doing 
+
+    infobot-import <filename>
+
+where I<filename> ends in I<.fact>.
+
+It should be noted that if you have a lot of items then the Storable 
+backend, whilst quick, will bloat up to a lot of memory. the DBI backend 
+is slow but efficient. The Deep backend is a good compromise.
+
+
+=head1 DESCRIPTION
+
+This program will import the values for an existing, old style infobot
+into a new style.
+
+=over 4
+
+=item infobot factoids
+
+=item seen lists
+
+=item karma
+
+=item ignore lists
+
+=back
+
+it will look in the current directory for an infobot.config
+for which C<Bot::BasicBot::Pluggable::Store> backend to use.
+
+See the C<infobot> documentation for details on the 
+C<Store> config keys.
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2005, Simon Wistow
+
+Distributed under the same terms as Perl itself
+
+=cut
+
+# various vars
+my $width = 72;
+my $debug_limit = -100;
+
+############################################################
+# Banner
+############################################################
+print "\n\n".("*" x $width)."\n\n";
+print "   Infobot brain slurper  \n";
+print "   - convert an Infobot brain to Bot::BasicBot::Pluggable";
+print "\n\n".("*" x $width)."\n\n";
+
+
+
+############################################################
+# Injoke
+############################################################
+status_init("reticulating splines");
+status_finish("injoke successfully promulgated");
+
+
+FACTOIDS:
+############################################################
+# Factoids first
+############################################################
+{
+    status_init("extracting factoids");
+    my $atoms = 0;
+    my $facts = 0;
+
+    foreach my $table (qw(is are)) {
+        $importer->fetch(${table});
+        my $rows  = $importer->rows;
+
+        while (my $result = $importer->next) {
+            my $what = $result->{key};
+            my $fact = $result->{value};
+            my $time = $result->{touched} || time();
+            status_update("$facts/$rows");
+            
+            my @current;
+            foreach my $part (split /\s*\|\s*/,$fact) {
+                my $alt = ($part =~ /^</);
+                if ($alt) {
+                    push @current, { alt => 1, text => $part}; 
+                } else {
+                    push (@current, { alt => 0, text => $_ }) for split (/\s+or\s+/,$part);
+                }
+                $atoms += scalar(@current);
+                
+            }
+            my $set = {
+                   is_are => $table,
+               factoids => \@current,
+              };
+
+            $store->set('Infobot',"infobot_".lc($what), $set);
+            last if $debug_limit > 1 && $facts >= $debug_limit;
+            $facts++;
+        }
+        $importer->finish;
+        last;
+    }
+    status_finish("$facts factoids with $atoms atoms");
+}
+
+
+SEEN:
+############################################################
+# Now seen
+############################################################
+{
+    status_init("extracting last seen");
+    my %seen;
+    my $count = 0;
+    my $total = 0;
+    $importer->fetch("seen");
+    while (my $result = $importer->next) {
+        my $who  = $result->{key};
+        my $seen = $result->{value};
+        $total++;
+        status_update("$total");
+        #local $; = \034;
+        my ($when,$where,$what) = split /$;/, $seen;
+        next unless defined $when && defined $where && defined $what;
+        $store->set('Seen',"seen_$who", { time => $when, channel => $where, what => $what });
+
+        $count++;
+        last if $debug_limit > 1 && $count >= $debug_limit;
+    }
+    $importer->finish;
+    $total -= $count;
+    status_finish("did $count people, skipped $total");
+}
+
+
+KARMA:
+############################################################
+# Then karma
+############################################################
+{
+    my %karma;
+    my %scores;
+
+    # first off we select stuff from the negative and postive comments
+    foreach my $what (qw(positive negative)) 
+    {
+        status_init("extracting $what karma");
+        my $count = 0;
+        eval { $importer->fetch("${what}karmacomments") };
+        
+        while (!$@ && (my $result = $importer->next)) {
+            my $who  = $result->{key};
+            my $why  = $result->{value};
+            my $when = $result->{touched};
+            my $pos  = $what eq 'positive';
+            
+            my $csv = Text::CSV->new(); $csv->parse($why);
+            
+            foreach my $col ($csv->fields) {                
+                push @{$karma{$who}}, { positive => $pos, reason => $col, timestamp => $when, who => 'infobot_importer' };
+                $scores{$who} += -1 + (2*$pos);
+                $count++;
+            }
+            status_update("$count");
+            last if $debug_limit > 1 && $count >= $debug_limit;
+        }
+        status_finish("inserted $count real items");
+        $importer->finish;
+    }
+    status_init("fudging non explained karma");
+    my $count = 0;
+    # then we count the difference between that and the actual tally
+    
+    my $table = (ref($importer) =~ /DBI$/) ? "plusplus" : "karma";
+    $importer->fetch($table);
+
+    while (my $result = $importer->next) {
+        my $who    = $result->{key};
+        my $many   = $result->{value}   || 0;
+        my $when   = $result->{touched} || time();
+
+        $scores{$who} ||= 0;
+        
+        my $diff   = $many - $scores{$who}; next if $diff == 0;
+        my $pos    = $diff > 0; $diff *= -1 if !$pos;
+        my $text   = ($pos)? "positive" : "negative";
+        #print "  updating $who karma";
+        foreach (0..$diff) {
+            push @{$karma{$who}}, { positive => $pos, reason => '', timestamp => $when, who => 'infobot_importer' };            
+        }
+        $count++;
+        status_update("$count");
+        $importer->finish;
+    }
+    status_finish("fudged $count items");
+
+    $count = 0;
+    my $total = scalar(keys %karma);
+    status_init("storing karma"); 
+    while (my ($key,$val) = each %karma) {
+        $count++;
+        status_update("$count/$total");
+        $store->set('Karma',"karma_${key}", $val);
+        delete $karma{$key};
+    }
+    status_finish("stored $count karma incidents");
+}
+
+IGNORE:
+{
+    status_init("setting ignore list");
+    my $ignore = $config{'ignore_list'} || "";
+    my %ignore = map { $_ => 1 } split ' ', $ignore; 
+    my $count = 0;
+    $importer->fetch('ignore');
+    while (my $who = $importer->next) {
+    next unless $who->{key};
+        $ignore{$who->{key}} = 1;
+        $count++;
+    }
+    $importer->finish;
+    $config{'ignore_list'} = join " ", keys %ignore;
+    save_config( 'infobot.conf', %config );
+    status_finish("added $count people");
+}
+
+
+print "\n\nCompleted - have a nice day!\n\n";
+
+
+
+
+{
+    my $status_header = "";
+
+    # hrmm, maybe I could do something with a closure
+    # to have to stop the double print and status thingies
+    sub status_init {
+        $status_header = shift || "";
+
+        print $status_header;
+        print "."x($width-length($status_header));
+    }
+
+    sub status_update {
+        my $update = shift || "";
+        print "\r";
+        print $status_header;
+        print "."x($width-length($status_header.$update));
+        print $update;
+        
+    }
+
+    sub status_finish {
+        my $end = shift || "";
+                print "\r";
+                print $status_header;
+                print "."x($width-length($status_header.$end));
+                print $end;
+        print "\n";
+        $status_header = "";
+    }
+}
+

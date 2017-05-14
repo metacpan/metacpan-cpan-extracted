@@ -1,0 +1,3 @@
+elsif.sdf error, macro on 6: argument 'value' missing for macro 'elsif'
+elsif.sdf error, macro on 6: !elsif not expected
+elsif.sdf error, macro on 15: !elsif found after else macro

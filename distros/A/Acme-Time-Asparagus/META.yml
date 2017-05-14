@@ -1,0 +1,22 @@
+---
+abstract: 'Time on the vegetable clock'
+author:
+  - 'Rich Bowen (rich@DrBacchus.com)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.132140'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Time-Asparagus
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+version: 1.18

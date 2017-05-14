@@ -1,0 +1,6 @@
+Revision history for Perl extension FLAT::FA.
+
+0.01  Tue Feb 21 23:50:39 2006
+	- original version; created by h2xs 1.23 with options
+		-AX FLAT::FA
+

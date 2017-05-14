@@ -3,5 +3,4 @@
   output: [\0_\a_\A];
   output: \0_\a_\A;
   output: \0_\a_\A;
-  output: ['\0_\a_\A'];
-}
+  output: ['\0_\a_\A']; }

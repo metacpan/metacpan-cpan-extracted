@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution SOAP-WSDL-Server-Plack,
+version 0.006:
+
+  Plack application for SOAP::WSDL Server modules
+
+This software is copyright (c) 2013 by futureLAB AG, info@futurelab.ch.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

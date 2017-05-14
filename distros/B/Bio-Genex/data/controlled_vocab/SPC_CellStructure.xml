@@ -1,0 +1,26 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Species" db_column="cell_structure" cv_table="SPC_CellStructure">
+  <comment type="definition">This table provides the restricted vocabulary for the column cell_structure in the table Species and provides a way to quickly separate categories relevant to single and multicellular species and eukaryotic or prokaryotic or viral species.   
+</comment>
+<term name="unicellular_eubacteria"
+        description="organisms that are single celled and eubacteria"/>
+<term name="unicellular_archaebacteria"
+        description="organisms that are single-celled and archaebacteria"/>
+<term name="unicellular_eukaryotic"
+        description="organisms that are single celled and nucleated"/>
+<term name="rna_virus"
+        description="viruses whose nucleic acid is composed of RNA"/>
+<term name="dna_virus"
+        description="viruses whose nucleic acid is composed of DNA"/>
+<term name="prion"
+        description="organisms not known to have a nucleic acid component"/>
+<term name="multicellular_eukaryotic"
+        description="organisms with nuclei and a multicellular structure unknown from a mixed or uncharacterized source"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

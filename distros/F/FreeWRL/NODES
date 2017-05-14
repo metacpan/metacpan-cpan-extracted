@@ -1,0 +1,110 @@
+Anchor
+	
+Appearance
+	- Implemented
+
+AudioClip
+Background
+Billboard
+
+Box
+	- Implemented, no textures
+
+Collision
+	- Implemented, but not working
+
+Color
+	
+ColorInterpolator
+	- Implemented, ???
+
+Cone
+	- Implemented, no tex
+
+Coordinate
+CoordinateInterpolator
+
+Cylinder
+	- Implemented, no tex
+
+CylinderSensor
+DirectionalLight
+ElevationGrid
+Extrusion
+Fog 
+FontStyle
+
+Group
+	- Implemented
+
+ImageTexture
+
+IndexedFaceSet
+	- Implemented, missing a lot
+
+IndexedLineSet
+Inline
+LOD
+Material
+	- Implemented, no transparency, others ???
+
+MovieTexture
+
+NavigationInfo
+	- Implemented, nonfunctional
+
+Normal
+NormalInterpolator
+
+OrientationInterpolator
+	- Implemented, don't know about working..
+	
+
+PixelTexture
+PlaneSensor
+PointLight
+PointSet
+
+PositionInterpolator
+	- Implemented, ??
+
+ProximitySensor 
+
+ScalarInterpolator
+	- Implemented, ??
+
+Script
+	- Implemented, ??
+
+Shape
+	- Implemented
+
+Sound
+
+Sphere
+	- Implemented
+
+SphereSensor
+SpotLight
+Switch
+Text
+TextureCoordinate
+TextureTransform
+
+TimeSensor
+	- Implemented (?)
+
+TouchSensor
+	- Implemented, incomplete (no hitpoint/normals)
+
+Transform
+	- Implemented, need to check
+
+Viewpoint
+	- Implemented, binding not yet complete
+
+VisibilitySensor
+
+WorldInfo
+	- Implemented
+

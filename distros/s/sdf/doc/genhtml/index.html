@@ -1,0 +1,694 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: Generating HTML Using SDF</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<H1>Generating HTML Using SDF</H1>
+<ADDRESS>MTR-SDF-0011.001 (Final)</ADDRESS>
+<ADDRESS>Ian Clatworthy (<A HREF="mailto:ianc@mincom.com">ianc@mincom.com</A>), Research Architect, <A HREF="http://www.mincom.com">Mincom Pty Ltd</A></ADDRESS>
+<ADDRESS>27 October 1998</ADDRESS>
+<BR CLEAR="All">
+<!-- TOC -->
+<HR>
+<H2>Table of Contents</H2>
+<UL>
+<A HREF="#Introduction">1. Introduction</A>
+<BR>
+<A HREF="#Generating HTML">2. Generating HTML</A><UL>
+<A HREF="#Generating a Single Document">2.1. Generating a Single Document</A>
+<BR>
+<A HREF="#Changing the Output Extension">2.2. Changing the Output Extension</A>
+<BR>
+<A HREF="#Sending Output to Standard Output">2.3. Sending Output to Standard Output</A>
+<BR>
+<A HREF="#Changing the Default Extension">2.4. Changing the Default Extension</A>
+<BR>
+<A HREF="#Generating a Set of Topics">2.5. Generating a Set of Topics</A>
+<BR>
+<A HREF="#Controlling Topic Breaks">2.6. Controlling Topic Breaks</A></UL>
+<BR>
+<A HREF="#Customising the Generated HTML">3. Customising the Generated HTML</A><UL>
+<A HREF="#Paragraph and Phrase Style Mappings">3.1. Paragraph and Phrase Style Mappings</A>
+<BR>
+<A HREF="#Output Driver Enhancements">3.2. Output Driver Enhancements</A>
+<BR>
+<A HREF="#General Customisations">3.3. General Customisations</A>
+<BR>
+<A HREF="#Topics Mode Variables">3.4. Topics Mode Variables</A></UL>
+<BR>
+<A HREF="#Colours, Logos, Backgrounds and Separators">4. Colours, Logos, Backgrounds and Separators</A><UL>
+<A HREF="#Colours">4.1. Colours</A>
+<BR>
+<A HREF="#Logos">4.2. Logos</A>
+<BR>
+<A HREF="#Background Images">4.3. Background Images</A>
+<BR>
+<A HREF="#Section Separators">4.4. Section Separators</A></UL>
+<BR>
+<A HREF="#Titles and Table of Contents">5. Titles and Table of Contents</A><UL>
+<A HREF="#HTML Title String">5.1. HTML Title String</A>
+<BR>
+<A HREF="#Title Section">5.2. Title Section</A>
+<BR>
+<A HREF="#Table of Contents Section">5.3. Table of Contents Section</A></UL>
+<BR>
+<A HREF="#Headers and Footers">6. Headers and Footers</A><UL>
+<A HREF="#The Default Header/Footer Macros">6.1. The Default Header/Footer Macros</A>
+<BR>
+<A HREF="#The Default Navigation Macros">6.2. The Default Navigation Macros</A>
+<BR>
+<A HREF="#Customising the Navigation Macros">6.3. Customising the Navigation Macros</A>
+<BR>
+<A HREF="#Customising Navigation Text">6.4. Customising Navigation Text</A>
+<BR>
+<A HREF="#Pre-header and Post-footer Tuning">6.5. Pre-header and Post-footer Tuning</A></UL>
+<BR>
+<A HREF="#Inline HTML">7. Inline HTML</A>
+<BR>
+<A HREF="#Feedback">8. Feedback</A></UL>
+<!-- ENDTOC -->
+<HR>
+<H1><A NAME="Introduction">1. Introduction</A></H1>
+<P>SDF is a useful tool for generating HTML documents for several reasons:</P>
+<OL>
+<LI>SDF provides a high-level language for documentation including macros, filters, variables, conditional text and event processing
+<LI>SDF is more readable than HTML, making it much easier to maintain
+<LI>Unlike HTML, SDF documents can contain user defined style names allowing authors to specify a document in a logical manner
+<LI>SDF provides the features required to create any HTML document.</OL>
+<P>For a general overview of SDF, see <A HREF="../paper/sdfintro.html">The SDF Document Development System</A>. For a general introduction to the core features in SDF, see the <A HREF="../user/ug_sdf.html">SDF User Guide</A>.</P>
+<P>This tutorial supplements these documents by providing:</P>
+<UL>
+<LI>an overview of how SDF documents are converted to HTML documents
+<LI>details on how to customise the generated HTML.</UL>
+<HR>
+<H1><A NAME="Generating HTML">2. Generating HTML</A></H1>
+<H2><A NAME="Generating a Single Document">2.1. Generating a Single Document</A></H2>
+<P>To generate HTML for <TT>myfile.sdf</TT>, the command is:</P>
+<PRE>
+   sdf -2html myfile
+</PRE>
+<P>This will create a single html file called <TT>myfile.html</TT>.</P>
+<H2><A NAME="Changing the Output Extension">2.2. Changing the Output Extension</A></H2>
+<P>By default, SDF creates HTML files with an output extension of <EM>html</EM>. To specify a different extension, use the -o option like this:</P>
+<PRE>
+   sdf -2html -ohtm myfile
+</PRE>
+<H2><A NAME="Sending Output to Standard Output">2.3. Sending Output to Standard Output</A></H2>
+<P>To send output to standard output, use the -o option like this:</P>
+<PRE>
+   sdf -2html -o- myfile
+</PRE>
+<H2><A NAME="Changing the Default Extension">2.4. Changing the Default Extension</A></H2>
+<P>If you are generating HTML for a system which only supports 8.3 filenames, you may wish to set the default extension to be <EM>htm</EM> like this:</P>
+<PRE>
+   sdf -2html -DHTML_EXT=htm myfile
+</PRE>
+<P>If you are working on a system which only supports 8.3 filenames, you may wish to permanently set the <EM>HTML_EXT</EM> variable within the <TT>sdf.ini</TT> configuration file, so that you don't need to specify it every time.</P>
+<P>Unlike using the -o option, this approach changes the output extension on all HTML files generated, including sub-topics.</P>
+<H2><A NAME="Generating a Set of Topics">2.5. Generating a Set of Topics</A></H2>
+<P>For large documents, it is often much better to generate a set of topics rather than a large HTML file. To do this, the command is:</P>
+<PRE>
+   sdf -2topics myfile
+</PRE>
+<P>This will create:</P>
+<UL>
+<LI>a HTML file called <TT>myfile.html</TT> which contains a table of contents
+<LI>a HTML file for each topic.</UL>
+<H2><A NAME="Controlling Topic Breaks">2.6. Controlling Topic Breaks</A></H2>
+<P>If you want to manually control how a document is split into topics, simply include other sdf files which contain headings. These manual topics, if any, can be supplemented with automatically generated topics. By default, level 1 headings are used as topic breaks, in addition to the manual ones. The -n (or --split_level) option can be used to change this:</P>
+<UL>
+<LI>-n0 disables autosplitting
+<LI>-n2 uses level 1-2 headings to autosplit
+<LI>-n3 uses level 1-3 headings to autosplit
+<LI>etc.</UL>
+<HR>
+<H1><A NAME="Customising the Generated HTML">3. Customising the Generated HTML</A></H1>
+<P>The following files are used to convert SDF to HTML:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>File</STRONG>
+</TD>
+<TD>
+<STRONG>Directory</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+html.sdn
+</TD>
+<TD>
+stdlib
+</TD>
+<TD>
+tuning file for HTML generation
+</TD>
+</TR>
+<TR>
+<TD>
+tohtml.pl
+</TD>
+<TD>
+perllib/sdf
+</TD>
+<TD>
+output driver for HTML generation
+</TD>
+</TR>
+</TABLE>
+
+<P>The tuning file contains:</P>
+<UL>
+<LI>the mapping tables used to convert SDF paragraph and phrase styles to HTML entities
+<LI>the default definitions of macros, variables, etc.</UL>
+<H2><A NAME="Paragraph and Phrase Style Mappings">3.1. Paragraph and Phrase Style Mappings</A></H2>
+<P>If you want to create new paragraph and phrase styles and/or override the default mapping, you can edit the tuning file. Alternatively, create a site-specific tuning file and <A HREF="../ref/muse.html">use</A> it at the top of each document.</P>
+<H2><A NAME="Output Driver Enhancements">3.2. Output Driver Enhancements</A></H2>
+<P>On some occasions, the conversion rules are too complicated for mapping tables and need to be coded into the output driver as Perl logic. If you need to edit the output driver, please forward the patches to me so that everyone can benefit from your enhancements.</P>
+<H2><A NAME="General Customisations">3.3. General Customisations</A></H2>
+<P>On most occasions, the generated HTML can be easily customised by overriding the default values of variables and macros. In particular, you can customise:</P>
+<UL>
+<A HREF="#Colours, Logos, Backgrounds and Separators">Colours, Logos, Backgrounds and Separators</A>
+<BR>
+<A HREF="#Titles and Table of Contents">Titles and Table of Contents</A>
+<BR>
+<A HREF="#Headers and Footers">Headers and Footers</A></UL>
+<P>Furthermore, if you really need it, <A HREF="#Inline HTML">Inline HTML</A> can be used to generate any HTML you like.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>If you override a macro, it is probably a good idea to start with the default definition in the HTML tuning file, <TT>stdlib/html.sdn</TT>.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H2><A NAME="Topics Mode Variables">3.4. Topics Mode Variables</A></H2>
+<P>When customising the generated HTML, it is occasionally necessary to know whether a single document or set of topics is being generated. The following variables can be tested to determine this.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TOPICS_MODE
+</TD>
+<TD>
+the table of contents for a set of topics is being generated
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_SUBTOPICS_MODE
+</TD>
+<TD>
+the actual sub-topics are being generated
+</TD>
+</TR>
+</TABLE>
+
+<P>These variables represent the two passes of the topic generation process.</P>
+<HR>
+<H1><A NAME="Colours, Logos, Backgrounds and Separators">4. Colours, Logos, Backgrounds and Separators</A></H1>
+<H2><A NAME="Colours">4.1. Colours</A></H2>
+<P>The following variables can be used to customise the colours used:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_BG_COLOR
+</TD>
+<TD>
+the background colour
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_COLOR
+</TD>
+<TD>
+the colour of normal text
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_LINK_COLOR
+</TD>
+<TD>
+the colour of links
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_VLINK_COLOR
+</TD>
+<TD>
+the colour of visited links
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+  !define HTML_BG_COLOR   COLOR_WHITE
+  !define HTML_LINK_COLOR '00ff00'
+</PRE>
+<P>The value of each variable is the hexidecimal number representing the required RGB (Red Green Blue) combination. For convenience, the following set of color variables are provided:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_WHITE
+</TD>
+<TD>
+'ffffff'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_BLACK
+</TD>
+<TD>
+'000000'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_RED
+</TD>
+<TD>
+'ff0000'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_GREEN
+</TD>
+<TD>
+'00ff00'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_BLUE
+</TD>
+<TD>
+'0000ff'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_YELLOW
+</TD>
+<TD>
+'ffff00'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_MAGENTA
+</TD>
+<TD>
+'ff00ff'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_CYAN
+</TD>
+<TD>
+'00ffff'
+</TD>
+</TR>
+<TR>
+<TD>
+COLOR_GREY
+</TD>
+<TD>
+'c0c0c0'
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="Logos">4.2. Logos</A></H2>
+<P>The following variables can be used to add a logo:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOGO
+</TD>
+<TD>
+the default logo to use
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_HTML_LOGO
+</TD>
+<TD>
+the logo to use at the top of each document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOPIC_LOGO
+</TD>
+<TD>
+the logo to use at the top of each topic
+</TD>
+</TR>
+</TABLE>
+
+<P>To add a logo to the main document and all its topics, simply set the DOC_LOGO variable. Alternatively, different logos can be specified by using the DOC_HTML_LOGO and/or the DOC_TOPIC_LOGO variables.</P>
+<H2><A NAME="Background Images">4.3. Background Images</A></H2>
+<P>The following variables can be used to customise the background image, if any:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_BG_IMAGE
+</TD>
+<TD>
+the URL of the file to use as the background image
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_BG_FIXED
+</TD>
+<TD>
+if set, scrolling of the background image is disabled
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>These HTML features may not be supported by all browsers.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H2><A NAME="Section Separators">4.4. Section Separators</A></H2>
+<P>By default, SDF places a line above each section within a document. If you want to use an alternative separator, override the <EM>HTML_PRE_SECTION</EM> macro like this:</P>
+<PRE>
+    !macro HTML_PRE_SECTION
+         !import &quot;fancy_line.gif&quot;
+    !endmacro
+</PRE>
+<P>Section boundaries are determined using the heading level specified by the HTML_SECTION_LEVEL variable. To put a section separator above level 2 (and 1) headings, you can <A HREF="../ref/mdefine.html">define</A> this variable in your document or specify it on the command line like this:</P>
+<PRE>
+   sdf -2html -DHTML_SECTION_LEVEL=2 myfile
+</PRE>
+<P>When a single document is being generated, the default level is 1. When sub-topics are being generated, the default level is 2.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>A value of 0 turns off section boundaries.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H1><A NAME="Titles and Table of Contents">5. Titles and Table of Contents</A></H1>
+<H2><A NAME="HTML Title String">5.1. HTML Title String</A></H2>
+<P>To customise the title string generated by the <A HREF="../ref/mbuild_t.html">build_title</A> macro, set the HTML_TITLE variable <EM>after</EM> calling <A HREF="../ref/mbuild_t.html">build_title</A>.</P>
+<P>Alternatively, you can override the definition of the <EM>HTML_BUILD_TITLE</EM> macro before <A HREF="../ref/mbuild_t.html">build_title</A> is called. The default definition is:</P>
+<PRE>
+!macro HTML_BUILD_TITLE
+  !if HTML_SUBTOPICS_MODE
+    !if DOC_PROJECT
+      !define HTML_TITLE \
+        &quot;$var{'DOC_PROJECT'}: $var{'HTML_MAIN_TITLE'}: $var{'DOC_TITLE'}&quot;
+    !else
+      !define HTML_TITLE &quot;$var{'HTML_MAIN_TITLE'}: $var{'DOC_TITLE'}&quot;
+    !endif
+  !elsif DOC_PROJECT
+    !define HTML_TITLE &quot;$var{'DOC_PROJECT'}: $var{'DOC_TITLE'}&quot;
+  !else
+    !define HTML_TITLE DOC_TITLE
+  !endif
+!endmacro
+</PRE>
+<H2><A NAME="Title Section">5.2. Title Section</A></H2>
+<P>To customise the title section generated by the <A HREF="../ref/mbuild_t.html">build_title</A> macro, override the definition of the <EM>build_html_cover</EM> macro. For example:</P>
+<PRE>
+    !macro build_html_cover
+        [align=Center]DOC_TITLE
+    !endmacro
+</PRE>
+<H2><A NAME="Table of Contents Section">5.3. Table of Contents Section</A></H2>
+<P>To customise the title of the table of contents, override the DOC_TOC_TITLE variable like this:</P>
+<PRE>
+  !define DOC_TOC_TITLE 'Contents'
+</PRE>
+<P>Alternatively, you can completely control the presentation of the table of contents by overriding the <EM>toc_html</EM> filter. For example:</P>
+<PRE>
+!block script
+sub toc_html_Filter {
+    local(*text, %param) = @_;
+#   local();
+
+    # Make top level section titles bigger
+    @text = grep(s/^L1/P2/ || $_, @text);
+
+    # Prepend a section separator and a title
+    unshift(@text, &quot;!HTML_PRE_SECTION&quot;, &quot;P1[notoc;align=Center]Contents&quot;);
+}
+!endblock
+</PRE>
+<P>See the <A HREF="../guru/gg_sdf.html">SDF Guru Guide</A> for further information on writing your own filters.</P>
+<HR>
+<H1><A NAME="Headers and Footers">6. Headers and Footers</A></H1>
+<P>You can override the default headers and footers by defining the following macros:</P>
+<UL>
+<LI>HTML_HEADER - header on a HTML document (or main topic)
+<LI>HTML_FOOTER - footer on a HTML document (or main topic)
+<LI>HTML_TOPIC_HEADER - header on a HTML topic
+<LI>HTML_TOPIC_FOOTER - footer on a HTML topic.</UL>
+<P>For example:</P>
+<PRE>
+    !macro HTML_FOOTER
+        Line:
+        [align='Right']
+        {{This page was last updated on [[DATE:DOC_MODIFIED]]}}
+    !endmacro
+</PRE>
+<H2><A NAME="The Default Header/Footer Macros">6.1. The Default Header/Footer Macros</A></H2>
+<P>The default HTML_HEADER and HTML_FOOTER definitions are shown below.</P>
+<PRE>
+    !macro HTML_HEADER
+        !HTML_NAVIGATE
+    !endmacro
+    !macro HTML_FOOTER
+        !HTML_PRE_SECTION
+        !HTML_NAVIGATE
+    !endmacro
+</PRE>
+<P>Likewise, the default header and footer on sub-topics share a macro called HTML_TOPIC_NAVIGATE. Therefore, it is usually sufficient to override HTML_NAVIGATE and/or HTML_TOPIC_NAVIGATE instead of overriding the HTML_HEADER/HTML_FOOTER and HTML_TOPIC_HEADER/HTML_TOPIC_FOOTER macros respectively.</P>
+<H2><A NAME="The Default Navigation Macros">6.2. The Default Navigation Macros</A></H2>
+<P>The default implementation of the HTML_NAVIGATE macro provides the following jumps when topics are being generated:</P>
+<UL>
+Previous Topic
+<BR>
+Next Topic</UL>
+<P>The default implementation of the HTML_TOPIC_NAVIGATE macro provides the following jumps:</P>
+<UL>
+Contents
+<BR>
+Parent Topic
+<BR>
+Previous Topic
+<BR>
+Next Topic</UL>
+<P>In addition, the navigation macros can optionally provide the following jumps:</P>
+<UL>
+Home
+<BR>
+Catalog
+<BR>
+Search</UL>
+<H2><A NAME="Customising the Navigation Macros">6.3. Customising the Navigation Macros</A></H2>
+<P>Instead of simply overriding the HTML_NAVIGATE and HTML_TOPIC_NAVIGATE macros, it is also possible to customise their output by defining the variables below:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_URL_HOME
+</TD>
+<TD>
+URL of the home page
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_URL_CATALOG
+</TD>
+<TD>
+URL of the catalog page
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_URL_SEARCH
+</TD>
+<TD>
+URL of the search page
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+  !define HTML_URL_HOME   &quot;../index.html&quot;
+  !define HTML_URL_SEARCH &quot;../search.html&quot;
+</PRE>
+<P>If one or more of these variables are set, the default navigate macros will output a second line containing jumps to the respective pages.</P>
+<H2><A NAME="Customising Navigation Text">6.4. Customising Navigation Text</A></H2>
+<P>If you are generally happy with the default headers and footers but want to change the text to another language, say, you can set the following variables:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Default Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_CONTENTS
+</TD>
+<TD>
+Contents
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_PARENT
+</TD>
+<TD>
+Parent
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_PREVIOUS
+</TD>
+<TD>
+Previous Topic
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_NEXT
+</TD>
+<TD>
+Next Topic
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_HOME
+</TD>
+<TD>
+Home
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_CATALOG
+</TD>
+<TD>
+Catalog
+</TD>
+</TR>
+<TR>
+<TD>
+HTML_TEXT_SEARCH
+</TD>
+<TD>
+Search
+</TD>
+</TR>
+</TABLE>
+
+<P>The HOME, CATALOG and SEARCH variables only apply if the corresponding URL variables are set.</P>
+<H2><A NAME="Pre-header and Post-footer Tuning">6.5. Pre-header and Post-footer Tuning</A></H2>
+<P>The generated HTML can be tuned by using the HTML_PRE_HEADER and HTML_POST_FOOTER variables. These variables contain HTML to be added immediately after the &lt;BODY&gt; and immediately before the &lt;/BODY&gt; tags respectively. For example, a page-like border can be added to the generated HTML like this:</P>
+<PRE>
+  !define HTML_PRE_HEADER  '&lt;blockquote&gt;'
+  !define HTML_POST_HEADER '&lt;/blockquote&gt;'
+</PRE>
+<HR>
+<H1><A NAME="Inline HTML">7. Inline HTML</A></H1>
+<P>As HTML is constantly evolving and contains features which SDF doesn't explicitly support (e.g. frames), it is occasionally necessary to directly embed native HTML. To do this, use the <A HREF="../ref/finline.html">inline</A> filter. For example:</P>
+<PRE>
+    !block inline
+    &lt;P&gt;
+    My name is &lt;B&gt;Bill&lt;/B&gt;.
+    !endblock
+</PRE>
+<P>If you want to use embedded expressions (enclosed in [[ and ]]) and macros within the inline text, add the <EM>expand</EM> parameter like this:</P>
+<PRE>
+    !block inline; expand
+        !if DATE
+            &lt;P&gt;
+            The date is [[DATE:DOC_START]].
+        !else
+            &lt;P&gt;
+            The time is [[TIME:DOC_START]].
+        !endif
+    !endblock
+</PRE>
+<P>Likewise, you can use the INLINE phrase style within a paragraph to embed HTML within a paragraph. For example:</P>
+<PRE>
+  My name is {{INLINE:&lt;B&gt;Bill&lt;/B&gt;}}.
+</PRE>
+<HR>
+<H1><A NAME="Feedback">8. Feedback</A></H1>
+<P>If you have any feedback on SDF or this tutorial, please let me know.</P>
+<HR>
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,223 @@
+
+Visual Perl/Tk editor (widget edition)
+
+               Revision 2.38
+
+  (by Felix Liberman - FelixL@Rambler.ru)
+
+This editor can help any unexperienced in programming user
+to create widget-based Perl/Tk application.
+It can be a 'long brush' tool for user interface sketching.
+
+  0. License
+
+This software distributed FREE under GNU Public License.
+You can visit http://www.gnu.org in order to see details.
+Original author - Felix Liberman - welcomes all contributors
+to make changes and re-distribute this product under GPL terms.
+See also Chapter 5 of this document.
+
+  1. Installation
+
+No need for special installation since it's self-configuring
+Perl script. Just place all files as they were arranged in original
+tarball archive anywhere in your system and run main file "vptk_w.pl".
+For convenience one can create shortcuts or wrappers (depending on
+OS and desktop manager) but it's not critical. Another way to run
+this script is to incorporate it's path into environment variable 
+"PATH" (again, depend on your OS).
+
+  2. System requirements
+
+Presented tool should run on any platform which support Perl/Tk
+compile-time and run-time environments. Basically, it could be any
+Unix flavor with X-Windows support or MS Windows system plus 
+Perl interpreter and Perl/Tk library installed. The tool was not 
+tested on MacOS, but obviously it should work on it too (maybe after 
+slight tuning of OS detection mechanism). Authour recommend to use 
+the same paltform and environment for application development and 
+production, but for most cases it should not be critical. From other 
+hand, some format tuning could be necessary when porting Perl/Tk 
+application from Unix clones to MS Win. Moreover, inside same Unix 
+platform paths to Perl interpreter could differ between development 
+and production environments (this is the main reason for "same 
+evironment" recommendation above). As a result the developer should 
+apply some patch prior to production version release in order to 
+build correct compile-time and run-time environment. Recommended 
+patches are:
+# if development environment is Unix while production is MS Win
+unix2dos yourfile.pl
+# if development environment is MS Win while production is Unix
+dos2unix yourfile.pl
+# if development perl path differ from production one
+perl -pi -e 's/development perl path/production perl path/' yourfile.pl
+
+  3.1. Main menu
+
+All editing functions can be called from main menu:
+File Insert Edit View      Help
+
+File
+File menu interact with design reading/storing and
+output format.
+
+Note:
+There are two possible ways to use generated design
+- Generate fully executable code and run it as standalone script
+- Generate code for subwindow using $mw as base window
+In second case user can embed his design in dialog box or
+control panel.
+
+Insert
+User can (almost) free insert each widget inside of
+others. Although it's not recommended to insert sub-widgets
+inside of 'regular' widgets. Really useful containers are
+Frame, NoteBookFrame and LabFrame.
+
+During insertion some geometry collisions may occour.
+Refer to 'Geometry' chapter of this manual for details.
+
+Widgets that can be inserted under regular containers:
+- Frame
+- Label
+- Button
+- Entry
+- Text
+- Listbox
+- LabEntry
+- LabFrame
+- Scale
+- Optionmenu
+- Message
+- BrowseEntry
+- Radiobutton
+- Checkbutton
+- Menubutton
+- packAdjust (Adjustor)
+- NoteBook
+
+Notebook can contain only NoteBookFrames
+Menubutton can contain one and only one Menu
+Menu can contain:
+- command
+- cascade
+- checkbutton
+- radiobutton
+- separator
+
+  3.2. Toolbar
+
+Some commonly used actions can be invoked using toolbar buttons.
+Holding mouse pointer on such button you can read popup help message.
+
+  3.3. Keyboard shortcuts
+
+There are also keyboard shortcuts for main commands:
+  Ctrl/Z - Undo
+  Ctrl/R - Redo
+  Ctrl/O - File Open
+  Ctrl/S - File Save
+   DEL   - Delete
+
+  3.4. Mouse
+
+Mouse functions:
+
+  Left button - select object under cursor
+  Left button double-click - edit object properties
+  Right button - call pop-up menu for this object
+
+This mapping works both on design tree list and inside
+preview window.
+
+Exclusion:
+Actions in preview window can cause callback function
+to run, thus (for VPTK application safety) calls to
+real functions replaced with message box popup.
+
+  3.5. Hierarhy
+
+  Due to modular character of Tk geometry manager your
+project must have hierarhy structure: each widget may
+have father (container), brothers (neighbor widgets
+sitting in same container) and children (sub-widgets).
+
+  Note that all brother widgets must use same geometry
+manager. Conflicts of such type automatically detected
+and resolved by VPTK.
+
+  3.6. Status bar
+
+  In the bottom of editor window located status bar, displaying
+ID of currently selected object, mouse (X,Y) coordinates and
+modification flag
+
+NOTE:
+When going back with 'undo' to state before 1st modification
+the flag remain 'dirty' :-(
+
+  3.7. Geometry conflicts and Tk glitches
+
+  What is geometry conflict? First of all it's mix of different
+geometry managers under same parent widget. Additional restriction
+(possible deviated from first one) Tk geometry manager gets
+mad if user tryes to use 'grid' geometry under frame with label.
+
+  Yet another geometry conflict source: when some widget use
+packAdjust 'sub-widget' while 'brothers' use non-pack
+geometry managers. No solution till now (simply avoid such
+situations - otherwise application became stuck).
+
+  As noted in chapter 5, this type of conflicts arise only
+for widgets placed on the same level in same container.
+
+  More Tk glitches that recommended to consider:
+  - when baloons assigned to some widgets Tk goes mad after
+the widget clicked (fixed in latest Tk releases);
+  - baloons not working in dialog windows - only in top-level;
+  - color dialog can't be called from dailog window.
+
+  4. Additional (but not less important) notes
+
+  Your 'hand-written' source code in most cases can't be read-in
+by this program. This 'feature' appears due to limitations in
+source code format suggested by author for internal use.
+Please be avare of situation when only part of your code 
+interpreted by VPTK, so check twice before saving such project.
+
+  This apply to users that generated some code and manually
+changed it from outside of VPTK. Latest VPTK version allow
+much more flexibility with nearly full set of widget options,
+variables and callback subroutines support + freestyle user-side
+code (mainly for callbacks) that can be edited from VPTK and
+stored safely. Thus I'll recommend to preserve generated
+part unchanged for future editing purposes.
+
+  My program developed for "fair use" suggesting that user would
+not try intentionally damage any data. From my side done all the
+best in order to supply powerful 'undo' mechanisms for such cases
+elimination. All bug reports are welcomed and will be served ASAP.
+
+  You can contact me, download updated versions of this program
+and other FREE software from my site 
+http://felixl.coolpage.biz/download.html
+
+  Thanks a lot to all customers that sent me advices and
+suggestions.
+
+  Special thanks to RonW for code tuning and bug fixes in versions
+2_38 & 2_42.
+
+  Thanks to PerlTk.ORG web-site for publishing my dilettante
+artwork among real PerlTk classics.
+
+  5. Copyright
+
+Copyright (c) 2002 Felix Liberman
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

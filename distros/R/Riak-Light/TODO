@@ -1,0 +1,22 @@
+0.04
+
+ 1- add warn in Alarm (not safe) ok
+ 4- refactor timeout tests ok
+ 5- check conditions for timeout providers ok
+ 6- add io::select as default ok
+ 2- skip tests for setsockopt in some conditions "netbsd" ok
+ 7- add more documentation about IO Timeout ?
+ 8- improve coverage (100=stm, 100=bran) ?
+ 
+ 3- remove 'around' from all timeout providers (vincent) ? 
+ 9- introduce CRUD role
+10- use RIAK_PBC_HOST or localhost das host/port default
+11- provider can be a name instead a namespace (like alarm)
+
+12- get_keys can return a list of keys without a callback
+13- callback return false will stop, in get_keys
+14- add option limit => in get_keys
+
+15- manage conflict with vclock
+
+try any-event :)

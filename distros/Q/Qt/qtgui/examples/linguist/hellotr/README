@@ -1,0 +1,13 @@
+To use this example, follow the directions found at http://doc.trolltech.com/4.5/linguist-hellotr.html
+
+The basic steps are:
+Run "lupdate hellotr.pro"
+Run "linguist hellotr_la.ts"
+    Enter "Orbis, te saluto!" as a translation for "Hello, World!" (don't forget the exclamation mark!).
+    Click the "?" to change it to a check mark to mark it done.
+    Save the file.
+Then either
+    Choose "File|Release" in Qt4 Linguist
+    Run "lrelease hellotr_la.ts"
+
+Now when you run the example, you'll see the translated text in the PushButton.

@@ -1,0 +1,35 @@
+---
+abstract: 'trim chatty command outputs'
+author:
+  - 'Gaal Yahas <gaal@forum2.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300007, CPAN::Meta::Converter version 2.113640'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Prolix
+requires:
+  Data::Munge: 0
+  Getopt::Long: 0
+  IO::File: 0
+  IPC::Run: 0
+  JSON: 2.0
+  Moose: 0
+  Moose::Exporter: 0
+  Moose::Role: 0
+  MooseX::ConfigFromFile: 0
+  MooseX::Getopt: 0.39
+  String::ShellQuote: 0
+  Term::ReadKey: 0
+  Term::ReadLine: 0
+  Text::Balanced: 0
+  Try::Tiny: 0
+  perl: v5.10
+  strict: 0
+  warnings: 0
+version: 0.03

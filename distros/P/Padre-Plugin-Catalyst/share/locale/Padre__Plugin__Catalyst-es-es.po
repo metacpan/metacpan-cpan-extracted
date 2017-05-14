@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: padre-plugin-catalyst\n"
+msgstr "Project-Id-Version: Padre-Plugin-Catalyst\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-07 02:26+0100\n"
 "PO-Revision-Date: \n"

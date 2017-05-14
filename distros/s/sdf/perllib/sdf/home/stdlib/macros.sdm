@@ -1,0 +1,223 @@
+# $Id$
+#
+# >>Title::     Macros Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:macros}} is the [[SDF]] module containing the built-in macros
+# implemented in SDF.
+# This module is {{2:always}} implicitly loaded (via {{FILE:kernel.sdm}}).
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# build_title - build the title page and headers/footers for a document/manual
+#
+# The variables below are used.
+#
+# !block table
+# Variable          Comments
+# DOC_NAME          e.g. "SDF 1.003"
+# DOC_TYPE          e.g. "User's Guide"
+# DOC_STATUS        e.g. "Draft"
+# DOC_AUTHOR        e.g. "Bill Bloggs"
+# DOC_AUTHOR2
+# DOC_AUTHOR3
+# DOC_CODE          e.g. "MTR-SDF-0099"
+# DOC_VERSION       e.g. "001"
+# DOC_DISTRIBUTION  e.g. "MINCOM INTERNAL USE ONLY"
+# DOC_PROJECT       e.g. "SIMPLE DOCUMENT FORMAT"
+# DOC_APPROVE       e.g. "Project Leader"
+# DOC_APPROVE2
+# DOC_APPROVE3
+# DOC_URL           e.g. "http://mtr.mincom.oz.au/sdf/doc/0002"
+# DOC_OWNER         the person or company owning the copyright
+# DOC_ID_SEP        the string within DOC_ID separating DOC_CODE & DOC_VERSION
+# !endblock
+#
+# It also uses the macros below.
+#
+# !block table
+# Macro             Comments
+# DOC_RECIPIENTS    only used in project documents - a macro variable
+#                   specifying a table of controlled copy recipients
+# DOC_TRADEMARKS    only used in manuals & usually a macro variable
+# !endblock
+#
+
+# Build a title page
+!macro build_title
+
+# If the code is set, but the name isn't, lookup the name
+!if $var{'DOC_CODE'} ne '' && $var{'DOC_NAME'} eq ''
+!define DOC_NAME $obj_short{'references',&Var('DOC_CODE'),'Document'}
+!endif
+
+# Build the document title
+!if DOC_TYPE
+!define DOC_TITLE join(' ', &Var('DOC_NAME'), &Var('DOC_TYPE'))
+!else
+!define DOC_TYPE  ''
+!define DOC_TITLE DOC_NAME
+!endif
+
+# If not already set, lookup the document properties, if possible
+!default DOC_CODE     $obj_long{'references',&Var('DOC_TITLE'),'Reference'}
+!default DOC_VERSION  $obj_long{'references',&Var('DOC_TITLE'),'Version'} ||\
+                      $obj_short{'references',&Var('DOC_CODE'),'Version'}
+!default DOC_STATUS   $obj_long{'references',&Var('DOC_TITLE'),'Status'} ||\
+                      $obj_short{'references',&Var('DOC_CODE'),'Status'}
+!if !DOC_URL
+!default DOC_URL      $obj_long{'references',&Var('DOC_TITLE'),'Jump'} ||\
+                      $obj_short{'references',&Var('DOC_CODE'),'Jump'}
+#!message "DOC_URL is $var{'DOC_URL'}."
+!endif
+
+# Provide defaults for key variables (to eliminate warnings)
+!default DOC_DISTRIBUTION ''
+!default DOC_PROJECT      ''
+!default DOC_STATUS       ''
+!default DOC_CODE         ''
+!default DOC_OWNER        'The author'
+!default DOC_ID_SEP       '.'
+
+# Build the document identifier
+!if DOC_VERSION
+!define DOC_ID join($var{'DOC_ID_SEP'}, &Var('DOC_CODE'), &Var('DOC_VERSION'))
+!else
+!define DOC_ID DOC_CODE
+!endif
+
+# Format the copyright year
+!define _DOC_YEAR &FormatTime('$year', 'DOC_START')
+
+# include the cover (unless using this file as a book config. file)
+!if !DOC_INBOOK
+    !if   $macro{"build_" . $var{'OPT_DRIVER'} . "_cover"}
+        !insert "build_" . $var{'OPT_DRIVER'} . "_cover"
+    !elsif   $macro{"build_" . $var{'DOC_COVER'} . "_cover"}
+        !insert "build_" . $var{'DOC_COVER'} . "_cover"
+    !elsif DOC_COVER
+        !message "unable to build cover '$var{'DOC_COVER'}'"; "warning"
+    !endif
+!endif
+!endmacro
+
+# If we're building sub-topics for HTML, do nothing for build_title
+!if HTML_SUBTOPICS_MODE
+!macro build_title
+!endmacro
+!endif
+
+
+# slide_down & slide_up - adjust heading levels
+!macro slide_down
+!on paragraph '[HAP]\-?\d';SLIDE_DOWN; $style =~ /^(\w)/; $style = $1 . ($' + 1)
+!endmacro
+!macro slide_up
+!on paragraph '[HAP]\-?\d';SLIDE_UP; $style =~ /^(\w)/; $style = $1 . ($' - 1)
+!endmacro
+
+# end_topic - mark the end of a topic
+!macro end_topic
+!endmacro
+
+######## COMPONENTS & COVERS #########
+
+# Init the component macros (these can be used to initialise
+# and/or finalise things on a per component basis)
+!macro DOC_COMPONENT_BEGIN
+!endmacro
+!macro DOC_COMPONENT_END
+!endmacro
+
+# This macro is used to initialise a component cover page
+!macro DOC_COMPONENT_COVER_BEGIN
+!default DOC_COMPONENT_LOGO $var{'DOC_LOGO'}
+!if DOC_COMPONENT_LOGO
+    N[top=Right;wide;sp_after=100]
+    {{IMPORT[align=Left;wrap_text][[DOC_COMPONENT_LOGO]]}}
+!else
+    N[top=Right;wide;sp_after=100]
+!endif
+!endmacro
+
+# This macro is used to finalise a component cover page
+!macro DOC_COMPONENT_COVER_END
+PB:
+!endmacro
+
+######## EXTRACTED DOCUMENTATION MACROS #########
+
+!macro SDF_OPT_HELP
+The -h option provides help. If it is specified without a parameter,
+a brief description of each option is displayed. To display
+the attributes for an option, specify the option letter as a parameter.
+!endmacro
+
+!macro SDF_OPT_STD
+!SDF_OPT_HELP
+
+By default, generated output goes to standard output. To direct
+output to a file per input file, use the -o option to specify
+an extension for output files. If the -o option is specified
+without a parameter, an extension of {{out}} is assumed.
+
+Likewise, error messages go to standard error by default. Use
+the -l option to create a log file per input file. If the -l
+option is specified without a parameter, an extension of {{log}}
+is assumed.
+!endmacro
+
+!macro SDF_DESCRIPTION_PRE
+!if $var{'FILE_EXT'} eq 'pl'
+	H2: Interface
+	!perlapi $var{'FILE_SHORT'}; example
+	!on phrase 'Y'; _symbols; \
+          $attr{'id'} = &TextToId("$var{'FILE_BASE'}_$text"); \
+          $attr{'id'} =~ s/[\$\@\%]//g
+!elsif $var{'FILE_EXT'} eq 'sdg'
+	H2: Data
+	!getcode $var{'FILE_SHORT'}; table
+!elsif $var{'FILE_EXT'} eq ''
+	H2: Usage
+	!getusage $var{'FILE_BASE'}
+        !script %found = ()
+	!on paragraph ''; _options; if ($text =~ / \-(\w)/) {$tmpid = "$var{'FILE_BASE'}_$1";unless ($found{$tmpid}++) {$attr{'id'} = $tmpid}}
+!endif
+!endmacro
+
+!macro SDF_DESCRIPTION_POST
+!if $var{'FILE_EXT'} eq 'pl'
+	!off phrase _symbols
+!elsif $var{'FILE_EXT'} eq ''
+	!off paragraph _options
+!endif
+!endmacro
+
+!macro SDF_DEFAULT_END
+#!if $var{'OPT_TARGET'} eq 'hlp'
+#	H2:Related Topics
+#	!insert &Related($topic)
+#!endif
+!endmacro
+
+######## Backwards compatibility stuff #########
+
+# Old macros
+!define BUILD_TITLE "build_title"
+!define SLIDE_UP    "slide_up"
+!define SLIDE_DOWN  "slide_down"
+!define END_TOPIC   "end_topic"
+

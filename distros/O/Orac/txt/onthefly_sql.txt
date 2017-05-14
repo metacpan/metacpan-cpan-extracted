@@ -1,0 +1,4 @@
+Enter your selection SQL text below and then 'Execute SQL':
+(NB: For now, please only use 1 Select statement at a 
+ time and no terminating semi-colons)
+

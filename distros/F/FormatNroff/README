@@ -1,0 +1,58 @@
+FormatNroff
+
+Copyright (c) 1998 Frederick Hirsch
+
+This library is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+WARNING: THIS IS Beta SOFTWARE. IT IS POSSIBLY UNRELIABLE!
+
+It requires perl 5.004, since it assumes that version of the HTML::Formatter
+module.
+
+------------------------------------------------
+
+The purpose of this software is to provide a means to automatically
+convert HTML to nroff source, using tbl to support tables.
+
+This work is based upon the HTML::Formatter and HTML::Parse modules, 
+available as part of libwww-perl:
+	http://www.perl.com/CPAN/modules/by-module/HTML/libwww-perl-5.18.readme
+	http://www.perl.com/CPAN/modules/by-module/HTML/libwww-perl-5.18.tar.gz
+
+This software package is *NOT COMPLETE*, see the ToDo file.
+
+Available POD Documentation (see perldoc,pod2html,etc):
+
+HTML::FormatNroff.3
+HTML::FormatNroffSub.3
+HTML::FormatTable.3
+HTML::FormatTableCell.3
+HTML::FormatTableCellNroff.3
+HTML::FormatTableNroff.3
+HTML::FormatTableRow.3
+HTML::FormatTableRowNroff.3
+HTML::Testing.3
+
+=====================================================================
+
+INSTALLING:
+
+perl Makefile.PL
+make
+make test
+make install (If all tests pass)
+
+PROBLEMS:
+Mail me (f.hirsch@opengroup.org) the following info:
+
+1. The output of:
+
+    perl Makefile.PL           (do a make realclean first)
+    make
+    make test
+
+2. The output of:
+    perl -V
+
+

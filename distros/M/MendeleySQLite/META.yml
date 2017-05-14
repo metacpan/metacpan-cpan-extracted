@@ -1,0 +1,26 @@
+---
+abstract: "A collection of tools for working with Mendeley Desktop's SQLite backend."
+author:
+  - 'Spiros Denaxas <s.denaxas@gmail.com>'
+build_requires:
+  Test::Deep: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MendeleySQLite
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  Data::Dumper: 0
+  Getopt::Long: 0
+  HTML::TagCloud: 0
+  SQL::Abstract: 0
+  strict: 0
+  warnings: 0
+version: 0.002

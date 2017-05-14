@@ -144,9 +144,9 @@ or other section in the XML specification.
 
 <H2><A NAME="ERROR_Messages">ERROR Messages
 
-</A></H2><H3><A NAME="100_109">100 - 109
+</A></H2><H2><A NAME="100_109">100 - 109
 
-</A></H3><UL><LI><P><B>100</B> - undefined NOTATION [$notation] in ATTLIST
+</A></H2><UL><LI><P><B>100</B> - undefined NOTATION [$notation] in ATTLIST
 
 <P>The ATTLIST contained a Notation reference that was not defined in a
 NOTATION definition. 
@@ -172,9 +172,9 @@ See <A HREF="http://www.w3.org/TR/REC-xml#elemdecls">Element Type Declarations</
 <B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#ValueType">Attribute Value Type</A>
  
 <PRE>
-</PRE></UL><H3><A NAME="110_119">110 - 119
+</PRE></UL><H2><A NAME="110_119">110 - 119
 
-</A></H3><UL><LI><P><B>110</B> - attribute [$attrName] of element [$tagName] already defined
+</A></H2><UL><LI><P><B>110</B> - attribute [$attrName] of element [$tagName] already defined
 
 <P>The specified attribute was already defined in this ATTLIST definition or
 in a previous one.
@@ -208,9 +208,9 @@ See <A HREF="http://www.w3.org/TR/REC-xml#sec-entity-decl">Entity Declarations</
 <B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#EDUnique">Unique Element Type Declaration</A>
  
 <PRE>
-</PRE></UL><H3><A NAME="120_129">120 - 129
+</PRE></UL><H2><A NAME="120_129">120 - 129
 
-</A></H3><UL><LI><P><B>120</B> - invalid default ENTITY [$default]
+</A></H2><UL><LI><P><B>120</B> - invalid default ENTITY [$default]
 
 <P>(Or IDREF or NMTOKEN instead of ENTITY.)
 The ENTITY, IDREF or NMTOKEN reference in the default attribute 
@@ -248,9 +248,9 @@ for Mixed models.
 See <A HREF="http://www.w3.org/TR/REC-xml#sec-mixed-content">Mixed Content</A>
  
 <PRE>
-</PRE></UL><H3><A NAME="130_139">130 - 139
+</PRE></UL><H2><A NAME="130_139">130 - 139
 
-</A></H3><UL><LI><P><B>130</B> - invalid NMTOKEN [$attrValue]
+</A></H2><UL><LI><P><B>130</B> - invalid NMTOKEN [$attrValue]
 
 <P>The attribute value is not a valid NmToken token.
 <B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#enum">Enumeration</A>
@@ -301,9 +301,9 @@ NMTOKEN, NMTOKENS, CDATA, NOTATION or an Enumeration.
 See definition of <A HREF="http://www.w3.org/TR/REC-xml#NT-AttType">AttType</A>
  
 <PRE>
-</PRE></UL><H3><A NAME="150_159">150 - 159
+</PRE></UL><H2><A NAME="150_159">150 - 159
 
-</A></H3><UL><LI><P><B>150</B> - bad #FIXED attribute value [$value], it should be [$default]
+</A></H2><UL><LI><P><B>150</B> - bad #FIXED attribute value [$value], it should be [$default]
 
 <P>The specified attribute was defined as #FIXED in the ATTLIST definition
 and the found attribute $value differs from the specified $default value.
@@ -388,9 +388,9 @@ which means that a value should have been specified.
 <B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#RequiredAttr">Required Attribute</A>
  
 <PRE>
-</PRE></UL><H3><A NAME="160_169">160 - 169
+</PRE></UL><H2><A NAME="160_169">160 - 169
 
-</A></H3><UL><LI><P><B>160</B> - invalid Enumeration value [$attrValue]
+</A></H2><UL><LI><P><B>160</B> - invalid Enumeration value [$attrValue]
 
 <P>The specified attribute value does not match one of the Enumeration values
 in the ATTLIST.
@@ -486,9 +486,9 @@ guaranteed not to clash with internal hash keys.
 
 </PRE><DD>Returns the root element name as found in the DOCTYPE
 
-</DL><H3><A NAME="Expat_interface">Expat interface
+</DL><H2><A NAME="Expat_interface">Expat interface
 
-</A></H3><P>XML::Checker supports what I call the <I>Expat</I> interface, which is 
+</A></H2><P>XML::Checker supports what I call the <I>Expat</I> interface, which is 
 the collection of methods you normally specify as the callback handlers
 when using XML::Parser.
 
@@ -546,9 +546,9 @@ entity references that start with '%'.
 </STRONG></A><DD>Used by XML::DOM::Element::check() to initialize (and cleanup) the 
 context stack when checking a single element.
 
-</DL><H3><A NAME="PerlSAX_interface">PerlSAX interface
+</DL><H2><A NAME="PerlSAX_interface">PerlSAX interface
 
-</A></H3><P>XML::Checker now also supports the PerlSAX interface, so you can use XML::Checker
+</A></H2><P>XML::Checker now also supports the PerlSAX interface, so you can use XML::Checker
 wherever you use PerlSAX handlers.
 
 <P>XML::Checker implements the following methods: start_document, end_document,
@@ -588,4 +588,4 @@ libxml-perl distribution by Ken MacLeod.
 
 <P>The original SAX specification (Simple API for XML) can be found at 
 <A HREF="http://www.megginson.com/SAX">http://www.megginson.com/SAX</A> and <A HREF="http://www.megginson.com/SAX/SAX2">http://www.megginson.com/SAX/SAX2</A>
-<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:20 1999</FONT></I></BODY></HTML>
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:15 2000</FONT></I></BODY></HTML>

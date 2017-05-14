@@ -1,0 +1,138 @@
+=head1 NAME
+
+Ossec::Log::Parse - Object-oriented Perl interface for parsing ossec alert files
+
+=head1 SYNOPSIS
+
+  ### Sample alert ###
+  # 
+  # ** Alert 1443175627.1028: mail  - syslog,fts,authentication_success
+  # 2015 Sep 25 06:07:07 (i7dev) 10.0.0.4->/var/log/auth.log
+  # Rule: 10100 (level 4) -> 'First time user logged in.'
+  # Src IP: 10.0.0.2
+  # User: phirelight
+  # Sep 25 06:07:06 i7dev sshd[17673]: Accepted publickey for phirelight from 10.0.0.2 port 44857 ssh2: RSA 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+
+  use Ossec::Log::Parse;
+  
+  my $parse = Ossec::Log::Parse->new('/path/to/logfile');
+  while ( $events = $parse->getAlert() ) {
+    print $alert->{ts};
+    # 1443175627.1028
+    print $alert->{ts.human};
+    # 2015 Sep 25 06:07:07
+    print $alert->{type};     
+    # mail 
+    print $alert->{group};    
+    # syslog,fts,authentication_success
+    print $alert->{agent.name}; 
+    # i7dev
+    print $alert->{agent.ip}; 
+    # 10.0.0.4
+    print $alert->{location};
+    # /var/log/auth.log
+    print $alert->{rule.id}; 
+    # 10100
+    print $alert->{rule.level}; 
+    # 4
+    print $alert->{rule.comment};
+    # First time user logged in
+    print $alert->{full_log}; 
+    # Src IP: 10.0.0.2
+    # User: phirelight
+    # Sep 25 06:07:06 i7dev sshd[17673]: Accepted publickey for phirelight from 10.0.0.2 port 44857 ssh2: RSA 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+  }
+
+=head1 ABSTRACT
+
+Perl interface for parsing ossec alert files
+
+=head1 DESCRIPTION
+
+This library provides an easy and convenient way to parse the log files generated
+by L<ossec|http://www.ossec.net>.
+
+=head1 Constructor
+
+The base constructor for ossec::log::parse classes is called new. There are
+several different ways of calling the constructor, depending on the options you
+want to set. In a nutshell, one can either pass no argument (data is read from
+C<< <> >>); a string argument, which is interpreted as a file name; a file handle which
+is used to read data from; or an array reference that can use all of these
+options and set a few more parameter.
+
+=over 4
+
+=item B<new()>
+
+The first invocation of the base constructor for ossec::log::parse. No argument is
+passed. The resulting class reads ossec alert log data from C<< <> >>.
+
+=item B<new('/path/to/file')>
+
+Passing a string to the constructor for ossec::log::parse will read ossec alert log data
+from the file pointed to. If the file pointed to does not exist or cannot be
+opened, a fatal error is raised.
+
+=item B<new($fh)>
+
+Passing a file handle to the constructor for ossec::log::parse will read ossec alert log
+data from the filehandle.
+
+=item B<new({ option =E<gt> value })>
+
+Pass a hashref of options to the constructor for ossec::log::parse. Options that
+can be given (in descending order of importance):
+
+=over 4
+
+=item B<fh>
+
+Filehandle to be used as data source.
+
+=item B<file>
+
+Name of file to be used as data source.
+
+=item B<diamond>
+
+Boolean; if set to true, data is read from C<< <> >>, if no other data source is given.
+
+=back
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<getAlert()>
+
+Read input and return the parsed event data as a hash. Returns
+undef when on EOF.
+
+Hash includes: ts, ts.human, type, group, agent.name, agent.ip, location, rule.id, rule.level, rule.comment, full_log
+
+=item B<fh()>
+
+Return the filehandle data is read from. Returns undef if data is read from C<< <> >>.
+
+=item B<file()>
+
+Return the filename data is read from. Returns undef if no filename was given in
+constructor.
+
+=back
+
+=head1 AUTHOR
+
+Stefan Amyotte, E<lt>samyotte@phirelight.comE<gt>
+
+This work is a modified version of Johanna Amann repo L<Perl-Bro-Log-Parse|https://github.com/0xxon/perl-bro-log-parse>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015 by Stefan Amyotte
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

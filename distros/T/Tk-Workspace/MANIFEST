@@ -1,0 +1,22 @@
+Artistic
+eg/mwm_menu
+INSTALL
+Makefile.PL
+MANIFEST
+mkws
+RemoteFileSelect.pm
+SearchDialog.pm
+Shell.pm
+workspace
+Workspace.pm
+WorkspaceText.pm
+WorkspaceText.txt
+Workspace.txt
+workspace.xpm
+ws-upgrade
+ws-upgrade.txt
+XFontSelect.pm
+
+
+
+META.yml                                 Module meta-data (added by MakeMaker)

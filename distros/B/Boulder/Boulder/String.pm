@@ -2,8 +2,64 @@ package Boulder::String;
 use Boulder::Stream;
 @ISA = 'Boulder::Stream';
 
-$DATE=14.10.96;
-$VERSION=1.00;
+$DATE="4 Dec 2000";
+$VERSION=1.01;
+
+=head1 NAME
+
+Boulder::String - Read and write tag/value data from a string.
+
+=head1 SYNOPSIS
+
+   #!/bin/perl
+   # Read a B<Stone> from stdin and create a string that can be 
+   # passed to a dumb sub, which doesn't know about Stones.
+   use Boulder::Stream;
+   use Boulder::String;
+   
+   my $stream = Boulder::Stream->newFh;
+   
+   # read a stone from stdin
+   my $record = <$stream> );
+
+      print $stream $record;
+    }
+
+=head1 DESCRIPTION
+
+Boulder::String provides access to L<Boulder> IO
+hierarchical tag/value data.  
+Stone objects printed to the tied string
+are appended to the string in L<Boulder> format.
+
+=head1 Boulder::Stream METHODS
+
+=head2 $stream = Boulder::Stream->new($in_string,\$out_string);
+
+The B<new()> method creates a new B<Boulder::String> object.  You must
+provide an input string and a reference to an output string.
+The input string may be empty.
+
+=head2 $stream->write_record($stone)
+
+Write the passed stone in L<Boulder> IO format into $out_string.
+
+=head1 AUTHOR
+
+Lincoln D. Stein <lstein@cshl.org>, Cold Spring Harbor Laboratory,
+Cold Spring Harbor, NY.  This module can be used and distributed on
+the same terms as Perl itself.
+
+Patches and bug fixes contributed by Bernhard Schmalhofer
+<bernhard@biomax.de>.
+
+=head1 SEE ALSO
+
+L<Boulder>, L<Boulder::Stream>, 
+L<Boulder::Blast>, L<Boulder::Genbank>, L<Boulder::Medline>, L<Boulder::Unigene>,
+L<Boulder::Omim>, L<Boulder::SwissProt>
+
+=cut
 
 # Override Stream.pm to allow the input and output to be 
 # strings.  If outString is not defined, then we fall back
@@ -45,13 +101,14 @@ sub write_record {
 	@value = $stone->get($key);
 	$key = $self->escapekey($key);
 	foreach $value (@value) {
-	    unless (ref $value) {
-		$value = $self->escapeval($value);
-		$$out .= "$key$self->{delim}$value\n";
-	    } else {
-		$$out .= "$key$self->{delim}$self->{subrec_start}\n";
-		_write_nested($self,1,$value);
-	    }
+	  next unless ref $value;
+	  if (exists $value->{'.name'}) {
+	    $value = $self->escapeval($value);
+	    $$out .= "$key$self->{delim}$value\n";
+	  } else {
+	    $$out .= "$key$self->{delim}$self->{subrec_start}\n";
+	    _write_nested($self,1,$value);
+	  }
 	}
     }
     ${$self->{OUTSTRING}} .= "$self->{delim}\n";
@@ -91,13 +148,14 @@ sub _write_nested {
 	@value = $stone->get($key);
 	$key = $self->escapekey($key);
 	foreach $value (@value) {
-	    unless (ref $value) {
-		$value = $self->escapeval($value);
-		$$out .= "$indent$key$self->{delim}$value\n";
-	    } else {
-		$$out .= "$indent$key$self->{delim}$self->{subrec_start}\n";
-		_write_nested($self,$level+1,$value);
-	    }
+	  next unless ref $value;
+	  if (exists $value->{'.name'}) {
+	    $value = $self->escapeval($value);
+	    $$out .= "$indent$key$self->{delim}$value\n";
+	  } else {
+	    $$out .= "$indent$key$self->{delim}$self->{subrec_start}\n";
+	    _write_nested($self,$level+1,$value);
+	  }
 	}
     }
     

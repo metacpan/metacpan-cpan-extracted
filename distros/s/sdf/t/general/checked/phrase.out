@@ -1,0 +1,5 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Some text with an {{1[]implicit}} style.
+N[orig_style='N']Some text with an {{B[]explicit}} style or {{U[]two}}.
+N[orig_style='N']Some text with an {{EX[] example}} style or {{EX[]   two}}.

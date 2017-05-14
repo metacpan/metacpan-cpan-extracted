@@ -5,10 +5,12 @@
 use strict;
 use warnings;
 use Test::More;
-use Class::Load qw(try_load_class);
 
-try_load_class('Config::Scoped')
-    or plan skip_all => "No Config::Scoped module.";
+eval "use Config::Scoped";
+
+if ($@) {
+	plan skip_all => "No Config::Scoped module.";
+}
 
 plan tests => 3;
 

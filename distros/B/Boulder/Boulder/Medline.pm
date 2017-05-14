@@ -6,7 +6,7 @@ require Exporter;
 @EXPORT = ();
 @EXPORT_OK = ();
 use Carp;
-$VERSION=08061999;
+$VERSION=1.02;
 use constant DEFAULT_MEDLINE_PATH => '/data/medline/medline.txt';
 
 =head1 NAME
@@ -306,7 +306,7 @@ sub parse {
 # following are records which may appear multiple times 
   }elsif ($line=~/^RO/) { ($junk,$ro_tmp)=split(/  \- /,$line);$label="RO";$ro.=$ro_tmp."\n";
   }elsif ($line=~/^RN/) { ($junk,$rn_tmp)=split(/  \- /,$line);$label="RN";$rn.=$rn_tmp."\n";
-  }elsif ($line=~/^LA/) { ($junk,$la_tmp)=split(/  \- /,$line);$label="LA";$la.=.$la_tmp."\n";
+  }elsif ($line=~/^LA/) { ($junk,$la_tmp)=split(/  \- /,$line);$label="LA";$la.=$la_tmp."\n";
   }elsif ($line=~/^SB/) { ($junk,$sb_tmp)=split(/  \- /,$line);$label="SB";$sb.=$sb_tmp."\n";
   }elsif ($line=~/^GS/) { ($junk,$gs_tmp)=split(/  \- /,$line);$label="GS";$gs.=$gs_tmp."\n";
   }elsif ($line=~/^MH/) { ($junk,$mh_tmp)=split(/  \- /,$line);$label="MH";$mh.=$mh_tmp."\n";

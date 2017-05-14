@@ -1,9 +1,5 @@
 Revision history for Bio-Gonzales
 
-0.0548  2014-10-17
-        Started doing the Changes file
+0.01    Date/time
+        First version, released on an unsuspecting world.
 
-0.0549  2014-10-18
-        * Changed the log format. Shortend and simplified it. (Bio::Gonzales::Util::Log)
-        * Added sequence count info to nstat function. (Bio::Gonzales::Stat::Util)
-        * Fixed bug in show-align2clustalw.pl; thanks to Congmao Wang.

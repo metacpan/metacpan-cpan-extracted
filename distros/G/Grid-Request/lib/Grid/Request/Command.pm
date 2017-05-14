@@ -44,7 +44,7 @@ use vars qw( %VALID_OS %VALID_PARAM_ARGS %VALID_STATE
              %VALID_TYPE %VALID_CMD_TYPE );
 
 # The IO:Scalar and XML::Writer are pulled in with "require" if necessary.
-our $VERSION = qw$Revision: 8365 $[1];
+our $VERSION = '0.11';
 
 # Get rid of warnings about single usage.
 if ($^W) {
@@ -140,25 +140,15 @@ sub _init {
     # This is important for systems such as psearch, which change
     # uid's in order to submit jobs on behalf of users.
     # We should use the real user id.
-    $logger->debug("Setting the username according to effective uid: ",
-                   "$self->{username}.");
     $self->{username} = getpwuid($<);
+    $logger->debug("Set the username to the effective UID: " . $self->{username});
 
     # Set the default block size.
     $logger->debug("Setting the default block size.");
     $self->{block_size} = $DEFAULT_BLOCK_SIZE;
     
-    $logger->debug("Setting the project.");
-    if ( exists($args{project}) && defined($args{project}) ) {
-        $self->project($args{project});
-    } else {
-        my $msg = "Mandatory 'project' attribute not provided.";
-        $logger->fatal($msg);
-        Grid::Request::Exception->throw($msg);
-    }
-
     foreach my $method qw(block_size command class error getenv initialdir input output
-                          name priority times evictable length runtime hosts
+                          name project priority times evictable length runtime hosts
                          ) {
         if (exists($args{$method}) && defined($args{$method})) {
             $logger->info("Initializing $method.");
@@ -313,7 +303,7 @@ sub add_param {
             # Make the type case insensitive from the perspective of the user
             # by always capitalizing what they passed in.
             $param_obj->type(uc($args[2]));
-        } elsif (@args > 3 || @args == 0) {
+        } elsif (@args > 3 || @args == 0 || @args == 2) {
             # This method was called incorrectly.
             $msg = "add_param() only accepts 1 or 3 arguments.";
             $logger->error($msg);
@@ -685,37 +675,6 @@ sub initialdir {
         return undef;
     }
 }
-
-
-=item $obj->length([length]);
-
-B<Description:> This method is used to characterize how long the request
-is expected to take to complete. For long running requests, an attempt to
-match appropriate resources is made. If unsure, leave this setting unset.
-
-B<Parameters:> "short", "medium", "long". No attempt is made to validate
-the length passed in when used as a setter.
-
-B<Returns:> The currently set length attribute (when called with no
-arguments).
-
-=cut
-
-sub length {
-    $logger->debug("In length.");
-    my ($self, $length, @args) = @_;
-
-    if (defined $length) {
-        $logger->warn("The length method takes only one argument ",
-                      "when making an assignment.") if @args;
-        $self->{length} = $length;
-    } elsif (exists($self->{length}) && defined($self->{length})) {
-        return $self->{length};
-    } else {
-        return undef;
-    }
-}
-
 
 =item $obj->name([name]);
 
@@ -1211,7 +1170,6 @@ sub to_xml {
     my $output   = $self->output;
     my $priority = $self->priority;
     my $times    = $self->times;
-    my $length   = $self->length;
     my $getenv   = $self->getenv;
     my $email    = $self->email;
     my @ids      = $self->ids();
@@ -1229,47 +1187,44 @@ sub to_xml {
                            );
 
     $w->startTag('command', 'type' => $cmd_type);
-    $w->dataElement('executable', $exe);
-    $w->dataElement('project', $project );
-    $w->dataElement('username', getpwuid($<));
+    $w->dataElement('executable', $exe) if (defined($exe) && ($exe ne ""));
+    $w->dataElement('project', $project) if (defined($project) && ($project ne ""));
     foreach my $id (@ids) { 
-        $w->dataElement('id', $id );
+        $w->dataElement('id', $id);
     }
     $w->startTag('config');
     
     $logger->debug("XML :  Opsys is $opsys \n");
-    $w->dataElement("opSys", $opsys) if (defined $opsys);
-    $w->dataElement("class", $class) if (defined($class));
+    $w->dataElement("opSys", $opsys) if (defined($opsys) && ($opsys ne ""));
+    $w->dataElement("class", $class) if (defined($class) && ($class ne ""));
     $w->dataElement("hosts", $hosts) if (defined($hosts) && ($hosts ne ""));
-    $w->dataElement("memory", $memory) if defined($memory);
+    $w->dataElement("memory", $memory) if (defined($memory) && ($memory ne ""));
     $w->dataElement("passThrough", $pass_through) if (defined($pass_through) && ($pass_through ne ""));
 
     # getenv and length are are not mandatory in the config block.
     # Check if they are defined before writing any XML for them.
     $w->dataElement('getenv', $getenv) if defined($getenv);
-    $w->dataElement('length', $length) if (defined($length) && ($length ne ""));
-    $w->dataElement('evictable', $evictable) if (defined($evictable));
-    $w->dataElement('runningTime', $runtime) if (defined($runtime));
+    $w->dataElement('evictable', $evictable) if (defined($evictable) && ($evictable ne ""));
+    $w->dataElement('runningTime', $runtime) if (defined($runtime) && ($runtime ne ""));
 					   
     $w->endTag('config');
-
 
     # Several fields are are not required. Check if they are defined
     # before writing any XML for them.
     $w->dataElement('email', $email) if (defined($email) && ($email ne ""));
-    $w->dataElement('name', $name) if defined($name);
-    $w->dataElement('times', $times) if defined($times);
+    $w->dataElement('name', $name) if (defined($name) && ($name ne ""));
+    $w->dataElement('times', $times) if (defined($times) && ($times ne ""));
     
     # Command Param block.
     my @params = $self->params;
     if (@params) {
         $logger->info("Coding params into XML document.");
-        foreach my $ref (@params) {
-            $w->startTag('param', 'type' => $ref->{type} );
-            if ( exists($ref->{key}) && defined($ref->{key}) ) {
-                $w->dataElement('key', $ref->{key});
+        foreach my $param (@params) {
+            $w->startTag('param', 'type' => $param->type );
+            if ( defined($param->key) && length($param->key) ) {
+                $w->dataElement('key', $param->key);
             }
-            $w->dataElement('value', $ref->{value});
+            $w->dataElement('value', $param->value) if (defined($param->value));
             $w->endTag('param');
         }
     } else {
@@ -1293,8 +1248,8 @@ sub to_xml {
 sub _write_temp_array_file {
     $logger->debug("In _write_temp_array_file.");
     my ($self, $arrayref) = @_;
-    # To aid in tracking down problems, we are going to use the hostname to
-    # of the machine making the requests to name our temporary file.
+    # To aid in tracking down problems, we are going to use the hostname of
+    # the machine making the requests to name our temporary file.
     require Sys::Hostname;
     # Get the temporary file location. This was probably set by the enclosing
     # Request object when add_param was invoked.

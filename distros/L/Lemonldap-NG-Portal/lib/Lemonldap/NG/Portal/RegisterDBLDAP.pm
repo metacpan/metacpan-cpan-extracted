@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Simple;
 # Compute a login from register infos
 # @result Lemonldap::NG::Portal constant
 sub computeLogin {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Get first letter of firstname and lastname
     my $login =
@@ -37,7 +37,7 @@ sub computeLogin {
 # Insert new user
 # @result Lemonldap::NG::Portal constant
 sub createUser {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     my $mesg = $self->ldap->add(
         "uid=" . $self->{registerInfo}->{login} . "," . $self->{ldapBase},
@@ -72,7 +72,7 @@ sub createUser {
 # Search if login is already in use
 # @result 0 if login is used, 1 else
 sub isLoginUsed {
-    my ( $self, $login ) = splice @_;
+    my ( $self, $login ) = @_;
 
     my $mesg = $self->ldap->search(
         base   => $self->{ldapBase},

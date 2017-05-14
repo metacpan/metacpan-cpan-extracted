@@ -1,0 +1,13 @@
+version 0.000; 2015-03-24
+
+  * initial released version of Sub-WhenBodied; other changes noted here
+    are relative to Sub-Mutate-0.005
+
+  * port to Perl 5.21.1 which removed PL_sv_objcount
+
+  * port to Perl 5.21.6 which removed the padlist slot from XS subroutines
+
+  * port to Perl 5.21.7 which made PADNAMELIST a distinct type
+
+  * rename things in the C code to reflect the single-purpose status of
+    this module

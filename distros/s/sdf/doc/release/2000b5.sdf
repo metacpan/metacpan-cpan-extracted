@@ -1,0 +1,113 @@
+H1: 2.000beta5
+
+!subsections "Enhancements,General Fixes,HTML Fixes,HLP Fixes,Incompatibilities"
+
+H2: Enhancements
+
+H3: Performance
+
+Performance is now 2-3 times faster for most documents.
+There is still some work to do here, but the performance
+is now "respectable" (rather than "disappointing").
+
+H3: Perl 5
+
+This release has been tested with Perl 5.002 and is
+configured to use it, by default. However:
+
+* the odd "eval" buglet still (randomly?) appears when using Perl 5
+
+* the {{CMD:mif2rtf}} script has {{2:not}} been tested.
+
+If you wish to use Perl 4 instead, you will need
+to change the top line of the scripts in the
+{{FILE:bin}} directory after installing SDF.
+
+H3: Newsletters
+
+There is now a new style called {{newsletter}}.
+
+The {{FILT:title}} filter now supports a {{toc}}
+parameter for specifying a table of contents.
+For example:
+
+!block example; pure
+!block title; toc=$var{'OPT_TARGET'} eq 'html' ? 2 : 0
+Name    Value
+Title   My Newsletter
+Editor  Me
+!endblock
+!endblock
+
+This produces a title block for a newsletter and only gives it
+a table of contents when the target is [[HTML]].
+
+H3: Pre-Filtering
+
+{{CMD:sdfcvt}}'s -p option prefilters the input file for each argument.
+The (optional) parameter is the filter to use. For example:
+
+E:	sdfcvt -ptable mytable.tbl
+
+is equivalent to executing {{CMD:sdfcvt}} on a file which only contains:
+
+E:	!include "mytable.pl"; table
+
+File extensions can be mapped to filters in {{FILE:sdfcvt.ini}}.
+For example, {{FILE:sdfcvt.ini}} now contains the following:
+
+!block example
+[PreFilters]
+Name    Aliases     Module
+table   tbl
+module  sdm,sde     frmodule
+!endblock
+
+As {{tbl}} is mapped to {{table}}, creating nicely formatted
+tables is now quite easy. For example:
+
+E:	sdfcvt -p -aformat='15,75,10' mytable.tbl
+
+(The -a option can be used to specify prefilter parameters.)
+
+For a given prefilter, a module can be configured in
+{{FILE:sdfcvt.ini}} to be loaded before the filter is applied.
+As a result, it's possible to do really clever things via
+autoloaded filters. Examples include:
+
+* automatically documenting SDF modules
+* converting other formats to SDF on the fly.
+
+For example, the following command will build the reference documentation
+for a SDF module in [[HTML]] (real soon now):
+
+E: sdfcvt +sdf2html -p abc.sdm
+
+H2: General Fixes
+
+The {{CMD:sdf2txt}} stuff now works.
+
+H2: HTML Fixes
+
+Empty cells now look better. (This was supposed to be fixed
+by the previous release but I had missed a few.)
+
+Paragraphs with multiple anchors are now handled better
+(although the odd problem probably remains with this stuff).
+
+If a table of contents is requested and SDF doesn't know
+the "right" place for it, it is now prepended (rather
+than being dumped).
+
+Title blocks for correspondence look much better now.
+
+H2: HLP Fixes
+
+Absolute path names for libraries now correctly go into
+HPJ files. / characters are now also mapped to \ characters.
+
+Title blocks for correspondence look much better now.
+
+H2: Incompatibilities
+
+None.

@@ -1,0 +1,133 @@
+H1: 2.000beta7b
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+The new features in this version are:
+
+!block sections
+. Object catalog formatting
+. Subsections support
+. Appending text to phrases
+. New figure attributes
+. Other 2.000beta7b goodies
+!endblock
+
+Details are given below.
+
+H3: Object catalog formatting
+
+The user can now control how a catalog of objects
+(e.g. a table of references) is presented by
+setting the {{columns}} and {{compact}} parameters.
+{{columns}} is a comma-separated list of:
+
+E:   [tag":"]attribute
+
+:where:
+
+* {{tag}} is a phrase style (or expression format)
+* {{attribute}} is the name of an attribute of the class.
+
+{{compact}} is a boolean flag which reduces the spacing
+between the rows in the table.
+
+This feature is extremely useful for building "project overview"
+Web pages. See the SDF document catalog for an example.
+
+H3: Subsections support
+
+The new {{MAC:subsections}} macro can now be used to specify
+the subsections in a topic. This has several advantages:
+
+* subsections can be given a hypertext {{id}} which contains the
+  current topic name (making them unique)
+* for HTML, a "jump line" can be generated.
+
+For example:
+
+E:   H1: MyApp
+E:   !subsections "Purpose,Usage,Description,Examples"
+
+In this case, the {{MAC:subsections}} macro changes the
+{{id}} generated for the headings listed to:
+
+E:   MyApp - {{heading}}
+
+For HTML, it will also generate a line of jumps to the headings.
+
+H3: Appending text to phrases
+
+Event processing on phrases has now been extended to support
+appending text to a phrase, i.e. prepending text to the rest of
+the paragraph. Text is appended by setting {{$append}}.
+For example:
+
+E:   !on phrase 'PRD';; $append .= '(tm)'
+
+Note: This feature is used to provide "qsd-style" (document name and code)
+expansion for REF phrases.
+
+H3: New figure attributes
+
+The {{IMPORT}} phrase style and the {{MAC:import}} macro
+now support new attributes:
+
+* {{base}} - the prefix to prepend to the figure pathname
+  to get the location needed for the HTML output
+* {{jump}} - the URL to jump to
+* {{border}} - the border width in pixels.
+
+These attributes are currently only supported for HTML output.
+
+H3: Other 2.000beta7b goodies
+
+The {{FILT:table}} filter now supports new attributes:
+
+* {{cellpadding}} - the pixels between the cell boundary and contents
+* {{cellspacing}} - the pixels between cells.
+
+These attributes are currently only supported for HTML output.
+
+In topics mode, the default header for the main topic now
+contains jumps to the next and previous topics.
+
+The {{SUBR:Values}} subroutine can now be used to lookup the value
+of an attribute for an object in a class.
+
+{{Calculation subroutines}} can now be defined for attributes in
+a class. See {{FILE:perllib/sdf/values.pl}} for examples.
+
+H2: Fixes
+
+Unzipping SDF 2.000beta7a on MS-DOS caused problems as symbolic
+links on Un*x were not being unzipped correctly.
+This should now be fixed - the new distribution does not contain
+symbolic links for files, just directories.
+
+SECT phrases are now output again in [[PostScript]] documents.
+(However, there is a still a bug in the cross reference support
+which caused this problem.)
+
+A number of obscure errors in formatting list items for HTML
+are now fixed.
+
+Warnings are now produced again for unknown parameters to filters.
+(This was broken by the performance enhancements added in
+2.000beta5, I think.)
+
+An error is now output for tables which have repeated headings.
+Previously, columns were silently "ignored".
+
+A "noheadings" table with no data rows no longer produces
+unexpected output.
+
+A number of problems are now fixed in the {{mincom/mims}} library.
+In particular, the screen dumps for MSM000A and MSM000B now look
+as they should.
+
+H2: Incompatibilities
+
+The {{sdf2mimsus}} and {{sdf2qsdus}} aliases have been renamed
+to {{sdf2mimsl}} and {{sdf2qsdl}} respectively.

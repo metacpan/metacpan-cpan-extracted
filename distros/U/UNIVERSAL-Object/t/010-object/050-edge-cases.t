@@ -76,7 +76,7 @@ TODO:
     eval { UNIVERSAL::Object->new([]) };
     like(
         $@,
-        qr/^\[ARGS\] expected a HASH reference but got a ARRAY\(0x.*\)/,
+        qr/^Invalid BUILDARGS args for UNIVERSAL\:\:Object\, expected a HASH reference but got a ARRAY\(0x.*\)/,
         '... error case when incorrect type of args is passed in'
     );
 
@@ -84,7 +84,7 @@ TODO:
     eval { UNIVERSAL::Object->new(10) };
     like(
         $@,
-        qr/^\[ARGS\] expected an even sized list reference but instead got 1 element\(s\)/,
+        qr/^Invalid BUILDARGS args for UNIVERSAL\:\:Object\, expected an even sized list\, but got 1 element\(s\) instead/,
         '... error case when incorrect number of args is passed in'
     );
 

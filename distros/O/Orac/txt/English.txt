@@ -1,0 +1,262 @@
+about_orac^About Orac & Terms of Use^
+add^Add^
+add_butt_mess^Please pick the cascade you wish to attach button to^
+add_button^Add Button^
+add_cascade^Add Cascade^
+are_you_sure^Please Confirm^
+auto_clear^Automatic Clear^
+back_col_menu^Background Colour Menu^
+back_procs^Background Processes^
+bar_col^red^
+blk_siz^Block Size^
+build_index^Build Index^
+butt_text^Button Text (Report Title)^
+button^Button^
+cancel^Cancel^
+casc_text^Cascade Text^
+cascade^Cascade^
+change_dbtyp^Change DB^
+choose_butt^Choose Button^
+choose_casc^Choose Cascade^
+clear^Clear^
+comments^Comments^
+comp_errs_for^Compilation Errors for^
+compr_extnts^Compressed Extents^
+config_add_butt^Add a Button to a Cascade^
+config_add_casc^Add a Cascade to My Tools Menu^
+config_del_butt^Delete a Button from a Cascade^
+config_del_casc^Delete a Cascade^
+config_edit_butt^Edit Text for Button^
+config_edit_casc^Edit Text for Cascade^
+config_edit_sql^Edit SQL Attached to Button^
+config_tools^Configure My Tools^
+conn_times^Connection Times^
+connect^Connect^
+connecting^Connecting...^
+constrnts^Constraints^
+cont^Continue^
+curr_procs^Current Processes^
+data_obj^Data Objects^
+datfils^Datafiles^
+db^Database^
+db_change_mess^Changing DB without correct DBI will cause failure report^
+db_files^Database Files^
+db_info^Database Info^
+db_recr_sql^Database Recreation SQL^
+db_type^Database Type^
+dba_views^DBA Tables Viewer^
+dbish^GUI Dbish^
+dbwr^Database Writer^
+dbwr_io_rp^DBWR I/O Report^
+dbwr_lgwr^DBWR & LGWR^
+dbwr_lgwr_wts^DBWR & LGWR Waits Monitor^
+dbwr_lru_ltch^DBWR LRU Latches^
+dbwr_mon^DBWR Monitor^
+def_backgr_col^steelblue2^
+def_fg_col^black^
+def_fill_fld_col^white^
+del^Delete^
+del_butt_mess2^This will delete the button and attached SQL^
+del_butt_mess^Please pick the cascade you wish to delete button from^
+del_butt_text^Button for Deletion^
+del_button^Delete Button^
+del_cascade^Delete Cascade^
+del_message^This will delete the cascade, and all attached buttons/SQL^
+det_tab_datafil^Detailed Chart by Tablespace/Datafile^
+disconn^Disconnected...^
+dispatch_mts^Dispatcher Mts Related Info^
+doub_click^Double-Click Selection^
+ed_sql_mess2^Please pick a Button^
+ed_sql_mess^Please pick a Cascade^
+ed_sql_txt^Edit the SQL Text and save its attachment to Button^
+err_obj^Errored Objects^
+execute_sql^Execute SQL^
+exit^Exit^
+explain^Explain^
+explain_help^Enter valid SQL for User, and Explain (no semi-colons)^
+explain_plan^SQL Browser/Explain Plan^
+ext_rep^Extents Report^
+file^File^
+file_io^File I/O^
+form^Interactive Form^
+form_for^Form for^
+full^Full^
+funcs^Functions^
+gh_summ_sess^Summary of Session Waits & CPU^
+help_with_tools^Help with My Tools^
+hits^Hit Ratios^
+hold_sql^Holding SQL^
+i_col^Column^
+i_dat_typ^Datatype^
+i_desc^Descend?^
+i_ord^Ord^
+i_sel_sql^Select SQL^
+id_srt_usrs^Identifying Sort Users^
+ind_crt_for^Index Creation for^
+ind_name^Index Name^
+ind_ord_arrng^Please Arrange Index Order, then continue^
+indexs^Indexes^
+info^Information^
+inval_obj^Invalid Object SQL^
+investgn^Investigation^
+lck^Lock^
+lcks_held^Locks Currently Held^
+lgwr^Log Writer^
+lgwr_mon^LGWR Monitor^
+lgwr_redo_ltchs^LGWR Redo Buffer Latches^
+ln_nums^Line Numbers^
+lnks^Links^
+logdon_usrs^Current Logged on Users^
+logical_struct^Logical Structures^
+login_txt^DBA User Connection^
+lt_wtrs^Latch Waiters^
+ltchs^Latches^
+lw_ratio^Current Latch Wait Ratios^
+man_clear^Manual Clear^
+max_exts_free^Max Extents Free Space^
+mem_hogs1^Pool Statements, High Disk Reads^
+mem_hogs2^All Pool Statements^
+menu_config^Orac Configuration Guide^
+mts^Mts^
+mts_bzy^Mts Busy Time of the Dispatchers^
+mts_mem^Mts User Session Current and Max Memory^
+mts_wait_srv^Mts Wait Time for a Server^
+mts_wt_disp^Mts Wait Time for the Dispatcher Queues^
+my_tools^My Tools^
+new_dbtyp^Initial Orac Installation of Default DB^
+next^Next^
+nls_prms^NLS Parameters^
+no^No^
+no_cascs^There are no appropriate records^
+no_cols_sel^No Columns Selected^
+no_ln_nums^No Line Numbers^
+no_rows^No rows selected^
+no_rows_found^no rows found^
+no_semi_colon^NB: No semi-colon required to terminate SQL^
+no_val_def^No Value Defined^
+not_conn^Not Connected^
+obj^Object^
+oi_blobs^Blobs^
+oi_chunks^Chunks^
+oi_col_attbs^Column attributes^
+oi_columns^Columns^
+oi_curr_sql^Current SQL statements^
+oi_dbspaces^DbSpaces^
+oi_expl_err^Explain error number^
+oi_extents_report^Extent report^
+oi_grants^Grants^
+oi_indices^Indices^
+oi_io_profile^I/O profile^
+oi_io_profile_title^Chunk IO Profile^
+oi_log_rep^Log report^
+oi_logical_log^Display logical log^
+oi_onconfig_params^Onconfig parameters^
+oi_proc_list^Procedure listing^
+oi_procedures^Procedures^
+oi_schema^Schema^
+oi_synonyms^Synonyms^
+oi_tabinfo^Table Info^
+oi_tables^Tables^
+oi_threads^Threads/Sessions^
+oi_trig_list^Trigger listing^
+oi_triggers^Triggers^
+oi_view_dets^View details^
+oi_views^Views^
+orac_pan^Orac Control Panel^
+orig_exts^Original Extents^
+params^Parameters^
+pck_bods^PackageBods^
+pck_hds^PackageHeads^
+physical^Physical^
+pl_sql^PL/SQL^
+please_pick_db^Please choose your default database^
+pool_frag^Pool Fragmentation?^
+procs^Procedures^
+procss_wts^Processes Experiencing Waits^
+profiles^Profiles^
+profiles_db^Profiles on Database^
+prov_sql^Provide SQL, indicate order, then^
+quick_sql^Quick SQL Execution^
+quots^Quotas^
+raw_db_sql^Raw Database Component SQL^
+rec_of^Record of^
+reconn^Reconnect^
+recrt_base_sql^Recreation SQL for svrmgrl^
+reg_usrs^Registered Users on Database^
+rep^Report^
+report^REPORT^
+rolegrnts^RoleGrants^
+roll_seg_stats^Rollback segment statistics^
+rollback^Rollback^
+rollbk_lcks^Rollback locks?^
+rollbk_stats^Rollback Statistics^
+rollname^Rollback Sizings^
+rollsegs^Current States^
+rols^Roles^
+rols_db^Roles on Database^
+save^Save^
+saved^Saved^
+see_sql^See SQL^
+sel_addr^Paddr Results^
+sel_cols^Select Columns & then Build Index^
+sel_info^Select Information^
+sel_sid^Sid Stats Results^
+seqs^Sequences^
+sess_mem^Session Memory Consumption^
+sess_uga_max^Total Session UGA Max^
+sess_wt_stats^Top ORACLE Wait events^
+sga_stat^Main SGA Stats^
+sga_stats^Fuller SGA Stats Info^
+sh_prms^Show Parameters^
+shared_pool_sql^Shared Pool & SQL^
+snap_logs^SnapshotLogs^
+snaps^Snapshots^
+sort_mon^Sort Monitor^
+sorts^Sorts^
+spec_addrss^Specific Addresses^
+spec_sids^Specific Sids^
+sql_crt_states^SQL Creation Statements^
+sql_for^SQL for^
+sql_menu^SQL^
+sql_quest^sql?^
+stat^Stat^
+stop^Stop^
+struct^Structure^
+summ_tabsp^Summary Chart by Tablespace^
+synyms^Synonyms^
+sys_pass^DBA User Password^
+sys_user^DBA User^
+system_please^Please enter a DBA user password^
+tabs^Tables^
+tabsp^Tablespace^
+tabsp_frag^Tablespace Fragmentation^
+tabsp_sp_shorts^Tablespace Space Shortages^
+tabsp_tune^Tablespace Tuning^
+tabsp_txt^Tablespace Text Report^
+tot_sess_uga^Total Session UGA^
+trggrs^Triggers^
+tune^Tune^
+upd^Update^
+upd_butt_text^Button for Update^
+upd_button^Update Button^
+upd_cascade^Update Cascade^
+use_utlxplan^Please run utlxplan.sql to create user's PLAN_TABLE, for 'Explain Plan' option.^
+user^User^
+user_access^User Access^
+user_obj^User Objects^
+user_please^Please enter a DBA user with at least main 'Select' privileges^
+user_proc_io^Any User Processes Performing I/O?^
+user_process^User Processess^
+user_record^User Records^
+user_summ^User Activity Summary^
+user_upd_db^Any Users Updating on Database?^
+usergrant^UserGrants^
+users^Users^
+vers_info^Version Info^
+views^Views^
+what_sql^What SQL^
+what_sql_users^What SQL statements are Users Processing?^
+who_accs_obj^Who's accessing which objects?^
+who_hold^Who's holding back Whom?^
+wrong_dbi^You may have selected the wrong database type for your system^
+yes^Yes^

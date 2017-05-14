@@ -13,14 +13,18 @@ use Command::Interactive;
 use POSIX qw(locale_h);
 use locale;
 
+setlocale(LC_ALL, 'en');
+
 # Test 1. Create a simple expected interaction
 # and verify that it works "echo yes"
 my $interaction = Command::Interactive::Interaction->new({
-        expected_string => 'yes',
-        is_required     => 1,
+    expected_string => 'yes',
+    is_required     => 1,
 });
 
-my $command = Command::Interactive->new({interactions => [$interaction],});
+my $command = Command::Interactive->new({
+    interactions => [$interaction],
+});
 
 is($command->run("echo yes"),      undef,                                                   "Run command successfully");
 is($command->run("echo no"),       "Failed to encounter required string 'yes' before exit", "Catch expected failure");
@@ -35,7 +39,7 @@ $interaction->is_error(1);
 is($command->run("echo yes"), "Got error string 'yes', which matched error detection string 'yes'", "Detect known error strings");
 
 $command->interactions([]);
-like($command->run("asdfasdf"), qr/Could not execute asdfasdf/, "Bogus command");
+is($command->run("asdfasdf"), 'Could not execute asdfasdf: No such file or directory', "Bogus command");
 is($command->run("false"), 'Error executing false: ', "Command returning non-zero value");
 
 $command->always_use_expect(1);
@@ -47,12 +51,11 @@ is(defined($tempfh), 1, "Created a temporary file for output stream testing");
 $command->output_stream($tempfh);
 $command->echo_output(1);
 my $test_string = "This is a test string";
-is($command->run("echo '$test_string'"), undef, "Echo some output");
+is($command->run("echo -n '$test_string'"), undef, "Echo some output");
 $tempfh->close;
 $tempfh = IO::File->new($tempfile);
 is(defined($tempfh), 1, "Re-open temporary file for output stream testing");
 my $contents = join('', <$tempfh>);
-chomp($contents);
 is($contents, $test_string, "Contents from output file match original string");
 $tempfh->close;
 

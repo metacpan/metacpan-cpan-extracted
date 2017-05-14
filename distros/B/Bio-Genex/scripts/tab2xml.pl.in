@@ -1,0 +1,86 @@
+%%START_PERL%%
+#
+# tab2xml.pl.in
+#    first version Tue Oct 24 14:13:45 MST 2000
+#    script for converting tab deliimited file into XML
+#
+my $VERSION = '$Id: tab2xml.pl.in,v 1.3 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+use Bio::Genex::XMLUtils qw(pretty_print);
+
+my ($infile,$outfile);
+my $ELEMENT_NAME = 'element';
+my $rc = GetOptions('infile=s' => \$infile,
+		    'outfile=s' => \$outfile,
+		    'tag=s' => \$ELEMENT_NAME,
+		   );
+
+my $USAGE = <<"EOU";
+usage: $0 --infile=file_name --outfile=file_name --tag=main_tag_name
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --infile\n$USAGE" unless defined $infile;
+die "Must specify --outfile\n$USAGE" unless defined $outfile;
+
+open(IN,$infile) or die "Couldn't open $infile for reading";
+open(OUT,">$outfile") or die "Couldn't open $outfile for writing";
+
+my $xml = <<"EOX";
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<$ {ELEMENT_NAME}_list/>
+EOX
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parse($xml);
+my ($list_node) = $DOC->getElementsByTagName($ELEMENT_NAME . '_list');
+die "Couldn't get <$ {ELEMENT_NAME}_list> from ", $DOC->toString(), "\n"
+  unless defined $list_node;
+
+my $line_num;
+my $COL_NUM;
+my $col_num;
+foreach my $line (<IN>) {
+  $line_num++;
+  next if $line =~ /^\#/;
+  next if $line =~ /^\s*$/;
+
+  my @cols = split("\t",$line);
+  my $col_num = scalar @cols;
+  die "Coulnd't get columns from line: $line_num: $line\n" 
+    unless $col_num;
+
+  if (defined $COL_NUM) {
+    die "Expected $COL_NUM columns, found $col_num at line: $line_num: $line\n"
+      unless $COL_NUM == $col_num;
+  } else {
+    $COL_NUM = $col_num;
+    print STDERR "Looking for $COL_NUM columns\n";
+  }
+
+  my $node = $DOC->createElement($ELEMENT_NAME);
+  $list_node->appendChild($node);
+  my $i;
+  foreach my $col (@cols) {
+    $i++;
+    $node->setAttribute('attr' . $i, $col);
+  }
+}
+close(IN);
+
+print OUT pretty_print($DOC->toString());
+close(OUT);
+exit(0);
+
+sub error {
+  my ($error) = @_;
+  die "$error\n";
+}

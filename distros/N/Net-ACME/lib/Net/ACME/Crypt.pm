@@ -9,99 +9,28 @@ package Net::ACME::Crypt;
 use strict;
 use warnings;
 
+use Digest::SHA       ();
 use JSON              ();
 use MIME::Base64      ();
 
-use Crypt::Perl::PK ();
-
-use Net::ACME::X ();
-
-#As per the ACME spec
-use constant JWK_THUMBPRINT_DIGEST => 'sha256';
-
-use constant JWT_RSA_SIG => 'RS256';
-
-*parse_key = \&Crypt::Perl::PK::parse_key;
-
-sub get_jwk_thumbprint {
-    my ($jwk_hr) = @_;
-
-    #We could generate the thumbprint directly from the JWK,
-    #but there’d be more code to maintain. For now the speed hit
-    #seems acceptable … ?
-
-    my $key_obj = Crypt::Perl::PK::parse_jwk($jwk_hr);
-
-    return $key_obj->get_jwk_thumbprint(JWK_THUMBPRINT_DIGEST());
-}
+use Net::ACME::Crypt::RSA ();
 
 *_encode_b64u = \&MIME::Base64::encode_base64url;
 
-#expects:
-#   key - object
-#   payload
-#   extra_headers (optional, hashref)
-sub create_jwt {
-    my (%args) = @_;
-
-    if ($args{'key'}->isa('Crypt::Perl::RSA::PrivateKey')) {
-        return _create_rs256_jwt(%args);
-    }
-    elsif ($args{'key'}->isa('Crypt::Perl::ECDSA::PrivateKey')) {
-        return _create_ecc_jwt(%args);
-    }
-
-    die "Unrecognized “key”: “$args{'key'}”";
-}
-
-#----------------------------------------------------------------------
+*get_rsa_public_jwk = \&Net::ACME::Crypt::RSA::get_public_jwk;
+*get_rsa_jwk_thumbprint = \&Net::ACME::Crypt::RSA::get_jwk_thumbprint;
 
 #Based on Crypt::JWT::encode_jwt(), but focused on this particular
-#protocol’s needs. Note that UTF-8 might get mangled in here,
+#protocol’s needs. Note that UTF-8 will probably get mangled in here,
 #but that’s not a problem since ACME shouldn’t require sending raw UTF-8.
-#(Maybe with registration??)
-sub _create_rs256_jwt {
-    my ( %args ) = @_;
-
-    my $alg = JWT_RSA_SIG();
-
-    my $key = $args{'key'};
-
-    my $signer_cr = sub {
-        return $key->can("sign_$alg")->($key, @_);
-    };
-
-    return _create_jwt(
-        %args,
-        alg => $alg,
-        signer_cr => $signer_cr,
-    );
-}
-
-sub _create_ecc_jwt {
-    my (%args) = @_;
-
-    my $key = $args{'key'};
-
-    my $signer_cr = sub {
-        return $key->sign_jwa(@_);
-    };
-
-    return _create_jwt(
-        %args,
-        alg => $key->get_jwa_alg(),
-        signer_cr => $signer_cr,
-    );
-}
-
-sub _create_jwt {
+sub create_rs256_jwt {
     my ( %args ) = @_;
 
     # key
     die "JWS: missing 'key'" if !$args{key};
 
     my $payload = $args{payload};
-    my $alg     = $args{'alg'};
+    my $alg     = 'RS256';
 
     my $header  = $args{extra_headers} ? { %{$args{extra_headers}} } : {};
 
@@ -118,12 +47,14 @@ sub _create_jwt {
     my $json_header = _encode_json($header);
     my $b64u_header = _encode_b64u($json_header);
 
-    my $signer_cr = $args{'signer_cr'};
+    my $signer_cr = Net::ACME::Crypt::RSA->can("sign_$alg");
 
     my $b64u_signature = _encode_b64u( $signer_cr->("$b64u_header.$b64u_payload", $args{key}) );
 
     return join('.', $b64u_header, $b64u_payload, $b64u_signature);
 }
+
+#----------------------------------------------------------------------
 
 sub _encode_json {
     my ($payload) = @_;
@@ -145,6 +76,20 @@ sub _payload_enc {
     }
 
     return $payload;
+}
+
+sub _bigint_to_raw {
+    my ($bigint) = @_;
+
+    my $hex = $bigint->as_hex();
+    $hex =~ s<\A0x><>;
+
+    #Ensure that we have an even number of hex digits.
+    if (length($hex) % 2) {
+        substr($hex, 0, 0) = '0';
+    }
+
+    return pack 'H*', $hex;
 }
 
 1;

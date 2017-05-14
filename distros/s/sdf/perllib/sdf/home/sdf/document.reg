@@ -1,0 +1,41 @@
+# $Id$
+#
+# >>Title::     SDF Document Register
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{FILE:document.reg}} is the reference table for [[SDF]] documents.
+# This table is used to lookup document properties.
+# It can also be used to generate a catalog of project documents.
+#
+# >>Description::
+# The fields used are given below.
+#
+# !block table
+# Field     Description
+# Reference the document code
+# Document  the document title
+# Jump      the filename of the document
+# Version   the document version number
+# Status    the document status (e.g. Draft, Review or Final)
+# !endblock
+#
+Reference    Version Status  Jump                 Document
+MTR-SDF-0001 001     Final   paper/sdfintro.html  The SDF Document Development System
+MTR-SDF-0002 001     Final   user/ug_sdf.html     SDF User Guide
+MTR-SDF-0003 002     Draft   quickref/qr_sdf.html SDF Quick Reference
+MTR-SDF-0004 001     Final   ref/re_sdf.html      SDF Reference
+MTR-SDF-0005 001     Final   guru/gg_sdf.html     SDF Guru Guide
+MTR-SDF-0008 001     Final   release/rn_sdf.html  SDF Release Notes
+MTR-SDF-0011 001     Final   genhtml/index.html   Generating HTML Using SDF
+MTR-SDF-0012 001     Final   podusers/index.html  SDF for POD Users
+SDF-FAQ      001     Final   faq/faq.html         SDF Frequently Asked Questions

@@ -1,8 +1,0 @@
-Revision history for Perl extension QPopupMenu.
-
-0.02  Sun Apr 13 13:17:06 1997
-	- updated for qt-1.2
-
-0.01  Fri Apr  4 10:20:55 1997
-	- original version; created by h2xs 1.18
-

@@ -1,8 +1,10 @@
 # Copy&Paste template for yourTest.t
 =head1
 package yourTest;
-use base TestBase;
 use strict;
+use FindBin;
+use lib ($FindBin::Bin);
+use parent 'TestBase';
 use TypeTests;
 use Test::More;
 

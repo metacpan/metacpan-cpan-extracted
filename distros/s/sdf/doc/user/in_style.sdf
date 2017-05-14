@@ -1,0 +1,63 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Document styles
+
+H2: Changing the style
+
+The general style (or type) of a document can be changed
+by initialising the OPT_STYLE variable on the top line of a document.
+For example:
+
+E:   !init OPT_STYLE="manual"
+
+Alternatively, {{CMD:sdf}}'s -s option can be used. For example:
+
+E:   sdf -2ps -smanual mydoc
+
+Note: The -s option overrides the {{MAC:init}} macro setting.
+
+H2: Available styles
+
+The available document styles, grouped by {{style category}}, are:
+
+!block table; groups
+Style           Purpose
+General:
+document        a normal document
+manual          a manual
+paper           a technical paper
+Administration:
+admin           generic administration document
+fax             a fascimile
+memo            a memorandum
+newslttr        a newsletter
+minutes         minutes of a meeting
+Miscellaneous:
+listing         a source code listing
+!endblock
+
+H2: Building a title
+
+Each style category has a different way of building a title section:
+
+* {{general}} styles use the {{MAC:build_title}} macro
+* {{administration}} styles use the {{FILT:title}} filter
+* {{miscellaneous}} styles do not have a title.
+
+H2: Creating new styles
+
+It is relatively simple to create new styles
+by inheriting details from an existing one.
+
+Refer to the {{DOC:SDF Guru Guide}} for details.

@@ -1,0 +1,339 @@
+blob
+mark :1
+data 468
+{{$dist}} version {{$version}}, released {{$date}}
+
+
+Blah blah blah.
+
+
+
+INSTALLATION
+
+To install these modules, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+{{ $t->dependency_list }}
+
+
+
+CHANGES
+    Here's what's new in version {{$version}} of {{$dist}}:
+    (See the file "Changes" for the full revision history.)
+
+{{$changes}}
+
+
+
+COPYRIGHT AND LICENSE
+
+{{ local $_ = $zilla->license->notice; chomp; $_ }}
+
+blob
+mark :2
+data 178
+name     = DZT-Sample
+author   = E. Xavier Ample <example@example.org>
+license  = Perl_5
+copyright_holder = E. Xavier Ample
+
+[GatherDir]
+[VersionFromModule]
+[GitVersionCheckCJM]
+
+blob
+mark :3
+data 98
+package DZT::First;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.01';
+
+blob
+mark :4
+data 456
+package DZT::Sample;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.01';
+# This file is part of {{$dist}} {{$dist_version}} ({{$date}})
+
+=attr bogus
+
+Don't have this.
+
+=method return_arrayref_of_values_passed
+
+blah
+
+=cut
+
+sub return_arrayref_of_values_passed {
+  my $invocant = shift;
+  return \@_;
+}
+
+1;
+
+=head1 DEPENDENCIES
+
+DZT::Sample requires {{$t->dependency_link('Bloofle')}} and
+{{$t->dependency_link('Foo::Bar')}}.
+
+=cut
+
+blob
+mark :5
+data 228
+use strict;
+use warnings;
+
+use Test::More 0.88;
+use DZT::Sample;
+
+is_deeply(
+  DZT::Sample->return_arrayref_of_values_passed(1, [ 2 ], { 3 => 4 }),
+  [ 1, [ 2 ], { 3 => 4 } ],
+  "we do what we say on the tin",
+);
+
+done_testing;
+
+reset refs/tags/0.01
+commit refs/tags/0.01
+mark :6
+author E. Xavier Ample <example@example.org> 1289243198 -0600
+committer E. Xavier Ample <example@example.org> 1289243198 -0600
+data 13
+Version 0.01
+M 100644 :1 README
+M 100644 :2 dist.ini
+M 100644 :3 lib/DZT/First.pm
+M 100644 :4 lib/DZT/Sample.pm
+M 100644 :5 t/basic.t
+
+blob
+mark :7
+data 456
+package DZT::Sample;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.02';
+# This file is part of {{$dist}} {{$dist_version}} ({{$date}})
+
+=attr bogus
+
+Don't have this.
+
+=method return_arrayref_of_values_passed
+
+blah
+
+=cut
+
+sub return_arrayref_of_values_passed {
+  my $invocant = shift;
+  return \@_;
+}
+
+1;
+
+=head1 DEPENDENCIES
+
+DZT::Sample requires {{$t->dependency_link('Bloofle')}} and
+{{$t->dependency_link('Foo::Bar')}}.
+
+=cut
+
+blob
+mark :8
+data 107
+package DZT::Sample::Second;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.02';
+
+commit refs/tags/0.02
+mark :9
+author E. Xavier Ample <example@example.org> 1289243358 -0600
+committer E. Xavier Ample <example@example.org> 1289243358 -0600
+data 13
+Version 0.02
+from :6
+M 100644 :7 lib/DZT/Sample.pm
+M 100644 :8 lib/DZT/Sample/Second.pm
+
+blob
+mark :10
+data 120
+package DZT::First;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.03';
+
+# added in version 3
+
+blob
+mark :11
+data 456
+package DZT::Sample;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.03';
+# This file is part of {{$dist}} {{$dist_version}} ({{$date}})
+
+=attr bogus
+
+Don't have this.
+
+=method return_arrayref_of_values_passed
+
+blah
+
+=cut
+
+sub return_arrayref_of_values_passed {
+  my $invocant = shift;
+  return \@_;
+}
+
+1;
+
+=head1 DEPENDENCIES
+
+DZT::Sample requires {{$t->dependency_link('Bloofle')}} and
+{{$t->dependency_link('Foo::Bar')}}.
+
+=cut
+
+commit refs/tags/0.03
+mark :12
+author E. Xavier Ample <example@example.org> 1289243521 -0600
+committer E. Xavier Ample <example@example.org> 1289243521 -0600
+data 22
+Starting version 0.03
+from :9
+M 100644 :10 lib/DZT/First.pm
+M 100644 :11 lib/DZT/Sample.pm
+
+blob
+mark :13
+data 107
+package DZT::Sample::Second;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.03';
+
+commit refs/tags/0.03
+mark :14
+author E. Xavier Ample <example@example.org> 1289243545 -0600
+committer E. Xavier Ample <example@example.org> 1289243545 -0600
+data 22
+Finished version 0.03
+from :12
+M 100644 :13 lib/DZT/Sample/Second.pm
+
+blob
+mark :15
+data 456
+package DZT::Sample;
+# ABSTRACT: Sample DZ Dist
+
+use strict;
+use warnings;
+
+our $VERSION = '0.04';
+# This file is part of {{$dist}} {{$dist_version}} ({{$date}})
+
+=attr bogus
+
+Don't have this.
+
+=method return_arrayref_of_values_passed
+
+blah
+
+=cut
+
+sub return_arrayref_of_values_passed {
+  my $invocant = shift;
+  return \@_;
+}
+
+1;
+
+=head1 DEPENDENCIES
+
+DZT::Sample requires {{$t->dependency_link('Bloofle')}} and
+{{$t->dependency_link('Foo::Bar')}}.
+
+=cut
+
+commit refs/heads/master
+mark :16
+author E. Xavier Ample <example@example.org> 1289243648 -0600
+committer E. Xavier Ample <example@example.org> 1289243648 -0600
+data 13
+Version 0.04
+from :14
+M 100644 :15 lib/DZT/Sample.pm
+
+reset refs/heads/master
+from :16
+
+reset refs/tags/0.04
+from :16
+
+tag 0.04
+from :16
+tagger E. Xavier Ample <example@example.org> 1289243653 -0600
+data 14
+Tagging v0.04
+
+tag 0.03
+from :14
+tagger E. Xavier Ample <example@example.org> 1289243598 -0600
+data 14
+Tagging v0.03
+
+tag 0.02
+from :9
+tagger E. Xavier Ample <example@example.org> 1289243370 -0600
+data 14
+Tagging v0.02
+
+tag 0.01
+from :6
+tagger E. Xavier Ample <example@example.org> 1289243224 -0600
+data 14
+Tagging v0.01
+

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE AGENDA SYSTEM "agenda.dtd">
+<!-- Place comment here -->
+<AGENDA NAME="Sigma">
+  <MAAND ID="1/99" NAAM="Januari">
+    <PUNT TYPE="Borrel">
+      <TITEL>Nieuwjaarsborrel</TITEL>
+      <DATUM>4/1/1999</DATUM>
+      <ORG>Subfaculteit Scheikunde</ORG>
+      <LINK URL="http://www.sci.kun.nl/sigma/"/>
+      <INFO>
+        <PLAATS>kantine B-faculteit</PLAATS>
+        <TIJD>16.30</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="E-lezing">
+      <TITEL>Informed Chemistry: what can it do for synthesis?</TITEL>
+      <DATUM>13/1/1999</DATUM>
+      <ORG>Chemweb.Com</ORG>
+      <LINK URL="http://chemweb.vei.co.uk/"/>
+      <INFO>
+        <PLAATS>Internet</PLAATS>
+        <TIJD>16.00</TIJD>
+      </INFO>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="2/99" NAAM="Februari">
+    <PUNT TYPE="Lezing">
+      <TITEL>
+        "Nieuwe materialen op basis van organische synthese"
+      </TITEL>
+      <DATUM>2/2/1999</DATUM>
+      <ORG>NSR</ORG>
+      <COMMENTAAR>
+        Spreker: dr. Frank van Veggel, Laboratorium voor organische chemie,
+              Universiteit Twente<BR/>
+        Gastheer: Prof. dr. RJM Nolte
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>CZ I</PLAATS>
+        <TIJD>14.00</TIJD>
+      </INFO>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="4/99" NAAM="April">
+    <PUNT TYPE="Sport">
+      <TITEL>Paaslympics</TITEL>
+      <DATUM>5/4/1999</DATUM>
+      <LINK URL="http://www.sci.kun.nl/beet/sportdag/"/>
+      <ORG>St. Beet en BeeVee</ORG>
+    </PUNT>
+    <PUNT TYPE="Borrel">
+      <TITEL>W en N Paas-Beestborrel</TITEL>
+      <DATUM>6/4/1999</DATUM>
+      <ORG>BBB en Leonardo</ORG>
+    </PUNT>
+    <PUNT TYPE="Film">
+      <TITEL>X-Files: Fight the Future</TITEL>
+      <DATUM>6/4/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/film"/>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+        <TIJD>19.30u</TIJD>
+        <PRIJS>1,50</PRIJS>
+      </INFO>
+    </PUNT>
+  </MAAND> 
+</AGENDA>

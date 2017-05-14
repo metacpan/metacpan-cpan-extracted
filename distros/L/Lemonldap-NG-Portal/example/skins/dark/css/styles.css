@@ -80,7 +80,8 @@ width:auto;
 /* All contents */
 #logincontent, #mailcontent, #errorcontent, #menucontent, #notifcontent {
 margin:100px auto 20px auto;
-background:#4B4B4B;
+background-color:rgb(75,75,75);
+background-color:rgba(75,75,75,0.8);
 padding:10px;
 width:800px;
 border-radius:10px 10px 10px 10px;
@@ -154,6 +155,15 @@ text-align:center;
 text-align:center;
 font-weight:normal;
 clear:both;
+background-color:rgb(75,75,75);
+background-color:rgba(75,75,75,0.8);
+width: 800px;
+margin:auto;
+padding:3px 10px;
+border-radius:10px 10px 10px 10px;
+-moz-border-radius:10px 10px 10px 10px;
+-webkit-border-radius:10px 10px 10px 10px;
+
 }
 
 /* Logout and error */

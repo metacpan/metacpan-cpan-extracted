@@ -1,0 +1,47 @@
+---
+abstract: 'Perl module dependency manager (aka Bundler for Perl)'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+  version: 0.77
+dynamic_config: 0
+generated_by: 'Dist::Milla version v0.9.3, Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: carton
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  App::cpanminus: 1.6
+  CPAN::Meta: 2.120921
+  CPAN::Meta::Requirements: 2.121
+  Capture::Tiny: 0
+  Exception::Class: 1.32
+  ExtUtils::MakeMaker: 6.59
+  Getopt::Long: 2.36
+  IO::Compress::Gzip: 0
+  JSON: 2.53
+  Module::Build: 0.38
+  Module::CPANfile: 0.9004
+  Module::Metadata: 1.000003
+  Term::ANSIColor: 1.12
+  Try::Tiny: 0.09
+  local::lib: 1.008
+  parent: 0.223
+  perl: v5.8.5
+resources:
+  bugtracker: https://github.com/miyagawa/carton/issues
+  homepage: https://github.com/miyagawa/carton
+  repository: https://github.com/miyagawa/carton.git
+version: v0.9.15

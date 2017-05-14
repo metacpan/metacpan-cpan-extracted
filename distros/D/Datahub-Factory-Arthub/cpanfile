@@ -8,3 +8,4 @@ on test => sub {
 requires 'Datahub::Factory';
 requires 'URI::Split';
 requires 'LWP::UserAgent';
+requires 'Try::Tiny';

@@ -1,0 +1,170 @@
+#!/usr/bin/env perl
+# ABSTRACT: Install, upgrade and examine the CPAN Testers database schema
+# PODNAME: cpantesters-schema
+our $VERSION = '0.008';
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     # prepare a new upgrade script
+#pod     cpantesters-schema prepare --preversion <version>
+#pod
+#pod     # install a new database
+#pod     cpantesters-schema install
+#pod
+#pod     # upgrade an existing database
+#pod     cpantesters-schema upgrade
+#pod
+#pod     # check what version our database is running
+#pod     cpantesters-schema check
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This script works with L<DBIx::Class::Schema::Versioned> to prepare a new
+#pod database upgrade script, install the database, upgrade the database, or
+#pod check the database version and available upgrades.
+#pod
+#pod =head1 ARGUMENTS
+#pod
+#pod =head2 <command>
+#pod
+#pod The command to run. One of C<check>, C<install>, C<upgrade>, C<prepare>.
+#pod
+#pod C<check> will show the current database version and the list of
+#pod potential versions. C<install> will install a new database from scratch
+#pod or prepare an existing database to be upgraded. C<upgrade> will upgrade
+#pod the current database. C<prepare> is run during development to prepare
+#pod a new upgrade script.
+#pod
+#pod =head1 OPTIONS
+#pod
+#pod =head2 --preversion
+#pod
+#pod The previous version. Used by the C<prepare> command to determine which
+#pod upgrade script to make.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<DBIx::Class::Schema::Versioned>
+#pod
+#pod =cut
+
+use v5.24;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use CPAN::Testers::Schema;
+use File::Share qw( dist_dir );
+
+my ( $preversion, $help );
+GetOptions(
+    'p|preversion:s'  => \$preversion,
+) or pod2usage(1);
+
+my $schema = CPAN::Testers::Schema->connect_from_config;
+
+my %tasks = (
+    prepare => \&prepare,
+    install => \&install,
+    upgrade => \&upgrade,
+    check => \&check,
+);
+
+$tasks{ shift @ARGV }->();
+
+sub prepare {
+    my $sql_dir = dist_dir( 'CPAN-Testers-Schema' );
+    my $version = $schema->schema_version();
+    $schema->create_ddl_dir( 'MySQL', $version, $sql_dir, $preversion );
+}
+
+sub check {
+    say "  Current: " . $schema->get_db_version;
+    say "Available: " . join ", ", $schema->ordered_schema_versions;
+}
+
+sub install {
+    $schema->install( '0.000' );
+    $schema->upgrade;
+}
+
+sub upgrade {
+    $schema->upgrade;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cpantesters-schema - Install, upgrade and examine the CPAN Testers database schema
+
+=head1 VERSION
+
+version 0.008
+
+=head1 SYNOPSIS
+
+    # prepare a new upgrade script
+    cpantesters-schema prepare --preversion <version>
+
+    # install a new database
+    cpantesters-schema install
+
+    # upgrade an existing database
+    cpantesters-schema upgrade
+
+    # check what version our database is running
+    cpantesters-schema check
+
+=head1 DESCRIPTION
+
+This script works with L<DBIx::Class::Schema::Versioned> to prepare a new
+database upgrade script, install the database, upgrade the database, or
+check the database version and available upgrades.
+
+=head1 ARGUMENTS
+
+=head2 <command>
+
+The command to run. One of C<check>, C<install>, C<upgrade>, C<prepare>.
+
+C<check> will show the current database version and the list of
+potential versions. C<install> will install a new database from scratch
+or prepare an existing database to be upgraded. C<upgrade> will upgrade
+the current database. C<prepare> is run during development to prepare
+a new upgrade script.
+
+=head1 OPTIONS
+
+=head2 --preversion
+
+The previous version. Used by the C<prepare> command to determine which
+upgrade script to make.
+
+=head1 SEE ALSO
+
+L<DBIx::Class::Schema::Versioned>
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Oriol Soriano, Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

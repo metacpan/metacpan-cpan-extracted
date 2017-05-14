@@ -18,7 +18,7 @@ sub new {
 
     my $type = $DB->type();
 
-    my $subclass = $class . '::' . $type;
+    my $subclass = "$class::$type";
     load($subclass);
 
     my $self = bless( {}, $subclass );
@@ -227,7 +227,7 @@ App::OverWatch::ServiceLock - ServiceLock base class
 
 =head1 VERSION
 
-version 0.1
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -250,7 +250,7 @@ App::OverWatch::ServiceLock - App::OverWatch Locking System
 
 =head2 new
 
-Create an App::OverWatch::EventLog object - usually handled by App::OverWatch.
+Create an App::OverWatch::EventLog object - usualy handled by App::OverWatch.
 
 =head2 create_lock
 
@@ -278,14 +278,11 @@ Return an App::OverWatch::Lock object for a given lock.
 
 Attempt to gain a lock.
 
-  $ServiceLock->try_lock({
+  $ServiceLock->try_unlock({
      system => $system,
      worker => 'myworkerid',
-     text   => 'Why we want the lock',
      expiry => $expiry_in_minutes,   # Optional
-   });
-
-Returns 1 on success, 0 otherwise.
+  });
 
 =head2 try_update
 

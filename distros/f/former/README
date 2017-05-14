@@ -1,0 +1,48 @@
+                                               March 25, 1996
+
+Former is a CGI script that is used for processing forms. It is 
+geared toward producing highly configurable forms without the
+need of writing a script each time a form is needed. 
+
+All the documentation for Former is in Perl POD format inside
+the former.pl file. 
+  
+
+  INSTALLATION
+
+Installation of Former is straight forward. 
+
+	1. Insure that at least perl 5.001m is installed.
+	
+	2. Insure that the following perl modules are installed:
+		+ CGI
+		+ MailTools
+		+ Msql 
+		
+	3. Copy the ConfigFile.pm file over to your perl lib area.
+						     
+	4. Copy former.pl to your cgi-bin directory. 
+	   
+	5. Edit cgi-bin/former.pl and specify where your perl 
+	   executable is. 
+	   
+After that, it is just start using Former.
+
+
+  HOW TO USE
+  
+Former is just a CGI script. It is invoked as:
+
+    http://www-server/cgi-bin/former.pl/path/to/config/file
+
+It is that easy.....
+  
+I have include a simple example of the config file and the 
+FDF file (form2.conf and form2.def). Very simple mind you.
+
+Former is now in a constant state of flux. Mostly it is getting 
+new code to include new ways of processing forms. If you have 
+ideas, forward them on to me.
+
+Gerard Hickey (hickey@ctron.com)  
+

@@ -6,6 +6,7 @@ Makefile.PL
 README
 lib/Template/Flute.pm
 lib/Template/Flute/Increment.pm
+lib/Template/Flute/Iterator/Rose.pm
 lib/Template/Flute/Config.pm
 lib/Template/Flute/Filter.pm
 lib/Template/Flute/Filter/Currency.pm
@@ -15,7 +16,6 @@ lib/Template/Flute/Filter/CountryName.pm
 lib/Template/Flute/Filter/JsonVar.pm
 lib/Template/Flute/Filter/LanguageName.pm
 lib/Template/Flute/Filter/LowerDash.pm
-lib/Template/Flute/Filter/Markdown.pm
 lib/Template/Flute/Filter/NobreakSingle.pm
 lib/Template/Flute/Filter/Replace.pm
 lib/Template/Flute/Filter/Strip.pm
@@ -26,6 +26,7 @@ lib/Template/Flute/Specification.pm
 lib/Template/Flute/UriAdjust.pm
 lib/Template/Flute/Container.pm
 lib/Template/Flute/List.pm
+lib/Template/Flute/Database/Rose.pm
 lib/Template/Flute/Expression.pm
 lib/Template/Flute/Form.pm
 lib/Template/Flute/I18N.pm
@@ -36,7 +37,6 @@ lib/Template/Flute/Pager.pm
 lib/Template/Flute/Paginator.pm
 lib/Template/Flute/HTML.pm
 lib/Template/Flute/Utils.pm
-lib/Template/Flute/Types.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -70,7 +70,6 @@ t/filters/date.t
 t/filters/eol.t
 t/filters/json.t
 t/filters/lowerdash.t
-t/filters/markdown.t
 t/filters/multi.t
 t/filters/nobreak_single.t
 t/filters/strip.t
@@ -82,10 +81,8 @@ t/values/basic.t
 t/values/bom.t
 t/values/checkboxes.t
 t/values/hook-script.t
-t/values/img.t
 t/values/input.t
 t/values/js.t
-t/values/keep.t
 t/values/multiple.t
 t/values/nbsp.t
 t/values/object-and-structs.t
@@ -113,7 +110,6 @@ t/forms/basic.t
 t/forms/checkbox.t
 t/forms/container.t
 t/forms/duplicate-dropdowns.t
-t/forms/multiselect.t
 t/forms/fields.t
 t/iterators/00-load.t
 t/iterators/01-simple.t
@@ -122,7 +118,6 @@ t/iterators/cache.t
 t/iterators/paginator.t
 t/lists/append.t
 t/lists/double-process.t
-t/lists/gh11.t
 t/lists/global-containers.t
 t/lists/increments.t
 t/lists/limit.t

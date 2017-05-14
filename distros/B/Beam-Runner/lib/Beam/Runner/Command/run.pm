@@ -1,5 +1,5 @@
 package Beam::Runner::Command::run;
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 # ABSTRACT: Run the given service with the given arguments
 
 #pod =head1 SYNOPSIS
@@ -54,7 +54,7 @@ Beam::Runner::Command::run - Run the given service with the given arguments
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

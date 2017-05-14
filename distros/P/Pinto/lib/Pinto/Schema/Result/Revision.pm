@@ -73,7 +73,7 @@ with 'Pinto::Role::Schema::Result';
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -131,35 +131,16 @@ has is_root => (
 has datetime => (
     is       => 'ro',
     isa      => 'DateTime',
-    default  => sub { DateTime->from_epoch( epoch => $_[0]->utc_time ) },
+    default  => sub { DateTime->from_epoch( epoch => $_[0]->utc_time, time_zone => $_[0]->timezone ) },
     init_arg => undef,
     lazy     => 1,
 );
 
-has datetime_local => (
-    is       => 'ro',
-    isa      => 'DateTime',
-    default  =>  sub {
-        my $tz = DateTime::TimeZone->offset_as_string( $_[0]->repo->config->time_offset );
-        return DateTime->from_epoch( epoch => $_[0]->utc_time, time_zone => $tz );
-    },
-    init_arg => undef,
-    lazy     => 1,
-);
-
-has datetime_user => (
-    is       => 'ro',
-    isa      => 'DateTime',
-    default  => sub { DateTime->from_epoch( epoch => $_[0]->utc_time, time_zone => $_[0]->time_zone ) },
-    init_arg => undef,
-    lazy     => 1,
-);
-
-has time_zone => (
+has timezone => (
     is      => 'ro',
     isa     => 'DateTime::TimeZone',
     default => sub {
-        my $offset = DateTime::TimeZone->offset_as_string( $_[0]->time_offset );
+        my $offset = DateTime::TimeZone->offset_as_string( $_[0]->repo->config->time_offset );
         return DateTime::TimeZone::OffsetOnly->new( offset => $offset );
     },
     init_arg => undef,
@@ -229,34 +210,6 @@ sub children {
 
 #------------------------------------------------------------------------------
 
-sub is_ancestor_of {
-    my ($self, $rev) = @_;
-
-    my @ancestors = $rev->parents;
-    while (my $ancestor = pop @ancestors) {
-        return 1 if $ancestor->id == $self->id;
-        push @ancestors, $ancestor->parents;
-    }
-
-    return 0;
-}
-
-#------------------------------------------------------------------------------
-
-sub is_descendant_of {
-    my ($self, $rev) = @_;
-
-    my @descendants = $rev->children;
-    while (my $descendant = pop @descendants) {
-        return 1 if $descendant->id == $self->id;
-        push @descendants, $descendant->children;
-    }
-
-    return 0;
-}
-
-#------------------------------------------------------------------------------
-
 sub distributions {
     my ($self) = @_;
 
@@ -289,7 +242,7 @@ sub commit {
     throw "Must specify a message to commit" if not $args{message};
 
     $args{is_committed} = 1;
-    $args{has_changes}  = 0; # XXX: Why reset this?
+    $args{has_changes}  = 0;
     $args{username}    ||= $self->repo->config->username;
     $args{time_offset} ||= $self->repo->config->time_offset;
     $args{utc_time}    ||= current_utc_time;
@@ -384,7 +337,7 @@ sub to_string {
         i => sub { $self->uuid_prefix },
         I => sub { $self->uuid },
         j => sub { $self->username },
-        u => sub { $self->datetime_local->strftime( $_[0] || '%c' ) },
+        u => sub { $self->datetime->strftime( $_[0] || '%c' ) },
         g => sub { $self->message_body },
         G => sub { indent_text( trim_text( $self->message ), $_[0] ) },
         t => sub { $self->message_title },
@@ -416,7 +369,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -424,7 +380,7 @@ Pinto::Schema::Result::Revision - Represents a set of changes to a stack
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 NAME
 
@@ -533,7 +489,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

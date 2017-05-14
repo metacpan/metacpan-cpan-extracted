@@ -1,0 +1,67 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre.it\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-26 20:25+0300\n"
+"PO-Revision-Date: 2010-11-03 14:25+0100\n"
+"Last-Translator: Simone Blandino <simone.blandino@gmail.com>\n"
+"Language-Team:  <simone.blandino@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+
+#: lib/Padre/Plugin/CSS.pm:23
+msgid "CSS"
+msgstr "CSS"
+
+#: lib/Padre/Plugin/CSS.pm:24
+msgid "CSS Minifier"
+msgstr "Riduttore CSS"
+
+#: lib/Padre/Plugin/CSS.pm:26
+msgid "Validate CSS"
+msgstr "Convalida CSS"
+
+#: lib/Padre/Plugin/CSS.pm:28
+msgid "Docs"
+msgstr "Documenti"
+
+#: lib/Padre/Plugin/CSS.pm:29
+msgid "CSS 2.1 specs"
+msgstr "Specifiche CSS 2.1"
+
+#: lib/Padre/Plugin/CSS.pm:31
+msgid "CSS 2.1 property list"
+msgstr "Elenco proprietà CSS 2.1"
+
+#: lib/Padre/Plugin/CSS.pm:46
+msgid "No Code"
+msgstr "Nessun codice"
+
+#: lib/Padre/Plugin/CSS.pm:46
+msgid "Error"
+msgstr "Errore"
+
+#: lib/Padre/Plugin/CSS.pm:55
+msgid "CSS is valid\n"
+msgstr "Il CSS è valido\n"
+
+#: lib/Padre/Plugin/CSS.pm:57
+msgid "CSS is not valid\n"
+msgstr "Il CSS non è valido\n"
+
+#: lib/Padre/Plugin/CSS.pm:58
+msgid "Errors:\n"
+msgstr "Errori:\n"
+
+#: lib/Padre/Plugin/CSS.pm:68
+msgid "Failed to validate the code\n"
+msgstr "Impossibile validare il codice\n"
+

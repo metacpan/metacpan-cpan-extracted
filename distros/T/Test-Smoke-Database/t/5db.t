@@ -18,9 +18,8 @@ my @file2 = qw!3_nb_smoke.png 5_configure_by_os.png 7_conftested.png
 my %file3 = ( "last50/4_nb_configure.png" => 1,
 	      "last50/3_nb_smoke.png"     => 1 );
 my @dir = qw!0 17500 last50!;
-my $nbii = 60; 
+my $nbii = 64; # number of parsed reports
 
-#chdir(dirname($0));
 my $rep; 
 
 # Count how many test
@@ -83,7 +82,16 @@ if ($@) {
 } else {
   $t->build_graph;
   foreach (@file) {
-    cmp_ok(-e $_,"==",1, "Exist $_") && unlink($_);
+    if (/cpan/) {
+     TODO: {
+       local $TODO= "www interface of cpan tester has moved";
+       cmp_ok(-e $_,"==",1, "Exist $_") or diag("on $_");
+     }
+    } else {
+      cmp_ok(-e $_,"==",1, "Exist $_") 
+	?  unlink($_)
+	: diag("on $_");
+    }
   }
 
   foreach (@file2) {

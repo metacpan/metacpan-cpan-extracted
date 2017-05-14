@@ -1,13 +1,13 @@
 {
    "bookmark": "devel",
    "branch": "default",
-   "date": "2017-05-08T22:31:37Z",
-   "desc": "Added tag latest, v0.32.1 for changeset a98db27607a7",
-   "node": "eb82132fe81c",
+   "date": "2017-05-09T13:43:14Z",
+   "desc": "Added tag latest, v0.32.2 for changeset 8d46d64a05af",
+   "node": "2d62a18ad140",
    "phase": "public",
-   "release": "v0.32.1",
+   "release": "v0.32.2",
    "release_distance": 0,
-   "release_id": "v0.32.1",
+   "release_id": "v0.32.2",
    "tags": [
       "tip"
    ]

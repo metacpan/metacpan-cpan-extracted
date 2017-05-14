@@ -1,0 +1,46 @@
+---
+abstract: 'Comparative assesment of variant calling (CAVar)'
+author:
+  - 'Andrew J. Page <ap13@sanger.ac.uk>'
+build_requires:
+  Env::Path: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-Pipeline-Comparison
+requires:
+  Archive::Tar: 0
+  Bio::SeqIO: 0
+  Carp: 0
+  Cwd: 0
+  Data::Dumper: 0
+  Exception::Class: 0
+  Exporter: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Path: 0
+  File::Temp: 0
+  File::Which: 0
+  Getopt::Long: 0
+  IO::Zlib: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  POSIX: 0
+  Try::Tiny: 0
+  Vcf4_0: 0
+  VcfReader: 0
+  base: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  homepage: http://www.sanger.ac.uk/
+  repository: https://github.com/sanger-pathogens/Bio-Pipeline-Comparison.git
+version: 1.123050

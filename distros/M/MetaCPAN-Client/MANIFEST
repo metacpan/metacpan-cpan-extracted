@@ -20,6 +20,7 @@ examples/complex-either-and.pl
 examples/complex-either-not.pl
 examples/complex-nested-either-and.pl
 examples/complex.pl
+examples/contributors.pl
 examples/distribution.pl
 examples/download_url.pl
 examples/es_filter.pl
@@ -27,6 +28,7 @@ examples/fields-filter.pl
 examples/metacpan_url.pl
 examples/mirror.pl
 examples/module.pl
+examples/package.pl
 examples/permission.pl
 examples/pod.pl
 examples/rating.pl
@@ -44,6 +46,7 @@ lib/MetaCPAN/Client/Favorite.pm
 lib/MetaCPAN/Client/File.pm
 lib/MetaCPAN/Client/Mirror.pm
 lib/MetaCPAN/Client/Module.pm
+lib/MetaCPAN/Client/Package.pm
 lib/MetaCPAN/Client/Permission.pm
 lib/MetaCPAN/Client/Pod.pm
 lib/MetaCPAN/Client/Rating.pm
@@ -65,6 +68,7 @@ t/api/download_url.t
 t/api/favorite.t
 t/api/file.t
 t/api/module.t
+t/api/package.t
 t/api/permission.t
 t/api/pod.t
 t/api/rating.t

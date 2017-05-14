@@ -3,11 +3,11 @@ BEGIN {
   use Test::More;
   plan tests => 13;
   use_ok('Data::Dumper');
-  use_ok('Package::Configure');
+  use_ok('Package::Install::Configure');
 }
 
 
-ok(my $config = Package::Configure->new());
+ok(my $config = Package::Install::Configure->new());
 
 ok(my $s1 = $config->opt_string());
 ok(my $s2 = $config->opt_integer());

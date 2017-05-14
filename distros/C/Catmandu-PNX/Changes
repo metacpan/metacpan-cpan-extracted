@@ -1,5 +1,9 @@
 Revision history for Catmandu-PNX
 
+0.03  2017-05-11 13:45:03 CEST
+  - Fixing encoding errors
+  - Fixing roundtrip of PNX to PNX
+
 0.02  2017-02-23 15:47:13 CET
   - Adding almaid to controlType
 

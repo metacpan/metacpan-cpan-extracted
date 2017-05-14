@@ -1,0 +1,31 @@
+V0.99.11 - 25. Jun 2000
+	Added the close() method.
+	Fixed all known warnings.
+
+V0.99.10 - 20.04.2000
+	Hash.pm
+	-------
+	CASEINSNSITIVE can now be disabled (forgotten to implement, *nirg*) 
+
+	Plain.pm
+	--------	
+	Changes behavior of get_errors, if no error occured: it returns now ''
+	The 'asm' comment type works now.
+
+V0.99.09 - 13.03.2000
+	Hash.pm
+	-------
+	Fixed a bug that causes the file was every time parsed again, 
+	not only if neccessary. 
+	Added options ALLOWREDEFINE, CASEINSENSITIVE, DEFAULT and REQUIRE
+	Implemented error handling. 
+
+	Plain.pm
+	--------
+	Added get_errors method which returns a preformated string 
+	holding all error messages. 
+
+V0.99.08 - 09.03.2000
+	Added Hash.pm, a module to parse KEY/VALUE pairs into a hash
+	Added DATA option to Plain.pm, a possibility to make recursive parsing 
+

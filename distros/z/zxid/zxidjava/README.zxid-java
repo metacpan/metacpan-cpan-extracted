@@ -1,0 +1,71 @@
+README.zxid-java
+================
+
+This is the Java JNI module for using libzxid. This JNI module is
+tightly integrated into the main ZXID project and distribution.
+As the diretory name reflects, the package name is zxidjava so
+you would do in your .java file:
+
+  import zxidjava.*;
+
+The Java stuff lives in
+
+  zxidjava.jar            Classes to use zxid
+  zxiddemo.war            Demonstration servlet ready to deploy
+
+The Java JNI interface also needs the C library (which must be
+found by dynamic linker):
+
+  libzxidjni.so           C library implementing ZXID JNI interface
+  zxidjni.dll             Windows version of the JNI
+  zxid.dll                Windows version of ZXID core
+
+> N.B. The .jar (or .war) DOES NOT contain libzxidjni.so.  You need to
+> download and copy this file separately.  The .jar is platform
+> independent. The libzxidjni.so (or zxidjni.dll) is platform
+> dependent.
+
+Please see for further information
+
+  zxid.org
+  zxid/README.zxid
+  zxid/INSTALL.zxid
+  zxid/zxid-java.pd       Using ZXID from Java
+  zxid/zxidsrvlet.java    Ready to use SSO servlet
+  zxid/zxidappdemo.java   Example code for using SSO servlet
+  zxid/zxidhlo.java       Example code for direct SSO integration
+
+Install
+
+  cd zxid-0.40
+  make dep
+  make                   # creates libzxid
+  make javazxid
+  make zxiddemo.war      # also builds zxidjava.jar
+  cp zxiddemo.war ../apache-tomcat-5.5.20/webapps/
+  # copy libzxidjni.so to place where dynamic linking finds it
+  cp libzxidjni.so ../apache-tomcat-5.5.20/bin/
+  # On Windows you need to copy zxid.dll and zxidjni.dll
+
+Rather than program directly with the module, you probably
+want to deploy it as a Servlet, e.g. in Tomcat. For this
+the SSO servler is zxidsrvlet.java and an example payload
+application using the SSO servlet is provided in
+zxidappdemo.java
+
+You can study both for source code, or use them as template
+to develop your own code.
+
+If you get compilation errors, check SERVLET_PATH and other variables
+in Makefile (see zxid-java.pd and zxid-install.pd for details).
+
+See zxid-java.pd (or html) for further information.
+
+Copyright (c) 2013 Synergetics NV (sampo@synergetics.be), All Rights Reserved.
+Copyright (c) 2010 Sampo Kellomaki (sampo@iki.fi), All Rights Reserved.
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomaki (sampo@iki.fi)
+NO WARRANTY, not even implied warranties.
+Licensed under Apache License 2.0, see file COPYING.
+
+--Sampo

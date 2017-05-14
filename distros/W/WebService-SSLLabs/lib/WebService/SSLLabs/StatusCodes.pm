@@ -3,7 +3,7 @@ package WebService::SSLLabs::StatusCodes;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 sub new {
     my ( $class, $json ) = @_;
@@ -26,7 +26,7 @@ WebService::SSLLabs::StatusCodes - StatusCodes object
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =head1 SUBROUTINES/METHODS
 

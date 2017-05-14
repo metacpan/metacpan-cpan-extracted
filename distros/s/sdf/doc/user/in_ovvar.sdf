@@ -1,0 +1,132 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Variables
+
+H2: Introduction
+
+A {{variable}} is a named value. Document-wide settings are
+controlled in SDF using variables. Likewise, authors can
+define and access their own variables. In either case,
+the value of a variable can be referenced in a paragraph
+by delimiting it with the special symbols E<2[> and E<2]>.
+
+For example:
+
+V:  !define MY_EMAIL 'abc@xyz.com'
+V:  My electronic mail address is [[MY_EMAIL]].
+
+The result is:
+
+!define MY_EMAIL 'abc@xyz.com'
+My electronic mail address is [[MY_EMAIL]].
+
+
+H2: Commonly used system variables
+
+Some commonly used system variables are:
+
+!block table; groups; coltags='VAR'
+Variable            Description
+Options:
+OPT_LOOK            the overall look (e.g. simple, fancy)
+OPT_STYLE           the general type (e.g. memo, manual)
+Titles:
+DOC_NAME            the title, excluding the type (e.g. SDF)
+DOC_TYPE            the title type (e.g. User Guide)
+DOC_AUTHOR          the author
+DOC_TOC             the number of heading levels in the table of contents
+!endblock
+
+
+H2: Setting variables
+
+Variables can be set via:
+
+* the {{MAC:define}} macro
+* the {{MAC:default}} macro
+* the {{MAC:init}} macro
+* {{CMD:sdf}}'s command line.
+
+To undefine a variable, use the {{MAC:undef}} macro.
+
+
+H2: The Define macro
+
+Variables are usually set in [[SDF]] by using the {{MAC:define}} macro.
+The format is:
+
+E:   !define symbol [expression]
+
+Examples are:
+
+E:   !define LONG
+E:   !define VERSION "1.002"
+
+{{symbol}} is a sequence of letters, digits and underscore.
+If {{expression}} is omitted, the default value is 1.
+
+
+H2: The Default macro
+
+It is often a good idea to only define a variable if it does not
+already have a value. To do this, use the {{MAC:default}} macro.
+The format is:
+
+E:   !default symbol [expression]
+
+For example:
+
+E:   !default VERSION "1.002"
+
+{{symbol}} is a sequence of letters, digits and underscore.
+If {{expression}} is omitted, the default value is 1.
+
+
+H2: The Init macro
+
+Generally speaking, the first thing {{CMD:sdf}} does is to
+load the standard library ({{stdlib.sdm}}).
+However, if the first line of an SDF document is the {{MAC:init}}
+macro, the nominated variables are initialised {{before}}
+the standard library is loaded. This allows an SDF
+document to initialise variables used within the standard library.
+The format of the init macro is:
+
+E:   !init name1["="expression1]";" name2["="expression2] ...
+
+For example:
+
+E:   !init OPT_STYLE="memo"
+
+Note: Certain variables cannot be set after the standard library
+is loaded. These variables can {{only}} be set via {{CMD:sdf}}'s
+command line or via the {{MAC:init}} macro.
+
+
+H2: Using the command line
+
+It is occasionally useful to set variables via {{CMD:sdf}}'s -D option.
+Multiple definitions can be separated by commas.
+For example:
+
+E:   sdf -DLONG,VERSION="1.002" ...
+
+Alternatively, the option can be repeated. For example:
+
+E:   sdf -DLONG -DVERSION="1.002" ...
+
+In either case, if a value is not specified for a variable, 1 is assumed.
+
+Note: Variables set on the command line override the values
+set by the {{MAC:init}} macro.

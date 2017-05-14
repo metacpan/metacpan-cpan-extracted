@@ -1,3 +1,14 @@
+0.201     2017-05-12 15:42:54+02:00 Europe/Paris
+
+        * Fix space/tab issue in Makefile (srezic, ether)
+        * Don't use DynamicPrereqs for unrelated Makefile.PL snippet (ehter)
+
+0.200     2017-05-12 10:14:26+02:00 Europe/Paris
+
+        * Reimplement in pure Perl, with a dynamic dependency on a new
+          Ref::Util::XS module that contains the fast XS implementation.
+          ether++ for the Dist::Zilla wrangling.
+
 0.113     2017-01-16 19:36:58+01:00 Europe/Amsterdam
 
         * Fix bugtracker link.

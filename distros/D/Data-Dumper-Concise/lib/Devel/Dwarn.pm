@@ -8,7 +8,7 @@ sub import {
 
 =head1 NAME
 
-Devel::Dwarn - return Dwarn @return_value
+Devel::Dwarn - Combine warns and Data::Dumper::Concise
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,362 @@
+libdocument-perl (0.03-3) unstable; urgency=low
+
+  * Fixed problem with perldoc titles that confused CPAN, a
+    single colon instead of two.
+  * Added DMA::FSM to Makefile.PL
+
+ -- Dale Amon <amon@vnl.com>  Mon, 01 Sep 2008 11:17:11 +0100
+
+libdocument-perl (0.03-2) unstable; urgency=low
+
+  * Add dh_perl to rules and ${perl:Depends} to control file.
+  * Add Directory class to handle an archive document directory.
+
+ -- Dale Amon <amon@vnl.com>  Thu, 28 Aug 2008 16:46:22 +0100
+
+libdocument-perl (0.03-1) unstable; urgency=low
+
+  * Combined File::Spec::* modules into the Document package release.
+
+ -- Dale Amon <amon@vnl.com>  Sat, 16 Aug 2008 14:03:38 +0100
+
+libfile-specdocument-perl (0.03-1) unstable; urgency=low
+
+  * Initial packaged release.
+
+ -- Dale Amon <amon@vnl.com>  Thu, 14 Aug 2008 19:11:50 +0100
+
+libdocument-perl (0.02-1) unstable; urgency=low
+
+  * Initial combined package release.
+
+ -- Dale Amon <amon@vnl.com>  Wed, 13 Aug 2008 12:49:08 +0100
+
+libfile-specpublicationpage-perl (0.02-3) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:19:09 +0100
+
+libfile-specpublicationpage-perl (0.02-2) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libfile-specpublicationpage-perl (0.02-1) unstable; urgency=low
+
+  * Complete reworking of filename spec parsing family. 
+    Added pod docs from Specification.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 29 Aug 2004 00:22:41 +0100
+
+libfile-specpublicationpage-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 26 Aug 2004 15:03:00 +0100
+
+libfile-specdated-perl (0.02-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:23:30 +0100
+
+libfile-specdated-perl (0.02-4) unstable; urgency=low
+
+  * Added undated_filename method.
+
+ -- Dale Amon <amon@islandone.org>  Fri, 17 Sep 2004 17:39:16 +0100
+
+libfile-specdated-perl (0.02-3) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libfile-specdated-perl (0.02-2) unstable; urgency=low
+
+  * Bugfix. _nullFilename was spelled _nullFileName in the state table.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  1 Sep 2004 11:54:41 +0100
+
+libfile-specdated-perl (0.02-1) unstable; urgency=low
+
+  * Major reworking of the whole filename spec parsing family.
+    Added pod docs from Specification.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 29 Aug 2004 00:07:08 +0100
+
+libfile-specdated-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Sat, 15 Aug 2004 00:53:00 +0100
+
+libfile-specdatedpage-perl (0.02-4) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:21:16 +0100
+
+libfile-specdatedpage-perl (0.02-3) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libfile-specdatedpage-perl (0.02-2) unstable; urgency=low
+
+  * Bugfix. document_title_section method returned page_title_section
+    value instead of what it was supposed to.
+
+ -- Dale <amon@islandone.org>  Wed,  1 Sep 2004 12:57:03 +0100
+
+libfile-specdatedpage-perl (0.02-1) unstable; urgency=low
+
+  * Major rework of the entire filename spec parsing family.
+    Added pod docs from Specification.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 29 Aug 2004 00:16:54 +0100
+
+libfile-specdatedpage-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Sat, 15 Aug 2004 02:11:00 +0100
+
+libfile-specbaseparse-perl (0.02-3) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:25:42 +0100
+
+libfile-specbaseparse-perl (0.02-2) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libfile-specbaseparse-perl (0.02-1) unstable; urgency=low
+
+  * Major reworking of the whole Filename Spec parse family. 
+    Added pod docs from Specification.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 29 Aug 2004 00:02:53 +0100
+
+libfile-specbaseparse-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 12 Aug 2004 16:02:00 +0100
+
+libdocument-tocfile-perl (0.01-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:29:09 +0100
+
+libdocument-tocfile-perl (0.01-4) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdocument-tocfile-perl (0.01-3) unstable; urgency=low
+
+  * Completed the split into Document and Archivist Classes; created pod
+    and Specification documentation.
+
+ -- Dale Amon <amon@islandone.org>  Thu,  2 Sep 2004 14:12:24 +0100
+
+libdocument-tocfile-perl (0.01-2) unstable; urgency=low
+
+  * Modified to use renamed DMA::Version setVersion object
+    method which used to be 'parse'.
+
+ -- Dale Amon <amon@islandone.org>  Sat, 28 Aug 2004 23:47:58 +0100
+
+libdocument-tocfile-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Fri, 13 Aug 2004 15:20:00 +0100
+
+libdocument-toc-perl (0.01-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@vnl.com>  Sat,  2 Sep 2006 00:28:00 +0100
+
+libdocument-toc-perl (0.01-4) unstable; urgency=low
+
+  * Added a note to documentation that would should use "" for 
+    blank titles and never use the "--" representation as used in
+    TocFile objects and .toc files.
+
+ -- root <root@otv.islandone.org>  Sun, 12 Sep 2004 13:42:16 +0100
+
+libdocument-toc-perl (0.01-3) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdocument-toc-perl (0.01-2) unstable; urgency=low
+
+  * Updated Specification to match reality; added pod section to module.
+
+ -- Dale Amon <amon@islandone.org>  Mon, 30 Aug 2004 19:10:47 +0100
+
+libdocument-toc-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 12 Aug 2004 13:48:00 +0100
+
+libdocument-pageiterator-perl (0.01-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:30:37 +0100
+
+libdocument-pageiterator-perl (0.01-4) unstable; urgency=low
+
+  * Add more argument checking, especially for numeric overflow of
+    specified field sizes. Added documentation to perldoc section.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  5 Jul 2006 13:23:36 +0100
+
+libdocument-pageiterator-perl (0.01-3) unstable; urgency=low
+
+  * Support for generalized increment to next page id.
+
+ -- Dale Amon <amon@islandone.org>  Tue,  4 Jul 2006 20:49:55 +0100
+
+libdocument-pageiterator-perl (0.01-2) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdocument-pageiterator-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Sat, 04 Sep 2004 00:10:00 +0100
+
+libdocument-pageid-perl (0.02-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:32:31 +0100
+
+libdocument-pageid-perl (0.02-4) unstable; urgency=low
+
+  * Bug fix. A page of (001,01,a) was printing as 00101a because
+    the dot was misplaced in the format statement.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  5 Jul 2006 13:17:29 +0100
+
+libdocument-pageid-perl (0.02-3) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdocument-pageid-perl (0.02-2) unstable; urgency=low
+
+  * Split most of the new method off into _init so subclasses 
+    can access it. Created an _update method so subclasses can modify
+    components of a pageid and then reconstruct it.
+
+ -- Dale Amon <amon@islandone.org>  Sun,  5 Sep 2004 14:59:16 +0100
+
+libdocument-pageid-perl (0.02-1) unstable; urgency=low
+
+  * Added Class parse method. Added docs from Specification.
+
+ -- Dale Amon <amon@islandone.org>  Sat, 28 Aug 2004 23:37:50 +0100
+
+libdocument-pageid-perl (0.01-2) unstable; urgency=low
+
+  * Added support for document spine images as page '0+\.spine',
+    eg. 000.spine. Added the pairable method to return a flag
+    if the pageid contains this id since it cannot be used as
+    part of a start-end pair of page identifiers.
+
+ -- Dale Amon <amon@islandone.org>  Mon, 16 Aug 2004 23:00:32 +0100
+
+libdocument-pageid-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 12 Aug 2004 15:45:00 +0100
+
+libdocument-notesfile-perl (0.01-2) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:40:01 +0100
+
+libdocument-notesfile-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Mon, 27 Sep 2004 16:14:31 +0100
+
+libdocument-members-perl (0.01-4) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:41:34 +0100
+
+libdocument-members-perl (0.01-3) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdocument-members-perl (0.01-2) unstable; urgency=low
+
+  * Documented it fully and made pod and Specification docs match.
+
+ -- Dale Amon <amon@islandone.org>  Mon, 30 Aug 2004 16:10:22 +0100
+
+libdocument-members-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 12 Aug 2004 13:39:00 +0100
+
+libdocument-logfile-perl (0.01-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:42:58 +0100
+
+libdocument-logfile-perl (0.01-4) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libdocument-logfile-perl (0.01-3) unstable; urgency=low
+
+  * Added documenation here and made Specification reflect reality.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 29 Aug 2004 18:06:37 +0100
+
+libdocument-logfile-perl (0.01-2) unstable; urgency=low
+
+  * Mostly reverted code to the way it was originally; I have
+    now got Archivist::PublicationSpec installed as 
+    File::Spec::DatedPage so this is possible.
+
+ -- Dale Amon <amon@islandone.org>  Fri, 20 Aug 2004 01:47:40 +0100
+
+libdocument-logfile-perl (0.01-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 12 Aug 2004 18:02:00 +0100

@@ -1,13 +1,7 @@
 #!./perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-	push @INC, "../../t";
-    }
+    unshift @INC, 't';
     require Config;
     if (($Config::Config{'extensions'} !~ /\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
@@ -16,7 +10,7 @@ BEGIN {
     require 'test.pl';		# we use runperl from 'test.pl', so can't use Test::More
 }
 
-plan tests => 157;
+plan tests => 163;
 
 require_ok("B::Concise");
 
@@ -98,7 +92,7 @@ SKIP: {
 my @stylespec;
 $@='';
 eval { add_style ('junk_B' => @stylespec) };
-like ($@, 'expecting 3 style-format args',
+like ($@, qr/expecting 3 style-format args/,
     "add_style rejects insufficient args");
 
 @stylespec = (0,0,0); # right length, invalid values
@@ -387,9 +381,7 @@ like($out, qr/Config::AUTOLOAD exists in stash, but has no START/,
     "coderef properly undefined");
 
 # test -stash and -src rendering
-# todo: stderr=1 puts '-e syntax OK' into $out,
-# conceivably fouling one of the lines that are tested
-$out = runperl ( switches => ["-MO=Concise,-stash=B::Concise,-src"],
+$out = runperl ( switches => ["-MO=-qq,Concise,-stash=B::Concise,-src"],
 		 prog => '-e 1', stderr => 1 );
 
 like($out, qr/FUNC: \*B::Concise::concise_cv_obj/,
@@ -398,14 +390,17 @@ like($out, qr/FUNC: \*B::Concise::concise_cv_obj/,
 like($out, qr/FUNC: \*B::Concise::walk_output/,
      "stash rendering includes Concise::walk_output");
 
-like($out, qr/FUNC: \*B::Concise::PAD_FAKELEX_MULTI/,
-     "stash rendering includes constant sub: PAD_FAKELEX_MULTI");
-
-like($out, qr/PAD_FAKELEX_MULTI is a constant sub, optimized to a IV/,
-     "stash rendering identifies it as constant");
-
 like($out, qr/\# 4\d\d: \s+ \$l->concise\(\$level\);/,
      "src-line rendering works");
+
+$out = runperl ( switches => ["-MStorable", "-MO=Concise,-stash=Storable,-src"],
+		 prog => '-e 1', stderr => 1 );
+
+like($out, qr/FUNC: \*Storable::BIN_MAJOR/,
+     "stash rendering has constant sub: Storable::BIN_MAJOR");
+
+like($out, qr/BIN_MAJOR is a constant sub, optimized to a IV/,
+     "stash rendering identifies it as constant");
 
 $out = runperl ( switches => ["-MO=Concise,-stash=ExtUtils::Mksymlists,-src,-exec"],
 		 prog => '-e 1', stderr => 1 );
@@ -416,10 +411,14 @@ like($out, qr/FUNC: \*ExtUtils::Mksymlists::_write_vms/,
 $out = runperl ( switches => ["-MO=Concise,-stash=Data::Dumper,-src,-exec"],
 		 prog => '-e 1', stderr => 1 );
 
-like($out, qr/FUNC: \*Data::Dumper::format_refaddr/,
-     "stash rendering loads package as needed");
+SKIP: {
+    skip "Data::Dumper is statically linked", 1
+	if $Config{static_ext} =~ m|\bData/Dumper\b|;
+    like($out, qr/FUNC: \*Data::Dumper::format_refaddr/,
+	"stash rendering loads package as needed");
+}
 
-my $prog = q{package FOO; sub bar { print "bar" } package main; FOO::bar(); };
+my $prog = q{package FOO; sub bar { print q{bar} } package main; FOO::bar(); };
 
 # this would fail if %INC used for -stash test
 $out = runperl ( switches => ["-MO=Concise,-src,-stash=FOO,-main"],
@@ -427,5 +426,80 @@ $out = runperl ( switches => ["-MO=Concise,-src,-stash=FOO,-main"],
 
 like($out, qr/FUNC: \*FOO::bar/,
      "stash rendering works on inlined package");
+
+# Test that consecutive nextstate ops are not nulled out when PERLDBf_NOOPT
+# is set.
+# XXX Does this test belong here?
+
+$out = runperl ( switches => ["-MO=Concise"],
+		 prog => 'BEGIN{$^P = 0x04} 1 if 0; print',
+		 stderr => 1 );
+like $out, qr/nextstate.*nextstate/s,
+  'nulling of nextstate-nextstate happeneth not when $^P | PERLDBf_NOOPT';
+
+
+# A very basic test for -tree output
+$out =
+ runperl(
+  switches => ["-MO=Concise,-tree"], prog => 'print', stderr => 1
+ );
+ok index $out=~s/\r\n/\n/gr=~s/gvsv\(\*_\)/gvsv[*_]/r, <<'end'=~s/\r\n/\n/gr =>>= 0, '-tree output';
+<6>leave[1 ref]-+-<1>enter
+                |-<2>nextstate(main 1 -e:1)
+                `-<5>print-+-<3>pushmark
+                           `-ex-rv2sv---<4>gvsv[*_]
+end
+
+# -nobanner
+$out =
+ runperl(
+  switches => ["-MO=Concise,-nobanner,foo"], prog=>'sub foo{}', stderr => 1
+ );
+unlike $out, qr/main::foo/, '-nobanner';
+
+# glob
+$out =
+ runperl(
+  switches => ["-MO=Concise"], prog=>'glob(q{.})', stderr => 1
+ );
+like $out, qr/\*<none>::/, 'glob(q{.})';
+
+# Test op_other in -debug
+$out = runperl(
+    switches => ["-MO=Concise,-debug,xx"],
+    prog => q{sub xx { if ($a) { return $b } }},
+    stderr => 1,
+);
+
+$out =~s/\r\n/\n/g;
+
+# Look for OP_AND
+$end = <<'EOF';
+LOGOP \(0x\w+\)
+	op_next		0x\w+
+	op_other	(0x\w+)
+	op_sibling	0
+	op_ppaddr	PL_ppaddr\[OP_AND\]
+EOF
+
+$end =~ s/\r\n/\n/g;
+
+like $out, qr/$end/, 'OP_AND has op_other';
+
+# like(..) above doesn't fill in $1
+$out =~ $end;
+my $next = $1;
+
+# Check it points to a PUSHMARK
+$end = <<'EOF';
+OP \(<NEXT>\)
+	op_next		0x\w+
+	op_sibling	0x\w+
+	op_ppaddr	PL_ppaddr\[OP_PUSHMARK\]
+EOF
+
+$end =~ s/<NEXT>/$next/;
+
+like $out, qr/$end/, 'OP_AND->op_other points correctly';
 
 __END__

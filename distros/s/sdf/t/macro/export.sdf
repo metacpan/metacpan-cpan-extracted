@@ -1,0 +1,16 @@
+# This file tests the export macro
+
+# define some variables
+!define num1 42
+!define str1 "My favorite station"
+!define str2 "hello world"
+
+# export some of them
+!export num1
+!export str2
+
+# mark an undefined variable for export
+!export num2
+
+# now define it (which should export it too)
+!define num2 77

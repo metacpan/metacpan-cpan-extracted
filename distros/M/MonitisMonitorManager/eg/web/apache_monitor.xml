@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<config>
+	<!--
+		=== CentOS/RHEL =====
+		Just add the section below to /etc/httpd/conf.d/status.conf
+		Restart your web server by running:
+		# service httpd restart
+		=====================
+
+		=== Debian/Ubuntu ===
+		Just add the section below to /etc/apache2/sites-available/status
+		Then link it:
+		# ln -s /etc/apache2/sites-available/mod_status /etc/apache2/sites-enabled/mod_status
+		Restart your web server by running:
+		# /etc/init.d/apache2 restart
+		=====================
+
+		The configuration to add:
+		=======================
+		<IfModule mod_status.c>
+			ExtendedStatus On
+			<Location /server-status>
+				SetHandler server-status
+				Order deny,allow
+				Deny from all
+				Allow from localhost ip6-localhost
+				</Location>
+		</IfModule>
+		=======================
+
+		Now you should be set for running this monitor...
+	-->
+	<apicredentials apikey="%API_KEY%" secretkey="%SECRET_KEY%"/>
+	<agent name="Apache mod_status Agent" interval="60">
+		<monitor name="Apache mod_status Monitor" tag="apacheMonitor">
+			<url>
+				<url>http://localhost/server-status?auto</url>
+			</url>
+			<metric name="Accesses">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>Total Accesses: (\d+)</regex>
+			</metric>
+			<metric name="KBytes">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>Total kBytes: (\d+)</regex>
+			</metric>
+			<metric name="Uptime">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>Uptime: (\d+)</regex>
+			</metric>
+			<metric name="ReqPerSec">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>ReqPerSec: (\S+)</regex>
+			</metric>
+			<metric name="BytesPerSec">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>BytesPerSec: (\S+)</regex>
+			</metric>
+			<metric name="BytesPerReq">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>BytesPerReq: (\S+)</regex>
+			</metric>
+			<metric name="BusyWorkers">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>BusyWorkers: (\d+)</regex>
+			</metric>
+			<metric name="IdleWorkers">
+				<type>integer</type>
+				<uom>number</uom>
+				<regex>IdleWorkers: (\d+)</regex>
+			</metric>
+		</monitor>
+	</agent>
+</config>

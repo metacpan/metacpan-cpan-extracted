@@ -1,26 +1,20 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/B/t');
-    } else {
-	unshift @INC, 't';
-	push @INC, "../../t";
-    }
+    unshift @INC, 't';
     require Config;
     if (($Config::Config{'extensions'} !~ /\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
-    # require 'test.pl'; # now done by OptreeCheck
+    if (!$Config::Config{useperlio}) {
+        print "1..0 # Skip -- need perlio to walk the optree\n";
+        exit 0;
+    }
 }
 use OptreeCheck;
 use Config;
-plan tests => 11;
-
-SKIP: {
-skip "no perlio in this build", 11 unless $Config::Config{useperlio};
+plan tests => 21;
 
 pass("SORT OPTIMIZATION");
 
@@ -83,7 +77,7 @@ checkOptree ( name	=> 'sub {@a = sort @a}',
 7  <0> pushmark s
 8  <#> gv[*a] s
 9  <1> rv2av[t2] lKRM*/1
-a  <2> aassign[t5] KS/COMMON
+a  <2> aassign[t5] KS/COM_AGG
 b  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 65 optree.t:311) v:>,<,%
@@ -95,7 +89,7 @@ EOT_EOT
 # 7  <0> pushmark s
 # 8  <$> gv(*a) s
 # 9  <1> rv2av[t1] lKRM*/1
-# a  <2> aassign[t3] KS/COMMON
+# a  <2> aassign[t3] KS/COM_AGG
 # b  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
@@ -204,7 +198,7 @@ checkOptree ( name	=> 'sub {my @a; @a = sort @a}',
 7  <@> sort lK
 8  <0> pushmark s
 9  <0> padav[@a:-437,-436] lRM*
-a  <2> aassign[t2] KS/COMMON
+a  <2> aassign[t2] KS/COM_AGG
 b  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 427 optree_sort.t:172) v:>,<,%
@@ -215,8 +209,8 @@ EOT_EOT
 # 6  <0> padav[@a:427,428] l
 # 7  <@> sort lK
 # 8  <0> pushmark s
-# 9  <0> padav[@a:427,428] lRM*
-# a  <2> aassign[t2] KS/COMMON
+# 9  <0> padav[@a:-437,-436] lRM*
+# a  <2> aassign[t2] KS/COM_AGG
 # b  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
@@ -309,8 +303,3 @@ EOT_EOT
 # 9  <$> const(IV 1) s
 # a  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
-
-} #skip
-
-__END__
-

@@ -916,27 +916,6 @@ No.
 =back
 
 
-=head1 TO DO
-
-The following modules are relevant but have not yet been cataloged above.
-
-=head2 Attribute::Property
-
-=head2 Class::Accessor::Chained
-
-=head2 Class::Accessor::Lvalue
-
-=head2 Class::Accessor::Ref
-
-=head2 Class::AutoClass
-
-=head2 Class::Builder
-
-=head2 Class::Member
-
-=head2 Class::Trigger
-
-
 =head1 SEE ALSO
 
 See L<Class::MakeMethods> for general information about this distribution. 

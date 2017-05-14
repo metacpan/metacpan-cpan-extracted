@@ -1,5 +1,12 @@
 Revision history for Perl extension Tree::BPTree.
 
+1.08  Sun Dec 23 2007
+    - Changed to use Module::Install from Module::Build.
+    - Fixing a bug in Perl version requirements reported by gyles19
+      (reported http://rt.cpan.org/Public/Bug/Display.html?id=31831).
+    - Updated the README
+    - Updated the MANIFEST
+
 1.07  Tue Nov 30 2004
 	- Changed to use Module::Build from ExtUtils::MakeMaker
 	- Moved BPTree.pm into lib/Tree/BPTree.pm in distribution

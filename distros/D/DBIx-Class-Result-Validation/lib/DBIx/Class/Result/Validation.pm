@@ -7,6 +7,8 @@ use Carp;
 use Try::Tiny;
 use Scalar::Util 'blessed';
 use DBIx::Class::Result::Validation::VException;
+use DateTime;
+use DateTime::Set;
 
 =head1 NAME
 
@@ -18,7 +20,7 @@ Version 0.14
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -106,6 +108,8 @@ You can redefined it in your Result object and call back it with  :
 
 sub validate {
   my $self = shift;
+
+  require Data::Dumper;
   $self->_erase_result_error();
   my @columns = $self->result_source->columns;
   foreach my $field (@columns)
@@ -124,6 +128,12 @@ sub validate {
               foreach my $validation (@{$validations}){
                   my $validation_function = "validate_" . $validation;
                   #Unvalid validation method cause a croak exception
+                 croak( DBIx::Class::Result::Validation::VException->new(
+                                  object  => $self,
+                                  message => "Validation : $validation is not valid"
+                                  )
+                           ) unless ($self->can($validation_function));
+
                   try{
                      $self->$validation_function($field);
                   }
@@ -131,7 +141,7 @@ sub validate {
                       croak(
                               DBIx::Class::Result::Validation::VException->new(
                                   object  => $self,
-                                  message => "Validation : $validation is not valid"
+                                  message => "Error is ".Data::Dumper::Dumper($_)
                                   )
                            );
                   }
@@ -296,6 +306,20 @@ sub validate_enum {
       )
     );
 }
+
+=head2 validate_ascii
+
+validation of field which must be ascii characters, return error if the field is not ascii
+
+=cut
+
+sub validate_ascii {
+    my ($self, $field) = @_;
+
+    $self->add_result_error( $field, "only ascii characters are authorized" )
+      if($self->$field && $self->$field =~ /[^[:ascii:]]/);
+}
+
 
 =head2 validate_defined
 

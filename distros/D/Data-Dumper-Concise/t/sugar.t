@@ -40,7 +40,7 @@ DWARN: {
 
 DWARN_CODEREF: {
    my $foo = ['warn', 'friend']->$Dwarn;
-   is $warned_string,qq{[\n  "warn",\n  "friend"\n]\n}, 'Dwarn warns lists';
+   like $warned_string,qr{^\[\n  "warn",\n  "friend",?\n\]\n\z}, 'Dwarn warns lists';
 
    ok eq_array($foo, ['warn','friend']), 'Dwarn passes lists through correctly';
 }
@@ -48,7 +48,7 @@ DWARN_CODEREF: {
 DWARNF: {
    my @foo = DwarnF { "arr: $_[0] str: $_[1]" } [qw(wut HALP)], "gnarl";
 
-   is($warned_string, qq{arr: [\n  "wut",\n  "HALP"\n]\n str: "gnarl"\n}, 'DumperF works!');
+   like($warned_string, qr{^arr: \[\n  "wut",\n  "HALP",?\n\]\n str: "gnarl"\n\z}, 'DumperF works!');
    ok eq_array($foo[0], ['wut','HALP']) && $foo[1] eq 'gnarl', 'DwarnF passes lists through correctly';
 }
 
@@ -57,12 +57,12 @@ DWARNN: {
    if ($loaded) {
       my $x = [1];
       my $foo = DwarnN $x;
-      is $warned_string, qq{\$x => [\n  1\n]\n}, 'DwarnN warns';
+      like $warned_string, qr{^\$x => \[\n  1,?\n\]\n\z}, 'DwarnN warns';
 
       ok eq_array($foo, [1]), 'DwarnN passes through correctly';
 
       DwarnN [1];
-      is $warned_string, qq{(anon) => [\n  1\n]\n}, 'DwarnN warns';
+      like $warned_string, qr{^\(anon\) => \[\n  1,?\n\]\n\z}, 'DwarnN warns';
    }
 }
 
@@ -70,6 +70,6 @@ DDIE: {
    eval {
       DdieS [ 'k', 'bar' ];
    };
-   is $@, qq{[\n  "k",\n  "bar"\n]\n}, 'DwarnD dies output correctly';
+   like $@, qr{^\[\n  "k",\n  "bar",?\n\]\n\z}, 'DwarnD dies output correctly';
 }
 

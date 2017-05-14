@@ -1,0 +1,443 @@
+#####################################################################
+# package PreliminaryResults;
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to creating the preliminaryDisplay page.  The Preliminary
+# display page is displayed to the user as the first thing after they
+# search for a record.  
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package PreliminaryResults;
+
+
+##########################################################################
+# StartPreliminaryResults
+#
+# This creates a query based on the search criteria vgiven  by the user
+# and then sends the data along to the ShowPreliminaryResults Function.
+##########################################################################
+sub StartPreliminaryResults {
+  $priKeyArrNum = $main::tableInfo->{'priKeyArrNum'};
+
+  	# Now do the query and display the results back to the user.
+  $DBHost = ( $main::tableInfo->{'DBHost'} ) ?  
+              $main::tableInfo->{'DBHost'} : undef ;
+  $DBName = $main::tableInfo->{'DBName'};
+  $fieldName = $main::tableInfo->{'TableName'};
+
+  $query = CreateFindQuery ( $fieldName, $main::tData );
+
+  $dbh = &MsqlCGI::SetupMsqlConnection();
+
+  &main::DPrint ( "Doing Query: <pre>$query</pre>" );
+  $sth = $dbh->Query ( $query ) || 
+  	&main::Error ( "Failed Query: $Msql::db_errstr" );
+
+  $nRows = $sth->numrows;
+  $nCols = $sth->numfields;
+
+  if ( $nRows == 0 ) {
+    &main::Error ( "Sorry, There were no matches for your query" );
+  }
+
+  &ShowPreliminaryResults ( $sth );
+}
+
+
+##########################################################################
+# ShowPreliminaryResults
+#
+# This function actually creates the page which is displayed to the user.
+# This page is very funky because it's the only page that has repetitive
+# sections.  This makes templates very wierd.
+##########################################################################
+sub ShowPreliminaryResults {
+  ($sth ) = @_;
+  &main::DPrint ( "<b>In ShowPreliminaryResults</b>" );
+
+	# Standard crap.  Make sure we print out the MsqlCGI Header so
+	# we know what to do with the data when we get the next directive.
+
+  if ( $main::tableInfo->{'PreliminaryResultsTemplate'} ) {
+    &Template::DoTemplate ( $main::tableInfo->{'PreliminaryResultsTemplate'}, 
+    		  "PRELIMINARY_RESULTS", 
+		  $sth );
+    return;
+  } else {
+    print &DoStandardAction ( $sth );
+  }
+}
+
+
+
+##########################################################################
+# DoStandardAction
+#
+##########################################################################
+sub DoStandardAction {
+  my ( $sth ) = @_;
+  my ( $strRet ) = "";
+
+  $nRows = $sth->numrows;
+  if  ( $nRows > 1 ) {
+    $strHeader = "There are $nRows matches for your query:\n";
+    $strParagraph1 = "Please click on the checkbox of the record or
+    records you would like to select.  Click on the button below<p>";
+    $strResetButton = "<input type=reset value=\"Deselect All Records\">";
+
+  } else {
+    $strHeader = "There is 1 match for your query:\n";
+    $strResetButton = "";
+  }
+  &main::DPrint ( "nRows: $nRows" );
+
+  #print &main::HtmlTop ( $strHeader );
+  $strRet .= "$strParagraph1\n<table border width=\"100%\">\n";
+  $strRet .= &DoCGIHeader ();
+
+	# Now Fetch the data...
+  for ( $i = 0; $i < $nRows; $i++ ) {
+    $sth->DataSeek ( $i );
+    ( @arr = $sth->FetchRow() ) || &main::Error ( "Error Fetching Row $i" );
+    $strRet .= <<"    EOF";
+  <tr>
+    EOF
+
+	# We need to setup some information.  
+	# If we have more than one match, we need to add an extra table
+	# cell for each row.  This will be a checkbox so that the user can
+	# selectively choose which  record to display/modify/delete, etc.
+	# Oh yeah, this function sets the header string for the form.
+    if ( $nRows > 1 ) {
+      $strRet .= <<"      EOF";
+    <td><input type=checkbox name="_MsqlCGI_priKey"
+        value="$arr[$priKeyArrNum]"> </td>
+    <td>
+      <table>
+      EOF
+
+    } else {
+      $strRet .= <<"      EOF";
+    <td>
+      <input type=hidden name="_MsqlCGI_priKey"
+             value="$arr[$priKeyArrNum]">
+      <table>
+      EOF
+    }
+
+
+    &main::DPrint ( "<b>$main::tData, $#{$main::tData}</b>" );
+    for ( $j = 0; $j <= $#{$main::tData}; $j++ ) {
+      if ( $main::tData->[$j]->{'summary'} ) {
+	$strValue = &MsqlCGI::ConvertValue ( $arr[$j], $main::tData->[$j] );
+	$strRet .= <<"        EOF";
+        <tr>
+	  <td width=22%><font size=-1>$main::tData->[$j]->{'description'}:</font></td>
+	  <td width=3%>&nbsp;</td>
+	  <td width=75%><b>$strValue</b></td>
+	</tr>
+
+        EOF
+	
+      }
+    }
+    $strRet .= "      </table>\n";
+    $strRet .= "    </td>\n";
+  }	# end of per Record loop.
+
+  $strRet .= "  </table>\n";
+  $strRet .= &DoCGIFooter ( $sth );
+  return $strRet;
+}
+
+
+
+##########################################################################
+# DoCGIHeader
+# 
+# Setup the header for the Record Find screen.  This is called internally
+# by DoRecordFindSetup or by a $CGIHeader token in the
+# preliminarySearchTemplate.
+##########################################################################
+sub DoCGIHeader {
+    return  &Template::GetCGIHeader ( "RecActions" );
+}
+
+##########################################################################
+# CreateFindQuery 
+#
+# This routine creates a search query suitable for Msql.  It uses the
+# global variable "%in" to figure out which fields to use.
+##########################################################################
+sub CreateFindQuery {
+  local ( $fieldName ) = @_;
+
+  &main::DPrint ( "In CreateFindQuery" );
+
+  $tie = $main::in{'_MsqlCGI_tie'};
+  &main::DPrint ( "Tie: $tie" );
+  $query = <<EOF;
+	SELECT	*
+	FROM	$fieldName
+	WHERE	
+EOF
+  $nCount = 0;
+  foreach $key ( keys ( %main::in ) ) {
+    if ( ( $main::in{$key} ) && ( $key !~ /^_MsqlCGI_/ ) ) {
+      $pData = &MsqlCGI::GetElementStruct ( $key, $main::tData );
+      &main::DPrint ( "<b>$key, $pData->{'description'}</b>" );
+      $strValue = $main::in{$key};
+
+
+    	# Do Special Processing for Field.
+      &main::DPrint ( "About to call Special, $nCount" );
+      if ( $pData->{'special'} ) {
+	$funcName = &MsqlCGI::GetSpecialFunctionName 
+		( $pData, "CreateQueryPart_Search" );
+	( $value ) = &{$funcName} 
+		( $main::tableInfo, $pData, $strValue );
+	&main::DPrint ( "Returned from Special $funcName, Value is: $value" );
+
+      } 
+
+      if ( ( ( $pData->{'special'} ) && 
+	     ( $value eq "_MsqlCGI_Defer" ) ) ||
+           ( ! $pData->{'special'} ) ) {
+      
+	  # Do substitutions on special characters...
+	$strValue = &MsqlCGI::StrToQueryStr ( $strValue,
+		      $pData->{'fieldType'}, "SEARCH" );
+
+	  # A Standard text field has a case insensitive option
+	$case = "_MsqlCGI_ignoreCase-" . $key;
+	$ignoreCase = ( $main::in{$case} eq "Yes" ) ? 1 : 0;
+	if ( $ignoreCase ) {
+	  $strValue =~ s/([A-Za-z])/\[\L$1\U$1\]/gi;
+	}
+
+	  # A standard numeric field has a setup for operands
+
+	if ( $pData->{'cgiType'} =~ /^(text|password)/i ) {
+	  if ( $pData->{'fieldType'} eq "char" ) {
+	    $strValue =~ /'(.*)'/;
+	    $strValue = "'%$1%'";
+	    $queryPart = "$key like $strValue";
+	  } elsif ( ( $pData->{'fieldType'} eq "int" ) || 
+		    ( $pData->{'fieldType'} eq "real" ) ) {
+	    $operandStr = "_MsqlCGI_operand-" . $key;
+	    $operand = $main::in{$operandStr};
+	    $queryPart = "$key $operand $strValue";
+	  }
+
+	  $query .= ( $nCount++ ) ? "\t$tie\t$queryPart\n" : "\t\t$queryPart\n";
+
+	} elsif ( $pData->{'cgiType'} =~ /^(radio|checkbox|select)$/i ) {
+	  @arr = split ( /\0/, $strValue );
+	  foreach $value ( @arr ) {
+	  &main::DPrint ( "Value: $value" );
+	    $queryPart = "$key = $value";
+	    $query .= ( $nCount++ ) ? "\t$tie\t$queryPart\n" : "\t\t$queryPart\n";
+	  }
+
+	} else {
+	  $queryPart = "$key = $strValue";
+	  $query .= ( $nCount++ ) ? "\t$tie\t$queryPart\n" : "\t\t$queryPart\n";
+
+	}
+      }
+
+    }
+  }
+  return $query;
+}
+
+############################################################################
+# Repetitive Section.
+#
+# This is the "repetitive section" processor for the
+# PreliminaryResultsTemplate.  
+# The prelim results template is the only template that has the capability
+# of having multiple "repeating sections".  These sections are the summary
+# output.  We're making the template have a "start" block (the token:
+# "$Start_Repetitive_Section") and an "end" token: (the token:
+# "$End_Repetitive_Section") which defines the summary section.  
+#
+# Processing of the repetitive section is as follows:
+#  1: we read all the lines between the summary section into an array
+#     of strings.  While reading, we'll perform substitutions which are
+#     not RECORD Specific.  (date, time, database, tcp port, etc...)
+#  2: We get the data from the database
+#  3: For each of the records returned:
+#    3a: run through the array of strings and perform whatever
+#        substitutions on the RECORD SPecific data which are necessary.
+#        The results are concatinated to a string..
+#  4: Return the string.
+############################################################################
+sub RepetitiveSection {
+  ( $filePtr ) = @_;
+  local ( $strRet ) = 
+  $strRet = "<pre>Start, $filePtr<br>\n" if ( $main::debug );
+  $continue = 1;
+  $nCount = 0;
+  $priKeyArrNum = $main::tableInfo->{'priKeyArrNum'};
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+  $date = sprintf ( "%02d/%02d/%02d", $mon + 1, $mday, $year + 1900 );
+  $time = sprintf ( "%d:%02d:%02d", $hour, $min, $sec );
+  &main::DPrint ( "<b>In RepetitiveSection, $file</b>" );
+  $nRows = $sth->numrows;
+
+	# This reads the section in until we get the
+	# "$End_Repetitive_Section" token is seen.
+  do {
+    $nCount++;
+    $_ = <$filePtr>;
+    if ( $_ eq undef ) {
+      $msg = <<"      EOF";
+	The template file: for the PreliminaryResults page had a
+	"\$Start_Repetitive_Section" token but no corresponding
+	"\$End_Repetitive_Section".  Please check the syntax of the
+	template file.
+      EOF
+      &main::Error ( $msg );
+    }
+    s/(.?)(\$DBHost\b)/$1 eq '\\' ? $2 : $1 . $main::tableInfo->{DBHost} /ge;
+    s/(.?)(\$DBPort\b)/$1 eq '\\' ? $2 : $1 . $main::tableInfo->{DBPort} /ge;
+    s/(.?)(\$DBName\b)/    $1 eq '\\' ? $2 : 
+    	$1 .  $main::tableInfo->{DBName} /ge;
+    s/(.?)(\$TableName\b)/$1 eq '\\' ? $2 : 
+    	$1 . $main::tableInfo->{TableName} /ge;
+    s/(.?)(\$date\b)/$1 eq '\\' ? $2 : $1 . $date /ge;
+    s/(.?)(\$time\b)/$1 eq '\\' ? $2 : $1 . $time /ge;
+    s/(.?)(\$FieldDescription\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 :
+      $1 . &MsqlCGI::GetElementValue ( $3, "description", $main::tData) /ge;
+    s/(.?)(\$TotalRecords\b)/$1 eq '\\' ? $2 : $1 . $nRows /ge;
+
+    $_ =~ /(.?)(\$End_Repetitive_Section\b)/;
+    if ( ( $1 ne '\\' ) && ( $2 eq "\$End_Repetitive_Section" ) ) {
+      $continue = 0;
+    } else {
+      push @strList, $_;
+    }
+  } while ( $continue );
+
+  	# Loop through the records we've got, get the data, and perform
+	# the substitutions. 
+  for ( $nRowCount = 0; $nRowCount < $nRows; $nRowCount++ ) {
+    $sth->DataSeek ( $nRowCount );
+    ( @arr = $sth->FetchRow() ) || 
+    	&main::Error ( "Error Fetching Row $nRowCount" );
+
+    foreach $str ( @strList ) {
+      	# We have to create a second variable here because if we modify
+	# "$str", it will modify the fields in the array...Definitely not
+	# what we want.
+      $strReplace = $str;
+
+      $strReplace =~ s/(.?)(\$RecordCount\b)/$1 eq '\\' ? $2 : 
+      	$1 . $nRowCount /ge;
+		 
+      $strReplace =~ s/(.?)(\$FieldValue\s*\(\s*(\w*)\s*\))/ $1 eq '\\' ? $2 :
+         $1 . &DisplayValue ( $3, \@arr )/ge;
+
+      	# this checked variable just makes sure that the checkbox is
+	# checked by default if there's only one record that's going to be
+	# displayed.
+      $checked = ( $nRows > 1 ) ? " " : "CHECKED";
+      $strReplace =~ s/(.?)(\$FieldCheckbox\b)/
+      	$1 eq '\\' ? $2 : $1 . "
+				<Input type=checkbox $checked 
+				name=\"_MsqlCGI_priKey\" 
+	       		        value=\"$arr[$priKeyArrNum]\">"/ge;
+
+      $strRet .= $strReplace;
+    }
+  }
+  $strRet .= "</pre>" if ( $main::debug );
+  return $strRet;
+}
+
+############################################################################
+# This just displays the value given the name of a field.  It's only here
+# to clean up how the code looks.
+############################################################################
+sub DisplayValue {
+  ( $fieldName, $fieldArray ) = @_;
+  $fieldNum = &MsqlCGI::GetElementStructNumber ( $fieldName );
+  local ( $strRet ) = &MsqlCGI::ConvertValue ( $fieldArray->[$fieldNum] );
+  return $strRet;
+}
+
+
+############################################################################
+# DoCGIFooter
+#
+# This creates the bottom CGI buttons.  We need to check a bunch of things
+# to see what process buttons and radio buttons we need to create.
+############################################################################
+sub DoCGIFooter {
+  local ( $sth ) = @_;
+  $nRows = $sth->numrows;
+
+  $strDispButton = <<"  EOF";
+    <input type=radio name="_MsqlCGI_recAction" value="display" checked>
+    Display Selected Record(s)
+  EOF
+
+  $strDispHidden = <<"  EOF";
+    <input type=hidden name="_MsqlCGI_recAction" value="display">
+  EOF
+
+  $strModButton = <<"  EOF";
+    <input type=radio name="_MsqlCGI_recAction" value="modify">
+    Modify Selected Record
+  EOF
+
+  $strDelButton = <<"  EOF";
+    <input type=radio name="_MsqlCGI_recAction" value="delete">
+    Delete Selected Record(s)
+  EOF
+
+  if ( ( $main::tableInfo->{'AllowModify'} ) || 
+       ( $main::tableInfo->{'AllowDelete'} ) ) {
+    $strRadioButtons = "$strDispButton";
+    $strSubmitButton = "Process Selected Record(s)";
+    if ( $main::tableInfo->{'AllowModify'} ) {
+      $strRadioButtons .= "<br>$strModButton";
+    }
+
+    if ( $main::tableInfo->{'AllowDelete'} ) {
+      $strRadioButtons .= "<br>$strDelButton";
+    }
+  } else {
+    	
+	# this is the special case where we don't have modify or delete
+	# privlidges.  So...We're not going to give the user the option to
+	# select "Display Record".  We're just going to hide it and make
+	# the submit button say "Display Record(s)".
+    $strRadioButtons = $strDispHidden;
+    $strSubmitButton = "Display Record(s)";
+  }
+  $strResetButton = ( ( $nRows ) > 1 ) ?  
+  	"<input type=reset value=\"Deselect All Records\">" : "";
+
+
+	# Just finish off the form.  Close the table and print the radio
+	# buttons and the submit buttons.
+  $strRet = <<"  EOF";
+  <p>
+  <center>
+    <font size=+1>
+    $strRadioButtons
+    </font>
+    <p>
+    <input type=submit value="$strSubmitButton">
+    $strResetButton
+  </center>
+  EOF
+  return $strRet;
+}
+
+1;

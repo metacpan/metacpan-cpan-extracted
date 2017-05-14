@@ -1,0 +1,10 @@
+
+=head1 NAME
+
+LEGO::NXT::Manual::FAQ - Frequenty asked questions about LEG::NXT.
+
+=head1 OVERVIEW
+
+This document is currently just a placeholder until someone
+gets the time and initiatiative to work on it.
+

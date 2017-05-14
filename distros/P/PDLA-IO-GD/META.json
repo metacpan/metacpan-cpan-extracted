@@ -1,0 +1,60 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0529, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDLA-IO-GD",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "PDLA::Core" : "0",
+            "PDLA::IO::Misc" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "PDLA::Core" : "0",
+            "PDLA::IO::Misc" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "PDLA::Core" : "0",
+            "PDLA::IO::Misc" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "PDLA::Core" : "0",
+            "PDLA::IO::Misc" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/pdla-io-gd",
+         "web" : "https://github.com/PDLPorters/pdla-io-gd"
+      }
+   },
+   "version" : "2.013006"
+}
+

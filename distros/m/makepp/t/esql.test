@@ -1,0 +1,60 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	6	755	1317765475	1342133044	makepp_test_script.pl
+makepp;
+
+n_files 'n_files_1';
+c_echo '/* unimportant change */', '-o', $_ for qw(t-db2.sqc t-proc.pc);
+
+makepp qw(t-db2.c t-proc.c);
+###	37	644	1103319650	1319890767	Makeppfile
+#
+# Alas all embedded SQL/C precompilers vary wildly in how they work.  Test a few very different types.
+#
+
+# Also try alternate syntaxes, only to check if input gets generated
+$(phony all): xt-db2.c xt-proc.c
+	bin$/db2 PRECOMPILE db2.sqx
+	bin$/foo -bar foo.ec
+	bin$/gpre gpre
+	bin$/proc proc
+
+register-parser foo esql-compilation
+
+&mkdir bin empty inc sysinc
+
+# Generate "precompilers"
+bin/$(foreach) bin/$(foreach).bat: :foreach db2 foo gpre proc
+       @&echo '#! /bin/sh\necho ok >t-$(foreach).c' -o $(output)
+       @&chmod 755 $(output)
+       @&echo '@echo ok >t-$(foreach).c' -o $(output 2)
+
+export DB2INCLUDE=inc:sysinc
+x%.c: %.sqc
+	bin$/db2 "prep $(input) bindfile"
+	&mv $(stem).c $(output)	# Fake compiler can't handle filenames, be different from alternate above
+
+x%.c: %.pc
+	bin$/proc config=proc.cfg MODE=ANSI iname=$(input)
+	&mv $(stem).c $(output)
+
+$(foreach): :foreach db2.sqx inc/db2a.sqc sysinc/db2b.h \
+	foo.ec gpre.exx \
+	proc.pc empty/proc1.h sysinc/proc2.h inc/proc3.h
+  &echo $(map $(output), tr+./++d; $_ = "int $_ = 1;") -o $(output)
+
+proc.cfg:
+    &echo 'include=(empty,inc)' -o $(output)
+###	3	644	1103319458	1294864859	t-db2.sqc
+EXEC SQL INCLUDE SQLCA;
+EXEC SQL INCLUDE db2a;
+EXEC SQL INCLUDE 'db2b.h';
+###	4	644	1103319429	1294613661	t-proc.pc
+EXEC ORACLE OPTION (sys_include=sysinc);
+EXEC SQL INCLUDE PROC1;
+#include <proc2.h>
+$INCLUDE 'proc3.h';
+###	D	755	1103319665	1103319662	answers/
+###	1	644	1067451878	1190053833	answers/n_files_1
+20 1 0
+###	1	644	1317765460	1317765460	answers/n_files
+0 0 0

@@ -1,7 +1,11 @@
-#$Id: clihub.pm 787 2011-05-25 21:41:28Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/lib/Net/DirectConnect/clihub.pm $
+#$Id: clihub.pm 998 2013-08-14 12:21:20Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/lib/Net/DirectConnect/clihub.pm $
 package    #hide from cpan
   Net::DirectConnect::clihub;
 use strict;
+no strict qw(refs);
+use warnings "NONFATAL" => "all";
+no warnings qw(uninitialized);
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use utf8;
 use Time::HiRes qw(time sleep);
 use Data::Dumper;    #dev only
@@ -9,8 +13,7 @@ $Data::Dumper::Sortkeys = $Data::Dumper::Indent = 1;
 use Net::DirectConnect;
 use Net::DirectConnect::clicli;
 #use Net::DirectConnect::http;
-no warnings qw(uninitialized);
-our $VERSION = ( split( ' ', '$Revision: 787 $' ) )[1];
+our $VERSION = ( split( ' ', '$Revision: 998 $' ) )[1];
 use base 'Net::DirectConnect';
 
 sub name_to_ip($) {
@@ -50,7 +53,7 @@ sub init {
     'search_every_min'     => 10,
     'auto_connect'         => 1,
     'auto_bug'             => 1,
-    'reconnects'           => 5,
+    'reconnects'           => 99999,
     'NoGetINFO'            => 1,                              #test
     'NoHello'              => 1,
     'UserIP2'              => 1,
@@ -62,7 +65,10 @@ sub init {
     'disconnect_recursive' => 1,
   );
   $self->{$_} //= $_{$_} for keys %_;
-  $self->{'periodic'}{ __FILE__ . __LINE__ } = sub { $self->cmd( 'search_buffer', ) if $self->{'socket'}; };
+  $self->{'periodic'}{ __FILE__ . __LINE__ } = sub {
+    my $self = shift if ref $_[0];
+    $self->search_buffer() if $self->{'socket'};
+  };
   #$self->log($self, 'inited',"MT:$self->{'message_type'}", ' with', Dumper  \@_);
   #$self->baseinit();
   #share_full share_tth want
@@ -73,14 +79,14 @@ sub init {
          #$self->log( $self, 'inited3', "MT:$self->{'message_type'}", ' with' );
          #You are already in the hub.
          #  $self->{'parse'} ||= {
+  $self->module_load('filelist');
   local %_ = (
     'chatline' => sub {
       my $self = shift if ref $_[0];
       #$self->log( 'dev', Dumper \@_);
       my ( $nick, $text ) = $_[0] =~ /^(?:<|\* )(.+?)>? (.+)$/s;
       #$self->log('dcdev', 'chatline parse', Dumper(\@_,$nick, $text));
-      $self->log( 'warn', "[$nick] oper: already in the hub [$self->{'Nick'}]" ), $self->cmd('nick_generate'),
-        $self->reconnect(),
+      $self->log( 'warn', "[$nick] oper: already in the hub [$self->{'Nick'}]" ), $self->nick_generate(), $self->reconnect(),
         if ( ( !keys %{ $self->{'NickList'} } or $self->{'NickList'}{$nick}{'oper'} )
         and $text eq 'You are already in the hub.' );
       if ( $self->{'NickList'}{$nick}{'oper'} or $self->{'NickList'}{$nick}{'hubbot'} or $nick eq 'Hub-Security' ) {
@@ -89,6 +95,9 @@ sub init {
 /Минимальный интервал поиска составляет: \(Minimum search interval is:\) (\d+)секунд \(seconds\)/
           or $text =~ /^(?:Minimum search interval is|Минимальный интервал поиска):(\d+)s/
           or $text =~ /Search ignored\.  Please leave at least (\d+) seconds between search attempts\./  #Hub-Security opendchub
+          or $text =~
+/Минимальный интервал между поисковыми запросами:(\d+)сек., попробуйте чуть позже/
+          or $text =~ /You can do 1 searches in (\d+) seconds/
           )
         {
           $self->{'search_every'} = int( rand(5) + $1 || $self->{'search_every_min'} );
@@ -99,7 +108,8 @@ sub init {
              /(?:Пожалуйста )?подождите (\d+) секунд перед следующим поиском\./i
           or $text =~ /(?:Please )?wait (\d+) seconds before next search\./i
           or $text eq 'Пожалуйста не используйте поиск так часто!'
-          or $text eq "Please don't flood with searches!" )
+          or $text eq "Please don't flood with searches!"
+          or $text eq 'Sorry Hub is busy now, no search, try later..' )
         {
           $self->{'search_every'} += int( rand(5) + $1 || $self->{'search_every_min'} );
           $self->log( 'warn', "[$nick] oper: increase min interval => $self->{'search_every'}" );
@@ -126,9 +136,11 @@ sub init {
           $self->{'Nick'} = $try if length $try;
         } elsif ( $text =~ /Bad nickname: Wait (\d+)sec before reconnecting/i
           or $text =~
-          /Пожалуйста подождите (\d+) секунд до повторного подключения\./ )
+          /Пожалуйста подождите (\d+) секунд до повторного подключения\./
+          or $text =~ /Do not reconnect too fast. Wait (\d+) secs before reconnecting./ )
         {
-          sleep $1 + 1;
+          #sleep $1 + 1;
+          $self->work( $1 + 10 );
         } elsif ( $self->{'auto_bug'} and $nick eq 'VerliHub' and $text =~ /^This Hub Is Running Version 0.9.8d/i ) {    #_RC1
           ++$self->{'bug_MyINFO_last'};
           $self->log( 'dev', "possible bug fixed [$self->{'bug_MyINFO_last'}]" );
@@ -209,10 +221,11 @@ sub init {
     },
     'ForceMove' => sub {
       my $self = shift if ref $_[0];
-      $self->log( 'warn', "ForceMove to $_[0]" );
+      my ($to) = grep { length $_ } split /;/, $_[0];
+      $self->log( 'warn', "ForceMove to $to :: ", @_ );
       $self->disconnect();
       sleep(1);
-      $self->connect(@_) if $self->{'follow_forcemove'} and @_;
+      $self->connect($to) if $self->{'follow_forcemove'} and $to;
     },
     'Quit' => sub {
       my $self = shift if ref $_[0];
@@ -223,6 +236,10 @@ sub init {
       my ( $nick, $host, $port ) = $_[0] =~ /\s*(\S+)\s+(\S+)\:(\S+)/;
       $self->{'IpList'}{$host}{'port'} = $self->{'PortList'}->{$host} = $port;
       #$self->log('dev', "portlist: $host = $self->{'PortList'}->{$host} :=$port");
+      $self->log("ignore flooding attempt to [$host:$port ] ($self->{flood}{$host})"), $self->{flood}{$host} = time + 30,
+        return
+        if $self->{flood}{$host} > time;
+      $self->{flood}{$host} = time + 60;
       return if $self->{'clients'}{ $host . ':' . $port }->{'socket'};
       $self->{'clients'}{ $host . ':' . $port } = Net::DirectConnect::clicli->new(
         #!        %$self, $self->clear(),
@@ -258,7 +275,7 @@ sub init {
     'Search' => sub {
       my $self = shift if ref $_[0];
       my $search = $_[0];
-      $self->cmd('make_hub');
+      $self->make_hub();
       my $params = { 'time' => int( time() ), 'hub' => $self->{'hub_name'}, };
       ( $params->{'who'}, $params->{'cmds'} ) = split /\s+/, $search;
       $params->{'cmd'} = [ split /\?/, $params->{'cmds'} ];
@@ -296,7 +313,8 @@ sub init {
           $path =~ s{^\w:}{};
           $path =~ s{^\W+}{};
           $path =~ tr{/}{\\};
-          $path = Encode::encode $self->{charset_protocol}, Encode::decode $self->{charset_fs}, $path
+          $path = Encode::encode $self->{charset_protocol}, Encode::decode( $self->{charset_fs}, $path, Encode::FB_WARN ),
+            Encode::FB_WARN
             if $self->{charset_fs} ne $self->{charset_protocol};
         }
         local @_ = (
@@ -347,12 +365,12 @@ sub init {
     'SR' => sub {
       my $self = shift if ref $_[0];
 #$self->log( 'dev', "SR", @_ , 'parent=>', $self->{parent}, 'h=', $self->{handler}, Dumper($self->{handler}), 'ph=', $self->{parent}{handler}, Dumper($self->{parent}{handler}), ) if $self;
-      $self->cmd('make_hub');
+      $self->make_hub();
       my $params = { 'time' => int( time() ), 'hub' => $self->{'hub_name'}, };
       ( $params->{'nick'}, $params->{'str'} ) = split / /, $_[0], 2;
       $params->{'str'} = [ split /\x05/, $params->{'str'} ];
       $params->{'file'} = shift @{ $params->{'str'} };
-      ( $params->{'filename'} ) = $params->{'file'}     =~ m{([^\\]+)$};
+      ( $params->{'filename'} ) = $params->{'file'} =~ m{([^\\]+)$};
       ( $params->{'ext'} )      = $params->{'filename'} =~ m{[^.]+\.([^.]+)$};
       ( $params->{'size'}, $params->{'slots'} )  = split / /, shift @{ $params->{'str'} };
       ( $params->{'tth'},  $params->{'ipport'} ) = split / /, shift @{ $params->{'str'} };
@@ -503,34 +521,23 @@ sub init {
       $_[3] ||= ( $_[4] =~ s/^(TTH:)?([A-Z0-9]{39})$/TTH:$2/ ? '9' : '1' ) unless defined $_[3];
       #
       #$self->cmd( 'search_buffer', 'F', 'T', '0', '1', @_ );
-      $self->cmd( 'search_buffer', @_ );
+      $self->search_buffer(@_);
     },
     'search_tth' => sub {
       my $self = shift if ref $_[0];
       $self->{'search_last_string'} = undef;
-      $self->cmd(
-        'search_nmdc',
-        #'F', 'T', '0', '9',
-        #'TTH:' .
-        #$_[0],
-        @_
-      );
+      $self->search_nmdc(@_);
     },
     'search_string' => sub {
       my $self = shift if ref $_[0];
       #my $string = $_[0];
       $self->{'search_last_string'} = $_[0];    #$string;
                                                 #$string =~ tr/ /$/;
-      $self->cmd(
-        'search_nmdc',
-        #'F', 'T', '0', '1',
-        #$string,
-        @_
-      );
-      #}
+      $self->search_nmdc(@_);
     },
     'search_send' => sub {
       my $self = shift if ref $_[0];
+      #$self->log( 'devsearchsend', "$self->{'M'} ne 'P' and $self->{'myip'} and $self->{'myport_udp'}" );
       $self->sendcmd(
         'Search', (
           ( $self->{'M'} ne 'P' and $self->{'myip'} and $self->{'myport_udp'} )

@@ -1,0 +1,10 @@
+Revision history for Catmandu-Store-RKD
+
+0.03  2017-01-06 08:02:08 UTC
+        - Updated dependency on LWP::Protocol::https
+
+0.02  2017-01-05 14:30:56 UTC
+        - Updated documentation
+
+0.01  2017-01-05 14:24:36 UTC
+        - Initial release

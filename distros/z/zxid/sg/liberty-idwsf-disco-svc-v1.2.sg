@@ -1,0 +1,136 @@
+# zxid/sg/liberty-idwsf-disco-svc-v1.2.sg
+# Slightly edited, 14.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-disco-svc-v1.2.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(di12, urn:liberty:disco:2003-08)
+import(xenc, http://www.w3.org/2001/04/xmlenc#, http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd)
+#include(liberty-idwsf-utility-v1.1.xsd)
+
+ServiceType	 -> %xs:anyURI
+
+%ResourceIDType:	 base(xs:anyURI)
+  @id?	 -> %xs:ID
+  ;
+
+%EncryptedResourceIDType:
+  xenc:EncryptedData
+  xenc:EncryptedKey       # N.B. Encrypted data itself can carry a key, too
+  ;
+
+ResourceID -> %di12:ResourceIDType
+
+EncryptedResourceID -> %di12:EncryptedResourceIDType
+
+&ResourceIDGroup: 
+  di12:ResourceID?
+  di12:EncryptedResourceID?
+  ;
+
+%DescriptionType:
+  di12:SecurityMechID+	 -> %xs:anyURI
+  di12:CredentialRef*	 -> %xs:IDREF
+  &di12:WsdlRef*
+  &di12:BriefSoapHttpDescription*
+  @id?	 -> %xs:ID
+  ;
+
+&WsdlRef: 
+  di12:WsdlURI        -> %xs:anyURI
+  di12:ServiceNameRef -> %xs:QName
+  ;
+
+&BriefSoapHttpDescription: 
+  di12:Endpoint    -> %xs:anyURI
+  di12:SoapAction? -> %xs:anyURI
+  ;
+
+%ServiceInstanceType:
+  di12:ServiceType
+  di12:ProviderID	 -> %xs:anyURI        #%md:entityIDType
+  di12:Description+	 -> %di12:DescriptionType
+  ;
+
+ResourceOffering	 -> %di12:ResourceOfferingType
+%ResourceOfferingType:
+  &di12:ResourceIDGroup
+  di12:ServiceInstance	 -> %di12:ServiceInstanceType
+  di12:Options?
+  di12:Abstract?	 -> %xs:string
+  @entryID?	 -> %xs:string   #%IDType
+  ;
+
+Options	 -> %di12:OptionsType
+%OptionsType:
+  di12:Option*	 -> %xs:anyURI
+  ;
+
+Query	 -> %di12:QueryType
+%QueryType:
+  &di12:ResourceIDGroup
+  di12:RequestedServiceType*:
+    di12:ServiceType
+    di12:Options?
+    ;
+  @id?	 -> %xs:ID
+  ;
+
+QueryResponse	 -> %di12:QueryResponseType
+%QueryResponseType:
+  di12:Status
+  di12:ResourceOffering*
+  di12:Credentials?:
+    any*  processContents(lax)
+    ;
+  @id?	 -> %xs:ID
+  ;
+
+%InsertEntryType:
+  di12:ResourceOffering
+  any*  processContents(lax)
+  ;
+
+%RemoveEntryType:
+  @entryID	 -> %xs:string #%IDReferenceType
+  ;
+
+Modify	 -> %di12:ModifyType
+%ModifyType:
+  &di12:ResourceIDGroup
+  di12:InsertEntry*	 -> %di12:InsertEntryType
+  di12:RemoveEntry*	 -> %di12:RemoveEntryType
+  @id?	 -> %xs:ID
+  ;
+
+%DirectiveType:
+  @descriptionIDRefs?	 -> %xs:IDREFS
+  ;
+
+AuthenticateRequester	   -> %di12:DirectiveType
+AuthorizeRequester	   -> %di12:DirectiveType
+AuthenticateSessionContext -> %di12:DirectiveType
+EncryptResourceID	   -> %di12:DirectiveType
+
+ModifyResponse	 -> %di12:ModifyResponseType
+%ModifyResponseType:
+  di12:Status
+  di12:Extension?
+  @id?	 -> %xs:ID
+  @newEntryIDs? -> %xs:string       # : list (IDReferenceType) ;
+  ;
+
+# From liberty-idwsf-utility-v1.1.sg
+
+Status   -> %di12:StatusType
+%StatusType:
+  di12:Status*
+  @code     -> %xs:QName
+  @ref?     -> %xs:string
+  @comment? -> %xs:string
+  ;
+
+Extension        -> %di12:extensionType
+%extensionType:
+  any+  ns(##other)  processContents(lax)
+  ;
+
+#EOF

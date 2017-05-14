@@ -3,10 +3,10 @@
 BEGIN {
     chdir 't' if -d 't';
     require './test.pl';
-    @INC = '../lib';
+    set_up_inc('../lib');
 }
 
-plan (tests => 22);
+plan (tests => 41);
 
 print "not " unless length("")    == 0;
 print "ok 1\n";
@@ -161,3 +161,88 @@ tie $u, 'Tie::StdScalar', chr 256;
 is(length $u, 1, "Length of a UTF-8 scalar returned from tie");
 is(length $u, 1, "Again! Again!");
 
+$^W = 1;
+
+my $warnings = 0;
+
+$SIG{__WARN__} = sub {
+    $warnings++;
+    warn @_;
+};
+
+is(length(undef), undef, "Length of literal undef");
+
+my $u;
+
+is(length($u), undef, "Length of regular scalar");
+
+$u = "Gotcha!";
+
+tie $u, 'Tie::StdScalar';
+
+is(length($u), undef, "Length of tied scalar (MAGIC)");
+
+is($u, undef);
+
+{
+    package U;
+    use overload '""' => sub {return undef;};
+}
+
+my $uo = bless [], 'U';
+
+{
+    my $w;
+    local $SIG{__WARN__} = sub { $w = shift };
+    is(length($uo), 0, "Length of overloaded reference");
+    like $w, qr/uninitialized/, 'uninit warning for stringifying as undef';
+}
+
+my $ul = 3;
+is(($ul = length(undef)), undef, 
+                    "Returned length of undef with result in TARG");
+is($ul, undef, "Assigned length of undef with result in TARG");
+
+$ul = 3;
+is(($ul = length($u)), undef,
+                "Returned length of tied undef with result in TARG");
+is($ul, undef, "Assigned length of tied undef with result in TARG");
+
+$ul = 3;
+{
+    my $w;
+    local $SIG{__WARN__} = sub { $w = shift };
+    is(($ul = length($uo)), 0,
+                "Returned length of overloaded undef with result in TARG");
+    like $w, qr/uninitialized/, 'uninit warning for stringifying as undef';
+}    
+is($ul, 0, "Assigned length of overloaded undef with result in TARG");
+
+{
+    my $y = "\x{100}BC";
+    is(index($y, "B"), 1, 'adds an intermediate position to the offset cache');
+    is(length $y, 3,
+       'Check that sv_len_utf8() can take advantage of the offset cache');
+}
+
+{
+    local $SIG{__WARN__} = sub {
+        pass("'print length undef' warned");
+    };
+    print length undef;
+}
+
+{
+    local $SIG{__WARN__} = sub {
+	pass '[perl #106726] no crash with length @lexical warning'
+    };
+    eval ' sub { length my @forecasts } ';
+}
+
+# length could be fooled by UTF8ness of non-magical variables changing with
+# stringification.
+my $ref = [];
+bless $ref, "\x{100}";
+is length $ref, length "$ref", 'length on reference blessed to utf8 class';
+
+is($warnings, 0, "There were no other warnings");

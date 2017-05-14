@@ -1,32 +1,41 @@
-package Mac::SystemDirectory;
+package Mac::SystemDirectory; # git description: v0.09-2-g9008eff
+# ABSTRACT: Locate Mac OS X Standard System Directories
 
 use 5.006000;
 use strict;
 use warnings;
 
-BEGIN {
-    our $VERSION     = '0.06';
-    our @EXPORT_OK   = ('FindDirectory', 'HomeDirectory', 'TemporaryDirectory');
+our $VERSION = '0.10';
 
-    require XSLoader;
-    XSLoader::load('Mac::SystemDirectory', $VERSION);
+our @EXPORT_OK   = ('FindDirectory', 'HomeDirectory', 'TemporaryDirectory');
 
-    our %EXPORT_TAGS = (
-        'all'        => [ @EXPORT_OK ],
-        'DomainMask' => [ grep { /^NS.*DomainMask/ } @EXPORT_OK ],
-        'Directory'  => [ grep { /^NS.*Directory/  } @EXPORT_OK ],
-    );
+require XSLoader;
+XSLoader::load('Mac::SystemDirectory', $VERSION);
 
-    require Exporter;
-    *import = \&Exporter::import;
-}
+our %EXPORT_TAGS = (
+    'all'        => [ @EXPORT_OK ],
+    'DomainMask' => [ grep { /^NS.*DomainMask/ } @EXPORT_OK ],
+    'Directory'  => [ grep { /^NS.*Directory/  } @EXPORT_OK ],
+);
+
+require Exporter;
+*import = \&Exporter::import;
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Mac::SystemDirectory - Locate Mac OS X Standard System Directories
+
+=head1 VERSION
+
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -321,16 +330,26 @@ in sets grouped by tag names. The tag names are:
 L<http://developer.apple.com/mac/library/DOCUMENTATION/Cocoa/Conceptual/LowLevelFileMgmt/Articles/StandardDirectories.html>
 L<http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPFileSystem/BPFileSystem.html>
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Mac-SystemDirectory>
+(or L<bug-Mac-SystemDirectory@rt.cpan.org|mailto:bug-Mac-SystemDirectory@rt.cpan.org>).
+
 =head1 AUTHOR
 
-Christian Hansen, E<lt>chansen@cpan.orgE<gt>
+Christian Hansen <chansen@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTOR
 
-Copyright (C) 2009 by Christian Hansen
+=for stopwords Karen Etheridge
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.9 or,
-at your option, any later version of Perl 5 you may have available.
+Karen Etheridge <ether@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2009 by Christian Hansen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

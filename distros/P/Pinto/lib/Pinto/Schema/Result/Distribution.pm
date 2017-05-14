@@ -78,7 +78,7 @@ use CPAN::DistnameInfo;
 use String::Format;
 
 use Pinto::Util qw(itis debug whine throw);
-use Pinto::Target::Distribution;
+use Pinto::DistributionSpec;
 
 use overload (
     '""'  => 'to_string',
@@ -87,7 +87,7 @@ use overload (
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -114,14 +114,12 @@ sub FOREIGNBUILDARGS {
 sub register {
     my ( $self, %args ) = @_;
 
-    my $stack   = $args{stack};
-    my $force   = $args{force}   || 0;
-    my $pin     = $args{pin}     || 0;
-
-    my $can_intermingle = $stack->repo->config->intermingle;
-    my $did_register    = 0;
+    my $stack        = $args{stack};
+    my $pin          = $args{pin};
+    my $did_register = 0;
 
     $stack->assert_is_open;
+    $stack->assert_not_locked;
 
     # TODO: This process makes a of trips to the database.  You could
     # optimize this by fetching all the incumbents at once, checking
@@ -129,62 +127,35 @@ sub register {
 
     for my $pkg ($self->packages) {
 
-        if (not $pkg->can_index) {
-            my $file = $pkg->file || '';
-            debug( sub {"Package $pkg in file $file is not indexable.  Skipping registration"} );
-            next;
-        }
+      my $where = {package_name => $pkg->name};
+      my $incumbent = $stack->head->find_related(registrations => $where);
 
-        my $where = {package_name => $pkg->name};
-        my $incumbent = $stack->head->find_related(registrations => $where);
+      if (not defined $incumbent) {
+          debug( sub {"Registering $pkg on stack $stack"} );
+          $pkg->register(stack => $stack, pin => $pin);
+          $did_register++;
+          next;
+      }
 
-        if (not defined $incumbent) {
-            debug( sub {"Registering package $pkg on stack $stack"} );
-            $pkg->register(stack => $stack, pin => $pin);
-            $did_register++;
-            next;
-        }
-        elsif (not $can_intermingle) {
-            # If the repository prohibits intermingled distributions, we can
-            # assume all the apckages in the incumbent are already registered.
-            my $dist = $incumbent->distribution;
-            if ($dist->id == $self->id and $incumbent->is_pinned == $pin) {
-                debug( sub {"Distribution $dist is already fully registered"} );
-                last;
-            }
-        }
+      my $incumbent_pkg = $incumbent->package;
+
+      if ( $incumbent_pkg == $pkg ) {
+        debug( sub {"Package $pkg is already on stack $stack"} );
+        $incumbent->pin && $did_register++ if $pin and not $incumbent->is_pinned;
+        next;
+      }
 
 
-        my $incumbent_pkg = $incumbent->package;
+      if ( $incumbent->is_pinned ) {
+        my $pkg_name = $pkg->name;
+        throw "Unable to register distribution $self: package $pkg_name is pinned to $incumbent_pkg";
+      }
 
-        if ( $incumbent_pkg == $pkg ) {
-            debug( sub {"Package $pkg is already on stack $stack"} );
-            $incumbent->pin && $did_register++ if $pin and not $incumbent->is_pinned;
-            next;
-        }
+      whine "Downgrading package $incumbent_pkg to $pkg on stack $stack"
+        if $incumbent_pkg > $pkg;
 
 
-        if ( $incumbent->is_pinned ) {
-            my $pkg_name = $incumbent_pkg->name;
-            my $dist = $incumbent->distribution;
-            $force ? whine "Forcibly changing $dist to $self"
-                   : throw "Unable to register distribution $self: $pkg_name is pinned to $incumbent_pkg";
-        }
-
-        whine "Downgrading package $incumbent_pkg to $pkg on stack $stack"
-            if $incumbent_pkg > $pkg;
-
-        if ( $can_intermingle ) {
-            # If the repository allows intermingled distributions, then
-            # remove only the incumbent package from the index.
-            $incumbent->delete;
-        }
-        else {
-            # Otherwise, remove all packages in the incumbent
-            # distribution from the index.  This is the default.
-            $incumbent->distribution->unregister(stack => $stack, force => $force);
-        }
-
+      $incumbent->distribution->unregister(stack => $stack);
       $pkg->register(stack => $stack, pin => $pin);
       $did_register++;
     }
@@ -323,10 +294,10 @@ sub native_path {
 
 #------------------------------------------------------------------------------
 
-sub uri {
+sub url {
     my ( $self, $base ) = @_;
 
-    # TODO: Is there a sensible URI for local dists?
+    # TODO: Is there a sensible URL for local dists?
     return 'UNKNOWN' if $self->is_local;
 
     $base ||= $self->source;
@@ -389,21 +360,22 @@ sub main_module {
     my $dist_name = $self->name;
     $dist_name =~ s/-/::/g;
 
-    # First, look for an indexable package that matches the dist name
+    # First, look for a package name that matches the dist name
     for my $pkg (@pkgs) {
-        return $pkg if $pkg->can_index && $pkg->name eq $dist_name;
+        return $pkg->name if $pkg->name eq $dist_name;
     }
 
-    # Then, look for any indexable package
+    # Then, look for a package name that matches it's file name
     for my $pkg (@pkgs) {
-        return $pkg if $pkg->can_index;
+        return $pkg->name if $pkg->is_simile;
     }
 
-    # Then, just use the first package
-    return $pkgs[0] if @pkgs;
+    # Then just use the first (i.e. shortest) package name
+    return $pkgs[0]->name if @pkgs;
 
-    # There are no packages
-    return undef;
+    # If we get here, then there are no packages, so we just guess
+    whine "Guessing that main module for $self is $dist_name";
+    return $dist_name;
 }
 
 #------------------------------------------------------------------------------
@@ -419,15 +391,15 @@ sub package_count {
 sub prerequisite_specs {
     my ($self) = @_;
 
-    return map { $_->as_target } $self->prerequisites;
+    return map { $_->as_spec } $self->prerequisites;
 }
 
 #------------------------------------------------------------------------------
 
-sub as_target {
+sub as_spec {
     my ($self) = @_;
 
-    return Pinto::Target::Distribution->new( path => $self->path );
+    return Pinto::DistributionSpec->new( path => $self->path );
 }
 
 #------------------------------------------------------------------------------
@@ -456,14 +428,14 @@ sub to_string {
         'D' => sub { $self->vname },
         'V' => sub { $self->version },
         'm' => sub { $self->is_devel ? 'd' : 'r' },
-        'M' => sub { my $m = $self->main_module; $m ? $m->name : '' },
+        'M' => sub { $self->main_module },
         'h' => sub { $self->path },
         'H' => sub { $self->native_path },
         'f' => sub { $self->archive },
         's' => sub { $self->is_local ? 'l' : 'f' },
         'S' => sub { $self->source },
         'a' => sub { $self->author },
-        'u' => sub { $self->uri },
+        'u' => sub { $self->url },
         'c' => sub { $self->package_count },
     );
 
@@ -492,7 +464,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -500,7 +475,7 @@ Pinto::Schema::Result::Distribution - Represents a distribution archive
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 NAME
 
@@ -605,7 +580,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

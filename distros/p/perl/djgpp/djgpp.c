@@ -222,7 +222,7 @@ do_spawn (pTHX_ char *cmd)
 }
 
 bool
-Perl_do_exec (pTHX_ char *cmd)
+Perl_do_exec (pTHX_ const char *cmd)
 {
     do_spawn2 (aTHX_ cmd,EXECF_EXEC);
     return FALSE;
@@ -352,9 +352,7 @@ XS(dos_GetCwd)
         ST(0)=sv_newmortal ();
         if (getcwd (tmp,PATH_MAX+1)!=NULL)
             sv_setpv ((SV*)ST(0),tmp);
-#ifndef INCOMPLETE_TAINTS
 	SvTAINTED_on(ST(0));
-#endif
     }
     XSRETURN (1);
 }
@@ -377,9 +375,7 @@ XS(XS_Cwd_sys_cwd)
 	RETVAL = getcwd(p, MAXPATHLEN);
 	ST(0) = sv_newmortal();
 	sv_setpv((SV*)ST(0), RETVAL);
-#ifndef INCOMPLETE_TAINTS
 	SvTAINTED_on(ST(0));
-#endif
     }
     XSRETURN(1);
 }

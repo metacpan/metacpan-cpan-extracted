@@ -1,23 +1,9 @@
-# Copyright (c) 2013-2014 David Caldwell.
-# Copyright (c) 2014-2017 Marcel Greter.
+# Copyright © 2013 David Caldwell.
+# Copyright © 2014 Marcel Greter.
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself, either Perl version 5.12.4 or,
+# at your option, any later version of Perl 5 you may have available.
 
 package CSS::Sass;
 
@@ -32,17 +18,12 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
 	quote
 	unquote
-	auto_quote
-	need_quotes
-	resolve_file
 	sass2scss
 	import_sv
 	sass_compile
 	sass_compile_file
 	libsass_version
 	sass2scss_version
-	sass_operation
-	sass_stringify
 	SASS_COMMA
 	SASS_SPACE
 	SASS_ERROR
@@ -69,11 +50,11 @@ our @EXPORT = qw(
 	SASS2SCSS_CONVERT_COMMENT
 );
 
-our $VERSION = "3.4.5";
+our $VERSION = "v3.2.1";
 
 require XSLoader;
 XSLoader::load('CSS::Sass', $VERSION);
-require CSS::Sass::Value;
+require CSS::Sass::Type;
 
 sub new
 {
@@ -157,10 +138,6 @@ sub sass_compile
     no warnings 'uninitialized';
     $normalize_options->(\%options);
     my $r = compile_sass($sass_code, \%options);
-    # decode the streams (maybe move directly to XS code)
-    #utf8::decode($r->{output_string}) if defined $r->{output_string};
-    #utf8::decode($r->{output_string}) if defined $r->{output_string};
-    #utf8::decode($r->{error_message}) if defined $r->{error_message};
     wantarray ? ($r->{output_string}, $r->{error_message}, $r) : $r->{output_string}
 }
 
@@ -170,9 +147,6 @@ sub sass_compile_file
     no warnings 'uninitialized';
     $normalize_options->(\%options);
     my $r = compile_sass_file($input_path, \%options);
-    # decode the streams (maybe move directly to XS code)
-    #utf8::decode($r->{output_string}) if defined $r->{output_string};
-    #utf8::decode($r->{error_message}) if defined $r->{error_message};
     wantarray ? ($r->{output_string}, $r->{error_message}, $r) : $r->{output_string}
 }
 
@@ -214,7 +188,7 @@ CSS::Sass - Compile .scss files using libsass
   my $css = $sass->compile_file('styles.scss');
 
   # Add custom function to use inside your Sass code
-  sub foobar { CSS::Sass::Value::String->new('blue') }
+  sub foobar { CSS::Sass::Type::String->new('blue') }
   $sass->options->{sass_functions}->{'foobar'} = \ &foobar;
 
   # Compile string and get css output and source-map json
@@ -273,8 +247,8 @@ CSS::Sass - Compile .scss files using libsass
 =head1 DESCRIPTION
 
 CSS::Sass provides a perl interface to libsass, a fairly complete Sass
-compiler written in C++. It is currently around ruby sass 3.3/3.4 feature parity and
-heading towards full 3.4 compatibility. It can compile .scss and .sass files.
+compiler written in C++. It is currently somewhere around ruby sass 3.3/3.4
+feature parity and heading towards 3.4. It can compile .scss and .sass files.
 
 =head1 OBJECT ORIENTED INTERFACE
 
@@ -396,7 +370,7 @@ Set the floating point precision for output.
 
 Set the linefeed string used for css output.
 
-=item C<indent>
+=item C<indentation>
 
 Set the indentation string used for css output.
 
@@ -410,10 +384,6 @@ line the code corresponds to.
 Setting this option enables the source-map generating. The file will not
 actually be created, but its content will be returned to the caller. It
 will also enable sourceMappingURL comment by default. See C<no_src_map_url>.
-
-=item C<source_map_file_urls>
-
-Render source entries in the source map json as file urls (`file:///`).
 
 =item C<source_map_root>
 
@@ -457,20 +427,20 @@ This is a hash of Sass functions implemented in Perl. The key for each
 function should be the function's Sass signature and the value should be a
 Perl subroutine reference. This subroutine will be called whenever the
 function is used in the Sass being compiled. The arguments to the subroutine
-are L<CSS::Sass::Value> objects, which map to native perl types if possible.
-You can return either L<CSS::Sass::Value> objects or supported native perl data
-structures. C<undef> is an equivalent of CSS::Sass::Value::Null->new.
+are L<CSS::Sass::Type> objects, which map to native perl types if possible.
+You can return either L<CSS::Sass::Type> objects or supported native perl data
+structures. C<undef> is an equivalent of CSS::Sass::Type::Null->new.
 
 The function is called with an C<eval> statement so you may use "die" to
-throw errors back to libsass (C<CSS::Sass::Value::Error>).
+throw errors back to libsass (C<CSS::Sass::Type::Error>).
 
 A simple example:
 
     sass_functions => {
         'append_hello($str)' => sub {
             my ($str) = @_;
-            die '$str should be a string' unless $str->isa("CSS::Sass::Value::String");
-            return CSS::Sass::Value::String->new($str->value . " hello");
+            die '$str should be a string' unless $str->isa("CSS::Sass::Type::String");
+            return CSS::Sass::Type::String->new($str->value . " hello");
             # equivalent to return $str->value . " hello";
         }
     }
@@ -514,11 +484,11 @@ Another highly experimental feature to prepend content on every compilation. It 
 used to predefine mixins or other stuff. Internally the content is really just added to
 the top of the processed data. Custom headers have the same structure as importers. But
 all registered headers are called in the order given by the priority flag.
-
+	
 =item C<Sass_Value> Types
 
 Sass knowns various C<Sass_Value> types. We export the constants for completeness.
-Each type is mapped to a package inside the C<CSS::Sass::Value> namespace.
+Each type is mapped to a package inside the C<CSS::Sass::Type> namespace.
 
     # Value types
     SASS_ERROR
@@ -541,11 +511,11 @@ mapped to C<string>, C<number> or C<null>. You can directly return these
 native data types from your custom functions or use the datastructures
 to access maps and lists.
 
-    undef; # same as CSS::Sass::Value::Null->new;
-    42; # same as CSS::Sass::Value::Number->new(42);
-    "foobar"; # same as CSS::Sass::Value::String->new("foobar");
-    [ 'foo', 'bar' ]; # same as CSS::Sass::Value::List->new('foo', 'bar');
-    { key => 'value' }; # same as CSS::Sass::Value::Map->new(key => 'value');
+    undef; # same as CSS::Sass::Type::Null->new;
+    42; # same as CSS::Sass::Type::Number->new(42);
+    "foobar"; # same as CSS::Sass::Type::String->new("foobar");
+    [ 'foo', 'bar' ]; # same as CSS::Sass::Type::List->new('foo', 'bar');
+    { key => 'value' }; # same as CSS::Sass::Type::Map->new(key => 'value');
 
 We bless native return values from custom functions into the correct package.
 
@@ -604,7 +574,7 @@ automatically recognize the format of your string data.
 
 =head1 SEE ALSO
 
-L<CSS::Sass::Value>
+L<CSS::Sass::Type>
 
 L<The Sass Home Page|http://sass-lang.com/>
 

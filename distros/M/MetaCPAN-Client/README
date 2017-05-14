@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.012000
+    version 2.014000
 
 SYNOPSIS
 
@@ -144,6 +144,12 @@ METHODS
         my $mirror = $mcpan->mirror('kr.freebsd.org');
 
     Returns a MetaCPAN::Client::Mirror object.
+
+ package
+
+        my $package = $mcpan->package('MooseX::Types');
+
+    Returns a MetaCPAN::Client::Package object.
 
  permission
 

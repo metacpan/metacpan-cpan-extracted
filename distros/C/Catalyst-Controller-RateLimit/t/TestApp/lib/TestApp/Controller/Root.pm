@@ -10,15 +10,17 @@ use parent qw/Catalyst::Controller::RateLimit Catalyst::Controller/;
 #
 __PACKAGE__->config(
     namespace => '',
-    rate_limit => [
-        {
-            period =>  3600,
-            max_requests => 30
-        }, {
-            period => 60,
-            max_requests => 5
-        }
-    ]
+    rate_limit => {
+        default => [
+            {
+                period =>  3600,
+                attempts => 30
+            }, {
+                period => 60,
+                attempts => 5
+            }
+        ]
+    }
 );
 
 =head1 NAME
@@ -39,7 +41,7 @@ TestApp::Controller::Root - Root Controller for TestApp
 
 sub checked_page :Local :Args(0) {
     my ( $self, $c ) = @_;
-    if ( $self->is_user_overrated( 'test' . $$ ) ) {
+    if ( $self->flood_control->is_user_overrated( default => 'test' . $$ ) ) {
         $c->response->status( 500 );
     };
     $c->response->body( 'превед' );
@@ -47,7 +49,8 @@ sub checked_page :Local :Args(0) {
 
 sub protected_page :Local :Args(0) {
     my ( $self, $c ) = @_;
-    if ( $self->register_attempt( 'test' . $$ ) ) {
+    my $flood_control = $self->flood_control;
+    if ( $flood_control->register_attempt( default => 'test' . $$ ) ) {
         $c->response->status( 500 );
     };
     $c->response->body( 'превед' );
@@ -66,13 +69,7 @@ sub default :Path {
     
 }
 
-=head2 end
 
-Attempt to render a view, if needed.
-
-=cut 
-
-sub end : ActionClass('RenderView') {}
 
 =head1 AUTHOR
 

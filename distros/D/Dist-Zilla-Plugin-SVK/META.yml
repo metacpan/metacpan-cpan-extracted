@@ -1,0 +1,46 @@
+---
+abstract: 'Use SVK rather than git as your VCS'
+author:
+  - 'Dr Bean <drbean at (a) cpan dot (.) org>'
+build_requires:
+  Carp: 0
+  Dist::Zilla::Tester: 0
+  Path::Class: 0
+  SVN::Repos: 0
+  Test::Exception: 0
+  Test::More: 0
+  Try::Tiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 3.101461, CPAN::Meta::Converter version 2.101461'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-SVK
+requires:
+  Class::MOP: 0
+  Cwd: 0
+  DateTime: 0
+  Dist::Zilla: 2.100880
+  Dist::Zilla::Role::AfterRelease: 0
+  Dist::Zilla::Role::BeforeRelease: 0
+  Dist::Zilla::Role::PluginBundle: 0
+  File::Basename: 0
+  File::Temp: 0
+  List::MoreUtils: 0
+  Moose: 0
+  Moose::Autobox: 0
+  Moose::Role: 0
+  MooseX::Has::Sugar: 0
+  MooseX::Types::Moose: 0
+  SVK: 0
+  SVK::Util: 0
+  SVK::XD: 0
+  String::Formatter: 0
+  perl: 5.008
+resources:
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-SVK/
+  repository: http://svn.openfoundry.org/dzilsvk
+version: 0.10

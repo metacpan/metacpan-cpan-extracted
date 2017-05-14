@@ -1,0 +1,27 @@
+.# Title: Ifelse
+.# .if ... .ifelse ... .fi
+Line 1
+.if 0
+Not generated
+.elsif 1
+Generated
+.else
+Also not generated
+.fi
+After .if
+.if 1
+Generated
+.elsif 1
+Not Generated
+.else
+Also not generated
+.fi
+Another after .if
+.if 0
+Not generated
+.elsif 0
+Also not Generated
+.else
+Generated
+.fi
+EOF

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.000';
+our $VERSION = '0.20';
 
 sub init {
     my ( $self, $alias ) = @_;
@@ -51,15 +51,15 @@ AI::MicroStructure::Alias - Alias one structure to another
     1;
 
     =head1 NAME
-    
+
     AI::MicroStructure::bonk - The bonk structure
-    
+
     =head1 DESCRIPTION
-    
+
     This structure is just an alias of the C<batman> theme.
 
     =cut
-    
+
     # no __DATA__ section required!
 
 =head1 DESCRIPTION

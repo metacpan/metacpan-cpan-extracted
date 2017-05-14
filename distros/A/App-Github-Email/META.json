@@ -1,0 +1,48 @@
+{
+   "abstract" : "Search and print related Github user emails.",
+   "author" : [
+      "faraco <skelic3@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Github-Email",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Address" : "1.908",
+            "Getopt::Long" : "v2.49.1",
+            "LWP::UserAgent" : "6.07",
+            "List::MoreUtils" : "0.416",
+            "Test::More" : "1.302075",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/faraco/App-Github-Email/issues"
+      },
+      "homepage" : "https://github.com/faraco/App-Github-Email",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/faraco/App-Github-Email.git",
+         "web" : "https://github.com/faraco/App-Github-Email"
+      }
+   },
+   "version" : "0.0.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

@@ -193,7 +193,7 @@ servicelock - Interface to App::OverWatch DB locks
 
 =head1 VERSION
 
-version 0.1
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -202,8 +202,7 @@ version 0.1
   Commands:
 
     --check
-    --create_lock
-    --create_table
+    --create
     --force_unlock
     --list
     --lock

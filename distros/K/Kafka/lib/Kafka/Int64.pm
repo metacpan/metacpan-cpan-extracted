@@ -7,7 +7,7 @@ protocol on 32 bit systems.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Int64> version 1.001013 .
+This documentation refers to C<Kafka::Int64> version 1.02 .
 
 =cut
 
@@ -21,7 +21,7 @@ use bigint; # this allows integers of practially any size at the cost of signifi
 
 # ENVIRONMENT ------------------------------------------------------------------
 
-our $VERSION = '1.001013';
+our $VERSION = '1.02';
 
 use Exporter qw(
     import
@@ -194,7 +194,7 @@ __END__
 
 =head1 DIAGNOSTICS
 
-When error is detected, an exception, represented by object of C<Kafka::Exception::Producer> class,
+When error is detected, an exception, represented by object of C<Kafka::Exception::Int64> class,
 is thrown (see L<Kafka::Exceptions|Kafka::Exceptions>).
 
 Any error L<functions|/FUNCTIONS> is FATAL.
@@ -274,7 +274,7 @@ Vlad Marchenko
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016 by TrackingSoft LLC.
+Copyright (C) 2012-2017 by TrackingSoft LLC.
 
 This package is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. See I<perlartistic> at

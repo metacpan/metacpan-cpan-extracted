@@ -4,6 +4,10 @@ requires "Test2::API" => "1.302084";
 requires "Time::HiRes" => "0";
 requires "perl" => "5.008001";
 
+on 'test' => sub {
+  requires "Test2::Bundle::Extended" => "0.000070";
+};
+
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
 };

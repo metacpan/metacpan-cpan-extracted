@@ -1,0 +1,44 @@
+End2End Trust Architecture (e2eta) Software Copying
+
+Copyright (c) 2012-2013 Synergetics NV (sampo@synergetics.be), All Rights Reserved.
+Copyright (c) 2009-2012 Sampo Kellomaki (sampo@iki.fi), All Rights Reserved.
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomaki (sampo@iki.fi)
+
+Commercial software. Please write info@synergetics.be for licensing terms.
+
+LICENSE-2.0.txt does not apply. It is only provided for information,
+e.g. on some related software packages.
+
+LICENSE.ssleay and LICENSE.openssl are displayed per licensing
+requirements of OpenSSL and SSLeay SSL and crypto implementations.
+Per the mentioned terms, we state
+
+  "This product includes cryptographic software written by
+   Eric Young (eay@cryptsoft.com)"
+
+  "This product includes software developed by the OpenSSL Project
+   for use in the OpenSSL Toolkit (http://www.openssl.org/)"
+
+LICENSE.ssleay only applies to code from OpenSSL and SSLeay. It does
+not apply to rest of this software.
+
+LICENSE.curl is displayed per licensing requirements of libcurl HTTP
+client implementation. It does not apply to rest of this software.
+
+Although not required by license terms, for completeness of attribution
+we would like to state that
+
+  This software uses zlib, written by Jean-loup Gailly and Mark Adler.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+The research leading to these results has received funding from the
+European Community's Seventh Framework Programme (FP7/2007-2013) under
+grant agreement number 216287 (TAS3 - Trusted Architecture for Securely
+Shared Services - www.tas3.eu). However, most of the results were
+produced outside the project or after it had ended.

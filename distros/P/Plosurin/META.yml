@@ -4,133 +4,98 @@ author:
   - 'Zahatski Aliaksandr zag@cpan.org'
 build_requires: {}
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plosurin
 provides:
   Exp::Digit:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Exp::String:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Exp::Var:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Exp::add:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Exp::base:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Exp::list:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Exp::mult:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Plo::File:
     file: lib/Plosurin.pm
-    version: 0
   Plo::h_params:
     file: lib/Plosurin.pm
-    version: 0
   Plo::template:
     file: lib/Plosurin.pm
-    version: 0
   Plosurin:
     file: lib/Plosurin.pm
-    version: 0.1
+    version: v0.1.2
   Plosurin::AbstractVisiter:
     file: lib/Plosurin/AbstractVisiter.pm
-    version: 0
   Plosurin::Context:
     file: lib/Plosurin/Context.pm
-    version: 0
   Plosurin::Grammar:
     file: lib/Plosurin/Grammar.pm
-    version: 0
   Plosurin::HTTP:
     file: lib/Plosurin/HTTP.pm
-    version: 0
   Plosurin::SoyTree:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Plosurin::To::Perl5:
     file: lib/Plosurin/To/Perl5.pm
-    version: 0
   Plosurin::Utl::ExpMapVariables:
     file: lib/Plosurin/Utl/ExpMapVariables.pm
-    version: 0
   Plosurin::Utl::SetLinePos:
     file: lib/Plosurin/Utl/SetLinePos.pm
-    version: 0
   Plosurin::Writer::Perl5:
     file: lib/Plosurin/Writer/Perl5.pm
-    version: 0
   Soy::Actions:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::Expression:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::Node:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::base:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_call:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_call_self:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_else:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_elseif:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_foreach:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_foreach_ifempty:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_if:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_import:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_param:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_param_self:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::command_print:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
-  Soy::expression:
+  Soy::expressiong:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
   Soy::raw_text:
     file: lib/Plosurin/SoyTree.pm
-    version: 0
 requires:
-  HTTP::Server::Simple::WebDAO: 0.01
-  Perl6::Pod: 0.35
-  Perl6::Pod::Lib: 0.07
-  Regexp::Grammars: 1.014
+  HTTP::Server::Simple::WebDAO: '0.02'
+  Perl6::Pod: '0.35'
+  Perl6::Pod::Lib: '0.07'
+  Regexp::Grammars: '1.014'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Plosurin
   license: http://dev.perl.org/licenses/
   repository: git://github.com/zag/p5-Plosurin.git
-version: 0.1
+version: v0.1.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

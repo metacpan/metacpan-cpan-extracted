@@ -5,6 +5,11 @@ TODO:
   - Special Characters, i.e. {sp}
   - {if}, {for}, {switch}, {css}, {msg}, {literal}
 
+    + use utf8 for inputs
+0.1.2 17 May 2012
+    + use v5.10
+0.1.1 14 Jun 2012
+    + reduce debug messages
 0.1 10 Jun 2012
     + {foreach}, {call}, {print} commands
     + Expression grammars

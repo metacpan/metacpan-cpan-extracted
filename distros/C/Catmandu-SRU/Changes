@@ -1,47 +1,5 @@
 Revision history for Catmandu-SRU
 
-0.039  2016-11-07 13:41:07 CET
-  - documentation and tests
-
-0.038  2014-10-21 22:56:17 CEST
-  - Added missing test requirement Test::Exception
-
-0.037  2014-06-22 10:24:58 CEST
-  - Fixing multiple harvesting of first record set bug
-  
-0.036  2014-06-18 20:24:19 CEST
-  - Fixing prove vs perl testing bug
-  
-0.035  2014-06-18 10:01:24 CEST
-  - Add better support for namespace prefixes
-
-0.034  2014-05-29 16:45:37 CEST
-  - building code with Dist::Milla
-  - updating pod
-
-0.033 2014-03-03
-  - credits
-
-0.032 2014-02-21
-  - adding support for pluggable callback functions to parse SRU responses
-  - adding url method
-  - adding simple and struct record parsers
-  - tests
-  - pod
-
-0.031 2014-02-20
-  - adding backwards compatibility for LibXML::Simple responses
-
-0.03  2014-02-20
-  - adding support for pluggable SRU response parsers
-  - tests
-  - pod
-
-0.02  2014-02-20
-  - pod
-  - tests
-  - recordTag option
-
 0.0101  2013-01-10
   - remove debug print
 

@@ -153,7 +153,7 @@ bless \$a, 'Foo::Bark';
 +++ no_round_trip
 XXX: probably a YAML.pm bug
 +++ perl
-&YAML::VALUE
+&YAML::Old::VALUE
 +++ yaml
 --- =
 

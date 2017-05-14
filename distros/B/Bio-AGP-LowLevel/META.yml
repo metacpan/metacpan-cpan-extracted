@@ -1,0 +1,30 @@
+---
+name: Bio-AGP-LowLevel
+version: 0.02
+author:
+  - 'Robert Buels <rmb32@cornell.edu>'
+  - 'Sheena Scroggins <sheena.scroggins@gmail.com>'
+abstract: "low-level functions for working with Accessioned Golden Path (AGP) files"
+license: perl
+build_requires:
+  File::Basename: 0
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+requires:
+  Carp: 0
+  File::Basename: 0
+  List::Util: 0
+  perl: v5.8.0
+configure_requires:
+  Module::Build: 0.340201
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+provides:
+  Bio::AGP::LowLevel:
+    file: lib/Bio/AGP/LowLevel.pm
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/sheenams/Bio-AGP

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Release;
 # ABSTRACT: A Release data object
-$MetaCPAN::Client::Release::VERSION = '2.012000';
+$MetaCPAN::Client::Release::VERSION = '2.014000';
 use Moo;
 use Ref::Util qw< is_hashref >;
 use JSON::MaybeXS qw< decode_json >;
@@ -72,6 +72,15 @@ sub metacpan_url {
     sprintf( "https://metacpan.org/release/%s/%s", $self->author, $self->name )
 }
 
+sub contributors {
+    my $self = shift;
+    my $url = sprintf( "https://fastapi.metacpan.org/release/contributors/%s/%s", $self->author, $self->name );
+    my $res = $self->ua->get($url);
+    return unless is_hashref($res);
+    my $content = decode_json $res->{'content'};
+    return $content->{'contributors'};
+}
+
 1;
 
 __END__
@@ -86,7 +95,7 @@ MetaCPAN::Client::Release - A Release data object
 
 =head1 VERSION
 
-version 2.012000
+version 2.014000
 
 =head1 SYNOPSIS
 
@@ -238,6 +247,10 @@ Returns the Changes text for the release.
 =head2 metacpan_url
 
 Returns a link to the release page on MetaCPAN.
+
+=head2 contributors
+
+Returns a structure with release contributors info.
 
 =head1 AUTHORS
 

@@ -1,0 +1,23 @@
+Instructions for installing fameperl with Perl 5
+------------------------------------------------
+
+You must have perl installed and running before beginning.  Make
+sure to make perl first, as fameperl uses most of the same files.
+This version of fameperl is made to run with perl 5.003.
+
+1.  Use "cd" to change to the perl source code directory.  If perl 
+    source code is in /usr/gnu/src/perl5.003, then type
+
+       cd /usr/gnu/src/perl5.003/ext
+
+2.  Create the Fame directory and files from the tar file.  If your
+    tar file /usr/home/joe/Fame-2.tar, then type
+
+       tar xf /usr/home/joe/Fame-2.tar
+
+3.  Change to the new Fame extensions directory
+
+       cd Fame-2
+
+4.  View the README file and follow the instructions there to
+    build everything.

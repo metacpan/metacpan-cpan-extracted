@@ -9,17 +9,16 @@ use MooseX::MarkAsMethods ( autoclean => 1 );
 use Path::Class;
 use File::NFSLock;
 
-use Pinto::Util qw(debug throw whine);
+use Pinto::Util qw(debug throw);
 use Pinto::Types qw(File);
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
 our $LOCKFILE_TIMEOUT = $ENV{PINTO_LOCKFILE_TIMEOUT} || 50;    # Seconds
-our $STALE_LOCKFILE_TIMEOUT = $ENV{PINTO_STALE_LOCKFILE_TIMEOUT} || 0;    # Seconds
 
 #-----------------------------------------------------------------------------
 
@@ -53,13 +52,8 @@ sub lock {    ## no critic qw(Homonym)
 
     my $root_dir  = $self->repo->config->root_dir;
     my $lock_file = $root_dir->file('.lock')->stringify;
-
-    if ($STALE_LOCKFILE_TIMEOUT) {
-        whine( 'PINTO_STALE_LOCKFILE_TIMEOUT > 0, may steal lock !!');
-    }
-    
-    my $lock      = File::NFSLock->new( $lock_file, $lock_type, $LOCKFILE_TIMEOUT, $STALE_LOCKFILE_TIMEOUT )
-        or throw 'The repository is currently in use -- please try again later (' . $File::NFSLock::errstr . ')';
+    my $lock      = File::NFSLock->new( $lock_file, $lock_type, $LOCKFILE_TIMEOUT )
+        or throw 'The repository is currently in use -- please try again later';
 
     debug("Process $$ got $lock_type lock on $root_dir");
 
@@ -100,7 +94,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer NFS
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn NFS
 
 =head1 NAME
 
@@ -108,7 +105,7 @@ Pinto::Locker - Manage locks to synchronize concurrent operations
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 DESCRIPTION
 
@@ -141,7 +138,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

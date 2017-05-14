@@ -1,0 +1,41 @@
+---
+name: Bot-BasicBot-Pluggable-Module-Tools
+version: 0.96
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: a miscellany of useful plugins for Bot::BasicBot::Pluggable
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Bot::BasicBot::Pluggable: 0.5
+  Finance::Currency::Convert::XE: 0
+  Finance::Quote: 0
+  Lingua::Ispell: 0
+  Lingua::Translate: 0
+  Locale::Language: 0
+  Math::Expression: 0
+  Math::Units: 0
+  Test::More: 0
+  WWW::Shorten: 0
+provides:
+  Bot::BasicBot::Pluggable::Module::Convert:
+    file: lib/Bot/BasicBot/Pluggable/Module/Convert.pm
+  Bot::BasicBot::Pluggable::Module::Funcs:
+    file: lib/Bot/BasicBot/Pluggable/Module/Funcs.pm
+  Bot::BasicBot::Pluggable::Module::LongURLs:
+    file: lib/Bot/BasicBot/Pluggable/Module/LongURLs.pm
+  Bot::BasicBot::Pluggable::Module::Maths:
+    file: lib/Bot/BasicBot/Pluggable/Module/Maths.pm
+  Bot::BasicBot::Pluggable::Module::Spell:
+    file: lib/Bot/BasicBot/Pluggable/Module/Spell.pm
+  Bot::BasicBot::Pluggable::Module::Status:
+    file: lib/Bot/BasicBot/Pluggable/Module/Status.pm
+  Bot::BasicBot::Pluggable::Module::Stockquote:
+    file: lib/Bot/BasicBot/Pluggable/Module/Stockquote.pm
+  Bot::BasicBot::Pluggable::Module::Translate:
+    file: lib/Bot/BasicBot/Pluggable/Module/Translate.pm
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

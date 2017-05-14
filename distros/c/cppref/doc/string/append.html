@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    append    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2009-10-10T20:02:48-0700" />
+<meta name="keywords" content="string,append" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/string/append?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=string" />
+<link rel="edit" title="Edit this page" href="/wiki/string/append?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/string/append" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/string/append" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/string/append" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='string';var JSINFO = {"id":"string:append","namespace":"string"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../start.html"  title="start">C++ Reference</a> &raquo; <a href="../string/start.html"  title="string:start">C++ Strings</a> &raquo; <a href="../string/append.html"  title="string:append">append</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="append" id="append">append</a></h2>
+<div class="level2">
+
+<p>
+Syntax:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    <span class="co2">#include &lt;string&gt;</span>
+    string<span class="sy0">&amp;</span> append<span class="br0">&#40;</span> <span class="kw4">const</span> string<span class="sy0">&amp;</span> str <span class="br0">&#41;</span><span class="sy0">;</span>
+    string<span class="sy0">&amp;</span> append<span class="br0">&#40;</span> <span class="kw4">const</span> Char<span class="sy0">*</span> str <span class="br0">&#41;</span><span class="sy0">;</span>
+    string<span class="sy0">&amp;</span> append<span class="br0">&#40;</span> <span class="kw4">const</span> string<span class="sy0">&amp;</span> str<span class="sy0">,</span> size_type index<span class="sy0">,</span> size_type len <span class="br0">&#41;</span><span class="sy0">;</span>
+    string<span class="sy0">&amp;</span> append<span class="br0">&#40;</span> <span class="kw4">const</span> Char<span class="sy0">*</span> str<span class="sy0">,</span> size_type num <span class="br0">&#41;</span><span class="sy0">;</span>
+    string<span class="sy0">&amp;</span> append<span class="br0">&#40;</span> size_type num<span class="sy0">,</span> Char ch <span class="br0">&#41;</span><span class="sy0">;</span>
+    string<span class="sy0">&amp;</span> append<span class="br0">&#40;</span> input_iterator start<span class="sy0">,</span> input_iterator end <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+The append function either:
+
+</p>
+<ul>
+<li class="level1"><div class="li"> (1&amp;2)appends <code>str</code> on to the end of the current string,</div>
+</li>
+<li class="level1"><div class="li"> (3)appends a substring of <code>str</code> starting at <code>index</code> that is <code>len</code> characters long on to the end of the current string,</div>
+</li>
+<li class="level1"><div class="li"> (4)appends first num characters from str on to string  </div>
+</li>
+<li class="level1"><div class="li"> (5)appends <code>num</code> repetitions of <code>ch</code> on to the end of the current string,</div>
+</li>
+<li class="level1"><div class="li"> (6)appends the sequence denoted by <code>start</code> and <code>end</code> on to the end of the current string.</div>
+</li>
+</ul>
+
+<p>
+
+For example, the following code uses append to add 10 copies of the &#039;!&#039; character to a string:
+</p>
+<pre class="c code c++" style="font-family:monospace;">     <span class="kw4">string</span> str <span class="sy0">=</span> <span class="st0">&quot;Hello World&quot;</span><span class="sy0">;</span>
+     str.<span class="me1">append</span><span class="br0">&#40;</span> <span class="nu0">10</span><span class="sy0">,</span> <span class="st0">'!'</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+     <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> str <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span></pre>
+<p>
+That code displays:
+</p>
+<pre class="code">
+     Hello World!!!!!!!!!!</pre>
+<p>
+In the next example, append() is used to concatenate a substring of one string onto another string:
+</p>
+<pre class="c code c++" style="font-family:monospace;">   <span class="kw4">string</span> str1 <span class="sy0">=</span> <span class="st0">&quot;Eventually I stopped caring... &quot;</span><span class="sy0">;</span>
+   <span class="kw4">string</span> str2 <span class="sy0">=</span> <span class="st0">&quot;but that was the '80s so nobody noticed.&quot;</span><span class="sy0">;</span>
+&nbsp;
+   str1.<span class="me1">append</span><span class="br0">&#40;</span> str2<span class="sy0">,</span> 25<span class="sy0">,</span> 15 <span class="br0">&#41;</span><span class="sy0">;</span>
+   <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;str1 is &quot;</span> <span class="sy0">&lt;&lt;</span> str1 <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span></pre>
+<p>
+When run, the above code displays:
+</p>
+<pre class="code">
+   str1 is Eventually I stopped caring... nobody noticed.</pre>
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        string/append.txt &middot; Last modified: 10/10/2009 20:02 by 124.255.102.233      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

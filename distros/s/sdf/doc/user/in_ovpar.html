@@ -1,0 +1,201 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Paragraphs</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_overv.html">Previous Topic</A> | <A HREF="in_ovphr.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>2.2. Paragraphs</H1>
+<HR>
+<H2><A NAME="Introduction">2.2.1. Introduction</A></H2>
+<P>Paragraphs have the following format:</P>
+<PRE>
+   line1
+   ...
+   lineN
+</PRE>
+<P>Leading and trailing whitespace on lines is generally ignored. Paragraphs are separated by blank lines or:</P>
+<UL>
+<LI><EM>comment lines</EM> - first non-whitespace character is &quot;#&quot;
+<LI><EM>macros</EM> - first non-whitespace character is &quot;!&quot;.</UL>
+<P>For normal paragraphs, simply specify the text on one or more lines. For example:</P>
+<PRE>
+   I like products which are simple to use and
+   do what I expect. We should encourage engineers
+   to design more products with these qualities.
+</PRE>
+<HR>
+<H2><A NAME="Paragraph styles">2.2.2. Paragraph styles</A></H2>
+<P>A paragraph can be given a style using the following syntax:</P>
+<PRE>
+   style&quot;:&quot;line1
+   ...
+   lineN
+</PRE>
+<P>Tagged paragraphs do not need to be separated by blank lines. <EM>style</EM> is a sequence of one or more of the following characters:</P>
+<UL>
+<LI>letters
+<LI>digits
+<LI>underscore character (_).</UL>
+<P>Whitespace is not permitted before the &quot;:&quot; but is generally ignored immediately after it. The style is optional and defaults to N (for Normal). The text is also optional.</P>
+<HR>
+<H2><A NAME="Commonly used styles">2.2.3. Commonly used styles</A></H2>
+<P>Commonly used paragraph styles are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+N
+</TD>
+<TD>
+normal paragraph (the default)
+</TD>
+</TR>
+<TR>
+<TD>
+H1 .. H6
+</TD>
+<TD>
+chapter heading at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+A1 .. A6
+</TD>
+<TD>
+appendix heading at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+P1 .. P6
+</TD>
+<TD>
+plain heading at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+Note
+</TD>
+<TD>
+a single paragraph note
+</TD>
+</TR>
+<TR>
+<TD>
+E
+</TD>
+<TD>
+fixed-width (example) text
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+   Note: Life is too short to drink bad wine.
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Life is too short to drink bad wine.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Special styles">2.2.4. Special styles</A></H2>
+<P>For certain styles, the following syntax is also supported:</P>
+<PRE>
+   special_style line1
+   ...
+   lineN
+</PRE>
+<P>The special styles available are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+. .. ......
+</TD>
+<TD>
+paragraph or plain list item at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+* .. ******
+</TD>
+<TD>
+unordered list at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
+- .. -----
+</TD>
+<TD>
+unordered list at level 2-6
+</TD>
+</TR>
+<TR>
+<TD>
+^ .. ^^^^^^
+</TD>
+<TD>
+first entry in an ordered list at level 1-6
+</TD>
+</TR>
+<TR>
+<TD>
++ .. ++++++
+</TD>
+<TD>
+next entry in an ordered list at level 1-6
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+* fruits:
+  - peach
+  - banana
+* vegetables:
+  - potato
+  - carrots.
+</PRE>
+<P>The result is:</P>
+<UL>
+<LI>fruits:<UL>
+<LI>peach
+<LI>banana</UL>
+<LI>vegetables:<UL>
+<LI>potato
+<LI>carrots.</UL></UL>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_overv.html">Previous Topic</A> | <A HREF="in_ovphr.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

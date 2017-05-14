@@ -1,0 +1,35 @@
+
+Changes of Laola distribution:
+
+OLE-Storage-0.386 (28.4.98)
+   +  Little improvements and fixes at lhalw and Herbert
+
+OLE-Storage-0.385 (24.3.98)
+   +  Herbert supports now Excel 2 to Excel 97 formats,
+      combined cells are recognized and converted.
+
+OLE-Storage-0.384 ()
+   +  new method at OLE::Storage: clsid
+   +  Improved Herbert's color support.
+
+OLE-Storage-0.383 (3.3.98)
+   +  Herbert is new. It converts Excel-Spreadsheets to some kind of HTML. 
+
+OLE-Storage-0.382 (12.2.98)
+   *  ldat, lhalw and lls got long options and use Startup.pm 
+   *  Real unicode support for PropertySet.pm
+
+OLE-Storage-0.381:
+   +  support of big files (> about 6.9 MB)
+   .  trash detection fix, sigh
+
+OLE-Storage-0.380:
+   !  Changed name and distribution structure to fit into CPAN
+
+Laola_0.374:
+   .  trash detection fix, sigh
+
+Laola_0.373:
+   +  This "changes" file
+   !  Improved trash detection -> Incompatibilities with "lclean" hidden files.
+

@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+package Bio::InterProScanWrapper::Main::MergeResultsEukaryotesInterProScanWrapper;
+
+# ABSTRACT: Merge results files from the annotate_eukaryotes script
+# PODNAME: merge_results_annotate_eukaryotes
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+use Bio::InterProScanWrapper::CommandLine::AnnotateEukaryotes;
+
+Bio::InterProScanWrapper::CommandLine::AnnotateEukaryotes->new(args => \@ARGV, script_name => $0)->merge_results;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+merge_results_annotate_eukaryotes - Merge results files from the annotate_eukaryotes script
+
+=head1 VERSION
+
+version 1.133090
+
+=head1 SYNOPSIS
+
+Merge results files from the annotate_eukaryotes script. Run as part of the previous script so no need to run this on its own.
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

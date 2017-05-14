@@ -7,7 +7,7 @@ package Lemonldap::NG::Portal::_Browser;
 
 use strict;
 
-our $VERSION = '1.3.0';
+our $VERSION = '1.9.1';
 our $_ua;
 
 ## @method LWP::UserAgent ua()
@@ -19,8 +19,12 @@ sub ua {
     eval { require LWP::UserAgent; };
     $self->abort( 'LWP::UserAgent isn\'t installed', $@ ) if ($@);
 
-    # TODO : LWP options to use a proxy for example
-    $_ua = LWP::UserAgent->new() or $self->abort($@);
+# TODO : - LWP options to use a proxy for example
+    $_ua = LWP::UserAgent->new(
+        $self->{lwpSslOpts} && %{ $self->{lwpSslOpts} }
+        ? ( ssl_opts => $self->{lwpSslOpts} )
+        : ()
+    ) or $self->abort($@);
     push @{ $_ua->requests_redirectable }, 'POST';
     $_ua->env_proxy();
     return $_ua;

@@ -1,0 +1,56 @@
+Lingua-TreeTagger-Filter
+
+This module allows you to search choosen sequences in a 
+lingua::TreeTagger::Taggedtext object (an output from Treetagger produced
+from the corresponding distribution by Aris Xanthos).
+
+Installing and using this module requires a working version of TreeTagger
+(available at http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger).
+Windows users are advised to follow the installation instructions given on page
+http://www.smo.uhi.ac.uk/~oduibhin/oideasra/interfaces/winttinterface.htm.
+There is also a Lingua::TreeTagger::Installer script created by Alberto
+Manuel Brandao Simoes (this distribution is not directly related to the present
+one).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Lingua::TreeTagger::Filter
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-TreeTagger-Filter
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Lingua-TreeTagger-Filter
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Lingua-TreeTagger-Filter
+
+    Search CPAN
+        http://search.cpan.org/dist/Lingua-TreeTagger-Filter/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Benjamin Gay
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

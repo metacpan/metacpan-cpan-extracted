@@ -1,0 +1,69 @@
+Perl/Qt4
+=========================
+
+Creating this library we aimed to use the Perl functionality 
+as much as possible, but to make the syntax similar to C++ Qt4.
+This allows to use the original Qt4 documentation.
+All the list classes (QVector,QList) are replaced by the Perl arrays.
+All the associated arrays (QMap,QHash,QPair) are replaced by Perl hashes.
+The classes of modules are completely coincide with the corresponding  ones of C++ Qt4.
+One can use all the protected functions from the object classes (QObject children) 
+except of those that use *Private classes as input parameter.
+
+It's advisable to study the examples attached before writing programs.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL [option]
+   make
+   make test
+   make install
+   
+Options:
+   -i include directory for Qt, default /usr/include
+   -qc diretory with Perl QtCore sources for copy *.core files, 
+        default ../QtCore (need for QtGui and other top level libraries)
+example:
+   perl Makefile.PL -i /usr/local/include -qc ../QtCore-4.000
+
+for QtGui:
+If you do not point  -qc key, you will have to copy redef.h, all 
+the files *.core and typemap to the QtGui catalogue from the QtCore catalogue. 
+Then it is necessary to rename "typemap" to "typemap.core".
+   
+
+NOTES
+
+You will work with the Qt4 classes not directly but through their children.
+
+All the Qt4 classes in Perl are blessed hashes.
+A real pointer to the class can be found in $qt_class->{_ptr} and must not be changed.
+
+Because it is impossible to overload operator= in Perl one should use 
+the constructor of copies in order to copy the classes:
+   my $qstring2 = QString($qstring1);
+
+Several functions which names coincide with Perl reserved words are shifted to capital letters.
+They are TR, TRUtf8, CONNECT, METHOD, SLOT, SIGNAL.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+Perl 5.8 and Trolltech Qt4 (4.2 or later).
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008 by Vadim Likhota
+
+This library is free software.
+You can redistribute the generator of Perl SX modules and/or modify
+it under the same terms as Perl itself, either Perl version 5.8 or,
+at your option, any later version of Perl 5 you may have available.
+You can redistribute Perl/Qt4 modules under the GPL2 or any other Qt4 licencies.
+

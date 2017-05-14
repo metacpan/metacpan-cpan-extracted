@@ -1,14 +1,27 @@
-TODO:
+TO DO
 
-* Conductor needs to have a way to support chords containing notes of different lengths
+* Conductor needs to have a way to support chords containing notes
+  of different lengths
 
-This will probably get very nasty, since it involves rooting around in the guts
-of MIDI::Simple.  Not really a high priority, but it would be nice.
+This will probably get very nasty, since it involves rooting around 
+in the guts of MIDI::Simple.  Not really a high priority, but it 
+would be nice.
 
 * Conductor needs phrase renderer support
+
 * Add supported event type check to Conductor.pm during render
-* Use Hook::LexWrap to install "Autorules" for Bars - effectively making
-  themselves self-regulating
+
+* Use Hook::LexWrap to install "Autorules" for Bars - effectively
+  making themselves self-regulating
+
 * Test, test, test!  t/* lacks.  :-\ 
-* Re-add Gene's phrase similarity code.
-* Noop support for twidding other MIDI params like modulation and pitch bend
+
+* Noop support for twidding other MIDI params like modulation and
+  pitch bend, etc.
+  
+  
+* Bar object needs to develop intelligence to be able to enforce its 'rules'
+( needs to match time sig, etc)
+
+* shouldn't Phrase.pm be a subclass of Bar.pm ?
+

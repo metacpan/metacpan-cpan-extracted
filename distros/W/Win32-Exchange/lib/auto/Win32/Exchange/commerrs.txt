@@ -1,0 +1,40 @@
+Common Errors
+------------------------
+0x80040154 Class not registered
+   Desc: Similar to 0x800401f3
+0x800401f3 Invalid class string
+   Desc: you don't have something installed, or the class that you are looking
+         for would be registered
+0x80020003 Member Not Found
+  Desc:  Some issues can be fixed by reinstalling a current MDAC and/or ADS (NT4 only)
+         As well, this could be an older LetProperty issue with a SecurityDescriptor.
+           --make sure you have a recent build of ActivePerl (AS631 or AS633) and Win32-Exchange.
+0x80070539  The security ID structure is invalid. 
+  Desc:  Make sure that you've tried to set perms on a valid NT Account.  Computers are so picky that way.
+0x8007203a LDAP Server Down
+  Desc: (see readment4.txt if you use NT4 to communicate with your exchange servers,
+        but check the obvious...  did someone turn your server off?
+0x800708ad - The user name could not be found
+  Desc:  We couldn't find the username that you have tried to query...
+0x80072021 - A Protocol Error occurred
+  Desc: Chances are that you've tried to set an invalid value
+0x80005000 - Invalid AD Path
+  Desc: If you are creating a new mailbox, Check to see that this ad path doesn't exist
+        somewhere as a custom recipient or a hidden Mailbox.  This usually happens on E55
+        when creating a new mailbox (your create is trying to use a directory name that
+        looks to be already in use).
+0x8000500d - Property Not Found
+  Desc:  Are you sure that you know what you are looking for, that property
+         doesn't seem to exist.
+0x80004001 - Not Implemented
+  Desc:  The function you are using doesn't have a way to do what you are asking it to do.
+0x80072030 - Object Does Not Exist/No Such Object
+  Desc:  This is a good thing when you do a GetMailbox for a mailbox that you want to create.
+         It means that the soon to be created mailbox doesn't already exist.
+0x80020011 - Object Does Not Support a Collection
+0x8002000e - Invalid number of parameters
+  Desc:  You are sending the wrong number of parameters to an OLE object..  Don't do that!
+0x80004005 - 
+  Desc:  You might have an AD<->Exchange replication issue.  Either way, look at the event logs
+         to see if the active directory connector is warning you of any failures
+         (probably only in E2K)

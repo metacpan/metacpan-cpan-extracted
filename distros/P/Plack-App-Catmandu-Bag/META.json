@@ -1,0 +1,73 @@
+{
+   "abstract" : "Plack application that wraps a REST API around a Catmandu::Bag",
+   "author" : [
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-App-Catmandu-Bag",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "1.0506",
+            "JSON" : "0",
+            "Plack" : "1.0042",
+            "Router::Simple" : "0.17",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Plack-App-Catmandu-Bag/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Plack-App-Catmandu-Bag",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Plack-App-Catmandu-Bag.git",
+         "web" : "https://github.com/LibreCat/Plack-App-Catmandu-Bag"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

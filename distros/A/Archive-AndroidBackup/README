@@ -5,7 +5,8 @@ repo: git@github.com:NathanielLLally/AndroidBackup.git
 the motivation to this project stemmed from the evil that is motorola's moto-x 
 tyranny in their bootlocker and filesystem security
 I simply love games that get ported to android and maintain the same save game
-format one can then easily transfer their progress between devices
+format
+one can then easily transfer their progress between devices
 this utility makes that simple
 
 there is a java utility named the Android Backup Extractor which can be found

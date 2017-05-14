@@ -1,0 +1,11 @@
+Lingua::EN::Words2Nums parses English representations of numbers like
+"two thousand and one". Some samples of the range of inputs it can handle
+can be found in the file "samples", which is used by the regression test
+suite.
+
+Web site is http://kitenet.net/~joey/code/words2nums/
+
+Copyright 2001, 2003 Joey Hess <joey@kitenet.net>
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

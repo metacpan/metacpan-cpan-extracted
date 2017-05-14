@@ -1,0 +1,31 @@
+Revision history for cppref.
+
+0.09
+	- fix install error (do not bundle ExtUtils::MakeMaker in inc/)
+
+0.08  Fri May 07 07:48:00 2010
+	- fix installation issues thanks to walf443 (build script happened to be installed as well, and docs were not installed unless Makefile.PL was called multiple times)
+	- no more auto_include
+
+0.07  Wed Oct 21 10:24:00 2009
+	- change distribution_type to 'module' so that cppref will (hopefully) be indexed
+
+0.06  Tue Oct 13 18:20:00 2009
+	- add lib/App/Cppref.pm so that cppref can be installed using CPAN.pm
+
+0.05  Fri Oct 09 19:55:00 2009
+	- rewrite constructor and operator filenames (now can be specified like string::string or vector::operator)
+	- accept $ENV{CPPREF_DOCROOT} as document directory
+
+0.04  Fri Oct 09 14:48:00 2009
+	- added support for lynx (through $ENV{BROWSER}, thanks to yappo)
+
+0.03  Fri Oct 09 13:20:00 2009
+	- fix release error in 0.02
+
+0.02  Fri Oct 09 12:57:00 2009
+	- when having multiple choices, let the user select in w3m
+	- use $ENV{BROWSER} if exists (thanks to yappo)
+
+0.01  Thu Oct 08 20:00:00 2009
+	- initial version

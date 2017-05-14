@@ -1,43 +1,27 @@
-<HTML><HEAD><TITLE>XML::DOM::PerlSAX - PerlSAX handler that creates XML::DOM document structures</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+<HTML><HEAD><TITLE>XML::DOM::PerlSAX - Old name of XML::Handler::BuildDOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
 
-</A></H1><P>XML::DOM::PerlSAX - PerlSAX handler that creates XML::DOM document structures
+</A></H1><P>XML::DOM::PerlSAX - Old name of <A HREF="../Handler/BuildDOM.html">XML::Handler::BuildDOM</A>
 
 <P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
 
-</A></H1><PRE> use XML::DOM::PerlSAX;
- use XML::Parser::PerlSAX;
-
-</PRE><PRE> my $handler = new XML::DOM::PerlSAX (KeepCDATA =&gt; 1);
- my $parser = new XML::Parser::PerlSAX (Handler =&gt; $handler);
-
-</PRE><PRE> my $doc = $parser-&gt;parsefile ("file.xml");
+</A></H1><PRE> See L&lt;XML::DOM::BuildDOM&gt;
 
 </PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
 
-</A></H1><P>XML::DOM::PerlSAX creates <A HREF="../DOM.html">XML::DOM</A> document structures 
-(i.e. <A HREF="Document.html">XML::DOM::Document</A>) from PerlSAX events.
+</A></H1><P>XML::DOM::PerlSAX was renamed to <A HREF="../Handler/BuildDOM.html">XML::Handler::BuildDOM</A> to comply
+with naming conventions for PerlSAX filters/handlers.
 
-<H2><A NAME="CONSTRUCTOR_OPTIONS">CONSTRUCTOR OPTIONS
+<P>For backward compatibility, this package will remain in existence 
+(it simply includes XML::Handler::BuildDOM), but it will print a warning when 
+running with <I>'perl -w'</I>.
 
-</A></H2><P>The XML::DOM::PerlSAX constructor supports the following options:
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
 
-<DL><DT><A NAME="_KeepCDATA_1_"><STRONG><P>* KeepCDATA =&gt; 1 
+</A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
+&lt;<I>enno@att.com</I>&gt;.
 
-</STRONG></A><DD>If set to 0 (default), CDATASections will be converted to regular text.
+<P><HR><H1><A NAME="SEE_ALSO">SEE ALSO
 
-<DT><A NAME="_Document_doc_"><STRONG><P>* Document =&gt; $doc
+</A></H1><P><A HREF="../Handler/BuildDOM.html">XML::Handler::BuildDOM</A>, <A HREF="../DOM.html">XML::DOM</A>
 
-</STRONG></A><DD>If undefined, start_document will extract it from Element or DocType (if set),
-otherwise it will create a new XML::DOM::Document.
-
-<DT><A NAME="_Element_elem_"><STRONG><P>* Element =&gt; $elem
-
-</STRONG></A><DD>If undefined, it is set to Document. This will be the insertion point (or parent)
-for the nodes defined by the following callbacks.
-
-<DT><A NAME="_DocType_doctype_"><STRONG><P>* DocType =&gt; $doctype
-
-</STRONG></A><DD>If undefined, start_document will extract it from Document (if possible).
-Otherwise it adds a new XML::DOM::DocumentType to the Document.
-
-</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:31 1999</FONT></I></BODY></HTML>
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:27 2000</FONT></I></BODY></HTML>

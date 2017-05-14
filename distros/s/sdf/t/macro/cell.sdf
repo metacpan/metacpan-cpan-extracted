@@ -1,0 +1,10 @@
+# This file tests the cell macro
+
+# Try an unexpected cell
+!cell
+
+# Try another unexpected cell
+!table 1
+!cell
+!endtable
+!cell

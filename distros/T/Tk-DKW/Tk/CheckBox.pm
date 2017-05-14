@@ -1,26 +1,25 @@
 package Tk::CheckBox;
 
 use Tk;
-
 use Tk::Canvas;
 use Tk::Frame;
 
-use vars qw ($VERSION @ISA);
-
+use vars qw ($VERSION);
 use strict;
+use Carp;
 
-$VERSION = '1.01';
+$VERSION = '0.01';
 
-@ISA = qw (Tk::Derived Tk::Frame);
+use base qw (Tk::Derived Tk::Frame);
 
 Tk::Widget->Construct ('CheckBox');
 
-*textvariable = \&TextVariable;
-*get = \&CurrentState;
-*disable = \&Disable;
-*enable = \&Enable;
-*state = \&State;
-*set = \&State;
+*textvariable = \&Tk::CheckBox::TextVariable;
+*get = \&Tk::CheckBox::CurrentState;
+*disable = \&Tk::CheckBox::Disable;
+*enable = \&Tk::CheckBox::Enable;
+*state = \&Tk::CheckBox::State;
+*set = \&Tk::CheckBox::State;
 
 sub ClassInit
    {

@@ -43,7 +43,7 @@ sub init {
   if(!$#ARGV){
     push @ARGV,"any";
    }
- 
+
 
 
 if($kkey =~ /debug/){
@@ -209,8 +209,10 @@ AI::MicroStructure->new( $structure, category => "new" )
 my $module = "$absstructdir/$structure.pm";
 
 if(!-f $module){
-`touch $module`;
-`micro $structure new verbose`;
+print "no\n\e[00;33m $module\e[00m";
+print "create like\n\e[00;33mmicro $structure new verbose\e[00m";
+
+exit;
 }
 
 # load the remote structure if needed

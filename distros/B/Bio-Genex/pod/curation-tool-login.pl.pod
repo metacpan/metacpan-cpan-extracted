@@ -1,0 +1,34 @@
+=head1 NAME
+
+B<curation-tool-login.pl>: a CGI script for downloading a Gene Expression
+Markup Language (GEML) control bundle file to the curation tool.
+
+=head1 SYNOPSIS
+
+  curation-tool-login.pl
+
+=head1 DESCRIPTION
+
+This CGI script takes no CGI parameters. It provides a login field and
+a password and a multi-select list for choosing species for
+download. It calls control-bundle.pl when the button is clicked.
+
+=head1 BUGS
+
+It will not provide a graceful error if the user and password field do
+not match.
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Jun 19 00:43:39 MDT 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

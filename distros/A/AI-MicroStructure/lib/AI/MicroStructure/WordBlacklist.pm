@@ -205,8 +205,6 @@ return \%stoplist;
 
 =head1 SUPPORT AND DOCUMENTATION
 
-  ☞ [sample using concepts](http://quantup.com)
-
   ☞ [PDF info on my works](https://github.com/santex)
 
 

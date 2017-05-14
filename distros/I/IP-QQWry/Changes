@@ -41,3 +41,7 @@ Revision history for IP-QQWry
        - add kwalitee tests
 0.0.16 Wed Jul 15 17:40:46 CST 2009
        - check if base and ext have useless info, independantly
+
+0.0.20 Tue Nov 24 05:49:27 CST 2011
+       - IP::QQWry::Decoded to get decoded info
+

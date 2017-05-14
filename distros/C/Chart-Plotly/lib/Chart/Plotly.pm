@@ -16,7 +16,7 @@ use Ref::Util;
 use HTML::Show;
 use UUID::Tiny ':std';
 
-our $VERSION = '0.011';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 # ABSTRACT: Generate html/javascript charts from perl data using javascript library plotly.js
 
@@ -74,7 +74,7 @@ TEMPLATE
 
 sub _process_data {
     my $data           = shift;
-    my $json_formatter = JSON->new->utf8->allow_blessed(1)->convert_blessed(1);
+    my $json_formatter = JSON->new->allow_blessed(1)->convert_blessed(1);
     local *PDL::TO_JSON = sub { $_[0]->unpdl };
     if ( Ref::Util::is_blessed_ref($data) ) {
         my $adapter_name = 'Chart::Plotly::Adapter::' . ref $data;
@@ -124,7 +124,7 @@ Chart::Plotly - Generate html/javascript charts from perl data using javascript 
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

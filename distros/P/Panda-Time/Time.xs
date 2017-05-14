@@ -1,9 +1,8 @@
 #include <xs/xs.h>
-#include <xs/lib.h>
 #include <panda/time.h>
 using namespace panda::time;
 using panda::string;
-using xs::lib::sv2string;
+using xs::sv2string;
 
 #ifdef _WIN32
 #  define SYSTIMEGM(x)    _mkgmtime(x)

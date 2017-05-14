@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-ILS
 
+0.12 2017-05-12T03:43:00Z
+    - OneClickDigital: Moved products search url from PartnerBase to top module
+
 0.11 2017-03-27T07:10:22Z
     - item_metadata()
     - OneClickDigital: better handling of place_hold(), remove_hold() and return()

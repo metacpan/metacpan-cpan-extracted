@@ -1,0 +1,36 @@
+%module ArrayRet
+
+%{
+char **
+test (){
+    static char * argv[] = {"abc", "def", "ghi", NULL};
+    return argv;
+}
+%}
+
+%typemap(perl5,out) char ** {   /* All functions returning char **  */
+                                /* get this typemap                 */
+    /* $source is of type char **
+     * $target is of type RV (referring to an AV)
+     */
+    AV *ret_av = newAV();
+    int i      = 0;
+    char **p   = $source;
+    /* First allocate a new AV, of the right size */
+    while (*p++)
+        ;            /* Incr. p while *p is non-null */ 
+
+    av_extend(ret_av, p - $source);
+
+    /* For each element in the array of strings, create a new
+     * mortalscalar, and stuff it into the above array */
+    for (i = 0, p = $source; *p; p++, i++) {
+        av_store(ret_av, i, sv_2mortal( newSVpv(*p, 0)));
+    }
+    /* Finally, create a reference to the array; the "target"
+       of this typemap */
+    $target = newRV((SV*)ret_av);
+    argvi++;
+}
+
+char **test();

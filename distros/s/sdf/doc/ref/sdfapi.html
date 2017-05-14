@@ -1,0 +1,132 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: sdfapi - API Extraction Utility</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdf.html">Previous Topic</A> | <A HREF="sdfbatch.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="sdfapi">11.3. sdfapi - API Extraction Utility</A></H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P><A HREF="../ref/sdfapi.html">sdfapi</A> extracts <EM>Application Programming Interface</EM> information from (<A HREF="http://www.perl.com/perl/index.html">Perl</A>) source code.</P>
+<HR>
+<H2><A NAME="Usage">Usage</A></H2>
+<PRE>
+usage  : sdfapi [-h[help]] [-o[out_ext]]
+         [-l[log_ext]] [-f fmt_tag] [-p[pattern]]
+         [-s sym_type,..] [-j] file ...
+purpose: extract the API from a (perl) library
+version: 2.000    (SDF 2.001beta1)
+</PRE>
+<P>The options are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfapi_h">-h</A>
+</TD>
+<TD>
+display help on options
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfapi_o">-o</A>
+</TD>
+<TD>
+output file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfapi_l">-l</A>
+</TD>
+<TD>
+log file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfapi_f">-f</A>
+</TD>
+<TD>
+output format tag
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfapi_p">-p</A>
+</TD>
+<TD>
+only symbols matching pattern
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfapi_s">-s</A>
+</TD>
+<TD>
+only symbols of these types
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfapi_j">-j</A>
+</TD>
+<TD>
+add SDF-style hypertext jumps from each symbol
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P><A NAME="sdfapi_h">The -h option provides help. If it is specified without a parameter, a brief description of each option is displayed. To display the attributes for an option, specify the option letter as a parameter.</A></P>
+<P><A NAME="sdfapi_o">By default, generated output goes to standard output. To direct output to a file per input file, use the -o option to specify an extension for output files. If the -o option is specified without a parameter, an extension of <EM>out</EM> is assumed.</A></P>
+<P><A NAME="sdfapi_l">Likewise, error messages go to standard error by default. Use the -l option to create a log file per input file. If the -l option is specified without a parameter, an extension of <EM>log</EM> is assumed.</A></P>
+<P><A NAME="sdfapi_f">The format of the output can be controlled using the -f option. Supported formats are <EM>std</EM> and <EM>concise</EM>. The default is <EM>std</EM>. <EM>std</EM> format is:</A></P>
+<PRE>
+require &quot;abc.pl&quot;;
+
+$myvar = ...
+
+$result =
+&amp;myfunc($myparams);
+</PRE>
+<P><EM>concise</EM> format has fewer blank lines and uses 1 line per symbol.</P>
+<P><A NAME="sdfapi_s">A comma-separated list of symbol types to output can be specified using the -s option. Supported symbol types are:</A></P>
+<UL>
+<LI><EM>sub</EM> - subroutines
+<LI><EM>var</EM> - variables</UL>
+<P>The default is to extract all symbols.</P>
+<P><A NAME="sdfapi_p">The -p option is used to extract only a subset of the symbols. If not supplied, the pattern is symbols beginning with a letter. If supplied without an option, the pattern defaults to all symbols. If perl libraries use the coding convention that symbols beginning with underscore are private, then -p_ can be used to extract the private symbols.</A></P>
+<P><A NAME="sdfapi_j">The -j option can be used to request SDF-style hypertext jumps be added for each symbol. The jump target is <EM>lib_sym</EM> where:</A></P>
+<UL>
+<LI><EM>lib</EM> is the library name
+<LI><EM>sym</EM> is the symbol name.</UL>
+<HR>
+<H2><A NAME="Limitations and future directions">Limitations and future directions</A></H2>
+<P>The only language currently supported is <A HREF="http://www.perl.com/perl/index.html">Perl</A>.</P>
+<P>It would be useful to extract messages from the scripts too. This would require a new utility called <EM>sdfmsg</EM> say, which searched through the source (including libraries) for <STRONG>AppMsg</STRONG> and <STRONG>AppExit</STRONG> calls.</P>
+<P>Internally, it may be better to implement formats via routines. This would give better control over output. e.g. it would be up to the routine to decide if it wanted to output the 'require' header.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdf.html">Previous Topic</A> | <A HREF="sdfbatch.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

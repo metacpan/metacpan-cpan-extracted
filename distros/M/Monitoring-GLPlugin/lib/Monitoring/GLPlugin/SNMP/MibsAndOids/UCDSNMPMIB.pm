@@ -189,12 +189,12 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'UCD-SNMP-MIB'} = {
 };
 
 $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'UCD-SNMP-MIB'} = {
-  UCDErrorFix => {
-    '0' => 'noError',
-    '1' => 'runFix',
-  },
   UCDErrorFlag => {
     '0' => 'noError',
     '1' => 'error',
+  },
+  UCDErrorFix => {
+    '0' => 'noError',
+    '1' => 'runFix',
   },
 };

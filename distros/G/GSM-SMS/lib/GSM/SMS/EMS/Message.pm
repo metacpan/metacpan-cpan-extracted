@@ -3,7 +3,7 @@ package GSM::SMS::EMS::Message;
 use strict;
 use vars qw($VERSION);
 
-$VERSION="0.0";
+$VERSION = "0.161";
 
 =head1 NAME
 

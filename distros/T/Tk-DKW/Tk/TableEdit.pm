@@ -1,29 +1,25 @@
 package Tk::TableEdit;
 
 use Tk;
-
 use Tk::TabbedForm;
 use Tk::SplitFrame;
 use Tk::Columns;
 use Tk::Frame;
 use Tk::Pane;
 
+use base qw (Tk::Derived Tk::Frame);
+use vars qw ($VERSION);
+use strict;
 use Carp;
 
-use strict;
-
-use vars qw ($VERSION @ISA);
-
-$VERSION = '0.98';
-
-@ISA = qw (Tk::Derived Tk::Frame);
+$VERSION = '0.01';
 
 Tk::Widget->Construct ('TableEdit');
 
-*separator = \&Separator;
-*file = \&File;
-*Save = \&Commit;
-*Load = \&Fetch;
+*separator = \&Tk::TableEdit::Separator;
+*file = \&Tk::TableEdit::File;
+*Save = \&Tk::TableEdit::Commit;
+*Load = \&Tk::TableEdit::Fetch;
 
 sub Populate
    {

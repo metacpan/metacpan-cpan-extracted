@@ -1,0 +1,17 @@
+MANIFEST
+Makefile.PL
+README
+docs/Reference.txt
+lib/DNS/Config.pm
+lib/DNS/Config/File.pm
+lib/DNS/Config/File/Nsd.pm
+lib/DNS/Config/File/Bind9.pm
+lib/DNS/Config/Server.pm
+lib/DNS/Config/Statement.pm
+lib/DNS/Config/Statement/Key.pm
+lib/DNS/Config/Statement/Options.pm
+lib/DNS/Config/Statement/Zone.pm
+t/01_require.t
+t/02_configfile.t
+t/data/named.conf
+t/data/zonemaster.org

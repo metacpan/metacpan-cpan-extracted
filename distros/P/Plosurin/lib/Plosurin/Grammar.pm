@@ -126,7 +126,7 @@ qr{
         ['"] <value=(?: ([^'"]+) )>  ['"]
 
     <token: variable>            \$?\w+ 
-    <objtoken: Soy::expression>  .*?
+    <objtoken: Soy::expressiong>  .*?
     <objrule:  Soy::raw_text>    [^\{]+
 
 

@@ -1,0 +1,14 @@
+Thread Suppport
+---------------
+Agent threads are still considered alpha at the moment.  So far, they have
+worked for me, but I haven't done anything complicated with them yet. :)
+
+I would _like_ to make sending and recieving messages near-transparent by,
+for example, having a queue of incoming/outgoing messages, assigning one
+thread to handle all incoming data and another to handle all outgoing.
+
+And I've got some other ideas too, but they are all just dreams at the
+moment.
+
+--Steve Purkis
+October 5, 1998

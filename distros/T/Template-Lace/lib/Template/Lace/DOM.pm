@@ -8,6 +8,17 @@ use Scalar::Util;
 
 # General Helpers
 
+sub ctx {
+  my $self = shift;
+  local $_ = $self;
+  if(ref($_[0]) eq 'ARRAY') {
+    push @{$_[0]}, $_[1]->($self, @_[2..$#_]);
+  } else {
+    $_[0]->($self, @_[1..$#_]);
+  }
+  return $self;
+}
+
 sub clone {
   return Storable::dclone(shift);
 }
@@ -44,11 +55,11 @@ sub repeat {
 }
 
 sub smart_content {
-  my ($self, $data) =@_;
+  my ($self, $data) = @_;
   if($self->tag eq 'input') {
     $self->attr(value=>$data);
   } else {
-    $self->content($data);
+    $self->content(escape_html($data));
   }
   return $self;
 }
@@ -151,6 +162,43 @@ sub append_link_uniquely {
   return $self;
 }
 
+my %_escape_table = (
+  '&' => '&amp;', 
+  '>' => '&gt;', 
+  '<' => '&lt;',
+  q{"} => '&quot;',
+  q{'} => '&#39;' );
+
+sub escape_html {
+  my ($value) = @_;
+  return unless defined $value;
+  $value =~ s/([&><"'])/$_escape_table{$1}/ge;
+  return $value;
+}
+
+sub do {
+  my $self = shift;
+  while(@_) {
+    my ($matchspec, $action) = (shift, shift);
+    my ($css, $maybe_attr) = split('@', $matchspec);
+    $self->find($css)
+      ->each(sub {
+          if($maybe_attr) {
+            $_->attr($maybe_attr => $action);
+          } elsif(!ref $action) {
+            warn "zzz" x 100;
+            my $escaped = escape_html $action;
+            warn "$action ... $escaped";
+            $_->content($escaped);
+          } else {
+            $_->fill($action);
+          }
+        }
+      );
+  }
+  return $self;
+}
+
 # attribute helpers (tag specific or otherwise
 
 sub attribute_helper {
@@ -166,6 +214,21 @@ sub id { shift->attribute_helper('id', @_) }
 sub class { shift->attribute_helper('class', @_) }
 sub action { shift->attribute_helper('action', @_) }
 sub method { shift->attribute_helper('method', @_) }
+sub colspan { shift->attribute_helper('colspan', @_) }
+sub alt { shift->attribute_helper('alt', @_) }
+sub enctype { shift->attribute_helper('enctype', @_) }
+sub formaction { shift->attribute_helper('formaction', @_) }
+sub headers { shift->attribute_helper('headers', @_) }
+sub size { shift->attribute_helper('size', @_) }
+
+sub boolean_attribute_helper {
+  my ($self, $name, $value) = @_;
+  $self->attribute_helper($name, 'on') if $value;
+}
+
+sub checked { shift->boolean_attribute_helper('checked', @_) }
+sub selected { shift->boolean_attribute_helper('selected', @_) }
+sub hidden { shift->boolean_attribute_helper('hidden', @_) }
 
 
 # unique tag helpers
@@ -245,6 +308,31 @@ This class defines the following methods for general use
 =head2 clone
 
 Uses L<Storable> C<dclone> to clone the current DOM.
+
+=head2 ctx
+
+Execute a DOM under a given data context, return DOM.  Example
+
+    my $dom = Template::Lace::DOM->new(qq[
+      <section>
+        <p id='story'>...</p>
+      </section>
+    ]);
+
+    $dom->ctx(sub {
+          my ($self, $data) = @_;
+          $_->at('#story')->content($data);
+        }, "Don't look down")
+      ->... # more commands on $dom;
+
+Returns:
+
+      <section>
+        <p id='story'>Don&#39;t look down'</p>
+      </section>
+
+Isolate running transformaions on a DOM to explicit data.  Makes it easier to create
+reusable snips of transformations.
 
 =head2 overlay
 
@@ -326,6 +414,9 @@ it will put the value into the 'value' attribute of the C<input>
 tag.
 
 Returns the original DOM.
+
+B<NOTE> We also html escape values here, since this is usually the
+safest thing.
 
 B<NOTE> Possibly magical method that will need lots of fixes.
 
@@ -436,6 +527,95 @@ Useful when you have a lot of components that need supporting scripts
 or styles and you want to make sure you only add the required supporting
 code once.
 
+=head2 do
+
+B<NOTE>: Helper is evolving and may change.
+
+Allows you to run a list of CSS matches at once.  For example:
+
+    my $dom = Template::Lace::DOM->new(q[
+      <section>
+        <h2>title</h2>
+        <ul id='stuff'>
+          <li></li>
+        </ul>
+        <ul id='stuff2'>
+          <li>
+            <a class='link'>Links</a> and Info: 
+            <span class='info'></span>
+          </li>
+        </ul>
+
+        <ol id='ordered'>
+          <li></li>
+        </ol>
+        <dl id='list'>
+          <dt>Name</dt>
+          <dd id='name'></dd>
+          <dt>Age</dt>
+          <dd id='age'></dd>
+        </dl>
+        <a>Link</a>
+      </section>
+    ]);
+
+    $dom->do(
+      'section h2' => 'Wrathful Hound',
+      '#stuff', [qw/aaa bbbb ccc/],
+      '#stuff2', [
+        { link=>'1.html', info=>'one' },
+        { link=>'2.html', info=>'two' },
+        { link=>'3.html', info=>'three' },
+      ],
+      '#ordered', sub { $_->fill([qw/11 22 33/]) },
+      '#list', +{
+        name=>'joe', 
+        age=>'32',
+      },
+      'a@href' => 'localhost://aaa.html',
+    );
+
+Returns:
+
+    <section>
+      <h2>Wrathful Hound</h2>
+      <ul id="stuff">
+        
+      <li>aaa</li><li>bbbb</li><li>ccc</li></ul>
+      <ul id="stuff2">
+        
+      <li>
+          <a class="link" href="localhost://aaa.html">1.html</a> and Info: 
+          <span class="info">one</span>
+        </li><li>
+          <a class="link" href="localhost://aaa.html">2.html</a> and Info: 
+          <span class="info">two</span>
+        </li><li>
+          <a class="link" href="localhost://aaa.html">3.html</a> and Info: 
+          <span class="info">three</span>
+        </li></ul>
+
+      <ol id="ordered">
+        
+      <li>11</li><li>22</li><li>33</li></ol>
+      <dl id="list">
+        <dt>Name</dt>
+        <dd id="name">joe</dd>
+        <dt>Age</dt>
+        <dd id="age">32</dd>
+      </dl>
+      <a href="localhost://aaa.html">Link</a>
+    </section>
+
+Takes a list of pairs where the first item in the pair is a match specification
+and the second is an action to take on it.  The match specification is basically
+just a CSS match with one added feature to make it easier to fill values into
+attributes, if the match specification ends in C<@attr> the action taken is to
+fill that attribute.
+
+Additionally if the action is a simple, scalar value we automatically HTML escape
+it for you
+
 =head1 ATTRIBUTE HELPERS
 
 The following methods are intended to make setting standard attributes on
@@ -456,12 +636,37 @@ it easier to chain several calls.
 
 =head2 method
 
+=head2 size
+
+=head2 headers
+
+=head2 formaction
+
+=head2 enctype
+
+=head2 alt
+
+=head2 colspan
+
+s
+
+
 Example
 
     $dom->at('form')
       ->id('#login_form')
       ->action('/login')
       ->method('POST');
+
+=head2 checked
+
+=head2 selected
+
+=head2 hidden
+
+These attribute helpers have a special feature, since its basically a boolean attribute
+will check the passed value for its truth state, setting the attribute value to 'on'
+when true, but NOT setting the attribute at all if its false.
 
 =head1 UNIQUE TAG HELPERS
 

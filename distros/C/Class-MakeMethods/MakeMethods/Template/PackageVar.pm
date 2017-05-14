@@ -1,6 +1,7 @@
 package Class::MakeMethods::Template::PackageVar;
 
-use Class::MakeMethods::Template::Generic '-isasubclass';
+use Class::MakeMethods::Template::Generic;
+BEGIN { @ISA = qw( Class::MakeMethods::Template::Generic ); }
 
 $VERSION = 1.008;
 use strict;

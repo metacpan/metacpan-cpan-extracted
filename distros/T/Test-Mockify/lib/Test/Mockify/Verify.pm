@@ -21,6 +21,7 @@ use Scalar::Util qw( blessed );
 use base qw ( Exporter );
 
 use strict;
+use warnings;
 
 our @EXPORT_OK = qw (
     GetParametersFromMockifyCall
@@ -35,9 +36,9 @@ our @EXPORT_OK = qw (
 
   my $aParameters = GetParametersFromMockifyCall($MockifiedObject, 'nameOfMethod', $OptionalPosition);
 
-This function returns all the parameters after the *mockified* module was used. If the test calls the method multiple times, the "$OptionalPosition" can be used to get the specific call. The default is "0".
+This function returns all the parameters after the I<mockified> module was used. If the test calls the method multiple times, the "$OptionalPosition" can be used to get the specific call. The default is "0".
 Returns an array ref with the parameters of the specific method call.
-*(Note: The calls are counted starting from zero. You will get the parameters from the first call with 0, the ones from the second call with 1, and so on.)*
+I<(Note: The calls are counted starting from zero. You will get the parameters from the first call with 0, the ones from the second call with 1, and so on.)>
 
 =cut
 sub GetParametersFromMockifyCall {
@@ -67,7 +68,7 @@ sub GetParametersFromMockifyCall {
 
   my $WasCalled = WasCalled($MockifiedObject, 'nameOfMethod');
 
-This function returns the information if the method was called on the *mockified* module.
+This function returns the information if the method was called on the I<mockified> module.
 
 =cut
 sub WasCalled {
@@ -90,7 +91,7 @@ sub WasCalled {
 
   my $AmountOfCalls = GetCallCount($MockifiedObject, 'nameOfMethod');
 
-This function returns the information on how often the method was called on the *mockified* module. If the method was not called it will return "0".
+This function returns the information on how often the method was called on the I<mockified> module. If the method was not called it will return "0".
 
 =cut
 sub GetCallCount {
@@ -116,3 +117,17 @@ sub _TestMockifyObject {
 }
 
 1;
+__END__
+
+=head1 LICENSE
+
+Copyright (C) 2017 ePages GmbH
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Christian Breitkreutz E<lt>christianbreitkreutz@gmx.deE<gt>
+
+=cut

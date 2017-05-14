@@ -1,5 +1,5 @@
 package Log::Log4perl::Layout::JSON;
-$Log::Log4perl::Layout::JSON::VERSION = '0.50';
+$Log::Log4perl::Layout::JSON::VERSION = '0.51';
 # ABSTRACT: Layout a log message as a JSON hash, including MDC data
 
 use 5.008;
@@ -136,12 +136,39 @@ sub render {
     # increment caller_level to resolve caller appropriately
     $caller_level++;
 
-    my $layed_out_msg = $self->_pattern_layout->render($message, $category, $priority, $caller_level);
+    my $m    = '';
+    my @data = ();
+
+    # Will receive array ref if "warp_message" appender option is set to "0"
+    if ( ref($message) eq 'ARRAY' and @{$message} > 1 and @{$message} % 2 == 0 ) {
+        @data = @{$message};
+        $m = 'WARP_MESSAGE_0';
+    }
+    elsif ( ref($message) eq 'ARRAY' ) {
+        @data = @{$message};
+        $m = shift @data;
+    }
+    else {
+        $m = $message;
+    }
+
+    my $layed_out_msg = $self->_pattern_layout->render($m, $category, $priority, $caller_level);
 
     my @fields = (
         split($self->_separator, $layed_out_msg),
+        @data, # append extra fields but before mdc
         $self->mdc_handler->($self) # MDC fields override non-MDC fields (not sure if this is a feature)
     );
+
+    # might need to remove dummy message
+    if ( $m eq 'WARP_MESSAGE_0' ) {
+        for ( my $i = 0; $i < $#fields; $i += 2 ) {
+            if ( $fields[$i] eq 'message' ) {
+                splice( @fields, $i, 2 );
+                last;
+            }
+        }
+    }
 
     my $max_json_length = $self->max_json_length_kb * 1024;
     my @dropped;
@@ -241,7 +268,7 @@ Log::Log4perl::Layout::JSON - Layout a log message as a JSON hash, including MDC
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -254,6 +281,9 @@ Example configuration:
     log4perl.appender.Example.layout.field.file = %F{1}
     log4perl.appender.Example.layout.field.sub = %M{1}
     log4perl.appender.Example.layout.include_mdc = 1
+
+    # Note: Appender option!
+    # log4perl.appender.Example.warp_message = 0
 
 See below for more configuration options.
 
@@ -345,6 +375,24 @@ In future this rather dumb logic will be replaced by something smarter.
 =head2 utf8
 
 Switch JSON encoding from ASCII to UTF-8.
+
+=head2 warp_message = 0
+
+The C<warp_message> B<appender option> is used to specify the desired behavior
+for handling log calls with multiple arguments.
+The default behaviour (C<warp_message> not set>) is to concatenate all
+arguments using C<join( $Log::Log4perl::JOIN_MSG_ARRAY_CHAR, @log_args )> and
+setting a JSON field C<message> to this simple string.
+
+If, on the other hand, C<warp_message = 0> is applied, then for log calls with
+multiple arguments these are considered name/value pairs and rendered to a
+hash-like JSON structure.
+For log calls with an odd number of arguments (3 or more), the first argument
+is considered the C<message> and the others are again considered
+name/value pairs.
+
+See L<Log::Log4perl::Appender/Appenders Expecting Message Chunks> for more info
+on the configuration option.
 
 =head2 EXAMPLE USING Log::Log4perl::MDC
 

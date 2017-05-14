@@ -8,7 +8,7 @@ use Test::More 'no_plan';
 my $name = 'rpm-query-in-scriptlet';
 
 need_root_and_prepare();
-rpm_is_jbj_version() or system_('mkdir -p root/var/lib/rpm');
+system_('mkdir -p root/var/lib/rpm');
 test_rpm_query_in_scriptlet();
 
 sub test_rpm_query_in_scriptlet {

@@ -1,0 +1,108 @@
+-- MySQL dump 9.09
+--
+-- Host: localhost    Database: beancounter
+-- ------------------------------------------------------
+-- Server version	4.0.16-log
+
+--
+-- Table structure for table `beancounter`
+--
+
+CREATE TABLE beancounter (
+  version varchar(12) NOT NULL default '',
+  data_last_updated datetime default NULL
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `cash`
+--
+
+CREATE TABLE cash (
+  name varchar(16) NOT NULL default '',
+  value float default NULL,
+  currency varchar(12) default NULL,
+  type varchar(12) default NULL,
+  owner varchar(16) default NULL,
+  cost float default NULL,
+  date date default NULL,
+  UNIQUE KEY cash_pkey (name,type,owner,date)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `fxprices`
+--
+
+CREATE TABLE fxprices (
+  currency varchar(12) NOT NULL default '',
+  date date default NULL,
+  previous_close float default NULL,
+  day_open float default NULL,
+  day_low float default NULL,
+  day_high float default NULL,
+  day_close float default NULL,
+  day_change float default NULL,
+  UNIQUE KEY fxprices_pkey (currency,date)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `indices`
+--
+
+CREATE TABLE indices (
+  symbol varchar(12) NOT NULL default '',
+  stockindex varchar(12) NOT NULL default ''
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `portfolio`
+--
+
+CREATE TABLE portfolio (
+  symbol varchar(16) NOT NULL default '',
+  shares float default NULL,
+  currency varchar(12) default NULL,
+  type varchar(16) default NULL,
+  owner varchar(16) default NULL,
+  cost float default NULL,
+  date date default NULL,
+  UNIQUE KEY portfolio_pkey (symbol,owner,date)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `stockinfo`
+--
+
+CREATE TABLE stockinfo (
+  symbol varchar(12) NOT NULL default '',
+  name varchar(64) NOT NULL default '',
+  exchange varchar(16) NOT NULL default '',
+  capitalisation float default NULL,
+  low_52weeks float default NULL,
+  high_52weeks float default NULL,
+  earnings float default NULL,
+  dividend float default NULL,
+  p_e_ratio float default NULL,
+  avg_volume int(11) default NULL,
+  active tinyint(1) default '1',
+  PRIMARY KEY  (symbol)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `stockprices`
+--
+
+CREATE TABLE stockprices (
+  symbol varchar(12) NOT NULL default '',
+  date date default NULL,
+  previous_close float default NULL,
+  day_open float default NULL,
+  day_low float default NULL,
+  day_high float default NULL,
+  day_close float default NULL,
+  day_change float default NULL,
+  bid float default NULL,
+  ask float default NULL,
+  volume int(11) default NULL,
+  UNIQUE KEY stockprices_pkey (symbol,date)
+) TYPE=MyISAM;
+

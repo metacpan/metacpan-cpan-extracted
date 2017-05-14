@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+##   use strict; use warnings; 
+##  use lib '/home/foranw/src/eyds/EyeTracking-EYD/lib/';
+##  use EyeTracking::EYD ;
+##  use Data::Dumper;
+##  
+##  
+##  my $eydfile='/home/foranw/remotes/B/bea_res/Data/Tasks/BarsScan/Basic/10128/20080925/Raw/EyeData/10128_run1.eyd';
+##  my $eprimelog='/home/foranw/remotes/B/bea_res/Data/Tasks/BarsScan/Basic/10128/20080925/Raw/EPrime/071008 Scanner Value Bars with scoring - version 1-10128-1.txt';
+##  my $eprimeOrder="/home/foranw/remotes/B/bea_res/MR_Scanner_Experiments/Scanner Tasks/MRRC tasks/Rewards Scanner Bars/OrderOfEvents-v1.txt"
+##  my $startCodes  = Number::Range->new("50,100,200");
+##  my $targetCodes = Number::Range->new("110..160,201..210");
+##  my $stopCodes   = Number::Range->new("250");
+##  
+##  my $eyd = EyeTracking::EYD->new($eydfile);
+##  $eyd->read();
+##  
+##  #print Dumper($eyd),"\n";
+##  #print @{$eyd->{fields}}, "\n";
+##  #$eyd->printEyeData();
+##  
+##  $eyd->trialPositions($startCodes,$targetCodes,$stopCodes );
+##  # print Dumper($eyd->{codes}),"\n";
+##  
+##  
+##  
+##  
+##  $eyd->barsEprimeLog($eprimelog);
+##  $eyd->barsEprimeTrialOrder($eprimeOrder)
+##  # print Dumper($eyd->{_barsHash}),"\n";
+##  
+##  #$eyd->printCodes();
+##  $eyd->{verbose} = 1; 
+##  my $score = $eyd->checkAlignment();
+##  print "$score\n";
+##  
+##  #use Test::More tests => 1;
+##  #ok( $eyd

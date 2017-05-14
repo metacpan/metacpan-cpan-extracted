@@ -1,10 +1,9 @@
 package urpm::select;
 
-# $Id: select.pm 258637 2009-07-28 13:14:16Z cfergeau $
 
 use strict;
 use urpm::msg;
-use urpm::util;
+use urpm::util qw(any formatList intersection member min partition uniq);
 use urpm::sys;
 use URPM;
 
@@ -94,6 +93,8 @@ sub build_listid_ {
 
 Search packages registered by their names by storing their ids into the $packages hash.
 
+Returns either 0 (error), 1 (OK) or 'substring' (fuzzy match).
+
 Recognized options:
 
 =over
@@ -105,7 +106,7 @@ Recognized options:
 
 =item * fuzzy
 
-=item * no_substring
+=item * no_substring: in --auto, do not allow to install a package substring match (you can use -a to force it)
 
 =item * src
 
@@ -145,17 +146,19 @@ sub _search_packages {
 	my @found;
 	$qv = '(?i)' . $qv if $options{caseinsensitive};
 
+	# First: try to find an exact match
 	if (!$options{fuzzy}) {
 	    #- try to search through provides.
-	    if (my @l = map {
+	    my @l = map {
 		    $_
 		    && ($options{src} ? $_->arch eq 'src' : $_->is_arch_compat)
 		    && ($options{use_provides} || $_->name eq $v)
 		    && defined($_->id)
 		    && (!$urpm->{searchmedia} || pkg_in_searchmedia($urpm, $_))
 		    ? $_ : @{[]};
-		} $urpm->packages_providing($v))
-	    {
+	    } $urpm->packages_providing($v);
+
+	    if (@l) {
 		$exact{$v} = _search_packages_keep_best($v, \@l, $options{all});
 		next;
 	    }
@@ -163,6 +166,7 @@ sub _search_packages {
 	    _findindeps($urpm, \%found, $qv, $v, $options{caseinsensitive}, $options{src});
 	}
 
+	# Second pass: try to find a partial match (substring) [slow]
 	foreach my $id (build_listid_($urpm)) {
 	    my $pkg = $urpm->{depslist}[$id];
 	    ($options{src} ? $pkg->arch eq 'src' : $pkg->is_arch_compat) or next;
@@ -173,14 +177,12 @@ sub _search_packages {
 	    if (!$options{fuzzy}) {
 		if ($pack eq $v) {
 		    $exact{$v} = $id;
-		    next;
 		} elsif ($pack_a eq $v) {
 		    push @{$exact_a{$v}}, $id;
-		    next;
 		} elsif ($pack_ra eq $v || $options{src} && $pack_name eq $v) {
 		    push @{$exact_ra{$v}}, $id;
-		    next;
 		}
+		next;
 	    }
 	    if ($pack =~ /$qv/) {
 		next if member($pack, @found);
@@ -217,7 +219,7 @@ sub _search_packages {
 		$urpm->{error}(N("No package named %s", $v));
 		values(%l) != 0 and $urpm->{error}(
 		    N("The following packages contain %s: %s",
-			$v, urpm::util::formatList(4, sort { $a cmp $b } keys %l)) . "\n" . 
+			$v, formatList(4, sort { $a cmp $b } keys %l)) . "\n" . 
 		    N("You should use \"-a\" to use all of them")
 		);
 		$result = 0;
@@ -305,7 +307,7 @@ installed or upgraded
 
 =item * nodeps
 
-=item * no_suggests
+=item * no_recommends
 
 =back
 
@@ -350,6 +352,7 @@ sub resolve_dependencies {
 		$need_restart = _resolve_priority_upgrades($urpm, $db, $state, $state->{selected}, \@l, %options);
 	    }
 	}
+	$urpm->{options}{'split-length'} = 0 if $need_restart;
     }
     $need_restart;
 }
@@ -359,7 +362,7 @@ sub select_replacepkgs {
 
     my $db = urpm::db_open_or_die_($urpm);
     foreach my $id (keys %$requested) {
-	my @pkgs = $urpm->find_candidate_packages_($id);
+	my @pkgs = $urpm->find_candidate_packages($id);
 	if (my ($pkg) = grep { URPM::is_package_installed($db, $_) } @pkgs) {
 		$urpm->{debug_URPM}("selecting replacepkg " . $pkg->fullname) if $urpm->{debug_URPM};
 		$pkg->set_flag_requested;
@@ -398,9 +401,9 @@ sub _resolve_priority_upgrades {
     my %priority_requested = map { $_->id => undef } @$priority_pkgs;
 
     $urpm->resolve_requested($db, \%priority_state, \%priority_requested, %options);
-    if (grep { ! exists $priority_state{selected}{$_} } keys %priority_requested) {
+    if (any { ! exists $priority_state{selected}{$_} } keys %priority_requested) {
 	#- some packages which were selected previously have not been selected, strange!
-    } elsif (grep { ! exists $priority_state{selected}{$_} } keys %$selected) {
+    } elsif (any { ! exists $priority_state{selected}{$_} } keys %$selected) {
 	#- there are other packages to install after this priority transaction.
 	%$state = %priority_state;
 	$need_restart = 1;
@@ -488,9 +491,12 @@ sub find_packages_to_remove {
 			push @m, scalar $p->fullname;
 			$found = 1;
 		    });
-		$found and next;
 
-		push @notfound, $_;
+		if ($found) {
+		    next;
+		} else {
+		    push @notfound, $_;
+		}
 	    }
 	    if (!$options{force} && @notfound && @$l > 1) {
 		$options{callback_notfound} && $options{callback_notfound}->($urpm, @notfound)
@@ -564,7 +570,7 @@ sub _prohibit_packages_that_would_be_removed {
     });
 
     grep {
-	! grep { $base{$_} } rejected_unsatisfied($state, $_);
+	! any { $base{$_} } rejected_unsatisfied($state, $_);
     } intersection(\@to_remove, \@base_fn);
 }
 
@@ -687,7 +693,7 @@ sub translate_why_removed_one {
     my $closure = rejected_closure($state, $fullname) or return $fullname;
 
     my ($from) = keys %$closure;
-    my ($whyk) = keys %{$closure->{$from}};
+    my ($whyk) = sort { $b ne 'avoid' } keys %{$closure->{$from}};
     my $whyv = $closure->{$from}{$whyk};
     my $frompkg = $urpm->search($from, strict_fullname => 1);
     my $s = do {
@@ -712,7 +718,7 @@ sub translate_why_removed_one {
 }
 
 sub _libdb_version { $_[0] =~ /libdb-(\S+)\.so/ ? version->new("v$1") : () }
-sub _rpm_version() { `rpm --version` =~ /version ([0-9.]+)$/ ? version->new("v$1") : () }
+sub _rpm_version() { `rpm --version` =~ /version ([0-9.]+)(?:-(beta|rc).*)?$/ ? version->new("v$1") : () }
 
 sub should_we_migrate_back_rpmdb_db_version {
     my ($urpm, $state) = @_;

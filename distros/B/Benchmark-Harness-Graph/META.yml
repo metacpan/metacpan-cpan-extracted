@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Benchmark-Harness-Graph
+version:      1.02
+version_from: Graph.pm
+installdirs:  site
+requires:
+    Benchmark::Harness:            1.08
+    GD:                            2.12
+    GD::Graph::lines:              1.15
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

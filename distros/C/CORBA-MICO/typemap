@@ -22,6 +22,16 @@ PortableServer::ObjectId     T_OBJECTID
 CORBA::MICO::GtkDispatcher    T_PTROBJ
 CORBA::MICO::ServerlessObject T_PTROBJ
 
+DynamicAny::DynAny		T_PTROBJ
+DynamicAny::DynFixed		T_PTROBJ
+DynamicAny::DynEnum		T_PTROBJ
+DynamicAny::DynStruct		T_PTROBJ
+DynamicAny::DynUnion		T_PTROBJ
+DynamicAny::DynSequence		T_PTROBJ
+DynamicAny::DynArray		T_PTROBJ
+DynamicAny::DynValue		T_PTROBJ
+DynamicAny::DynAnyFactory*	T_MICOOB
+
 ######################################################################
 INPUT
 T_SERVANT
@@ -43,7 +53,7 @@ T_OBJECTID
 		$var = new PortableServer::ObjectId (len);
 		$var->length(len);
 		for (STRLEN i = 0 ; i < len ; i++) {
-		    $var\[i] = str[i];
+		    $var\[(unsigned long)i] = str[i];
 		}	
 	}
 T_LONGLONG
@@ -70,7 +80,7 @@ T_OBJECTID
 		char *pv = SvPVX ($arg);
 		
 		for (unsigned int i = 0 ; i < $var->length() ; i++) {
-		    pv[i] = $var\[i];
+		    pv[i] = $var\[(unsigned long)i];
 		}	
 		pv[$var->length()] = '\\0';
 	}

@@ -1,11 +1,36 @@
 package Mojolicious::Plugin::LinkEmbedder::Link::Text::Travis;
+
+=head1 NAME
+
+Mojolicious::Plugin::LinkEmbedder::Link::Text::Travis - https://travis-ci.org link
+
+=cut
+
 use Mojo::Base 'Mojolicious::Plugin::LinkEmbedder::Link';
+
+=head1 ATTRIBUTES
+
+=head2 media_id
+
+  $str = $self->media_id;
+
+Example C<$str>: "Nordaaker/convos/builds/47421379".
+
+=head2 provider_name
+
+=cut
 
 has media_id => sub {
   shift->url->path =~ m!^/(.*/builds/\d+)$! ? $1 : '';
 };
 
 sub provider_name {'Travis'}
+
+=head1 METHODS
+
+=head2 learn
+
+=cut
 
 sub learn {
   my ($self, $c, $cb) = @_;
@@ -26,6 +51,12 @@ sub learn {
     },
   );
 }
+
+=head2 to_embed
+
+Returns data about the HTML page in a div tag.
+
+=cut
 
 sub to_embed {
   my $self        = shift;
@@ -72,34 +103,10 @@ sub to_embed {
   return $self->SUPER::to_embed(@_);
 }
 
-1;
-
-=encoding utf8
-
-=head1 NAME
-
-Mojolicious::Plugin::LinkEmbedder::Link::Text::Travis - https://travis-ci.org link
-
-=head1 ATTRIBUTES
-
-=head2 media_id
-
-  $str = $self->media_id;
-
-Example C<$str>: "Nordaaker/convos/builds/47421379".
-
-=head2 provider_name
-
-=head1 METHODS
-
-=head2 learn
-
-=head2 to_embed
-
-Returns data about the HTML page in a div tag.
-
 =head1 AUTHOR
 
 Jan Henning Thorsen
 
 =cut
+
+1;

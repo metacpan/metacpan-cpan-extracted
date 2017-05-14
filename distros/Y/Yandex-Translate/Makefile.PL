@@ -25,3 +25,4 @@ WriteMakefile(
         'TESTS' => 't/*.t',
     }
 );
+

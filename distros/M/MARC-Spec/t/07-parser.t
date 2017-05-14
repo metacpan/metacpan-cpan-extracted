@@ -2,7 +2,7 @@ use Test::More;
 use MARC::Spec;
 use MARC::Spec::Subfield;
 
-my $parser = MARC::Spec->parse('006');
+my $parser = MARC::Spec::parse('006');
 
 # checking field
 ok $parser->field->tag eq '006'        , 'field tag';

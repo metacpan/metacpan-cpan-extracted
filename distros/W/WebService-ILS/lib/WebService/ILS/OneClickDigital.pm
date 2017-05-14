@@ -122,6 +122,17 @@ sub api_url {
     return sprintf "%s/%s%s", $self->_api_base_url, API_VERSION, $action;
 }
 
+sub library_action_base_url {
+    my $self = shift;
+
+    return $self->api_url("/libraries/".$self->library_id);
+}
+
+sub products_url {
+    my $self = shift;
+    return $self->library_action_base_url."/search";
+}
+
 sub circulation_action_url {
     my $self = shift;
     my $action = shift or croak "No action";

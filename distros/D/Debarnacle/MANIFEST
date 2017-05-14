@@ -1,0 +1,16 @@
+COPYING
+GPL
+MANIFEST
+Makefile.PL
+README
+README-cruft
+debarnacle
+debarnacle.pod
+etc/globs
+etc/prune
+lib/Debian/Debarnacle/Alternatives.pm
+lib/Debian/Debarnacle/Diversions.pm
+lib/Debian/Debarnacle/DocBase.pm
+lib/Debian/Debarnacle/Python.pm
+lib/Debian/Debarnacle/Dpkg.pm
+lib/Debian/Debarnacle/Globs.pm

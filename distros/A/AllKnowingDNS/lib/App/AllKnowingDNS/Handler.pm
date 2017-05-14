@@ -11,9 +11,21 @@ use App::AllKnowingDNS::Zone;
 use POSIX qw(strftime);
 use v5.10;
 
-our @EXPORT = qw(reply_handler);
+=head1 NAME
 
-our $VERSION = '1.0';
+App::AllKnowingDNS::Handler - main code of AllKnowingDNS
+
+=head1 DESCRIPTION
+
+Note: User documentation is in L<all-knowing-dns>(1).
+
+This module contains the C<Net::DNS::Nameserver> handler function.
+
+=head1 FUNCTIONS
+
+=cut
+
+our @EXPORT = qw(reply_handler);
 
 sub handle_ptr_query {
     my ($querylog, $zone, $qname, $qclass, $qtype) = @_;
@@ -32,6 +44,12 @@ sub handle_ptr_query {
         if (defined($result) && $result->header->rcode eq 'NOERROR') {
             if ($querylog) {
                 say strftime('%x %X %z', localtime) . " - Relaying upstream answer for $qname";
+            }
+            my @answer = $result->answer;
+            for my $answer (@answer) {
+                my $name = $answer->name;
+                $name =~ s/\.upstream$//;
+                $answer->name($name);
             }
             return ('NOERROR', [ $result->answer ], [], [], { aa => 1 });
         }
@@ -61,6 +79,10 @@ sub handle_aaaa_query {
     my ($digits) = ($qname =~ /$regexp/);
     return ('NXDOMAIN', undef, undef, undef) unless defined($digits);
 
+    if ($qtype ne 'AAAA') {
+        return ('NOERROR', [ ], [], [], { aa => 1 });
+    }
+
     # Pad with zeros so that we can match 4 digits each.
     $digits = "0$digits" while (length($digits) % 4) != 0;
 
@@ -83,6 +105,7 @@ Returns DNS RRs for PTR and AAAA queries of zones which are configured in
 C<$config>.
 
 =cut
+
 sub reply_handler {
     my ($config, $querylog, $qname, $qclass, $qtype, $peerhost) = @_;
 
@@ -95,8 +118,7 @@ sub reply_handler {
         return handle_ptr_query($querylog, $zone, $qname, $qclass, $qtype);
     }
 
-    if ($qtype eq 'AAAA' &&
-        defined(my $zone = $config->zone_for_aaaa($qname))) {
+    if (defined(my $zone = $config->zone_for_aaaa($qname))) {
         return handle_aaaa_query($zone, $qname, $qclass, $qtype);
     }
 
@@ -107,29 +129,9 @@ sub reply_handler {
 
 __END__
 
-=head1 NAME
-
-AllKnowingDNS - Tiny DNS server for IPv6 Reverse DNS
-
-=head1 DESCRIPTION
-
-AllKnowingDNS provides reverse DNS for IPv6 networks which use SLAAC
-(autoconf), e.g. for a /64 network.
-
-The problem with IPv6 reverse DNS and traditional nameservers is that the
-nameserver requires you to provide a zone file. Assuming you want to provide
-RDNS for a /64 network, you have 2**64 = 18446744073709551616 different usable
-IP addresses (a little less if you are using SLAAC). Providing a zone file for
-that, even in a very terse notation, would consume a huge amount of disk space
-and could not possibly be held in the memory of the computers we have nowadays.
-
-AllKnowingDNS instead generates PTR and AAAA records on the fly. You only
-configure which network you want to serve and what your entries should look
-like.
-
 =head1 VERSION
 
-Version 1.0
+Version 1.7
 
 =head1 AUTHOR
 

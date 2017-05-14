@@ -1,0 +1,52 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Adding Figure Titles
+
+H2: Adding a Title to a Figure
+
+To add a title, use the {{title}}
+attribute of the {{MAC:import}} macro.
+For example:
+
+E:  !import "growth"; title="Predicted Growth"
+
+H2: Adding a Title to a Psuedo Figure
+
+Occasionally, it is useful to label a source
+code example or ASCII graphic with a title.
+To do this, use the FT (Figure Title) paragraph style.
+For example:
+
+E:   FT: Source code for main.c
+E:   !include "main.c"; example; lang='C'
+
+H2: Generating a List of Figures
+
+A list of figures can be generated from the figure titles.
+To do this, set the {{VAR:DOC_LOF}} variable. For example:
+
+E:# Build the title
+E:!define DOC_NAME "World Peace in 60 Days"
+E:!define DOC_LOF
+E:!build_title
+
+This will generate a list of figures after the table of contents.
+
+H2: Changing the List of Figures Title
+
+The default title for the list of figures is "List of Figures".
+To change this, set the DOC_LOF_TITLE.
+For example:
+
+E:!define DOC_LOF_TITLE "Figures"

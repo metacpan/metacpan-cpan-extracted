@@ -1,5 +1,8 @@
 Revision history for Dancer2-Plugin-Tail
 
+0.011   Sun May  7 04:47:18 GMT 2017
+        Cleanup code, add documentation and bug fix
+
 0.010   Tue Apr 11 19:54:03 GMT 2017
         define_file_to_tail
 

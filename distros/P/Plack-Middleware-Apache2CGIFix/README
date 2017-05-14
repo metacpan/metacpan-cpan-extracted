@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-Apache2CGIFix,
+version 0.002:
+
+  Hacks for Plack and CGI under Apache2
+
+This software is copyright (c) 2014 by CV-Library Ltd.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

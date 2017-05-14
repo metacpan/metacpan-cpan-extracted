@@ -1,0 +1,20 @@
+lib/Linux/Fanotify.pm		Perl interface to the package
+Fanotify.xs			Perl extension
+t/00-load.t			Module load test
+t/01-init-and-mark.t		Load module, init fanotify, mark a dir
+t/02-non-read-nonblocking.t	Test non-blocking read and check errno
+t/03-read-some-events.t		Monitor a directory, open two files
+t/_validate_kernel.pm		Simple kernel feature validation function
+Makefile.PL			MakeMaker make file
+MANIFEST			This list of files
+README				Pseudo-Readme
+ChangeLog			Change log
+typemap				Minimal type map
+sample/1000_opens.pl		Execute 1000 processes, execute fanotify_init and fanotify_mark in each
+sample/1000_responses.pl	Answer 1000 events with random responses
+sample/forked_reply.pl		Reply to events in forked processes
+sample/monitor-dir.pl		Monitor a directory
+sample/sample-func.pl		Sample for functional interface
+sample/sample-oo.pl		Sample for OO interface
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

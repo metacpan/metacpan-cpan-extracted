@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 39;
+use Test::More tests => 30;
 
 BEGIN { use_ok('CSS::Sass') };
 
@@ -49,9 +49,9 @@ like  ($r,   qr/color:\s*yellow;/,                     "Custom importer works");
 is    ($err, undef,                                    "Custom importer returns no errors");
 
 is    (scalar(@{$stat->{'included_files'}}), 3,        "included_files has correct size");
-is    ($stat->{'included_files'}->[0], "http://www.host.dom/final", "included_files[0] has correct url");
-is    ($stat->{'included_files'}->[1], "http://www.host.dom/green", "included_files[1] has correct url");
-is    ($stat->{'included_files'}->[2], "red.css", "included_files[2] has correct url");
+is    ($stat->{'included_files'}->[0], "green", "included_files[0] has correct url");
+is    ($stat->{'included_files'}->[1], "http://www.host.dom/red", "included_files[1] has correct url");
+is    ($stat->{'included_files'}->[2], "yellow", "included_files[2] has correct url");
 
 is    (scalar(@{$stat->{'included_files'}}), 3,        "included_files has correct size");
 
@@ -60,35 +60,22 @@ is    (scalar(@{$stat->{'included_files'}}), 3,        "included_files has corre
 my %files = (
 
   "index.scss" => "
-    \@import 'header.css';
-    \@import 'foo.scss';
     \@import 'foo.scss';
     \@import 'bar.scss';
-    \@import 'footer.css';
-    \@import 'footer.css';
   ",
   "foo.scss" => "
-    \@import 'baz.scss';
+    \@import 'bar2.scss';
     body { color: red; }
   ",
   "bar.scss" => "
     p { color: grey; }
   ",
-  "baz.scss" => "
+  "bar2.scss" => "
     span { z-index: 4; }
   "
 );
 
-my $expected = "\@import url(header.css);
-\@import url(footer.css);
-\@import url(footer.css);
-span {
-  z-index: 4; }
-
-body {
-  color: red; }
-
-span {
+my $expected = "span {
   z-index: 4; }
 
 body {
@@ -116,36 +103,11 @@ chomp ($expected); $expected =~ s/(?:\r?\n)+/\n/g;
 is  ($err, undef,                         "Custom importer has no error");
 is  ($r,   $expected,                     "Custom importer yields expected result");
 
-is    (scalar(@{$stat->{'included_files'}}), 5,         "included_files has correct size");
-is    ($stat->{'included_files'}->[0], "bar.scss",      "included_files[0] has correct url");
-is    ($stat->{'included_files'}->[1], "baz.scss",      "included_files[1] has correct url");
-is    ($stat->{'included_files'}->[2], "baz.scss",      "included_files[2] has correct url");
-is    ($stat->{'included_files'}->[3], "foo.scss",      "included_files[3] has correct url");
-is    ($stat->{'included_files'}->[4], "foo.scss",      "included_files[4] has correct url");
+is    (scalar(@{$stat->{'included_files'}}), 3,     "included_files has correct size");
+is    ($stat->{'included_files'}->[0], "bar.scss",  "included_files[0] has correct url");
+is    ($stat->{'included_files'}->[1], "bar2.scss", "included_files[1] has correct url");
+is    ($stat->{'included_files'}->[2], "foo.scss",  "included_files[2] has correct url");
 
-####### real imports test #######
-
-($r, $err, $stat) = CSS::Sass::sass_compile_file(
-    "t/inc/imp/index.scss",
-    input_file => "t/inc/imp/index.scss",
-    output_file => "t/inc/imp/index.css",
-    source_map_file => "t/inc/imp/index.css.map"
-);
-
-chomp ($r); $r =~ s/(?:\r?\n)+/\n/g;
-chomp ($expected); $expected =~ s/(?:\r?\n)+/\n/g;
-
-is  ($err, undef,                         "Importer has no error");
-is  ($r,   $expected,                     "Importer yields expected result");
-
-# use Data::Dumper;
-# warn Dumper($stat->{'included_files'});
-
-is    (scalar(@{$stat->{'included_files'}}), 4,         "included_files has correct size");
-like  ($stat->{'included_files'}->[0], qr/index.scss$/, "included_files[0] has correct url");
-like  ($stat->{'included_files'}->[1], qr/bar.scss$/,   "included_files[1] has correct url");
-like  ($stat->{'included_files'}->[2], qr/baz.scss$/,   "included_files[2] has correct url");
-like  ($stat->{'included_files'}->[3], qr/foo.scss$/,   "included_files[3] has correct url");
 
 ####### load handling #######
 
@@ -160,18 +122,18 @@ like  ($stat->{'included_files'}->[3], qr/foo.scss$/,   "included_files[3] has c
     }
 );
 
-is ($r, "foo {\n  color: #ff1111; }\n", "custom importer test");
+is ($r, "foo {\n  color: #ff1111; }\n", "correctly report error file");
 
 ####### load handling #######
 
 ($r, $err, $stat) = CSS::Sass::sass_compile(
     '@import "foobar";',
     importer => sub {
-      return "t/inc/styles"
+      return "t/inc/simple"
     }
 );
 
-is ($r, "foo {\n  color: red; }\n", "custom importer test");
+is ($r, "foo {\n  color: red; }\n", "correctly report error file");
 
 ####### error handling #######
 
@@ -183,7 +145,7 @@ my $err_msg = "my error msg";
     output_file => "index.css",
     source_map_file => "index.css.map",
     importer => sub {
-      if ($_[0] ne "baz.scss") { return [ [ $_[0], $files{$_[0]}, "" ] ]; }
+      if ($_[0] ne "bar2.scss") { return [ [ $_[0], $files{$_[0]}, "" ] ]; }
       else { return [ [ $_[0], $files{$_[0]}, "", $err_msg, 42, 84 ] ]; }
     }
 );

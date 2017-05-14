@@ -20,11 +20,7 @@ use JSON;
 use URI::Template;
 use RDF::LDF::Error;
 
-our $VERSION = '0.22';
-{
-   my $ua   = RDF::Trine->default_useragent;
-   $ua->agent("RDF:::LDF/$RDF::LDF::VERSION " . $ua->_agent);
-}
+our $VERSION = '0.23';
 
 has url => (
     is => 'ro' ,
@@ -88,7 +84,7 @@ sub get_pattern {
     my @vars = $bgp->referenced_variables;
 
     my @bgps = map { $self->_parse_triple_pattern($_)} @triples;
-    
+
     my $sub = sub {
         state $it = $self->_find_variable_bindings(\@bgps);
         my $b = $it->();
@@ -143,7 +139,7 @@ sub _find_variable_bindings {
 
             $results = $self->_find_variable_bindings($bgps_prime,$bindings);
         }
-        
+
         $ret;
     };
 
@@ -156,10 +152,10 @@ sub _find_variable_bindings {
 #  my ($iterator, $rest) = $self->_find_variable_bindings([ {pattern} , {pattern} , ... ]);
 #
 #  where:
-# 
+#
 #  $iterator - Iterator for variable bindings for the winnnig pattern, or undef when no
 #              patterns are provided or we get zero results
-#              
+#
 #  $rest     - An array ref of patterns not containing the best pattern
 sub _find_variable_bindings_ {
     my ($self,$bgps) = @_;
@@ -235,8 +231,8 @@ sub _apply_binding {
 #    my ($pattern, $rest) = $self->_find_best_pattern($triples);
 #
 #    $pattern => Pattern in $triples which least ammount of results
-#    $rest    => All patterns in $triples except $pattern      
-#  
+#    $rest    => All patterns in $triples except $pattern
+#
 sub _find_best_pattern {
     my ($self,$triples) = @_;
 
@@ -262,7 +258,7 @@ sub _find_best_pattern {
             $best_count   = $count;
             $best_pattern = $pattern;
         }
-    }   
+    }
 
     return (undef,$triples) unless defined $best_pattern;
 
@@ -278,7 +274,7 @@ sub _find_best_pattern {
 #    my $count = $self->_total_triples(
 #                { subject => ... , predicate => ... , object => ...}
 #                );
-# Where 
+# Where
 #       $count is a number
 sub _total_triples {
     my ($self,$pattern) = @_;
@@ -383,15 +379,15 @@ sub get_statements {
     if (_is_blessed($object) && $object->isa('RDF::Trine::Node') and not $object->is_variable) {
         $object = ($object->isa('RDF::Trine::Node::Literal')) ? $object->as_string : $object->value;
     }
-  
-    # Do a federated search over all the URLs provided 
+
+    # Do a federated search over all the URLs provided
     my $parts  = ref($self->url) ? $self->url : [ $self->url ];
     my @federated;
 
     for my $part (@$parts) {
         my $pattern = $self->get_query_pattern($part);
         return undef unless defined $pattern;
-    
+
         my %params;
         $params{ $pattern->{rdf_subject} }   = $subject if _is_string($subject);
         $params{ $pattern->{rdf_predicate} } = $predicate if _is_string($predicate);
@@ -471,21 +467,22 @@ sub get_fragment {
     $self->log->info("fetching: $url");
 
     my $model = RDF::Trine::Model->temporary_model;
-    
+
     # JSON support in RDF::Trine isn't JSON-LD
     # Set the accept header quality parameter at a minimum for this format
-    my $ua = RDF::Trine->default_useragent;
+    my $ua = clone(RDF::Trine->default_useragent);
+    $ua->agent("RDF:::LDF/$RDF::LDF::VERSION " . $ua->_agent);
     $ua->default_header('Accept','text/turtle;q=1.0,application/turtle;q=1.0,application/x-turtle;q=1.0,application/rdf+xml;q=0.9,text/x-nquads;q=0.9,application/json;q=0.1,application/x-rdf+json;q=0.1');
 
     eval {
         # Need to explicitly set the useragent to keep the accept headers
         RDF::Trine::Parser->parse_url_into_model($url, $model, useragent => $ua);
     };
-    
+
     if ($@) {
         $self->log->error("failed to parse input");
     }
-    
+
     return $model;
 }
 
@@ -494,7 +491,7 @@ sub get_fragment {
 #    $model    - RDF::Trine::Model
 #    $this_uri - result page URL
 #    %opts
-#        clean => 1 - remove the metadata from the model 
+#        clean => 1 - remove the metadata from the model
 sub _model_metadata {
     my ($self,$model,$this_uri,%opts) = @_;
 
@@ -564,7 +561,7 @@ sub _model_metadata {
 # Helper method for _parse_model
 sub _build_metadata {
     my ($self, $model, $triple, $info) = @_;
-    
+
     my $iterator = $model->get_statements(
         $triple->{subject},
         $triple->{predicate},
@@ -665,7 +662,7 @@ RDF::LDF - Linked Data Fragments client
 
     while (my $statement = $iterator->()) {
         # $model is a RDF::Trine::Statement
-    } 
+    }
 
 
 =head1 DESCRIPTION
@@ -681,14 +678,14 @@ use L<RDF::Trine::Store::LDF>.
 
 =item url
 
-URL to retrieve RDF from. 
+URL to retrieve RDF from.
 
 Experimental: more than one URL can be provided for federated search over many LDF endpoints.
 
     my $store = RDF::Trine::Store->new_with_config({
             storetype => 'LDF',
             url => [ $url1, $url2, $url3 ]
-    });    
+    });
 
     # or
 
@@ -698,7 +695,7 @@ Experimental: more than one URL can be provided for federated search over many L
 
 =head1 METHODS
 
-=over 
+=over
 
 =item get_statements( $subject, $predicate, $object )
 

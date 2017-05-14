@@ -1,0 +1,16 @@
+MANIFEST
+Changes
+META.yml
+Makefile.PL
+README
+lib/LEGO/NXT.pm
+lib/LEGO/NXT/Constants.pm
+lib/LEGO/NXT/Manual.pod
+lib/LEGO/NXT/Manual/Plugins.pod
+lib/LEGO/NXT/Manual/Troubleshooting.pod
+lib/LEGO/NXT/Manual/Cookbook.pod
+lib/LEGO/NXT/Manual/FAQ.pod
+lib/LEGO/NXT/Manual/Introduction.pod
+test.pl
+t/00_pod.t
+t/00_basic.t

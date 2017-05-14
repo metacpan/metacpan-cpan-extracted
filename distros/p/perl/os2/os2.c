@@ -1140,6 +1140,7 @@ do_spawn_ve(pTHX_ SV *really, U32 flag, U32 execf, char *inicmd, U32 addflag)
 		    if (!buf)
 			buf = "";	/* XXX Needed? */
 		    if (!buf[0]) {	/* Empty... */
+                        struct stat statbuf;
 			PerlIO_close(file);
 			/* Special case: maybe from -Zexe build, so
 			   there is an executable around (contrary to
@@ -1148,8 +1149,8 @@ do_spawn_ve(pTHX_ SV *really, U32 flag, U32 execf, char *inicmd, U32 addflag)
 			   reached this place). */
 			sv_catpv(scrsv, ".exe");
 	                PL_Argv[0] = scr = SvPV(scrsv, n_a);	/* Reload */
-			if (PerlLIO_stat(scr,&PL_statbuf) >= 0
-			    && !S_ISDIR(PL_statbuf.st_mode)) {	/* Found */
+                        if (PerlLIO_stat(scr,&statbuf) >= 0
+                            && !S_ISDIR(statbuf.st_mode)) {	/* Found */
 				real_name = scr;
 				pass++;
 				goto reread;
@@ -1345,8 +1346,8 @@ do_spawn_ve(pTHX_ SV *really, U32 flag, U32 execf, char *inicmd, U32 addflag)
 int
 do_spawn3(pTHX_ char *cmd, int execf, int flag)
 {
-    register char **a;
-    register char *s;
+    char **a;
+    char *s;
     char *shell, *copt, *news = NULL;
     int rc, seenspace = 0, mergestderr = 0;
 
@@ -1475,11 +1476,11 @@ do_spawn3(pTHX_ char *cmd, int execf, int flag)
 
 /* Array spawn/exec.  */
 int
-os2_aspawn_4(pTHX_ SV *really, register SV **args, I32 cnt, int execing)
+os2_aspawn_4(pTHX_ SV *really, SV **args, I32 cnt, int execing)
 {
-    register SV **argp = (SV **)args;
-    register SV **last = argp + cnt;
-    register char **a;
+    SV **argp = (SV **)args;
+    SV **last = argp + cnt;
+    char **a;
     int rc;
     int flag = P_WAIT, flag_set = 0;
     STRLEN n_a;
@@ -1518,7 +1519,7 @@ os2_aspawn_4(pTHX_ SV *really, register SV **args, I32 cnt, int execing)
 
 /* Array spawn.  */
 int
-os2_do_aspawn(pTHX_ SV *really, register SV **vmark, register SV **vsp)
+os2_do_aspawn(pTHX_ SV *really, SV **vmark, SV **vsp)
 {
     return os2_aspawn_4(aTHX_ really, vmark + 1, vsp - vmark, ASPAWN_WAIT);
 }
@@ -1543,7 +1544,7 @@ do_spawn_nowait(pTHX_ char *cmd)
 }
 
 bool
-Perl_do_exec(pTHX_ char *cmd)
+Perl_do_exec(pTHX_ const char *cmd)
 {
     do_spawn3(aTHX_ cmd, EXECF_EXEC, 0);
     return FALSE;
@@ -1560,15 +1561,15 @@ my_syspopen4(pTHX_ char *cmd, char *mode, I32 cnt, SV** args)
 {
 #ifndef USE_POPEN
     int p[2];
-    register I32 this, that, newfd;
-    register I32 pid;
+    I32 this, that, newfd;
+    I32 pid;
     SV *sv;
     int fh_fl = 0;			/* Pacify the warning */
     
     /* `this' is what we use in the parent, `that' in the child. */
     this = (*mode == 'w');
     that = !this;
-    if (PL_tainting) {
+    if (TAINTING_get) {
 	taint_env();
 	taint_proper("Insecure %s%s", "EXEC");
     }
@@ -2011,7 +2012,7 @@ mod2fname(pTHX_ SV *sv)
     if (SvTYPE(sv) != SVt_PVAV) 
       Perl_croak_nocontext("Not array reference given to mod2fname");
 
-    avlen = av_len((AV*)sv);
+    avlen = av_tindex((AV*)sv);
     if (avlen < 0) 
       Perl_croak_nocontext("Empty array reference given to mod2fname");
 
@@ -2072,7 +2073,7 @@ os2error(int rc)
 	dTHX;
 	ULONG len;
 	char *s;
-	int number = SvTRUE(get_sv("OS2::nsyserror", TRUE));
+	int number = SvTRUE(get_sv("OS2::nsyserror", GV_ADD));
 
         if (!(_emx_env & 0x200)) return ""; /* Nop if not OS/2. */
 	if (rc == 0)
@@ -3461,9 +3462,7 @@ XS(XS_Cwd_sys_cwd)
 	RETVAL = _getcwd2(p, MAXPATHLEN);
 	ST(0) = sv_newmortal();
 	sv_setpv(ST(0), RETVAL);
-#ifndef INCOMPLETE_TAINTS
 	SvTAINTED_on(ST(0));
-#endif
     }
     XSRETURN(1);
 }
@@ -3595,10 +3594,8 @@ XS(XS_Cwd_sys_abspath)
 	    *t = 0;
 	    SvCUR_set(sv, t - SvPVX(sv));
 	}
-#ifndef INCOMPLETE_TAINTS
 	if (!items)
 	    SvTAINTED_on(ST(0));
-#endif
     }
     XSRETURN(1);
 }
@@ -3720,7 +3717,7 @@ fill_extLibpath(int type, char *pre, char *post, int replace, char *msg)
 	s = pre - 1;
 	while (*++s)
 	    if (*s == '/')
-		*s = '\\';			/* Be extra causious */
+		*s = '\\';			/* Be extra cautious */
 	memcpy(to, pre, l);
 	if (!l || to[l-1] != ';')
 	    to[l++] = ';';
@@ -3751,7 +3748,7 @@ fill_extLibpath(int type, char *pre, char *post, int replace, char *msg)
 	s = post - 1;
 	while (*++s)
 	    if (*s == '/')
-		*s = '\\';			/* Be extra causious */
+		*s = '\\';			/* Be extra cautious */
 	memcpy(to, post, l);
 	if (!l || to[l-1] != ';')
 	    to[l++] = ';';
@@ -3859,7 +3856,7 @@ XS(XS_OS2__headerInfo)
 
 	if (size <= 0)
 	    Perl_croak(aTHX_ "OS2::_headerInfo(): unexpected size: %d", (int)size);
-	ST(0) = newSVpvn("",0);
+	ST(0) = newSVpvs("");
 	SvGROW(ST(0), size + 1);
 	sv_2mortal(ST(0));
 
@@ -3889,7 +3886,7 @@ XS(XS_OS2_libPath)
 	    Perl_croak(aTHX_ "OS2::_headerInfo(%ld,%ld,%ld,%ld) error: %s",
 		       DQHI_QUERYLIBPATHSIZE, sizeof(size), 0, 0,
 		       os2error(Perl_rc));
-	ST(0) = newSVpvn("",0);
+	ST(0) = newSVpvs("");
 	SvGROW(ST(0), size + 1);
 	sv_2mortal(ST(0));
 
@@ -4261,7 +4258,7 @@ XS(XS_OS2_pipe)
 	ST(0) = sv_newmortal();
 	{
 	    GV *gv = newGVgen("OS2::pipe");
-	    if ( do_open(gv, perltype, strlen(perltype), FALSE, 0, 0, perlio) )
+	    if ( do_open6(gv, perltype, strlen(perltype), perlio, NULL, 0) )
 		sv_setsv(ST(0), sv_bless(newRV((SV*)gv), gv_stashpv("IO::Handle",1)));
 	    else
 		ST(0) = &PL_sv_undef;

@@ -1,8 +1,10 @@
 package DTL::Fast::Filter::Wordcount;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Filter';
 
-$DTL::Fast::FILTER_HANDLERS{'wordcount'} = __PACKAGE__;
+$DTL::Fast::FILTER_HANDLERS{wordcount} = __PACKAGE__;
 
 #@Override
 sub filter

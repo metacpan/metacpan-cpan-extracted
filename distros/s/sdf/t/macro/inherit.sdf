@@ -1,0 +1,31 @@
+# Test the inherit macro
+
+# Define a macro to dump the current include path in terms of
+#  the current library directory
+!block script
+sub dump_path_Macro {
+    local($sdfhome, $igc);
+
+    $sdfhome = $'app_lib_dir;
+    print "SDF include path is now:\n";
+    for $igc (@include_path) {
+        $igc =~ s/$sdfhome/\$SDFHOME/;
+        print "$igc.\n";
+    }
+}
+!endblock
+
+# Show the initial path
+!dump_path
+
+# Try a simple name
+!inherit "abc"
+!dump_path
+
+# Try a name with several parts
+!inherit "xyz/qwe"
+!dump_path
+
+# Try an absolute path
+!inherit "/qwe/xyz"
+!dump_path

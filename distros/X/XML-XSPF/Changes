@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::XSPF.
 
+0.7.1 Mon Feb 23 21:01:41 PST 2009
+	- Fix https://rt.cpan.org/Ticket/Display.html?id=43108
+
 0.7   Sat Nov  8 15:46:07 PST 2008
 	- Fix http://rt.cpan.org/Ticket/Display.html?id=36778
 

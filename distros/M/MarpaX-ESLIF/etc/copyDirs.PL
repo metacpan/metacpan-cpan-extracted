@@ -237,6 +237,12 @@ sub _dircopy {
         next if $_ eq 'Testing';
         next if $_ eq 'Win32';
         next if $_ eq 'ipch';
+        next if $_ eq 'patchit';
+        next if $_ eq 'pcre2-10.22';
+        next if $_ eq 'pcre2-10.22.tar.gz';
+        next if $_ eq 'pcre2-10.23';
+        next if $_ eq 'pcre2-10.23.patchdir';
+        next if $_ eq 'pcre2-10.23.tar.gz';
 
         my $mode = $stats->{$_}->[2];
 

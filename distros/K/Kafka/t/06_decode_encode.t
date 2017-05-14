@@ -34,20 +34,11 @@ plan 'no_plan';
 
 #use Data::Dumper;
 
-use IO::Compress::Gzip qw(
-    gzip
-    $GzipError
-);
-use IO::Uncompress::Gunzip qw(
-    gunzip
-    $GunzipError
-);
-
 use Kafka qw(
     $COMPRESSION_GZIP
     $COMPRESSION_NONE
     $COMPRESSION_SNAPPY
-    $RECEIVE_EARLIEST_OFFSETS
+    $RECEIVE_EARLIEST_OFFSET
     $WAIT_WRITTEN_TO_LOCAL_LOG
 );
 use Kafka::Internals qw(
@@ -680,7 +671,7 @@ $decoded = {
             partitions                  => [
                 {
                     Partition           => 0,
-                    Time                => $RECEIVE_EARLIEST_OFFSETS,
+                    Time                => $RECEIVE_EARLIEST_OFFSET,
                     MaxNumberOfOffsets  => 1,
                 },
             ],

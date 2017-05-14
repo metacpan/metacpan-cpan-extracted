@@ -1,0 +1,7 @@
+# This file tests the insert macro
+
+# define a variable with an arbitrary name
+!define varname "abc"
+!insert "define " . &Var("varname") . " 'hello world'"
+Variable varname is [[varname]].
+Variable abc is [[abc]].

@@ -1,0 +1,71 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+&nbsp;<font color="#7f7f7f"><i>#!/usr/bin/perl</i></font><font color="#7f7f7f"><i><BR>
+</i></font><BR>
+<b>use</b>&nbsp;<b>warnings</b>;<BR>
+<b>use</b>&nbsp;<b>strict</b>;<BR>
+<b>use</b>&nbsp;<b>utf8</b>;<BR>
+<b>use</b>&nbsp;encoding&nbsp;<font color="#ffa500">'</font><font color="#ff0000">utf8</font><font color="#ffa500">'</font>;<BR>
+<b>use</b>&nbsp;<font color="#007f00">open</font>&nbsp;<font color="#ffa500">'</font><font color="#ff0000">locale</font><font color="#ffa500">'</font>;<BR>
+<b>use</b>&nbsp;Encode;<BR>
+<b>use</b>&nbsp;<font color="#007f00">DownVideos::DataSexta</font>;<BR>
+<b>use</b>&nbsp;<font color="#007f00">DownVideos::SextaXML</font>;<BR>
+<BR>
+<b>my</b>&nbsp;<font color="#0000ff">$sexta</font>&nbsp;=&nbsp;DataSexta-&gt;new();<BR>
+<b>my</b>&nbsp;<font color="#0000ff">$noticias</font>&nbsp;=&nbsp;<font color="#0000ff">$sexta</font>-&gt;<font color="#0000ff">get_noticias</font>;<BR>
+<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff0000">Obtenemos&nbsp;los&nbsp;programas&nbsp;de&nbsp;la&nbsp;sección&nbsp;noticias</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+<BR>
+<b>for</b>&nbsp;<b>my</b>&nbsp;<font color="#0000ff">$p</font>&nbsp;(0..<font color="#0000ff">@$noticias</font>&nbsp;<font color="#ffa500">-</font>&nbsp;<font color="#00007f">1</font>)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>for</b>&nbsp;<b>my</b>&nbsp;<font color="#0000ff">$k</font>&nbsp;(<font color="#007f00">keys</font>&nbsp;<font color="#0000ff">@$noticias</font>[<font color="#0000ff">$p</font>])<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff0000">Título&nbsp;</font><font color="#0000ff">$p</font><font color="#ff0000">:&nbsp;</font><font color="#0000ff">$k</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff0000">URL&nbsp;</font><font color="#0000ff">$p</font><font color="#ff0000">:&nbsp;</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">@</font>{<font color="#0000ff">$noticias</font>}[<font color="#0000ff">$p</font>]<font color="#ffa500">-</font>&gt;{<font color="#0000ff">$k</font>}&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n\n</font><font color="#ffa500">"</font>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+<BR>
+<font color="#7f7f7f"><i>#&nbsp;Obtenemos&nbsp;los&nbsp;capítulos&nbsp;del&nbsp;noticiero&nbsp;"Deportes";</i></font><font color="#7f7f7f"><i><BR>
+</i></font><b>my</b>&nbsp;<font color="#0000ff">$capitulos</font>&nbsp;=&nbsp;<font color="#0000ff">$sexta</font>-&gt;<font color="#0000ff">get_capitulos</font>(<font color="#ffa500">"</font><font color="#ff0000">Deportes</font><font color="#ffa500">"</font>);<BR>
+<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff0000">Mostramos&nbsp;información&nbsp;de&nbsp;los&nbsp;3&nbsp;últimos&nbsp;capítulos</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+<BR>
+<b>for</b>&nbsp;<b>my</b>&nbsp;<font color="#0000ff">$c</font>&nbsp;(0.<font color="#00007f">.2</font>)<BR>
+&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>for</b>&nbsp;<b>my</b>&nbsp;<font color="#0000ff">$k</font>&nbsp;(<font color="#007f00">keys</font>&nbsp;<font color="#0000ff">@$capitulos</font>[<font color="#0000ff">$c</font>])<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff0000">(</font><font color="#0000ff">$c</font><font color="#ff0000">)&nbsp;</font><font color="#0000ff">$k</font><font color="#ff0000">:</font><font color="#ffa500">"</font>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff0000">&nbsp;</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">@</font>{<font color="#0000ff">$capitulos</font>}[<font color="#0000ff">$c</font>]<font color="#ffa500">-</font>&gt;{<font color="#0000ff">$k</font>}&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+&nbsp;&nbsp;&nbsp;}<BR>
+<BR>
+<b>my</b>&nbsp;<font color="#0000ff">$xml</font>&nbsp;=&nbsp;SextaXML-&gt;new(URL&nbsp;=&gt;&nbsp;<font color="#0000ff">$$capitulos</font>[0]<font color="#ffa500">-</font>&gt;{URL});<BR>
+<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n\n\n</font><font color="#ff0000">Obteniendo&nbsp;datos&nbsp;del&nbsp;primer&nbsp;capítulo:</font><font color="#ff00ff">\n\n</font><font color="#ffa500">"</font>;<BR>
+<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\t</font><font color="#ff0000">Nombre:</font><font color="#ff00ff">\t\t</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">nombre</font>&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\t</font><font color="#ff0000">Sección:</font><font color="#ff00ff">\t</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">seccion</font>&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\t</font><font color="#ff0000">Info:</font><font color="#ff00ff">\t\t</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">info</font>&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\t</font><font color="#ff0000">Descripción:</font><font color="#ff00ff">\t</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">descripcion</font>&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\t</font><font color="#ff0000">RTMP:</font><font color="#ff00ff">\t\t</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">rtmp</font>&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n\n</font><font color="#ffa500">"</font>;<BR>
+<BR>
+<b>my</b>&nbsp;<font color="#0000ff">@etiquetas</font>&nbsp;=&nbsp;(<font color="#ffa500">'</font><font color="#ff0000">Video</font><font color="#ffa500">'</font>,&nbsp;<font color="#ffa500">'</font><font color="#ff0000">Tipo</font><font color="#ffa500">'</font>,&nbsp;<font color="#ffa500">'</font><font color="#ff0000">Tamaño</font><font color="#ffa500">'</font>,&nbsp;<font color="#ffa500">'</font><font color="#ff0000">Imagen</font><font color="#ffa500">'</font>);&nbsp;<BR>
+<b>my</b>&nbsp;<font color="#0000ff">@seccion</font>&nbsp;=&nbsp;(<font color="#ffa500">'</font><font color="#ff0000">VIDEO</font><font color="#ffa500">'</font>,&nbsp;<font color="#ffa500">'</font><font color="#ff0000">MIMETYPE</font><font color="#ffa500">'</font>,&nbsp;<font color="#ffa500">'</font><font color="#ff0000">TAMANYO</font><font color="#ffa500">'</font>,&nbsp;<font color="#ffa500">'</font><font color="#ff0000">IMAGEN</font><font color="#ffa500">'</font>);&nbsp;<BR>
+<BR>
+<b>my</b>&nbsp;<font color="#0000ff">$multimedia</font>&nbsp;=&nbsp;<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">multimedia</font>;<BR>
+<BR>
+<b>foreach</b>&nbsp;<b>my</b>&nbsp;<font color="#0000ff">$n</font>&nbsp;(0..<font color="#0000ff">@</font>{<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">multimedia</font>}&nbsp;<font color="#ffa500">-</font>&nbsp;<font color="#00007f">1</font>)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<b>foreach</b>&nbsp;<b>my</b>&nbsp;<font color="#0000ff">$m</font>&nbsp;(0..<font color="#0000ff">@seccion</font>&nbsp;<font color="#ffa500">-</font>&nbsp;<font color="#00007f">1</font>)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\t</font><font color="#0000ff">$etiquetas</font><font color="#ff0000">[</font><font color="#0000ff">$m</font><font color="#ff0000">]:</font><font color="#ff00ff">\t\t</font><font color="#ffa500">"</font>&nbsp;.&nbsp;<font color="#0000ff">@</font>{<font color="#0000ff">$xml</font>-&gt;<font color="#0000ff">multimedia</font>}[<font color="#0000ff">$n</font>]<font color="#ffa500">-</font>&gt;{<font color="#ffa500">"</font><font color="#0000ff">$seccion</font><font color="#ff0000">[</font><font color="#0000ff">$m</font><font color="#ff0000">]</font><font color="#ffa500">"</font>}&nbsp;.&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#007f00">print</font>&nbsp;<font color="#ffa500">"</font><font color="#ff00ff">\n</font><font color="#ffa500">"</font>;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+<BR>
+</body>
+</html>

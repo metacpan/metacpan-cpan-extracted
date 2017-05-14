@@ -26,14 +26,18 @@
 #undef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
+/* Test #undef'ining an existing constant function */
+#define NOTTRUE 0
+#undef NOTTRUE
+
 /* Test #ifdef */
 #ifdef __SOME_UNIMPORTANT_PROPERTY
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif /* __SOME_UNIMPORTANT_PROPERTY */
 
 /* 
- * Test #if, #elif, #else, #endif, #warn and #error, and `!'
- * Also test whitespace between the `#' and the command
+ * Test #if, #elif, #else, #endif, #warn and #error, and '!'
+ * Also test whitespace between the '#' and the command
  */
 #if !(defined __SOMETHING_MORE_IMPORTANT)
 #    warn Be careful...
@@ -64,13 +68,15 @@ function Tru64_Pascal(n: Integer): Integer;
 /* 
  * Test #include, #import and #include_next
  * #include_next is difficult to test, it really depends on the actual
- *  circumstances - for example, `#include_next <limits.h>' on a Linux system
- *  with `use lib qw(/opt/perl5/lib/site_perl/i586-linux/linux);' or whatever
+ *  circumstances - for example, '#include_next <limits.h>' on a Linux system
+ *  with 'use lib qw(/opt/perl5/lib/site_perl/i586-linux/linux);' or whatever
  *  your equivalent is...
  */
+#if 0
 #include <sys/socket.h>
 #import "sys/ioctl.h"
 #include_next <sys/fcntl.h>
+#endif
 
 /* typedefs should be ignored */
 typedef struct a_struct {
@@ -125,6 +131,11 @@ enum flimflam {
    */
   flam                      
  } flamflim;
+
+static __inline__ int blli_in_use(struct atm_blli blli)
+{
+  return blli.l2_proto || blli.l3_proto;
+}
 
 /* Handle multi-line quoted strings: */
 __asm__ __volatile__("

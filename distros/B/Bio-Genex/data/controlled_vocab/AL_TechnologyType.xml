@@ -1,0 +1,28 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ArrayLayout" db_column="technology_type" cv_table="AL_TechnologyType">
+  <comment type="definition">Referred to in the Array Layout Table to describe the general technology for expression analysis	
+</comment>
+<term name="cdna_microarray"
+        description="sequence features are full-length cDNA and have been spotted onto a solid surface"/>
+<term name="oligo_chip_array"
+        description="sequence features are oligonucleotides and have been attached via chemistry or photolithography to a surface"/>
+<term name="pcr_microarray"
+        description="sequence features are PCR-derived products and have been spotted onto a solid surface"/>
+<term name="aflp"
+        description="sequence features are length/restriction site determined and gel separated"/>
+<term name="northern_blot"
+        description="sequence features have been gel separated and attached to a membrane"/>
+<term name="sage"
+        description="sequence features have been concatenated together and then sequenced for identification and counted for frequency"/>
+<term name="mage"
+        description="sequence features have been concatenated together and then sequenced for identification and counted for frequency"/>
+<term name="mmpg_beads"
+        description="sequence features have been attached to beads, visualized, sequenced and then counted, LYNX technology"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

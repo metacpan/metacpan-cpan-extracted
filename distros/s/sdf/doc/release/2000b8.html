@@ -1,0 +1,2123 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta8</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b8a.html">Previous Topic</A> | <A HREF="2000b7c.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>9. 2.000beta8</H1>
+<P ALIGN="Left"><A HREF="#2.000beta8 - Enhancements">Enhancements</A> | <A HREF="#2.000beta8 - Fixes">Fixes</A> | <A HREF="#2.000beta8 - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000beta8 - Enhancements">9.1. Enhancements</A></H2>
+<P>There are lots of new things in this version. The general enhancements are:</P>
+<UL>
+<A HREF="2000b8.html#Easier enumerated values">Easier enumerated values</A>
+<BR>
+<A HREF="2000b8.html#Look improvements">Look improvements</A>
+<BR>
+<A HREF="2000b8.html#Style rationalisation">Style rationalisation</A>
+<BR>
+<A HREF="2000b8.html#More build_title control variables">More build_title control variables</A>
+<BR>
+<A HREF="2000.html#Miscellaneous things">Miscellaneous things.</A></UL>
+<P>The table enhancements are:</P>
+<UL>
+<A HREF="2000b8.html#Easier column widths">Easier column widths</A>
+<BR>
+<A HREF="2000b8.html#Heading/footing rows for tables">Heading/footing rows for tables</A>
+<BR>
+<A HREF="2000b8.html#Table positioning">Table positioning</A>
+<BR>
+<A HREF="2000b8.html#Table filtering and sorting">Table filtering and sorting</A>
+<BR>
+<A HREF="2000b8.html#Landscape tables">Landscape tables</A>
+<BR>
+<A HREF="2000b8.html#Column alignment">Column alignment</A>
+<BR>
+<A HREF="2000b8.html#Cell attributes">Cell attributes</A>
+<BR>
+<A HREF="2000b8.html#Spreadsheet calculations">Spreadsheet calculations.</A></UL>
+<P>The page formatting enhancements are:</P>
+<UL>
+<A HREF="2000b8.html#Arbitrary page sizes">Arbitrary page sizes</A>
+<BR>
+<A HREF="2000b8.html#Headers and footers">Headers and footers</A>
+<BR>
+<A HREF="2000b8.html#Header/footer special tags">Header/footer special tags</A>
+<BR>
+<A HREF="2000b8.html#Header/footer borders">Header/footer borders</A>
+<BR>
+<A HREF="2000b8.html#Page backgrounds">Page backgrounds</A>
+<BR>
+<A HREF="2000b8.html#Page layout variables">Page layout variables</A>
+<BR>
+<A HREF="2000b8.html#Page control within a book">Page control within a book.</A></UL>
+<P>The configuration enhancements are:</P>
+<UL>
+<A HREF="2000b8.html#FrameMaker templates are no longer required">FrameMaker templates are no longer required</A>
+<BR>
+<A HREF="2000b8.html#Event processing enhancements">Event processing enhancements.</A></UL>
+<P>Details are given below.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>For <EM>html</EM> and <EM>txt</EM> targets, this release is slightly faster than the previous one. For <EM>mif</EM> (and <EM>ps</EM>), this release may be slightly slower (as SDF templates, not FrameMaker ones, are now used).
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="Easier enumerated values">9.1.1. Easier enumerated values</A></H3>
+<P>Enumerated values no longer need to be quoted. In a set of name-value pairs, if an expression is a single word where:</P>
+<UL>
+<LI>the first character is uppercase
+<LI>the remaining characters are lowercase</UL>
+<P>then the word is assumed to be an enemerated value and it is automatically converted to a string. For example, the following two lines are now equivalent:</P>
+<PRE>
+   P1[align=&quot;Center&quot;] My Title
+   P1[align=Center] My Title
+</PRE>
+<H3><A NAME="Look improvements">9.1.2. Look improvements</A></H3>
+<P>The overall appearance (i.e. look) of an SDF document can be controlled via the -k option or the OPT_LOOK variable. SDF now supports the following looks:</P>
+<UL>
+<LI><EM>simple</EM> - the default look, useful for general documentation
+<LI><EM>fancy</EM> - QSD-like look, but without any logos
+<LI><EM>infomap</EM> - look based on Information Mapping&#153; 
+<LI><EM>overhead</EM> - look suitable for overhead transparencies.</UL>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>For backwards compatibility, <EM>plain</EM> is now an alias for <EM>simple</EM>.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="Style rationalisation">9.1.3. Style rationalisation</A></H3>
+<P>SDF now supports the styles (i.e. document types) below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>General:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+document
+</TD>
+<TD>
+a normal document
+</TD>
+</TR>
+<TR>
+<TD>
+manual
+</TD>
+<TD>
+a manual
+</TD>
+</TR>
+<TR>
+<TD>
+paper
+</TD>
+<TD>
+a technical paper
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Administration:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+admin
+</TD>
+<TD>
+generic administration document
+</TD>
+</TR>
+<TR>
+<TD>
+fax
+</TD>
+<TD>
+a fascimile
+</TD>
+</TR>
+<TR>
+<TD>
+memo
+</TD>
+<TD>
+a memorandum
+</TD>
+</TR>
+<TR>
+<TD>
+newslttr
+</TD>
+<TD>
+a newsletter
+</TD>
+</TR>
+<TR>
+<TD>
+minutes
+</TD>
+<TD>
+minutes of a meeting
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Miscellaneous:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+listing
+</TD>
+<TD>
+a source code listing
+</TD>
+</TR>
+</TABLE>
+
+<P>The <A HREF="../ref/mbuild_t.html">build_title</A> macro is used to build the cover page for the general styles. The <A HREF="../ref/ftitle.html">title</A> filter is used to build the title block for the administation styles. The miscellaneous styles do not have a title.</P>
+<P>Adding new styles for a look is now much easier than it was previously. Furthermore, <EM>manual</EM> is now just another style rather than a special mode.</P>
+<H3><A NAME="More build_title control variables">9.1.4. More build_title control variables</A></H3>
+<P><A HREF="../ref/mbuild_t.html">build_title</A> now supports the following variable:</P>
+<UL>
+<LI><EM>DOC_COVER</EM> - the logical name of the cover page to use.</UL>
+<P>Supported DOC_COVER values and their meanings are given below:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+original
+</TD>
+<TD>
+SDF's original cover page layout
+</TD>
+</TR>
+<TR>
+<TD>
+project
+</TD>
+<TD>
+a cover page useful for project documentation
+</TD>
+</TR>
+<TR>
+<TD>
+manual
+</TD>
+<TD>
+the cover page used when OPT_STYLE is manual
+</TD>
+</TR>
+<TR>
+<TD>
+paper
+</TD>
+<TD>
+the cover page used when OPT_STYLE is paper
+</TD>
+</TR>
+</TABLE>
+
+<P>The <EM>manual</EM> cover supports a new macro called <EM>DOC_OFFICES</EM>, i.e. if DOC_OFFICES is defined, its contents are appended after the inside cover page.</P>
+<H3><A NAME="Miscellaneous things">9.1.5. Miscellaneous things</A></H3>
+<P>The <EM>SDF What's Planned</EM> document and <EM>bugs.html</EM> have been replaced by the <A HREF="http://www.mincom.com/mtr/sdf/bugs/index.html">SDF Bug Database</A>. In fact, the organisation of the documentation has been improved quite a bit.</P>
+<P>Any document can now be converted to a FrameMaker book, i.e. it is no longer necessary to specially organise files in order to create a FrameMaker book.</P>
+<P>Tables of style <EM>columns</EM> (the default) now have a thin line above group rows.</P>
+<P>Tables can now be specified as list items by using the <EM>listitem</EM> parameter of the <A HREF="../ref/ftable.html">table</A> filter. The value is the logical indent of the list (e.g. 1, 2, etc.). When generating HTML which contains a table within a numbered list, the <EM>listitem</EM> parameter is necessary in order to prevent the numbering from resetting.</P>
+<P>The new <EM>box</EM> filter can be used to place a box around one or more lines of text.</P>
+<P>The new <EM>center</EM> filter can be used to center a region of text.</P>
+<P>The new paragraph attribute called <EM>wide</EM> can be used to specify that a paragraph straddles the side-head area in addition to the main text area. Likewise. class filters (e.g. terms, references, etc.) now also support the <EM>wide</EM> attribute.</P>
+<P>By default, SDF automatically generates an <EM>id</EM> attribute for all headings in the table of contents. However, it is occasionally necessary to disable this, particularly when the same heading appears multiple times in a file. The new paragraph attribute <EM>noid</EM> can be used to prevent an <EM>id</EM> being generated for a paragraph.</P>
+<P>The title for an administration-style document can now be changed by either setting the DOC_TYPE variable or by using the new <EM>type</EM> parameter to the <A HREF="../ref/ftitle.html">title</A> filter. For example, if you want the title &quot;Urgent Memo&quot; rather than the default &quot;MEMORANDUM&quot; for a memo, you can now do the following:</P>
+<PRE>
+!init OPT_STYLE=&quot;memo&quot;
+!block title; type=&quot;Urgent Memo&quot;
+<EM>usual name-values pairs go here ...</EM>
+!endblock
+</PRE>
+<P>The <A HREF="../ref/ftitle.html">title</A> filter now also supports a <EM>format</EM> parameter which can be used to tune the column widths, when necessary.</P>
+<P>RTF can now be generated via FrameMaker by using the new <EM>sdf2fmrtf</EM> alias, i.e. the command is (say):</P>
+<PRE>
+   sdf -2fmrtf myfile.sdf
+</PRE>
+<P>When RTF is generated via FrameMaker, Word's standard style names are used, where possible. This makes it easier to import the RTF file into an existing Word document.</P>
+<P>Lists of tables and lists of figures can now be generated for normal documents, i.e. it is no longer necessary to use a FrameMaker book to build these lists.</P>
+<P>The new variable <EM>TXT_MARGIN</EM> can be used to control the width for <EM>txt</EM> output. Likewise, the new variable <EM>POD_MARGIN</EM> can be used to control the width of tables for <EM>pod</EM> format.</P>
+<P>The new <EM>bugtrack</EM> module can be used to build a simple bug tracking system like SDF's bug database.</P>
+<P>The new <EM>namevalues</EM> macro can be used to output a set of name-value pairs for an object. The parameters are:</P>
+<UL>
+<LI>the class name
+<LI>the object name
+<LI>a comma-separated list of attribute names.</UL>
+<P>For example:</P>
+<PRE>
+!namevalues 'bugs'; 'sd0001'; 'Priority,Status,Type'
+</PRE>
+<P>Finer control over object catalog formatting is now available via the new <EM>style</EM> and <EM>headings</EM> attributes. <EM>style</EM> is the table style to use. The default value is <EM>plain</EM>. If <EM>headings</EM> is set, column headings are output. (By default, they are not.)</P>
+<H3><A NAME="Easier column widths">9.1.6. Easier column widths</A></H3>
+<P>SDF now supports <EM>dynamic</EM> column widths for paper documentation, i.e. if a width is not specified for a column, then the column is sized based on the text within it and the space available. Proportional column widths are also supported.</P>
+<P>The <EM>format</EM> attribute of the <A HREF="../ref/ftable.html">table</A> filter is either:</P>
+<UL>
+<LI>a single number, in which case each digit represents 10% of the width available to the table, or
+<LI>a comma-separated list of column width specifications.</UL>
+<P>Examples of the column width specifications now supported are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+30pt
+</TD>
+<TD>
+an exact size (other supported units are cm, mm, &quot; and in)
+</TD>
+</TR>
+<TR>
+<TD>
+30%
+</TD>
+<TD>
+a percentage of the size available
+</TD>
+</TR>
+<TR>
+<TD>
+30
+</TD>
+<TD>
+a percentage of the size available (% is implicit)
+</TD>
+</TR>
+<TR>
+<TD>
+10-20
+</TD>
+<TD>
+dynamic size between 10% and 20% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+-20
+</TD>
+<TD>
+dynamic size between 0% and 20% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+10-
+</TD>
+<TD>
+dynamic size between 10% and 100% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+-
+</TD>
+<TD>
+dynamic size between 0% and 100% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+3*
+</TD>
+<TD>
+3 units of the remaining space
+</TD>
+</TR>
+<TR>
+<TD>
+*
+</TD>
+<TD>
+same as 1*
+</TD>
+</TR>
+</TABLE>
+
+<P>For example, in the table below, the second column will be twice the size of the last column.</P>
+<PRE>
+!block  table; format=&quot;20,2*,10,*&quot;
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<P>If a column is not given a size, the following rules are used:</P>
+<OL>
+<LI>The last unspecified column size is implicitly '*' (i.e. the rest), unless the <EM>narrow</EM> attribute is set, in which case the size is implicitly '-' (i.e. as much as needed).
+<LI>The other unknown sizes are implicitly '-'.</OL>
+<P>For example, the first and third columns in the table below will be dynamically sized. The first column will take as much space as required and the last column will expand so that the table takes the full width of the text area.</P>
+<PRE>
+!block  table; format=&quot;,30,,10&quot;
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<P>However, in the example below, each column will only take as much space is required, making the table narrower than it would be otherwise.</P>
+<PRE>
+!block  table; narrow
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<P>If an = character is used in place of a - character for a column width, then those columns will be equalised in size. For example, the second and forth columns in the table below will be made equal in size.</P>
+<PRE>
+!block  table; format=&quot;20,5=30,10,=&quot;
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>As previously, the <EM>format</EM> parameter has no impact on HTML generation, i.e. all columns in HTML remain dynamically sized. Dynamic sizing is also ignored for <EM>txt</EM> and <EM>pod</EM> targets.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="Heading/footing rows for tables">9.1.7. Heading/footing rows for tables</A></H3>
+<P>The <A HREF="../ref/ftable.html">table</A> filter now supports the following attributes:</P>
+<UL>
+<LI><EM>headings</EM> - the number of heading rows at the top of the table
+<LI><EM>footings</EM> - the number of footing rows at the end of the table.</UL>
+<P>If the <EM>headings</EM> attribute is not defined, then as previously done, the column headings are generated using the column names given on the <EM>parsing</EM> line. For example, the column headings in the table below will be <EM>Name</EM> and <EM>Age</EM>:</P>
+<PRE>
+!block table
+Name    Age
+Bill    42
+!endblock
+</PRE>
+<P>Alternatively, if the <EM>headings</EM> attribute is defined, then that number of <EM>data</EM> rows are used as the column headings, i.e. the parsing line is not used to build the column headings. For example, the column headings in the table below will be <EM>&quot;Title&quot;</EM> and <EM>Age</EM> (remembering that a filter attribute is implicitly given the value 1 is no value is supplied).</P>
+<PRE>
+!block table; headings
+A       B
+&quot;Title&quot; Age
+Bill    42
+Sally   23
+!endblock
+</PRE>
+<P>Likewise, the column headings below will be <EM>Preferred Title</EM> and <EM>Likely Age</EM> with each heading taking 2 rows.</P>
+<PRE>
+!block table; headings=2
+A           B
+Preferred   Likely
+Title       Age
+Bill        42
+Sally       23
+!endblock
+</PRE>
+<P>Collectively, these new attributes improve things in several ways:</P>
+<UL>
+<LI>heading rows can now include non-alphanumeric characters
+<LI>macros (e.g. change bars) can be applied to heading rows
+<LI>multi-line heading and footing rows are now supported.</UL>
+<H3><A NAME="Table positioning">9.1.8. Table positioning</A></H3>
+<P>The horizontal alignment and vertical placement of a table can be controlled by setting the <EM>align</EM> and <EM>placement</EM> parameters of the <A HREF="../ref/ftable.html">table</A> filter respectively. The permitted <EM>align</EM> values are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Left
+</TD>
+<TD>
+left-align the table
+</TD>
+</TR>
+<TR>
+<TD>
+Center
+</TD>
+<TD>
+center the table
+</TD>
+</TR>
+<TR>
+<TD>
+Right
+</TD>
+<TD>
+right-align the table
+</TD>
+</TR>
+<TR>
+<TD>
+Inner
+</TD>
+<TD>
+align the table with the inner margin
+</TD>
+</TR>
+<TR>
+<TD>
+Outer
+</TD>
+<TD>
+align the table with the outer margin
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <EM>wide</EM> parameter changes the left indent of a table to include the sidehead of a page. Therefore, the <EM>wide</EM> parameter will impact the horizontal positioning of any table which is not right-aligned.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>The permitted <EM>placement</EM> values are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Float
+</TD>
+<TD>
+next column if necessary
+</TD>
+</TR>
+<TR>
+<TD>
+Pagetop
+</TD>
+<TD>
+top of the next page
+</TD>
+</TR>
+<TR>
+<TD>
+Columntop
+</TD>
+<TD>
+top of the next column
+</TD>
+</TR>
+<TR>
+<TD>
+Lefttop
+</TD>
+<TD>
+top of the next left-hand page
+</TD>
+</TR>
+<TR>
+<TD>
+Righttop
+</TD>
+<TD>
+top of the next right-hand page
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Table filtering and sorting">9.1.9. Table filtering and sorting</A></H3>
+<P>Tables can now be filtered and sorted by using the new <EM>where</EM> and <EM>sort</EM> attributes of the <A HREF="../ref/ftable.html">table</A> filter. These attributes are also supported by the class filters (e.g. terms, references). In either case, filtering is done before sorting.</P>
+<P>The <EM>where</EM> attribute takes an expression which is evaluated for each record. Special symbols available are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$_
+</TD>
+<TD>
+the current record
+</TD>
+</TR>
+<TR>
+<TD>
+$o{&quot;xyz&quot;}
+</TD>
+<TD>
+the value of column xyz
+</TD>
+</TR>
+</TABLE>
+
+<P><EM>sort</EM> takes a comma-separated list of column names to sort on. If no columns are specified, the data is sorted using all columns in the order in which they appear. All sorting is done alphabetically - numeric sorting is not supported.</P>
+<H3><A NAME="Landscape tables">9.1.10. Landscape tables</A></H3>
+<P>Landscape tables are now supported via the <EM>landscape</EM> parameter of the <A HREF="../ref/ftable.html">table</A> filter. The value is the height allocated to the area in which the table is placed. If a unit is not specified, the value is assumed to be a percentage of the text column height. For convenience, a value of 1 implies a full page table. Some examples are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=&quot;50pt&quot;
+</TD>
+<TD>
+height allocated to table is 50 points
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=&quot;50%&quot;
+</TD>
+<TD>
+half page table
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=50
+</TD>
+<TD>
+half page table (% is the default units)
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=1
+</TD>
+<TD>
+full page table (1 implies 100%)
+</TD>
+</TR>
+<TR>
+<TD>
+landscape
+</TD>
+<TD>
+full page table (syntactic shorthand for above)
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>This feature is currently <B>use at your own risk</B>. In particular, long tables and table titles confuse it badly. Furthermore, the <EM>align</EM> and <EM>placement</EM> parameters are effectively ignored for landscape tables.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="Column alignment">9.1.11. Column alignment</A></H3>
+<P>The <EM>colaligns</EM> parameter of the <A HREF="../ref/ftable.html">table</A> filter can now be used to control the alignment of text within columns of a table. For example:</P>
+<PRE>
+!block  table; colaligns=&quot;LCCR&quot;
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN='Left'>
+<STRONG>Name</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column2</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column3</STRONG>
+</TD>
+<TD ALIGN='Right'>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+A
+</TD>
+<TD ALIGN='Center'>
+B
+</TD>
+<TD ALIGN='Center'>
+C
+</TD>
+<TD ALIGN='Right'>
+1.0
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+X
+</TD>
+<TD ALIGN='Center'>
+Hello dear world
+</TD>
+<TD ALIGN='Center'>
+Y
+</TD>
+<TD ALIGN='Right'>
+10.2
+</TD>
+</TR>
+</TABLE>
+
+<P>The value of <EM>colaligns</EM> is usually a sequence of the letters <EM>L</EM>, <EM>C</EM> and <EM>R</EM> (which mean what one would expect). If you prefer, a comma-separated list of the values <EM>Left</EM>, <EM>Center</EM> and <EM>Right</EM> can be specified. For example:</P>
+<PRE>
+!block  table; colaligns=&quot;Left,Center,Center,Right&quot;
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+</PRE>
+<H3><A NAME="Cell attributes">9.1.12. Cell attributes</A></H3>
+<P>Cells within a table can now be given attributes by preceding the cell value with a semicolon-separated list of name-value pairs enclosed in square brackets. For example:</P>
+<PRE>
+!block  table; colaligns=&quot;LCCR&quot;
+Name    Column2             Column3     Column4
+A       [align=Left]B       C           [bgcolor=Green]1.0
+X       Hello dear world    Y           [bgcolor=Red]10.2
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN='Left'>
+<STRONG>Name</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column2</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column3</STRONG>
+</TD>
+<TD ALIGN='Right'>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+A
+</TD>
+<TD ALIGN='Left'>
+B
+</TD>
+<TD ALIGN='Center'>
+C
+</TD>
+<TD ALIGN='Right' BGCOLOR='Green'>
+1.0
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+X
+</TD>
+<TD ALIGN='Center'>
+Hello dear world
+</TD>
+<TD ALIGN='Center'>
+Y
+</TD>
+<TD ALIGN='Right' BGCOLOR='Red'>
+10.2
+</TD>
+</TR>
+</TABLE>
+
+<P>The cell attributes supported are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>General:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+align
+</TD>
+<TD>
+horizontal alignment (Left, Center, Right)
+</TD>
+</TR>
+<TR>
+<TD>
+valign
+</TD>
+<TD>
+vertical alignment (Top, Middle, Bottom, Baseline)
+</TD>
+</TR>
+<TR>
+<TD>
+cols
+</TD>
+<TD>
+the number of columns this cell spans (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+rows
+</TD>
+<TD>
+the number of rows this cell spans (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+bgcolor
+</TD>
+<TD>
+background colour of cell (see below)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>PS only:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+fill
+</TD>
+<TD>
+background colour fill percentage
+</TD>
+</TR>
+<TR>
+<TD>
+truling
+</TD>
+<TD>
+ruling setting for top of cell
+</TD>
+</TR>
+<TR>
+<TD>
+bruling
+</TD>
+<TD>
+ruling setting for bottom of cell
+</TD>
+</TR>
+<TR>
+<TD>
+lruling
+</TD>
+<TD>
+ruling setting for left of cell
+</TD>
+</TR>
+<TR>
+<TD>
+rruling
+</TD>
+<TD>
+ruling setting for right of cell
+</TD>
+</TR>
+<TR>
+<TD>
+angle
+</TD>
+<TD>
+angle of text (0, 90, 180, 270)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>HTML only:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+nowrap
+</TD>
+<TD>
+disable word wrap for this cell
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Special:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+sdf
+</TD>
+<TD>
+treat the cell text as SDF (rather than as phrase text)
+</TD>
+</TR>
+<TR>
+<TD>
+tag
+</TD>
+<TD>
+phrase tag to apply to cell text
+</TD>
+</TR>
+<TR>
+<TD>
+paratag
+</TD>
+<TD>
+paragraph style to apply to cell text
+</TD>
+</TR>
+</TABLE>
+
+<P>For PS (i.e. MIF) generation, the supported colour values are <EM>Black</EM>, <EM>White</EM>, <EM>Red</EM>, <EM>Green</EM>, <EM>Blue</EM>, <EM>Yellow</EM>, <EM>Cyan</EM> and <EM>Magenta</EM>. If a different colour is specified, it is ignored. The supported fill values are 100, 90, 70, 50, 30, 10 and 3. If a fill value is not specified, 100% fill is used.</P>
+<P>For HTML generation, any of the HTML colours names (including those supported for PS generation) or the &quot;#rrggbb&quot; form can be used.</P>
+<P>The permitted ruling values are <EM>Vthin</EM>, <EM>Thin</EM>, <EM>Medium</EM>, <EM>Thick</EM> and <EM>Double</EM>.</P>
+<P>The <EM>sdf</EM>, <EM>tag</EM> and <EM>paratag</EM> attributes control the way in which the cell text is converted to SDF:</P>
+<OL>
+<LI>If <EM>sdf</EM> is set, the cell text is already SDF.
+<LI>Otherwise if <EM>tag</EM> is set, the SDF paragraph is paratag:{{tag:text}}.
+<LI>Otherwise, the paragraph is paratag:text.</OL>
+<P><EM>tag</EM> is usually set via the <EM>tags</EM> or <EM>groups</EM> parameters of the <A HREF="../ref/ftable.html">table</A> filter.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG><EM>paratag</EM> is not yet implemented.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="Spreadsheet calculations">9.1.13. Spreadsheet calculations</A></H3>
+<P><EM>The spreadsheet expression evaluator and the documentation below was written by Tim Hudson (<A HREF="mailto:tjh@cryptsoft.com">tjh@cryptsoft.com</A>)</EM>.</P>
+<P>Spreadsheet style calculations have been introduced into SDF using the standard <EM>[[ ]]</EM> syntax with a prefix of <EM>+</EM> (or <EM>=</EM>) indicating that the expression is to be evaluated by the calculation routines.</P>
+<P>This extension has been loosely modelled on <A HREF="http://www.microsoft.com">Microsoft</A> <EM>Excel</EM>&#174;  in terms of the initial functions supported and the syntax used.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Calculation support for a table can be disabled by adding in an attribute of <EM>nocalcs</EM> (otherwise the pointers required to table data that are needed when doing spreadsheet calculations occur for each table cell).
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>Each <EM>cell</EM> in a table has an <EM>cellid</EM> which is made up of a single uppercase letter indicating the column index and a number indicating the row index (counting from 1 and excluding the heading rows). The upper left <EM>cell</EM> is hence <EM>A1</EM>.</P>
+<P>An example grid indicating <EM>cellid</EM>s:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Title1</STRONG>
+</TD>
+<TD>
+<STRONG>Title2</STRONG>
+</TD>
+<TD>
+<STRONG>Title3</STRONG>
+</TD>
+<TD>
+<STRONG>Title4</STRONG>
+</TD>
+<TD>
+<STRONG>Title5</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A1
+</TD>
+<TD>
+B1
+</TD>
+<TD>
+C1
+</TD>
+<TD>
+D1
+</TD>
+<TD>
+E1
+</TD>
+</TR>
+<TR>
+<TD>
+A2
+</TD>
+<TD>
+B2
+</TD>
+<TD>
+C2
+</TD>
+<TD>
+D2
+</TD>
+<TD>
+E2
+</TD>
+</TR>
+<TR>
+<TD>
+A3
+</TD>
+<TD>
+B3
+</TD>
+<TD>
+C3
+</TD>
+<TD>
+D3
+</TD>
+<TD>
+E3
+</TD>
+</TR>
+<TR>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+</TR>
+<TR>
+<TD>
+A100
+</TD>
+<TD>
+B100
+</TD>
+<TD>
+C100
+</TD>
+<TD>
+D100
+</TD>
+<TD>
+E100
+</TD>
+</TR>
+</TABLE>
+
+<P>A range of <EM>cellid</EM>s is specified using the syntax <EM>cellid1:cellid2</EM>. For example: <EM>A1:C1</EM> is exactly the same as <EM>A1,B1,C1</EM></P>
+<P>An expression consists of a combination of standard Perl operators and spreadsheet functions and <EM>cellid</EM>s or <EM>cellid</EM> ranges.</P>
+<P>Standard Perl operators include:</P>
+<UL>
+<LI>+ - * /</UL>
+<P>Spreadsheet functions use the syntax <EM>FUNCTION(ARG1,ARG2,...ARGN)</EM>.</P>
+<P>The following functions are supported:</P>
+<UL>
+<LI><EM>AVERAGE</EM> - the average - SUM(ARGS)/COUNT(ARGS)
+<LI><EM>SUM</EM> - the sum of the args - same as ARG1+ARG2+...+ARGN
+<LI><EM>MIN</EM> - the minumum argument value
+<LI><EM>MAX</EM> - the maximum argument value
+<LI><EM>COUNT</EM> - the number of arguments
+<LI><EM>PRODUCT</EM> - the product of the args - same as ARG1*ARGN*...*ARGN
+<LI><EM>ROWSUM</EM> - the <EM>SUM</EM> of all the cells in the row to the left of the current cell
+<LI><EM>ROWPROD</EM> - the <EM>PRODUCT</EM> of all the cells in the row to the left of the current cell
+<LI><EM>COLSUM</EM> - the <EM>SUM</EM> of all the cells in the column above the current cell
+<LI><EM>COLPROD</EM> - the <EM>PRODUCT</EM> of all the cells in the column above the current cell</UL>
+<P>A simple example:</P>
+<PRE>
+!block table; style=&quot;grid&quot;
+Count         Price        Total
+10            5            [\[=A1*B1]\]
+15            5.23         [\[=ROWPROD]\]
+[\[=COLSUM]]   [\[=B1+B2]\]   [\[=COLSUM]\]
+!endblock
+</PRE>
+<P>Which generates the result below. (Ok, summing two prices is meaningless, but it illustrates the syntax.)</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Count</STRONG>
+</TD>
+<TD>
+<STRONG>Price</STRONG>
+</TD>
+<TD>
+<STRONG>Total</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+10
+</TD>
+<TD>
+5
+</TD>
+<TD>
+50.00
+</TD>
+</TR>
+<TR>
+<TD>
+15
+</TD>
+<TD>
+5.23
+</TD>
+<TD>
+78.45
+</TD>
+</TR>
+<TR>
+<TD>
+25.00
+</TD>
+<TD>
+10.23
+</TD>
+<TD>
+128.45
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>values are available until the next table is processed so you can refer to data inside <EM>normal</EM> paragraphs after the table like this [\[=A1]\] which evaluates to 10.00</P>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<P>A spreadsheet expression will recursively evaluate any expressions contained in <EM>cells</EM> that are used in an expression. In the example above, the expression in <EM>cell</EM> <EM>C3</EM> depends on the results of the expression in <EM>cell</EM> <EM>C1</EM> and <EM>C2</EM>.</P>
+<H3><A NAME="Arbitrary page sizes">9.1.14. Arbitrary page sizes</A></H3>
+<P>Generally speaking, SDF can now support arbitrary page sizes. The catch is that the page size must now be specified up front via the OPT_PAGE_SIZE variable on the <A HREF="../ref/minit.html">init</A> line or via <A HREF="../ref/sdf.html">sdf</A>'s -S option. (Previously, the (no longer supported) DOC_PAGE_SIZE variable could be specified anywhere in the document.)</P>
+<P>The supported values of OPT_PAGE_SIZE are given below. The default page size is <EM>global</EM>.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Width</STRONG>
+</TD>
+<TD>
+<STRONG>Height</STRONG>
+</TD>
+<TD>
+<STRONG>Comment</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+global
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+will fit on either A4 or letter
+</TD>
+</TR>
+<TR>
+<TD>
+A3
+</TD>
+<TD>
+29.7cm
+</TD>
+<TD>
+42.0cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+A4
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+29.7cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+A5
+</TD>
+<TD>
+14.8cm
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+B4
+</TD>
+<TD>
+25.7cm
+</TD>
+<TD>
+36.4cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+B5
+</TD>
+<TD>
+17.6cm
+</TD>
+<TD>
+25.0cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+letter
+</TD>
+<TD>
+8.5in
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+legal
+</TD>
+<TD>
+8.5in
+</TD>
+<TD>
+14.0in
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+tabloid
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+17.0in
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG><EM>global</EM> is 0.23&quot; narrower than <EM>letter</EM> and 1.76cm shorter than <EM>A4</EM>.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>New page sizes can be defined in <TT>sdf.ini</TT>. A rotated version is also available for each page size. Rotated sizes are named with an appended R. For example, the rotated A4 size is called A4R.</P>
+<H3><A NAME="Headers and footers">9.1.15. Headers and footers</A></H3>
+<P>SDF now provides 3 ways of controlling headers and footers:</P>
+<UL>
+<LI>The OPT_HEADINGS variable (high level control)
+<LI>PAGE_<EM>page</EM>_<EM>HF</EM>_<EM>ICO</EM><EM>n</EM> variables (medium level control)
+<LI>PAGE_<EM>page</EM>_<EM>HF</EM> macros (low level control)</UL>
+<P>where:</P>
+<UL>
+<LI><EM>page</EM> is FIRST, RIGHT or LEFT
+<LI><EM>HF</EM> is HEADER or FOOTER
+<LI><EM>ICO</EM> is INNER, CENTER or OUTER
+<LI><EM>n</EM> is the line number within the header or footer (usually 1 or 2).</UL>
+<P>The meaning of each page type is explained below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Page</STRONG>
+</TD>
+<TD>
+<STRONG>Usage</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+FIRST
+</TD>
+<TD>
+the first page in the document
+</TD>
+</TR>
+<TR>
+<TD>
+RIGHT
+</TD>
+<TD>
+the page used for single-sided documents and the right hand side of double-sided documents
+</TD>
+</TR>
+<TR>
+<TD>
+LEFT
+</TD>
+<TD>
+the left hand side of double-sided documents; ignored for single-sided documents
+</TD>
+</TR>
+</TABLE>
+
+<P>Supported OPT_HEADINGS values and their meanings are given below:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+0
+</TD>
+<TD>
+no header, no footer
+</TD>
+</TR>
+<TR>
+<TD>
+1
+</TD>
+<TD>
+single line header, single line footer
+</TD>
+</TR>
+<TR>
+<TD>
+2
+</TD>
+<TD>
+two line header and two line footer
+</TD>
+</TR>
+<TR>
+<TD>
+3
+</TD>
+<TD>
+two line header and three line footer
+</TD>
+</TR>
+<TR>
+<TD>
+4
+</TD>
+<TD>
+two line header and four line footer
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Header/footer special tags">9.1.16. Header/footer special tags</A></H3>
+<P>The following special tags are supported within headers and footers:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PAGENUM
+</TD>
+<TD>
+current page number
+</TD>
+</TR>
+<TR>
+<TD>
+PAGECOUNT
+</TD>
+<TD>
+highest page number
+</TD>
+</TR>
+<TR>
+<TD>
+PARATEXT
+</TD>
+<TD>
+paragraph text (e.g. Hardware requirements)
+</TD>
+</TR>
+<TR>
+<TD>
+PARANUM
+</TD>
+<TD>
+paragraph number (e.g. Appendix A)
+</TD>
+</TR>
+<TR>
+<TD>
+PARANUMONLY
+</TD>
+<TD>
+paragraph number only (e.g. A)
+</TD>
+</TR>
+<TR>
+<TD>
+PARASHORT
+</TD>
+<TD>
+value of <EM>short</EM> attribute of paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+PARALAST
+</TD>
+<TD>
+text of last paragraph on page with the nominated style
+</TD>
+</TR>
+</TABLE>
+
+<P>The <EM>PARA*</EM> tags require a comma separated list of paragraph styles to be nominated as the text of the phrase, e.g. {{PARATEXT:H1,A1,P1}}.</P>
+<P>The <EM>PARASHORT</EM> tag is useful for placing an alternative heading in a header, say. For example, you might set up your header to include {{PARASHORT:H1}} and have the following text in your document:</P>
+<PRE>
+  H1[short='Getting started'] Getting started with SDF
+</PRE>
+<P>The <EM>PARALAST</EM> tag is useful for producing dictionary-like headers.</P>
+<H3><A NAME="Header/footer borders">9.1.17. Header/footer borders</A></H3>
+<P>High level control over header/footer borders is provided by the OPT_BORDERS variable. The supported values and their meanings are given below:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+0
+</TD>
+<TD>
+no header/footer borders
+</TD>
+</TR>
+<TR>
+<TD>
+1
+</TD>
+<TD>
+line below header, line above footer
+</TD>
+</TR>
+<TR>
+<TD>
+2
+</TD>
+<TD>
+lines above and below header, line above footer
+</TD>
+</TR>
+</TABLE>
+
+<P>Finer control is available by setting the following variables:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>page</EM>_HEADER_BORDER
+</TD>
+<TD>
+border specification string
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>page</EM>_FOOTER_BORDER
+</TD>
+<TD>
+border specification string
+</TD>
+</TR>
+</TABLE>
+
+<P>where <EM>page</EM> is either FIRST, RIGHT or LEFT.</P>
+<P>A <EM>border specification</EM> string is a comma-separated list of attributes which collectively describe the border. The format of each attribute is name[=value]. The supported attributes are:</P>
+<UL>
+<LI><EM>top</EM> - a line above the area
+<LI><EM>bottom</EM> - a line below the area
+<LI><EM>box</EM> - a box around the area
+<LI><EM>radius</EM> - for a box, the radius of the corner.</UL>
+<P>For <EM>top</EM>, <EM>bottom</EM> and <EM>box</EM>, the value of the attribute is the line width in points.</P>
+<H3><A NAME="Page backgrounds">9.1.18. Page backgrounds</A></H3>
+<P>In order to support fancy background images, SDF supports the following variables:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>page</EM>_BACKGROUND
+</TD>
+<TD>
+the logical image name
+</TD>
+</TR>
+</TABLE>
+
+<P>where <EM>page</EM> is either FIRST, RIGHT or LEFT.</P>
+<P>When <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> is being used to generate <A HREF="http://www.adobe.com">PostScript</A>, the image name is mapped to a master page called <EM>backgrnd</EM> within a file called <EM>backgrnd</EM>.mif.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>At the moment, objects from the master page (excluding TextRects) are directly transferred to the generated MIF file. This means that objects in the lower right hand corner of an A4 master page will not will be positioned nicely if the paper size is changed to A5, say.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="Page layout variables">9.1.19. Page layout variables</A></H3>
+<P>Page margins can now be controlled via the following variables:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_TOP
+</TD>
+<TD>
+size of the margin above the header, if any
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_BOTTOM
+</TD>
+<TD>
+size of the margin below the footer, if any
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_INNER
+</TD>
+<TD>
+size of the inner margin
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_MARGIN_OUTER
+</TD>
+<TD>
+size of the outer margin
+</TD>
+</TR>
+</TABLE>
+
+<P>The positioning of headers and footers can now be controlled via the following variables:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>page</EM>_HEADER_HEIGHT
+</TD>
+<TD>
+height of the area allocated to the header
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>page</EM>_HEADER_GAP
+</TD>
+<TD>
+size of the gap between the header area and the text area
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>page</EM>_FOOTER_HEIGHT
+</TD>
+<TD>
+height of the area allocated to the footer
+</TD>
+</TR>
+<TR>
+<TD>
+PAGE_<EM>page</EM>_FOOTER_GAP
+</TD>
+<TD>
+size of the gap between the text area and the footer area
+</TD>
+</TR>
+</TABLE>
+
+<P>where <EM>page</EM> is either FIRST, RIGHT or LEFT.</P>
+<P>After the margins and header/footer are allocated, the remaining text area contains 1 or more text columns and an optional side head. The layout of these is controlled by the following variables:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_COLUMNS
+</TD>
+<TD>
+numbers of text columns
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_COLUMN_GAP
+</TD>
+<TD>
+space between columns
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_SIDEHEAD_WIDTH
+</TD>
+<TD>
+size allocated to the sidehead
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_SIDEHEAD_GAP
+</TD>
+<TD>
+space between the side-head and first text column
+</TD>
+</TR>
+</TABLE>
+
+<P>The following read-only variables provide information on the page layout:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_PAGE_WIDTH
+</TD>
+<TD>
+width of page
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_PAGE_HEIGHT
+</TD>
+<TD>
+height of page
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_FULL_WIDTH
+</TD>
+<TD>
+width of text area including the side-head
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TEXT_WIDTH
+</TD>
+<TD>
+width of text area available for text columns
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TEXT_HEIGHT
+</TD>
+<TD>
+height of text area
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COLUMN_WIDTH
+</TD>
+<TD>
+width of a text column
+</TD>
+</TR>
+</TABLE>
+
+<P>All the information variables are in units of points. The text area is the area allocated to text, excluding the header and footer (if any) on the RIGHT page.</P>
+<H3><A NAME="Page control within a book">9.1.20. Page control within a book</A></H3>
+<P>When a book is being generated, each component of the book may have its own FIRST, RIGHT and LEFT pages, i.e. all of the macros and variables above support an extended set of <EM>page</EM> values <EM>component</EM>_<EM>FRL</EM> where:</P>
+<UL>
+<LI><EM>component</EM> is the name of the component
+<LI><EM>FRL</EM> is FIRST, RIGHT or LEFT.</UL>
+<P>The component names supported are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+FRONT
+</TD>
+<TD>
+the cover component
+</TD>
+</TR>
+<TR>
+<TD>
+PRETOC
+</TD>
+<TD>
+components before the contents
+</TD>
+</TR>
+<TR>
+<TD>
+TOC
+</TD>
+<TD>
+the table of contents
+</TD>
+</TR>
+<TR>
+<TD>
+LOF
+</TD>
+<TD>
+the list of figures
+</TD>
+</TR>
+<TR>
+<TD>
+LOT
+</TD>
+<TD>
+the list of tables
+</TD>
+</TR>
+<TR>
+<TD>
+PRECHAPTER
+</TD>
+<TD>
+components before the chapters
+</TD>
+</TR>
+<TR>
+<TD>
+CHAPTER
+</TD>
+<TD>
+a normal chapter
+</TD>
+</TR>
+<TR>
+<TD>
+APPENDIX
+</TD>
+<TD>
+an appendix
+</TD>
+</TR>
+<TR>
+<TD>
+PREIX
+</TD>
+<TD>
+components before the index
+</TD>
+</TR>
+<TR>
+<TD>
+IX
+</TD>
+<TD>
+the index
+</TD>
+</TR>
+</TABLE>
+
+<P>If a component does not have a component-specific macro/variable defined, then the generic macro/variable is used.</P>
+<H3><A NAME="FrameMaker templates are no longer required">9.1.21. FrameMaker templates are no longer required</A></H3>
+<P>Previously, SDF produced MIF documents by merging generated MIF paragraphs into FrameMaker templates. This approach was easy to implement but maintaining the FrameMaker templates was difficult as every look required several templates for <EM>each</EM> page size!</P>
+<P>FrameMaker templates can still be used but are no longer needed, nor recommended. Instead, the definitions of paragraph styles, phrase styles, table styles and graphic (border) frames is now done via <EM>SDF templates</EM>. SDF templates have the following advantages:</P>
+<OL>
+<LI>Templates can be parameterised so that a single template can support any number of page sizes.
+<LI>Each look only requires a single template, rather than a template for each component of a FrameMaker book.
+<LI>Templates can inherit definitions from other templates, making it much easier to create and maintain templates.
+<LI>Each definition supports inheritance, so a new paragraph style, say, can be defined in terms of the differences between it and a parent style.</OL>
+<P>The new <EM>sdtgen</EM> command can be used to build an SDF template from a FrameMaker one. Typically, <EM>sdtgen</EM> is used to create an initial template which is then simplified via definition inheritance and template inheritance.</P>
+<H3><A NAME="Event processing enhancements">9.1.22. Event processing enhancements</A></H3>
+<P>The following new symbols are now available within event processing for paragraphs:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$level
+</TD>
+<TD>
+the current heading level (<EM>before</EM> this paragraph)
+</TD>
+</TR>
+<TR>
+<TD>
+$prev_style
+</TD>
+<TD>
+the style of the previous paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+$prev_text
+</TD>
+<TD>
+the text of the previous paragraph
+</TD>
+</TR>
+<TR>
+<TD>
+%prev_attr
+</TD>
+<TD>
+the attributes of the previous paragraph
+</TD>
+</TR>
+</TABLE>
+
+<P>These symbols make it much easier to do some really nice things. For example, the following rule can be used to put level 2 headings on a new page unless the heading is the first one within a chapter:</P>
+<PRE>
+!on paragraph '[HAP]2';; if ($level != 1) {$attr{'top'} = 1}
+</PRE>
+<HR>
+<H2><A NAME="2.000beta8 - Fixes">9.2. Fixes</A></H2>
+<P>Tim Hudson has contributed a number of fixes to this release including:</P>
+<UL>
+<LI>this version should now work with Perl 5 again - the previous version triggered a Perl 5 syntax error
+<LI>the <EM>IMPORT</EM> pragma now supports filename extension adding ala the <A HREF="../ref/mimport.html">import</A> macro
+<LI>centred figures now work as expected in HTML
+<LI>numerous Windows help generation fixes/enhancements.</UL>
+<P>Other fixes include:</P>
+<UL>
+<LI>the renaming of xx.out.ps to xx.ps is now done by <A HREF="../ref/sdfbatch.html">sdfbatch</A>, so failures (due to lack of disk space, say) are now handled much better than they previously were
+<LI>topics mode now generates an error if the heading of a topic is duplicated within a file (see <A HREF="2000.html#Miscellaneous things">Miscellaneous things</A> above)
+<LI>headings containing a ? character should no longer cause problems
+<LI>some bugs in <A HREF="../ref/sdfget.html">sdfget</A>'s extraction of documentation from C code have been fixed (thanks to Keith Ponting).</UL>
+<HR>
+<H2><A NAME="2.000beta8 - Incompatibilities">9.3. Incompatibilities</A></H2>
+<P>As the default page size is now <EM>global</EM> rather than <EM>A4</EM>, page breaks may occur slightly earlier than they previously did. The advantage of changing to <EM>global</EM> is that documents should now print successfully on US letter paper.</P>
+<P>Memos, faxes, minutes and newsletters no longer have the company address in the top right hand corner. (I'll fix this soon, but it is not a high priority at the moment.)</P>
+<P>As <EM>txt</EM> and <EM>pod</EM> outputs use a different algorithm for deciding column widths when a table does not have a format parameter, some table cells may no longer fit when these output formats are used.</P>
+<P>The table attribute previously called <EM>headings</EM> has been renamed to <EM>parseline</EM> to better reflect its purpose and to make way for the new meaning.</P>
+<P>The DOC_TOCTEXT variable has been renamed to DOC_TOC_TITLE. The DOC_TOCGRAPHIC variable has been renamed to DOC_TOC_GRAPHIC.</P>
+<P>The <EM>newsletter</EM> style has been renamed to <EM>newslttr</EM>.</P>
+<P><EM>overhead</EM> is now a look, rather than a style. The overhead look is untested and rarely used, so use it at your own risk.</P>
+<P>The aliases <EM>sdf2htmls</EM> and <EM>sdf2txts</EM> have been renamed to <EM>sdf2fmhtml</EM> and <EM>sdf2fmtxt</EM> respectively.</P>
+<P><TT>/usr/local/bin/perl5</TT> is now the default perl interpreter used.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b8a.html">Previous Topic</A> | <A HREF="2000b7c.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

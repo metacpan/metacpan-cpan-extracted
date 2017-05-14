@@ -1,5 +1,11 @@
 Revision history for CPANTS::Kwalitee::Report
 
+0.09  Wed May 10 10:30:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.08  Tue May 09 12:40:00 2017
+      - Added key 'provides' to the Makefile.PL script.
+
 0.07  Thu Mar 09 12:30:00 2017
       - Added missing dependency on XML::RSS::Parser.
 

@@ -1,0 +1,25 @@
+NAME
+    XAO::DO::FS::Glue::MySQL - Fast MySQL driver for XAO::FS
+
+SYNOPSIS
+     my $odb=XAO::Objects->new(objname => 'FS::Glue',
+                               dsn     => 'OS:MySQL:testdatabase');
+
+DESCRIPTION
+    This is a faster MySQL driver for XAO::FS that does not use DBI/DBD and
+    connects to the database directly. It is otherwise compatible with
+    MySQL_DBI driver and can be used everywhere MySQL_DBI is used by simply
+    substituting 'OS:MySQL_DBI:dbname' string with 'OS:MySQL:dbname' in
+    connection to the database.
+
+    See the XAO::DO::FS::Glue::MySQL_DBI manpage for the description of
+    methods.
+
+AUTHORS
+    Copyright (c) 2002 XAO Inc.
+
+    Andrew Maltsev <am@xao.com>
+
+SEE ALSO
+    the XAO::FS manpage, the XAO::DO::FS::Glue::MySQL_DBI manpage.
+

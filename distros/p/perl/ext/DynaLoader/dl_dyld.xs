@@ -9,11 +9,13 @@
  */
 
 /*
-    And Gandalf said: 'Many folk like to know beforehand what is to
-    be set on the table; but those who have laboured to prepare the
-    feast like to keep their secret; for wonder makes the words of
-    praise louder.'
-*/
+ *  And Gandalf said: 'Many folk like to know beforehand what is to
+ *  be set on the table; but those who have laboured to prepare the
+ *  feast like to keep their secret; for wonder makes the words of
+ *  praise louder.'
+ *
+ *     [p.970 of _The Lord of the Rings_, VI/v: "The Steward and the King"]
+ */
 
 /* Porting notes:
 
@@ -37,7 +39,9 @@ been tested on NeXT platforms.
 
 */
 
+#define PERL_EXT
 #include "EXTERN.h"
+#define PERL_IN_DL_DYLD_XS
 #include "perl.h"
 #include "XSUB.h"
 
@@ -171,9 +175,10 @@ dl_load_file(filename, flags=0)
 
 
 void *
-dl_find_symbol(libhandle, symbolname)
+dl_find_symbol(libhandle, symbolname, ign_err=0)
     void *		libhandle
     char *		symbolname
+    int	        	ign_err
     CODE:
     symbolname = Perl_form_nocontext("_%s", symbolname);
     DLDEBUG(2, PerlIO_printf(Perl_debug_log,
@@ -183,9 +188,10 @@ dl_find_symbol(libhandle, symbolname)
     DLDEBUG(2, PerlIO_printf(Perl_debug_log,
 			     "  symbolref = %lx\n", (unsigned long) RETVAL));
     ST(0) = sv_newmortal() ;
-    if (RETVAL == NULL)
-	SaveError(aTHX_ "%s",dlerror()) ;
-    else
+    if (RETVAL == NULL) {
+        if (!ign_err)
+	    SaveError(aTHX_ "%s",dlerror()) ;
+    } else
 	sv_setiv( ST(0), PTR2IV(RETVAL) );
 
 
@@ -201,7 +207,7 @@ void
 dl_install_xsub(perl_name, symref, filename="$Package")
     char *	perl_name
     void *	symref
-    char *	filename
+    const char *	filename
     CODE:
     DLDEBUG(2,PerlIO_printf(Perl_debug_log, "dl_install_xsub(name=%s, symref=%x)\n",
 	    perl_name, symref));
@@ -211,12 +217,29 @@ dl_install_xsub(perl_name, symref, filename="$Package")
 					      XS_DYNAMIC_FILENAME)));
 
 
-char *
+SV *
 dl_error()
     CODE:
     dMY_CXT;
-    RETVAL = dl_last_error ;
+    RETVAL = newSVsv(MY_CXT.x_dl_last_error);
     OUTPUT:
     RETVAL
+
+#if defined(USE_ITHREADS)
+
+void
+CLONE(...)
+    CODE:
+    MY_CXT_CLONE;
+
+    PERL_UNUSED_VAR(items);
+
+    /* MY_CXT_CLONE just does a memcpy on the whole structure, so to avoid
+     * using Perl variables that belong to another thread, we create our 
+     * own for this thread.
+     */
+    MY_CXT.x_dl_last_error = newSVpvs("");
+
+#endif
 
 # end.

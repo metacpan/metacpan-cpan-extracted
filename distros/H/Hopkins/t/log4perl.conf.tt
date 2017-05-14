@@ -1,0 +1,3 @@
+log4perl.rootLogger = FATAL, default
+
+log4perl.appender.hopkins = Log::Log4perl::Appender::Screen

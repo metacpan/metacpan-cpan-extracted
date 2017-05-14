@@ -10,6 +10,8 @@ use warnings;
 
 use Exporter 'import';
 
+our $VERSION = '1.9.7';
+
 use warnings;
 use MIME::Base64;
 use Lemonldap::NG::Common::CGI;
@@ -70,8 +72,6 @@ use Digest::MD5;
 #inherits Lemonldap::NG::Portal::PasswordDBLDAP
 #inherits Apache::Session
 #link Lemonldap::NG::Common::Apache::Session::SOAP protected globalStorage
-
-our $VERSION = '1.4.10';
 
 use base qw(Lemonldap::NG::Common::CGI Exporter);
 our @ISA;
@@ -184,6 +184,14 @@ use constant {
     PM_ERROR_MSG             => 21,
     PM_LAST_LOGINS           => 22,
     PM_LAST_FAILED_LOGINS    => 23,
+    PM_OIDC_CONSENT          => 24,
+    PM_OIDC_SCOPE_OPENID     => 25,
+    PM_OIDC_SCOPE_PROFILE    => 26,
+    PM_OIDC_SCOPE_EMAIL      => 27,
+    PM_OIDC_SCOPE_ADDRESS    => 28,
+    PM_OIDC_SCOPE_PHONE      => 29,
+    PM_OIDC_SCOPE_OTHER      => 30,
+    PM_OIDC_CONFIRM_LOGOUT   => 31,
 };
 
 # EXPORTER PARAMETERS
@@ -213,7 +221,9 @@ our @EXPORT = qw( PE_IMG_NOK PE_IMG_OK PE_INFO PE_REDIRECT PE_DONE PE_OK
   PM_SAML_IDPSELECT PM_SAML_IDPCHOOSEN PM_REMEMBERCHOICE PM_SAML_SPLOGOUT
   PM_REDIRECTION PM_BACKTOSP PM_BACKTOCASURL PM_LOGOUT PM_OPENID_EXCHANGE
   PM_CDC_WRITER PM_OPENID_RPNS PM_OPENID_PA PM_OPENID_AP PM_ERROR_MSG
-  PM_LAST_LOGINS PM_LAST_FAILED_LOGINS
+  PM_LAST_LOGINS PM_LAST_FAILED_LOGINS PM_OIDC_CONSENT PM_OIDC_SCOPE_OPENID
+  PM_OIDC_SCOPE_PROFILE PM_OIDC_SCOPE_EMAIL PM_OIDC_SCOPE_ADDRESS
+  PM_OIDC_SCOPE_PHONE PM_OIDC_SCOPE_OTHER PM_OIDC_CONFIRM_LOGOUT
 );
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT, 'import' ], );
 
@@ -248,6 +258,8 @@ sub new {
     $self->getConf(@_)
       or $self->abort( "Configuration error",
         "Unable to get configuration: $Lemonldap::NG::Common::Conf::msg" );
+
+    $self->{multiValuesSeparator} ||= ';';
 
     # Test mandatory elements
 
@@ -286,6 +298,12 @@ sub new {
         $self->{captchaStorageOptions} = $self->{globalStorageOptions};
     }
 
+    # OpenIDConnect
+    $self->{oidcStorage} ||= $self->{globalStorage};
+    if ( !$self->{oidcStorageOptions} or !%{ $self->{oidcStorageOptions} } ) {
+        $self->{oidcStorageOptions} = $self->{globalStorageOptions};
+    }
+
     # 2. Domain
     $self->abort( "Configuration error",
         "You've to indicate a domain for cookies" )
@@ -307,7 +325,8 @@ sub new {
     foreach my $type (qw(authentication userDB passwordDB registerDB)) {
         my $module_name = 'Lemonldap::NG::Portal::';
         my $db_type     = $type;
-        my $db_name     = $self->{$db_type};
+        my $db_name     = $self->{$db_type}
+          or $self->abort("'$db_type' is not set");
 
         # Adapt module type to real module name
         $db_type =~ s/authentication/Auth/;
@@ -335,7 +354,7 @@ sub new {
     }
 
     # Check issuerDB path to load the correct issuerDB module
-    foreach my $issuerDBtype (qw(SAML OpenID CAS)) {
+    foreach my $issuerDBtype (qw(SAML OpenID CAS OpenIDConnect Get)) {
         my $module_name = 'Lemonldap::NG::Portal::IssuerDB' . $issuerDBtype;
 
         $self->lmLog( "[IssuerDB activation] Try issuerDB module $issuerDBtype",
@@ -537,8 +556,9 @@ sub setHiddenFormValue {
     # Store value
     if ($val) {
         $key = $prefix . $key;
-        $val = encode_base64($val) if $base64;
+        $val = encode_base64( $val, '' ) if $base64;
         $self->{portalHiddenFormValues}->{$key} = $val;
+        $self->lmLog( "Store $val in hidden key $key", 'debug' );
     }
 }
 
@@ -561,6 +581,7 @@ sub getHiddenFormValue {
     if ( my $val = $self->param($key) ) {
         $val = decode_base64($val) if $base64;
         return $val;
+        $self->lmLog( "Hidden value $val found for key $key", 'debug' );
     }
 
     # No value found
@@ -577,9 +598,13 @@ sub clearHiddenFormValue {
 
     unless ( defined $keys ) {
         delete $self->{portalHiddenFormValues};
+        $self->lmLog( "Delete all hidden values", 'debug' );
     }
     else {
-        delete $self->{portalHiddenFormValues}->{$_} foreach (@$keys);
+        foreach (@$keys) {
+            delete $self->{portalHiddenFormValues}->{$_};
+            $self->lmLog( "Delete hidden value for key $_", 'debug' );
+        }
     }
 
     return;
@@ -743,7 +768,31 @@ _RETURN $string Error string
 sub msg {
     my $self = shift;
     my $code = shift;
-    return &Lemonldap::NG::Portal::_i18n::msg( $code, $self->{lang} );
+    my $msg;
+
+    # Check for customized message
+    foreach ( @{ $self->{lang} } ) {
+        if ( $self->{ "msg_" . $_ . "_" . $code } ) {
+            $msg = $self->{ "msg_" . $_ . "_" . $code };
+            last;
+        }
+    }
+    $msg ||= $self->{ "msg_" . $code };
+
+    # Use customized message or built-in message
+    if ( defined $msg ) {
+
+        # Manage UTF-8
+        utf8::decode($msg);
+
+        $self->lmLog( "Use customized message $msg for message $code",
+            'debug' );
+    }
+    else {
+        $msg = &Lemonldap::NG::Portal::_i18n::msg( $code, $self->{lang} );
+    }
+
+    return $msg;
 }
 
 ##@method string error(int code)
@@ -779,8 +828,6 @@ sub error {
         $msg = &Lemonldap::NG::Portal::_i18n::error( $code, $self->{lang} );
     }
 
-    # Return message
-    # Manage SOAP
     return $msg;
 }
 
@@ -851,14 +898,25 @@ sub redirect {
     }
 }
 
-## @method protected hashref getApacheSession(string id, boolean noInfo)
+## @method protected hashref getApacheSession(string id, boolean noInfo, boolean $force, string $kind)
 # Try to recover the session corresponding to id and return session datas.
-# If $id is set to undef, return a new session.
+# If $id is set to undef or if $force is true, return a new session.
 # @param id session reference
 # @param noInfo do not set Apache REMOTE_USER
+# @param force Force session creation if it does not exist
+# @param kind Session kind
 # return Lemonldap::NG::Common::Session object
 sub getApacheSession {
-    my ( $self, $id, $noInfo ) = @_;
+    my ( $self, $id, $noInfo, $force, $kind ) = @_;
+
+    $kind ||= "SSO";
+
+    if ($id) {
+        $self->lmLog( "Try to get $kind session $id", 'debug' );
+    }
+    else {
+        $self->lmLog( "Try to get a new $kind session", 'debug' );
+    }
 
     my $apacheSession = Lemonldap::NG::Common::Session->new(
         {
@@ -867,12 +925,36 @@ sub getApacheSession {
             cacheModule          => $self->{localSessionStorage},
             cacheModuleOptions   => $self->{localSessionStorageOptions},
             id                   => $id,
-            kind                 => "SSO",
+            force                => $force,
+            kind                 => $kind,
         }
     );
 
-    if ( $apacheSession->error ) {
-        $self->lmLog( $apacheSession->error, 'debug' );
+    if ( my $err = $apacheSession->error ) {
+        $self->lmLog( $err,
+            ( $err =~ /Object does not exist/ ? 'notice' : 'error' ) );
+        return;
+    }
+
+    if ( $id and !$force and !$apacheSession->data ) {
+        $self->lmLog( "Session $kind $id not found", 'debug' );
+        return;
+    }
+
+    my $now = time;
+    if (
+            $id
+        and defined $apacheSession->data->{_utime}
+        and (
+            $now - $apacheSession->data->{_utime} > $self->{timeout}
+            or (    $self->{timeoutActivity}
+                and $apacheSession->data->{_lastSeen}
+                and $now - $apacheSession->data->{_lastSeen} >
+                $self->{timeoutActivity} )
+        )
+      )
+    {
+        $self->lmLog( "Session $kind $id expired", 'debug' );
         return;
     }
 
@@ -881,22 +963,29 @@ sub getApacheSession {
           if ($id);
         $self->{id} = $apacheSession->id;
     }
+
+    $self->lmLog( "Return $kind session " . $apacheSession->id, 'debug' );
+
     return $apacheSession;
 }
 
-## @method protected hashref getPersistentSession(string id)
-# Try to recover the persitent session corresponding to id and return session datas.
-# If $id is set to undef, return a new session.
-# @param id session reference
+## @method protected hashref getPersistentSession(string uid)
+# Try to recover the persistent session corresponding to uid and return session datas.
+# @param uid main user identifier (whatToTrace)
 # return Lemonldap::NG::Common::Session object
 sub getPersistentSession {
-    my ( $self, $id ) = @_;
+    my ( $self, $uid ) = @_;
+
+    return unless defined $uid;
+
+    # Compute persistent identifier
+    my $pid = $self->_md5hash($uid);
 
     my $persistentSession = Lemonldap::NG::Common::Session->new(
         {
             storageModule        => $self->{persistentStorage},
             storageModuleOptions => $self->{persistentStorageOptions},
-            id                   => $id,
+            id                   => $pid,
             force                => 1,
             kind                 => "Persistent",
         }
@@ -904,6 +993,16 @@ sub getPersistentSession {
 
     if ( $persistentSession->error ) {
         $self->lmLog( $persistentSession->error, 'debug' );
+    }
+
+    # Set _session_uid if not already present
+    unless ( defined $persistentSession->data->{_session_uid} ) {
+        $persistentSession->update( { '_session_uid' => $uid } );
+    }
+
+    # Set _utime if not already present
+    unless ( defined $persistentSession->data->{_utime} ) {
+        $persistentSession->update( { '_utime' => time } );
     }
 
     return $persistentSession;
@@ -938,8 +1037,7 @@ sub updatePersistentSession {
     $uid ||= $self->{sessionInfo}->{ $self->{whatToTrace} };
     return () unless ($uid);
 
-    my $persistentSession =
-      $self->getPersistentSession( $self->_md5hash($uid) );
+    my $persistentSession = $self->getPersistentSession($uid);
 
     $persistentSession->update($infos);
 
@@ -1076,11 +1174,11 @@ sub _subProcess {
 # status module with the result (portal error).
 sub updateStatus {
     my $self = shift;
-    print $Lemonldap::NG::Handler::Simple::statusPipe (
-        $self->{user} ? $self->{user} : $self->ipAddr )
+    my $p    = $Lemonldap::NG::Handler::Main::tsv->{statusPipe};
+    print $p ( $self->{user} ? $self->{user} : $self->ipAddr )
       . " => $ENV{SERVER_NAME}$ENV{SCRIPT_NAME} "
       . $self->{error} . "\n"
-      if ($Lemonldap::NG::Handler::Simple::statusPipe);
+      if ($p);
 }
 
 ##@method protected string notification()
@@ -1329,7 +1427,9 @@ sub printImage {
         return;
     }
     print $self->header(
-        $type . '; charset=utf-8; content-length=' . ( stat($file) )[10] );
+        -type             => "$type; charset=utf-8",
+        '-Content-Length' => ( stat($file) )[10]
+    );
     my $buffer = "";
     while ( read( IMAGE, $buffer, 4096 ) ) {
         print $buffer;
@@ -1462,6 +1562,24 @@ sub process {
           checkNotification issuerForAuthUser autoRedirect)
     );
     $self->updateStatus;
+    if (    !$self->{noAjaxHook}
+        and defined $self->http('Accept')
+        and $self->http('Accept') =~ m#(?:application|text)/json# )
+    {
+        if ( ( my $code = $self->{error} ) > 0 ) {
+            print $self->header(
+                -status                        => '401 Unauthorizated',
+                '-WWW-Authenticate'            => "SSO $self->{portal}",
+                '-Access-Control-Allow-Origin' => '*',
+            );
+            $self->quit;
+        }
+        else {
+            $self->header( -type => 'application/json' );
+            print '{"result":1,"message":"Authenticated"}';
+            $self->quit;
+        }
+    }
     return ( ( $self->{error} > 0 ) ? 0 : 1 );
 }
 
@@ -1600,9 +1718,10 @@ sub controlExistingSession {
 
         if ( $captcha && $captcha->image ) {
             binmode STDOUT;
-            print $self->header( 'image/png'
-                  . '; charset=utf-8; content-length='
-                  . length( $captcha->image ) );
+            print $self->header(
+                -type             => 'image/png; charset=utf-8',
+                '-Content-Length' => length( $captcha->image )
+            );
             print $captcha->image;
         }
         $self->quit();
@@ -1706,7 +1825,8 @@ sub controlExistingSession {
                 return $self->{error} if $self->{error} > 0;
 
                 # Collect logout services and build hidden iFrames
-                if ( %{ $self->{logoutServices} } ) {
+                if ( $self->{logoutServices} and %{ $self->{logoutServices} } )
+                {
 
                     $self->lmLog(
                         "Create iFrames to forward logout to services",
@@ -1779,6 +1899,8 @@ sub controlExistingSession {
             # A session has been found => call existingSession
             my $r = $self->_sub( 'existingSession', $id, $self->{sessionInfo} );
             if ( $r == PE_DONE ) {
+                $self->{user} = $self->{sessionInfo}
+                  ->{ $self->{whatToTrace} || '_whatToTrace' };
                 $self->{error} = $self->_subProcess(
                     qw(checkNotification issuerDBInit authInit issuerForAuthUser authFinish autoRedirect)
                 );
@@ -1787,6 +1909,19 @@ sub controlExistingSession {
             else {
                 return $r;
             }
+        }
+        else {
+            push @{ $self->{cookie} },
+              $self->cookie(
+                -name    => $self->{cookieName},
+                -value   => 0,
+                -domain  => $self->{domain},
+                -path    => "/",
+                -secure  => 0,
+                -expires => '-1d',
+                @_,
+              );
+            return PE_SESSIONEXPIRED;
         }
     }
 
@@ -1948,6 +2083,7 @@ sub modifyPassword {
 
 ##@apmethod int setSessionInfo()
 # Set ipAddr, startTime, updateTime, _utime and _userDB
+# Set _lastSeen if activity timeout is configured
 # Call setSessionInfo() in UserDB* module
 #@return Lemonldap::NG::Portal constant
 sub setSessionInfo {
@@ -1968,6 +2104,7 @@ sub setSessionInfo {
         $self->{sessionInfo}->{_utime} ||= time();
         $self->{sessionInfo}->{startTime} =
           strftime( "%Y%m%d%H%M%S", localtime() );
+        $self->{sessionInfo}->{_lastSeen} = time() if $self->{timeoutActivity};
     }
 
     # Get environment variables matching exportedVars
@@ -1996,7 +2133,7 @@ sub setSessionInfo {
 #@return Lemonldap::NG::Portal constant
 sub setMacros {
     my $self = shift;
-    $self->{sessionInfo}->{groups} = '';
+    $self->{sessionInfo}->{groups}  = '';
     $self->{sessionInfo}->{hGroups} = {};
     foreach ( sort keys %{ $self->{macros} } ) {
         $self->{sessionInfo}->{$_} =
@@ -2041,16 +2178,14 @@ sub setPersistentSessionInfo {
 
         return PE_OK unless ( $key and length($key) );
 
-        my $persistentSession =
-          $self->getPersistentSession( $self->_md5hash($key) );
+        my $persistentSession = $self->getPersistentSession($key);
 
         if ($persistentSession) {
             $self->lmLog( "Persistent session found for $key", 'debug' );
             foreach my $k ( keys %{ $persistentSession->data } ) {
 
                 # Do not restore some parameters
-                next if $k =~ /^_session_id$/;
-                next if $k =~ /^_session_kind$/;
+                next if $k =~ /^_(?:utime|session_(?:u?id|kind))$/;
                 $self->lmLog( "Restore persistent parameter $k", 'debug' );
                 $self->{sessionInfo}->{$k} = $persistentSession->data->{$k};
             }
@@ -2110,6 +2245,10 @@ sub registerLogin {
 
     if ( $self->{loginHistoryEnabled} ) {
         my $history = $self->{sessionInfo}->{loginHistory} ||= {};
+
+        foreach ( @{ $history->{failedLogin} } ) {
+            utf8::decode( $_->{error} );
+        }
 
         my $type = ( $errorCode ? "failed" : "success" ) . "Login";
         $history->{$type} ||= [];
@@ -2363,7 +2502,7 @@ sub store {
     }
 
     # Main session
-    my $session = $self->getApacheSession( $self->{id} );
+    my $session = $self->getApacheSession( $self->{id}, 0, $self->{force} );
     return PE_APACHESESSIONERROR unless ($session);
 
     # Compute unsecure cookie value if needed
@@ -2551,6 +2690,10 @@ sub issuerForAuthUser {
     # Register IssuerDB module in session
     $self->addSessionValue( '_issuerDB', $issuerDBtype, $self->{id} );
 
+    # Update session activity unless for Null IssuerDB
+    $self->updateSession( { '_lastSeen' => time() } )
+      if ( $self->{timeoutActivity} && $issuerDBtype ne 'Null' );
+
     # Call IssuerDB module method
     return $self->SUPER::issuerForAuthUser();
 }
@@ -2599,13 +2742,36 @@ sub autoRedirect {
         {
             my $ssl = $self->{urldc} =~ /^https/;
             $self->lmLog( 'CDA request', 'debug' );
-            $self->{urldc} .= ( $self->{urldc} =~ /\?/ ? '&' : '?' )
-              . (
-                ( $self->{securedCookie} < 2 or $ssl )
-                ? $self->{cookieName} . "=" . $self->{id}
-                : $self->{cookieName} . "http="
-                  . $self->{sessionInfo}->{_httpSession}
-              );
+
+            # Create CDA session
+            if ( my $cdaSession =
+                $self->getApacheSession( undef, 1, undef, "CDA" ) )
+            {
+                my $cdaInfos = { '_utime' => time };
+                if ( $self->{securedCookie} < 2 or $ssl ) {
+                    $cdaInfos->{cookie_value} = $self->{id};
+                    $cdaInfos->{cookie_name}  = $self->{cookieName};
+                }
+                else {
+                    $cdaInfos->{cookie_value} =
+                      $self->{sessionInfo}->{_httpSession};
+                    $cdaInfos->{cookie_name} = $self->{cookieName} . "http";
+                }
+
+                $self->updateSession( $cdaInfos, $cdaSession->id );
+
+                $self->{urldc} .=
+                    ( $self->{urldc} =~ /\?/ ? '&' : '?' )
+                  . $self->{cookieName} . "cda="
+                  . $cdaSession->id;
+
+                $self->lmLog( "CDA redirection to " . $self->{urldc}, 'debug' );
+
+            }
+            else {
+                $self->lmLog( "Unable to create CDA session", 'error' );
+                return PE_APACHESESSIONERROR;
+            }
         }
 
         $self->updateStatus;
@@ -2746,7 +2912,7 @@ Lemonldap::NG::Portal::Simple - Base module for building Lemonldap::NG compatibl
     print '<input type="hidden" name="url" value="'.$portal->param('url').'">';
     # Next, login and password
     print 'Login : <input name="user"><br>';
-    print 'Password : <input name="password" type="password" autocomplete="off">';
+    print 'Password : <input name="password" type="password">';
     print '<input type="submit" value="go" />';
     print '</form>';
   }
@@ -3054,15 +3220,15 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2005-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by Sandro Cazzaniga, E<lt>cazzaniga.sandro@gmail.comE<gt>
 
-=item Copyright (C) 2012, 2012, 2013 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
+=item Copyright (C) 2012-2013 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2006, 2008, 2009, 2010, 2011, 2012, 2012, 2013 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2006-2016 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
-=item Copyright (C) 2010, 2011 by Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item Copyright (C) 2010-2011 by Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
 
 =back
 

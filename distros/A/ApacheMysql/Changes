@@ -1,0 +1,12 @@
+Revision history for ApacheMYSQL
+
+0.1   July 16, 1997
+	- creation
+
+0.2   December 17, 1997
+	- changed manpage headline to be consistent with module name
+
+0.3   April 26, 1998
+	- modified $idx to correct blessing errors (suggested by ravyn@primenet.com)
+
+

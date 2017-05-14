@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Stats;
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 # ABSTRACT: The basic statistics information extracted from test reports
 
 #pod =head1 SYNOPSIS
@@ -42,24 +42,11 @@ our $VERSION = '0.005';
 #pod
 #pod See C<ATTRIBUTES> below for the full list of attributes.
 #pod
+#pod This data is built from the Metabase by the L<CPAN::Testers::Data::Generator>.
+#pod
 #pod =head1 SEE ALSO
 #pod
-#pod =over 4
-#pod
-#pod =item L<DBIx::Class::Row>
-#pod
-#pod =item L<CPAN::Testers::Schema>
-#pod
-#pod =item L<CPAN::Testers::Data::Generator>
-#pod
-#pod This module processes the data and writes to this table.
-#pod
-#pod =item L<http://github.com/cpan-testers/cpantesters-project>
-#pod
-#pod For an overview of how the CPANTesters project works, and for information about
-#pod project goals and to get involved.
-#pod
-#pod =back
+#pod L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 #pod
 #pod =cut
 
@@ -86,8 +73,9 @@ primary_column 'id', {
 #pod
 #pod =cut
 
-column 'guid', {
-    data_type   => 'varchar',
+# Must be unique for foreign keys to work
+unique_column 'guid', {
+    data_type   => 'char',
     is_nullable => 0,
     size        => 36,
 };
@@ -298,7 +286,7 @@ CPAN::Testers::Schema::Result::Stats - The basic statistics information extracte
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -338,6 +326,8 @@ extracted from test reports. This data is used to generate reports for the
 web application and web APIs.
 
 See C<ATTRIBUTES> below for the full list of attributes.
+
+This data is built from the Metabase by the L<CPAN::Testers::Data::Generator>.
 
 =head1 ATTRIBUTES
 
@@ -448,22 +438,7 @@ Get the related row in the `uploads` table. See L<CPAN::Testers::Schema::Result:
 
 =head1 SEE ALSO
 
-=over 4
-
-=item L<DBIx::Class::Row>
-
-=item L<CPAN::Testers::Schema>
-
-=item L<CPAN::Testers::Data::Generator>
-
-This module processes the data and writes to this table.
-
-=item L<http://github.com/cpan-testers/cpantesters-project>
-
-For an overview of how the CPANTesters project works, and for information about
-project goals and to get involved.
-
-=back
+L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
 =head1 AUTHORS
 

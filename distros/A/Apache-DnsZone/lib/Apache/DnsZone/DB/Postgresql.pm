@@ -1,10 +1,10 @@
 package Apache::DnsZone::DB::Postgresql;
 
-# $Id: Postgresql.pm,v 1.3 2001/06/03 11:10:25 thomas Exp $
+# $Id: Postgresql.pm,v 1.6 2001/06/21 21:20:23 thomas Exp $
 
 use strict;
 use vars qw($VERSION);
-($VERSION) = qq$Revision: 1.3 $ =~ /([\d\.]+)/;
+($VERSION) = qq$Revision: 1.6 $ =~ /([\d\.]+)/;
 
 package Apache::DnsZone::DB;
 
@@ -28,6 +28,15 @@ sub a_lookup {
     my ($name, $ip, $ttl) = $self->{'dbh'}->selectrow_array("select name,address,ttl from records_A where id = ? and domain = ?", undef, $a_id, $domain_id);
     return $name, $ip, $ttl if wantarray;
     return qq{$name $ip $ttl};
+}
+
+sub aaaa_lookup {
+    my $self = shift;
+    my $domain_id = shift;
+    my $aaaa_id = shift;
+    my ($name, $address, $ttl) = $self->{'dbh'}->selectrow_array("select name,address,ttl from records_AAAA where id = ? and domain = ?", undef, $aaaa_id, $domain_id);
+    return $name, $address, $ttl if wantarray;
+    return qq{$name $address $ttl};
 }
 
 sub cname_lookup {
@@ -55,6 +64,15 @@ sub ns_lookup {
     my ($name, $ns, $ttl) = $self->{'dbh'}->selectrow_array("select name,nsdname,ttl from records_NS where id = ? and domain = ?", undef, $ns_id, $domain_id);
     return $name, $ns, $ttl if wantarray;
     return qq{$name $ns $ttl};
+}
+
+sub ptr_lookup {
+    my $self = shift;
+    my $domain_id = shift;
+    my $ptr_id = shift;
+    my ($name, $ptrdname, $ttl) = $self->{'dbh'}->selectrow_array("select name,ptrdname,ttl from records_PTR where id = ? and domain = ?", undef, $ptr_id, $domain_id);
+    return $name, $ptrdname, $ttl if wantarray;
+    return qq{$name $ptrdname $ttl};
 }
 
 sub txt_lookup {
@@ -131,7 +149,7 @@ sub set_user_lang_email {
 	$sth->execute($lang_id, $email, $uid);
 	$sth->finish();
 	$self->{'dbh'}->commit();
-    }
+    };
     if ($@) {
 	$self->{'dbh'}->rollback();
 	return 0;
@@ -148,7 +166,7 @@ sub set_user_password {
 	$sth->execute($password, $uid);
 	$sth->finish();
 	$self->{'dbh'}->commit();
-    } 
+    }; 
     if ($@) {
 	$self->{'dbh'}->rollback();
 	return 0;
@@ -217,7 +235,7 @@ sub update_password {
 	$sth_password_update->execute($password, $uid);
 	$sth_password_update->finish();
 	$self->{'dbh'}->commit();
-    }
+    };
     if ($@) {
 	$self->{'dbh'}->rollback();
 	return 0;
@@ -235,7 +253,7 @@ sub domain_stat {
 sub get_max_record_count {
     my $self = shift;
     my $dom_id = shift;
-    return $self->{'dbh'}->selectrow_array("select A_count, CNAME_count, MX_count, NS_count, TXT_count from rec_count where domain = ?", undef, $dom_id);
+    return $self->{'dbh'}->selectrow_array("select A_count, AAAA_count, CNAME_count, MX_count, NS_count, PTR_count, TXT_count from rec_count where domain = ?", undef, $dom_id);
 }
 
 sub get_a_count {
@@ -257,6 +275,27 @@ sub is_duplicate_A {
     my $host = shift;
     my $address = shift;
     return $self->{'dbh'}->selectrow_array("select count(id) from records_A where domain = ? and name = ? and address = ?", undef, $dom_id, $host, $address)
+}
+
+sub get_aaaa_count {
+    my $self = shift;
+    my $dom_id = shift;
+    return $self->{'dbh'}->selectrow_array("select count(id) from records_AAAA where domain = ?", undef, $dom_id);
+}
+
+sub does_AAAA_exist {
+    my $self = shift;
+    my $dom_id = shift;
+    my $host = shift;
+    return $self->{'dbh'}->selectrow_array("select count(id) from records_AAAA where domain = ? and name = ?", undef, $dom_id, $host)
+}
+
+sub is_duplicate_AAAA {
+    my $self = shift;
+    my $dom_id = shift;
+    my $host = shift;
+    my $address = shift;
+    return $self->{'dbh'}->selectrow_array("select count(id) from records_AAAA where domain = ? and name = ? and address = ?", undef, $dom_id, $host, $address)
 }
 
 sub get_cname_count {
@@ -321,6 +360,27 @@ sub is_duplicate_NS {
     return $self->{'dbh'}->selectrow_array("select count(id) from records_NS where domain = ? and name = ? and nsdname = ?", undef, $dom_id, $host, $nsdname);
 }
 
+sub get_ptr_count {
+    my $self = shift;
+    my $dom_id = shift;
+    return $self->{'dbh'}->selectrow_array("select count(id) from records_PTR where domain = ?", undef, $dom_id);
+}
+
+sub does_PTR_exist {
+    my $self = shift;
+    my $dom_id = shift;
+    my $host = shift;
+    return $self->{'dbh'}->selectrow_Array("select count(id) from records_PTR where domain = ? and name = ?", undef, $dom_id, $host);
+}
+
+sub is_duplicate_PTR {
+    my $self = shift;
+    my $dom_id = shift;
+    my $host = shift;
+    my $ptrdname = shift;
+    return $self->{'dbh'}->selectrow_array("select count(id) from records_PTR where domain = ? and name = ? and ptrdname = ?", undef, $dom_id, $host, $ptrdname);
+}
+
 sub get_txt_count {
     my $self = shift;
     my $dom_id = shift;
@@ -355,6 +415,13 @@ sub get_lock_A {
     return $self->{'dbh'}->selectrow_array("select rec_lock from records_A where id = ? and domain = ?", undef, $record_id, $dom_id);
 }
 
+sub get_lock_AAAA {
+    my $self = shift;
+    my $dom_id = shift;
+    my $record_id = shift;
+    return $self->{'dbh'}->selectrow_array("select rec_lock from records_AAAA where id = ? and domain = ?", undef, $record_id, $dom_id);
+}
+
 sub get_lock_CNAME {
     my $self = shift;
     my $dom_id = shift;
@@ -376,6 +443,13 @@ sub get_lock_NS {
     return $self->{'dbh'}->selectrow_array("select rec_lock from records_NS where id = ? and domain = ?", undef, $record_id, $dom_id);
 }
 
+sub get_lock_PTR {
+    my $self = shift;
+    my $dom_id = shift;
+    my $record_id = shift;
+    return $self->{'dbh'}->selectrow_array("select rec_lock from records_PTR where id = ? and domain = ?", undef, $record_id, $dom_id);
+}
+
 sub get_lock_TXT {
     my $self = shift;
     my $dom_id = shift;
@@ -395,6 +469,14 @@ sub view_domain_A_prepare {
     my $self = shift;
     my $dom_id = shift;
     my $sth = $self->{'dbh'}->prepare("select id, name, address, ttl, rec_lock from records_A where domain = ?");
+    $sth->execute($dom_id);
+    return $sth;
+}
+
+sub view_domain_AAAA_prepare {
+    my $self = shift;
+    my $dom_id = shift;
+    my $sth = $self->{'dbh'}->prepare("select id, name, address, ttl, rec_lock from records_AAAA where domain = ?");
     $sth->execute($dom_id);
     return $sth;
 }
@@ -423,33 +505,20 @@ sub view_domain_NS_prepare {
     return $sth;
 }
 
+sub view_domain_PTR_prepare {
+    my $self = shift;
+    my $dom_id = shift;
+    my $sth = $self->{'dbh'}->prepare("select id, name, ptrdname, ttl, rec_lock from records_PTR where domain = ?");
+    $sth->execute($dom_id);
+    return $sth;
+}
+
 sub view_domain_TXT_prepare {
     my $self = shift;
     my $dom_id = shift;
     my $sth = $self->{'dbh'}->prepare("select id, name, txtdata, ttl, rec_lock from records_TXT where domain = ?");
     $sth->execute($dom_id);
     return $sth;
-}
-
-sub set_A {
-    my $self = shift;
-    my $domain_id = shift;
-    my $name = shift;
-    my $ip = shift;
-    my $ttl = shift;
-    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::set_A called});
-    eval {
-	my $sth = $self->{'dbh'}->prepare("insert into records_A (domain, name, address, ttl) values (?, ?, ?, ?)");
-	$sth->execute($domain_id, $name, $ip, $ttl);
-	$sth->finish();
-	$self->{'dbh'}->commit();
-    };
-    if ($@) {
-        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::set_A failed: $@});
-	$self->{'dbh'}->rollback();
-	return 0;
-    }
-    return 1;
 }
 
 sub update_serial_soa {
@@ -495,6 +564,27 @@ sub update_SOA {
     return 1;
 }
 
+sub set_A {
+    my $self = shift;
+    my $domain_id = shift;
+    my $name = shift;
+    my $ip = shift;
+    my $ttl = shift;
+    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::set_A called});
+    eval {
+	my $sth = $self->{'dbh'}->prepare("insert into records_A (domain, name, address, ttl) values (?, ?, ?, ?)");
+	$sth->execute($domain_id, $name, $ip, $ttl);
+	$sth->finish();
+	$self->{'dbh'}->commit();
+    };
+    if ($@) {
+        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::set_A failed: $@});
+	$self->{'dbh'}->rollback();
+	return 0;
+    }
+    return 1;
+}
+
 sub update_A {
     my $self = shift;
     my $domain_id = shift;
@@ -531,6 +621,70 @@ sub delete_A {
     };
     if ($@) {
         Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::delete_A failed: $@});
+	$self->{'dbh'}->rollback();
+	return 0;
+    }
+    Apache::DnsZone::update_serial($domain_id);
+    return 1;
+}
+
+sub set_AAAA {
+    my $self = shift;
+    my $domain_id = shift;
+    my $name = shift;
+    my $address = shift;
+    my $ttl = shift;
+    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::set_AAAA called});
+    eval {
+	my $sth = $self->{'dbh'}->prepare("insert into records_AAAA (domain, name, address, ttl) values (?, ?, ?, ?)");
+	$sth->execute($domain_id, $name, $address, $ttl);
+	$sth->finish();
+	$self->{'dbh'}->commit();
+    };
+    if ($@) {
+        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::set_AAAA failed: $@});
+	$self->{'dbh'}->rollback();
+	return 0;
+    }
+    return 1;
+}
+
+sub update_AAAA {
+    my $self = shift;
+    my $domain_id = shift;
+    my $aaaa_id = shift;
+    my $name = shift;
+    my $address = shift;
+    my $ttl = shift;
+    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::update_AAAA called});
+    eval {
+	my $sth = $self->{'dbh'}->prepare("update records_AAAA set name = ?, address = ?, ttl = ? where id = ? and domain = ?");
+	$sth->execute($name, $address, $ttl, $aaaa_id, $domain_id);
+	$sth->finish();
+	$self->{'dbh'}->commit();
+    };
+    if ($@) {
+        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::update_AAAA failed: $@});
+	$self->{'dbh'}->rollback();
+	return 0;
+    }
+    Apache::DnsZone::update_serial($domain_id);
+    return 1;
+}
+
+sub delete_AAAA {
+    my $self = shift;
+    my $domain_id = shift;
+    my $aaaa_id = shift;
+    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::delete_AAAA called});
+    eval {
+	my $sth = $self->{'dbh'}->prepare("delete from records_AAAA where id = ? and domain = ?");
+	$sth->execute($aaaa_id, $domain_id);
+	$sth->finish();
+	$self->{'dbh'}->commit();
+    };
+    if ($@) {
+        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::delete_AAAA failed: $@});
 	$self->{'dbh'}->rollback();
 	return 0;
     }
@@ -728,6 +882,71 @@ sub delete_NS {
     };
     if ($@) {
         Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::delete_NS failed: $@});
+	$self->{'dbh'}->rollback();
+	return 0;
+    }
+    Apache::DnsZone::update_serial($domain_id);
+    return 1;
+}
+
+sub set_PTR {
+    my $self = shift;
+    my $domain_id = shift;
+    my $name = shift;
+    my $ptrdname = shift;
+    my $ttl = shift;
+    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::set_PTR called});
+    eval {
+	my $sth = $self->{'dbh'}->prepare("insert into records_PTR (domain, name, ptrdname, ttl) values (?, ?, ?, ?)");
+	$sth->execute($domain_id, $name, $ptrdname, $ttl);
+	$sth->finish();
+	$self->{'dbh'}->commit();
+    };
+    if ($@) {
+        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::set_PTR failed: $@});
+        $self->{'dbh'}->rollback();
+	return 0;
+    }
+    Apache::DnsZone::update_serial($domain_id);
+    return 1;
+}
+
+sub update_PTR {
+    my $self = shift;
+    my $domain_id = shift;
+    my $ptr_id = shift;
+    my $name = shift;
+    my $ptrdname = shift;
+    my $ttl = shift;
+    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::update_PTR called});
+    eval {
+	my $sth = $self->{'dbh'}->prepare("update records_PTR set name = ?, ptrdname = ?, ttl = ? where id = ? and domain = ?");
+	$sth->execute($name, $ptrdname, $ttl, $ptr_id, $domain_id);
+	$sth->finish();
+	$self->{'dbh'}->commit();
+    };
+    if ($@) {
+        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::update_PTR failed: $@});
+        $self->{'dbh'}->rollback();
+	return 0;
+    }
+    Apache::DnsZone::update_serial($domain_id);
+    return 1;
+}
+
+sub delete_PTR {
+    my $self = shift;
+    my $domain_id = shift;
+    my $ptr_id = shift;
+    Apache::DnsZone::Debug(5, qq{Apache::DnsZone::DB::delete_PTR called});
+    eval {
+	my $sth = $self->{'dbh'}->prepare("delete from records_PTR where id = ? and domain = ?");
+	$sth->execute($ptr_id, $domain_id);
+	$sth->finish();
+	$self->{'dbh'}->commit();
+    };
+    if ($@) {
+        Apache::DnsZone::Debug(1, qq{Apache::DnsZone::DB::delete_PTR failed: $@});
 	$self->{'dbh'}->rollback();
 	return 0;
     }

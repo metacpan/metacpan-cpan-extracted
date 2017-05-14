@@ -4,7 +4,7 @@ designed to be readable as is.
 
 =head1 NAME
 
-README.tru64 - Perl version 5 on Tru64 (formerly known as Digital UNIX formerly known as DEC OSF/1) systems
+perltru64 - Perl version 5 on Tru64 (formerly known as Digital UNIX formerly known as DEC OSF/1) systems
 
 =head1 DESCRIPTION
 
@@ -26,18 +26,21 @@ of the op/regexp and op/pat, or ext/Storable tests dumping core
 (the exact pattern of failures depending on the GCC release and
 optimization flags).
 
-gcc 3.2.1 is known to work okay with Perl 5.8.0.  However, when
-optimizing the toke.c gcc likes to have a lot of memory, 256 megabytes
-seems to be enough.  The default setting of the process data section
-in Tru64 should be one gigabyte, but some sites/setups might have
-lowered that.  The configuration process of Perl checks for too low
-process limits, and lowers the optimization for the toke.c if
-necessary, and also gives advice on how to raise the process limits.
+Both the native cc and gcc seem to consume lots of memory when
+building Perl.  toke.c is a known trouble spot when optimizing:
+256 megabytes of data section seems to be enough.  Another known
+trouble spot is the mktables script which builds the Unicode support
+tables.  The default setting of the process data section in Tru64
+should be one gigabyte, but some sites/setups might have lowered that.
+The configuration process of Perl checks for too low process limits,
+and lowers the optimization for the toke.c if necessary, and also
+gives advice on how to raise the process limits
+(for example: C<ulimit -d 262144>)
 
 Also, Configure might abort with
 
-    Build a threading Perl? [n]
-    Configure[2437]: Syntax error at line 1 : `config.sh' is not expected.
+ Build a threading Perl? [n]
+ Configure[2437]: Syntax error at line 1 : 'config.sh' is not expected.
 
 This indicates that Configure is being run with a broken Korn shell
 (even though you think you are using a Bourne shell by using
@@ -56,16 +59,12 @@ is harmless).
 
 =head2 Threaded Perl on Tru64
 
-If you want to use threads, you should primarily use the new Perl
+If you want to use threads, you should primarily use the Perl
 5.8.0 threads model by running Configure with -Duseithreads.
 
-The old Perl 5.005 threads is obsolete, unmaintained, and its use is
-discouraged.  If you really want it, run Configure with the
--Dusethreads -Duse5005threads options as described in INSTALL.
-
-Either thread model is going to work only in Tru64 4.0 and newer
-releases, older operating releases like 3.2 aren't probably going
-to work properly with threads.
+Perl threading is going to work only in Tru64 4.0 and newer releases,
+older operating releases like 3.2 aren't probably going to work
+properly with threads.
 
 In Tru64 V5 (at least V5.1A, V5.1B) you cannot build threaded Perl with gcc
 because the system header <pthread.h> explicitly checks for supported
@@ -110,7 +109,7 @@ and then using the BerkeleyDB module from CPAN instead of DB_File.
 The BerkeleyDB works with Berkeley DB versions 2.* or greater.
 
 The Berkeley DB 4.1.25 has been tested with Tru64 V5.1A and found
-to work.  The latest Berkeley DB can be found from F<http://www.sleepycat.com>.
+to work.  The latest Berkeley DB can be found from L<http://www.sleepycat.com>.
 
 =head2 64-bit Perl on Tru64
 
@@ -124,15 +123,17 @@ since pointers are automatically 64-bit wide.
 When compiling Perl in Tru64 you may (depending on the compiler
 release) see two warnings like this
 
-    cc: Warning: numeric.c, line 104: In this statement, floating-point overflow occurs in evaluating the expression "1.8e308". (floatoverfl)
-        return HUGE_VAL;
-    -----------^
+ cc: Warning: numeric.c, line 104: In this statement, floating-point
+ overflow occurs in evaluating the expression "1.8e308". (floatoverfl)
+     return HUGE_VAL;
+ -----------^
 
 and when compiling the POSIX extension
 
-    cc: Warning: const-c.inc, line 2007: In this statement, floating-point overflow occurs in evaluating the expression "1.8e308". (floatoverfl)
-                return HUGE_VAL;
-    -------------------^
+ cc: Warning: const-c.inc, line 2007: In this statement, floating-point
+ overflow occurs in evaluating the expression "1.8e308". (floatoverfl)
+             return HUGE_VAL;
+ -------------------^
 
 The exact line numbers may vary between Perl releases.  The warnings
 are benign and can be ignored: in later C compiler releases the warnings
@@ -147,7 +148,7 @@ instructs Perl not to use the feature.
 
 =head1 Testing Perl on Tru64
 
-During "make test" the C<comp/cpp> will be skipped because on Tru64 it
+During "make test" the C<comp>/C<cpp> will be skipped because on Tru64 it
 cannot be tested before Perl has been installed.  The test refers to
 the use of the C<-P> option of Perl.
 
@@ -168,6 +169,19 @@ If you get an error like
 you need to either recompile your Perl in Tru64 4.0D or upgrade your
 Tru64 4.0D to at least 4.0F: the sockatmark() system call was
 added in Tru64 4.0F, and the IO extension refers that symbol.
+
+=head1 read_cur_obj_info: bad file magic number
+
+You may be mixing the Tru64 cc/ar/ld with the GNU gcc/ar/ld.
+That may work, but sometimes it doesn't (your gcc or GNU utils
+may have been compiled for an incompatible OS release).
+
+Try 'which ld' and 'which ld' (or try 'ar --version' and 'ld --version',
+which work only for the GNU tools, and will announce themselves to be such),
+and adjust your PATH so that you are consistently using either
+the native tools or the GNU tools.  After fixing your PATH, you should
+do 'make distclean' and start all the way from running the Configure
+since you may have quite a confused situation.
 
 =head1 AUTHOR
 

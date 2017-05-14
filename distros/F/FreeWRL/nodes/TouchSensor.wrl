@@ -1,0 +1,108 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# Move the mouse on the shapes, see the little blue thing move
+#
+# XXX IndexedFaceSet, Extrusion, ElevationGrid!!!
+# XXX hitNormal doesn't work
+# XXX hitTexCoord
+
+PROTO Testtouch [
+ field SFNode node Box { }
+] {
+Group {
+children [
+	Group {
+	children [
+	DEF TS TouchSensor { }
+	DEF ORIG Shape {
+	 appearance Appearance {material Material { diffuseColor 0.8 0 0 } }
+	 geometry IS node 
+	}
+	]
+	} 
+
+	Transform {
+		translation 2 0 0
+		rotation 1 1 0 0.7
+		scale 0.8 0.8 0.8
+		children [
+			USE ORIG
+			DEF TR Transform {
+				children [
+					Shape {
+						 appearance Appearance {material Material { diffuseColor 0 0 0.8 } }
+						 geometry Box { size 0.15 0.15 0.15 }
+					}
+				]
+			}
+		]
+	}
+	Transform {	
+		translation 3.5 0 0
+		rotation 1 1 0 0.7
+		scale 0.8 0.8 0.8
+		children [
+			Shape {
+				 appearance Appearance {material Material { diffuseColor 0.8 0 0.8 } }
+				 geometry Box { size 0.3 0.3 0.3 }
+			}
+			DEF TR2 Transform {
+				children [
+					Shape {
+						 appearance Appearance {material Material { diffuseColor 0.8 0.8 0 } }
+						 geometry Box { size 0.3 0.3 0.3 }
+					}
+				]
+			}
+		]
+	}
+
+]
+}
+	ROUTE TS.hitPoint_changed TO TR.set_translation
+	ROUTE TS.hitNormal_changed TO TR2.set_translation
+}
+
+Transform {
+scale 0.4 0.4 0.4 
+children [
+Testtouch { node Sphere { } }
+Transform { translation 0 2.5 0 children [
+	Testtouch { node Box { } }
+]}
+Transform { translation 0 -2.5 0 children [
+	Testtouch { node Cylinder { } }
+]}
+Transform { translation 0 -5.0 0 children [
+	Testtouch { node Cone { } }
+]}
+Transform { translation 0 5.0 0 children [
+	Testtouch { node IndexedFaceSet { 
+		coord Coordinate {
+			point [-1 -1 0 1 -1 0 -1 1 0]
+		}
+		coordIndex [ 0 1 2 -1]
+		solid FALSE 
+	} }
+]}
+Transform { translation 0 6.0 0 children [
+	Testtouch { node ElevationGrid { 
+		height [
+			0 0 0
+			0 0.5 0
+			0 0 0
+		]
+		xDimension 3
+		zDimension 3
+		xSpacing 0.5
+		zSpacing 0.5
+		solid FALSE 
+	} }
+]}
+]
+}
+

@@ -1,0 +1,44 @@
+# Build the title
+!define DOC_NAME           "GalaxyBuilder"
+!define DOC_TYPE           "Discussion Paper"
+!define DOC_AUTHOR         "Joe Bloggs"
+!build_title
+ 
+H1: Introduction
+
+After extensive market research, I believe there is
+an excellent opportunity for us to develop software
+for the I<galaxy construction industry>. Potential
+customers include:
+
+* NASA
+* European Community
+* China
+* Japan.
+
+Note: The proposed name of the software package to be
+developed is [[DOC_NAME]]. If you want to suggest a
+better name, send email to {{EMAIL:joe@bloggs.com}}.
+
+H2: Software Requirements
+
+The key requirements are:
+
+^ support for the design and simulation of galaxies
+  containing up to:
+  - 1000 large planets, or
+  - 5000 small planets
++ the package needs to be easy to use
++ the package needs to be well documented.
+
+H2: Project Team
+
+Exploding galaxies will be B<very> bad for business,
+so we need the best team possible for this project:
+
+!block table
+Person          Role
+Mary Jones      Project Manager
+Hans Blass      Architect
+Bill Smith      Software Engineer
+!endblock

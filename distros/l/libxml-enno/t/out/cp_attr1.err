@@ -38,6 +38,8 @@ XML::Checker ERROR-130: invalid NMTOKEN [1bad default nmtoken]
 	Context: Element n, Attr bad_def, line 71, column 1, byte 1497
 XML::Checker ERROR-130: invalid NMTOKEN [1bad default nmtoken]
 	Context: Element n, Attr bad_def, line 72, column 1, byte 1529
+XML::Checker ERROR-103: undefined attribute [bad_idref]
+	Context: Element bad_id, line 76, column 1, byte 1608
 XML::Checker ERROR-131: invalid ID [1bad_default_id]
 	Context: Element bad_id, Attr bad_default_id, line 76, column 1, byte 1608
 XML::Checker ERROR-132: invalid IDREF [1bad_default_idref]
@@ -52,6 +54,8 @@ XML::Checker ERROR-132: invalid IDREF [1bad_default_idref]
 	Context: Element bad_id, Attr bad_default_idref, line 77, column 1, byte 1639
 XML::Checker ERROR-132: invalid IDREF [1bad_default_idrefs]
 	Context: Element bad_id, Attr bad_default_idrefs, line 77, column 1, byte 1639
+XML::Checker ERROR-103: undefined attribute [bad_ent]
+	Context: Element bad_ent, line 78, column 1, byte 1650
 XML::Checker ERROR-133: invalid ENTITY name [1bad_default_ent]
 	Context: Element bad_ent, Attr bad_default_ent, line 78, column 1, byte 1650
 XML::Checker ERROR-102: undefined unparsed ENTITY [1bad_default_ent]

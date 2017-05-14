@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
 # we are testing ourselves, so we don't want this warning
@@ -22,8 +22,8 @@ my $test_count;
 subtest 'Test::Kwalitee import' => sub {
     require Test::Kwalitee;
     # we use an eval because Module::CPANTS::Analyse is not yet taint-clean
-    eval { Test::Kwalitee->import(tests => \@expected) };
-    $test_count = Test::Builder->new->current_test,
+    eval { Test::Kwalitee->import(tests => \@expected) } or diag $@;
+    $test_count = Test::Builder->new->current_test;
 };
 
 is(

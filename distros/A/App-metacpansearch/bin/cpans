@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use strict;
+use LWP::Simple;
+use JSON;
+use Getopt::Std;
+use URL::Encode qw( url_encode );
+
+sub HELP_MESSAGE {
+  print q|
+
+cpans [-q] SearchTerms
+
+Uses the metacpan API to do a search!
+
+-l <count>  Limit to <count> results (default 100)
+-q          Quiet down a bit, no abstract
+--help      This
+
+|;
+}
+
+my $opts = {
+  l => 10,
+};
+
+getopts('l:q', $opts);
+
+# Everything else is part of the search
+my $search = "@ARGV";
+
+# Quote modules
+$search =~ s/\b(\w+(::\w+)+)\b/"$1"/g;
+
+$search = url_encode($search);
+
+# print STDERR "http://api.metacpan.org/v0/release/_search?size=$opts->{l}&q=status:latest AND $search\n";
+
+my $r = decode_json(
+  get "http://api.metacpan.org/v0/release/_search?size=$opts->{l}&q=status:latest AND $search"
+);
+
+foreach my $hit (@{$r->{hits}->{hits}}) {
+  my $dist = $hit->{_source}->{distribution};
+  $dist =~ s/-/::/g;
+
+  if($opts->{q}) {
+    print "$dist\n";
+  } else {
+    print "$dist - $hit->{_source}->{abstract}\n"
+  }
+}
+
+if((! $opts->{q}) && scalar @{$r->{hits}->{hits}} == $opts->{l}) {
+  print "[Limit $opts->{l} reached, use -l to change limit]\n";
+}
+

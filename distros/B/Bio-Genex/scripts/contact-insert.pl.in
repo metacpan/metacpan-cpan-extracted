@@ -1,0 +1,117 @@
+%%START_PERL%%
+my $VERSION = '$Id: contact-insert.pl.in,v 1.7 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+use POSIX 'strftime';
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+use Bio::Genex qw($SU_USERNAME $SU_PASSWORD timestamp);
+use Bio::Genex::DBUtils qw(create_insert_sql create_select_sql);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::ExternalDatabase;
+
+my $infile;
+my $UPDATE;
+my $rc = GetOptions('file=s' => \$infile,
+		    'update' => \$UPDATE,
+		   );
+
+my $USAGE = <<"EOU";
+usage: $0 --file=file_name --update
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parsefile($infile);
+
+my @contact_list = $DOC->getElementsByTagName('contact');
+
+
+# open up a writeable connection
+$Bio::Genex::DBNAME = 'genex';
+$Bio::Genex::USER = $SU_USERNAME;
+$Bio::Genex::PASSWORD = $SU_PASSWORD;
+$Bio::Genex::TRANSACTION = 1;	# do it in a transaction
+
+my $dbh = Bio::Genex::current_connection();
+my $curr_table = 'Contact';
+my $timeformat = '%r %A %B %d %Y'; 
+
+print STDERR scalar @contact_list, " Contacts to insert\n";
+
+foreach my $con_node (@contact_list) {
+  assert_element($con_node,'contact');
+  my $type = $con_node->getAttribute('type');
+  error("Couldn't find type for node: " . $con_node->toString()) 
+    unless $type ne '';
+  my $name = $con_node->getAttribute('contact_person') ne '' ?
+    $con_node->getAttribute('contact_person') :
+      $con_node->getAttribute('organization');
+  error("Couldn't find name for node: " . $con_node->toString()) 
+    unless $name ne '';
+
+  my $column_map = $con_node->getAttributes();
+  my @attr_nodes = @{$column_map->getValues()};
+  my %attributes = map {$_->getName, $_->getValue} @attr_nodes;
+  $attributes{last_updated} = timestamp();
+
+  if ($UPDATE) {
+    print STDERR "Updating contact for $type, $name\n";
+
+    my $WHERE = '(contact_person=' .
+      $dbh->quote($name) . ' OR organization=' .
+      $dbh->quote($name) . ') AND type=' . 
+      $dbh->quote($type);
+    my $sql = create_select_sql($dbh,
+		FROM=>[$curr_table],
+		COLUMNS=>['con_pk'],
+		WHERE=>"$WHERE"
+			       );
+    my $con_pk = $dbh->selectall_arrayref($sql);
+    error("couldn't SELECT contact for node: " . $con_node->toString(), $sql)
+      if $dbh->err;
+    # extract the value from the array of arrays
+    $con_pk = $con_pk->[0][0];
+    error("couldn't get contact for node: " . $con_node->toString(), $sql)
+      unless $con_pk;
+
+    foreach my $key (keys %attributes) {
+      $sql = "UPDATE $curr_table set $key=? WHERE con_pk=$con_pk";
+      my $sth = $dbh->prepare($sql);
+      error("couldn't prepare update SQL", $sql)
+	if $dbh->err;
+      $sth->execute($attributes{$key});
+    error("couldn't execute update SQL for <$key>=<$attributes{$key}>", $sql, $sth)
+      if $dbh->err;      
+    }
+  } else {
+  print STDERR "Inserting contact for $name\n";
+
+    my $sql = create_insert_sql($dbh,$curr_table,\%attributes);
+    $dbh->do($sql);
+    error("couldn't insert record for node: " . $con_node->toString(), $sql)
+      if $dbh->err;
+  }
+}
+
+$dbh->commit();
+# $dbh->rollback();
+$dbh->disconnect();
+exit(0);
+
+sub error {
+  my ($error,$sql) = @_;
+  $error .= ", SQL=<$sql>, DBI=<$DBI::errstr>" if defined $sql;
+  $dbh->rollback();
+  $dbh->disconnect();
+  die "$error\n";
+}

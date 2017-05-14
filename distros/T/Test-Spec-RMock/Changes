@@ -1,0 +1,29 @@
+2012-10-11: version 0.006    
+
+ - Better diagnostic messages
+
+2012-10-09: version 0.005001
+
+ - Added support for stub several methods with one call to stub()
+
+ - Added support for stub chaining
+
+2012-10-07: version 0.004
+
+ - Added support for creating null object mocks
+
+2012-10-06: version 0.003    
+
+ - Fixed a bug that was triggered when argument matching failed.
+
+ - Added documentation
+
+ - Removed the dependency on Moose
+
+2012-10-06: version 0.002    
+
+ - Support multiple expectations for the same message
+
+2012-10-05: version 0.001
+
+ - Initial release

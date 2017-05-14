@@ -106,7 +106,7 @@
 # undef I_SYS_UN
 #endif 
 
-#if defined(USE_5005THREADS) || defined(USE_ITHREADS)
+#ifdef USE_ITHREADS
 
 #define do_spawn(a)      os2_do_spawn(aTHX_ (a))
 #define do_aspawn(a,b,c) os2_do_aspawn(aTHX_ (a),(b),(c))
@@ -209,12 +209,10 @@ int pthread_create(pthread_t *tid, const pthread_attr_t *attr,
 
 #define THREADS_ELSEWHERE
 
-#else /* USE_5005THREADS */
+#else /* USE_ITHREADS */
 
 #define do_spawn(a)      os2_do_spawn(a)
 #define do_aspawn(a,b,c) os2_do_aspawn((a),(b),(c))
-
-#endif /* USE_5005THREADS */
  
 void Perl_OS2_init(char **);
 void Perl_OS2_init3(char **envp, void **excH, int flags);
@@ -984,7 +982,7 @@ unsigned long   SIS_MMIOAddr;   /* Memory mapped I/O address  */
 unsigned char   SIS_MaxVDMs;      /* Max. no. of Virtual DOS machines */
 unsigned char   SIS_Reserved;
 
-unsigned char   SIS_perf_mec_table[32]; /* varga 6/5/97 Table of Perfomance Major Event Codes (MECS) varga*/
+unsigned char   SIS_perf_mec_table[32]; /* varga 6/5/97 Table of Performance Major Event Codes (MECS) varga*/
 } GINFOSEG, *PGINFOSEG;
 
 #define SIS_LEN         sizeof(struct InfoSegGDT)
@@ -1040,7 +1038,7 @@ unsigned long   LIS_pPIB;       /* Pointer to PIB */
 /*
  *      Process Type codes
  *
- *      These are the definitons for the codes stored
+ *      These are the definitions for the codes stored
  *      in the LIS_ProcType field in the local infoseg.
  */
 

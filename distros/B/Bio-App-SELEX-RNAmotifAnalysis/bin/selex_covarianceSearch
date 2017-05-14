@@ -1,0 +1,238 @@
+#!/usr/bin/env perl
+
+# ABSTRACT:
+
+#=============================================================================
+# STANDARD MODULES AND PRAGMAS
+use 5.008;       # Require at least Perl version 5.08
+use strict;      # Must declare all variables before using them
+use warnings;    # Emit helpful warnings
+use autodie;     # Fatal exceptions for common unrecoverable errors (e.g. open)
+use Carp qw( croak );    # Throw errors from calling function
+
+#=============================================================================
+# ADDITIONAL MODULES
+use Getopt::Long::Descriptive; # Parse @ARGV as command line flags and arguments
+use lib 'lib';
+use Bio::App::SELEX::RNAmotifAnalysis;
+
+#=============================================================================
+# CONSTANTS
+
+my $TRUE  = 1;
+my $FALSE = 0;
+
+my $DEFAULT_ITERATIONS = 10;
+my $DEFAULT_CONFIG     = 'cluster.cfg';
+my $AWK_CMD            = '$1!~/^#/{print $2}';
+
+my @REQUIRED_FLAGS = qw( cm fasta sto );
+
+# CONSTANTS
+#=============================================================================
+
+#=============================================================================
+# COMMAND LINE
+
+# Run as a command-line program if not used as a module
+main(@ARGV) if !caller();
+
+sub main {
+
+    #-------------------------------------------------------------------------
+    # COMMAND LINE INTERFACE                                                 #
+    #                                                                        #
+    my ( $opt, $usage ) = describe_options(
+        '%c %o <some-arg>',
+        [ 'cm=s',     'file name for the input covariance model (required)', ],
+        [ 'fasta=s',  'file name for the FASTA file (required)',             ],
+        [ 'sto=s',    'file name for the Stockholm file (required)',         ],
+        [ 'rounds=i', 'Rounds of covariance model searching (default=10)',   ],
+        [ 'config=s', 'Configuration file (default="cluster.cfg")',          ],
+        [],
+        [ 'help', 'print usage message and exit'                             ],
+    );
+
+    my $exit_with_usage = sub {
+        print "\nUSAGE:\n";
+        print $usage->text();
+        exit();
+    };
+
+    # If requested, give usage information regardless of other options
+    $exit_with_usage->() if $opt->help;
+
+    # Make some flags required
+    my $missing_required = $FALSE;
+    for my $flag (@REQUIRED_FLAGS) {
+        if ( !defined $opt->$flag ) {
+            print "Missing required option '$flag'\n";
+            $missing_required = $TRUE;
+        }
+    }
+
+    # Exit with usage statement if any required flags are missing
+    $exit_with_usage->() if $missing_required;
+
+    #                                                                        #
+    # COMMAND LINE INTERFACE                                                 #
+    #-------------------------------------------------------------------------
+
+    #-------------------------------------------------------------------------
+    #                                                                        #
+    #                                                                        #
+
+    my $config_file = $opt->config || $DEFAULT_CONFIG;
+    my $config      = Bio::App::SELEX::RNAmotifAnalysis::get_config($config_file);
+
+    process(
+        {
+            cm     => $opt->cm,
+            fasta  => $opt->fasta,
+            sto    => $opt->sto,
+            rounds => $opt->rounds || $DEFAULT_ITERATIONS,
+            config => $config,
+        },
+    );
+
+    return;
+
+    #                                                                        #
+    #                                                                        #
+    #-------------------------------------------------------------------------
+}
+
+# COMMAND LINE
+#=============================================================================
+
+#=============================================================================
+#
+
+sub process {
+    my ($arg_ref) = @_;
+
+    my $cm     = $arg_ref->{cm};
+    my $fasta  = $arg_ref->{fasta};
+    my $sto    = $arg_ref->{sto};
+    my $config = $arg_ref->{config};
+    my $rounds = $arg_ref->{rounds};
+
+    my $cmalign     = get_full_path_for_executable('cmalign',    $config);
+    my $cmbuild     = get_full_path_for_executable('cmbuild',    $config);
+    my $cmcalibrate = get_full_path_for_executable('cmcalibrate',$config);
+    my $cmsearch    = get_full_path_for_executable('cmsearch',   $config);
+
+    my $stock2fasta = $config->{executables}{stock2fasta};
+    die 'stock2fasta executable path not found in the configuration file' if ! defined $stock2fasta;
+
+    my $round = 1;
+
+    my $basename = $cm;
+
+    #Strip off extension
+    $basename =~ s/\. .* \z//gxms;
+
+    my %file = map { filenames( $basename, $_ ) } ( 1 .. $rounds + 1 );
+
+    print "#round$round\n";
+    print "$cmcalibrate $cm\n";
+    print "$cmsearch --toponly -E 0.1 --tabfile $file{1}{tab} $cm $fasta\n";
+    print "\n";
+    print "awk '$AWK_CMD' $file{1}{tab} > $file{1}{found}\n";
+    print "\n";
+    print "grep -w -f $file{1}{found} $sto > $file{2}{sto}\n";
+    print "$stock2fasta $file{2}{sto} > $file{2}{fasta}\n";
+    print "\n";
+    print "\n";
+
+    while ( $round < $rounds ) {
+        $round++;
+        my $next_round            = $round + 1;
+        my $current               = "${basename}_rnd$round";
+        my $current_aln_cm        = "${current}_aln.cm";
+        my $current_tab           = "$current.tab";
+        my $current_fasta         = "$current.fasta";
+        my $current_found         = "${current}_clusters_found.txt";
+        my $current_cmaligned_sto = "${current}_cmaligned.sto";
+
+        my $next       = "${basename}_rnd$next_round";
+        my $next_sto   = "$next.sto";
+        my $next_fasta = "$next.fasta";
+
+        print "#round$round\n";
+        print "$cmalign -o $current_cmaligned_sto $cm $current_fasta\n";
+        print "$cmbuild $current_aln_cm $current_cmaligned_sto\n";
+        print "$cmcalibrate $current_aln_cm\n";
+        print "$cmsearch --toponly -E 0.1 --tabfile $current_tab $current_aln_cm $fasta\n";
+        print "\n";
+        print "awk '$AWK_CMD' $current_tab > $current_found\n";
+        print "\n";
+        print "grep -w -f $current_found $sto > $next_sto\n";
+        print "$stock2fasta $next_sto > $next_fasta\n";
+        print "\n";
+        print "\n";
+    }
+
+    return;
+}
+
+sub get_full_path_for_executable {
+    my $exe       = shift;
+    my $config    = shift;
+    my $full_path = $config->{executables}->{$exe} || die "Path for executable '$exe' not found in configuration file";
+    return $full_path;
+}
+
+sub filenames {
+    my $basename = shift;
+    my $round    = shift;
+
+    return (
+        $round => {
+            cm    => "${basename}_rnd$round.cm",
+            tab   => "${basename}_rnd$round.tab",
+            found => "${basename}_rnd${round}_clusters_found.txt",
+            sto   => "${basename}_rnd$round.sto",
+            aln   => "${basename}_rnd${round}_aln.cm",
+            fasta => "${basename}_rnd${round}.fasta",
+        },
+    );
+}
+
+#
+#=============================================================================
+
+1;    
+
+#Documentation-----------------------------------------------------------------------------
+
+=pod
+
+=head1 SYNOPSIS
+
+    covarianceSearchScripts --cm rna.cm --fasta rna.fasta --sto rna.sto [--rounds 10] [--config cluster.cfg]
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+    None known
+
+=head1 BUGS AND LIMITATIONS
+
+     There are no known bugs in this module.
+     Please report problems to molecules <at> cpan <dot> org.
+     Patches are welcome.
+
+=head1 SEE ALSO
+
+=head1 ACKNOWLEDGEMENTS
+

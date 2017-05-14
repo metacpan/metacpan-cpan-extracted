@@ -1,0 +1,49 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 24-May-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: pod Filter
+
+H2: Interface
+
+!filter_interface "pod"
+
+H2: Description
+
+The {{pod}} filter is used to nest POD text within an SDF document.
+
+The {{main}} parameter is used to specify that the first paragraph
+after "=head1 NAME" is the document name. This parameter is used
+internally by the {{CMD:sdf}} program when it needs to convert
+a POD document to another format.
+
+H2: Examples
+
+Some examples are:
+
+!block example; lang='sdf'
+    # Insert some pod
+    !block pod
+    A normal POD paragraph.
+
+        And some verbatim text.
+    !endblock
+
+    # Get pod from a file
+    !include "perlre.pod"; pod
+
+    # Get pod from standard output
+    !execute "getpod 'hello.c'"; pod
+!endblock
+
+
+#H2: Limitations & Future Directions

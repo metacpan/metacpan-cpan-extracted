@@ -3,7 +3,7 @@ use Moose;
 
 use Chart::Plotly::Trace::Attribute::Colorbar;
 
-our $VERSION = '0.011';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 sub TO_JSON {
     my $self = shift;
@@ -152,7 +152,7 @@ Chart::Plotly::Trace::Heatmap
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

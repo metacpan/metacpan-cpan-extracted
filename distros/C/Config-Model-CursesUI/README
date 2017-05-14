@@ -22,9 +22,9 @@ You can also run the test in interactive mode by typing:
 --------------------------------------------------------------------
 
 AUTHOR
-    Copyright (c) 2007-2009 Dominique Dumont.
+    Copyright (c) 2007-2009,2011,2017 Dominique Dumont.
 
-    This file is part of Config-Model-Itself.
+    This file is released under the LGPL-2.1 or any later version
 
 ---------------------------------------------------------------------
 INSTALLATION

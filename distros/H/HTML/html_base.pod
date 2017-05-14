@@ -1,0 +1,826 @@
+=head1 NAME
+
+HTML::Base
+
+=head1 DESCRIPTION
+
+HTML::Base is an expansion module for PERL version 5 which provides an
+object-oriented way to build pages of HTML.  It's purpose is to create
+HTML tags at the lowest level of functionality, that is to say, it creates
+HTML and doesn't do much else.  Specifically, it does B<not> provide any
+CGI-like services (see the CGI modules for that!).
+
+Currently, the module supports all of the standard HTML 2.0 tags, plus some
+selected tags from the proposed HTML 3.0 standard, and some NetScapeisms.
+
+=head1 AUTHOR
+
+Greg Anderson, of Anderson-Coates, a consulting firm specializing in
+professional Internet software and services.
+
+	email: greg@acoates.com
+	web:   http://www.acoates.com/
+	snail: 2504 Fairglen Drive, San Jose, CA  95125
+	phone: (408) 267-3306
+	fax:   (408) 269-8937
+
+Substantial contributions to the code have been made by:
+
+	Joel Rosi-Schwartz (joel@etish.co.uk)
+	Etish Associates
+        12 Waverley Way, Finchampstead, Wokingham, Berkshire RG40 4YD, UK
+        +44 1734 730260 (phone)
+	+44 1734 730272 (fax)
+
+	Randy Terbush (randy@zyzzyva.com)
+
+=head1 STATUS OF THE MODULE
+
+As of today (6/8/95) HTML::Base is in preliminary development, and is
+considered pre-Alpha code, presented solely for evaluation and discussion by
+the Perl community.  It is possible (even likely) that radical changes 
+will occur in the module before being released to the larger PERL world.
+
+=head1 COPYRIGHT
+
+The HTML::Base module is B<Copyright 1995, Anderson-Coates, all rights reserved>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 DOCUMENT CONVENTIONS
+
+An object whose class is defined by HTML::Base is called (loosely) an HTML
+object.  Each object represents a single instance of an HTML tag (such as
+B<H1> or B<BR>, for example).
+
+In code examples:
+
+	$objref = A reference to any HTML object.
+	$scalar = Any string (a normal scalar variable).
+
+=head1 OVERVIEW
+
+The primary function of the HTML::Base module is to provide definitions and
+methods for classes of HTML objects.  A base class, known as HtmlObject, is
+defined, from which all other HTML objects are derived.  All objects know
+where they are situated in a hierarchy of HTML objects that make up a page
+(or pages) of HTML.  They also know how to realize (display) themselves.
+
+When the module is first invoked (with the PERL 5 B<use> command -- see USAGE),
+an HTML hierarchy tree is begun by creating a single "top" HTML object.
+This object becomes the B<current> object.  The current object is the
+object which will be the parent of the next object created.
+
+HTML objects are created using the B<new> function (the syntax is described
+later).  Each newly created object becomes the current object, and hence will
+be the parent of the next object created.  This chain of parenthood continues
+until an object is B<ended>, or until another object is made the current
+object (you'll see how in a minute).
+
+When an entire hierarchy of HTML objects has been created, it may be 
+"realized"; that is, the objects may be told to output the appropriate HTML
+for their object classes, either to standard output or to a file.
+
+Here is a quick preliminary example:
+
+	use HTML::Base;
+
+	# Start the HTML, create a <BODY> tag
+	$body = new HTML::Base::Body;         
+	# Create an <H1>
+	new HTML::Base::Header 1;           
+
+	# Add some text to the header
+	new HTML::Base::Text "This is a header?";
+
+	# Add an image to the header
+	new HTML::Base::Image ('SRC','pictures/Huh.gif'); 
+
+	# Make the body current again
+	$body->make_current;                   
+	# Add a paragraph to the body
+	new HTML::Base::Paragraph;             
+
+	# Add some text to the paragraph
+	new HTML::Base::Text "This is a paragraph"; 
+
+	# Output everything
+	$body->realize;                        
+
+The above example would create (after the B<realize> method had been called)
+the following HTML:
+
+	<BODY>
+	<H1>
+	This is a header?
+	<IMG SRC="pictures/Huh.gif"></H1>
+	<P>
+	This is a paragraph
+	</P>
+	</BODY>
+
+=head1 INSTALLATION
+
+To install, simply copy the file Base.pm to a subdirectory called HTML in
+whatever directory you use to stash PERL 5 modules.  For example, if
+your PERL 5 modules are in /usr/local/lib/perl5, your should create a
+subdirectory there called HTML and copy Base.pm into it, like this:
+
+	/usr/local/lib/perl5/HTML/Base.pm
+
+=head1 USAGE
+
+To use HTML::Base in your PERL 5 program, include the following B<use> command:
+
+	use HTML::Base;
+
+HTML::Base exports no subroutine names into your program's namespace.
+
+
+=head1 HTML OBJECTS
+
+All objects that can be output to an HTML stream are derived from sub-classes 
+of the class HtmlObject.  Each HtmlObject can contain:
+
+=over 5
+
+=item 1
+
+A reference to the object's parent, if known. 
+
+=item 2
+
+A list of references to all of the object's children, if any. 
+
+=item 3
+
+A method for creating output to an HTML stream, called "display".
+
+=item 4
+
+A set of Attributes.  
+
+This is just a hash where the required attributes
+of a particular HTML object are stored.  For instance, the IMG tag
+requires a SRC attribute.  
+
+Each HTML object knows which attributes to recognize, and will ignore all 
+others.  Hence, it is perfectly fine to give your own attributes to HTML 
+objects during their construction (I'll show you how in a minute), so long 
+as their names do not conflict with any of the standard HTML attributes.  For
+convenience, the standard HTML attributes are specified in all capitals 
+(ie, "HREF").
+
+=item 5
+
+A set of Displayed Attributes.  
+
+This is a list of Attribute key names 
+that are to be used in building the HTML tags.  For example, the
+Preformatted object has one attribute in its displayed attributes
+list, "WIDTH".  If a Preformatted object is created with an
+{Attributes} hash = {'WIDTH','80','NAME','Bob'},
+only the WIDTH attribute will actually be output.  The result would look 
+like this:
+
+	<PRE WIDTH="80"> ... </PRE>
+
+=item 6
+
+A key, called "NoNewLine".
+
+If this key is set in the object, newlines will not be printed after the
+HTML tags for this object have been written to the output stream.  
+This key is generally set by an object's constructor (see, for example, 
+the package Preformatted), but may be set at any time on any HTML object.
+
+=back
+
+=head2 CONSTRUCTION OF HTML OBJECTS
+
+HTML objects are constructed using the B<new> function.  The simplest case is
+that of an HTML object that needs no attributes:
+
+	new HTML::Base::Break;
+
+This creates a Break object, making it the child of the B<current> HTML object.
+After construction, the new object becomes the current object, and hence the
+next HTML object to be constructed will be the child of this Break (unless
+other actions are taken first, like calling B<HTML::Base::end_object>).
+
+Some HTML objects expect their first parameter to be specified.  For example,
+the HTML headers come in 6 flavors (numbered 1-6), and so to create a Header
+object:
+
+	new HTML::Base::Header 2;
+		or
+	new HTML::Base::Header 'Level' => 2;
+
+This creates a level 2 Header as the child of the current HTML object.  Of 
+course like all good new functions, B<HtmlObject::new> returns a
+reference to the new object, which you can retain for later use:
+
+	$header = new HTML::Base::Header 6;
+
+All HTML objects will accept attributes.  It is assumed that the attributes
+(if any) will follow any required parameters in the new call, and will take
+the form of simple key, value pairs like this:
+
+	new HTML::Base::Header (2, 'Key', 'Value');
+
+You may also use the object parameter syntax to specify attributes, like this:
+
+	new HTML::Base::Header 'Level' => 2, Key => Value;
+
+Both examples create a level 2 Header and gives it an attribute called Key 
+with a value of Value.  Of course, the Header object doesn't recognize any 
+attributes, so this particular Key/Value pair would be purely for private 
+use (Motif people can think of it as the widget's "user data" resource).
+
+Those HTML objects that B<do> recognize attributes expect them to be set in the
+constructor.  For example:
+
+	new HTML::Base::Anchor ('HREF','http://www.acoates.com/');
+
+creates an anchor with my company's home page as its destination.
+
+Similarly, the statement
+
+
+	new HTML::Base::Image 
+		('SRC','pictures/Goofy.gif','ALT',' ','ALIGN','MIDDLE');
+
+creates an image tag with the given SRC, ALT, and ALIGN attributes.
+
+One special attribute is recognized by all HTML objects.  If specified in
+the construction of an object, the B<NoParent> attribute will force the
+module to create an object which is B<not> linked into the HTML hierarchy
+and is B<not> made a child of the B<current> object.  This allows you to
+create "lone" objects which exist in memory but will not affect the
+HTML output in any way.  
+
+See the object methods B<link_to_parent>, B<copy_object>, and 
+B<use_object> to see what you can do with these rogue objects.
+
+
+=head2 HTML OBJECT METHODS
+
+HTML objects have some methods defined which make them easier (hopefully) to
+work with.  
+
+=over 8
+
+=item $objref->make_current
+
+This makes the referenced object the B<current> object.  
+Hence, the next HTML object created will be a child of this object.
+This is useful for remembering a point in an HTML hierarchy that you wish 
+to return to quickly.  Simply stash a reference to the desired object in a 
+scalar variable.  Then, when you want that object to be current again, 
+call $objref->make_current.
+
+=item $objref->end_object 
+
+This "closes" the given object, and makes its parent the
+B<current> object.  Note that, although I use the word "close" here, the
+object is never really "open", and hence you can call end_object
+for any object at any time.  The only real consequence is that the
+object's parent becomes the B<current> object.  
+
+=item $objref->realize 
+
+This is the method to call when you want a tree of HTML objects to
+display themselves.  The object passed to realize is executed, along
+with all of its children (but not its ancesters).  
+
+A global function, C<HTML::Base::realize>, will call B<realize> for
+the upper-most object in the tree, thus "realizing" the entire
+hierarchy and outputting all of the HTML.
+
+A method called B<execute> is also defined, and it does the exact same thing
+as B<realize>.
+
+=item $objref->find_top_object 
+
+This returns a reference to the object which is the given object's most 
+distant relative (up-wise, that is).
+
+=item $objref->object_type  
+
+Returns a scalar returning the name of the class of the HTML object referenced
+by B<$objref>.  The returned name has been stripped of its HTML::Base::
+prefix.  Hence, the name of an anchor object is merely "Anchor".
+
+=item $objref->copy_object
+
+Makes a copy of the given HTML object and returns a reference to the new
+object.  The source object is copied, along with all of its attributes.
+All of its children are copied too, along with all of B<their> children
+and attributes.
+
+The new object is B<not> inserted into the HTML hierarchy, nor does it
+have a parent.  To add the new copy into the object tree, use the
+B<link_to_parent> method.
+
+=item $objref->link_to_parent ($parent_objref)
+
+This makes the object referenced by B<$objref> a child of the object 
+referenced by B<$parent_objref>.  
+B<Note that an object may only have one parent.>
+This means if the source object already has a relationship with a parent,
+that relationship will be forgotten altogether, and only the new relationship
+will exist.
+
+Be careful how you use this method.  The best use is to link objects that
+have been copied from other objects (via the B<copy_object> method) to
+objects in the HTML hierarchy.
+
+=item $objref->contained_by ($scaler)
+
+If B<$scaler> contains the name of an HTML object class, B<contained_by> will
+return B<1> if the object referenced by B<$objref> has an ancester who
+belongs to that class.  For example:
+
+	use HTML::Base;
+
+	new HTML::Base::Preformatted;
+	new HTML::Base::Text "This is preformatted text";
+	new HTML::Base::Bold 
+	$boldtext = new HTML::Base::Text "This is bold preformatted text";
+	if ($boldtext->contained_by ('Preformatted')) {
+  		print "huh?\n";
+	}
+
+This can be useful for finding out if a given object is contained in a FORM,
+ANCHOR, or PRE tag.
+
+=item $objref->showme  
+
+This is a little debugging routine.  Calling B<$objref->showme> 
+causes the object to print out some stats about itself to STDERR.
+
+=head1 GLOBAL SUBROUTINES
+
+HTML::Base contains several B<global> subroutines 
+(ie, they are defined directly in package HTML::Base).  
+
+=item HTML::Base::html_debug 
+
+Turns on a rather verbose debugging mode.  Messages about object creation
+and realization will be sent to STDERR.
+
+=item HTML::Base::get_current 
+
+Returns a reference to the B<current> object.
+
+=item HTML::Base::end_object($objref) 
+
+When passed a reference to an Html object, B<closes> that object by making 
+its parent the B<current> object.  If no $objref is passed, closes the
+current object, making its parent current.
+
+=item HTML::Base::end_all_objects 
+
+Closes all open objects, simply by changing the 
+current object to be the upper-most object.  This is a convenient way 
+to get out of a deeply nested set of HTML commands quickly and start fresh.
+
+=item HTML::Base::realize 
+
+This is the method which makes an HTML object tree 
+output itself.  Html::Base::realize is simply a convenient wrapper around the 
+HtmlObject class's realize method.  A client application may 
+use this subroutine without any arguments to mean "output the 
+entire object tree from the top down".
+
+=item HTML::Base::copy_object($objref)
+
+This takes a reference to an existing HTML object (B<$objref>)
+and makes a copy of it, including all of its attributes and children.
+The copy will have no parent, and will not be linked to the current object.
+A reference to the copy is returned.
+
+=item HTML::Base::link_to_parent($child_objref, $parent_objref) 
+
+This makes the object referenced by B<$child_objref> a child of the object 
+referenced by B<$parent_objref>.  
+B<Note that an object may still  have only one parent.> 
+
+=item HTML::Base::cache_object($name, $objref)
+
+Pushes a copy of the HtmlObject referenced by $objref into the HTML object
+cache, and gives the copy the name contained in the scalar B<$name>.  
+The copy will include all of the source object's attributes and children,
+but will have no parent, and will not be linked to the current object.
+
+The HTML object cache is simply an associative array relating names and
+object references.  It can be used to build a library of frequently used
+HTML constructs, of any size, and then later insert them into the
+HTML hierarchy via the HTML::Base::use_object function.
+
+Returns a reference to the new object.
+
+=item HTML::Base::use_object($name)
+
+Copies a previously cached HtmlObject from the HTML object cache into the 
+current object tree.
+The scalar B<$name> is used as the key in the cache to locate the desired
+object.  If B<$name> is null, or the name is not recognized, nothing happens.
+
+The new copy will include all of the cached object's attributes and children,
+and will be made a child of the B<current> object.  The cached object is
+left unaltered in the cache, and may be used again.
+
+It is important to note that, in a progression of B<new>, B<cache_object>,
+and B<use_object> calls, the source object in each call is unaltered and
+continues to exist after the function is completed.  This means that in
+such a progression, three objects are created and maintained.
+Changing any of the parents or children of any of the three has no effect
+upon the other two.
+
+Returns a reference to the new object, which is also made the B<current>
+object.
+
+=item HTML::Base::object_type($objref)
+
+Returns a scalar containing the name of the class of the HTML object referenced
+by B<$objref>.  The returned name has been stripped of its HTML::Base::
+prefix.  Hence, the name of an anchor object is merely "Anchor".
+
+=item HTML::Base::contained_by($objref, $scaler)
+
+If B<$scaler> contains the name of an HTML object class, B<contained_by> will
+return B<1> if the object referenced by B<$objref> has an ancester who
+belongs to that class.  
+
+=item HTML::Base::output_html($scalar) 
+
+This is a simple output filter which translates all 
+of the HTML reserved characters (like "<" and ">") to their ugly HTML escape 
+equivalents, then outputs the resulting string.  You will probably never
+need to call this, since the display methods of the HTML objects use it
+themselves.
+
+=head1 CONTROLLING OUTPUT DESTINATION
+
+By default, all HTML output is directed to STDOUT.  This can be changed
+using the OUTPUTFILE attribute of the B<Page> object.  See the B<Page> object's
+description in the HTML Object Classes section.
+
+=head1 HTML OBJECT CLASSES
+
+Here are the details for all of the HTML object classes currently defined.
+Some objects have special features which may be invoked at construction time.
+Because I prefer to use english name for HTML tags, I have mapped all of the
+HTML tags to english-named objects.  Note that all of the following class
+names must be preceded by the package name B<HTML::Base::> during construction.
+
+=item Address 
+
+Implements the <ADDRESS></ADDRESS> HTML tags
+
+=item Anchor  
+
+Implements the <A></A> HTML tags
+
+Takes the following attributes: HREF, NAME, REL, REV, URN, METHODS
+
+=item Base 
+
+Implements the <BASE></BASE> HTML tags
+
+Takes the following attribute: HREF
+
+=item BlockQuote 
+
+Implements the <BLOCKQUOTE></BLOCKQUOTE> HTML tags
+
+=item Body 
+
+Implements the <BODY></BODY> HTML tags
+
+Takes the following attributes: BACKGROUND, BGCOLOR, TEXT, LINK, and VLINK
+
+=item Bold 
+
+Implements the <B></B> HTML tags
+
+=item Break 
+
+Implements the <BR> HTML tag
+
+Takes the following attribute: CLEAR
+
+=item Center 
+
+Implements the <CENTER></CENTER> HTML tags
+
+=item Cite 
+
+Implements the <CITE></CITE> HTML tags
+
+=item Code 
+
+Implements the <CODE></CODE> HTML tags
+
+=item Comment 
+
+Implements the <!-- ...  --> HTML tags
+
+=item Definition 
+
+Implements the <DD> HTML tag
+
+=item DefinitionList 
+
+Implements the <DL></DL> HTML tags
+
+=item DefinitionTerm 
+
+Implements the <DT> HTML tag
+
+=item Directory 
+
+Implements the <DIR></DIR> HTML tags
+
+=item Emphasis 
+
+Implements the <EM></EM> HTML tags
+
+=item Form 
+
+Implements the <FORM></FORM> HTML tags
+
+Takes the following attributes: METHOD, ACTION, and ENCTYPE
+
+=item Head 
+
+Implements the <HEAD></HEAD> HTML tags
+
+=item Header 
+
+Takes the following attributes (see below): Level, ALIGN
+
+Implements the <Hx></Hx> HTML tags, where
+"x" is an integer in the range of 1-6, which must be specified as
+the first parameter of the "new" function call.  For example:
+
+	new HTML::Base::Header 2;
+
+This may also be specified as an attribute called B<Level>, but if
+used it must be the first attribute to be given, like this:
+
+	new HTML::Base::Header ('Level', '2');
+		   or
+	new HTML::Base::Header 'Level' => '2';
+
+=item HorizontalRule 
+
+Implements the <HR> HTML tag
+
+=item Image 
+
+Implements the <IMG> HTML tag
+
+Takes the following attributes: SRC, ALIGN, ALT, ISMAP, BORDER
+
+Note that the "ISMAP" attribute in HTML takes no value.  To
+specify, just define it in the constructor and give it an empty
+value:
+
+	 new HTML::Base::Image ('SRC','pictures/goofy.gif','ISMAP','');
+
+=item Input 
+
+Implements the <INPUT> HTML tag
+
+Takes the following attributes: ALIGN, CHECKED, MAXLENGTH, NAME, SIZE, SRC, 
+TYPE, and VALUE
+
+=item IsIndex 
+
+Implements the <ISINDEX> HTML tag
+
+=item Italic 
+
+Implements the <I></I> HTML tags
+
+=item Keyboard 
+
+Implements the <KEYBOARD></KEYBOARD> HTML tags
+
+=item Link 
+
+Implements the <LINK> HTML tag
+
+Takes the following attributes: HREF, NAME, REL, REV, URN, METHODS
+
+=item ListItem 
+
+Implements the <LI> HTML tag
+
+=item Menu 
+
+Implements the <MENU></MENU> HTML tags
+
+=item Meta 
+
+Implements the <META> HTML tag
+
+Takes the following attributes: NAME, CONTENT, HTTP-EQUIV
+
+=item NextId 
+
+Implements the <NEXTID> HTML tag
+
+Takes the curious attribute: N
+
+=item Option 
+
+Implements the <OPTION> HTML tag
+
+Takes the following attributes: SELECTED, and VALUE
+
+=item OrderedList 
+
+Implements the <OL></OL> HTML tags
+
+=item Page 
+
+Implements the <HTML></HTML> HTML tags
+
+Takes the following attributes (see below): OUTPUTFILE, OUTPUTMODE
+
+Page is a special kind of HtmlObject.  Not only does it output the
+HTML and /HTML tags, it also controls the filehandle to which output
+for a particular page of HTML will be sent.
+
+The Page object recognizes the attribute "OUTPUTFILE", which will specify
+the name of the file to write HTML into for this page.  The attribute
+OUTPUTMODE defines whether or not we want to trash any existing content
+of the file (OUTPUTMODE = OVERWRITE, which is the default), or append
+the current HTML to an existing file (OUTPUTMODE = APPEND).
+If no filename is given, standard output is assumed.
+
+Each page object remembers the output file handle that it replaced.
+This allows you to nest page objects in a hierarchy, if you want to.
+For example:
+
+	$page = new HTML::Base::Page ('OUTPUTFILE','gorpo.html');
+	new HTML::Base::Text "This is being written to gorpo.html!";
+	new HTML::Base::Page ('OUTPUTFILE','trasho.html');
+	new HTML::Base::Text "This is being written to trasho.html!";
+        $page->make_current;
+	new HTML::Base::Text "This TOO is being written to gorpo.html!";
+        $page->realize;
+
+This example creates two HTML files.  Check 'em out:
+
+	$ more gorpo.html
+	<HTML>
+	This is being written to gorpo.html!
+	This TOO is being written to gorpo.html!
+	</HTML>
+	$ more trasho.html
+	<HTML>
+	This is being written to trasho.html!
+	</HTML>
+
+Neat, huh?
+
+=item Paragraph 
+
+Implements the <P></P> HTML tags
+
+Takes the attribute: ALIGN
+
+=item Preformatted 
+
+Implements the <PRE></PRE> HTML tags
+
+Takes the attribute: WIDTH
+
+=item Sample 
+
+Implements the <SAMPLE></SAMPLE> HTML tags
+
+=item Select
+
+Implements the <SELECT></SELECT> HTML tags
+
+Takes the following attributes: NAME, MULTIPLE, SIZE, and ALIGN
+
+=item Strong 
+
+Implements the <STRONG></STRONG> HTML tags
+
+=item Text 
+
+Implements regular text in HTML.
+
+Takes the following attributes (see below): Text, Eval, Verb
+
+Text is a special-purpose HTML object which has no HTML tag associated
+with it.  Instead, it is meant to contain the text that makes up the
+actual content of the HTML document.  A Text object which is a child of
+an HTML object will output its text within the scope of the HTML tags
+of its owner.
+
+The actual text is stored in an attribute of Text called {Text} (confused
+yet?)  When being passed to the Text constructor, the text to be
+displayed must be the first parameter, preceding any attributes to be
+set.  Examples:
+
+
+	new HTML::Base::Text "This is my text";
+        new HTML::Base::Text ("This is my text","Attribute1","Wowzo");
+
+The text may also be passed in as the attribute B<Text>, but if specified
+like this it must be the first Attribute given:
+
+        new HTML::Base::Text ('Text', 'This is my text');
+		  or
+        new HTML::Base::Text Text => 'This is my text';
+
+Before being output, the text is sanitized for HTML use by translating
+forbidden HTML chars (like "<") into their HTML escape equivalences.
+
+Two other attributes are defined for the Text object. If B<Verb> is defined
+in the constructor, then the text will not be "sanitized" for HTML before
+being output, but rather will be copied verbatim to the output stream.  This
+allows you to patch in bits of HTML code wherever you want (but B<you> are
+responsible for the integrity of such code).
+
+Similarly, if B<Eval> is defined, the text is first passed to the PERL
+B<eval> function, and the output of that call is sent, unfiltered, to the
+output stream.  This permits the inclusion of text objects on the
+HTML tree that are evaluated at the time of actual usage, enabling
+the embedding of Perl variables whose values are either
+not known at the time of construction or which change dynamically.
+
+This is especially useful for constructs such as
+
+	new HTML::Base::Text('${\main::pure_magic()}', Eval => 1);
+
+This will delay the call to B<pure_magic()> until the moment that
+the Page is being output, at which time it will insert the output from the call
+into the byte stream of the Page. Note that the the argument must be in 
+single quotes (') for this to work. Also be aware that the evaluation takes 
+place in package Eval, but that all variables are automatically forced back 
+into main before the evaluation. This does the `right' thing even if
+the variable is in another package.
+
+=item TextArea 
+
+Implements the <TEXTAREA></TEXTAREA> HTML tags
+
+Takes the following attributes: NAME, ROWS, and COLS
+
+=item Title 
+
+Implements the <TITLE></TITLE> HTML tags
+
+=item Tty 
+
+Implements the <TTY></TTY> HTML tags
+
+=item UnorderedList 
+
+Implements the <UL></UL> HTML tags
+
+=item Var 
+
+Implements the <VAR></VAR> HTML tags
+
+=item Table
+
+Implements the <TABLE></TABLE> HTML tags
+
+Takes the following attributes: BORDER, CELLPADDING, CELLSPACING,and WIDTH
+
+=item TableCaption
+
+Implements the <CAPTION></CAPTION> HTML tags
+
+Takes the following attributes: ALIGN, and VALIGN
+
+=item TableData
+
+Implements the <TD></TD> HTML tags
+
+Takes the following attributes: ALIGN, VALIGN, NOWRAP, COLSPAN, ROWSPAN, 
+and WIDTH
+
+=item TableHeader
+
+Implements the <TH></TH> HTML tags
+
+Takes the following attributes: ALIGN, VALIGN, NOWRAP, COLSPAN, ROWSPAN, 
+and WIDTH
+
+=item TableRow
+
+Implements the <TR></TR> HTML tags
+
+Takes the following attributes: ALIGN, and VALIGN

@@ -1,0 +1,14 @@
+
+
+
+=begin list  # push pending begin & pos
+
+=begin list  # push pending begin & pos
+
+=item 1.     # finish one pending begin, still one waiting
+
+=end list    # begin still pending, must queue
+
+=item *      # finish pending begin, flush queue
+
+=end list    #output normally

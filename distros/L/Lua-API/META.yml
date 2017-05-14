@@ -1,0 +1,43 @@
+---
+abstract: "interface to Lua's embedding API"
+author:
+  - 'Diab Jerius, <djerius@cpan.org>'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::ParseXS: 2.21
+  Test::Class: 0
+  Test::Compile: 0
+  Test::Most: 0
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::PkgConfig: 0
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lua-API
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+provides:
+  Lua::API:
+    file: lib/Lua/API.pm
+  Lua::API::Buffer:
+    file: API.xs
+  Lua::API::Debug:
+    file: API.xs
+  Lua::API::State:
+    file: API.xs
+requires:
+  XSLoader: 0.1
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/gpl-3.0.html
+version: 0.04

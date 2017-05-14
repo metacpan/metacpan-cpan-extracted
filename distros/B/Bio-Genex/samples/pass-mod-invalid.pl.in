@@ -1,0 +1,135 @@
+%%START_PERL%% -wT
+#
+# File: samples/pass-mod-invalid.pl.in
+#
+# This script is called by samples/pass-mod.pl when the password change
+#   fails
+#
+# Programmer: Jason E. Stewart (jes@ncgr.org)
+#
+# script copyright (c) 2000 by NCGR.
+# All rights reserved.
+
+use strict;
+%%GENEX_EXTRALIBS%%
+
+use CGI qw(:standard :html3);
+
+# Clean up the enviroment for Taint mode
+$ENV{PATH} = "/bin:/usr/bin";
+delete @ENV{ 'IFS','CDPATH','ENV','BASH_ENV' };
+
+$|++;
+
+my $q = CGI->new();
+my $PASS_LEN = 12;
+
+# Extract and validate the user ID. This will be the primary key
+# for the entry in the UserSec table, and should only have digits
+# separated by a hyphen and then any hexadecimal digit
+# User ID pass on command line
+my ($field,$user,$rest) = split /=/, $ARGV[0];
+$user =~ /^(\d+-[a-f\d]+)$/;
+my $userid = $1;
+error('No user ID') unless defined $userid;
+
+my $reason;
+($field,$reason,$rest) = split /=/, $ARGV[1];
+
+if ($reason eq 'short') {
+  $reason = ' the password contained too few characters.'
+} else {
+  $reason = ' the two passwords did not match.'
+}
+
+# Display the input form
+print <<EofHTML;
+Content-type: text/html
+
+<html><head><title>GeneX Password Modification</title></head>
+<body bgcolor=#ffffff>
+<div align=center>
+  <h2>Password Modification Failed</h2>
+</div>
+<p>Your password modification failed because $reason</p>
+
+<p>Please try again.</p>
+
+<p>
+Please enter your new password in the 'New Password' field, and again
+in the 'Re-type Password' field. If the passwords do not match, you
+will be asked to type them again.
+
+Passwords should have at least 5 characters and no more than $PASS_LEN.
+</p>
+
+<div align=center>
+<h1>  </h1>
+<form action="./pass-mod.pl" method=post>
+<input type=hidden name=userid value=$userid>
+<table>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> New Password:</td>
+    <td><input type=password name=new_password size=$PASS_LEN maxlength=$PASS_LEN></td>
+  </tr>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> Re-type Password:</td>
+    <td><input type=password name=retype_password size=$PASS_LEN maxlength=$PASS_LEN></td>
+  </tr>
+  <tr>
+    <td colspan=3 align=center>
+      <input type=submit value=\"Submit New Password\">
+    </td>
+  </tr>
+</table>
+</div>
+<hr>
+<div align=center>
+<font size=-2>
+Copyright &copy; 2000<br>by NCGR<br>All Rights Reserved
+</font>
+</div>
+</body></html>
+
+EofHTML
+
+sub error {
+  my $error = shift;
+  print $q->header(), $q->start_html('Error'),
+    $q->h1("Error: $error"),
+      $q->end_html();
+  exit(1);
+}
+
+__END__
+
+=head1 NAME
+
+B<pass-mod-invalid.pl>: a CGI script for modifying the UserSec password information.
+
+=head1 SYNOPSIS
+
+  password.pl
+
+=head1 DESCRIPTION
+
+This script takes no parameters. The script provides fields for modifying the user\'s password.
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+$Date: 2001/02/05 16:34:24 $ by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

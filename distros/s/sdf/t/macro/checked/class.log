@@ -1,0 +1,7 @@
+class.sdf warning, filter on 14: unknown object 'D' in class 'widgets'
+class.sdf warning, para. on 31: unknown object 'F' in class 'widgets' (name EP)
+class.sdf warning, para. on 31: unknown object 'Omega' in class 'widgets' (long EP)
+class.sdf warning, para. on 35: unknown object 'F' in class 'widgets' (name EP)
+class.sdf warning, para. on 35: unable to expand object 'F' in class 'widgets'
+class.sdf warning, para. on 35: unknown object 'Omega' in class 'widgets' (long EP)
+class.sdf warning, para. on 35: unable to shrink object 'Omega' in class 'widgets'

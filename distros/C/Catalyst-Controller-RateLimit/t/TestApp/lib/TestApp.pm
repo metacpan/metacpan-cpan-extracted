@@ -16,8 +16,8 @@ use Catalyst::Runtime '5.70';
 use parent qw/Catalyst/;
 use Catalyst qw/
                 ConfigLoader
-                Cache::Memcached::Fast
-                Static::Simple/;
+                Cache::FastMmap
+                /;
 our $VERSION = '0.01';
 
 # Configure the application. 
@@ -29,11 +29,7 @@ our $VERSION = '0.01';
 # with a external configuration file acting as an override for
 # local deployment.
 
-__PACKAGE__->config( name => 'TestApp', cache => {
-    servers => [
-        $ENV{MEMCACHED_SERVER}
-    ]
-});
+__PACKAGE__->config( name => 'TestApp' );
 
 # Start the application
 __PACKAGE__->setup();

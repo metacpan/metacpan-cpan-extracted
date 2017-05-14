@@ -9,6 +9,8 @@ use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST;
 use lib 't/lib';
 use Util;
 
+## no critic (ProhibitCallsToUnexportedSubs)
+## no critic (RequireExplicitInclusion)
 {
     my $ppa = Util::mocked_ppa;
     my $mocker
@@ -32,7 +34,6 @@ use Util;
 
 # Ensure PPREF is now present in response
 {
-
     my $ppa = Util::mocked_ppa;
     my $mocker
         = WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST->new(

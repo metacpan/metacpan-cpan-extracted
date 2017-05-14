@@ -1,0 +1,20 @@
+# This file tests the on macro (phrases)
+
+!on phrase '';; $text =~ s/object/Object/
+
+Some text including a {{MYTYPE:mytype object}} and
+another {{B:bold object}}.
+
+# Try conditionally setting an attribute and changing the style
+!on phrase 'MY\w*';; $attr{'jump'} = "#$text"; $style = 'U'
+
+Some more text including a {{MYTYPE:mytype object}} and
+another {{B:bold object}}.
+
+Yet another {{MY:object}}.
+
+H2[obj="MYTYPE"] A Heading which is a MYTYPE
+
+# Try appending to a phrase
+!on phrase '';; $append .= ++$igc_count
+Hello {{world}}. I hope you are {{B:really {{U:well}}}} today.

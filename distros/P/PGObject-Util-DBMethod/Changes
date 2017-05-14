@@ -1,5 +1,9 @@
 Revision history for PGObject-Util-DBMethod
 
+1.00.002
+	2017-05-10
+	Remove MYMETA.json from distribution archive
+
 1.00.001
 	2014-02-24
 	Bumped up required Perl version from 5.6 to 5.8

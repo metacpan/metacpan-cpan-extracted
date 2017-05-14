@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_SAML;    #inherits
 use Lemonldap::NG::Common::Conf::SAML::Metadata;
 
-our $VERSION = '1.4.11';
+our $VERSION = '1.9.8';
 our @ISA     = qw(Lemonldap::NG::Portal::_SAML);
 
 ## @apmethod int authInit()
@@ -192,15 +192,17 @@ sub extractFormInfo {
             }
 
             # Do we check conditions?
-            my $checkConditions =
+            my $checkTime =
               $self->{samlIDPMetaDataOptions}->{$idpConfKey}
-              ->{samlIDPMetaDataOptionsCheckConditions};
+              ->{samlIDPMetaDataOptionsCheckTime};
+            my $checkAudience =
+              $self->{samlIDPMetaDataOptions}->{$idpConfKey}
+              ->{samlIDPMetaDataOptionsCheckAudience};
 
-            # Check conditions - time and audience
-            if (
-                $checkConditions
-                and !$self->validateConditions(
-                    $assertion, $self->getMetaDataURL( "samlEntityID", 0, 1 )
+            unless (
+                $self->validateConditions(
+                    $assertion, $self->getMetaDataURL( "samlEntityID", 0, 1 ),
+                    $checkTime, $checkAudience
                 )
               )
             {
@@ -208,8 +210,12 @@ sub extractFormInfo {
                 return PE_SAML_CONDITIONS_ERROR;
             }
 
+            my $relayStateURL =
+              $self->{samlIDPMetaDataOptions}->{$idpConfKey}
+              ->{samlIDPMetaDataOptionsRelayStateURL};
+
             #  Extract RelayState information
-            if ( $self->extractRelayState($relaystate) ) {
+            if ( $self->extractRelayState( $relaystate, $relayStateURL ) ) {
                 $self->lmLog( "RelayState $relaystate extracted", 'debug' );
             }
 
@@ -293,52 +299,57 @@ sub extractFormInfo {
             $self->{_samlToken} = $saml_token;
 
             # Restore initial SAML request in case of proxying
-            my $moduleOptions = $self->{samlStorageOptions} || {};
-            $moduleOptions->{backend} = $self->{samlStorage};
-            my $module = "Lemonldap::NG::Common::Apache::Session";
+            if ($assertion_responded) {
+                my $moduleOptions = $self->{samlStorageOptions} || {};
+                $moduleOptions->{backend} = $self->{samlStorage};
+                my $module = "Lemonldap::NG::Common::Apache::Session";
 
-            my $saml_sessions =
-              $module->searchOn( $moduleOptions, "ProxyID",
-                $assertion_responded );
+                my $saml_sessions =
+                  $module->searchOn( $moduleOptions, "ProxyID",
+                    $assertion_responded );
 
-            if ( my @saml_sessions_keys = keys %$saml_sessions ) {
+                if ( my @saml_sessions_keys = keys %$saml_sessions ) {
 
-                # Warning if more than one session found
-                if ( $#saml_sessions_keys > 0 ) {
-                    $self->lmLog(
+                    # Warning if more than one session found
+                    if ( $#saml_sessions_keys > 0 ) {
+                        $self->lmLog(
 "More than one SAML proxy session found for ID $assertion_responded",
-                        'warn'
-                    );
-                }
+                            'warn'
+                        );
+                    }
 
-                # Take the first session
-                my $saml_session = shift @saml_sessions_keys;
+                    # Take the first session
+                    my $saml_session = shift @saml_sessions_keys;
 
-                # Get session
-                $self->lmLog(
+                    # Get session
+                    $self->lmLog(
 "Retrieve SAML proxy session $saml_session for ID $assertion_responded",
-                    'debug'
-                );
+                        'debug'
+                    );
 
-                my $samlSessionInfo = $self->getSamlSession($saml_session);
+                    my $samlSessionInfo = $self->getSamlSession($saml_session);
 
-                $self->{_proxiedRequest} = $samlSessionInfo->data->{Request};
-                $self->{_proxiedMethod}  = $samlSessionInfo->data->{Method};
-                $self->{_proxiedRelayState} =
-                  $samlSessionInfo->data->{RelayState};
-                $self->{_proxiedArtifact} = $samlSessionInfo->data->{Artifact};
+                    $self->{_proxiedRequest} =
+                      $samlSessionInfo->data->{Request};
+                    $self->{_proxiedMethod} = $samlSessionInfo->data->{Method};
+                    $self->{_proxiedRelayState} =
+                      $samlSessionInfo->data->{RelayState};
+                    $self->{_proxiedArtifact} =
+                      $samlSessionInfo->data->{Artifact};
 
                # Save values in hidden fields in case of other user interactions
-                $self->setHiddenFormValue( 'SAMLRequest',
-                    $self->{_proxiedRequest} );
-                $self->setHiddenFormValue( 'Method', $self->{_proxiedMethod} );
-                $self->setHiddenFormValue( 'RelayState',
-                    $self->{_proxiedRelayState} );
-                $self->setHiddenFormValue( 'SAMLart',
-                    $self->{_proxiedArtifact} );
+                    $self->setHiddenFormValue( 'SAMLRequest',
+                        $self->{_proxiedRequest} );
+                    $self->setHiddenFormValue( 'Method',
+                        $self->{_proxiedMethod} );
+                    $self->setHiddenFormValue( 'RelayState',
+                        $self->{_proxiedRelayState} );
+                    $self->setHiddenFormValue( 'SAMLart',
+                        $self->{_proxiedArtifact} );
 
-                # Delete session
-                $samlSessionInfo->remove();
+                    # Delete session
+                    $samlSessionInfo->remove();
+                }
             }
 
             return PE_OK;
@@ -801,7 +812,8 @@ sub extractFormInfo {
                 name => $self->{_idpList}->{$_}->{name}
               };
         }
-        $self->{list} = \@list;
+        $self->{list}            = \@list;
+        $self->{confirmRemember} = 1;
 
         # Delete existing IDP resolution cookie
         push @{ $self->{cookie} },
@@ -905,7 +917,7 @@ sub extractFormInfo {
     my $method =
       $self->{samlIDPMetaDataOptions}->{$idpConfKey}
       ->{samlIDPMetaDataOptionsSSOBinding};
-    $method = $self->getHttpMethod($method) if $method;
+    $method = $self->getHttpMethod($method);
 
     # If no method defined, get first HTTP method
     unless ( defined $method ) {
@@ -1287,7 +1299,7 @@ sub authLogout {
     $method =
       $self->{samlIDPMetaDataOptions}->{$idpConfKey}
       ->{samlIDPMetaDataOptionsSLOBinding};
-    $method = $self->getHttpMethod($method) if $method;
+    $method = $self->getHttpMethod($method);
 
     # If no method defined, get first HTTP method
     unless ( defined $method ) {
@@ -1552,13 +1564,13 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2009-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by Sandro Cazzaniga, E<lt>cazzaniga.sandro@gmail.comE<gt>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2010, 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2015 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =item Copyright (C) 2010 by Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
 

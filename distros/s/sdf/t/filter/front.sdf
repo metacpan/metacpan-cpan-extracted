@@ -1,0 +1,19 @@
+# This file tests the front filter
+
+Some text before.
+
+!block front
+Some sdf
+- text.
+!endblock
+
+Some middle text.
+
+!block front
+Some more
+sdf text.
+
+E: An example paragraph
+!endblock
+
+Some text after.

@@ -1,0 +1,72 @@
+create table beancounter (
+	    version		varchar(12) not null,
+   	    data_last_updated	timestamp with time zone
+	);
+create table cash (
+	    name 		varchar(16) not null default '',
+	    value 		float default null,
+	    currency 		varchar(12) default null,
+	    type 		varchar(12) default null,
+	    owner 		varchar(16) default NULL,
+	    cost 		float default NULL,
+	    date 		date default NULL
+	);
+create table fxprices (
+	    currency   		varchar(12) not null default '',
+	    date		date default null,
+	    previous_close	float4 default null,
+	    day_open		float4 default null,
+	    day_low		float4 default null,
+	    day_high		float4 default null,
+	    day_close		float4 default null,
+	    day_change		float4 default null
+	);
+create table indices (
+	    symbol   		varchar(12) not null default '',
+	    stockindex		varchar(12) not null default ''
+	);
+create table portfolio (
+	    symbol   		varchar(16) not null default '',
+	    shares		float4 default null,
+	    currency		varchar(12) default null,
+	    type		varchar(16) default null,
+	    owner		varchar(16) default null,
+	    cost		float(4) default null,
+	    date		date default null
+	);
+create table stockinfo (
+	    symbol   		varchar(12) not null default '',
+	    name     		varchar(64) not null default '',
+	    exchange 		varchar(16) not null default '',
+	    capitalisation  	float4 default null,
+	    low_52weeks		float4 default null,
+	    high_52weeks	float4 default null,
+	    earnings		float4 default null,
+	    dividend		float4 default null,
+	    p_e_ratio		float4 default null,
+	    avg_volume		int4 default null,
+	    active		boolean default TRUE
+	);
+create table stockprices (
+	    symbol   		varchar(12) not null default '',
+	    date		date default null,
+	    previous_close	float4 default null,
+	    day_open		float4 default null,
+	    day_low		float4 default null,
+	    day_high		float4 default null,
+	    day_close		float4 default null,
+	    day_change		float4 default null,
+	    bid			float4 default null,
+	    ask			float4 default null,
+	    volume		int4 default null
+	);
+create unique index cash_pkey 
+	    on cash (name,type,owner,date);
+create unique index fxprices_pkey
+	    on fxprices (currency, date);
+create unique index portfolio_pkey
+	    on portfolio (symbol, owner, date);
+create unique index stockinfo_pkey
+	    on stockinfo (symbol);
+create unique index stockprices_pkey
+	    on stockprices (symbol, date);

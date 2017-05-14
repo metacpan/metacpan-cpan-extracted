@@ -1,5 +1,5 @@
 package Mojo::Weixin;
-our $VERSION = '1.3.3';
+our $VERSION = '1.3.4';
 use Mojo::Weixin::Base 'Mojo::EventEmitter';
 use Mojo::IOLoop;
 use Mojo::Weixin::Log;
@@ -23,6 +23,7 @@ has disable_color       => 0;           #是否禁用终端打印颜色
 
 has is_init_group_member => 0;
 has is_update_group_member => 1;
+has is_update_all_friend => 1;
 
 has account             => sub{ $ENV{MOJO_WEIXIN_ACCUNT} || 'default'};
 has start_time          => time;

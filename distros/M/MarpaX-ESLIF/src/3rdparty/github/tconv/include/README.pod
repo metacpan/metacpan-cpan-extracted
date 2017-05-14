@@ -26,6 +26,8 @@ When calling L<tconv_open>:
 it is I<legal> to have NULL for C<fromcode>. In this case the I<first chunk> of input will be used for charset detection, it is therefore recommended to use enough bytes at the very beginning. If C<fromcode> is not NULL, no charset detection will occur, and tconv will behave like L<iconv(3)>, modulo the engine being used (see below).
 If C<tocode> is NULL, it will default to C<fromcode>.
 
+Testing if the return value is equal to C<(size_t) -1> or not, together with C<errno> value when it is C<(size_t) -1> as documented for C<iconv>, is the only reliable check: in theory it should return the number of non-reversible characters, and this is what will happen is this is C<iconv> running behind. In case of another convertion engine, the return value depend on this engine capabilities, or how the corresponding plugin is implemented.
+
 =head1 ENGINES
 
 tconv support two engine types: one for charset detection, one for character conversion, please refer to the L<tconv_open_ext> documentation for technical details. Engines, whatever their type, are supposed to have three entry points: C<new>, C<run> and C<free>. They can be:
@@ -85,6 +87,28 @@ It is guaranteed that tconv() will behave exactly like iconv() if the character 
 =item POSIX compliance
 
 By POSIX compliance, we mean that, when the output buffer is too small, iconv should stop updating the input and output pointers prior to when the limit is reached. When the character conversion engine is ICONV on an UNIX platform, it is the behaviour of this UNIX platform that happen. In any other case, the plug-ins guarantee at least that input and output pointers are left in a state that, if being called again, will correctly handle the continuation of the conversion.
+
+=item Iconv plugin
+
+Iconv plugin is a direct interface to C<iconv> library when tconv is compiled. Though, iconv implementations are not uniform. tconv applies the following:
+
+=over
+
+=item C<//TRANSLIT> support
+
+If native iconv does not support C<//TRANSLIT>, this option is silently removed. Only the uppercased C<//TRANSLIT> is checked.
+
+=item C<//IGNORE> support
+
+If native iconv does not support C<//IGNORE>, this option is silently removed. Only the uppercased C<//IGNORE> is checked.
+
+=item Identical charsets
+
+If charsets appears to be identical (case insensitive), tconv is trusting the user and I<no> call to iconv will happen: data will be transfered as-is.
+
+=back
+
+Because of this non-uniform implementation of iconv, it is recommended to have ICU available at least available when you build tconv.
 
 =back
 

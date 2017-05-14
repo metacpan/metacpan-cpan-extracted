@@ -12,17 +12,16 @@ use JSON;
 use HTTP::Request::Common;
 
 use Pinto::Result;
-use Pinto::Constants qw(:protocol);
-use Pinto::Util qw(current_time_offset);
+use Pinto::Constants qw(:server);
 use Pinto::Types qw(Uri);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
-with qw(Pinto::Role::Plated Pinto::Role::UserAgent);
+with qw(Pinto::Role::Plated);
 
 #------------------------------------------------------------------------------
 
@@ -56,6 +55,12 @@ has password => (
     required => 1,
 );
 
+has ua => (
+    is       => 'ro',
+    isa      => 'LWP::UserAgent',
+    required => 1,
+);
+
 #------------------------------------------------------------------------------
 
 
@@ -76,15 +81,13 @@ sub _make_request {
     my $action_name  = $args{name} || $self->name;
     my $request_body = $args{body} || $self->_make_request_body;
 
-    my $uri = URI->new( $self->root );
-    $uri->path_segments( '', 'action', lc $action_name );
+    my $url = URI->new( $self->root );
+    $url->path_segments( '', 'action', lc $action_name );
 
     my $request = POST(
-        $uri,
-        Accept        => $PINTO_PROTOCOL_ACCEPT,
-        Content       => $request_body,
-        Content_Type  => 'form-data',
-
+        $url,
+        Content_Type => 'form-data',
+        Content      => $request_body
     );
 
     if ( defined $self->password ) {
@@ -109,8 +112,8 @@ sub _chrome_args {
 
     my $chrome_args = {
         verbose  => $self->chrome->verbose,
-        color    => $self->chrome->color,
-        palette  => $self->chrome->palette,
+        no_color => $self->chrome->no_color,
+        colors   => $self->chrome->colors,
         quiet    => $self->chrome->quiet
     };
 
@@ -123,10 +126,7 @@ sub _chrome_args {
 sub _pinto_args {
     my ($self) = @_;
 
-    my $pinto_args = {
-        username    => $self->username,
-        time_offset => current_time_offset,
-    };
+    my $pinto_args = { username => $self->username };
 
     return ( pinto => encode_json($pinto_args) );
 }
@@ -148,11 +148,10 @@ sub _send_request {
 
     my $request = $args{req} || $self->_make_request;
     my $status = 0;
-    my $buffer = '';
 
     # Currying in some extra args to the callback...
-    my $callback = sub { $self->_response_callback( \$status, \$buffer, @_ ) };
-    my $response = $self->request( $request, $callback );
+    my $callback = sub { $self->_response_callback( \$status, @_ ) };
+    my $response = $self->ua->request( $request, $callback );
 
     if ( not $response->is_success ) {
         $self->error( $response->content );
@@ -165,29 +164,38 @@ sub _send_request {
 #------------------------------------------------------------------------------
 
 sub _response_callback {
-    my ( $self, $status, $buffer, $data ) = @_;
+    my ( $self, $status, $data ) = @_;
 
-    $data = ${$buffer}.$data;
-    while($data =~ /\G([^\n]*)\n/gc) {
-        my $line = $1;
-        if ( $line eq $PINTO_PROTOCOL_STATUS_OK ) {
+    # Each data chunk will be one or more lines ending with \n
+
+    chomp $data;
+    if ( not $data ) {
+
+        # HACK: So that blank lines come out right
+        # Need to find a better way to do this!!
+        $self->chrome->show('');
+        return 1;
+    }
+
+    for my $line ( split m/\n/, $data, -1 ) {
+
+        if ( $line eq $PINTO_SERVER_STATUS_OK ) {
             ${$status} = 1;
         }
-        elsif ( $line eq $PINTO_PROTOCOL_PROGRESS_MESSAGE ) {
+        elsif ( $line eq $PINTO_SERVER_PROGRESS_MESSAGE ) {
             $self->chrome->show_progress;
         }
-        elsif ( $line eq $PINTO_PROTOCOL_NULL_MESSAGE ) {
+        elsif ( $line eq $PINTO_SERVER_NULL_MESSAGE ) {
+
             # Do nothing, discard message
         }
-        elsif ( $line =~ m{^ \Q$PINTO_PROTOCOL_DIAG_PREFIX\E (.*)}x ) {
+        elsif ( $line =~ m{^ \Q$PINTO_SERVER_DIAG_PREFIX\E (.*)}x ) {
             $self->chrome->diag($1);
         }
         else {
             $self->chrome->show($line);
         }
     }
-    #Save leftovers, use them in next packet
-    (${$buffer}) = ($data =~ /\G(.*)$/g);
 
     return 1;
 }
@@ -205,7 +213,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -213,7 +224,7 @@ Pinto::Remote::Action - Base class for remote Actions
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 METHODS
 
@@ -228,7 +239,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -11,7 +11,7 @@ use HTTP::Date ();
 
 #-------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-------------------------------------------------------------------------------
 
@@ -24,12 +24,16 @@ sub respond {
 
     # e.g. /stack_name/modules/02packages.details.txt.gz
     my ( undef, @path_parts ) = split '/', $self->request->path_info;
+
     my $file = $self->root->file(@path_parts);
 
-    return not_found($file) if not -f $file;
-    return not_found($file) if index($file, '/../') > 0;
-
     my @stat = stat($file);
+    unless ( -f _ ) {
+        my $body = "File $file not found";
+        my $headers = [ 'Content-Type' => 'text/plain', 'Content-Length' => length($body) ];
+        return [ 404, $headers, [$body] ];
+    }
+
     my $modified_since = HTTP::Date::str2time( $self->request->env->{HTTP_IF_MODIFIED_SINCE} );
     return [ 304, [], [] ] if $modified_since && $stat[9] <= $modified_since;
 
@@ -67,15 +71,6 @@ sub should_not_cache {
 
 #-------------------------------------------------------------------------------
 
-sub not_found {
-    my $file = shift;
-    my $body = "File $file not found";
-    my $headers = [ 'Content-Type' => 'text/plain', 'Content-Length' => length($body) ];
-    return [ 404, $headers, [$body] ];
-}
-
-#-------------------------------------------------------------------------------
-
 __PACKAGE__->meta->make_immutable;
 
 #-------------------------------------------------------------------------------
@@ -88,7 +83,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -96,7 +94,7 @@ Pinto::Server::Responder::File - Responder for static files
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 METHODS
 
@@ -112,7 +110,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

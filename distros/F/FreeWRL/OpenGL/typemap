@@ -1,0 +1,37 @@
+XID		T_U_LONG
+Mask		T_U_LONG
+Atom		T_U_LONG
+VisualID		T_U_LONG
+Time		T_U_LONG
+Window		T_U_LONG
+Drawable		T_U_LONG
+Font		T_U_LONG
+Pixmap		T_U_LONG
+Cursor		T_U_LONG
+Colormap		T_U_LONG
+GContext		T_U_LONG
+KeySym		T_U_LONG
+KeyCode		T_U_CHAR
+GLenum		T_INT
+GLbitfield		T_U_INT
+GLboolean		T_U_CHAR
+GLbyte		T_CHAR
+GLshort		T_SHORT
+GLint		T_INT
+GLubyte		T_U_CHAR
+GLushort		T_U_SHORT
+GLuint		T_U_INT
+GLsizei		T_INT
+GLfloat		T_FLOAT
+GLclampf		T_FLOAT
+GLdouble		T_DOUBLE
+GLclampd		T_DOUBLE
+GLXPixmap		T_U_LONG
+GLXDrawable		T_U_LONG
+GLXContextID		T_U_LONG
+GLXContext	T_PTR
+Bool	T_INT
+GLUtriangulatorObj *	T_PTR
+GLUnurbsObj *	T_PTR
+GLUquadricObj *	T_PTR
+const GLubyte *  T_PTR

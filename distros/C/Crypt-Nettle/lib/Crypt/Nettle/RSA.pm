@@ -29,15 +29,8 @@ sub rsa_sign {
 
   my $hash = Crypt::Nettle::Hash->new($digest_algo);
   $hash->update($data);
-  my $signature = $self->rsa_sign_hash($hash);
-  return $signature
-    if (!defined($signature));
-  $signature =~ s/^0x//;
-  # pack gobbles up a byte at a time, not just a nybble.
-  # so make sure that we have an even number of nybbles to send to pack.
-  $signature = '0'.$signature
-    if (length($signature) % 2);
-  return pack('H*', $signature);
+  my $signature = $self->rsa_sign_hash_context($hash);
+  return $signature;
 };
 
 sub rsa_verify {
@@ -48,8 +41,7 @@ sub rsa_verify {
 
   my $hash = Crypt::Nettle::Hash->new($digest_algo);
   $hash->update($data);
-  my $cleansig = '0x'.unpack('H*', $signature);
-  return $self->rsa_verify_hash($hash, $cleansig);
+  return $self->rsa_verify_hash_context($hash, $signature);
 };
 
 
@@ -73,6 +65,16 @@ Crypt::Nettle::RSA - Perl interface to RSA public key cryptography from libnettl
 
 Crypt::Nettle::RSA provides an object interface to RSA public key
 cryptography implemented in the nettle C library (using libhogweed).
+
+Allowed RSA signature digest algorithms are: md5, sha1, sha256, and
+sha512.
+
+=head2 hashes_available()
+
+Get a list of strings that refer to the digest functions this perl
+module can use for creating and verifying RSA signatures.
+
+ my @algos = Crypt::Nettle::RSA::hashes_available();
 
 =head1 KEY CREATION
 
@@ -106,9 +108,6 @@ Return a packed binary string that is the key's signature over $data.
 
 Returns undefined if there was an error.
 
-Allowed RSA signature digest algorithms are: md5, sha1, sha256, and
-sha512.
-
 =head2 rsa_verify($digest_algo, $data, $signature)
 
 Returns 1 if this public key was the author of $signature over $data.
@@ -120,8 +119,51 @@ Return undefined if there was an error.
  my $ret = $private_key->rsa_verify('sha1', 'This is a test message', $sig);
  printf('Signature: %s\n', (defined($ret) ? ($ret ? 'OK' : 'BAD') : 'ERROR'));
 
-Allowed RSA signature digest algorithms are: md5, sha1, sha256, and
-sha512.
+=head2 rsa_sign_hash_context($hash_ctx)
+
+=head2 rsa_verify_hash_context($hash_ctx, $signature)
+
+These functions let you pass a Crypt::Nettle::Digest object for RSA
+signature/verification instead of needing to keep the entire $data in
+memory.  Here's signing:
+
+ my $hash = Crypt::Nettle::Hash->new('sha1');
+ $hash->update($data);
+ # ... more update()s ...
+ my $sig = $private_key->rsa_sign_hash_context($hash);
+
+And verifying:
+
+ my $hash = Crypt::Nettle::Hash->new('sha1');
+ $hash->update($data);
+ # ... more update()s ...
+ my $ok = $public_key->rsa_verify_hash_context($hash, $sig);
+
+Note that the $hash_ctx will be re-initialized after calling either of
+these functions.  If you don't want that to happen, consider passing
+$hash->copy() instead of $hash.
+
+=head2 rsa_sign_hash_context($hash_ctx)
+
+=head2 rsa_verify_hash_context($hash_ctx, $signature)
+
+These functions let you pass a raw digest for RSA
+signature/verification instead of needing to keep the entire $data in
+memory.  Here's signing:
+
+ my $hash = Crypt::Nettle::Hash->new('sha1');
+ $hash->update($data);
+ # ... more update()s ...
+ my $digest = $hash->digest();
+ my $sig = $private_key->rsa_sign_digest('sha1', $digest);
+
+And verifying:
+
+ my $hash = Crypt::Nettle::Hash->new('sha1');
+ $hash->update($data);
+ # ... more update()s ...
+ my $digest = $hash->digest();
+ my $ok = $public_key->rsa_verify_hash_context($digest, $sig);
 
 =head2 WARNING ABOUT CRYPTOGRAPHIC BLINDING
 
@@ -160,8 +202,8 @@ leading '0x'.
 
 =head2 other data
 
-Data sent to sign, verify, encrypt, or decrypt functions should be
-sent as packed binary.
+Data, raw digests, and signatures sent to sign, verify, encrypt, or
+decrypt functions should be sent as packed binary scalars.
 
 Data returned from signature functions will be in packed binary form
 as well.

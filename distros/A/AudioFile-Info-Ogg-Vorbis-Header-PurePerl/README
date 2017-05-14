@@ -1,0 +1,29 @@
+AudioFile::Info::Ogg::Vorbis::Header::PurePerl
+==============================================
+
+AudioFile::Info::Ogg::Vorbis::Header::PurePerl is a plugin module for
+AudioFile::Info. It extracts information from Ogg Vorbis files using the
+module Ogg::Vorbis::Header::PurePerl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * Ogg::Vorbis::Header::PurePerl
+  * AudioFile::Info
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Dave Cross
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

@@ -1,0 +1,73 @@
+NB.  This is from James Callan's original documentation for LTU.C.
+Most of it is applicable to LTU.pm as well.
+--------------------------------------------------
+
+
+							September 3, 1991
+
+		           LTU.C, Version 2.4
+
+The LTU.C module contains utility functions for creating, manipulating and
+destroying linear threshold units.  It offers four learning algorithms:
+  * The absolute correction rule (ACR) discussed in Nilsson's "Learning
+    Machines:  Foundations of Trainable Pattern-Classification Systems" book,
+    published by McGraw-Hill in 1965.  This rule is identical to the
+    Perceptron rule.  Its advantage is that it is guaranteed to converge
+    when the training instances are linearly separable.
+  * The least-mean-square (LMS) rule, devised by Widrow and Hoff in 1960.
+    See the AI Handbook or Duda & Hart for information on the LMS rule.
+    The advantage of the LMS rule over absolute correction or fixed
+    increment is that it tends to minimize the mean-squared error, even
+    when the classes are not linearly separable.
+  * The recursive least square (RLS) rule, copied from Peter Young's book
+    "Recursive Estimation and Time-Series Analysis" book, published by
+    Springer-Verlag in 1984.  This rule is like the LMS rule, but far
+    superior to it.  It's faster, because each instance only needs to
+    be seen once.  It's also more accurate.
+  * The thermal perceptron (TACR) rule, copied from Marcus Frean's PhD
+    thesis "Learning in Single Perceptrons," published by University of
+    Edinburgh in 1990.  This rule is like the ACR rule, except that its
+    annealing capabilities enable it to handle classes that are not
+    linearly separable.
+
+The training rules are most effective when attribute values are scaled
+to a fixed range.  When values exceed 1.0, some of the rules (e.g. ACR,
+TACR) may allow the magnitude of weights to grow without bound.  When
+different attributes have different ranges, some of the rules (e.g. RLS)
+give greater influence to attributes with larger ranges.  Therefore, you
+can request automatic scaling, if you desire it, when the LTU is created.
+If you enable scaling, your data is automatically scaled, so that its value
+does not exceed 1.0.  Scales are computed and adjusted when necessary,
+without any intervention from you.  
+
+LTU's converge most quickly when the data includes both positive and
+negative values.  Therefore, when your data is scaled, it is scaled so
+that the midpoint of the range is 0.0.
+
+Each time scales are adjusted, the weights in the LTU become inaccurate.
+The scaling procedure cannot compensate for this inaccuracy.  Therefore,
+the automatic scaling can affect the speed with which the algorithm
+converges.  However, once the scales "settle down" (i.e. once the extreme
+values for each attribute have been seen), the speed of convergence is not
+affected.
+
+Automatic scaling adversely affects the RLS rule, because the RLS rule
+implicitly "remembers" each instance.  When scales are adjusted, the 
+instances remembered by the LTU become noisy.  If you enable scaling with
+the RLS rule, you should cycle through your instances several times, at
+least until the extreme values (min/maxs) of each attribute have been seen.
+
+All of the LTU learning rules assume that the desired function is of the
+form f(x) = w1*a1 + ... + wn*an + c, where c is a constant that translates
+the hyperplane away from the origin.  This is implemented within the learning
+rules by adding an extra attribute, whose value is always 1.0, to the end of
+the attribute vector.  The learning rule then finds a weight (c) for that
+attribute.
+
+In some cases, the caller knows that the desired function is of the
+form f(x) = w1*a1 + ... + wn*an, i.e. that the hyperplane must
+intersect the origin.  This is the case when the LTU is being trained
+on the difference between two attribute vectors (often called "delta"
+vectors).  In this case, the caller can increase the speed of learning
+by restricting the search space to those hyperplanes that interset the
+origin.  Use set_origin_restriction.

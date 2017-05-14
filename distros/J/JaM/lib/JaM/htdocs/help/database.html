@@ -1,0 +1,49 @@
+$HELP::HEADER
+
+<h2>Abstract</h2>
+
+JaM uses a MySQL database to manage its data. It can create
+a database for you or you use an existent database. With
+the "Edit Database Information" dialog you configure the
+database connection information and initialize a new database.
+<p>
+It is recommended to create a database especially for JaM,
+otherwise table or index names may clash with existing objects.
+
+<h2>1. Provide connection information</h2>
+
+First of all enter the DBI Data Source, Username and Password
+to connect your MySQL database. The default for DBI Data Source
+is "dbi:mysql:jam", but you can change it, e.g. if your database
+is not installed on localhost or behind a DBI::Proxy. Refer
+to the manpage of DBD::mysql for information about DBI data
+sources for MySQL databases.
+<p>
+This information will be stored in the file ~/.JaMrc, so JaM
+will be able to connect the database without asking you again.
+
+<h2>2. Test your configuration</h2>
+
+Press the button "Test" to test your connection information. A
+connection will be established and terminated immediately. If
+everything works ok, a corresponding message will appear in the
+"Status" area. Otherweise an error message will be displayed there.
+
+<h2>3. Create your database</h2>
+
+If you want to create a new database for JaM, press the "Create DB"
+Button. You can skip this step, if you want to use an existent database.
+If a database with this name does already exist, a error message
+will be thrown and the existent database will not be touched.
+
+<h2>4. Create tables</h2>
+
+The last step is creating the tables for JaM. Press the "Create Tables"
+button and they will be created inside the database you have chosen.
+
+<h2>That's all, Folks</h2>
+
+Almost ;) If you change the database connection information at runtime (not in
+the initialization phase) you have to restart JaM.
+
+$HELP::FOOTER

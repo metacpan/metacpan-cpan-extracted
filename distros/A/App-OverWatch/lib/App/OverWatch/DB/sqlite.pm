@@ -46,7 +46,7 @@ App::OverWatch::DB::sqlite - SQLite subclass for OverWatch DB
 
 =head1 VERSION
 
-version 0.1
+version 0.003
 
 =head1 NAME
 

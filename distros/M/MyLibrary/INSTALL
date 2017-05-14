@@ -1,0 +1,103 @@
+
+INSTALL
+
+This is the INSTALL file for MyLibrary version 3.x.
+
+MyLibrary is a set of object-oriented Perl modules providing specific
+I/O functions against a specifically designed relational database -- a
+digital library framework and toolbox. Since MyLibrary uses the Perl DBI
+module, MyLibrary is independent of the underlying database application.
+We use MySQL.
+
+In order to install MyLibrary you MUST create and initilize a MyLibrary
+database before running the normal perl Makefile.PL, make, make test,
+and make install commands. Otherwise the tests will fail. Below is an
+outline of the required steps using MySQL as an example:
+
+  1. Install Perl.
+  
+  2. Install MySQL.
+  
+  3. Install the Perl module called DBI.
+  
+  4. Install the Perl module DBD::mysql.
+
+  5. Decide on a name for your database - This is easy. We use
+     mylibrary, but since the modules support mulitiple instances you
+     might want to use mylibrary001, mylibrary002, etc.
+
+  6. Create your database - This can be done using the mysqladmin
+     utility:
+
+      $ mysqladmin -uroot -p create mylibrary
+
+  7. Initialize your database - This means giving your database
+     structure. It can be done from the root of the MyLibrary
+     distribution using the mysql client:
+
+      $ mysql -uroot -p mylibrary < etc/mylibrary-mysql-schema.sql
+
+  8. Assign permissions to the database - This is done through the
+     use of the SQL GRANT command. Use the mysql client to log into
+     the mysql database and then GRANT permissions for a specific
+     user against the mylibrary database:
+
+      $ mysql -uroot -p mysql
+      mysql> GRANT SELECT, UPDATE, DELETE, INSERT ON mylibrary.* TO 'nobody'@'localhost' IDENTIFIED BY 'nobody';
+
+  9. Configure MyLibrary - This is done by editing
+     lib/MyLibrary/Config.pm and changing the values of $DATA_SOURCE,
+     $USERNAME, and $PASSWORD as follows:
+
+      * $USERNAME - The username you denoted in Step #8.
+      * $PASSWORD - The password you denoted in Step #8.
+      * $DATA_SOURCE - This is the "DSN" for the database.
+        If you have used the examples above as a template,
+        then the value for $DATA_SOURCE would be
+        DBI:mysql:mylibrary:localhost
+
+If you use Postgresql as your database, then the process is very
+similar:
+
+  * Install Perl.
+  * Install PostgreSQL.
+  * Install DBD::Pg.
+  * Decide on a name of your database.
+  * Create/initialize the database using the provided schema
+    (etc/mylibrary-postgresql-schema.sql).
+  * Grant the necessary priveleges to a user against the database.
+  * Configure MyLibrary as per Step #9, above. Assuming the username is
+    nobody, the password is nobody, and the name of the database is
+    mylibrary, then the value for $DATA_SOURCE should be
+    DBI:Pg:database=mylibrary.
+
+Now you can use the normal installation procedure to make, test, and
+install MyLibrary:
+
+  1. perl Makefile.PL
+  2. make
+  3. make test
+  4. make install
+
+After installation consult the POD documentation/tutorial:
+
+  perldoc MyLibrary::Tutorial
+
+Also visit the MyLibrary home page where you will find sample scripts,
+applications, and more documentation:
+
+  http://dewey.library.nd.edu/mylibrary/
+  
+Thank you for using MyLibrary!
+
+-- 
+Eric Lease Morgan <emorgan@nd.edu>
+University Libraries of Notre Dame
+Notre Dame, IN 46556
+
+Robert Fox <rfox2@nd.edu>
+University Libraries of Notre Dame
+Notre Dame, IN 46556
+
+September 6, 2007
+

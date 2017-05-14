@@ -1,0 +1,72 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Filters
+
+H2: Introduction
+
+A {{filter}} controls how a block of text is interpreted.
+The text is usually delimited by {{MAC:block}} and {{MAC:endblock}}
+macros.
+
+For example, tables are usually defined via the {{FILT:table}} filter:
+
+E:!block table
+E:Option  Description
+E:-h      display help
+E:-o      specify the output extension
+E:!endblock
+
+The result is:
+
+!block table
+Option  Description
+-h      display help
+-o      specify the output extension
+!endblock
+
+
+H2: Commonly used filters
+
+Some of the commonly used filters are:
+
+!block table; coltags='FILT'
+Filter      Description
+table       the lines are a table in SDF's {{FMT:TBL}} format
+example     the lines are example paragraphs
+title       used to build a title block for memos, faxes, etc.
+topics      include files as sub-topics
+appendix    replace H1 styles with A1, etc.
+plain       replace H1 styles with P1, etc.
+!endblock
+
+A complete list of the supported filters and their parameters
+is given in the {{DOC: SDF Reference}} manual.
+
+
+H2: Other macros supporting filters
+
+Other macros also support filters. These include:
+
+* {{MAC:include}} - include text from another file
+* {{MAC:execute}} - include the output of a system command.
+
+For example, the following line includes another [[SDF]] file
+and formats it as an appendix:
+
+E:   !include "tips.sdf"; appendix
+
+Note: The {{FILT:appendix}} and {{FILT:plain}} filters enable
+authors to construct topics without needing to worry about how
+those topics will be used, e.g. a topic may be a chapter in
+one document and an appendix in another!

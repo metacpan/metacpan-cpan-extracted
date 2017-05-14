@@ -1,0 +1,59 @@
+{
+   "abstract" : "provide a version number by bumping the last SVN release tag",
+   "author" : [
+      "Markus Benning <me@w3r3wolf.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Subversion-NextVersion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4",
+            "Dist::Zilla::Role::BeforeRelease" : "0",
+            "Dist::Zilla::Role::VersionProvider" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "SVN::Client" : "0",
+            "Try::Tiny" : "0",
+            "Version::Next" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "SVN::Client" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-Plugin-Subversion-NextVersion@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Subversion-NextVersion"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/Dist-Zilla-Plugin-Subversion-NextVersion",
+         "web" : "https://github.com/benningm/Dist-Zilla-Plugin-Subversion-NextVersion.git"
+      }
+   },
+   "version" : "1.003"
+}
+

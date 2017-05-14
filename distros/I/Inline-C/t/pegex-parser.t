@@ -1,13 +1,15 @@
 use Test::More;
+BEGIN {
 plan skip_all => '$ENV{PERL_INLINE_DEVELOPER_TEST} not set'
   unless defined $ENV{PERL_INLINE_DEVELOPER_TEST};
 plan tests => 2;
+}
 
 use IO::All;
 use YAML::XS;
 
-BEGIN { system "rm _Inline* -fr" }
-END { system "rm _Inline* -fr" }
+BEGIN { system "rm -fr _Inline*" }
+END { system "rm -fr _Inline*" }
 
 use Inline C => <<'END', USING => '::Parser::Pegex';
 SV* JAxH(char* x) {

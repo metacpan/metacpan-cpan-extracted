@@ -1,0 +1,60 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 12-Feb-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: continued Macro
+
+H2: Interface
+
+!macro_interface "continued"; "id"
+
+H2: Description
+
+The {{continued}} macro continues a heading from a previous page,
+provided the target format is page-based, i.e. nothing is
+output for html or hlp formats.
+
+The first parameter is the heading style to repeat.
+The second parameter is the suffix to append the text
+from the repeated heading. The default suffix is ", E<2{>N:ContinuedE<2}>".
+
+H2: Examples
+
+A typical example is:
+
+!block example
+H2: Solving world peace
+
+H3: Procedure
+
+The steps are given below.
+
+...
+
+!continued 'H2'
+!continued 'H3'; ' {{N:(Continued)}}'
+
+Some more procedure text.
+!endblock
+
+In the example above, the macros effectively produce:
+
+!block verbatim
+H2[notoc;noid;continued] Solving world peace, {{Continued}}
+H3[notoc;noid;continued] Procedure {{(N:Continued)}}
+!endblock
+
+Note: This macro does not cause a new page. Typically, a
+rule (i.e. event processing) is used to trigger new pages
+at the necessary paragraph styles.
+
+#H2: Limitations & Future Directions

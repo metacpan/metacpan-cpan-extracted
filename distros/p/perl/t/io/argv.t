@@ -7,14 +7,22 @@ BEGIN {
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 23);
+plan(tests => 37);
 
-use File::Spec;
+my ($devnull, $no_devnull);
 
-my $devnull = File::Spec->devnull;
+if (is_miniperl()) {
+    $no_devnull = "no dynamic loading on miniperl, File::Spec not built, so can't determine /dev/null";
+} else {
+    require File::Spec;
+    $devnull = File::Spec->devnull;
+}
 
 open(TRY, '>Io_argv1.tmp') || (die "Can't open temp file: $!");
 print TRY "a line\n";
+close TRY or die "Could not close: $!";
+open(TRY, '>Io_argv2.tmp') || (die "Can't open temp file: $!");
+print TRY "another line\n";
 close TRY or die "Could not close: $!";
 
 $x = runperl(
@@ -29,13 +37,44 @@ is($x, "1a line\n2a line\n", '<> from two files');
 	stdin	=> "foo\n",
 	args	=> [ 'Io_argv1.tmp', '-' ],
     );
-    is($x, "a line\nfoo\n", '   from a file and STDIN');
+    is($x, "a line\nfoo\n", '<> from a file and STDIN');
+
+    # readline should behave as <>, not <<>>
+    $x = runperl(
+        prog	=> 'while (readline) { print $_; }',
+        stdin	=> "foo\n",
+        stderr 	=> 1,
+        args	=> [ '-' ],
+    );
+    is($x, "foo\n", 'readline() from STDIN');
 
     $x = runperl(
 	prog	=> 'while (<>) { print $_; }',
 	stdin	=> "foo\n",
     );
-    is($x, "foo\n", '   from just STDIN');
+    is($x, "foo\n", '<> from just STDIN');
+
+    $x = runperl(
+	prog	=> 'while (<>) { print $ARGV.q/,/.$_ }',
+	args	=> [ 'Io_argv1.tmp', 'Io_argv2.tmp' ],
+    );
+    is($x, "Io_argv1.tmp,a line\nIo_argv2.tmp,another line\n", '$ARGV is the file name');
+
+TODO: {
+        local $::TODO = "unrelated bug in redirection implementation" if $^O eq 'VMS';
+        $x = runperl(
+            prog	=> 'print $ARGV while <>',
+            stdin	=> "foo\nbar\n",
+            args   	=> [ '-' ],
+        );
+        is($x, "--", '$ARGV is - for explicit STDIN');
+
+        $x = runperl(
+            prog	=> 'print $ARGV while <>',
+            stdin	=> "foo\nbar\n",
+        );
+        is($x, "--", '$ARGV is - for implicit STDIN');
+    }
 }
 
 {
@@ -45,7 +84,8 @@ is($x, "1a line\n2a line\n", '<> from two files');
     is( 0+$?, 0, q(eof() doesn't segfault) );
 }
 
-@ARGV = ('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
+@ARGV = is_miniperl() ? ('Io_argv1.tmp', 'Io_argv1.tmp', 'Io_argv1.tmp')
+    : ('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
 while (<>) {
     $y .= $. . $_;
     if (eof()) {
@@ -63,7 +103,7 @@ close TRY or die "Could not close: $!";
 @ARGV = ('Io_argv1.tmp', 'Io_argv2.tmp');
 $^I = '_bak';   # not .bak which confuses VMS
 $/ = undef;
-my $i = 7;
+my $i = 11;
 while (<>) {
     s/^/ok $i\n/;
     ++$i;
@@ -88,37 +128,114 @@ open STDIN, 'Io_argv1.tmp' or die $!;
 @ARGV = ();
 ok( !eof(),     'STDIN has something' );
 
-is( <>, "ok 7\n" );
+is( <>, "ok 11\n" );
 
-open STDIN, $devnull or die $!;
-@ARGV = ();
-ok( eof(),      'eof() true with empty @ARGV' );
+SKIP: {
+    skip_if_miniperl($no_devnull, 4);
+    open STDIN, $devnull or die $!;
+    @ARGV = ();
+    ok( eof(),      'eof() true with empty @ARGV' );
 
-@ARGV = ('Io_argv1.tmp');
-ok( !eof() );
+    @ARGV = ('Io_argv1.tmp');
+    ok( !eof() );
 
-@ARGV = ($devnull, $devnull);
-ok( !eof() );
+    @ARGV = ($devnull, $devnull);
+    ok( !eof() );
 
-close ARGV or die $!;
-ok( eof(),      'eof() true after closing ARGV' );
+    close ARGV or die $!;
+    ok( eof(),      'eof() true after closing ARGV' );
+}
+
+SKIP: {
+    local $/;
+    open my $fh, 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $!";
+    <$fh>;	# set $. = 1
+    is( <$fh>, undef );
+
+    skip_if_miniperl($no_devnull, 5);
+
+    open $fh, $devnull or die;
+    ok( defined(<$fh>) );
+
+    is( <$fh>, undef );
+    is( <$fh>, undef );
+
+    open $fh, $devnull or die;	# restart cycle again
+    ok( defined(<$fh>) );
+    is( <$fh>, undef );
+    close $fh or die "Could not close: $!";
+}
+
+open(TRY, '>Io_argv1.tmp') || (die "Can't open temp file: $!");
+print TRY "one\n\nthree\n";
+close TRY or die "Could not close: $!";
+
+$x = runperl(
+    prog	=> 'print $..$ARGV.$_ while <<>>',
+    args	=> [ 'Io_argv1.tmp' ],
+);
+is($x, "1Io_argv1.tmpone\n2Io_argv1.tmp\n3Io_argv1.tmpthree\n", '<<>>');
+
+$x = runperl(
+    prog	=> '$w=q/b/;$w.=<<>>;print $w',
+    args	=> [ 'Io_argv1.tmp' ],
+);
+is($x, "bone\n", '<<>> and rcatline');
+
+$x = runperl(
+    prog	=> 'while (<<>>) { print }',
+    stdin	=> "foo\n",
+);
+is($x, "foo\n", '<<>> from just STDIN (no argument)');
+
+TODO: {
+    local $::TODO = "unrelated bug in redirection implementation" if $^O eq 'VMS';
+    $x = runperl(
+        prog	=> 'print $ARGV.q/,/ for <<>>',
+        stdin	=> "foo\nbar\n",
+    );
+    is($x, "-,-,", '$ARGV is - for STDIN with <<>>');
+}
+
+$x = runperl(
+    prog	=> 'while (<<>>) { print $_; }',
+    stdin	=> "foo\n",
+    stderr	=> 1,
+    args	=> [ '-' ],
+);
+like($x, qr/^Can't open -: .* at -e line 1/, '<<>> does not treat - as STDIN');
 
 {
-    local $/;
-    open F, 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $!";
-    <F>;	# set $. = 1
-    is( <F>, undef );
+    # tests for an empty string in @ARGV
+    $x = runperl(
+        prog	=> 'push @ARGV,q//;print while <>',
+        stderr	=> 1,
+    );
+    like($x, qr/^Can't open : .* at -e line 1/, '<> does not open empty string in ARGV');
 
-    open F, $devnull or die;
-    ok( defined(<F>) );
+    $x = runperl(
+        prog	=> 'push @ARGV,q//;print while <<>>',
+        stderr	=> 1,
+    );
+    like($x, qr/^Can't open : .* at -e line 1/, '<<>> does not open empty string in ARGV');
+}
 
-    is( <F>, undef );
-    is( <F>, undef );
+SKIP: {
+    skip('no echo', 2) unless -x '/bin/echo';
 
-    open F, $devnull or die;	# restart cycle again
-    ok( defined(<F>) );
-    is( <F>, undef );
-    close F or die "Could not close: $!";
+    $x = runperl(
+        prog	=> 'while (<<>>) { print $_; }',
+        stderr	=> 1,
+        args	=> [ '"echo foo |"' ],
+    );
+    like($x, qr/^Can't open echo foo \|: .* at -e line 1/, '<<>> does not treat ...| as fork');
+
+    $x = runperl(
+        prog	=> 'while (<<>>) { }',
+        stderr	=> 1,
+        args	=> [ 'Io_argv1.tmp', '"echo foo |"' ],
+    );
+    like($x, qr/^Can't open echo foo \|: .* at -e line 1, <> line 3/, '<<>> does not treat ...| as fork after eof');
 }
 
 # This used to dump core
@@ -136,7 +253,17 @@ close IN;
 unlink "Io_argv3.tmp";
 **PROG**
 
+# This used to fail an assertion.
+# The tricks with *x and $x are to make PL_argvgv point to a freed SV when
+# the readline op does SvREFCNT_inc on it.  undef *x clears the scalar slot
+# ++$x vivifies it, reusing the just-deleted GV that PL_argvgv still points
+# to.  The BEGIN block ensures it is freed late enough that nothing else
+# has reused it yet.
+is runperl(prog => 'undef *x; delete $::{ARGV}; $x++;'
+                  .'eval q-BEGIN{undef *x} readline-; print qq-ok\n-'),
+  "ok\n", 'deleting $::{ARGV}';
+
 END {
-    1 while unlink 'Io_argv1.tmp', 'Io_argv1.tmp_bak',
+    unlink_all 'Io_argv1.tmp', 'Io_argv1.tmp_bak',
 	'Io_argv2.tmp', 'Io_argv2.tmp_bak', 'Io_argv3.tmp';
 }

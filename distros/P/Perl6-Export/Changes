@@ -35,3 +35,19 @@ Revision history for Perl extension Perl6::Export.
 0.07	Tue Mar  9 02:58:16 2004
 
 	- Minor doc bug fix
+
+
+
+0.008  Sat Oct  3 20:26:28 2015
+
+	- Fixed problems when exporting under 'use strict'
+
+	- Added support for Perl 6 IMPORT blocks
+
+    - unknitted POD nit (thanks Steve)
+
+    - Added META files (thanks Jarkko)
+
+
+0.009  Tue Nov 24 09:12:06 2015
+

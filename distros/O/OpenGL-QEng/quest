@@ -1,0 +1,354 @@
+eval 'exec perl -S $0 ${1+"$@"}' # -*-Perl-*-
+  if $running_under_some_shell;
+
+###  $Id: quest 435 2008-11-11 15:04:30Z overmars $
+
+package main;
+
+use strict;
+use warnings;
+use OpenGL qw/:all/;
+use OpenGL::QEng::Event;
+use OpenGL::QEng::GameState;
+use OpenGL::QEng::Overview;
+use OpenGL::QEng::Inventory;
+use OpenGL::QEng::Control;
+use OpenGL::QEng::GUIVoice;
+use OpenGL::QEng::GUIWindow;
+
+use base qw/OpenGL::QEng::OUtil/;
+
+our $VERSION = 0.27; #program version
+
+### main execution found below all the subs -----vvv----- ###
+
+my $self = bless {}; # create a singleton 'main' object
+
+#---------------------------------------------------------------------
+## @fn $ nav(map)
+sub nav {
+  drawScene(GL_RENDER);
+}
+
+{my $need_p_draw = 0;
+ my $need_g_draw = 0;
+ my $autoFg  = 0;
+ my $autoCnt = 0;
+ my ($autoCmd, @autoArgs);
+
+#---------------------------------------------------------------------
+ sub set_p_draw {$need_p_draw = 1; }
+
+#---------------------------------------------------------------------
+ sub set_g_draw {$need_g_draw = 1; }
+
+#---------------------------------------------------------------------
+ sub handle_auto {
+   (undef,undef,undef,undef,$autoCnt,$autoCmd,@autoArgs) = (@_);
+   $autoFg = 1;
+ }
+
+#---------------------------------------------------------------------
+ sub moveScene {
+   glutTimerFunc($self->move_ms,\&moveScene,0);
+
+   return unless $self->game->currmap;
+   my $win = glutGetWindow();
+
+   $self->ctrl->stateTest;
+   if ($autoFg) {
+     $self->send_event($autoCmd, @autoArgs);
+     $autoCnt--;
+     if ($autoCnt<1) {
+       $autoFg = 0;
+     }
+   }
+   glutSetWindow($self->pwin);
+   $self->game->team->move();
+   $self->game->currmap->move;
+   glutPostRedisplay() if $need_p_draw;
+
+   #XXX these only need calling if something moved
+   {
+     glutSetWindow($self->gui->parent);
+     $self->ov->setupMapView($self->game->currmap);
+     $self->ov->drawMapView if $self->game->team->{ability}{birdseye_view};
+     glutPostRedisplay();
+   }
+   glutSetWindow($win);
+ }
+
+#---------------------------------------------------------------------
+## @fn $drawScene($mode)
+# Present the scene from the viewpoint of the team as a perspective view
+# or for detecting touched items
+ sub drawScene {
+   my ($mode) = @_;
+
+   return unless $self->game->currmap;
+   my $win = glutGetWindow();
+   glutSetWindow($self->pwin);
+
+   if ($mode == GL_RENDER) {
+     glLoadIdentity();
+   }
+   glPushMatrix(); #........................................
+
+   $self->game->team->draw($mode);
+   if ($mode==GL_SELECT) {
+     $self->game->currmap->draw(GL_SELECT);
+   }
+   else {
+     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+     $self->game->currmap->draw($mode);
+     $self->game->team->see($mode);
+     $need_p_draw = 0;
+     tErr('pre ?? pop');
+   }
+
+   glPopMatrix(); #........................................
+   tErr('post ?? pop');
+   glutSwapBuffers;
+   glutSetWindow($win);
+ }
+} #end closure
+
+#---------------------------------------------------------------------
+## @fn drawOverview
+# Update the overview - only used in event callback
+sub drawOverview { die join ':',caller;
+  print STDERR "drawOverview ov=",$self->ov||'undef',"\n";
+  return unless defined $self->ov;
+
+  my $win = glutGetWindow();
+  glutSetWindow($self->gui->parent);
+#  $self->ov->drawMap($self->game->currmap);
+  glutSetWindow($win);
+}
+
+#---------------------------------------------------------------------
+## @fn $ tErr(w)
+# Print any outstanding openGL error
+sub tErr { #warn 'tErr(',join(',',@_),') ',join(':',caller);
+  my $w = shift;
+  while (my $e = OpenGL::glGetError()) {
+    print STDERR "$e, $w\n";
+  }
+}
+
+#---------------------------------------------------------------------
+## @fn $ pickRects($x,$y)
+#  pickRects() sets up selection mode, name stack,
+#  and projection matrix for picking.  Then the objects
+#  are drawn.
+sub pickRects {
+  my ($button,$state,$x,$y) = @_;
+
+  # only react on button up not both down and up
+  return unless $state == 1;
+
+  my $BUFSIZE = 512;
+  my $selectBuf = OpenGL::Array->new($BUFSIZE, GL_INT);
+  my $viewport  = OpenGL::Array->new(4,        GL_INT);
+
+  glGetIntegerv_c(GL_VIEWPORT, $viewport->ptr());
+  glSelectBuffer_c($BUFSIZE, $selectBuf->ptr());
+  glRenderMode(OpenGL::GL_SELECT);
+  glInitNames();
+  glPushName(0);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+
+  ####  create 5x5 pixel picking region near cursor location */
+  gluPickMatrix_p($x, ($viewport->retrieve(3,1) - $y), 5.0, 5.0,
+		  $viewport->retrieve(0,1),
+		  $viewport->retrieve(1,1),
+		  $viewport->retrieve(2,1),
+		  $viewport->retrieve(3,1));
+
+  gluPerspective(80.0, 1.0 , 0.1, 60.0); ##new
+  glMatrixMode(GL_MODELVIEW);	## new
+  drawScene(OpenGL::GL_SELECT);
+  glMatrixMode(GL_PROJECTION);  ## new
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);	##new
+  glFlush();
+  my $hits = glRenderMode(GL_RENDER);
+
+  my $reach = 0.03;    	# set the distance that things can be touched
+  my $ptr = 0;
+  my $z1minName;
+  my $z1min = +2.0;
+
+  for (1..$hits) { ### for each hit
+    my $nameCnt = $selectBuf->retrieve($ptr++,1);
+    my $z1 = ($selectBuf->retrieve($ptr++,1)/0x7fffffff);
+    $ptr++; # z2
+    my @names;
+    for (1..$nameCnt) { ### for each name
+      push @names, $selectBuf->retrieve($ptr++,1);
+    }
+    if ($z1 < $z1min) {
+      $z1min = $z1;
+      $z1minName = $names[0];
+    }
+  }
+  if ($z1min < -$reach) {
+    $self->send_event('touched_map',$z1minName);
+  } else {
+    $self->send_event('msg',"It's out of reach\n");
+  }
+}
+
+#---------------------------------------------------------------------
+sub checkInventory {
+  return unless defined $self->{game};
+  return unless defined $self->{inv};
+  #XXX make sure to redraw gui if there is an inv change
+  $self->inv->show($self->game->team); # XXX ???
+}
+
+#---------------------------------------------------------------------
+## @method load()
+# Respond to 'load' event - Perform file loading
+sub load {                 # Read game from file
+  my ($self,$stash,$obj,$ev,@arg) = @_;
+
+  $self->game($self->game->load("$ENV{'HOME'}/.currQuest"));
+  die 'bad game' unless defined $self->game;
+  checkInventory();
+}
+
+#---------------------------------------------------------------------
+## @method save()
+# Respond to 'save' event - Perform save on file
+sub save {
+  my ($self,$stash,$obj,$ev,@arg) = @_;
+
+  $self->game->save("$ENV{'HOME'}/.currQuest");
+}
+
+#---------------------------------------------------------------------
+## @method $ send_event(event)
+#signal an event
+sub send_event {
+  $_[0]->{event}->yell(@_)
+}
+
+#---------------------------------------------------------------------
+# main program
+#---------------------------------------------------------------------
+
+# Get user input via Splash Window --- Future
+
+###############################################################
+##                                                           ##
+##                  Create User Interface                    ##
+##                                                           ##
+###############################################################
+my $gwidth = 400+15;
+my $pwidth = 600;
+my $aspect = 1;
+
+glutInit;
+glutInitWindowSize($pwidth+$gwidth,$pwidth/$aspect);
+glutInitDisplayMode(GLUT_RGBA  |
+		    GLUT_ALPHA |
+		    GLUT_DEPTH |
+		    GLUT_DOUBLE);
+unless (glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
+  glutInitDisplayMode(GLUT_RGB   |
+		      GLUT_DEPTH |
+		      GLUT_DOUBLE);
+}
+$self->{mw}   = glutCreateWindow("Quest");
+$self->{pwin} = glutCreateSubWindow($self->{mw},
+				    0,0, $pwidth,$pwidth/$aspect);
+glViewport(0,0,$pwidth,$pwidth/$aspect);
+glutDisplayFunc(\&nav);
+#glutIdleFunc(\&moveScene);
+$self->{move_ms} = 200.0;
+glutTimerFunc($self->{move_ms},\&moveScene,0);
+glutMouseFunc(\&pickRects);
+glutSpecialFunc(sub{$self->ctrl->keyboard(@_)});
+
+$self->{gui} = OpenGL::QEng::GUIWindow->new(GLwindow=> $self->{mw},
+				    x       => $pwidth,
+				    y       => 0,
+				    width   => $gwidth,
+				    height  => $pwidth/$aspect,
+				    texture => 'leather',
+				   );
+
+$self->{ov}  = ($ENV{WIZARD})
+  ? OpenGL::QEng::Overview->new(root=>$self->{gui},size=>265,
+			onclick=>sub{$self->send_event('go',$_[0],$_[1])})
+  : OpenGL::QEng::Overview->new(root=>$self->{gui},size=>265);
+
+$self->{ctrl}= OpenGL::QEng::Control->new(style=>'move', x=>75, y=>285);
+
+# Read in Game or Map
+$self->{game} = OpenGL::QEng::GameState->load(shift);
+die 'bad game' unless ref $self->{game};
+
+$self->{inv} = OpenGL::QEng::Inventory->new(x         => 280,
+				    y         =>   0,
+				    width     => 180,
+				    height    => 500,
+				    max_items =>
+				    $self->{game}->team->max_contains,);
+$self->{msg} = OpenGL::QEng::GUIVoice->new(x=>5, y=>515, width=>390+15, height=>80,);
+$self->create_accessors;
+$self->gui->adopt($self->ov);
+$self->gui->adopt($self->ctrl);
+$self->gui->adopt($self->inv);
+$self->gui->adopt($self->msg);
+
+glutDisplayFunc(sub{ $self->{gui}->draw(@_) });
+glutMouseFunc(  sub{ $self->{gui}->mouseButton(@_) });
+glutSpecialFunc(sub{$self->ctrl->keyboard(@_)});
+
+# Back to the game window
+glutSetWindow($self->pwin);
+glEnable(GL_DEPTH_TEST);
+glClearColor(0,0,0,1);
+glDepthRange(0.0,80.0);		### the default Z mapping
+glMatrixMode(GL_PROJECTION);
+glLoadIdentity();
+gluPerspective(80.0, $aspect , 0.1, 80.0);
+glMatrixMode(GL_MODELVIEW);
+glLoadIdentity();
+
+# set up our event handlers
+$self->{event} = OpenGL::QEng::Event->new();
+for my $event (['need_redraw',      \&set_p_draw	    ],
+	       ['need_ov_draw',     \&set_g_draw	    ],
+	       ['inventory_change', \&checkInventory	    ],
+	       ['auto',             \&handle_auto	    ],
+	       ['saveGame',         \&save		    ],
+	       ['loadGame',         \&load		    ],
+	       ['quit',             sub{exit(0)}	    ],
+	       ['special', sub{ warn 'got a special event' }],
+	       # 'team_at' event handler added after GL init below
+	      ) {
+  $self->{event}->callback($self,$event->[0],$event->[1]);
+}
+$self->{event}->callback($self,'team_at',
+			 sub{if ($self->game->team->{ability}{birdseye_view}){
+			   my $win = glutGetWindow();
+			   glutSetWindow($self->gui->parent);
+			   $self->ov->update($self->game->currmap,
+					     $self->game->team);
+			   glutSetWindow($win);
+			 }
+			 });
+checkInventory();
+
+glutMainLoop();
+
+##############################################################################
+#
+# read the POD at Games::Quest3D.pod
+#
+__END__

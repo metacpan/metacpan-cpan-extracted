@@ -1,0 +1,6 @@
+Revision history for Perl extension HTML::Paginator.
+
+0.01  Tue Jun  4 22:41:58 2002
+	- original version; created by h2xs 1.20 with options
+		-X -n HTML::Paginator
+

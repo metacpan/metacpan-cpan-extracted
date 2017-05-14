@@ -1,0 +1,13 @@
+This is a (silly) example of how you might use OpenThought for a real app.
+Note that it makes use of CGI::Application, which is an excellent environment
+for developing web apps.
+
+It has a SoulFoodCafe instance script (.pl file) and class (.pm file), as well
+as seperate HTML templates (using HTML::Template) for our seperation of code
+and content needs :-)
+
+The idea for this app came after watching the Blues Brothers one too many
+times.  Having an online ordering site might prevent hooligans like Jake and
+Elwood from going inside in the future (and the addition of a computer means he
+could have simply emailed Matt guitar Murphy anyhow, rather than tracking him
+down on foot!)

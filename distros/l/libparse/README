@@ -1,0 +1,144 @@
+(NOTE: This library has only been tested under Windows NT so far,
+using Perl 5.001m)
+
+PURPOSE
+
+This library offers Perl programmers the ability to easily create LL
+and LR parsers, and hence to easily process structured text.  (NOTE:
+LR parsers are not yet supported).
+
+Input format for scanners and parsers follows lex/yacc pretty closely.
+The input format processors are separate modules, so in the future the
+library may support PCCTS and EBNF grammars.
+
+To create a sample parser, let's take RFC822 dates.  According to the
+RFC, the token set is quite simple (sample/RFC822/rfc822.l):
+
+    ($DAY, $MONTH, $ZONE, $DIGIT4, $DIGIT2, $DIGIT1, $ALPHA1 )
+        = (100 .. 110);
+    
+    #%%
+    
+    [A-Za-z]{3} {
+        return $DAY   if $days{$_[1]};
+        return $MONTH if $months{$_[1]};
+        return $ZONE  if $zones{$_[1]};
+        return 0;
+    }
+    
+    [+:,-]      { $_[1]; }
+    
+    [0-9]{4}    $DIGIT4
+    [0-9]{2}    $DIGIT2
+    [0-9]{1}    $DIGIT1
+    [A-Z]       $ALPHA1
+
+The top of this file defines the constants, and the bottom defines the
+scanner in lex-like format.  The separator character divides the two
+halves.
+
+Each action block is passed two parameters, $_[0] is a reference to
+the scanner object (for state-switching and error reporting, to be
+improved on in the future), and $_[1] is the lexeme of the token.
+
+With these tokens, we're ready to write the grammar
+(sample/RFC822/rfc822.y):
+
+    #%%
+    
+    start:      day_opt date time ;
+    day_opt:    $DAY ',' | ;
+    date:       day $MONTH      { print "mon $months{$_[0]} "; }
+                year ;
+    day:        $DIGIT1         { print "day $_[0] "; }
+              | $DIGIT2         { print "day $_[0] "; } ;
+    year:       $DIGIT2         { print "year ", 1900 + $_[0], " "; }
+              | $DIGIT4         { print "year $_[0] "; } ;
+    time:       hour zone ;
+    hour:       $DIGIT2         { print "hour $_[0] "; }
+                ':' $DIGIT2     { print "min $_[0] "; }
+                sec_opt ;
+    sec_opt:    ':' $DIGIT2     { print "sec $_[0] "; } | ;
+    zone:       $ZONE | $ALPHA1 | prefix $DIGIT4 ;
+    prefix:     '+' | '-' ;
+
+Except for the fact that "year" accepts both DIGIT2 and DIGIT4, this
+grammar matches the RFC.  The input format is yacc-like.  The
+arguments to each action body are: $_[0] - lexeme of term to left
+(last lexeme), $_[1] - value of inherited attribute tagged to
+left-hand side, $_[2] - reference to array of inherited attributes for
+current term rightwards (so $_[2][0] is the attribute for the action
+body, $_[2][1] is the attribute for the term to the right, etc).  None
+of the TopDown parsers supported synthesized attributes (yet).
+
+It is entirely acceptable for users to write these tables as perl
+arrays (which the library could use directly), but there is really no
+advantage, since the plex and ppar tools (below) generate those arrays
+from the input files.
+
+To generate the scanner and parser:
+
+    perl <PERLLIB>/Scanner/plex -Ce rfc822.l RFC822::Scanner
+    perl <PERLLIB>/Parser/ppar rfc822.y RFC822::Parser RFC822::Scanner
+
+There are three different kinds of scanners currently, and two
+parsers:
+
+    scanners:
+       <no flag>      Simple "first match".  Decent for very small
+                      token tables where scanning is unambiguous.
+                      Uses a linear-search matching algorithm,
+                      however.  Yet it has the fastest startup time,
+                      and the lowest memory requirement.
+
+       -Cf            Uses next/accept DFA tables.  "flex" is used as a
+                      backend to generate these tables.  Requires the
+                      most memory, and the greatest startup time.
+                      Performance depends on the problem.  Usually
+                      wins out in the long run over the other
+                      scanners, but loses in the short run.  This is a
+                      greedy scanner.
+
+       -Ce            Uses compressed equivalency tables.  Again, "flex"
+                      is used to generate these tables.  This is the
+                      "middle of the road": moderate memory and
+                      startup.  Good for medium-sized tasks.
+
+    parsers:
+       <no flag>      A top-down PDA.  The real problem with this parsers
+                      is how it finds which branch to take when the
+                      corner of a right-hand side is a non-terminal.
+                      Also, it doesn't handle epsilon transition very
+                      well yet, so if your grammar is tricky, watch
+                      out.  It won't warn you.
+
+       -dfa           A top-down PDA that uses DFA transition tables.
+                      The FIRST/FOLLOW/SELECT sets are generated uses
+                      perl code in Parser::Table and
+                      Parser::TopDown::Table.  This parser runs at
+                      about the same speed, but tends to be a bit
+                      slower for smaller tasks.  However, it is a true
+                      LL(1) parser, and will warn you if your grammar
+                      is not LL(1).  If you want to be sure that the
+                      parse is correct, use this one.
+
+'ppar' must know the name of the scanner when the parser is to be
+generated (in order to pull in the token values).  So it's usually
+best to generate the scanner first.
+
+To use the parser all you have to do is include the scanner,
+include the parser, and let it run!
+
+    use RFC822::Scanner;
+    use RFC822::Parser;
+
+    RFC822::Parser::Parse("blah.txt");
+
+If you have any questions/problems/suggestions, write to me at
+<johnw@borland.com>.
+
+HISTORY
+
+0.7
+    First release.  Not intend for wide distribution just yet.  There
+    is no support for scanner state-switching in this release.

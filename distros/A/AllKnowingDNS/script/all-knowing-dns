@@ -15,6 +15,8 @@ use Net::DNS::Nameserver;
 use Privileges::Drop;
 use v5.10;
 
+our $VERSION = '1.7';
+
 my $configfile = '/etc/all-knowing-dns.conf';
 my $querylog = 0;
 
@@ -22,7 +24,7 @@ GetOptions(
     'configfile=s' => \$configfile,
     'querylog!' => \$querylog,
     'version' => sub {
-        say "AllKnowingDNS v$App::AllKnowingDNS::Handler::VERSION " .
+        say "AllKnowingDNS v$VERSION " .
             "© 2012 Michael Stapelberg and contributors";
         exit 0;
     },
@@ -38,7 +40,7 @@ GetOptions(
 );
 
 openlog('all-knowing-dns', 'pid', 'daemon');
-syslog('info', "AllKnowingDNS v$App::AllKnowingDNS::Handler::VERSION starting");
+syslog('info', "AllKnowingDNS v$VERSION starting");
 
 my $input;
 my $fh;
@@ -71,3 +73,177 @@ my $ns = Net::DNS::Nameserver->new(
 drop_privileges('nobody');
 
 $ns->main_loop;
+
+__END__
+
+=head1 NAME
+
+all-knowing-dns - Tiny DNS server for IPv6 Reverse DNS
+
+=head1 SYNOPSIS
+
+    all-knowing-dns [--configfile <path>] [--querylog]
+
+=head1 DESCRIPTION
+
+AllKnowingDNS provides reverse DNS for IPv6 networks which use SLAAC
+(autoconf), e.g. for a /64 network.
+
+The problem with IPv6 reverse DNS and traditional nameservers is that the
+nameserver requires you to provide a zone file. Assuming you want to provide
+RDNS for a /64 network, you have 2**64 = 18446744073709551616 different usable
+IP addresses (a little less if you are using SLAAC). Providing a zone file for
+that, even in a very terse notation, would consume a huge amount of disk space
+and could not possibly be held in the memory of the computers we have nowadays.
+
+AllKnowingDNS instead generates PTR and AAAA records on the fly. You only
+configure which network you want to serve and what your entries should look
+like.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--configfile=I<path>>
+
+Use I<path> instead of /etc/all-knowing-dns.conf as configuration file.
+
+=item B<--querylog>
+
+Enable logging every query to stdout (for debugging).
+
+=back
+
+=head1 CONFIGURATION FILE (/etc/all-knowing-dns.conf)
+
+The configuration file is wonderfully simple:
+
+    # Configuration file for AllKnowingDNS v1.7
+
+    listen 79.140.39.197
+    listen 2001:4d88:100e:1::3
+    
+    # RaumZeitLabor
+    network 2001:4d88:100e:ccc0::/64
+        resolves to ipv6-%DIGITS%.nutzer.raumzeitlabor.de
+        with upstream 2001:4d88:100e:1::2
+    
+    # Chaostreff
+    network 2001:4d88:100e:cd1::/64
+        resolves to ipv6-%DIGITS%.treff.noname-ev.de
+
+This example contains all configuration directives. Let's go over them one by
+one:
+
+=over 4
+
+=item B<listen I<address>>
+
+Listens on the given I<address> (IPv4 and IPv6 is supported) on port 53.
+
+=item B<network I<network>>
+
+Specifies that queries for PTR records within the given network should be
+answered (any query for an unconfigured network will be answered with
+NXDOMAIN). You need to specify at least the B<resolves to> directive
+afterwards.
+
+=item B<resolves to I<address>>
+
+Specifies the address to which PTR records should resolve. The address needs to
+contain %DIGITS% exactly once. When answering AAAA queries, %DIGITS% will be
+parsed and converted back to an IPv6 address.
+
+Example:
+
+    network 2001:4d88:100e:ccc0::/64
+        resolves to ipv6-%DIGITS%.nutzer.raumzeitlabor.de
+
+Example query:
+
+    The PTR query 2001:4d88:100e:ccc0:216:eaff:fecb:826 will resolve to
+    ipv6-0216eafffecb0826.nutzer.raumzeitlabor.de
+
+=item B<with upstream I<address>>
+
+Before answering a PTR query for this network, AllKnowingDNS will ask the DNS
+server at I<address> first, appending .upstream to the query.
+
+Example:
+
+    network 2001:4d88:100e:ccc0::/64
+        resolves to ipv6-%DIGITS%.nutzer.raumzeitlabor.de
+        with upstream 2001:4d88:100e:1::2
+
+Example query:
+
+    The PTR query 2001:4d88:100e:ccc0:219:dbff:fe43:2ec5 will make
+    AllKnowingDNS ask for
+    5.c.e.2.3.4.e.f.f.f.b.d.9.1.2.0.0.c.c.c.e.0.0.1. \
+    8.8.d.4.1.0.0.2.ip6.arpa.upstream. at 2001:4d88:100e:1::2
+    and relay the answer, if any.
+
+=back
+
+=head1 DELEGATING ZONES
+
+This section shows you how to delegate a zone in BIND9 or any DNS server with a
+compatible zone file syntax. To use AllKnowingDNS, you need to delegate the
+appropriate .ip6.arpa zone for your network and one regular domain.
+
+=head2 REVERSE DELEGATION (.ip6.arpa)
+
+
+    $ORIGIN .
+    $TTL 604800     ; 1 week
+    e.0.0.1.8.8.d.4.1.0.0.2.ip6.arpa IN SOA infra.in.zekjur.net. \
+                                          hostmaster.zekjur.net. (
+                                    20         ; serial
+                                    604800     ; refresh (1 week)
+                                    86400      ; retry (1 day)
+                                    2419200    ; expire (4 weeks)
+                                    604800     ; minimum (1 week)
+                                    )
+                            NS      libri.sur5r.net.
+                            NS      infra.in.zekjur.net.
+
+    ; net for RaumZeitLabor
+    0.c.c.c.e.0.0.1.8.8.d.4.1.0.0.2.ip6.arpa. IN  NS        ipv6-rdns.zekjur.net.
+
+=head2 FORWARD DELEGATION (.nutzer.raumzeitlabor.de)
+
+
+    $TTL    6h
+    raumzeitlabor.de    IN  SOA ns1.jpru.de.    hostmaster.jpru.de. (
+                            2012030701
+                            3h
+                            30m
+                            7d
+                            1d )
+        IN  NS  ns1.jpru.de.
+        IN  NS  ns2.jpru.de.
+        IN  A   195.49.138.121
+        IN  MX  10  rzl.uugrn.org.
+        IN  MX  20  up.uugrn.org.
+        IN  MX  50  mail.uugrn.org.
+        IN  MX  100 rzl.uugrn.org.
+
+    nutzer.raumzeitlabor.de. IN NS ipv6-rdns.zekjur.net.
+
+
+=head1 VERSION
+
+Version 1.7
+
+=head1 AUTHOR
+
+Michael Stapelberg, C<< <michael at stapelberg.de> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Michael Stapelberg.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the BSD license.
+
+=cut

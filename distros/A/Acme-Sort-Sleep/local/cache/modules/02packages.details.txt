@@ -1,0 +1,67 @@
+File:         02packages.details.txt
+URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+Description:  Package names found in cpanfile.snapshot
+Columns:      package name, version, path
+Intended-For: Automated fetch routines, namespace documentation.
+Written-By:   Carton v1.0.28
+Line-Count:   58
+Last-Updated: Mon Oct  3 22:47:35 2016
+
+Future                             0.34  P/PE/PEVANS/Future-0.34.tar.gz
+Future::Mutex                      0.34  P/PE/PEVANS/Future-0.34.tar.gz
+Future::Utils                      0.34  P/PE/PEVANS/Future-0.34.tar.gz
+IO::Async                          0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Channel                 0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::ChildManager            0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Debug                   0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::File                    0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::FileStream              0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Function                0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Future                  0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Handle                  0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Listener                0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Loop                    0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Loop::Poll              0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Loop::Select            0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::LoopTests               0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Notifier                0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::OS                      0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::OS::cygwin              0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::OS::linux               0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::OS::MSWin32             0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::PID                     0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Process                 0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Protocol                0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Protocol::LineStream    0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Protocol::Stream        0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Resolver                0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Routine                 0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Signal                  0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Socket                  0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Stream                  0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Test                    0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Timer                   0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Timer::Absolute         0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Timer::Countdown        0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+IO::Async::Timer::Periodic         0.70  P/PE/PEVANS/IO-Async-0.70.tar.gz
+Module::Build                    0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Base              0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Compat            0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Config            0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Cookbook          0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Dumper            0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Notes             0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::aix     0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::cygwin  0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::darwin  0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::Default 0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::MacOS   0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::os2     0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::Unix    0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::VMS     0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::VOS     0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::Platform::Windows 0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::PodParser         0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Module::Build::PPMMaker          0.4220  L/LE/LEONT/Module-Build-0.4220.tar.gz
+Struct::Dumb                       0.09  P/PE/PEVANS/Struct-Dumb-0.09.tar.gz
+Test::Future                       0.34  P/PE/PEVANS/Future-0.34.tar.gz

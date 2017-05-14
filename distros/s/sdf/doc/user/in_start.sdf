@@ -1,0 +1,24 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Getting Started
+
+!block topics
+Topic
+in_intro
+in_insta
+in_gsex
+in_gsgen
+in_style
+in_title
+!endblock

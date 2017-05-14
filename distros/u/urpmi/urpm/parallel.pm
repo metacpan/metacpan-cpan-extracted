@@ -1,9 +1,25 @@
-package urpm::parallel; # $Id: parallel.pm 250871 2009-01-06 17:21:05Z pixel $
+package urpm::parallel;
 
 use strict;
 use urpm;
-use urpm::util;
+use urpm::util qw(any basename cat_);
 use urpm::msg;
+
+=head1 NAME
+
+urpm::parallel - Run an urpmi command in parallel on a number of hosts
+
+=head1 SYNOPSIS
+
+This enables to run urpmi command on several computers at once.
+
+Two backends are available: L<urpm::parallel_ka_run> and L <urpm::parallel_ssh>
+
+=head1 DESCRIPTION
+
+=over
+
+=cut
 
 
 sub configure {
@@ -55,7 +71,12 @@ sub resolve_dependencies {
     $urpm->{parallel_handler}->parallel_resolve_dependencies($file, $urpm, $state, $requested, %options);
 }
 
-#- remove packages from node as remembered according to resolving done.
+=item remove($urpm, $remove, %options)
+
+remove packages from node as remembered according to resolving done.
+
+=cut
+
 sub remove {
     my ($urpm, $remove, %options) = @_;
     my $state = {};
@@ -67,7 +88,12 @@ sub remove {
 						   );
 }
 
-#- parallel find_packages_to_remove
+=item parallel_find_remove($parallel, $urpm, $state, $l, %options)
+
+parallel find_packages_to_remove
+
+=cut
+
 sub parallel_find_remove {
     my ($parallel, $urpm, $state, $l, %options) = @_;
 
@@ -106,7 +132,12 @@ sub parallel_find_remove {
 }
 
 
-#- parallel copy
+=item parallel_register_rpms($parallel, $urpm, @files)
+
+parallel copy
+
+=cut
+
 sub parallel_register_rpms {
     my ($parallel, $urpm, @files) = @_;
 
@@ -178,7 +209,7 @@ sub _parse_urpmq_output {
 	#- distant urpmq returned a choices, check if it has already been chosen
 	#- or continue iteration to make sure no more choices are left.
 	$$cont ||= 1; #- invalid transitory state (still choices is strange here if next sentence is not executed).
-	unless (grep { exists $chosen->{$_} } split /\|/, $s) {
+	unless (any { exists $chosen->{$_} } split /\|/, $s) {
 	    my $choice = $options{callback_choices}->($urpm, undef, $state, [ map { $urpm->search($_) } split /\|/, $s ]);
 	    if ($choice) {
 		$chosen->{scalar $choice->fullname} = $choice;
@@ -195,7 +226,12 @@ sub _parse_urpmq_output {
     }
 }
 
-#- parallel resolve_dependencies
+=item parallel_resolve_dependencies($parallel, $synthesis, $urpm, $state, $requested, %options)
+
+parallel resolve_dependencies on each node
+
+=cut
+
 sub parallel_resolve_dependencies {
     my ($parallel, $synthesis, $urpm, $state, $requested, %options) = @_;
 
@@ -227,7 +263,12 @@ sub parallel_resolve_dependencies {
     $parallel->{line} = join(' ', $line, keys %chosen);
 }
 
-#- compute command line of urpm? tools.
+=item _simple_resolve_dependencies($parallel, $urpm, $state, $requested, %options)
+
+Compute command line of urpm? tools
+
+=cut
+
 sub _simple_resolve_dependencies {
     my ($parallel, $urpm, $state, $requested, %options) = @_;
 
@@ -235,8 +276,8 @@ sub _simple_resolve_dependencies {
     foreach (keys %$requested) {
 	if (/\|/) {
 	    #- taken from URPM::Resolve to filter out choices, not complete though.
-	    my $packages = $urpm->find_candidate_packages($_);
-	    foreach (values %$packages) {
+	    my @packages = $urpm->find_candidate_packages_($_);
+	    foreach (@packages) {
 		my ($best_requested, $best);
 		foreach (@$_) {
 		    exists $state->{selected}{$_->id} and $best_requested = $_, last;
@@ -255,7 +296,7 @@ sub _simple_resolve_dependencies {
 		$_ = $best_requested || $best;
 	    }
 	    #- simplified choice resolution.
-	    my $choice = $options{callback_choices}->($urpm, undef, $state, [ values %$packages ]);
+	    my $choice = $options{callback_choices}->($urpm, undef, $state, \@packages);
 	    if ($choice) {
 		push @pkgs, $choice;
 	    }
@@ -306,3 +347,15 @@ sub parallel_install {
 }
 
 1;
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005 MandrakeSoft SA
+
+Copyright (C) 2005-2010 Mandriva SA
+
+Copyright (C) 2010-2015 Mageia
+
+=cut

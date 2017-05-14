@@ -1,0 +1,116 @@
+NAME
+    CGI::CIPP - Use CIPP embedded HTML Pages in a CGI environment
+
+DESCRIPTION
+    CGI::CIPP is a Perl module which enables you to use CIPP on
+    every CGI capable webserver. It is based on a central wrapper
+    script, which does all the preprocessing. It executes the
+    generated Perl code directly afterwards.
+
+    Additionally, it implements a filesystem based cache for the
+    generated code. Preprocessing is done only when the
+    corresponding CIPP source code changed on disk, otherwise this
+    step is skipped.
+
+WHAT IS CIPP?
+    CIPP is a Perl module for translating CIPP sources to pure Perl
+    programs. CIPP defines a HTML embedding language also called
+    CIPP which has powerful features for CGI and database
+    developers.
+
+    Many standard CGI and database operations (and much more) are
+    covered by CIPP, so the developer does not need to code them
+    again and again.
+
+    CIPP is not part of this distribution, please download it from
+    CPAN.
+
+SIMPLE CIPP EXAMPLE
+    To give you some imagination of what you can do with CIPP: here
+    is a (really) simple example of using CIPP in a HTML source to
+    retrieve some information from a database. Think this as a HTML
+    page which is "executed" on the fly by your webserver.
+
+    Note: there is no code to connect to the database. This is done
+    implicitely. The configuration is taken from the central
+    CGI::CIPP wrapper srcipt.
+
+      # print table of users who match the given parameter
+  
+      <?INTERFACE INPUT="$search_name">
+
+      <HTML>
+      <HEAD><TITLE>tiny litte CIPP example</TITLE></HEAD>
+      <BODY>
+      <H1>Users matching '$search_name'</H1>
+      <P>
+
+      <TABLE BORDER=1>
+      <TR><TD>Name</TD><TD>Adress</TD><TD>Phone</TD></TR>
+      <?SQL SQL="select name, adress, phone
+                 from   people
+                 where  name like '%' || ? || '%'"
+            PARAMS="$search_name"
+            MY VAR="$n, $a, $p">
+        <TR><TD>$n</TD><TD>$a</TD><TD>$p</TD></TR>
+      <?/SQL>
+      </TABLE>
+
+      </BODY>
+      </HTML>
+
+SYNOPSIS
+    Create a CGI program in a directory, where CGI programs usually
+    reside on your server (e.g. /cgi-bin/cipp), or configure this
+    program another way to be a CGI program.
+
+    This program is the central CGI::CIPP wrapper. It only consists
+    of a single function call to the CGI::CIPP module, with a hash
+    of parameters for configuration. This is a example:
+
+      #!/usr/local/bin/perl
+
+      use strict;
+      use CGI::CIPP;
+
+      CGI::CIPP->request (
+            document_root  => '/www/htdocs/cippstuff',
+            wrapper_url    => '/cgi-bin/cipp',
+            directoy_index => 'index.cipp',
+            cache_dir      => '/tmp/cipp_cache',
+            databases      => {
+                    test => {
+                            data_source => 'dbi:mysql:test',
+                            user        => 'dbuser',
+                            password    => 'dbpassword',
+                            auto_commit => 1
+                    },
+                    foo => {
+                            ...
+                    }
+            }
+            default_database => 'test',
+            lang => 'EN'
+      );
+
+    See the embedded POD documentation for details about
+    configuring CGI::CIPP, particularly see the Apache
+    and CGI::SpeedyCGI configuration hints. They will make
+    your life easier.
+
+    The file 'example.cgi' is part of this distribution.
+    It is a example for a CGI::CIPP wrapper script. Copy and
+    modify it for your needs.
+
+AUTHOR
+    Joern Reder <joern@dimedis.de>
+
+COPYRIGHT
+    Copyright 1998-1999 Joern Reder, All Rights Reserved
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), CIPP(3pm), Apache::CIPP(3pm), CGI::SpeedyCGI(3pm)
+

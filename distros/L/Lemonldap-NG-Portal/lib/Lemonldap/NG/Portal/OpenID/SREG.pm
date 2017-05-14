@@ -15,7 +15,7 @@ use utf8;
 # Hook called to add SREG parameters to the OpenID response
 # @return Hash containing wanted parameters
 sub sregHook {
-    my ( $self, $u, $trust_root, $is_id, $is_trusted, $prm ) = splice @_;
+    my ( $self, $u, $trust_root, $is_id, $is_trusted, $prm ) = @_;
     my ( @req, @opt );
 
     # Refuse federation if rejected by user
@@ -217,7 +217,7 @@ sub sregHook {
 # SREG.
 # @return fitered datas
 sub sregfilter {
-    my ( $self, @attr ) = splice @_;
+    my ( $self, @attr ) = @_;
     my ( @ret, @rej );
 
     # Browse attributes

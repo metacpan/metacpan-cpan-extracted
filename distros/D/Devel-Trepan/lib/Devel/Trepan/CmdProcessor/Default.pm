@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2015 Rocky Bernstein <rocky@cpan.org>
 use Exporter;
 use warnings;
 
@@ -19,7 +19,7 @@ our @ISA;
 
 BEGIN {
     $HAVE_DATA_PRINT =
-        eval("use Data::Printer { colored => 1, sort_keys => 1}; 1") ?
+        eval("use Data::Printer { colored => 1, deparse => 1, sort_keys => 1 }; 1") ?
         1 : 0;
     $HAVE_DATA_DUMPER_CONCISE =
         eval("use Data::Dumper::Concise; 1") ?
@@ -28,7 +28,7 @@ BEGIN {
         require Data::Dumper::Perltidy;
     } ? 1 : 0;
     @DISPLAY_TYPES = ('dumper');
-    push @DISPLAY_TYPES, 'dprint'  if $HAVE_DATA_PRINT;
+    push @DISPLAY_TYPES, 'ddp'  if $HAVE_DATA_PRINT;
     push @DISPLAY_TYPES, 'tidy'    if $HAVE_PERLTIDY;
     push @DISPLAY_TYPES, 'concise' if $HAVE_DATA_DUMPER_CONCISE;
 }
@@ -36,7 +36,7 @@ BEGIN {
 # Return what to use for evaluation display
 sub default_eval_display() {
     if ($HAVE_DATA_PRINT) {
-        return 'dprint';
+        return 'ddp';
     } elsif ($HAVE_PERLTIDY) {
         return 'tidy';
     } elsif ($HAVE_DATA_DUMPER_CONCISE) {
@@ -58,8 +58,7 @@ use constant DEFAULT_SETTINGS => {
     cmddir        => [],     # Additional directories to load commands
                              # from
     different     => 0,      # stop *only* when  different position?
-    displayop     => $DB::HAVE_MODULE{'Devel::Callsite'} &&
-	!$ENV{AUTOMATED_TESTING},
+    displayop     => !$ENV{AUTOMATED_TESTING},
                              # If set, show OP address in location
     debugdbgr     => 0,      # Debugging the debugger
     debugexcept   => 1,      # Internal debugging of command exceptions
@@ -80,6 +79,7 @@ use constant DEFAULT_SETTINGS => {
     highlight     => Devel::Trepan::Options::default_term(),
                              # Use terminal highlight? 0 or undef if off.
 
+    maxlines      => 1,      # Number of context lines in location,
     maxlist       => 10,     # Number of source lines to list
     maxstack      => 10,     # backtrace limit
     maxstring     => 150,    # Strings which are larger than this

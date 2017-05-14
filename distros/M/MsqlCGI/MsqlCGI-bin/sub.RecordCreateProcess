@@ -1,0 +1,153 @@
+#####################################################################
+# package RecordCreateProcess
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to creating a record.  (It is called after the record
+# creation stuff is setup in the RecordCreateSetup package.
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package RecordCreateProcess;
+
+#####################################################################
+# sub RecCreateReq.  
+#
+# This creates the entry in the database...
+#####################################################################
+sub main::RecCreateReq {
+  $dbh = &MsqlCGI::SetupMsqlConnection();
+
+  ( $query, $priKey ) = &CreateCreateQueryPart_Create ();
+
+  &main::DPrint ( "Doing Create Query: <pre>$query</pre>" );
+
+  &main::DPrint ( "$main::tableInfo", $main::tableInfo->{'ErrorTemplate'} );
+  &main::DPrint ( $main::tableInfo->{'TemplateDir'} );
+  $sth = $dbh->Query ( $query ) || 
+  	&main::Error ( "Failed Create: $Msql::db_errstr" );
+
+  &main::DPrint ( "$main::tableInfo");
+  &main::DPrint ( "looking for : " .  $main::tableInfo->{'RecordCreateSuccessTemplate'} );
+  if ( $main::tableInfo->{'RecordCreateSuccessTemplate'} ) {
+    &main::DPrint ( "Going into Template..." );
+    &Template::DoTemplate ( $main::tableInfo->{'RecordCreateSuccessTemplate'} ,
+    			    "RECORD_CREATE_SUCCESS", $sth );
+  } else {
+    print <<"    EOF";
+      <title>Record Created</title>
+      <h2>Your record has been created.</h2>
+    EOF
+    print &DoStandardAction 
+    	( "CREATE_RECORD_SUCCESS", $sth );
+    
+    print &Template::GetHTMLFooter();
+  }
+}
+
+#########################################################################
+# DoStandardAction
+#########################################################################
+sub DoStandardAction {
+  my ( $type, $sth ) = @_;
+  my ( $strRet ) = "";
+
+  $strRet .= &Template::GetCGIHeader ( "RecActions" );
+  $strRet .= <<"  EOF";
+    Your new record has been created successfully.  You can click on the
+    button below to view the new record.<p>
+    <center>
+  EOF
+  $strRet .= &DoCGIFooter ( $sth );
+  $strRet .= <<"  EOF";
+    </center>
+  EOF
+  return $strRet;
+}
+
+#########################################################################
+# DoCGIFooter
+# 
+# put a single button that says "view record", and that has the primary
+# key of the data element.
+#
+# This uses the local variable "$priKey" which is set in the "constructor"
+# function.
+#########################################################################
+sub DoCGIFooter {
+  my ( $sth ) = @_;
+  my ( $strRet ) .= <<"  EOF";
+    <input type=hidden name="_MsqlCGI_recAction" value="display">
+    <input type=hidden name="_MsqlCGI_priKey" value="$priKey">
+    <input type=submit value="View Record">
+  EOF
+  return $strRet;
+}
+
+#########################################################################
+# CreateCreateQueryPart_Create
+#
+# this sub takes the data from the CGI input (the %in hash) and converts
+# it into a CREATE query.
+#########################################################################
+sub CreateCreateQueryPart_Create {
+	# Since this is such a simple query to create, we're going to keep
+	# this inside of this function...
+  local ( $query ) = <<EOF;
+  	INSERT
+	INTO 	$main::tableInfo->{'TableName'}
+	VALUES	(
+EOF
+
+  for ( $nFieldCount = 0; $nFieldCount <= $#{$main::tData}; $nFieldCount++ ) {
+
+    $strField = $main::tData->[$nFieldCount]->{'fieldName'};
+    &main::DPrint ( "Field is: $strField" );
+    $value = $main::in{$strField};
+
+	# if this is the primary Key, record the value...We're going to
+	# need it when we try to display the value.
+    if ( $nFieldCount == $main::tableInfo->{'priKeyArrNum'} ) {
+      $priKey = $value;
+      &main::DPrint ( "Primary Key: $value".  
+                      $main::tableInfo->{'priKeyArrNum'}  );
+    }
+
+
+    &main::DPrint ( "Value before: $value" );
+
+    $value = &MsqlCGI::StrToQueryStr 
+    		( $value, $main::tData->[$nFieldCount]->{'fieldType'}, "CREATE" );
+    &main::DPrint ( "Value after: $value" );
+
+    	# Do Special Processing for Field.
+    &main::DPrint ( "ABout to call Special, $nFieldCount" );
+    if ( $main::tData->[$nFieldCount]->{'special'} ) {
+      $funcName = &MsqlCGI::GetSpecialFunctionName 
+      		  ( $main::tData->[$nFieldCount], "CreateQueryPart_Create" );
+      ( $value ) = &{$funcName} ( $main::tableInfo, $main::tData->[$nFieldCount], $value );
+      &main::DPrint ( "Returned from Special $funcName, Value is: $value" );
+    }
+
+
+    if ( $main::tData->[$nFieldCount]->{'fieldType'} =~ /^char$/i ) {
+      $value = "$value";
+
+    } else { 	# fieldType is int or real
+    	# we're making sure that the integer and real values actually have
+	# a value even if one wasn't given in the form.  This is because
+	# if you msql will give an error if you try to add a record with a
+	# null value for an integer or real.
+      $value = ( $value ) ? $value : 0;
+    }
+
+    &main::DPrint ( "nFieldCount: $nFieldCount" );
+    $query .= ( $nFieldCount ) ? ",\n\t\t$value" : "\t\t$value" ;
+  }
+  $query .= "\t\t)";
+  return ( $query, $priKey );
+}
+
+
+1;

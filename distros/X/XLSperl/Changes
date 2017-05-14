@@ -1,0 +1,10 @@
+Changelog for XLSperl
+=====================
+
+0.7 - 20 June 2008
+Added '-m' and '-M' options to load additional Perl modules into XLSperl
+Added example of CSV conversion using Text::CSV_XS (thanks to Sam Vilain)
+
+0.6 - 11 June 2008
+Fixed compatibility problem with Windows which was causing some
+spreadsheets to fail with a "PPS:67" error.

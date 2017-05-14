@@ -1,0 +1,255 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NOMBRE</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#nombre">NOMBRE</a></li>
+	<li><a href="#sinopsis">SINOPSIS</a></li>
+	<li><a href="#descripci__n">DESCRIPCIÓN</a></li>
+	<li><a href="#m__todos">MÉTODOS</a></li>
+	<ul>
+
+		<li><a href="#constructor">CONSTRUCTOR</a></li>
+		<li><a href="#accesores">ACCESORES</a></li>
+	</ul>
+
+	<li><a href="#ejemplo">EJEMPLO</a></li>
+	<li><a href="#autor">AUTOR</a></li>
+	<li><a href="#licencia">LICENCIA</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="nombre">NOMBRE</a></h1>
+<p><strong>DownVideos::DataSexta</strong> - Un módulo para obtener rutas a los capítulos de los programas de La Sexta</p>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="sinopsis">SINOPSIS</a></h1>
+<p>use DownVideos::DataSexta</p>
+<p>my $sexta =  DataSexta-&gt;<a href="#new"><code>new()</code></a>;</p>
+<p>my $series = $sexta-&gt;get_series;</p>
+<p>for my $p (@$series)
+  {
+  for my $k (keys $p)
+    {
+    print &quot;$k\n&quot;;
+    }
+ }</p>
+<p>my $capitulos = $sexta-&gt;<a href="#get_capitulos"><code>get_capitulos(&quot;$nombre_serie&quot;)</code></a>;</p>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="descripci__n">DESCRIPCIÓN</a></h1>
+<p>Un módulo para obtener rutas a los capítulos de los programas de <strong>La Sexta</strong>, que junto con <strong>DownVideos::SextaXML</strong> proporciona la URL de los archivos de video tanto de sus series, como de sus noticieros y programas.</p>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="m__todos">MÉTODOS</a></h1>
+<p>
+</p>
+<h2><a name="constructor">CONSTRUCTOR</a></h2>
+<dl>
+<dt><strong><a name="new" class="item"><code>new()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$sexta = DataSexta-&gt;new();</strong></strong></dt>
+
+</dl>
+<p>Crea el objeto. No requiere opciones.</p>
+<ul>
+<li><strong><a name="sexta" class="item">$sexta (Objeto DataSexta=HASH)</a></strong>
+
+</li>
+</ul>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="accesores">ACCESORES</a></h2>
+<dl>
+<dt><strong><a name="get_series" class="item"><code>get_series()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$series = $sexta-&gt;get_series();</strong></strong></dt>
+
+</dl>
+<p>Obtiene un listado de las series y la URL a los capítulos. No requiere argumentos.</p>
+<ul>
+<li><strong><a name="series" class="item">$series (Array de hashes)</a></strong>
+
+</li>
+</ul>
+<pre>
+    $series = [
+            {
+              'Serie foo' =&gt; '/videos/sfoo.html'
+            },
+            {
+              'Serie bar' =&gt; '/videos/sbar.html'
+            }
+          ];</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="get_programas" class="item"><code>get_programas()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$programas = $sexta-&gt;get_series();</strong></strong></dt>
+
+</dl>
+<p>Obtiene un listado de los programas y la URL a los capítulos. No requiere argumentos.</p>
+<ul>
+<li><strong><a name="programas" class="item">$programas (Array de hashes)</a></strong>
+
+</li>
+</ul>
+<pre>
+    $programas = [
+               {
+                 'Programa foo' =&gt; '/videos/pfoo.html'
+               },
+               {
+                 'Programa bar' =&gt; '/videos/pbar.html'
+               }
+             ];</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="get_noticias" class="item"><code>get_noticias()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$noticias = $sexta-&gt;get_noticias();</strong></strong></dt>
+
+</dl>
+<p>Obtiene un listado de los noticieros y la URL a los capítulos. No requiere argumentos.</p>
+<ul>
+<li><strong><a name="noticias" class="item">$noticias (Array de hashes)</a></strong>
+
+</li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="get_capitulos" class="item"><code>get_capitulos()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$capitulos = $sexta-&gt;get_capitulos($nombre);</strong></strong></dt>
+
+</dl>
+<p>Obtiene un hash con información acerca de todos los capitulos del título (la clave de $series, $programas o $noticias) de la serie, el programa o el noticiero indicado en $nombre.</p>
+<ul>
+<li><strong><a name="nombre" class="item">$nombre (Cadena de texto)</a></strong>
+
+</li>
+<li><strong><a name="capitulos" class="item">$capitulos (Array de hashes)</a></strong>
+
+</li>
+</ul>
+<pre>
+    $capitulos = [
+               {
+                 'URL' =&gt; '<a href="http://www.lasexta.com/videos/seriefoo/temporada-2/capitulo-2.html">http://www.lasexta.com/videos/seriefoo/temporada-2/capitulo-2.html</a>',
+                 'DESCRIPCION' =&gt; &quot;Capítulo 2&quot;,
+                 'TITULO' =&gt; &quot;Serie foo - Capítulo 2 - Temporada 1&quot;,
+                 'IMAGEN' =&gt; '<a href="http://www.lasexta.com/clipping/2013/05/02/00047/10.jpg">http://www.lasexta.com/clipping/2013/05/02/00047/10.jpg</a>'
+               },
+               {
+                 'URL' =&gt; '<a href="http://www.lasexta.com/videos/seriefoo/temporada-2/capitulo-1.html">http://www.lasexta.com/videos/seriefoo/temporada-2/capitulo-1.html</a>',
+                 'DESCRIPCION' =&gt; &quot;Capítulo 1&quot;,
+                 'TITULO' =&gt; &quot;Serie foo - Capítulo 1 - Temporada 1&quot;,
+                 'IMAGEN' =&gt; '<a href="http://www.lasexta.com/clipping/2013/04/25/00069/10.jpg">http://www.lasexta.com/clipping/2013/04/25/00069/10.jpg</a>'
+               }
+             ];</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="ejemplo">EJEMPLO</a></h1>
+<dl>
+<dt><strong><a name="ejemplo_de_obtenci_n_de_informaci_n_sobre_tres_cap_tulos_del_noticiero_deportes" class="item">Ejemplo de obtención de información sobre tres capítulos del noticiero Deportes:</a></strong></dt>
+
+<dd>
+<pre>
+ #!/usr/bin/perl</pre>
+<pre>
+ use warnings;
+ use strict;
+ use utf8;
+ use encoding 'utf8';
+ use open 'locale';
+ use Encode;
+ use DataSexta;</pre>
+<pre>
+ my $sexta = DataSexta-&gt;new();
+ my $noticias = $sexta-&gt;get_noticias;
+ 
+ print &quot;Obtenemos los programas de la sección noticias\n&quot;;</pre>
+<pre>
+ for my $p (0..@$noticias - 1)
+    {
+        for my $k (keys @$noticias[$p])
+            {
+            print &quot;Título $p: $k\n&quot;;
+            print &quot;URL $p: &quot; . @{$noticias}[$p]-&gt;{$k} . &quot;\n\n&quot;;
+            }
+    }</pre>
+<pre>
+ # Obtenemos los capítulos del noticiero &quot;Deportes&quot;;
+ my $capitulos = $sexta-&gt;get_capitulos(&quot;Deportes&quot;);</pre>
+<pre>
+ print &quot;Mostramos información de los 3 últimos capítulos\n&quot;;</pre>
+<pre>
+ for my $c (0..2)
+    {
+        for my $k (keys @$capitulos[$c])
+            {
+            print &quot;($c) $k:&quot;;
+            print &quot; &quot; . @{$capitulos}[$c]-&gt;{$k} . &quot;\n&quot;;
+            }
+    print &quot;\n&quot;;
+    }</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="autor">AUTOR</a></h1>
+<p>Hugo Morago Martín &lt;<a href="mailto:morago@ono.com">morago@ono.com</a>&gt;</p>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="licencia">LICENCIA</a></h1>
+<p>Copyright © 2013 Hugo Morago Martín &lt;<a href="mailto:morago@ono.com">morago@ono.com</a>&gt;</p>
+<p>Este programa se distribuye bajo los términos de la GPL v3 del 29 de enero de 2007. Puede encontrar una copia de la misma en <a href="http://www.gnu.org/licenses/gpl-3.0.html">http://www.gnu.org/licenses/gpl-3.0.html</a></p>
+<p><a href="#__index__"><small>Subir</small></a></p>
+
+</body>
+
+</html>

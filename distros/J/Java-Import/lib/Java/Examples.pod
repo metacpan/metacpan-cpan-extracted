@@ -1,0 +1,61 @@
+=head1 NAME
+
+Java::Import::Examples - Example of how to use Java::Import to call into Java classes
+
+=head2 Making RMI calls from Perl
+
+One nice thing about Java is the extremely straight forward manner in which it allows you to make calls to 
+remote objects residing on distant servers.  Many people use this ability as a point of integration between 
+their system and a posible third party or legacy system.  Unfortunatly, for the most part the ability to make 
+calls to these remote objects is something that only other Java applications can do without making a big 
+fuss about it.  However, we can now do this from Perl.
+
+Assume that I have a RMI server from which I can get data from in the form of simple Java Beans.  One method 
+of doing this is to use the GCJ::Cni library and natively compile and wrap a set of Java Classes which can 
+then be 'used' from my Perl script.  However, there is an easier way.
+
+Let's begin by descriping the Java interfaces that we'll be working with.  We first have the Remote Interface 
+that we will be interacting with:
+
+  import java.rmi.*;
+  public interface RemoteInterface extends Remote {
+    public SomeBean getMessage(String seedMessage) throws RemoteException;
+  }
+
+And we also have the bean we will be asking for:
+
+  import java.io.*;
+  public class SomeBean implements Serializable {
+    private String value;
+    public SomeBean() {}
+    public void setValue ( String _value ) { ... }
+    public String getValue ( ) { ... }
+  }
+
+As far as any Perl client program is concerned this is all we need to know about. 
+
+Now all there is left to do is write a client:
+
+  use Java::Import qw(
+    java.rmi.Naming
+  );
+  
+  my $remote_interface = java::rmi::Naming->lookup(jstring("//localhost/Home"));
+  my $bean = $remote_interface->getMessage(jstring("Hi there"));
+  print $bean->getValue(), "\n";
+
+That's all there is.  Notice that all we had to tell Java::Import about was java.rmi.Naming, this is because it 
+was the only class we used by name in our Perl code, every other Java class (the objects held by $bean and 
+$remote_interface) was returned by some other method call originating from java.rmi.Naming.
+
+In order to run this example we have to make sure everything is in it's place.  We start by compiling the client
+code.  Assuming that we have been given a Stub class file (RemoteObject_Stub.class) we can do the following:
+
+  gcj -C SomeBean.java RemoteInterface.java
+  fastjar -cvf client.jar SomeBean.class RemoteInterface.class RemoteObject_Stub.class
+  
+Making sure our server is reachable we can then run the client code:
+
+  CLASSPATH=client.jar perl client.pl
+
+That's it, you should then see the message returned by your server.

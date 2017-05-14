@@ -1,0 +1,19 @@
+---
+abstract: 'CAS sso authentication for Dancer2'
+author:
+  - 'Jean Stebens <cpan.helba@recursor.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Auth-CAS
+requires:
+  Authen::CAS::Client: '0'
+  Dancer2::Core::Error: '0'
+  Dancer2::Plugin: '0'
+version: '2.000'

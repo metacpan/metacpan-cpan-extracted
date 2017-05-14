@@ -1,0 +1,46 @@
+#!/usr/bin/perl -I.
+
+use Pod::Simplify;
+
+$x = new Pod::Simplify;
+
+$idx=0;
+
+sub doindex {
+	foreach (@_) {
+		if(ref $_ eq "ARRAY") {
+			my(@i) = @$_;
+			my($i) = shift @i;
+			if( $i eq "X") {
+				shift @i; # discard printable block
+				$idx++;
+				$name = join("/",@{$i[0]});
+				$name =~ s/([^A-Za-z0-9_])/ "%".sprintf("%.2X",ord($1)) /ge;
+				foreach (@i) {
+					$idx{join("/",@$_)} = [$name,$idx,$file];
+				}
+				#print "Index: ",Pod::Simplify::dumpout([@i]),"\n";
+			} else {
+				doindex(@i);
+			}
+		}
+	}
+}
+
+sub dump1 {
+	my($par,$line,$pos,$cmd,$var1,$var2) = @_;
+	
+	if( $cmd eq "begin" and $var1 eq "file" ) {
+		$file = $var2;
+	}
+	if( $cmd =~ /^(item|head|flow|index)$/) {
+		doindex(@$var2);
+	}
+}
+
+$x->parse_from_file_by_name($ARGV[0] || "pod/perlfunc.pod",\&dump1);
+
+foreach (sort keys %idx) {
+        print join(" ",$_,@{$idx{$_}}),"\n";
+}
+        

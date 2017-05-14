@@ -18,8 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: FileHandle.pm,v 1.2 2004/11/09 11:28:29 rwmj Exp $
-
 =pod
 
 =head1 NAME
@@ -30,11 +28,7 @@ Net::FTPServer::Full::FileHandle - The full FTP server personality
 
   use Net::FTPServer::Full::FileHandle;
 
-=head1 DESCRIPTION
-
 =head1 METHODS
-
-=over 4
 
 =cut
 
@@ -52,6 +46,8 @@ use vars qw(@ISA);
 @ISA = qw(Net::FTPServer::FileHandle);
 
 =pod
+
+=over 4
 
 =item $dirh = $fileh->dir;
 
@@ -74,7 +70,7 @@ sub dir
 =item $fh = $fileh->open (["r"|"w"|"a"]);
 
 Open a file handle (derived from C<IO::Handle>, see
-L<IO::Handle(3)>) in either read or write mode.
+C<IO::Handle(3)>) in either read or write mode.
 
 =cut
 
@@ -210,7 +206,7 @@ sub readlink
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -223,6 +219,6 @@ London, SW6 3EG, UK
 
 =head1 SEE ALSO
 
-L<Net::FTPServer(3)>, L<perl(1)>
+C<Net::FTPServer(3)>, C<perl(1)>
 
 =cut

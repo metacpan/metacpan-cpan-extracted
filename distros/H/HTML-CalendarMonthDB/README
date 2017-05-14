@@ -1,0 +1,356 @@
+NAME
+    HTML::CalendarMonthDB - Perl Module for Generating Persistant HTML
+    Calendars
+
+SYNOPSIS
+       use HTML::CalendarMonthDB;
+       $cal = new HTML::CalendarMonthDB('year'=>2001,'month'=>2, 'dbname'=>'test', 'dbuser'=>'postgres', 'dbpass'=>'', 'dbcalendar'=>'testcal', 'dbclient'=>'testClient');
+       $cal->width('50%'); # non-persistant
+       $cal->border(10);   # non-persistant
+       $cal->header('Text at the top of the Grid'); # non-persistant
+       $cal->bgcolor('pink');
+       $cal->editdbcalendar('width'=>'50%', 'border'=>10, 'header'=>'Text at the top of the Grid', 'bgcolor'=>'pink'); # persistant, stored in DB.
+       $cal->setcontent(14,"Don't forget to buy flowers"); # non-persistant
+       $cal->addcontent(13,"Guess what's tomorrow?"); # non-persistant
+       $cal->adddbevent('date'=>'14', 'eventname'=>'Don't forget to buy flowers'); # persistant, stored in db
+       $cal->adddbevent('date'=>'13', 'eventname'=>'Guess what's tomorrow?', 'eventdesc'=>'A big surprise is happening tommorrow.  Click here to see more!!', 'eventlink'=>'http://www.surprise.com'); # persistant, stored in db
+       print $cal->as_HTML; # print standard 7 column calendar
+       print $cal->as_HTML_list; # print HTML calendar as list
+
+DESCRIPTION
+    HTML::CalendarMonthDB is a Perl module for generating, manipulating, and
+    printing a HTML calendar grid for a specified month. It is intended as a
+    faster and easier-to-use alternative to HTML::CalendarMonth. It is based
+    on HTML::CalendarMonthSimple, but can store persistant data into a
+    database, as well as adding features like per-event links, descriptions,
+    and times.
+        This module requires the Date::Calc module, which is available from
+        CPAN.
+
+INTERFACE METHODS
+
+  new(ARGUMENTS)
+    Naturally, new() returns a newly constructed calendar object. Recognized
+    arguments include 'year' and 'month', to specify which month's calendar
+    will be used. If either is omitted, the current value is used. An
+    important note is that the month and the year are NOT the standard C or
+    Perl -- use a month in the range 1-12 and a real year, e.g. 2001. If
+    this is to be a persistant calendar (you wish to store info in a
+    database), there are other arguments:
+
+        * 'dbname' (name of database to use, required if you wish to use a
+        database)
+        * 'dbuser' (database user, default 'nobody')
+        * 'dbpass' (database user password, default '')
+        * 'dbcalendar' (database calendar name, default '')
+        * 'dbclient' (database calendar client name, default '')
+        * 'dbhost' (database host name, default '')
+
+           # Examples:
+           # Create a calendar for this month.
+           $cal = new HTML::CalendarMonthSimple(); # not persistant
+           # One for a specific month/year
+           $cal = new HTML::CalendarMonthSimple('month'=>2,'year'=>2000); # not persistant
+           # One for "the current month" in 1997
+           $cal = new HTML::CalendarMonthSimple('year'=>1997); # not persistant
+   
+           # One for a specific month/year, to use database specified
+           $cal = new HTML::CalendarMonthSimple('month'=>2,'year'=>2000,'dbname'=>'test','dbuser'=>postgres,'dbcalendar'=>'testcal','dbclient'=>'testClient');
+
+  deldbevent (EVENTID)
+    Permanently deletes record from database associated with the event id
+    passed in.
+
+  adddbevent (ARGUMENTS)
+    Add persistant event for date (day) specified within current month and
+    year. The following are arguments:
+
+        * 'eventname' (name of event)
+        * 'eventdesc' (event description, optional)
+        * 'eventlink' (event link, optional)
+        * 'eventtime' (event time, optional)
+    =head2 addevent(DATE,STRING)
+
+  getcontent(DATE)
+    These methods are used to control the content of date cells within the
+    calendar grid. The DATE argument may be a numeric date or it may be a
+    string describing a certain occurrence of a weekday, e.g. "3MONDAY" to
+    represent "the third Monday of the month being worked with", or it may
+    be the plural of a weekday name, e.g. "wednesdays" to represent all
+    occurrences of the given weekday. The weekdays are case-insensitive.
+
+           # Examples:
+           # The cell for the 15th of the month will now say something.
+           $cal->setcontent(15,"An Important Event!");
+           # Later down the program, we want the content to be boldfaced.
+           $foo = "<b>" . $cal->getcontent(15) . "</b>";
+           $cal->setcontent(15,$foo);
+           # Or we could get extra spiffy:
+           $cal->setcontent(15,"<b>" . $cal->getcontent(15) . "</b>");
+
+           # addcontent() does not clober existing content.
+           # Also, if you setcontent() to '', you've deleted the content.
+           $cal->setcontent(16,'');
+           $cal->addcontent(16,"<p>Hello World</p>");
+           $cal->addcontent(16,"<p>Hello Again</p>");
+           print $cal->getcontent(16); # Prints 2 sentences
+
+           # Padded and decimal numbers may be used, as well:
+           $cal->setcontent(3.14159,'Third of the month');
+           $cal->addcontent('00003.0000','Still the third');
+           $cal->getcontent('3'); # Gets the 2 sentences
+
+           # The second Sunday of May is some holiday or another...
+           $cal->addcontent('2sunday','Some Special Day') if ($cal->month() == 5);
+           # So is the third wednesday of this month
+           $cal->setcontent('3WedNEsDaY','Third Wednesday!');
+           # What's scheduled for the second Friday?
+           $cal->getcontent('2FRIDAY');
+
+           # Every Wednesday and Friday of this month...
+           $cal->addcontent('wednesdays','Every Wednesday!');
+           $cal->getcontent('Fridays');
+
+  as_HTML(ARGUMENTS)
+
+  as_HTML_list(ARGUMENTS)
+    These methods return a string containing the HTML calendar for the
+    month. as_HTML() returns a standard 7 column table, while as_HTML_list()
+    returns a two-column list format calendar.
+
+           # Examples:
+           print $cal->as_HTML();
+           print $cal->as_HTML_list('editurl'=>'editcal.cgi', 'addurl'=>'addcal.cgi');
+
+        Two optional arguments may be passed, in order to ease the integration
+        of adminitrative front-ends: 'editurl' (Will add a [edit] link in each
+        day's cell to specified url like so-
+        http://editurl?date=month_day_year&calid=calendarid.) 'addurl' (Will add
+        a [add] link in each day's cell to specified url like so-
+        http://addurl?date=month_day_year&calid=calendarid.)
+
+  year()
+
+  month()
+
+  monthname()
+    These methods simply return the year/month of the calendar. monthname()
+    returns the text name of the month, e.g. "December".
+
+  getdbcontent()
+    Loads calendar event content from database.
+
+  getdbcalendar()
+    Loads calendar formatting data from database.
+
+  editdbcalendar(ARGUMENTS)
+    Edits calendar formatting attributes stored in database. Takes any or
+    all of the following arguments:
+
+        * 'border' (size of calendar border, integer)
+        * 'width' (width of calendar, should be in pixels or %)
+        * 'bgcolor' (background color of calendar)
+        * 'weekdaycolor' (background color of weekday cells)
+        * 'weekendcolor' (background color of weekend cells)
+        * 'todaycolor' (background color of today's cell)
+        * 'bordercolor' (border color of calendar)
+        * 'weekdaybordercolor' (border color of weekday cells)
+        * 'weekendbordercolor' (border color of weekend cells)
+        * 'todaybordercolor' (border color of today's cell)
+        * 'contentcolor' (color of cell content)
+        * 'weekdaycontentcolor' (color of weekday cell content)
+        * 'weekendcontentcolor' (color of weekend cell content)
+        * 'todaycontentcolor' (color of today's cell content)
+        * 'headercolor' (background color of header cell)
+        * 'weekdayheadercolor' (background color of weekday header cell)
+        * 'weekendheadercolor' (background color of weekend header cell)
+        * 'header' (header text, defaults to 'Month Year' if not specified or
+        '')
+        * 'cellalignment' (alignment of text within cells, defaults to left,
+        other valid values include right, center)
+
+  editdbevent(ARGUMENTS)
+    Edits specific event attributes in database. Arguments:
+
+        * 'eventid' (id of specific event, required)
+        * 'eventname' (name of event)
+        * 'eventdesc' (event description)
+        * 'eventlink' (event link)
+        * 'eventtime' (event time)
+
+  getdbevent(DATE)
+    Takes an argument of the date(day) and returns a hash of event id's and
+    their attributes for the specified day in this form:
+    hash{eventid}{eventattribute}
+
+        Useful as a function to be used in admin tools.
+
+  border([INTEGER])
+    This specifies the value of the border attribute to the <TABLE>
+    declaration for the calendar. As such, this controls the thickness of
+    the border around the calendar table. The default value is 5.
+
+        If a value is not specified, the current value is returned. If a value
+        is specified, the border value is changed and the new value is returned.
+
+  width([INTEGER][%])
+    This sets the value of the width attribute to the <TABLE> declaration
+    for the calendar. As such, this controls the horizintal width of the
+    calendar.
+
+        The width value can be either an integer (e.g. 600) or a percentage
+        string (e.g. "80%"). Most web browsers take an integer to be the table's
+        width in pixels and a percentage to be the table width relative to the
+        screen's width. The default width is "100%".
+
+        If a value is not specified, the current value is returned. If a value
+        is specified, the border value is changed and the new value is returned.
+
+           # Examples:
+           $cal->width(600);    # absolute pixel width
+           $cal->width("100%"); # percentage of screen size
+
+  showdatenumbers([1 or 0])
+    If showdatenumbers() is set to 1, then the as_HTML() method will put
+    date labels in each cell (e.g. a 1 on the 1st, a 2 on the 2nd, etc.) If
+    set to 0, then the date labels will not be printed. The default is 1.
+
+        If no value is specified, the current value is returned.
+
+        The date numbers are shown in boldface, normal size font. If you want to
+        change this, consider setting showdatenumbers() to 0 and using
+        setcontent()/addcontent() instead.
+
+  showweekdayheaders([1 or 0])
+    If showweekdayheaders() is set to 1 (the default) then calendars
+    rendered via as_HTML() will display the names of the days of the week.
+    If set to 0, the days' names will not be displayed.
+
+        If no value is specified, the current value is returned.
+
+  cellalignment([STRING])
+    This sets the value of the align attribute to the <TD> tag for each
+    day's cell. This controls how text will be centered/aligned within the
+    cells.
+
+        Any value can be used, if you think the web browser will find it
+        interesting. Some useful alignments are: left, right, center, top, and
+        bottom,
+
+        By default, cells are aligned to the left.
+
+  header([STRING])
+    By default, the current month and year are displayed at the top of the
+    calendar grid. This is called the "header".
+
+        The header() method allows you to set the header to whatever you like.
+        If no new header is specified, the current header is returned.
+
+        If the header is set to an empty string, then no header will be printed
+        at all. (No, you won't be stuck with a big empty cell!)
+
+           # Example:
+           # Set the month/year header to something snazzy.
+           my($y,$m) = ( $cal->year() , $cal->monthname() );
+           $cal->header("<center><font size=+2 color=red>$m $y</font></center>\n\n");
+
+  bgcolor([STRING])
+
+  weekdaycolor([STRING])
+
+  weekendcolor([STRING])
+
+  todaycolor([STRING])
+
+  bordercolor([STRING])
+
+  weekdaybordercolor([STRING])
+
+  weekendbordercolor([STRING])
+
+  todaybordercolor([STRING])
+
+  contentcolor([STRING])
+
+  weekdaycontentcolor([STRING])
+
+  weekendcontentcolor([STRING])
+
+  todaycontentcolor([STRING])
+
+  headercolor([STRING])
+
+  weekdayheadercolor([STRING])
+
+  weekendheadercolor([STRING])
+    These define the colors of the cells. If a string (which should be
+    either a HTML color-code like '#000000' or a color-word like 'yellow')
+    is supplied as an argument, then the color is set to that specified.
+    Otherwise, the current value is returned. To un-set a value, try
+    assigning the null string as a value.
+
+        The bgcolor defines the color of all cells. The weekdaycolor overrides
+        the bgcolor for weekdays (Monday through Friday), the weekendcolor
+        overrides the bgcolor for weekend days (Saturday and Sunday), and the
+        todaycolor overrides the bgcolor for today's date. (Which may not mean a
+        lot if you're looking at a calendar other than the current month.)
+
+        The weekdayheadercolor overrides the bgcolor for the weekday headers
+        that appear at the top of the calendar if showweekdayheaders() is true,
+        and weekendheadercolor does the same thing for the weekend headers. The
+        headercolor overrides the bgcolor for the month/year header at the top
+        of the calendar.
+
+        The colors of the cell borders may be set: bordercolor determines the
+        color of the calendar grid's outside border, and is the default color of
+        the inner border for individual cells. The inner bordercolor may be
+        overridden for the various types of cells via weekdaybordercolor,
+        weekendbordercolor, and todaybordercolor.
+
+        Finally, the color of the cells' contents may be set with contentcolor,
+        weekdaycontentcolor, weekendcontentcolor, and todaycontentcolor. The
+        contentcolor is the default color of cell content, and the other methods
+        override this for the appropriate days' cells.
+
+           # Example:
+           $cal->bgcolor('white');                 # Set the default cell color
+           $cal->bordercolor('green');             # Set the default border color
+           $cal->contentcolor('black');            # Set the default content color
+           $cal->headercolor('yellow');            # Set the color of the Month+Year header
+           $cal->weekdayheadercolor('orange');     # Set the color of weekdays' headers
+           $cal->weekendheadercolor('pink');       # Set the color of weekends' headers
+           $cal->weekendcolor('palegreen');        # Override weekends' cell color
+           $cal->weekendcontentcolor('blue');      # Override weekends' content color
+           $cal->todaycolor('red');                # Override today's cell color
+           $cal->todaycontentcolor('yellow');      # Override today's content color
+           print $cal->as_HTML;                    # Print a really ugly calendar!
+
+BUGS, TODO, CHANGES
+    No known bugs, though contributions and improvements are welcome, this
+    is currently a first run.
+
+AUTHORS, CREDITS, COPYRIGHTS
+    This Perl module is freeware. It may be copied, derived, used, and
+    distributed without limitation.
+        HTML::CalendarMonthDB is based on HTML::CalendarMonthSimple by Gregor
+        Mosheh <stigmata@blackangel.net>. Many additions and modifications were
+        performed by Matt Vella (the_mcv@yahoo.com) for About.com/Primedia.
+
+        HTML::CalendarMonth was written and is copyrighted by Matthew P. Sisk
+        <sisk@mojotoad.com> and provided inspiration for the module's interface
+        and features. Frankly, the major inspiration was the difficulty and
+        unnecessary complexity of the interface. (Laziness is a virtue.)
+
+        HTML::CalendarMonthSimple was written by Gregor Mosheh
+        <stigmata@blackangel.net> None of Matt Sisk's code appears herein.
+
+        This would have been extremely difficult if not for Date::Calc. Many
+        thanks to Steffen Beyer <sb@engelschall.com> for a very fine set of
+        date-related functions!
+
+        Danny J. Sohier <danny@gel.ulaval.ca> provided many of the color
+        functions.
+
+        Bernie Ledwick <bl@man.fwltech.com> provided base code for the today*()
+        functions, and for the handling of cell borders.
+

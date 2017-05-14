@@ -6,13 +6,14 @@
 package Lemonldap::NG::Portal::Menu;
 
 use strict;
+use utf8;
 use warnings;
 use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_LibAccess;
 use base qw(Lemonldap::NG::Portal::_LibAccess);
 use Clone qw(clone);
 
-our $VERSION  = '1.4.0';
+our $VERSION  = '1.9.2';
 our $catlevel = 0;
 
 ## @method void menuInit()
@@ -126,7 +127,7 @@ sub displayModules {
 # Returns categories and applications list as HTML::Template loop
 # @return categories and applications list
 sub appslist {
-    my ($self) = splice @_;
+    my ($self) = @_;
     my $appslist = [];
 
     return $appslist unless defined $self->{applicationList};
@@ -151,8 +152,9 @@ sub appslist {
 # @param catlevel Category level
 # @return Category Hash
 sub _buildCategoryHash {
-    my ( $self, $catid, $cathash, $catlevel ) = splice @_;
+    my ( $self, $catid, $cathash, $catlevel ) = @_;
     my $catname = $cathash->{catname} || $catid;
+    utf8::decode($catname);
     my $applications;
     my $categories;
 
@@ -200,7 +202,7 @@ sub _buildCategoryHash {
 # @param $apphash Hash of application elements
 # @return Application Hash
 sub _buildApplicationHash {
-    my ( $self, $appid, $apphash ) = splice @_;
+    my ( $self, $appid, $apphash ) = @_;
     my $applications;
 
     # Get application items
@@ -208,6 +210,8 @@ sub _buildApplicationHash {
     my $appuri  = $apphash->{options}->{uri}  || "";
     my $appdesc = $apphash->{options}->{description};
     my $applogo = $apphash->{options}->{logo};
+    utf8::decode($appname);
+    utf8::decode($appdesc) if $appdesc;
 
     # Detect sub applications
     my $subapphash;
@@ -286,7 +290,7 @@ sub appslistDescription {
 # @param catlevel Category level
 # @return HTML string
 sub _displayConfCategory {
-    my ( $self, $catname, $cathash, $catlevel ) = splice @_;
+    my ( $self, $catname, $cathash, $catlevel ) = @_;
     my $html;
     my $key;
 
@@ -427,7 +431,7 @@ sub _displayConfDescription {
 # @param $apphash Menu elements
 # @return filtered hash
 sub _filter {
-    my ( $self, $apphash ) = splice @_;
+    my ( $self, $apphash ) = @_;
     my $filteredHash;
     my $key;
 
@@ -602,11 +606,11 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2008, 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2008-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2008-2016 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

@@ -1,0 +1,133 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ExperimentFactors" db_column="minor_category" cv_table="EF_MinorCategory">
+  <comment type="definition">This table provides the restricted vocabulary for the column minor category in the table Experimental Factor and is used to group variables not considered to be the primary treatment or major variables in an experiment	
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They are not
+currently implemented but are likely to be soon.</comment>
+<term name="array_replicate"
+        description="multiple arrays are used with either the same or
+different RNA samples"
+        comment="methodological"
+/>
+<term name="experimental_replicate"
+        description="entire experimental design was replicated"
+        comment="methodological"
+/>
+<term name="spot_replicate"
+        description="array has each sequence feature multiple times"
+        comment="methodological"
+/>
+<term name="sample_replicate"
+        description="different RNA samples were used on either the
+same filter with a hyb-strip-rehyb or on a different filter"
+        comment="methodological"
+/>
+<term name="sample_preparation"
+        description="Different sample preparation methods were
+used, so this is not a true replicate, but one could compare the
+results as if it were a replicate."
+        comment="methodological"
+/>
+<term name="time_series"
+        description="the experimental parameter is time"
+        comment="biological"
+/>
+<term name="heat"
+        description="the experimental parameter is an increase in
+temperature above the organism's normal range"
+        comment="biological"
+/>
+<term name="cold"
+        description="the experimental parameter is a decrease in
+temperature below the organism's normal range"
+        comment="biological"
+/>
+<term name="salt"
+        description="the experimental parameter is a change in
+the salt concentration outside the organism's normal range"
+        comment="biological"
+/>
+<term name="water"
+        description="the experimental parameter is a change in
+the amount of water"
+        comment="biological"
+/>
+<term name="light"
+        description="the experimental parameter is a change in
+the amount of light"
+        comment="biological"
+/>
+<term name="nutrient"
+        description="the experimental parameter is a change in
+concentration of an important nutrient, such as glucose"
+        comment="biological"
+/>
+<term name="chemical"
+        description="the experimental parameter is a change in
+concentration of an exogenous chemical. This differs from drug or
+toxin in that the chemical is not directly harmful to the organism,
+but modifies the expression pattern of the organism. It is different
+from nutrient in that it is not required for the organism's survival."
+        comment="biological"
+/>
+<term name="toxin"
+        description="the experimental parameter is a change in
+concentration of a toxin, such as kanate"
+        comment="biological"
+/>
+<term name="drug"
+        description="the experimental parameter is a change in
+concentration of a drug, such as an antibiotic"
+        comment="biological"
+/>
+<term name="strain_comparison"
+        description="a comparison of different strains of the same organism"
+        comment="biological"
+/>
+<term name="taxon_comparison"
+        description="a comparison of organisms from differing taxa"
+        comment="biological"
+/>
+<term name="developmental_stage_comparison"
+        description="comparisons of profiles from different
+developmental stages"
+        comment="biological"
+/> 
+<term name="mutant_wt_comparison"
+        description="a comparison of a mutant to it's wild type"
+        comment="biological"
+/>
+<term name="pathology_comparison"
+        description="a comparison of tissues of differing pathologies"
+        comment="biological"
+/>
+<term name="tissue_comparison"
+        description="a comparison of different tissues from the same organism"
+        comment="biological"
+/>
+<term name="infection_comparison"
+        description="a comparison of pre- and post-infected samples"
+        comment="biological"
+/>
+<term name="isolate_comparison"
+        description="a comparison of more than one genotype or ecotype
+observation"
+        comment="biological"
+/>
+<term name="symbiont_comparison"
+        description="a comparison of an isolated sample and the sample
+and it's symbiotic partner, such as a plant and it's associated
+mycorrhizal fungus" 
+        comment="biological"
+/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->
+<!--  LocalWords:  kanate
+ -->

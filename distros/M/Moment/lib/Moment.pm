@@ -1,5 +1,5 @@
 package Moment;
-$Moment::VERSION = '1.3.0';
+$Moment::VERSION = '1.3.1';
 # ABSTRACT: class that represents the moment in time
 
 use strict;
@@ -64,7 +64,7 @@ sub new {
         } else {
             my $safe_iso_string = 'undef';
             $safe_iso_string = "'$input_iso_string'" if defined $input_iso_string;
-            croak "Incorrect usage. dt $safe_iso_string is not in expected format 'YYYY-MM-DDThh:mm:ssZ'. Stopped";
+            croak "Incorrect usage. iso_string $safe_iso_string is not in expected format 'YYYY-MM-DDThh:mm:ssZ'. Stopped";
         }
 
         $self->_get_range_value_or_die( 'year', $self->{_year}, 1800, 2199 );
@@ -757,7 +757,7 @@ Moment - class that represents the moment in time
 
 =head1 VERSION
 
-version 1.3.0
+version 1.3.1
 
 =head1 SYNOPSIS
 
@@ -1011,7 +1011,7 @@ Method return '9', not '09'.
 
 =head2 get_day()
 
-Returns the scalar with number of day since the beginning of mongth of the
+Returns the scalar with number of day since the beginning of month of the
 moment stored in the object.
 
     say Moment->now()->get_day(); # 7
@@ -1230,7 +1230,7 @@ Loop for every day in month:
         $current = $current->plus( day => 1 );
     }
 
-Find out the weekday name for given date (for 2014-01-01 is is wednesday):
+Find out the weekday name for given date (for 2014-01-01 it is wednesday):
 
     my $weekday = Moment->new( dt => '2014-01-01 00:00:00' )->get_weekday_name();
 

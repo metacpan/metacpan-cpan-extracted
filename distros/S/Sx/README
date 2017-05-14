@@ -1,0 +1,96 @@
+Sx-2.3			fmc@pasteur.fr
+
+Date: 12-Jun-95, 1-Aug-95, 7-Aug-95, 15-Oct-95, 9-Nov-95, 14-Apr-97
+
+=======================
+Changes for version 2.3
+=======================
+
+- Callbacks can now be specified either as the name of the callback function
+  or as a reference to it.
+
+- All widgets can be independently named to allow finer tuning through
+  ressource file.
+
+- Fixed a bug in the DrawArc and DrawFilledArc functions.
+
+- Fixed a bug in Sx.pm.
+
+- Cleaned up the callback code.
+
+- Cleaned up the documentation file.
+
+Incompatible changes with previous versions :
+
+- Added prototype to the xsub functions. In particular, be careful that 
+
+  ShowDisplay;
+  and
+  &ShowDisplay;
+
+  are entirely different. The second form is equivalent to ShowDisplay(@_)
+  which will fail if @_ isn't empty.
+
+- All scalar variables have been replaced by equivalent constant sub. So
+  instead of using $Sx::PLACE_UNDER, you should now use PLACE_UNDER.
+
+- The $data arguments for the MakeXXX function used to be optional. It is
+  now mandatory. Use undef if you don't need it.
+
+- XtDestroyWidget and XWarpPointer have been renamed DestroyWidget and
+  WarpPointer.
+
+
+=========
+TODO List
+=========
+
+- Get ride of the specific Makefile for libsx and integrate it with MakeMaker
+
+- Finish the MakeCanvas widget creation.
+
+- Add some tests
+
+============================
+Installation in (very) short
+============================
+
+- You need perl5.002 or later.
+
+- Unpack Sx package. Probably you've done this already, because you're
+  reading this text.
+
+- Edit Sx/Makefile.PL: change DEFINE, INC, LIBS, etc. as needed.
+  In particular, if you want to compile for the 3d version of Xaw,
+  you should include '-lXaw3d' in LIBS and '-DXAW3D' in INCS. Be
+  careful with the commented LDFROM line, you should uncomment it 
+  at least on SunOs.
+
+- Edit Sx/sx/libsx_defs: change CC, CFLAGS and RANLIB as needed.
+  Here too, make sure to include '-DXAW3D' in CFLAGS if you want to
+  compile for the 3d version of Xaw. Include also -DX11R6 if you're
+  running it.
+
+- Create a new Makefile by
+
+	cd Sx
+	perl Makefile.PL
+
+- Compile the package by
+
+	make
+
+- Install the package to perl lib dir by
+
+	make install
+
+- Read the manpage: from within Sx source directory by
+
+	pod2man Sx.pod | nroff -man | more
+
+
+- Thanks to 
+	- Dominic Giampaolo <dbg@sgi.com>.
+	- Andreas Koppenhoefer <koppenas@informatik.uni-stuttgart.de>
+	- and everyone on the perl5-porters list.
+

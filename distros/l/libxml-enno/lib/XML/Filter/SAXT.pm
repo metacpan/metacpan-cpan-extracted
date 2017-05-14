@@ -51,36 +51,36 @@ sub new
 {
     my ($class, @out) = @_;
 
-    my $self = bless $class, { Out => \@out };
+    my $self = bless { Out => \@out }, $class;
 
-    my $index = 0;
-    for my $out (@out)
+    for (my $i = 0; $i < @out; $i++)
     {
-	for (my ($handler, $callbacks) = each %SAX_HANDLERS)
+	for my $handler (keys %SAX_HANDLERS)
 	{
-	    my $h = $out->{$handler};
+	    my $callbacks = $SAX_HANDLERS{$handler};
+	    my $h = ($self->{Out}->[$i]->{$handler} ||= $self->{Out}->[$i]->{Handler});
 	    next unless defined $h;
 
 	    for my $cb (@$callbacks)
 	    {
 		if (UNIVERSAL::can ($h, $cb))
 		{
-		    $self->{$cb} .= "\$out->[$index]->$cb (\@_);\n";
+		    $self->{$cb} .= "\$out->[$i]->{$handler}->$cb (\@_);\n";
 		}
 	    }
 	}
-	$index++;
     }
 
-    for (my ($handler, $callbacks) = each %SAX_HANDLERS)
+    for my $handler (keys %SAX_HANDLERS)
     {
+	my $callbacks = $SAX_HANDLERS{$handler};
 	for my $cb (@$callbacks)
 	{
 	    my $code = $self->{$cb};
 	    if (defined $code)
 	    {
 		$self->{$cb} = 
-		    eval "sub { my $out = shift->{Out}; $code }"
+		    eval "sub { my \$out = shift->{Out}; $code }";
 	    }
 	    else
 	    {
@@ -88,6 +88,7 @@ sub new
 	    }
 	}
     }
+    return $self;
 }
 				       
 sub noop
@@ -95,12 +96,9 @@ sub noop
     # does nothing
 }
 
-for (my ($handler, $callbacks) = each %SAX_HANDLERS)
+for my $cb (map { @{ $_ } } values %SAX_HANDLERS)
 {
-    for my $cb (@$callbacks)
-    {
-	eval "sub $cb { my \$self = shift; \&{ \$self->{$cb} } (\@_); }";
-    }
+    eval "sub $cb { shift->{$cb}->(\@_); }";
 }
 
 1; # package return code
@@ -113,8 +111,8 @@ XML::Filter::SAXT - Replicates SAX events to several SAX event handlers
 
 =head1 SYNOPSIS
 
- $saxt = new XML::Filter::SAXT ( { Handler => $out0 },
-				 { DocumentHandler => $out1 },
+ $saxt = new XML::Filter::SAXT ( { Handler => $out1 },
+				 { DocumentHandler => $out2 },
 				 { DTDHandler => $out3,
 				   Handler => $out4 
 				 }
@@ -125,13 +123,13 @@ XML::Filter::SAXT - Replicates SAX events to several SAX event handlers
 
 =head1 DESCRIPTION
 
-SAXT is like the Unix 'tee' command in that it splits the input stream
+SAXT is like the Unix 'tee' command in that it multiplexes the input stream
 to several output streams. In this case, the input stream is a PerlSAX event
 producer (like XML::Parser::PerlSAX) and the output streams are PerlSAX 
-handlers.
+handlers or filters.
 
 The SAXT constructor takes a list of hash references. Each hash specifies
-and output handler. The hash keys can be: DocumentHandler, DTDHandler, 
+an output handler. The hash keys can be: DocumentHandler, DTDHandler, 
 EntityResolver or Handler, where Handler is a combination of the previous three
 and acts as the default handler.
 E.g. if DocumentHandler is not specified, it will try to use Handler.
@@ -141,23 +139,25 @@ E.g. if DocumentHandler is not specified, it will try to use Handler.
 In this example we use L<XML::Parser::PerlSAX> to parse an XML file and
 to invoke the PerlSAX callbacks of our SAXT object. The SAXT object then
 forwards the callbacks to L<XML::Checker>, which will 'die' if it encounters
-an error, and to L<XML::DOM::PerlSAX>, which will store the XML in an
+an error, and to L<XML::Hqandler::BuildDOM>, which will store the XML in an
 L<XML::DOM::Document>.
 
  use XML::Parser::PerlSAX;
  use XML::Filter::SAXT;
- use XML::DOM::PerlSAX;
+ use XML::Handler::BuildDOM;
  use XML::Checker;
 
  my $checker = new XML::Checker;
- my $builder = new XML::DOM::PerlSAX (KeepCDATA => 1);
+ my $builder = new XML::Handler::BuildDOM (KeepCDATA => 1);
  my $tee = new XML::Filter::SAXT ( { Handler => $checker },
 				   { Handler => $builder } );
 
  my $parser = new XML::Parser::PerlSAX (Handler => $tee);
  eval
  {
+    # This is how you set the error handler for XML::Checker
     local $XML::Checker::FAIL = \&my_fail;
+
     my $dom_document = $parser->parsefile ("file.xml");
     ... your code here ...
  };

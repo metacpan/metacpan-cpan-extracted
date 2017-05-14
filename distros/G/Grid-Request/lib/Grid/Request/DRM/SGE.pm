@@ -3,7 +3,7 @@ package Grid::Request::DRM::SGE;
 use strict;
 use Log::Log4perl qw(get_logger);
 
-our $VERSION = qw$Revision$[1];
+our $VERSION = '0.11';
 
 my $logger = get_logger(__PACKAGE__);
 
@@ -88,13 +88,6 @@ sub memory {
     return $spec;
 }
 
-sub length {
-    $logger->debug("In length.");
-    my ($self, $length) = @_;
-    my $spec = "";
-    return $spec;
-}
-
 sub project {
     $logger->debug("In project.");
     my ($self, $project) = @_;
@@ -109,17 +102,16 @@ sub project {
 sub class {
     $logger->debug("In class.");
     my ($self, $class) = @_;
-    my $spec = "";
-    if (lc($class) eq "assembly") {
-        $spec .= "-l msc";
-    }
-    $logger->debug(qq|Returning "$spec".|);
-    return $spec;
+    $logger->warn(qq|'class' doesn't do anyting in this drm package.|);
+    return "";
 }
 
 sub runtime {
     $logger->debug("In runtime.");
     my ($self, $min) = @_;
+    if ($min !~ m/\d+/ ) {
+        $logger->logcroak("Bad runtime value entered. Must be an integer number of minutes.");
+    }
     # Convert the minutes to 'HH:mm" format by determining the
     # number of hours and minutes
     my $hours = sprintf("%02s", int($min/60));

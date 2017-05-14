@@ -1,0 +1,11 @@
+body { font-family: sans-serif; background: white; color: black; }
+.zxtop { background: #330033; color: #ffaaff;
+       padding-left: 20px;  padding-right:  20px;
+       padding-top:  10px;  padding-bottom: 10px; }
+.zxbot { background: #330033; color: #ffaaff;
+       padding-left: 20px;  padding-right:  20px;
+       padding-top:  10px;  padding-bottom: 10px; }
+a.zx:link    { color: #ffccff; }
+a.zx:visited { color: #aa44aa; }
+a.zx:active  { color: #ff0000; }
+a.zx:hover   { color: #ffffff; }

@@ -1,0 +1,35 @@
+!init OPT_CONFIG='sdf'; SDF_ROOT="../"
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 14-Jul-97 ianc    2.000beta11 release
+# 23-Apr-96 ianc    2.000beta4c release
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+# Define variables
+!define DOC_NAME    "SDF"
+!define DOC_TYPE    "Frequently Asked Questions"
+!define DOC_AUTHOR  "Ian Clatworthy"
+
+# Build the title page
+!build_title
+
+# Set up the HTML footer
+!macro HTML_CONTENTS_FOOTER
+    Line:
+    [align='Center']
+    {{A[jump="home.html"] Home}}
+!endmacro
+
+!include "faq_gen.sdf"
+!include "faq_real.sdf"
+!include "faq_fmts.sdf"
+!include "faq_lang.sdf"

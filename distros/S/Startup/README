@@ -1,0 +1,34 @@
+Hello!
+
+Welcome to the Startup-0.103
+
+To be found at: http://wwwwbs.cs.tu-berlin.de/~schwartz/perl/
+
+Developing with perl you certainly appreciate to write easily nifty programs. 
+Unfortunately a bunch of boring problems makes life uncomfortable. With some 
+of them I had to deal so often, that I created this little collection. 
+
+Imagine:
+
+-   You want to have an option to work on files recursively.
+
+-   You want some modules to print some info during work, but this output 
+    would hardly be predictable and thus might destroy your program output.
+
+-   You want to have a little logfile reporting actions.
+
+-   You want to report errors, but not via "die", and you dislike to write 
+    trapping code all the time.
+
+This module shall contribute to solve those problems, making your your 
+programs more valuable.
+
+I propose to settle Startup.pm in CPAN's category 3 as:
+
+Startup    aupO   A program flow utility
+
+
+Contact: Martin schwartz@cs.tu-berlin.de
+
+Comments welcome! 
+

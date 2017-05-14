@@ -7,12 +7,15 @@ use utf8;
 
 BEGIN {
 	$MooX::Struct::AUTHORITY = 'cpan:TOBYINK';
-	$MooX::Struct::VERSION   = '0.014';
+	$MooX::Struct::VERSION   = '0.015';
 }
 
-use Moo          1.000000;
-use Object::ID   0         qw(      );
-use Scalar::Does 0         qw( does );
+use Moo 1.000;
+use Types::TypeTiny 1.000 qw( HashLike ArrayLike );
+use Types::Standard 1.000 qw( HashRef ArrayRef Num Ref );
+
+my $HashLike  = HashLike | Ref['HASH'];
+my $ArrayLike = ArrayLike | Ref['ARRAY'];
 
 use overload
 	q[""]      => 'TO_STRING',
@@ -23,7 +26,7 @@ use overload
 
 METHODS: {
 	no warnings;
-	sub OBJECT_ID   { goto \&Object::ID::object_id };
+	sub OBJECT_ID   { require Object::ID; goto \&Object::ID::object_id };
 	sub FIELDS      { qw() };
 	sub TYPE        { +undef };
 	sub TO_ARRAY    {  [ map {;       $_[0]->$_ } $_[0]->FIELDS ] };
@@ -38,9 +41,8 @@ sub BUILDARGS
 	my @fields = $class->FIELDS;
 	
 	if (
-		@_ == 1                 and
-		does($_[0], 'ARRAY')    and
-		not does($_[0], 'HASH')
+		(@_==1 and ref $_[0] eq 'ARRAY') or  # optimized usual case
+		(@_==1 and ArrayLike->check($_[0]) and not $HashLike->check($_[0]))
 	)
 	{
 		my @values = @{ $_[0] };
@@ -54,7 +56,7 @@ sub BUILDARGS
 		}
 	}
 
-	elsif (@_ == 1 and does($_[0], 'HASH') and not ref($_[0]) eq 'HASH')
+	elsif (@_ == 1 and ref $_[0] ne 'HASH' and $HashLike->check($_[0]))
 	{
 		# help Moo::Object!
 		@_ = +{ %{$_[0]} };
@@ -126,28 +128,36 @@ BEGIN {
 	{
 		no warnings;
 		our $AUTHORITY = 'cpan:TOBYINK';
-		our $VERSION   = '0.014';
+		our $VERSION   = '0.015';
 	}
 	
 	sub _uniq { my %seen; grep { not $seen{$_}++ } @_ };
 	
-	use Moo                  1.000000;
-	use Carp                 0         qw( confess      );
-	use Data::OptList        0         qw(              );
-	use Sub::Install         0         qw( install_sub  );
-	use Scalar::Does         0         qw( does blessed looks_like_number );
-	use namespace::clean               qw(              );
-	use B::Hooks::EndOfScope           qw( on_scope_end );
+	use Moo 1.000;
+	use Exporter::Tiny qw();
+	use Types::TypeTiny 1.000 qw( TypeTiny CodeLike HashLike ArrayLike );
+	use Types::Standard 1.000 qw( HashRef ArrayRef CodeRef Num );
+	use Carp qw(confess);
+	use Scalar::Util qw(blessed);
+	use namespace::clean qw();
+	use B::Hooks::EndOfScope qw(on_scope_end);
+	
+	sub __install_sub__ ($) {
+		my $args = shift;
+		my ($pkg, $name, $code) = @$args{qw(into as code)};
+		no strict 'refs';
+		*{"$pkg\::$name"} = $code;
+	}
 	
 	has flags => (
 		is       => 'ro',
-		isa      => sub { die "flags must be HASH" unless does $_[0], 'HASH' },
+		isa      => HashLike,
 		default  => sub { +{} },
 	);
 	
 	has class_map => (
 		is       => 'ro',
-		isa      => sub { die "class_map must be HASH" unless does $_[0], 'HASH' },
+		isa      => HashLike,
 		default  => sub { +{} },
 	);
 	
@@ -183,7 +193,7 @@ BEGIN {
 		my $klass;
 		for my $o (@$opts) {
 			next unless $o->[0] eq '-class';
-			$klass = ref($o->[1]) eq 'ARRAY' ? join('::', @{$o->[1]}) : ${$o->[1]};
+			$klass = ArrayRef->check($o->[1]) ? join('::', @{$o->[1]}) : ${$o->[1]};
 			last;
 		}
 		$klass = sprintf('%s::__ANON__::%04d', $self->base, ++$counter) unless defined $klass;
@@ -256,7 +266,7 @@ BEGIN {
 	sub process_method
 	{
 		my ($self, $klass, $name, $coderef) = @_;
-		install_sub {
+		__install_sub__ {
 			into   => $klass,
 			as     => $name,
 			code   => $coderef,
@@ -278,15 +288,16 @@ BEGIN {
 		return;
 	}
 	
+	my $ScalarLike;
 	sub process_spec
 	{
 		my ($self, $klass, $name, $val) = @_;
 		
 		my %spec = (
 			is => ($self->flags->{rw} ? 'rw' : 'ro'),
-			( does($val, 'ARRAY')
+			( ArrayLike->check($val)
 				? @$val
-				: ( does($val,'HASH') ? %$val : () )
+				: ( HashLike->check($val) ? %$val : () )
 			),
 		);
 		
@@ -299,36 +310,24 @@ BEGIN {
 		if ($name =~ /^\@(.+)/)
 		{
 			$name = $1;
-			$spec{isa} ||= sub {
-				die "wrong type for '$name' (not arrayref)"
-					unless does($_[0], 'ARRAY');
-			};
+			$spec{isa} ||= ArrayLike;
 		}
 		elsif ($name =~ /^\%(.+)/)
 		{
 			$name = $1;
-			$spec{isa} ||= sub {
-				die "wrong type for '$name' (not hashref)"
-					unless does($_[0], 'HASH');
-			};
+			$spec{isa} ||= HashLike;
 		}
 		elsif ($name =~ /^\+(.+)/)
 		{
 			$name = $1;
-			$spec{isa} ||= sub {
-				die "wrong type for '$name' (not number)"
-					unless looks_like_number($_[0]);
-			};
+			$spec{isa}     ||= Num;
 			$spec{default} ||= sub { 0 } unless $spec{required};
 		}
 		elsif ($name =~ /^\$(.+)/)
 		{
+			$ScalarLike ||= (~(ArrayRef|HashRef))->create_child_type(name => 'ScalarLike');
 			$name = $1;
-			$spec{isa} ||= sub {
-				my $ref = ref($_[0]);
-				die "wrong type for '$name' (should not be arrayref or hashref)"
-					if $ref eq 'ARRAY' || $ref eq 'HASH';
-			};
+			$spec{isa} ||= $ScalarLike;
 		}
 		
 		return ($name, \%spec);
@@ -343,14 +342,18 @@ BEGIN {
 		if ($self->trace)
 		{
 			require Data::Dumper;
-			my $spec_str = "Data::Dumper"->new([$spec])->Terse(1)->Indent(0)->Sortkeys(1)->Dump;
+			my %sanespec = %$spec;
+			if (TypeTiny->check($sanespec{isa})) {
+				$sanespec{isa} = $sanespec{isa}->display_name;
+			}
+			my $spec_str = "Data::Dumper"->new([\%sanespec])->Terse(1)->Indent(0)->Sortkeys(1)->Dump;
 			$spec_str =~ s/(^\{)|(\}$)//g;
 			$self->trace_handle->printf(
 				"has %s => (%s);\n",
 				$name,
 				$spec_str,
 			);
-			if ($self->flags->{deparse} and $spec->{isa})
+			if ($self->flags->{deparse} and CodeRef->check($spec->{isa}))
 			{
 				require B::Deparse;
 				my $code = "B::Deparse"->new(qw(-q -si8T))->coderef2text($spec->{isa});
@@ -379,8 +382,8 @@ BEGIN {
 		my $self = shift;
 		my ($klass, $name, $val) = @_;
 		
+		return $self->process_method(@_)    if CodeLike->check($val);
 		return $self->process_meta(@_)      if $name =~ /^-/;
-		return $self->process_method(@_)    if does($val, 'CODE');
 		return $self->process_attribute(@_);
 	}
 	
@@ -392,7 +395,7 @@ BEGIN {
 			1; # bizarre, but necessary if $] < 5.014
 			if (ref $proto)  # inflate!
 			{
-				my $opts   = Data::OptList::mkopt($proto);
+				my $opts   = Exporter::Tiny::mkopt($proto);
 				my $klass  = $self->create_class($opts);
 				my $seen_extends;
 				my @fields = _uniq map {
@@ -419,13 +422,13 @@ BEGIN {
 			$self->flags->{ lc($1) } = !!shift;
 		}
 		
-		foreach my $arg (@{ Data::OptList::mkopt(\@_) })
+		foreach my $arg (@{ Exporter::Tiny::mkopt(\@_) })
 		{
 			my ($subname, $details) = @$arg;
 			$details = [] unless defined $details;
 			
 			$self->class_map->{ $subname } = $self->make_sub($subname, $details);
-			install_sub {
+			__install_sub__ {
 				into   => $caller,
 				as     => $subname,
 				code   => $self->class_map->{ $subname },

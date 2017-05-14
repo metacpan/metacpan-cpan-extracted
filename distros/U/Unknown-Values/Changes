@@ -1,0 +1,21 @@
+Revision history for Perl extension Unknown::Values.
+
+0.005   February 25, 2013
+        - Fix the minimum Perl assertion in the generated Makefile.PL (Darin McBriade #83563)
+        - Add fatal unknown objects (multiple comments this would be useful)
+        - unknowns sort last (bart on blogs.perl.org)
+
+0.004   February 20, 2013
+        - Fix two invalid overloads (Toby Inkster #83477)
+        - is_unknown now defaults to checking $_ (Toby Inkster #83470)
+        - Minor doc nits (Toby Inkster and Krasimir Berov #83469 and #83471)
+
+0.003   February 19, 2013
+        - Make a non-trial release to claim the namespace on CPAN
+        - Update docs to be explicit about EXPORT
+
+0.002   February 19, 2013
+        - First release
+
+0.001   February 19, 2013
+        - Implement 3VL in Perl ("unknown" instead of "undef")

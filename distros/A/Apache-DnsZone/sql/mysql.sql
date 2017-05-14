@@ -4,9 +4,11 @@
 #drop table soa;
 #drop table rec_count;
 #drop table records_A;
+#drop table records_AAAA;
 #drop table records_CNAME;
 #drop table records_MX;
 #drop table records_NS;
+#drop table records_PTR;
 #drop table records_TXT;
 #drop table tickets;
 #drop table ticketsecrets;
@@ -15,7 +17,7 @@ create table languages (
   id integer not null auto_increment,
   lang varchar(2) not null,
   language varchar(255) not null,
-  abbrev varchar(2) not null,
+  abbrev varchar(5) not null,
   primary key (id)
 );
 
@@ -25,6 +27,7 @@ insert into languages (lang, language, abbrev) values ('dk','Dansk','da');
 insert into languages (lang, language, abbrev) values ('it','Italiano','it');
 insert into languages (lang, language, abbrev) values ('fr','Fran&ccedil;ais','fr');
 insert into languages (lang, language, abbrev) values ('se','Svenska','sv');
+insert into languages (lang, language, abbrev) values ('br','Portuguese Brazil','pt-BR');
 
 create table users (
   id integer not null auto_increment,
@@ -48,7 +51,7 @@ create table soa (
   domain integer not null,
   auth_ns varchar(255) not null, # also the nameserver where the updates should go to
   email varchar(255) not null,
-  serial int(7) not null,
+  serial int(11) not null,
   refresh int(7) not null,
   retry int(7) not null,
   expire int(7) not null,
@@ -61,9 +64,11 @@ create table soa (
 create table rec_count (
   domain integer not null,
   A_count integer not null,
+  AAAA_count integer not null,
   CNAME_count integer not null,
   MX_count integer not null,
   NS_count integer not null,
+  PTR_count integer not null,
   TXT_count integer not null,
   foreign key (domain) references domains (id)
 );
@@ -73,6 +78,17 @@ create table records_A (
   domain integer not null,
   name varchar(255) not null,
   address varchar(16) not null,
+  ttl int(7) not null,
+  rec_lock int(1) default 0 null,
+  primary key (id),
+  foreign key (domain) references domains (id)
+);
+
+create table records_AAAA (
+  id integer not null auto_increment,
+  domain integer not null,
+  name varchar(255) not null,
+  address varchar(39) not null,
   ttl int(7) not null,
   rec_lock int(1) default 0 null,
   primary key (id),
@@ -118,6 +134,17 @@ create table records_TXT (
   domain integer not null,
   name varchar(255) not null,
   txtdata varchar(255) not null,
+  ttl int(7) not null,
+  rec_lock int(1) default 0 null,
+  primary key (id),
+  foreign key (domain) references domains (id)
+);
+
+create table records_PTR (
+  id integer not null auto_increment,
+  domain integer not null,
+  name varchar(255) not null,
+  ptrdname varchar(255) not null,
   ttl int(7) not null,
   rec_lock int(1) default 0 null,
   primary key (id),

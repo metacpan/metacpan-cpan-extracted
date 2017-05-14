@@ -1,26 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2013 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2015 Rocky Bernstein <rocky@cpan.org>
 
 # A debugger command processor. This includes the debugger commands
 # and ties together the debugger core and I/O interface.
 package Devel::Trepan::CmdProcessor;
 
-# Because we use Exporter we want to silence:
-#   Use of inherited AUTOLOAD for non-method ... is deprecated
-no warnings 'redefine';
-sub AUTOLOAD
-{
-    my $name = our $AUTOLOAD;
-    $name =~ s/.*:://;  # lose package name
-    my $target = "DynaLoader::$name";
-    goto &$target;
-}
-
 use English qw( -no_match_vars );
-use Exporter;
 use warnings; no warnings 'redefine';
 
-use vars qw(@EXPORT @ISA $eval_result);
+use vars qw(@ISA $eval_result);
 
 use rlib '../..';
 
@@ -46,14 +34,14 @@ use strict;
 
 use Devel::Trepan::Util qw(hash_merge uniq_abbrev parse_eval_sigil);
 
-@ISA = qw(Exporter Devel::Trepan::Processor);
+@ISA = qw(Devel::Trepan::Processor);
 
 BEGIN {
     no warnings;
     @DB::D = ();  # Place to save eval results;
 }
 
-sub new($;$$$) {
+sub new {
     my ($class, $interfaces, $dbgr, $settings) = @_;
     my $intf;
     if (defined $interfaces) {
@@ -116,7 +104,7 @@ sub new($;$$$) {
     return $self;
 }
 
-sub compute_prompt($)
+sub set_prompt($)
 {
     my $self = shift;
     my $thread_str = '';
@@ -127,8 +115,9 @@ sub compute_prompt($)
     # } else {
     #   $thread_str = "@#{Thread.current.object_id}";
     # }
-    sprintf("%s$self->{settings}{prompt}%s%s: ",
-            '(' x $DB::level, $thread_str, ')' x $DB::level);
+    my $prompt = sprintf("%s$self->{settings}{prompt}%s%s: ",
+			 '(' x $DB::level, $thread_str, ')' x $DB::level);
+    return $prompt;
 }
 
 sub terminated($)
@@ -229,7 +218,7 @@ sub process_command_and_quit($)
         $self->errmsg("internal error: $EVAL_ERROR")
     } else {
         # Save it to the history.
-        $intf->save_history($self->{last_command}) if
+        $intf->add_history($self->{last_command}) if
             $self->{last_command};
     }
 }
@@ -262,7 +251,7 @@ sub process_commands($$$;$)
         $self->handle_eval_result();
         if ($event eq 'after_nest') {
             $self->msg("Leaving nested debug level $DB::level");
-            $self->{prompt} = compute_prompt($self);
+            $self->{prompt} = set_prompt($self);
             $self->frame_setup();
             $self->print_location;
         }
@@ -315,7 +304,7 @@ sub process_commands($$$;$)
                 }
             }
 
-            $self->{prompt} = compute_prompt($self);
+            $self->{prompt} = set_prompt($self);
             $self->print_location unless $self->{settings}{traceprint} ||
                 $self->{terminated};
 
@@ -426,8 +415,8 @@ sub run_command($$)
         $run_cmd_name = uniq_abbrev([keys %commands], $run_cmd_name) if
             !$commands{$run_cmd_name} && $self->{settings}{abbrev};
 
-        if ($commands{$run_cmd_name}) {
-            my $cmd = $commands{$run_cmd_name};
+        my $cmd = $commands{$run_cmd_name};
+        if ($cmd) {
             if ($self->ok_for_running($cmd, $run_cmd_name, scalar(@args)-1)) {
                 # Get part of string after command name
                 my $cmd_argstr = substr($current_command, length($cmd_name));
@@ -495,7 +484,7 @@ unless (caller) {
         $proc->$fn('testing');
     }
     $DB::level = 1;
-    my $prompt = $proc->{prompt} = compute_prompt($proc);
+    my $prompt = $proc->{prompt} = set_prompt($proc);
     eval <<'EOE';
     sub foo() {
         my @call_values = caller(0);
@@ -504,7 +493,7 @@ unless (caller) {
 EOE
     print "prompt setting: $prompt\n";
     $DB::level = 2;
-    $prompt = $proc->{prompt} = compute_prompt($proc);
+    $prompt = $proc->{prompt} = set_prompt($proc);
     print "prompt setting 2: $prompt\n";
     my @call_values = foo();
     ## $proc->frame_setup(\@call_values, 0);

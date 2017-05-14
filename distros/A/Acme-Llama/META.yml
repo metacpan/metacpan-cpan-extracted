@@ -1,0 +1,15 @@
+---
+abstract: 'An object-oriented interface to llamas.'
+author:
+  - 'Alexandria Marie Wolcott <alyx@woomoo.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.110240'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Llama
+version: 0.42

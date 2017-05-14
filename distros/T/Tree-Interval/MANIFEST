@@ -1,0 +1,7 @@
+lib/Tree/Interval.pm		Tree::Interval
+lib/Tree/Interval/Node.pm	helper class for Tree::Interval
+lib/Tree/Interval/Test.pm	test cases for Tree::Interval
+Makefile.PL			Makefile
+MANIFEST			This list of files
+test.pl				test running script
+META.yml                                 Module meta-data (added by MakeMaker)

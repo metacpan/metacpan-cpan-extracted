@@ -1,0 +1,53 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: catalog Macro
+
+H2: Interface
+
+!macro_interface "catalog"
+
+H2: Description
+
+The {{catalog}} macro build a catalog from objects already loaded.
+
+The {{class}} parameter specifies the class name. As it is defined
+as a symbol rather than a string type, the name is given without quotes
+and it is space-separated from the following parameter.
+
+The {{mask}} parameter can be used to filter the objects as
+shown below:
+
+!block table
+Mask            Description
+empty string    no filtering - display all objects
+cited           display just the cited objects
+abc.*           display the objects with (short) names matching the pattern, \
+                i.e. names beginning with abc
+xyz:abc         display the objects where attribute {{xyz}} matches the \
+                pattern, i.e. {{xyz}} is exactly equal to {{abc}}
+!endblock
+
+Remaining parameters are passed through to the class filter.
+
+H2: Examples
+
+Display some interesting attributes of {{CLASS:references}} with
+a Status of 'Review':
+
+!block example
+!catalog references 'Status:Review'; compact; \
+  columns="PDF,2:Reference,DOC:Document,Version"
+!endblock
+
+#H2: Limitations & Future Directions

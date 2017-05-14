@@ -1,0 +1,26 @@
+This is the changes file for MsqlCGI.  Please see the web site
+http://petrified.cic.net/MsqlCGI for more information about MsqlCGI.
+
+Version 0.8
+-----------
+First "public" beta version.
+
+Lots of code cleanup (although there needs to be a whole lot more).  
+No major features added.  
+
+Version 0.7
+-----------
+Added many options and cleaned up a bunch of code.  This is still mainly
+an internal version.  Features Added:
+  * HTML Templates
+  * Search Options
+
+Scrapped the current version of the SpecialFieldsAPI.  It's not working
+properly at all.  I need to figure out a couple more questions before I
+continue.
+
+
+Version 0.6 -> NULL
+-------------------
+Internal versions.
+

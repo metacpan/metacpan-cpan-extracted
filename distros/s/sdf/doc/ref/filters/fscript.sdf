@@ -1,0 +1,43 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: script Filter
+
+H2: Interface
+
+!filter_interface "script"
+
+H2: Description
+
+The {{script}} filter can be used to embed arbitrary Perl source
+code within an SDF document. This is useful for many things including:
+
+* declaring Perl subroutines implementing SDF filters and macros
+* accessing databases
+* updating log files.
+
+H2: Examples
+
+!block example; lang='sdf'
+!block script
+printf STDERR "Hello world!\n";
+!endblock
+!endblock
+
+H2: Limitations & Future Directions
+
+As arbitrary sections of [[Perl]] can be included and executed,
+the code can potentially cause harm. At the moment, the ability
+to update external files from within an SDF document is seen as
+a {{feature}}. However, a version of SDF which restricts the
+embedded Perl to "safe" operations would be nice.

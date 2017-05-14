@@ -1,166 +1,110 @@
 package Padre::Plugin::Swarm;
+
 use 5.008;
 use strict;
 use warnings;
-use Socket;
-use IO::Handle;
-use File::Spec        ();
-use Padre::Constant   ();
-use Padre::Role::Task ();
-use Padre::Wx         ();
-use Padre::Plugin     ();
-use Object::Event     ();
-use Padre::Wx::Icon   ();
+use File::Spec      ();
+use Padre::Constant ();
+use Padre::Wx       ();
+use Padre::Plugin   ();
+use Padre::Wx::Icon ();
 use Padre::Logger;
-use Params::Util '_INVOCANT';
-use Carp 'confess';
-use Data::Dumper;
 
-our $VERSION = '0.2';
-our @ISA     = ('Padre::Plugin','Padre::Role::Task','Object::Event');
-
-sub padre_interfaces {
-	#'Padre::Task' 		=> 0.90,
-	#'Padre::Document' 	=> 0.91,
-	#'Padre::Plugin' 	=> 0.91,
-}
+our $VERSION = '0.11';
+our @ISA     = 'Padre::Plugin';
 
 use Class::XSAccessor {
 	accessors => {
+		geometry  => 'geometry',
+		resources => 'resources',
+		editor    => 'editor',
+		chat      => 'chat',
 		config    => 'config',
 		wx        => 'wx',
 		global    => 'global',
 		local     => 'local',
-		service   => 'service',
 	}
 };
 
-# TODO connect/disconnect should be ->enable and ->disable
 sub connect {
 	my $self = shift;
-	$self->global->event('enable');
-	$self->local->event('enable');
-	return;
+
+	# For now - use global,
+	#  could be Padre::Plugin::Swarm::Transport::Local::Multicast
+	#   based on preferences
+	$self->global->enable;
+	$self->local->enable;
 }
 
 sub disconnect {
 	my $self = shift;
 
-
-	$self->global->event('disable');
-	$self->local->event('disable');
-	
-	# Don't rely on Task bi-directional
-	#$self->service->tell_child( 'shutdown_service' => "disabled" );
-	
-	# Co-operative shutdown the service, allowing Task->run to complete in the child
-	$self->service->notify( 'shutdown_service'  , 'disabled' );
-	return;
-	
+	$self->global->disable;
+	$self->local->disable;
 }
 
-
-## Task::Role handlers for subscribed states of the child task/service
-sub on_swarm_service_message {
+sub NOTsend {
 	my $self = shift;
-	my $service = shift;
-	my $incoming= shift;
-	
-	# Puke about this as ': shared' should only be applied to the storable data
-	#  as it is moved between threads. Decoded message should NOT be :shared
-	if ( threads::shared::is_shared( $incoming ) ) {
-		TRACE('Parent RECV : shared ??? ' . Dumper $incoming );
-		confess 'got : shared $message';
+	my $message = shift;
+	my $mclass = ref $message;
+	unless ( $mclass =~ /^Padre::Swarm::Message/ ) {
+		bless $message , 'Padre::Swarm::Message';
+	}
+	$message->{from} = $self->identity->nickname;
+	$self->transport->send( $message );
+}
+
+sub on_transport_connect {
+	my ($self) = @_;
+	TRACE( "Swarm transport connected" ) if DEBUG;
+	$self->send(
+		{ type=>'announce', service=>'swarm' }
+	);
+	$self->send(
+		{ type=>'disco', service=>'swarm' }
+	);
+	return;
+}
+
+sub on_transport_disconnect {
+	my ($self) = @_;
+	TRACE( "Swarm transport disconnected" ) if DEBUG;
+	$self->chat->write_unstyled( "swarm transport disconnected!\n" );
+
+}
+
+sub on_recv {
+	my $self = shift;
+	# my $universe = shift;
+	my $message = shift;
+
+	TRACE( "on_recv handler for " . $message->type ) if DEBUG;
+	# TODO can i use 'SWARM' instead?
+	my $lock = $self->main->lock('UPDATE');
+	my $handler = 'accept_' . $message->type;
+
+	if ( $self->can( $handler ) ) {
+		TRACE( $handler ) if DEBUG;
+		eval { $self->$handler( $message ); };
 	}
 
-	if (ref $incoming eq 'ARRAY') {
-		# Enveloped messages from the service are 'events'
-		my ($eventname,@args) = @$incoming;
-		TRACE( 'Posting Service event ' . $eventname ) if DEBUG;
-		$self->event($eventname,@args);
-		return;
-	} elsif ( _INVOCANT($incoming) ) {  # TODO be more explicit about INVOCANT
-		# This still seems to result in editor flicker?
-		my $lock = $self->main->lock('UPDATE');
-		
-		my $origin  = $incoming->origin;
-		$self->event( "recv_$origin" , $incoming );
-	}
-	
-	return;
+	# TODO - make these parts use the message event! srsly
+	$self->geometry->On_SwarmMessage( $message );
+
+	my $data = Storable::freeze( $message );
+	Wx::PostEvent(
+                $self->wx,
+                Wx::PlThreadEvent->new( -1, $self->message_event , $data ),
+        ) if $self->message_event;
 }
 
-sub on_swarm_service_running {
-	my ($self,$service) = @_;
-	# Capture the service. We're not CONNECTED yet - the service is just running
-	$self->{service} = $service;
-	return;
-}
-
-sub on_swarm_service_finish {
-	TRACE( "Service finished?? @_" ) if DEBUG;
-	my $self = shift;
-	# In theory we're already disconnected
-	# just cleanup the finished task
-	delete $self->{service};
-	return;
-}
-
-
-sub on_swarm_service_status {
-	TRACE( @_ )  if DEBUG;
-	my $self = shift;
-	$self->main->status(shift);
-}
-
-
-# Surely Padre::Role::Task would provide this?
-# TODO - investigate a way to have Service co-operatively exit it's loop
-sub task_cancel {
-	my $self = shift;
-	$self->task_manager->cancel( $self->{task_revision} );
+sub accept_disco {
+	my ($self,$message) = @_;
+	$self->send( {type=>'promote',service=>'swarm'} );
 }
 
 
 
-SCOPE: {
-# This is here to cheat and presume transports will connect - eventually.
-# accept ->send from the foreground and queue it until the service is 
-# running and connected;
-my @outbox;
-
-sub _flush_outbox {
-	my ($self,$origin) = @_;
-	my @list = grep { $_->[0] eq $origin } @outbox;
-	my @keep = grep { $_->[0] ne $origin } @outbox;
-	@outbox = @keep;
-	$self->send(@$_) for @list;
-	return;
-}
-
-sub send {
-	my ($self,$origin,$message) = @_;
-	my $service = $self->{service};
-	
-	TRACE( 'Sending to task ~ ' . $service ) if DEBUG;
-	# Be careful - we can race our task and send messages to it before it is ready
-	unless ($self->{service}) {
-		TRACE( "Queued service message in outbox" ) if DEBUG;
-		push @outbox, [$origin,$message];
-		return;
-	}
-	
-	my $handler = 'send_'.$origin;
-	TRACE( "outbound handle $handler" ) if DEBUG;
-	$self->{service}->notify( $handler => $message );
-
-}
-
-}
-# END SCOPE:
-
-
-# TODO move identity management into the ::Universe
 sub identity {
 	my $self = shift;
 	unless ($self->{identity}) {
@@ -190,6 +134,10 @@ sub identity {
 
 #####################################################################
 # Padre::Plugin Methods
+
+sub padre_interfaces {
+	'Padre::Plugin' => 0.56;
+}
 
 sub plugin_name {
 	'Swarm';
@@ -223,59 +171,6 @@ sub plugin_large_icon {
 	return $icon;
 }
 
-sub margin_icons {
-	my $class = shift;
-	my $icon1  = Padre::Wx::Icon::find(
-		'margin/ghost-one',
-		{
-			size  => '12x12',
-			icons => $class->plugin_icons_directory,
-		}
-	);
-	my $icon2  = Padre::Wx::Icon::find(
-		'margin/ghost-two',
-		{
-			size  => '12x12',
-			icons => $class->plugin_icons_directory,
-		}
-	);
-	
-	return ($icon1,$icon2);
-}
-
-sub margin_owner_icons {
-	my $class = shift;
-	my $icon1  = Padre::Wx::Icon::find(
-		'margin/owner-one',
-		{
-			size  => '12x12',
-			icons => $class->plugin_icons_directory,
-		}
-	);
-	my $icon2  = Padre::Wx::Icon::find(
-		'margin/owner-two',
-		{
-			size  => '12x12',
-			icons => $class->plugin_icons_directory,
-		}
-	);
-	
-	return ($icon1,$icon2);
-}
-
-sub margin_feedback_icon {
-	my $class = shift;
-	my $icon = Padre::Wx::Icon::find(
-		'margin/feedback',
-		{
-			size  => '12x12',
-			icons => $class->plugin_icons_directory,
-		}
-	);
-	warn "Got icon $icon";
-	return $icon;
-}
-
 sub menu_plugins_simple {
     my $self = shift;
     return $self->plugin_name => [
@@ -288,9 +183,6 @@ SCOPE: {
 	my $instance;
 
 	sub new {
-		die "Plugin instance is still defined - cannot create a new one"
-			if $instance;
-		
 		$instance = shift->SUPER::new(@_);
 	}
 
@@ -303,33 +195,73 @@ SCOPE: {
 		my $wxobj = new Wx::Panel $self->main;
 		$self->wx( $wxobj );
 		$wxobj->Hide;
-		
-		Wx::Image::AddHandler( Wx::XPMHandler->new );
 
-
-		require Padre::Plugin::Swarm::Service;
+		require Padre::Plugin::Swarm::Wx::Chat;
+		require Padre::Plugin::Swarm::Wx::Resources;
+		require Padre::Plugin::Swarm::Wx::Editor;
 		require Padre::Plugin::Swarm::Wx::Preferences;
+		require Padre::Plugin::Swarm::Transport::Global::WxSocket;
+		require Padre::Plugin::Swarm::Transport::Local::Multicast;
 		require Padre::Plugin::Swarm::Universe;
 		require Padre::Swarm::Geometry;
 
 		my $config = $self->bootstrap_config;
 		$self->config( $config );
 
-		my $u_global = 	Padre::Plugin::Swarm::Universe->new(origin=>'global');
-		my $u_local  = 	Padre::Plugin::Swarm::Universe->new(origin=>'local');
-		
+		my $geo = Padre::Swarm::Geometry->new;
+		$self->geometry( $geo );
+
+		my $u_global = Padre::Plugin::Swarm::Universe->new;
+		my $u_local  = Padre::Plugin::Swarm::Universe->new;
 		$self->global($u_global);
 		$self->local($u_local);
-		
-		$self->task_request(
-				task =>'Padre::Plugin::Swarm::Service',
-					on_message => 'on_swarm_service_message',
-					on_finish  => 'on_swarm_service_finish',
-					on_run     => 'on_swarm_service_running',
-					on_status  => 'on_swarm_service_status',
+
+		## Instance the transport but do not connect them - yet
+		my $t_global =
+		Padre::Plugin::Swarm::Transport::Global::WxSocket->new(
+			token => $self->config->{token},
+			wx => $self->wx,
 		);
-		$self->reg_cb( 'connect' , \&event_connect );
-		$self->reg_cb( 'disconnect', \&event_disconnect );
+		$u_global->transport($t_global);
+
+		my $t_local =
+			Padre::Plugin::Swarm::Transport::Local::Multicast->new(
+				token => $self->config->{token},
+				wx    => $self->wx,
+			);
+		$u_local->transport($t_local);
+
+
+		$u_global->geometry($geo);
+		$u_local->geometry($geo);
+
+		## Should this be in global or local?
+		my $editor = Padre::Plugin::Swarm::Wx::Editor->new(
+			transport => $t_global,
+		);
+		$self->editor($editor);
+		$u_global->editor($editor);
+
+		my $g_directory = Padre::Plugin::Swarm::Wx::Resources->new(
+			$self->main,
+			label => 'Global'
+		);
+		$self->resources( $g_directory );
+		$u_global->resources($g_directory);
+
+		my $g_chat = Padre::Plugin::Swarm::Wx::Chat->new( $self->main,
+				label => 'Global', transport => $self->global->transport
+		 );
+		$u_global->chat($g_chat);
+
+		my $l_chat = Padre::Plugin::Swarm::Wx::Chat->new(
+				$self->main,
+				label => 'Local',
+				transport => $self->local->transport
+		 );
+		$u_local->chat($l_chat);
+
+
 		$self->connect();
 
 
@@ -339,17 +271,29 @@ SCOPE: {
 	sub plugin_disable {
 		my $self = shift;
 
-		# TODO - is this being used at ALL ?
+		eval {
+				$self->global->disable;
+		};
+		if ($@) {
+			TRACE( "Disable global failed $@" ) if DEBUG;
+		}
+
+		eval { $self->local->disable; };
+		if ($@) {
+			TRACE( "Disable local failed $@" ) if DEBUG;
+		}
+
+		$self->editor->disable;
+		$self->editor(undef);
+
 		$self->wx->Destroy;
 		$self->wx(undef);
-		
-		$self->disconnect;
-		
+
 		undef $instance;
 
 
 	}
-} # END SCOPE
+}
 
 sub plugin_preferences {
 	my $self = shift;
@@ -372,6 +316,7 @@ sub plugin_preferences {
 sub bootstrap_config {
 	my $self = shift;
 	my $config = $self->config_read;
+	#warn 'Got ' , join "\t" , %$config;
 	@$config{qw/
 		nickname
 		token
@@ -393,16 +338,14 @@ sub bootstrap_config {
 
 }
 
-
-# Catch notification from Padre and rethrow events for them.
 sub editor_enable {
 	my $self = shift;
-	$self->event( 'editor_enable' , @_ );
+	$self->editor->editor_enable(@_);
 }
 
 sub editor_disable {
 	my $self = shift;
-	$self->event( 'editor_disable' , @_ );
+	$self->editor->editor_disable(@_);
 }
 
 
@@ -424,6 +367,7 @@ sub show_about {
 Surrender to the Swarm!
 END_MESSAGE
 	$about->SetIcon( Padre::Wx::Icon::cast_to_icon($icon) );
+
 	# Show the About dialog
 	Wx::AboutBox($about);
 
@@ -444,80 +388,53 @@ __END__
 
 =head1 NAME
 
-Padre::Plugin::Swarm - Experimental plugin for co-operative editing
+Padre::Plugin::Swarm - Experimental plugin for collaborative editing
 
 =head1 DESCRIPTION
 
 This is Swarm!
 
 Swarm is a Padre plugin for experimenting with remote inspection,
-peer programming and co-operative editing functionality.
+peer programming and collaborative editing functionality.
 
 Within this plugin all rules are suspended. No security, no efficiency,
 no scalability, no standards compliance, remote code execution,
 everything is allowed. The only goal is things that work, and things
 that look shiny in a demo :)
 
-B<Addendum> Deliberate remote code execution was 
-removed very early. Swarm no longer blindly runs code sent to it from the network.
+Lessons learned here will be applied to more practical plugins later.
 
 =head1 FEATURES
 
-=head2 Connectivity
-
 =over
 
-=item * 
+=item Global server transport
 
-Global server transport - Connect with other Swarmers on teh interwebs. 
-C<swarm.perlide.org> is a free swarm server
+=item Local network multicast transport.
 
-=item *
+=item L<User chat|Padre::Plugin::Swarm::Wx::Chat> - converse with other padre editors
 
-Local network multicast transport. Connect with Swarmers on your 
-local network. No configuration required - other editors should simply 'appear'
+=item Resources - browse and open files from other users' editor
 
-=back
-
-=head2 Interfaces
-
-=over
-    
-=item *
-
-L<User chat|Padre::Plugin::Swarm::Wx::Chat> 
-- converse with other padre editors
-
-=item *
-
-Resources - browse and open files from another users' editor
-
-=item *
-
-L<Editor|Padre::Plugin::Swarm::Wx::Editor>
-integration and co-operation allow multiple users to edit the same document
-at the same time.
+=item Remote execution! Run arbitary code in other users' editor
 
 =back
 
 =head1 SEE ALSO
 
 L<Padre::Swarm::Manual> L<Padre::Plugin::Swarm::Wx::Chat>
-L<Padre::Plugin::Swarm::Wx::Editor>
 
 =head1 BUGS
 
-  Many. Identity management and interaction with L<Padre::Swarm::Geometry> is
-  rather poor.
+Many. Identity management and interaction with L<Padre::Swarm::Geometry> is
+rather poor.
 
-  More than 2 users editing same document at once MAY not work
-  
-  No accomodation is made for edits that overlap in time spent transmitting
-  them. Edits MAY arrive out of order.
+Crashes when 'Reload All Plugins' is called from the padre plugin manager
+
 
 =head1 COPYRIGHT
 
-Copyright 2009-2011 The Padre development team as listed in Padre.pm
+Copyright 2009-2010 The Padre development team as listed in Padre.pm
 
 =head1 LICENSE
 

@@ -1,0 +1,27 @@
+=head2  Bootstrapping the Lua API interface
+
+The file F<protos> contains C prototypes for Lua routines which may
+throw errors via C<lua_error()>.  The Perl interface code for these is
+generated from templates. All other Perl interfaces are hand crafted.
+
+Lua API routines which can throw errors have to be sandboxed so that the
+Perl runtime environment isn't corrupted. This is done by creating C
+wrappers designed to be invoked via Lua's protected call mechanism.
+If the API routine throws and error it is caught and translated into a Perl
+exception.
+
+
+The wrappers are generated in two steps.
+
+F<utils/pproto> parses the C prototypes in F<protos> and generates a YAML
+database containing the parsed result (F<protos.yml>).  It also adds
+any "hints" to the contained in F<proto_hints.yml>.
+
+F<utils/genxs> reads F<protos.yml>, F<wrap_xs.tpl>, and F<xs_xs.tpl>
+and generates F<wrap.h> and F<xs.h>, which are included by F<API.xs>.
+F<wrap_xs.tpl> and F<xs_xs.tpl> are B<Template::Toolkit> formatted
+code templates.  F<xs.h> contains the Perl XS interface code, F<wrap.h>
+contains the C wrappers for the Lua API routines.
+
+
+At present the above scripts are invoked manually.

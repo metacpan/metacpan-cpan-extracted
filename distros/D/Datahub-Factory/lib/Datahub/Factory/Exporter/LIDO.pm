@@ -27,3 +27,42 @@ sub add {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Datahub::Factory::Exporter::LIDO - Export items to LIDO
+
+=head1 SYNOPSIS
+
+    use Datahub::Factory;
+
+    my $exporter = Datahub::Factory->exporter('LIDO')->new();
+
+    $exporter->add({'id' => 1});
+
+=head1 DESCRIPTION
+
+Convert records to LIDO XML and send them to STDOUT. The records are
+convert as-is; any fixes must be done beforehand.
+
+=head1 AUTHORS
+
+Pieter De Praetere <pieter@packed.be>
+
+Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+
+=head1 COPYRIGHT
+
+Copyright 2017 - PACKED vzw, Vlaamse Kunstcollectie vzw
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GPLv3.
+
+=cut
+

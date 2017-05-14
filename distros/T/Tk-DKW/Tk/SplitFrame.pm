@@ -14,19 +14,17 @@
 package Tk::SplitFrame;
 
 use Tk;
-
 use Tk::ChildNotification;
 use Tk::Derived;
 use Tk::Widget;
 use Tk::Frame;
 
-use vars qw ($VERSION @ISA);
-
+use base qw (Tk::Derived Tk::Widget Tk::Frame);
+use vars qw ($VERSION);
 use strict;
+use Carp;
 
-$VERSION = '1.01';
-
-@ISA = qw (Tk::Derived Tk::Widget Tk::Frame);
+$VERSION = '0.02';
 
 Tk::Widget->Construct ('SplitFrame');
 

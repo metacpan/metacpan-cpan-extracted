@@ -1,12 +1,14 @@
 package Padre::Plugin::Catalyst::Panel;
+BEGIN {
+  $Padre::Plugin::Catalyst::Panel::VERSION = '0.13';
+}
+
+# ABSTRACT: A Catalyst plugin panel
 
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
-
 use Padre::Wx ();
-use Wx        ();
 use base 'Wx::Panel';
 
 sub new {
@@ -178,4 +180,39 @@ sub led {
 
 
 1;
+
+
+__END__
+=pod
+
+=head1 NAME
+
+Padre::Plugin::Catalyst::Panel - A Catalyst plugin panel
+
+=head1 VERSION
+
+version 0.13
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Breno G. de Oliveira <garu@cpan.org>
+
+=item *
+
+Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Breno G. de Oliveira.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
 

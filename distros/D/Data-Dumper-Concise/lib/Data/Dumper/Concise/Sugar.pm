@@ -2,6 +2,8 @@ package Data::Dumper::Concise::Sugar;
 
 use 5.006;
 
+our $VERSION = '2.023';
+
 use Exporter ();
 use Data::Dumper::Concise ();
 

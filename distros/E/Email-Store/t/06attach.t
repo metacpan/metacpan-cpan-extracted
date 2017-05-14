@@ -1,7 +1,7 @@
 use Test::More tests => 8;
 use File::Slurp;
 BEGIN { unlink("t/test.db"); }
-use Email::Store 
+use Email::Store { only => [qw( Mail Attachment )] }, 
     ("dbi:SQLite:dbname=t/test.db", "", "", { sqlite_handle_binary_nulls => 1 } );
 Email::Store->setup;
 ok(1, "Set up");

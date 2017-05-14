@@ -1,4 +1,4 @@
-package urpm::bug_report; # $Id: bug_report.pm 250871 2009-01-06 17:21:05Z pixel $
+package urpm::bug_report;
 
 use strict;
 use urpm;
@@ -71,7 +71,6 @@ sub copy_requested {
 
 1;
 
-__END__
 
 =back
 

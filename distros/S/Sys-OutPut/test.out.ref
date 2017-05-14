@@ -1,0 +1,14 @@
+*** STDOUT ***
+(out) This is a test -- there should be a newline on this text.
+(put) This is another test -- (put) this line should continue the previous.
+(out)This should start and end a new line
+(out)This line should go to stdout
+*** STDERR ***
+(err)Output should go to stderr
+(err)This line is back in stderr
+(talk)This line should print in stderr
+(talk)This line should appear
+(talk)But this should print when debug returns nil
+(debug)This is a line of debugging output
+(err)This line should be in stderr with it.
+(debug)This is another line of debugging output

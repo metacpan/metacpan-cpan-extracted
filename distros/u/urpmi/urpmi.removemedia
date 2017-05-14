@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: urpmi.removemedia 271299 2010-11-21 15:54:30Z peroyvind $
 
 #- Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA

@@ -57,11 +57,11 @@ test_auto_select_both('l', 'll',  'l-2 ll-1');
 test_auto_select_both('m', 'mm',  'm-2 mm-2');
 test_auto_select_both('n', 'nn',  'n-2 nn-2');
 test_auto_select_both('o', 'oo1', 'o-2 oo2-2');
-test_auto_select_both('r', 'rr2', 'r-2', 'rr2-1');
+test_auto_select_both('r', 'rr1', 'r-2', 'rr1-1');
 test_auto_select_both('s', 'ss1 ss2', 's-2 ss1-1 ss2-1');
 test_auto_select_both('t', 'tt1', 't-2 tt2-2', 'tt1-1');
 
-test_auto_select(['r', 'rr1'], 'r rr1 rr2', 'r-2 rr1-1', 'rr2-1');
+test_auto_select(['r', 'rr2'], 'r rr1 rr2', 'r-2 rr2-1', 'rr1-1');
 #test_auto_select(['s ss1'],    's ss1 ss2', 's-2 ss1-1', 'ss2-1'); # this fails, but that's ok
 
 test_urpme(['g'], 'g', 'g', '');

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2012, 2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2012, 2014-2015 Rocky Bernstein <rocky@cpan.org>
 use warnings; no warnings 'redefine'; no warnings 'once';
 use rlib '../../../../../..';
 
@@ -20,7 +20,19 @@ our $HELP         = <<'HELP';
 
 Show OP address in debugger location.
 
-See also C<set display op>, C<show line>, C<show program> and
+Showing the OP address allows you to disambiguate
+I<exactly> where you are in a line that may have many statements or
+stopping points.
+
+In a mult-statement line, the C<deparse> command will print just the
+current command.
+
+=head2 See also:
+
+L<C<set display op>|Devel::Trepan::CmdProcessor::Command::Set::Display::OP>,
+L<C<deparse>|Devel::Trepan::CmdProcessor::Command::Deparse>,
+L<C<info line>|Devel::Trepan::CmdProcessor::Command::Info::Line>,
+L<C<info program>|Devel::Trepan::CmdProcessor::Command::Info::Line> and
 C<disassemble> via plugin L<Devel::Trepan::Disassemble>
 =cut
 HELP
@@ -35,12 +47,12 @@ unless (caller) {
     my $cmdproc = Devel::Trepan::CmdProcessor->new();
     my $subcmd  =  Devel::Trepan::CmdProcessor::Command::Show->new($cmdproc, 'show');
     my $dispcmd =  Devel::Trepan::CmdProcessor::Command::Show::Display->new($subcmd, 'display');
-    my $opcmd   =  Devel::Trepan::CmdProcessor::Command::Show::Display::OP->new($dispcmd, 'op');
+    my $cmd   =  Devel::Trepan::CmdProcessor::Command::Show::Display::OP->new($dispcmd, 'op');
     # Add common routine
     foreach my $field (qw(min_abbrev name)) {
-	printf "Field %s is: %s\n", $field, $opcmd->{$field};
+	printf "Field %s is: %s\n", $field, $cmd->{$field};
     }
-    $opcmd->run();
+    $cmd->run();
 }
 
 1;

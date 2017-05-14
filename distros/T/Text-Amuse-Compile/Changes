@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.91 2017-05-11
+
+ - Make \sout (strike) really robust and survive hyperref
+
 0.90 2017-04-07
 
  - Obey #notoc for HTML as well

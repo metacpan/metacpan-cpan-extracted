@@ -1,0 +1,53 @@
+<scanner_list>
+<scanner
+  model_description="GenePix"
+  model_serial_num="any"
+  contact="Axon Instruments, Inc."
+/>
+<scanner
+  model_description="ScanArray"
+  model_serial_num="any"
+  contact="GSI Lumonics"
+/>
+<scanner
+  model_description="arrayWoRx"
+  model_serial_num="any"
+  contact="Applied Precision"
+/>
+<scanner
+  model_description="GeneArray_Scanner"
+  model_serial_num="any"
+  contact="Affymetrix"
+/>
+<scanner
+  model_description="Arrayer_Scanner"
+  model_serial_num="any"
+  contact="Affymetrix"
+/>
+<scanner
+  model_description="GMS"
+  model_serial_num="418"
+  contact="Affymetrix"
+/>
+<scanner
+  model_description="Genorama"
+  model_serial_num="any"
+  contact="Asper"
+/>
+<scanner
+  model_description="FluorChem"
+  model_serial_num="any"
+  contact="Alpha Innotech"
+/>
+<scanner
+  model_description="DNA_Microarray_Scanner"
+  model_serial_num="any"
+  contact="Agilent"
+/>
+<scanner
+  model_description="Biodetect"
+  model_serial_num="any"
+  contact="GeneScan"
+/>
+</scanner_list>
+

@@ -1,5 +1,22 @@
 Revision history for ExtUtils-Install
 
+2.08
+
+- Optimisations:
+
+  * use our instead of vars
+  * lazy load modules
+  * make OS variables into constants
+  * move some calculations out of a loop
+
+2.06
+
+- Removed instructions using Build.PL from README
+
+- Load Win32API::File for _move_file_at_boot only when needed
+
+- Allow disabling autosplit by omitting autosplit dir
+
 2.04
 
 - Cosmetic change as forgot to update version information in POD on last two

@@ -1,0 +1,195 @@
+###
+# see "Bind 9 Configuration Reference" in "Bind-9.1.0/doc/arm/Bv9ARM.html"
+###
+
+address_match_list = address_match_list_element ;
+  [ address_match_list_element; ... ]
+address_match_list_element = [ ! ] (ip_address [/length] |
+   key key_id | acl_name | { address_match_list } )
+
+/* This is a BIND comment as in C */
+
+// This is a BIND comment as in C++
+
+# This is a BIND comment as in common UNIX shells and perl
+
+acl acl-name { 
+    address_match_list 
+};
+
+controls {
+   inet ( ip_addr | * ) [ port ip_port ] allow address_match_list 
+keys key_list ;
+   [ inet ...; ]
+};
+
+include filename;
+
+key key_id {
+    algorithm string;
+    secret string;
+};
+
+logging {
+   [ channel channel_name {
+     ( file path name
+         [ versions ( number | unlimited ) ]
+         [ size size spec ]
+         | syslog syslog_facility
+         | stderr
+         | null
+     );
+     [ severity (critical | error | warning | notice |
+                 info | debug [ level ] | dynamic ); ]
+     [ print-category yes or no; ]
+     [ print-severity yes or no; ]
+     [ print-time yes or no; ]
+   }; ]
+   [ category category_name {
+     channel_name ; [ channel_name ; ... ]
+   }; ]
+   ...
+};
+
+#lightweight resolver
+lwres {
+    [ listen-on { ip_addr [port ip_port] ; [ ip_addr [port ip_port] ; ... ] }; ]
+    [ view view_name; ]
+    [ search { domain_name ; [ ip_addr ; ... ] }; ]
+    [ ndots number; ]
+};
+
+options {
+    [ version version_string; ]
+    [ directory path_name; ]
+    [ named-xfer path_name; ]
+    [ tkey-domain domainname; ]
+    [ tkey-dhkey key_name key_tag; ]
+    [ dump-file path_name; ]
+    [ memstatistics-file path_name; ]
+    [ pid-file path_name; ]
+    [ statistics-file path_name; ]
+    [ zone-statistics yes_or_no; ]
+    [ auth-nxdomain yes_or_no; ]
+    [ deallocate-on-exit yes_or_no; ]
+    [ dialup dialup_option; ]
+    [ fake-iquery yes_or_no; ]
+    [ fetch-glue yes_or_no; ]
+    [ has-old-clients yes_or_no; ]
+    [ host-statistics yes_or_no; ]
+    [ multiple-cnames yes_or_no; ]
+    [ notify yes_or_no | explicit; ]
+    [ recursion yes_or_no; ]
+    [ rfc2308-type1 yes_or_no; ]
+    [ use-id-pool yes_or_no; ]
+    [ maintain-ixfr-base yes_or_no; ]
+    [ forward ( only | first ); ]
+    [ forwarders { [ in_addr ; [ in_addr ; ... ] ] }; ]
+    [ check-names ( master | slave | response )( warn | fail | ignore ); ]
+    [ allow-notify { address_match_list }; ]
+    [ allow-query { address_match_list }; ]
+    [ allow-transfer { address_match_list }; ]
+    [ allow-recursion { address_match_list }; ]
+    [ blackhole { address_match_list }; ]
+    [ listen-on [ port ip_port ] { address_match_list }; ]
+    [ listen-on-v6 [ port ip_port ] { address_match_list }; ]
+    [ query-source [ address ( ip_addr | * ) ] [ port ( ip_port | * ) ]; ]
+    [ max-transfer-time-in number; ]
+    [ max-transfer-time-out number; ]
+    [ max-transfer-idle-in number; ]
+    [ max-transfer-idle-out number; ]
+    [ tcp-clients number; ]
+    [ recursive-clients number; ]
+    [ serial-queries number; ]
+    [ transfer-format ( one-answer | many-answers ); ]
+    [ transfers-in  number; ]
+    [ transfers-out number; ]
+    [ transfers-per-ns number; ]
+    [ transfer-source (ip4_addr | *) [port ip_port] ; ]
+    [ transfer-source-v6 (ip6_addr | *) [port ip_port] ; ]
+    [ notify-source (ip4_addr | *) [port ip_port] ; ]
+    [ notify-source-v6 (ip6_addr | *) [port ip_port] ; ]
+    [ also-notify { ip_addr [port ip_port] ; [ ip_addr [port ip_port] ; ... ] }; ]
+    [ max-ixfr-log-size number; ]
+    [ coresize size_spec ; ]
+    [ datasize size_spec ; ]
+    [ files size_spec ; ]
+    [ stacksize size_spec ; ]
+    [ cleaning-interval number; ]
+    [ heartbeat-interval number; ]
+    [ interface-interval number; ]
+    [ statistics-interval number; ]
+    [ topology [{ address_match_list }]; ]
+    [ sortlist [{ address_match_list }]; ]
+    [ rrset-order [{ order_spec ; [ order_spec ; ... ] ] }];
+    [ lame-ttl number; ]
+    [ max-ncache-ttl number; ]
+    [ max-cache-ttl number; ]
+    [ sig-validity-interval number ; ]
+    [ min-roots number; ]
+    [ use-ixfr yes_or_no ; ]
+    [ treat-cr-as-space yes_or_no ; ]
+    [ min-refresh-time number ; ]
+    [ max-refresh-time number ; ]
+    [ min-retry-time number ; ]
+    [ max-retry-time number ; ]
+    [ port ip_port; ]
+    [ additional-from-auth yes_or_no ; ]
+    [ additional-from-cache yes_or_no ; ]
+};
+
+server ip_addr {
+    [ bogus yes_or_no ; ]
+    [ provide-ixfr yes_or_no ; ]
+    [ request-ixfr yes_or_no ; ]
+    [ transfers number ; ]
+    [ transfer-format ( one-answer | many-answers ) ; ]]
+    [ keys { string ; [ string ; [...]] } ; ]
+};
+
+trusted-keys {
+    string number number number string ;
+    [ string number number number string ; [...]]
+};
+
+view view_name [class] {
+      match-clients { address_match_list } ;
+      [ view_option; ...]
+      [ zone-statistics yes_or_no ; ]
+      [ zone_statement; ...]
+};
+
+zone zone_name [class] [{ 
+    type ( master | slave | hint | stub | forward ) ;
+    [ allow-notify { address_match_list } ; ]
+    [ allow-query { address_match_list } ; ]
+    [ allow-transfer { address_match_list } ; ]
+    [ allow-update { address_match_list } ; ]
+    [ update-policy { update_policy_rule [...] } ; ]
+    [ allow-update-forwarding { address_match_list } ; ]
+    [ also-notify { ip_addr [port ip_port] ; [ ip_addr [port ip_port] ; ... ] }; ]
+    [ check-names (warn|fail|ignore) ; ]
+    [ dialup dialup_option ; ]
+    [ file string ; ]
+    [ forward (only|first) ; ]
+    [ forwarders { [ ip_addr ; [ ip_addr ; [...]]] } ; ]
+    [ ixfr-base string ; ]
+    [ ixfr-tmp-file string ; ]
+    [ maintain-ixfr-base yes_or_no ; ]
+    [ masters [port ip_port] { ip_addr [port ip_port] [key key]; [...] } ; ]
+    [ max-ixfr-log-size number ; ]
+    [ max-transfer-idle-in number ; ]
+    [ max-transfer-idle-out number ; ]
+    [ max-transfer-time-in number ; ]
+    [ max-transfer-time-out number ; ]
+    [ notify yes_or_no | explicit ; ]
+    [ pubkey number number number string ; ]
+    [ transfer-source (ip4_addr | *) [port ip_port] ; ]
+    [ transfer-source-v6 (ip6_addr | *) [port ip_port] ; ]
+    [ notify-source (ip4_addr | *) [port ip_port] ; ]
+    [ notify-source-v6 (ip6_addr | *) [port ip_port] ; ]
+    [ zone-statistics yes_or_no ; ]
+    [ sig-validity-interval number ; ]
+    [ database string ; ]
+}];
+

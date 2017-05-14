@@ -1,0 +1,72 @@
+H1: 2.000beta6a
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+The documentation now includes a draft version of an overview paper
+called {{DOC:The SDF Document Development System}}. This is
+recommended reading for all SDF users.
+
+For [[Mincom]] users, Mincom-style title pages can now be generated
+for technical documents. To do this, initialise the {{VAR:OPT_LOOK}}
+variable using the {{MAC:init}} macro on the top line of the document
+like this:
+
+E:   !init OPT_LOOK='mincom'
+
+{{CMD:sdf}}'s -k option can also be used to override the default look.
+For example:
+
+E:   sdf -2ps -kmincom mydoc.sdf
+
+The {{DOC:SDF Reference}} has been improved - most of the filters and
+macros now have a description and an example.
+
+The {{MAC:build_title}} macro now outputs the date the document was
+last modified when the target is HTML.
+
+Section jumps across documents are now supported via the {{doc}}
+phrase attribute. For example:
+
+!block example; pure
+See {{SECT[doc='SDF User Guide'] Event Processing}}
+in the {{DOC:SDF User Guide}} for further details.
+!endblock
+
+The default {{target}} for the {{FILT:inline}} filter is now {{html}}.
+
+The {{FILT:namevalues}} filter can now be used to specify a table of
+names and values. This is useful at the top of QSD procedures, etc.
+
+The search order for figure importing into PostScript documents is
+now eps, pct, gif and finally bmp.
+
+H2: Fixes
+
+Under certain circumstances, figure importing into [[PostScript]]
+documents was broken by the previous version. It should now be
+working again.
+
+Tables with titles no longer cause blank pages to be appended to the
+end of the document. This was a [FrameMaker]] 5.0 bug which I now
+workaround by producing "simple" titles. As a result, table titles
+are no longer repeated when a table crosses a page boundary.
+
+{{Encapsulated PostScript}} figures output by {{PRD:Visio}} are now
+correctly sized.
+
+URLs in [[PostScript]] documents are no longer blue.
+
+A large number of bugs in the QSD templates have been fixed. These had
+been introduced by the upgrade from [[FrameMaker]] to version 5.
+
+The {{MAC:build_title}} macro (as implemented in the {{plain}} library)
+no longer outputs a page break after the {{Document control}} stuff.
+
+Change bars no longer cause example text (e.g. source code) to be badly
+formatted in HTML.
+
+H2: Incompatibilities
+
+None.

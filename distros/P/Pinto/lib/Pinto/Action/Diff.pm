@@ -1,21 +1,19 @@
-# ABSTRACT: Show the difference between stacks or revisions
+# ABSTRACT: Show the difference between two stacks
 
 package Pinto::Action::Diff;
 
 use Moose;
-use MooseX::Aliases;
 use MooseX::StrictConstructor;
 use MooseX::MarkAsMethods ( autoclean => 1 );
-use MooseX::Types::Moose qw(Bool Str);
 
 use Pinto::Difference;
-use Pinto::Constants qw(:color :diff);
-use Pinto::Types qw(StackName StackDefault StackObject RevisionID DiffStyle);
-use Pinto::Util qw(throw default_diff_style);
+use Pinto::Constants qw(:color);
+use Pinto::Types qw(StackName StackDefault StackObject RevisionID);
+use Pinto::Util qw(throw);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -25,7 +23,7 @@ extends qw( Pinto::Action );
 
 has left => (
     is      => 'ro',
-    isa     => StackName | StackObject | StackDefault | RevisionID,
+    isa     => StackName | StackDefault | StackObject | RevisionID,
     default => undef,
 );
 
@@ -35,28 +33,6 @@ has right => (
     required => 1,
 );
 
-has style => (
-    is       => 'ro',
-    isa      => DiffStyle,
-    alias    => 'diff_style',
-    default  => \&default_diff_style,
-    lazy     => 1,
-);
-
-has format => (
-    is      => 'ro',
-    isa     => Str,
-    builder => '_build_format',
-);
-
-sub _build_format {
-    my ($self) = @_;
-
-    return $self->style eq $PINTO_DIFF_STYLE_DETAILED
-        ? '%o[%F] %-40p %12v %a/%f'
-        : '%o[%F] %a/%f';
-}
-
 #------------------------------------------------------------------------------
 
 sub execute {
@@ -65,34 +41,29 @@ sub execute {
     my $error_message = qq{"%s" does not match any stack or revision};
 
     my $left =
-           $self->repo->get_stack_maybe( $self->left )
-        || $self->repo->get_revision_maybe( $self->left )
+           $self->repo->get_stack( $self->left, ( nocroak => 1 ) )
+        || $self->repo->get_revision( $self->left )
         || throw sprintf $error_message, $self->left;
 
     my $right =
-           $self->repo->get_stack_maybe( $self->right )
-        || $self->repo->get_revision_maybe( $self->right )
+           $self->repo->get_stack( $self->right, ( nocroak => 1 ) )
+        || $self->repo->get_revision( $self->right )
         || throw sprintf $error_message, $self->right;
 
-    my $diff = Pinto::Difference->new( left  => $left,
-                                       right => $right,
-                                       style => $self->style );
-
-    # TODO: Extract the colorizing & formatting code into a separate
-    # class that can be reused.  Maybe subclassed for HTML and text.
+    my $diff = Pinto::Difference->new( left => $left, right => $right );
 
     if ( $diff->is_different ) {
-        $self->show( "--- $left",  { color => $PINTO_PALETTE_COLOR_1 } );
-        $self->show( "+++ $right", { color => $PINTO_PALETTE_COLOR_1 } );
+        $self->show( "--- $left",  { color => $PINTO_COLOR_1 } );
+        $self->show( "+++ $right", { color => $PINTO_COLOR_1 } );
     }
 
-    for my $entry ( $diff->entries ) {
-        my $color  = $entry->is_addition ? $PINTO_PALETTE_COLOR_0 : $PINTO_PALETTE_COLOR_2;
-        my $string = $entry->to_string( $self->format );
+    for my $entry ( $diff->diffs ) {
+        my $op     = $entry->op;
+        my $reg    = $entry->registration;
+        my $color  = $op eq '+' ? $PINTO_COLOR_0 : $PINTO_COLOR_2;
+        my $string = $op . $reg->to_string('[%F] %-40p %12v %a/%f');
         $self->show( $string, { color => $color } );
     }
-
-    $self->notice('No difference') if not $diff->is_different;
 
     return $self->result;
 }
@@ -111,15 +82,18 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
-Pinto::Action::Diff - Show the difference between stacks or revisions
+Pinto::Action::Diff - Show the difference between two stacks
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -127,7 +101,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

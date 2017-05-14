@@ -9,8 +9,8 @@ BEGIN {
 
 use strict;
 
-require "test.pl";
-plan(tests => 4);
+require "./test.pl";
+plan(tests => 10);
 
 # Generate a load of random numbers.
 # int() avoids possible floating point error.
@@ -57,3 +57,34 @@ sleep(1); # in case our srand() is too time-dependent
 @second_run = `$^X -le "print int rand 100 for 1..100"`;
 
 ok( !eq_array(\@first_run, \@second_run), 'srand() called automatically');
+
+# check srand's return value
+my $seed = srand(1764);
+is( $seed, 1764, "return value" );
+
+$seed = srand(0);
+ok( $seed, "true return value for srand(0)");
+cmp_ok( $seed, '==', 0, "numeric 0 return value for srand(0)");
+
+{
+    my @warnings;
+    my $b;
+    {
+	local $SIG{__WARN__} = sub {
+	    push @warnings, "@_";
+	    warn @_;
+	};
+	$b = $seed + 0;
+    }
+    is( $b, 0, "Quacks like a zero");
+    is( "@warnings", "", "Does not warn");
+}
+
+# [perl #40605]
+{
+    use warnings;
+    my $w = '';
+    local $SIG{__WARN__} = sub { $w .= $_[0] };
+    srand(2**100);
+    like($w, qr/^Integer overflow in srand at /, "got a warning");
+}

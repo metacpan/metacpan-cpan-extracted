@@ -4,10 +4,13 @@ package Pinto::PackageExtractor;
 
 use Moose;
 use MooseX::StrictConstructor;
+use MooseX::Types::Moose qw(HashRef Bool);
 use MooseX::MarkAsMethods ( autoclean => 1 );
 
 use Try::Tiny;
 use Dist::Metadata;
+use Path::Class qw(dir);
+use Archive::Extract;
 
 use Pinto::Types qw(File Dir);
 use Pinto::Util qw(debug throw whine);
@@ -15,7 +18,7 @@ use Pinto::ArchiveUnpacker;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -56,8 +59,7 @@ sub provides {
     my ($self) = @_;
 
     my $archive = $self->archive;
-    my $basename = $archive->basename;
-    debug "Extracting packages provided by archive $basename";
+    debug "Extracting packages provided by archive $archive";
 
     my $mod_info = try {
 
@@ -71,27 +73,23 @@ sub provides {
         $self->dm->module_info;    # returned from try{}
     }
     catch {
-        throw "Unable to extract packages from $basename: $_";
+        throw "Unable to extract packages from $archive: $_";
     };
 
     my @provides;
-    for my $package ( sort keys %{$mod_info} ) {
+    for my $pkg_name ( sort keys %{$mod_info} ) {
 
-        my $info    = $mod_info->{$package};
-        my $version = version->parse( $info->{version} );
-        debug "Archive $basename provides: $package-$version";
+        my $info    = $mod_info->{$pkg_name};
+        my $pkg_ver = version->parse( $info->{version} );
+        debug "Archive $archive provides: $pkg_name-$pkg_ver";
 
-        push @provides, { 
-            name    => $package, 
-            version => $version,
-            file    => $info->{file},
-        };
+        push @provides, { name => $pkg_name, version => $pkg_ver };
     }
 
-    @provides = $self->__apply_workarounds(@provides);
+    @provides = $self->__apply_workarounds if @provides == 0;
 
-    whine "$basename contains no packages and will not be in the index" 
-        if not @provides;
+    whine sprintf "%s contains no packages and will not be indexed",
+        $archive->basename if not @provides;
 
     return @provides;
 }
@@ -110,23 +108,16 @@ sub requires {
     my @prereqs;
     for my $phase ( keys %{$prereqs_meta} ) {
 
-        # TODO: Also capture the relation (suggested, requires, recomends, etc.)
-        # But that will require a schema change to add another column to the table.
-
         my $prereqs_for_phase = $prereqs_meta->{$phase}        || {};
         my $required_prereqs  = $prereqs_for_phase->{requires} || {};
 
-        for my $package ( sort keys %{$required_prereqs} ) {
+        for my $pkg_name ( sort keys %{$required_prereqs} ) {
 
-            my $version = $required_prereqs->{$package};
-            debug "Archive $archive requires ($phase): $package~$version";
+            my $pkg_ver = version->parse( $required_prereqs->{$pkg_name} );
+            debug "Archive $archive requires ($phase): $pkg_name-$pkg_ver";
 
-            push @prereqs, { 
-                name    => $package, 
-                version => $version,
-                phase   => $phase, 
-            };
-
+            my $struct = { phase => $phase, name => $pkg_name, version => $pkg_ver };
+            push @prereqs, $struct;
         }
     }
 
@@ -154,22 +145,31 @@ sub metadata {
     return $metadata;
 }
 
-#=============================================================================
-# TODO: Generalize these workarounds and/or move them into a separate module
+#-----------------------------------------------------------------------------
+# HACK: The common-sense and FCGI distributions generate the .pm file at build
+# time.  It relies on an unusual feature of PAUSE that scans the __DATA__
+# section of .PM files for potential packages.  Module::Metdata doesn't have
+# that feature, so to us, it appears that these distributions contain no packages.
+# I've asked the authors to use the "provides" field of the META file so
+# that other tools can discover the packages in the distribution, but then have
+# not done so.  So we work around it by just assuming the distribution contains a
+# package named "common::sense" or "FCGI".
 
 sub __apply_workarounds {
-    my ($self, @provides) = @_;
+    my ($self) = @_;
 
-    return $self->__common_sense_workaround(@provides)
+    return $self->__common_sense_workaround
         if $self->archive->basename =~ m/^ common-sense /x;
 
-    return $self->__fcgi_workaround(@provides)
+    return $self->__fcgi_workaround
         if $self->archive->basename =~ m/^ FCGI-\d /x;
 
-    return @provides;
+    return;
 }
 
 #-----------------------------------------------------------------------------
+# TODO: Generalize both of these workaround methods into a single method that
+# just guesses the package name and version based on the distribution name.
 
 sub __common_sense_workaround {
     my ($self) = @_;
@@ -178,12 +178,13 @@ sub __common_sense_workaround {
 
     return {
         name    => 'common::sense',
-        file    => 'sense.pm.PL',
-        version => version->parse($version),
+        version => version->parse($version)
     };
 }
 
 #-----------------------------------------------------------------------------
+# TODO: Generalize both of these workaround methods into a single method that
+# just guesses the package name and version based on the distribution name.
 
 sub __fcgi_workaround {
     my ($self) = @_;
@@ -192,8 +193,7 @@ sub __fcgi_workaround {
 
     return {
         name    => 'FCGI',
-        file    => 'FCGI.PL',
-        version => version->parse($version),
+        version => version->parse($version)
     };
 }
 
@@ -219,7 +219,7 @@ Pinto::PackageExtractor - Extract packages provided/required by a distribution a
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -227,7 +227,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

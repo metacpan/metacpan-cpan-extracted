@@ -1,8 +1,6 @@
 use t::App;
 use Test::More;
 
-plan skip_all => 'TEST_ONLINE=1 need to be set' unless $ENV{TEST_ONLINE};
-
 $t->app->embed_link->_ua->server->app($t->app);
 $t->app->routes->get('/empty'    => 'empty');
 $t->app->routes->get('/timer-fb' => 'timer-fb');

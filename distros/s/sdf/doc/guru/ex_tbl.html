@@ -1,0 +1,46 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: Creating New Table Styles</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_phras.html">Previous Topic</A> | <A HREF="ex_look.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.6. Creating New Table Styles</H1>
+<HR>
+<H2><A NAME="Using Event Processing">1.6.1. Using Event Processing</A></H2>
+<P>SDF's event processing feature makes it easy to create a new table style from an existing one. For example, the following line makes <EM>schedule</EM> a variation of the <EM>shade</EM> style:</P>
+<PRE>
+!on table 'schedule';; $style='shade'; $param{&quot;wide&quot;} = 1
+</PRE>
+<HR>
+<H2><A NAME="Using Mapping Tables">1.6.2. Using Mapping Tables</A></H2>
+<P>SDF uses the <EM>tablestyles</EM> filter to define the mapping between an SDF table style and a target table style. For example:</P>
+<PRE>
+!block tablestyles
+Name    To
+columns Columns
+rows    Rows
+grid    Grid
+plain   Plain
+box     Box
+shade   Shade
+!endblock
+</PRE>
+<HR>
+<H2><A NAME="Creating New Target Phrase Styles">1.6.3. Creating New Target Phrase Styles</A></H2>
+<P>SDF makes it easy to define new target table styles by inheriting configuration details from an existing style.</P>
+<P>See the <TT>look/simple/mif.sdn</TT> file in the SDF distribution for examples.</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_phras.html">Previous Topic</A> | <A HREF="ex_look.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

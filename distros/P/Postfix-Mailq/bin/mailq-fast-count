@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+#
+# ABSTRACT: quickly count mails in your postfix spool
+# PODNAME: mailq-fast-count
+#
+
+
+package main; # dzil needs this or it stops working
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Postfix::Mailq;
+
+my @args = @ARGV;
+
+GetOptions(
+    'spool_dir:s' => \(my $spool_dir = Postfix::Mailq::DEFAULT_SPOOL_DIR),
+    'hold'        => \(my $get_hold = 1),
+);
+
+my $count = Postfix::Mailq::get_fast_count({
+    get_hold => $get_hold,
+    spool_dir => $spool_dir,
+});
+
+# No postfix dir?
+if (! $count || ref $count ne "HASH") {
+    exit 1;
+}
+
+if ($count->{total} == 0) {
+    print "Mail queue is empty\n";
+    exit 0;
+}
+
+# ... but we cannot output this info, because we're only counting
+
+for (keys %{ $count }) {
+    printf "%s: %d\n", $_, $count->{$_};
+}
+
+__END__
+=pod
+
+=head1 NAME
+
+mailq-fast-count - quickly count mails in your postfix spool
+
+=head1 VERSION
+
+version 0.01
+
+=head1 DESCRIPTION
+
+Outputs a count of all messages in your postfix spool
+
+=head1 NAME
+
+mailq-fast-count
+
+=head1 AUTHOR
+
+Cosimo Streppone <cosimo@opera.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Opera Software ASA.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut
+

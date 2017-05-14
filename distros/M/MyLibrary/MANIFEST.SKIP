@@ -1,0 +1,6 @@
+CVS
+ChangeLog.bak
+MANIFEST.bak
+Makefile$
+Makefile.old
+blib

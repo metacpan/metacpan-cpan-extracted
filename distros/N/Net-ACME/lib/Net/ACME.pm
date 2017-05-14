@@ -4,7 +4,7 @@ package Net::ACME;
 
 =head1 NAME
 
-Net::ACME - Client for the ACME protocol (e.g., L<Let’s Encrypt|http://letsencrypt.org>)
+Net::ACME - Client for the ACME protocol (e.g., Let’s Encrypt)
 
 =head1 SYNOPSIS
 
@@ -16,9 +16,8 @@ Net::ACME - Client for the ACME protocol (e.g., L<Let’s Encrypt|http://letsenc
 
 =head1 DESCRIPTION
 
-This module implements client logic (including SSL certificate issuance)
-for the ACME protocol, the system for automated issuance of SSL
-certificates used by Let’s Encrypt.
+This module implements client logic for the ACME protocol,
+the system for automated issuance of SSL certificates used by Let’s Encrypt.
 
 The methods of this class return objects that correspond to the
 respective ACME resource:
@@ -39,8 +38,6 @@ respective ACME resource:
 
 =item * Closely based on cPanel’s widely used Let’s Encrypt plugin.
 
-=item * Support for both RSA and ECDSA encryption (via L<Crypt::Perl>).
-
 =item * Thorough error-checking: any deviation from what the ACME protocol
 expects is reported immediately via an exception.
 
@@ -54,8 +51,9 @@ expects is reported immediately via an exception.
 (Hopefully your code isn’t susceptible to this anyway, but it’s just a good
 precaution.)
 
-=item * All dependencies are either core or pure Perl. Net::ACME will run
-anywhere that Perl runs!
+=item * All dependencies are either core or pure Perl. For RSA crypto we use
+L<Crypt::OpenSSL::RSA> if it’s available, or the system’s C<openssl> binary.
+Net::ACME will run almost anywhere!
 
 =back
 
@@ -64,6 +62,11 @@ anywhere that Perl runs!
 This module is now well-tested and should be safe for use in your application.
 
 =head1 CUSTOMIZATION
+
+B<OpenSSL>: This module will attempt to use L<Crypt::OpenSSL::RSA> if it is
+available; if not, it falls back to the C<openssl> binary. On most systems this
+should already be in the process’s search path, but if not, specify the binary’s
+location by setting C<$Net::ACME::Crypt::OPENSSL_BIN_PATH>.
 
 B<HTTPS options>: This module uses C<HTTP::Tiny> for its network operations.
 In some instances it is desirable to specify custom C<SSL_options> in that
@@ -91,7 +94,7 @@ See below for cut-paste-y examples.
 
     #Use this method any time you want to update contact information,
     #not just when you set up a new account.
-    my $reg = $acme->register('mailto:me@example.com', 'mailto:who@example.com');
+    my $reg = $acme->register('mailto:who.am@i.tld', 'mailto:who@else.tld');
 
     $acme->accept_tos( $reg->uri(), $tos_url );
 
@@ -128,7 +131,7 @@ See below for cut-paste-y examples.
                     last if $poll->status() eq 'valid';
 
                     if ( $poll->status() eq 'invalid' ) {
-                        my @failed = map { $_->error() } $poll->challenges();
+                        my @failed = grep { $_->error() } $poll->challenges();
 
                         warn $_->to_string() . $/ for @failed;
 
@@ -159,12 +162,11 @@ See below for cut-paste-y examples.
 
 =over 4
 
-=item * Once the L<ACME specification|https://tools.ietf.org/html/draft-ietf-acme-acme>
-is finalized, update this module to take advantage of the full specification.
-As Let’s Encrypt’s L<Boulder|https://github.com/letsencrypt/boulder> is currently
-the only widely-used ACME server, and that software is compatible with
-L<the first draft of the ACME spec|https://tools.ietf.org/html/draft-ietf-acme-acme-01>,
-there’s little reason to update for the time being.
+=item * Find a way to sign with RSA in pure Perl. (NB: L<Crypt::RSA> has XS dependencies.)
+
+=item * Support EC keys.
+
+=item * Test and support more ACME v2 features (pending server support).
 
 =back
 
@@ -175,7 +177,7 @@ there’s little reason to update for the time being.
 =item * cPanel, Inc. for permission to adapt their ACME framework for
 public consumption.
 
-=item * Stephen Ludin for developing and maintaining L<Protocol::ACME>, from which
+=item * Stephen Ludin for developing and maintaining C<Protocol::ACME>, from which
 this module took its inspiration.
 
 =back
@@ -406,9 +408,7 @@ sub do_challenge {
 
     my ( $token, $uri ) = map { $challenge_obj->$_() } qw( token uri );
 
-    my $key_obj = Net::ACME::Crypt::parse_key($self->{'_key'});
-
-    $self->{'_key_jwk'} ||= $key_obj->get_struct_for_public_jwk();
+    $self->{'_key_jwk'} ||= Net::ACME::Utils::get_jwk_data( $self->{'_key'} );
 
     my $resp = $self->_post_url(
         $uri,

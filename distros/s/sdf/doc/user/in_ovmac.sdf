@@ -1,0 +1,58 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Macros
+
+H2: Introduction
+
+A {{macro}} is a command which can be embedded within [[SDF]].
+Macros begin with an exclamation mark (!) as the first non-whitespace
+character on a line. Some examples are:
+
+E:  !use "delphi"
+E:  !define DOC_AUTHOR "Joe Bloggs"
+E:  !build_title
+
+
+H2: Commonly used macros
+
+Some commonly used macros are given below.
+
+!block table
+Macro                                   Description
+init {{variables}}                      initialise variables
+define {{variable}} [{{expression}}]    set a variable's value
+build_title                             build a title page
+block {{filter}}                        begin a block of text
+endblock                                end a block of text
+include {{file}}[; {{filter}}]          include another file
+import {{file}}[; {{parameters}}]       import a figure
+!endblock
+
+A complete list of the supported macros and their parameters
+is given in the {{DOC: SDF Reference}} manual.
+
+H2: Creating new macros
+
+The easiest way to create a new macro is to use the
+{{MAC:macro}} and {{MAC:endmacro}} macros. For example:
+
+!block example; pure
+!macro MY_MACRO
+This text will appear whenever the author calls !MY_MACRO.
+!endmacro
+!endblock
+
+Macros can also be implemented by a Perl subroutine which
+generates the SDF text to be inserted when the macro is called.
+See the {{DOC:SDF Guru Guide}} for further details.

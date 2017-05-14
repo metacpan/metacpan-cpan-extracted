@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Test::More tests => 64;
+use Test::More tests => 65;
 
 BEGIN { use_ok 'File::Basename' }
 
@@ -14,6 +14,12 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 
 ### Testing Unix
 {
+    {
+        eval { fileparse(undef); 1 };
+        like($@, qr/need a valid path/,
+            "detect undef first argument to fileparse()");
+    }
+
     ok length fileparse_set_fstype('unix'), 'set fstype to unix';
     is( fileparse_set_fstype(), 'Unix',     'get fstype' );
 
@@ -154,7 +160,9 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 
 
 ### Test tainting
-{
+SKIP: {
+    skip "A perl without taint support", 2
+        if not ${^TAINT};
     #   The empty tainted value, for tainting strings
     my $TAINT = substr($^X, 0, 0);
 

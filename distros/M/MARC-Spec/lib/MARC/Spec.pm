@@ -5,7 +5,7 @@ use Moo;
 use MARC::Spec::Parser;
 use namespace::clean;
 
-our $VERSION = '0.1.4';
+our $VERSION = '1.0.0';
 
 has field => (
     is => 'rw',
@@ -55,7 +55,7 @@ sub add_subfields {
 }
 
 sub parse {
-    my ($self, $spec) = @_;
+    my ($spec) = @_;
     my $parser = MARC::Spec::Parser->new($spec);
     return $parser->marcspec;
 }
@@ -84,7 +84,7 @@ L<MARC::Spec|MARC::Spec> - A MARCspec parser and builder
     use MARC::Spec;
     
     # Parsing MARCspec from a string
-    my $ms = MARC::Spec->parse('246[0-1]_16{007/0=\h}$f{245$h~\[microform\]|245$h~\microfilm}');
+    my $ms = MARC::Spec::parse('246[0-1]_16{007/0=\h}$f{245$h~\[microform\]|245$h~\microfilm}');
 
     # Structure
     say ref $ms;                                             # MARC::Spec
@@ -137,15 +137,17 @@ L<MARC::Spec|MARC::Spec> - A MARCspec parser and builder
 
 L<MARC::Spec|MARC::Spec> is a L<MARCspec - A common MARC record path language|http://marcspec.github.io/MARCspec/> parser and validator.
 
+=head1 FUNCTIONS
+
+=head2 parse(Str)
+
+Parses a MARCspec as string and returns an instance of MARC::Spec.
+
 =head1 METHODS
 
 =head2 new(MARC::Spec::Field)
 
 Create a new MARC::Spec instance. Parameter must be an instance of L<MARC::Spec::Field|MARC::Spec::Field>.
-
-=head2 parse(Str)
-
-Parses a MARCspec as string and returns an instance of MARC::Spec.
 
 =head2 add_subfield(MARC::Spec::Subfield)
 

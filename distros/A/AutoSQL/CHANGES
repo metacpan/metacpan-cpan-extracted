@@ -1,0 +1,24 @@
+
+16 Dec 2003
+
+Schema-based Perl project system.
+
+Read Chapters 10..12, the Programming Perl 3rd Edition.
+
+19 Dec 2003
+Ideas of ObjectFactor and Object
+
+24 Dec 2003
+Since people wants to inherit the AutoSQL generated module, 
+
+The ObjectFactory and Object would not work, since the typeglob pollution under
+Object::
+
+Idea of virtual package, which exists in symbol table, but not in source code.
+
+
+
+29 Dec 2003
+Ideas of separation between ObjectFactory and ModuleFactory.
+
+

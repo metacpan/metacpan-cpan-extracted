@@ -6,23 +6,14 @@
 
 \if EMIT_LICENCE
 
-    ========== licence begin  GPL
-    Copyright (c) 2001-2005 SAP AG
+    ========== licence begin  SAP
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+    (c) Copyright 2001-2006 SAP AG
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    All rights reserved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     ========== licence end
+
 
 
 
@@ -71,6 +62,7 @@ struct imp_dbh_st {
   SQLDBC_Connection        *m_connection;  /*!< MaxDB connect handle */
   SQLDBC_DatabaseMetaData  *m_dbmd;        
   SQLDBC_Statement         *m_stmt;        /*!< MaxDB statement handle use by executeUpdate*/
+  SQLDBC_Bool               m_readlongcompletly; /*!< Flag that signal if blob/clob columns should be read completely*/
 };
 
 /*
@@ -90,7 +82,8 @@ typedef struct dbd_maxdb_bind_param {
 typedef struct dbd_maxdb_bind_column {
     char* buf;                  /*!< offset pointer to internal buffer */
     SQLDBC_Length   bufLen;     /*!< maximum length of buffer within the result */
-    SQLDBC_HostType hostType;   /*!< column datatyp */
+    SQLDBC_HostType hostType;   /*!< host variable data type */
+    SQLDBC_SQLType  columnType; /*!< database column data type */
     SQLDBC_Length   indicator;  /*!< coulumn indicator */
     SQLDBC_Bool     chopBlanks; /*!< flag that indicates whether the column is relevant for cutoff blanks*/
 } dbd_maxdb_bind_column;
@@ -146,12 +139,17 @@ struct imp_sth_st {
 #define dbd_st_blob_read    dbd_maxdb_st_blob_read
 #define dbd_st_STORE_attrib dbd_maxdb_st_STORE_attrib
 #define dbd_st_FETCH_attrib dbd_maxdb_st_FETCH_attrib
+#define dbd_discon_all		  dbd_maxdb_discon_all
 /*
 #define dbd_st_rows
 #define dbd_st_finish3
 #define dbd_st_execute_for_fetch
 */
 #define DBD_MAXDB_ERROR_RETVAL -42
+
+#define ENCODING_UTF8 1
+#define ENCODING_ASCII_8BIT 0
+#define ENCODING  "ENCODING"
 
 /*prototypes to avoid warnings*/
 int dbd_maxdb_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *url, char *user, char* password, SV *attr);
@@ -177,7 +175,9 @@ SV* dbd_maxdb_st_FETCH_attrib(SV* sth, imp_sth_t* imp_sth, SV* keysv);
 int dbd_maxdb_st_STORE_attrib(SV* sth, imp_sth_t* imp_sth, SV* keysv, SV* valuesv);
 
 int dbd_maxdb_db_executeInternal( SV *dbh, SV *sth, char *statement );
-int dbd_maxdb_db_executeUpdate( SV *dbh, char *statement );
+int dbd_maxdb_db_executeUpdate( SV *dbh, SV *statement );
 SV* dbd_maxdb_st_cancel( SV *sth);
 SV* dbd_maxdb_db_getSQLMode(SV* dbh);
+SV* dbd_maxdb_db_getVersion(SV* dbh);
+
 /* end */

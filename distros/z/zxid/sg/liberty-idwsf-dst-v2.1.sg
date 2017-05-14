@@ -1,0 +1,153 @@
+# zxid/sg/liberty-idwsf-dst-v2.1.sg
+# Slightly edited, 1.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-dst-v2.1.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(dst, urn:liberty:dst:2006-08)
+import(lu, urn:liberty:util:2006-08, liberty-idwsf-utility-v2.0.xsd)
+import(xml, http://www.w3.org/XML/1998/namespace, http://www.w3.org/2001/xml.xsd)
+
+@id	 -> %lu:IDType
+@modificationTime	 -> %xs:dateTime
+&@commonAttributes: 
+  @dst:id?
+  @dst:modificationTime?
+  ;
+@ACC	 -> %xs:anyURI
+@ACCTime	 -> %xs:dateTime
+@modifier	 -> %xs:string
+
+&@leafAttributes: 
+  &@dst:commonAttributes
+  @dst:ACC?
+  @dst:ACCTime?
+  @dst:modifier?
+  ;
+
+@script	 -> %xs:anyURI
+
+&@localizedLeafAttributes: 
+  &@dst:leafAttributes
+  @xml:lang
+  @dst:script?
+  ;
+
+@refreshOnOrAfter	 -> %xs:dateTime
+@destroyOnOrAfter	 -> %xs:dateTime
+
+%DSTLocalizedString:	 base(xs:string)
+  &@dst:localizedLeafAttributes
+  ;
+
+%DSTString:	 base(xs:string)
+  &@dst:leafAttributes
+  ;
+
+%DSTInteger:	 base(xs:integer)
+  &@dst:leafAttributes
+  ;
+
+%DSTURI:	 base(xs:anyURI)
+  &@dst:leafAttributes
+  ;
+
+%DSTDate:	 base(xs:date)
+  &@dst:leafAttributes
+  ;
+
+%DSTMonthDay:	 base(xs:gMonthDay)
+  &@dst:leafAttributes
+  ;
+
+@itemID    -> %lu:IDType
+@itemIDRef -> %lu:IDReferenceType
+
+%RequestType:
+  lu:Extension*
+  @dst:itemID?
+  @any
+  ;
+
+%ResponseType:
+  lu:Status
+  lu:Extension*
+  @dst:itemIDRef?
+  @any
+  ;
+
+%DataResponseBaseType:	 base(dst:ResponseType)
+  @timeStamp?	 -> %xs:dateTime
+  ;
+
+ChangeFormat:	 enum( ChangedElements CurrentElements ) ;
+@changeFormat:	 enum( ChangedElements CurrentElements All ) ;
+@objectType	 -> %xs:NCName
+@predefined	 -> %xs:string
+
+&@selectQualif: 
+  @dst:objectType?
+  @dst:predefined?
+  ;
+
+%ResultQueryBaseType:
+  dst:ChangeFormat{0,2}
+  &@dst:selectQualif
+  @dst:itemIDRef?
+  @contingency?	 -> %xs:boolean
+  @includeCommonAttributes?	 -> %xs:boolean  default (0)
+  @changedSince?	 -> %xs:dateTime
+  @dst:itemID?
+  ;
+
+&@ItemDataAttributeGroup: 
+  @dst:itemIDRef?
+  @notSorted?:	 enum( Now Never ) ;
+  @dst:changeFormat?
+  ;
+
+%TestItemBaseType:
+  &@dst:selectQualif
+  @id? -> %xs:ID
+  @dst:itemID?
+  ;
+
+TestResult        -> %dst:TestResultType
+%TestResultType:  base(xs:boolean)
+  @dst:itemIDRef
+  ;
+
+&@PaginationAttributeGroup: 
+  @count?	 -> %xs:nonNegativeInteger
+  @offset?	 -> %xs:nonNegativeInteger  default (0)
+  @setID?	 -> %lu:IDType
+  @setReq?:	 enum( Static DeleteSet ) ;
+  ;
+
+&@PaginationResponseAttributeGroup: 
+  @remaining?	 -> %xs:integer
+  @nextOffset?	 -> %xs:nonNegativeInteger  default (0)
+  @setID?	 -> %lu:IDType
+  ;
+
+&@CreateItemAttributeGroup: 
+  @dst:objectType?
+  @id?	 -> %xs:ID
+  @dst:itemID?
+  ;
+
+&@ModifyItemAttributeGroup: 
+  &@dst:selectQualif
+  @notChangedSince?	 -> %xs:dateTime
+  @overrideAllowed?	 -> %xs:boolean  default (0)
+  @id?	 -> %xs:ID
+  @dst:itemID?
+  ;
+
+%DeleteItemBaseType:
+  &@dst:selectQualif
+  @notChangedSince?	 -> %xs:dateTime
+  @id?	 -> %xs:ID
+  @dst:itemID?
+  ;
+%DeleteResponseType:	 base(dst:ResponseType) ;
+
+#EOF

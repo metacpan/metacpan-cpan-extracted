@@ -1,0 +1,8 @@
+Notes on upgrading from previous versions of DnsZone.
+
+0.1 => 0.2
+
+    What mostly changed in this release is the sql due to addition of
+    2 new record types (AAAA and PTR).
+    An upgrade script is only supplied for MySQL, it is located in:
+    sql/upgrade/mysql-0.1-0.2.sql

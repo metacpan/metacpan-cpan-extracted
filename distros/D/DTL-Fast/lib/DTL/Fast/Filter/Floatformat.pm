@@ -1,15 +1,17 @@
 package DTL::Fast::Filter::Floatformat;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Filter';
 
-$DTL::Fast::FILTER_HANDLERS{'floatformat'} = __PACKAGE__;
+$DTL::Fast::FILTER_HANDLERS{floatformat} = __PACKAGE__;
 
 #@Override
 sub parse_parameters
 {
     my $self = shift;
-    $self->{'digits'} = $self->{'parameter'}->[0]
-        if scalar @{$self->{'parameter'}};
+    $self->{digits} = $self->{parameter}->[0]
+        if (scalar @{$self->{parameter}});
     return $self;
 }
 
@@ -21,16 +23,16 @@ sub filter
     my $value = shift;
     my $context = shift;
 
-    my $digits = defined $self->{'digits'} ? $self->{'digits'}->render($context) : undef;
-    
-    if( 
-        defined $digits 
-        and $digits =~ /^\d+$/
+    my $digits = defined $self->{digits} ? $self->{digits}->render($context) : undef;
+
+    if (
+        defined $digits
+            and $digits =~ /^\d+$/
     )
     {
         $value = sprintf "%.0${digits}f", $value;
     }
-    
+
     return $value;
 }
 

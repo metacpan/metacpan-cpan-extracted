@@ -1,0 +1,41 @@
+---
+abstract: 'because we are too hip to use LWP::UserAgent'
+author:
+  - 'Sergey Romanov <sromanov@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-CPAN-Uploader-tinyua
+no_index:
+  directory:
+    - lib/CPAN
+    - bin
+requires:
+  Alt::Assert: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  Getopt::Long::Descriptive: '0.084'
+  HTTP::Tiny::Multipart: '0'
+  HTTP::Tiny::UA: '0'
+  IO::Socket::SSL: '1.56'
+  Net::SSLeay: '1.49'
+  Term::ReadKey: '0'
+  URI: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sergeyromanov/p5-alt-cpan-uploader-tinyua/issues
+  homepage: https://github.com/sergeyromanov/p5-alt-cpan-uploader-tinyua
+  repository: https://github.com/sergeyromanov/p5-alt-cpan-uploader-tinyua.git
+version: '0.000001'

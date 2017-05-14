@@ -96,6 +96,7 @@ lib/Catmandu/Fix/capitalize.pm
 lib/Catmandu/Fix/clone.pm
 lib/Catmandu/Fix/code.pm
 lib/Catmandu/Fix/collapse.pm
+lib/Catmandu/Fix/compact.pm
 lib/Catmandu/Fix/copy_field.pm
 lib/Catmandu/Fix/count.pm
 lib/Catmandu/Fix/downcase.pm
@@ -258,6 +259,7 @@ t/Catmandu-Fix-capitalize.t
 t/Catmandu-Fix-clone.t
 t/Catmandu-Fix-code.t
 t/Catmandu-Fix-collapse.t
+t/Catmandu-Fix-compact.t
 t/Catmandu-Fix-copy_field.t
 t/Catmandu-Fix-count.t
 t/Catmandu-Fix-downcase.t

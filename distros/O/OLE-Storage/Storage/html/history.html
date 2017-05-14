@@ -1,0 +1,133 @@
+<html><head><title>LAOLA file system, history</title>
+<body bgcolor="#ffffff" link="#0000ff" alink="#ff0000" vlink="#0000bf">
+<!--$Id: history.html,v 1.1.1.1 1998/02/25 21:13:00 schwartz Exp $-->
+<hr><p>
+
+<H1 align=left><font color="#7f007f">LAOLA file system</font></H1>
+
+<H2>History</H2>
+
+Development of the Laola project.<p>
+
+<dl>
+<dt>Sep/19/97, meantime release, <em>Laola files only</em>
+   <ul>
+   <li>Alles neu macht der Herbst.
+   <li>New: Laola now is a perl 5 project. laola.pl is split into
+       several modules into a Laola:: hierarchie.
+   </ul>
+<dt>Jun/30/97, fifth release, <em>last release in perl 4!</em>
+   <ul>
+   <li>Generally: Laola project is now maintained with means of rcs. Do not 
+       wonder about the strange tags everywhere in the files beginnings...
+   <li>Generally: Laola distribution now is traded as a whole (as zip file). 
+       Further more I included, sigh, an installation program.
+   <li>laola.pl:
+      <ul>
+      <li>Added: laola_open_document now supports a buffer. This can
+          be used very kindly to support streams. This was funny a bit,
+          because it is the first useful thing to do with all this "cache"
+          code I've written. Idea by Tomi Ollila. Thanks!
+      <li>Fixed: trash handling: small blocks trash had not been reported.
+      <li>Fixed: properties: it could happen, that values from another
+          document were returned.
+      </ul>
+   <li>Demonstration programs:
+      <ul>
+      <li><font color=#cf0000>lclean!</font> laola.pl did not report small 
+          block trash correctly. Therefore the "hidden" file structure is 
+          no more compatible to that of release four!
+      <li>lhalw: now understands fastsave format for Word 6 and 7. Changed 
+          the file name endings of the created files from "asc" to "txt". 
+          This because ASCII defines only 7 bit of a character, but lhalw
+          of course uses 8 bit ISO 8859-1. Cleaned up a little bit. Width of 
+          output can now be regulated (thanks again to Tomi!).
+      </ul>
+   <li>Applications: new.<br>
+      <ul>
+      <li>Elser: new. A program to handle Word documents. Features password 
+          resolving, macro decoding and deletion, a little bit virus detection,
+          a first approximation of a word 6/7 binary document structure map, 
+          some first information about Johann Georg Elser.<p>
+      </ul>
+   </ul>
+
+<dt>Mar/23/97, fourth release, <em>still experimentary</em>
+   <ul>
+   <li>laola.pl:
+      <ul>
+      <li>New IO engine, several times faster.
+      <li>Property storages are now loaded dynamically when the document
+          contains huge numbers of embedded objects. 
+      <li>Improved property support. Now dictionaries, arrays and user 
+          customized properties can be handled. Some more variable types 
+          are now supported, some old are corrected. Thanx to Loris Caren 
+          for hint and support.
+      </ul>
+   <li>Demonstration programs:
+      <ul>
+      <li>All: Fixed some problems with pathes. Thanx to David Seidman.
+      <li>ldat: Added code for array handling for -d "debug" mode.
+      <li>lhalw: Now gives a little info, when trouble while converting.
+      </ul>
+   </ul>
+<p>
+
+<dt>Mar/09/97, third release
+   <ul>
+   <li>This history file
+   <li>"How to obtain perl" info
+   <li>laola.pl:
+      <ul>
+      <li>Quick Reference
+      <li>Improved reading functionality, especially offset handling.
+      <li>First writing function, enables to modify file entries.
+      <li>Read and write access to trash sections
+      </ul>
+   <li>Demonstration programs:
+      <ul>
+      <li>Programs guess if unix or dos system, so manual changes 
+          should be no longer necessary.
+      <li>A "-o &lt;file&gt;" option is now available for every program.
+          Standard output will be redirected then to &lt;file&gt;.
+      <li>Now a public available document is chosen for sample outputs.
+          Thanx to Dave Quecke for idea.
+      <li>lclean: New, cleans trash in documents.
+      <li>ldat: Added some Excel support.
+      </dl>
+   </ul>
+<p>
+
+<dt>Jan/02/97, second release
+   <ul>
+   <li>laola.pl:
+      <ul>
+      <li>Basic support of property sets. This made ldat understandable.
+      </ul>
+   <li>Demonstration programs:
+      <ul>
+      <li>Sample output for ldat and lls
+      </ul>
+   </ul>
+<p>
+
+<dt>Nov/30/96, first release
+   <ul>
+   <li>Hacking guide, explaining the basic structure of OLE binary documents
+   <li>Perl package ("library") laola.pl, featuring mainly:
+      <ul>
+      <li>reading directory structure
+      <li>reading files
+      </ul>
+   <li>Demonstration programs:
+      <ul>
+      <li>lls: New, lists internal file structure of OLE documents.
+      <li>ldat: New, lists SummaryInformation properties.
+      <li>lhalw: New, reads the text chunk out of Word 6 style documents.
+      </ul>
+   </ul>
+</dl>
+
+Back to <a href=index.html>Laola</a> Homepage.<p>
+
+<p><hr></body></html>

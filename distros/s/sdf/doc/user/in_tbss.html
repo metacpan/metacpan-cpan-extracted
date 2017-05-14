@@ -1,0 +1,226 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Spreadsheet calculations</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tboth.html">Previous Topic</A> | <A HREF="in_sdadv.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.8. Spreadsheet calculations</H1>
+<HR>
+<H2><A NAME="Overview">5.8.1. Overview</A></H2>
+<P>Spreadsheet style calculations have been introduced into SDF using the standard <EM>[[ ]]</EM> syntax with a prefix of <EM>+</EM> (or <EM>=</EM>) indicating that the expression is to be evaluated by the calculation routines.</P>
+<P>This extension has been loosely modelled on <A HREF="http://www.microsoft.com">Microsoft</A> <EM>Excel</EM>&#174;  in terms of the initial functions supported and the syntax used.</P>
+<P>The spreadsheet expression evaluator and the documentation below was written by Tim Hudson (<A HREF="mailto:tjh@cryptsoft.com">tjh@cryptsoft.com</A>).</P>
+<HR>
+<H2><A NAME="Cells and Cellids">5.8.2. Cells and Cellids</A></H2>
+<P>Each <EM>cell</EM> in a table has an <EM>cellid</EM> which is made up of a single uppercase letter indicating the column index and a number indicating the row index (counting from 1 and excluding the heading rows). The upper left <EM>cell</EM> is hence <EM>A1</EM>.</P>
+<P>An example grid indicating <EM>cellid</EM>s:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Title1</STRONG>
+</TD>
+<TD>
+<STRONG>Title2</STRONG>
+</TD>
+<TD>
+<STRONG>Title3</STRONG>
+</TD>
+<TD>
+<STRONG>Title4</STRONG>
+</TD>
+<TD>
+<STRONG>Title5</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A1
+</TD>
+<TD>
+B1
+</TD>
+<TD>
+C1
+</TD>
+<TD>
+D1
+</TD>
+<TD>
+E1
+</TD>
+</TR>
+<TR>
+<TD>
+A2
+</TD>
+<TD>
+B2
+</TD>
+<TD>
+C2
+</TD>
+<TD>
+D2
+</TD>
+<TD>
+E2
+</TD>
+</TR>
+<TR>
+<TD>
+A3
+</TD>
+<TD>
+B3
+</TD>
+<TD>
+C3
+</TD>
+<TD>
+D3
+</TD>
+<TD>
+E3
+</TD>
+</TR>
+<TR>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+<TD>
+...
+</TD>
+</TR>
+<TR>
+<TD>
+A100
+</TD>
+<TD>
+B100
+</TD>
+<TD>
+C100
+</TD>
+<TD>
+D100
+</TD>
+<TD>
+E100
+</TD>
+</TR>
+</TABLE>
+
+<P>A range of <EM>cellid</EM>s is specified using the syntax <EM>cellid1:cellid2</EM>. For example: <EM>A1:C1</EM> is exactly the same as <EM>A1,B1,C1</EM></P>
+<HR>
+<H2><A NAME="Spreadsheet Expressions">5.8.3. Spreadsheet Expressions</A></H2>
+<P>An expression consists of a combination of standard Perl operators and spreadsheet functions and <EM>cellid</EM>s or <EM>cellid</EM> ranges.</P>
+<P>Standard Perl operators include:</P>
+<UL>
+<LI>+ - * /</UL>
+<HR>
+<H2><A NAME="Spreadsheet Functions">5.8.4. Spreadsheet Functions</A></H2>
+<P>Spreadsheet functions use the syntax <EM>FUNCTION(ARG1,ARG2,...ARGN)</EM>.</P>
+<P>The following functions are supported:</P>
+<UL>
+<LI><EM>AVERAGE</EM> - the average - SUM(ARGS)/COUNT(ARGS)
+<LI><EM>SUM</EM> - the sum of the args - same as ARG1+ARG2+...+ARGN
+<LI><EM>MIN</EM> - the minumum argument value
+<LI><EM>MAX</EM> - the maximum argument value
+<LI><EM>COUNT</EM> - the number of arguments
+<LI><EM>PRODUCT</EM> - the product of the args - same as ARG1*ARGN*...*ARGN
+<LI><EM>ROWSUM</EM> - the <EM>SUM</EM> of all the cells in the row to the left of the current cell
+<LI><EM>ROWPROD</EM> - the <EM>PRODUCT</EM> of all the cells in the row to the left of the current cell
+<LI><EM>COLSUM</EM> - the <EM>SUM</EM> of all the cells in the column above the current cell
+<LI><EM>COLPROD</EM> - the <EM>PRODUCT</EM> of all the cells in the column above the current cell</UL>
+<HR>
+<H2><A NAME="An Example">5.8.5. An Example</A></H2>
+<P>A simple example is shown below:</P>
+<PRE>
+!block table; style=&quot;grid&quot;
+Count         Price        Total
+10            5            [[=A1*B1]]
+15            5.23         [[=ROWPROD]]
+[[=COLSUM]]   [[=B1+B2]]   [[=COLSUM]]
+!endblock
+</PRE>
+<P>This generates the result below. (Ok, summing two prices is meaningless, but it illustrates the syntax.)</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Count</STRONG>
+</TD>
+<TD>
+<STRONG>Price</STRONG>
+</TD>
+<TD>
+<STRONG>Total</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+10
+</TD>
+<TD>
+5
+</TD>
+<TD>
+50.00
+</TD>
+</TR>
+<TR>
+<TD>
+15
+</TD>
+<TD>
+5.23
+</TD>
+<TD>
+78.45
+</TD>
+</TR>
+<TR>
+<TD>
+25.00
+</TD>
+<TD>
+10.23
+</TD>
+<TD>
+128.45
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Accessing Spreadsheet Values in Paragraph Text">5.8.6. Accessing Spreadsheet Values in Paragraph Text</A></H2>
+<P>Values are available until the next table is processed so you can refer to data inside <EM>normal</EM> paragraphs after the table like this [[=A1]] (which evaluates to 10.00).</P>
+<HR>
+<H2><A NAME="Recursive Expression Evaluation">5.8.7. Recursive Expression Evaluation</A></H2>
+<P>A spreadsheet expression will recursively evaluate any expressions contained in <EM>cells</EM> that are used in an expression. In the example above, the expression in <EM>cell</EM> <EM>C3</EM> depends on the results of the expression in <EM>cell</EM> <EM>C1</EM> and <EM>C2</EM>.</P>
+<HR>
+<H2><A NAME="Disabling Calculations">5.8.8. Disabling Calculations</A></H2>
+<P>Calculation support for a table can be disabled by adding in an attribute of <EM>nocalcs</EM>. (Without this, the pointers required to table data that are needed when doing spreadsheet calculations occur for each table cell.)</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tboth.html">Previous Topic</A> | <A HREF="in_sdadv.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

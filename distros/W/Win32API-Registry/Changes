@@ -1,5 +1,14 @@
 Revision history for Perl extension Win32API::Registry.
 
+0.33:  2015-04-04
+       - Fixed RT#37750 - RegQueryValueEx can cause perl to crash (DDICK@cpan.org)
+       - Fixed test 21 for Windows with locale other than English or Russian
+
+0.32_01: 2015-02-16
+       - Fix RT#77440
+       - Fixed test 21 for Russian Windows
+       - tests moved to t/
+
 0.32:  2010-04-29
        - Undo changes to move to Module::Build until I have more time to 
          work out how I broke things.

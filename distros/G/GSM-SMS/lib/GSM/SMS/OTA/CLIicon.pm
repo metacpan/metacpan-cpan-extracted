@@ -10,7 +10,7 @@ require  Exporter;
 		OTACLIicon_fromfile
 		); 
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 use constant OTACLIicon_PORT => 5507;
 

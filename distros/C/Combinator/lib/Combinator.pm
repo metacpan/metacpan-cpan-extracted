@@ -10,12 +10,11 @@ Combinator - Intuitively write async program serially, parallel, or circularly
 
 =head1 VERSION
 
-Version 0.4.2
+Version 0.4.3
 
 =cut
 
-use version;
-our $VERSION = qv 'v0.4.2';
+our $VERSION = '0.004003';
 
 =head1 SYNOPSIS
 
@@ -657,6 +656,11 @@ sub com { # depth, code, head
     my @ser;
     $code .= "\n" if( substr($code, -1) eq "\n" );
     push @ser, $1 while( $code =~ m/(?:^|$ser_pat)($token_pat*?)(?=$ser_pat|$)/gs );
+
+    if( @ser == 1 && $head !~ $cir_par_pat && $head !~ $cir_begin_pat && $head !~ $nex_begin_pat ) {
+        replace_code($depth, @ser);
+        return "{$ser[0]}";
+    }
 
     my $delayed = $head =~ $nex_begin_pat;
 

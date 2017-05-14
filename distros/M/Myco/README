@@ -4,7 +4,7 @@
 
 README
 
-$Id: README,v 1.1.1.1 2004/11/22 19:16:00 owensc Exp $
+$Id: README,v 1.3 2006/02/28 17:34:27 sommerb Exp $
 
 
 * Welcome to myco and The myco Project!
@@ -30,72 +30,53 @@ The myco framework supports:
           o role-based access control
           o logging
     * Unit testing
-    * Metadata driven user interfaces
-      (a Model-View-Controller implementation, usable in both HTML::Mason
-       and cgi script contexts)
-    * And more... ("but wait...that's not all")
-
 
 * Status
 
 The myco framework has been in production use within Eastern Nazarene College
-for about two years.  Publishing to CPAN has always been our intention... but
-life intervenes.
+for over three years.
 
-This initial release is extremely rough.   This is the "get it out the door
-AS-IS" release.  I hope to release something a bit more polished before
-too long, and then put the CVS repository up on Sourceforge.
-
-The core of the system works and works well, but is not anywhere near the
-place where it can really live up to its core goal:  drop it in and get
-coding effectively.  The framework up until now has been very much enmeshed
-with the applications for which it was originally developed to support (a CRM, and more recently, "identiprov").  This release represents the first major
-attempt to have myco stand on its own, and thus potentially be of value to
-a broader audience.
-
-Next steps / goals:
-   * Docs -- beginners tutorial
-   * Improved installer
-   * Test infrastructure reworked to use Test::More and friends
-   * Lots more ideas... look for TODO doc in next release
-
+The core of the system works and works well, and with release 1.0 solidly
+behind us, the great task of back-porting all the legacy pieces of the "old"
+myco has begun. You see, the framework up until now has been very much enmeshed
+with the applications for which it was originally developed to support
+(a CRM, and more recently, "identiprov").  This release represents the first
+major attempt to have myco stand on its own, and thus potentially be of value
+to a broader audience.
 
 * Getting Started
 
-We're more than a bit lean on documentation at present.
-Newer classes now have POD documentation firmly embedded.  To access:
+Our documentation for 1.0 has much improved, including a beginning Developer's
+guide. Recommended initial reading:
 
-	cd lib
-	perldoc CLASS
-
-Recommended initial reading:
-
-  Installation and administration (largely accurate)
+  Installation and administration
    * Myco::Admin
+  Get started coding a simple 'guitar' application
+   * Myco::Devel
 
   Key framework base classes
-   * Myco::Base::Entity
+   * Myco::Entity
    * Myco::Test::EntityTest
 
   Clean example of Entity class:
-   * Myco::Base::Entity::SampleEntityAddress
+   * Myco::Entity::SampleEntityAddress
 
-
+  And, for the ambitious, the black art of the Myco/Tangram query:
+   * Myco::QueryTemplate
 
 Key 3rd-party components
    * Perl - http://www.perl.com
    * Tangram - http://soundobjectlogic.com
    * Class::Tangram
-   * HTML::Mason - http://www.masonhq.com
-   * mod_perl (1.x thus far) - http://perl.apache.org
+   * PostrgreSQL - http://www.postgresql.org
 
 
 * Requirements
 
 The myco framework should function under most any modern UNIX-like operating
 system where perl 5.6 or greater is available.  Data persistence and
-user interface functionality is limited to platforms that support the
-related 3rd-party components (Tangram, mod_perl, HTML::Mason).
+functionality is limited to platforms that support the related 3rd-party
+components (Tangram, Class::Tangram, PostrgreSQL).
 
 The myco framework has been used successfully on these platforms:
 
@@ -108,18 +89,17 @@ also within Cygwin (http://www.cygwin.com)
 
 * Support
 
-  myco homepage (hopefully appearing soon):
+  myco homepage:
 
-    http://www.myco.ws
+    http://www.mycohq.com
 
-  myco project page (very little here thus far):
+  email:
 
-    http://sourceforge.net/projects/myco/
+    info@mycohq.com
 
   A user mailing list exists at 
 
     http://lists.sourceforge.net/lists/listinfo/myco-users
-
 
 
 * Build a better myco
@@ -127,9 +107,6 @@ also within Cygwin (http://www.cygwin.com)
 Comments, suggestions, patches... all are welcome!
 
 
-
 Thanks for your interest and participation!
 
-Charles N. Owens,
-Senior Technology Officer
-Eastern Nazarene College
+  ~Ben Sommer & Charles N. Owens

@@ -1,0 +1,354 @@
+#!/usr/local/bin/perl
+
+# this program looks at the tapes and records files and figures out 
+# how long it has been since each system was dumped.
+
+	use JulianDay;
+	use CTime;
+	use ParseDate;
+	use Carp;
+
+# copy these settings from the frogbak file
+$recorddir = "/usr/local/dump";
+$dhistdays = 75;		# number of days of dump history to display
+
+chdir($recorddir) || die "chdir $recorddir: $!";
+
+opendir(TAPES,"tapes") || die "opendir tapes: $!";
+
+&initTimeSubs();
+
+$not_all_known = 0;
+while ($t = readdir(TAPES)) {
+	next if ($t eq ".");
+	next if ($t eq "..");
+	$tape{$t} = 1;
+
+	$tapename = "";
+	$timing_found = 0;
+	$control_found = 0;
+	open(TF,"tapes/$t") || die "open $tapes/$t: $!";
+	while(<TF>) {
+		if (/^DUMP: (\S+) \((\S+)\)/) {
+			$timing{$1} = &cmin($2);
+			$timing_found = 1;
+			$tapename = $1;
+			next;
+		}
+		if (/^control file: (\S+)/) {
+			if (-e $1) {
+				$cfiles{$1}++;
+			} else {
+				print STDERR "Warning: control file $1 does not exist\n";
+			}
+			if ($tapename) {
+				$cfile{$tapename} = $1;
+				$control_found = 1;
+			} else {
+				print STDERR "Warning: tape file tapes/$t does not list control file\n";
+			}
+			last;
+		}
+		last if (/^-------/);
+	}
+	close(TF);
+	print STDERR "Warning: no proper label in $t\n" unless $timing_found;
+	unless ($control_found) {
+		$cfile{ $tapename ? $tapename : $t } = 'unknown';
+		$not_all_known = 1;
+	}
+}
+
+for $cf (sort keys %cfiles) {
+	open(CF,$cf) || die "open $cf: $!";
+	while(<CF>) {
+		next if /^#/;
+		next if /^$/;
+		next if /^average/;
+		next if /^\s*(\w+)\s*=\s*(.*)$/;
+		($file, $host, @rest) = split;
+		print STDERR "Warning syntax error, $cf line $.\n" 
+			unless $#rest == 4;
+
+		$filesys = "//$host/$file";
+		$file{$filesys} = $file;
+		$host{$filesys} = $host;
+	}
+	close(CF);
+}
+
+for $fs (sort keys %file) {
+
+	%fulldone = ();
+	%anydone = ();
+	%incrdone = ();
+
+	$fullcount{$fs} = 0;
+	$lastfull{$fs} = "never";
+	$full = &getdumphistname($host{$fs},$file{$fs},'full');
+	if (-e $full) {
+		open(FULL,$full) || die "open $full: $!";
+		while(<FULL>) {
+			if (/^0 (\S+) (\S+)/) {
+				$when = &cmin($1);
+				$tape = $2;
+				$fullcount{$fs} += 1;
+				$fulldone{$when} = 1;
+				$anydone{$when} = 1;
+				next;
+			}
+			die "Corrupt record file: $full, line $.\n";
+		}
+		close(FULL);
+		$lastfull{$fs} = int(($nowi-$when)/(24*3600));
+	}
+
+	$incrcount{$fs} = 0;
+	$lastincr{$fs} = "never";
+	$incr = &getdumphistname($host{$fs},$file{$fs},'incr');
+	if (-e $incr) {
+		open(INCR,$incr) || die "open $incr: $!";
+		while(<INCR>) {
+			if (/^\S+ (\S+) (\S+)/) {
+				$when = &cmin($1);
+				$tape = $2;
+				$incrcount{$fs} += 1;
+				$anydone{$when} = 1;
+				$incrdone{$when} = 1;
+				next;
+			}
+			die "Corrupt record file: $incr, line $.\n";
+		}
+		$lastincr{$fs} = int(($nowi-$when)/(24*3600));
+	}
+
+	$prev = $nowi;
+	$fullgap = 0;
+	@ftime = sort {$b <=> $a} keys %fulldone;
+	for $ftime (@ftime) {
+		if ($prev - $ftime > $fullgap) {
+			$fullgap = $prev - $ftime;
+		}
+		$prev = $ftime;
+	}
+	if ($fullgap) {
+		$fullgap{$fs} = int($fullgap/(24*3600));
+	} else {
+		$fullgap{$fs} = "na";
+	}
+
+	$prev = $nowi;
+	$anygap = 0;
+	for $atime (sort {$b <=> $a} keys %anydone) {
+		if ($prev - $atime > $anygap) {
+			$anygap = $prev - $atime;
+		}
+		$prev = $atime;
+	}
+	if ($anygap) {
+		$anygap{$fs} = int($anygap/(24*3600));
+	} else {
+		$anygap{$fs} = "na";
+	}
+
+	@itime = sort {$b <=> $a} keys %incrdone;
+
+	for $day (1..($dhistdays + 20)) {
+		$end = $nowi - $day*24*3600;
+
+		$i = 0;
+		$f = 0;
+
+		while (@itime && $itime[0] > $end) {
+			$i++;
+			shift(@itime);
+		}
+		while (@ftime && $ftime[0] > $end) {
+			$f++;
+			shift(@ftime);
+		}
+
+		if ($i == 0 && $f == 0) {
+			$c = '.';
+		} elsif ($i == 1 && $f == 0) {
+			$c = 'i';
+		} elsif ($i > 1 && $f == 0) {
+			$c = 'I';
+		} elsif ($i == 0 && $f == 1) {
+			$c = 'f';
+		} elsif ($i == 0 && $f > 1) {
+			$c = 'F';
+		} elsif ($i == 1 && $f == 1) {
+			$c = '+';
+		} elsif ($i == 1 && $f > 1) {
+			$c = '@';
+		} elsif ($i > 1 && $f == 1) {
+			$c = '*';
+		} elsif ($i > 1 && $f > 1) {
+			$c = '#';
+		} else {
+			die "i & f ($i, $f) not in bounds";
+		}
+		#print $c;
+		$dhist{$fs} .= $c;
+	}
+#print "\n";
+	$dhist{$fs} =~ s/\.+$//;
+}
+
+$fmt = "%-25s %-9s %-9s %-6s %-6s %-8s %-7s\n";
+printf $fmt, "hostname:filesystem", "last full", "last incr", "#fulls", "#incrs", "full gap", "any gap";
+for $fs (sort keys %file) {
+	printf $fmt, $host{$fs}.":".$file{$fs}, $lastfull{$fs}, $lastincr{$fs}, $fullcount{$fs}, $incrcount{$fs}, $fullgap{$fs}, $anygap{$fs};
+	printf "  >".substr($dhist{$fs},0,$dhistdays)."\n";
+}
+
+exit(0);
+if (@ARGV) {
+	$fmt = "%-25s %-9s %-9s %-6s %-6s %-8s %-7s\n";
+	printf $fmt, "hostname:filesystem", "last full", "last incr", "#fulls", "#incrs", "full gap", "any gap";
+	for $fs (sort keys %file) {
+		printf $fmt, $host{$fs}.":".$file{$fs}, $lastfull{$fs}, $lastincr{$fs}, $fullcount{$fs}, $incrcount{$fs}, $fullgap{$fs}, $anygap{$fs};
+	}
+} else {
+	$fmt = "%-25s %s\n";
+	printf $fmt, "hostname:filesystem", "daily activity";
+	for $fs (sort keys %file) {
+		printf $fmt, $host{$fs}.":".$file{$fs}, substr($dhist{$fs},0,$dhistdays);
+	}
+}
+
+exit(0);
+
+# 
+# convert a hostname:filesys:type triplet into a history file name.
+# examples:
+#	cae780:/home:full		becomes "records/cae780/home.full"
+#	bullet://lemmy/u/mfg:incr	becomes "records/lemmy/u.mfg.incr"
+#	bullet://lemmy:full		becomes "records/lemmy/.full"
+#	
+sub getdumphistname {
+	local ($host, $file, $type) = @_;
+	if ($file =~ m,^//([^/]*)/?(.*),) {
+		$host = $1;
+		$file = $2;
+		if ($file eq "") {
+			$file = "/";
+		}
+	}
+	if ($file =~ m,^/(.*),) {
+		$file = $1;
+	}
+	$file =~ s,/,_,g;
+	if (! -d "records/$host") {
+		&print ("warning: making directory records/$host\n");
+		mkdir("records/$host",0777)
+			|| warn "could not mkdir records/$host: $!\n";
+	}
+#	&logfile("records/" . $host . "/" . $file . "." . $type);
+	return "records/" . $host . "/" . $file . "." . $type;
+}
+
+sub print {}
+
+#########################################################################
+# 
+#  	TIME MANIPULATION
+#
+#########################################################################
+
+#
+# convert a string which is known to be a date, into
+# seconds since 1970
+#  
+sub seconds
+{  
+        my ($s) = @_;
+        my $sec;
+	if ($s =~ m,^(\d\d)/(\d\d)/(\d\d)\.(\d\d)\:(\d\d)$,) {
+		my ($year,$mon1,$day,$hour,$min) = ($1, $2, $3, $4, $5);
+		$year += 100 if $year < 70;
+		$year += 1900 if $year < 1900;
+		my $jd = julian_day($year, $mon1, $day);
+		$sec = jd_seconds($jd, $hour, $min, 0);
+	} elsif ($s eq "" || $s eq "0" || ! defined $s) {
+		$sec = "epoch";
+	} else {
+		$sec = parse2seconds($s);
+	}
+        croak "could not convert $s to seconds" unless $sec;
+#print "seconds($s) = $sec, = ".ctime($sec);
+        return $sec;
+}     
+#  
+# convert a time (seconds since 1970) into wbak date format
+# YY/MM/DD.HH:MM
+#
+sub dint
+{
+	my ($ss70) = @_;
+    	my($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst, $TZname) = localtime($ss70);
+
+	my $wbf = sprintf("%02d/%02d/%02d.%02d:%02d",$year%100,$mon+1,$mday,$hour,$min);
+#print "dint($ss70) = $wbf\n";
+#print "normal ctime($ss70) = ".ctime($ss70);
+	return $wbf;
+}
+
+
+# convert YY/MM/DD.HH:MM format to ctime format...
+sub ctime_ {
+	my ($yymmddhhmm) = @_;
+	my $ct = &CTime::asctime_n(localtime(&seconds($yymmddhhmm)));
+#print "ctime_($yymmddhhmm) = $ct\n";
+	return $ct;
+}
+#
+# convert the current time to the YY/MM/DD.HH:MM format.
+#
+sub now {
+	my $now = &dint(time);
+#print "now = $now\n";
+	return $now;
+}
+
+#
+# convert the YY/MM/DD.HH:MM format into an integer.
+#
+sub cmin {
+	my ($yymmddhhmm) = @_;
+	my $ss70 = &seconds($yymmddhhmm);
+#print "cmin($yymmddhhmm) = $ss70\n";
+	return $ss70;
+}
+
+# 
+# convert a number+units string into minutes, eg: 3d.
+#
+sub nUnits
+{
+	local($freq) = @_;
+
+	if ($freq =~ m,^([0-9]*)h,) { return ($1 * 3600); }
+	if ($freq =~ m,^([0-9]*)d,) { return ($1 * 3600 * 24); }
+	if ($freq =~ m,^([0-9]*)w,) { return ($1 * 3600 * 24 * 7); }
+	if ($freq =~ m,^([0-9]*)m,) { return ($1 * 3600 * 24 * 30); }
+	if ($freq =~ m,^([0-9]*)y,) { return ($1 * 3600 * 24 * 30 * 12); }
+	return 0;
+}
+
+#
+#	initialize arrays for the above routines.  (historical)
+#
+
+sub initTimeSubs {
+#print "BEGIN TIMESUBS\n";
+	$now = &now;
+	$nowi = &cmin($now);
+	print DEBUG "now = $now\n";
+	local($t) = &dint($nowi);
+	print DEBUG "dint(now) = $t\n";
+	$nowc = &ctime_($now);
+	print DEBUG "nowc = $nowc\n";
+#print "END TIMESUBS\n";
+}

@@ -1,0 +1,36 @@
+<XMLtoDB>
+<!-- Example map file for use with DBIx::XML::DtataLoader -->
+<dbinfo dbuser="na" dbpass="na" dbsource="dbi:CSV:f_dir=./data1" name="test_data"/>
+<RootElement name="PeopleDoc"/>
+<DocKeyColumn name="UID"/>
+	
+	<Table name="People_info" dbname="test_data" xpath="./Person">
+		<KeyColumn name="Last_Name" order="2"/>
+		<KeyColumn name="UID" order="1"/>
+		<KeyColumn name="Mothers_Maiden" order="3"/>
+       		<Element xpath="./@uid" toColumn="UID"/>
+      		 <Element xpath="./@first" toColumn="First_Name">
+			<!-- below is a subroutine for changing our names into title case -->
+			<Handler name="sub{$_[0]=~s/.*/\u\L$&amp;/; return $_[0];}"/>
+		</Element>
+       		<Element xpath="./@last" toColumn="Last_Name">
+			<Handler name="sub{$_[0]=~s/.*/\u\L$&amp;/; return $_[0];}"/>
+		</Element>
+       		<Element xpath="./@mothers_maiden" toColumn="Mothers_Maiden"/>
+       		<Element xpath="./@age" toColumn="Age"/>	
+	</Table>
+	<Table name="Addresses" dbname="test_data" xpath="./Person/Addresses/Address">
+		<KeyColumn name="type" order="2"/>
+		<KeyColumn name="UID" order="1"/>
+		<KeyColumn name="Zip" order="3"/>
+		<KeyColumn name="City" order="4"/>
+       		<Element xpath="../../@uid" toColumn="UID"/>
+
+       		<Element xpath="./@type" toColumn="type"/>
+       		<Element xpath="./Street" toColumn="Street"/>
+       		<Element xpath="./City" toColumn="City"/>
+       		<Element xpath="./State" toColumn="State"/>
+       		<Element xpath="./Zip" toColumn="Zip"/>
+	</Table>
+</XMLtoDB>
+

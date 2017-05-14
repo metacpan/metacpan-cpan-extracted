@@ -1,0 +1,235 @@
+rezrov - an Infocom game interpreter
+
+DESCRIPTION
+
+ Rezrov is an implementation of a z-machine written in pure Perl.  In 
+ other words, it's a program that can play Infocom games, such as Zork.
+ Its chief distinguishing feature from other z-code interpreters is a wide 
+ array of cheat commands.  Full documentation, in POD format, can be 
+ found embedded in the file "rezrov".
+
+ For online documentation, screenshots, etc. visit:
+
+   http://edmonson.paunix.org/rezrov/
+
+ Rezrov's old home was http://www.voicenet.com/~mikeedmo/rezrov/.
+
+COPYRIGHT
+
+ Copyright (c) 1998-(1900+(localtime)[5]) 
+   Michael Edmonson <mnedmonson@gmail.com>.
+
+ All rights reserved.  This program is free software; you can
+ redistribute it and/or modify it under the same terms as Perl itself.
+
+REVISION HISTORY
+ 
+ 0.20  Sat Mar  6 14:05:56 EST 2010
+        - six years to the day since last update, maybe it's time...
+        - various new cheat commands:
+           - Enchanter series:
+              - "gmacho": emulate "gnusto" spell: copies ANY spell 
+                 to spellbook, even powerful ones where this is not
+                 normally allowed
+              - "verdelivre": attempt to copy ALL spells to spellbook
+           - "angiotensin": automatically manage blood pressure 
+                            in "Bureaucracy"
+           - "voluminus": expand capacity of a container
+             (Zork I only at the moment)
+        - bug fixes:
+           - fix inappropriate typo correction
+           - "omap" cheat fixed in Sorcerer (premature end to object
+              list parsing)
+           - ZIO_Tk: various fixes
+           - ZIO_Win32: screen buffer size fix
+        - new ZIO_Test.pm, simplest possible ZIO, good for testing 
+          and accepting commands from STDIN.  Maybe now CPAN testing 
+          will work more consistently...
+        - thanks to "Oliver Klozoff" (nee Stephen Oberholtzer) 
+          and Neil Bowers for bug reports and patches.
+
+ 0.19  Sat Mar  6 15:30:00 EST 2004
+        - Optional speech synthesis ("-speak") and recognition ("-listen").
+          This only works under win32 at the moment, using the optional
+          Win32::SAPI4 module.  For more details see the full rezrov
+          POD documentation.
+        - termcap interface improvements: all lines on screen should 
+          be available now if terminal has "cs" capability
+        - optional typo correction, a-la Evin Robertson's
+          Nitfol interpreter. Enabled by default; toggle with 
+          "#typo", or "-typo 0" on the command line.
+        - Term::ReadLine usage cleanups:
+            - Term::ReadLine::Perl seems to erase the line before prompting,
+              while Term::ReadLine::Gnu doesn't.  Since the prompt has 
+              been printed by the game before readline is invoked, if using
+              Gnu version, attempt to erase it so we don't wind up seeing
+              two prompts.
+            - centralize readline access between termcap/dumb interfaces
+        - test.pl: should always work, no really (even if not running 
+          on a tty; CPAN testers, I'm looking in your direction)
+        - improved "help" handling under win32
+        - manual_install.pl: "-u" switch to uninstall.
+
+ 0.18  Wed Feb  4 22:31:08 EST 2004
+        - cleanup/bugfix release
+        - various fixes to pass Amir Karger's "czech" test suite (ver. 0.8)
+        - 2 silly new cheats, which only work in Zork I for now:
+            - "vilify": make an object attackable
+            - "baste"/"nosh": make an object edible
+        - improved test routine (should work with automated testing systems now)
+        - manual_install.pl for Windows and other platforms without "make"
+        - auto-disabled (problematic) title guessing for Beyond Zork and sampler
+        - cleaned up a few annoying warning messages (termcap, tk, win32)
+        - fixed "lingo" cheat crash (ahem)
+        - slightly smarter "help" handling
+
+ 0.17  Sun Jun 13 16:18:49 EDT 1999
+        - new cheat commands:
+            - "lummox": remove restrictions on number and weight of
+               items that may be carried
+            - "systolic": lower blood pressure ("Bureaucracy" only)
+        - optimizations:
+            - many simple methods inlined via more regexp/eval munging
+              (see InlinedPrivateMethod.pm)
+            - tweak opcode/operand loading
+            - runs between 7-10% faster.
+        - interface fixes:
+            - Tk:
+                - arrow keys now work in Beyond Zork
+                - Bureaucracy scrolling pause now works correctly
+                - code is less hideous
+            - Curses: backspace more reliable
+            - Termcap: screen attributes reset correctly
+            - Win32::Console: buffer keypresses
+        - "-24h" flag, show time games in 24-hour time rather than AM/PM
+        - "teleport" to character locations in Suspect now works.
+        - various miscellaneous fixes
+
+ 0.16  Sun Mar  7 20:50:43 EST 1999
+        - more optimizations:
+           - ZFrame.pm gone, call stack now in StoryFile.pm
+           - a bit more "macro"-style inlining
+           - StoryFile.pm is now completely static; oh well,
+             it was never truly OO anyway.
+           - overall about 20-25% faster.  Don't know if I can
+             speed it up any more.  Suggestions very welcome!
+        - perl 5.005 is now required.
+        - tentative support for new v8 games; "anchorhead.z8" starts,
+          but looks like you'll need a gHz to play it  :/
+        - new cheat command: "spiel", decode *all* game text.
+          Can reveal easter eggs, debug messages, and all-around
+          interesting things you may have missed; see documentation
+        - partial support for character graphics in Tk and Curses
+          interfaces; Beyond Zork now works much much better.
+          [see screenshots at WWW site above]
+        - fix a few bugs with interactions between undo/restore and 
+          some cheat commands
+        - fix Quetzal compatibility bug
+
+ 0.15  Sun Jan 24 17:41:39 EST 1999
+        - Optimizations:
+           - some memory-access and variable casting functions
+             inlined using regexp/eval hack (blech).
+           - hand-inline opcode loading
+           - cache object properties
+           - overall seems to run between 15-25% faster.
+        - packages renamed from Rezrov:: to Games::Rezrov (for CPAN)
+        - new cheat commands:
+            "travis": attempts to fool the game into thinking the item 
+                      you specify is a weapon.  Zork I only for now;
+                      slay the troll with your mighty leaflet.
+              "tail": automatically follow a character in a game as they 
+                      move from room to room
+
+ 0.14  Sun Jan 10 20:35:53 EST 1999
+        - new cheat verb: "frotz" (only for some games).
+          Frotz, from the spell in "Enchanter", turns any item
+          into a light source, obviating the need for fuel/batteries.
+          See the documentation for full details.
+        - If you specify an item name for "teleport", it will take you
+          to the room containing the item
+        - now passes all "strictz.z5" object 0 torture tests
+        - the usual little tweaks and fixes
+
+ 0.13  Sun Jan  3 22:15:46 EST 1999
+        - fixed color support (Tk, Curses, Win32 console)
+        - cheat commands:
+             - new commands: "rooms" and "items"
+             - "teleport" shows description of new room
+             - "pilfer" attempts to move pilfered item into inventory
+             - "omap" object dump more reliable
+        - more etude.z5 z-machine torture tests passed
+        - more code reorganization/thrashing
+
+ 0.12  Tue Dec  1 21:16:26 EST 1998
+        - added Tk interface (works under both X and win32)
+        - i/o layer reorganized
+        - many little glitches fixed
+
+ 0.11  Sat Oct 24 20:27:08 EDT 1998
+        - about 10-15% faster:
+            - cache game objects
+            - streamline handling of decoded text
+            - convert to blessed arrays instead of hashes
+            - A few more critical globals :(
+        - slightly improved v5 compatibility
+        - emulation of the "#reco", "#unre" and "#comm"
+          command-transcript commands
+
+ 0.10  Sun Oct 18 20:07:19 EDT 1998
+        - first public release
+
+PREREQUISITES
+
+ Rezrov is written in pure Perl, no extension compilation is required.
+
+ Perl version 5.005 or later is required.
+
+ Optionally supported but not required:
+    Tk (version 800.*)
+    Curses
+    Term::Cap
+    Win32::Console
+    Term::ReadLine
+
+HOW TO BUILD AND INSTALL
+
+See the manual instructions below if you have trouble.
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+ After installation, run rezrov on a z-code file, such as the
+ provided minizork.z3: "rezrov minizork.z3".
+
+MANUAL INSTALLATION INSTRUCTIONS (Windows, etc.)
+
+ On some platforms (e.g., binary distributions of Perl under Windows),
+ the "generic" instructions above probably won't work.
+ 
+ If you're feeling lucky, try running the provided
+ "manual_install.pl".  This creates appropriate directories in your
+ Perl installation and copies everything where it needs to go.  It
+ works for me under Windows XP, but I haven't tested other platforms
+ (please let me know one way or the other!).
+
+EXTREMELY MANUAL INSTALLATION INSTRUCTIONS
+
+ The following are instructions on how to install rezrov by hand:
+
+ Rezrov consists of two basic pieces: a set of packages (*.pm files),
+ and a script called "rezrov".  The *.pm files need to be installed
+ in a subdirectory called "Games/Rezrov" somewhere in Perl's module search
+ path (@INC).  "rezrov" is the main wrapper program that requires these
+ modules to run; it can go anywhere you like.
+
+ For example, on a Windows 9x/NT/XP machine, using the ActiveState
+ distribution of Perl installed in C:\PERL, you would need to:
+
+ 1. mkdir C:\perl\lib\site\Games
+ 2. mkdir C:\perl\lib\site\Games\Rezrov
+ 3. copy *.pm c:\perl\lib\site\Games\Rezrov
+ 4. perl rezrov minizork.z3
+

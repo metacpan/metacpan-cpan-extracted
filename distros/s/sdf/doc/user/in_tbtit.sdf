@@ -1,0 +1,64 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Adding Table Titles
+
+H2: Adding a Title to a Table
+
+To add a title, use the {{title}} attribute.
+For example:
+
+E:!block table; title="Phone numbers of good friends"
+E:Name   Phone
+E:Bill   123 4567
+E:Joe    789 1234
+E:Mary   584 3333
+E:!endblock
+
+The output is:
+
+!block table; title="Phone numbers of good friends"
+Name   Phone
+Bill   123 4567
+Joe    789 1234
+Mary   584 3333
+!endblock
+
+H2: Adding a Title to a Psuedo Table
+
+Occasionally, it is useful to title a table by hand.
+To do this, use the TT (Table Title) paragraph style.
+For example:
+
+E:   TT: My Boring Looking Table
+E:   !include "my_table.txt"; example; wide
+
+H2: Generating a List of Tables
+
+A list of tables can be generated from the table titles.
+To do this, set the {{VAR:DOC_LOT}} variable. For example:
+
+E:# Build the title
+E:!define DOC_NAME "World Peace in 60 Days"
+E:!define DOC_LOT
+E:!build_title
+
+This will generate a list of tables after the table of contents.
+
+H2: Changing the List of Tables Title
+
+The default title for the list of tables is "List of Tables".
+To change this, set the DOC_LOT_TITLE.
+For example:
+
+E:!define DOC_LOT_TITLE "Tables"

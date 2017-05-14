@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use Template;
+
+use YAML qw[ LoadFile ];
+
+use IO::File;
+
+open( my $wfh, '>', 'wrap.h' )
+  or die( "error opening wrap.h\n" );
+
+open( my $xfh, '>', 'xs.h' )
+  or die( "error opening xs.h\n" );
+
+my $wtpl = Template->new( OUTPUT => $wfh );
+my $xtpl = Template->new( OUTPUT => $xfh );
+
+my %protos = LoadFile( 'protos.yml' );
+
+for my $proto ( values %protos )
+{
+    $wtpl->process( 'wrap_xs.tpl', $proto );
+
+    $xtpl->process( 'xs_xs.tpl', $proto )
+      unless $proto->{attr}{noxs};
+
+}
+
+
+

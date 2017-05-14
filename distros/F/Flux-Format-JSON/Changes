@@ -1,0 +1,7 @@
+Revision history for Flux-Format-JSON
+
+1.01    2013-04-17
+    * enable JSON utf8 flag - fix wide character handling
+
+1.00    2013-04-13
+    * Initial release

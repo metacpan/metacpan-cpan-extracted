@@ -1,0 +1,72 @@
+Summary: @PACKAGE_NAME@ Apache Module
+Name: @PACKAGE@
+Version: @VERSION@
+Release: 1
+Group: Synetrix
+License: WWW
+BuildRoot: %{_tmppath}/%{name}-root
+BuildArch: noarch
+Source0: @PACKAGE@-@VERSION@.tar.gz
+Requires: @PACKAGE@-db-modules = @VERSION@
+
+%description
+CHANGE ME
+
+%package db-modules
+Group: Databases
+Summary: Modules for accessing the @PACKAGE_NAME@ database
+
+%description db-modules
+Modules for accessing the @PACKAGE_NAME@ database.
+
+%prep
+%setup -q
+
+%build
+
+./bootstrap
+./configure @ac_configure_args@
+
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(0644,root,root)
+[% FOREACH tableName = TABLES -%]
+@prefix@/modules/Apache/Request/Controller/[% tableName %].pm
+[% END -%]
+[% FOREACH tableName = TABLES -%]
+@prefix@/@PACKAGE_NAME@/templates/[% tableName %]/list.tt2
+@prefix@/@PACKAGE_NAME@/templates/[% tableName %]/show.tt2
+@prefix@/@PACKAGE_NAME@/templates/[% tableName %]/create.tt2
+@prefix@/@PACKAGE_NAME@/templates/[% tableName %]/edit.tt2
+[% END -%]
+@prefix@/@PACKAGE_NAME@/templates/_header.tt2
+@prefix@/@PACKAGE_NAME@/templates/_fieldDisplay.tt2
+@prefix@/@PACKAGE_NAME@/templates/_fieldInput.tt2
+@prefix@/@PACKAGE_NAME@/templates/_fkeyDisplay.tt2
+@prefix@/@PACKAGE_NAME@/templates/_fkeyInput.tt2
+@prefix@/@PACKAGE_NAME@/templates/_pager.tt2
+@prefix@/@PACKAGE_NAME@/templates/_form.tt2
+@prefix@/@PACKAGE_NAME@/templates/_auth.tt2
+@prefix@/@PACKAGE_NAME@/html/js/prototype.js
+@prefix@/@PACKAGE_NAME@/html/js/validate.js
+@prefix@/@PACKAGE_NAME@/html/css/style.css
+%config @apacheIncludedConfigs@/@PACKAGE_NAME@.apache.conf
+%config @apacheIncludedConfigs@/@PACKAGE_NAME@.pl
+%config @prefix@/@PACKAGE_NAME@/@PACKAGE_NAME@.cfg
+
+%files db-modules
+[% FOREACH tableName = TABLES -%]
+@prefix@/modules/DB/Table/[% tableName %].pm
+[% END -%]
+[% FOREACH tableName = TABLES -%]
+@prefix@/modules/DB/Table/Row/[% tableName %].pm
+[% END %]
+

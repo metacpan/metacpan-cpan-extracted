@@ -1,0 +1,87 @@
+# This file tests the table macro
+
+Some text before.
+
+!table 2
+!row "Heading"
+Hdg 1
+!cell
+Hdg 2
+!row
+Row 1, col 1
+!cell
+Row 1, col 2
+!row "Body"
+Row 2, col 1
+!cell
+Row 2, col 2
+!row "Footing"
+Footing 1
+!cell
+Footing 2
+!endtable
+
+Some text in the middle.
+
+# Try an empty table
+!table 1; style='rows'
+!endtable
+
+# Try some empty rows
+!table 1; style='grid'
+!row
+!row
+!endtable
+
+# Try some empty cells
+!table 3
+Some text
+!cell
+!cell
+Some text in row 1, column 3
+!row
+!cell
+!cell
+Some text in row 2, column2
+!endtable
+
+# Try a nested table
+!table 2
+Text in first table
+!row
+Row 2, column 1
+!cell
+Row 2, column 2 start
+!table 2
+Text in second table
+!row
+Text in second table
+!endtable
+Row 2, column 2 end
+!row
+hello world
+!endtable
+
+# Try some multi-line cells
+!table 2
+!row
+!cell
+This is a paragraph with
+a few lines.
+!cell
+This is:
+
+* a list
+* with two entries.
+
+And another paragraph.
+!row
+!cell
+simple cell
+!cell
+And another multi-line
+cell with lots and lots and lots
+of text.
+
+The quick brown fox jumped over the slow green frog.
+!endtable

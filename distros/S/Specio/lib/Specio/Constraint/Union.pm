@@ -3,7 +3,7 @@ package Specio::Constraint::Union;
 use strict;
 use warnings;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use List::Util qw( all any );
 use Role::Tiny::With;
@@ -133,7 +133,7 @@ Specio::Constraint::Union - A class for union constraints
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 

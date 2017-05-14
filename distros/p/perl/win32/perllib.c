@@ -1,5 +1,9 @@
 /*
- * "The Road goes ever on and on, down from the door where it began."
+ *      The Road goes ever on and on
+ *          Down from the door where it began.
+ *
+ *     [Bilbo on p.35 of _The Lord of the Rings_, I/i: "A Long-Expected Party"]
+ *     [Frodo on p.73 of _The Lord of the Rings_, I/iii: "Three Is Company"]
  */
 #define PERLIO_NOT_STDIO 0
 #include "EXTERN.h"
@@ -14,7 +18,7 @@
 
 
 /* Register any extra external extensions */
-char *staticlinkmodules[] = {
+const char * const staticlinkmodules[] = {
     "DynaLoader",
     /* other similar records will be included from "perllibst.h" */
 #define STATIC1
@@ -207,31 +211,13 @@ RunPerl(int argc, char **argv, char **env)
 {
     int exitstatus;
     PerlInterpreter *my_perl, *new_perl = NULL;
-    OSVERSIONINFO osver;
-    char szModuleName[MAX_PATH];
-    char *arg0 = argv[0];
-    char *ansi = NULL;
     bool use_environ = (env == environ);
 
-    osver.dwOSVersionInfoSize = sizeof(osver);
-    GetVersionEx(&osver);
-
-    if (osver.dwMajorVersion > 4) {
-        WCHAR widename[MAX_PATH];
-        GetModuleFileNameW(NULL, widename, sizeof(widename)/sizeof(WCHAR));
-        argv[0] = ansi = win32_ansipath(widename);
-    }
-    else {
-        Win_GetModuleFileName(NULL, szModuleName, sizeof(szModuleName));
-        (void)win32_longpath(szModuleName);
-        argv[0] = szModuleName;
-    }
-
 #ifdef PERL_GLOBAL_STRUCT
-#define PERLVAR(var,type) /**/
-#define PERLVARA(var,type) /**/
-#define PERLVARI(var,type,init) PL_Vars.var = init;
-#define PERLVARIC(var,type,init) PL_Vars.var = init;
+#define PERLVAR(prefix,var,type) /**/
+#define PERLVARA(prefix,var,type) /**/
+#define PERLVARI(prefix,var,type,init) PL_Vars.prefix##var = init;
+#define PERLVARIC(prefix,var,type,init) PL_Vars.prefix##var = init;
 #include "perlvars.h"
 #undef PERLVAR
 #undef PERLVARA
@@ -277,11 +263,6 @@ RunPerl(int argc, char **argv, char **env)
     }
 #endif
 
-    /* At least the Borland RTL wants to free argv[] after main() returns. */
-    argv[0] = arg0;
-    if (ansi)
-        win32_free(ansi);
-
     PERL_SYS_TERM();
 
     return (exitstatus);
@@ -298,7 +279,7 @@ EndSockets(void);
 EXTERN_C		/* GCC in C++ mode mangles the name, otherwise */
 #endif
 BOOL APIENTRY
-DllMain(HANDLE hModule,		/* DLL module handle */
+DllMain(HINSTANCE hModule,	/* DLL module handle */
 	DWORD fdwReason,	/* reason called */
 	LPVOID lpvReserved)	/* reserved */
 { 
@@ -307,14 +288,6 @@ DllMain(HANDLE hModule,		/* DLL module handle */
 	 * initialization or a call to LoadLibrary.
 	 */
     case DLL_PROCESS_ATTACH:
-/* #define DEFAULT_BINMODE */
-#ifdef DEFAULT_BINMODE
-	setmode( fileno( stdin  ), O_BINARY );
-	setmode( fileno( stdout ), O_BINARY );
-	setmode( fileno( stderr ), O_BINARY );
-	_fmode = O_BINARY;
-#endif
-
 #ifndef UNDER_CE
 	DisableThreadLibraryCalls((HMODULE)hModule);
 #endif
@@ -334,7 +307,7 @@ DllMain(HANDLE hModule,		/* DLL module handle */
             PerlIO_cleanup() was done here but fails (B).
          */     
 	EndSockets();
-#if defined(USE_5005THREADS) || defined(USE_ITHREADS)
+#if defined(USE_ITHREADS)
 	if (PL_curinterp)
 	    FREE_THREAD_KEY;
 #endif

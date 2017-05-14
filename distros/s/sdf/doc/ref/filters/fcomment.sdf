@@ -1,0 +1,32 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: comment Filter
+
+H2: Interface
+
+!filter_interface "comment"
+
+H2: Description
+
+The {{comment}} filter is used to temporarily ignore a block of text.
+
+H2: Examples
+
+!block example; lang='sdf'
+!block comment
+Ignore me
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

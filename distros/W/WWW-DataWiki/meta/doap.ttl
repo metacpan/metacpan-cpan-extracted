@@ -1,0 +1,24 @@
+# This file contains general metadata about the project.
+
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/WWW-DataWiki/project>
+	a               :Project ;
+	:programming-language "Perl" ;
+	:name           "WWW-DataWiki" ;
+	:shortdesc      "RESTful read-write RDF repository" ;
+	:homepage       <https://metacpan.org/release/WWW-DataWiki> ;
+	:download-page  <https://metacpan.org/release/WWW-DataWiki> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=WWW-DataWiki> ;
+	:repository	[ a :HgRepository; :browse <https://bitbucket.org/tobyink/p5-www-datawiki> ];
+	:created        "2011-10-27"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:developer      [ a foaf:Person ; foaf:name "Toby Inkster" ; foaf:mbox <mailto:tobyink@cpan.org> ] .
+
+<http://dev.perl.org/licenses/>
+	dc:title        "the same terms as the perl 5 programming language system itself" .
+

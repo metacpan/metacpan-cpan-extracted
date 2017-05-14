@@ -1,0 +1,6 @@
+html/docs.css
+lib/Log/WithCallbacks.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/Basic.t

@@ -1,9 +1,7 @@
 package open;
 use warnings;
-use Carp;
-$open::hint_bits = 0x20000; # HINT_LOCALIZE_HH
 
-our $VERSION = '1.06';
+our $VERSION = '1.10';
 
 require 5.008001; # for PerlIO::get_layers()
 
@@ -12,6 +10,10 @@ my $locale_encoding;
 sub _get_encname {
     return ($1, Encode::resolve_alias($1)) if $_[0] =~ /^:?encoding\((.+)\)$/;
     return;
+}
+
+sub croak {
+    require Carp; goto &Carp::croak;
 }
 
 sub _drop_oldenc {
@@ -39,13 +41,11 @@ sub _drop_oldenc {
     require Encode;
     my ($loname, $lcname) = _get_encname($old[-2]);
     unless (defined $lcname) { # Should we trust get_layers()?
-	require Carp;
-	Carp::croak("open: Unknown encoding '$loname'");
+	croak("open: Unknown encoding '$loname'");
     }
     my ($voname, $vcname) = _get_encname($new[-1]);
     unless (defined $vcname) {
-	require Carp;
-	Carp::croak("open: Unknown encoding '$voname'");
+	croak("open: Unknown encoding '$voname'");
     }
     if ($lcname eq $vcname) {
 	binmode($h, ":pop"); # utf8 is part of the encoding layer
@@ -56,7 +56,6 @@ sub import {
     my ($class,@args) = @_;
     croak("open: needs explicit list of PerlIO layers") unless @args;
     my $std;
-    $^H |= $open::hint_bits;
     my ($in,$out) = split(/\0/,(${^OPEN} || "\0"), -1);
     while (@args) {
 	my $type = shift(@args);
@@ -96,20 +95,26 @@ sub import {
 	    }
 	}
 	if ($type eq 'IN') {
-	    _drop_oldenc(*STDIN, @val);
+	    _drop_oldenc(*STDIN, @val) if $std;
 	    $in  = join(' ', @val);
 	}
 	elsif ($type eq 'OUT') {
-	    _drop_oldenc(*STDOUT, @val);
+	    if ($std) {
+		_drop_oldenc(*STDOUT, @val);
+		_drop_oldenc(*STDERR, @val);
+	    }
 	    $out = join(' ', @val);
 	}
 	elsif ($type eq 'IO') {
-	    _drop_oldenc(*STDIN,  @val);
-	    _drop_oldenc(*STDOUT, @val);
+	    if ($std) {
+		_drop_oldenc(*STDIN, @val);
+		_drop_oldenc(*STDOUT, @val);
+		_drop_oldenc(*STDERR, @val);
+	    }
 	    $in = $out = join(' ', @val);
 	}
 	else {
-	    croak "Unknown PerlIO layer class '$type'";
+	    croak "Unknown PerlIO layer class '$type' (need IN, OUT or IO)";
 	}
     }
     ${^OPEN} = join("\0", $in, $out);
@@ -208,7 +213,9 @@ many encodings have several aliases.  See L<Encode::Supported> for
 details and the list of supported locales.
 
 When open() is given an explicit list of layers (with the three-arg
-syntax), they override the list declared using this pragma.
+syntax), they override the list declared using this pragma.  open() can
+also be given a single colon (:) for a layer name, to override this pragma
+and use the default (C<:raw> on Unix, C<:crlf> on Windows).
 
 The C<:std> subpragma on its own has no effect, but if combined with
 the C<:utf8> or C<:encoding> subpragmas, it converts the standard

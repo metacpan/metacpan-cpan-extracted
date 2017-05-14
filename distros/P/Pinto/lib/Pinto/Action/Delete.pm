@@ -8,11 +8,11 @@ use MooseX::Types::Moose qw(Bool);
 use MooseX::MarkAsMethods ( autoclean => 1 );
 
 use Pinto::Util qw(throw);
-use Pinto::Types qw(DistributionTargetList);
+use Pinto::Types qw(DistSpecList);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ with qw( Pinto::Role::Transactional );
 #------------------------------------------------------------------------------
 
 has targets => (
-    isa      => DistributionTargetList,
+    isa      => DistSpecList,
     traits   => [qw(Array)],
     handles  => { targets => 'elements' },
     required => 1,
@@ -45,7 +45,7 @@ sub execute {
 
     for my $target ( $self->targets ) {
 
-        my $dist = $self->repo->get_distribution( target => $target );
+        my $dist = $self->repo->get_distribution( spec => $target );
 
         throw "Distribution $target is not in the repository" if not defined $dist;
 
@@ -79,7 +79,7 @@ Pinto::Action::Delete - Delete archives from the repository
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -87,7 +87,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

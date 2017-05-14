@@ -1,0 +1,31 @@
+SWIG
+====
+swig -c++ -perl5 -Imacopt++ base.i
+
+INSTALL
+=======
+perl Makefile.PL PREFIX=< desired installation path >
+make
+make test
+make install
+
+About "PREL_PL_NONLAZY"
+=======================
+http://www.perl.com/pub/a/2001/03/p5pdigest/THISWEEK-20010312.html
+
+CHANGES
+=======
+0.03
+----
+1) Fixed the VERSION number.
+2) Modified the original "pgapack" to use "-fPIC" compiler flag
+
+0.02
+----
+1) Fixed the VERSION number.
+2) Revised POD documentation. 
+3) Fixed the Makefile.PL and MANIFEST.
+
+0.01
+----
+1) First alpha version of "Math::Macopt"

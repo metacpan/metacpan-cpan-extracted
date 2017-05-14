@@ -1,0 +1,33 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: AppendText
+
+H2: Purpose
+
+{{S:AppendText}} is used within a paragraph event handler to
+add [[SDF]] after a paragraph.
+
+H2: Interface
+
+E:  &AppendText(@sdf)
+
+H3: Description
+
+The argument is the list of [[SDF]] paragraphs to append.
+
+H2: Examples
+
+To append a line after each level 1 heading:
+
+E:  !on paragraph 'H1';; &AppendText('Line:')

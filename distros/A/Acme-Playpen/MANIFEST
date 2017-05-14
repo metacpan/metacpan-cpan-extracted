@@ -12,5 +12,5 @@ lib/Acme/Playpen/NonIndexedFile.pm
 lib/Acme/Playpen/NonIndexedPackage.pm
 lib/Acme/Playpen/Utilities.pm
 lib/Acme/Playpen/_common.pm
-lib/Fatfinger.pm
+lib/Acme/STUDY/PERL.pm
 t/01-require.t

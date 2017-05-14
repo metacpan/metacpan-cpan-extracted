@@ -18,8 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: Server.pm,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 =pod
 
 =head1 NAME
@@ -28,7 +26,7 @@ Net::FTPServer::Full::Server - The full FTP server personality
 
 =head1 SYNOPSIS
 
-  ftpd [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
+  ftpd.sh [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
 
 =head1 DESCRIPTION
 
@@ -37,8 +35,6 @@ personality. This personality implements a complete
 FTP server with similar functionality to I<wu-ftpd>.
 
 =head1 METHODS
-
-=over 4
 
 =cut
 
@@ -60,6 +56,8 @@ use vars qw(@ISA);
 @ISA = qw(Net::FTPServer);
 
 =pod
+
+=over 4
 
 =item $rv = $self->authentication_hook ($user, $pass, $user_is_anon)
 
@@ -274,8 +272,17 @@ sub user_login_hook
 	    $root_directory =~ s/%U/$user/ge;
 	    $root_directory =~ s/%%/%/g;
 
-	    chroot $root_directory
-	      or die "cannot chroot: $root_directory: $!";
+	    if ($< == 0)
+	      {
+		chroot $root_directory
+		  or die "cannot chroot: $root_directory: $!";
+	      }
+	    else
+	      {
+		chroot $root_directory
+		  or die "cannot chroot: $root_directory: $!"
+		    . " (you need root privilege to use chroot feature)";
+	      }
 	  }
       }
     # For anonymous users, chroot to ftp directory.
@@ -285,7 +292,15 @@ sub user_login_hook
 	  = getpwnam "ftp"
 	    or die "no ftp user in password file";
 
-	chroot $homedir or die "cannot chroot: $homedir: $!";
+	if ($< == 0)
+	  {
+	    chroot $homedir or die "cannot chroot: $homedir: $!";
+	  }
+	else
+	  {
+	    chroot $homedir or die "cannot chroot: $homedir: $!"
+	      . " (you need root privilege to use chroot feature)";
+	  }
       }
 
     # We don't allow users to relogin, so completely change to
@@ -313,18 +328,7 @@ sub root_directory_hook
 
 __END__
 
-=back 4
-
-=head1 FILES
-
-  /etc/ftpd.conf
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/FileHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Handle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Full/Server.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Full/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Full/FileHandle.pm
+=back
 
 =head1 AUTHORS
 
@@ -337,10 +341,10 @@ London, SW6 3EG, UK
 
 =head1 SEE ALSO
 
-L<Net::FTPServer(3)>,
-L<Authen::PAM(3)>,
-L<Net::FTP(3)>,
-L<perl(1)>,
+C<Net::FTPServer(3)>,
+C<Authen::PAM(3)>,
+C<Net::FTP(3)>,
+C<perl(1)>,
 RFC 765,
 RFC 959,
 RFC 1579,

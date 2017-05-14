@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# damn, I should just hack a makefile? Why would I do that if I have dzil?
+dzil clean && dzil test && dzil build 

@@ -5,6 +5,7 @@ use base qw( Plagger::Plugin );
 
 use XML::Feed;
 use XML::Feed::Entry;
+use XML::Feed::RSS; # load explicitly to force LibXML
 use XML::RSS::LibXML;
 use File::Spec;
 
@@ -12,6 +13,7 @@ $XML::Feed::RSS::PREFERRED_PARSER = "XML::RSS::LibXML";
 
 sub register {
     my($self, $context) = @_;
+    $context->autoload_plugin({ module => 'Filter::FloatingDateTime' });
     $context->register_hook(
         $self,
         'publish.feed' => \&publish_feed,
@@ -50,8 +52,13 @@ sub publish_feed {
     $feed->author( $self->make_author($f->author, $feed_format) )
         if $f->primary_author;
 
+    my $taguri_base = $self->conf->{taguri_base} || do {
+        require Sys::Hostname;
+        Sys::Hostname::hostname();
+    };
+
     if ($feed_format eq 'Atom') {
-        $feed->{atom}->id("tag:plagger.org,2006:" . $f->id);
+        $feed->{atom}->id("tag:$taguri_base,2006:" . $f->id); # XXX what if id is empty?
     }
 
     # add entry
@@ -66,15 +73,14 @@ sub publish_feed {
             if ($feed_format eq 'RSS') {
                 $entry->content($e->body);
             } else {
-                $entry->{entry}->content($e->body);
+                $entry->{entry}->content($e->body->utf8);
             }
         }
 
-        $entry->category(join(' ', @{$e->tags}));
+        $entry->category(join(' ', @{$e->tags})) if @{$e->tags};
         $entry->issued($e->date)   if $e->date;
         $entry->modified($e->date) if $e->date;
 
-        $entry->author( $self->make_author($e->author, $feed_format) );
         if ($feed_format eq 'RSS') {
             my $author = 'nobody@example.com';
             $author .= ' (' . $e->author . ')' if $e->author;
@@ -85,7 +91,7 @@ sub publish_feed {
             }
         }
 
-        $entry->id("tag:plagger.org,2006:" . $e->id);
+        $entry->id("tag:$taguri_base,2006:" . $e->id);
 
         if ($e->has_enclosure) {
             for my $enclosure (grep { defined $_->url && !$_->is_inline } $e->enclosures) {
@@ -104,7 +110,9 @@ sub publish_feed {
     }
 
     # generate file path
-    my $filepath = File::Spec->catfile($self->conf->{dir}, $self->gen_filename($f));
+    my $tmpl = '%i.' . ($feed_format eq 'RSS' ? 'rss' : 'atom');
+    my $file = Plagger::Util::filename_for($f, $self->conf->{filename} || $tmpl);
+    my $filepath = File::Spec->catfile($self->conf->{dir}, $file);
 
     $context->log(info => "save feed for " . $f->link . " to $filepath");
 
@@ -113,33 +121,6 @@ sub publish_feed {
     open my $output, ">:utf8", $filepath or $context->error("$filepath: $!");
     print $output $xml;
     close $output;
-}
-
-my %formats = (
-    'u' => sub { my $s = $_[0]->url;  $s =~ s!^https?://!!; $s },
-    'l' => sub { my $s = $_[0]->link; $s =~ s!^https?://!!; $s },
-    't' => sub { $_[0]->title },
-    'i' => sub { $_[0]->id },
-);
-
-my $format_re = qr/%(u|l|t|i)/;
-
-sub gen_filename {
-    my($self, $feed) = @_;
-
-    my $file = $self->conf->{filename} ||
-        '%i.' . ($self->conf->{format} eq 'RSS' ? 'rss' : 'atom');
-    $file =~ s{$format_re}{
-        $self->safe_filename($formats{$1}->($feed))
-    }egx;
-    $file;
-}
-
-sub safe_filename {
-    my($self, $path) = @_;
-    $path =~ s![^\w\s]+!_!g;
-    $path =~ s!\s+!_!g;
-    $path;
 }
 
 sub make_author {
@@ -183,7 +164,7 @@ __END__
 
 Plagger::Plugin::Publish::Feed - republish RSS/Atom feeds
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
   - module: Publish::Feed
     config:
@@ -234,13 +215,20 @@ like printf():
 
 Whether to publish full content feed. Defaults to 1.
 
+=item taguri_base
+
+Domain name to use with Tag URI base for Atom feed IDs. If it's not
+set, the domain is grabbed using Sys::Hostname module Optional.
+
 =back
 
 =head1 AUTHOR
 
-Yoshiki KURIHARA
-
 Tatsuhiko Miyagawa
+
+=head1 CONTRIBUTORS
+
+Yoshiki Kurihara
 
 Gosuke Miyashita
 

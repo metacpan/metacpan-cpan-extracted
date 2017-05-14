@@ -1,0 +1,76 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: FormatTime
+
+H2: Purpose
+
+This routine is used to format a date-time quantity into a
+human readable form.
+
+H2: Interface
+
+E:  $result = &FormatTime($fmt, $var);
+
+H2: Description
+
+The first parameter is either a format string or the name of a variable
+containing a format string.
+The second parameter is the name of the variable to be formatted.
+The variable's value is a number of seconds since January 1, 1970.
+
+The building blocks used in the format strings are given below.
+
+!block table; format=352
+Symbol:Description:Example
+$day:day number in month:6 or 22
+$day0:day number in month zero-padded:06 or 22
+$month:month name:January
+$smonth:abbreviated month name:Jan
+$monthnum:month number (1..12):6 or 12
+$monthnum0:month number zero-padded (01..12):06 or 12
+$year:year:1995
+$syear:abbreviated year:95
+$weekday:weekday name:Monday
+$sweekday:abbreviated weekday name:Mon
+$hour:hour (1..24):6 or 14
+$hour0:hour zero-padded (01..24):06 or 14
+$shour:hour (1..12):6 or 12
+$shour0:hour zero-padded (01..12):06 or 12
+$ampm:am or pm:am
+$AMPM:AM or PM:PM
+$minute:minute (0..59):0 or 42
+$minute0:minute zero-padded (00..59):00 or 42
+$second:second (0..59):0 or 42
+$second0:second zero-padded (00..59):00 or 42
+!endblock
+
+Commonly used formats are defined in the variables given below.
+
+!block table
+Variable    Value
+FMT_FULL    $day $month $year, $hour:$minute0.$second0
+FMT_TIME    $hour:$minute0.$second0
+FMT_DATE    $day $month $year
+FMT_CONCISE $day0-$smonth-$syear
+!endblock
+
+H2: Examples
+
+To format the 'last modified' date-time for a document:
+
+E:   &FormatTime('FMT_FULL', 'DOC_MODIFIED')
+
+To format the year when conversion started (for copyright reasons, say):
+
+E:   &FormatTime('$year', 'DOC_START')

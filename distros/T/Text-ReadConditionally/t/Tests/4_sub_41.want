@@ -1,0 +1,20 @@
+Line 1
+After subroutine definitions
+Sub a line 1
+_ = '12'
+Sub b line 1
+_ = 'sub b'
+Sub c line 1
+_ = '22'
+Sub d line 1
+_ = '25'
+Sub e line 1
+_ = '5'
+Sub f line 1
+_ = 'v3'
+Sub i_a line 1
+From 4_sub_41.inc
+After 4_sub_41.inc _ = '95'
+Last in i_a
+_ = '95'
+EOF

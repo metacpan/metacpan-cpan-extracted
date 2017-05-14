@@ -38,6 +38,8 @@ my @files = (
     't/basiclib/TestsFor/Basic.pm',
     't/basiclib/TestsFor/Basic/Subclass.pm',
     't/cli.t',
+    't/clilib/Bar.pm',
+    't/clilib/Foo.pm',
     't/controllib/TestsFor/Control/SkipClass.pm',
     't/controllib/TestsFor/Control/SkipMethod.pm',
     't/environment.t',

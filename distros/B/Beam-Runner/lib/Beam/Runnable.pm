@@ -1,5 +1,5 @@
 package Beam::Runnable;
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 # ABSTRACT: Role for runnable objects
 
 #pod =head1 SYNOPSIS
@@ -86,7 +86,7 @@ Beam::Runnable - Role for runnable objects
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

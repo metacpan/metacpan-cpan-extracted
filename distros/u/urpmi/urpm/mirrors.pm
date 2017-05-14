@@ -1,9 +1,8 @@
 package urpm::mirrors;
 
-# $Id: $
 
 use strict;
-use urpm::util;
+use urpm::util qw(cat_ find output_safe reduce_pathname);
 use urpm::msg;
 use urpm::download;
 
@@ -277,7 +276,9 @@ sub add_proximity_and_sort {
 	$_->{proximity_corrected} *= _between_country_correction($country_code, $_->{country}) if $best;
 	$_->{proximity_corrected} *= _between_continent_correction($best->{continent}, $_->{continent}) if $best;
     }
-    @$mirrors = sort { $a->{proximity_corrected} <=> $b->{proximity_corrected} } @$mirrors;
+    # prefer http mirrors by sorting them to the beginning
+    @$mirrors = sort { ($b->{url} =~ m!^http://!) <=> ($a->{url} =~ m!^http://!)
+		       || $a->{proximity_corrected} <=> $b->{proximity_corrected} } @$mirrors;
 }
 
 # add +/- 5% random
@@ -352,7 +353,6 @@ sub parse_LDAP_namespace_structure {
 
 1;
 
-__END__
 
 =back
 

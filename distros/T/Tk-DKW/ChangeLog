@@ -1,2 +1,15 @@
 27-Oct-1998	SplitFrame.pm	In RedrawTrim(), a test for -trimcount disallowed zero when,
-				in fact, zero was a desirable value
+				in fact, zero was a desirable value.
+
+##-###-####     ...             Various updates and fixes
+
+12-Oct-1999     Tk-DKW-0.02     Release. minor bugfixes & enhancements + DockFrame.pm & rewritten Columns.pm
+
+25-Nov-1999     Columns.pm      method Columns::__delete was passing a reference to the Columns
+                                widget to ListBox->delete() erroneously.
+
+26-Nov-1999     ComboEntry.pm   Added single key seek (finds first listbox row whose first character
+                                matches the user's keypress). Added -popupwidth and -scrollbarwidth
+                                options. Changed focus/grab model for popup listbox.
+
+26-Nov-1999     Tk-DKW-0.03     Release. minor bugfixes & enhancements

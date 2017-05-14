@@ -1,0 +1,9 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+illegal_package_prefix
+	A package name doesn't match the list of allowed package prefixes.
+	Package: %s
+	Prefixes: %s

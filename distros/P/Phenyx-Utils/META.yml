@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name: Phenyx-Utils
+version: 0.0.3
+author:
+  - |-
+    Alexandre Masselot <Alexandre_dot_masselot_at_genebio_dot_com>
+abstract: ~
+license: lgpl
+requires:
+  File::Basename: 0
+  File::Copy: 0
+  File::Find::Rule: 0
+  File::Path: 0
+  File::Temp: 0
+  File::chmod: 0
+  Getopt::Long: 0
+  Test::More: 0
+  Time::localtime: 0
+provides:
+  Phenyx::Utils:
+    file: lib/Phenyx/Utils.pm
+    version: 0.0.3
+  Phenyx::Utils::LSF::JobInfo:
+    file: lib/Phenyx/Utils/LSF/JobInfo.pm
+  Phenyx::Utils::LSF::Submission:
+    file: lib/Phenyx/Utils/LSF/Submission.pm
+generated_by: Module::Build version 0.24

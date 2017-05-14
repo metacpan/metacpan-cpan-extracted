@@ -1,0 +1,38 @@
+Changelog for MarpaX-ESLIF-ECMA404
+
+0.001 2017-05-13T07:20:18
+ [Jean-Damien Durand <Jean-Damien.Durand@fisglobal.com>]
+ - Use MarpaX::ESLIF 2.0.9
+ - json_decode is now decode_json dev+
+ - dev+
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - .gitignore fix v2 [ci skip]
+ - .gitignore fix [ci skip]
+ - dist.ini: Fix for README.pod [ci skip]
+ - ESLIF/ECMA404.pm: POD fix [ci skip]
+ - .gitignore: more in a perl section [ci skip]
+ - t/test.t: ok and ko tests [ci skip]
+ - travis again - sudo cpanm --notest Test::EOL Test::Kwalitee Test::NoTabs
+   Test::Pod::Coverage dev+
+ - travis again - dzil authordeps should be before dzil listdeps
+ - travis again - dzil authordeps --missing
+ - travis again - dzil listdeps --omit-core `perl -e print $];`
+ - travis again - added install for t dependencies dev+
+ - travis again - language: perl fails by default... dev+
+ - travis again - back to my stuff only - travis-ci-helpers never sees my
+   own installs do not know why dev+
+ - travis again - do both my stuff and travis-ci-helpers dev+
+ - travis again - trying to put Dist::Zilla::PluginBundle::RJBS in [Prereqs
+   / DevelopRequires] dev+
+ - travis again dev+
+ - travis - need travis-perl-helpers in before_install anyway dev+
+ - travis - back to my own version... cpan-install
+   Pod::Weaver::PluginBundle::RJBS installed but dzil test says it is not
+   (!?) dev+
+ - travis - added cpan-install Pod::Weaver::PluginBundle::RJBS dev+
+ - travis - added cpan-install Dist::Zilla::PluginBundle::RJBS dev+
+ - travis - trying travis-perl-helpers dev+
+ - travis dev+
+ - Travis trial
+ - Cosmetic changes [ci skip]

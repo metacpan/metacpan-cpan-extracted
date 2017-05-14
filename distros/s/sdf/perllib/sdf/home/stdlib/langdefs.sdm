@@ -1,0 +1,207 @@
+# $Id$
+#
+# >>Title::     Language Definitions Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 12-Oct-98 ianc    fixed Java keywords, removed case-sensitive names,
+#                   improved Perl keywords (thanks to Colin Jitlal)
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:langdefs}} defines language definitions used in [[SDF]]
+# documents.
+#
+# >>Description::
+# Language names are case insensitive.
+#
+# >>Limitations::
+#
+
+!block langdefs
+# For SDF, treat the built-in macros as keywords.
+# We also need to put all the keywords on one line to get around
+# parsing problems related to lines beginning with !.
+sdf|sdm|sds|sdn|sdl|sde:\
+    :cb=#:ce=$:sb=":se=\e":lb=':\
+    :le=\e':\
+    :kw=!build_title !block !endblock !include !execute !import !use !inherit !on !off !if !elsif !elseif !else !endif !init !define !default !undef !restrict !export !class !macro !endmacro !message !line !script !insert !getdoc !getcode !getusage !perlapi
+
+# From the Perl FAQ
+# The list of keywords is taken from cperl-mode.el
+perl|pl|pm|sdp|sdr:\
+    :pb=^\d?(sub|package)\d\p\d:\
+    :bb={:be=}:cb=#:ce=$:sb=":se=\e":lb=':\
+    :le=\e':tl:\
+    :id=_:\
+    :kw=\
+           AUTOLOAD BEGIN DESTROY END __END__ chomp \
+           chop defined delete do each else elsif \
+           eval exists for foreach format goto \
+           grep if keys last local map my next \
+           no package pop pos print printf push \
+           q qq qw qx redo return scalar shift \
+           sort splice split study sub tie tr \
+           undef unless unshift untie until use \
+           while y \
+           CORE __FILE__ __LINE__ abs accept alarm \
+           and atan2 bind binmode bless caller \
+           chdir chmod chown chr chroot close \
+           closedir cmp connect continue cos crypt \
+           dbmclose dbmopen die dump endgrent \
+           endhostent endnetent endprotoent endpwent \
+           endservent eof eq exec exit exp fcntl \
+           fileno flock fork formline ge getc \
+           getgrent getgrgid getgrnam gethostbyaddr \
+           gethostbyname gethostent getlogin \
+           getnetbyaddr getnetbyname getnetent \
+           getpeername getpgrp getppid getpriority \
+           getprotobyname getprotobynumber getprotoent \
+           getpwent getpwnam getpwuid getservbyname \
+           getservbyport getservent getsockname \
+           getsockopt glob gmtime gt hex index int \
+           ioctl join kill lc lcfirst le length \
+           link listen localtime log lstat lt \
+           mkdir msgctl msgget msgrcv msgsnd ne \
+           not oct open opendir or ord pack pipe \
+           quotemeta rand read readdir readline \
+           readlink readpipe recv ref rename require \
+           reset reverse rewinddir rindex rmdir seek \
+           seekdir select semctl semget semop send \
+           setgrent sethostent setnetent setpgrp \
+           setpriority setprotoent setpwent setservent \
+           setsockopt shmctl shmget shmread shmwrite \
+           shutdown sin sleep socket socketpair \
+           sprintf sqrt srand stat substr symlink \
+           syscall sysread system syswrite tell \
+           telldir time times truncate uc ucfirst \
+           umask unlink unpack utime values vec \
+           wait waitpid wantarray warn write x xor
+
+# From Kent Sandvik (sandvik@sgi.com) and Sect 3.9 of the language spec.
+# Note: null and super are treated as keywords.
+java:\
+        :pb=^\d?*?\d?\p\d?\(\a?\)(\d|{):bb={:be=}:cb=/*:ce=*/:ab=//:\
+        :ae=$:sb=":se=\e":lb=':\
+        :le=\e':tl:\
+        :kw=abstract boolean break byte case catch char class const continue\
+        default do double else extends final finally float for goto\
+        if implements import instanceof int interface long native new null\
+        package private protected public return short\
+        static super switch synchronized this throw throws transient try\
+        void volatile while
+
+# From Prachin Ranavat (prachin@mincom.com)
+c:\
+    :pb=^\d?*?\d?\p\d?\(\a?\)(\d|{):bb={:be=}:cb=/*:ce=*/:sb=":se=\e":lb=':\
+    :le=\e':tl:\
+    :kw=asm auto break case char continue default do double else enum\
+    extern float for fortran goto if int long register return short\
+    sizeof static struct switch typedef union unsigned void while #define\
+    #else #endif #if #ifdef #ifndef #include #undef # define endif\
+    ifdef ifndef include undef defined:
+
+c++|cpp|hpp|cc|h:\
+    :pb=^\d?*?\d?\p\d?\(\a?\)(\d|{):bb={:be=}:cb=/*:ce=*/:ab=//:\
+    :ae=$:sb=":se=\e":lb=':\
+    :le=\e':tl:\
+    :kw=asm auto break case char continue default do double else enum\
+    extern float for fortran goto if int long register return short\
+    sizeof static struct switch typedef union unsigned while void #define\
+    #else #endif #if #ifdef #ifndef #include #undef # define endif\
+    ifdef ifndef include undef defined\
+    catch class const delete friend inline new operator overload private\
+    protected public throw try virtual:
+
+# Note: extensible is a Visibroker extension to the OMG standard
+idl:\
+	:pb=^\d?*?\d?\p\d?\(\a?\)(\d|{):bb={:be=}:cb=/*:ce=*/:ab=//:\
+	:ae=$:sb=":se=\e":lb=':\
+	:le=\e':tl:\
+	:kw=any attribute boolean case char const context default double\
+	enum exception extensible float in inout interface long module octet oneway\
+	out raises readonly sequence short string struct switch typedef\
+	unsigned union void FALSE Object TRUE #define #undef #include #if\
+	#ifdef #ifndef #elif #else #endif #defined #error #pragma:
+
+fortran|f77|fc|f|for:\
+    :pb=(function|subroutine|program)\d\p\d?\(\a?\):\
+    :bb=(function|subroutine|program)\d\p\d?\(\a?\):be=^\dend:\
+    :cb=^c:\
+    :ce=$:\
+    :sb=':\
+    :se=':\
+    :oc:\
+    :kw=call common complex continue dimension do double else elseif\
+    end endif equivalence format function\
+    goto if include integer \
+    parameter precision real return stop subroutine:
+
+delphi|pascal|pas|int:\
+    :pb=(^\d?procedure|function|program\d\p\d|\(|;|\:)|(=\d?record\d):\
+    :bb=\dcase|begin\d:be=\dend|forward\d|;:\
+    :cb={:ce=}:\
+    :ab=\(*:ae=*\):\
+    :sb=':se=':\
+    :kw=absolute abstract and array as asm assembler at begin case cdcel\
+    class const constructor default destructor div do downto dynamic else\
+    end except export exports external far file finally for forward\
+    function goto if implementation in index inherited initialization\
+    inline interface interrupt is label library messages mod name near\
+    nil nodefault not object of on or override packed private procedure\
+    program property protected public published raise read record repeat\
+    resident set shl shr stored string then to try type unit until uses\
+    var virtual while with write xor
+
+sh:\
+    :pb=(;|^)\d?\p\(\)(\d|{):\
+    :ab=\$#:ae=(\d?|\a?):\
+    :bb={:be=}:cb=#:ce=$:sb=":se=\e":lb=':\
+    :le=\e':tl:\
+    :kw=break case cd continue do done \
+    elif else esac eval exec exit export \
+    fi for if in then while until \
+    read readonly set shift test trap umask wait:
+
+csh:\
+    :cb=#:ce=$:sb=":se=\e":lb=':\
+    :ab=\$\a?#:ae=(\d?|\a?):\
+    :le=\e':tl:\
+    :kw=alias alloc break breaksw case cd chdir continue default\
+    echo else end endif endsw exec exit foreach \
+    glob goto history if logout nice nohup onintr repeat set\
+    setenv shift source switch then time \
+    while umask unalias unset wait while @ env \
+    argv child home ignoreeof noclobber noglob \
+    nomatch path prompt shell status verbose :
+
+# From Programming Python
+python|jpython|py:\
+        :pb=^\d?\p\d?\(\a?\)(\d|\:):cb=""":ce=""":ab=#:\
+        :ae=$:sb=":se=\e":lb=':\
+        :le=\e':tl:\
+        :kw=print del pass break continue return raise import from \
+            global access exec in if elif else while for try finally \
+            except class def or and not is lambda:
+
+# TJH added in a quick set of COBOL things ... why not!
+cobol:\
+    :ab=*:ae=$:
+    :kw=SECTION CALL PERFORM VARYING FROM BY UNTIL\
+    IF END-IF ELSE NOT LESS AND OR EQUAL COMPUTE ADD SUBTRACT\
+    MOVE TO EXIT SEARCH DIVISION AUTHOR GO TO GOTO\
+    PIC COMP COMP-5 STRING PROGRAM-ID
+mimscobol|pcom|precom:\
+    :ab=*:ae=$:
+    :kw=SECTION CALL PERFORM VARYING FROM BY UNTIL\
+    IF END-IF ELSE NOT LESS AND OR EQUAL COMPUTE ADD SUBTRACT\
+    MOVE TO EXIT SEARCH DIVISION AUTHOR GO TO GOTO\
+    PIC COMP COMP-5 STRING PROGRAM-ID\
+    EXEC END-EXEC MACRO MEND
+!endblock

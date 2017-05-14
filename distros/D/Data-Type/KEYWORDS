@@ -1,0 +1,17 @@
+# Keywords for Data::Type
+#
+# [Note] Hopefully one day used for categorization into the CPAN registry
+
+datatype
+valuetype
+data manipulation
+data pattern
+database
+CGI
+form
+formfield
+form data
+user input
+tie
+Getopt
+DBI

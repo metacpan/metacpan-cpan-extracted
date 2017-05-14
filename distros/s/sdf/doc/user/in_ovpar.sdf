@@ -1,0 +1,116 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Paragraphs
+
+H2: Introduction
+
+Paragraphs have the following format:
+
+E:   line1
+E:   ...
+E:   lineN
+
+Leading and trailing whitespace on lines is generally ignored.
+Paragraphs are separated by blank lines or:
+
+* {{comment lines}} - first non-whitespace character is "#"
+* {{macros}} - first non-whitespace character is "!".
+
+For normal paragraphs, simply specify the text on one or more lines.
+For example:
+
+E:   I like products which are simple to use and
+E:   do what I expect. We should encourage engineers
+E:   to design more products with these qualities.
+
+
+H2: Paragraph styles
+
+A paragraph can be given a style using the following syntax:
+
+E:   style":"line1
+E:   ...
+E:   lineN
+
+Tagged paragraphs do not need to be separated by blank lines.
+{{style}} is a sequence of one or more of the following characters:
+
+* letters
+* digits
+* underscore character (_).
+
+Whitespace is not permitted before the ":" but is generally
+ignored immediately after it. The style is optional and
+defaults to N (for Normal). The text is also optional.
+
+
+H2: Commonly used styles
+
+Commonly used paragraph styles are given below.
+
+!block table
+Style           Description
+N               normal paragraph (the default)
+H1 .. H6        chapter heading at level 1-6
+A1 .. A6        appendix heading at level 1-6
+P1 .. P6        plain heading at level 1-6
+Note            a single paragraph note
+E               fixed-width (example) text
+!endblock
+
+For example:
+
+E:   Note: Life is too short to drink bad wine.
+
+The result is:
+
+Note: Life is too short to drink bad wine.
+
+
+H2: Special styles
+
+For certain styles, the following syntax is also supported:
+
+E:   special_style line1
+E:   ...
+E:   lineN
+
+The special styles available are:
+
+!block table
+Style           Description
+. .. ......     paragraph or plain list item at level 1-6
+* .. ******     unordered list at level 1-6
+- .. -----      unordered list at level 2-6
+^ .. ^^^^^^     first entry in an ordered list at level 1-6
++ .. ++++++     next entry in an ordered list at level 1-6
+!endblock
+
+For example:
+
+E:* fruits:
+E:  - peach
+E:  - banana
+E:* vegetables:
+E:  - potato
+E:  - carrots.
+
+The result is:
+
+* fruits:
+  - peach
+  - banana
+* vegetables:
+  - potato
+  - carrots.

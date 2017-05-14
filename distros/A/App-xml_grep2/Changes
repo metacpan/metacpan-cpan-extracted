@@ -1,0 +1,31 @@
+Revision history for App-xml_grep2
+
+0.14    2011-03-10
+        fixed warnings and man/help display in tests
+        fixed RT #75042, due to changes in the way XML::LibXML 
+        formats its output, reported by Thomas Reuben
+        https://rt.cpan.org/Ticket/Display.html?id=75042
+        fixed typos in help, reported by Thomas Reuben
+        changed the namespace url from xmltwig.com to xmltwig.org
+        (more accurately from http://xmltwig.org/tools/xml_grep2/
+        to http://xmltwig.org/tools/xml_grep2/)
+
+0.13    2009-11-26
+        added lib/App/Xml_grep2 to MANIFEST. Duh!
+
+0.12    2009-11-25
+        Added the xl option, which uses XML::Liberal to parse even broken XML
+        refactored to make xml_grep2 a very simple front end to the 
+        Add::Xml_grep2.pm module, which offers 2 main methods: new and grep 
+        this should give more flexibility in the future, to allow plugins for
+        example
+
+0.11    2009-11-22
+        Fixed --man test
+
+0.10    2009-11-18
+        Fixed tests so they would pass with different versions of XML::LibXML 
+
+0.09    2009-09-24
+        First released version
+

@@ -16,7 +16,7 @@ use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
 
-our $VERSION = '0.15';    ## VERSION
+our $VERSION = '0.16';    ## VERSION
 
 =head3 C<< my $ch = get_mocked_chronicle(); >>
 

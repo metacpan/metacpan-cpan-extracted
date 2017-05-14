@@ -1,0 +1,359 @@
+#!/usr/bin/perl
+use strict;
+use CPAN;
+use CPAN::Config;
+use ExtUtils::MakeMaker;
+use Getopt::Long;
+use File::Spec;
+
+use Ovid::Error;
+use Ovid::Package;
+use Ovid::Dependency;
+
+our $VERSION = '0.12';
+
+unshift @INC, File::Spec->catdir($ENV{HOME},".cpan");
+eval {require CPAN::MyConfig;};
+
+my %opts = (ignore => [], tmpdir => $ENV{TMP} || '/tmp', 
+            packager => 'unknown@localhost', installdirs => 'site');
+
+my @optionlist =
+(
+  'deps|d' => 'List dependencies.',
+  'forcebuild' => 'Build the rpm even if it exists.',
+  'help|h' => 'Help',
+  'ignore|i=s' => 'Ignore specified package name. Use as frequently as necessary.',
+  'installdirs=s' => 'Set INSTALLDIRS variable for ExtUtils::MakeMaker',
+  'packager|p=s' => 'Packager',
+  'skipbuild|nobuild|n' => 'Just create the rpm spec file.',
+  'skip-perl-rpm-modules|r' => 'Skip any modules that ship with the installed perl rpm',
+  'tmpdir|t=s' => 'Temporary directory',
+  'verbose|v+' => 'Log level. Repeat for greater effect.',
+  'version|V'=> 'Display version info',
+);
+
+my @options;
+
+for (my $i = 0; $i < @optionlist; $i += 2) {
+  push @options, $optionlist[$i];
+}
+
+exit(1) unless GetOptions(\%opts, @options);
+
+if ($opts{'help'}){
+
+  my %opt_types = ('s' => 'STRING', 'i' => 'INTEGER');
+  my @opts = ();
+
+  for (my $i = 0; $i < @optionlist; $i += 2) {
+      my ($opts, $type) = split /=/, $optionlist[$i];
+
+      my $opt_type = $opt_types{$type};
+      my @opt_line;
+
+      for my $opt (split /\|/, $opts) {
+          my @opt;
+          if (length($opt) > 1){
+              push @opt, qq[--$opt];
+              push @opt, '=' if $opt_type;
+          }
+          else {
+              push @opt, qq[-$opt];
+              push @opt, ' ' if $opt_type;
+          }
+
+          push @opt, $opt_type if $opt_type;
+          push @opt_line, join('', @opt);
+      }
+
+      push @opts, join(' | ', @opt_line) .  qq[\t$optionlist[$i + 1]\n];
+  }
+
+  Usage(\@opts);
+  exit 0;
+}
+elsif ($opts{'version'}) {
+  Version();
+  exit 0;
+}
+elsif (exists $opts{skipbuild} && exists $opts{forcebuild}) {
+  warning "skipbuild and forcebuild options are mutually exclusive";
+  exit 1;
+}
+
+
+$LOG_LEVEL = LOG_LEVEL_INFO;
+
+if ($opts{verbose} >= 2){
+  $LOG_LEVEL &= LOG_LEVEL_DEBUG | LOG_LEVEL_INFO;
+}
+elsif ($opts{verbose} >= 1){
+  $LOG_LEVEL &= LOG_LEVEL_INFO;
+}
+
+
+my $perl_rpm_modules = $opts{'skip-perl-rpm-modules'} ? &get_core_modules() : {};
+
+my $src_dir = qq[$CPAN::Config->{keep_source_where}/authors/id];
+
+my %seen;
+my @queue = @ARGV;
+
+my %packages;
+my @packages;
+
+my %ignore = map { $_, 1 } @{$opts{'ignore'}};
+
+while (@queue)
+  {
+    my $item = pop @queue;
+
+    
+    if (exists $ignore{$item}){
+      info "ignoring package $item";
+      next;
+    }
+    
+    my @exp = &cpan_expand($item);
+    
+    unless (@exp){
+       warn "No match for: $item\n";
+       next;
+    }
+    
+    for my $obj (@exp){
+    
+      if (exists $seen{$item}){
+        info "skipping previously seen package $item";
+        next;
+      }
+
+      my $type = ref($obj);
+
+      if ($type eq 'CPAN::Bundle'){
+        push @queue, grep { !exists $seen{$_} } $obj->contains();
+        next;
+      }
+
+      my %opts_args = ( basedir => $src_dir, name => $item );
+      $opts_args{$_} = $opts{$_} for qw(packager tmpdir skipbuild forcebuild installdirs);
+
+      my $package = Ovid::Package->new(%opts_args);
+
+      
+      my $archive;
+      if ($type eq 'CPAN::Module'){
+        
+        $package->interrogate($obj);
+        
+        my $cpan_file = $obj->cpan_file;
+        
+        debug "found Module [$item]. Converting to Distribution [$cpan_file]";
+        $obj = CPAN::Shell->expand("Distribution", $cpan_file);
+        $type = ref($obj);
+      }
+      
+      if ($type eq 'CPAN::Distribution')
+        { 
+          if ($obj->isa_perl){
+            info "Skipping perl distribution for package [$item]";
+            next;
+          }
+          
+          $package->interrogate($obj);
+          
+          if (my @mods = $obj->containsmods)
+            {
+              if ($opts{'skip-perl-rpm-modules'} && 
+                  grep { $perl_rpm_modules->{$_} } @mods){
+                info "Skipping perl rpm bundled package [$item]";
+                next;    
+              }
+              
+              info "distribution $item contains modules @mods";
+              @seen{@mods} = (1) x scalar @mods;
+            }
+       
+          $obj->get();
+
+          my $dependency = Ovid::Dependency->new(dir => $obj->dir);
+          
+          #note: This call depends on passing dir arg to new method
+          $package->builder($dependency->builder);
+
+          $package->build_dir($obj->dir);
+
+          unless ($package->get_description($dependency->builder)){
+             $package->description($obj->as_string);
+          }
+
+          $seen{$item}++;
+
+          if (my @dependencies = $dependency->dependencies)
+            {
+              for my $dep (@dependencies)
+                {
+                    $package->requires($dep);
+                  
+                    my $name = $dep->{name};
+                    
+                    next if exists $seen{$name};
+                    
+                    debug "got dependency: $name => $dep->{version}";
+
+                    push @queue, $name;
+                }
+            }
+          
+          push @packages, $package;
+        }
+    }
+  }
+
+for my $package (reverse @packages){
+  if ($opts{deps}){
+    print join(' ', $package->name, $package->name_string(with_version => 1, prefixed => 1)), "\n";
+  }
+  else {
+    $package->make_rpm();
+  }
+}
+
+exit 0;
+
+#Old CPAN versions don't have expandany method. work around it.
+sub cpan_expand
+{
+  my ($item) = @_;
+  
+  my $cpan = 'CPAN::Shell';
+  
+  if ($cpan->can('expandany')){
+    return $cpan->expandany($item);
+  }
+  else {
+      my @t;
+      for my $type (qw(Author Bundle Distribution Module)){
+          my @z = $cpan->expand($type, $item);
+          push @t, @z if @z;
+      }
+      return @t;
+  }
+}
+
+sub get_core_modules
+{
+  my %mods;
+  my $cmd = "rpm -q --provides perl";
+  open(X, "$cmd|") or die "command [$cmd] failed. $!\n";
+  while(<X>){
+    $mods{$1}++ if /^perl\(([^)]+)\)/;
+  } 
+  return \%mods;
+}
+
+sub Usage
+{
+  my $opts = shift;
+  print STDERR <<EOF;
+
+$0: recursively builds perl CPAN modules and dependent modules as RPM files. 
+usage: $0 [optons] <perl-module-name> [ <another-module> ... ]
+options:
+ @$opts
+EOF
+}
+
+sub Version
+{
+ print STDERR <<EOF;
+$0 -- version: $VERSION
+Copyright 2004 Gyepi Sam <gyepi\@praxis-sw.com>
+EOF
+
+}
+exit 0;
+
+__END__
+
+=head1 NAME
+
+Ovid - collection of scripts and modules for recursively converting perl CPAN modules into RPM files. 
+
+=head1 SYNOPSIS
+
+ perl ovid [options] <cpan::module> 
+
+=head1 ABSTRACT
+
+Ovid recursively downloads and builds perl CPAN modules, and most dependent modules, as RPM files.
+Each RPM file lists all CPAN module dependencies so that rpm installation tools like
+apt-get, urpmi, yum, and others can automatically install all dependent packages as well.
+
+=head1 DESCRIPTION
+
+Ovid recursively downloads and builds specified CPAN modules and all dependent modules as RPM files.
+Each RPM file contains dependency information that can be used by rpm tools to automatically install
+all the dependent rpm packages.
+
+Ovid provides an automated solution to the problem of manually building dependent modules, an onerous
+task at best, or giving up and using the CPAN installer.
+
+=head1 OPTIONS
+
+=over 4
+
+=item  --packager | -p  "Your Name <you@example.com>"
+
+RPM Packager. Defaults to unknown@localhost.
+
+=item  --verbose | -v
+
+Increase verbosity. Multiple uses have a cumulative effect.
+
+=item  --tmpdir | -t  <tmpdir>
+
+Temporary directory to be used for builds. Defaults to C<$ENV{TMP}> or /tmp.
+
+=item  --help | -h
+
+You're reading it.
+
+=item  --skipbuild | --nobuild | -n
+
+Just create the rpm spec file, do not build rpms.
+
+=item --ignore | -i s
+
+Ignore any modules named s. Can be used multiple times.
+
+=item --skip-perl-rpm-modules | -r
+
+Skip any modules that ship with the installed perl rpm.
+
+=item --installdirs
+
+Set ExtUtils::MakeMaker's INSTALLDIRS variable, used to determine where the perl files
+will be installed. Usually one of: perl, site, vendor. Defaults to vendor.
+
+=back
+
+=head1  BUGS
+
+I would appreciate hearing of any problems with this program and am interested in feedback
+to help improve it.
+
+
+=head1 AUTHOR
+
+Gyepi Sam, E<lt>gyepi@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004-2007 by Gyepi Sam
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=

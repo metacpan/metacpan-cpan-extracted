@@ -69,7 +69,7 @@ with 'Pinto::Role::Schema::Result';
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -179,7 +179,6 @@ sub to_string {
         p => sub { $self->package->name },
         P => sub { $self->package->vname },
         v => sub { $self->package->version },
-        M => sub { $self->package->is_main_module ? 'm' : '-'},
         y => sub { $self->is_pinned ? '!' : '-' },
         m => sub { $self->distribution->is_devel ? 'd' : 'r' },
         h => sub { $self->distribution->path },
@@ -191,7 +190,7 @@ sub to_string {
         d => sub { $self->distribution->name },
         D => sub { $self->distribution->vname },
         V => sub { $self->distribution->version },
-        u => sub { $self->distribution->uri },
+        u => sub { $self->distribution->url },
         i => sub { $self->revision->uuid_prefix },
         F => sub { $self->flags },
     );
@@ -232,7 +231,7 @@ Pinto::Schema::Result::Registration - Represents the relationship between a Pack
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 NAME
 
@@ -330,7 +329,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

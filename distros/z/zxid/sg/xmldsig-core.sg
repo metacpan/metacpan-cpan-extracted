@@ -1,0 +1,184 @@
+# xmldsig-core.sg  --  Slightly edited after generation
+# $Id: xmldsig-core.sg,v 1.3 2007-09-24 02:34:34 sampo Exp $
+
+target(ds, http://www.w3.org/2000/09/xmldsig#)
+ns(xs, http://www.w3.org/2001/XMLSchema)
+ns(exca, http://www.w3.org/2001/10/xml-exc-c14n#)
+ns(xenc, http://www.w3.org/2001/04/xmlenc#)
+
+%CryptoBinary:	 base(xs:base64Binary) ;
+
+Signature	 -> %ds:SignatureType
+%SignatureType:
+  ds:SignedInfo
+  ds:SignatureValue
+  ds:KeyInfo?
+  ds:Object*
+  @Id?	 -> %xs:ID
+  ;
+
+SignatureValue	 -> %ds:SignatureValueType
+%SignatureValueType:	 base(xs:base64Binary)
+  @Id?	 -> %xs:ID
+  ;
+
+SignedInfo	 -> %ds:SignedInfoType
+%SignedInfoType:
+  ds:CanonicalizationMethod
+  ds:SignatureMethod
+  ds:Reference+
+  @Id?	 -> %xs:ID
+  ;
+
+CanonicalizationMethod	 -> %ds:CanonicalizationMethodType
+%CanonicalizationMethodType:
+  any*
+  @Algorithm	 -> %xs:anyURI
+  ;
+
+SignatureMethod	 -> %ds:SignatureMethodType
+%SignatureMethodType:
+  ds:HMACOutputLength?	 -> %ds:HMACOutputLengthType
+  any*
+  @Algorithm	 -> %xs:anyURI
+  ;
+
+Reference	 -> %ds:ReferenceType
+%ReferenceType:
+  ds:Transforms?
+  ds:DigestMethod
+  ds:DigestValue
+  @Id?	 -> %xs:ID
+  @URI?	 -> %xs:anyURI
+  @Type?	 -> %xs:anyURI
+  ;
+
+Transforms	 -> %ds:TransformsType
+%TransformsType:
+  ds:Transform+
+  ;
+
+Transform	 -> %ds:TransformType
+%TransformType:
+  ds:XPath*	 -> %xs:string
+  exca:InclusiveNamespaces?
+  any*
+  @Algorithm	 -> %xs:anyURI
+  ;
+
+DigestMethod	 -> %ds:DigestMethodType
+%DigestMethodType:
+  any*
+  @Algorithm	 -> %xs:anyURI
+  ;
+
+DigestValue	 -> %ds:DigestValueType
+%DigestValueType:	 base(xs:base64Binary) ;
+
+KeyInfo	 -> %ds:KeyInfoType
+%KeyInfoType:
+  ds:KeyName*
+  ds:KeyValue*
+  ds:RetrievalMethod*
+  ds:X509Data*
+  ds:PGPData*
+  ds:SPKIData*
+  ds:MgmtData*
+  xenc:EncryptedKey*
+  any*
+  @Id?	 -> %xs:ID
+  ;
+
+KeyName	 -> %xs:string
+
+MgmtData	 -> %xs:string
+
+KeyValue	 -> %ds:KeyValueType
+%KeyValueType:
+  ds:DSAKeyValue?
+  ds:RSAKeyValue?
+  any?
+  ;
+
+RetrievalMethod	 -> %ds:RetrievalMethodType
+%RetrievalMethodType:
+  ds:Transforms?
+  @URI?	 -> %xs:anyURI
+  @Type?	 -> %xs:anyURI
+  ;
+
+X509Data	 -> %ds:X509DataType
+%X509DataType:
+       ds:X509IssuerSerial*	 -> %ds:X509IssuerSerialType
+       ds:X509SKI*	 -> %xs:base64Binary
+       ds:X509SubjectName*	 -> %xs:string
+       ds:X509Certificate*	 -> %xs:base64Binary
+       ds:X509CRL*	 -> %xs:base64Binary
+       any*
+       ;
+
+%X509IssuerSerialType:
+  ds:X509IssuerName	 -> %xs:string
+  ds:X509SerialNumber	 -> %xs:integer
+  ;
+
+PGPData	 -> %ds:PGPDataType
+%PGPDataType:
+  ds:PGPKeyID?	 -> %xs:base64Binary
+  ds:PGPKeyPacket?	 -> %xs:base64Binary
+  any*
+  ;
+
+SPKIData	 -> %ds:SPKIDataType
+%SPKIDataType:
+  ds:SPKISexp	 -> %xs:base64Binary
+  any?
+  ;
+
+Object	 -> %ds:ObjectType
+%ObjectType:
+  any*  processContents(lax)
+  @Id?	 -> %xs:ID
+  @MimeType?	 -> %xs:string
+  @Encoding?	 -> %xs:anyURI
+  ;
+
+Manifest	 -> %ds:ManifestType
+%ManifestType:
+  ds:Reference+
+  @Id?	 -> %xs:ID
+  ;
+
+SignatureProperties	 -> %ds:SignaturePropertiesType
+%SignaturePropertiesType:
+  ds:SignatureProperty+
+  @Id?	 -> %xs:ID
+  ;
+
+SignatureProperty	 -> %ds:SignaturePropertyType
+%SignaturePropertyType:
+  any+
+  @Target	 -> %xs:anyURI
+  @Id?	 -> %xs:ID
+  ;
+
+%HMACOutputLengthType:	 base(xs:integer) ;
+
+DSAKeyValue	 -> %ds:DSAKeyValueType
+%DSAKeyValueType:
+  ds:P?	 -> %ds:CryptoBinary
+  ds:Q?	 -> %ds:CryptoBinary
+  ds:G?	 -> %ds:CryptoBinary
+  ds:Y	 -> %ds:CryptoBinary
+  ds:J?	 -> %ds:CryptoBinary
+  ds:Seed?	 -> %ds:CryptoBinary
+  ds:PgenCounter?	 -> %ds:CryptoBinary
+  ;
+
+RSAKeyValue	 -> %ds:RSAKeyValueType
+%RSAKeyValueType:
+  ds:Modulus	 -> %ds:CryptoBinary
+  ds:Exponent	 -> %ds:CryptoBinary
+  ;
+
+#EOF

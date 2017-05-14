@@ -1,6 +1,6 @@
 use strict;
 our %config;
-# $config{dc}{'share'} = [qw(/usr/ports/distfiles /usr/ports/packages c:\dist c:\distr c:\pub )];
+# $config{dc}{'share'} = [qw(/usr/ports/distfiles /usr/ports/packages /var/cache/apt/archives c:\dist c:\distr c:\pub )];
 # $config{dc}{host} = ['myhub.net', 'adc://otherhub.com'];
 # $config{dc}{file_min}          = 100_000;                 #skip files  smaller
 # $config{dc}{filelist_scan}     = 86400;              #every seconds, 0 to disable
@@ -9,6 +9,26 @@ our %config;
 # $config{dc}{skip_symlink}      = 1;
 # $config{debug} = 1;
 # $config{ 'log_' . $_ } = 1 for qw (dmp dcdmp dcdbg adcdev dev);
-# $config{dc}{dev_http} = 1;
-# $config{auto_get_best} = 1; #for dcget : download all popular files
+# $config{dc}{dev_http} = 8000; # port or 1 for default 8000
+# $config{dc}{http_download} = 1; #download files via http. for speed tests. http://127.0.0.1:8000/QT7KX4AROSNRK4MRUTR22PM4H3UR3ELFFHI5N5A http://127.0.0.1:8000/ActivePerl-5.10.1.1008-MSWin32-x86-294165.msi
+# $config{dc}{http_control} = 1; #future: debug [or control interface]
+
+# $config{dc}{dev_sctp} = 1;
+# $config{dc}{no_sctp_fallback} = 1; #use sctp only (no tcp)
+# $config{dc}{dev_ipv6} = 1; #future
+# $config{dc}{dev_adcs} = 1; #future
+# $config{dchub}{myport} = 412; #only for dchub script
+# $config{dc}{socket_options_listen} = {LocalHost => "0.0.0.0",};# windows bug: if v6only listener by default "::" in netstat -a
+#
+# adcs hub or listener
+# openssl req -new -x509 -out certs/cert.pem
+# place cert, key and password:
+# $config{dc}{socket_options} = { SSL_cert_file => "certs/cert.pem", SSL_key_file  => "certs/key.pem", SSL_passwd_cb => sub { return "1234" },};
+
+#dcget:
+# $config{dcget}{'Nick'}  = 'dcacher';
+# $config{auto_get_best} = 1;          #for dcget : download all popular files
+# $config{'hit_to_ask'}         = 10;  # search hits on tth to download
+# $config{'queue_recalc_every'} = 600; # calculate to-download list every seconds
+# $config{'get_every'}          = 600; # try to get next file every seconds
 1;

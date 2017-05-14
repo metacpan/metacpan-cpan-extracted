@@ -1,0 +1,173 @@
+# Map for the little girl quest
+#
+###  $Id: girlmap.txt 124 2007-08-08 20:51:50Z overmars $
+
+map 0 0 0 xsize=>80, zsize=>80, start=>[4,76,0];
+in_last;
+
+level 0 0 0 zsize=>80, xsize=>80, texture=>'green_tile';
+level 0 0 0 zsize=>80, xsize=>80, texture=>'sooty', tex_fs=>8, y=>8;
+
+#Top wall
+wall   0  0   0 xsize=>80;
+#bottom wall
+wall   0 80   0 xsize=>80;
+#left wall
+wall   0  0 270 xsize=>80;
+#right wall
+wall  80  0 270 xsize=>80;
+
+#inner walls
+wall   0 16   0;
+wall   8 16   0;
+wall  16 16   0;
+wall  24 16   0;
+wall  32 16   0;
+wall  40 16   0;
+wall  48 16   0;
+wall  56 16   0;
+wall  64 16   0;
+wall   0 72   0;
+wall   8 72   0;
+wall  32 72   0;
+wall  48 72   0;
+archwall  56 72   0;
+door      58 72   0 state=>'locked', key=>'brass';
+wall  64 72   0;
+wall  24 72 270 ;
+wall  40 72 270;
+wall  16 64 270;
+wall  32 64 270;
+wall  48 64 270;
+wall  56 64 270;
+wall  72 64 270;
+wall  72 64   0;
+Key 76 68 E type=>'brass';
+wall   8 48 270;
+wall   8 56 270;
+wall   0 32   0;
+switch 4 36 N state=>'off', on_event=>'sw1_on';
+wall   8 32 270;
+wall   8 40   0;
+wall  16 40   0;
+wall  24 40   0;
+wall  16 40 270 ;
+wall  32 40 270;
+wall  32 48   0;
+wall  40 48   0;
+wall  48 48   0;
+wall  56 48 270;
+wall  56 56 270;
+wall  56 64 270;
+wall   8 56   0;
+wall  16 56   0;
+wall  24 48 270;
+wall  32 56   0;
+wall  40 56   0;
+wall  48 56 270;
+wall  48 64 270;
+
+wall   0 16   0;
+wall   8 16   0;
+wall  16 16   0;
+wall  24 16   0;
+wall  32 16   0;
+wall  40 16   0;
+wall  48 16   0;
+wall  56 16   0;
+wall  64 16   0;
+wall   8  0 270;
+wall  16  8 270;
+wall  24  0 270;
+wall  32  8 270;
+wall  40  0 270;
+wall  48  8 270;
+wall  56  0 270;
+wall  64  8 270;
+wall  72  0 270;
+archwall  40  8   0;
+archwall  48 40 270;
+door  48 46  90 state=>'locked', type=>'bar', 
+ event_script=>
+  {'sw1_on'=>"sub{
+                $self->send_event('msg',\"Click\n\");
+                $self->state('closed');
+              }",
+  };
+wall   4 24 90;
+wall   0 24  0 xsize=>4;
+archwall  8 16 270;
+door   8 18 270 state=>'locked', type=>'bar', swing=>-90, opener=>'Sword',
+ name=>'doggie door',
+ event_script=>{door_motion=>
+                "sub{
+		   my ($self,$stash,$obj,$ev,$what) = @_;
+                   return unless $obj->x==8 && $obj->z==18;
+                   $self->send_event('slide',5,undef,20);
+                 }",
+                collision=>
+		"sub{
+		   my ($self,$stash,$obj,$ev,$what) = @_;
+		   if ($what->x==8 && $what->z==18) {
+                     $self->send_event('slide',4.5,undef,20);
+		     $self->send_event('effect', 'stars');
+		     $self->send_event('remove_dog');
+		   }
+		 }",
+	       };
+wall   8 24   0;
+wall  16 24   0;
+wall  24 16 270;
+wall  24 24 270;
+wall  24 32   0;
+wall  32 32   0;
+wall  40 24 270;
+archwall  40 32 270;
+wall  40 40   0;
+wall  48 40   0;
+wall  56 40   0;
+wall  64 24   0;
+wall  72 24   0;
+wall  64 24 270;
+archwall  56 32   0;
+wall  56 32 270;
+wall  64 40 270;
+wall  64 48   0;
+wall  72 48 270;
+wall  72 56   0;
+Treasure 36 76 90 type=>'silver', count=>2;
+Treasure 76 20 90 type=>'silver', count=>2;
+Treasure 36 28 90 type=>'silver', count=>2;
+Treasure 52 68 90 type=>'silver', count=>3;
+Treasure 4 4 90 type=>'gold';
+Treasure 76 52 90 type=>'copper', count=>5;
+Treasure 44 60 90 type=>'copper', count=>5;
+character 12 20 90 texture=>'dog1', y=>0, frames=>5,
+ event_script=>
+  {'remove_dog'=>"sub{
+                return if $self->{state} eq 'gone'; 
+                $self->send_event('msg',\"Are you alright?\n\");
+                $self->send_event('msg',\"Thanks for helping me get my dog back\n\");
+                $self->send_event('msg',\"Here is the key to the bank\n\");
+                $self->send_event('give_team','Key',type=>'silver');
+                $self->color_me_gone();
+		$self->{state} = 'gone';
+              }",
+  };
+
+Key 68 44 0 type=>'iron';
+chest 76 28 90 state=>'locked', key=>'iron';
+in_last;
+Treasure 0 0 0 type=>'silver', count=>3, y=>.2;
+done;
+chest 76 60 90;
+in_last;
+Sword 0 0 0;
+done;
+detector  20 20 0 visible=>1, range=>4,
+ near_script=>"sub{
+                 $self->send_event('map','maps/startMap.txt');
+                 $self->send_event('go',4,4,90);
+                 $self->send_event('clear_msg');
+               }";
+done;

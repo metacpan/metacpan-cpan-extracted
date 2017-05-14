@@ -1,0 +1,84 @@
+NAME
+
+    MARC::File::MARCXML - MARCXML implementation for MARC records
+
+SYNOPSIS
+
+    use MARC::File::MARCXML;
+
+    my $file = MARC::File::MARCXML->in( $filename );
+
+    while ( my $marc = $file->next() ) { # Do something } $file->close();
+    undef $file;
+
+EXPORT
+
+    None.
+
+METHODS
+
+ decode( $string [, \&filter_func ] )
+
+        Constructor for handling data from a MARCXML file.  This function takes care of
+        all the tag directory parsing & mangling.
+    
+        Any warnings or coercions can be checked in the C<warnings()> function.
+    
+        The C<$filter_func> is an optional reference to a user-supplied function
+        that determines on a tag-by-tag basis if you want the tag passed to it
+        to be put into the MARC record.  The function is passed the tag number
+        and the raw tag data, and must return a boolean.  The return of a true
+        value tells MARC::File::MARCXML::decode that the tag should get put into
+        the resulting MARC record.
+    
+        For example, if you only want title and subject tags in your MARC record,
+        try this:
+    
+        sub filter {
+          my ($tagno,$tagdata) = @_;
+    
+          return ($tagno == 245) || ($tagno >= 600 && $tagno <= 699);
+    }
+
+    my $marc = MARC::File::MARCXML->decode( $string, \&filter );
+
+    Why would you want to do such a thing? The big reason is that creating
+    fields is processor-intensive, and if your program is doing read-only
+    data analysis and needs to be as fast as possible, you can save time by
+    not creating fields that you'll be ignoring anyway.
+
+        Another possible use is if you're only interested in printing certain
+        tags from the record, then you can filter them when you read from disc
+        and not have to delete unwanted tags yourself.
+
+ encode()
+
+        Returns a string of characters suitable for writing out to a MARCXML file
+
+RELATED MODULES
+
+    MARC::Record
+
+TODO
+
+    Make some sort of autodispatch so that you don't have to explicitly
+    specify the MARC::File::X subclass, sort of like how DBI knows to use
+    DBD::Oracle or DBD::Mysql.
+
+    Create a toggle-able option to check inside the field data for end of
+    field characters. Presumably it would be good to have it turned on all
+    the time, but it's nice to be able to opt out if you don't want to take
+    the performance hit.
+
+LICENSE
+
+    Copyright (c) 2011-2014, 2016 University Of Helsinki (The National
+    Library Of Finland)
+
+    This project's source code is licensed under the terms of GNU General
+    Public License Version 3.
+
+AUTHOR
+
+    The National Library of Finland
+

@@ -1,4 +1,0 @@
-Error: Invalid function name.
-@function not() {
-^^^^^^^^^^^^^^^
-  /sass/spec/libsass-issues/issue_713/not/input.scss 1:1

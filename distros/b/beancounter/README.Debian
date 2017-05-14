@@ -1,0 +1,89 @@
+
+		  Debian Installation Notes for beancounter
+
+On a Debian system, the following steps are required for beancounter to run:
+
+0. In case you are upgrading from an older installation of beancounter,
+   run the script update_beancounter to add some columns to the tables.
+
+1. Install PostgreSQL [or MySQL or SQLite]
+
+      root# apt-get install postgresql
+
+   which will also install postgresql-client and libpgsql2,
+
+   Configure postgresql with the defaults (ie SQL_ASCII) encoding and ISO
+   datestyle is my preference, others datestyles might or might not work.
+
+   Postgresql is what I use on my development system. If you have experience
+   with MySQL, use that backend. 
+
+   SQLite may be the very easiest to setup as it is file-based. The preferred 
+   SQLite version is now SQLite3 but the previous version is still supported
+   in both setup_beancounter and beancounter itself.
+
+2. Install all the other Perl packages required by beancounter:
+
+      root# apt-get install libdbd-pg-perl libdbi-perl
+
+   and the other packages. But 'apt-get install beancounter' should have
+   taken care of that anyway.
+
+3. Configure postgres to let the user as which you are running beancounter
+   create database etc:
+
+      root# su - postgres     
+      postgres:~> createuser -d edd
+      Enter user's postgres ID or RETURN to use unix user ID: 1000 ->
+      Is user "edd" a superuser? (y/n) y
+      WARNING: Any user who can add users can also modify the system catalog
+      createuser: edd was successfully added
+
+   Note that the superuser rights might not be required, however it is
+   *important* to use the -d option to createuser. 
+
+4. Configure postgres to allow TCP/IP connections by uncommenting the 
+   following line in /etc/postgresql/postgresql.conf
+
+       # TCP/IP access is allowed by default, but the default access given in
+       # pg_hba.conf will permit it only from localhost, not other machines.
+      tcpip_socket = true
+
+   [ Historically, this option was in the file postmaster.init:
+       # PGALLOWTCPIP=no  
+       PGALLOWTCPIP=yes 
+     but this seems to have changed with the 7.* releases of Postgresql. ]
+
+   Also ensure that network access is granted via /etc/posgresql/pg_hba_conf:
+
+     # TYPE  DATABASE    USER  IP-ADDRESS     IP-MASK          METHOD
+
+     local   all         all                                   trust
+     host    all         all   127.0.0.1      255.0.0.0        trust
+     host    all         all   192.168.1.0    255.255.255.0    ident sameuser
+
+   which enables me to have access from the same machine (127.0.0.1) for
+   whoever is on it, as well as from users owning databases from whereever
+   they are on my local LAN.
+
+   Lastly, restarting the postgresql daemon:
+
+       root# /etc/init.d/postgresql restart    
+
+5. Install beancounter 
+
+       root# dpkg -i beancounter_0.1.0_all.deb 
+       Selecting previously deselected package beancounter.
+       (Reading database ... 54112 files and directories currently installed.)
+       Unpacking beancounter (from beancounter_0.1.0_all.deb) ...
+       Setting up beancounter (0.1.0) ...
+
+6. As the user running beancounter, run 'setup_beancounter' to initialise
+   the tables and run an example report.
+
+   setup_beancounter can create and populate databases for PostgreSQL, MySQL
+   SQLite (the current version 3.*) and SQLite2 (the previous version, with
+   an incompatible format).
+
+7. That's it! 
+

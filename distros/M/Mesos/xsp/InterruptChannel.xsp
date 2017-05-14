@@ -1,0 +1,56 @@
+%module{Mesos};
+#include <InterruptChannel.hpp>
+#include <XS/MesosUtils.hpp>
+#include <string>
+
+
+%name{Mesos::XS::InterruptChannel} class mesos::perl::InterruptChannel
+{
+
+%{
+
+static void
+DESTROY(SV* self)
+    PPCODE:
+        // make sure the c++ destructor only gets called once
+        //  (both the blessed glob and the tied hash will call DESTROY)
+        if (!SvROK(self) || (SvTYPE(SvRV(self)) != SVt_PVGV))
+            XSRETURN_YES;
+        SV* glob = SvRV(self);
+        MAGIC *tie_magic = mg_find(MUTABLE_SV(GvIOp(glob)), PERL_MAGIC_tiedscalar);
+        SV* tied_hash = SvRV(tie_magic->mg_obj);
+        MAGIC* ext_magic = mg_find(tied_hash, PERL_MAGIC_ext);
+        mesos::perl::InterruptChannel* channel = (mesos::perl::InterruptChannel*) ext_magic->mg_ptr;
+        delete channel;
+        XSRETURN_YES;
+
+static void
+_xs_init(SV* self, void* interrupt_cb, void* interrupt_arg)
+    PPCODE:
+        if (SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV) {
+            mesos::perl::InterruptChannel* channel = new mesos::perl::InterruptChannel((interrupt_cb_t) interrupt_cb, interrupt_arg);
+            sv_magic(SvRV(self), Nullsv, PERL_MAGIC_ext,
+                             (const char*) channel, 0);
+        }
+
+mesos::perl::MesosCommand
+mesos::perl::InterruptChannel::recv()
+    CODE:
+        if (!THIS->size()) {
+            if (GIMME_V == G_ARRAY) {
+                XSRETURN_EMPTY;
+            } else {
+                XSRETURN_UNDEF;
+            }
+        }
+        RETVAL = THIS->recv();
+    OUTPUT:
+        RETVAL
+
+%}
+
+void send(mesos::perl::MesosCommand command);
+
+int size();
+
+};

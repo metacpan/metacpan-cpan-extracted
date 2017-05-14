@@ -70,9 +70,8 @@ sub display{	#this sub will display the page headers if needed
 			my $content = $self->_getContent();	#get the contents of the template
 			$self->content($content);
 		}
-		if($self->getError() && $self->code() =~ m/^[123]/){	#set the error code when needed
+		if($self->getError()){	#set the error code when needed
 			$self->code(500);
-			$self->message('Internal Server Error');
 		}
 		$output = "Status: " . $self->as_string();
 	}

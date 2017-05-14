@@ -1,0 +1,52 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Classes
+
+H2: Overview
+
+The classes available are summarised below.
+
+!block table; tags="CLASS"
+Name            Purpose
+references      references/documents
+terms           terms/definitions
+organisations   organisations
+products        products
+!endblock
+
+Further details on these are provided below.
+
+# Define the help to be placed after each class interface
+!macro CLASS_INTERFACE_END
+See {{SECT:Understanding Class Interfaces}}, if necessary.
+!endmacro
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'HTML_TOPICS_MODE'} || $var{'HTML_SUBTOPICS_MODE'}
+    # do nothing
+!elsif $var{'OPT_TARGET'} eq 'html' || $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!block topics
+Topic
+classes/corganis
+classes/cproduct
+classes/creferen
+classes/cterms
+!endblock
+
+!if !($var{'HTML_TOPICS_MODE'} || $var{'HTML_SUBTOPICS_MODE'})
+!off paragraph h2top
+!endif

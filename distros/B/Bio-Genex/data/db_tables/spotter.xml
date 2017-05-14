@@ -1,0 +1,73 @@
+<spotter_list>
+<spotter
+  model_description="MGuide"
+  model_serial_num="any"
+  contact="Patrick O. Brown"
+/>
+<spotter
+  model_description="ProSys"
+  model_serial_num="any"
+  contact="Cartesian Technologies"
+/>
+<spotter
+  model_description="PixSys"
+  model_serial_num="any"
+  contact="Cartesian Technologies"
+/>
+<spotter
+  model_description="MicroSys"
+  model_serial_num="any"
+  contact="Cartesian Technologies"
+/>
+<spotter
+  model_description="PegaSys 3000"
+  model_serial_num="any"
+  contact="Cartesian Technologies"
+/>
+<spotter
+  model_description="OmniGrid"
+  model_serial_num="any"
+  contact="GeneMachines"
+/>
+<spotter
+  model_description="Arrayer"
+  model_serial_num="any"
+  contact="Affymetrix"
+/>
+<spotter
+  model_description="GMS"
+  model_serial_num="417"
+  contact="Affymetrix"
+/>
+<spotter
+  model_description="FlexJet"
+  model_serial_num="any"
+  contact="Rosetta"
+/>
+<spotter
+  model_description="Agilent_Inkjet"
+  model_serial_num="any"
+  contact="Agilent"
+/>
+<spotter
+  model_description="BioRobotics"
+  model_serial_num="any"
+  contact="GeneScan"
+/>
+<spotter
+  model_description="ScienceChips"
+  model_serial_num="any"
+  contact="GeneScan"
+/>
+<spotter
+  model_description="MicroGrid"
+  model_serial_num="any"
+  contact="BioRobotics"
+/>
+<spotter
+  model_description="BioGrid"
+  model_serial_num="any"
+  contact="BioRobotics"
+/>
+</spotter_list>
+

@@ -1,0 +1,757 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: app.pl - Application Framework Library</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="in_api.html">Previous Topic</A> | <A HREF="dict.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="app.pl">2.2. app.pl - Application Framework Library</A></H1>
+<HR>
+<H2><A NAME="Purpose">2.2.1. Purpose</A></H2>
+<P>This library provides a common application framework for <A HREF="http://www.perl.com/perl/index.html">Perl</A> scripts.</P>
+<HR>
+<H2><A NAME="Interface">2.2.2. Interface</A></H2>
+<PRE>
+require &quot;app.pl&quot;;
+
+$<A HREF="#app_APP_STDIN_ARGS">APP_STDIN_ARGS</A> = ...
+
+$<A HREF="#app_app_lib_dir">app_lib_dir</A> = ...
+
+@<A HREF="#app_app_exit_routines">app_exit_routines</A> = ...
+
+%<A HREF="#app_app_config">app_config</A> = ...
+
+@<A HREF="#app_app_option_core">app_option_core</A> = ...
+
+@<A HREF="#app_app_option">app_option</A> = ...
+
+@<A HREF="#app_app_msg_table">app_msg_table</A> = ...
+
+$<A HREF="#app_app_context">app_context</A> = ...
+
+$<A HREF="#app_app_lineno">app_lineno</A> = ...
+
+%<A HREF="#app_app_msg_index">app_msg_index</A> = ...
+
+$<A HREF="#app_app_product_name">app_product_name</A> = ...
+
+$<A HREF="#app_app_product_version">app_product_version</A> = ...
+
+%<A HREF="#app_app_trace_level">app_trace_level</A> = ...
+
+&amp;<A HREF="#app_AppMsg">AppMsg</A>($type, $text, $calltree);
+
+%count =
+&amp;<A HREF="#app_AppMsgCounts">AppMsgCounts</A>($start_index);
+
+$index =
+&amp;<A HREF="#app_AppMsgNextIndex">AppMsgNextIndex</A>();
+
+&amp;<A HREF="#app_AppExit">AppExit</A>($type, $text, $calltree);
+
+&amp;<A HREF="#app_AppTrace">AppTrace</A>($group, $level, $msg);
+
+$ok =
+&amp;<A HREF="#app_AppInit">AppInit</A>($arguments, $purpose, $product, $ini_handler);
+
+&amp;<A HREF="#app_AppPrintUsage">AppPrintUsage</A>();
+
+%values =
+&amp;<A HREF="#app_AppSectionValues">AppSectionValues</A>($strs);
+
+&amp;<A HREF="#app_AppShowParts">AppShowParts</A>();
+
+&amp;<A HREF="#app_AppShowCallTree">AppShowCallTree</A>();
+
+$app_err =
+&amp;<A HREF="#app_AppProcess">AppProcess</A>($arg_process_fn, $arg_post_process_fn, $default_ext);
+
+</PRE>
+<HR>
+<H2><A NAME="Description">2.2.3. Description</A></H2>
+<H3><A NAME="Overview">2.2.3.1. Overview</A></H3>
+<P>This library provides routines for:</P>
+<UL>
+<LI>option processing
+<LI>argument processing
+<LI>message handling
+<LI>exiting a script</UL>
+<P>In principle, scripts using this library have a consistent user interface and internal structure, making them easier to use and maintain. A typical script looks like:</P>
+<PRE>
+     require &quot;sdf/app.pl&quot;;
+
+     # define configuration
+     %app_config = (
+             'inifile',      'abc.ini',
+     );
+
+     # define options
+     push(@app_option, (
+             'str|STR|my string parameter',
+     ));
+
+     # handle options
+     &amp;AppInit('file ...', 'do things to files') || &amp;AppExit();
+
+     # my post init stuff. e.g.
+     # * act on options
+     # * pop leading/trailing argument
+
+     &amp;AppProcess('argProcess');
+
+     # my pre exit stuff. e.g.
+     # * print summary information
+
+     &amp;AppExit();
+</PRE>
+<P>To summarise the framework:</P>
+<UL>
+<LI>%app_config is an optional set of configuration parameters
+<LI>@app_option is the set of options supported
+<LI>AppInit processes options and checks the argument count
+<LI>AppProcess processes arguments (i.e. for each one, calls a user defined subroutine typically called <EM>argProcess</EM>)
+<LI><EM>argProcess</EM> outputs messages using AppMsg
+<LI>AppExit exits and returns an error code to the operating system based on the severity of the messages output via AppMsg</UL>
+<H3><A NAME="Option Definitions">2.2.3.2. Option Definitions</A></H3>
+<P>Each option is defined by the fields in the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Field</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Option
+</TD>
+<TD>
+option name
+</TD>
+</TR>
+<TR>
+<TD>
+Spec
+</TD>
+<TD>
+option specification (type, etc.)
+</TD>
+</TR>
+<TR>
+<TD>
+Help
+</TD>
+<TD>
+short description of option
+</TD>
+</TR>
+</TABLE>
+
+<P>The name of the option is used in several ways:</P>
+<UL>
+<LI>as the name of the Perl variable (e.g. $help)
+<LI>as the name of the long option (e.g. --help)</UL>
+<P>If short format is enabled (e.g. -h), by default, the first character of the option name is used as the option code. Alternatively, the code to use can be explicitly specified using the <EM>Option</EM> syntax:</P>
+<PRE>
+      name&quot;;&quot;code
+</PRE>
+<P>This should be done if the default codes are not unique. To specify an option without a parameter, use the following <EM>Spec</EM> syntax:</P>
+<PRE>
+     BOOL
+</PRE>
+<P>If no <EM>Spec</EM> field is specified, this is the default. The value of a parameter-less option is 1 if the option if supplied on the command-line.</P>
+<P>To specify an option with a parameter, use the following <EM>Spec</EM> syntax:</P>
+<PRE>
+     opt_type&quot;-&quot;validation&quot;;&quot;initial_value&quot;;&quot;default_value
+</PRE>
+<P>Only the <EM>opt_type</EM> field is mandatory. The second semi-colon must be present to nominate the parameter as optional. Otherwise, the parameter is assumed to be required. The list of supported opt_types is given in the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Validation</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+STR
+</TD>
+<TD>
+value list
+</TD>
+<TD>
+text string
+</TD>
+</TR>
+<TR>
+<TD>
+INT
+</TD>
+<TD>
+min,max
+</TD>
+<TD>
+integer number
+</TD>
+</TR>
+<TR>
+<TD>
+NUM
+</TD>
+<TD>
+min,max
+</TD>
+<TD>
+real number
+</TD>
+</TR>
+</TABLE>
+
+<P><EM>min</EM> and <EM>max</EM> are optional in the validation of numeric options. Typical STR definitions are given below.</P>
+<PRE>
+     STR-(qwe,asd,zxc);qwe;asd       # in-lining of codes
+     STR-@ok_array;qwe;asd           # array lookup
+     STR-keys %ok_hash;qwe;asd       # hash validate
+     STR-values %ok_hash;qwe;asd     # hash validate
+</PRE>
+<P>An array of STR, INT or NUM can be requested by suffixing the type with 'LIST' or 'HASH'. LIST create a normal array and HASH create an associative array in Perl. Array options can be specified multiple times on the command-line and multiple items can be specified at once separated by commas. For a LIST, the values supplied are appended to the current list. For a HASH, values are treated as follows:</P>
+<UL>
+<LI>if the format is 'x=y', the result is: $optname{'x'} = 'y'
+<LI>otherwise, the result is: $optname{'x'} = 1</UL>
+<P>In some cases, it is useful to give an array option an initial value but permit the user to 'reset' the array back to empty. This can be done by defining the option as having an empty optional parameter. i.e. selecting the default value of a parameter-optional LIST or HASH does not append the default value - it initialises the array to the default value.</P>
+<P>If finer control is required over processing an option, a routine can be nominated to process an option. To do this, use the following <EM>Spec</EM> syntax:</P>
+<PRE>
+     ROUTINE&quot;-&quot;routine_name&quot;;&quot;initial_value&quot;;&quot;default_value
+</PRE>
+<P>The parameter type is specified by the number of semi-colons:</P>
+<UL>
+<LI>0 - no parameter
+<LI>1 - required parameter
+<LI>2 - optional parameter</UL>
+<P>The parameter, if any, is passed as a string to the nominated routine.</P>
+<H3><A NAME="Configuration Parameters">2.2.3.3. Configuration Parameters</A></H3>
+<P>The configuration parameters supported are summarised below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Parameter</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+inifile
+</TD>
+<TD>
+the name of the initialisation file to use, if any
+</TD>
+</TR>
+<TR>
+<TD>
+version
+</TD>
+<TD>
+the script version
+</TD>
+</TR>
+<TR>
+<TD>
+product
+</TD>
+<TD>
+the product to which this script belongs, if any
+</TD>
+</TR>
+<TR>
+<TD>
+parts
+</TD>
+<TD>
+display name &amp; version of components (and exit)
+</TD>
+</TR>
+<TR>
+<TD>
+time
+</TD>
+<TD>
+display execution time (when exiting)
+</TD>
+</TR>
+<TR>
+<TD>
+calltree
+</TD>
+<TD>
+display the sequence of function calls causing the exit
+</TD>
+</TR>
+</TABLE>
+
+<P>There are several ways to set configuration parameters:</P>
+<OL>
+<LI>by initialising %app_config before calling AppInit
+<LI>by defining parameters in the '[Configuration]' section of an initialisation file
+<LI>by setting parameters on the command line (using the . option)
+<LI>for backwards compatibility, certain parameters can be set other ways:<UL>
+<LI><EM>version</EM> can be set via $VERSION{'PUBLIC'}</UL><UL>
+<LI><EM>product</EM> can be set via AppInit</UL></OL>
+<H3><A NAME="Configuration Data">2.2.3.4. Configuration Data</A></H3>
+<P>Configuration data can be stored in <EM>ini</EM> files and loaded during the initialisation stage (i.e. while AppInit is running). To do this, specify a subroutine as the <EM>ini_handler</EM> parameter for AppInit. The routine is passed the name of the ini file and an associative array containing the sections (after the standard ones like 'Configuration' have been removed). A warning will be produced for any sections not processed by your routine, so delete each section after you have finished processing it. A sample processing routine is given below.</P>
+<PRE>
+sub iniProcess {
+    local($fname, *data) = @_;
+#   local();
+    local($section);
+    local(@my_table, %my_values);
+
+    for $section (sort keys %data) {
+        if ($section eq 'MyTable') {
+            @my_table = &amp;TableParse($data{$section});
+            delete $data{$section};
+        }
+        elsif ($section eq 'MyValues') {
+            %my_values = &amp;AppIniValues($data{$section});
+            delete $data{$section};
+        }
+    }
+}
+</PRE>
+<H3><A NAME="Component Descriptions">2.2.3.5. Component Descriptions</A></H3>
+<P><STRONG><A NAME="app_APP_STDIN_ARGS">$APP_STDIN_ARGS</A></STRONG> is the pseudo argument (default '+') which causes standard input to be processed as a list of arguments. Some scripts may wish to use another symbol (i.e. '+' might be required as a genuine argument), or disable this behaviour altogether. See <STRONG><A NAME="app_AppProcess">AppProcess</A></STRONG>.</P>
+<P><STRONG><A NAME="app_app_path">$app_path</A></STRONG>, <STRONG><A NAME="app_app_dir">$app_dir</A></STRONG> and <STRONG><A NAME="app_app_name">$app_name</A></STRONG> are the full pathname, directory and name of the application respectively.</P>
+<P><STRONG><A NAME="app_app_lib_dir">$app_lib_dir</A></STRONG> is the library directory for this application, i.e. the directory containing configuration files. The default value is the <STRONG><A NAME="app_app_dir">$app_dir</A></STRONG>. This directory is typically set by searching the Perl library path for the <EM>libdir</EM> configuration parameter, if any.</P>
+<P><STRONG><A NAME="app_app_exit_routines">@app_exit_routines</A></STRONG> is the stack of routines to be executed on program termination. If you want a routine to be called on termination (normal and abnormal), push the name of the routine onto this stack. These routines will be executed when <STRONG><A NAME="app_AppExit">AppExit</A></STRONG> is called. It is thus advisable to ensure that <STRONG><A NAME="app_AppExit">AppExit</A></STRONG> is NOT called within an exit routine.</P>
+<P><STRONG><A NAME="app_app_config">%app_config</A></STRONG> contains the application's configuration parameters. <EM>@app_option</EM> defines the options supported by the application. The default options are <EM>help</EM>, <EM>out_ext</EM> and <EM>log_ext</EM>. To append to these, push your arguments onto the array. For example:</P>
+<PRE>
+ push(@app_option,
+      'report|STR|report file',
+ );
+</PRE>
+<P>If the script will never have a need for 'per file' output or errors, assign <STRONG><A NAME="app_app_option_core">@app_option_core</A></STRONG> to <STRONG><A NAME="app_app_option">@app_option</A></STRONG> before appending your script-specific options. For example:</P>
+<PRE>
+ @app_option = @app_option_core;
+ push(@app_option,
+      'report|STR|report file',
+ );
+</PRE>
+<P>To obtain a concise description of each option, use the help option with no parameter. Alternatively, detailed help on a given option can be obtained by suppying the option name as a parameter.</P>
+<P>By default, output goes to standard output and diagnostics goes to standard error. These rules can be changed by specifying the <EM>out_ext</EM> and <EM>log_ext</EM> options respectively (and calling <STRONG><A NAME="app_AppProcess">AppProcess</A></STRONG> to process arguments). If a string is supplied to these options, it is treated as the extension of the file to send things to for each file. If supplied without a parameter, the extensions default to <EM>out</EM> and <EM>log</EM> respectively. A minus character (-) or an equals character (=) can be used to indicate standard output or standard error respectively.</P>
+<P><STRONG><A NAME="app_app_msg_table">app_msg_table</A></STRONG> defines the known message types. Each type is defined by the attributes in the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Attribute</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Type
+</TD>
+<TD>
+message type name
+</TD>
+</TR>
+<TR>
+<TD>
+Severity
+</TD>
+<TD>
+application exit code caused by this message
+</TD>
+</TR>
+<TR>
+<TD>
+Layout
+</TD>
+<TD>
+format of message text
+</TD>
+</TR>
+</TABLE>
+
+<P><EM>Layout</EM> can include the symbols given in the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$text
+</TD>
+<TD>
+user text
+</TD>
+</TR>
+<TR>
+<TD>
+$type
+</TD>
+<TD>
+message type
+</TD>
+</TR>
+<TR>
+<TD>
+$app_name
+</TD>
+<TD>
+application name
+</TD>
+</TR>
+<TR>
+<TD>
+$ARGV
+</TD>
+<TD>
+current argument name (usually a file name)
+</TD>
+</TR>
+<TR>
+<TD>
+$app_context
+</TD>
+<TD>
+current &quot;context&quot; (e.g. 'line ')
+</TD>
+</TR>
+<TR>
+<TD>
+$.
+</TD>
+<TD>
+current line number
+</TD>
+</TR>
+<TR>
+<TD>
+$app_lineno
+</TD>
+<TD>
+current line number (if $. is 0)
+</TD>
+</TR>
+</TABLE>
+
+<P>The standard message types are explained in the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Tag</STRONG>
+</TD>
+<TD>
+<STRONG>Severity</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>current object:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+object
+</TD>
+<TD>
+0
+</TD>
+<TD>
+general information
+</TD>
+</TR>
+<TR>
+<TD>
+warning
+</TD>
+<TD>
+8
+</TD>
+<TD>
+something you should know
+</TD>
+</TR>
+<TR>
+<TD>
+error
+</TD>
+<TD>
+16
+</TD>
+<TD>
+something you should fix
+</TD>
+</TR>
+<TR>
+<TD>
+abort
+</TD>
+<TD>
+24
+</TD>
+<TD>
+cannot precede processing
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>whole application:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+app
+</TD>
+<TD>
+0
+</TD>
+<TD>
+general information
+</TD>
+</TR>
+<TR>
+<TD>
+app_warning
+</TD>
+<TD>
+10
+</TD>
+<TD>
+something you should know
+</TD>
+</TR>
+<TR>
+<TD>
+app_error
+</TD>
+<TD>
+18
+</TD>
+<TD>
+something you should fix
+</TD>
+</TR>
+<TR>
+<TD>
+fatal
+</TD>
+<TD>
+32
+</TD>
+<TD>
+cannot precede processing
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>non-user messages:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+debug
+</TD>
+<TD>
+0
+</TD>
+<TD>
+debugging diagnostics - ignore
+</TD>
+</TR>
+<TR>
+<TD>
+failed
+</TD>
+<TD>
+64
+</TD>
+<TD>
+internal check failed - notify developer
+</TD>
+</TR>
+</TABLE>
+
+<P>All messages are output to the standard error stream with a newline appended and prefixed as follows:</P>
+<UL>
+<LI><EM>object</EM> messages by the current object name
+<LI><EM>warning</EM>, <EM>error</EM> and <EM>abort</EM> by current object name, line number and message type
+<LI><EM>app</EM> messages by the application name
+<LI><EM>app_warning</EM> messages by the application name and 'warning'
+<LI><EM>app_error</EM> messages by the application name and 'error'
+<LI><EM>fatal</EM> messages by the application name and 'fatal'
+<LI><EM>debug</EM> by application name and 'debug'
+<LI><EM>failed</EM> by application name and 'internal failure'</UL>
+<P>Most applications only use <EM>fatal</EM>, <EM>abort</EM>, <EM>error</EM> and <EM>warning</EM>. <EM>fatal</EM> is used when an application decides to terminate. (e.g. when an option is illegal.) <EM>abort</EM> is used when an application decides not be precede any further on the current object (e.g. too many errors encountered). <EM>error</EM> is used when a serious error is detected in processing the current object. <EM>warning</EM> is used when a minor error or possible error is detected. Typically, an application continues processing the current object when an error or warning is encountered but errors prevent further passes on the object while warnings do not.</P>
+<P><STRONG><A NAME="app_app_context">app_context</A></STRONG> and <STRONG><A NAME="app_app_lineno">app_lineno</A></STRONG> are the context and line number used in error messages. <STRONG><A NAME="app_app_lineno">app_lineno</A></STRONG> is only used if $. is 0.</P>
+<P><STRONG><A NAME="app_app_msg_index">%app_msg_index</A></STRONG> is the index into the message table. (Most programmers have no need for this, but it's provided in case someone does want it.)</P>
+<P><STRONG><A NAME="app_app_product_name">app_product_name</A></STRONG> and <STRONG><A NAME="app_app_product_version">app_product_version</A></STRONG> are the application name and version respectively. These are typically set during execution of the <EM>AppInit</EM> routine.)</P>
+<P><STRONG><A NAME="app_app_trace_level">app_trace_level</A></STRONG> is the highest level of trace messages output by <STRONG><A NAME="app_AppTrace">AppTrace</A></STRONG> for each tracing group.</P>
+<P><STRONG><A NAME="app_AppMsg">AppMsg</A></STRONG> outputs a message. The format of the message is determined by the <EM>type</EM> parameter which should be defined in <STRONG><A NAME="app_app_msg_table">app_msg_table</A></STRONG>. If the type is unknown, behaviour is undefined. If <EM>calltree</EM> is set, a call tree is dumped after the message is output.</P>
+<P>If a message layout includes the current line number ($.) and it is 0, <STRONG><A NAME="app_AppMsg">AppMsg</A></STRONG> uses the dot-version (e.g. &quot;.error&quot;) of the message instead.</P>
+<P>The messages output via <STRONG><A NAME="app_AppMsg">AppMsg</A></STRONG> influence the exit code returned to the operating system by <STRONG><A NAME="app_AppExit">AppExit</A></STRONG>. If you wish to influence this but not output a message, specify a <EM>type</EM> parameter without a <EM>text</EM> parameter.</P>
+<P><STRONG><A NAME="app_AppMsgCounts">AppMsgCounts</A></STRONG> returns the number of each message type found. If you are interested in the message counts since a particular point in time, a starting index to begin the counting from can be specified.</P>
+<P><STRONG><A NAME="app_AppMsgNextIndex">AppMsgNextIndex</A></STRONG> returns the next index to be used in the message log. The value returned can be used as the <EM>start_index</EM> parameter to the <STRONG><A NAME="app_AppMsgCounts">AppMsgCounts</A></STRONG> routine.</P>
+<P><STRONG><A NAME="app_AppExit">AppExit</A></STRONG> exits the current application. If a message is specified, it is first output via <STRONG><A NAME="app_AppMsg">AppMsg</A></STRONG>. The exit code returned to the operating system is dependent on the messages output by <STRONG><A NAME="app_AppMsg">AppMsg</A></STRONG>. If <EM>calltree</EM> is set, a call tree is dumped after the message is output.</P>
+<P><STRONG><A NAME="app_AppTrace">AppTrace</A></STRONG> outputs a trace message if <EM>group</EM> tracing is supported and for that group, the trace level is &gt;= <EM>level</EM>. The default group is called <EM>user</EM>.</P>
+<P><STRONG><A NAME="app_AppInit">AppInit</A></STRONG> processes options and checks the argument count for a perl script. The supported options are defined by @app_option. Options must occur before arguments and begin with a - character for the short format or -- for the long format. Option processing is terminated when either an argument or the -- symbol is detected. If an environment variable of the form <EM>app_name</EM>OPTS is found, options are first processed from there.</P>
+<P>The expected number of arguments is derived from the format of the <EM>arguments</EM> parameter as illustrated by the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Expected</STRONG>
+</TD>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+0
+</TD>
+<TD>
+&quot;&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+0 or more
+</TD>
+<TD>
+&quot;...&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+1
+</TD>
+<TD>
+&quot;file&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+1 or more
+</TD>
+<TD>
+&quot;file ...&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+2
+</TD>
+<TD>
+&quot;source destination&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+2 or more
+</TD>
+<TD>
+&quot;pattern file ...&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+2 or more
+</TD>
+<TD>
+&quot;file ... destination&quot;
+</TD>
+</TR>
+</TABLE>
+
+<P>The pattern &quot;...&quot; is used to detect if a variable number of arguments is permitted. If no arguments are supplied and one or more are expected, then a concise usage message is output. If an application does not require an argument, there is no way to output only a concise usage (use the help option instead). <EM>purpose</EM> is displayed as part of the usage message. <EM>product</EM> is an optional parameter. If it is supplied and a product of that name exists in the internal product version lookup table, the product version is included in the usage too. Note that the usage message always includes a script version, regardless of whether a product version is displayed or not.</P>
+<P>If <STRONG><A NAME="app_AppInit">AppInit</A></STRONG> encounters an error, it outputs a usage message and returns 0. Otherwise, it returns 1.</P>
+<P><STRONG><A NAME="app_AppPrintUsage">AppPrintUsage</A></STRONG> outputs the usage header message build during the last call to <STRONG><A NAME="app_AppInit">AppInit</A></STRONG>. Only the first call to this routine (after <STRONG><A NAME="app_AppInit">AppInit</A></STRONG> is called) will print the message. This allows programmers to do additional validation after <STRONG><A NAME="app_AppInit">AppInit</A></STRONG> returns and know that only one usage header message will be output.</P>
+<P><STRONG><A NAME="app_AppSectionValues">AppSectionValues</A></STRONG> converts an inifile section into a set of name-value pairs.</P>
+<P><STRONG><A NAME="app_AppShowParts">AppShowParts</A></STRONG> displays the versions of components making up this application and exits. To support this facility, each library should include a line of the form:</P>
+<UL>
+$VERSION{__FILE__} = &quot;x.y&quot;</UL>
+<P>Strings containing SCCS or RCS stuff have the baggage stripped. For example:</P>
+<UL>
+<LI>'@(#) 3.2' is displayed as '3.2'
+<LI>'$Revision: 1.27 $' is displayed as '3.3'</UL>
+<P><STRONG><A NAME="app_AppShowParts">AppShowParts</A></STRONG> is usually called via the '.parts' special help option. However, certain application code might have a need to call it directly.</P>
+<P><STRONG><A NAME="app_AppShowCallTree">AppShowCallTree</A></STRONG> displays the call tree (excluding the call to itself). The routine is usually called indirectly:</P>
+<UL>
+<LI>via <STRONG><A NAME="app_AppMsg">AppMsg</A></STRONG> or <STRONG><A NAME="app_AppExit">AppExit</A></STRONG> (<EM>calltree</EM> parameter set), or
+<LI>via the .calltree special help parameter</UL>
+<P>Like <STRONG><A NAME="app_AppShowComponents">AppShowComponents</A></STRONG>, certain application code may wish to call <STRONG><A NAME="app_AppShowCallTree">AppShowCallTree</A></STRONG> directly.</P>
+<P><STRONG><A NAME="app_AppProcess">AppProcess</A></STRONG> processes each argument on the command-line. In particular, it does the following for each argument:</P>
+<UL>
+<LI>if the argument is '+', processes each line of standard input as an argument
+<LI>if a file matching an argument is not found, but <EM>default_ext</EM> is supplied and adding that extension results in a file being found, then <EM>default_ext</EM> is added as an extension to the argument
+<LI>echos the argument to standard error if there is more than one
+<LI>if $out_ext is set, opens an output file for the current argument and redirects STDOUT to it
+<LI>if $log_ext is set, opens a log file for the current argument and redirects STDERR to it
+<LI>calls <EM>arg_process_fn</EM>
+<LI>close the output and log files, returning STDOUT and STDERR back to their initial state
+<LI>calls <EM>arg_post_process_fn</EM>, if any</UL>
+<P>Note that <EM>arg_post_process</EM> is optional - it is only used in scripts which need to do additional processing on an file <EM>after</EM> output streams have been closed.</P>
+<P><EM>arg_process_fn</EM> has the following interface:</P>
+<PRE>
+     $err = &amp;arg_process_fn($arg)
+</PRE>
+<P><EM>arg_post_process_fn</EM> has the following interface:</P>
+<PRE>
+     $err = &amp;arg_post_process_fn($arg, $arg_err)
+</PRE>
+<P>where <EM>arg_err</EM> is the error code returned by <EM>arg_process_fn</EM>. <STRONG><A NAME="app_AppProcess">AppProcess</A></STRONG> returns the highest error code it encounters from the user processing functions it calls.</P>
+<P>If you need to disable the special meaning of '+', set the <STRONG><A NAME="app_APP_STDIN_ARGS">APP_STDIN_ARGS</A></STRONG> configuration constant to an empty string. Likewise, you can change the character used by setting it to another value, although this is not recommended given the consistency implications.</P>
+<HR>
+<H2><A NAME="Limitations and future directions">2.2.4. Limitations and future directions</A></H2>
+<P>On MS-DOS using BigPerl v2 or v3, redirecting STDOUT after <STRONG>AppProcess</STRONG> doesn't work.</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="in_api.html">Previous Topic</A> | <A HREF="dict.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

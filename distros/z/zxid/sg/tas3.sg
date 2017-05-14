@@ -1,0 +1,68 @@
+# zxid/sg/tas3.sg
+# Created, 22.11.2009, Sampo Kellomaki (sampo@iki.fi)
+# 11.2.2016, added <tas3:AltAddress> element --Sampo
+# $Id: tas3.sg,v 1.1 2010-01-08 02:10:09 sampo Exp $
+
+target(tas3, http://tas3.eu/tas3/200911/)
+ns(xs,       http://www.w3.org/2001/XMLSchema)
+ns(b,        urn:liberty:sb:2006-08)
+import(sa,   urn:oasis:names:tc:SAML:2.0:assertion, saml-schema-assertion-2.0.xsd)
+ns(sa11,     urn:oasis:names:tc:SAML:1.0:assertion)
+ns(ff12,     urn:liberty:iff:2003-08)
+ns(xa,       urn:oasis:names:tc:xacml:2.0:policy:schema:os)
+ns(xac,      urn:oasis:names:tc:xacml:2.0:context:schema:os)
+import(lu,  urn:liberty:util:2006-08, liberty-idwsf-utility-v2.0.xsd)
+
+Credentials -> %tas3:CredentialsType
+%CredentialsType:
+  sa:Assertion?
+  sa:EncryptedAssertion?
+  sa11:Assertion?
+  ff12:Assertion?
+  sa:Attribute*
+  sa:EncryptedAttribute*
+  xac:Attribute*
+  &@b:hdr
+  @usage?
+  ;
+
+ESLPolicies -> %tas3:ESLPoliciesType
+%ESLPoliciesType:
+  tas3:ESLApply+
+  &@b:hdr
+  @usage?
+  ;
+
+ESLApply -> %tas3:ESLApplyType
+%ESLApplyType:
+  tas3:ESLRef+
+  xa:Obligation+
+  ;
+
+ESLRef -> %tas3:ESLRefType
+%ESLRefType:
+  @ref?   -> %xs:anyURI
+  @xpath? -> %xs:string
+  ;
+
+Status -> %tas3:StatusType
+%StatusType: base(lu:StatusType)
+  @ctlpt? -> %xs:string
+  &@b:hdr
+  ;
+
+Trust -> %tas3:TrustType
+%TrustType:
+  tas3:TrustRanking*
+  @vers -> %xs:string
+  ;
+
+TrustRanking -> %tas3:TrustRankingType
+%TrustRankingType:
+  @metric -> %xs:string
+  @val -> %xs:string
+  ;
+
+AltAddress -> %xs:anyURI
+
+#EOF

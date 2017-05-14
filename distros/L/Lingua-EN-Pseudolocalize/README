@@ -1,0 +1,50 @@
+SYNOPSIS
+
+        use Lingua::EN::Pseudolocalize qw( convert deconvert );
+    
+        my $text = 'Widdly scuds?';
+    
+        my $pl_text = convert($text);
+
+DESCRIPTION
+
+    This package contains utilities for pseudolocalizing English or similar
+    languages expressable in the ASCII character set.
+
+    Applications created or maintained by English-speaking developers may
+    suffer from overlooked Unicode support due to the ASCII, latin1,
+    Windows CP1252, and utf8 encodings being equivalent for the code points
+    used in English. You may think that your application is
+    Unicode-friendly, but it's easy to forget to test for extended
+    character support. It goes overlooked until a customer pastes in some
+    decorative quotes from MS Word and you end up with mojibake in your
+    app.
+
+    This module will convert your basic Latin characters to similar-looking
+    characters that are much higher on the code plane. This process is
+    called pseudolocalization, and it will very quickly expose a few common
+    errors in encoding support.
+
+    DO NOT USE THIS MODULE IN PRODUCTION. Use it in read-only mode, or on a
+    test data set. It should make round-trip conversions just fine, but if
+    you have data in your application that is in the conversion table, no
+    effort is made to preserve your data. It might end up stripping out all
+    the diacritics from your data, and that would ruin your comprehensive
+    database of melodic Finnish folk-metal bands.
+
+FUNCTIONS
+
+    convert($text)
+
+      Converts $text into pseudolocalized text using a simple mapping
+      table. A few pairs are combined into single characters with
+      ligatures, while the rest are simple one-to-one mappings.
+
+      Returns: the converted string
+
+    deconvert($text)
+
+      Reverses the process of convert() using the same mapping table.
+
+      Returns: the converted string
+

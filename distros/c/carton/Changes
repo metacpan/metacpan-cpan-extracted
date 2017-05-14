@@ -1,0 +1,71 @@
+Revision history for carton
+
+v0.9.15  2013-03-31 18:11:28 PDT
+        - Add minimum perl dependency
+
+v0.9.14  2013-03-30 18:25:39 PDT
+        - Unset $VERSION on PAUSE (Thanks andk)
+
+v0.9.13  2013-03-30 15:14:49 PDT
+        - repackage for better META files with Milla v0.9.3
+
+v0.9.12  2013-03-30 15:01:55 PDT
+        - repackage to set $VERSION
+
+v0.9.11  2013-03-30 14:54:21 PDT
+        - Ignore 'perl' requirements so as it won't fail, for now. #71
+        - Install 'test' dependencies by default. #66
+        - Convert to Milla, do not install carton-* man pages
+
+v0.9.10 Tue Feb 26 13:32:34 PST 2013
+        - Same as v0.9_9. Still considered pre-1.0!
+
+v0.9_9  Wed Feb  6 11:02:46 PST 2013
+        - Fixed bundle command where it updated modules, not the versions specified in carton.lock.
+          bundle now builds mirror files like install --deployment, and downloads tarballs for the
+          specified versions. (vti)
+
+v0.9_8  Tue Feb  5 12:17:54 PST 2013
+        - Do not use carton.lock to build extra dependencies. Everything has to be
+          pulled out of cpanfile, even with the deployment mode. This makes the deployment
+          much more reliable, and could possibly work with differing os/perl versions
+          across development and deployments.
+
+v0.9_7  Sat May 12 06:15:44 EEST 2012
+        - Experimental multiple mirror support (nihen)
+        - Fixed cpanm dependency to avoid cascading bug
+
+v0.9_6  Thu May 10 21:05:35 CEST 2012
+        - use cpanfile + Module::Install for dogfooding
+        - `carton` without args now does `carton install` (inspired by bundler)
+        - Update bundle command to use install.json (masaki)
+        - code cleanups and doc overhauls
+        - removed `uninstall` command for now
+        - Fixed CPAN::Meta::Requirements dependency
+
+v0.9_5  Thu Apr 12 19:39:19 JST 2012
+        - Added experimental cpanfile support
+        - Fixed POD (yanick)
+
+v0.9.4  Sat Mar 31 13:49:41 CEST 2012
+        - use Capture::Tiny to capture output (wchristian)
+        - Improve synopsis for exec (dagolden)
+        - Implemented bundle command (masaki)
+        - Fix Getopt::Long dependency (pfig)
+
+v0.9.3  Wed Oct 19 14:30:50 JST 2011
+        - Fixed META.yml by patching Module::Install and repackaging
+
+v0.9.2  Tue Oct 18 12:53:57 JST 2011
+        - Fixed packaging *again* by declaring version as a simple string
+          via http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
+
+v0.9.1  Mon Oct 17 19:05:12 JST 2011
+        - Fixed packaging
+        - Fixed UTF8 encoding warnings for JSON
+
+v0.9.0  Fri Oct 14 01:27:02 JST 2011
+        - Initial non-dev release. Still considered beta before it hits 1.0.0!
+
+v0.1_0  Sun Jun 26 11:03:50 PDT 2011
+        - original version

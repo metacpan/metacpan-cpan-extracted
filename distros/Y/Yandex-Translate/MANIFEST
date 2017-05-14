@@ -2,9 +2,7 @@ Changes
 examples/detect_lang.pl
 examples/get_langs.pl
 examples/tr_with_ins.pl
-examples/tr_with_methods_ins.pl
-examples/translate_with_instance_attrs.pl
-examples/translate_with_methods.pl
+examples/tr_with_methods.pl
 lib/Yandex/Translate.pm
 Makefile.PL
 MANIFEST

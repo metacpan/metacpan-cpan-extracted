@@ -3,14 +3,13 @@ use strict;
 use WWW::SourceForge;
 use WWW::SourceForge::Project;
 
-our $VERSION = '0.20';
+our $VERSION = '0.30';
 
 =head2 new
 
  Usage: 
  
-    my $user = new WWW::SourceForge::User( id => 1234 );
-    my $user2 = new WWW::SourceForge::User( username => 'rbowen' );
+    my $user = new WWW::SourceForge::User( username => 'rbowen' );
 
  Returns: WWW::SourceForge::User object;
 
@@ -24,21 +23,18 @@ sub new {
     my $api = new WWW::SourceForge;
     my $json;
     if ( $parameters{id} ) {
-        $json = $api->call(
-            method => 'user',
-            id     => $parameters{id}
-        );
+        warn("The Sourceforge API no longer understands user IDs.");
+        return 0;
     } elsif ( $parameters{username} ) {
         $json = $api->call(
-            method   => 'user',
-            username => $parameters{username}
+            uri => '/u/' . $parameters{username} . '/profile/',
         );
     } else {
         warn('You must provide an id or username. Bad monkey.');
         return 0;
     }
 
-    $self->{data} = $json->{User};
+    $self->{data} = $json;
     return $self;
 
 }

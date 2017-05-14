@@ -2,7 +2,9 @@ package WebService::PayPal::PaymentsAdvanced;
 
 use Moo;
 
-our $VERSION = '0.000021';
+use namespace::autoclean;
+
+our $VERSION = '0.000022';
 
 use feature qw( say state );
 
@@ -13,7 +15,8 @@ use MooX::StrictConstructor;
 use Type::Params qw( compile );
 use Types::Common::Numeric qw( PositiveNum );
 use Types::Common::String qw( NonEmptyStr );
-use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Int Num Optional );
+use Types::Standard
+    qw( ArrayRef Bool CodeRef HashRef InstanceOf Int Num Optional );
 use Types::URI qw( Uri );
 use URI;
 use URI::FromHash qw( uri uri_object );
@@ -162,15 +165,16 @@ sub _response_for {
 sub create_secure_token {
     my $self = shift;
 
-    state $check = compile(HashRef);
-    my ($args) = $check->(@_);
+    state $check = compile( HashRef, Optional [HashRef] );
+    my ( $args, $options ) = $check->(@_);
+    $options ||= {};
 
     my $post = $self->_force_upper_case($args);
 
     $post->{CREATESECURETOKEN} = 'Y';
     $post->{SECURETOKENID} ||= Data::GUID->new->as_string;
 
-    my $res = $self->post($post);
+    my $res = $self->post( $post, $options );
 
     $self->_validate_secure_token_id( $res, $post->{SECURETOKENID} );
 
@@ -233,8 +237,8 @@ sub inquiry_transaction {
 sub post {
     my $self = shift;
 
-    state $check = compile(HashRef);
-    my ($post) = $check->(@_);
+    state $check = compile( HashRef, Optional [HashRef] );
+    my ( $post, $options ) = $check->(@_);
 
     $post = $self->_force_upper_case($post);
     $post->{VERBOSITY} = 'HIGH' if $self->verbose;
@@ -257,6 +261,7 @@ sub post {
             payflow_link_uri         => $self->payflow_link_uri,
             ua                       => $self->ua,
             validate_hosted_form_uri => $self->validate_hosted_form_uri,
+            %{ $options || {} },
         );
     }
 
@@ -434,13 +439,15 @@ sub _pseudo_encode_args {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Payments Advanced web service
 
 =head1 VERSION
 
-version 0.000021
+version 0.000022
 
 =head1 SYNOPSIS
 
@@ -606,6 +613,11 @@ to C<true>.
 Create a secure token which you can use to create a hosted form uri.  Returns a
 L<WebService::PayPal::PaymentsAdvanced::Response::SecureToken> object.
 
+The first parameter holds the key/value parameters for the request. The second
+parameter is optional and holds parameters to the underlying
+L<WebService::PayPal::PaymentsAdvanced::Response::SecureToken> object, which is
+useful to set attributes such as C<retry_attempts> and C<retry_callback>.
+
     use WebService::PayPal::PaymentsAdvanced;
     my $payments = WebService::PayPal::PaymentsAdvanced->new(...);
 
@@ -668,7 +680,9 @@ C<Boolean>.
 Generic method to post arbitrary params to PayPal.  Requires a C<HashRef> of
 parameters and returns a L<WebService::PayPal::PaymentsAdvanced::Response>
 object.  Any lower case keys will be converted to upper case before this
-response is sent.
+response is sent. The second parameter is an optional C<HashRef>. If provided,
+it defines attributes to pass to the
+L<WebService::PayPal::PaymentsAdvanced::Response::SecureToken> object.
 
     use WebService::PayPal::PaymentsAdvanced;
     my $payments = WebService::PayPal::PaymentsAdvanced->new(...);
@@ -775,15 +789,23 @@ Returns a response object.
 The official L<Payflow Gateway Developer Guide and
 Reference|https://developer.paypal.com/docs/classic/payflow/integration-guide/>
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues>.
+
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Greg Oschwald Mark Fowler Olaf Alders
+=for stopwords Andy Jack Dave Rolsky Greg Oschwald Mark Fowler Mateu X Hunter Olaf Alders William Storey
 
 =over 4
+
+=item *
+
+Andy Jack <ajack@maxmind.com>
 
 =item *
 
@@ -799,13 +821,21 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =item *
 
+Mateu X Hunter <mhunter@maxmind.com>
+
+=item *
+
 Olaf Alders <oalders@maxmind.com>
+
+=item *
+
+William Storey <wstorey@maxmind.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc.
+This software is copyright (c) 2017 by MaxMind, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

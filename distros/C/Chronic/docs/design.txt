@@ -1,0 +1,190 @@
+
+Chronic constraints-based scheduling algorithm: 
+
+    The scheduler maintains three kinds of timers:
+
+            ``constraint_wait'' - per constraint
+            ``task_wait'' - per task
+            ``scheduler_wait'' - per scheduler
+
+        constraint_wait is what ::Constraint::wait() returns, immediately
+        after the call to met().
+
+        task_wait is the smallest of constraint_wait's for a
+        task.
+
+    When a constraint_wait <= 0, it's met() method is called to see if the
+    constraint was met. wait() must be called after the met() function to
+    determine the wait() before the constraint should be checked again
+    (ie. before the next met() call). wait() should be called immediately
+    after met(), since the wait() value is actually computed by met(), 
+    and wait() just returns it.
+
+    The scheduler also maintains an "active" timer for each constraint.
+    This active value is number of seconds for which the constrain has
+    been active.
+
+    The algorithm is as follows: 
+
+    1. sleep_for_unit_time()
+
+    2. If scheduler_wait > 0, sleep(scheduler_wait);
+
+    3. Choose the next task from the list.
+
+       If task_wait > 0, goto step 1
+        
+    4. For every constraint of the task: 
+
+        a. Call ::constraint::met() followed by 
+            ::constrain::wait()
+
+        c. set time_wait to wait if wait > time_wait
+
+        c. If met(),
+ 
+            -> reset constraint_active timer if 
+                not running
+            -> if (constraint_active > reqd_active) 
+                constraint_active
+                    -> last_ran = time();
+                    -> execute the program
+
+        c. If not met(), 
+            do nothing.
+
+        d. Goto Slep 1.
+                
+
+A tasks consists of: 
+
+    1. A ``frequency'' in seconds (the task should be executed no 
+        more than once in ``frequency'' seconds.
+
+    2. A ``command'' to execute.
+
+    3. One or more ``constraints'' that must be met before the task is
+       run.
+
+    4. A ``last_ran'' time that is used by the scheduler to determine
+       if the task is in or outside the ``frequency'' threshold. If
+       ``last_run'' is not provided, Chronic assumes a ``last_time''
+       of 0, which means the task should be scheduled soon as
+       constraints are met.
+
+    5. A ``hard_limit'' is an optional frequency that tells chronic to 
+       schedule the task irrespective of the constraints if the task
+       has not been executed in ``hard_limit'' seconds.
+
+Schedule:
+
+Is a set of tasks, represented as hash references. Example of a schedule
+of two tasks:
+
+ '_schedule' => [
+                  {
+                    'constraints' => {
+                                 'Freq' => {
+                                       'active' => '1',
+                                       'thresholds' => [
+                                                         'OnceIn',
+                                                         '60'
+                                                       ]
+                                     },
+                                 'DiskIO' => {
+                                         'active' => '600',
+                                         'thresholds' => [
+                                                           '20',
+                                                           '20'
+                                                         ]
+                                       }
+                                 },
+                    '_task_wait' => bless( {
+                                         'direction' => 'down',
+                                         'starttime' => 1083119049,
+                                         'value' => 0,
+                                         'running' => 1
+                                       }, 'Schedule::Chronic::Timer' ),
+                    'command' => '/bin/ls ',
+                    'last_ran' => 0
+
+
+Contraints: 
+
+    Constraints are executed as perl classes that take the schedule and
+    thresholds as parameters. Every task has its own Contraint object, so
+    it is possible to store constraint state in this object across
+    invocations. There is no support for storing constraint state in
+    permanent storage, but would be easy to add if required.
+
+    Contraint Classes provide a constructor (new()) that accepts the
+    schedule and thresholds/parameters. They must also provide a met()
+    method and a state() method. The met() method should return if the
+    constraint is not met and 1 if it is. The state returns an array of
+    values describing the state of the constraint. In case of the Loadavg
+    constraint, state() returns the current loadavg(). Here's the Loadavg
+    constraint in its entirety. See ConstraintTemplate.pm for a template
+    constraint that you can fill out to write your own constriaint class.
+
+    package Schedule::Chronic::Constraint::Loadavg;
+
+    sub new { 
+
+        my ($class, $schedule, @args) = @_;
+       
+        my %self; 
+
+        $self{threshold} = $args[0] or 0.00;
+        $self{schedule}  = $schedule; 
+        
+        return bless \%self, $class;
+
+    }
+
+
+    sub met { 
+
+        my ($self) = @_;
+
+        my $load_avg = $self->state();
+
+        $self->debug("load average = $load_avg ($$self{threshold})");
+        if ($load_avg <= $$self{threshold}) { 
+            return 1;
+        } 
+
+        return 0;
+
+    }
+
+    sub state { 
+
+        my ($self) = @_;
+        open LOADAVG, "/proc/loadavg" or die $!;
+        my $load_avg = <LOADAVG>;
+        close LOADAVG;
+        
+        my @undef;
+        ($load_avg, @undef) = split /\s/, $load_avg;
+        return $load_avg;
+
+    }
+
+
+Classes: 
+
+    Schedule::Chronic
+
+        ::Base
+        ::Scheduler 
+        ::ScheduleSerializer
+        ::Constraint
+            ::LoadAvg
+            ::DiskIO
+            ::NetworkIO
+            ::Inactivity
+            ::FileExists
+            ::AfterTask
+            ::Time
+            ::Cron
+

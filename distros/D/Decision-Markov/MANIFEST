@@ -6,3 +6,4 @@ Markov.pm
 test.pl
 Markov/State.pm
 Markov/Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

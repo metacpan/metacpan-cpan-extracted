@@ -1,0 +1,25 @@
+
+=pod
+
+=head1 NAME
+
+AutoCode::AdaptorFactory
+
+=head1 SYNOPSIS
+
+
+
+=head1 DESCRIPTION
+
+AdaptorFactory inherits ModuleFacoty which has the knowledge of Schema.
+
+For ModuleFactory::make_virtual_module and AdaptorFactory::make_object_adaptor,
+they generate the module according to
+the type in schema, and return the generated module's name.
+
+
+
+=cut
+
+
+

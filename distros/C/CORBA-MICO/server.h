@@ -26,18 +26,23 @@ public:
     virtual CORBA::RepositoryId _primary_interface (const PortableServer::ObjectId &, PortableServer::POA_ptr);
     
 private:
-    bool PMicoServant::builtin_invoke (CORBA::ServerRequest_ptr svreq);
+    bool builtin_invoke (CORBA::ServerRequest_ptr svreq);
 
-    CORBA::OperationDescription *find_operation (CORBA::InterfaceDef::FullInterfaceDescription *d, 
-						 const char  *name);
-    CORBA::AttributeDescription *find_attribute (CORBA::InterfaceDef::FullInterfaceDescription *d, 
-						 const char  *name, 
-						 bool         set);
-    CORBA::NVList_ptr  PMicoServant::build_args (const char  *name, 
-						 int         &return_items,
-						 CORBA::TypeCode *&return_type,
-						 int         &inout_items,
-						 CORBA::ExcDescriptionSeq  *&exceptions);
+    CORBA::OperationDescription *find_operation(
+	CORBA::InterfaceDef::FullInterfaceDescription *d, 
+	const char  *name);
+    CORBA::AttributeDescription *find_attribute(
+	CORBA::InterfaceDef::FullInterfaceDescription *d, 
+	const char  *name, 
+	bool         set);
+    CORBA::NVList_ptr build_args(
+	const char  *name, 
+	int         &return_items,
+	CORBA::TypeCode *&return_type,
+	int         &inout_items,
+	CORBA::ExcDescriptionSeq  *&exceptions);
+
+    PerlInterpreter* thx;	//! Perl context
     SV *perlobj;
     CORBA::InterfaceDef::FullInterfaceDescription *desc;
 };
@@ -57,11 +62,9 @@ private:
     SV *perlobj;
 };
 
-class PMicoServantActivator : public POA_PortableServer::ServantActivator {
+class PMicoServantActivator : public virtual POA_PortableServer::ServantActivator {
 public:
-    PMicoServantActivator               (SV *_perlobj) {
-	perlobj = SvRV(_perlobj);
-    }
+    PMicoServantActivator(SV *_perlobj);
 
     PortableServer::Servant incarnate   (const PortableServer::ObjectId& oid,
 				         PortableServer::POA_ptr         adapter);
@@ -71,6 +74,7 @@ public:
 					 CORBA::Boolean                  cleanup_in_progress,
 					 CORBA::Boolean                  remaining_activations);
 private:
+    PerlInterpreter* thx;	//! Perl context
     SV *perlobj;
 };
 
@@ -81,11 +85,11 @@ public:
     }
 
     PortableServer::Servant preinvoke  (const PortableServer::ObjectId& oid,
-				        const PortableServer::POA_ptr   adapter,
+				        PortableServer::POA_ptr   adapter,
 				        const char *                    operation,
 				        PortableServer::ServantLocator::Cookie &the_cookie);
     void                    postinvoke (const PortableServer::ObjectId& oid,
-					const PortableServer::POA_ptr   adapter,
+					PortableServer::POA_ptr   adapter,
 					const char *                    operation,
 					PortableServer::ServantLocator::Cookie  the_cookie,
 					PortableServer::Servant         serv);

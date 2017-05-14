@@ -1,0 +1,92 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Creating Figures
+
+H2: Types of Figure Formats
+
+Figure formats are typically either:
+
+* {{vector}} based, i.e. a set of drawing instructions
+* {{bitmap}} based, i.e. a set of pixels.
+
+For diagrams which look good when printed, a vector format (e.g. EPS)
+is required. For window snapshots, a bitmap format (e.g. GIF)
+is sufficient.
+
+H2: Generating Bitmap-based Figures
+
+With the current popularity of the World Wide Web, most diagramming
+and image processing tools can now export JPEG, PNG and/or GIF formats.
+Therefore, if HTML is the only output format you care about for a
+given document, getting a figure into it is easy.
+
+Occasionally, GIF format is also sufficient for paper-based documents.
+However, a GIF figure which displays fine in a browser may or may not
+display correctly in a PostScript document! The reason is that
+FrameMaker 5.x has problems importing:
+
+* certain GIFs in 89a format
+* GIFs with interlacing
+* GIFs with transparent backgrounds.
+
+Therefore, if you want to import a GIF file into a PostScript
+document, you will probably need to stick with GIF 87 format
+and avoid anything fancy.
+
+H2: Generating Vector-based Figures
+
+For good quality diagrams,
+you will need to export your figure from your drawing application
+into a vector-based format that FrameMaker can successfully import.
+
+The following information may be useful in selecting a vector-based format:
+
+* 99% of Windows tools have a good WMF export filter, but EPS
+  export is rarely supported and often broken (Visio 3.0 and
+  Adobe Illustrator are known exceptions)
+* FrameMaker 5.x on Solaris 2.x has a good EPS import filter, but
+  the WMF import filter seems buggy
+* FrameMaker 5.x on Windows 95/NT has a good WMF import filter.
+
+So, if you are using FrameMaker on Windows 95/NT, WMF is the vector format
+to use and generating it from a Windows-based tool should be easy.
+However, if you are using FrameMaker on Solaris, EPS is the vector format
+to use, but generating it from a Windows-based tool might be tricky.
+
+H2: Generating EPS From Windows Applications
+
+The following approach can often be used to generate an EPS file from
+a Windows program:
+
+^ Print PostScript to a file, typically via a PostScript printer
+  configured to use the FILE: port.
++ Run Ghostscript's ps2epsi program on the file.
+
+Depending on the combination of application and printer driver,
+you may need to hand edit the ps file before you run ps2epsi.
+See the {{REF[expand]SDF-FAQ}} for examples.
+
+H2: Generating FrameMaker Figures
+
+FrameMaker can be used to produce figures which
+SDF can import when it is generating PostScript.
+To do this, the steps are:
+
+^ Create an anchored frame.
++ Draw the figure within it using FrameMaker's drawing tools.
++ Save the file into MIF format.
+
+The main disadvantage with this approach is that FrameMaker 5.x
+does not provide an easy way to convert the figure to other formats
+(e.g. GIF).

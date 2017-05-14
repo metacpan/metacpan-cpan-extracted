@@ -1,11 +1,10 @@
 package urpm::get_pkgs;
 
-# $Id: get_pkgs.pm 267986 2010-04-28 10:10:27Z cfergeau $
 
 use strict;
 use urpm::msg;
 use urpm::sys;
-use urpm::util;
+use urpm::util qw(basename put_in_hash);
 use urpm::media;
 use urpm 'file_from_local_url';
 # perl_checker: require urpm::select
@@ -157,14 +156,6 @@ sub _create_old_list_from_blists {
     } @$media ];
 }
 
-# deprecated, use selected2local_and_blists() instead
-sub selected2list {
-    my ($urpm, $selected, %options) = @_;
-
-    my ($local_sources, $blists) = selected2local_and_blists($urpm, $selected, %options);
-    ($local_sources, _create_old_list_from_blists($urpm->{media}, $blists));
-}
-
 sub verify_partial_rpm_and_move {
     my ($urpm, $cachedir, $filename) = @_;
 
@@ -309,7 +300,6 @@ sub _download_packages_of_distant_media {
 
 1;
 
-__END__
 
 =back
 

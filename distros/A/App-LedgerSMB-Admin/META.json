@@ -4,7 +4,7 @@
       "Chris Travers <chris@efficito.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "bsd"
    ],
@@ -33,15 +33,10 @@
       },
       "runtime" : {
          "requires" : {
-            "DBD::Pg" : "0",
-            "DBI" : "0",
-            "Dancer" : "0",
             "PGObject::Simple::Role" : "0",
             "PGObject::Util::DBAdmin" : "0",
             "PGObject::Util::DBChange" : "0.04",
             "PGObject::Util::DBMethod" : "0",
-            "Template" : "0",
-            "Try::Tiny" : "0",
             "perl" : "5.01"
          }
       }
@@ -54,5 +49,5 @@
          "web" : "https://github.com/ledgersmb/App-LedgerSMB-Admin"
       }
    },
-   "version" : "0.05"
+   "version" : "0.07"
 }

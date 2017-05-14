@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::_Browser;
 use Lemonldap::NG::Common::Session;
 
 our @ISA     = (qw(Lemonldap::NG::Portal::_Browser));
-our $VERSION = '1.4.1';
+our $VERSION = '1.9.1';
 
 ## @method hashref getCasSession(string id)
 # Try to recover the CAS session corresponding to id and return session datas
@@ -18,7 +18,7 @@ our $VERSION = '1.4.1';
 # @param id session reference
 # @return CAS session object
 sub getCasSession {
-    my ( $self, $id ) = splice @_;
+    my ( $self, $id ) = @_;
 
     my $casSession = Lemonldap::NG::Common::Session->new(
         {
@@ -49,7 +49,7 @@ sub getCasSession {
 # Return an error for CAS VALIDATE request
 # @return nothing
 sub returnCasValidateError {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     $self->lmLog( "Return CAS validate error", 'debug' );
 
@@ -64,7 +64,7 @@ sub returnCasValidateError {
 # @param username User name
 # @return nothing
 sub returnCasValidateSuccess {
-    my ( $self, $username ) = splice @_;
+    my ( $self, $username ) = @_;
 
     $self->lmLog( "Return CAS validate success with username $username",
         'debug' );
@@ -81,7 +81,7 @@ sub returnCasValidateSuccess {
 # @param text Error text
 # @return nothing
 sub returnCasServiceValidateError {
-    my ( $self, $code, $text ) = splice @_;
+    my ( $self, $code, $text ) = @_;
 
     $code ||= 'INTERNAL_ERROR';
     $text ||= 'No description provided';
@@ -98,14 +98,15 @@ sub returnCasServiceValidateError {
     $self->quit();
 }
 
-## @method void returnCasServiceValidateSuccess(string username, string pgtIou, string proxies)
+## @method void returnCasServiceValidateSuccess(string username, string pgtIou, string proxies, hashref attributes)
 # Return success for CAS SERVICE VALIDATE request
 # @param username User name
 # @param pgtIou Proxy granting ticket IOU
 # @param proxies List of used CAS proxies
+# @param attributes Attributes to return
 # @return nothing
 sub returnCasServiceValidateSuccess {
-    my ( $self, $username, $pgtIou, $proxies ) = splice @_;
+    my ( $self, $username, $pgtIou, $proxies, $attributes ) = @_;
 
     $self->lmLog( "Return CAS service validate success with username $username",
         'debug' );
@@ -114,6 +115,21 @@ sub returnCasServiceValidateSuccess {
     print "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>\n";
     print "\t<cas:authenticationSuccess>\n";
     print "\t\t<cas:user>$username</cas:user>\n";
+    if ( defined $attributes ) {
+        print "\t\t<cas:attributes>\n";
+        foreach my $attribute ( keys %$attributes ) {
+            foreach my $value (
+                split(
+                    $self->{multiValuesSeparator},
+                    $attributes->{$attribute}
+                )
+              )
+            {
+                print "\t\t\t<cas:$attribute>$value</cas:$attribute>\n";
+            }
+        }
+        print "\t\t</cas:attributes>\n";
+    }
     if ( defined $pgtIou ) {
         $self->lmLog( "Add proxy granting ticket $pgtIou in response",
             'debug' );
@@ -139,7 +155,7 @@ sub returnCasServiceValidateSuccess {
 # @param text Error text
 # @return nothing
 sub returnCasProxyError {
-    my ( $self, $code, $text ) = splice @_;
+    my ( $self, $code, $text ) = @_;
 
     $code ||= 'INTERNAL_ERROR';
     $text ||= 'No description provided';
@@ -161,7 +177,7 @@ sub returnCasProxyError {
 # @param ticket Proxy ticket
 # @return nothing
 sub returnCasProxySuccess {
-    my ( $self, $ticket ) = splice @_;
+    my ( $self, $ticket ) = @_;
 
     $self->lmLog( "Return CAS proxy success with ticket $ticket", 'debug' );
 
@@ -179,7 +195,7 @@ sub returnCasProxySuccess {
 # @param session_id Primary session ID
 # @return result
 sub deleteCasSecondarySessions {
-    my ( $self, $session_id ) = splice @_;
+    my ( $self, $session_id ) = @_;
     my $result = 1;
 
     # Find CAS sessions
@@ -217,7 +233,7 @@ sub deleteCasSecondarySessions {
 # @param session object
 # @return result
 sub deleteCasSession {
-    my ( $self, $session ) = splice @_;
+    my ( $self, $session ) = @_;
 
     # Check session object
     unless ( $session && $session->data ) {
@@ -246,7 +262,7 @@ sub deleteCasSession {
 # @param pgtId Proxy granting ticket
 # @return result
 sub callPgtUrl {
-    my ( $self, $pgtUrl, $pgtIou, $pgtId ) = splice @_;
+    my ( $self, $pgtUrl, $pgtIou, $pgtId ) = @_;
 
     # Build URL
     my $url = $pgtUrl;
@@ -349,7 +365,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

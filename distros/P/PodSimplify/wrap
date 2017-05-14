@@ -1,0 +1,14 @@
+sub wrap {
+	my($i,$w);
+	my($m)=-1;
+	for ($i=0;$i<length($_[0]);$i++,$w++) {
+		if(substr($_[0],$i,1) eq " ") {
+			$m=$i;
+		}
+		if($w>75 and $m>-1) {
+			substr($_[0],$m,1)="\n";
+			$w=($i-$m);
+		}
+	}
+	$_[0];
+}

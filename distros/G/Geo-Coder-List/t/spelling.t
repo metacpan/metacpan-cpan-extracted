@@ -1,4 +1,4 @@
-#!perl
+#!perl -T
 
 use strict;
 use warnings;
@@ -23,3 +23,5 @@ CPAN
 GPL
 RT
 geocode
+geocoders
+OpenStreetMap

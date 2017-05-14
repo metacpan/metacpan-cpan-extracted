@@ -1,0 +1,3060 @@
+#!/usr/local/bin/perl
+# -*- mode:perl -*-
+# $Id$
+#
+# mif2rtf       - Frame Maker Interchange Format to Microsoft Rich Text Format
+#
+# Available from:
+#	ftp.mincom.com:/pub/mtr/sdf/mif2rtf/
+#
+# Original version available from:
+# 	ftp.irisa.fr:/pub/FrameMaker/Filters/
+#
+# The original code has been significantly reworked in the area of
+# hypertext construct handling with the aim of being able to generate
+# Microsoft Windows Help files from FrameMaker documents
+# 
+# This program can be used to generate reasonable Microsoft Windows 
+# Help files.
+#
+# Any feedback on this code should be initially directed to tjh@mincom.com
+#
+# Parts of this program are:
+#     Copyright 1992 by Convex Computer Corporation, Richardson, Texas.
+#
+# (see the full COPYRIGHT notice further down in the file for details of
+#  the copyright restrictions that were part of the original version and
+#  hence effect this derivative)
+#
+# Tim Hudson
+# tjh@mincom.com
+#
+#
+# 19-Feb-97 ianc        fixed (r) and (c) characters
+# 02-Feb-97 ianc        TOCTEXT/TOCGRAPHIC -> TOC_TITLE/TOC_GRAPHIC
+# 30-Dec-96 tjh         center pictures ... controlled by Align=Center
+# ..................... in the IMPORT statement under SDF
+# 18-Nov-96 tjh         unfortunately had to change this code for perl5.001
+# ..................... so Ian is no longer the last to touch the code 
+# 05-Aug-96 ianc        changed TOC detection to use marker 11, not 9
+# 30-May-96 tjh         "fixed" the 23-May-96 "fix" :-)
+# 23-May-96 ianc        "fixed" jumps to topics within another file
+# 09-May-96 tjh		yet another bug in context stuff fixed + get
+# ..................... size and font changes toggling correct too
+# 19-Apr-96 tjh		get TOC stuff right when user has specified
+# ..................... the name of the topic
+# 16-Apr-96 tjh		grab title and toc text from vars
+# 16-Apr-96 tjh		fixed up to handle TOC and HELPTOC as XRefName
+# ..................... which got introduced in SDF2B3?
+# 03-Apr-96 tjh		more rework for better HLP output (Delphi-style)
+# 26-Mar-96 tjh		Color support added ... plus SDF2 stuff
+# 25-Mar-96 tjh		PgfNumFormat support added (and lots of other changes)
+# 25-Mar-96 tjh		changed things to handle SDF mif input
+# ..................... better without having to go via FrameMaker
+# 15-Dec-95 craigw      Modified the Hypertext markup sections, convert_table
+# ..................... & convert_picture
+# 29-Jul-95 tjh         windows help output make useful ... generate
+# ..................... the right footnotes for all the hypertext stuff
+# 11-Jun-95 tjh         added in the "tjh" stuff to enable better
+# ..................... handling of documents with hypertext links
+# ..................... in them as the first step in being able to 
+# ..................... generate RTF for WinHelp purposes
+#
+# Tim Hudson   - tjh@mincom.com
+# Craig Willis - craigw@mincom.com
+#
+# With bug fixes by:
+#   Ian Clatworthy - ianc@mincom.com
+
+# output of # indicates loaded in a MIF statement
+# output of . indicates processed a MIF statement into RTF for output
+
+# HELP FOOTNOTES:
+#     * - build tag
+#     # - context string (jump to with \v id)
+#     $ - topic title  [one only]
+#     + - browse sequence [one only]
+#     K - keywords (; separated)
+#     ! - help macro
+# other - alternate keyword ... see HELP_MULTIKEY for details
+
+# variables for controlling some of the current under-development stuff
+# which will move to a more standard location 
+$pgfnumdebug=0;
+$tmpdebug=0;
+$sdfvartrace=0;
+$quiet=1;
+$rtfdebug=0;
+
+$fullcatalog=1;
+
+#------------------------------------------------------------------------------
+# NOTES ... to be removed shortly ... perhaps into documentation for
+#           this stuff --tjh
+#------------------------------------------------------------------------------
+#
+# FrameMaker -> PgfSpBefore, PgfSpAfter are handled specially inside 
+# 		Tables ... and differently to MSWord et al
+#
+# PgfPlacement -> !AnyWhere means start topic
+# PgfNumFormat -> can be in a Para
+# PgfNumString -> if not there then use PgfNumFormat information
+# FTag -> Italic, Bold, Blank => weight, angle
+#
+# MORE TJH NOTES: (25-Jan-96)
+#	- duplicate stuff controlled via 
+#	- escape [] in context ids
+#	- handle backslashes correctly
+#	- handle curlybraces correctly
+#	- fix convert_marker to turn jump into valid id ... had spaces etc
+#	- added convert_context and changed everything to reference
+#	  this as it was messy how I originally did this and I needed
+#	  to escape more chars ... \{}
+#
+# The following will have to be sorted out too ... reference to paragraph
+# format names needs thinking about
+#            $heading=($curtag =~ /^h[1]_Heading\b/);
+#            if ( $State{'PgfTag'} eq 'tt_TableTitle' ) {
+#            push(@r, "\n$PgfCatalog{'Style',b0_Body} ...
+#            if ( $curtag eq "dn_DocName" && $DocName eq "" ) {
+#		+ references to dn_DocName in a few other places too!
+#            if ( $State{'PgfTag'} eq 'tt_TableTitle' ) {
+#
+# TJH NOTES: (20-Jan-96)
+#	- *never* use `date` as it will not work under DOS (see my 
+#         usage of ctime() for the "portable" way of doing things)
+#	- don't output title line if there isn't one in the document
+#	- Copyright should only be output if its there (rather than Pty Ltd)
+#	- spacing in TOC was too large ... whitespace should be used
+#	  *sparingly* in HELP FILES
+#	- fixed rtf_dimensions to handle whitespace gracefully
+#	- typo for VariableName (was VarialbeName)
+#	- using b0_Body as the style name in TOC is non-portable!
+#	- twip conversion for tabs had too much space for left margin
+#	- paragraph style and tabs for TOC need to be kept so that
+#	  we get indented reasonable looking TOC from default stuff
+#
+#
+
+
+
+#------------------------------------------------------------------------------
+# HELP INFORMATION ... to be expanded
+#------------------------------------------------------------------------------
+#> If -ftoc=n is used, it will produce a Table of Contents if hypertexting
+#
+# USE
+#   -o [out file]    Output file
+#   -c [Copyright]   Copyright message for WINHELP file
+#   -d               turn on debugging
+#   -info TAG GROUP  Put all text from TAG paragraphs into info group GROUP
+#   -v               Verbose Mode
+#   -m [style]       If style = help, use Hypertext, else create only RTF
+#   -win [x,y,width,height] (x,y) co-ordinates, Width & Height on Help Window
+#   Input File      (MIF File)
+#
+# If -win, (x,y,width,height) must be supplied or an error will occur
+#
+# Notes:
+#       Output of keep has been blatted in most cases as this is
+#     not wanted with help?
+#       The usage of -m help will generate a Help Project File (.hpj) based 
+#     on the name of the output file. The output file always has an 
+#     extension presumed to be ".rtf". The ".hpj" file is a standard file
+#     that can be easily manipulated for specific purposes. A Table of Contents
+#     will be generated if there is marker type of 11 and hypertext is being
+#     generated.
+#
+
+# The following is the original text contained in the version that I started
+# with as the base for this much improved mif2rtf filter --tjh
+#
+# The changes that I have made have only one restriction ... you cannot 
+# pretend that you wrote them and the comment blocks in the source file 
+# must be left intact.
+#
+# Note: I have not updated any of the text in the block below ... lots of
+#       the BUGS noted have been fixed.
+#
+# Tim Hudson
+# tjh@mincom.com
+#
+
+#------------------------------------------------------------------------------
+# Code marked @@ needs fixing.
+# Code marked @# is an improvisation
+# Code marked HEURISTIC is not exact.
+#
+# COPYRIGHT
+#
+# Copyright 1992 by Convex Computer Corporation, Richardson, Texas.
+#
+#                        All Rights Reserved
+#
+# Permission to use, copy, modify, and distribute this software and its 
+# documentation for any purpose and without fee is hereby granted, 
+# provided that the above copyright notice appear in all copies and that
+# both that copyright notice and this permission notice appear in 
+# supporting documentation, and that the name Convex not be
+# used in advertising or publicity pertaining to distribution of the
+# software without specific, written prior permission.  
+# 
+# CONVEX DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+# ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
+# CONVEX BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
+# ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+# WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+# ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+# SOFTWARE.
+#
+# BUGS
+#
+# @#Footnote paragraph formats not right
+# @#should convert page margins (frame BRect->margr etc.)
+# @#No way to make TOC entries
+# @#master pages
+# @# Not all document, section, or table properties are converted.
+# @#Hard problems: reference page items
+#   Maybe use command line options for those.
+# @# LineSpacing doesn't translate
+#
+# IDEAS
+# absolute positioned object: frame brect etc.
+#
+#------------------------------------------------------------------------------
+
+require 'ctime.pl';	# for date
+
+$winhelp=1; 	# this controls the handling of certain constructs that
+		# are *naughty* in the context of windows help files
+
+$fixup_duplicates=0;
+$hyper_debug=0;
+
+$lots_of_whitespace=0;
+$tjh_xref_debug=0;
+
+$use_numformat=1; # switch off if you don't want section numbers in the
+                  # output (which is handy for matching the paper document
+		  # but may be irritating to some users)
+
+local($stmt_call_level);
+local(%SDFVAR,$USER_WH_topic,$USER_WH_context);
+local($done_pagebreak);
+local(%SavedState);
+
+
+local(%doc_defaults);
+local(%char_defaults);
+local(%para_defaults);
+
+# convert_paragraph() uses delayed_text to pass information that
+# is added using the auto-paragraph header prefix (PgfNumFormat,PgfNumString)
+# into convert_paraline() ... such that it stays with the text and
+# is not left dangling when hypertext things are inserted
+local($delayed_text);		
+
+%skiptags = (
+"dd_DocDistr",1,
+"dp_DocProject",1,
+"dn_DocName",1,
+
+"dt_DocType",1,
+"ds_DocStatus",1,
+"dc_DocCode",1,
+"dk_DocSkip",1,
+"da_DocAction",1,
+"du_DocAuthor",1,
+"dw_DocWho",1,
+
+# To remove the table of contents stuff ... which
+# is required to drop the TOC page for Windows Help
+# file generation --tjh
+"fh_FrontHeading",1,
+"h1_HeadingTOC",1,
+"h2_HeadingTOC",1,
+"h3_HeadingTOC",1,  
+"h4_HeadingTOC",1, 
+);
+
+$OutputFile='';
+
+$Usage = "
+$0 -o [out file]    Output file
+   -c [Copyright]   Copyright message for WINHELP file
+   -d               turn on debugging
+   -info TAG GROUP  Put all text from TAG paragraphs into info group GROUP
+   -v               Verbose Mode
+   -m [style]       Determines Output style, help - Hypertext
+   -win [x,y,width,height] (x,y) co-ordinates, Width & Height on Help Window
+   Input File
+";
+
+#########
+#
+# main
+#
+# 
+# %TagGroup maps MIF paragraph tags to RTF info groups
+# %RTFInfo holds the text of the RTF info groups
+# so that after &convert_pages(),
+# $RTFInfo{$TagGroup{pgftag}} contains all text tagged pgftag
+# 
+# @@ idea: extend this to character tags
+# 
+local($Debug,
+      %TagGroup
+      );
+
+@ARGV = &parse_args(@ARGV);
+
+if ($OutputFile ne '' ) {
+    open (OUTPUT,">$OutputFile") || die "Failed to open $OutputFile";
+}
+
+#local($Date) = `date`;
+local($Date) = &ctime(time);
+
+&Verbose("Program: $0\nDate   : ${Date}Input  : @ARGV\nOutput : $OutputFile");
+
+# 
+# %State maps MIF and RTF codes to their current settings
+# 
+local(%State,
+      %CharacterConversions
+      );
+
+local( $paragraph_count, $browse_seqno);
+&initialize_state();
+
+&debug( "initialize_state done");
+
+local($Document,
+      # $Document is the RTF code to get from the default
+      # document format to what's in %State
+      # NOTE: some MIF document attrs are RTF Section attrs
+      # ASSUME: MIF document defaults are RTF defaults
+      %Typeface, $Typeface,
+      # %Typeface maps FFamilys to RTF font numbers
+      %Tag, $Tag,
+      # %Tag maps PgfTags to RTF style numbers
+      %PgfCatalog, %FontCatalog,
+      @BodyPage,
+      %TextRect, %TextFlow,
+      %AFrame,
+      %Tbl
+      );
+#> Local Variables Used globally internally
+local( $DocName, $PgfAutoNum, $Xref_TOC);
+
+# This is the default in Frame, but not in Word.
+$Document = "\\widowctrl\\ftnbj\\cvmme\\sprsspbf\\brkfrm\\swpdr\\noextraspl".
+    "\\hypcaps0";               #> CRW Modified from standard RTF file
+
+local($PageType, $TextRectID, $ID, $TblID, $XRefName, $VaraibleName);
+&read_whole_file
+     ('DPageSize', '$Document .= &change_dims($data, "paperw", "paperh")',
+      'DStartPage', '$Document .= &change_attr("pgnstarts", $data)',
+      'DPageNumStyle', '$Document .= &select_attr($data, "PageNumStyle",
+                                         "Arabic", "pgndec",
+                                         "UCRoman", "pgnucrm",
+                                         "LCRoman", "pgnlcrm",
+                                         "UCALpha", "pgnucltr",
+                                         "LCAlpha", "pgnlcltr")',
+      'DTwoSides', '$Document .= &change_attr("facingp", 1)',
+      'DFNoteRestart', '$Document .= &select_attr($data, "FNoteRestart",
+                                         "PerPage", "ftnrestart")',
+      'DFNoteStartNum', '$Document .= &change_attr("fntstart", $data)',
+      'DAutoChBars', '$Document .= &change_attr("revisions", 1)',
+      
+      'FFamily', '&intern(*Typeface, $data)',
+      'PgfTag', 
+        '&intern(*Tag, $data);
+        ',
+      
+      'PgfCatalog', '&convert_paragraph_catalog($here)',
+      'FontCatalog', '&convert_character_catalog($here)',
+      
+      'PageType', '$PageType = $data',
+      'Page', '
+                push(@BodyPage, $here) if $PageType eq "BodyPage";
+                &debug("$PageType $here");
+              ',
+
+      'TextRectID',
+      '$TextRectID ? &debug("Extra TextRect: $data") : ($TextRectID = $data)',
+
+      'TextFlow', '@TextRect{$TextRectID} = $here;
+                   &debug("flow", %TextRect); $TextRectID = ""',
+
+      'Frame', '$AFrame{&data_search($here, "ID", 1)} = $here',
+
+      'TblID', '$TblID = $data',
+      'Tbl', '$Tbl{$TblID} = $here',
+
+      'XRefName', '$XRefName = &convert_string($data)',
+      'XRefDef', '$Definition{"XRef", $XRefName} = $data;
+      		  $Definition{"XRefPgfTag", $XRefName} = $State{\'PgfTag\'};
+		  print STDERR "XRef $XRefName ($data) => $State{\'PgfTag\'}\n" if ($tjh_xref_debug);
+		 ',
+      
+      'VariableName', '$VariableName = &convert_string($data)',
+      'VariableDef', '$Definition{"Variable", $VariableName} = $data'
+      );
+
+if ( $OutputFile ne '' ) {
+    $Output = "OUTPUT";
+} else {
+    $Output = "STDOUT";
+}
+
+print $Output &rtf_begin_doc;
+print $Output &rtf_font_table(%Typeface);
+
+if (0) {
+print $Output &rtf_color_table(('0     0   0', # These are Frame's colors
+                                '0     0 255',
+                                '0   255 255',
+                                '0   255   0',
+                                '255   0 255',
+                                '255 255   0',
+                                '255 255 255',
+                                '0     0 128',
+                                '0   128 128',
+                                '0   128   0',
+                                '128   0 128',
+                                '128   0   0',
+                                '128 128   0',
+                                '128 128 128',
+                                '192 192 192'));
+} else {
+#
+# Frame4 Colors are the following ...
+# Black, White, Red, Green, Blue, Cyan, Magenta, Yellow
+#
+print $Output &rtf_color_table(('0     0   0',  # Black
+                                '255 255 255',  # White
+                                '255   0   0',  # Red
+                                '0   255   0',  # Green
+                                '0     0 255',  # Blue
+                                '0   255 255',  # Cyan
+                                '255   0 255',  # Magenta
+                                '255 255   0'   # Yellow
+                                ));
+}
+
+print $Output $Document, "\n";
+
+&debug("body pages: ", @BodyPage);
+
+local(@Document, $cnt);
+
+foreach $page (@BodyPage){
+    &debug("converting page:\n", &expand_mif_statement($page));
+    push(@Document, &convert_frame($page));
+}
+
+if ( !defined($StyleSheet) || $StyleSheet) {
+    print $Output &rtf_style_sheet(%Tag);
+}
+print $Output &rtf_info(%RTFInfo);
+print $Output @Document;
+print $Output &rtf_end_doc;
+
+# when debugging the hypertext stuff it is nice to be able to 
+# output the map table directly ... might have a dinky flag for
+# doing this too ...
+if ( $hypertext_sw ) {                 
+    foreach ( keys(%Context_ID)) {
+        &debug(sprintf("%-30s %010d ; $WH_topic_comments{$_}\n", 
+	                    $WH_context_ids{$_}, $_));
+    }
+}
+
+print STDERR "\n"; # after all the .....'s
+
+if ( $hypertext_sw ne '' ) {
+    local($cnt);
+    close $Output;
+
+    $ErrFile = $HPJFile = $OutputFile;
+    $ErrFile =~ s/\.\w+$/\.err/;
+    $HPJFile =~ s/\.\w+$/\.hpj/;
+
+    open (OUTPUT,">$HPJFile") || die "open $HPJFile";       
+
+    print OUTPUT "[OPTIONS]\n";
+
+    if ( scalar(@Bmroot) ) {
+        print OUTPUT "BMROOT=";
+        foreach (@Bmroot) {
+            print $_ eq "$Bmroot[0]" ? "" : ":" ;
+            print $_;
+        }
+        print OUTPUT "\n";
+    }
+
+    # pick up the title from the new variable that holds this
+    # information
+    if (defined $Definition{"Variable", "DOC_TITLE"} ) {
+	$DocName = &convert_string($Definition{"Variable", "DOC_TITLE"});
+    }
+
+#    print OUTPUT "COMPRESS=ON\n";
+    print OUTPUT "COMPRESS=OFF\n";
+    print OUTPUT "COPYRIGHT=$Copyright\n" if ($Copyright ne "");
+#    print OUTPUT "CITATION=\n";
+    print OUTPUT "ERRORLOG=$ErrFile\n";
+#    print OUTPUT "ICON=\n";
+    print OUTPUT "OLDKEYPHRASE=NO\n";
+    print OUTPUT "REPORT=ON\n";
+    print OUTPUT "TITLE=$DocName\n" if ($DocName ne "");
+    print OUTPUT "WARNING=3\n";
+
+    # let individual options be set as variables
+    # that make their way into the options section of the
+    # output file
+    foreach $key (keys %Definition) {
+      ($defn,$var)=split($;,$key,2);
+      #print STDERR "DEFN $defn VAR $var\n";
+      next unless $defn eq "Variable";
+      $val=&convert_string($Definition{"Variable",$var});
+      #print STDERR "VAR $var VALUE $val\n";
+      if ($var =~ /^HLP_OPTIONS_/) {
+	  $name = $var;
+	  $name =~ s/^HLP_OPTIONS_//;
+
+          #print STDERR "OPTION $name = $val\n";
+	  print OUTPUT "$name=$val\n";
+      }
+    }
+
+    print OUTPUT "\n[FILES]\n";
+    print OUTPUT "$OutputFile\n";
+    print OUTPUT "\n[CONFIG]\n";
+
+    # grab HLP_CONFIG as a filename variable that is read in 
+    # TODO ...
+
+    print OUTPUT "BrowseButtons()\n";
+    print OUTPUT "\n[WINDOWS]\n";
+    if ($yellow_muck) {
+	    print OUTPUT "main=,($xcoordinate,$ycoordinate,$win_width,$win_height)".
+		",,,(255,255,0)\n";
+    } else {
+	    # leave the window stuff out! 
+	    #print OUTPUT "main=,($xcoordinate,$ycoordinate,$win_width,$win_height)". ",,,\n";
+    }
+    print OUTPUT "\n[MAP]\n";
+
+    foreach (keys (%WH_context_ids)) {
+        print OUTPUT sprintf("%-30s %10d ; $WH_topic_comments{$_}\n", 
+	                    $WH_context_ids{$_}, $_);
+    }
+}
+
+
+##################### END OF MAIN PROGRAM ####################################
+#
+##################### SUBROUTINES START   ####################################
+# 
+# USE : @ARGV = &parse_args(@ARGV);
+# SETS: $Debug, %TagGroup
+#
+sub parse_args{
+    local(@files, $style, $win_sw);
+
+    while($_ = shift){
+        if(/^-c/){          # Copyright option
+            $Copyright = shift;
+        }
+        elsif(/^-d/){
+            $Debug = 'debug';
+        }
+        elsif(/^-hd/){
+            $hyper_debug = '1';
+        }
+        elsif(/^-info/){
+            $TagGroup{shift} = shift;
+        }
+        elsif(/^-h[elp]/){
+            print "\nUsage: $Usage\n";
+            exit(0);
+        }
+        elsif(/^-m/){
+            $style = shift;
+            if ( $style =~ /HELP/i ) { $hypertext_sw = 1 };
+        }
+        elsif(/^-nostyles/){
+            $StyleSheet = 0;
+        }
+        elsif(/^-o/){
+            $OutputFile = shift;
+        }
+        elsif(/^-v/){
+            $vbs_sw = 1;
+        }
+        elsif(/^-win/) {        # Windows co-ordinates
+            $win_sw++;
+            ($xcoordinate,$ycoordinate,$win_width, $win_height) = 
+                split(/,/, shift,4);
+        }
+        else{
+            push(@files, $_);
+        }
+    }
+
+    if ( scalar(@files) == 0 ) {
+        die "No Input file supplied\n";
+    }
+    if ( $hypertext_sw && $OutputFile eq "" ) {
+        die "Output file is mandatory with help option\n" ;
+    }
+
+    if ( $win_sw ) {
+        if ( !$xcoordinate || !$ycoordinate || !$win_width|| !$win_height) {
+            die "You need to supply x & y co-ordinates & window height & width\n";
+        }
+    }
+    else {
+        $xcoordinate = 496;
+        $ycoordinate = 128;
+        $win_width   = 512;
+        $win_height  = 768;
+    }
+
+    @files;
+}
+#
+#
+##########
+# Mif Parsing Routines
+#
+# I've finally found a perl representation of a mif file that I'm happy with.
+# It's pretty memory intensive and not real zippy, but that's the nature
+# of the beast with MIF.
+# 
+sub read_whole_file{
+    local(%Callbacks) = @_;
+    # global(@Parts);
+    @Parts = (0); # put one element in it so there's no statement 0.
+
+    while(&read_mif_statement()) {
+      print STDERR "#\n" unless ($quiet);
+    }
+}
+# 
+# Returns an index in @Parts so that
+# $Parts[$index] is the statement type
+# and @Parts[$index+1, $index+2, ...] are the parts of the statement.
+# For compound statement, @Parts[$index, ...]  looks like
+# ('<', token, index1, index2, index3, ...)
+# where indexN are the substatements
+# 
+# for each statment, $Callbacks{$token} is evaluated
+#   with $token, $data, and $here set
+#
+sub read_mif_statement{
+    local($_, $type, $token, $data, @parts, $here, $line);
+    # global(@Parts);
+
+    while(<>){
+        $line = $.;
+        $type = '<>', $token = $1, $data = $2, last
+            if /^\s*<(\w+)\s+(.*\S)?\s*>/;
+        $type = '<', $token = $1, last
+            if /^\s*<(\w+)/;
+        return 0 if /^\s*>/;
+        $type = '=', $token = $1, $data = &read_mif_inset(), last
+            if /^=(\w+)/;
+
+	print STDERR "#\n" if (0);
+    }
+
+    &debug("LINE=$line $_ type=$type token=$token data=$data");
+
+    return 0 unless $type;
+
+    local($callback);
+
+    if($type eq '<>' || $type eq '='){
+        $here = $#Parts+1;
+        push (@Parts, $type, $token, $data);
+        eval $callback if $callback = $Callbacks{$token};
+        die "$@ $callback" if $@;
+    }
+    else{
+        while ($_ = &read_mif_statement()) {
+            push(@parts, $_);
+        }
+
+        $here = $#Parts+1;
+        push(@Parts, '<', $token, @parts);
+        eval $callback if $callback = $Callbacks{$token};
+        die "$@ $callback" if $@;
+    }
+
+    $Lines{$here} = $line; # for debugging purposes
+    $here;
+}
+#
+# Read until a line starts with "=EndInset"
+# and return all the lines concatenated
+#
+sub read_mif_inset{
+    local($inset);
+    while(<>){
+        $inset .= $_;
+        last if /^=EndInset/;
+    }
+    $inset;
+}
+
+
+sub new_statement{
+    local($s) = $#Parts + 1;
+    push(@Parts, @_);
+    return $s;
+}
+
+sub type{
+    $Parts[$_[0]];
+}
+
+sub token{
+    $Parts[$_[0]+1];
+}
+
+sub data{
+    $Parts[$_[0]+2];
+}
+
+sub parts{
+    local($i) = @_;
+    if(&type($_[0]) eq '<'){
+        local($s) = $i+2;
+        for(; $Parts[$s] > 0; $s++){
+        }
+        return @Parts[$i+2 .. $s-1];
+    }else{
+        return @Parts[$i+2]; #data
+    }
+}
+
+
+# Dump the context of the MIF statement ... such that it is easier
+# to figure out information about where an error has occured ... the
+# original stuff was a little hairy in this area too --tjh
+# TODO: compare this with expand_mif_statement()
+sub DUMP_CONTEXT {
+    local($__s) = @_;
+    local($here,$exp);
+
+    foreach $here (&parts($__s)){
+        local($type) = &type($here);
+        local($token) = &token($here);
+        local($data) = &data($here);
+
+	# exp has newline in it!
+	$exp=&expand_mif_statement($here,"EXP: ");
+
+	print STDERR "[$here]:$type:$token:$data || $exp";
+    }
+}
+
+sub do_statement{
+    # global(@Parts);
+    local($__s, %__callbacks) = @_;
+    local($here, $__cb);
+
+    # one level deeper in the do_statement call stack
+    $stmt_call_level++;
+
+    foreach $here (&parts($__s)){
+        local($token) = &token($here);
+        local($data) = &data($here);
+
+	$stmt_call_level_context{"$stmt_call_level"}=$here;
+
+        eval $__cb if $__cb = $__callbacks{$token};
+        warn "Error executing: $__cb \n-->$@" if $@;
+        warn "DEBUG: statement=$__s token=$token data=$data here=$here parts=".
+            &parts($__s) . "line:", $Lines{$here} if (0);
+
+	if ((&type($here) ne '<>') && !$__cb) {
+	    warn "IGNORED: statement=$__s token=$token data=$data here=$here ".
+            "parts=" . &parts($__s) . "line:" , $Lines{$here};
+	    # TJH ADDITION
+	    print STDERR "HERE:\n";
+	    &DUMP_CONTEXT($here);
+
+	    print STDERR "STMT:\n";
+	    &DUMP_CONTEXT($__s);
+
+#	    print STDERR "PARENT:\n";
+#	    &DUMP_CONTEXT($stmt_call_level_context{$stmt_call_level-1});
+	}
+
+# TJH took this out 
+#       &assert('$token =~ /\w+/');
+    }
+
+    # returning from one level down ... 
+    $stmt_call_level--;
+
+}
+
+sub expand_mif_statement{
+    # global(@Parts);
+    local($i, $leader) = @_;
+    local($_) = &type($i);
+
+    if($_ eq '<>'){
+        return (sprintf("%s<%s %s>\n", $leader, @Parts[$i+1, $i+2]));
+    }elsif($_ eq '='){
+        return (sprintf("=%s\n%s", @Parts[$i+1, $i+2]));
+    }elsif($_ eq '<'){
+        local(@lines);
+        @lines = (sprintf("%s<%s\n", $leader, &token($i)));
+        foreach (&parts($i)){
+            #TJH#push (@lines, &expand_mif_statement($_, "  $leader"));
+            push (@lines, &expand_mif_statement($_, "$leader  "));
+        }
+        push(@lines, "$leader>\n");
+        return @lines;
+    }
+}
+
+#
+# use $tag = &data_search($para, 'PgfTag', 2)
+# to search 2 levels of the $para statement,
+# and return the data of the first PgfTag statement found.
+# 
+sub data_search{
+    local($s, $t, $levels) = @_;
+    foreach (&parts($s)){
+        if(&type($_) eq '<'){
+            if($levels>1){
+                $s = &data_search($_, $t, $levels-1);
+                return $s if $s ne '';
+            }
+        }else{
+            return &data($_) if &token($_) eq $t;
+        }
+    }
+    return '';
+}
+
+#
+# use &token_search($compound_statement, "token", 3)
+# to search the next three levels of hairy_statement for
+# "token" statements.
+# 
+sub token_search{
+    local($s, $t, $levels) = @_;
+
+    local(@matches, $_);
+
+    foreach (&parts($s)){
+        push(@matches, $_) if &token($_) eq $t;
+        push(@matches, &token_search($_, $t, $levels-1))
+            if &type($_) eq '<' && $levels>1;
+    }
+    return @matches;
+}
+
+
+#
+#
+########
+# %State manipulation
+#
+sub change_attr{
+    local($attr, $val) = @_;
+
+    &debug("change attr: $attr ($State{$attr}) -> [$val]");
+    $State{$attr} = $val
+        , return "\\$attr$val "
+            unless $State{$attr} eq $val;
+    '';
+}
+
+sub change_dims{
+    local($dims, @attrs) = @_;
+    local($_, $r);
+
+    foreach (&rtf_dimensions($dims)){
+        local($attr) = shift(@attrs);
+        last unless $attr;
+        $attr =~ s-/(\d+)-- && ($_ = int($_/$1)); #HACK
+        $r .= &change_attr($attr, $_);
+    }
+
+#print STDERR "change_dims $dims->$r\n";
+
+    $r;
+}
+
+sub select_attr{
+    local($key, $s, %attrs) = @_;
+
+    if($attrs{$key}){
+        &debug("select attr: '$s=$key' from ", join(",", %attrs)),
+        $State{$s} = $attrs{$key}, return "\\$attrs{$key} "
+            unless $State{$s} eq $attrs{$key};
+    }
+    $State{$s} = '';
+}
+#############
+#
+# Conversions
+#
+sub convert_paragraph_catalog{
+    local($s) = @_;
+    #global(%State, %PgfCatalog);
+
+    local($tag);
+    &do_statement($s, 'Pgf', '
+                  $tag = &convert_string(&data_search($here, "PgfTag"));
+                  $PgfCatalog{"Statement", $tag} = $here;
+		  # for a full catalog we want conversion now!
+		  if ($fullcatalog) {
+		    &change_style($tag);
+		  }
+		  '
+                  );
+}
+
+# convert a freeform string into a "safe" context id for
+# the purposes of Windows Help
+sub convert_context
+{
+  local($s)=@_;
+
+  $s =~ s/[#, ._\/\-><()?&\[\]\\{}+'`~:]//g;
+
+  ##print STDERR "FROM: @_ to $s\n";
+
+  return $s;
+}
+
+sub convert_character_catalog{
+    local($s) = @_;
+    #global(%State, %FontCatalog);
+
+    local($tag);
+    &do_statement($s,'Font', '
+                  $tag = &convert_string(&data_search($here, "FTag"));
+                  $FontCatalog{"Statement", $tag} = $here;'
+                  );
+}
+
+#
+# Returns RTF to change from what's in %State to what's in $s
+# EXCEPT TABS! use &current_tabs() to get them.
+# 
+sub convert_pgf_format{
+    local($s) = @_;
+    local($rtf, $_);
+    local($lindent) = &data_search($s, 'PgfLIndent');
+    local($li);
+
+    if ($lindent gt ''){
+
+	print STDERR "LINDENT: $lindent\n" if ($tmpdebug);
+
+        ($li) = &rtf_dimensions($lindent);
+        $State{'LIndent'}=$lindent;
+    }
+    else{
+        ($li) = &rtf_dimensions($State{'LIndent'});
+    }
+
+    local($findent) = &data_search($s, 'PgfFIndent');
+    local($fi);
+
+    if ($findent gt ''){
+        ($fi) = &rtf_dimensions($findent);
+        $State{'FIndent'}=$findent;
+    }
+    else{
+        ($fi) = &rtf_dimensions($State{'FIndent'});
+    }
+
+    $rtf .= &change_attr("fi", $fi - $li);
+    $rtf .= &change_attr("li", $li);
+
+    &debug("findent: $findent fi: $fi lindent: $findent li: $li");
+
+    &do_statement
+        ($s,
+         'PgfNumberFont', '$State{"NumberFont"} = &convert_string($data)',
+         'PgfNumFormat', '$State{"NumFormat"} = &convert_string($data, $State{"Family"} ne "Symbol");',
+         'PgfNextTag',
+         '$rtf .= &change_attr("snext", &intern(*Tag, $data))',
+         'PgfNumTabs', 'undef($State{"TabStops"})',
+         'TabStop', '0 && &TabStop($here)',
+         'PgfAlignment', '$rtf .= &select_attr($data, "Alignment",
+                                        "Left", "ql",
+                                        "Center", "qc",
+                                        "Right", "qr",
+                                        "LeftRight", "qj")',
+         # RTF & MIF are different about tabs and first indents
+         'PgfRIndent', '$rtf .= &change_dims($data, "ri")',
+         'PgfTopSeparator',
+         '$rtf .= &change_attr("brdrt", 1) if $data ne "`\'"', #@#
+         'PgfBotSeparator',
+         '$rtf .= &change_attr("brdrb", 1) if $data ne "`\'"', #@#
+
+#TJHNEW#
+         'PgfPlacement', 
+	 ' $State{"Placement"} = &convert_string($data);
+	   if ($winhelp) { 
+	     # look at for not Anywhere as TOPIC start trigger
+	     if ( $State{"Placement"} ne "Anywhere" ) {
+	       $State{"NEWTOPIC"} = 1;
+	     } else {
+	       $State{"NEWTOPIC"} = 0;
+	     }
+	   } else {
+	     $rtf .= &select_attr($data, "Placement",
+                                       "ColumnTop", "pagebb", 
+                                       "PageTop", "pagebb",
+                                       "LPageTop", "pagebb", 
+                                       "RPageTop", "pagebb");
+	   }
+	 ',
+
+         'PgfSpBefore', '$State{"SpBefore"} = &change_dims($data,"sb")',
+         'PgfSpAfter',  '$State{"SpAfter"} = &change_dims($data,"sa")',
+
+         #@# withprev
+##TJH-WINHELP-no keepn0
+         'PgfWithNext', ' if (!$winhelp) { $rtf .= &select_attr($data, 
+                              "WithNext","Yes", "keepn", "No", "keepn0") } ',
+##TJH-WINHELP-no keep1
+         'PgfBlockSize', ' if (!winhelp) { $rtf .= &change_attr("keep", 1) unless $data <2 }',
+         'PgfLeading', '$rtf .= &change_dims($data, "sl")',
+         'PgfFont', '$rtf .= &convert_char_format($here)'
+         );
+
+    &debug("converted $State{'PgfTag'} -> $rtf");
+    $rtf;
+}
+
+sub TabStop {
+    local($s) = @_;
+
+    #@# tab alignment ignored!
+    $State{'TabStops'} .= " " . &data_search($s, 'TSX');
+}
+
+sub convert_char_format{
+    local($rtf);
+    &do_statement
+        ($_[0],
+         'FFamily', '$State{"Family"} = &convert_string($data);
+                     $rtf .= &change_attr("f", &intern(*Typeface, $data))',
+#@#      'FVar', 'warn "IGNORED: Variation $data" unless $data =~ /regular/i',
+
+##TJHNEW##
+	 # FTag can also be used to set the font to Italic or Bold or 
+         # also to reset both of these back to "normal" 
+         'FTag',  ' 	
+			$str=&convert_string($data); 
+			$rtf .= &handle_font_change($str);
+		  ',
+
+         'FColor',  '$rtf .= &select_attr(&convert_string($data),"Color",
+				  "Black", "cf0",
+				  "White", "cf1",
+				  "Red", "cf2",
+				  "Green", "cf3",
+				  "Blue", "cf4",
+				  "Cyan", "cf5",
+				  "Magenta", "cf6",
+				  "Yellow", "cf7",
+				  "", "cf0"
+				  )',
+
+         'FWeight',  '$rtf .= &select_attr(&convert_string($data),"Weight",
+                                  "Bold", "b", "Regular", "b0")',
+         'FAngle', '$rtf .= &select_attr(&convert_string($data), "Angle",
+                                 "Italic", "i", "Oblique", "i2",
+                                 "Regular", "i0")',
+         'FSize', '$State{"fs"}=$data; $rtf .= &change_dims($data, "fs/10")',
+         'FUnderline', '$rtf .= &select_attr($data, "Underline",
+                                     "Yes", "ul", "No", "ulnone")',
+         'FStrike',  '$rtf .= &select_attr($data, "Strike",
+                                  "Yes", "strike", "No", "strike0")',
+         'FSupScript',  '$rtf .= &select_attr($data, "SupScript",
+                                  "Yes", "up6", "No", "up0")',
+         'FSubScript',  '$rtf .= &select_attr($data, "SubScript",
+                                  "Yes", "dn6", "No", "dn0")',
+         'FChangeBar',  '$rtf .= &select_attr($data, "ChangeBar",
+                                  "Yes", "revised", "No", "revised0")',
+         'FOutline',  '$rtf .= &select_attr($data, "Outline",
+                                  "Yes", "outl", "No", "outl0")',
+         'FShadow',  '$rtf .= &select_attr($data, "Shadow",
+                                  "Yes", "shad", "No", "shad0")',
+         'FSeparation',  '$rtf .= &change_attr("cf", $data)'
+         );
+    &debug("char format: $rtf");
+
+    ### print STDERR "convert_char_format: Weight $State{'Weight'} Angle $State{'Angle'}\n";
+    $rtf;
+}
+
+########
+
+sub convert_frame{
+    local($s) = @_;
+#@@ local(@BRect) = @BRect;
+    local(@ret);
+    local($align,$oldalign)=0;
+
+    &debug("convert frame: $s");
+    &do_statement
+        ($s,
+         'TextRect',     'push(@ret, &convert_textrect($here))',
+         'Frame',        'push(@ret, &convert_frame($here))',
+         'ImportObject', 'push(@ret, &convert_picture($here))',
+         'BRect', 'push(@ret, &change_dims($data, "posx", "posy", "absw"))',
+         'AnchorAlign',  '$oldalign=$State{"Alignment"};
+	 		  $align=1;
+			  push(@ret, &select_attr($data, "Alignment",
+				  "Left", "ql",
+				  "Center", "qc",
+				  "Right", "qr",
+				  "LeftRight", "qj"));',
+         'FrameType', 'push(@ret, &select_attr($data, "FrameType",
+                                    "Inline", "posyil",
+                                    "Top", "posyt",
+                                    "Bottom", "posyb",
+                                    "Left", "posxl",
+                                    "Right", "posxr",
+                                    "Near", "posxi",
+                                    "Far", "posxo"))'
+         );
+
+    # if we fiddled the alignment then we put it back how
+    # it was as we don't want to affect other things --tjh
+    if ($align) {
+    	push(@ret,"\\par\\pard");
+	$State{"Alignment"}=$oldalign;
+    }
+
+    @ret;
+}
+
+sub convert_textrect{
+    local($tr) = @_;
+    local(@ret);
+    local($myparts) = &parts($tr);
+    local($mytoken) = &token($tr);
+    local($mydata) = &data($tr);
+
+    ## &DUMP_CONTEXT($tr);
+
+    ##print STDERR "TEXTRECT: $_ : $tr => $myparts $mytoken : $mydata\n";
+
+    &do_statement
+        ($tr,
+	 'DashedPattern', ' # do nothing ... print STDERR "GOT DASHED PATTERN\n"; ',
+         'ID',
+         'local($_) = $TextRect{$data};
+         $_ && !$TextFlow{$_}++ ? push(@ret, &convert_flow($_))
+         : &debug("no flow or repeated flow:$data line: ",$Lines{$_});',
+         );
+    @ret;
+}
+
+#
+# this is one alternative...
+#
+sub old_convert_textrect{
+    local($tr) = @_;
+    local($id, @ret);
+
+    &debug("convert textrect $tr");
+    for($id = &data_search($tr, 'ID', 1); $id;
+        $id = &data_search($tr, 'TRNext', 1)){
+        local($s) = $TextRect{$id};
+        last if $TextRect[$s]++;
+        &debug("TextRectID = $id");
+        push(@ret, &convert_flow($s));
+    }
+    @ret;
+}
+
+#> Modified Table conversion to work. 
+#> Assumption: That TblColumnWidth, TblH & TblBody are the main parts 
+#>             for conversion only
+#> Global_Var: Tbl_sw: Used in convert_paragraph for special paragraph handling
+sub convert_table{
+    local($s) = @_;
+    local(@r, @cellx);  #>Added @cellx for cell dimensions
+
+    #>Set table switch used in convert_paragraph section
+    $Tbl_sw++;        
+
+    # need to know which row we are on in the table
+    $State{$Tbl_Sw,"ROW"}=0;
+
+    &do_statement
+        ($s,
+         'TblColumnWidth', 'push(@cellx, &rtf_dimensions(&data($here)))', 
+         'TblH','push(@r, &convert_rows($here, *cellx, 1))',
+	 # handle the title like "normal" text for the moment
+	 'TblTitleContent', 'push(@r, &convert_flow($here), "" ); ',
+	 'TblFormat', '#IGNORED#', 
+         'TblBody','push(@r, &convert_rows($here, *cellx, 0))',
+         );                    
+    push(@r, "\\pard");     #> Requires mark to terminate table
+    $Tbl_sw--;            #> Set table switch used in convert_paragraph 
+    @r;
+}
+
+#> Converts a row for a table
+#> Sets standard headings for the row and converts cell size into twips, then 
+#> converts cells data
+#>
+sub convert_rows{
+    local($s, *cellx, $row_sw) = @_;
+    local(@r);
+
+    &do_statement
+        ($s,
+         'Row', 
+         '$State{$Tbl_Sw,"ROW"}++;
+	 push(@r, "\n\\\\trowd\\\\trgaph108\\\\trleft-108 ");
+         local($cell, $cell_twips);
+         foreach $cell (@cellx) {
+             $cell_twips = $cell_twips + $cell;
+             push(@r, "\\\\cellx$cell_twips ");
+         }
+         push(@r, "\\\\pard\\\\plain\\\\intbl ",&convert_cells($here), 
+              " \\\\pard \\\\intbl \\\\row")'
+         );
+    @r;
+}
+
+#> Convert cells of a table
+#
+sub convert_cells{
+    local($s) = @_;
+    local(@r);
+
+    &do_statement
+        ($s,
+         'Cell', 'push(@r, &convert_cell($here))'
+         );
+    @r;
+}
+
+#> Convert single cell in table and suffix of cell to terminate cell definition
+#
+sub convert_cell{
+    local($s) = @_;
+    local(@r);
+
+    #@@ cell formatting!
+    &do_statement
+        ($s,
+         'CellContent',
+         ' $State{$Tbl_sw,"FirstCellPara"}=1;
+           $State{$Tbl_sw,"FirstTableRow"}=($State{$Tbl_sw,"ROW"}==1); 
+	   push(@r, &convert_flow($here), "\\\\cell ")'           
+         );
+    @r;
+}
+
+#> Converts a picture into RTF
+#> Assumptions: That all 'ImportObFileDI' will have a corresponding bitmap.
+#> Glbal_Var: @Bmroot : A list of paths used for Bitmaps
+sub convert_picture{
+    local($s) = @_;
+
+    local(@r, $color, $unixpath, $dipath, $epsi, $image, $brect);
+
+    &do_statement
+        ($s,
+         'Separation', '$color = $data',
+         'ImportObFile', '$unixpath = $data',
+         'ImportObFileDI', '$dipath = $data',
+         'EPSI', '$epsi = $data',
+         'FrameImage', 'push(@r, "\\\\frameimage\n", $data)',
+         'BRect', '$brect = $data'
+         );
+
+    &debug("picture: color($color) file($unixpath,$dipath) brect($brect)");
+
+    if($brect){
+        local($l, $t, $h, $w) = &rtf_dimensions($brect);
+        unshift(@r, "\\picwgoal$w\\pichgoal$h\n");
+    }
+
+    undef($unixpath) if $unixpath =~ /internal inset/;
+
+    local($path, $filename);
+    if($dipath){
+        ($path, $filename) = &convert_filename($dipath);    #> CRW
+        warn "no path is : $dipath" if ( $filename eq "" ); #> CRW
+        if ( $filename ) {                                  #> CRW
+	    if (0) {
+		# center the pictures ... might stuff up a few
+		# things with inline mini-images but that can
+		# be sorted out later --tjh
+		push(@r, "\n\\qc\\{bmc $filename\\}\\par\n" );
+	    } else {
+		push(@r, "\n\\{bmc $filename\\}\n" );       #> CRW
+	    }
+            push(@Bmroot, $path) if ( $path );              #> CRW
+        }
+    }
+    else {
+        if($epsi){
+            $epsi =~ s/.*&%v\s*&//;
+            $epsi =~ s/\n&//g;
+            push(@r, "\\epsi\n", $epsi);
+        }
+
+        @r = ("\\qc{\\pict\n", @r, "}\\par\n"); # put in a centered paragraph
+        @r = ("{\\cf$color", @r, "}") if $color;
+    }
+    @r;
+}
+
+#> CRW convert_filename : Converts Frame file names into paths , storing
+#> those paths, to be used in the hpj files
+sub convert_filename{
+    local( $Filename) = @_;
+    local( $Directory, $file, @File_Parts, $Path_sw, $Temp_File );
+
+    $Filename =~ s/[`']//g;
+    @File_Parts = split( /</, $Filename); # Split Filename on '<'
+
+    foreach (@File_Parts) {
+        $file = $_;
+        if ( $_ =~ /^r\\>/ ) {  # Root Directory - Unix
+            ($Directory = $_ ) =~ s/r\\>/\// ;
+        }
+        elsif ( $_ =~ /^c\\>/ ) { # Relative Path name unless 'C'
+            if ($Path_sw) {
+                $file      =~ s/^c\\>/\//;
+                $Directory .= $file;
+            }
+            else {
+                $file =~ s/^c\\>//;
+            }
+
+            $Path_sw    = 1;
+
+            if ( $_ = $File_Parts[$#File_Parts] ) {
+                ($Filename = $_) =~ s/^c\\>//;
+            }
+            else {
+                $Directory .= $file;
+            }
+        }
+        elsif ( $_ =~ /^u\\>/ ) { # Previous directory ie go up
+            $Directory .= "../";
+            $file       =~ s/^u\\>//;
+
+            if ( $_ = $File_Parts[$#File_Parts] ) {
+                ($Filename = $_) =~ s/^u\\>//;
+            }
+            else {
+                $Directory .= $file;
+            }
+        }
+    }                           # Should have Directory & Filename
+
+    #> Convert filename to be a "BMP" always for WinHelp Files
+    if ( $Filename ne "" ) {
+        $Filename =~ s/\.(gif|mif|epsi|eps)$/\.bmp/;
+    }
+
+    return($Directory, $Filename);
+}
+#
+sub convert_flow{
+    local($s, $Container) = @_;
+    local(@r, %Notes);
+
+    &do_statement
+        ($s,
+         'Notes', '&save_notes($here)',
+         'Para', 'push(@r, &convert_paragraph($here))'
+         );
+    @r;
+}
+
+sub save_notes{
+    local($s) = @_;
+    local($_, $n);
+
+    foreach (&parts($s)){
+        $n = &data_search($_, 'ID', 1);
+#       &debug("note: $n is:", &expand_mif_statement($_));
+        $Notes{$n} = $_;
+    }
+}
+
+
+#> Convert a block of markers/text that starts with the marker <Para
+#
+sub convert_paragraph{
+    local($s) = @_;
+    local(@fmt, @lines, @pre, @post, $HyperGroup, $ExtraHyperGroup );
+    # global($PgfTag);
+#TJHNEW#
+    local($have_numstring,@newdata);
+
+    # we need to know if we have a PfgNumString or not
+    # as if it is not there and the paragraph has a 
+    # PgfNumFormat then we need to get the details from
+    # there and use them to insert the equivalent of the
+    # PgfNumString that FrameMaker would put there if
+    # we went into it and saved the file.
+    $have_numstring=0;
+    #$State{"NumFormat"}='';
+    
+    # we know nothing about a paragraph at this point so 
+    # clear all the state variables that we buildup from SDF
+    # marker tags ...
+
+    ##print STDERR "CLEAR SDFVAR\n";
+    %SDFVAR=();
+    undef $USER_WH_topic;
+    undef $USER_WH_context;
+
+    $delayed_text='';
+    
+    &do_statement($s,
+                  'PgfTag',
+                  'push(@fmt, &change_style(&convert_string($data)))',
+                  'Pgf',
+                  'push(@fmt, &convert_pgf_format($here))',
+                  'PgfNumString',
+                  '$delayed_text=&convert_numstring($data); 
+		   $have_numstring=1;
+		  ',
+
+                  # support local override of things ... which SDF
+		  # will generate for lots of things ... text bullet -> *
+                  'PgfNumberFont', 
+		  '$State{"NumberFont"} = &convert_string($data); ',
+                  'PgfNumFormat', 
+		  '$State{"NumFormat"} = &convert_string($data,$State{"Family"} ne "Symbol");',
+
+
+		# certainly need to support spacing overrides!
+		'PgfSpBefore', '$State{"SpBefore"} = &change_dims($data,"sb")',
+		'PgfSpAfter',  '$State{"SpAfter"} = &change_dims($data,"sa")',
+
+                  'ParaLine',
+		  '
+		    @newdata=();
+
+                    if ($State{$Tbl_sw,"FirstCellPara"}) { 
+		      $State{"SpBefore"} = &change_dims("0 pt","sb");
+		      $State{"SpAfter"} = &change_dims("0 pt","sa");
+		    }
+
+		    push(@newdata,"$State{SpBefore}","$State{SpAfter}");
+
+		    # add in NumFormat if there is no NumString setting
+		    # and a NumFormat exists ...
+		    if ( !$have_numstring && $State{"NumFormat"} ) {
+		      $delayed_text=&convert_numformat($State{"NumFormat"});
+		    }
+
+                    push(@newdata,&convert_paraline($here, *pre, *post));
+		    
+		    if ($verbose && $pgfnumdebug) {
+  	    	      $newdatastring = join("|",@newdata);
+		      print STDERR "STATE " . $State{"NumFormat"} . "\n";
+		      print STDERR "STMT $have_numstring $newdatastring\n";
+		    }
+		    
+                    push(@lines, @newdata, "\n");
+		    
+		  ',
+                  );
+
+    # we have done at least one paragraph so we are no longer
+    # on the first paragraph of a cell ... so clear it now
+    $firstcellpara=$State{$Tbl_sw,"FirstCellPara"}; # we need this below!
+    undef $State{$Tbl_sw,"FirstCellPara"};
+
+    &debug("convert_paragraph: ",$State{'PgfTag'});
+
+    print STDERR "." unless ($quiet);
+
+    push(@lines, $HyperGroup), undef($HyperGroup) if $HyperGroup;
+    
+    local($group);
+
+    #@#lines is arbitrary
+    $RTFInfo{$group} .= join('', @lines)."\\par\n" 
+        if $group = $TagGroup{$State{'PgfTag'}};
+
+    &debug(%TagGroup);
+    &debug("tag: ", $State{'PgfTag'}, " group: ", $group);
+
+    #> CRW Added !$Tbl_sw
+    #if ( !$skiptags{$State{PgfTag}} && !$Tbl_sw ) { 
+    if ( !$skiptags{$State{PgfTag}} ) { 
+        # $Container is, e.g. '\intbl ' (for tables)
+
+        #> CRW Added Test for tt_TableTitle to generate Autonumber Title 
+	# THIS IS OLD CODE ... we now look at the table title stuff
+        # as the user can set that to whatever they like!
+	if (0) {
+        if ( $State{'PgfTag'} eq 'tt_TableTitle' ) {
+            local($Table_Hdr) = "{\\b Table ". ++$PgfAutoNum{'tt_TableTitle'} .": }";
+            unshift(@lines, "$Table_Hdr");
+        }
+	}
+
+#        return(@pre, @fmt, $Container, &current_tabs(),
+#               @lines, "\\par", @post, "\n");
+        # moved the insert of the "\\par" between lines and post
+	# up to the start of the next one ...
+	if (!$SDFVAR{"header"} && ($paragraph_count>1)) {
+	    ##print STDERR "inserting par\n";
+            if ( ! $firstcellpara ) {
+		if ($rtfdebug) {
+		    unshift(@pre,"\\par{{ENDPARA}}");
+		} else {
+		    unshift(@pre,"\\par");
+		}
+	    } else {
+		if ($rtfdebug) {
+		    unshift(@pre,"{{FIRSTCELL-NOENDPARA}}");
+		}
+	    }
+	}
+
+        $paragraph_count++;
+
+	if ($rtfdebug) {
+	    return(@pre, @fmt, $Container, &current_tabs(),
+		   @lines, "{{OLD-PAR}}", @post, "\n");
+	} else {
+	    return(@pre, @fmt, $Container, &current_tabs(),
+		   @lines, "\\line", @post, "\n");
+	}
+    } else {               
+        # $Container is, e.g. '\intbl ' (for tables)
+        return ( ($Tbl_sw) ? "@fmt@lines" : "");
+    }
+}
+
+sub current_tabs{
+    local($rtf, $_);
+    
+    local($li) = &rtf_dimensions($State{'LIndent'});
+
+    foreach (&rtf_dimensions($State{'TabStops'})){
+        $_ -= $li; #@# MIF to RTF mindset
+	$_ = $_ - 720 + 72 if ( $winhelp );
+        $rtf .= "\\tx$_ ";
+    }
+    $rtf;
+}
+
+sub convert_numstring{
+    local($string) = @_;
+    local(%State) = %State; # don't clobber font
+    local($numfont) = $State{'NumberFont'};
+    local($font) = $numfont ? &change_char_style($numfont) : '';
+    local($form) = $State{'NumFormat'};
+
+    $string = &convert_string($string, $State{'Family'} ne 'Symbol');
+
+    &debug("numstring($string) [font($numfont): $font form: $form]");
+    local($tabs) = &current_tabs();
+    return "{\\field{\\fldinst PgfNumFormat $form}{\\fldrslt $font$tabs$string}}";
+}
+
+#
+# convert_numformat : handle the FrameMaker PgfNumFormat construct
+#
+# [TAG:][TEXT|<EXPR>]*
+#
+# TAG is anything ... typically a single letter
+# EXPR is something like <n>, <n+1>, <n=1>
+# or the above with A for alpha
+#
+# From FrameMaker 4 - Using FrameMaker 4-38
+#
+# <SPACE> keep same don't display
+# <SPACE=0> reset to zero ... don't display
+# n=numeric      1,2,3,4,...
+# r=lower roman  i,ii,iii,iv,...
+# R=upper roman  I,II,III,IV,...
+# a=lower alpha  a,b,c,...,aa
+# A=upper alpha  A,B,C,...,AA
+#
+
+sub num_eval{
+  local($tag,$level,$text,$expr)=@_;
+  local($result,$op,$arg,$type);
+
+  # keep state local here ... makes moving this to other packages
+  # much easier ... who knows if I've got the following list right
+  # as I cannot recollect much of my Latin classes from so long ago 
+  # -- tjh :-)
+  if (!defined $num_to_roman) {
+    @num_to_roman=('0','i','ii','iii','iv','v','vi','vii','viii','ix','x',
+	               'xi','xii','xiii','xiv','xv','xvi','xvii', 'xviii',
+		       'xix','xx'
+		  );
+  }
+  
+  $type=''; $op=''; $arg='';
+  
+  $type=substr($expr,0,1);
+  
+  if (length($expr)>1) {
+    $op=substr($expr,1,1);
+    $arg=substr($expr,2);
+    $arg = '1' if ($arg eq '');
+  }
+  
+  # make the tag the combined name and the type so that
+  # things are easier to follow if we have to debug this :-)
+  $tag = "$tag$type";
+  
+  $result='';
+  if ($op eq '') {
+    if (!defined($NUM_EVAL{$tag,$level})) {
+      $NUM_EVAL{$tag,$level}=1;
+    }
+  } elsif ($op eq '+') {
+    $NUM_EVAL{$tag,$level}+=$arg;
+  } elsif ($op eq '-') {
+    $NUM_EVAL{$tag,$level}-=$arg;
+  } elsif ($op eq '=') {
+    $NUM_EVAL{$tag,$level}=$arg;
+  } 
+
+  # altering the lowest level value *always* clears
+  # the other dependant values ... 
+  # i.e. 1.2 changing the 1->2 means .2->.1
+  if ($op ne '') {
+    undef $NUM_EVAL{$tag,$level+1};
+  }
+  
+  # A = alpha, n = numeric
+  if ($type eq 'A') {
+    $result = sprintf("%c",ord('A')+$NUM_EVAL{$tag,$level}-1);
+  } elsif ($type eq 'a') {
+    $result = sprintf("%c",ord('a')+$NUM_EVAL{$tag,$level}-1);
+  } elsif ($type eq 'R') {
+    $result=$NUM_EVAL{$tag,$level};
+    $result =~ s/(\S+)/\U$1\E/g;
+  } elsif ($type eq 'r') {
+    $result=$num_to_roman[$NUM_EVAL{$tag,$level}];
+  } else {
+    $result=$NUM_EVAL{$tag,$level};
+  }
+  
+  if ($pgfnumdebug) {
+    print STDERR "num_eval($tag,$level) $expr :OP=$op ARG=$arg -> $result [$text]\n";
+  }
+  
+  if ($use_numformat) {
+    return "$text$result";
+  } else {
+    return "$text";
+  }
+}
+
+sub convert_numformat{
+  local($str) = @_;
+  local($format,$tag,$rest,$level);
+  
+  $format=$str;
+  if (substr($format,1,1) eq ':') {
+    $tag=substr($format,0,1);
+    substr($format,0,2)='';
+  }
+  
+  # throw away ">." if not using the number stuff as 
+  # it is probably not what the user wants or expects to see
+  if (!$use_numformat) {
+    $format =~ s/>\./>/g;
+  }
+  
+  $level=0;
+  $format =~ s/([^<]*)(<([^>]*)>)/&num_eval($tag,$level++,$1,$3)/ge;
+  
+  if ($pgfnumdebug) {
+    print STDERR "NUMFORMAT($str) => TAG $tag FORMAT $format\n";
+  }
+  
+  return $format;
+}
+
+sub change_style{
+    local($tag) = @_;    
+
+    local($style, $_);
+
+    if($PgfCatalog{"Style", $tag}){
+        &set_paragraph_format($tag);
+        $style = $PgfCatalog{"Style", $tag};
+    }else{
+        local($pgf_fmt) = $PgfCatalog{'Statement', $tag};
+        if($pgf_fmt){
+            &reset_paragraph_format();
+            &reset_character_format();
+            $style = &convert_pgf_format($pgf_fmt);
+            $PgfCatalog{"Style", $tag} = $style;
+
+##STYLE##
+            #warn "Catalog entry for '$tag' added as $style";
+
+            &save_paragraph_format($tag);
+        }else{
+            warn "No catalog entry for '$tag'";
+        }
+    }
+    
+    if ($pgfnumdebug) {
+      print STDERR "CHANGE_STYLE to \"$tag\" NumFormat \"$State{'NumFormat'}\" Placement \"$State{'Placement'}\" NEWTOPIC $State{'NEWTOPIC'}\n";
+    }
+
+    $State{'PgfTag'} = $tag;
+
+    join('', "\\pard\\plain\\s", &intern(*Tag, $tag), " ", $style);
+}
+
+sub change_char_style{
+    local($tag) = @_;    
+    local($style, $_);
+
+    &reset_character_format();
+    $State{'FTag'} = $tag;
+
+    local($s) = $FontCatalog{'Statement', $tag};
+    $s ? "\\plain" . &convert_char_format($s)
+        : '';
+}
+
+#> Converts the block of text/markes which start with <ParaLine,
+#> $HyperGroup is determined from Marker Type 8
+#> $Xref_TOC is determined from Marker Type 11
+sub convert_paraline{
+    local($s, *pre, *post) = @_;
+    #@# empty_hyper gets around the: <marker><font>hot-text<font> bug.
+    local(@text, $empty_hyper);
+
+    #print STDERR "SDFVAR header = " . $SDFVAR{"header"} . "\n";
+    #print STDERR "SDFVAR window = " . $SDFVAR{"window"} . "\n";
+
+    &do_statement
+        ($s,
+	 'DashedPattern', '# do nothing',
+         'String',
+         'local(@tmptext)=&convert_string($data,$State{"Family"} ne "Symbol");
+          # if we have hypertext information then we process it
+          # now we have all the pieces required --tjh
+          if ( $Xref_TOC && $hypertext_sw ) {      #> If TOC has been defined
+               $Xref{$Xref_TOC} = "@tmptext";
+               $XrefTopic{$Xref_TOC} = &convert_context("@tmptext");
+	       if ($tjh_xref_debug) {
+	       	 print STDERR "Xref{$Xref_TOC}=\"$Xref{$Xref_TOC}\"\n";
+	       }
+          }
+
+	  ##print STDERR "Text: " . join(" ",@tmptext) . " Delayed $delayed_text\n";
+
+	  # force a page break here for the first time we hit a 
+	  # popup window ... might have to think about how to 
+	  # separate multiple popup windows too ...
+	  if ($SDFVAR{"window"}) {
+	    if (!$done_pagebreak) {
+		$done_pagebreak=1;
+		if ($rtfdebug) {
+		    push(@text, "\n\\\\page{{WINDOWSTART}}\n");
+		} else {
+		    push(@text, "\n\\\\page\n");
+		}
+	    }
+	  } elsif ($SDFVAR{"endwindow"}) {
+	    # push another page break?
+	    if ($rtfdebug) {
+		push(@text, "\n\\\\page{{WINDOWEND}}\n");
+	    }else {
+		push(@text, "\n\\\\page\n");
+	    }
+	    $done_pagebreak=0;
+	  } elsif ($SDFVAR{"header"}) {
+	    # keep this with the previous paragraph!
+	    if ($rtfdebug) {
+		push(@text, "\n\\\\keepn{{HEADERKEEP}}\n");
+	    } else {
+		push(@text, "\n\\\\keepn\n");
+	    }
+	  }
+
+          # if we have saved up some text that goes before the
+          # next output string and it has formatting information
+	  # (i.e. font specification) then we must grab that
+          # now and then reset back to current ...
+	  ##if ($delayed_text && $State{"NumberFont"} )
+	  if ($delayed_text) {
+	    &save_char_format();
+	    $delayed_text = &handle_font_change($State{"NumberFont"}) . $delayed_text . &restore_char_format();
+	  }
+		    
+          if ( $HyperGroup && $hypertext_sw ) {
+            ($token,$arg) = $HyperGroup =~ /(\S+) (.*)/;
+            $curtag=$State{PgfTag};
+
+            #$heading=($curtag =~ /^h[1]_Heading\b/);
+            #$heading=$State{"PgfPlacement"} ne "Anywhere";
+            $heading=$State{"NEWTOPIC"} eq "1";
+	    
+	    $WH_topic = &convert_context($arg);
+
+            &hyperdebug("Token=$token Arg=$arg Hyper=$HyperGroup Tmptext=@tmptext");
+
+	    # handle each hypertext construct ...
+	    if ( $token eq "newlink" ) {
+
+              #>Added enhanced footnote text, check that tmptext is not blank
+              if ( $heading && $tmptext[0] ne "") {    
+		#> Footnote - Title
+                $Footnote_txt  = "\\\\keepn {\\\\up6 \${\\\\footnote \\\\pard".
+                    "\\\\plain{\\\\up6 \$} @tmptext}}\n"; 
+                $Footnote_txt .= "{\\\\up6 +{\\\\footnote \\\\pard\\\\plain".
+                    "{\\\\up6 +}";                  
+		#>Footnote Browse Seqeunce
+                $Footnote_txt  = sprintf("$Footnote_txt %04d}}\n",++$browse_seqno);
+                push(@text, "\n");
+		# page break *before* the topic starts ...
+                push(@text, $paragraph_count>0 ? "\\\\page" : "", "\n"); 
+                push(@text, $Footnote_txt);
+                $paragraph_count++;  #>New Page after every major header/topic
+              } 
+
+              &rtf_topic_keyword(*WH_topic, *text, $arg);
+              &Generate_ID($WH_topic,*tmptext);
+          
+	      # override TOC marker text from the default of the
+	      # value of the string to being what was directly
+	      # specified --tjh
+	      if ( $Xref_TOC && $hypertext_sw ) {      
+                $XrefTopic{$Xref_TOC} = "$WH_topic";
+	      }
+
+              if ( $ExtraHyperGroup ) {
+                   ($token,$arg) = $ExtraHyperGroup =~ /(\S+) (.*)/;
+                   $WH_topic=&convert_context($arg);
+                   &hyperdebug( "Extra Token=$token Arg=$arg");
+                   if ( $token eq "HELPTOC" ) {
+                       push(@text,"{\\\\up6 #{\\\\footnote \\\\pard\\\\plain".
+                            "{\\\\up6 #} $WH_topic}}\n");
+                       &Generate_ID($WH_topic, *tmptext);
+                   }
+                   undef ($ExtraHyperGroup);
+               }
+
+	       # allow for delayed text that must stay with
+	       # the real string and not be broken by the hypertext
+	       # stuff being inserted!
+	       push(@text,$delayed_text) if ($delayed_text);
+	       $delayed_text="";
+	       
+               push(@text,@tmptext); # Push Actual Header into Document
+
+            } elsif ( $token eq "gotolink" ) {
+ 	        # allow for delayed text that must stay with
+	        # the real string and not be broken by the hypertext
+	        # stuff being inserted!
+	        push(@text,$delayed_text) if ($delayed_text);
+		$delayed_text="";
+		
+                if ( $arg =~ /\.fvo:/ ) {  #> CRW This is an external link
+                   local($file, $link);
+                   $arg =~ s/\.fvo/\.hlp/;                    #>Strip .fvo ext
+                   ($file, $link) = split(/:/, $arg);
+                   # IGC begin
+                   #$file = &convert_context($file);
+                   $link = &convert_context($link);
+                   # IGC end
+                   $WH_topic = "$link\@$file";
+                } 
+		if ($SDFVAR{"popup"}) {
+		    push(@text,"{\\\\ul @tmptext}{\\\\v $WH_topic}");
+		    undef $SDFVAR{"popup"};
+		} else {
+		    push(@text,"{\\\\uldb @tmptext}{\\\\v $WH_topic}");
+		}
+            } elsif ( $token eq "HELPTOC" ) {
+		#> $ Footnote - Title
+                $Footnote_txt  = "{\\\\up6 \${\\\\footnote \\\\pard\\\\plain".
+                    "{\\\\up6 \$} @tmptext}}\n"; 
+                $Footnote_txt .= "{\\\\up6 #{\\\\footnote \\\\pard\\\\plain".
+                    "{\\\\up6 #} $WH_topic}}\n";#> 
+		# Footnote Context String
+                $Footnote_txt .= "\\\\keepn{\\\\up6 +{\\\\footnote \\\\pard".
+                    "\\\\plain{\\\\up6 +}";       
+		#> + Footnote Browse Seqeunce
+                $Footnote_txt  = sprintf("$Footnote_txt %04d}}\n",++$browse_seqno);              
+                push(@text, "\n");
+                push(@text, $paragraph_count>0 ? "\\\\page" : "", "\n"); 
+                push(@text, $Footnote_txt);
+
+                &Generate_ID($WH_topic, *tmptext);
+
+                if ( $ExtraHyperGroup ) {
+                  ($token,$arg) = $ExtraHyperGroup =~ /(\S+) (.*)/;
+                  $WH_topic=&convert_context($arg);
+                  &hyperdebug("Extra Token=$token Arg=$arg");
+                  if ( $token eq "HELPTOC" ) {
+                    push(@text,"{\\\\up6 #{\\\\footnote \\\\pard\\\\plain".
+                         "{\\\\up6 #} $WH_topic}}\n");
+                    &Generate_ID( $WH_topic, *tmptext);
+                  }
+                  undef ($ExtraHyperGroup);
+                }
+		
+ 	        # allow for delayed text that must stay with
+	        # the real string and not be broken by the hypertext
+	        # stuff being inserted!
+	        push(@text,$delayed_text) if ($delayed_text);
+		$delayed_text="";
+		
+                push(@text,@tmptext);
+            #> Assume that gotopage is external document(Table of ContentsId=1)
+            } elsif ( $token eq "gotopage" ) {
+                local($macro);
+                ($WH_topic = $arg) =~ s/\.fvo.*/\.hlp/;
+                #$macro  = "{\\\\v \!JC(";
+                #$macro .= "\"$WH_topic\"\,0000000001)}";
+
+		# use the JumpContents option and then we do not
+		# get two error windows ... --tjh
+                $macro = "{\\\\v \!JumpContents(\"$WH_topic\")}";
+
+ 	        # allow for delayed text that must stay with
+	        # the real string and not be broken by the hypertext
+	        # stuff being inserted!
+	        push(@text,$delayed_text) if ($delayed_text);
+		$delayed_text="";
+		
+                push(@text, "{\\\\uldb @tmptext}", $macro); #>
+            #> Assume that the gotourl is a URL for WWW
+            } elsif ( $token eq "gotourl" ) {
+		if ($sdfvartrace) {
+		   print STDERR ("SDF:gotourl: $tmptext\n");
+		}
+
+ 	        # allow for delayed text that must stay with
+	        # the real string and not be broken by the hypertext
+	        # stuff being inserted!
+	        push(@text,$delayed_text) if ($delayed_text);
+		$delayed_text="";
+		
+                push(@text, "{\\\\b @tmptext}"); #> URL is bolded with text
+            } else {
+
+ 	        # allow for delayed text that must stay with
+	        # the real string and not be broken by the hypertext
+	        # stuff being inserted!
+	        push(@text,$delayed_text) if ($delayed_text);
+		$delayed_text="";
+		
+                push(@text, "{{\\\\v \\\\xe $HyperGroup}}");
+            }
+
+	    # once we use the hypertext stuff in the output it
+	    # is totally finished with ... so blow it away!
+            undef ($HyperGroup);
+
+	    # these are cleared on para entry so can be removed
+	    # from here soon ...
+	    #undef ($USER_WH_context);
+	    #undef ($USER_WH_topic);
+
+          } else {
+
+            if ( $HyperGroup && !$hypertext_sw ) {  
+              push( @tmptext , "{\\\\pard \\\\plain \\\\v\\\\f4\\\\fs20".
+                   "{\\\\xe {@tmptext}}}");
+              undef $HyperGroup;
+            } 
+	    
+	    # any delayed text must go out now as it can be
+	    # delayed no longer!
+	    push(@text,$delayed_text) if ($delayed_text);
+	    $delayed_text="";
+	    
+            push(@text,@tmptext);
+          } 
+
+	  # finished with this stuff now ... 
+          if ( $Xref_TOC && $hypertext_sw ) {      #> If TOC has been defined
+               $Xref_TOC = "";
+	  }
+
+          $empty_hyper=0;',
+         'Char',
+         'push(@text, &convert_character($data))',
+
+         'ATbl',
+         'local(%State) = %State;
+          local(@tbl) = &convert_table($Tbl{$data});
+          $State{"TblPlacement"} =~ /Top|Left|Right|Near|Far/
+            ? push(@pre, "{", @tbl, "}") : push(@post, "{", @tbl, "}")',
+
+         'AFrame',
+         'local(%State) = %State;
+          &debug("converting AFrame $data");
+          local(@af) = &convert_frame($AFrame{$data});
+          $State{"FrameType"} =~ /Top|Left|Right|Near|Far/
+            ? push(@pre, "{", @af, "}") : push(@post, "{", @af, "}")',
+
+         'FNote',
+         'push(@text, &convert_footnote($Notes{$data}))',
+
+         'XRefEnd',
+         'push(@text, &convert_xref_end($data))',
+
+         #@@ there could be a problem with tagged fonts here:
+         # convert_char_format ignores tags. Catalog lookup occurs
+         # in its caller (e.g. convert_character_catalog).
+         # And this is its caller.
+         'Font',
+         'push(@text, $HyperGroup), undef($HyperGroup)
+            if $HyperGroup && !$empty_hyper;
+          push(@text, &convert_char_format($here))',
+
+         'Marker',
+         'push(@text, &convert_marker($here)); $empty_hyper=1',
+
+         'Variable',
+         'push(@text, &convert_definition("Variable",
+                                       &data_search("VariableName", $here)))',
+         'XRef',
+         'push(@text, &convert_xref($here))'
+         );
+
+    @text;
+}
+
+local($active);
+
+sub handle_font_change{
+  local($str)=@_;
+  local($ret);
+
+  return '' if ($active);
+
+  $ret='';
+
+  if ($str eq "Bold") {
+    # Bold by itself means Bold with *no* Italics
+    $ret = &select_attr($str,"Weight", $str, "b");
+    $ret .= &select_attr($str,"Angle", $str, "i0");
+  } elsif ($str eq "Italic") {
+    # Italics by itself means Italics with *no* Bold
+    $ret = &select_attr($str,"Angle", $str, "i");
+    $ret .= &select_attr($str,"Weight", $str, "b0");
+  } elsif ($str eq "" || $str eq "Default" ) {
+    $ret .= &select_attr($str,"Weight", $str, "b0");
+    $ret .= &select_attr($str,"Angle", $str, "i0");
+    $ret .= &select_attr($str,"Color", $str, "cf0");
+  } else {
+    $active=1;
+    # assume that it is a "normal" font catalog entry
+    $stmt=$FontCatalog{'Statement', $str};
+    if ($stmt) {
+      $State{'FTag'} = $str;
+      $ret = &convert_char_format($stmt);
+      ## Debug stuff ...
+      ##&DUMP_CONTEXT($stmt);
+      #warn "font change \"$str\" maps to $ret\n"; 
+    } else {
+	warn "unknown font change ignored \"$str\"\n"; 
+    }
+    #$ret=&change_char_style($str);
+    $active=0;
+  }
+
+  return $ret;
+}
+
+# Change a MIF String datum (without newlines) to a rtf string
+#
+sub convert_string{
+  local($_, $do_hex) = @_;
+
+  # put backslashes out of band
+  if (0) {
+    s/\\\\/\n\n/g;
+  } else {
+    #s/\\\\/\0\0/g;
+    s/\\\\/\\/g;
+  }
+
+  # undo MIFisms
+  s/^`//;
+  s/'.*//;
+  s/\\q/'/g;
+  s/\\Q/`/g;
+  s/\\</</g;
+  s/\\>/>/g;
+
+  # tjh added
+  s/\\ / /g ;
+  s/\\x15 /-/g ;                # handle non-breaking hyphen!
+
+  # convert hex stuff
+  $do_hex ? s/\\x(\w\w) /$FrameCode[hex($1)]/ge :
+      s/\\x(\w\w) /pack('C', hex($1))/ge;
+
+  # protect RTFisms
+  if (0) {
+    s/\{/\n\{/;
+    s/\}/\n\}/;
+  } else {
+    # TJH get the curlybraces right
+    s/{/\\{/g;
+    s/}/\\}/g;
+  }
+
+  s/\\t/\\tab /g;                #TJH
+  
+  # convert the bullet into something that actually looks right!
+  ###TODO XXXX GET THIS RIGHT!!!###
+  #s/\\bullet/&convert_other("SYMBOL 183 \\\\\\\\f \\"Symbol\\" \\\\\\\\s 10 \\\\\\\\h");/ge;
+  s/\\bullet/\\f99 \\'B7 \\f- /g;
+
+  # put backslashed back in! --tjh
+  if (0) {
+  } else {
+    s/\0\0/\\\\/g;
+  }
+
+  $_;
+}
+
+sub convert_character{
+    local($name) = @_;
+    $CharacterConversions{$name};
+}
+
+sub convert_footnote{
+    return ("\\chftn{\\footnote\n", &convert_flow($_[0]), "}");
+}
+
+sub convert_xref{
+    local($s) = @_;
+
+    $XRefSrcText = "";
+    $XRefSrcFile = "";
+        
+    if ( $hypertext_sw ) {      #> If hypertext add TOC, add TOC at fron of doco
+        $XRefName = &convert_string(&data_search($s, 'XRefName'));
+        $XRefSrcText = &convert_string(&data_search($s, 'XRefSrcText'));
+	# Used for TOC types
+        if ( $XRefName eq 'TOC' || $XRefName eq 'HELPTOC' ) {     
+	    # also keep track of the paragraph style when the
+	    # XRef is seen as we need this for handling multi-level
+	    # table of contents for sorting out the indent side
+	    # of things --tjh
+	    $XrefStyle{$XRefSrcText} = $State{'PgfTag'};
+	    $XrefTabs{$XRefSrcText} = &current_tabs();
+	    if ($tjh_xref_debug) {
+	      print STDERR "XREF::$XRefSrcText=>$State{'PgfTag'}::" . &current_tabs() . "\n";
+	      print STDERR "XRefSrcText: $XRefSrcText $State{'PgfTag'}\n";
+	    }
+            push(@XRefTOC, $XRefSrcText);
+        }
+    }
+    return "";
+
+}
+
+sub convert_xref_end{
+
+    $XRefSrcText = "";
+    $XRefSrcFile = "";
+    return "";
+
+}
+
+sub convert_definition{
+    local($type, $name) = @_;
+    #@# converts Frame variables literally to RTF
+    return &convert_string($Definition{$type, $name});
+}
+
+sub convert_other{
+    local($token, $text, $invisible) = @_;
+    local($fldpriv) = $invisible ? '\fldpriv\v' : '';
+    
+    print STDERR "CONVERT_OTHER: $token $text\n";
+    
+    return "{\\field$fldpriv{\\fldinst $token}{\\fldrslt $text}}";
+}
+
+#> Converts the '<Marker' from the MIF to ... depending upon the 
+#> string '<MType n'> where  0<n<25
+sub convert_marker{
+    local($type) = &data_search($_[0], 'MType', 1);
+    local($text) = &convert_string(&data_search($_[0], 'MText', 1));
+    local($keyword);
+
+
+    if ($type == 0 || $type == 1) {
+        #@@ these actually occur in pairs.
+        return &convert_other('FrameHeaderFooter ' . ($type+1), $text, 1); #@#
+    } elsif($type == 2){
+	#XXXX TJH XXXX TODO ... this was wrong!!!
+	if (1) {
+	  #> Change the index to a keyword for Help files
+	  if ( $hypertext_sw ) {  
+	      $keyword = "{\\up6 K{\\footnote \\pard\\plain{\\up6 K} $text}}";
+	      if ( $State{'PgfTag'} eq 'dn_DocName' ) {
+		  $Keyword_dn_DocName = $keyword;
+	      }
+	  }
+	  return "$keyword{\\v{\\xe $text}}"; #@# text needs to be interpreted
+	} else {
+	  # The following does a different job ... not sure what
+	  # Craig wanted above ... treat it like a marker of type 8
+	  # ... think about this ... we are working in DOS without 
+	  # having gone through framemaker ... this could be the issue!
+	  $HyperGroup = "gotolink $text";
+	  &debug( "HyperGroup = $HyperGroup");
+	  return "";
+	}
+    } elsif ($type == 3) {
+        $RTFInfo{'comment'} .= "$text\n";
+    } elsif ($type == 4) {
+        $RTFInfo{'subject'} .= "$text\n";
+    } elsif ($type == 5) {         #> This is 'Author' type indexes
+        #> Change  'Author' index to a keyword for Help files
+        if ( $hypertext_sw ) {  
+            $keyword = "{\\up6 K{\\footnote \\pard\\plain{\\up6 K} $text}}";
+        }
+        $RTFInfo{'author'} .= "$text\n";
+        return "$keyword";      #> Return Keyword
+    } elsif($type == 6) {
+        $RTFInfo{'keywords'} .= "$text\n"; #@# glossary, really
+    } elsif($type == 7) {
+        return '{\|}'; #@# equation marker->formula character
+    } elsif($type == 8) {
+
+        # &Verbose("Marker text=$text");
+
+        # save the text for when we have the string the follows
+        # the text and hence can process it ... as we may need 
+        # to embed the following string in the output! --tjh
+        #
+
+	($token,$arg) = $text =~ /(\S+) (.*)/;
+
+	# handle the variables that SDF is passing through to
+	# us to indicate the values to use for topic names
+	# and context ids so that we have total control
+	# over things in the HELP output
+	if ( $token eq "sdf" ) {
+	  ($var,$value)=split(/=/,$arg);
+	  $SDFVAR{$var}=$value;
+
+	  if ($sdfvartrace) {
+	    print STDERR ("SDF SET => $var=$value\n");
+	  }
+
+	  if ( $var eq "topic" ) {
+	    # use whatever is given as the topic name
+	    $USER_WH_topic=$value;
+	    if ($sdfvartrace) {
+	      print STDERR ("SDF:USER_WH_topic: $USER_WH_topic\n");
+	    }
+
+	    # DO NOT PUT ANYTHING IN HERE ... if the user does not
+	    # have this defined as a link then too bad!
+
+	    # make sure we get a hypertext link in here ...
+	    # which the user can override if the wish but
+	    # we will use the saved value for the topic name
+	    # ZZZZ
+	    if ( ! $HyperGroup ) {
+	      $HyperGroup="newlink $value";
+	    }
+	  } elsif ( $var eq "context" ) {
+	    # use whatever is given as the context ID
+	    $USER_WH_context=$value;
+	    if ($sdfvartrace) {
+	       print STDERR ("SDF:USER_WH_context: $USER_WH_context\n");
+	    }
+
+	    # DO NOT PUT ANYTHING IN HERE ... if the user does not
+	    # have this defined as a link then too bad!
+
+	    # make sure we get a hypertext link in here ...
+	    # which the user can override if the wish but
+	    # we will use the saved value for the context id
+	    # ZZZZ
+	    if ( ! $HyperGroup ) {
+	      $HyperGroup="newlink $value";
+	    }
+	  } elsif ( $var eq "header" ) {
+	    # the current paragraph is included in the header 
+	    # of the non-scrolling region ... so do not close that 
+	    # off just yet!
+	    # ZZZZ
+	    if ( ! $HyperGroup ) {
+	      $HyperGroup="newlink $value";
+	    }
+	  } elsif ( $var eq "window" ) {
+	    # the current paragraph is part of a popup window
+	    # and hence we need to do special things
+	  } elsif ( $var eq "endwindow" ) {
+	    # the current paragraph is a marker of the end
+	    # of a popup window ... we can toss it!
+	  } elsif ( $var eq "popup" ) {
+	    # jump off to a popup window ... which we want
+	    # to be just link gotolink 
+	    $HyperGroup="gotolink $value";
+	  } elsif ( $var eq "url" ) {
+	    # just like the old gotourl 
+	    $HyperGroup="gotourl $value";
+	  } else {
+	    # Warn the user that there is something that we do not
+	    # understand being sent there ... at least for the 
+	    # moment until we get this working smoothly
+	    print STDERR ("Warning: Unknown SDF variable $var=$value\n");
+	  }
+	} else {
+	  # otherwise "normal" thing ...
+	  $HyperGroup = "$text";
+	  &debug( "HyperGroup = $HyperGroup");
+	}
+        return "";
+
+    } elsif ( $type == 9 ) {
+        return "";
+    } elsif ( $type == 11 ) {
+
+        if ( $hypertext_sw && $State{PgfTag} ne 'dn_DocName') {
+            $Xref_TOC = $text;
+        }
+        return "";
+    }
+
+    return &convert_other('FrameMarker ' . ($type+1), $text, 1); #@#
+}
+
+#
+# Output routines
+#
+
+sub debug{
+#    print STDERR @_, " @$.\n" if ( $Debug );
+    print STDERR @_, "\n" if ( $Debug );
+}
+
+sub hyperdebug{
+    print STDERR @_, "\n" if ( $hyper_debug );
+}
+
+#> Calls debug 
+sub Verbose{
+    if ( $vbs_sw ) {
+        if ( $Debug ) {
+            &debug(@_);
+        }
+        else{
+            $Debug = 1;
+            &debug(@_);
+            $Debug = 0;
+        }
+    }
+}
+
+#
+# Initialize global variables
+#> Added 'pb_PageBreak' to SkipTags if Hypertext
+sub initialize_state{
+    @FrameCode = 
+        ('',      '',      '',      '',      '\-',    '',      '\_',    '',
+         '\tab',  '\line', "\266",  "\247",  '',      '',      '',      '',
+         " ",     "\240",  " ",     " ",     " ",     "\255",  '',      '',
+         '',      '',      '',      '',      '',      '',      '',      '',
+         ' ',     '!',     '"',     '#',     "\$",    '%',     '&',     "\'",
+         '(',     ')',     '*',     '+',     ',',     '-',     '.',     '/',
+         '0',     '1',     '2',     '3',     '4',     '5',     '6',     '7',
+         '8',     '9',     ':',     ';',     '<',     '=',     '>',     '?',
+         '@',     'A',     'B',     'C',     'D',     'E',     'F',     'G',
+         'H',     'I',     'J',     'K',     'L',     'M',     'N',     'O',
+         'P',     'Q',     'R',     'S',     'T',     'U',     'V',     'W', 
+         'X',     'Y',     'Z',     '[',     "\\",    ']',     '^',     '_',
+         "\`",    'a',     'b',     'c',     'd',     'e',     'f',     'g',
+         'h',     'i',     'j',     'k',     'l',     'm',     'n',     'o',
+         'p',     'q',     'r',     's',     't',     'u',     'v',     'w',
+         'x',     'y',     'z',     '{',     '|',     '}',     '~',     '',
+# 0x80
+         "\304",  "\305",  "\307",  "\311",  "\321",  "\326",  "\334",  "\341",
+# 0x88
+         "\340",  "\342",  "\344",  "\343",  "\345",  "\347",  "\351",  "\350",
+# 0x90
+         "\352",  "\353",  "\355",  "\354",  "\356",  "\357",  "\361",  "\363",
+# 0x98
+         "\362",  "\364",  "\366",  "\365",  "\372",  "\371",  "\373",  "\374",
+# 0xa0
+#TJH     "**",    "\260",  "\242",  "\243",  "\247",  "\267",  "\266",  "\337",
+         "**",    "\260",  "[CENT]",  "[POUND]",  "\247",  "\\bullet",  "\266",  "\337",
+# 0xa8
+         "(r)",  "(c)",  "(tm)",  "\264",  "\250",  "",      "\306",  "\330",
+# 0xb0
+         "",      "",      "",      "",      "\225",  "",      "",      "",
+# 0xb8
+         "",      "",      "",      "\252",  "\272",  "",      "\346",  "\370",
+# 0xc0
+         "\277",  "\241",  "\254",  "",      "f",     "",      "",      "\253",
+# 0xc8
+         "\273",  "...",   "",      "\300",  "\303",  "\325",  "OE",    "oe",
+# 0xd0
+         "\255",  "--",    "``",    "''",    "`",     "'",     "",      "",
+# 0xd8
+         "\377",  "Y",     "/",     "\244",  "<",     ">",     "fi",    "fl",
+# 0xe0
+         "***",   "\267",  ",",     ",,",    "%.",    "\302",  "\312",  "\301",
+# 0xe8
+         "\313",  "\310",  "\315",  "\316",  "\317",  "\314",  "\323",  "\324",
+# 0xf0
+         "",      "\322",  "\332",  "\333",  "\331",  "i",     "^",     "~",
+# 0xf8
+         "\256",  "\257",  ".",     "\260",  "\270",  "''",    ",");
+
+    %CharacterConversions =
+        ('Tab', '\tab ',
+         'HardSpace', '\~ ',
+         'SoftHypen', '\_ ', #@#
+         'DiscHypen', '\- ',
+#         'Cent', "\242", # from ISO8859-1
+#         'Pound', "\243",
+#         'Yen', "\245",
+         'Cent', "[CENT]", 		#TJH#
+         'Pound', "[POUND]",		#TJH#
+         'Yen', "[YEN]",		#TJH#
+         'EnDash', "\255",
+         'EmDash', '-', #@#
+         'Dagger', '**', #@#
+         'DoubleDagger', '***', #@#
+#         'Bullet', "\267",
+         'Bullet', "\\bullet",		#TJH#
+         'HardReturn', '\line ',
+         'EndOfPara', "\266",
+         'EndOfFlow', "\247",
+         'NumberSpace', ' ', #@#
+         'ThinSpace', ' ', #@#
+         'EnSpace', ' ',
+         'EmSpace', ' '
+         );
+
+    %doc_defaults =
+        ('paperw', 12240,
+         'paperh', 15840,
+         'margl', 1800,
+         'margr', 1800,
+         'margt', 1440,
+         'margb', 1440,
+         'facingp', '',
+         'TwoSides', 'No',
+         'gutter', 0,
+         'deftab', 720,
+         'widowctrl', '',
+         'hyphhotz', '',
+         'fntsep', '',
+         'ftnsepc', '',
+         'ftncn', '',
+         'endnotes', 1,
+         'enddoc', 0,
+         'ftntj', 0,
+         'ftnbj', 1,
+         'ftnstart', 1,
+         'pgnstart', 1,
+         'linestart', 1,
+         'landscape', 0,
+         'fracwidth', 0,
+         'nextfile', '',
+         'template', '',
+         'makeback', '',
+         'defformat', '',
+         'revisions', '',
+         'margmirror', '',
+         'revprop', 3,
+         'revbar', 3);
+
+    %para_defaults =
+        ('snext', '',
+         'sbasedon', '',
+         'pard', '',
+         's', '',
+         'ql', '',
+         'qr', '',
+         'qj', '',
+         'qc', '',
+         'Alignment', 'ql',
+         'LIndent', '0',
+         'FIndent', '',
+         'NumberFont', '',
+         'fi', 0,
+         'li', 0,
+         'ri', 0,
+         'sb', 0,
+         'sa', 0,
+         'sl', '',
+         'intbl', '',
+##TJH-WINHELP-no keepn0
+         'keep', '',
+         'keepn', '',
+         'WithNext', 'keep0',
+         'sbys', '',
+         'pagebb', '',
+         'Placement', 'Anywhere',
+         'noline', '',
+         'TabStops', '',
+         'tx', '',
+         'tqr', '',
+         'tqc', '',
+         'tqdec', '',
+         'tb', '',
+         'brdrt', '',
+         'brdrb', '',
+         'brdrl', '',
+         'brdrr', '',
+         'box', '',
+         'brdrs', '',
+         'brdrth', '',
+         'brdrsh', '',
+         'brdrdb', '',
+         'brdrdot', '',
+         'brdrhair', '',
+         'brsp', '',
+         'tldot', 1,
+         'tlhyph', '',
+         'tlul', '',
+         'tlth', '',
+#TJHNEW#
+	 # the following also should always be preserved
+	 # across changes ... we need this to do handling of
+	 # bulletted lists and other things too!
+	 'NEWTOPIC', '',
+	 'NumberFont', '',
+	 'NumString', '',
+	 'NumFormat', '',
+	 'SpBefore', '',
+	 'SpAfter', ''
+	);
+
+    %char_defaults =
+        ('f', '',
+         'Family', '',
+         'b', '',
+         'Weight', 'b0',
+         'i', '',
+         'Angle', 'i0',
+         'strike', '',
+         'Strike', 'strike0',
+         'outl', '',
+         'Outline', 'outl0',
+         'shad', '',
+         'Shadow', 'shad0',
+         'scaps', '',
+         'caps', '',
+         'v', '',
+         'fn', '',
+         'fs', '24',
+         'expnd', 0,
+         'ul', '',
+         'ulw', '',
+         'uld', '',
+         'uldb', '',
+         'ulnone', '',
+         'Underline', 'ulnone',
+         'up', '',
+         'SupScript', 'up0',
+         'dn', '',
+         'SubScript', 'dn0',
+         'revised', '',
+         'ChangeBar', 'revised0',
+         'cf', 0,
+
+#TJHNEW#
+	 'Color', 'cf0'
+
+         );
+
+    local($_);
+    @DocumentAttrs = keys(%doc_defaults);
+    foreach (@DocumentAttrs){
+        push(@DocumentDefaults, $doc_defaults{$_});
+    }
+    @State{@DocumentAttrs} = @DocumentDefaults;
+
+    @ParagraphAttrs = keys(%para_defaults);
+    foreach (@ParagraphAttrs){
+        push(@ParagraphDefaults, $para_defaults{$_});
+    }
+    @State{@ParagraphAttrs} = @ParagraphDefaults;
+
+    @CharacterAttrs = keys(%char_defaults);
+    foreach (@CharacterAttrs){
+        push(@CharacterDefaults, $char_defaults{$_});
+    }
+    @State{@CharacterAttrs} = @CharacterDefaults;
+
+#    $SkipTags{'pb_PageBreak'} = 1 if ( $hypertext_sw );   #> Added
+
+    $paragraph_count = 0;
+    $browse_seqno    = 1;
+
+}
+
+sub reset_paragraph_format{
+    @State{@ParagraphAttrs} = @ParagraphDefaults;
+    '';
+}
+
+sub set_paragraph_format{
+    local($tag) = @_;
+    local($_);
+    &reset_paragraph_format();
+    &reset_character_format();
+    grep($State{$_} = $PgfCatalog{$_, $tag},
+         @ParagraphAttrs, @CharacterAttrs);
+}
+
+sub save_paragraph_format{
+    local($tag) = @_;
+    local($_);
+    grep($PgfCatalog{$_, $tag} = $State{$_},
+         @ParagraphAttrs, @CharacterAttrs);
+}
+
+sub reset_character_format{
+    @State{@CharacterAttrs} = @CharacterDefaults;
+    '';
+}
+
+sub mini_reset{
+  # make sure we actually know what things are!
+
+  if ($State{"Weight"} eq "") {
+    $State{"Weight"} = $char_defaults{"Weight"};
+  }
+
+  if ($State{"Angle"} eq "") {
+    $State{"Angle"} = $char_defaults{"Angle"};
+  }
+
+  if ($State{"Color"} eq "") {
+    $State{"Color"} = $char_defaults{"Color"};
+  }
+}
+
+sub save_char_format{
+  local($ret);
+
+  &mini_reset();
+
+  $SavedState{"Family"}=$State{"Family"};
+
+#print STDERR "Saving fs as " . $State{"fs"} . "\n";
+
+  $SavedState{"fs"}=$State{"fs"};
+  $SavedState{"Weight"}=$State{"Weight"};
+  $SavedState{"Angle"}=$State{"Angle"};
+  $SavedState{"Color"}=$State{"Color"};
+
+  $ret='';
+  $ret.="F:$SavedState{'Family'} ";
+  $ret.="S:$SavedState{'fs'} ";
+  $ret.="W:$SavedState{'Weight'} ";
+  $ret.="A:$SavedState{'Angle'} ";
+  $ret.="C:$SavedState{'Color'}";
+
+  ##print STDERR "SAVE: $ret\n";
+}
+
+sub restore_char_format{
+  local($ret);
+
+  &mini_reset();
+
+  if ($State{"Family"} ne $SavedState{"Family"}) {
+#    $ret .= &change_attr("f", &intern(*Typeface, $SavedState{"Family"}));
+    $ret .= "\\f$SavedState{'f'} " if ($SavedState{"f"});
+    $State{"Family"}=$SavedState{"Family"};
+  }
+  if ($State{"fs"} ne $SavedState{"fs"}) {
+#print STDERR "Restoring fs as " . $State{"fs"} . " was " . $SavedState{"fs"} . "\n";
+#    $ret .= &change_dims($State{"fs"}, "fs/10");
+    $ret .= "\\fs$SavedState{'fs'} " if ($SavedState{"fs"});
+    $State{"fs"}=$SavedState{"fs"};
+  }
+  if ($State{"Weight"} ne $SavedState{"Weight"}) {
+    $ret .= "\\$SavedState{'Weight'} " if ($SavedState{"Weight"});
+    $State{"Weight"}=$SavedState{"Weight"};
+  }
+  if ($State{"Angle"} ne $SavedState{"Angle"}) {
+    $ret .= "\\$SavedState{'Angle'} " if ($SavedState{"Angle"});
+    $State{"Angle"}=$SavedState{"Angle"};
+  }
+  if ($State{"Weight"} ne $SavedState{"Weight"}) {
+    $ret .= "\\$SavedState{'Color'} " if ($SavedState{"Color"});
+    $State{"Color"}=$SavedState{"Color"};
+  }
+
+  ##print STDERR "RESTORE: $ret\n";
+  return ($ret);
+}
+    
+###############
+#
+#
+    
+###############
+#
+#
+
+sub rtf_begin_doc{
+    return "{\\rtf1\\ansi\n";
+}
+
+sub rtf_end_doc{
+    return "}\n";
+}
+
+sub rtf_info{
+    local(%groups) = @_;
+    local(@r, $_);
+    local($toctext);
+
+    push(@r, "{\\info\n");
+    foreach (keys %groups){
+        push(@r, "{\\$_ ", $groups{$_}, "}\n");
+    }
+    push(@r, "}\n");
+
+    if ( $hypertext_sw ) {
+       #> If the TOC is set, add a header and the table of contents
+
+       if ( scalar(keys(%Xref)) > 0 && $hypertext_sw ) {
+
+           if (defined $Definition{"Variable", "DOC_TOC_TITLE"} ) {
+	      $toctext=&convert_string($Definition{"Variable", "DOC_TOC_TITLE"});
+	   } else {
+	      $toctext="Table of Contents";
+	   }
+   
+           push(@r, "\n$PgfCatalog{'Style',h2_Heading}\\keepn");
+
+           # a nice graphic can make all the difference in the world
+	   # for doing things ...
+           if (defined $Definition{"Variable", "DOC_TOC_GRAPHIC"} ) {
+             push(@r, "\n\\{bml " . &convert_string($Definition{"Variable", "DOC_TOC_GRAPHIC"}) . "\\}\n" );
+	   }
+
+	   if ($lots_of_whitespace) {
+		   push(@r, "\n{\\up6 \${\\footnote \\pard\\plain{\\up6 \$} $toctext}}");
+		   push(@r, "\n{\\up6 +{\\footnote \\pard\\plain{\\up6 +} 0000}}$toctext\\par\\pard");
+		   push(@r, "\n{\\up6 #{\\footnote \\pard\\plain{\\up6 #} TableofContents}}\\par\\pard\\plain");
+	   } else {
+		   push(@r, "\n{\\up6 \${\\footnote {\\up6 \$} $toctext}}");
+		   push(@r, "\n{\\up6 +{\\footnote {\\up6 +} 0000}}$toctext\\par\\pard\\plain");
+		   push(@r, "\n{\\up6 #{\\footnote {\\up6 #} TableofContents}}");
+	   }
+
+           foreach ( sort (keys (%Xref))) {
+	       local($sty,$str);
+	       
+	       if ($lots_of_whitespace) {
+                 $sty="b0_Body";
+	       } else {
+	         $sty="$XrefStyle{$_}";
+	       }
+
+	       $str="\n$PgfCatalog{'Style',$sty}\\snext-1\\sl-1\\sb-1$XrefTabs{$_}\\tab{\\uldb ". $Xref{$_} ."}{\\v $XrefTopic{$_}}\\par\\pard\\plain\n";
+
+	       if ($tjh_xref_debug) {
+		 	print STDERR "TOC added: $Xref{$_}\n";
+			push(@r,"TOCSTART $Xref{$_}\n");
+			print STDERR "TOCSTYLE \"$PgfCatalog{'Style',$XrefStyle{$_}}\"\n";
+                 	print STDERR "$str\n";
+
+	       }
+
+	       if (0) {
+	       if ($lots_of_whitespace) {
+                 push(@r, "\n$PgfCatalog{'Style',b0_Body}" . "{\\uldb " . "$Xref{$_}" . "}" . "{\\v $XrefTopic{$_}}\\par" );
+		 push(@r, "WOW", "$str", "WOW" );
+	       } else {
+                 #push(@r, "\n$PgfCatalog{'Style',$XrefStyle{$_}}\\snext-1\\sl-1\\sb-1$XrefTabs{$_}\\tab{\\uldb ". $Xref{$_} ."}{\\v $XrefTopic{$_}}\\par\\pard\\plain");
+                 push(@r, "FOO", "FOO $str BAR-Introduction", "BAR", "asdasd");
+	       }
+	       }
+
+	       # work around perl 5.001 "features" 
+	       push(@r, "$str" );
+
+	       if ($tjh_xref_debug) {
+			push(@r,"TOCFINISH $Xref{$_}\n");
+	       }
+           }
+           push(@r, "\\par\\plain\n\\page");
+       }
+       else {
+           push(@r, "+{\\footnote + 0000}\n");
+       }   
+    }
+    return @r;
+}
+
+sub intern{
+    local(*arr, $_) = @_;
+
+    s/^\`//;
+    s/\'.*//;
+    $arr{$_} || ($arr{$_} = ++$arr);
+#    $_ = $arr{$_} || ($arr{$_} = ++$arr);
+#    &debug("intern: $_[1] -> $_");
+#    $_;
+
+}
+#
+# HEURISTIC: uses \fnil for unrecognized fonts.
+# recognizes all FrameMaker 2.1 fonts
+#
+sub rtf_font_table{
+    local(%fonts) = @_;
+    local(@r, $have_zero, $n, $family, $_);
+
+    foreach (keys %fonts){
+        $family = 'nil';
+        $n = $fonts{$_};
+        $have_zero = 1 if ( $n eq "0" );
+        $family = 'roman' if /serif/ || /times/i || /palatino/i
+            || /bookman/i || /newcenturysch/;
+        $family = 'swiss' if /sans/ || /helvetica/i || /avantgarde/i;
+        $family = 'modern' if /courier/i;
+        $family = 'script' if /cursive/i;
+        $family = 'decor' if /zapfchancery/i;
+        $family = 'tech' if /symbol/i;
+
+        push(@r, "{\\f$n\\f$family $_;}\n");
+    }
+
+    # for RTF help files we *must* have a font 0 entry --tjh
+    # and I happen to like Times Roman
+    push(@r, "{\\f0\\froman Times;}\n");
+    push(@r, "{\\f99\\ftech Symbol;}\n");
+    
+    return("{\\fonttbl\n", @r, "}\n");
+}
+
+
+sub rtf_style_sheet{
+    local(%styles) = @_;
+    local(@r);
+
+    local($n, $style, $_);
+    foreach (keys %styles){
+        $n = &intern(*Tag, $_);
+        #@# all styles mentioned in the document will appear in the
+        # stylesheet, but only styles used in the document will be defined!
+        $style = $PgfCatalog{'Style', $_};
+
+        # TJH - blank styles are illegal ... 
+        #       MS WORD 2 will reject the RTF file
+
+        if ( "$style$_" ne "" ) {
+            push(@r, "{\\s$n $style$_;}\n");
+        }
+    }
+    return("{\\stylesheet\n", @r, "}\n");
+}
+
+
+sub rtf_color_table{
+    local(@colors) = @_;
+
+    local($red, $green, $blue, $_);
+    foreach (@colors){
+        ($red, $green, $blue) = split(/\s+/, $_);
+        push(@r, "\\red$red\\green$green\\blue$blue;\n");
+    }
+    return("{\\colortbl\n", @r, "}\n");
+}
+
+sub rtf_dimensions{
+  local($_, $twips) = @_;
+  local(@trect);
+#
+# convert all dimensions to twips
+# didot@@ cicero@@
+#
+  while($_){
+    warn "\@\@Dimensions: (@_) \"$_\"\n" if ($tjhdebug);
+    if( s/\s*(-?\d*(\.\d*)?)\s*//){
+      $twips = $1 * 1440;
+    }else{
+      warn "\@\@Bad dimensions: (@_) \"$_\"\n";
+      return ();
+    }
+    s/"//;
+    s/in//;
+    s/pt// && ($twips = $twips/72);
+    s-cm-- && ($twips = $twips/2.54);
+    s-mm-- && ($twips = $twips/25.4);
+
+    # TJH
+    # remove leading spaces
+    s/^\s+//;
+
+    push (@trect, int($twips));
+  }
+  @trect;
+}
+
+#> rtf_topic_keyword: Will produce a keyword with a topic.
+#> Params: *keyword, *text, Topic Text
+#>Process: Check there is not a duplicate keyword, if it is, apply alogrithm
+#>         to create a new keyword
+#>
+sub rtf_topic_keyword {
+    local(*WH_topic, *text, @tmptext) = @_;
+
+    # allow the user to override the automatic stuff
+    if ( defined($USER_WH_topic) ) {
+      $WH_topic=&convert_context($USER_WH_topic);
+    }
+
+    if ( ! $skiptags{$State{PgfTag}} ) {
+
+        if ( $Keywords{$WH_topic} ) {
+	    if ( $fixup_duplicates ) {
+	      warn "\nDuplicate Keyword: $WH_topic";
+	      $WH_topic = "$WH_topic". ++$Keywords{$WH_topic};
+	      warn "       replaced with Keyword: $WH_topic TEXT:@tmptext";
+	    } else {
+	      # warn "\nHandling Duplicate Keyword: $WH_topic (@tmptext)";
+	    }
+        }
+
+        push(@text,"{\\up6 #{\\footnote \\pard\\plain{\\up6 #} $WH_topic}}\n");
+	push(@text,"{\\up6 K{\\footnote \\pard\\plain{\\up6 K} @tmptext}}\n");    
+
+        #> Print the keywords for Docname on the first available opportunity
+        if ( $Keyword_dn_DocName ne "" ) {
+            push(@text, "$Keyword_dn_DocName\n");
+            $Keyword_dn_DocName = "";
+        }
+        $Keywords{$WH_topic} =  @tmptext;
+    }
+    
+}
+#
+#> Generate_ID: Generate unique ID numbers with context string
+#>       Parsed: Context String, Text
+#>       
+sub Generate_ID {
+    local( $WH_context, *tmptext) = @_;
+    local( @characters, $operator, $value);
+
+    # allow the user to override the automatic stuff
+    if ( defined($USER_WH_context) ) {
+      $value=&convert_context($USER_WH_context);
+      $WH_context=&convert_context(@tmptext);
+    }
+
+    if ( ! $skiptags{$State{PgfTag}} ) {
+	$operator   = 1;
+	@characters = split(//, $WH_context);
+
+        if ( !defined($USER_WH_context) ) {
+	    foreach (@characters) {
+		$value = $value + (ord($_) * $operator);
+		$operator = $operator + 2;
+	    }
+
+	    # MOD zero is illegal
+	    $value=1 if ($value == 0);
+	    
+	    $value = 9393931%$value;
+
+	    if ($fixup_duplicates) {
+	      while ( $Context_ID{$value} ) {
+		  warn "Duplicate Context ID:$value String:$string\n";
+		  $value++;
+	      }
+	    }
+	}
+
+	$WH_topic_comments{$value} = "@tmptext";
+	$WH_context_ids{$value} = $WH_context;
+    }
+}
+
+##############
+#
+# tchrists' assert stuff
+#
+
+sub assert {
+    &panic("ASSERTION BOTCHED: $_[0]",$@) unless eval $_[0];
+} 
+
+sub panic {
+
+    select(STDERR);
+
+
+    print "\npanic: @_";
+
+    exit 1 if $] <= 4.003;  # caller broken
+
+    # stack traceback stolen from perl debugger
+
+    local($i,$_);
+    local($p,$f,$l,$s,$h,$a,@a,@sub);
+    for ($i = 1; ($p,$f,$l,$s,$h,$w) = caller($i); $i++) {
+        @a = @DB'args;
+        for (@a) {
+            if (/^StB\000/ && length($_) == length($_main{'_main'})) {
+                $_ = sprintf("%s",$_);
+            }
+            else {
+                s/'/\\'/g;
+                s/([^\0]*)/'$1'/ unless /^-?[\d.]+$/;
+                s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
+                s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+            }
+        }
+        $w = $w ? '@ = ' : '$ = ';
+        $a = $h ? '(' . join(', ', @a) . ')' : '';
+        push(@sub, "$w&$s$a from file $f line $l\n");
+        last if $signal;
+    }
+    for ($i=0; $i <= $#sub; $i++) {
+        last if $signal;
+        print $sub[$i];
+    }
+    # kill 'TERM', -$Start_Pid;
+    exit 1;
+}
+
+

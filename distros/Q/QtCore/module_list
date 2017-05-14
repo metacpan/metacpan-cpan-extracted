@@ -1,0 +1,97 @@
+#!/usr/bin/perl -w
+# order have meaning !
+
+sub Core_module_list {
+
+push @modules, 'QGlobal';         $modules{'QGlobal'}         = 'QtCore/qglobal.h';
+# ??? <T> Iterator
+# ??? <T> QPointer
+# ??? <T> QVector
+# ??? <T> QStack
+# ??? <T> QLinkedList
+# ??? <T> QList
+# ??? <T> QQueue
+# ??? <T> QMap
+# ??? <T> QSharedData
+# ??? <T> QVarLengthArray
+
+push @modules, 'QPoint';          $modules{'QPoint'}          = 'QtCore/qpoint.h';
+push @modules, 'QLine';           $modules{'QLine'}           = 'QtCore/qline.h';
+push @modules, 'QSize';           $modules{'QSize'}           = 'QtCore/qsize.h';
+push @modules, 'QRect';           $modules{'QRect'}           = 'QtCore/qrect.h';
+
+push @modules, 'QMutex';          $modules{'QMutex'}          = 'QtCore/qmutex.h';
+push @modules, 'QWaitCondition';  $modules{'QWaitCondition'}  = 'QtCore/qwaitcondition.h';
+push @modules, 'QReadWriteLock';  $modules{'QReadWriteLock'}  = 'QtCore/qreadwritelock.h';
+push @modules, 'QSemaphore';      $modules{'QSemaphore'}      = 'QtCore/qsemaphore.h';
+
+push @modules, 'QBasicTimer';     $modules{'QBasicTimer'}     = 'QtCore/qbasictimer.h';
+
+push @modules, 'QChar';           $modules{'QChar'}           = 'QtCore/qstring.h:QtCore/qchar.h';
+# ??? <T> QHash
+# ??? <T> QSet
+# ??? <T> QCache
+push @modules, 'QByteArray';      $modules{'QByteArray'}      = 'QtCore/qlist.h:QtCore/qbytearray.h';
+push @modules, 'QBitArray';       $modules{'QBitArray'}       = 'QtCore/qbitarray.h';
+push @modules, 'QString';         $modules{'QString'}         = 'QtCore/qvector.h:QtCore/qstringlist.h:QtCore/qstring.h';
+push @modules, 'QStringList';     $modules{'QStringList'}     = 'QtCore/qstringlist.h';
+push @modules, 'QLocale';         $modules{'QLocale'}         = 'QtCore/qvariant.h:QtCore/qlocale.h';
+push @modules, 'QTextCodec';      $modules{'QTextCodec'}      = 'QtCore/qtextcodec.h';
+# QTextCodecPlugin
+push @modules, 'QStringMatcher';  $modules{'QStringMatcher'}  = 'QtCore/qstringmatcher.h';
+push @modules, 'QRegExp';         $modules{'QRegExp'}         = 'QtCore/qstringlist.h:QtCore/qregexp.h';
+push @modules, 'QResource';       $modules{'QResource'}       = 'QtCore/qresource.h';
+push @modules, 'QUrl';            $modules{'QUrl'}            = 'QtCore/qstringlist.h:QtCore/qurl.h'; # ??? QList<QPair<QString, QString> >
+push @modules, 'QUuid';           $modules{'QUuid'}           = 'QtCore/quuid.h';
+
+push @modules, 'QEvent';          $modules{'QEvent'}          = 'QtCore/qcoreevent.h';
+push @modules, 'QDateTime';       $modules{'QDateTime'}       = 'QtCore/qdatetime.h';
+
+push @modules, 'QLibraryInfo';    $modules{'QLibraryInfo'}    = 'QtCore/qlibraryinfo.h';
+
+#push @modules, 'QMetaObject';     $modules{'QMetaObject'}     = 'QtCore/qmetaobject.h:QtCore/qobjectdefs.h'; # ??? qmetaobject.h
+push @modules, 'QObject';         $modules{'QObject'}         = 'QtCore/qvariant.h:QtCore/qobject.h';
+
+push @modules, 'QObjectCleanupHandler'; $modules{'QObjectCleanupHandler'} = 'QtCore/qobjectcleanuphandler.h';
+#push @modules, 'QFactoryInterface'; $modules{'QFactoryInterface'} = 'QtCore/qfactoryinterface.h';
+
+push @modules, 'QLibrary';        $modules{'QLibrary'}        = 'QtCore/qlibrary.h';
+push @modules, 'QPluginLoader';   $modules{'QPluginLoader'}   = 'QtCore/qpluginloader.h';
+
+push @modules, 'QTimeLine';       $modules{'QTimeLine'}       = 'QtCore/qtimeline.h';
+push @modules, 'QTimer';          $modules{'QTimer'}          = 'QtCore/qtimer.h';
+
+push @modules, 'QEventLoop';      $modules{'QEventLoop'}      = 'QtCore/qeventloop.h';
+push @modules, 'QThread';         $modules{'QThread'}         = 'QtCore/qthread.h';
+#push @modules, 'QAbstractEventDispatcher'; $modules{'QAbstractEventDispatcher'} = 'QtCore/qabstracteventdispatcher.h';
+push @modules, 'QCoreApplication'; $modules{'QCoreApplication'} = 'QtCore/qstringlist.h:QtCore/qcoreapplication.h';
+# ??? <T> QThreadStorage
+push @modules, 'QSignalMapper';   $modules{'QSignalMapper'}    = 'QtCore/qsignalmapper.h';
+push @modules, 'QSocketNotifier'; $modules{'QSocketNotifier'}  = 'QtCore/qsocketnotifier.h';
+
+push @modules, 'QIODevice';       $modules{'QIODevice'}        = 'QtCore/qiodevice.h';
+push @modules, 'QFile';           $modules{'QFile'}            = 'QtCore/qfile.h';
+push @modules, 'QFileInfo';       $modules{'QFileInfo'}        = 'QtCore/qdatetime.h:QtCore/qdir.h:QtCore/qfileinfo.h';
+push @modules, 'QDir';            $modules{'QDir'}             = 'QtCore/qdir.h';
+push @modules, 'QAbstractFileEngine'; $modules{'QAbstractFileEngine'} = 'QtCore/qdatetime.h:QtCore/qabstractfileengine.h';
+	$classes{'QAbstractFileEngine'}{module} = 'QAbstractFileEngine';
+push @modules, 'QFSFileEngine';   $modules{'QFSFileEngine'}    = 'QtCore/qdatetime.h:QtCore/qfsfileengine.h';
+push @modules, 'QFileSystemWatcher'; $modules{'QFileSystemWatcher'} = 'QtCore/qstringlist.h:QtCore/qfilesystemwatcher.h';
+push @modules, 'QTemporaryFile';  $modules{'QTemporaryFile'}   = 'QtCore/qtemporaryfile.h';
+push @modules, 'QBuffer';         $modules{'QBuffer'}          = 'QtCore/qbuffer.h';
+push @modules, 'QProcess';        $modules{'QProcess'}         = 'QtCore/qprocess.h';
+push @modules, 'QTextStream';     $modules{'QTextStream'}      = 'QtCore/qtextstream.h';
+push @modules, 'QDataStream';     $modules{'QDataStream'}      = 'QtCore/qdatastream.h';
+# ??? <T> QPair
+push @modules, 'QMetaType';       $modules{'QMetaType'}        = 'QtCore/qmetatype.h';
+
+push @modules, 'QTranslator';     $modules{'QTranslator'}      = 'QtCore/qtranslator.h';
+push @modules, 'QVariant';        $modules{'QVariant'}         = 'QtCore/qline.h:QtCore/qrect.h:QtCore/qbitarray.h:QtCore/qstringlist.h:QtCore/qregexp.h:QtCore/qdatetime.h:QtCore/qlocale.h:QtCore/qurl.h:QtCore/qvariant.h';
+push @modules, 'QAbstractItemModel'; $modules{'QAbstractItemModel'} = 'QtCore/qsize.h:QtCore/qstringlist.h:QtCore/qabstractitemmodel.h';
+#push @modules, 'QMetaMethod';     $modules{'QMetaMethod'}      = 'QtCore/qmetaobject.h';
+push @modules, 'QMimeData';       $modules{'QMimeData'}        = 'QtCore/qstringlist.h:QtCore/qurl.h:QtCore/qmimedata.h';
+push @modules, 'QSettings';       $modules{'QSettings'}        = 'QtCore/qstringlist.h:QtCore/qsettings.h';
+
+}
+
+1;

@@ -6,13 +6,13 @@ use Carp;
 use Time::HiRes;
 use Config;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our $DEBUG = $ENV{FORKS_QUEUE_DEBUG} || 0;
 
 our $NOTIFY_OK = $ENV{FORKS_QUEUE_NOTIFY} // do {
     $Config::Config{sig_name} =~ /\bIO\b/;
-    1;
 };
+
 our $SLEEP_INTERVAL = $NOTIFY_OK ? 2 : 1;
 our $SLEEP_INTERVALX = 2;
 
@@ -21,11 +21,19 @@ our %OPTS = (limit => -1, on_limit => 'fail', style => 'fifo',
              impl => $ENV{FORKS_QUEUE_IMPL} || 'File' );
 
 sub new {
-    my $pkg = shift;
+    my $class = shift;
     my %opts = (%OPTS, @_);
 
+    if ($opts{remote}) {
+        require Net::Objwrap;
+        if (-f $opts{remote}) {
+            my $q = Net::Objwrap::unwrap($opts{remote});
+            return $q;
+        }
+    }
+
     if ($opts{impl}) {
-        $pkg = delete $opts{impl};
+        my $pkg = delete $opts{impl};
         if ($pkg =~ /[^\w:]/) {
             croak "Forks::Queue cannot be instantiated. Invalid 'impl' $pkg";
         }
@@ -193,7 +201,7 @@ Forks::Queue - queue that can be shared across processes
 
 =head1 VERSION
 
-0.06
+0.08
 
 =head1 SYNOPSIS
 
@@ -336,6 +344,21 @@ C<list> option. The argument must be an array reference.
 
 If the C<join> option is specified, the contents of the list
 could be added to an already existing queue.
+
+=item * C<< remote => FILENAME >>
+
+Enable proxy access to a queue that may be running on another host.
+If the given filename exists, this option will get C<Forks::Queue>
+to read server connection information from the file, establish a
+network connection to the server, and provide a proxy object
+that implements the C<Forks::Queue> interface and manipulates the
+queue on the remote server. If the filename does not exist,
+then C<Forks::Queue> will create a new queue object and launch a
+server to make the queue available remotely, writing the details
+about how to connect to the server into the file.
+
+Remote access to queues is provided through the L<Net::Objwrap>
+distribution, which is bundled with C<Forks::Queue> v0.08.
 
 =back
 
@@ -769,7 +792,7 @@ See http://dev.perl.org/licenses/ for more information.
 #
 #     priorities
 #     Directory implementation (see Queue::Dir)
-# _X_ Better thread support
-#     network implementation with simple client-server
-#     even better thread support, 2nd signal from main to threads    
-#     import function to set global impl, limit, on_limit settings
+# _X_ network implementation with simple client-server
+#     even better thread support, 2nd signal from main to threads?
+#
+

@@ -23,5 +23,5 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '0.21'
+version: '2.01'
 x_serialization_backend: 'YAML::Tiny version 1.62'

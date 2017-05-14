@@ -17,7 +17,13 @@ my $blessed_formatref = bless do {
     *FH2{'FORMAT'};
 }, 'FormatRef';
 
-my ( $var_for_globref, $var_for_blessed_globref );
+my $evil_blessed_formatref = bless do {
+    format FH3 =
+.
+    *FH3{'FORMAT'};
+}, '0';
+
+my ( $var_for_globref, $var_for_blessed_globref, $var_for_evil_globref );
 my $plain_scalar = 'string';
 my $var_for_scalarref = 'stringy';
 my $blessed_scalarref = bless \$var_for_scalarref, 'ScalarRef';
@@ -45,13 +51,22 @@ my %all;
         'blessed_globref'   => bless( \*::var_for_blessed_globref, 'GlobRef' ),
         'blessed_formatref' => $blessed_formatref,
         'blessed_refref'    => bless( \\$blessed_scalarref, 'RefRef' ),
+
+        'evil_blessed_scalarref' => bless( \ do { my $x = 'evil' }, '0' ),
+        'evil_blessed_arrayref'  => bless( [], '0' ),
+        'evil_blessed_hashref'   => bless( +{}, '0' ),
+        'evil_blessed_coderef'   => bless( sub {'blessed_code'}, '0' ),
+        #'evil_blessed_regexp'    => bless( qr{evil}, '0' ),
+        'evil_blessed_globref'   => bless( \*::var_for_evil_globref, '0' ),
+        'evil_blessed_formatref' => $evil_blessed_formatref,
+        'evil_blessed_refref'    => bless( \\do { my $x = 'evil' }, '0' ),
     );
 }
 
 my ( %plain, %blessed );
 foreach my $key ( keys %all ) {
-    $key =~ /^plain_/   and $plain{$key}   = $all{$key};
-    $key =~ /^blessed_/ and $blessed{$key} = $all{$key};
+    $key =~ /^plain_/  and $plain{$key}   = $all{$key};
+    $key =~ /blessed_/ and $blessed{$key} = $all{$key};
 }
 
 my @all_keys     = sort keys %all;
@@ -59,22 +74,20 @@ my @plain_keys   = sort keys %plain;
 my @blessed_keys = sort keys %blessed;
 
 subtest 'non-refs' => sub {
-    plan 'tests' => 7;
-
     foreach my $value ( 0, 1, 'string', '', undef, '0', '0e0' ) {
         # better string representation for test output
         my $rep = defined $value ? $value eq '' ? q{''} : $value : '(undef)';
 
-        ok( !is_ref($value), "is_ref($rep) is false" );
-
-        # FIXME: is_any_ref
-        #ok( !is_any_ref($value), "is_any_ref($rep) is false" );
+        for my $name (grep /^is_/, @Ref::Util::EXPORT_OK) {
+            my $func = do { no strict 'refs'; \&{"Ref::Util::$name"} };
+            ok( !$func->($value), "$name($rep) is false" );
+        }
     }
+
+    done_testing();
 };
 
 subtest 'plain references only work on is_plain functions' => sub {
-    plan 'tests' => 56;
-
     # each %plain should fail each test of the %blessed
     foreach my $plain_type (@plain_keys) {
         my $value = $plain{$plain_type};
@@ -119,11 +132,11 @@ subtest 'plain references only work on is_plain functions' => sub {
             "is_blessed_refref($plain_type) is false",
         );
     }
+
+    done_testing();
 };
 
 subtest 'plain references' => sub {
-    plan 'tests' => 112;
-
     # each should fail everything except their own
     foreach my $plain_type (@plain_keys) {
         my $value = $plain{$plain_type};
@@ -326,11 +339,11 @@ subtest 'plain references' => sub {
             );
         }
     }
+
+    done_testing();
 };
 
 subtest 'blessed references only work on is_blessed functions' => sub {
-    plan 'tests' => 56;
-
     # each %blessed should fail each test of the %plain
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
@@ -375,11 +388,11 @@ subtest 'blessed references only work on is_blessed functions' => sub {
             "is_plain_refref($blessed_type) is false",
         );
     }
+
+    done_testing();
 };
 
 subtest 'blessed references' => sub {
-    plan 'tests' => 112;
-
     # each should fail everything except their own
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
@@ -403,7 +416,7 @@ subtest 'blessed references' => sub {
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type eq 'blessed_scalarref' ) {
+        if ( $blessed_type =~ /blessed_scalarref/ ) {
             ok(
                 is_blessed_scalarref($value),
                 "is_blessed_scalarref($blessed_type) is true",
@@ -429,7 +442,7 @@ subtest 'blessed references' => sub {
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type eq 'blessed_arrayref' ) {
+        if ( $blessed_type =~ /blessed_arrayref/ ) {
             ok(
                 is_blessed_arrayref($value),
                 "is_blessed_arrayref($blessed_type) is true",
@@ -455,7 +468,7 @@ subtest 'blessed references' => sub {
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type eq 'blessed_hashref' ) {
+        if ( $blessed_type =~ /blessed_hashref/ ) {
             ok(
                 is_blessed_hashref($value),
                 "is_blessed_hashref($blessed_type) is true",
@@ -481,7 +494,7 @@ subtest 'blessed references' => sub {
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type eq 'blessed_coderef' ) {
+        if ( $blessed_type =~ /blessed_coderef/ ) {
             ok(
                 is_blessed_coderef($value),
                 "is_blessed_coderef($blessed_type) is true",
@@ -507,7 +520,7 @@ subtest 'blessed references' => sub {
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type eq 'blessed_globref' ) {
+        if ( $blessed_type =~ /blessed_globref/ ) {
             ok(
                 is_blessed_globref($value),
                 "is_blessed_globref($blessed_type) is true",
@@ -533,7 +546,7 @@ subtest 'blessed references' => sub {
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type eq 'blessed_formatref' ) {
+        if ( $blessed_type =~ /blessed_formatref/ ) {
             ok(
                 is_blessed_formatref($value),
                 "is_blessed_formatref($blessed_type) is true",
@@ -559,7 +572,7 @@ subtest 'blessed references' => sub {
     foreach my $blessed_type (@blessed_keys) {
         my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type eq 'blessed_refref' ) {
+        if ( $blessed_type =~ /blessed_refref/ ) {
             ok(
                 is_blessed_refref($value),
                 "is_blessed_refref($blessed_type) is true",
@@ -581,4 +594,6 @@ subtest 'blessed references' => sub {
             );
         }
     }
+
+    done_testing();
 };

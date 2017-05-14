@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name:                RWDE-Doxy
+version:             518
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    RWDE:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

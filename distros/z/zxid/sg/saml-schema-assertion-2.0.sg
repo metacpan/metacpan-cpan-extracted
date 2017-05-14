@@ -1,0 +1,242 @@
+# zxid/sg/saml-schema-assertion-2.0.sg
+# $Id: saml-schema-assertion-2.0.sg,v 1.10 2009-11-14 22:44:43 sampo Exp $
+#
+# N.B. This file is not a direct conversion. Instead it has been manually edited to
+# make it simpler and to facilitate code generation.
+# 15.10.2006, extended AttributeValue schema to cater for bootstrap, Sampo Kellomaki (sampo@iki.fi)
+# 10.2.2007, added other types of assertions as potential Advice content --Sampo
+# 3.3.2007,  added XACML support --Sampo
+# 24.8.2009, modified sa:Statement to be able to carry xac:Response --Sampo
+
+target(sa, urn:oasis:names:tc:SAML:2.0:assertion)
+ns(xs,http://www.w3.org/2001/XMLSchema)
+import(ds,http://www.w3.org/2000/09/xmldsig#,http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+import(xenc,http://www.w3.org/2001/04/xmlenc#,http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd)
+ns(di12, urn:liberty:disco:2003-08)
+ns(a,    http://www.w3.org/2005/08/addressing)
+ns(sa11, urn:oasis:names:tc:SAML:1.0:assertion)
+ns(ff12, urn:liberty:iff:2003-08)
+ns(xasa, urn:oasis:xacml:2.0:saml:assertion:schema:os)
+ns(xasacd1, urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:assertion:cd-01)
+ns(xac,  urn:oasis:names:tc:xacml:2.0:context:schema:os)
+ns(xsi,  http://www.w3.org/2001/XMLSchema-instance)
+ns(idp,  urn:liberty:idp:2006-12)
+
+&@IDNameQualifiers: 
+  @NameQualifier?   -> %xs:string
+  @SPNameQualifier? -> %xs:string
+  ;
+
+BaseID	 -> %sa:BaseIDAbstractType
+%BaseIDAbstractType:
+  &@sa:IDNameQualifiers
+  ;
+
+NameID	 -> %sa:NameIDType
+%NameIDType:	 base(xs:string)
+  @Format?	 -> %xs:anyURI
+  &@sa:IDNameQualifiers
+  @SPProvidedID? -> %xs:string
+  ;
+
+%EncryptedElementType:
+  xenc:EncryptedData
+  xenc:EncryptedKey*
+  ;
+
+EncryptedID      -> %sa:EncryptedElementType
+Issuer           -> %sa:NameIDType
+AssertionIDRef   -> %xs:NCName
+AssertionURIRef  -> %xs:anyURI
+
+Assertion        -> %sa:AssertionType
+%AssertionType:
+  sa:Issuer
+  ds:Signature?
+  sa:Subject?
+  sa:Conditions?
+  sa:Advice?
+  sa:Statement*                  # *** how to express * for choice
+  sa:AuthnStatement*
+  sa:AuthzDecisionStatement*
+  sa:AttributeStatement*
+  xasa:XACMLAuthzDecisionStatement*
+  xasa:XACMLPolicyStatement*
+  xasacd1:XACMLAuthzDecisionStatement*
+  xasacd1:XACMLPolicyStatement*
+  @ID	         -> %xs:ID
+  @IssueInstant  -> %xs:dateTime
+  @Version       -> %xs:string
+  ;
+
+Subject	 -> %sa:SubjectType
+%SubjectType:
+  sa:BaseID?                     # Only one of the IDs should occur
+  sa:NameID?
+  sa:EncryptedID?
+  sa:SubjectConfirmation*        # SAML spec is more lax than the schema: saml-core-2.0-os.pdf ll.653-657 says <SubjectConfirmation> [Zero or More]
+  ;
+
+SubjectConfirmation	 -> %sa:SubjectConfirmationType
+%SubjectConfirmationType:
+  sa:BaseID?                     # Only one of the IDs should occur
+  sa:NameID?
+  sa:EncryptedID?
+  sa:SubjectConfirmationData?
+  @Method	 -> %xs:anyURI
+  ;
+
+SubjectConfirmationData	 -> %sa:SubjectConfirmationDataType
+%SubjectConfirmationDataType:	 base(anyType)
+  ds:KeyInfo+
+  @Address?	 -> %xs:string
+  @InResponseTo? -> %xs:NCName
+  @NotBefore?	 -> %xs:dateTime
+  @NotOnOrAfter? -> %xs:dateTime
+  @Recipient?	 -> %xs:anyURI
+  @xsi:type?
+  @any
+  ;
+
+%KeyInfoConfirmationDataType:	 base(sa:SubjectConfirmationDataType)
+  ds:KeyInfo+
+  ;
+
+Conditions	 -> %sa:ConditionsType
+%ConditionsType:
+  sa:Condition*                  # *** Stated differently in XSD
+  sa:AudienceRestriction*
+  sa:OneTimeUse*
+  sa:ProxyRestriction*
+  idp:SubjectRestriction*
+  @NotBefore?	 -> %xs:dateTime
+  @NotOnOrAfter? -> %xs:dateTime
+  ;
+
+Condition	 -> %sa:ConditionAbstractType
+
+AudienceRestriction -> %sa:AudienceRestrictionType
+%AudienceRestrictionType:	 base(sa:ConditionAbstractType)
+  sa:Audience+
+  ;
+
+Audience	 -> %xs:anyURI
+
+OneTimeUse	 -> %sa:OneTimeUseType
+%OneTimeUseType: base(sa:ConditionAbstractType) ;
+
+ProxyRestriction -> %sa:ProxyRestrictionType
+%ProxyRestrictionType:	 base(sa:ConditionAbstractType)
+  sa:Audience*
+  @Count?	 -> %xs:nonNegativeInteger
+  ;
+
+Advice	 -> %sa:AdviceType
+%AdviceType:
+  sa:AssertionIDRef*    # *** really a choice, but maxOccurs="unbounded"
+  sa:AssertionURIRef*
+  sa:Assertion*
+  sa:EncryptedAssertion*
+  sa11:Assertion*
+  ff12:Assertion*
+  any*  ns(##other)  processContents(lax)
+  ;
+
+EncryptedAssertion -> %sa:EncryptedElementType
+
+#Statement	 -> %sa:StatementAbstractType
+
+Statement	 -> %sa:StatementType
+
+%StatementType:   base(sa:StatementAbstractType)
+  xac:Response*
+  xac:Request*
+  any*  ns(##other)  processContents(lax)
+  @xsi:type? -> %xs:string
+  ;
+
+AuthnStatement	 -> %sa:AuthnStatementType
+%AuthnStatementType:	 base(sa:StatementAbstractType)
+  sa:SubjectLocality?
+  sa:AuthnContext
+  @AuthnInstant	         -> %xs:dateTime
+  @SessionIndex?	 -> %xs:string
+  @SessionNotOnOrAfter?	 -> %xs:dateTime
+  ;
+
+SubjectLocality	 -> %sa:SubjectLocalityType
+%SubjectLocalityType:
+  @Address?	 -> %xs:string
+  @DNSName?	 -> %xs:string
+  ;
+
+AuthnContext	 -> %sa:AuthnContextType
+%AuthnContextType:
+  sa:AuthnContextClassRef?    # N.B. We diverge from canonical XSD
+  sa:AuthnContextDecl?
+  sa:AuthnContextDeclRef?
+  sa:AuthenticatingAuthority*
+  ;
+
+AuthnContextClassRef	 -> %xs:anyURI
+AuthnContextDeclRef	 -> %xs:anyURI
+AuthnContextDecl	 -> %xs:anyType
+AuthenticatingAuthority	 -> %xs:anyURI
+
+AuthzDecisionStatement	 -> %sa:AuthzDecisionStatementType
+%AuthzDecisionStatementType:	 base(sa:StatementAbstractType)
+  sa:Action+
+  sa:Evidence?
+  @Decision	 -> %sa:DecisionType
+  @Resource	 -> %xs:anyURI
+  ;
+
+%DecisionType:	 enum( Permit Deny Indeterminate ) ;
+
+Action	 -> %sa:ActionType
+%ActionType:	 base(string)
+  @Namespace	 -> %xs:anyURI
+  ;
+
+Evidence	 -> %sa:EvidenceType
+%EvidenceType:
+  sa:AssertionIDRef*      # XSD has choice maxOccurs="unbounded"
+  sa:AssertionURIRef*
+  sa:Assertion*
+  sa:EncryptedAssertion*
+  ;
+
+AttributeStatement	 -> %sa:AttributeStatementType
+%AttributeStatementType: base(sa:StatementAbstractType)
+  sa:Attribute*           # XSD has choice maxOccurs="unbounded"
+  sa:EncryptedAttribute*
+  ;
+
+Attribute	 -> %sa:AttributeType
+%AttributeType:
+  sa:AttributeValue*
+  @FriendlyName? -> %xs:string
+  @Name	         -> %xs:string
+  @NameFormat?	 -> %xs:anyURI
+  @any
+  ;
+
+# To cater for discovery bootstraps we add them to schema here
+#AttributeValue	   -> %xs:anyType
+
+AttributeValue -> %sa:AttributeValueType
+%AttributeValueType:
+  di12:ResourceOffering*
+  a:EndpointReference*
+  sa:Assertion*
+  sa:EncryptedAssertion*
+  @xsi:type?              # often any attribute extension point is used for this
+  ;
+
+EncryptedAttribute -> %sa:EncryptedElementType
+
+TestElem:
+  sa:AttributeValue*
+  ;
+
+#EOF

@@ -1,0 +1,6 @@
+.# This comment is not output
+.# Test that comments are ignored and the rest given to the application
+line 1
+line 2
+line 3
+line 4

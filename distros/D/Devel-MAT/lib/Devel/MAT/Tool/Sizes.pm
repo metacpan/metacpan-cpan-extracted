@@ -8,7 +8,7 @@ package Devel::MAT::Tool::Sizes;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use constant FOR_UI => 1;
 

@@ -1,0 +1,23 @@
+---
+abstract: 'provide the important mathematical constant tau = 6.2831...'
+author:
+  - 'Franklin Chen <franklinchen@franklinchen.com>'
+build_requires:
+  Math::Complex: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Tau
+requires:
+  Exporter: 0
+  constant: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+version: 1.003

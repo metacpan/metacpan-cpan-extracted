@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+ovid
+ovid.spec
+Ovid/Common.pm
+Ovid/Dependency.pm
+Ovid/Error.pm
+Ovid/Package.pm
+META.yml                                 Module meta-data (added by MakeMaker)

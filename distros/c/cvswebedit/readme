@@ -1,0 +1,43 @@
+CVSwebedit - A Web browser based read/write interface to CVS implemented using CGI.
+
+Copyright (c) 1998, Martin R.J. Cleaver (Martin.Cleaver@BCS.org.uk)
+
+This library is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+History
+-------
+
+In late 1997 I came across Bill Fenner's cvsweb.pl CGI script.
+cvsweb.pl allows a web browser based user to browse a CVS ("Concurrent
+Versioning System") repository using a web browser.
+
+I wrote cvswebedit to allow Web Based users to edit files in the
+repository, using only a web browser. I released a first version in
+February 1998 that allowed users to edit, but not create, files.
+Cvswebedit permitted both editing in the browser (for text files) and an
+upload/download model for binaries.
+
+This version (v.2.0) of cvswebedit adds some default security tailored for
+Apache, the ability to create files or directories and some rudimentary
+administrative functions such that an administrator can view the log
+files. Security wise, by default anyone can read the repository but only
+editors can create or edit files. This version also has much improved 
+error messages and, hopefully, clear installation instructions.
+
+You can visit a site that uses cvswebedit by going to 
+http://www.perl.com/CPAN/authors/id/MRJC/cvswebedit-redirect.html
+
+
+Prerequisites
+-------------
+1) Preferably a UNIX machine running Solaris or Linux. Other UNIXs should work and
+   currently you get reduced functionality on PCs running Win95 or NT.
+2) An Apache Webserver. (Actually, not strictly true, but I develop only with Apache)
+3) The ability to run CGI scripts on your server.  (normally requires admin privilege to set up)
+4) CVS on your server, or the ability to install it (you do not need admin privilege)
+5) Perl 5.004 or later installed on the machine with the webserver.
+6) A willingness to experiment :^)
+7) The willingness to give me good feedback!
+
+

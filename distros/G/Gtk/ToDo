@@ -1,0 +1,8 @@
+
+Repair colormap refcounting, as soon as Gdk colormap refcounting is
+repaired.
+
+Switch signal handling over to _interp calls.
+
+
+

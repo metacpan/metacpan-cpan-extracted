@@ -1,0 +1,39 @@
+The code in this package is
+
+Copyright (c) 1996,2007 Peter Reif (Gallasch) <gal@adv.magwien.gv.at>
+
+and may be used, copied and redistributed under the same terms as perl 
+(see the files README, Copying and Artistic in the perl distribution).
+
+
+Description
+-----------
+
+PGForth is a Forth interpreter written in Perl.  It is very simple and tries
+to minimize the effort of calling one language from another.
+
+
+Name
+----
+
+PG are my initials.
+
+
+Contents
+--------
+
+Forth.pm	the Perl module
+run		an example of how to use it
+
+
+Documentation
+-------------
+
+Could be more extensive, you will have to examine the code, sorry.
+
+
+Bugs
+----
+
+No error handling at all.
+

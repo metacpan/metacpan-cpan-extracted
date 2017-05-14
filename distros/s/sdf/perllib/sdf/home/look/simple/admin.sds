@@ -1,0 +1,59 @@
+# $Id$
+#
+# >>Title::	Admin Style
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 09-Jan-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{admin}} is an [[SDF]] style for administration documents (e.g. memos).
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Build the borders
+!default OPT_BORDERS 2
+!build_borders
+
+# Define the number of header/footer lines
+!default OPT_HEADINGS 2
+
+# Provide defaults for variables used in the header/footer
+!default DOC_URL   ''
+!default DOC_OWNER 'The author'
+
+# Define the first page footer
+!define PAGE_FIRST_FOOTER_INNER1  ''
+!define PAGE_FIRST_FOOTER_INNER2  ''
+!define PAGE_FIRST_FOOTER_CENTER1 ''
+!define PAGE_FIRST_FOOTER_CENTER2 ''
+!define PAGE_FIRST_FOOTER_OUTER1  ''
+!define PAGE_FIRST_FOOTER_OUTER2  ''
+
+# Define the right page header
+!define PAGE_RIGHT_HEADER_INNER1   '[[$var{"DOC_PROJECT"}]]'
+!define PAGE_RIGHT_HEADER_INNER2   ''
+!define PAGE_RIGHT_HEADER_CENTER1  ''
+!define PAGE_RIGHT_HEADER_CENTER2  ''
+!define PAGE_RIGHT_HEADER_OUTER1   '{{B:[[$var{"DOC_TITLE"}]]}}'
+!define PAGE_RIGHT_HEADER_OUTER2   ''
+
+# Define the right page footer
+!define PAGE_RIGHT_FOOTER_INNER1   FULL:DOC_MODIFIED
+!define PAGE_RIGHT_FOOTER_INNER2   '[[DOC_URL]]'
+!define PAGE_RIGHT_FOOTER_CENTER1  "Copyright [[c]] [[YEAR:DOC_START]], [[DOC_OWNER]]"
+!define PAGE_RIGHT_FOOTER_CENTER2  ''
+!define PAGE_RIGHT_FOOTER_OUTER1   "{{PAGENUM:}} of {{PAGECOUNT:}}"
+!define PAGE_RIGHT_FOOTER_OUTER2   ''
+
+# Build the left page as a mirror of the right page
+!left_mirror_right_page

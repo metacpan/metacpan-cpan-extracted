@@ -1,0 +1,13 @@
+** Alert 1443175106.517: - syslog, su,authentication_success,
+2015 Sep 25 05:58:26 server->/var/log/auth.log
+Rule: 5303 (level 3) -> 'User successfully changed UID to root.'
+User: root
+Sep 25 05:58:25 devG8-1 su[10627]: + /dev/pts/7 root:root
+
+** Alert 1443175627.1028: mail  - syslog,fts,authentication_success
+2015 Sep 25 06:07:07 (i7dev) 10.0.0.4->/var/log/auth.log
+Rule: 10100 (level 4) -> 'First time user logged in.'
+Src IP: 10.0.0.2
+User: phirelight
+Sep 25 06:07:06 i7dev sshd[17673]: Accepted publickey for phirelight from 10.0.0.2 port 44857 ssh2: RSA 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+

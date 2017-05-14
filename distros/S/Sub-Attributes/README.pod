@@ -1,0 +1,80 @@
+=head1 NAME
+
+Sub::Attributes - meta programming with subroutine attributes
+
+=head1 SYNOPSIS
+
+  package Point;
+  use base 'Sub::Attributes';
+
+  # croak if not called as a class method
+  sub new :ClassMethod {
+    ...
+  }
+
+  # croak if not called as object method
+  sub add : Method {
+    ...
+  }
+
+  # private subroutine, will croak unless called from within Point package
+  sub _internal_logic : Private Method {
+    ...
+  }
+
+  # Typical method modifiers ala LISP & Class::Method::Modifiers
+  # before, after & around all occur at compile time
+  sub check_state : Before(add) {
+    ...
+  }
+
+  sub doubleme : After(add) {
+    ...
+  }
+  # orig is a coderef to add, it needs to be given $self becase it's an object
+  # method
+  sub filter_calls : Around(add) {
+    my ($orig, $self, @args) = @_;
+    my $result = $orig->($self, @args);
+    ...
+  }
+
+  package main;
+  my $p = Point->new(3,8);
+  $p->sub_attributes(); # { add => ['Method'], _internal_logic => ['Private','Method'], ... }
+
+=head1 METHODS
+
+=head2 sub_attributes
+
+Returns a hashref of subroutine names and their attributes.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Class::Method::Modifiers|https://metacpan.org/pod/Class::Method::Modifiers>
+
+=item * L<MooseX::MethodAttributes|https://metacpan.org/pod/MooseX::MethodAttributes>
+
+=back
+
+=head1 AUTHOR
+
+E<copy> 2016 David Farrell
+
+=head1 LICENSE
+
+See LICENSE
+
+=head1 REPOSITORY
+
+L<https://github.com/dnmfarrell/Sub-Attributes>
+
+=head2 BUGTRACKER
+
+L<https://github.com/dnmfarrell/Sub-Attributes/issues>
+
+
+=cut
+

@@ -1,0 +1,71 @@
+# $Id$
+#
+# >>Title::     POD Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 14-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# The {{stdlib/pod.sdn}} module defines [[SDF]] configuration details for
+# generating {{POD}} files.
+#
+# >>Description::
+# POD_MARGIN is used in the formatting of tables.
+# The default margin is taken from sdf -w option.
+#
+# >>Limitations::
+#
+
+# Set the default margin
+!default POD_MARGIN OPT_WIDTH
+
+# Make POD a restricted variable family
+!restrict 'POD'
+
+# Declare document variables
+!block variables; family="POD"; export
+Name                        Type            Rule
+MARGIN                      integer
+!endblock
+
+# Define paragraph styles
+!block parastyles
+Name        To                      Attributes
+H1          head1
+H2          head2
+!endblock
+
+# Define phrase styles
+# Note: some of these are less than optimal :-)
+!block phrasestyles
+Name    To
+A       S
+B       B
+C       C
+F       F
+I       I
+L       L
+N       S
+S       S
+U       B
+1       =I
+2       =B
+3       =U
+ST      B
+EX      C
+FILE    F
+JUMP    L
+!endblock
+
+# Default build_title output
+!macro build_pod_cover
+	H1: NAME
+	N: [[DOC_TITLE]]
+!endmacro

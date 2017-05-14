@@ -87,7 +87,7 @@ use Kafka qw(
     $ERROR_SEND_NO_ACK
     $ERROR_NO_CONNECTION
     $MIN_BYTES_RESPOND_HAS_DATA
-    $RECEIVE_EARLIEST_OFFSETS
+    $RECEIVE_EARLIEST_OFFSET
     $REQUEST_TIMEOUT
     $RETRY_BACKOFF
     $SEND_MAX_ATTEMPTS
@@ -166,7 +166,7 @@ my $decoded_offset_request = {
             partitions                  => [
                 {
                     Partition           => $partition,
-                    Time                => $RECEIVE_EARLIEST_OFFSETS,
+                    Time                => $RECEIVE_EARLIEST_OFFSET,
                     MaxNumberOfOffsets  => 1,
                 },
             ],
@@ -305,6 +305,7 @@ sub Kafka_IO_error {
     my $expected_error_code = shift;
     my $expected_nonfatals  = shift;
     my $decoded_request     = shift;
+    my $throw_error         = shift // $ERROR_CANNOT_SEND;
 
     my $replaced_method_name = 'Kafka::IO::'.$method_name;
     $replaced_method = \&$replaced_method_name;
@@ -317,7 +318,7 @@ sub Kafka_IO_error {
                     return $main::replaced_method->( @_ );
                 } else {
                     my ( $self ) = @_;
-                    $self->_error( $ERROR_CANNOT_SEND );  # any exception
+                    $self->_error( $throw_error );
                 }
             },
             into    => 'Kafka::IO',
@@ -329,6 +330,7 @@ sub Kafka_IO_error {
         host                => $host,
         port                => $port,
         RETRY_BACKOFF       => $RETRY_BACKOFF * 2,
+        dont_load_supported_api_versions => 1,
     );
 
     is scalar( @{ $connection->nonfatal_errors } ), 0, 'non-fatal errors are not fixed';
@@ -362,6 +364,7 @@ $connection = Kafka::Connection->new(
     host                => $host,
     port                => $port,
     RETRY_BACKOFF       => $RETRY_BACKOFF * 2,
+    dont_load_supported_api_versions => 1,
 );
 
 #-- $ERROR_LEADER_NOT_FOUND
@@ -395,6 +398,7 @@ Kafka_IO_error(
     # because connection is not available
     $SEND_MAX_ATTEMPTS,                  # expected non-fatal errors
     $decoded_produce_request,
+    $ERROR_CANNOT_BIND, # error to throw from IO
 );
 
 #-- send IO
@@ -484,6 +488,7 @@ foreach my $ErrorCode (
         host                => $host,
         port                => $port,
         RETRY_BACKOFF       => $RETRY_BACKOFF * 2,
+        dont_load_supported_api_versions => 1,
     );
 
     is scalar( @{ $connection->nonfatal_errors } ), 0, 'non-fatal errors are not fixed';

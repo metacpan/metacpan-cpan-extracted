@@ -1,13 +1,12 @@
 package urpm;
 
-# $Id: urpm.pm 271301 2010-11-22 00:50:49Z eugeni $
 
 no warnings 'utf8';
 use strict;
 use File::Find ();
 use urpm::msg;
 use urpm::download;
-use urpm::util;
+use urpm::util qw(basename begins_with cat_ cat_utf8 dirname file2absolute_file member);
 use urpm::sys;
 use urpm::cfg;
 use urpm::md5sum;
@@ -15,7 +14,7 @@ use urpm::md5sum;
 # perl_checker: require urpm::media
 # perl_checker: require urpm::parallel
 
-our $VERSION = '7.8';
+our $VERSION = '8.106';
 our @ISA = qw(URPM Exporter);
 our @EXPORT_OK = ('file_from_local_url', 'file_from_local_medium', 'is_local_medium');
 
@@ -25,6 +24,22 @@ our $postponed_code = 0;
 
 use URPM;
 use URPM::Resolve;
+
+
+=head1 NAME
+
+urpm - Mageia perl tools to handle the urpmi database
+
+=head1 DESCRIPTION
+
+C<urpm> is used by urpmi executables to manipulate packages and media
+on a Mageia Linux distribution.
+
+=head2 The urpm class
+
+=over 4
+
+=cut
 
 #- this violently overrides is_arch_compat() to always return true.
 sub shunt_ignorearch {
@@ -47,7 +62,72 @@ sub default_options {
     };
 }
 
-#- create a new urpm object.
+=item urpm->new()
+
+The constructor creates a new urpm object. It's a blessed hash that
+contains fields from L<URPM>, and also the following fields:
+
+B<source>: { id => src_rpm_file|spec_file }
+
+B<media>: [ { 
+   start => int, end => int, name => string, url => string,
+   virtual => bool, media_info_dir => string, with_synthesis => string,
+   no-media-info => bool,
+   iso => string, downloader => string,
+   ignore => bool, update => bool, modified => bool, really_modified => bool,
+   unknown_media_info => bool, 
+ } ],
+
+B<options>: hashref of urpm options
+
+several paths:
+
+=over
+
+B<config>: path of  urpmi.cfg (/etc/urpmi/urpmi.cfg)
+
+B<mediacfgdir>: path of mediacfg.d (/etc/urpmi/mediacfg.d)
+
+B<skiplist>: path of skip.list (/etc/urpmi/skip.list),
+
+B<instlist>: path of inst.list (/etc/urpmi/inst.list),
+
+B<prefer_list>: path of prefer.list (/etc/urpmi/prefer.list),
+
+B<prefer_vendor_list>: path of prefer.vendor.list (/etc/urpmi/prefer.vendor.list),
+
+B<private_netrc>: path of netrc (/etc/urpmi/netrc),
+
+B<statedir>: state directory (/var/lib/urpmi),
+
+B<cachedir>: cache directory (/var/cache/urpmi),
+
+B<root>: path of the rooted system (when using global urpmi config),
+
+B<urpmi_root>: path of the rooted system (when both urpmi & rpmdb are chrooted)
+
+=back
+
+Several subs:
+
+=over
+
+B<fatal>: sub for relaying fatal errors (should popup in GUIes)
+
+B<error>: sub for relaying other errors
+
+B<log>: sub for relaying messages if --verbose
+
+B<print>: sub for always displayed messages, enable to redirect output for eg: installer
+
+B<info>: sub for messages displayed unless --quiet
+
+=back
+
+All C<URPM> methods are available on an urpm object.
+
+=cut
+
 sub new {
     my ($class) = @_;
     my $self;
@@ -71,6 +151,12 @@ sub new {
     $self->set_nofatal(1);
     $self;
 }
+
+=item urpm->new_parse_cmdline()
+
+Like urpm->new but also parse the command line and parse the configuration file.
+
+=cut
 
 sub new_parse_cmdline {
     my ($class) = @_;
@@ -102,36 +188,47 @@ sub prefer_rooted {
     -e "$root$file" ? "$root$file" : $file;
 }
 
-sub check_cache_dir {
+sub check_dir {
     my ($urpm, $dir) = @_;
     -d $dir && ! -l $dir or $urpm->{fatal}(1, N("fail to create directory %s", $dir));
     -o $dir && -w $dir or $urpm->{fatal}(1, N("invalid owner for directory %s", $dir));
 }
 
-sub init_cache_dir {
+sub init_dir {
     my ($urpm, $dir) = @_;
 
     mkdir $dir, 0755; # try to create it
 
-    check_cache_dir($urpm, $dir);
+    check_dir($urpm, $dir);
 
     mkdir "$dir/partial";
     mkdir "$dir/rpms";
 
     $dir;
 }
+
 sub userdir_prefix {
     my ($_urpm) = @_;
     '/tmp/.urpmi-';
 }
+
+sub valid_statedir {
+    my ($urpm) = @_;
+    $< or return;
+
+    my $dir = ($urpm->{urpmi_root} || '') . userdir_prefix($urpm) . $< . "/lib";
+    init_dir($urpm, $dir);
+}
+
 sub userdir {
     #mdkonline uses userdir because it runs as user
     my ($urpm) = @_;
     $< or return;
 
     my $dir = ($urpm->{urpmi_root} || '') . userdir_prefix($urpm) . $<;
-    init_cache_dir($urpm, $dir);
+    init_dir($urpm, $dir);
 }
+
 sub ensure_valid_cachedir {
     my ($urpm) = @_;
     if (my $dir = userdir($urpm)) {
@@ -139,6 +236,7 @@ sub ensure_valid_cachedir {
     }
     -w "$urpm->{cachedir}/partial" or $urpm->{fatal}(1, N("Can not download packages into %s", "$urpm->{cachedir}/partial"));
 }
+
 sub valid_cachedir {
     my ($urpm) = @_;
     userdir($urpm) || $urpm->{cachedir};
@@ -295,6 +393,12 @@ sub is_cdrom_url {
     protocol_from_url($url) eq 'cdrom';
 }
 
+=item db_open_or_die($urpm, $b_write_perm)
+
+Open RPM database (RW or not) and die if it fails
+
+=cut
+
 sub db_open_or_die_ {
     my ($urpm, $b_write_perm) = @_;
     my $db;
@@ -320,7 +424,12 @@ sub db_open_or_die {
     $db;
 }
 
-#- register local packages for being installed, keep track of source.
+=item register_rpms($urpm, @files)
+
+Register local packages for being installed, keep track of source.
+
+=cut
+
 sub register_rpms {
     my ($urpm, @files) = @_;
     my ($start, $id, $error, %requested);
@@ -375,10 +484,15 @@ sub register_rpms {
     %requested;
 }
 
-#- checks whether the delta RPM represented by $pkg is installable wrt the
-#- RPM DB on $root. For this, it extracts the rpm version to which the
-#- delta applies from the delta rpm filename itself. So naming conventions
-#- do matter :)
+=item is_delta_installable($urpm, $pkg, $root)
+
+checks whether the delta RPM represented by $pkg is installable wrt the
+RPM DB on $root. For this, it extracts the rpm version to which the
+delta applies from the delta rpm filename itself. So naming conventions
+do matter :)
+
+=cut
+
 sub is_delta_installable {
     my ($urpm, $pkg, $root) = @_;
     $pkg->flag_installed or return 0;
@@ -394,10 +508,17 @@ sub is_delta_installable {
     $v_match eq $v_installed;
 }
 
-#- extract package that should be installed instead of upgraded,
-#- installing instead of upgrading is useful
-#- - for inst.list (cf flag disable_obsolete)
-#- sources is a hash of id -> source rpm filename.
+
+=item extract_packages_to_install($urpm, $sources)
+
+Extract package that should be installed instead of upgraded,
+installing instead of upgrading is useful
+- for inst.list (cf flag disable_obsolete)
+
+Sources is a hash of id -> source rpm filename.
+
+=cut
+
 sub extract_packages_to_install {
     my ($urpm, $sources) = @_;
     my %inst;
@@ -411,14 +532,26 @@ sub extract_packages_to_install {
     \%inst;
 }
 
-#- deprecated
-sub install { require urpm::install; &urpm::install::install }
+#- deprecated, use find_candidate_packages_() directly
+#-
+#- side-effects: none
+sub find_candidate_packages_ {
+    my ($urpm, $id_prop) = @_;
 
-#- deprecated
-sub parallel_remove { &urpm::parallel::remove }
+    my %packages;
+    foreach ($urpm->find_candidate_packages($id_prop)) {
+	push @{$packages{$_->name}}, $_;
+    }
+    values %packages;
+}
 
-#- get reason of update for packages to be updated
-#- use all update medias if none given
+=item get_updates_description($urpm, @update_medias)
+
+Get reason of update for packages to be updated.
+Use all update medias if none given.
+
+=cut
+
 sub get_updates_description {
     my ($urpm, @update_medias) = @_;
     my %update_descr;
@@ -459,49 +592,30 @@ sub DESTROY {}
 
 1;
 
-__END__
-
-=head1 NAME
-
-urpm - Mageia perl tools to handle the urpmi database
-
-=head1 DESCRIPTION
-
-C<urpm> is used by urpmi executables to manipulate packages and media
-on a Mageia Linux distribution.
-
-=head2 The urpm class
-
-=over 4
-
-=item urpm->new()
-
-The constructor creates a new urpm object. It's a blessed hash that
-contains fields from C<URPM>, and also the following fields:
-
-B<source>: { id => src_rpm_file|spec_file }
-
-B<media>: [ { 
-   start => int, end => int, name => string, url => string,
-   virtual => bool, media_info_dir => string, with_synthesis => string,
-   no-media-info => bool,
-   iso => string, downloader => string,
-   ignore => bool, update => bool, modified => bool, really_modified => bool,
-   unknown_media_info => bool, 
- } ],
 
 =back
 
 =head1 SEE ALSO
 
-The C<URPM> package is used to manipulate at a lower level synthesis and rpm
+The L<URPM> package is used to manipulate at a lower level synthesis and rpm
 files.
+
+See also submodules: L<gurpmi>, L<urpm::args>, L<urpm::bug_report>,
+L<urpm::cdrom>, L<urpm::cfg>, L<urpm::download>, L<urpm::get_pkgs>,
+L<urpm::install>, L<urpm::ldap>, L<urpm::lock>, L<urpm::main_loop>,
+L<urpm::md5sum>, L<urpm::media>, L<urpm::mirrors>, L<urpm::msg>,
+L<urpm::orphans>, L<urpm::parallel_ka_run>, L<urpm::parallel>,
+L<urpm::parallel_ssh>, L<urpm::prompt>, L<urpm::removable>,
+L<urpm::select>, L<urpm::signature>, L<urpm::sys>, L<urpm::util>,
+L<urpm::xml_info_pkg>, L<urpm::xml_info>
 
 =head1 COPYRIGHT
 
 Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
+
+Copyright (C) 2011-2015 Mageia
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Simple;
 
 #inherits Lemonldap::NG::Portal::_Choice
 
-our $VERSION = '1.4.10';
+our $VERSION = '1.9.5';
 
 ## @apmethod int authInit()
 # Build authentication loop
@@ -62,7 +62,7 @@ sub authFinish {
 }
 
 ## @apmethod int authPostStore()
-# Does nothing
+# Does nothing.
 # @return Lemonldap::NG::Portal constant
 sub authPostStore {
     my $self = shift;
@@ -159,7 +159,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =item Copyright (C) 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2010, 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

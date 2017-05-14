@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/X11/Wallpaper.pm
+t/basic.t
+t/release-no-tabs.t
+t/release-pod-syntax.t

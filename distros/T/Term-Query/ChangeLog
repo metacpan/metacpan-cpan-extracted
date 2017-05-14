@@ -1,0 +1,45 @@
+Sat Sep 30 00:35:29 1995  Alan K. Stebbens  <aks@dokoka.ucsb.edu>
+
+	* Makefile:
+	Implemented non-version-only installs; added uninstalls; changed
+	the archive names to be prefixed with $(CLASS).
+
+Sat Sep 30 00:29:56 1995  Alan K. Stebbens  <aks@dokoka.ucsb.edu>
+
+	* README: Updated with the new archive names.
+
+Fri Sep 29 21:39:07 1995  Alan K. Stebbens  <aks@dokoka.ucsb.edu>
+
+	* tq: Reorganized.
+
+	* tq: Added another deref variable test.
+
+	* tq: Changes for new version.
+
+	* Query.pm:
+	Fixed bug in define_var -- failed to correctly implement DeMorgan's
+	theorem across a negated "or".
+
+	* Query.pm: Documented the other module dependencies
+
+Wed Sep 27 22:19:29 1995  Alan K. Stebbens  <aks@dokoka.ucsb.edu>
+
+	* README: Fixed FTP location.
+
+	* Makefile: Fixed version extraction.
+
+	* Makefile: Fixed version extraction bug.
+
+	* Query.pm:
+	Changed package name to Term::Query.pm.  Changed the Synopsis in the pod
+	section to reflect this.
+
+	* Makefile: Added ChangeLog to the SHARFILES list.
+
+	* Makefile: Updated for versioning and CLASS name.
+
+	* README: Removed the Log from the Readme and moved it to ChangeLog.
+
+	* README:
+	Changed the name from Query.pm to Term::Query.pm; changed the @EXPORT to
+	@EXPORT_OK.

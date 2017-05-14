@@ -1,0 +1,174 @@
+H1: 2.000
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+As this is the first public production release of SDF,
+the focus has been to fix bugs and improve the documentation.
+The enhancements are:
+
+!block sections
+^ Better documentation
++ Better packaging
++ Better support for non-English languages
++ Table enhancements
++ Object management enhancements
++ Example/verbatim enhancements
++ Miscellaneous things.
+!endblock
+
+H3: Better documentation
+
+The following documents have been improved:
+
+* {{DOC: The SDF Document Development System}}
+* {{DOC: SDF Reference}}.
+
+The {{DOC: SDF Web Site}} has also been improved by the addition of
+the following sections:
+
+* {{DOC: SDF Latest News}}
+* {{DOC: SDF Template Catalog}}
+* {{DOC: SDF Resource Center}}
+* {{DOC: SDF Sample Showcase}}.
+
+H3: Better packaging
+
+The PostScript and PDF versions of the documentation have been
+removed from the core distribution making it substantially smaller.
+The PostScript and PDF documents can still be accessed as needed from
+{{URL:http://www.mincom.com/mtr/sdf/catalog.html}}.
+
+The SDF distribution is now CPAN-compliant, thanks to the
+efforts of Achim Bonnet ({{EMAIL:ach@mpe.mpg.de}}). As a result,
+several things have changed:
+
+* installation is much easier
+* the SDFHOME environment variable is no longer used to find files:
+  - Perl libraries are now assumed to be available on Perl's library path
+  - configuration files, including {{FILE:sdf.ini}}, are now located
+    within the {{FILE:sdf/home}} directory somewhere on Perl's library path.
+* the {{test}} directory has been renamed to {{t}}
+* the {{CMD:sdftest}} script is now located within the {{t}} directory.
+
+H3: Better support for non-English languages
+
+Russian characters (and characters from other non-English languages)
+are now hopefully better handled for users running on Perl 5.004 or later.
+(Thanks to Nikolaj Logvinov for this fix.)
+
+A German locale (de_de.sdl) has also been added.
+(Thanks to Andreas Lohrum for this.)
+
+H3: Table enhancements
+
+The {{FILT:table}} filter now supports some new parameters:
+  * {{colvaligns}} - a comma-separated list of vertical alignments 
+    values (Top, Middle, Bottom, Baseline) for columns. For the lazy
+    people, a single word containing the letters T, M, B and L can
+    be used for the value as well.
+  * {{select}} - a comma-separated list of columns to display.
+  * {{delete}} - a comma-separated list of columns to delete.
+
+The {{delete}} parameter is particularly useful if
+you want to sort or filter a table
+(using the {{sort}} and {{where}} parameters, respectively) using
+a column which you don't want in the output.
+
+H3: Object management enhancements
+
+Class filters also support the {{colaligns}}, {{colvaligns}}, {{select}}
+and {{delete}} parameters provided by the {{FILT:table}} filter.
+
+A new feature called {{object views}} has been introduced. See
+{{[jump="../ref/in_claif.html"] Understanding Class Interfaces}}
+within the {{DOC: SDF Reference}} for details.
+
+The {{MAC:catalog}} macro can now apply the filtering mask to
+an attribute other than the name. To specify the attribute,
+use a mask of the format:
+
+>       attribute":"mask_pattern
+
+H3: Example/verbatim enhancements
+
+The {{FILT:verbatim}} and {{FILT:example}} filters now support
+a {{listitem}} attribute (ala the {{FILT:table}} filter), although
+this attribute currently only indents the text for these filters.
+
+The {{skipheader}} attribute of the {{FILT:example}} and {{FILT:verbatim}}
+filters now uses the {{lang}} attribute, if any, to determine the commenting
+conventions. Previously, it assumed comments began with # and were
+terminated by the end of line.
+
+H3: Miscellaneous things
+
+A module with support for Use Cases has been added (stdlib/usecases.sdm).
+
+The {{MAC:insert}} macro can now be used to insert/execute a macro
+which may not be defined.
+
+
+H2: Fixes
+
+{{CMD:sdftest}} on Windows/DOS systems now works.
+
+For plain text output, unwanted lines between consecutive example
+paragraphs have been removed.
+
+File handling on the Macintosh should now be fixed.
+(Thanks to David Schooley.)
+
+Within {{CMD:sdfget}} reports, * processing now works again.
+
+When generating an {{rtf}} file via [[FrameMaker]], the intermediate
+{{mif}} file is now deleted.
+
+{{Inner}} and {{Outer}} no longer produce warnings as unknown values
+for the {{align}} parameter for the {{FILT:table}} or {{FILT:box}}
+filter.
+
+Consecutive normal paragraphs within a {{FILT:box}} filter or a
+multi-paragraph table cell no longer run together when HTML is generated.
+
+The {{FILT:about}} filter works correctly again for HTML output.
+
+The {{FILE}} phrase style is now mapped to TT for HTML output.
+
+The {{OPT_PAGE_SIZE}} and {{OPT_WIDTH}} variables are no longer
+ignored if they are set via the {{MAC:init}} macro.
+
+Generating PostScript and DVI via SGML-Tools 1.02 or later
+should now work.
+
+Column alignments within tables are no longer ignored when SGML
+is generated.
+
+{{None}} is now a legal value for cell rulings within tables.
+(Thanks to Cliff Krumvieda for this fix.)
+
+H2: Incompatibilities
+
+Configuration files are now located differently.
+See {{SECT:Better packaging}}, above, for details.
+
+The scripts in the {{FILE:bin}} directory
+now use {{FILE:/usr/local/bin/perl}}, rather than
+{{FILE:/usr/local/bin/perl5}}, i.e. the default version
+of Perl installed at a site is now assumed to be 5.003 or later.
+
+The PDF and PostScript versions of the documentation are no longer
+shipped with the SDF package. Instead, the document catalog points
+to PDF and PostScript files on SDF's web site. (This change was made
+to reduce the size of the SDF distribution.)
+
+If you are generating outputs via SGML-Tools, you now need SGML-Tools
+1.02 or later (rather than 0.99 or later).
+
+The {{paper}} document style now leaves headings as they are defined.
+Previously, it implicitly changed H-style headings to P-style
+headings and slid them down one level.
+
+The {{sdtgen}} script has been renamed {{CMD:sdngen}} to reflect the
+fact that {{sdn}} is the extension now used for tuning modules.

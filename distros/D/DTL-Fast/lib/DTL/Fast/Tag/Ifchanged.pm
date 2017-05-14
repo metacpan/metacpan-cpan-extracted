@@ -1,13 +1,15 @@
 package DTL::Fast::Tag::Ifchanged;
-use strict; use utf8; use warnings FATAL => 'all';
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Tag';
 
-$DTL::Fast::TAG_HANDLERS{'ifchanged'} = __PACKAGE__;
+$DTL::Fast::TAG_HANDLERS{ifchanged} = __PACKAGE__;
 
 use DTL::Fast::Expression::Operator::Binary::Eq;
 
 #@Override
-sub get_close_tag{ return 'endifchanged'; }
+sub get_close_tag { return 'endifchanged'; }
 
 #@Override
 sub parse_parameters
@@ -16,13 +18,13 @@ sub parse_parameters
 
     $self->add_branch();
 
-    if ( $self->{'parameter'})
+    if ($self->{parameter})
     {
-        $self->{'watches'} = $self->parse_sources($self->{'parameter'});
+        $self->{watches} = $self->parse_sources($self->{parameter});
     }
     else
     {
-        $self->{'watch_content'} = 1;
+        $self->{watch_content} = 1;
     }
 
     return $self;
@@ -35,7 +37,7 @@ sub add_chunk
     my $self = shift;
     my $chunk = shift;
 
-    $self->{'branches'}->[-1]->add_chunk($chunk);
+    $self->{branches}->[- 1]->add_chunk($chunk);
 
     return $self;
 }
@@ -43,11 +45,11 @@ sub add_chunk
 #@Override
 sub parse_tag_chunk
 {
-    my( $self, $tag_name, $tag_param, $chunk_lines ) = @_;
+    my ( $self, $tag_name, $tag_param, $chunk_lines ) = @_;
 
     my $result = undef;
 
-    if( $tag_name eq 'else' )
+    if ($tag_name eq 'else')
     {
         $self->add_branch();
         $DTL::Fast::Template::CURRENT_TEMPLATE_LINE += $chunk_lines;
@@ -67,23 +69,23 @@ sub render
     my $context = shift;
     my $result = '';
 
-    my $forloop = $context->{'ns'}->[-1]->{'forloop'};
+    my $forloop = $context->{ns}->[- 1]->{forloop};
 
-    if( defined $forloop )
+    if (defined $forloop)
     {
-        if( $self->{'watch_content'} ) # slow behavior
+        if ($self->{watch_content}) # slow behavior
         {
-            $result = $self->{'branches'}->[0]->render($context);
-            if(
-                $forloop->{'first'}                             # first pass
-                or $result ne $self->{'last_iteration_content'} # content changed
+            $result = $self->{branches}->[0]->render($context);
+            if (
+                $forloop->{first}                             # first pass
+                    or $result ne $self->{last_iteration_content} # content changed
             )
             {
-                $self->{'last_iteration_content'} = $result;
+                $self->{last_iteration_content} = $result;
             }
-            elsif( scalar @{$self->{'branches'}} > 1 )
+            elsif (scalar @{$self->{branches}} > 1)
             {
-                $result = $self->{'branches'}->[1]->render($context);
+                $result = $self->{branches}->[1]->render($context);
             }
             else
             {
@@ -92,21 +94,21 @@ sub render
         }
         else
         {
-            if( $forloop->{'first'} ) # first pass
+            if ($forloop->{first}) # first pass
             {
                 $self->update_preserved($context);
-                $result = $self->{'branches'}->[0]->render($context);
+                $result = $self->{branches}->[0]->render($context);
             }
             else
             {
-                if( $self->watches_changed($context) )
+                if ($self->watches_changed($context))
                 {
-                    $result = $self->{'branches'}->[0]->render($context);
+                    $result = $self->{branches}->[0]->render($context);
                     $self->update_preserved($context);
                 }
-                elsif( scalar @{$self->{'branches'}} > 1 )
+                elsif (scalar @{$self->{branches}} > 1)
                 {
-                    $result = $self->{'branches'}->[1]->render($context);
+                    $result = $self->{branches}->[1]->render($context);
                 }
             }
         }
@@ -125,12 +127,12 @@ sub watches_changed
     my $context = shift;
     my $result = 0;
 
-    for( my $i = 0; $i < scalar @{$self->{'watches'}}; $i++ )
+    for (my $i = 0; $i < scalar @{$self->{watches}}; $i++)
     {
-        my $watch = $self->{'watches'}->[$i]->render($context);
-        my $preserve = $self->{'preserved'}->[$i];
+        my $watch = $self->{watches}->[$i]->render($context);
+        my $preserve = $self->{preserved}->[$i];
 
-        if( not DTL::Fast::Expression::Operator::Binary::Eq::dispatch($self, $watch, $preserve))
+        if (not DTL::Fast::Expression::Operator::Binary::Eq::dispatch($self, $watch, $preserve))
         {
             $result = 1;
             last;
@@ -145,11 +147,11 @@ sub update_preserved
     my $self = shift;
     my $context = shift;
 
-    $self->{'preserved'} = [];
-    
-    foreach my $watch ( @{$self->{'watches'}} )
+    $self->{preserved} = [ ];
+
+    foreach my $watch (@{$self->{watches}})
     {
-        push @{$self->{'preserved'}}, $watch->render($context);
+        push @{$self->{preserved}}, $watch->render($context);
     }
 
     return $self;
@@ -159,8 +161,8 @@ sub add_branch
 {
     my $self = shift;
 
-    $self->{'branches'} //= [];
-    push @{$self->{'branches'}}, DTL::Fast::Renderer->new();
+    $self->{branches} //= [ ];
+    push @{$self->{branches}}, DTL::Fast::Renderer->new();
     return $self;
 }
 

@@ -1,0 +1,73 @@
+# $Id$
+#
+# >>Title::     Bug Tracking Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 20-Feb-97 ianc    SDF 2.000
+#                   (With lots of initial from Tim Hudson)
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:bugtrack}} is an [[SDF]] module for
+# building a simple bug tracking system.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# This is the ordered list of attributes at the top of each details file
+# Bug tracking systems can change the order or set of attributes
+# supported by defining this variable before using this module
+!default BUG_ATTRIBUTES 'Status,Priority,Type'
+
+# Define the "bugs" class
+!class bugs 'BUG,BUGTITLE'; 'Code,Title'; "Jump,$var{'BUG_ATTRIBUTES'}"
+
+# Define the hypertext generation rules
+!on phrase 'BUG';; $attr{'jump'}="$text.html"
+!on phrase 'BUGTITLE';; $attr{'jump'}=$obj_long{'bugs',$text,'Code'} . ".html"
+
+# Macro to construct the title for a bug description.
+# If a title is supplied, a warning is output if it does not
+# match the title in the database.
+!block script
+@_bug_title_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'title      string      _NULL_',
+);
+sub bug_title_Macro {
+    local(%arg) = @_;
+    local(@text);
+    local($title, $db_title);
+    local($code);
+
+    # Check the title matches the database
+    $title = $arg{'title'};
+    $code = $var{'FILE_BASE'};
+    $db_title = &Value('bugs', $code, 'Title');
+    if ($title eq '') {
+        $title = $db_title;
+    }
+    elsif ($title ne $db_title) {
+        &'AppMsg("warning", "bug title does not match database value");
+    }
+
+    # Build result
+    @text = (
+        "!define DOC_NAME '$code - $title'",
+        "!define DOC_TOC 0",
+        "!build_title",
+        "!subsections 'Description,Action'; 'noprefix'",
+        "!namevalues 'bugs'; '$code'; BUG_ATTRIBUTES");
+
+    # Return result
+    return @text;
+}
+!endblock

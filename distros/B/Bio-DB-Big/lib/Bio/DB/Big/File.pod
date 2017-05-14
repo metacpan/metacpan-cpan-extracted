@@ -1,0 +1,247 @@
+=head1 NAME
+
+Bio::DB::Big::File - Object representing a UCSC big file
+
+=head1 DESCRIPTION
+
+This object encapsulates the querying and logic associcated with working with a big file. Both BigWig and BigBed are supported through the same object. When a routine is run on the wrong type of file that routine will throw an exception informing you of the error.
+
+=head1 CLASS METHODS
+
+These methods are all called on the package name
+
+=head2 Bio::DB::Big::File->test_big_bed('/path/to/big.file')
+
+Returns a boolean response if the given path (local or remote) was a BigBed or not. 
+
+=head2 Bio::DB::Big::File->test_big_wig('/path/to/big.file')
+
+Returns a boolean response if the given path (local or remote) was a BigWig or not. 
+
+=head2 my $bw = Bio::DB::Big::File->open_big_wig('/path/to/big.bw')
+
+Opens a BigWig from a given path (local or remote) and returns a Bio::DB::Big::File object.
+
+=head2 my $bb = Bio::DB::Big::File->open_big_bed('/path/to/big.bb')
+
+Opens a BigBed from a given path (local or remote) and returns a Bio::DB::Big::File object.
+
+=head1 GENERIC METHODS
+
+These methods are available across all big files.
+
+=head2 $bf->type()
+
+Returns 0 if the file is a BigWig and 1 if the file is a BigBed
+
+=head2 $bf->is_big_wig
+
+Returns true if the file is a BigWig
+
+=head2 $bf->is_big_bed
+
+Returns true if the file is a BigBed
+
+=head2 my $header_hash = $bf->header()
+
+Returns a hash to the big file's header. Elements available are
+
+=over 8
+
+=item B<version> - Version of the file format
+
+=item B<nLevels> - Number of zoom levels available
+
+=item B<nBasesCovered> - Number of bases covered by the file (BigWig only)
+
+=item B<minVal> - Smallest value in the file (BigWig only)
+
+=item B<maxVal> - Largest value in the file (BigWig only)
+
+=item B<sumData> - Sum of all available values (BigWig only)
+
+=item B<sumSquared> - The sum of all squared values (BigWig only)
+
+=item B<fieldCount> - Number of columns in bed version (BigBed only)
+
+=item B<definedFieldCount> -  Number of columns using bed standard definitions (BigBed only)
+
+=back
+
+Ensure that these are used according to the file type.
+
+=head2 my $chroms_hash = $bf->chroms();
+
+  my $chroms_hash = $bf->chroms();
+  foreach my $chrom (keys %{$chroms_hash}) {
+    my $h = $chroms_hash->{$chrom};
+    printf("%s - %d", $h->{name}, $h->{length});
+  }
+
+Returns a hash of chromsoomes keyed by the chromsome name. Each value is a hash with the keys B<name> and B<length>.
+
+=head2 my $length = $bf->chrom_length('chr1')
+
+Return the length of the specified chromosome
+
+=head2 $bf->has_chrom('chr1')
+
+Returns a boolean if the given chromosome was found in the given big file i.e. there was data recorded for it
+
+=head1 BIGWIG METHODS
+
+The following methods are available only for bigwig files
+
+=head2 my $stats_array = $bf->get_stats($chromosome, $start, $end, $bins, $type, $full);
+
+Used to calculate statistics from a BigWig file across a range specified in 0-based, half-open coordinates. Chromosome, start and end are required paramters. Bins defaults to 1 and type defaults to mean. Consult the later documentation on the available summary statistics you can request.
+
+  my $stats = $bf->get_stats('chr1', 0, 100, 5, "max", 0);
+  foreach my $v (@{$stats}) {
+    printf("%f\n", $v);
+  }
+
+The full parameter is used to force libBigWig to use the true underlying values held in the BigWig file for a small speed penalty. If this is set to false (as is done by default) then the library will use the pre-computed summary statistic zoom levels to calculate your request from. More information is available from L<https://github.com/dpryan79/pyBigWig#a-note-on-statistics-and-zoom-levels>.
+
+=head2 my $all_stats = $bf->get_all_stats($chromosome, $start, $end, $bins, $full);
+
+Calculate all available statistics and returns the elements back to you in a single array reference of Hashes. 
+
+  my $stats = $bf->get_all_stats('chr1', 0, 100, 5, 0);
+  foreach my $v (@{$stats}) {
+    printf("mean -- %f | min -- %f | max -- %f", $v->{mean}, $v->{min}, $v->{max});
+    if(exists $v->{cov}) {
+      printf(" | cov -- %f", $v->{cov});
+    }
+    print "\n";
+  }
+
+Each hash is keyed by the following elements.
+
+=over 8
+
+=item B<mean> - mean value across the requested region
+
+=item B<min> - smallest value across the requested region
+
+=item B<max> - largest value across the requested region
+
+=item B<cov> - number of bases covered by a value across the requested region
+
+=item B<std> - standard deviation of values across the region
+
+=back
+
+If a statistic was not available then the key will not be available in the hash to differentiate between those values missing and those which were set explicitly to a value e.g. telling the difference quickly between 0 and a lack of a value.
+
+Be aware that this code currently executes a seperate stats call for each type of statistic so the runtime of this method will be 5x slower than running C<get_stats()> on the types you want. This performance may change if libBigWig supports this kind of operation.
+
+=head2 my $values_array = $bf->get_values($chromosome, $start, $end);
+
+Used to retrieve the original values for each base across a range specified in 0-based, half-open coordinates. Chromosome, start and end are required paramters. The returned array will contain an element for each base in the given range. Those without a value in the underlying BigWig file will be returned as undefined. You must check for these values when iterating the list.
+
+  my $values = $bf->get_values('chr1', 0, 100);
+  foreach my $v (@{$values}) {
+    if(! defined $v) {
+      print "X\n";
+    }
+    else {
+      printf("%f\n", $v);
+    }
+  }
+
+=head2 my $intervals_array = $bf->get_intervals($chromosome, $start, $end);
+
+Used to retrieve the intervals that overlap a range specified in 0-based, half-open coordinates. Chromosome, start and end are required paramters. The returned array will contain a hash for each interval with the keys start (0 based), end (half-open) and value (a double).
+
+  my $intervals = $bf->get_intervals('chr1', 0, 100);
+  foreach my $i (@{$intervals}) {
+    printf("%d - %d: %f\n", $i->{start}, $i->{end}, $i->{value});
+  }
+
+=head2 my $iter = $self->get_intervals_iterator($chromosome, $start, $end);
+
+An iterator version of the C<get_intervals()> code allowing you to walk through an entire BigWig file of data without loading all of it into memory.
+
+  my $iter = $bf->get_intervals_iterator('chr1', 0, 100);
+  while(my $intervals = $iter->next()) {
+    foreach my $i (@{$intervals}) {
+      printf("%d - %d: %f\n", $i->{start}, $i->{end}, $i->{value});
+    }
+  }
+
+=head1 BIGBED METHODS
+
+=head2 my $entries_array = $bf->get_entries($chromosome, $start, $end, $use_string);
+
+Used to retrieve the intervals that overlap a range specified in 0-based, half-open coordinates. Chromosome, start and end are required paramters. The $use_string parameter controls if the call returns just the bounds of each bed record or returns the tab seperated Bed line along with the element. If you are using bed for most things apart from overlap calls then you want to set this to true. 
+
+The returned array will contain a hash for each entry with the keys start (0 based), end (half-open) and string (a string). If strings were not requested then the string key will be absent from the hash.
+
+  my $entries = $bf->get_entries('chr1', 0, 100, 1);
+  foreach my $e (@{$entries}) {
+    printf("%d - %d: %s\n", $e->{start}, $e->{end}, $e->{string});
+  }
+
+=head2 my $iter = $bf->get_entries_iterator($chromosome, $start, $end, $use_string);
+
+Iterator version of C<get_entries()> allowing you to walk through an entire BigBed file of entries without loading all of it into memory.
+
+  my $iter = $bf->get_entries_iterator('chr1', 0, 100, 1);
+  while(my $entries = $iter->next()) {
+    foreach my $e (@{$entries}) {
+      printf("%d - %d: %s\n", $e->{start}, $e->{end}, $e->{string});
+    }
+  }
+
+=head2 my $autosql = $bf->get_autosql_string();
+
+Returns the AutoSQL held alongside a BigBed file. Will return undef if no AutoSQL was used in the file.
+
+=head2 my $autosql_obj = $bf->get_autosql();
+
+Returns a L<Bio::DB::Big::AutoSQL> object representing the retrieved AutoSQL string. Will return undef if there is no AutoSQL assoicated with the big file. Can throw an exception if the AutoSQL string does not correctly parse.
+
+=head1 AVAILABLE SUMMARY TYPES
+
+The following strings can be used when calculating statistics over a BigWig file.
+
+=over 4
+
+=item mean - Calculate a mean value for each bin
+
+=item std - The deviation of values within a bin
+
+=item dev - See std
+
+=item max - The maximum value for a bin
+
+=item min - The minimum value for a bin
+
+=item cov - The fraction of bases covered
+
+=item coverage - See cov
+
+=back
+
+=cut
+
+=pod 
+
+=head1 LICENSE
+
+Copyright [2015-2017] EMBL-European Bioinformatics Institute
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

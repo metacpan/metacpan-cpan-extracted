@@ -1,0 +1,318 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Bernhard Reiter
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+#
+# Test for Extrusion node.
+# We want to test figures with a lot of succesive equal spine vertices 
+
+# First line figure: just a few more vertices more in the middle and at the end 
+#	and beginning
+
+Transform  {
+  translation -6 0 0 
+  children [
+  
+    Transform  {
+    translation 0 0 0 
+     children [
+      Shape {
+        appearance Appearance {material Material {diffuseColor 0.7 0.3 0.6}}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 1 0, 0 1 0, 0 1 0, 3 1 0]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -4 
+     children [
+      Shape {
+        appearance Appearance {material Material {diffuseColor 0.7 0.3 0.6} }
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 -2 0, 
+			0 1 0, 0 1 0, 0 1 0, 
+			3 1 0, 3 1 0, 3 1 0, 3 1 0]
+	}
+      }
+     ]
+    }
+  ]
+}
+
+# second line of figures
+# 	modeling a round edge with more equal spine points in the middle
+Transform  {
+  translation 0 0 0 
+  children [
+  
+    Transform  {
+    translation 0 0 0 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.4 0.65 0.2 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 1 0, 0 1 0, 3 1 0]
+		orientation [ 0 1 0 0, 0 0 1 0.7853, 0 0 1 -0.7853,0 0 1 0]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -4 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.4 0.65 0.2 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 1 0, 0 1 0, 0 1 0, 3 1 0]
+		orientation [ 	0 1 0 0, 
+				0 0 1 0.7853, 0 1 0 0, 0 0 1 -0.7853,
+				0 0 1 0]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -8 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.4 0.65 0.2 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 1 0, 0 1 0, 0 1 0, 0 1 0, 0 1 0, 3 1 0]
+		orientation [ 	0 1 0 0, 
+				0 0 1 0.7853, 0 0 1 0.3927, 
+				0 1 0 0, 
+				0 0 1 -0.3927, 0 0 1 -0.7853,
+				0 0 1 0]
+	}
+      }
+     ]
+    }
+  ]
+}
+
+
+# third line of figures
+#
+Transform  {
+  translation 6 0 0 
+  children [
+  
+    Transform  {
+    translation 0 0 0 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.4 0.4 0.7 } }
+        geometry Extrusion {
+		beginCap FALSE
+		endCap FALSE
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+              	spine [0 0 0, 0 0 0]
+		orientation [ 0 1 0 0, 0 0 1 0.7853]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -4 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.4 0.4 0.7 } }
+        geometry Extrusion {
+		beginCap FALSE
+		endCap FALSE
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+              	spine [0 0 0, 0 0 0, 0 0 0 ]
+		orientation [ 0 1 0 0, 0 0 1 0.7853, 0 0 1 1.5708]
+	}
+      }
+     ]
+    }
+    Transform  {
+    translation 0 0 -8 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.4 0.4 0.7 } }
+        geometry Extrusion {
+		beginCap FALSE
+		endCap FALSE
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+              	spine [0 0 0, 0 0 0, 0 0 0, 0 0 0 ]
+		orientation [ 0 1 0 0, 0 0 1 0.7853, 0 0 1 1.5708, 
+			0 0 1 2.3562]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -12 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.4 0.4 0.7 } }
+        geometry Extrusion {
+		beginCap FALSE
+		endCap FALSE
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+              	spine [0 0 0, 0 0 0, 0 0 0 , 0 0 0, 0 0 0]
+		orientation [ 0 1 0 0, 0 0 1 0.7853, 0 0 1 1.5708,
+			0 0 1 2.3562, 0 0 1 3.1415]
+	}
+      }
+     ]
+    }
+    
+  ]
+}
+
+# fourth line of figures
+# 	closed, colinear spines
+#	round edges at the end; the first figure is an interesting special case
+Transform  {
+  translation 12 0 0 
+  children [
+  
+    Transform  {
+    translation 0 0 0 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.3 0.4 0.4 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 1 -3, 0 -2 0]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -6 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.3 0.4 0.4 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 -2 0, 0 1 -3, 0 1 -3, 0 -2 0, 0 -2 0]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -12 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.3 0.4 0.4 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [0 -2 0, 0 -2 0, 0 1 -3, 0 1 -3, 0 1 -3, 0 -2 0, 0 -2 0]
+		orientation [ 	0 0 1 1.5, 0 1 0 0, 
+				0 0 1 0, 0 0 1 -1.5, 0 0 1 0,
+				0 0 1 0, 0 0 1 -1.5]
+	}
+      }
+     ]
+    }
+
+    Transform  {
+    translation 0 0 -18 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.3 0.4 0.4 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [	0 -2 0, 0 -2 0, 0 -2 0, 
+			0 1 -3, 0 1 -3, 0 1 -3, 0 1 -3, 0 1 -3,
+			0 -2 0, 0 -2 0, 0 -2 0] 
+		orientation [ 	
+		  0 0 1 1.5708, 0 0 1 0.7854 ,0 1 0 0, 
+		  0 0 1 0,0 0 1 -0.7854,0 0 1 -1.5708,0 0 1 -2.3562,0 0 1 0,
+		  0 0 1 0, 0 0 1 -0.7854, 0 0 1 -1.5708
+		]
+	}
+      }
+     ]
+    }
+
+  ]
+}
+
+# fifth line of figures
+# 	closed spine, round edges
+Transform  {
+  translation 18 0 0 
+  children [
+
+    Transform  {
+    translation 0 0 0 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.8 0.7 0.1}}
+        geometry Extrusion {
+                solid FALSE
+		spine [
+			0 -2  0, 
+			0  2  0, 
+			0  2 -4, 
+			0 -2 -4, 
+			0 -2 0 
+		]
+	}
+      }
+     ]
+    }
+  
+    Transform  {
+    translation 0 0 -12 
+     children [
+      Shape {
+        appearance Appearance { material Material { diffuseColor 0.8 0.7 0.1 }}
+        geometry Extrusion {
+		crossSection [ 1 1,  1.5 0, 1 -1, -1 -1 , -1 1 , 1 1] 
+                solid FALSE
+		spine [
+			0 -2  0, 0 -2  0, 0 -2  0,
+			0  2  0, 0  2  0, 0  2  0, 0  2  0, 0  2  0,
+			0  2 -4, 0  2 -4, 0  2 -4, 0  2 -4, 0  2 -4,
+			0 -2 -4, 0 -2 -4, 0 -2 -4, 0 -2 -4, 0 -2 -4,
+			0 -2 0 , 0 -2  0, 0 -2  0
+		]
+		orientation [ 
+                  1 0 0 0, 1 0 0 -.3927, 1 0 0 -0.7853,
+                  1 0 0 .7853, 1 0 0 .3927, 1 0 0 0, 1 0 0 -.3927, 1 0 0 -.7853,
+                  1 0 0 .7853, 1 0 0 .3927, 1 0 0 0, 1 0 0 -.3927, 1 0 0 -.7853,
+                  1 0 0 .7853, 1 0 0 .3927, 1 0 0 0, 1 0 0 -.3927, 1 0 0 -.7853,
+                  1 0 0 .7853, 1 0 0 .3927, 1 0 0 0
+                ]
+	}
+      }
+     ]
+    }
+
+
+
+  ]
+}

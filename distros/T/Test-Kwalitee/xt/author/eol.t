@@ -32,6 +32,7 @@ my @files = (
     'xt/author/pod-spell.t',
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
+    'xt/kwalitee_ok.t',
     'xt/release/changes_has_content.t',
     'xt/release/cpan-changes.t',
     'xt/release/distmeta.t',

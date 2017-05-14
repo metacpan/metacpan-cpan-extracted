@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    vscanf, vfscanf, vsscanf    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2009-11-23T06:17:18-0800" />
+<meta name="keywords" content="c,io,vscanf_vfscanf_vsscanf" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/c/io/vscanf_vfscanf_vsscanf?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=c:io" />
+<link rel="edit" title="Edit this page" href="/wiki/c/io/vscanf_vfscanf_vsscanf?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/c/io/vscanf_vfscanf_vsscanf" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/c/io/vscanf_vfscanf_vsscanf" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/c/io/vscanf_vfscanf_vsscanf" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='c:io';var JSINFO = {"id":"c:io:vscanf_vfscanf_vsscanf","namespace":"c:io"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../c/start.html"  title="c:start">The Standard C Library</a> &raquo; <a href="../../c/io/start.html"  title="c:io:start">Standard C I/O</a> &raquo; <a href="../../c/io/vscanf_vfscanf_vsscanf.html"  title="c:io:vscanf_vfscanf_vsscanf">vscanf, vfscanf, vsscanf</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="vscanf_vfscanf_vsscanf" id="vscanf_vfscanf_vsscanf">vscanf, vfscanf, vsscanf</a></h2>
+<div class="level2">
+
+<p>
+
+Syntax:
+
+</p>
+<pre class="c code c++" style="font-family:monospace;">    <span class="co2">#include &lt;cstdarg&gt;</span>
+    <span class="co2">#include &lt;cstdio&gt;</span>
+    <span class="kw4">int</span> vscanf<span class="br0">&#40;</span> <span class="kw4">char</span> <span class="sy0">*</span>format<span class="sy0">,</span> va_list arg_ptr <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw4">int</span> vfscanf<span class="br0">&#40;</span> FILE <span class="sy0">*</span>stream<span class="sy0">,</span> <span class="kw4">const</span> <span class="kw4">char</span> <span class="sy0">*</span>format<span class="sy0">,</span> va_list arg_ptr <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw4">int</span> vsscanf<span class="br0">&#40;</span> <span class="kw4">char</span> <span class="sy0">*</span>buffer<span class="sy0">,</span> <span class="kw4">char</span> <span class="sy0">*</span>format<span class="sy0">,</span> va_list arg_ptr <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+
+These functions are very much like scanf(), fscanf(), and sscanf(). The
+difference is that the argument list is a pointer to a list of arguments.
+va_list is defined in cstdarg, and is also used by <a href="../../c/other/va_arg.html" class="wikilink1" title="c:other:va_arg">va_arg</a>. For example:
+</p>
+<pre class="c code c++" style="font-family:monospace;">     <span class="kw4">int</span> scanf_<span class="br0">&#40;</span> <span class="kw4">char</span> <span class="sy0">*</span>fmt<span class="sy0">,</span> ... <span class="br0">&#41;</span> <span class="br0">&#123;</span>
+       va_list args<span class="sy0">;</span>
+       va_start<span class="br0">&#40;</span> args<span class="sy0">,</span> fmt <span class="br0">&#41;</span><span class="sy0">;</span>
+       <span class="kw4">int</span> r <span class="sy0">=</span> vscanf<span class="br0">&#40;</span>frmt<span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+       scanf<span class="br0">&#40;</span><span class="st0">&quot;%*[^<span class="es1">\n</span>]&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> getchar<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">//Empty buffer</span>
+       va_end<span class="br0">&#40;</span> args <span class="br0">&#41;</span><span class="sy0">;</span>
+       <span class="kw1">return</span> r<span class="sy0">;</span>
+     <span class="br0">&#125;</span></pre>
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        c/io/vscanf_vfscanf_vsscanf.txt &middot; Last modified: 11/23/2009 06:17 by shibu      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

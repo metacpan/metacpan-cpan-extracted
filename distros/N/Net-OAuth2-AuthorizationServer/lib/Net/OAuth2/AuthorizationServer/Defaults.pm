@@ -309,8 +309,8 @@ sub _revoke_access_token {
 sub token {
     my ( $self, %args ) = @_;
 
-    my ( $client_id, $scopes, $type, $redirect_uri, $user_id ) =
-        @args{ qw/ client_id scopes type redirect_uri user_id / };
+    my ( $client_id, $scopes, $type, $redirect_uri, $user_id, $claims ) =
+        @args{ qw/ client_id scopes type redirect_uri user_id jwt_claims_cb / };
 
 	if (
 		! $self->_uses_auth_codes
@@ -328,6 +328,8 @@ sub token {
         $code = encode_base64( join( '-', $sec, $usec, rand(), random_string( 30 ) ), '' );
     }
     else {
+		my $jti = random_string( 32 );
+
         $code = Mojo::JWT->new(
             ( $ttl ? ( expires => time + $ttl ) : () ),
             secret  => $self->jwt_secret,
@@ -337,16 +339,26 @@ sub token {
             claims => {
 
                 # Registered Claim Names
-#        iss    => undef, # us, the auth server / application
-#        sub    => undef, # the logged in user
                 aud => $redirect_uri,         # the "audience"
-                jti => random_string( 32 ),
+                jti => $jti,
 
                 # Private Claim Names
                 user_id => $user_id,
                 client  => $client_id,
                 type    => $type,
                 scopes  => $scopes,
+
+				( $claims
+					? ( $claims->({
+							user_id      => $user_id,
+							client_id    => $client_id,
+							type         => $type,
+							scopes       => $scopes,
+							redirect_uri => $redirect_uri,
+							jti          => $jti,
+					}) )
+					: ()
+				),
             },
         )->encode;
     }

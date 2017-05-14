@@ -1,4 +1,30 @@
-Revision history for Perl extension Email::Store.
+Revision history for Perl extension Email::Store
+
+0.257     2011-11-02
+          fix a busted Makefile.PL; thanks Jamyn
+
+0.256     2009-07-09
+          request that this module no longer be smoke tested
+
+0.255     2007-03-22
+          packaging improvements
+
+0.254  2006-09-19
+    - previously, "only" arguments had to be suffices to Email::Store::
+      this is now fixed; also, except didn't seem to be implemented, and now is
+
+0.252  2006-08-28
+    - add todo pod-coverage test
+
+0.251  2006-08-22
+    - use strict in all modules
+    - correctly add pod test
+
+0.25   2006-07-23
+    - require 3.0.3 Class::DBI to avoid attempts at null PK (bug 13902)
+    - turn on autocommit for Pg and Oracle databases (bug 13068, 13069)
+    - update tests to use SQLite, not SQLite2, to match prereq
+    - some documentation updates (bug 7772)
 
 0.24 Mon Feb  7 12:02:32 GMT 2005
     - There were various problems with attachments which seem to be todo with 

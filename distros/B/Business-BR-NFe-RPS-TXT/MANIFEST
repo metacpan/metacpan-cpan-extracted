@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Business/BR/NFe/RPS/TXT.pm
+t/001-params-test.t
+weaver.ini

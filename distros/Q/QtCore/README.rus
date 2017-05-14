@@ -1,0 +1,70 @@
+Perl/Qt4
+=========================
+
+В библиотеке по возможности используется функциональность перла,
+но при этом синтаксис сделан по возможности похожим на C++ Qt4,
+что бы можно было легко пользоваться оригинальной документацией по Qt4
+Все списковые классы (QVector,QList) заменены массивами перла, все 
+хешевые классы (QMap,QHash,QPair) заменены хешами перла.
+Классы модулей полностью совпадает с таковыми в C++ Qt4.
+Для всех объектных классов (потомков QObject) возможно
+использование виртуальных функций, для этого, как в С++, достаточно
+создать свою функцию с таким же названием
+Для объектных классов возможено использование всех protected функций,
+кроме принимающих в качестве входного параметра классы *Private.
+
+Перед написанием программ желательно изучить примеры, идущие с пакетом.
+
+ИНСТАЛЯЦИЯ
+
+Для установки этой библиотеки выполните:
+
+   perl Makefile.PL [параметры]
+   make
+   make test
+   make install
+   
+Параметры:
+   -i каталог include для Qt, по умолчанию /usr/include
+   -qc каталог с исходниками  Perl QtCore для копирования *.core файлов, 
+        по-умолчанию ../QtCore (надо для QtGui и других высокоуровневых библиотек)
+например:
+   perl Makefile.PL -i /usr/local/include -qc ../QtCore-4.000
+
+для QtGui:
+Если не указывать ключ -qc, то в каталог QtGui из каталога QtCore надо скопировать
+redef.h, все файлы *.core и typemap, typemap надо переименовать в typemap.core
+   
+
+
+ЗАМЕЧАНИЯ
+Работа с классами Qt4 идёт не наприямую, а через их потомков,
+которым и можно назначать дополнительные сигналы и слоты.
+
+В перле все классы являются bessed hash, сама ссылка на класс
+находится в $qt_class->{_ptr} и её желательно не изменять.
+
+Т.к. operator= в перле напрямую перегрузить нельзя, то для
+копирования классов надо использовать конструктор копий:
+   my $qstring2 = QString($qstring1);
+
+некоторые функции, имеющие имена, которые совпадают с
+зарезервированными в перле, переведены в верхний регистр.
+Это TR, TRUtf8, CONNECT, METHOD, SLOT, SIGNAL.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+Perl 5.8 and Trolltech Qt4 (4.2 or later).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008 Вадим Лихота
+
+You can redistribute the generator of Perl SX modules and/or modify
+it under the same terms as Perl itself, either Perl version 5.8 or,
+at your option, any later version of Perl 5 you may have available.
+You can redistribute Perl/Qt4 modules under the GPL2 or any other Qt4 licencies.
+

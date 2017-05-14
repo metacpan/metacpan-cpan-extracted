@@ -1,0 +1,6 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Variable num1 is 1. Variable num2 is 42.
+N[orig_style='N']Variable str1 is My favorite station. Variable str2 is Hello world.
+N[orig_style='N']Variable num3 is 28. Variable str3 is AA-My favorite station-ZZ.
+N[orig_style='N']Variable num2 is 42. Variable str2 is Hello world.

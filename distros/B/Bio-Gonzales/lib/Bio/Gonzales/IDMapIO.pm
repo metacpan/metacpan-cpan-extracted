@@ -11,7 +11,7 @@ use 5.010;
 use parent qw/Bio::Root::Root/;
 use YAML qw/freeze thaw/;
 use Data::Dumper;
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 our $MAP_PREFIX = 's';
 our $IDLENGTH   = 9;

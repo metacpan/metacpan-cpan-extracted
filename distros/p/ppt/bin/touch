@@ -1,14 +1,14 @@
 #!/usr/local/bin/perl -w
 
 #
-# $Id: touch,v 1.1.1.1 2001/06/06 08:55:17 sdague Exp $
+# $Id: touch,v 1.2 2004/08/05 14:17:44 cwest Exp $
 #
 # $Log: touch,v $
-# Revision 1.1.1.1  2001/06/06 08:55:17  sdague
-# initial import
+# Revision 1.2  2004/08/05 14:17:44  cwest
+# cleanup, new version number on website
 #
-# Revision 1.1  2001/05/14 00:49:40  sdague
-# added more files
+# Revision 1.1  2004/07/23 20:10:18  cwest
+# initial import
 #
 # Revision 1.1  1999/02/28 13:00:24  abigail
 # Initial revision
@@ -20,7 +20,7 @@ use Getopt::Std;
 
 sub parse_time ($);
 
-my ($VERSION) = '$Revision: 1.1.1.1 $' =~ /([.\d]+)/;
+my ($VERSION) = '$Revision: 1.2 $' =~ /([.\d]+)/;
 
 my $warnings = 0;
 
@@ -220,11 +220,11 @@ except for the I<-f> option.
 =head1 REVISION HISTORY
 
     $Log: touch,v $
-    Revision 1.1.1.1  2001/06/06 08:55:17  sdague
-    initial import
+    Revision 1.2  2004/08/05 14:17:44  cwest
+    cleanup, new version number on website
 
-    Revision 1.1  2001/05/14 00:49:40  sdague
-    added more files
+    Revision 1.1  2004/07/23 20:10:18  cwest
+    initial import
 
     Revision 1.1  1999/02/28 13:00:24  abigail
     Initial revision

@@ -1,0 +1,24 @@
+---
+abstract: 'Paste to http://hpaste.org, the Haskell paste site'
+author:
+  - "\"Dr Bean\""
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Nopaste-Service-Hpaste
+requires:
+  App::Nopaste::Service: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: http://search.cpan.org/dist/App-Nopaste-Service-Hpaste/
+  repository: http://svn.openfoundry.org/nopaste-hpaste
+version: 0.04

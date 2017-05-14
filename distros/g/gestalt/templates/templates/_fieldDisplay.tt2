@@ -1,0 +1,28 @@
+<!-- partial, used to display different field types in different ways. -->
+  [%- IF field.is_array -%]
+    [% ROW.$fieldName().join(',') | html_entity %]
+  [%- ELSE -%]
+    [%- IF field.type == 'character varying' || field.type == 'character' -%]
+      [% ROW.$fieldName() | html_entity %]
+    [%- ELSIF field.type == 'inet' || field.type == 'macaddr' || field.type == 'cidr' -%]
+      [% ROW.$fieldName() | html_entity %]
+    [%- ELSIF field.type == 'text' -%]
+      <p>[% ROW.$fieldName() | html_entity %]</p>
+    [%- ELSIF field.type == 'bigint' -%]
+      [% ROW.$fieldName() | html_entity %]
+    [%- ELSIF field.type == 'integer' -%]
+      [% ROW.$fieldName() | html_entity %]
+    [%- ELSIF field.type == 'smallint' -%]
+      [% ROW.$fieldName() | html_entity %]
+    [%- ELSIF field.type == 'date' -%]
+      [% ROW.$fieldName() | html_entity %]
+    [%- ELSIF field.type == 'boolean' %]
+        <input type="checkbox" class="checkbox" readonly=1 value="1"[% IF ROW.$fieldName() %] checked[% END %]>
+    [%- ELSIF field.type == 'bytea' -%]
+      <-- TODO: Provide a link to download binary data --> &nbsp;
+    [%- ELSIF field.type == 'bit' || field.type == 'bit varying' -%]
+      <-- TODO: Provide a link to download binary data --> &nbsp;
+    [%- ELSE -%]
+       (Unknown Type: [% field.type %]) [% ROW.$fieldName() | html_entity %]
+    [%- END -%]
+  [%- END -%]

@@ -1,0 +1,75 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Understanding Filter Interfaces
+
+H2: Overview
+
+H3: General Syntax
+
+The general syntax for using each filter is shown first.
+By convention, the filter is shown using the {{MAC:block}}
+and {{MAC:endblock}} macros, although filters can also be
+used with other macros, including {{MAC:include}} and {{MAC:execute}}.
+
+H3: Parameters
+
+If a filter has one or more optional parameters, these are listed
+in a table containing the following columns:
+
+* {{Name}} - the parameter name
+* {{Type}} - the parameter type
+* {{Rule}} - the pattern, if any, used to validate the value.
+
+H3: Parameter Types and Rules
+
+Parameter types and rules follow the same conventions
+as macro argument types and rules. Refer to
+{{SECT:Understanding Macro Interfaces}} for details.
+
+H2: Data Tables
+
+H3: Table Fields
+
+Providing data to a filter via a table is a common idiom in SDF as
+using tables makes it easy to add additional columns later on.
+
+If a filter expects a table of data in {{FMT:TBL}} format,
+the fields in the table of data are listed
+in a table containing the following columns:
+
+* {{Field}} - the field name
+* {{Category}} - {{key}}, {{mandatory}} or {{optional}}
+* {{Rule}} - the pattern, if any, used to validate the value.
+
+H3: Table Field Categories
+
+The supported table field categories are explained below.
+
+!block table
+Category        Description
+key             a unique value must be provided for each row
+mandatory       a value must be provided for each row
+optional        a value is optional
+!endblock
+
+H3: Validating Table Fields
+
+As validating table fields can reduce performance quite a bit,
+the {{CMD:sdf}} program doesn't validate them by default. To enable
+table field validation, use the -v option like this:
+
+V:  sdf -v99 ...
+
+Typically, this is only needed when a filter isn't working as you'd
+expect.

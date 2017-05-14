@@ -1,7 +1,7 @@
 package DBIx::Class::Migration::PostgresqlSandbox;
 
 use Moose;
-use Test::postgresql;
+use Test::PostgreSQL;
 use File::Spec::Functions 'catdir', 'catfile';
 use File::Path 'mkpath';
 use POSIX qw(SIGINT);
@@ -35,8 +35,8 @@ sub _build_test_postgresql {
   my %config = (
     auto_start => $auto_start,
     base_dir => $base_dir,
-    initdb_args => $Test::postgresql::Defaults{initdb_args},
-    postmaster_args => $Test::postgresql::Defaults{postmaster_args});
+    initdb_args => $Test::PostgreSQL::Defaults{initdb_args},
+    postmaster_args => $Test::PostgreSQL::Defaults{postmaster_args});
 
   unless($auto_start) {
     open ( my $pid_fh, '<', catdir($base_dir, 'data','postmaster.pid')) ||
@@ -46,10 +46,10 @@ sub _build_test_postgresql {
     $config{port} = $lines[3];
   }
 
-  if(my $testdb = Test::postgresql->new(%config)) {
+  if(my $testdb = Test::PostgreSQL->new(%config)) {
     return $testdb;
   } else {
-    die $Test::postgresql::errstr;
+    die $Test::PostgreSQL::errstr;
   }
 }
 
@@ -119,6 +119,54 @@ USE
   chmod oct("0755"), catfile($bin, 'use');
 }
 
+sub _write_dump {
+  my $base_dir = (my $self = shift)->test_postgresql->base_dir;
+  mkpath(my $bin = catdir($base_dir, 'bin'));
+  open( my $fh, '>', catfile($bin, 'dump'))
+    || die "Cannot open $bin/dump: $!";
+
+  my $test_postgresql = $self->test_postgresql;
+  my $postmaster = $test_postgresql->{postmaster};
+  my $psql = $postmaster;
+  $psql =~s/postmaster$/pg_dump/; # ugg
+  my $port = $test_postgresql->{port};
+
+  print $fh <<USE;
+#!/usr/bin/env sh
+
+$psql -h localhost --user postgres --port $port \$@
+USE
+
+  close($fh);
+
+  chmod oct("0755"), catfile($bin, 'dump');
+}
+
+sub _write_config {
+  my $base_dir = (my $self = shift)->test_postgresql->base_dir;
+  mkpath(my $bin = catdir($base_dir, 'bin'));
+  open( my $fh, '>', catfile($bin, 'config'))
+    || die "Cannot open $bin/config $!";
+
+  my $test_postgresql = $self->test_postgresql;
+  my $postmaster = $test_postgresql->{postmaster};
+  my $psql = $postmaster;
+  $psql =~s/postmaster$/pg_dump/; # ugg
+  my $port = $test_postgresql->{port};
+
+  print $fh <<USE;
+#!/usr/bin/env perl
+
+my \$connect_info => { dsn => 'DBI:Pg:dbname=template1;host=localhost;port=$port', user => 'postgres', password => '' }
+
+USE
+
+  close($fh);
+
+  chmod oct("0755"), catfile($bin, 'config');
+}
+
+
 sub make_sandbox {
   my $self = shift;
   my $base_dir = $self->_generate_sandbox_dir;
@@ -127,6 +175,9 @@ sub make_sandbox {
     $self->_write_start;
     $self->_write_stop;
     $self->_write_use;
+    $self->_write_dump;
+    $self->_write_config;
+
     my $port = $self->test_postgresql->port;
     return "DBI:Pg:dbname=template1;host=127.0.0.1;port=$port",'postgres','';
   } else {
@@ -137,7 +188,9 @@ sub make_sandbox {
 ## I have to stop the database manually, not sure why, something borks 
 ## postgresql when SQLT->translate in DBIC-DH is called.
 
-sub DEMOLISH { shift->test_postgresql->stop(SIGINT) }
+#sub DEMOLISH { shift->test_postgresql->stop(SIGINT) }
+
+# ^ 03/04/2015 commenting this out since I 'think' its not an issue anymore
 
 __PACKAGE__->meta->make_immutable;
 
@@ -160,7 +213,7 @@ DBIx::Class::Migration::PostgresqlSandbox - Autocreate a postgresql sandbox
 
 This automatically creates a postgresql sandbox in your C<target_dir> that you can
 use for initial prototyping, development and demonstration.  If you want to
-use this, you will need to add L<Test::postgresql> to your C<Makefile.PL> or your
+use this, you will need to add L<Test::PostgreSQL> to your C<Makefile.PL> or your
 C<dist.ini> file, and get that installed properly.  It also requires that you
 have Postgresql installed locally (although Postgresql does not need to be running, as
 long as we can find in $PATH the binary installation).  If your copy of Postgresql
@@ -177,9 +230,11 @@ above permanent.
 NOTE: You might find installing L<DBD::Pg> to be easier if you edit the
 C<$PATH> before trying to install it.
 
-In addition to the Postgresql sandbox, we create three helper scripts C<start>,
+In addition to the Postgresql sandbox, we create several helper scripts C<start>,
 C<stop> and C<use> which can be used to start, stop and open shell level access
-to you mysql sandbox.
+to you mysql sandbox.  C<dump> lets you easily access pg_dump and C<config> is
+a Perl library that returns a hashref of the connection info, which is suitable
+to use in L<DBIx::Class> Schema connect.
 
 These helper scripts will be located in a child directory of your C<target_dir>
 (which defaults to C<share> under your project root directory).  For example:
@@ -199,6 +254,8 @@ If your schema class is C<MyApp::Schema> you should see helper scripts like
         /fixtures
         /myapp-schema
           /bin
+            config
+            dump
             start
             stop
             use
@@ -211,7 +268,7 @@ queries).
 
 =head1 SEE ALSO
 
-L<DBIx::Class::Migration>, L<DBD::Pg>, L<Test::postgresql>.
+L<DBIx::Class::Migration>, L<DBD::Pg>, L<Test::PostgreSQL>.
 
 =head1 AUTHOR
 

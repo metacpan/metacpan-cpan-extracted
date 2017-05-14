@@ -3,5 +3,4 @@
   output: [[ foo ]];
   output: [ foo ];
   output: [ foo ];
-  output: ['[ foo ]'];
-}
+  output: ['[ foo ]']; }

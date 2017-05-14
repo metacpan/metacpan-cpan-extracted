@@ -1,0 +1,8 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+invalid_error_type
+	Don't know what to do with the type of $EVAL_ERROR.
+	﻿Type: '%s'.

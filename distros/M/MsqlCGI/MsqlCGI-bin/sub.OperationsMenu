@@ -1,0 +1,141 @@
+#####################################################################
+# package OpsMenu
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to setting up the menu for adding or modifying/deleting a
+# record...
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package OpsMenu;
+
+#####################################################################
+# sub SetupOpsMenu.  
+#
+# This function sets up the "Operations Menu".  This function should be
+# bypassed if there is no 'Create" privlidges to the database because
+# there are currently only 2 options: Create and Find.
+#####################################################################
+sub main::SetupOpsMenu {
+  local ( $file ) = @_;
+  &main::DPrint ( "In SetupOpsMenu: $file, $main::tableInfo, $main::tData" );
+
+  if ( $main::tableInfo->{'OperationsMenuTemplate'} ) {
+    &main::DPrint ( "In OperationsMenuTemplate" );
+    &Template::DoTemplate ( $main::tableInfo->{'OperationsMenuTemplate'},
+    		           "OPERATIONS_MENU", $sth);
+    
+  } else {
+    print <<"    EOF";
+    <title>MsqlCGI: Operations Menu</title>
+    <h2 align=center>MsqlCGI: Operations Menu</h2>
+
+    This is the MsqlCGI Operations Menu.  Depending on the permissions on
+    the database and table, you can choose to create a new record or search
+    for a record and perform operations upon those records.<p>
+  
+    EOF
+    print &DoStandardAction ( $sth );
+    print &Template::GetHTMLFooter( $main::tableInfo );
+  }
+}
+
+sub DoStandardAction {
+  my ( $sth ) = @_;
+  my ( $strRet ) =  "";
+    	# we don't have a Template to use, so use the default page
+      # generation algorithm.
+
+      # If we have create permissions, show the "Create part of the form".
+  if ( $main::tableInfo->{'AllowCreate'} ) {
+    $strRet .= <<"    EOF";
+
+    <h3>Create Record</h3>
+    You can Create a new record for the database by clicking on the
+    button below.  You will be taken to a screen which will ask you for
+    more information about the new record.
+    EOF
+
+    $strRet .= "<center>\n" . 
+	  &DoRecordCreateSetup() .
+	  "</center>\n";
+
+  }
+  
+      # If we can display, modify or delete records, we need to setup
+      # the search screen.
+  if ( ( $main::tableInfo->{'AllowDisplay'} ) || 
+       ( $main::tableInfo->{'AllowModify'} ) ||
+       ( $main::tableInfo->{'AllowDelete'} ) ) {
+
+    $strFind = "";
+    $strFind .= "Find" if ( $main::tableInfo->{'AllowDisplay'} );
+    $strFind .= ", Modify" if ( $main::tableInfo->{'AllowModify'} );
+    $strFind .= ", Delete" if ( $main::tableInfo->{'AllowDelete'} );
+
+    $strRet .= <<"    EOF";
+
+    <h3>$strFind Existing Records</h3>
+    You can $strFind existing records in the table by clicking on the
+    button below.  You will be taken to a screen which will let you
+    search through the table for the records you would like to
+    $strFind.
+    EOF
+
+    $strRet .= "<center>\n" . 
+	  &DoRecordSearchSetup() .
+	  "</center>\n";
+  }
+  return $strRet;
+}
+
+#####################################################################
+# DoRecordCreateSetup
+#
+# this just returns out the link that will bring us to the RecordSearch
+# page.  This function is normally called internally or by a
+# $stdInfo(RecordCreateSetup) token in a template file.
+#####################################################################
+sub DoRecordCreateSetup {
+  if ( $main::tableInfo->{'AllowCreate'} ) {
+    $strRet = &Template::GetCGIHeader ( "RecordCreateReq" );
+    $strRet .= <<"    EOF";
+
+      <input type=submit value="Create New Record">
+    </form>
+
+    EOF
+  }
+  return $strRet;
+}
+
+#####################################################################
+# DoRecordSearchSetup
+#
+# this just prints out the link that will bring us to the RecordSearch
+# page.  This function is normally called internally or by a
+# $stdInfo(RecordSearchSetup) token in a template file.
+#####################################################################
+sub DoRecordSearchSetup {
+  $strFind = "";
+  $strFind .= "Find" if ( $main::tableInfo->{'AllowDisplay'} );
+  $strFind .= ", Modify" if ( $main::tableInfo->{'AllowModify'} );
+  $strFind .= ", Delete" if ( $main::tableInfo->{'AllowDelete'} );
+
+  if ( ( $main::tableInfo->{'AllowDisplay'} ) || 
+       ( $main::tableInfo->{'AllowModify'} ) ||
+       ( $main::tableInfo->{'AllowDelete'} ) ) {
+    $strRet = &Template::GetCGIHeader ( "RecordSearchReq" );
+    $strRet .=<<"    EOF";
+
+      <input type=submit value="$strFind an Existing Record">
+    </form>
+
+    EOF
+  }
+  return $strRet;
+}
+
+1;

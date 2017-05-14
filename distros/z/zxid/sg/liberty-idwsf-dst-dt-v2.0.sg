@@ -1,0 +1,52 @@
+# zxid/sg/liberty-idwsf-dst-dt-v2.0.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-dst-dt-v2.0.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+# N.B. This schema is meant to be included from other schemas. It is not standalone.
+
+#import(md, urn:liberty:metadata:2004-12,liberty-metadata-v2.0.xsd)
+#import(http://www.w3.org/XML/1998/namespace,http://www.w3.org/2001/xml.xsd)
+include(liberty-idwsf-utility-v2.0.xsd)
+
+@id	 -> %IDType
+@modificationTime	 -> %xs:dateTime
+&@commonAttributes: 
+  @id?
+  @modificationTime?
+  ;
+@ACC	 -> %xs:anyURI
+@ACCTime	 -> %xs:dateTime
+@modifier	 -> %xs:string     #%md:entityIDType
+&@leafAttributes: 
+  &@commonAttributes
+  @ACC?
+  @ACCTime?
+  @modifier?
+  ;
+@script	 -> %xs:anyURI
+&@localizedLeafAttributes: 
+  &@leafAttributes
+  @xml:lang
+  @script?
+  ;
+@refreshOnOrAfter	 -> %xs:dateTime
+@destroyOnOrAfter	 -> %xs:dateTime
+%DSTLocalizedString:	 base(xs:string)
+  &@localizedLeafAttributes
+  ;
+%DSTString:	 base(xs:string)
+  &@leafAttributes
+  ;
+%DSTInteger:	 base(xs:integer)
+  &@leafAttributes
+  ;
+%DSTURI:	 base(xs:anyURI)
+  &@leafAttributes
+  ;
+%DSTDate:	 base(xs:date)
+  &@leafAttributes
+  ;
+%DSTMonthDay:	 base(xs:gMonthDay)
+  &@leafAttributes
+  ;
+
+#EOF

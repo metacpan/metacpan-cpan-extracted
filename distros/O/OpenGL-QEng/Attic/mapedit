@@ -1,0 +1,288 @@
+eval 'exec perl -S $0 ${1+"$@"}' # -*-Perl-*-
+  if $running_under_some_shell;
+###  $Id: mapedit 324 2008-07-23 19:42:43Z duncan $
+####------------------------------------------
+
+## @file
+# Tool to allow initial creation of maps.
+
+## @class main
+# main class for mapedit
+
+###
+### AUTHORS
+##   John D. Overmars overmars@rejiquar.com,
+##   and Rob Duncan duncan@rejiquar.com
+##
+## COPYRIGHT
+##   Copyright 2008 John D. Overmars and Rob Duncan, All rights reserved.
+## 
+## LICENSE
+##   This software is provided under the Perl Artistic License.  It may be 
+##   distributed, and revised according to the terms of that license.
+##
+
+package main;
+use strict;
+use warnings;
+
+use Tk;
+
+use lib ('lib');
+
+use GameState;
+use Level;
+use Map;
+use ShowSite;
+use tkOverview;
+use Wall;
+
+###############################################################
+##                                                           ##
+##                   Create Game Objects                     ##
+##                                                           ##
+###############################################################
+# Create an empty game
+my $game = GameState->new;
+
+###############################################################
+##                                                           ##
+##                  Read in Game or Map                      ##
+##                                                           ##
+###############################################################
+
+{my $file = shift @ARGV;
+
+ if (defined($file)) {
+  #XXX load($self,$filename,$want_map,$x,$z,$yaw);
+   $game->load($file);
+ } else {
+   ## Get size from user before bringing up GUI windows
+   my $width = input("Map Width: ");
+   my $height = input("Map Height: ");
+   # Round map dimensions up to multiples of 8
+   $width = 8*int(($width+7)/8);
+   $height = 8*int(($height+7)/8);
+
+   my $map = Map->new(xsize=>$width, zsize=>$height);
+   $game->add_map($map,"map_${width}_${height}.txt");
+   add(Level->new(xsize=>$width, zsize=>$height));
+   add(Level->new(xsize=>$width, zsize=>$height, y=>8, texture=>'sand'));
+
+  # Force perimeter walls
+   for (my $w=0;$w<$width; $w+=8) {
+     add(Wall->new(x=>$w,z=>0,yaw=>0)); 
+     add(Wall->new(z=>$height,x=>$w,yaw=>0));
+   }
+   for (my $h=0;$h<$height; $h+=8) {
+     add(Wall->new(z=>$h,x=>0,yaw=>270)); 
+     add(Wall->new(z=>$h,x=>$width,yaw=>270
+		   ));
+   }
+ }
+}
+
+###############################################################
+##                                                           ##
+##                  Create Tk User Interface                 ##
+##                                                           ##
+###############################################################
+my $mw;
+my $inventory;
+my $overview;
+my $contObj;
+
+#share Tk size info
+sub ovSize {400}
+
+# Tk Frame sizes
+my $fullHeight     = 650;
+my $fullWidth      = 700;
+my $topWidth       = $fullWidth;
+my $topHeight      = ovSize;
+my $topLeftWidth   = ovSize;
+my $topLeftHeight  = ovSize;
+my $topRightWidth  = $topWidth - $topLeftWidth;
+my $topRightHeight = $topLeftHeight;
+my $bottomHeight   = $fullHeight - $topHeight;
+my $bottomWidth    = $topWidth;
+
+my @frames;
+
+$mw = MainWindow->new(-title=>'Quest Control',
+		      -height=>$fullHeight, -width=> $fullWidth,
+		     );
+my $id = $mw->WindowId;
+$mw->withdraw;
+$mw->MoveToplevelWindow(100,400);
+
+my $topFrame = $mw->Frame(-height=>$topHeight,-width=>$topWidth
+			 )->grid(-row=>0,-column=>0);
+my $leftFrame = $topFrame->Frame(-height=>$topLeftHeight,
+				 -width=>$topLeftWidth
+				)->grid(-row=>0,-column=>0);
+my $rightFrame = $topFrame->Frame(-height=>$topRightHeight,
+				  -width=> $topRightWidth
+				 )->grid(-row=>0,-column=>1);
+my $bottomFrame = $mw->Frame(-height=>$bottomHeight,-width=>$bottomWidth
+			    )->grid(-row=>1,-column=>0);
+my $base3 = $rightFrame->Frame(-height=>$topRightHeight,
+			       -width=> $topRightWidth,
+			       -relief=>'sunken', -bd=>2
+			      )->grid(-row=>0,-column=>0);
+my $base1 = $leftFrame->Frame(-height=>$topLeftHeight, -width=> $topLeftWidth,
+			      -relief=>'sunken', -bd=>2
+			     )->grid(-row=>0,-column=>0);
+my $base2 = $bottomFrame->Frame(-height=>40, -width=> $bottomWidth,
+			      -bd=>2)->grid(-row=>0,-column=>0);
+
+# Create a gvoice object
+
+my $base4 = $bottomFrame->Frame(-height=>$bottomHeight-40,
+				-width=> $bottomWidth,
+				-relief=>'sunken', -bd=>2
+			       )->grid(-row=>1,-column=>0);
+my $base5 = $bottomFrame->Frame(-height=>$bottomHeight-40,
+				-width=> $bottomWidth,
+				-relief=>'sunken', -bd=>2
+			       )->grid(-row=>2,-column=>0);
+
+$overview = Overview->new(root=>$base1, size=>ovSize, onclick=>\&mapClick,
+			  showUnseen=>1);
+
+#$inventory = Inventory->new;
+$mw->update;
+
+$overview->drawMap($game->currmap,$base1);
+$overview->setupMapView($game->currmap);
+$overview->drawMapView;
+my $showSite = ShowSite->new($base3,$base4);
+
+$base5->Button(-text => 'Load', 
+	       -command => \&doLoad)->grid(-row=>0,-column=>0);
+$base5->Button(-text => 'Quit', 
+	       -command => \&Tk::exit)->grid(-row=>0,-column=>1);
+$base5->Button(-text => 'Save', 
+	       -command => \&doSave)->grid(-row=>0,-column=>2);
+
+$mw->Popup;
+$mw->raise;
+Tk::MainLoop();
+
+###############################################################
+##                                                           ##
+##         Tk Support Functions for Running the Game         ##
+##                                                           ##
+###############################################################
+
+sub doLoad {
+  print "Not Yet Implemented\n";
+}
+
+#--------------------------------------------------------
+sub doSave {
+  local *STDOUT;
+  open STDOUT,'>','newMap.txt' or die "Unable to redirect STDOUT";
+  $game->currmap->printMe;
+  $mw->messageBox(-icon    => 'info',
+		  -type    => 'OK',
+		  -title   => 'Message',
+		  -message => 'Map saved to file "newMap.txt"',
+		 );
+}
+
+#-------------------------------------------------------------
+
+## search the map for things within dist of the given x,y
+sub findNear {
+  my ($self, $x, $z, $dist) = @_;
+
+  my $dSq = $dist*$dist;
+  my @list =();
+
+  for my $thing (@{$self->currmap->contains}) {
+    my $distSq = ($x -$thing->x)*($x -$thing->x)+
+      ($z -$thing->z)*($z -$thing->z);
+    if (0) {
+      warn $thing,', ',$distSq,', ',$dSq;
+      if (ref($thing) eq 'Character') {
+	warn $z;
+	warn $thing->z;
+	warn $x;
+	warn $thing->x;
+      }
+    }
+    next if $distSq >$dSq;
+    push(@list, $thing);
+  }
+  if (0) {
+  print ">>\n";
+  for my $i (@list) {
+    my $yaw = $i->yaw;
+    my $x = $i->x;
+    my $z = $i->z;
+    print "$i at $x,$z yaw $yaw\n";
+  }
+}
+  return @list;
+}
+
+#---------------------------------------------------------------------
+sub mapClick {
+  my ($x,$z) = @_;
+  my @list = findNear($game,$x,$z,6);
+  $overview->setupMapView($game->currmap);
+  $overview->drawMapView;
+  $overview->showSpot($x,$z,'orange');
+  $showSite->showSite($x,$z,@list);
+}
+
+#--------------------------------------------------------
+sub remove {
+  my $thing = shift @_;
+  $thing = $game->currmap->find_thing($thing) unless ref($thing);
+  $game->currmap->take_thing($thing);
+  $overview->drawMap($game->currmap);
+}
+
+#--------------------------------------------------------
+sub add {
+  my $thing = shift @_;
+  $game->currmap->put_thing($thing,1);
+  if (defined ($overview)) {
+    $overview->drawMap($game->currmap);
+    $overview->setupMapView($game->currmap);
+    $overview->drawMapView;
+  }
+}
+
+#--------------------------------------------------------
+# /**
+# Read prompted user input
+# */
+sub input {
+  print STDOUT shift;
+  chomp(my $inp = <STDIN>);
+  $inp;
+}
+
+#------------------------------------------------------------
+
+=head1 Name
+
+mapedit - Tool to initially create Quests maps
+
+=head2 Running mapedit
+
+The command "./mapedit" runs the tool
+
+Enter the sizes for the map and pick spots on the map to add items or edit
+
+=head2 Generating New Scenarios for Quest
+
+Building map files is described in class Map and in page Map Items
+
+Add char and logic to start map to enter new scenario
+
+
+=cut

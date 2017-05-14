@@ -37,10 +37,6 @@ sub post_form {
 sub post {
     my ($self, $url, $body, $headers) = @_;
     my $res = $self->_client->post($url, %$headers, Content => $body);
-    if ($self->debug) {
-        use Data::Dumper;
-        print STDERR Dumper($res)."\n";
-    }
     $res->code, $self->_get_headers($res), $res->content;
 }
 

@@ -1,0 +1,49 @@
+<tmpl_include header.tmpl>
+
+<tmpl_var form_start>
+
+<table>
+	<thead>
+		<th></th>
+		<th>ID</th>
+		<th>System</th>
+		<th>Vendor</th>
+		<th>CVV</th>
+		<th>VALID</th>
+	</thead>
+	<tbody>
+		<tmpl_loop u_card><tr>
+			<td><input type="checkbox" id="s_<tmpl_var id>" name="s_<tmpl_var id>" /></td>
+			<td><a href="#set" onclick="setform(document.forms[0],'<tmpl_var id>','<tmpl_var sys>','<tmpl_var vendor>','<tmpl_var cvv>','<tmpl_var valid>')"><tmpl_var id></a></td>
+			<td><tmpl_var sys></td>
+			<td><tmpl_var vendor></td>
+			<td><tmpl_var cvv></td>
+			<td><tmpl_var valid></td>
+		</tr></tmpl_loop>
+	</tbody>
+</table>
+
+<input class="<tmpl_var styleclass>_button" type="submit" value="Delete" onclick="this.form.submit_action.value='delete'" />
+<p/>
+<table class="inline">
+	<tr><td>ID</td><td><tmpl_var field_id></td></tr>
+	<tr><td>System</td><td><tmpl_var field_sys></td></tr>
+	<tr><td>Vendor</td><td><tmpl_var field_vendor></td></tr>
+	<tr><td>CVV</td><td><tmpl_var field_cvv></td></tr>
+	<tr><td>Valid</td><td><tmpl_var field_valid> (MM/YY)</td></tr>
+</table>
+<input class="<tmpl_var styleclass>_button" type="submit" value="Add/Modify" />
+
+<tmpl_var form_end>
+
+<script><!--
+function setform (f,id,sys,vendor,cvv,valid) {
+	f.id.value = id;
+	f.sys.value = sys;
+	f.vendor.value = vendor;
+	f.cvv.value = cvv;
+	f.valid.value = valid;
+}
+--></script>
+
+<tmpl_include footer.tmpl>

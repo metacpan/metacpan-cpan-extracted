@@ -1,0 +1,132 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.001beta1</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="rn_sdf.html">Previous Topic</A> | <A HREF="2000.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1. 2.001beta1</H1>
+<P ALIGN="Left"><A HREF="#2.001beta1 - Enhancements">Enhancements</A> | <A HREF="#2.001beta1 - Fixes">Fixes</A> | <A HREF="#2.001beta1 - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.001beta1 - Enhancements">1.1. Enhancements</A></H2>
+<P>The enhancements are:</P>
+<UL>
+<A HREF="2001b1.html#Better documentation">Better documentation</A>
+<BR>
+<A HREF="2001b1.html#build_title enhancements">build_title enhancements</A>
+<BR>
+<A HREF="2001b1.html#Library search path">Library search path</A>
+<BR>
+<A HREF="2001b1.html#Improved searching rules">Improved searching rules</A>
+<BR>
+<A HREF="2001b1.html#Pretty printing enhancements">Pretty printing enhancements</A>
+<BR>
+<A HREF="2001b1.html#Localisation improvements">Localisation improvements</A>
+<BR>
+<A HREF="2001b1.html#New verbose levels and debug tracing">New verbose levels and debug tracing</A>
+<BR>
+<A HREF="2001b1.html#Miscellaneous stuff">Miscellaneous stuff</A></UL>
+<H3><A NAME="Better documentation">1.1.1. Better documentation</A></H3>
+<P>The <A HREF="../quickref/qr_sdf.html">SDF Quick Reference</A> has been greatly improved. It now documents 95% of SDF's features rather than the 10% of features most frequently used.</P>
+<H3><A NAME="build_title enhancements">1.1.2. build_title enhancements</A></H3>
+<P>If DOC_CODE is set and DOC_NAME is not set, <A HREF="../ref/mbuild_t.html">build_title</A> will now lookup DOC_NAME via <EM>references</EM> data if it can.</P>
+<P>The separator between DOC_CODE and DOC_VERSION in DOC_ID can now be controlled by setting DOC_ID_SEP. The default value is '.'.</P>
+<H3><A NAME="Library search path">1.1.3. Library search path</A></H3>
+<P>Previously, libraries had to be placed in the <TT>perllib/sdf/home</TT> directory. Now, <A HREF="../ref/sdf.html">sdf</A>'s new -Y option can be used to specify a comma-separated list of directories to search for libraries. For example, if you want <A HREF="../ref/sdf.html">sdf</A> to search <TT>c:\mysdflib</TT> and <TT>c:\</TT> for libraries on a MS-DOS/Windows system, the command is:</P>
+<PRE>
+  sdf -Yc:\mysdflib,c:\ ...
+</PRE>
+<P>If your search path for libraries is always the same, the <TT>SDFOPTS</TT> environment variable can be used, e.g. the following sequence of commands will have the same effect as above:</P>
+<PRE>
+  set SDFOPTS=-Yc:\mysdflib,c:\
+  sdf ...
+</PRE>
+<H3><A NAME="Improved searching rules">1.1.4. Improved searching rules</A></H3>
+<P>Previously, libraries had to be placed in a fixed location but modules used the same search rules as normal files. Now that <A HREF="../ref/sdf.html">sdf</A> supports a library search path, libraries, modules and normal files have different search rules. The new rules are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>File type</STRONG>
+</TD>
+<TD>
+<STRONG>Directories searched</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+libraries
+</TD>
+<TD>
+current directory, document's directory, directories on the library path, <TT>perllib/sdf/home</TT>
+</TD>
+</TR>
+<TR>
+<TD>
+modules
+</TD>
+<TD>
+current directory, document's directory, directories on the module path, <TT>perllib/sdf/home</TT>, <TT>perllib/sdf/home/stdlib</TT>
+</TD>
+</TR>
+<TR>
+<TD>
+normal files
+</TD>
+<TD>
+current directory, document's directory, directories on the include path, <TT>perllib/sdf/home</TT>
+</TD>
+</TR>
+</TABLE>
+
+<P>The library path and the module path are initialised by <A HREF="../ref/sdf.html">sdf</A>'s -Y option. The include path is initialised by <A HREF="../ref/sdf.html">sdf</A>'s -I option. Inheriting a library (via a configuration library or the <A HREF="../ref/minherit.html">inherit</A> macro) appends the library's directory to the module path and the include path.</P>
+<H3><A NAME="Pretty printing enhancements">1.1.5. Pretty printing enhancements</A></H3>
+<P>Language names are now case insensitive. The keywords for Perl, Java and IDL have also been improved. Python support has been added.</P>
+<H3><A NAME="Localisation improvements">1.1.6. Localisation improvements</A></H3>
+<P>Strings within dates and times can now be localised using the <A HREF="../ref/fdatestr.html">datestrings</A> filter. See <TT>en_au.sdl</TT> for an example.</P>
+<P>A Czech locale (cz_cz) is now provided (although it doesn't have localised date strings yet).</P>
+<H3><A NAME="New verbose levels and debug tracing">1.1.7. New verbose levels and debug tracing</A></H3>
+<P><A HREF="../ref/sdf.html">sdf</A>'s -v option now supports additional verbose levels:</P>
+<UL>
+2 - show how names of files and libraries are resolved
+<BR>
+3 - show the directories searched for libraries
+<BR>
+4 - show the directories searched for modules
+<BR>
+5 - show the directories searched for normal files.</UL>
+<P>As before, level 1 shows the post-processing actions and leaves intermediate files around.</P>
+<P>In addition, <A HREF="../ref/sdf.html">sdf</A>'s new -T option can be used to switch on debug tracing. The parameter is a comma-separated list of name-value pairs where each name is a <EM>tracing group</EM> and each value is the level of tracing for that group. To get the trace output provided by the -v option, one can use the <EM>user</EM> group like this:</P>
+<PRE>
+  sdf -Tuser=2 ...
+</PRE>
+<P>This is slightly different from the -v option in that intermediate files are not implicitly kept. Additional tracing groups will be added over time (probably one per output driver).</P>
+<H3><A NAME="Miscellaneous stuff">1.1.8. Miscellaneous stuff</A></H3>
+<P>Class filters now support a <EM>variables</EM> parameter which implicitly defines a variable for each object. The variable name is the same as the object name with non-alphanumeric characters replaced with '_'. (This feature should simplify configuration libraries for projects.)</P>
+<P>The <A HREF="../ref/mjumps.html">jumps</A> macro has been introduced as a more convenient form of the <A HREF="../ref/msubsect.html">subsections</A> macro. (This feature should simplify web pages for projects.)</P>
+<P>KP and KN have been added as paragraph styles. These are shorthands for N[keep_prev] and N[keep_next] respectively.</P>
+<P>SUB and SUP have been introduced as phrase styles for subscripts and superscripts respectively. (Consider these experimental features for now, as I haven't had a chance to test them.)</P>
+<HR>
+<H2><A NAME="2.001beta1 - Fixes">1.2. Fixes</A></H2>
+<P>The <EM>SDF Templates</EM> link on the home page included in the distribution now points to the SDF web site as it should.</P>
+<P>Mac filename handling should finally be ok now. (However, installation instructions for the Mac are yet to be added.)</P>
+<P>Minor corrections have been made to the <A HREF="../user/ug_sdf.html">SDF User Guide</A>.</P>
+<P>The conversion of PRN files to GIF files has been improved: a margin is no longer added as ps2gif is prone to incorrectly make it black.</P>
+<P>Books generated with the <EM>fancy</EM> look now have a correctly formatted table of contents.</P>
+<P>Java pretty printing has been fixed.</P>
+<HR>
+<H2><A NAME="2.001beta1 - Incompatibilities">1.3. Incompatibilities</A></H2>
+<P>The <SECT>Improved search rules</SECT> may introduce some unexpected incompatibilities, particularly if custom file searching was implemented. Previously, advanced users could customise the search rules (to integrate a configuration management system, say) by overriding the <EM>FindFile</EM> subroutine. The default <EM>FindFile</EM> subroutine no longer searches <TT>perllib/sdf/home/stdlib</TT>, but otherwise, the search rule for normal files has not changed so custom <EM>FindFile</EM> routines should still hopefully work. The new routine called <EM>FileModule</EM> will need to be overriden if your custom <EM>FindFile</EM> is also needed for finding modules (or similar things like <EM>sdg</EM>, <EM>sdr</EM> and <EM>sdp</EM> files).</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="rn_sdf.html">Previous Topic</A> | <A HREF="2000.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

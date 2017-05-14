@@ -31,7 +31,7 @@ use DateTime::TimeZone::Local::Unix;
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ around BUILDARGS => sub {
     my $args  = $class->$orig(@_);
 
     # Grrr.  Gotta avoid passing undefs to Moose
-    my @chrome_attrs = qw(verbose quiet color);
+    my @chrome_attrs = qw(verbose quiet no_color);
     my %chrome_args = map { $_ => delete $args->{$_} }
         grep { exists $args->{$_} } @chrome_attrs;
 
@@ -78,17 +78,14 @@ sub run {
     # Divert all warnings through our chrome
     local $SIG{__WARN__} = sub { $self->warning($_) for @_ };
 
-    # Convert hash refs to plain hash
-    @action_args = %{$action_args[0]} if @action_args == 1 and ref $action_args[0];
-
     my $result = try {
 
-        $self->repo->assert_sanity_ok;
-	$self->repo->assert_version_ok;
-
         my $action = $self->create_action( $action_name => @action_args );
+        my $lock_type = $action->lock_type;
 
-        $self->repo->lock( $action->lock_type );
+        $self->repo->assert_sanity_ok;
+        $self->repo->assert_version_ok;
+        $self->repo->lock($lock_type);
 
         $action->execute;
     }
@@ -144,7 +141,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer cpan testmatrix url annocpan anno bugtracker rt
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn cpan testmatrix url annocpan anno bugtracker rt
 cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
@@ -153,7 +153,7 @@ Pinto - Curate a repository of Perl modules
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 SYNOPSIS
 
@@ -167,12 +167,12 @@ L<Stratopan|http://stratopan.com> for hosting your Pinto repository in the cloud
 
 =head1 DESCRIPTION
 
-Pinto is an application for creating and managing a custom CPAN-like
-repository of Perl modules.  The purpose of such a repository is to
-provide a stable, curated stack of dependencies from which you can
-reliably build, test, and deploy your application using the standard
-Perl tool chain. Pinto supports various operations for gathering and
-managing distribution dependencies within the repository, so that you
+Pinto is an application for creating and managing a custom CPAN-like 
+repository of Perl modules.  The purpose of such a repository is to 
+provide a stable, curated stack of dependencies from which you can 
+reliably build, test, and deploy your application using the standard 
+Perl tool chain. Pinto supports various operations for gathering and 
+managing distribution dependencies within the repository, so that you 
 can control precisely which dependencies go into your application.
 
 =head1 FEATURES
@@ -308,7 +308,7 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.cpanauthors.org/dist/Pinto>
+L<http://cpants.perl.org/dist/overview/Pinto>
 
 =item *
 
@@ -369,8 +369,6 @@ L<https://github.com/thaljef/Pinto>
 
 =head1 CONTRIBUTORS
 
-=for stopwords BenRifkah Bergsten-Buret Karen Etheridge Michael G. Schwern Jemmeson Mike Raynham Nikolay Martynov Oleg Gashev Steffen Schwigon Tommy Stanton Wolfgang Kinkeldei Yanick Champoux Boris Däppen brian d foy hesco popl Chris Kirke Cory G Watson David Steinbrunner Florian Ragwitz Glenn Fowler Jakob Voss Jeffrey Ryan Thalhammer Kahlil (Kal) Hodgson
-
 =over 4
 
 =item *
@@ -379,23 +377,35 @@ BenRifkah Bergsten-Buret <mail.spammagnet+github@gmail.com>
 
 =item *
 
+Boris Däppen <bdaeppen.perl@gmail.com>
+
+=item *
+
+Cory G Watson <gphat@onemogin.com>
+
+=item *
+
+David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Glenn Fowler <cebjyre@cpan.org>
+
+=item *
+
+Jakob Voss <jakob@nichtich.de>
+
+=item *
+
+Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
+
+=item *
+
 Karen Etheridge <ether@cpan.org>
 
 =item *
 
 Michael G. Schwern <schwern@pobox.com>
-
-=item *
-
-Michael Jemmeson <mjemmeson@cpan.org>
-
-=item *
-
-Mike Raynham <mike.raynham@spareroom.co.uk>
-
-=item *
-
-Nikolay Martynov <mar.kolya@gmail.com>
 
 =item *
 
@@ -419,51 +429,11 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =item *
 
-Boris Däppen <bdaeppen.perl@gmail.com>
-
-=item *
-
-brian d foy <brian.d.foy@gmail.com>
-
-=item *
-
 hesco <hesco@campaignfoundations.com>
 
 =item *
 
 popl <popl_likes_to_code@yahoo.com>
-
-=item *
-
-Chris Kirke <chris.kirke@gmail.com>
-
-=item *
-
-Cory G Watson <gphat@onemogin.com>
-
-=item *
-
-David Steinbrunner <dsteinbrunner@pobox.com>
-
-=item *
-
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
-Glenn Fowler <cebjyre@cpan.org>
-
-=item *
-
-Jakob Voss <jakob@nichtich.de>
-
-=item *
-
-Jeffrey Ryan Thalhammer <jeff@thaljef.org>
-
-=item *
-
-Kahlil (Kal) Hodgson <kahlil.hodgson@dealmax.com.au>
 
 =back
 
@@ -473,7 +443,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WWW/Delicious/Simple.pm
+t/01-load.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,180 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Object Management</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_libr.html">Previous Topic</A> | <A HREF="in_cond.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.3. Object Management</H1>
+<HR>
+<H2><A NAME="Overview">6.3.1. Overview</A></H2>
+<P><EM>Object management</EM> is a collection of features which support:</P>
+<OL>
+<LI>the definition of special objects in configuration files
+<LI>the use of these special objects in documents.</OL>
+<P>For example, a configuration file can contain a lookup table of <A HREF="../ref/creferen.html">references</A>. Within a document:</P>
+<UL>
+<LI>a table of references can be inserted by simply specifying document codes - the document names are found from the lookup table
+<LI>REF/DOC object phrases are validated as legal references/documents
+<LI>hypertext is generated for:<UL>
+<LI>entries in the table of references
+<LI>REF and DOC object phrases</UL>
+<LI>REF objects can be converted to DOC objects and visa versa.</UL>
+<P><A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> supports 4 predefined <EM>classes</EM> of objects - <A HREF="../ref/creferen.html">references</A>, <A HREF="../ref/cterms.html">terms</A>, <A HREF="../ref/cproduct.html">products</A> and <A HREF="../ref/corganis.html">organisations</A>. New classes can be added via the <A HREF="../ref/mclass.html">class</A> macro.</P>
+<HR>
+<H2><A NAME="The Predefined Classes">6.3.2. The Predefined Classes</A></H2>
+<P>The fields supported by the predefined classes are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Class</STRONG>
+</TD>
+<TD>
+<STRONG>Styles</STRONG>
+</TD>
+<TD>
+<STRONG>Identifer fields</STRONG>
+</TD>
+<TD>
+<STRONG>Property fields</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+references
+</TD>
+<TD>
+REF, DOC
+</TD>
+<TD>
+Reference, Document
+</TD>
+<TD>
+Jump, Version, Status
+</TD>
+</TR>
+<TR>
+<TD>
+terms
+</TD>
+<TD>
+TERM
+</TD>
+<TD>
+Term, Definition
+</TD>
+<TD>
+Jump
+</TD>
+</TR>
+<TR>
+<TD>
+products
+</TD>
+<TD>
+PRD
+</TD>
+<TD>
+Name
+</TD>
+<TD>
+Jump
+</TD>
+</TR>
+<TR>
+<TD>
+organisations
+</TD>
+<TD>
+ORG, ORGN
+</TD>
+<TD>
+Name, Long
+</TD>
+<TD>
+Jump
+</TD>
+</TR>
+</TABLE>
+
+<P><EM>Styles</EM> are the tags used for objects in the class. The first style is the 'normal' one. The second style is the 'long' one.</P>
+<P><EM>Identifier fields</EM> are the 'normal' and 'long' (if any) fields within the data tables. <EM>Property fields</EM> are the additional fields, if any.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <A HREF="../ref/mbuild_t.html">build_title</A> macro uses the <A HREF="../ref/creferen.html">references</A> declarations to provide default values for DOC_CODE, DOC_VERSION, DOC_STATUS and DOC_URL.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>The <EM>objects</EM> module provides some commonly used objects in these predefined classes (and matching variables).</P>
+<HR>
+<H2><A NAME="Declaring Objects">6.3.3. Declaring Objects</A></H2>
+<P>To declare a table of objects, the syntax is:</P>
+<PRE>
+  !block <EM>class</EM>; data
+  <EM>field names</EM>
+  <EM>object record1</EM>
+  ...
+  <EM>object recordN</EM>
+  !endblock
+</PRE>
+<P>An example lookup table for organisations is given below.</P>
+<PRE>
+!block organisations; data
+Name        Long                             Jump
+DEC         Digital Equipment Corporation    http://www.dec.com
+Frame       Frame International              http://www.frame.com
+HP          Hewlett Packard                  http://www.hp.com
+IBM         International Business Machines  http://www.ibm.com
+Mincom      Mincom Pty Ltd                   http://www.mincom.com
+Microsoft   Microsoft Corporation            http://www.microsoft.com
+!endblock
+</PRE>
+<P>To insert a table of objects, the syntax is:</P>
+<PRE>
+  !block <EM>class</EM>
+  <EM>field names</EM>
+  <EM>object key or record1</EM>
+  ...
+  <EM>object key or recordN</EM>
+  !endblock
+</PRE>
+<P>If only the key is provided, then the 'long' name is found from the configured data, if any. For example, a configuration file may have the following declaration of <A HREF="../ref/cterms.html">terms</A>:</P>
+<PRE>
+  !block terms; data
+  Term     Definition
+  SDF      Simple Document Format
+  SQL      Structured Query Language
+  !endblock
+</PRE>
+<P>These can then be inserted into a document as follows:</P>
+<PRE>
+  !block terms
+  Term     Definition
+  SDF
+  SQL
+  WWW      World Wide Web
+  !endblock
+</PRE>
+<P>Note that the definition for a term already declared will be inserted if none is provided. Furthermore, new terms (like WWW above) can be inserted and added to the configured ones.</P>
+<HR>
+<H2><A NAME="Hypertext and Name Conversion">6.3.4. Hypertext and Name Conversion</A></H2>
+<P>If an object has a 'Jump' property defined for it, hypertext is automatically generated for it. For example:</P>
+<PRE>
+ See {{DOC:My Design Document}} for further details
+</PRE>
+<P>will have a jump created for the DOC object.</P>
+<P>Object names can be converted between the normal and long forms by using the <EM>expand</EM> and <EM>shrink</EM> attributes. For example:</P>
+<PRE>
+ {{PRD:Java}} was developed by {{ORG[expand]Sun}}.
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_libr.html">Previous Topic</A> | <A HREF="in_cond.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

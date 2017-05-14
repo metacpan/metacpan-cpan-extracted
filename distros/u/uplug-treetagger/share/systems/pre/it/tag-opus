@@ -1,0 +1,44 @@
+{
+  'module' => {
+    'name' => 'Italian pre-processing',
+    'submodules' => [
+        'pre/it/toktag',
+        'pre/it/annotate',
+    ],
+    'submodule names' => [
+	'tokenization and POS tagging (TreeTagger)',
+        'other annotation',
+    ],
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This is the pre-processing pipe-line for Italian that includes the TreeTagger for tokenization and POS tagging.',
+  'input' => {
+    'text' => {
+      'format' => 'text',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'tag'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=de)'
+	  },
+       },
+  }
+}

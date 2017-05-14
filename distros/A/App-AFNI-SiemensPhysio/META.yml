@@ -1,0 +1,23 @@
+---
+abstract: "Physio from Siemens into format suitable for AFNI's RetroTS retroicor routine"
+author:
+  - 'Will Foran <willforan+cpan@gmail.com>'
+build_requires:
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-AFNI-SiemensPhysio
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  List::MoreUtils: '0'
+  feature: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.006'

@@ -3,5 +3,4 @@
   output: [foobarbaz];
   output: foobarbaz;
   output: foobarbaz;
-  output: ['foobarbaz'];
-}
+  output: ['foobarbaz']; }

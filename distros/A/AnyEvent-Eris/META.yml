@@ -1,0 +1,29 @@
+---
+abstract: 'Implementation of eris pub/sub client and server'
+author:
+  - 'Sawyer X'
+build_requires:
+  Test::More: 0.92
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Eris
+requires:
+  AnyEvent: 0
+  AnyEvent::Graphite: 0
+  AnyEvent::Handle: 0
+  AnyEvent::Socket: 0
+  Carp: 0
+  List::Util: 0
+  Parse::Syslog::Line: 0
+  Scalar::Util: 0
+  Sys::Hostname: 0
+resources:
+  bugtracker: https://github.com/xsawyerx/anyevent-eris/issues
+  repository: git://github.com/xsawyerx/anyevent-eris.git
+version: 0.000001

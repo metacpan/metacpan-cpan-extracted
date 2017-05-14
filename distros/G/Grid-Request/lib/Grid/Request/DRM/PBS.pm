@@ -3,7 +3,7 @@ package Grid::Request::DRM::PBS;
 use strict;
 use Log::Log4perl qw(get_logger);
 
-our $VERSION = qw$Revision$[1];
+our $VERSION = '0.11';
 
 my $logger = get_logger(__PACKAGE__);
 

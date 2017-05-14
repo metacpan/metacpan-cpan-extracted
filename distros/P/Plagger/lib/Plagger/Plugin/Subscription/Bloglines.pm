@@ -65,9 +65,14 @@ sub init_bloglines {
 sub notifier {
     my($self, $context) = @_;
 
-    my $count = $self->{bloglines}->notify();
-    $context->log(info => "You have $count unread item(s) on Bloglines.");
-    if ($count) {
+    my $to_fetch = $self->conf->{dont_use_notifier_api};
+    unless ($to_fetch) {
+        my $count = $self->{bloglines}->notify();
+        $context->log(info => "You have $count unread item(s) on Bloglines.");
+        $to_fetch = $count;
+    }
+
+    if ($to_fetch) {
         my $feed = Plagger::Feed->new;
         $feed->aggregator(sub { $self->sync(@_) });
         $context->subscription->add($feed);
@@ -229,7 +234,7 @@ Your username & password to use with Bloglines API.
 
 C<mark_read> specifies whether this plugin I<marks as read> the items
 you synchronize. With this option set to 0, you will get the
-duplicated updates everytime you run Plagger, until you mark them
+duplicated updates every time you run Plagger, until you mark them
 unread using Bloglines browser interface. Defaults to 1.
 
 For people who uses Bloglines browser interface regularly, and use
@@ -242,10 +247,15 @@ to 1, the default.
 =item fetch_meta
 
 C<fetch_meta> specifies whether this plugin fetches I<folder>
-strucuture using listsubs API. With this option on, all feeds under
+structure using listsubs API. With this option on, all feeds under
 I<Plagger> folder will have I<Plagger> as its tag.
 
 You can use this tags information using Rules in later phase.
+
+=item dont_use_notifier_api
+
+Turn it on when you want to skip Notifier API, which could sometimes
+be broken and always returns 0 instead of the actual unread count.
 
 =back
 

@@ -1,0 +1,95 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: sdfcli - Command Line Interface Utility</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdfbatch.html">Previous Topic</A> | <A HREF="sdfget.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="sdfcli">11.5. sdfcli - Command Line Interface Utility</A></H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P><A HREF="../ref/sdfcli.html">sdfcli</A> extracts command line interface (CLI) information from applications and formats it into <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A>.</P>
+<HR>
+<H2><A NAME="Usage">Usage</A></H2>
+<PRE>
+usage  : sdfcli [-h[help]] [-o[out_ext]]
+         [-l[log_ext]] [-w wrap] utility ...
+purpose: format a utility's command line interface into SDF
+version: 2.000    (SDF 2.001beta1)
+</PRE>
+<P>The options are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfcli_h">-h</A>
+</TD>
+<TD>
+display help on options
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfcli_o">-o</A>
+</TD>
+<TD>
+output file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfcli_l">-l</A>
+</TD>
+<TD>
+log file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdfcli_w">-w</A>
+</TD>
+<TD>
+column at which to wrap option specifications
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P><A NAME="sdfcli_h">The -h option provides help. If it is specified without a parameter, a brief description of each option is displayed. To display the attributes for an option, specify the option letter as a parameter.</A></P>
+<P><A NAME="sdfcli_o">By default, generated output goes to standard output. To direct output to a file per input file, use the -o option to specify an extension for output files. If the -o option is specified without a parameter, an extension of <EM>out</EM> is assumed.</A></P>
+<P><A NAME="sdfcli_l">Likewise, error messages go to standard error by default. Use the -l option to create a log file per input file. If the -l option is specified without a parameter, an extension of <EM>log</EM> is assumed.</A></P>
+<P><A HREF="../ref/sdfcli.html">sdfcli</A> executes each argument with a -h flag and converts the resultant output to nicely formatted <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A>. An argument of &quot;-&quot; specifies that the help should be read from standard input.</P>
+<P>Formatting is done as follows:</P>
+<OL>
+<LI>lines are tagged as <EM>Example</EM> paragraphs, with the first line formatted to wrap option usage specifications nicely
+<LI>if a line is found that starts with 'options:', it is replaced with a <EM>Body</EM> paragraph saying &quot;The options are:&quot;, and the following lines are formatted as a table of codes and descriptions
+<LI>if a line is found that starts with 'aliases:', it is replaced with a <EM>Body</EM> paragraph saying &quot;The aliases are:&quot;, and the following lines are formatted as a table of names and descriptions
+<LI>each option code in the table is formatted as a hypertext jump to a tag called <EM>cmd_opt</EM> where:<UL>
+<LI><EM>cmd</EM> is the command name</UL><UL>
+<LI><EM>opt</EM> is the option code</UL></OL>
+<P><A NAME="sdfcli_w"> </A>The -w option specifies at what column to wrap option specifications. The default is 50 - this is the best for output imported into the <A HREF="http://www.mincom.com">Mincom</A> templates.</P>
+<HR>
+<H2><A NAME="Limitations and future directions">Limitations and future directions</A></H2>
+<P>The table formats used are hard coded.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="sdfbatch.html">Previous Topic</A> | <A HREF="sdfget.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

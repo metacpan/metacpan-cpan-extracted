@@ -1,0 +1,128 @@
+liblingua-en-words2nums-perl (0.18) unstable; urgency=low
+
+  * Remove the PM_FILTER to support Windows. (rt.cpan.org #38101)
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 05 Feb 2010 16:42:32 -0500
+
+liblingua-en-words2nums-perl (0.17) unstable; urgency=low
+
+  * Use debhelper v7; rules file minimisation.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 22 Jul 2008 00:29:12 -0400
+
+liblingua-en-words2nums-perl (0.16) unstable; urgency=low
+
+  * The repository has moved from svn to git.
+  * Minor improvement to debian/rules clean.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 19 Oct 2007 22:21:04 -0400
+
+liblingua-en-words2nums-perl (0.15) unstable; urgency=low
+
+  * Update url to the web site.
+  * Current standards-version (no real changes).
+  * Fix unicode error in man page.
+  * Fix lintian warning about rules file.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 04 Jun 2007 16:49:19 -0400
+
+liblingua-en-words2nums-perl (0.14) unstable; urgency=low
+
+  * Remove the tests that involve exponentents, as they may not on 64 bit
+    machines, and will cause false test failures. Closes: #250610
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  4 Jun 2004 15:09:13 -0300
+
+liblingua-en-words2nums-perl (0.13) unstable; urgency=low
+
+  * Remove quoting in Makefile.PL so it will build under 5.8.1 (this breaks
+    building under earlier versions of perl though). Closes: #213928
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  6 Oct 2003 19:49:19 -0400
+
+liblingua-en-words2nums-perl (0.12) unstable; urgency=low
+
+  * Move from build-depends-indep to build-depends to meet current policy.
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  3 Sep 2003 12:14:45 -0400
+
+liblingua-en-words2nums-perl (0.11) unstable; urgency=low
+
+  * Do not pass through things of the form "10-11", since they're note really
+    numbers.
+  * Fix testnum to work with library in same directory.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 26 May 2003 15:48:37 -0400
+
+liblingua-en-words2nums-perl (0.10) unstable; urgency=low
+
+  * Add proper spelling of "forty", and alternate "nought" spelling.
+  * Make regression test work on win32, with exponents with leading zeroes.
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  7 May 2003 01:34:11 -0400
+
+liblingua-en-words2nums-perl (0.09) unstable; urgency=low
+
+  * Corrected parsing of "fourth". Oops!
+  * Moved pm file out of deep directory in source tarball, which was
+    unnecessary for such a small package.
+  * Added AUTHOR and ABSTRACT_FROM to Makefile.PL.
+  * Accept douvigintillion, as well as dovigintillion; I don't know which is
+    right.
+  * Thanks to Erick Calder for his help.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  3 Feb 2003 12:16:02 -0500
+
+liblingua-en-words2nums-perl (0.08) unstable; urgency=low
+
+  * Localize $_. 
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 18 Oct 2002 16:09:59 -0400
+
+liblingua-en-words2nums-perl (0.07) unstable; urgency=low
+
+  * Use debhelper v4. 
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  1 Jun 2002 18:15:26 -0400
+
+liblingua-en-words2nums-perl (0.06) unstable; urgency=low
+
+  * Don't try to test for inf, since it seems "Infinity" is the string on some
+    platforms.
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  1 Jun 2002 10:01:09 -0400
+
+liblingua-en-words2nums-perl (0.05) unstable; urgency=low
+
+  * Added big numbers between undecillion and trigintillion. Also
+    centillion, and billiard through quindecilliard.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 26 Feb 2002 23:09:29 -0500
+
+liblingua-en-words2nums-perl (0.04) unstable; urgency=low
+
+  * Corrected parsing of otherwise plain numbers that have commas in them
+    (123,456.789)
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 12 Jan 2002 17:33:22 -0500
+
+liblingua-en-words2nums-perl (0.03) unstable; urgency=low
+
+  * If the entire string is ignorables ("and", "a", punctuation), don't
+    return 0, but undef.
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 12 Jan 2002 14:17:16 -0500
+
+liblingua-en-words2nums-perl (0.02) unstable; urgency=low
+
+  * Added support for trillion through googolplex, and added localization
+    code for the different billions and other numbers.
+  * Lots of bugfixes, including getting the ordinals right (I hope).
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 19 Dec 2001 23:08:03 -0500
+
+liblingua-en-words2nums-perl (0.01) unstable; urgency=low
+
+  * First release.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 19 Dec 2001 14:23:03 -0500

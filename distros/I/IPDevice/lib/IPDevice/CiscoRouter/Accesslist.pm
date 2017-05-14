@@ -20,8 +20,8 @@
 ## This file provides a class for holding informations about a Cisco accesslist.
 ####
 
-package CiscoRouter::Accesslist;
-use CiscoRouter::AccesslistEntry;
+package IPDevice::CiscoRouter::Accesslist;
+use IPDevice::CiscoRouter::AccesslistEntry;
 use strict;
 use vars qw($VERSION);
 
@@ -33,12 +33,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-CiscoRouter::Accesslist
+IPDevice::CiscoRouter::Accesslist
 
 =head1 SYNOPSIS
 
- use CiscoRouter::Accesslist;
- my $acl = new CiscoRouter::Accesslist;
+ use IPDevice::CiscoRouter::Accesslist;
+ my $acl = new IPDevice::CiscoRouter::Accesslist;
  $acl->set_id(10);
  $acl->add_entry('permit', '192.168.0.0/22', '20', '24');
 
@@ -126,7 +126,7 @@ Returns TRUE on success, otherwise FALSE.
 =cut
 sub add_entry {
   my($self, $permitdeny, @fields) = @_;
-  my $aclentry = new CiscoRouter::AccesslistEntry;
+  my $aclentry = new IPDevice::CiscoRouter::AccesslistEntry;
   return FALSE if !$aclentry->set_permitdeny($permitdeny);
   my $i = 1;
   for my $field (@fields) {
@@ -143,7 +143,7 @@ sub add_entry {
 Walks through the ACL calling the function $func for every ACL statement.
 Args passed to $func are:
 
-I<$aclentry>: The L<CiscoRouter::AccesslistEntry|CiscoRouter::AccesslistEntry>.
+I<$aclentry>: The L<IPDevice::CiscoRouter::AccesslistEntry|IPDevice::CiscoRouter::AccesslistEntry>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped.

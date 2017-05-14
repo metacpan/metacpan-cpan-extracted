@@ -1,0 +1,77 @@
+NAME
+    WWW::Getsy - Command line interface to Etsy V2 OAuth API
+
+SYNOPSIS
+    Command line interface to Etsy V2 OAuth API
+
+    Register for a developer account here:
+    http://developer.etsy.com/member/register Then register your app for a
+    V2 Sandbox key: http://developer.etsy.com/apps/register
+
+    Then define your consumer key and secret environment variables
+
+        export OAUTH_CONSUMER_KEY='your_key'
+        export OAUTH_CONSUMER_SECRET='your_secret'
+
+    Finally start making some api calls
+
+    Get a list of all methods
+
+        getsy --sandbox --path '/'
+
+    Get your user info
+
+        getsy --sandbox --path '/users/__SELF__'
+
+    You can use the --method paramter to make post, put, and delete calls
+    (get is default) and --params to pass in a JSON string of parameters
+
+        getsy --sandbox --path '/listings/51455722' --params '{"title" : "changing the title"}' --method put
+
+    A full list of methods available here
+
+        http://developer.etsy.com/docs/methods
+
+AUTHOR
+    John Goulah, "<jgoulah at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-www-getsy at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Getsy>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Getsy
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Getsy>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-Getsy>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-Getsy>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-Getsy/>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2012 John Goulah.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

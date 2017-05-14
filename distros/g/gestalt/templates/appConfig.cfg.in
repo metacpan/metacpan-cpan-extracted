@@ -1,0 +1,15 @@
+[% DEFAULT APP_NAME='mySpiffyApp' -%]
+[% DEFAULT EMAIL='bradley@kitefamily.co.uk' -%]
+
+db_dsn="DBI:Pg:database=[% DATABASE_NAME %];host=[% DATABASE_HOST %]"
+db_username=[% DATABASE_USERNAME %]
+db_password=[% DATABASE_PASSWORD %]
+
+templatePath="@prefix@/[% APP_NAME %]/templates"
+
+defaultController=[% TABLES.0 %]
+
+# If you wish to use sessions, uncomment this and make sure you have
+# created the sessions table within the database db_dsn.
+#useSessions="Apache::Session::Postgres"
+#sessionTable="sessions"

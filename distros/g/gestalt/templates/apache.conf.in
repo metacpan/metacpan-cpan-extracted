@@ -1,0 +1,8 @@
+<Location /[% APP_NAME %]>
+    SetHandler perl-script
+    PerlHandler Apache::Request::Dispatcher
+    SetEnv DispatcherConf @prefix@/[% APP_NAME %]/[% APP_NAME %].cfg
+    SetEnv APP_NAME [% APP_NAME %]
+</Location>
+Alias /[% APP_NAME %] @prefix@/[% APP_NAME %]/html
+PerlRequire conf.d/[% APP_NAME %].pl

@@ -1,0 +1,37 @@
+void luaL_argcheck (lua_State *L, int cond, int narg, const char *extramsg);
+
+int luaL_argerror (lua_State *L, int narg, const char *extramsg);
+
+void luaL_checkany (lua_State *L, int narg);
+
+int luaL_checkint (lua_State *L, int narg);
+
+lua_Integer luaL_checkinteger (lua_State *L, int narg);
+
+long luaL_checklong (lua_State *L, int narg);
+
+const char *luaL_checklstring (lua_State *L, int narg, size_t *l);
+
+lua_Number luaL_checknumber (lua_State *L, int narg);
+
+int luaL_checkoption (lua_State *L, int narg, const char *def, const char *const lst[]);
+
+const char *luaL_checkstring (lua_State *L, int narg);
+
+void luaL_checktype (lua_State *L, int narg, int t);
+
+void *luaL_checkudata (lua_State *L, int narg, const char *tname);
+
+int luaL_optint (lua_State *L, int narg, int d);
+
+lua_Integer luaL_optinteger (lua_State *L, int narg, lua_Integer d);
+
+long luaL_optlong (lua_State *L, int narg, long d);
+
+const char *luaL_optlstring (lua_State *L, int narg, const char *d, size_t *l);
+
+lua_Number luaL_optnumber (lua_State *L, int narg, lua_Number d);
+
+const char *luaL_optstring (lua_State *L, int narg, const char *d);
+
+int luaL_typerror (lua_State *L, int narg, const char *tname);

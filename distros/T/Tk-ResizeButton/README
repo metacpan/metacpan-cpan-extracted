@@ -1,0 +1,23 @@
+Tk::ResizeButton
+============================
+
+Provides a resizeable button to be used in an HList column header.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+All rights reserved by Shaun Wandler. This program is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+Changes Frank (xpix) Herrmann
+
+ 

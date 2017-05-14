@@ -1,0 +1,72 @@
+!init OPT_CONFIG='sdf'
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Jul-96 ianc    2.000beta7 release
+# -----------------------------------------------------------------------
+#
+
+# Setup the header/footer: as this is the catalog page, remove the
+# jump to it.
+!define HTML_URL_CATALOG ''
+
+# Define the list of columns to display
+!define COLUMNS $var{'LOCAL_DOCS'} ? "PDF,PS" : "PDF&website,PS&website"
+!define COLUMNS $var{'COLUMNS'} . ",DOC:Document,CONCISE:Date,Pages"
+
+# Build the title
+!define DOC_NAME "SDF Document Catalog"
+!define DOC_TOC  0
+!build_title
+
+!subsections "Getting started,Manuals,Tutorials,Other documents"; "noprefix"
+
+This page lists the supporting documentation available for SDF version
+{{B:[[SDF_VERSION]]}}. For the latest documentation, visit the
+{{DOC:SDF Document Catalog}} on the {{DOC:SDF Web Site}}.
+Documentation for local extensions, if any, may be found
+{{A[jump="local/"]here}}.
+
+
+P1: Getting started
+
+!block references; \
+  columns=COLUMNS
+Reference
+MTR-SDF-0001
+SDF-FAQ
+MTR-SDF-0003
+!endblock
+
+P1: Manuals
+
+!block references; \
+  columns=COLUMNS
+Reference
+MTR-SDF-0002
+MTR-SDF-0004
+MTR-SDF-0005
+!endblock
+
+P1: Tutorials
+
+!block references; \
+  columns=COLUMNS
+Reference
+MTR-SDF-0011
+MTR-SDF-0012
+!endblock
+
+P1: Other documents
+
+!block references; \
+  columns=COLUMNS
+Reference
+MTR-SDF-0008
+!endblock

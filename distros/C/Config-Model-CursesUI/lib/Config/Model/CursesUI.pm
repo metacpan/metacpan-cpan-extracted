@@ -8,10 +8,11 @@ use Config::Model::Exception ;
 use Carp;
 use warnings ;
 
+use Config::Model 2.095; # for get_help_as_text
 use Config::Model::ObjTreeScanner ;
 use Curses::UI ;
 
-our $VERSION = '1.105';
+our $VERSION = '1.106';
 
 my @help_settings = qw/-bg green -fg black -border 1 
                        -titlereverse 0
@@ -34,8 +35,6 @@ sub new {
         #-compat => 1,
         #-debug => 1
     );
-
-    $self->{experience} = $args{experience} || 'beginner' ;
 
     my %cb_set 
         = (
@@ -60,7 +59,6 @@ sub new {
         $self->{scan} = Config::Model::ObjTreeScanner
             -> new (
                 fallback   => 'all',
-                experience => $self->{experience},
                 %cb_set ,
             ) ;
     };
@@ -428,15 +426,9 @@ sub display_node_content {
     my $lb_sel_change = sub {
         my $sel = ($listbox->get_active_value)[0];
         return unless defined $sel ; # may happen with empty node
-        my $help = $node->get_help($sel) ;
+        my $help = $node->get_help_as_text($sel) ;
         $help = "no help for $sel" unless $help ;
         $helpw->text($help)  ;
-        if ($self->{experience} ne 'beginner') {
-            my $p = $node
-                -> get_element_property(property => 'experience',
-                                        element  => $sel) ;
-            $permw->text("experience: $p");
-        }
         my $type = $node->element_type($sel) ;
         my $elt = $node->fetch_element($sel) ;
         my $v_str = '' ;
@@ -489,7 +481,7 @@ sub display_node_content {
     my $help = {
 		-label => '< Help on node >',
 		-onpress => sub {
-		    my $help= $node->get_help ;
+		    my $help= $node->get_help_as_text ;
 		    $help = "Sorry, no help available" 
                 unless defined $help;
 		    $self->{cui}->dialog($help) ;
@@ -755,7 +747,7 @@ sub layout_hash {
                            '-y' => 7, '-x' => 41, -width => 38,
                            '-title' => 'Help on element',
                            @help_settings);
-    my $help = $node->get_help($element) || "no help for $element" ;
+    my $help = $node->get_help_as_text($element) || "no help for $element" ;
     $helpw->text($help)  ;
 
     return $listbox ;
@@ -813,14 +805,14 @@ sub layout_checklist_info {
                                '-x' => 42 ,
                                '-y' => $$yr ,
                                -width => 35,
-                               -text => $node->get_help($element) ,
+                               -text => $node->get_help_as_text($element) ,
                                '-title' => 'Help on value',
                                @help_settings ) ;
 
     my $help_update = sub {
         my $widget = shift ;
         my $choice = $values[$widget->get_active_id] ;
-        $help_w->text($check_list_obj->get_help($choice)) ;
+        $help_w->text($check_list_obj->get_help_as_text($choice)) ;
     } ;
 
     return ($cur_val_w,$help_update) ;
@@ -1024,7 +1016,7 @@ sub layout_enum_value {
     my ($orig_value,$current_value_widget,$help) = 
         $self->value_info($win,$leaf, 40, 1) ;
 
-    $help -> text ($leaf->get_help($orig_value) ) ;
+    $help -> text ($leaf->get_help_as_text($orig_value) ) ;
 
     my $y = 0;
 
@@ -1079,7 +1071,7 @@ sub layout_enum_value {
 
     my $lb_sel_change = sub {
         my ($new) = $listbox->get_active_value;
-        $help ->text($leaf->get_help($new)) ;
+        $help ->text($leaf->get_help_as_text($new)) ;
     } ;
 
     $listbox = $win -> add ( undef, 'Listbox',
@@ -1129,7 +1121,7 @@ sub layout_boolean_value {
             $self->set_leaf_value($leaf , 0+$new ) ;
             $value = $new ;
             $current_value_widget->text( 0+$new ) ;
-            $help ->text($leaf->get_help($new ? '1' : '0')) ;
+            $help ->text($leaf->get_help_as_text($new ? '1' : '0')) ;
         }
     } ;
 
@@ -1603,7 +1595,7 @@ sub display_view_list {
 
     my $leaf_cb = ($select eq 'audit') ? $audit_cb : $std_cb ;
 
-    my @scan_args = ( experience       => $self->{experience},
+    my @scan_args = (
                       fallback         => 'all',
                       hash_element_cb  => $hash_cb ,
                       leaf_cb          => $leaf_cb ,
@@ -1731,7 +1723,7 @@ sub show_node_element_help {
     my $text = '' ;
 
     return $text unless defined $node ;
-    my $node_help = $node->get_help();
+    my $node_help = $node->get_help_as_text();
 
     my $element_name = $node->element_name() ; # may be undef for root class
     if ($node_help) {
@@ -1740,7 +1732,7 @@ sub show_node_element_help {
     }
 
     if (defined $element) {
-        my $element_help = $node->get_help($element);
+        my $element_help = $node->get_help_as_text($element);
         $text .= "$element:\n  $element_help\n" if $element_help ;
     }
 
@@ -1844,7 +1836,7 @@ sub wiz_walk {
         } ;
     }
 
-    my @wiz_args = (experience        => $self->{experience},
+    my @wiz_args = (
                     hash_element_cb   => $hash_element_cb ,
                     %cb_hash 
                 );
@@ -1883,22 +1875,21 @@ Config::Model::CursesUI - Curses interface to edit config data
 
 =head1 SYNOPSIS
 
-use Config::Model ;
-use Config::Model::CursesUI ;
+ use Config::Model ;
+ use Config::Model::CursesUI ;
 
-my $model = Config::Model -> new ;
+ my $model = Config::Model -> new ;
 
-my $inst = $model->instance (root_class_name => 'XXX',
-instance_name   => 'yyy');
+ my $inst = $model->instance (
+    root_class_name => 'XXX',
+    instance_name   => 'yyy'
+ );
 
-# create dialog
-my $dialog = Config::Model::CursesUI-> new
-(
-experience => 'beginner', # or 'advanced' # 
-) ;
+ # create dialog
+ my $dialog = Config::Model::CursesUI-> new () ;
 
-# start never returns
-$dialog->start($model) ;
+ # start never returns
+ $dialog->start($model) ;
 
 =head1 DESCRIPTION
 
@@ -1914,12 +1905,6 @@ work as expected.
 The constructor accepts the following parameters:
 
 =over
-
-=item experience
-
-Specifies the experience level of the user (default:
-C<beginner>). The experience can be C<master advanced
-beginner>.
 
 =item load
 
@@ -1943,7 +1928,7 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 LICENSE
 
-Copyright (c) 2007-2009,2011 Dominique Dumont.
+Copyright (c) 2007-2009,2011,2017 Dominique Dumont.
 
 This file is part of Config-Model.
 

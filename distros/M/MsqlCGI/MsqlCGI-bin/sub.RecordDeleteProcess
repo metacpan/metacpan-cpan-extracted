@@ -1,0 +1,42 @@
+#####################################################################
+# package RecordDeleteProcess
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to deleting records and the display involved.
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package RecordDeleteProcess;
+
+
+#####################################################################
+# DoRecDelete
+#
+# Delete the records from the database...
+#####################################################################
+sub DoRecDelete {
+  local ( $dbh, $priKeys ) = @_;
+
+  &main::DPrint ( "In DoRecDelete." );
+  $query = &RecActions::CreateExplicitQuery( "DELETE", $priKeys );
+
+  &main::DPrint ( "Doing Query: <pre>$query</pre>" );
+  $sth = $dbh->Query ( $query ) || 
+  	&main::Error ( "Query Failed in DoRecModify. $Msql::db_errstr" );
+  
+  if ( $main::tableInfo->{'RecordDeleteSuccessTemplate'} ) {
+    &Template::DoTemplate ( $main::tableInfo->{'RecordDeleteSuccessTemplate'}, 
+    			    "RECORD_DELETE_SUCCESS", $sth );
+  } else {
+    print <<"    EOF";
+      <title>MsqlCGI: Record Deletion -- SUCCESS!</title>
+      <h2>The selected record(s) have been deleted.</h2>
+    EOF
+
+    print &Template::GetHTMLFooter();
+  }
+}
+
+1;

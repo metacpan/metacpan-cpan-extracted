@@ -1,28 +1,17 @@
-# t/01_ini.t - check module loading
-use strict;
-use warnings;
-use Test::More 
-tests =>  5;
-# qw(no_plan);
-use_ok( 'ExtUtils::ModuleMaker' );
-use_ok( 'File::Save::Home', qw|
-    get_home_directory
-    get_subhome_directory_status
-    make_subhome_directory
-    restore_subhome_directory_status
-| );
+# t/01_ini.t; just to load ExtUtils::ModuleMaker by using it
 
-my ($realhome);
+$|++; 
+print "1..1
+";
+my($test) = 1;
 
-ok( $realhome = get_home_directory(), 
-    "HOME or home-equivalent directory found on system");
+# 1 load
+use ExtUtils::ModuleMaker;
+my($loaded) = 1;
+$loaded ? print "ok $test
+" : print "not ok $test
+";
+$test++;
 
-my $mmkr_dir_ref = get_subhome_directory_status(".modulemaker");
-my $mmkr_dir = make_subhome_directory($mmkr_dir_ref);
-ok( $mmkr_dir, "personal defaults directory found on system");
-
-END {
-    ok( restore_subhome_directory_status($mmkr_dir_ref),
-        "original presence/absence of .modulemaker directory restored");
-}
+# end of t/01_ini.t
 

@@ -12,3 +12,7 @@ Revision history for Perl extension Ldraw.
 	- added option for idle callback to Lego::Ldraw::Display
 
 0.5.5 to 0.5.71 Minor documentation and distribution fixes
+
+0.5.8 Sun Nov 27 2005
+	- added rotate method
+	- fixed documentation for traslate 

@@ -16,6 +16,8 @@ has handler         => (is => 'ro');
 has set             => (is => 'ro');
 has from            => (is => 'ro');
 has until           => (is => 'ro');
+has username        => (is => 'ro');
+has password        => (is => 'ro');
 
 
 sub _build_importer {
@@ -26,7 +28,9 @@ sub _build_importer {
         metadataPrefix => $self->metadata_prefix,
         from           => $self->from,
         until          => $self->until,
-        set            => $self->set
+        set            => $self->set,
+        username       => $self->username,
+        password       => $self->password,
     );
     return $importer;
 }
@@ -42,10 +46,10 @@ Datahub::Factory::Importer::OAI - Import data from an L<OAI-PMH|https://www.open
 
 =head1 SYNOPSIS
 
-    use Datahub::Factory::Importer::OAI;
+    use Datahub::Factory;
     use Data::Dumper qw(Dumper);
 
-    my $oai = Datahub::Factory::Importer::OAI->new(
+    my $oai = Datahub::Factory->importer('OAI')->new(
         url            => 'https://biblio.ugent.be/oai',
         metadataPrefix => 'oai_dc',
         set            => '2011'
@@ -105,6 +109,14 @@ Optionally, a I<must_be_older_than> date.
 =item C<until>
 
 Optionally, a I<must_be_younger_than> date.
+
+=item C<username>
+
+An optional username.
+
+=item C<password>
+
+An optional password.
 
 =back
 

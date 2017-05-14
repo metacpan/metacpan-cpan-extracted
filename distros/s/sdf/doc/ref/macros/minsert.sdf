@@ -1,0 +1,47 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: insert Macro
+
+H2: Interface
+
+!macro_interface "insert"
+
+H2: Description
+
+The {{insert}} macro is used to insert the output of {{macro}}
+into an SDF document.
+{{missing}} determines the action if the macro isn't found:
+
+* {{ok}} - do nothing
+* {{warning}} - report a warning
+* {{error}} - report an error.
+
+Note: In early versions of SDF, this macro was used to call
+user-defined macros. In SDF 2.000 or later, user-defined macros
+can be called using the same syntax as built-in macros.
+
+H2: Examples
+
+!block example; lang='sdf'
+# Insert the text of macro XXX if it's defined
+!insert 'XXX'
+
+# Insert the text of macro XXX; output an error if it's not defined
+!insert 'XXX'; 'error'
+
+# Same as the previous example
+!XXX
+!endblock
+
+#H2: Limitations & Future Directions

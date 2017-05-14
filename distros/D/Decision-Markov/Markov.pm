@@ -18,7 +18,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader);
 @EXPORT = qw();
-$VERSION = "0.02";
+$VERSION = "0.03";
 
 
 sub new {
@@ -300,7 +300,7 @@ sub _discount_utility {
   my $utility = shift;
   my $rate = $self->DiscountRate;
   return $utility unless $rate;
-  return $utility * (1 - $rate)**$cycle;
+  return $utility * (1/ (1 + $rate))**$cycle;
 }
 
 sub EvalCoh {

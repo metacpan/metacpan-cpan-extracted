@@ -8,6 +8,7 @@ use Attribute::Handlers;
 use Parse::RecDescent;
 use warnings;
 
+our $VERSION='0.01';
 
 
 $Parse::RecDescent::skip = '[, \t]*' ;
@@ -79,4 +80,4 @@ sub  TcpdParser : ATTR  { ${$_[2]} = new Parse::RecDescent( $grammar )  or die }
 
 1;
 __END__
-
+=pod

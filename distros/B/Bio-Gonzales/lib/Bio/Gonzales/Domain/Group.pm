@@ -11,7 +11,7 @@ use Bio::Gonzales::Feat::IO::GFF3;
 use 5.010;
 use List::MoreUtils qw/uniq first_value any/;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 #my $q            = Bio::Gonzales::Search::IO::HMMER3->new( file => $out )->parse;
 has search_result               => ( is => 'rw', required   => 1 );

@@ -1,0 +1,14 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Sub/WhenBodied.pm
+lib/Sub/WhenBodied.xs
+t/pod_cvg.t
+t/pod_syn.t
+t/when_bodied.t
+SIGNATURE    Added here by Module::Build

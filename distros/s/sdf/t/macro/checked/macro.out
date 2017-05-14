@@ -1,0 +1,7 @@
+__tuning[]
+__endtuning[]
+H1[orig_style='H1']A heading before macro definition
+H1[orig_style='H1']A heading after macro definition
+N[orig_style='N']This is some text with several lines in it.
+N[orig_style='N']And a few more.
+N[orig_style='N']The end.

@@ -1,0 +1,37 @@
+.
+.
+makepp_variables ./makepp_variables.pod:
+makepp_signatures ./makepp_signatures.pod:
+makepp_incompatibilities ./makepp_incompatibilities.pod:
+makepp_build_cache ./makepp_build_cache.pod:
+makepp_command ./makepp_command.pod:
+makepp_compatibility ./makepp_compatibility.pod:
+makeppbuiltin ./makeppbuiltin.pod:
+makepp_sandboxes ./makepp_sandboxes.pod:
+makepp_scanning ./makepp_scanning.pod:
+makeppinfo ./makeppinfo.pod:
+makepp_speedup ./makepp_speedup.pod:
+makepp_rules ./makepp_rules.pod:
+makepp_tutorial_compilation ./makepp_tutorial_compilation.pod:
+makepp_builtin ./makepp_builtin.pod:
+2.1 ./2.1:
+makepp_statements ./makepp_statements.pod:
+makepp_functions ./makepp_functions.pod:
+makepp_repositories ./makepp_repositories.pod:
+makepp ./makepp.pod:
+makepp_tutorial ./makepp_tutorial.pod:
+makepp_faq ./makepp_faq.pod:
+makepp_release_notes ./makepp_release_notes.pod:
+perl_performance ./perl_performance.pod:
+html ./html:
+makepp_builtins ./makepp_builtins.pod:
+makeppgraph ./makeppgraph.pod:
+makepp_build_algorithm ./makepp_build_algorithm.pod:
+makepp_cookbook ./makepp_cookbook.pod:
+makepplog ./makepplog.pod:
+makepp_extending ./makepp_extending.pod:
+makeppclean ./makeppclean.pod:
+makepp_build_check ./makepp_build_check.pod:
+makeppreplay ./makeppreplay.pod:
+makepp_index ./makepp_index.pod:
+Pod ./html/Pod:

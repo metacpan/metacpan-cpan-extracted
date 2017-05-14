@@ -1,0 +1,43 @@
+This version of ShellScript-Env isn't compatible with Version 0.0.
+
+This is a program that allows one to create simple Bourne and C Shell
+that set environmental labels.  The program:
+
+#/usr/local/bin
+use Env::paths;
+my $local = new ShellScript::Env("/usr/local/opt/egcs");
+$local->set_path('PATH', 'bin', '$PATH');
+$local->set_path('MANPATH', 'man', '$MANPATH');
+$local->set_path('INFOPATH', 'info', '$INFOPATH');
+# AIX uses LIBPATH, not LD_LIBRARY_PATH, weird.
+$local->set_path('LIBPATH', 'lib', '$LIBPATH');
+$local->save();
+
+writes a file /usr/local/opt/egcs.sh that will contain:
+
+PATH=/usr/local/opt/egcs/bin:$PATH
+MANPATH=/usr/local/opt/egcs/man:$MANPATH
+LIBPATH=/usr/local/opt/egcs/lib:$LIBPATH
+INFOPATH=/usr/local/opt/egcs/info:$INFOPATH
+export PATH MANPATH LIBPATH INFOPATH
+
+and /usr/local/opt/egcs.csh that will contain:
+
+set path = (/usr/local/opt/egcs/bin $path)
+setenv MANPATH /usr/local/opt/egcs/man:$MANPATH
+setenv LIBPATH /usr/local/opt/egcs/lib:$LIBPATH
+setenv INFOPATH /usr/local/opt/egcs/info:$INFOPATH
+
+One can also use the $local->automatic() function to search for
+PATH, LD_LIBRARY_PATH, INFOPATH and MANPATH stuff automatically.
+
+To install:
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+
+sorry, no POD documentation yet.
+
+Please e-mail comments and questions to Sven Heinicke <sven@zen.org>.

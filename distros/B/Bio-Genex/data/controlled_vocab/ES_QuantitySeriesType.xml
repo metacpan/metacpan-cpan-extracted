@@ -1,0 +1,44 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ExperimentSet" db_column="quantity_series_type" cv_table="ES_QuantitySeriesType">
+  <comment type="definition">This table provides the restricted vocabulary for the column quantity series type in the table Experiment Set and is used to describe the main parameter that defines the focus of the experiment	
+</comment>
+<term name="heat"
+        description="the experimental variable is an increase in
+temperature above the organism's normal range"/>
+<term name="cold"
+        description="the experimental variable is a decrease in
+temperature below the organism's normal range"/>
+<term name="salt"
+        description="the experimental variable is a change in
+the salt concentration outside the organism's normal range"/>
+<term name="light"
+        description="the experimental variable is a change in
+the amount of light"/>
+<term name="nutrient"
+        description="the experimental variable is a change in
+concentration of an important nutrient, such as glucose"/>
+<term name="chemical"
+        description="the experimental variable is a change in
+concentration of an exogenous chemical. This differs from drug or
+toxin in that the chemical is not directly harmful to the organism,
+but modifies the expression pattern of the organism. It is different
+from nutrient in that it is not required for the organism's survival."/>
+<term name="toxin"
+        description="the experimental variable is a change in
+concentration of a toxin, such as kanate"/>
+<term name="drug"
+        description="the experimental variable is a change in
+concentration of a drug, such as an antibiotic"/>
+<term name="water"
+        description="the experimental variable is a change in the
+amount of water"/> 
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->
+<!--  LocalWords:  kanate
+ -->

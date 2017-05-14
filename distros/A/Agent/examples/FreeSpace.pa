@@ -1,0 +1,124 @@
+#!/usr/bin/perl
+
+##
+# The FreeSpace agent - observes free space on multiple hosts.
+# Steve Purkis <spurkis@engsoc.carleton.ca>
+# April 30, 1998
+##
+
+# NOTE: AN AGENT'S GLOBAL VARIABLES ARE **NOT** PERSISTANT!!
+# Only those stored in $self are!
+# Programming an agent is like programming a recursive function.
+
+package Agent::FreeSpace;
+@ISA = qw( Agent );
+
+sub new {
+	my ($class, %args) = @_;
+	my $self = {};
+	foreach (keys(%args)) { $self->{"$_"} = $args{"$_"}; }
+	bless $self, $class;
+}
+
+sub agent_main {
+	my ($self, @args) = @_;
+	my $to = \$self->{To};
+
+	print "At: $$to\n" if $self->{verbose};
+	if ($$to) {
+		${$self->{Space}}{$$to} = $self->space();
+	}
+
+	unless ($self->{To} = shift @{$self->{'Hosts'}}) {
+		return $self->summary();
+	}
+
+	# [attempt] jump to next host:
+	print "Jumping to $$to... ";
+	my $msg = new Agent::Message(
+		Body      => [ "Run me\n", $self->store() ],
+		Transport => TCP,
+		Address   => $$to
+	);
+	if ($msg->send) { print "done.\n"; }
+	else            { print "couldn't send agent!\n"; }
+}
+
+
+sub space {
+	my ($self, @args) = @_;
+
+	my $space;
+	if ($^O =~ /linux/i) {
+		my @df = `df -h`;
+		shift @df;	# lose the header
+		foreach (@df) {
+			if ($_ =~ /\S+\s+\S+\s+\S+\s+([\d\.]+)M/) {
+				$space += $1;
+			}
+		}
+	} elsif ($^O =~ /win32/i) {
+		# not yet.
+	}
+
+	$space .= "Mb free";
+	print "Space: $space\n" if $self->{verbose};
+	return $space;
+}
+
+sub summary {
+	my ($self, @args) = @_;
+
+	print "+------\n|FreeSpace Agent summary:\n";
+	foreach (keys(%{$self->{Space}})) {
+		print "|\t$_ =>\t", ${$self->{Space}}{$_}, "\n";
+	}
+	print "+------\n";
+}
+
+1;
+
+
+__END__
+
+=head1 NAME
+
+Agent::FreeSpace - observes free space on multiple hosts.
+
+=head1 SYNOPSIS
+
+use Agent;
+
+my $agent = new Agent( Name => 'FreeSpace', %args );
+$agent->run;
+
+=head1 DESCRIPTION
+
+The FreeSpace agent jumps to a number of hosts, observing how much free
+space is on each machine.  When it reaches the last host, it prints a
+summary of how much space is available on each machine.
+
+=head1 PARAMETERS
+
+Hosts    =>  a list of TCP addresses of static agents to visit.
+verbose  =>  on/off
+
+=head1 NOTES
+
+Presently only works on UN*X [namely Linux] machines.
+
+=head1 SEE ALSO
+
+The sample I<Static> agent, L<Agent>.
+
+=head1 AUTHOR
+
+Steve Purkis E<lt>F<spurkis@engsoc.carleton.ca>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1997, 1998 Steve Purkis.  All rights reserved.  This package
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=cut

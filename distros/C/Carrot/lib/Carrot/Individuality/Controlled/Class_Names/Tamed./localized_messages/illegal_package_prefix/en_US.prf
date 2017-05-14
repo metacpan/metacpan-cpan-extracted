@@ -1,0 +1,3 @@
+﻿The package name '%s'
+doesn't match the list of allowed package prefixes:
+%s

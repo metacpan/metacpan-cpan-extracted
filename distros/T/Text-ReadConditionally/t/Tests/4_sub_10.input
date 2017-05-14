@@ -1,0 +1,18 @@
+.# Title: Subroutine argument names
+Line 1
+.sub sub1 a0 a1 a2 a3
+In sub1
+Sub1 has arguments:
+.let arg0 := _ARGS[0]
+.eval _ARGS[0]=\v{arg0}
+.eval a0='\v{a0}'
+.done
+After sub1 definition
+.sub1 A1 A2
+.#
+.# Check that sub1 parameters revert to previous values, ie are local
+.let a0:='Joe'; a3:='three'
+.eval Before: a0='\v{a0}'
+.sub1 'Bilbo Baggins'
+.eval After: a0='\v{a0}'
+EOF

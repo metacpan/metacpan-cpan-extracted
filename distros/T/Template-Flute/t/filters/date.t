@@ -8,13 +8,18 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 use Template::Flute;
-use Class::Load qw(try_load_class);
 
-try_load_class('DateTime')
-    or plan skip_all => "Missing DateTime module.";
+eval "use DateTime";
 
-try_load_class('DateTime::Format::ISO8601')
-    or plan skip_all => "Missing DateTime::Format::ISO8601 module.";
+if ($@) {
+    plan skip_all => "Missing DateTime module.";
+}
+
+eval "use DateTime::Format::ISO8601";
+
+if ($@) {
+    plan skip_all => "Missing DateTime::Format::ISO8601 module.";
+}
 
 plan tests => 9;
 

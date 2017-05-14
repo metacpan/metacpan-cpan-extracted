@@ -40,8 +40,6 @@ is( $x->id, 'foo', 'blank node' );
 
 my $y = $g->uri('_:foo');
 is( $x->id, $y->id, 'another blank' );
-is $x->str, '_:foo', 'stringify blank node';
-is $x->qname, '_:foo', 'qname of blank node';
 
 # type
 is( $a->type->uri, $g->foaf_Person->uri, 'type eq' );
@@ -49,7 +47,6 @@ is( $a->type->str, $g->foaf_Person->str, 'type eq' );
 ok( $a->type('foaf:Person'), 'a faof:Person' );
 ok( $a->type('foaf:Organization','foaf:Person'), 'a faof:Person' );
 ok( $a->type('foaf:Person','foaf:Organization'), 'a faof:Person' );
-ok( !$a->type('foaf:Organization'), 'not a foaf:Organization');
 ok( $a->a('foaf:Organization','foaf:Person'), 'a faof:Person' );
 
 my $types = $a->types;

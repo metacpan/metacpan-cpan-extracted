@@ -8,15 +8,15 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Alien::SwaggerUI' => '0',
-                                      'CPAN::Testers::Schema' => '0.004',
+                                      'CPAN::Testers::Schema' => '0.007',
                                       'File::Share' => '0',
                                       'Import::Base' => '0.012',
                                       'Log::Any' => '1.045',
                                       'Log::Any::Adapter::MojoLog' => '0.02',
                                       'Mercury' => '0.010',
-                                      'Mojolicious' => '6',
+                                      'Mojolicious' => '7.24',
                                       'Mojolicious::Plugin::Config' => '0',
-                                      'Mojolicious::Plugin::OpenAPI' => '0',
+                                      'Mojolicious::Plugin::OpenAPI' => '1.13',
                                       'perl' => '5.024'
                                     }
                     },

@@ -4,9 +4,6 @@ use warnings;
 use Padre::Logger;
 use JSON::PP;
 
-use base 'Object::Event';
- 
-
 use Class::XSAccessor
 		accessors => {
 			marshal => 'marshal',
@@ -17,10 +14,11 @@ use Class::XSAccessor
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_);
-	
-	$self->{marshal} ||= $class->_marshal;
-	
+	my %args = @_;
+	$args{marshal} ||= $class->_marshal;
+	my $self = bless \%args, $class;
+	my $message_event  = Wx::NewEventType;
+	$self->{message_event} = $message_event;
 	return $self;
 }
 

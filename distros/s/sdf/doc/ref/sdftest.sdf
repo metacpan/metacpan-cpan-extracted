@@ -1,0 +1,33 @@
+H1[id='sdftest'] sdftest - Execute SDF Regression Tests
+
+H2: Purpose
+
+{{B:sdftest}} executes the regression tests provided with SDF.
+
+H2: Usage
+
+>  sdftest
+
+H2: Description
+
+This program is typically run just after SDF has been installed to
+check that the installation succeeded. However, users should be
+able to run it at any time to confirm that everything is still ok.
+
+This program works by iterating over the {{sdf}} files in the
+{{FILE:test}} directory where SDF is installed. For each file
+called {{xx.sdf}}, it generates {{xx.out}} and {{xx.log}} files
+containing the output and error logs, respectively. These files
+are then validated against the expected files in the {{FILE:checked}}
+directory.
+
+Note: Generated files which are ok are deleted. However, if a
+test fails, the file which failed is not deleted, so a user can
+then use {{CMD:diff}}, say, to analyse what the problem is.
+
+H2: Limitations and future directions
+
+This program only provides regression testing on the core
+SDF engine. In particular, it doesn't provide regression
+testing on the drivers used to generate each of the different
+output formats (e.g. HTML, PostScript).

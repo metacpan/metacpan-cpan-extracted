@@ -1,62 +1,71 @@
-# $Id: Noop.pm,v 1.2 2002/09/17 21:14:01 ology Exp $
-
-# POE::Framework::MIDI::Noop - an object representing a null operation 
-# (for twiddling the more obscure midi params)	
-#
-# Author:  Author: Steve McNabb (steve@justsomeguy.com)
+# $Id: Noop.pm,v 1.1.1.1 2004/11/22 17:52:11 root Exp $
 
 package POE::Framework::MIDI::Noop;
 
 use strict;
+use vars '$VERSION'; $VERSION = '0.02';
 use POE::Framework::MIDI::Utility;
-use constant VERSION => 0.1;
 
-sub new
-{
-	my ($self,$class) = ({},shift);
-	bless $self,$class;
-	$self->{cfg} = shift;
-	return $self;	
+sub new {
+    my ($self, $class) = ({}, shift);
+    bless $self, $class;
+    $self->{cfg} = shift;
+    return $self;    
 }
 
 # no idea how this works yet...
-sub params
-{
-	# So what is this even for then?
+#
+# the idea of this object is that it will allow the manipulation of various aspects
+# of the midi environment that are not note or rest related.  things like pitch bend, 
+# mod wheel, attack, decay, etc etc.    at the moment it does nothing terribly interesting
+# this is just a placeholder package for now
+sub params {
+    # So what is this even for then?
 }
 
 1;
 
+__END__
+
 =head1 NAME
 
-POE::Framework::MIDI::Noop
+POE::Framework::MIDI::Noop - An object representing a MIDI null operation
+
+=head1 ABSTRACT
 
 =head1 DESCRIPTION
 
-not sure how this will work yet.  need to root around in the MIDI::Simple 
-code to find out what weird things we can set like pitch wheel and attack
-and such
+Not sure how this will work yet.  need to root around in the 
+MIDI::Simple code to find out what weird things we can set like pitch 
+wheel and attack and such.
 
-=head1 BUGS
+(for twiddling the more obscure midi params)    
 
-=head1 AUTHOR
-
-	Steve McNabb
-	CPAN ID: JUSTSOMEGUY
-	steve@justsomeguy.com
-	http://justsomeguy.com/code/POE/POE-Framework-MIDI 
-
-=head1 COPYRIGHT
-
-Copyright (c) 2002 Steve McNabb. All rights reserved.
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
+=head1 SYNOPSIS
 
 =head1 SEE ALSO
 
-perl(1). POE.  Perl-MIDI
+L<POE>
+
+L<http://justsomeguy.com/code/POE/POE-Framework-MIDI>
+
+=head1 AUTHOR
+
+Primary: Steve McNabb E<lt>steve@justsomeguy.comE<gt>
+
+CPAN ID: SMCNABB
+
+Secondary: Gene Boggs E<lt>cpan@ology.netE<gt>
+
+CPAN ID: GENE
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Steve McNabb. All rights reserved.
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file 
+included with this module.
 
 =cut

@@ -1,8 +1,10 @@
 package DTL::Fast::Filter::Time;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Filter';
 
-$DTL::Fast::FILTER_HANDLERS{'time'} = __PACKAGE__;
+$DTL::Fast::FILTER_HANDLERS{time} = __PACKAGE__;
 
 use DTL::Fast::Utils;
 
@@ -11,9 +13,9 @@ use DTL::Fast::Utils;
 sub parse_parameters
 {
     my $self = shift;
-    push @{$self->{'parameter'}}, DTL::Fast::Variable->new('"TIME_FORMAT"')
-        if not scalar @{$self->{'parameter'}};
-    $self->{'format'} = $self->{'parameter'}->[0];
+    push @{$self->{parameter}}, DTL::Fast::Variable->new('"TIME_FORMAT"')
+        if (not scalar @{$self->{parameter}});
+    $self->{format} = $self->{parameter}->[0];
     return $self;
 }
 
@@ -24,9 +26,9 @@ sub filter
     shift;  # filter_manager
     my $value = shift;
     my $context = shift;
-    
-    my $format = $self->{'format'}->render($context);
-    
+
+    my $format = $self->{format}->render($context);
+
     return DTL::Fast::Utils::time2str($format, $value);
 }
 

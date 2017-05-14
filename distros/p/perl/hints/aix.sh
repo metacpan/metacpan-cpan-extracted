@@ -34,7 +34,6 @@ d_setrgid='undef'
 d_setruid='undef'
 
 alignbytes=8
-
 case "$usemymalloc" in
     '')  usemymalloc='n' ;;
     esac
@@ -96,7 +95,7 @@ cc=${cc:-cc}
 ccflags="$ccflags -D_ALL_SOURCE -D_ANSI_C_SOURCE -D_POSIX_SOURCE"
 case "$cc" in
     *gcc*) ;;
-    *) ccflags="$ccflags -qmaxmem=-1 -qnoansialias" ;;
+    *) ccflags="$ccflags -qmaxmem=-1 -qnoansialias -qlanglvl=extc99" ;;
     esac
 nm_opt='-B'
 
@@ -234,41 +233,26 @@ case "$usethreads" in
 	d_setgrent_r='undef'
 	d_setpwent_r='undef'
 	d_srand48_r='undef'
+	d_srandom_r='undef'
 	d_strerror_r='undef'
 
 	ccflags="$ccflags -DNEED_PTHREAD_INIT"
 	case "$cc" in
-	    *gcc*) ccflags="-D_THREAD_SAFE $ccflags" ;;
-
-	    cc_r) ;;
-	    '') cc=cc_r ;;
-
+	    *gcc*) 
+	      ccflags="-D_THREAD_SAFE $ccflags" 
+	      ;;
+	    cc_r) 
+	      ;;
+	    xlc_r) 
+	      ;;
+	    # we do not need the C++ compiler
+	    xlC_r) 
+	      cc=xlc_r 
+	      ;;
+	    '') 
+	      cc=cc_r 
+	      ;;
 	    *)
-
-
-	    # No | alternation in aix sed. :-(
-	    newcc=`echo $cc | sed -e 's/cc$/cc_r/' -e 's/xl[cC]$/cc_r/' -e 's/xl[cC]_r$/cc_r/'`
-	    case "$newcc" in
-		$cc) # No change
-		;;
-
-		*cc_r)
-		echo >&4 "Switching cc to cc_r because of POSIX threads."
-		# xlc_r has been known to produce buggy code in AIX 4.3.2.
-		# (e.g. pragma/overload core dumps)	 Let's suspect xlC_r, too.
-		# --jhi@iki.fi
-		cc="$newcc"
-		;;
-
-		*)
-		cat >&4 <<EOM
-*** For pthreads you should use the AIX C compiler cc_r.
-*** (now your compiler was set to '$cc')
-*** Cannot continue, aborting.
-EOM
-		exit 1
-		;;
-	    esac
 	esac
 
 	# Insert pthreads to libswanted, before any libc or libC.
@@ -279,6 +263,17 @@ EOM
 	set `echo X "$lddlflags " | sed -e 's/ \(-l[cC]\) / -lpthreads \1 /'`
 	shift
 	lddlflags="$*"
+	;;
+    *)
+	case "$cc" in
+	    xlc) 
+	      ;;
+	    # we do not need the C++ compiler
+	    xlC) 
+	      cc=xlc 
+	      ;;
+	    *)
+	esac
 	;;
 esac
 EOCBU
@@ -344,6 +339,9 @@ libswanted_uselargefiles="`getconf XBS5_ILP32_OFFBIG_LIBS 2>/dev/null|sed -e 's@
 		    $define|true|[yY]*) cc="$cc -q64"	;;
 		    *)			cc="$cc -q32"	;;
 		    esac
+                # Some 32-bit getconfs will set ccflags to include -qlonglong
+                # but that's no longer needed with an explicit -qextc99.
+                ccflags="`echo $ccflags | sed -e 's@ -qlonglong@@'`"
 		;;
 	    *)  # Remove xlc-specific -qflags.
 		ccflags="`echo $ccflags | sed -e 's@ -q[^ ]*@ @g' -e 's@^-q[^ ]* @@g'`"
@@ -529,5 +527,172 @@ EOF
 	    esac
 	;;
     esac
+
+# remove libbsd.a from wanted libraries
+libswanted=`echo " $libswanted " | sed -e 's/ bsd / /'`
+libswanted=`echo " $libswanted " | sed -e 's/ BSD / /'`
+d_flock='undef'
+
+# remove libgdbm from wanted libraries
+# The libgdbm < 1.8.3-5 from the AIX Toolbox is not working
+# because two wrong .h are present
+if [ -f "/opt/freeware/include/gdbm/dbm.h" ] ||
+   [ -f "/opt/freeware/include/gdbm/ndbm.h" ]; then
+    echo "GDBM support disabled because your GDBM package contains extraneous headers - see README.aix."
+    libswanted=`echo " $libswanted " | sed -e 's/ gdbm / /'`
+    i_gdbm='undef'
+    i_gdbmndbm='undef'
+fi
+
+# Some releases (and patch levels) of AIX cannot have both
+# long doubles and infinity (infinity plus one equals ... NaNQ!)
+#
+# This deficiency, and others, is apparently a well-documented feature
+# of AIX 128-bit long doubles:
+#
+# http://www-01.ibm.com/support/knowledgecenter/ssw_aix_61/com.ibm.aix.genprogc/128bit_long_double_floating-point_datatype.htm
+#
+# The URL seems to be fragile, it has moved around over the years,
+# but searching AIX docs at ibm.com for "128-bit long double
+# floating-point data type" should surface the latest info.
+#
+# Some salient points:
+#
+# <quote>
+# * The 128-bit implementation differs from the IEEE standard for long double
+#   in the following ways:
+# * Supports only round-to-nearest mode. If the application changes
+#   the rounding mode, results are undefined.
+# * Does not fully support the IEEE special numbers NaN and INF.
+# * Does not support IEEE status flags for overflow, underflow,
+#   and other conditions. These flags have no meaning for the 128-bit
+#   long double inplementation.
+# * The 128-bit long double data type does not support the following math
+#   APIs: atanhl, cbrtl, copysignl, exp2l, expm1l, fdiml, fmal, fmaxl,
+#   fminl, hypotl, ilogbl, llrintl, llroundl, log1pl, log2l, logbl,
+#   lrintl, lroundl, nanl, nearbyintl, nextafterl, nexttoward,
+#   nexttowardf, nexttowardl, remainderl, remquol, rintl, roundl,
+#   scalblnl, scalbnl, tgammal, and truncl.
+# * The representation of 128-bit long double numbers means that the
+#   following macros required by standard C in the values.h file do not
+#   have clear meaning:
+#   * Number of bits in the mantissa (LDBL_MANT_DIG)
+#   * Epsilon (LBDL_EPSILON)
+#   * Maximum representable finite value (LDBL_MAX)
+# </quote>
+#
+# The missing math functions affect the POSIX extension math interfaces.
+
+case "$uselongdouble" in
+'')
+  echo "Checking if your infinity is working with long doubles..." >&4
+  cat > inf$$.c <<EOF
+#include <math.h>
+#include <stdio.h>
+int main() {
+  long double inf = INFINITY;
+  long double one = 1.0L;
+  printf("%Lg\n", inf + one);
+}
+EOF
+  $cc -qlongdouble -o inf$$ inf$$.c -lm
+  case `./inf$$` in
+  INF) echo "Your infinity is working correctly with long doubles." >&4 ;;
+  *) # NaNQ (or anything else than INF)
+    echo " "
+    echo "Your infinity is broken, I suggest disabling long doubles." >&4
+    rp="Disable long doubles?"
+    dflt="y"
+    . UU/myread
+    case "$ans" in
+    [Yy]*)
+      echo "Okay, disabling long doubles." >&4
+      uselongdouble="$undef"
+      ccflags=`echo " $ccflags " | sed -e 's/ -qlongdouble / /'`
+      libswanted=`echo " $libswanted " | sed -e 's/ c128/ /'`
+      lddlflags=`echo " $lddlflags " | sed -e 's/ -lc128 / /'`
+      ;;
+    *)
+      echo "Okay, keeping long doubles enabled." >&4
+      ;;
+    esac
+    ;;
+  esac
+  rm -f inf$$.c inf$$
+  ;;
+esac
+
+# Some releases (and patch levels) of AIX have a broken powl().
+pp_cflags=''
+case "$uselongdouble" in
+define)
+  echo "Checking if your powl() is broken..." >&4
+  cat > powl$$.c <<EOF
+#include <math.h>
+#include <stdio.h>
+int main() {
+  printf("%Lg\n", powl(-3.0L, 2.0L));
+}
+EOF
+  case "$gccversion" in
+  '') $cc -qlongdouble -o powl$$ powl$$.c -lm ;;
+  *) $cc -o powl$$ powl$$.c -lm ;;
+  esac
+  case `./powl$$` in
+  9) echo "Your powl() is working correctly." >&4 ;;
+  *)
+    echo "Your powl() is broken, will use a workaround." >&4
+    pp_cflags='ccflags="$ccflags -DHAS_AIX_POWL_NEG_BASE_BUG"'
+    ;;
+  esac
+  rm -f powl$$.c powl$$
+  ;;
+esac
+
+# Some releases of AIX cc/xlc a broken fmodl(), but -q64 seems to help.
+case "$gccversion" in
+'') case "$uselongdouble" in
+   define)
+     case "$ccflags" in
+     *-q64*) ;;
+     *) echo "Checking if your fmodl() is broken..." >&4
+        cat > fmodl$$.c <<EOF
+#include <math.h>
+#include <stdio.h>
+int main() {
+  printf("%ld\n", (long)fmodl(powl(2, 31), (long double)4294967295));
+}
+EOF
+        $cc -qlongdouble -o fmodl$$ fmodl$$.c -lm
+        case `./fmodl$$` in
+        2147483648) echo "Your fmodl() is working correctly." >&4 ;;
+        *) echo "Your fmodl() is broken, will try with -q64..." >&4
+           $cc -q64 -qlongdouble -o fmodl$$ fmodl$$.c -lm
+           case `./fmodl$$` in
+           2147483648)
+             echo "The -q64 did the trick, will use it." >& 4
+             ccflags="`echo $ccflags | sed -e 's@-q32@@g'`"
+             ldflags="`echo $ldflags | sed -e 's@-q32@@g'`"
+             ccflags="$ccflags -q64"
+             ldflags="$ldflags -q64"
+             ;;
+           *) echo "Not even the -q64 worked.  I'm disabling long doubles." >&4
+              echo "And you should have stern talk with your IBM rep." >&4
+              uselongdouble="$undef"
+              ccflags=`echo " $ccflags " | sed -e 's/ -qlongdouble / /'`
+              libswanted=`echo " $libswanted " | sed -e 's/ c128/ /'`
+              lddlflags=`echo " $lddlflags " | sed -e 's/ -lc128 / /'`
+              ;;
+           esac  # second fmodl$$
+           ;;
+        esac # first fmodl$$
+        ;;
+     esac # Checking if ...
+     ;;
+  esac # uselongdouble
+  rm -f fmodl$$.c fmodl$$
+  ;;
+esac # not gcc
+
 
 # EOF

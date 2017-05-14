@@ -1,26 +1,37 @@
 To install Bio::PrimerDesigner, run the following commands:
 
-  $ perl Makefile.PL
-  $ make
-  $ make test
+  $ perl Build.PL
+  $ ./Build
+  $ ./Build test
   $ su
-  # make install
+  # ./Build install
 
-To learn which arguments Makefile.PL accepts, run the following command:
+To learn which arguments Build.PL accepts, run the following command:
 
-  $ perl Makefile.PL [-h|--help]
+  $ perl Build.PL [-h|--help]
 
+NOTE: For local installations, make sure you have installed the binary 
+executables for your OS for primer3 and e-PCR
 
-NOTE: For local installations, make sure you have installed te binary executables
-for your OS for primer3 and e-PCR
+  e-PCR  : http://www.ncbi.nlm.nih.gov/sutils/e-pcr/
+  primer3: http://primer3.sourceforge.net
 
-e-PCR: http://www.ncbi.nlm.nih.gov/sutils/e-pcr/
+Included are two scripts:
 
-primer3: http://primer3.sourceforge.net
+  primer_designer.cgi: Installed on remote linux/unix webserver to
+    provide access to thr primer3 and e-PCR binaries.  Requires a
+    server-side installation of Bio::PrimerDesigner
 
+  primer_designer: Script to demonstrate Bio::PrimerDesigner functions
+
+Google Code project home page:
+
+  http://code.google.com/p/bio-primer-designer/
+
+CPAN home page:
+
+  http://search.cpan.org/dist/Bio-PrimerDesigner/
 
 If you have problems, please contact the author:
 
   Sheldon McKay <mckays@cshl.edu>
-
-

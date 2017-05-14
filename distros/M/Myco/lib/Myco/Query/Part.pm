@@ -1,7 +1,7 @@
 package Myco::Query::Part;
 
 ###############################################################################
-# $Id: Part.pm,v 1.1.1.1 2004/11/22 19:16:02 owensc Exp $
+# $Id: Part.pm,v 1.6 2006/03/19 19:34:08 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ###############################################################################
@@ -10,42 +10,26 @@ package Myco::Query::Part;
 
 Myco::Query::Part - a Myco entity class
 
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
-
 =head1 SYNOPSIS
 
   use Myco;
 
-  # Constructors. See Myco::Base::Entity for more.
+  # Constructors. See Myco::Entity for more.
   my $obj = Myco::Query::Part->new;
 
-  # Accessors.
-  my $value = $obj->get_fooattrib;
-  $obj->set_fooattrib($value);
+  # Accessors:
+  #   see attribute list below
 
   $obj->save;
   $obj->destroy;
 
 =head1 DESCRIPTION
 
-Blah blah blah... Blah blah blah... Blah blah blah...
-Blah blah blah blah blah... Blah blah...
+This class abstracts the idea of a B<part> of a L<Myco::QueryTemplate> object.
+A part can be a filter (see L<Myco::Query::Part::Filter>) or clause
+(L<Myco::Query::Part::Clause>). A filter can itself contain clauses, thereby
+introducing the possibility (indeed, the routine requirement) of
+recursiveness in the construction of a query object.
 
 =cut
 
@@ -56,7 +40,7 @@ Blah blah blah blah blah... Blah blah...
 use warnings;
 use strict;
 use Myco::Exceptions;
-use Myco::Base::Entity::Meta;
+use Myco::Entity::Meta;
 
 ##############################################################################
 # Programatic Dependencies
@@ -71,7 +55,7 @@ use Myco::Base::Entity::Meta;
 # Inheritance & Introspection
 ##############################################################################
 use base qw(Class::Tangram);
-my $md = Myco::Base::Entity::Meta->new( name => __PACKAGE__ );
+my $md = Myco::Entity::Meta->new( name => __PACKAGE__ );
 
 ###########################################################################
 # Function and Closure Prototypes
@@ -85,7 +69,7 @@ my $md = Myco::Base::Entity::Meta->new( name => __PACKAGE__ );
 =head1 COMMON ENTITY INTERFACE
 
 Constructor, accessors, and other methods -- as inherited from
-Myco::Base::Entity.
+Myco::Entity.
 
 =cut
 
@@ -151,10 +135,6 @@ $md->add_attribute( name => 'optional',
                     type => 'yesno', );
 
 
-##############################################################################
-# Methods
-##############################################################################
-
 
 ##############################################################################
 # Object Schema Activation and Metadata Finalization
@@ -167,7 +147,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -176,10 +156,10 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Myco::Query::Part::Test|Myco::Query::Part::Test>,
-L<Myco::Base::Entity|Myco::Base::Entity>,
+L<Myco::Entity|Myco::Entity>,
 L<Myco|Myco>,
 L<Tangram|Tangram>,
 L<Class::Tangram|Class::Tangram>,
-L<mkentity|mkentity>
+L<myco-mkentity|mkentity>
 
 =cut

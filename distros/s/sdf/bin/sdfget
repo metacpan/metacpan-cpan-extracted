@@ -1,0 +1,224 @@
+#!/usr/local/bin/perl
+# $Id$
+$VERSION{'PUBLIC'} = '2.000';
+$VERSION{''.__FILE__} = '$Revision$';
+#
+# >>Title::     Documentation Extraction Utility
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{CMD:sdfget}} extracts documentation embedded in source code.
+#
+# >>Description::
+# !SDF_OPT_STD
+#
+# The {{get-rule}} nominates the formatting of the embedded
+# documentation to be extracted. All currently defined get-rules
+# assume the documentation is in comment blocks in one of the
+# following formats:
+#
+# V: >>section_title1::
+# V: text of section 1, line 1
+# V: text of section 1, line ..
+# V: 
+# V: >>section_title2::
+# V: text of section 2, line 1
+# V: text of section 2, line ..
+# V: >>END::
+# V: 
+# V: >>section_title3:: text of section 3
+#
+# The first form is most commonly used. In this format, the text
+# in a section extends until the end of the current "comment block"
+# or the start of the next section, whichever comes first. The
+# second form (i.e. explicitly specifying where the section ends) is
+# useful if you wish to add some normal comments (i.e. non-documentation)
+# which you do not want extracted. If the text is short, the
+# third form can be used. Regardless of the format, if a section
+# is found which is already defined, the text of the section is
+# concatenated onto the existing text. This permits the documentation
+# for each entity to be specified immediately above where it is
+# defined in the source code.
+#
+# The -g option specifies the {{get-rule}} to use.
+# The available get-rules differ on the prefix expected at the front
+# of each line as shown below. {{perl}} is the default get-rule.
+#
+# !block table
+# Rule          Prefix
+# perl          #
+# cpp           //
+# c             * or /*
+# fortran       c (with 5 preceding spaces)
+# eiffel        --
+# !endblock
+#
+# Within C code, a trailing space is required after the characters above.
+# For other languages, a trailing space is optional.
+# Within FORTRAN code, the "c" character must be preceded by exactly
+# 5 spaces. For other languages, zero or more whitespace characters are
+# permitted before the characters above.
+#
+# For example, embedded documentation within C code looks like:
+#
+# V: /* >>Purpose::
+# V:  * This library provides a high level interface
+# V:  * to commonly used network services.
+# V:  */
+#
+# A report can be specified using the -r option. Reports provide
+# a mechanism for:
+#
+# * selectively extracting sections, and
+# * rudimentary reformatting (e.g. to [[SDF]])
+#
+# If no report is specified, all sections are output in the
+# following format:
+#
+# V: section_title1
+# V: section_text1
+# V: 
+# V: section_title2
+# V: section_text2
+#
+# If -r is specified on its own, {{FILE:default.sdg}} is assumed.
+# This report selects the set of sections (within the [[SDF]]
+# documentation standards) which form the user documentation and
+# formats them into [[SDF]].
+# Details on the report format are specified below.
+# Reports are searched for in the current directory,
+# then in the {{stdlib}} directory within SDF's library directory.
+#
+# The -s option can be used to specify the scope of the documentation
+# to be extracted. (This is an experimental feature and may change
+# so most users should avoid using it.)
+#
+# The -i option outputs only those lines which the get-rule did
+# not match. This option is useful for extracting non-documentation
+# from a file to give just the code.
+#
+# Note: The -r option is ignored if -i is specified.
+#
+# >>Examples::
+#
+# To extract the user documentation from a [[SDF]] application
+# written in C++ ({{CMD:xyz}}, say) and save it into {{FILE:xyz.sdf}}:
+#
+# V:      sdfget -gcpp -r -osdf xyz.cpp
+#
+# >>Resources::
+#
+# >>Limitations::
+#
+# >>Implementation::
+#
+
+require "sdf/app.pl";
+require "sdf/dict.pl";
+require "sdf/sdfget.pl";
+
+########## Initialisation ##########
+
+#
+# >>_Description::
+# {{@_GET_RULES}} contains a table of {{get-rule}} definitions.
+# Each rule is defined by the fields in the table below.
+#
+# !block table
+# Field      Description
+# Name       rule name
+# Begin      regular expression matching the start of a key
+# Sep        regular expression matching the end of the key
+# End        regular expression matching the end of a description
+# Prefix     regular expression matching the start of each line
+# Desc       description
+# !endblock
+#
+@_GET_RULES = &TableParse (
+    'Name    Begin  Sep     End     Prefix          Desc',
+    'perl    >>     ::\s*   >>END:: \s*#[ ]?        Perl/Shell source code',
+    'cpp     >>     ::\s*   >>END:: \s*\/\/[ ]?     C++ source code',
+    'c       >>     ::\s*   >>END:: \s*\/?\*[ ]     C source code',
+    'fortran >>     ::\s*   >>END:: [ ]{5}c[ ]?     FORTRAN source code',
+    'eiffel  >>     ::\s*   >>END:: \s*\-\-[ ]?     Eiffel/Ada source code',
+    'table   >>     ::\s*   >>END:: \s*\/\*[ ]?     Mincom TP table files',
+);
+
+# Index into the rules table - we don't mind duplicates
+@_get_rules_dupl = ();
+%_GET_RULES_INDEX = &TableIndex(*_GET_RULES, *_get_rules_dupl, 'Name');
+@_RULE_IDS = keys %_GET_RULES_INDEX;
+
+# valid scope values
+@_SDFGET_SCOPE = ('PUBLIC','PROTECTED','PRIVATE');
+
+# define configuration
+%app_config = (
+    'libdir',   'sdf/home',
+);
+
+# define options
+push(@app_option, (
+    #'Name|Spec|Help',
+    'get_rule|STR-@_RULE_IDS;perl|rule to use to get documentation',
+    'rpt_file|STR;;default.sdg|report file',
+    'scope|STR-@_SDFGET_SCOPE;PUBLIC|scope of documentation to be extracted',
+    'inverse|BOOL|only output lines not extracted',
+));
+
+# handle options
+&AppInit('file ...', 'extract documentation embedded in source code', 'SDF') ||
+  &AppExit();
+
+# If supplied, fetch the report file.
+@report = ();
+if ($rpt_file) {
+    local($rpt, $rpt_dir);
+
+    $rpt_dir = "$app_lib_dir/stdlib";
+    unless ($rpt = &NameFind($rpt_file, ".", $rpt_dir)) {
+            &AppExit('fatal', "cannot find report-file '$rpt_file'");
+    }
+    ($all_ok, @report) = &TableFetch($rpt);
+    $all_ok || &AppExit('fatal', "error opening report-file '$rpt': $!");
+}
+
+# Get the rule parameters
+%rule = &TableLookup(*_GET_RULES, *_GET_RULES_INDEX, $get_rule);
+
+########## Processing ##########
+
+sub argProcess {
+    local($ARGV) = @_;
+#   local();
+    local($success, $buflistref);
+    local($level) = 0;
+
+    # Fetch the data
+    ($success, $buflistref) = &DictFetch($ARGV,
+        $rule{"Begin"},
+        $rule{"Sep"},
+        $rule{"End"},
+        $rule{"Prefix"});
+    return 1 unless $success;
+
+    # Print report
+    if ($inverse) {
+        print grep(! /^$rule{"Prefix"}$/, @dict_rest);
+    }
+    else {
+        &DictPrint(STDOUT, 0, 'main', $buflistref, @report);
+    }
+}
+
+&AppProcess('argProcess');
+&AppExit();

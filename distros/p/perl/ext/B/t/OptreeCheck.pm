@@ -1,15 +1,15 @@
 package OptreeCheck;
-use base 'Exporter';
+use parent 'Exporter';
 use strict;
 use warnings;
 use vars qw($TODO $Level $using_open);
 require "test.pl";
 
-our $VERSION = '0.02';
+our $VERSION = '0.13';
 
 # now export checkOptree, and those test.pl functions used by tests
 our @EXPORT = qw( checkOptree plan skip skip_all pass is like unlike
-		  require_ok runperl);
+		  require_ok runperl tempfile);
 
 
 # The hints flags will differ if ${^OPEN} is set.
@@ -51,15 +51,14 @@ various modes.
     prog   => 'sort @a',	# run in subprocess, aka -MO=Concise
     bcopts => '-exec',		# $opt or \@opts, passed to BC::compile
 
-    errs   => 'Useless variable "@main::a" .*'	# str, regex, [str+] [regex+],
+    errs   => 'Name "main::a" used only once: possible typo at -e line 1.',
+				# str, regex, [str+] [regex+],
 
     # various test options
     # errs   => '.*',		# match against any emitted errs, -w warnings
     # skip => 1,		# skips test
     # todo => 'excuse',		# anticipated failures
     # fail => 1			# force fail (by redirecting result)
-    # retry => 1		# retry on test failure
-    # debug => 1,		# use re 'debug' for retried failures !!
 
     # the 'golden-sample's, (must provide both)
 
@@ -102,11 +101,11 @@ various modes.
  # 7  <1> leavesub\[\d+ refs?\] K/REFC,1
  # $)/
  # got:          '2  <#> gvsv[*b] s'
- # want:  (?-xism:2  <\$> gvsv\(\*b\) s)
+ # want:  (?^:2  <\$> gvsv\(\*b\) s)
  # got:          '3  <$> const[IV 42] s'
- # want:  (?-xism:3  <\$> const\(IV 42\) s)
+ # want:  (?^:3  <\$> const\(IV 42\) s)
  # got:          '5  <#> gvsv[*a] s'
- # want:  (?-xism:5  <\$> gvsv\(\*a\) s)
+ # want:  (?^:5  <\$> gvsv\(\*a\) s)
  # remainder:
  # 2  <#> gvsv[*b] s
  # 3  <$> const[IV 42] s
@@ -136,10 +135,10 @@ results.
 
 =head2 getRendering
 
-getRendering() runs code or prog through B::Concise, and captures its
-rendering.  Errors emitted during rendering are checked against
-expected errors, and are reported as diagnostics by default, or as
-failures if 'report=fail' cmdline-option is given.
+getRendering() runs code or prog or progfile through B::Concise, and
+captures its rendering.  Errors emitted during rendering are checked
+against expected errors, and are reported as diagnostics by default,
+or as failures if 'report=fail' cmdline-option is given.
 
 prog is run in a sub-shell, with $bcopts passed through. This is the way
 to run code intended for main.  The code arg in contrast, is always a
@@ -181,9 +180,9 @@ If name property is not provided, it is synthesized from these params:
 bcopts, note, prog, code.  This is more convenient than trying to do
 it manually.
 
-=head2 code or prog
+=head2 code or prog or progfile
 
-Either code or prog must be present.
+Either code or prog or progfile must be present.
 
 =head2 prog => $perl_source_string
 
@@ -191,6 +190,11 @@ prog => $src provides a snippet of code, which is run in a sub-process,
 via test.pl:runperl, and through B::Concise like so:
 
     './perl -w -MO=Concise,$bcopts_massaged -e $src'
+
+=head2 progfile => $perl_script
+
+progfile => $file provides a file containing a snippet of code which is
+run as per the prog => $src example above.
 
 =head2 code => $perl_source_string || CODEREF
 
@@ -208,6 +212,11 @@ sampled from known-ok threaded and un-threaded bleadperl (5.9.1) builds.
 They're both required, and the correct one is selected for the platform
 being tested, and saved into the synthesized property B<wanted>.
 
+Individual sample lines may be suffixed with whitespace followed
+by (<|<=|==|>=|>)5.nnnn (up to two times) to
+select that line only for the listed perl
+version; the whitespace and conditional are stripped.
+
 =head2 bcopts => $bcopts || [ @bcopts ]
 
 When getRendering() runs, it passes bcopts into B::Concise::compile().
@@ -215,8 +224,8 @@ The bcopts arg can be a single string, or an array of strings.
 
 =head2 errs => $err_str_regex || [ @err_str_regexs ] 
 
-getRendering() processes the code or prog arg under warnings, and both
-parsing and optree-traversal errors are collected.  These are
+getRendering() processes the code or prog or progfile arg under warnings,
+and both parsing and optree-traversal errors are collected.  These are
 validated against the one or more errors you specify.
 
 =head1 testcase modifier properties
@@ -235,16 +244,6 @@ invokes todo('reason')
 
 For code arguments, this option causes getRendering to redirect the
 rendering operation to STDERR, which causes the regex match to fail.
-
-=head2 retry => 1
-
-If retry is set, and a test fails, it is run a second time, possibly
-with regex debug.
-
-=head2 debug => 1
-
-If a failure is retried, this turns on eval "use re 'debug'", thus
-turning on regex debug.  It's quite verbose, and not hugely helpful.
 
 =head2 noanchors => 1
 
@@ -274,17 +273,6 @@ checkErrs() is a getRendering helper that verifies that expected errs
 against those found when rendering the code on the platform.  It is
 run after rendering, and before mkCheckRex.
 
-Errors can be reported 3 different ways; diag, fail, print.
-
-  diag - uses test.pl _diag()
-  fail - causes double-testing
-  print-.no # in front of the output (may mess up test harnesses)
-
-The 3 ways are selectable at runtimve via cmdline-arg:
-report={diag,fail,print}.  
-
-
-
 =cut
 
 use Config;
@@ -312,12 +300,10 @@ sub import {
 our %gOpts = 	# values are replaced at runtime !!
     (
      # scalar values are help string
-     retry	=> 'retry failures after turning on re debug',
-     debug	=> 'turn on re debug for those retries',
      selftest	=> 'self-tests mkCheckRex vs the reference rendering',
 
      fail	=> 'force all test to fail, print to stdout',
-     dump	=> 'dump cmdline arg prcessing',
+     dump	=> 'dump cmdline arg processing',
      noanchors	=> 'dont anchor match rex',
 
      # array values are one-of selections, with 1st value as default
@@ -325,11 +311,7 @@ our %gOpts = 	# values are replaced at runtime !!
      help	=> [0, 'provides help and exits', 0],
      testmode	=> [qw/ native cross both /],
 
-     # reporting mode for rendering errs
-     report	=> [qw/ diag fail print /],
-     errcont	=> [1, 'if 1, tests match even if report is fail', 0],
-
-     # fixup for VMS, cygwin, which dont have stderr b4 stdout
+     # fixup for VMS, cygwin, which don't have stderr b4 stdout
      rxnoorder	=> [1, 'if 1, dont req match on -e lines, and -banner',0],
      strip	=> [1, 'if 1, catch errs and remove from renderings',0],
      stripv	=> 'if strip&&1, be verbose about it',
@@ -432,7 +414,14 @@ sub checkOptree {
 
     print "checkOptree args: ",mydumper($tc) if $tc->{dump};
     SKIP: {
-	skip("$tc->{skip} $tc->{name}", 1) if $tc->{skip};
+	if ($tc->{skip}) {
+	    skip("$tc->{skip} $tc->{name}",
+		    ($gOpts{selftest}
+			? 1
+			: 1 + @{$modes{$gOpts{testmode}}}
+			)
+	    );
+	}
 
 	return runSelftest($tc) if $gOpts{selftest};
 
@@ -466,19 +455,8 @@ sub newTestCases {
 	    $tc->{$k} = $gOpts{$k} unless defined $tc->{$k};
 	}
     }
-    # transform errs to self-hash for efficient set-math
     if ($tc->{errs}) {
-	if (not ref $tc->{errs}) {
-	    $tc->{errs} = { $tc->{errs} => 1};
-	}
-	elsif (ref $tc->{errs} eq 'ARRAY') {
-	    my %errs;
-	    @errs{@{$tc->{errs}}} = (1) x @{$tc->{errs}};
-	    $tc->{errs} = \%errs;
-	}
-	elsif (ref $tc->{errs} eq 'Regexp') {
-	    warn "regexp err matching not yet implemented";
-	}
+	$tc->{errs} = [$tc->{errs}] unless ref $tc->{errs} eq 'ARRAY';
     }
     return $tc;
 }
@@ -502,8 +480,8 @@ sub label {
 
 sub getRendering {
     my $tc = shift;
-    fail("getRendering: code or prog is required")
-	unless $tc->{code} or $tc->{prog};
+    fail("getRendering: code or prog or progfile is required")
+	unless $tc->{code} or $tc->{prog} or $tc->{progfile};
 
     my @opts = get_bcopts($tc);
     my $rendering = ''; # suppress "Use of uninitialized value in open"
@@ -514,6 +492,10 @@ sub getRendering {
 	$rendering = runperl( switches => ['-w',join(',',"-MO=Concise",@opts)],
 			      prog => $tc->{prog}, stderr => 1,
 			      ); # verbose => 1);
+    } elsif ($tc->{progfile}) {
+	$rendering = runperl( switches => ['-w',join(',',"-MO=Concise",@opts)],
+			      progfile => $tc->{progfile}, stderr => 1,
+			      ); # verbose => 1);
     } else {
 	my $code = $tc->{code};
 	unless (ref $code eq 'CODE') {
@@ -521,7 +503,7 @@ sub getRendering {
 	    #  in caller's package ( to test arg-fixup, comment next line)
 	    my $pkg = '{ package '.caller(1) .';';
 	    {
-		no strict;
+		BEGIN { $^H = 0 }
 		no warnings;
 		$code = eval "$pkg sub { $code } }";
 	    }
@@ -573,43 +555,36 @@ sub checkErrs {
     # check rendering errs against expected errors, reduce and report
     my $tc = shift;
 
-    # check for agreement, by hash (order less important)
-    my (%goterrs, @got);
-    $tc->{goterrs} ||= [];
-    @goterrs{@{$tc->{goterrs}}} = (1) x scalar @{$tc->{goterrs}};
-    
-    foreach my $k (keys %{$tc->{errs}}) {
-	if (@got = grep /^$k$/, keys %goterrs) {
-	    delete $tc->{errs}{$k};
-	    delete $goterrs{$_} foreach @got;
+    # check for agreement (order not important)
+    my (%goterrs, @missed);
+    @goterrs{@{$tc->{goterrs}}} = (1) x scalar @{$tc->{goterrs}}
+	if $tc->{goterrs};
+
+    foreach my $want (@{$tc->{errs}}) {
+	if (ref $want) {
+	    my $seen;
+	    foreach my $k (keys %goterrs) {
+		next unless $k =~ $want;
+		delete $goterrs{$k};
+		++$seen;
+	    }
+	    push @missed, $want unless $seen;
+	} else {
+	    push @missed, $want unless defined delete $goterrs{$want};
 	}
     }
-    $tc->{goterrs} = \%goterrs;
 
-    # relook at altered
-    if (%{$tc->{errs}} or %{$tc->{goterrs}}) {
-	$tc->diag_or_fail();
+    @missed = sort @missed;
+    my @got = sort keys %goterrs;
+
+    if (@{$tc->{errs}}) {
+	is(@missed + @got, 0, "Only got expected errors for $tc->{name}")
+    } else {
+	# @missed must be 0 here.
+	is(scalar @got, 0, "Got no errors for $tc->{name}")
     }
-    fail("FORCED: $tc->{name}:\n") if $gOpts{fail}; # silly ?
-}
-
-sub diag_or_fail {
-    # help checkErrs
-    my $tc = shift;
-
-    my @lines;
-    push @lines, "got unexpected:", sort keys %{$tc->{goterrs}} if %{$tc->{goterrs}};
-    push @lines, "missed expected:", sort keys %{$tc->{errs}}   if %{$tc->{errs}};
-
-    if (@lines) {
-	unshift @lines, $tc->{name};
-	my $report = join("\n", @lines);
-
-	if    ($gOpts{report} eq 'diag')	{ _diag ($report) }
-	elsif ($gOpts{report} eq 'fail')	{ fail  ($report) }
-	else					{ print ($report) }
-	next unless $gOpts{errcont}; # skip block
-    }
+    _diag(join "\n", "got unexpected:", @got) if @got;
+    _diag(join "\n", "missed expected:", @missed) if @missed;
 }
 
 =head1 mkCheckRex ($tc)
@@ -631,7 +606,7 @@ an ex-op.
 =head2 match criteria
 
 The selected golden-sample is massaged to eliminate various match
-irrelevancies.  This is done so that the tests dont fail just because
+irrelevancies.  This is done so that the tests don't fail just because
 you added a line to the top of the test file.  (Recall that the
 renderings contain the program's line numbers).  Similar cleanups are
 done on "strings", hex-constants, etc.
@@ -657,7 +632,6 @@ sub mkCheckRex {
     # converts expected text into Regexp which should match against
     # unaltered version.  also adjusts threaded => non-threaded
     my ($tc, $want) = @_;
-    eval "no re 'debug'";
 
     my $str = $tc->{expect} || $tc->{expect_nt};	# standard bias
     $str = $tc->{$want} if $want && $tc->{$want};	# stated pref
@@ -666,20 +640,41 @@ sub mkCheckRex {
 
     $str =~ s/^\# //mg;	# ease cut-paste testcase authoring
 
-    if ($] < 5.009) {
-	# add 5.8 private flags, which bleadperl (5.9.1) doesn't have/use/render
-	# works because it adds no wildcards, which are butchered below..
-        $str =~ s|(mapstart l?K\*?)|$1/2|mg;
-        $str =~ s|(grepstart l?K\*?)|$1/2|msg;
-        $str =~ s|(mapwhile.*? l?K)|$1/1|msg;
-	$str =~ s|(grepwhile.*? l?K)|$1/1|msg;
-    }
+    # strip out conditional lines
+
+    $str =~ s{^(.*?)   \s+(<|<=|==|>=|>)\s*(5\.\d+)
+		    (?:\s+(<|<=|==|>=|>)\s*(5\.\d+))? \ *\n}
+     {
+	my ($line, $cmp, $version, $cmp2, $v2) = ($1,$2,$3,$4,$5,$6);
+	my $repl = "";
+	if (  $cmp eq '<'  ? $] <  $version
+	    : $cmp eq '<=' ? $] <= $version
+	    : $cmp eq '==' ? $] == $version
+	    : $cmp eq '>=' ? $] >= $version
+	    : $cmp eq '>'  ? $] >  $version
+	    : die("bad comparison '$cmp' in string [$str]\n")
+	 and !$cmp2 || (
+	      $cmp2 eq '<'  ? $] <  $v2
+	    : $cmp2 eq '<=' ? $] <= $v2
+	    : $cmp2 eq '==' ? $] == $v2
+	    : $cmp2 eq '>=' ? $] >= $v2
+	    : $cmp2 eq '>'  ? $] >  $v2
+	    : die("bad comparison '$cmp2' in string [$str]\n")
+	  )
+	) {
+	    $repl = "$line\n";
+	}
+	$repl;
+     }gemx;
+
     $tc->{wantstr} = $str;
 
+    # make UNOP_AUX flag type literal
+    $str =~ s/<\+>/<\\+>/;
     # make targ args wild
     $str =~ s/\[t\d+\]/[t\\d+]/msg;
 
-    # escape bracing, etc.. manual \Q (doesnt escape '+')
+    # escape bracing, etc.. manual \Q (doesn't escape '+')
     $str =~ s/([\[\]()*.\$\@\#\|{}])/\\$1/msg;
     # $str =~ s/(?<!\\)([\[\]\(\)*.\$\@\#\|{}])/\\$1/msg;
 
@@ -710,32 +705,12 @@ sub mkCheckRex {
 		)
 		(?:(:>,<,%,\\{)		# hints when open.pm is in force
 		   |(:>,<,%))		# (two variations)
-		(\ ->[0-9a-z]+)?
+		(\ ->(?:-|[0-9a-z]+))?
 		$
 	       ]
 	[$1 . ($2 && ':{') . $4]xegm;	# change to the hints without open.pm
     }
 
-    if ($] < 5.009) {
-	# 5.8.x doesn't provide the hints in the OP, which means that
-	# B::Concise doesn't show the symbolic hints. So strip all the
-	# symbolic hints from the golden results.
-	$str =~ s[(			# capture
-		   \(\?:next\|db\)state	# the regexp matching next/db state
-		   .*			# all sorts of things follow it
-		  v			# The opening v
-		  )
-		  :(?:\\[{*]		# \{ or \*
-		      |[^,\\])		# or other symbols on their own
-		    (?:,
-		     (?:\\[{*]
-			|[^,\\])
-		      )*		# maybe some more joined with commas
-		(\ ->[0-9a-z]+)?
-		$
-	       ]
-	[$1$2]xgm;			# change to the hints without flags
-    }
 
     # don't care about:
     $str =~ s/:-?\d+,-?\d+/:-?\\d+,-?\\d+/msg;		# FAKE line numbers
@@ -748,7 +723,7 @@ sub mkCheckRex {
     $str =~ s/leavesub \[\d\]/leavesub [\\d]/msg;	# for -terse
     #$str =~ s/(\s*)\n/\n/msg;				# trailing spaces
     
-    croak "no reftext found for $want: $tc->{name}"
+    croak "whitespace only reftext found for '$want': $tc->{name}"
 	unless $str =~ /\w+/; # fail unless a real test
     
     # $str = '.*'	if 1;	# sanity test
@@ -776,28 +751,13 @@ sub mylike {
     my $cmnt	= $tc->{name};
     my $cross	= $tc->{cross};
 
-    my $msgs	= $tc->{msgs};
-    my $retry	= $tc->{retry}; # || $gopts{retry};
-    my $debug	= $tc->{debug}; #|| $gopts{retrydbg};
-
     # bad is anticipated failure
-    my $bad = (0 or ( $cross && $tc->{crossfail})
-	       or (!$cross && $tc->{fail})
-	       or 0); # no undefs !
+    my $bad = ($cross && $tc->{crossfail}) || (!$cross && $tc->{fail});
 
-    # same as A ^ B, but B has side effects
-    my $ok = ( $bad  &&  unlike ($got, $want, $cmnt, @$msgs)
-	       or !$bad && like ($got, $want, $cmnt, @$msgs));
+    my $ok = $bad ? unlike ($got, $want, $cmnt) : like ($got, $want, $cmnt);
 
     reduceDiffs ($tc) if not $ok;
 
-    if (not $ok and $retry) {
-	# redo, perhaps with use re debug - NOT ROBUST
-	eval "use re 'debug'" if $debug;
-	$ok = ( $bad  &&  unlike ($got, $want, "(RETRY) $cmnt", @$msgs)
-		or !$bad && like ($got, $want, "(RETRY) $cmnt", @$msgs));
-	eval "no re 'debug'";
-    }
     return $ok;
 }
 
@@ -1037,7 +997,7 @@ sub OptreeCheck::gentest {
 sub OptreeCheck::processExamples {
     my @files = @_;
 
-    # gets array of paragraphs, which should be code-samples.  Theyre
+    # gets array of paragraphs, which should be code-samples.  They're
     # turned into optreeCheck tests,
 
     foreach my $file (@files) {

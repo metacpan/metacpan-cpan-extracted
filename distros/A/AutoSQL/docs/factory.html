@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>MODULE FACTORY</title>
+<link rev="made" href="mailto:juguang@commandos.local." />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#module_factory">MODULE FACTORY</a></li>
+	<ul>
+
+		<li><a href="#overview">Overview</a></li>
+		<li><a href="#code_example">Code Example</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="module_factory">MODULE FACTORY</a></h1>
+<p>Introduction to ModuleFactory and AdaptorFactory</p>
+<p>
+</p>
+<h2><a name="overview">Overview</a></h2>
+<p>ModuleFactory has the knowledge of Schema.</p>
+<p>For ModuleFactory::make_virtual_module and AdaptorFactory::make_object_adaptor, they generate the module according to
+the type in schema, and return the generated module's name.</p>
+<pre>
+ make_object_adaptor        -- a module
+ _make_only_fetch_method    -- method(s)</pre>
+<p>
+</p>
+<h2><a name="code_example">Code Example</a></h2>
+<pre>
+ sub make_module {
+     my ($self, $type)=@_;</pre>
+<pre>
+ sub make_method {
+     my ($self, $model)=@_;
+     my ($self, $val)=@_;</pre>
+
+</body>
+
+</html>

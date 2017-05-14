@@ -35,61 +35,61 @@ name: Mastodon-Client
 provides:
   Mastodon::Client:
     file: lib/Mastodon/Client.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Account:
     file: lib/Mastodon/Entity/Account.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Application:
     file: lib/Mastodon/Entity/Application.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Attachment:
     file: lib/Mastodon/Entity/Attachment.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Card:
     file: lib/Mastodon/Entity/Card.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Context:
     file: lib/Mastodon/Entity/Context.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Error:
     file: lib/Mastodon/Entity/Error.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Instance:
     file: lib/Mastodon/Entity/Instance.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Mention:
     file: lib/Mastodon/Entity/Mention.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Notification:
     file: lib/Mastodon/Entity/Notification.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Relationship:
     file: lib/Mastodon/Entity/Relationship.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Report:
     file: lib/Mastodon/Entity/Report.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Results:
     file: lib/Mastodon/Entity/Results.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Status:
     file: lib/Mastodon/Entity/Status.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Entity::Tag:
     file: lib/Mastodon/Entity/Tag.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Listener:
     file: lib/Mastodon/Listener.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Role::Entity:
     file: lib/Mastodon/Role/Entity.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Role::UserAgent:
     file: lib/Mastodon/Role/UserAgent.pm
-    version: '0.010'
+    version: '0.011'
   Mastodon::Types:
     file: lib/Mastodon/Types.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   AnyEvent: '7.13'
   AnyEvent::Emitter: '0.02'
@@ -125,5 +125,8 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jjatria/Mastodon-Client/issues
   repository: git://gitlab.com/jjatria/Mastodon-Client.git
-version: '0.010'
+version: '0.011'
+x_contributors:
+  - 'Al Beano <albino@autistici.org>'
+  - 'Lance Wicks <lancew@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

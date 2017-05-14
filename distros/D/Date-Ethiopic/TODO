@@ -1,0 +1,14 @@
+* Add Hadiyya, Gedeo, Oromo data after reviewing ethiopic calendar usage.
+
+* Add getTsome method which checks if the object day, or args, is a tsome.
+
+* Eventually implement Gurage, Oromo and Sidama calendar systems.
+
+* Add ጾመ ገሀድ detection based on ትንሣኤ.
+
+* Add methods for holidays.  Consider islamic holidays (complicated by
+  lunar calendar).
+
+* Complete formatting methods.  Don't forget ethiopic hour difference.
+
+* Fill out documentation.

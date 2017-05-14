@@ -1,0 +1,50 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-May-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: simple Filter
+
+H2: Interface
+
+!block example
+!block {{B:simple}} [;{{parameters}}]
+...
+!endblock
+!endblock
+
+The parameters are:
+
+!block table
+Name    Description
+pre     Perl code to execute before the block
+exec    executed for each line with $line containing the text line
+post    Perl code to execute after the block
+!endblock
+
+H2: Description
+
+The {{simple}} filter is typically used as a building block
+for other filters. It provides a simple way of specifying
+the before (pre), per-line (exec) and after (post) actions.
+
+Note: As creating new filters is not something that the average
+SDF users does, this filter is really provided to make life easier
+for advanced SDF users and SDF administrators.
+
+H2: Examples
+
+E:!on filter "testcases";; \
+E:        $name='simple'; \
+E:        $params.=';pre="!testcaseStart"'; \
+E:        $params.=';post="!testcaseEnd"'
+
+#H2: Limitations & Future Directions

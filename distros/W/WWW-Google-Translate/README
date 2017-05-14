@@ -1,4 +1,4 @@
-WWW-Google-Translate version 0.09
+WWW-Google-Translate version 0.10
 =================================
 
 This module provides a convenient interface for using the
@@ -21,18 +21,16 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Data::Dumper (for the example/api.pl program)
-  HTTP::Status
-  JSON
-  LWP::UserAgent
-  Readonly
-  Sys::Hostname
   URI
-  File::Spec
+  JSON
+  Readonly
+  Storable
+  Data::Dumper
+  HTTP::Status
+  Sys::Hostname
+  LWP::UserAgent
 
 COPYRIGHT AND LICENCE
-
-Put the correct copyright and licence information here.
 
 Copyright (C) 2017 by Dylan Doxey
 

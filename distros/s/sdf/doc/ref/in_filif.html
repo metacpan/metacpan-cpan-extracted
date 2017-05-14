@@ -1,0 +1,86 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: Understanding Filter Interfaces</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="in_claif.html">Previous Topic</A> | <A HREF="in_macif.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>B. Understanding Filter Interfaces</H1>
+<HR>
+<H2><A NAME="Overview">B.1. Overview</A></H2>
+<H3><A NAME="General Syntax">General Syntax</A></H3>
+<P>The general syntax for using each filter is shown first. By convention, the filter is shown using the <A HREF="../ref/mblock.html">block</A> and <A HREF="../ref/mendbloc.html">endblock</A> macros, although filters can also be used with other macros, including <A HREF="../ref/minclude.html">include</A> and <A HREF="../ref/mexecute.html">execute</A>.</P>
+<H3><A NAME="Parameters">Parameters</A></H3>
+<P>If a filter has one or more optional parameters, these are listed in a table containing the following columns:</P>
+<UL>
+<LI><EM>Name</EM> - the parameter name
+<LI><EM>Type</EM> - the parameter type
+<LI><EM>Rule</EM> - the pattern, if any, used to validate the value.</UL>
+<H3><A NAME="Parameter Types and Rules">Parameter Types and Rules</A></H3>
+<P>Parameter types and rules follow the same conventions as macro argument types and rules. Refer to <A HREF="in_macif.html">Understanding Macro Interfaces</A> for details.</P>
+<HR>
+<H2><A NAME="Data Tables">B.2. Data Tables</A></H2>
+<H3><A NAME="Table Fields">Table Fields</A></H3>
+<P>Providing data to a filter via a table is a common idiom in SDF as using tables makes it easy to add additional columns later on.</P>
+<P>If a filter expects a table of data in <A HREF="../ref/fmt_tbl.html">TBL</A> format, the fields in the table of data are listed in a table containing the following columns:</P>
+<UL>
+<LI><EM>Field</EM> - the field name
+<LI><EM>Category</EM> - <EM>key</EM>, <EM>mandatory</EM> or <EM>optional</EM>
+<LI><EM>Rule</EM> - the pattern, if any, used to validate the value.</UL>
+<H3><A NAME="Table Field Categories">Table Field Categories</A></H3>
+<P>The supported table field categories are explained below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Category</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+key
+</TD>
+<TD>
+a unique value must be provided for each row
+</TD>
+</TR>
+<TR>
+<TD>
+mandatory
+</TD>
+<TD>
+a value must be provided for each row
+</TD>
+</TR>
+<TR>
+<TD>
+optional
+</TD>
+<TD>
+a value is optional
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Validating Table Fields">Validating Table Fields</A></H3>
+<P>As validating table fields can reduce performance quite a bit, the <A HREF="../ref/sdf.html">sdf</A> program doesn't validate them by default. To enable table field validation, use the -v option like this:</P>
+<PRE>
+  sdf -v99 ...
+</PRE>
+<P>Typically, this is only needed when a filter isn't working as you'd expect.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="in_claif.html">Previous Topic</A> | <A HREF="in_macif.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

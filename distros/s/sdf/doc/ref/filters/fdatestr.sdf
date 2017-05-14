@@ -1,0 +1,44 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1998, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 23-Oct-98 ianc    SDF 2.001
+# -----------------------------------------------------------------------
+#
+
+H1: datestrings Filter
+
+H2: Interface
+
+!filter_interface "datestrings"
+
+H2: Description
+
+The {{datestrings}} filter can be used to change the strings
+used within a date. The fields within the table are:
+
+* {{Symbol}} - the matching symbol name (without the $) from
+  the {{SUBR:FormatTime}} subroutine
+* {{Values}} - a Perl string containing a whitespace-separated
+  list of values.
+
+H2: Examples
+
+!block verbatim
+!block datestrings
+Symbol   Values
+month    "January February March April May June July August September October November December"
+smonth   "Jan     Feb      Mar   Apr   May Jun  Jul  Aug    Sep       Oct     Nov      Dec"
+weekday  "Monday Tuesday Wednesday Thursday Friday Saturday Sunday"
+sweekday "Mon    Tue     Wed       Thu      Fri    Sat      Sun"
+ampm     "am pm"
+AMPM     "AM PM"
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

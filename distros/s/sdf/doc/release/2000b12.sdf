@@ -1,0 +1,210 @@
+H1: 2.000beta12
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+Note: The {{sdf2...}} wrapper scripts are no longer provided -
+use the -2 option of the {{CMD:sdf}} command instead.
+
+The major enhancements are:
+
+!block sections
+. Output format naming rationalisation
+. Automatic figure format conversion
+. Better HTML customisation and documentation
+. New output formats
+. Locales
+. Template processing
+. Paragraph text is now the default output
+. Post filtering
+!endblock
+
+The minor enhancements are:
+
+* when include files and figures are searched for, the directory
+  containing the document is now searched after the current directory
+
+* a Perl document catalog is now included (F<perl/catalog.sdf>)
+
+* generation of non-MIF outputs is now slightly faster.
+
+Further details on the major enhancements are provided below.
+
+H3: Output format naming rationalisation
+
+As SDF occasionally provides several ways to generate an output:
+
+* a convention has been introduced for output format names
+  (i.e. the parameter to the -2 option)
+* a mapping table has been added to F<sdf.ini> so
+  that sites can customise the mapping from logical format names
+  to actual format names.
+
+As a result, it is now easy to change F<sdf.ini> so that PostScript
+generation (i.e. {{-2ps}}) is via POD format rather than via FrameMaker, say.
+Furthermore, regardless of the default setup for PostScript generation:
+
+* PostScript via FrameMaker can be explicitly requested via {{-2ps_fm}}, and
+* PostScript via POD can be explicitly requested via {{-2ps_pod}}.
+
+Generally speaking, a name of {{xxx_yyy}} means format {{xxx}} via {{yyy}}.
+Likewise, a name of {{xxx_}} means format {{xxx}} directly.
+
+H3: Automatic figure format conversion
+
+As requested (many years ago, in fact), SDF will now automatically
+convert figure formats for you if it needs to. In particular,
+if you have a {{prn}} file on the search path, {{CMD:sdf}} will convert
+it to {{gif}} for HTML and {{eps}} for PostScript. Likewise, if you
+have an {{eps}} for PostScript, sdf will convert this to {{gif}} when
+you generate HTML.
+
+Creating a {{prn}} file as a easy as printing to a PostScript file
+from most Windows apps including MS-Office and Rational Rose.
+As a result, figure management should no longer be the hassle its
+been in the past.
+
+The conversion rules are stored in F<bin/sdf.ini>.
+Feel free to have a look and/or forward me any additions/enhancements
+to the rules. One of the rules uses a new program supplied in
+SDF called {{CMD:prn2ps}}. This new command makes the output from
+a Windows 95/NT "print PostScript to a file" command acceptable to
+Ghostscript's {{CMD:ps2epsi}}.
+
+H3: Better HTML customisation and documentation
+
+A large number of HTML customisation features already existed,
+but were poorly documented. The new customisation features in
+this release are:
+
+* HTML_PRE_HEADER/HTML_POST_FOOTER support
+* HTML_TEXT_* support
+* HTML_SECTION_LEVEL/HTML_PRE_SECTION support.
+
+See the new tutorial titled {{DOC: Generating HTML Using SDF}} for details.
+
+H3: New output formats
+
+SDF can now be converted to SGML like this:
+
+>  sdf -2sgml mydoc.sdf
+
+By default, the {{linuxdoc}} DTD is used.
+Alternatively, the SGML_DTD variable can be used to change the DTD to
+{{qwertz}}, say, like this:
+
+>  !define SGML_DTD "qwertz"
+
+If {{SGML-Tools}} 1.02 or later is installed, you can also generate
+the formats given below.
+
+!block table
+Command          Output_format   Via
+sdf -2latex_sgml LaTeX           SGML-Tools
+sdf -2dvi_sgml   DVI             SGML-Tools and LaTeX
+sdf -2ps_sgml    PostScript      SGML-Tools and LaTeX
+sdf -2rtf_sgml   RTF             SGML-Tools
+sdf -2info_sgml  GNU info        SGML-Tools
+sdf -2lyx_sgml   LyX             SGML-Tools
+!endblock
+
+H3: Locales
+
+SDF now has better support for non-English languages via locales.
+The -L option of the {{CMD:sdf}} command can be used to specify a locale.
+The default locale name is specified in {{FILE:sdf.ini}}.
+Locale naming follows POSIX conventions (i.e. language_country), so
+the locale name for American english is {{en_us}}.
+The information for each locale is stored in the F<locale> directory,
+so you'll need to have to look in there to see what locales are
+available. (As the default locale can be set in F<sdf.ini>, this
+isn't as ugly as it first sounds.)
+
+At the moment, a locale file simply contains a list of language
+specific strings, although it should ultimately be extended to
+support localisation of date and time formats.
+Feel free to send me new locales so I can include them in
+future versions of SDF.
+
+H3: Template processing
+
+SDF can now also be used as a generic template processor, i.e.
+you can create C source, say, with ! macros and E<2[>..E<2]> expressions
+within it and use {{CMD:sdf}} to process it. For example, if you have
+a file called F<xx.sdt> like this:
+
+!block verbatim
+    !if DATE
+        <P>
+        The date is [[DATE:DOC_START]].
+    !else
+        <P>
+        The time is [[TIME:DOC_START]].
+    !endif
+!endblock
+
+you can process it like this:
+
+>  sdf xx.sdt | less
+>  sdf -DDATE xx.sdt | less
+
+If the file doesn't have a {{sdt}} extension, you need to specify
+template processing like this:
+
+>  sdf -ptemplate myskel.cpp | less
+
+H3: Paragraph text is now the default output
+
+If you run the {{CMD:sdf}} program on a file without giving a target,
+the text of each paragraph is output. Therefore, you can now do things
+like:
+
+  sdf mydoc.sdf | spell -b
+
+H3: Post filtering
+
+It is now possible to post filter the output of a format driver before
+the results are written to disk. The -y option of the {{CMD:sdf}} command
+can now be used to specify a post filter name. A post filter called
+{{xxx}} maps to a routine called {{xxx_PostFilter}} in the file
+F<perllib/sdf/post_xxx.pl>.
+
+Note: This feature is only useful for SDF developers who want to create a
+new output format which is very simliar to an existing one.
+
+
+H2: Fixes
+
+Heading numbering in HTML and text outputs should be fixed now.
+
+The file and line number in messages should generally be right now.
+Certain filters may still lead to incorrect line numbers being reported,
+but messages containing '$fullname', line number 0 or -1 should
+no longer appear.
+
+Man page generation now works again. Previously, {{CMD:pod2man}}
+fell over unless a DOC_PROJECT and DOC_RELEASE was defined.
+
+MIMS HTX and F6 Help formats should be working correctly now.
+The MIMS_CLIENT_CODE variable must now be specified on the
+command line when generating MIMS F6 help.
+
+The APIs for SDF's Perl libraries are now present again in the
+{{DOC:SDF Guru Guide}}.
+
+
+H2: Incompatibilities
+
+The {{sdf2...}} wrapper scripts are no longer provided -
+use the -2 option of the {{CMD:sdf}} command instead.
+
+Given the rationalisation of output format naming, some of
+the previously used names (e.g. fmrtf, sgmllatex) have
+been changed. If the {{CMD:sdf}} command complains about
+an unknown alias, have a look in F<sdf.ini> to see what
+the new name is.
+
+The interface to {{SUBR:FindFile}}, a subroutine which some users
+override to integrate SDF into their CM system, has changed.
+See the {{SUBR:FindFile}} documentation for details.

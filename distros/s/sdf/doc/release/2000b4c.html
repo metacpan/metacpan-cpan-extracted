@@ -1,0 +1,52 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta4c</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b5.html">Previous Topic</A> | <A HREF="2000b4b.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>19. 2.000beta4c</H1>
+<P ALIGN="Left"><A HREF="#2.000beta4c - Enhancements">Enhancements</A> | <A HREF="#2.000beta4c - General Fixes">General Fixes</A> | <A HREF="#2.000beta4c - HTML Fixes">HTML Fixes</A> | <A HREF="#2.000beta4c - HLP Fixes">HLP Fixes</A> | <A HREF="#2.000beta4c - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000beta4c - Enhancements">19.1. Enhancements</A></H2>
+<P>None.</P>
+<HR>
+<H2><A NAME="2.000beta4c - General Fixes">19.2. General Fixes</A></H2>
+<P>If an imported figure is not given an extension, an extension is added based on the target format:</P>
+<UL>
+<LI><EM>hlp</EM> for Windows help
+<LI><EM>gif</EM> for <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A>
+<LI><EM>eps</EM> otherwise (<STRONG>not</STRONG> epsi).</UL>
+<P>The <A HREF="../user/ug_sdf.html">SDF User Guide</A> had most of the <EM>Advanced Features</EM> section commented out - this has now been fixed. The architecture figure in <EM>SDF Getting Started</EM> has been updated to show direct <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A> generation.</P>
+<P>All hypertext jumps throughout the documentation should now be working correctly.</P>
+<HR>
+<H2><A NAME="2.000beta4c - HTML Fixes">19.3. HTML Fixes</A></H2>
+<P>Blank cells in tables no longer look ugly.</P>
+<P>References and terms are now formatted as a table.</P>
+<HR>
+<H2><A NAME="2.000beta4c - HLP Fixes">19.4. HLP Fixes</A></H2>
+<P>URLs no longer come out in blue.</P>
+<P>Bitmaps no longer need to be in the directory when <CMD>hcp.exe</CMD> is executed, as the HPJ file now contains a search path. The HPJ file can still be generated on a Unix box (even though <CMD>hcp.exe</CMD> runs under <A HREF="http://www.microsoft.com/windows">Windows</A>) as the search path is build using a new optional variable called SDF_DOSHOME.</P>
+<P>Any option in the HLP file (xxx, say) can be set via the matching SDF variable called HLP_OPTIONS_xxx.</P>
+<P><A HREF="mailto:tim.hudson@mincom.com">tim.hudson@mincom.com</A> has fixed a number of bugs in <CMD>mif2rtf</CMD> including:</P>
+<UL>
+<LI>table titles now work
+<LI>formatted phrases at the beginning of a note or bulleted list now work
+<LI>notes now have a closing line.</UL>
+<HR>
+<H2><A NAME="2.000beta4c - Incompatibilities">19.5. Incompatibilities</A></H2>
+<P>None.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b5.html">Previous Topic</A> | <A HREF="2000b4b.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

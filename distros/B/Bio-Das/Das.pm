@@ -1,15 +1,16 @@
 package Bio::Das;
-# $Id: Das.pm,v 1.42 2005/08/24 15:16:59 lstein Exp $
+# $Id: Das.pm,v 1.55 2010/06/29 19:42:48 lstein Exp $
 
 # prototype parallel-fetching Das
 
 use strict;
 use Bio::Root::Root;
+use Bio::DasI;
 use Bio::Das::HTTP::Fetch;
-use Bio::Das::TypeHandler;     # bring in the handler for feature type ontologies
-use Bio::Das::Request::Dsn;    # bring in dsn  parser
+use Bio::Das::TypeHandler;          # bring in the handler for feature type ontologies
+use Bio::Das::Request::Dsn;         # bring in dsn  parser
 use Bio::Das::Request::Sequences;   # bring in sequence  parser
-use Bio::Das::Request::Types;  # bring in type parser
+use Bio::Das::Request::Types;       # bring in type parser
 use Bio::Das::Request::Dnas;
 use Bio::Das::Request::Features;
 use Bio::Das::Request::Feature2Segments;
@@ -24,8 +25,8 @@ use IO::Select;
 
 use vars '$VERSION';
 use vars '@ISA';
-@ISA     = 'Bio::Root::Root';
-$VERSION = '1.02';
+@ISA     = ('Bio::Root::Root','Bio::DasI');
+$VERSION = '1.17';
 
 *feature2segment = *fetch_feature_by_name = \&get_feature_by_name;
 my @COLORS = qw(cyan blue red yellow green wheat turquoise orange);
@@ -34,20 +35,21 @@ sub new {
   my $package = shift;
 
   # compatibility with 0.18 API
-  my ($timeout,$auth_callback,$url,$dsn,$oldstyle_api,$aggregators,$autotypes,$autocategories);
+  my ($timeout,$auth_callback,$url,$dsn,$oldstyle_api,$aggregators,$autotypes,$autocategories,$proxy);
   my @p = @_;
 
   if (@p >= 1 && $p[0] =~ /^http/) {
     ($url,$dsn,$aggregators) = @p;
   } elsif ($p[0] =~ /^-/) {  # named arguments
-    ($url,$dsn,$aggregators,$timeout,$auth_callback,$autotypes,$autocategories) 
+    ($url,$dsn,$aggregators,$timeout,$auth_callback,$autotypes,$autocategories,$proxy)
       = rearrange([['source','server'],
 		   'dsn',
 		   ['aggregators','aggregator'],
 		   'timeout',
 		   'auth_callback',
 		   'types',
-		   'categories'
+		   'categories',
+		   'proxy',
 		  ],
 		  @p);
   } else {
@@ -66,6 +68,7 @@ sub new {
 		    autotypes      => $autotypes,
 		    autocategories => $autocategories,
 	       },$package;
+  $self->proxy($proxy) if $proxy;
   $self->auth_callback($auth_callback) if defined $auth_callback;
   if ($aggregators) {
     my @a = ref($aggregators) eq 'ARRAY' ? @$aggregators : $aggregators;
@@ -105,7 +108,6 @@ sub add_aggregator {
     my @args = (-method    => $agg_name,
 		-sub_parts => \@subparts);
     push @args,(-main_method => $mainpart) if $mainpart;
-    warn "making an aggregator with (@args), subparts = @subparts" if $self->debug;
     require Bio::DB::GFF::Aggregator;
     push @$list,Bio::DB::GFF::Aggregator->new(@args);
   }
@@ -197,7 +199,8 @@ sub make_fetcher {
   my $request = shift;
   return Bio::Das::HTTP::Fetch->new(
 				    -request   => $request,
-				    -headers   => {'Accept-encoding' => 'gzip'},
+				    -headers   => {'Accept-encoding' => 'gzip',
+                                                   'Cache-Control'   => 'no-cache'},
 				    -proxy     => $self->proxy || '',
 				    -norfcwarn => $self->no_rfc_warning,
 				   );
@@ -385,7 +388,8 @@ sub refclass { 'Segment' }
 sub features {
   my $self = shift;
   my ($dsn,$segments,$types,$categories,
-      $fcallback,$scallback,$feature_id,$group_id,$iterator,$rangetype)
+      $fcallback,$scallback,$feature_id,$group_id,$iterator,$rangetype,
+      $seqid,$start,$end)
                                  = rearrange([['dsn','dsns'],
 			                      ['segment','segments'],
 					      ['type','types'],
@@ -396,8 +400,12 @@ sub features {
                                               'group_id',
 					      'iterator',
 					      'rangetype',
+					      'seq_id',
+					      'start',
+					      'end',
 					     ],@_);
 
+  $dsn ||= $self->default_url;
   croak "must provide -dsn argument" unless $dsn;
   my @dsn = ref $dsn && ref $dsn eq 'ARRAY' ? @$dsn : $dsn;
 
@@ -405,15 +413,31 @@ sub features {
   $self->throw('DAS/1 only supports range queries of type "overlaps"')
     unless $rangetype eq 'overlaps';
 
+  if (!$segments && $seqid) {
+      $segments = [$self->segment($seqid,$start,$end)];
+  }
+
   # handle types
   my @aggregators;
-  my $typehandler = Bio::Das::TypeHandler->new;
-  my $typearray   = $typehandler->parse_types($types);
+  my $typehandler   = Bio::Das::TypeHandler->new;
+  my $typearray     = $typehandler->parse_types($types);
+  my @typearray_sav = @$typearray;
   for my $a ($self->aggregators) {
     unshift @aggregators,$a if $a->disaggregate($typearray,$typehandler);
   }
 
-  my @types = map {defined $_->[1] ? "$_->[0]:$_->[1]" : $_->[0]} @$typearray;
+  # change to gbrowse das server requires us to send the aggregator names,
+  # rather than the disaggregated components. We send both.
+  my %aggregator_methods = map {$_->method => 1} @aggregators;
+  my @aggregator_types;
+  for my $type (@typearray_sav) {
+    next unless $aggregator_methods{$type->[0]};
+    push @aggregator_types,[$type->[0],$type->[1]];
+  }
+
+  my %seen;
+  my @types = grep {!$seen{$_}++} map {defined $_->[1] ? "$_->[0]:$_->[1]" : $_->[0]} (@$typearray,@aggregator_types);
+
   my @request;
   for my $dsn (@dsn) {
     push @request,Bio::Das::Request::Features->new(
@@ -431,9 +455,15 @@ sub features {
   my @results = $self->run_requests(\@request);
   $self->aggregate(\@aggregators,
 		   $results[0]->can('results') ? \@results : [\@results],
-		   $typehandler) if @aggregators && @results;
+		   $typehandler) if @results;
   return Bio::Das::FeatureIterator->new(\@results) if $iterator;
   return wantarray ? @results : $results[0];
+}
+
+sub get_seq_stream {
+    my $self = shift;
+    my @args = @_;
+    return $self->features(@args,-iterator=>1);
 }
 
 sub search_notes { }
@@ -740,6 +770,9 @@ select the data source to use (e.g. "elegans") by passing the B<-dsn>
 argument. B<-aggregators> is a list of aggregators as described
 earlier.
 
+The optional B<-proxy> argument will initialize the Bio::Das object
+with an HTTP or HTTPS proxy (see also the proxy() method below).
+
 =item $das = Bio::Das->new('http://das.server/cgi-bin/das',$dsn,$aggregators)
 
 Shortcut for the above.
@@ -765,6 +798,9 @@ Aggregators are used to build multilevel hierarchies out of the raw
 features in the DAS stream.  For a description of aggregators, see
 L<Bio::DB::GFF>, which uses exactly the same aggregator system as
 Bio::Das.
+
+The optional B<-proxy> argument will initialize the Bio::Das object
+with an HTTP or HTTPS proxy (see also the proxy() method below).
 
 If successful, this method returns a Bio::Das object.
 

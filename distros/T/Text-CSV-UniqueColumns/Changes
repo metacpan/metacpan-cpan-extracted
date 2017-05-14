@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::CSV::UniqueColumns.
+
+0.01  Sat May 29 15:02:58 2010
+	- original version; created by h2xs 1.23 with options
+		-X -n Text::CSV::UniqueColumns
+

@@ -1,6 +1,5 @@
 package urpm::main_loop;
 
-# $Id: main_loop.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 #- Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
@@ -29,7 +28,7 @@ use urpm::select;
 use urpm::orphans;
 use urpm::get_pkgs;
 use urpm::signature;
-use urpm::util qw(difference2 find intersection member partition untaint);
+use urpm::util qw(find intersection member partition);
 
 #- global boolean options
 my ($auto_select, $no_install, $install_src, $clean, $noclean, $force, $parallel, $test);
@@ -98,7 +97,7 @@ sub _download_all {
     my ($urpm, $blists, $sources, $callbacks) = @_;
     if ($urpm->{options}{'download-all'}) {
         $urpm->{cachedir} = $urpm->{'urpmi-root'} . $urpm->{options}{'download-all'};
-        urpm::init_cache_dir($urpm, $urpm->{cachedir});
+        urpm::init_dir($urpm, $urpm->{cachedir});
     }
     my (undef, $available) = urpm::sys::df("$urpm->{cachedir}/rpms");
 
@@ -211,23 +210,25 @@ sub _init_common_options {
   (
       urpm::install::options($urpm),
       test => $test,
+      deploops => $options{deploops},
       verbose => $options{verbose},
       script_fd => $urpm->{options}{script_fd},
       oldpackage => $state->{oldpackage},
       justdb => $options{justdb},
       replacepkgs => $options{replacepkgs},
       callback_close_helper => $callbacks->{close_helper},
+      callback_error => $callbacks->{error},
       callback_inst => $callbacks->{inst},
       callback_open_helper => $callbacks->{open_helper},
       callback_trans => $callbacks->{trans},
-      callback_report_uninst => $callbacks->{callback_report_uninst},
+      callback_uninst => $callbacks->{uninst},
       raw_message => 1,
   );
 }
 
 sub _log_installing {
     my ($urpm, $transaction_sources_install, $transaction_sources) = @_;
-    if (my @packnames = (values $transaction_sources_install, values $transaction_sources)) {
+    if (my @packnames = (values %$transaction_sources_install, values %$transaction_sources)) {
         (my $common_prefix) = $packnames[0] =~ m!^(.*)/!;
         if (length($common_prefix) && @packnames == grep { m!^\Q$common_prefix/! } @packnames) {
             #- there's a common prefix, simplify message
@@ -240,7 +241,7 @@ sub _log_installing {
 
 sub _run_parallel_transaction {
     my ($urpm, $state, $transaction_sources, $transaction_sources_install) = @_;
-    $urpm->{print}(N("distributing %s", join(' ', values $transaction_sources_install, values $transaction_sources)));
+    $urpm->{print}(N("distributing %s", join(' ', values %$transaction_sources_install, values %$transaction_sources)));
     #- no remove are handle here, automatically done by each distant node.
     $urpm->{log}("starting distributed install");
     $urpm->{parallel_handler}->parallel_install(
@@ -309,7 +310,7 @@ sub _run_transaction {
     !$fatal;
 }
 
-=item run($urpm, $state, $something_was_to_be_done, $ask_unselect, $_requested, $callbacks)
+=item run($urpm, $state, $something_was_to_be_done, $ask_unselect, $callbacks)
 
 Run the main urpm loop:
 
@@ -344,6 +345,104 @@ Run the main urpm loop:
 =back
 
 Warning: locking is left to callers...
+
+Parameters:
+
+=over
+
+=item $urpm: the urpm object
+
+=item $state: the state object (see L<URPM>)
+
+=item $something_was_to_be_done
+
+=item $ask_unselect: an array ref of packages that could not be selected
+
+=item $callbacks: a hash ref of callbacks :
+
+=over
+
+=item packages download:
+
+=over
+
+=item trans_log($mode, $file, $percent, $total, $eta, $speed): called for displaying download progress
+
+=item post_download(): called after completing download of packages
+
+=back
+
+=item interaction with user:
+
+=over
+
+=item ask_yes_or_no($_title, $msg)
+
+=item need_restart($need_restart_formatted) called when restarting urpmi is needed (priority upgrades)
+
+=item message($_title, $msg): display a message (with a title for GUIes)
+
+=back
+
+=item signature management:
+
+=over
+
+=item pre_check_sig(): signature checking startup (for rpmdrake)
+
+=item check_sig(): signature checking progress (for rpmdrake)
+
+=item bad_signature($msg, $msg2): called when a package is not/badly signed
+
+=back
+
+=item removable media management:
+
+=over
+
+=item pre_removable(): called before handling removable media (for rpmdrake)
+
+=item copy_removable($medium_name): called for asking inserting a CD/DVD
+
+=item post_extract($set, $transaction_sources, $transaction_sources_install) called after handling removable media (for rpmdrake)
+
+=back
+
+=item packages installation callbacks (passed to urpm::install::install(), see L<URPM> for parameters)
+
+=over
+
+=item open_helper(): called when opening a package, must return a fd
+
+=item close_helper(): called when package is closed
+
+=item inst() called for package opening/progress/end
+
+=item trans() called for transaction opening/progress/end
+
+=item uninst(): called for erasure progress
+
+=item error() called for cpio, script or unpacking errors
+
+=back
+
+=item finish callbacks (mainly GUI callbacks for rpmdrake/gurpmi/drakx)
+
+=over
+
+=item completed(): called when everything is completed (for cleanups)
+
+=item trans_error_summary($nok, $errors) called to warn than $nok transactions failed with $errors messages
+
+=item success_summary() called on success
+
+=item already_installed_or_not_installable($msg1, $msg2)
+
+=back
+
+=back
+
+=back
 
 =cut
 
@@ -534,6 +633,6 @@ Copyright (C) 1999-2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2012 Mageia
+Copyright (C) 2011-2015 Mageia
 
 =cut

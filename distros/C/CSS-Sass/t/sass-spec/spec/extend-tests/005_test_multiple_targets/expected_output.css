@@ -1,7 +1,5 @@
 .foo, .bar {
-  a: b;
-}
+  a: b; }
 
 .blip .foo, .blip .bar {
-  c: d;
-}
+  c: d; }

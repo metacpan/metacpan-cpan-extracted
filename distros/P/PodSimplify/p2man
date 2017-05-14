@@ -1,0 +1,454 @@
+#!/usr/bin/perl -I.
+
+use Pod::Simplify;
+
+$x = new Pod::Simplify;
+
+sub findindex {
+	my(@a) = @_;
+	shift @a;
+	my(@look) = map(join("/",@$_),@a);
+	my($match)=0;
+	foreach(@look) {
+		if($match = $idx{$_}) {
+			last;
+		}
+	}
+	$match;
+}
+
+sub flowed {
+	my($out);
+	foreach $i (@_) {
+		if(ref $i eq "ARRAY") {
+			my(@i) = (@$i);
+			my($c) = shift @i;
+			if($c eq "B" or $c eq "I") { # Bold/italic
+				$out .= "<$c>" . flowed(@i) . "</$c>";
+			}
+			elsif($c eq "V") { # Variable
+				$out .= "``<CODE>{v}". flowed(@i) . "</CODE>''";
+			}
+			elsif($c eq "P") { # Procedure
+				$out .= "<I>{p}". flowed(@i) . "</I>";
+			}
+			elsif($c eq "F") { # Filename
+				$out .= "<EM>{f}". flowed(@i) . "</EM>";
+			}
+			elsif($c eq "S") { # Switch
+				$out .= "<B>{s}". flowed(@i) . "</B>";
+			}
+			elsif($c eq "C") { # Code
+				$out .= "<CODE>". flowed(@i) . "</CODE>";
+			}
+			elsif($c eq "R") { # Reference
+				my($id) = findindex(@i);
+				$out .= '<A HREF="' if $id;
+				$out .= $id->[2] if $id and $id->[2] ne "foo";
+				$out .= '#'.$id->[0].'">' if $id;
+				$out .= "{r}". flowed(@{$i[0]});
+				$out .= "</A>" if $id;
+#				$out .= "{R:".Pod::Simplify::dumpout([@i])."} ";
+			}
+			elsif($c eq "X") { # Index
+				my($id) = findindex(@i);
+				$out .= '<A NAME="'.$id->[0].'">'.flowed(@{$i[0]})."</A>";
+#				$out .= "{X:".Pod::Simplify::dumpout([@i])."} ";
+			} 
+			elsif($c eq "E") { # Escape
+				$out .= '&'.$i[0].';';
+			}
+			else {
+				$out .= "{$c".":". flowed(@i) ."}"; 
+			}
+		} else {
+			$i =~ s/([<>&])/ '&'.$Pod::Simplify::ASCII2Escape{$1}.';' /ge;
+			$out .= $i;
+		}
+	}
+	$out;
+}
+
+@listtype=();
+
+$idx=0;
+
+sub doindex {
+	foreach (@_) {
+		if(ref $_ eq "ARRAY") {
+			my(@i) = @$_;
+			my($i) = shift @i;
+			if( $i eq "X") {
+				shift @i; # discard printable block
+				$idx++;
+				$name = join("/",@{$i[0]});
+				$name =~ s/([^A-Za-z0-9_])/ "%".sprintf("%.2X",ord($1)) /ge;
+				foreach (@i) {
+					$idx{join("/",@$_)} = [$name,$idx,"perlvar.pod"];
+				}
+				#print "Index: ",Pod::Simplify::dumpout([@i]),"\n";
+			} else {
+				doindex(@i);
+			}
+		}
+	}
+}
+
+sub dump1 {
+	my($par,$line,$pos,$cmd,$var1,$var2) = @_;
+	
+	# Save the parsed data for later processing
+	push(@results,@_);
+	
+	if( $cmd =~ /^(item|head|flow|index)$/) {
+		doindex(@$var2);
+	}
+}
+
+sub dump2 {
+	my($par,$line,$pos,$cmd,$var1,$var2) = @_;
+	
+	#print "cmd = $cmd\n";
+	
+	if( $cmd eq "begin" ) {
+		if($var1 eq "list") {
+			if($var2 eq "bullet") {
+				print "<UL><!-- begin bulleted list -->\n";
+			}
+			elsif($var2 eq "number") {
+				print "<OL><!-- begin numbered list -->\n";
+			} else {
+				print "<DL><!-- begin glossary list -->\n";
+			}
+			unshift(@listtype,$var2);
+		}
+		elsif($var1 eq "pod") {
+			print "<HTML><HEAD>\n".
+				  "<CENTER><TITLE>".$var2->[0]."</TITLE></CENTER>\n".
+				  "</HEAD><BODY>\n";
+		}
+	}
+	elsif( $cmd eq "end" ) {
+		if($var1 eq "list") {
+			if($var2 eq "bullet") {
+				print "</UL><!-- end bulleted list -->\n";
+			}
+			elsif($var2 eq "number") {
+				print "</OL><!-- end numbered list -->\n";
+			} else {
+				print "</DL><!-- end glossary list -->\n";
+			}
+			shift(@listtype);
+		}
+		elsif($var1 eq "pod") {
+			print "</BODY>\n";
+		}
+	}
+	elsif( $cmd eq "item") {
+#		print "v=".Pod::Simplify::dumpout($var2)."\n";
+		if($var1->[0] eq "bullet" or $var1->[0] eq "number") {
+			print " <LI> ";
+			print "<!-- #".$var->[1]." --> " if $var1->[0] eq "number";
+			print flowed(@$var2);
+		} else {
+			print " <DT><STRONG> ", flowed(@$var2), "\n </STRONG><DD>\n";
+		}
+	}
+	elsif( $cmd eq "head") {
+		print "<HR><H$var1>", flowed(@$var2), "</H$var1>\n";
+	}
+	elsif( $cmd eq "verb") {
+		print "<PRE>\n";
+		$var1 =~ s/^/        /gm;
+		$var1 =~ s/([<>&])/ "&".$Pod::Simplify::ASCII2Escape{$1}.";" /ge;
+		#$var1 =~ s/([<>])/$1$1/g;
+		print $var1;
+		print "\n</PRE>\n\n";
+	}
+	elsif( $cmd eq "flow") {
+		$f = Pod::Simplify::wrap(flowed(@$var2),75);
+		print $f, "<P>\n\n";
+	}
+	elsif( $cmd eq "comment" ) {
+		$var1 =~ s/--/- -/g;
+		$var1 =~ s/</lt/g;
+		$var1 =~ s/>/gt/g;
+		print "<!--\n${var1}-->\n";
+	}
+}
+
+$CFont = "CW";
+
+$block1 =~ s/<CFont>/$CFont/;
+
+print $block1;
+print <<"END";
+.TH $name $section "$RP" "$date" "$center"
+.IX Title "$name $section"
+.UC
+END
+
+
+#$x->parse_from_file_by_name("newvar.pod",\&dump1);
+$x->parse_from_file_by_name($ARGV[0] || "pod/perlvar.pod",\&dump2);
+
+#write index
+#foreach (sort keys %idx) {
+#	print join(" ",$_,@{$idx{$_}}),"\n";
+#}
+
+#dump2(@_) while(@_=splice(@results,0,6));
+
+
+BEGIN {
+$block1 = <<'EOF';
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.\$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft <CFont>
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+.ds L' '
+.ds R' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds L' `
+.ds R' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+EOF
+
+.TH $name $section "$RP" "$date" "$center"
+.IX Title "$name $section"
+.UC
+END
+
+$block2 = <<'END';
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+END
+print ".ft $CFont\n";
+print <<'END';
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+END
+
+%HTML_Escapes = (
+    'amp'	=>	'&',	#   ampersand
+    'lt'	=>	'<',	#   left chevron, less-than
+    'gt'	=>	'>',	#   right chevron, greater-than
+    'quot'	=>	'"',	#   double quote
+
+    "Aacute"	=>	"A\\*'",	#   capital A, acute accent
+    "aacute"	=>	"a\\*'",	#   small a, acute accent
+    "Acirc"	=>	"A\\*^",	#   capital A, circumflex accent
+    "acirc"	=>	"a\\*^",	#   small a, circumflex accent
+    "AElig"	=>	'\*(AE',	#   capital AE diphthong (ligature)
+    "aelig"	=>	'\*(ae',	#   small ae diphthong (ligature)
+    "Agrave"	=>	"A\\*`",	#   capital A, grave accent
+    "agrave"	=>	"A\\*`",	#   small a, grave accent
+    "Aring"	=>	'A\\*o',	#   capital A, ring
+    "aring"	=>	'a\\*o',	#   small a, ring
+    "Atilde"	=>	'A\\*~',	#   capital A, tilde
+    "atilde"	=>	'a\\*~',	#   small a, tilde
+    "Auml"	=>	'A\\*:',	#   capital A, dieresis or umlaut mark
+    "auml"	=>	'a\\*:',	#   small a, dieresis or umlaut mark
+    "Ccedil"	=>	'C\\*,',	#   capital C, cedilla
+    "ccedil"	=>	'c\\*,',	#   small c, cedilla
+    "Eacute"	=>	"E\\*'",	#   capital E, acute accent
+    "eacute"	=>	"e\\*'",	#   small e, acute accent
+    "Ecirc"	=>	"E\\*^",	#   capital E, circumflex accent
+    "ecirc"	=>	"e\\*^",	#   small e, circumflex accent
+    "Egrave"	=>	"E\\*`",	#   capital E, grave accent
+    "egrave"	=>	"e\\*`",	#   small e, grave accent
+    "ETH"	=>	'\\*(D-',	#   capital Eth, Icelandic
+    "eth"	=>	'\\*(d-',	#   small eth, Icelandic
+    "Euml"	=>	"E\\*:",	#   capital E, dieresis or umlaut mark
+    "euml"	=>	"e\\*:",	#   small e, dieresis or umlaut mark
+    "Iacute"	=>	"I\\*'",	#   capital I, acute accent
+    "iacute"	=>	"i\\*'",	#   small i, acute accent
+    "Icirc"	=>	"I\\*^",	#   capital I, circumflex accent
+    "icirc"	=>	"i\\*^",	#   small i, circumflex accent
+    "Igrave"	=>	"I\\*`",	#   capital I, grave accent
+    "igrave"	=>	"i\\*`",	#   small i, grave accent
+    "Iuml"	=>	"I\\*:",	#   capital I, dieresis or umlaut mark
+    "iuml"	=>	"i\\*:",	#   small i, dieresis or umlaut mark
+    "Ntilde"	=>	'N\*~',		#   capital N, tilde
+    "ntilde"	=>	'n\*~',		#   small n, tilde
+    "Oacute"	=>	"O\\*'",	#   capital O, acute accent
+    "oacute"	=>	"o\\*'",	#   small o, acute accent
+    "Ocirc"	=>	"O\\*^",	#   capital O, circumflex accent
+    "ocirc"	=>	"o\\*^",	#   small o, circumflex accent
+    "Ograve"	=>	"O\\*`",	#   capital O, grave accent
+    "ograve"	=>	"o\\*`",	#   small o, grave accent
+    "Oslash"	=>	"O\\*/",	#   capital O, slash
+    "oslash"	=>	"o\\*/",	#   small o, slash
+    "Otilde"	=>	"O\\*~",	#   capital O, tilde
+    "otilde"	=>	"o\\*~",	#   small o, tilde
+    "Ouml"	=>	"O\\*:",	#   capital O, dieresis or umlaut mark
+    "ouml"	=>	"o\\*:",	#   small o, dieresis or umlaut mark
+    "szlig"	=>	'\*8',		#   small sharp s, German (sz ligature)
+    "THORN"	=>	'\\*(Th',	#   capital THORN, Icelandic
+    "thorn"	=>	'\\*(th',,	#   small thorn, Icelandic
+    "Uacute"	=>	"U\\*'",	#   capital U, acute accent
+    "uacute"	=>	"u\\*'",	#   small u, acute accent
+    "Ucirc"	=>	"U\\*^",	#   capital U, circumflex accent
+    "ucirc"	=>	"u\\*^",	#   small u, circumflex accent
+    "Ugrave"	=>	"U\\*`",	#   capital U, grave accent
+    "ugrave"	=>	"u\\*`",	#   small u, grave accent
+    "Uuml"	=>	"U\\*:",	#   capital U, dieresis or umlaut mark
+    "uuml"	=>	"u\\*:",	#   small u, dieresis or umlaut mark
+    "Yacute"	=>	"Y\\*'",	#   capital Y, acute accent
+    "yacute"	=>	"y\\*'",	#   small y, acute accent
+    "yuml"	=>	"y\\*:",	#   small y, dieresis or umlaut mark
+);
+}
+

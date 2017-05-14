@@ -8,7 +8,11 @@
 #include <os2.h>
 
 /*
- * "The Road goes ever on and on, down from the door where it began."
+ *      The Road goes ever on and on
+ *          Down from the door where it began.
+ *
+ *     [Bilbo on p.35 of _The Lord of the Rings_, I/i: "A Long-Expected Party"]
+ *     [Frodo on p.73 of _The Lord of the Rings_, I/iii: "Three Is Company"]
  */
 
 #ifdef OEMVS
@@ -30,12 +34,6 @@ static PerlInterpreter *my_perl;
 ULONG PERLEXPORTALL(PCSZ name, LONG rargc, const RXSTRING *rargv, PCSZ queuename, PRXSTRING retstr);
 ULONG PERLDROPALL(PCSZ name, LONG rargc, const RXSTRING *rargv, PCSZ queuename, PRXSTRING retstr);
 ULONG PERLDROPALLEXIT(PCSZ name, LONG rargc, const RXSTRING *rargv, PCSZ queuename, PRXSTRING retstr);
-
-#if defined (__MINT__) || defined (atarist)
-/* The Atari operating system doesn't have a dynamic stack.  The
-   stack size is determined from this value.  */
-long _stksize = 64 * 1024;
-#endif
 
 /* Register any extra external extensions */
 

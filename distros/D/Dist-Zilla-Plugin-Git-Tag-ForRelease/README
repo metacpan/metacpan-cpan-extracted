@@ -1,0 +1,61 @@
+NAME
+    Dist::Zilla::Plugin::Git::Tag::ForRelease - Create a Release Tag Before
+    Building the Distribution.
+
+VERSION
+    version v0.05
+
+SYNOPSIS
+    In your dist.ini:
+
+      [Git::Check]           ; Check that everything has been checked in.
+      [Git::Tag::ForRelease] ; Create a new release version tag.
+
+DESCRIPTION
+    This plugin attempts to tag the current repository with an appropriate
+    new version number.
+
+ATTRIBUTES
+  repo_dir
+    The Git repository location. Defaults to the current dir.
+
+  base_version
+    The version number to use for the very first commit, if one doesn't
+    exist. defaults to '0.00';
+
+  alpha_format
+    The sprintf string to use to generate an alpha version. Defaults to
+    '%d.%02d_%03d'
+
+  version_format
+    The sprintf string to use to generate a regular version number. Defaults
+    to '%d.%02d'
+
+  tag_prefix
+    This string is prepended to the version number to form the tag name to
+    tag the repository with. Defaults to 'v'
+
+  matches
+    This is a regex string that is used when searching the repository for
+    the latest tag to increment. Only the latest tag matching this regex
+    will count as a version tag to be incremented. By default this value is
+    empty, so all tags are considered to be version tags.
+
+  tag_trials
+    Normally, a release built with the 'dzil release --trial' command does
+    not result in an actual tag being committed to the repository, unless
+    this attribute has been set.
+
+  debug
+    If turned on, the plugin will produce some debugging output while
+    working.
+
+AUTHOR
+    Stirling Westrup <swestrup@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Stirling Westrup.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

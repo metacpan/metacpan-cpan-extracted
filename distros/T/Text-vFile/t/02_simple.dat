@@ -1,0 +1,7 @@
+BEGIN:VFILE
+VERSION:3.0
+ADR;type=HOME;type=pref:;;123 Disk Dr.\nSuite 101 \ side door;Ottawa;Ontario;K1Y 2E9;Canada
+ADR;type=WORK:;;74 Bayswater Ave;Ottawa;ON;K1Y 2E9;Canada
+ADR;type=WORK;type=pref,transient;codething=4829394:;;456 Lazy Lane;Ottawa;ON;K1Y 2E9;Canada
+PHOTO;encoding=b;type=png:leo's_nice_picture_here
+END:VFILE

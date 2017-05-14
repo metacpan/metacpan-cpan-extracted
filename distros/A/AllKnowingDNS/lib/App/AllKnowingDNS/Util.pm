@@ -9,6 +9,18 @@ use App::AllKnowingDNS::Zone;
 use NetAddr::IP::Util qw(ipv6_aton);
 use v5.10;
 
+=head1 NAME
+
+App::AllKnowingDNS::Util - utility functions
+
+=head1 DESCRIPTION
+
+Note: User documentation is in L<all-knowing-dns>(1).
+
+=head1 FUNCTIONS
+
+=cut
+
 our @EXPORT = qw(parse_config netmask_to_ptrzone);
 
 =head2 parse_config($lines)
@@ -18,6 +30,7 @@ Parses a block of text as configfile.
 Returns a corresponding App::AllKnowingDNS::Config object.
 
 =cut
+
 sub parse_config {
     my ($input) = @_;
     my $config = App::AllKnowingDNS::Config->new;
@@ -79,10 +92,12 @@ sub parse_config {
 Converts the given netmask to a PTR zone.
 
 Example:
+
     my $ptrzone = netmask_to_ptrzone('2001:4d88:100e:ccc0::/64');
     say $ptrzone; # 0.c.c.c.e.0.0.1.8.8.d.4.1.0.0.2.ip6.arpa
 
 =cut
+
 sub netmask_to_ptrzone {
     my ($netmask) = @_;
 

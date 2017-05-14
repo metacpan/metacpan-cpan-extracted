@@ -1,16 +1,14 @@
 ---
-abstract: 'Experimental plugin for co-operative editing'
+abstract: 'Experimental plugin for collaborative editing'
 author:
-  - '-2011 The Padre development team as listed in Padre.pm'
+  - '-2010 The Padre development team as listed in Padre.pm'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Padre: 0.90
+  ExtUtils::MakeMaker: 6.42
   Test::More: 0.42
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
+  ExtUtils::MakeMaker: 6.42
 distribution_type: module
-dynamic_config: 0
-generated_by: 'Module::Install version 1.04'
+generated_by: 'Module::Install version 1.01'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,17 +22,16 @@ no_index:
     - t
   junkyard: []
 requires:
-  AnyEvent: 0
   Class::XSAccessor: 1.03
   Graph: 0
+  IO::Select: 0
   IO::Socket::Multicast: 1.11
   JSON: 2.15
-  Object::Event: 0
-  Padre: 0.92
+  Padre: 0.56
   Params::Util: 1.00
   Text::Patch: 1.04
   Wx::Socket: 0
   perl: 5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.2
+version: 0.11

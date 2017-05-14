@@ -1,0 +1,12 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+reloading_singluar
+	Singular classes can't accept arguments a second time.
+	Class: %s
+
+package_loading_not_pending
+	A pending instance for a non-pending class was requested.
+	Class: %s

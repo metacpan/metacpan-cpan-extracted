@@ -1,0 +1,11 @@
+Revision history for Perl extension LSF.
+
+0.1  Mon Feb 18 12:10:31 2002
+	  First release.
+     
+0.2  Wed Apr 02 10:03:25 2002
+      Second release. Includes LSF::JobManager
+      
+0.21 Thu Apr 02 10:40:57 2002
+     Simplified the test suite. A couple of things have been superceeded by the
+     addition of LSF::JobManager (and i still need to write a proper test suite)

@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         ARCv2
+version:      1.05
+version_from: lib/Arc.pm
+installdirs:  site
+requires:
+    Authen::SASL:                  2.06
+    Authen::SASL::Cyrus:           0.10
+    Config::IniFiles:              0.0
+    IO::Pipe:                      0.0
+    IO::Select:                    0.0
+    IO::Socket::INET:              0.0
+    MIME::Base64:                  0.0
+    Net::Server::PreFork:          0.85
+    Term::ReadKey:                 0.0
+    Term::ReadLine:                0.0
+    Test::More:                    0.0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

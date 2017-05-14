@@ -1,5 +1,4 @@
 .foo {
   each: a 1;
   each: b 2;
-  each: c 3;
-}
+  each: c 3; }

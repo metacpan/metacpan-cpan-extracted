@@ -3,7 +3,7 @@ use parent 'Panda::Export';
 use 5.012;
 use Panda::Lib;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.1.2';
 
 use Panda::Export {
     ALLOW_LEADING_AUTHORITY => 1,

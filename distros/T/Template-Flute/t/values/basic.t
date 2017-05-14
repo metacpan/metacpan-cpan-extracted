@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Warnings;
+use Test::More tests => 12;
 use Template::Flute;
 
 my ($spec, $html, $flute, $out);
@@ -158,25 +157,3 @@ $out = $flute->process();
 ok ($out =~ m%<div class="test"></div>%,
     "dotted value test (three levels, wrong key)")
     || diag $out;
-
-# test "dotted" values with wrong level in passed values
-
-$spec = q{<specification>
-<value name="test" field="session.test"/>
-</specification>
-};
-
-$html = q{<div class="test">TEST</div>};
-
-$flute = Template::Flute->new(template => $html,
-                              specification => $spec,
-                              values => {session => 'Wrong message'},
-                             );
-
-$out = $flute->process();
-
-ok ($out =~ m%<div class="test"></div>%,
-    "dotted value test with wrong level in passed values")
-    || diag $out;
-
-done_testing;

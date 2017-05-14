@@ -1,0 +1,12 @@
+This is a very tiny module. It isn't intended to solve all your problems,
+or anyone else's. It's simply a piece of code that I found myself using
+frequently enough that I decided it would be a good idea for it to be
+on the CPAN (and besides, somebody was probably doing something similar
+anyways).
+
+If you use this module and would like to see it more formally supported,
+let me know. As far as I know, there is precisely one user other than
+myself out there.
+
+I should probably move this into the Benchmark:: tree or deprecate it as
+some of its functionality is present in the Benchmark module itself.

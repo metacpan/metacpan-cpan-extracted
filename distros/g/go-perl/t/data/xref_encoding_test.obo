@@ -1,0 +1,28 @@
+format-version: 1.2
+date: 27:04:2007 16:42
+saved-by: donghui
+auto-generated-by: OBO-Edit 1.100
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+default-namespace: gene_ontology
+remark: cvs version: $Revision: 1.1 $
+
+[Term]
+id: GO:0018980
+name: 2\,4\,5-trichlorophenoxyacetic acid metabolic process
+namespace: biological_process
+def: "The chemical reactions and pathways involving 2,4,5-trichlorophenoxyacetic acid, a chlorinated aromatic compound which is widely used as a herbicide, often as a weed killer for home lawns." [UM-BBD_pathwayID:2\,4\,5-t]
+subset: gosubset_prok
+synonym: "2,4,5-T metabolic process" EXACT []
+synonym: "2,4,5-T metabolism" EXACT []
+synonym: "2,4,5-trichlorophenoxyacetic acid metabolism" EXACT []
+xref: UM-BBD_pathwayID:2\,4\,5-t
+is_a: GO:0018904 ! organic ether metabolic process
+is_a: GO:0019752 ! carboxylic acid metabolic process
+is_a: GO:0042196 ! chlorinated hydrocarbon metabolic process
+is_a: GO:0042537 ! benzene and derivative metabolic process
+
+

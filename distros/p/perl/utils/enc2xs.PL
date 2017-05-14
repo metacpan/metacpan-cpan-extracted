@@ -1,5 +1,8 @@
 #!/usr/local/bin/perl
 
+# Copy the cpan/Encode/bin/enc2xs script to utils/, while
+# prepending a suitable #! invocation.
+
 use Config;
 use File::Basename qw(&basename &dirname);
 use Cwd;
@@ -33,7 +36,7 @@ $Config{startperl}
 
 use File::Spec;
 
-my $enc2xs = File::Spec->catfile(File::Spec->catdir(File::Spec->updir, "ext", "Encode", "bin"), "enc2xs");
+my $enc2xs = File::Spec->catfile(File::Spec->catdir(File::Spec->updir, "cpan", "Encode", "bin"), "enc2xs");
 
 if (open(ENC2XS, $enc2xs)) {
     print OUT <ENC2XS>;

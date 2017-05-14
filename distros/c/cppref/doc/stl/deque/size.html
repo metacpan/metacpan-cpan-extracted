@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    size    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2009-08-06T06:26:26-0700" />
+<meta name="keywords" content="stl,deque,size" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/stl/deque/size?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=stl:deque" />
+<link rel="edit" title="Edit this page" href="/wiki/stl/deque/size?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/stl/deque/size" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/stl/deque/size" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/stl/deque/size" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='stl:deque';var JSINFO = {"id":"stl:deque:size","namespace":"stl:deque"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../stl/start.html"  title="stl:start">C++ Standard Template Library</a> &raquo; <a href="../../stl/deque/start.html"  title="stl:deque:start">C++ Double-ended Queues</a> &raquo; <a href="../../stl/deque/size.html"  title="stl:deque:size">size</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="size" id="size">size</a></h2>
+<div class="level2">
+
+<p>
+Syntax:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    <span class="co2">#include &lt;deque&gt;</span>
+    size_type size<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw4">const</span><span class="sy0">;</span></pre>
+<p>
+The size function returns the number of elements in the current deque.
+</p>
+
+<p>
+For example:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    deque<span class="sy0">&lt;</span>int<span class="sy0">&gt;</span> myints<span class="sy0">;</span>
+    <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;initial size: &quot;</span> <span class="sy0">&lt;&lt;</span> myints.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> <span class="st0">'<span class="es1">\n</span>'</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">for</span><span class="br0">&#40;</span> <span class="kw4">int</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> <span class="nu0">5</span><span class="sy0">;</span> <span class="sy0">++</span>i <span class="br0">&#41;</span> myints.<span class="me1">push_back</span><span class="br0">&#40;</span>i<span class="br0">&#41;</span><span class="sy0">;</span>
+    <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;after five additions: &quot;</span> <span class="sy0">&lt;&lt;</span> myints.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> <span class="st0">'<span class="es1">\n</span>'</span><span class="sy0">;</span>
+&nbsp;
+    myints.<span class="me1">insert</span><span class="br0">&#40;</span> myints.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> 5<span class="sy0">,</span> 100 <span class="br0">&#41;</span><span class="sy0">;</span>
+    <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;after five insertions: &quot;</span> <span class="sy0">&lt;&lt;</span> myints.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> <span class="st0">'<span class="es1">\n</span>'</span><span class="sy0">;</span>
+&nbsp;
+    myints.<span class="me1">pop_back</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;after a removal: &quot;</span> <span class="sy0">&lt;&lt;</span> myints.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> <span class="st0">'<span class="es1">\n</span>'</span><span class="sy0">;</span></pre>
+<p>
+The above code produces the following output:
+</p>
+<pre class="code">
+    initial size: 0
+    after five additions: 5
+    after five insertions: 10
+    after a removal: 9</pre>
+<p>
+Related Topics: <a href="../../stl/deque/max_size.html" class="wikilink1" title="stl:deque:max_size">max_size</a>, <a href="../../stl/deque/resize.html" class="wikilink1" title="stl:deque:resize">resize</a>
+</p>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        stl/deque/size.txt &middot; Last modified: 08/06/2009 06:26 by n-839      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

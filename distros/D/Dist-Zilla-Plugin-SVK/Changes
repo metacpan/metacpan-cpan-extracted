@@ -1,0 +1,44 @@
+---
+version: 0.10
+date: 五  7月  2 08:31:11 CST 2010
+changes:
+  - Local tag path constructed from svk info's depotpath
+
+---
+version: 0.08
+date: 四  7月  1 16:29:37 CST 2010
+changes:
+  - Baseless smerge of local tags to remote repo tags
+
+---
+version: 0.07
+date: 四  7月  1 10:36:18 CST 2010
+changes:
+  - Set up remote with svn rather than svk, for tag push problem.
+
+---
+version: 0.05
+date: 三  6月 30 15:55:44 CST 2010
+changes:
+  - Tag plugin needs project accessor for finding tags dir.
+---
+version: 0.04
+date: 三  6月 30 15:28:33 CST 2010??
+changes:
+  - Tag plugin needs project accessor for finding tags dir.
+---
+version: 0.03
+date: 三  6月 30 09:28:33 CST 2010
+changes:
+  - Removed use of SVK, XD API. System calls on svk instead.
+---
+version: 0.02
+date: 日  6月 20 15:33:49 CST 2010
+changes:
+  - Tests pass but SVK not releasing lock on upload to CPAN
+---
+version: 0.01
+date: 日  6月 13 15:58:06 CST 2010
+changes:
+  - First CPAN release, with Dist::Zilla
+  - Pretty faithful porting of git plugins

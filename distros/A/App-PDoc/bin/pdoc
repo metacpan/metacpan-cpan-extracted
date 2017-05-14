@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+#  PODNAME: bin/pdoc
+# ABSTRACT: The executable to [App::PDoc]
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use App::PDoc;
+
+App::PDoc->main;
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+bin/pdoc - The executable to [App::PDoc]
+
+=head1 VERSION
+
+version 0.10.0
+
+=head1 SYNOPSIS
+
+The executable to L<App::PDoc>
+
+=head1 AUTHOR
+
+DBR <dbr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by DBR.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut
+

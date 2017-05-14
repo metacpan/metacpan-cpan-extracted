@@ -1,0 +1,163 @@
+#####################################################################
+# package RecordModifyProcess
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to processing a Record Modification request...
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package RecordModifyProcess;
+
+
+#####################################################################
+# sub DoModRec
+#
+# This function actually modifies the record.
+#####################################################################
+sub main::DoModRec {
+  $query = CreateModQuery ();
+  $dbh = &MsqlCGI::SetupMsqlConnection ();
+
+  &main::DPrint ( "Performing Modification Query: <pre>$query</pre><p>" );
+  $sth = $dbh->Query ( $query ) || 
+  	&main::Error ( "Mod Query Failed.  $Msql::db_errstr" );
+
+  &main::DPrint ( $main::tableInfo->{'RecordModifySuccessTemplate'} );
+  if ( $main::tableInfo->{'RecordModifySuccessTemplate'} ) {
+    &Template::DoTemplate ( $main::tableInfo->{'RecordModifySuccessTemplate'}, 
+    			    "RECORD_MODIFY_SUCCESS", $sth );
+
+  } else {
+
+    print <<"    EOF";
+
+      <title>MsqlCGI: Record Modification -- SUCCESS!</title>
+      <h2>Your record has been modified.</h2>
+    EOF
+
+    print &DoStandardAction 
+    	( "RECORD_MODIFY_SUCCESS", $sth );
+    
+    print &Template::GetHTMLFooter();
+  }
+
+}
+
+##########################################################################
+# CreateModQuery 
+#
+# This function creates the query that we're going to use to modify the
+# record.
+##########################################################################
+sub CreateModQuery {
+  $strQuery = <<EOF;
+  	UPDATE	$main::tableInfo->{'TableName'}
+	SET     
+EOF
+  $nModified = 0;
+
+	# We need to setup the variableIncluded hash list.  We'll use the
+	# elements in the variable in{'_MsqlCGI_variableIncluded'}.  As
+	# per the cgi-lib spec, the variables are separated by a null
+	# character ("\0").
+  @list = split ( /\0/, $main::in{'_MsqlCGI_variableIncluded'} );
+  foreach $listEl ( @list ) {
+    $variableIncluded{$listEl} = 1;
+    &main::DPrint ("Variable: $listEl" );
+  }
+
+  for ( $nFieldCount = 0; $nFieldCount <= $#{$main::tData}; $nFieldCount++ ) {
+    	
+	# first setup some variables.  These just make the code easier to
+	# read (and kepp track of...)
+    $fieldName = $main::tData->[$nFieldCount]->{'fieldName'};
+    $modField = "_MsqlCGI_modify-" .  $fieldName;
+    $value = $main::in{$fieldName};
+    $priKeyName = $main::tData->[$main::tableInfo->{'priKeyArrNum'}]->{'fieldName'};
+    $priKeyValue = $main::in{'_MsqlCGI_priKey'};
+    #&main::DPrint 
+    #	( " $fieldName, $modField, $value, $priKeyName, $priKeyValue");
+    	# We need to get the primary key value and store it away.  Since
+	# we're going through each field, we can look for it as we go.
+    if ( $main::tData->[$main::tableInfo->{'priKeyArrNum'}]->{'fieldType'} eq "char" ) {
+      $priKeyValue = "'$priKeyValue'";
+    }
+
+
+    &main::DPrint ( "$modField, $main::in{$modField}" );
+
+    if ( $main::tData->[$nFieldCount]->{'special'} ) {
+      $funcName = &MsqlCGI::GetSpecialFunctionName 
+      		   ( $main::tData->[$nFieldCount], "CreateQueryPart_Modify" );
+      ( $value ) = &{$funcName}( $main::tableInfo, $main::tData->[$nFieldCount], $value );
+    }
+
+    	# Skip this field if we're not supposed to modify it. There are 3
+	# ways we can get told that we're not supposed to modify this
+	# field: if the config file says don't modify this field when
+	# modifying the record, OR if the in{'_MsqlCGI_modify-Field'}
+	# variable says "No"
+	# The third way is if the field doesn't appear in the
+	# "includedVariable" list
+    
+    next if ( ( $main::in{$modField} =~ /^n/i ) ||
+              ( ! $main::tData->[$nFieldCount]->{'modFieldWhenModify'} ) ||
+	      ( ! $variableIncluded{$fieldName} ) );
+
+    &main::DPrint ( "Need to update field: 
+		       $main::tData->[$nFieldCount]->{'description'}" );
+
+    $value = &MsqlCGI::StrToQueryStr 
+    		( $value, $main::tData->[$nFieldCount]->{'fieldType'}, "MODIFY" );
+
+    $strQuery .= ( $nModified ) ? ",\n\t\t$fieldName = $value" :
+				  "\t\t$fieldName = $value";
+    $nModified++;
+  }
+  $strQuery .= <<EOF;
+
+  	WHERE	$priKeyName = $priKeyValue
+EOF
+  return $strQuery;
+}
+
+#########################################################################
+# DoStandardAction
+#########################################################################
+sub DoStandardAction {
+  my ( $type, $sth ) = @_;
+  my ( $strRet ) = "";
+
+  $strRet .= &Template::GetCGIHeader ( "RecActions" );
+  $strRet .= <<"  EOF";
+      Click on the button below to view the record (with your changes).
+      <center>
+  EOF
+  $strRet .= &DoCGIFooter ( $sth );
+  $strRet .= <<"  EOF";
+      </center>
+  EOF
+  
+  return $strRet;
+}
+
+
+#########################################################################
+# DoCGIFooter
+# 
+# put a single button that says "view record", and that has the primary
+# key of the data element.
+#########################################################################
+sub DoCGIFooter {
+  my ( $sth ) = @_;
+  my ( $strRet ) .= <<"  EOF";
+    <input type=hidden name="_MsqlCGI_recAction" value="display">
+    <input type=hidden name="_MsqlCGI_priKey" 
+           value="$main::in{'_MsqlCGI_priKey'}">
+    <input type=submit value="View Record">
+  EOF
+  return $strRet;
+}
+1;

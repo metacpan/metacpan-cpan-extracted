@@ -1,0 +1,39 @@
+H1: Creating New Paragraph Styles
+
+H2: Using Event Processing
+
+SDF's event processing feature makes it easy to create
+a new paragraph style from an existing one. For example, the
+following line makes {{FEATURE}} an alias of the {{P2}} style:
+
+E:!on paragraph 'FEATURE';; $style='P2'
+
+
+H2: Using Mapping Tables
+
+SDF uses the {{parastyles}} filter to define the mapping between
+an SDF paragraph style and a target paragraph style.
+For example:
+
+!block example; pure
+!block parastyles
+Name        To                      Attributes
+
+# normal paragraphs
+N           b0_Body
+
+# headings
+H1          h1_Heading
+H2          h2_Heading
+H3          h3_Heading
+!endblock
+!endblock
+
+
+H2: Creating New Target Paragraph Styles
+
+SDF makes it easy to define new target paragraph styles
+by inheriting configuration details from an existing style.
+
+See the {{FILE:look/simple/mif.sdn}} file in the SDF distribution
+for examples.

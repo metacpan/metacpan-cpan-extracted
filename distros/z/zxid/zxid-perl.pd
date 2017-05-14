@@ -1,0 +1,407 @@
+<<if: ZXIDBOOK>>
+<<else: >>Net::SAML - Perl Interface to ZXID
+##################################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-perl.pd,v 1.6 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-PERL 01>>
+<<define: ZXDOC=Net::SAML - ZXID Perl Interface>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. This document describes the Perl glue.
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+Perl access to ZXID is using Net::SAML module.
+
+The perl glue for ZXID was generated using swig(1), however, the swig
+interface is not a retrofit: the whole ZXID API was designed to
+be easily swiggifiable.
+
+The main aim of the glue is supporting the easy and simple API, see
+<<link:zxid-simple.html: zxid_simple()>> for general
+reference. Only differences and language specifics are covered in this
+document.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+
+6 Net::SAML Perl Module
+=======================
+
+<<fi: >>
+
+* perl CGI example: zxid.pl
+* using with mod_perl
+
+After building the main zxid tree, you can
+
+  cd Net
+  perl Makefile.PL
+  make
+  make test      # Tests are extremely sparse at the moment
+  make install
+
+This assumes you use the pregenerated Net/SAML_wrap.c and Net/SAML.pm files
+that we distribute. If you wish to generate these files from origin,
+you need to have SWIG installed and then say in main zxid directory
+
+  make perlmod ENA_GEN=1  # Makes all available perl modules (including heavy low level ones)
+  make samlmod ENA_GEN=1  # Only makes Net::SAML (much faster)
+  make wsfmod  ENA_GEN=1  # Only makes Net::WSF (much faster)
+
+>  WARNING: Low level interface is baroque, and consequently, it
+>  will take a lot of disk space, RAM and CPU to build it: 100 MB
+>  would not be exaggeration and over an hour (on 1GHz CPU). Build
+>  time memory consumption of single cc1 process will be over
+>  256 MB of RAM. You have been warned.
+
+6.1 Example Program (see also zxidhlo.pl)
+-----------------------------------------
+
+<<ignore: perl -ne 'printf "%02d %s", ++$i, $_' <zxidhlo.pl >>
+
+<<logoutput:
+01 use Net::SAML;
+02 $| = 1; undef $/;  # Flush pipes, read all in at once
+03 $url = "http://sp.tas3.pt:8082/zxidhlo.pl";  # Edit to match your situation
+04 $conf = "PATH=/var/zxid/&URL=$url";
+05 $cf = Net::SAML::new_conf_to_cf($conf);
+06 $qs = $ENV{'QUERY_STRING'};
+07 $qs = <STDIN> if $qs =~ /o=P/;
+08 $res = Net::SAML::simple_cf($cf, -1, $qs, undef, 0x1828);
+09 $op = substr($res, 0, 1);
+10 if ($op eq 'L' || $op eq 'C') { print $res; exit; } # LOCATION (Redir) or CONTENT
+11 if ($op eq 'n') { exit; } # already handled
+12 if ($op eq 'e') { my_render_idpsel_screen(); exit; }
+13 if ($op ne 'd') { die "Unknown Net::SAML::simple() res($res)"; }
+14
+15 ($sid) = $res =~ /^sesid: (.*)$/m;  # Extract a useful attribute from SSO output
+16
+17 print <<HTML
+18 CONTENT-TYPE: text/html
+19
+20 <title>ZXID perl HLO SP Mgmt & Protected Content</title>
+21 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+22 <link type="text/css" rel=stylesheet href="idpsel.css">
+23 <body bgcolor=white><font face=sans>
+24 $az
+25 <h1>ZXID SP Perl HLO Management & Protected Content (user logged in, session active)</h1>
+26 sesid: $sid
+27 HTML
+28     ;
+29 print Net::SAML::fed_mgmt_cf($cf, undef, -1, $sid, 0x1900);
+30 exit;
+31
+32 sub my_render_idpsel_screen {  # Replaces traditional login screen
+33     print <<HTML;
+34 CONTENT-TYPE: text/html
+35
+36 <title>ZXID SP PERL HLO SSO IdP Selection</title>
+37 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+38 <link type="text/css" rel=stylesheet href="idpsel.css">
+39 <body bgcolor=white><font face=sans>
+40 <h1>ZXID SP Perl HLO Federated SSO IdP Selection (user NOT logged in, no session.)</h1>
+41 <form method=get action="zxidhlo.pl">
+42
+43 <h3>Login Using New IdP</h3>
+44
+45 <i>A new IdP is one whose metadata we do not have yet. We need to know
+46 the Entity ID in order to fetch the metadata using the well known
+47 location method. You will need to ask the adminstrator of the IdP to
+48 tell you what the EntityID is.</i>
+49
+50 <p>IdP URL <input name=e size=60><input type=submit name=l2 value=" Login ">
+51 HTML
+52 ;
+53     print Net::SAML::idp_list_cf($cf, undef, 0x1c00);   # Get the IdP selection form
+54     print <<HTML;
+55 <h3>CoT configuration parameters your IdP may need to know</h3>
+56
+57 Entity ID of this SP: <a href="$url?o=B">$url?o=B</a> (Click on the link to fetch SP metadata.)
+58
+59 <input type=hidden name=fc value=1><input type=hidden name=fn value=prstnt>
+60 <input type=hidden name=fq value=""><input type=hidden name=fy value="">
+61 <input type=hidden name=fa value=""><input type=hidden name=fm value="">
+62 <input type=hidden name=fp value=0><input type=hidden name=ff value=0>
+63
+64 </form><hr><a href="http://zxid.org/">zxid.org</a>
+65 HTML
+66     ;
+67 }
+>>
+
+This example only demosntrates SSO.
+
+Lines 1-5 set up the configuration. See zxid-conf.pd for guidance.
+
+ll.6-7 reads in the CGI input the perl way.
+
+l.8 runs the SAML engine of ZXID. The engine will return result that
+is processed below. The magic constant 0x1828 sets some flags, see
+zxid-simple.pd for explanation. This explanation may be especially relevant
+if you plan to run as mod_perl process rather than as a CGI. With
+these flags you could eliminate the need to render the IdP selection
+screen.
+
+ll.9-13: interpret the return value. l.10 deals with parts of SAML
+protocol that need redirect or content. l.12 deals with rendering the
+IdP selection screen. This screen replaces the traditional login
+screen in most applications.
+
+l.15 demonstrates how to extract attributes from the return value. The ret
+is formatted as LDIF so it is very easy to parse with perl.
+
+ll.17-30 render the "protected content". Most protected content should
+contain also Single Logout button. This is accomplished on l.29.
+Protected content is where your normal application after SSO lives.
+You can rely in ZXID session mechanism and just show the content,
+or you could bootstrap your application's session mechanism here.
+
+ll.32-67 render the "idp selection" screen. This could have been
+automatically generated has the flags to Net::SAML::simple_cf()
+been different (see zxid-simple.pd for explanation).
+
+As can be seen, the most central logic for SSO is only about 10 lines. The
+rest is user interface.
+
+6.2 Current major modules are
+-----------------------------
+
+* Net::SAML - The high level interfaces for Single Sign-On (SSO)
+* Net::SAML::Raw - Low level assertion and protocol manipulation interfaces
+* Net::SAML::Metadata - Low level metadata manipulation interfaces
+
+6.3 Planned modules
+-------------------
+
+* Net::WSF - The high level interfaces for Web Services Frameworks (WSF)
+* Net::WSF::Raw - The low level interfaces for WSF variants
+* Net::WSF::WSC - The high level interfaces for Web Services Clients
+* Net::WSF::WSC:Raw
+
+6.4 Perl API Adaptations
+------------------------
+
+The perl APIs were generated from the C .h files using SWIG. Generally any
+C functions and constants that start by zxid_, ZXID_, SAML2_, or SAML_
+have that prefix changed to <<tt: Net::SAML::>>. Note, however, that
+the zx_ prefix is not stripped.
+
+Since ZXID wants to keep strings in many places in length + data
+representation, namely as ~struct zx_str~, SWIG typemaps were used
+to make this happen automatically. Thus any C function that takes as
+an argument <<tt: struct zx_str*>> can take a perl string
+directly. Similarly any C function that returns such a pointer, will
+return a perl string instead. As a final goodie, any C function, such
+as
+
+  struct zx_str* zx_ref_len_str(struct zx_ctx* c, int len, char* s);
+
+that takes ~length~ and <<tt: s>> as explicit arguments, takes only single
+argument that is a perl string (the one argument automatically satisfies
+two C arguments, thanks to a type map). The above could be called like
+
+  $a = Net::SAML::zx_ref_len_str(c, "foo");
+
+First the "foo" satisfies both ~len~ and ~s~, and then the return value
+is converted back to perl string.
+
+6.5 Testing Net::SAML and zxid.pl as CGI script
+-----------------------------------------------
+
+To test the perl module, you must restart the mini_httpd(8) so
+that it recognizes zxid.pl as CGI script:
+
+  mini_httpd -p 8443 -c zxid.pl -S -E zxid.pem
+
+Then start browsing from
+
+  https://sp1.zxidsp.org:8443/zxid.pl
+
+or if you want to avoid the common domain cookie check
+
+  https://sp1.zxidsp.org:8443/zxid.pl?o=E
+
+6.6 Testing Net::SAML and zxid.pl under mod_perl
+------------------------------------------------
+
+You can run zxid.pl under mod_perl using the Apache::Registry
+module. See <<link:apache.html: Apache recipe>> for how
+to compile Apache to support mod_perl. After configuration
+it should work the same as the CGI approach.
+
+<<ignore:
+[Sat Nov 14 12:13:55 2009] [error] [client 127.0.0.1] failed to resolve handler `ModPerl::Registry': Can't locate ModPerl/Registry.pm in @INC (@INC contains: /usr/local/lib/perl5/5.8.4/i686-linux /usr/local/lib/perl5/5.8.4 /usr/local/lib/perl5/site_perl/5.8.4/i686-linux /usr/local/lib/perl5/site_perl/5.8.4 /usr/local/lib/perl5/site_perl . /apps/apache/2.2.3) at (eval 2) line 3.\n
+>>
+
+6.7 Debugging Net::SAML with GDB
+--------------------------------
+
+As bizarre as it may sound, it is actually quite feasible to debug
+libzxid and the SAML_wrap.c using GDB while in perl. For example
+
+  cd zxid
+  gdb /usr/local/bin/perl
+  set env QUERY_STRING=o=E
+  r ./zxid.pl
+
+If the script crashes inside the C code, GDB will perfectly
+reasonably take control, allowing you to see stack back-trace (bt)
+and examine variables. Of course it helps if openssl and perl
+were compiled with debug symbols (libzxid is compiled
+with debug symbols by default), but even if they weren't you
+can usually at least get some clue.
+
+When preparing a perl module, generally Makefile.PL mechanism causes
+the same compilation flags to be used as were used to compile the perl
+itself. Generally this is good, but if libzxid was compiled with
+different flags, mysterious errors can crop up. For example, I compile
+my libzxid against openssl that I have also compiled myself. However, I
+once had a bug where the perl had been compiled such that the Linux
+distribution's incompatible openssl would be picked by perl compile
+flags, resulting in mystery crashes deep inside openssl ASN.1 decoder
+routines (c2i_ASN1_INTEGER() while in d2i_X509() to be exact). When I
+issued `info files' in GDB I finally realized that I was using the
+wrong openssl library.
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+96 License
+==========
+
+Copyright (c) 2010 Sampo Kellomäki (sampo@iki.fi), All Rights Reserved.
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+See file COPYING for complete information.
+
+97 FAQ extract
+==============
+
+See zxid-faq.pd for full story.
+
+97.1 Compilation Problems
+-------------------------
+
+97.1.4 Perl compiled with different compiler than zxid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in README.zxid FAQ)
+
+Perl modules generally want to be compiled with the same C compiler
+and options as were used to compile perl itself (see perl -V). If this
+happens to be different than the compiler you have defined in CC
+variable (gcc by default, near top of Makefile or in localconf.mk), you may
+get an error like:
+
+  cd Net; perl Makefile.PL && make
+  Warning: -L.. changed to -L/home/sampo/zxid/Net/..
+  Writing Makefile for Net::SAML
+  make[1]: Entering directory `/home/sampo/zxid/Net'
+  cc -c  -I.. -I/apps/openssl/std/include -I/apps/include -D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBUGGING -fno-strict-aliasing -pipe -Wdeclaration-after-statement -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O2 -march=i586 -mtune=i686 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -g -Wall -pipe   -DVERSION=\"\" -DXS_VERSION=\"\" -fPIC "-I/usr/lib/perl5/5.8.8/i586-linux-thread-multi/CORE"   SAML_wrap.c
+  /bin/sh: cc: command not found
+  make[1]: *** [SAML_wrap.o] Error 127
+  make[1]: Leaving directory `/zxid/Net'
+  make: *** [samlmod] Error 2
+
+*Solutions*
+
+1. Compile zxid with compiler that was used for perl, e.g.
+
+     make CC=the-compiler-that-perl-wants
+
+2. Recompile perl using the compiler that you want to use for zxid
+
+3. Tinker with PATH environment variable so that both C compilers
+   are found. However, using two different compilers is not really supported.
+
+In general these types of problems happen when you use perl installed
+by your distribution, but have later compiled a gcc of your own. It may
+even be that you never installed the distribution cc - in that case
+consider installing it and then trying approaches 1 or 3.
+
+A similar situation can arise with incompatibility of the compiler and
+options used for dependency libraries, such as OpenSSL or libcurl, and
+those used for compiling zxid itself.
+
+97.1.5 All files under zx missing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in README.zxid FAQ)
+
+You need to symlink zx to zxid source directory, thus
+
+  ln -s . zx
+
+If you do not have it, then you will get a lot of file inclusion errors for
+headers that are supposed to be in path starting by zx/
+
+The symlink is there to keep all hand written source files on top
+level of directory for ease of development, yet allow inclusions to go
+through ~zx~ subdirectory. When zxid is installed, it goes to
+/usr/include/zx. Hence the symlink keeps the includes the same whether
+developing or using installed version.
+
+97.1.6 Compiler Warnings
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in README.zxid FAQ)
+
+If you compile zxid with compiler warnings turned on (CFLAGS += -Wall),
+you will see quite a number of warnings, most of which are
+unwarranted. Since the warnings are unwarranted, I ship zxid Makefile
+with warnings turned off. If this bothers you, feel free to investigate
+the warnings and report to me any issues you uncover.
+
+Following warnings in partuclar are unwarranted:
+
+1. Any unusued variable warnings, especially in generated code. Most
+   common of these is ~se~ variable (see enc-templ.c).
+2. "Suggest parenthesis around assignment when used as truth value." I
+   rely on C language operator precedence. Also, in most cases the
+   assignment is the only expression in the truth test - there simply
+   is no opportunity for ambiguity -- and no justified case for gcc to
+   warn about this.
+3. "Suggest parenthesis around && when used in ||". I rely on C
+   language operator precedence, hence the suggestion is redundant.
+
+Some warnings you may want to worry about
+
+A. "int format, long int arg". On 32 bit platforms int and long
+   are both 32 bits so this warning is not an issue. On 64 bit platforms,
+   however, there may be cause for worry.
+
+97.1.8 SWIG and Perl Problems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID is tested and known to work with SWIG version 1.3.40. It is known not
+to work with SWIG-2.0.4. The telltale sign is
+
+  perl -MNet::SAML -e 'print Net::SAML::call($cf,$ses,$svctype,$url,0,0,$soap)'
+  TypeError in method 'zxid_call', argument 5 of type 'char const *'
+
+SWIG version should not be a concern for those using .tgz distributions of
+ZXID as the tar gzip archives already contain the files generated by SWIG.
+Also installs from cpan should not be affected.
+
+<<references:
+
+[SAML2core] "Assertions and Protocols for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-core-2.0-os
+
+
+>>
+
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

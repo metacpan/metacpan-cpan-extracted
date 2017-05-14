@@ -1,0 +1,56 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: SDF Advanced Features
+
+H2: Introduction
+
+This chapter presents information on some advanced [[SDF]] features.
+[[SDF]] beginners should skip this chapter and return to it
+if and when they wish to learn more.
+
+The topics covered are outlined below.
+
+!block table; tags="SECT"
+Section                 Description
+Modules and Libraries   how to load modules and libraries
+Object Management       how to define and use objects (e.g. references)
+Conditional Text        how to conditionally include or exclude [[SDF]]
+Event Processing        how to change the layout and automate tasks using rules
+Custom Formatting       how to change fonts, paper sizes, etc.
+Hypertext               how to build hypertext
+Escaping Symbols        how to include special symbols (e.g. E<2{>)
+Multiple Looks          packaged document-wide presentation styles
+#Book Mode
+#Indexes                 how to build indexes
+#Headers and Footers     how to override the default headers and footers
+#Cross References        how to build cross references
+#Footnotes & Endnotes    how to build footnotes and endnotes
+!endblock
+
+!block topics
+Topic
+in_libr
+in_omgmt
+in_cond
+in_event
+in_custf
+in_hyper
+in_symb
+in_looks
+#in_book
+#in_index
+#in_hdrfr
+#in_xref
+#in_fnote
+!endblock

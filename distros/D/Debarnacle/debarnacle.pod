@@ -1,0 +1,123 @@
+=begin rcsid
+
+$Id: debarnacle.pod,v 1.3 2002/05/10 07:55:38 itz Exp $
+
+=end rcsid
+
+=head1 NAME
+
+debarnacle - Check the filesystem for barnacles (missing and unexplained files)
+
+=head1 SYNOPSIS
+
+B<debarnacle> [ B<-v> I<VERBOSITY> | B<-C> I<CONFIGDIR> | B<-c> I<CACHESIZE> | B<-d> | B<-p> | B<-q> | B<-h> ] [ I<ROOT> ]
+
+=head1 DESCRIPTION
+
+This manual page documents briefly the
+B<debarnacle>
+command.
+
+B<debarnacle> is a program that goes over the Debian packaging system's database, and
+compares the contents of that with the files actually on your system, and
+produces a summary of the differences.
+
+=head1 OPTIONS
+
+A summary of options is included below.
+
+=over 4
+
+=item B<-h>
+
+Show summary of options.
+
+=item B<-d>
+
+Don't consider file names from packages explained, only those
+returned by plugins (see below).  Probably only makes sense together
+with B<-C>, otherwise almost all files in the system would turn out
+unexplained. 
+
+=item B<-p>
+
+Don't consider file names from plugins explained, only those
+returned by B<dpkg>.  B<debarnacle -d -p> is rather a roundabout way
+of doing B<find / -print>.
+
+=item B<-q>
+
+Be quiet.  B<-q> is equivalent to B<-v 0> and overrides any B<-v>
+option given.
+
+=item B<-v> I<VERBOSITY>
+
+If I<VERBOSITY> is greater than 0, B<debarnacle> will print some
+progress messages to standard error.  The default is B<-v 1>.
+
+=item B<-C> I<CONFIGDIR> 
+
+Look for configuration files in I<CONFIGDIR>.  The default is
+F</etc/debarnacle>, but it can be changed in two ways: first, by
+setting the envar I<sysconfdir> while processing F<Makefile.PL>,
+second, by passing B<sysconfdir=/usr/local/etc> (for example) on the
+B<make> command line.
+
+=item B<-c> I<CACHESIZE>
+
+B<debarnacle> uses L<DB_File(3)> for its database of filenames.  If
+given I<CACHESIZE> is the value C<< $DB_TREE->{cachesize} >> gets set to.
+The default (scientifically optimized) is 2000 times the number of
+installed packages (i.e. about 2M if you have 1000 packages installed).
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item I<CONFIGDIR>F</prunes>
+
+List of paths to prune from the existing file list, one per line.
+Empty lines and lines starting with the comment character '#' are
+ignored.  
+
+=item I<CONFIGDIR>F</globs>
+
+This file is processed twice: first, after performing the general tree
+scan, the main program reads glob patterns from it, one per line, and
+adds all matching files to the database.  This pass avoids "missing"
+reports about files which are omitted from the tree scan due to their
+localtion under one of the directories listed in F<prunes>, but which
+are shipped in a package.
+
+Second, a catch-all plugin F<Globs.pm> reads this file and "explains"
+all the matching filenames.  This means a file matching a line from
+F<globs> can never be reported as either missing or unexplained.
+
+=item I<CONFIGDIR>F</plugin.d/>
+
+This directory contains the "explanation plugins": Perl modules which
+produce lists of files.  Each file listed by
+at least one of these modules is considered "explained" and its
+existence is not mentioned in B<debarnacle>'s output (as long as it
+does exist, if not it is mentioned as missing).
+
+Each plugin should contain a single non-exported function C<get_list>
+with no parameters, in the namespace (Perl package)
+C<Debian::Debarnacle::>I<module_name>.  The function should return a
+reference to an array of absolute file names.
+
+The explanation plugins in the plugin directory will in practice most
+often be symlinks to the real modules, which are installed to the
+normal Perl places.
+
+=back
+
+=head1 AUTHOR
+
+This manual page was originally written by Anthony Towns
+<ajt@debian.org>, the author of the B<cruft> package from which
+B<debarnacle> is derived.  It has been modified by Ian Zimmerman
+<itz@speakeasy.org> to accurately document the newer program.
+

@@ -1,0 +1,3 @@
+0.16 20170512
+    . Spun off from WWW::Mechanize::PhantomJS
+    . No module code changes, no need to upgrade

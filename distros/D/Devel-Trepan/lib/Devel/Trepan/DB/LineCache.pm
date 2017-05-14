@@ -32,7 +32,7 @@ sub eval_ok ($)
 
 use rlib '../../..';
 
-=head1 NAME Devel::Trepan::DB::LineCache
+=head1 NAME
 
 Devel::Trepan::DB::LineCache - package to read and cache lines of a Perl program.
 
@@ -74,6 +74,7 @@ require Exporter;
              clear_cache update_cache
              file_list getlines
              filename_is_eval getline map_file is_cached
+             highlight_string cache_file
              load_file map_script map_file_line remap_file
              remap_dbline_to_file remap_string_to_tempfile %script_cache
              trace_line_numbers update_script_cache
@@ -91,10 +92,6 @@ use Cwd 'abs_path';
 use File::Basename;
 use File::Spec;
 use File::stat;
-
-## FIXME:: Make conditional
-use Devel::Trepan::DB::Colors;
-my $perl_formatter = Devel::Trepan::DB::Colors::setup();
 
 ## struct(stat => '$', lines => '%', path => '$', sha1 => '$');
 
@@ -129,6 +126,15 @@ not have to be fully qualified. In some cases I<@INC> will be used to
 find the file.
 
 =cut
+
+## FIXME:: Make conditional
+use Devel::Trepan::DB::Colors;
+my $perl_formatter;
+
+sub color_setup {
+    $perl_formatter = Devel::Trepan::DB::Colors::setup(@_);
+}
+color_setup('light');
 
 sub remove_temps()
 {
@@ -411,7 +417,7 @@ sub getline($$;$)
     my $max_index = scalar(@$lines) - 1;
     my $index = $line_number - 1;
     if (defined $lines && @$lines && $index >= 0 && $index <= $max_index) {
-        my $max_continue = $opts->{max_continue} || 1;
+        my $max_continue = $opts->{maxlines} || 1;
         my $line = $lines->[$index];
         return undef unless defined $line;
         if ($max_continue > 1) {
@@ -1254,12 +1260,12 @@ unless (caller) {
     #       "\n");
     $line = getline(__FILE__, __LINE__,
                     {output=>'term',
-                     max_continue => 6});
+                     maxlines => 6});
     print '-' x 30, "\n";
     print "$line\n";
     $line = getline(__FILE__, __LINE__,
                     {output=>'plain',
-                     max_continue => 5});
+                     maxlines => 5});
     print '-' x 30, "\n";
     print "$line\n";
     print '-' x 30, "\n";

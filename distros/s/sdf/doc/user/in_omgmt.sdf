@@ -1,0 +1,136 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Object Management
+
+H2: Overview
+
+{{Object management}} is a collection of features which support:
+
+^ the definition of special objects in configuration files
++ the use of these special objects in documents.
+
+For example, a configuration file can contain a lookup table of
+{{CLASS:references}}. Within a document:
+
+* a table of references can be inserted by simply specifying
+  document codes - the document names are found from the lookup table
+* REF/DOC object phrases are validated as legal references/documents
+* hypertext is generated for:
+  - entries in the table of references
+  - REF and DOC object phrases
+* REF objects can be converted to DOC objects and visa versa.
+
+[[SDF]] supports 4 predefined {{classes}} of objects - {{CLASS:references}},
+{{CLASS:terms}}, {{CLASS:products}} and {{CLASS:organisations}}.
+New classes can be added via the {{MAC:class}} macro.
+
+H2: The Predefined Classes
+
+The fields supported by the predefined classes are given below.
+
+!block table
+Class           Styles      Identifer_fields    Property_fields
+references      REF, DOC    Reference, Document Jump, Version, Status
+terms           TERM        Term, Definition    Jump
+products        PRD         Name                Jump
+organisations   ORG, ORGN   Name, Long          Jump
+!endblock
+
+{{Styles}} are the tags used for objects in the class.
+The first style is the 'normal' one. The second style
+is the 'long' one.
+
+{{Identifier fields}} are the 'normal' and 'long' (if any)
+fields within the data tables. {{Property fields}} are
+the additional fields, if any.
+
+Note: The {{MAC:build_title}} macro uses the {{CLASS:references}} declarations
+to provide default values for DOC_CODE, DOC_VERSION, DOC_STATUS and DOC_URL.
+
+The {{MOD:objects}} module provides some commonly used
+objects in these predefined classes (and matching variables).
+
+H2: Declaring Objects
+
+To declare a table of objects, the syntax is:
+
+E:  !block {{class}}; data
+E:  {{field names}}
+E:  {{object record1}}
+E:  ...
+E:  {{object recordN}}
+E:  !endblock
+
+An example lookup table for organisations is given below.
+
+!block example; wide
+!block organisations; data
+Name        Long                             Jump
+DEC         Digital Equipment Corporation    http://www.dec.com
+Frame       Frame International              http://www.frame.com
+HP          Hewlett Packard                  http://www.hp.com
+IBM         International Business Machines  http://www.ibm.com
+Mincom      Mincom Pty Ltd                   http://www.mincom.com
+Microsoft   Microsoft Corporation            http://www.microsoft.com
+!endblock
+!endblock
+
+To insert a table of objects, the syntax is:
+
+E:  !block {{class}}
+E:  {{field names}}
+E:  {{object key or record1}}
+E:  ...
+E:  {{object key or recordN}}
+E:  !endblock
+
+If only the key is provided, then the 'long' name is found from the
+configured data, if any. For example, a configuration file may have
+the following declaration of {{CLASS:terms}}:
+
+E:  !block terms; data
+E:  Term     Definition
+E:  SDF      Simple Document Format
+E:  SQL      Structured Query Language
+E:  !endblock
+
+These can then be inserted into a document as follows:
+
+E:  !block terms
+E:  Term     Definition
+E:  SDF
+E:  SQL
+E:  WWW      World Wide Web
+E:  !endblock
+
+Note that the definition for a term already declared will be inserted
+if none is provided. Furthermore, new terms (like WWW above) can be
+inserted and added to the configured ones.
+
+H2: Hypertext and Name Conversion
+
+If an object has a 'Jump' property defined for it, hypertext is
+automatically generated for it. For example:
+
+V: See {{DOC:My Design Document}} for further details
+
+will have a jump created for the DOC object.
+
+Object names can be converted between the normal and long forms
+by using the {{OATTR:expand}} and {{OATTR:shrink}} attributes.
+For example:
+
+V: {{PRD:Java}} was developed by {{ORG[expand]Sun}}.
+
+!end_topic

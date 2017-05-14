@@ -1,0 +1,35 @@
+=pod
+
+=head1 Exherbo::Packager
+
+=head2 Synopsis
+
+Generate Exheres automatically for Perl modules
+
+=head2 Things to consider
+
+You ought to check the output exheres and tweak a few things. This module
+is rather dumb in its current state.
+
+=over 
+
+=item Dependencies might include packages that don't exist
+
+=item Deps might not have sensible versions
+
+=item Deps might not be sensible
+
+=item You might've picked up a fake package
+
+=back
+
+I plan on fixing these particular issues, and embellishing the code. However,
+that's not going to happen right this second, since I want to package some
+things right now.
+
+=head2 BUGS
+
+Everything listed above is a huge bug. Also, it would be nice if there were
+Perl hooks in Paludis so I could check the existence of packages
+
+=cut

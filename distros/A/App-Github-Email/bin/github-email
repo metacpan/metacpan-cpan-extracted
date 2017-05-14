@@ -1,0 +1,76 @@
+#!perl
+
+use strict;
+use warnings;
+use LWP::UserAgent;
+use Getopt::Long qw(GetOptions);
+use Email::Address;
+use List::MoreUtils qw(uniq);
+#PODNAME: github-email
+#VERSION
+
+my $name;
+
+GetOptions( "name=s" => \$name ) or die("Error");
+
+if (not defined $name)
+{
+	die "Error. Username is not defined. Please try again with: 'github-email -n username'.\n";
+}
+
+my $ua = LWP::UserAgent->new;
+my $json_get = $ua->get("https://api.github.com/users/$name/events/public");
+
+if ( $json_get->is_success )
+{
+    my $raw_json    = $json_get->decoded_content;
+    my @addresses   = Email::Address->parse($raw_json);
+    my @unique_addr = uniq @addresses;
+
+    for my $address (@unique_addr)
+	{
+        if ( $address ne 'git@github.com')
+		{
+            print "\t$address\n";
+        }
+    }
+}
+
+else
+{
+    die "User is not exist\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+github-email
+
+=head1 VERSION
+
+version 0.0.6
+
+=head1 SYNOPSIS
+
+	github-email --name <Github username>
+
+	github-email --name faraco
+	github-email --n faraco 
+
+=head1 AUTHOR
+
+faraco <skelic3@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by faraco.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

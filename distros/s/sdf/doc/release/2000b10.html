@@ -1,0 +1,435 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta10</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b11.html">Previous Topic</A> | <A HREF="2000b9a.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5. 2.000beta10</H1>
+<P ALIGN="Left"><A HREF="#2.000beta10 - Enhancements">Enhancements</A> | <A HREF="#2.000beta10 - Fixes">Fixes</A> | <A HREF="#2.000beta10 - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="Introduction">5.1. Introduction</A></H2>
+<P>The primary objectives of this release are:</P>
+<OL>
+<LI>To provide a &quot;working prototype&quot; for a POD-friendly SDF.
+<LI>To rationalise SDF's escaping mechanisms and stabilise it's syntax.
+<LI>To provide greatly improved man page generation (via <EM>pod2man</EM>).
+<LI>To provide PostScript generation without needing a commercial tool.</OL>
+<P>I still need to fix up some bugs and loose ends with respect to the POD stuff, but there's enough working to be useful (in my opinion, at least). In particular, the core POD documentation provided with Perl 5.004 can be:</P>
+<OL>
+<LI>Converted to SDF and back to POD with a high degree of success (99.95% if the perltoc.pod file is excluded).
+<LI>Converted to HTML and plain text using the <A HREF="../ref/sdf.html">sdf</A> program.</OL>
+<P>If you're an existing POD user, please read the <A HREF="../podusers/index.html">SDF for POD Users</A> tutorial. If you find a bug not listed in the PODNOTES file, email the details to <A HREF="mailto:sdf-bugs@mincom.com">sdf-bugs@mincom.com</A>.</P>
+<P>If you're an existing SDF user, please note that most of the documentation doesn't yet reflect the changes outlined below. You will also need to take care with the <A HREF="#2.000beta10 - Incompatibilities">Incompatibilities</A> outlined below.</P>
+<HR>
+<H2><A NAME="2.000beta10 - Enhancements">5.2. Enhancements</A></H2>
+<P>The enhancements are:</P>
+<UL>
+<A HREF="2000b10.html#SDF is now POD-friendly">SDF is now POD-friendly</A>
+<BR>
+<A HREF="2000b10.html#Syntax Enhancements">Syntax Enhancements</A>
+<BR>
+<A HREF="2000b10.html#Verbatim paragraphs">Verbatim paragraphs</A>
+<BR>
+<A HREF="2000b10.html#Special symbol escapes">Special symbol escapes</A>
+<BR>
+<A HREF="2000b10.html#Enumerated lists">Enumerated lists</A>
+<BR>
+<A HREF="2000b10.html#New macros">New macros</A>
+<BR>
+<A HREF="2000b10.html#New phrase styles">New phrase styles</A>
+<BR>
+<A HREF="2000b10.html#Manpage, LaTeX and fancy text support">Manpage, LaTeX and fancy text support</A>
+<BR>
+<A HREF="2000b10.html#PostScript generation without a commercial tool">PostScript generation without a commercial tool</A>
+<BR>
+<A HREF="2000b10.html#POD to SDF conversion">POD to SDF conversion</A>
+<BR>
+<A HREF="2000b10.html#Nesting of POD within SDF">Nesting of POD within SDF</A>
+<BR>
+<A HREF="2000b10.html#Automatic translation of POD files">Automatic translation of POD files</A>
+<BR>
+<A HREF="2000b10.html#Configuration library for Perl documentation">Configuration library for Perl documentation.</A>
+<BR>
+<A HREF="2000b10.html#Topic previewing">Topic previewing</A>
+<BR>
+<A HREF="2000b10.html#Easier text width control">Easier text width control</A></UL>
+<P>Further details are provided below.</P>
+<H3><A NAME="SDF is now POD-friendly">5.2.1. SDF is now POD-friendly</A></H3>
+<P>POD users can now use SDF or migrate to SDF when POD isn't powerful enough. In particular:</P>
+<UL>
+<LI>POD can now be <EM>converted</EM> to SDF and vice versa
+<LI>SDF can now be <EM>nested</EM> inside POD and vice versa
+<LI>SDF is now largely upwardly compatible with POD in terms of syntax and functionality.</UL>
+<P>A <CMD>poddiff</CMD> program is provided so that users can translate POD -&gt; SDF -&gt; POD and compare the generated POD with the original.</P>
+<H3><A NAME="Syntax Enhancements">5.2.2. Syntax Enhancements</A></H3>
+<P>Any SDF macro can now be called via POD's = syntax, i.e. if a macro call starts with an = character, the call is terminated by the next blank line.</P>
+<P>As a consequence of its new meaning, = is no longer available as a shorthand for the E paragraph tag. However, the &gt; character can now be used as a shorthand for the V (verbatim) paragraph tag. See <A HREF="2000b10.html#Verbatim paragraphs">Verbatim paragraphs</A> below.</P>
+<P>Any phrase style which is a single capital letter can now be specified using POD's [A-Z]&lt;..&gt; syntax. So, the following lines are equivalent:</P>
+<PRE>
+   Hello {{B:world}}
+   Hello B&lt;world&gt;
+</PRE>
+<P>Paragraph and phrase styles must now start with a capital letter, digit or underscore. As a result, the following SDF will now come out as expected.</P>
+<PRE>
+  The following documents should be
+  reviewed:
+</PRE>
+<P>Previously, SDF would warn about <EM>reviewed</EM> being an unknown paragraph style. As a special case, phrases which look like URLs are still assumed to be so.</P>
+<P>Outside of blocks and multi-line macros calls, a \ at the start of a line now escapes a special character or pattern, including itself. A \ can also be used to escape a ] character within a set of attributes.</P>
+<P>At the end of a !-style macro call line:</P>
+<UL>
+<LI>a single \ continues the macro onto the next line
+<LI>exactly 2 backslashes means a single backslash (with no continuation)
+<LI>N backslashes (N &gt;= 3) means N-1 backslashes with continuation</UL>
+<H3><A NAME="Verbatim paragraphs">5.2.3. Verbatim paragraphs</A></H3>
+<P>For fixed-width verbatim paragraphs, the &gt; special tag or V paragraph style can now be used. For example:</P>
+<PRE>
+&gt;  {{Hello world}}
+</PRE>
+<P>or</P>
+<PRE>
+V:  {{Hello world}}
+</PRE>
+<P>The result is:</P>
+<PRE>
+  {{Hello world}}
+</PRE>
+<P>The new <EM>verbatim</EM> filter can be used to mark a block of text as verbatim.</P>
+<P>In fact, the interpolation of embedded characters within the text of any paragraph can be disabled by setting the <EM>verbatim</EM> paragraph attribute. For example:</P>
+<PRE>
+  N[verbatim] {{Hello world}}
+</PRE>
+<P>The result is:</P>
+<P>{{Hello world}}</P>
+<H3><A NAME="Special symbol escapes">5.2.4. Special symbol escapes</A></H3>
+<P>SDF uses a number of special symbols inside paragraphs:</P>
+<UL>
+<LI>A-Z&lt; and &gt; - delimit <EM>concise</EM> phrases
+<LI>{{ and }} - delimit <EM>verbose</EM> phrases
+<LI>[[ and ]] - delimit expressions (e.g. variables).</UL>
+<P>If you need to include one of these symbols in a paragraph, use the appropriate escape as shown below.</P>
+<PRE>
+    Symbol      Escape
+    &lt;           E&lt;lt&gt;
+    &gt;           E&lt;gt&gt;
+    {{          E&lt;2{&gt;
+    }}          E&lt;2}&gt;
+    [[          E&lt;2[&gt;
+    ]]          E&lt;2]&gt;
+</PRE>
+<P>Note the following rules:</P>
+<OL>
+<LI>It isn't necessary to escape any symbols within:<UL>
+<LI>paragraphs tagged with the V style or &gt; tag</UL><UL>
+<LI>paragraphs given the verbatim attribute</UL><UL>
+<LI>paragraphs within a verbatim block</UL>
+<LI>It is only necessary to escape a &lt; when it appears after a capital letter.
+<LI>It is only necessary to escape a &gt; inside a concise phrase. In particular, &gt; is implicitly escaped within a verbose phrase.</OL>
+<H3><A NAME="Enumerated lists">5.2.5. Enumerated lists</A></H3>
+<P>In addition to bulleted, ordered and plain lists, SDF now supports enumerated lists, i.e. lists where each item is a label. Each enumerated list item is tagged with either:</P>
+<UL>
+<LI>a &amp; special tag (&amp; .. &amp;&amp;&amp;&amp;&amp;&amp; like the other lists), or
+<LI>the LIn style, where n = 1 .. 6.</UL>
+<P>For example:</P>
+<PRE>
+&amp; BTW
+. by the way
+&amp; FYI
+. for your information
+&amp; RTFM
+. read the flamin' manual
+</PRE>
+<P>The result is:</P>
+<P><B>BTW</B></P>
+<UL>
+by the way</UL>
+<P><B>FYI</B></P>
+<UL>
+for your information</UL>
+<P><B>RTFM</B></P>
+<UL>
+read the flamin' manual</UL>
+<H3><A NAME="New macros">5.2.6. New macros</A></H3>
+<P>All of POD's commands are now available as SDF macros. The new macros are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Macro</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+head<EM>n</EM>
+</TD>
+<TD>
+level <EM>n</EM> heading (n = 1 .. 6)
+</TD>
+</TR>
+<TR>
+<TD>
+over [N]
+</TD>
+<TD>
+begins a list (N is the suggested indentation which is ignored)
+</TD>
+</TR>
+<TR>
+<TD>
+item string
+</TD>
+<TD>
+label for item in a list
+</TD>
+</TR>
+<TR>
+<TD>
+back
+</TD>
+<TD>
+ends a list
+</TD>
+</TR>
+<TR>
+<TD>
+pod
+</TD>
+<TD>
+does nothing
+</TD>
+</TR>
+<TR>
+<TD>
+cut
+</TD>
+<TD>
+ignore text until an = is found at the start of a line
+</TD>
+</TR>
+<TR>
+<TD>
+for X Y
+</TD>
+<TD>
+Y is target-specific output for X
+</TD>
+</TR>
+<TR>
+<TD>
+begin X
+</TD>
+<TD>
+begin target-specific output for X
+</TD>
+</TR>
+<TR>
+<TD>
+end X
+</TD>
+<TD>
+end target-specific output for X
+</TD>
+</TR>
+</TABLE>
+
+<P>See the perlpod manpage for further details.</P>
+<H3><A NAME="New phrase styles">5.2.7. New phrase styles</A></H3>
+<P>All of POD's interior sequences are now available as SDF phrase styles. The new phrase styles are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+B
+</TD>
+<TD>
+bold
+</TD>
+</TR>
+<TR>
+<TD>
+C
+</TD>
+<TD>
+code
+</TD>
+</TR>
+<TR>
+<TD>
+E
+</TD>
+<TD>
+special symbol or HTML escape
+</TD>
+</TR>
+<TR>
+<TD>
+F
+</TD>
+<TD>
+file
+</TD>
+</TR>
+<TR>
+<TD>
+I
+</TD>
+<TD>
+italics
+</TD>
+</TR>
+<TR>
+<TD>
+L
+</TD>
+<TD>
+POD-style link
+</TD>
+</TR>
+<TR>
+<TD>
+S
+</TD>
+<TD>
+text contains non-breaking spaces
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+an index entry
+</TD>
+</TR>
+<TR>
+<TD>
+Z
+</TD>
+<TD>
+does nothing
+</TD>
+</TR>
+</TABLE>
+
+<P>See the perlpod manpage for further details on the meanings of these tags.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The S and X tags are not yet working for most output formats.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<H3><A NAME="Manpage, LaTeX and fancy text support">5.2.8. Manpage, LaTeX and fancy text support</A></H3>
+<P>The <EM>sdf -2man ...</EM> command now generates a <EM>.out</EM> file in POD format and runs <CMD>pod2man</CMD>. The old man page generation software was limited in scope and quite buggy, so this will hopefully improve things in the short-to-medium term. The <TT>toman.pl</TT> output driver has been moved to the <TT>contrib/drivers</TT> directory just in case anyone really wants to use it instead.</P>
+<P>The <EM>sdf -2latex ...</EM> command now generates a <EM>.out</EM> file in POD format and runs <CMD>pod2latex</CMD>. This creates a <EM>.out.tex</EM> file which should probably be renamed to delete the <EM>.out</EM> bit.</P>
+<P>The <EM>sdf -2text ...</EM> command now generates a <EM>.out</EM> file in POD format and runs <CMD>pod2text</CMD>. For compatibility with <CMD>pod2text</CMD>, this sends the output to standard output.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Plain text output is still available via the -2txt option.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>Hopefully, someone will provide fully functional manpage and LaTeX drivers (complete with table support) eventually.</P>
+<H3><A NAME="PostScript generation without a commercial tool">5.2.9. PostScript generation without a commercial tool</A></H3>
+<P>SDF can now generate PostScript without needing a commercial tool. This can be done by:</P>
+<OL>
+<LI>Using <EM>sdf -2podps ...</EM> which generates PostScript directly via the freely available <CMD>pod2ps</CMD> program.
+<LI>Using <EM>sdf -2man ...</EM> which generates a man page which can be converted to PostScript by using the appropriate (*roff) tools.
+<LI>Using <EM>sdf -2latex ...</EM> which generates a LaTeX document which can be converted to PostScript by using LaTeX.</OL>
+<P>In general, the output via these methods isn't as good as the PostScript generated via FrameMaker, but it may be good enough. In particular, certain looks (e.g. infomap) are not available.</P>
+<H3><A NAME="POD to SDF conversion">5.2.10. POD to SDF conversion</A></H3>
+<P>A <CMD>pod2sdf</CMD> program is now available which is a wrapper around  a Perl module called Pod::Sdf. The SDF generated is more or less identical to the input POD, except that verbatim lines are tagged with a leading &quot;&gt;&quot;. The usage of <CMD>pod2sdf</CMD> is:</P>
+<PRE>
+  pod2sdf [-m] podfile &gt; outfile
+</PRE>
+<P>If the -m option is provided, the document is converted as a main document, rather than a topic, i.e. the NAME section is converted to a <A HREF="../ref/mbuild_t.html">build_title</A> macro rather than a <EM>head1</EM> macro.</P>
+<P>POD authors can escape to SDF if and when they need to by using the &quot;=for sdf&quot; and/or &quot;=begin/end sdf&quot; command pair. For example:</P>
+<PRE>
+  =for sdf
+  !block table
+  Name    Meaning
+  POD     Plain Old Documentation
+  SDF     Simple Document Format
+  !endblock
+</PRE>
+<P>If you want the rest of a POD file to be in SDF, simply put in an &quot;=begin sdf&quot; - the closing &quot;=end sdf&quot; isn't necessary.</P>
+<H3><A NAME="Nesting of POD within SDF">5.2.11. Nesting of POD within SDF</A></H3>
+<P>POD can now be nested inside SDF via the new <A HREF="../ref/fpod.html">pod</A> filter (which is another wrapper around the Pod::Sdf module). e.g.</P>
+<PRE>
+   !block pod
+   =head2 My B&lt;heading&gt;
+
+      Some verbatim text
+   !endblock
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Within the pod filter, all lines before the first command is ignored and leading whitespace implies a verbatim paragraph.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>The pod filter can also be specified to the <A HREF="../ref/minclude.html">include</A> and <A HREF="../ref/mexecute.html">execute</A> macros. For example:</P>
+<PRE>
+  !include &quot;perlre.pod&quot;; pod
+  !execute &quot;getpod 'hello.c'&quot;; pod
+</PRE>
+<P>where <EM>getpod</EM> is a fictitious program which outputs POD to standard output.</P>
+<H3><A NAME="Automatic translation of POD files">5.2.12. Automatic translation of POD files</A></H3>
+<P>If a file with a <EM>.pod</EM>, <EM>.pm</EM> or <EM>.PL</EM> extension is provided as an argument to the <A HREF="../ref/sdf.html">sdf</A> command, the <A HREF="../ref/fpod.html">pod</A> filter is implicitly applied. So</P>
+<UL>
+sdf -2html perlre.pod</UL>
+<P>will generate HTML for <TT>perlre.pod</TT> using SDF's HTML output driver. You can also explicitly request pod prefiltering via the -p option. e.g.</P>
+<UL>
+sdf -2html -ppod abc.pd</UL>
+<P>When pod prefiltering happens, the output is assumed to be a main document.</P>
+<H3><A NAME="Configuration library for Perl documentation">5.2.13. Configuration library for Perl documentation</A></H3>
+<P>A configuration library for building Perl's documentation is provided. The main thing which this provides is semi-intelligent hypertext link generation between Perl's standard documentation and its library documentation. Within this library, the HTML root directory (equivalent to <CMD>pod2html</CMD>'s --htmlroot flag) can be controlled via the PERL_HTML_ROOT variable. The default value is /perl. Typical usage is:</P>
+<PRE>
+  sdf -2html -cperl -DPERL_HTML_ROOT=/nmanual/perl perl*.pod
+</PRE>
+<P>At the moment, this library is only required for HTML generation.</P>
+<H3><A NAME="Topic previewing">5.2.14. Topic previewing</A></H3>
+<P>When editing a topic within a large document, it can be useful to only compile that topic in order to preview its appearance. The new -H option can be used to adjust the initial heading level like this:</P>
+<PRE>
+  sdf -2ps -H3 -kinfomap mytopic.sdf
+</PRE>
+<P>Without the -H3 option, the H1s within <TT>mytopic.sdf</TT> would come out as level 1 headings, rather than level 3 headings.</P>
+<H3><A NAME="Easier text width control">5.2.15. Easier text width control</A></H3>
+<P>The width of text output can now be controlled from the command line by using the new -w option to the <A HREF="../ref/sdf.html">sdf</A> program.</P>
+<HR>
+<H2><A NAME="2.000beta10 - Fixes">5.3. Fixes</A></H2>
+<P>Special characters in headings (like [) no longer cause problems.</P>
+<P>The POD output driver has been fixed. In particular, the generation of list items has been fixed.</P>
+<P>Some bugs in the pretty printing of source code have been fixed:</P>
+<UL>
+<LI>80 character lines should now fit
+<LI>The &gt;&gt; character sequence is no longer lost
+<LI>form feeds become page breaks.</UL>
+<P>Handling of multi-line macro calls within a block or macro has been fixed.</P>
+<P>The <A HREF="../ref/fbox.html">box</A> filter no longer centers the contents of the box unless the <EM>lines</EM> parameters is provided.</P>
+<HR>
+<H2><A NAME="2.000beta10 - Incompatibilities">5.4. Incompatibilities</A></H2>
+<P>This release now requires Perl 5. If you are still using Perl 4.036, you will need to upgrade.</P>
+<P>As paragraph and phrase styles can no longer start with a lowercase character, you will need to rename any user-defined styles which violate this rule.</P>
+<P>Lines within paragraphs which begin with the &gt; or &amp; character will now need to be escaped by a leading \.</P>
+<P>Wide example now use a slightly smaller font.</P>
+<P>The default values for the DOC_DISTRIBUTION and DOC_STATUS variables are now empty strings. Previously, they were &quot;COMMERCIAL IN CONFIDENCE&quot; and &quot;Draft&quot; respectively.</P>
+<P>Making SDF POD-friendly has introduced a number of incompatibilities. These are summarised below:</P>
+<UL>
+<LI>The = character is no longer a shorthand for E: - it is now used for multi-line macro calls.
+<LI>Existing paragraphs which contain the sequence [A-Z]&lt;..&gt; (i.e. a POD-like phrase) as text will need to be changed.
+<LI>The S (strong) and E (example) phrase styles have been renamed to ST and EX respectively. S and E now have the same meaning as their POD counterparts, i.e. &quot;text contains non-breaking spaces&quot; and &quot;escape&quot; respectively. As the S tag was often used for &quot;symbols&quot; (i.e. variables, subroutines) within a library, a Y tag has been introduced for this purpose.</UL>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b11.html">Previous Topic</A> | <A HREF="2000b9a.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

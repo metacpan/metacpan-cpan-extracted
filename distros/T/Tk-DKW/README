@@ -6,45 +6,46 @@ show adequate usage profiles, though.
 
 Requirements :-
 
-    Tk::TiedListbox - by Andrew Allen <ada@fc.hp.com>
-    Tk::Pane - by Graham Barr <gbarr@pobox.com>
+        Tk              - 800.005 or above
+        Tk::TiedListbox - by Andrew Allen <ada@fc.hp.com>
+        Tk::Pane        - by Graham Barr <gbarr@pobox.com>
 
 The suite is built/installed in the conventional manner :-
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+        perl Makefile.PL
+        make
+        make install
 
 The public classes are :-
 
 
-	Tk::CheckBox -   A radio button style widget that uses a
-                    check mark in a box. Useful as a boolean field.
+        Tk::CheckBox    - A radio button style widget that uses a
+                          check mark in a box. Useful as a boolean field.
 
-	Tk::Columns	-   A multicolumn list widget with resizeable borders
-                    and sorting by column.
+        Tk::Columns     - A multicolumn list widget with resizeable borders
+                          and sorting by column.
 
-	Tk::ComboEntry - A Drop down listbox + entry widget with nice keyboard
-                    equivalent behaviour
+        Tk::ComboEntry  - A Drop down listbox + entry widget with nice keyboard
+                          equivalent behaviour
 
-	Tk::IconCanvas - A canvas implementing a moveable iconic interface.
-                    Allows attaching menus to icons and to background.
+        Tk::IconCanvas  - A canvas implementing a moveable iconic interface.
+                          Allows attaching menus to icons and to background.
 
-	Tk::SplitFrame - A sliding separator for two child widgets. Allows either
-                    horizontal or vertical separation between the two widgets.
-                    Can work in concert as horizontal inside vertical or
-                    vice-versa.
+        Tk::SplitFrame  - A sliding separator for two child widgets. Allows either
+                          horizontal or vertical separation between the two widgets.
+                          Can work in concert as horizontal inside vertical or
+                          vice-versa.
 
-	Tk::TabFrame   - A tabbed frame geometry manager (like NoteBook).
+        Tk::TabFrame    - A tabbed frame geometry manager (like NoteBook).
 
-    Tk::DockingGroup - A dockable widget management widget hierarchy. This
-                       widget set only works properly on Win32. I've gotten
-                       most of the functionality on Linux under KDE to work
-                       but the docking stuff is still screwy. Any help here
-                       would be appreciated.
+        Tk::DockFrame   - A dockable widget management widget hierarchy.
 
-    Tk::CornerBox - A textured window resizing widget (like in Win95)
+        Tk::CornerBox   - A textured window resizing widget (like in Win95)
+
+        Tk::Signals     - A publish and subscribe object signalling method like
+                          that found in QT. Very useful when widgets that are not
+                          in the same hierarchy need to alert each other to various
+                          application level events.
 
     ################################################################
     # I consider the following widgets ready for use but having    #
@@ -52,33 +53,33 @@ The public classes are :-
     # them to be relatively bug-free and invite you to try them out#
     ################################################################
 
-	Tk::TabbedForm - An extended TabFrame, allowing managed subwidgets used
-                     as entry fields. Each field widget is given a 'set'
-                     and a 'get' method to provide widget independent
-                     methods of maintaining and querying data. The form
-		     will pass back a hash of all field values on request.
+        Tk::TabbedForm  - An extended TabFrame, allowing managed subwidgets used
+                          as entry fields. Each field widget is given a 'set'
+                          and a 'get' method to provide widget independent
+                          methods of maintaining and querying data. The form
+                          will pass back a hash of all field values on request.
 
-	Tk::TableEdit  - A compound widget built from the TabbedForm, SplitFrame,
-                     and Column widgets. It implements a simplified interface
-                     to a flat file database. Try out the demo.
+        Tk::TableEdit   - A compound widget built from the TabbedForm, SplitFrame,
+                          and Column widgets. It implements a simplified interface
+                          to a flat file database. Try out the demo.
 
-	Tk::Menustrip  - My own menu bar. Nothing special, though.
-
-	Tk::Signals    - A publish and subscribe object signalling method like
-			 that found in QT. Very useful when widgets that are not
-			 in the same hierarchy need to alert each other to various
-			 application level events.
+        Tk::Menustrip   - My own menu bar. Nothing special, though.
 
 The private classes are :-
 
-	Tk:ChildNotification - A kludge that some of the widgets use to get
+        Tk:ChildNotification - A kludge that some of the widgets use to get
                            alerted when a child widget is created. It
                            reimplements a method in Widget.pm and Derived.pm.
                            This will work in TK8.0 but hopefully something
                            will be implemented to take its place.
 
+                           NOTE : As of Tk-800.015 (Thanks, Nick) this class
+                           is deprecated. Some modules may still use this
+                           internally but they will gradually be weaned from
+                           it at which time it will disappear silently.
+
 Bugs, suggestions, fixes, etc. can either be sent to ptk@lists.stanford.edu
 or directly to myself at dkw@rcm.bm. All critiques are welcome.
 
-Copyright (c) 1998 Damion K. Wilson, all rights reserved. These classes are
+Copyright (c) 1998-1999 Damion K. Wilson, all rights reserved. These classes are
 distributed under identical terms as Perl itself.

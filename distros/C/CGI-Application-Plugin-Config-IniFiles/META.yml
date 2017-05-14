@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                CGI-Application-Plugin-Config-IniFiles
+version:             0.03
+abstract:            CGI::Application plugin for Config::IniFiles
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    CGI::Application:              4.06
+    Config::IniFiles:              2.38
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Artur Penttinen <artur+perl@niif.spb.su>

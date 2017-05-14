@@ -1,5 +1,5 @@
 package CPAN::Recent::Uploads::Retriever;
-$CPAN::Recent::Uploads::Retriever::VERSION = '0.10';
+$CPAN::Recent::Uploads::Retriever::VERSION = '0.12';
 #ABSTRACT: Retrieves recentfiles from a CPAN mirror
 
 use strict;
@@ -17,11 +17,11 @@ sub retrieve {
   $opts{lc $_} = delete $opts{$_} for keys %opts;
   my $self = bless \%opts, $class;
   $self->{uri} = URI->new( $self->{mirror} || 'http://www.cpan.org/' );
-  croak "Unknown scheme\n" 
+  croak "Unknown scheme\n"
       unless $self->{uri} and $self->{uri}->scheme and
              $self->{uri}->scheme =~ /^(http|ftp)$/i;
-  $self->{time} = '6h' 
-      unless $self->{time} 
+  $self->{time} = '6h'
+      unless $self->{time}
          and grep { $_ eq $self->{time} } @times;
   $self->{uri}->path( File::Spec::Unix->catfile( $self->{uri}->path, 'authors', 'RECENT-' . $self->{time} . '.yaml' ) );
   return $self->_fetch();
@@ -50,7 +50,7 @@ CPAN::Recent::Uploads::Retriever - Retrieves recentfiles from a CPAN mirror
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 SYNOPSIS
 

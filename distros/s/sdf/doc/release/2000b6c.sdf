@@ -1,0 +1,18 @@
+H1: 2.000beta6c
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+A {{FILE:template}} directory has been added. This contains
+skeleton SDF files for different document types.
+
+Prefilters now have their own subdirectory under {{FILE:lib}}.
+
+H2: Fixes
+
+None.
+
+H2: Incompatibilities
+
+None.

@@ -65,6 +65,8 @@ An example boulder stream looks like this:
 	Login=lds32
 	Password_age=20
 	Password_expires=60
+        Alias=lstein
+        Alias=steinl
 	=
 	Name=Leigh Deacon
 	Home=/u/bush202/tanager
@@ -85,8 +87,8 @@ indeed for all the records to be homogeneous.
 
 =item (2)
 
-Multiple values are allowed, as with the ALIAS tag in the 
-second record.
+Multiple values are allowed, as with the Alias tag in the second
+record.
 
 =item (3) 
 

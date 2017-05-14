@@ -1,47 +1,77 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "handles interactive (and non-interactive) process invocation",
    "author" : [
-      "binary.com <perl@binary.com>"
+      "binary.com <BINARY@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Command-Interactive",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Exception" : "0",
-            "Test::NoWarnings" : "0"
+            "perl" : "5.014000"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
             "Expect" : "0",
-            "List::Util" : "1.33",
             "Moose" : "0",
-            "perl" : "5.006"
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Exception" : "0",
+            "Test::More" : "0.94",
+            "Test::NoWarnings" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-command-interactive/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/binary-com/perl-command-interactive.git",
+         "url" : "git://github.com/binary-com/perl-command-interactive.git",
          "web" : "https://github.com/binary-com/perl-command-interactive"
       }
    },
-   "version" : "1.4"
+   "version" : "1.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
+

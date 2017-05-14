@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+
+# PODNAME: acme-catfs
+# ABSTRACT: acme-catfs is the init script for Acme::CatFS
+
+use Acme::CatFS;
+
+Acme::CatFS->new_with_options->run();
+
+=head1 SYNOPSIS
+
+  acme-catfs --mountpoint /tmp/catfs  # mount catfs in /tmp
+
+  acme-catfs -h                       # see other options  
+
+=head1 DESCRIPTION
+
+This script will create a Fuse mountpoint with a single random image of a cat.
+
+=cut

@@ -1,0 +1,25 @@
+.# Title: read from pipe-II
+.# NewOpt: PipeOK 1
+Line 1
+.#
+.sub readin
+In readin
+.read line
+After .read line
+.eval line='\v{line}'
+.done
+.#
+.sub doOpen level file
+.echo About to: .include -p\v{level} \v{file}
+.include -p\v{level} \v{file}
+Opened stream
+.done
+.#
+.sub readStream level file
+.doOpen \v{level} \v{file}
+.readin
+.done
+.#
+.readStream 2 '| echo "Hello World!"'
+.#
+EOF

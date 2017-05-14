@@ -1,0 +1,10 @@
+    <configuration>
+      <system>
+        <login>
+          <class>
+            <name>bar</name>
+            <permissions>view</permissions>
+          </class>
+        </login>
+      </system>
+    </configuration>

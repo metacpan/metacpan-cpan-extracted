@@ -1,0 +1,43 @@
+Discription
+-----------
+
+The CONFIG:: Perl modules are highly useful in connection with mod_perl
+CGI scripts. It caches files to speed up file reading. It's possible to
+configure the  module to  remove  comments  (several  types),  trailing 
+blanks, and empty lines, or to do other useful things only once.
+
+
+Download
+--------
+
+You can  download the  most recent  version of the CONFIG::  package at
+
+    http://www.fatalmind.com/programs/CONFIG/
+
+
+Documentation
+-------------
+
+Refer the  manpages  included  in the  package  and have a  look to the
+CONFIG:: guide at
+
+    http://www.fatalmind.com/programs/CONFIG/
+
+
+Installation
+------------
+
+There are three simple steps...
+
+    # perl Makefile.PL
+    # make
+    # make install
+
+Copyright
+---------
+
+    Copyright (C) 1999, 2000 by Markus Winand <mws@fatalmind.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

@@ -1,0 +1,39 @@
+# zxid/sg/liberty-idwsf-utility-v2.0.sg
+# Slightly edited, 18.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-utility-v2.0.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(lu, urn:liberty:util:2006-08)
+
+%IDType:    base(xs:string) ;
+%IDReferenceType: base(xs:string) ;
+@itemID     -> %lu:IDType
+@itemIDRef  -> %lu:IDReferenceType
+
+%StatusType:
+  lu:Status*
+  @code     -> %xs:string
+  @ref?     -> %lu:IDReferenceType
+  @comment? -> %xs:string
+  ;
+Status      -> %lu:StatusType
+
+%ResponseType:
+  lu:Status
+  lu:Extension*
+  @itemIDRef?  -> %lu:IDReferenceType
+  @any
+  ;
+
+TestResult       -> %lu:TestResultType
+%TestResultType: base(xs:boolean)
+  @itemIDRef  -> %lu:IDReferenceType
+  ;
+
+%EmptyType:	 base(xs:anyType) ;
+
+Extension -> %lu:extensionType
+%extensionType:
+  any+  ns(##other)  processContents(lax)
+  ;
+
+#EOF

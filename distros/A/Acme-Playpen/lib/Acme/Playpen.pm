@@ -8,7 +8,7 @@ use Acme::Playpen::Utilities;
 
 package Acme::odometer;
 
-our $VERSION = '0.20';
+our $VERSION = '0.20_1';
 
 1;
 

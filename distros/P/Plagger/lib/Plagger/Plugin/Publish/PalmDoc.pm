@@ -1,5 +1,5 @@
 # Plagger::Plugin::Publish::PalmDoc
-# $Id: /mirror/plagger/trunk/plagger/lib/Plagger/Plugin/Publish/PalmDoc.pm 3222 2006-07-26T18:11:42.718990Z miyagawa  $
+# $Id: /mirror/plagger/trunk/plagger/lib/Plagger/Plugin/Publish/PalmDoc.pm 5425 2006-09-25T03:05:48.317033Z cheebow  $
 package Plagger::Plugin::Publish::PalmDoc;
 use strict;
 use base qw( Plagger::Plugin );
@@ -39,8 +39,8 @@ sub finalize {
 
         my $filename = $prefix . '-' . $feed_count . '.pdb';
         my $outfile = File::Spec->catfile($path, $filename);
-        
-        my $doc = Palm::PalmDoc->new({OUTFILE=>$outfile, TITLE=>$feed->title});
+        my $title = encode("sjis", $feed->title);
+        my $doc = Palm::PalmDoc->new({OUTFILE=>$outfile, TITLE=>$title});
         $doc->compression(1);
         $doc->body($text);
         $doc->write_text();

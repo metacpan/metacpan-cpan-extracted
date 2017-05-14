@@ -1,114 +1,109 @@
-Revision history for perl distribution Mojolicious-Plugin-LinkEmbedder
+Revision history for Mojolicious-Plugin-LinkEmbedder
 
-0.24 2016-09-06T22:52:44+0200
- - Fix failing tests
- - Fix http://appear.in without room name #23
- - Add support for instagram #24
- - blip.tv is no more
+0.2301   Sun Apr  5 09:23:47 2015
+       * Need to skip t/music-spotify.t
 
-0.2301 2015-04-05T09:23:47Z
- - Need to skip t/music-spotify.t
+0.23     Fri Apr  3 15:08:36 2015
+       * Fix skipping tests in t/fallback.t #20
 
-0.23 2015-04-03T15:08:36Z
- - Fix skipping tests in t/fallback.t #20
+0.22     Thu Apr  2 19:27:29 2015
+       * Fix warnings with invalid input url
+       * Fix blip include parsing
+       * Experiment with etag header
+       * Experiment with max-age cache header
+       * Add support for http://pastie.org
+       * Add "error" attribute
+       * Remove caching
 
-0.22 2015-04-02T19:27:29Z
- - Fix warnings with invalid input url
- - Fix blip include parsing
- - Experiment with etag header
- - Experiment with max-age cache header
- - Add support for http://pastie.org
- - Add "error" attribute
- - Remove caching
+0.21     Wed Apr  1 17:04:50 2015
+       * Add support for Spotify #19
+       * Add support for http://ix.io
+       * Add support for http://pastebin.com
+       * Add support for http://paste.scsys.co.uk/
+       * Improved Twitter links handling #17
 
-0.21 2015-04-01T17:04:50Z
- - Add support for Spotify #19
- - Add support for http://ix.io
- - Add support for http://pastebin.com
- - Add support for http://paste.scsys.co.uk/
- - Improved Twitter links handling #17
+0.20     Tue Jan 20 20:09:11 2015
+       * Add support for appear.in
+       * Allow styling <iframe>s containing video
 
-0.20 2015-01-20T20:09:11Z
- - Add support for appear.in
- - Allow styling <iframe>s containing video
+0.19     Sun Jan 18 17:15:33 2015
+       * Add support for travis-ci.org links
 
-0.19 2015-01-18T17:15:33Z
- - Add support for travis-ci.org links
+0.18     Thu Jan 15 23:08:24 2015
+       * Fix escaping markup when embedding HTML pages #13
+         This includes Github links
+       * Will only learn meta information from HTML if response is success #14
+       * Video will have controls #12
+       * Twitter cards will embed media
+       * Remove cache_cb attribute
+       * Add caching to predefined handler
+         Marked caching as EXPERIMENTAL
 
-0.18 2015-01-15T23:08:24Z
- - Fix escaping markup when embedding HTML pages #13 This includes Github
-   links
- - Will only learn meta information from HTML if response is success #14
- - Video will have controls #12
- - Twitter cards will embed media
- - Remove cache_cb attribute
- - Add caching to predefined handler Marked caching as EXPERIMENTAL
+0.17     Sun Jan  4 16:54:01 2015
+       * Will not run online tests from cpantesters
 
-0.17 2015-01-04T16:54:01Z
- - Will not run online tests from cpantesters
+0.16     Fri Jan  2 14:19:51 2015
+       * Add support for xkcd.com image embedding
 
-0.16 2015-01-02T14:19:51Z
- - Add support for xkcd.com image embedding
+0.15     Sun Nov 16 14:11:43 2014
+       * Fix test containing date
+       * Skip tests that require connection to internet
 
-0.15 2014-11-16T14:11:43Z
- - Fix test containing date
- - Skip tests that require connection to internet
+0.14     Thu Nov 13 18:50:15 2014
+       * Add support for links from metacpan.org
+       * More robust tests
 
-0.14 2014-11-13T18:50:15Z
- - Add support for links from metacpan.org
- - More robust tests
+0.13     Wed Oct 22 20:49:23 2014
+       * Fix failing video-youtube.t and -vimeo.t
 
-0.13 2014-10-22T20:49:23Z
- - Fix failing video-youtube.t and -vimeo.t
+0.12     Sun Oct 19 15:19:41 2014
+       * Fix reading media_id in Link::Text::HTML
 
-0.12 2014-10-19T15:19:41Z
- - Fix reading media_id in Link::Text::HTML
+0.11     Sun Oct 19 13:30:27 2014
+       * Fix Video::Dbtv iframe src
+       * Fix handling https://www.youtube.com/user/jsconfeu
+       * Add support for git.io links
+       * Add support for github commit messages
+       * Add cache capabilities
+       * Remove string overload of Link objects
 
-0.11 2014-10-19T13:30:27Z
- - Fix Video::Dbtv iframe src
- - Fix handling https://www.youtube.com/user/jsconfeu
- - Add support for git.io links
- - Add support for github commit messages
- - Add cache capabilities
- - Remove string overload of Link objects
+0.10     Fri Oct 17 14:07:37 2014
+       * Add LinkEmbedder::Text::Github
+       * Fix embedding Youtube videos over HTTPS
+       * Fix embedding Ted videos over HTTPS
+       * Change to embedding tweets using javascript
 
-0.10 2014-10-17T14:07:37Z
- - Add LinkEmbedder::Text::Github
- - Fix embedding Youtube videos over HTTPS
- - Fix embedding Ted videos over HTTPS
- - Change to embedding tweets using javascript
+0.09     Sun Oct 12 20:46:49 2014
+       * Change link_embedder_text_gist_github_x() javascript methods to public
 
-0.09 2014-10-12T20:46:49Z
- - Change link_embedder_text_gist_github_x() javascript methods to public
+0.08     Sun Oct 12 19:37:18 2014
+       * Add support for scraping information from a HTML page
+         - Understands Open Graph and Twitter cards
+       * Add support for returning $self from embed_link() helper
+       * Add "ua" attribute to ::Link objects
+       * Add TO_JSON() method to ::Link objects
 
-0.08 2014-10-12T19:37:18Z
- - Add support for scraping information from a HTML page - Understands Open
-   Graph and Twitter cards
- - Add support for returning $self from embed_link() helper
- - Add "ua" attribute to ::Link objects
- - Add TO_JSON() method to ::Link objects
+0.07     Thu Aug  7 09:14:00 2014
+       * Add Imgur support, closes #1 (jberger)
 
-0.07 2014-08-07T09:14:00Z
- - Add Imgur support, closes #1 (jberger)
+0.06     Tue Jun 10 18:43:30 2014
+       * Allow custom stylesheet for Text::GistGithub
+       * Add DISCLAIMER section
+       * Add COPYRIGHT section
 
-0.06 2014-06-10T18:43:30Z
- - Allow custom stylesheet for Text::GistGithub
- - Add DISCLAIMER section
- - Add COPYRIGHT section
+0.05     Tue Jun 10 17:16:41 2014
+       * Fix embedding Text::GistGithub
 
-0.05 2014-06-10T17:16:41Z
- - Fix embedding Text::GistGithub
+0.04     Wed Apr  2 20:14:02 2014
+       * Fix embedding tweets
 
-0.04 2014-04-02T20:14:02Z
- - Fix embedding tweets
+0.03     Mon Feb 17 15:51:14 2014
+       * Will only render parseable URLs
 
-0.03 2014-02-17T15:51:14Z
- - Will only render parseable URLs
+0.02     Fri Feb 14 10:33:18 2014
+       * Add optional default action
 
-0.02 2014-02-14T10:33:18Z
- - Add optional default action
-
-0.01 2014-02-14T10:18:47Z
- - Add embed_link() helper
- - Add LinkEmbedder::Default
- - Add LinkEmbedder::Youtube
+0.01     Fri Feb 14 10:18:47 2014
+       * Add embed_link() helper
+       * Add LinkEmbedder::Default
+       * Add LinkEmbedder::Youtube

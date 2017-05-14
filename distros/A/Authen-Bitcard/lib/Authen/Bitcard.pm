@@ -1,16 +1,19 @@
 package Authen::Bitcard;
+BEGIN {
+  $Authen::Bitcard::VERSION = '0.90';
+}
 use strict;
 use base qw( Class::ErrorHandler );
 
-use Math::BigInt lib => 'GMP,Pari';
+use Math::BigInt;
 use MIME::Base64 qw( decode_base64 );
-use Digest::SHA1 qw( sha1 );
+use Digest::SHA qw( sha1 sha1_hex );
 use LWP::UserAgent;
 use HTTP::Status qw( RC_NOT_MODIFIED );
 use URI;
 use URI::QueryParam;
-
-our $VERSION = '0.87';
+use Carp qw(croak);
+use JSON qw(decode_json);
 
 sub new {
     my $class = shift;
@@ -39,6 +42,7 @@ sub key_cache         { shift->_var('key_cache',         @_) }
 sub skip_expiry_check { shift->_var('skip_expiry_check', @_) }
 sub expires           { shift->_var('expires',           @_) }
 sub token             { shift->_var('token',             @_) }
+sub api_secret        { shift->_var('api_secret',        @_) }
 sub version           { shift->_var('version',           @_) }
 sub ua                { shift->_var('ua',                @_) }
 sub bitcard_url       { shift->_var('bitcard_url',       @_) }
@@ -58,7 +62,18 @@ sub _url {
   my $base = $bc->bitcard_url;
   $base = "$base/" unless $base =~ m!/$!;
   my $uri = URI->new($base . $url);
-  $uri->query_form_hash($args) unless $url =~ m/regkey.txt/;;
+  unless ($url =~ m/regkey.txt/) {
+      if ($url =~ m!^api/!) {
+          croak "Bitcard API Secret required for API calls" unless $bc->api_secret;
+          $args->{bc_ts} = time;
+          my @fields = sort keys %$args;
+          $args->{bc_fields} = join ",", @fields, 'bc_fields';
+          my $string = join "::", (map { "$args->{$_}" } @fields, 'bc_fields'), $bc->api_secret;
+          warn "ST: $string";
+          $args->{bc_sig} = sha1_hex($string);
+      }
+      $uri->query_form_hash($args);
+  }
   $uri->as_string;
 }
 
@@ -81,6 +96,12 @@ sub account_url {
 sub register_url {
   shift->_url('register', @_)
 }
+
+sub _api_url {
+  my ($self, $method) = (shift, shift);
+  $self->_url("api/$method", @_);
+}
+
 
 sub verify {
     my $bc = shift;
@@ -154,6 +175,10 @@ sub _verify {
     $u1 == $sig->{r};
 }
 
+sub _get_ua {
+    shift->ua || LWP::UserAgent->new;
+}
+
 sub _fetch_key {
     my $bc = shift;
     my($uri) = @_;
@@ -162,7 +187,7 @@ sub _fetch_key {
     return $cache->($bc, $uri) if $cache && ref($cache) eq 'CODE';
     ## Otherwise, load the key.
     my $data;
-    my $ua = $bc->ua || LWP::UserAgent->new;
+    my $ua = $bc->_get_ua;
     if ($cache) {
         my $res = $ua->mirror($uri, $cache);
         return $bc->error("Failed to fetch key: " . $res->status_line)
@@ -184,6 +209,17 @@ sub _fetch_key {
         $key->{$k} = Math::BigInt->new($v);
     }
     $key;
+}
+
+sub add_invite {
+    my $self  = shift;
+    my $url = $self->_api_url('invite/add_invite', @_);
+    warn "URL: $url\n";
+    my $res = $self->_get_ua->get($url);
+    return $self->error("Failed to retrive invitation code: " . $res->status_line)
+      unless $res->is_success;
+    my $data = decode_json($res->content);
+    $data;
 }
 
 1;
@@ -267,7 +303,7 @@ With info_required you specify what user data you require.  The
 possible fields are "username", "name" and "email" (see C<verify> for
 more information).
 
-The method takes either a comma seperated string or a reference to an
+The method takes either a comma separated string or a reference to an
 array.
 
 This must be called before C<login_url>.
@@ -367,15 +403,27 @@ C<undef> unless the user agent has been previously set.
 Get/set the version of the Bitcard protocol to use. The default version
 is C<3>.
 
+=head2 $bc->api_secret( $secret )
+
+Get/set the api_secret (needed for some API calls, add_invite for
+example).
+
+=head2 $bc->add_invite
+
+Returns a hashref with C<invite_url> and C<invite_key>.  Can be used
+for "invitation only" sites where you have to login before you can
+access the site.
+
+
 =head1 LICENSE
 
-I<Authen::Bitcard> is free software; you may redistribute it and/or modify it
-under the same terms as Perl itself.
+I<Authen::Bitcard> is distributed under the Apache License; see the
+LICENSE file in the distribution for details.
 
 =head1 AUTHOR & COPYRIGHT
 
 Except where otherwise noted, I<Authen::Bitcard> is Copyright
-2004-2006 Develooper LLC, ask@develooper.com.
+2004-2010 Develooper LLC, ask@develooper.com.
 
 Parts are Copyright 2004 Six Apart Ltd, cpan@sixapart.com.
 

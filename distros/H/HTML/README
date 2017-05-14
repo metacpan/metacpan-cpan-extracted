@@ -1,0 +1,288 @@
+Greetings,
+
+Here it is, the long-awaited (by me, anyway), release 0.6 of the HTML
+module.  There have been many changes to the module since its first 
+incarnations, but the basic organization and structure of the thing is
+mostly the same.  This is still pre-alpha code, so expect to find
+bugs and expect things to change even more in the future.
+
+The most radical change is in the name of the module.  It is now called
+HTML::Base (at least for the time being); see the changes list below for
+details.
+
+I will send the new module in a separate message, and will send yet another
+message containing the new POD docs for the thing.  I'll also make a
+compressed archive and make it available on my FTP system.  If you
+want to grab it that way, anonymous FTP yourself over to
+
+	ftp.acoates.com
+
+and grab the file 
+
+	perl/HTML_0.6.tar.gz
+
+The archive includes the module, the POD doc, and the list of changes.
+
+Before I get to the changes we have made, I'd like to list first the
+changes that were *not* made -- not *yet* anyway.  These are things that
+I personally want to see included in the module, but which I have either
+not had the time to finish myself, or which I would like to hear more
+discussion of before I spend much energy on them.
+
+If you have any ideas, passions, rants, whatever on any of these topics, 
+please speak up:
+
+* The module does no rules-checking concerning which HTML objects
+  may contain others.  I have some ideas on this which I'll present a bit
+  later in a separate letter.  
+
+* I have not included all of the proposed HTML 3.0 tags, for a reason that's
+  related to my thoughts on rules-checking.
+
+* There is no comprehensive test program for the module.  (At the moment I
+  test new releases by re-building all of the pages of San Jose Living --
+  my web site at http://www.acoates.com/sjliving.  Check it out if you want
+  to see what a few thousand lines of PERL and the HTML::Base module can do.)
+
+* I have not split the module into smaller ones yet, mostly because I
+  haven't decided how to split it.  Input please!
+
+=============================================================================
+Ok, now here are the changes from the Html.pm module, revision 0.5:
+
+1.  Comment tags are no longer printed with spaces.  Example:
+
+	new HTML::Base::Comment
+	new HTML::Base::Text "This is a comment"
+
+	produces:
+		old way:  <!-- This is a comment 
+			   -->
+		new way:  <!--This is a comment-->
+
+2.  Header objects can be created either the old way:
+
+	new HTML::Base:Header 1;
+
+    or using the attribute 'Level' with the object syntax:
+
+	new HTML::Base:Header 'Level' => 1;
+
+    If used, "Level" must be the first attribute specified, otherwise it is
+    assumed that the first parameter is the level itself!
+
+    The same is true of Text objects; both of these examples work:
+
+	new HTML::Base:Text 'Text' => "This is some text";
+	new HTML::Base:Text "This is some text";
+
+3.  The module is now known as HTML::Base.  All objects defined by the
+    module must now be prefixed with HTML::Base::.  Yeah, I know it's wordy 
+    and geeky, but it makes it much less likely that the object names will
+    clash with something else in your program.
+
+    The "use" statement for the module is now:
+
+	use HTML::Base
+
+    The default filename for the module is now:
+    
+	$PERL5LIBS/HTML/Base.pm
+
+    where $PERL5LIBS = wherever you keep your PERL 5 modules (usually
+    /usr/local/lib/perl5).
+
+4.  Global functions (those at the HTML::Base level) have been separated
+    into "public" and "private", and the private ones have been renamed
+    to start with an underscore.
+
+5.  All HTML objects may now be created without inserting them into the
+    current HTML hierarchy.  To create one of these "lone" objects, set
+    the Attribute "NoParent" to "1" (or anything else you'd like).  
+
+    Example:
+
+       $loneparagraph = new HTML::Base::Paragraph 'NoParent' => 1;
+
+    Lone objects may also be created by copying existing objects:
+
+       $newloneparagraph = HTML::Base::copy_object ($loneparagraph);
+
+    The object being copied may be a lone object or a linked one, but the
+    new copy will always be "lone".  Copies of objects contain copies of
+    all of the original object's children as well.
+
+    Note that copy_object may also be called in object syntax:
+
+        $newobj = $oldobj->copy_object;
+
+6.  Objects may be linked as children to other objects, even if the target
+    parent is not the "current" object.  This can be done using the new
+    HTML::Base::link_to_parent subroutine, like this:
+
+        HTML::Base::link_to_parent ($loneobject, $targetparent);
+
+    If you want to link a "lone" object to the current object in the
+    hierarchy, use link_to_parent with get_current like this:
+
+        HTML::Base::link_to_parent ($loneparagraph, HTML::Base::get_current());
+
+    Be careful how you use HTML::Base::link_to_parent!
+
+    With HTML::Base::link_to_parent, you can build up collections of
+    lone HTML objects, link them up anyway you'd like, and then insert
+    the collection into the hierarchy anywhere you'd like.  It's a bit
+    laborious, but you can do it (see below for an easier method using
+    cache_object).  For example:
+
+      $loneparagraph = new HTML::Base::Paragraph 'NoParent' => 1;
+      $lonetext = new HTML::Base::Text "wowzo!", 'NoParent' => 1;
+      HTML::Base::link_to_parent ($lonetext, $loneparagraph);
+      HTML::Base::link_to_parent ($loneparagraph, HTML::Base::get_current());
+
+7.  Objects are now copied in the object cache, rather than just being
+    linked.  This means you can use a cached object as many times as you'd
+    like, without worrying about all of the parent-child relationships.
+
+    The two calls used in caching are 
+    HTML::Base::cache_object ($Name, $objectref) and
+    HTML::Base::use_object ($Name).  
+    
+    HTML::Base::cache_object makes a copy of the HTML object referenced by 
+    $objectref, and stores a reference to the copy into the object cache 
+    (a hash), giving it the name $Name.
+
+    HTML::Base::use_object retrieves a cached object, makes a copy of it,
+    and inserts the new copy into the HTML hierarchy, linking it as a child
+    of the "current" object.  Note that all of these object copies are
+    recursive, so that a cached object will also contain all of its
+    original children.  Here's an example:
+
+      $anchor = new HTML::Base::Anchor 
+	   'HREF' => 'http://www.acoates.com/sjliving';
+      new HTML::Base::Text 'Go to San Jose Living Home Page!';
+      HTML::Base::cache_object ('HomePageAnchor', $anchor);
+
+      ... later on ...
+
+      HTML::Base::use_object ('HomePageAnchor');
+
+    The above code will make a copy of the Anchor, complete with its
+    Text child, and store it in the object cache under the name HomePageAnchor.
+    When used, both the Anchor and the Text are copied into the object
+    hierarchy and linked to the current object;
+
+    Note that the original object, the "cached" object and the "used" object
+    are three *different* objects.  Each may be modified independant of
+    the others.  They just start their lives as copied of each other.
+
+8.  The type of an HTML object can now be retrieved using the 
+    HTML::Base::object_type call:
+
+        $objtype = HTML::Base::object_type($objectref);
+
+    The type returned is just the HTML object name, without the preceding
+    HTML::Base:: stuff.  So in this example:
+
+        $para = new HTML::Base::Paragraph
+        $objtype = HTML::Base::object_type($para);
+
+    $objtype would equal 'Paragraph'.
+
+    Note that object_type may also be executed in object syntax:
+
+        $objtype = $para->object_type;
+
+9.  If you want to know whether a given object is a certain type, or if
+    any of its ancesters are of that type, you can now use the new
+    HTML::Base::contained_by call.  
+
+	HTML::Base::contained_by ($objectref, $objecttype);
+
+    Example:
+
+        new HTML::Base::Preformatted;
+        new HTML::Base::Text "This is preformatted text";
+        new HTML::Base::Bold 
+        $boldtext = new HTML::Base::Text "This is bold preformatted text";
+        if (HTML::Base::contained_by ($boldtext, 'Preformatted')) {
+          print "huh?\n";
+        }
+
+10.  The execute method now has a synonym, "realize".  I just couldn't
+     let go of "execute", but I like "realize" as a better explanation
+     of what's really happening, so now we have both.  They do the same
+     thing:
+
+	 $objectref->execute;
+
+	      or
+
+	 $objectref->realize;
+
+     Similarly, there are two functions for realizing the entire hierarchy,
+     from the top down:
+
+	 HTML::Base::execute();
+
+	      or
+
+	 HTML::Base::realize();
+
+11.  Newlines are now suppressed after Image objects, and in Comments, as
+     well as in Preformatted text blocks.  This removes the little "ledger"
+     lines some browsers (ok, NetScape) place after images which are in
+     anchors if white space follows the Image tag, and also allows comments
+     to include "server-side include" statements.
+
+12.  Some NetScape and proposed HTML 3.0 tags and features have been added.
+     In the next release, I hope to provide the ability to choose a standard
+     and use it exclusively during a run of HTML.  For the moment, though,
+     the module has all of HTML 2.0, with a smattering of NetScapisms and
+     3.0 proposals.
+
+     The new features added are:
+
+     -  The Body object will now display the following attributes:
+	'BACKGROUND', 'BGCOLOR', 'TEXT', 'LINK', and 'VLINK'.
+
+     - The Break object accepts the 'CLEAR' attribute.
+
+     - The Header object now accepts the 'ALIGN' attribute.
+
+     - The Image object accepts the 'BORDER' attribute, along with the usual
+       'SRC', 'ALIGN', 'ALT', and ,'ISMAP'.
+
+     - The Paragraph object now accepts the 'ALIGN' attribute.
+
+     - Tables have been added.  The new objects are:
+
+       - HTML::Base::Table
+	   Attributes are 'BORDER', 'CELLPADDING', 'CELLSPACING', and 'WIDTH'.
+
+       - HTML::Base::TableCaption
+	   Attributes are 'ALIGN', and 'VALIGN'.
+
+       - HTML::Base::TableData
+	   Attributes are 'ALIGN', 'VALIGN', 'NOWRAP', 'COLSPAN', 'ROWSPAN',
+	   and 'WIDTH'.
+
+       - HTML::Base::TableHeader
+	   Attributes are 'ALIGN', 'VALIGN', 'NOWRAP', 'COLSPAN', 'ROWSPAN',
+	   and 'WIDTH'.
+
+       - HTML::Base::TableRow
+	   Attributes are 'ALIGN', and 'VALIGN'.
+
+13.  The debug mode messages have been expanded and (hopefully) made more
+     readable.  Each object's "new" function calls standard functions which
+     begin and end a block of comments about the construction of the object.
+     This makes it easier to read a debug dump to see how your objects
+     are being born.
+
+14.  Documentation is now available in POD format.
+
+
+
+
+

@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README.txt
+TAG/ID3v1.pm
+TAG/ID3v2.pm
+Tag.pm
+examples/extractID3v2.pl
+examples/tagged.pl
+examples/tagit.pl
+test.pl

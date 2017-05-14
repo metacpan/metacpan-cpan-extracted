@@ -1,0 +1,14 @@
+lib/Bot/BasicBot/Pluggable/Module/Bash.pm
+lib/Bot/BasicBot/Pluggable/Module/Foldoc.pm
+lib/Bot/BasicBot/Pluggable/Module/Hyperarchive.pm
+lib/Bot/BasicBot/Pluggable/Module/IMDB.pm
+lib/Bot/BasicBot/Pluggable/Module/Search.pod
+lib/Bot/BasicBot/Pluggable/Module/Websters.pm
+lib/Bot/BasicBot/Pluggable/Module/WebSearch.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01use.t
+Makefile.PL
+Build.PL

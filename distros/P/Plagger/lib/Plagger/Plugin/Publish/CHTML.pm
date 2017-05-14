@@ -5,6 +5,7 @@ use base qw( Plagger::Plugin );
 use Encode;
 use Digest::MD5 qw(md5_hex);
 use File::Path;
+use File::Copy;
 
 sub register {
     my($self, $context) = @_;
@@ -46,7 +47,7 @@ sub feed {
     my($self, $context, $args) = @_;
 
     my $feed = $args->{feed} or return;
-    my $feed_path = $self->work . '/feeds/' . $feed->id;
+    my $feed_path = $self->work . '/feeds/' . $feed->id_safe;
     my $publish_path = "$feed_path/" . $self->id;
 
     mkpath($publish_path);
@@ -79,7 +80,7 @@ sub feed {
 		 "$feed_path/index.html");
 
     $self->add(+{
-	feed_link => './feeds/' . $feed->id . '/' . $self->id . '.html',
+	feed_link => './feeds/' . $feed->id_safe . '/' . $self->id . '.html',
 	title  => $feed->title || '(no-title)',
 	lastdate => $feed->entries->[-1]->date,
 	count => scalar(@{$feed->entries}),
@@ -112,7 +113,10 @@ sub write {
 sub symlink {
     my ($self, $old, $new) = @_;
     unlink $new if -e $new;
-    symlink $old, $new;
+    eval { symlink $old, $new; };
+    if ($@) {  # primarily for Win32
+      copy $old, $new;
+    }
 }
 
 sub earlier {

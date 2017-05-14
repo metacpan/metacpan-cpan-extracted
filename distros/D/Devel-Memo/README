@@ -1,0 +1,29 @@
+-*- Outline -*-
+
+$Format: "* Version $DevelMemoRelease$"$
+* Version 0.004
+
+* Description
+
+Devel::Memo permits you to create function objects (i.e. blessed code-refs
+which can be bound to subroutine cells) which are called exactly like a
+regular subroutine (which you supply), but which memoize their arguments and
+results with each invocation, so that unnecessary recomputation is
+avoided. Internally, the FreezeThaw module is used to assist in the caching.
+
+* DLSI Synopsis
+
+Devel::Memo			Memoized functions.				adpO
+
+* Installation
+
+perl Makefile.PL && make all test install
+
+* Prerequisites
+
+FreezeThaw, available on CPAN (in ILYAZ's etext package). Test::Helper
+is needed (authors/id/JGLICK) for running the test suite.
+
+* Author
+
+Jesse Glick <jglick@sig.bsh.com>

@@ -7,7 +7,6 @@ use MooseX::StrictConstructor;
 use MooseX::MarkAsMethods ( autoclean => 1 );
 use MooseX::Types::Moose qw(Maybe Str);
 
-use Try::Tiny;
 use LWP::UserAgent;
 
 use Pinto::Chrome::Term;
@@ -18,11 +17,11 @@ use Pinto::Types qw(Uri);
 
 #-------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
-with qw(Pinto::Role::Plated Pinto::Role::UserAgent);
+with qw(Pinto::Role::Plated);
 
 #------------------------------------------------------------------------------
 
@@ -44,15 +43,37 @@ has password => (
     isa => Maybe [Str],
 );
 
+has ua => (
+    is      => 'ro',
+    isa     => 'LWP::UserAgent',
+    default => sub { LWP::UserAgent->new( agent => $_[0]->ua_name, env_proxy => 1 ) },
+    lazy    => 1,
+);
+
+has ua_name => (
+    is      => 'ro',
+    isa     => Str,
+    default => sub { sprintf '%s/%s', ref $_[0], $_[0]->VERSION || '??' },
+    lazy    => 1,
+);
+
 #------------------------------------------------------------------------------
 
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
+
     my $args = $class->$orig(@_);
 
+    # Normalize the root
+    $args->{root} = 'http://' . $args->{root}
+        if defined $args->{root} && $args->{root} !~ m{^ https?:// }mx;
+
+    $args->{root} = $args->{root} . ':' . $PINTO_SERVER_DEFAULT_PORT
+        if defined $args->{root} && $args->{root} !~ m{ :\d+ $}mx;
+
     # Grrr.  Gotta avoid passing undefs to Moose
-    my @chrome_attrs = qw(verbose quiet color);
+    my @chrome_attrs = qw(verbose quiet no_color);
     my %chrome_args = map { $_ => delete $args->{$_} }
         grep { exists $args->{$_} } @chrome_attrs;
 
@@ -67,32 +88,20 @@ around BUILDARGS => sub {
 sub run {
     my ( $self, $action_name, @args ) = @_;
 
-    # Divert all warnings through our chrome
-    local $SIG{__WARN__} = sub { $self->warning($_) for @_ };
-
     my $action_args = ( @args == 1 and ref $args[0] eq 'HASH' ) ? $args[0] : {@args};
+    my $action_class = $self->load_class_for_action( name => $action_name );
 
-    my $result = try {
+    my $action = $action_class->new(
+        name     => $action_name,
+        args     => $action_args,
+        root     => $self->root,
+        username => $self->username,
+        password => $self->password,
+        chrome   => $self->chrome,
+        ua       => $self->ua
+    );
 
-        my $action_class = $self->load_class_for_action( name => $action_name );
-
-        my $action = $action_class->new(
-            name     => $action_name,
-            args     => $action_args,
-            root     => $self->root,
-            username => $self->username,
-            password => $self->password,
-            chrome   => $self->chrome,
-        );
-
-        $action->execute;
-    }
-    catch {
-        $self->error($_);
-        Pinto::Result->new->failed( because => $_ );
-    };
-
-    return $result;
+    return $action->execute;
 }
 
 #------------------------------------------------------------------------------
@@ -136,7 +145,7 @@ Pinto::Remote - Interact with a remote Pinto repository
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 SYNOPSIS
 
@@ -155,7 +164,7 @@ on the remote host.
 
 If you are using the L<pinto> application, it will automatically load
 either Pinto or Pinto::Remote depending on whether your repository
-root looks like a local directory path or a remote URI.
+root looks like a local directory path or a remote URL.
 
 =head1 METHODS
 
@@ -172,7 +181,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

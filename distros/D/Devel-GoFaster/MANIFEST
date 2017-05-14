@@ -1,0 +1,18 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Devel/GoFaster.pm
+lib/Devel/GoFaster.xs
+t/endless_loop.t
+t/padsv_from_shift.t
+t/padsv_from_shift_dor_smalliv.t
+t/pod_cvg.t
+t/pod_syn.t
+t/shift_defav.t
+t/xs_disabled.t
+SIGNATURE    Added here by Module::Build

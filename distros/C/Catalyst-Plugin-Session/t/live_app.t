@@ -10,11 +10,12 @@ BEGIN {
       or plan skip_all =>
       "Catalyst::Plugin::Session::State::Cookie 0.03 or higher is required for this test";
 
-    eval { require Test::WWW::Mechanize::Catalyst }
-      or plan skip_all =>
-      "Test::WWW::Mechanize::Catalyst is required for this test";
-
-    plan tests => 36;
+    eval {
+        require Test::WWW::Mechanize::Catalyst;
+        Test::WWW::Mechanize::Catalyst->VERSION(0.51);
+    }
+    or plan skip_all =>
+        'Test::WWW::Mechanize::Catalyst >= 0.51 is required for this test';
 }
 
 use lib "t/lib";
@@ -80,3 +81,31 @@ $_->get_ok( "http://localhost/page", "get main page" ) for $ua1, $ua2;
 $ua1->content_contains( "please login", "ua1 not logged in" );
 $ua2->content_contains( "please login", "ua2 not logged in" );
 
+my $ua3 = Test::WWW::Mechanize::Catalyst->new;
+$ua3->get_ok( "http://localhost/login", "log ua3 in" );
+$ua3->get_ok( "http://localhost/dump_these_loads_session");
+$ua3->content_contains('NOT');
+
+my $ua4 = Test::WWW::Mechanize::Catalyst->new;
+$ua4->get_ok( "http://localhost/page", "initial get" );
+$ua4->content_contains( "please login", "ua4 not logged in" );
+
+$ua4->get_ok( "http://localhost/login", "log ua4 in" );
+$ua4->content_contains( "logged in", "ua4 logged in" );
+
+
+$ua4->get( "http://localhost/page", "get page" );
+my ( $ua4_expires1 ) = ($ua4->content =~ /(\d+)$/);
+$ua4->get( "http://localhost/page", "get page" );
+my ( $ua4_expires2 ) = ($ua4->content =~ /(\d+)$/);
+is( $ua4_expires1, $ua4_expires2, 'expires has not changed' );
+
+$ua4->get( "http://localhost/change_session_expires", "get page" );
+$ua4->get( "http://localhost/page", "get page" );
+my ( $ua4_expires3 ) = ($ua4->content =~ /(\d+)$/);
+ok( $ua4_expires3 > ( $ua4_expires1 + 30000000), 'expires has been extended' );
+
+diag("Testing against Catalyst $Catalyst::VERSION");
+diag("Testing Catalyst::Plugin::Session $Catalyst::Plugin::Session::VERSION");
+
+done_testing;

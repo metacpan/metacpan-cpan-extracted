@@ -1,7 +1,7 @@
 package Myco::Exceptions::Test;
 
 ################################################################################
-# $Id: Test.pm,v 1.1.1.1 2004/11/22 19:16:05 owensc Exp $
+# $Id: Test.pm,v 1.3 2006/03/17 22:41:32 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ################################################################################
@@ -12,20 +12,11 @@ package Myco::Exceptions::Test;
 
 Myco::Exceptions::Test - Myco::Exceptions unit tester.
 
-=head1 VERSION
-
-$Revision: 1.1.1.1 $
-
-=cut
-
-# Grab the Version Number.
-our $VERSION = (qw$Revision: 1.1.1.1 $ )[-1];
-
 =pod
 
 =head1 DATE
 
-$Date: 2004/11/22 19:16:05 $
+$Date: 2006/03/17 22:41:32 $
 
 =head1 SYNOPSIS
 
@@ -73,7 +64,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

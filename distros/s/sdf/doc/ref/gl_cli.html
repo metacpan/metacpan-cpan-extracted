@@ -1,0 +1,293 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: Command Line Guidelines</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="in_macif.html">Previous Topic</A> | <A HREF="re_sdf.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>D. Command Line Guidelines</H1>
+<HR>
+<H2><A NAME="Overview">D.1. Overview</A></H2>
+<H3><A NAME="General Usage">General Usage</A></H3>
+<P>Utilities have the following general usage:</P>
+<PRE>
+   utility [options] arguments
+</PRE>
+<P>Typically, arguments is a set of filenames. If more than one file is specified,  each filename is echoed to standard error as it is processed.</P>
+<P>Options can either be:</P>
+<UL>
+<LI><EM>short style</EM> - these begin with a '-' character, or
+<LI><EM>long-style</EM> - these begin with the character sequence '--'.</UL>
+<P>To obtain a concise summary of a utility's usage, execute it without any parameters. For example:</P>
+<PRE>
+$ hoopy
+usage  : hoopy [-h[help]] [-o[out_ext]] [-l[log_ext]] [-t thing,..] file ...
+purpose: do lots of hoopy things to files
+version: 1.000
+$ _
+</PRE>
+<H3><A NAME="Exit Codes">Exit Codes</A></H3>
+<P>The exit code returned to the operating system is dependent on the severity of any errors encountered during execution. The  pre-defined exit codes are linked to message types as summarised below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Code</STRONG>
+</TD>
+<TD>
+<STRONG>Message</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+0
+</TD>
+<TD>
+n/a
+</TD>
+<TD>
+everything succeeded
+</TD>
+</TR>
+<TR>
+<TD>
+8
+</TD>
+<TD>
+warning
+</TD>
+<TD>
+a possible problem was identified
+</TD>
+</TR>
+<TR>
+<TD>
+16
+</TD>
+<TD>
+error
+</TD>
+<TD>
+an error was found
+</TD>
+</TR>
+<TR>
+<TD>
+24
+</TD>
+<TD>
+abort
+</TD>
+<TD>
+processing could not continue on a file
+</TD>
+</TR>
+<TR>
+<TD>
+32
+</TD>
+<TD>
+fatal
+</TD>
+<TD>
+the application terminated abnormally
+</TD>
+</TR>
+<TR>
+<TD>
+64
+</TD>
+<TD>
+failed
+</TD>
+<TD>
+an internal error occurred
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Arguments">Arguments</A></H3>
+<P>The set of options is implicitly terminated by the first argument. i.e. the first symbol which does not begin with either '-' or '--'. To specify an argument which would otherwise be treated as an option, it is sometimes necessary to explicitly terminate the options using the '--' symbol.</P>
+<P>Unless stated otherwise for a particular utility, '+' can be used to specify that standard input contains a list of arguments. This feature is particularly useful for passing complex arguments to scripts on systems with poor support for command line quoting.</P>
+<P>If the arguments are files, '-' can be used to indicate standard input.</P>
+<H3><A NAME="Providing Default Options">Providing Default Options</A></H3>
+<P>Default options for a utility can be specified in an environment variable of the form:</P>
+<PRE>
+   <EM>name</EM>OPTS
+</PRE>
+<P>For example, if <CMD>hoopy</CMD> supported a -R option for specifying a directory to search for report files in, then the user may wish to define this directory in an environment variable so that they do not need to specify it each time. This could be done by adding the following to their <EM>.profile</EM>:</P>
+<PRE>
+   HOOPYOPTS=-R/home/me/etc/reports
+   export HOOPYOPTS
+</PRE>
+<HR>
+<H2><A NAME="Options">D.2. Options</A></H2>
+<H3><A NAME="Option Types">Option Types</A></H3>
+<P>Several types of options are supported as outlined in the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option type</STRONG>
+</TD>
+<TD>
+<STRONG>Usage message format</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+parameter-less
+</TD>
+<TD>
+[-x]
+</TD>
+</TR>
+<TR>
+<TD>
+parameter-required
+</TD>
+<TD>
+[-x thing]
+</TD>
+</TR>
+<TR>
+<TD>
+parameter-optional
+</TD>
+<TD>
+[-x[thing]]
+</TD>
+</TR>
+</TABLE>
+
+<P>For parameter-optional options, the option parameter typically defaults to a particular value if the option is supplied without a parameter. For example, the extension of output files can be specified using the -o option. The default value of this parameter-optional option is 'out'. The series of examples below illustrates this.</P>
+<OL>
+<LI>To send output to standard output:</OL>
+<PRE>
+   hoopy *.dat
+</PRE>
+<OL>
+<LI>To send output to .out files:</OL>
+<PRE>
+   hoopy -o *.dat
+</PRE>
+<OL>
+<LI>To send output to .new files:</OL>
+<PRE>
+   hoopy -onew *.dat
+</PRE>
+<P>As for arguments, '-' can be specified to indicate standard input for options expecting a filename.</P>
+<H3><A NAME="List Options">List Options</A></H3>
+<P>Some options have <EM>list parameters</EM>. These options can be specified several times and/or multiple list elements can be separated with commas. For example, the following are all equivalent:</P>
+<PRE>
+   hoopy -ta,b,c *.dat
+   hoopy -ta -tb,c *.dat
+   hoopy -ta,b -tc *.dat
+   hoopy -ta -tb -tc *.dat
+</PRE>
+<P>In addition to simple lists, lists of name-value pairs are also supported. In this case, the name and value are separated by a '=' or ':' character.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>on MS-DOS and OS/2, '=' causes problems so ':' must be used.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>If only the name is given, the value is assumed to be 1. For example, the following are equivalent:</P>
+<PRE>
+   mycmd -ftbl_dir=../tables -fverbose=1 *.dat
+   mycmd -ftbl_dir=../tables -fverbose *.dat
+   mycmd -ftbl_dir:../tables -fverbose *.dat
+</PRE>
+<P>Ordering is not important for name-value lists but may be important for normal lists. In either case, within a usage message, list options are indicated as follows:</P>
+<PRE>
+   [-t thing,..]
+</PRE>
+<H3><A NAME="Option Styles">Option Styles</A></H3>
+<P>There are two parameter styles: <EM>short</EM> and <EM>long</EM>. Short style is typically used on the command line. Long style is useful to improve readability in shell scripts.</P>
+<P>In short style:</P>
+<UL>
+<LI>options are specified by a single character
+<LI>a set of parameter-less options can be clustered
+<LI>between the option character and the parameter:<UL>
+<LI>whitespace is optional for a parameter-required option
+<LI>whitespace is <EM>not</EM> permitted for a parameter-optional option</UL></UL>
+<P>In long style:</P>
+<UL>
+<LI>the name can be abbreviated provided it is still unique
+<LI>a '=' or ':' is used to separate the option name from the parameter</UL>
+<P>Examples are:</P>
+<PRE>
+   hoopy --out *.dat
+</PRE>
+<P>and</P>
+<PRE>
+   hoopy --out=new *.dat
+</PRE>
+<H3><A NAME="Option Naming Conventions">Option Naming Conventions</A></H3>
+<P>Long option names should be selected for maximum readability. In general, the short name should be the first letter of the long name.</P>
+<P>For list options which specify a set of directories to search in:</P>
+<UL>
+<LI>the long name should end in '_path'
+<LI>the short name should be a capital letter</UL>
+<P>If applicable, the capital letter used should be taken from the related option. For example, if the -r option is used to specify a report file, the -R option should be the list of directories to search for the report in.</P>
+<HR>
+<H2><A NAME="Commonly Used Options">D.3. Commonly Used Options</A></H2>
+<H3><A NAME="Overview">Overview</A></H3>
+<P>There are 3 options available for most utilities:</P>
+<UL>
+<LI>-o[out_ext]
+<LI>-l[log_ext]
+<LI>-h[help]</UL>
+<H3><A NAME="Redirecting Standard Output and Standard Error">Redirecting Standard Output and Standard Error</A></H3>
+<P>By default, generated output goes to standard output. To direct output to a file per input file, use the -o option to specify an extension for output files. If the -o option is specified without a parameter, an extension of <EM>out</EM> is assumed. Likewise, error messages go to standard error by default. Use the -l option to create a log file per input file. If the -l option is specified without a parameter, an extension of <EM>log</EM> is assumed.</P>
+<P>For a small number of scripts, there is never a need for output or error files per argument. In this case, the -o and -l options are not available.</P>
+<H3><A NAME="Obtaining Help">Obtaining Help</A></H3>
+<P>The -h option provides help and is always available. To obtain a concise description of each option, use the help option with no parameter. For example:</P>
+<PRE>
+<STRONG>$</STRONG> sdfget -h
+usage  : sdfget [-h[help]] [-o[out_ext]] [-l[log_ext]] [-g get_rule] [-r[rpt_file]] [-i] file ...
+purpose: extract documentation embedded in source code
+version: 2.000    (SDF 2.000beta9)
+options:
+-h, --help            display help on options
+-o, --out_ext         output file extension
+-l, --log_ext         log file extension
+-g, --get_rule        rule to use to get documentation
+-r, --rpt_file        report file
+-i, --inverse         only output lines not extracted
+</PRE>
+<H3><A NAME="Obtaining Help on a Given Option">Obtaining Help on a Given Option</A></H3>
+<P>Detailed help on a given option can be obtained by specifying the option code as a parameter to the -h option. For example:</P>
+<PRE>
+<STRONG>$</STRONG> sdfget -hg
+usage  : sdfget [-h[help]] [-o[out_ext]] [-l[log_ext]] [-g get_rule] [-r[rpt_file]] [-i] file ...
+purpose: extract documentation embedded in source code
+version: 2.000    (SDF 2.000beta9)
+Detailed help on option: -g,--get_rule
+
+Attribute  Value
+Help       rule to use to get documentation
+Type       STR
+Parameter  yes
+Initial    perl
+Legal      table, perl, cpp, c, eiffel, fortran
+</PRE>
+<H3><A NAME="Obtaining Special Help">Obtaining Special Help</A></H3>
+<P>The help option can also be used to obtain other useful information by specifying a special keyword as the parameter. The keywords supported are:</P>
+<UL>
+<LI><EM>.parts</EM> - display name &amp; version of components (and exit)
+<LI><EM>.time</EM> - display execution time (when exiting)
+<LI><EM>.calltree</EM> - display the internal sequence of subroutines leading to utility exit</UL>
+<P>This type of information is useful when developing scripts but is rarely needed by end-users.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="in_macif.html">Previous Topic</A> | <A HREF="re_sdf.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

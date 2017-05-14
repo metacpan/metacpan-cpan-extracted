@@ -9,16 +9,12 @@ use 5.010;
 use base 'Exporter';
 use Bio::Gonzales::Util::File qw/basename regex_glob is_archive/;
 use List::Util qw/min max/;
-use File::Temp qw/tempdir tempfile mktemp/;
+use File::Temp qw/tempdir tempfile/;
 use Bio::Gonzales::Seq::IO qw(faiterate faspew);
-use Capture::Tiny qw/capture_merged/;
-use Path::Tiny;
-use File::Spec::Functions qw/catfile/;
-use String::ShellQuote;
 
 use Params::Validate qw/validate/;
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 @EXPORT      = qw();
 %EXPORT_TAGS = ();
@@ -38,38 +34,32 @@ sub makeblastdb {
     }
   );
 
-  $c{wd} ||= './';
   my $unlink;
-  my $seqf     = shell_quote( $c{seq_file} );
-  my $basename = basename( $c{seq_file} );
-  if ( my $type = is_archive($seqf) ) {
+  my $seqf = $c{seq_file};
+  if ( is_archive($seqf) ) {
     say STDERR "$seqf is an archive, extracting first ...";
-
-    my $tmp_f = mktemp( catfile( $c{wd}, 'tempXXXXXX' ) );
-
-    if ( $type eq 'gz' ) {
-      system("pigz -dc $seqf >$tmp_f") == 0 or die "system failed: $?";
-    } elsif ( $type eq 'bz2' ) {
-      system("bzip2 -dc $seqf >$tmp_f") == 0 or die "system failed: $?";
-    } else {
-      confess("archive type $type not supported");
+    my $fait = faiterate($seqf);
+    my ( $fh, $fn ) = tempfile();
+    while ( my $s = $fait->() ) {
+      faspew( $fh, $s );
     }
-
+    $fh->close;
     $unlink = 1;
-    $seqf   = $tmp_f;
+    $seqf   = $fn;
     say STDERR "extraction finished. making blast DB";
-    $basename = basename($basename);    # remove 2nd extension, e.g. a.fa.gz -> a.fa -> a
   }
 
-  my @cmd = 'makeblastdb';
+  my $basename = basename( $c{seq_file} );
+  my @cmd      = 'makeblastdb';
   push @cmd, '-in',    $seqf;
   push @cmd, '-title', $basename;
   push @cmd, '-parse_seqids' if ( $c{parse_seqids} );
   push @cmd, '-hash_index'   if ( $c{hash_index} );
-
-  if    ( $c{alphabet} =~ /^(?:a|p)/ )   { push @cmd, '-dbtype', 'prot' }
-  elsif ( $c{alphabet} =~ /^(?:n|d|r)/ ) { push @cmd, '-dbtype', 'nucl' }
-
+  given ( $c{alphabet} ) {
+    when (/^(?:a|p)/)   { push @cmd, '-dbtype', 'prot' }
+    when (/^(?:n|d|r)/) { push @cmd, '-dbtype', 'nucl' }
+  }
+  $c{wd} //= './';
   $c{db_prefix} //= $basename;
   $c{db_prefix} .= '.bdb';
   my $db_name = File::Spec->catfile( $c{wd}, $c{db_prefix} );
@@ -90,10 +80,9 @@ sub makeblastdb {
 
   say STDERR "Creating blast db:";
   say STDERR join " ", @cmd;
-
-  my $merged = capture_merged { system @cmd };
-
-  say STDERR $merged;
+  local *STDERR;
+  local *STDOUT;
+  system @cmd;
 
   unlink $seqf if ($unlink);
   return $db_name;

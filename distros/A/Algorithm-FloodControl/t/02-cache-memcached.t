@@ -16,5 +16,5 @@ if (! $ENV{ MEMCACHED_SERVER } ) {
 }
 plan tests => 6;
 require 't/tlib.pm';
-$tlib::skip_concurrency = 1;
+$tlib::skip_concurrency = $tlib::skip_concurrency = 1;
 tlib::test_backend( 'Cache::Memcached', { servers => [ $ENV{MEMCACHED_SERVER} ], debug => 0 })

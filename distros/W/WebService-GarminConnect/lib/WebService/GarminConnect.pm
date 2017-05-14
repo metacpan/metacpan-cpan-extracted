@@ -8,7 +8,7 @@ use LWP::UserAgent;
 use URI;
 use JSON;
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ WebService::GarminConnect - Access data from Garmin Connect
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ sub _login {
 
   # Retrieve the login page
   my %params = (
-    service   => "https://connect.garmin.com/post-auth/login",
+    service   => "https://connect.garmin.com/modern",
     gauthHost => "https://sso.garmin.com/sso",
     clientId  => "GarminConnect",
     consumeServiceTicket => "false",
@@ -102,16 +102,6 @@ sub _login {
   my $response = $ua->get($uri);
   croak "Can't retrieve login page: " . $response->status_line
     unless $response->is_success;
-  my $lt_value;
-  foreach my $line ( split /\n+/, $response->as_string ) {
-    if ( $line =~ /name=\"lt\"\s+value=\"([^\"]+)\"/ ) {
-      $lt_value = $1;
-      last;
-    }
-  }
-  if( !defined $lt_value ) {
-    croak "didn't find \"lt\" name/value pair in response";
-  }
 
   # Get sso ticket
   $uri = URI->new("https://sso.garmin.com/sso/login");
@@ -121,23 +111,11 @@ sub _login {
     password => $self->{password},
     _eventId => "submit",
     embed    => "true",
-    lt       => $lt_value,
   });
   croak "Can't retrieve sso page: " . $response->status_line
     unless $response->is_success;
-  my $ticket_value;
-  foreach my $line ( split /\n+/, $response->as_string ) {
-    if ( $line =~ /ticket=([^']+)'/ ) {
-      $ticket_value = $1;
-      last;
-    }
-  }
-  if( !defined $ticket_value ) {
-    croak "didn't find ticket value in response";
-  }
 
   $uri = URI->new('https://connect.garmin.com/post-auth/login');
-  $uri->query_form(ticket => $ticket_value);
   $response = $ua->get($uri);
   croak "Can't retrieve post-auth page: " . $response->status_line
     unless $response->is_success;

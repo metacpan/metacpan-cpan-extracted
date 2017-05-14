@@ -1,0 +1,42 @@
+Before for: i = 0 .. 9
+i is 0
+Before while, break in first iteration
+i is 0 j=1
+After while
+i is 1
+Before while, break in first iteration
+i is 1 j=1
+After while
+i is 2
+Before while, break in first iteration
+i is 2 j=1
+After while
+i is 3
+Before while, break in first iteration
+i is 3 j=1
+After while
+i is 4
+Before while, break in first iteration
+i is 4 j=1
+After while
+i is 5
+Before while, break in first iteration
+i is 5 j=1
+After while
+i is 6
+Before while, break in first iteration
+i is 6 j=1
+After while
+i is 7
+Before while, break in first iteration
+i is 7 j=1
+After while
+i is 8
+Before while, break in first iteration
+i is 8 j=1
+After while
+i is 9
+Before while, break in first iteration
+i is 9 j=1
+After while
+After for

@@ -60,19 +60,14 @@ sub getSiteUrl{
 	else{	#on plain
 		$url .= "http://";
 	}
-	if($ENV{'HTTP_HOST'} =~ /^([^\:]+)(\:\d+|)$/){
-		$url .= $1;   #only want the hostname part 
-		if(exists($ENV{'SERVER_PORT'})){	#will have to assume port 80 if we don't have this
-			if(exists($ENV{'HTTPS'}) && $ENV{'SERVER_PORT'} != 443){        #add non default ssl port
-				$url .= ":" . $ENV{'SERVER_PORT'};
-			}       
-			elsif(!exists($ENV{'HTTPS'}) && $ENV{'SERVER_PORT'} != 80){     #add non default plain port     
-				$url .= ":" . $ENV{'SERVER_PORT'};
-			}
+	$url .= $ENV{'HTTP_HOST'};
+	if(exists($ENV{'SERVER_PORT'})){	#will ahve to assume port 80 if we don't have this
+		if(exists($ENV{'HTTPS'}) && $ENV{'SERVER_PORT'} != 443){        #add non default ssl port
+			$url .= ":" . $ENV{'SERVER_PORT'};
+		}       
+		elsif(!exists($ENV{'HTTPS'}) && $ENV{'SERVER_PORT'} != 80){     #add non default plain port     
+			$url .= ":" . $ENV{'SERVER_PORT'};
 		}
-	}
-	else{
-	   Confess("Invalid HTTP host header");
 	}
 	return $url;
 }

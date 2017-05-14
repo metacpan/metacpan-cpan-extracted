@@ -1,0 +1,39 @@
+			Perl module: XML::XSLT
+
+Copyright (c) 1999 Geert Josten & Egon Willighagen.
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+This is a Perl module to parse XSL Transformational sheets. For a description of 
+the XSLT, see http://www.w3.org/ . It uses XML::Parser and XML::DOM.
+
+XML::Parser is a Perl extension interface to James Clark's XML parser, expat.
+It requires at least version 5.004 of perl and can be found on CPAN.
+
+XML::DOM is a Perl module that allows XML::Parser to build an Object Oriented datastructure
+with a DOM Level 1 compliant interface.
+
+This is an alpha version and the module is not conform the XSLT woking draft at
+this moment. We work very hard to make it conform. New releases will be announced
+on the perl-xml mailing list. [You can subscribe to
+this list by sending a message to subscribe-perl-xml@lyris.activestate.com.]
+
+For bug reports or suggestions send email to (gjosten|egonw)@sci.kun.nl.
+
+To configure this module, cd to the directory that contains this README file
+and type the following.
+
+	perl Makefile.PL
+
+Then to build you run make.
+
+	make
+
+If you have write access to the perl library directories, you may then
+install by typing (as superuser):
+
+	make install
+
+Egon Willighagen
+egonw@sci.kun.nl

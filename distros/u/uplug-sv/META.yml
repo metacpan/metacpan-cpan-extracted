@@ -1,0 +1,25 @@
+---
+abstract: 'Swedish language pack for Uplug'
+author:
+  - 'Joerg Tiedemann'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Uplug
+no_index:
+  directory:
+    - inc
+    - share
+requires:
+  Uplug: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.2

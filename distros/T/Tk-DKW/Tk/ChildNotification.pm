@@ -13,7 +13,7 @@ use Tk;
 use Tk::Derived;
 use Tk::Widget;
 
-$VERSION = '1.01';
+$VERSION = '0.01';
 
 sub Tk::Derived::InitObject
    {

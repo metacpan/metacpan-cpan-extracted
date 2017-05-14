@@ -9,26 +9,24 @@
 ## no critic (RequireUseStrict, RequireUseWarnings)
 package Riak::Light::Util;
 {
-    $Riak::Light::Util::VERSION = '0.12';
+    $Riak::Light::Util::VERSION = '0.052';
 }
 ## use critic
 use Config;
 use Exporter 'import';
 
-@EXPORT_OK = qw(is_windows is_netbsd is_solaris);
-
-#ABSTRACT: util class, provides is_windows, is_solaris, etc
+@EXPORT_OK = qw(is_windows is_netbsd_6_32bits);
 
 sub is_windows {
     $Config{osname} eq 'MSWin32';
 }
 
-sub is_netbsd {
-    $Config{osname} eq 'netbsd';
+sub is_netbsd_6_32bits {
+    _is_netbsd();
 }
 
-sub is_solaris {
-    $Config{osname} eq 'solaris';
+sub _is_netbsd {
+    $Config{osname} eq 'netbsd';
 }
 
 1;
@@ -40,29 +38,19 @@ __END__
 
 =head1 NAME
 
-Riak::Light::Util - util class, provides is_windows, is_solaris, etc
+Riak::Light::Util
 
 =head1 VERSION
 
-version 0.12
+version 0.052
 
 =head1 DESCRIPTION
 
   Internal class
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Tiago Peczenyj <tiago.peczenyj@gmail.com>
-
-=item *
-
-Damien Krotkine <dams@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

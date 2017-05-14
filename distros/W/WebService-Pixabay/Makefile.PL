@@ -20,11 +20,12 @@ my %WriteMakefileArgs = (
     "Data::Printer" => "0.39",
     "Function::Parameters" => "2.000006",
     "LWP::Online" => "1.08",
+    "Modern::Perl" => "1.20170117",
     "Moo" => "2.003000",
     "Test::More" => "1.302075",
     "WebService::Client" => "0.0501"
   },
-  "VERSION" => "0.0.3",
+  "VERSION" => "0.0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,6 +36,7 @@ my %FallbackPrereqs = (
   "Data::Printer" => "0.39",
   "Function::Parameters" => "2.000006",
   "LWP::Online" => "1.08",
+  "Modern::Perl" => "1.20170117",
   "Moo" => "2.003000",
   "Test::More" => "1.302075",
   "WebService::Client" => "0.0501"

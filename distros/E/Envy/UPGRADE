@@ -1,0 +1,13 @@
+Even after:
+
+  make test
+
+You should be very nervous about upgrading or changing anything about
+envy.  I am!  To give you some assurance, you can see what will
+changed before you do a 'make install':
+
+  make diff
+
+More tests welcome.  Please send suggestions to envy@listbox.com!
+
+Thanks.

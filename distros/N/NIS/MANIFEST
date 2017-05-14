@@ -1,0 +1,10 @@
+README
+MANIFEST
+Makefile.PL
+NIS.pm
+NIS.pod
+NISTable.pod
+NIS.xs
+NIS/Table.pm
+t/test
+t/tabletest

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Captcha-AreYouAHuman
-version:            0.00003
+version:            0.00004
 abstract:           Integrate the AreYouAHuman.com CAPTCHA-alterantive human verification into your Perl application
 author:
     - Jonathan Brown <jonathan@areyouahuman.com>

@@ -26,7 +26,13 @@ ClassVar implementations.
 
 Generally speaking, the Generic meta-methods define calling interfaces
 and behaviors which are bound to differently scoped data by each
-of those subclasses.
+of those implementations.
+
+(Note that those implementation classes are not subclasses of
+Generic; instead they import various interfaces and code fragments
+from the meta-method types defined here, by specifying '-import'
+values which are processed by Class::MakeMethods's _metamethod_definition
+mechanism.)
 
 =cut
 
@@ -1942,7 +1948,6 @@ sub object {
       get_set_init => { '*'=>'get_set_init', 'clear_*'=>'clear' },
       get_and_set => {'*'=>'get', 'set_*'=>'set', 'clear_*'=>'clear' },
       get_init_and_set => { '*'=>'get_init','set_*'=>'set','clear_*'=>'clear' },
-      init_and_get  => { '*'=>'init_and_get', -params=>{ init_method=>'init_*' } },
     },
     'params' => { 
       new_method => 'new' 
@@ -1983,14 +1988,6 @@ sub object {
 	    _CALL_NEW_AND_STORE_
 	  }
 	  _VALUE_;
-	},
-      'init_and_get' => q{
-	  if ( ! defined _VALUE_ ) {
-	    my $init_method = _ATTR_REQUIRED_{'init_method'};
-	    _SET_VALUE_{ _SELF_->$init_method( @_ ) };
-	  } else {
-	    _BEHAVIOR_{get}
-	  }
 	},
       'get_set_init' => q{
 	  if (ref $_[0] and UNIVERSAL::isa($_[0], _ATTR_REQUIRED_{'class'})) { 

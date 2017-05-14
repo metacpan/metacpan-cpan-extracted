@@ -1,6 +1,6 @@
 package Bio::Das::HTTP::Fetch;
 # file: Fetch.pm
-# $Id: Fetch.pm,v 1.17 2004/09/24 11:45:07 lstein Exp $
+# $Id: Fetch.pm,v 1.18 2009/08/26 21:57:11 lstein Exp $
 
 =head1 NAME
 
@@ -153,6 +153,8 @@ sub new {
   my $auth = ($user ? encode_base64("$user:$pass") : "");
   chomp($auth);
 
+  $debug=0;
+
   # save the rest of our information
   return bless {
                 # ("waiting", "reading header", "reading body", or "parsing body")
@@ -284,7 +286,10 @@ is one of:
 sub status   {
   my $self = shift;
   my $d    = $self->{status};
-  $self->{status} = shift if @_;
+  if (@_) {
+      $self->{status} = shift;
+      warn "STATUS $self->{status}" if $self->debug;
+  }
   $d;
 }
 

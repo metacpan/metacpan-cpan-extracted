@@ -7,7 +7,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = qw(. ../lib);
-    require "test.pl";
+    require "./test.pl";
     plan(tests => 28);
 }
 
@@ -125,13 +125,7 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
       skip("Out of memory -- increase your data/heap?", 2)
 	  if $r =~ /Out of memory/i;
       is($r, '', "64K deep recursion - no output expected");
-
-      if ($^O eq 'MacOS') {
-          ok(1, "$^O: \$? is unreliable");
-      } else {
-          is($?, 0, "64K deep recursion - no coredump expected");
-      }
-
+      is($?, 0, "64K deep recursion - no coredump expected");
   }
 }
 

@@ -1,33 +1,16 @@
+#!./perl -w
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
-        chdir 't';
-        @INC = '../lib';
-    }
-    require Config; import Config;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
-      print "1..0 # Skip: Encode was not built\n";
-      exit 0;
-    }
-    if (ord("A") == 193) {
-        print "1..0 # Skip: EBCDIC\n";
-        exit 0;
-    }
-    unless (PerlIO::Layer->find('perlio')){
-        print "1..0 # Skip: PerlIO required\n";
-        exit 0;
-    }
-    if ($ENV{PERL_CORE_MINITEST}) {
-        print "1..0 # Skip: no dynamic loading on miniperl, no Encode\n";
-        exit 0;
-    }
-    $| = 1;
+    chdir 't' if -d 't';
+    require './test.pl';
+    skip_all_without_dynamic_extension('Encode');
+    skip_all("no encoding pragma in EBCDIC") if $::IS_EBCDIC;
+    skip_all_without_perlio();
 }
 
 use strict;
-use Test::More tests => 6;
-use Encode;
-
+plan (tests => 8);
+no warnings 'deprecated';
 use encoding 'johab';
 
 ok(chr(0x7f) eq "\x7f");
@@ -36,6 +19,15 @@ ok(chr(0xff) eq "\xff");
 
 for my $i (127, 128, 255) {
     ok(chr($i) eq pack('C', $i));
+}
+
+# [perl #83048]
+{
+    my $w;
+    local $SIG{__WARN__} = sub { $w .= $_[0] };
+    my $chr = chr(-1);
+    is($chr, "\x{fffd}", "invalid values become REPLACEMENT CHARACTER");
+    like($w, qr/^Invalid negative number \(-1\) in chr at /, "with a warning");
 }
 
 __END__

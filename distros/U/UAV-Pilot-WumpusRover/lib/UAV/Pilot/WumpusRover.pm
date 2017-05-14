@@ -1,4 +1,4 @@
-# Copyright (c) 2014  Timm Murray
+# Copyright (c) 2015  Timm Murray
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 
@@ -27,7 +27,7 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = 0.2;
+# ABSTRACT: Control a rover over WiFi with a video feed
 
 use constant DEFAULT_PORT       => 49_000;
 use constant DEFAULT_VIDEO_PORT => 49_001;
@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-  UAV::Pilot::WumpusRover
+  UAV::Pilot::WumpusRover - Control a rover over WiFi with a video feed
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ be compatible; this will happen Soon(tm).
 
 =head1 LICENSE
 
-Copyright (c) 2014  Timm Murray
+Copyright (c) 2015  Timm Murray
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 

@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+use HTTP::Handle;
+
+my $hd = HTTP::Handle->new();
+my $regex = q!(?:"([^"]*)"|'([^']*)'|([^\s>]+))!;
+
+$hd->url($ARGV[0] || "http://www.google.com");
+$hd->connect();
+my $fd = $hd->fd();
+
+undef $/;
+my $source = <$fd>;
+
+while ($source =~ s/<a\s+(?:[^>]+\s+)*href=$regex[^>]*>//s) {
+   my $link = $1 || $2 || $3;
+   print "Link: $link\n";
+}
+

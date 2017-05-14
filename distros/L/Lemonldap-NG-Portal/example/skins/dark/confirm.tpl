@@ -20,10 +20,11 @@
     <TMPL_IF NAME="CONFIRMKEY">
       <input type="hidden" id="confirm" name="confirm" value="<TMPL_VAR NAME="CONFIRMKEY">" />
     </TMPL_IF>
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
     <TMPL_IF NAME="LIST">
 
-      <h3><lang en="Select your Identity Provider" fr="Choisissez votre fournisseur d'identité"/></h3>
+      <h3><lang en="Select your Identity Provider" fr="Choisissez votre fournisseur d'identit&eacute;"/></h3>
       <input type="hidden" id="idp" name="idp"/>
       <table>
       <TMPL_LOOP NAME="LIST">
@@ -41,7 +42,11 @@
 
       <TMPL_IF NAME="ACTIVE_TIMER">
         <p id="timer"><lang en="Automatically accept in 5 seconds" fr="Acceptation automatique dans 5 secondes"/></p>
-        <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+        <!-- //if:jsminified
+          <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.min.js"></script>
+        //else -->
+          <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+        <!-- //endif -->
       </TMPL_IF>
 
       <table><tr><td>
@@ -62,7 +67,7 @@
     <div class="buttons">
       <input type="checkbox" id="checkLogins" name="checkLogins" <TMPL_IF NAME="ASK_LOGINS">checked</TMPL_IF>/>
       <label for="checkLogins">
-        <lang en="Check my last logins" fr="Voir mes dernières connexions"/>
+        <lang en="Check my last logins" fr="Voir mes derni&egrave;res connexions"/>
       </label>
     </div>
     </TMPL_IF>

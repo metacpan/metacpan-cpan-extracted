@@ -1,0 +1,605 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.1.0" />
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: bold;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-bottom: 2px solid silver;
+  padding-top: 0.5em;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revision {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble,
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-right: 10%;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock {
+  margin-right: 0%;
+}
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock > div.content {
+  padding-left: 2.0em;
+}
+
+div.attribution {
+  text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 2px solid silver;
+}
+
+div.exampleblock > div.content {
+  border-left: 2px solid silver;
+  padding: 0.5em;
+}
+
+div.verseblock div.content {
+  white-space: pre;
+}
+
+div.imageblock div.content { padding-left: 0; }
+div.imageblock img { border: 1px solid silver; }
+span.image img { border-style: none; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: italic;
+}
+dd > *:first-child {
+  margin-top: 0;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.olist2 {
+  list-style-type: lower-alpha;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+
+div.hlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+td.hlist1 {
+  vertical-align: top;
+  font-style: italic;
+  padding-right: 0.8em;
+}
+td.hlist2 {
+  vertical-align: top;
+}
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-content {
+  padding-left: 2.0em;
+}
+
+div.exampleblock-content {
+  border-left: 2px solid silver;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+<title>INSTALL</title>
+</head>
+<body>
+<div id="header">
+<h1>INSTALL</h1>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<p>If you have never installed a perl module before, you may want to seek
+help from a friendly nearby perl programmer or sys admin. The
+instructions below aren't guaranteed to work on all systems. These
+instructions are for Linux/Unix and Mac OS X. Other users have
+installed successfully on PCs before; we are unable to provide
+installation instruction, but the protocols below may work.</p>
+<p>You will of course need perl in order to run this; perl5.8 is required
+(version 5.6.x should also work, but go-perl is no longer tested with
+this setup)</p>
+<p>There's a lot of instructions here. There are a number of different
+ways to set up go-perl; the best way for you depends on your
+experience of perl and how your system is set up. These ways are
+described as different protocols below. Hopefully you should only need
+to follow one protocol to get going!</p>
+</div>
+</div>
+<h2>Protocol I - set up via CPAN installer</h2>
+<div class="sectionbody">
+<p>If you are already familiar with installing CPAN modules, go-perl is
+no different from any other. If you aren't, you may wish to experiment
+now.</p>
+<p>Try typing the following:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>perl -MCPAN -e shell
+install GO::Parser</tt></pre>
+</div></div>
+<p>The following may also work:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>cpan GO::Parser</tt></pre>
+</div></div>
+<p>If this is the first time using the CPAN installer, you will be asked
+a barrage of questions. You are best to answer with the defaults - you
+can always change this later.</p>
+<p>If you do NOT have access to the system-wide perl directories on your
+system (these will typically be in /Library or /usr/local), then you
+should either get some help setting up CPAN for use with your system,
+OR you should follow an alternate protocol below. (You may wish to
+modify the value of PREFIX to ~ in the CPAN setup, as detailed in
+protocol III)</p>
+<p>If you are on OS X you may need to do this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>sudo cpan GO::Parser</tt></pre>
+</div></div>
+<p>Providing you do have write-access to these directories, the above
+commands should hopefully go smoothly. When installing go-perl, you
+may be asked if you wish to also install Data::Stag and IO::String -
+you should answer <em>yes</em></p>
+<p>After this, you should be ready to use go-perl! The scripts should be
+in your path and the libraries should be in the standard place. You
+may wish to start by trying "map2slim" or "go2obo_xml"</p>
+<p>There are certain applications that require additional third-party
+modules. All these are available from CPAN, and can be installed in
+the above manner. For example, if you try and use the
+go-filter-subset.pl script to generate a PNG image of an ontology
+subgraph, the system will complain you do not have the module
+"GraphViz" installed. To install this, simply type:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>perl -MCPAN -e shell
+install GraphViz</tt></pre>
+</div></div>
+<p>Depending on what you use go-perl for, you may not ever need to
+install other CPAN modules</p>
+</div>
+<h2>Protocol II - Manual installation</h2>
+<div class="sectionbody">
+<p>these are step-by-step manual installation instructions. These should
+be followed if protocol I does not work for you</p>
+<h3>Installing required modules</h3>
+<p>go-perl requires the Data::Stag module in order to run. You can
+download this module from here:</p>
+<p>http://search.cpan.org/~cmungall/Data-Stag/</p>
+<p>(version 0.07 or higher is required; these docs assume you have
+downloaded 0.08)</p>
+<p>Data::Stag in turn requires the following module:</p>
+<p>http://search.cpan.org/~gaas/IO-String/</p>
+<p>After downloading, type the following instructions to install IO-String:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>cd ~
+tar -zxvf IO-String-1.06
+cd IO-String-1.06
+perl Makefile.PL
+make test</tt></pre>
+</div></div>
+<p>If you have permission to install system-wide, you should then type:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>make install</tt></pre>
+</div></div>
+<p>On Mac OS X, you may need to type</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>sudo make install</tt></pre>
+</div></div>
+<p>If you do not have permission to install perl modules in the default
+directory on your system, you need to follow protocol III</p>
+<p>Once you have installed IO::String, you can install Data::Stag - the
+directions are the same:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>cd ~
+tar -zxvf Data-Stag-0.08.tar.gz
+cd Data-Stag-0.08
+perl Makefile.PL
+make test
+make install</tt></pre>
+</div></div>
+<p>Once you have installed Data::Stag, you are now ready to install
+go-perl</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">There are certain applications that require additional
+third-party modules (all available from CPAN); if you run into
+problems running any of these applications, see the section
+"Additional Modules" below</td>
+</tr></table>
+</div>
+<h3>Installing go-perl</h3>
+<p>If you are reading this, then presumably you have unpacked the
+distribution - either the go-perl distribution, or the go-dev
+distribution that contains go-perl.</p>
+<p>To install the modules system wide, type this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>cd go-perl-0.02
+perl Makefile.PL
+make test
+make install</tt></pre>
+</div></div>
+<p>The first command may tell you that you have certain optional modules
+missing - these may not be required. If you do require them, see
+"Additional Modules" below</p>
+<p>If the system complains when you type "make install" you may not have
+sufficient permissions. In this case you need to use the modules from
+your home directory</p>
+<h3>Additional Modules</h3>
+<p>You may need additional modules for running certain scripts in certain
+modes. You can obtain all these from this website:</p>
+<p>http://www.cpan.org/</p>
+</div>
+<h2>Protocol III - installing modules in your home directory</h2>
+<div class="sectionbody">
+<p>If you do not have sufficient permission to install system-wide, there
+is a third method you can try, which is to install IO::String,
+Data::Stag and go-perl in your home directory. To do this, you need to
+set the PREFIX variable when installing.</p>
+<p>First download Data::Stag and IO::String from CPAN, as detailed in
+protocol II.</p>
+<p>Then try this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>setenv PERL5LIB "${PERL5LIB}:$HOME/lib/perl5/site_perl/5.8.0/
+cd ~
+tar -zxvf IO-String-1.06
+cd IO-String-1.06
+perl Makefile.PL PREFIX=~
+make test
+make install
+cd ~
+tar -zxvf Data-Stag-0.08.tar.gz
+cd Data-Stag-0.08
+perl Makefile.PL PREFIX=~
+make test
+make install
+make install
+cd
+cd go-perl-0.02
+perl Makefile.PL PREFIX=~
+make test
+make install</tt></pre>
+</div></div>
+<p>If this works, then place this in your startup file:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>setenv PERL5LIB "${PERL5LIB}:$HOME/lib/perl5/site_perl/5.8.0/
+setenv PATH "${PATH}:$HOME/bin"</tt></pre>
+</div></div>
+<p>You may need to modify the above, depending on your
+setup. Instructions for this are outwith the scope of this
+document. Try consulting online sources, such as:</p>
+<p>http://www.perl.com/pub/a/2002/04/10/mod_perl.html</p>
+</div>
+<h2>Additional Modules</h2>
+<div class="sectionbody">
+<p>Certain applications (for example, those involving XML parsing) will
+require additional modules from CPAN. If you are going on to install
+go-db-perl and/or AmiGO you will probably need a few extra modules.</p>
+<p>If this is the case, you are strongly advised to use the CPAN
+auto-installer. Once you have set this up, installing perl modules
+will be <strong>much</strong> easier.</p>
+</div>
+<h2>To use this, type:</h2>
+<div class="sectionbody">
+</div>
+<h2>perl -MCPAN -e shell</h2>
+<div class="sectionbody">
+<p>Then follow the setup instructions</p>
+<p>Then type:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>install &lt;&lt;Module name here&gt;&gt;
+quit</tt></pre>
+</div></div>
+<p>You can use the CPAN installer to install go-perl itself; just type</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>perl -MCPAN -e shell
+install go-perl</tt></pre>
+</div></div>
+<p>This is the easiest way of keeping up to date with go-perl releases</p>
+</div>
+<h2>Using go-perl as part of go-dev</h2>
+<div class="sectionbody">
+<p>go-perl is part of the wider go-dev distribution, although it can be
+used independently. go-dev also includes go-db-perl (for GO MySQL DB
+access) and an xml library (for converting to other XML based formats
+such as OWL), the AmiGO web application and the schema for the GO
+MySQL db</p>
+<p>If you are using all of go-dev, you may need to alter the instructions
+above (for example, your go-perl library may be unpacked in
+~/go-dev/go-perl). You may also need to set GO_ROOT:</p>
+<h3>The GO_ROOT environment variable</h3>
+<p>If you are using go-perl as part of the wider go-dev distribution,
+there are some applications that require you to specify the location
+of go-dev using the GO_ROOT env var</p>
+<p>bash shells:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>export GO_ROOT=$HOME/go-dev</tt></pre>
+</div></div>
+<p>other shells:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>setenv GO_ROOT $HOME/go-dev</tt></pre>
+</div></div>
+<p>It is a good idea to put this in your startup file</p>
+</div>
+<h2>Installing from CVS</h2>
+<div class="sectionbody">
+<p>You can get the latest bleeding-edge version of go-perl from the
+go-dev cvs tree. See http://www.godatabase.org/dev for details</p>
+<p>Once you have checked out go-dev/go-perl, do the usual thing (if
+you're installing from cvs it's assumed you're a bleeding edge user
+and know how to do this):</p>
+<p>cd <sub>/cvs/go-dev/go-perl
+perl Makefile.PL
+make test
+setenv GO_ROOT </sub>/cvs/go-dev
+setenv PERL5LIB "$PERL5LIB:~/cvs/go-dev/go-perl"</p>
+<p>The assumption is that if you are using cvs you want to use the
+working copy; if you want to install from cvs, instead do the
+following steps:</p>
+<p>cd go-dev/go-perl
+perl Makefile.PL
+make GO/xsl
+make test
+make install</p>
+<p>The "make GO/xsl" stage is not strictly necessary; if you omit it you
+will get warnings. You can ignore these, but if you ever want to use
+the XSL you will need to check out go-dev/xml and set the GO_ROOT
+environment variaable as above.</p>
+<p>Note that none of this is necessary if you install from CPAN - the
+installation of the XSL is taken care of automatically</p>
+</div>
+<h2>Documentation</h2>
+<div class="sectionbody">
+<p>For full documentation, see the doc/ directory, or look online</p>
+<p>http://www.godatabase.org/dev</p>
+</div>
+<h2>Mailing List</h2>
+<div class="sectionbody">
+<p>http://lists.sourceforge.net/lists/listinfo/gmod-ontol-sw-dev</p>
+</div>
+<h2>Installing Documentation Locally</h2>
+<div class="sectionbody">
+<p>it's unlikely you'll need to do this: you can always browse the pod
+documentation online at:</p>
+<p>http://www.godatabase.org/dev/pod</p>
+<p>The documentation can be installed in a web-viewable directory; this
+is best done in a directory that is visible as $BASE_URL/dev/pod</p>
+<p>Just type</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>cd go-perl
+perl Makefile.PL
+make pod
+cp -pR pod/* $HTTP_DOCUMENT_ROOT/dev/pod</tt></pre>
+</div></div>
+<p>substituting HTTP_DOCUMENT_ROOT with the root path of the WWW
+documents on your webserver</p>
+<p>You can now browse the documentation:
+http://www.yourhost.com/dev/pod</p>
+<p>(You may also wish to copy the whole go-dev distribution under the
+/dev/ directory)</p>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 01-Aug-2007 09:00:44 PDT
+</div>
+</div>
+</body>
+</html>

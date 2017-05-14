@@ -1,0 +1,72 @@
+            XML <-> RDB scrambler/descrambler
+
+PRE-REQS:
+
+    1. DBI installed and a DBD driver for your database. 
+        a. DBI 1.16
+        b. DBD::mysql 2.0416
+        c. MySQL 3.23.39
+    2. DBIx::Recordset 0.23
+    3. URI::Escape 3.16
+    4. XML::DOM 1.29
+    5. DBIx::Sequence 0.04
+    6. FreezeThaw 0.41
+    7. DBIx::DBSchema 0.17
+
+DESCRIPTION
+
+    The scripts here will convert a Juniper XML configuration retreived via
+the 'get_config.pl' into a set of relational DB table, populate those tables
+with data from the XML file, and extract data from those tables & put it
+back into XML format.  No other functionality is provided.  
+    The SQL output by the 'make_tables.pl' script is pretty generic SQL and
+_may_ work with other RDB products, but has been tested to work with MySQL on
+FreeBSD 4.2.
+    You will have to edit the '$DSN' value in 'common.pm' to reflect your
+configuration.
+
+    Here's the breakdown:
+
+* get_config.pl utiliizes XML JUNOScript to retrieve an XML-encoding of a
+    given router's configuration.
+* make_tables.pl, given an XML file on the command line, will output (to STDOUT)
+    SQL statements (table creates & inserts) that will allow this XML file
+    to be stored in a relational DB
+* pop_tables.pl, given an XML file on the command line, will populate the
+    tables with data present in the XML file.
+* unpop_tables.pl, given the name of the 'root' XML element, will create
+    an XML file from the data in the relational database.
+
+    Here's how you work it:
+
+1. Run 'get_config.pl' against your favorite Juniper router to obtain an XML
+    rendering of that router's configuration.
+2. Run 'make_tables.pl' & give the XML configuration file to it on the command
+    line & re-direct STDOUT to 'tables.xml'
+3. Suck the tables.xml file into MySQL to create the table structure.
+4. Run 'pop_tables.pl' & give the XML configuration file to it on the command
+    line & the MySQL tables will be populated.
+5. Your router configuration is now in your relational DB!  Have Fun!
+6. Run 'unpop_tables.pl' & and 'jun_configuration' to it on the command line
+    and re-direct STDOUT to 'tables.out' to see it in XML format again -
+    suitable to be passed back to the router for re-configuration.
+
+    Here's a concrete example:
+
+1.  Get an XML-ized Juniper router configuration file:
+    a. 'perl get_config.pl ssh someuser somepass . myrouter.acme.com'
+            (this will store that router's configuration as XML in the
+                current directory as a file called 
+                'myrouter.acme.com.xmlconfig')
+2.  Create the DB tables:
+    a. 'perl make_tables.pl myrouter.acme.com.xmlconfig > tables.xml'
+
+3.  Set up your MySQL database - say it's called 'JUN_TEST' & import tables:
+    a. Edit 'DSN' value in 'common.pm' to reflect your database name
+    b. 'mysqladmin create JUN_TEST'
+    c. 'mysql JUN_TEST < tables.xml'
+4.  Populate tables in DB
+    a. 'perl pop_tables.pl myrouter.acme.com.xmlconfig'
+5.  Use all of your favorite RDB tools to play with it
+6.  Re-generate XML from your DB:
+    a. 'perl unpop_tables.pl jun_configuration > config.xml'

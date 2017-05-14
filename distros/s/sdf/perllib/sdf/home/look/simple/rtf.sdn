@@ -1,0 +1,115 @@
+# $Id$
+#
+# >>Title::	RTF Tuning (simple look)
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 10-Feb-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# The {{simple/rtf.sdn}} module provides the mapping of sdf styles to
+# rtf styles.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+#!message "Using rtf mapping tables"
+
+# Inherit the standard configuration
+!use 'stdlib/rtf.sdn'
+
+################ Mapping tables ###################
+
+!block parastyles
+Name        To                      Attributes
+
+# normal paragraphs
+N           Normal
+FIRST       Normal
+L1          List Continue
+L2          List Continue 2
+L3          List Continue 3
+L4          List Continue 4
+L5          List Continue 5
+L6          List Continue 6
+
+# headings
+H1          Heading 1
+H2          Heading 2
+H3          Heading 3
+H4          Heading 4
+H5          Heading 5
+H6          Heading 6
+P1          Heading 1
+P2          Heading 2
+P3          Heading 3
+P4          Heading 4
+P5          Heading 5
+P6          Heading 6
+A1          Heading 1
+A2          Heading 2
+A3          Heading 3
+A4          Heading 4
+A5          Heading 5
+A6          Heading 6
+
+# list items
+LU1         List Bullet
+LU2         List Bullet 2
+LU3         List Bullet 3
+LU4         List Bullet 4
+LU5         List Bullet 5
+LU6         List Bullet 6
+LF1         List Number
+LF2         List Number 2
+LF3         List Number 3
+LF4         List Number 4
+LF5         List Number 5
+LF6         List Number 6
+LN1         List Number
+LN2         List Number 2
+LN3         List Number 3
+LN4         List Number 4
+LN5         List Number 5
+LN6         List Number 6
+!endblock
+
+
+################ Define paragraph formats ###################
+
+!block targetobjects; type="Para"
+Name                Parent
+Normal              b0_Body
+List Continue       l0_ListBody
+List Continue 2     l1_ListBody
+List Continue 3     l2_ListBody
+List Continue 4     l3_ListBody
+List Continue 5     l4_ListBody
+List Continue 6     l5_ListBody
+Heading 1           h1_Heading
+Heading 2           h2_Heading
+Heading 3           h3_Heading
+Heading 4           h4_Heading
+Heading 5           h5_Heading
+Heading 6           h5_Heading
+List Bullet         u0_Unordered
+List Bullet 2       u1_Unordered
+List Bullet 3       u2_Unordered
+List Bullet 4       u3_Unordered
+List Bullet 5       u4_Unordered
+List Bullet 6       u5_Unordered
+List Number         on0_OrderedNext
+List Number 2       on1_OrderedNext
+List Number 3       on2_OrderedNext
+List Number 4       on3_OrderedNext
+List Number 5       on4_OrderedNext
+List Number 6       on5_OrderedNext
+!endblock

@@ -13,11 +13,11 @@ Text::Spintax - A parser and renderer for spintax formatted text.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
@@ -83,7 +83,7 @@ sub new {
 
 =head2 parse
 
-   Parses the spintax and returns a Text::Spintax::Node that is suitable for rendering.
+   Parses the spintax and returns a Text::Spintax::Node that is suitable for rendering.  Returns undef if the spintax couldn't be parsed.
 
 =cut
 
@@ -111,7 +111,12 @@ sub parse {
    $self->curr($root);
 
    $parser->YYData->{tree} = $self;
-   my $value = $parser->YYParse(yylex => \&lexer, yyerror =>\&error);
+   eval {
+      my $value = $parser->YYParse(yylex => \&lexer, yyerror =>\&error);
+   };
+   if ($@) {
+      return undef;
+   }
    return $root;
 }
 
@@ -178,13 +183,12 @@ sub lexer {
 }
 
 sub error {
-   print STDERR "error: ",Dump(\@_);
-   return;
+   die "error parsing spintax\n";
 }
 
 =head1 AUTHOR
 
-Dale Evans, C<< <daleevans@github> >>
+Dale Evans, C<< <daleevans@github> >> http://devans.mycanadapayday.com
 
 =head1 BUGS
 

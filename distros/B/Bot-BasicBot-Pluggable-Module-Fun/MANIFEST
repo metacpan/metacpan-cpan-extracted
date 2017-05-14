@@ -1,0 +1,15 @@
+lib/Bot/BasicBot/Pluggable/Module/Botsnack.pm
+lib/Bot/BasicBot/Pluggable/Module/Dice.pm
+lib/Bot/BasicBot/Pluggable/Module/Excuse.pm
+lib/Bot/BasicBot/Pluggable/Module/Insult.pm
+lib/Bot/BasicBot/Pluggable/Module/Magic8Ball.pm
+lib/Bot/BasicBot/Pluggable/Module/Nickometer.pm
+lib/Bot/BasicBot/Pluggable/Module/Summon.pm
+lib/Bot/BasicBot/Pluggable/Module/Zippy.pm
+Build.PL
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01use.t

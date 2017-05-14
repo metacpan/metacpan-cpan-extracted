@@ -1,0 +1,41 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+# One red box
+Transform {
+	translation -2 0 0
+	children [
+		Shape {
+			geometry Box { }
+			appearance Appearance {material Material {diffuseColor 0.8 0 0}}
+		}
+	]
+}
+
+# Tall, narrow blue box
+Transform {
+	translation 0 0 0
+	children [
+		Shape {
+			geometry Box { size 1 3 1 }
+			appearance Appearance {material Material {diffuseColor 0 0 0.8}}
+		}
+	]
+}
+
+# Long, textured box
+Transform {
+	translation 2 0 0
+	children [
+		Shape {
+			geometry Box { size 1 1 2 }
+			appearance Appearance {
+				texture ImageTexture {url "tex.jpg"}
+			}
+		}
+	]
+}

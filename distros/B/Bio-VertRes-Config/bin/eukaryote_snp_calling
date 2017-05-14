@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+package Bio::VertRes::Config::Main::EukaryoteSnpCalling;
+
+# ABSTRACT: Create config scripts to map and snp call eukaryotes
+# PODNAME: eukaryote_snp_calling
+
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+use Bio::VertRes::Config::CommandLine::EukaryotesSnpCalling;
+
+Bio::VertRes::Config::CommandLine::EukaryotesSnpCalling->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+eukaryote_snp_calling - Create config scripts to map and snp call eukaryotes
+
+=head1 VERSION
+
+version 1.133090
+
+=head1 SYNOPSIS
+
+Create config scripts to map and snp call eukaryotes.
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

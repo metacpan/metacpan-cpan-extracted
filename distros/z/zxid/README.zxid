@@ -1,0 +1,1585 @@
+README.zxid
+###########
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: README.zxid,v 1.125 2009-11-24 23:53:40 sampo Exp $>>
+<<class: article!a4paper!!ZXID 23>>
+
+See INSTALL.zxid for installation and quick tutorial.
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0,
+Liberty ID-WSF 2.0, and XACML 2.0 stacks and aims at implementing all popular
+federation, SSO, and ID Web Services protocols.  It is a C implementation
+with minimal external dependencies - OpenSSL, CURL, and zlib -
+ensuring easy deployment (no DLLhell). Due to its small footprint and
+efficient and accurate schema driven implementation, it is suitable
+for embedded and high volume applications. Language bindings to all
+popular highlevel languages such as PHP, Perl, and Java, are provided
+via SWIG.  ZXID implements, as of Nov 2011, SP, IdP, WSC, WSP,
+Discovery, PEP, and PDP roles. ZXID is the reference implementation
+of the core security architecture of the TAS3.eu project.\\\\
+
+ZXID.org ist eine C-Bibliothek, die den vollständigen SAML
+2.0-Stack implementiert und alle populären
+Identitätsverwaltungs-Protokolle wie Liberty ID-FF 1.2,
+WS-Federation, WS-Trust und ID-Webservices wie Liberty ID-WSF 1.1 und
+2.0 implementieren will. Sie beruht auf Schema-basierter
+Code-Erzeugung, woraus eine genaue Implementation resultiert. SWIG
+wird verwendet, um Schnittstellen zu Skriptsprachen wie Perl, PHP und
+Python sowie zu Java bereitzustellen. Sie kann als SP, IdP, WSC,
+WSP, Discovery, PEP, und PDP fungieren.\\\\
+
+A biblioteca de gestão de identidades ZXID.org é uma
+implementação, em C, das normas SAML 2.0, Liberty ID-WSF 2.0 e
+XACML 2.0 com dependências externas mínimas - OpenSSL, CURL, e
+zlib - facilitando uma implantação fácil sem "inferno dos
+DLL". Sendo económica em consumo de recursos é indicada para
+aplicações embutidas ou de grande volume e performance. A
+biblioteca é disponibilizada para todos os linguagens de
+programação de alto nível como, p.ex., PHP, Perl, e Java,
+atravez de interfáces SWIG. ZXID de hoje (Nov 2011) pode funcionar
+nos papeis SP (Provedor de Serviços), IdP (Provedor de Identidade),
+WSC (Cliente de Serviços Web) WSP (Provedor de Serviços Web),
+Discovery (descobrimento de serviços), PEP (controlo de acesso), e
+PDP (decisão de acesso). ZXID é a implementação de referência
+do parte segurança do projecto TAS3.eu.\\\\
+
+La librería de gestión de identidades ZXID.org es una
+implementación en C de las normas SAML 2.0, Liberty ID-WSF 2.0, y
+XACML 2.0 con dependencias externas mínimas - OpenSSL, CURL, y zlib
+- que elimina el "Infierno DLL" en su implantación. Como ZXID es
+muy económica, es apta para aplicaciones embebidas o de gran
+volumen y envergadura. Los lenguajes de programación de alto nivel,
+como Perl, PHP, y Java, son soportados con generador de interfaces
+SWIG. Hoy (Nov 2011) el ZXID soporta los roles SP (proveedor de
+servicios), IdP (proveedor de identidades), WSC (cliente de los
+servicios web) WSP (proveedor de servicios web), Discovery
+(descubrimeinto de servicios), PEP (copntrolo de acesso), y PDP
+(deciciónes de acesso). ZXID es el implementación de referencia
+de parte seguridad de proyecto TAS3.eu.\\\\
+
+ZXID.org on verkkohenkilöllisyyden ja -tunnisteiden
+hallintakirjasto joka tukee SAML 2.0 (sisäänkirjaantuminen),
+Liberty ID-WSF 2.0 (henkilöllisyyteen pohjautuvat webbipalvelut),
+ja XACML 2.0 (käyttöoikeuksien hallinta) standardeja. ZXID
+vaatii vain OpenSSL, CURL ja zlib kirjastot joten se välttää
+"DLL helvetti"-ongelman.  Skemapohjaisena C toteutuksena se on tarkka
+ja taloudellinen ja kelpaa sulautettuihin ja erittäin kovaa
+suorituskykyä vaativiin sovelluksiin. Se tukee korkeantason
+kieliä - kuten Perliä, PHP:tä, CSharp:ia, ja Javaa - SWIG
+generoiduin rajapinnoin. ZXID tukee (Marraskuu 2011) SP
+(palveluntarjoaja), IdP (henkilöllisyydenvarmentaja), WSC
+(webbipalvelunkutsuja), WSP (webbipalveluntarjoaja), Discovery
+(webbipalveluiden löytäminen), PEP (käyttöoikeuden
+tarkistus), ja PDP (käyttöoikeuden päätös) rooleja.
+ZXID on TAS3.eu projektin referenssi toteutus turvallisuus- ja
+luottamusteknologioissa.
+
+>>
+
+<<maketoc: 1>>
+
+1 Other Documentation
+=====================
+
+This README.zxid is in process of being rewritten and restructured.
+A lot of the material has moved to specific files, which
+you should read.
+
+* <<link:mod_auth_saml.html: mod_auth_saml>> Apache
+  module documentation: SSO without programming.
+* <<link:zxid-simple.html: zxid_simple()>> Easy API for SAML
+* <<link:zxid-raw.html: ZXID Raw API>>: Program like
+  the pros (and fix your own problems). See also <<link:../ref/html/index.html: Function Reference>>
+* <<link:zxid-wsf.html: ZXID ID-WSF API>>: Make Identity Web Services Calls using ID-WSF
+* <<link:zxid-install.html: ZXID Compilation and Installation>>: Compile
+  and install from source or package. See also <<link:html/INSTALL.zxid.html: INSTALL.zxid>>
+  for quick overview.
+* <<link:zxid-conf.html: ZXID Configuration Reference>>: Nitty gritty
+  on all options.
+* <<link:zxid-cot.html: ZXID Circle of Trust Reference>>: How to
+  set up the Circle of Trust, i.e. the partners your web site works with.
+* <<link:zxid-log.html: ZXID Logging Reference>>: ZXID digitally signed logging facility
+* <<link:zxid-java.html: javazxid>>: Using ZXID from Java
+* <<link:zxid-perl.html: Net::SAML>>: Using ZXID from Perl
+* <<link:zxid-php.html: php_zxid>>: Using ZXID from PHP
+* <<link:zxid-idp.html: IdP>>: Configuring zxididp
+* <<link:zxid-faq.html: FAQ>>: Frequently Asked Questions
+* <<link:../README.smime: README.smime>>: Crypto and Cert Tutorial
+
+* zxid.user@lists.unh.edu mailing list
+
+2 ZXID Project
+==============
+
+Web site:: http://zxid.org/
+License::  Open source: Apache 2, see License chapter and file COPYING
+
+Immediate goal: build a SAML 2.0 SP and ID-WSF 2.0 WSC
+
+Goals of ZXID project include
+
+* SOAP 1.1 support (done)
+* SAML 2.0 compliance
+  - SP role (done)
+  - IdP role (done)
+* Liberty ID-FF 1.2 support
+  - SP
+  - IdP
+  - SAML 1.1
+* Liberty ID-WSF 1.1 support
+  - Discovery bootstrap
+  - Discovery WSC
+  - ID-DAP WSC
+  - ID-DAP WSP
+* Liberty ID-WSF 2.0 support
+  - Discovery bootstrap (done)
+  - Discovery WSC (done)
+  - Discovery WSP (done)
+  - ID-DAP WSC (done)
+  - ID-DAP WSP (done)
+
+<<table: ZXID Platform Support
+Platform        Native     Cross Compile    Notes
+=============== ========== ================ ================================
+Linux-ix86      gcc-3.4.6  n/a              Development platform
+Solaris 8-sparc gcc-3.4.6  Linux gcc-3.4.6  Fully functional
+Windows 2000    -          Linux gcc-3.4.6  Poorly tested
+xBSD/Unix       gcc-3.4.6  n/a              C core tested, language bindings not tested
+>>
+
+<<table: ZXID Feature and Language Support (version number indicates last testing)
+Feature               C     mod_perl mod_php Python Java/Tomcat Apache Shell
+===================== ===== ======== ======= ====== =========== ====== =====
+Geo Location          Alpha
+ID-MM7                Alpha
+ID-DAP                Beta
+ID-HR-XML             Beta
+Contact Book          Alpha
+People Service        Alpha
+Discovery             0.41
+Web Services (ID-WSF) 0.41
+Authorization (XACML) 0.40  yes      0.40    Plan   0.40        0.40
+SSO                   0.17  0.17     0.17    Plan   0.17        0.40   0.17
+>>
+
+<<table: ZXID Enabled Application Packages
+Application    Language      Notes
+============== ============= =====================================================
+DokuWiki       PHP           Patch available, in process of submitting to DokuWiki authors
+Mahara         PHP           4Q2009
+>>
+
+<<ignore: table: ZXID Enabled Application Packages
+Application    Language      Notes
+============== ============= ==============================
+MediaWiki      PHP           Planned
+Cognito
+zxbug          Perl          Planned
+>>
+
+2.1 Project Layout
+------------------
+
+Following directory layout is used by the project. Many of the specified
+directories are used by intermediate outputs that are not distributed
+in tarball releases, but may or may no be present in CVS checkouts.
+
+  zxid-0.xx
+   |
+   +-- Net       The Net::SAML perl module (also mod_perl)
+   +-- php       PHP / mod_php integration
+   +-- zxidjava  The Java JNI interface to ZXID
+   +-- servlet   Apache Tomcat integration
+   +-- c         C code generated from the Schema Grammar descriptions
+   +-- sg        Schema Grammar (.sg) descriptions of protocols
+   +-- xsd       XML schema descriptions of protocols (not distributed)
+   +-- tex       Temporary files for document generation using PlainDoc (not distributed)
+   +-- html      HTML documentation generated using PlainDoc
+   +-- review    Publicly released announcements and documents (not distributed)
+   +-- t         Test scripts and expected test outputs
+   `-- tmp       Temporary files, such as actual test outputs
+
+The Manifest file, which follows, explains each file in more detail.
+
+<<logoutput:
+<<Manifest>>
+>>
+
+2.2 Protocol Encoders and Decoders
+----------------------------------
+
+The protocol encoders and decoders are generated automatically from
+the schema grammar (.sg) descriptions. This ensures accurate protocol
+implementation. While the output is strictly schema driven and correct,
+the decoders have some provisions to accept some deviations from
+strict spec (e.g. out of order elements are tolerated). However,
+one should note that XMLDSIG does not tolerate very much deviation,
+thus even if decoder accepts a slightly illformed message, it is likely
+to fail in signature verification.
+
+There are three outputs from generation
+
+1. Data structures describing the data (xx.h)
+2. Encoder that linearizes the data structure to wire protocol (xx-enc.c)
+3. Decoder that converts wire protocol byte stream to a data structure (xx-dec.c)
+
+2.3 Standards and Namespaces
+----------------------------
+
+ZXID uses consistently the same namespace prefixes throughout the project. The
+generated encoders and decoders support following schemata
+
+<<longtable: ZXID Namespace Convention
+Prefix URI                                            Description
+====== ============================================== =================================
+sa     urn:oasis:names:tc:SAML:2.0:assertion          SAML 2.0
+sp     urn:oasis:names:tc:SAML:2.0:protocol
+md     urn:oasis:names:tc:SAML:2.0:metadata
+ecp    urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp
+shibmd urn:mace:shibboleth:metadata:1.0               Shibboleth 2.0 Metadata extensions
+
+idpdisc
+urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol
+SAML IdP Discovery
+paos   urn:liberty:paos:2006-08
+sa11   urn:oasis:names:tc:SAML:1.0:assertion          SAML 1.1
+sp11   urn:oasis:names:tc:SAML:1.0:protocol
+ff12   urn:liberty:iff:2003-08                        ID-FF 1.2
+m20    urn:liberty:metadata:2004-12                   v2.0 (almost same as 1.2)
+ac     urn:liberty:ac:2004-12                         v2.0 (almost same as 1.2)
+b12    urn:liberty:sb:2003-08                         ID-WSF 1.1 SOAP Binding
+sec12  urn:liberty:sec:2003-08                        ID-WSF 1.1 Security Mechanisms
+di12   urn:liberty:disco:2003-08                      ID-WSF 1.1 Discovery Service
+is12   urn:liberty:is:2003-08                         ID-WSF 1.1 Interaction Service
+lu     urn:liberty:util:2006-08                       ID-WSF 2.0 Utility Schema
+sbf    urn:liberty:sb                                 Framework header
+b      urn:liberty:sb:2006-08                         ID-WSF 2.0 SOAP Binding
+sec    urn:liberty:security:2006-08                   ID-WSF 2.0 Security Mechanisms
+di     urn:liberty:disco:2006-08                      ID-WSF 2.0 Discovery Service
+is     urn:liberty:is:2006-08                         ID-WSF 2.0 Interaction Service
+dap    urn:liberty:id-sis-dap:2006-08:dst-2.1         ID Directory Access Protocol
+dst    urn:liberty:dst:2006-08                        Data Services Template 2.1
+subs   urn:liberty:ssos:2006-08                       Subscription and Notification
+ps     urn:liberty:ps:2006-08                         People Service
+im     urn:liberty:ims:2006-08                        Identity Mapping svc (aka Token Map)
+as     urn:liberty:sa:2006-08                         ID-WSF 2.0 Authentication Service
+cb     urn:liberty:id-sis-cb:2004-10                  Contact Book Protocol (DST 2.0 based)
+cdm    urn:liberty:cb:conceptual-data-model:2004-10   Contact Book Common Data Model
+gl     urn:liberty:id-sis-gl:2005-07                  Geolocation Service
+
+mm7
+http://www.3gpp.org/ftp/Specs/archive/23_series/23.140/schema/REL-6-MM7-1-4
+ID-MM7 (ID-SIS-CSM)
+dp     urn:liberty:dp:2006-12                         ID-WSF 2.0 Design Patterns
+idp    urn:liberty:idp:2006-12                        ID-WSF 2.0 IdP as web svc
+pmm    urn:liberty:pmm:2006-12                        ID-WSF 2.0 Prov Mod Mgr
+prov   urn:liberty:prov:2006-12                       ID-WSF 2.0 TM Provisioning
+shps   urn:liberty:shps:2006-12                       ID-WSF 2.0 Svc Handling and Proxying
+e      http://schemas.xmlsoap.org/soap/envelope/      SOAP 1.1, with SAML and WSF
+xa     urn:oasis:names:tc:xacml:2.0:policy:schema:os  XACML 2.0
+xac    urn:oasis:names:tc:xacml:2.0:context:schema:os
+xasp   urn:oasis:xacml:2.0:saml:protocol:schema:os
+xasa   urn:oasis:xacml:2.0:saml:assertion:schema:os
+
+xaspcd1
+urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol:cd-01
+Committee draft with extensions for passing policies as input
+
+xasacd1
+urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:assertion:cd-01
+Committee draft with extentsions
+
+wst
+http://docs.oasis-open.org/ws-sx/ws-trust/200512/
+WS-Trust 1.3 CD-01
+wsp    http://schemas.xmlsoap.org/ws/2004/09/policy   *** Newer version? http://www.w3.org/ns/ws-policy/
+
+wsc
+http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512
+WS-Secure Conversation CD-01
+ds     http://www.w3.org/2000/09/xmldsig#             XML Signatures
+xenc   http://www.w3.org/2001/04/xmlenc#              XML Encryption
+exca   http://www.w3.org/2001/10/xml-exc-c14n#        Exclusive Canonicalization
+a      http://www.w3.org/2005/08/addressing           WSA 1.0
+
+wsse
+http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd
+WS Security SecExt 1.0
+
+wsu
+http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd
+WS Security Utility 1.0
+xml    http://www.w3.org/XML/1998/namespace           http://www.w3.org/2001/xml.xsd
+xsi    http://www.w3.org/2001/XMLSchema-instance
+xs     http://www.w3.org/2001/XMLSchema               Namespace only, no code
+xop    http://www.w3.org/2004/08/xop/include          MOTM-XOP include tag
+
+bpel
+http://docs.oasis-open.org/wsbpel/2.0/process/executable
+Business Process Execution Language v2.0
+igf0   urn:LibertyAlliance:igf:0.3:core               Early draft 01, WIP
+carml0 urn:LibertyAlliance:igf:0.3:carml              Early draft 03, WIP
+tas3   http://tas3.eu/tas3/200911/                    TAS3 Credentials passing
+
+tas3sol
+http://tas3.eu/tas3sol/200911/
+TAS3 Simple Obligations Language 1
+sol    urn:tas3:sol                                   Simple Obligations Language Generic
+sol1   urn:tas3:sol1                                  Simple Obligations Language 1
+
+tas3spl
+http://tas3.eu/tas3sol/201111/
+TAS3 Simple Policy Language 1
+spl    urn:tas3:spl                                   Simple Policy Language Generic
+spl1   urn:tas3:spl1                                  Simple Policy Language 1
+
+sup
+http://schemas.suplight.eu/plugin/common/2013-05/xs
+Suplight Common Schema
+
+px
+http://schemas.suplight.eu/plugin/ExamplePlugin/2013-05/xs
+Suplight ExamplePlugin Schema
+>>
+
+
+96 Copyright, License, Notices, and Acknowledgements
+====================================================
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+The research leading to these results has received funding from the
+European Community's Seventh Framework Programme (FP7/2007-2013) under
+grant agreement number 216287 (TAS3 - Trusted Architecture for Securely
+Shared Services - www.tas3.eu).
+
+While the source distribution of ZXID does not contain
+SSLeay or OpenSSL code, if you use this code you will use OpenSSL
+library. Please give Eric Young and OpenSSL team credit (as required by
+their licenses).
+
+Binary distribution of this product includes software developed by the
+OpenSSL Project for use in the OpenSSL Toolkit
+(http://www.openssl.org/). See LICENSE.openssl for further information.
+
+Binary distribution of this product includes cryptographic software
+written by Eric Young (eay@cryptsoft.com).  Binary distribution of
+this product includes software written by Tim Hudson
+(tjh@cryptsoft.com). See LICENSE.ssleay for further information.
+
+And remember, you, and nobody else but you, are responsible for
+auditing ZXID and OpenSSL library for security problems,
+back-doors, and general suitability for your application.
+
+96.1 Dependency Library Licenses
+--------------------------------
+
+ZXID strives to maintain IPR hygiene and avoid both
+non-free and GPL license contamination. All the
+dependency libraries have, and shall have, BSD style licenses
+
+* OpenSSL under BSDish (with "advertising" clause)
+* libcurl under BSDish
+* zlib under BSDish
+* libc available as part of the operating system
+
+Please see each library package for the exact details of their
+licenses.
+
+96.1.1 Yubikey
+~~~~~~~~~~~~~~
+
+Contains libyubikey components which are subject to following
+notice:
+
+> Written by Simon Josefsson <simon@josefsson.org>.
+> Copyright (c) 2006, 2007, 2008, 2009 Yubico AB
+> All rights reserved.
+>
+> Redistribution and use in source and binary forms, with or without
+> modification, are permitted provided that the following conditions are
+> met:
+>
+>   > Redistributions of source code must retain the above copyright
+>      notice, this list of conditions and the following disclaimer.
+>
+>   > Redistributions in binary form must reproduce the above
+>      copyright notice, this list of conditions and the following
+>      disclaimer in the documentation and/or other materials provided
+>      with the distribution.
+>
+> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+> "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+> LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+> A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+> OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+> SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+> LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+> DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+> THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+> (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+> OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+96.1.2 OpenSSL
+~~~~~~~~~~~~~~
+
+The source distribution references, but does not contain, OpenSSL. The
+binary distributions may incorporate or dynamically link to OpenSSL,
+which is subject to the following terms and conditions:
+
+> Copyright (c) 1998-2005 The OpenSSL Project.  All rights reserved.
+> 
+> Redistribution and use in source and binary forms, with or without
+> modification, are permitted provided that the following conditions
+> are met:
+> 
+> 1. Redistributions of source code must retain the above copyright
+>    notice, this list of conditions and the following disclaimer. 
+> 
+> 2. Redistributions in binary form must reproduce the above copyright
+>    notice, this list of conditions and the following disclaimer in
+>    the documentation and/or other materials provided with the
+>    distribution.
+> 
+> 3. All advertising materials mentioning features or use of this
+>    software must display the following acknowledgment:
+>    "This product includes software developed by the OpenSSL Project
+>    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
+> 
+> 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used
+>    to endorse or promote products derived from this software without
+>    prior written permission. For written permission, please contact
+>    openssl-core@openssl.org.
+> 
+> 5. Products derived from this software may not be called "OpenSSL"
+>    nor may "OpenSSL" appear in their names without prior written
+>    permission of the OpenSSL Project.
+> 
+> 6. Redistributions of any form whatsoever must retain the following
+>    acknowledgment:
+>    "This product includes software developed by the OpenSSL Project
+>    for use in the OpenSSL Toolkit (http://www.openssl.org/)"
+> 
+> THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
+> EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+> PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
+> ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+> SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+> NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+> LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+> STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+> ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+> OF THE POSSIBILITY OF SUCH DAMAGE.
+> ====================================================================
+> 
+> This product includes cryptographic software written by Eric Young
+> (eay@cryptsoft.com).  This product includes software written by Tim
+> Hudson (tjh@cryptsoft.com).
+
+96.1.3 SSLeay
+~~~~~~~~~~~~~
+
+The source distribution references, but does not contain, OpenSSL
+which contains SSLeay. The binary distributions may incorporate or
+dynamically link to OpenSSL containing SSLeay, which is subject to the
+following terms and conditions:
+
+> Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
+> All rights reserved.
+> 
+> This package is an SSL implementation written
+> by Eric Young (eay@cryptsoft.com).
+> The implementation was written so as to conform with Netscape's SSL.
+> 
+> This library is free for commercial and non-commercial use as long as
+> the following conditions are adhered to.  The following conditions
+> apply to all code found in this distribution, be it the RC4, RSA,
+> lhash, DES, etc., code; not just the SSL code.  The SSL documentation
+> included with this distribution is covered by the same copyright terms
+> except that the holder is Tim Hudson (tjh@cryptsoft.com).
+> 
+> Copyright remains Eric Young's, and as such any Copyright notices in
+> the code are not to be removed.
+> If this package is used in a product, Eric Young should be given
+> attribution as the author of the parts of the library used.
+> This can be in the form of a textual message at program startup or
+> in documentation (online or textual) provided with the package.
+> 
+> Redistribution and use in source and binary forms, with or without
+> modification, are permitted provided that the following conditions
+> are met:
+> 
+> 1. Redistributions of source code must retain the copyright
+>    notice, this list of conditions and the following disclaimer.
+> 2. Redistributions in binary form must reproduce the above copyright
+>    notice, this list of conditions and the following disclaimer in
+>    the documentation and/or other materials provided with the
+>    distribution.
+> 3. All advertising materials mentioning features or use of this
+>    software must display the following acknowledgement:
+>    "This product includes cryptographic software written by
+>     Eric Young (eay@cryptsoft.com)"
+>    
+>    The word 'cryptographic' can be left out if the routines from the
+>    library being used are not cryptographic related :-).
+> 4. If you include any Windows specific code (or a derivative thereof)
+>    from the apps directory (application code) you must include an
+>    acknowledgement:
+>    "This product includes software written by Tim Hudson 
+>    (tjh@cryptsoft.com)"
+> 
+> THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND
+> ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+> PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS
+> BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+> OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+> OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR 
+> BUSINESS INTERRUPTION)
+> HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+> STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+> IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+> POSSIBILITY OF SUCH DAMAGE.
+> 
+> The license and distribution terms for any publicly available
+> version or derivative of this code cannot be changed.  i.e. this
+> code cannot simply be copied and put under another distribution
+> license [including the GNU Public License.]
+
+96.2 Specification IPR
+----------------------
+
+ZXID is based on open SAML, Liberty, and TAS3 specifications. The
+parties that have developed these specifications, including Symlabs,
+have made Royalty Free (RF) licensing commitment. Please ask OASIS,
+Liberty Alliance, and TAS3 project for the specifics of their IPR
+policies and IPR disclosures.
+
+Some protocols, such as WS-Trust and WS-Federation enjoy Microsoft's
+pledge<<footnote: If you have a reference to where this pledge can be
+found, please let me know so it can be included here.>> that they will
+not sue you even if you implement these specifications. You should
+evaluate yourself whether this is good enough for your situation.
+
+96.3 Further Warranties
+-----------------------
+
+If you need the author or Symlabs to further disclaim IPR interest or
+make warranties of non-infringement, such declarations are
+available for a fee. Please contact sales@symlabs.com
+
+Legal queries and clarifications will be answered at then-current
+Symlabs Professional Services rate, please contact sales@symlabs.com.
+
+20 Testing
+==========
+
+ZXID test suite is still in tatters. Some things that should
+be tested
+
+1. Will generated HTTP redirect sig validate at IdP?
+2. Does IdP issued A7N validate?
+3. Validation of EncryptedAssertion?
+4. Will generated SOAP binding sig validate at IdP?
+5. Does IdP issued SOAP sig validate?
+
+Metadata related
+
+1. IBM metadata (can we parse)
+2. Sun metadata (can we parse)
+
+XML related
+
+1. Fully qualified XML parses?
+2. Unknown ns prefix that refers to known namespace URI
+3. Known ns prefix, referring to wrong URI
+4. Known prefix refers to aliased URI
+5. Use of default namespaces working?
+6. Unknown prefix and URI as long as it is never used
+7. Unknown prefix and URI, used
+8. Known NS (prefix or URI), unknown element
+
+14 Integration of Other Implementations with ZXID
+=================================================
+
+14.1 Conor Cahill's C++ Library for ID-WSF
+------------------------------------------
+
+Conor P. Cahill, of AOL and Intel fame, has developed and maintains a
+C++ library for ID-WSF 2.0 Web Service Client functionality for
+selected application protocols, including the ID-WSF 2.0 Discovery and
+some application protcols. Conor also provides a server side package
+that implements the corresponding WSP roles in Java. These libraries
+are valuable resources and come with extensive test suites - in fact,
+passing Conor's test suites has become the gold standard for validity
+and interoperability of any ID-WSF implmentations (this is not to
+detract from formal IOP events and the Liberty certification program,
+but passing Conor's test suite is a good predictor of getting
+certified).
+
+*Install Recipe*
+
+Conor's libraries have certain dependencies. Following is my best understanding
+of how to get them installed.<<footnote: As of May 2007, Conor's packages
+explode in the current working directory. I recommend creating a wrapper
+directory first. Also, the client and server functionality can not be
+unpacked in same directory without creating conflict and overwriting some files.>>
+
+  mkdir conor
+  cd conor
+  tar xvf /t/LibertyIDWSFServices-v0.8.2.tgz 
+  cd ..
+  mkdir conor-cli
+  cd conor-cli/
+  tar xvf /t/LibertyClientToolkit-v1.0.1.tgz 
+
+14.2 Pat Patterson's php module
+-------------------------------
+
+(*** This section also appears in zxid-php.pd)
+
+Pat Patterson of Sun distributes a pure PHP module (not to be confused
+with Sun's OpenSSO open source effort, with which Pat has some
+contact) that implements some aspects of SAML 2.0. As of May 2007, his
+library provides functionality that, by and large, parallels that of the
+php_zxid module. A major advatage of his module is that it does not have
+C shared library dependency, but beware that he still depends on XML
+parsing and popular crypto libraries (openssl) to be available. These
+assumptions are not onerous, but you should be aware of them in case
+your system differs from main stream deployments.
+
+Overall, Pat's PHP implementation, as of May 2007, is still lacking
+in metadata generation and loading (it does not implement Auto-CoT
+or Well Known Location) and has some rough edges around less frequently
+used parts of the SAML specification. No doubt matters will improve
+over the time.
+
+Pat's library handles only SSO and not ID Web Services. It would be
+possible to extract the discovery bootstrap from SSO using his library
+after which you can use ZXID WSC API to actually call the services.
+
+14.3 Sun OpenSSO
+----------------
+
+Sun Microsystems distributes an open source implementation of SAML 2.0.
+Their implementation is of primary interest as it provides a freely available
+IdP implementation (as of May 2007 IMNSHO the ZXID SP interface is
+superior to the OpenSSO SP - and since both implement an open standard,
+you can mix ZXID SP with OpenSSO IdP).
+
+Thus, the ZXID to OpenSSO integration reduces to each one acting in its
+role using standard wire protocol - SAML 2.0.
+
+14.4 University of Kent's PERMIS PDP
+------------------------------------
+
+University of Kent is a supplier of PERMIS XACML PDP software. ZXID has been
+interoperated and found compatible on wire with PERMIS as of Nov. 2009.
+However, not integration at library or API level has been attempted.
+
+14.5 Shibboleth 2
+-----------------
+
+Shibboleth 2, a SAML 2.0 based IdP, has been interoperated with ZXID SP
+code as of Nov. 2009.
+
+99 Appendix: Schema Grammars
+============================
+
+Large parts of ZXID code are generated from +schema grammars+ which
+are a convenient notation for describing XML schmata. This chapter
+gives a sampling of some schema grammars that are currently implemented and
+distributed in the ZXID package. For fuller list, see sg subdirectory
+of the distribution or schemata.pd file.
+
+<<table: Schema grammar syntax
+Construct     Description
+============= ====================================================================
+  ee          Bareword signifies an XML element
+  @aa         At (@) prefix signifies an XML attribute
+  %tt         Percent (%) prefix signifies a complexType
+  &gg         Ampersand (&) prefix a signifies group
+  &@ag        Ampersand and at (&@) prefix signifies attributeGroup
+  xx -> %tt   Arrow (->) signifies reference to type that defines element or attribute
+  xx: ... ;   Colon (:) means that the definition of type follows immediately
+  ee          An element or attribute by itself means exactly one occurance is expected
+  ee?         Question mark (?) means the element or attribute is optional
+  ee*         Asterisk (*) means the element may appear from zero to infinite number of times (same as * in regular expressions)
+  ee+         Plus (+) means the element must appear at least once, but may appear an infinite number of times (same as + in regular expressions)
+  ee{x,y}     The element must appear between x and y times (same as in regex)
+  ee | ee     The pipey symbol (|) means elements are mutually exclusive choices.
+  ee ee       Concatenation of elements or attributes means sequence
+  base( t )   Introduce Extension base type (derive a type)
+  redef( .. ) Redefine a type (using <xs:redefine> construct)
+  mixed(1)    Mark a complex type as having mixed content type, i.e. strings and elements alternate
+  enum( ... ) Introduce enumeration of xs:strings
+  any         xs:any, the XML arbitrary element extension mechanism
+  @any        xs:anyAttribute, the XML arbitrary attribute extension mechanism
+target( ... ) Define target namespace described by the schema
+import( ... ) Bring in other schemata and namespaces
+ns( ... )     Declare existence of another namespace (without importing it)
+>>
+
+<<tex: \small>>
+
+99.1 SAML 2.0
+-------------
+
+99.1.1 saml-schema-assertion-2.0 (sa)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/saml-schema-assertion-2.0.sg>>
+>>
+
+99.1.2 saml-schema-protocol-2.0 (sp)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/saml-schema-protocol-2.0.sg>>
+>>
+
+99.1.4 saml-schema-metadata-2.0 (md)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/saml-schema-metadata-2.0.sg>>
+>>
+
+99.5 Liberty ID-WSF 2.0
+-----------------------
+
+99.5.1 liberty-idwsf-utility-v2.0 (lu)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/liberty-idwsf-utility-v2.0.sg>>
+>>
+
+99.5.3 liberty-idwsf-soap-binding-v2.0 (b)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/liberty-idwsf-soap-binding-v2.0.sg>>
+>>
+
+99.5.4 liberty-idwsf-security-mechanisms-v2.0 (sec)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/liberty-idwsf-security-mechanisms-v2.0.sg>>
+>>
+
+99.5.5 liberty-idwsf-disco-svc-v2.0 (di)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/liberty-idwsf-disco-svc-v2.0.sg>>
+>>
+
+99.5.7 id-dap (dap)
+~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/id-dap.sg>>
+>>
+
+99.5.8 liberty-idwsf-subs-v1.0 (subs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/liberty-idwsf-subs-v1.0.sg>>
+>>
+
+99.5.9 liberty-idwsf-dst-v2.1 (dst)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/liberty-idwsf-dst-v2.1.sg>>
+>>
+
+99.6 SOAP 1.1 Processor wsf-soap11 (e)
+--------------------------------------
+
+<<schema:
+<<sg/wsf-soap11.sg>>
+>>
+
+99.7 XML and Web Services Infrastructure
+----------------------------------------
+
+99.7.1 xmldsig-core (ds)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/xmldsig-core.sg>>
+>>
+
+99.7.2 xenc-schema (xenc)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/xenc-schema.sg>>
+>>
+
+99.7.3 ws-addr-1.0 (a)
+~~~~~~~~~~~~~~~~~~~~~~
+
+<<schema:
+<<sg/ws-addr-1.0.sg>>
+>>
+
+100 Appendix: Some Example XML Blobs
+====================================
+
+These XML blobs are for reference. They have been pretty
+printed. Indentation indicates nesting level and closing tags have
+been abbreviated as "</>". The actual XML on wire generally does not
+have any whitespace.
+
+100.1 SAML 2.0 Artifact Response with SAML 2.0 SSO Assertion and Two Bootstraps
+-------------------------------------------------------------------------------
+
+This example corresponds to t/sso-w-bootstraps.xml in the distribution.
+
+Both bootstraps illustrate SAML assertion as bearer token.
+
+ <soap:Envelope
+    xmlns:lib="urn:liberty:iff:2003-08"
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing">
+  <soap:Body>
+
+    <sp:ArtifactResponse
+        xmlns:sp="urn:oasis:names:tc:SAML:2.0:protocol"
+        ID="REvgoIIlkzTmk-aIX6tKE"
+        InResponseTo="RfAsltVf2"
+        IssueInstant="2007-02-10T05:38:15Z"
+        Version="2.0">
+      <sa:Issuer
+          xmlns:sa="urn:oasis:names:tc:SAML:2.0:assertion"
+          Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">
+        https://a-idp.liberty-iop.org:8881/idp.xml</>
+      <sp:Status>
+        <sp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></>
+
+      <sp:Response
+          xmlns:sp="urn:oasis:names:tc:SAML:2.0:protocol"
+          ID="RCCzu13z77SiSXqsFp1u1"
+          InResponseTo="NojFIIhxw"
+          IssueInstant="2007-02-10T05:37:42Z"
+          Version="2.0">
+        <sa:Issuer
+            xmlns:sa="urn:oasis:names:tc:SAML:2.0:assertion"
+            Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">
+          https://a-idp.liberty-iop.org:8881/idp.xml</>
+        <sp:Status>
+          <sp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></>
+
+        <sa:Assertion
+            xmlns:sa="urn:oasis:names:tc:SAML:2.0:assertion"
+            ID="ASSE6bgfaV-sapQsAilXOvBu"
+            IssueInstant="2007-02-10T05:37:42Z"
+            Version="2.0">
+          <sa:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">
+            https://a-idp.liberty-iop.org:8881/idp.xml</>
+
+          <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:SignedInfo>
+              <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+              <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+              <ds:Reference URI="#ASSE6bgfaV-sapQsAilXOvBu">
+                <ds:Transforms>
+                  <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                  <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></>
+                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                <ds:DigestValue>r8OvtNmq5LkYwCNg6bsRZAdT4NE=</></></>
+            <ds:SignatureValue>GtWVZzHYW54ioHk/C7zjDRThohrpwC4=</></>
+
+          <sa:Subject>
+            <sa:NameID
+                Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+                NameQualifier="https://a-idp.liberty-iop.org:8881/idp.xml">PB5fLIA4lRU2bH4HkQsn9</>
+            <sa:SubjectConfirmation
+                Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+              <sa:SubjectConfirmationData
+                  NotOnOrAfter="2007-02-10T06:37:41Z"
+                  Recipient="https://sp1.zxidsp.org:8443/zxidhlo?o=B"/></></>
+
+          <sa:Conditions
+              NotBefore="2007-02-10T05:32:42Z"
+              NotOnOrAfter="2007-02-10T06:37:42Z">
+            <sa:AudienceRestriction>
+              <sa:Audience>https://sp1.zxidsp.org:8443/zxidhlo?o=B</></></>
+
+          <sa:Advice>
+
+            <!-- This assertion is the credential for the ID-WSF 1.1 bootstrap (below). -->
+
+            <sa:Assertion
+                ID="CREDOTGAkvhNoP1aiTq4bXBg"
+                IssueInstant="2007-02-10T05:37:42Z"
+                Version="2.0">
+              <sa:Issuer
+                  Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">
+                https://a-idp.liberty-iop.org:8881/idp.xml</>
+              <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                <ds:SignedInfo>
+                  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                  <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                  <ds:Reference URI="#CREDOTGAkvhNoP1aiTq4bXBg">
+                    <ds:Transforms>
+                      <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                      <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></>
+                    <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                    <ds:DigestValue>dqq/28hw5eEv+ceFyiLImeJ1P8w=</></></>
+                <ds:SignatureValue>UKlEgHKQwuoCE=</></>
+              <sa:Subject>
+                <sa:NameID/>  <!-- *** Bug here!!! -->
+                <sa:SubjectConfirmation
+                    Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"/></>
+              <sa:Conditions
+                  NotBefore="2007-02-10T05:32:42Z"
+                  NotOnOrAfter="2007-02-10T06:37:42Z">
+                <sa:AudienceRestriction>
+                  <sa:Audience>https://sp1.zxidsp.org:8443/zxidhlo?o=B</></></></></>
+
+          <sa:AuthnStatement
+              AuthnInstant="2007-02-10T05:37:42Z"
+              SessionIndex="1171085858-4">
+            <sa:AuthnContext>
+              <sa:AuthnContextClassRef>
+                urn:oasis:names:tc:SAML:2.0:ac:classes:Password</></></>
+
+          <sa:AttributeStatement>
+
+            <!-- Regular attribute -->
+
+            <sa:Attribute
+                Name="cn"
+                NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+              <sa:AttributeValue>Sue</></>
+
+            <!-- ID-WSF 1.1 Bootstrap for discovery. See also the Advice, above. -->
+
+            <sa:Attribute
+                Name="DiscoveryResourceOffering"
+                NameFormat="urn:liberty:disco:2003-08">
+              <sa:AttributeValue>
+                <di12:ResourceOffering
+                    xmlns:di12="urn:liberty:disco:2003-08"
+                    entryID="2">
+                  <di12:ResourceID>
+                    https://a-idp.liberty-iop.org/profiles/WSF1.1/RID-DISCO-sue</>
+                  <di12:ServiceInstance>
+                    <di12:ServiceType>urn:liberty:disco:2003-08</>
+                    <di12:ProviderID>https://a-idp.liberty-iop.org:8881/idp.xml</>
+                    <di12:Description>
+                      <di12:SecurityMechID>urn:liberty:security:2005-02:TLS:Bearer</>
+                      <di12:CredentialRef>CREDOTGAkvhNoP1aiTq4bXBg</>
+                      <di12:Endpoint>https://a-idp.liberty-iop.org:8881/DISCO-S</></></>
+                  <di12:Abstract>Symlabs Discovery Service Team G</></></></>
+
+            <!-- ID-WSF 2.0 Bootstrap for Discovery. The credential (bearer token) is inline. -->
+
+            <sa:Attribute
+                Name="urn:liberty:disco:2006-08:DiscoveryEPR"
+                NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+              <sa:AttributeValue>
+                <wsa:EndpointReference
+                    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+                    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                    notOnOrAfter="2007-02-10T07:37:42Z"
+                    wsu:Id="EPRIDcjP8ObO9In47SDjO9b37">
+                  <wsa:Address>https://a-idp.liberty-iop.org:8881/DISCO-S</>
+                  <wsa:Metadata xmlns:di="urn:liberty:disco:2006-08">
+                    <di:Abstract>SYMfiam Discovery Service</>
+                    <sbf:Framework xmlns:sbf="urn:liberty:sb" version="2.0"/>
+                    <di:ProviderID>https://a-idp.liberty-iop.org:8881/idp.xml</>
+                    <di:ServiceType>urn:liberty:disco:2006-08</>
+                    <di:SecurityContext>
+                      <di:SecurityMechID>urn:liberty:security:2005-02:TLS:Bearer</>
+
+                      <sec:Token
+                          xmlns:sec="urn:liberty:security:2006-08"
+                          usage="urn:liberty:security:tokenusage:2006-08:SecurityToken">
+
+                        <sa:Assertion
+                            ID="CREDV6ZBMyicmyvDq9pLIoSR"
+                            IssueInstant="2007-02-10T05:37:42Z"
+                            Version="2.0">
+                          <sa:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">
+                            https://a-idp.liberty-iop.org:8881/idp.xml</>
+                          <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <ds:SignedInfo>
+                              <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                              <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                              <ds:Reference URI="#CREDV6ZBMyicmyvDq9pLIoSR">
+                                <ds:Transforms>
+                                  <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                                  <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></>
+                                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                                <ds:DigestValue>o2SgbuKIBzl4e0dQoTwiyqXr/8Y=</></></>
+                            <ds:SignatureValue>hHdUKaZ//cZ8UYJxvTReNU=</></>
+                          <sa:Subject>
+                            <sa:NameID
+                                Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+                                NameQualifier="https://a-idp.liberty-iop.org:8881/idp.xml">
+                              9my93VkP3tSxEOIb3ckvjLpn0pa6aV3yFXioWX-TzZI=</>
+                            <sa:SubjectConfirmation
+                                Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"/></>
+                          <sa:Conditions
+                              NotBefore="2007-02-10T05:32:42Z"
+                              NotOnOrAfter="2007-02-10T06:37:42Z">
+                            <sa:AudienceRestriction>
+                              <sa:Audience>https://a-idp.liberty-iop.org:8881/idp.xml</></></>
+                          <sa:AuthnStatement AuthnInstant="2007-02-10T05:37:42Z">
+                            <sa:AuthnContext>
+                              <sa:AuthnContextClassRef>
+                                urn:oasis:names:tc:SAML:2.0:ac:classes:Password</></></></></></></></></></></></></></></></>
+
+N.B. The AttributeStatement/Attribute/AttributeValue/
+EndpointReference/Metadata/SecurityContext/
+Token/Assertion/Conditions/AudienceRestriction/Audience is the same as
+the IdP because in many products the IdP and Discovery Service roles
+are implemented by the same entity. Note also that the audience of the inner
+assertion is the discovery service where as the audience of the outer assertion
+is the SP that will eventually call the Discovery Service.
+
+100.2 ID-WSF 2.0 Call with X509v3 Sec Mech
+------------------------------------------
+
+ <e:Envelope
+    xmlns:e="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:b="urn:liberty:sb:2005-11"
+    xmlns:sec="urn:liberty:security:2005-11"
+    xmlns:wsse="http://docs.oasis-open.org/wss/20 04/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+    xmlns:wsa="http://www.w3.org/2005/08/ addressing">
+  <e:Header>
+    <wsa:MessageID wsu:Id="MID">123</>
+    <wsa:To wsu:Id="TO">...</>
+    <wsa:Action wsu:Id="ACT">urn:xx:Query</>
+    <wsse:Security mustUnderstand="1">
+      <wsu:Timestamp wsu:Id="TS"><wsu:Created>2005-06-17T04:49:17Z</></>
+      <wsse:BinarySecurityToken
+          ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"
+          wsu:Id="X509Token"
+          EncodingType="http://docs.oas is-open.org/wss/2004/01/oasis-200401-wss-soap-message-securiy-1.0#Base64Binary">
+        MIIB9zCCAWSgAwIBAgIQ...</>
+      <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:SignedInfo>
+          <ds:Reference URI="#MID">...</>
+          <ds:Reference URI="#TO">...</>
+          <ds:Reference URI="#ACT">...</>
+          <ds:Reference URI="#TS">...</>
+          <ds:Reference URI="#X509">
+            <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <ds:DigestValue>Ru4cAfeBAB</></>
+          <ds:Reference URI="#BDY">
+            <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <ds:DigestValue>YgGfS0pi56p</></></>
+        <ds:KeyInfo><wsse:SecurityTokenReference><wsse:Reference URI="#X509"/></></>
+        <ds:SignatureValue>HJJWbvqW9E84vJVQkjDElgscSXZ5Ekw==</></></></>
+  <e:Body wsu:Id="BDY">
+    <xx:Query/></></>
+
+The salient features of the above XML blob are
+
+* Signature that covers relevant SOAP headers and Body
+* Absence of any explicit identity token.
+
+Absence of identity token means that from the headers it is not
+possible to identify the taget identity. The signature generally
+coveys the Invoker identity (the WSC that is calling the
+service). Since one WSC typically serves many principals, knowing
+which principal is impossible.  For this reason X509 security mechanism is
+seldom used in ID-WSF 2.0 world (with ID-WSF 1.1 the ResourceID
+provides an alternative way of identifying the principal, thus making
+X509 a viable option).
+
+100.3 ID-WSF 2.0 Call with Bearer (Binary) Sec Mech
+---------------------------------------------------
+
+ <e:Envelope
+    xmlns:e="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:b="urn:liberty:sb:2005-11"
+    xmlns:sec="urn:liberty:security:2005-11"
+    xmlns:wsse="http://docs.oasis-open.org/wss/20 04/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+    xmlns:wsa="http://www.w3.org/2005/03/ addressing">
+  <e:Header>
+    <wsa:MessageID wsu:Id="MID">...</>
+    <wsa:To wsu:Id="TO">...</>
+    <wsa:Action wsu:Id="ACT">urn:xx:Query</>
+    <wsse:Security mustUnderstand="1">
+      <wsu:Timestamp wsu:Id="TS">
+        <wsu:Created>2005-06-17T04:49:17Z</></>
+      <wsse:BinarySecurityToken
+          ValueType="anyNSPrefix:ServiceSess ionContext"
+          EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64 Binary"
+          wsu:Id="BST">
+        mQEMAzRniWkAAAEH9RWir0eKDkyFAB7PoFazx3ftp0vWwbbzqXdgcX8fpEqSr1v4
+        YqUc7OMiJcBtKBp3+jlD4HPUaurIqHA0vrdmMpM+sF2BnpND118f/mXCv3XbWhiL
+        VT4r9ytfpXBluelOV93X8RUz4ecZcDm9e+IEG+pQjnvgrSgac1NrW5K/CJEOUUjh
+        oGTrym0Ziutezhrw/gOeLVtkywsMgDr77gWZxRvw01w1ogtUdTceuRBIDANj+KVZ
+        vLKlTCaGAUNIjkiDDgti=</>
+      <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig #">
+        <ds:SignedInfo>
+          <ds:Reference URI="#MID">...</>
+          <ds:Reference URI="#TO">...</>
+          <ds:Reference URI="#ACT">...</>
+          <ds:Reference URI="#TS">...</>
+          <ds:Reference URI="#BST">...</>
+          <ds:Reference URI="#BDY">
+            <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1 "/>
+            <ds:DigestValue>YgGfS0pi56pu</></></>
+        ...</></></>
+  <e:Body wsu:Id="BDY">
+    <xx:Query/></></>
+
+100.4 ID-WSF 2.0 Call with Bearer (SAML) Sec Mech
+-------------------------------------------------
+
+ <e:Envelope
+    xmlns:e="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:sb="urn:liberty:sb:2005-11"
+    xmlns:sec="urn:liberty:security:2005-11"
+    xmlns:wsse="http://docs.oasis-open.org/wss/20 04/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+  <e:Header>
+    <sbf:Framework version="2.0-simple" e:mustUnderstand="1"
+      e:actor="http://schemas.../next"
+      wsu:Id="SBF"/>
+    <wsa:MessageID wsu:Id="MID">...</>
+    <wsa:To wsu:Id="TO">...</>
+    <wsa:Action wsu:Id="ACT">urn:xx:Query</>
+    <wsse:Security mustUnderstand="1">
+      <wsu:Timestamp wsu:Id="TS">
+        <wsu:Created>2005-06-17T04:49:17Z</></>
+
+      <sa:Assertion
+          xmlns:sa="urn:oasis:names:tc:SAML:2.0:assertion"
+          Version="2.0"
+          ID="A7N123"
+          IssueInstant="2005-04-01T16:58:33.173Z">
+        <sa:Issuer>http://idp.symdemo.com/idp.xml</>
+        <ds:Signature>...</>
+        <sa:Subject>
+          <sa:EncryptedID>
+            <xenc:EncryptedData>U2XTCNvRX7Bl1NK182nmY00TEk==</>
+            <xenc:EncryptedKey>...</></>
+          <sa:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"/></>
+        <sa:Conditions
+            NotBefore="2005-04-01T16:57:20Z"
+            NotOnOrAfter="2005-04-01T21:42:4 3Z">
+          <sa:AudienceRestrictionCondition>
+            <sa:Audience>http://wsp.zxidsp.org</></></>
+        <sa:AuthnStatement
+            AuthnInstant="2005-04-01T16:57:30.000Z"
+            SessionIndex="6345789">
+          <sa:AuthnContext>
+            <sa:AuthnContextClassRef>
+              urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</></></>
+        <sa:AttributeStatement>
+          <sa:EncryptedAttribute>
+            <xenc:EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element">
+              mQEMAzRniWkAAAEH9RbzqXdgcX8fpEqSr1v4=</>
+            <xenc:EncryptedKey>...</></></></>
+
+      <wsse:SecurityTokenReference
+          xmlns:wsse11="..."
+          wsu:Id="STR1"
+          wsse11:TokenType="http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0">
+        <wsse:KeyIdentifier
+            ValueType="http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID">
+          A7N123</></>
+
+      <ds:Signature>
+        <ds:SignedInfo>
+          <ds:Reference URI="#MID">...</>
+          <ds:Reference URI="#TO">...</>
+          <ds:Reference URI="#ACT">...</>
+          <ds:Reference URI="#TS">...</>
+          <ds:Reference URI="#STR1">
+            <ds:Transform Algorithm="...#STR-Transform">
+              <wsse:TransformationParameters>
+                <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/></></></>
+          <ds:Reference URI="#BDY"/></>
+        ...</></></>
+  <e:Body wsu:Id="BDY">
+    <xx:Query/></></>
+
+*** is the reference above to wsse11:TokenType really correct?
+
+Note how the <Subject> and the attributes are encrypted such that only
+the WSP can open them. This protects against WSC gaining knowledge of
+the NameID at the WSP.
+
+<<references:
+
+[SAML11core] SAML 1.1 Core, OASIS, 2003
+
+[SAML11bind] "Bindings and Profiles for the OASIS Security Assertion Markup Language (SAML) V1.1", Oasis Standard, 2.9.2003, oasis-sstc-saml-bindings-1.1
+
+[IDFF12] http://www.projectliberty.org/resources/specifications.php
+
+[IDFF12meta] Peted Davis, Ed., "Liberty Metadata Description and Discovery Specification", version 1.1, Liberty Alliance Project, 2004. (liberty-metadata-v1.1.pdf)
+
+[SAML2core] "Assertions and Protocols for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-core-2.0-os
+
+[SAML2prof] "Profiles for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-profiles-2.0-os
+
+[SAML2bind] "Bindings for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-bindings-2.0-os
+
+[SAML2context] "Authentication Context for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-authn-context-2.0-os
+
+[SAML2meta] Cantor, Moreh, Phipott, Maler, eds., "Metadata for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-metadata-2.0-os
+
+[SAML2security] "Security and Privacy Considerations for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-sec-consider-2.0-os
+
+[SAML2conf] "Conformance Requirements for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-conformance-2.0-os
+
+[SAML2glossary] "Glossary for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-glossary-2.0-os
+
+[XML-C14N] XML Canonicalization (non-exclusive), http://www.w3.org/TR/2001/REC-xml-c14n-20010315; J. Boyer: "Canonical XML Version 1.0", W3C Recommendation, 15.3.2001, http://www.w3.org/TR/xml-c14n, RFC3076
+
+[XML-EXC-C14N] Exclusive XML Canonicalization, http://www.w3.org/TR/xml-exc-c14n/ 
+
+[Shibboleth] http://shibboleth.internet2.edu/shibboleth-documents.html
+
+[XMLENC] "XML Encryption Syntax and Processing", W3C Recommendation, 10.12.2002, http://www.w3.org/TR/xmlenc-core
+
+[XMLDSIG] "XML-Signature Syntax and Processing", W3C Recommendation, 12.2.2002, http://www.w3.org/TR/xmldsig-core, RFC3275
+
+[Disco2] Liberty ID-WSF Discovery service 2.0
+
+[Disco12] Liberty ID-WSF Discovery service 1.1 (liberty-idwsf-disco-svc-v1.2.pdf)
+
+[SecMech2] Liberty ID-WSF 2.0 Security Mechanisms
+
+[SOAPAuthn2] Liberty ID-WSF 2.0 Authentication Service
+
+[SOAPBinding2] Liberty ID-WSF 2.0 framework document that pulls together all aspects
+
+[DST21] Liberty Data Services Template 2.1
+
+[DST20] Liberty DST v2.0
+
+[DST11] Liberty DST v1.1
+
+[IDDAP] Liberty Identity based Directory Access Protocol
+
+[IDPP] Liberty Personal Profile specification.
+
+[Interact11] Liberty ID-WSF Interaction Service protocol 1.1
+
+[FF12] Liberty ID Federation Framework 1.2, Protocols and Schemas
+
+[SUBS2] Liberty Subscriptions and Notifications specification
+
+[Schema1-2] Henry S. Thompson et al. (eds): XML Schema Part 1: Structures, 2nd Ed., WSC Recommendation, 28. Oct. 2004, http://www.w3.org/2002/XMLSchema
+
+[XML] http://www.w3.org/TR/REC-xml
+
+[RFC1950] P. Deutcsh, J-L. Gailly: "ZLIB Compressed Data Format Specification version 3.3", Aladdin Enterprises, Info-ZIP, May 1996
+
+[RFC1951] P. Deutcsh: "DEFLATE Compressed Data Format Specification version 1.3", Aladdin Enterprises, May 1996
+
+[RFC1952] P. Deutcsh: "GZIP file format specification version 4.3", Aladdin Enterprises, May 1996
+
+[RFC2246] TLSv1
+
+[RFC2251] LDAP
+
+[RFC3548] S. Josefsson, ed.: "The Base16, Base32, and Base64 Data Encodings", July 2003. (Section 4 describes Safebase64)
+
+[MS-MWBF] Microsoft Web Browser Federated Sign-On Protocol Specification, 20080207, http://msdn2.microsoft.com/en-us/library/cc236471.aspx
+
+>>
+
+<<htmlpreamble: <title>README ZXID</title><body bgcolor="#330033" text="#ffaaff" link="#ffddff" vlink="#aa44aa" alink="#ffffff"><font face=sans><h1>README ZXID</h1> >>
+
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+
+SAML Open Source catalogs
+http://saml.xml.org/saml-open-source-implementations
+http://openliberty.org/wiki/index.php/Existing_Identity_Systems#Open_Source_
+http://docs.safehaus.org/display/HAUS/Id+OSS+Map
+
+Suspicious: when decrypting elements and plugging their plain
+text variants into original data structure, the wo pointers
+are not updated. Thus the "old" encrypted data may remain
+accessible for some purposes.
+
+Pointers from Pat
+http://rnd.feide.no/2007/04/13/light-bulb-update-request-for-testing/
+https://opensso.dev.java.net/public/extensions/index.html
+
+Add macros for OK response.
+
+http://wiki.oasis-open.org/security/SstcSamlX509AuthnAttribProfile
+http://wiki.oasis-open.org/security/SimpleSignBinding
+
+
+On CYGWIN lockf() and flock() apparently are not defined.
+On mingw they are.
+
+Way to pass RelayState through zxid_simple()
+
+AuditExplorer
+
+elgg.org is very relevant for e-Learning / HR-XML market
+https://imb.phil.uni-augsburg.de/elgg/
+
+FEDORA
+
+Moodle (Open Source, Open University)
+MyStuff (Open Source, Open University)
+
+Privacy features of SAML/Liberty
+User centric features of SAML/Liberty
+- User control (not necessarily interaction every steps of the way)
+
+ECP + IS plugin for Firefox
+
+==================
+In general, wild card cert is one whose cn field is of form *.cellmail.com
+
+The openssl command for creating CSR is 'openssl req', for example
+
+> openssl req -new -nodes -keyout pkey.pem -out req.pem       
+Generating a 1024 bit RSA private key
+......................++++++
+.................................................................................++++++
+writing new private key to 'pkey.pem'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:FI
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:Helsinki
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Tietosampo
+Organizational Unit Name (eg, section) []:
+Common Name (eg, YOUR name) []:*.tietosampo.fi
+Email Address []:sampo@iki.fi
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+
+In the example above I left the challenge password and company name empty, but
+it could be that Thawte insists that you fill in something there. They may
+also have specific requirements about the company name (and possibly the Organization
+Name and Oraganization Unit Name) matching the registered name of your company.
+
+Anyway, the output from the above should be
+
+> cat req.pem 
+-----BEGIN CERTIFICATE REQUEST-----
+MIIBwjCCASsCAQAwgYExCzAJBgNVBAYTAkZJMRMwEQYDVQQIEwpTb21lLVN0YXRl
+MREwDwYDVQQHEwhIZWxzaW5raTETMBEGA1UEChMKVGlldG9zYW1wbzEYMBYGA1UE
+AxQPKi50aWV0b3NhbXBvLmZpMRswGQYJKoZIhvcNAQkBFgxzYW1wb0Bpa2kuZmkw
+gZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALudDsX0ZU13ajartg4IECD0+5Lo
+xSThKu47vQ6GfIeh1+5QO0PCytmrUAI+w0mai9gIp4MssBGqvLs5e2No09ih1KmM
+7s8tgXnnexRQ7FsTEVnaZlZ2dgMNO4DYYtRgX+Kxks6hpHLEY0R3VmCVe1BPlkPs
+0Y4gP1yDNMXMAO+bAgMBAAGgADANBgkqhkiG9w0BAQUFAAOBgQBSWviTot4mScAi
+xGlky+UqkYtih0dmqhBBTiiSaVHBerUATKG0p8NkM0NGXuPt8Wozx6t53f8VeXDo
+BML4SzkoYSrmOkEqk8np8O3IWSG4+HRwhetG/THOvNwRz9shvadPec+VQxJEL2FC
+vxz/z/oQ8oFxyCwVUtTb4zKhT9rFEw==
+-----END CERTIFICATE REQUEST-----
+
+Or if you want to convince yourself that the wild card is
+really in there, you can check with
+
+> openssl asn1parse  <req.pem      
+    0:d=0  hl=4 l= 450 cons: SEQUENCE          
+    4:d=1  hl=4 l= 299 cons: SEQUENCE          
+    8:d=2  hl=2 l=   1 prim: INTEGER           :00
+   11:d=2  hl=3 l= 129 cons: SEQUENCE          
+   14:d=3  hl=2 l=  11 cons: SET               
+   16:d=4  hl=2 l=   9 cons: SEQUENCE          
+   18:d=5  hl=2 l=   3 prim: OBJECT            :countryName
+   23:d=5  hl=2 l=   2 prim: PRINTABLESTRING   :FI
+   27:d=3  hl=2 l=  19 cons: SET               
+   29:d=4  hl=2 l=  17 cons: SEQUENCE          
+   31:d=5  hl=2 l=   3 prim: OBJECT            :stateOrProvinceName
+   36:d=5  hl=2 l=  10 prim: PRINTABLESTRING   :Some-State
+   48:d=3  hl=2 l=  17 cons: SET               
+   50:d=4  hl=2 l=  15 cons: SEQUENCE          
+   52:d=5  hl=2 l=   3 prim: OBJECT            :localityName
+   57:d=5  hl=2 l=   8 prim: PRINTABLESTRING   :Helsinki
+   67:d=3  hl=2 l=  19 cons: SET               
+   69:d=4  hl=2 l=  17 cons: SEQUENCE          
+   71:d=5  hl=2 l=   3 prim: OBJECT            :organizationName
+   76:d=5  hl=2 l=  10 prim: PRINTABLESTRING   :Tietosampo
+   88:d=3  hl=2 l=  24 cons: SET               
+   90:d=4  hl=2 l=  22 cons: SEQUENCE          
+   92:d=5  hl=2 l=   3 prim: OBJECT            :commonName
+   97:d=5  hl=2 l=  15 prim: T61STRING         :*.tietosampo.fi
+  114:d=3  hl=2 l=  27 cons: SET               
+  116:d=4  hl=2 l=  25 cons: SEQUENCE          
+  118:d=5  hl=2 l=   9 prim: OBJECT            :emailAddress
+  129:d=5  hl=2 l=  12 prim: IA5STRING         :sampo@iki.fi
+  143:d=2  hl=3 l= 159 cons: SEQUENCE          
+  146:d=3  hl=2 l=  13 cons: SEQUENCE          
+  148:d=4  hl=2 l=   9 prim: OBJECT            :rsaEncryption
+  159:d=4  hl=2 l=   0 prim: NULL              
+  161:d=3  hl=3 l= 141 prim: BIT STRING        
+  305:d=2  hl=2 l=   0 cons: cont [ 0 ]        
+  307:d=1  hl=2 l=  13 cons: SEQUENCE          
+  309:d=2  hl=2 l=   9 prim: OBJECT            :sha1WithRSAEncryption
+  320:d=2  hl=2 l=   0 prim: NULL              
+  322:d=1  hl=3 l= 129 prim: BIT STRING        
+
+Here we can see that hitting empty for State or Provice question was not
+such a smart idea after all: it used nonsensical default value. I guess
+you would have to invent something as place holder.
+ 
+> On another train of thought, if I was to have a local CA here, could I use the
+> commercial certificate I get to sign the x509 certificates I would make? The
+> x509 would be used to sign emails via smart cards. This is not a commercial
+> project but rather one to learn more about smart cards. Sun has made code
+> available to manage smart cards so it may be interesting to learn more.
+
+The regular SSL certificate usually will not work as CA certificate due
+to certificate usage indicators. Technically it is possible to ignore
+such indicators and use the certificate anyway, but a lot of widely
+distributed software does not ignore them so you would have a lot of
+interoperability problems or at least confirmation questions.
+
+Commercial CAs do issue CA certificates, but they tend to be expensive.
+
+Even if you get commercial CA certificate, you should know that some (older)
+software only supports one level of certificate hierarchy. This problem
+has surfaced when some commercial CAs tried to structure themselves
+internally as multi layer CA.
+
+If you want to run your own CA, all you really have to do is configure
+the CA cert of yours to be trusted by all the software. For browsers
+this is easy enough within the GUI itself. For servers (such as apache
+or dsproxy), there is a way to do this at config file level. Configuring
+direct trust to your CA cert tends to be easier than trying to get
+commercial CA cert and playing multilayer CA games.
+
+Re Thunderbird, I am bit surprised that it does not accept self signed
+certs. It seems more probable to me that it actually can be configured
+to accept them, but does not ship with that turned on to protect
+naive users. The most basic way to use self signed cert would be
+to import the self signed cert as one of the trusted CA certs.
+
+Was your problem with Thunderbird not accepting the IMAPS connection? In
+that case the Thunderbird client software needs to start trusting the
+self signed cert as CA cert. There is probably a GUI way to do this - probably
+something very similar to the Firefox GUI for configuring certs.
+
+If you were trying to configure a ClientTLS certificate and the IMAPS
+server refused it, then you need to adjust configuration in the
+server end, probably in a config file.
+
+
+
+-----
+
+ZXID CARML stack
+
+* frontend API bindings
+* middle layer routing and mapping engine
+* backend connectors
+
+--Sampo
+
+
+-----
+
+http://saml.xml.org/products
+http://saml.xml.org/zxid
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0
+and Liberty ID-WSF 2.0 stacks. It is a C implementation with minimal
+external dependencies - OpenSSL, CURL, and zlib - ensuring easy
+deployment (no DLLhell). Due to its small footprint and efficient and
+accurate schema driven implementation, it is suitable for embedded and
+high volume applications. Language bindings to all popular highlevel
+languages such as PHP, Perl, and Java, are provided via SWIG.  ZXID
+implements, as of July 07, SP, WSC, and WSP roles.
+
+
+
+
+Paul Madsen wrote:
+> http://saml.xml.org/forum/calculating-digest-of-an-authentication-statement
+> 
+> Dear Sirs, my name is Gianluca from Italy
+>  I'm trying to calculate the Digest value of a SAML Authentication
+> STatement whith the SHA-1 algorithm. Let us suppose that we are dealing
+> with a string representing the following node:
+> 
+> <saml:AuthenticationStatement>
+>     <saml:Subject>
+>         <saml:NameIdentifier>GIANLUCA</saml:NameIdentifier>
+>     </saml:Subject>
+> </saml:AuthenticationStatement>
+> 
+> When I try to calculate SHA-1 with the function  b64_sha1(str2Digest) 
+> what
+> exactly should the string str2Digest contain? I mean it should be equal to
+> "<saml:AuthenticationStatement><saml:Subject><saml:NameIdentifier>GIANLUCA<
+> /saml:NameIdentifier></saml:Subject></saml:AuthenticationStatement>"
+> or only "GIANLUCA" or ....what else?
+
+Its a pity he did not provide email address, but lets hope this reaches
+him anyway.
+
+1. There is no univesally agreed way to digest Authentication Statements
+2. "Universally" agreed way to digest XML in general is exc-c14n (exclusive
+   canonicalization) [XML-EXC-C14N]. This method is used by all certified
+   SAML implementations. It is also the method used by digital
+   signatures [XMLDSIG].
+3. Canonicalization is difficult and typically 80% of digital signature
+   failures derive from canonicalization bugs. Of those 95% are
+   XML namespace related (curse the inventor of XML namespaces), and
+   4% are whitespace related.
+4. For what you are apparently trying to do, it is important to
+   digest the entire canonicalized Authentication Statement.
+   If the question had been about canonicalizing the NameID, it
+   would still be important to digest the entire canonicalized
+   Name Identifier as the actual value in isolation is meaningless.
+   You need the identifier type and namespace qualification
+   for the digest to be meaningful.
+
+[XML-C14N] XML Canonicalization (non-exclusive), http://www.w3.org/TR/2001/REC-xml-c14n-20010315; J. Boyer: "Canonical XML Version 1.0", W3C Recommendation, 15.3.2001, http://www.w3.org/TR/xml-c14n, RFC3076
+
+[XML-EXC-C14N] Exclusive XML Canonicalization, http://www.w3.org/TR/xml-exc-c14n/ 
+
+[XMLDSIG] "XML-Signature Syntax and Processing", W3C Recommendation, 12.2.2002, http://www.w3.org/TR/xmldsig-core, RFC3275
+
+Cheers,
+--Sampo

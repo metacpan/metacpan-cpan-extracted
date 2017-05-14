@@ -2,24 +2,6 @@
 
 Myco::Admin - myco System Administration Guide.
 
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
-
 =head1 DESCRIPTION
 
 This guide is intended for the system administrator in charge of installing,
@@ -77,15 +59,21 @@ START MODULE LIST
 
 =item Bit::Vector
 
+=item Class::Accessor::Assert
+
 =item Class::Data::Inheritable
 
 =item Class::Inner
 
-=item Class::Tangram 1.15
+=item Class::Tangram 1.57
+
+=item Config::General
 
 =item DBD::Pg
 
 =item DBI
+
+=item Data::Lazy 0.6
 
 =item Date::Calc
 
@@ -94,6 +82,8 @@ START MODULE LIST
 =item Devel::StackTrace
 
 =item Devel::Symdump
+
+=item Digest::SHA1
 
 =item Error
 
@@ -105,7 +95,7 @@ START MODULE LIST
 
 =item Set::Object 1.04
 
-=item Tangram
+=item Tangram 2.10
 
 =item Test::Unit
 
@@ -165,7 +155,7 @@ requires a number of extra steps that one might not expect.
 
 If you're using Redhat Linux you may already have Postgres installed. If so,
 all you need to do to get it ready for use with myco is edit your
-postgresql.conf file (run C<locate postgresql.conf> to find it) and turn on
+postgresql.conf file (run C<locate postgresql.conf> or C<find / -name postgresql.conf -print> to find it) and turn on
 the tcpip_socket option:
 
   tcpip_socket = true
@@ -199,7 +189,7 @@ Install PostgreSQL:
 
 If the PostgreSQL installation did not create a user named "pgsql" for you,
 create it now. This is the user that will start the PostgreSQL server and own
-the log and data files.
+the log and data files. Certain platforms (i.e. various Linux distributions) may create another user to own and run the server process. On FreeBSD (our favourite platform), "pgsql" is the user. The following instructions were written with this in mind.
 
 =item *
 
@@ -220,11 +210,11 @@ and set the right permissions:
 Initialize the PostgreSQL database. Be sure to pass the directory you just
 created to the C<-D> command.
 
-  su - pgsql -c "/usr/local/pgsql/bin/initdb -D /var/db/pgsql/data"
+  su - pgsql -c "initdb -D /var/db/pgsql/data"
 
 =item *
 
-Start the PostgreSQL "postmaster".
+Start the PostgreSQL "postmaster". On FreeBSD this looks like so:
 
   /usr/local/etc/rc.d/pgsql.sh start
 
@@ -235,12 +225,12 @@ environment variable first:
 
 =item *
 
-Now create a postgres user for yourself. Using your login username is best,
-since the myco deploy and testrun scripts depend on this. The other option is
-to set the C<PGDATABASE>, C<PGUSER>, C<PGPASSWORD> environment variables.
+Now create a postgres user for yourself.
 
   su - pgsql -c "createuser someuser"
 
+Be sure to enter the postrges username, password and database name into C<myco.conf>. The Makefile.PL script included with myco will do this for you.
+    
 =back
 
 
@@ -254,16 +244,16 @@ will not provide this support by default.
 
 =head2 Myco.pm and required Perl Modules
 
-There are quite a few 3rd-party Perl modules required by the myco framework (see
-L<"PACKAGES"> above for a list). The easiest way to install them all, together
-with all myco framework modules (Myco.pm et al), is to let CPAN.pm take care of
-the process:
+There are quite a few 3rd-party Perl modules required by the myco framework
+(see L<"PACKAGES"> above for a list). The easiest way to install them all,
+together with all myco framework modules (Myco.pm et al), is to let CPAN.pm
+take care of the process:
 
   perl -MCPAN -e 'install Myco'
 
 If you have never before used the CPAN module then you will be prompted to
-go through configuration process.  Setting the environment variable FTP_PASSIVE
-beforehand can be helpful:
+go through configuration process. If your computer sits behind a firewall,
+setting the environment variable FTP_PASSIVE beforehand can be helpful:
 
  export FTP_PASSIVE=yes   # sh, bash
  setenv FTP_PASSIVE yes   # csh
@@ -296,29 +286,29 @@ Change to the source directory and execute these commands:
 
 =head2 Deploying the Database
 
-Now you should deploy the database, assuming you were successful in installing
-PostgreSQL.
+Now you should myco-deploy the database, assuming you were successful in installing
+PostgreSQL. The CPAN installation method will have already done this for you, if you answered "yes" to the "Do you plan to run the test suite?" question.
 
 =over
 
 =item *
 
-Set the MYCO_ROOT environment variable to point to the directory (usually 'myco'
-or 'myco/framework') that contains the 'classes', 'test',
-'bin', and 'conf' directories. Alternatively you can set it temporarily on the
-command line if you don't plan to be runnin the myco web application.
+Set the MYCO_ROOT environment variable to point to the directory (usually
+'myco' or 'myco/framework') that contains the 'classes', 'test', 'bin', and
+'conf' directories. Alternatively you can set it temporarily on the command
+line.
 
 =item *
 
-Change to the 'bin' directory, in the source directory, and run the 'deploy'
+Change to the 'bin' directory, in the source directory, and run the 'myco-deploy'
 script:
 
   cd bin
-  perl deploy
+  perl myco-deploy
 
-or
+or, in csh:
 
-  env MYCO_ROOT=~/myco/framework perl deploy
+  env MYCO_ROOT=~/myco perl myco-deploy
 
 =back
 
@@ -330,11 +320,11 @@ myco-users@lists.sourceforge.net
 
 =head1 AUTHOR
 
-Charles Owens <czbsd@cpan.org> and Ben Sommer <Ben.Sommer@enc.edu>; based on
+Charles Owens <czbsd@cpan.org> and Ben Sommer <ben@mycohq.com>; based on
 L<Bric::Admin|Bric::Admin> by David Wheeler
 
 =head1 SEE ALSO
 
-L<Myco|Myco>, L<Myco::Base::Entity|Myco::Base::Entity>
+L<Myco|Myco>, L<Myco::Entity|Myco::Entity>
 
 =cut

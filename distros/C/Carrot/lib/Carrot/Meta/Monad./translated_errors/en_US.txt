@@ -1,0 +1,16 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+package_dot_missing
+	The package dot directory doesn't exist.
+	Directory: %s
+
+subroutine_name_not_qualified
+	The subroutine name misses full qualification (with a package name).
+	Subroutine: %s
+
+autoload_rule_missing
+	No rule to autoload a monad provider.
+	Name: %s

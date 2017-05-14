@@ -1,9 +1,40 @@
 ==================================================
-Changes from 2016-05-02 00:00:00 +0000 to present.
+Changes from 2016-05-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-05-02 19:30:55 +0000
+version 0.004 at 2017-05-09 18:08:12 +0000
+------------------------------------------
+
+  Change: 8cf428963af3304d843e2e074fca4b7fd4dd2c09
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-05-09 12:08:03 +0000
+
+    Version bump 
+
+  Change: ed7143e7f9303380b31d79c43e73d41444a078ea
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-05-08 17:32:46 +0000
+
+    Merge pull request #2 from oaxlin/master
+
+    fix version numbers and mask cc data 
+
+  Change: 43f7ce9816072b75de11b43ef7651542929869af
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-05-08 16:12:46 +0000
+
+    remove version number, it is auto generated... put in scrubbing of
+    cc/cvv 
+
+  Change: d3e1f1522a15235536af62afa08c86448691589e
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-05-08 16:12:10 +0000
+
+    auto version numbers 
+
+------------------------------------------
+version 0.003 at 2017-05-02 19:30:42 +0000
 ------------------------------------------
 
   Change: bbfb139463167336f6fa11577bae18da7aaeccd2

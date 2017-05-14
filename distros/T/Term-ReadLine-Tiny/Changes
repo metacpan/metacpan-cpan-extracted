@@ -1,3 +1,7 @@
+1.08	2017-05-11
+		- Added keys that starting with ^[O
+		- Returns binary encoded UTF-8 string when input handle has :utf8 layer and utf8 feature is true
+
 1.07	2017-05-09
 		- Bug fix: Cursor appearance at end of terminal line
 		- Line auto completion by Tab

@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Upload;
-our $VERSION = '0.006';
+our $VERSION = '0.008';
 # ABSTRACT: API for uploads to CPAN
 
 #pod =head1 DESCRIPTION
@@ -151,7 +151,7 @@ CPAN::Testers::API::Controller::Upload - API for uploads to CPAN
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 DESCRIPTION
 

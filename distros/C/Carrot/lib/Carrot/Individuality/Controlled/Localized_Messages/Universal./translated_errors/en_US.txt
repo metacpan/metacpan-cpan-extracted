@@ -1,0 +1,9 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+message_not_found
+	An error message was requested for a package, but couldn't be found.
+	Package: %s
+	Message: '%s'

@@ -1,0 +1,162 @@
+=head1 SYNOPSIS
+
+A basic synopsis follows.  For a more complete definition of the syntax
+supported in Config::XML, see the XML Schema in hopkins.xsd.
+
+ <?xml version="1.0" encoding="UTF-8"?>
+ <hopkins>
+   <state>
+     <root>/path/to/durable/storage</root>
+   </state>
+
+   <plugin name="Plugin">
+     [ .... ]
+   </plugin>
+
+   <database>
+     <dsn>...</dsn>
+     <user>...</user>
+     <pass>...</pass>
+     <options>
+       <option name="..." value="..." />
+       [ ... ]
+     </options>
+   </database>
+
+   <queue name="...">
+     <concurrency>N</concurrency>
+   </queue>
+
+   <queue name="...">
+     <concurrency>N</concurrency>
+   </queue>
+
+   <task name="..." [ enabled="no" ] [ stack="no|N" ] [ onerror="disable" ]>
+     <class>...</class>
+     <queue>...</queue>
+     <options>
+       <option name="..." value="..." type="text|combo|bool" />
+       [ ... ]
+     </options>
+   </task>
+ </hopkins>
+
+=head1 EXAMPLE
+
+An example configuration follows.
+
+ <?xml version="1.0" encoding="UTF-8"?>
+ <hopkins>
+   <!-- store state according to the FHS -->
+   <state>
+     <root>/var/lib/hopkins</root>
+   </state>
+
+   <!-- catalyst-powered web interface plugin authenticating against
+        active directory -->
+   <plugin name="HMI">
+     <auth>
+       <default>
+         <credential>
+           <class>Password</class>
+           <password_field>password</password_field>
+           <password_type>self_check</password_type>
+         </credential>
+         <store>
+           <class>LDAP</class>
+           <binddn>cn=UNIX,ou=System Accounts,ou=Accounts,dc=domain,dc=com</binddn>
+           <bindpw>unix</bindpw>
+           <ldap_server>pdc:389</ldap_server>
+           <ldap_server_options>
+             <timeout>30</timeout>
+           </ldap_server_options>
+           <role_basedn>ou=Groups,dc=domain,dc=com</role_basedn>
+           <role_field>name</role_field>
+           <role_filter>(member=%s)</role_filter>
+           <role_scope>sub</role_scope>
+           <role_search_as_user>0</role_search_as_user>
+           <role_search_options>
+             <deref>always</deref>
+           </role_search_options>
+           <role_value>dn</role_value>
+           <use_roles>1</use_roles>
+           <user_basedn>ou=Accounts,dc=domain,dc=com</user_basedn>
+           <user_field>mail</user_field>
+           <user_filter>(userPrincipalName=%s)</user_filter>
+         </store>
+       </default>
+     </auth>
+     <session class="Session::Store::File">
+       <storage>/tmp/cat-session-store-file</storage>
+       <expires>99999</expires>
+     </session>
+   </plugin>
+
+   <!-- use mysql for the database backend -->
+   <database>
+     <dsn>dbi:mysql:database=hopkins;host=localhost</dsn>
+     <user>root</user>
+     <pass></pass>
+     <options>
+       <option name="AutoCommit" value="1" />
+       <option name="RaiseError" value="1" />
+       <option name="mysql_auto_reconnect" value="1" />
+       <option name="quote_char" value="" />
+       <option name="name_sep" value="." />
+     </options>
+   </database>
+
+   <!-- a queue with up to five workers -->
+   <queue name="shared">
+     <concurrency>5</concurrency>
+   </queue>
+
+   <!-- a serialized queue that stops if any tasks fail -->
+   <queue name="orders" onerror="halt">
+     <concurrency>1</concurrency>
+   </queue>
+
+   <!-- basic task; runs at 11pm Mon-Fri -->
+   <task name="Order Fulfillment">
+     <class>MyApp::Job::OrderFulfillment</class>
+     <queue>orders</queue>
+     <schedule><cron>0 23 * * 1-5</cron></schedule>
+   </task>
+
+   <!-- basic task; no schedule -->
+   <task name="One Off">
+     <class>MyApp::Job::OneOff</class>
+     <queue>shared</queue>
+   </task>
+
+   <!-- multiple schedules to get around limitations in cron -->
+   <task name="Charge">
+     <class>MyApp::Job::Charge</class>
+     <queue>orders</queue>
+     <schedule>
+       <cron>*/10 8-17 * 1-5</cron>
+       <cron>45 23 * * 1-5</cron>
+     </schedule>
+   </task>
+
+   <!-- a disabled task -- please no discombobulations today -->
+   <task name="Discombobulator" enabled="no">
+     <class>MyApp::Job::Discombobulator</class>
+     <queue>shared</queue>
+     <options>
+       <option name="who" value="everyone" />
+       <option name="really" type="bool" value="1" />
+     </options>
+   </task>
+
+   <!-- only enqueue once; there's no reason to ping flood the site-->
+   <task name="HTTP Monitor" stack="no">
+     <class>MyApp::Job::Monitor</class>
+     <queue>shared</queue>
+     <options>
+       <option name="url" value="http://www.domain.com" />
+     </options>
+   </task>
+ </hopkins>
+
+=cut

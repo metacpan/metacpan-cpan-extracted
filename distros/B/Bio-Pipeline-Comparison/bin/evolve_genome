@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+package Bio::Pipeline::Comparison::EvolveGenome;
+# ABSTRACT: Take in a reference genome and evolve it.
+# PODNAME: evolve_genome
+
+BEGIN { unshift( @INC, '../lib' ) }
+use Moose;
+use Getopt::Long;
+use Cwd 'abs_path';
+use File::Path qw(make_path);
+use Bio::Pipeline::Comparison;
+use Bio::Pipeline::Comparison::Generate::EvolvedSet;
+
+my ($number_of_genomes, $create_archive, $help );
+
+GetOptions(
+    'n|number_of_genomes=i' => \$number_of_genomes,
+    'a|create_archive'      => \$create_archive,
+    'h|help'                => \$help,
+);
+
+my $reference_filename = $ARGV[0];
+
+( defined($reference_filename) && ( -e $reference_filename ) && !$help ) or die <<USAGE;
+Usage: evolve_genome [options]
+Given a reference genome, introduce changes
+
+# Create 1 evolved genome
+evolve_genome my_reference.fa
+
+# Specify the number of evolved genomes
+evolve_genome -n 10 my_reference.fa
+
+# Create an archive (tar and gzipped) of the reference, evolved genomes and VCFs
+evolve_genome -a my_reference.fa
+
+# This help message
+evolve_genome -h
+
+USAGE
+
+$reference_filename  = abs_path($reference_filename);
+$number_of_genomes ||= 1;
+
+my $evolved_set = Bio::Pipeline::Comparison::Generate::EvolvedSet->new(input_filename => $reference_filename, number_of_genomes => $number_of_genomes);
+$evolved_set->evolve;
+
+if(defined($create_archive))
+{
+   $evolved_set->create_archive;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+evolve_genome - Take in a reference genome and evolve it.
+
+=head1 VERSION
+
+version 1.123050
+
+=head1 SYNOPSIS
+
+Take in a reference genome and evolve it.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Bio::Pipeline::Comparison>
+
+=back
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

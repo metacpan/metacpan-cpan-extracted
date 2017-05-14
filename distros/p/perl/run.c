@@ -26,28 +26,27 @@
 #include "perl.h"
 
 /*
- * "Away now, Shadowfax!  Run, greatheart, run as you have never run before!
- * Now we are come to the lands where you were foaled, and every stone you
- * know.  Run now!  Hope is in speed!"  --Gandalf
+ * 'Away now, Shadowfax!  Run, greatheart, run as you have never run before!
+ *  Now we are come to the lands where you were foaled, and every stone you
+ *  know.  Run now!  Hope is in speed!'                    --Gandalf
+ *
+ *     [p.600 of _The Lord of the Rings_, III/xi: "The Palantír"]
  */
 
 int
 Perl_runops_standard(pTHX)
 {
-    while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX))) {
-	PERL_ASYNC_CHECK();
+    OP *op = PL_op;
+    PERL_DTRACE_PROBE_OP(op);
+    while ((PL_op = op = op->op_ppaddr(aTHX))) {
+        PERL_DTRACE_PROBE_OP(op);
     }
+    PERL_ASYNC_CHECK();
 
     TAINT_NOT;
     return 0;
 }
 
 /*
- * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: t
- * End:
- *
- * ex: set ts=8 sts=4 sw=4 noet:
+ * ex: set ts=8 sts=4 sw=4 et:
  */

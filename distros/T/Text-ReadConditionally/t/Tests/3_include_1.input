@@ -1,0 +1,4 @@
+.# Title: Include simple
+Line 1
+.include 3_include_1.inc
+Line end

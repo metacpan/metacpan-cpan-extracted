@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+# PODNAME: get-shit-done
+# ABSTRACT: Boost productivity by blocking distracting websites
+
+use strict;
+use warnings;
+
+use App::GSD;
+use English qw($EUID);
+use File::ShareDir qw(dist_dir);
+use Getopt::Long;
+use Pod::Usage;
+use YAML;
+
+my $DIST = 'App-GSD';
+my @config_paths = ('/etc/get-shit-done.yaml', '/etc/gsd.yaml');
+
+GetOptions(
+    'help' => sub { pod2usage() },
+    'man' => sub { pod2usage({-verbose => 2}) },
+    'config=s' => sub { @config_paths = ($_[1]) },
+) or pod2usage(1);
+
+$EUID != 0 && pod2usage("This program must be run as root");
+}
+
+my $mode = shift or pod2usage('Invalid mode');
+@ARGV == 0 or pod2usage('Too many arguments');
+
+my $config = get_config(@config_paths);
+
+my $app = App::GSD->new($config);
+if ($mode =~ /^(work|play)$/) {
+    $app->$mode;
+}
+else {
+    pod2usage("Missing mode '$mode'");
+}
+
+sub get_config {
+    my $config = (grep { -f } @_)[0];
+    if (!defined $config) {
+        my $sample_config = dist_file($DIST, 'sample.yaml');
+        die "No configuration found, please copy the sample config at '$sample_config' "
+          . " to '$_[0]'\n";
+
+    eval { return YAML::LoadFile($config) }
+        or die "Could not read configuration file '$config':\n$@\n";
+}
+
+
+
+=pod
+
+=head1 NAME
+
+get-shit-done - Boost productivity by blocking distracting websites
+
+=head1 VERSION
+
+version 0.4
+
+=head1 SYNOPSIS
+
+ sudo get-shit-done [work|play]
+
+=head1 DESCRIPTION
+
+C<get-shit-done> is a simple utility that blocks a user-specified list of
+sites at the DNS level by adding host entries pointing to 127.0.0.1 in the
+system's hosts file. Invoking with C<work> as an argument blocks the sites;
+C<play> unblocks them. After either operation, the DNS cache is flushed.
+
+=head1 CONFIGURATION
+
+The script will look for either C</etc/get-shit-done.yaml> or C</etc/gsd.yaml>
+for configuration. The file is in YAML format, with the following fields:
+
+=head2 block
+
+List of hostnames to block, without 'www.' prefix (if any). For example,
+if 'reddit.com' is provided, both 'reddit.com' and 'www.reddit.com' will
+be blocked.
+
+=head2 hosts_file
+
+Path to the system hosts file, e.g. /etc/hosts. If not supplied, a default
+is guessed based on operating system.
+
+=head2 network_command
+
+A command to flush DNS and/or restart the network. If not supplied, a
+default is guessed based on OS.
+
+=head1 FLUSHING THE DNS CACHE
+
+C<get-shit-done> attempts to support Mac OS X and Linux (patches for other
+operating systems are more than welcome). For the former, it flushes the
+DNS directly. On Linux, it will flush nscd or unscd caches if they are
+present, and restart the network via one of the following methods:
+
+=over
+
+=item *
+
+/etc/init.d/networking, if present (e.g. Ubuntu)
+
+=item *
+
+/etc/init.d/network (e.g. CentOS)
+
+=item *
+
+rc.d (e.g. Arch) - will detect which of network, NetworkManager or wicd
+is being used and restart that.
+
+=back
+
+=head1 CREDITS
+
+Inspired by the PHP/shell/python version by leftnode and contributors
+(L<https://github.com/leftnode/get-shit-done>).
+
+=head1 AUTHOR
+
+Richard Harris <RJH@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Richard Harris.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

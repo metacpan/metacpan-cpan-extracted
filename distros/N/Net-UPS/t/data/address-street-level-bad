@@ -1,0 +1,23 @@
+POST https://wwwcie.ups.com/ups.app/xml/XAV
+
+<?xml version='1.0' standalone='yes'?>
+<AddressValidationRequest>
+  <AddressKeyFormat>
+    <AddressLine>999 Not a Road</AddressLine>
+    <ConsigneeName>Bad Place</ConsigneeName>
+    <CountryCode>US</CountryCode>
+    <PoliticalDivision1>NY</PoliticalDivision1>
+    <PoliticalDivision2>Bad City</PoliticalDivision2>
+    <PostcodePrimaryLow>998877</PostcodePrimaryLow>
+  </AddressKeyFormat>
+  <Request>
+    <RequestAction>XAV</RequestAction>
+    <RequestOption>3</RequestOption>
+    <TransactionReference>
+      <CustomerContext>Net::UPS</CustomerContext>
+      <XpciVersion>1.0001</XpciVersion>
+    </TransactionReference>
+  </Request>
+</AddressValidationRequest>
+
+<?xml version="1.0"?><AddressValidationResponse><Response><TransactionReference><CustomerContext>Net::UPS</CustomerContext><XpciVersion>1.0001</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><NoCandidatesIndicator/><AddressClassification><Code>0</Code><Description>Unknown</Description></AddressClassification></AddressValidationResponse>

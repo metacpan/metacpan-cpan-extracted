@@ -36,10 +36,11 @@ my %WriteMakefileArgs = (
     "DateTime::Duration" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
+    "Test::Warn" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "MooseX::Clone" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::Warn" => 0,
   "Throwable" => 0,
   "URI::Escape" => 0,
   "namespace::clean" => 0,

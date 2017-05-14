@@ -1,0 +1,118 @@
+#!perl
+use strict;
+use warnings;
+package
+  cpan_upload;
+# PODNAME: cpan-upload
+# ABSTRACT: upload a distribution to the CPAN
+
+use CPAN::Uploader;
+use Getopt::Long::Descriptive 0.084;
+
+=head1 USAGE
+
+  usage: cpan-upload [options] file-to-upload-1 [ file-to-upload-2 ... ]
+    -v --verbose       enable verbose logging
+    -h --help          display this help message
+    --dry-run          do not actually upload anything
+
+    -u --user          your PAUSE username
+    -p --password      the password to your PAUSE account
+    -d --directory     a dir in your CPAN space in which to put the file
+    --http-proxy       URL of the http proxy to use in uploading
+
+=head1 CONFIGURATION
+
+If you have a C<.pause> file in your home directory, it will be checked for a
+username and password.  It should look like this:
+
+  user EXAMPLE
+  password your-secret-password
+
+You can GnuPG-encrypt this file if you wish:
+
+    # Follow the prompts, setting your key as the "recipient"
+    # Use ^D once you've finished typing out your authentication information
+    gpg -ea > $HOME/.pause
+    # OR, encrypt a file you already created:
+    gpg -ea $HOME/.pause && mv $HOME/.pause{.asc,}
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<CPAN::Uploader>
+
+=item L<Config::Identity>
+
+=back
+
+=cut
+
+my %arg;
+
+# This nonsensical hack is to cope with Module::Install wanting to call
+# cpan-upload -verbose; it should be made to use CPAN::Uploader instead.
+$ARGV[0] = '--verbose' if @ARGV == 2 and $ARGV[0] eq '-verbose';
+
+# Process arguments
+my ($opt, $usage) = describe_options(
+  "usage: %c [options] file-to-upload",
+
+  [ "verbose|v" => "enable verbose logging" ],
+  [ "help|h"    => "display this help message" ],
+  [ "dry-run"   => "do not actually upload anything" ],
+  [],
+  [ "user|u=s"      => "your PAUSE username" ],
+  [ "password|p=s"  => "the password to your PAUSE account" ],
+  [ "directory|d=s" => "a dir in your CPAN space in which to put the files" ],
+  [ "http-proxy=s"  => "URL of the http proxy to use in uploading" ],
+  [ "config|c=s"    => "config file to use; defaults to ~/.pause" ],
+);
+
+if ($opt->help) {
+  print $usage->text;
+  exit;
+}
+
+my $from_file = CPAN::Uploader->read_config_file($opt->config);
+
+die "Please provide at least one file name.\n" . $usage unless @ARGV;
+
+$arg{user} = $opt->_specified('user') ? $opt->user : $from_file->{user};
+
+die "Please provide a value for --user\n" unless defined $arg{user};
+
+$arg{user} = uc $arg{user};
+
+$arg{password} = $opt->password if $opt->_specified('password');
+
+if (
+  ! $arg{password}
+  and defined $from_file->{user}
+  and ($arg{user} eq uc $from_file->{user})
+) {
+  $arg{password} = $from_file->{password};
+}
+
+$arg{debug}  = 1 if $opt->verbose;
+$arg{subdir} = $opt->directory if defined $opt->directory;
+
+$arg{ $_ } = $opt->$_ for grep { defined $opt->$_ } qw(dry_run http_proxy);
+
+if (! $arg{password}) {
+  require Term::ReadKey;
+  local $| = 1;
+  print "PAUSE Password: ";
+  Term::ReadKey::ReadMode('noecho');
+  chop($arg{password} = <STDIN>);
+  Term::ReadKey::ReadMode('restore');
+  print "\n";
+}
+
+foreach my $file (@ARGV) {
+  CPAN::Uploader->upload_file(
+    $file,
+    \%arg,
+  );
+}

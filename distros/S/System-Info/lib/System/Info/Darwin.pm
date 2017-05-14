@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::BSD";
 
-our $VERSION = "0.050";
+our $VERSION = "0.051";
 
 =head1 NAME
 
@@ -27,6 +27,10 @@ sub prepare_sysinfo {
     my $system_profiler = __get_system_profiler () or
 	return $self->SUPER::prepare_sysinfo ();
 
+    if (my $kv = $system_profiler->{"System Version"}) {
+	$self->{__os} =~ s{\)$}{ - $kv)};
+	}
+
     my $model = $system_profiler->{"Machine Name"} ||
 		$system_profiler->{"Machine Model"};
 
@@ -45,7 +49,7 @@ sub prepare_sysinfo {
 sub __get_system_profiler {
     my $system_profiler_output = do {
 	local $^W = 0;
-	`/usr/sbin/system_profiler -detailLevel mini SPHardwareDataType`;
+	`/usr/sbin/system_profiler -detailLevel mini SPHardwareDataType SPSoftwareDataType`;
 	} or return;
 
     my %system_profiler;
@@ -54,21 +58,21 @@ sub __get_system_profiler {
 
     # convert newer output from Intel core duo
     my %keymap = (
-	"Processor Name"        => "CPU Type",
-	"Processor Speed"       => "CPU Speed",
-	"Model Name"            => "Machine Name",
-	"Model Identifier"      => "Machine Model",
+	"Processor Name"	=> "CPU Type",
+	"Processor Speed"	=> "CPU Speed",
+	"Model Name"		=> "Machine Name",
+	"Model Identifier"	=> "Machine Model",
 	"Number Of Processors"  => "Number Of CPUs",
 	"Number of Processors"  => "Number Of CPUs",
 	"Total Number of Cores" => "Total Number Of Cores",
 	);
     for my $newkey (keys %keymap) {
 	my $oldkey = $keymap{$newkey};
-	if (exists $system_profiler{$newkey}) {
+	exists $system_profiler{$newkey} and
 	    $system_profiler{$oldkey} = delete $system_profiler{$newkey};
-	    }
 	}
 
+    chomp ($system_profiler{"CPU Type"} ||= `uname -m`);
     $system_profiler{"CPU Type"} ||= "Unknown";
     $system_profiler{"CPU Type"}   =~ s/PowerPC\s*(\w+).*/macppc$1/;
     $system_profiler{"CPU Speed"}  =~
@@ -80,6 +84,23 @@ sub __get_system_profiler {
 1;
 
 __END__
+
+$ uname -a
+Darwin grannysmith.local 16.5.0 Darwin Kernel Version 16.5.0: Fri Mar  3 16:52:33 PST 2017; root:xnu-3789.51.2~3/RELEASE_X86_64 x86_64
+
+$ uname -m
+x86_64
+$ uname -n
+grannysmith.local
+$ uname -p
+i386
+$ uname -r
+16.5.0
+$ uname -s
+Darwin
+$ uname -v
+Darwin Kernel Version 16.5.0: Fri Mar  3 16:52:33 PST 2017; root:xnu-3789.51.2~3/RELEASE_X86_64
+
 
 =head1 COPYRIGHT AND LICENSE
 

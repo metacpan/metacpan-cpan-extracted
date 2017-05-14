@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+
+<class name="Employee">
+  <info>Stores an employee's data</info>
+  <uses>
+    <use>string</use>
+  </uses>
+  <dependencies>
+    <dependency>Object</dependency>
+  </dependencies>
+  <parents>
+    <parent name="Object" visibility="public"></parent>
+  </parents>
+  <methods>
+    <method name="increaseSalary" type="void">
+      <params>
+	<param name="percent" type="double">
+	</param>
+      </params>
+    </method>
+  </methods>
+  <properties>
+    <property name="Name" type="string" has_set="false">
+    </property>
+    <property name="SSN" type="int" has_set="false" is_unique="true">
+    </property>
+    <property name="Salary" type="double">
+    </property>
+  </properties>
+</class>

@@ -16,5 +16,5 @@
 #
 #$config{'purge'}          = 7 * 86400;.# for big hub[s]
 #
-# $config{dc}{'share'} = [qw(/usr/ports/distfiles /usr/ports/packages c:\dist c:\distr c:\pub )];
+# $config{dc}{'share'} = [qw(/usr/ports/distfiles /usr/ports/packages /var/cache/apt/archives c:\dist c:\distr c:\pub )];
 1;

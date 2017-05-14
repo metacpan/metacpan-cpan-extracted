@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::ReleaseStat;
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 # ABSTRACT: A single test report reduced to a simple pass/fail
 
 #pod =head1 SYNOPSIS
@@ -25,26 +25,7 @@ our $VERSION = '0.005';
 #pod
 #pod =head1 SEE ALSO
 #pod
-#pod =over 4
-#pod
-#pod =item L<DBIx::Class::Row>
-#pod
-#pod =item L<CPAN::Testers::Schema>
-#pod
-#pod =item L<CPAN::Testers::Schema::Result::Release>
-#pod
-#pod These rows are collected into the Release table.
-#pod
-#pod =item L<Labyrinth::Plugin::CPAN::Release>
-#pod
-#pod This module processes the data and writes to this table.
-#pod
-#pod =item L<http://github.com/cpan-testers/cpantesters-project>
-#pod
-#pod For an overview of how the CPANTesters project works, and for
-#pod information about project goals and to get involved.
-#pod
-#pod =back
+#pod L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 #pod
 #pod =cut
 
@@ -94,6 +75,7 @@ column id => {
 
 column guid => {
     data_type => 'char',
+    size => 36,
     is_nullable => 0,
 };
 
@@ -200,6 +182,7 @@ column unknown => {
 
 column uploadid => {
     data_type => 'int',
+    extra       => { unsigned => 1 },
     is_nullable => 0,
 };
 
@@ -224,7 +207,7 @@ CPAN::Testers::Schema::Result::ReleaseStat - A single test report reduced to a s
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -316,26 +299,7 @@ L<CPAN::Testers::Schema::Result::Upload>.
 
 =head1 SEE ALSO
 
-=over 4
-
-=item L<DBIx::Class::Row>
-
-=item L<CPAN::Testers::Schema>
-
-=item L<CPAN::Testers::Schema::Result::Release>
-
-These rows are collected into the Release table.
-
-=item L<Labyrinth::Plugin::CPAN::Release>
-
-This module processes the data and writes to this table.
-
-=item L<http://github.com/cpan-testers/cpantesters-project>
-
-For an overview of how the CPANTesters project works, and for
-information about project goals and to get involved.
-
-=back
+L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
 =head1 AUTHORS
 

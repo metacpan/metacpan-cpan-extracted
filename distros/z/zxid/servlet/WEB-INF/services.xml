@@ -1,0 +1,8 @@
+<service name="zxidwspaxisdemo">
+    <description>Demo service using TAS3 WSP filter</description>
+    <module ref="zxidwspaxidmod"/>
+    <parameter name="ServiceClass">zxidjava.zxidwspaxisdemo</parameter>
+    <operation name="demodemo">
+      <messageReceiver class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
+    </operation>
+</service>

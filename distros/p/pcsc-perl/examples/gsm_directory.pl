@@ -1,12 +1,13 @@
-#!/usr/bin/perl -w
-#
+#!/usr/bin/perl
+
+
 #    This program reads the phone directory of a GSM11.11 SIM card and
 #    prints out its contents in a human readable format. It is based on
 #    another Perl script from Ludovic ROUSSEAU <ludovic.rousseau@free.fr>
 #    That you can obtain at the following URL:
 #        http://ludovic.rousseau.free.fr/softwares/SIM-1.0.tar.gz
 #
-#    Copyright (C) <2001> - Lionel VICTOR <lionel.victor@free.fr>
+#    Copyright (C) 2001 - Lionel VICTOR, 2003 Ludovic ROUSSEAU
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,36 +22,30 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#
 
-# $Id: gsm_directory.pl,v 1.5 2001/09/07 14:17:45 lvictor Exp $
 
-# $Log: gsm_directory.pl,v $
-# Revision 1.5  2001/09/07 14:17:45  lvictor
-# cosmetic chage in the header comment
-#
-# Revision 1.4  2001/09/06 09:55:25  rousseau
-# added CVS Id and Log fields
-#
+# $Id: gsm_directory.pl,v 1.7 2006-08-12 17:35:53 rousseau Exp $
 
+
+use warnings;
 use strict;
 use Carp;
 
-use PCSC;
-use PCSC::Card;
+use Chipcard::PCSC;
+use Chipcard::PCSC::Card;
 
 use Getopt::Std;
 use Term::ReadKey;
 
 my %options;
 
-my $hContext = new PCSC();
+my $hContext = new Chipcard::PCSC();
 my $hCard;
 my $RecvData;
 my $nRecordsLength;
 my $PIN;
 
-die ("Could not create PCSC object: $PCSC::errno\n") unless defined $hContext;
+die ("Could not create PCSC object: $Chipcard::PCSC::errno\n") unless defined $hContext;
 
 sub gsmrecord_to_ascii {
 	my $gsmrecord = shift;
@@ -109,34 +104,34 @@ if (exists $options{h}) {
 }
 
 if (exists $options{r}) {
-    $hCard = new PCSC::Card ($hContext, $options{r});
-    die ("Can't allocate PCSCCard object: $PCSC::errno\n") unless defined $hCard;
+    $hCard = new Chipcard::PCSC::Card ($hContext, $options{r});
+    die ("Can't allocate PCSCCard object: $Chipcard::PCSC::errno\n") unless defined $hCard;
     print STDERR "Using given card reader: $options{r}\n" if exists $options{'v'};
 } else {
     my @readers_list = $hContext->ListReaders ();
-    die ("Can't get readers list: $PCSC::errno\n") unless defined $readers_list[0];
+    die ("Can't get readers list: $Chipcard::PCSC::errno\n") unless defined $readers_list[0];
     print STDERR "No reader given: using $readers_list[0]\n" if exists $options{v};
-    $hCard = new PCSC::Card ($hContext, $readers_list[0]);
-    die ("Can't allocate PCSCCard object: $PCSC::errno\n") unless defined $hCard;
+    $hCard = new Chipcard::PCSC::Card ($hContext, $readers_list[0]);
+    die ("Can't allocate PCSCCard object: $Chipcard::PCSC::errno\n") unless defined $hCard;
 }
 
 # Select MF (3F00)
 print STDERR "Selecting Master File (3F00)\n" if exists $options{v};
 $RecvData = $hCard->Transmit([0xA0, 0xA4, 0x00, 0x00, 0x02, 0x3F, 0x00]);
-die ("Can't communicate: $PCSC::errno\n") unless defined $RecvData;
-die ("Can't select MF: SW = [ ".PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x9F;
+die ("Can't communicate: $Chipcard::PCSC::errno\n") unless defined $RecvData;
+die ("Can't select MF: SW = [ ".Chipcard::PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x9F;
 
 # Select DF Telecom (7F10)
 print STDERR "Selecting Telecom Directory (3F00/7F10)\n" if exists $options{v};
 $RecvData = $hCard->Transmit([0xA0, 0xA4, 0x00, 0x00, 0x02, 0x7F, 0x10]);
-die ("Can't communicate: $PCSC::errno\n") unless defined $RecvData;
-die ("Can't select DF Telecom: SW = [ ".PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x9F; 
+die ("Can't communicate: $Chipcard::PCSC::errno\n") unless defined $RecvData;
+die ("Can't select DF Telecom: SW = [ ".Chipcard::PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x9F; 
 
 # Select EF_ADN (6F3A) (Abbreviated Dialing Numbers)
 print STDERR "Selecting Abbreviated Dialing Numbers File (3F00/7F10/6F3A)\n" if exists $options{v};
 $RecvData = $hCard->Transmit([0xA0, 0xA4, 0x00, 0x00, 0x02, 0x6F, 0x3A]);
-die ("Can't communicate: $PCSC::errno\n") unless defined $RecvData;
-die ("Can't select EF_ADN: SW = [ ".PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x9F;
+die ("Can't communicate: $Chipcard::PCSC::errno\n") unless defined $RecvData;
+die ("Can't select EF_ADN: SW = [ ".Chipcard::PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x9F;
 
 # Get Response (get informations about EF_ADN)
 # The last SW gives the length of available bytes:
@@ -144,8 +139,8 @@ die ("Can't select EF_ADN: SW = [ ".PCSC::array_to_ascii($RecvData)." ]") unless
 print STDERR "Getting ADN Records length\n" if exists $options{v};
 $nRecordsLength = $$RecvData[1];
 $RecvData = $hCard->Transmit([0xA0, 0xC0, 0x00, 0x00, $nRecordsLength]);
-die ("Can't communicate: $PCSC::errno\n") unless defined $RecvData;
-die ("Can't retrieve records length: SW = [ ".PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[$nRecordsLength] == 0x90;
+die ("Can't communicate: $Chipcard::PCSC::errno\n") unless defined $RecvData;
+die ("Can't retrieve records length: SW = [ ".Chipcard::PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[$nRecordsLength] == 0x90;
 
 # Extract record length from the response
 $nRecordsLength = $$RecvData[$nRecordsLength-1];
@@ -162,8 +157,8 @@ print STDOUT "\n";
 # Submitting PIN code to the card
 print STDERR "Submitting PIN code\n" if exists $options{v};
 $RecvData = $hCard->Transmit([0xA0, 0x20, 0x00, 0x01, 0x08, pin_to_array($PIN)]);
-die ("Can't communicate: $PCSC::errno\n") unless defined $RecvData;
-die ("Can't access file (wrong PIN code ?): SW = [ ".PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x90;
+die ("Can't communicate: $Chipcard::PCSC::errno\n") unless defined $RecvData;
+die ("Can't access file (wrong PIN code ?): SW = [ ".Chipcard::PCSC::array_to_ascii($RecvData)." ]") unless $$RecvData[0] == 0x90;
 
 # Get phone records
 my $i;
@@ -171,7 +166,7 @@ my @SW;
 print STDERR "Getting records\n" if exists $options{v};
 for $i (1..255) {
 	$RecvData = $hCard->Transmit([0xA0, 0xB2, $i, 0x04, $nRecordsLength]);
-	die ("Can't communicate: $PCSC::errno\n") unless defined $RecvData;
+	die ("Can't communicate: $Chipcard::PCSC::errno\n") unless defined $RecvData;
 
 	# pop the status word out of the retrieved bytes
 	$SW[1] = pop @$RecvData;
@@ -187,11 +182,11 @@ for $i (1..255) {
 	# TODO:remove that it is only debug...
 	# TODO: format that and print phone record...
 	print "SLOT $i: ".gsmrecord_to_ascii($RecvData)."\n";
-	#print "[ ".PCSC::array_to_ascii($RecvData)." ] [".PCSC::array_to_ascii(\@SW)."]\n";
+	#print "[ ".Chipcard::PCSC::array_to_ascii($RecvData)." ] [".Chipcard::PCSC::array_to_ascii(\@SW)."]\n";
 }
 
 print STDERR "Reseting the card\n" if exists $options{v};
-$hCard->Disconnect($PCSC::SCARD_RESET);
+$hCard->Disconnect($Chipcard::PCSC::SCARD_RESET);
 
 # End of File
 

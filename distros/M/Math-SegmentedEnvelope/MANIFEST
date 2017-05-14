@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/plot.pl
+lib/Math/SegmentedEnvelope.pm
+lib/Math/SegmentedEnvelope.pod
+t/use.t

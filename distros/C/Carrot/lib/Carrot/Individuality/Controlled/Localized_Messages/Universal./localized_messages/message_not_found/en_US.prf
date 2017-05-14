@@ -1,0 +1,3 @@
+﻿The package '%s'
+requests a message named '%s'
+but that could not be foundin the language(s) '%s'.

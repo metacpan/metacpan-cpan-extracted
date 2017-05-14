@@ -7,7 +7,7 @@ use Env qw/PWD/;
 
 sub get_cwd {
     my @CWD; if (!-e ".micro") {
-        push @CWD, $ENV{HOME}."/data-hub/";
+        push @CWD, $ENV{HOME}."/data-hub";
     } else {
         push @CWD, getcwd();
     }

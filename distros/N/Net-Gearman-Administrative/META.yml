@@ -1,0 +1,18 @@
+---
+abstract: 'A wrapper around Gearmans administrative protocol'
+author:
+  - 'Moritz Grosch <moritz.grosch@autinity.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Gearman-Administrative
+resources:
+  bugtracker: https://github.com/autinitysystems/Net-Gearman-Administrative/issues
+  repository: https://github.com/autinitysystems/Net-Gearman-Administrative.git
+version: '0.00101'

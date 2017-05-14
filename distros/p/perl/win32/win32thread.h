@@ -109,10 +109,9 @@ typedef HANDLE perl_mutex;
 
 /* XXX Docs mention that the RTL versions of thread creation routines
  * should be used, but that advice only seems applicable when the RTL
- * is not in a DLL.  RTL DLLs in both Borland and VC seem to do all of
- * the init/deinit required upon DLL_THREAD_ATTACH/DETACH.  So we seem
- * to be completely safe using straight Win32 API calls, rather than
- * the much braindamaged RTL calls.
+ * is not in a DLL.  RTL DLLs seem to do all of the init/deinit required
+ * upon DLL_THREAD_ATTACH/DETACH.  So we seem to be completely safe using
+ * straight Win32 API calls, rather than the much braindamaged RTL calls.
  *
  * _beginthread() in the RTLs call CloseHandle() just after the thread
  * function returns, which means: 1) we have a race on our hands
@@ -123,11 +122,7 @@ typedef HANDLE perl_mutex;
  */
 #ifdef USE_RTL_THREAD_API
 #  include <process.h>
-#  if defined(__BORLANDC__)
-     /* Borland RTL doesn't allow a return value from thread function! */
-#    define THREAD_RET_TYPE	void _USERENTRY
-#    define THREAD_RET_CAST(p)	((void)(thr->i.retv = (void *)(p)))
-#  elif defined (_MSC_VER)
+#  if defined (_MSC_VER)
 #    define THREAD_RET_TYPE	unsigned __stdcall
 #    define THREAD_RET_CAST(p)	((unsigned)(p))
 #  else
@@ -145,7 +140,7 @@ typedef THREAD_RET_TYPE thread_func_t(void *);
 
 START_EXTERN_C
 
-#if defined(PERLDLL) && defined(USE_DECLSPEC_THREAD) && (!defined(__BORLANDC__) || defined(_DLL))
+#if defined(PERLDLL) && defined(USE_DECLSPEC_THREAD)
 extern __declspec(thread) void *PL_current_context;
 #define PERL_SET_CONTEXT(t)   		(PL_current_context = t)
 #define PERL_GET_CONTEXT		PL_current_context
@@ -153,16 +148,6 @@ extern __declspec(thread) void *PL_current_context;
 #define PERL_GET_CONTEXT		Perl_get_context()
 #define PERL_SET_CONTEXT(t)		Perl_set_context(t)
 #endif
-
-#if defined(USE_5005THREADS)
-struct perl_thread;
-int Perl_thread_create (struct perl_thread *thr, thread_func_t *fn);
-void Perl_set_thread_self (struct perl_thread *thr);
-void Perl_init_thread_intern (struct perl_thread *t);
-
-#define SET_THREAD_SELF(thr) Perl_set_thread_self(thr)
-
-#endif /* USE_5005THREADS */
 
 END_EXTERN_C
 

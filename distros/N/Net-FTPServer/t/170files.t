@@ -1,16 +1,8 @@
-#!/usr/bin/perl -w
-
-# $Id: 170files.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 36;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
-
-BEGIN {
-  plan tests => 36;
-}
 
 use Net::FTPServer::InMem::Server;
 
@@ -183,3 +175,5 @@ sub download_and_check
     # OK!
     return 1;
   }
+
+__END__

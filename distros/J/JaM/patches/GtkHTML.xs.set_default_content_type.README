@@ -1,0 +1,11 @@
+$Id: GtkHTML.xs.set_default_content_type.README,v 1.1 2001/08/19 11:36:11 joern Exp $
+
+Apply this patch to
+
+  Gtk-Perl-0.7008/GtkHTML/xs/GtkHTML.xs
+
+to get support for the
+
+  set_default_content_type()
+
+method.

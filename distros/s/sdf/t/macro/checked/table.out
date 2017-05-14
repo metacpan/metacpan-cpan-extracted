@@ -1,0 +1,69 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Some text before.
+__table[format='0%-100%,1*';style='columns']2
+__row[]Heading
+N[orig_style='N']Hdg 1
+__cell[]
+N[orig_style='N']Hdg 2
+__row[]Body
+N[orig_style='N']Row 1, col 1
+__cell[]
+N[orig_style='N']Row 1, col 2
+__row[]Body
+N[orig_style='N']Row 2, col 1
+__cell[]
+N[orig_style='N']Row 2, col 2
+__row[]Footing
+N[orig_style='N']Footing 1
+__cell[]
+N[orig_style='N']Footing 2
+__endtable[]
+N[orig_style='N']Some text in the middle.
+__table[format='1*';style='rows']1
+__endtable[]
+__table[format='1*';style='grid']1
+__row[]Body
+__row[]Body
+__endtable[]
+__table[format='0%-100%,0%-100%,1*';style='columns']3
+N[orig_style='N']Some text
+__cell[]
+__cell[]
+N[orig_style='N']Some text in row 1, column 3
+__row[]Body
+__cell[]
+__cell[]
+N[orig_style='N']Some text in row 2, column2
+__endtable[]
+__table[format='0%-100%,1*';style='columns']2
+N[orig_style='N']Text in first table
+__row[]Body
+N[orig_style='N']Row 2, column 1
+__cell[]
+N[orig_style='N']Row 2, column 2 start
+__table[format='0%-100%,1*';style='columns']2
+N[orig_style='N']Text in second table
+__row[]Body
+N[orig_style='N']Text in second table
+__endtable[]
+N[orig_style='N']Row 2, column 2 end
+__row[]Body
+N[orig_style='N']hello world
+__endtable[]
+__table[format='0%-100%,1*';style='columns']2
+__row[]Body
+__cell[]
+N[orig_style='N']This is a paragraph with a few lines.
+__cell[]
+N[orig_style='N']This is:
+LU1[orig_style='LU1']a list
+LU1[orig_style='LU1']with two entries.
+N[orig_style='N']And another paragraph.
+__row[]Body
+__cell[]
+N[orig_style='N']simple cell
+__cell[]
+N[orig_style='N']And another multi-line cell with lots and lots and lots of text.
+N[orig_style='N']The quick brown fox jumped over the slow green frog.
+__endtable[]

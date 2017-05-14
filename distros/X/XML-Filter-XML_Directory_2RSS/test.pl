@@ -1,7 +1,5 @@
 use strict;
 
-use lib qw (./lib);
-
 package MySAX;
 use base qw (XML::SAX::Base);
 
@@ -25,7 +23,6 @@ my $rss    = undef;
 
 if (&t4(&t3(&t2(&t1())))) {
   print "Passed all tests\n";
-  # print $output,"\n";
 }
 
 sub t1 {
@@ -39,7 +36,7 @@ sub t1 {
 
   $rss = XML::Filter::XML_Directory_2RSS->new(Handler=>$writer);
 
-  if (! $rss) {
+  if (! $writer) {
     print "Failed to create XML::Filer::XML_Directory_2RSS object, $!\n";
     print "not ok 1\n";
     return 0;
@@ -79,8 +76,7 @@ sub t3 {
     return 0;
   }
 
-  my $parse_dir = $INC[2];
-  my $directory = XML::Directory::SAX->new(Handler=>$rss,detail=>2,depth=>2);
+  my $directory = XML::Directory::SAX->new(Handler=>$rss,detail=>2,depth=>1);
 
   if (! $directory) {
     print "Failed to create XML::Directory::SAX object, $!\n";
@@ -89,7 +85,7 @@ sub t3 {
   }
 
   $directory->order_by("a");
-  eval { $directory->parse_dir($parse_dir); };
+  eval { $directory->parse_dir($INC[1]); };
 
   if ($@) {
     print $@,"\n";

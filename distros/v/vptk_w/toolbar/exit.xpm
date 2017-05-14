@@ -1,0 +1,26 @@
+/* XPM */
+static char * exit_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"20 16 4 1",
+/* colors */
+"  s None c None",
+". c #000000",
+"X c #00FFFF",
+"o c #FFFFFF",
+/* pixels */
+"   .                ",
+"   ........         ",
+"   .X.oooo.    .    ",
+"   .XX.ooo.   ..    ",
+"   .XXX.oo.  ...... ",
+"   .XXX.oo. ....... ",
+"   .XXX.oo.  ...... ",
+"   .XXX.oo.   ..    ",
+"   .X.X.oo.    .    ",
+"   .XXX.oo.         ",
+"   .XXX.oo.         ",
+"....XXX.............",
+"    .XX.            ",
+"     .X.            ",
+"      ..            ",
+"       .            "};

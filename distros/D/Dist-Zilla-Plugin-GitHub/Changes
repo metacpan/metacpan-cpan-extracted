@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-GitHub
 
+0.44      2017-05-11 09:30:45Z
+
+  - fix undef warnings in [GitHub::Update] when any current settings un GitHub
+    are unset.
+
 0.43      2016-12-25 01:42:31Z
 
   - avoid undef warnings when the login name cannot be determined from git

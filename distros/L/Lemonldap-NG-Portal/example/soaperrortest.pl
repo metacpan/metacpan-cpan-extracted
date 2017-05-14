@@ -13,8 +13,7 @@ use Data::Dumper;
 my $error_code = 15;
 
 # Service
-my $soap =
-  SOAP::Lite->new( proxy => 'http://auth.example.com/index.pl' );
+my $soap = SOAP::Lite->new( proxy => 'http://auth.example.com/index.pl' );
 $soap->default_ns('urn:Lemonldap/NG/Common/CGI/SOAPService');
 
 # Call error SOAP method

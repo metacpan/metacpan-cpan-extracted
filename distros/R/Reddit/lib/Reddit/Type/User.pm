@@ -1,6 +1,6 @@
 package Reddit::Type::User;
 
-use 5.012004;
+use 5.010001;
 use common::sense;
 use Moose;
 

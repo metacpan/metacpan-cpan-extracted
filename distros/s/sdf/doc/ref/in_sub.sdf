@@ -1,0 +1,44 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Subroutines
+
+H2: Overview
+
+The subroutines available are summarised below.
+
+!block table; tags="SUBR"
+Name            Purpose
+FormatTime      format a date-time value
+AppendText      within the {{MAC:on}} macro, appends text after the current line
+PrependText     within the {{MAC:on}} macro, prepends text before the current line
+#DefineAttrs     within the {{MAC:on}} macro, defines a set of attributes
+#DefaultAttrs    within the {{MAC:on}} macro, defaults a set of attributes
+FindFile        override this if you need custom searching rules
+!endblock
+
+Further details on these are provided below.
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!block topics
+Topic
+sappendt
+sfindfil
+sformatt
+sprepend
+!endblock
+!off paragraph h2top

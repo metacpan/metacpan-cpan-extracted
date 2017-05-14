@@ -1,7 +1,7 @@
 package Chart::Plotly::Trace::Attribute::Xbins;
 use Moose;
 
-our $VERSION = '0.011';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 sub TO_JSON {
     my $self = shift;
@@ -47,7 +47,7 @@ Chart::Plotly::Trace::Attribute::Xbins
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

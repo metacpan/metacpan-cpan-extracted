@@ -1,5 +1,32 @@
 Revision history for Perl extension AI::Fuzzy.
 
+0.05 Sat Jan  4 10:20:29 EST 2003
+	- found problem with stringifycation in Set.pm
+	- fixed warning messages due to not checking "exists" for hash 
+	  values in Set.pm (union,intersection).  Thanks to Richard Jelinek
+	  for pointing this out, and a problem in the code in the docs.
+	
+0.04 Fri Dec  6 13:49:55 EST 2002
+        - replaced current AI::Fuzzy::Label with a new AI::Fuzzy::Axis (a container for label objects)
+          and changed AI::Fuzzy::Label to be concerned only about label data.  This
+          will allow us to add new AI::Fuzzy::Label{Spline, Trapezoid, etc.} subclasses
+          of labels to the now independent Axis class.  Axis will defer to the Label
+          itself to decide applicability, >,<,>=,<=, and the like.
+        - changed test.pl to work with the new setup
+        - added functions: greaterthan, greaterequal, lessthan, lessequal, and between
+          to AI::Fuzzy::Label
+        - added overriding of >,>=,<,<=, and <=> in AI::Fuzzy::Label.
+
+0.03 Wed Oct  9 18:07:34 EDT 2002
+	- added functions: support, core, height, is_normal, is_subnormal
+	  to AI::Fuzzy::Set
+
+0.02 Wed Oct  9 16:41:29 EDT 2002
+	- ownership transfering to Tom Scanlan <tscanlan@openreach.com>
+	- added functions to AI::Fuzzy::Set for intersection, union, 
+	  complement, equal, and as_string
+	- made a heck of a lot of tests.  use them as examples...
+
 0.01  Mon Jul 19 19:33:46 1999
 	- original version; created by h2xs 1.18
 

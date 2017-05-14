@@ -1,0 +1,2 @@
+endtable.sdf error, macro on 4: !endtable not expected
+endtable.sdf error, EOF at 9: !endtable missing for !table on line 7

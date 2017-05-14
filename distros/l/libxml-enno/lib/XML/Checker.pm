@@ -777,7 +777,7 @@ use vars qw ( $VERSION $FAIL $INSIGNIF_WS );
 
 BEGIN 
 { 
-    $VERSION = '0.08'; 
+    $VERSION = '0.09'; 
 }
 
 $FAIL = \&print_error;
@@ -790,6 +790,7 @@ sub new
     my ($class, %args) = @_;
 
     $args{ERule} = {};
+    $args{ARule} = {};
     $args{InCDATA} = 0;
 
 #    $args{Debug} = 1;
@@ -857,7 +858,7 @@ sub Element
 sub attlist_decl
 {
     my ($self, $hash) = @_;
-    $self->Attlist ($hash->{EntityName}, $hash->{AttributeName},
+    $self->Attlist ($hash->{ElementName}, $hash->{AttributeName},
 		    $hash->{Type}, $hash->{Default}, $hash->{Fixed});
 }
 
@@ -962,13 +963,13 @@ sub Attr
 #print "Attr for tag=$tag attr=$attr val=$val spec=$specified\n";
 
     my $arule = $self->{ARule}->{$tag};
-    if (defined $arule)
+    if (defined $arule && $arule->{Defined}->{$attr})
     {
 	$arule->check ($attr, $val, $specified);
     }
     else
     {
-	$self->fail (103, "undefined attribute [$attr]", Elem => $tag);
+	$self->fail (103, "undefined attribute [$attr]", Element => $tag);
     }
 }
 
@@ -1211,7 +1212,7 @@ sub entity_decl
     my ($self, $hash) = @_;
 
     $self->Entity ($hash->{Name}, $hash->{Value}, $hash->{SystemId},
-		   $hash->{PublicId}, $hash->{Notation});
+		   $hash->{PublicId}, $hash->{'Notation'});
 }
 
 sub Entity
@@ -1269,7 +1270,7 @@ sub error_string	# static
     while ($key = shift)
     {
 	$val = shift;
-	push @a, ("$key " . $val); 
+	push @a, ("$key " . (defined $val ? $val : "(undef)"));
     }
 
     my $cat = $code >= 200 ? ($code >= 300 ? "INFO" : "WARNING") : "ERROR";
@@ -1439,7 +1440,7 @@ or other section in the XML specification.
 
 =head2 ERROR Messages
 
-=head3 100 - 109
+=head2 100 - 109
 
 =over 4
 
@@ -1479,7 +1480,7 @@ B<VC:> L<Attribute Value Type|http://www.w3.org/TR/REC-xml#ValueType>
 
 =back
 
-=head3 110 - 119
+=head2 110 - 119
 
 =over 4
 
@@ -1531,7 +1532,7 @@ B<VC:> L<Unique Element Type Declaration|http://www.w3.org/TR/REC-xml#EDUnique>
 
 =back
 
-=head3 120 - 129
+=head2 120 - 129
 
 =over 4
 
@@ -1585,7 +1586,7 @@ See L<Mixed Content|http://www.w3.org/TR/REC-xml#sec-mixed-content>
 
 =back
 
-=head3 130 - 139
+=head2 130 - 139
 
 =over 4
 
@@ -1658,7 +1659,7 @@ See definition of L<AttType|http://www.w3.org/TR/REC-xml#NT-AttType>
 
 =back
 
-=head3 150 - 159
+=head2 150 - 159
 
 =over 4
 
@@ -1769,7 +1770,7 @@ B<VC:> L<Required Attribute|http://www.w3.org/TR/REC-xml#RequiredAttr>
 
 =back
 
-=head3 160 - 169
+=head2 160 - 169
 
 =over 4
 
@@ -1897,7 +1898,7 @@ Returns the root element name as found in the DOCTYPE
 
 =back
 
-=head3 Expat interface
+=head2 Expat interface
 
 XML::Checker supports what I call the I<Expat> interface, which is 
 the collection of methods you normally specify as the callback handlers
@@ -1961,7 +1962,7 @@ context stack when checking a single element.
 
 =back
 
-=head3 PerlSAX interface
+=head2 PerlSAX interface
 
 XML::Checker now also supports the PerlSAX interface, so you can use XML::Checker
 wherever you use PerlSAX handlers.

@@ -1,0 +1,33 @@
+NAME
+    Acme::Curse - Remove the blessing that lay on references
+
+SYNOPSIS
+        use Acme::Curse qw(curse);
+
+        my $unblessed_ref = curse($object);
+
+DESCRIPTION
+    Did you ever want to droo the blessing of an object? Well, now you can:
+    Acme::Curse unblesses reference by returning a shallow, non-blessed copy
+    of the object.
+
+    Currently only references to scalar, hashes, arrays and code objects can
+    be unblessed.
+
+    Exported subs:
+
+    curse
+        Unblesses a reference to an object.
+
+BUGS
+    None known, but surely there are many.
+
+AUTHOR
+    Moritz Lenz, <http://perlgeek.de/>, <http://perl-6.de/>
+
+LICENSE AND COPYRIGHT
+    Copyright (C) 2008 Moritz Lenz
+
+    This module is free software; it can be used under the same terms as
+    perl itself.
+

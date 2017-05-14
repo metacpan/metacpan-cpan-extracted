@@ -1,10 +1,7 @@
 package urpm::prompt;
 
-# $Id: prompt.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
-
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
 
 sub new {
     my ($class, $title, $prompts, $defaults, $hidden) = @_;
@@ -40,7 +37,6 @@ sub prompt {
 
 1;
 
-__END__
 
 =head1 NAME
 

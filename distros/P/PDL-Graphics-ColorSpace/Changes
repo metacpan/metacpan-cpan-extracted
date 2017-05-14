@@ -1,0 +1,19 @@
+Revision history for PDL-Graphics-ColorSpace
+
+0.1.0	01-04-2013
+		Added support for custom RGB space.
+
+0.0.9	02-11-2012
+		Fixed pp and perl 5.8* version format issue.
+
+0.0.8	02-09-2012
+		Added CMYK and RGB conversions.
+		Better handling of versions.
+
+0.0.7	02-07-2012
+		Fixed double * warnings. Thanks Sisypus!
+		Added README and Changes.
+
+0.0.6	02-01-2012
+		First version released on an unsuspecting world.
+

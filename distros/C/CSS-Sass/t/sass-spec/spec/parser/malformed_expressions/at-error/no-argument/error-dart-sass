@@ -1,4 +1,0 @@
-Error: Expected expression.
-@error;
-      ^
-  /sass/spec/parser/malformed_expressions/at-error/no-argument/input.scss 1:7

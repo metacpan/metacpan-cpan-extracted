@@ -1,0 +1,43 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Paragraph Attributes
+
+The paragraph attributes available are summarised below.
+{{SECT:Phrase Attributes}} can also be used as paragraph attributes.
+
+!block table; tags="PATTR"; groups
+Name                Purpose
+Margins:
+left                left margin indent (in points)
+first               first line indent (in points)
+right               right margin indent (in points)
+align               either Full, Left, Right or Center
+Positioning:
+top                 either Page (the default), Column, LPage or RPage
+sp_before           space before this paragraph
+sp_after            space after this paragraph
+keep_prev           keep this paragraph with the previous one
+keep_next           keep this paragraph with the next one
+Miscellaneous:
+label               prefix label (e.g. Note:)
+obj                 define this paragraph as an object with a given tag
+noevents            disable event processing for this object
+nopb                disable the implicit page break, if any
+notoc               remove this heading from the table of contents
+Help specific:
+hlp.context         context in the HPJ file
+hlp.topic           topic in the HPJ file
+hlp.header          include this paragraph in the non-scrolling region
+hlp.window          paragraph is part of the contents in a popup window
+hlp.endwindow       paragraph is the last one in a popup window
+!endblock

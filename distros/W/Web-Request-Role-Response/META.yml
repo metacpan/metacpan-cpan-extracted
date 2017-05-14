@@ -24,8 +24,8 @@ meta-spec:
 name: Web-Request-Role-Response
 requires:
   Moose::Role: '0'
-  Plack::Response: '0'
+  Web::Response: '0'
   perl: '5.010'
 resources:
   repository: git://github.com/domm/Web-Request-Role-Response.git
-version: '1.002'
+version: '1.003'

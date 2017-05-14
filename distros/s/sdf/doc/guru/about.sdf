@@ -1,0 +1,36 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: About this manual
+
+H2: Purpose
+
+This manual provides information on customising and extending [[SDF]] - a
+documentation system for software developers.
+Readers should be familiar with the following documents before
+reading this one:
+
+. {{DOC:The SDF Document Development System}}
+. {{DOC:SDF User Guide}}.
+
+H2: Scope
+
+This manual contains information on:
+
+* how to extend SDF with new entities (e.g. macros, filters, etc.)
+* how to develop an [[SDF]] driver to support a new output format
+* [[SDFAPI]] - the set of Perl libraries provided with SDF.
+
+H2: Amendments
+
+!SDF_AMENDMENTS

@@ -1,0 +1,17 @@
+This list should always be empty:
+
+        - Fix Text.xs warnings (during compilation) 
+
+
+Documentation:
+        - Add addChars(), addExport(), writeExports() methods
+        - Add documentation for $button->setMenu(flag) 
+	- add SWFShape_drawCubic and SWFShape_drawCubicTo ????
+	- SWF::Text
+
+This is wish list:
+
+	1- Simple interface
+	2- XML
+	3- proper example + mod_perl examples
+

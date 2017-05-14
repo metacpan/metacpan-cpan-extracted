@@ -11,7 +11,9 @@ my $src = Apache::src->new;
 $necessary_modules = {
 	'Apache' => 'Make sure your installation of mod_perl is complete',
 	'LWP::UserAgent' => 'You need to install the LWP modules',
-	'URI::URL' => 'You need to install URI::URL'
+	'URI::URL' => 'You need to install URI::URL',
+	'Apache::Table' => 'mod_perl needs to have Table enabled',
+	'Apache::Util' => 'mod_perl needs to have Util enabled'
 };
 
 my($errors, $warnings);

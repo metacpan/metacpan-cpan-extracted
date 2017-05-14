@@ -1,0 +1,9 @@
+# This file tests the endtable macro
+
+# Try an unexpected end
+!endtable
+
+# Try a missing end
+!table 1
+!table 1
+!endtable

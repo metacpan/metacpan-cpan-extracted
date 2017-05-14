@@ -19,14 +19,8 @@ my $t = TestClass->new();
 $t->file('foo/bar/baz');
 is( ref $t->file(), 'Path::Class::File', 'Coerced file from string' );
 
-$t->file('file:///foo/bar/baz');
-is( $t->file, '/foo/bar/baz', 'Converted file:// URI to file path' );
-
 $t->dir('foo/bar/baz');
 is( ref $t->dir(), 'Path::Class::Dir', 'Coerced dir from string' );
-
-$t->dir('file:///foo/bar/baz');
-is( $t->dir, '/foo/bar/baz', 'Converted file:// URI to dir path' );
 
 $t->uri('http://nuts');
 is( ref $t->uri(), 'URI::http', 'Coerced URI from string' );
@@ -71,26 +65,26 @@ $t->version('v5.1.2');
 is( ref $t->version, 'version', 'Coerced version from v-string' );
 
 $t->pkg('Foo~0.01');
-is( ref $t->pkg,      'Pinto::Target::Package', 'Coerced PackageSpec from string' );
+is( ref $t->pkg,      'Pinto::PackageSpec', 'Coerced PackageSpec from string' );
 is( $t->pkg->name,    'Foo',                'PackageSpec has correct name' );
 is( $t->pkg->version, '0.01',               'PackageSpec has correct version' );
 
 $t->dist('Author/subdir/Dist-1.0.tar.gz');
-is( ref $t->dist, 'Pinto::Target::Distribution', 'Coerced DistributionSpec from string' );
+is( ref $t->dist, 'Pinto::DistributionSpec', 'Coerced DistributionSpec from string' );
 is( $t->dist->author, 'AUTHOR', 'DistributionSpec has correct author' );
 is_deeply( $t->dist->subdirs, ['subdir'], 'DistribiutionsSpec has correct subdirs' );
 is( $t->dist->archive, 'Dist-1.0.tar.gz', 'DistribiutionsSpec has correct archive' );
 
 $t->targets('author/subdir/Dist-1.0.tar.gz');
 is( ref $t->targets, 'ARRAY', 'Coerced ArrayRef from string' );
-is( ref $t->targets->[0], 'Pinto::Target::Distribution', 'Coereced DistributionSpec from string' );
+is( ref $t->targets->[0], 'Pinto::DistributionSpec', 'Coereced DistributionSpec from string' );
 
 $t->targets( [ 'Foo~1.2', 'author/subdir/Dist-1.0.tar.gz' ] );
-is( ref $t->targets->[0], 'Pinto::Target::Package',      'Coerced PackageSpec in array' );
-is( ref $t->targets->[1], 'Pinto::Target::Distribution', 'Coereced DistributionSpec in array' );
+is( ref $t->targets->[0], 'Pinto::PackageSpec',      'Coerced PackageSpec in array' );
+is( ref $t->targets->[1], 'Pinto::DistributionSpec', 'Coereced DistributionSpec in array' );
 
 $t->targets( ['Foo'] );
-is( ref $t->targets->[0], 'Pinto::Target::Package', 'Coerced PackageSpec in array' );
+is( ref $t->targets->[0], 'Pinto::PackageSpec', 'Coerced PackageSpec in array' );
 
 $t->revision('AA-AA');
 is( $t->revision, 'aa-aa', 'Coerced RevisionID to lowercase' );
@@ -102,15 +96,11 @@ lives_ok { $t->color('dark red') };
 dies_ok { $t->color('foo bar') } 'Invalid color thorws exception';
 dies_ok { $t->color(undef) } 'undef color thorws exception';
 
-lives_ok { $t->palette( [qw(red blue green)] ) };
-dies_ok { $t->palette( [qw(red blue)] ) } 'Palette needs 3 colors';
-dies_ok { $t->palette( [qw(a b c)] ) } 'Palette must be valid colors';
-dies_ok { $t->palette(undef) };
-dies_ok { $t->palette( [] ) };
-
-lives_ok { $t->diffstyle('concise') } 'Valid DiffStyle';
-lives_ok { $t->diffstyle('detailed') } 'Valid DiffStyle';
-dies_ok { $t->diffstyle('pretty') } 'Invalid DiffStyle';
+lives_ok { $t->colorset( [qw(red blue green)] ) };
+dies_ok { $t->colorset( [qw(red blue)] ) } 'Colorset needs 3 colors';
+dies_ok { $t->colorset( [qw(a b c)] ) } 'Colorset must be valid colors';
+dies_ok { $t->colorset(undef) };
+dies_ok { $t->colorset( [] ) };
 
 #-----------------------------------------------------------------------------
 

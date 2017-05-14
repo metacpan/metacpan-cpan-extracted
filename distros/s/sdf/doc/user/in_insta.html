@@ -1,0 +1,157 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Installing SDF</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_intro.html">Previous Topic</A> | <A HREF="in_gsex.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.2. Installing SDF</H1>
+<HR>
+<H2><A NAME="Overview">1.2.1. Overview</A></H2>
+<P>If SDF is not yet installed, you will need to fetch it and install it. The latest version of SDF can be fetched from the SDF download page, <A HREF="http://www.mincom.com/mtr/sdf/download.html">http://www.mincom.com/mtr/sdf/download.html</A>.</P>
+<P>If Perl is not installed, you will also need to fetch and install it. Various ports of Perl can be obtained from the Perl Home Page (<A HREF="http://www.perl.com/index/">http://www.perl.com/index/</A>).</P>
+<P>SDF installation details are provided below for:</P>
+<UL>
+<LI><A HREF="in_insta.html#Unix">Unix</A>
+<LI><A HREF="in_insta.html#Windows NT">Windows NT</A>
+<LI><A HREF="in_insta.html#Windows 95">Windows 95</A>
+<LI><A HREF="in_insta.html#MS-DOS/Windows 3.x">MS-DOS/Windows 3.x.</A></UL>
+<P>Some general <A HREF="in_insta.html#Installation Notes">Installation Notes</A> are also provided.</P>
+<HR>
+<H2><A NAME="Unix">1.2.2. Unix</A></H2>
+<P>Use the <CMD>tar</CMD> and <CMD>gunzip</CMD> programs to unpack the distribution like this:</P>
+<PRE>
+   gunzip sdf-2.000.tar.gz
+   tar xvf sdf-2.000.tar
+</PRE>
+<P>Build, test and install the software like this:</P>
+<PRE>
+   perl Makefile.PL
+   make
+   make test
+   make install
+</PRE>
+<HR>
+<H2><A NAME="Windows NT">1.2.3. Windows NT</A></H2>
+<P>Unpack the distribution using a program which understands long file names (e.g. WinZip).</P>
+<P>Within the <EM>Control Panel</EM>, go to the <EM>System</EM> properties, select the <EM>Environment</EM> tab and edit the variables as follows:</P>
+<OL>
+<LI>Update the PATH to include the <TT>bin\dos</TT> directory where SDF is installed.
+<BR>
+For example, if SDF is installed in <TT>c:\sdf</TT>, then you need to edit the PATH system variable to include <TT>c:\sdf\bin\dos</TT>.
+<LI>Edit (or add) the PERL5LIB variable to include the Perl libraries used by SDF.
+<BR>
+For example, if SDF is installed in <TT>c:\sdf</TT>, then you need to edit the PERL5LIB variable to include <TT>c:\sdf\perllib</TT>.
+<LI>Set the SDFBIN variable to point to the directory containing SDF's scripts, including the trailing \.
+<BR>
+For example, if SDF is installed in <TT>c:\sdf</TT>, then you need to set the SDFBIN variable to <TT>c:\sdf\bin\</TT>.</OL>
+<P>Test the software. To do this:</P>
+<OL>
+<LI>Start an MS-DOS window.
+<LI>Change directory to the <TT>t</TT> directory within the SDF distribution.
+<LI>Run <A HREF="../ref/sdf.html">sdf</A> without any arguments to confirm that SDF was successfully installed.
+<LI>Run <A HREF="../ref/sdftest.html">sdftest</A>.</OL>
+<P>If anything fails, <A HREF="../ref/sdftest.html">sdftest</A> will leave the failed <TT>.out</TT> and <EM>.log</EM> files in the relevant directories.</P>
+<HR>
+<H2><A NAME="Windows 95">1.2.4. Windows 95</A></H2>
+<P>Unpack the distribution using a program which understands long file names (e.g. WinZip).</P>
+<P>Update the PATH to include the <TT>bin\dos</TT> directory where SDF is installed. For example, if SDF is installed in <TT>c:\sdf</TT>, then the command is:</P>
+<PRE>
+   set PATH=%PATH%;c:\sdf\bin\dos
+</PRE>
+<P>Edit (or add) the PERL5LIB system variable to include the Perl libraries used by SDF. For example, if SDF is installed in <TT>c:\sdf</TT>, then the command is:</P>
+<PRE>
+   set PERL5LIB=%PERL5LIB%;c:\sdf\perllib
+</PRE>
+<P>Set the SDFBIN variable to point to the directory containing SDF's scripts, including the trailing \. For example, if SDF is installed in <TT>c:\sdf</TT>, then the command is:</P>
+<PRE>
+   set SDFBIN=c:\sdf\bin\
+</PRE>
+<P>Test the software. To do this:</P>
+<OL>
+<LI>Change directory to the <TT>t</TT> directory within the SDF distribution.
+<LI>Run <A HREF="../ref/sdf.html">sdf</A> without any arguments to confirm that SDF was successfully installed.
+<LI>Run <A HREF="../ref/sdftest.html">sdftest</A>.</OL>
+<P>If anything fails, <A HREF="../ref/sdftest.html">sdftest</A> will leave the failed <TT>.out</TT> and <EM>.log</EM> files in the relevant directories.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>PATH, PERL5LIB and SDFBIN should be set within your <TT>autoexec.bat</TT> file.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="MS-DOS/Windows 3.x">1.2.5. MS-DOS/Windows 3.x</A></H2>
+<P>Use <CMD>pkunzip</CMD> to unpack the distribution. The command is:</P>
+<PRE>
+   pkunzip -d sdf.zip
+</PRE>
+<P>Update the PATH to include the <TT>bin\dos</TT> directory where SDF is installed. For example, if SDF is installed in <TT>c:\sdf</TT>, then the command is:</P>
+<PRE>
+   set PATH=%PATH%;c:\sdf\bin\dos
+</PRE>
+<P>Edit (or add) the PERL5LIB system variable to include the Perl libraries used by SDF. For example, if SDF is installed in <TT>c:\sdf</TT>, then the command is:</P>
+<PRE>
+   set PERL5LIB=%PERL5LIB%;c:\sdf\perllib
+</PRE>
+<P>Set the SDFBIN variable to point to the directory containing SDF's scripts, including the trailing \. For example, if SDF is installed in <TT>c:\sdf</TT>, then the command is:</P>
+<PRE>
+   set SDFBIN=c:\sdf\bin\
+</PRE>
+<P>Test the software. To do this:</P>
+<OL>
+<LI>Change directory to the <TT>t</TT> directory within the SDF distribution.
+<LI>Run <A HREF="../ref/sdf.html">sdf</A> without any arguments to confirm that SDF was successfully installed.
+<LI>Run <A HREF="../ref/sdftest.html">sdftest</A>.</OL>
+<P>If anything fails, <A HREF="../ref/sdftest.html">sdftest</A> will leave the failed <TT>.out</TT> and <EM>.log</EM> files in the relevant directories.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>PATH, PERL5LIB and SDFBIN should be set within your <TT>autoexec.bat</TT> file.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Installation Notes">1.2.6. Installation Notes</A></H2>
+<H3><A NAME="Distribution Formats">1.2.6.1. Distribution Formats</A></H3>
+<P>The <TT>tar.gz</TT> and <TT>zip</TT> distributions should both contain the same set of files. Therefore, it shouldn't matter which distribution you obtain provided you have the necessary software to unpack it.</P>
+<H3><A NAME="The sdf.ini File">1.2.6.2. The sdf.ini File</A></H3>
+<P>The <TT>sdf.ini</TT> configuration file (in the <TT>sdf/home</TT> directory on Perl's library path) contains several sets of configuration parameters which you may want to edit after SDF is installed. Refer to the comments in the file for further details.</P>
+<H3><A NAME="Win32 Support">1.2.6.3. Win32 Support</A></H3>
+<P>SDF has been briefly tested with:</P>
+<UL>
+<LI>Gurusamy Sarathy's 5.004_02 Perl port (August 97), and
+<LI>ActiveState's Perl port build 315 (based on 5.003_07).</UL>
+<P>Both seem to work ok, although running <A HREF="../ref/sdftest.html">sdftest</A> with the 5.004_02 port leaves zero length <TT>.out</TT> and <TT>.log</TT> files for the tests which work (when they should be deleted).</P>
+<H3><A NAME="The SDFBIN Environment Variable">1.2.6.4. The SDFBIN Environment Variable</A></H3>
+<P>This environment variable is only used by the Windows/DOS wrapper batch files within <TT>bin/dos</TT> to find the real scripts. Therefore, if you wish to wrap the scripts in some other way, then there is no need to set this variable.</P>
+<H3><A NAME="Macintosh support">1.2.6.5. Macintosh support</A></H3>
+<P>Unlike earlier versions, the 2.000 release includes support for Macintosh filename handling. Installation instructions for the Macintosh will be made available soon.</P>
+<H3><A NAME="Testing Notes">1.2.6.6. Testing Notes</A></H3>
+<P>When the <A HREF="../ref/sdf.html">sdf</A> command is run without arguments, the output should be something like:</P>
+<PRE>
+usage  : sdf [+alias] [-h[help]] [-o[out_ext]] [-l[log_ext]] [-2 format] [-D var
+iable,..] [-n split_level] [-f flag,..] [-I include_path,..] [-p prefilter] [-a
+parameters] [-P[plang]] [-N[line_numbers]] [-r report] [-L locale] [-k look] [-s
+ style] [-S page_size] [-c config] [-u uses,..] [-H head_level] [-d driver] [-y
+post_filter] [-z post_process,..] [-t target] [-v[verbose]] [-w width] sdf_file
+...
+purpose: convert an sdf file to another format
+version: 2.000    (SDF 2.000)
+</PRE>
+<P>If this fails, check the following:</P>
+<OL>
+<LI><CMD>perl</CMD> 5.003 or later is installed (type <E>perl -v</E> to test)
+<LI>the <A HREF="../ref/sdf.html">sdf</A> script is on your path and under Unix, is executable.</OL>
+<P>SDF is supplied with a regression testing system. To run the tests, change to the <TT>t</TT> directory within the SDF distribution and execute <A HREF="../ref/sdftest.html">sdftest</A> like this:</P>
+<PRE>
+   sdftest
+</PRE>
+<P>This command can be used at anytime to verify your installation of SDF.</P>
+<P>The <A HREF="http://www.mincom.com/mtr/sdf/samples/index.html">SDF Sample Showcase</A> contains SDF source code and matching outputs. If you wish to conduct further tests, these samples can be used.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_intro.html">Previous Topic</A> | <A HREF="in_gsex.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

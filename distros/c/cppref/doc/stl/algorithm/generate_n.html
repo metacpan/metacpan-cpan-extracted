@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    generate_n    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2009-10-10T17:21:51-0700" />
+<meta name="keywords" content="stl,algorithm,generate_n" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/stl/algorithm/generate_n?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=stl:algorithm" />
+<link rel="edit" title="Edit this page" href="/wiki/stl/algorithm/generate_n?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/stl/algorithm/generate_n" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/stl/algorithm/generate_n" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/stl/algorithm/generate_n" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='stl:algorithm';var JSINFO = {"id":"stl:algorithm:generate_n","namespace":"stl:algorithm"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../stl/start.html"  title="stl:start">C++ Standard Template Library</a> &raquo; <a href="../../stl/algorithm/start.html"  title="stl:algorithm:start">C++ Algorithms</a> &raquo; <a href="../../stl/algorithm/generate_n.html"  title="stl:algorithm:generate_n">generate_n</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="generate_n" id="generate_n">generate_n</a></h2>
+<div class="level2">
+
+<p>
+Syntax:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    <span class="co2">#include &lt;algorithm&gt;</span>
+    <span class="kw4">void</span> generate_n<span class="br0">&#40;</span> output_iterator result<span class="sy0">,</span> SIZE num<span class="sy0">,</span> Generator g <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+The generate_n() function runs the Generator function object g num times,
+saving the result of each execution in result, (result+1), etc.
+</p>
+
+<p>
+For example, the following code uses generate_n() to fill an array of int with random numbers using the standard C library rand function:
+</p>
+<pre class="c code c++" style="font-family:monospace;"> <span class="co2">#include &lt;cstddef&gt;</span>
+ <span class="co2">#include &lt;cstdlib&gt;</span>
+ <span class="co2">#include &lt;iostream&gt;</span>
+ <span class="co2">#include &lt;iterator&gt;</span>
+ <span class="co2">#include &lt;algorithm&gt;</span>
+&nbsp;
+ <span class="kw4">int</span> main<span class="br0">&#40;</span><span class="br0">&#41;</span>
+ <span class="br0">&#123;</span>
+   <span class="kw4">const</span> std<span class="sy0">::</span><span class="me2">size_t</span> N <span class="sy0">=</span> <span class="nu0">5</span><span class="sy0">;</span>
+   <span class="kw4">int</span> ar<span class="br0">&#91;</span>N<span class="br0">&#93;</span><span class="sy0">;</span>
+   std<span class="sy0">::</span><span class="me2">generate_n</span><span class="br0">&#40;</span>ar<span class="sy0">,</span> N<span class="sy0">,</span> std<span class="sy0">::</span><span class="me2">rand</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// Using the C function rand()</span>
+&nbsp;
+   std<span class="sy0">::</span><a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;ar: &quot;</span><span class="sy0">;</span>
+   std<span class="sy0">::</span><span class="me2">copy</span><span class="br0">&#40;</span>ar<span class="sy0">,</span> ar<span class="sy0">+</span>N<span class="sy0">,</span> std<span class="sy0">::</span><span class="me2">ostream_iterator</span><span class="sy0">&lt;</span>int<span class="sy0">&gt;</span><span class="br0">&#40;</span>std<span class="sy0">::</span><a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a><span class="sy0">,</span> <span class="st0">&quot; &quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+   <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span>
+ <span class="br0">&#125;</span></pre>
+<p>
+
+Related Topics: <a href="../../stl/algorithm/generate.html" class="wikilink1" title="stl:algorithm:generate">generate</a>
+</p>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        stl/algorithm/generate_n.txt &middot; Last modified: 10/10/2009 17:21 by 124.255.102.233      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

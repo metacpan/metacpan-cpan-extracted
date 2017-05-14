@@ -1,16 +1,16 @@
 {
    "abstract" : "Like Exporter, but add a '-base' flag to declare a class as a child",
    "author" : [
-      "Olivier Mengué <dolmen@cpan.org>"
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Exporter-WithBase",
    "prereqs" : {
@@ -42,19 +42,21 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
+            "blib" : "1.01",
+            "lib" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/dolmen/p5-Exporter-WithBase",
+      "homepage" : "https://github.com/dolmen-perl5/Exporter-WithBase",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/dolmen/p5-Exporter-WithBase.git",
-         "web" : "https://github.com/dolmen/p5-Exporter-WithBase"
+         "url" : "https://github.com/dolmen-perl5/Exporter-WithBase.git",
+         "web" : "https://github.com/dolmen-perl5/Exporter-WithBase"
       }
    },
-   "version" : "0.03"
+   "version" : "1.00"
 }
 

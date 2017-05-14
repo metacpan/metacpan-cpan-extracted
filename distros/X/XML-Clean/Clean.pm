@@ -1,4 +1,5 @@
-# $Id: Clean.pm,v 1.6 2003/09/21 14:04:37 petr Exp $
+# $Id
+# $Log
 
 =head1 NAME
 
@@ -6,19 +7,16 @@ XML::Clean - Ensure, that I<(HTML)> text pass throught an XML parser.
 
 =head1 SYNOPSIS
 
-	use XML::Clean;
+	use XML::XMLClean;
 
-	print XML::Clean::clean ("<foo bar>barfoo");
-		# <foo>barfoo</foo>
+	print XML::XMLClean::clean ("<foo bar>barfoo");
+		# <foo bar>barfoo</foo>
 	
-	print XML::Clean::clean ("<foo bar>barfoo",1.5);
-		# <?xml version="1.5" encoding="ISO-8859-1"?>
-		# <foo bar>barfoo</foo> 
+	print XML::XMLClean::clean ("<foo bar>barfoo",1.5); >>
+		# <?xml version="1.5" encoding="ISO-8859-1"?><foo bar>barfoo</foo> 
 	
-	print XML::Clean::clean ("bar <foo bar=10> bar",1.6,){root=>"XML_ROOT",encoding=>"ISO-8859-2"} ); 
-		# <?xml version="1.6" encoding="ISO-8859-2"?>
-		# <XML_ROOT
-		# bar <foo bar="10"> bar</foo></XML_ROOT> 
+	print XML::XMLClean::clean ("bar <foo bar> bar",1.6,"XML_ROOT","ISO-8859-2"); 
+		# <?xml version="1.6" encoding="ISO-8859-2"?><XML_ROOT>bar <foo bar> bar </foo></XML_ROOT>" 
 
 =head1 DESCRIPTION
 
@@ -45,7 +43,7 @@ Return (almost) XML text, made from input parameter C<$text>.
 When C<$version> is false, only match tags, and escapes any unmatched
 tags.
 
-When you pass C<$version> parameter, then text is checked for standard
+When you pass C<$version> parameter, than text is checked for standard
 XML head (<!XML VERSION=..>), and depending on options (force_root), some is
 added / existing is modified. Also depending on options, text is checked for
 root element. VERSION XML head parameter in output text is set to parameter
@@ -58,7 +56,7 @@ to I<ISO-8859-1>.
 
 force_root - If true, output text will have XML root. Defaults to I<false>.
 
-root - Output text will have that tag as root element. Defaults to
+root - Output text will have that text as root element. Defaults to
 I<xml_root>.
 
 =item clean_file $filename [$version [%options] ] 
@@ -81,7 +79,7 @@ Its otherwise too ineficient and slow:).
 =head1 AUTHOR
 
 =for html 
-<a href="mailto:petr@kubanek.net">petr@kubanek.net</a>. Send there any complains, comments and so on.
+<a href="mailto:peta@kubanek.net">peta@kubanek.net</a>. Send there any complains, comments and so on.
 
 =head1 DISTRIBUTION
 
@@ -91,13 +89,13 @@ Its otherwise too ineficient and slow:).
 =cut
 
 BEGIN {
-	$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+	$VERSION = do { my @r = (q$Revision: 1.1.1.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 }
 
 use strict;
 use warnings;
 
-package 	XML::Clean;
+package 	XML::XMLClean;
 use vars 	qw(@ISA @EXPORT);
 require		Exporter;
 @ISA	  	=qw(Exporter);
@@ -114,7 +112,6 @@ sub clean_attr {
 	my $attr = shift;
 	return "" unless $attr;
 	my $ret;
-	$ret = "";
 	# put to result only well-formed or almost-well formed values
 	while ($attr =~ m/((?:\w|_|-)+)\s*=\s*((?:\w|\d|_|-)+|".*?")/g) {
 		my $name=$1;
@@ -132,7 +129,7 @@ sub clean_attr {
 sub handle_start {
 	my $element = shift;
 	my $attr = shift;
-
+	
 	push @stack, $element unless ($attr =~ m#/$#);
 
 	$attr = clean_attr $attr;
@@ -172,8 +169,8 @@ sub handle_text {
 	my $element = shift;
 	
 	# escape our elements
-	$element =~ s#$escapes_keys#$escapes{$1}#exg if defined $element;
-	
+	$element =~ s#$escapes_keys#$escapes{$1}#exg;
+
 	return $element;
 }
 
@@ -188,20 +185,21 @@ sub clean {
 
 	my $output = "";
 
+	$root = "xml_root" unless $root;
 	$encoding = "ISO-8859-1" unless $encoding;
 
 	if ($version) {
 		# first, check for <?xml ?> tag
 		if ($text !~ m/^<\?xml[^<>]*\?>\s*(<!\w+[^<>]*>)?\s*<\w+[^<>]*>/s ) {
 			$output = "<?xml version=\"$version\" encoding=\"$encoding\"?>\n";
-			$text = "<$root>\n". $text if ($root);
+			$text = "<$root>\n". $text;
 		}
 	}
 
 	# if there is something in $output, it must be <?xml
 	# version..> string
 
-	$text =~ s/^<\?xml[^<>]*\?>\s*(<!\w+[^<>]*>)?\s*//s if defined $text;
+	$text =~ s/^<\?xml[^<>]*\?>\s*(<!\w+[^<>]*>)?\s*//s;
 	$output = $& unless $output; 
 
 	# if we are asked to produce full-correct text with root as root
@@ -214,8 +212,7 @@ sub clean {
 
 	undef @stack;
 
-	if (defined $text) {
- 	  while ($text =~ m#^(.*?)<(/?\w+.*?)>(.*)#s) {
+	while ($text =~ m#^(.*?)<(/?\w+.*?)>(.*)#s) {
 	
 		my ($bg, $cont, $en) = ($1, $2, $3);
 		
@@ -249,14 +246,13 @@ sub clean {
 		}
 
 		$text = $en;
-	  }
 	}
 	
-	$output .= handle_text ($text) if defined $text;
+	$output .= handle_text ($text);
 	
 	my $x;
 	foreach $x (reverse @stack) {
-		$output .= "</$x>";
+		$output .= "</$x>\n";
 	}
 
 	return $output;

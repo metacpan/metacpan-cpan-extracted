@@ -1,0 +1,59 @@
+#
+#################################### XS SECTION
+#
+
+Widget		T_WIDGET
+Rwidget		T_RWIDGET
+XFont		T_PTROBJ
+String_Array	T_PACKED
+RGB_Array	T_PACKED
+Byte_Array	T_OPAQUEPTR
+int *		T_PACKED
+KVMT		T_PTROBJ
+PROC		T_PTROBJ
+USER		T_PTROBJ
+float		T_FLOAT
+GV *		T_GVREF
+
+INPUT
+T_WIDGET
+	if (($arg == &sv_undef) || (SvTYPE($arg) == SVt_NULL)) { 
+	  $var = NULL;
+	} else if (sv_isa($arg,\"SxWidget\")) {
+	  unsigned long tmp;
+	  tmp = (unsigned long)SvNV((SV*)SvRV($arg));
+          $var = ((struct Edata *)(tmp))->w;
+	} else {
+	  sv_dump($arg);
+	  croak(\"$var (%x) is not a SxWidget\",$arg); 
+	}
+T_RWIDGET
+	if (sv_isa($arg,\"SxWidget\")) {
+	  unsigned long tmp;
+	  tmp = (unsigned long)SvNV((SV*)SvRV($arg));
+          $var = (struct Edata *)(tmp);
+	} else {
+	  sv_dump($arg);
+	  croak(\"$var (%x) is not a SxWidget\",$arg); 
+	}
+T_FLOAT
+	$var = (float)SvNV($arg)
+T_GVREF
+	if (sv_isa($arg, \"${ntype}\"))
+	    $var = (GV*)SvRV($arg);
+	else
+	    croak(\"$var is not of type ${ntype}\")
+
+OUTPUT
+T_WIDGET
+        if (RETVAL) {
+	  tmp->w = RETVAL;
+	  tmp->mysv = $arg;
+	  sv_setptrobj(tmp->mysv, tmp, \"SxWidget\");
+	  SvREFCNT_inc(tmp->mysv);	
+	  $arg = tmp->mysv;
+        } else {
+          $arg = sv_newmortal();
+        }
+T_FLOAT
+	sv_setnv($arg, (double)$var);

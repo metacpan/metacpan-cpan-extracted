@@ -2,6 +2,7 @@ Boulder.pod
 Boulder/Blast.pm
 Boulder/Genbank.pm
 Boulder/Labbase.pm
+Boulder/LocusLink.pm
 Boulder/Store.pm
 Boulder/Stream.pm
 Boulder/String.pm

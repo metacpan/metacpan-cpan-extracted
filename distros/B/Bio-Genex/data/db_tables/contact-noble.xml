@@ -1,0 +1,20 @@
+<contact_list>
+<contact
+  type="test_user"
+  contact_person="Maria Harrison"
+  contact_person_email="mjh@ncgr.org"
+  contact_person_phone="(505) 995-4427"
+/>
+<contact
+  type="developer"
+  contact_person="William Anderson"
+  contact_person_email="wxa@ncgr.org"
+  contact_person_phone="(505) 995-4453"
+/>
+<contact
+  type="developer"
+  contact_person="Jason Stewart"
+  contact_person_email="jes@ncgr.org"
+  contact_person_phone="(505) 255-8271"
+/>
+</contact_list>

@@ -1,0 +1,131 @@
+NAME
+    Apache::CIPP - Use CIPP embedded HTML Pages with mod_perl
+
+SYNOPSIS
+      <Location ~ ".*\.cipp" >
+
+        # Advise Apache to use Apache::CIPP as the request
+        # handler for this Location  
+        SetHandler "perl-script"
+        PerlHandler Apache::CIPP
+
+        # directory for caching of preprocessed CIPP programs
+        # (this must be writable by the webserver user)
+        PerlSetVar  cache_dir       /tmp/cipp_cache
+
+        # what language do you prefer for error messages?
+        # (EN=English, DE=German)
+        PerlSetVar  lang            EN
+      
+        # debugging infos to error log?
+        PerlSetVar  debug           1
+
+        # used databases
+        # (comma separated, whitespace is ignored)
+        PerlSetVar  databases       "zyn, foo"
+
+        # default database
+        PerlSetVar  default_db      zyn
+
+        # configuration for the database named 'zyn'
+        # (please refer to the DBI documentation for details)
+        PerlSetVar  db_zyn_data_source      dbi:mysql:zyn
+        PerlSetVar  db_zyn_user             my_username1
+        PerlSetVar  db_zyn_password         my_password1
+        PerlSetVar  db_zyn_auto_commit      1
+
+        # configuration for the database named 'foo'
+        PerlSetVar  db_foo_data_source      dbi:Oracle:foo
+        PerlSetVar  db_foo_user             my_username2
+        PerlSetVar  db_foo_password         my_password2
+        PerlSetVar  db_foo_auto_commit      0
+
+      </Location>
+
+DESCRIPTION
+    This module enables you to use the powerful CIPP HTML embedding
+    language together with the Apache webserver. It is based on
+    mod_perl and works as a request handler. So you can
+    transparently use CIPP pages everywhere on your webserver.
+
+WHAT IS CIPP?
+    CIPP is a Perl module for translating CIPP sources to pure Perl
+    programs. CIPP defines a HTML embedding language also called
+    CIPP which has powerful features for CGI and database
+    developers.
+
+    Many standard CGI and database operations (and much more) are
+    covered by CIPP, so the developer does not need to code them
+    again and again.
+
+    CIPP is not part of this distribution, please download it from
+    CPAN.
+
+SIMPLE CIPP EXAMPLE
+    To give you some imagination of what you can do with CIPP: here
+    is a (really) simple example of using CIPP in a HTML source to
+    retrieve some information from a database. Think this as a HTML
+    page which is "executed" on the fly by your Apache webserver.
+    Note: there is no code to connect to the database. This is done
+    implicitely. The configuration is taken from the Apache
+    configuration file(s).
+
+      # print table of users who match the given parameter
+      
+      <?INTERFACE INPUT="$search_name">
+
+      <HTML>
+      <HEAD><TITLE>tiny litte CIPP example</TITLE></HEAD>
+      <BODY>
+      <H1>Users matching '$search_name'</H1>
+      <P>
+
+      <TABLE BORDER=1>
+      <TR><TD>Name</TD><TD>Adress</TD><TD>Phone</TD></TR>
+      <?SQL SQL="select name, adress, phone
+                 from   people
+                 where  name like '%' || ? || '%'"
+            PARAMS="$search_name"
+            MY VAR="$n, $a, $p">
+        <TR><TD>$n</TD><TD>$a</TD><TD>$p</TD></TR>
+      <?/SQL>
+      </TABLE>
+
+      </BODY>
+      </HTML>
+
+CONFIGURATION
+    Place the configuration options listed in the SYNOPSIS into your
+    Apache configuration file(s) (e.g. httpd.conf). The SYNOPSIS
+    example configures all files with the suffix .cipp to be handled
+    by Apache::CIPP. Please refer to the Apache documentation for
+    details about configuring your webserver.
+
+    The CIPP PDF documentation contains some more explantation of
+    the Apache::CIPP configuration parameters. Also CGI::CIPP
+    explains them briefly. You can download the documentation and
+    CGI::CIPP from CPAN.
+
+DOWNLOAD Apache::CIPP
+    Apache::CIPP and friends can be downloaded from CPAN
+
+      $CPAN/modules/by-authors/id/J/JR/JRED/
+
+INSTALLING Apache::CIPP
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+AUTHOR
+    Joern Reder <joern@dimedis.de>
+
+COPYRIGHT
+    Copyright 1998-1999 Joern Reder, All Rights Reserved
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), CIPP(3pm), CGI::CIPP(3pm), CIPP::Manual(3pm)
+

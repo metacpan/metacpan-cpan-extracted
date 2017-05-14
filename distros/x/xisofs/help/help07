@@ -1,0 +1,1 @@
+Omit trailing period from files that do not have an extension. This violates the ISO9660 standard, but it happens to work on many systems. Use with caution.

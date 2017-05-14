@@ -1,6 +1,8 @@
+ChangeLog			Package history
 MANIFEST			This file
 MANIFEST.SKIP
 Makefile.PL			Makefile generator
+lib/Bundle/Wizard.pm
 lib/Wizard.pm			Main Wizard module
 lib/Wizard/Elem/BR/HTML.pm
 lib/Wizard/Elem/BR/Shell.pm

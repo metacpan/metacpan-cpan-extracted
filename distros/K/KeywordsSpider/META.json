@@ -1,0 +1,48 @@
+{
+   "abstract" : "web spider searching for keywords",
+   "author" : [
+      "Katarina Durechova <durechova@ynet.sk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "KeywordsSpider",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MockObject" : "0",
+            "Test::Spec" : "0",
+            "Test::Spec::Mocks" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP::UserAgent" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "MooseX::UndefTolerant" : "0",
+            "Parallel::ForkManager" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/katkad/KeywordsSpider"
+      }
+   },
+   "version" : "0.02"
+}

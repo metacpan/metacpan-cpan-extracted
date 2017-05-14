@@ -9,7 +9,7 @@ use strict;
 use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Common::Regexp;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.1';
 
 ## @apmethod int userDBInit()
 # Check if authentication module is Google

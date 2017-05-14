@@ -70,13 +70,6 @@ sub parse_alignment {
     q_end    => $6,
   );
 
-  if ( $coords{r_start} > $coords{r_end} ) {
-    %coords = ( %coords, r_start => $coords{r_end}, r_end => $coords{r_start} );
-  }
-  if ( $coords{q_start} > $coords{q_end} ) {
-    %coords = ( %coords, q_start => $coords{q_end}, r_end => $coords{q_start} );
-  }
-
   my @alignments;
   for ( my $i = 0; $i < @raw_alignment; $i++ ) {
     my ( $start, $seq ) = split /\s+/, $raw_alignment[$i];

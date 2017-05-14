@@ -1,0 +1,125 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Lists
+
+H2: Overview
+
+[[SDF]] supports 3 types of lists:
+
+* {{unordered}} - items are bulleted
+* {{plain}} - items are not bulleted
+* {{ordered}} - items are labelled with numbers or letters.
+
+As lists are so common, they are supported by a special syntax:
+
+E:   special_tag text
+
+where {{special_tag}} is a sequence of 1 to 6 special characters.
+Spaces or tabs between the tag and text are ignored.
+
+H2: Unordered Lists
+
+To define an unordered list, use the '*' character. For example:
+
+E:* peach
+E:* banana
+E:* mango.
+
+The result is:
+
+* peach
+* banana
+* mango.
+
+H2: Plain Lists
+
+To define a plain list, use the '.' character. For example:
+
+E:. peach
+E:. banana
+E:. mango.
+
+The result is:
+
+. peach
+. banana
+. mango.
+
+H2: Ordered Lists
+
+To define an ordered list, use the '^' character for the first
+item and the '+' character for remaining items. For example:
+
+E:^ peach
+E:+ banana
+E:+ mango.
+
+The result is:
+
+^ peach
++ banana
++ mango.
+
+H2: List Paragraphs
+
+To nest a normal paragraph inside a list, use the '.' tag.
+For example:
+
+E:* peach
+E:. This is one of my favorites.
+
+The result is:
+
+* peach
+. This is one of my favorites.
+
+H2: Nested Lists
+
+Lists can be nested up to 6 levels. The nesting level is taken
+from the number of special characters in the tag. For example:
+
+E:** a bulleted list at level 2
+E:^^^ an ordered list at level 3
+
+To nest normal paragraphs inside these lists, use plain list items.
+For example:
+
+E:** a bulleted list at level 2
+E:.. A normal paragraph at level 2.
+
+H2: The '-' Special Tag
+
+As a convenience, the '-' character can be used to specify
+a bulleted list at level 2. For example:
+
+E:* inputs:
+E:  - programmers
+E:  - pizza
+E:* outputs:
+E:  - software
+E:  - empty pizza boxes.
+
+The result is:
+
+* inputs:
+  - programmers
+  - pizza
+* outputs:
+  - software
+  - empty pizza boxes.
+
+Likewise, the tags '--' to '-----' are equivalent to the tags
+'***' to '******'.
+
+!end_topic

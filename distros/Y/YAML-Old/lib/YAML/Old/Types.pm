@@ -20,12 +20,17 @@ sub yaml_dump {
               "!perl/$kind$class";
     if ($type eq 'REF') {
         YAML::Old::Node->new(
-            {(&YAML::VALUE, ${$_[0]})}, $tag
+            {(&YAML::Old::VALUE, ${$_[0]})}, $tag
         );
     }
     elsif ($type eq 'SCALAR') {
         $_[1] = $$value;
         YAML::Old::Node->new($_[1], $tag);
+    }
+    elsif ($type eq 'GLOB') {
+        # blessed glob support is minimal, and will not round-trip
+        # initial aim: to not cause an error
+        return YAML::Old::Type::glob->yaml_dump($value, $tag);
     } else {
         YAML::Old::Node->new($value, $tag);
     }
@@ -47,7 +52,11 @@ package YAML::Old::Type::glob;
 
 sub yaml_dump {
     my $self = shift;
-    my $ynode = YAML::Old::Node->new({}, '!perl/glob:');
+    # $_[0] remains as the glob
+    my $tag = pop @_ if 2==@_;
+
+    $tag = '!perl/glob:' unless defined $tag;
+    my $ynode = YAML::Old::Node->new({}, $tag);
     for my $type (qw(PACKAGE NAME SCALAR ARRAY HASH CODE IO)) {
         my $value = *{$_[0]}{$type};
         $value = $$value if $type eq 'SCALAR';
@@ -128,7 +137,7 @@ sub yaml_dump {
     }
     else {
         bless $value, "CODE" if $class;
-        eval { use B::Deparse };
+        eval { require B::Deparse };
         return if $@;
         my $deparse = B::Deparse->new();
         eval {
@@ -136,7 +145,7 @@ sub yaml_dump {
             $code = $deparse->coderef2text($value);
         };
         if ($@) {
-            warn YAML::YAML_DUMP_WARN_DEPARSE_FAILED() if $^W;
+            warn YAML::Old::YAML_DUMP_WARN_DEPARSE_FAILED() if $^W;
             $code = $default;
         }
         bless $value, $class if $class;
@@ -172,15 +181,15 @@ package YAML::Old::Type::ref;
 
 sub yaml_dump {
     my $self = shift;
-    YAML::Old::Node->new({(&YAML::VALUE, ${$_[0]})}, '!perl/ref')
+    YAML::Old::Node->new({(&YAML::Old::VALUE, ${$_[0]})}, '!perl/ref')
 }
 
 sub yaml_load {
     my $self = shift;
     my ($node, $class, $loader) = @_;
     $loader->die('YAML_LOAD_ERR_NO_DEFAULT_VALUE', 'ptr')
-      unless exists $node->{&YAML::VALUE};
-    return \$node->{&YAML::VALUE};
+      unless exists $node->{&YAML::Old::VALUE};
+    return \$node->{&YAML::Old::VALUE};
 }
 
 #-------------------------------------------------------------------------------

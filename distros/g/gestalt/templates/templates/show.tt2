@@ -1,0 +1,52 @@
+
+<html>
+
+  [% INCLUDE _header.tt2 title = "Showing ${TABLE.desc().0}" %]
+
+<body>
+
+  <h1>Showing [% TABLE.desc().0 %]</h1>
+
+  Click <a href="javascript: history.go(-1); ">Here</a> to go back.
+
+    <table>
+    [% FOREACH fName = TABLE.fields() %]
+    [% f = TABLE.field(fName) %]
+      <tr>
+        <td><b>[% f.desc %]</b></td>
+        <td>
+          [% IF f.fkey %]
+            [% INCLUDE _fkeyDisplay.tt2 fieldName = fName field = f %]
+          [% ELSE %]
+            [% INCLUDE _fieldDisplay.tt2 fieldName = fName field = f %]
+          [% END %]
+        </td>
+      </tr>
+    [% END %]
+    [% FOREACH rTable = TABLE.referingTables() %]
+      <tr>
+        <td>
+          <b>[% rTable.desc().1 %]</b>
+        </td>
+      </tr>
+      [% FOREACH fKeyName = rTable.foreignKeys %]
+      [% fKeyField = rTable.field( fKeyName ) %]
+      [% IF fKeyField.fkey.table == TABLE.name() %]
+        [% RROWS = rTable.getRowsByFKey( fKeyName, ROW.${fKeyField.fkey.field}() ) %]
+        [% FOREACH RROW = RROWS %]
+      <tr>
+        <td>
+          [% FOREACH rField = rTable.summaryFields() %]
+            [% RROW.$rField() %][% UNLESS loop.last %] / [% END %]
+          [% END %]
+        </td>
+      </tr>
+        [% END %]
+      [% END %]
+      [% END %]
+    [% END %]
+
+    </table>
+
+</body>
+

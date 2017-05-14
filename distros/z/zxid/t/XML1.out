@@ -1,0 +1,10 @@
+Original and WO are different lengths 294 != 293
+Re-encoded result WO (len=293):
+<ws:FindPatients xmlns:ws="http://ws.impl.services.repository.pils.custodix.com/">
+	<FirstName>bart</FirstName>
+	<LastName>simpson</LastName>
+	<Gender>MALE</Gender>
+	<BirthDateLowerBound>1995-02-03</BirthDateLowerBound>
+	<BirthDateUpperBound>2005-02-03</BirthDateUpperBound>
+</ws:FindPatients>
+

@@ -1,0 +1,2 @@
+endmacro.sdf error, macro on 4: endmacro macro not expected
+endmacro.sdf error, EOF at 20: !endmacro missing for !macro on line 9

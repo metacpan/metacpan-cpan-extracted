@@ -3,7 +3,7 @@
 # Business::Bitcoin::Request - Bitcoin payment request
 # Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash dot neomailbox.ch>
 #
-# $Id: lib/Business/Bitcoin/Request.pm v1.038 Wed Apr 19 00:59:00 PDT 2017 $
+# $Id: lib/Business/Bitcoin/Request.pm v1.043 Tue May  9 22:54:03 PDT 2017 $
 
 use warnings;
 use strict;
@@ -21,7 +21,7 @@ use Crypt::RIPEMD160;
 
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.038 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.043 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %args) = @_;
@@ -33,7 +33,7 @@ sub new {
   return undef unless $db->do("INSERT INTO requests values ($index, '$args{Amount}', NULL, $refid, '$timestamp', NULL, NULL);");
   $index = $db->last_insert_id('%', '%', 'requests', 'reqid');
   $ENV{PATH} = undef;
-  return undef unless my $address = _getaddress($args{_BizBTC}->xpub, $index);
+  return undef unless my $address = _getaddress($args{_BizBTC}, $index);
   my $rows = $db->do("UPDATE requests set address='$address' where reqid='$index';");
   bless { Address => $address,
 	  ID => $index,
@@ -49,7 +49,10 @@ sub verify {
   my $ua = new LWP::UserAgent;
   my $req = HTTP::Request->new(GET => 'https://blockchain.info/q/addressbalance/' . $self->address . '?confirmations=' . $self->confirmations);
   my $res = $ua->request($req);
-  $res->content == $self->amount;
+  my $paid = $res->content;
+  $self->error($paid), return if $paid =~ /\D/;
+  $self->error('');
+  $paid >= $self->amount ? $paid : 0;
 }
 
 sub _find {
@@ -86,19 +89,24 @@ sub commit {
 }
 
 sub _getaddress {
-  my ($xpub, $index) = @_;
+  my ($bizbtc, $index) = @_;
+  my $xpub = $bizbtc->xpub;
   my $curve = Math::EllipticCurve::Prime->from_name('secp256k1');
   my $xpubdata =  Math::BigInt->new(_decode58($xpub))->as_hex;
   $xpubdata =~ /.(.{8})(..)(.{8})(.{8})(.{64})(.{66})(.*)/;
   my ($ver, $depth, $fp, $i, $c, $Kc) = ($1, $2, $3, $4, $5, $6);
   my $K = Math::EllipticCurve::Prime::Point->from_hex(_decompress($Kc));
-  # m/0
-  # my ($Ki, $ci) = _CKDpub($K, $c, 0);
-  # m/0/$index
-  # my ($Ki2, $ci2) = _CKDpub($Ki, $ci, $index);
-  # return _address(_compress($Ki2));
-  my ($Ki, $ci) = _CKDpub($K, $c, $index);
-  return _address(_compress($Ki));
+  if ($bizbtc->path eq 'electrum') {
+    # m/0
+    my ($Ki, $ci) = _CKDpub($K, $c, 0);
+    # m/0/$index
+    my ($Ki2, $ci2) = _CKDpub($Ki, $ci, $index);
+    return _address(_compress($Ki2));
+  }
+  else {
+    my ($Ki, $ci) = _CKDpub($K, $c, $index);
+    return _address(_compress($Ki));
+  }
 }
 
 sub _CKDpub {
@@ -115,7 +123,10 @@ sub _address {
   my $sha256 = sha256(pack('H*', shift));
   my $id = '00' . Crypt::RIPEMD160->hexhash($sha256); $id =~ s/\s//g;
   my $checksum = substr(sha256_hex(sha256(pack('H*', $id))), 0, 8);
-  return '1' . _encode58(Math::BigInt->from_hex($id . $checksum));
+  my $address = _encode58(Math::BigInt->from_hex($id . $checksum));
+  my $leadingones;
+  while ($id =~ /^(00)/) { $leadingones .= '1'; $id =~ s/^00//; }
+  return $leadingones . $address;
 }
 
 sub _decompress {
@@ -152,10 +163,10 @@ sub _encode58 {
 sub AUTOLOAD {
   my $self = shift; (my $auto = $AUTOLOAD) =~ s/.*:://;
   return if $auto eq 'DESTROY';
-  if ($auto =~ /^(confirmations|processed|status)$/x and defined $_[0]) {
+  if ($auto =~ /^(confirmations|processed|status|error)$/x and defined $_[0]) {
     $self->{"\u$auto"} = shift;
   }
-  if ($auto =~ /^(reqid|amount|address|reference|version|created|confirmations|processed|status)$/x) {
+  if ($auto =~ /^(reqid|amount|address|reference|version|created|confirmations|processed|status|error)$/x) {
     return $self->{"\u$auto"};
   }
   if ($auto =~ /^(db|id)$/x) {
@@ -174,8 +185,8 @@ Business::Bitcoin::Request - Bitcoin payment request
 
 =head1 VERSION
 
- $Revision: 1.038 $
- $Date: Wed Apr 19 00:59:00 PDT 2017 $
+ $Revision: 1.043 $
+ $Date: Tue May  9 22:54:03 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -206,9 +217,11 @@ Commit the Request object to the requests database. Only the
 
 =head2 verify
 
-Verify that the request has been paid. Returns true if the request has
-been paid, false otherwise. The number of confirmations required to
-consider a payment valid can be set via the confirmations accessor.
+Verify that the request has been paid. Returns the total unspent
+balance at the address corresponding to the request if the request has
+been paid, and 0 if the balance at the address is lower than the
+request amount. The number of confirmations required to consider a
+payment valid can be set via the confirmations accessor.
 
 =head1 ACCESSORS
 
@@ -250,6 +263,11 @@ database. Read/write.
 An optional property that can be used to record the status of the
 transaction ('processed', 'shipped', 'refunded', etc.). Stored as a
 text field in the requests database. Read/write.
+
+=head2 error
+
+If the last verify() returned undef, this accessor will return the
+error string that was received from the blockchain API call.
 
 =head2 version
 

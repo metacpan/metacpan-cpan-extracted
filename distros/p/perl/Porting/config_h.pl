@@ -3,7 +3,10 @@
 # This script reorders config_h.SH after metaconfig
 # Changing metaconfig is too complicated
 #
-# Copyright (C) 2005-2007 by H.Merijn Brand (m)'07 [18-04-2007]
+# This script is run just after metaconfig, and it
+# is run ONLY ONCE. Not to be used afterwards
+#
+# Copyright (C) 2005-2012 by H.Merijn Brand (m)'12 [22-09-2012]
 #
 # You may distribute under the terms of either the GNU General Public
 # License or the Artistic License, as specified in the README file.
@@ -33,7 +36,6 @@ my %dep = (
     BYTEORDER		=> [ qw( UVSIZE				) ],
     LONGSIZE		=> [ qw( BYTEORDER			) ],
     MULTIARCH		=> [ qw( BYTEORDER MEM_ALIGNBYTES	) ],
-    USE_CROSS_COMPILE	=> [ qw( BYTEORDER MEM_ALIGNBYTES	) ],
     HAS_QUAD		=> [ qw( I64TYPE			) ],
     HAS_GETGROUPS	=> [ qw( Groups_t			) ],
     HAS_SETGROUPS	=> [ qw( Groups_t			) ],
@@ -68,6 +70,8 @@ push @ch, ";;\nesac\n";
 
 open  $ch, "> $cSH" or die "Cannot write $cSH: $!\n";
 print $ch <<EOW;
+#!/bin/sh
+#
 # THIS IS A GENERATED FILE
 # DO NOT HAND-EDIT
 #

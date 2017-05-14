@@ -4,7 +4,7 @@ specifically designed to be readable as is.
 
 =head1 NAME
 
-README.irix - Perl version 5 on Irix systems
+perlirix - Perl version 5 on Irix systems
 
 =head1 DESCRIPTION
 
@@ -74,14 +74,10 @@ errors (especially with -Duse64bitall).
 =head2 Building with threads in Irix
 
 Run Configure with -Duseithreads which will configure Perl with
-the new Perl 5.8.0 "interpreter threads", see L<threads>.
+the Perl 5.8.0 "interpreter threads", see L<threads>.
 
-The old Perl 5.005 threads is obsolete, unmaintained, and its use is
-discouraged.  If you really want it, run Configure with the
--Dusethreads -Duse5005threads options as described in INSTALL.
-
-For either thread model and for Irix 6.2, you have to have the
-following patches installed:
+For Irix 6.2 with perl threads, you have to have the following
+patches installed:
 
         1404 Irix 6.2 Posix 1003.1b man pages
         1645 Irix 6.2 & 6.3 POSIX header file updates
@@ -110,8 +106,8 @@ Ignore them: in IRIX 5.3 there is no way to quieten ld about this.
 During compilation you will see this warning from toke.c:
 
   uopt: Warning: Perl_yylex: this procedure not optimized because it
-        exceeds size threshold; to optimize this procedure, use -Olimit option
-        with value >= 4252.
+        exceeds size threshold; to optimize this procedure, use -Olimit
+        option with value >= 4252.
 
 Ignore the warning.
 
@@ -119,12 +115,13 @@ In IRIX 5.3 and with Perl 5.8.1 (Perl 5.8.0 didn't compile in IRIX 5.3)
 the following failures are known.
 
  Failed Test                  Stat Wstat Total Fail  Failed  List of Failed
- --------------------------------------------------------------------------
+ -----------------------------------------------------------------------
  ../ext/List/Util/t/shuffle.t    0   139    ??   ??       %  ??
  ../lib/Math/Trig.t            255 65280    29   12  41.38%  24-29
  ../lib/sort.t                   0   138   119   72  60.50%  48-119
  56 tests and 474 subtests skipped.
- Failed 3/811 test scripts, 99.63% okay. 78/75813 subtests failed, 99.90% okay.
+ Failed 3/811 test scripts, 99.63% okay. 78/75813 subtests failed,
+    99.90% okay.
 
 They are suspected to be compiler errors (at least the shuffle.t
 failure is known from some IRIX 6 setups) and math library errors

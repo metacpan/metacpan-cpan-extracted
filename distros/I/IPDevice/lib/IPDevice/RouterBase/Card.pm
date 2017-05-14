@@ -3,12 +3,12 @@
 ## This file provides a class for holding informations about a router card.
 ####
 
-package RouterBase::Card;
-use RouterBase::Atom;
-use RouterBase::Module;
+package IPDevice::RouterBase::Card;
+use IPDevice::RouterBase::Atom;
+use IPDevice::RouterBase::Module;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom);
+@ISA = qw(IPDevice::RouterBase::Atom);
 
 $VERSION = 0.01;
 
@@ -18,12 +18,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::Card
+IPDevice::RouterBase::Card
 
 =head1 SYNOPSIS
 
- use RouterBase::Card;
- my $card = new RouterBase::Card;
+ use IPDevice::RouterBase::Card;
+ my $card = new IPDevice::RouterBase::Card;
  $card->module(1)->interface(2)->set_encapsulation('ppp');
 
 =head1 DESCRIPTION
@@ -61,7 +61,7 @@ sub _init {
 
 =head2 set_number($number)
 
-Defines the card number. When created via any class from the RouterBase
+Defines the card number. When created via any class from the IPDevice::RouterBase
 namespace, this is automatically set.
 
 =cut
@@ -360,7 +360,7 @@ sub module {
   $moduleno = -1 if !defined $moduleno;
   my $module = $self->{modules}->{$moduleno};
   if (!$module) {
-    $module = new RouterBase::Module;
+    $module = new IPDevice::RouterBase::Module;
     $module->set_toplevel($self->toplevel);
     $module->set_parent($self->parent);
     $module->set_number($moduleno);
@@ -386,7 +386,7 @@ sub interface {
   
   my $module = $self->{modules}->{$moduleno};
   if (!$module) {
-    $module = new RouterBase::Module;
+    $module = new IPDevice::RouterBase::Module;
     $module->set_name($moduleno);
     $self->{modules}->{$moduleno} = $module;
   }
@@ -400,7 +400,7 @@ sub interface {
 Walks through all modules calling the function $func.
 Args passed to $func are:
 
-I<$module>: The L<RouterBase::Module|RouterBase::Module>.
+I<$module>: The L<IPDevice::RouterBase::Module|IPDevice::RouterBase::Module>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped.
@@ -410,7 +410,7 @@ sub foreach_module {
   my($self, $func, %data) = @_;
   for my $moduleno (keys %{$self->{modules}}) {
     my $module = $self->{modules}->{$moduleno};
-    #print "DEBUG: RouterBase::Card::foreach_module(): Module $moduleno\n";
+    #print "DEBUG: IPDevice::RouterBase::Card::foreach_module(): Module $moduleno\n";
     return FALSE if !$func->($module, %data);
   }
   return TRUE;
@@ -422,7 +422,7 @@ sub foreach_module {
 Walks through all interfaces calling the function $func.
 Args passed to $func are:
 
-I<$interface>: The L<RouterBase::Interface|RouterBase::Interface>.
+I<$interface>: The L<IPDevice::RouterBase::Interface|IPDevice::RouterBase::Interface>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped.
@@ -432,7 +432,7 @@ sub foreach_interface {
   my($self, $func, %data) = @_;
   for my $moduleno (sort {$a <=> $b} keys %{$self->{modules}}) {
     my $module = $self->{modules}->{$moduleno};
-    #print "DEBUG: RouterBase::Card::foreach_interface(): Module $moduleno\n";
+    #print "DEBUG: IPDevice::RouterBase::Card::foreach_interface(): Module $moduleno\n";
     return FALSE if !$module->foreach_interface($func, %data);
   }
   return TRUE;
@@ -441,10 +441,10 @@ sub foreach_interface {
 
 =head2 foreach_unit($func, %data)
 
-Walks through all L<RouterBase::LogicalInterface|RouterBase::LogicalInterface>
+Walks through all L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface>
 calling the function $func. Args passed to $func are:
 
-I<$unit>: The L<RouterBase::LogicalInterface|RouterBase::LogicalInterface>.
+I<$unit>: The L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped.
@@ -454,7 +454,7 @@ sub foreach_unit {
   my($self, $func, %data) = @_;
   for my $moduleno (sort {$a <=> $b} keys %{$self->{modules}}) {
     my $module = $self->{modules}->{$moduleno};
-    #print "DEBUG: RouterBase::Card::foreach_unit(): Module $moduleno\n";
+    #print "DEBUG: IPDevice::RouterBase::Card::foreach_unit(): Module $moduleno\n";
     return FALSE if !$module->foreach_unit($func, %data);
   }
   return TRUE;

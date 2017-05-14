@@ -1,0 +1,5 @@
+Use of uninitialized value at blib/lib/Term/Query.pm line 242.
+Please enter an integer number.
+Use of uninitialized value at Query_Test.pl line 24, <STDIN> chunk 1.
+Use of uninitialized value at Query_Test.pl line 25, <STDIN> chunk 1.
+Answer = "undef"

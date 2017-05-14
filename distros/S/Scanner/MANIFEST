@@ -1,0 +1,18 @@
+MANIFEST
+Changes
+README.perl
+COPYING
+TODO
+TODONE
+Version
+licenses/Artistic
+licenses/BSD
+licenses/LGPL-2.1
+Makefile.PL
+lib/Scanner/Device.pm
+lib/Scanner/Format.pm
+lib/Scanner/Page.pm
+lib/Scanner/Job.pm
+t/load.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

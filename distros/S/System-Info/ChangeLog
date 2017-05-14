@@ -1,3 +1,8 @@
+0.055	- 2017-05-12,  H.Merijn Brand
+    * Make a longer description
+    * Chomp entries in internal info (Linux)
+    * Add cpu_type and kernel version for Darwin
+
 0.054	- 2017-03-21,  H.Merijn Brand
     * It's 2017
     * Add DSM-6.1

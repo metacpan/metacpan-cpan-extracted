@@ -53,7 +53,7 @@ namespace panda { namespace time {
 
 string tz_lzname () {
     char tmp[TZNAME_MAX+1];
-    if (_from_env(tmp, "TZ") || _tz_lzname(tmp)) return string(tmp);
+    if (_from_env(tmp, "TZ") || _tz_lzname(tmp)) return string(tmp, strlen(tmp));
     return string(GMT_FALLBACK);
 }
 

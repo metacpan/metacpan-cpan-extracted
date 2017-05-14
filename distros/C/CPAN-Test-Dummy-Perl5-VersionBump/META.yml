@@ -27,4 +27,4 @@ resources:
   bugtracker: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-VersionBump/issues
   homepage: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-VersionBump
   repository: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-VersionBump.git
-version: '0.01'
+version: '0.02'

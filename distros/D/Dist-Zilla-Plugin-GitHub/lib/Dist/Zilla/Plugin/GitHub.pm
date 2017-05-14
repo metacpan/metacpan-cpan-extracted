@@ -1,9 +1,9 @@
-package Dist::Zilla::Plugin::GitHub; # git description: v0.42-7-gef92c3f
+package Dist::Zilla::Plugin::GitHub; # git description: v0.43-3-g82b44d8
 # ABSTRACT: Plugins to integrate Dist::Zilla with GitHub
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use JSON::MaybeXS;
 use Moose;
@@ -187,7 +187,7 @@ Dist::Zilla::Plugin::GitHub - Plugins to integrate Dist::Zilla with GitHub
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 DESCRIPTION
 

@@ -11,15 +11,13 @@ use Scalar::Util qw/refaddr/;
 
 our $QUIET_MODE;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 has [qw/source type/] => ( is => 'rw', required => 1 );
 
 has attributes => ( is => 'rw', default => sub { {} } );
 
 has [qw/subfeats parentfeats/] => ( is => 'rw', default => sub { [] } );
-
-
 
 sub attr { return shift->attributes(@_); }
 
@@ -82,8 +80,6 @@ sub name { return shift->_attr_single( { name => 'Name' } ); }
 sub parent_ids { return shift->_attr_list('Parent', @_); }
 
 sub parent_id { return shift->_attr_single( { name => 'Parent' } ); }
-
-sub attr_replace { return shift->replace_attr(@_) }
 
 sub replace_attr {
   my ( $self, $name, @values ) = @_;

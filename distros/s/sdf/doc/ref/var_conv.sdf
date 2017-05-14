@@ -1,0 +1,46 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Conversion Variables
+
+H2: Purpose
+
+These variables control the conversion process.
+
+H2: Interface
+
+!block table; groups; format=325
+Name                Type        Purpose
+Init-only:
+OPT_CONFIG          string      the configuration library
+OPT_LOOK            string      the look library
+OPT_STYLE           string      the type of a document
+OPT_TARGET          string      target format
+OPT_NUMBER          integer     line numbering frequency (when pretty-printing programming languages)
+Processing:
+DEFAULT_TABLE_STYLE string      default style for tables (initially {{columns}})
+DEFAULT_TAB_SIZE    integer     default tab size (initially 8)
+!endblock
+
+H2: Description
+
+The {{init-only}} variables can only be set via {{CMD:sdf}}'s -D option or
+via the {{MAC:init}} macro on the top line of a file.
+
+The {{processing}} variables control the processing of [[SDF]] text
+before it is passed to a format driver for conversion.
+
+{{DEFAULT_TAB_SIZE}} is used when tabs are converted to spaces
+within [[SDF]] files.
+
+!end_topic

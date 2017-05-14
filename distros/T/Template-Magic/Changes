@@ -1,12 +1,5 @@
 Template-Magic Latest Versions Changes
 
-Version 1.4
-- some deprecation warnings removed
-- fixing one broken test - after some investigations in the problem
-  I've concluded the test was wrong and not the code
-- Sebastian Knapp <rock@ccls-online.de> is the current maintainer
-  of this module 
-
 Version 1.39
 - A lot of minor fixes in the POD
 - Removed the use of AUTOLOADER. Now all handlers are loaded at compile-time

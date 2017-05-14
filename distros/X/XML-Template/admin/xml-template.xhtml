@@ -1,0 +1,552 @@
+<html xmlns:core="http://syrme.net/xml-template/core/v1"
+      xmlns:exception="http://syrme.net/xml-template/exception/v1"
+      xmlns:file="http://syrme.net/xml-template/file/v1"
+      xmlns:condition="http://syrme.net/xml-template/condition/v1"
+      xmlns:var="http://syrme.net/xml-template/var/v1"
+      xmlns:form="http://syrme.net/xml-template/form/v1"
+      xmlns:user="http://syrme.net/xml-template/user/v1"
+      xmlns:block="http://syrme.net/xml-template/block/v1"
+      xmlns:item="http://syrme.net/xml-template/item/v1"
+      xmlns:type="http://syrme.net/xml-template/type/v1"
+      xmlns:group="http://syrme.net/xml-template/group/v1"
+      xmlns:multimedia="http://syrme.net/xml-template/multimedia/v1">
+
+<file:include name="admin/header.xhtml"/>
+
+<body marginwidth="5" leftmargin="5" marginheight="5" topmargin="5">
+
+<var:set name="_title">${Config/xml-template/namespaces/namespace[@name='${Form.xmlns}']/title/text()}</var:set>
+<var:set name="_prefix">${Config/xml-template/namespaces/namespace[@name='${Form.xmlns}']/prefix/text()}</var:set>
+<var:set name="_keys">${Config/xml-template/source-mappings/source-mapping[@namespace='${Form.xmlns}']/keys/text()}</var:set>
+
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="1">
+      <img src="image/trans.gif" width="1" height="24" alt=" "/>
+    </td>
+
+    <var:foreach var="el" array="${Config/xml-template/source-mappings/source-mapping}">
+      <condition:if cond="${el/@namespace} eq ${Form.xmlns}">
+
+    <td class="tab" width="109">
+      <font size="-2">${el/table/text()}</font>
+    </td>
+
+      <condition:else>
+
+    <td class="tab_back" width="109">
+      <font size="-2">
+        <a href="/admin/admin.xhtml?xmlns=${el/@namespace}">${el/table/text()}</a>
+      </font>
+    </td>
+
+      </condition:else>
+
+      </condition:if>
+
+    <td class="tab_between">&nbsp;</td>
+    </var:foreach>
+
+    <td class="tab_between" width="109">&nbsp;</td>
+    <td class="tab_between" width="109">&nbsp;</td>
+  </tr>
+
+  <tr class="bg">
+    <td width="1" bgcolor="#ffffff"/>
+    <td colspan="14">
+      <div class="box">
+
+        <condition:if cond="${Form.xmlns}">
+
+        <table width="100%" border="0" cellspacing="0" cellpadding="2">
+          <tr>
+            <td>
+              <font size="-1">
+                [ <a href="/admin/admin.xhtml?xmlns=${Form.xmlns}">New/Edit</a> |
+                  <a href="/admin/admin.xhtml?Logout=1">Logout</a> ]
+              </font>
+            </td>
+            <td align="right">
+              <font size="-1">
+                Help: [ <a href="/help/index.html"
+                           onClick="window.open ('/help/index.html', 'help',
+                                      'toolbar=no,scrollbars=yes,width=600,height=450');
+                                    return false">Top</a>
+                      | <a href="/help/index.html#${_prefix}"
+                           onClick="window.open ('/help/index.html#${_prefix}', 'help',
+                                      'toolbar=no,scrollbars=yes,width=600,height=450');
+                                    return false">${_prefix}</a>
+                      ]
+              </font>
+            </td>
+          </tr>
+
+          <condition:if cond="${Form.Edit}">
+            <condition:if cond="${Form.${_keys}}.length > 1">
+
+          <tr><td colspan="2">
+              <file:include name="admin/msgbox.xhtml" text="Please only select one entry."/>
+          </td></tr>
+
+              <var:unset name="Form.Edit"/>
+              <var:unset name="Form.${_keys}"/>
+            </condition:if>
+          </condition:if>
+
+          <condition:if cond="${Form.Upload}">
+            <exception:try>
+              <form:upload name="file" dest="${Config/xml-template/uploaddir/text()}/${Form.file}"/>
+              <exception:catch>
+          <tr><td colspan="2">
+            <file:include name="admin/msgbox.xhtml" text="Error Uploading file '${Form.file}': ${Exception.info}"/>
+          </td></tr>
+              </exception:catch>
+              <exception:else>
+          <tr><td colspan="2">
+            <file:include name="admin/msgbox.xhtml" text="Uploaded file '${Form.file}'"/>
+          </td></tr>
+              </exception:else>
+            </exception:try>
+
+          <condition:elseif cond="${Form.ListFiles}">
+          <tr>
+            <td colspan="2">
+              <table width="100%" bgcolor="#666666" border="0" cellpadding="0" cellspacing="0"><tr><td>
+                <table width="100%" bgcolor="#666666" border="0" cellpadding="1" cellspacing="1">
+                  <tr class="title">
+                    <td>
+                      <font color="#ffffff"><b>Files in ${Config/xml-template/uploaddir/text()}</b></font>
+                    </td>
+                  </tr>
+                  <tr class="main">
+                    <td>
+                      <file:list cols="7" src="${Config/xml-template/uploaddir/text()}"/>
+                    </td>
+                  </tr>
+                </table>
+              </td></tr></table>
+            </td> 
+          </tr>
+          </condition:elseif>
+
+          <condition:elseif cond="${Form.Update}">
+            <exception:try>
+              <${_prefix}:update name="${Form.old_${_keys}}" insert="true">
+                <${_prefix}:foreach_describe fields="Field,Type,Values">
+                  <exception:try>
+                    <file:include name="admin/update_${_prefix}_${Field}\.xhtml"/>
+                    <exception:catch>
+                      <condition:if cond="${Type} eq 'datetime'">
+                        <${_prefix}:${Field}>${Form.${Field}_year}-${Form.${Field}_month}-${Form.${Field}_day} ${Form.${Field}_hour}:${Form.${Field}_minute}:00</${_prefix}:${Field}/>
+                      <condition:elseif cond="${Type} eq 'enum'">
+                        <condition:if cond="${Form.${Field}_new} ne ''">
+                          <${_prefix}:alter action="change" column="${Field}" type="enum"
+                                            values="${Values}.join (,),${Form.${Field}_new}"/>
+                          <${_prefix}:${Field}>${Form.${Field}_new}</${_prefix}:${Field}/>
+                        <condition:else>
+                          <${_prefix}:${Field}>${Form.${Field}}</${_prefix}:${Field}/>
+                        </condition:else>
+                        </condition:if>
+                      </condition:elseif>
+                      <condition:else>
+                        <${_prefix}:${Field}>${Form.${Field}}</${_prefix}:${Field}/>
+                      </condition:else>
+                      </condition:if>
+                    </exception:catch>
+                  </exception:try>
+                </${_prefix}:foreach_describe>
+              </${_prefix}:update>
+
+              <exception:catch>
+
+          <tr><td colspan="2">
+            <file:include name="admin/msgbox.xhtml" text="Error Creating/Updating ${Form.${_keys}}: ${Exception.info}"/>
+          </td></tr>
+
+              </exception:catch>
+              <exception:else>
+
+          <tr><td colspan="2">
+            <file:include name="admin/msgbox.xhtml" text="Created/Updated ${Form.${_keys}}"/>
+          </td></tr>
+
+              </exception:else>
+            </exception:try>
+
+          </condition:elseif>
+          <condition:elseif cond="${Form.Delete} && ! ${Form.Cancel}">
+            <condition:if cond="${Form.Confirm}.defined">
+              <exception:try>
+                <var:foreach var="el" array="${Form.${_keys}}">
+                  <${_prefix}:delete name="${el}"/>
+                </var:foreach>
+                <exception:catch>
+
+          <tr><td colspan="2">
+             <file:include name="admin/msgbox.xhtml" text="Error Deleting ${Form.${_keys}}: ${Exception.info}"/>
+          </td></tr>
+
+                </exception:catch>
+                <exception:else>
+
+          <tr><td colspan="2:">
+            <file:include name="admin/msgbox.xhtml" text="Deleted entries."/>
+          </td></tr>
+
+                </exception:else>
+              </exception:try>
+
+              <var:unset name="Form.Delete"/>
+              <var:unset name="Form.${_keys}"/>
+            <condition:else>
+
+          <tr>
+            <td colspan="2">
+              <table width="100%" bgcolor="#666666" border="0" cellpadding="0" cellspacing="0"><tr><td>
+                <table width="100%" bgcolor="#666666" border="0" cellpadding="1" cellspacing="1">
+                  <form action="/admin/admin.xhtml" method="post">
+                    <input type="hidden" name="xmlns" value="${Form.xmlns}"/>
+                    <tr class="title">
+                      <td>
+                        <a href="/help/db.html#confirm"
+                           onClick="window.open ('/help/db.html#confirm',
+                                                 'help',
+                                                 'toolbar=no,scrollbars=yes,width=320,height=320');
+                                    return false"><b><font color="white">Confirm Delete</font></b></a>
+                      </td>
+                    </tr>
+                    <tr class="main">
+                      <td>
+                        Delete:
+                        <ul>
+                          <var:foreach var="el" array="${Form.${_keys}}">
+                            <li><b>${el}</b></li>
+                          </var:foreach>
+                        </ul>
+                        <input type="hidden" name="Delete" value="Delete"/>
+                        <var:foreach var="el" array="${Form.${_keys}}">
+                          <input type="hidden" name="${_keys}" value="${el}"/>
+                        </var:foreach>
+                        <input type="submit" name="Confirm" value="ConfirmDelete"/>
+                        <input type="submit" name="Cancel" value="Cancel"/>
+                      </td>
+                    </tr>
+                  </form>
+                </table>
+              </td></tr></table>
+            </td>
+          </tr>
+
+            </condition:else>
+            </condition:if>
+          </condition:elseif>
+
+          <condition:elseif cond="${Form.Cancel}">
+            <var:unset name="Form.Delete"/>
+            <var:unset name="Form.${_keys}"/>
+          </condition:elseif>
+
+          <condition:elseif cond="${Form.AddMembers}">
+            <var:set name="_rprefix">${Config/xml-template/namespaces/namespace[@name='${Form.rxmlns}']/prefix/text()}</var:set>
+            <var:set name="_rkeys">${Config/xml-template/source-mappings/source-mapping[@namespace='${Form.rxmlns}']/keys/text()}</var:set>
+            <${_prefix}:select name="${Form.${_keys}}" fields="*">
+              <exception:try>
+                <var:foreach var="rname" array="${Form.rnames}">
+                  <${_rprefix}:insert name="${rname}"/>
+                </var:foreach>
+
+                <exception:catch>
+
+          <tr><td colspan="2:">
+             <file:include name="admin/msgbox.xhtml" text="Error Adding Members: ${Exception.info}"/>
+          </td></tr>
+
+                </exception:catch>
+
+                <exception:else>
+
+          <tr><td colspan="2:">
+             <file:include name="admin/msgbox.xhtml" text="Added Members."/>
+          </td></tr>
+
+                </exception:else>
+              </exception:try>
+            </${_prefix}:select>
+          </condition:elseif>
+
+          <condition:elseif cond="${Form.RemoveMembers}">
+            <var:set name="_rprefix">${Config/xml-template/namespaces/namespace[@name='${Form.rxmlns}']/prefix/text()}</var:set>
+            <var:set name="_rkeys">${Config/xml-template/source-mappings/source-mapping[@namespace='${Form.rxmlns}']/keys/text()}</var:set>
+            <${_prefix}:select name="${Form.${_keys}}" fields="*">
+              <exception:try>
+                <var:foreach var="name" array="${Form.names}">
+                  <${_rprefix}:delete name="${name}"/>
+                </var:foreach>
+
+                <exception:catch>
+
+          <tr><td colspan="2:">
+             <file:include name="admin/msgbox.xhtml" text="Error Removing Members: ${Exception.info}"/>
+          </td></tr>
+
+                </exception:catch>
+
+                <exception:else>
+
+          <tr><td colspan="2:">
+             <file:include name="admin/msgbox.xhtml" text="Removed Members."/>
+          </td></tr>
+
+                </exception:else>
+              </exception:try>
+            </${_prefix}:select>
+          </condition:elseif>
+          </condition:if>
+
+          <condition:if cond="! ${Form.Delete}">
+            <condition:if cond="! ${Form.Edit}">
+
+          <tr>
+            <td colspan="2">
+              <table width="100%" bgcolor="#666666" border="0" cellpadding="0" cellspacing="0"><tr><td>
+                <table width="100%" bgcolor="#666666" border="0" cellpadding="1" cellspacing="1">
+                  <form action="/admin/admin.xhtml" method="post">
+                    <input type="hidden" name="xmlns" value="${Form.xmlns}"/>
+                    <tr class="title">
+                      <td>
+                        Select/Delete [
+                        <a class="title" href="/help/db.html#select"
+                           onClick="window.open ('/help/db.html#select', 'help',
+                                      'toolbar=no,scrollbars=yes,width=320,height=320');
+                                    return false">help</a>
+                        ]
+                      </td>
+                    </tr>
+                    <tr class="main">
+                      <td>
+                        <select name="${_keys}" size="10" multiple="true">
+                          <${_prefix}:foreach fields="${_keys}" orderby="${_keys}">
+                            <option>${${_keys}}</option>
+                          </${_prefix}:foreach>
+                        </select><br/>
+                        <input type="submit" name="Edit" value="Edit"/>
+                        <input type="submit" name="Delete" value="Delete"/>
+                      </td>
+                    </tr>
+                  </form>
+                </table>
+              </td></tr></table>
+            </td>
+          </tr>
+
+            </condition:if>
+
+          <tr>
+            <td colspan="2">
+              <table width="100%" bgcolor="#666666" border="0" cellpadding="0" cellspacing="0"><tr><td>
+                <table width="100%" bgcolor="#666666" border="0" cellpadding="1" cellspacing="1">
+                  <form action="/admin/admin.xhtml" method="post">
+                    <input type="hidden" name="xmlns" value="${Form.xmlns}"/>
+                    <input type="hidden" name="Edit" value="Edit"/>
+                    <tr class="title">
+                      <td colspan="2">
+                        Create/Edit [
+                        <a class="title" href="/help/db.html#edit"
+                           onClick="window.open ('/help/db.html#edit', 'help',
+                                      'toolbar=no,scrollbars=yes,width=320,height=320');
+                                    return false">help</a>
+                        ]
+                      </td>
+                    </tr>
+                    <${_prefix}:select name="${Form.${_keys}}" fields="*">
+                      <${_prefix}:foreach_describe fields="Field,Type,Size,Key">
+                        <tr class="main">
+                          <td width="1%" align="right" nowrap="1">
+                            <condition:if cond="${Key} eq 'PRI'">
+                              <font color="red">*</font>
+                            </condition:if>
+                            <a href="/help/${_prefix}\.html#${Field}"
+                               onClick="window.open('/help/${_prefix}\.html#${Field}', 'help',
+                                          'toolbar=no,scrollbars=yes,width=320,height=320');
+                                        return false">${Field}</a>:
+                          </td>
+                          <td>
+                            <exception:try>
+                              <file:include name="admin/edit_${_prefix}_${Field}\.xhtml"/>
+                              <exception:catch>
+                                <condition:if cond="${Type} eq 'varchar'">
+                                  <condition:if cond="${Size} > 60">
+                                    <var:set name="size">60</var:set>
+                                  <condition:else>
+                                    <var:set name="size">${Size}</var:set>
+                                  </condition:else>
+                                  </condition:if>
+                                  <input type="text" name="${Field}" size="${size}" value="${${Field}}"/>
+                                <condition:elseif cond="${Type} eq 'text'">
+                                  <textarea name="${Field}" rows="5" cols="40">${${Field}}</textarea>
+                                </condition:elseif>
+                                <condition:elseif cond="${Type} eq 'mediumtext'">
+                                  <textarea name="${Field}" rows="25" cols="60" wrap="off">${${Field}}</textarea>
+                                </condition:elseif>
+                                <condition:elseif cond="${Type} eq 'datetime'">
+                                  ${${Field}}.set_date_vars (${Field})
+                                  <form:select name="${Field}_month" default="${${Field}_month}">
+                                    <form:option value="01">January</form:option>
+                                    <form:option value="02">February</form:option>
+                                    <form:option value="03">March</form:option>
+                                    <form:option value="04">April</form:option>
+                                    <form:option value="05">May</form:option>
+                                    <form:option value="06">June</form:option>
+                                    <form:option value="07">July</form:option>
+                                    <form:option value="08">August</form:option>
+                                    <form:option value="09">September</form:option>
+                                    <form:option value="10">October</form:option>
+                                    <form:option value="11">November</form:option>
+                                    <form:option value="12">December</form:option>
+                                  </form:select>
+                                  <form:select name="${Field}_day" default="${${Field}_day}">
+                                    <var:foreach var="day" array="01..31">
+                                      <form:option value="${day}">${day}</form:option>
+                                     </var:foreach>
+                                 </form:select>,
+                                  <form:select name="${Field}_year" default="${${Field}_year}">
+                                    <var:foreach var="year" array="1998..2005">
+                                      <form:option value="${year}">${year}</form:option>
+                                    </var:foreach>
+                                  </form:select>@
+                                  <form:select name="${Field}_hour" default="${${Field}_hour}">
+                                    <var:foreach var="hour" array="00..24">
+                                      <form:option value="${hour}">${hour}</form:option>
+                                    </var:foreach>
+                                  </form:select>:
+                                  <form:select name="${Field}_minute" default="${${Field}_minute}">
+                                    <var:foreach var="minute" array="00..60">
+                                      <form:option value="${minute}">${minute}</form:option>
+                                    </var:foreach>
+                                  </form:select>
+                                </condition:elseif>
+                                <condition:elseif cond="${Type} eq 'enum'">
+                                  <form:select name="${Field}" default="${${Field}}">
+                                    <var:foreach var="value" array="${Values}">
+                                      <form:option value="${value}">${value}</form:option>
+                                    </var:foreach>
+                                  </form:select>
+                                  <i>or</i> new value:
+                                  <input type="text" name="${Field}_new" length="32"/>
+                                </condition:elseif>
+                                </condition:if>
+                                <condition:if cond="${Key} eq 'PRI'">
+                                  <input type="hidden" name="old_${Field}" value="${${Field}}"/>
+                                </condition:if>
+                              </exception:catch>
+                            </exception:try>
+                          </td>
+                        </tr>
+                      </${_prefix}:foreach_describe>
+                    </${_prefix}:select>
+                    <tr class="title">
+                      <td colspan="2" align="center">
+                        <font color="#ffffff">
+                          <input type="submit" name="Update" value="Update"/>
+                        </font>
+                      </td>
+                    </tr>
+                  </form>
+                </table>
+              </td></tr></table>
+            </td>
+          </tr>
+
+            <condition:if cond="${Form.Edit} && ${Config/xml-template/namespaces/namespace[@name='${Form.xmlns}']/relation}">
+              <var:foreach var="relation" array="${Config/xml-template/namespaces/namespace[@name='${Form.xmlns}']/relation}">
+                <var:set name="_rprefix">${Config/xml-template/namespaces/namespace[@name='${relation/relation/text()}']/prefix/text()}</var:set>
+                <var:set name="_rkeys">${Config/xml-template/source-mappings/source-mapping[@namespace='${relation/relation/text()}']/keys/text()}</var:set>
+          <tr>
+            <td colspan="2">
+              <table width="100%" bgcolor="#666666" border="0" cellpadding="0" cellspacing="0"><tr><td>
+                <table width="100%" bgcolor="#666666" border="0" cellpadding="1" cellspacing="1">
+                  <form action="/admin/admin.xhtml" method="post">
+                  <input type="hidden" name="xmlns" value="${Form.xmlns}"/>
+                  <input type="hidden" name="rxmlns" value="${relation/relation/text()}"/>
+                  <input type="hidden" name="Edit" value="Edit"/>
+                  <input type="hidden" name="${_keys}" value="${Form.${_keys}}"/>
+                  <tr class="title">
+                    <td colspan="2">
+                      <font color="#ffffff">
+                      <b>Add/Remove ${_rprefix} Members</b>
+                      [
+                      <a href="/help/db.html#relation"
+                         onClick="window.open ('/help/db.html#relation', 'help',
+                                    'toolbar=no,scrollbars=yes,width=320,height=320');
+                                  return false"><font color="#ffffff">help</font></a>
+                      ]
+                      </font>
+                    </td>
+                  </tr>
+                  <tr class="main">
+                    <td colspan="2">
+                      <table width="100%" border="0" cellpadding="1" cellspacing="0">
+                        <tr>
+                          <td width="33%">
+                            Members:<br/>
+                            <select name="names" size="10" multiple="true">
+                              <${_prefix}:select name="${Form.${_keys}}" fields="*">
+                                <${_rprefix}:foreach fields="*">
+                                  <option>${${_rkeys}}</option>
+                                </${_rprefix}:foreach>
+                              </${_prefix:select}>
+                            </select>
+                          </td>
+                          <td align="center" valign="center" width="33%">
+                            <input type="submit" name="AddMembers" value=" &lt; "/><br/><br/>
+                            <input type="submit" name="RemoveMembers" value=" &gt; "/>
+                          </td>
+                          <td width="33%">
+                            Non-Members:<br/>
+                            <select name="rnames" size="10" multiple="true">
+                              <${_rprefix}:foreach fields="*">
+                                <option>${${_rkeys}}</option>
+                              </${_rprefix}:foreach:foreach>
+                            </select>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  </form>
+                </table>
+              </td></tr></table>
+            </td>
+          </tr>
+
+              </var:foreach>
+            </condition:if>
+
+            <condition:if cond="! ${Form.Edit}">
+              <exception:try>
+                <file:include name="admin/${_prefix}\.xhtml"/>
+                <exception:catch/>
+              </exception:try>
+            </condition:if>
+
+          </condition:if>
+
+        </table>
+
+        <condition:else>
+
+          <center><font color="red">Please select a module.</font></center>
+
+        </condition:else>
+
+        </condition:if>
+      </div>
+    </td>
+  </tr>
+</table>
+
+</body>
+
+<file:include name="admin/footer.xhtml"/>
+
+</html>

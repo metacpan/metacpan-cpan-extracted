@@ -3,10 +3,7 @@ use File::Temp qw/tempfile/;
 use IPC::Open3 qw/open3/;
 use List::Util qw/first/;
 
-{
-    no warnings 'redefine';
-    *Test2::Plugin::IOMuxer::Layer::time = sub() { 12345 };
-}
+BEGIN { *JSON = Test2::Plugin::IOMuxer::Layer->can('JSON') }
 
 ok($INC{'Test2/Plugin/OpenFixPerlIO.pm'}, "Loaded OpenFixPerlIO");
 
@@ -45,28 +42,16 @@ subtest mux_handle => sub {
     $Test2::Plugin::IOMuxer::Layer::MUX_FILES{$muxed} = undef;
 
     open($mh, '<', $muxed) or die "$!";
+
     like(
-        [<$mh>],
+        [map { JSON->new->decode($_) } <$mh>],
         [
-            qr{^START-TEST2-SYNC-\d+: 12345\n$},
-            qr{^This is a test\n$},
-            qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
-            qr{^START-TEST2-SYNC-\d+: 12345\n$},
-            qr{^This is a\n$},
-            qr{^multi-line test\n$},
-            qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
-            qr{^START-TEST2-SYNC-\d+: 12345\n$},
-            qr{^This is a no line-end test 1\n$},
-            qr{^-STOP-TEST2-SYNC-\d+: 12345\n$},
-            qr{^START-TEST2-SYNC-\d+: 12345\n$},
-            qr{^This is a no line-end test 2\n$},
-            qr{^-STOP-TEST2-SYNC-\d+: 12345\n$},
-            qr{^START-TEST2-SYNC-\d+: 12345\n$},
-            qr{^\n$},
-            qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
-            qr{^START-TEST2-SYNC-\d+: 12345\n$},
-            qr{^This is the final test\n$},
-            qr{^\+STOP-TEST2-SYNC-\d+: 12345\n$},
+            {buffer => "This is a test\n"},
+            {buffer => "This is a\nmulti-line test\n"},
+            {buffer => "This is a no line-end test 1"},
+            {buffer => "This is a no line-end test 2"},
+            {buffer => "\n"},
+            {buffer => "This is the final test\n"},
         ],
         "Got all lines as expected, with markers in mux file"
     );
@@ -132,58 +117,21 @@ subtest mux_test_io => sub {
     );
 
     like(
-        [<$mux_fh>],
-        array {
-            item qr/^START-TEST2-SYNC-(\d+): [0-9\.]+/;
-            item qr/^STDOUT BEFORE TESTING/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^STDERR BEFORE TESTING/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^# Seeded srand with seed/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^ok 1 - pass 1/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^STDOUT IN TESTING/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^ok 2 - pass 2/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^# a diag message 1/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^STDERR IN TESTING/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^# a diag message 2/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^1\.\.2/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^STDOUT AFTER TESTING/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-            item qr/^STDERR AFTER TESTING/;
-            item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-            end;
-        },
+        [map { JSON->new->decode($_) } <$mux_fh>],
+        [
+            {buffer => "STDOUT BEFORE TESTING\n"},
+            {buffer => "STDERR BEFORE TESTING\n"},
+            {buffer => qr/# Seeded srand with seed/},
+            {buffer => "ok 1 - pass 1\n"},
+            {buffer => "STDOUT IN TESTING\n"},
+            {buffer => "ok 2 - pass 2\n"},
+            {buffer => "# a diag message 1\n"},
+            {buffer => "STDERR IN TESTING\n"},
+            {buffer => "# a diag message 2\n"},
+            {buffer => "1..2\n"},
+            {buffer => "STDOUT AFTER TESTING\n"},
+            {buffer => "STDERR AFTER TESTING\n"}
+        ],
         "Got muxed output"
     );
 

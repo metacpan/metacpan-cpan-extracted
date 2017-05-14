@@ -1,0 +1,22 @@
+Announcing the release of Perl Module GetOpt::Regex Version 0.03
+Uploaded to ftp://franz.ww.tu-berlin.de/incoming
+
+Getopt::Regex - handle command line options flexibly using 
+                regular expressions 
+
+This package provides a flexible yet simple method for handling
+command line options. It does not stamp over the callers namespace or,
+currently, inforce any particular standard for the options - the user
+can do this if they want. By using anonymous closures sophisticated
+option specifications can easily be constructed.
+
+Module Entry
+
+12) Option, Argument, Parameter and Configuration File Processing
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Getopt::
+::Regex        Rdpr  Regular expression option handling           JARW
+
+  JARW John A.R. Williams <J.A.R.Williams@aston.ac.uk>

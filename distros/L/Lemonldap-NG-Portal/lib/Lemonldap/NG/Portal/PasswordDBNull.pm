@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::PasswordDBNull;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.9.1';
 
 ## @apmethod int passwordDBInit()
 # Does nothing

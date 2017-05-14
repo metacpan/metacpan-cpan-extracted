@@ -1,5 +1,10 @@
 Revision history for Devel-MAT
 
+0.26    2017/05/09 19:14:57
+        [BUGFIXES]
+         * Handle perl 5.25.6's moving of OP_PUSHRE to OP_SPLIT
+         * Don't bother #include'ing <unistd.h> as we don't need it
+
 0.25    2017/03/27 14:09:55
         [CHANGES]
          * Attempt to elide RVs in `identify` output

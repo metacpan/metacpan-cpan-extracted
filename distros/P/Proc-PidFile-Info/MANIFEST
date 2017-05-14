@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Proc/PidFile/Info.pm
+t/01_use.t
+t/author-critic.t
+t/info.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/run/bar.pid
+t/run/foo.pid
+t/run/whitespace.pid
+t/service.pid

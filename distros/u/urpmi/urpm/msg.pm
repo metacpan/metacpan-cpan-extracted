@@ -1,11 +1,11 @@
 package urpm::msg;
 
-# $Id: msg.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
 no warnings;
 use Exporter;
 use URPM;
+use urpm::util 'append_to_file';
 
 my $encoding;
 BEGIN {
@@ -13,10 +13,8 @@ BEGIN {
     eval "use open ':locale'" if $encoding && $encoding ne 'ANSI_X3.4-1968';
 }
 
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
-
 our @ISA = 'Exporter';
-our @EXPORT = qw(N N_ P translate bug_log message_input message_input_ toMb formatXiB sys_log);
+our @EXPORT = qw(N N_ P translate bug_log message_input toMb formatXiB sys_log);
 
 #- I18N.
 use Locale::gettext;
@@ -94,23 +92,15 @@ sub sys_log { defined &syslog and eval { syslog("info", @_) } }
 
 #- writes only to logfile, not to screen
 sub bug_log {
-    if ($::logfile) {
-	open my $fh, ">>$::logfile"
-	    or die "Can't output to log file [$::logfile]: $!\n";
-	print $fh @_;
-	close $fh;
-    }
+    append_to_file($::logfile, @_) if $::logfile;
 }
 
 sub ask_yes_or_no {
     my ($msg) = @_;
-    message_input_($msg . N(" (y/N) "), boolean => 1) =~ /[$yesexpr]/;
+    message_input($msg . N(" (y/N) "), boolean => 1) =~ /[$yesexpr]/;
 }
 
-#- deprecated, use message_input_() instead
-sub message_input { &_message_input }
-
-sub message_input_ {
+sub message_input {
     my ($msg, %o_opts) = @_;
     _message_input($msg, undef, %o_opts);
 }
@@ -175,8 +165,8 @@ sub _format_line_selected_packages {
 
     my @l = map {
 	my @name_and_evr = $_->fullname;
-	if ($state->{selected}{$_->id}{suggested}) {
-	    push @name_and_evr, N("(suggested)");
+	if ($state->{selected}{$_->id}{recommended}) {
+	    push @name_and_evr, N("(recommended)");
 	}
 	\@name_and_evr;
     } sort { $a->name cmp $b->name } @$pkgs;
@@ -221,7 +211,6 @@ sub localtime2changelog { scalar(localtime($_[0])) =~ /(.*) \S+ (\d{4})$/ && "$1
 
 1;
 
-__END__
 
 =head1 NAME
 

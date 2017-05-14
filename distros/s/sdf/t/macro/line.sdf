@@ -1,0 +1,7 @@
+# This file tests the line and message macros
+
+!line 42
+!message "the line number should be 43 now"; "Warning"
+
+!line 0; "myfile.xyz"
+The file name is now [[FILE_SHORT]].

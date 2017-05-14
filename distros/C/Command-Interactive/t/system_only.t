@@ -12,10 +12,9 @@ use locale;
 
 setlocale(LC_ALL, 'en');
 
-
 my $command = Command::Interactive->new;
 
 is($command->run("echo yes"), undef, "Run command successfully");
-like($command->run("asdfasdf"), qr/Could not execute asdfasdf/, "Bogus command");
+is($command->run("asdfasdf"), 'Could not execute asdfasdf: No such file or directory', "Bogus command");
 
 1;

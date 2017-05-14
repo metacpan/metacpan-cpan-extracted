@@ -1,0 +1,43 @@
+# zxid/sg/liberty-idwsf-people-service-v1.0.sg
+# Slightly edited, 1.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-authn-svc-v2.0.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(as,  urn:liberty:sa:2006-08)
+import(a,   http://www.w3.org/2005/08/addressing,ws-addr-1.0.xsd)
+import(sp,  urn:oasis:names:tc:SAML:2.0:protocol, saml-schema-protocol-2.0.xsd)
+import(lu,  urn:liberty:util:2006-08, liberty-idwsf-utility-v2.0.xsd)
+
+SASLRequest:
+  as:Data?
+  sp:RequestedAuthnContext?
+  as:Extensions?:
+    any+  ns(##other)  processContents(lax)
+    ;
+  @mechanism        -> %xs:string
+  @authzID?         -> %xs:string
+  @advisoryAuthnID? -> %xs:string
+  @any
+  ;
+
+SASLResponse:
+  lu:Status
+  as:PasswordTransforms?
+  as:Data?
+  a:EndpointReference*
+  @serverMechanism? -> %xs:string
+  @any
+  ;
+
+Data: base(xs:base64Binary) ;
+
+PasswordTransforms:
+  as:Transform+:
+    as:Parameter*: base(xs:string)
+      @name -> %xs:string
+      ;
+    @name -> %xs:anyURI
+    @any
+    ;
+  ;
+
+#EOF

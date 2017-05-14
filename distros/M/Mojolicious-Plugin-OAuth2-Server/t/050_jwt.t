@@ -17,6 +17,14 @@ MOJO_APP: {
   # plugin configuration
   plugin 'OAuth2::Server' => {
     jwt_secret           => $jwt_secret,
+    jwt_claims           => sub {
+      my ( $args ) = @_;
+
+      return (
+        iss => "some iss",
+        sub => "not the passed user_id",
+      );
+    },
     clients              => {
       1 => {
         client_secret => 'boo',
@@ -82,6 +90,8 @@ cmp_deeply(
     'exp' => re( '^\d{10}$' ),
     'iat' => re( '^\d{10}$' ),
     'jti' => re( '^.{32}$' ),
+    'iss' => "some iss",
+    'sub' => "not the passed user_id",
     'scopes' => [
       'eat',
       'sleep'
@@ -132,6 +142,8 @@ cmp_deeply(
     'exp' => re( '^\d{10}$' ),
     'iat' => re( '^\d{10}$' ),
     'jti' => re( '^.{32}$' ),
+    'iss' => "some iss",
+    'sub' => "not the passed user_id",
     'scopes' => [
       'eat',
       'sleep',
@@ -149,6 +161,8 @@ cmp_deeply(
     'user_id' => undef,
     'iat' => re( '^\d{10}$' ),
     'jti' => re( '^.{32}$' ),
+    'iss' => "some iss",
+    'sub' => "not the passed user_id",
     'scopes' => [
       'eat',
       'sleep',

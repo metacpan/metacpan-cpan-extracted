@@ -1,0 +1,6 @@
+t/Compare.t
+Makefile.PL
+README
+MANIFEST
+lib/String/Compare.pm
+META.yml

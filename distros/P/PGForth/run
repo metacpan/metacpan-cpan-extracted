@@ -1,0 +1,29 @@
+#! /usr/bin/perl -w
+
+require 5;
+ 
+use Language::PGForth;
+
+Language::PGForth::forth (<<'END');
+perl( "Forth in Perl\nby Peter Gallasch\n\n" )perl .
+END
+
+Language::PGForth::interpret;
+
+__END__
+
+test input:
+
+44 55 perl(
+print forth (5, 6 ,7, "perl( print \"\@st\\n\" )"."perl drop * + ")
+)perl drop cr .s
+
+end test input.
+test input should yield:
+
+5 6 7
+47
+        55
+        44
+ok
+

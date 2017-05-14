@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Phenyx/Utils.pm
+lib/Phenyx/Utils/LSF/lsf.bash.profile
+lib/Phenyx/Utils/LSF/Submission.pm
+lib/Phenyx/Utils/LSF/JobInfo.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/Phenyx/Submit/LSF.t
+t/Phenyx/Submit/lsf.conf
+t/Phenyx/Submit/JobInfo.t
+t/Phenyx/Submit/bjobs.out
+scripts/lsf-synchroFilesUntilFinished.pl

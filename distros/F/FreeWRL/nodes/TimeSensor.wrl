@@ -1,0 +1,102 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+PROTO Show [
+	field SFVec3f loc 0 0 0
+	eventIn SFFloat set_fraction 
+	eventOut SFTime startTime
+] {
+	Transform {
+	translation IS loc
+	children [
+		DEF TR Transform {
+			children [
+				TouchSensor {
+					touchTime IS startTime
+				}
+				Shape { geometry Box { size 0.4 0.4 0.4}
+				 appearance Appearance { material 
+				 	Material { } } }
+			]
+		}
+	]
+	}
+	DEF POS PositionInterpolator {key [0 1] keyValue [ 0 0 0 0 1 0]
+		set_fraction IS set_fraction
+		}
+	ROUTE POS.value_changed TO TR.translation
+}
+
+
+###################### Test 1: various cycle times
+DEF TS1 TimeSensor {
+	loop TRUE
+}
+DEF S1 Show {loc 0 0 0}
+ROUTE TS1.fraction_changed TO S1.set_fraction
+
+DEF TS2 TimeSensor {
+	loop TRUE
+	cycleInterval 1.5
+}
+DEF S2 Show {loc 1 0 0}
+ROUTE TS2.fraction_changed TO S2.set_fraction
+
+DEF TS3 TimeSensor {
+	loop TRUE
+	cycleInterval 2
+}
+DEF S3 Show {loc 2 0 0}
+ROUTE TS3.fraction_changed TO S3.set_fraction
+
+##################### Test 2: disabled ones
+
+DEF TS4 TimeSensor {
+	loop TRUE
+	cycleInterval 2
+	enabled FALSE
+}
+DEF S4 Show {loc 0 -1 0}
+ROUTE TS4.fraction_changed TO S4.set_fraction
+
+DEF TS5 TimeSensor {
+	loop TRUE
+	cycleInterval 2
+	loop FALSE
+}
+DEF S5 Show {loc 1 -1 0}
+ROUTE TS5.fraction_changed TO S5.set_fraction
+
+DEF TS6 TimeSensor {
+	loop TRUE
+	cycleInterval 2
+	startTime 2 
+	stopTime 3 
+}
+DEF S6 Show {loc 2 -1 0}
+ROUTE TS6.fraction_changed TO S6.set_fraction
+
+##################### Test 3: click to activate
+
+
+DEF TS7 TimeSensor {
+	loop FALSE
+	cycleInterval 2
+}
+DEF S7 Show {loc 0 -2.5 0}
+ROUTE TS7.fraction_changed TO S7.set_fraction
+ROUTE S7.startTime TO TS7.startTime
+
+DEF TS8 TimeSensor {
+	loop TRUE
+	cycleInterval 2
+	startTime 5
+	stopTime 6
+}
+DEF S8 Show {loc 1 -2.5 0}
+ROUTE TS8.fraction_changed TO S8.set_fraction
+ROUTE S8.startTime TO TS8.startTime

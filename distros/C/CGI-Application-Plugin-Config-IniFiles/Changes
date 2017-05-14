@@ -1,0 +1,10 @@
+Revision history for Perl extension CGI::Application::Plugin::Config::IniFiles.
+
+0.02  Mon Oct 22 15:02:33 CEST 2007
+    - add support for passing a Config::IniFiles object instead of 
+      a filename (Sven Neuhaus)
+
+0.01  Wed Apr  4 09:47:55 2007
+	- original version; created by h2xs 1.23 with options
+		-n CGI::Application::Plugin::Config::IniFiles -AXc
+

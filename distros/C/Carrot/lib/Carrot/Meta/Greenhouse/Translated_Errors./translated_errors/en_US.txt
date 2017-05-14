@@ -1,0 +1,21 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+publication
+	A fatal error occured in program
+	%s
+	Amount of Carrot loaded: '%s'
+	The following should be a trace to the cause.
+
+opponent
+	Objection against calling parameters of a subroutine.
+	Called subroutine: %s
+	Origin line: #%s
+	Origin package: %s
+
+origin
+	around line %s
+	in subroutine %s
+	in package %s

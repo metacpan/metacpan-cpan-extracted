@@ -1,0 +1,77 @@
+# $Id$
+#
+# >>Title::     HLP Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# The {{stdlib/hlp.sdn}} module defines [[SDF]] configuration details for
+# generating [[Windows]] help files.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# This is needed for building HPJ files on Unix
+!default SDF_DOSHOME        SDF_HOME
+!define  HLP_OPTIONS_ROOT   "."
+!block end
+!export HLP_OPTIONS_ROOT
+!endblock
+
+# Controlling options
+!block variables; family="HLP_OPTIONS"; export
+Name            Type        Rule
+BMROOT          string
+BUILD           string
+CITATION        string
+COMPRESS        string
+CONTENTS        string
+COPYRIGHT       string
+ERRORLOG        boolean
+FORCEFONT       boolean
+ICON            string
+LANGUAGE        string
+MAPFONTSIZE     string
+MULTIKEY        string
+OLDKEYPHRASE    string
+OPTCDROM        string
+REPORT          string
+ROOT            string
+TITLE           string
+WARNING         string
+!endblock
+
+# Things at the paragraph level for doing help ...
+!block paraattrs; family="hlp"
+Name:Type:Rule
+context:integer:
+header:boolean:
+topic:string:
+window:boolean:
+endwindow:boolean:
+!endblock
+
+# Things at the phrase level for doing help ...
+!block phraseattrs; family="hlp"
+Name:Type:Rule
+popup:string:
+!endblock
+
+# Default build_title output
+!macro build_hlp_cover
+        !default DOC_TOC 2
+        !default DOC_TOC_TITLE DOC_TITLE
+        !if DOC_LOGO
+            !define DOC_TOC_GRAPHIC $var{'DOC_LOGO'} . ".bmp"
+        !endif
+!endmacro

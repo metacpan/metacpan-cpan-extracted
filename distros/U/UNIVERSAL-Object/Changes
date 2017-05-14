@@ -1,5 +1,13 @@
 Revision history for Perl extension UNIVERSAL::Object
 
+0.10 2017-05-12
+    - Improve the content of the errors produced by
+      this module so that it is clearer where the
+      errors are coming from without having to view
+      the stack trace. If that is needed there is
+      the Carp::Always module.
+        - tweaked the tests to match the new errors
+
 0.09 2017-05-08
     - add support to UNIVERSAL::Object::Immutable
       to handle additional REPR types

@@ -1,0 +1,552 @@
+SMIME TOOL (merged with ZXID.org project since 2009)
+29.10.1999, 17.11.1999, Sampo Kellomaki <sampo@iki.fi>
+
+NOTE: This is still highly experimental code and build system has not been
+      perfected yet. No Windows build is known to exist (contributions?).
+
+OFFICIAL WEB SITE
+	http://zxid.org/Net_SSLeay/smime.html
+
+BUILDING
+
+	(build and install OpenSSL-0.9.4, from www.openssl.org)
+	tar xzf smime-0.7.tgz
+	cd smime-0.7
+	cons smime        # get cons from http://www.dsmit.com/cons/
+	cons SMIMEutil.so # build the perl module (optional)
+	./smime -help     # shows quick usage
+	./smime -dv ../smime-0.7.tgz
+	    (cut my certificate and distribution signature from the web
+	     site and paste to stdin)
+
+TUTORIAL PART 1: SIGNING AND ENCRYPTING
+
+	First you need to have certicate and private key in pem format. To
+	produce them, use openssl tool or export them from your browser.
+	I illustrate the latter method first, because I'm going to use
+	Netscape browser for interoperability testing later. You can
+	peek at TUTORIAL PART3, Key generation if you need to do this
+	yourself.
+
+	- Go to security info dialog in Netscape browser.
+	- From Certificates-Yours export your certificate (if you
+	  don't have a certificate installed yet, read the FAQs and mailing
+	  list archieves at www.openssl.org), save it as me.p12. It
+	  will ask for password to protect your private key.
+	
+	  openssl pkcs12 -clcerts <me.p12 >me.pem
+		- it will ask for the password to open your private key and
+		  then asks you to invent a new password that will be
+		  used to protect your private key in pem format
+
+	  more me.pem
+	
+	You should see something like this:
+
+Bag Attributes
+    friendlyName: your@email.com
+    localKeyID: F3 85 A8 4B DA 39 B6 40 6B D6 20 01 39 46 6A 94 47 9D 2C 0F
+Key Attributes: <No Attributes>
+-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,541E04862A13F6B1
+
+8+2vo6Iz49uj/Mf31JTgaRuIq9ueHsknsHXhmXp7s1BmS8xulT22Zzpdh6g1yqAO
+(snip)XeQsZrWykdWvN2qGu/cNa2HnUQAG0p25tNZ3CKmqpJBVg0RXr20JlQ==
+-----END RSA PRIVATE KEY-----
+Bag Attributes
+    friendlyName: your@email.com
+    localKeyID: F3 85 A8 4B DA 39 B6 40 6B D6 20 01 39 46 6A 94 47 9D 2C 0F
+subject=/C=PT/L=City/O=Company/OU=Dept/CN=Your Name/Email=your@email.com
+issuer= /C=PT/L=City/O=Your CA/OU=Personal Certs/CN=End user CA/Email=certifier@ca.com
+-----BEGIN CERTIFICATE-----
+MIIDEzCCAnygAwIBAgIBAzANBgkqhkiG9w0BAQQFADCBlTELMAkGA1UEBhMCUFQx
+(snip)Tj0JYGZMzSUfzOG3wajK6B39d6EyXK8=
+-----END CERTIFICATE-----
+
+	Ok. Now you are all set to use smime tool. First lets create
+	simple mime entity (see RFC1521 for definition):
+	
+	  echo foo | ./smime -mime text/plain | tee foo.mime
+	
+Signing
+	Now, let's sign it:
+
+	  ./smime -s me.pem password <foo.mime | tee foo.smime
+
+	And send it:
+
+	  ./send.pl 'Sig test' your@email.com your@email.com <foo.smime
+
+	Now go to your email reading software (Netscape Communicator suggested
+	for this exercise) and read the mail you just sent. It should display
+	as signed. In the previous command the second argument is the
+        From: header which must match friendlyname/EMAIL in me.pem
+
+	You can repeat this success using following pipeline:
+
+	  echo foo | ./smime -mime text/plain | ./smime -s me.pem password \
+	  | ./send.pl 'Sig test' your@email.com your@email.com
+
+	(Note how \ is used for folding the lines. In reality you should
+	 type all the stuff in one line.)
+
+Clear signing
+	The previous method produces a base64 blob that you probaly would not
+	like to send to a news group. Clear signing allows mail to be read
+	even if the reader is not S/MIME aware:
+
+	  echo foo | ./smime -mime text/plain | ./smime -cs me.pem password \
+	  | ./send.pl 'Sig test' your@email.com your@email.com
+
+	Note how the message has "foo" visible. Now go read this with your
+	mail reader. It should also display as signed. If not, then its
+	possible that canonization was not correctly done. That might even
+	be an error in my part.
+
+Encrypting
+	To encrypt you need to know recipient's cert. Here I use our own
+	because its by definition already installed in our browser.
+
+	  echo foo | ./smime -mime text/plain | ./smime -e me.pem \
+	  | ./send.pl 'Enc test' your@email.com your@email.com
+
+	Now you should be able to read your mail (it may ask for a password
+	to open your private key) and see the message in plain text, but
+	marked as encrypted.
+
+Signing and Encrypting
+	Next we'll first sign a message and then wrap it in encryption. This
+	is the usual way and hides the signatories from eavesdroppers:
+
+	  echo foo | ./smime -mime text/plain | ./smime -cs me.pem password \
+	  | ./smime -e me.pem | ./send.pl 'test' your@email.com your@email.com
+
+	Again your mail reader should show the message marked as
+	Encrypted and Signed.
+
+Encrypting and Signing
+	The other way is to first encrypt and then sign the encrypted
+	message. This might be useful in some automated context where a robot
+	would verify the signature but the robot should not be allowed to see
+	the message:
+
+	  echo foo | ./smime -mime text/plain | ./smime -e me.pem \
+	  | ./smime -cs me.pem password \
+	  | ./send.pl 'Enc test' your@email.com your@email.com
+
+	Now Netscape shows two icons: one saying "Signed" and placed near
+	the headers. Other icon that says "Encrypted" appears in the
+	content area.
+
+	In fact S/MIME specification allows arbitrary nesting of encryptions
+	and signatures, what ever your application may need.
+
+Multipart content
+	Now for the final part that is not really S/MIME specific, but
+	nice to have. You can first compose a normal mime multipart message,
+	possibly even containing some encrypted components and some not.
+	Try this:
+
+	  echo bar | ./smime -m image/gif some.gif \
+	  | ./smime -cs me.pem password | ./smime -e me.pem \
+	  | ./send.pl 'Enc test' your@email.com your@email.com
+
+	Now you should see signed and encrypted message with an image
+	attached. The multipart functionality implemented by -m is very
+	basic and by no means anything generic. Its only a demonstration.
+
+TUTORIAL PART 2: DECRYPTING AND VERIFYING SIGNATURES
+
+Decrypting
+	To demonstrate decrypting, I'll cut the mail from the loop. Basically
+	I'll demonstrate introperability with myself. If you want to try
+	interoperability with Netscape, you can use Netscape to send mail
+	and grab it from mail spool and then feed it into pipeline. As this
+	is a bit messy and might involve editing the file manually, I
+	wont go into that now. Here's a simple encryption - decryption:
+	
+	  echo foo | ./smime -mime text/plain | ./smime -e me.pem \
+	  | tee foo.p7m | ./smime -d me.pem passwd
+
+	foo wrapped in mime headers should come out. I also used tee(1) to
+	put the encrypted form in a file in case I also want to verify
+	it with Netscape
+
+	  ./send.pl 'Enc test' your@email.com your@email.com <foo.p7m
+
+	or in qmail
+
+	  /var/qmail/bin/qmail-inject your@email.com < foo.p7m
+
+        This is most convenient method because it allows you to import
+	certificates belonging to others than yourself and still
+	deliver mail to yourself. You want this, because you will soon
+	discover that Netscape can hold in its certificate database
+	only one certificate per email address (or is it distinguished name?)
+	and if that one "slot" is occupied, say, in "People" section, then
+	you can't import it any more to "Yours" section. Hence the solution
+	is to use different email address (and friendly name) every
+	single time.
+
+Verifying signature
+	Due to somewhat incomplete nature of OpenSSL-0.9.4 PKCS7 signature
+	verification code, I have implemented my own signature verfication
+	scheme that works in five steps
+
+		1. find out who signed the message
+		2. verify message signature using signer's certificate
+		3. find out who certified the signer's certificate
+		4. verify signer's cert using certifier's cert
+		5. repeat 3. & 4. until at root of the chain
+
+	This has the advantage that there are less obscure stuff and
+	assumptions hidden inside the program, i.e. user must understand
+	what signature and certificate verification is all about and
+	you get to observe every step of the way. The down side is that
+	its less automatic. In my particular application this does not
+	happen to be a problem because I have out of band information
+	about who is supposed to have signed what.
+
+	Here we go: lets produce a signature to play with
+
+	  echo foo | ./smime -mime text/plain | tee foo.mime \
+	  | ./smime -s me.pem password | tee foo.p7m
+	
+	Now see who signed it
+	
+	  ./smime -qs < foo.p7m
+	
+	Now I assume that I have some way of finding the certificate using
+	the issuer DN and serial number returned in the previous step. These
+	two pieces of information constitute unique ID for a certificate.
+	Perhaps I keep my certs in LDAP or some other database. Anyway,
+	assume the certificate is found, then
+	
+	  ./smime -v me.pem <foo.p7m | tee foo2.mime
+	  diff foo.mime foo2.mime   # just to check!
+	
+	Note that diff may show white space differences (try diff -b) because
+	line endings in your mime message were canonized to CRLF for signing.
+	This is mandated by S/MIME specification.
+
+	Now proceed with verifying the certificate:
+
+	  ./smime -qc <me.pem
+
+	Now out of band means are used to find the signer's certificate. Then
+	to check that the signature matches:
+
+	  ./smime -vc ca.pem <me.pem
+
+Verifying clear signature
+	(does not currently work :-(
+
+Under construction: chain verification (does not currently work)
+	mkdir certs
+	cd certs
+	cp ../me.pem .
+	../hash-certs.pl *.pem
+	cd ..
+	echo foo | ./smime -mime text/plain | ./smime -s me.pem password \
+	| ./smime -v
+
+TUTORIAL PART 3: A KEY GENERATION METHOD
+
+Bootstrapping a simple public key infrastructure
+
+	Suppose entity M is funding projects and needs to have all project
+	leaders (Ps) sign a contract specifying responsibilities. M
+	distributes a simple application that incorporates the smime tool. Ps
+	use the application to sign the contracts and send them electronically
+	to M. If irregularities develop, M sues P to court and uses the
+	digitally signed contract as evidence. For this to work
+
+		I.  M must convince the court that the system does not have
+		    technical flaws that could work in his favor. This proof
+		    is much easier with digital signatures than with systems
+		    that depend on procedural integrity (e.g. passwords over
+		    SSL protected connection may prove at the moment the
+		    intention of P, but when document is recovered from backup
+		    10 years later, all procedural proofs vanish)
+		
+		II. P's signature must be as valid as paper and ink
+			1. P's real world identity must be connected to
+			   digital signature
+			2. P must have understood what it means to sign
+			   contract digitally
+			3. P must have sufficient integrity or the system
+			   must technically guarantee that P's private
+			   key could not have been used by any one else
+			4. P must have acted by free will and in full powers
+			   of mind
+			5. law must not prohibit digital signature
+
+	M needs to establish a simple public key infrastructure. I propose
+	that the application generates key pairs for P's and sends
+	certification requests, further, it also prints the certification
+	request in paper form including,
+
+		- fingerprint of public key (as number and as bar code)
+		- full dump of public key and all attributes appearing
+		  in the certification request
+		- legal language to guarantee 2. & 3. (on point 3 we rely
+		  on integrity)
+		- details of conventional identification of P
+		- space for signature
+
+	With this paper P goes to some commonly agreed and trustworthy
+	notary. This could be notary public or it could be some trusted
+	administrative organ in P's organization. It could even be M, but
+	that would cause a bureaucracy bottle neck at M, and hence increase
+	costs of the solution.
+	
+	P signs the paper and proves his identity in presence of the notary
+	who confirms the act. The paper is sent to M. This takes care of
+	1. and 4. As paper contract about use of digital signatures now
+	exists between M and P, 5. is only of concern if it explicitly
+	nullifies such contract (or if court practice still does not consider
+	digital signature valid?).
+
+	Finally paper arrives to M where a clerk processes it (the bar
+	code helps here). He finds the certification request from data base
+	and sees that it matches the paper and issues a digital cerificate
+	that is immediately placed on a public server for everybody to
+	see. The paper is securely archieved forever.
+	
+	Once the certificate is publically available, signing and verifying
+	contracts using it is trivial and can even be done between P and
+	some other party than M (e.g. certificate could be used for email).
+	
+	However, to bootstrap the system it should, ideally, be possible
+	to sign your first contract even without waiting for the
+	certification to happen. After all, the impulse	for P to adhere
+	to PKI of M came from needing to sign a	contract (dead line for
+	research proposals may be very close). The contract would be
+	in signed, but not verified status until the certification happens.
+
+	Here the OpenSSL (or PKCS7?) does not serve us well, because it needs
+	a certificate even for the signing operation, although common
+	sense says that the private key and attributes of certification
+	request (ok, you can't know what serial number will be assigned)
+	should be enough. I solve this problem by signing the first contract
+	with a self signed certificate. Although this is quite suboptimal,
+	it allows me to get going without hacking OpenSSL innards too much.
+	Only complication arises from needing to establish that also the
+	certified public key is able to decrypt the hash of the signed
+	material.
+
+Key generation
+
+	Smime tool contains simple key generation command that will
+	make certification request as well as self signed cert. This
+	is bit simplistic and really geared towards my particular application
+	as the X509v3 certificate options are hardwired. Be sure to read
+	the source code to check they are the way you want.
+
+	  echo "commonName=Joe Smith|emailAddress=joe@test.com" \
+	  | ./smime -kg "description=foo" passwd req.pem >priv_ss.pem
+
+	The stuff that is echoed to stdin is your distinguished name. You
+	must use long forms of attribute name and you can only use attributes
+	known to OpenSSL.
+
+        *** How to specify cn as needed by SSL certs?
+
+        The req.pem should be sent to certification authority for signing.
+        Meanwhile you can use the self signed certificate which was output
+	to stdout, here priv_ss.pem. Note that the private key is also
+	output to the stdout so do not give that file to anyone. If you need
+	to give the certificate, you should edit a copy of priv_ss.pem
+	and remove the private key.
+
+	To be able to import your private key and certificate to Netscape
+	you can use
+
+	  ./smime -pem-p12 you@test.com passwd pw-for-p12 <priv_ss.pem >me.p12
+
+	The first argument (the email address) is the friendly name. Netscape
+	appears to match this against From mail header when verifying
+	signatures. For minimum troubles you should keep this equal to
+	emailAddress field of your certificate.
+
+Being a certificate authority
+
+	Once you have made your req.pem, you can send it to some commercial
+	certification authority or you can just be your own. The CA
+	functionality of smime tool is not very complete. Basically
+	it allows you to do the crypto part (signing certificate request with
+	CA's private key) but you must manually do book keeping to ensure
+	uniqueness of serial numbers and to make sure you do not issue the
+	same certificate twice, etc.
+
+	Here's how you'd sign a request (you probably used -kg to make
+	the CA's certificate):
+
+	  ./smime -ca ca-id.pem very-secret 1 <req.pem >cert.pem
+
+	The number one is the serial number. As I said, you should do
+	bookkeeping to ensure you never reuse a serial number. Many
+	systems depend on being uniquely able to identify certificate
+	by its issuing authority and serial number. A certificate
+	authority that can not guarantee uniqueness of serial numbers is
+	not trustworthy.
+
+	Please note that the -ca hard wires all X509v3 options and extensions.
+	Be sure to read the source to check they are the way you want them.
+
+TUTORIAL PART 4: SIGNING AND VERIFYING SOFTWARE DISTRIBUTIONS
+
+	smime tool has detached signature feature which is meant for
+	signing and verifying software distributions. Here's how. First
+	make yourself an identity
+
+	  echo 'commonName=my dist key|emailAddress=you@test.com' \
+	  | ./smime -kg '' pw dist-req.pem >dist-id.pem
+	
+	Now open dist-id.pem in editor and save the certificate part as
+	dist-cert.pem. Pubish dist-cert.pem on your web site.
+
+	Then sign your software package
+
+	  ./smime -ds dist-id.pem pw <your-dist-1.00.tgz >your-dist-1.00.sig
+
+	I suggest convention of naming the signature file with same name
+	as the tarball, but extension `.sig'. Now put the .sig file
+	available where ever you put your tarball. You should also publish
+	it on your web site so people can get it even if they forgot to
+	download the .sig file.
+
+	Or you could produce a combination signature and certificate file
+	and put that available on your website
+
+	  ./smime -ds dist-id.pem pw <your-dist-1.00.tgz \
+	  | cat - dist-cert.pem >your-dist-1.00.sigcert
+
+	To verify a distribution signature one would say 
+	
+	  ./smime -dv your-dist-1.00.tgz
+	    (cut certificate and distribution signature from the web
+	     site and paste to stdin)
+
+	The dv looks for the -----BEGIN/END CERTIFICATE----- separator to
+	figure out where the certificate ends and signature starts.
+
+	If you already had the .sig or the certificate you could just say
+
+	  cat dist-cert.pem your-dist-1.00.sig | ./smime -dv your-dist-1.00.tgz
+	
+	(OK, PGP already exists to do this stuff, but I always found it
+	 quite messy to deal with detached signatures in PGP. I'm sure
+	 poor usability leads to less people verifying the signatures.)
+
+SMIMEUTIL LIBRARY AND PERL MODULE
+
+	The smimeutil library is documented in smimeutil.h, see smime.c
+	for some examples of usage. The SMIMEUtil:: perl module is
+	not currently documented. For usage examples see test.pl.
+
+CAVEATS
+	For signing to work correctly, your mime entity must be canonized
+	the same way as the recipient will canonize it. In general this
+	means that you must use CRLF as line termination and must include
+	all headers.
+	
+	If you are clear signing, then you may want to consult RFC2311 for
+	some ways the message might get ruined (e.g. changes in whitespace).
+	In my experience most important requirement seems to be to not
+	use any trailing whitespace. YMMV.
+
+	For signatures to verify correctly, the From: header of the mail
+	must be equal to "friendlyname:" and EMAIL fields in your cert.
+
+	When encrypting, do not forget to wrap your message in mime entity.
+	If you don't, ./smime -d will silently return emptiness, Netscape
+	reports "improperly formatted DER-encoded message". This
+	will _not_ work:
+
+	  echo "foo" | ./smime -e me.pem | ./smime -d me.pem secret  # WRONG!
+
+SECURITY CAVEATS
+	Passing passwords on command line is insecure. The smime tool is
+	intended more as a demonstration than a production tool. See
+	pass-password.pl for an example how to use file descriptor to
+	pass the passwords more securely.
+
+	smimeutil.c compiles by default to use DES-EDE3-CBC cipher which
+	is not known by export versions of many browsers. See around
+	line 400 in smime-enc.c if you need to change this. Be ware that
+	RC2-40-CBC can be cracked in real time by trivial resources.
+	Never-the-less its the only cipher that interoperates with all
+	versions of browsers.
+
+	Randomnumbers are not (yet) initialized as they should.
+	
+	Certificate verification scheme puts the burden of verification
+	on user. For example, the user must notice if purported CA certificate
+	has X509v3 attribute that forbids it from being CA cert.
+
+TIP
+	You can use Netscape to encrypt and sign messages and then look
+	at them in mail spool. This way you see their raw structure before
+	any mail reader gets to interpret it. This is the best way to
+	debug differences between what you produce and what is presumably
+	standards compatible.
+
+TO DO
+	Parsing mime messages in robust and fully correct way
+
+BUGS
+	Due to the way the API is defined all stuff is kept in memory. While
+	this is simple and easy, you might get into trouble with large files.
+	I'd say the memory consumption will not exceed five times the file
+	size, but don't bet on it.
+
+	Signature verification in perl module still needs some work.
+
+SEE ALSO
+	RFC1521 (MIME)
+	RFC2111 (S/MIME v2)
+	*** RFCXXXX (S/MIME v3)
+	http://www.openssl.org
+	http://zxid.org/Net_SSLeay/smime.html  (this stuff)
+
+USAGE
+	(reproduced from ./smime -help)
+	
+	./smime -cs private password <mime-entity >smime  # clear sign
+	./smime -cv cert <smime-entity >data              # verify clear sig
+	./smime -ds private passwd <file >smime-sig       # make detached sig
+	./smime -dv file <smime-sig-entity                # verify detached
+	./smime -s  private password <mime-entity >smime  # sign
+	./smime -qs <smime-entity >signing-cert-info      # find out who signed
+	./smime -v cert <smime-entity >signer-dn          # verify signature
+
+	./smime -vc cacert <cert                          # verify certificate
+
+	./smime -e public <mime-entity >smime-ent         # encrypt
+	./smime -d private password <smime-entity >mime   # decrypt
+
+	./smime -qr <req.pem    # Query all you can about request
+	./smime -qc <cert.pem   # Query all you can about certificate
+	./smime -ca ca_cert passwd serial <req.pem >cert.pem     # sign a req
+
+	./smime -p12-pem p12pw pempw <x.p12 >x.pem  # convert PKCS12 to pem
+	./smime -pem-p12 frindly@name.com pempw p12pw <x.pem >x.p12
+
+	./smime -m type1 file1 type2 file2 type3 file3 <text  # make multipart
+	./smime -m image/gif foo.gif <message | ./smime -s private pass >smime
+
+	./smime -kg attr passwd req.pem <dn >priv_ss.pem  # keygen
+
+	./smime -base64 <file >file.base64
+	./smime -unbase64 <file.base64 >file
+	./smime -mime text/plain <file >mime-entity
+	./smime -mime_base64 image/gif <file.gif >mime-entity
+	./smime -split dirprefix <multipart         # splits multipart
+	./smime -base64 <in | ./smime -unbase64 >out
+	./smime -cat <in >out   # copy input to output using slurp and barf
+
+	./smime -kg 'description=Test' secret req.pem <me.dn >ss.pem
+
+--Sampo

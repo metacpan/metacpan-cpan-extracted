@@ -1,0 +1,5 @@
+.# Title: variable set numeric from environment
+.# Set: a := 12 + 3
+Fish
+.echo a has value \v{a}
+Cake

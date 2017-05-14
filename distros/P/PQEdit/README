@@ -1,0 +1,44 @@
+Copyright 1998, Washington University School of Medicine,
+Institute for Biomedical Computing. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. 
+
+
+PQEdit is a perl cgi script which provides general purpose Web-based database
+table editing for relational database tables using automatic CGI forms.  PQEdit
+is based on the RDBAL Relational Database Abstraction Layer Schema Object.
+Currently it supports Oracle (via ODBC) and all Transact-SQL relational
+database servers.  This has been tested, at least minimally, on the Apache web
+server under Solaris and MS WinNT and on MS IIS 3.0 under MS WinNT.
+
+It runs on a web server as a Perl 5 CGI script that uses the CGI,
+Apache::Sybase::DBlib, Sybase::DBlib, Win32::ODBC, RDBAL, RDBAL::Schema
+modules.
+
+PQ Edit uses the RDBAL::Schema module to query the database for information
+about the tables and fields available.  Based on this information, it tries
+construct a reasonable interface for editing any table of interest.
+
+PQ Edit does not maintain a connection to the database--it reconnects to the
+database server on each action.  PQ Edit passes the username and password
+given to it to itself on each action so that it can reconnect to the database
+server.
+
+INSTALLATION: 
+
+To install this package, just change to the directory in which this file is
+found and type the following: 
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+And then copy pqedit.cgi to a place in your web directory tree that allows CGI
+scripts to run (if your web server supports mod_perl, a mod_perl location is
+preferred). pqedit.cgi will be copied to your '/usr/local/bin' directory also. 
+
+The mssql_pqweb.sql or sybase_pqweb.sql DDL scripts may be used to create the
+appropriate tables in the optional pqweb database.  See the comments at the top
+of these files for their usage.

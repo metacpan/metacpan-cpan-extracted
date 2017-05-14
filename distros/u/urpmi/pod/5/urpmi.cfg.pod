@@ -58,9 +58,9 @@ all xml info files are downloaded when doing urpmi.addmedia and urpmi.update
 
 =back
 
-=item B<no-suggests>
+=item B<no-recommends>
 
-Same as specifying B<--no-suggests> for urpmi. Disabled by default.
+Same as specifying B<--no-recommends> for urpmi. Disabled by default.
 
 =item B<auto>
 
@@ -174,11 +174,6 @@ like B<basesystem> dependencies).
 
 Same as B<--prozilla-options> for urpmi, urpmq or urpmi.addmedia.
 Additional options to pass to B<prozilla> when downloading files.
-
-=item B<repackage>
-
-Same as specifying B<--repackage> for urpmi. Disabled by default.
-Ignored when it's set globally by urpmi.recover.
 
 =item B<resume>
 

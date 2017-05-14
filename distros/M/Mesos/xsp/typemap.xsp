@@ -1,0 +1,181 @@
+%loadplugin{feature::default_xs_typemap};
+
+%typemap{std::string};
+%typemap{std::vector<std::string>};
+%typemap{Status}{parsed}{
+    %xs_type{T_ENUM};
+};
+
+%typemap{mesos::perl::SchedulerDriver*}{simple}{
+    %xs_type{O_SCHEDULER_DRIVER};
+    %xs_input_code{%{ 
+        if (!SvROK($arg) || !(SvTYPE(SvRV($arg)) == SVt_PVHV))
+            Perl_croak(aTHX_ \"$var is not a blessed reference of type ${ntype}\"); 
+        SV* tied_hash = SvRV($arg); 
+        MAGIC* ext_magic = mg_find(tied_hash, PERL_MAGIC_ext); 
+        if (!ext_magic) Perl_croak(aTHX_ \"$var has not been initialized by Mesos::XS::SchedulerDriver\");
+        $var = ($type) ext_magic->mg_ptr; 
+    }%}; 
+    %xs_output_code{%{ 
+        HV* stash = gv_stashpv(\"Mesos::SchedulerDriver\", GV_ADDWARN); 
+        SV* attr_hash = (SV*) newHV(); 
+        sv_magic(attr_hash, Nullsv, PERL_MAGIC_ext, 
+                         (const char*) $var, 0); 
+        $arg = sv_bless(sv_2mortal(newRV_noinc(attr_hash)), stash); 
+    }%}; 
+};
+
+%typemap{mesos::perl::ExecutorDriver*}{simple}{
+    %xs_type{O_EXECUTOR_DRIVER};
+    %xs_input_code{%{ 
+        if (!SvROK($arg) || !(SvTYPE(SvRV($arg)) == SVt_PVHV))
+            Perl_croak(aTHX_ \"$var is not a blessed reference of type ${ntype}\"); 
+        SV* tied_hash = SvRV($arg); 
+        MAGIC* ext_magic = mg_find(tied_hash, PERL_MAGIC_ext); 
+        if (!ext_magic) Perl_croak(aTHX_ \"$var has not been initialized by Mesos::XS::ExecutorDriver\");
+        $var = ($type) ext_magic->mg_ptr; 
+    }%}; 
+    %xs_output_code{%{ 
+        HV* stash = gv_stashpv(\"Mesos::ExecutorDriver\", GV_ADDWARN); 
+        SV* attr_hash = (SV*) newHV(); 
+        sv_magic(attr_hash, Nullsv, PERL_MAGIC_ext, 
+                         (const char*) $var, 0); 
+        $arg = sv_bless(sv_2mortal(newRV_noinc(attr_hash)), stash); 
+    }%}; 
+};
+
+%typemap{mesos::perl::MesosChannel*}{simple}{
+    %xs_type{O_MESOS_CHANNEL};
+    %xs_input_code{%{
+        if (!SvROK($arg) || !(SvTYPE(SvRV($arg)) == SVt_PVHV))
+            Perl_croak(aTHX_ \"$var is not a blessed reference of type ${ntype}\");
+        SV* tied_hash = SvRV($arg);
+        MAGIC* ext_magic = mg_find(tied_hash, PERL_MAGIC_ext);
+        if (!ext_magic) Perl_croak(aTHX_ \"$var has not been initialized by Mesos XS\");
+        $var = ($type) ext_magic->mg_ptr;
+    }%};
+};
+
+%typemap{mesos::perl::PipeChannel*}{simple}{
+    %xs_type{O_MESOS_CHANNEL};
+};
+
+%typemap{mesos::perl::InterruptChannel*}{simple}{
+    %xs_type{O_MESOS_CHANNEL};
+};
+
+%typemap{mesos::perl::MesosCommand}{parsed}{
+    %xs_type{O_MESOS_COMMAND};
+    %xs_input_code{%{
+        if (!SvROK($arg) || !(SvTYPE(SvRV($arg)) == SVt_PVAV))
+            Perl_croak(aTHX_ \"$var must be an array ref\");
+        AV* command_av = (AV*) SvRV($arg);
+        SV* name_sv = *(av_fetch(command_av, 0, 0));
+        if (SvTYPE(name_sv) != SVt_PV)
+            Perl_croak(aTHX_ \"Command name must be a string\");
+        mesos::perl::CommandArgs args;
+        int length = AvFILL(command_av) + 1;
+        for (int i = 1; i < length; i++) {
+            SV* arg = *(av_fetch(command_av, i, 0));
+            args.push_back(sv_to_CommandArg(arg));
+        }
+        $var = ($type) mesos::perl::MesosCommand(sv_to_string(name_sv), args);
+    }%};
+    %xs_output_code{%{
+        mesos::perl::MesosCommand command((mesos::perl::MesosCommand) $var);
+        AV* retval  newAV();
+        av_store(retval, 0, newSVpvn(command.name_.c_str(), command.name_.length()));
+        for (int i=0; i < command.args_.size(); i++) {
+            av_store(retval, i + 1, CommandArg_to_sv( command.args_.at(i) ));
+        }
+        $arg = sv_2mortal(newRV_noinc((SV*) retval));
+    }%};
+};
+
+%typemap{mesos::FrameworkInfo}{parsed}{
+    %xs_type{O_MESOS_FRAMEWORKINFO};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::FrameworkInfo>($arg);
+    }%};   
+};
+
+%typemap{mesos::Credential}{parsed}{
+    %xs_type{O_MESOS_CREDENTIAL};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::Credential>($arg);
+    }%};   
+};
+
+%typemap{mesos::Filters}{parsed}{
+    %xs_type{O_MESOS_FILTERS};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::Filters>($arg);
+    }%};   
+};
+
+%typemap{mesos::OfferID}{parsed}{
+    %xs_type{O_MESOS_OFFERID};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::OfferID>($arg);
+    }%};   
+};
+
+%typemap{mesos::TaskID}{parsed}{
+    %xs_type{O_MESOS_TASKID};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::TaskID>($arg);
+    }%};   
+};
+
+%typemap{mesos::ExecutorID}{parsed}{
+    %xs_type{O_MESOS_EXECUTORID};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::ExecutorID>($arg);
+    }%};   
+};
+
+
+%typemap{mesos::SlaveID}{parsed}{
+    %xs_type{O_MESOS_SLAVEID};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::SlaveID>($arg);
+    }%};   
+};
+
+%typemap{mesos::TaskStatus}{parsed}{
+    %xs_type{O_MESOS_TASKSTATUS};
+    %xs_input_code{%{
+        $var = ($type) toMsg<mesos::TaskStatus>($arg);
+    }%};   
+};
+
+
+%typemap{std::vector<mesos::Request>}{parsed}{
+    %xs_type{O_MESOS_REQUEST_VEC};
+    %xs_input_code{%{
+        $var = ($type) toMsgVec<mesos::Request>($arg);
+    }%};   
+};
+
+
+%typemap{std::vector<mesos::OfferID>}{parsed}{
+    %xs_type{O_MESOS_OFFERID_VEC};
+    %xs_input_code{%{
+        $var = ($type) toMsgVec<mesos::OfferID>($arg);
+    }%};   
+};
+
+%typemap{std::vector<mesos::TaskInfo>}{parsed}{
+    %xs_type{O_MESOS_TASKINFO_VEC};
+    %xs_input_code{%{
+        $var = ($type) toMsgVec<mesos::TaskInfo>($arg);
+    }%};   
+};
+
+%typemap{std::vector<mesos::TaskStatus>}{parsed}{
+    %xs_type{O_MESOS_TASKSTATUS_VEC};
+    %xs_input_code{%{
+        $var = ($type) toMsgVec<mesos::TaskStatus>($arg);
+    }%};   
+};
+

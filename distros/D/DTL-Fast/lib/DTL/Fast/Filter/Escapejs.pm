@@ -1,8 +1,10 @@
 package DTL::Fast::Filter::Escapejs;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Filter';
 
-$DTL::Fast::FILTER_HANDLERS{'escapejs'} = __PACKAGE__;
+$DTL::Fast::FILTER_HANDLERS{escapejs} = __PACKAGE__;
 
 our $CHARMAP = {
     "\n" => '\n',
@@ -21,9 +23,9 @@ sub filter
     my $value = shift;  # value
     shift;  # context
 
-    $filter_manager->{'safe'} = 1;
+    $filter_manager->{safe} = 1;
     $value =~ s/([\n\r\t\0'"])/$CHARMAP->{$1}/gs;
-    
+
     return $value;
 }
 

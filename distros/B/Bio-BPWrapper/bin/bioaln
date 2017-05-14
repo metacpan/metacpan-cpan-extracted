@@ -2,11 +2,15 @@
 
 use strict;
 use warnings;
-use rlib '../lib';
-use Bio::BPWrapper::AlnManipulations;
+
 use v5.10;
-use Bio::BPWrapper::GetoptLong qw(:config gnu_getopt);
+use Getopt::Long qw( :config bundling permute no_getopt_compat );
 use Pod::Usage;
+use rlib '../lib';
+
+use Pod::Usage;
+use Bio::BPWrapper;
+use Bio::BPWrapper::AlnManipulations;
 
 ################################################################################
 # Option parsing
@@ -45,9 +49,9 @@ GetOptions(
     "pep2dna|P=s",
     "resample|R:i",    # Optional value, default is floor of num_sequences/2
     "shuffle-sites|S",
-    "select-third|T",
+    "select-third",
     "remove-third",
-    "uppercase|U", # make upper case (for DNAStatistics)
+    "uppercase", # make upper case (for DNAStatistics)
     "gapstates",
     "gapstates2",
     "random-slice=i",
@@ -60,76 +64,88 @@ GetOptions(
   #  "inform|Z",
 ) or pod2usage(2);
 
-pod2usage(1) if $opts{"help"};
-pod2usage(-exitstatus => 0, -verbose => 2) if $opts{"man"};
-&print_version() if $opts{"version"};
+use constant PROGRAM => File::Basename::basename(__FILE__);
+Bio::BPWrapper::print_version(PROGRAM) if $opts{"version"};
 
-
-######################## Main #####################
-
-# This sets all internal variables, and loads AlignIO objects
 initialize(\%opts);
-
-for my $option (keys %opts) {
-    next if ($option eq 'input') || ($option eq 'output') || ($option eq 'noflatname') || ($option eq 'binary'); # Don't process these options: they are for AlignIO
-
-    if (can_handle($option)) { handle_opt($option) } # If there is a function to handle the current option, execute it
-    else { warn "Missing handler for: $option\n" }
-}
-
-write_out();
+write_out(\%opts);
 
 ################# POD Documentation ############
 
 __END__
+=encoding utf8
 
 =head1 NAME
 
-bioaln - Alignment utility based on L<Bio::Perl>
+bioaln - L<Bio::Perl> Alignment utility wrappers for use
+L<Bio::AlignIO>, L<Bio::SimpleAlign> and L<Bio::Align::Utilities>
 
 =head1 SYNOPSIS
 
-B<bioaln> I<options> [I<file>]
+B<bioaln> I<options> [I<alignment_file>]
 
-B<bioaln> C<-h> | C<--help>
-
-B<bioaln> C<-v> | C<--version>
-
-B<bioaln> C<--man>
-
+B<bioaln> [C<-h> | C<--help> | --C<v> | C<--version> C<--man>]
 
 =head1 DESCRIPTION
 
-B<bioaln> performs common, routine manipulations of sequence alignments. By default, B<bioaln> assumes that both the input and the output files are in CLUSTALW format so that multiple B<bioaln> runs can be chained with UNIX pipes. Upper-case options are less commonly used.
+B<bioaln> performs common, routine manipulations of sequence
+alignments. By default, B<bioaln> assumes that both the input and the
+output files are in CLUSTALW format so that multiple C<bioaln> runs
+can be chained with UNIX pipes. Upper-case options are less commonly
+used.
 
-=head1 OPTIONS
+=head2 OPTIONS
 
-=head2 --help, -h
+=head3 Alignment Descriptors
 
-Print a brief help message and exit.
+=over 4
 
-=head2 --avpid, -a
+=item --avpid, -a
 
-Calculate the average percent identity of an alignment. Returns the value alone. Wrap Bio::SimpleAlign->average_percentage_identity().
+Calculate the average percent identity of an alignment. Returns the
+value alone.
 
-Usage: bioaln -a <alignment_file>
+Wraps L<Bio::SimpleAlign-E<gt>average_percentage_identity()|https://metacpan.org/pod/Bio::SimpleAlign#average_percentage_identity>.
 
-=head2 --bootstrap, -b
+=item --gapstate
 
-Produced a bootstrapped alignment. Wrap Bio::Align::Utilities->bootstrap(). Note that only a single alignment is produced. To produce multiple bootstraped alignment, use BASH loop (see below)
+   bioaln --gapstate <alignment_file>
 
-Usage: bioaln -b <alignment_file> (single bootstrapped alignment)
-Usage: for i in {1..10}; do bioaln -b foo.aln > foo.boot-$i.aln; done (10 bootstrapped alignments)
+=item --length, -l
 
-=head2 --codon-view, -c
+Print alignment length. Wraps L<Bio::SimpleAlign-E<gt>length()|https://metacpan.org/pod/Bio::SimpleAlign#length>.
+
+   bioaln --length <alignment_file>
+
+=item --listids, -L
+
+List all sequence ids.
+
+   bioaln --listids <alignment_file>
+
+=item --numseq, -n
+
+Get number of sequences in alignment.
+
+   bioaln --numseq <alignment_file>
+
+=item --window, -w
+
+Calculate pairwise average sequence difference by windows (overlapping windows with fixed step of 1). Default value for window_size is 30.
+
+   bioaln --window window_size <alignment_file>
+
+=back
+
+=head3 Alignment Viewers
+
+=over 4
+
+=item --codon-view, -c
 
 Print a CLUSTALW-like alignment, but separated by codons. Intended for use with DNA sequences. Block-final position numbers are printed at the end of every alignment block at the point of wrapping, and block-initial counts appear over first nucleotide in a block.
 
-If invoked as --codon-view=n where n is some number, will print n codons per line. Other normally stackable options, such as -m, can be used alongside it. If piping through bioaln, ensure codon-view is used in the last invocation.
-
-Usage: bioaln -c <alignment_file>
-
-=head3 example
+If invoked as C<--codon-view=>I<n> where I<n> is some number, will print I<n> codons per line. Other normally stackable options, such as C<--match>, can be used alongside it. If piping through bioaln, ensure codon-view is used in the last invocation.
 
 For C<bioaln -c input_DNA.aln> when C<input_DNA.aln> contains:
 
@@ -152,41 +168,15 @@ you get:
   Seq5   ATG AAT AAA AAA ATA TAT AGC ATA GAA GAA TTA ATA GAC AAA ATA AGC
   Seq6   ATG AAT AAA AAA ATA TAT AGC ATA GAA GAA TTA ATA GAC AAA ATA AGT
 
-=head2 --delete, -d
+=item --match, -m
 
-Delete sequences based on their id. Option takes a comma-separated list of ids.
+Go through all columns and change residues identical to the reference sequence to be the match character, '.' Wraps L<Bio::SimpleAlign-E<gt>match()|https://metacpan.org/pod/Bio::SimpleAlign#match>.
 
-   bioaln -d 'seq_id_1, seq_id_2, ... , seq_id_n' <alignment_file>
+   bioaln --match <alignment_file>
 
-=head2 --nogaps, -g
+With
 
-Remove gaps (and returns an de-gapped alignment). Wrap Bio::SimpleAlign->remove_gaps();
-
-   bioaln -g <alignment_file>
-
-=head2 --input, -i
-
-Input file format (see Bio::AlignIO for supported formats). By default, this is 'clustalw'. Wrap Bio::AlignIO->new().
-
-   bioaln -i 'format'
-
-=head2 --length, -l.
-
-Print alignment length. Wrap Bio::SimpleAlign->length().
-
-   bioaln -l <alignment_file>
-
-=head2 --match, -m.
-
-Go through all columns and change residues identical to the reference sequence to be the match character, '.' Wrap Bio::SimpleAlign->match().
-
-   bioaln -m <alignment_file>
-
-=head3 Example
-
-For bioaln -m input.aln
-
-INPUT:
+For input:
 
  Seq1           ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA--ATAAGT
  Seq2           ATGAATAAAAAGATATACAGCATAGAAGAATTAATAGATAAACGATAAGC
@@ -196,7 +186,7 @@ INPUT:
  Seq6           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAA--ATAAGT
                 ******** ** * *** *************** **** ***  *****
 
-OUTPUT:
+C<bioaln --match input.aln> gives:
 
  Seq1           ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA--ATAAGT
  Seq2           .................C...............A........CG.....C
@@ -205,53 +195,147 @@ OUTPUT:
  Seq5           ...........A.....................A....C...C......C
  Seq6           ...........A.....................A....C...........
 
-=head2 --numseq, -n
+=back
 
-Get number of sequences in alignment.
+=head3 Alignment filters which produce a new alignment
 
-   bioaln -n <alignment_file>
+=over 4
 
-=head2 --output, -o
+=item --consensus, -C
 
-Output file format (see Bio::AlignIO for supported formats). By default, this is 'clustalw'. Wrap Bio::AlignIO->new().
+Add a consensus sequence to the end of the alignment with a certain
+threshold percent and id Consensus_<percent>. By default percent is
+50. Wraps
+L<Bio::SimpleAlign-E<gt>consensus_string()|https://metacpan.org/pod/Bio::SimpleAlign#consensus_string>.
 
-   bioaln -o 'format'
+   bioaln --consensus 'percent' <alignment_file>
 
-=head2 --pick, -p
+For C<bioaln --consensus '90' input.aln> where C<input.aln> contains:
+
+ Seq1                  MNNKIYSIEELIDKISMPVVAYAGEAKSFLREALEYAKNK
+ Seq2                  MNKKTYSIEELIDKISMPVVAYSGEAKSFLREALEHAKNK
+ Seq3                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
+ Seq4                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
+ Seq5                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
+ Seq6                  MNKKIYSIEELVDKISMPVVAYSGEAKSFLREALEYAKNK
+                       **:* ******:**********:************:****
+
+you get
+
+ Seq1                  MNNKIYSIEELIDKISMPVVAYAGEAKSFLREALEYAKNK
+ Seq2                  MNKKTYSIEELIDKISMPVVAYSGEAKSFLREALEHAKNK
+ Seq3                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
+ Seq4                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
+ Seq5                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
+ Seq6                  MNKKIYSIEELVDKISMPVVAYSGEAKSFLREALEYAKNK
+ Consensus_90          MN?K?YSIEEL?DKISMPVVAY?GEAKSFLREALE?AKNK
+                       ** * ****** ********** ************ ****
+
+=item --delete, -d
+
+Delete sequences based on their id. Option takes a comma-separated list of ids.
+
+   bioaln --delete 'seq_id_1, seq_id_2, ... , seq_id_n' <alignment_file>
+
+=item --dna2pep, -D
+
+Turn a CDS alignment to a corresponding protein alignment. Wraps
+L<Bio::Align::Utilities-E<gt>dna_to_aa_aln()|https://metacpan.org/pod/Bio::Align::Utilities#dna_to_aa_al>.
+
+   bioaln --dna2pep <cds_alignment>
+
+=item --erasecol, -E
+
+Remove columns with gap in designated sequence.
+
+   bioaln --erasecol 'seq_id' <alignment_file>
+
+For C<bioaln --erasecol 'Seq5' input.aln> where C<input.aln> contains:
+
+ Seq1           ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA--ATAAGT
+ Seq2           ATGAATAAAAAGATATACAGCATAGAAGAATTAATAGATAAACGATAAGC
+ Seq3           ATGAATAATAAAATATACAGCATAGAAGAATTAATAGATAAA--ATAAGC
+ Seq4           ATGAATAAAAAAACATATAGCATAGAAGAATTAATAGATAAA--ATAAGT
+ Seq5           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAAC-ATAAGC
+ Seq6           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAA--ATAAGT
+                ******** ** * *** *************** **** ***  *****
+
+you get output:
+
+ Seq1           ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA-ATAAGT
+ Seq2           ATGAATAAAAAGATATACAGCATAGAAGAATTAATAGATAAACATAAGC
+ Seq3           ATGAATAATAAAATATACAGCATAGAAGAATTAATAGATAAA-ATAAGC
+ Seq4           ATGAATAAAAAAACATATAGCATAGAAGAATTAATAGATAAA-ATAAGT
+ Seq5           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAACATAAGC
+ Seq6           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAA-ATAAGT
+                ******** ** * *** *************** **** *** *****
+
+=item --input, -i
+
+Input file format. See L<Bio::AlignIO> for supported formats. By
+default, this is 'clustalw'. Wraps L<Bio::AlignIO-E<gt>new()|https://metacpan.org/pod/Bio::AlignIO#new>.
+
+   bioaln --input 'format'
+
+=item --nogaps, -g
+
+Remove gaps (and returns an de-gapped alignment). Wraps
+L<Bio::SimpleAlign-E<gt>remove_gaps()|https://metacpan.org/pod/Bio::SimpleAlign#remove_gaps>.
+
+   bioaln --nogaps <alignment_file>
+
+=item --output, -o
+
+Output file format. see L<Bio::AlignIO> for supported formats. By
+default, this is 'clustalw'. Wraps
+L<Bio::AlignIO-E<gt>new()|https://metacpan.org/pod/Bio::AlignIO#new>.
+
+   bioaln --output 'format'
+
+=item --pick, -p
 
 Pick sequences based on their id. Option takes a comma-separated list of ids.
 
-   bioaln -p 'seq_id_1, seq_id_2, ... , seq_id_n' <alignment_file>
+   bioaln --pick 'seq_id_1, seq_id_2, ... , seq_id_n' <alignment_file>
 
-=head2 --refseq, -r
+=item --refseq, -r I<seqid>
 
-Change the reference sequence to be seq_id. Wrap Bio::SimpleAlign->set_new_reference().
+Change the reference sequence to be I<seq_id>. Wraps
+L<Bio::SimpleAlign-E<gt>set_new_reference()|https://metacpan.org/pod/Bio::SimpleAlign#set_new_reference>.
 
-   bioaln -r 'seq_id' <alignment_file>
+   bioaln --refseq 'seq_id' <alignment_file>
 
-=head2 --slice, -s
+=item --slice, -s
 
-Get a slice of the alignment. Wrap Bio::SimpleAlign->slice() with improvements.
+Get a slice of the alignment. Wraps
+L<Bio::SimpleAlign-E<gt>slice()|Bio::SimpleAlign#https://metacpan.org/pod/Bio::SimpleAlign#slice>
+with improvements.
 
 Using a '-' character in the first or second position defaults to the beginning or end, respectively. Therefore specifying -s'-,-' is the same as grabbing the whole alignment.
 
-   bioaln -s 'min,max' <alignment_file>
+   bioaln --slice 'min,max' <alignment_file>
 
--s'20,80' or --slice'20,80' or -s='20,80' or --slice='20,80'   Slice from position 20 to 80, inclusive.
--s'-,80'  Slice from beginning up to, and including position 80
--s'20,-'  Slice from position 20 up to, and including, the end of the alignment
+--slice'20,80' or --slice'20,80' or -s='20,80' or --slice='20,80'   Slice from position 20 to 80, inclusive.
+--slice'-,80'  Slice from beginning up to, and including position 80
+--slice'20,-'  Slice from position 20 up to, and including, the end of the alignment
 
 NOTE: --slice'-,x' (where x is '-' or a position) does NOT work. Use --slice='-,x' instead.
 
-=head2 --uniq, -u.
+=item --trimends
 
-Extract the alignment of unique sequences. Wrap Bio::SimpleAlign->uniq_seq().
+=item --varsites, -v
 
-   bioaln -u <alignment_file>
+Extracts variable sites. B<Used in conjunction with -g:> do not show sites with gaps in any sequence.
 
-=head3 Example
+   bioaln --varsites <alignment_file>
 
-For C<bioaln -u input.aln> where C<input.aln> contains:
+=item --uniq, -u.
+
+Extract the alignment of unique sequences. Wraps L<Bio::SimpleAlign-E<gt>uniq_seq()|https://metacpan.org/pod/Bio::SimpleAlign#uniq_seq>.
+
+   bioaln --uniq <alignment_file>
+
+For C<bioaln --uniq input.aln> where C<input.aln> contains:
 
  seq1                  ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA--ATAAGT
  seq11                 ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA--ATAAGT
@@ -282,37 +366,48 @@ you get:
  ST6                   ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAA--ATAAGT
                        ******** ** * *** *************** **** ***  *****
 
-=head2 --varsites, -v
+=item --pep2dna, -P
 
-Extracts variable sites. B<Used in conjunction with -g:> do not show sites with gaps in any sequence.
+Align CDS sequences according to their corresponding protein
+alignment. Wraps
+L<Bio::Align::Utilities-E<gt>aa_to_dna_aln()https://metacpan.org/pod/Bio::Align::Utilities#aa_to_dna_aln>.
 
-   bioaln -v <alignment_file>
+   bioaln --pep2dna 'unaligned_cds.fas' <protein_alignment>
 
-=head2 --window, -w
+=item --uppercase
 
-Calculate pairwise average sequence difference by windows (overlapping windows with fixed step of 1). Default value for window_size is 30.
+Make an uppercase alignment.
 
-   bioaln -w 'window_size'[default is 30] <alignment_file>
+   bioaln --uppercase <alignment_file>
 
-=head2 --concat, -A
+=back
 
-Concatenate multiple alignments sharing the same set of unique IDs. This is normally used for concatenating individual gene alignments of the same set of samples to a single one for making a "supertree". Wrap Bio::Align::Utilities->cat().
+=head3 Evolutionary Analysis
 
-   bioaln -A gene1.aln gene2.aln gene3.aln gene4.aln
+=over 4
 
-or using wildcard to specify files:
+=item --bootstrap, -b
 
-   bioaln -A gene*.aln
+Produced a bootstrapped alignment. Wraps
+L<Bio::Align::Utilities-E<gt>bootstrap()|https://metacpan.org/pod/Bio::Align::Utilities#bootstrap_replicates>.
 
-=head2 --conblocks, -B
+Note that only a single alignment is produced. To produce multiple
+bootstraped alignment, use BASH loop (see below)
+
+Here is an example in bash:
+
+   # 10 bootstrapped alignments
+   for i in {1..10}; do
+      bioaln --bootstrap foo.aln > foo.boot-$i.aln;
+   done
+
+=item --conblocks, -B
 
 Extract perfectly conserved blocks (PCBs, gap excluded) from an alignment, each to a new clustalw file. Default minimum length of PCB is 6 sites.
 
-   bioaln -B <alignment_file>
+   bioaln --conblocks <alignment_file>
 
-=head3:
-
-With C<bioaln -B input.aln> on input:
+With C<bioaln --conblocks input.aln> where C<input.aln> is:
 
  Seq1           ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA--ATAAGT
  Seq2           ATGAATAAAAAGATATACAGCATAGAAGAATTAATAGATAAACGATAAGC
@@ -322,7 +417,7 @@ With C<bioaln -B input.aln> on input:
  Seq6           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAA--ATAAGT
                 ******** ** * *** *************** **** ***  *****
 
-yhou get:
+you get:
 
  nuc.aln.slice-1.aln : file contents below. Site positions indicated after the '/'
 
@@ -353,112 +448,59 @@ yhou get:
  Seq6/40-47            AAAATAAG
                        ********
 
-=head2 --consensus, -C
+=item --concat, -A
 
-Add a consensus sequence to the end of the alignment with a certain threshold percent and id Consensus_<percent>. By default percent is 50. Wrap Bio::SimpleAlign->consensus_string().
+Concatenate multiple alignments sharing the same set of unique
+IDs. This is normally used for concatenating individual gene
+alignments of the same set of samples to a single one for making a
+"supertree". Wraps L<Bio::Align::UtilitiesE<gt>cat()|https://metacpan.org/pod/Bio::Align::Utilities#cat>.
 
-   bioaln -C 'percent' <alignment_file>
+   bioaln --concat gene1.aln gene2.aln gene3.aln gene4.aln
 
-=head3 Example
+or using wildcard to specify files:
 
-For C<bioaln -C '90' input.aln> where C<input.aln> contains:
+   bioaln --concat gene*.aln
 
- Seq1                  MNNKIYSIEELIDKISMPVVAYAGEAKSFLREALEYAKNK
- Seq2                  MNKKTYSIEELIDKISMPVVAYSGEAKSFLREALEHAKNK
- Seq3                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
- Seq4                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
- Seq5                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
- Seq6                  MNKKIYSIEELVDKISMPVVAYSGEAKSFLREALEYAKNK
-                       **:* ******:**********:************:****
+=item --noflatname, -F
 
-you get
+By default, sequence names do not contain 'begin-end'. This option
+turns ON 'begin-end' naming. Wraps
+L<Bio::SimpleAlign-E<gt>set_displayname_flat()|https://metacpan.org/pod/Bio::SimpleAlign#set_displayname_flat>.
 
- Seq1                  MNNKIYSIEELIDKISMPVVAYAGEAKSFLREALEYAKNK
- Seq2                  MNKKTYSIEELIDKISMPVVAYSGEAKSFLREALEHAKNK
- Seq3                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
- Seq4                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
- Seq5                  MNKKIYSIEELIDKISMPVVAYSGEAKSFLREALEYAKNK
- Seq6                  MNKKIYSIEELVDKISMPVVAYSGEAKSFLREALEYAKNK
- Consensus_90          MN?K?YSIEEL?DKISMPVVAY?GEAKSFLREALE?AKNK
-                       ** * ****** ********** ************ ****
+   bioaln --noflatname <alignment_file>
 
-=head2 --dna2pep, -D
+=item --aln-index, -I
 
-Turn a CDS alignment to a corresponding protein alignment. Wrap Bio::Align::Utilities->dna_to_aa_aln().
+Identify aligned position of a residue. Wraps
+L<Bio::SimpleAlign-E<gt>column_from_residue_number()|https://metacpan.org/pod/Bio::SimpleAlign#column_from_residue_number>.
 
-   bioaln -D <cds_alignment>
+   bioaln --aln-index 'seq_id,position' <alignment_file>
 
-=head2 --erasecol, -E
+=item --permute-states, -M
 
-Remove columns with gap in designated sequence.
+Generate an alignment with randomly permuted residues at each
+site. This operation removes phylogenetic signal among aligned
+sequences, if there is any in the original alignment. This is the
+basis of the Permutation Trail Prob (PTP) test of tree-ness of an
+alignment.
 
-   bioaln -E 'seq_id' <alignment_file>
+   bioaln --permute-states <alignment_file>
 
-=head3 Example
+=item --resample, -R
 
-For C<bioaln -E 'Seq5' input.aln> where C<input.aln> contains:
+Picks I<n> random sequences from input alignment and produces a new
+alignment consisting of those sequences.
 
- Seq1           ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA--ATAAGT
- Seq2           ATGAATAAAAAGATATACAGCATAGAAGAATTAATAGATAAACGATAAGC
- Seq3           ATGAATAATAAAATATACAGCATAGAAGAATTAATAGATAAA--ATAAGC
- Seq4           ATGAATAAAAAAACATATAGCATAGAAGAATTAATAGATAAA--ATAAGT
- Seq5           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAAC-ATAAGC
- Seq6           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAA--ATAAGT
-                ******** ** * *** *************** **** ***  *****
+If n is not given, default is the number of sequences in alignment
+divided by 2, rounded down.
 
-you get output:
+This functionality uses an implementation of Reservoir Sampling, based
+on the algorithm found here:
+http://blogs.msdn.com/b/spt/archive/2008/02/05/reservoir-sampling.aspx
 
- Seq1           ATGAATAAAAAGATATATAGCATAGAAGAATTAGTAGATAAA-ATAAGT
- Seq2           ATGAATAAAAAGATATACAGCATAGAAGAATTAATAGATAAACATAAGC
- Seq3           ATGAATAATAAAATATACAGCATAGAAGAATTAATAGATAAA-ATAAGC
- Seq4           ATGAATAAAAAAACATATAGCATAGAAGAATTAATAGATAAA-ATAAGT
- Seq5           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAACATAAGC
- Seq6           ATGAATAAAAAAATATATAGCATAGAAGAATTAATAGACAAA-ATAAGT
-                ******** ** * *** *************** **** *** *****
+   bioaln --resample 'n' <alignment_file>
 
-=head2 --noflatname, -F
-
-By default, sequence names do not contain 'begin-end'. This option turns ON 'begin-end' naming. Wrap Bio::SimpleAlign->set_displayname_flat().
-
-   bioaln -F <alignment_file>
-
-=head2 --aln-index, -I
-
-Identify aligned position of a residue. Wrap Bio::SimpleAlign->column_from_residue_number().
-
-   bioaln -I 'seq_id,position' <alignment_file>
-
-=head2 --listids, -L
-
-List all sequence ids.
-
-   bioaln -L <alignment_file>
-
-=head2 --permute-states, -M
-
-Generate an alignment with randomly permuted residues at each site. This operation removes phylogenetic signal among aligned sequences, if there is any in the original alignment. This is the basis of the Permutation Trail Prob (PTP) test of tree-ness of an alignment.
-
-   bioaln -M <alignment_file>
-
-=head2 --pep2dna, -P
-
-Align CDS sequences according to their corresponding protein alignment. Wrap Bio::Align::Utilities->aa_to_dna_aln().
-
-   bioaln -P 'unaligned_cds.fas' <protein_alignment>
-
-=head2 --resample, -R
-
-Picks n random sequences from input alignment and produces a new alignment consisting of those sequences.
-
-If n is not given, default is the number of sequences in alignment divided by 2, rounded down.
-
-This functionality uses an implementation of Reservoir Sampling, based on the algorithm found here: http://blogs.msdn.com/b/spt/archive/2008/02/05/reservoir-sampling.aspx
-
-   bioaln -R 'n' <alignment_file>
-
-=head3:
-
-For C<bioaln -R4 input.aln> where C<input.aln> contains
+For C<bioaln --resample 4 input.aln> where C<input.aln> contains
 
  Seq1                  MNNKIYSIEELIDKISMPVVAYAGEAKSFLREALEYAKNK
  Seq2                  MNKKTYSIEELIDKISMPVVAYSGEAKSFLREALEHAKNK
@@ -476,17 +518,16 @@ you get:
  Seq6                  MNKKIYSIEELVDKISMPVVAYSGEAKSFLREALEYAKNK
                        **** ******:***********************:****
 
-=head2 --shuffle-sites, -S
+=item --shuffle-sites, -S
 
-Make a shuffled (not bootstraped) alignment. This operation randomizes alignment columns. It is used for testing the signficance of long-runs of conserved sites in an alignment (e.g., conserved intergenic spacers [IGSs]).
+Make a shuffled (not bootstraped) alignment. This operation randomizes
+alignment columns. It is used for testing the signficance of long-runs
+of conserved sites in an alignment (e.g., conserved intergenic spacers
+[IGSs]).
 
-   bioaln -S <alignment_file>
+   bioaln --shuffle-sites <alignment_file>
 
-=head3 Example
-
-For bioaln -S input.aln
-
-INPUT:
+For bioaln --shuffle-sites input.aln
 
  Seq1                  MNNKIYSIEELIDKISMPVVAYAGEAKSFLREALEYAKNK
  Seq2                  MNKKTYSIEELIDKISMPVVAYSGEAKSFLREALEHAKNK
@@ -496,7 +537,7 @@ INPUT:
  Seq6                  MNKKIYSIEELVDKISMPVVAYSGEAKSFLREALEYAKNK
                        **:* ******:**********:************:****
 
-OUTPUT:
+you get:
 
  Seq1                  VIEELKYEKAAEAFIPNISEDASGKIRLKLMSVNAYKMYN
  Seq2                  VIEELKYEKAAEAFIPNISEDASGKTRLKLMSVKSYKMHN
@@ -506,73 +547,79 @@ OUTPUT:
  Seq6                  VIEELKYEKAAEAFVPNISEDASGKIRLKLMSVKSYKMYN
                        **************:********** *******::***:*
 
-=head2 --third-sites, -T
+=item --select-third
 
 Generate an alignment of every-third (mostly synonymous) bases (assuming a CDS alignment).
 
-   bioaln -T <alignment_file>
+=back
 
-=head2 --uppercase, -U
+=head3 Common Options
 
-Make an uppercase alignment.
+=over 4
 
-   bioaln -U <alignment_file>
+=item --help, -h
 
-=head2 --version, -V
+Print a brief help message and exit.
 
-Print current release version of bp-utils.
+=item --man
 
-   bioaln -V
+Print the manual page and exit.
 
-=head1 OTHER EXAMPLES
+=item --version, -V
 
-=head2 Alignment descriptors
+Print current release version of this command and exit.
 
- bioaln -l aln_file                  # [l]ength of an alignment
- bioaln -n aln_file                  # [n]umber of aligned sequences
- bioaln -L aln_file                  # [L]ist all sequence IDs
- bioaln -a input.aln                 # [a]verage percent identity
- bioaln -w '30' aln_file             # average identifies for sliding [w]indows of 30
- bioaln -I 'B31,100' aln_file        # get aln column [I]ndex of seq 'B31' residue 100
- bioaln --gapstates  aln_file        # identify unique gaps (start, end, frequency, whether internal)
+=back
 
-=head2 Alignment alignment viewers
+=head1 EXAMPLES
 
- bioaln -m input.aln                 # [m]atch view (show variable sites)
- bioaln -c aln_file                  # [c]odon view (groups of 3 nts)
+=head2 Alignment Descriptors
+
+ bioaln --avpid input.aln            # average percent identity
+ bioaln --gapstates  aln_file        # identify unique gaps (start, end, frequency, whether in bioaln --index 'B31,100' aln_file   # get aln column index of seq 'B31' residue 100
+ bioaln --length aln_file            # length of an alignment
+ bioaln --listids aln_file           # list all sequence IDs
+ bioaln --numseq aln_file            # number of aligned sequences
+ bioaln --window '30' aln_file       # average identifies for sliding [w]indows of 30
+ternal)
+
+=head2 Alignment Viewers
+
+ bioaln --codon-view aln_file             # codon view (groups of 3 nts)
+ bioaln --match input.aln                 # match view (show variable sites)
 
 =head2 Alignment filters which produce a new alignment
 
- bioaln -i 'fasta' fasta_aln_file    # [i]nput is a FASTA alignment (CLUSTALW is dafault)
- bioaln -o 'fasta' aln_file          # [o]utput a FASTA alignment (CLUSTALW is dafault)
- bioaln -g aln_file                  # remove [g]apped sites
- bioaln -s '10,20'                   # alignment [s]lice from 10-20
- bioaln -r 'seq_id' aln_file         # change [r]eference (1st) sequence
- bioaln -d 'Seq1,Seq2' aln_input     # [d]elete sequences
- bioaln -p 'Seq1, Seq2' aln_input    # [p]ick sequences
- bioaln -u aln_file                  # [u]nique-fy sequences (remove redundant seqs)
- bioaln -v aln_file                  # show only variable sites
- bioaln -C '90' aln_file             # add a 90% [C]onsensus sequence
- bioaln -D cds.aln                   # D(na) alignment => protein alignment
- bioaln -E 'Seq5' input.aln          # [E]rase sites gapped at Seq5
- bioaln -P 'cds.fas' pep.aln         # Back-align CDS seqs according to [P]rotein alignment
- bioaln -U aln_file                  # turn into [U]pper-case
+ bioaln --binary-informative
+ bioaln --consensus '90' aln_file         # add a 90% consensus sequence
+ bioaln --delete 'Seq1,Seq2' aln_input    # delete sequences
+ bioaln --dna2pep cds.aln                 # DNA alignment => protein alignment
+ bioaln --erasecol 'Seq5' input.aln       # erase sites gapped at Seq5
+ bioaln --input 'fasta' fasta_aln_file    # input is a FASTA alignment (CLUSTALW is dafault)
+ bioaln --nogaps aln_file                 # remove gapped sites
+ bioaln --output 'fasta' aln_file         # output a FASTA alignment (CLUSTALW is dafault)
+ bioaln --pep2dna 'cds.fas' pep.aln       # Back-align CDS seqs according to protein alignment
+ bioaln --pick 'Seq1, Seq2' aln_input     # pick sequences
+ bioaln --refseq 'seq_id' aln_file        # change reference (1st) sequence
+ bioaln --slice '10,20'                   # alignment slice from 10-20
+ bioaln --uniq aln_file                   # remove redundant sequences
+ bioaln --upperasealn_file                # turn into upper-case
+ bioaln --varsites aln_file               # show only variable sites
 
-=head2 Evolutionary analysis
+=head2 Evolutionary Analysis
 
- bioaln -A *.aln                     # conc(A)tenate aln files
- bioaln -B aln_file                  # extract conserved [B]locks
- bioaln -S aln_file                  # [S]huffle sites (for testing conserved blocks)
- bioaln -R '10' aln_file             # [R]e-sampled an alignment of 10 sequences
- bioaln -b aln_file                  # [b]ootstrap an alignment (for testing branch stability)
- bioaln -M aln_file                  # per[m]ute at each site (for testing tree-ness)
- bioaln -T aln_file                  # extract [T]hird site (assume coding sequences)
+ bioaln --concat *.aln               # concattenate aln files
+ bioaln --conblocks aln_file         # extract conserved blocks
+ bioaln --shuffle-sitesaln_file      # shuffle sites (for testing conserved blocks)
+ bioaln --resample '10' aln_file     # [R]e-sampled an alignment of 10 sequences
+ bioaln --bootstrap aln_file         # bootstrap an alignment (for testing branch stability)
+ bioaln --permute-states aln_file    # permute at each site (for testing tree-ness)
  bioaln --remove-third aln_file      # remove [T]hird site (assume coding sequences)
 
 =head2 change alignment format
 
- bioaln -i 'fasta' -o 'phylip'       # FASTA => PHYLIP
- bioaln -i 'fasta' -o 'pmal'         # FASTA => PAML
+ bioaln --input 'fasta' --output 'phylip'       # FASTA => PHYLIP
+ bioaln --input 'fasta' --output 'pmal'         # FASTA => PAML
 
 =head2 Chaining with pipes
 
@@ -580,8 +627,9 @@ Print current release version of bp-utils.
  bioaln -i'fasta' fasta.aln | bioaln -s'10,20' | bioaln -a
 
  # Chaining with bioseq:
- # Turn a coding-sequence alignment into a protein alignemnt (an alternative to -D):
- bioaln -o'fasta' cds.aln | bioseq -t1 | bioaln -i'fasta'
+ # Turn a coding-sequence alignment into a protein alignemnt (an alternative to C<--dna2pep>):
+
+   bioaln --output fasta cds.aln | bioseq --translate 1 | bioaln --input fasta
 
 =head1 SEE ALSO
 
@@ -589,11 +637,19 @@ Print current release version of bp-utils.
 
 =item *
 
-L<Qui Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+L<Bio::BPWrapper::AlnManipulations>, the underlying Perl Module
 
 =item *
 
-L<Github project wiki page|http://https://github.com/rocky/p5-BPWrapper>
+L<Qiu Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+
+=item *
+
+L<Github project wiki page|https://github.com/bioperl/p5-bpwrapper/wiki>
+
+=item *
+
+L<bioseq>: a wrapper of BioPerl class L<Bio::Seq> with additional methods
 
 =back
 
@@ -611,13 +667,13 @@ Girish Ramrattan <gramratt at gmail dot com>
 Che Martin <che dot l dot martin at gmail dot com>
 
 =item  *
-Yoezen Hernandez <yzhernand at gmail dot com>
+Yözen Hernández yzhernand at gmail dot com
 
 =item *
 Levy Vargas <levy dot vargas at gmail dot com>
 
 =item  *
-L<Weigang Qiu | mailto:weigang@genectr.hunter.cuny.edu> (Maintainer)
+L<Weigang Qiu|mailto:weigang@genectr.hunter.cuny.edu> (Maintainer)
 
 =item *
 Rocky Bernstein

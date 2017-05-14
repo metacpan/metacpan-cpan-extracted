@@ -1,0 +1,128 @@
+%%START_PERL%%
+
+use Carp;
+use CGI qw(:standard :html3);
+use CGI::Carp qw(fatalsToBrowser);
+use DBI;
+use Bio::Genex;
+%%GENEX_EXTRALIBS%%
+
+use Bio::Genex::DBUtils qw(create_select_sql assert_table_defined);
+use Bio::Genex::XMLUtils qw(pretty_print);
+use strict;
+
+use XML::DOM;
+use Bio::Genex::ControlledVocab;
+
+# set up the global connection variables for Bio::Genex::connect()
+my $www_server = '%%WWWHOST%%';
+my $cgi_bin = '%%GENEX_URL_EXAMPLE%%';
+my $cgi_dir = '%%GENEX_CGIDIR%%';
+my $tmp_url = '%%CGITMPURL%%';
+
+# get the connection
+my $dbh = Bio::Genex::current_connection();
+
+my $TMPDIR =  '%%SYSTMP%%';
+my $outfile = "$TMPDIR/control-bundle-$$.xml";
+my $outfile_url = "control-bundle-$$.xml";
+my $CB_SCRIPT = "$cgi_dir/xml-write.pl --cb=$outfile";
+
+my (@species,$login,$password);
+
+if (param) {
+  @species = param('species');
+  $login = param('login');
+  $password = param('password');
+}
+
+my $args = '';
+die "Must specify user" unless defined $login;
+$args .= " --user=$login";
+die "Must specify password" unless defined $password;
+$args .= " --password=$password";
+
+foreach (@species) {
+  # add to the arg list
+  $args .= " --species=$_ ";
+}
+
+#
+# run the control bundle script
+#
+
+my $string = do_control();
+
+print header(-type => 'text/xml',
+	     -target => 'control-bundle.xml',
+	    );
+
+print $string;
+
+sub do_control {
+  system("$CB_SCRIPT $args");
+  open(IN,"$outfile") or die "Couldn't open $outfile for reading";
+  local $/ = undef;		# enable whole file slurping
+  my $string = <IN>;		# slurp
+  close(IN);
+  return $string;
+}
+
+__END__
+
+=head1 NAME
+
+B<control-bundle.pl>: a CGI script for creating a Gene Expression
+Markup Language (GeneXML) control bundle file.
+
+=head1 SYNOPSIS
+
+  control-bundle.pl?species=4&user=jes&password=foo
+
+=head1 DESCRIPTION
+
+This CGI script takes returns a page of content type 'text/xml' which
+should cause the browser to prompt for file save. 
+
+=head1 PARAMETERS
+
+=over 4
+
+=item species=$spc_id
+
+Passed directly to L<xml-write.pl> as a --species option.
+
+=item user=$login_name
+
+Passed directly to L<xml-write.pl> as --user option.
+
+=item password=$password
+
+Passed directly to L<xml-write.pl> as --password option.
+
+=head1 IMPLEMENTATION
+
+The script calls L<xml-write.pl> internally to generate the GeneXML
+file. It I<does not> currently specifies either the --include_usf or
+the --include_al options which means that neither user sequence
+feature information nor array layout information will be included in
+the control bundle file.
+
+=head1 BUGS
+
+It will not provide a graceful error if the user and password field do
+not match.
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Jun 19 00:43:39 MDT 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).

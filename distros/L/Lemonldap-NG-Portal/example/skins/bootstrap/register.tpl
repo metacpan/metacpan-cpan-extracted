@@ -20,7 +20,7 @@
 
     <div class="form-group input-group">
       <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i> </span>
-      <input name="firstname" type="text" value="<TMPL_VAR NAME="FIRSTNAME">" class="form-control" placeholder="<lang en="First name" fr="Prénom"/>" required />
+      <input name="firstname" type="text" value="<TMPL_VAR NAME="FIRSTNAME">" class="form-control" placeholder="<lang en="First name" fr="Pr&eacute;nom"/>" required />
     </div>
 
     <div class="form-group input-group">
@@ -75,9 +75,9 @@
       <h3><lang en="Resend confirmation mail?" fr="Renvoyer le mail de confirmation ?"/></h3>
 
       <p class="alert alert-info">
-        <lang en="A register request for this account was already issued on " fr="Une demande de création pour ce compte a déjà été faite le " />
+        <lang en="A register request for this account was already issued on " fr="Une demande de cr&eacute;ation pour ce compte a d&eacute;j&agrave; &eacute;t&eacute; faite le " />
         <TMPL_VAR NAME="STARTMAILDATE">.
-        <lang en="Do you want the confirmation mail to be resent?" fr="Voulez-vous que le message de confirmation soit renvoyé ?" />
+        <lang en="Do you want the confirmation mail to be resent?" fr="Voulez-vous que le message de confirmation soit renvoy&eacute; ?" />
       </p>
 
 
@@ -102,10 +102,10 @@
     <form action="#" method="post" class="login" role="form">
     <div class="form">
       <h3>
-        <lang en="A message has been sent to your mail address." fr="Un message a été envoyé à votre adresse mail." />
+        <lang en="A message has been sent to your mail address." fr="Un message a &eacute;t&eacute; envoy&eacute; &agrave; votre adresse mail." />
       </h3>
       <p class="alert alert-info">
-        <lang en="A confirmation link has been sent, this link is valid until " fr="Un lien de confirmation a été envoyé, ce lien est valide jusqu'au " />
+        <lang en="A confirmation link has been sent, this link is valid until " fr="Un lien de confirmation a &eacute;t&eacute; envoy&eacute;, ce lien est valide jusqu'au " />
         <TMPL_VAR NAME="EXPMAILDATE">.
       </p>
     </div>
@@ -116,7 +116,7 @@
     <form action="#" method="post" class="login" role="form">
     <div class="form">
       <h3>
-        <lang en="Your account has been created, your temporary password has been sent to your mail address." fr="Votre compte a été créé, un mot de passe temporaire a été envoyé à votre adresse mail." />
+        <lang en="Your account has been created, your temporary password has been sent to your mail address." fr="Votre compte a &eacute;t&eacute; cr&eacute;&eacute;, un mot de passe temporaire a &eacute;t&eacute; envoy&eacute; &agrave; votre adresse mail." />
       </h3>
     </div>
     </form>

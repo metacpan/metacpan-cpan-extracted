@@ -1,0 +1,209 @@
+#!/bin/csh -f
+
+set device = /dev/nrst0
+set mt = "mt -t $device"
+
+alias do 'echo + "\!*"; \!*'
+
+#
+# This script examines a tape drive to determine:
+#
+#	1.  does an empty file prevent access to the rest of the tape
+#	2.  must files be multiples of 512 bytes long?
+#
+
+set td = /tmp/et$$
+
+mkdir $td
+cd $td
+
+foreach i (1 2 3 4)
+	echo "THIS IS SHORT ODD-SIZE FILE NUMBER $i ..." > so$i
+
+	echo "THIS IS LONG REGULAR FILE NUMBER $i ..." \
+		| dd conv=sync obs=10b > rf$i
+end
+
+do $mt rew
+
+do dd if=so1 of=$device obs=112b
+do dd if=so2 of=$device obs=112b
+do dd if=so3 of=$device obs=112b
+do dd if=so4 of=$device obs=112b
+
+do $mt rew
+
+do dd if=$device of=unload1 bs=112b
+do dd if=$device of=unload2 bs=112b
+do dd if=$device of=unload3 bs=112b
+do dd if=$device of=unload4 bs=112b
+
+foreach i (1 2 3 4)
+	cmp -s unload$i so$i
+	@ diff = $status
+	if ($diff) then
+		echo "FILES MUST BE MULTIPLES OF 512 BYTES"
+		goto test_zero
+	endif
+end
+
+echo "SHORT (<512 byte) BLOCKS ARE SUPPORTED"
+set short_blocks
+
+test_zero:
+
+do $mt rew
+
+do dd if=rf1 of=$device bs=10b
+do dd if=rf2 of=$device bs=10b
+set echo
+dd of=$device bs=10b < /dev/null
+unset echo
+do dd if=rf3 of=$device bs=10b
+do dd if=rf4 of=$device bs=10b
+
+do $mt rew
+
+rm -f unload*
+
+do dd if=$device of=unload1
+do dd if=$device of=unload2
+do dd if=$device of=unload3
+do dd if=$device of=unload4
+
+foreach i (1 2) 
+	cmp -s unload$i rf$i
+	@ diff = $status
+	if ($diff) then
+		echo "CANNOT DO EXPECTED THINGS"
+		goto cleanup
+	endif
+end
+
+foreach i (3 4) 
+	cmp -s unload$i rf$i
+	@ diff = $status
+	if ($diff) then
+		echo "NULL FILES ARE NOT IGNORED WHEN READING"
+		goto try_fsf
+	endif
+end
+
+echo "NULL FILES ARE IGNORED WHEN READING"
+set null_ignore_read
+
+try_fsf:
+
+do $mt rew
+do $mt fsf 2
+
+do dd if=$device of=unload3
+do dd if=$device of=unload4
+
+foreach i (3 4) 
+	cmp -s unload$i rf$i
+	@ diff = $status
+	if ($diff) then
+		echo "NULL FILES ARE NOT IGNORED WHEN FORWARDING"
+		goto get_past
+	endif
+end
+
+echo "NULL FILES ARE IGNORED WHEN FORWARDING"
+set null_ignore_fwd
+
+get_past:
+
+if (! $?null_ignore_read) then
+
+	do $mt rew
+
+	rm -f unload*
+
+	do dd if=$device of=unload1
+	do dd if=$device of=unload2
+	do dd if=$device of=unload_null
+	do dd if=$device of=unload3
+	do dd if=$device of=unload4
+
+	foreach i (1 2) 
+		cmp -s unload$i rf$i
+		@ diff = $status
+		if ($diff) then
+			echo "CANNOT DO EXPECTED THINGS"
+			goto cleanup
+		endif
+	end
+
+	foreach i (3 4) 
+		cmp -s unload$i rf$i
+		@ diff = $status
+		if ($diff) then
+			echo "CANNOT READ PAST NULL FILE"
+			goto try_fsf2
+		endif
+	end
+
+	echo "CAN READ PAST NULL FILE"
+	set null_read_past
+
+endif
+
+try_fsf2:
+
+if (! $?null_ignore_fwd) then
+	$mt rew
+	$mt fsf 3
+
+	dd if=$device of=unload3
+	dd if=$device of=unload4
+
+	foreach i (3 4) 
+		cmp -s unload$i rf$i
+		@ diff = $status
+		if ($diff) then
+			echo "CANNOT FAST FORWARD PAST NULL FILE"
+			goto done
+		endif
+	end
+
+	echo "CAN FAST FORWARD PAST NULL FILE"
+	set null_fwd_past
+endif
+
+done:
+
+	echo ''
+	echo 'put the following in the configuration section of frogbak:'
+	echo ''
+
+	if ($?null_ignore_fwd && $?null_ignore_read) then
+		echo '$null_file_action = "compensate"'
+	else if ($?null_ignore_fwd) then
+		echo '# you must mt fsf to the file you want'
+		echo '$null_file_action = "compensate"'
+	else if ($?null_ignore_read) then
+		echo '# you must mt fsf to the file you want'
+		echo '$null_file_action = "ignore"'
+	else if ($?null_fwd_past && $?null_read_past) then
+		echo '$null_file_action = "ignore"'
+	else if ($?null_fwd_past) then
+		echo '# you must mt fsf to the file you want'
+		echo '$null_file_action = "ignore"'
+	else if ($?null_read_past) then
+		echo '# can only get past a null file by reading it, sigh'
+		echo '$null_file_action = "abort"'
+	else 
+		echo '$null_file_action = "abort"'
+	endif
+
+	if ($?short_blocks) then
+		echo '$do_compress = 1'
+	else
+		echo '$do_compress = 0'
+	endif
+
+cleanup:
+
+	cd
+	rm -r $td

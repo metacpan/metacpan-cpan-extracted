@@ -1,0 +1,230 @@
+#!/usr/bin/perl
+#############################################################################
+# Copyright (C) 2002, Stefano Corsi <ippo@madeinlinux.com>                  #
+#                                                                           #
+# This program is free software; you can redistribute it and/or modify      #
+# it under the terms of the GNU General Public License as published by      #
+# the Free Software Foundation; either version 2 of the License, or         #
+# (at your option) any later version.                                       #
+#                                                                           #
+# This program is distributed in the hope that it will be useful,           #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of            #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             #
+# GNU General Public License for more details.                              #
+#                                                                           #
+# You should have received a copy of the GNU General Public License         #
+# along with this program; if not, write to the Free Software               #
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA #
+#                                                                           #
+#############################################################################
+
+use Quizzer::Template;
+use Quizzer::Question;
+use Quizzer::AutoSelect;
+use Quizzer::Loader;
+
+use strict;
+
+use vars qw(%templates %questions);
+
+### Il file dei template di Quizzer
+my $TPLFILE='/etc/Quizzer.tpl';
+
+### Prende il nome del file contenente i Quiz!
+my $QUIZFILE=$ARGV[0];
+
+### Vede se e' gia' stato configurato
+### (scelta della lingua, etc...)
+my $CONFIGURED=$ARGV[1];
+
+### Se non e' stato specificato alcun file muore
+($QUIZFILE) || do { 
+	print STDERR "Non e' stato specificato un Quiz file...\n";
+	print STDERR "**************************************************\n";
+	print STDERR "E' possibile utilizzare il Quiz di esempio fornito\n";
+	print STDERR "(di solito) in /usr/share/Quizzer/quiz.txt!\n";
+	print STDERR "**************************************************\n";
+	
+	exit -1;
+};
+
+### Carica i template di base
+loadtemplatefile($TPLFILE, 'quiz');
+
+### Carica i quiz...
+loadtemplatefile($QUIZFILE, 'quiz');
+
+### Vede qual'e' il tipo di frontend
+my $frontend=Quizzer::AutoSelect::frontend();
+
+### Se e' la prima chiamata ...
+if (!$CONFIGURED) {
+
+	my $langs = {
+		'Italiano' => 'it_IT',
+		'Deutsch' => 'de_DE'
+	};
+
+	my $message = getquestion('lingua/scelta');	
+	$frontend->add($message, 'high');
+	$frontend->default_title('Scelta lingua');
+	my $result = $frontend->go();
+
+	if (!$result)  {
+		exit -1;	
+	}
+
+	my $ret = $message->value();
+
+	
+	$ENV{'LANG'} = $langs->{$ret};
+	exec qq{Quizzer $QUIZFILE CONFIGURED};
+	exit -1;
+
+}
+
+### Il calcolo del punteggio
+my $answers = 0;
+my $correct_answers = 0;
+my $uncorrect_answers = 0;
+
+### Pone tutte le domande
+my $index = 0;
+while(1) {
+
+	### Estrae una domanda dai template
+	my $question = getquestion('quiz/domanda' . ++$index);	
+
+	### Se sono finite le domande ... mostra il punteggio ed esce
+	$question || do {
+	
+			my $message = getquestion('risultato/riassunto');	
+			$message->{'variables'} = {
+				'correct' => $correct_answers,
+				'uncorrect' => $uncorrect_answers,
+				'percent' => (100 * $correct_answers) / $answers,
+			};
+			$frontend->add($message, 'high');
+			$frontend->default_title('Riassunto finale');
+			$frontend->go();
+			exit 0;
+	
+	};
+
+	### Aggiunge la domanda ... se e' del livello corretto
+	my $visible = $frontend->add($question, $question->level());
+
+	### Imposta il titolo	
+	$frontend->default_title('Domanda ' . $index);
+
+	### Mostra il dialogo
+	my $result = $frontend->go();
+
+	if (!$result)  {
+		exit -1;	
+	}
+
+	my $ret = undef;
+
+	### Se e' una solo una domanda ...
+	if (!$question->exercise()) {
+		$ret = $question->value();
+	### Se invece e' un esercizio ...
+	} else {
+		my $exercise = $question->exercise();
+		my $dirname = `basename $exercise`;
+		chop $dirname;
+		$dirname =~ s/\.tar\.gz$//;
+
+		### Scompattiamo il tar.gz
+		system qq{
+			rm -rf /tmp/$dirname
+			cd /tmp; tar zxf $exercise
+		};
+	
+		### Eseguiamo i comandi
+		system qq{
+			/tmp/$dirname/$dirname.pre 2> /dev/null 1> /dev/null
+			if [ -n "\$DISPLAY" ]; then \\
+				xterm -e /tmp/$dirname/$dirname.cmd ; \\
+			else \\
+				/tmp/$dirname/$dirname.cmd ; \\
+			fi
+		};
+
+		### Eseguiamo il post per valutare il risultato
+		system qq{
+			/tmp/$dirname/$dirname.post 2> /dev/null 1> /dev/null
+		};
+
+		$ret = $?;	
+	}
+
+	my $answer = $question->answer();
+	my $answer_description = $question->answer_description();
+	my $answer2 = $question->answer2();
+	my $explanation = $question->explanation();
+	
+	### Solo se la domanda era visibile...
+	### ... ovvero se il livello era sufficientemente alto
+	if ($visible) {
+
+		### Se la risposta e' corretta ...
+		if (($ret eq $answer) || ($answer2 && ($ret eq $answer2))) {
+			$answers++;
+			$correct_answers++;
+
+			if ($question->exercise()) {
+				my $message = getquestion('esercizio/corretto');
+				$message->{'variables'} = {
+					'answer' => $answer_description
+				};
+				$frontend->add($message, 'high');
+				$frontend->default_title('Esercizio corretto');
+			} else {
+				my $message = getquestion('risposta/corretta');
+				$message->{'variables'} = {
+					'answer' => $answer_description ? 
+						$answer_description  :
+						($answer eq $ret ? $answer : $answer2)
+				};
+				$frontend->add($message, 'high');
+				$frontend->default_title('Risposta corretta');
+			}
+			$frontend->go();
+		### Altrimenti, se la risposta e' scorretta
+		} else {
+			$answers++;
+			$uncorrect_answers++;
+
+			if ($question->exercise()) {
+				my $message = getquestion('esercizio/scorretto');
+				$message->{'variables'} = {
+					'answer' => $answer_description
+				};
+				$frontend->add($message, 'high');
+				$frontend->default_title('Esercizio non corretto');
+			} else {
+
+				my $message = getquestion('risposta/scorretta');
+				$message->{'variables'} = {
+					'answer' => $answer_description ?
+						$answer_description : $answer,	
+					'explanation' => $explanation
+				};
+				$frontend->add($message, 'high');
+				$frontend->default_title('Risposta errata');
+			}
+			$frontend->go();
+		}
+	}	
+
+}
+
+=head1 AUTHOR
+
+Stefano Corsi <ippo@madeinlinux.com>
+
+=cut
+
+1

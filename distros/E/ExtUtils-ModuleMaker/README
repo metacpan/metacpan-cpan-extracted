@@ -1,53 +1,276 @@
-ExtUtils::ModuleMaker - Better than h2xs for creating modules
+NAME
+    ExtUtils::ModuleMaker - A simple replacement for h2xs -XA
 
-This document refers to version 0.56 of ExtUtils::ModuleMaker.
-This version was released January 30 2017.
+SYNOPSIS
+    h2xs can be used for pure perl modules using the -XA flags. But it has
+    many annoying features. ExtUtils::ModuleMaker is designed to bring
+    module templates into the 21st Century.
 
-To install this module on your system, place the tarball archive file in a
-temporary directory and call the following:
+    In the simplest case it can be used from the command line as
 
-% gunzip ExtUtils-ModuleMaker-0.52.tar.gz
-% tar xf ExtUtils-ModuleMaker-0.52.tar
-% cd ExtUtils-ModuleMaker-0.52
-% perl Makefile.PL
-% make
-% make test
-% make install
+            perl -MExtUtils::ModuleMaker -e "Quick_Module ('Sample::Module::Foo')"
 
-If during installation you wish to view more information on test results,
-substitute the following for the sixth line in the sequence of commands
-above:
+DESCRIPTION
+    This module is a replacement for h2xs. It can be used from the command
+    line with just a module name, similar to h2xs, or can be called from a
+    Modulefile.PL similar to calling MakeMaker from Makefile.PL.
 
-% make test TEST=VERBOSE
+USAGE
+      use ExtUtils::ModuleMaker;
 
-If you are installing this module over any earlier version, you may
-substitute the following for the last line in the sequence of commands
-above:
+      Generate_Module_Files (
+                             NAME     => 'Sample::Module::Foo',
+                             ABSTRACT => 'a sample module',
+                             AUTHOR   => {NAME    => 'A. U. Thor',
+                                          EMAIL   => 'a.u.thor@a.galaxy.far.far.away',
+                                          CPANID  => 'AUTHOR',
+                                          WEBSITE => 'http://a.galaxy.far.far.away/modules',
+                                         },
+                             VERSION  => 0.01,
+                             LICENSE  => 'perl',
+                             EXTRA_MODULES=> [
+                                              {
+                                               NAME     => 'Sample::Module::Bar',
+                                               ABSTRACT => 'a second module',
+                                              },
+                                              {
+                                               NAME     => 'Sample::Baz',
+                                               ABSTRACT => 'a third module',
+                                              },
+                                             ],
+      );
 
-% make install UNINST=1
+BUGS
+    Still only supports the simple perl only modules, not things with XS
+    components.
 
-If you are installing this module on a Win32 system with 'nmake',
-substitute 'nmake' for 'make' in the sequence of commands above.
+SUPPORT
+    Send email to modulemaker@PlatypiVentures.com.
 
-In sending e-mail to the maintainer, please put "ExtUtils::ModuleMaker",
-"ExtUtils-ModuleMaker" or "modulemaker" in the subject line.
+AUTHOR
+        R. Geoffrey Avery
+        CPAN ID: RGEOFFREY
+        modulemaker@PlatypiVentures.com
+        http://www.PlatypiVentures.com/perl/modules/ModuleMaker.shtml
 
-Original author:  R. Geoffrey Avery
-CPAN ID: RGEOFFREY
-modulemaker@PlatypiVentures.com
-http://www.PlatypiVentures.com/perl/modules/ModuleMaker.shtml
+COPYRIGHT
+    Copyright (c) 2001 R. Geoffrey Avery. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 
-Maintainer since version 0.33: James E. Keenan
-CPAN ID:  JKEENAN
-jkeenan@cpan.org
+SEE ALSO
+    h2xs, ExtUtils::MakeMaker
 
-Development repository:  https://github.com/jkeenan/extutils-modulemaker
+PUBLIC METHODS
+    Each public function/method is described here. These are how you should
+    interact with this module.
 
-Copyright (c) 2001-2002 R. Geoffrey Avery.
-Revisions from v0.33 forward (c) 2005-2017 James E. Keenan.  All rights reserved.
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+  Quick_Module
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+     Usage     :
+                 perl -MExtUtils::ModuleMaker -e "Quick_Module ('Sample::Module')"
+     or
+                 use ExtUtils::ModuleMaker;
+                 Quick_Module ('Sample::Module');
+
+     Purpose   : Creates a Module.pm with supporing files
+     Returns   : n/a
+     Argument  : A name for the module, like 'Module' or 'Sample::Module'
+     Throws    : 
+     Comments  : More closely mimics h2xs behavior than Generate_Module_Files.
+               : Included to allow simple creation from a command line.
+
+    See Also : Generate_Module_Files
+
+  Generate_Module_Files
+
+     Usage     : How to use this function/method
+     Purpose   : Creates one or more modules with supporing files
+     Returns   : n/a
+     Argument  : A hash with the information for the new module(s)
+     Throws    : 
+     Comments  : 
+
+    See Also : Verify_Data, Create_Changes, Create_Makefile, Create_README,
+    : Create_Module, Create_MANIFEST
+
+  Generate_Module_Files
+
+    NAME
+        The only required feature. This is the name of the primary module
+        (with '::' separators if needed).
+
+    ABSTRACT
+        A short description of the module, this will be passed on to
+        MakeMaker through Makefile.PL.
+
+    VERSION
+        A real number to be the version number. The default is 0.01.
+
+    LICENSE
+        Which license to include in the Copyright section. You can choose
+        one of the standard licenses by including 'perl', 'gpl', 'artistic',
+        and 18 others approved by opensource.org. The default is to choose
+        the 'perl' flavor which is to share it "under the same terms as Perl
+        itself". Any other value is passed on directly so you can have any
+        license you want.
+
+        LICENSE == 'custom'
+            When set to 'custom', you get the opportunity to specify exactly
+            these fields...
+
+        COPYRIGHT
+            Text to appear in the COPYRIGHT section of the pod
+
+        LICENSETEXT
+            The text for the LICENSE file
+
+    AUTHOR
+        A hash contining information about the author to pass on to all the
+        necessary places in the files.
+
+        NAME
+            Name of the author.
+
+        EMAIL
+            Email address of the author.
+
+        CPANID
+            The CPANID of the author. If this is omited, then the line will
+            not be added to the documentation.
+
+        WEBSITE
+            The personal or organizational website of the author.
+
+    EXTRA_MODULES
+        An array of hashes that each contain values for NAME and ABSTRACT.
+        Each extra module will be created in the correct relative place in
+        the <b>lib directory, but no extra supporting documents, like README
+        or Changes.
+
+        This is one major improvement over the earlier <b>h2xs as you can
+        now build multi module packages.
+
+PRIVATE METHODS
+    Each private function/method is described here. These methods and
+    functions are considered private and are intended for internal use by
+    this module. They are not considered part of the public interface and
+    are described here for documentation purposes only.
+
+  Verify_Data
+
+     Usage     : 
+     Purpose   : To fill in default values for unspecified features
+     Returns   : n/a
+     Argument  : pointer to hash of data for modules
+     Throws    : 
+     Comments  : 
+
+    See Also : Create_Base_Directory
+
+  Create_Base_Directory
+
+     Usage     : 
+     Purpose   :
+                 Create the directory where all the files will be created.
+     Returns   :
+                 $DIR = directory name where the files will live
+     Argument  :
+                 $package_name = name of module separated by '::'
+     Throws    : 
+     Comments  : 
+
+    See Also : Check_Dir
+
+  Check_Dir
+
+     Usage     :
+                 Check_Dir ($dir, $MODE);
+     Purpose   :
+                 Creates a directory with the correct mode if needed.
+     Returns   : n/a
+     Argument  :
+                 $dir = directory name
+                 $MODE = mode of directory (e.g. 0777, 0755)
+     Throws    : 
+     Comments  : 
+
+    See Also :
+
+  Create_Makefile
+
+     Usage     : Create_Makefile ($p_module_data);
+     Purpose   : Write the Makefile.PL file
+     Returns   : n/a
+     Argument  : $p_module_data = hash with all the data
+     Throws    : 
+     Comments  : 
+
+    See Also :
+
+  Create_Changes
+
+     Usage     : Create_Changes ($p_module_data);
+     Purpose   : 
+     Returns   : n/a
+     Argument  : $p_module_data = hash with all the data
+     Throws    : 
+     Comments  : 
+
+    See Also :
+
+  Create_License
+
+     Usage     : Create_License ($p_module_data);
+     Purpose   : 
+     Returns   : n/a
+     Argument  : $p_module_data = hash with all the data
+     Throws    : 
+     Comments  : 
+
+    See Also :
+
+  Create_MANIFEST
+
+     Usage     : Create_MANIFEST ($p_module_data);
+     Purpose   : 
+     Returns   : n/a
+     Argument  : $p_module_data = hash with all the data
+     Throws    : 
+     Comments  : 
+
+    See Also :
+
+  Create_README
+
+     Usage     : Create_README ($p_module_data);
+     Purpose   : 
+     Returns   : n/a
+     Argument  : $p_module_data = hash with all the data
+     Throws    : 
+     Comments  : 
+
+    See Also :
+
+  Create_Module
+
+     Usage     : 
+     Purpose   : 
+     Returns   : 
+     Argument  : 
+     Throws    : 
+     Comments  : 
+
+    See Also :
+
+  Create_Test_Init
+
+     Usage     : 
+     Purpose   : 
+     Returns   : 
+     Argument  : 
+     Throws    : 
+     Comments  : 
+
+    See Also :
 

@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+RegExp.pm
+RegExp.xs
+test.pl
+typemap

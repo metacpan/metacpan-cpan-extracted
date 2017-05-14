@@ -195,8 +195,8 @@ sub parse_hits {
       $signif = $1 < $signif ? $1 : $signif;
     }
     
-    if (/Identities = \S+ \((\d+)%?\)/) {
-      my $idn = $1 * 0.01;
+    if (/Identities = \S+ \((\d+%?)\)/) {
+      my $idn = $1;
       $hsp->insert(Identity => $idn);
       $ident = $idn > $ident ? $idn : $ident;
     }

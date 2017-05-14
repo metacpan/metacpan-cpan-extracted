@@ -2,7 +2,7 @@ package GSM::SMS::NBS;
 
 use vars qw($VERSION);
 
-$VERSION = '0.160';
+$VERSION = "0.161";
 
 =head1 NAME
 
@@ -548,10 +548,10 @@ Port is the port number used to denote a specified service in the NBS stack.
 =cut
 	
 sub receive {
-	my ($self, $ref_originatingaddress, $ref_message, $ref_timestamp, $ref_transportname, $ref_port, $blocking) = @_;	
+	my ($self, $ref_originatingaddress, $ref_message, $ref_timestamp, $ref_transportname, $ref_port, $blocking, $ref_csca) = @_;	
 
 	my $stack = $self->{'__STACK__'};
-	return $stack->receive($ref_originatingaddress, $ref_message, $ref_timestamp, $ref_transportname, $ref_port, $blocking);
+	return $stack->receive($ref_originatingaddress, $ref_message, $ref_timestamp, $ref_transportname, $ref_port, $blocking, $ref_csca);
 }
 
 =item B<get_transport> - Return the GSM::SMS::Transport object

@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
 	require Config;
 	if (($Config::Config{'extensions'} !~ /\bre\b/) ){
         	print "1..0 # Skip -- Perl configured without re module\n";
@@ -12,7 +10,10 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 13;
+my $re_taint_bit = 0x00100000;
+my $re_eval_bit = 0x00200000;
+
+use Test::More tests => 15;
 require_ok( 're' );
 
 # setcolor
@@ -31,8 +32,8 @@ my $warn;
 local $SIG{__WARN__} = sub {
 	$warn = shift;
 };
-eval { re::bits(1) };
-like( $warn, qr/Useless use/, 'bits() should warn with no args' );
+#eval { re::bits(1) };
+#like( $warn, qr/Useless use/, 'bits() should warn with no args' );
 
 delete $ENV{PERL_RE_COLORS};
 re::bits(0, 'debug');
@@ -44,20 +45,31 @@ isnt( $ENV{PERL_RE_COLORS}, '',
 re::bits(0, 'nosuchsubpragma');
 like( $warn, qr/Unknown "re" subpragma/, 
 	'... should warn about unknown subpragma' );
-ok( re::bits(0, 'taint') & 0x00100000, '... should set taint bits' );
-ok( re::bits(0, 'eval')  & 0x00200000, '... should set eval bits' );
+ok( re::bits(0, 'taint') & $re_taint_bit, '... should set taint bits' );
+ok( re::bits(0, 'eval')  & $re_eval_bit, '... should set eval bits' );
 
 local $^H;
 
 # import
 re->import('taint', 'eval');
-ok( $^H & 0x00100000, 'import should set taint bits in $^H when requested' );
-ok( $^H & 0x00200000, 'import should set eval bits in $^H when requested' );
+ok( $^H & $re_taint_bit, 'import should set taint bits in $^H when requested' );
+ok( $^H & $re_eval_bit, 'import should set eval bits in $^H when requested' );
 
 re->unimport('taint');
-ok( !( $^H & 0x00100000 ), 'unimport should clear bits in $^H when requested' );
+ok( !( $^H & $re_taint_bit ), 'unimport should clear bits in $^H when requested' );
 re->unimport('eval');
-ok( !( $^H & 0x00200000 ), '... and again' );
+ok( !( $^H & $re_eval_bit ), '... and again' );
+my $reg=qr/(foo|bar|baz|blah)/;
+close STDERR;
+eval"use re Debug=>'ALL'";
+my $ok='foo'=~/$reg/;
+eval"no re Debug=>'ALL'";
+ok( $ok, 'No segv!' );
+
+my $message = "Don't tread on me";
+$_ = $message;
+re->import("/aa");
+is($_, $message, "re doesn't clobber \$_");
 
 package Term::Cap;
 
@@ -67,4 +79,13 @@ sub Tgetent {
 
 sub Tputs {
 	return $_[1];
+}
+
+package main;
+
+{
+  my $w;
+  local $SIG{__WARN__} = sub { warn shift; ++$w };
+  re->import();
+  is $w, undef, 'no warning for "use re;" (which is not useless)';
 }

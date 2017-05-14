@@ -1,0 +1,16 @@
+# This file tests the catalog macro
+
+# Declare some objects
+!class things 'THING'; 'Name'; 'Jump'
+!block things; data
+Name    Jump
+ABC     j1
+DEF     j2
+!endblock
+
+# Output a catalog of them
+!catalog things ''; columns="THING:Name"
+
+# Now try a mask ...
+Testing masking ...
+!catalog things 'A.*'; columns="THING:Name"

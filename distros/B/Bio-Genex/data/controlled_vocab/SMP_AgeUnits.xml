@@ -1,0 +1,28 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="age_units" cv_table="SMP_AgeUnits">
+  <comment type="definition">This table provides the restricted vocabulary for the column age_units in the table sample and is  used to define and limit the units in which the age is described	
+</comment>
+<term name="seconds"
+        description="none available"/>
+<term name="minutes"
+        description="none available"/>
+<term name="days"
+        description="none available"/>
+<term name="hours"
+        description="none available"/>
+<term name="weeks"
+        description="none available"/>
+<term name="months"
+        description="none available"/>
+<term name="years"
+        description="none available"/>
+<term name="stage"
+        description="none available"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

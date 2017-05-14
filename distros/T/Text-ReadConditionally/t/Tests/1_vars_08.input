@@ -1,0 +1,15 @@
+.# Title: Variable scoping with .local
+.let name := 'Fred'
+.echo name is \v{name} at start
+.#
+.# An if that always succeeds - to provide a block
+.if 1
+.local name
+.let name := 'Bill'
+.echo name is \v{name} in block
+.fi
+.#
+.# name should be what it was as the one that was given the
+.# value Bill was local and so has been popped.
+.echo name is \v{name} at end
+

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::DownloadURL;
 # ABSTRACT: A Download URL data object
-$MetaCPAN::Client::DownloadURL::VERSION = '2.012000';
+$MetaCPAN::Client::DownloadURL::VERSION = '2.014000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -43,7 +43,7 @@ MetaCPAN::Client::DownloadURL - A Download URL data object
 
 =head1 VERSION
 
-version 2.012000
+version 2.014000
 
 =head1 SYNOPSIS
 

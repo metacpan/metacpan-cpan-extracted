@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ArrayLayout" db_column="medium" cv_table="AL_Medium">
+  <comment type="definition">Referred to in the Array Layout Spots table and used to describe the medium on which the the probe is deposited	
+</comment>
+<term name="glass_slide"
+        description="user sequence features are spotted on a rigid silicon-based support medium"/>
+<term name="nylon_membrane"
+        description="user sequence features are spotted on a nylon-coated flexible medium"/>
+<term name="nitrocellulose"
+        description="user sequence features are spotted on a nitrocellulose medium"/>
+<term name="gel_sieve"
+        description="target sequence features are separated through a size sieving procedure"/>
+<term name="mag_bead"
+        description="target sequence features are separated by magnetic bead attachment"/>
+<term name="sequence_instance"
+        description="target sequence features are  sequenced fragments whose frequency of occurrence is recorded"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

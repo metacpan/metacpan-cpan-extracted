@@ -3,7 +3,7 @@
 /* wincesck.c
  *
  * (c) 1995 Microsoft Corporation. All rights reserved.
- * 		Developed by hip communications inc., http://info.hip.com/info/
+ * 		Developed by hip communications inc.
  * Portions (c) 1993 Intergraph Corporation. All rights reserved.
  *
  *    You may distribute under the terms of either the GNU General Public
@@ -57,22 +57,11 @@ XCE_EXPORT struct protoent *xcegetprotobynumber(int number);
 
 #define TO_SOCKET(X) (X)
 
-#ifdef USE_5005THREADS
 #define StartSockets() \
     STMT_START {					\
 	if (!wsock_started)				\
 	    start_sockets();				\
-       set_socktype();                         \
     } STMT_END
-#else
-#define StartSockets() \
-    STMT_START {					\
-	if (!wsock_started) {				\
-	    start_sockets();				\
-	    set_socktype();				\
-	}						\
-    } STMT_END
-#endif
 
 #define SOCKET_TEST(x, y) \
     STMT_START {					\
@@ -116,11 +105,6 @@ start_sockets(void)
 
     /* atexit((void (*)(void)) EndSockets); */
     wsock_started = 1;
-}
-
-void
-set_socktype(void)
-{
 }
 
 u_long
@@ -499,11 +483,9 @@ win32_savecopyservent(struct servent*d, struct servent*s, const char *proto)
     d->s_name = s->s_name;
     d->s_aliases = s->s_aliases;
     d->s_port = s->s_port;
-#ifndef __BORLANDC__	/* Buggy on Win95 and WinNT-with-Borland-WSOCK */
     if (!IsWin95() && s->s_proto && strlen(s->s_proto))
 	d->s_proto = s->s_proto;
     else
-#endif
     if (proto && strlen(proto))
 	d->s_proto = (char *)proto;
     else

@@ -13,7 +13,7 @@ use Lemonldap::NG::Common::Regexp;
 #inherits Lemonldap::NG::Portal::OpenID::Server
 #link Lemonldap::NG::Portal::OpenID::SREG protected sreg_extension
 
-our $VERSION = '1.4.2';
+our $VERSION = '1.9.1';
 our $initDone;
 
 BEGIN {
@@ -225,7 +225,7 @@ sub openIDServer {
 # Manage Lemonldap::NG::Portal::OpenID::Server responses
 # @return Lemonldap::NG::Portal error code
 sub _openIDResponse {
-    my ( $self, $type, $data ) = splice @_;
+    my ( $self, $type, $data ) = @_;
 
     # Redirect
     if ( $type eq 'redirect' ) {

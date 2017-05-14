@@ -1,0 +1,22 @@
+---
+abstract: 'Writing and updating PST files using Outlook Redemption on Windows '
+author:
+  - 'John Wang <johncwang@gmail.com>'
+build_requires:
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-PST-Win32
+requires:
+  Moose: 0
+  Try::Tiny: 0
+  Win32::OLE: 0
+  namespace::autoclean: 0
+version: 0.04

@@ -1,0 +1,14 @@
+debarnacle does essentially the same thing as cruft.  However, the
+implementation is completely different.  It is written in carefully
+optimized Perl instead of a mixture of C and shell.  It does not
+artificially divide the filesystem by mount points, instead it does
+one big "find /" to scan existing files.  And it doesn't make the
+debatable distinction between "wanted" and "needed" files (although
+the Glob plugin may be said to serve a similar purpose).
+
+For details, please see the manpage, or use the source.
+
+Ian Zimmerman, Oakland, California, U.S.A. <itz@speakeasy.org>
+GPG: 433BA087  9C0F 194F 203A 63F7 B1B8  6E5A 8CA3 27DB 433B A087
+To many people, "Unix security" may seem to be an oxymoron.
+-Garfinkel & Spafford, _Practical Unix Security_

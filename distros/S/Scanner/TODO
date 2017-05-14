@@ -1,0 +1,152 @@
+=================
+General
+
+- Set up Defaults in the debian/control file.
+  [DMA 20080807 - ?]
+
+- Use ($$) arg templates in all functions
+  [DMA 20080827 - ?]
+
+- Use argument fault checks all exported functions
+  [DMA 20080827 - ?]
+
+=================
+Device
+
+- I will have to regeneralize since scanimage has dropped high level support
+  for res, colour depth, etc. I should discuss this with the people on the
+  SANE developer list. Without a means of polling the current scanner, there
+  is no way to accurately validate values I am setting.
+  [DMA 20080120-?]
+
+	- There really is no choice but to parse the scanimage output
+          on a device. 
+          [DMA 20080828 - ?]
+
+- Fully impliment the _validateScanner, _validatePageSource and _validateDpi 
+  stub methods.
+  [DMA 20080120-?]
+	- I should have a way to detect if I have a valid device name, that it
+	  exists on/is reachable by this machine and is on line and ready to
+	  scan.
+	  [DMA 20080120-?]
+
+- May want to log a warning if a page dimensions exceed the scan bed size.
+  [DMA 20080120-?]
+
+	- I need to check the sizes against what scanimage allows, or
+	  else report the failed size back to the user.
+	  [DMA 20080827 - ?]
+
+
+- Need to catch and retry cases where attempts are made to scan another page
+  before the scanner is ready for it:
+	scanimage: no SANE devices found
+	convert: Not a PNM image file (tmp.pnm).
+  [DMA 20080120-?]
+
+- There are many similarities between the routines in _set*,_validate* and
+  default* routines so one could probably simplify the code with a
+  master routine for each group and called by the others.
+  [DMA 20080120-?]
+
+- Need a quick test for whether a scanner is valid or not.
+  [DMA 20070514-?]
+
+	- Can test for a scanner using
+	   lsusb (as root) helps in finding where a usb scanner is
+	   so you can use the "hp:libusb:001:019" format.
+	  [DMA 20080817 - ? ]
+
+	- ARCHIVIST: Scanner class should scanimage to get a list of 
+	  available scanners for selection
+	  [DMA VERYOLD - ?]
+
+- Should job control the turn of of the lamp? I think so.
+  [DMA 20080825 - ?]
+
+- Internal validation of scanner, page source and dpi strings is unimplimented 
+  at this time.
+  [DMA 20080817 - ? ]
+
+- I only support a few scanners, ones I have worked with, and those 
+  incompletely. 
+  [DMA 20080817 - ? ]
+
+- HP5590 sane backend ADF does not work properly. It scans a page and ejects
+  the following two.
+  [DMA 20080817 - ? ]
+
+- Mustek A3 sane backend has a source option that is disabled. I have
+  not found a way to enable it.
+  [DMA 20080817 - ? ]
+
+- There are other modes than Flatbed and ADF, but those are all I am 
+  supporting at the moment. My wish is for a better Perl programmer 
+  interface to SANE than attempting to work through the scanimage CLI.
+  [DMA 20080817 - ? ]
+
+- ARCHIVIST: speeding up the Mustek scanner
+	- why didn't the compile work?
+	- is depth=12 12b colour output worth using?
+  [DMA VERYOLD - ?]
+
+=================
+Page
+
+- The Page class was written with some misunderstanding of how page names
+  are used in documents and especially in .toc objects. 
+  [DMA 20080827 - ?]
+
+- add arg Fault isa check to _setFormat to confirm Scanner::Format obj
+  [DMA 20040818 - ?]    
+
+=================
+Format
+
+- Create a debian package of Paper::Specs.
+  [DMA 20080818 - ?]
+
+	- I can possibly work with dh_make_perl to automatically
+	  down load and package it.
+
+	- Use Paper::Spec to handle all the info about paper sizes and such.
+	  [DMA 20080818 - ?]
+
+	- Use Paper::Spec for defaultPaperTypeIs setup
+	  [DMA 20060615 - ?}
+
+	- Replace _paperSpects with Paper::Specs
+	  [DMA 20060615 - ?}
+
+=================
+Job
+
+- ARCHIVIST: need to set batch size based on how many pages
+  there are, not just a number. If I start autoscan late,
+  I could scan for more pages than there are!
+  [DMA 20070511-?]
+
+- When I get smarter code I will want to check the proposed batch size against
+  the sheet count of the document and the number scanned so far and decide
+  when we are at the end. Or I could allow for keeping a batch count and just
+  reloading the hopper. This will happen in setBatchLength. I might then use
+  a batchcnt that gets reset from batchlen when a new batch is started.
+  [DMA 20070511-?]
+
+- In nextPageNumbers, if someone types in pages which are not sequential in one
+  of the formats, the next increment will get things wrong.
+  [DMA 20070511-?]
+
+- setBatchLength. Should test for non-numeric.
+  [DMA 20070511-?]
+
+- Can I make this handle single page non-document scans also?
+  [DMA 20080827 - ?]
+
+- I should modify all the setPageTitles. That should be held in the Page object
+  and passed to the document file as needed.
+  [DMA 20080828 - ?]
+
+- Should job control the turn of of the lamp? I think so.
+  [DMA 20080825 - ?]

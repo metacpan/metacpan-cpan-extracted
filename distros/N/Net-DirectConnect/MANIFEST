@@ -1,4 +1,7 @@
 Changes
+examples/certs/cert.pem
+examples/certs/cfg
+examples/certs/key.pem
 examples/config.pl.dist
 examples/countub.pl
 examples/dcget
@@ -18,9 +21,9 @@ examples/stat/stat.pl
 examples/stat/statlib.pm
 examples/stat/style.css
 examples/watch.pl
-IO-Socket-INET.pm.sctp.diff
 lib/Net/DirectConnect.pm
 lib/Net/DirectConnect/adc.pm
+lib/Net/DirectConnect/adcs.pm
 lib/Net/DirectConnect/clicli.pm
 lib/Net/DirectConnect/clihub.pm
 lib/Net/DirectConnect/filelist.pm
@@ -28,11 +31,15 @@ lib/Net/DirectConnect/http.pm
 lib/Net/DirectConnect/hub.pm
 lib/Net/DirectConnect/hubcli.pm
 lib/Net/DirectConnect/hubhub.pm
+lib/Net/DirectConnect/ipv6.pm
 lib/Net/DirectConnect/nmdc.pm
 lib/Net/DirectConnect/pslib/psmisc.pm
 lib/Net/DirectConnect/pslib/pssql.pm
+lib/Net/DirectConnect/pslib/psweb.pm
+lib/Net/DirectConnect/sctp.pm
 Makefile.PL
 MANIFEST			This list of files
 t/Net-DirectConnect.t
 TODO
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

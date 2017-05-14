@@ -1,6 +1,74 @@
 Revision history for DBIx-Class-Migration.
 
-NOTE: Date format is YEAR-MONTH-DAY
+0.058   2016-01-07
+        - https://github.com/jjn1056/DBIx-Class-Migration/pull/61 (doc update)
+        - https://github.com/jjn1056/DBIx-Class-Migration/pull/64 (find local perl install better)
+        - https://github.com/jjn1056/DBIx-Class-Migration/pull/53 (use JSON module with more reliable author)
+        - https://github.com/jjn1056/DBIx-Class-Migration/pull/57 (quote table names better)
+        - https://github.com/jjn1056/DBIx-Class-Migration/pull/56 (properly delete stuff)
+        - https://github.com/jjn1056/DBIx-Class-Migration/pull/68 (work properly on newer Perl)
+        - Thanks for all the PRs, sorry I was slow to pick this up :(
+
+0.057   2015-03-24
+        - Lowered some dependency versions to solve reported installation
+          issues (Some stuff is not 'dual lived' and only gets updated with
+          a newer Perl version).
+
+0.056   2015-02-06
+        - tweaked the dist.ini so that '.devdir' is found and gathered into
+          the tarball.  This solves massive fail on cpantesters.
+
+0.055   2015-02-05
+        - Specify higher minimum versions to try and narrow down massive
+          failure reports on CPAN testers.  Please give me a shout if any
+          of these version minimum increases cause you trouble.
+
+0.054   2015-02-05
+        - Change use of deprecated config name in SQLT
+
+0.053   2015-02-05
+        - Even more careful disconnection on DEMOLISH
+
+0.052   2015-02-05
+        - Don't disconnect on DEMOLISH if the schema already is gone
+
+0.051   2015-02-05
+        - Removed postgresqlsandbox shutdown hack (I think this issue is long fixed
+          in DBIC:DH and I can't honestly recall the exact problem...
+        - Fixed bad test case that was not properly scoping $schema, leading to
+          trouble.
+        - More explicit disconnect of schema when the migration object goes out of
+          scope.  This should reduce or eliminate "Cleanup" warnings when trying to
+          shutdown Postgresql and the $schema is still connected.
+        - Added some docs on the Postgresql sandbox helpers I added yesterday.
+
+0.050   2015-02-04
+        - New script helpers for Postgresql sandboxs
+        - Corrected some dates in the changelog
+
+0.049   2015-02-04
+        - New feature 'db_sandbox_dir' which allows you to specify an alternative
+          location for a sandbox.
+        - Removed some Dzil components I didn't understand or seem to think I
+          really benefitted from.
+
+0.048     2015-02-20 17:00:51+00:00 Europe/London
+
+        - marking as stable
+
+0.04_7    2015-01-26 14:48:07+00:00 Europe/London
+
+        - no changes from previous release, just removing examples from PAUSE indexing.
+
+0.046     2015-01-26 03:10:37+00:00 Europe/London
+
+        - Switch from Test::postgresql to Test::PostgreSQL
+        ( the latter is a fork of the former )
+
+0.04_5    2015-01-15 01:44:23+00:00 Europe/London
+
+        - Don't use config_dir from DBIx::Class::Fixtures as a Path::Class::Dir,
+          it no longer is one.
 
 0.044   2013-20-35
         - POD fixs (MidLifeXis++)

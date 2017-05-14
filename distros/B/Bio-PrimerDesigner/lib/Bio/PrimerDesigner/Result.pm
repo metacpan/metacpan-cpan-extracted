@@ -1,6 +1,6 @@
-# $Id: Result.pm,v 1.9 2005/08/23 13:51:14 smckay Exp $
-
 package Bio::PrimerDesigner::Result;
+
+# $Id: Result.pm 14 2008-11-07 02:40:49Z kyclark $
 
 =head1 NAME 
 
@@ -53,34 +53,42 @@ design or validation results
 =cut
 
 use strict;
+use warnings;
+use Readonly;
+
+Readonly our 
+    $VERSION => sprintf "%s", q$Revision: 24 $ =~ /(\d+)/;
+
 use base 'Class::Base';
 
-use vars '$VERSION';
-$VERSION = sprintf "%d.%02d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/;
+Readonly my @AUTO_FIELDS => qw(
+    ***PRIMER3_KEYS*** 
+    PRIMER_LEFT_EXPLAIN PRIMER_RIGHT_EXPLAIN PRIMER_PAIR_EXPLAIN
+    PRIMER_INTERNAL_OLIGO_EXPLAIN left_explain right_explain
+    hyb_oligo_explain hyb_oligo lselfend PRIMER_LEFT rendstab 
+    PRIMER_LEFT_SEQUENCE prod SEQUENCE TARGET PRIMER_RIGHT_END_STABILITY 
+    right lselfany PRIMER_RIGHT_GC_PERCENT left PRIMER_PRODUCT_SIZE_RANGE 
+    PRIMER_PAIR_COMPL_END raw_output lendstab PRIMER_INTERNAL_OLIGO_TM 
+    hyb_tm PRIMER_RIGHT_SEQUENCE PRIMER_PRODUCT_SIZE PRIMER_PAIR_COMPL_ANY 
+    leftgc PRIMER_LEFT_SELF_END rightgc rqual qual PRIMER_PAIR_PENALTY 
+    PRIMER_LEFT_SELF_ANY PRIMER_SEQUENCE_ID PRIMER_LEFT_TM PRIMER_RIGHT_TM
+    tmright PRIMER_RIGHT startright tmleft pairendcomp PRIMER_RIGHT_SELF_END
+    PRIMER_LEFT_GC_PERCENT rselfend PRIMER_LEFT_PENALTY PRIMER_RIGHT_PENALTY
+    EXCLUDED_REGION PRIMER_LEFT_END_STABILITY PRIMER_NUM_RETURN 
+    PRIMER_RIGHT_SELF_ANY rselfany pairanycomp lqual startleft
+    ***other keys*** 
+    products size start stop end amplicon strand
+);
 
-use constant AUTO_FIELDS => [
-    qw (
-        ***PRIMER3_KEYS*** 
-        PRIMER_LEFT_EXPLAIN PRIMER_RIGHT_EXPLAIN PRIMER_PAIR_EXPLAIN
-        PRIMER_INTERNAL_OLIGO_EXPLAIN left_explain right_explain
-        hyb_oligo_explain hyb_oligo lselfend PRIMER_LEFT rendstab 
-        PRIMER_LEFT_SEQUENCE prod SEQUENCE TARGET PRIMER_RIGHT_END_STABILITY 
-        right lselfany PRIMER_RIGHT_GC_PERCENT left PRIMER_PRODUCT_SIZE_RANGE 
-        PRIMER_PAIR_COMPL_END raw_output lendstab PRIMER_INTERNAL_OLIGO_TM 
-        hyb_tm PRIMER_RIGHT_SEQUENCE PRIMER_PRODUCT_SIZE PRIMER_PAIR_COMPL_ANY 
-        leftgc PRIMER_LEFT_SELF_END rightgc rqual qual PRIMER_PAIR_PENALTY 
-        PRIMER_LEFT_SELF_ANY PRIMER_SEQUENCE_ID PRIMER_LEFT_TM PRIMER_RIGHT_TM
-        tmright PRIMER_RIGHT startright tmleft pairendcomp PRIMER_RIGHT_SELF_END
-        PRIMER_LEFT_GC_PERCENT rselfend PRIMER_LEFT_PENALTY PRIMER_RIGHT_PENALTY
-        EXCLUDED_REGION PRIMER_LEFT_END_STABILITY PRIMER_NUM_RETURN 
-        PRIMER_RIGHT_SELF_ANY rselfany pairanycomp lqual startleft
-        ***other keys*** 
-        products size start stop end amplicon strand
-    )
-];
+# -------------------------------------------------------------------
+sub init {
+    my ( $self, $config ) = @_;
 
-BEGIN {
-    for my $sub_name ( @{ +AUTO_FIELDS } ){
+    $self->params( $config, 'data' );
+
+    for my $sub_name ( @AUTO_FIELDS ) {
+        next if $sub_name =~ /^\*/;
+
         no strict 'refs';
         *{ $sub_name } = sub {
             my $self    = shift;
@@ -90,16 +98,14 @@ BEGIN {
             return @result > 1 ? @result : $result[0];
         }
     }
-}
 
-# -------------------------------------------------------------------
-sub init {
-    my ( $self, $config ) = @_;
-    $self->params( $config, 'data' );
     return $self;
 }
 
 # -------------------------------------------------------------------
+sub keys {
+
+=pod
 
 =head2 keys
 
@@ -189,9 +195,6 @@ B<Other keys>
 
 =cut
 
-
-sub keys {
-
     my $self = shift;
     return $self->error('method not implemented');
 }
@@ -204,13 +207,14 @@ sub keys {
 
 =head1 AUTHOR
 
-Copyright Sheldon McKay E<lt>mckays@cshl.eduE<gt> and Ken Y. Clark E<lt>kclark@cpan.orgE<gt>.
+Copyright (c) 2003-2009 Sheldon McKay E<lt>mckays@cshl.eduE<gt>,
+Ken Youens-Clark E<lt>kclark@cpan.orgE<gt>.
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; version 2.
+the Free Software Foundation; version 3 or any later version.
 
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -219,7 +223,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 
 =head1 SEE ALSO

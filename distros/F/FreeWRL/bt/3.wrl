@@ -1,0 +1,97 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# Chain of boxes
+
+DEF TS TimeSensor {
+	loop TRUE 
+}
+
+DEF GR Transform {
+	rotation 1 1 0 0.5
+	children [
+	   Shape {
+		appearance Appearance {
+		 material Material {
+			diffuseColor 0.8 0.8 0
+		 }
+		}
+		geometry Text { string [
+		"Dynamic creation"
+		]}
+	   }
+	]
+}
+
+DEF CRS Script {
+	eventIn SFTime tick
+	eventOut MFNode nod
+	field MFNode onod []
+	field SFInt32 count 0
+	url [
+	"javascript:
+	    function tick(val,time) {
+		a = count++;
+		if(a<3) {return 0;};
+		a -= 3;
+		n = Browser.createVrmlFromString(
+\"Shape { appearance Appearance { material Material { diffuseColor 0.8 0 0 } } geometry Box { size 0.8 0.8 0.8 } } \"
+		);
+		nod = n;
+	   }
+		// function tick {
+		// 	koo = Browser.createVrmlFromString(
+		// 		\"Transform {
+		// 		  translation $c 0 0
+		// 		  children [
+		// 		   Shape {
+		// 			appearance Appearance {
+		// 			 material Material {
+		// 			 	diffuseColor 0.8 0 0
+		// 			 }
+		// 			}
+		// 			geometry Box { size 0.8 0.8 0.8 }
+		// 		   }
+		// 		  ]
+		// 		 } \"
+		// 	);
+		// 	onod[onod.length] = koo[0];
+		// 	nod=onod;
+		// }
+	"
+	"perl_tjl_xxx1:
+		tick => sub {
+			my $c = $t->{count} ++;
+			#VRML::VRMLFunc::render_verbose(1);
+			return if($c < 2);
+			$c -= 2;
+			print \"DO SCRIPT\\n\";
+			my $n = $t->{onod};
+			my $nn = $Browser->createVrmlFromString(
+				\"Transform {
+				  translation $c 0 0
+				  children [
+				   Shape {
+					appearance Appearance {
+					 material Material {
+					 	diffuseColor 0.8 0 0
+					 }
+					}
+					geometry Box { size 0.8 0.8 0.8 }
+				   }
+				  ]
+				 } \"
+			);
+			print \"N IS @$n\\n\";
+			$t->{nod} = [@$nn, @$n];
+			$t->{onod} = [@$nn, @$n];
+		}
+	"
+	]
+}
+
+ROUTE TS.cycleTime TO CRS.tick
+ROUTE CRS.nod TO GR.children

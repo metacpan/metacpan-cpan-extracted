@@ -1,0 +1,65 @@
+Revision history for Perl extension Ovid.
+0.12  Friday May 25 2007
+ - Update version regex matcher to reflect the variety of version schemes on CPAN.
+   Thanks: Kevin Frost
+
+0.11  Tue May 30 2006
+ - Change long deprecated 'Copyright' spec tag to 'License'
+   Add '=s' modifier to packager option.
+   Thanks:  Richard Siddall
+ - Maintain option list in array instead of hash to maintain order.
+
+0.10  Wed May 17 2006
+ - Propagate CFLAGS environment variable into spec file.
+
+0.09  Fri Feb 17 2006
+  - Updated version parser to handle the v in name-v0.1
+
+0.08  Mon Mar 21 2005
+  - Added installdirs option.
+  - Removed unused modules Ovid::RunQuiet and Ovid::IORedirector.
+  - changed rpm spec file and generated spec files to use
+    DESTDIR instead of PERL_INSTALL_ROOT, which is apparently old.
+    Thanks: SHLOMIF via RT bugs list
+  - changed rpm spec file and generated spec files to ignore *.bs files
+
+0.07  Tue Feb 15 2005
+  - Added skip-perl-rpm-modules option. Thanks: Rob Kearey
+
+0,06  Sat Jan 01 2005
+  - removed IO redirection. It was just not working well.
+  - removed log file options. Not necessary.
+  - added ability to list dependencies.
+  - generate rpm filename based on CPAN distribution name. Sometimes this matters.
+
+0.05  Wed Dec 08 2004
+
+  -Works with perl 5.6+. Thanks: Steven Ruby
+
+  -expose any CPAN errors.
+
+  -improve documentation
+  
+  -Add -i option to ignore certain modules
+
+  -Change -v option to be more standard
+
+  -Remove non-standard loglevel option.
+
+  -avoid perl 5.8 style constant declarations to maintain
+   compatibility with older perls.
+
+0.04  Mon Sep 27 2004
+  -expand bundles into individual distributions
+
+0.03  Wed Sep  1 2004
+  -check for existing rpms, either installed or on disk
+  -bug fix to clear out old dependencies
+
+0.02  Mon Aug 16 2004
+  - copy sources to rpm source dir.
+
+0.01  Sat Aug 14 13:48:57 2004
+	- original version; created by h2xs 1.22 with options
+		-b 5.6.0 -Xn Ovid
+

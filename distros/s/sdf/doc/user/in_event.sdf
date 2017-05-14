@@ -1,0 +1,121 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Event Processing
+
+H2: The on Macro
+
+The {{MAC:on}} macro allows you to execute an arbitrary piece of
+[[Perl]] code during document conversion.
+The syntax of the {{MAC:on}} macro is:
+
+E: !on {{type}} {{pattern}}; [{{id}}]; {{action}}
+
+:where:
+
+* {{type}} specifies the event type
+* {{pattern}} is a [[Perl]] regular expression string, anchored at both ends,
+  which specifies which styles (or names) the action is to be executed for
+* {{id}} is optionally used to name an event for later disabling via
+  the {{MAC:off}} macro
+* {{action}} is the block of [[Perl]] code to execute.
+
+For example, the following statement makes every heading a hypertext
+target named itself:
+
+E:  !on paragraph 'H\d';; $attr{'id'} = $text
+
+H2: Event Types
+
+The types supported and the symbols available in the respective actions
+include:
+
+!block table
+Type        Symbols
+paragraph   $style, $text, %attr
+phrase      $style, $text, %attr
+macro       $name, $args
+filter      $name, $params
+table       $style, %param
+!endblock
+
+H2: Event Patterns
+
+Some example event patterns are given below.
+
+!block table
+Pattern     Comments
+'XYZ'       matches a thing called XYZ
+'AB|CD|E'   matches things named AB, CD or E
+'H1'        for paragraphs, matches a level 1 normal heading
+'H[1-4]'    for paragraphs, matches normal headings at levels 1 to 4
+'[HAP]\d'   for paragraphs, matches all headings
+!endblock
+
+If the pattern is an empty string, the action is executed for all
+entities of that type.
+
+If multiple actions are registered for a given type, actions are
+executed in "last in, first out" order.
+
+H2: The off Macro
+
+The {{off}} macro is used to cancel an event.
+The syntax is:
+
+E: !off {{type}} {{id}}
+
+For example:
+
+E:  !on paragraph 'H\d'; XYZ; $attr{'id'} = $text
+E:  # lots of SDF
+E:  !off paragraph XYZ
+
+If two events are given the same name, the most-recently-named event
+will be cancelled. i.e. nested event cancelling works as expected.
+
+H2: Examples
+
+H3: Generating Hypertext Targets
+
+To make all level 1 and 2 headings hypertext targets:
+
+E:  !on paragraph '[HAP][12]';; $attr{"id"} = $text
+
+H3: Generating Index Entries
+
+To make index entries for all commands (CMD character tags):
+
+E:  !on phrase 'CMD';; $attr{"index"} = $text
+
+H3: Adjusting Heading Levels
+
+To move normal headings down one level:
+
+E:  !on paragraph 'H\d';; $style =~ tr/1234/2345/
+
+H3: Changing Spelling
+
+To convert selected words to North American spelling:
+
+E:  !on paragraph '';; $text =~ s/colour/color/ig; \
+E:                     $text =~ s/ise\b/ize/g
+
+This approach uses Perl's substitute operator on the text
+in each paragraph:
+
+* the 'i' switch means case insensitive
+* the 'g' switch means global. i.e. all occurances in each paragraph
+* the '\b' symbol matches a word boundary.
+
+!end_topic

@@ -7,7 +7,7 @@ require 'conf.pl';
 
 my ($db_src, $db_user, $db_pass) = conf();
 
-my $dbh = DBI->connect($db_src, $db_user, $db_pass, { RaiseError => 1, PrintError => 1});
+my $dbh = DBI->connect($db_src, $db_user, $db_pass, { RaiseError => 1, PrintError => 1, AutoCommit => 0});
 
 print "User to delete domain from: ";
 my $user = <>;
@@ -19,6 +19,7 @@ chomp($domain);
 my $uid = $dbh->selectrow_array("select id from users where username = ?", undef, $user);
 unless ($uid =~ /^\d+$/) {
     print "Unknown user\n";
+    $dbh->rollback();
     $dbh->disconnect();
     exit 1;
 }
@@ -26,6 +27,7 @@ unless ($uid =~ /^\d+$/) {
 my $dom_id = $dbh->selectrow_array("select id from domains where domain = ? and owner = ?", undef, $domain, $uid);
 unless ($dom_id =~ /^\d+$/) {
     print "Unknown domain\n";
+    $dbh->rollback();
     $dbh->disconnect();
     exit 1;
 }
@@ -33,12 +35,15 @@ unless ($dom_id =~ /^\d+$/) {
 $dbh->do("delete from rec_count where domain = ?", undef, $dom_id);
 $dbh->do("delete from soa where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_A where domain = ?", undef, $dom_id);
+$dbh->do("delete from records_AAAA where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_CNAME where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_MX where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_NS where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_TXT where domain = ?", undef, $dom_id);
 $dbh->do("delete from domains where id = ?", undef, $dom_id);
 
+$dbh->commit();
 print "$domain succesfully deleted\n";
 
 $dbh->disconnect();
+

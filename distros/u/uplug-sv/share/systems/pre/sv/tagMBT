@@ -1,0 +1,68 @@
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+	'status' => 'tagMBT',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+     'tagger' => {
+      'language' => 'swedish',
+      'startup base' => 'mbt',
+     },
+     'output' => {
+        'attribute' => 'pos',
+        'token delimiter' => ' ',
+        'sentence delimiter' => '<s>//VB ',
+        'tag delimiter' => '\/\/?',
+	'encoding' => 'iso-8859-1',
+     },
+     'input' => {
+        'token delimiter' => ' ',
+        'sentence delimiter' => "\n\<s\>\n",
+     },
+  },
+  'module' => {
+    'program' => 'uplug-tag',
+    'location' => '$UplugBin',
+    'name' => 'MBT tagger (swedish)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+      'lang' => 'parameter:tagger:language',
+       'attr' => 'parameter:output:attribute',
+       'char' => 'output:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'inroot' => 'input:text:root',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk),language=sv)'
+	  },
+       },
+       'parameter' => {
+          'output' => {
+	     'attribute' => 'optionmenu (pos,mbt)',
+	  }
+       }
+  }
+}

@@ -6,6 +6,9 @@ extends 'YAML::Old::Dumper::Base';
 use YAML::Old::Dumper::Base;
 use YAML::Old::Node;
 use YAML::Old::Types;
+use Scalar::Util qw();
+use B ();
+use Carp ();
 
 # Context constants
 use constant KEY       => 3;
@@ -18,7 +21,7 @@ my $ESCAPE_CHAR = '[\\x00-\\x08\\x0b-\\x0d\\x0e-\\x1f]';
 my $LIT_CHAR    = '|';
 
 #==============================================================================
-# OO version of Dump. YAML::Old->new->dump($foo);
+# OO version of Dump. YAML->new->dump($foo);
 sub dump {
     my $self = shift;
     $self->stream('');
@@ -441,7 +444,7 @@ sub _emit_str {
             $self->_emit_block($LIT_CHAR, $_[0]),
             $self->_emit($eb), last
               if $self->use_block;
-              Carp::cluck "[YAML] \$UseFold is no longer supported"
+              Carp::cluck "[YAML::Old] \$UseFold is no longer supported"
               if $self->use_fold;
             $self->_emit($sf),
             $self->_emit_double($_[0]),
@@ -455,6 +458,10 @@ sub _emit_str {
             $self->_emit_block($LIT_CHAR, $_[0]),
             $self->_emit($eb), last;
         }
+        $self->_emit($sf),
+        $self->_emit_number($_[0]),
+        $self->_emit($ef), last
+          if $self->is_literal_number($_[0]);
         $self->_emit($sf),
         $self->_emit_plain($_[0]),
         $self->_emit($ef), last
@@ -474,10 +481,23 @@ sub _emit_str {
     return;
 }
 
+sub is_literal_number {
+    my $self = shift;
+    # Stolen from JSON::Tiny
+    return B::svref_2object(\$_[0])->FLAGS & (B::SVp_IOK | B::SVp_NOK)
+            && 0 + $_[0] eq $_[0];
+}
+
+sub _emit_number {
+    my $self = shift;
+    return $self->_emit_plain($_[0]);
+}
+
 # Check whether or not a scalar should be emitted as an plain scalar.
 sub is_valid_plain {
     my $self = shift;
     return 0 unless length $_[0];
+    return 0 if $self->quote_numeric_strings and Scalar::Util::looks_like_number($_[0]);
     # refer to YAML::Old::Loader::parse_inline_simple()
     return 0 if $_[0] =~ /^[\s\{\[\~\`\'\"\!\@\#\>\|\%\&\?\*\^]/;
     return 0 if $_[0] =~ /[\{\[\]\},]/;

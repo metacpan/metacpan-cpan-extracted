@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # created by thomas@stderr.net (2001/03/23)
-# $Id: en.lang,v 1.10 2001/04/24 22:15:09 thomas Exp $
+# $Id: en.lang,v 1.12 2001/06/21 21:20:22 thomas Exp $
 
 use strict;
 
@@ -29,7 +29,9 @@ sub lang () {
 		'EXPIRE'            => 'Expire time',
 		'TTL'               => 'Time to Live',
 		'HOST'              => 'Host',
+		'REVERSE_HOST'      => 'Reverse Host',
 		'IP_ADDRESS'        => 'IP address',
+		'IPV6_ADDRESS'      => 'IPv6 address',
 		'CNAME'             => 'Canonical name',
 		'MX'                => 'Mail exchanger',
 		'PREFERENCE'        => 'Preference',
@@ -48,7 +50,9 @@ sub lang () {
 		'ERROR_CORRECT'     => 'Please correct the following error(s):',
 		'ERROR_DUPLICATE'   => 'Duplicate record exists',
 		'ERROR_IP'          => 'Incorrect value for IP address',
+		'ERROR_IPV6'        => 'Incorrect value for IPv6 address',
 		'ERROR_HOST'        => 'Incorrect value for Host',
+		'ERROR_REVERSE'     => 'Incorrect value for Reverse Host',
 		'ERROR_TTL'         => 'Incorrect value for TTL',
 		'ERROR_CNAME'       => 'Incorrect value for Canonical Name',
 		'ERROR_MX'          => 'Incorrect value for Mail exchanger',

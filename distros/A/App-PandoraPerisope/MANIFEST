@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/pandora-periscope
+dist.ini
+extra/Pandora.png
+lib/App/PandoraPeriscope.pm

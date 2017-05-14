@@ -85,7 +85,7 @@ sub _configure_inc {
 
     # not for PAR
     if ( !$ENV->is_par ) {
-        my $is_module_build_test = $ENV->dist && exists $inc_index->{ $ENV->dist->root . 'blib/lib' } ? 1 : 0;
+        my $is_module_build_test = 0;    # $ENV->dist && exists $inc_index->{ $ENV->dist->root . 'blib/lib' } ? 1 : 0;
 
         # add dist lib and PCORE_LIB to @INC only if we are int on the PAR archive and not in the Module::Build testing environment
         # under Module::Build dist lib is already added and PCORE_LIB is not added to emulate clean CPAN installation

@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                Scanner
+version:             0.02-5
+abstract:            Classes for handling page Scanning.
+license:             ~
+author:              
+    - Dale Amon
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Document::LogFile:             0
+    Document::PageIterator:        0
+    Document::Toc:                 0
+    Document::TocFile:             0
+    Exporter:                      0
+    File::Spec:                    0
+    File::Spec::PublicationPage:   0
+    POSIX:                         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,19 @@
+  SelFile.pm is a file select Perl-Tk module.  It runs under
+  Perl version 5.001-l (dash el) and Perl Tk version b7 .
+
+  If you do not wish to install it under the usual Tk distribution,
+  and you have a personal Perl library such as /u/someone/lib/MyPerl,
+  then this can be installed in the directory /u/someone/lib/MyPerl/Tk
+  You would then need to set the environmental variable PERL5LIB.
+  PERL5LIB=/u/someone/lib/MyPerl ; export PERL5LIB
+  (Example show above is Bourne, Korn style.  For more than one
+  directory, the directory names should be separated by a colon.)
+
+  FS_example.pl is a wrapper for using the Perl module with C.
+  The first lines needs to be modified for your site, for example,
+  #!/usr/local/bin/perl5
+  It seems to work without starting MainLoop -- which is commented-out
+  in the code.
+
+  fs_example.c is not a complete C program, but just a code fragment
+  showing how FS_example.pl could be used with a C program.

@@ -1,0 +1,565 @@
+# $Id$
+#
+# >>Title::     Standard Library
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 24-Oct-98 ianc    added KN/KP support
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{stdlib}} is the [[SDF]] library containing the built-in features.
+#
+# >>Description::
+# This library is {{2:always}} implicitly loaded.
+#
+# >>Limitations::
+#
+
+######## Declare the standard entities #########
+
+# Declare built-in paragraph styles
+!block parastyles
+Name    Category
+A1
+A2
+A3
+A4
+A5
+A6
+Addr
+E       example
+E80     example
+FA
+FOOTER
+FT
+GL
+GLD
+GLT
+H1
+H2
+H3
+H4
+H5
+H6
+HEADER
+L1
+L2
+L3
+L4
+L5
+L6
+Line
+LF1
+LF2
+LF3
+LF4
+LF5
+LF6
+LI1
+LI2
+LI3
+LI4
+LI5
+LI6
+LN1
+LN2
+LN3
+LN4
+LN5
+LN6
+LU1
+LU2
+LU3
+LU4
+LU5
+LU6
+N
+NB
+NE
+NV
+Note
+P1
+P2
+P3
+P4
+P5
+P6
+PB
+Sign
+V       example
+!endblock
+
+# Declare built-in phrase styles
+!block phrasestyles
+Name        Category
+1
+2
+3
+A
+B
+C           example
+E
+F
+I
+L
+N
+P
+S           example
+T
+U
+X
+Y
+CHAR        special
+CMD
+EMAIL
+EX          example
+ST
+FILE
+INLINE      special
+IMPORT      special
+PAGENUM     special
+PAGECOUNT   special
+PARATEXT    special
+PARANUM     special
+PARANUMONLY special
+PARASHORT   special
+PARALAST    special
+JUMP
+SECT
+SUB
+SUP
+!endblock
+
+# Declare built-in paragraph attributes
+# (Handled and removed prior to validation: obj, noevents)
+!block paraattrs
+Name        Type        Rule
+align       string      <1|Full|Left|Right|Center>
+first       string
+keep_next   boolean
+keep_prev   boolean
+label       string
+left        string
+nopb        boolean
+notoc       boolean
+noid        boolean
+continued   boolean
+sp_after    string
+sp_before   string
+top         string      <1|0|Page|Column|Left|Right>
+right       string
+wide        boolean
+component   string
+tabs        string
+in          integer
+orig_style  string
+out_style   string
+!endblock
+
+# Declare built-in phrase attributes
+# (Handled and removed prior to validation: expand, shrink)
+!block phraseattrs
+Name        Type        Rule
+bold        boolean
+changed     boolean
+color       string      <Black|White|Red|Green|Blue|Yellow|Cyan|Magenta>
+family      string
+id          string
+index       string
+index_type  string
+italics     boolean
+jump        string
+short       string
+size        string
+underline   boolean
+verbatim    boolean
+xref        string
+!endblock
+
+# Declare built-in table styles
+!block tablestyles
+Name
+columns
+rows
+grid
+plain
+shade
+!endblock
+
+# Declare built-in table parameters
+!block tableparams
+Name        Type        Rule
+style       string
+format      string
+title       string
+wide        boolean
+narrow      boolean
+align       string      <Left|Center|Right|Inner|Outer>
+placement   string      <Float|Columntop|Pagetop|Lefttop|Righttop>
+landscape   string
+bgcolor     string
+cellspacing integer
+cellpadding integer
+listitem    integer
+tmargin     integer
+bmargin     integer
+lmargin     integer
+rmargin     integer
+colaligns   string
+!endblock
+
+# Declare built-in row parameters
+#!block rowparams
+#Name        Type        Rule
+#!endblock
+
+# Declare built-in cell parameters
+!block cellparams
+Name        Type        Rule
+align       string      <Left|Center|Right>
+valign      string      <Top|Middle|Bottom|Baseline>
+cols        integer
+rows        integer
+nowrap      boolean
+bgcolor     string
+fill        integer     <100|90|70|50|30|10|3|0>
+angle       integer     <0|90|180|270>
+bruling     string      <None|Vthin|Thin|Medium|Thick|Double>
+lruling     string      <None|Vthin|Thin|Medium|Thick|Double>
+rruling     string      <None|Vthin|Thin|Medium|Thick|Double>
+truling     string      <None|Vthin|Thin|Medium|Thick|Double>
+tmargin     integer
+bmargin     integer
+lmargin     integer
+rmargin     integer
+hidden      boolean
+!endblock
+
+######## Define the standard variables #########
+
+# Setup the default stuff
+!default OPT_LOOK   DEFAULT_LOOK
+!default OPT_LOCALE DEFAULT_LOCALE
+!default OPT_STYLE  "document"
+!default OPT_WIDTH  70
+!default OPT_PAGE_SIZE "global"
+
+# Declare restricted variable families
+!restrict 'OPT'
+!restrict 'DEFAULT'
+!restrict 'DOC'
+
+# Declare the option variables
+!block variables; family="OPT"
+Name                    Type        Rule
+BORDERS                 integer
+HEADINGS                integer
+NUMBER_PER_COMPONENT    boolean
+COMPONENT_COVER         boolean
+TEMPLATE                string
+LIST_INDENT             dimension
+MARGIN_TOP              string
+MARGIN_BOTTOM           string
+MARGIN_INNER            string
+MARGIN_OUTER            string
+LOCALE                  string
+!endblock
+
+# Character definitions
+!block define
+Name            Value
+amp             "{{CHAR:amp}}"
+bullet          "{{CHAR:bullet}}"
+c               "{{CHAR:c}}"
+cent            "{{CHAR:cent}}"
+dagger          "{{CHAR:dagger}}"
+doubledagger    "{{CHAR:doubledagger}}"
+emdash          "{{CHAR:emdash}}"
+endash          "{{CHAR:endash}}"
+emspace         "{{CHAR:emspace}}"
+enspace         "{{CHAR:enspace}}"
+nbdash          "{{CHAR:nbdash}}"
+nbspace         "{{CHAR:nbspace}}"
+nbsp            "{{CHAR:nbspace}}"
+nl              "{{CHAR:nl}}"
+pound           "{{CHAR:pound}}"
+r               "{{CHAR:r}}"
+reg             "{{CHAR:r}}"
+tab             "{{CHAR:tab}}"
+tm              "{{CHAR:tm}}"
+yen             "{{CHAR:yen}}"
+!endblock
+
+# Colour variables
+!block define; family="COLOR"
+Name    Value
+WHITE   'ffffff'
+BLACK   '000000'
+RED     'ff0000'
+GREEN   '00ff00'
+BLUE    '0000ff'
+YELLOW  'ffff00'
+MAGENTA 'ff00ff'
+CYAN    '00ffff'
+GREY    'c0c0c0'
+!endblock
+
+# Default FormatTime and case conversion variables.
+!block default; family="FORMAT"
+Name      Value
+DATETIME  '&FormatTime(\'$day $month $year, $hour:$minute0.$second0\', $_)'
+TIME      '&FormatTime(\'$hour:$minute0.$second0\', $_)'
+DATE      '&FormatTime(\'$day $month $year\', $_)'
+SDATE     '&FormatTime(\'$day0-$smonth-$syear\', $_)'
+YEAR      '&FormatTime(\'$year\', $_)'
+UPPER     '"\U$_"'
+LOWER     '"\L$_"'
+UPPER1    '"\u$_"'
+LOWER1    '"\l$_"'
+!endblock
+
+# Provide FULL and CONCISE DateTime formats for backwards compatibility
+!default FORMAT_FULL    FORMAT_DATETIME
+!default FORMAT_CONCISE FORMAT_SDATE
+
+# Declare generation control variables
+!block variables; family="DEFAULT"
+Name        Type        Rule
+TABLE_STYLE string
+XREF_STYLE  string
+TAB_SIZE    integer
+!endblock
+
+# Set the default generation controls
+!default DEFAULT_TABLE_STYLE "columns"
+!default DEFAULT_XREF_STYLE  "section"
+!default DEFAULT_TAB_SIZE    8
+
+# Declare column layout variables
+!block variables; family="OPT,OPT_IX"
+Name                    Type        Rule
+SIDEHEAD_WIDTH          dimension
+SIDEHEAD_GAP            dimension
+COLUMNS                 integer
+COLUMN_GAP              dimension
+!endblock
+
+# Declare page layout variables
+!block variables; family="PAGE_FIRST,PAGE_RIGHT,PAGE_LEFT"
+Name                Type        Rule
+HEADER_BORDER       string
+HEADER_HEIGHT       dimension
+HEADER_GAP          dimension
+FOOTER_BORDER       string
+FOOTER_HEIGHT       dimension
+FOOTER_GAP          dimension
+BACKGROUND          string
+!endblock
+
+# Declare header/footer variables
+!block variables; family="PAGE_FIRST,PAGE_RIGHT,PAGE_LEFT"
+Name                Type        Rule
+HEADER_INNER1       string
+HEADER_INNER2       string
+HEADER_CENTER1      string
+HEADER_CENTER2      string
+HEADER_OUTER1       string
+HEADER_OUTER2       string
+FOOTER_INNER0       string
+FOOTER_INNER1       string
+FOOTER_INNER2       string
+FOOTER_INNER3       string
+FOOTER_CENTER0      string
+FOOTER_CENTER1      string
+FOOTER_CENTER2      string
+FOOTER_CENTER3      string
+FOOTER_OUTER0       string
+FOOTER_OUTER1       string
+FOOTER_OUTER2       string
+FOOTER_OUTER3       string
+!endblock
+
+# Declare the document "title" variables
+!block variables; family="DOC"
+Name            Type        Rule
+COVER           string
+NAME            string
+TYPE            string
+STATUS          string
+AUTHOR          string
+AUTHOR2         string
+AUTHOR3         string
+CODE            string
+VERSION         string
+DISTRIBUTION    string
+PROJECT         string
+PRODUCT         string
+SECTION         integer
+APPROVE         string
+APPROVE2        string
+APPROVE3        string
+ID              string
+ID_SEP          string
+URL             string
+TITLE           string
+OWNER           string
+LOGO            string
+LOGO_BASE       string
+TITLE_LOGO      string
+TITLE_LOGO_BASE string
+ADMIN_LOGO      string
+ADMIN_LOGO_BASE string
+HTML_LOGO       string
+HTML_LOGO_BASE  string
+TOPIC_LOGO      string
+TOPIC_LOGO_BASE string
+MANUAL_LOGO     string
+COMPONENT_LOGO  string
+TOC             integer
+LOF             boolean
+LOT             boolean
+IX              boolean
+TWO_SIDES       boolean
+COMPONENT       string
+!endblock
+
+# Export these for use in generating lists
+#!block variables; family="DOC"; export
+!block variables; family="DOC"
+Name        Type        Rule
+TOC_TITLE   string
+TOC_GRAPHIC string
+LOF_TITLE   string
+LOT_TITLE   string
+!endblock
+
+# Set the default list indent (1/4 inch)
+!default OPT_LIST_INDENT 18
+
+# Modified date variable for easier memos, etc.
+!define MODIFIED_DATE DATE:DOC_MODIFIED
+
+# Generally useful SDF variables
+!define SDF             "{{PRD:SDF}}"
+!define SDF_WWW         "http://www.mincom.com/mtr/sdf"
+!define SDF_FTP         "ftp://ftp.mincom.com/pub/mtr/sdf"
+!define SDF_BUGS        '{{EMAIL:sdf-bugs@mincom.com}}'
+!define SDF_USERS       '{{EMAIL:sdf-users@mincom.com}}'
+
+######## Define the standard rules #########
+
+# If the text attribute is set, use it instead of the current text
+!on paragraph '';; if (defined($attr{'text'})) {$text = delete $attr{'text'}}
+!on phrase    '';; if (defined($attr{'text'})) {$text = delete $attr{'text'}}
+
+# For online target, ignore the style (i.e. make 'as-is') for hypertext jumps
+!if $var{'OPT_TARGET'} eq 'html' || $var{'OPT_TARGET'} eq 'hlp' || $var{'OPT_TARGET'} eq 'fvo'
+!on phrase '';; $style = 'A' if $attr{'jump'} ne ''
+!endif
+
+# Convert xref attributes to a special style, if the output is PostScript
+!if $var{'OPT_TARGET'} eq 'ps'
+!on phrase '';; &ConvertXRef
+!endif
+
+# Treat 'obj' paragraphs as phrases
+!on paragraph '';; &CheckParaObject
+
+# Support KN & KP (keep-next/previous) paragraph styles
+!on paragraph 'KN';; $style = N; $attr{'keep_next'} = 1
+!on paragraph 'KP';; $style = N; $attr{'keep_prev'} = 1
+
+# Automatic hypertext generation
+!on phrase 'JUMP' ;; $attr{'jump'} = $text
+!on phrase 'EMAIL';; $attr{'jump'} = "mailto:" . $text
+!on phrase 'SECT' ;; &BuildSectJump
+
+# If OPT_NOBARS is set, ignore change bars
+!if OPT_NOBARS
+!on paragraph '';; delete $attr{'changed'} if $attr{'changed'};
+!on phrase    '';; delete $attr{'changed'} if $attr{'changed'};
+!endif
+
+# Useful filters
+!on filter 'template';; $name='inline'; $params.="; expand"
+!on filter 'changed';; $name='sdf'; $params.="; changed"
+!on filter 'center' ;; $name='sdf'; $params.="; align=Center"
+!on filter 'chapter';; $name = 'sdf'
+!on filter 'glossary';; $name = 'plain'
+
+# Do nice things to phrases which look like URLs
+!on phrase '1';; \
+        if ($text =~ /^(http|ftp|telnet|news|gopher|wais|https|snews):/) {\
+            $style = 'JUMP'; \
+        }
+
+# Make URL an alias for JUMP
+!on phrase 'URL';; $style="JUMP"
+
+# For all level 1 headings, reset the current topic name
+#!on paragraph '[HAP]1';; $topic = $attr{'id'}
+!on paragraph '[HAP]1';; $topic = $text
+
+# Convert a glossary paragraph into term and definition paragraphs
+!if $var{'OPT_TARGET'} ne 'html'
+!on paragraph 'GL';; $style = 'GLT'; \
+                     ($text, $_rest) = split(/\t/, $text, 2);\
+                     &AppendText("GLD:" . $_rest)
+!endif
+
+# Give each heading a hypertext id, unless:
+# * it doesn't have one, or
+# * it already has one, or
+# * it has been explicitly excluded from the table of contents.
+!if &Var('OPT_DRIVER') ne 'raw'
+!on paragraph '[HAP]\d';; \
+    unless ($attr{'noid'} || $attr{'id'} ne '' || $attr{'notoc'}) { \
+        $attr{'id'} = $subsection_prefix{$text} . &TextToId($text); \
+    }
+!endif
+
+# If a file looks like a URL, assume it is (a PODism)
+!on phrase 'FILE';; if ($text =~ /^\w\w+:/) {$attr{'jump'} = $text}
+
+# Support POD phrase style names
+!on phrase 'C';; $style = 'EX'
+#!on phrase 'E';; $style = 'CHAR'
+!on phrase 'F';; $style = 'FILE'
+
+######## Define the standard classes & objects #########
+
+# Note: Class definitions must occur AFTER the general rules defined above,
+# as defining a class adds rules to the event processing tables.
+# Likewise, rules which assume a class has been defined must go
+# AFTER the class definitions below.
+
+# Classes
+!class references    'REF,DOC'; 'Reference,Document'; 'Jump,Version,Status'
+!class terms         'TERM'   ; 'Term,Definition'
+!class products      'PRD'    ; 'Name'
+!class organisations 'ORG,ORGN'
+
+# Support REFNUMONLY - a reference where only the trailing number is output
+!on phrase 'REFNUMONLY';; $style = 'REF'; \
+    $attr{'text'} = ($text =~ /([\d\.]+)$/) ? $1 : $text
+
+# Objects
+!block products; data
+Name            Jump
+SDF             http://www.mincom.com/mtr/sdf/
+!endblock
+
+
+######## Load the standard libraries & modules #########
+
+!inherit "images"
+!use     "stdlib/macros"
+!use     "stdlib/langdefs"
+!use     "locale/$var{'OPT_LOCALE'}.sdl"

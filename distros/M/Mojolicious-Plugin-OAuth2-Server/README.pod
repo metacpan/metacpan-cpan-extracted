@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.36
+0.37
 
 =head1 SYNOPSIS
 
@@ -101,9 +101,9 @@ use Mojo::Util qw/ b64_decode /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
-my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant );
+my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
 =head1 METHODS
 
@@ -184,6 +184,8 @@ sub register {
     / ),
     %{ $config },
   );
+
+  $JWTCallback = $config->{jwt_claims};
 
   $app->routes->get(
     $auth_route => sub { _authorization_request( @_ ) },
@@ -282,6 +284,7 @@ sub _authorization_request {
       scopes          => [ @scopes ],
       type            => 'auth',
       redirect_uri    => $uri,
+      jwt_claims_cb   => $JWTCallback,
     );
 
     $Grant->store_auth_code(
@@ -317,6 +320,7 @@ sub _maybe_generate_access_token {
     client_id  => $client,
     scopes     => $scope,
     type       => 'access',
+    jwt_claims_cb => $JWTCallback,
   );
 
   $Grant->store_access_token(
@@ -382,6 +386,7 @@ sub _access_token_request {
       scopes    => $scope,
       type      => 'access',
       user_id   => $user_id,
+      jwt_claims_cb => $JWTCallback,
     );
 
     my $refresh_token  = $Grant->token(
@@ -389,6 +394,7 @@ sub _access_token_request {
       scopes    => $scope,
       type      => 'refresh',
       user_id   => $user_id,
+      jwt_claims_cb => $JWTCallback,
     );
 
     $Grant->store_access_token(

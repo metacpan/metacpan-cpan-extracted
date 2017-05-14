@@ -1,4 +1,4 @@
-# Copyright 2011-2016, Paul Johnson (paul@pjcj.net)
+# Copyright 2011-2017, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -11,21 +11,18 @@ use strict;
 use warnings;
 
 use Fcntl ":flock";
+use JSON::MaybeXS ();
 
-our $VERSION = '1.24'; # VERSION
-
-my $Format;
-
-BEGIN {
-    $Format = "JSON"     if              eval "use JSON; 1";
-    $Format = "JSON::PP" if !$Format and eval "use JSON::PP; 1";
-    die "Can't load either JSON or JSON::PP" unless $Format;
-}
+our $VERSION = '1.25'; # VERSION
 
 sub new {
     my $class = shift;
-    my $self  = { options => "", @_ };
-    bless $self, $class
+    my %args = @_;
+
+    my $json = JSON::MaybeXS->new(utf8 => 1, allow_blessed => 1);
+    $json->ascii->pretty->canonical if exists $args{options} && $args{options} =~ /\bpretty\b/i;
+
+    bless \$json, $class
 }
 
 sub read {
@@ -35,13 +32,8 @@ sub read {
     open my $fh, "<", $file or die "Can't open $file: $!\n";
     flock $fh, LOCK_SH      or die "Can't lock $file: $!\n";
     local $/;
-    my $data;
-    eval {
-        $data = $Format eq "JSON"
-            ? JSON::decode_json(<$fh>)
-            : JSON::PP::decode_json(<$fh>);
-    };
-    die "Can't read $file with $Format: $@" if $@;
+    my $data = eval { ${$self}->decode(<$fh>) };
+    die "Can't read $file with ".(ref ${$self}).": $@" if $@;
     close $fh or die "Can't close $file: $!\n";
     $data
 }
@@ -50,12 +42,9 @@ sub write {
     my $self = shift;
     my ($data, $file) = @_;
 
-    my $json = $Format eq "JSON" ? JSON->new : JSON::PP->new;
-    $json->utf8->allow_blessed;
-    $json->ascii->pretty->canonical if $self->{options} =~ /\bpretty\b/i;
     open my $fh, ">", $file or die "Can't open $file: $!\n";
     flock $fh, LOCK_EX      or die "Can't lock $file: $!\n";
-    print $fh $json->encode($data);
+    print $fh ${$self}->encode($data);
     close $fh or die "Can't close $file: $!\n";
     $self
 }
@@ -70,7 +59,7 @@ Devel::Cover::DB::IO::JSON - JSON based IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -86,7 +75,8 @@ This module provides JSON based IO routines for Devel::Cover::DB.
 
 =head1 SEE ALSO
 
- Devel::Cover
+L<Devel::Cover>
+L<JSON::MaybeXS>
 
 =head1 METHODS
 
@@ -94,7 +84,7 @@ This module provides JSON based IO routines for Devel::Cover::DB.
 
  my $io = Devel::Cover::DB::IO::JSON->new;
 
-Contructs the IO object.
+Constructs the IO object.
 
 =head2 read
 
@@ -114,7 +104,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2011-2016, Paul Johnson (paul@pjcj.net)
+Copyright 2011-2017, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

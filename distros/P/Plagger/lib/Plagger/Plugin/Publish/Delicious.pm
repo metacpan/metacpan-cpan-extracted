@@ -9,10 +9,12 @@ sub register {
     my($self, $context) = @_;
     $context->register_hook(
         $self,
-        'publish.init'        => \&initialize,
-        'publish.entry.fixup' => \&add_entry,
+        'plugin.init'   => \&initialize,
+        'publish.entry' => \&add_entry,
     );
 }
+
+sub rule_hook { 'publish.entry' }
 
 sub initialize {
     my ($self, $context, $args) = @_;
@@ -88,7 +90,7 @@ A flag to post entry's body as extended field for del.icio.us. Defaults to 0.
 
 =head1 AUTHOR
 
-Tsutomu Koyacho
+Tsutomu Koyachi
 
 =head1 SEE ALSO
 

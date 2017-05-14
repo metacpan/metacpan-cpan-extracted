@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 #    multiple_readers.pl: test the pcsc Perl wrapper with TWO readers
-#    Copyright (C) 2001  Lionel Victor
+#    Copyright (C) 2001  Lionel Victor, 2003 Ludovic Rousseau
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -17,24 +17,12 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: multiple_readers.pl,v 1.7 2001/09/05 07:56:51 rousseau Exp $
-
-# $Log: multiple_readers.pl,v $
-# Revision 1.7  2001/09/05 07:56:51  rousseau
-# Added title and author name in the GPL licence
-#
-# Revision 1.6  2001/09/05 07:53:54  rousseau
-# Added -w flag to /usr/bin/perl and corrected some warnings
-#
-# Revision 1.5  2001/09/05 07:43:38  rousseau
-# Added CVS Id and Log fields
-# Added GPL licence
-#
+# $Id: multiple_readers.pl,v 1.10 2006-08-12 17:35:54 rousseau Exp $
 
 use ExtUtils::testlib;
-use PCSC;
-#use PCSCpipo;
+use Chipcard::PCSC;
 
+use warnings;
 use strict;
 
 #my $current_protocol;
@@ -59,48 +47,49 @@ my $RecvData2;
 
 #-------------------------------------------------------------------------------
 print "Getting context:\n";
-$hContext = new PCSC();
-die ("Can't create the pcsc object: $PCSC::errno\n") unless (defined $hContext);
+$hContext = new Chipcard::PCSC();
+die ("Can't create the pcsc object: $Chipcard::PCSC::errno\n") unless (defined $hContext);
 print '.'x40 . " OK\n";
 
 #-------------------------------------------------------------------------------
 print "Retrieving readers'list:\n";
 @ReadersList = $hContext->ListReaders ();
-die ("Can't get readers' list: $PCSC::errno\n") unless (defined($ReadersList[0]));
+die ("Can't get readers' list: $Chipcard::PCSC::errno\n") unless (defined($ReadersList[0]));
 $, = "\n  ";
 $" = "\n  ";
 print "  @ReadersList\n" . '.'x40 . " OK\n";
 
 #-------------------------------------------------------------------------------
-print "Connecting to the card:\n";
-$hCard = new PCSC::Card ($hContext, $ReadersList[0]);
-die ("Can't connect to the reader '$ReadersList[0]': $PCSC::errno\n") unless (defined($hCard));
+print "Connecting to the card: $ReadersList[0]\n";
+$hCard = new Chipcard::PCSC::Card ($hContext, $ReadersList[0]);
+die ("Can't connect to the reader '$ReadersList[0]': $Chipcard::PCSC::errno\n") unless (defined($hCard));
 print '.'x40 . " OK\n";
 
 #-------------------------------------------------------------------------------
-print "Connecting to the card2:\n";
-$hCard2 = new PCSC::Card ($hContext, $ReadersList[1]);
-die ("Can't connect to the reader '$ReadersList[1]': $PCSC::errno\n") unless (defined($hCard2));
+die "no second reader present" if (! defined $ReadersList[1]);
+print "Connecting to the card2: $ReadersList[1]\n";
+$hCard2 = new Chipcard::PCSC::Card ($hContext, $ReadersList[1]);
+die ("Can't connect to the reader '$ReadersList[1]': $Chipcard::PCSC::errno\n") unless (defined($hCard2));
 print '.'x40 . " OK\n";
 
 # sleep (3);
 
 #-------------------------------------------------------------------------------
-if ($hCard->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T0 &&
-    $hCard->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T1 &&
-	$hCard->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_RAW)
+if ($hCard->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T0 &&
+    $hCard->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T1 &&
+	$hCard->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_RAW)
 {
 	print "Don't understand the active protocol, reconnecting to the card:\n";
 
-	my $active_protocol = $hCard->Reconnect($PCSC::SCARD_SHARE_EXCLUSIVE,
-	                                        $PCSC::SCARD_PROTOCOL_T1,
-											$PCSC::SCARD_RESET_CARD);
+	my $active_protocol = $hCard->Reconnect($Chipcard::PCSC::SCARD_SHARE_EXCLUSIVE,
+	                                        $Chipcard::PCSC::SCARD_PROTOCOL_T1,
+											$Chipcard::PCSC::SCARD_RESET_CARD);
 
-	die ("Failed to reconnect to '$ReadersList[0]': $PCSC::errno\n") unless (defined($active_protocol));
+	die ("Failed to reconnect to '$ReadersList[0]': $Chipcard::PCSC::errno\n") unless (defined($active_protocol));
 
-	if ($hCard->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T0 &&
-    	$hCard->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T1 &&
-		$hCard->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_RAW)
+	if ($hCard->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T0 &&
+    	$hCard->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T1 &&
+		$hCard->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_RAW)
 	{
 		print "here is '$hCard->{dwProtocol}'";
 		die ("Still don't understand the active current protocol: the card may be mute.\n");
@@ -112,7 +101,7 @@ if ($hCard->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T0 &&
 #-------------------------------------------------------------------------------
 print "Getting Status:\n";
 @StatusResult = $hCard->Status ();
-die ("Can't get card status: $PCSC::errno\n") unless (defined ($StatusResult[0]));
+die ("Can't get card status: $Chipcard::PCSC::errno\n") unless (defined ($StatusResult[0]));
 
 printf "  ReaderName = %s\n  Status = %X\n  Protocol =  %X\n  ATR = ",
 	$StatusResult[0], $StatusResult[1], $StatusResult[2];
@@ -126,7 +115,7 @@ print '.'x40 . " OK\n";
 print ("Exchanging data:\n");
 $SendData = [0x00,0xA4,0x01,0x00, 0x02, 0x10, 0x00];
 $RecvData = $hCard->Transmit($SendData);
-die ("Can't transmit data: $PCSC::errno") unless (defined ($RecvData));
+die ("Can't transmit data: $Chipcard::PCSC::errno") unless (defined ($RecvData));
 
 print "  Send = ";
 foreach $tmpVal (@{$SendData}) {
@@ -141,21 +130,22 @@ print '.'x40 . " OK\n";
 # sleep (3);
 
 #-------------------------------------------------------------------------------
-if ($hCard2->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T0 &&
-    $hCard2->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T1 &&
-	$hCard2->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_RAW)
+if (defined $hCard2 && 
+	$hCard2->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T0 &&
+    $hCard2->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T1 &&
+	$hCard2->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_RAW)
 {
 	print "Don't understand the active protocol, reconnecting to the card:\n";
 
-	my $active_protocol = $hCard2->Reconnect($PCSC::SCARD_SHARE_EXCLUSIVE,
-	                                        $PCSC::SCARD_PROTOCOL_T1,
-											$PCSC::SCARD_RESET_CARD);
+	my $active_protocol = $hCard2->Reconnect($Chipcard::PCSC::SCARD_SHARE_EXCLUSIVE,
+	                                        $Chipcard::PCSC::SCARD_PROTOCOL_T1,
+											$Chipcard::PCSC::SCARD_RESET_CARD);
 
-	die ("Failed to reconnect to '$ReadersList[1]': $PCSC::errno\n") unless (defined($active_protocol));
+	die ("Failed to reconnect to '$ReadersList[1]': $Chipcard::PCSC::errno\n") unless (defined($active_protocol));
 
-	if ($hCard2->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T0 &&
-    	$hCard2->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T1 &&
-		$hCard2->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_RAW)
+	if ($hCard2->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T0 &&
+    	$hCard2->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_T1 &&
+		$hCard2->{dwProtocol} != $Chipcard::PCSC::SCARD_PROTOCOL_RAW)
 	{
 		print "here is '$hCard2->{dwProtocol}'";
 		die ("Still don't understand the active current protocol: the card may be mute.\n");
@@ -167,7 +157,7 @@ if ($hCard2->{dwProtocol}!=$PCSC::SCARD_PROTOCOL_T0 &&
 #-------------------------------------------------------------------------------
 print "Getting Status:\n";
 @StatusResult = $hCard2->Status ();
-die ("Can't get card status: $PCSC::errno\n") unless (defined ($StatusResult[0]));
+die ("Can't get card status: $Chipcard::PCSC::errno\n") unless (defined ($StatusResult[0]));
 
 printf "  ReaderName = %s\n  Status = %X\n  Protocol =  %X\n  ATR = ",
 	$StatusResult[0], $StatusResult[1], $StatusResult[2];
@@ -180,7 +170,7 @@ print '.'x40 . " OK\n";
 print ("Exchanging data:\n");
 $SendData = [0x00,0xA4,0x00,0x00, 0x02, 0x10, 0x00];
 $RecvData = $hCard2->Transmit($SendData);
-die ("Can't transmit data: $PCSC::errno") unless (defined ($RecvData));
+die ("Can't transmit data: $Chipcard::PCSC::errno") unless (defined ($RecvData));
 
 print "  Send = ";
 foreach $tmpVal (@{$SendData}) {
@@ -195,15 +185,15 @@ print '.'x40 . " OK\n";
 
 #-------------------------------------------------------------------------------
 print "Disconnecting the card:\n";
-$hCard->Disconnect($PCSC::SCARD_LEAVE_CARD);
+$hCard->Disconnect($Chipcard::PCSC::SCARD_LEAVE_CARD);
 undef $hCard;
 print '.'x40 . " OK\n";
 #-------------------------------------------------------------------------------
 print "Disconnecting the card:\n";
-$hCard2->Disconnect($PCSC::SCARD_LEAVE_CARD);
+$hCard2->Disconnect($Chipcard::PCSC::SCARD_LEAVE_CARD);
 undef $hCard2;
 print '.'x40 . " OK\n";
-#die ("") unless ($hCard->Disconnect ($PCSC::SCARD_UNPOWER_CARD));
+#die ("") unless ($hCard->Disconnect ($Chipcard::PCSC::SCARD_UNPOWER_CARD));
 
 #-------------------------------------------------------------------------------
 print "Closing context:\n";

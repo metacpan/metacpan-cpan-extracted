@@ -1,0 +1,175 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2007 celmorlauren limited. All rights reserved. 
+# This program is free software; you can redistribute it and/or modify it under
+# the same terms as Perl itself.
+
+=head1 NAME
+
+Sendmail::M4::mail8_zombie  - Stop fake MX and most spammers, sendmail M4 hack file
+
+=head1 STATUS
+
+Version 0.2 (early Beta)
+Very much a work in progress.
+
+=head1 SYNOPSIS
+
+Perl Helper for B<sendmail>
+
+=head1 AUTHOR
+
+Ian McNulty, celmorlauren limited (registered in England & Wales 5418604). 
+
+email E<lt>development@celmorlauren.comE<gt>
+
+=head1 HISTORY
+
+B<Versions>
+
+=over 5
+
+=item 0.1
+
+Nov 2006 1st version, Perl plug-in program for B<sendmail> anti spam hack file, original hack did a large amount of checking. But not as much or even in the same order as the new B<Sendmail::M4::Mail8> hack generator. The original hack continued in use at B<celmorlauren>, however it will be replaced by the CPAN version on completion and initial testing, it is thought that the improved format and action of the B<Sendmail::M4::Mail8> hack should suffice, the future of the other helpers will be decided at a later date.
+
+B<Amendments> to release version>
+
+=over 3
+
+=item 22 
+
+Sept 2007 Ported from old format to format and use required by B<Sendmail::M4::Mail8>
+
+=back
+
+=item 0.2
+
+22 Sept 2007 CPAN Release
+
+=back
+
+=head1 USES NOTHING
+
+=head1 EXPORTS NOTHING
+
+=cut
+
+# mail8 sendmail anti spammer aid
+
+sub whoops
+{
+    my $whoops = join ",", @_;
+    print "ERR.WHOOPS PROGRAM ERROR: $whoops\n";
+    exit 0;
+}
+
+#Globals
+
+my ( $helo, $ip ) = @ARGV or whoops "called without required arguments, HELO IP";
+
+if ( $helo =~ s/ +/\t/g )
+{
+    ( $helo, $ip ) = split "\t", $helo;
+}
+
+
+# sendmail macros should have already checked ip against helo name, however it can not cope with run together
+# names, just in case these checks as well as run together checks
+
+my $IP = $ip; # split won't work with '.'!
+$IP =~ s/\./\t/g;
+my ( $ip1, $ip2, $ip3, $ip4 ) = split "\t", $IP or whoops "ip <$ip> is not an IP?";
+# some ISP's encode their users as HEX strings!
+my $IP1 = sprintf "%lx", $ip1;
+my $IP2 = sprintf "%lx", $ip2;
+my $IP3 = sprintf "%lx", $ip3;
+my $IP4 = sprintf "%lx", $ip4;
+# now match strings
+my $wild = '\D*(\.|-|\D)*0*';
+my $WILD = '([g-zG-Z])*(\.|-)*';
+my %grep = (
+    p1_4    => "$ip1"."$wild"."$ip2"."$wild"."$ip3"."$wild"."$ip4",
+    p4_1_3  => "$ip4"."$wild"."$ip1"."$wild"."$ip2"."$wild"."$ip3",
+    p1_3    => "$ip1"."$wild"."$ip2"."$wild"."$ip3",
+    p1_2    => "$ip1"."$wild"."$ip2",
+    p2_4    => "$ip2"."$wild"."$ip3"."$wild"."$ip4",
+    p3_4    => "$ip3"."$wild"."$ip4",
+    p4_1    => "$ip4"."$wild"."$ip3"."$wild"."$ip2"."$wild"."$ip1",
+    p4_2    => "$ip4"."$wild"."$ip3"."$wild"."$ip2",
+    p4_3    => "$ip4"."$wild"."$ip3",
+    p3_1    => "$ip3"."$wild"."$ip2"."$wild"."$ip1",
+    p2_1    => "$ip2"."$wild"."$ip1",
+    __BAR__ => "above numeric, below HEX",
+    P1_4    => "$IP1"."$WILD"."$IP2"."$WILD"."$IP3"."$WILD"."$IP4",
+    P4_1_3  => "$IP4"."$WILD"."$IP1"."$WILD"."$IP2"."$WILD"."$IP3",
+    P1_3    => "$IP1"."$WILD"."$IP2"."$WILD"."$IP3",
+    P1_2    => "$IP1"."$WILD"."$IP2",
+    P2_4    => "$IP2"."$WILD"."$IP3"."$WILD"."$IP4",
+    P3_4    => "$IP3"."$WILD"."$IP4",
+    P4_1    => "$IP4"."$WILD"."$IP3"."$WILD"."$IP2"."$WILD"."$IP1",
+    P4_2    => "$IP4"."$WILD"."$IP3"."$WILD"."$IP2",
+    P4_3    => "$IP4"."$WILD"."$IP3",
+    P3_1    => "$IP3"."$WILD"."$IP2"."$WILD"."$IP1",
+    P2_1    => "$IP2"."$WILD"."$IP1",
+    );
+
+my @numeric_match = qw(
+    p1_4
+    p4_1_3
+    p1_3
+    p1_2
+    p2_4
+    p3_4
+    p4_1
+    p4_2
+    p4_3
+    p3_1
+    p2_1
+    );
+my @hex_match = qw(
+    P1_4
+    P4_1_3
+    P1_3
+    P1_2
+    P2_4
+    P3_4
+    P4_1
+    P4_2
+    P4_3
+    P3_1
+    P2_1
+    );
+my @grep = ( @numeric_match, @hex_match );
+
+# NOTE however sendmail macros do a very good job of matching .|- delimited IP HELO's
+# Better than this can do easily
+
+foreach ( @grep )
+{
+    my $match= $grep{$_};
+    my $grep = "\$helo =~ m/$match/i";
+    my $ok   =  eval $grep;
+    defined $ok or whoops "grep failed with:",$@;
+    if ( scalar $ok )
+    {
+        print "ERR.IP <HOST $helo with IP $ip> matched mail8_zombie: $_\n";
+        exit 0;
+    }
+}
+# one last test, might not match IP but have a lots of numerics
+my $HELO = $helo;
+$HELO =~ s/(\D|\.|-)+//g;
+my $length = length $HELO;
+if ( $length >= 6 )
+{
+    print "ERR.IP <HOST $helo> looks like a numeric user address, name resolves to $length digit <$HELO>\n";
+    exit 0;
+}
+elsif ( $length >= 4 )
+{
+    print "ERR.IP <HOST $helo> looks numeric <like a spammer>, name resolves to $length digit <$HELO>, apply for OK listing using NON spammer address\n";
+    exit 0;
+}
+
+
+1;

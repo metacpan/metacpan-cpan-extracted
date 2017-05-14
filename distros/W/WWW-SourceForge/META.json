@@ -4,7 +4,7 @@
       "Rich Bowen (rbowen@rcbowen.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -22,28 +22,29 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Data::Dumper" : 0,
-            "File::HomeDir" : 0,
-            "JSON::Parse" : 0,
-            "LWP::Authen::OAuth" : 0,
-            "LWP::Simple" : 0,
-            "LWP::UserAgent" : 0,
-            "Test::More" : 0,
+            "Data::Dumper" : "0",
+            "File::HomeDir" : "0",
+            "JSON::Parse" : "0",
+            "LWP::Authen::OAuth" : "0",
+            "LWP::Simple" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::More" : "0",
             "Test::Simple" : "0.44",
-            "XML::Feed" : 0
+            "XML::Feed" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.70"
+   "version" : "0.73",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

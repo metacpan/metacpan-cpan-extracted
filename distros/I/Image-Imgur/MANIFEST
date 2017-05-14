@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Image-Imgur.t
+lib/Image/Imgur.pm

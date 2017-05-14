@@ -8,13 +8,13 @@ package Lemonldap::NG::Portal::RegisterDBDemo;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.1';
 
 ## @method int computeLogin
 # Compute a login from register infos
 # @result Lemonldap::NG::Portal constant
 sub computeLogin {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     # Get first letter of firstname and lastname
     my $login =
@@ -30,7 +30,7 @@ sub computeLogin {
 # Do nothing
 # @result Lemonldap::NG::Portal constant
 sub createUser {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     return PE_OK;
 }
@@ -39,7 +39,7 @@ sub createUser {
 # Do nothing
 # @result Lemonldap::NG::Portal constant
 sub registerDBFinish {
-    my ($self) = splice @_;
+    my ($self) = @_;
 
     return PE_OK;
 }

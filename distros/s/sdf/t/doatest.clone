@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+for sdf in */*.sdf; do
+	cmd="cp doatest.templ `dirname $sdf`/`basename $sdf .sdf`.t"
+	echo do: $cmd ...
+	$cmd
+done

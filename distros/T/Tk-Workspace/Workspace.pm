@@ -1,6 +1,6 @@
 package Tk::Workspace;
 # Temp version for CPAN
-$VERSION=1.75;
+$VERSION=1.76;
 my $RCSRevKey = '$Revision: 1.75 $';
 $RCSRevKey =~ /Revision: (.*?) /;
 $VERSION=$1;
@@ -1803,9 +1803,7 @@ __END__
 
 =head1 NAME
 
-  Workspace.pm--Persistent, multi-purpose text processor.
-  (File browser, shell, editor) script.
-  Requires Perl/Tk; optionally Net::FTP.
+Tk::Workspace - Persistent, multi-purpose text processor.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    max_element    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2009-10-09T02:16:41-0700" />
+<meta name="keywords" content="stl,algorithm,max_element" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/stl/algorithm/max_element?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=stl:algorithm" />
+<link rel="edit" title="Edit this page" href="/wiki/stl/algorithm/max_element?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/stl/algorithm/max_element" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/stl/algorithm/max_element" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/stl/algorithm/max_element" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='stl:algorithm';var JSINFO = {"id":"stl:algorithm:max_element","namespace":"stl:algorithm"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../stl/start.html"  title="stl:start">C++ Standard Template Library</a> &raquo; <a href="../../stl/algorithm/start.html"  title="stl:algorithm:start">C++ Algorithms</a> &raquo; <a href="../../stl/algorithm/max_element.html"  title="stl:algorithm:max_element">max_element</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="max_element" id="max_element">max_element</a></h2>
+<div class="level2">
+
+<p>
+Syntax:
+</p>
+<pre class="c code c++" style="font-family:monospace;">  <span class="co2">#include &lt;algorithm&gt;</span>
+  forward_iterator max_element<span class="br0">&#40;</span> forward_iterator start<span class="sy0">,</span> forward_iterator end <span class="br0">&#41;</span><span class="sy0">;</span>
+  forward_iterator max_element<span class="br0">&#40;</span> forward_iterator start<span class="sy0">,</span> forward_iterator end<span class="sy0">,</span> BinPred p <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+The max_element() function returns an iterator to the largest element in the
+range [start,end).
+</p>
+
+<p>
+If the binary predicate p is given, then it will be used instead of the &lt;
+operator to determine the largest element.
+</p>
+
+<p>
+For example, the following code uses the max_element() function to determine
+the largest integer in an array and the largest character in a vector of
+characters:
+</p>
+<pre class="c code c++" style="font-family:monospace;">  <span class="kw4">int</span> array<span class="br0">&#91;</span><span class="br0">&#93;</span> <span class="sy0">=</span> <span class="br0">&#123;</span> 3<span class="sy0">,</span> 1<span class="sy0">,</span> 4<span class="sy0">,</span> 1<span class="sy0">,</span> 5<span class="sy0">,</span> 9 <span class="br0">&#125;</span><span class="sy0">;</span>
+  <span class="kw4">unsigned</span> <span class="kw4">int</span> array_size <span class="sy0">=</span> <span class="kw4">sizeof</span><span class="br0">&#40;</span>array<span class="br0">&#41;</span> <span class="sy0">/</span> <span class="kw4">sizeof</span><span class="br0">&#40;</span>array<span class="br0">&#91;</span>0<span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+  <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Max element in array is &quot;</span> <span class="sy0">&lt;&lt;</span> <span class="sy0">*</span>max_element<span class="br0">&#40;</span>array<span class="sy0">,</span> array<span class="sy0">+</span>array_size<span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span>
+&nbsp;
+  vector<span class="sy0">&lt;</span>char<span class="sy0">&gt;</span> v<span class="sy0">;</span>
+  v.<span class="me1">push_back</span><span class="br0">&#40;</span><span class="st0">'a'</span><span class="br0">&#41;</span><span class="sy0">;</span> v.<span class="me1">push_back</span><span class="br0">&#40;</span><span class="st0">'b'</span><span class="br0">&#41;</span><span class="sy0">;</span> v.<span class="me1">push_back</span><span class="br0">&#40;</span><span class="st0">'c'</span><span class="br0">&#41;</span><span class="sy0">;</span> v.<span class="me1">push_back</span><span class="br0">&#40;</span><span class="st0">'d'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+  <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Max element in the vector v is &quot;</span> <span class="sy0">&lt;&lt;</span> <span class="sy0">*</span>max_element<span class="br0">&#40;</span>v.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> v.<span class="me1">end</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span></pre>
+<p>
+When run, the above code displays this output:
+</p>
+<pre class="code">
+   Max element in array is 9
+   Max element in the vector v is d</pre>
+<p>
+Related Topics: <a href="../../stl/algorithm/max.html" class="wikilink1" title="stl:algorithm:max">max</a>, <a href="../../stl/algorithm/min.html" class="wikilink1" title="stl:algorithm:min">min</a>, <a href="../../stl/algorithm/min_element.html" class="wikilink1" title="stl:algorithm:min_element">min_element</a>
+</p>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        stl/algorithm/max_element.txt &middot; Last modified: 10/09/2009 02:16 by 124.255.102.233      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

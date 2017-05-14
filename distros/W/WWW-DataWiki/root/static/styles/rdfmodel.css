@@ -1,0 +1,25 @@
+@import url(page.css);
+
+form {
+	border: 1px solid;
+	color: #060;
+	background: #CFC;
+	padding: 0.67em 1em;
+}
+textarea {
+	width: 99.9%;
+}
+dt {
+	font-weight: bold;
+}
+div[about] {
+	border: 1px solid;
+	background: #ddd;
+	padding: 1em;
+	margin: 1em 0;
+}
+img {
+	float: right;
+	position: relative;
+	top: -3.33em;
+}

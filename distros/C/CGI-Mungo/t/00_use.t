@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use lib qw(lib ../lib);
-plan(tests => 9);
+plan(tests => 10);
 #1
 use_ok("CGI::Mungo");
 #2
@@ -20,4 +20,6 @@ use_ok("CGI::Mungo::Utils");
 #8
 use_ok("CGI::Mungo::Response::Raw");
 #9
+use_ok("CGI::Mungo::Response::SimpleTemplate");
+#10
 use_ok("CGI::Mungo::Response::TemplateToolkit");

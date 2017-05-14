@@ -34,7 +34,7 @@ WSRF::Lite - Implementation of the Web Service Resource Framework
 
 =head1 VERSION
 
-This document refers to version 0.8.3.0 of WSRF::Lite released March, 2011
+This document refers to version 0.8.3.1 of WSRF::Lite released Feb, 2011
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ use strict;
 use vars qw{ $VERSION };
 
 BEGIN {
-	$VERSION = '0.8.3.0';
+	$VERSION = '0.8.3.1';
 }
 
 # WSRF uses WS-Address headers in the SOAP Header - by default
@@ -697,6 +697,7 @@ sub std_envelope {
 sub envelope {
 	my $self = shift @_;
 
+	my ($dummy, $method, $params,$orig_header) = @_;
 	#create an envelope - this returns raw XML
 	my $envelope = $self->std_envelope(@_);
 
@@ -717,7 +718,11 @@ sub envelope {
 				   \SOAP::Data->value(
 					 SOAP::Data->name(
 						 SOAP::Utils::qualify( $self->envprefix => 'Header' ) =>
-						   \SOAP::Data->value($header)->type('xml')
+						   ($orig_header ? 
+						      \SOAP::Data->value(  $orig_header,  SOAP::Data->value($header)->type('xml')  ) 
+                             :
+                              \SOAP::Data->value($header)->type('xml') 
+                            )
 					 ),
 					 SOAP::Data->value($Body)->type('xml')
 				   )

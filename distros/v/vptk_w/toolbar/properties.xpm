@@ -1,0 +1,30 @@
+/* XPM */
+static char *properties[] = {
+/* width height ncolors chars_per_pixel */
+"17 17 6 1",
+/* colors */
+"x c #FCFEFC",
+". c #C4C6C4",
+"X c #040284",
+"o c #646264",
+"O c #040204",
+"  s None c None",
+/* pixels */
+"                 ",
+"       OOOOOO XX ",
+"      OxxxxxxOXX ",
+"     OxOxxxxxxXX ",
+"oOOOOxOxOxxxxxXX ",
+"o..OxOxOxOxxxOXX ",
+"o.OxO.OxOxOOOxXX ",
+"o.OO...OxO.O     ",
+"o.......O..O     ",
+"o..........O     ",
+"o.OO.OOOOO.O     ",
+"o..........O     ",
+"o.OO.OOOOO.O     ",
+"o..........O     ",
+"oOOOOOOOOOOO     ",
+"                 ",
+"                 "
+};

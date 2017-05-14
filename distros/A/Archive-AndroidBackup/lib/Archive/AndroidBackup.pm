@@ -9,7 +9,7 @@ use IO::Handle '_IOLBF';
 use Archive::AndroidBackup::TarIndex;
 extends 'Archive::Tar';
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 has 'file' => (
   is => 'rw',
@@ -188,20 +188,41 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 METHODS
 
-=head2 write
+=head2 list_files($file)
 
+  prints 
+
+=head2 write($file)
+
+ writes in memory archive to $file in android backup format
 
 =head 2 read($file)
 
-  performs 
+  performs validation while reading $file into memory
+
+=head 2 extract
+
+  performs validation while reading $file into memory
 
 =head2 add_dir($dir)
-  emulate tar -cf dir
+
+emulate tar -cf dir
 
   will correctly sort directory index the way android backup needs it
   (aka the implementation peculiarity that spawned this whole project)
 
+=head1 LICENSE
 
+This package is free software; you can redistribute it and/or modify it
+under the terms of the "GNU General Public License v3".
+
+Please refer to the file "COPYING" for details.
+
+=head1 AUTHOR
+
+  Nathaniel Lally 
+  nll@cpan.org
 
 =cut
+
 1;

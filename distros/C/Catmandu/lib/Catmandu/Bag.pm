@@ -2,7 +2,7 @@ package Catmandu::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0504';
+our $VERSION = '1.0506';
 
 use Catmandu::Util qw(:check is_string require_package);
 use Catmandu::Bag::IdGenerator::UUID;
@@ -67,11 +67,16 @@ sub generate_id {
     $self->id_generator->generate($self);
 }
 
+sub exists {
+    my ($self, $id) = @_;
+    defined $self->get($id) ? 1 : 0;
+}
+
 sub get_or_add {
     my ($self, $id, $data) = @_;
     check_value($id);
     check_hash_ref($data);
-    $self->get($id) || do {
+    $self->get($id) // do {
         $data->{$self->id_key} = $id;
         $self->add($data);
     };
@@ -106,7 +111,7 @@ Catmandu::Bag - A Catmandu::Store compartment to persist data
     my $store = Catmandu::Store::DBI->new(
             data_source => 'DBI:mysql:database=test',
             bags => { journals => {
-                            fixes => [ ... ] ,
+                            fix => [ ... ] ,
                             autocommit => 1 ,
                             plugins => [ ... ] ,
                             id_generator => Catmandu::IdGenerator::UUID->new ,
@@ -132,6 +137,10 @@ Catmandu::Bag - A Catmandu::Store compartment to persist data
     # Commit changes...
     $bag->commit;
 
+    if ($bag->exists($id)) {
+        # ...
+    }
+
     my $obj = $bag->get($id);
     $bag->delete($id);
 
@@ -141,9 +150,9 @@ Catmandu::Bag - A Catmandu::Store compartment to persist data
 
 =over
 
-=item fixes
+=item fix
 
-An array of fixes to apply before importing or exporting data from the bag.
+Contains an array of fixes (or Fix files) to be applied before importing data into the bag.
 
 =item plugins
 
@@ -182,6 +191,10 @@ Add or update one or more items to the bag.
 =head2 get($id)
 
 Retrieves the item with identifier $id from the bag.
+
+=head2 exists($id)
+
+Returns C<1> if the item with identifier $id exists in the bag.
 
 =head2 get_or_add($id, $hash)
 

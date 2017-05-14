@@ -6,9 +6,9 @@
 # -g:		Generates the t/out/*.err files (should probably only be 
 #		used by enno)
 # -d:		If specified, generates 2 output files in t/out:
-#			dv_attr1.out1 : result of test case
-#			dv_attr1.out2 : expected output (same as .err with 
-#							 normalized newlines)
+#			dv_attr1.err.out1 : result of test case
+#			dv_attr1.err.out2 : expected output (same as .err with 
+#							     normalized newlines)
 # -o:		Also print the result of the test case.
 #
 # This script basically runs all test cases for all xml files in the t/ directory

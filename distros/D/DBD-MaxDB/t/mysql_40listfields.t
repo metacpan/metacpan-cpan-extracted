@@ -111,7 +111,8 @@ while (Testing()) {
     Test($state or (($ref = $cursor->{TYPE})  &&  (@$ref == @table_def)
 		    &&  ($ref->[0] eq DBI::SQL_INTEGER())
 		    &&  ($ref->[1] eq DBI::SQL_VARCHAR()  ||
-			 $ref->[1] eq DBI::SQL_CHAR())))
+			 $ref->[1] eq DBI::SQL_CHAR()||
+			 $ref->[1] eq DBI::SQL_WCHAR())))
 	or printf("Expected types %d and %d, got %s and %s\n",
 		  &DBI::SQL_INTEGER(), &DBI::SQL_VARCHAR(),
 		  defined($ref->[0]) ? $ref->[0] : "undef",

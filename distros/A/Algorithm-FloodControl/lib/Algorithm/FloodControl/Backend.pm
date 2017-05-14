@@ -7,8 +7,6 @@ use warnings;
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors( qw/storage prefix expires/ );
 
-our ($VERSION) = '$Revision: 2609 $' =~ m{ \$Revision: \s+ (\S+) }mx;
-
 =head2 get_info
 
 =cut

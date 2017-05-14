@@ -15,16 +15,15 @@ use Proc::Fork;
 use Path::Class;
 use Proc::Terminator;
 use Plack::Response;
-use HTTP::Status qw(:constants);
 
 use Pinto;
 use Pinto::Result;
 use Pinto::Chrome::Net;
-use Pinto::Constants qw(:protocol);
+use Pinto::Constants qw(:server);
 
 #-------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-------------------------------------------------------------------------------
 
@@ -35,15 +34,12 @@ extends qw(Pinto::Server::Responder);
 sub respond {
     my ($self) = @_;
 
-    my $error_response = $self->check_protocol_version;
-    return $error_response if $error_response;
-
     # path_info always has a leading slash, e.g. /action/list
     my ( undef, undef, $action_name ) = split '/', $self->request->path_info;
 
     my %params      = %{ $self->request->parameters };                         # Copying
     my $chrome_args = $params{chrome} ? decode_json( $params{chrome} ) : {};
-    my $pinto_args  = $params{pinto}  ? decode_json( $params{pinto} )  : {};
+    my $pinto_args  = $params{pinto} ? decode_json( $params{pinto} ) : {};
     my $action_args = $params{action} ? decode_json( $params{action} ) : {};
 
     for my $upload_name ( $self->request->uploads->keys ) {
@@ -58,32 +54,11 @@ sub respond {
     my $pipe = IO::Pipe->new;
 
     run_fork {
-        child  { $self->child_proc( $pipe, $chrome_args, $pinto_args, $action_name, $action_args ) }
-        parent { my $child_pid = shift; $response = $self->parent_proc( $pipe, $child_pid ) }
-        error  { croak "Failed to fork: $!" };
+        child { $self->child_proc( $pipe, $chrome_args, $pinto_args, $action_name, $action_args ) }
+        parent { $response = $self->parent_proc( $pipe, shift ) } error { croak "Failed to fork: $!" };
     };
 
     return $response;
-}
-
-#-------------------------------------------------------------------------------
-
-sub check_protocol_version {
-    my ($self) = @_;
-
-    # NB: Format derived from GitHub: https://developer.github.com/v3/media
-    my $media_type_rx = qr{^ application / vnd [.] pinto [.] v(\d+) (?:[+] .+)? $}ix;
-
-    my $accept = $self->request->header('Accept') || '';
-    my $version = $accept =~ $media_type_rx ? $1 : 0;
-
-    return unless my $cmp = $version <=> $PINTO_PROTOCOL_VERSION;
-
-    my $fmt = 'Your client is too %s for this server. You must upgrade %s.';
-    my ($age, $component) = $cmp > 0 ? qw(new pintod) : qw(old pinto);
-    my $msg = sprintf $fmt, $age, $component;
-
-    return [ HTTP_UNSUPPORTED_MEDIA_TYPE, [], [$msg] ];
 }
 
 #-------------------------------------------------------------------------------
@@ -111,10 +86,10 @@ sub child_proc {
     my $pinto = Pinto->new( chrome => $chrome, root => $self->root );
 
     my $result =
-        try   { $pinto->run( ucfirst $action_name => %{$action_args} ) }
-        catch { print {$writer} $_; Pinto::Result->new->failed };
+        try { $pinto->run( ucfirst $action_name => %{$action_args} ) }
+    catch { print {$writer} $_; Pinto::Result->new->failed };
 
-    print {$writer} $PINTO_PROTOCOL_STATUS_OK . "\n" if $result->was_successful;
+    print {$writer} $PINTO_SERVER_STATUS_OK . "\n" if $result->was_successful;
 
     exit $result->was_successful ? 0 : 1;
 }
@@ -130,12 +105,10 @@ sub parent_proc {
 
     my $response = sub {
         my $responder = shift;
-
-        my $headers   = ['Content-Type' => 'text/plain'];
-        my $writer    = $responder->( [ HTTP_OK, $headers ] );
+        my $headers   = [ 'Content-Type' => 'text/plain' ];
+        my $writer    = $responder->( [ 200, $headers ] );
         my $socket    = $self->request->env->{'psgix.io'};
-        my $nullmsg   = $PINTO_PROTOCOL_NULL_MESSAGE . "\n";
-
+        my $nullmsg   = $PINTO_SERVER_NULL_MESSAGE . "\n";
 
         while (1) {
 
@@ -181,7 +154,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -189,7 +165,7 @@ Pinto::Server::Responder::Action - Responder for action requests
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -197,7 +173,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

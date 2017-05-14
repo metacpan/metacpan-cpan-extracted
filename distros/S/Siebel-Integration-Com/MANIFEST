@@ -1,0 +1,10 @@
+Changes
+lib/Siebel/Integration/Com.pm
+lib/Siebel/Integration/Com/BusComp.pm
+lib/Siebel/Integration/Com/BusObj.pm
+lib/Siebel/Integration/Com/BusSrv.pm
+lib/Siebel/Integration/Com/PropSet.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t

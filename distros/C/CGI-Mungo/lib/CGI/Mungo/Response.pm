@@ -37,6 +37,12 @@ will be returned instead.
 sub new{
 	my($class, $mungo, $plugin) = @_;
 	if($plugin){
+		my $request = $mungo->getRequest();
+		my $currentEtag = $request->getHeader('If-None-Match');
+		if($currentEtag && $currentEtag eq $mungo->createEtag()){	#cached response
+			$mungo->log("Using not modified response");
+			$plugin = $class . "::NotModified";
+		}
 		eval "use $plugin;";	#should do this a better way
 		if(!$@){	#plugin loaded ok
 			my $self = $plugin->new($mungo);

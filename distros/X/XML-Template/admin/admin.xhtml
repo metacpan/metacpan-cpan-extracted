@@ -1,0 +1,14 @@
+<exception:try xmlns:exception="http://syrme.net/xml-template/exception/v1"
+               xmlns:user="http://syrme.net/xml-template/user/v1"
+               xmlns:file="http://syrme.net/xml-template/file/v1">
+  <user:authenticate username="${Form.username}" pwd="${Form.pwd}"
+                     logintemplate="admin/login_success.xhtml"
+                     logouttemplate="admin/logout_success.xhtml"
+                     logouturl="/admin/admin.xhtml"/>
+  <exception:catch name="Auth">
+    <file:include name="admin/login.xhtml"/>
+  </exception:catch>
+  <exception:else>
+    <file:include name="admin/xml-template.xhtml"/>
+  </exception:else>
+</exception:try>

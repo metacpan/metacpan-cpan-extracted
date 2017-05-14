@@ -18,27 +18,26 @@
 #undef dEXT
 #undef EXTCONST
 #undef dEXTCONST
-#if defined(VMS) && !defined(__GNUC__)
-    /* Suppress portability warnings from DECC for VMS-specific extensions */
-#  ifdef __DECC
-#    pragma message disable (GLOBALEXT,NOSHAREEXT,READONLYEXT)
-#  endif
-#  define EXT globalref
-#  define dEXT globaldef {"$GLOBAL_RW_VARS"} noshare
-#  define EXTCONST globalref
-#  define dEXTCONST globaldef {"$GLOBAL_RO_VARS"} readonly
-#else
-#  if defined(WIN32) && !defined(PERL_STATIC_SYMS)
-#    ifdef PERLDLL
-#      define EXT extern __declspec(dllexport)
+
+#  if (defined(WIN32) || defined(__SYMBIAN32__)) && !defined(PERL_STATIC_SYMS)
+    /* miniperl should not export anything */
+#    if defined(PERL_IS_MINIPERL) && !defined(UNDER_CE) && defined(_MSC_VER)
+#      define EXT extern
 #      define dEXT 
-#      define EXTCONST extern __declspec(dllexport) const
+#      define EXTCONST extern const
 #      define dEXTCONST const
 #    else
-#      define EXT extern __declspec(dllimport)
-#      define dEXT 
-#      define EXTCONST extern __declspec(dllimport) const
-#      define dEXTCONST const
+#      if defined(PERLDLL) || defined(__SYMBIAN32__)
+#        define EXT EXTERN_C __declspec(dllexport)
+#        define dEXT 
+#        define EXTCONST EXTERN_C __declspec(dllexport) const
+#        define dEXTCONST const
+#      else
+#        define EXT EXTERN_C __declspec(dllimport)
+#        define dEXT 
+#        define EXTCONST EXTERN_C __declspec(dllimport) const
+#        define dEXTCONST const
+#      endif
 #    endif
 #  else
 #    if defined(__CYGWIN__) && defined(USEIMPORTLIB)
@@ -53,7 +52,6 @@
 #      define dEXTCONST const
 #    endif
 #  endif
-#endif
 
 #undef INIT
 #define INIT(x)

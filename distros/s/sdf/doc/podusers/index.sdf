@@ -1,0 +1,554 @@
+!init OPT_CONFIG="sdf"; OPT_STYLE="paper"; SDF_ROOT="../"
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 20-Jun-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+# Build the title
+!define DOC_NAME     "SDF for POD Users"
+!define DOC_AUTHOR   "Ian Clatworthy ({{EMAIL:ianc@mincom.com}}), Research Architect, {{ORG[expand]Mincom}}"
+!build_title
+
+H1: Overview
+
+Over the last few years, Perl's POD format has proven itself as
+a useful tool for documenting Perl's functionality and its
+library modules. POD is easy to learn, easy to read and easy
+to embed.
+
+In 1992, I wanted to embed documentation in source code in order
+to make it easier to keep the documentation up to date.
+POD didn't exist, so I invented a similar system called
+SDF (Simple Document Format) and implemented it in Perl,
+the world's greatest programming language.
+SDF has grown rapidly over the years and is
+now a powerful general purpose documentation system.
+But like POD, SDF has remained simple in spirit: easy to learn,
+easy to read and easy to embed.
+
+In June 1997, most of POD's syntax and functionality were merged into
+SDF, making it easier for people to migrate from POD to SDF.
+This document aims to answer the following questions for POD users:
+
+!block sections
+^ How do I convert from POD to SDF?
++ How do I convert from SDF to POD?
++ How do I nest SDF inside a POD document?
++ How do I nest POD inside an SDF document?
++ Is it hard to learn SDF?
++ Is SDF more readable than POD?
++ What does SDF offer me?
++ What's wrong with SDF?
+!endblock
+
+If you have other questions, check out the documentation provided
+with SDF. If that doesn't help, you can always email your question
+to {{EMAIL:sdf-users@mincom.com}}.
+
+H1: How do I convert from POD to SDF?
+
+By using the {{CMD:pod2sdf}} program. Typical usage is:
+
+>  pod2sdf perlrun.pod > perlrun.sdf
+
+As SDF is essentially a superset of POD, the SDF output
+is almost the same as the POD input, except that verbatim lines
+are marked with a leading >. For example, the following POD:
+
+!block box
+!block example
+=head1 NAME
+
+abc - output the alphabet
+
+=head1 DESCRIPTION
+
+This program displays the alphabet like this:
+
+  ABCDEFGHIJ
+  KLMNOPQRST
+  UVWXYZ
+
+Pretty simple, eh?
+!endblock
+!endblock
+
+gets converted to:
+
+!block box
+!block example
+=head1 NAME
+
+abc - output the alphabet
+
+=head1 DESCRIPTION
+
+This program displays the alphabet like this:
+
+>  ABCDEFGHIJ
+>  KLMNOPQRST
+>  UVWXYZ
+
+Pretty simple, eh?
+!endblock
+!endblock
+
+Note that it isn't actually necessary to use {{CMD:pod2sdf}}
+unless you intend migrating to SDF format - the {{CMD:sdf}}
+program can be used on a POD file directly like this:
+
+>  sdf -2html perlrun.pod
+
+How does this work? Well, the {{CMD:sdf}} program can be
+configured to automatically {{prefilter}} files with
+certain extensions. The default configuration is to
+prefilter {{.pod}}, {{.pm}} and {{.PL}} files with the
+{{FILT:pod}} filter (which converts POD to SDF).
+
+If you want to use the {{CMD:sdf}} program on POD files
+without one of these extensions, you can either edit the
+F<sdf.ini> configuration file, or explicitly specify
+the prefiltering like this:
+
+>  sdf -2html -ppod xyz.pd
+
+
+H1: How do I convert from SDF to POD?
+
+By using the {{CMD:sdf}} program. Typical usage is:
+
+>  sdf -2pod mydoc.sdf
+
+This will create a file called F<mydoc.pod> in the current directory.
+
+The general usage of the sdf program is:
+
+>  sdf [options] filename ...
+
+A {{.sdf}} extension is assumed on each filename (unless a filename
+without the extension is found).
+
+
+H1: How do I nest SDF inside a POD document?
+
+If you're generally happy with POD and only need SDF occasionally,
+SDF can be embedded in POD using POD's =for command or =begin/=end
+command pair. Some examples are:
+
+!block example
+    Here's our new logo:
+  
+    =for sdf !import "mylogo.gif"
+  
+    And these are the documentation systems we use:
+  
+    =begin sdf
+  
+    !block table
+    Name    Meaning
+    POD     Plain Old Documentation
+    SDF     Simple Document Format
+    !endblock
+  
+    =end sdf
+!endblock
+
+If you want the rest of a POD file to be in SDF, simply put
+in an "=begin sdf" - the closing "=end sdf" isn't necessary.
+
+
+H1: How do I nest POD inside an SDF document?
+
+By using the {{FILT:pod}} filter. Filters can be applied to
+blocks of text in a file, complete files or the output
+of programs. Some examples are:
+
+!block example; lang='sdf'
+    # Insert some pod
+    !block pod
+    =head2 My B<heading>
+
+    A normal POD paragraph.
+
+        And some verbatim text.
+    !endblock
+
+    # Get pod from a file
+    !include "perlre.pod"; pod
+
+    # Get pod from standard output
+    !execute "getpod 'hello.c'"; pod
+!endblock
+
+So reusing existing POD documentation within an SDF document
+is easy.
+
+
+H1: Is it hard to learn SDF?
+
+No. 90% of SDF documents use a set of core features which can
+be summarised in a few pages. For POD users, the main things
+to know are these:
+
+* Leading whitespace is generally ignored in SDF. So, verbatim
+  lines need to be explicitly marked using a > tag, or
+  enclosed within "!block verbatim" and "!endblock".
+
+* Commands in POD are called {{macros}} in SDF.
+  Macros can be called using the same syntax as POD, i.e.
+  an = at the start of a line starts a macro call which
+  terminates at the next blank line. All of POD's commands
+  are available as macros in SDF.
+
+* Interior sequences in POD are called {{phrases}} in SDF.
+  Phrases can be called using the same [A-Z]<..> syntax as POD.
+  All of POD's interior sequences are available as POD phrases.
+
+* Normal paragraphs in SDF are the same as normal paragraphs
+  in POD, except that paragraphs can be optionally tagged with
+  a {{paragraph style}} and/or {{paragraph attributes}}.
+  The general syntax is:
+
+>      style":" text
+
+. or
+
+>      style"["attributes"]" text
+
+. Some examples are:
+
+!block example
+    A normal paragraph with
+    a few lines.
+
+    Note: This is a paragraph tagged with
+    the Note style.
+
+    Note[label='Important'] This is an important note!
+!endblock
+
+* Except for lines within a multi-line macro call or
+  a {{MAC:block}}/{{MAC:endblock}} macro pair, each line may
+  begin a new paragraph or macro.
+  So, if you have a special character or pattern at the start
+  of a line, you will need to escape it by placing a
+  backslash character (\) before it.
+
+* To maximise convenience and readability, list items can be
+  tagged using the special characters below:
+
+!block table; listitem; narrow
+Tag     Meaning
+*       bulleted list item
+-       2nd-level bulleted list item
+.       plain list item/paragraph
+^       first item in an ordered list
++       next item in an ordered list
+&       enumerated list item
+!endblock
+
+. For example, a simple bulleted list is shown below.
+
+!block example
+     * item 1
+       - item 1a
+       - item 1b
+     * item 2
+     * item3
+!endblock
+
+. Of course, you can always use the over/item/back macros
+  if you prefer them.
+
+
+H1: Is SDF more readable than POD?
+
+To its fans, SDF is more readable than POD
+for the following reasons:
+
+* simple lists look like lists (which is quite important for
+  embedded documentation masquerading as comments)
+
+* a single line macro syntax is available (!-style), making
+  SDF documents less whitespace intensive
+
+* leading whitespace doesn't imply verbatim,
+  so nested things can look nested
+
+* multi-character phrase styles can be used,
+  e.g. E<2{>DOC: SDF for POD UsersE<2}>,
+  making the document source more readable
+
+* within E<2{> style phrases, > doesn't need to be escaped
+  unless a [A-Z]<> phrase is nested, so certain code examples
+  are more readable, e.g. E<2{>C:$arrayref->[0]E<2}>.
+
+Of course, POD's fans argue that
+POD is more readable for equally valid reasons.
+Beauty is in the eye of the beholder - even
+Lisp has it's fans. :-)
+
+
+H1: What does SDF offer me?
+
+The main reasons for using SDF over POD are:
+
+!block sections
+^ Tables
++ Figures
++ Variables
++ Better Extensibility
++ Configurable Expansion of Links
+!endblock
+
+These are briefly considered below.
+
+Note: Not every output format supported by SDF
+supports every table/figure feature. In some cases, the SDF -> xxx
+format driver isn't yet clever enough. In other cases,
+the target format isn't clever enough! So, your milage
+may vary with some of these features, particularly in the short
+term as the SDF format drivers are maturing. Of course,
+the Perl source code for each format driver is provided
+with the SDF package, so feel free to improve them.
+
+
+H2: Tables
+
+SDF support tables via the {{table}} filter. Typically,
+tables are defined using the {{MAC:block}}
+and {{MAC:endblock}} macros like this:
+
+!block example
+!block table
+Name    Meaning
+POD     Plain Old Documentation
+SDF     Simple Document Format
+!endblock
+!endblock
+
+The result is:
+
+!block table
+Name    Meaning
+POD     Plain Old Documentation
+SDF     Simple Document Format
+!endblock
+
+The first line specifies the headings and the input
+format of the data:
+
+* if the first two field names are separated by whitespace,
+  the input format is assumed to be fixed-width
+* otherwise, the input format is assumed to be "delimited"
+  and the special character separating the first two fields
+  is the delimiter.
+
+For readability reasons, fixed-width format is preferred.
+Delimited format is useful for tables already in that
+format and for data exported by spreadsheets.
+
+SDF supports a large number of features for tables including:
+
+* column widths can be dynamically sized or explicitly set
+* heading, footing and group rows can be specified
+* table alignment and positioning can be controlled
+* cells support custom alignment, shading, ruling and colours.
+
+See the {{DOC: SDF User Guide}} for further details.
+
+
+H2: Figures
+
+Figures are supported in SDF via the {{MAC:import}} macro.
+The usage is:
+
+>  !import "filename" [parameters]
+
+For example:
+
+>  !import "mylogo"; align=Right
+
+It is generally best {{not}} to specify an extension for the filename
+containing the figure, as SDF will then use the best format it can find.
+The search rules are:
+
+!block table; narrow
+When_generating     The_search_order_is
+PostScript          epsi, eps, wmf, mif, gif
+HTML                jpeg, jpg, png, gif
+Windows Help        bmp
+!endblock
+
+See the {{DOC: SDF User Guide}} for further details.
+
+
+H2: Variables
+
+Variables can be defined using the {{MAC:define}} macro
+like this:
+
+>  !define VERSION 1.34
+
+The first argument is the variable name and the second argument
+is the value. You can use a Perl expression for the value if
+you wish. For example:
+
+>  !define LOGO $ENV{'LOGO'} || "mylogo"
+
+Having defined a variable, it can be used in paragraph text by
+enclosing it within E<2[> and E<2]>. For example:
+
+>  WorldPeace [[VERSION]] is just what you need and
+>  is available for free download from ...
+
+In fact, a Perl expression can be embedded in paragraph text the
+same way, e.g.
+
+>  !define STARS 5
+>  ...
+>  This movie gets [['*' x $var{'STARS'}]].
+
+Within Perl expressions, SDF variables are available via
+the %var associative array.
+
+
+H2: Better Extensibility
+
+From its beginning, one of SDF's primary goals has been
+to support the authoring of documents in a logical manner.
+Therefore, it is possible to define your own:
+
+* paragraph styles
+* paragraph attributes
+* phrase styles
+* phrase attributes
+
+and to either alias these to existing styles/attributes
+or map them to target format entities.
+
+Likewise, you can define your own macros and filters
+to do almost anything you want. See the
+{{DOC:SDF Guru Guide}} for further details.
+
+Typically, a workgroup or project team will
+put their extensions in an SDF library, which is
+essentially a normal SDF file which is included at
+the start of each document. Alternatively, you can specify
+a configuration library on the {{CMD:sdf}} command line.
+This is useful if you want an SDF configuration library
+for a POD document, say.
+
+H2: Configurable Expansion of Links
+
+For L (Link) phrases, SDF lets you customise:
+
+* the rules for expanding the text
+* the HTML URL searching/generation rule
+
+This flexibility is important for non-English documentation
+and non-Perl documentation.
+
+To change the text expansion rules, define one of
+more of the variables below:
+
+!block table
+Variable                  Default_Value
+FORMAT_LINK_PAGE          the $page manpage
+FORMAT_LINK_PAGE_ENTRY    the $entry entry in the $page manpage
+FORMAT_LINK_PAGE_SECTION  the section on "$sect" in the $page manpage
+FORMAT_LINK_SECTION       the section on "$sect"
+!endblock
+
+For example:
+
+>  !define FORMAT_LINK_SECTION 'the "$sect" section'
+
+To change the URL generation rule, override the {{BuildLinkUrl}}
+subroutine like this:
+
+!block example
+!block script
+sub BuildLinkUrl  {
+    my ($page, $sect, $entry) = @_;
+    my $url = ...
+    return $url;
+}
+!endblock
+!endblock
+
+The default implementation of {{BuildLinkUrl}} is simplistic by design.
+This is considered a feature.
+If you want intelligent URL generation ala {{B:pod2html}}, use the
+{{perl}} configuration library and set the PERL_HTML_ROOT variable
+like this:
+
+>  sdf -2html -cperl -DPERL_HTML_ROOT=/nmanual/perl perlrun.pod
+
+The default value of PERL_HTML_ROOT is /perl.
+
+
+H1: What's wrong with SDF?
+
+The most common complaints about SDF are:
+
+^ It isn't WYSIWYG.
++ It doesn't support the output format I need.
++ It doesn't have the features I need.
++ It has too much functionality.
+
+On the WYSIWYG issue, SDF is a tool for people who would rather
+use a text editor. It tries hard to be readable and an emacs
+mode is available. If that isn't good enough, then SDF isn't
+for you.
+
+On the output format issue, I'm working on it.
+For developers with a good knowledge of Perl and
+the output format they need, writing an "SDF output driver"
+isn't hard, it just takes time. Like all of us,
+I only have so much free time, so any assistance
+anyone can offer in this regard is very welcome.
+
+On the functionality issue, SDF is growing and will
+continue growing. If it doesn't have a feature you need,
+the Perl source code is provided, so you might be able
+to add it yourself.
+
+If SDF is already too complex, then stick with POD.
+You can always mix in some SDF or migrate to SDF
+if you need to at a later date. Personally, I find
+the "I'm sticking with POD because SDF is too complex"
+argument a little short-sighted:
+
+* SDF's basic ideas (styles, attributes, macros, filters and variables)
+  and commonly used tags are easy to learn
+* I'd rather use the same markup language for embedded documentation,
+  memos, design documents and user documentation.
+
+I prefer SDF to POD for the same reason that I prefer [[Perl]] to awk:
+the latter may be sufficent for a given task, but choosing it will
+cause me grief the moment the task grows. On the other hand,
+as the designer of SDF, I'm probably just a little biased. :-)
+
+
+H1: Credits
+
+Thanks to the many people who have used and
+contributed to SDF over the years, particularly
+David Cox, Tim Hudson and Chris Moran.
+Likewise, thanks to Larry Wall for inventing Perl
+and to everyone who has contributed to Perl over the years.
+Without it, SDF wouldn't exist.
+
+Finally, I'd like to thank the people who encouraged
+me to merge POD and SDF, including Kenneth Albanowski,
+Brad Appleton, Achim Bohnet, Jim Esten, Chaim Frenkel,
+Gerd Knops, Hugues Lafarge, Tuomas J. Lukka, Andy Wardley
+and Peter Wolfe. I hope the result is useful.

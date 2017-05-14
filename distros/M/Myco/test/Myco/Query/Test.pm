@@ -1,7 +1,7 @@
 package Myco::Query::Test;
 
 ###############################################################################
-# $Id: Test.pm,v 1.1.1.1 2004/11/22 19:16:05 owensc Exp $
+# $Id: Test.pm,v 1.4 2006/03/19 19:34:08 sommerb Exp $
 ###############################################################################
 
 =head1 NAME
@@ -10,25 +10,17 @@ Myco::Query::Test -
 
 unit tests for features of Myco::Query
 
-=head1 VERSION
-
-$Revision: 1.1.1.1 $
-
-=cut
-
-our $VERSION = (qw$Revision: 1.1.1.1 $ )[-1];
-
 =head1 DATE
 
-$Date: 2004/11/22 19:16:05 $
+$Date: 2006/03/19 19:34:08 $
 
 =head1 SYNOPSIS
 
  cd $MYCO_DISTRIB/bin
  # run tests.  '-m': test just in-memory behavior
- ./testrun [-m] Myco::Query::Test
+ ./myco-testrun [-m] Myco::Query::Test
  # run tests, GUI style
- ./tktestrun Myco::Query::Test
+ ./tkmyco-testrun Myco::Query::Test
 
 =head1 DESCRIPTION
 
@@ -43,8 +35,8 @@ use base qw(Test::Unit::TestCase Myco::Test::EntityTest);
 use Myco::Query;
 use Myco::Query::Part::Clause;
 use Myco::Query::Part::Filter;
-use Myco::Base::Entity::Meta::Attribute;
-use Myco::Base::Entity::Meta::Attribute::UI;
+use Myco::Entity::Meta::Attribute;
+use Myco::Entity::Meta::Attribute::UI;
 use strict;
 use warnings;
 use Data::Dumper;
@@ -54,14 +46,14 @@ use Data::Dumper;
 # This class tests features of:
 use constant FILTER => 'Myco::Query::Part::Filter';
 use constant CLAUSE => 'Myco::Query::Part::Clause';
-use constant ATTR_META => 'Myco::Base::Entity::Meta::Attribute';
-use constant UI_META => 'Myco::Base::Entity::Meta::Attribute::UI';
-use constant ENTITY => 'Myco::Base::Entity::SampleEntity';
-use constant ADDRESS => 'Myco::Base::Entity::SampleEntityAddress';
+use constant ATTR_META => 'Myco::Entity::Meta::Attribute';
+use constant UI_META => 'Myco::Entity::Meta::Attribute::UI';
+use constant ENTITY => 'Myco::Entity::SampleEntity';
+use constant ADDRESS => 'Myco::Entity::SampleEntityAddress';
 my $class = 'Myco::Query';
 
-# It may be helpful to number tests... use testrun's -d flag to view
-#   test-specific debug output (see example tests, testrun)
+# It may be helpful to number tests... use myco-testrun's -d flag to view
+#   test-specific debug output (see example tests, myco-testrun)
 use constant DEBUG => $ENV{MYCO_TEST_DEBUG} || 0;
 
 ##############################################################################
@@ -112,7 +104,7 @@ sub tear_down {
 
 sub test_get_closure {
     my $test = shift;
-
+	
     my $q = $class->new( name => 'default',
                          description => 'the default query',
                          remotes => { '$sample_base_entity_' => ENTITY },
@@ -141,6 +133,8 @@ sub test_get_closure {
 sub test_optional_params {
     my $test = shift;
 
+    return if $test_parameters{skip_persistence};
+	
     # Pre-destroy from previous failed tests
     Myco->destroy( Myco->select(ENTITY) );
 
@@ -166,10 +160,11 @@ sub test_optional_params {
                   },
         filter => { parts => [ $clause1, $clause2 ] }
       );
+
     my ($myguy) = eval { $q->run_query( name => 'Da Man' ) };
     $test->assert( ! $@, "no error encountered, or was there...$@" );
     $test->assert( $myguy->id == $e_id,
-                   'query ignored the clause involving my optional param' );
+		   'query ignored the clause involving my optional param' );
 
     # Okay - add another optional param
     $q->set_params(
@@ -236,6 +231,8 @@ sub test_optional_params {
 sub test_match_oper {
     my $test = shift;
 
+	return if $test_parameters{skip_persistence};
+	
     # Pre-destroy from previous failed tests
     Myco->destroy( Myco->select(ENTITY) );
 
@@ -268,12 +265,14 @@ sub test_match_oper {
 }
 
 # Tests logic involved in using a remote as the right part of a filter
-# statement - i.e. its not passed as a param. Further distinction between
-# is needed between right operands and params, which ain't always the same
+# statement - i.e. its not passed as a param. Further distinction is needed 
+# between right operands and params, which ain't always the same
 
 sub test_remote_as_param_or_I_mean_as_right_operand_yeah_thats_the_ticket {
     my $test = shift;
 
+	return if $test_parameters{skip_persistence};
+	
     # pre-cleanup
     my $e_ = Myco->remote(ENTITY);
     Myco->destroy( Myco->select($e_, $e_->{last} eq 'Millionaire'),
@@ -282,7 +281,7 @@ sub test_remote_as_param_or_I_mean_as_right_operand_yeah_thats_the_ticket {
     # This tests a detailed query that uses a remote object set comparison
     # as a param intead of an object attribute as parameter.
 
-    my $addr = ADDRESS->new( key => 'home', city => 'Quincy',
+    my $addr = ADDRESS->new( address_key => 'home', city => 'Quincy',
                              state => 'MA', zip => '02170',
                              street => '23 East Elm Ave' );
     $addr->save;
@@ -343,18 +342,20 @@ sub test_remote_as_param_or_I_mean_as_right_operand_yeah_thats_the_ticket {
     # bad results. It should, since ::Clause requires the remotes hash to be
     # passed to it from ::Query to determine this.
 
+    my $filter = $q->get_filter;
+    my $filter_parts = $filter->get_parts;
+    my $fifth_filter_part = $filter_parts->[5];
     my $clause_string;
-#    eval { $clause_string = $q->get_filter->get_parts->[5]->get_clause };
-#    $test->assert( $@ && $@ =~ /param looks like a remote/, $@ );
+    eval { $clause_string = $fifth_filter_part->get_clause };
+    $test->assert( $@ && $@ =~ /param looks like a remote/, $@ );
 
-
-    my ($guy) = $q->run_query(first_initial => 'Jo',
-                              last_initial => 'Mi',
-                              zip => '02170',
-                              city => 'Quincy',
-                              state => 'MA');
+    my $guy;
+    ($guy) = $q->run_query(first_initial => 'Jo',
+			   last_initial => 'Mi',
+			   zip => '02170',
+			   city => 'Quincy',
+			   state => 'MA');
     $test->assert( $guy->id == $e_id, 'detailed query worked!' );
-
 
     # Now test how this query handles optional parameters
     ($guy) = $q->run_query( first_initial => 'Jo',
@@ -365,7 +366,7 @@ sub test_remote_as_param_or_I_mean_as_right_operand_yeah_thats_the_ticket {
 
     # Now try with several similar objects to see how set comparisons work
     for my $state ( qw(NY LA CA RI RI) ) {
-        my $addr = ADDRESS->new( key => 'home',
+        my $addr = ADDRESS->new( address_key => 'home',
                                  city => 'Quincy',
                                  state => $state,
                                  zip => '02170',

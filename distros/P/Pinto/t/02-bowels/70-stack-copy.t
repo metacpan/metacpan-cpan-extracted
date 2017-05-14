@@ -15,8 +15,8 @@ use Pinto::Tester::Util qw(make_dist_archive);
 my $t = Pinto::Tester->new;
 
 #------------------------------------------------------------------------------
-subtest 'create new stack' => sub {
 
+{
     # Create a new stack...
     my $stk_name = 'dev';
     $t->run_ok( New => { stack => $stk_name } );
@@ -24,7 +24,7 @@ subtest 'create new stack' => sub {
     is $stack->name, $stk_name, 'Got correct stack name';
 
     # Add to the stack...
-    my $foo_and_bar_1 = make_dist_archive('FooAndBar-1 = Foo~1; Bar~1');
+    my $foo_and_bar_1 = make_dist_archive('FooAndBar-1 = Foo~1,Bar~1');
     $t->run_ok( Add => { author => 'ME', stack => $stk_name, archives => $foo_and_bar_1 } );
 
     # Note the time of last commit
@@ -34,21 +34,20 @@ subtest 'create new stack' => sub {
     sleep 2;
 
     # Add more stuff to the stack...
-    my $foo_and_bar_2 = make_dist_archive('FooAndBar-2 = Foo~2; Bar~2');
+    my $foo_and_bar_2 = make_dist_archive('FooAndBar-2 = Foo~2,Bar~2');
     $t->run_ok( Add => { author => 'ME', stack => $stk_name, archives => $foo_and_bar_2 } );
 
     # Check that mtime was updated...
     cmp_ok $stack->refresh->head->utc_time, '>', $old_mtime, 'Updated stack mtime';
-
-};
+}
 
 #------------------------------------------------------------------------------
-subtest 'copy stack' => sub {
 
+{
     # Copy dev -> qa...
     my $dev_stk_name = 'dev';
     my $qa_stk_name  = 'qa';
-    $t->run_ok( Copy => { stack => $dev_stk_name, to_stack => $qa_stk_name } );
+    $t->run_ok( Copy => { from_stack => $dev_stk_name, to_stack => $qa_stk_name } );
 
     my $dev_stack = $t->pinto->repo->get_stack($dev_stk_name);
     my $qa_stack  = $t->pinto->repo->get_stack($qa_stk_name);
@@ -58,18 +57,17 @@ subtest 'copy stack' => sub {
     is $qa_stack->description, 'Copy of stack dev', 'Got correct stack description';
 
     is $qa_stack->head->id, $dev_stack->head->id, 'Head of copied stack points to head of original stack';
-
-};
+}
 
 #------------------------------------------------------------------------------
-subtest 'copy stack with changes' => sub {
 
+{
     # Copy with extra stuff
     my $dev_stk_name  = 'dev';
     my $xtra_stk_name = 'xtra';
     $t->run_ok(
         Copy => {
-            stack  => $dev_stk_name,
+            from_stack  => $dev_stk_name,
             to_stack    => $xtra_stk_name,
             description => 'custom',
             lock        => 1
@@ -80,11 +78,11 @@ subtest 'copy stack with changes' => sub {
 
     is $xtra_stack->is_locked,   1,        'Copied stack is locked';
     is $xtra_stack->description, 'custom', 'Copied stack has custom description';
-
-};
+}
 
 #------------------------------------------------------------------------------
-subtest 'mark stack as default' => sub {
+
+{
 
     # Marking default stack...
     my $master_stack = $t->pinto->repo->get_stack;
@@ -103,12 +101,12 @@ subtest 'mark stack as default' => sub {
 
     throws_ok { $master_stack->is_default(0) } qr/Cannot directly set is_default/,
         'Setting is_default directly throws exception';
-
-};
+}
 
 #------------------------------------------------------------------------------
 # Mixed-case stack names...
-subtest 'stack with mixed-case name' => sub {
+
+{
 
     $t->run_ok(
         New => { stack => 'MixedCase' },
@@ -119,16 +117,16 @@ subtest 'stack with mixed-case name' => sub {
 
     $t->path_exists_ok( [qw( stacks MixedCase)], 'Stack directory name has mixed-case name too' );
 
-};
+}
 
 #------------------------------------------------------------------------------
 # Exceptions...
-subtest 'stack exceptions' => sub {
 
+{
     # Copy from a stack that doesn't exist
     $t->run_throws_ok(
         Copy => {
-            stack => 'nowhere',
+            from_stack => 'nowhere',
             to_stack   => 'somewhere'
         },
         qr/Stack nowhere does not exist/
@@ -137,7 +135,7 @@ subtest 'stack exceptions' => sub {
     # Copy to a stack that already exists
     $t->run_throws_ok(
         Copy => {
-            stack => 'master',
+            from_stack => 'master',
             to_stack   => 'dev'
         },
         qr/Stack dev already exists/
@@ -146,7 +144,7 @@ subtest 'stack exceptions' => sub {
     # Copy to a stack that already exists, but with different case
     $t->run_throws_ok(
         Copy => {
-            stack => 'master',
+            from_stack => 'master',
             to_stack   => 'DeV'
         },
         qr/Stack dev already exists/
@@ -161,7 +159,7 @@ subtest 'stack exceptions' => sub {
     # Copy to stack with invalid name
     $t->run_throws_ok(
         Copy => {
-            stack => 'master',
+            from_stack => 'master',
             to_stack   => '$bogus@'
         },
         qr/must be alphanumeric/
@@ -170,7 +168,7 @@ subtest 'stack exceptions' => sub {
     # Copy to stack with no name
     $t->run_throws_ok(
         Copy => {
-            stack => 'master',
+            from_stack => 'master',
             to_stack   => ''
         },
         qr/must be alphanumeric/
@@ -179,13 +177,12 @@ subtest 'stack exceptions' => sub {
     # Copy to stack with undef name
     $t->run_throws_ok(
         Copy => {
-            stack => 'master',
+            from_stack => 'master',
             to_stack   => undef
         },
         qr/must be alphanumeric/
     );
-
-};
+}
 
 #------------------------------------------------------------------------------
 

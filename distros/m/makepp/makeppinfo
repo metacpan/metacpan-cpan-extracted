@@ -1,0 +1,220 @@
+#!/usr/bin/perl -w
+# $Id: makeppinfo,v 1.18 2012/05/29 21:31:38 pfeiffer Exp $
+
+package Mpp;
+
+use strict;
+
+use POSIX ();
+
+#
+# Exiting
+#
+# Do this early, because the END block defined below shall be the first seen
+# by perl, such that it is the last executed.  It leaves the process via
+# POSIX::_exit, so that no expensive garbage collection of Mpp::File objects
+# occurs.  All other places can use die or normal exit.  If you define
+# additional END blocks in any module, you must take care to not reset $?.
+#
+END {
+  close STDOUT; close STDERR;
+  POSIX::_exit $?;
+}
+
+our $datadir;
+BEGIN {
+  our $VERSION = '@VERSION@';
+#@@setdatadir
+#
+# Find the location of our data directory that contains the auxiliary files.
+# This is normally built into the program by install.pl, but if makepp hasn't
+# been installed, then we look in the directory we were run from.
+#
+  $datadir = $0;		# Assume it's running from the same place that
+				# we're running from.
+  unless ($datadir =~ s@/[^/]+$@@) { # No path specified?
+				# See if we can find ourselves in the path.
+    foreach (split(/:/, $ENV{'PATH'}), '.') {
+				# Add '.' to the path in case the user is
+				# running it with "perl makeppclean" even if
+				# . is not in his path.
+      if( -d "$_/Mpp" ) {	# Found something we need?
+	$datadir = $_;
+	last;
+      }
+    }
+  }
+  $datadir or die "makepp: can't find library files\n";
+
+  $datadir = eval "use Cwd; cwd . '/$datadir'"
+    if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+#@@
+  unshift @INC, $datadir;
+}
+
+use Mpp::Utils;
+use Mpp::File;
+use Mpp::FileOpt;
+
+my( $decode_date, $force, $keylist, $quiet, $traverse, $unremembered, @keys_not, @keys );
+Mpp::Text::getopts
+  ['d', qr/(?:decode[-_]?)?dates?/, \$decode_date],
+
+  [qw'f force', \$force],
+
+  ['k', qr/key(?:s|list)/, \$keylist, 1],
+
+  [qw'q quiet', \$quiet],
+
+  [qw't traverse', \$traverse],
+
+  [qw'u unremembered', \$unremembered],
+
+  splice @Mpp::Text::common_opts;
+
+$traverse = 2 if $unremembered;
+
+$SIG{__WARN__} = sub {} if $quiet && $quiet > 1;
+
+for( $keylist ) {
+  last if !defined;
+  tr/a-z/A-Z/;
+  s/(?=[?*])/./g;
+  if( s/\{/(?:/g ) {
+    tr/,}/|)/ or die "makeppinfo: error: -k, --keylist contained '{', but no ',' or '}'\n";
+  } else {
+    /,/ and die "makeppinfo: error: -k, --keylist contained ',', but no '{...}'\n";
+  }
+}
+
+my @seen_dirs;
+sub merge($@) {
+  my( $build_info, $key1, $key2 ) = @_;
+  if( exists $build_info->{$key1} && exists $build_info->{$key2} ) {
+    my @list1 = split /\cA/, delete $build_info->{$key1};
+    my @list2 = split /\cA/, delete $build_info->{$key2};
+    $build_info->{"$key1 $key2"} = join "\n", '',
+      map sprintf( $decode_date ? "%-44s %s" : "%-22s %s", $_, shift @list2 ), @list1;
+  }
+}
+
+@ARGV = '.' unless @ARGV;
+while( @ARGV ) {
+  my $finfo = shift;
+  if( ref $finfo ) {		# This means we looped around to found deps
+    undef $traverse if $traverse && $traverse == 1;
+  } else {
+    $finfo = file_info $finfo;
+  }
+  next if exists $finfo->{xSEEN};
+  undef $finfo->{xSEEN};
+  my $exists = file_exists $finfo;
+  unless( $exists ) {
+    warn 'makeppinfo: file `' . relative_filename( $finfo ) . "' not found\n";
+    next unless $force;
+  }
+  if( is_dir $finfo ) {
+    unshift @ARGV, grep -f, glob relative_filename( $finfo ) . '/*';
+    next;
+  }
+
+  my $build_info = Mpp::File::load_build_info_file $finfo;
+  unless( $build_info ) {
+    warn 'makeppinfo: file `' . relative_filename( $finfo ) . "' not remembered by mpp\n"
+      unless $quiet;
+    next;
+  }
+  unless( $build_info->{SIGNATURE} ) {
+    warn 'makeppinfo: file `' . relative_filename( $finfo ) . "' modified outside of mpp\n"
+      if $exists;
+    next unless $force;
+  }
+
+  if( $traverse ) {
+    my $finfodir = exists $finfo->{DIRCONTENTS} ? $finfo : $finfo->{'..'};
+    my $cwd = file_info $build_info->{CWD}, $finfodir
+      if exists $build_info->{CWD};
+
+    my $length = @ARGV;		# When not traversing we throw these away again:
+    push @ARGV, map file_info( $_, $cwd ), split /\cA/, $build_info->{SORTED_DEPS}
+      if $cwd && $build_info->{SORTED_DEPS};
+
+    if( $unremembered ) {
+      push @seen_dirs, grep { exists $_->{xPUSHED} ? 0 : !undef $_->{xPUSHED} }
+	@ARGV[$length..$#ARGV], $finfodir, $cwd ? $cwd : ();
+      next;
+    }
+  }
+
+  if( $keylist ) {
+    my %want;
+    for my $re ( split ' ', $keylist ) {
+      if( $re =~ s/^[!^]// ) {
+	@want{keys %$build_info} = () if !%want;
+	delete @want{grep /^$re$/, keys %want};
+      } else {
+	@want{grep /^$re$/, keys %$build_info} = ();
+      }
+    }
+    delete @{$build_info}{grep !exists $want{$_}, keys %$build_info};
+  }
+
+  merge $build_info, qw(DEP_SIGS SORTED_DEPS);
+  merge $build_info, qw(ENV_DEPS ENV_VALS);
+
+  print relative_filename( $finfo ) . ":\n" unless $quiet;
+  for my $key ( sort keys %$build_info ) {
+    # Check names explicitly, because there may be no ^B, making it look like a 1 level list:
+    if( $key =~ /^(?:IMPLICIT_DEPS|INCLUDE_(?:PATHS|SFXS)|META_DEPS)$/ || $build_info->{$key} =~ /\cB/ ) {
+      my @lists = split /\cB/, $build_info->{$key};
+      $build_info->{$key} = '';
+      for( @lists ) {
+	my( $tag, @sublist ) = split /\cA/, $_;
+	$build_info->{$key} .= "\n\t$tag\t$_" for @sublist;
+      }
+    } elsif( $build_info->{$key} =~ /\cA/ ) {
+      my @list = split /\cA/, $build_info->{$key};
+      $build_info->{$key} = '';
+      $build_info->{$key} .= "\n\t$_" for @list;
+    } else {
+      $build_info->{$key} =~ s/\n/\n\t/g;
+      $build_info->{$key} .= ' -- ' .
+	(file_exists( $finfo ) ? 'now is ' . Mpp::File::signature( $finfo ) : 'file deleted')
+	if $force && $key eq 'invalidated_SIGNATURE';
+    }
+    if( $decode_date ) {
+      $build_info->{$key} =~ s((\b(\d{9,}),\d+)(?: {22})?){
+	my( $sec, $min, $hour, $mday, $mon, $year ) = localtime $2;
+	sprintf "(%d-%02d-%02d %02d:%02d:%02d) %s", $year+1900, $mon+1, $mday, $hour, $min, $sec, $1;
+      }eg;
+    }
+    if( $quiet ) {
+      $build_info->{$key} =~ s/\A\n//;
+      print "$build_info->{$key}\n";
+    } else {
+      print "$key=$build_info->{$key}\n";
+    }
+  }
+}
+
+if( @seen_dirs ) {
+  my @unremembered;
+  for my $dir ( @seen_dirs ) {
+    next if $unremembered == 1
+      and 999 <= relative_filename $CWD_INFO, $dir, 1;
+    Mpp::File::read_directory $dir;
+    for my $finfo ( values %{$dir->{DIRCONTENTS}} ) {
+      push @unremembered, relative_filename $finfo unless
+	exists $finfo->{xSEEN} or is_dir $finfo;
+    }
+  }
+
+  print "$_\n" for sort { ($a =~ tr:/:: || ~0) <=> ($b =~ tr:/:: || ~0) or $a cmp $b } @unremembered;
+}
+
+__DATA__
+[option ...] [file ...]
+
+For each file print a human readable version of makepp's build info.  DEP_SIGS
+and SORTED_DEPS get merged, as do ENV_DEPS and ENV_VALS.  Tagged lists have the
+tag prepended.  Valid options are:

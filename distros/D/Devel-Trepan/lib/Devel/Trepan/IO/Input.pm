@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2015 Rocky Bernstein <rocky@cpan.org>
 
 # Debugger user/command-oriented input possibly attached to IO-style
 # input or GNU Readline.
@@ -10,6 +10,10 @@ use Exporter;
 
 package Devel::Trepan::IO::Input;
 
+use vars qw(@EXPORT @ISA $HAVE_TERM_READLINE);
+@ISA = qw(Devel::Trepan::IO::InputBase Exporter);
+@EXPORT = qw($HAVE_TERM_READLINE term_readline_capability);
+
 BEGIN {
     my @OLD_INC = @INC;
     use rlib '../../..';
@@ -18,9 +22,12 @@ BEGIN {
     @INC = @OLD_INC;
 }
 
-use vars qw(@EXPORT @ISA $HAVE_TERM_READLINE);
-@ISA = qw(Devel::Trepan::IO::InputBase Exporter);
-@EXPORT = qw($HAVE_TERM_READLINE term_readline_capability);
+END {
+    if ($HAVE_TERM_READLINE eq 'Perl5') {
+	no strict 'subs';
+	Term::ReadLine::Perl5::readline::ResetTTY;
+    }
+}
 
 sub term_readline_capability() {
     # Prefer Term::ReadLine::Perl5 if we have it
@@ -46,6 +53,7 @@ sub new($;$$) {
     my ($class, $inp, $opts) = @_;
     $inp ||= *STDIN;
     my $self = Devel::Trepan::IO::InputBase->new($inp, $opts);
+    $self->{histfile} = undef;
     if ($opts->{readline} && $HAVE_TERM_READLINE) {
         my $rc = 0;
         $rc = eval {
@@ -93,7 +101,7 @@ sub rl_filename_list($$)  {
     if ($HAVE_TERM_READLINE eq 'Perl5') {
 	Term::ReadLine::Perl5::readline::rl_filename_list($prefix);
     } elsif ($HAVE_TERM_READLINE eq 'Gnu') {
-	Term::ReadLine::Gnu::XS::rl_filename_list($prefix);
+	eval {Term::ReadLine::Gnu::XS::rl_filename_list($prefix)};
     # } elsif ($HAVE_TERM_READLINE eq 'Perl') {
 	# FIXME: how does one do this for Perl?
     }
@@ -108,12 +116,23 @@ sub readline($;$) {
     my $line;
     if (defined $self->{readline}) {
         $line = $self->{readline}->readline($prompt);
+	$self->{eof} = !defined($line);
     } else {
         $self->{eof} = eof($self->{input});
         return '' if $self->{eof};
         $line = CORE::readline $self->{input};
     }
     return $line;
+}
+
+sub write_history($$)
+{
+    my ($self, $histfile) = @_;
+    $self->{readline}->StifleHistory($self->{histsize}) if
+	$self->{readline}->can("StifleHistory");
+    if ($self->{readline}->can("WriteHistory")) {
+	$self->{readline}->WriteHistory($self->{histfile})
+    }
 }
 
 # Demo

@@ -1,0 +1,64 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Devel::CheckLib' => '0.9',
+                                        'ExtUtils::MakeMaker' => '6.3',
+                                        'Module::Build' => '0.28'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Synopsis' => '0',
+                                      'blib' => '1.01',
+                                      'perl' => '5.006',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DynaLoader' => '0',
+                                      'Exporter' => '0',
+                                      'base' => '0',
+                                      'strict' => '0',
+                                      'vars' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '6.3',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Pod::Coverage::TrustPod' => '0',
+                                   'Test' => '0',
+                                   'Test::CPAN::Meta' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::More' => '0.94',
+                                   'Test::Pod::Coverage' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.006',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

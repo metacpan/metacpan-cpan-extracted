@@ -1,0 +1,29 @@
+Revision history for Perl extension Perl6::Currying.
+
+0.01  Tue May 14 16:46:41 2002
+	- original version; created by h2xs 1.20 with options
+		-A -P -X -f -n Perl6::Currying
+
+
+
+0.02	Wed May 15 10:51:23 2002
+
+	- Added Filter::Simple as a prerequisite
+
+
+0.03	Wed May 15 10:55:24 2002
+
+	- Correctly added Filter::Simple as a prerequisite :-(
+
+
+0.04	Wed May 29 11:34:02 2002
+
+	- Completely changed module interface in line with redesign
+	  of Perl 6 mechanism. (Thanks Angel!)
+
+	- Fixed bug in prototype handling for named subs
+
+
+0.05	Wed May 29 11:36:16 2002
+
+	- Removed spurious debugging code

@@ -171,10 +171,11 @@ sub scalar {
   map { 
     my $name = $_;
     $name => sub {
-      if ( scalar @_ > 1 ) {
-	$_[0]->{$name} = $_[1];
+      my $self = shift;
+      if ( scalar @_ ) {
+	$self->{$name} = shift;
       } else {
-	$_[0]->{$name};
+	$self->{$name};
       }
     }
   } @_;

@@ -1,5 +1,6 @@
 Changes
 cloning.xsi
+CMakeLists.txt
 encode.xsi
 lib/Panda/URI.pm
 lib/Panda/URI.pod

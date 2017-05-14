@@ -1,0 +1,31 @@
+---
+abstract: 'Fuse filesystem with a random pic of a cat'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::TinyMocker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CatFS
+requires:
+  Carp: 0
+  Fuse::Simple: 0
+  LWP::Simple: 0
+  Moo: 0
+  MooX::Options: 0
+  Try::Tiny: 0
+  Types::Path::Tiny: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/peczenyj/catfs/issues
+  homepage: https://github.com/peczenyj/catfs
+  repository: git://github.com/peczenyj/catfs.git
+version: 0.002

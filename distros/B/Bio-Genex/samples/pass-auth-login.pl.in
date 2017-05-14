@@ -1,0 +1,113 @@
+%%START_PERL%% -w
+#
+# File: pass-auth-login.pl
+
+# This script expects a user login name and password as parameters.
+# the script queries the GeneX database to determine whether the user
+# is authenticated to access the DB. If the user is successfully
+# authenticated, the script will call the script pass-mod.pl to
+# receive new password information. Otherwise, the script displays a
+# bad login page.
+
+# Programmer: Jason E. Stewart (jes@ncgr.org
+
+# script copyright (C) 2000 by NCGR
+# All rights reserved.
+#
+
+%%GENEX_EXTRALIBS%%
+
+use CGI qw(:standard);
+use strict;
+use LoginUtil;
+
+use DBI;
+use Bio::Genex;
+use Bio::Genex::DBUtils qw(check_password);
+
+$|++;
+
+my $password = "";
+my $username = "";
+my $sample_bin = '%%GENEX_URL_EXAMPLE%%';
+my $ct_bin = '%%GENEX_CUR_TOOL_DIR%%';
+
+# Clean up the enviroment for Taint mode
+$ENV{PATH} = "/bin:/usr/bin";
+delete @ENV{ 'IFS','CDPATH','ENV','BASH_ENV' };
+
+my $q = new CGI;
+# Get the CGI parameters
+if ($q->param()) {
+  # we were provided parameters, so get them
+  # Note that I allow only alpha characters (both upper and
+  # lower case) and numeric digits.
+
+  ($username)   = $q->param('User_Name') =~ /^([a-zA-Z_0-9]+)$/;
+  ($password)   = $q->param('Password') =~ /^([a-zA-Z_0-9]+)$/;
+		
+  if (!$username) {
+    system ("./pass-invalid-login.pl","User_Name=");
+    exit 0;
+  }
+  unless (defined $password && $password ne "") {
+    system ("./pass-invalid-login.pl","User_Name=$username");
+    exit 0;
+  }
+
+} else {
+  # we were NOT provided parameters
+  # so call the failed login script
+  #print "No Parameters provided!<br>\n";
+  system ("./pass-invalid-login.pl","User_Name=");
+  exit (0);
+}				# end if
+
+my $dbh = Bio::Genex::current_connection();
+my $userid = check_password($dbh,$username,$password);
+
+if (defined $userid) {
+  # They match, so send the user on to the next step
+  # first calculate a MD5 checksum on the parameter to be passed.
+  my $sendstring = "userid=$userid"; 
+  my $digest = LoginUtil::create_checksum($sendstring);
+  system ('./pass-mod.pl', $sendstring . '-' . $digest);
+} else {
+  # The passwords do not match, send to the invalid login script
+  #print "Passwords do not match!<br>\n";
+  system ("./pass-invalid-login.pl","User_Name=$username");
+}
+
+__END__
+
+=head1 NAME
+
+B<pass-auth-login.pl>: a CGI script for validating a user login to the DB.
+
+=head1 SYNOPSIS
+
+  pass-auth-login.pl
+
+=head1 DESCRIPTION
+
+This CGI script takes two parameters: username and password. If the
+username is valid and the CGI password matches the password in the DB,
+then pass-mod.pl is called to enable the user to modify the DB
+password.
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Nov  6 12:09:31 MST 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

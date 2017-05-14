@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+##
+# The Eval agent - a sample agent for doing remote eval()'s.
+# Steve Purkis <spurkis@engsoc.carleton.ca>
+# October 5, 1998.
+##
+
+package Agent::Eval;
+@ISA = qw( Agent );
+
+sub new {
+	my ($class, %args) = @_;
+	my $self = {};
+	foreach (keys(%args)) { $self->{"$_"} = $args{"$_"}; }
+	bless $self, $class;
+}
+
+sub agent_main {
+	my ($self, @args) = @_;
+	my $message;
+
+	# delete so we only do one hop..
+	my $to = delete($self->{Host});
+	if ($to) {
+		@message = ("$self->{Return}\n", $self->store());
+	} else {
+		unless ($to = delete($self->{Return})) {
+			print "I've been abandoned!\n" if $self->{verbose};
+			return;
+		}
+		@message = eval "$self->{Eval}";
+		push @message, "ERROR: $@" if $@; # capture errors, if any
+	}
+
+	# transfer self | send result to remote host...
+	print "Sending message to $to\n" if $self->{verbose};
+	my $msg = new Agent::Message(
+		Body      => [ @message ],
+		Transport => TCP,
+		Address   => $to
+	);
+	if ($msg->send) { print "done.\n" if $self->{verbose}; }
+	else { print "couldn't send message!\n" if $self->{verbose}; }
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Agent::Eval - the Eval sample agent.
+
+=head1 SYNOPSIS
+
+use Agent;
+
+my $agent = new Agent( Name => 'Eval', %args );
+$agent->run;
+
+=head1 DESCRIPTION
+
+The Eval agent relocates to a I<static agent> and eval()'s some user-defined
+code there.  Return values are packaged in plaintext and delivered back to
+the invoking program.
+
+=head1 PARAMETERS
+
+Host     =>  TCP address of static agent
+Eval     =>  code to be eval()'d
+Return   =>  TCP address to return results to
+verbose  =>  self evident
+
+=head1 NOTES
+
+This algorithm may be largely inefficient if the code being evaluated is
+trivial.  Eg. the Eval agent jumps to a remote host, severs the connection
+and does its thing, then establishes a I<new> connection to deliver the
+results.  There is alot of overhead creating connections here.
+
+It is also powerful in that the program sending the Eval agents needn't
+block while waiting for a response.  In addition to this, it is more dynamic
+that traditional RPC as the code to be evaluated is not predefined on the
+server.
+
+=head1 SEE ALSO
+
+The I<Static> example agent, F<dcalc.pl>.
+
+=head1 AUTHOR
+
+Steve Purkis E<lt>F<spurkis@engsoc.carleton.ca>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1997, 1998 Steve Purkis.  All rights reserved.  This package
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=cut

@@ -5,7 +5,7 @@ use warnings;
 use inc::Module::Install;
 
 name     'AllKnowingDNS';
-all_from 'lib/App/AllKnowingDNS/Handler.pm';
+all_from 'script/all-knowing-dns';
 
 requires 'Net::DNS';
 requires 'Privileges::Drop';

@@ -1,0 +1,21 @@
+
+0.03      2015-12-15 16:24:58+00:00 Europe/Lisbon
+
+    * set aspell lang for testing instead of forcing locales
+
+0.02      2015-12-13 18:04:21+00:00 Europe/Lisbon
+
+    * force english locale for testing (SREZIC++ for report)
+
+0.01      2015-12-01 15:41:14+00:00 Europe/Lisbon
+
+    * simple handle of more hard split markers ('-','::' and '.')
+    * consider sequences of numbers valid words
+    * small tweaks to the main algorithm
+    * update copyright holder
+    * improve docs
+
+0.01_1    2014-03-18 10:38:52WET+0000 Europe/Lisbon
+
+    * First release, still under development.
+

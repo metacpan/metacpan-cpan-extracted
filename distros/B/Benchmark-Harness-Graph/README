@@ -1,0 +1,10 @@
+
+Benchmark::Harness::Graph - Graph and profile of Benchmark::Harness results.
+
+See eg/GraphIt.pl for example.
+
+Installs the normal Perl way:
+
+    perl Makefile.PL
+    make test
+    make install

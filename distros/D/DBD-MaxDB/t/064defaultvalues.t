@@ -35,7 +35,7 @@ my $data = '1234abcd';
 
 # to help ActiveState's build process along by behaving (somewhat) if a dsn is not provided
 BEGIN {
-   $tests = 7;
+   $tests = 8;
    $MaxDBTest::numTest=0;
    unless (defined $ENV{DBI_DSN}) {
       print "1..0 # Skipped: DBI_DSN is undefined\n";
@@ -43,37 +43,40 @@ BEGIN {
    }
 }
 print "1..$tests\n";
-print " Test 1: connect\n";
+MaxDBTest::beginTest("primary connect");
 my $c = DBI->connect() or die "Can't connect $DBI::err $DBI::errstr\n";
-MaxDBTest::Test(1);
+MaxDBTest::endTest();
 
-print " Test 2: drop table\n";
+MaxDBTest::beginTest("drop table");
 MaxDBTest::dropTable($c, "defaultvalues");
-MaxDBTest::Test(1);
+MaxDBTest::endTest();
 
-my $testval = "abc123"
+my $testval = "abc123";
 my $testval_int = 42;
 
-print " Test 3: create table\n";
-$c->do("CREATE TABLE defaultvalues (ID INT NOT NULL DEFAULT ".$testval_int." , DTA VARCHAR(10) DEFAULT ".$testval.")") or die "CREATE TABLE failed $DBI::err $DBI::errstr\n";
-MaxDBTest::Test(1);
+MaxDBTest::beginTest("create table");
+$c->do("CREATE TABLE defaultvalues (ID INT NOT NULL DEFAULT ".$testval_int." , DTA VARCHAR(10) DEFAULT '".$testval."')") or die "CREATE TABLE failed $DBI::err $DBI::errstr\n";
+MaxDBTest::endTest();
 
-print " Test 4: insert data\n";
+MaxDBTest::beginTest("insert data");
 my $s = $c->prepare( 'INSERT INTO defaultvalues ( ID, DTA ) VALUES ( ?, ? )' ) or die "PREPARE INSERT ... failed $DBI::err $DBI::errstr\n";
-$s->execute or die "EXECUTE INSERT ... failed $DBI::err $DBI::errstr\n"; 
-MaxDBTest::Test(1);
+$s->execute ($DBD::MaxDB::DEFAULT_PARAMETER, $DBD::MaxDB::DEFAULT_PARAMETER) or die "EXECUTE INSERT ... failed $DBI::err $DBI::errstr\n"; 
+MaxDBTest::endTest();
 
-print " Test 5: select data\n";
+MaxDBTest::beginTest("select data");
 my $s2 = $c->prepare( 'SELECT * FROM defaultvalues' ) or die "PREPARE SELECT ... failed $DBI::err $DBI::errstr\n";
 $s2->execute or die "EXECUTE SELECT ... failed $DBI::err $DBI::errstr\n"; 
 my $row = $s2->fetchrow_hashref() or die "FETCH ... failed $DBI::err $DBI::errstr\n"; 
-MaxDBTest::Test(1);
+MaxDBTest::endTest();
 
-print " Test 6: check data\n";
-MaxDBTest::Test( $testval eq $row->{DTA}));
+MaxDBTest::beginTest("check data");
+MaxDBTest::TestEnd( $testval eq $row->{DTA});
 
-print " Test 7: check data\n";
-MaxDBTest::Test($testval_int == $row->{ID});
+MaxDBTest::beginTest("check data");
+MaxDBTest::TestEnd($testval_int == $row->{ID});
 
-$c->disconnect;
+MaxDBTest::beginTest("DISCONNECT");
+$s2->finish();
+$c->disconnect or die "DISCONNECT ... failed $DBI::err $DBI::errstr\n";
+MaxDBTest::endTest();
 

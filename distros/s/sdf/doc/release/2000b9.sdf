@@ -1,0 +1,127 @@
+H1: 2.000beta9
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+H3: Overview
+
+The {{contrib}} directory now contains an SDF mode for Emacs and
+a rudimentary RTF to SDF converter. Like other things in the
+{{contrib}} directory, these are unsupported but may be useful.
+
+The other enhancements are:
+
+!block sections
+. Improved documentation
+. Improved text tables
+. New filters
+. Citation support.
+!endblock
+
+Further details are provided below.
+
+
+H3: Improved documentation
+
+The documentation has been improved in a number of ways:
+
+^ The {{DOC:SDF User Guide}} has been revised and updated.
++ The {{DOC:SDF Guru Guide}} now has a chapter on extending SDF.
++ The manuals provided with SDF now have an index.
++ The {{SDF 2.000 Migration Guide}} is no longer provided in
+  the standard distribution (as it is only useful for SDF 1.x
+  users within {{ORG:Mincom}}).
+
+
+H3: Improved text tables
+
+Thanks to Tim MacKenzie ({{EMAIL:Tim.MacKenzie@fulcum.com.au}}):
+tables output in txt format have been improved:
+
+* all cells are now word wrapped (not just the last one in each row)
+* cell alignment is now supported
+* Line paragraph styles within cells are now supported
+* heading underlining has been improved.
+
+H3: New filters
+
+Thanks to Tim Hudson ({{EMAIL:tjh@cryptsoft.com}}), a number
+of new filters are now available:
+
+!block table; groups
+Name            Description
+built-in:
+nofill          format a set of lines
+simple          generic filter for building other filters
+defines.sdm:
+product_defines define products and variables for each
+section_defines define section names as variables
+testcase.sdm:
+testcases       collect testcases from A3s into a table at the end of document
+!endblock
+
+
+H3: Citation support
+
+References can now be easily numbered and the numbers can be
+inserted in paragraph text. The new features which make this possible are:
+
+* the references class now supports a {{Cite}} attribute which
+  produces a string of the form [n]
+* the REF phrase style now supports a {{cite}} attribute which
+  inserts the reference number using the syntax [n].
+
+For example:
+
+!block example; pure
+H1: References
+
+!include "doc.reg"; references; columns='Cite,Document'
+
+H1: Some heading
+
+Refer to {{REF[cite]ABC}} and {{REF[cite]ME2}}.
+!endblock
+
+If you want to put the reference table at the back of the document,
+it is necessary to forward declare which documents will be cited
+by using the {{cited}} parameter of the {{CLASS:references}} filter.
+The table of cited references can then be built later by using
+the {{MAC:catalog}} macro. For example:
+
+!block example; pure
+!include "doc.reg"; references; cited
+
+H1: Some heading
+
+Refer to {{REF[cite]ABC}} and {{REF[cite]ME2}}.
+
+H1: References
+
+!catalog references 'cited'; columns='Cite,Document'
+!endblock
+
+
+H2: Fixes
+
+FrameMaker 4.x compatibility has been improved thanks to a patch
+from Tim MacKenzie ({{EMAIL:Tim.MacKenzie@fulcum.com.au}}).
+
+The document control section (on the inside of the front cover)
+of project documents has been improved. (In fact, it is now much
+easier to customise output of the {{MAC:build_title}} macro.)
+
+The {{FILT:about}} filter was fixed to work better with documents
+formatted using the {{infomap}} look.
+
+For Windows 3.x/MS-DOS users:
+
+* the sdftest.bat file has been fixed
+* the sdfget.bat file has been added.
+
+Date formatting for years >= 2000 has been fixed.
+
+H2: Incompatibilities
+
+None.

@@ -7,16 +7,20 @@ use strict;
 use 5.010;
 use Carp;
 
+use Bio::SeqIO;
+use Bio::Root::IO;
 use Bio::Gonzales::Seq::IO qw/faiterate/;
 use Bio::Gonzales::Seq::Filter qw/clean_pep_seq clean_dna_seq clean_rna_seq/;
 
 use Pod::Usage;
 use Getopt::Long;
 
-my %opt = (clean => '');
+my %opt = ();
 GetOptions( \%opt, 'clean=s' ) or pod2usage(2);
 
 pod2usage( -exitval => 0, -verbose => 2 ) if ( $opt{help} );
+pod2usage(2)
+  unless ( @ARGV && @ARGV > 0 );
 
 my $clean_fun;
 
@@ -37,3 +41,4 @@ while ( my $so = $io->() ) {
   }
   print $so->all_pretty;
 }
+$io->();

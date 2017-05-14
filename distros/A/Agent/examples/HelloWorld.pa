@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+##
+# The HelloWorld agent - a simple agent
+# Steve Purkis <spurkis@engsoc.carleton.ca>
+# March 24, 1998
+##
+
+package Agent::HelloWorld;
+#use Net::FTP;
+@ISA = qw( Agent );
+
+sub new {
+	my ($class, %args) = @_;
+	my $self = {};
+	foreach (keys(%args)) { $self->{"$_"} = $args{"$_"}; }
+	bless $self, $class;
+}
+
+sub agent_main {
+	my ($self, @args) = @_;
+
+	# NB: we don't need a transport address..
+
+	# delete so we only do one hop..
+	my $to = delete($self->{Host});
+	print "Are we there yet? " if $self->{verbose};
+
+	# are we there yet?
+	unless ($to) {
+		print "\n",	# yep, reach fruition
+		  "\t\t+--------------+\n" ,
+		  "\t\t: Hello World! :\n" ,
+		  "\t\t+--------------+\n\n";
+		return 1;			# and die happy.
+	}
+
+	# no, so transfer self to remote host:
+	print "no.\n Dispatching HelloWorld agent... " if $self->{verbose};
+	my $msg = new Agent::Message(
+		Body      => [ "Run me\n", $self->store() ],
+		Transport => TCP,
+		Address   => $to
+	);
+	if ($msg->send) { print "done.\n"; }
+	else            { print "couldn't send agent!\n"; }
+}
+
+1;
+
+
+__END__
+
+=head1 NAME
+
+Agent::HelloWorld - a 'Hello World' sample agent.
+
+=head1 SYNOPSIS
+
+use Agent;
+
+my $agent = new Agent( Name => 'HelloWorld', %args );
+$agent->run;
+
+=head1 DESCRIPTION
+
+The HelloWorld agent is meant to introduce the reader to the basics of Agent
+Perl from both a developer's and a user's point of view.
+
+A HelloWorld agent jumps to a remote I<Static> agent and prints:
+
+		+--------------+
+		: Hello World! :
+		+--------------+
+
+on that agent's terminal.
+
+=head1 PARAMETERS
+
+Host     =>  TCP address of static agent
+verbose  =>  on/off
+
+=head1 SEE ALSO
+
+The sample I<Static> agent, L<Agent>.
+
+=head1 AUTHOR
+
+Steve Purkis E<lt>F<spurkis@engsoc.carleton.ca>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1997, 1998 Steve Purkis.  All rights reserved.  This package
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+v=cut

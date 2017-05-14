@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use RWDE::Doxy::SCF;
+
+foreach my $file (@ARGV) {
+  print "Doxygenating $file \n";
+  my $scf = new RWDE::Doxy::SCF({ file_location => $file });
+  $scf->doxygenate();
+  $scf->save({ save_file_name => $file . 'orig' });
+}

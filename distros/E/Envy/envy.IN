@@ -1,0 +1,324 @@
+#!/nw/dist/prod/bin/perl -w
+use strict;
+use vars qw($VERSION $running_under_some_shell);
+$VERSION = '#VERSION#';
+use Envy::DB;
+use Envy::UI qw(cmd_2re alength);
+
+warn "[WARNING: Envy version mismatch -- Envy::DB $Envy::DB::VERSION ne $VERSION]\n\n"
+    if $Envy::DB::VERSION ne $VERSION;
+
+my $is_unload=0;
+my $is_csh=0;
+my $is_showing=0;
+
+sub sync_env {
+    my ($db) = @_;
+    my $failed = $db->commit;
+    for ($db->warnings) { print }
+    exit 1
+	if $failed;
+    $db->write_log if !$is_showing;
+    my $old = select STDOUT if !$is_showing;
+    for my $z ($db->to_sync()) {
+	my ($k,$v) = @$z;
+	# hope that single-quoting is enough XXX
+	if (defined $v) {
+	    if ($is_csh) {
+		print "setenv $k '$v';\n";
+	    } else {
+		print "$k='$v'; export $k;\n";
+	    }
+	} else {
+	    if ($is_csh) {
+		print "unsetenv $k;\n";
+	    } else {
+		print "unset $k;\n";
+	    }
+	}
+    }
+    select $old if $old;
+}
+
+sub Huh {
+    my ($why) = @_;
+    if ($why) {
+	print "** $why\n";
+    } else {
+	print "\n";
+    }
+    print "** Type 'envy help' for usage information. **\n";
+}
+
+sub Help {
+    my $page = shift;
+    if (!$page) {
+	print "
+  Envy $Envy::DB::VERSION -- Environment Dimension Manager
+
+  Try:
+
+     envy help usage    for command line arguments
+     envy help author   for help writing .env files
+     envy help path     for an explaination of search paths
+     envy help env      for a list of envy specific environment variables
+     envy help license  for licensing information
+
+     envy help custom   for a description of \$HOME/.custom/ files [OPTIONAL]
+
+  Send email to envy\@listbox.com for support.  Thanks!
+
+";
+    } elsif ($page eq 'usage') {
+	print "
+   list [<envy>]                - See descriptions
+   paths [<envy>]               - Location of source files
+   load <envy> [<envy> ...]     - Loads <envy>
+   reload <envy> [<envy> ...]   - Unloads & reloads <envy>
+   show <envy> [<envy> ...]     - Shows changes (shell env is unchanged)
+   un <envy> [<envy> ...]       - Unloads <envy>
+   unload all                   - Unloads all envies
+   <str>                        - Lists/loads envies that match <str>
+                                  AVOID IN SCRIPTS; CMD-LINE ONLY
+
+   These options must be first on the command line:
+   -csh                         - csh mode
+   -quiet                       - Only report errors
+   -v\\d                         - Set verbosity level
+   -strict 1                    - Upgrade warnings to errors.
+   --trace                      - Trace activity
+   --debug                      - Maximum verbosity
+
+";
+    } elsif ($page eq 'custom') {
+	require Envy::Conf;
+	# avoid silly warning
+	my $startup = $Envy::Conf::startup = $Envy::Conf::startup;
+	print '
+   [THIS IS AN OPTIONAL FEATURE.  YOUR SYSTEM MIGHT BE DIFFERENT.]
+
+   The following files can be found in $HOME/.custom/...
+
+     startup     - Your startup envy (default: '.$startup.')
+     win.name    - Your window manager setup
+
+   Bourne Shell:
+     profile     - Sourced once upon login
+     shrc        - Sourced for each new shell instance
+
+   C-Shell:
+     login       - Sourced once upon login
+     cshrc       - Sourced for each new shell instance
+
+';
+
+    } elsif ($page eq 'author') {
+	print "
+   dimension java                    # Declares dimension membership
+   desc Java 1.2 Test                # Description for 'envy list'
+   echo Java admin - call Joe x1212  # Outputs when loading
+   alpha                             # Notify is alpha software
+   beta                              # Notify is beta software
+   depreciated                       # Notify is depreciated
+   error Java is no longer available.  Sorry.
+   require Envy 2.16                 # Uses required features from 2.16
+
+   require objstore                  # Insures objstore is loaded
+   JAVA_HOME=/nw/prod/usr            # Sets environment variable
+   JAVA_HOME:=\$HOME/java             # Overrides environment variable
+   PATH+=\$JAVA_HOME/bin              # Prepend to colin separated list
+   PATH=+\$JAVA_HOME/bin              # Append to colin separated list
+   MYTOP=\$ENVY_BASE                  # Real path to .env file's tree top
+   MYTOP=\$ENVY_LINKBASE              # Path to .env file's tree top
+
+";
+    } elsif ($page eq 'path') {
+	print "
+   Current search path (order is observed):
+     ".join("\n     ", split /:+/, $ENV{ENVY_PATH})."
+
+   All search paths also include the .priv directory (if found).
+
+   Envy also looks in \$HOME/.envy/ for .env files.  You can
+   use this to test new stuff.
+
+";
+    } elsif ($page eq 'env') {
+	print "
+   \$ENVY_PATH      - Colin separated search path.  Envies are typically
+                     installed in \$ETOP/env/envy.  See 'envy help path' too.
+   \$ENVY_STATE     - Keeps track of which modules are loaded & dependencies.
+   \$ENVY_DIMENSION - Keeps track of dimensions.
+   \$ENVY_VERSION   - Envy protocol version.
+   \$ENVY_VERBOSE   - Default verbosity level.
+
+   \$ETOP           - Prefix for login scripts. [OPTIONAL]
+
+";
+    } elsif ($page eq 'copy' or $page eq 'license') {
+	print q[
+   Copyright © 1997-1999 Joshua Nathaniel Pritikin.  All rights reserved.
+
+   This package is free software and is provided "as is" without express
+   or implied warranty.  It may be used, redistributed and/or modified
+   under the terms of the Perl Artistic License (see
+   http://www.perl.com/perl/misc/Artistic.html)
+
+   ('Envy' is not an acronym.  Pronounced: 'n-v')
+
+];
+    } else {
+	print "No help for $page.  Sorry.\n";
+    }
+}
+
+my $db = Envy::DB->new(\%ENV);
+
+while (@ARGV and $ARGV[0] =~ m/^\-/) {
+    my $arg = shift @ARGV;
+    if    ($arg eq '-csh')           { $is_csh=1 }   #rename: --csh
+    elsif ($arg eq '-un')            { $is_unload=1 } #deprecate? XXX
+    elsif ($arg =~ m/^-q(uiet)?$/)   { $db->warnlevel(0) } #rename
+    elsif ($arg eq '--trace')        { $db->warnlevel(3) }
+    elsif ($arg eq '--debug')        { $db->warnlevel(4) }
+    elsif ($arg eq '-v')             { $db->warnlevel($db->warnlevel() + 1) }
+    elsif ($arg =~ m/^-v(\d*)/)      { $db->warnlevel(length $1? $1 : 2); }
+    elsif ($arg =~ m/^(-h|--help)$/) { select STDERR; &Help; exit }
+    elsif ($arg eq '-strict')        { $db->{strictness} = shift @ARGV } #XXX
+    else {
+	warn "option '$arg' ignored\n"
+    }
+}
+
+my $cmd = cmd_2re(shift @ARGV);
+
+select STDERR;    # STDOUT goes the shell eval
+
+if ($cmd eq 'show' and @ARGV >= 1 and $ARGV[0] eq 'paths') {
+    print "[Just use 'paths' instead of 'show paths'.]\n\n";
+    shift @ARGV;
+    $cmd = 'paths';
+}
+
+if ($cmd eq 'paths') {
+    $cmd = cmd_2re(shift @ARGV);
+    my ($mo, $loaded) = $db->all_matching($cmd);
+    for ($db->warnings) { print }
+    my $l = alength(keys %$mo);
+    print "Location of source files".
+	($cmd eq '.*'?'':" matching '$cmd'").":\n\n";
+    for my $m (sort keys %$mo) {
+	my $NumSpaces = 1 + $l - length $m;
+	my $desc = $mo->{$m};
+	print(($$loaded{$m}? " x ":"   ").
+	      $m . ' 'x($NumSpaces-1) . " $desc\n");
+    }
+    Huh();
+    exit;
+}
+elsif ($cmd eq "load" or $cmd eq "reload") {
+    if ($is_unload) {
+	Huh("Unenvy load means what?");
+	exit 1;
+    }
+    if (@ARGV < 1) {
+	&Help;
+	exit 1;
+    }
+    my ($loaded, $dim) = $db->quick_status;
+    while (@ARGV) {
+	my $e = shift @ARGV;
+	$db->envy(1, $e)
+	    if ($cmd eq 'reload' and $loaded->{$e});
+	$db->envy(0, $e);
+    }
+    sync_env($db);
+    
+} elsif ($cmd eq "show") {
+    if (@ARGV < 1) {
+	&Help;
+	exit 1;
+    }
+    $is_showing = 1;
+    for my $mo (@ARGV) { $db->envy(!$is_unload, $mo); }
+    $db->commit;
+    $db->warnings; #flush
+    $db->begin;
+    for my $mo (@ARGV) { $db->envy($is_unload, $mo); }
+    sync_env($db);
+    
+} elsif ($cmd eq "un" or $cmd eq "unload") {
+    if ($is_unload) {
+	Huh("Unenvy unload doesn't mean what?");
+	exit 1;
+    }
+	    
+    if (@ARGV == 0 or $ARGV[0] eq 'all') {
+	$db->unload_all
+    } else {
+	while (@ARGV) { $db->envy(1, shift @ARGV); }
+    }
+    sync_env($db);
+    
+} elsif ($cmd eq "list") {
+    $cmd = cmd_2re(shift @ARGV);
+    my ($mo, $loaded) = $db->all_matching($cmd);
+    for ($db->warnings) { print }
+    my $l = alength(keys %$mo);
+    
+    if ($cmd eq '.*') {
+	print "All available envies:\n\n";
+    } else {
+	print "Envies matching '$cmd':\n\n";
+    }
+    for my $m (sort keys %$mo) {
+	my $NumSpaces = 1 + $l - length $m;
+	my $padding = "\n" . ' 'x($l+4);
+	my $desc = $db->description($m) || '-';
+	$desc =~ s/\n/$padding/g;
+	print(($$loaded{$m}? " x ":"   ").
+	      $m . ' 'x($NumSpaces-1) . " $desc\n");
+    }
+    Huh();
+    exit;
+    
+} elsif ($cmd eq 'diff') {
+    Huh("The 'diff' command is not implemented yet.");
+    exit 1;
+    
+} elsif ($cmd eq "help") {
+    &Help(shift @ARGV);
+    exit 0;
+    
+} else {
+    my ($mo, $loaded) = $db->try_match($cmd);
+    for ($db->warnings) { print }
+    my @mo = @$mo;
+    if (@mo == 0) {
+	print "Envy '$cmd' not found.\n";
+    } elsif (@mo == 1) {
+	$db->envy($is_unload, $mo[0]);
+	sync_env($db);
+    } else {
+	if ($cmd eq '.*') {
+	    print "All available envies:\n\n";
+	} else {
+	    print "Envies matching '$cmd':\n\n";
+	}
+	use integer;
+	my $mid = (1+@mo)/2;
+	for (my $i=0; $i < $mid; $i++) {
+	    my $m = $mo[$i];
+	    print $$loaded{$m}? " x " : "   ";
+	    print $m.' 'x(34-length $m);
+	    if ($mo[$i+$mid]) {
+		my $m = $mo[$i+$mid];
+		print $$loaded{$m}? " x " : "   ";
+		print $m;
+	    }
+	    print "\n";
+	}
+	exit 1;
+    }
+}
+exit;

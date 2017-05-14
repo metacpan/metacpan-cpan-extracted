@@ -1,0 +1,678 @@
+#!/usr/local/bin/perl -w
+
+# POD docs at end of file
+
+use strict;
+use FileHandle;
+use GO::Parser;
+
+if (!@ARGV) {
+    system("perldoc $0");
+    exit;
+}
+if ("@ARGV" eq "-h") {
+    system("perldoc $0");
+    exit;
+}
+
+use Getopt::Long;
+my $opt = {};
+GetOptions($opt,
+           "help",
+           "dbname|d=s",
+           "host|h=s",
+           "out|o=s",
+           "err|e=s",
+           "force",
+	   "ontdir=s",
+           "outmap=s",
+           "shownames",
+           "cache=s",
+           "inmap=s",
+           "gff",
+           "aspect|a=s",
+	   "count|c",
+	   "tab|t",
+	   "bucket|b=s",
+           "evcode|ev=s@",
+	   "verbose|v");
+
+if ($opt->{help}) {
+    system("perldoc $0");
+    exit;
+}
+my $verbose = $opt->{verbose};
+
+# cached results
+my %memo_mapslim = ();
+
+my $slimfile = shift @ARGV;
+my $assocfile;
+$assocfile = pop @ARGV unless $opt->{outmap};
+my @ontfiles = @ARGV;
+
+if ($opt->{ontdir}) {
+    @ontfiles = glob($opt->{ontdir}."/*{obo}");
+    @ontfiles = glob($opt->{ontdir}."/*{ontology}") unless @ontfiles;
+}
+
+# parse GO-slim and get the slim graph
+my $parser = GO::Parser->new({handler=>'obj'});
+printf STDERR "Parsing slimfile: $slimfile\n" if $verbose;
+$parser->parse($slimfile);
+my $gslim = $parser->handler->graph;
+
+# optionally add "slop" terms; eg "OTHER nucleotide binding"
+my $bucketf = $opt->{bucket};
+if ($bucketf) {
+    printf STDERR "Adding bucket terms to: $bucketf\n" if $verbose;
+    $gslim->add_buckets;
+    if (-f $bucketf && !$opt->{force}) {
+        printf STDERR "Overwrite existing $bucketf file?\n(use -force option to skip this prompt)\n";
+        my $yesno = <STDIN>;
+        unless ($yesno =~ /^y/i) {
+            printf STDERR "Will not overwrite $bucketf. Quitting!\n";
+            exit 1;
+        }
+    }
+    my $fh = FileHandle->new(">$bucketf") || 
+      die("can't write to $bucketf");
+    $gslim->to_text_output(-fh=>$fh);
+    $fh->close;
+}
+
+# make a hash of term objects keyed by slim term accession
+my $slimterms = $gslim->get_all_terms;
+my %slimh = map {$_->acc => $_} @$slimterms;
+
+# parse full ontology
+
+# use cache if required (secret option)
+my $cache = $opt->{cache};
+require "Storable.pm" if $cache;
+my $ont;
+if ($cache && -f $cache) {
+    print STDERR "Using cache: $cache\n" if $verbose;
+    #$ont = YAML::LoadFile($cache);
+    $ont = Storable::retrieve($cache);
+}
+else {
+    if ($opt->{dbname}) {
+        # secret db mode
+        require "GO/AppHandle.pm";
+        my $apph = GO::AppHandle->connect(-dbname=>$opt->{dbname},
+                                          -dbhost=>$opt->{host},
+                                         );
+        $ont = $apph->get_graph(-template=>{terms=>{acc=>1}});
+        $apph->disconnect;
+    }
+    else {
+        my $parser2 = GO::Parser->new({handler=>'obj'});
+        foreach my $ontfile (@ontfiles) {
+            printf STDERR "Parsing ontology file: $ontfile\n" if $verbose;
+            $parser2->litemode(1);
+            $parser2->parse($ontfile);
+        }
+        $ont = $parser2->handler->graph;
+    }
+    if ($cache) {
+        print STDERR "Writing to cache: $cache\n" if $verbose;
+        #print YAML::DumpFile($cache, $ont);
+        store($ont, $cache);
+    }
+}
+
+# write output to stdout or a file
+my $ofh;
+if ($opt->{out}) {
+    $ofh = FileHandle->new(">".$opt->{out}) || die($opt->{out});
+}
+else {
+    $ofh = \*STDOUT;
+}
+
+# initialize counts to 0
+my %countleaf = map { ($_ => 0) } keys %slimh;
+my %countall = %countleaf;
+
+# write out slim mappings and exit if in outmap mode
+if ($opt->{outmap}) {
+    printf STDERR "Writing slim mappings\n" if $verbose;
+    my $outmap = FileHandle->new(">$opt->{outmap}") ||
+      die("cannot open $opt->{outmap} for writing");
+    # write slim mapping for all GO terms
+    my $terms = $ont->get_all_terms;
+    foreach my $t (sort {$a->acc cmp $b->acc} @$terms) {
+	my $acc = $t->acc;
+	my ($leaf_pnodes, $all_pnodes) = mapslim($acc);
+        if ($opt->{shownames}) {
+            printf $outmap "%s => %s // %s\n",
+              fmt_acc_names($acc),
+                fmt_acc_names(@$leaf_pnodes),
+                  fmt_acc_names(@$all_pnodes),
+        }
+        else {
+            print $outmap "$acc => @$leaf_pnodes // @$all_pnodes\n";
+        }
+    }
+    $outmap->close;
+    exit 0;
+}
+
+# use pre-made mappings
+if ($opt->{inmap}) {
+    printf STDERR "Using predefined mappings\n" if $verbose;
+    my $inmap = FileHandle->new(">$opt->{inmap}") ||
+      die("cannot open $opt->{inmap}");
+    while (<$inmap>) {
+	chomp;
+	if (/(\S+)\s*=\>\s*(.*)\s+\/\.\s+(.*)/) {
+	    my $acc = $1;
+	    $memo_mapslim{$acc} = 
+	      [[split(' ', $2)], [split(' ', $3)]];
+	}
+	else {
+	    warn("illegal slimmap line: $_");
+	}
+    }
+    $inmap->close;
+    exit 0;
+}
+
+# hash of hashes - maps slim accessions to gene products
+#  key of outer hash is slim accession
+#  key of inner hash is gene product accession
+#  value is boolean
+my %leafh = ();
+my %allh = ();
+
+my %counted = ();
+my $fh;
+if ($assocfile =~ /\.(Z|gz)$/) {
+    printf STDERR "Uncompressing and mapping $assocfile to slim\n" if $verbose;
+    $fh = FileHandle->new("gzip -dc $assocfile|") || 
+      die("cannot open assocfile: $assocfile");
+}
+else {
+    printf STDERR "Mapping $assocfile to slim\n" if $verbose;
+    $fh = FileHandle->new($assocfile) || 
+      die("cannot open assocfile: $assocfile");
+}
+
+my $gff = $opt->{gff};
+while(<$fh>) {
+    next if /^\!/;
+    chomp;
+    next unless $_;
+    my @cols = split('\t', $_);
+    my $is_not = $cols[3];
+    my $acc = $cols[4];
+    if ($gff) {
+        $is_not = 0;
+        my $type = $cols[2];
+        if ($type =~ /^SO:/) {
+            $acc = $type;
+        }
+        else {
+            my $term = $ont->get_term_by_name($type);
+            if (!$term) {
+                warn("ignoring type: $type");
+                next;
+            }
+            $acc = $term->acc;
+        }
+    }
+    if (!$acc) {
+        printf STDERR "WARNING! NO ACCESSION: $_\n" if $verbose;
+        next;
+    }
+    my $prod = $cols[1];
+    if ($gff) {
+        $prod = $cols[8];
+    }
+
+    next if $is_not && $is_not =~ /^not$/i;                  # skip NOT assocs
+    if ($opt->{aspect}) {
+        next unless $cols[8] eq $opt->{aspect};
+    }
+    if ($opt->{count}) {
+	# save time - if we've encoutered this pair before
+	# then skip it
+	next if $counted{$acc.$prod};
+	$counted{$acc.$prod} = 1;
+    }
+
+    # map the annotated GO term up to the slim term(s)
+    my ($leaf_pnodes, $all_pnodes) = mapslim($acc);
+
+    # mark the gene product as belonging to that slim term
+    $leafh{$_}->{$prod} = 1 foreach @$leaf_pnodes;
+    $allh{$_}->{$prod} = 1 foreach @$all_pnodes;
+
+    unless ($opt->{count}) {
+	foreach my $replacement_acc (@$leaf_pnodes) {
+            if ($gff) {
+                $cols[2] = $replacement_acc;
+            }
+            else {
+                $cols[4] = $replacement_acc;
+            }
+	    print $ofh join("\t", @cols), "\n";
+	}
+    }
+}
+close($fh) || die("problem reading $assocfile");
+
+
+if ($opt->{count}) {
+    printf STDERR "Getting gene product counts\n" if $verbose;
+
+    # iterate through the slim graph, depth-first traversal,
+    # printing out slim term accession & name, and the total
+    # distinct gene products attached to that term or its children
+    $gslim->iterate(
+		    sub {
+			my $ni = shift;
+			my $t = $ni->term;
+                        return if $t->is_relationship_type;
+
+			my $acc = $t->acc;
+			my $t2;	# equivalent term in GO-full
+			if ($acc) {
+			    $t2 = $ont->get_term($acc);
+			} else {
+			    # no equivalent term - the slim id has been
+			    # retired and not tracked; this should
+			    # only happen with old slims
+			    $acc = "NO_ACC";
+			}
+			if ($opt->{tab}) {
+			    my $depth = $ni->depth +1;
+			    printf $ofh ' ' x $depth;
+			}
+                        my $count_leaf = scalar(keys %{$leafh{$acc} || {}}) || 0;
+                        my $count_all = scalar(keys %{$allh{$acc} || {}}) || 0;
+                          
+			printf $ofh ("%s %s (%s)\t%d\t%d\t%s\t%s\n",
+				     $acc,
+				     $t->name,
+				     $t2 && $t2->name ? $t2->name : '?',
+				     $count_leaf || 0,
+				     $count_all || 0,
+				     $t2 && $t2->is_obsolete ? 'OBSOLETE' : '',
+				     $t->type || '',
+				    );
+			return;
+		    },
+                    {no_duplicates=>1}
+		   );
+}
+$ofh->close;
+printf STDERR "Done!\n" if $verbose;
+exit 0;
+
+# function: mapslim($acc)
+#
+# argument: accession [in full GO]
+# returns:  slim-direct-acc-list, slim-all-acc-list
+#
+# slim-direct-acc-list is the slim accs that the input acc DIRECTLY maps to
+#  - this corresponds to the most pertinent slim term
+#
+# slim-all-acc-list is the slim accs that the input acc maps to 
+#                    DIRECT & INDIRECT
+# - this corresponds to ALL the slim terms that are ancestors of input term
+# 
+# algorithm for finding most pertinent slim term:
+#
+# IF a GO acc has two ancestors in the slim,
+#   AND the parents are NOT ancestors of one another
+# THEN the acc maps to BOTH parents
+#
+# IF an acc has two ancestors in the slim,
+#   AND the parents ARE ancestors of one another,
+# THEN the MORE SPECIFIC parent acc is returned
+#
+sub mapslim {
+    my $acc = shift;
+
+    # save time - never recompute on the same accession
+    my $memo = $memo_mapslim{$acc};
+    return (@$memo) if $memo;        # return same result
+
+    # trace the paths to root of the input acc in the full GO
+    # (there may be multiple paths to the root)
+    my $paths = $ont->paths_to_top($acc);
+
+    my $term = $ont->get_term($acc);
+    if (!$term) {
+	# no such accession in GO
+        return ([],[]);
+    }
+
+    # keep hash, keyed by slim accession, boolean value -
+    #  will have true if the slim term is an ancestor of $acc
+    my %ancestorh = ();   # ALL ancestors of $acc in slim
+    my %pancestorh = ();  # ancestors of $acc in slim for which there
+                          #  is a path through another ancestor
+
+    foreach my $path (@$paths) {
+        my $terms = $path->term_list;
+        unshift(@$terms, $term); # make path inclusive of base term
+
+	# if there are "slop" terms (eg OTHER nucleotide binding)
+	# AND there is an IMPLICIT path through this slop term,
+	# then add this to the explicit path
+	if ($opt->{bucket}) {
+	    my $got_leaf = 0;
+	    @$terms = 
+	      map {
+		  my $slimt = $slimh{$_};
+		  my @R = ($_);
+		  if ($slimt && !$got_leaf) {
+		      my $crs = $gslim->get_child_relationships($_);
+		      my @brels = grep {$_->type eq "bucket"} @$crs;
+		      if (@brels) {
+			  my $bterm = $gslim->get_term($brels[0]->acc2);
+			  @R = ($bterm, $_);
+		      }
+		  }
+		  if ($slimt) {
+		      $got_leaf = 1;
+		  }
+		  @R;
+	      } @$terms;
+	}
+
+        my $got_leaf = 0;
+	# follow path from $acc up to root, checking to
+	# see if the intermediate term is in the slim
+        foreach my $term (@$terms) {
+            my $pacc = $term->acc;
+
+            if ($slimh{$pacc}) {
+		# intermediate term is in the slim
+                $ancestorh{$pacc} = 1;
+                if ($got_leaf) {
+                    $pancestorh{$pacc} = 1;
+                }
+                $got_leaf = 1;
+            }
+        }
+    }
+    # find unique ancestors, ie ancestors that are not intermediates to
+    # another anestor
+    my @uancestors = grep {!$pancestorh{$_}} keys %ancestorh;
+    $memo = [[@uancestors], [keys %ancestorh]];
+    #printf STDERR "SLIM($acc) = @{$memo->[0]} // @{$memo->[1]}\n";
+    $memo_mapslim{$acc} = $memo;
+    return @$memo;
+}
+
+sub fmt_acc_names {
+    my @accs = @_;
+    return join(' ',
+                map {
+                    my $t = $ont->get_term($_);
+                    if (!$t) {
+                        $t = $gslim->get_term($_);
+                    }
+                    sprintf('%s "%s"',$_,$t ? $t->name : '?');
+                } @accs);
+}
+
+__END__
+
+=head1 NAME
+
+map2slim - maps gene associations to a 'slim' ontology
+
+=head1 SYNOPSIS
+
+  cd go
+  map2slim GO_slims/goslim_generic.obo ontology/gene_ontology.obo gene-associations/gene_association.fb
+
+=head1 DESCRIPTION
+
+Given a GO slim file, and a current ontology (in one or more files),
+this script will map a gene association file (containing annotations
+to the full GO) to the terms in the GO slim.
+
+The script can be used to either create a new gene association file,
+containing the most pertinent GO slim accessions, or in count-mode, in
+which case it will give distinct gene product counts for each slim
+term
+
+The association file format is described here:
+
+L<http://www.geneontology.org/GO.annotation.shtml#file>
+
+
+=head1 ARGUMENTS
+
+=over
+
+=item -b B<bucket slim file>
+
+This argument adds B<bucket terms> to the slim ontology; see the
+documentation below for an explanation. The new slim ontology file,
+including bucket terms will be written to B<bucket slim file>
+
+=item -outmap B<slim mapping file>
+
+This will generate a mapping file for every term in the full ontology
+showing both the most pertinent slim term and all slim terms that are
+ancestors. If you use this option, do NOT supply a gene-associations
+file
+
+=item shownames
+
+(Only works with -outmap)
+
+Show the names of the term in the slim mapping file
+
+=item -c
+
+This will force map2slim to give counts of the assoc file, rather than map it
+
+=item -t
+
+When used in conjunction with B<-c> will tab the output so that the
+indentation reflects the tree hierarchy in the slim file
+
+=item -o B<out file>
+
+This will write the mapped assocs (or counts) to the specified file,
+rather than to the screen
+
+=back
+
+=head1 DOWNLOAD
+
+This script is part of the B<go-perl> package, available from CPAN
+
+L<http://search.cpan.org/~cmungall/go-perl/>
+
+This script will not work without installing go-perl
+
+=head2 MAPPING ALGORITHM 
+
+GO is a DAG, not a tree. This means that there is often more than one
+path from a GO term up to the root Gene_Ontology node; the path may
+intersect multiple terms in the slim ontology - which means that one
+annotation can map to multiple slim terms!
+
+(B<note> you need to view this online to see the image below - if you
+are not viewing this on the http://www.geneontology.org site, you can look at the following URL:
+L<http://geneontology.cvs.sourceforge.net/*checkout*/geneontology/go-dev/go-perl/doc/map2slim.gif> )
+
+=begin html
+
+<img src="http://geneontology.cvs.sourceforge.net/*checkout*/geneontology/go-dev/go-perl/doc/map2slim.gif"/>
+
+=end html
+
+A hypothetical example  blue circles show terms in the GO slim, and yellow circles show terms in the full ontology. The full ontology subsumes the slim, so the blue terms are also in the ontology.
+
+  GO ID	 MAPS TO SLIM ID	ALL SLIM ANCESTORS
+  =====  ===============        ==================
+  5	 2+3	                2,3,1
+  6	 3 only	                3,1
+  7	 4 only	                4,3,1
+  8	 3 only	                3,1
+  9	 4 only	                4,3,1
+  10	 2+3	                2,3,1
+
+
+The 2nd column shows the most pertinent ID(s) in the slim  the direct mapping. The 3rd column shows all ancestors in the slim.
+
+Note  in particular the mapping of ID 9  although this has two paths to the root through the slim via 3 and 4, 3 is discarded because it is subsumed by 4.
+
+On the other hand, 10 maps to both 2 and 3 because these are both the first slim ID in the two valid paths to the root, and neither subsumes the other.
+
+The algorithm used is:
+
+to map any one term in the full ontology:
+find all valid paths through to the root node in the full ontology
+
+for each path, take the first slim term encountered in the path
+
+discard any redundant slim terms in this set  ie slim terms subsumed by other slim terms in the set
+
+=head2 BUCKET TERMS
+
+If you run the script with the -b option, bucket terms will be added. For any term P in the slim, if P has at least one child C, a bucket term P' will be created under P. This is a catch-all term for mapping any term in the full ontology that is a descendant of P, but NOT a descendant of any child of P in the slim ontology.
+
+For example, the slim generic.0208 has the following terms and structure:
+
+    %DNA binding ; GO:0003677
+     %chromatin binding ; GO:0003682 
+     %transcription factor activity ; GO:0003700, GO:0000130
+
+After adding bucket terms, it will look like this:
+
+   %DNA binding ; GO:0003677
+    %chromatin binding ; GO:0003682
+    %transcription factor activity ; GO:0003700 ; synonym:GO:0000130
+    @bucket:Z-OTHER-DNA binding ; slim_temp_id:12
+
+Terms from the full ontology that are other children of DNA binding, such as single-stranded DNA binding and its descendents will map to the bucket term.
+
+The bucket term has a slim ID which is transient and is there only to facilitate the mapping. It should not be used externally.
+
+The bucket term has the prefix Z-OTHER; the Z is a hack to make sure that the term is always listed last in the alphabetic ordering.
+
+The algorithm is slightly modified if bucket terms are used. The bucket term has an implicit relationship to all OTHER siblings not in the slim.
+
+=head3 Do I need bucket terms?
+
+Nowadays most slim files are entirely or nearly 'complete', that is
+there are no gaps. This means the the -b option will not produce
+noticeable different results. For example, you may see a bucket term
+OTHER-binding created, with nothing annotated to it: because all the
+children of binding in the GO are represented in the slim file.
+
+The bucket option is really only necessary for some of the older
+archived slim files, which are static and were generated in a fairly
+ad-hoc way; they tend to accumulate 'gaps' over time (eg GO will add a
+new child of binding, but the static slim file won't be up to date, so
+any gene products annotated to this new term will map to OTHER-binding
+in the slim)
+
+=head2 GRAPH MISMATCHES
+
+Note that the slim ontology file(s) may be out of date with respect to
+the current ontology.
+
+Currently map2slim does not flag graph mismatches between the slim
+graph and the graph in the full ontology file; it takes the full
+ontology as being the real graph. However, the slim ontology will be
+used to format the results if you select B<-t -c> as options.
+
+=head2 OUTPUT
+
+In normal mode, a standard format gene-association file will be
+written. The GO ID column (5) will contain GO slim IDs. The mapping
+corresponds to the 2nd column in the table above. Note that the output
+file may contain more lines that the input file. This is because some
+full GO IDs have more than one pertinent slim ID.
+
+=head3 COUNT MODE
+
+map2slim can be run with the -c option, which will gives the counts of
+distinct gene products mapped to each slim term. The columns are as follows
+
+=over
+
+=item GO Term
+
+The first column is the GO ID followed by the term name (the term name
+is provided as it is found in both the full GO and slim ontologies -
+these will usually be the same but occasionally the slim file will
+lage behind changes in the GO file)
+
+=item Count of gene products for which this is the most relevant slim term
+
+the number of distinct gene products for which this is the most
+pertinent/direct slim ID. By most direct we mean that either the
+association is made directly to this term, OR the association is made
+to a child of this slim term AND there is no child slim term which the
+association maps to.
+
+For most slims, this count will be equivalent to the number of
+associations directly mapped to this slim term. However, some older
+slim files are "spotty" in that they admit "gaps". For example, if the
+slim has all children of "biological process" with the exception of
+"behavior" then all annotations to "behavior" or its children will be
+counted here
+
+see example below
+
+=item Count of gene products inferred to be associated with slim term
+
+and the number of distinct gene products which are annotated
+to any descendant of this slim ID (or annotated directly to the slim
+ID).
+
+=item obsoletion flag
+
+=item GO ontology
+
+=back
+
+To take an example; if we use -t and -c like this:
+
+  map2slim -t -c GO_slims/goslim_generic.obo ontology/gene_ontology.obo gene-associations/gene_association.fb 
+
+Then part of the results may look like this:
+
+ GO:0008150 biological_process (biological_process)     34      10025           biological_process
+  GO:0007610 behavior (behavior)        632     632             biological_process
+  GO:0000004 biological process unknown (biological process unknown)    832     832             biological_process
+  GO:0007154 cell communication (cell communication)    333     1701            biological_process
+   GO:0008037 cell recognition (cell recognition)       19      19              biological_process                                                              
+19 products were mapped to GO:0008037 or one of its children. (GO:0008037 is a leaf node in the slim, so the two counts are identical).
+
+On the other hand, GO:0008150 only gets 34 products for which this is
+the most relevant term. This is because most annotations would map to
+some child of GO:0008150 in the slim, such as GO:0007610
+(behavior). These 34 gene products are either annotated directly to
+GO:0008150, or to some child of this term which is not in the
+slim. This can point to 'gaps' in the slim. Note that running map2slim
+with the -b option will 'plug' these gaps with artificial filler terms.
+
+
+=head1 AUTHOR
+
+Chris Mungall BDGP
+
+=head1 SEE ALSO
+
+http://www.godatabase.org/dev
+
+L<GO::Parser>
+
+L<GO::Model::Graph>
+
+=cut
+

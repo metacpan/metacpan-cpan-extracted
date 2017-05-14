@@ -471,6 +471,17 @@ If you don't want T_OEXT / T_OPTR to insert that for you, set C<prevent_default_
 
 Keep in mind that in this case you must by any means avoid memory leaks, i.e. do the same or similar.
 
+=head3 String typemaps
+
+=over
+
+=item string, std::string, panda::string (mapped to T_STRING)
+
+=item string_view, std::string_view (mapped to T_STRING_VIEW)
+
+=back
+
+
 =head1 HOW TO
 
 =head2 CREATE AN XS CLASS HOLDING C++ CLASS OR C STRUCTURE
@@ -1516,52 +1527,6 @@ for details.
 
 =head1 C++ CLASSES
 
-=head2 panda::RefCounted
-
-A base class for refcounting.
-
-=head4 SYNOPSIS
-
-    #include <panda/refcnt.h>
-    
-    class MyClass : virtual public RefCounted { ... }
-    
-    MyClass* obj = new MyClass(...);
-    obj->retain();
-    obj->release();
-    shared_ptr<MyClass> myobj(obj);
-
-=head4 [protected] RefCounted ()
-
-Initializes object with refcnt = 0. You will need to call retain() if you want to hold this object. Call release() if you don't
-need it anymore.
-
-=head4 void retain () const
-
-Increments refcounter.
-
-=head4 void release () const
-
-Decrements refcounter and deletes the object if refcounter <= 0.
-
-=head4 int32_t refcnt () const
-
-Returns refcount.
-
-=head4 virtual void on_retain () const
-
-If you define this method in your class, it will be called on every C<retain()>, after refcnt is increased
-
-=head4 virtual void on_release () const
-
-If you define this method in your class, it will be called on every C<release()>, after C<refcnt> is decreased, but before object
-is deleted (in case if C<refcnt> reached 0). If C<refcnt> reaches 0 and you C<retain> the object in this callback, object will survive.
-
-=head2 template <class T> panda::shared_ptr<T>
-
-API is the same as for std::shared_ptr.
-
-
 =head2 xs::XSBackref
 
 Mix-class for XS backreferences. See C<HOW TO>. You will also have to enable C<backref> param in typemap.
@@ -1606,14 +1571,27 @@ If C<source_module> does not exist, function does nothing and C<false> is return
 Makes C<module> inherit from C<parent>. Adds C<parent> to the end of C<@module::ISA>. The reason why one may need to call it from XS is the same
 as explained in C<register_package> function: when you don't have perl .pm wrapper around some XS package.
 
-=head4 panda::dynamic_pointer_cast/const_pointer_cast/static_pointer_cast
+=head4 panda::string xs::sv2string (SV* svstr) [pTHX]
 
-The same as std::*_pointer_cast for panda::shared_ptr and std::shared_ptr.
+Creates panda::string from SV string.
 
-=head4 panda::dyn_cast<>()
+Panda::XS installs a typemap for panda::string, so it is okay to receive it in XS function.
 
-Same as C<dynamic_cast>, but has a constant execution time, MUCH faster than C<dynamic_cast>.
-All of the Panda::XS typemaps use it.
+    using panda::string;
+    
+    ...
+    
+    void
+    myfunc (string str)
+    PPCODE:
+        printf("string is %s, len is %d", str.data(), str.length());
+        ...
+
+=head4 std::string_view xs::sv2string_view (SV* svstr) [pTHX]
+
+Creates string_view from SV string.
+
+Panda::XS installs a typemap for string_view, std::string_view so it is okay to receive it in XS function.
 
 =head2 PAYLOAD FUNCTIONS
 
@@ -1816,6 +1794,48 @@ Same as C<XS_AV_ITER> but skips empty slots. _NE stands for 'not empty'.
 
 Same as C<XS_AV_ITER> but skips empty slots and undefined emelents. _NU stands for 'not undef'.
 
+=head4 PXS_TRY({CODE})
+
+Macro that catches c++ exceptions and croaks (throws perl exceptions). Example
+
+    #include <xs/xs.h>
+
+    // somewhere in code
+    PXS_TRY({
+        throw std::logic_error("hello");
+    });
+    
+    // in perl code
+    MyXSModule::function_that_leads_to_the_code_above();
+    
+    // possible output
+    "[std::logic_error] hello" at misc/mytest.plx line 30.
+    
+Output depends on exception type:
+
+=over
+
+=item Everything that inherits from std::exception
+
+[FQN_exception_class_name] exc.what()
+
+=item const char*
+
+string in const char*
+
+=item std::string, panda::string
+
+value.c_str()
+
+=item everything else
+
+unknown c++ exception thrown
+
+=back
+
+=head4 SV* xs::error_sv(const std::exception& err)
+
+Returns perl string '[FQN_exception_class_name] exc.what()'
 
 
 =head1 PERL FUNCTIONS

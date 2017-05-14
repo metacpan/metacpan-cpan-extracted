@@ -45,21 +45,23 @@
 
             <ul>
             <li>Test report summaries (releases) for <a
-            href="/docs/?url=/v1#!/Release/release_all">all of CPAN</a>,
-            <a href="/docs/?url=/v1#!/Release/release_author">by
+            href="/docs/?url=/v3#!/Release/release_all">all of CPAN</a>,
+            <a href="/docs/?url=/v3#!/Release/v3_release_author">by
             author</a>, or <a
-            href="/docs/?url=/v1#!/Release/release_dist">by
+            href="/docs/?url=/v3#!/Release/v3_release_dist">by
             distribution</a>.</li>
             <li>CPAN uploads for <a
-            href="/docs/?url=/v1#!/Upload/upload_all">all of CPAN</a>,
-            <a href="/docs/?url=/v1#!/Upload/upload_author">by
+            href="/docs/?url=/v3#!/Upload/v3_upload_all">all of CPAN</a>,
+            <a href="/docs/?url=/v3#!/Upload/v3_upload_author">by
             author</a>, or <a
-            href="/docs/?url=/v1#!/Upload/upload_dist">by
+            href="/docs/?url=/v3#!/Upload/v3_upload_dist">by
             distribution</a>. Subscribing to these using a WebSocket
             will enable push notifications of new uploads to CPAN (see
             <a
             href="https://github.com/cpan-testers/cpantesters-api/blob/master/eg/feed.pl">an
             example WebSocket subscriber using Mojo::UserAgent</a>).</li>
+            <li><a href="/docs/?url=/v3#!/Report/v3_report_post">Posting new test reports</a></li>
+            <li><a href="/docs/?url=/v3#!/Report/v3_report_get">Getting individual test reports by ID</a></li>
             </ul>
 
             <p>Future data that can be made available by this API include:</p>
@@ -69,7 +71,7 @@
             </ul>
 
             <p>For full documentation on the available APIs, see <a
-            href="/docs/?url=/v1">the API documentation</a>.</p>
+            href="/docs/?url=/v3">the API documentation</a>.</p>
 
             If you'd like to help contribute to the CPAN Testers API,
             visit <a

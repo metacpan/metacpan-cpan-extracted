@@ -55,7 +55,7 @@ sub new {
     # named patterns
     $self->{patterns} = {};
 
-	bless $self, $class;
+	bless $self;
 }
 
 sub _ids {
@@ -701,7 +701,7 @@ Please report any bugs or feature requests at L<https://github.com/racke/Templat
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2010-2014 Stefan Hornburg (Racke).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

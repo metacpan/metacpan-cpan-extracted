@@ -1,0 +1,44 @@
+%module{Mesos};
+#include <ExecutorDriver.hpp>
+#include <ProxyExecutor.hpp>
+#include <XS/MesosUtils.hpp>
+#include <string>
+#include <vector>
+
+
+%name{Mesos::XS::ExecutorDriver} class mesos::perl::ExecutorDriver
+{
+
+%{
+
+static void
+_xs_init(SV* self, mesos::perl::MesosChannel* channel)
+    PPCODE:
+        if (SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV) {
+            // make sure channel ref gets incremented
+            mesos::perl::ProxyExecutor* proxy = new mesos::perl::ProxyExecutor(channel->share());
+            mesos::perl::ExecutorDriver* driver = new mesos::perl::ExecutorDriver(proxy);
+            sv_magic(SvRV(self), Nullsv, PERL_MAGIC_ext,
+                             (const char*) driver, 0);
+        }
+
+%}
+
+// for now, dont call the c++ destructor
+// has a nasty habit of segfaulting(not a perl problem, purely a mesos issue)
+//~ExecutorDriver();
+
+Status start();
+
+Status stop();
+
+Status abort();
+
+Status sendStatusUpdate(mesos::TaskStatus status);
+
+Status sendFrameworkMessage(std::string data);
+
+Status status()
+    %code{% RETVAL = THIS->status_; %};
+
+};

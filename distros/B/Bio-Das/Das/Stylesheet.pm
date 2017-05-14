@@ -3,9 +3,12 @@ package Bio::Das::Stylesheet;
 use strict;
 
 use Carp 'croak';
+use Memoize;
 
 use vars qw($VERSION);
 $VERSION = '1.00';
+
+memoize('_glyph');
 
 
 #
@@ -29,11 +32,12 @@ sub categories {
 # in a scalar context, return name of glyph
 # in array context, return name of glyph followed by attribute/value pairs
 sub glyph {
-  local $^W = 0;
-
   my $self    = shift;
   my $feature = shift;
   my $length  = shift || 0;
+
+  local $^W = 0;
+
   unless ($length =~ /^\d+$/) {
     $length = $length eq 'low' ? $self->lowzoom : $self->highzoom;
   }
@@ -43,39 +47,64 @@ sub glyph {
 
   my ($category,$type);
   if (ref $feature) {
-    $category = lc $feature->category;
-    $type     = lc $feature->type;
+    $category = eval {lc $feature->category};
+    $type     = eval {lc $feature->type};
   } else {
     $type     = $feature;
   }
-  $category ||= 'default';
-  $type     ||= 'default';
 
-  # my $cat    = $self->{categories}{$category} || $self->{categories}{default};
-  # my $zoom   = $cat->{$type}                  || $cat->{default} || {};
-  (my $base = $type) =~ s/:.+$//;
-  my $zoom   =  $self->{categories}{$category}{$type};
-  $zoom     ||= $self->{categories}{$category}{$base};
-  $zoom    ||= $self->{categories}{'default'}{$type};
-  $zoom    ||= $self->{categories}{'default'}{$base};
-  $zoom    ||= $self->{categories}{'default'}{'default'};
+    return $self->_glyph($category,$type,$length);
+}
 
-  my $glyph;
+sub _glyph {
+    my $self = shift;
+    my ($category,$type,$length) = @_;
 
-  # find the best zoom level -- this is a Schwartzian Transform
-  my @zoomlevels = map  {$_->[0]}
+    $category = 'default' unless $self->{categories}{$category};
+    $type     ||= 'default';
+
+    (my $base = $type) =~ s/:.+$//;
+    my $zoom   =  $self->{categories}{$category}{$type};
+    $zoom    ||= $self->{categories}{$category}{$base};
+    $zoom    ||= $self->{categories}{'default'}{$type};
+    $zoom    ||= $self->{categories}{'default'}{$base};
+    $zoom    ||= $self->{categories}{'default'}{'default'};
+
+    my $glyph;
+
+    # find the best zoom level -- this is a Schwartzian Transform
+    my @zoomlevels = map  {$_->[0]}
                    sort {$b->[1]<=>$a->[1]}
                    grep {!$length or $_->[1] <= $length}
                    map  {  $_ eq 'low'  ? [$_ => $self->lowzoom]
 	                 : $_ eq 'high' ? [$_ => $self->highzoom]
 		         : [$_ => $_ || 0] } keys %$zoom;
 
-  my ($base_glyph,@base_attributes)     = _format_glyph($zoom->{$zoomlevels[-1]});
-  my ($zoom_glyph,@zoom_attributes)     = _format_glyph($zoom->{$zoomlevels[0]}) if $length;
-  my %attributes = (@base_attributes,@zoom_attributes);
-  $glyph = $zoom_glyph || $base_glyph;
 
-  return wantarray ? ($glyph,%attributes) : $glyph;
+    my ($base_glyph,@base_attributes)     = _format_glyph($zoom->{$zoomlevels[-1]});
+    my ($zoom_glyph,@zoom_attributes)     = _format_glyph($zoom->{$zoomlevels[0]}) if $length;
+    my %attributes = (@base_attributes,@zoom_attributes);
+    $glyph = $zoom_glyph || $base_glyph;
+
+
+    # MUNGES!!!
+    if ($glyph eq 'anchored_arrow') { # because the default looks ugly
+	$glyph = 'box';
+	push @base_attributes,(-stranded=>1,
+			       -arrowhead=>'filled');
+    }
+    
+    if ($glyph eq 'line') {
+      my $line_type = $attributes{line_style} || $attributes{style};
+      $glyph        = 'hat'         if $line_type eq 'hat';
+      $glyph        = 'dashed_line' if $line_type eq 'dashed';
+    }
+
+
+    # warn "stylesheet for $feature returning $glyph ",join ' ',%attributes;
+    # warn "category=$category, type=$type, glyph=$glyph";
+
+    return wantarray ? ($glyph,%attributes) : $glyph;
 }
 
 # turn configuration into a set of -name=>value pairs suitable for add_track()
@@ -102,6 +131,8 @@ sub add_type {
 							    attr => $attributes,  # a hashref
 						 };
   $self->{categories}{'default'}{lc $type}{lc $zoom} = $self->{categories}{lc $category}{lc $type}{lc $zoom};
+  # this works around the bug of gff types with no category
+  $self->{categories}{''}{lc $type} = $self->{categories}{lc $category}{lc $type};
 }
 
 sub lowzoom {

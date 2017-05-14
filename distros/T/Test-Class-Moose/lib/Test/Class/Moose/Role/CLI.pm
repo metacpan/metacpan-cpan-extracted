@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::CLI;
 
 use 5.10.0;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -170,6 +170,7 @@ sub _load_classes {
     my $self = shift;
 
     if ( $self->_has_class_names ) {
+        local @INC = ( $self->_test_lib_dirs, @INC );
         use_package_optimistically($_) for @{ $self->_class_names };
     }
     else {
@@ -279,7 +280,7 @@ Test::Class::Moose::Role::CLI - Role for command line argument handling and extr
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

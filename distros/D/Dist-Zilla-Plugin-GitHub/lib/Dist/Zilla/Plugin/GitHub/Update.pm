@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Update;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use JSON::MaybeXS;
 use Moose;
@@ -124,9 +124,9 @@ sub after_release {
 
     my $current = $self->_current_params($url);
     if ($current &&
-        $current->{name} eq $params->{name} &&
-        $current->{description} eq $params->{description} &&
-        $current->{homepage} eq $params->{homepage}) {
+        ($current->{name} || '') eq $params->{name} &&
+        ($current->{description} || '') eq $params->{description} &&
+        ($current->{homepage} || '') eq $params->{homepage}) {
 
         $self->log("GitHub repo info is up to date");
         return;
@@ -188,7 +188,7 @@ Dist::Zilla::Plugin::GitHub::Update - Update a GitHub repo's info on release
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 

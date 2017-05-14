@@ -1,0 +1,58 @@
+QUIZZER
+-------
+
+Quizzer e' un motore di generazione di esercizi interattivi che puo' essere usato per porre all'utente domande a cui rispondere oppure veri e propri esercizi da svolgere.
+
+E' basato su una sintassi molto semplice, mutuata dal programma Debconf di Joey Hess, che descrive i template delle domande e degli esercizi da porre all'utente. Inoltre, un formato convenzionale permette all'utente di creare esercizi interattivi in cui l'utente e' chiamato a svolgere delle operazioni, all'interno del sistema Unix, per ottenere un risultato preciso.
+
+Un insieme di esercizi e domande riunite in un unico file viene chiamato convenzionalmente test set. Quizzer, al momento attuale, puo' caricare ed eseguire un solo test set per volta.
+
+Un test set e' composto da un insieme di template. Ogni template descrive una domanda o un esercizio e comporta una risposta o una operazione che l'utente deve svolgere. Quando l'utente da la risposta o esegue l'esercizio, il risultato viene valutato e viene mostrato all'utente. Al termine del test set viene mostrato il punteggio completo.
+
+Un template deve sempre contenere la linea di intestazione:
+
+Template: quiz/domanda(n)
+
+che descrive il numero progressivo della domanda. E' necessario usare proprio questo formato e non altro. Ad esempio:
+
+Template: prova/domanda3
+
+non va bene perche' "prova" non e' "quiz". Oppure:
+
+Template: quiz/question_five
+
+non va bene perche' "question" non e' "domanda" e "_five" non e' "5".
+Sostanzialmente la prima riga del template serve ad indicare il numero progressivo della domanda e che si tratta di un nuovo template.
+
+Un'altra riga che un template deve sempre contenere e' la riga "Type".
+Es:
+
+Type: Select
+
+La riga type descrive il tipo di domanda e di schermata che vogliamo visualizzare all'utente. Esistono questi tipi di template:
+
+Type: String
+	Viene richiesto all'utente di inputare una stringa di testo in un textbox.
+Type: Select
+	Viene chiesto all'utente di scegliere una risposte tra molte scelte.
+Type: Multiselect
+	Viene chiesto all'utente di scegliere piu' risposte tra molte scelte.
+Type: Note
+	Viene visualizzato all'utente un messaggio
+
+La riga description permette di formulare il testo della domanda.
+
+La riga answer contiene la risposta alla domanda. Essa deve essere esattamente uguale, carattere per carattere, alla risposta che l'utente deve dare.
+
+La riga answer2 contiene l'eventuale risposta alternativa, utile soprattutto in caso di domanda che richiede di inputare del testo libero.
+
+Vediamo alcuni esempi di template. Un template per domanda con multiple scelte: 
+
+Template: quiz/domanda4 	<-- e' la quarta domanda del test set...
+Type: multiselect			<-- e' di tipo a scelta multipla
+Level: critical				<-- e' di livello critical (difficile)
+Description: Quali di queste estensioni di file caratterizzano (di solito...) archivi compressi?			<-- la domanda vera e propria
+Choices: .tar.gz, .bak, .Z, .exe, .bz2 <-- le alternative
+Answer: .tar.gz, .Z, .bz2	<-- le risposte corrette nell'ordine esatto
+
+

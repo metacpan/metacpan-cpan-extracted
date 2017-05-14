@@ -23,6 +23,7 @@ lib/Net/ACME/Challenge/Pending/http_01.pm
 lib/Net/ACME/Challenge/Pending/http_01/Handler.pm
 lib/Net/ACME/Constants.pm
 lib/Net/ACME/Crypt.pm
+lib/Net/ACME/Crypt/RSA.pm
 lib/Net/ACME/Error.pm
 lib/Net/ACME/HTTP.pm
 lib/Net/ACME/HTTP/Response.pm
@@ -41,7 +42,6 @@ lib/Net/ACME/X/InvalidParameter.pm
 lib/Net/ACME/X/OverloadBase.pm
 lib/Net/ACME/X/Protocol.pm
 lib/Net/ACME/X/UnexpectedResponse.pm
-lib/Net/ACME/X/UnrecognizedKey.pm
 t/001_load.t
 t/Net-ACME-Authorization-Pending.t
 t/Net-ACME-Authorization.t

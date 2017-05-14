@@ -52,9 +52,9 @@ METHODS
 
     Returns an instance of MarpaX::ESLIF, noted $eslif below.
 
-    $loggerInterface is an optional parameter that, when set, must be an
-    object instance that can do the methods documented in
-    MarpaX::ESLIF::Logger::Interface.
+    $loggerInterface is an optional parameter that, when its exists, must
+    be an object instance that can do the methods documented in
+    MarpaX::ESLIF::Logger::Interface, or undef.
 
     An example of logging implementation can be a Log::Any adapter.
 

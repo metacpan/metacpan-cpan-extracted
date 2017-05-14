@@ -1,0 +1,79 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Phrases
+
+H2: Introduction
+
+A {{phrase}} is a section of text within a paragraph
+enclosed in the symbols E<2{> and E<2}>. Like paragraphs,
+phrases are optionally tagged with a style.
+Some examples are given below.
+
+!block table
+SDF                         Typical_result
+E<2{>Hello worldE<2}>       {{Hello world}}
+E<2{>1:Hello worldE<2}>     {{1:Hello world}}
+E<2{>2:Hello worldE<2}>     {{2:Hello world}}
+E<2{>B:Hello worldE<2}>     {{B:Hello world}}
+E<2{>I:Hello worldE<2}>     {{I:Hello world}}
+E<2{>SECT:TablesE<2}>       {{SECT:Tables}}
+E<2{>FILE:autoexec.batE<2}> {{FILE:autoexec.bat}}
+!endblock
+
+
+H2: Commonly used styles
+
+Some commonly used phrase styles are given below.
+
+!block table; groups
+Tag         Description                     Sample_Output
+Emphasis:
+1           1st level emphasis (default)    {{1:emphasis 1}}
+2           2nd level emphasis              {{2:emphasis 2}}
+3           3rd level emphasis              {{3:emphasis 3}}
+ST          strong emphasis                 {{ST:strong emphasis}}
+Formatting:
+N           normal                          {{N:some normal text}}
+I           italic                          {{I:some italic text}}
+B           bold                            {{B:some bold text}}
+U           underline                       {{U:some underline text}}
+EX          example                         {{EX:some example text}}
+Types:
+EMAIL       email address                   {{EMAIL:ianc@mincom.com}}
+FILE        Filename                        {{FILE:myfile.sdf}}
+SECT        Section                         {{SECT:Paragraphs}}
+URL         Uniform Resource Locator        {{URL:http://www.mincom.com}}
+Classes:
+DOC         document title                  {{DOC:SDF User Guide}}
+REF         reference (document code)       {{REF:MTR-SDF-0002}}
+ORG         organisation                    {{ORG:Mincom}}
+PRD         product                         {{PRD:MIMS}}
+!endblock
+
+Note: When emphasising text, it is generally better to
+use an emphasis style rather than a formatting style as the best way of
+doing so depends on the output format.
+
+
+H2: Type vs class styles
+
+A {{type}} (e.g. EMAIL) simply marks a phrase as a logical entity.
+Rules may be defined for processing (e.g. generating hypertext) for
+these types.
+
+A {{class}} (e.g. DOC) is a special kind of type where the entity
+must be a member of a predefined set. Rules can also be defined
+for processing classes, although hypertext jumps are often defined
+for each entity in the tables which define the known entities.
+Refer to {{SECT:Object Management}}, later.

@@ -1,0 +1,7 @@
+1995:Actor:Nicholas Cage
+1995:Picture:Braveheart
+1995:Supporting Actor:Kevin Spacey
+1994:Actor:Tom Hanks
+1994:Picture:Forrest Gump
+1928:Picture:WINGS
+

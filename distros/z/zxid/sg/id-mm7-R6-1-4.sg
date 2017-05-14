@@ -1,0 +1,371 @@
+# zxid/sg/id-mm7-R6-1-4.sg
+# Author: Sampo Kellomaki (sampo@symlabs.com)
+# $Id: id-mm7-R6-1-4.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+#ta rget(csm, urn:liberty:id-sis-csm:2006-02)
+target(mm7, http://www.3gpp.org/ftp/Specs/archive/23_series/23.140/schema/REL-6-MM7-1-4)
+import(e, http://schemas.xmlsoap.org/soap/envelope/, http://schemas.xmlsoap.org/soap/envelope/)
+ns(di12, urn:liberty:disco:2003-08)
+#import(b, urn:liberty:sb:2005-11,http://projectliberty.org/)
+
+SubmitReq        -> %mm7:submitReqType
+SubmitRsp        -> %mm7:submitRspType
+DeliverReq       -> %mm7:deliverReqType
+DeliverRsp       -> %mm7:deliverRspType
+CancelReq        -> %mm7:cancelReqType
+CancelRsp        -> %mm7:genericResponseType
+ReplaceReq       -> %mm7:replaceReqType
+ReplaceRsp       -> %mm7:genericResponseType
+extendedCancelReq        -> %mm7:extendedcancelReqType
+extendedCancelRsp        -> %mm7:extendedcancelRspType
+extendedReplaceReq       -> %mm7:extendedreplaceReqType
+extendedReplaceRsp       -> %mm7:extendedreplaceRspType
+DeliveryReportReq        -> %mm7:deliveryReportReqType
+DeliveryReportRsp        -> %mm7:genericResponseType
+ReadReplyReq     -> %mm7:readReplyReqType
+ReadReplyRsp     -> %mm7:genericResponseType
+RSErrorRsp       -> %mm7:genericResponseType
+VASPErrorRsp     -> %mm7:genericResponseType
+QueryStatusReq   -> %mm7:queryStatusReqType
+QueryStatusRsp   -> %mm7:queryStatusRspType
+
+%submitReqType:  base(mm7:genericVASPRequestType)
+  mm7:Recipients           -> %mm7:recipientsType
+  mm7:PreferredChannels?:
+    mm7:DeliverUsing+      -> %mm7:Channels
+    ;
+  mm7:ServiceCode?         -> %mm7:serviceCodeType
+  mm7:LinkedID?            -> %mm7:messageIDType
+  mm7:MessageClass?        -> %mm7:messageClassType
+  mm7:TimeStamp?           -> %xs:dateTime
+  mm7:ReplyCharging?:
+    @replyChargingSize?        -> %xs:positiveInteger
+    @replyDeadline?    -> %mm7:relativeOrAbsoluteDateType
+    ;
+  mm7:EarliestDeliveryTime?        -> %mm7:relativeOrAbsoluteDateType
+  mm7:ExpiryDate?  -> %mm7:relativeOrAbsoluteDateType
+  mm7:DeliveryReport?      -> %xs:boolean
+  mm7:ReadReply?   -> %xs:boolean
+  mm7:Priority?    -> %mm7:priorityType
+  mm7:Subject?     -> %xs:string
+  mm7:ChargedParty?        -> %mm7:chargedPartyType
+  mm7:ChargedPartyID?      -> %mm7:chargedPartyIDType
+  mm7:ThirdPartyPayer?     -> %mm7:addressType
+  mm7:DistributionIndicator?       -> %xs:boolean
+  mm7:DeliveryCondition?   -> %mm7:deliveryConditionType
+  mm7:ApplicID?    -> %xs:string
+  mm7:ReplyApplicID?       -> %xs:string
+  mm7:AuxApplicInfo?       -> %xs:string
+  mm7:ContentClass?        -> %mm7:contentClassType
+  mm7:DRMContent?          -> %xs:boolean
+  mm7:Content*             -> %mm7:contentReferenceType
+  mm7:AdditionalInformation*       -> %mm7:additionalInformationType
+  mm7:MessageExtraData?            -> %mm7:messageExtraDataType
+  ;
+%submitRspType:  base(mm7:genericResponseType)
+  mm7:MessageID    -> %mm7:messageIDType
+  ;
+
+%deliverReqType:         base(mm7:genericRSReqType)
+  mm7:VASPID?      -> %mm7:entityIDType
+  mm7:VASID?       -> %mm7:entityIDType
+  mm7:LinkedID?    -> %mm7:messageIDType
+  mm7:Sender       -> %mm7:addressType
+  mm7:Recipients?  -> %mm7:recipientsType
+  mm7:Previouslysentby?    -> %mm7:previouslySentByType
+  mm7:Previouslysentdateandtime?   -> %mm7:previouslySentByDateTime
+  mm7:SenderSPI?   -> %mm7:serviceProviderIDType
+  mm7:RecipientSPI?        -> %mm7:serviceProviderIDType
+  mm7:TimeStamp?   -> %xs:dateTime
+  mm7:ReplyChargingID?     -> %mm7:messageIDType
+  mm7:Priority?    -> %mm7:priorityType
+  mm7:Subject?     -> %xs:string
+  mm7:ApplicID?    -> %xs:string
+  mm7:ReplyApplicID?       -> %xs:string
+  mm7:AuxApplicInfo?       -> %xs:string
+  mm7:UACapabilities?      -> %mm7:capabilitiesType
+  mm7:Content*             -> %mm7:contentReferenceType
+  mm7:AdditionalInformation*       -> %mm7:additionalInformationType
+  mm7:MessageExtraData?            -> %mm7:messageExtraDataType
+  ;
+%deliverRspType:         base(mm7:genericResponseType)
+  mm7:ServiceCode?         -> %mm7:serviceCodeType
+  ;
+
+%cancelReqType:  base(mm7:genericVASPRequestType)
+  mm7:MessageID      -> %mm7:messageIDType
+  mm7:Recipients?    -> %mm7:recipientsType
+  mm7:ApplicID?      -> %xs:string
+  mm7:ReplyApplicID? -> %xs:string
+  mm7:AuxApplicInfo? -> %xs:string
+  ;
+%extendedcancelReqType:  base(mm7:genericVASPRequestType)
+  mm7:CancelID       -> %mm7:messageIDType
+  ;
+%extendedcancelRspType:
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:Status         -> %mm7:extendedcancelresponseStatusType
+  ;
+
+%replaceReqType:       base(mm7:genericVASPRequestType)
+  mm7:MessageID            -> %mm7:messageIDType
+  mm7:ServiceCode?         -> %mm7:serviceCodeType
+  mm7:TimeStamp?           -> %xs:dateTime
+  mm7:ReadReply?           -> %xs:boolean
+  mm7:EarliestDeliveryTime?        -> %mm7:relativeOrAbsoluteDateType
+  mm7:DistributionIndicator?       -> %xs:boolean
+  mm7:ContentClass?        -> %mm7:contentClassType
+  mm7:DRMContent?          -> %xs:boolean
+  mm7:ApplicID?            -> %xs:string
+  mm7:ReplyApplicID?       -> %xs:string
+  mm7:AuxApplicInfo?       -> %xs:string
+  mm7:Content*             -> %mm7:contentReferenceType
+  mm7:AdditionalInformation*       -> %mm7:additionalInformationType
+  mm7:MessageExtraData?            -> %mm7:messageExtraDataType
+  ;
+%extendedreplaceReqType:
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:VASPID?        -> %mm7:entityIDType
+  mm7:VASID?         -> %mm7:entityIDType
+  mm7:ServiceCode?   -> %mm7:serviceCodeType
+  mm7:ReplaceID?     -> %mm7:messageIDType
+  mm7:TimeStamp?     -> %xs:dateTime
+  mm7:EarliestDeliveryTime?  -> %mm7:relativeOrAbsoluteDateType
+  mm7:ExpiryDate?    -> %mm7:relativeOrAbsoluteDateType
+  mm7:ReadReply?     -> %xs:boolean
+  mm7:DeliveryReport?        -> %xs:boolean
+  mm7:Content*       -> %mm7:contentReferenceType
+  mm7:AdditionalInformation*       -> %mm7:additionalInformationType
+  mm7:MessageExtraData?            -> %mm7:messageExtraDataType
+  ;
+%extendedreplaceRspType:
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:MessageID      -> %mm7:messageIDType
+  mm7:Status         -> %mm7:extendedcancelresponseStatusType
+  ;
+
+%deliveryReportReqType:  base(mm7:genericRSReqType)
+  mm7:MessageID    -> %mm7:messageIDType
+  mm7:Recipient    -> %mm7:addressType
+  mm7:Sender       -> %mm7:addressType
+  mm7:Date         -> %xs:dateTime
+  mm7:MMStatus     -> %mm7:mmDeliveryStatusType
+  mm7:MMStatusExtension?   -> %mm7:MMStatusExtensionType
+  mm7:StatusText?  -> %xs:string
+  mm7:ApplicID?    -> %xs:string
+  mm7:ReplyApplicID?       -> %xs:string
+  mm7:AuxApplicInfo?       -> %xs:string
+  mm7:UACapabilities?      -> %mm7:capabilitiesType
+  ;
+
+%readReplyReqType:       base(mm7:genericRSReqType)
+  mm7:MessageID    -> %mm7:messageIDType
+  mm7:Recipient    -> %mm7:addressType
+  mm7:Sender       -> %mm7:addressType
+  mm7:TimeStamp    -> %xs:dateTime
+  mm7:MMStatus     -> %mm7:mmReadStatusType
+  mm7:StatusText?  -> %xs:string
+  mm7:ApplicID?    -> %xs:string
+  mm7:ReplyApplicID?       -> %xs:string
+  mm7:AuxApplicInfo?       -> %xs:string
+  ;
+
+%queryStatusReqType:
+  mm7:TransactionID
+  mm7:MessageType    -> %mm7:messageTypeType
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:VASPID?        -> %mm7:entityIDType
+  mm7:VASID?         -> %mm7:entityIDType
+  mm7:MessageID      -> %mm7:messageIDType
+  ;
+%queryStatusRspType:
+  mm7:TransactionID
+  mm7:MessageType    -> %mm7:messageTypeType
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:StatusCode:    base(mm7:statusCodeType) ;
+  mm7:StatusText     -> %mm7:statusTextType
+  mm7:Details?       -> %mm7:anyDataType
+  ;
+
+%genericRSReqType:
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:MMSRelayServerID?      -> %mm7:entityIDType
+  mm7:Extension*
+  ;
+
+%genericVASPRequestType:
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:SenderIdentification   -> %mm7:senderIDType
+  mm7:Extension*
+  ;
+
+%genericResponseType:
+  mm7:MM7Version     -> %mm7:versionType
+  mm7:Status         -> %mm7:responseStatusType
+  mm7:Extension*
+  ;
+
+%senderIDType:
+  mm7:VASPID?        -> %mm7:entityIDType
+  mm7:VASID?         -> %mm7:entityIDType
+  mm7:SenderAddress? -> %mm7:addressType
+  ;
+
+%responseStatusType: # all 
+  mm7:StatusCode:    base(mm7:statusCodeType) ;
+  mm7:StatusText     -> %mm7:statusTextType
+  mm7:Details?       -> %mm7:anyDataType
+  ;
+
+%extendedcancelresponseStatusType: # all 
+  mm7:StatusCode:    base(mm7:statusCodeType) ;
+  ;
+
+%messageTypeType:        base(xs:string) ;
+
+%mmDeliveryStatusType:   enum( Expired Retrieved Rejected Indeterminate
+                               Forwarded Unrecognised Deferred
+                               DeliveryConditionNotMet
+                               Processing Cancelled Replaced Delivered ) ;
+
+%mmReadStatusType:       enum( Indeterminate Read Deleted ) ;
+
+%messageIDType:          base(xs:string) ;
+
+%Channels: enum ( SMS MMS WAPPUSH ) ;
+
+%RFC2822AddressType:     base(xs:string)
+    @displayOnly?        -> %xs:boolean  default (false)
+    &@mm7:addressSecurity
+    ;
+%NumberType:     base(xs:string)
+    @displayOnly?        -> %xs:boolean  default (false)
+    &@mm7:addressSecurity
+    ;
+%ShortCodeType:  base(xs:string)
+    @displayOnly?        -> %xs:boolean  default (false)
+    &@mm7:addressSecurity
+    ;
+
+RFC2822Address -> %mm7:RFC2822AddressType
+Number -> %mm7:NumberType
+ShortCode -> %mm7:ShortCodeType
+
+&AddressGroup:
+ mm7:RFC2822Address?
+ mm7:Number?
+ mm7:ShortCode?
+ mm7:Extension?
+ any?
+ ;
+
+Extension:
+ mm7:IdentityAddressingToken?
+ mm7:MessageExtraData?
+ any?
+ ;
+
+IdentityAddressingToken:
+ #di12:ResourceIDGroup
+ mm7:CredentialRef -> %xs:IDREF
+ ;
+
+%multiAddressType: &mm7:AddressGroup+  ;
+%addressType:      &mm7:AddressGroup ;
+
+To  -> %mm7:multiAddressType
+Cc  -> %mm7:multiAddressType
+Bcc -> %mm7:multiAddressType
+%recipientsType:
+  mm7:To?
+  mm7:Cc?
+  mm7:Bcc?
+  ;
+
+&@addressSecurity: 
+  @addressCoding?        -> %mm7:addressCodingType
+  @id?                   -> %xs:ID
+  ;
+%addressCodingType:      enum( encrypted obfuscated ) ;
+
+%previouslySentByType:
+  mm7:UserAgent*     -> %mm7:userAgentInfoType
+  ;
+
+%previouslySentByDateTime:
+  mm7:DateTime*      -> %mm7:userAgentDateTimeType
+  ;
+
+%userAgentInfoType:      base(mm7:addressType)
+  @sequence?     -> %xs:positiveInteger
+  ;
+
+# *** investigate
+%userAgentDateTimeType:  base(mm7:relativeOrAbsoluteDateType)
+  @sequence?     -> %xs:positiveInteger
+  ;
+
+%serviceProviderIDType:  base(xs:string) ;
+%chargedPartyIDType:     base(xs:string) ;
+%MMStatusExtensionType:  enum( RejectionByMMSRecipient RejectionByOtherRS ) ;
+%serviceCodeType:        base(xs:string)
+  @any
+  ;
+%entityIDType:   base(xs:string) ;
+
+%messageClassType:            enum( Personal Informational Advertisement Auto ) ;
+%priorityType:                enum( Normal High Low ) ;
+%relativeOrAbsoluteDateType:  base(xs:string);  #union(xs:dateTime xs:duration) ;
+
+%deliveryConditionType:
+  mm7:DC*    -> %xs:positiveInteger
+  ;
+
+%chargedPartyType:       enum( Sender Recipient Both Neither ThirdParty Other ) ;
+%contentQualityType:     enum( TEXT MULTIMEDIA_LOW MULTIMEDIA_HIGH ) ;
+%contentClassType:       enum( text image-basic image-rich video-basic video-rich
+                               megapixel content-basic content-rich ) ;
+%versionType:            enum( 6.8.0 6.6.0 6.5.0 6.4.0 6.3.0 5.10.0 5.8.0 5.6.0 5.5.0 5.3.0 ) ;
+%statusCodeType:         base(xs:positiveInteger) ;
+%statusTextType:         base(xs:string) ;
+
+%contentReferenceType:
+  @type                  -> %mm7:contentQualityType
+  @href                  -> %xs:anyURI
+  @allowAdaptations?     -> %xs:boolean  default (true)
+  ;
+
+%capabilitiesType:
+  @UAProf?       -> %xs:string
+  @TimeStamp?    -> %mm7:relativeOrAbsoluteDateType
+  ;
+
+%messageExtraDataType:
+  mm7:element+ -> %mm7:elementType
+  ;
+
+%elementType:
+  mm7:key   -> %xs:string
+  mm7:value -> %xs:string
+  ;
+
+%additionalInformationType:
+  @href -> %xs:anyURI
+  ;
+
+%anyDataType:    base(xs:anyType)
+  any*  processContents(lax)
+  ;
+
+# Schema for new SOAP header required by MT ID-WSF 1.1 Profile
+
+#ResourceID -> %mm7:ResourceIDType
+#ResourceIDType: base(xs:string) ;
+
+TransactionID:   base(xs:string)
+  @e:mustUnderstand?
+  @e:encodingStyle?
+  @e:actor?
+  ;
+
+#EOF

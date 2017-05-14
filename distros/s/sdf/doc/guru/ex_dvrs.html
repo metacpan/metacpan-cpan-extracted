@@ -1,0 +1,53 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: Creating a New Format Driver</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_look.html">Previous Topic</A> | <A HREF="in_api.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.8. Creating a New Format Driver</H1>
+<HR>
+<H2><A NAME="Overview">1.8.1. Overview</A></H2>
+<P>The steps are:</P>
+<OL>
+<LI>Pick an existing driver to copy.
+<LI>Copy it.
+<LI>Make the necessary changes.
+<LI>Update the <TT>sdf.ini</TT> file in the bin directory.</OL>
+<P>Simple, really! :-)</P>
+<P>Good drivers to start from are <TT>totxt.pl</TT>, <TT>tohtml.pl</TT> and <TT>tomif.pl</TT>. The drivers can be found in the <EM>perllib/sdf</EM> directory of the SDF distribution.</P>
+<HR>
+<H2><A NAME="Required Skills">1.8.2. Required Skills</A></H2>
+<P>The following skills are required to write a format driver:</P>
+<OL>
+<LI>Good knowledge of the target format.
+<LI>Perl programming.</OL>
+<P>It also helps if one has a look at <A HREF="in_api.html">SDFAPI</A> before beginning.</P>
+<HR>
+<H2><A NAME="Driver Architecture Overview">1.8.3. Driver Architecture Overview</A></H2>
+<P>An SDF driver interacts with the core SDF system as follows:</P>
+<OL>
+<LI>The <TT>sdf.ini</TT> file configures SDF so that the relevant driver is loaded and called, when necessary.
+<LI>Each driver is implemented by a single subroutine which is responsible for initialising itself, processing the input, finalising things and returning the output.
+<LI>The input should be processed by:<OL>
+<LI>calling the <EM>SdfNextPara</EM> routine within a while loop
+<LI>for each paragraph, calling the <EM>SdfNextSection</EM> routine within a while loop.</OL></OL>
+<HR>
+<H2><A NAME="Some General Comments">1.8.4. Some General Comments</A></H2>
+<P>If you are considering writing a driver, it might be a good idea to let people on the SDF mailing lists know. If you're lucky, someone else might have started a driver for the same output format or be willing to assist you develop a new one. Likewise, if you're having problems, send email to <A HREF="mailto:sdf-bugs@mincom.com">sdf-bugs@mincom.com</A>. Chances are, an SDF guru will try to help.</P>
+<P>As a rule, it is a good idea to use configuration files to define the mappings from SDF entities to target entities. In this way, people can override the default mappings without changing your driver.</P>
+<P>Depending on your skills, the amount of changes you need to make, and your knowledge of SDF, the driver can take anything from 10 minutes to 10 weeks. Good luck. :-)</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_look.html">Previous Topic</A> | <A HREF="in_api.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

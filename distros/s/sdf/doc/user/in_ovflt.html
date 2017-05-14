@@ -1,0 +1,137 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Filters</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovvar.html">Previous Topic</A> | <A HREF="in_ovatt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>2.6. Filters</H1>
+<HR>
+<H2><A NAME="Introduction">2.6.1. Introduction</A></H2>
+<P>A <EM>filter</EM> controls how a block of text is interpreted. The text is usually delimited by <A HREF="../ref/mblock.html">block</A> and <A HREF="../ref/mendbloc.html">endblock</A> macros.</P>
+<P>For example, tables are usually defined via the <A HREF="../ref/ftable.html">table</A> filter:</P>
+<PRE>
+!block table
+Option  Description
+-h      display help
+-o      specify the output extension
+!endblock
+</PRE>
+<P>The result is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+-h
+</TD>
+<TD>
+display help
+</TD>
+</TR>
+<TR>
+<TD>
+-o
+</TD>
+<TD>
+specify the output extension
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Commonly used filters">2.6.2. Commonly used filters</A></H2>
+<P>Some of the commonly used filters are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Filter</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftable.html">table</A>
+</TD>
+<TD>
+the lines are a table in SDF's <A HREF="../ref/fmt_tbl.html">TBL</A> format
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fexample.html">example</A>
+</TD>
+<TD>
+the lines are example paragraphs
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftitle.html">title</A>
+</TD>
+<TD>
+used to build a title block for memos, faxes, etc.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftopics.html">topics</A>
+</TD>
+<TD>
+include files as sub-topics
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fappendi.html">appendix</A>
+</TD>
+<TD>
+replace H1 styles with A1, etc.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fplain.html">plain</A>
+</TD>
+<TD>
+replace H1 styles with P1, etc.
+</TD>
+</TR>
+</TABLE>
+
+<P>A complete list of the supported filters and their parameters is given in the <A HREF="../ref/re_sdf.html">SDF Reference</A> manual.</P>
+<HR>
+<H2><A NAME="Other macros supporting filters">2.6.3. Other macros supporting filters</A></H2>
+<P>Other macros also support filters. These include:</P>
+<UL>
+<LI><A HREF="../ref/minclude.html">include</A> - include text from another file
+<LI><A HREF="../ref/mexecute.html">execute</A> - include the output of a system command.</UL>
+<P>For example, the following line includes another <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> file and formats it as an appendix:</P>
+<PRE>
+   !include &quot;tips.sdf&quot;; appendix
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <A HREF="../ref/fappendi.html">appendix</A> and <A HREF="../ref/fplain.html">plain</A> filters enable authors to construct topics without needing to worry about how those topics will be used, e.g. a topic may be a chapter in one document and an appendix in another!
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovvar.html">Previous Topic</A> | <A HREF="in_ovatt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

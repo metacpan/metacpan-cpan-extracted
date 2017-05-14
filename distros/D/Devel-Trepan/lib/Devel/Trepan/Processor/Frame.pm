@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2012-2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2012-2015 Rocky Bernstein <rocky@cpan.org>
 use strict; use warnings; use utf8;
 use rlib '../../..';
 use Devel::Trepan::DB::LineCache; # for map_file
@@ -26,6 +26,7 @@ sub adjust_frame($$$)
                 basename    => $self->{settings}{basename},
                 current_pos => $frame_num,
                 maxwidth    => $self->{settings}{maxwidth},
+                displayop   => $self->{settings}{displayop},
             };
             $self->print_stack_trace_from_to($frame_num, $frame_num, $self->{frames}, $opts);
             $self->print_location ;
@@ -60,7 +61,7 @@ sub frame_setup($$)
 	# $stack_size contains the stack ignoring frames
 	# of this debugger.
         my $stack_size = $DB::stack_depth;
-        my @frames = $self->{dbgr}->backtrace(0);
+        my @frames = $self->{dbgr}->tbacktrace(0);
         @frames = splice(@frames, 2) if $self->{dbgr}{caught_signal};
 
         if ($self->{event} eq 'post-mortem') {
@@ -104,18 +105,7 @@ sub frame_setup($$)
 		$self->{gave_stack_trunc_warning} = 1;
 	    }
 	    $stack_size = $computed_stack_depth;
-	    if ($self->{event} eq 'call') {
-		no warnings 'once';  # for DB:: names below
-		$frames[0] =
-		     {
-			 file      => $DB::filename,
-			 fn        => $DB::subroutine,
-			 line      => $DB::lineno,
-			 pkg       => $DB::package,
-			 # FIXME: more later...
-		     };
-
-	    }
+	    $stack_size++ if $self->{event} eq 'call';
         }
         $self->{frames} = \@frames;
         $self->{stack_size}    = $stack_size;
@@ -166,7 +156,7 @@ sub get_frame($$$)
 
     my $frames = $self->{frames};
     unless ($frames->[$frame_num]) {
-        my @new_frames = $self->{dbgr}->backtrace(0);
+        my @new_frames = $self->{dbgr}->tbacktrace(0);
         $self->{frames}[$frame_num] = $new_frames[$frame_num];
     }
     $self->{frame} = $frames->[$frame_num];

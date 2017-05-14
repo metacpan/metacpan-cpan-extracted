@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use blib; # work on uninstalled package
+use Words2Nums;
+import Lingua::EN::Words2Nums;
+
+$Lingua::EN::Words2Nums::debug=1;
+if (@ARGV) {
+	print "$ARGV[0] => ".words2nums(shift)."\n";
+}
+else {
+	while (<>) {
+		print "$_ => ".words2nums($_)."\n";
+	}
+}

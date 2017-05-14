@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 # The list of tests has to be explicitly generated on Win98.
 my @tests;
-for my $dir (qw(t t/pod_simple)) {
+for my $dir (qw(t)) {
     opendir TESTS, $dir or die $!;
     push @tests, map { "$dir/$_" } grep { /\.t$/ } readdir TESTS;
     closedir TESTS;

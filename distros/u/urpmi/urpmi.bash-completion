@@ -95,12 +95,12 @@ _urpmi()
 	    --excludepath --excludedocs --searchmedia --ignoresize \
 	    --ignorearch --strict-arch --wget-options --curl-options \
 	    --prozilla-options --rsync-options --resume --retry --skip \
-	    --prefer --nolock --more-choices"
+	    --prefer --nolock --more-choices --downgrade --deploops --debug-librpm"
 	# add dangereous option for everything else as rurpmi
 	if [[ ${COMP_WORDS[0]} != *rurpmi ]]; then
 	    options="$options --root --use-distrib --env --auto-orphans \
 		--replacepkgs --justdb --allow-nodeps --allow-force \
-		--no-suggests --force --noscripts --auto-update --keep \
+		--no-recommends --force --noscripts --auto-update --keep \
 		--nokeep --replacefiles --verify-rpm"
 	    for (( i=1; i < COMP_CWORD; i++ )); do
 		case ${COMP_WORDS[i]} in
@@ -166,10 +166,10 @@ _urpmq()
 	COMPREPLY=( $( compgen -W "$common_options -d -u -m -a -c -y -s -i -g \
 	    -p -r -f -l --update --media --excludemedia --sortmedia \
 	    --synthesis --auto-select --auto-orphans --not-available \
-	    --no-suggests --fuzzy \
+	    --no-recommends --fuzzy \
 	    --keep --nokeep --list --list-url --list-media --list-nodes \
 	    --list-aliases --src --sources --provides --requires --obsoletes \
-	    --suggests --summary --sourcerpm --force --parallel --wget --curl \
+	    --recommends --summary --sourcerpm --force --parallel --wget --curl \
 	    --prozilla --changelog --conflicts --proxy --proxy-user --env \
 	    --dump-config --whatprovides --whatrequires \
 	    --whatrequires-recursive --skip --prefer --use-distrib \
@@ -229,10 +229,10 @@ _urpmf()
     if [[ "$cur" == -* ]]; then
 	# return list of available options
 	COMPREPLY=( $( compgen -W "$common_options -i -f -e -a -o -m --update \
-	    --media --excludemedia --sortmedia --synthesis --use-distrib \
+	    --media --excludemedia --literal --sortmedia --synthesis --use-distrib \
 	    --uniq --name --group --license --size --epoch --summary \
 	    --description --sourcerpm --packager--buildhost --url --provides \
-	    --requires --suggests --files --conflicts --obsoletes --env" \
+	    --recommends --requires --files --conflicts --obsoletes --env" \
 	    -- $cur ) )
     else
 	# return available files

@@ -32,21 +32,18 @@ sub new {
 
     my $json;
     if ( $parameters{id} ) {
-        $json = $api->call(
-            method => 'project',
-            id     => $parameters{id}
-        );
+        warn('The API does not support project IDs any more');
+        return 0;
     } elsif ( $parameters{name} ) {
         $json = $api->call(
-            method   => 'project',
-            name => $parameters{name}
+            uri => '/p/' . $parameters{name}
         );
     } else {
         warn('You must provide an id or name. Bad monkey.');
         return 0;
     }
 
-    $self->{data} = $json->{Project};
+    $self->{data} = $json;
     return $self;
 }
 
@@ -131,15 +128,17 @@ sub files {
     # Passing a full uri feels evil, but it's necessary because the file
     # api cares about argument order.
     my $files = $self->{api}->call(
-        uri    => '/file/index/project-id/' . $self->id() . '/crtime/desc/rss',
+        uri  => '/projects/' . $self->{name} . '/rss',
         format => 'rss',
     );
+    print Dumper( $files );
 
     my @files;
     foreach my $f ( @{ $files->{entries} } ) {
         push @files, $f->{entry};
     }
     $self->{data}->{files} = \@files;
+
     return @files;
 }
 
@@ -154,6 +153,8 @@ a DateTime object.
 sub latest_release {
     my $self = shift;
     my @files = $self->files();
+    print Dumper(@files);
+
     return $files[0]->{pubDate}; # TODO This is an object, and
                                  # presumably I should be calling
                                  # object methods.
@@ -255,15 +256,6 @@ WARNING WARNING WARNING
 
 =cut
 
-sub summary {
-    my $self = shift;
-    my $psp_content = $self->_psp_content();
-
-    my $summary = $1 if $psp_content =~ m!id="summary">(.*?)</p>!s;
-    $summary =~ s/^\s+//; $summary =~ s/\s+$//;
-    return $summary;
-}
-
 # Project Summary Page URL
 sub psp {
     my $self = shift;
@@ -307,6 +299,10 @@ sub activity {
     }
     $self->{data}->{activity} = \@activity;
     return @activity;
+}
+
+sub id {
+    return shift->{data}->{_id};
 }
 
 =head2 Data access AUTOLOADER

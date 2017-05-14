@@ -1,0 +1,20 @@
+# This file tests the endmacro macro
+
+# Test an unexpected endmacro (should generate an error)
+!endmacro
+
+Some text.
+
+# Test a macro will no matching endmacro (should generate an error)
+!macro xyz
+
+Some text inside macro xyz.
+
+!macro abc
+This is some text with
+several lines in
+it.
+
+And a few
+more.
+!endmacro

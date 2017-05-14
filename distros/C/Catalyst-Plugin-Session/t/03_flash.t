@@ -4,28 +4,32 @@ use strict;
 use warnings;
 
 use Test::More tests => 12;
-use Test::MockObject::Extends;
 use Test::Exception;
 use Test::Deep;
 
 my $m;
 BEGIN { use_ok( $m = "Catalyst::Plugin::Session" ) }
 
-my $c = Test::MockObject::Extends->new($m);
+my $c_meta = Class::MOP::Class->create_anon_class(
+    superclasses => [ $m, 'Moose::Object', ],
+);
+my $c = $c_meta->name->new;
 
 my $flash = {};
-$c->mock(
+$c_meta->add_method(
     get_session_data => sub {
         my ( $c, $key ) = @_;
         return $key =~ /expire/ ? time() + 1000 : $flash;
     },
 );
-$c->mock("debug" => sub { 0 });
-$c->mock("store_session_data" => sub { $flash = $_[2] });
-$c->mock("delete_session_data" => sub { $flash = {} });
-$c->set_always( _sessionid => "deadbeef" );
-$c->set_always( config     => { session => { expires => 1000 } } );
-$c->set_always( stash      => {} );
+$c->meta->add_method("debug" => sub { 0 });
+$c->meta->add_method("store_session_data" => sub { $flash = $_[2] });
+$c->meta->add_method("delete_session_data" => sub { $flash = {} });
+$c->meta->add_method( _sessionid => sub { "deadbeef" });
+my $config = { expires => 1000 };
+$c->meta->add_method( config     => sub { { session => $config } });
+my $stash = {};
+$c->meta->add_method( stash      => sub { $stash } );
 
 is_deeply( $c->session, {}, "nothing in session" );
 
@@ -67,7 +71,7 @@ cmp_deeply( $c->session, { __updated => re('^\d+$'), }, "session has empty __fla
 
 $c->flash->{bar} = "gorch";
 
-$c->config->{session}{flash_to_stash} = 1;
+$config->{flash_to_stash} = 1;
 
 $c->finalize_body;
 $c->prepare_action;

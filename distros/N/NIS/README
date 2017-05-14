@@ -1,0 +1,59 @@
+This is a snapshot release of the NIS interface to Perl 5.  There are two
+parts to the interface: the raw component (Net::NIS), and the
+object-oriented component (Net::NIS::Table).
+
+The NIS interface only implements the NIS API, so there is no write
+access to the NIS databases.
+
+The object-oriented interface is used to simplify access to the NIS
+databases.  It is used like this: 
+
+  require Net::NIS::Table;
+  $hostname="test";
+ 
+  $hosts=Net::NIS::Table->new("hosts.byname");	# automatically uses
+						# the default domainname
+
+  $data=$hosts->list;				# retrieve the host data
+
+  print "$hostname's IP address is $data->{$hostname}\n";
+
+I have included the start to the documentation in NIS.pod and
+NISTable.pod.
+
+INSTALLATION:
+------------
+
+To compile the NIS package:
+
+1. Unpack the distribution file.  It will create its own directory.
+2. cd NIS-a2
+3. perl Makefile.PL
+4. make
+5. t/tabletest
+
+when you are happy with the extension, you can type:
+
+6. make install
+
+to install it on your system
+
+BUGS:
+----
+
+This is alpha code.  This means:
+
+a) the interfaces may change
+b) it may not even work for you
+
+Please report any bugs in the code or documentation to
+rik.harris@fulcrum.com.au.  There is a mailing list
+perl-nis@lists.fulcrum.com.au, which I encourage anyone using the alpha
+or beta versions of the NIS or NIS+ interfaces to subscribe to.  You
+can subscribe by sending the message 'subscribe perl-nis' in the body
+of a message to majordomo@lists.fulcrum.com.au.  The list is intended
+to be a discussion/announcement list for all things to do with the NIS
+and NIS+ perl extensions.
+
+have fun,
+rik.	(1995-11-10)

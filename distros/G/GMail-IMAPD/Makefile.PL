@@ -5,10 +5,7 @@ WriteMakefile(
     'NAME'         => 'GMail::IMAPD',
     'VERSION_FROM' => 'lib/GMail/IMAPD.pm',
     'PREREQ_PM'    => {
-                HTTP::Cookies => undef,
-                LWP::UserAgent=> undef,
-                HTTP::Request => undef,
-                Crypt::SSLeay => undef,
+                Mail::Webmail::Gmail => 1.09,
     },
     'MAN3PODS'     => { 
           'lib/GMail/IMAPD.pm'=> '$(INST_MAN3DIR)/GMail::IMAPD.3' 

@@ -1,0 +1,1 @@
+Do "perl Makefile.PL; make; make install". You can also use "make test" to run a test.

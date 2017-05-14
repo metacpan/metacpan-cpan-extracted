@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl implementation of Django templating language.",
+   "abstract" : "unknown",
    "author" : [
       "Alexandr Evstigneev <hurricup@evstigneev.com>"
    ],
@@ -60,6 +60,6 @@
          "web" : "https://github.com/hurricup/DTL-Fast"
       }
    },
-   "version" : "1.623",
+   "version" : "2017.1",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

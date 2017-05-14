@@ -4,6 +4,9 @@ use strict;
 use GSM::SMS::NBS;
 use Getopt::Long;
 use Pod::Usage;
+use Log::Agent;
+
+logconfig( -level => 99 );
 
 my $msisdn;
 my $text;

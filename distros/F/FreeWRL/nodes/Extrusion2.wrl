@@ -1,0 +1,77 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Bernhard Reiter
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+		Shape {
+        		appearance Appearance {
+                		material Material {
+                        		diffuseColor 0.8 1 0.6
+                		}
+        		}
+        		geometry Extrusion {
+                		crossSection [ 1 1, 1 -1, -1 -1,-1 1, 0 1.5]
+                		solid FALSE
+                		spine [0 0 0, 0 1 0, 0 2 0.5]
+        		}
+		}
+
+Transform { 
+	translation 4 0 0 
+	children [
+		Shape {
+        		appearance Appearance {
+                		material Material {
+                        		diffuseColor 0.6 0.8 1
+                		}
+        		}
+        		geometry Extrusion {
+				endCap FALSE
+                		crossSection [ 1 1, 1 -1, -1 -1,-1 1, 0 1]
+                		solid FALSE
+                		spine [0 0 0, 0 1 0, 0 2 0.5]
+        		}
+		}
+	]
+}
+
+Transform { 
+	translation -4 0 0 
+	children [
+		Shape {
+        		appearance Appearance {
+                		material Material {
+                        		diffuseColor 1 0.8 0.6
+                		}
+        		}
+        		geometry Extrusion {
+				beginCap FALSE
+                		crossSection [ 1 1, 1 0, 1 -1, -1 -1,-1 1, 0 1]
+                		solid FALSE
+                		spine [0 0 0, 0 1 0, 0 2 0.5]
+        		}
+		}
+	]
+}
+
+Transform { 
+	translation 0 0 -4 
+	children [
+		Shape {
+        		appearance Appearance {
+                		material Material {
+                        		diffuseColor  1 0.6 0.8
+                		}
+        		}
+        		geometry Extrusion {
+				beginCap FALSE
+				endCap FALSE
+                		crossSection [ 1 1, 1 -1, -1 -1,-1 1, 0 1]
+                		solid FALSE
+                		spine [0 0 0, 0 1 0, 0 2 0.5]
+        		}
+		}
+	]
+}

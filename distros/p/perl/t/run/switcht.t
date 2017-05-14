@@ -1,12 +1,12 @@
 #!./perl -t
 
 BEGIN {
-    chdir 't';
+    chdir 't' if -d 't';
     @INC = '../lib';
     require './test.pl';
 }
 
-plan tests => 11;
+plan tests => 13;
 
 my $Perl = which_perl();
 
@@ -44,3 +44,23 @@ like( $warning, qr/^Insecure dependency in unlink $Tmsg/,
 ok( !-e $file,  'unlink worked' );
 
 ok( !$^W,   "-t doesn't enable regular warnings" );
+
+
+mkdir('ttdir');
+open(FH,'>','ttdir/ttest.pl')or DIE $!;
+print FH 'return 42';
+close FH or DIE $!;
+
+SKIP: {
+    ($^O eq 'MSWin32') || skip('skip tainted do test with \ separator');
+    my $test = 0;
+    $test =  do '.\ttdir/ttest.pl';
+    is($test, 42, 'Could "do" .\ttdir/ttest.pl');
+}
+{
+    my $test = 0;
+    $test =  do './ttdir/ttest.pl';
+    is($test, 42, 'Could "do" ./ttdir/ttest.pl');
+}
+unlink ('./ttdir/ttest.pl');
+rmdir ('ttdir');

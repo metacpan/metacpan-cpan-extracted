@@ -4,7 +4,7 @@ Term::ReadLine::Tiny - Tiny implementation of ReadLine
 
 # VERSION
 
-version 1.07
+version 1.08
 
 # SYNOPSIS
 
@@ -122,7 +122,7 @@ This features are present:
 - _gethistory_ is present, always `TRUE`.
 - _sethistory_ is present, always `TRUE`.
 - _changehistory_ is present, default `TRUE`. See `changehistory` method.
-- _utf8_ is present. `TRUE` if input file handle has `:utf8` layer.
+- _utf8_ is present, default `TRUE`. See `utf8` method.
 
 # Additional Methods and Functions
 
@@ -160,19 +160,26 @@ reads a key from input and echoes if _echo_ argument is `TRUE`.
 
 Returns `undef` on `EOF`.
 
+## utf8(\[$enable\])
+
+If `$enable` is `TRUE`, all read methods return that binary encoded UTF-8 string as possible.
+
+Returns the old value.
+
 ## encode\_controlchar($c)
 
-encodes if argument `c` is a control character, otherwise returns argument `c`.
+encodes if argument `$c` is a control character, otherwise returns argument `c`.
 
 # UTF-8
 
-`Term::ReadLine::Tiny` fully supports UTF-8. If no input/output handle specified when calling `new()` or `newTTY()`,
+`Term::ReadLine::Tiny` fully supports UTF-8. If no input/output file handle specified when calling `new()` or `newTTY()`,
 opens console input/output file handles with `:utf8` layer by `LANG` environment variable. You should set `:utf8`
 layer explicitly, if input/output file handles specified with `new()` or `newTTY()`.
 
         $term = Term::ReadLine::Tiny->new("", $in, $out);
         binmode($term->IN, ":utf8");
         binmode($term->OUT, ":utf8");
+        $term->utf8(0); # to get UTF-8 marked string as possible
         while ( defined($_ = $term->readline("Prompt: ")) )
         {
                 print "$_\n";

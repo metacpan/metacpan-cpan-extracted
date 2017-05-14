@@ -61,9 +61,9 @@
       <h3><lang en="Resend confirmation mail?" fr="Renvoyer le mail de confirmation ?"/></h3>
 
       <p class="alert alert-info">
-        <lang en="A password reset request was already issued on " fr="Une demande de réinitialisation de mot de passe a déjà été faite le " />
+        <lang en="A password reset request was already issued on " fr="Une demande de r&eacute;initialisation de mot de passe a d&eacute;j&agrave; &eacute;t&eacute; faite le " />
         <TMPL_VAR NAME="STARTMAILDATE">.
-        <lang en="Do you want the confirmation mail to be resent?" fr="Voulez-vous que le message de confirmation soit renvoyé ?" />
+        <lang en="Do you want the confirmation mail to be resent?" fr="Voulez-vous que le message de confirmation soit renvoy&eacute; ?" />
       </p>
 
 
@@ -113,7 +113,7 @@
         <div class="checkbox">
           <label for="reset">
             <input id="reset" type="checkbox" name="reset" />
-            <lang en="Generate the password automatically" fr="Générer le mot de passe automatiquement" />
+            <lang en="Generate the password automatically" fr="G&eacute;n&eacute;rer le mot de passe automatiquement" />
           </label>
         </div>
 
@@ -132,10 +132,10 @@
     <form action="#" method="post" class="login" role="form">
     <div class="form">
       <h3>
-        <lang en="A message has been sent to your mail address." fr="Un message a été envoyé à votre adresse mail." />
+        <lang en="A message has been sent to your mail address." fr="Un message a &eacute;t&eacute; envoy&eacute; &agrave; votre adresse mail." />
       </h3>
       <p class="alert alert-info">
-        <lang en="This message contains a link to reset your password, this link is valid until " fr="Ce message contient un lien pour réinitialiser votre mot de passe, ce lien est valide jusqu'au " />
+        <lang en="This message contains a link to reset your password, this link is valid until " fr="Ce message contient un lien pour r&eacute;initialiser votre mot de passe, ce lien est valide jusqu'au " />
         <TMPL_VAR NAME="EXPMAILDATE">.
       </p>
     </div>

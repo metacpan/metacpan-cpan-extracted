@@ -18,7 +18,7 @@ use Plack::Middleware::OAuth::Handler::AccessTokenV2;
 use DateTime;
 use feature qw(switch say);
 
-our $VERSION = '0.10';
+our $VERSION = '0.071';
 
 # routes cache
 #    path => { provider => ... , method => .... }
@@ -170,7 +170,7 @@ Plack::Middleware::OAuth - Plack middleware for OAuth1, OAuth2 and builtin provi
 
 This module is still in B<**BETA**> , B<DO NOT USE THIS FOR PRODUCTION!>
 
-L<Plack::Middleware::OAuth> supports OAuth1 and OAuth2, and provides builtin config for providers like Twitter, GitHub, Google, Facebook.
+L<Plack::Middleware::OAuth> supports OAuth1 and OAuth2, and provides builtin config for providers like Twitter, Github, Google, Facebook.
 The only one thing you need to mount your OAuth service is to setup your C<consumer_key>, C<consumer_secret> (for OAuth1) or C<client_id>, C<client_secret>, C<scope> (for OAuth2).
 
 This middleware also generates authorize url (mount_path/provider_id) and auththorize callback url (mount_path/provider_id/callback). 
@@ -227,7 +227,7 @@ For more details, please check the example psgi in F<eg/> directory.
                         scope            => 'email,read_stream',
                     },
 
-                    'GitHub' => 
+                    'Github' => 
                     {
                         client_id => ...
                         client_secret => ...
@@ -238,12 +238,6 @@ For more details, please check the example psgi in F<eg/> directory.
                         client_id     => '',
                         client_secret => '',
                         scope         => 'https://www.google.com/m8/feeds/'
-                    },
-                    
-                    'Live' =>  { 
-                        client_id     => '',
-                        client_secret => '',
-                        scope         => 'wl.basic'
                     },
 
                     'custom_provider' => { 
@@ -267,7 +261,7 @@ the generated URLs will be like:
 
 The provider id (key) will be converted into lower-case.
 
-For example, GitHub's URLs will be like:
+For example, Github's URLs will be like:
 
     /oauth/github
     /oauth/github/callback
@@ -387,14 +381,14 @@ Twitter uses OAuth 1.0a, and the access token callback returns data like this:
 
 =head1 OAuth2 AccessToken Callback Data Structure
 
-GitHub uses OAuth 2.0, and the access token callback returns data like this:
+Github uses OAuth 2.0, and the access token callback returns data like this:
 
     ---
     params:
         code: {{string}}
         access_token: {{string}}
         token_type: bearer
-    provider: GitHub
+    provider: Github
     version: 2
 
 Google returns:
@@ -411,19 +405,14 @@ Google returns:
 
 =head1 Sessions
 
-You can get OAuth1 or OAuth2 access token from L<Plack::Session>,
+You can get OAuth1 or OAuth2 access token from Session,
 
     my $session = Plack::Session->new( $env );
     $session->get( 'oauth.twitter.access_token' );
-    $session->get( 'oauth.twitter.access_token_secret' );  # OAuth version
+    $session->get( 'oauth.twitter.access_token_secret' );
 
-    $session->get( 'oauth.facebook.access_token' );
-    $session->get( 'oauth.facebook.version' );   # OAuth version
-
-Custom provider:
-
-    $session->get( 'oauth.custom_provider.access_token' );
-    $session->get( 'oauth.custom_provider.version' );
+    $session->get( 'oauth2.facebook.access_token' );
+    $session->get( 'oauth2.custom_provider' );
 
 
 =head1 Supported Providers
@@ -444,11 +433,7 @@ Facebook
 
 =item
 
-GitHub
-
-=item
-
-Live
+Github
 
 =back
 
@@ -472,7 +457,7 @@ L<http://tools.ietf.org/html/draft-ietf-oauth-v2>
 
 =item *
 
-GitHub - Create A New Client
+Github - Create A New Client
 L<https://github.com/account/applications>
 
 =item *
@@ -525,20 +510,6 @@ L<http://code.google.com/apis/accounts/docs/OAuth2.html>
 Google OAuth Scope:
 L<http://code.google.com/apis/gdata/faq.html#AuthScopes>
 
-=item *
-
-Live OAuth
-L<http://msdn.microsoft.com/en-us/library/hh243647.aspx>
-
-=item *
-
-Live OAuth Scope:
-L<http://msdn.microsoft.com/en-us/library/hh243646.aspx>
-
 =back
-
-=head2 Contributors
-
-RsrchBoy
 
 =cut

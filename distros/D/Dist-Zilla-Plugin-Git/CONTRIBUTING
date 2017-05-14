@@ -88,7 +88,7 @@ https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Git
 or via email: bug-Dist-Zilla-Plugin-Git@rt.cpan.org
 
 There is also a mailing list available for users of this distribution, at
-http://www.listbox.com/subscribe/?list_id=139292
+http://dzil.org/#mailing-list
 There is also an irc channel available for users of this distribution, at
 irc://irc.perl.org/#distzilla
 
@@ -99,5 +99,5 @@ wish to be listed under a different name or address, you should submit a pull
 request to the .mailmap file to contain the correct mapping.
 
 
-This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.012 from a
-template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.121.
+This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.013 from a
+template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.123.

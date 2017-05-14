@@ -1,16 +1,8 @@
-#!/usr/bin/perl -w
-
-# $Id: 220restart.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 18;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
-
-BEGIN {
-  plan tests => 18;
-}
 
 use Net::FTPServer::InMem::Server;
 
@@ -176,3 +168,5 @@ sub download_and_check
 
     return $expected_data eq $actual_data;
   }
+
+__END__

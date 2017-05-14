@@ -1,24 +1,23 @@
 package Padre::Plugin::Catalyst;
-use base 'Padre::Plugin';
+BEGIN {
+  $Padre::Plugin::Catalyst::VERSION = '0.13';
+}
+
+# ABSTRACT: Catalyst helper interface for Padre
 
 use warnings;
 use strict;
 
-use Padre::Util ('_T');
-use Padre::Perl;
+use Padre::Perl ();
 
-our $VERSION = '0.09';
+use base 'Padre::Plugin';
 
 # The plugin name to show in the Plugin Manager and menus
 sub plugin_name {'Catalyst'}
 
 # Declare the Padre interfaces this plugin uses
 sub padre_interfaces {
-	'Padre::Plugin' => 0.43,
-
-		#    'Padre::Document::Perl' => 0.16,
-		#    'Padre::Wx::Main'       => 0.16,
-		#    'Padre::DB'             => 0.16,
+	'Padre::Plugin' => 0.47,;
 }
 
 sub plugin_icon {
@@ -66,7 +65,7 @@ sub menu_plugins {
 	my $menu = Wx::Menu->new;
 	Wx::Event::EVT_MENU(
 		$main,
-		$menu->Append( -1, _T('New Catalyst Application') ),
+		$menu->Append( -1, Wx::gettext('New Catalyst Application') ),
 		sub {
 			require Padre::Plugin::Catalyst::NewApp;
 			Padre::Plugin::Catalyst::NewApp::on_newapp();
@@ -74,10 +73,10 @@ sub menu_plugins {
 		},
 	);
 	my $menu_new = Wx::Menu->new;
-	$menu->Append( -1, _T('Create new...'), $menu_new );
+	$menu->Append( -1, Wx::gettext('Create new...'), $menu_new );
 	Wx::Event::EVT_MENU(
 		$main,
-		$menu_new->Append( -1, _T('Model') ),
+		$menu_new->Append( -1, Wx::gettext('Model') ),
 		sub {
 			require Padre::Plugin::Catalyst::Helper;
 			Padre::Plugin::Catalyst::Helper::on_create_model();
@@ -85,7 +84,7 @@ sub menu_plugins {
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$menu_new->Append( -1, _T('View') ),
+		$menu_new->Append( -1, Wx::gettext('View') ),
 		sub {
 			require Padre::Plugin::Catalyst::Helper;
 			Padre::Plugin::Catalyst::Helper::on_create_view();
@@ -93,7 +92,7 @@ sub menu_plugins {
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$menu_new->Append( -1, _T('Controller') ),
+		$menu_new->Append( -1, Wx::gettext('Controller') ),
 		sub {
 			require Padre::Plugin::Catalyst::Helper;
 			Padre::Plugin::Catalyst::Helper::on_create_controller();
@@ -103,13 +102,13 @@ sub menu_plugins {
 	$menu->AppendSeparator;
 	Wx::Event::EVT_MENU(
 		$main,
-		$menu->Append( -1, _T('Start Web Server') ),
+		$menu->Append( -1, Wx::gettext('Start Web Server') ),
 		sub { $self->on_start_server },
 	);
 
 	# when we start the plugin, the "stop web server" option
 	# is disabled.
-	my $stop_server_item = $menu->Append( -1, _T('Stop Web Server') );
+	my $stop_server_item = $menu->Append( -1, Wx::gettext('Stop Web Server') );
 	Wx::Event::EVT_MENU(
 		$main,
 		$stop_server_item,
@@ -119,13 +118,13 @@ sub menu_plugins {
 
 	$menu->AppendSeparator;
 	my $docs_menu = Wx::Menu->new;
-	$menu->Append( -1, _T('Catalyst Online References'), $docs_menu );
+	$menu->Append( -1, Wx::gettext('Catalyst Online References'), $docs_menu );
 
 	my $tutorial_menu = Wx::Menu->new;
-	$docs_menu->Append( -1, _T('Beginner\'s Tutorial'), $tutorial_menu );
+	$docs_menu->Append( -1, Wx::gettext('Beginner\'s Tutorial'), $tutorial_menu );
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('Overview') ),
+		$tutorial_menu->Append( -1, Wx::gettext('Overview') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial');
 		},
@@ -133,21 +132,21 @@ sub menu_plugins {
 
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('1. Introduction') ),
+		$tutorial_menu->Append( -1, Wx::gettext('1. Introduction') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::01_Intro');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('2. Catalyst Basics') ),
+		$tutorial_menu->Append( -1, Wx::gettext('2. Catalyst Basics') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::02_CatalystBasics');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('3. More Catalyst Basics') ),
+		$tutorial_menu->Append( -1, Wx::gettext('3. More Catalyst Basics') ),
 		sub {
 			Padre::Wx::launch_browser(
 				'http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::03_MoreCatalystBasics');
@@ -155,49 +154,49 @@ sub menu_plugins {
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('4. Basic CRUD') ),
+		$tutorial_menu->Append( -1, Wx::gettext('4. Basic CRUD') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::04_BasicCRUD');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('5. Authentication') ),
+		$tutorial_menu->Append( -1, Wx::gettext('5. Authentication') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::05_Authentication');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('6. Authorization') ),
+		$tutorial_menu->Append( -1, Wx::gettext('6. Authorization') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::06_Authorization');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('7. Debugging') ),
+		$tutorial_menu->Append( -1, Wx::gettext('7. Debugging') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::07_Debugging');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('8. Testing') ),
+		$tutorial_menu->Append( -1, Wx::gettext('8. Testing') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::08_Testing');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('9. Advanced CRUD') ),
+		$tutorial_menu->Append( -1, Wx::gettext('9. Advanced CRUD') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::09_AdvancedCRUD');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$tutorial_menu->Append( -1, _T('10. Appendices') ),
+		$tutorial_menu->Append( -1, Wx::gettext('10. Appendices') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Tutorial::10_Appendices');
 		},
@@ -205,21 +204,21 @@ sub menu_plugins {
 
 	Wx::Event::EVT_MENU(
 		$main,
-		$docs_menu->Append( -1, _T('Catalyst Cookbook') ),
+		$docs_menu->Append( -1, Wx::gettext('Catalyst Cookbook') ),
 		sub {
 			Padre::Wx::launch_browser('http://search.cpan.org/perldoc?Catalyst::Manual::Cookbook');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$docs_menu->Append( -1, _T('Recommended Plugins') ),
+		$docs_menu->Append( -1, Wx::gettext('Recommended Plugins') ),
 		sub {
 			Padre::Wx::launch_browser('http://dev.catalystframework.org/wiki/recommended_plugins');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$docs_menu->Append( -1, _T('Catalyst Community Live Support') ),
+		$docs_menu->Append( -1, Wx::gettext('Catalyst Community Live Support') ),
 		sub {
 			Padre::Wx::launch_irc( 'irc.perl.org' => 'catalyst' );
 		},
@@ -227,7 +226,7 @@ sub menu_plugins {
 
 	Wx::Event::EVT_MENU(
 		$main,
-		$docs_menu->Append( -1, _T('Examples') ),
+		$docs_menu->Append( -1, Wx::gettext('Examples') ),
 		sub {
 			Padre::Wx::launch_browser('http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/');
 		},
@@ -235,14 +234,14 @@ sub menu_plugins {
 
 	Wx::Event::EVT_MENU(
 		$main,
-		$docs_menu->Append( -1, _T('Catalyst Wiki') ),
+		$docs_menu->Append( -1, Wx::gettext('Catalyst Wiki') ),
 		sub {
 			Padre::Wx::launch_browser('http://dev.catalystframework.org/wiki/');
 		},
 	);
 	Wx::Event::EVT_MENU(
 		$main,
-		$docs_menu->Append( -1, _T('Catalyst Website') ),
+		$docs_menu->Append( -1, Wx::gettext('Catalyst Website') ),
 		sub {
 			Padre::Wx::launch_browser('http://www.catalystframework.org/');
 		},
@@ -251,14 +250,14 @@ sub menu_plugins {
 	$menu->AppendSeparator;
 	Wx::Event::EVT_MENU(
 		$main,
-		$menu->Append( -1, _T('Update Application Scripts') ),
+		$menu->Append( -1, Wx::gettext('Update Application Scripts') ),
 		sub { $self->on_update_script },
 	);
 
 	$menu->AppendSeparator;
 	Wx::Event::EVT_MENU(
 		$main,
-		$menu->Append( -1, _T('About') ),
+		$menu->Append( -1, Wx::gettext('About') ),
 		sub { $self->on_show_about },
 	);
 
@@ -293,7 +292,7 @@ sub event_on_context_menu {
 		$menu->AppendSeparator;
 		my $item = $menu->Append(
 			-1,
-			sprintf( _T("Open Template '%s'"), $template ),
+			sprintf( Wx::gettext("Open Template '%s'"), $template ),
 		);
 		Wx::Event::EVT_MENU(
 			$self->main,
@@ -327,10 +326,10 @@ sub _open_template {
 	unless (@files) {
 		Wx::MessageBox(
 			sprintf(
-				_T("Template '%s' not found in '%s'"),
+				Wx::gettext("Template '%s' not found in '%s'"),
 				$template, $template_dir
 			),
-			_T('Error'),
+			Wx::gettext('Error'),
 			Wx::wxOK, $main
 		);
 	}
@@ -376,7 +375,10 @@ sub on_update_script {
 	chdir $project_dir;
 	chdir File::Spec->updir;
 
-	$main->run_command("catalyst.pl -force -scripts $project");
+	require Padre::Constant;
+	require File::Which;
+	my $catalyst = Padre::Constant::WIN32 ? File::Which::which('catalyst') : 'catalyst.pl';
+	$main->run_command("$catalyst -force -scripts $project");
 
 	# restore current dir
 	chdir $pwd;
@@ -404,11 +406,12 @@ sub on_start_server {
 	if ( !-e $server_full_path ) {
 		Wx::MessageBox(
 			sprintf(
-				_T( "Catalyst development web server not found at\n%s\n\nPlease make sure the active document is from your Catalyst project."
+				Wx::gettext(
+					"Catalyst development web server not found at\n%s\n\nPlease make sure the active document is from your Catalyst project."
 				),
 				$server_full_path
 			),
-			_T('Server not found'),
+			Wx::gettext('Server not found'),
 			Wx::wxOK, $main
 		);
 		return;
@@ -438,8 +441,8 @@ sub on_start_server {
 
 	# TODO: actually check whether this is true.
 	my $ret = Wx::MessageBox(
-		_T('Web server appears to be running. Launch web browser now?'),
-		_T('Start Web Browser?'),
+		Wx::gettext('Web server appears to be running. Launch web browser now?'),
+		Wx::gettext('Start Web Browser?'),
 		Wx::wxYES_NO | Wx::wxCENTRE,
 		$main,
 	);
@@ -465,7 +468,8 @@ sub run_command {
 		if ( $Wx::Perl::ProcessStream::VERSION < .20 ) {
 			$self->main->error(
 				sprintf(
-					_T(       'Wx::Perl::ProcessStream is version %s'
+					Wx::gettext(
+						      'Wx::Perl::ProcessStream is version %s'
 							. ' which is known to cause problems. Get at least 0.20 by typing'
 							. "\ncpan Wx::Perl::ProcessStream"
 					),
@@ -519,8 +523,8 @@ sub run_command {
 
 		# Failed to start the command. Clean up.
 		Wx::MessageBox(
-			sprintf( _T("Failed to start server via '%s'"), $command ),
-			_T("Error"), Wx::wxOK, $self
+			sprintf( Wx::gettext("Failed to start server via '%s'"), $command ),
+			Wx::gettext("Error"), Wx::wxOK, $self
 		);
 
 		#		$self->menu->run->enable;
@@ -545,7 +549,7 @@ sub on_stop_server {
 	}
 	delete $self->{server};
 
-	$self->panel->output->AppendText( "\n" . _T('Web server stopped successfully.') . "\n" );
+	$self->panel->output->AppendText( "\n" . Wx::gettext('Web server stopped successfully.') . "\n" );
 
 	# handle menu graying
 	require Padre::Plugin::Catalyst::Util;
@@ -560,10 +564,10 @@ sub on_show_about {
 	require Class::Unload;
 	my $about = Wx::AboutDialogInfo->new;
 	$about->SetName("Padre::Plugin::Catalyst");
-	$about->SetDescription( _T('Catalyst support for Padre') . "\n\n"
-			. _T('This system is running Catalyst version')
+	$about->SetDescription( Wx::gettext('Catalyst support for Padre') . "\n\n"
+			. Wx::gettext('This system is running Catalyst version')
 			. " $Catalyst::VERSION\n" );
-	$about->SetVersion($VERSION);
+	$about->SetVersion($Padre::Plugin::Catalyst::VERSION);
 	Class::Unload->unload('Catalyst');
 
 	Wx::AboutBox($about);
@@ -646,23 +650,25 @@ sub enable {
 	}
 }
 
+1;
 
-42;
-__END__
+
+
+=pod
 
 =head1 NAME
 
 Padre::Plugin::Catalyst - Catalyst helper interface for Padre
+
+=head1 VERSION
+
+version 0.13
 
 =head1 SYNOPSIS
 
 	cpan install Padre::Plugin::Catalyst;
 
 Then use it via L<Padre>, The Perl IDE.
-
-=head1 IDEAS WANTED!
-
-How can this Plugin further improve your Catalyst development experience? Please let us know! We are always looking for new ideas and wishlists on how to improve it even more, so drop us a line via email, RT or by joining us via IRC in #padre, right at irc.perl.org (if you are using Padre, you can do this by choosing 'Help->Live Support->Padre Support').
 
 =head1 DESCRIPTION
 
@@ -714,6 +720,10 @@ This option lets you update your application's scripts, upgrading it to a new ve
 
 Shows a nice about box with this module's name and version, as well as your installed Catalyst version.
 
+=head1 IDEAS WANTED!
+
+How can this Plugin further improve your Catalyst development experience? Please let us know! We are always looking for new ideas and wishlists on how to improve it even more, so drop us a line via email, RT or by joining us via IRC in #padre, right at irc.perl.org (if you are using Padre, you can do this by choosing 'Help->Live Support->Padre Support').
+
 =head1 TRANSLATIONS
 
 This plugin has been translated to the folowing languages (alphabetic order):
@@ -746,23 +756,17 @@ Many thanks to all contributors!
 
 Feel free to help if you find any of the translations need improvement/updating, or if you can add more languages to this list. Thanks!
 
-=head1 AUTHOR
-
-Breno G. de Oliveira, C<< <garu at cpan.org> >>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-padre-plugin-catalyst at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Padre-Plugin-Catalyst>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Padre::Plugin::Catalyst
-
 
 You can also look for information at:
 
@@ -786,16 +790,33 @@ L<http://search.cpan.org/dist/Padre-Plugin-Catalyst/>
 
 =back
 
-
 =head1 SEE ALSO
 
 L<Catalyst>, L<Padre>
 
+=head1 AUTHORS
 
-=head1 COPYRIGHT & LICENSE
+=over 4
 
-Copyright 2008-2009 The Padre development team as listed in Padre.pm.
-all rights reserved.
+=item *
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Breno G. de Oliveira <garu@cpan.org>
+
+=item *
+
+Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Breno G. de Oliveira.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

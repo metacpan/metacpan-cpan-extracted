@@ -1,0 +1,17 @@
+Revision history for PPI::Prettify
+
+0.07    16/08/2014
+        -Moved to GitHub for #cpanday
+
+0.06    18/01/2014
+        -Fixed matching of functions inside brackets { } per ticket #92217.
+
+0.05    18/01/2014
+        -Fixed POD heredoc interpolation bug.
+
+0.04    18/01/2014
+        -Revised _determineToken function to be more accurate. Updated mapping.
+
+0.03    11/01/2014
+        -Initial release
+

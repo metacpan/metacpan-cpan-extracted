@@ -1,0 +1,15 @@
+1.1.309 17th August 2014
+	- re-packed 1.1.308 with bsdtar, because it's compatible with Archive::Tar.
+
+1.1.308 16th August 2014
+	- installs like a standard Perl module
+	- writable overlay enables straightforward use by non-developers
+
+1.1.307 23th July 2014
+	- fixed cosmetic issues
+
+1.1.306 22th July 2014
+	- test of new release workflow
+
+0.0.0	30th October 2012
+	- empty release to reserve the name before writing the documentation

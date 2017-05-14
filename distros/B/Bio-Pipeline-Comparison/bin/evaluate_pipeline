@@ -1,0 +1,104 @@
+#!/usr/bin/env perl
+
+package Bio::Pipeline::Comparison::EvolveGenome;
+# ABSTRACT: Take in a VCFs of known variants and observed variants and output a report
+# PODNAME: evaluate_pipeline
+
+BEGIN { unshift( @INC, '../lib' ) }
+use Moose;
+use Getopt::Long;
+use Bio::Pipeline::Comparison;
+use Bio::Pipeline::Comparison::Report::Overview;
+use Bio::Pipeline::Comparison::Report::InputParameters;
+
+my ($known_variants, $observed_variants, $help );
+
+GetOptions(
+    'k|known_variants=s@'    => \$known_variants,
+    'o|observed_variants=s@' => \$observed_variants,
+    'h|help'                 => \$help,
+);
+
+# check all the input files exist
+my $input_files_exist = 1;
+for my $input_file (@{$known_variants})
+{
+  $input_files_exist = 0 unless( -e $input_file);
+}
+for my $input_file (@{$observed_variants})
+{
+  $input_files_exist = 0 unless( -e $input_file);
+}
+
+( ($input_files_exist == 1) && (@{$observed_variants} > 0) && (@{$known_variants} > 0) && !$help ) or die <<USAGE;
+Usage: evaluate_pipeline [options]
+Take in a VCFs of known variants and observed variants, then output a report.
+
+# Compare 1 pair of files
+evaluate_pipeline -k known.1.vcf.gz -o observed.1.vcf.gz
+
+# Compare 1 to multiple observed files
+evaluate_pipeline -k known.1.vcf.gz -o observed.1.vcf.gz observed.2.vcf.gz observed.3.vcf.gz 
+
+# Compare multiple known to multiple observed. Pairs are compared based on the order.
+evaluate_pipeline -k known.1.vcf.gz known.2.vcf.gz known.3.vcf.gz  -o observed.1.vcf.gz observed.2.vcf.gz observed.3.vcf.gz 
+
+
+# This help message
+evaluate_pipeline -h
+
+USAGE
+
+
+my $input_parameters = Bio::Pipeline::Comparison::Report::InputParameters->new(
+  known_variant_filenames    => $known_variants, 
+  observed_variant_filenames => $observed_variants
+);
+$input_parameters->known_to_observed_mappings();
+
+my $comparison_overview = Bio::Pipeline::Comparison::Report::Overview->new(
+  known_to_observed_mappings => $input_parameters->known_to_observed_mappings()
+);
+
+print "FP\t".$comparison_overview->total_false_positives;
+print "FN\t".$comparison_overview->total_false_negatives;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+evaluate_pipeline - Take in a VCFs of known variants and observed variants and output a report
+
+=head1 VERSION
+
+version 1.123050
+
+=head1 SYNOPSIS
+
+Take in a VCFs of known variants and observed variants and output a report.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Bio::Pipeline::Comparison>
+
+=back
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

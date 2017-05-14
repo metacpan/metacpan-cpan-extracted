@@ -1,0 +1,54 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Hypertext
+
+H2: Attributes
+
+Hypertext can be specified using the {{OATTR:id}} and {{OATTR:jump}}
+phrase attributes.
+The value of {{OATTR:id}} is a text string which can include letters, digits,
+underscores and spaces.
+The value of {{OATTR:jump}} is 
+a World Wide Web (WWW) Uniform Resource Locator (URL).
+
+Commonly used jump formats are summarised below.
+
+!block table
+Format      Description
+{{#}}xyz    jump to {{xyz}} within this document
+abc         jump to document {{abc}}
+abc{{#}}xyz jump to {{xyz}} within document {{abc}}
+!endblock
+
+For example:
+
+!block example; pure
+This is the only software you will ever need.
+See {{CMD[jump="#smartcmd"]smartcmd}} for details.
+
+H2[id="smartcmd"] smartcmd - Do What I Want Utility
+
+{{CMD:smartcmd}} is the best program ever written.
+It detects what you want to do next by ...
+!endblock
+
+If you want to specify a phrase as a hypertext
+target within "normal" paragraph text, use the N (for Normal) phrase style.
+For example:
+
+V:   The {{N[id='_option_o']-o option}} specifies ...
+
+Note: Hypertext jumps are ignored when paper documents are being generated.
+
+!end_topic

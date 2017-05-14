@@ -1,0 +1,59 @@
+# $Id$
+#
+# >>Title::	Listing Style
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{listing}} is an [[SDF]] style for source code listings.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Number lines if requested
+!if OPT_NUMBER
+!on paragraph 'E80|PB';; $_plcnt++;\
+    if ($_plcnt % $var{'OPT_NUMBER'} == 0 && $style ne 'PB') {\
+        $attr{'label'} = "$_plcnt\\t";\
+        $attr{'sp_before'} = 0;\
+    }
+!endif
+
+# Build the borders
+!default OPT_BORDERS 2
+!build_borders
+
+# Define the number of header/footer lines
+!default OPT_HEADINGS 2
+
+# Define the right page header
+!define PAGE_RIGHT_HEADER_INNER1   DOC_PATH
+!define PAGE_RIGHT_HEADER_INNER2   'Listing'
+!define PAGE_RIGHT_HEADER_CENTER1  ''
+!define PAGE_RIGHT_HEADER_CENTER2  ''
+!define PAGE_RIGHT_HEADER_OUTER1   ''
+!define PAGE_RIGHT_HEADER_OUTER2   ''
+
+# Define the right page footer
+!define PAGE_RIGHT_FOOTER_INNER1   FULL:DOC_MODIFIED
+!define PAGE_RIGHT_FOOTER_INNER2   ''
+!define PAGE_RIGHT_FOOTER_CENTER1  ''
+!define PAGE_RIGHT_FOOTER_CENTER2  ''
+!define PAGE_RIGHT_FOOTER_OUTER1   "{{PAGENUM:}} of {{PAGECOUNT:}}"
+!define PAGE_RIGHT_FOOTER_OUTER2   ''
+
+# Build the first page as a copy of the right page
+!first_copy_right_page
+
+# Build the left page as a mirror of the right page
+!left_mirror_right_page

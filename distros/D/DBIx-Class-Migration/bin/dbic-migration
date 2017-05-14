@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 
 (require DBIx::Class::Migration::Script)
   ->run_with_options;
@@ -9,7 +9,7 @@ dbic-migration - commandline tool to create and manage your migrations
 
 =head1 SYNOPSIS
 
-    dic-migration help
+    dbic-migration help
 
 =head1 DESCRIPTION
 

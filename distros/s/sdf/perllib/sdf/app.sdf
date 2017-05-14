@@ -1,0 +1,200 @@
+H3: Overview
+
+This library provides routines for:
+
+* option processing
+* argument processing
+* message handling
+* exiting a script
+
+In principle, scripts using this library have a consistent
+user interface and internal structure, making them easier to
+use and maintain. A typical script looks like:
+
+!block verbatim
+     require "sdf/app.pl";
+
+     # define configuration
+     %app_config = (
+             'inifile',      'abc.ini',
+     );
+
+     # define options
+     push(@app_option, (
+             'str|STR|my string parameter',
+     ));
+
+     # handle options
+     &AppInit('file ...', 'do things to files') || &AppExit();
+
+     # my post init stuff. e.g.
+     # * act on options
+     # * pop leading/trailing argument
+
+     &AppProcess('argProcess');
+
+     # my pre exit stuff. e.g.
+     # * print summary information
+
+     &AppExit();
+!endblock
+
+To summarise the framework:
+* {{S:%app_config}} is an optional set of configuration parameters
+* {{S:@app_option}} is the set of options supported
+* {{S:AppInit}} processes options and checks the argument count
+* {{S:AppProcess}} processes arguments (i.e. for each one,
+  calls a user defined subroutine typically called {{argProcess}})
+* {{argProcess}} outputs messages using {{S:AppMsg}}
+* {{S:AppExit}} exits and returns an error code to the
+  operating system based on the severity of the messages output
+  via {{S:AppMsg}}
+
+H3: Option Definitions
+
+Each option is defined by the fields in the table below.
+
+!block table
+Field    Description
+Option   option name
+Spec     option specification (type, etc.)
+Help     short description of option
+!endblock
+
+The name of the option is used in several ways:
+* as the name of the Perl variable (e.g. $help)
+* as the name of the long option (e.g. --help)
+
+If short format is enabled (e.g. -h), by default, the first
+character of the option name is used as the option code.
+Alternatively, the code to use can be explicitly specified
+using the {{Option}} syntax:
+
+V:      name";"code
+
+This should be done if the default codes are not unique.
+To specify an option without a parameter,
+use the following {{Spec}} syntax:
+
+V:     BOOL
+
+If no {{Spec}} field is specified, this is the default.
+The value of a parameter-less option is 1 if the option
+if supplied on the command-line.
+
+To specify an option with a parameter, use the following
+{{Spec}} syntax:
+
+V:     opt_type"-"validation";"initial_value";"default_value
+
+Only the {{opt_type}} field is mandatory. The second semi-colon
+must be present to nominate the parameter as
+optional. Otherwise, the parameter is assumed to be required.
+The list of supported opt_types is given in the table below.
+
+!block table
+Type  Validation      Description
+STR   value list      text string
+INT   min,max         integer number
+NUM   min,max         real number
+!endblock
+
+{{min}} and {{max}} are optional in the validation of
+numeric options. Typical STR definitions are given below.
+
+V:     STR-(qwe,asd,zxc);qwe;asd       # in-lining of codes
+V:     STR-@ok_array;qwe;asd           # array lookup
+V:     STR-keys %ok_hash;qwe;asd       # hash validate
+V:     STR-values %ok_hash;qwe;asd     # hash validate
+
+An array of STR, INT or NUM can be requested by suffixing
+the type with 'LIST' or 'HASH'. LIST create a normal array
+and HASH create an associative array in Perl. Array options
+can be specified multiple times on the command-line and
+multiple items can be specified at once separated by commas.
+For a LIST, the values supplied are appended to the current
+list. For a HASH, values are treated as follows:
+
+* if the format is 'x=y', the result is: $optname{'x'} = 'y'
+* otherwise, the result is: $optname{'x'} = 1
+
+In some cases, it is useful to give an array option an
+initial value but permit the user to 'reset' the array back to
+empty. This can be done by defining the option as having an
+empty optional parameter. i.e. selecting the default value of
+a parameter-optional LIST or HASH does not append the default
+value - it initialises the array to the default value.
+
+If finer control is required over processing an option, a
+routine can be nominated to process an option. To do this,
+use the following {{Spec}} syntax:
+
+V:     ROUTINE"-"routine_name";"initial_value";"default_value
+
+The parameter type is specified by the number of semi-colons:
+
+* 0 - no parameter
+* 1 - required parameter
+* 2 - optional parameter
+
+The parameter, if any, is passed as a string to the nominated
+routine.
+
+H3: Configuration Parameters
+
+The configuration parameters supported are summarised below.
+
+!block table
+Parameter          Description
+inifile            the name of the initialisation file to use, if any
+version            the script version
+product            the product to which this script belongs, if any
+parts              display name & version of components (and exit)
+time               display execution time (when exiting)
+calltree           display the sequence of function calls causing the exit
+!endblock
+
+There are several ways to set configuration parameters:
+
+^ by initialising {{S:%app_config}} before calling {{S:AppInit}}
++ by defining parameters in the '[Configuration]' section of an
+  initialisation file
++ by setting parameters on the command line (using the . option)
++ for backwards compatibility, certain parameters can be set other ways:
+- {{version}} can be set via $VERSION{'PUBLIC'}
+- {{product}} can be set via {{S:AppInit}}
+
+H3: Configuration Data
+
+Configuration data can be stored in {{ini}} files and loaded during
+the initialisation stage (i.e. while {{S:AppInit}} is running).
+To do this, specify a subroutine as the {{ini_handler}} parameter
+for {{S:AppInit}}. The routine is passed the name of the ini file
+and an associative array containing the sections (after the standard
+ones like 'Configuration' have been removed).
+A warning will be produced for any sections not processed by your
+routine, so delete each section after you have finished processing it.
+A sample processing routine is given below.
+
+!block verbatim
+sub iniProcess {
+    local($fname, *data) = @_;
+#   local();
+    local($section);
+    local(@my_table, %my_values);
+
+    for $section (sort keys %data) {
+        if ($section eq 'MyTable') {
+            @my_table = &TableParse($data{$section});
+            delete $data{$section};
+        }
+        elsif ($section eq 'MyValues') {
+            %my_values = &AppIniValues($data{$section});
+            delete $data{$section};
+        }
+    }
+}
+!endblock
+
+H3: Component Descriptions
+

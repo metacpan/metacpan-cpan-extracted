@@ -1,0 +1,37 @@
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Credits
+
+SDF has taken several years to put together and would not
+exist in its current form without the contributions below.
+
+Firstly, thanks to my former {{Leeds and Northrup Australia}}
+colleagues, particularly Tom Beale, Craig Gibbings and Greg Birnie,
+for inspiring my initial interest in {{literate programming}}.
+
+Secondly, thanks to Tim Hudson ({{EMAIL:tjh@cryptsoft.com}}) for
+being SDF's biggest fan. Tim has assisted in design, fixed bugs, added
+features, "sold" SDF to many of its current user base and generally
+hassled me to package SDF into its current form. Thanks also
+to Chris Moran ({{EMAIL:chris.moran@mincom.com}}) for maintaining
+the {{[jump=SDF_WWW]SDF Home Page}}, assisting in design, etc.
+Many other [[Mincom]] colleagues have assisted with SDF,
+particularly Craig Willis and David Cox.
+Thanks to everyone involved.
+
+SDF is built on [[Perl]], a freely available scripting language
+created by Larry Wall ({{EMAIL:larry@wall.org}}). Without Perl,
+SDF would not exist. Thanks Larry.
+
+Finally, thanks to my wife, Geraldine, for being my best friend
+and inspiring me to develop SDF.

@@ -16,7 +16,7 @@ BEGIN  {
 }
 
 
-our $VERSION     = '0.07';
+our $VERSION     = '0.08';
 our @EXPORT      = qw(  tcpdmatch check);
 
 
@@ -48,11 +48,11 @@ disabled.
 =for hide
 
 The default action is to load
-the yapp parser since it is serval times faster than RecDescent, and it 
+the yapp parser since it is several times faster than RecDescent, and it 
 is a lot easier to make it re-entrant.
 
-Set the environment veriable  TCPDMATCH to "RD" in order to use the RecDescent parser,
-or just ingore this module and load  "use  Authen::Tcpdmatch::TcpdmatchRD"  instead.
+Set the environment variable  TCPDMATCH to "RD" in order to use the RecDescent parser,
+or just ignore this module and load  "use  Authen::Tcpdmatch::TcpdmatchRD"  instead.
 The use interface is the same for all Authen::Tcpdmatch::Tcpdmatch*  modules.
 =end
 

@@ -8,16 +8,12 @@ use Call::Context ();
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Net::ACME::Crypt ();
 use Net::ACME::LetsEncrypt ();
 
-use Crypt::Perl::ECDSA::Generate ();
-use Crypt::Perl::PKCS10 ();
+use Crypt::OpenSSL::RSA    ();
+use Crypt::OpenSSL::PKCS10 ();
 
-#LE doesn’t seem to support this curve.
-#my $ECDSA_CURVE = 'secp521r1';
-
-my $ECDSA_CURVE = 'secp384r1';
+my $KEY_SIZE = 2_048;
 
 sub do_example {
     my ($handle_combination_cr) = @_;
@@ -26,9 +22,11 @@ sub do_example {
     print "Look at:$/$/\t$tos_url$/$/… and hit CTRL-C if you DON’T accept these terms.$/";
     <STDIN>;
 
-    my $reg_key = Crypt::Perl::ECDSA::Generate::by_name($ECDSA_CURVE);
+    #Safe as of 2016
+    my $key_size = 2_048;
 
-    my $reg_key_pem = $reg_key->to_pem_with_curve_name();
+    my $reg_rsa     = Crypt::OpenSSL::RSA->generate_key($KEY_SIZE);
+    my $reg_rsa_pem = $reg_rsa->get_private_key_string();
 
     #Want a real cert? Then comment this out.
     {
@@ -36,7 +34,7 @@ sub do_example {
         *Net::ACME::LetsEncrypt::_HOST = \&Net::ACME::LetsEncrypt::STAGING_SERVER;
     }
 
-    my $acme = Net::ACME::LetsEncrypt->new( key => $reg_key_pem );
+    my $acme = Net::ACME::LetsEncrypt->new( key => $reg_rsa_pem );
 
     my $reg = $acme->register();
 
@@ -55,16 +53,14 @@ sub do_example {
 
     print $/;
 
-    my ( $cert_key_pem, $csr_pem ) = _make_key_and_csr_for_domains(@domains);
-
-    my $jwk = Net::ACME::Crypt::parse_key($reg_key_pem)->get_struct_for_public_jwk();
+    my ( $cert_key_pem, $csr_pem ) = _make_csr_for_domains(@domains);
 
     for my $domain (@domains) {
         my $authz_p = $acme->start_domain_authz($domain);
 
         for my $cmb_ar ( $authz_p->combinations() ) {
 
-            my @challenges = $handle_combination_cr->( $domain, $cmb_ar, $jwk );
+            my @challenges = $handle_combination_cr->( $domain, $cmb_ar, $reg );
 
             next if !@challenges;
 
@@ -77,7 +73,7 @@ sub do_example {
                     last if $poll->status() eq 'valid';
 
                     if ( $poll->status() eq 'invalid' ) {
-                        my @failed = map { $_->error() } $poll->challenges();
+                        my @failed = grep { $_->error() } $poll->challenges();
 
                         print $_->to_string() . $/ for @failed;
 
@@ -91,6 +87,7 @@ sub do_example {
         }
     }
 
+    #Create your own CSR (e.g., using Crypt::OpenSSL::PKCS10).
     my $cert = $acme->get_certificate($csr_pem);
 
     #This shouldn’t actually be necessary for Let’s Encrypt,
@@ -106,32 +103,26 @@ sub do_example {
     return;
 }
 
-sub _make_key_and_csr_for_domains {
+sub _make_csr_for_domains {
     my (@domains) = @_;
-
     Call::Context::must_be_list();
 
-    #ECDSA is used here because it’s quick enough to run in pure Perl.
-    #If you need/want RSA, look at Crypt::OpenSSL::RSA, and/or
-    #install Math::BigInt::GMP (or M::BI::Pari) and use
-    #Crypt::Perl::RSA::Generate. Or just do qx<openssl genrsa>. :)
-    my $key = Crypt::Perl::ECDSA::Generate::by_name($ECDSA_CURVE);
+    my $rsa = Crypt::OpenSSL::RSA->generate_key($KEY_SIZE);
 
-    my $pkcs10 = Crypt::Perl::PKCS10->new(
-        key => $key,
+    my $req = Crypt::OpenSSL::PKCS10->new_from_rsa($rsa);
+    $req->set_subject('/');
 
-        subject => [
-            commonName => $domains[0],
-        ],
+    my @san_parts = map { "DNS.$_:$domains[$_]" } 0 .. $#domains;
 
-        attributes => [
-            [ 'extensionRequest',
-                [ 'subjectAltName', map { ( dNSName => $_ ) } @domains ],
-            ],
-        ],
+    $req->add_ext(
+        Crypt::OpenSSL::PKCS10::NID_subject_alt_name(),
+        join( ',', @san_parts ),
     );
+    $req->add_ext_final();
 
-    return ( $key->to_pem_with_curve_name(), $pkcs10->to_pem() );
+    $req->sign();
+
+    return ( $rsa->get_private_key_string(), $req->get_pem_req() );
 }
 
 1;

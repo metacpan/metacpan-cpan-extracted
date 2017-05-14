@@ -24,6 +24,7 @@ xt/04_pod-coverage.t
 xt/05_dependencies.t
 xt/06_benchmark.t
 xt/07_dummy_benchmark.t
+xt/08_benchmark_ack.t
 xt/perlcriticrc
 META.yml
 MANIFEST

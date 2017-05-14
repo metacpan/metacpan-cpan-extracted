@@ -1,0 +1,40 @@
+bin/smotiftf.pl
+bin/smotiftf_prereq.pl
+# bin/smotiftf_cluster.pl
+bin/smotiftf_config.ini
+Changes
+lib/SmotifTF.pm
+# lib/SmotifTF/ClusterShellScripts.pm
+lib/SmotifTF/CompareSmotifs.pm
+lib/SmotifTF/EnumerateSmotifCombinations.pm
+lib/SmotifTF/GeometricalCalculations.pm
+lib/SmotifTF/GeometricMeasurements.pm
+lib/SmotifTF/GetSMotifsfromPDB.pm
+lib/SmotifTF/HHblits.pm
+#lib/SmotifTF/MYSQLSmotifs.pm
+lib/SmotifTF/PDB/PDBCoordinateSectionParse.pm
+lib/SmotifTF/PDB/PDBfileParser.pm
+lib/SmotifTF/Protein.pm
+lib/SmotifTF/Psiblast.pm
+lib/SmotifTF/Psipred.pm
+lib/SmotifTF/RankEnumeratedStructures.pm
+lib/SmotifTF/RankSmotifs.pm
+lib/SmotifTF/RunModeller.pm
+lib/SmotifTF/StatisticalPotential.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+smotiftf.pl
+smotiftf_prereq.pl
+# smotiftf_cluster.pl
+smotiftf_config.ini
+t/01.Psipred_run.t
+t/02.Psipred.t
+t/pod.t
+t/t
+t/xt
+t/Data/smotiftf_config.ini
+t/Data/4uzx.horiz
+t/Data/4uzx.fasta
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

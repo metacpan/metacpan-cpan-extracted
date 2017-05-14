@@ -1,0 +1,9 @@
+Changes
+lib/CGI/Application/Plugin/Config/IniFiles.pm
+Makefile.PL
+MANIFEST
+README
+t/CGI-Application-Plugin-Config-IniFiles.t
+test.conf
+t/TestConfigIniFiles.pm
+META.yml                                 Module meta-data (added by MakeMaker)

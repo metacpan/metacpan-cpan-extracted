@@ -14,7 +14,7 @@ use Pinto::Util qw(throw);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -36,30 +36,30 @@ has do_pull => (
     default => 0,
 );
 
-has mirror_uri => (
+has mirror_url => (
     is      => 'ro',
     isa     => Str,
-    builder => '_build_mirror_uri',
+    builder => '_build_mirror_url',
     lazy    => 1,
 );
 
 #------------------------------------------------------------------------------
 
-sub _build_mirror_uri {
+sub _build_mirror_url {
     my ($self) = @_;
 
     my $stack      = $self->args->{stack};
     my $stack_dir  = defined $stack ? "/stacks/$stack" : '';
-    my $mirror_uri = $self->root . $stack_dir;
+    my $mirror_url = $self->root . $stack_dir;
 
     if ( defined $self->password ) {
 
-        # Squirt username and password into URI
+        # Squirt username and password into URL
         my $credentials = $self->username . ':' . $self->password;
-        $mirror_uri =~ s{^ (https?://) }{$1$credentials\@}mx;
+        $mirror_url =~ s{^ (https?://) }{$1$credentials\@}mx;
     }
 
-    return $mirror_uri;
+    return $mirror_url;
 }
 
 #------------------------------------------------------------------------------
@@ -112,7 +112,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -120,7 +123,7 @@ Pinto::Remote::Action::Install - Install packages from the repository
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =for Pod::Coverage BUILD
 
@@ -130,7 +133,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,77 +9,70 @@ use 5.010;
 
 use base 'Exporter';
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 @EXPORT      = qw();
 %EXPORT_TAGS = ();
 @EXPORT_OK   = qw(clean_peptide_seq clean_dna_seq clean_rna_seq clean_pep_seq);
 
 sub clean_pep_seq {
-  my ( $seqs, $config ) = @_;
+    my ( $seqs, $config ) = @_;
 
-  $seqs = [$seqs] if ( blessed($seqs) && $seqs->isa('Bio::Gonzales::Seq') );
-  confess "please supply the sequences as an arrayref" unless ( ref $seqs eq 'ARRAY' );
-  confess "config format not readable" if ( $config && ref $config ne 'HASH' );
+    $seqs = [ $seqs ] if(blessed( $seqs) && $seqs->isa('Bio::Gonzales::Seq'));
+    confess "please supply the sequences as an arrayref" unless ( ref $seqs eq 'ARRAY' );
+    confess "config format not readable" if ( $config && ref $config ne 'HASH' );
 
-  for my $s (@$seqs) {
+    for my $s (@$seqs) {
 
-    my $seq = $s->seq;
+        my $seq = $s->seq;
 
-    $seq =~ tr/*//d if ( !exists( $config->{terminal} )     || $config->{terminal} );
-    $seq =~ s/\*$// if ( !exists( $config->{end_terminal} ) || $config->{end_termninal} );
-    $seq =~ s/[^*SFTNKYEVZQMCLAOWXPBHDIRGsftnkyevzqmclaowxpbhdirg]/X/g
-      if ( !exists( $config->{uncommon_aa} ) || $config->{uncommon_aa} );
-    $s->seq($seq);
-    $s->desc('') if ( !exists( $config->{no_desc} ) || $config->{no_desc} );
-  }
-  return $seqs;
+        $seq =~ tr/*//d if ( !exists( $config->{terminal} )     || $config->{terminal} );
+        $seq =~ s/\*$// if ( !exists( $config->{end_terminal} ) || $config->{end_termninal} );
+        $seq =~ s/[^*SFTNKYEVZQMCLAOWXPBHDIRGsftnkyevzqmclaowxpbhdirg]/X/g
+            if ( !exists( $config->{uncommon_aa} ) || $config->{uncommon_aa} );
+        $s->seq($seq);
+        $s->desc('') if ( !exists( $config->{no_desc} ) || $config->{no_desc} );
+    }
+    return $seqs;
 }
 
 sub clean_peptide_seq { return clean_pep_seq(@_); }
 
 sub clean_rna_seq {
-  my ( $seqs, $config ) = @_;
+    my ( $seqs, $config ) = @_;
 
-  $seqs = [$seqs] if ( blessed($seqs) && $seqs->isa('Bio::Gonzales::Seq') );
-  confess "please supply the sequences as an arrayref" unless ( ref $seqs eq 'ARRAY' );
-  confess "config format not readable" if ( $config && ref $config ne 'HASH' );
+    $seqs = [ $seqs ] if(blessed($seqs) && $seqs->isa('Bio::Gonzales::Seq'));
+    confess "please supply the sequences as an arrayref" unless ( ref $seqs eq 'ARRAY' );
+    confess "config format not readable" if ( $config && ref $config ne 'HASH' );
 
-  for my $s (@$seqs) {
+    for my $s (@$seqs) {
 
-    my $seq = $s->seq;
-    $seq =~ y/Tt/Uu/;
-    if ( $config->{intermediate_ambi} ) {
-      $seq =~ y/AGCUNagcun/N/c;
-    } else {
-      $seq =~ y/agcunkmryswhbvdAGCUNKMRYSWHBVD/N/c;
+        my $seq = $s->seq;
+        $seq =~ y/Tt/Uu/;
+        $seq =~ y/AGCUNagcun/N/c;
+        $s->seq($seq);
+        $s->desc('') if ( !exists( $config->{no_desc} ) || $config->{no_desc} );
     }
-    $s->seq($seq);
-    $s->desc('') if ( !exists( $config->{no_desc} ) || $config->{no_desc} );
-  }
-  return $seqs;
+    return $seqs;
 
 }
 
 sub clean_dna_seq {
-  my ( $seqs, $config ) = @_;
+    my ( $seqs, $config ) = @_;
 
-  $seqs = [$seqs] if ( blessed($seqs) && $seqs->isa('Bio::Gonzales::Seq') );
-  confess "please supply the sequences as an arrayref" unless ( ref $seqs eq 'ARRAY' );
-  confess "config format not readable" if ( $config && ref $config ne 'HASH' );
 
-  for my $s (@$seqs) {
+    $seqs = [ $seqs ] if(blessed($seqs) && $seqs->isa('Bio::Gonzales::Seq'));
+    confess "please supply the sequences as an arrayref" unless ( ref $seqs eq 'ARRAY' );
+    confess "config format not readable" if ( $config && ref $config ne 'HASH' );
 
-    my $seq = $s->seq;
-    if ( $config->{intermediate_ambi} ) {
-      $seq =~ y/AGCTNagctn/N/c;
-    } else {
-      $seq =~ y/agctnkmryswhbvdAGCTNKMRYSWHBVD/N/c;
+    for my $s (@$seqs) {
+
+        my $seq = $s->seq;
+        $seq =~ y/AGCTNagctn/N/c;
+        $s->seq($seq);
+        $s->desc('') if ( !exists( $config->{no_desc} ) || $config->{no_desc} );
     }
-    $s->seq($seq);
-    $s->desc('') if ( !exists( $config->{no_desc} ) || $config->{no_desc} );
-  }
-  return $seqs;
+    return $seqs;
 
 }
 

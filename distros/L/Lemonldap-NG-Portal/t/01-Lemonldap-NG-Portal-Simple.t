@@ -32,12 +32,14 @@ $ENV{REQUEST_METHOD}  = 'GET';
 $ENV{REQUEST_URI}     = '/';
 $ENV{QUERY_STRING}    = '';
 $ENV{REMOTE_ADDR}     = '127.0.0.1';
+$ENV{HTTP_ACCEPT}     = 'text/html';
 
 ok(
     $p = Lemonldap::NG::Portal::Simple->new(
         {
             globalStorage        => 'Apache::Session::File',
             domain               => 'example.com',
+            hideLogLevels        => 'debug|info|notice',
             authentication       => 'LDAP test=1',
             userDB               => 'LDAP',
             passwordDB           => 'LDAP',

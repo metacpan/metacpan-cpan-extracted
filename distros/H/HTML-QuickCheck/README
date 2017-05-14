@@ -1,0 +1,86 @@
+From ylu@ccwf.cc.utexas.edu  Fri Sep 29 21:43:52 1995
+Date: Fri, 29 Sep 1995 15:44:06 -0500 (CDT)
+From: Luke <ylu@ccwf.cc.utexas.edu>
+To: Andreas Koenig <k>
+Subject: Re: QuickCheck
+In-Reply-To: <199509291851.TAA25241@anna.mind.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+On Fri, 29 Sep 1995, Andreas Koenig wrote:
+> Hi, Luke,
+> 
+> in Tim's modulelist you have an entry...
+> 
+> HTML::
+> ::QuickCheck   cdpf  Fast simple validation of HMTL text          YLU
+> 
+> Can you give me a pointer, where the package lives? I just followed
+> your email address and finally found your homepage
+> http://uts.cc.utexas.edu/~lyl/, but the links that seemed interesting
+> there are password protected. So... I have to ask you.
+
+The truth is, project and personal are not ready yet.  password protection
+is my perverted way to frustrate random web surfers.;) jumpgate is however
+functional and protection is obvious necessary.  Anyway here is the copy
+(pod appended).  Note, the purpose of QuickCheck is, not surprisingly, a
+quick check, esp.  for validation of user input in CGI transactions.  I
+recommend weblint etc. for offline comprehensive html syntax checking.  I
+haven't got time to update it for a while, but the concept and update is
+obvious and trivial...
+
+hope it can be of any use to you,
+
+__Luke
+
+
+Date: Sat, 30 Sep 1995 13:26:29 -0500 (CDT)
+From: Luke <ylu@ccwf.cc.utexas.edu>
+To: Andreas Koenig <k>
+Subject: Re: QuickCheck
+In-Reply-To: <199509292352.AAA26116@anna.mind.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+On Sat, 30 Sep 1995, Andreas Koenig wrote:
+>Thanks, it maybe will, but -- how silly of me, I haven't introduced my
+>intent, is it ok for you if I put this version on the module server?
+>I'm currently collecting everything, but you could of course not know
+>that, so... I have to ask once again :)
+
+Yeah, sure, just note it is still in beta, may need more extensive
+field test.
+
+>For more info see http://franz.ww.tu-berlin.de/modulelist/
+>
+>The list of mirrors is meanwhile more than ten sites long, will update soon.
+
+Thanks for maintaining such a great resource for the benefit of everybody.
+
+__Luke
+
+
+Date: Sun, 1 Oct 1995 04:26:37 -0500 (CDT)
+From: Luke <ylu@ccwf.cc.utexas.edu>
+To: andreas.koenig@mind.de
+Subject: Re: QuickCheck
+In-Reply-To: <199510010757.IAA01767@anna.mind.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+On Sun, 1 Oct 1995, Andreas Koenig wrote:
+> There is a precedence problem in QuickCheck.
+> 
+> % perl -e 'require HTML::QuickCheck'
+> Can't modify logical or in concatenation at /usr/local/lib/perl5/HTML/QuickCheck.pm line 108, near ""<$tag1> does not match </$tag>\n";"
+
+Yuck.  I only paid attention to perl 4 compatibility (we have too much
+script to use perl 5 as perl).  Why Larry changed the precedence is beyond
+me... Anyway here is the fixed version (just added couple of parentheses).
+I confess I am not familiar with the MakeMaker...
+
+Thanks for the 'bug' report.
+
+__Luke
+
+

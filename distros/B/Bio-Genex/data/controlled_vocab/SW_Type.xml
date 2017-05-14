@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Software" db_column="type" cv_table="SW_Type">
+  <comment type="definition">This table provides the restricted vocabulary for the column type in the table software  and is used to restrict the search of software to those performing a particular function	
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They regulate
+the sub-setting of which software entries are displayed in the software
+screen.</comment>  
+<term name="image_analysis"
+        description="software used to extract intensity data from a scanned image"/>
+<term name="scanner"
+        description="software used to scan in an image"/>
+<term name="spotter"
+        description="software used to drive an array spotter"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

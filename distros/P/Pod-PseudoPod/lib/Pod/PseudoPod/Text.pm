@@ -4,7 +4,7 @@ package Pod::PseudoPod::Text;
 use strict;
 use Carp ();
 use vars qw( $VERSION $FREAKYMODE );
-$VERSION = '0.11';
+$VERSION = '0.18';
 use base qw( Pod::PseudoPod );
 
 use Text::Wrap 98.112902 ();

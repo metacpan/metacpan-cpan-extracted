@@ -1,0 +1,407 @@
+Mon Feb  5 21:04:50 MST 2001
+* make GenexAdmin class
+
+Mon Jan 22 13:24:34 MST 2001
+* document (POD) db2xml
+* figure out how to keep all the .pl files from getting installed
+
+Sun Jan 21 08:35:44 MST 2001
+* db2xml: Find new way to specify how to download just specific user
+  information now that --user not required
+
+Fri Jan 19 22:24:57 MST 2001
+FIXED ==> * fetch is broken for linking tables
+
+Tue Dec 12 15:03:39 MST 2000
+FIXED ==> * implement caching in control bundle retrieval
+
+Sat Nov 11 14:22:16 MST 2000
+Priority 1 
+==========
+FIXED ==> * expset-login.pl CGI script needs to be updated to use cached data
+* Hatfield ES in DB needs to have its AM's updated (at least adding a
+  new AM for each data point w/o the spot reps separated out
+* copyright and headers for all files
+FIXED ==> * ensure all scripts that access UserSec:password use
+  Bio::Genex::DBUtils::check_password() to crypt()/de-crypt() entries
+
+Priority 2
+==========
+* DB schema to support security and updates
+* DB schema to support separate one/two channel tables
+* MGED XML
+* XDF
+* XML dump for Brown Hatfield
+
+Priority 3
+==========
+FIXED ==> * addgroup CGI script
+FIXED ==> * test xml2db with output from db2xml
+FIXED ==> * fix Genex.pm install
+FIXED ==> * adduser CGI script
+* last_updated fields in DB
+* new DB security tables
+
+Wed Nov  8 19:40:26 MST 2000
+FIXED ==> * create Genex::DBUtils::check_password()
+FIXED ==> * ensure that scripts that access UserSec:password use check_password()
+FIXED ==> * create Bio::Genex::DBUtils::check_password()
+FIXED ==> * ensure that scripts that access UserSec:password use check_password()
+
+Wed Nov  1 17:28:17 MST 2000
+FIXED ==> * fix current_connection() to take parameters. rename it to be
+  connect()
+
+Mon Oct 30 15:01:16 MST 2000
+FIXED ==>  * All ratio AM's written to same <array>. Probably has to do with:
+      Use of uninitialized value in hash element at
+        ./scripts/db2xml.pl line 2320.
+FIXED ==>  * ration AM's seem to be being given channels even though
+    channel_name should be undefined: Use of uninitialized value in
+       concatenation (.) at ./scripts/db2xml.pl line 2061. 
+FIXED ==>  * cy5 channels have empty <measurement_factor_value_list/>'s
+FIXED ==>  * each <treatment_list> has three empty <treatment/>'s
+FIXED ==>  * all <treatment_factor>'s have value=1
+FIXED ==>  * the non-empty <treatment>'s have empty <treatment_array_list/>'s
+FIXED ==>  * use DBI::quote in get_objects()
+FIXED ==>  * when calling get_objects({column=>foo, value=>bar,
+    pkey_link=>baz}) $pkey_name should not get stomped on. Also, 'ALL'
+    pkey_link=>should not be specified. 
+FIXED ==>  * get_objects() should not have the same result as
+    get_objects('ALL'), or it should give a warning.
+  * XMLUtils::pretty_print() must not remove all newlines
+FIXED ==>  * initialize() should only do DB query if the values have not been
+    returned by a DB query.
+FIXED ==>   * fix get_objects(@id) so that it functions identical to
+    get_objects('ALL') 
+
+Mon Oct 23 16:48:31 MST 2000
+FIXED ==> * num_chromosomes not getting written to control-bundle
+FIXED ==> * protocol:text written as single line
+
+Thu Oct 19 09:36:52 MST 2000
+* for gxquery
+FIXED ==>   * gxquery1.pl: providers are not being reported
+FIXED ==>   * gxfetch_es1.pl: cit_fk not getting translated
+FIXED ==>   * gxfetch_array1.pl: wants to be split into a download, and analysis
+    page, type not getting translated
+
+* Controlled Vocab issues
+  * AL_DefaultSpotConcUnits.xml seems to be for individual spots not
+    layout
+FIXED ==>   * AL_IdentifierCode.xml is stupid
+FIXED ==>   * CSF_Type.xml has extra terms
+FIXED ==>  * ContactType.xml: technology_media, data_provider_protocol can't be
+    used by DB; software_analysis overlaps with software_image
+FIXED ==>  * EF_MajorCategory.xml and EF_MinorCategory.xml need to be looked at
+FIXED ==>  * SW_Name.xml, SPT_ModelDescription.xml, SCN_ModelDescription.xml
+    are creating too much work
+  * SMP_GeneticStatus.xml is too generic, most terms overlap
+
+Wed Oct  4 22:36:18 MST 2000
+FIXED ==> * {USF,CSF}_ExternalDBLink has db_name() as an OO fkey method, it
+  should have db_name_obj()
+
+Tue Oct  3 12:35:33 MST 2000
+FIXED ==> * changes for xml2db.pl: 
+  * remove hard-coded dates (line 249)
+  * switch to create_{insert,select}_sql()
+  * switch to fetch_last_value() (line 1232)
+  * make error messages more verbose
+  * why this? 'login => join('', split / /,
+    $content{contact_person}),'
+  * find better way to transmit usersec information than hardcoding
+    login and password as Contact:contact_person
+  * hard-coding of array_measurement type (line 997)
+
+Tue Sep 26 21:40:19 MST 2000
+FIXED ==> * fix CSF_ExternalDBLink::db_name ==> two methods...
+FIXED ==> * fix CanonicalSequenceFeature::relatedcsf_fk ==> two methods...
+FIXED ==> * install_cgi only works with 5.6
+
+Mon Sep 25 14:54:58 MST 2000
+FIXED ==> * make Bio::Genex::undefined call fetch_fkey_list() for all OTM types, and
+  then have fetch_fkey_list() decide whether to call get_matrix() or
+  not depending on the status of a class variable that defaults to
+  true for the LT classes.
+FIXED ==> * Get rid of OTM_LT and OTM_LINK fkeys (and their _OO mirrors), and
+  replace their usage with OTM fkeys. This should be simple after
+  replacing the $lt_fkey usage in create_genex_class.pl
+FIXED ==> * need to make MTO fkeys act like FKEY fkeys
+
+Sun Sep 24 22:20:41 MST 2000
+* documentation on attributes needs to be expanded
+
+Sat Sep 23 16:22:05 MST 2000
+* !!!HUGE MAJOR API CHANGE!!!
+  Having these two fkey modes 'raw' and 'object' that allows the same
+  method to be invoked in two different ways doesn't work. The code is
+  broken and must be fixed. Instead raw fkey values will be accessed
+  through the existing $obj->blah_fk() method, and objects are
+  accessed through a new $obj->foo_obj() method.
+FIXED ==> * fkey properties must be transferred to the OO method.
+GONE ==> * get rid of recursive fetch
+GONE ==> * get rid of no_fkey_objects
+GONE ==> * get rid of fetch_fkey_fkeys, fetch_otm_fkeys 
+FIXED ==> * fix get_objects(@id_list) so that bogus pkey values don't return
+  objects
+FIXED ==> * fix all code in create_genex_class.pl to use new OO fkey methods
+FIXED ==> * fix all documentation in create_genex_class.pl
+FIXED ==> * fix all code in Genex.pm to use new OO fkey methods
+FIXED ==> * fix all code in DBUtils.pm, HTMLUtils.pm and XMLUtils.pm
+  to use new OO fkey methods
+FIXED ==> * fix all tests to use new OO fkey methods
+FIXED * fix all code in scripts to use new OO fkey methods
+FIXED ==> * fix all code in xml-write.pl to use new OO fkey methods
+
+Fri Sep 22 11:27:26 MST 2000
+FIXED ==> * Change the fkey code. The blah_fk() methods should always return
+  *raw* fkey values. A corresponding blah() function is created that
+  accesses the slot as OO interface.
+* move Jiaye's XML2DB.pl to Genex.pm interface
+
+Thu Sep 21 14:41:57 MST 2000
+FIXED ==> * fix length on ExternalDatabase:urls
+FIXED ==> * why does pbrown experiment print 2 CSF tables
+
+Wed Sep 20 14:40:31 MST 2000
+FIXED ==> * CSF/USF files are printed in output even if not written
+   (A. Thaliana) 
+
+Tue Sep 19 13:46:48 MST 2000
+FIXED ==> * multiple <groups> get written for same id
+FIXED ==> * <treatment_factors> are written to <treatment_array_list>
+FIXED ==> * all contacts are being written for do_experiments()
+FIXED ==> * con_pk is being written out
+FIXED ==> * multiple <experiment_factor_list> being written to same <array>
+FIXED ==> * multiple <array_measurement_lists> are added to <array>
+FIXED ==> * make sure local_accession gets written for <experiment_set>
+
+Sat Sep 16 14:30:50 MST 2000
+FIXED ==> * fix Makefile so that cgi scripts get installed on 'make
+  install' and not on 'make' 
+Fri Sep 15 19:43:24 MST 2000
+FIXED ==> * change do_misc(), change user_name to be UserSec:login
+FIXED ==> * change genex.ncgr.org DB experiment names
+
+Thu Sep 14 16:22:35 MST 2000
+FIXED ==> * treatment_factor_list apparently not being output for treatment
+	elements
+FIXED ==> * ensure that citation, software, scanner, and protocol are written
+  out. 
+
+Sat Sep  9 00:22:08 MST 2000
+FIXED ==> * fix geml.dtd, so that <array> has all params
+
+Thu Sep  7 15:10:23 MST 2000
+FIXED ==> * add checking to current_connection, so that if any of the connection
+  parameters are different than the settings for the current dbh,
+  close the current connection and open a new one.
+
+Tue Sep  5 10:59:37 MST 2000
+FIXED ==> * remove AM_Group
+FIXED ==> * fix Makefile.PL so that prompt has default answer
+
+Mon Sep  4 11:05:47 MST 2000
+FIXED ==> * fix call to do_contacts() in do_experiment() so that it writes only
+  the contacts for that experiment
+
+Thu Aug 31 12:36:27 MST 2000
+FIXED ==> * properly handle writing of multiple experiment sets
+
+Wed Aug 30 16:19:32 MST 2000
+FIXED ==> * fix classes so that a lookup on an fkey that results in only
+  whitespace returns undef and not an object 
+FIXED ==> * include dtd in xml files
+FIXED ==> * accept dir_name for writing, return file list
+FIXED ==> * add experiment names to control bundle
+FIXED ==> * get do_control_bundle() to output CSF
+FIXED ==> * File name convention ==> control-bundle.xml
+                           control-bundle_{ALS,CSF,USF}NN.ext
+                           exp-set-name.xml
+                           exp-set-name_{AMS,ALS,CSF,USF}NN.ext
+
+Tue Aug 29 10:18:13 MST 2000
+FIXED ==> * make do_al() callable by do_array() when needed
+FIXED ==> * Ensure that all elements that have ID attributes call create_id() (TIME => 2h)
+FIXED ==> * Ensure that all elements that have IDREF attributes call lookup_id() (TIME => 2h)
+FIXED ==> * Rewrite lookup_id(). If it detects that the ID being requested is
+  not yet stored in the XML file, it should fetch it from the DB and
+  store it, before returning the ID. (TIME => 4h) 
+FIXED ==> * Remove debugging code in do_usf() and do_al() that sets _LIMIT. (TIME => 30m)
+FIXED ==> * Fix hard coded USF names in xml-write.pl line 994. Instead must
+  decide whether usf_name is gene_name or serial_orf dynamically. (TIME => 1h)
+
+Sun Aug 27 19:47:28 MST 2000
+FIXED ==> * rewrite Bio::Genex::undefined() so that a Bio::Genex::Fkey object is
+  called to dispatch the fetching of the data.
+
+Tue Aug 22 19:34:07 MST 2000
+* document one-to-many-link fkeys in create-genex-class.pl
+
+Sun Jun 18 10:35:20 MDT 2000
+FIXED ==> * change $_USE_CACHE ==> $USE_CACHE and $_LIMIT ==> $LIMIT
+FIXED ==> * add HTMLUtils::objs2html()
+FIXED ==> * add {column=>$col,value=>$val} options to get_objects().
+
+Tue Jun 13 22:39:16 MDT 2000
+FIXED ==> * add OTM_LINK fkey, so that Bio::Genex::undefined() can call
+  fetch_fkey_list with the proper info and not call classname->pkey_name
+				   
+Fri Jun  9 12:15:45 MDT 2000
+FIXED ==> * Add dbms(), db_name(), db_host() methods to Bio::Genex::Connect()
+FIXED ==> * Require a Bio::Genex::Connect in DBUtils
+FIXED ==> * write an assert_dbh() method for DBUtils so that all the error
+  checking is in one function
+
+Thu Jun  8 09:59:35 MDT 2000
+FIXED ==> * Fix Makefile.PL so that there is a default on the extra library
+  question.
+FIXED ==> * fix DBUtils::create_insert_sql() to accept values as well as
+  placeholders 
+
+Wed Jun  7 19:41:55 MDT 2000
+FIXED ==> * add a fetch_es_spot_values() helper function to DBUtils that fetches
+  all array and spot data for a given experiment set
+FIXED ==> * get rid of 'recursive_fetch'
+FIXED ==> * implement object caching in Classes
+FIXED ==> * add $LIMIT to all classes
+FIXED ==> * add LIMIT clause to create_select_sql
+* test linking table classes better
+* test lookup table classes better
+				   
+Mon Jun  5 21:32:54 MDT 2000
+FIXED ==> * Fix LOOKUP_TABLE fkey, there needs to be a OTM_LT fkey
+FIXED ==> * Need a better way to specify which types of fkey_objects get fetched
+  during a fetch(), in undefined(), or with fetch_fkey_list(), or
+  get_objects() . One idea was to add three attributes: fetch_fkey,
+  fetch_lt_fkey, fetch_otm_fkey. The values of these are used to
+  determine what is fetched. 
+
+Sun Jun  4 16:29:52 MDT 2000
+FIXED ==> * eliminate 'delayed_fetch' by making it always on
+FIXED ==> * add LOOKUP_TABLE fkeys
+FIXED ==> * move fetch_otm_list() from create_genex_class.pl to DBUtils
+FIXED ==> * deal properly with fkey_accessors in Bio::Genex::undefined
+
+Sat Jun  3 10:18:20 MDT 2000
+FIXED ==> * Add tests for get_objects()
+FIXED ==> * redo attributes() call in create_genex_class.pl so that we have
+  attributes that are not automatically looked-up, and those that
+  are. 
+FIXED ==> * add @COLUMN_NAMES TO create_genex_class.pl
+FIXED ==> * redo Bio::Genex::undefined so that it handles attributes that aren't
+  looked up automatically
+
+Fri Jun  2 11:05:04 MDT 2000
+FIXED ==> * Fix documentation bug for fkey methods
+FIXED ==> * fix bug in ObjectTemplate where calling foo(undef) calls
+   setter and triggers undefined(); 
+* Document MANIFEST to let people know what the files are
+FIXED ==> * Deal with linking tables
+FIXED ==> * It should not be an error to call an fkey accessor with delayed
+  fetch, it should work if 'id' is set, or else it should be a warning
+
+Wed May 31 16:30:49 MDT 2000
+FIXED ==> * Fix security bug, input from HTML form is being used directly in SQL query. 
+FIXED ==> * change all the sql WHERE list generating code to use join() per
+  Andrew's suggestion  
+
+Thu May 25 16:06:51 MDT 2000
+FIXED ==> * Add filter to fetch_es.pl that enables only selection of:
+  - primary_raw
+  - background_corrected
+  - derived_ratio
+FIXED ==> * modify fetch_array.pl to include the array fkey as "es_fk:array_pk"
+  so that fetch_spot.pl can write the arrays to different output
+  files. 
+FIXED ==> * modify query-intro.pl, fetch_es.pl, and fetch_arry.pl to accept an
+  'ONLY_ONE_ES' parameter. This will cause fetch_array.pl to signal an
+  error if it receives more than one exp_set.
+FIXED ==> * create fetch_spot.pl
+* Add link table between ExperimentSet and Species
+FIXED ==> * Can fudge Species filter in fetch_es.pl by:
+  - SELECT am_pk FROM ArrayMeasurement WHERE primary_es_fk = $es_pk LIMIT 1
+  - SELECT usf_fk FROM AM_spots WHERE am_fk = $am_pk LIMIT 1
+  - SELECT spc_fk FROM UserSequenceFeature WHERE usf_pk = $usf_fk
+
+Wed May 24 17:57:33 MDT 2000
+FIXED ==> * Add new .t files for all modules
+FIXED ==> * Add new tests for recursion fetch
+
+Tue May 23 11:24:13 MDT 2000
+FIXED ==> * Add data retreival button to fetch_array.pl
+FIXED ==> * add xml writing capability for entire experiment set.
+* add xml writing capability for individual data pieces.
+FIXED ==> * add TAB writing capability for entire array
+FIXED ==> * Fix grammer error in fetch_* pages. If table name ends in 's', no
+  's' should be added to plural.
+FIXED ==> * Fix query-intro.pl to use Species to restrict query
+FIXED ==> * Fix query-intro.pl to properly show technology types
+FIXED ==> * Fix problem with calling disconnect() on a handle stored by
+  Bio::Genex::current_connection();
+
+Mon May 22 16:58:30 MDT 2000
+FIXED ==> * find out why the Pat Brown user and group links don't work
+FIXED ==> * fix the trailing '/' problem on the Make parameters
+FIXED ==> * Add these fkeys to HTMLUtils::post_process()
+FIXED  - ams_fk
+FIXED  - als_fk
+FIXED  - tl_fk
+FIXED  - sptr_fk
+FIXED  - scn_fk
+FIXED  - prt_fk
+FIXED  - ef_fk
+FIXED  - db_name
+FIXED  - smp_fk
+FIXED  - owner_us_fk
+FIXED  - primary_es_fk
+FIXED  - al_fk
+FIXED  - image_anal_sw_fk
+FIXED  - spotter_sw_fk
+FIXED  - scan_sw_fk
+FIXED  - csf1_csf_fk
+FIXED  - csf2_csf_fk
+FIXED  - csf_fk
+FIXED  - putative_csf_fk
+FIXED  - es_fk
+FIXED  - ratio_am_fk
+FIXED  - am_fk
+
+* Add new modules: 
+FIXED  - ExperimentSet.pm
+FIXED  - ArrayMeasurement.pm
+FIXED  - AM_Group.pm
+FIXED  - ArrayLayout.pm
+FIXED  - Sample.pm
+FIXED  - UserSequenceFeature.pm
+FIXED  - CanonicalSequenceFeature.pm
+FIXED  - Scanner.pm
+FIXED  - Spotter.pm
+FIXED  - Software.pm
+FIXED  - ExternalDatabase.pm
+FIXED  - BlastHits.pm
+FIXED  - SampleProtocols.pm => LINK
+FIXED  - Protocol.pm
+FIXED  - HotSpots.pm => LINK
+FIXED  - ExperimentFactors.pm
+FIXED  - AM_FactorValues.pm => LINK
+FIXED  - TL_FactorValues.pm => LINK
+FIXED  - TreatmentLevel.pm
+FIXED  - GroupLink.pm ==> array of groups/users
+FIXED  - USF_ExternalDBLink.pm ==> array of DB/SF
+FIXED  - CSF_ExternalDBLink.pm ==> array of DB/SF
+FIXED  - RelatedCSF.pm ==> array of CSF
+FIXED  - Treatment_AMs.pm ==> array of TreatmentLevels/ArrayMeasurements
+FIXED  - AM_Spots.pm
+FIXED  - AL_Spots.pm
+
+Thu May 18 18:22:46 MDT 2000
+FIXED ==> * Fix ObjectTemplate so that autofetch works again
+
+
+### *** emacs file mode definition ***
+### Local Variables: 
+### mode:text
+### mode:filladapt
+### End: 

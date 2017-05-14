@@ -1,0 +1,198 @@
+%%START_PERL%% -wT
+#
+# File: samples/pass-mod.pl
+#
+# This script enables GeneX users to change their password entries in 
+#   the UserSec table via the WWW
+#
+# Programmer: Jason E. Stewart (jes@ncgr.org)
+#
+# script copyright (c) 2000 by NCGR.
+# All rights reserved.
+
+use strict;
+use CGI qw(:standard :html3 :netscape);
+
+%%GENEX_EXTRALIBS%%
+use Genex qw($SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_update_sql);
+use Bio::Genex::UserSec;
+use LoginUtil;
+
+# Clean up the enviroment for Taint mode
+$ENV{PATH} = "/bin:/usr/bin";
+delete @ENV{ 'IFS','CDPATH','ENV','BASH_ENV' };
+
+$|++;
+
+my $q = CGI->new();
+my ($us_pk,$userid);
+my $PASS_LEN = 12;
+
+if ($q->param()) {
+  # Extract and validate the user ID. This will be the primary key
+  # for the entry in the UserSec table, and should only have digits
+  # separated by a hyphen and then any hexadecimal digit
+  ($userid,$us_pk)  = $q->param('userid') =~ /^((\d+)-[a-f\d]+)$/;
+  error('No user ID') unless defined $us_pk;
+
+  # Extract and validate the passwords
+  # Passwords can contain any characters, but only $PASS_LEN characters in length
+  my ($new_password) = $q->param('new_password') =~ /^(.{1,$PASS_LEN})$/;
+  my ($retype_password) = $q->param('retype_password') =~ /^(.{1,$PASS_LEN})$/;
+
+  if ($new_password ne $retype_password) {
+    system('./pass-mod-invalid.pl',"userid=$userid",'reason=ne');
+    exit 0;
+  }
+  if (length($new_password) < 5) {
+    system('./pass-mod-invalid.pl',"userid=$userid",'reason=short');
+    exit 0;
+  }
+
+  #
+  # now we crypt() the password to keep off prying eyes
+  #
+  my $us_db = Bio::Genex::UserSec->new(id=>$us_pk);
+  error("Couldn't get User for $us_pk")
+    unless $us_db->login();
+
+  # the salt is the first two letters of their login
+  my $salt = substr($us_db->login,0,2);
+  $new_password = crypt($new_password, $salt);
+
+  # store the new password
+  # we use the global $Bio::Genex::* variables so that we affect every
+  # connection
+  $Bio::Genex::USER = $SU_USERNAME;
+  $Bio::Genex::PASSWORD = $SU_PASSWORD;
+  $Bio::Genex::TRANSACTION = 1;
+
+  my $dbh = Bio::Genex::current_connection();
+  my $sql = create_update_sql($dbh,'UserSec',
+			      SET=>{password=>$new_password},
+			      WHERE=>"us_pk=" . $dbh->quote($us_pk));
+  $dbh->do($sql);
+  dbi_error($sql,$dbh) if $dbh->err;
+  $dbh->commit();
+#   $dbh->rollback();
+  $dbh->disconnect();
+
+  print $q->header(), 
+    $q->start_html({-title=>'Password Modified',-bgcolor=>"\#ffffff"});
+  print $q->div({-align=>'CENTER'},
+		$q->h2('Your password has been updated'),
+		$q->hr(), 
+		$q->font({-size=>-2}, 
+                     'Copyright &copy; 2000',
+                     $q->br(), 'by NCGR', 
+                     $q->br(), 'All Rights Reserved'));
+  print $q->end_html();
+} else {
+  # grab the command line parameters
+
+  # Extract and validate the user ID. This will be the primary key
+  # for the entry in the UserSec table, and should only have digits
+  # separated by a hyphen and then any hexadecimal digit
+  my ($field,$user,$rest) = split /=/, $ARGV[0];
+  ($userid,$us_pk)  = $user =~ /^((\d+)-[a-f\d]+)$/;
+  error('No user ID') unless defined $us_pk;
+
+  # Display the input form
+  print <<EofHTML;
+Content-type: text/html
+
+<html><head><title>GeneX Password Modification</title></head>
+<body bgcolor=#ffffff>
+<div align=center>
+  <h2>Modify Genex Password </h2>
+</div>
+<p>
+Congratulations, you have successfully logged in to the GeneX DB.
+</p>
+<p>
+Please enter your new password in the 'New Password' field, and again
+in the 'Re-type Password' field. If the passwords do not match, you
+will be asked to type them again.
+
+Passwords should have at least 5 characters and no more than $PASS_LEN.
+</p>
+
+<div align=center>
+<h1>  </h1>
+<form action="./pass-mod.pl" method=post>
+<input type=hidden name=userid value=$userid>
+<table>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> New Password:</td>
+    <td><input type=password name=new_password size=$PASS_LEN maxlength=$PASS_LEN></td>
+  </tr>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> Re-type Password:</td>
+    <td><input type=password name=retype_password size=$PASS_LEN maxlength=$PASS_LEN></td>
+  </tr>
+  <tr>
+    <td colspan=3 align=center>
+      <input type=submit value=\"Submit New Password\">
+    </td>
+  </tr>
+</table>
+</div>
+<hr>
+<div align=center>
+<font size=-2>
+Copyright &copy; 2000<br>by NCGR<br>All Rights Reserved
+</font>
+</div>
+</body></html>
+
+EofHTML
+}
+
+sub dbi_error {
+  my ($sql,$dbh) = @_;
+  my $error = "SQL=[$sql], DBI=[$DBI::errstr]";
+  $dbh->rollback();
+  $dbh->disconnect();
+  LoginUtil::DisplayError($error);
+}
+sub error {
+  my $error = shift;
+  print $q->header(), $q->start_html('Error'),
+    $q->h1("Error: $error"),
+      $q->end_html();
+  exit(1);
+}
+
+__END__
+
+=head1 NAME
+
+B<password.pl>: a CGI script for modifying the UserSec password information.
+
+=head1 SYNOPSIS
+
+  password.pl
+
+=head1 DESCRIPTION
+
+This script takes no parameters. The script provides fields for modifying the user\'s password.
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+$Date: 2001/02/05 16:34:24 $ by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

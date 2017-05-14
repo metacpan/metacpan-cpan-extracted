@@ -1,16 +1,19 @@
-use strict;
-use warnings;
+package CPAN::Packager::Test;
+use base qw/Test::Class/;
 use Test::More;
-use t::Util::RPM;
+use IPC::System::Simple qw(system);
 
-unless ( $ENV{CPAN_PACKAGER_TEST_LIVE} ) {
-    plan skip_all => "You need to set CPAN_PACKAGER_TEST_LIVE environment variable to execute live tests\n";
-    exit 0;
+our $BUILD_SUCCESS = 0;
+
+sub test_build_simple_module : Test {
+    my $self = shift;
+    my $build_status
+        = system(
+        'sudo perl bin/cpan-packager --module Mojo --builder RPM --conf t/it/conf/config-rpm.yaml'
+        );
+    is $BUILD_SUCCESS, $build_status, 'build mojo suceded';
 }
 
-subtest "install simple module" => sub {
-    build_ok 'Acme::Bleach';
-    done_testing;
-};
+__PACKAGE__->runtests;
 
-done_testing;
+1;

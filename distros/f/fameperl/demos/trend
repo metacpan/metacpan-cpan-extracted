@@ -1,0 +1,57 @@
+#!/usr/local/bin/perl
+#
+# trend <date> [files]
+#
+# this script opens the remote pricing database and
+# extracts the 10 closing price quotes up to and
+# including the specified date for all the securities
+# specified in the [files] or stdin.
+#
+
+if ($#ARGV < 0) {
+  print STDERR "usage: trend <date> [files]\n";
+  exit(1);
+}
+
+$date=shift;
+
+use Fame;
+
+# remote server name
+$server="parker";
+
+# open the remote database
+if (! ($db = new Fame::DB "$server \\\$PRC_TARGET/prc")) {
+  print "Server $server failed: ",&errortxt,"\n";
+  exit(1);
+}
+
+# read the input
+while(<>) {
+  chop;
+  tr/a-z/A-Z/;
+  # get the "CLOSE" item for $date-10 to $date (note, Read
+  # evaluates the $date-10 string).
+  if (@data = $db->Read("$_.CLOSE", "$date-10", $date)) {
+    print $_, " ", join(" ", @data), "\n";
+  }
+  else {
+    print $_, " not found: ",&errortxt,"\n";
+  }
+}
+
+#
+# &errortxt($status);
+#
+# return a pretty Fame error message
+#
+sub errortxt {
+  my($v,$stat);
+  # get a status if its the first parameter
+  if ($_[0]) { $stat=$_[0]; }
+  else { $stat=$Fame::HLI::status; }
+  $v="HLI($stat)";
+  # hliutils may not be loaded, so do an eval!
+  eval '$v .= " ".&Fame::HLI::getsta($stat)';
+  return $v;
+}

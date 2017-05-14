@@ -12,7 +12,7 @@ use HTTP::Request;
 use JSON;
 
 our @ISA     = (qw(Lemonldap::NG::Portal::_Browser));
-our $VERSION = '1.3.0';
+our $VERSION = '1.9.1';
 
 ## @apmethod int authInit()
 # Enables Browser ID (required for templates)
@@ -96,7 +96,7 @@ sub extractFormInfo {
                 "Received BrowserID answer: " . $self->{browserIdAnswerRaw},
                 'debug' );
 
-            my $json = new JSON();
+            my $json = JSON->new();
             $self->{browserIdAnswer} =
               $json->decode( $self->{browserIdAnswerRaw} );
 

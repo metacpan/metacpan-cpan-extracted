@@ -1,22 +1,17 @@
 package Tk::IconCanvas;
 
 use Tk;
-
 use Tk::Scrollbar;
 use Tk::Frame;
 
-use vars qw ($VERSION @ISA $SERIAL_NUMBER @COPYLIST $DRAGDROP $ICON_DEFAULTS);
-
+use vars qw ($VERSION $SERIAL_NUMBER @COPYLIST $DRAGDROP $ICON_DEFAULTS);
+use base qw (Tk::Derived Tk::Frame Tk::Widget);
 use strict;
-
-@ISA = qw (Tk::Derived Tk::Frame Tk::Widget);
+use Carp;
 
 $SERIAL_NUMBER = 0;
-
-$VERSION = '1.01';
-
+$VERSION = '0.02';
 @COPYLIST = ();
-
 $DRAGDROP = 0;
 
 $ICON_DEFAULTS =

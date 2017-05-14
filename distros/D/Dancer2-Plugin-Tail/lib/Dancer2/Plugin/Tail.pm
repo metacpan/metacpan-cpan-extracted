@@ -1,25 +1,23 @@
 package Dancer2::Plugin::Tail;
 
-use warnings;
-use strict;
-use Carp;
-use Session::Token;
-
 use Dancer2::Core::Types qw(Bool HashRef Str);
 use Dancer2::Plugin;
 
+use Carp;
+use Session::Token;
 
 =head1 NAME
 
 Dancer2::Plugin::Tail - Tail a file from Dancer2
 
+
 =head1 VERSION
 
-Version 0.010
+Version 0.011
 
 =cut
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 
 =head1 SYNOPSIS
@@ -35,7 +33,7 @@ This plugin will allow you to tail a file from within Dancer2.  It's designed to
 
 =head1 CONFIGURATION
 
-You may specify the route and access to files.  The plugin will only read files so it must have read access to them.  The following configuration will generate two routes: '/tail/display' and '/tail/read'.  
+You may specify the route to files.  The plugin will only read files so Dancer2 must have read access to them.  The following configuration will generate two routes: '/tail/display' and '/tail/read'.  
 
 A sample HTML page with Bootstrap and jQuery is included in the samples directory.  Use it as an example to build your own page.
 
@@ -90,12 +88,15 @@ Default 'get'.
 
 =item I<url>
 
-Route in Dancer to display template for tailing.  Default '/tail/display'
+Route in Dancer2 to display template for tailing.  
+Default = '/tail/display'
 
 
 =item I<template>
 
-Template of tail screen. Default 'tail.tt'
+Template of tail screen. 
+Default = 'tail.tt'
+
 
 =item I<layout>
 
@@ -116,13 +117,14 @@ Default 'get'.
 
 =item I<url>
 
-Route in Dancer to tail files.  Default '/tail/read'
+Route in Dancer2 to tail files.  
+Default = '/tail/read'
 
 =back
 
 =item I<files>
 
-List of predefine files that can be tailed.
+List of predefined files that can be tailed.
 
 =over 
 
@@ -136,6 +138,7 @@ Define a unique ID for this file
 
 This is a heading or title of the html page to be passed to the template.  Use it as a short description to the file you're taiing.
 
+
 =item I<file>
 
 Full path and file name to tail.
@@ -145,6 +148,26 @@ Full path and file name to tail.
 B<Note> that you B<must> have a session provider configured to dynamically tail files using this plugin.  This plugin requires sessions in order to track information about user defined tailed files for the logged in user.
 Please see L<Dancer2::Core::Session> for information on how to configure session management within your application.
 
+
+=head1 display_tail 
+
+This function displays the specified template with the data from the configuration file.
+
+
+=head1 define_file_to_tail
+
+A function called to dynamically define a file to tail.  This is useful for launching long running applications and having their out put tailed.  In general, this will generate a 32 character string that you should use to direct the output of your process.  Then, Dancer2::Plugin::Tail will tail the content of this file.
+
+
+=head1 _tail_the_file
+
+This private function does the actual job of tailing the file.
+
+
+
+=head1 _new_file_id
+  
+An internal functio that returns a 32 character string when called from define_file_to_tail.
 
 
 =cut 
@@ -236,6 +259,9 @@ sub BUILD {
   my $disp_method   = $plugin->display_method;
   my $disp_url      = $plugin->display_url;
 
+  $plugin->app->log( debug => "Adding Route ");
+  $plugin->app->log( debug => "      Method " . $disp_method);
+  $plugin->app->log( debug => "      Regexp " . $disp_url);
   $plugin->app->add_route(
     method => $disp_method,
     regexp => qr!$disp_url!,
@@ -246,11 +272,14 @@ sub BUILD {
   my $data_url    = $plugin->data_url;
   my $data_method = $plugin->data_method;
 
+  $plugin->app->log( debug => "Adding Route ");
+  $plugin->app->log( debug => "      Method " . $data_method);
+  $plugin->app->log( debug => "      Regexp " . $data_url);
   # Use regexp to match part of the file, then splat inside code
   $plugin->app->add_route(
     method => $data_method,
     regexp => qr!^$data_url!,
-    code   => \&tail_file,
+    code   => \&_tail_the_file,
   );
 
 }    ### BUILD
@@ -258,46 +287,77 @@ sub BUILD {
 
 # Function to display template
 sub display_tail {
-  my $app    = shift;
-  my $plugin = $app->with_plugin('Tail');
+  my $app     = shift;
+  my $plugin  = $app->with_plugin('Tail');
 
-  my $error    = undef;
-  my $file_id  = $app->request->params->{id};
-  my $curr_pos = $app->request->params->{curr_pos};
+  my $error   = undef;
+  my $params  = $app->request->params;
 
-  my $files = $plugin->files;
+  $plugin->app->log( debug => "Params:");
+  $plugin->app->log( debug => $params );
 
-  # Check for errors
-  if ( ! defined $files->{$file_id}->{file} ) {
-    $error = "The specified id: $file_id is not defined or not properly defined in your configuration.\n$files->{$file_id}->{file}";
-  } elsif ( ! -r $files->{$file_id}->{file} ) { 
-    $error = "The specified id: $file_id is not accessible." if ( ! -r $files->{$file_id}->{file} );
+  my $file_id  = $params->{'id'};        ### ID in config
+  my $curr_pos = $params->{'curr_pos'};  ### Current position to read from
+
+  my $tail_id  = 'tail-' . $file_id;                  ### ID from session
+
+  my $file         = undef;
+  my $tail_file    = undef;
+  my $tail_heading = undef;
+  my $files        = $plugin->files;
+
+  $plugin->app->log( debug => "Files:" );
+  $plugin->app->log( debug => $files );
+  $plugin->app->log( debug => "File id:" . $file_id );
+  $plugin->app->log( debug => "tail id:" . $tail_id );
+  $plugin->app->log( debug => "if "      . $files->{$file_id} );
+  $plugin->app->log( debug => "file:"    . $files->{$file_id}->{file} );
+  $plugin->app->log( debug => "heading"  . $files->{$file_id}->{heading} );
+
+  # Predefined
+  if ( $files->{$file_id} ) {
+    $plugin->app->log( debug => "Predefined file_id=" . $file_id );
+    $tail_file    = $files->{$file_id}->{file} ;
+    $tail_heading = $files->{$file_id}->{heading};
+
+  # User defined
+  } else {
+    $plugin->app->log( debug => "User defined tail_id=" . $tail_id );
+    my $file      = $plugin->app->session->read($tail_id); 
+    $tail_file    = $file->{file};
+    $tail_heading = $file->{heading};
   }
+
+  if (    ! defined $tail_file 
+       || $tail_file eq '' ) {
+    $plugin->app->log( debug => "file id " . $file_id . " is not defined." );
+    $error = 'The file-id you specified does not exist.' ;
+  } 
 
   $app->template($plugin->display_template, 
                   { id                => $file_id,
                     curr_pos          => $curr_pos,
-                    title             => $files->{$file_id}->{heading},
+                    heading           => $tail_heading,
                     data_method       => $plugin->data_method,    
                     data_url          => $plugin->data_url,
                     update_interval   => $plugin->update_interval,
                     stop_on_empty_cnt => $plugin->stop_on_empty_cnt,
                     error             => $error },
-                  { layout => $plugin->display_layout }) ;
+                  { layout            => $plugin->display_layout }) ;
 }              
 
 # Function for a user to dynamically define a file 
 sub define_file_to_tail {
-  my ( $plugin, $file ) = @_;
+  my ( $plugin, $tail ) = @_;
 
-  my $file_id = _new_file_id();          # Create a new file id
+  my $file_id = _new_file_id();  # Create a new file id
 
-  $file->{heading} = ' '  if ( $file->{heading} == undef );
-  if ( $file->{file} == undef ) { 
-    $file->{file} = $plugin->tmpdir . '/' . $file_id ;
+  $tail->{heading} = ' '  if ( ! defined $tail->{heading} );
+  if ( ! defined $tail->{file} ) { 
+    $tail->{file} = $plugin->tmpdir . '/' . $file_id ;
   } else {
-    if ( ! -e $file->{file} ) {
-      open( my $touchfile, ">>", $file->{file} ) ;
+    if ( ! -e $tail->{file} ) {
+      open( my $touchfile, ">>", $tail->{file} ) ;
       print $touchfile " ";
       close($touchfile);
     }
@@ -306,35 +366,50 @@ sub define_file_to_tail {
   my $tail_id = 'tail-' . $file_id ;
 
   # Store the file name into session
-  $plugin->app->session->write( $tail_id => \%{$file} );  
+  $plugin->app->session->write( $tail_id => $tail );
 
   return $file_id;
 }
 
 # Function to tail a file
-sub tail_file {
-  my $app    = shift;
-  my $plugin = $app->with_plugin('Tail');
+sub _tail_the_file {
+  my $app      = shift;
+  my $plugin   = $app->with_plugin('Tail');
 
-  my $file_id  = $app->request->params->{id};
-  my $curr_pos = $app->request->params->{curr_pos};
+  my $params  = $app->request->params;
 
-  my $file;
-  my $tail_file;
-  my $tail_heading;
-  my $files = $plugin->files;
+  $plugin->app->log( debug => "In _tail_the_file " );
 
+  my $file_id  = $params->{'id'};
+  my $curr_pos = $params->{'curr_pos'};
+
+  my $tail_id  = 'tail-' . $file_id ;
+
+  my $files        = $plugin->files;
+  my $file         = undef;
+  my $tail_file    = undef;
+  my $tail_heading = undef;
+
+  $plugin->app->log( debug => "files " );
+  $plugin->app->log( debug => $files );
+
+  # Predefined
   if ( $files->{$file_id} ) {
+    $plugin->app->log( debug => "Predefined " . $file_id );
     $tail_file    = $files->{$file_id}->{file} ;
     $tail_heading = $files->{$file_id}->{heading};
+
+  # User defined
   } else {
-    my $tail_id   = 'tail-' . $file_id ;
+    $plugin->app->log( debug => "User defined " . $tail_id );
     my $file      = $plugin->app->session->read($tail_id); 
     $tail_file    = $file->{file};
     $tail_heading = $file->{heading};
   }
 
-  if ( $tail_file ne '' && -e $tail_file ) {
+  $plugin->app->log( debug => "File to tail is " . $tail_file );
+  if (    $tail_file  
+       && -e $tail_file ) {
 
     my ($output, $whence);
 
@@ -361,18 +436,25 @@ sub tail_file {
     my $file_end = tell($IN);   # Figure out the end 
                                                      #  of the file
     close($IN);
+    $plugin->app->log( debug => "Returning JSON:" );
+    $plugin->app->log( debug => "new_curr_pos " . $file_end);
+    $plugin->app->log( debug => "interval     " . $plugin->update_interval);
+    $plugin->app->log( debug => "output       " . $output );
+
+
     # Return JSON
     $app->send_as( JSON => { new_curr_pos => $file_end, 
                              interval     => $plugin->update_interval,
                              output       => $output } );
 
   } else {  ### if -e
+    $plugin->app->log( debug => "No file to tail or file does not exist " . $tail_file );
 
   }
 }    
 
 # setup keywords
-plugin_keywords qw( tail_file define_file_to_tail );
+plugin_keywords qw( define_file_to_tail );
 
 =back
 
@@ -420,7 +502,7 @@ L<https://metacpan.org/pod/Dancer2::Plugin::Tail/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2016 Hagop "Jack" Bilemjian.
+Copyright 2016-2017 Hagop "Jack" Bilemjian.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

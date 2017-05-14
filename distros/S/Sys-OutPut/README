@@ -1,0 +1,45 @@
+Sys::OutPut, release 2.1, is a Perl 5 module which defines the
+subroutines "out", "put", "err", "talk", and "debug", all of which
+perform printf-formatting of their arguments to either STDOUT or
+STDERR, as appropriate, with or without trailing newlines, and possibly
+depending upon the $quiet or $debug variables.
+
+Basically, I don't like to write "printf STDERR" or "printf STDOUT", so
+these little routines do it for me.  And, they take care of ensuring
+that newlines are output when appropriate.
+
+You would be surprised how much easier writing Perl scripts is when you
+use these routines.  The "debug" routine is particularly useful when
+you can code like this:
+
+    next if debug "I got this far."
+
+The module has embedded POD text with which man or HTML pages can be
+created.
+
+For detailed usage information, you can do:
+
+    pod2man OutPut.pm | nroff -man 
+
+The module is accompanied with a Makefile.PL, this README, a test
+program (test.pl), a reference test output file, and the GNU License,
+under which this software is freely available.
+
+Follow these steps to install:
+
+    gunzip Sys-OutPut-2.1.tar.gz
+    tar xvf Sys-OutPut-2.1.tar
+    cd Sys-OutPut-2.1
+    perl Makefile.PL
+    make
+    make test && make install
+
+The "make install" will only succeed if you have the correct
+permissions.
+
+The archives are available at your nearest CPAN site, which you can
+find from http://www.perl.org/CPAN/.
+
+Contributions or improvements are welcome.
+___________________________________________________________
+Alan Stebbens <aks@sgi.com>      http://reality.sgi.com/aks

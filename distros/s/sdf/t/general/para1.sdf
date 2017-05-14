@@ -1,0 +1,12 @@
+# This file tests paragraph tagging
+
+H1: First Level heading
+
+A simple paragraph.
+
+H2: Second level
+heading
+
+Another simple paragraph with
+more than
+1 line.

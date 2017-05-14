@@ -1,0 +1,16 @@
+What code in the distribution is not mine (if I have left something
+out, contact me as soon as possible at lukka@fas.harvard.edu - I really
+want no-one to be left out accidentally) - I'm truly grateful to all
+these people for their help:
+
+ - Mozilla JS (http://www.mozilla.com) (JS/js)
+
+ - John Breen's new WALK viewer (Viewer.pm, VRML::Viewer::Walk) + 
+   Viewer handle RELEASE 
+
+ - Robin Williams: numerical improvements to rendering - 2nd degree eqs
+   + trigs
+
+ - Bernhard Reiter: Extrusion genpolyrep code and nodes/Extrusion[23].wrl,
+   misc comments & generated code cleanup (e.g. the cool vertical "standard"
+   thingy ;)

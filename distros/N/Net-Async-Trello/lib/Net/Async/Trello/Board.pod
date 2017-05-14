@@ -1,0 +1,34 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Trello::Board
+at lib/Net/Async/Trello/Board.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head2 subscribe
+
+=head2 lists
+
+=head2 cards
+
+=head2 create_card
+
+Creates a new card on this board.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::Trello::Generated::Board>
+
+L<closed|Net::Async::Trello::Generated::Board/closed>, L<date_last_activity|Net::Async::Trello::Generated::Board/date_last_activity>, L<date_last_view|Net::Async::Trello::Generated::Board/date_last_view>, L<desc|Net::Async::Trello::Generated::Board/desc>, L<desc_data|Net::Async::Trello::Generated::Board/desc_data>, L<id|Net::Async::Trello::Generated::Board/id>, L<id_organization|Net::Async::Trello::Generated::Board/id_organization>, L<invitations|Net::Async::Trello::Generated::Board/invitations>, L<invited|Net::Async::Trello::Generated::Board/invited>, L<label_names|Net::Async::Trello::Generated::Board/label_names>, L<memberships|Net::Async::Trello::Generated::Board/memberships>, L<name|Net::Async::Trello::Generated::Board/name>, L<pinned|Net::Async::Trello::Generated::Board/pinned>, L<power_ups|Net::Async::Trello::Generated::Board/power_ups>, L<prefs|Net::Async::Trello::Generated::Board/prefs>, L<short_link|Net::Async::Trello::Generated::Board/short_link>, L<short_url|Net::Async::Trello::Generated::Board/short_url>, L<starred|Net::Async::Trello::Generated::Board/starred>, L<subscribed|Net::Async::Trello::Generated::Board/subscribed>, L<url|Net::Async::Trello::Generated::Board/url>
+
+=item L<Net::Async::Trello::Common>
+
+L<new|Net::Async::Trello::Common/new>, L<trello|Net::Async::Trello::Common/trello>
+
+=back
+

@@ -15,7 +15,7 @@ use Unicode::String qw(utf8);
 use strict;
 
 our @EXPORT   = qw(ldap);
-our $VERSION  = '1.4.11';
+our $VERSION  = '1.9.7';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -56,6 +56,8 @@ sub new {
         ( $portal->{ldapTimeout} ? ( timeout => $portal->{ldapTimeout} ) : () ),
         ( $portal->{ldapVersion} ? ( version => $portal->{ldapVersion} ) : () ),
         ( $portal->{ldapRaw}     ? ( raw     => $portal->{ldapRaw} )     : () ),
+        ( $portal->{caFile}      ? ( cafile  => $portal->{caFile} )      : () ),
+        ( $portal->{caPath}      ? ( capath  => $portal->{caPath} )      : () ),
     );
     unless ($self) {
         $portal->lmLog( $@, 'error' );
@@ -90,10 +92,10 @@ sub new {
 sub bind {
     my $self = shift;
     my $mesg;
-    my ( $dn, %args ) = splice @_;
+    my ( $dn, %args ) = @_;
     unless ($dn) {
         $dn = $self->{portal}->{managerDn};
-        $args{password} = $self->{portal}->{managerPassword};
+        $args{password} = decode( 'utf-8', $self->{portal}->{managerPassword} );
     }
     if ( $dn && $args{password} ) {
         if ( $self->{portal}->{ldapPwdEnc} ne 'utf-8' ) {
@@ -119,8 +121,7 @@ sub bind {
 # @return Net::LDAP::Message
 sub unbind {
     my $self     = shift;
-    my $ldap_uri = $self->{portal}->{ldapServer};
-    eval { $ldap_uri = $self->uri; };
+    my $ldap_uri = $self->uri;
 
     $self->{portal}->lmLog( "Unbind and disconnect from $ldap_uri", 'debug' );
 
@@ -245,8 +246,7 @@ sub userBind {
 # @param $ad Active Directory mode
 # @return Lemonldap::NG::Portal constant
 sub userModifyPassword {
-    my ( $self, $dn, $newpassword, $confirmpassword, $oldpassword, $ad ) =
-      splice @_;
+    my ( $self, $dn, $newpassword, $confirmpassword, $oldpassword, $ad ) = @_;
     my $ppolicyControl     = $self->{portal}->{ldapPpolicyControl};
     my $setPassword        = $self->{portal}->{ldapSetPassword};
     my $asUser             = $self->{portal}->{ldapChangePasswordAsUser};
@@ -400,10 +400,40 @@ sub userModifyPassword {
 
             # Bind as user if oldpassword and ldapChangePasswordAsUser
             if ( $oldpassword and $asUser ) {
-                $mesg = $self->bind( $dn, password => $oldpassword );
-                if ( $mesg->code != 0 ) {
-                    $self->{portal}->lmLog( "Bad old password", 'debug' );
-                    return PE_BADOLDPASSWORD;
+
+                $mesg = $self->bind(
+                    $dn,
+                    password => $oldpassword,
+                    control  => [$pp]
+                );
+                my ($bind_resp) = $mesg->control("1.3.6.1.4.1.42.2.27.8.5.1");
+
+                unless ( defined $bind_resp ) {
+                    if ( $mesg->code != 0 ) {
+                        $self->{portal}->lmLog( "Bad old password", 'debug' );
+                        return PE_BADOLDPASSWORD;
+                    }
+                }
+                else {
+
+                    # Check if password is expired
+                    my $pp_error = $bind_resp->pp_error;
+                    if (    defined $pp_error
+                        and $pp_error == 0
+                        and $self->{portal}->{ldapAllowResetExpiredPassword} )
+                    {
+                        $self->{portal}->lmLog(
+"Password is expired but user is allowed to change it",
+                            'debug'
+                        );
+                    }
+                    else {
+                        if ( $mesg->code != 0 ) {
+                            $self->{portal}
+                              ->lmLog( "Bad old password", 'debug' );
+                            return PE_BADOLDPASSWORD;
+                        }
+                    }
                 }
             }
 
@@ -435,10 +465,39 @@ sub userModifyPassword {
             if ($oldpassword) {
 
                 # Check old password with a bind
-                $mesg = $self->bind( $dn, password => $oldpassword );
-                if ( $mesg->code != 0 ) {
-                    $self->{portal}->lmLog( "Bad old password", 'debug' );
-                    return PE_BADOLDPASSWORD;
+                $mesg = $self->bind(
+                    $dn,
+                    password => $oldpassword,
+                    control  => [$pp]
+                );
+                my ($bind_resp) = $mesg->control("1.3.6.1.4.1.42.2.27.8.5.1");
+
+                unless ( defined $bind_resp ) {
+                    if ( $mesg->code != 0 ) {
+                        $self->{portal}->lmLog( "Bad old password", 'debug' );
+                        return PE_BADOLDPASSWORD;
+                    }
+                }
+                else {
+
+                    # Check if password is expired
+                    my $pp_error = $bind_resp->pp_error;
+                    if (    defined $pp_error
+                        and $pp_error == 0
+                        and $self->{portal}->{ldapAllowResetExpiredPassword} )
+                    {
+                        $self->{portal}->lmLog(
+"Password is expired but user is allowed to change it",
+                            'debug'
+                        );
+                    }
+                    else {
+                        if ( $mesg->code != 0 ) {
+                            $self->{portal}
+                              ->lmLog( "Bad old password", 'debug' );
+                            return PE_BADOLDPASSWORD;
+                        }
+                    }
                 }
 
           # Rebind as Manager only if user is not granted to change its password
@@ -536,7 +595,7 @@ sub ldap {
 # @param attributes to get from found groups (array ref)
 # @return hashRef groups
 sub searchGroups {
-    my ( $self, $base, $key, $value, $attributes ) = splice @_;
+    my ( $self, $base, $key, $value, $attributes ) = @_;
 
     my $portal = $self->{portal};
     my $groups = {};
@@ -620,7 +679,7 @@ sub searchGroups {
 # @param attribute Attribute name
 # @return string value
 sub getLdapValue {
-    my ( $self, $entry, $attribute ) = splice @_;
+    my ( $self, $entry, $attribute ) = @_;
 
     return $entry->dn() if ( $attribute eq "dn" );
 

@@ -1,0 +1,17 @@
+ChangeLog
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Data/Localize/Storage/MongoDB.pm
+t/000-load.t
+t/001-basic.t
+t/001-basic/en.po
+t/001-basic/ja.po
+t/002-multilevel.t
+t/002-multilevel/en.yml
+t/002-multilevel/ja.yml
+t/003-load-from-storage.t
+weaver.ini

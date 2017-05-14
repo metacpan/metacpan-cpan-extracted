@@ -1,0 +1,32 @@
+# $Id$
+#
+# >>Title::     User Documentation Report
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# This report is used to extract and format [[SDF]]-style
+# reference documentation embedded in source code.
+#
+# >>Description::
+# 
+# >>Limitations::
+#
+Key             Format
+Title           "H1[id=\"$short\"] $short - $data\n\n"
+Purpose         "H2: $key\n\n$data\n\n"
+Interface       "H2: $key\n\n$data\n\n"
+-               "!SDF_DESCRIPTION_PRE\n"
+Description     "H2: $key\n\n$data\n\n"
+-               "!SDF_DESCRIPTION_POST\n"
+Examples        "H2: $key\n\n$data\n\n"
+Limitations     "H2: Limitations and future directions\n\n$data\n\n"
+-               "!SDF_DEFAULT_END\n"

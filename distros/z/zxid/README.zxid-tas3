@@ -1,0 +1,355 @@
+README.zxid-tas3
+================
+$Id: README.zxid-tas3,v 1.4 2009-10-18 12:39:10 sampo Exp $
+
+ZXID is general purpose SSO and Identity Web Services project, see zxid.org
+
+TAS3 - Trustable Architecture for Secure Shared Services - is an European
+FP7 research project that has chosen to use SAML 2.0 and ID-WSF 2.0
+and is using ZXID as one implementation of these technologies. See tas3.eu
+
+The research leading to these results has received funding from the
+European Community's Seventh Framework Programme (FP7/2007-2013) under
+grant agreement number 216287 (TAS3 - Trusted Architecture for Securely
+Shared Services - www.tas3.eu).
+
+Since ZXID is important for TAS3 and vice versa, ZXID Makefile contains
+some targets for producing ZXID specific packages
+
+  make tas3maspkg   # T3-SSO-ZXID-MODAUTHSAML-V.VV.zip
+  make tas3phppkg   # T3-SSO-ZXID-PHP-V.VV.zip
+  make tas3javapkg  # T3-SSO-ZXID-JAVA-V.VV.zip
+  make tas3idppkg   # T3-IDP-ZXID-V.VV.zip
+  make tas3rel      # build all of the above
+  make tas3copyrel  # scp release packages
+
+https://portal.tas3.eu/pool/        -- Download from here
+http://idpdemo.tas3.eu/cot/         -- Register your metadata here
+http://idpdemo.tas3.eu/zxididp?o=B  -- Publicly available TAS3 demo IdP
+
+<<dia: tas3-integration,,:bg,fg,comp,api,zxmod:: API and modules for SSO and web service call.>>
+
+For help, I recommend joining the ZXID mailing
+list zxid.user@lists.unh.edu 
+at http://listproc.unh.edu/archives/zxid.user/
+
+You can also see TAS3 Architecture Video
+
+http://www.youtube.com/watch?v=QXQ7bbOULYc
+http://zxid.org/tas3/ArchitectureExplained_3_4_1.avi
+
+--Sampo
+
+
+T3-ZXID-LINUX-X86 Install
+-------------------------
+
+T3-ZXID-LINUX-X86 package contains binaries for Linux x86 platforms.
+It was produced by compiling the source code in T3-ZXID-SRC.
+
+To obtain latest version of the T3-ZXID-LINUX-X86 package please
+check https://portal.tas3.eu/pool/ (login needed).
+
+1.  Download and unzip the package
+
+      unzip T3-ZXID-LINUX-X86_1.03.zip
+      cd T3-ZXID-LINUX-X86_1.03
+
+2.  Check that your system has all the dependency libraries
+    installed:
+
+      ldd zxididp
+        linux-gate.so.1 =>  (0xb7818000)
+        libpthread.so.0 => /lib/libpthread.so.0 (0xb77d6000)
+        libcurl.so.3 => not found
+        libssl.so.0.9.8 => /usr/lib/libssl.so.0.9.8 (0xb7792000)
+        libcrypto.so.0.9.8 => /usr/lib/libcrypto.so.0.9.8 (0xb766a000)
+        libz.so.1 => /lib/libz.so.1 (0xb7656000)
+        libc.so.6 => /lib/libc.so.6 (0xb7512000)
+        /lib/ld-linux.so.2 (0xb7819000)
+        libdl.so.2 => /lib/libdl.so.2 (0xb750e000)
+
+    Here you can see that libcurl.so.3 was not found. To remedy
+    such dependencies you may need to adjust LD_LIBRARY_PATH
+    or you may need to simply install the dependency packages
+
+       Debian / Ubuntu                Redhat
+       ------------------------------ -------------------------
+       sudo apt-get install libcurl   sudo yum install libcurl
+       sudo apt-get install openssl   sudo yum install openssl
+       sudo apt-get install libz      sudo yum install libz
+
+    Then recheck with ldd that all libraries are found.
+
+3.  Copy maintenance utilities to a directory in your PATH
+
+      sudo cp zxcot zxpasswd zxmkdirs.sh zxlogview zxdecode /usr/local/bin
+
+4.  Copy zxididp and SP demos to document root of your web server
+
+      cp zxididp zxidhlo.php /srv/www/htdocs   # OpenSUSE 10.2
+
+    The document root directory is distribution and/or web server
+    and/or local configuration specific. You should know where
+    it is.
+
+    Configuring and using zxididp is further documented in
+    zxid-idp.pd file or on web site http://zxid.org/html/zxid-idp.html
+
+5.  Copy PHP libraries to expected place
+
+      sudo mkdir -p `php-config --extension-dir`
+      sudo cp php/php_zxid.so `php-config --extension-dir`
+
+    If you do not intend to use PHP, you can skip this step.
+
+    The PHP usage is further documented in
+
+      php/README.zxid-php:  PHP specific README
+      zxid-php.pd:          Using ZXID from PHP
+      zxidhlo.php:          Example code
+      Web site:             http://zxid.org/html/zxid-php.html
+
+6.  Copy Java libraries to expected place
+
+    If you do not intend to use Java, you can skip this step.
+
+    Here the tricky part is knowing what "the expected place" is.
+    This will depend on how you configure your servlet engine.
+    You will need to investigate your own configuration and
+    tweak the following accordingly:
+
+      sudo cp zxidjava/libzxidjni.so /usr/local/apache-tomcat-5.5.20/bin/
+      sudo cp -r zxidjava            /usr/local/apache-tomcat-5.5.20/webapps/your-servlet-dir
+
+    To get things to work you may need to perform detctive work
+    to understand where Java is looking for them or adjust SERVLET_PATH
+    and/or LD_LIBRARY_PATH. zxid-java.pd has entire section of
+    documentation dedicated to solving these issues.
+
+    The Java usage is further documented in
+
+      zxidjava/README.zxid-java  Java specific README
+      zxid-java.pd       Using ZXID from Java
+      zxidsrvlet.java    Ready to use SSO servlet
+      zxidappdemo.java   Example code for using SSO servlet
+      zxidhlo.java       Example code for direct SSO integration
+      Web site:          http://zxid.org/html/zxid-java.html
+
+7.  Copy Apache SSO support module to the right place
+
+      sudo cp mod_auth_saml.so /usr/local/httpd/modules
+
+    You will need to determine where your distribution has
+    installed the Apache httpd and adjust the path accordingly.
+    Once you think you got it right, you can check with
+    command
+
+      httpd -M
+
+    the following line should appear in the output
+
+       auth_saml_module (shared)
+
+    Despite the name, it indicates that mod_auth_saml has
+    loaded successfully.
+
+    > N.B. Linux distributions often rename httpd as apache2 and
+    > install it in a location different than where apache httpd
+    > source code distribution would install by default. For
+    > example, on Ubuntu the modules directory seems to be
+    > /usr/lib/apache2/modules
+    
+
+8.  Copy include files and libraries to where your development
+    environment can find them:
+
+      sudo cp libzxid.a /usr/local/lib
+      sudo cp -r include/zx /usr/local/include
+
+    This step is only needed if you plan to compile programs
+    to use zxid. If that is your plan and skillset, you may
+    prefer to install zxid from source anyway.
+
+9.  Create directory hierarchy
+
+    Before you run these commands, you need to find out what user
+    your httpd runs as. Here we have assumed user "apache". Adjust
+    as needed.
+
+      sudo zxmkdirs.sh                # For the SP
+      chown -R apache /var/zxid
+      su apache
+      echo NICE_NAME=Your SP Branding              >/var/zxid/zxid.conf
+      echo ORG_NAME=Your Organization              >>/var/zxid/zxid.conf
+      echo ORG_URL=http://your.org/                >>/var/zxid/zxid.conf
+      echo URL=https://sp1.zxidsp.org:8443/zxidhlo >>/var/zxid/zxid.conf
+
+      zxmkdirs.sh /var/zxid/idp       # For the IdP
+      echo NICE_NAME=Your IdP Branding             >/var/zxid/idpzxid.conf
+      echo ORG_NAME=Your IdP Organization          >>/var/zxid/idpzxid.conf
+      echo ORG_URL=http://youridp.org/             >>/var/zxid/idpzxid.conf
+      echo URL=https://idp1.zxid.org:8443/zxididp  >>/var/zxid/idpzxid.conf
+      echo IDP_ENA=1                               >>/var/zxid/idpzxid.conf
+      echo AS_ENA=1                                >>/var/zxid/idpzxid.conf
+      echo PDP_ENA=1                               >>/var/zxid/idpzxid.conf
+
+    In the above, the configuration files for SP and IdP were created. Some
+    configuration options are actually set in the source code of the respective
+    applications. In the config files you MUST set
+
+    NICE_NAME:: Used for user interface purposes (displayed to user) to identify the site.
+    ORG_NAME::  The name of the legal entity responsible for the site, shown to user.
+    ORG_URL::   Institutional web site of the legal entity, shown to user.
+    URL::       Entity Id of the web site. For demo, set them as shown (often set in source).
+
+10. Create certificates
+
+    There are two ways to obtain certificates: (a) Allow ZXID to generate them
+    for you, and (b) obtain and install commercial certificates.
+
+    a. Using auto generated certificates
+
+       i.  For SP certificates, run
+
+             zxcot -m
+
+           and observe that the output has two large base64 blobs. They
+           are inside <ds:X509Certificate> XML elements. zxcot -m generates
+           metadata for the SP. In doing so, it will also generate the
+           certificates on the fly if they do not exist. If the filesystem
+           permissions are incorrect, it will fail to generate the certificates.
+           This is why the `chown -R apache /var/zxid' command was issued
+           in the previous step (9). Check the permissions with
+
+             ls -alF /var/zxid/pem
+       
+           Keep running zxcot -m until you get it to output the certificates.
+
+       ii. For IdP certificates, run
+
+            zxcot -ci -m
+
+           Again, the certificates are generated on the fly. If not, check
+           permissions with
+
+             ls -alF /var/zxid/idppem
+
+           N.B. This assumes the IdP is configured to use the default
+           PATH /var/zxid/idp (-ci is shorthand for this). If this is
+           not the case, you will need to supply the PATH explicitly:
+
+             zxcot -c 'PATH=/your/idp/path/&IDP_ENA=1' -m
+
+           Similarily, if any config options (that affect metadata) are
+           specified in source code rather than in zxid.conf file,
+           you would need to supply them to zxcot using the -c option.
+
+    b. Installing previously obtained certificates
+
+       We assume you have the certificate in file cert.pem and the
+       private key in priv.pem.
+
+       i.  For SP
+
+             sudo su
+             cat cert.pem priv.pem >/var/zxid/pem/ssl-nopw-cert.pem  # put both in one file
+             cp /var/zxid/pem/ssl-nopw-cert.pem /var/zxid/pem/sign-nopw-cert.pem
+             cp /var/zxid/pem/ssl-nopw-cert.pem /var/zxid/pem/enc-nopw-cert.pem
+             cp /var/zxid/pem/ssl-nopw-cert.pem /var/zxid/pem/logenc-nopw-cert.pem
+             cp /var/zxid/pem/ssl-nopw-cert.pem /var/zxid/pem/logsign-nopw-cert.pem
+             chmod 600 /var/zxid/pem/*
+             # end su
+
+           Check with
+
+             zxcot -m
+
+       ii. For IdP
+
+             sudo su
+             cat cert.pem priv.pem >/var/zxid/idppem/ssl-nopw-cert.pem  # put both in one file
+             cp /var/zxid/idppem/ssl-nopw-cert.pem /var/zxid/idppem/sign-nopw-cert.pem
+             cp /var/zxid/idppem/ssl-nopw-cert.pem /var/zxid/idppem/enc-nopw-cert.pem
+             cp /var/zxid/idppem/ssl-nopw-cert.pem /var/zxid/idppem/logenc-nopw-cert.pem
+             cp /var/zxid/idppem/ssl-nopw-cert.pem /var/zxid/idppem/logsign-nopw-cert.pem
+             chmod 600 /var/zxid/idppem/*
+             # end su
+
+           Check with
+
+             zxcot -ci -m
+
+T3-IDP-ZXID Install
+-------------------
+
+Prerequisite:: you must have CGI capable web server, such as mini_httpd, Apache, or IIS.
+
+See also: zxid-idp.pd for more comprehensive documantation
+
+N.B: T3-IDP-ZXID package has been merged with T3-ZXID-LINUX-X86 package, see above.
+
+1.  Download and unzip the package
+
+2.  ldd zxididp
+
+3.  Copy zxididp to document root of your web server
+
+      cp zxididp /srv/www/htdocs   # OpenSUSE 10.2
+
+4.  Create directory hierarchy and initial config
+
+      mkdir /var/zxid
+      chown webuser /var/zxid
+      su webuser
+      zxmkdirs.sh /var/zxid/idp
+      ls -alFR /var/zxid
+
+5.  Create configuration file /var/zxid/idpzxid.conf
+
+      URL=http://idp.tas3.pt:8081/zxididp
+      PDP_ENA=1
+
+6.  Create a user
+
+      mkdir /var/zxid/idpuid/koerkki
+      echo -n salainen >/var/zxid/idpuid/koerkki/.pw
+      
+7.  Configure web server to run the zxididp as a CGI script.
+    
+    On Apache edit httpd.conf (often in /etc/apache2/httpd.conf)
+
+      <Location "/zxididp">
+      Options ExecCGI
+      SetHandler cgi-script
+      </Location>
+
+8.  Test it
+
+      tail -f /var/tmp/zxid.stderr
+      tail -f /var/log/apache2/error_log
+
+    http://idp.tas3.pt:8081/zxididp?o=B
+
+T3-ZXID-SRC Compile and Install
+-------------------------------
+
+After unzipping the package, unpack the tarball contained therein, and
+read INSTALL.zxid contained in the tarball.
+
+Mapping between TAS3 API and ZXID API
+-------------------------------------
+
+* Use zxidjava/libzxidjni.so instead of tas3jni.so
+* import zxidjava.*; instead of import tas3.*;
+* System.loadLibrary("tas3jni.so");  should become           
+  System.loadLibrary("zxidjava/libzxidjni.so");
+* In class names replace "tas3" with "zxidjni", for example
+
+    tas3.wsp_validate()
+
+  becomes
+
+    zxidjni.wsp_validate()
+
+--Sampo

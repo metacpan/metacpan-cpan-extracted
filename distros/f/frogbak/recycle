@@ -1,0 +1,76 @@
+#!/usr/local/bin/perl
+
+$recorddir = "/usr/local/dump";
+
+chdir($recorddir) || die "chdir $recorddir: $!";
+
+mkdir("recycled",0777) unless -d "recycled";
+
+for $tape (@ARGV) {
+	rename("tapes/$tape","recycled/$tape") 
+		|| warn "rename tapes/$tape recycled/$tape: $!";
+	unless (open(TAPE,"recycled/$tape")) {
+		print "Could not open recycled/$tape: $!\n";
+		next;
+	}
+	while(<TAPE>) {
+		last if /^---/;
+	}
+	DUMP: while($t = <TAPE>) {
+		last DUMP if ($t =~ /^--/);
+		($t =~ /^\s*([^ 	:]+):(\/\S*).*(full|incr)/) || do {
+			print "Unrecognized tape file line recycled/$tape, line $.:\n\t$t";
+			next DUMP;
+		};
+		($host,$filesys,$type) = ($1,$2,$3);
+		$recfile = &getdumphistname($host,$filesys,$type);
+		unless (open(RECFILE,$recfile)) {
+			print "Could not open $recfile: $!\n";
+			next DUMP;
+		}
+		unless (open(NEWREC,">$recfile.new")) {
+			print "Could not open >$recfile.new: $!\n";
+			close(RECFILE);
+			next DUMP;
+		}
+		while ($rec = <RECFILE>) {
+			@f = split(' ',$rec);
+			next if ($f[2] eq $tape);
+			unless (print NEWREC $rec) {
+				print "Write error on $recfile.new: $!\n";
+				next DUMP;
+			}
+		}
+		close(RECFILE);
+		unless (close(NEWREC)) {
+			print "error closing $recfile.new: $!\n";
+			next DUMP;
+		}
+		rename("$recfile.new",$recfile) ||
+			warn "rename $recfile.new $recfile: $!\n";
+	}
+	close(TAPE);
+}
+
+
+sub getdumphistname {
+	local ($host, $file, $type) = @_;
+	if ($file =~ m,^//([^/]*)/?(.*),) {
+		$host = $1;
+		$file = $2;
+		if ($file eq "") {
+			$file = "/";
+		}
+	}
+	if ($file =~ m,^/(.*),) {
+		$file = $1;
+	}
+	$file =~ s,/,_,g;
+	if (! -d "records/$host") {
+		print ("warning: making directory records/$host\n");
+		mkdir("records/$host",0777)
+			|| warn "could not mkdir records/$host: $!\n";
+	}
+	return "records/" . $host . "/" . $file . "." . $type;
+}
+

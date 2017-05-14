@@ -1,0 +1,29 @@
+Revision history for Acme-Coinbase
+
+0.007    2014/11/22
+        Corrected Changes entry for 0.006
+        More headers as speced.
+        use bignum for arbitrary-precision math
+
+0.006    2014/11/18 
+        More POD, about command-line options in bin/coinbase.pl, and more.
+
+0.005    2014/11/18 
+        Added used of PodWeaver.
+        Add POD to bin/coinbase.pl.
+        Fixed version numbers in Changes.
+
+0.004    2014/11/18 
+        Documented --nonce=N option.
+        Show less output when not in verbose mode.
+        Added Changes file.
+
+0.003    2014/11/18 
+        There is no 0.003.
+
+0.002    2014/11/18 
+        Added pod and some tests, and --nonce option.
+
+0.001    2014/11/16 
+        First version, released on an unsuspecting world.
+

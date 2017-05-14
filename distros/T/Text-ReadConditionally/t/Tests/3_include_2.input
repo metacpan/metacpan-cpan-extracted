@@ -1,0 +1,9 @@
+.# Title: Include nested
+Line 1
+.include 3_include_2.inc
+
+Back to top level file
+.let allfiles := join(':', _FileNames); allnumbers := join(':', _LineNumbers)
+.echo allfiles = \v{allfiles}
+.echo allnumbers = \v{allnumbers}
+Line end

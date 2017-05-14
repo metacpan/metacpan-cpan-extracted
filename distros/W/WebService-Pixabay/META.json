@@ -24,6 +24,7 @@
             "Data::Printer" : "0.39",
             "Function::Parameters" : "2.000006",
             "LWP::Online" : "1.08",
+            "Modern::Perl" : "1.20170117",
             "Moo" : "2.003000",
             "Test::More" : "1.302075",
             "WebService::Client" : "0.0501",
@@ -43,7 +44,7 @@
          "web" : "https://github.com/faraco/WebService-Pixabay"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

@@ -1,0 +1,177 @@
+# zxid/sg/liberty-idwsf-disco-svc-v2.0.sg
+# Slightly edited, 18.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-disco-svc-v2.0.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(di,  urn:liberty:disco:2006-08)
+import(md,  urn:oasis:names:tc:SAML:2.0:metadata, saml-schema-metadata-2.0.xsd)
+import(b,   urn:liberty:sb:2006-08, liberty-idwsf-soap-binding-v2.0.xsd)
+import(sbf, urn:liberty:sb, liberty-idwsf-soap-binding.xsd)
+import(a,   http://www.w3.org/2005/08/addressing, ws-addr-1.0.xsd)
+import(lu,  urn:liberty:util:2006-08, liberty-idwsf-utility-v2.0.xsd)
+import(sec, urn:liberty:security:2006-08, liberty-idwsf-security-mechanisms-v2.0.xsd)
+
+Abstract	 -> %xs:string
+ProviderID	 -> %xs:anyURI
+ServiceType	 -> %xs:anyURI
+Framework	 -> %sbf:FrameworkType
+@NotOnOrAfter	 -> %xs:dateTime
+
+SecurityContext:
+  di:SecurityMechID+
+  sec:Token*
+  ;
+SecurityMechID	 -> %xs:anyURI
+
+Options	 -> %di:OptionsType
+Option	 -> %xs:anyURI
+%OptionsType:
+  di:Option*
+  ;
+
+Address	 -> %xs:anyURI
+Action	 -> %xs:anyURI
+
+Keys	 -> %di:KeysType
+%KeysType:
+  md:KeyDescriptor+
+  ;
+
+SvcMD	 -> %di:SvcMetadataType
+%SvcMetadataType:
+  di:Abstract
+  di:ProviderID
+  di:ServiceContext+
+  @svcMDID?	 -> %xs:string
+  ;
+
+ServiceContext	 -> %di:ServiceContextType
+%ServiceContextType:
+  di:ServiceType+
+  di:Options*
+  di:EndpointContext+
+  ;
+
+EndpointContext	 -> %di:EndpointContextType
+%EndpointContextType:
+  di:Address+
+  sbf:Framework+
+  di:SecurityMechID+
+  di:Action*
+  ;
+
+SvcMDID	 -> %xs:string
+
+Query	 -> %di:QueryType
+%QueryType:
+  di:RequestedService*	 -> %di:RequestedServiceType
+  @any
+  ;
+
+%RequestedServiceType:
+  di:ServiceType*
+  di:ProviderID*
+  di:Options*
+  di:SecurityMechID*
+  di:Framework*
+  di:Action*
+  any*  ns(##other)  processContents(lax)
+  @reqID?	 -> %xs:string
+  @resultsType?	 -> %xs:string
+  ;
+
+QueryResponse -> %di:QueryResponseType
+%QueryResponseType:
+  lu:Status
+  a:EndpointReference*
+  @any
+  ;
+
+SvcMDAssociationAdd -> %di:SvcMDAssociationAddType
+%SvcMDAssociationAddType:
+  di:SvcMDID+
+  @any
+  ;
+
+SvcMDAssociationAddResponse -> %di:SvcMDAssociationAddResponseType
+%SvcMDAssociationAddResponseType:
+  lu:Status
+  @any
+  ;
+
+SvcMDAssociationDelete -> %di:SvcMDAssociationDeleteType
+%SvcMDAssociationDeleteType:
+  di:SvcMDID+
+  @any
+  ;
+
+SvcMDAssociationDeleteResponse -> %di:SvcMDAssociationDeleteResponseType
+%SvcMDAssociationDeleteResponseType:
+  lu:Status
+  @any
+  ;
+
+SvcMDAssociationQuery -> %di:SvcMDAssociationQueryType
+%SvcMDAssociationQueryType:
+  di:SvcMDID*
+  @any
+  ;
+
+SvcMDAssociationQueryResponse -> %di:SvcMDAssociationQueryResponseType
+%SvcMDAssociationQueryResponseType:
+  lu:Status
+  di:SvcMDID*
+  @any
+  ;
+
+SvcMDRegister -> %di:SvcMDRegisterType
+%SvcMDRegisterType:
+  di:SvcMD+
+  @any
+  ;
+
+SvcMDRegisterResponse -> %di:SvcMDRegisterResponseType
+%SvcMDRegisterResponseType:
+  lu:Status
+  di:SvcMDID*
+  di:Keys*
+  @any
+  ;
+
+SvcMDDelete -> %di:SvcMDDeleteType
+%SvcMDDeleteType:
+  di:SvcMDID+
+  @any
+  ;
+
+SvcMDDeleteResponse -> %di:SvcMDDeleteResponseType
+%SvcMDDeleteResponseType:
+  lu:Status
+  @any
+  ;
+
+SvcMDQuery -> %di:SvcMDQueryType
+%SvcMDQueryType:
+  di:SvcMDID*
+  @any
+  ;
+
+SvcMDQueryResponse -> %di:SvcMDQueryResponseType
+%SvcMDQueryResponseType:
+  lu:Status
+  di:SvcMD*
+  @any
+  ;
+
+SvcMDReplace -> %di:SvcMDReplaceType
+%SvcMDReplaceType:
+  di:SvcMD+
+  @any
+  ;
+
+SvcMDReplaceResponse -> %di:SvcMDReplaceResponseType
+%SvcMDReplaceResponseType:
+  lu:Status
+  @any
+  ;
+
+#EOF

@@ -1,0 +1,34 @@
+#!/usr/local/bin/perl
+
+use Fame;
+
+# remove database
+if (-e "test.db") { system("rm -f test.db"); }
+
+#
+# open database and write values to ser1 and ser2
+#
+$db = new Fame::DB &Fame::HLI::HCMODE, "test";
+$db->Create("ser1");
+$db->Create("ser2");
+$db->Write("ser1","1jan95", 15, 8, 9, 21 ,14 ,17);
+$db->Write("ser2","1jan95", 12, 14, 5, 9 ,3 ,10);
+$db->destroy;
+
+#
+# open database and perform analytics
+#
+$ip = new Fame::LANG;
+$ip->command('open <access read> "test.db" as test');
+@diff = $ip->exec('ser1 - ser2');
+($mean) = $ip->exec('ave(ser1 - ser2)');
+
+print "Differences: ", join(", ",@diff), "\n";
+print "mean = $mean\n";
+
+$ip->command('fit ser1 by ser2');
+
+$ip->destroy;
+
+# wipe out database
+system("rm -f test.db");

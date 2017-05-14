@@ -1,0 +1,6 @@
+Revision history for Perl extension Sub::Versive.
+
+0.01  Mon Feb 19 20:56:12 2001
+	- original version; created by h2xs 1.20 with options
+		-AX -n Sub::Versive
+

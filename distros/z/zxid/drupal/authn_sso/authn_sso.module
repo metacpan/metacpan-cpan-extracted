@@ -1,0 +1,89 @@
+<?php
+/**
+ * @file
+ * authn_sso.module - mod_auth_saml based login support for Drupal
+ *
+ * Copyright (c) 2013 Synergetics NV. All Rights Reserved.
+ * Author: Sampo Kellomaki (sampo@synergetics.be)
+ *
+ * Drupal module to match Apache mod_auth_saml (see zxid.org). This module
+ * will also work with HTTP Basic Auth (or anything that sets REMOTE_USER)
+ * configured at Apache httpd level.
+ *
+ * See also:
+ * http://api.drupal.org/api/drupal/includes!module.inc/group/hooks/7
+ *
+ * cp -r authn_sso/ sites/all/modules/
+ */
+
+function authn_sso_help($path, $arg) {
+    switch ($path) {
+    case '':
+      return t("Help string for authn_sso module: remember to deploy mod_auth_saml (from zxid.org) at Apache level.");
+    }
+}
+
+function ssodbg($msg) {
+  //syslog(LOG_ERR, $msg);
+  //error_log($msg);
+  //watchdog("authn_sso", $msg, NULL, WATCHDOG_ERROR);
+  $log = fopen("/var/tmp/authn_sso.log", "a");
+  fwrite($log, $msg."\n");
+  fclose($log);
+}
+
+// This hook is supposedly too early in the process and not all prerequisites are in place, yet
+// http://api.drupal.org/api/drupal/modules!system!system.api.php/function/hook_boot/7
+//function authn_sso_boot() { }
+
+// Seems to be the appropriate hook for login tasks
+// http://api.drupal.org/api/drupal/modules!system!system.api.php/function/hook_init/7
+
+// Apparenlty this does not work if page is cached. In this case
+// calling drupal_page_is_cacheable(FALSE); from hook_init() can
+// be a solution, if you can identify whether page is indeed not
+// cacheable (otherwise you might as well just turn off the cache globally).
+
+function authn_sso_init() {
+  ssodbg("HERE1");
+  if (isset($_SERVER['REQUEST_URI']) && ($_SERVER['REQUEST_URI'] == '/development/inloggen')) {
+    ssodbg("INLOGGEN1 dont cache");
+    drupal_page_is_cacheable(FALSE);
+  }
+  ssodbg(var_export($_SERVER, true));
+  //ssodbg("GLOBALS");  ssodbg(var_export($GLOBALS, true));
+  $remote_user = false;
+  if (isset($_SERVER['REMOTE_USER'])) {
+    $remote_user = $_SERVER['REMOTE_USER'];
+    ssodbg("REMOTE_USER".$remote_user);
+  } elseif (isset($_SERVER['REDIRECT_REMOTE_USER'])) {
+    $remote_user = $_SERVER['REDIRECT_REMOTE_USER'];
+    ssodbg("REDIRECT_REMOTE_USER".$remote_user);
+  } else {
+    return;
+  }
+  $account = user_load_by_name($remote_user);  // HTTP Auth or its simulation
+  if (!$account) {
+    $cn = '';
+    if (isset($_SERVER['SAML_cn'])) {
+      $cn = $_SERVER['SAML_cn'];
+    } elseif (isset($_SERVER['REDIRECT_SAML_cn'])) {
+      $cn = $_SERVER['REDIRECT_SAML_cn'];
+    }
+    ssodbg("Account ".$remote_user." (".$cn.") does not exist. Creating it (on-the-fly).");
+    $account = user_save($account, array('name' => $remote_user, 'cn' => $cn));
+    if (!$account) {
+      drupal_set_message(t("Error creating user account based on SSO."), 'error');
+      return;
+    }
+  }
+  global $user;
+  $user = $account;   // Login happens when global variable $user is set
+  ssodbg("Logging in as ".$remote_user);
+  user_login_finalize();
+  ssodbg("DONE");
+}
+
+//function authn_sso_user_logout($account) {}
+
+/* EOF - authn_sso.module */

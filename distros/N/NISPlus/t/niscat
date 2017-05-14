@@ -1,0 +1,181 @@
+#!/usr/local/bin/perl -w
+
+#BEGIN { unshift(@INC, "../blib/lib", "./blib/lib", "../blib/arch"); }
+use Net::NISPlus::Directory;
+use Net::NISPlus::Table;
+use Getopt::Std;
+
+# OPTIONS
+#
+# -A    Display the data within the table and all of the data in tables in
+#       the initial table's concatenation path.
+#
+# -h    Display the header line prior to displaying the table. The
+#       header consists of the `#' (hash) character followed by the name of
+#       each column. The column names are separated by the table separator
+#       character.
+#
+# -L    Follow links. When this option is specified, if tablename or name
+#       names a LINK type object, the link is followed and the object or table
+#       named by the link is displayed.
+#
+# -M    Master server only. This option specifies that the request should
+#       be sent to the master server of the named data. This guarantees that
+#       the most up-to-date information is seen at the possible expense
+#       of increasing the load on the master server and increasing the
+#       possibility of the NIS+ server being unavailable or busy for updates.
+#
+# -P    Follow concatenation path. This option specifies that the request
+#       should follow the concatenation path of a table if the initial search
+#       is unsuccessful. This option is only useful when using an indexed
+#       name for name and the -o option.
+#
+# -v    Display binary data directly. This option displays columns
+#       containing binary data on the standard output. Without this option
+#       binary data is displayed as the string *BINARY*.
+#
+# -o name
+#       Display the internal representation of the named NIS+
+#       object(s). If name is an indexed name (see nismatch(1)), then each
+#       of the matching entry objects is displayed. This option is used to
+#       display access rights and other attributes of individual columns.
+
+
+$usage="niscat [ -AhLMv ] tablename\nniscat [ -ALMP ] -o name ...\n";
+
+getopts("DAhLMPvo");
+
+if (($opt_h || $opt_v) && ($opt_P || $opt_o)) { die $usage; };
+
+chop($os=`uname -r`);
+$style = 1 if $os eq "5.3";
+$style = 1 if $os eq "5.4";
+$style = 2 if $os eq "5.5";
+$style = 2 if $os eq "5.5.1";
+
+print "#ARGV = $#ARGV\n" if $opt_D;
+print "os = $os\n" if $opt_D;
+foreach $tname (@ARGV)
+{
+  if ($opt_o)
+  {
+    if (Net::NISPlus::type($tname) eq "TABLE")
+    {
+      $table = Net::NISPlus::Table->new("$tname");
+      print "table = $table\n" if $opt_D;
+      if ($table)
+      {
+#        $table->set('master_only', 1) if $opt_M;
+#        $table->set('binary', 1) if $opt_v;
+#        $table->set('follow_links', 1) if $opt_L;
+        $info = $table->info();
+
+        common($info);
+        print "Table Type          : $info->{'ta_type'}\n";
+        print "Number of Columns   : $info->{'ta_maxcol'}\n";
+        print "Character Separator : $info->{'ta_sep'}\n";
+        print "Search Path         : $info->{'ta_path'}\n";
+        print "Columns             :\n";
+        @cols = @{$info->{'ta_cols'}};
+        foreach $col ($[..$#cols)
+        {
+          print "\t[$col]\tName          : $cols[$col]\n";
+          print "\t\tAttributes    : ",
+            Net::NISPlus::flags2str($info->{'ta_cols_flags'}->{$cols[$col]}),
+            "\n";
+          print "\t\tAccess Rights : ",
+            Net::NISPlus::rights2str($info->{'ta_cols_rights'}->{$cols[$col]}),
+            "\n";
+        }
+      }
+    }
+    else
+    {
+      if ($tname =~ /[\[\],=]/)
+      {
+        $tablename = $tname;
+        $tablename =~ s/.*,([^\[\],=]*)/$1/;
+        if (Net::NISPlus::type($tablename) eq "TABLE")
+        {
+          $table = Net::NISPlus::Table->new("$tablename");
+          print "table = $table\n" if $opt_D;
+          if ($table)
+          {
+            @colnames = $table->colnames();
+#            $table->set('master_only', 1) if $opt_M;
+#            $table->set('binary', 1) if $opt_v;
+#            $table->set('follow_links', 1) if $opt_L;
+            foreach  $entry ($table->lookup($tname))
+            {
+              $info = $table->info();
+
+              common($info);
+              print "\tEntry data of type $info->{'en_type'}\n";
+              foreach $col ($[..$#colnames)
+              {
+                print
+                  "\t[", $col, "] - [",
+                  length($entry->{$colnames[$col]}) + 1, " bytes",
+                  "] '$entry->{$colnames[$col]}'\n";
+              }
+            }
+          }
+        }
+        else
+        {
+          die "$tname: Database for table does not exist.\n";
+        }
+      }
+      else
+      {
+        die "$tname: Not found.\n";
+      }
+    }
+  }
+  else
+  {
+    if (Net::NISPlus::type($tname) eq "TABLE")
+    {
+      $table = Net::NISPlus::Table->new("$tname");
+      print "table = $table\n" if $opt_D;
+      if ($table)
+      {
+#      $table->set('master_only', 1) if $opt_M;
+#      $table->set('binary', 1) if $opt_v;
+#      $table->set('follow_links', 1) if $opt_L;
+        $info = $table->info();
+        print "# ", join($info->{'ta_sep'}, $table->colnames()), "\n" if $opt_h;
+        foreach ($table->list())
+        {
+          print join($info->{'ta_sep'}, @{$_}), "\n";
+        }
+      }
+    }
+    else
+    {
+      die "$tname: Not found.\n";
+    }
+  }
+}
+
+sub common
+{
+  local($ctime, $mtime) = unpack('N2', $info->{'oid'});
+
+  print "Object Name   : $info->{'name'}\n";
+  print "Directory     : $info->{'domain'}\n" if $style == 2;
+  print "Owner         : $info->{'owner'}\n";
+# niscat has some tabs in odd placess...
+  print "Group\t      : $info->{'group'}\n";
+  print "Domain        : $info->{'domain'}\n" if $style == 1;
+  print "Access Rights : ", Net::NISPlus::rights2str($info->{'access'}), "\n";
+  print "Time to Live  : ", Net::NISPlus::ttl2str($info->{'ttl'}), "\n";
+  print "Creation Time : ", scalar localtime($ctime), "\n" if $style == 2;
+  print "Mod. Time     : ", scalar localtime($mtime), "\n" if $style == 2;
+  print "Object Type   : $info->{'type'}\n";
+}
+
+sub nevercalled
+{
+  $opt_v = $opt_P = 0;
+}

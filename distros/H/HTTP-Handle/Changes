@@ -1,0 +1,14 @@
+2004-05-14 16:54  psionic
+
+	* Changes: [no log message]
+
+2004-05-08 20:03  psionic
+
+	* Changes, Handle.pm, Makefile.PL: - Some minor changes.  - Added
+	  dependencies in Makefile.PL
+
+2004-05-01 03:38  psionic
+
+	* Changes, Handle.pm, MANIFEST, Makefile.PL, Makefile.old, README,
+	  test.pl: - Initial revision
+

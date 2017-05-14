@@ -1,0 +1,21 @@
+---
+abstract: 'create geometric grids'
+author:
+  - 'Simone <scesano@cpam.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Grid-Coordinates
+requires:
+  List::AllUtils: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  POSIX: '0'
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

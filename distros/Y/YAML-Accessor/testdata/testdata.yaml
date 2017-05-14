@@ -1,0 +1,29 @@
+---
+concatenated: these words should be on the same line
+heredoc: 'a heredoc begins here
+
+  and ends here.'
+mapping:
+  key1: value1
+  key2: value2
+  key3: value3
+nested:
+  parent:
+    child1:
+      childkey1: childvalue1
+      childkey2: childvalue2
+      childkey3: childvalue3
+    child2:
+      childkey1: childvalue1
+      childkey2: childvalue2
+      childkey3: childvalue3
+ordered_mapping:
+- h1key1: h1value1
+  h1key2: h1value2
+  h1key3: h1value3
+  h1key4: h1value4
+- h2key1: h2value1
+  h2key2: h2value2
+  h2key3: h2value3
+  h2key4: h2value4
+string: an awesome string

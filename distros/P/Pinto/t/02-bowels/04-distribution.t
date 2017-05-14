@@ -11,8 +11,8 @@ use lib 't/lib';
 use Pinto::Tester::Util qw(make_dist_obj);
 
 #-----------------------------------------------------------------------------
-subtest 'author/archive' => sub {
 
+{
     my $dist = make_dist_obj(
         author  => 'FOO',
         archive => 'Bar-1.2.tar.gz'
@@ -29,12 +29,11 @@ subtest 'author/archive' => sub {
     is( $dist->path,     'F/FO/FOO/Bar-1.2.tar.gz', 'Logical archive path' );
     is( $dist->native_path('here'), file(qw(here F FO FOO Bar-1.2.tar.gz)), 'Physical archive path, with base' );
     is( "$dist", 'FOO/Bar-1.2.tar.gz', 'Stringifies to author/archive' );
-
-};
+}
 
 #-----------------------------------------------------------------------------
-subtest 'author/archive/source' => sub {
 
+{
     my $dist = make_dist_obj(
         author  => 'FOO',
         archive => 'Bar-4.3_34.tgz',
@@ -47,12 +46,11 @@ subtest 'author/archive/source' => sub {
     is( $dist->version(),  '4.3_34',                       'dist version' );
     is( $dist->is_local(), q{},                            'is_local is false when dist is remote' );
     is( $dist->is_devel(), 1,                              'this is a devel dist' );
-
-};
+}
 
 #------------------------------------------------------------------------------
-subtest 'author/archive/formats' => sub {
 
+{
     my $dist = make_dist_obj(
         author  => 'AUTHOR',
         archive => 'Foo-2.0.tar.gz'
@@ -74,8 +72,7 @@ subtest 'author/archive/formats' => sub {
         my $got = $dist->to_string("%$placeholder");
         is( $got, $expected, "Placeholder: %$placeholder" );
     }
-
-};
+}
 
 #------------------------------------------------------------------------------
 

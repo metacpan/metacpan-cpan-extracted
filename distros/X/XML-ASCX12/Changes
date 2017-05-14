@@ -1,6 +1,9 @@
 Revision history for Perl extension XML::ASCX12.
 $Id: Changes,v 1.4 2004/09/28 14:59:34 brian.kaney Exp $
 
+0.04  Mon Sep 28 16:17:23 EDT 2009
+    - Add $IS_CHILD and Catalog 175 support
+
 0.03  Tue Sep 28 10:54:32 EDT 2004
     - Properly initialized a variable in the _proc_element() method
     - POD spelling correction

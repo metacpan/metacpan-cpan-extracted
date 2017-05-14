@@ -1,0 +1,6 @@
+.# Title: simple read
+Line 1
+.read x
+some line
+.eval x=\v{x}
+EOF

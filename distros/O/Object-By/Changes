@@ -1,0 +1,26 @@
+0.08	11 May 2012
+	- fixed package name of ::Typeglob
+	- unified subroutine style
+	- removed *_Initializer, because they violate the KISS policy
+	- renamed Any_Reference to Existing_Reference
+
+0.07	11 May 2012
+	- basic idea remains, documentation stays valid, but many improvements and additions
+
+0.06	11 May 2011
+	- renamed new() to constructor()
+
+0.05	03 May 2011
+	- no changes (versioning accident)
+
+0.04	29 April 2011
+	- use 5.8.1 because Internals:: was introduced then
+
+0.03	28 April 2011
+	- added basic tests
+
+0.02	24 April 2011
+	- added documentation
+
+0.01	17 April 2011
+	- first public release

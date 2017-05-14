@@ -1,0 +1,108 @@
+TYPEMAP
+
+# These are synonyms for Gtk::Gdk::Pixmap (which itself is a renamed Gtk::Gdk::Window)
+Gtk::Gdk::Window	T_SimpleVal
+Gtk::Gdk::Bitmap	T_SimpleVal
+
+Gtk::Gdk::Cursor	T_MISCPTROBJ
+Gtk::Gdk::GC		T_MISCPTROBJ
+Gtk::Gdk::Image		T_SimpleVal
+Gtk::Gdk::GCValues	T_MISCPTROBJ
+Gtk::Gdk::Atom		T_SimpleVal
+
+Gtk::MenuFactory	T_MISCPTROBJ
+Gtk::SelectionData      T_MISCPTROBJ
+
+upGtk::Widget		T_GtkUPPTROBJ
+
+Gtk::Gdk::Event		T_SimpleVal
+Gtk::Gdk::Region	T_SimpleVal
+Gtk::Gdk::Rectangle	T_SimplePtr
+Gtk::Gdk::Color		T_SimpleVal
+
+gfloat				T_FLOAT
+
+bool				T_BOOL
+
+INPUT
+
+T_BOOL
+	$var = (int)SvIV($arg)
+
+T_GtkPTROBJ
+	if (SvTRUE($arg)) {
+		$var = Cast$type(SvGtkObjectRef($arg, \"${ntype}\"));
+	} else
+		croak(\"$var is not of type ${ntype}\")
+
+T_GtkPTROBJOrNULL
+	$var = SvTRUE($arg) ? Cast$type(SvGtkObjectRef($arg, \"" . ($foo=$ntype,$foo=~s/OrNULL//,$foo). "\")) : 0
+
+T_GtkUPPTROBJ
+	$var = Cast$type(SvGtkObjectRef($arg, \"${ntype}\"))
+
+T_GtkPTRREF
+	$var = Cast$type(SvGtkObjectRef($arg, 0))
+
+T_GtkUPPTRREF
+	$var = Cast$type(SvGtkObjectRef($arg, 0))
+
+T_MISCPTROBJ
+	$var = ($type)SvMiscRef($arg, \"${ntype}\")
+
+T_MISCPTRREF
+	$var = ($type)SvMiscRef($arg, 0);
+
+T_REFPTROBJ
+	$var = ($type)SvMiscRef($arg, \"${ntype}\")
+
+T_REFPTRREF
+	$var = ($type)SvMiscRef($arg, 0);
+
+T_SimpleVal
+	$var = Sv" . ($foo=$ntype, $foo=~s/://g, $foo=~s/^GtkGdk/Gdk/, $foo) . "($arg)
+
+T_SimplePtr
+	$var = Sv" . ($foo=$ntype, $foo=~s/://g, $foo=~s/^GtkGdk/Gdk/, $foo) . "($arg,0)
+
+OUTPUT
+
+T_BOOL
+	$arg = boolSV($var);
+
+T_GtkPTROBJ
+    if (!$var) {
+    	croak("failed to return mandatory object of type $ntype");
+    }
+	sv_setsv($arg, newSVGtkObjectRef(GTK_OBJECT($var), \"${ntype}\"));
+	SvREFCNT_dec(SvRV($arg));
+
+T_GtkPTROBJOrNULL
+    if ($var) {
+		sv_setsv($arg, newSVGtkObjectRef(GTK_OBJECT($var), \"@{[map(s/OrNULL//,$ntype)]}\"));
+		SvREFCNT_dec(SvRV($arg));
+	} else
+		sv_setsv($arg, newSVsv(&sv_undef));
+
+T_GtkUPPTROBJ
+	sv_setsv($arg, newSVGtkObjectRef(GTK_OBJECT($var), 0));
+	SvREFCNT_dec(SvRV($arg));
+
+T_MISCPTROBJ
+	sv_setsv($arg, newSVMiscRef((void*)$var, \"${ntype}\", 0));
+	SvREFCNT_dec(SvRV($arg));
+
+T_REFPTROBJ
+	{
+		int n;
+		sv_setsv($arg,newSVMiscRef((void*)$var, \"${ntype}\", &n));
+		SvREFCNT_dec(SvRV($arg));
+		if (n)
+			@{[grep {s/://g, s/^GtkGdk/Gdk/, s/([a-z])([A-Z]+)/$1_$2/g, tr/A-Z/a-z/, 1} $ntype]}_ref($var);
+	}
+
+T_SimpleVal
+	sv_setsv($arg,sv_2mortal(newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var)));
+
+T_SimplePtr
+	sv_setsv($arg,sv_2mortal(newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var)));

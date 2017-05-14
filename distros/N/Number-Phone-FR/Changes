@@ -1,5 +1,9 @@
 Revision history for Number::Phone::FR.
 
+0.0917109    2017-05-11    DOLMEN (Olivier Mengué)
+	Fix Build.PL and tests for compatibility with dot-less-@INC-perl.
+	ARCEP data: 2017-04-19.
+
 0.0815091    2015-04-02    DOLMEN (Olivier Mengué)
 	ARCEP data: 2015-04-01.
 

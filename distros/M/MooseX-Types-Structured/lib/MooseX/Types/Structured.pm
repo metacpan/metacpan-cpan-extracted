@@ -1,7 +1,7 @@
-package MooseX::Types::Structured; # git description: v0.34-6-g17def06
+package MooseX::Types::Structured; # git description: v0.35-8-gc2cf3da
 # ABSTRACT: Structured Type Constraints for Moose
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use 5.008;
 use Moose::Util::TypeConstraints 1.06 'find_type_constraint';
@@ -1015,7 +1015,7 @@ MooseX::Types::Structured - Structured Type Constraints for Moose
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -1718,7 +1718,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-L<irc://irc.perl.org/#moose>.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 

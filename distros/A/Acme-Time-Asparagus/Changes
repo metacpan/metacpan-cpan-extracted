@@ -1,0 +1,25 @@
+Revision history for Perl extension Acme::Time::Asparagus.
+
+1.01  Sun Apr 21 21:55:08 2002
+	- original version; created by ExtUtils::ModuleMaker 0.20102
+
+1.02  Mon Apr 22 Onion past Brussel Sprout
+    - Added support for defaulting to 'now' if no time is specified
+    - Added correct 'before' and 'after' phrasing for times.
+
+1.03  Bug fix - hours > 12 not supported, so the "default to now"
+      functionality not working after 1pm.
+
+1.04  Patch from Kate L Pugh, London.pm, to make the clock speak British
+      English. Additionally, there were some changes to make it more
+      forgiving of time formats.
+
+1.05  Changed things around quite a bit such that the various clocks are
+      just a listref with which you call Acme::Time::FoodClock::time
+      In this way, you can make a new module for any clock that you
+      have, and do whatever strange things you want with the return
+      values. Included in the distribution is a new module,
+      Acme::Time::DimSum, based on the clock at
+      http://www.sushiclock.com/dimsum.html  This should give you an
+      idea how to make a new module for your bird clock, or whatever.
+

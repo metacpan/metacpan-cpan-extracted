@@ -6,17 +6,14 @@ my $ivbits = $Config{ivsize}*8;
 
 write_makefile(
     NAME      => 'Panda::Time',
-    PREREQ_PM => {
-        'Panda::Export' => 0,
-        'Panda::Lib'    => '1.3.0', # endian.h
-    },
+    PREREQ_PM => {'Panda::Export' => 0},
     CPLUS     => 11,
     SRC       => 'src',
     INC       => '-Isrc',
     DEFINE    => $ENV{TEST_FULL} ? '-DTEST_FULL' : '',
     TYPEMAPS  => "typemap$ivbits",
     PAYLOAD   => {'zoneinfo' => ''},
-    BIN_DEPS  => 'Panda::Lib',
+    BIN_DEPS  => ['Panda::XS', 'CPP::panda::lib'],
     BIN_SHARE => {
         CPLUS    => 11,
         INCLUDE  => {'src' => '/'},

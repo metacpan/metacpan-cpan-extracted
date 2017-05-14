@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::UserDBLDAP;      #inherits
 
 #inherits Lemonldap::NG::Portal::_SMTP
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.1';
 
 *_formateFilter = *Lemonldap::NG::Portal::UserDBLDAP::formateFilter;
 *_search        = *Lemonldap::NG::Portal::UserDBLDAP::search;

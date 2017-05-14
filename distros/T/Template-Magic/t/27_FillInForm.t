@@ -14,23 +14,28 @@
 
 
 ; my $temp1 = << "EOT1"
-<!--{FillInForm ignore_fields => [ 'fieldA', 'fieldC' ] }--><form>
+<!--{FillInForm ignore_fields => [ 'fieldA', 'fieldC' ] }-->
+<form>
 <input type= "text" name="fieldA">
 <input type= "text" name="fieldB">
 <input type= "text" name="fieldC">
-</form><!--{/FillInForm}-->
+</form>
+<!--{/FillInForm}-->
 EOT1
 
 
 ; my $temp2 = << "EOT2"
-<!--{FillInForm}--><form>
+<!--{FillInForm}-->
+<form>
 <input type= "text" name="fieldA">
 <input type= "text" name="fieldB">
 <input type= "text" name="fieldC">
-</form><!--{/FillInForm}-->
+</form>
+<!--{/FillInForm}-->
 EOT2
 
 ; my $expected1 = << "EOE1"
+
 <form>
 <input name="fieldA" type="text">
 <input value="B" name="fieldB" type="text">
@@ -39,6 +44,7 @@ EOT2
 EOE1
 
 ; my $expected2 = << "EOE2"
+
 <form>
 <input value="A" name="fieldA" type="text">
 <input value="B" name="fieldB" type="text">

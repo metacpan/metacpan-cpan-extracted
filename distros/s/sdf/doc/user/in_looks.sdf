@@ -1,0 +1,52 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Looks
+
+H2: Changing the look
+
+The overall appearance of a paper-based output format can be controlled
+by initialising the OPT_LOOK variable on the top line of a document.
+For example:
+
+E:   !init OPT_LOOK="infomap"
+
+Alternatively, {{CMD:sdf}}'s -k option can be used. For example:
+
+E:   sdf -2ps -kinfomap mydoc
+
+The -k option overrides the {{MAC:init}} macro setting.
+
+Note: At this time (January 98), multiple looks are currently only
+supported for paper documentation generated via FrameMaker.
+Multiple look support will hopefully be added to other SDF output
+drivers during 1998.
+
+H2: Available looks
+
+The available looks include:
+
+* {{simple}} - the default look, useful for general documentation
+
+* {{fancy}} - a look suitable for user documentation
+
+* {{infomap}} - a look based on Information Mapping[[tm]]
+
+* {{overhead}} - a look suitable for overhead transparencies.
+
+H2: Creating new looks
+
+It is relatively simple to create new looks
+by inheriting details from an existing one.
+
+Refer to the {{DOC:SDF Guru Guide}} for details.

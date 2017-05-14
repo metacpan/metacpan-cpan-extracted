@@ -1,0 +1,23 @@
+Note for netdata.dat
+
+netdata.dat don't support comments (# .....) !
+netdata.dat don't support multi-lignes configuration for one computer !
+- MAC: MAC address (ethernet address) of the DHCP client
+- IP: IP address of the DHCP client
+- DNS: DNS name, hostname.domain_name
+  - hostname must be the WINS name of the computer
+  - domain_name is send to the DHCP client to specify the domain name (for DNS not WINS)
+- NETMASK: IP subnet mask for the DHCP client
+- DEFAULTGW: Default IP gateway for the DHCP client
+- T1: renewing lease time in seconds and in hex (see RFC2131 for more).
+- T2: rebinding lease time in seconds and in hex (see RFC2131 for more).
+- T3: IP address lease time in seconds and in hex (see RFC2131 for more).
+- NETBIOSNAMESERVER: NetBIOS Name Server = WINS Server
+- NETBIOSNODETYPE: NetBIOS Node Type: 8= H-Type, it is the default, you must specify it 
+                   in netdata.dat if you send a WINS server address !
+- DNSSERVER: DNS Server
+
+Exemple:
+MAC:08-00-2b-be-49-e2 IP:157.26.66.11 DNS:groucho.eicn.ch NETMASK:255.255.255.0 DEFAULTGW:157.26.66.1 T1:000124f8 T2:000249f0 T3:000493e0 NETBIOSNAMESERVER:157.26.66.33 NETBIOSNODETYPE:8 DNSSERVER:157.26.66.33
+MAC:00-00-f8-32-37-2e IP:157.26.66.1 DNS:duck.eicn.ch NETMASK:255.255.240.0 DEFAULTGW:157.26.66.11,157.26.66.1 T1:000224f8 T2:000449f0 T3:000593e0 NETBIOSNAMESERVER:157.26.80.12,157.26.66.33 NETBIOSNODETYPE:0 DNSSERVER:157.26.66.33,157.26.66.11 
+

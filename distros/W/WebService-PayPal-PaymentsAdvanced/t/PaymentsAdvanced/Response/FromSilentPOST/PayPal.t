@@ -9,6 +9,7 @@ use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST;
 use lib 't/lib';
 use Util;
 
+## no critic (ProhibitCallsToUnexportedSubs)
 my $ppa    = Util::mocked_ppa;
 my $mocker = WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST->new(
     secure_token_id => 'FOO' );

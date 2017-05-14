@@ -4,7 +4,7 @@
       "ePages GmbH"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.8",
+   "generated_by" : "Minilla/v3.0.9",
    "license" : [
       "perl_5"
    ],
@@ -30,10 +30,12 @@
          "requires" : {
             "Devel::Cover" : "1.23",
             "Devel::Cover::Report::Clover" : "1.01",
+            "Fatal" : "0",
             "Minilla" : "v3.0.0",
             "Module::Build::Tiny" : "0.039",
             "Perl::Critic" : "1.123",
-            "TAP::Harness::Archive" : "0.18"
+            "TAP::Harness::Archive" : "0.18",
+            "Version::Next" : "0"
          }
       },
       "configure" : {
@@ -52,26 +54,53 @@
       },
       "runtime" : {
          "requires" : {
+            "CPAN::Uploader" : "0",
             "Data::Compare" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
             "Module::Load" : "0",
+            "Scalar::Util" : "0",
             "Test::MockObject::Extends" : "0",
             "experimental" : "0",
-            "perl" : "v5.10.1"
+            "perl" : "v5.10.1",
+            "strict" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "FindBin" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "parent" : "0",
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "Test::Mockify" : {
          "file" : "lib/Test/Mockify.pm",
-         "version" : "0.9"
+         "version" : "v0.10.1"
+      },
+      "Test::Mockify::CompatibilityTools" : {
+         "file" : "lib/Test/Mockify/CompatibilityTools.pm"
+      },
+      "Test::Mockify::Matcher" : {
+         "file" : "lib/Test/Mockify/Matcher.pm"
+      },
+      "Test::Mockify::Method" : {
+         "file" : "lib/Test/Mockify/Method.pm"
       },
       "Test::Mockify::MethodCallCounter" : {
          "file" : "lib/Test/Mockify/MethodCallCounter.pm"
+      },
+      "Test::Mockify::MethodSpy" : {
+         "file" : "lib/Test/Mockify/MethodSpy.pm"
+      },
+      "Test::Mockify::Parameter" : {
+         "file" : "lib/Test/Mockify/Parameter.pm"
+      },
+      "Test::Mockify::ReturnValue" : {
+         "file" : "lib/Test/Mockify/ReturnValue.pm"
       },
       "Test::Mockify::Tools" : {
          "file" : "lib/Test/Mockify/Tools.pm"
@@ -94,13 +123,14 @@
          "web" : "https://github.com/ePages-de/Mockify"
       }
    },
-   "version" : "0.9",
+   "version" : "0.10.1",
    "x_authority" : "cpan:CHRISBR",
    "x_contributors" : [
       "Christian Breitkreutz <c.breitkreutz@epages.com>",
       "Alexander Sandau <a.sandau@epages.com>",
       "Birgit Bader <b.bader@epages.com>",
-      "Christian Breitkreutz <cbreitkreutz@epages.com>",
-      "Oliver Trosien <otrosien@epages.com>"
-   ]
+      "Oliver Trosien <otrosien@epages.com>",
+      "Christian Breitkreutz <cbreitkreutz@epages.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

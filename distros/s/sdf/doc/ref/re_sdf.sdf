@@ -1,0 +1,55 @@
+!init OPT_LOOK='infomap'; OPT_STYLE='manual'
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+# Load the configuration
+!define SDF_ROOT "../"
+!inherit "sdf"
+
+# Define variables
+!define DOC_NAME    "SDF"
+!define DOC_TYPE    "Reference"
+!define DOC_AUTHOR  "Ian Clatworthy"
+!define DOC_TOC     2
+!define DOC_IX
+
+# For HTML, only put the chapter headings in the contents
+!if $var{'OPT_TARGET'} eq 'html'
+!define DOC_TOC     1
+!endif
+
+# Build the title page
+!build_title
+
+# Make all level 3 headings plain
+!on paragraph '[HA]3';; $style = 'P3'
+
+# Include the document components
+!include "reasdf.sdf"; about
+!include "in_class.sdf"
+!include "in_dstyl.sdf"
+!include "in_esc.sdf"
+!include "in_fmt.sdf"
+!include "in_filt.sdf"
+!include "in_mac.sdf"
+!include "in_pattr.sdf"
+!include "in_pstyl.sdf"
+!include "in_oattr.sdf"
+!include "in_ostyl.sdf"
+!include "in_prog.sdf"
+!include "in_sub.sdf"
+!include "in_var.sdf"
+!include "in_claif.sdf"; appendix
+!include "in_filif.sdf"; appendix
+!include "in_macif.sdf"; appendix
+!include "gl_cli.sdf"; appendix

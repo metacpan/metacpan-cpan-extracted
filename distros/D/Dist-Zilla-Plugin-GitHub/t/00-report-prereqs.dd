@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.121'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.123'
                                       },
                       'requires' => {
                                       'Dist::Zilla' => '5',
@@ -16,6 +16,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::AutoPrereqs' => '5.038',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.004',
                                       'Dist::Zilla::Plugin::CheckIssues' => '0',
+                                      'Dist::Zilla::Plugin::CheckMetaResources' => '0',
                                       'Dist::Zilla::Plugin::CheckPrereqsIndexed' => '0.019',
                                       'Dist::Zilla::Plugin::CheckSelfDependency' => '0',
                                       'Dist::Zilla::Plugin::CheckStrictVersion' => '0',
@@ -128,7 +129,7 @@ do { my $x = {
                                    'Test::Deep' => '0',
                                    'Test::Deep::JSON' => '0',
                                    'Test::Fatal' => '0',
-                                   'Test::More' => '0',
+                                   'Test::More' => '0.96',
                                    'if' => '0',
                                    'perl' => '5.006'
                                  }

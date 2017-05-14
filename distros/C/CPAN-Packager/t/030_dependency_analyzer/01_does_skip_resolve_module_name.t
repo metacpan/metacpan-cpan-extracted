@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 2;
 use CPAN::Packager::DependencyAnalyzer;
 use YAML;
 

@@ -1,0 +1,50 @@
+#!/usr/local/bin/perl
+
+use Pod::Sdf;
+use strict;
+
+# Get the options, if any
+my %param = ();
+if ($ARGV[0] eq '-m') {
+    $param{'main'} = 1;
+    shift;
+}
+
+# Check the usage
+unless (scalar(@ARGV) == 1) {
+    print "usage: pod2sdf [-m] infile > outfile\n";
+    exit 1;
+}
+
+# Load the pod into an array
+my $infile = shift;
+open(INFILE, $infile) || die "unable to open '$infile': $!\n";
+my @pod = <INFILE>;
+chop(@pod);
+
+# Convert it to SDF and output it
+my @sdf = pod2sdf(\@pod, \%param);
+print join("\n", @sdf), "\n";
+
+1;
+
+__END__
+
+=head1 NAME
+
+pod2sdf - converts POD to SDF markup
+
+=head1 SYNOPSIS
+
+  pod2sdf [-m] infile > outfile
+
+=head1 DESCRIPTION
+
+B<pod2sdf> should be used when one wants to use SDF instead of
+POD as the base documentation format.  B<sdf> does this
+convertion on the fly for C<*.pod, *.pl, *.pm> files for you.
+So B<pod2sdf> is only needed when one wants to make extensive use
+of the powerful features of SDF and marking them with C<=begin sdf>
+and C<=end sdf> gets inconvenient.
+
+=cut

@@ -9,27 +9,11 @@ use strict;
 use warnings;
 
 use Test;
-BEGIN { plan tests => 2 };
+BEGIN { plan tests => 1 };
 use Crypt::HC128;
 ok(1); # If we made it this far, we're ok.
 
 
-my $fail;
-foreach my $constname (qw(
-	HC128_ENC_TYPE)) {
-  next if (eval "my \$a = $constname; 1");
-  if ($@ =~ /^Your vendor has not defined Crypt::HC128 macro $constname/) {
-    print "# pass: $@";
-  } else {
-    print "# fail: $@";
-    $fail = 1;
-  }
-}
-if ($fail) {
-  print "not ok 2\n";
-} else {
-  print "ok 2\n";
-}
 
 #########################
 

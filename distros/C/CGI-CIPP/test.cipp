@@ -1,0 +1,5 @@
+<?AUTOPRINT OFF>
+# this simple CIPP program simply prints "ok 2" for 'make test'
+<?PERL>
+  print "ok 2\n";
+<?/PERL>

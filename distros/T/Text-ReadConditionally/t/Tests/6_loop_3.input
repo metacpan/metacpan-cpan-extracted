@@ -1,0 +1,13 @@
+.# Title: Loop in sub
+Test Start
+.sub routine
+In routine; loop i = 1 .. 9
+.let i := 0
+.while ++i < 10
+.echo In while i = \v{i}
+.done while
+End of loop/routine
+.done
+Calling .routine
+.routine
+EOF

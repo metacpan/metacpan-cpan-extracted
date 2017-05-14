@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 16;
+use Test::Most tests => 18;
 use Test::NoWarnings;
 use Test::Number::Delta within => 1e-2;
 
@@ -17,12 +17,12 @@ GOOGLEPLACES: {
 		eval {
 			require Geo::Coder::GooglePlaces::V3;
 
-			Geo::Coder::GooglePlaces::V3->import;
+			Geo::Coder::GooglePlaces::V3->import();
 		};
 
 		if($@) {
 			diag('Geo::Coder::GooglePlaces::V3 not installed - skipping tests');
-			skip 'Geo::Coder::GooglePlaces::V3 not installed', 14;
+			skip 'Geo::Coder::GooglePlaces::V3 not installed', 16;
 		} else {
 			diag("Using Geo::Coder::GooglePlaces::V3 $Geo::Coder::GooglePlaces::V3::VERSION");
 		}
@@ -32,11 +32,11 @@ GOOGLEPLACES: {
 		$geocoderlist->push($geocoder);
 
 		if($key) {
-			my $location = $geocoderlist->geocode('Silver Spring, MD, USA');
+			my $location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
 			ok(defined($location));
-			ok(ref($location) eq 'HASH');
-			delta_ok($location->{geometry}{location}{lat}, 38.991);
-			delta_ok($location->{geometry}{location}{lng}, -77.026);
+			is(ref($location), 'HASH', 'geocode should return a reference to a HASH');
+			delta_ok($location->{geometry}{location}{lat}, 39.00);
+			delta_ok($location->{geometry}{location}{lng}, -77.10);
 
 			$location = $geocoderlist->geocode('Wisdom Hospice, Rochester, England');
 			ok(defined($location));
@@ -44,14 +44,17 @@ GOOGLEPLACES: {
 			delta_ok($location->{geometry}{location}{lat}, 51.372);
 			delta_ok($location->{geometry}{location}{lng}, 0.50873);
 
-			$location = $geocoderlist->geocode('St Mary The Virgin, Minster, Thanet, Kent, England');
+			$location = $geocoderlist->geocode('St Mary The Virgin Church, Minster, Thanet, Kent, England');
 			ok(defined($location));
 			ok(ref($location) eq 'HASH');
 			delta_ok($location->{geometry}{location}{lat}, 51.330);
 			delta_ok($location->{geometry}{location}{lng}, 1.366);
+
+			ok(!defined($geocoderlist->geocode()));
+			ok(!defined($geocoderlist->geocode('')));
 		} else {
 			diag('Set GMAP_KEY to enable more tests');
-			skip 'GMAP_KEY not set', 12;
+			skip 'GMAP_KEY not set', 14;
 		}
 	}
 }

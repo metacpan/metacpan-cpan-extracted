@@ -1,0 +1,33 @@
+// Handdrawn call graph of metadata fetching
+// 24.3.2010, Sampo Kellomaki (sampo@iki.fi)
+// dot -Tps meta-fetch.dot -o meta-fetch.ps && gv meta-fetch.ps
+digraph metadata_fetching {
+
+lscot_line [shape=none];
+addmd [shape=none];
+load_cot_cache [shape=none];
+get_ent_by_succinct_id [shape=none];
+many_callers [shape=none];
+get_ent_ss [shape=box];
+
+lscot_line -> parse_meta;
+addmd -> parse_meta;
+addmd -> get_meta;
+get_meta -> parse_meta;
+get_meta_ss -> get_meta;
+get_ent_ss -> get_meta_ss;
+get_ent_ss -> get_ent_from_cache;
+many_callers -> get_ent_ss;
+
+get_ent_from_file -> parse_meta;
+get_ent_by_sha1_name -> get_ent_from_file;
+get_ent_from_cache -> get_ent_from_file;
+load_cot_cache_from_file -> get_ent_from_file;
+
+load_cot_cache -> load_cot_cache_from_file;
+get_ent_from_cache -> load_cot_cache_from_file;
+
+load_cot_cache -> get_ent_by_sha1_name;
+get_ent_by_succinct_id -> get_ent_by_sha1_name;
+
+}

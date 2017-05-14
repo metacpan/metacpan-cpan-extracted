@@ -1,0 +1,28 @@
+---
+name: Bot-BasicBot-Pluggable-Module-Search
+version: 1.0
+author:
+  - Simon Wistow <simon@thegestalt.org>
+abstract: ~
+license: perl
+requires:
+  Bot::BasicBot::Pluggable: 0.5
+  HTML::Entities: 0
+  LWP::Simple: 0
+  Test::More: 0
+  WWW::Search: 0
+  XML::RSS: 0
+provides:
+  Bot::BasicBot::Pluggable::Module::Bash:
+    file: lib/Bot/BasicBot/Pluggable/Module/Bash.pm
+  Bot::BasicBot::Pluggable::Module::Foldoc:
+    file: lib/Bot/BasicBot/Pluggable/Module/Foldoc.pm
+  Bot::BasicBot::Pluggable::Module::Hyperarchive:
+    file: lib/Bot/BasicBot/Pluggable/Module/Hyperarchive.pm
+  Bot::BasicBot::Pluggable::Module::IMDB:
+    file: lib/Bot/BasicBot/Pluggable/Module/IMDB.pm
+  Bot::BasicBot::Pluggable::Module::Search:
+    file: lib/Bot/BasicBot/Pluggable/Module/WebSearch.pm
+  Bot::BasicBot::Pluggable::Module::Websters:
+    file: lib/Bot/BasicBot/Pluggable/Module/Websters.pm
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,20 @@
+Revision history for Plack::App::HostMap
+
+0.006     2014-08-04 19:18:28-05:00 America/Chicago
+    Fixed Hostmap to HostMap
+
+0.005     2014-08-04 12:08:07-05:00 America/Chicago
+    Can now handle multilevel subdomains, as suggested by singingfish. Also, added caching feature for
+    subdomains that match rules. Also, foo.com and *.foo.com can have different apps now.
+
+0.004     2014-05-17 14:19:25-07:00 America/Los_Angeles
+	Removed warn from module
+
+0.003     2014-05-17 13:46:15-07:00 America/Los_Angeles
+	Fixed issue for *. syntax
+
+0.002     2014-05-17 12:59:35-07:00 America/Los_Angeles
+	Updated Documentation 
+
+0.002     2014-05-17 12:59:35-07:00 America/Los_Angeles
+	First release to the world!

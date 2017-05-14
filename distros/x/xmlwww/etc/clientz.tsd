@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by yyy (yyy) -->
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tsd="http://namespaces.softwareag.com/tamino/TaminoSchemaDefinition">
+	<xs:annotation>
+		<xs:appinfo>
+			<tsd:schemaInfo name="clientz">
+				<tsd:collection name="yuranz"/>
+				<tsd:doctype name="clientz">
+					<tsd:logical>
+						<tsd:content>closed</tsd:content>
+					</tsd:logical>
+				</tsd:doctype>
+			</tsd:schemaInfo>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:element name="clientz">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="client" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="pass" type="xs:string"/>
+							<xs:element name="sname" type="xs:string"/>
+							<xs:element name="fname" type="xs:string"/>
+							<xs:element name="inn" type="xs:decimal"/>
+							<xs:element name="birth" type="xs:date"/>
+							<xs:element name="numbers">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="number" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="num" type="xs:decimal"/>
+													<xs:element name="sum" type="xs:decimal"/>
+												</xs:sequence>
+												<xs:attribute name="vendor" type="xs:string" use="required"/>
+												<xs:attribute name="sub" type="xs:string" use="optional" default="all"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="cards">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="card" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="id" type="xs:string"/>
+													<xs:element name="cvv" type="xs:int" minOccurs="0"/>
+													<xs:element name="valid" type="xs:string" minOccurs="0"/>
+												</xs:sequence>
+												<xs:attribute name="sys" type="xs:string" use="required"/>
+												<xs:attribute name="vendor" type="xs:string" use="optional"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:Name" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

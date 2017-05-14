@@ -1,0 +1,66 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+PROTO Show [
+	field SFVec3f loc 0 0 0
+	field SFNode material NULL
+] {
+# Narrow tall cone
+Transform {
+	translation IS loc
+	children [
+		Shape {
+			# geometry Cylinder { radius 0.4 height 0.9 }
+			geometry Sphere { radius 0.4 }
+			appearance Appearance {material IS material}
+		}
+	]
+}
+}
+
+Show { 
+	loc -1 0 0 
+	material Material { diffuseColor 0.8 0 0 }
+}
+
+Show { 
+	loc 0 0 0 
+	material Material { diffuseColor 0 0.8 0 }
+}
+
+Show { 
+	loc 1 0 0 
+	material Material { diffuseColor 0 0 0.8 }
+}
+
+# Default
+Show { 
+	loc 2 0 0 
+	material Material { }
+}
+
+# Show a series of increasing shininess
+Show { loc -5 1 0 material Material { shininess 0.0 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc -4 1 0 material Material { shininess 0.1 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc -3 1 0 material Material { shininess 0.2 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc -2 1 0 material Material { shininess 0.3 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc -1 1 0 material Material { shininess 0.4 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc -0 1 0 material Material { shininess 0.5 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc  1 1 0 material Material { shininess 0.6 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc  2 1 0 material Material { shininess 0.7 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc  3 1 0 material Material { shininess 0.8 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc  4 1 0 material Material { shininess 0.9 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+Show { loc  5 1 0 material Material { shininess 1.0 specularColor 1 0 0 diffuseColor 0.3 0.3 0.3} }
+
+Show { loc -2 -1 0 material Material { ambientIntensity 0 diffuseColor 0 0 0.3 } }
+Show { loc -1 -1 0 material Material { ambientIntensity 0.2 diffuseColor 0 0 0.3 } }
+Show { loc -0 -1 0 material Material { ambientIntensity 0.4 diffuseColor 0 0 0.3 } }
+Show { loc  1 -1 0 material Material { ambientIntensity 0.6 diffuseColor 0 0 0.3 } }
+Show { loc  2 -1 0 material Material { ambientIntensity 0.8 diffuseColor 0 0 0.3 } }
+Show { loc  3 -1 0 material Material { ambientIntensity 1.0 diffuseColor 0 0 0.3 } }
+
+# XXX Transparency, emissive color (in lighting??)

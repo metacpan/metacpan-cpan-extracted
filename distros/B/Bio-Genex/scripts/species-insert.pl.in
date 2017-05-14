@@ -1,0 +1,133 @@
+%%START_PERL%%
+#
+# species-insert.pl.in
+#    first version Tue Oct 24 14:13:45 MST 2000
+#    script for inserting species entries into genex DB
+#
+my $VERSION = '$Id: species-insert.pl.in,v 1.6 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+
+use Bio::Genex qw($SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_insert_sql create_select_sql);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::ExternalDatabase;
+
+my $infile;
+my $UPDATE = 0;
+my $DBNAME = 'genex';
+my $USER = $SU_USERNAME;
+my $PASSWORD = $SU_PASSWORD;
+my $TRANSACTION = 1;	# do it in a transaction
+
+my $rc = GetOptions('file=s' => \$infile, 
+		    'update' => \$UPDATE,
+		    'dbname=s' => \$DBNAME,
+		   );
+
+my $USAGE = <<"EOU";
+usage: $0 --file=file_name --update
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parsefile($infile);
+
+my @species_list = $DOC->getElementsByTagName('species');
+
+# open up a writeable connection
+my $dbh = Bio::Genex::current_connection(USER=>$USER,
+					 PASSWORD=>$PASSWORD,
+					 TRANSACTION=>$TRANSACTION,
+					 DBNAME=>$DBNAME,
+					);
+my $curr_table = 'Species';
+my $timeformat = '%r %A %B %d %Y'; 
+
+print STDERR scalar @species_list, " Species to insert\n";
+
+foreach my $species_node (@species_list) {
+  assert_element($species_node,'species');
+
+  my $primary_scientific_name = $species_node->getAttribute('primary_scientific_name');
+  error("Couldn't find primary_scientific_name for node: " . $species_node->toString()) 
+    unless $primary_scientific_name ne '';
+
+  my $column_map = $species_node->getAttributes();
+  my @attr_nodes = @{$column_map->getValues()};
+  my %attributes = map {$_->getName, $_->getValue} @attr_nodes;
+  $attributes{is_sequenced_genome} = 'no' 
+    unless exists $attributes{is_sequenced_genome};
+  $attributes{is_circular_genome} = 'no'
+    unless exists $attributes{is_circular_genome};
+
+  if (exists $attributes{classification_group}) {
+    $attributes{comments} .= "Curation Tool Classification = "
+                          .  $attributes{classification_group} . ",\n\n";
+    delete $attributes{classification_group};
+  }
+  if (exists $attributes{full_taxonomy}) {
+    $attributes{comments} .= "Full Taxonomy = "
+                          . $attributes{full_taxonomy} . ",\n\n";
+    delete $attributes{full_taxonomy};
+  }
+
+  if ($UPDATE) {
+    print STDERR "Updating species $primary_scientific_name\n";
+
+    my $sql = create_select_sql($dbh,
+		FROM=>[$curr_table],
+		COLUMNS=>['spc_pk'],
+		WHERE=>"primary_scientific_name='$primary_scientific_name'"
+			       );
+    my $spc_pk = $dbh->selectall_arrayref($sql);
+    error("couldn't SELECT species for node: " . $species_node->toString(), $sql)
+      if $dbh->err;
+    # extract the value from the array of arrays
+    $spc_pk = $spc_pk->[0][0];
+    error("couldn't get species for node: " . $species_node->toString(), $sql)
+      unless $spc_pk;
+
+    foreach my $key (keys %attributes) {
+      $sql = "UPDATE $curr_table set $key=? WHERE spc_pk=$spc_pk";
+      my $sth = $dbh->prepare($sql);
+      error("couldn't prepare update SQL", $sql)
+	if $dbh->err;
+      $sth->execute($attributes{$key});
+    error("couldn't execute update SQL for <$key>=<$attributes{$key}>", $sql, $sth)
+      if $dbh->err;      
+    }
+  } else {
+    print STDERR "Inserting species $primary_scientific_name\n";
+
+    my $sql = create_insert_sql($dbh,$curr_table,\%attributes);
+    $dbh->do($sql);
+    error("couldn't insert record for node: " . $species_node->toString(), $sql)
+      if $dbh->err;
+  }
+}
+
+$dbh->commit();
+# $dbh->rollback();
+$dbh->disconnect();
+exit(0);
+
+sub error {
+  my ($error,$sql,$sth) = @_;
+  $error .= ", SQL=<$sql>, DBI=<$DBI::errstr>" if defined $sql;
+  $sth->finish() if defined $sth;
+  $dbh->rollback();
+  $dbh->disconnect();
+  die "$error\n";
+}

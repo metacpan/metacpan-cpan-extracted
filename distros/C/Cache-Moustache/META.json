@@ -5,7 +5,7 @@
       "TOBYINK <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -45,7 +45,7 @@
    "provides" : {
       "Cache::Moustache" : {
          "file" : "lib/Cache/Moustache.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -64,5 +64,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Cache-Moustache/project"
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
 }

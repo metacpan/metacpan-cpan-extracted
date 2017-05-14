@@ -1,0 +1,34 @@
+# zxid/sg/saml-schema-ecp-2.0.sg
+# Slightly edited, 7.2.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: saml-schema-ecp-2.0.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(ecp,urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp)
+ns(xs,http://www.w3.org/2001/XMLSchema)
+import(sp,urn:oasis:names:tc:SAML:2.0:protocol,saml-schema-protocol-2.0.xsd)
+import(sa,urn:oasis:names:tc:SAML:2.0:assertion,saml-schema-assertion-2.0.xsd)
+import(e,http://schemas.xmlsoap.org/soap/envelope/,http://schemas.xmlsoap.org/soap/envelope/)
+
+Request	 -> %ecp:RequestType
+%RequestType:
+  sa:Issuer
+  sp:IDPList?
+  @e:mustUnderstand
+  @e:actor
+  @ProviderName? -> %xs:string
+  @IsPassive?    -> %xs:boolean
+  ;
+
+Response	 -> %ecp:ResponseType
+%ResponseType:
+  @e:mustUnderstand
+  @e:actor
+  @AssertionConsumerServiceURL	 -> %xs:anyURI
+  ;
+
+RelayState	 -> %ecp:RelayStateType
+%RelayStateType:	 base(xs:string)
+  @e:mustUnderstand
+  @e:actor
+  ;
+
+#EOF

@@ -1,0 +1,5 @@
+Revision history for YARN
+
+0.01    11.02.2015
+        * Initial release of YARN module.
+        * Get YARN cluster info and metrics

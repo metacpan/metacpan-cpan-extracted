@@ -1,0 +1,3 @@
+#!/bin/bash
+
+reindex t/*.t t/*/*.t

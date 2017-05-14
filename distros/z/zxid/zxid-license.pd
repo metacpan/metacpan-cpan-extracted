@@ -1,0 +1,100 @@
+<<if: ZXIDBOOK>>
+<<else: >>96 License
+==========
+<<fi: >>
+
+<<ignore: $Id: zxid-license.pd,v 1.1 2009-08-25 16:22:44 sampo Exp $ >>
+
+Copyright (c) 2010-2011 Sampo Kellomäki (sampo@iki.fi), All Rights Reserved.\\
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.\\
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+While the source distribution of ZXID does not contain
+SSLeay or OpenSSL code, if you use this code you will use OpenSSL
+library. Please give Eric Young and OpenSSL team credit (as required by
+their licenses).
+
+Binary distribution of this product includes software developed by the
+OpenSSL Project for use in the OpenSSL Toolkit
+(http://www.openssl.org/). See LICENSE.openssl for further information.
+
+Binary distribution of this product includes cryptographic software
+written by Eric Young (eay@cryptsoft.com).  Binary distribution of
+this product includes software written by Tim Hudson
+(tjh@cryptsoft.com). See LICENSE.ssleay for further information.
+
+And remember, you, and nobody else but you, are responsible for
+auditing ZXID and OpenSSL library for security problems,
+back-doors, and general suitability for your application.
+
+96.1 Dependency Library Licenses
+--------------------------------
+
+ZXID strives to maintain IPR hygiene and avoid both
+non-free and GPL license contamination. All the
+dependency libraries have BSD style licenses
+
+* OpenSSL under BSDish (with "advertising" clause)
+* libcurl under BSDish
+* zlib under BSDish
+* libc available as part of the operating system
+
+Please see each library package for the exact details of their
+licenses.
+
+96.2 Specification IPR
+----------------------
+
+ZXID is based on open SAML and Liberty specifications. The parties
+that have developed these specifications, including Symlabs, have made
+Royalty Free (RF) licensing commitment. Please ask OASIS and Liberty
+Alliance for the specifics of their IPR policies and IPR disclosures.
+
+Some protocols, such as WS-Trust and WS-Federation enjoy Microsoft's
+pledge<<footnote: If you have a reference to where this pledge can be
+found, please let me know so it can be included here.>> that they will
+not sue you even if you implement these specifications. You should
+evaluate yourself whether this is good enough for your situation.
+
+96.3 Further Warranties
+-----------------------
+
+If you need the author or Symlabs to further disclaim IPR interest or
+make warranties of non-infringement, such declarations are
+available for a fee. Please contact sales@symlabs.com
+
+Legal queries and clarifications will be answered at then-current
+Symlabs Professional Services rate, please contact sales@symlabs.com.
+
+96.4 TAS3 Free to Implement and Use Pledge
+------------------------------------------
+
+Per decisions of TAS3 General Assembly of 2010-09-13\\
+(TAS3_General_Assembly_minutes_2010_09_13_Leuven_V03.doc), following
+declaration was made:
+
+> TAS3 architecture and specifications, as described in public
+> deliverables D2.1, D2.4, and D7.1, are licensed free for
+> implementation and use by anyone. Up to June 2010, TAS3 consortium
+> partners do not hold patents nor will exercise patents that cover
+> implementation and use of the TAS3 architecture and specifications of
+> those deliverables. This license is only granted for the specific
+> purpose of correct implementations of TAS3 specifications.
+
+For further openness, it should be noted that ZXID, which is
+distributed under Apache2 open source license, is the Reference
+Implementation of the TAS3 Core Security Architecture, i.e. from
+software licensing perspective TAS3 is available in open source. Many
+other components of TAS3 are available in open source as well.
+

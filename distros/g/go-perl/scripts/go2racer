@@ -1,0 +1,2 @@
+#!/bin/sh
+go2fmt.pl -w xml $1 | go-apply-xslt oboxml_to_racer -

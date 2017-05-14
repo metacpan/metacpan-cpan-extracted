@@ -1,0 +1,159 @@
+=head1 NAME
+
+makepp_faq -- Frequently asked questions about makepp
+
+=for vc $Id: makepp_faq.pod,v 1.12 2012/03/25 18:34:48 pfeiffer Exp $
+
+=head1 DESCRIPTION
+
+Here you may find some points which are not obvious from the rest of the
+documentation.  This shows stumbling blocks, whereas howto type questions will
+be found in the L<cookbook|makepp_cookbook>.
+
+=head2 Build Questions
+
+=head3 Why does it run this rule 3 times?
+
+GNU make has no makepp style multi target rules.  Instead it interprets this
+as a shortcut for three separate rules:
+
+    a b c:
+ 	echo $@
+ 	touch a b c
+
+However, it doesn't check why a file is there.  If a file exists (and is newer
+than any dependencies) it is happy.  Whichever of the three files gets built
+first, provides the other two, so this behaves somewhat like a multitarget
+rule -- but can cause race conditions in parallel builds.
+
+A similar rule might have been:
+
+    a b c:
+ 	touch $@
+
+Gmake indeed runs this one once per required file.  Without knowing what the
+command does (it might be a script which internally creates some files), the
+two cases can't easily be told apart by makepp.
+
+So as a special compatibility fallback, if a multi target rule action mentions
+only old style C<$@> and neither new style C<$(output)> nor C<$(target)> nor their
+plural forms, it is treated as separate rules.  This however means running it
+repeatedly, as makepp ignores randomly appearing files for which it has no
+metadata.
+
+=head3 Why does it complain that a created file is phony?
+
+If you have a command that continues working asynchronously, after it came
+back with a success return code, makepp will notice the promised file as
+missing and complain.  This can also typically happen on some network file
+systems, which may physically write only several seconds later.
+
+If you cannot evite such an unsatisfactory situation, you can ask makepp to be
+sloppy about this check with the C<--gullible> option.  But then the next
+command which depends on the produced file might still fail.
+
+=head3 Why does it recreate files unnecessarily?
+
+I have observed this on NFS, where due to file attribute caching the timestamp
+of the produced file was not yet the one the it finally had.  On the next run
+makepp noticed the difference and considered the file unduly modified.  This
+got resolved with a mount option of C<acregmin=0>, making attributes visible
+immediately.
+
+This can also happen with repositories, e.g. if someone else has built in the
+repository with C<umask 066> or using a compiler that bars others from reading
+the produced file.  This will also happen if either the repository or your
+build tree shares a common path prefix with some dependencies
+(e.g. F</opt/repository> and F</opt/sometool>, in which case makepp will
+remember the path once as relative, and once as absolute, looking like changed
+dependencies.
+
+=head2 Miscellaneous
+
+=head3 Why does makepp selectively detect dependencies?
+
+In this rule why does makepp make F<output> depend on F<input1>, but not on
+F<input2>?
+
+    output:
+ 	zcat <input1 >output
+ 	zcat input2 >>output
+
+There are three levels to scanning.  The first is the lexer, which tries to
+understand the Shell part of the execution.  I.e. which commands get called
+and what I/O redirections take place.  This notices F<input1> and F<output>
+(even if it had not been declared a target of this rule).
+
+The next step are the command parsers.  Makepp has a few for typical
+compilation commands.  These check the command line options to understand what
+the command will do.  In the process they pick up dependencies like libraries
+(C<cc -llib>), include paths (C<cc -Idir>) and input files.  The task of a
+C<zcat> parser would be to know that C<-S> takes an argument, but all other
+non option words are filenames (optionally suffixed by F<.gz>), and that C<-->
+ends options.  Alas there is no such parser, no more than for hundreds of
+other commands.
+
+The third step for some languages is the scanning of input files, to detect
+includes as further dependencies.  This does not apply to this example.
+
+=head3 How can I debug makepp?
+
+You can put C<$(print )> around a suspicious expression.  This returns the
+unchanged expression, while printing it as a side effect.
+
+You can dump the current directory's (multiply after C<-C> if you want)
+makefile with the C<--dump-makefile=file> option, to see how makepp sees it.
+
+Makepp writes a log of everything it does and why.  You can look at that with
+L<makepplog, mppl|makepplog> or L<makeppgraph, mppg|makeppgraph>.
+
+Makepp records all it knows about a file, for reuse on the next run.  Though
+it takes some understanding of makepp's internals, dumping it with
+L<makeppinfo, mppi|makeppinfo> for one or more files, usually gives a clue
+what is wrong.
+
+=head3 Is it safe to use?
+
+B<Yes>, it will do exactly what your makefiles say (which many programmers
+find hard to understand, since rule based inference is very different from
+most programming paradigms).
+
+B<And no>, if you don't trust the makefiles you got, definitely not!  A
+makefile is a funny kind of script, the purpose of which is to run commands
+that are expected to modify your file system.  Makepp has no means of checking
+what they will do.
+
+Worse, there are execute always syntaxes, which are performed even with
+C<--dry-run> (which does not run the rules, but evaluates everything else).
+That might be something like this:
+
+    bad_boy := $(shell rm *)
+
+=head2 External tools
+
+=head3 Can I use cc -M or gcc -MM?
+
+The short answer is yes.  The long answer is that they have the advantage of
+knowing the effect of even the last weird compiler option, and sub-includes
+hidden in some compiler internal directory, where makepp only comes pretty
+close.  The disadvantage is that they have no idea of the build rules, so they
+can not reliably depend on yet to-be-built files, which includes files to be
+fetched from a L<repository|makepp_repositories>.  And they are not extensible
+to other languages, as makepp's L<scanner|makepp_scanning> is.  Usually you
+are at least as well off, not resorting to these tools.
+
+Nonetheless, some compilers can produce this as a by-product.  If you'd rather
+use this see L<:include|makepp_rules/include_file_or_pattern>.
+
+=head3 Can I use CCache, Compilercache or cachecc1?
+
+The short answer is yes.  The long answer is that these programs need to
+repeat the work makepp does, to get a reliable fingerprint of files.  With
+traditional makes this even comes too late, because those miss many situations
+calling for a recompilation.  With makepp it is just easier to use the built
+in L<build cache|makepp_build_cache>, which has the added advantage that it
+can handle all kinds of files.
+
+=head1 AUTHOR
+
+Daniel Pfeiffer (occitan@esperanto.org)

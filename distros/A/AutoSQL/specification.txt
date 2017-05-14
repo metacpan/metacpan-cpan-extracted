@@ -1,0 +1,23 @@
+
+This specification is to declare and constrain the usage of AutoSQL system.
+
+To avoid the ambiguity, we give up some unnecessary flexiblities describe below.
+
+
+For accessor in a module, it is forbidden to use the same name for both scalar
+and array attribute. Such as
+
+Idea => {
+    'comment' => '$',
+    'comments' => '@'
+}
+
+For a scalar accessor, the name is singular, and the accessor method name is 
+just that. For an array accessor, the name is in plural form, and the accessor
+names for it are
+
+add_$name # I mean it, it accepts a list of arguments
+get_$name # Get all elements in the array.
+remove_$name # remove all
+
+

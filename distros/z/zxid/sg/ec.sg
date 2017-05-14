@@ -1,0 +1,26 @@
+# zxid/sg/ec.sg  --  Declaration of InclusiveNamespaces from Exclusive XML Canonicalization
+#
+# This declaration is sometimes needed with XML-DSIG
+#
+# We choose to use exca prefix instead of ec suggested by spec because this construct
+# is seldom used and we want to keep ec in reserve for something frequently used. --Sampo
+#
+# $Id: ec.sg,v 1.1 2007-08-10 19:19:10 sampo Exp $
+#
+# Schema from: http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/
+#
+# <schema xmlns="http://www.w3.org/2001/XMLSchema"
+#                xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#"
+#         targetNamespace="http://www.w3.org/2001/10/xml-exc-c14n#"
+#         version="0.1" elementFormDefault="qualified">
+#     <element name="InclusiveNamespaces" type="ec:InclusiveNamespaces"/>
+#     <complexType name="InclusiveNamespaces">
+#        <attribute name="PrefixList" type="NMTOKENS"/>
+#     </complexType>
+# </schema>
+
+target(exca, http://www.w3.org/2001/10/xml-exc-c14n#)
+
+InclusiveNamespaces: @PrefixList -> %xs:string ;
+
+#EOF

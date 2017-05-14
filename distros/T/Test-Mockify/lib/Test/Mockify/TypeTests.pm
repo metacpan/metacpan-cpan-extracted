@@ -1,5 +1,6 @@
 package Test::Mockify::TypeTests;
 use strict;
+use warnings;
 use Scalar::Util qw ( blessed );
 use base qw( Exporter );
 our @EXPORT_OK = qw (
@@ -9,18 +10,19 @@ our @EXPORT_OK = qw (
         IsArrayReference
         IsHashReference
         IsObjectReference
+        IsCodeReference
     );
 
-use Test::More;
 #------------------------------------------------------------------------
 sub IsInteger {
     my ( $Value ) = @_;
 
     my $IsInteger = 0;
     my $Sign = '[-+]?'; # + or - or nothing
-
-    if( $Value =~ /^$Sign\d+$/ ) {
-        $IsInteger = 1;
+	if( defined $Value ){
+	    if($Value =~ /^$Sign\d+$/ ) {
+	        $IsInteger = 1;
+		}
     }
 
     return $IsInteger;
@@ -36,7 +38,8 @@ sub IsFloat {
     my $OptionalExponent = '([eE][-+]?\d+)?';
     my $FloatRegex = sprintf('%s%s%s', $OptionalSign, $NumberOptions, $OptionalExponent);
 
-    if ( $Value =~ /^$FloatRegex$/ ){
+	
+    if ( $Value && $Value =~ /^$FloatRegex$/ ){
         $IsFloat = 1;
     }
 
@@ -86,6 +89,18 @@ sub IsHashReference {
     return $IsHash;
 }
 #------------------------------------------------------------------------
+sub IsCodeReference {
+    my ( $hValue ) = @_;
+
+    my $IsCode = 0;
+
+    if ( ref($hValue) eq 'CODE' ) {
+        $IsCode = 1;
+    }
+
+    return $IsCode;
+}
+#------------------------------------------------------------------------
 sub IsObjectReference {
     my ( $Value ) = @_;
 
@@ -97,4 +112,5 @@ sub IsObjectReference {
 
     return $IsObject;
 }
+
 1;

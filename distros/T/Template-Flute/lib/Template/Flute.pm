@@ -3,9 +3,8 @@ package Template::Flute;
 use strict;
 use warnings;
 
-use Carp;
-use Module::Runtime qw/use_module/;
 use Scalar::Util qw/blessed/;
+
 use Template::Flute::Utils;
 use Template::Flute::Specification::XML;
 use Template::Flute::HTML;
@@ -14,10 +13,6 @@ use Template::Flute::Iterator::Cache;
 use Template::Flute::Increment;
 use Template::Flute::Pager;
 use Template::Flute::Paginator;
-use Template::Flute::Types -types;
-
-use Moo;
-use namespace::clean;
 
 =head1 NAME
 
@@ -25,11 +20,11 @@ Template::Flute - Modern designer-friendly HTML templating Engine
 
 =head1 VERSION
 
-Version 0.025
+Version 0.0184
 
 =cut
 
-our $VERSION = '0.025';
+our $VERSION = '0.0184';
 
 =head1 SYNOPSIS
 
@@ -95,7 +90,7 @@ The resulting output would be:
 
 In other words, rather than including a templating language within your
 templates which your designers must master and which could interfere with
-previews in WYSIWYG tools, CSS selectors in the template are tied to your
+previews in WYSWYG tools, CSS selectors in the template are tied to your
 data structures or objects by a specification provided by the programmer.
 
 
@@ -161,7 +156,7 @@ Parse template with L<Template::Flute::HTML> object.
     $flute->process();
 
 =back
-
+	
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -177,7 +172,7 @@ Specification file name.
 =item specification_parser
 
 Select specification parser. This can be either the full class name
-like C<MyApp::Specification::Parser> or the last part for classes residing
+like L<MyApp::Specification::Parser> or the last part for classes residing
 in the Template::Flute::Specification namespace.
 
 =item specification
@@ -191,6 +186,10 @@ HTML template file.
 =item template
 
 L<Template::Flute::HTML> object or template as string.
+
+=item database
+
+L<Template::Flute::Database::Rose> object.
 
 =item filters
 
@@ -299,266 +298,178 @@ contain a cid with C<filename> "image.png".
 
 # Constructor
 
-has autodetect => (
-    is  => 'ro',
-    isa => HashRef,
-);
+sub new {
+	my ($class, $self, $filter_subs, $filter_opts, $filter_class, $filter_objects);
 
-has auto_iterators => (
-    is      => 'ro',
-    isa     => Bool,
-    default => 0,
-);
+	$class = shift;
 
-has cids => (
-    is  => 'ro',
-    isa => HashRef,
-);
+	$filter_subs = {};
+	$filter_opts = {};
+	$filter_class = {};
+    $filter_objects = {};
+    
+	$self = {iterators => {},
+             translate_attributes => [qw/placeholder input.value.type.submit/],
+             @_,
+             _filter_subs => $filter_subs,
+             _filter_opts => $filter_opts,
+             _filter_class => $filter_class,
+             _filter_objects => $filter_objects,
+	};
 
-has email_cids => (
-    is  => 'ro',
-    isa => HashRef,
-);
+	bless $self, $class;
+	
+	if (exists $self->{specification}
+		&& ! ref($self->{specification})) {
+		# specification passed as string
+		$self->_bootstrap_specification('string', delete $self->{specification});
+	}
 
-has filters => (
-    is      => 'ro',
-    isa     => HashRef,
-    default => sub { +{} },
-);
+	if (exists $self->{template}
+		&& ! ref($self->{template})
+		&& ref($self->{specification})) {
+		$self->_bootstrap_template('string', delete $self->{template});
+	}
 
-has _filter_class => (
-    is      => 'ro',
-    isa     => HashRef,
-    default => sub { +{} },
-);
+	if (exists $self->{filters}) {
+	    my ($name, $value);
 
-has _filter_objects => (
-    is      => 'ro',
-    isa     => HashRef,
-    default => sub { +{} },
-);
+	    while (($name, $value) = each %{$self->{filters}}) {
+		if (ref($value) eq 'CODE') {
+		    # passing subroutine
+		    $filter_subs->{$name} = $value;
+		    next;
+		}
+		if (exists($value->{class})) {
+		    # record filter class
+		    $filter_class->{$name} = $value->{class};
+		}
+		if (exists($value->{options})) {
+		    # record filter options
+		    $filter_opts->{$name} = $value->{options};
+		}
+	    }
+	}
 
-has _filter_opts => (
-    is      => 'ro',
-    isa     => HashRef,
-    default => sub { +{} },
-);
-
-has _filter_subs => (
-    is      => 'ro',
-    isa     => HashRef,
-    default => sub { +{} },
-);
-
-# FIXME: (SysPete 28/4/16) find & fix code that passes in i18n as undef
-has i18n => (
-    is  => 'ro',
-    isa => Maybe[InstanceOf ['Template::Flute::I18N']],
-);
-
-has iterators => (
-    is      => 'ro',
-    isa     => HashRef,
-    lazy    => 1,
-    default => sub { +{} },
-);
-
-has patterns => (
-    is       => 'ro',
-    isa      => HashRef,
-    default  => sub { +{} },
-    init_arg => undef,
-);
-
-has scopes => (
-    is      => 'ro',
-    isa     => Bool,
-    default => 0,
-);
-
-has _specification => (
-    is       => 'ro',
-    isa      => Specification | Str,
-    init_arg => 'specification',
-);
-
-# FIXME: (SysPete 28/4/16) Due to GH#54 (see below) we need a writer which
-# we'll make private
-has specification => (
-    is       => 'rwp',
-    isa      => Specification,
-    lazy     => 1,
-    init_arg => undef,
-    default  => sub {
-        my $self = shift;
-        my $ret;
-
-        if ( ref( $self->_specification ) ) {
-            $ret = $self->_specification;
-        }
-        else {
-            my $parser_spec = use_module( $self->specification_parser )->new;
-
-            if ( $self->_specification ) {
-                $ret = $parser_spec->parse( $self->_specification );
-            }
-            else {
-                $ret = $parser_spec->parse_file( $self->specification_file );
-            }
-
-            croak "Error parsing specification: ", $parser_spec->error
-              unless $ret;
-        }
-
-        # copy iterators into specification
-        while ( my ( $name, $iter ) = each %{ $self->iterators } ) {
-            $ret->set_iterator( $name, $iter );
-        }
-
-        # copy patterns from specification
-        if ( my %patterns = $ret->patterns ) {
-            foreach my $k ( keys %patterns ) {
-                $self->_set_pattern( $k, $patterns{$k} );
-            }
-        }
-
-        return $ret;
-    },
-);
-
-has specification_file => (
-    is      => 'ro',
-    isa     => ReadableFilePath,
-    lazy    => 1,
-    default => sub {
-        my $self = shift;
-
-        croak "No template_file supplied so cannot determine specification_file"
-          unless $self->template_file;
-
-        Template::Flute::Utils::derive_filename( $self->template_file, '.xml' );
-    },
-);
-
-has specification_parser => (
-    is      => 'ro',
-    isa     => Str,
-    default => 'Template::Flute::Specification::XML',
-    coerce  => sub {
-        $_[0] =~ /::/ ? $_[0] : "Template::Flute::Specification::$_[0]";
-    },
-);
-
-has _template => (
-    is       => 'ro',
-    isa      => HtmlParser | Str,
-    init_arg => 'template',
-);
-
-has template => (
-    is       => 'ro',
-    isa      => HtmlParser,
-    lazy     => 1,
-    init_arg => undef,
-    default  => sub {
-        my $self = shift;
-
-        return $self->_template if ref( $self->_template );
-
-        my $template_object = Template::Flute::HTML->new(uri => $self->uri);
-
-        if ( $self->_template ) {
-            $template_object->parse(
-                $self->_template, $self->specification
-            );
-        }
-        else {
-            $template_object->parse_file(
-                $self->template_file, $self->specification
-            );
-        }
-
-        return $template_object;
-    },
-);
-
-has template_file => (
-    is  => 'ro',
-    isa => Str,
-);
-
-has translate_attributes => (
-    is      => 'ro',
-    isa     => ArrayRef,
-    default => sub { [ 'placeholder', 'input.value.type.submit' ] },
-);
-
-# FIXME: (SysPete 28/4/16) find & fix code that passes in uri as undef
-# FIXME: (SysPete 28/4/16) perhaps stringify in coerce so we don't have
-# to accept URI objects?
-has uri => (
-    is  => 'ro',
-    isa => Maybe [ InstanceOf ['URI'] | Str ],
-);
-
-has values => (
-    is      => 'ro',
-    isa     => HashRef,
-    writer  => 'set_values',
-    default => sub { +{} },
-);
-
-sub BUILDARGS {
-    my $class = shift;
-    my %args = @_ == 1 && ref($_[0]) eq 'HASH' ? %{ $_[0] } : @_;
-
-    croak "Either 'template' or 'template_file' must be supplied"
-      unless ( exists $args{template} || exists $args{template_file} );
-
-    # build the various _filter_* attributes
-    while ( my ( $name, $value ) = each %{ $args{filters} } ) {
-        if ( ref($value) eq 'CODE' ) {
-            # passing subroutine
-            $args{_filter_subs}->{$name} = $value;
-            next;
-        }
-        if ( exists( $value->{class} ) ) {
-            # record filter class
-            $args{_filter_class}->{$name} = $value->{class};
-        }
-        if ( exists( $value->{options} ) ) {
-            # record filter options
-            $args{_filter_opts}->{$name} = $value->{options};
-        }
-    }
-
-    return \%args;
-}
-
-sub BUILD {
-    my $self = shift;
-    # catch exception in lazy builders early by forcing template to build now
-    $self->template;
+	return $self;
 }
 
 sub _get_pattern {
     my ($self, $name) = @_;
-    return $self->patterns->{$name};
+    return $self->{patterns}->{$name};
 }
 
 sub _set_pattern {
     my ($self, $name, $regexp) = @_;
-    croak "Missing pattern name" unless $name;
-    croak "pattern $name already exists!" if $self->patterns->{$name};
-    croak "Missing pattern regexp for $name" unless $regexp;
-    $self->patterns->{$name} = $regexp;
+    die "Missing pattern name" unless $name;
+    die "pattern $name already exists!" if $self->{patterns}->{$name};
+    die "Missing pattern regexp for $name" unless $regexp;
+    # print "Adding pattern $name";
+    $self->{patterns}->{$name} = $regexp;
+}
+
+
+sub _bootstrap {
+	my ($self, $snippet) = @_;
+	my ($parser_name, $parser_spec, $spec_file, $spec, $template_file, $template_object);
+	
+	unless ($self->{specification}) {
+		unless ($self->{specification_file}) {
+			# try to derive specification file name from template file name
+			$self->{specification_file} = Template::Flute::Utils::derive_filename($self->{template_file}, '.xml');
+
+			unless (-f $self->{specification_file}) {
+				die "Missing Template::Flute specification for template $self->{template_file}\n";
+			}
+		}
+
+		$self->_bootstrap_specification(file => $self->{specification_file});
+	}
+
+	$self->_bootstrap_template(file => $self->{template_file}, $snippet);
+}
+
+sub _bootstrap_specification {
+	my ($self, $source, $specification) = @_;
+	my ($parser_name, $parser_spec, $spec_file);
+	
+	if ($parser_name = $self->{specification_parser}) {
+		# load parser class
+		my $class;
+			
+		if ($parser_name =~ /::/) {
+			$class = $parser_name;
+		} else {
+			$class = "Template::Flute::Specification::$parser_name";
+		}
+
+		eval "require $class";
+		if ($@) {
+			die "Failed to load class $class as specification parser: $@\n";
+		}
+
+		eval {
+			$parser_spec = $class->new();
+		};
+
+		if ($@) {
+			die "Failed to instantiate class $class as specification parser: $@\n";
+		}
+	} else {
+		$parser_spec = new Template::Flute::Specification::XML;
+	}
+	
+	if ($source eq 'file') {
+		unless ($self->{specification} = $parser_spec->parse_file($specification)) {
+			die "$0: error parsing $specification: " . $parser_spec->error() . "\n";
+		}
+	}
+	else {
+		# text
+		unless ($self->{specification} = $parser_spec->parse($specification)) {
+			die "$0: error parsing $spec_file: " . $parser_spec->error() . "\n";
+		}
+	}
+
+	
+	my ($name, $iter);
+	
+	while (($name, $iter) = each %{$self->{iterators}}) {
+		$self->{specification}->set_iterator($name, $iter);
+	}
+	
+    if (my %patterns = $self->{specification}->patterns) {
+        foreach my $k (keys %patterns) {
+            $self->_set_pattern($k, $patterns{$k});
+        }
+    }
+
+	return $self->{specification};
+}
+
+sub _bootstrap_template {
+	my ($self, $source, $template, $snippet) = @_;
+	my ($template_object);
+
+	$template_object = new Template::Flute::HTML(uri => $self->{uri});
+	
+	if ($source eq 'file') {
+		$template_object->parse_file($template, $self->{specification}, $snippet);
+		$self->{template} = $template_object;
+	}
+	elsif ($source eq 'string') {
+		$template_object->parse($template, $self->{specification}, $snippet);
+		$self->{template} = $template_object;
+	}
+
+	unless ($self->{template}) {
+		die "$0: Missing Template::Flute template.\n";
+	}
+
+	return $self->{template};
 }
 
 =head1 METHODS
-
-=head2 BUILD
-
-Force creation of template class as soon as object is instantiated.
 
 =head2 process [HASHREF]
 
@@ -571,23 +482,29 @@ Returns HTML output.
 
 sub process {
 	my ($self, $params) = @_;
+	
 
-	if ($self->i18n) {
+	unless ($self->{template}) {
+		$self->_bootstrap($params->{snippet});
+	}
+	
+	if ($self->{i18n}) {
 		# translate static text first
-		$self->template->translate($self->i18n, @{$self->translate_attributes});
+		$self->{template}->translate($self->{i18n},
+                                     @{$self->{translate_attributes}});
 	}
 
 	my $html = $self->_sub_process(
-		$self->template->{xml},
-		$self->specification->{xml}->root,
-		$self->values,
-		$self->specification,
-		$self->template,
+		$self->{template}->{xml}, 
+		$self->{specification}->{xml}->root, 
+		$self->{'values'},
+		$self->{specification},
+		$self->{template}, 
         0,
         0,
 		);
 
-    if ($self->email_cids) {
+    if ($self->{email_cids}) {
         $self->_cidify_html($html);
     }
 	my $shtml = $html->sprint;
@@ -598,14 +515,13 @@ sub _cidify_html {
     my ($self, $html) = @_;
 
     my %options;
-    if ($self->cids) {
-        %options = %{ $self->cids };
+    if ($self->{cids}) {
+        %options = %{ $self->{cids} };
     }
 
     foreach my $img ($html->descendants('img')) {
-        my $source = $img->att('src');
 
-        if (defined $source && $source =~ /\S/ && $source !~ /^cid:/) {
+        if (my $source = $img->att('src')) {
             my $cid = $source;
             # to generate a cid, remove every character save for [a-zA-Z0-9]
             # and use that.
@@ -629,7 +545,7 @@ sub _cidify_html {
             # found? cidify the source
             if ($filename) {
                 $img->set_att(src => "cid:$cid");
-                $self->email_cids->{$cid} = { filename => $filename };
+                $self->{email_cids}->{$cid} = { filename => $filename };
             }
         }
     }
@@ -639,18 +555,16 @@ sub _sub_process {
 	my ($self, $html, $spec_xml,  $values, $spec, $root_template, $count, $level) = @_;
 	my ($template, %list_active);
 	# Use root spec or sub-spec
-    my $specification = $spec
-      || use_module( $self->specification_parser )->new()
-      ->parse( "<specification>" . $spec_xml->sprint . "</specification>" );
-
+	my $specification = $spec || $self->_bootstrap_specification(string => "<specification>".$spec_xml->sprint."</specification>", 1);
+	
 	if($root_template){
 		$template = $root_template;
 	}
 	else {
-		$template = Template::Flute::HTML->new();;
+		$template = new Template::Flute::HTML;
 		$template->parse("<flutexml>".$html->sprint."</flutexml>", $specification, 1);
 	}
-
+	
 	my $classes = $specification->{classes};
 	my ($dbobj, $iter, $sth, $row, $lel, $query, %skip, %iter_names);
 
@@ -671,8 +585,8 @@ sub _sub_process {
             }
         }
 		push @{$spec_elements->{$type}}, $elt;
-
-	}
+		
+	}	
 
     while (my ($name, $value) = each %iter_names) {
         next if $name =~ /\./;
@@ -725,7 +639,7 @@ sub _sub_process {
 		my $iterator = $elt->{'att'}->{'iterator'} || '';
 		my $sub_spec = $elt->copy();
 		my $element_template = $classes->{$spec_class}->[0]->{elts}->[0];
-
+		
 		unless($element_template){
 			next;
 		}
@@ -791,7 +705,7 @@ sub _sub_process {
                 $iter_records = $records;
             }
             else {
-                croak "Object cannot be used as iterator for list $spec_name: ", ref($records);
+                die "Object cannot be used as iterator for list $spec_name: ", ref($records);
             }
         }
         else {
@@ -834,9 +748,9 @@ sub _sub_process {
             # otherwise it would be overwritten and can cause weird
             # errors (GH #54)
 
-            my $old_spec = $self->specification;
+            my $old_spec = $self->{specification};
 			$element = $self->_sub_process($element, $sub_spec, $record_values, undef, undef, $count, $level + 1);
-            $self->_set_specification($old_spec);
+            $self->{specification} = $old_spec;
 
 			# Get rid of flutexml container and put it into position
 			my $current;
@@ -885,7 +799,7 @@ sub _sub_process {
     }
 
 	# Values
-	for my $elt ( @{$spec_elements->{value}}, @{$spec_elements->{param}}, @{$spec_elements->{field}} ){
+	for my $elt ( @{$spec_elements->{value}}, @{$spec_elements->{param}}, @{$spec_elements->{field}} ){	
         if ($elt->tag eq 'param') {
             my $name = $spec_xml->att('name');
 
@@ -914,7 +828,7 @@ sub _sub_process {
 		my $spec_id = $elt->{'att'}->{'id'};
 		my $spec_name = $elt->{'att'}->{'name'};
 		my $spec_class = $elt->{'att'}->{'class'} ? $elt->{'att'}->{'class'} : $spec_name;
-
+		
 		# Use CLASS or ID if set
 		my $spec_clases = [];
 		if ($spec_id){
@@ -923,7 +837,7 @@ sub _sub_process {
 		else {
 			$spec_clases = $classes->{$spec_class};
 		}
-
+		
 		for my $spec_class (@$spec_clases){
             # check if it's a form and it's already filled
             if (exists $spec_class->{form} && $spec_class->{form}) {
@@ -931,13 +845,13 @@ sub _sub_process {
                 next if $form && $form->is_filled;
             }
             # check if we need an iterator for this element
-            if ($self->auto_iterators && $spec_class->{iterator}) {
+            if ($self->{auto_iterators} && $spec_class->{iterator}) {
                 my ($iter_name, $iter);
 
                 $iter_name = $spec_class->{iterator};
 
                 unless ($specification->iterator($iter_name)) {
-		    my $maybe_iter = $self->values->{$iter_name};
+		    my $maybe_iter = $self->{values}->{$iter_name};
 
 		    if (defined blessed $maybe_iter) {
 			if ($maybe_iter->can('next') &&
@@ -945,11 +859,11 @@ sub _sub_process {
 			    $iter = $maybe_iter;
 			}
 			else {
-			    croak "Object cannot be used as iterator for value $spec_name: ", ref($maybe_iter);
+			    die "Object cannot be used as iterator for value $spec_name: ", ref($maybe_iter);
 			}
 		    }
-                    elsif (ref($self->values->{$iter_name}) eq 'ARRAY') {
-                        $iter = Template::Flute::Iterator->new($self->values->{$iter_name});
+                    elsif (ref($self->{values}->{$iter_name}) eq 'ARRAY') {
+                        $iter = Template::Flute::Iterator->new($self->{values}->{$iter_name});
                     }
                     else {
                         $iter = Template::Flute::Iterator->new([]);
@@ -960,7 +874,7 @@ sub _sub_process {
             }
 
 			# Increment count
-			$spec_class->{increment} = Template::Flute::Increment->new(
+			$spec_class->{increment} = new Template::Flute::Increment(
 				increment => $spec_class->{increment}->{increment},
 				start => $count
 			) if $spec_class->{increment};
@@ -986,7 +900,7 @@ sub _sub_process {
         }
     }
 
-	return $count ? $template->{xml}->root() : $template->{xml};
+	return $count ? $template->{xml}->root() : $template->{xml};	
 }
 
 sub _replace_within_elts {
@@ -1012,24 +926,14 @@ sub _replace_within_elts {
                 $elt->paste(first_child => $elt->former_parent);
             }
         }
-
+        
 		if ($zref->{rep_sub}) {
 			# call subroutine to handle this element
 			$zref->{rep_sub}->($elt, $rep_str);
 		} elsif ($zref->{rep_att}) {
 			# replace attribute instead of embedded text (e.g. for <input>)
             foreach my $replace_attr (_expand_elt_attributes($elt, $zref->{rep_att})) {
-                if (exists $param->{op}) {
-                    if ($param->{op} eq 'toggle') {
-                        if ($rep_str) {
-                            $elt->set_att($replace_attr);
-                        }
-                        else {
-                            $elt->del_att($replace_attr);
-                        }
-                        next;
-                    }
-
+                if (exists $param->{op} && $param->{op} eq 'append') {
                     my $original_attribute = '';
 
                     if (exists $zref->{rep_att_orig}->{$replace_attr}) {
@@ -1038,40 +942,34 @@ sub _replace_within_elts {
 
                     if (exists $param->{joiner}) {
                         if ($rep_str) {
-                            if ($param->{op} eq 'append') {
-                                $elt->set_att($replace_attr, $original_attribute . $param->{joiner} . $rep_str);
-                            }
-                            elsif ($param->{op} eq 'prepend') {
-                                $elt->set_att($replace_attr, $rep_str . $param->{joiner} . $original_attribute);
-                            }
+                            $elt->set_att($replace_attr, $original_attribute . $param->{joiner} . $rep_str);
                         }
                     }
                     else {
-                        my $rep_str_new;
-
-                        if ($param->{op} eq 'append') {
-                            $rep_str_new = $rep_str ? ($original_attribute . $rep_str) : $original_attribute;
-                        }
-                        elsif ($param->{op} eq 'prepend') {
-                            $rep_str_new = $rep_str ? ($rep_str . $original_attribute) : $original_attribute;
-                        }
-
-                        $elt->set_att($replace_attr, $rep_str_new);
+                        my $rep_str_appended = $rep_str ? ($original_attribute . $rep_str) : $original_attribute;
+                        $elt->set_att($replace_attr, $rep_str_appended);
                     }
-                    next;
-                }
 
-                if (defined $rep_str) {
-                    $elt->set_att($replace_attr, $rep_str);
+                } elsif (exists $param->{op} && $param->{op} eq 'toggle') {
+                    if ($rep_str) {
+                        $elt->set_att($replace_attr);
+                    }
+                    else {
+                        $elt->del_att($replace_attr);
+                    }
+                } else {
+                    if (defined $rep_str) {
+                        $elt->set_att($replace_attr, $rep_str);
+                    }
+                    else {
+                        $elt->del_att($replace_attr);
+                    }
                 }
-                else {
-                    $elt->del_att($replace_attr);
-                }
-             }
+            }
 		} elsif ($zref->{rep_elt}) {
 			# use provided text element for replacement
 			$zref->{rep_elt}->set_text($rep_str);
-		} else {
+		} else {			
         	$elt->set_text($rep_str) if defined $rep_str;
 		}
 	}
@@ -1085,12 +983,12 @@ Processes HTML template and returns L<Template::Flute::HTML> object.
 
 sub process_template {
 	my ($self) = @_;
+	
+	unless ($self->{template}) {
+		$self->_bootstrap();
+	}
 
-#	unless ($self->{template}) {
-#		$self->_bootstrap();
-#	}
-
-	return $self->template;
+	return $self->{template};
 }
 
 
@@ -1137,7 +1035,7 @@ sub _replace_record {
 		}
 		#debug "$name has value ";
 		#debug "'$rep_str'";
-
+		
 		# Template specified value if value defined
 		if ($value->{value}) {
             if ($rep_str) {
@@ -1163,7 +1061,7 @@ sub _replace_record {
                         if (!defined($newtext)) {
                             $newtext = '';
                         }
-                        $newtext =~ s/$regexp/$string/g;
+                        $newtext =~ s/$regexp/$string/;
                         $elt->set_att($att, $newtext)
                     };
                 };
@@ -1178,13 +1076,13 @@ sub _replace_record {
                     if (!defined($newtext)) {
                         $newtext = '';
                     }
-                    $newtext =~ s/$regexp/$string/g;
+                    $newtext =~ s/$regexp/$string/;
                     $elt->set_text($newtext);
                 };
             }
         }
         else {
-            croak "No pattern named $pattern!";
+            die "No pattern named $pattern!";
         }
 
     }
@@ -1195,7 +1093,7 @@ sub _replace_record {
 			$value->{increment}->increment();
 		}
 		#return undef unless defined $rep_str;
-
+		
 		if (ref($value->{op}) eq 'CODE') {
 		    _replace_within_elts($value, $rep_str, $value->{op}, $elts);
 		}
@@ -1250,24 +1148,37 @@ sub _filter {
     my ($self, $name, $element, $value) = @_;
 	my ($filter, $mod_name, $class, $filter_obj, $filter_sub);
 
-    if (exists $self->_filter_subs->{$name}) {
-        $filter = $self->_filter_subs->{$name};
+    if (exists $self->{_filter_subs}->{$name}) {
+        $filter = $self->{_filter_subs}->{$name};
         return $filter->($value);
     }
-
-    unless (exists $self->_filter_objects->{$name}) {
+    
+    unless (exists $self->{_filter_objects}->{$name}) {
         # try to bootstrap filter
-	    unless ($class = $self->_filter_class->{$name}) {
+	    unless ($class = $self->{_filter_class}->{$name}) {
             $mod_name = join('', map {ucfirst($_)} split(/_/, $name));
             $class = "Template::Flute::Filter::$mod_name";
 	    }
 
-        $self->_filter_objects->{$name} =
-          use_module($class)->new( options => $self->_filter_opts->{$name} );
+	    eval "require $class";
+
+	    if ($@) {
+            die "Missing filter $name: $@\n";
+	    }
+
+	    eval {
+            $filter_obj = $class->new(options => $self->{_filter_opts}->{$name});
+	    };
+
+	    if ($@) {
+            die "Failed to instantiate filter class $class: $@\n";
+	    }
+
+        $self->{_filter_objects}->{$name} = $filter_obj;
     }
 
-    $filter_obj = $self->_filter_objects->{$name};
-
+    $filter_obj = $self->{_filter_objects}->{$name};
+    
     if ($filter_obj->can('twig')) {
 		$element->{op} = sub {$filter_obj->twig(@_)};
     }
@@ -1314,12 +1225,12 @@ sub _paging {
         $slide_length = $list->{paging}->{slide_length} || 0;
 
         if (exists $list->{paging}->{page_value} and
-            exists $self->values->{$list->{paging}->{page_value}}) {
-            $paging_page = $self->values->{$list->{paging}->{page_value}};
+            exists $self->{values}->{$list->{paging}->{page_value}}) {
+            $paging_page = $self->{values}->{$list->{paging}->{page_value}};
         }
         if (exists $list->{paging}->{link_value} and
-            exists $self->values->{$list->{paging}->{link_value}}) {
-            $paging_link = $self->values->{$list->{paging}->{link_value}};
+            exists $self->{values}->{$list->{paging}->{link_value}}) {
+            $paging_link = $self->{values}->{$list->{paging}->{link_value}};
         }
         $paging_page ||= 1;
 
@@ -1362,7 +1273,7 @@ sub _paging {
             } elsif ($element_orig->next_sibling()) {
                 %element_pos = (before => $element_orig->next_sibling());
             } else {
-                croak "Neither last child nor next sibling.";
+                die "Neither last child nor next sibling.";
             }
 
             if ($element->{type} eq 'active') {
@@ -1491,43 +1402,42 @@ sub value {
 	$ref_value = $values;
 	$record_is_object = $self->_is_record_object($ref_value);
 
-	if ($self->scopes) {
+	if ($self->{scopes}) {
 		if (exists $value->{scope}) {
-			$ref_value = $self->values->{$value->{scope}};
+			$ref_value = $self->{values}->{$value->{scope}};
 		}
 	}
 
 	if (exists $value->{include}) {
 		my (%args, $include_file);
 
-		if ($self->template_file) {
+		if ($self->{template_file}) {
 			$include_file = Template::Flute::Utils::derive_filename
-				($self->template_file, $value->{include}, 1,
+				($self->{template_file}, $value->{include}, 1,
 				 pass_absolute => 1);
 		}
 		else {
 			$include_file = $value->{include};
 		}
-
+		
 		# process template and include it
-        %args = (
-            template_file  => $include_file,
-            auto_iterators => $self->auto_iterators,
-            i18n           => $self->i18n,
-            filters        => $self->filters,
-            values         => $value->{field}
-                              ? $self->values->{ $value->{field} }
-                              : $self->{values},
-            uri => $self->uri,
-        );
-
+		%args = (template_file => $include_file,
+			 auto_iterators => $self->{auto_iterators},
+			 i18n => $self->{i18n},
+             filters => $self->{filters},
+			 values => $value->{field} ? $self->{values}->{$value->{field}} : $self->{values},
+                 uri => $self->{uri},
+         );
+		
 		$raw_value = Template::Flute->new(%args)->process();
 	}
 	elsif (exists $value->{field}) {
         if (ref($value->{field}) eq 'ARRAY') {
+            my $lookup;
+
             $raw_value = $ref_value;
 
-            for my $lookup (@{$value->{field}}) {
+            for $lookup (@{$value->{field}}) {
                 if (ref($raw_value)) {
                     if ($self->_is_record_object($raw_value)) {
                         $raw_value = $raw_value->$lookup;
@@ -1575,7 +1485,7 @@ sub value {
 	if (wantarray) {
 		return ($raw_value, $rep_str);
 	}
-
+	
 	return $rep_str;
 }
 
@@ -1601,11 +1511,11 @@ sub _is_record_object {
 sub _autodetect_ignores {
     my $self = shift;
     my @ignores;
-    if ($self->autodetect and exists $self->autodetect->{disable}) {
-        @ignores = @{ $self->autodetect->{disable} };
+    if (exists $self->{autodetect} and exists $self->{autodetect}->{disable}) {
+        @ignores = @{ $self->{autodetect}->{disable} };
     }
     foreach my $f (@ignores) {
-        croak "empty string in the disabled autodetections" unless length($f);
+        die "empty string in the disabled autodetections" unless length($f);
     }
     return @ignores;
 }
@@ -1620,7 +1530,7 @@ sub _value_should_be_skipped {
             }
         }
         else {
-            croak "Unrecognized skip type $skiptype";
+            die "Unrecognized skip type $skiptype";
         }
     }
     return;
@@ -1633,26 +1543,39 @@ Sets hash reference of values to be used by the process method.
 Same as passing the hash reference as values argument to the
 constructor.
 
+=cut
+
+sub set_values {
+	my ($self, $values) = @_;
+
+	$self->{values} = $values;
+}
+
 =head2 template
 
 Returns HTML template object, see L<Template::Flute::HTML> for
 details.
+
+=cut
+
+sub template {
+	my $self = shift;
+
+	return $self->{template};
+}
 
 =head2 specification
 
 Returns specification object, see L<Template::Flute::Specification> for
 details.
 
-=head2 patterns
-
-Returns all patterns found in the specification.
-
 =cut
 
-# FIXME: (SysPete 28/4/16) (SysPete) What is scopes used for? I don't see
-# anything in the pod.
+sub specification {
+	my $self = shift;
 
-=head2 scopes
+	return $self->{specification};
+}
 
 =head1 SPECIFICATION
 
@@ -1756,12 +1679,8 @@ The following operations are supported for param elements:
 =over 4
 
 =item append
-
+ 
 Appends the param value to the text found in the HTML template.
-
-=item prepend
-
-Prepends the param value to the text found in the HTML template.
 
 =item target
 
@@ -1803,7 +1722,7 @@ Uses value from increment instead of a value from the iterator.
 
 Value elements are replaced with a single value present in the values hash
 passed to the constructor of this class or later set with the
-L<set_values|/set_values HASHREF> method.
+L<set_values|/set_values_HASHREF> method.
 
 The following operations are supported for value elements:
 
@@ -1813,19 +1732,10 @@ The following operations are supported for value elements:
 
 Appends the value to the text found in the HTML template.
 
-=item prepend
-
-Prepends the value to the text found in the HTML template.
-
 =item hook
 
 Insert HTML residing in value as subtree of the corresponding HTML element.
 HTML will be parsed with L<XML::Twig>. See L</INSERT HTML> for an example.
-
-=item keep
-
-Preserves the text inside of the HTML element if value is false
-in the Perl sense.
 
 =item toggle
 
@@ -1875,7 +1785,7 @@ is usually more convenient.
 
 =item filter
 
-=item sort
+=item sort	
 
 =item i18n
 
@@ -1947,9 +1857,6 @@ element content, yielding such output:
    <span class="category">in category pizza</span>
   </li>
  </ul>
-
-Note: All matches of the pattern are subject to replacement, starting
-with version 0.025.
 
 =back
 
@@ -2140,13 +2047,13 @@ Code:
   @colors = ({code => 'red', name => 'Red'},
              {code => 'black', name => 'Black'},
             );
-
+  
   $flute = Template::Flute->new(template => $html,
                                 specification => $spec,
                                 iterators => {colors => \@colors},
                                 values => { color => 'black' },
                                );
-
+  
   $out = $flute->process();
 
 Output:
@@ -2350,11 +2257,6 @@ Requires L<JSON> module.
 Replaces spaces with dashes (-) and makes lowercase.
 see L<Template::Flute::Filter::LowerDash>.
 
-=item markdown
-
-Turns text in Markdown format into HTML.
-see L<Template::Flute::Filter::Markdown>.
-
 =back
 
 Filter classes are loaded at runtime for efficiency and to keep the
@@ -2414,31 +2316,6 @@ The result replaces the inner HTML of the following C<div> tag:
         Sample content
     </div>
 
-=head1 INSTALLATION
-
-C<Template::Flute> can be installed from the latest release on CPAN, or if
-you wish for the very latest version, you can also install from the sources
-on GitHub.
-
-=head2 FROM CPAN
-
-To install from CPAN, simply use the C<cpanm> utility:
-
-    $ cpanm Template::Flute
-
-=head2 FROM SOURCE
-
-To install from source, first clone the repository, install the required
-dependencies, and build:
-
-    $ git clone https://github.com/racke/Template-Flute
-    $ cd Template-Flute
-    $ cpanm --installdeps .
-    $ perl Makefile.PL
-    $ make
-    $ make test     # optional, but still a good idea
-    $ make install
-
 =head1 AUTHOR
 
 Stefan Hornburg (Racke), <racke@linuxia.de>
@@ -2473,13 +2350,6 @@ L<http://search.cpan.org/dist/Template-Flute/>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Nitish Bezzala (GH #157).
-
-Thanks to Mohammad S Anwar (GH #156).
-
-Thanks to Paul Cochrane for his tremendous amount of pull requests
-issued during the GitHub challenge.
-
 Thanks to Peter Mottram (GH #81, #87).
 
 Thanks to William Carr (GH #86, #91).
@@ -2506,7 +2376,7 @@ a request from Matt S. Trout, author of the L<HTML::Zoom> module.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2010-2014 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

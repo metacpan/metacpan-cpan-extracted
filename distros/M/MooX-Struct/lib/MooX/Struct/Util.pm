@@ -1,18 +1,14 @@
 package MooX::Struct::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 use strict;
 use warnings;
-use Sub::Install qw(install_sub);
+use Exporter::Tiny ();
 
-sub import
-{
-	my $class  = shift;
-	my $caller = caller;
-	install_sub { code => $_, from => $class, into => $caller } for @_;
-}
+our @ISA    = qw(Exporter::Tiny);
+our @EXPORT = qw(lazy_default);
 
 sub lazy_default (&)
 {

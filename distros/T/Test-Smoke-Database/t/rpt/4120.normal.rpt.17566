@@ -1,0 +1,27 @@
+Return-Path: <alb@petra.albert-inc.com>
+Date: Thu, 17 Apr 2003 09:24:57 +0200 (MET DST)
+Subject: Smoke [5.9.0] 18566 PASS solaris 2.7 (sun4/1 cpu)
+From: alb@petra.albert-inc.com (Cpan Tester'Cpan++ Automate)
+
+Automated smoke report for 5.9.0 patch 17566 on solaris - 2.7 (sun4/1 cpu)
+          v1.16_12      using /export/home/alb/bin/gcc -B/usr/ccs/bin/ version gcc
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+ 18566   Configuration (common) -Dcc="/export/home/alb/bin/gcc
+                       -B/usr/ccs/bin/" -Dcf_email=alian@cpan.org
+-------  --------------------------------------------------------------
+O O O O
+O O O O  -Duse64bitint
+O O O O  -Duseithreads
+O O O O  -Duseithreads -Duse64bitint
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio
+
+Summary: PASS
+

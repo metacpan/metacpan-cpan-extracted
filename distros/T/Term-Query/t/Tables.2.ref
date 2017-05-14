@@ -1,0 +1,9 @@
+The input "IBM" fails to match any of the allowed keywords:
+query_table returned 1
+  $int1 = "4"
+  $int2 = "5"
+  $num3 = "3.1415"
+  $yn4 = "yes"
+  $yn5 = "no"
+  $key6 = ""
+  $nonkey7 = ""

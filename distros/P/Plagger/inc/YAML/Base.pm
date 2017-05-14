@@ -130,9 +130,9 @@ $_scalar_info = sub {
 };
 
 $_new_error = sub {
+    require Carp;
     my $self = shift;
     require YAML::Error;
-    require Carp;
 
     my $code = shift || 'unknown error';
     my $error = YAML::Error->new(code => $code);
@@ -168,6 +168,8 @@ $default_as_code = sub {
     return $code;
 };
 
+1;
+
 __END__
 
-#line 198
+#line 200

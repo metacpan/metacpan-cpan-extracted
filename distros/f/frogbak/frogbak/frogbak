@@ -1,0 +1,1285 @@
+#!/usr/local/bin/perl
+require 5.000;
+
+#############################################################################
+#
+#  Copyright (c) 1993 David Muir Sharnoff
+#  Copyright (c) 1992 Comdisco Systems Inc.
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. All advertising materials mentioning features or use of this software
+#     must display the following acknowledgement:
+#       This product includes software developed by the Comdisco Systems Inc.
+#  4. The name of Comdisco may not be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COMDISCO SYSTEMS INC ``AS IS'' AND
+#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED.  IN NO EVENT SHALL COMDISCO SYSTEMS INC BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+#  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+#  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+#  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#  SUCH DAMAGE.
+#
+# This copyright notice derrived from material copyrighted by the Regents
+# of the University of California.
+#
+#############################################################################
+
+#
+# David Muir Sharnoff	2/1/90
+#
+
+#########################################################################
+#
+# 	ARGUMENT PARSING
+#
+#########################################################################
+
+$usage = "$0: [-dryrun] [-netout] [-summary] [-future period] [-control control_file]\n";
+while (@ARGV) {
+	$_ = shift(@ARGV);
+	if (/^-d(ry(run)?)?$/) {
+		$dryrunf = 1;
+		next;
+	}
+	if (/^-n(et(out)?)?$/) {
+		$netout = 1;
+		next;
+	}
+	if (/^-s(ummary)?$/) {
+		$silentf = 1;
+		$dryrunf = 1;
+		next;
+	}
+	die $usage unless @ARGV;
+	if (/^-f(uture)?$/) {
+		$pretend_time = shift(@ARGV);
+		next;
+	}
+	if (/^-c(ontrol(_?file)?)?$/) {
+		$control = shift(@ARGV);
+		next;
+	}
+	die $usage;
+}
+
+#########################################################################
+# 
+#	CONFIGURATION
+#
+#########################################################################
+
+BEGIN	{
+	# do this during compile
+	$recorddir = "/usr/local/dump";
+}
+
+$tapehostos = "FreeBSD";
+
+## for testing purposes - forcing net output
+$netout = 1;
+
+
+$tapedevice = "/dev/nrst0";	# must be no-rewind
+$blocksize = "112";		# in .5k's. 8K blocks per AnDATAco. <64k per Sun
+$mt_f = "-f";			# -f for real unix systems
+$tapetype = "DAT";		# machine dependent variable
+$timeout_rsh = 1;		# rsh(1) supports timeouts?
+$do_compress = 1;
+$tapedevicedriver = "default";	
+$netstat = "netstat -i";
+umask(0);			# no nfs root=root, shared log files...
+
+# sometimes something will go wrong and no output will be produced by
+# a dump.  On some systems, it is not possible to read or fast forward
+# past a null file so the dump should be aborted ("abort").  On some
+# other systems, nothing gets written to the tape at all and thus the
+# dump number would get off if nothing was done ("compensate").  On
+# still others, a null file is just a zero lenght file and has no
+# special semantics ("ignore");
+$null_file_action = "compensate";
+
+$eject = 1;			# eject the tape when finished?
+
+$tapehost = `hostname`;
+chop $tapehost;
+$controlfile = ($control ? "control.$control" : "control.$tapehost");
+
+$incr_bias = 2;			# set high to move incrementals to front of tape (MUST BE >0)
+
+#########################################################################
+#
+# 	PRECOMPUTATION & INITIIZATION
+#
+#########################################################################
+
+#		RELOCATE
+
+chdir($recorddir)
+	|| die "chdir $recorddir: $!\n";
+
+# 		SUPPORT
+
+BEGIN	{
+	push(@INC,"/usr/local/dump");
+	use JulianDay;
+	use CTime;
+	use ParseDate;
+	use Carp;
+}
+
+#		DO NOT BUFFER ANYTHING
+$| = 1;
+
+# 		DO A "dry run", send all output to stdout...
+if ($dryrunf) {
+	if ($silentf) {
+		$bl = ">/dev/null";
+	} else {
+		open(STDERR,">&STDOUT");
+		$bl = ">&STDOUT";
+	}
+} else {
+	$bl = ">>backup.log.$$";
+}
+
+#		OPEN DEBUGGIN LOG
+open(DEBUG, "$bl")
+	|| die "could not open $bl: $!\n";
+select(DEBUG); $| =1; select(STDOUT);
+
+#		DATE/TIME ARRAYS
+&initTimeSubs;
+
+#
+print DEBUG "----------- DUMP LOG FOR $now ($$) -----------\n";
+
+#########################################################################
+#
+#	READ THE DUMP CONTROL FILE
+#
+#########################################################################
+
+#
+# format of control file:
+#
+# filesystem	host	program	if	ii	ff	fi
+#
+#	program = dump program to use
+#		dump = dump on a sun
+#		ultrix = dump on ultrix 3.1
+#		sony = dump on a sony news workstation
+#		wbak = wbak on apollo 10.2
+#	if = incremental frequency
+#	ii = incremental importance
+#	ff = full frequency
+#	fi = full importance
+#
+
+#
+# read the control file to see what priorities the dumps have.
+#
+#	for each dump, find when it was last done and compute 
+#	a importance rating so that next set of dumps can be 
+#	properly ordered.
+#
+
+sub valuate
+{
+	local($expr,$varname) = @_;
+	local($val);
+	$varname = "___foo" unless $varname;
+	$expr =~ s,([a-zA-Z_]),\$$1,g;
+	1 while ($expr =~ s,([a-zA-Z_])\$([a-zA-Z_]),$1$2,g);
+	$expr =~ s!\b0+(\d+)!$1!g;
+	$val = eval <<;
+		package uservars;
+		\$$varname = $expr;
+		\$$varname;
+
+	die "eval $expr: $@ for control file line $.\n"
+		if ($@);
+	return $val;
+}
+
+open(CONTROL,$controlfile)
+	|| die "open $controlfile: $!\n";
+&logfile($controlfile);
+while(<CONTROL>) {
+        /^#/ && next;
+	/^$/ && next;
+	chop;
+
+	if (/^average/) {
+		$full_av = 0;
+		$incr_av = 0;
+		($av, $host, @fslist) = split;
+		die "Too little to average at line $.\n" unless @fslist;
+		for $fs (@fslist) {
+			$filesys = "//$host/$fs";
+			$incr_av += $dumpincrrate{$filesys} if defined($dumpincrrate{$filesys});
+			$full_av += $dumpfullrate{$filesys} if defined($dumpfullrate{$filesys});
+		}
+		$incr_av /= scalar(@fslist);
+		$full_av /= scalar(@fslist);
+		for $fs (@fslist) {
+			$filesys = "//$host/$fs";
+			$av = ((defined($dumptype{$filesys}) && $dumptype{$filesys} eq 'full') ? $full_av : $incr_av);
+			$dumprating{$filesys} = ($av*10000+$dumprating{$filesys})/10001 if defined($dumprating{$filesys});
+			print DEBUG "Average $filesys $dumptype{$filesys} to $dumprating{$filesys}\n" if defined($dumprating{$filesys});
+		}
+		next;
+	}
+
+	if (/^\s*(\w+)\s*=\s*(.*)$/) {
+		($lval,$expr) = ($1,$2);
+		$foo = &valuate($expr);
+		eval "package uservars; \$$lval = $foo";
+		next;
+	}
+
+	($file, $host, $prog, $ifreq, $ivalue, $ffreq, $fvalue, @rest) = split;
+	if ($fvalue eq "" || @rest) {
+		&print("WARNING: control file line $. is malformed\n");
+		next;
+	}
+
+	$ivalue = &valuate($ivalue);
+	$fvalue = &valuate($fvalue);
+	print DEBUG "ival = $ivalue, fval = $fvalue\n";
+
+	$filesys = "//$host/$file";
+	$file{$filesys} = $file;
+	$host{$filesys} = $host;
+	$program{$filesys} = $prog;
+
+	#
+	# find out when the dumps were last done...
+	#
+	$full = &fetchlastdump($host,$file,"full");
+	$incr = &fetchlastdump($host,$file,"incr");
+	#
+	# if we do dump this filesystem, are we going to do a full dump
+	# or an incremental???
+	#
+	$dumpfullrate{$filesys} = $fullrate = &rate($full,$ffreq,$fvalue,$file,$host," full");
+	$incrrate = &rate($incr,$ifreq,$ivalue,$file,$host,"");
+	$dumpincrrate{$filesys} = $incrrate*$incr_bias;
+
+	print DEBUG "fileyss = $filesys full = $full incr = $incr fullrate = $fullrate incrrate = $incrrate\n";
+	if ($fullrate <= 0 && $incrrate <= 0) {
+		print DEBUG "skipping $filesys....  \n";
+		next;
+	}
+	if ($fullrate >= $incrrate) {
+		$dumptype{$filesys} = "full";
+		$dumprating{$filesys} = $fullrate;
+		$dumpdelta{$filesys} = 0;
+	} else {
+		$dumptype{$filesys} = "incr";
+		#
+		# if the incr is chosen, increase the rate to
+		# queue it ahead of other fulls -- BJM
+		#
+		$dumprating{$filesys} = $incrrate * $incr_bias;
+		$dumpdelta{$filesys} = $nextbestdate;
+	}
+}
+close(CONTROL);
+
+sub byratings {
+	$dumprating{$a} <=> $dumprating{$b};
+}
+@sortedratings = reverse sort byratings keys(%dumprating);
+
+if ($#sortedratings < 0) {
+	&print( "NO DUMPS NEED TO BE DONE.\n");
+	&exit(0);
+}
+
+&print(sprintf("Will be attempting %d dumps.\n", $#sortedratings+1));
+
+foreach $fs (@sortedratings) {
+	local($i) = &ctime_($dumpdelta{$fs});
+	&print(sprintf("%12s:%-20s %s %10s %9.2f\n",$host{$fs},$file{$fs},$dumptype{$fs},$program{$fs},$dumprating{$fs})) if $silentf;
+	print DEBUG "will dump $file{$fs} on $host{$fs}.  rating = $dumprating{$fs} type = $dumptype{$fs} program = $program{$fs} delta = $i\n";
+}
+
+if ($dryrunf) {
+	&exit(0);
+}
+
+#########################################################################
+#
+#	PREPARE THE TAPE
+#
+#########################################################################
+
+# sanity check
+$hostname = `hostname`;
+chop $hostname;
+if ($tapehost ne $hostname) {
+	die "must run on system with tape drive ($tapehost != $hostname)\n";
+}
+
+&rewind;
+
+&dd("if=$tapedevice of=/tmp/backup.list$$ bs=${blocksize}b count=2");
+	
+#
+#	Only tapes that have been pre-labeled as blanks will be written
+#	on.
+#
+
+if (! -z "/tmp/backup.list$$") {
+	&logfile("/tmp/backup.list$$");
+	open(TAPEHEADER, "/tmp/backup.list$$")
+		|| die "could not open /tmp/backup.list$$: $!\n";
+	$fl = <TAPEHEADER>;
+	$tapelabel = <TAPEHEADER>;
+	close (TAPEHEADER);
+	chop $fl;
+	$fl =~ s#[^A-Za-z0-9 ---=+:;.,/]#.#g;
+	$fl =~ s/(.{0,30}).*/$1/;
+	chop $tapelabel;
+	$tapelabel =~ s#[^A-Za-z0-9 ---=+:;.,/]#.#g;
+	$tapelabel =~ s/(.{0,30}).*/$1/;
+	if ($fl ne "BLANK" && !($fl eq "DUMP" && -e "recycled/$tapelabel" && !-e "tapes/$tapelabel")) {
+		die "tape '$tapelabel' is not labeled as blank or recycled ($fl).\n";
+	}
+	if ($tapelabel eq "") {
+		die "tape label '' not good enough.\n";
+	}
+} else {
+	die "could not read header file on dump tape.\n";
+}
+
+&rewind;
+
+&print("Dumping to tape $tapelabel\n");
+
+unlink("/tmp/backup.list$$")
+	|| die "unlink /tmp/backup.list$$: $!\n";
+
+#
+#	Label the tape.
+#
+
+open(TAPEHEADER, ">/tmp/backup.list$$")
+	|| die "could not open for write /tmp/backup.list$$: $!\n";
+print TAPEHEADER "DUMP\n";
+print TAPEHEADER "$tapelabel\n";
+print TAPEHEADER "$now\n";
+print TAPEHEADER "dumps are COMPRESSED\n" if $do_compress;
+print TAPEHEADER "The following dumps will be attempted:\n";
+foreach $fs (@sortedratings) {
+	print TAPEHEADER "$host{$fs}:$file{$fs} $dumptype{$fs}\n";
+}
+close(TAPEHEADER);
+&logfile("/tmp/backup.list$$");
+
+&dd("if=/tmp/backup.list$$ bs=${blocksize}b of=$tapedevice count=1 conv=sync")
+	|| die "dd complained: $dderror, $mtstatus.\n";
+
+
+#########################################################################
+#
+#	DUMP
+#
+#########################################################################
+
+#
+#	record the dump.
+#
+open (RECORD, ">tapes/$tapelabel")
+	|| die "could not create tapes/$tapelabel: $!\n";
+select(RECORD); $| =1; select(STDOUT);
+print RECORD "DUMP: $tapelabel ($now)\n";
+print RECORD "dumps are COMPRESSED\n" if $do_compress;
+print RECORD "control file: $controlfile\n";
+print RECORD "        host:filesystem            priority size mb rate/s cmp      level position\n";
+print RECORD "------------ ------------------- ---------- ------- ------ --- ---------- ---\n";
+#             --------------------------------------------------------------------------------
+
+$amountdumped = 0;
+$amounttaped = 0;
+
+#
+#	Dump.
+#
+Dump: foreach $fs (@sortedratings) {
+	if ($mtstatus eq "eot") {
+		&rprint("Ran out of tape.");
+		last Dump;
+	}
+	$now = &now;
+	$nowi = &cmin($now);
+	&outprint( "Dumping \($dumptype{$fs}\) $host{$fs}:$file{$fs}  ...\n"); 
+	open(ZERO,">/tmp/backup.ddout$$")
+		|| die "could not open /tmp/backup.ddout$$: $!\n";
+	close(ZERO);
+
+	if ($dumptype{$fs} eq "full") {
+		$dt = 0;
+	} else {
+		$dt = 1;
+	}
+	local($ct) = &ctime_($dumpdelta{$fs});
+	print DEBUG "ctime = $ct\n";
+	$begin_time = time;
+	if ($netout eq 1) {
+           @array1 = &getnet();
+	}
+	system("./dump.local",
+		$host{$fs},
+		$file{$fs},
+		"'$dumpdelta{$fs}'",
+		"'$ct'", 
+		"'of=$tapedevice ibs=2b obs=$blocksize"."b'",
+		"/tmp/backup.ddout$$", 
+		"/tmp/backup.rshout$$", 
+		$dt,
+		$program{$fs},
+		$do_compress,
+		$timeout_rsh);
+	$end_time = time;
+	if ($netout eq 1) {
+            @array2 = &getnet();
+	}
+	#
+	# check if things went ok.
+	#
+	print DEBUG "return status: $? ($!)\n";
+	&logfile("/tmp/backup.rshout$$");
+	&parseddout("/tmp/backup.ddout$$");
+	if ($ddexactbytes) {
+		$amounttaped += $ddexactbytes;
+	} else {
+		$amounttaped += ($ddrecordsout * 512 * $blocksize);
+	}
+	if ($netout eq 1) {
+            ($perrs, $pcoll)  = &netresults(*array1, *array2);
+	}
+	if ($ddreturnederrors) {
+		printf "result:%21s %s  failed. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+		&print( "dd returned errors: $dderror\n");
+		last Dump;
+	}
+	if ($ddnodumpdone) {
+		&print("$ddnodumpdone\n");
+		printf "result:%21s %s  failed. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+		next Dump;
+	}
+	if ($ddrecordsout == 0 && $ddpartialrecordsout == 0) {
+		&print( "Nothing was saved to tape by this dump. crashed?\n");
+		printf "result:%21s %s  failed. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+		if ($null_file_action eq "abort") { 
+			&print( "Aborting all the rest\n");
+			last Dump;
+		} elsif ($null_file_action eq "compensate") {
+			&print( "Writing a small file in place of the dump\n");
+			system("dd of=$tapedevice if=./dump.local conv=sync bs=112b");
+			next Dump;
+		} elsif ($null_file_action eq "ignore") {
+			next Dump;
+		} else {
+			die "illegal value for null_file_action: '$null_file_action'";
+		}
+	}
+	if ($ddrecordsout <= 0 && $ddpartialrecordsout <= 0) {
+		&print( "dd output was unparseable!!!\n");
+		printf "result:%21s %s  failed. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+		next Dump;
+	}
+
+	#	check for dump completion message.
+	{ 
+		local(@foo) = ("boggie");
+		open(RSHOUT,"/tmp/backup.rshout$$")
+			|| die "cannot open /tmp/backup.rshout$$: $!\n";
+		@rshout = <RSHOUT>;
+		close(RSHOUT);
+		
+		if (grep(/rsh: timeout reached/, @rshout)) {
+			&print("rsh timed out\n");
+			printf "result:%21s %s  failed. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+			next Dump;
+		}
+		@foo = ();
+		if ($program{$fs} =~ /^(sunos|sony|mach|hp-ux|hpux|netbsd|freebsd|solaris)$/) { 
+			@foo = grep(/DUMP IS DONE/,@rshout);
+		}
+		if ($program{$fs} eq "ultrix") {
+			@foo = grep(/Dump is done/,@rshout);
+		}
+		if ($program{$fs} eq "domain") {
+			@foo = grep(/Write complete/,@rshout);
+		}
+		if ($program{$fs} eq "xenix") {
+			@foo = grep(/blocks/,@rshout);
+		}
+		if ($program{$fs} =~ /^(linux|gtar|dostar|targtar)$/) {
+			@foo = grep (/Total bytes written:\s+\d*[1-9]\d*/,@rshout);
+		}
+		print DEBUG "foo = @foo\n";
+		$foo[0] ne "boggie" 
+			|| warn "don't understand dump program $program{$fs}.\n";
+		if ($#foo < 0) {
+		      if ($netout eq 1) {
+			printf"result:%21s %s  failed. %8.2f  %% errs: %2.1f  %% colls %.1f\n", $fs, $dumptype{$fs}, $dumprating{$fs}, $perrs, $pcoll;
+		      } else {
+			printf"result:%21s %s  failed. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+		      }
+			next Dump;
+		} 
+	#	else {
+		      if ($netout eq 1) {
+	#		printf"result:%21s %s  worked. %8.2f  %% errs %2.1f  %% colls %.1f\n", $fs, $dumptype{$fs}, $dumprating{$fs}, $perrs, $pcoll;
+		      } else {
+	#		printf"result:%21s %s  worked. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+		      }
+	#	}
+	}
+
+	#
+	# record the dump --- it was good.
+	#
+	if ($mtstatus eq "ok" || $mtstatus eq "na" || $mtstatus eq "eot") {
+		&outprint("Done.\n");
+		$dumpsize = ($ddrecordsout * 512 * $blocksize);
+		$amountdumped += $dumpsize;
+		if ($do_compress) {
+			$uncompressed += ($dumpsize / ((100.0-$ddcompression) / 100.0));
+		}
+		$ldc_priority = $dumprating{$fs};
+		if ($do_compress) {
+		      if ($netout eq 1) {
+			$printrec = sprintf("%10s:%-16s %8.2f %7.1f %5sk %2.0f%% %10s %3d %2.1f %2.1f\n",
+				$host{$fs},$file{$fs},
+				$ldc_priority,$dumpsize/1024/1024,
+				sprintf("%3.1f",$dumpsize/1024/($end_time-$begin_time+1)), # I shouldn't need the sprintf.
+				$ddcompression, $dumptype{$fs},$tapeposition-1),
+				$perrs, $pcoll;
+		      } else {
+			$printrec = sprintf("%10s:%-16s %8.2f %7.1f %5sk %2.0f%% %10s %3d\n",
+				$host{$fs},$file{$fs},
+				$ldc_priority,$dumpsize/1024/1024,
+				sprintf("%3.1f",$dumpsize/1024/($end_time-$begin_time+1)), # I shouldn't need the sprintf.
+				$ddcompression, $dumptype{$fs},$tapeposition-1);
+		      }
+		} else {
+		      if ($netout eq 1) {
+			$printrec = sprintf("%10s:%-16s %8.2f %7.1f %5sk %10s %3d %2.1f %2.1f\n",
+				$host{$fs},$file{$fs},
+				$ldc_priority,$dumpsize/1024/1024,
+				sprintf("%3.1f",$dumpsize/1024/($end_time-$begin_time+1)), # I shouldn't need the sprintf.
+				$dumptype{$fs},$tapeposition-1, $perrs, $pcoll);
+		      } else {
+			$printrec = sprintf("%10s:%-16s %8.2f %7.1f %5sk %10s %3d\n",
+				$host{$fs},$file{$fs},
+				$ldc_priority,$dumpsize/1024/1024,
+				sprintf("%3.1f",$dumpsize/1024/($end_time-$begin_time+1)), # I shouldn't need the sprintf.
+				$dumptype{$fs},$tapeposition-1);
+		      }
+		}
+		print RECORD $printrec;
+		print $printrec;
+		&recorddump($host{$fs},$file{$fs},$dumptype{$fs},$dumpdelta{$fs},$program{$fs});
+		$lastfs = $fs;
+		$total_time += ($end_time - $begin_time);
+		next Dump;
+	}
+
+	#
+	# stop dumping -- the tape is full or has some error.
+	#
+	if ($mtstatus eq "unknown") {
+		&print("unknown status from mt: $mtstatus\n");
+	}
+	if ($mtstatus ne "unknown" && $mtstatus ne "eot" && $mtstatus ne "na") {
+		printf"result:%21s %s  failed. %8.2f\n", $fs, $dumptype{$fs}, $dumprating{$fs};
+		&print("MT status = $mtstatus");
+	}
+	&print("Aborting remainder of dumps.\n");
+	last Dump;
+}
+&print("Tape is finished.\n");
+
+#########################################################################
+#
+#	CLEANUP
+#
+#########################################################################
+
+&rprint("--\n");
+&rprint("mt status = $mtstatus\n") unless ($mtstatus eq "na"); 
+&rprintf("size of compressed dumps: %.3fM.\n", $amountdumped/1024.0/1024.0)
+	if $do_compress;
+&rprintf("estimated size of uncompressed dumps: %.3fM.\n", $uncompressed/1024.0/1024.0)
+	if $do_compress;
+&rprintf("average data rate to tape %.1fk/s.\n", ($amountdumped/($total_time+1)/1024));
+&rprintf("priority of the last dump completed: %.2f\n", $ldc_priority);
+&rprintf("bytes sent to the tape %.3fM.\n", $amounttaped/1024.0/1024.0);
+&rprintf("bytes wasted: %.3fM.\n", ($amounttaped-$amountdumped)/1024.0/1024.0);
+close (RECORD);
+
+&rewind;
+
+if ($eject && $amountdumped > 100) {
+	system("mt $mt_f $tapedevice off");
+}
+
+close (DEBUG);
+
+if (! $dryrunf) {
+	if (! -d "logs") {
+		mkdir("logs",0777) 
+			|| die "could not mkdir logs: $!\n";
+	}
+	rename("logs/$tapelabel","logs/#$tapelabel")
+		if (-e "logs/$tapelabel");
+	rename("backup.log.$$","logs/$tapelabel")
+		|| warn "could not rename backup.log.$$ logs/$tapelabel: $!\n";
+}
+
+&exit(0);
+
+#########################################################################
+#
+#	TAPE MANIPULATION
+#
+#########################################################################
+
+# rewind the tape.
+sub rewind {
+	$tapeposition = 0;
+	print DEBUG "tape position reset to 0 ($tapeposition).\n";
+	&domtstatus;
+	if ($mtstatus eq "ok" && $mtposition == 0.0) {
+		return;			# tape does not need to be rewound
+	}
+	&print("+ mt $mt_f $tapedevice rewind\n");
+	local($rwind) = `mt $mt_f $tapedevice rewind`;
+	if ($rwind ne "") {
+		&print ("rewinding the tape produced output! ($rwind)\n");
+	}
+}
+
+#
+# Under SunOS 4.0.3, perl 3.0pl8, system "dd 2>&1 >/tmp/backup.ddout$$" does
+# not work.   However, by looking at the source to dd, I know that 
+# dd never writes anything to stdout.
+#
+# The full output from the dd command must be left in /tmp/backup.ddout$$
+#
+sub dd {
+	local($ddargs) = @_;
+
+	if ($tapehostos eq "FreeBSD" and $tapetype eq 'DAT' and ! $dryrunf) {
+		system("set -x;mt -f $tapedevice blocksize 0");
+	}
+
+	local($understood) = 0;
+	&print ("+ dd $ddargs\n");
+	if ($tapehostos eq "mach2.6") {
+		$understood = 1;
+	} elsif ($tapehostos =~ m/SunOS 4/) {
+		$understood = 1;
+	} elsif ($tapehostos =~ m/HP-UX/) {
+		$understood = 1;
+	} elsif ($tapehostos =~ m/FreeBSD/) {
+		$understood = 1;
+	}
+	if (! $understood) {
+		die "do not know how to run dd.\n";
+	}
+	system "dd $ddargs 2>/tmp/backup.ddout$$ >/dev/null";
+	&parseddout("/tmp/backup.ddout$$");
+	print DEBUG "ddrete = $ddreturnederrors mtstatus = $mtstatus\n" unless $tapehostos eq "mach2.6";
+	return !($ddreturnederrors || ($mtstatus eq "unknown"));
+}
+
+#
+# Look at the output from dd.  Figure out:
+#	did an error occur?
+#	how many records input?
+#	how many records output?
+#
+sub parseddout {
+	#
+	# zero out the return variables. 
+	#
+	$ddrecordsin = -999;
+	$ddpartialrecordsin = -999;
+	$ddrecordsout = -999;
+	$ddpartialrecordsout = -999;
+	$ddreturnederrors = 0;
+	$dderror = "";
+	$ddnodumpdone = "";
+	$ddcompression = 0.0;
+	#
+	local($ddout) = $_[0];
+	&logfile($ddout);
+	open (DDOUT, $ddout) 
+		|| warn "could not open dd output file $ddout: $!\n";
+	while(<DDOUT>) {
+		if (/^(\d+)\+(\d+) records/) {
+			split;
+			if ($3 eq "in") {
+				$ddrecordsin = $1;
+				$ddpartialrecordsin = $2;
+			} else {
+				$ddrecordsout = $1;
+				$ddpartialrecordsout = $2;
+			}
+		} elsif (m!^(\d+) bytes transferred in (\d+) secs \((\d+) bytes/sec\)!) {
+			$ddexactbytes = $1;
+		} elsif (/^(?:Compression:)?\s+(\-?[\d.]+)%/x) {
+			$ddcompression = $1;
+			if ($ddcompression > 99.99) {
+				print "COMPRESSION TOO GOOD TO BE REAL ($1)\n";
+				$ddcompression = 95.0;
+			}
+		} elsif (/^no_dump_done(.*)/) {
+			$ddnodumpdone = "dump failed: $1";
+		} else { 
+			$dderror .= $_;
+			$ddreturnederrors = 1;
+		}
+	}
+	close(DDOUT);
+	#
+	# This information should come from mt status output...
+	#
+	$tapeposition += 1;
+	&domtstatus;
+}
+
+#
+#	the following routine is very machine dependent.  It will have
+#	to be modified to suit.
+#
+#		$mtstatus should be one of:
+#			"unknown":	problems...
+#			"ok": 		A OK
+#			"eot":		End of the tape
+#			"smallread":	blocksize for read was too small
+#			"eof":		end of the written part of the tape
+#		$mtposition should be the current file number on the tape.
+#		Unfortunantly, mt -f status will NOT return the correct
+#		file position under SunOS 4.*..
+#
+#		$tapeposition should be set by some routine....
+#
+#
+
+sub domtstatus {
+
+	# default values for the globals...
+
+	$mtstatus = "unknown";
+	$mtposition = -1;
+
+	if ($tapehostos eq "FreeBSD") {
+		$mtstatus = "na";
+		return;
+	}
+	if ($tapehostos eq "mach2.6") {
+		# Julian's tape driver doesn't do much yet.
+		$mtstatus = "na";
+		return;
+	}
+	if ($tapehostos eq "HP-UX") {
+		# HP-UX is short for H PHUX
+		$mtstatus = "na";
+		return;
+	}
+	
+	print DEBUG "+ mt $mt_f $tapedevice status\n";
+	system("mt $mt_f $tapedevice status 2>&1 > /tmp/backup.mt$$");
+	&logfile("/tmp/backup.mt$$");
+	open(MTSTATUS,"/tmp/backup.mt$$")
+		|| die "could not open /tmp/backup.mt$$: $!\n";
+	if (($tapetype eq "Exabyte" || $tapetype eq "DAT") 
+			    && $tapehostos =~ m/SunOS 4/ &&
+			$tapedevicedriver eq "default") {
+		local(@mtstatus) = <MTSTATUS>;
+		if ($#mtstatus != 2) {
+			die "could not understand # of lines of mt status output: $#mtstatus\n";
+		}
+
+		if (($mtstatus[0] ne "Exabyte EXB-8200 8mm tape drive:\n")
+			&& ($mtstatus[0] ne "Exabyte tape drive:\n")
+			&& ($mtstatus[0] ne "Wangtek QIC-150 tape drive:\n")
+			&& ($mtstatus[0] ne "SCSI tape drive:\n")) {
+				die "could not understand mt status header: $mtstatus[0].\n";
+		}
+		if ($mtstatus[1] =~ m,.*sense key\(0x([0-9a-z]+)\)= (.*)residual.*,) {
+			if ($1 eq "14") {
+				$mtstatus = "read too small";
+			}
+			if ($1 eq "0") {
+				$mtstatus = "ok";
+			}
+			if ($1 eq "13") {
+				$mtstatus = "eot";  
+			}
+			if ($1 eq "12") {
+				$mtstatus = "eof";
+			}
+			if ($mtstatus eq "unknown") {
+				warn "did not parse mt status: $mtstatus[1]";
+			}
+		} else {
+			die "could not understand output of mt status: $mtstatus[1].\n";
+		}
+		if ($mtstatus[2] =~ m,.*file no=(.*)block no= (.*),) {
+			$mtposition = sprintf("%d.%d",$1,$2); 
+		} else {
+			die "Could not understand output of mt status: $mtstatus[1].\n";
+		}
+		close(MTSTATUS);
+		return;
+	} 
+	die "unable to understand how to use mt.\n";
+}
+
+#########################################################################
+#
+#	COMPUTE DUMP IMPORTANCE RATINGS
+#
+#########################################################################
+
+sub rate {
+	local($date,$freq,$value,$file,$host,$type) = @_;
+	local($period) = 0;
+	local($rate);
+
+	$period = &nUnits($freq);
+
+	if ($period == 0) {
+		&print ("illegal dump frequency: $freq\n");
+		return 0;
+	}
+
+	# time since last dump = $now - $date
+
+	print DEBUG "date = $date, now = $now\n";
+	#
+	# is this the first dump of this type to be considered?
+	#    if so, then treat the full dump as if it hasn't been done
+	#    for four "periods" and an incremental as if it hasn't been
+	#    done for two "periods".
+	#
+	if ($date == 0) {
+		print DEBUG "$host:$filesys$type never dumped before.\n";
+		if ($type eq " full") {
+			return $value * 10 * 4;
+		} else {
+			# this is a hack!!
+			$nextbestdate = &dint($nowi - $period*2);
+			return $value * 10 * 2;
+		}
+	}
+
+	#
+	# how long has it been since this was dumped?
+	#
+	printf DEBUG "%s not%s dumped in %d days.\n",$filesys,$type,($nowi - $date) / 24 / 3600;
+	#
+	# is it too soon to consider this dump?  (not, 10hrs are given for free)
+	#
+	if ($nowi - $date - $period +36000 <= 0) {
+		print DEBUG "$host:$filesys$type dumped recently ($nowi -$date -$period)\n";
+		return -$value;
+	}
+
+	$rate = ( ( $nowi - $date - $period +36000) * $value * 10 / $period );
+	$rate = -0.0001 if ($rate < 0);
+	return $rate / 60;
+}
+
+#########################################################################
+#
+#	DUMP HISTORY FILE MANIPULATION
+#
+#########################################################################
+
+# 
+# convert a hostname:filesys:type triplet into a history file name.
+# examples:
+#	cae780:/home:full		becomes "records/cae780/home.full"
+#	bullet://lemmy/u/mfg:incr	becomes "records/lemmy/u.mfg.incr"
+#	bullet://lemmy:full		becomes "records/lemmy/.full"
+#	
+sub getdumphistname {
+	local ($host, $file, $type) = @_;
+	if ($file =~ m,^//([^/]*)/?(.*),) {
+		$host = $1;
+		$file = $2;
+		if ($file eq "") {
+			$file = "/";
+		}
+	}
+	if ($file =~ m,^/(.*),) {
+		$file = $1;
+	}
+	$file =~ s,/,_,g;
+	if (! -d "records/$host") {
+		&print ("warning: making directory records/$host\n");
+		mkdir("records/$host",0777)
+			|| warn "could not mkdir records/$host: $!\n";
+	}
+#	&logfile("records/" . $host . "/" . $file . "." . $type);
+	return "records/" . $host . "/" . $file . "." . $type;
+}
+
+#
+# read a history dump file to find out when the last dump was done.  
+#
+# dump history files contain lines with four fields.  The first two 
+# fields specify the range of time covered by the dump.  The third field
+# specifies name of the dump tape that the dump can be found on.  The
+# fourth field is the file position on the dump tape.  
+#
+# For example,
+# 
+# 	90/01/20.18:30 90/02/10.21:10 0023 12 # comments
+# would indicate that a dump was done on the 2nd of Febuary 1990; that the
+# dump was run such that all files modified since the 20th of January would
+# be dumped; that the dump tape is labeled "0023"; and that the dump is
+# the twelth file on the tape.
+#
+# Note that for full dumps, the first field does not really mean anything.
+#
+# fetchlastdump serves two purposes.  First, it finds the last dump ($best) 
+# so that we know how long it has been since a dump.  Second, it finds the
+# second to last dump ($next) so that we can overlap incremental dumps 
+# properly.
+#
+#
+# |-older dump--|
+#        |------ old dump ----|
+# 		|-------last----------|
+#      			      |----------best-----------|
+#		                      |---------today's incremental-----|
+#									NOW
+#
+#		TIME -------->
+#
+# Note: $next is not very important for full dumps....
+#
+# 
+sub fetchlastdump {
+	local ($host, $file, $type) = @_;
+	local ($hfile) = &getdumphistname($host,$file,$type);
+	local ($next, $best, $zero);
+
+	if (! -d "records") { 
+		mkdir("records",0777) 
+			|| die "could not mkdir records: $!\n";
+	}
+	if (! -d "tapes") { 
+		mkdir("tapes",0777) 
+			|| die "could not mkdir tapes: $!\n";
+	}
+	$zero = $nextbestdate = $next = $best = "89/01/01.00:00";
+	if (! -e $hfile) {
+		print DEBUG "no history file: $hfile.\n";
+		return (0);
+	}
+	if (! (open (HFILE,$hfile)))  {
+		warn "could not open $hfile: $!\n";
+		return (0);
+	}
+	while (<HFILE>) {
+		/^#/ && next;
+		chop;
+		s/\s*#.*$//;
+		split;
+#(Too much goo)	print DEBUG "@_\n";
+		if ($_[1] ge $next) {
+			if ($_[1] ge $best) {
+				$next = $best;
+				$best = $_[1];
+			} else {
+				$next = $_[1];
+			}
+		}
+	}
+	close(HFILE);
+	print DEBUG "best = $best, next = $next\n";
+	if ($best eq $zero) {
+		print DEBUG "best = 0\n";
+		return (0);
+	}
+	if ($next eq $zero) {
+		$nextbestdate = $best;
+	} else {
+		$nextbestdate = $next;
+	}
+	return (&cmin($best));
+}
+
+sub recorddump {
+	local ($host, $file, $type, $delta, $program) = @_;
+	print DEBUG "record dump $host $file $type $delta\n";
+	local ($hfile) = &getdumphistname($host,$file,$type);
+	open (HFILE, ">>$hfile")
+		|| die "could not open >>$hfile: $!\n";
+	#
+	# We subtract one from the tapeposition because it is incremented
+	# before we record the dump.
+	#
+	local($t) = $tapeposition -1;
+	print HFILE "$delta $now $tapelabel $t # tapehost=$tapehost program=$program\n";
+	close (HFILE);
+#	&logfile($hfile);
+}
+
+#########################################################################
+# 
+#  	TIME MANIPULATION
+#
+#########################################################################
+
+#
+# convert a string which is known to be a date, into
+# seconds since 1970
+#  
+sub seconds
+{  
+        my ($s) = @_;
+        my $sec;
+	if ($s =~ m,^(\d\d)/(\d\d)/(\d\d)\.(\d\d)\:(\d\d)$,) {
+		my ($year,$mon1,$day,$hour,$min) = ($1, $2, $3, $4, $5);
+		$year += 100 if $year < 70;
+		$year += 1900 if $year < 1900;
+		my $jd = julian_day($year, $mon1, $day);
+		$sec = jd_seconds($jd, $hour, $min, 0);
+	} elsif ($s eq "" || $s eq "0" || ! defined $s) {
+		$sec = "epoch";
+	} else {
+		$sec = parse2seconds($s);
+	}
+        croak "could not convert $s to seconds" unless $sec;
+#print "seconds($s) = $sec, = ".ctime($sec);
+        return $sec;
+}     
+#  
+# convert a time (seconds since 1970) into wbak date format
+# YY/MM/DD.HH:MM
+#
+sub dint
+{
+	my ($ss70) = @_;
+    	my($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst, $TZname) = localtime($ss70);
+
+	my $wbf = sprintf("%02d/%02d/%02d.%02d:%02d",$year%100,$mon+1,$mday,$hour,$min);
+#print "dint($ss70) = $wbf\n";
+#print "normal ctime($ss70) = ".ctime($ss70);
+	return $wbf;
+}
+
+
+# convert YY/MM/DD.HH:MM format to ctime format...
+sub ctime_ {
+	my ($yymmddhhmm) = @_;
+	my $ct = &CTime::asctime_n(localtime(&seconds($yymmddhhmm)));
+#print "ctime_($yymmddhhmm) = $ct\n";
+	return $ct;
+}
+#
+# convert the current time to the YY/MM/DD.HH:MM format.
+#
+sub now {
+	my $now = &dint(time);
+#print "now = $now\n";
+	return $now;
+}
+
+#
+# convert the YY/MM/DD.HH:MM format into an integer.
+#
+sub cmin {
+	my ($yymmddhhmm) = @_;
+	my $ss70 = &seconds($yymmddhhmm);
+#print "cmin($yymmddhhmm) = $ss70\n";
+	return $ss70;
+}
+
+# 
+# convert a number+units string into minutes, eg: 3d.
+#
+sub nUnits
+{
+	local($freq) = @_;
+
+	if ($freq =~ m,^([0-9]*)h,) { return ($1 * 3600); }
+	if ($freq =~ m,^([0-9]*)d,) { return ($1 * 3600 * 24); }
+	if ($freq =~ m,^([0-9]*)w,) { return ($1 * 3600 * 24 * 7); }
+	if ($freq =~ m,^([0-9]*)m,) { return ($1 * 3600 * 24 * 30); }
+	if ($freq =~ m,^([0-9]*)y,) { return ($1 * 3600 * 24 * 30 * 12); }
+	return 0;
+}
+
+#
+#	initialize arrays for the above routines.  (historical)
+#
+
+sub initTimeSubs {
+#print "BEGIN TIMESUBS\n";
+	$now = &now;
+	$nowi = &cmin($now);
+	print DEBUG "now = $now\n";
+	local($t) = &dint($nowi);
+	print DEBUG "dint(now) = $t\n";
+	$nowc = &ctime_($now);
+	print DEBUG "nowc = $nowc\n";
+#print "END TIMESUBS\n";
+}
+
+#########################################################################
+#
+#	MISC
+#
+#########################################################################
+
+sub logfile {
+	local($file) = $_[0];
+
+	print DEBUG "=== $file ===\n";
+	open(TOLOG, $file)
+		|| warn "could not open $file: $!\n";
+	print DEBUG <TOLOG>;
+	print DEBUG "=====\n";
+	close(TOLOG);
+}
+
+sub rprint {
+	print (@_);
+	print DEBUG ": ".@_;
+	print RECORD ": ".@_;
+}
+sub rprintf
+{
+	printf (@_);
+	printf DEBUG ": ";
+	printf DEBUG @_;
+	printf RECORD @_;
+}
+sub print {
+	print @_;
+	print DEBUG ": ".@_;
+}
+
+# only print if stdout NOT file
+sub outprint {
+        print @_ if -t;
+	print DEBUG ": ".@_ if -t;
+}
+
+sub exit {
+	system("/bin/rm -f /tmp/backup.*$$");
+	exit $_[0];
+}
+
+sub satisfy_dash_w
+{
+	$a;
+	$b;
+	$isdst;
+	$lastfs;
+	@minstoyear;
+	&satisfy_dash_w;
+	$sec,$wday,$yday;
+}
+
+
+#
+#  netresults - correlates netstat results
+#
+sub netresults {
+
+  local(*array1, *array2) = @_;
+  local ($totipkts, $totierrs, $totoerrs, $totopkts, $totcoll);
+  local ($tpkts, $terrs, $tcoll);
+  local ($percenterrs, $percentcoll);
+
+  #
+  # if packets in each array are same -- no errs or colls
+  #
+  if (($array1[0] == $array2[0]) && ($array1[2] == $array2[2])) {
+       return(0, 0);
+  }
+  $totipkts = $array2[0] - $array1[0];
+  $totierrs = $array2[1] - $array1[1];
+  $totopkts = $array2[2] - $array1[2];
+  $totoerrs = $array2[3] - $array1[3];
+  $totcoll = $array2[4] - $array1[4];
+
+  $tpkts = $totipkts + $totopkts;
+  $terrs = $totierrs + $totoerrs;
+	 
+  $tpkts = 1 unless $tpkts;
+  $totopkts = 1 unless $totopkts;
+
+  $percenterrs = $toterrs/$tpkts * 100;
+  $percentcoll = $totcoll/$totopkts * 100;
+
+  return($percenterrs, $percentcoll);
+
+}
+
+#
+#  getnet - gets netstat info
+#
+sub getnet {
+
+  # net stuff only guaranteed to work on hp-ux or sun 
+  return(0,0,0,0,0)
+    unless $netstat;
+  #
+  # get netstat output 
+  #
+
+  local (*NETSTAT);
+  local ($Ipkts, $Ierrs, $Oerrs, $Opkts, $Coll);
+  open(NETSTAT, "$netstat |") || die "could not open: $!\n";
+   
+  #
+  #  read each line of output
+  #    if third field = Network | none | loopback  -- skip line
+  #    other wise:
+  #       want fields: 5     6     7     8     9 
+  #                    Ipkts Ierrs Opkts Oerrs Coll
+  #
+
+  while ( <NETSTAT> ) {
+    @network = split;
+    if (($network[2] ne "Network") && ($network[2] ne "loopback")
+	  && ($network[2] ne "none")){
+       $Ipkts += $network[4]; 
+       $Ierrs += $network[5];
+       $Opkts += $network[6]; 
+       $Oerrs += $network[7];
+       $Coll += $network[8];
+    }
+  }
+
+  return($Ipkts, $Ierrs, $Opkts, $Oerrs, $Coll);
+}
+

@@ -1,0 +1,56 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	1	755	1067749983	1210350510	is_relevant.pl
+!is_windows || is_windows == -1
+###	9	755	1293761335	1293819567	makepp_test_script.pl
+#
+# Test how many Makefiles recursive makes handle in the original process.
+#
+makepp qw(--traditional);
+n_files 'n_files_0';
+makepp qw(--hybrid hybrid);
+n_files 'n_files_1';
+makepp 'smart';
+1;
+###	6	644	1293762729	1293819297	Makefile
+perl {
+    $Mpp::main_process = 1;	# recognize this instance
+}
+
+$(foreach): :foreach traditional hybrid smart
+	$(MAKE) -Cdir $(output)
+###	2	644	1236523730	1237488485	hint
+This tests the old fashioned way of doing multi-directory builds.  The failure
+does not imply that the makepp-way of doing things is broken.
+###	D	755	1236523730	1237488485	dir
+###	6	644	1293762729	1293819378	dir/Makefile
+$(phony smart):
+	&expr $$Mpp::main_process || 2 -o ../$(output)
+
+$(foreach): :foreach $(phony traditional hybrid)
+	&expr $$Mpp::main_process || 2 -o ../$(output)
+	$(MAKE) -f Makefile2 $(output)
+###	3	644	1293762729	1293821694	dir/Makefile2
+$(foreach): :foreach $(phony traditional hybrid)
+	&expr $$Mpp::main_process || 2 -o >>../$(output)
+	$(MAKE) -Csubdir $(output)
+###	D	755	1293762729	1293821071	dir/subdir
+###	2	644	1293762729	1293829275	dir/subdir/Makefile
+$(foreach): :foreach $(phony traditional hybrid)
+	&expr $$Mpp::main_process || 2 -o >>../../$(output)
+###	D	755	1067451878	1078122199	answers
+###	3	644	1293791624	1293791624	answers/hybrid
+1
+2
+1
+###	1	644	1293791624	1293818003	answers/smart
+1
+###	3	644	1293791635	1293791635	answers/traditional
+2
+2
+2
+###	1	644	1067451878	1291317183	answers/n_files
+1 1 0
+###	1	644	1078122192	1190052203	answers/n_files_0
+1 0 0
+###	1	644	1078122192	1190052203	answers/n_files_1
+1 2 0

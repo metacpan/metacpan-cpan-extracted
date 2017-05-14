@@ -1,0 +1,21 @@
+---
+abstract: 'Echo 360 API'
+author:
+  - 'Kiel R Stirling <kielstr@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Echo360
+requires:
+  HTML::Parser: 0
+  HTTP::Headers: 0
+  LWP::UserAgent: 0
+  Net::OAuth: 0
+  XML::Simple: 0
+version: 0.001

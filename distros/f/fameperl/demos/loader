@@ -1,0 +1,21 @@
+#
+# loader -- this program does not do anything.  It is for
+#           explanatory purposes only.  Don't run it!
+#
+
+use Fame;
+
+# open output database for updating
+$db=new Fame::DB &Fame::HLI::HUMODE, "prices";
+die "Can't open database" unless $db;
+
+while(<>) {
+  # unpack in the format YYYYMMDDIIIIIIIIIPPPPPPPPP
+  ($date, $id, $price) = unpack("A8 A9 A9", $_);
+  if ($db->Exists($id)) {
+    $db->Write($id, $date, $price);
+  }
+  else {
+    print STDERR "New identifier $id ignored (line $.: $_)\n";
+  }
+}

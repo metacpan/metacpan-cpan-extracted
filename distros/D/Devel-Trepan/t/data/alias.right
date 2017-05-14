@@ -1,6 +1,5 @@
 -- main::(gcd.pl:18)
 die sprintf "Need two integer arguments, got %d", scalar(@ARGV) unless 
-    @ARGV == 2;
 set max width is 80.
 *** You must alias to a command name, and 'foo' isn't one.
 New alias 'yy' for command string 'step' created.
@@ -24,9 +23,10 @@ New alias 'upper' for command string 'up' created.
      up -1     # Same as down
 
  See also:
-  "down", and "frame".
+  "down", "frame", and "backtrace"
 
  Aliases:
+----------
 upper
 Alias for upper removed.
   up [*count*]
@@ -41,7 +41,7 @@ Alias for upper removed.
      up -1     # Same as down
 
  See also:
-  "down", and "frame".
+  "down", "frame", and "backtrace"
 set auto eval is off.
 *** Undefined command: "upper". Try "help".
 trepan.pl: That's all, folks...

@@ -3,7 +3,7 @@ package RMI::Server::ForkedPipes;
 use strict;
 use warnings;
 use version;
-our $VERSION = $RMI::VERSION;
+our $VERSION = qv('0.1');
 
 use base 'RMI::Server';
 
@@ -14,10 +14,6 @@ RMI::Node::_mk_ro_accessors(__PACKAGE__,'peer_pid');
 =head1 NAME
 
 RMI::Server::ForkedPipes - service RMI::Client::ForkedPipes requests
-
-=head1 VERSION
-
-This document describes RMI::Server::ForkedPipes v0.10.
 
 =head1 SYNOPSIS
 

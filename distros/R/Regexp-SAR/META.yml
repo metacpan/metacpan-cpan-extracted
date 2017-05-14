@@ -1,0 +1,15 @@
+---
+abstract: 'Regexp::SAR - perl module implementing regular expression engine for handling matching events (Simple API for Regexp)'
+author:
+  - 'Pinkhas Nisanov <pinkhas@nisanov.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-SAR
+version: '0.004'

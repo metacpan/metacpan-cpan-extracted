@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use URI::URL;
+
+my $f = URI::URL->new("http://www.csh.rit.edu/~psionic/foo/../../bar", "http://www.csh.rit.edu");
+
+print "F: " . $f->abs . "\n";

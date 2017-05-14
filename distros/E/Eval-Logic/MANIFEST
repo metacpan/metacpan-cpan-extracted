@@ -1,0 +1,15 @@
+lib/Eval/Logic.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/10_basic.t
+t/20_syntax.t
+t/21_valuecheck.t
+t/22_long_value_names.t
+t/23_keyword_value_names.t
+t/24_list_context.t
+t/30_eval_if.t
+t/40_complex_examples.t
+t/50_constants.t
+t/60_warnings.t
+META.yml                                 Module meta-data (added by MakeMaker)

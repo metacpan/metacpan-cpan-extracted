@@ -1,0 +1,17 @@
+# This file acts as the project's changelog.
+
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix dist:    <http://purl.org/NET/cpan-uri/dist/WWW-DataWiki/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project :release dist:v_0-001 .
+dist:v_0-001
+	a               :Version ;
+	dc:issued       "2011-11-13"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/WWW-DataWiki-0.001.tar.gz> ;
+	rdfs:label      "Initial release" .
+

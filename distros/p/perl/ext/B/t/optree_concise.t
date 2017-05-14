@@ -1,29 +1,23 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/B/t');
-    } else {
-	unshift @INC, 't';
-	push @INC, "../../t";
-    }
+    unshift @INC, 't';
     require Config;
     if (($Config::Config{'extensions'} !~ /\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
-    # require 'test.pl'; # now done by OptreeCheck
+    if (!$Config::Config{useperlio}) {
+        print "1..0 # Skip -- need perlio to walk the optree\n";
+        exit 0;
+    }
 }
 
 # import checkOptree(), and %gOpts (containing test state)
 use OptreeCheck;	# ALSO DOES @ARGV HANDLING !!!!!!
 use Config;
 
-my $tests = 23;
-plan tests => $tests;
-SKIP: {
-skip "no perlio in this build", $tests unless $Config::Config{useperlio};
+plan tests => 41;
 
 $SIG{__WARN__} = sub {
     my $err = shift;
@@ -270,7 +264,7 @@ checkOptree
     ( name	=> 'cmdline self-strict compile err using prog',
       prog	=> 'use strict; sort @a',
       bcopts	=> [qw/ -basic -concise -exec /],
-      errs	=> 'Global symbol "@a" requires explicit package name at -e line 1.',
+      errs	=> 'Global symbol "@a" requires explicit package name (did you forget to declare "my @a"?) at -e line 1.',
       expect	=> 'nextstate',
       expect_nt	=> 'nextstate',
       noanchors => 1, # allow simple expectations to work
@@ -280,7 +274,9 @@ checkOptree
     ( name	=> 'cmdline self-strict compile err using code',
       code	=> 'use strict; sort @a',
       bcopts	=> [qw/ -basic -concise -exec /],
-      errs	=> 'Global symbol "@a" requires explicit package name at .*? line 1.',
+      errs	=> qr/Global symbol "\@a" requires explicit package (?x:
+		     )name \(did you forget to declare "my \@a"\?\) at (?x:
+		     ).*? line 1\./,
       note	=> 'this test relys on a kludge which copies $@ to rendering when empty',
       expect	=> 'Global symbol',
       expect_nt	=> 'Global symbol',
@@ -295,26 +291,20 @@ checkOptree
       strip_open_hints => 1,
       expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:>,<,%,{
-# 3  <#> gv[*a] s
-# 4  <1> rv2av[t3] vK/OURINTR,1
-# 5  <;> nextstate(main 2 -e:1) v:>,<,%,{
-# 6  <0> pushmark s
-# 7  <#> gv[*a] s
-# 8  <1> rv2av[t5] lK/1
-# 9  <@> sort vK
-# a  <@> leave[1 ref] vKP/REFC
+# 2  <;> nextstate(main 2 -e:1) v:>,<,%,{
+# 3  <0> pushmark s
+# 4  <#> gv[*a] s
+# 5  <1> rv2av[t5] lK/1
+# 6  <@> sort vK
+# 7  <@> leave[1 ref] vKP/REFC
 EOT_EOT
 # 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:>,<,%,{
-# 3  <$> gv(*a) s
-# 4  <1> rv2av[t2] vK/OURINTR,1
-# 5  <;> nextstate(main 2 -e:1) v:>,<,%,{
-# 6  <0> pushmark s
-# 7  <$> gv(*a) s
-# 8  <1> rv2av[t3] lK/1
-# 9  <@> sort vK
-# a  <@> leave[1 ref] vKP/REFC
+# 2  <;> nextstate(main 2 -e:1) v:>,<,%,{
+# 3  <0> pushmark s
+# 4  <$> gv(*a) s
+# 5  <1> rv2av[t3] lK/1
+# 6  <@> sort vK
+# 7  <@> leave[1 ref] vKP/REFC
 EONT_EONT
 
 
@@ -359,7 +349,7 @@ sub set_up_relative_test {
 		$h->{arg} .= ' RELATIVE' if $h->{name} eq 'leavesub';
 	    }
 	    elsif ($style eq 'scope') {
-		# supress printout entirely
+		# suppress printout entirely
 		$$format="" unless grep { $h->{name} eq $_ } @scopeops;
 	    }
 	});
@@ -475,6 +465,3 @@ EOT_EOT
 7  <1> leavesub[1 ref] K/REFC,1 ->(end) 
 1        <;> nextstate(main 76 optree_concise.t:407) v ->2 
 EONT_EONT
-
-} #skip
-

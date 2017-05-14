@@ -1,0 +1,9 @@
+Revision history for Perl module swd
+
+0.01 Thu Sep 28 18:36:53 2006
+    - Former cwd pragma renamed to swd 
+
+0.01 Wed Jun 28 21:05:11 2006
+    - original version; created by ExtUtils::ModuleMaker 0.44
+
+

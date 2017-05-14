@@ -1,29 +1,27 @@
-$Id: README,v 1.2 2003/09/08 03:48:07 btrott Exp $
+NAME
 
-This is XML::Atom, an implementation of the API and feed format.
+    XML::Atom - Atom feed and API implementation
 
-PREREQUISITES
+SYNOPSIS
 
-    * XML::LibXML
-    * LWP
-    * Digest::SHA1
-    * MIME::Base64
-    * HTML::Parser
+        use XML::Atom;
 
-INSTALLATION
+DESCRIPTION
 
-XML::Atom installation is straightforward. If your CPAN shell
-is set up, you should just be able to do
+    Atom is a syndication, API, and archiving format for weblogs and other
+    data. XML::Atom implements the feed format as well as a client for the
+    API.
 
-    % perl -MCPAN -e 'install XML::Atom'
+LICENSE
 
-Download it, unpack it, then build it as per the usual:
+    XML::Atom is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-    % perl Makefile.PL
-    % make && make test
+AUTHOR
 
-Then install it:
+    Benjamin Trott, Tatsuhiko Miyagawa
 
-    % make install
+COPYRIGHT
 
-Benjamin Trott / cpan@stupidfool.org
+    All rights reserved.
+

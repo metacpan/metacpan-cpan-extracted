@@ -1,0 +1,20 @@
+This file documents the revision history for DBIx::Class::Tree::Mobius
+
+0.212     2011-07-15
+          add SQL::Translator test dependency 
+
+0.211     2011-07-13
+          cleanup git tmp files in last release
+
+0.210     2011-07-13
+          add DBIx::Class dependency
+          use Math::BigFloat and bigint for Perl Mobius encoding
+          default to BIGINT for a,b,c,d SQL columns
+          rewrite LIMITATIONS section in documentation
+
+0.201     2011-06-29
+          fix utf8 in pod
+          complete documentation
+
+0.2000    2011-06-28
+          first release

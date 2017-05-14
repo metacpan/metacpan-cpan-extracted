@@ -1,0 +1,158 @@
+#!/usr/bin/perl -w
+#=============================== findmatches =================================
+# Filename:  	       findmatches
+# Description:         Find files in a set of trees that match a name list.
+# Original Author:     Dale M. Amon
+# Revised by:          $Author: $ 
+# Date:                $Date: $ 
+# Version:             $Revision: $
+# License:	       LGPL 2.1, Perl Artistic or BSD
+#
+#=============================================================================
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+
+use Fault::DebugPrinter;
+use Fault::Logger;
+use Fault::Delegate::Stderr;
+
+use FileHash::FormatString;
+use FileHash::Name;
+use FileHash::Report
+
+#=============================================================================
+#                   Logging, debugging and signal handling
+#=============================================================================
+my %opts;
+$::PROCESS_NAME = "findmatches";
+$::DEBUG        = 0;
+
+sub done {
+  {local $SIG{'TERM'} = 'IGNORE'; kill 'TERM' => -$$;}
+  Fault::Logger->log ("Shutdown.","NOTE",'notice');
+  exit 1;
+}
+
+                 Fault::DebugPrinter->new(0);
+my $delegate1  = Fault::Delegate::Stderr->new;
+my @delegates = ($delegate1);
+                 Fault::Logger->new (@delegates);
+
+$SIG{'INT'}  = \&done;
+$SIG{'TERM'} = \&done;
+
+#=============================================================================
+#                    Switch and argument handling
+#=============================================================================
+my ($HELP,$MAN,$REPORT,$DIAGNOSTIC_PRINT_LEVEL) = (0,0,"/dev/stdout",0);
+
+my $opts  = Getopt::Long::Parser->new;
+$opts->getoptions (
+        'd|debug'      => sub { $::DEBUG = 1 },
+        'v|verbose=i'  => \$DIAGNOSTIC_PRINT_LEVEL,
+	'report=s' => \$REPORT,
+        'h|help'   => \$HELP,
+        'man'      => \$MAN
+);
+pod2usage(1)                            if $HELP;
+pod2usage(-exitval => 0, -verbose => 2) if $MAN;
+Fault::DebugPrinter->level ($DIAGNOSTIC_PRINT_LEVEL);
+
+#-----------------------------------------------------------------------------
+
+if ($#ARGV < 1 ) {
+     pod2usage(-exitval => "NOEXIT", -verbose => 1);
+     printf STDERR "$::PROCESS_NAME must have a list file and at least one " .
+       "directory, eg.\n      $::PROCESS_NAME /my/listofnames /my/Archive\n" .
+                   "Terminating...\n";
+     exit 1;
+   }
+
+my $report = FileHash::Report->new;
+my $fha    = FileHash::Name->alloc;
+my $fhd    = FileHash::Name->alloc;
+my $fhe    = FileHash::Name->alloc;
+             $fha->initFromFile ("path",shift @ARGV);
+
+             $fhe->initFromTree (shift @ARGV);
+
+foreach my $target (@ARGV) {
+  my $fhb  = FileHash::Name->alloc;
+             $fhb->initFromTree ($target);
+  my $fhc  = $fhb->and($fha);
+             $fhd->addFromObject ($fhc);
+}
+
+my $fhf = $fhd->andnot ($fhe);
+
+$report->all ($fhf, $REPORT,1);
+
+exit 0;
+
+#=============================================================================
+#                          POD DOCUMENTATION                                
+#=============================================================================
+# You may extract and format the documention section with the 'perldoc' cmd.
+
+=head1 NAME
+
+ findmatches - Find files in a set of trees that match a name list.
+
+=head1 SYNOPSIS
+
+ findmatches {-h|--help|--man} \
+	   {-d|--debug} \
+	   {-v|--verbose=1} \
+	   {--report="~report"} filelist target dirname1 {dirname2 ... }
+
+=head1 Description
+
+The program generates a name hash from a file containing a list of file 
+path names, one to a line. It finds file names in the set of trees which
+match a name in the last, ie the file name is in a and b; then it checks
+the target tree and selects those files which are in one of the trees
+but are not in the target.
+
+It then lists all the matching files to stdout or to the specified 
+file if --report defines one.
+
+This example could be used to recreate a lost directory tree in the case 
+where the tree has been deleted but a list of the files it contained 
+still exists. The file list is the description of what was lost; target
+is the place we are regenerating it; dirnames are the trees we are searching
+for backups of the lost files.
+
+=head1 Examples
+
+ findmatches --report myreport /home/me/olddir.list \
+             /home/me/newdir /home/me/Photos1
+
+ findmatches /home/me/olddir.list /home/me/newdir \
+             /home/me/Photos1 /home/me/Photos2 > report
+
+=head1 Errors and Warnings
+
+ Lots.
+
+=head1 KNOWN BUGS
+
+ None.
+
+=head1 SEE ALSO
+
+ None.
+
+=head1 AUTHOR
+
+Dale Amon <amon@vnl.com>
+
+=cut
+
+#=============================================================================
+#                                CVS HISTORY
+#=============================================================================
+# $Log: $
+# 20080217	Dale Amon <amon@vnl.com>
+#		Created.
+1;

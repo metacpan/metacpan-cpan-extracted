@@ -3,11 +3,12 @@ abstract: 'Old YAML.pm Legacy Code'
 author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires:
-  Test::YAML: '0.99'
+  Test::More: '0.88'
+  Test::YAML: '1.05'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,14 +16,15 @@ meta-spec:
 name: YAML-Old
 no_index:
   directory:
+    - example
     - inc
     - t
     - xt
-    - example
 requires:
   perl: v5.8.1
 resources:
   bugtracker: https://github.com/ingydotnet/yaml-old-pm/issues
   homepage: https://github.com/ingydotnet/yaml-old-pm
   repository: https://github.com/ingydotnet/yaml-old-pm.git
-version: '1.07'
+version: '1.23'
+x_serialization_backend: 'YAML::Tiny version 1.70'

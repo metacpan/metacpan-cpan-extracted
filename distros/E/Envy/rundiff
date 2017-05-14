@@ -1,0 +1,40 @@
+#!./perl -w
+
+use strict;
+use Symbol;
+
+my @f = qw(
+blib/lib/Envy/Conf.pm
+blib/etc/login/dot.login
+blib/etc/login/dot.dtprofile
+blib/etc/login/login.part2
+blib/etc/login/bash.inputrc
+blib/etc/login/dot.shrc
+blib/etc/login/dot.profile
+blib/etc/login/profile.part2
+blib/etc/login/dot.cshrc
+blib/script/wrapper
+blib/script/launche
+);
+
+my %map = @ARGV;
+
+my $more = gensym;
+my $pager = '|' . ($ENV{PAGER} || 'more');
+open $more, $pager or die "open $pager: $!";
+
+for my $f (@f) {
+    my $orig = $f;
+    for (keys %map) { last if $orig =~ s/^$_/$map{$_}/ }
+    if (-r $orig) {
+	my $diff = `diff -c $orig $f`;
+	if ($diff) {
+	    print $more $diff;
+	} else {
+	    print $more "eq: $orig $f\n";
+	}
+    }
+}
+
+close $more;
+wait;

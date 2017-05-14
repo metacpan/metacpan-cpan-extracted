@@ -1,0 +1,37 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="sex_mating_type" cv_table="SMP_SexMatingType">
+  <comment type="definition">This table provides the restricted vocabulary for the column sex mating type in the table samples and is used to limit the description of mating/sex so it is searchable	
+</comment>
+<term name="hfr"
+        description="bacteria that have incorporated the F plasmid
+into their bacterial chromosome. Hfr stands for high frequency of
+recombination"/> 
+<term name="f_plus"
+        description="bacteria with the ability to exchange material"/>
+<term name="f_minus"
+        description="bacteria without the ability to exchange material"/>
+<term name="a"
+        description="yeast mating type 'a'"/>
+<term name="alpha"
+        description="yeast mating type 'alpha'"/>
+<term name="male"
+        description="male in a species with sexual recombination"/>
+<term name="female"
+        description="female in a species with sexual recombination"/>
+to this organism"/>
+<term name="hermaphroditic"
+        description="an organism with both male and female capabilities"/>
+<term name="haploid"
+        description="the state in which only half the normal genetic content is present"/>
+<term name="a1"
+        description="a mating type in Phytophthora"/>
+<term name="a2"
+        description="a mating type in Phytophthora"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

@@ -3,6 +3,7 @@ abstract: 'Protect your site from robots'
 author:
   - 'Andrey Kostenko, C<< <andrey at kostenko.name> >>'
 build_requires:
+  Catalyst::Plugin::Cache::FastMmap: 0
   Catalyst::Runtime: 0
   Test::More: 0
   Test::WWW::Mechanize::Catalyst: 0
@@ -19,7 +20,9 @@ no_index:
     - inc
     - t
 requires:
+  Algorithm::FloodControl: 1.91
+  Params::Validate: 0
   perl: 5.8.7
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.17
+version: 0.23

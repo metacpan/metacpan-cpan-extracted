@@ -1,0 +1,36 @@
+Devel::TraceFuncs lets you instrument your programs, so you can see
+what subroutines get called when, and by whom.  This is particularly
+useful if you have a timing problem that doesn't show up if you use
+the debugger (a "heisenbug").
+
+The following program:
+
+   use Devel::TraceFuncs qw(trace debug);
+ 
+   sub foo {
+     trace(my $f);
+
+     debug "hi";
+   }
+
+   trace(my $f);
+
+   foo(1, 2);
+   debug "there";
+
+produces this output:
+
+   +-> global
+   |  +-> main::foo(1, 2) (in t.pm:10)
+   |  |  hi (in t.pm:6)
+   |  +-< main::foo(1, 2) (in t.pm:10)
+   |  there (in t.pm:11)
+   +-< global
+
+INSTALLATION:
+
+This should do it:
+
+   perl Makefile.PL
+   make install
+

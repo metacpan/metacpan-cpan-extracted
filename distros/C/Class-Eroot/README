@@ -1,0 +1,22 @@
+Class::Eroot is a simple object persistence engine that can persist any
+datatype.  Some objects will need to have an extra method or two added to
+their classes, but this is probably the exception rather than the rule.
+
+Here's the blurb from the manpage:
+
+"The Eternal Root (eroot) is given references to the root objects of any
+object hierarchies which must persist between separate invocations of the
+application.  When the eroot's destructor is called, the eroot will find all
+objects referenced in the object hierarchies and will store them.  All
+objects will be restored (if possible) when and if the B<Continue> message
+is sent to the eroot."
+
+This package also include Class::Template, which builds getter/setter
+methods for structs and classes.
+
+Dean Roehrich
+jun3,96
+
+------
+# changes/bugs fixed since 14mar95 version:
+#  - removed some 'defined' checks on 'ref's--bonehead bug.

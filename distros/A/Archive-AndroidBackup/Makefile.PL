@@ -20,7 +20,7 @@ my(%params) =
 	dist => { COMPRESS => 'gzip', SUFFIX   => 'gz' },
 	clean =>
 	{
-		FILES => 'blib/* Makefile MANIFEST MANIFEST.bak AndoidBackup-*'
+		FILES => 'blib/* Makefile MANIFEST MANIFEST.bak Archive-AndroidBackup-*'
 	},
 	($] ge '5.005') ?
 	(

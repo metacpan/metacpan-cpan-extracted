@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/piglatin
+dist.ini
+lib/App/PigLatin.pm
+t/00-load.t
+t/01-translate.t
+t/files/moby11-test.txt
+t/files/moby11.txt

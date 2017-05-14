@@ -1,0 +1,26 @@
+Revision history for Net-Amazon-EMR
+
+0.10    2012-12-19
+        First version
+
+0.11    2013-01-03
+        rt.cpan.org #82345; fixed undeclared dependencies
+
+0.12    2013-01-10
+        Fixed BootstrapActionConfig
+        rt.cpan.org #82617; expanded documentation
+
+0.13    2013-01-13
+        Additional dependencies
+
+0.14    2013-02-07
+        Fixed specification of JobFlowInstancesConfig
+
+0.15    2013-08-28
+        Minor documentation fix
+
+0.16    2013-08-28
+        Minor documentation fix relating to rt.cpan.org #88197
+
+0.17    2013-09-30
+        Added retry loop for 500 errors

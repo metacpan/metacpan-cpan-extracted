@@ -111,7 +111,7 @@
                         <TMPL_ELSE>
                           <div class="col-xs-12">
                         </TMPL_IF>
-
+                        
                         <!-- Name and link (mandatory) -->
                         <h4 class="appname <TMPL_VAR NAME="appid"> text-center">
                           <TMPL_VAR NAME="appname">
@@ -130,6 +130,7 @@
 
                       </div>
                       </div>
+
 
                     <!-- End of applications loop -->
                     </TMPL_LOOP>
@@ -210,7 +211,7 @@
 <TMPL_IF NAME="PING">
 <!-- Keep session alive -->
 <script type="text/javascript">
-  setTimeout('ping();',pingInterval);
+  setTimeout(ping,pingInterval);
 </script>
 </TMPL_IF>
 

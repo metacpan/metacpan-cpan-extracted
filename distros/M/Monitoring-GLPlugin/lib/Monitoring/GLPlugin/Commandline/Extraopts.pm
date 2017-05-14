@@ -58,8 +58,7 @@ sub get_default_file {
 sub init {
   my $self = shift;
   if (! defined $self->{file}) {
-    $self->{errors} = sprintf 'no extra-opts file specified and no default file 
-found';
+    $self->{errors} = sprintf 'no extra-opts file specified and no default file found';
   } elsif (! -f $self->{file}) {
     $self->{errors} = sprintf 'could not open %s', $self->{file};
   } else {
@@ -79,6 +78,7 @@ sub is_valid {
   my $self = shift;
   return ! exists $self->{errors};
 }
+
 sub overwrite {
   my $self = shift;
   if (scalar(keys %{$self->{config}->{default_no_section}}) > 0) {
@@ -91,6 +91,11 @@ sub overwrite {
       $self->{commandline}->{$_} = $self->{config}->{$self->{section}}->{$_};
     }
   }
+}
+
+sub errors {
+  my $self = shift;
+  return $self->{errors} || "";
 }
 
 1;

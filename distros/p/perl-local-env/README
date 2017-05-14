@@ -1,0 +1,66 @@
+NAME
+    perl-local-env - Easily create and activate a local::lib environment
+
+SYNOPSIS
+        perl-local-lib <environment-path> ...
+             ... create
+             ... activate
+             ... run <command>
+
+DESCRIPTION
+    This tool provides a set of commands for creating and activating local
+    environments created by local::lib.
+
+WORKFLOW
+  Create a local environment
+        perl-local-lib <environment-path> create
+
+    This will create a directory at the given path and configure it to work
+    as a local environment. You only need to do this step once for each
+    environment.
+
+  Activate your environment
+    Each time you want to run code in the context of the environment you
+    must first activate it:
+
+        perl-local-lib <environment-path> activate
+
+    This will start a new child shell with the right settings to make "perl"
+    look for libraries only in the local environment, and add the
+    environment's "bin" directory to the "PATH" so that local tools are
+    available.
+
+    You can use that shell to run as many commands as you like in the
+    context of the virtual environment, including "cpanm" to install new
+    packages into the local environment.
+
+  Exit the environment
+    To leave the environment, just exit the shell that was launched by
+    "activate" above. If you were already in a shell when you activated the
+    environment, you will be returned to that shell.
+
+OTHER COMMANDS
+  Run an arbitrary command
+    Rather than launching a full shell, you can launch an individual command
+    in the context of the environment using the "run" command:
+
+        perl-local-lib <environment-path> run <command>
+
+    For example, you could use this to install Plack into your local
+    environment without first launching a shell:
+
+        perl-local-lib <environment-path> run cpanm Plack
+
+CAVEATS
+    This tool currently only works fully on UNIX systems. You may have
+    limited success on other systems, but don't be surprised if things
+    randomly go wrong.
+
+SEE ALSO
+    local::lib, cpanm
+
+AUTHOR
+    Copyright 2010 Martin Atkins and Six Apart Ltd. All Rights Reserved.
+
+    This tool is redistributable under the same terms as perl itself.
+

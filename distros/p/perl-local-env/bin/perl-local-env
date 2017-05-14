@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+perl-local-env - Easily create and activate a local::lib environment
+
+=head1 SYNOPSIS
+
+    perl-local-lib <environment-path> ...
+         ... create
+         ... activate
+         ... run <command>
+
+=head1 DESCRIPTION
+
+This tool provides a set of commands for creating and activating
+local environments created by L<local::lib>.
+
+=head1 WORKFLOW
+
+=head2 Create a local environment
+
+    perl-local-lib <environment-path> create
+
+This will create a directory at the given path and configure
+it to work as a local environment. You only need to do
+this step once for each environment.
+
+=head2 Activate your environment
+
+Each time you want to run code in the context of the environment
+you must first activate it:
+
+    perl-local-lib <environment-path> activate
+
+This will start a new child shell with the right settings to
+make C<perl> look for libraries only in the local environment,
+and add the environment's C<bin> directory to the C<PATH>
+so that local tools are available.
+
+You can use that shell to run as many commands as you like
+in the context of the virtual environment, including C<cpanm>
+to install new packages into the local environment.
+
+=head2 Exit the environment
+
+To leave the environment, just exit the shell that was launched
+by C<activate> above. If you were already in a shell when you
+activated the environment, you will be returned to that shell.
+
+=head1 OTHER COMMANDS
+
+=head2 Run an arbitrary command
+
+Rather than launching a full shell, you can launch an individual
+command in the context of the environment using the "run" command:
+
+    perl-local-lib <environment-path> run <command>
+
+For example, you could use this to install L<Plack> into your
+local environment without first launching a shell:
+
+    perl-local-lib <environment-path> run cpanm Plack
+
+=head1 CAVEATS
+
+This tool currently only works fully on UNIX systems. You may
+have limited success on other systems, but don't be surprised
+if things randomly go wrong.
+
+=head1 SEE ALSO
+
+L<local::lib>, L<cpanm>
+
+=head1 AUTHOR
+
+Copyright 2010 Martin Atkins and Six Apart Ltd. All Rights Reserved.
+
+This tool is redistributable under the same terms as perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+our $VERSION = 0.03;
+
+BEGIN {
+    # Load local::lib without calling ->import
+    require local::lib;
+}
+
+use Getopt::Long ();
+use Pod::Usage;
+
+my $help = 0;
+Getopt::Long::GetOptions(
+    "help" => \$help,
+) or pod2usage("");
+pod2usage("") if $help;
+
+my $env_path = shift || pod2usage("environment-path is required");
+my $cmd = shift || pod2usage("command is required");
+
+$env_path = local::lib->resolve_path($env_path);
+
+if ($cmd eq 'create') {
+    if (-e $env_path) {
+        die "$env_path already exists. move it out of the way to create a new environment.\n";
+    }
+    local::lib->ensure_dir_structure_for($env_path);
+
+    print "\nRun the following command to activate the new environment:\n    $0 $env_path activate\n\n";
+}
+elsif ($cmd eq 'activate') {
+    my %env = local::lib->build_environment_vars_for($env_path, 1);
+    foreach my $k (keys %env) {
+        $ENV{$k} = $env{$k};
+    }
+    warn "\nLaunching a shell in this environment. Exit the shell when you're done to return to normality.\n\n";
+    # FIXME: Make this do something sane outside UNIX?
+    my $shell = $ENV{SHELL};
+    $shell = "/bin/sh" unless $shell;
+    exec($shell);
+}
+elsif ($cmd eq 'run') {
+    my @child_cmd = @ARGV;
+    my %env = local::lib->build_environment_vars_for($env_path, 1);
+    foreach my $k (keys %env) {
+        $ENV{$k} = $env{$k};
+    }
+    exec(@child_cmd);
+}
+else {
+    pod2usage("Unrecognized command '$cmd'");
+}
+

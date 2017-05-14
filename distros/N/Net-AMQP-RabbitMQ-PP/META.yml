@@ -23,7 +23,7 @@ no_index:
     - inc
 requires:
   File::ShareDir: '1'
-  File::ShareDir::Install: '0.11'
+  File::ShareDir::Install: '0.1'
   List::MoreUtils: '0.25'
   Net::AMQP: '0.06'
   Socket::Linux: '0.01'
@@ -34,7 +34,7 @@ resources:
   homepage: https://metacpan.org/module/Net::AMQP::RabbitMQ::PP
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/net-amqp-rabbitmq
-version: '0.04'
+version: '0.05'
 x_repository:
   type: git
   url: https://github.com/Humanstate/net-amqp-rabbitmq.git

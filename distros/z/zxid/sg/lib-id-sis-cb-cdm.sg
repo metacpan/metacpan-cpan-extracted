@@ -1,0 +1,392 @@
+# zxid/sg/lib-id-sis-cb-cdm.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: lib-id-sis-cb-cdm.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(cdm, urn:liberty:cb:conceptual-data-model:2004-10)
+ns(cb, urn:liberty:id-sis-cb:2004-10)
+
+vCard:
+  cdm:VERSION
+  cdm:CARDID
+  cdm:DISTRIBUTIONLIST?
+  cdm:SELF?
+  cdm:FAVORITE?
+  cdm:FN+
+  cdm:N+
+  cdm:LISTMEMBER*
+  cdm:NICKNAME*
+  cdm:PHOTO*
+  cdm:BDAY*
+  cdm:ADR*
+  cdm:LABEL*
+  cdm:TEL*
+  cdm:EMAIL*
+  cdm:JABBERID*
+  cdm:MAILER*
+  cdm:TZ*
+  cdm:GEO*
+  cdm:TITLE*
+  cdm:ROLE*
+  cdm:LOGO*
+  cdm:AGENT*
+  cdm:ORG*
+  cdm:CATEGORIES*
+  cdm:NOTE*
+  cdm:PRODID*
+  cdm:REV*
+  cdm:SORT-STRING*
+  cdm:SOUND*
+  cdm:UID*
+  cdm:URL*
+  cdm:CLASS*
+  cdm:KEY*
+  cdm:DESC*
+  cdm:PHYSICALACCESS*
+  cdm:CALURI*
+  cdm:CAPURI*
+  cdm:CALADRURI*
+  cdm:FBURL*
+  cb:Extension*
+  &@cb:commonAttributes
+  ;
+
+VERSION: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+FN: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+N:
+  cdm:FAMILY?
+  cdm:GIVEN?
+  cdm:MIDDLE?
+  cdm:PREFIX?
+  cdm:SUFFIX?
+  &@cb:commonAttributes
+  ;
+
+FAMILY: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+GIVEN: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+MIDDLE: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+PREFIX: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+SUFFIX: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+NICKNAME: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+PHOTO:
+  cdm:TYPE?
+  cdm:BINVAL?
+  cdm:EXTVAL?
+  &@cb:commonAttributes
+  ;
+
+BDAY: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+ADR:
+  cdm:HOME?
+  cdm:WORK?
+  cdm:POSTAL?
+  cdm:PARCEL?
+  cdm:DOM?
+  cdm:INTL?
+  cdm:PREF?
+  cdm:POBOX?
+  cdm:EXTADR?
+  cdm:STREET?
+  cdm:LOCALITY?
+  cdm:REGION?
+  cdm:PCODE?
+  cdm:CTRY?
+  &@cb:commonAttributes
+  ;
+
+POBOX: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+EXTADR: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+STREET: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+LOCALITY: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+REGION: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+PCODE: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+CTRY: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+LABEL:
+  cdm:HOME?
+  cdm:WORK?
+  cdm:POSTAL?
+  cdm:PARCEL?
+  cdm:DOM?
+  cdm:INTL?
+  cdm:PREF?
+  cdm:LINE+
+  &@cb:commonAttributes
+  ;
+
+LINE: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+TEL:
+  cdm:HOME?
+  cdm:WORK?
+  cdm:VOICE?
+  cdm:FAX?
+  cdm:PAGER?
+  cdm:MSG?
+  cdm:CELL?
+  cdm:VIDEO?
+  cdm:BBS?
+  cdm:MODEM?
+  cdm:ISDN?
+  cdm:PCS?
+  cdm:PREF?
+  cdm:NUMBER
+  &@cb:commonAttributes
+  ;
+
+NUMBER: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+EMAIL:
+  cdm:HOME?
+  cdm:WORK?
+  cdm:INTERNET?
+  cdm:PREF?
+  cdm:X400?
+  cdm:USERID
+  &@cb:commonAttributes
+  ;
+
+USERID: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+JABBERID: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+MAILER: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+TZ: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+GEO:
+  cdm:LAT
+  cdm:LON
+  &@cb:commonAttributes
+  ;
+
+LAT: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+LON: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+TITLE: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+ROLE: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+LOGO:
+  cdm:TYPE?
+  cdm:BINVAL?
+  cdm:EXTVAL?
+  &@cb:commonAttributes
+  ;
+
+AGENT:
+  cdm:vCard?
+  cdm:EXTVAL?
+  &@cb:commonAttributes
+  ;
+
+ORG:
+  cdm:ORGNAME
+  cdm:ORGUNIT*
+  &@cb:commonAttributes
+  ;
+
+ORGNAME: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+ORGUNIT: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+CATEGORIES:
+  cdm:KEYWORD+
+  &@cb:commonAttributes
+  ;
+
+KEYWORD: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+NOTE: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+PRODID: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+REV: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+SORT-STRING: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+SOUND:
+  cdm:PHONETIC?
+  cdm:BINVAL?
+  cdm:EXTVAL?
+  &@cb:commonAttributes
+  ;
+
+PHONETIC: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+UID: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+URL: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+DESC: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+CLASS:
+  cdm:PUBLIC?
+  cdm:PRIVATE?
+  cdm:CONFIDENTIAL? 
+  &@cb:leafAttributes
+  ;
+
+# Flag elements. Only presence matters (and content is typically empty)
+
+PUBLIC -> %xs:string
+PRIVATE -> %xs:string
+CONFIDENTIAL -> %xs:string
+
+KEY:
+  cdm:TYPE?
+  cdm:CRED
+  ;
+
+CRED: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+# Flag elements. Only presence matters (and content is typically empty)
+
+HOME   -> %xs:string
+WORK   -> %xs:string
+POSTAL -> %xs:string
+PARCEL -> %xs:string
+DOM    -> %xs:string
+INTL   -> %xs:string
+PREF   -> %xs:string
+VOICE  -> %xs:string
+FAX    -> %xs:string
+PAGER  -> %xs:string
+MSG    -> %xs:string
+CELL   -> %xs:string
+VIDEO  -> %xs:string
+BBS    -> %xs:string
+MODEM  -> %xs:string
+ISDN   -> %xs:string
+PCS    -> %xs:string
+INTERNET -> %xs:string
+X400   -> %xs:string
+
+TYPE: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+BINVAL: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+EXTVAL: base(xs:string)
+  &@cb:leafAttributes
+  ;
+
+PHYSICALACCESS: base(xs:string)
+  &@cb:typeAttributes
+  ;
+
+# Flag elements
+
+SELF -> %xs:string
+FAVORITE -> %xs:string
+DISTRIBUTIONLIST -> %xs:string
+
+CALURI    -> %cdm:QualifiedURIType
+CAPURI    -> %cdm:QualifiedURIType
+CALADRURI -> %cdm:QualifiedURIType
+FBURL     -> %cdm:QualifiedURIType
+%QualifiedURIType:
+  cdm:PREF?
+  cdm:URI -> %cb:DSTURI
+  &@cb:leafAttributes
+  ;
+
+CARDID -> %xs:anyURI
+
+LISTMEMBER -> %cb:DSTURI
+
+#EOF

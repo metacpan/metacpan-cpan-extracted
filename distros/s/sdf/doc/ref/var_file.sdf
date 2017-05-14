@@ -1,0 +1,35 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: File Information Variables
+
+H2: Purpose
+
+These variables provide information on the file [[SDF]] is
+currently processing.
+
+H2: Interface
+
+!block table; format=325
+Name            Type        Purpose
+FILE_PATH       string      current pathname (e.g. {{/doc/sdf/mydoc.sdf}})
+FILE_DIR        string      directory of current filename (e.g. {{/doc/sdf}})
+FILE_BASE       string      base component of current filename (e.g. {{mydoc}})
+FILE_EXT        string      extension of current filename (e.g. {{sdf}})
+FILE_MODIFIED   datetime    time when this file was last modified
+!endblock
+
+#H2: Description
+
+!end_topic
+

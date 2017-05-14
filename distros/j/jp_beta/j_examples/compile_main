@@ -1,0 +1,12 @@
+#! /bin/sh
+
+cp ../bin/jp.class .
+
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:../bin"
+export LD_LIBRARY_PATH
+
+echo "Compiling..."
+javac main.java
+
+echo "Executing..."
+exec java main

@@ -1,0 +1,47 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: verbatim Filter
+
+H2: Interface
+
+!filter_interface "verbatim"
+
+H2: Description
+
+The {{verbatim}} filter is used to specify a section of fixed-width text.
+Unlike the {{FILT:verbatim}} filter, embedded SDF symbols (like E<2{>)
+are treated like normal text.
+
+The {{skipheader}} parameter is useful when an external file is being
+included as an example, but you do not want the header comment in
+the example. The {{lang}} parameter, if any, is used to determine
+the commenting conventions. If no language is specified, comments
+are assumed to start with a # and be terminated by the end of line.
+
+The {{wide}} parameter can be used to ensure that at least 80 characters
+are output on a line before it is wrapped.
+
+The {{listitem}} parameter can be used to specify that this block
+of text is part of a list. The value is the logical
+indent of the list (e.g. 1, 2, etc.).
+
+H2: Examples
+
+!block example; lang='sdf'
+
+# Include myfile.c but exclude the copyright, revision history, etc.
+!include "myfile.c"; verbatim; skipheader; lang='c'
+!endblock
+
+#H2: Limitations & Future Directions

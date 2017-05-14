@@ -1,0 +1,41 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: INI Format</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_fmt.html">Parent Topic</A> | <A HREF="in_fmt.html">Previous Topic</A> | <A HREF="fmt_sdg.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>4.2. INI Format</H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P>INI files are used to store simple configuration information for scripts.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>An INI file contains of a series of sections. Each section begins with a header enclosed in '[' and ']'. Comment lines begin with ';' or '#' as the first non-whitespace character. Blank lines before a section or at the end of a section are ignored.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>A sample file is:</P>
+<PRE>
+[Drivers]
+Format  Library     Subroutine  Book
+mif     sdf2mif.pl  MifFormat   MifBook
+raw     sdf2raw.pl  RawFormat
+
+[PostProcessing]
+ps     = &amp;SdfBatch(&quot;-pfile&quot;)
+doc    = &amp;SdfBatch(&quot;-sdoc -Sd&quot;)
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_fmt.html">Parent Topic</A> | <A HREF="in_fmt.html">Previous Topic</A> | <A HREF="fmt_sdg.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

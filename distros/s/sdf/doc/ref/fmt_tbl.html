@@ -1,0 +1,105 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: TBL Format</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_fmt.html">Parent Topic</A> | <A HREF="fmt_sdg.html">Previous Topic</A> | <A HREF="in_filt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>4.4. TBL Format</H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P><EM>TBL</EM> format is a text-based format for storing tabular data.</P>
+<HR>
+<H2><A NAME="Overview">Overview</A></H2>
+<P>The basic rules are:</P>
+<UL>
+<LI>blank lines and comment lines are ignored,
+<LI>the first data line specifies the record format,
+<LI>each remaining data line specifies a single record.</UL>
+<P>Comment lines begin with # as the first non-whitespace character.</P>
+<HR>
+<H2><A NAME="Record Formats">Record Formats</A></H2>
+<P>For a given table, all records have the same format. The record format is either:</P>
+<UL>
+<LI><EM>delimited</EM> - fields are separated by a special character, or
+<LI><EM>fixed-width</EM> - fields are defined by column positions.</UL>
+<P>An example of delimited format is given below.</P>
+<PRE>
+# A simple TBL example
+Name:Age:Phone:Addr
+Bill:42:397 1234:14 Smith St, New Farm
+Sarah:37:892 4321:105 Brown St, Chelmer
+Joe:44:365 7890:6 Royal Av, Buranda
+</PRE>
+<P>An example of fixed-width format is given below.</P>
+<PRE>
+# A simple TBL example
+Name    Age     Phone           Addr
+Bill    42      397 1234        14 Smith St, New Farm
+Sarah   37      892 4321        105 Brown St, Chelmer
+Joe     44      365 7890        6 Royal Av, Buranda
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Tabs in fixed-width records are assumed to be 8 spaces wide.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Input Format Specification">Input Format Specification</A></H2>
+<P>The first data line is called the <EM>input format specification</EM>. It specifies:</P>
+<UL>
+<LI>the name and order of the fields in each record
+<LI>the record format - delimited or fixed-width</UL>
+<P>Field names can contain:</P>
+<UL>
+<LI>alphanumeric characters (A-Z, a-z, 0-9)
+<LI>the underscore character (_)</UL>
+<P>If the first character after the first field name is a space or tab, the format is assumed to be <EM>fixed width</EM>. Otherwise, the format is <EM>delimited</EM> with fields separated by the special character found.</P>
+<HR>
+<H2><A NAME="Multi-line Fields">Multi-line Fields</A></H2>
+<P>Generally, each data line specifies a single record. However, if the last field begins with the sequence '&lt;&lt;', then it is a multi-line field terminated by the first line beginning with '&gt;&gt;'. Multi-line fields are supported by both record formats.</P>
+<P>Within a multi-line field, blank lines and lines starting with # are treated as part of that field. i.e. it is not possible to embed a comment line within a multi-line field.</P>
+<P>An example of a table containing multi-line fields is given below.</P>
+<PRE>
+# A simple TBL example with multi-line fields
+Name    Age     Phone           Addr
+Bill    42      397 1234        &lt;&lt;
+14 Smith St
+New Farm QLD 4005
+&gt;&gt;
+Sarah   37      892 4321        &lt;&lt;
+105 Brown St
+Chelmer QLD 4068
+&gt;&gt;
+Joe     44      365 7890        &lt;&lt;
+6 Royal Av
+Buranda QLD 4102
+&gt;&gt;
+</PRE>
+<HR>
+<H2><A NAME="Special Characters in Fields">Special Characters in Fields</A></H2>
+<P>For delimited fields:</P>
+<OL>
+<LI>If a field contains the delimiter character or the double quote character, it must be enclosed in double quotes.
+<LI>A double quote character within a field is represented by two double quotes.
+<LI>Leading whitespace is kept.
+<LI>Trailing whitespace is kept.</OL>
+<P>For fixed-width fields:</P>
+<OL>
+<LI>Leading whitespace is kept.
+<LI>Trailing whitespace is removed.</OL>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Multi-line fields are enclosed by the &lt;&lt; and &gt;&gt; symbols so none of the rules above apply to them.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_fmt.html">Parent Topic</A> | <A HREF="fmt_sdg.html">Previous Topic</A> | <A HREF="in_filt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

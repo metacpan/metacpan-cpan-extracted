@@ -9,7 +9,7 @@ has 'upstream_dns' => (is => 'rw', isa => 'Str');
 
 # These are set when adding the zone to the ::Config object.
 has 'ptrzone' => (is => 'rw', isa => 'Str');
-has 'aaaazone' => (is => 'rw', isa => 'Str');
+has 'aaaazone' => (is => 'rw', isa => 'Regexp');
 
 __PACKAGE__->meta->make_immutable();
 

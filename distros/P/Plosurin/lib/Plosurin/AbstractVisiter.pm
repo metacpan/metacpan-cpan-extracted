@@ -56,7 +56,7 @@ sub __default_method {
     my $n = shift;
     my $method = ref($n);
     $method =~ s/.*:://;
-    die ref($self). ": Method '$method' for class " . ref($n). " not implemented at ";
+    die ref($self) . ": Method '$method' for class " . ref($n) . " not implemented at ";
 }
 
 sub AUTOLOAD {

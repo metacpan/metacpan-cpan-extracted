@@ -1,0 +1,24 @@
+# $Id$
+#
+# >>Title::     Settings Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 09-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:settings}} is a dummy module which users can override to
+# tune [[HTML]] colours, page headers, footers, etc.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# do nothing

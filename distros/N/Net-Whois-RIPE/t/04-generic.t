@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More qw( no_plan );
+use Data::Dumper;
 
 # synchronizes the {error,standard} output of this test.
 # use IO::Handle;
@@ -55,8 +56,7 @@ SKIP: {
     isa_ok $c->ios, 'IO::Select';
     ok $c->ios->count >= 1,
       q{There's at least one handle registered with the IO::Select object.};
-    # Test here
-    #diag('count='.$c->ios->count); 
+ diag('count='.$c->ios->count); 
 
     # socket()
     isa_ok $c->socket, 'IO::Socket';

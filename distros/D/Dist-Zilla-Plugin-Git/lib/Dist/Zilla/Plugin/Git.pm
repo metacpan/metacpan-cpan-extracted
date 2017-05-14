@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.040-2-g789d3f3
+package Dist::Zilla::Plugin::Git; # git description: v2.041-5-g07880cd
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.041';
+our $VERSION = '2.042';
 
 use Dist::Zilla 2.100880;    # Need mvp_multivalue_args in Plugin role
 use namespace::autoclean;
@@ -31,12 +31,12 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.041
+version 2.042
 
 =head1 DESCRIPTION
 
 This set of plugins for L<Dist::Zilla> can do interesting things for
-module authors using Git (L<http://git-scm.com>) to track their work.
+module authors using Git (L<https://git-scm.com>) to track their work.
 
 You need Git 1.5.4 or later to use these plugins.  Some plugins
 require a more recent version of Git for certain features.
@@ -139,7 +139,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 (or L<bug-Dist-Zilla-Plugin-Git@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Git@rt.cpan.org>).
 
 There is also a mailing list available for users of this distribution, at
-L<http://www.listbox.com/subscribe/?list_id=139292>.
+L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
@@ -152,7 +152,7 @@ Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Graham Knop Chris Weyl Mike Friedman Your Name Stephen R. Scaffidi Randy Stauner Apocalypse Doherty Barr Brian Phillips Matt Follett Michael Schout Brendan Byrd Nigel Metheringham Olivier Mengué Alessandro Ghedini Tatsuhiko Miyagawa Tuomas Jormola Alexandr Ciornii Harley Pig Jesse Luehrs Geoffrey Broadwell Steinbrunner
+=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Mike Friedman Graham Knop Chris Weyl Stephen R. Scaffidi Randy Stauner Barr Apocalypse Doherty Nigel Metheringham Olivier Mengué Tatsuhiko Miyagawa Tuomas Jormola Alessandro Ghedini Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Brendan Byrd Alexandr Ciornii Matt Follett Michael Schout
 
 =over 4
 
@@ -186,19 +186,15 @@ David Golden <dagolden@cpan.org>
 
 =item *
 
+Mike Friedman <friedo@friedo.com>
+
+=item *
+
 Graham Knop <haarg@haarg.org>
 
 =item *
 
 Chris Weyl <cweyl@alumni.drew.edu>
-
-=item *
-
-Mike Friedman <friedo@socialflow.com>
-
-=item *
-
-Your Name <you@example.com>
 
 =item *
 
@@ -210,35 +206,15 @@ Randy Stauner <randy@magnificent-tears.com>
 
 =item *
 
+Graham Barr <gbarr@pobox.com>
+
+=item *
+
 Apocalypse <perl@0ne.us>
 
 =item *
 
 Mike Doherty <doherty@cs.dal.ca>
-
-=item *
-
-Graham Barr <gbarr@pobox.com>
-
-=item *
-
-Brian Phillips <bphillips@digitalriver.com>
-
-=item *
-
-Matt Follett <matt.follett@gmail.com>
-
-=item *
-
-Michael Schout <mschout@gkg.net>
-
-=item *
-
-Mike Friedman <friedo@friedo.com>
-
-=item *
-
-Brendan Byrd <Perl@ResonatorSoft.org>
 
 =item *
 
@@ -250,10 +226,6 @@ Olivier Mengué <dolmen@cpan.org>
 
 =item *
 
-Alessandro Ghedini <al3xbio@gmail.com>
-
-=item *
-
 Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
 =item *
@@ -262,7 +234,19 @@ Tuomas Jormola <tj@solitudo.net>
 
 =item *
 
-Alexandr Ciornii <alexchorny@gmail.com>
+Alessandro Ghedini <al3xbio@gmail.com>
+
+=item *
+
+Brian Phillips <bphillips@digitalriver.com>
+
+=item *
+
+David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Geoffrey Broadwell <geoffb@corp.sonic.net>
 
 =item *
 
@@ -274,11 +258,19 @@ Jesse Luehrs <doy@tozt.net>
 
 =item *
 
-Geoffrey Broadwell <geoffb@corp.sonic.net>
+Brendan Byrd <Perl@ResonatorSoft.org>
 
 =item *
 
-David Steinbrunner <dsteinbrunner@pobox.com>
+Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
+
+Matt Follett <matt.follett@gmail.com>
+
+=item *
+
+Michael Schout <mschout@gkg.net>
 
 =back
 

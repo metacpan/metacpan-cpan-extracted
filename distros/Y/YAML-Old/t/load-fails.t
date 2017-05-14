@@ -16,14 +16,14 @@ __DATA__
 +++ SKIP
 This test hangs YAML.pm
 +++ msg
-YAML Error: Inconsistent indentation level
+YAML::Old Error: Inconsistent indentation level
 +++ yaml
 a: *
 
 
 ===
 +++ msg
-YAML Error: Inconsistent indentation level
+YAML::Old Error: Inconsistent indentation level
 +++ yaml
 --- |\
 foo\zbar
@@ -31,14 +31,14 @@ foo\zbar
 
 ===
 +++ msg
-YAML Error: Unrecognized implicit value
+YAML::Old Error: Unrecognized implicit value
 +++ yaml
 --- @ 42
 
 
 ===
 +++ msg
-YAML Error: Inconsistent indentation level
+YAML::Old Error: Inconsistent indentation level
 +++ yaml
 ---
  - 1

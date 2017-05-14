@@ -1,7 +1,8 @@
 package Class::MakeMethods::Template::Flyweight;
 
-use Class::MakeMethods::Template::InsideOut '-isasubclass';
+use Class::MakeMethods::Template::InsideOut;
 
+@ISA = "Class::MakeMethods::Template::InsideOut";
 $VERSION = 1.008;
 
 sub new { { '-import' => { 'Template::Scalar:new' => '*' } } }

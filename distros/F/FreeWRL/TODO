@@ -1,0 +1,67 @@
+Stuff to do, easy ones first, more intricate ones later.
+
+- Billboard: 0 0 0 is not correct ??
+
+- Ignore .gif
+
+- comment set_bind
+
+- key mapping
+
+- smooth normals
+
+- normals as arguments
+
+- smoother truetype: actually do bezier points..
+
+- text justification 
+
+- nonconvex polygons.
+
+- proper reaction to sensor disabling while active
+
+- Comment more
+
+- elevationgrid triangulation: choose diagonal nicer.
+
+- correct primitive texturing coordinates
+
+- make Text generate polyrep instead of just rendering - then we can
+  do button click / collision detection.
+
+- key remapping.
+
+- Transparency
+- transparency (sourcebook ch10 fig10
+
+- Anchor: make it do something..
+
+- lights properly
+
+- viewpoints with jump false
+
+- SphereSensor: virtual sphere stays, may not move with coordinate
+  motions -- ????? What does it mean e.g. when the user moves?
+
+- as_string: ensure DEF/USE ordering correct-- how?
+
+- JavaScript: rest of support. 
+  Remember to do node.thing.thang correctly in the same way as 
+  the parameters of the node itself -- but have to notice the events
+  immediately. Hmmm...
+
+- Collision, ground following, gravity
+
+- EAI : see ARCHITECTURE for how to
+
+- fix bindable nodes' loading so that the correct nodes get bound..
+  nodes inside protos don't currently count.
+
+- separate RFields into eventIns, eventOuts and fields
+
+- multithreading: load & execute?
+
+- SOFTREFS!!!
+
+
+

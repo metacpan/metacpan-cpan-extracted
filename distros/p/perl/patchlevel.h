@@ -1,7 +1,7 @@
 /*    patchlevel.h
  *
- *    Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
- *    2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+ *    2003, 2004, 2005, 2006, 2007, 2008, 2009, by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -14,8 +14,8 @@
  * exactly on the third column */
 
 #define PERL_REVISION	5		/* age */
-#define PERL_VERSION	8		/* epoch */
-#define PERL_SUBVERSION	9		/* generation */
+#define PERL_VERSION	24		/* epoch */
+#define PERL_SUBVERSION	1		/* generation */
 
 /* The following numbers describe the earliest compatible version of
    Perl ("compatibility" here being defined as sufficient binary/API
@@ -26,13 +26,17 @@
    options such as usemultiplicity tend to break binary compatibility
    more often.
 
-   This is used by Configure et al to figure out 
+   This is used by Configure et al to figure out
    PERL_INC_VERSION_LIST, which lists version libraries
    to include in @INC.  See INSTALL for how this works.
+
+   Porting/bump-perl-version will automatically set these to the version of perl
+   to be released for blead releases, and to 5.X.0 for maint releases. Manually
+   changing them should not be necessary.
 */
-#define PERL_API_REVISION	5	/* Adjust manually as needed.  */
-#define PERL_API_VERSION	8	/* Adjust manually as needed.  */
-#define PERL_API_SUBVERSION	0	/* Adjust manually as needed.  */
+#define PERL_API_REVISION	5
+#define PERL_API_VERSION	24
+#define PERL_API_SUBVERSION	0
 /*
    XXX Note:  The selection of non-default Configure options, such
    as -Duselonglong may invalidate these settings.  Currently, Configure
@@ -66,8 +70,8 @@
 	   + 	,"MINE001 - my new patch"
 	     	,NULL
 	     };
-	
-	please change it to 
+
+	please change it to
 	   *** patchlevel.h.orig	<date here>
 	   --- patchlevel.h	<date here>
 	   *** 41,43 ***
@@ -75,7 +79,7 @@
 	   + 	,"MINE001 - my new patch"
 	     	,NULL
 	     };
-	
+
 	(Note changes to line numbers as well as removal of context lines.)
 	This will prevent patch from choking if someone has previously
 	applied different patches than you.
@@ -92,6 +96,8 @@ my $seen=0;
 while (<PLIN>) {
     if (/\t,NULL/ and $seen) {
        while (my $c = shift @ARGV){
+	    $c =~ s|\\|\\\\|g;
+	    $c =~ s|"|\\"|g;
             print PLOUT qq{\t,"$c"\n};
        }
     }
@@ -115,12 +121,22 @@ hunk.
 
  */
 
-
-
-
 #if !defined(PERL_PATCHLEVEL_H_IMPLICIT) && !defined(LOCAL_PATCH_COUNT)
-static const char *local_patches[] = {
+#  if defined(PERL_IS_MINIPERL)
+#    define PERL_PATCHNUM "UNKNOWN-miniperl"
+#    define PERL_GIT_UNPUSHED_COMMITS /*leave-this-comment*/
+#  elif defined(PERL_MICRO)
+#    define PERL_PATCHNUM "UNKNOWN-microperl"
+#    define PERL_GIT_UNPUSHED_COMMITS /*leave-this-comment*/
+#  else
+#include "git_version.h"
+#  endif
+static const char * const local_patches[] = {
 	NULL
+#ifdef PERL_GIT_UNCOMMITTED_CHANGES
+	,"uncommitted-changes"
+#endif
+	PERL_GIT_UNPUSHED_COMMITS    	/* do not remove this line */
 	,NULL
 };
 
@@ -128,7 +144,7 @@ static const char *local_patches[] = {
 
 /* Initial space prevents this variable from being inserted in config.sh  */
 #  define	LOCAL_PATCH_COUNT	\
-	((int)(sizeof(local_patches)/sizeof(local_patches[0])-2))
+	((int)(C_ARRAY_LENGTH(local_patches)-2))
 
 /* the old terms of reference, add them only when explicitly included */
 #define PATCHLEVEL		PERL_VERSION

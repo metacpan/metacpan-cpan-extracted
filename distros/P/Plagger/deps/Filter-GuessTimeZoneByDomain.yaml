@@ -1,0 +1,4 @@
+name: Filter::GuessTimeZoneByDomain
+author: Tatsuhiko Miyagawa
+depends:
+  IP::Country: 0

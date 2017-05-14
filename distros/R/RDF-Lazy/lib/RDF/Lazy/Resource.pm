@@ -1,6 +1,10 @@
-package RDF::Lazy::Resource;
-use strict;
+﻿use strict;
 use warnings;
+package RDF::Lazy::Resource;
+{
+  $RDF::Lazy::Resource::VERSION = '0.081';
+}
+#ABSTRACT: URI reference node (aka resource) in a RDF::Lazy graph
 
 use base 'RDF::Lazy::Node';
 use Scalar::Util qw(blessed);
@@ -44,11 +48,18 @@ sub qname {
 }
 
 1;
+
+
 __END__
+=pod
 
 =head1 NAME
 
 RDF::Lazy::Resource - URI reference node (aka resource) in a RDF::Lazy graph
+
+=head1 VERSION
+
+version 0.081
 
 =head1 DESCRIPTION
 
@@ -74,4 +85,16 @@ Return the HTML-escaped URI value. Alias for method 'esc'.
 Returns a qualified name (C<prefix:local>) if a mathcing namespace prefix is
 defined. See also method L<RDF::Lazy#ns> for namespace handling.
 
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
+

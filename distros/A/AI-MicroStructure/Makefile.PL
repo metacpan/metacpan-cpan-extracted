@@ -22,12 +22,14 @@ my %WriteMakefileArgs = (
     "bin/getnice",
     "bin/leo",
     "bin/linksearch",
+    "bin/linksearch~",
     "bin/localfiles",
     "bin/micro",
     "bin/micro-dict",
     "bin/micro-dict~",
     "bin/micro-leo",
     "bin/micro-relation",
+    "bin/micro-relation-test",
     "bin/micro-rename",
     "bin/micro-sense",
     "bin/micro-soundex",
@@ -65,6 +67,7 @@ my %WriteMakefileArgs = (
     "Fcntl" => 0,
     "File::Basename" => 0,
     "File::Glob" => 0,
+    "File::HomeDir" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => 0,
     "HTML::SimpleLinkExtor" => 0,
@@ -92,7 +95,7 @@ my %WriteMakefileArgs = (
     "Storable::CouchDB" => 0,
     "Sysadm::Install" => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/t/*.t"
   }
@@ -120,6 +123,7 @@ my %FallbackPrereqs = (
   "Fcntl" => 0,
   "File::Basename" => 0,
   "File::Glob" => 0,
+  "File::HomeDir" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => 0,
   "HTML::SimpleLinkExtor" => 0,

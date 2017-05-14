@@ -18,9 +18,20 @@ sub register {
         module => 'Filter::StripTagsFromTitle',
     });
 
+    eval { require HTML::Tidy };
+    unless ($@) {
+        $context->load_plugin({
+            module => 'Filter::HTMLTidy',
+        });
+    }
+
     $context->load_plugin({
         module => 'Filter::HTMLScrubber',
         config => $self->conf->{scrubber} || {},
+    });
+
+    $context->load_plugin({
+        module => 'Filter::GuessTimeZoneByDomain',
     });
 
     my @rules;
@@ -77,6 +88,7 @@ sub register {
             dir => $self->conf->{dir},
             filename => 'atom.xml',
             format => 'Atom',
+            taguri_base => URI->new($self->conf->{url})->host,
         },
     });
 
@@ -140,7 +152,11 @@ configurations.
 
 =item Filter::StripTagsFromTitle
 
+=item Filter::HTMLTidy (if HTML::Tidy is available)
+
 =item Filter::HTMLScrubber
+
+=item Filter::GuessTimeZoneByDomain
 
 =item SmartFeed::All
 
@@ -185,7 +201,7 @@ all the entries aggregated. Defaults to I<7 days>.
 
 =item extra_rule
 
-Additional rule to add to filter entris using SmartFeed::All. Optional and defaults to nothing.
+Additional rule to add to filter entries using SmartFeed::All. Optional and defaults to nothing.
 
 =item description
 

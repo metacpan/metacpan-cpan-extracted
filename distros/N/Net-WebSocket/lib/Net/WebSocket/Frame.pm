@@ -113,7 +113,7 @@ sub new {
     $first2 |= "\x80" if $fin;
 
     if ($rsv) {
-        die "RSV must be < 0-7!" if $rsv > 7;
+        die "“rsv” must be < 0-7!" if $rsv > 7;
         $first2 |= chr( $rsv << 4 );
     }
 

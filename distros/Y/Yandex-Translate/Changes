@@ -1,28 +1,55 @@
 Revision history for perl module Yandex::Translate
 
-1.000005 2017-05-08T23:12:30+07:00 Europe/Moscow
+1.001 2017-05-12T18:30:05+03:00 Europe/Moscow
+
+ - Corrected t/reference.t (I did copy and paste without ran any test, 
+   I trust myself that I should not trust)
+
+1.000009 2017-05-11T21:43:45+03:00 Europe/Moscow
+
+ - Corrected MANIFEST
+ - Updated t/reference.t
+
+1.000008 2017-05-11T13:45:10+03:00 Europe/Moscow
+
+ - Checked text, key, from_lang and to_lang before sending any request.
+ - Possibiliy to pass text in Yandex::Translate instance.
+ - utf-8 required in any script using this module (see examples/).
+ - Decelared one HTTP::Tiny instance.
+
+1.000007 2017-05-09T12:00:00+03:00 Europe/Moscow
+
+ - Corrected time Zone, conflict with server that exist in Russia/Magadan.
+ - Correct some examples
+
+1.000006 2017-05-09T12:00:00+03:00 Europe/Moscow
+ 
+ - Update MANIFEST file.
+ - Updated documentation.
+
+1.000005 2017-05-08T23:12:30+03:00 Europe/Moscow
  
  - Correct a bug: passing text in instance.
  - Added UI (user interface for turkish)
 
-1.000004 2017-05-08T22:19:30+07:00 Europe/Moscow
+1.000004 2017-05-08T22:19:30+03:00 Europe/Moscow
 
  - Changed examples to be more compatible with new 'code' update.
  - Added Url for code source and Tickets (Bug Report).
 
-1.000003 2017-05-06T02:35:12-04:00
+1.000003 2017-05-06T02:35:12-04:00 America/New_York
 
  - Added a MANIFEST file.
  - Replaced t/Yandex-Translate.t with t/10-prereqs.t, t/11-load.t,
    t/12-getlangs.t, t/13-detect.t, t/14-translate.t, and t/15-reference.t.
  - Updated Makefile.PL and META.yml.
 
-1.000002 2017-05-05T12:50:45-04:00
+1.000002 2017-05-05T12:50:45-04:00 America/New_York
 
  - Changed the input parameter for set_hint().
  - Updated documentation.
 
-1.000001 2017-05-04T13:40:34-04:00
+1.000001 2017-05-04T13:40:34-04:00 America/New_York
 
  - Added automatic URL encoding of text parameter in new() and set_text().
  - Added set_default_ui(), set_ui(), set_hint(), set_format(), set_options(),
@@ -35,22 +62,23 @@ Revision history for perl module Yandex::Translate
    and to comply with Test::CPAN::README.
  - Updated the Changes file to comply with CPAN::Changes::Spec.
 
-1.0 2017-05-03T22:57:07+07:00 Europe/Moscow
+1.0 2017-05-03T22:57:07+03:00 Europe/Moscow
 
  - First release version.
 
-0.04 2017-05-03T22:20:07+07:00 Europe/Moscow
+0.04 2017-05-03T22:20:07+03:00 Europe/Moscow
 
  - Made documentation more readable.
 
-0.03 2017-05-03T21:18:07+07:00 Europe/Moscow
+0.03 2017-05-03T21:18:07+03:00 Europe/Moscow
 
  - Changed documentation.
 
-0.02 2017-05-02T14:44:07+07:00 Europe/Moscow
+0.02 2017-05-02T14:44:07+03:00 Europe/Moscow
 
  - Added detect_lang() and get_langs_list().
 
-0.01 2017-04-26T14:16:11+07:00 Europe/Moscow
+0.01 2017-04-26T14:16:11+03:00 Europe/Moscow
 
  - Initial release.
+

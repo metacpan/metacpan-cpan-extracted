@@ -1,0 +1,298 @@
+# zxid/sg/liberty-idwsf-pmm-v1.0.sg  -- Provisioned Module Manager
+# Slightly edited, 3.6.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-prov-v1.0.sg,v 1.3 2007-08-10 19:19:10 sampo Exp $
+
+target(prov, urn:liberty:prov:2006-12)
+
+import(lu, urn:liberty:util:2006-08, liberty-idwsf-utility-v2.0.xsd)
+import(dp, urn:liberty:dp:2006-12,   liberty-idwsf-dp-v1.0.xsd)
+import(ds, http://www.w3.org/2000/09/xmldsig#, http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+import(a,  http://www.w3.org/2005/08/addressing, http://www.w3.org/2005/08/addressing/ws-addr.xsd)
+
+PMID	 -> %prov:PMIDType
+%PMIDType:	 base(xs:anyURI)
+  @issuer	 -> %xs:anyURI
+  ;
+
+PMDescriptor	 -> %prov:PMDescriptorType
+%PMDescriptorType:
+  prov:PMID
+  prov:PMEngineRef?
+  prov:PMInitData?
+  prov:PMRTData?
+  ds:Signature?
+  @activate?	 -> %xs:boolean
+  @activateAt?	 -> %xs:dateTime
+  @deactivateAt? -> %xs:dateTime
+  @any
+  ;
+
+PMInitData	 -> %xenc:EncryptedData
+PMRTData	 -> %xenc:EncryptedData
+
+ProvisioningHandle	 -> %prov:ProvisioningHandleType
+%ProvisioningHandleType:
+  prov:PMDArtifact
+  prov:ProvisioningServiceEPR?
+  ds:Signature?
+  @expires?	 -> %xs:dateTime
+  @any
+  ;
+
+ProvisioningServiceEPR	 -> %a:EndpointReferenceType
+
+PMDArtifact	 -> %xs:string
+
+CallbackEPR	 -> %a:EndpointReferenceType
+
+PMStatus	 -> %prov:PMStatusType
+%PMStatusType:
+  prov:PMID
+  prov:State
+  ;
+
+State	 -> %prov:StateType
+%StateType:	 base(xs:anyURI)
+  @asof?	 -> %xs:dateTime
+  ;
+
+PMEInfo	 -> %prov:PMEInfoType
+%PMEInfoType:
+  prov:PMEngineRef
+  prov:PMECreatorID
+  prov:PMEWhenCreated
+  prov:PMEEnabled
+  prov:PMEWhenEnabled
+  prov:PMESize
+  prov:PMEHash
+  ;
+
+PMEngineRef	 -> %xs:anyURI
+PMECreatorID	 -> %xs:anyURI
+PMEWhenCreated	 -> %xs:dateTime
+PMEEnabled	 -> %xs:boolean
+PMEWhenEnabled	 -> %xs:dateTime
+PMESize	 -> %xs:integer
+
+PMEHash	 -> %prov:PMEHashType
+%PMEHashType:	 base(xs:base64Binary)
+  @method	 -> %xs:anyURI
+  ;
+
+%RequestAbstractType:
+  @any
+  ;
+
+%ResponseAbstractType:
+  lu:Status
+  @any
+  ;
+
+PMERegister	 -> %prov:PMERegisterType
+%PMERegisterType:	 base(prov:RequestAbstractType)
+  prov:PMEngineRef
+  prov:PMESize
+  prov:PMEHash
+  ;
+
+PMERegisterResponse	 -> %prov:PMERegisterResponseType
+%PMERegisterResponseType:	 base(prov:ResponseAbstractType)
+  prov:PMEUploadMax?
+  ;
+
+PMEUploadMax	 -> %xs:integer
+
+PMEUpload	 -> %prov:PMEUploadType
+%PMEUploadType:	 base(prov:RequestAbstractType)
+  prov:PMEngineRef
+  prov:EngineData
+  @offset	 -> %xs:integer
+  @remaining	 -> %xs:integer
+  ;
+
+PMEUploadResponse	 -> %prov:PMEUploadResponseType
+%PMEUploadResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMEDownload	 -> %prov:PMEDownloadType
+%PMEDownloadType:	 base(prov:RequestAbstractType)
+  prov:PMEngineRef
+  &@dp:BasicPagingAttributeGroup
+  ;
+
+PMEDownloadResponse	 -> %prov:PMEDownloadResponseType
+%PMEDownloadResponseType:	 base(prov:ResponseAbstractType)
+  prov:EngineData?
+  &@dp:BasicPagingResponseAttributeGroup
+  ;
+
+EngineData	 -> %xs:base64Binary
+
+PMEEnable	 -> %prov:PMEEnableType
+%PMEEnableType:	 base(prov:RequestAbstractType)
+  prov:PMEngineRef+
+  ;
+
+PMEEnableResponse	 -> %prov:PMEEnableResponseType
+%PMEEnableResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMEDisable	 -> %prov:PMEDisableType
+%PMEDisableType:	 base(prov:RequestAbstractType)
+  prov:PMEngineRef+
+  ;
+
+PMEDisableResponse	 -> %prov:PMEDisableResponseType
+%PMEDisableResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMEDelete	 -> %prov:PMEDeleteType
+%PMEDeleteType:	 base(prov:RequestAbstractType)
+  prov:PMEngineRef+
+  ;
+
+PMEDeleteResponse	 -> %prov:PMEDeleteResponseType
+%PMEDeleteResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMEGetInfo	 -> %prov:PMEGetInfoType
+%PMEGetInfoType:	 base(prov:RequestAbstractType)
+  prov:PMEngineRef*
+  ;
+
+PMEGetInfoResponse	 -> %prov:PMEGetInfoResponseType
+%PMEGetInfoResponseType:	 base(prov:ResponseAbstractType)
+  prov:PMEInfo*
+  ;
+
+PMGetDescriptor	 -> %prov:PMGetDescriptorType
+%PMGetDescriptorType:	 base(prov:RequestAbstractType)
+  prov:PMDArtifact
+  prov:CallbackEPR+
+  ;
+
+PMGetDescriptorResponse	 -> %prov:PMGetDescriptorResponseType
+%PMGetDescriptorResponseType:	 base(prov:ResponseAbstractType)
+  prov:PMDescriptor?
+  ;
+
+PMActivate	 -> %prov:PMActivateType
+%PMActivateType:	 base(prov:RequestAbstractType)
+  prov:PMActivateItem+
+  dp:NotifyTo?
+  ;
+
+PMActivateItem	 -> %prov:PMActivateItemType
+%PMActivateItemType:
+  prov:PMID
+  @itemID	 -> %xs:string
+  @at?	 -> %xs:dateTime
+  ;
+
+PMActivateResponse	 -> %prov:PMActivateResponseType
+%PMActivateResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMDeactivate	 -> %prov:PMDeactivateType
+%PMDeactivateType:	 base(prov:RequestAbstractType)
+  prov:PMDeactivateItem+
+  dp:NotifyTo?
+  ;
+
+PMDeactivateItem	 -> %prov:PMDeactivateItemType
+%PMDeactivateItemType:
+  prov:PMID
+  @itemID	 -> %xs:string
+  @at?	 -> %xs:dateTime
+  ;
+
+PMDeactivateResponse	 -> %prov:PMDeactivateResponseType
+%PMDeactivateResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMRegisterDescriptor	 -> %prov:PMRegisterDescriptorType
+%PMRegisterDescriptorType:	 base(prov:RequestAbstractType)
+  prov:PMRegisterDescriptorItem+
+  ;
+
+PMRegisterDescriptorItem	 -> %prov:PMRegisterDescriptorItemType
+%PMRegisterDescriptorItemType:
+  prov:PMDescriptor
+  @itemID	 -> %xs:string
+  ;
+
+PMRegisterDescriptorResponse	 -> %prov:PMRegisterDescriptorResponseType
+%PMRegisterDescriptorResponseType:	 base(prov:ResponseAbstractType)
+  prov:PMRegisterDescriptorResponseItem*
+  ;
+
+PMRegisterDescriptorResponseItem	 -> %prov:PMRegisterDescriptorResponseItemType
+%PMRegisterDescriptorResponseItemType:
+  prov:ProvisioningHandle
+  @ref	 -> %xs:string
+  ;
+
+PMUpdate	 -> %prov:PMUpdateType
+%PMUpdateType:	 base(prov:RequestAbstractType)
+  prov:PMUpdateItem+
+  dp:NotifyTo?
+  ;
+
+PMUpdateItem	 -> %prov:PMUpdateItemType
+%PMUpdateItemType:
+  prov:PMDescriptor
+  @type	 -> %xs:anyURI
+  @itemID	 -> %xs:string
+  @at?	 -> %xs:dateTime
+  ;
+
+PMUpdateResponse	 -> %prov:PMUpdateResponseType
+%PMUpdateResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMDelete	 -> %prov:PMDeleteType
+%PMDeleteType:	 base(prov:RequestAbstractType)
+  prov:PMDeleteItem+
+  dp:NotifyTo?
+  ;
+
+PMDeleteItem	 -> %prov:PMDeleteItemType
+%PMDeleteItemType:
+  prov:PMID
+  @itemID	 -> %xs:string
+  ;
+
+PMDeleteResponse	 -> %prov:PMDeleteResponseType
+%PMDeleteResponseType:	 base(prov:ResponseAbstractType) ;
+
+PMGetStatus	 -> %prov:PMGetStatusType
+%PMGetStatusType:	 base(prov:RequestAbstractType)
+  prov:PMID*
+  ;
+
+PMGetStatusResponse	 -> %prov:PMGetStatusResponseType
+%PMGetStatusResponseType:	 base(prov:ResponseAbstractType)
+  prov:PMStatus*
+  ;
+
+PMSetStatus	 -> %prov:PMSetStatusType
+%PMSetStatusType:	 base(prov:RequestAbstractType)
+  prov:PMStatus
+  ;
+
+PMSetStatusResponse	 -> %prov:PMSetStatusResponseType
+%PMSetStatusResponseType:	 base(prov:ResponseAbstractType) ;
+
+Poll	 -> %dp:PollType
+
+PollResponse	 -> %dp:PollResponseType
+
+UpdateEPR	 -> %prov:UpdateEPRType
+%UpdateEPRType:	 base(prov:RequestAbstractType)
+  prov:UpdateEPRItem+
+  ;
+
+UpdateEPRItem	 -> %prov:UpdateEPRItemType
+%UpdateEPRItemType:
+  prov:PMID
+  prov:CallbackEPR
+  @itemID	 -> %xs:string
+  ;
+
+UpdateEPRResponse	 -> %prov:UpdateEPRResponseType
+%UpdateEPRResponseType:	 base(prov:ResponseAbstractType) ;
+
+#EOF

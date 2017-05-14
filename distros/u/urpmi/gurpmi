@@ -10,9 +10,21 @@ BEGIN { #- set up a safe path and environment
     delete @ENV{qw(ENV BASH_ENV IFS CDPATH)};
 }
 
-use Gtk2;
+eval {
+	use lib qw(/usr/lib/libDrakX);
+	use drakbug; # for reporting crashes in our bugzilla
+};
+use utf8 'valid';
+use Encode '_utf8_on';
+use Gtk3;
 use gurpmi;
-use urpm::util;
+use urpm::util qw(basename member);
+
+# For other distros w/o exception support:
+eval { Glib->enable_exceptions3 };
+if (my $err = $@) {
+   warn "Error: $err\n";
+}
 
 sub usage() { gurpmi::usage() }
 
@@ -21,19 +33,24 @@ my ($srpms, $rpms) = ([], []);
 my ($mainw, $mainbox);
 my @all_rpms = gurpmi::parse_command_line();
 
+# Gtk3->init will change @ARGV encoding (mga#12407):
+foreach (@ARGV) {
+    utf8::valid($_) && Encode::_utf8_on($_);
+}
+
 #- Now, the graphical stuff.
 
-Gtk2->init;
+Gtk3->init;
 
 #- Create main window
 
-$mainw = Gtk2::Window->new('toplevel');
+$mainw = Gtk3::Window->new('toplevel');
 $mainw->set_border_width(3);
 $mainw->set_title(N("RPM installation"));
 $mainw->signal_connect(destroy => \&cancel_n_quit);
 $mainw->set_position('center');
 $mainw->set_modal(0);
-$mainbox = Gtk2::VBox->new(0, 5);
+$mainbox = Gtk3::VBox->new(0, 5);
 $mainw->add($mainbox);
 
 sub all_descriptions {
@@ -44,19 +61,19 @@ sub all_descriptions {
 foreach (@all_rpms) {
     unless (-e $_) {
 	$mainbox->pack_start(new_label(N("Error: unable to find file %s, will cancel operation", $_)), 1, 1, 0);
-	my $abort_button = Gtk2::Button->new(but(N("_Ok")));
+	my $abort_button = Gtk3::Button->new(but(N("_Ok")));
 	$abort_button->signal_connect(clicked => sub { cancel_n_quit(); exit 1 });
 	add_button_box($mainbox, $abort_button);
 	$mainw->show_all;
-	Gtk2->main;
+	Gtk3->main;
     }
     /\.src\.rpm$/ ? push(@$srpms, $_) : push(@$rpms, $_);
 }
 
 sub proceed() {
-    #- we need to switch to root if we're not already (via consolehelper)
+    #- we need to switch to root if we're not already (via polkit)
     #- yes. hardcoded paths. safe.
-    exec $> ? '/usr/bin/gurpmi2' : '/usr/sbin/gurpmi2', @ARGV;
+    exec $> ? '/usr/bin/gurpmi2' : '/usr/libexec/gurpmi2', @ARGV;
 }
 
 #- Ask question: save or install ?
@@ -96,9 +113,9 @@ Proceed?", all_descriptions(@all_rpms))
 }
 
 {   #- buttons
-    my $inst_button = Gtk2::Button->new(but(N("_Install")));
-    my $save_button = @all_rpms == 1 ? Gtk2::Button->new(but(N("_Save"))) : undef;
-    my $ccel_button = Gtk2::Button->new(but(N("_Cancel")));
+    my $inst_button = Gtk3::Button->new(but(N("_Install")));
+    my $save_button = @all_rpms == 1 ? Gtk3::Button->new(but(N("_Save"))) : undef;
+    my $ccel_button = Gtk3::Button->new(but(N("_Cancel")));
 
     $inst_button->signal_connect(clicked => sub {
 	#- performs installation.
@@ -106,23 +123,24 @@ Proceed?", all_descriptions(@all_rpms))
 	proceed();
     });
     $save_button and $save_button->signal_connect(clicked => sub {
-	my $file_dialog = Gtk2::FileSelection->new(N("Choose location to save file"));
+	my $file_dialog = Gtk3::FileChooserDialog->new(N("Choose location to save file"), $mainw, 'select_folder', N("Cancel") => 'cancel', N("Ok") => 'ok');
 	$file_dialog->set_modal(1);
 	$file_dialog->set_position('center');
 	my $filename = @$srpms > 0 ? $srpms->[0] : $rpms->[0];
 	$file_dialog->set_filename($filename);
-	$file_dialog->hide_fileop_buttons;
-	$file_dialog->ok_button->signal_connect(clicked => sub {
+	$file_dialog->show;
+	my $answer = $file_dialog->run;
+	if (member($answer, qw(apply ok yes))) {
 	    my $location = $file_dialog->get_filename;
 	    quit();
 	    $location and exec '/bin/mv', '-f', $filename, $location;
-	});
-	$file_dialog->cancel_button->signal_connect(clicked => \&quit);
-	$file_dialog->show;
+	} elsif (member($answer, qw(cancel delete-event))) {
+		quit();
+	}
     });
     $ccel_button->signal_connect(clicked => \&cancel_n_quit);
     add_button_box($mainbox, grep { defined $_ } $inst_button, $save_button, $ccel_button);
 }
 
 $mainw->show_all;
-Gtk2->main;
+Gtk3->main;

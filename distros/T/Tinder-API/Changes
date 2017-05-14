@@ -1,0 +1,10 @@
+Revision history for Perl extension Tinder::API.
+
+0.01  Wed Feb 18 19:29:58 2015
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Tinder::API
+0.02  Wed Feb 18 20:00:00 2015
+	- Changes in Makefile.pl
+0.03  Thu Feb 19 12:00:00 2015
+	- Complete restruct of tests so that the module passes them.
+	-Added subs getFbToken() and getId();

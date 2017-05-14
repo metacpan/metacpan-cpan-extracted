@@ -1,0 +1,76 @@
+{
+  'module' => {
+    'name' => 'beas parser (swedish)',
+    'program' => 'uplug-parse-sv',
+    'location' => '$UplugBin',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    },
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+#	'encoding' => 'iso-8859-1',
+      'write_mode' => 'overwrite',
+	'status' => 'chunk',
+    }
+  },
+  'parameter' => {
+    'input' => {
+      'token delimiter' => ' ',
+      'sentence delimiter' => '
+',
+      'POS tag delimiter' => '/',
+      'POS attribute' => 'pos'
+    },
+    'output' => {
+      'token delimiter' => '\\s+',
+      'constituent tag' => 'c',
+      'sentence delimiter' => '
+',
+      'POS tag delimiter' => '\\/',
+	'encoding' => 'iso-8859-1',
+    },
+    'input token replacements' => {
+      '\\,' => 'COMMA',
+        ' ' => '_',
+      '\[' => '&lpar;',
+      '\]' => '&rpar;',
+    },
+    'parser' => {
+      'language' => 'swedish',
+      'startup base' => 'parser_'
+    },
+    'input tag replacements' => {
+      '\\,' => 'COMMA'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'pos' => 'parameter:input:POS attribute',
+       'char' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'tag' => 'parameter:output:constituent tag',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=tag,language=sv)'
+	  },
+       },
+       'parameter' => {
+          'input' => {
+	     'POS attribute' => 'optionmenu (pos,tnt)',
+	  }
+       }
+  }
+}

@@ -18,14 +18,14 @@ my %module_build_args = (
     "Thomas Klausner <domm\@cpan.org>"
   ],
   "dist_name" => "Web-Request-Role-Response",
-  "dist_version" => "1.002",
+  "dist_version" => "1.003",
   "license" => "perl",
   "module_name" => "Web::Request::Role::Response",
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
     "Moose::Role" => 0,
-    "Plack::Response" => 0,
+    "Web::Response" => 0,
     "perl" => "5.010"
   },
   "script_files" => [],

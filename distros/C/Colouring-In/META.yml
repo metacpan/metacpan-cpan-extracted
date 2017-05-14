@@ -22,4 +22,4 @@ requires:
   perl: 5.006
   strict: 0
   warnings: 0
-version: 0.05
+version: 0.07

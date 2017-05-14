@@ -1,0 +1,8 @@
+Changelog for CPAN-Testers-Backend
+
+0.001     2017-05-13 11:00:49+02:00 Europe/Paris
+
+    [Added]
+
+    - Added migration script for metabase users from local metabase
+      cache

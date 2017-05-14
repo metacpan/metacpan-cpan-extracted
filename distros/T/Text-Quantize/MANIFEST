@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Text/Quantize.pm
+t/001-synopsis.t
+t/002-bucketize.t
+t/003-endpoints-for.t
+t/004-options.t
+t/005-negative.t
+t/006-missing-buckets.t

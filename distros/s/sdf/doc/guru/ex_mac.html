@@ -1,0 +1,344 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: Creating New Macros</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="in_ex.html">Previous Topic</A> | <A HREF="ex_filt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.2. Creating New Macros</H1>
+<HR>
+<H2><A NAME="Using Event Processing">1.2.1. Using Event Processing</A></H2>
+<P>SDF's event processing feature makes it easy to create a new macro from an existing one. For example, the following line makes <EM>image</EM> an alias for the <A HREF="../ref/mimport.html">import</A> macro:</P>
+<PRE>
+!on macro 'image';; $name='import'
+</PRE>
+<P>The new macro can then be used as follows:</P>
+<PRE>
+!image 'mylogo'
+</PRE>
+<HR>
+<H2><A NAME="Using !macro and !endmacro">1.2.2. Using !macro and !endmacro</A></H2>
+<P>The <A HREF="../ref/mmacro.html">macro</A> and <A HREF="../ref/mendmacr.html">endmacro</A> macros are useful for creating simple macros. For example, if you have a block of text which is regularly repeated, you can make it a macro like this:</P>
+<PRE>
+!macro RealSoonNow
+Note: This feature will be implemented real soon now.
+The documentation below is the proposed design.
+Any feedback on the design should be forwarded to
+{{EMAIL:bill}} as soon as possible.
+!endmacro
+</PRE>
+<P>See the <TT>stdlib/macros.sdm</TT> file within the SDF distribution for more examples of macro definitions.</P>
+<HR>
+<H2><A NAME="Using Perl">1.2.3. Using Perl</A></H2>
+<P>For complicated macros including those requiring arguments, Perl subroutines can be used to implement the logic and build the SDF text to be inserted, if any.</P>
+<P>An SDF macro called <EM>xxx</EM> is mapped to a Perl subroutine called <EM>xxx</EM>_Macro within the SDF_USER package. The subroutine has the following interface:</P>
+<PRE>
+       @text = xxx_Macro(%arg);
+</PRE>
+<P>where:</P>
+<UL>
+<LI>@text is the SDF to be inserted when this macro is called
+<LI>%arg is the set of arguments (name-value pairs).</UL>
+<P>For example, a Perl implementation of the RealSoonNow macro is:</P>
+<PRE>
+!block script
+sub RealSoonNow_Macro {
+    local(%arg) = @_;
+    local(@text);
+
+    @text = (
+      'Note: This feature will be implemented real soon now.',
+      'The documentation below is the proposed design.',
+      'Any feedback on the design should be forwarded to',
+      '{{EMAIL:bill}} as soon as possible.');
+    return @text;
+}
+!endblock
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <A HREF="../ref/fscript.html">script</A> filter makes it easy to embed Perl code within an SDF document. (The code is executed within the SDF_USER package.)
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>The <TT>perllib/sdf/macros.pl</TT> file within the SDF distribution contains lots of examples of macros implemented as Perl subroutines.</P>
+<HR>
+<H2><A NAME="Adding Arguments">1.2.4. Adding Arguments</A></H2>
+<P>If a macro is implemented as a Perl subroutine, arguments can be declared in a Perl array called _<EM>xxx</EM>_MacroArgs. The array is a table in <A HREF="../ref/fmt_tbl.html">TBL</A> format which contains the following fields:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Field</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Name
+</TD>
+<TD>
+The argument name
+</TD>
+</TR>
+<TR>
+<TD>
+Type
+</TD>
+<TD>
+The argument type
+</TD>
+</TR>
+<TR>
+<TD>
+Default
+</TD>
+<TD>
+The default value, if any
+</TD>
+</TR>
+<TR>
+<TD>
+Rule
+</TD>
+<TD>
+The argument validation rule, if any
+</TD>
+</TR>
+</TABLE>
+
+<P>For example, the RealSoonNow macro can be generalised so that the person to contact is an optional argument.</P>
+<PRE>
+!block script
+@_RealSoonNow_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'contact    string      bill',
+);
+sub RealSoonNow_Macro {
+    local(%arg) = @_;
+    local(@text);
+
+    @text = (
+      'Note: This feature will be implemented real soon now.',
+      'The documentation below is the proposed design.',
+      'Any feedback on the design should be forwarded to',
+      '{{EMAIL:' . $arg{'contact'} . '}} as soon as possible.');
+    return @text;
+}
+!endblock
+</PRE>
+<HR>
+<H2><A NAME="Argument Types">1.2.5. Argument Types</A></H2>
+<P>The supported set of argument types are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Common:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+string
+</TD>
+<TD>
+a string
+</TD>
+</TR>
+<TR>
+<TD>
+integer
+</TD>
+<TD>
+an integer
+</TD>
+</TR>
+<TR>
+<TD>
+boolean
+</TD>
+<TD>
+either 1 or 0
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Special:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+symbol
+</TD>
+<TD>
+a symbolic name
+</TD>
+</TR>
+<TR>
+<TD>
+filter
+</TD>
+<TD>
+a filter name
+</TD>
+</TR>
+<TR>
+<TD>
+rest
+</TD>
+<TD>
+the rest of the arguments
+</TD>
+</TR>
+<TR>
+<TD>
+eventid
+</TD>
+<TD>
+an event tag
+</TD>
+</TR>
+<TR>
+<TD>
+condition
+</TD>
+<TD>
+a logical expression
+</TD>
+</TR>
+</TABLE>
+
+<P>The special types are needed for some of SDF's built-in macros including <A HREF="../ref/mdefine.html">define</A>, <A HREF="../ref/minclude.html">include</A>, <A HREF="../ref/mon.html">on</A> and <A HREF="../ref/mif.html">if</A> - they are rarely needed for normal macros.</P>
+<HR>
+<H2><A NAME="Default Values">1.2.6. Default Values</A></H2>
+<P>For default values within argument tables:</P>
+<UL>
+<LI>the empty string means there is no default
+<LI>the symbol _NULL_ means the default is the empty string.</UL>
+<P>For example, the arguments for the <A HREF="../ref/minclude.html">include</A> macros are declared as shown below:</P>
+<PRE>
+@_include_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'filename   string',
+    'filter     filter      sdf',
+    'params     rest        _NULL_',
+);
+</PRE>
+<HR>
+<H2><A NAME="Rules">1.2.7. Rules</A></H2>
+<P>If you wish, arguments can be validated using a rule. Rules are either:</P>
+<UL>
+<LI><A HREF="ex_mac.html#Patterns">Patterns</A>
+<LI><A HREF="ex_mac.html#General Perl Expressions">General Perl Expressions.</A></UL>
+<HR>
+<H2><A NAME="Patterns">1.2.8. Patterns</A></H2>
+<P>A <EM>pattern</EM> is a Perl regular expression which the argument value is matched against. Patterns are enclosed in angle brackets to differentiate them from normal Perl expressions. Typical patterns are given in the table below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Pattern</STRONG>
+</TD>
+<TD>
+<STRONG>Explanation</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+&lt;\w+&gt;
+</TD>
+<TD>
+one or more characters in A-Z, a-z, 0-9 and '_'
+</TD>
+</TR>
+<TR>
+<TD>
+&lt;\d{4}&gt;
+</TD>
+<TD>
+a 4 digit number
+</TD>
+</TR>
+<TR>
+<TD>
+&lt;on|off&gt;
+</TD>
+<TD>
+a string which is either &quot;on&quot; or &quot;off&quot;
+</TD>
+</TR>
+<TR>
+<TD>
+&lt;XMIT-.*&gt;
+</TD>
+<TD>
+a string which begins with &quot;XMIT-&quot;
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="General Perl Expressions">1.2.9. General Perl Expressions</A></H2>
+<P>More complex rules are required when:</P>
+<UL>
+<LI>the regular expression does not apply to the whole value
+<LI>the regular expression is case-insensitive.</UL>
+<P>In these cases, a general Perl expression can be used as the rule. Within the expression, $_ is the value of the argument. Examples are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Expression</STRONG>
+</TD>
+<TD>
+<STRONG>Explanation</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+/\d/
+</TD>
+<TD>
+a digit exists somewhere in the string
+</TD>
+</TR>
+<TR>
+<TD>
+/^(on|off)$/i
+</TD>
+<TD>
+value is either &quot;on&quot; or &quot;off&quot; (case insensitive)
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>A pattern is simply a short-hand notation for the general Perl expression below:</P>
+<PRE>
+        /^(pattern)$/
+</PRE>
+<P>Pattern notation is provided as it makes rules easier to read and write. (Pattern-style validation typically covers 80% or more of validation rules so improving the readability of patterns has a large impact on the overall readability.)</P>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="in_ex.html">Previous Topic</A> | <A HREF="ex_filt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

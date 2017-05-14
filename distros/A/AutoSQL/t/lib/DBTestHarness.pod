@@ -1,0 +1,36 @@
+
+=pod
+
+=head1 DBTestHarness
+
+=head1 USAGE
+
+    use DBTestHarness;
+    my $harness=DBTestHarness->new(
+        -user => 'root',
+        -drop_during_destroy => 1, # 0 or -1 means keeping db.
+    );
+    
+    $harness->create_test_db;
+    $harness->import_tables($schema);
+
+    # Since DBTestHarness is a DBContext, so you can use it as DBContext
+    # For instance,
+
+    my $factor=AutoSQL::AdaptorFactory->new(
+        -schema => ContactSchema->new
+    );
+
+    my $dba=$factory->get_adaptor_instance(
+        -dbcontext => $harness
+    );
+    
+
+=head1 NOTES
+
+=head2 debug and verbose
+
+This module, or its super modules, uses 'debug' method inherited from 
+AutoCode::Root.
+
+=cut

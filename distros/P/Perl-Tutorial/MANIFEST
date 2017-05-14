@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Perl/Tutorial.pm
+lib/Perl/Tutorial/HelloWorld.pod
+t/release-pod-syntax.t

@@ -1,0 +1,6 @@
+-*- Outline -*-
+
+* Array vs. scalar context
+
+It would be nice if the memoization also covered array vs. scalar context
+(storing these caches separately).

@@ -1,0 +1,12 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Hello world
+UNKNOWNP[orig_style='UNKNOWNP';unknownp=1]Some text with an {{N[unknown=1]unknown attribute}} and  on the second and {{UNKNOWN[]unknown object}} on the third line.
+H0[orig_style='H0']Heading with a bad level
+N[orig_style='N']Some text with an {{WXYZ[]unknown tag}}.
+BADP[badp=1;orig_style='BADP']Some more text with a {{N[bad=1]bad attribute}} on the second and {{BAD[]bad object}} on the third line.
+A0[orig_style='H0']Heading with a bad level
+N[orig_style='N']Some text with an {{WXYZ[]unknown tag}}.
+A9[orig_style='H9']Another heading with a bad level
+H0[orig_style='H0']Heading with a bad level
+N[orig_style='N']Some text with an {{WXYZ[]unknown tag}}.

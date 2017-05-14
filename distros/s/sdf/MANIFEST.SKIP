@@ -1,0 +1,9 @@
+Makefile$
+\.ps$
+\.pdf$
+\.old$
+\.bak$
+\.orig$
+pm_to_blib$
+^sdf.prj$
+^\.sdf.prcs_aux$

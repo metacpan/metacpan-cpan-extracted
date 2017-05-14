@@ -15,7 +15,7 @@ BEGIN {
 #all I can do is test for dependencies..
 #-----
   print "\n\n";
-  my @mod = qw/Sybase::DBlib Sybase::ObjectInfo Sybase::Xfer Getopt::Long Tie::IxHash/;
+  my @mod = qw/Sybase::CTlib Getopt::Long Tie::IxHash/;
   for my $m (@mod) {
      print "checking for $m. ";
      eval "use $m";

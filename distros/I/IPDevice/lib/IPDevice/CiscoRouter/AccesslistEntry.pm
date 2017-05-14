@@ -21,7 +21,7 @@
 ## entry.
 ####
 
-package CiscoRouter::AccesslistEntry;
+package IPDevice::CiscoRouter::AccesslistEntry;
 use strict;
 use vars qw($VERSION);
 
@@ -33,12 +33,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-CiscoRouter::AccesslistEntry
+IPDevice::CiscoRouter::AccesslistEntry
 
 =head1 SYNOPSIS
 
- use CiscoRouter::AccesslistEntry;
- my $entry = new CiscoRouter::AccesslistEntry;
+ use IPDevice::CiscoRouter::AccesslistEntry;
+ my $entry = new IPDevice::CiscoRouter::AccesslistEntry;
  $entry->set_permitdeny('deny');
  $entry->set_field(1, '192.168.0.0/22');
  $entry->set_field(2, '20');

@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Digest::MD5;
 use Data::Dumper;
-use CGI::Simple::Cookie;
+use CGI::Thin::Cookies;
 use File::Spec;
 use base qw(CGI::Mungo::Base CGI::Mungo::Log);
 our $prefix = "MG";
@@ -146,14 +146,21 @@ sub create{	#creates a server-side cookie for the session
 		$self->setVar($name, $value);
 	}
 	if(!$self->getError()){	#all ok so far
-		my $cookie = $self->_setCookie(VALUE => $sessionId);
+		my $domain = $ENV{'HTTP_HOST'};	#use the full domain name here
 		if($response){
-			$response->header("Set-Cookie" => $cookie);
+			my $cookie = &Set_Cookie(NAME => 'SESSION', VALUE => $sessionId, EXPIRE => 0, DOMAIN => $domain);
+			if($cookie =~ m/^([^ ]+): (.+)$/){
+				$response->header($1 => $2);
+				$result = 1;
+			}
+			else{
+				$self->setError("Invalid cookie line: $cookie");
+			}
 		}
 		else{	#old method if it is still used
-			print "Set-Cookie: " , $cookie;
+			print &Set_Cookie(NAME => 'SESSION', VALUE => $sessionId, EXPIRE => 0, DOMAIN => $domain);
+			$result = 1;
 		}
-		$result = 1;
 	}
 	return $result;
 }
@@ -218,12 +225,17 @@ sub delete{	#remove a session
 		my $sessionFile = File::Spec->catfile($path, $sessionId);
 		if(unlink($sessionFile)){
 			$self->log("Deleted session: $sessionId");
-			my $cookie = $self->_setCookie(EXPIRE => 'now');
 			if($response){
-				$response->header("Set-Cookie" , => $cookie);
+				my $cookie = &Set_Cookie(NAME => 'SESSION', EXPIRE => 'delete');
+				if($cookie =~ m/^([^ ]+): (.+)$/){
+					$response->header($1 => $2);
+				}
+				else{
+					$self->setError("Invalid cookie line: $cookie");
+				}
 			}
 			else{
-				print "Set-Cookie: " , $cookie;
+				print &Set_Cookie(NAME => 'SESSION', EXPIRE => 'delete');
 			}
 			$self = undef;	#destroy this object
 			$result = 1;
@@ -240,28 +252,6 @@ sub delete{	#remove a session
 ###############################################################################################################
 #private class method
 ###############################################################################################################
-sub _setCookie{
-	my($self, %options) = @_;
-	my $secure = 0;
-	if(exists($ENV{'HTTPS'})){ #use secure cookies if running on ssl
-		$secure = 1;
-	}
-	my $cookie = CGI::Simple::Cookie->new(
-		-name => 'SESSION',
-		-value => $options{'VALUE'} || undef,
-		-expires => $options{'EXPIRE'} || undef,
-		-httponly => 1,
-		-secure => $secure
-	);
-	if($cookie){
-		return $cookie->as_string();
-	}
-	else{
-		$self->setError("Can't create cookie");
-	}
-	return undef;
-}
-##############################################################################################################
 sub _expire{	#remove old session files
 	my $self = shift;
 	my $path = $self->_getPath();
@@ -357,7 +347,7 @@ Development questions, bug reports, and patches are welcome to the above address
 
 =head1 Copyright
 
-Copyright (c) 2013 MacGyveR. All rights reserved.
+Copyright (c) 2012 MacGyveR. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

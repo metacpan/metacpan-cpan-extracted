@@ -11,6 +11,7 @@
     <TMPL_IF NAME="CHOICE_VALUE">
       <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
     </TMPL_IF>
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
     <TMPL_VAR NAME="MSG">
     <p id="timer"><lang en="You'll be redirected in 10 seconds" fr="Vous allez &ecirc;tre redirig&eacute;(e) automatiquement dans 10 secondes"/></p>
     <table><tbody><tr><td>
@@ -26,7 +27,11 @@
       </div>
     </td></tr></tbody></table>
   </form>
-  <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+  <!-- //if:jsminified
+    <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.min.js"></script>
+  //else -->
+    <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/info.js"></script>
+  <!-- //endif -->
 
 </div>
 

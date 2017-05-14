@@ -1,0 +1,19 @@
+
+This archive contains the distribution Acme-Coinbase,
+version 0.001:
+
+  Simple Coinbase API Test using docs at  
+  https://www.coinbase.com/docs/api/authentication
+
+    test with
+
+      perl -Ilib bin/coinbase.pl
+
+    Connects to a test coinbase account.
+
+This software is copyright (c) 2014 by joshr.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

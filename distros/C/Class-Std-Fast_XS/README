@@ -1,0 +1,57 @@
+INSTALLING ON WINDOWS
+=====================
+
+Class-Std-Fast_XS has successfully been compiled on windows using either
+MinGW/MSYS/gcc or Visual Studio 2005
+
+Only the MinGW/MSYS/gcc variant is described here - to compile with Visual
+Studio, you'll need to a add .manifest XML files for the resulting dll.
+
+Installing on Windows using MinGW/MSYS/gcc
+------------------------------------------
+
+Prerequisites
+-------------
+
+Install MinGW and MSYS. You may follow the instructions from
+http://www.mingw.org/download.shtml
+It's probably easiest to just use the installer package for MinGW and MSYS.
+You need at least MinGW, gcc, w32api and MSYS.
+
+Install Class-Std-Fast >= 0.0.7
+
+You may install it through CPAN or via ppm (if available).
+
+Preparations
+------------
+
+1. Start MSYS. You should see a bash-like shell.
+Note that C: is /c/ in MSYS.
+
+2. Setup environment:
+
+You'll have to setup a few environment variables for the header and library
+files to be found.
+
+Add the current directory to gcc's include path. This is where the AutoXS
+header file for Class-Std-Fast lives.
+
+   @> export CPATH="$CPATH:."
+
+Setup library path for linking. This is where my perl-related dlls live:
+
+   @> export LIBRARY_PATH='/c/perl/bin'
+
+Building and Installing
+-----------------------
+
+1. Unwrap into a directory
+2. go there
+   @>cd /d/workspace/Class-Std-Fast_XS
+
+3. Run the following mantra:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install

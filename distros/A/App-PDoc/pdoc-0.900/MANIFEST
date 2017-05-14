@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/pdoc
+dist.ini
+weaver.ini

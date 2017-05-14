@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+author.t/pay.t
+dist.ini
+lib/iTransact/Lite.pm
+t/01_public.t

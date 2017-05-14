@@ -1,0 +1,20 @@
+# This file tests the endblock block
+
+# Test an unexpected endblock (should generate an error)
+!endblock
+
+Some text.
+
+# Test a block will no matching endblock (should generate an error)
+!block sdf
+
+Some text inside block xyz.
+
+!block sdf
+This is some text with
+several lines in
+it.
+
+And a few
+more.
+!endblock

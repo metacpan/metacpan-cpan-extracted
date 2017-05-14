@@ -1,0 +1,7 @@
+/home/perl/bin/cover -delete;
+PERL5OPT=-MDevel::Cover=-ignore,Build perl Build test 
+/home/perl/bin/cover -report html -outputdir /home/ask/public_html/tmp/coverage 
+
+# http://one.develooper.com/~ask/tmp/coverage/
+
+

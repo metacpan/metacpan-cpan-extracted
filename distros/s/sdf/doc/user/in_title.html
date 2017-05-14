@@ -1,0 +1,95 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Building a title</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_style.html">Previous Topic</A> | <A HREF="in_overv.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.6. Building a title</H1>
+<P>Each document style category has a different way of building a title section:</P>
+<UL>
+<LI><EM>administration</EM> styles use the <A HREF="../ref/ftitle.html">title</A> filter
+<LI><EM>general</EM> styles use the <A HREF="../ref/mbuild_t.html">build_title</A> macro
+<LI><EM>miscellaneous</EM> styles do not have a title.</UL>
+<P>Refer to <A HREF="in_style.html">Document styles</A> for a summary of the styles available and the category of each style.</P>
+<HR>
+<H2><A NAME="The title filter">1.6.1. The title filter</A></H2>
+<P>The <A HREF="../ref/ftitle.html">title</A> filter generates a title block for administration-style documents like memos and faxes. For example:</P>
+<PRE>
+!block title
+Name        Value
+Date:       [[DATE:DOC_MODIFIED]]
+To:         Joe Bloggs, Sue Brown, Maree Jones
+Copy:       David Smith
+From:       Neil Armstrong
+Subject:    Solar System Information
+Ref. No:    XY.002/GUI/96
+!endblock
+</PRE>
+<P>Refer to the documentation on the <A HREF="../ref/ftitle.html">title</A> filter within the <A HREF="../ref/re_sdf.html">SDF Reference</A> for further details.</P>
+<HR>
+<H2><A NAME="The build_title macro">1.6.2. The build_title macro</A></H2>
+<P>The <A HREF="../ref/mbuild_t.html">build_title</A> macro tunes the layout and content of the title section for each target format. Typically:</P>
+<UL>
+<LI>paper-based documents have all the title information formatted on a page (or two)
+<LI>online documents only have the essential title information formatted in a few lines.</UL>
+<P>By convention, parameters are passed to <A HREF="../ref/mbuild_t.html">build_title</A> via predefined variable names. For example:</P>
+<PRE>
+  !define DOC_NAME           &quot;GalaxyBuilder&quot;
+  !define DOC_TYPE           &quot;User Guide&quot;
+  !define DOC_AUTHOR         &quot;Joe Bloggs&quot;
+  !build_title
+</PRE>
+<HR>
+<H2><A NAME="Variables used by build_title">1.6.3. Variables used by build_title</A></H2>
+<P>The following variables are commonly defined before <A HREF="../ref/mbuild_t.html">build_title</A> is called:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_NAME
+</TD>
+<TD>
+the title, excluding the type (e.g. SDF)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TYPE
+</TD>
+<TD>
+the title type (e.g. User Guide)
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_AUTHOR
+</TD>
+<TD>
+the author
+</TD>
+</TR>
+</TABLE>
+
+<P>Refer to the documentation on the <A HREF="../ref/mbuild_t.html">build_title</A> macro within the <A HREF="../ref/re_sdf.html">SDF Reference</A> for further details.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_style.html">Previous Topic</A> | <A HREF="in_overv.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

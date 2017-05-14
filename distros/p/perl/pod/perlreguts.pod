@@ -12,14 +12,15 @@ author's experience, comments in the source code, other papers on the
 regex engine, feedback on the perl5-porters mail list, and no doubt other
 places as well.
 
-B<WARNING!> It should be clearly understood that this document
-represents the state of the regex engine as the author understands it at
-the time of writing. It is B<NOT> an API definition; it is purely an
-internals guide for those who want to hack the regex engine, or
-understand how the regex engine works. Readers of this document are
-expected to understand perl's regex syntax and its usage in detail. If
-you want to learn about the basics of Perl's regular expressions, see
-L<perlre>.
+B<NOTICE!> It should be clearly understood that the behavior and
+structures discussed in this represents the state of the engine as the
+author understood it at the time of writing. It is B<NOT> an API
+definition, it is purely an internals guide for those who want to hack
+the regex engine, or understand how the regex engine works. Readers of
+this document are expected to understand perl's regex syntax and its
+usage in detail. If you want to learn about the basics of Perl's
+regular expressions, see L<perlre>. And if you want to replace the
+regex engine with your own, see L<perlreapi>.
 
 =head1 OVERVIEW
 
@@ -31,7 +32,7 @@ not to, in which case we will explain why.
 
 When speaking about regexes we need to distinguish between their source
 code form and their internal form. In this document we will use the term
-"pattern" when we speak of their textual, source code form, the term
+"pattern" when we speak of their textual, source code form, and the term
 "program" when we speak of their internal representation. These
 correspond to the terms I<S-regex> and I<B-regex> that Mark Jason
 Dominus employs in his paper on "Rx" ([1] in L</REFERENCES>).
@@ -43,7 +44,7 @@ specified in a mini-language, and then applies those constraints to a
 target string, and determines whether or not the string satisfies the
 constraints. See L<perlre> for a full definition of the language.
 
-So in less grandiose terms the first part of the job is to turn a pattern into
+In less grandiose terms, the first part of the job is to turn a pattern into
 something the computer can efficiently use to find the matching point in
 the string, and the second part is performing the search itself.
 
@@ -167,23 +168,29 @@ multiple of four bytes:
 
 =item C<regnode_charclass>
 
-Character classes are represented by C<regnode_charclass> structures,
-which have a four-byte argument and then a 32-byte (256-bit) bitmap
-indicating which characters are included in the class.
+Bracketed character classes are represented by C<regnode_charclass>
+structures, which have a four-byte argument and then a 32-byte (256-bit)
+bitmap indicating which characters in the Latin1 range are included in
+the class.
 
     regnode_charclass        U32 arg1;
                              char bitmap[ANYOF_BITMAP_SIZE];
 
-=item C<regnode_charclass_class>
+Various flags whose names begin with C<ANYOF_> are used for special
+situations.  Above Latin1 matches and things not known until run-time
+are stored in L</Perl's pprivate structure>.
+
+=item C<regnode_charclass_posixl>
 
 There is also a larger form of a char class structure used to represent
-POSIX char classes called C<regnode_charclass_class> which has an
-additional 4-byte (32-bit) bitmap indicating which POSIX char class
+POSIX char classes under C</l> matching,
+called C<regnode_charclass_posixl> which has an
+additional 32-bit bitmap indicating which POSIX char classes
 have been included.
 
-    regnode_charclass_class  U32 arg1;
-                             char bitmap[ANYOF_BITMAP_SIZE];
-                             char classflags[ANYOF_CLASSBITMAP_SIZE];
+   regnode_charclass_posixl U32 arg1;
+                            char bitmap[ANYOF_BITMAP_SIZE];
+                            U32 classflags;
 
 =back
 
@@ -221,7 +228,7 @@ always be so.
 =item *
 
 There is the "next regop" from a given regop/regnode. This is the
-regop physically located after the the current one, as determined by
+regop physically located after the current one, as determined by
 the size of the current regop. This is often useful, such as when
 dumping the structure we use this order to traverse. Sometimes the code
 assumes that the "next regnode" is the same as the "next regop", or in
@@ -332,12 +339,12 @@ first C<|> symbol it sees.
 
 C<regbranch()> in turn calls C<regpiece()> which
 handles "things" followed by a quantifier. In order to parse the
-"things", C<regatom()> is called. This is the lowest level routine which
+"things", C<regatom()> is called. This is the lowest level routine, which
 parses out constant strings, character classes, and the
 various special symbols like C<$>. If C<regatom()> encounters a "("
 character it in turn calls C<reg()>.
 
-The routine C<regtail()> is called by both C<reg()>, C<regbranch()>
+The routine C<regtail()> is called by both C<reg()> and C<regbranch()>
 in order to "set the tail pointer" correctly. When executing and
 we get to the end of a branch, we need to go to the node following the
 grouping parens. When parsing, however, we don't know where the end will
@@ -353,20 +360,23 @@ simpler form.
 
 The call graph looks like this:
 
-    reg()                        # parse a top level regex, or inside of parens
-        regbranch()              # parse a single branch of an alternation
-            regpiece()           # parse a pattern followed by a quantifier
-                regatom()        # parse a simple pattern
-                    regclass()   #   used to handle a class
-                    reg()        #   used to handle a parenthesised subpattern
-                    ....
-            ...
-            regtail()            # finish off the branch
-        ...
-        regtail()                # finish off the branch sequence. Tie each
-                                 # branch's tail to the tail of the sequence
-                                 # (NEW) In Debug mode this is
-                                 # regtail_study().
+ reg()                        # parse a top level regex, or inside of
+                              # parens
+     regbranch()              # parse a single branch of an alternation
+         regpiece()           # parse a pattern followed by a quantifier
+             regatom()        # parse a simple pattern
+                 regclass()   #   used to handle a class
+                 reg()        #   used to handle a parenthesised
+                              #   subpattern
+                 ....
+         ...
+         regtail()            # finish off the branch
+     ...
+     regtail()                # finish off the branch sequence. Tie each
+                              # branch's tail to the tail of the
+                              # sequence
+                              # (NEW) In Debug mode this is
+                              # regtail_study().
 
 A grammar form might be something like this:
 
@@ -382,11 +392,57 @@ A grammar form might be something like this:
     piece : _piece
           | _piece quant
 
+=head3 Parsing complications
+
+The implication of the above description is that a pattern containing nested
+parentheses will result in a call graph which cycles through C<reg()>,
+C<regbranch()>, C<regpiece()>, C<regatom()>, C<reg()>, C<regbranch()> I<etc>
+multiple times, until the deepest level of nesting is reached. All the above
+routines return a pointer to a C<regnode>, which is usually the last regnode
+added to the program. However, one complication is that reg() returns NULL
+for parsing C<(?:)> syntax for embedded modifiers, setting the flag
+C<TRYAGAIN>. The C<TRYAGAIN> propagates upwards until it is captured, in
+some cases by C<regatom()>, but otherwise unconditionally by
+C<regbranch()>. Hence it will never be returned by C<regbranch()> to
+C<reg()>. This flag permits patterns such as C<(?i)+> to be detected as
+errors (I<Quantifier follows nothing in regex; marked by <-- HERE in m/(?i)+
+<-- HERE />).
+
+Another complication is that the representation used for the program differs
+if it needs to store Unicode, but it's not always possible to know for sure
+whether it does until midway through parsing. The Unicode representation for
+the program is larger, and cannot be matched as efficiently. (See L</Unicode
+and Localisation Support> below for more details as to why.)  If the pattern
+contains literal Unicode, it's obvious that the program needs to store
+Unicode. Otherwise, the parser optimistically assumes that the more
+efficient representation can be used, and starts sizing on this basis.
+However, if it then encounters something in the pattern which must be stored
+as Unicode, such as an C<\x{...}> escape sequence representing a character
+literal, then this means that all previously calculated sizes need to be
+redone, using values appropriate for the Unicode representation. Currently,
+all regular expression constructions which can trigger this are parsed by code
+in C<regatom()>.
+
+To avoid wasted work when a restart is needed, the sizing pass is abandoned
+- C<regatom()> immediately returns NULL, setting the flag C<RESTART_UTF8>.
+(This action is encapsulated using the macro C<REQUIRE_UTF8>.) This restart
+request is propagated up the call chain in a similar fashion, until it is
+"caught" in C<Perl_re_op_compile()>, which marks the pattern as containing
+Unicode, and restarts the sizing pass. It is also possible for constructions
+within run-time code blocks to turn out to need Unicode representation.,
+which is signalled by C<S_compile_runtime_code()> returning false to
+C<Perl_re_op_compile()>.
+
+The restart was previously implemented using a C<longjmp> in C<regatom()>
+back to a C<setjmp> in C<Perl_re_op_compile()>, but this proved to be
+problematic as the latter is a large function containing many automatic
+variables, which interact badly with the emergent control flow of C<setjmp>.
+
 =head3 Debug Output
 
-In the 5.9.x development version of perl you can C<< use re Debug => 'PARSE' >> to see some trace
-information about the parse process. We will start with some simple
-patterns and build up to more complex patterns.
+In the 5.9.x development version of perl you can C<< use re Debug => 'PARSE' >>
+to see some trace information about the parse process. We will start with some
+simple patterns and build up to more complex patterns.
 
 So when we parse C</foo/> we see something like the following table. The
 left shows what is being parsed, and the number indicates where the next regop
@@ -488,11 +544,11 @@ Now for something much more complex: C</x(?:foo*|b[a][rR])(foo|bar)$/>
                                       atom
  >)$<             34              tail~ BRANCH (28)
                   36              tsdy~ BRANCH (END) (31)
-                                      ~ attach to CLOSE1 (34) offset to 3
+                                     ~ attach to CLOSE1 (34) offset to 3
                                   tsdy~ EXACT <foo> (EXACT) (29)
-                                      ~ attach to CLOSE1 (34) offset to 5
+                                     ~ attach to CLOSE1 (34) offset to 5
                                   tsdy~ EXACT <bar> (EXACT) (32)
-                                      ~ attach to CLOSE1 (34) offset to 2
+                                     ~ attach to CLOSE1 (34) offset to 2
  >$<                        tail~ BRANCH (3)
                                 ~ BRANCH (9)
                                 ~ TAIL (25)
@@ -544,9 +600,9 @@ the C<$> symbol has been converted into an C<EOL> regop, a special piece of
 code that looks for C<\n> or the end of the string.
 
 The next pointer for C<BRANCH>es is interesting in that it points at where
-execution should go if the branch fails. When executing if the engine
+execution should go if the branch fails. When executing, if the engine
 tries to traverse from a branch to a C<regnext> that isn't a branch then
-the engine will know that the entire set of branches have failed.
+the engine will know that the entire set of branches has failed.
 
 =head3 Peep-hole Optimisation and Analysis
 
@@ -589,13 +645,13 @@ optimisations along these lines:
 
 =back
 
-Another form of optimisation that can occur is post-parse "peep-hole"
-optimisations, where inefficient constructs are replaced by
-more efficient constructs. An example of this are C<TAIL> regops which are used
-during parsing to mark the end of branches and the end of groups. These
-regops are used as place-holders during construction and "always match"
-so they can be "optimised away" by making the things that point to the
-C<TAIL> point to thing that the C<TAIL> points to, thus "skipping" the node.
+Another form of optimisation that can occur is the post-parse "peep-hole"
+optimisation, where inefficient constructs are replaced by more efficient
+constructs. The C<TAIL> regops which are used during parsing to mark the end
+of branches and the end of groups are examples of this. These regops are used
+as place-holders during construction and "always match" so they can be
+"optimised away" by making the things that point to the C<TAIL> point to the
+thing that C<TAIL> points to, thus "skipping" the node.
 
 Another optimisation that can occur is that of "C<EXACT> merging" which is
 where two consecutive C<EXACT> nodes are merged into a single
@@ -616,20 +672,20 @@ finding the start point in the string where we should match from,
 and the second being running the regop interpreter.
 
 If we can tell that there is no valid start point then we don't bother running
-interpreter at all. Likewise, if we know from the analysis phase that we
+the interpreter at all. Likewise, if we know from the analysis phase that we
 cannot detect a short-cut to the start position, we go straight to the
 interpreter.
 
 The two entry points are C<re_intuit_start()> and C<pregexec()>. These routines
 have a somewhat incestuous relationship with overlap between their functions,
 and C<pregexec()> may even call C<re_intuit_start()> on its own. Nevertheless
-other parts of the the perl source code may call into either, or both.
+other parts of the perl source code may call into either, or both.
 
-Execution of the interpreter itself used to be recursive. Due to the
-efforts of Dave Mitchell in the 5.9.x development track, it is now iterative. Now an
+Execution of the interpreter itself used to be recursive, but thanks to the
+efforts of Dave Mitchell in the 5.9.x development track, that has changed: now an
 internal stack is maintained on the heap and the routine is fully
 iterative. This can make it tricky as the code is quite conservative
-about what state it stores, with the result that that two consecutive lines in the
+about what state it stores, with the result that two consecutive lines in the
 code can actually be running in totally different contexts due to the
 simulated recursion.
 
@@ -679,12 +735,12 @@ subroutines but the bulk are inline code.
 =head2 Unicode and Localisation Support
 
 When dealing with strings containing characters that cannot be represented
-using an eight-bit character set, perl uses an internal representation 
+using an eight-bit character set, perl uses an internal representation
 that is a permissive version of Unicode's UTF-8 encoding[2]. This uses single
-bytes to represent characters from the ASCII character set, and sequences 
+bytes to represent characters from the ASCII character set, and sequences
 of two or more bytes for all other characters. (See L<perlunitut>
 for more information about the relationship between UTF-8 and perl's
-encoding, utf8 -- the difference isn't important for this discussion.)
+encoding, utf8. The difference isn't important for this discussion.)
 
 No matter how you look at it, Unicode support is going to be a pain in a
 regex engine. Tricks that might be fine when you have 256 possible
@@ -711,101 +767,117 @@ Care must be taken when making changes to make sure that you handle
 UTF-8 properly, both at compile time and at execution time, including
 when the string and pattern are mismatched.
 
-The following comment in F<regcomp.h> gives an example of exactly how
-tricky this can be:
+=head2 Base Structures
 
-    Two problematic code points in Unicode casefolding of EXACT nodes:
+The C<regexp> structure described in L<perlreapi> is common to all
+regex engines. Two of its fields are intended for the private use
+of the regex engine that compiled the pattern. These are the
+C<intflags> and pprivate members. The C<pprivate> is a void pointer to
+an arbitrary structure whose use and management is the responsibility
+of the compiling engine. perl will never modify either of these
+values. In the case of the stock engine the structure pointed to by
+C<pprivate> is called C<regexp_internal>.
 
-    U+0390 - GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS
-    U+03B0 - GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS
+Its C<pprivate> and C<intflags> fields contain data
+specific to each engine.
 
-    which casefold to
+There are two structures used to store a compiled regular expression.
+One, the C<regexp> structure described in L<perlreapi> is populated by
+the engine currently being. used and some of its fields read by perl to
+implement things such as the stringification of C<qr//>.
 
-    Unicode                      UTF-8
 
-    U+03B9 U+0308 U+0301         0xCE 0xB9 0xCC 0x88 0xCC 0x81
-    U+03C5 U+0308 U+0301         0xCF 0x85 0xCC 0x88 0xCC 0x81
+The other structure is pointed to by the C<regexp> struct's
+C<pprivate> and is in addition to C<intflags> in the same struct
+considered to be the property of the regex engine which compiled the
+regular expression;
 
-    This means that in case-insensitive matching (or "loose matching",
-    as Unicode calls it), an EXACTF of length six (the UTF-8 encoded
-    byte length of the above casefolded versions) can match a target
-    string of length two (the byte length of UTF-8 encoded U+0390 or
-    U+03B0). This would rather mess up the minimum length computation.
+The regexp structure contains all the data that perl needs to be aware of
+to properly work with the regular expression. It includes data about
+optimisations that perl can use to determine if the regex engine should
+really be used, and various other control info that is needed to properly
+execute patterns in various contexts such as is the pattern anchored in
+some way, or what flags were used during the compile, or whether the
+program contains special constructs that perl needs to be aware of.
 
-    What we'll do is to look for the tail four bytes, and then peek
-    at the preceding two bytes to see whether we need to decrease
-    the minimum length by four (six minus two).
+In addition it contains two fields that are intended for the private use
+of the regex engine that compiled the pattern. These are the C<intflags>
+and pprivate members. The C<pprivate> is a void pointer to an arbitrary
+structure whose use and management is the responsibility of the compiling
+engine. perl will never modify either of these values.
 
-    Thanks to the design of UTF-8, there cannot be false matches:
-    A sequence of valid UTF-8 bytes cannot be a subsequence of
-    another valid sequence of UTF-8 bytes.
+As mentioned earlier, in the case of the default engines, the C<pprivate>
+will be a pointer to a regexp_internal structure which holds the compiled
+program and any additional data that is private to the regex engine
+implementation.
 
-=head2 Base Struct
+=head3 Perl's C<pprivate> structure
 
-F<regexp.h> contains the base structure definition:
+The following structure is used as the C<pprivate> struct by perl's
+regex engine. Since it is specific to perl it is only of curiosity
+value to other engine implementations.
 
-    typedef struct regexp {
-            I32 *startp;
-            I32 *endp;
-            regnode *regstclass;
-            struct reg_substr_data *substrs;
-            char *precomp;          /* pre-compilation regular expression */
-            struct reg_data *data;  /* Additional data. */
-            char *subbeg;           /* saved or original string 
-                                       so \digit works forever. */
-            U32 *offsets;           /* offset annotations 20001228 MJD */
-            I32 sublen;             /* Length of string pointed by subbeg */
-            I32 refcnt;
-            I32 minlen;             /* minimum possible length of $& */
-            I32 prelen;             /* length of precomp */
-            U32 nparens;            /* number of parentheses */
-            U32 lastparen;          /* last paren matched */
-            U32 lastcloseparen;     /* last paren matched */
-            U32 reganch;            /* Internal use only +
-                                       Tainted information used by regexec? */
-            regnode program[1];     /* Unwarranted chumminess with compiler. */
-    } regexp;
-
-C<program>, and C<data> are the primary fields of concern in terms of
-program structure. C<program> is the actual array of nodes, and C<data> is
-an array of "whatever", with each whatever being typed by letter, and
-freed or cloned as needed based on this type.  regops use the data
-array to store reference data that isn't convenient to store in the regop
-itself. It also means memory management code doesn't need to traverse the
-program to find pointers. So for instance, if a regop needs a pointer, the
-normal procedure is use a C<regnode_arg1> store the data index in the C<ARG>
-field and look it up from the data array.
+ typedef struct regexp_internal {
+         U32 *offsets;           /* offset annotations 20001228 MJD
+                                  * data about mapping the program to
+                                  * the string*/
+         regnode *regstclass;    /* Optional startclass as identified or
+                                  * constructed by the optimiser */
+         struct reg_data *data;  /* Additional miscellaneous data used
+                                  * by the program.  Used to make it
+                                  * easier to clone and free arbitrary
+                                  * data that the regops need. Often the
+                                  * ARG field of a regop is an index
+                                  * into this structure */
+         regnode program[1];     /* Unwarranted chumminess with
+                                  * compiler. */
+ } regexp_internal;
 
 =over 5
 
-=item -
+=item C<offsets>
 
-C<startp>, C<endp>, C<nparens>, C<lasparen>, and C<lastcloseparen> are used to manage capture
-buffers.
+Offsets holds a mapping of offset in the C<program>
+to offset in the C<precomp> string. This is only used by ActiveState's
+visual regex debugger.
 
-=item -
+=item C<regstclass>
 
-C<subbeg> and optional C<saved_copy> are used during the execution phase for managing
-replacements.
+Special regop that is used by C<re_intuit_start()> to check if a pattern
+can match at a certain position. For instance if the regex engine knows
+that the pattern must start with a 'Z' then it can scan the string until
+it finds one and then launch the regex engine from there. The routine
+that handles this is called C<find_by_class()>. Sometimes this field
+points at a regop embedded in the program, and sometimes it points at
+an independent synthetic regop that has been constructed by the optimiser.
 
-=item -
+=item C<data>
 
-C<offsets> and C<precomp> are used for debugging purposes.
+This field points at a C<reg_data> structure, which is defined as follows
 
-=item -
+    struct reg_data {
+        U32 count;
+        U8 *what;
+        void* data[1];
+    };
 
-The rest are used for start point optimisations.
+This structure is used for handling data structures that the regex engine
+needs to handle specially during a clone or free operation on the compiled
+product. Each element in the data array has a corresponding element in the
+what array. During compilation regops that need special structures stored
+will add an element to each array using the add_data() routine and then store
+the index in the regop.
+
+=item C<program>
+
+Compiled program. Inlined into the structure so the entire struct can be
+treated as a single blob.
 
 =back
 
-=head2 De-allocation and Cloning
-
-Any patch that adds data items to the regexp will need to include
-changes to F<sv.c> (C<Perl_re_dup()>) and F<regcomp.c> (C<pregfree()>). This
-involves freeing or cloning items in the regexes data array based
-on the data item's type.
-
 =head1 SEE ALSO
+
+L<perlreapi>
 
 L<perlre>
 

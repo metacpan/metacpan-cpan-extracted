@@ -1,0 +1,85 @@
+=pod
+
+=head1 NAME
+
+Bot::Infobot - a Bot::BasicBot::Pluggable based replacement for the venerable infobot
+
+
+=head1 USAGE
+
+First write a config file (see below for details of the format) making sure that
+you have a C<[ Store ]> section. Then run
+
+    % infobot-import <dsn> <username> <password>
+
+and sit back and watch the show. This can take anything from 5 minutes to 6 hours
+depending on size of the brain and the store method (Storable is fastest, then 
+then the DBM::Deep based Deep driver and then DBI).
+
+Finally just type 
+
+    % infobot 
+
+in the same directory and everything will just work. Probably.
+
+
+=head1 CONFIG 
+
+The C<infobot> and C<Bot::Infobot::Config> documentation have more information but, 
+essentially you have a main namespace and then sub namespaces for the different plugins
+including one special C<Store> namespace for configuring the store.
+
+You can get a list of config values for the bot on the C<infobot> manpage but the 
+minimum config you should have to get yourself up and running are something like
+
+    
+    nick     = mybotsnick
+    server   = irc.perl.org
+    channels = #bottest
+
+    [ Store ]
+    type     = Storable
+
+ 
+The format is C<.ini> style and currently there's no way to pass in an alternative
+config file but there probably should be.
+
+=head1 DESCRIPTION
+
+After hacking in a couple of features to dipsy, #london.pm's slightly loopy
+infobot I felt, well, dirty. The infobt code is horrible to the point of 
+profane depravity. The next wednesday, burdened with a monster hangover and
+a thorny problem percolating through my brain I hacked up a quick 
+C<Bot::BasicBot::Pluggable> framework as a replacement and played with porting
+the various plugins I could find over to this new, shiny way of doing anythings.
+
+A few sprinkled hours later and I'd done pretty much everything and began to 
+write a brain slurper to import the distilled wisdom of 5 odd years of 
+ramblings.
+
+Along the way there was various bits of Yak Shaving. Some of the results of that 
+are up on CPAN.
+
+The original patches that inspired this are here - http://thegestalt.org/simon/perl/
+
+=head1 VERSION CONTROL
+
+The master repository for this code is at
+
+https://github.com/simonwistow/Bot-Infobot
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2005, Simon Wistow
+
+Distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Bot:::BasicBot::Pluggable>, L<Bot::Infobot::Config>, L<infobot>, L<infobot-import>, http://www.infobot.org
+
+=cut

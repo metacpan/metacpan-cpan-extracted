@@ -1,0 +1,32 @@
+---
+abstract: 'Conveniently create $c objects for testing'
+author:
+  - 'Eden Cardim <edencardim@gmail.com>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  FindBin: 0
+  HTTP::Request::Common: 0
+  Moose: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Test-MockContext
+requires:
+  Class::Load: 0
+  Plack::Test: 0
+  Sub::Exporter: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: http://github.com/edenc/CatalystX-Test-MockContext.git
+version: 0.000001

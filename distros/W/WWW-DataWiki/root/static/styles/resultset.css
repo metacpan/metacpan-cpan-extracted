@@ -1,0 +1,24 @@
+@import url(page.css);
+
+pre {
+	color: #060;
+	background: #CFC;
+	border: 1px solid;
+	padding: 0.5em;
+}
+table {
+	border: 2px solid black;
+	border-collapse: collapse;
+}
+th {
+	background: black;
+	color: white;
+	border: 1px solid black;
+	text-align: left;
+	vertical-align: top;
+}
+td {
+	border: 1px solid black;
+	text-align: left;
+	vertical-align:	top;
+}

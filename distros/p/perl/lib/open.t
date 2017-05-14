@@ -3,11 +3,12 @@
 BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
-	push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
 	require Config; import Config;
+	require './test.pl';
+	require './charset_tools.pl';
 }
 
-use Test::More tests => 25;
+plan 23;
 
 # open::import expects 'open' as its first argument, but it clashes with open()
 sub import {
@@ -21,10 +22,6 @@ ok( require 'open.pm', 'requiring open' );
 eval { import() };
 like( $@, qr/needs explicit list of PerlIO layers/,
 	'import should fail without args' );
-
-# the hint bits shouldn't be set yet
-is( $^H & $open::hint_bits, 0,
-	'hint bits should not be set in $^H before open import' );
 
 # prevent it from loading I18N::Langinfo, so we can test encoding failures
 my $warn;
@@ -48,8 +45,6 @@ like( $warn, qr/Unknown PerlIO layer/,
 
 # see if it sets the magic variables appropriately
 import( 'IN', ':crlf' );
-ok( $^H & $open::hint_bits,
-	'hint bits should be set in $^H after open import' );
 is( $^H{'open_IN'}, 'crlf', 'should have set crlf layer' );
 
 # it should reset them appropriately, too
@@ -187,17 +182,39 @@ EOE
     }
 }
 SKIP: {
-    skip("no perlio", 2) unless (find PerlIO::Layer 'perlio');
+    skip("no perlio", 1) unless (find PerlIO::Layer 'perlio');
+    skip("no Encode", 1) unless $Config{extensions} =~ m{\bEncode\b};
+    skip("EBCDIC platform doesnt have 'use encoding' used by open ':locale'", 1)
+                                                                if $::IS_EBCDIC;
 
     eval q[use Encode::Alias;use open ":std", ":locale"];
     is($@, '', 'can use :std and :locale');
+}
 
-    use open IN => ':non-existent';
-    eval {
-	require Symbol; # Anything that exists but we havn't loaded
-    };
-    like($@, qr/Can't locate Symbol|Recursive call/i,
-	 "test for an endless loop in PerlIO_find_layer");
+{
+    local $ENV{PERL_UNICODE};
+    delete $ENV{PERL_UNICODE};
+    local $TODO;
+    $TODO = "Encode not working on EBCDIC" if $::IS_EBCDIC;
+    is runperl(
+         progs => [
+            'use open q\:encoding(UTF-8)\, q-:std-;',
+            'use open q\:encoding(UTF-8)\;',
+            'if(($_ = <STDIN>) eq qq-\x{100}\n-) { print qq-stdin ok\n- }',
+            'else { print qq-got -, join(q q q, map ord, split//), "\n" }',
+            'print STDOUT qq-\x{fe}\n-;',
+            'print STDERR qq-\x{fe}\n-;',
+         ],
+         stdin => byte_utf8a_to_utf8n("\xc4\x80") . "\n",
+         stderr => 1,
+       ),
+       "stdin ok\n"
+        . byte_utf8a_to_utf8n("\xc3\xbe")
+        . "\n"
+        . byte_utf8a_to_utf8n("\xc3\xbe")
+        . "\n",
+       "use open without :std does not affect standard handles",
+    ;
 }
 
 END {

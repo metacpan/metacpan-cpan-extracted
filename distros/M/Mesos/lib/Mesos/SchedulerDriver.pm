@@ -1,165 +1,68 @@
 package Mesos::SchedulerDriver;
-use Mesos::XS;
-use Mesos::Types qw(:all);
-use Type::Params qw(validate);
-use Types::Standard qw(:all);
+use Mesos;
+use Mesos::Messages;
+use Mesos::Channel;
 use Moo;
-use namespace::autoclean;
-with 'Mesos::Role::HasDispatcher';
+use Types::Standard qw(:all);
+use Type::Params qw(validate);
+use Mesos::Types qw(:all);
+use strict;
+use warnings;
 
 =head1 NAME
 
-Mesos::SchedulerDriver - perl interface to MesosSchedulerDriver
-
-=head1 ATTRIBUTES
-
-=head2 credential
-
-A Mesos::Credential message
-
-=head2 dispatcher
-
-Either a Mesos::Dispatcher instance, or the short name of a dispatcher to instantiate(such as AnyEvent). The short name cannot be used if the dispatcher has required arguments.
-
-Defaults to AnyEvent
-
-=head2 framework
-
-A Mesos::FrameworkInfo message
-
-=head2 master
-
-The address of a Mesos master
-
-=head2 scheduler
-
-A Mesos::Scheduler instance
+Mesos::SchedulerDriver - perl driver for Mesos scheduler drivers
 
 =cut
 
-has credential => (
-    is     => 'ro',
-    isa    => Credential,
-    coerce => 1,
-);
-
-has framework => (
-    is       => 'ro',
-    isa      => FrameworkInfo,
-    coerce   => 1,
-    required => 1,
-);
-
-has master => (
-    is       => 'ro',
-    isa      => Str,
-    required => 1,
-);
-
-has scheduler => (
-    is       => 'ro',
-    isa      => Scheduler,
-    required => 1,
-);
-sub event_handler { shift->scheduler }
-
-around requestResources => sub {
-    my ($orig, $self, @args) = @_;
-    return $self->$orig(validate \@args, ArrayRef[Request]);
-};
-
-around launchTasks => sub {
-    my ($orig, $self, @args) = @_;
-    return $self->$orig(
-        validate \@args,
-        ArrayRef[OfferID],
-        ArrayRef[TaskInfo],
-        Optional[Filters],
-    );
-};
-
-around launchTask => sub {
-    my ($orig, $self, @args) = @_;
-    return $self->$orig(
-        validate \@args,
-        OfferID,
-        ArrayRef[TaskInfo],
-        Optional[Filters],
-    );
-};
-
-around killTask => sub {
-    my ($orig, $self, @args) = @_;
-    return $self->$orig(validate \@args, TaskID);
-};
-
-around declineOffer => sub {
-    my ($orig, $self, @args) = @_;
-    return $self->$orig(validate \@args, OfferID, Optional[Filters]);
-};
-
-around sendFrameworkMessage => sub {
-    my ($orig, $self, @args) = @_;
-    return $self->$orig(validate \@args, ExecutorID, SlaveID, Str);
-};
-
-around reconcileTasks => sub {
-    my ($orig, $self, @args) = @_;
-    return $self->$orig(validate \@args, ArrayRef[TaskStatus]);
-};
-
-sub BUILD {
+sub xs_init {
     my ($self) = @_;
-
-    my @xs_args = map $self->$_, qw(dispatcher framework master);
-    push @xs_args, $self->credential if $self->credential;
-
-    $self->_xs_init(@xs_args);
+    return $self->_xs_init(grep {$_} map {$self->$_} qw(framework master channel credential));
 }
 
-=head1 METHODS
+sub join {
+    my ($self) = @_;
+    $self->dispatch_loop;
+    return $self->status;
+}
 
-=over 4
+has channel => (
+    is       => 'ro',
+    isa      => Channel,
+    builder  => 1,
+    # this needs to be lazy so that BUILD runs xs_init first
+    lazy     => 1,
+);
 
-=item new(%args)
+sub _build_channel {
+    require Mesos::Channel::Pipe;
+    return Mesos::Channel::Pipe->new;
+}
 
-    my $driver = Mesos::SchedulerDriver(%args)
+has process => (
+    is      => 'ro',
+    builder => 1,
+    lazy    => 1,
+);
 
-        %args
-            REQUIRED framework
-            REQUIRED scheduler
-            REQUIRED master
-            OPTIONAL credential
-            OPTIONAL dispatcher
+sub _build_process {
+    my ($self) = @_;
+    return $self->scheduler;
+}
 
-=item start()
+# need to apply this after declaring channel and process
+with 'Mesos::Role::SchedulerDriver';
+with 'Mesos::Role::Dispatcher::AnyEvent';
 
-=item stop($failover)
+after start => sub {
+    my ($self) = @_;
+    $self->setup_watcher;
+};
 
-=item abort()
+after $_ => sub {
+    my ($self) = @_;
+    $self->stop_dispatch;
+} for qw(stop abort);
 
-=item join()
-
-=item run()
-
-=item requestResources($requests)
-
-=item launchTasks($offerIds, $tasks, $filters)
-
-=item launchTask($offerId, $tasks, $filters)
-
-=item killTask($taskId)
-
-=item declineOffer($offerId, $filters)
-
-=item reviveOffers()
-
-=item sendFrameworkMessage($executorId, $slaveId, $data)
-
-=item reconcileTasks($statuses)
-
-=back
-
-=cut
 
 1;

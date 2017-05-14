@@ -1,0 +1,10 @@
+# This file tests the row macro
+
+# Try an unexpected row
+!row
+
+# Try another unexpected row
+!table 1
+!row
+!endtable
+!row

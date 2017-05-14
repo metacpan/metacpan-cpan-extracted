@@ -11,7 +11,7 @@ use Padre::Util     ();
 use Padre::Wx       ();
 use Padre::Constant ();
 
-our $VERSION = '0.2';
+our $VERSION = '0.11';
 our @ISA     = 'Wx::TreeCtrl';
 
 
@@ -21,7 +21,6 @@ our @ISA     = 'Wx::TreeCtrl';
 sub new {
 	my $class = shift;
 	my $panel = shift;
-	my %args = @_;
 	my $self  = $class->SUPER::new(
 		$panel,
 		-1,
@@ -30,10 +29,7 @@ sub new {
 		Wx::wxTR_HIDE_ROOT | Wx::wxTR_SINGLE | Wx::wxTR_FULL_ROW_HIGHLIGHT | Wx::wxTR_HAS_BUTTONS
 			| Wx::wxTR_LINES_AT_ROOT | Wx::wxBORDER_NONE
 	);
-	
-	# Yuk - TODO event subscriptions 'after' geometry handles this ?
-	$self->{universe} =  $args{universe} ;
-	
+
 	# Files that must be skipped
 	$self->{CACHED} = {};
 
@@ -123,8 +119,6 @@ sub new {
 	return $self;
 }
 
-sub universe { $_[0]->{universe} }
-
 # Returns the Directory Panel object reference
 sub parent {
 	$_[0]->GetParent;
@@ -162,6 +156,8 @@ sub refresh {
 	#$_update_subdirs( $self, $root );
 }
 
+sub plugin { Padre::Plugin::Swarm->instance }
+
 # Updates root nodes data to the current project
 # Called when turned beteween projects
 use Data::Dumper;
@@ -173,7 +169,7 @@ sub _update_root_data {
 	my $root = $self->GetRootItem;
 	$self->DeleteChildren($root);
 	my $data = $self->GetPlData($root);
-	my $geo = $self->universe->geometry;
+	my $geo = $self->plugin->geometry;
 	foreach my $user ( $geo->get_users ) {
 		my $user_node = 
 			$self->AppendItem( $root, $user , -1 , -1 ,
@@ -257,7 +253,7 @@ sub _on_tree_item_activated {
 	
 	if ($node_data->{type} eq 'editor' ) {
 		## Another FIXME!
-		$self->universe->send(
+		$self->plugin->global->transport->send(
 			{ type=>'gimme',
 			  resource => $node_data->{resource} }
 		);

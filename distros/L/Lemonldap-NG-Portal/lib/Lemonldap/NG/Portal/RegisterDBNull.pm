@@ -8,10 +8,10 @@ package Lemonldap::NG::Portal::RegisterDBNull;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.1';
 
 sub getLogin {
-    my $self = splice @_;
+    my $self = @_;
     $self->{registerInfo}->{login} = "";
     return PE_OK;
 }

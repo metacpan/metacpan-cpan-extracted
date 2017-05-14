@@ -1,0 +1,25 @@
+# This file tests the default macro
+
+# test numbers
+!default num1
+!default num2 42
+Variable num1 is [[num1]].
+Variable num2 is [[num2]].
+
+# test strings
+!default str1 "My favorite station"
+!default str2 "Hello world"
+Variable str1 is [[str1]].
+Variable str2 is [[str2]].
+
+# test expressions
+!default num3 42 * 2 / 3
+!default str3 'AA-' . &Var("str1") . '-ZZ'
+Variable num3 is [[num3]].
+Variable str3 is [[str3]].
+
+# test re-definition
+!default num2 24
+!default str2 str3
+Variable num2 is [[num2]].
+Variable str2 is [[str2]].

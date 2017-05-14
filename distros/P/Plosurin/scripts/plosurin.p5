@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
-use v5.12;
+use v5.10;
 use Data::Dumper;
 use IO::File;
 use Plosurin;
@@ -40,7 +40,7 @@ if ( $mode eq 'web' ) {
 
     #check if web server mode
     my $srv = new HTTP::Server::Simple::WebDAO::($port);
-    $srv->set_config( wdEngine => "Plosurin::HTTP", wdDebug => 3 );
+    $srv->set_config( wdEngine => "Plosurin::HTTP", wdDebug => 1 );
     $srv->run();
 }
 else {
@@ -54,6 +54,8 @@ else {
     }
     my $in;
     { local $/; undef $/; $in = <$in_fd> };
+    utf8::decode( $in ) unless utf8::is_utf8( $in );
+
     my $p = new Plosurin::;
     my $nodes = $p->parse( $in, $infile // "STDIN" );
     die "Can't parse $infile" unless $nodes;

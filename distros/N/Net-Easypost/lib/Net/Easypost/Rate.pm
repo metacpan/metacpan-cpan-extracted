@@ -1,5 +1,5 @@
 package Net::Easypost::Rate;
-$Net::Easypost::Rate::VERSION = '0.18';
+$Net::Easypost::Rate::VERSION = '0.19';
 use Moo;
 with qw(Net::Easypost::Resource);
 
@@ -50,7 +50,7 @@ Net::Easypost::Rate
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 NAME 
 

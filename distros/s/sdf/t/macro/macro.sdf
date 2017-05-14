@@ -1,0 +1,18 @@
+# This file tests the macro macro
+
+H1: A heading before macro definition
+
+!macro abc
+This is some text with
+several lines in
+it.
+
+And a few
+more.
+!endmacro
+
+H1: A heading after macro definition
+
+!abc
+
+The end.

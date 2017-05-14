@@ -1,0 +1,156 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Document styles</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_gsgen.html">Previous Topic</A> | <A HREF="in_title.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.5. Document styles</H1>
+<HR>
+<H2><A NAME="Changing the style">1.5.1. Changing the style</A></H2>
+<P>The general style (or type) of a document can be changed by initialising the OPT_STYLE variable on the top line of a document. For example:</P>
+<PRE>
+   !init OPT_STYLE=&quot;manual&quot;
+</PRE>
+<P>Alternatively, <A HREF="../ref/sdf.html">sdf</A>'s -s option can be used. For example:</P>
+<PRE>
+   sdf -2ps -smanual mydoc
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The -s option overrides the <A HREF="../ref/minit.html">init</A> macro setting.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Available styles">1.5.2. Available styles</A></H2>
+<P>The available document styles, grouped by <EM>style category</EM>, are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Style</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>General:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+document
+</TD>
+<TD>
+a normal document
+</TD>
+</TR>
+<TR>
+<TD>
+manual
+</TD>
+<TD>
+a manual
+</TD>
+</TR>
+<TR>
+<TD>
+paper
+</TD>
+<TD>
+a technical paper
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Administration:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+admin
+</TD>
+<TD>
+generic administration document
+</TD>
+</TR>
+<TR>
+<TD>
+fax
+</TD>
+<TD>
+a fascimile
+</TD>
+</TR>
+<TR>
+<TD>
+memo
+</TD>
+<TD>
+a memorandum
+</TD>
+</TR>
+<TR>
+<TD>
+newslttr
+</TD>
+<TD>
+a newsletter
+</TD>
+</TR>
+<TR>
+<TD>
+minutes
+</TD>
+<TD>
+minutes of a meeting
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Miscellaneous:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+listing
+</TD>
+<TD>
+a source code listing
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Building a title">1.5.3. Building a title</A></H2>
+<P>Each style category has a different way of building a title section:</P>
+<UL>
+<LI><EM>general</EM> styles use the <A HREF="../ref/mbuild_t.html">build_title</A> macro
+<LI><EM>administration</EM> styles use the <A HREF="../ref/ftitle.html">title</A> filter
+<LI><EM>miscellaneous</EM> styles do not have a title.</UL>
+<HR>
+<H2><A NAME="Creating new styles">1.5.4. Creating new styles</A></H2>
+<P>It is relatively simple to create new styles by inheriting details from an existing one.</P>
+<P>Refer to the <A HREF="../guru/gg_sdf.html">SDF Guru Guide</A> for details.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_start.html">Parent Topic</A> | <A HREF="in_gsgen.html">Previous Topic</A> | <A HREF="in_title.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

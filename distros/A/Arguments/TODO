@@ -1,0 +1,7 @@
+Version 0.2:
+* Tie type-checking of prototypes and attributes.
+* Support for non-scalar prototypes (e.g., sub (\@)).
+* Support for optional prototypes (e.g., sub ($;$)).
+* Support for list prototypes (e.g., sub (%)).
+* Generate prototype declarations from the attributes.
+* Tests.

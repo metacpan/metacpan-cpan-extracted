@@ -1,0 +1,22 @@
+
+This is a real simple module that let's you make special variables that 
+contain both a numeric and text part. (Like $!.)
+
+Usage:
+
+	use SetDualVar;
+
+	SetDualVar $x, "hello", 4.12;
+
+	print $x+1,"\n",$x.'|',"\n";
+	
+	
+You may do whatever you like with this code. I, the author, Kenneth
+Albanowski, hereby release all of the files included in this module
+to the public domain.
+
+--
+Kenneth Albanowski (kjahds@kjahds.com, CIS: 70705,126)
+
+	
+ 

@@ -1,0 +1,64 @@
+
+
+README
+
+This is the README file for MyLibrary version 3.x.
+
+MyLibrary is a true digital library framework and toolbox. Using
+MyLibrary is more than possible to:
+
+  * create dynamic Web pages against the underlying content
+  * create sets of personal "my library" pages akin to My Yahoo,
+    iGoogle, etc.
+  * do inventories of your collection
+  * do manual data-entry into the system
+  * import MARC data into the system
+  * import OAI-accessible data into this system
+  * index the content and facilitate a search this site feature
+  * syndicate content to your institution-wide portal
+  * write reports against the system in the form of browsable
+    (subject, title, format, etc.) lists
+
+The system is made up of essentially four modules. One to manage
+information resources. One to manage people. One to manage librarians.
+One to manage a facet/term ontology creating relationships between
+items #1, #2, and #3. By doing so a MyLibrary system is expected to
+allow people to create their "my library" and do all the things
+increasingly expected from information systems such as Find More Like
+This, People Who Used This Also Used That, The Most Popular Item Is,
+Review, Annotate, Share...  MyLibrary is a set of tools enabling the
+creation of things like My Yahoo, iGoogle, etc.
+
+From a technical point of view, MyLibrary is as set of object-oriented
+Perl modules designed to facilitate I/O against a specific, underlying
+database structure. Each module provides the usual get and set methods
+as well as a number of find methods facilitating retrieval of data. Once
+the data is retrieved the developer is expected to loop through the set
+and export the data in the needed format: HTML, XML, plain text, etc.
+
+Consult the POD documentation/tutorial for instructions on creating
+your first MyLibrary:
+
+  perldoc MyLibrary::Tutorial
+
+Visit the MyLibrary home page where you will find sample scripts,
+applications, and more documentation:
+
+  http://dewey.library.nd.edu/mylibrary/
+  
+MyLibrary is distributed as open source software under the GNU Public
+License.
+
+Thank you for using MyLibrary!
+
+-- 
+Eric Lease Morgan <emorgan@nd.edu>
+University Libraries of Notre Dame
+Notre Dame, IN 46556
+
+Robert Fox <rfox2@nd.edu>
+University Libraries of Notre Dame
+Notre Dame, IN 46556
+
+June 25, 2007
+

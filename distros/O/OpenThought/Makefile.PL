@@ -1,34 +1,36 @@
-# Makefile.PL for OpenThought                            http://openthought.net
-# ---------------------------                           eric at openthought.net
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
 
-use lib "./dist";
-use inc::Module::Install;
+use lib 'inc';
+#use ExtUtils::AutoInstall (
+#    'Dependencies for the Demo Application (optional)' => [
+#        'Apache::Session'     => '',
+#        'HTML::Template'      => '',
+#    ],
+#);
 
-name         ('OpenThought');
-abstract     ('Build web pages which do not require the page to reload');
-author       ('Eric Andreychek <eric@openthought.net>');
-license      ('gpl');
-version_from ('lib/OpenThought.pm');
+require ExtUtils::AutoInstall;
 
-include( 'File::NCopy'           => '0' );
-include( 'Text::Template'        => '0' );
-include( 'ExtUtils::AutoInstall' => '0.40' );
+my @version;
+if($] >= 5.00503) {
+    push @version, "Dependencies for version/api checks, could make upgrades less painful (optional)";
+    push @version, [ -default => 0, 'version' => '', 'version::Limit' => '0.03' ];
+}
 
-requires(
-      'Test::Harness'         => '2.0',
-      'Test::More'            => '0.47',
-      'File::Spec'            => '0.82',
-      'HTML::Template'        => '2.2',
-      'OpenThought::XML2Hash' => '0.57',
-      'OpenPlugin'            => '0.11',
+ExtUtils::AutoInstall->import(
+    'Dependencies for the Demo Application (optional)' => [
+        'Apache::Session'     => '',
+        'HTML::Template'      => '',
+    ],
+    @version,
 );
 
-
-&OpenThought->config();
-
-check_nmake();      # check and download nmake.exe for Win32
-
-&AutoInstall->run;
-&Makefile->write;
-
+WriteMakefile(
+    NAME                => 'OpenThought',
+    DISTNAME            => 'OpenThought',
+    AUTHOR              => 'Eric Andreychek <eric@openthought.net>',
+    VERSION_FROM        => 'lib/OpenThought.pm',
+    ABSTRACT_FROM       => 'lib/OpenThought.pm',
+);
 

@@ -1,0 +1,461 @@
+=head1 NAME
+
+Fame - Perl5 access to FAME
+
+=head1 SYNOPSIS
+
+   use Fame;
+
+   [$X =] tie %hash, Fame::DB, $dbname|$mode...
+
+   @data=@{$hash{"object:1jan80:31dec81"}}
+
+   untie %hash
+
+   &Fame::HLI::cfmddes($status,$dbkey,$desc);
+
+   print "error" if $status != &Fame::HLI::HSUCC;
+
+   $db = new Fame::DB $dbname|$mode...;
+
+   @data = $db->Read($name, $start, $end);
+
+   $db->Write($name, $start, @data);
+
+   $interp = new Fame::LANG;
+
+   $interp->command('open <access read> "db"');
+
+   @profit = $interp->exec('revenue.qtr - sales.qtr');
+
+
+=head1 SUMMARY
+
+=over 4
+
+=item 1.  
+
+All but 6 C HLI 7.7 functions are fully implemented in native perl
+code.  Not implemented: cfmlsts, cfmrdfa, cfmrrng, cfmrsts, cfmwrng,
+cfmwsts.
+
+=item 2.
+
+For implementations with the FRB extensions, all hli_* functions are
+implemented fully.  famedbpath is also implemented.
+
+=item 3.
+
+New perl-like functions have been added (see FAME Utilities).  These
+provide an interface to TIE and the FAME interpreter.
+
+=item 4.
+
+Values of hli.h are available.
+
+=back
+
+=head1 DESCRIPTION
+
+This is a long section.  The first part describes essential FAME hli.h
+macros.  The second part, TIE, deals with the TIEHASH mechanism for
+accessing FAME data.  The next part deals with high level functions
+for reading and writing.  Following is a short description about
+accessing the FAME interpreter. The next parts deal with more direct
+control of the C HLI.  Familiarity with the C HLI is assumed in this
+last part.
+
+Three subpackages are defined by this package:
+
+=over 4
+
+=item Fame::HLI 
+
+Includes almost all the CHLI functions as well as some simple
+utilities.
+
+=item Fame::DB 
+
+Includes a TIE interface using the Fame::HLI package, as well a
+high-level object-oriented functions for reading and writing data.
+
+=item Fame::LANG
+
+Provides a simple object-oriented way to run programs, commands, and
+functions in the FAME 4GL language.  It uses the Fame::HLI package.
+
+=back
+
+
+=head2 HLI.H
+
+Values of hli.h are accessed by adding "&Fame::HLI::" in front of the
+name.  Thus, HDAILY becomes &Fame::HLI::HDAILY.
+
+
+=head2 TIE
+
+You can use the Perl TIEHASH mechanism for accessing most of the FAME
+database features.  Unlike with Fame, the default open mode is
+read-only.  First, open the databases with the tie command:
+
+   tie(%db, Fame::DB, "prices", "orders");
+
+You may specify a fame open mode by using it before the databases for
+which the mode should be used:
+
+   tie(%db, Fame::DB, &Fame::HUMODE, "prices");
+
+Instead of listing the databse names, you may also specify a reference
+to an array.  Either way, the new hash is tied to all the opened
+databases so that they are searched for objects in the order
+specified.
+
+Data is read by indexing the hash (%db in our example) using the
+object name and an optional start and end date.  The index is the
+object name followed by a ":", the start date, a ",", and the end
+date.  However, only the object name is required.  When accessed this
+way, the hash returns a reference to an array so it must be
+indirected.  For example
+
+   @{$db{"ibm:1jun95,31jun95"}}
+
+will return an array containing the values of "ibm" from 1jun95 to
+31jun95.  Note the use of the @{} construct which returns the values
+of a reference.  The dates must be in a format consistent with the
+frequency of the object ("ibm"), which in this case is daily.
+
+Likewise, to write values to the database, assign the hash to an
+array reference.  For example
+
+   $db{"ibm:1jun95"} = [1,4,6];
+
+will write out the numbers 1, 4, and 6 starting at date 1jun95.
+fameperl will write the given number of elements starting at the given
+date.  You may specify an end date, but it will be silently ignored.
+This construct will only write data to existing data object.  To
+create objects, you must use the C HLI routines or the functions
+described below.
+
+Hash functions, like "each" and "keys" will work by performing a
+wildcard lookup on the database.  The variable $Fame::DB::WILD
+contains a string with the FAME wildcard specification (default "?").
+
+There are certain variables in the Fame::DB package which are used as
+defaults by some Fame::DB functions.  $Fame::DB::FREQ contains the
+default frequency code.  This code can be one of the valid HLI
+frequency codes such as &Fame::HLI::HDAILY.  The following data items
+similarly can take on any valid and appropriate HLI code.
+$Fame::DB::TYPE contains the default data type.  $Fame::DB::BASIS
+contains the default basis attribute.  $Fame::DB::OBSERVED contains
+the default observed attribute.  $Fame::DB::CLASS is the default
+class.
+
+
+=head2 FUNCTIONS
+
+There are several high level functions for reading, writing and
+creating data object.  These functions can be used as both normal
+function calls and object-oriented calls.  They are summarized below.
+The first function opens a database using the same syntax as the tie
+command.
+
+ $ref = &Fame::DB::new($db_path|$db_mode...)
+    $db_path  database path
+    $db_mode  access mode from Fame::HLI
+
+An alternative syntax for the Fame::DB::new syntax is
+
+  $ref = new Fame::DB $db_path|$db_mode;
+
+There are also two other functions for adding databases to an
+existing object.
+
+  $ref->append($db_path|$db_mode...);
+
+or
+
+  $ref->append_db($dbkey...)
+
+The following functions take as their first parameter either a
+reference to array of databases as returned by Fame::DB::new or a
+single database key number.
+
+ @val = &Fame::DB::Read($db, $name, $start, $end)
+    @val    array of values read
+    $db     database key (or $ref)
+    $name   string object name
+    $start  start string date
+    $end    end string date
+
+.
+
+ &Fame::DB::Write($db, $name, $start, @val)
+    $db     database key (or $ref)
+    $name   string object name
+    $start  start string date
+    @val    array of values to store
+
+.
+
+ &Fame::DB::Create($db, $name [, $class, $freq, $type, $basis, $obs])
+    $db     database key (or $ref)
+    $name   object name
+ The following are optional:
+    $class  class code
+    $freq   frequency code
+    $type   object type
+    $basis  basis attribute
+    $obs    observed attribute
+
+An alternative object-oriented syntax for all of the above functions
+would be:
+
+  @data = $ref->Read($name, $start, $end);
+
+where $ref is an object of type Fame::HLI which would usually be
+initialized by
+
+  $ref = new Fame::DB $dbname;
+
+
+=head2 FAME 4GL
+
+There is also a simple object-oriented interface to the FAME 4GL
+language using the HLI FAME/Server HLI functions.  There are several
+methods for doing this in Fame::LANG.
+
+=over 4
+
+=item $x = new Fame::LANG
+
+Create a new LANG object and open the work database.
+
+=item $x->command($cmd)
+
+Execute the command $cmd.  If the command is more than one line long,
+all lines except the last one must be followed by "&&", the FAME
+line-continuation string.
+
+=item $x->exec($fxn)
+
+Execute the given function and return an array (not a scalar) of the
+results.
+
+=item $x->inp($file)
+
+Input the lines file named $file (this file should follow the "&&"
+line-continuation standard) and execute the commands with command().
+Note that you cannot use $x->command("inp file").  FAME will ignore
+this command.
+
+=item $x->destroy
+
+Close the work database and remove the LANG object.
+
+=item $x->{status}
+
+The HLI status of the last command.
+
+=item $x->{workdb}
+
+The HLI database key for the work database.
+
+=back
+
+
+=head2 C HLI
+
+The Fame::HLI package includes almost all of the C HLI functions available
+form Fame.  The typical C HLI function is translated directly to perl.  For
+example, to call cfmddes from C HLI, you would use:
+
+   cfmddes(&status,dbkey,desc);
+
+In fameperl, you would use:
+
+   &Fame::HLI::cfmddes($status,$dbkey,$desc);
+
+Perl makes no distinction between pointers and values.  Thus, all
+variables (whether output or input) are specified the same way.  Perl
+takes care of modifying those values it has to modify.
+
+
+=head2 SPECIAL FUNCTIONS
+
+There are exceptions.  Functions which use a range (or other array
+with a limited and fixed length) are called with one variable for
+every array element.  Thus, cfmsrng would be called from C as:
+
+   cfmsrng(&status,freq,&sy,&sp,&ey,&ep,range,&numobs);
+
+From perl, each element of range must be specified.  Thus, you would
+use the following:
+
+   &Fame::HLI::cfmsrng($status,$freq,$sy,$sp,$ey,$ep,
+                       $range1,$range2,$range3,$numobs);
+
+The functions which require this type of array expansion are: cfmrstr,
+cfmsbm, cfmsfis, cfmsnm, cfmspm, cfmwstr.
+
+Some functions have not been implemented.  See Summary for a list.
+
+
+=head2 UTILITY FUNCTIONS
+
+There are several functions which assist perl users in rapidly getting
+and updating FAME data.  Most of the C HLI functions that write or
+read data are not implemented.  In their place, you should use the
+functions described in this section.
+
+When missing value translation is not specified, missing values are
+returned as string "NA", "ND", "NC" if the values are numeric; this
+will evaluate to a zero in a numeric context.  For strings, "" is
+returned.
+
+=over 4
+
+=item $dbkey = &Fame::HLI::fameopen($name);
+
+=item $dbkey = &Fame::HLI::fameopen($name,$mode);
+
+Open a FAME database.  First, look at the FAME databse directory as
+given by famedbpath.  If the database is not there, then try to open
+it in the current directory.  Returns -1 on error.
+
+
+=item &Fame::HLI::fameclose($dbkey);
+
+Close database.
+
+
+=item $type = &Fame::HLI::famegettype($dbkey,$objnam);
+
+Get an object's type.
+	
+
+=item $freq = &Fame::HLI::famegetfreq($dbkey,$objnam);
+
+Get an object's frequency.
+
+
+=item @list = $Fame::HLI::famegetinfo($dbkey,$objnam);
+
+Get info (as returned by cfmwhat) with:
+
+     ($class,$type,$freq,$basis,$observ,$fyear,$fprd,
+      $lyear,$lprd,$cyear,$cmonth,$cday,$myear,$mmonth,
+      $mday,$desc,$doc) = @list
+
+The following table describes the order of your parameters for easy
+reference in an array context:
+
+       Name             #
+       ------------    ---
+       class            0
+       type             1
+       freq             2
+       basis            3
+       observed         4
+       first year       5
+       first period     6
+       last year        7
+       last period      8
+       create year      9
+       create month    10
+       create day      11
+       modify year     12
+       modify month    13
+       modify day      14
+       description     15
+       documentation   16
+
+
+=item @data = &Fame::HLI::fameread($dbkey,$objnam,$syear,$sprd,$eyear,$eprd);
+
+Read data for the given range of dates.  Returns undef if there's
+a problem (the $Fame::HLI:status variable should be set with the
+error code).
+
+
+=item @data = &Fame::HLI::famereadn($dbkey,$objnam,$numobs,@r,@m);
+
+   @r=($range1,$range2,$range3);
+
+   @m=($tmiss,$mistt1,$mistt2,$mistt3);
+
+Read a given number of value starting with the values of a given
+range.  Get the rangex values with the functions cfmsrng, cfmsfix.
+This function will read the whole range of values, but only store
+numobs of them.  You can get the value of numobs when setting the
+range.  The missing value variables must contain data even if no
+translation is being done.
+
+
+=item &Fame::HLI::famewrite($dbkey,$objnam,$year,$prd,@list);
+
+Writes out all the elements of @list into the object staring with the
+given date.  Returns error status if failed; 0 if sucessful.\n;
+
+=back
+
+
+=head2 ERRORS
+
+Errors in the utility functions are generally not reported.  However,
+an empty list or undef returned from a function call generally means
+there is an error.  You can also check the variable Fame::HLI::status
+which returns the HLI status code for the last HLI function that was
+executed by a utility function.  This value is not affected by calling
+HLI functions directly from perl (such as "&cfmini($s)").
+
+
+=head2 NOTES
+
+=over 4
+
+=item 1.
+
+The source code is written in Perl, C and CLI (a common language
+interface).  It does not use the standard Perl 5 extension macro
+language "xs" because the code was originally written for both Perl 4
+and Tcl.  Because it uses CLI, a lot of the code is the same for both
+interfaces.
+
+=item 2.
+
+FAME is a registered trademark of Fame Information Services.  Neither
+this program nor its author are associated with Fame Information
+Services, nor does the author guarantee this software in any way.
+This software is derived from public domain work done at the Federal
+Reserve Board, Washington, DC.
+
+=item 3.
+
+Everything except the Fame::HLI component is Copyright 1995-1997 by
+Fernando Trias.  Parts of the Fame::HLI component are also Copyright
+1995 by Fernando Trias.  These are marked as such.
+
+=back
+
+
+=head1 BUGS
+
+There's an object symbolic name inconsistency between the Fame C HLI
+library and the perl executable.  Both have an symbol named "Error".
+You may have to edit the perl executable and change all occurrences of
+"Error" to something like "ErroX"; the Makefile includes a line for
+doing this automatically (make patchperl).  Alternatively, you can
+try to edit the Fame dynamic libarary file in the same way.
+
+Fame also handles some functions as #define's in hli.h.  This is not
+the best coding practice, since it confuses the linking process. I
+cannot guarantee that further versions of Fame will not do this also
+and possibly affect this extension.
+
+=head1 AUTHOR
+
+ Fernando Trias
+ ftrias@bigfoot.com
+
+=cut

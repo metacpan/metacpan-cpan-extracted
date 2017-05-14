@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/POE/Component/Pastebin/Create.pm
+t/00-load.t

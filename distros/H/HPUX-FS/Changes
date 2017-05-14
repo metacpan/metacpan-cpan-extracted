@@ -1,0 +1,10 @@
+Revision history for Perl extension HPUX::FS.
+
+0.01  Tue Nov 20 15:47:29 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n HPUX::FS
+0.02
+0.03
+0.04	Updated hp_disk_info.cgi's postscript routines
+	added hp_disk_info_text.pl to contrib dir
+

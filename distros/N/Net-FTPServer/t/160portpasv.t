@@ -1,17 +1,9 @@
-#!/usr/bin/perl -w
-
-# $Id: 160portpasv.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 41;
 use POSIX qw(dup2);
 use IO::Handle;
 use IO::Socket;
 use FileHandle;
-
-BEGIN {
-  plan tests => 41;
-}
 
 use Net::FTPServer::InMem::Server;
 
@@ -148,3 +140,5 @@ for (my $pass = 1; $pass <= 3; ++$pass)
 
 print OUTFD0 "QUIT\r\n";
 $_ = <INFD1>;
+
+__END__

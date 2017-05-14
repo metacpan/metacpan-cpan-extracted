@@ -8,7 +8,7 @@ use GSM::SMS::Spool;
 use GSM::SMS::TransportRouterFactory;
 use Log::Agent;
 
-$VERSION = '0.13';
+$VERSION = "0.161";
 
 =head1 NAME
 

@@ -2,11 +2,14 @@
 
 =head1 NAME
 
-Bio::BPWrapper::SeqManipulations - Functions for bioseq
+Bio::BPWrapper::SeqManipulations - Functions for L<bioseq>
 
 =head1 SYNOPSIS
 
-    require Bio::BPWrapper::SeqManipulations;
+    use Bio::BPWrapper::SeqManipulations;
+    # Set options hash ...
+    initialize(\%opts);
+    write_out(\%opts);
 
 =cut
 
@@ -31,15 +34,13 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 @ISA         = qw(Exporter);
 
-# FIXME: some of these might be put in
-# a common routine like print_version
 @EXPORT      = qw(initialize can_handle handle_opt write_out
 print_composition filter_seqs retrieve_seqs remove_gaps
 print_lengths print_seq_count make_revcom
-print_subseq restrict_digets anonymize
+print_subseq restrict_digest anonymize
 shred_seq count_codons print_gb_gene_feats
 count_leading_gaps hydroB linearize reloop_at
-print_version remove_stop parse_orders find_by_order
+remove_stop parse_orders find_by_order
 pick_by_order del_by_order find_by_id
 pick_by_id del_by_id find_by_re
 pick_by_re del_by_re
@@ -48,7 +49,8 @@ del_by_length);
 
 # Package global variables
 my ($in, $out, $seq, %opts, $filename, $in_format, $out_format);
-my $RELEASE = '1.0';
+use Bio::BPWrapper;
+my $VERSION = '1.0';
 
 ## For new options, just add an entry into this table with the same key as in
 ## the GetOpts function in the main program. Make the key be a reference to the handler subroutine (defined below), and test that it works.
@@ -106,9 +108,23 @@ my %filter_dispatch = (
 ## TODO Function documentation!
 ## TODO Formal testing!
 
+=head1 SUBROUTINES
+
+=head2 initialize()
+
+Sets up most of the actions to be performed on an alignment.
+
+Call this right after setting up an options hash.
+
+Sets package variables: C<$in>, C<$in_format>, C<$filename>, C<$out_format>, and C<$out>.
+
+
+=cut
+
 sub initialize {
-    my $val = shift;
-    %opts = %{$val};
+    my $opts_ref = shift;
+    Bio::BPWrapper::common_opts($opts_ref);
+    %opts = %{$opts_ref};
 
     die "Option 'prefix' requires a value\n" if defined $opts{"prefix"} && $opts{"prefix"} =~ /^$/;
 
@@ -133,6 +149,14 @@ sub handle_opt {
     my $option = shift;
     $opt_dispatch{$option}->($option)  # This passes option name to all functions
 }
+
+=head2 write_out()
+
+Writes out the sequence file.
+
+Call this after calling C<#initialize(\%opts)> and processing those options.
+
+=cut
 
 sub write_out {
     while ($seq = $in->next_seq()) { $out->write_seq($seq) }
@@ -227,6 +251,13 @@ sub filter_seqs {
     }
 }
 
+=head2 retrieve_seqs()
+
+Retrieves a sequence from GenBank using the provided accession
+number. A wrapper for C<L<Bio::DB::GenBank>E<gt>#get_Seq_by_acc>.
+
+=cut
+
 # To do: add fetch by gi
 sub retrieve_seqs {
     my $gb  = Bio::DB::GenBank->new();
@@ -234,7 +265,13 @@ sub retrieve_seqs {
     $out->write_seq($seq)
 }
 
-sub remove_gaps {    # remove gaps
+=head2 remove_gaps()
+
+Remove gaps
+
+=cut
+
+sub remove_gaps {
     while ($seq = $in->next_seq()) {
         my $string = $seq->seq();
         $string =~ s/-//g;
@@ -243,9 +280,24 @@ sub remove_gaps {    # remove gaps
     }
 }
 
+=head2 print_lengths()
+
+Print all sequence lengths. Wraps
+L<Bio::Seq-E<gt>length|https://metacpan.org/pod/Bio::Seq#length>.
+
+=cut
+
 sub print_lengths {
     while ($seq = $in->next_seq()) { print $seq->id(), "\t", $seq->length(), "\n" }
 }
+
+
+=head2 print_seq_count()
+
+Print all sequence lengths. Wraps
+L<Bio::Seq-E<gt>length|https://metacpan.org/pod/Bio::Seq#length>.
+
+=cut
 
 sub print_seq_count {
     my $count;
@@ -253,12 +305,28 @@ sub print_seq_count {
     print $count, "\n"
 }
 
+=head2 make_revcom()
+
+Reverse complement. Wraps
+L<Bio::Seq-E<gt>revcom()|https://metacpan.org/pod/Bio::Seq#revcom>.
+
+=cut
+
+
 sub make_revcom {    # reverse-complement a sequence
     while ($seq = $in->next_seq()) {
         my $new = Bio::Seq->new(-id  => $seq->id() . ":revcom", -seq => $seq->revcom()->seq());
         $out->write_seq($new)
     }
 }
+
+=head2 print_subseq()
+
+Select substring (of the 1st sequence). Wraps
+L<Bio::Seq-E<gt>subseq()|https://metacpan.org/pod/Bio::Seq#subseq>.
+
+=cut
+
 
 sub print_subseq {
     while ($seq = $in->next_seq()) {
@@ -276,6 +344,18 @@ sub _internal_stop_or_x {
     $str =~ s/\*$//; # remove last stop
     return ($str =~ /[X\*]/) ? 1 : 0; # previously missed double **
 }
+
+=head2 reading_frame_ops
+
+Translate in 1, 3, or 6 frames based on the value of C<$opts> set via
+L<C<#initilize(\%opts)>|/initialize>.  Wraps
+L<Bio::Seq-E<gt>translate()|https://metacpan.org/pod/Bio::Seq#translate>,
+L<Bio::SeqUtils-E<gt>translate_3frames()|https://metacpan.org/pod/Bio::SeqUtils#translate_3frames>,
+and
+L<Bio::SeqUtils-E<gt>translate_6frames()|https://metacpan.org/pod/Bio::SeqUtils#translate_6frames>.
+
+=cut
+
 
 sub reading_frame_ops {
     my $frame = $opts{"translate"};
@@ -297,6 +377,17 @@ sub reading_frame_ops {
     }
 }
 
+=head2 restrict_digest()
+
+Predicted fragments from digestion by a specified restriction enzyme
+specified in C<$opts{restrinct}> set via L<C<#initilize(\%opts)>|/initialize>.
+
+An input file with a single sequence is expected. Wraps
+L<Bio::Restriction::Analysis-E<gt>cut()|https://metacpan.org/pod/Bio::Restriction::Analysis#cut>.
+
+=cut
+
+
 sub restrict_digest {
     my $enz = $opts{"restrict"};
     use Bio::Restriction::Analysis;
@@ -311,6 +402,20 @@ sub restrict_digest {
         $out->write_seq($seq_obj)
     }
 }
+
+=head2 anonymize()
+
+Replace sequence IDs with serial IDs I<n> characters long, as specified in
+C<$opts{'anonymize'}> set via L<C<#initilize(\%opts)>|/initialize>.
+For example if C<$opts{'anonymize'}>, the first ID will be C<S0001>.
+leading 'S' The length of the serial idea
+
+A sed script file is produced with a F<.sed> suffix that may be used
+with sed's C<'-f'> argument. If the filename is F<'-'>, the sed file
+is named C<STDOUT.sed> instead. A message containing the sed filename is
+written to C<STDERR>.
+
+=cut
 
 sub anonymize {
     my $char_len = $opts{"anonymize"} // die "Tried to use option 'preifx' without using option 'anonymize'. Exiting...\n";
@@ -337,6 +442,13 @@ sub anonymize {
     warn "WARNING: Anonymized ID length exceeded requested length: try a different length or prefix.\n" if $length_warn
 }
 
+=head2 shred_seq()
+
+Break into individual sequences writing a FASTA file for each sequence.
+
+=cut
+
+
 sub shred_seq {
     while ($seq = $in->next_seq()) {
         my $newid = $seq->id();
@@ -347,6 +459,14 @@ sub shred_seq {
     }
     exit
 }
+
+=head2 count_codons()
+
+Count codons for coding sequences (e.g., a genome file consisting of
+CDS sequences). Wraps
+L<Bio::Tools::SeqStats-E<gt>count_codons()|https://metacpan.org/pod/Bio::Tools::SeqStats#count_codons>.
+
+=cut
 
 sub count_codons {
     my $new_seq;
@@ -361,6 +481,13 @@ sub count_codons {
         print "%\n"
     }
 }
+
+=head2 print_gb_gene_feats()
+
+print gene sequences in FASTA from a GenBank file of bacterial
+genome. Won't work for a eukaryote genbank file.
+
+=cut
 
 sub print_gb_gene_feats { # works only for prokaryote genome
     $seq = $in->next_seq();
@@ -386,6 +513,12 @@ sub print_gb_gene_feats { # works only for prokaryote genome
     }
 }
 
+=head2 count_leading_gaps()
+
+Count and print the number of leading gaps in each sequence.
+
+=cut
+
 sub count_leading_gaps {
     while ($seq = $in->next_seq()) {
         my $lead_gap = 0;
@@ -399,6 +532,15 @@ sub count_leading_gaps {
     }
 }
 
+=head2 hydroB()
+
+Return the mean Kyte-Doolittle hydropathicity for protein
+sequences. Wraps
+L<Bio::Tools::SeqStats-E<gt>hydropathicity()|https://metacpan.org/pod/Bio::Tools::SeqStats#hydropathicity>.
+
+=cut
+
+
 sub hydroB {
     while ($seq = $in->next_seq()) {
         my $pep_str = $seq->seq();
@@ -409,10 +551,27 @@ sub hydroB {
     }
 }
 
+=head2 linearize()
+
+Linearize FASTA, print one sequence per line.
+
+=cut
+
+
 sub linearize {
     while ($seq = $in->next_seq()) { print $seq->id(),  "\t", $seq->seq(), "\n" }
 }
 
+=head2 reloop_at()
+
+Re-circularize a bacterial genome by starting at a specified position
+given in the C<$opts{"reloop"> set via
+L<C<#initilize(\%opts)>|/initialize>.
+
+For example for sequence "ABCDE".  C<bioseq -R'2' ..>
+would generate"'BCDEA".
+
+=cut
 sub reloop_at {
     my $seq = $in->next_seq;  # only the first sequence
     my $break = $opts{"reloop"};
@@ -420,10 +579,11 @@ sub reloop_at {
     $out->write_seq($new_seq)
 }
 
-sub print_version {
-    say "bp-utils release version: ", $RELEASE;
-    exit
-}
+=head2 remove_stop()
+
+Remove stop codons.
+
+=cut
 
 sub remove_stop {
     my $myCodonTable = Bio::Tools::CodonTable->new();
@@ -580,3 +740,95 @@ sub del_by_length {
 }
 
 1;
+__END__
+
+=head1 EXTENDING THIS MODULE
+
+We encourage BioPerl developers to add command-line interface to their BioPerl methods here.
+
+Here is how to extend.  We'll use option C<--count-codons> as an example.
+
+=over 4
+
+=item *
+Create a new method like one of the above in the previous section.
+
+=item *
+Document your method in pod using C<=head2>. For example:
+
+    =head2 count_codons()
+
+    Count codons for coding sequences (e.g., a genome file consisting of
+    CDS sequences). Wraps
+    L<Bio::Tools::SeqStats-E<gt>count_codons()|https://metacpan.org/pod/Bio::Tools::SeqStats#count_codons>.
+
+    =cut
+
+See L<C<count_codons()>|/count_codons> for how this gets rendered.
+
+
+=item *
+Add the method to C<@EXPORT> list in C<SeqManipulations.pm>.
+
+=item *
+Add option to C<%opt_displatch> which maps the option used in C<bioaln> to the subroutine that
+gets called here. For example:
+
+   'count-codons' => \&count_codons,
+
+=item *
+Add option in to C<bioseq> script. See the code that starts:
+
+    GetOptions(
+    ...
+    "count-codons|C",
+    ...
+
+This option has a short option name C<C> and takes no additional argument. See L<Getopt::Long> for how to specify options.
+
+=item *
+Write a test for the option. See the file C<t/10test-bioseq.t> and L<Testing|https://github.com/bioperl/p5-bpwrapper/wiki/Testing>.
+
+=item *
+Share back. Create a pull request to the github repository and contact
+Weigang Qiu, City University of New York, Hunter College (L<mailto:weigang@genectr.hunter.cuny.edu>)
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<bioaseq>: command-line tool for using this
+
+=item *
+
+L<Qui Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+
+=item *
+
+L<Github project wiki page|https://github.com/bioperl/p5-bpwrapper/wiki>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item  *
+Yözen Hernández yzhernand at gmail dot com
+
+=item *
+Pedro Pegan
+
+=item  *
+L<Weigang Qiu | mailto:weigang@genectr.hunter.cuny.edu> (Maintainer)
+
+=item *
+Rocky Bernstein
+
+=back
+
+=cut

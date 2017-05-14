@@ -1,0 +1,27 @@
+#title <strike>Deleted</strike> ok <strike>Deleted</strike> ok
+#author <strike>Deleted</strike> ok <strike>Deleted</strike> ok
+#source <strike>Source</strike> ok <strike>Deleted</strike> ok
+#lang en
+#slides on
+
+* <strike>Part</strike>
+
+** <strike>Chapter</strike>
+
+*** <strike>Section</strike>
+
+**** <strike>Subsection</strike>
+
+***** <strike>subsubsection</strike>
+
+<strike>Source</strike> ok <strike>Deleted this is a quite very long
+text which was deleted without mercy</strike> ok.
+
+ In a table | <strike>Source</strike> ok <strike>Deleted this is a quite very long</strike>
+
+In <strike>footnote</strike> [1]
+
+[1] <strike>Source</strike> ok <strike>Deleted this is a quite very long
+text which was deleted without mercy</strike> ok.
+
+[[link][Even in link <strike>Source</strike>]]

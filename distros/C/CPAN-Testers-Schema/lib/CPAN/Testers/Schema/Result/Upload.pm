@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Upload;
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 # ABSTRACT: Information about uploads to CPAN
 
 #pod =head1 SYNOPSIS
@@ -35,24 +35,12 @@ our $VERSION = '0.005';
 #pod determine which packages were authorized and indexed by PAUSE for
 #pod installation by CPAN clients.
 #pod
+#pod This data is read directly from the local CPAN mirror by
+#pod L<CPAN::Testers::Data::Uploads> and written to this table.
+#pod
 #pod =head1 SEE ALSO
 #pod
-#pod =over 4
-#pod
-#pod =item L<DBIx::Class::Row>
-#pod
-#pod =item L<CPAN::Testers::Schema>
-#pod
-#pod =item L<CPAN::Testers::Data::Uploads>
-#pod
-#pod This module processes the data and writes to this table.
-#pod
-#pod =item L<http://github.com/cpan-testers/cpantesters-project>
-#pod
-#pod For an overview of how the CPANTesters project works, and for
-#pod information about project goals and to get involved.
-#pod
-#pod =back
+#pod L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 #pod
 #pod =cut
 
@@ -68,6 +56,7 @@ table 'uploads';
 
 primary_column uploadid => {
     data_type => 'int',
+    extra     => { unsigned => 1 },
     is_auto_increment => 1,
     is_nullable => 0,
 };
@@ -213,7 +202,7 @@ CPAN::Testers::Schema::Result::Upload - Information about uploads to CPAN
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -246,6 +235,9 @@ with the same name, distribution, and version, there may be duplicate
 C<< dist => version >> pairs in this table. This table does not
 determine which packages were authorized and indexed by PAUSE for
 installation by CPAN clients.
+
+This data is read directly from the local CPAN mirror by
+L<CPAN::Testers::Data::Uploads> and written to this table.
 
 =head1 ATTRIBUTES
 
@@ -302,22 +294,7 @@ Inflated from a UNIX epoch into a L<DateTime> object.
 
 =head1 SEE ALSO
 
-=over 4
-
-=item L<DBIx::Class::Row>
-
-=item L<CPAN::Testers::Schema>
-
-=item L<CPAN::Testers::Data::Uploads>
-
-This module processes the data and writes to this table.
-
-=item L<http://github.com/cpan-testers/cpantesters-project>
-
-For an overview of how the CPANTesters project works, and for
-information about project goals and to get involved.
-
-=back
+L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
 =head1 AUTHORS
 

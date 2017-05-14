@@ -1,0 +1,276 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Custom Formatting</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_event.html">Previous Topic</A> | <A HREF="in_hyper.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.6. Custom Formatting</H1>
+<HR>
+<H2><A NAME="Overview">6.6.1. Overview</A></H2>
+<P>One of the nice things about <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> is that system administrators can control the formatting of documents via templates. This has two major advantages:</P>
+<OL>
+<LI>document authors can focus on content
+<LI>by default, documents have a consistent format.</OL>
+<P>However, there are occasions when authors need to override the default formatting conventions. Custom formatting is supported for documents, paragraphs and phrases.</P>
+<HR>
+<H2><A NAME="Custom Document Formatting">6.6.2. Custom Document Formatting</A></H2>
+<P>Document formatting can be controlled by setting variables. The commonly used ones are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOC
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+table of contents level
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOF
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build a list of figures
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOT
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build a list of tables
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_IX
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build an index
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TWO_SIDES
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+build a two-sided document
+</TD>
+</TR>
+</TABLE>
+
+<P>For example, to create a two-sided document, add this line to your document:</P>
+<PRE>
+  !define DOC_TWO_SIDES
+</PRE>
+<HR>
+<H2><A NAME="Custom Paragraph Formatting">6.6.3. Custom Paragraph Formatting</A></H2>
+<P>Paragraph formatting can be controlled by setting attributes. The commonly used ones are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+label
+</TD>
+<TD>
+prefix label (e.g. Note:)
+</TD>
+</TR>
+<TR>
+<TD>
+top
+</TD>
+<TD>
+either Page (the default), Column, LPage or RPage
+</TD>
+</TR>
+<TR>
+<TD>
+left
+</TD>
+<TD>
+left margin indent (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+first
+</TD>
+<TD>
+first line indent (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+right
+</TD>
+<TD>
+right margin indent (in points)
+</TD>
+</TR>
+<TR>
+<TD>
+justify
+</TD>
+<TD>
+either Full, Left, Right or Center
+</TD>
+</TR>
+</TABLE>
+
+<P>For example, to start a paragraph at the top of a page:</P>
+<PRE>
+ H3[top] Other Issues
+</PRE>
+<P>To indent a paragraph 1 inch from both margins:</P>
+<PRE>
+ [left='1in'; right='1in'] This paragraph will be indented from
+ both margins by 1 inch.
+</PRE>
+<P>The result is:</P>
+<P>This paragraph will be indented from both margins by 1 inch.</P>
+<HR>
+<H2><A NAME="Custom Phrase Formatting">6.6.4. Custom Phrase Formatting</A></H2>
+<P>Phrase formatting can be controlled by setting attributes. The commonly used ones are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+family
+</TD>
+<TD>
+font family
+</TD>
+</TR>
+<TR>
+<TD>
+size
+</TD>
+<TD>
+font size
+</TD>
+</TR>
+<TR>
+<TD>
+color
+</TD>
+<TD>
+text colour
+</TD>
+</TR>
+<TR>
+<TD>
+bold
+</TD>
+<TD>
+enable bold
+</TD>
+</TR>
+<TR>
+<TD>
+italics
+</TD>
+<TD>
+enable italics
+</TD>
+</TR>
+<TR>
+<TD>
+underline
+</TD>
+<TD>
+enable underline
+</TD>
+</TR>
+<TR>
+<TD>
+changed
+</TD>
+<TD>
+enable change bars
+</TD>
+</TR>
+</TABLE>
+
+<P>For example, to change the size of a phrase to 11.5 points:</P>
+<PRE>
+  I love {{N[size=11.5]custom formatting}}.
+</PRE>
+<P>The result is:</P>
+<P>I love custom formatting.</P>
+<HR>
+<H2><A NAME="Applying Phrase Attributes to Paragraphs">6.6.5. Applying Phrase Attributes to Paragraphs</A></H2>
+<P>Phrase attributes can also be used for paragraphs. For example, to add a change bar to a paragraph:</P>
+<PRE>
+  [changed] This paragraph has a change bar.
+</PRE>
+<P>The result is:</P>
+<P>This paragraph has a change bar.</P>
+<HR>
+<H2><A NAME="sdf Blocks">6.6.6. sdf Blocks</A></H2>
+<P>Attributes can be applied to a block of text by using the <A HREF="../ref/fsdf.html">sdf</A> filter. For example:</P>
+<PRE>
+!block sdf; size='8pt'; bold; align='Center'
+This paragraph has custom formatting:
+
+* and so does this.
+!endblock
+</PRE>
+<P>The result is:</P>
+<P ALIGN="Center"><B>This paragraph has custom formatting:</B></P>
+<UL ALIGN="Center">
+<LI><B>and so does this.</B></UL>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_event.html">Previous Topic</A> | <A HREF="in_hyper.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

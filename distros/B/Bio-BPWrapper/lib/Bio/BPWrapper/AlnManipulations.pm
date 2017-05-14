@@ -2,11 +2,14 @@
 
 =head1 NAME
 
-Bio::BPWrapper::AlnManipulations - Functions for bioaln
+Bio::BPWrapper::AlnManipulations - Functions for L<bioaln>
 
 =head1 SYNOPSIS
 
-    require Bio::BPWrapper::AlnManipulations;
+    use Bio::BPWrapper::AlnManipulations;
+    # Set options hash ...
+    initialize(\%opts);
+    write_out(\%opts);
 
 =cut
 
@@ -30,8 +33,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 @ISA         = qw(Exporter);
 
 # FIXME: some of these have too generic names like
-# "upper_case" or "concat". Some things like print_version could be
-# put in a common routine.
+# "upper_case" or "concat".
 @EXPORT      = qw(initialize can_handle handle_opt write_out write_out_paml
 phylip_non_interleaved split_cdhit trim_ends gap_states
 gap_states_matrix print_avp_id bootstrap draw_codon_view del_seqs
@@ -41,13 +43,18 @@ avg_id_by_win concat conserve_blocks get_consensus dns_to_protein
 remove_gapped_cols_in_one_seq colnum_from_residue_pos
 list_ids premute_states protein_to_dna sample_seqs
 shuffle_sites random_slice select_third_sites remove_third_sites
-upper_case print_version );
+upper_case );
 
+use Bio::BPWrapper;
 # Package global variables
 my ($in, $out, $aln, %opts, $file, $in_format, $out_format, @alns, $binary);
-my $RELEASE = '1.0';
 
-## For new options, just add an entry into this table with the same key as in the GetOpts function in the main program. Make the key be a reference to the handler subroutine (defined below), and test that it works.
+my $VERSION = $Bio::BPWrapper::VERSION;
+
+## For new options, just add an entry into this table with the same
+## key as in the GetOpts function in the main program. Make the key be
+## a reference to the handler subroutine (defined below), and test
+## that it works.
 my %opt_dispatch = (
     "avpid" => \&print_avp_id,
     "bootstrap" => \&bootstrap,
@@ -86,13 +93,28 @@ my %opt_dispatch = (
     "phy-nonint" => \&phylip_non_interleaved
    );
 
+
 ##################### initializer & option handlers ###################
 
 ## TODO Formal testing!
 
+=head1 SUBROUTINES
+
+=head2 initialize()
+
+Sets up most of the actions to be performed on an alignment.
+
+Call this right after setting up an options hash.
+
+Sets package variables: C<$in_format>, C<$binary>, C<$out_format>, and C<$out>.
+
+
+=cut
+
 sub initialize {
-    my $val = shift;
-    %opts = %{$val};
+    my $opts_ref = shift;
+    Bio::BPWrapper::common_opts($opts_ref);
+    %opts = %{$opts_ref};
 
     # This is the format that aln-manipulations expects by default
     my $default_format = "clustalw";
@@ -130,13 +152,13 @@ sub handle_opt {
     $opt_dispatch{$option}->($option)
 }
 
-sub write_out {
-    $aln->set_displayname_flat() unless $opts{"noflatname"};
-    if ($out_format eq 'paml') { &write_out_paml($aln) }
-    else { $out->write_aln($aln) }
-}
+=head2 write_out_paml()
 
-sub write_out_paml {
+Writes output in PAML format.
+
+=cut
+
+sub write_out_paml() {
     my @seq;
     my $ct=0;
 
@@ -153,6 +175,33 @@ sub write_out_paml {
 	   print $_->display_id(), "\n";
 	   print $_->seq(), "\n"
     }
+}
+
+=head2 write_out()
+
+Performs the bulk of the alignment actions actions set via
+L<C<initialize(\%opts)>|/initialize> and calls
+L<C<$AlignIO-E<gt>write_aln()>|https://metacpan.org/pod/Bio::AlignIO#write_aln>
+or L<C<write_out_paml()>|/write_out_paml>.
+
+Call this after calling C<#initialize(\%opts)>.
+
+=cut
+
+sub write_out($) {
+
+    my $opts = shift;
+    for my $option (keys %{$opts}) {
+	next if ($option eq 'input') || ($option eq 'output') || ($option eq 'noflatname') || ($option eq 'binary'); # Don't process these options: they are for AlignIO
+
+	if (can_handle($option)) { handle_opt($option) } # If there is a function to handle the current option, execute it
+	else { warn "Missing handler for: $option\n" }
+    }
+
+
+    $aln->set_displayname_flat() unless $opts{"noflatname"};
+    if ($out_format eq 'paml') { &write_out_paml($aln) }
+    else { $out->write_aln($aln) }
 }
 
 sub phylip_non_interleaved {
@@ -410,16 +459,41 @@ sub gap_states_matrix {
     exit;
 }
 
+=head2 print_avp_id
+
+Print the average percent identity of an alignment.
+
+Wraps
+L<Bio::SimpleAlign-E<gt>average_percentage_identity()|https://metacpan.org/pod/Bio::SimpleAlign#average_percentage_identity>.
+
+
+=cut
 
 sub print_avp_id {
-    say $aln->average_percentage_identity();
+    printf "%.4f\n", $aln->average_percentage_identity();
     exit
 }
+
+=head2 boostrap()
+
+Produce a bootstrapped
+alignment. L<Bio::Align::Utilities-E<gt>bootstrap()|https://metacpan.org/pod/Bio::Align::Utilities#bootstrap_replicates>.
+
+=cut
 
 sub bootstrap {
     my $replicates = bootstrap_replicates($aln,1);
     $aln = shift @$replicates
 }
+
+=head2 draw_codon_view()
+
+Print a CLUSTALW-like alignment, but separated by codons. Intended for
+use with DNA sequences. Block-final position numbers are printed at
+the end of every alignment block at the point of wrapping, and
+block-initial counts appear over first nucleotide in a block.
+
+=cut
 
 sub draw_codon_view {
 #    my $aln = shift;
@@ -488,35 +562,99 @@ sub draw_codon_view {
     exit 0
 }
 
+=head2 del_seqs()
+
+Delete sequences based on their id. Option takes a comma-separated list of ids.
+The list of sequences to delete is in C<$opts{"delete"}> which is set via
+L<C<#initilize(\%opts)>|/initialize>
+
+=cut
+
 sub del_seqs {
     _del_or_pick($opts{"delete"}, "remove_seq", 0)
 }
 
+=head2 remove_gaps()
+
+Remove gaps (and returns an de-gapped alignment). Wraps
+L<Bio::SimpleAlign-E<gt>remove_gaps()|https://metacpan.org/pod/Bio::SimpleAlign#remove_gaps>.
+
+=cut
+
 sub remove_gaps {
     $aln = $aln->remove_gaps()
 }
+
+=head2 print_length()
+
+Print alignment length. Wraps L<Bio::SimpleAlign-E<gt>length()|https://metacpan.org/pod/Bio::SimpleAlign#length>.
+
+=cut
 
 sub print_length {
     say $aln->length();
     exit
 }
 
+=head2 print_match()
+
+Go through all columns and change residues identical to the reference
+sequence to be the match character, '.' Wraps
+L<Bio::SimpleAlign-E<gt>match()|https://metacpan.org/pod/Bio::SimpleAlign#match>.
+
+=cut
+
 sub print_match {
     $aln->match()
 }
+
+=head2 print_num_seq()
+
+Print number of sequences in alignment.
+
+=cut
 
 sub print_num_seq {
     say $aln->num_sequences();
     exit
 }
 
+=head2 pick_seqs()
+
+Pick sequences based on their id. Option takes a comma-separated list
+of ids.  The sequences to pick set in C<$opts{"pick"}> which is set via
+L<C<#initilize(\%opts)>|/initialize>.
+
+=cut
+
 sub pick_seqs {
     _del_or_pick($opts{"pick"}, "add_seq", 1)
 }
 
+=head2 change_ref()
+
+Change the reference sequence to be what is in C<$opts{"refseq"}>
+which is set via L<C<#initilize(\%opts)>|/initialize>. Wraps
+L<Bio::SimpleAlign-E<gt>set_new_reference()|https://metacpan.org/pod/Bio::SimpleAlign#set_new_reference>.
+
+=cut
+
 sub change_ref {
     $aln = $aln->set_new_reference($opts{"refseq"})
 }
+
+
+=head2 aln_slice()
+
+Get a slice of the alignment.  The slice is specifiedn
+C<$opts{"slice"}> which is set via L<C<#initilize(\%opts)>|/initialize>.
+
+Wraps
+L<Bio::SimpleAlign-E<gt>slice()|https://metacpan.org/pod/Bio::SimpleAlign#slice>
+with improvements.
+
+=cut
+
 
 sub aln_slice {    # get alignment slice
     my ($begin, $end) = split(/\s*,\s*/, $opts{"slice"});
@@ -528,7 +666,15 @@ sub aln_slice {    # get alignment slice
     $aln = $aln->slice($begin, $end)
 }
 
-sub get_unique {
+=head2 get_unique()
+
+Extract the alignment of unique sequences. Wraps
+L<Bio::SimpleAlign-E<gt>uniq_seq()|https://metacpan.org/pod/Bio::SimpleAlign#uniq_seq>.
+
+=cut
+
+
+sub get_unique() {
     $aln->verbose(1);
     $aln = $aln->uniq_seq();
 }
@@ -548,6 +694,13 @@ sub _has_singleton {
     }
     return 0;
 }
+
+=head2 binary_informative
+
+extract binary and informative sites (for clique): discard constant,
+3/4-states, non-informative
+
+=cut
 
 sub binary_informative {
     my $new_aln = Bio::SimpleAlign->new();
@@ -588,6 +741,11 @@ sub binary_informative {
     $aln = $new_aln
 }
 
+=head2 variable_sites()
+
+Extracts variable sites.
+
+=cut
 sub variable_sites {
     $aln = $aln->remove_gaps();
     my $new_aln = Bio::SimpleAlign->new();
@@ -620,6 +778,15 @@ sub variable_sites {
     $aln = $new_aln
 }
 
+=head2 avg_id_by_win()
+
+Calculate pairwise average sequence difference by windows (overlapping
+windows with fixed step of 1). The window size is set in
+C<$opts{"window"}> which is set via L<C<#initilize(\%opts)>|/initialize>.
+
+=cut
+
+
 sub avg_id_by_win {
     my $window_sz = $opts{"window"};
     for my $i (1 .. ($aln->length() - $window_sz + 1)) {
@@ -629,6 +796,17 @@ sub avg_id_by_win {
     }
     exit
 }
+
+=head2 concat()
+
+Concatenate multiple alignments sharing the same set of unique
+IDs. This is normally used for concatenating individual gene
+alignments of the same set of samples to a single one for making a
+"supertree". Wraps
+L<Bio::Align::UtilitiesE<gt>cat()|https://metacpan.org/pod/Bio::Align::Utilities#cat>.
+
+=cut
+
 
 sub concat {
     $aln = cat(@alns)
@@ -708,6 +886,14 @@ sub get_consensus {
     $aln->add_seq($consense)
 }
 
+=head2 dna_to_protein()
+
+Align CDS sequences according to their corresponding protein
+alignment. Wraps
+L<Bio::Align::Utilities-E<gt>aa_to_dna_aln()|https://metacpan.org/pod/Bio::Align::Utilities#aa_to_dna_aln>.
+
+=cut
+
 sub dna_to_protein {
     $aln = dna_to_aa_aln($aln)
 }
@@ -737,6 +923,12 @@ sub colnum_from_residue_pos {
     print $aln->column_from_residue_number($id, $pos), "\n";
     exit
 }
+
+=head2 list_ids()
+
+List all sequence ids.
+
+=cut
 
 sub list_ids {
     my @ids;
@@ -775,6 +967,14 @@ sub permute_states {
     $aln = $new_aln
 }
 
+=head2 protein_to_dna()
+
+Align CDS sequences according to their corresponding protein
+alignment. Wraps
+L<Bio::Align::Utilities-E<gt>aa_to_dna_aln()https://metacpan.org/pod/Bio::Align::Utilities#aa_to_dna_aln>.
+
+=cut
+
 sub protein_to_dna {
     use Bio::SeqIO;
     my $cds_in = Bio::SeqIO->new(-file=>$opts{pep2dna}, -format=>'fasta');
@@ -782,6 +982,20 @@ sub protein_to_dna {
     while (my $seq = $cds_in->next_seq()) { $CDSs{$seq->display_id()} = $seq }
     $aln = aa_to_dna_aln($aln, \%CDSs);
 }
+
+=head2 sample_seqs()
+
+Picks I<n> random sequences from input alignment and produces a new
+alignment consisting of those sequences.
+
+If n is not given, default is the number of sequences in alignment
+divided by 2, rounded down.
+
+This functionality uses an implementation of Reservoir Sampling, based
+on the algorithm found here:
+http://blogs.msdn.com/b/spt/archive/2008/02/05/reservoir-sampling.aspx
+
+=cut
 
 sub sample_seqs {
     # If option was given with no number, take the integer part of num_sequences/2
@@ -801,6 +1015,15 @@ sub sample_seqs {
     my $tmp_aln = $aln->select_noncont(@sampled);
     $aln = $tmp_aln
 }
+
+=head2 shuffle_sites()
+
+Make a shuffled (not bootstraped) alignment. This operation randomizes
+alignment columns. It is used for testing the signficance of long-runs
+of conserved sites in an alignment (e.g., conserved intergenic spacers
+[IGSs]).
+
+=cut
 
 sub shuffle_sites {
     my $new_aln = Bio::SimpleAlign->new();
@@ -903,12 +1126,6 @@ sub remove_third_sites {
 sub upper_case {
     $aln->uppercase()
 }
-
-sub print_version {
-    say "bp-utils release version: ", $RELEASE;
-    exit
-}
-
 
 ########################## internal subroutine #######################
 
@@ -1082,3 +1299,105 @@ sub _find_max_id_len {
 }
 
 1;
+__END__
+
+=head1 EXTENDING THIS MODULE
+
+We encourage BioPerl developers to add command-line interface to their BioPerl methods here.
+
+Here is how to extend.  We'll use option C<--avpid> as an example.
+
+=over 4
+
+=item *
+Create a new method like one of the above in the previos section.
+
+=item *
+Document your method in pod using C<=head2>. For example:
+
+    =head2 print_avpid
+
+    Print the average percent identity of an alignment.
+
+    Wraps
+    L<Bio::SimpleAlign-E<gt>average_percentage_identity()|https://metacpan.org/pod/Bio::SimpleAlign#average_percentage_identity>.
+
+    =cut
+
+See L<C<print_avpid()>|/print_avpid> for how this gets rendered.
+
+
+=item *
+Add the method to C<@EXPORT> list in C<AlnManipulations.pm>.
+
+=item *
+Add option to C<%opt_displatch> which maps the option used in C<bioaln> to the subroutine that
+gets called here. For example:
+
+    "avpid" => \&print_avp_id,
+
+=item *
+Add option in to C<bioaln> script. See the code that starts:
+
+    GetOptions(
+    ...
+    "avpid|a",
+    ...
+
+This option has a short option name C<a> and takes no additional argument
+
+=item *
+Write a test for the option. See the file C<t/10test-bioaln.t> and L<Testing|https://github.com/bioperl/p5-bpwrapper/wiki/Testing>.
+
+=item *
+Share back. Create a pull request to the github repository and contact
+Weigang Qiu, City University of New York, Hunter College (L<mailto:weigang@genectr.hunter.cuny.edu>)
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<bioaln>: command-line tool for using this
+
+=item *
+
+L<Qui Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+
+=item *
+
+L<Github project wiki page|https://github.com/bioperl/p5-bpwrapper>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+William McCaig <wmccaig at gmail dot com>
+
+=item *
+Girish Ramrattan <gramratt at gmail dot com>
+
+=item  *
+Che Martin <che dot l dot martin at gmail dot com>
+
+=item  *
+Yözen Hernández yzhernand at gmail dot com
+
+=item *
+Levy Vargas <levy dot vargas at gmail dot com>
+
+=item  *
+L<Weigang Qiu|mailto:weigang@genectr.hunter.cuny.edu> (Maintainer)
+
+=item *
+Rocky Bernstein
+
+=back
+
+=cut

@@ -1,0 +1,1530 @@
+# hrxml-sampo.sg  --  HR-XML Candidate schema as of 19.6.2007
+# Original from Marc Van Collie
+# http://www.w3.org/2001/03/webdata/xsv
+# $Id: hr-xml-sampo.sg,v 1.2 2007-08-10 19:19:10 sampo Exp $
+# Root: Candidate
+
+target(hrxml, http://ns.hr-xml.org/2007-04-15)
+
+#ns(oa,http://www.openapplications.org/oagis)
+#ns(dc,http://purl.org/dc/elements/1.1/)
+#ns(ds,http://www.w3.org/2000/09/xmldsig#)
+#ns(xsi,http://www.w3.org/2001/XMLSchema-instance)
+#ns(xsd,http://www.w3.org/2001/XMLSchema)
+#import(http://www.w3.org/XML/1998/namespace,xml.xsd)
+
+Candidate	 -> %hrxml:CandidateType
+%AcademicCreditCodeType:	 enum( A C G N Q S U V X ) ;
+%AnyDateTimeNaType:  union(hrxml:LocalDateType hrxml:DateType hrxml:LocalDateTimeType hrxml:DateTimeType hrxml:NotApplicableLiteral)  ;
+%AnyDateTimeNkNaType:  union(hrxml:LocalDateType hrxml:DateType hrxml:LocalDateTimeType hrxml:DateTimeType hrxml:NotKnownLiteral hrxml:NotApplicableLiteral)  ;
+%AnyDateTimeNkType:  union(hrxml:LocalDateType hrxml:DateType hrxml:LocalDateTimeType hrxml:DateTimeType hrxml:NotKnownLiteral)  ;
+%AnyDateTimeType:  union(hrxml:LocalDateType hrxml:DateType hrxml:LocalDateTimeType hrxml:DateTimeType)
+  ;
+%AnyLocalDateYearMonthDayType:	 base(xsd:date) ;
+%AnyLocalDateYearMonthType:	 base(xsd:gYearMonth) ;
+%AnyLocalDateYearType:	 base(xsd:gYear) ;
+%AreaTypeType:	 enum( municipality postalcode countrycode ) ;
+%AssociationTypeType:	 enum( Professional Social Community Non-Profit Religious Political ) ;
+%BasicExpatriateBenefitTypeTypes:	 enum( Relocation Package School Fees Vehicle Professional Service Fees Language Instruction Club Membership ) ;
+%BasicFrequencyType:	 enum( Hourly Daily Weekly Bi-Weekly Semi-Monthly Monthly Month-Week-1 Month-Week-2 Month-Week-3 Month-Week-4 Month-Week-5 Month-Week-Last Bi-Monthly Quarterly Semi-Annually Annually Once ) ;
+%BasicHierarchicalRoleType:	 enum( Functional Logical ) ;
+%BasicHoursTypes:	 enum( Regular Overtime TimeHalf DoubleTime Special Premium Per Diem On Call ) ;
+%BasicInsuranceTypes:	 enum( Medical Dental Vision Life ) ;
+%BasicNoticeFrequencyType:	 enum( Hour Day Week Month ) ;
+%BasicOrganizationalUnitRelationshipType:	 enum( Child Sibling Parent Ultimate Parent ) ;
+%BasicOrganizationalUnitStructureType:	 enum( Reporting Legal Fiduciary Structural Project ) ;
+%BasicOrganizationContactPurposeType:	 enum( Headquarters Sales Support Billing Legal Human Resources ) ;
+%BasicOrganizationLegalOwnershipType:	 enum( Public Private Government ) ;
+%BasicOrganizationRelationshipType:	 enum( Child Parent Ultimate Parent Domestic Parent ) ;
+%BasicOtherPayTypeTypes:	 enum( Bonus Commission Incentive Sliding Commission ) ;
+%BasicPositionClassification:	 enum( Direct Hire Temp to Hire Contract to Hire Contract Temporary Volunteer Internship Apprenticeship On Call Remote Any ) ;
+%BasicReferenceType:	 enum( Professional Personal Verification ) ;
+%BasicScaleTypes:	 enum( Global National Regional Local ) ;
+%BasicScheduleTypes:	 enum( Full Time Part Time Flex Time Seasonal Any ) ;
+%BasicShiftPeriodTypes:	 enum( On Call Annual Rostered Variable Monthly Weekly Daily 1 2 3 4 5 6 7 ) ;
+%BasicStatusType:	 enum( Active Inactive Pending ) ;
+%BasicTimeOffTypes:	 enum( PaidHoliday UnpaidHoliday PaidVacation PaidLeave UnpaidLeave PersonalDays HealthDays ) ;
+%BasicWorkStyleTypes:	 enum( Independent Team ) ;
+%CompetencyWeightType:	 enum( levelOfInterest skillLevel ) ;
+%contactMethodLocationPatternExtensionType:  union(hrxml:contactMethodLocationType hrxml:xStringPatternExtensionType)  ;
+%contactMethodLocationType:	 enum( office vehicle onPerson home ) ;
+%contactMethodUsePatternExtensionType:  union(hrxml:contactMethodUseType hrxml:xStringPatternExtensionType)  ;
+%contactMethodUseType:	 enum( business businessDirect personal ) ;
+%contactMethodWhenAvailableType:	 base(xsd:string) ;
+%contactTypes:	 enum( recruiter HRRep directSupervisor ) ;
+%ContactTypeStringExtensionType:  union(hrxml:contactTypes hrxml:xsd:string)  ;
+%CountryCodeType:	 base(xsd:string) ;
+%CourseLevelCodeType:	 enum( 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 A AR B D DL E F G H I L M P R T U V ) ;
+%CurrencyCodeType:	 base(xsd:string) ;
+%DateTimeType:	 base(xsd:dateTime) ;
+%DateType:	 base(xsd:date) ;
+%degreeCodeTypes:	 enum( B17 B18 B19 B20 B21 B22 B23 B24 B25 B26 ) ;
+%degreeTypes:	 enum( secondary high school or equivalent some high school or equivalent HND/HNC or equivalent vocational certification some college associates bachelors some post-graduate masters doctorate postdoctorate professional postprofessional intermediategraduate specialeducation ged international ) ;
+%DegreeTypeStringExtensionType:  union(hrxml:degreeTypes hrxml:degreeCodeTypes hrxml:graduationCodeTypes xsd:string) ;
+%DressCodeContentType:	 enum( Professional Business Business Casual Uniform ) ;
+%DressCodeContentTypes:  union(hrxml:DressCodeContentType hrxml:xStringPatternExtensionType)  ;
+%DunsNumberBaseType:	 base(xsd:integer) ;
+%EEOCJobCategoryEnumType:	 enum( Officials and Managers Professionals  Technicians Sales Official and Clerical Craft Workers Skilled Operative SemiSkilled Laborers Unskilled Service Workers ) ;
+%employerOrgTypes:	 enum( soleEmployer agent broker self ) ;
+%EmpOrgTypeStringExtensionType:  union(hrxml:employerOrgTypes xsd:string)  ;
+%EventTypeType:	 enum( convention rally conference sales meeting television show radio show web-based ) ;
+%ExpatriateBenefitTypeTypes:  union(hrxml:BasicExpatriateBenefitTypeTypes hrxml:xStringPatternExtensionType) ;
+%ExtendedAssociationTypeType: union(hrxml:AssociationTypeType hrxml:xStringPatternExtensionType) ;
+%ExtendedBasicStatusType:     union(hrxml:BasicStatusType hrxml:xStringPatternExtensionType) ;
+%ExtendedEventTypeType:       union(hrxml:EventTypeType hrxml:xStringPatternExtensionType) ;
+%ExtendedRoleType:            union(hrxml:xStringPatternExtensionType hrxml:RoleType) ;
+%ExtendedSpeakingTypeType:    union(hrxml:SpeakingTypeType hrxml:xStringPatternExtensionType) ;
+%ExtendedWeightType:          union(hrxml:CompetencyWeightType hrxml:xStringPatternExtensionType) ;
+%EyeColorQualifiers:          union(hrxml:PersonEyeColorQualifiers hrxml:xStringPatternExtensionType) ;
+%FLSAStatusEnumType:          enum( exempt non-exempt ) ;
+%FrequencyType:               union(hrxml:BasicFrequencyType hrxml:xStringPatternExtensionType) ;
+%GenderCodeType:              base(xsd:integer) ;
+%GraduatingDegreeType:        enum( graduating qualifying ) ;
+%graduationCodeTypes:         enum( 2.1 2.2 2.3 2.4 2.5 2.6 2.7 3.1 3.2 4.1 4.2 4.3 4.4 4.5 ) ;
+%HairColorQualifiers:         union(hrxml:PersonHairColorQualifiers hrxml:xStringPatternExtensionType) ;
+%HandicapStatusEnumType:      enum( HandicapOnly All ) ;
+%HierarchicalRoleType:        union(hrxml:BasicHierarchicalRoleType hrxml:xStringPatternExtensionType) ;
+%InsuranceTypes:              union(hrxml:BasicInsuranceTypes hrxml:xStringPatternExtensionType) ;
+%InternetEmailAddressType:	 base(xsd:string) ;
+%InternetWebAddressType:	 base(xsd:string) ;
+%intervalTypes:	 enum( hourly daily weekly monthly quarterly yearly semi-monthly biweekly fortnightly ) ;
+%IntervalTypeStringExtensionType:  union(hrxml:intervalTypes xsd:string)
+  ;
+%isbnType:	 base(xsd:string) ;
+%ISCEDInstitutionClassificationType:	 enum( 0 1 2 3 4 5 6 ) ;
+%issnType:	 base(xsd:string) ;
+%LanguageCodeType:	 base(xsd:language) ;
+%LatitudeType:	 base(xsd:decimal) ;
+%LocalDateNkNaType:  union(hrxml:LocalDateType hrxml:NotKnownLiteral hrxml:NotApplicableLiteral)  ;
+%LocalDateTimeType:	 base(xsd:dateTime) ;
+%LocalDateType:	 base(xsd:date) ;
+%LocalTimeNkNaType:  union(hrxml:LocalTimeType hrxml:NotKnownLiteral hrxml:NotApplicableLiteral)  ;
+%LocalTimeType:	 base(xsd:time) ;
+%LocationAreaTypeType:	 enum( municipality postalcode countrycode region ) ;
+%LongitudeType:	 base(xsd:decimal) ;
+%MaritalStatusList:	 enum( Domestic Partner Divorced Married Unreported Separated Unmarried Widowed Legally Separated ) ;
+%MaritalStatusType:  union(hrxml:MaritalStatusList hrxml:xStringPatternExtensionType)
+  ;
+%NonNegativeDecimal:	 base(xsd:decimal) ;
+%NotApplicableLiteral:	 enum( notApplicable ) ;
+%NoticeFrequencyType:  union(Bhrxml:asicNoticeFrequencyType hrxml:xStringPatternExtensionType)
+  ;
+%NotKnownLiteral:	 enum( notKnown ) ;
+%OrganizationalUnitRelationshipType:  union(hrxml:BasicOrganizationalUnitRelationshipType hrxml:xStringPatternExtensionType)  ;
+%OrganizationalUnitStructureType:  union(hrxml:BasicOrganizationalUnitStructureType hrxml:xStringPatternExtensionType)  ;
+%OrganizationContactPurposeType:  union(hrxml:BasicOrganizationContactPurposeType hrxml:xStringPatternExtensionType)  ;
+%OrganizationLegalOwnershipType:  union(hrxml:BasicOrganizationLegalOwnershipType hrxml:xStringPatternExtensionType)  ;
+%OrganizationRelationshipType:  union(hrxml:BasicOrganizationRelationshipType hrxml:xStringPatternExtensionType)  ;
+%organizationTypes:	 enum( department group team branch company subsidiary unit headquarters ) ;
+%OrganizationTypeStringExtensionType:  union(hrxml:organizationTypes xsd:string)  ;
+%orgTypes:	 enum( department subSchool ) ;
+%OrgTypeStringExtensionType:  union(hrxml:orgTypes xsd:string)  ;
+%OtherIntervalType:  union(hrxml:BasicFrequencyType hrxml:SignOnType hrxml:xStringPatternExtensionType)  ;
+%OtherPayTypeTypes:  union(hrxml:BasicOtherPayTypeTypes hrxml:xStringPatternExtensionType)  ;
+%PatentStatusTypes:  union(hrxml:PatentStatusTypeTypes hrxml:xStringPatternExtensionType)  ;
+%PatentStatusTypeTypes:	 enum( PatentIssued PatentPending PatentFiled ) ;
+%PersonEyeColorQualifiers:	 enum( Black Hazel Gray Brown Violet Green Blue Maroon Pink Dichromatic Unknown ) ;
+%PersonHairColorQualifiers:	 enum( Bald Brown White Blonde Gray Red Auburn Black Silver Unknown ) ;
+%PositionScheduleType:  union(hrxml:BasicScheduleTypes hrxml:xStringPatternExtensionType)  ;
+%positionTypes:	 enum( directHire contract temp contractToHire tempToHire volunteer internship ) ;
+%PositionTypexStringPatternExtensionType:  union(hrxml:positionTypes hrxml:xStringPatternExtensionType)  ;
+%PublicationOtherTypes:  union(hrxml:xStringPatternExtensionType hrxml:PublicationOtherTypeTypes)  ;
+%PublicationOtherTypeTypes:	 enum( Thesis Whitepaper Report TechnicalDocumentation Study Manual ResearchPaper ) ;
+%PublicationTypes:  union(hrxml:PublicationTypeTypes hrxml:xStringPatternExtensionType)  ;
+%PublicationTypeTypes:	 enum( Article Book Conference Other ) ;
+%ReferenceTypes:  union(hrxml:BasicReferenceType hrxml:xStringPatternExtensionType)  ;
+%RelationshipsType:  union(hrxml:RelationshipType hrxml:xStringPatternExtensionType)  ;
+%RelationshipType:	 enum( agent broker self referrer ) ;
+%ResumeItemTypes:  union(hrxml:xStringPatternExtensionType hrxml:ResumeItemTypeTypes)  ;
+%ResumeItemTypeTypes:	 enum( Activities Interests Personal Community Hobbies Volunteer ) ;
+%RoleType:	 enum( author editor illustrator contributor ) ;
+%ScaleType:  union(hrxml:BasicScaleTypes hrxml:xStringPatternExtensionType)  ;
+%schoolTypes:	 enum( highschool secondary trade community college university ) ;
+%SchoolTypeStringExtensionType:  union(hrxml:schoolTypes xsd:string)  ;
+%SchoolTypeType:	 enum( current prior joint degree ) ;
+%ShiftPeriodType:  union(hrxml:BasicShiftPeriodTypes hrxml:xStringPatternExtensionType)  ;
+%SignOnType:	 enum( Sign-on ) ;
+%SourceEnumType:	 enum( Job Board Staffing Agency Intermediary Referrer ) ;
+%SpeakingTypeType:	 enum( speech presentation demonstration interview debate panel discussion ) ;
+%StaffingPositionClassificationType:  union(hrxml:BasicPositionClassification hrxml:xStringPatternExtensionType)  ;
+%TimeOffTypes:  union(hrxml:BasicTimeOffTypes hrxml:xStringPatternExtensionType)  ;
+%TimeType:	 base(xsd:time) ;
+%USPayTypeHoursType:  union(hrxml:BasicHoursTypes hrxml:xStringPatternExtensionType)  ;
+%WorkStyleType:  union(hrxml:BasicWorkStyleTypes hrxml:xStringPatternExtensionType)  ;
+%xStringPatternExtensionType:	 base(xsd:string) ;
+
+%AccountingCodeType:	 base(xsd:string)
+  @description?	 -> %xsd:string
+  ;
+
+%AchievementType:
+  hrxml:Date?	 -> %hrxml:FlexibleDatesType
+  hrxml:Description?	 -> %xsd:string
+  hrxml:IssuingAuthority?	 -> %xsd:string
+  ;
+
+%AdditionalItemType:
+  hrxml:EffectiveDate?:
+    hrxml:StartDate?	 -> %hrxml:FlexibleDatesType
+    hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+    ;
+  hrxml:Description+	 -> %xsd:string
+  @type?	 -> %hrxml:ResumeItemTypes
+  ;
+
+%AreaType:
+  hrxml:Value	 -> %xsd:string
+  hrxml:Area*	 -> %hrxml:AreaType
+  @type?:    union(hrxml:AreaTypeType hrxml:xStringPatternExtensionType)
+    ;
+  ;
+
+%ArticleType:	 base(hrxml:BasicBibliographicRecordType)
+    hrxml:JournalOrSerialName?	 -> %xsd:string
+    hrxml:ISSN?	 -> %hrxml:issnType
+    hrxml:Volume?	 -> %xsd:string
+    hrxml:Issue?	 -> %xsd:string
+    hrxml:PageNumber?	 -> %xsd:string
+    hrxml:PublicationLanguage?	 -> %hrxml:LanguageCodeType
+  ;
+
+%AssociationType:
+  hrxml:Name	 -> %xsd:string
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Link?	 -> %hrxml:InternetWebAddressType
+  hrxml:StartDate?	 -> %hrxml:FlexibleDatesType
+  hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+  hrxml:Role*:
+    hrxml:Name?	 -> %xsd:string
+    hrxml:Deliverable*	 -> %xsd:string
+    hrxml:StartDate?	 -> %hrxml:FlexibleDatesType
+    hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+    hrxml:Comments?	 -> %xsd:string
+    ;
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+%BasePayType:
+  hrxml:BasePayAmountMin?	 -> %xsd:decimal
+  hrxml:BasePayAmountMax?	 -> %xsd:decimal
+  @currencyCode?	 -> %hrxml:CurrencyCodeType
+  @baseInterval?	 -> %hrxml:FrequencyType
+  ;
+
+%BasicBibliographicRecordType:
+  hrxml:Title	 -> %xsd:string
+  hrxml:Name*:	 base(hrxml:PersonNameType)
+    @role	 -> %hrxml:ExtendedRoleType
+    ;
+  hrxml:PublicationDate?	 -> %hrxml:FlexibleDatesType
+  hrxml:Link*	 -> %hrxml:InternetWebAddressType
+  hrxml:Abstract?	 -> %xsd:string
+  hrxml:Copyright?	 -> %hrxml:CopyrightType
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+%BenefitsType:
+  hrxml:Insurance*:	 base(xsd:boolean)
+    @type?	 -> %hrxml:InsuranceTypes
+    ;
+  hrxml:RetirementOrSavingsPlan?	 -> %xsd:boolean
+  hrxml:CompanyVehicle*:
+    hrxml:Description?	 -> %xsd:string
+    @companyOffered?	 -> %xsd:boolean
+    ;
+  hrxml:RelocationAssistance*:
+    hrxml:Description?	 -> %xsd:string
+    @companyOffered?	 -> %xsd:boolean
+    ;
+  hrxml:VisaSponsorship?	 -> %xsd:boolean
+  hrxml:TimeOffAllowance*	 -> %hrxml:TimeOffAllowanceType
+  hrxml:ExpatriateBenefits?	 -> %hrxml:ExpatriateBenefitsType
+  hrxml:OtherBenefits*:	 base(xsd:string)
+    @type?	 -> %xsd:string
+    ;
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+%BiologicalDescriptorsType:
+  hrxml:DateOfBirth?	 -> %hrxml:LocalDateNkNaType
+  hrxml:MonthDayOfBirth?	 -> %xsd:gMonthDay
+  hrxml:Age?	 -> %xsd:nonNegativeInteger
+  hrxml:GenderCode?	 -> %hrxml:GenderCodeType
+  hrxml:EyeColor?	 -> %hrxml:EyeColorQualifiers
+  hrxml:HairColor?	 -> %hrxml:HairColorQualifiers
+  hrxml:Height?:	 base(xsd:string)
+    @unitOfMeasure?	 -> %xsd:string
+    ;
+  hrxml:Weight?:	 base(xsd:string)
+    @unitOfMeasure?	 -> %xsd:string
+    ;
+  hrxml:IdentifyingMarks*	 -> %xsd:string
+  hrxml:DisabilityInfo*	 -> %hrxml:DisabilityInfoType
+  hrxml:UserArea?
+  ;
+
+%BookType:	 base(hrxml:BasicBibliographicRecordType)
+    hrxml:Edition?	 -> %xsd:string
+    hrxml:Chapter?	 -> %xsd:string
+    hrxml:ISSN?	 -> %hrxml:issnType
+    hrxml:ISBN?	 -> %hrxml:isbnType
+    hrxml:NumberOfPages?	 -> %xsd:positiveInteger
+    hrxml:PublisherName?	 -> %xsd:string
+    hrxml:PublisherLocation?	 -> %xsd:string
+  ;
+
+%CandidatePersonalDataType:
+  hrxml:PersonId?	 -> %hrxml:EntityIdType
+  hrxml:PersonName?	 -> %hrxml:PersonNameType
+  hrxml:ContactMethod*	 -> %hrxml:ContactMethodType
+  hrxml:PersonDescriptors?	 -> %hrxml:PersonDescriptorsType
+  hrxml:UserArea?
+  ;
+
+%CandidateProfileType:
+  hrxml:ProfileId?	 -> %hrxml:EntityIdType
+  hrxml:ProfileName?	 -> %xsd:string
+  hrxml:AvailabilityInfo{0,0}:
+    hrxml:AvailabilityDates*:
+      hrxml:StartDate?	 -> %hrxml:LocalDateNkNaType
+      hrxml:EndDate?	 -> %hrxml:LocalDateNkNaType
+      ;
+    hrxml:TermOfNotice?:
+      hrxml:Value	 -> %xsd:integer
+      hrxml:Interval	 -> %hrxml:NoticeFrequencyType
+      ;
+    ;
+  hrxml:DistributionGuidelines{0,0}	 -> %hrxml:DistributionGuidelinesType
+  hrxml:PersonalData?	 -> %hrxml:CandidatePersonalDataType
+  hrxml:PreferredPosition{0,0}:	 base(hrxml:PositionMatchingType)
+      hrxml:Commute?	 -> %hrxml:CommuteType
+    ;
+  hrxml:EmploymentHistory{0,0}
+  hrxml:EducationHistory{0,0}
+  hrxml:MilitaryHistory{0,0}
+  hrxml:Associations{0,0}
+  hrxml:SupportingMaterials{0,0}	 -> %hrxml:StaffingSupportingMaterialsType
+  hrxml:UserArea{0,0}
+  @xml:lang?
+  ;
+
+%CandidateType:
+  hrxml:CandidateRecordInfo?	 -> %hrxml:RecordInfoType
+  hrxml:RelatedPositionPostings:
+    hrxml:PositionPosting*	 -> %hrxml:PositionPostingSearchInfoType
+    ;
+  hrxml:CandidateSupplier{0,0}	 -> %hrxml:SupplierType
+  hrxml:DistributionGuidelines{0,0}	 -> %hrxml:DistributionGuidelinesType
+  hrxml:CandidateProfile*	 -> %hrxml:CandidateProfileType
+  hrxml:Resume?	 -> %hrxml:Resume301111
+  hrxml:UserArea{0,0}
+  @xml:lang?
+  ;
+
+%ClassificationType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Description?	 -> %xsd:string
+  ;
+
+%CommuteType:
+  hrxml:TimeMax?:	 base(xsd:decimal)
+    @unitOfMeasure?	 -> %xsd:string
+    ;
+  hrxml:DistanceMax?:	 base(xsd:decimal)
+    @unitOfMeasure?	 -> %xsd:string
+    ;
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+%CompetencyType:
+  hrxml:CompetencyId?:
+    @id	 -> %xsd:string
+    @idOwner?	 -> %xsd:string
+    @description?	 -> %xsd:string
+    ;
+  hrxml:TaxonomyId*:
+    @id	 -> %xsd:string
+    @idOwner?	 -> %xsd:string
+    @description?	 -> %xsd:string
+    ;
+  hrxml:CompetencyEvidence*:
+    hrxml:EvidenceId?:
+      @id	 -> %xsd:string
+      @idOwner?	 -> %xsd:string
+      @description?	 -> %xsd:string
+      ;
+    hrxml:NumericValue?
+    hrxml:StringValue?
+    hrxml:SupportingInformation*
+    @dateOfIncident?	 -> %hrxml:AnyDateTimeType
+    @name?	 -> %xsd:string
+    @typeDescription?	 -> %xsd:string
+    @expirationDate?	 -> %hrxml:AnyDateTimeType
+    @typeId?	 -> %xsd:string
+    @required?	 -> %xsd:boolean
+    @lastUsed?	 -> %hrxml:AnyDateTimeType
+    ;
+  hrxml:CompetencyWeight*:
+    hrxml:NumericValue?
+    hrxml:StringValue?
+    hrxml:SupportingInformation*
+    @type?	 -> %hrxml:ExtendedWeightType
+    ;
+  hrxml:Competency*
+  hrxml:UserArea?
+  @name?	 -> %xsd:string
+  @description?	 -> %xsd:string
+  @required?	 -> %xsd:boolean
+  ;
+
+%ConferencePaperType:	 base(hrxml:BasicBibliographicRecordType)
+    hrxml:EventName?	 -> %xsd:string
+    hrxml:ConferenceDate?	 -> %hrxml:FlexibleDatesType
+    hrxml:ConferenceLocation?	 -> %xsd:string
+  ;
+
+%ContactMethodType:
+  hrxml:Use?
+  hrxml:Location?
+  hrxml:WhenAvailable?
+  hrxml:Telephone?
+  hrxml:Mobile?
+  hrxml:Fax?
+  hrxml:Pager?
+  hrxml:TTYTDD?
+  hrxml:InternetEmailAddress?
+  hrxml:InternetWebAddress?
+  hrxml:PostalAddress?
+  ;
+
+%CopyrightType:
+  hrxml:CopyrightDates?:
+    hrxml:OriginalDate	 -> %hrxml:FlexibleDatesType
+    hrxml:MostRecentDate?	 -> %hrxml:FlexibleDatesType
+    ;
+  hrxml:CopyrightText?	 -> %xsd:string
+  ;
+
+%CredentialType:
+  hrxml:Name	 -> %xsd:string
+  hrxml:Id?	 -> %xsd:string
+  hrxml:IssuingAuthority?	 -> %hrxml:IssuingAuthorityType
+  hrxml:Description?	 -> %xsd:string
+  hrxml:EffectiveDate?:
+    hrxml:ValidFrom?	 -> %hrxml:FlexibleDatesType
+    hrxml:ValidTo?	 -> %hrxml:FlexibleDatesType
+    hrxml:FirstIssuedDate?	 -> %hrxml:FlexibleDatesType
+    ;
+  ;
+
+%DatesOfAttendanceType:
+  hrxml:StartDate	 -> %hrxml:FlexibleDatesType
+  hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+  @enrollmentStatus?	 -> %xsd:string
+  @currentlyEnrolled?	 -> %xsd:boolean
+  @studentInGoodStanding?	 -> %xsd:boolean
+  ;
+
+%DatesOfServiceType:
+  hrxml:StartDate	 -> %hrxml:FlexibleDatesType
+  hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+  ;
+
+%DELocalizedPositionClassificationType:
+  hrxml:BKZClassification?:
+    hrxml:BKZId?	 -> %hrxml:EntityIdType
+    hrxml:BKZName?	 -> %xsd:string
+    ;
+  hrxml:EducationAuthorization?	 -> %xsd:boolean
+  hrxml:HandicapStatus?	 -> %hrxml:HandicapStatusEnumType
+  ;
+
+%DemographicDescriptorsType:
+  hrxml:Race*	 -> %xsd:string
+  hrxml:Ethnicity*	 -> %xsd:string
+  hrxml:Nationality*	 -> %xsd:string
+  hrxml:PrimaryLanguage*	 -> %hrxml:LanguageCodeType
+  hrxml:BirthPlace?	 -> %xsd:string
+  hrxml:Religion?	 -> %xsd:string
+  hrxml:MaritalStatus?	 -> %hrxml:MaritalStatusType
+  hrxml:ChildrenInfo?:
+    hrxml:NumberOfChildren?	 -> %xsd:nonNegativeInteger
+    hrxml:Comments?	 -> %xsd:string
+    ;
+  hrxml:UserArea?
+  ;
+
+%DeprecatedDatesOfAttendanceType:
+  hrxml:StartDate	 -> %hrxml:FlexibleDatesType
+  hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+  @enrollmentStatus?	 -> %xsd:string
+  @currentlyEnrolled?	 -> %xsd:boolean
+  @studentInGoodStanding?	 -> %xsd:boolean
+  ;
+
+%DisabilityInfoType:
+  hrxml:LevelOfDisability?	 -> %xsd:string
+  hrxml:Percentage?	 -> %xsd:integer
+  hrxml:Type?	 -> %xsd:string
+  hrxml:AccommodationsNeeded?	 -> %xsd:boolean
+  ;
+
+%DistributionGuidelinesType:
+  hrxml:DistributeTo*:	 base(hrxml:DistributionType)
+      hrxml:ContactMethod*	 -> %ContactMethodType
+    ;
+  hrxml:DoNotDistributeTo*	 -> %hrxml:DistributionType
+  ;
+
+%hrxml:DistributionType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Name?	 -> %xsd:string
+  @validFrom?	 -> %hrxml:LocalDateNkNaType
+  @validTo?	 -> %hrxml:LocalDateNkNaType
+  ;
+
+%DressCodeType:	 base(hrxml:DressCodeContentTypes)
+  @suppliedByOrganization?	 -> %xsd:boolean
+  ;
+
+%DunsNumberDataType:	 base(hrxml:DunsNumberBaseType)
+  @dunsNumberType:	 enum( standard Duns global ultimate domestic ultimate ) ;
+  ;
+
+%EducationalMeasureType:
+  hrxml:EducationalMeasure?	 -> %hrxml:EducationMeasureType
+  hrxml:AcademicCreditCode?	 -> %hrxml:AcademicCreditCodeType
+  hrxml:CourseLevelCode?	 -> %hrxml:CourseLevelCodeType
+  hrxml:CumulativeSummaryIndicator?	 -> %xsd:boolean
+  hrxml:AcademicCreditHoursIncluded?	 -> %xsd:decimal
+  hrxml:AcademicCreditHoursAttempted?	 -> %xsd:decimal
+  hrxml:AcademicCreditHoursEarned?	 -> %xsd:decimal
+  hrxml:ClassRank?:	 base(xsd:integer)
+    @numberOfStudents?	 -> %xsd:integer
+    ;
+  @measureType?	 -> %xsd:string
+  ;
+
+%SchoolOrInstitutionType_copy:
+  hrxml:SchoolName?	 -> %xsd:string
+  hrxml:School*	 -> %hrxml:SchoolDataType
+  hrxml:LocationSummary?:
+    hrxml:Municipality?	 -> %xsd:string
+    hrxml:Region*	 -> %xsd:string
+    hrxml:CountryCode?
+    hrxml:PostalCode?	 -> %xsd:string
+    ;
+  hrxml:PostalAddress?
+  hrxml:OrganizationUnit*:	 base(xsd:string)
+    @organizationType	 -> %hrxml:OrgTypeStringExtensionType
+    @attendanceStatus?:	 enum( current prior unknown ) ;
+    ;
+  hrxml:Degree*:	 base(EduDegreeType) ;
+  hrxml:Major*	 -> %xsd:string
+  hrxml:Minor*	 -> %xsd:string
+  hrxml:Measure?	 -> %hrxml:EduMeasureType
+  hrxml:DatesOfAttendance?	 -> %hrxml:DeprecatedDatesOfAttendanceType
+  hrxml:Comments?	 -> %xsd:string
+  hrxml:ISCEDInstitutionClassification?	 -> %hrxml:ISCEDInstitutionClassificationType
+  hrxml:LocalInstitutionClassification*	 -> %hrxml:ClassificationType
+  hrxml:UserArea{0,0}
+  @schoolType	 -> %hrxml:SchoolTypeStringExtensionType
+  ;
+
+%EducationHistoryType:
+  hrxml:SchoolOrInstitution+:	 base(hrxml:SchoolOrInstitutionType_copy) ;
+  ;
+
+%EducationMeasureType:
+  hrxml:MeasureSystem?	 -> %xsd:string
+  hrxml:MeasureValue?	 -> %hrxml:MeasureValueType
+  hrxml:LowestPossibleValue?	 -> %hrxml:MeasureValueType
+  hrxml:HighestPossibleValue?	 -> %hrxml:MeasureValueType
+  hrxml:ExcessiveValueIndicator?	 -> %xsd:boolean
+  hrxml:GoodStudentIndicator?	 -> %xsd:boolean
+  ;
+
+%EduDegreeType:
+  hrxml:DegreeName?:	 base(xsd:string)
+    @academicHonors?	 -> %xsd:string
+    @honorsProgram?	 -> %xsd:string
+    ;
+  hrxml:DegreeDate?	 -> %hrxml:FlexibleDatesType
+  hrxml:OtherHonors*:	 base(xsd:string)
+    @type?	 -> %xsd:string
+    ;
+  hrxml:DegreeMajor*	 -> %hrxml:MajorType
+  hrxml:DegreeMinor*	 -> %hrxml:MinorType
+  hrxml:DegreeMeasure?	 -> %hrxml:EducationalMeasureType
+  hrxml:DatesOfAttendance*	 -> %hrxml:DatesOfAttendanceType
+  hrxml:Comments?	 -> %xsd:string
+  hrxml:DegreeClassification*	 -> %hrxml:ClassificationType
+  hrxml:UserArea?
+  @degreeType?	 -> %hrxml:DegreeTypeStringExtensionType
+  @examPassed?	 -> %xsd:boolean
+  @graduatingDegree?	 -> %hrxml:GraduatingDegreeType
+  ;
+
+%EduMeasureType:
+  hrxml:MeasureSystem	 -> %xsd:string
+  hrxml:MeasureValue	 -> %xsd:string
+  @measureType	 -> %xsd:string
+  ;
+
+%EEOCJobCategoryType:
+  hrxml:StandardValue?	 -> %hrxml:EEOCJobCategoryEnumType
+  hrxml:NonStandardValue?	 -> %xsd:string
+  ;
+
+%EmpContactInfoType:
+  hrxml:PersonName?
+  hrxml:ContactMethod*	 -> %hrxml:ContactMethodType
+  hrxml:LocationSummary?	 -> %hrxml:EmploymentLocationSummaryType
+  hrxml:InternetDomainName*	 -> %hrxml:InternetDomainNameType
+  @contactType?	 -> %hrxml:ContactTypeStringExtensionType
+  ;
+
+%EmployerOrgDataType:
+  hrxml:EmployerOrgName	 -> %xsd:string
+  hrxml:EmployerContactInfo?	 -> %hrxml:EmpContactInfoType
+  hrxml:PositionHistory+:	 base(hrxml:PositionHistoryType) ;
+  hrxml:UserArea?
+  @employerOrgType?	 -> %hrxml:EmpOrgTypeStringExtensionType
+  ;
+
+%EmploymentHistoryType:
+  hrxml:EmployerOrg+	 -> %hrxml:EmployerOrgDataType
+  ;
+
+%EmploymentLocationSummaryType:
+  hrxml:Municipality?	 -> %xsd:string
+  hrxml:Region*	 -> %xsd:string
+  hrxml:CountryCode?
+  hrxml:PostalCode?	 -> %xsd:string
+  ;
+
+%EmploymentQuestionAnswerPairType:
+  hrxml:Question	 -> %xsd:string
+  hrxml:Answer?	 -> %xsd:string
+  ;
+
+%EntityIdType:
+  hrxml:IdValue+:	 base(xsd:string)
+    @name?	 -> %xsd:string
+    ;
+  @validFrom?	 -> %hrxml:AnyDateTimeNkNaType
+  @validTo?	 -> %hrxml:AnyDateTimeNkNaType
+  @idOwner?	 -> %xsd:string
+  ;
+
+%EntityReferenceType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Name?	 -> %xsd:string
+  ;
+
+%ExpatriateBenefitsType:
+  hrxml:ExpatriateBenefitsOffered*	 -> %xsd:boolean
+  hrxml:ExpatriateBenefitList*	 -> %hrxml:ExpatriateBenefitTypeTypes
+  ;
+
+%FlexibleDatesType:
+  hrxml:AnyDate?	 -> %hrxml:AnyDateTimeNkNaType
+  hrxml:YearMonth?	 -> %xsd:gYearMonth
+  hrxml:Year?	 -> %xsd:gYear
+  hrxml:MonthDay?	 -> %xsd:gMonthDay
+  hrxml:StringDate?	 -> %xsd:string
+  @dateDescription?	 -> %xsd:string
+  ;
+
+%IndustryCodeType:	 base(xsd:string)
+  @primaryIndicator?	 -> %xsd:boolean
+  @classificationName?	 -> %xsd:string
+  ;
+
+%InternetDomainNameType:	 base(xsd:string)
+  @primaryIndicator?	 -> %xsd:boolean
+  ;
+
+%IssuingAuthorityType:	 base(xsd:string)
+  @countryCode?	 -> %hrxml:CountryCodeType
+  ;
+
+%JobLevelInfoType:
+  hrxml:JobPlan?	 -> %xsd:string
+  hrxml:JobGrade?	 -> %xsd:string
+  hrxml:JobStep?	 -> %xsd:string
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+%LanguageDependentTextType:	 base(xsd:string)
+  @xml:lang?
+  ;
+
+%LegalIdentifiersType:
+  hrxml:PersonLegalId*	 -> %hrxml:PersonLegalIdType
+  hrxml:MilitaryStatus*:	 base(xsd:string)
+    @type?	 -> %xsd:string
+    ;
+  hrxml:VisaStatus*:	 base(xsd:string)
+    @countryCode?	 -> %hrxml:CountryCodeType
+    @validFrom?	 -> %hrxml:AnyDateTimeNkNaType
+    @validTo?	 -> %hrxml:AnyDateTimeNkNaType
+    ;
+  hrxml:Citizenship*	 -> %hrxml:CountryCodeType
+  hrxml:Residency*	 -> %hrxml:CountryCodeType
+  hrxml:UserArea?
+  ;
+
+%LocationAreaType:
+  hrxml:Description	 -> %xsd:string
+  hrxml:Area*	 -> %hrxml:LocationAreaType
+  @type?:    union(hrxml:LocationAreaTypeType hrxml:xStringPatternExtensionType) ;
+  ;
+
+%MajorType:
+  hrxml:ProgramId*	 -> %hrxml:EntityIdType
+  hrxml:DegreeConcentration*	 -> %xsd:string
+  hrxml:Name+	 -> %xsd:string
+  hrxml:Option*	 -> %xsd:string
+  ;
+
+%MeasureValueType:
+  hrxml:NumericValue?
+  hrxml:StringValue?
+  ;
+
+%MilitaryHistoryType:
+  hrxml:CountryServed	 -> %hrxml:CountryCodeType
+  hrxml:ServiceNumber?	 -> %hrxml:EntityIdType
+  hrxml:ServiceDetail*:
+    hrxml:UnitOrDivision?	 -> %xsd:string
+    hrxml:RankAchieved?	 -> %hrxml:RankAchievedType
+    hrxml:DatesOfService	 -> %hrxml:DatesOfServiceType
+    hrxml:Campaign*	 -> %xsd:string
+    hrxml:AreaOfExpertise*	 -> %xsd:string
+    hrxml:RecognitionAchieved*	 -> %xsd:string
+    hrxml:DisciplinaryAction*	 -> %xsd:string
+    hrxml:DischargeStatus?	 -> %xsd:string
+    hrxml:UserArea?
+    @branch	 -> %xsd:string
+    ;
+  hrxml:ServiceStatus?	 -> %xsd:string
+  hrxml:Comments?	 -> %xsd:string
+  hrxml:UserArea?
+  ;
+
+%MinorType:
+  hrxml:ProgramId*	 -> %hrxml:EntityIdType
+  hrxml:Name+	 -> %xsd:string
+  ;
+
+%MobileTelcomNumberType:	 base(hrxml:TelcomNumberType)
+  @smsEnabled?	 -> %xsd:boolean
+  ;
+
+%NonXMLResumeType:
+  hrxml:TextResume?	 -> %xsd:string
+  hrxml:LinkToResume?	 -> %xsd:string
+  hrxml:SupportingMaterials*	 -> %hrxml:StaffingSupportingMaterialsType
+  &hrxml:Comments?
+  hrxml:RevisionDate?	 -> %hrxml:AnyDateTimeNkType
+  ;
+
+%NumericValueType:	 base(xsd:double)
+  @minValue?	 -> %xsd:double
+  @maxValue?	 -> %xsd:double
+  @interval?	 -> %xsd:double
+  @description?	 -> %xsd:string
+  ;
+
+%OccupationalCategoryType:
+  hrxml:TaxonomyName?:	 base(xsd:string)
+    @version?	 -> %xsd:string
+    ;
+  hrxml:CategoryCode?	 -> %xsd:string
+  hrxml:CategoryDescription?	 -> %xsd:string
+  hrxml:Comments?	 -> %xsd:string
+  hrxml:JobCategory?	 -> %hrxml:OccupationalCategoryType
+  ;
+
+%OrganizationalUnitPersonMemberRoleType:
+  hrxml:RoleName?	 -> %xsd:string
+  hrxml:RoleId?	 -> %hrxml:EntityIdType
+  hrxml:Description?	 -> %xsd:string
+  @leader?	 -> %xsd:boolean
+  ;
+
+%OrganizationalUnitPersonMemberType:
+  hrxml:PersonName?	 -> %hrxml:PersonNameType
+  hrxml:PersonId*	 -> %hrxml:EntityIdType
+  hrxml:PersonRole*	 -> %hrxml:OrganizationalUnitPersonMemberRoleType
+  hrxml:ContactMethod*	 -> %hrxml:ContactMethodType
+  ;
+
+%OrganizationalUnitType:
+  hrxml:OrganizationalUnitName?	 -> %xsd:string
+  hrxml:OrganizationalUnitId*	 -> %hrxml:EntityIdType
+  hrxml:OrganizationId?	 -> %hrxml:EntityIdType
+  hrxml:Description?	 -> %xsd:string
+  hrxml:IndustryCode*	 -> %hrxml:IndustryCodeType
+  hrxml:AccountingCode*	 -> %hrxml:AccountingCodeType
+  hrxml:WorkSite*	 -> %hrxml:WorkSiteType
+  hrxml:RelatedOrganizationalUnit*	 -> %hrxml:RelatedOrganizationalUnitType
+  hrxml:PersonMember*	 -> %hrxml:OrganizationalUnitPersonMemberType
+  hrxml:UserArea?	 -> %hrxml:UserAreaType
+  @typeOfGroup?	 -> %xsd:string
+  @hierarchicalRole?	 -> %hrxml:HierarchicalRoleType
+  ;
+
+%OrganizationContactType:
+  hrxml:ContactName?	 -> %hrxml:PersonNameType
+  hrxml:ContactId?	 -> %hrxml:EntityIdType
+  hrxml:ContactMethod?	 -> %hrxml:ContactMethodType
+  @purpose?	 -> %hrxml:OrganizationContactPurposeType
+  ;
+
+%OrganizationLegalClassificationType:	 base(xsd:string)
+  @countryCode	 -> %hrxml:CountryCodeType
+  @ownership?	 -> %hrxml:OrganizationLegalOwnershipType
+  ;
+
+%OrganizationType:
+  hrxml:OrganizationName?	 -> %xsd:string
+  hrxml:OrganizationId*	 -> %hrxml:EntityIdType
+  hrxml:TaxId*	 -> %hrxml:EntityIdType
+  hrxml:LegalId*	 -> %hrxml:EntityIdType
+  hrxml:DunsNumber*	 -> %hrxml:DunsNumberDataType
+  hrxml:IsPublicCompany?	 -> %xsd:boolean
+  hrxml:Stock*	 -> %hrxml:StockType
+  hrxml:MissionStatement?	 -> %xsd:string
+  hrxml:ValueStatement?	 -> %xsd:string
+  hrxml:InternetDomainName*	 -> %hrxml:InternetDomainNameType
+  hrxml:DoingBusinessAs*	 -> %hrxml:LanguageDependentTextType
+  hrxml:LegalClassification*	 -> %hrxml:OrganizationLegalClassificationType
+  hrxml:IndustryCode*	 -> %hrxml:IndustryCodeType
+  hrxml:Headcount?	 -> %xsd:nonNegativeInteger
+  hrxml:Description?	 -> %xsd:string
+  hrxml:WorkSite*	 -> %hrxml:WorkSiteType
+  hrxml:ContactInfo*	 -> %hrxml:OrganizationContactType
+  hrxml:RelatedOrganization*	 -> %hrxml:RelatedOrganizationType
+  hrxml:OrganizationalUnit*	 -> %hrxml:OrganizationalUnitType
+  hrxml:UserArea?	 -> %hrxml:UserAreaType
+  ;
+
+%OtherDescriptorsType:
+  hrxml:Name?	 -> %xsd:string
+  hrxml:Applicable?	 -> %xsd:boolean
+  hrxml:Value?	 -> %xsd:string
+  hrxml:List?:
+    hrxml:Item+	 -> %xsd:string
+    ;
+  ;
+
+%OtherPayDataType:
+  hrxml:OtherPayAmountMin?	 -> %xsd:decimal
+  hrxml:OtherPayAmountMax?	 -> %xsd:decimal
+  hrxml:OtherPayCalculation?	 -> %xsd:string
+  hrxml:Comments?	 -> %xsd:string
+  @currencyCode?	 -> %hrxml:CurrencyCodeType
+  @otherInterval?	 -> %hrxml:OtherIntervalType
+  @otherPayType?	 -> %hrxml:OtherPayTypeTypes
+  ;
+
+%OtherPublicationType:	 base(hrxml:BasicBibliographicRecordType)
+    hrxml:ISSN?	 -> %hrxml:issnType
+    hrxml:ISBN?	 -> %hrxml:isbnType
+    hrxml:NumberOfPages?	 -> %xsd:positiveInteger
+    hrxml:PublisherName?	 -> %xsd:string
+    hrxml:PublisherLocation?	 -> %xsd:string
+  @type?	 -> %hrxml:PublicationOtherTypes
+  ;
+
+%OtherSearchCriteriaType:
+  hrxml:CriterionName	 -> %xsd:string
+  hrxml:CriterionValue?	 -> %xsd:string
+  hrxml:Weight?	 -> %hrxml:NumericValueType
+  ;
+
+%PatentDescriptionType:
+  hrxml:PatentTitle?	 -> %xsd:string
+  hrxml:Description?	 -> %xsd:string
+  hrxml:Inventors?:
+    hrxml:InventorName+	 -> %xsd:string
+    ;
+  hrxml:PatentDetail*:
+    hrxml:IssuingAuthority?:	 base(xsd:string)
+      @countryCode?	 -> %hrxml:CountryCodeType
+      ;
+    hrxml:PatentMilestone+:
+      hrxml:Id?	 -> %xsd:string
+      hrxml:Status?	 -> %hrxml:PatentStatusTypes
+      hrxml:Date?	 -> %hrxml:AnyDateTimeNkNaType
+      ;
+    ;
+  hrxml:Link?	 -> %hrxml:InternetWebAddressType
+  ;
+
+%PatentHistoryType:
+  hrxml:Patent+	 -> %hrxml:PatentDescriptionType
+  ;
+
+%PersonDescriptorsType:
+  hrxml:LegalIdentifiers?	 -> %hrxml:LegalIdentifiersType
+  hrxml:DemographicDescriptors?	 -> %hrxml:DemographicDescriptorsType
+  hrxml:BiologicalDescriptors?	 -> %hrxml:BiologicalDescriptorsType
+  hrxml:SupportingMaterials*	 -> %hrxml:StaffingSupportingMaterialsType
+  hrxml:OtherDescriptors{0,0}	 -> %hrxml:OtherDescriptorsType
+  hrxml:UserArea{0,0}
+  ;
+
+%PersonLegalIdType:	 base(hrxml:EntityIdType)
+  @countryCode?	 -> %hrxml:CountryCodeType
+  @jurisdiction?	 -> %xsd:string
+  @issuingRegion?	 -> %xsd:string
+  @documentType?	 -> %xsd:string
+  @idSource?	 -> %xsd:string
+  ;
+
+%PersonNameType:
+  hrxml:FormattedName?	 -> %xsd:string
+  hrxml:LegalName{0,0}	 -> %xsd:string
+  hrxml:GivenName*	 -> %xsd:string
+  hrxml:PreferredGivenName{0,0}	 -> %xsd:string
+  hrxml:MiddleName{0,0}	 -> %xsd:string
+  hrxml:FamilyName*:	 base(xsd:string)
+    @primary?:	 enum( true false undefined ) ;
+    @prefix?	 -> %xsd:string
+    ;
+  hrxml:Affix{0,0}:	 base(xsd:string)
+    @type:	 enum( aristocraticTitle formOfAddress generation qualification ) ;
+    ;
+  hrxml:AlternateScript{0,0}:
+    hrxml:FormattedName?	 -> %xsd:string
+    hrxml:LegalName?	 -> %xsd:string
+    hrxml:GivenName*	 -> %xsd:string
+    hrxml:PreferredGivenName?	 -> %xsd:string
+    hrxml:MiddleName?	 -> %xsd:string
+    hrxml:FamilyName*:	 base(xsd:string)
+      @primary?:	 enum( true false undefined ) ;
+      @prefix?	 -> %xsd:string
+      ;
+    hrxml:Affix*:	 base(xsd:string)
+      @type:	 enum( aristocraticTitle formOfAddress generation qualification ) ;
+      ;
+    @script?	 -> %xsd:string
+    ;
+  @script?	 -> %xsd:string
+  ;
+
+%PhysicalLocationType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Name?	 -> %xsd:string
+  hrxml:EffectiveDate?:
+    hrxml:StartDate?	 -> %hrxml:LocalDateNkNaType
+    hrxml:EndDate?	 -> %hrxml:LocalDateNkNaType
+    ;
+  hrxml:SpatialLocation?
+  hrxml:TravelDirections*	 -> %xsd:string
+  hrxml:PostalAddress?
+  hrxml:Area*	 -> %hrxml:LocationAreaType
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+%PositionCompensationType:
+  hrxml:StartingCompensation?:	 base(xsd:string)
+    @currency	 -> %hrxml:CurrencyCodeType
+    @intervalType?	 -> %hrxml:IntervalTypeStringExtensionType
+    @validFrom?	 -> %hrxml:AnyDateTimeNaType
+    @validTo?	 -> %hrxml:AnyDateTimeNaType
+    ;
+  hrxml:EndingCompensation?:	 base(xsd:string)
+    @currency	 -> %hrxml:CurrencyCodeType
+    @intervalType?	 -> %hrxml:IntervalTypeStringExtensionType
+    @validFrom?	 -> %hrxml:AnyDateTimeNaType
+    @validTo?	 -> %hrxml:AnyDateTimeNaType
+    ;
+  hrxml:Comments?	 -> %xsd:string
+  hrxml:OtherCompensation*:	 base(xsd:string)
+    @type?	 -> %xsd:string
+    @validFrom?	 -> %hrxml:AnyDateTimeNaType
+    @validTo?	 -> %hrxml:AnyDateTimeNaType
+    ;
+  ;
+
+%PositionHistoryType:
+  hrxml:Title?	 -> %xsd:string
+  hrxml:OrgName	 -> %hrxml:PositionOrgNameType
+  hrxml:OrgInfo*	 -> %hrxml:PositionOrgInfoType
+  hrxml:OrgIndustry*	 -> %hrxml:PositionOrgIndustryType
+  hrxml:OrgSize?	 -> %xsd:string
+  hrxml:Description	 -> %xsd:string
+  hrxml:StartDate	 -> %hrxml:FlexibleDatesType
+  hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+  hrxml:Compensation?	 -> %hrxml:PositionCompensationType
+  hrxml:Comments?	 -> %xsd:string
+  hrxml:Verification?	 -> %hrxml:VerificationType
+  hrxml:JobLevelInfo*	 -> %hrxml:JobLevelInfoType
+  hrxml:JobCategory*	 -> %hrxml:OccupationalCategoryType
+  hrxml:Competency*
+  hrxml:UserArea?
+  @positionType?	 -> %hrxml:PositionTypexStringPatternExtensionType
+  @currentEmployer?	 -> %xsd:boolean
+  ;
+
+%PositionMatchingType:
+  hrxml:Company*	 -> %hrxml:EntityReferenceType
+  hrxml:CompanyScale*	 -> %hrxml:ScaleType
+  hrxml:IndustryCode*	 -> %hrxml:IndustryCodeType
+  hrxml:PhysicalLocation*	 -> %hrxml:SEPPhysicalLocationType
+  hrxml:JobCategory*	 -> %hrxml:OccupationalCategoryType
+  hrxml:PositionTitle*	 -> %xsd:string
+  hrxml:PositionClassification*	 -> %hrxml:StaffingPositionClassificationType
+  hrxml:PositionSchedule*:	 base(hrxml:PositionScheduleType)
+    @percentage?	 -> %xsd:float
+    ;
+  hrxml:Shift*	 -> %hrxml:WorkShiftScheduleType
+  hrxml:Competency*
+  hrxml:RemunerationPackage?	 -> %hrxml:PrehireRemunerationPackageType
+  hrxml:WorkStyle*	 -> %hrxml:WorkStyleType
+  hrxml:DressCode*	 -> %hrxml:DressCodeType
+  hrxml:Travel?	 -> %hrxml:StaffingTravelType
+  hrxml:Relocation?	 -> %hrxml:StaffingRelocationType
+  hrxml:PreferredLanguage?	 -> %hrxml:LanguageCodeType
+  hrxml:UserArea?	 -> %hrxml:UserAreaType
+  ;
+
+%PositionOrgIndustryType:
+  hrxml:IndustryDescription?	 -> %xsd:string
+  hrxml:IndustryCode?:	 base(xsd:string)
+    @classificationName?	 -> %xsd:string
+    ;
+  @primaryIndicator	 -> %xsd:boolean
+  ;
+
+%PositionOrgInfoType:
+  hrxml:PositionLocation?	 -> %hrxml:PostalAddressType
+  hrxml:WebSite?	         -> %hrxml:InternetWebAddressType
+  hrxml:LocationSummary?	 -> %hrxml:EmploymentLocationSummaryType
+  ;
+
+%PositionOrgNameType:
+  hrxml:OrganizationName	 -> %xsd:string
+  hrxml:OrgName?	 -> %hrxml:PositionOrgNameType
+  @organizationType?	 -> %hrxml:OrganizationTypeStringExtensionType
+  ;
+
+%PositionPostingSearchInfoType:	 base(hrxml:PositionPostingType)
+    hrxml:SearchCriteria?
+    hrxml:SearchResult?
+  ;
+
+%PositionPostingType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Title?	 -> %xsd:string
+  hrxml:Link?	 -> %hrxml:InternetWebAddressType
+  ;
+
+%PostalAddressType:
+  hrxml:CountryCode:	 base(xsd:string) ;
+  hrxml:PostalCode?	 -> %xsd:string
+  hrxml:Region*	 -> %xsd:string
+  hrxml:Municipality?	 -> %xsd:string
+  hrxml:DeliveryAddress?:
+    hrxml:AddressLine*	 -> %xsd:string
+    hrxml:StreetName?	 -> %xsd:string
+    hrxml:BuildingNumber?	 -> %xsd:string
+    hrxml:Unit?	 -> %xsd:string
+    hrxml:PostOfficeBox?	 -> %xsd:string
+    ;
+  hrxml:Recipient{0,0}:
+    hrxml:PersonName?	 -> %hrxml:PersonNameType
+    hrxml:AdditionalText*	 -> %xsd:string
+    hrxml:Organization?	 -> %xsd:string
+    hrxml:OrganizationName?	 -> %xsd:string
+    ;
+  @type?:	 enum( postOfficeBoxAddress streetAddress militaryAddress undefined ) ;
+  ;
+
+%PrehireRemunerationPackageType:
+  hrxml:BasePay*	 -> %hrxml:BasePayType
+  hrxml:OtherPay*	 -> %hrxml:OtherPayDataType
+  hrxml:Benefits*	 -> %hrxml:BenefitsType
+  hrxml:UserArea?
+  ;
+
+%ProfessionalAssociationType:
+  hrxml:Association*	 -> %xsd:string
+  ;
+
+%PublicationHistoryType:
+  hrxml:FormattedPublicationDescription*:	 base(xsd:string)
+    @type?	 -> %hrxml:PublicationTypes
+    ;
+  hrxml:Article*	 -> %hrxml:ArticleType
+  hrxml:Book*	 -> %hrxml:BookType
+  hrxml:ConferencePaper*	 -> %hrxml:ConferencePaperType
+  hrxml:OtherPublication*	 -> %hrxml:OtherPublicationType
+  ;
+
+%RankAchievedType:
+  hrxml:StartRank?	 -> %xsd:string
+  hrxml:CurrentOrEndRank?	 -> %xsd:string
+  ;
+
+%RankedSearchRelevanceType:
+  hrxml:CriterionName?	 -> %xsd:string
+  hrxml:Requested?	 -> %xsd:string
+  hrxml:Offered?	 -> %xsd:string
+  hrxml:Score?:	 base(xsd:string)
+    @unitOfMeasure?	 -> %xsd:string
+    ;
+  hrxml:Weight?	 -> %hrxml:NumericValueType
+  hrxml:UserArea?
+  hrxml:RankedResult*	 -> %hrxml:RankedSearchRelevanceType
+  ;
+
+%RankedSearchResultsType:
+  hrxml:RankedResult*	 -> %hrxml:RankedSearchRelevanceType
+  ;
+
+%RatingType:
+  hrxml:NumericValue?:	 base(xsd:double)
+    @minValue?	 -> %xsd:double
+    @maxValue?	 -> %xsd:double
+    @description?	 -> %xsd:string
+    ;
+  hrxml:StringValue?:	 base(xsd:string)
+    @minValue?	 -> %xsd:string
+    @maxValue?	 -> %xsd:string
+    @description?	 -> %xsd:string
+    ;
+  ;
+
+%RecordInfoType:
+  hrxml:Id*	 -> %hrxml:EntityIdType
+  hrxml:Status?:	 base(hrxml:ExtendedBasicStatusType)
+    @validFrom?	 -> %hrxml:AnyDateTimeNkNaType
+    @validTo?	 -> %hrxml:AnyDateTimeNkNaType
+    ;
+  ;
+
+%ReferencesType:
+  hrxml:Reference+
+  ;
+
+%ReferenceType:
+  hrxml:PersonName?	 -> %hrxml:PersonNameType
+  hrxml:PositionTitle?	 -> %xsd:string
+  hrxml:ContactMethod*	 -> %hrxml:ContactMethodType
+  hrxml:Comments?	 -> %xsd:string
+  @type?	 -> %hrxml:ReferenceTypes
+  ;
+
+%RelatedOrganizationalUnitType:	 base(hrxml:OrganizationalUnitType)
+  @relationship?	 -> %hrxml:OrganizationalUnitRelationshipType
+  @natureOfRelationship?	 -> %hrxml:OrganizationalUnitStructureType
+  ;
+
+%RelatedOrganizationType:	 base(hrxml:OrganizationType)
+  @relationship?	 -> %hrxml:OrganizationRelationshipType
+  ;
+
+%SafetyEquipmentType:	 base(xsd:string)
+  @suppliedByOrganization?	 -> %xsd:boolean
+  ;
+
+%SchoolDataType:
+  hrxml:InternetDomainName*	 -> %hrxml:InternetDomainNameType
+  hrxml:SchoolId*	 -> %hrxml:EntityIdType
+  hrxml:SchoolName?	 -> %xsd:string
+  @type?	 -> %hrxml:SchoolTypeType
+  ;
+
+%SchoolOrInstitutionType:
+  hrxml:SchoolName?	 -> %xsd:string
+  hrxml:School*	 -> %hrxml:SchoolDataType
+  hrxml:LocationSummary?:
+    hrxml:Municipality?	 -> %xsd:string
+    hrxml:Region*	 -> %xsd:string
+    hrxml:CountryCode?
+    hrxml:PostalCode?	 -> %xsd:string
+    ;
+  hrxml:PostalAddress?
+  hrxml:OrganizationUnit*:	 base(xsd:string)
+    @organizationType	 -> %hrxml:OrgTypeStringExtensionType
+    @attendanceStatus?:	 enum( current prior unknown ) ;
+    ;
+  hrxml:Degree*:	 base(hrxml:EduDegreeType) ;
+  hrxml:Major*	 -> %xsd:string
+  hrxml:Minor*	 -> %xsd:string
+  hrxml:Measure?	 -> %hrxml:EduMeasureType
+  hrxml:DatesOfAttendance?	 -> %hrxml:DeprecatedDatesOfAttendanceType
+  hrxml:Comments?	 -> %xsd:string
+  hrxml:ISCEDInstitutionClassification?	 -> %hrxml:ISCEDInstitutionClassificationType
+  hrxml:LocalInstitutionClassification*	 -> %hrxml:ClassificationType
+  hrxml:UserArea?
+  @schoolType	 -> %hrxml:SchoolTypeStringExtensionType
+  ;
+
+%SearchCriteriaType:
+  hrxml:SearchCriteriaId?	 -> %hrxml:EntityIdType
+  hrxml:SearchTarget*	 -> %xsd:string
+  hrxml:UserId?	 -> %hrxml:EntityIdType
+  hrxml:SearchTimeStamp?	 -> %xsd:dateTime
+  hrxml:SearchString?	 -> %xsd:anyURI
+  hrxml:SearchCriterion*	 -> %hrxml:OtherSearchCriteriaType
+  hrxml:UserArea?
+  ;
+
+%SearchResultType:
+  hrxml:SearchResultId?	 -> %hrxml:EntityIdType
+  hrxml:SearchTarget*	 -> %xsd:string
+  hrxml:UserId?	 -> %hrxml:EntityIdType
+  hrxml:SearchTimeStamp?	 -> %xsd:dateTime
+  hrxml:MatchedObjectId?	 -> %hrxml:EntityIdType
+  hrxml:SearchRelevanceScore?:	 base(xsd:string)
+    @unitOfMeasure?	 -> %xsd:integer
+    ;
+  hrxml:SearchRelevanceRank?	 -> %xsd:int
+  hrxml:SearchResultCount?	 -> %xsd:int
+  hrxml:RankedSearchResults?	 -> %hrxml:RankedSearchResultsType
+  hrxml:UserArea?
+  ;
+
+%SEPContactInfoType:
+  hrxml:PersonName?
+  hrxml:ContactMethod*	 -> %hrxml:ContactMethodType
+  ;
+
+%SEPPhysicalLocationType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Name?	 -> %xsd:string
+  hrxml:SpatialLocation?:
+    hrxml:Latitude:	 base(xsd:string) ;
+    hrxml:Longitude:	 base(xsd:string) ;
+    hrxml:Altitude?	 -> %xsd:decimal
+    hrxml:AltitudeMeanSeaLevel?	 -> %xsd:decimal
+    hrxml:HorizontalAccuracy?	 -> %hrxml:NonNegativeDecimal
+    hrxml:VerticalAccuracy?	 -> %hrxml:NonNegativeDecimal
+    ;
+  hrxml:TravelDirections*	 -> %xsd:string
+  hrxml:Area*	 -> %hrxml:AreaType
+  hrxml:PostalAddress?
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+%SourceTypeType:
+  hrxml:StandardValue	 -> %hrxml:SourceEnumType
+  hrxml:NonStandardValue	 -> %xsd:string
+  ;
+
+%SpatialLocationType:
+  hrxml:Latitude	 -> %hrxml:LatitudeType
+  hrxml:Longitude	 -> %hrxml:LongitudeType
+  hrxml:Altitude?	 -> %xsd:decimal
+  hrxml:AltitudeMeanSeaLevel?	 -> %xsd:decimal
+  hrxml:HorizontalAccuracy?	 -> %hrxml:NonNegativeDecimal
+  hrxml:VerticalAccuracy?	 -> %hrxml:NonNegativeDecimal
+  ;
+
+%SpeakingEventType:
+  hrxml:Title?	 -> %xsd:string
+  hrxml:Role?	 -> %xsd:string
+  hrxml:StartDate?	 -> %hrxml:FlexibleDatesType
+  hrxml:EndDate?	 -> %hrxml:FlexibleDatesType
+  hrxml:EventName	 -> %xsd:string
+  hrxml:EventType?	 -> %hrxml:ExtendedEventTypeType
+  hrxml:Location?	 -> %xsd:string
+  hrxml:Description?	 -> %xsd:string
+  hrxml:AffiliatedOrganization*	 -> %xsd:string
+  hrxml:Link?	 -> %hrxml:InternetWebAddressType
+  @type?	 -> %hrxml:ExtendedSpeakingTypeType
+  ;
+
+%SpecifiedCompetencyReferenceType:
+  hrxml:CompetencyId
+  hrxml:ProficencyLevel?	 -> %xsd:string
+  ;
+
+%StaffingRelocationType:
+  hrxml:Comments?	 -> %xsd:string
+  @relocationConsidered	 -> %xsd:boolean
+  ;
+
+%StaffingSupportingMaterialsType:
+    hrxml:Link{0,0}	 -> %InternetWebAddressType
+    hrxml:AttachmentReference?:	 base(xsd:string)
+      @context?	 -> %xsd:string
+      @mimeType?	 -> %xsd:string
+    ;
+   hrxml:Description?	 -> %xsd:string
+  ;
+
+%StaffingTravelType:
+  hrxml:Applicable?	 -> %xsd:boolean
+  hrxml:TravelFrequency?	 -> %xsd:string
+  hrxml:TravelConsiderations?	 -> %xsd:string
+  ;
+
+%StockType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Symbol?	 -> %xsd:string
+  hrxml:Exchange?	 -> %xsd:string
+  ;
+
+%StructuredXMLResumeType:
+  hrxml:ContactInfo?	 -> %hrxml:SEPContactInfoType
+  hrxml:ExecutiveSummary?	 -> %xsd:string
+  hrxml:Objective?	 -> %xsd:string
+  hrxml:EmploymentHistory?
+  hrxml:EducationHistory?
+  hrxml:LicensesAndCertifications?
+  hrxml:MilitaryHistory?
+  hrxml:PatentHistory?
+  hrxml:PublicationHistory?
+  hrxml:SpeakingEventsHistory?
+  hrxml:Qualifications?:
+    hrxml:QualificationSummary?	 -> %xsd:string
+    hrxml:Competency*
+    ;
+  hrxml:Languages{0,0}:
+    hrxml:Language+
+    ;
+  hrxml:Achievements?
+  hrxml:Associations?
+  hrxml:References?
+  hrxml:SecurityCredentials?
+  hrxml:ResumeAdditionalItems?:
+    hrxml:ResumeAdditionalItem+
+    ;
+  hrxml:SupportingMaterials*	 -> %hrxml:StaffingSupportingMaterialsType
+  hrxml:ProfessionalAssociations?	 -> %hrxml:ProfessionalAssociationType
+  &hrxml:Comments?
+  hrxml:RevisionDate?	 -> %hrxml:AnyDateTimeNkType
+  ;
+
+%SupplierType:
+  hrxml:SupplierId?	 -> %hrxml:EntityIdType
+  hrxml:EntityName?	 -> %xsd:string
+  hrxml:ContactName?	 -> %hrxml:PersonNameType
+  hrxml:ContactMethod*	 -> %hrxml:ContactMethodType
+  hrxml:SourceType?	 -> %hrxml:SourceTypeType
+  @relationship?	 -> %hrxml:RelationshipsType
+  ;
+
+%TelcomNumberType:
+  hrxml:FormattedNumber?
+  &TelcomNumberGroup?
+  ;
+
+%TimeOffAllowanceType:
+  hrxml:Description?	 -> %xsd:string
+  @timeOffType?	 -> %hrxml:TimeOffTypes
+  ;
+
+%UserAreaType:
+  any*
+  ;
+
+%USLocalizedPositionClassificationType:
+  hrxml:FLSAStatus	 -> %hrxml:FLSAStatusEnumType
+  hrxml:EEOCJobCategory?	 -> %hrxml:EEOCJobCategoryType
+  hrxml:AffirmativeActionPlanJobGroupId?	 -> %hrxml:EntityIdType
+  ;
+
+%VerificationType:
+  hrxml:ContactInfo:
+    hrxml:PersonName
+    hrxml:ContactMethod*	 -> %hrxml:ContactMethodType
+    ;
+  hrxml:ReasonForLeaving?	 -> %xsd:string
+  hrxml:PermissionToContact?	 -> %xsd:boolean
+  hrxml:VerifyEmployment?	 -> %xsd:boolean
+  hrxml:EligibleForRehire?	 -> %xsd:boolean
+  hrxml:AttendanceRating?	 -> %RatingType
+  hrxml:OverallPerformanceRating?	 -> %RatingType
+  hrxml:QuestionAnswerPair*	 -> %EmploymentQuestionAnswerPairType
+  ;
+
+%WorkShiftScheduleType:
+  hrxml:Id?	 -> %hrxml:EntityIdType
+  hrxml:Name?	 -> %xsd:string
+  hrxml:Hours?	 -> %xsd:decimal
+  hrxml:StartTime?	 -> %hrxml:LocalTimeNkNaType
+  hrxml:EndTime?	 -> %hrxml:LocalTimeNkNaType
+  hrxml:PayTypeHours?
+  hrxml:Comments?	 -> %xsd:string
+  @shiftPeriod?	 -> %hrxml:ShiftPeriodType
+  ;
+%WorkSiteEnvironmentType:
+  hrxml:EnvironmentName?	 -> %xsd:string
+  hrxml:EnvironmentId?	 -> %hrxml:EntityIdType
+  hrxml:WorkSiteId?	 -> %hrxml:EntityIdType
+  hrxml:Description?:	 base(xsd:string)
+    @xml:lang?
+    ;
+  hrxml:Considerations*:
+    hrxml:General*	 -> %xsd:string
+    hrxml:Physical*	 -> %xsd:string
+    hrxml:SafetyEquipment*	 -> %hrxml:SafetyEquipmentType
+    hrxml:DressCode*	 -> %hrxml:DressCodeType
+    hrxml:UserArea?
+    @xml:lang?
+    ;
+  hrxml:UserArea?
+  ;
+
+%WorkSiteType:
+  hrxml:WorkSiteName?	 -> %xsd:string
+  hrxml:WorkSiteId?	 -> %hrxml:EntityIdType
+  hrxml:Details*:	 base(hrxml:LanguageDependentTextType)
+    @type?	 -> %xsd:string
+    ;
+  hrxml:PostalAddress?	 -> %hrxml:PostalAddressType
+  hrxml:TravelDirections*	 -> %hrxml:LanguageDependentTextType
+  hrxml:ParkingInstructions*	 -> %hrxml:LanguageDependentTextType
+  hrxml:WorkSiteEnvironment*
+  hrxml:UserArea?
+  ;
+
+Achievement	 -> %hrxml:AchievementType
+Achievements:
+  hrxml:Achievement+
+  ;
+AreaCityCode	 -> %xsd:string
+Association:	 base(hrxml:AssociationType)
+  @type?	 -> %hrxml:ExtendedAssociationTypeType
+  ;
+
+Associations:
+  hrxml:Association+
+  ;
+
+Competency	 -> %hrxml:CompetencyType
+CompetencyId	 -> %hrxml:EntityIdType
+CountryCode	 -> %hrxml:CountryCodeType
+CurrencyCode	 -> %hrxml:CurrencyCodeType
+
+DunsNumber	 -> %hrxml:DunsNumberDataType
+EducationHistory	 -> %hrxml:EducationHistoryType
+EmploymentHistory	 -> %hrxml:EmploymentHistoryType
+Extension	 -> %xsd:string
+Fax	 -> %hrxml:TelcomNumberType
+FLSAStatus	 -> %hrxml:FLSAStatusEnumType
+FormattedNumber	 -> %xsd:string
+Frequency	 -> %hrxml:FrequencyType
+
+GenderCode	 -> %hrxml:GenderCodeType
+IndustryCode	 -> %hrxml:IndustryCodeType
+InternationalCountryCode	 -> %xsd:string
+InternetDomainName	 -> %hrxml:InternetDomainNameType
+InternetEmailAddress	 -> %hrxml:InternetEmailAddressType
+InternetWebAddress	 -> %hrxml:InternetWebAddressType
+
+Language:
+  hrxml:LanguageCode?
+  hrxml:Read?	 -> %xsd:boolean
+  hrxml:Write?	 -> %xsd:boolean
+  hrxml:Speak?	 -> %xsd:boolean
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+LanguageCode	 -> %hrxml:LanguageCodeType
+LicenseOrCertification	 -> %hrxml:CredentialType
+LicensesAndCertifications:
+  hrxml:LicenseOrCertification+
+  ;
+
+Location	 -> %hrxml:contactMethodLocationPatternExtensionType
+MilitaryHistory	 -> %hrxml:MilitaryHistoryType
+Mobile	 -> %hrxml:MobileTelcomNumberType
+NationalNumber	 -> %xsd:string
+NonXMLResume	 -> %hrxml:NonXMLResumeType
+NumericValue	 -> %hrxml:NumericValueType
+Organization:	 base(OrganizationType) ;
+OrganizationalUnit	 -> %hrxml:OrganizationalUnitType
+Pager	 -> %hrxml:TelcomNumberType
+PatentHistory	 -> %hrxml:PatentHistoryType
+PayTypeHours	 -> %hrxml:USPayTypeHoursType
+PersonalData	 -> %hrxml:CandidatePersonalDataType
+PersonDescriptors	 -> %hrxml:PersonDescriptorsType
+PersonName	 -> %hrxml:PersonNameType
+PhysicalLocation	 -> %hrxml:PhysicalLocationType
+PositionMatching	 -> %hrxml:PositionMatchingType
+PostalAddress	 -> %hrxml:PostalAddressType
+PrehireRemuneration	 -> %hrxml:PrehireRemunerationPackageType
+PublicationHistory	 -> %hrxml:PublicationHistoryType
+Reference	 -> %hrxml:ReferenceType
+References	 -> %hrxml:ReferencesType
+Resume:
+  hrxml:ResumeId?	 -> %hrxml:EntityIdType
+  hrxml:DistributionGuidelines?	 -> %hrxml:DistributionGuidelinesType
+  hrxml:StructuredXMLResume?
+  hrxml:NonXMLResume?
+  hrxml:UserArea?
+  @xml:lang?
+  ;
+
+ResumeAdditionalItem	 -> %hrxml:AdditionalItemType
+SearchCriteria	 -> %hrxml:SearchCriteriaType
+SearchResult	 -> %hrxml:SearchResultType
+SecurityCredential	 -> %hrxml:CredentialType
+SecurityCredentials:
+  hrxml:SecurityCredential+
+  ;
+SEPPhysicalLocation	 -> %hrxml:SEPPhysicalLocationType
+SpatialLocation	 -> %hrxml:SpatialLocationType
+SpeakingEvent	 -> %hrxml:SpeakingEventType
+SpeakingEventsHistory:
+  hrxml:SpeakingEvent+
+  ;
+SpecifiedCompetencyReference	 -> %hrxml:SpecifiedCompetencyReferenceType
+
+StringValue:	 base(xsd:string)
+  @minValue?	 -> %xsd:string
+  @maxValue?	 -> %xsd:string
+  @description?	 -> %xsd:string
+  ;
+
+StructuredXMLResume	 -> %hrxml:StructuredXMLResumeType
+
+SubscriberNumber	 -> %xsd:string
+
+SupportingInformation	 -> %xsd:string
+
+Telephone	 -> %hrxml:TelcomNumberType
+
+TTYTDD	 -> %hrxml:TelcomNumberType
+
+Use	 -> %hrxml:contactMethodUsePatternExtensionType
+
+UserArea	 -> %hrxml:UserAreaType
+
+WhenAvailable	 -> %hrxml:contactMethodWhenAvailableType
+
+WorkSite	 -> %hrxml:WorkSiteType
+
+WorkSiteEnvironment	 -> %hrxml:WorkSiteEnvironmentType
+
+&Comments: 
+  hrxml:Comments?	 -> %xsd:string
+  ;
+
+&TelcomNumberGroup: 
+  hrxml:InternationalCountryCode?
+  hrxml:NationalNumber?
+  hrxml:AreaCityCode?
+  hrxml:SubscriberNumber
+  hrxml:Extension?
+  ;
+
+%Resume301111:
+  hrxml:ResumeId?	 -> %EntityIdType
+  hrxml:DistributionGuidelines{0,0}	 -> %DistributionGuidelinesType
+  hrxml:StructuredXMLResume?
+  hrxml:NonXMLResume{0,0}
+  hrxml:UserArea{0,0}
+  @xml:lang?
+  ;
+
+#EOF

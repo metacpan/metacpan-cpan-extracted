@@ -1,12 +1,13 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use FindBin;                      # Find the location of seq-manipulations
-use rlib '../lib';
-require Bio::BPWrapper::PopManipulations;
-use v5.10;
-use Getopt::Long qw(:config gnu_getopt);
 use Pod::Usage;
+use FindBin;                      # Find the location of seq-manipulations
+use v5.10;
+use rlib '../lib';
+use Getopt::Long qw( :config bundling permute no_getopt_compat );
+use Bio::BPWrapper;
+use Bio::BPWrapper::PopManipulations;
 
 ################# Option parsing #################
 my %opts;
@@ -42,115 +43,139 @@ GetOptions(
 #    "kaks=s",
 ) or pod2usage(2);
 
-pod2usage(1) if $opts{"help"};
-pod2usage(-exitstatus => 0, -verbose => 2) if $opts{"man"};
-&print_version() if $opts{"version"};
-
-######################## Main #####################
+use constant PROGRAM => File::Basename::basename(__FILE__);
+Bio::BPWrapper::print_version(PROGRAM) if $opts{"version"};
 
 # This sets all internal variables, and loads AlignIO objects
 initialize(\%opts, \%flags);
-
-for my $option (keys %opts) {
-    # If there is a function to handle the current option, execute it
-    if (can_handle($option)) { handle_opt($option); exit }
-    else { warn "Missing handler for: $option\n" }
-}
+write_out(\%opts)
 
 ################# POD Documentation ##################
 
 __END__
-
 =encoding utf8
 
 =head1 NAME
 
-=over
-
-=item B<biopop> - Wrapper script for BioPerl's population genetics modules
-
-=back
+biopop - Wrapper script for L<Bio::Perl>'s population genetics modules
 
 =head1 SYNOPSIS
 
-B<biopop> [options] <alignment_file>
+B<biopop> I<options> [I<alignment_file>]
+
+B<biopop> [C<-h> | C<--help> | --C<v> | C<--version> C<--man>]
 
 =head1 DESCRIPTION
 
-B<biopop> DESCRIPTION GOES HERE
+Wrapper script for L<Bio::Perl>'s population genetics modules: use L<Bio::PopGen::Utilities>;
+L<Bio::PopGen::Statistics>, and L<Bio::PopGen::Population>;
 
-=head1 OPTIONS
+=head2 OPTIONS
 
-=head2 --help, -h
+=over 4
 
-Print a brief help message and exits.
-
-=head2 --distance, -d
+=item --distance, -d
 
 Calculates a distance matrix for all pairwise distances of all sequences in the input alignment and prints it out.
 
 Use B<--dist-method> to specify the method desired. The default in Bio::Align::DNAStatistics is "JukesCantor".
 
-=head2 --dist-method, -D
+=item --dist-method, -D
 
 Used with --distance to specify which distance method to use when getting the distance matrix.
 
 Program quits if the distance method is invalid
 
-=head2 --heterozygosity, -H
+=item --heterozygosity, -H
 
 Foreach segregating site(s), the observed heterozygosity is returned.
 
-=head2 --input, -i
+=item --input, -i
 
 Input file format. By default, this is 'clustalw'.
 
-=head2 --mismatch, -m
+=item --mismatch, -m
 
 Pairwise calculation of mismatches for all sequences in the alignment.
 
-=head2 --numseq, -n
+=item --numseq, -n
 
 Input file format. By default, this is 'clustalw'.
 
-=head2 --pi, -p
+=item --pi, -p
 
 Nucleotide Diversity is a measure of genetic variation or differences. It is similar to expected heterozygosity. This method takes in an alignment and outputs an integer.
 
-=head2 --stats, -s <comma separated list of values>
+=item --stats, -s <comma separated list of values>
 
 Specify the statistics you would like to gather from input data. e.g., "theta,pi" will calculate the theta and pi values.
 
 Can also be specified by giving the option multiple times. e.g.,
  biopop --stats=pi --stats=theta
 
-=head2 --snp_coding
+=item --snp_coding
 
 Identify & print, for each 2-state SNP, codon position, aligned nucleotide position, syn/nonsyn, frequencies of each allleic state, for a coding alignment.
 
-=head2 --varsites, -v
+=item --varsites, -v
 
 This method outputs the number of segregating or SNP sites within your alignment.
 
-=head2 --version, -V
+=back
 
-Print current release version of bp-utils.
+=head3 Common Options
 
-Usage: bioseq -V
+=over 4
 
-=head1 REQUIRES
+=item --help, -h
 
-Perl 5.010, BioPerl
+Print a brief help message and exit.
+
+=item --man
+
+Print the manual page and exit.
+
+=item --version, -V
+
+Print current release version of this command and exit.
+
+=back
 
 =head1 SEE ALSO
 
-  perl(1)
+=over 4
 
-=head1 AUTHORS
+=item *
 
- Weigang Qiu at genectr.hunter.cuny.edu
+L<Bio::BPWrapper::PopManipulations>, the underlying Perl Module
+
+=item *
+
+L<Qiu Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+
+=item *
+
+L<Github project wiki page|https://github.com/bioperl/p5-bpwrapper/wiki>
+
+=item *
+
+L<bioseq>: a wrapper of BioPerl class L<Bio::Seq> with additional methods
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
  Yözen Hernández yzhernand at gmail dot com
 
-=cut
+=item *
+L<Weigang Qiu | mailto:weigang@genectr.hunter.cuny.edu> (Maintainer)
 
-##################### End ##########################
+=item *
+Rocky Bernstein
+
+=back
+
+=cut

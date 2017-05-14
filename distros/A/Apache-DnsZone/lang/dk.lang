@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # created by thomas@stderr.net (2001/03/23)
-# $Id: dk.lang,v 1.8 2001/04/24 22:15:09 thomas Exp $
+# $Id: dk.lang,v 1.9 2001/06/22 17:45:07 thomas Exp $
 
 use strict;
 
@@ -29,7 +29,9 @@ sub lang () {
 		'EXPIRE'            => 'Udl&oslash;bs interval',
 		'TTL'               => 'Levetid',
 		'HOST'              => 'V&aelig;rt',
+		'REVERSE_HOST'      => 'Omvendt opslag',
 		'IP_ADDRESS'        => 'IP adresse',
+		'IPV6_ADDRESS'      => 'IPv6 adresse',
 		'CNAME'             => 'Kanonisk navn',
 		'MX'                => 'Mail udveksler',
 		'PREFERENCE'        => 'Pr&aelig;ference',
@@ -48,7 +50,9 @@ sub lang () {
 		'ERROR_CORRECT'     => 'Ret venligst f&oslash;lgende fejl:',
 		'ERROR_DUPLICATE'   => 'Enslydende post eksisterer',
 		'ERROR_IP'          => 'Ukorrekt v&aelig;rdi for IP adresse',
+		'ERROR_IPV6'        => 'Ukorrekt v&aelig;rdi for IPv6 adresse',
 		'ERROR_HOST'        => 'Ukorrekt v&aelig;rdi for V&aelig;rt',
+		'ERROR_REVERSE'     => 'Ukorrekt v&aelig;rdi for Omvendt opslag',
 		'ERROR_TTL'         => 'Ukorrekt v&aelig;rdi for Levetid',
 		'ERROR_CNAME'       => 'Ukorrekt v&aelig;rdi for Kanonisk navn',
 		'ERROR_MX'          => 'Ukorrekt v&aelig;rdi for Mail udveksler',

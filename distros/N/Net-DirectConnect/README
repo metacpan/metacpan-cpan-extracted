@@ -28,7 +28,11 @@ DESCRIPTION
 INSTALLATION
      To install this module type the following:
 
+       cpan DBD::SQLite IO::Socket::IP IO::Socket::INET6 IO::Socket::SSL
        perl Makefile.PL && make install clean
+
+     debian:
+     apt-get install libdbd-sqlite3-perl libio-socket-ip-perl libjson-xs-perl libjson-perl libmime-base32-perl liblib-abs-perl
 
 SEE ALSO
      latest snapshot
@@ -64,11 +68,4 @@ COPYRIGHT AND LICENSE
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.10.0 or, at
     your option, any later version of Perl 5 you may have available.
-
-POD ERRORS
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 1172:
-        Unknown directive: =no
 

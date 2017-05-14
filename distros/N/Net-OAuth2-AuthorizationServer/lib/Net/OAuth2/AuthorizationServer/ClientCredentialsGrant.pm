@@ -31,6 +31,7 @@ Net::OAuth2::AuthorizationServer::ClientCredentialsGrant - OAuth2 Client Credent
     client_id       => $client_id,
     scopes          => [ qw/ list of scopes / ],
     user_id         => $user_id,      # optional
+	jwt_claims_cb   => sub { ... },   # optional, see jwt_claims_cb in Manual
   );
 
   # store access token

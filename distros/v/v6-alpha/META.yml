@@ -1,0 +1,21 @@
+abstract: ~
+author: The Pugs Team <perl6-compiler@perl.org>.
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: v6-alpha
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Perl::Tidy: 0
+requires: 
+  Data::Bind: 0.25
+  Devel::Caller: 0.10
+  Module::Compile: 0.17
+  Moose: 0.10
+  Pugs::Compiler::Rule: 0.06
+  Scalar::Util: 0
+  perl: 5.6.0
+version: 0.006

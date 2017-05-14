@@ -2,7 +2,6 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 use IO::Scalar;
-use Test::Exception;
 
 BEGIN {
   eval "use 5.010";
@@ -75,22 +74,6 @@ EOF
   my $m = dict_slurp( $sh, { key_idx => 1, val_idx => 0 } );
   $sh->close;
   is_deeply( $m, { 2 => [1], 6 => [5] } );
-}
-{
-  my $data = <<EOF;
-c1;c2
-a;a1
-b;b1
-c;c1
-c;c2
-EOF
-  my $sh = IO::Scalar->new( \$data );
-  dies_ok {dict_slurp( $sh, { key_idx => 0, val_idx => 1, uniq => 1, strict => 1, sep => ';' } )};
-  $sh->close;
-  my $sh2 = IO::Scalar->new( \$data );
-  my $m = dict_slurp( $sh2, { key_idx => 0, val_idx => 1, uniq => 1, strict => 0, sep => ';' } );
-  $sh2->close;
-  is_deeply( $m, { c1 => 'c2', a => 'a1', b => 'b1', c => 'c2' } );
 }
 {
   my $data = <<EOF;

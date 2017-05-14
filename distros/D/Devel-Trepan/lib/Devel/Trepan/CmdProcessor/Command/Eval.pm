@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011, 2012, 2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2012, 2014-2015 Rocky Bernstein <rocky@cpan.org>
 use warnings; use utf8;
 use rlib '../../../..';
 
@@ -22,8 +22,6 @@ use vars qw(@ISA); @ISA = @CMD_ISA;
 use vars @CMD_VARS;  # Value inherited from parent
 
 our $NAME = set_name();
-=pod
-
 =head2 Synopsis:
 
 =cut
@@ -49,13 +47,13 @@ alias) and no string is given we will the perform the translations:
  var = expr                    => expr
 
 The above is done via regular expression. No fancy parsing is done, say,
-to look to see if expr is split across a line or whether var an assigment
+to look to see if I<expr> is split across a line or whether var an assigment
 might have multiple variables on the left-hand side.
 
 The value of the expression is stored into global array I<@DB:D> so it
 may be used again easily.
 
-Normally eval assumes you are typing a statement, not an expression;
+Normally I<eval> assumes you are typing a statement, not an expression;
 the result is a scalar value. However you can force the type of the result
 by adding the appropriate sigil C<@>, C<%>, or C<$>.
 
@@ -79,8 +77,9 @@ by adding the appropriate sigil C<@>, C<%>, or C<$>.
 =head2 See also:
 
 L<C<set auto
-eval>|Devel::Trepan::CmdProcessor::Command::Set::Auto::Eval>, and
-L<C<set display eval>|Devel::Trepan::CmdProcessor::Command::Set::Display::Eval>.
+eval>|Devel::Trepan::CmdProcessor::Command::Set::Auto::Eval>,
+L<C<set display eval>|Devel::Trepan::CmdProcessor::Command::Set::Display::Eval>, and
+L<C<shell>|Devel::Trepan::CmdProcessor::Command::Shell>.
 =cut
 HELP
 

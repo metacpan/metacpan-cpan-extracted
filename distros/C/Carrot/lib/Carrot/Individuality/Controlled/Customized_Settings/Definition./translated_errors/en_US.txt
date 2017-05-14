@@ -1,0 +1,13 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+missing_definition_purpose
+	﻿The definition candidate class has no known purpose.
+	Candidate: '%s'
+
+
+invalid_definition_flag
+	﻿The definition of a  flag isn't known.
+	Flag: '%s'

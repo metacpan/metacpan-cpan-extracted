@@ -1,0 +1,53 @@
+This document applies to version 1.1.309 of Carrot, released 17th August 2014
+
+The current release is a development snapshot for the purpose of
+public preview. It's possible but not recommended to install Carrot
+like other Perl modules. Installation follows the standard pattern:
+
+	perl Makefile.PL
+	make
+	#make test #no systematic unit tests for the moment
+	make install
+
+However, the problem with installation is de-installation.
+There is no "make uninstall". But new versions might require
+old versions to be uninstalled. Therefore its recommended
+to evaluate Carrot without installation. The remainder of
+this document is about running Carrot from the archive.
+
+This statement downloads and unpacks the archive file:
+
+curl http://www.carrot-programming.org/perl/snapshots/Carrot-1.1.309.tar.gz \
+| tar -xzf -
+
+Execute these commands to see Carrot in action:
+
+	cd Carrot-1.1.309
+	cp -a Documentation/dot_carrot ~/.carrot
+	./lib/Carrot./carrot_program.sh \
+		--carrot-mode=development hello_world
+
+It should print something like the following
+
+	  END loading | ^
+	  END loading ^
+	S: 4
+	START loading Carrot::Continuity::Coordination::Episode::Targ...
+	START loading | Carrot::Continuity::Coordination::Episode::So...
+	START loading | | Carrot::Continuity::Coordination::Episode::...
+	  END loading | | ^
+	  END loading | ^
+	  END loading ^
+	Starting Loop
+	Hello World 9466
+	Hello World 9466
+	Hello World 9466
+
+Press Ctrl-C to abort. Verbosity is controlled in the file
+~/.carrot/global_variables-development.pl
+You might also try one of the general test scripts:
+
+       ./lib/Carrot./carrot_script.sh \
+		Carrot/Personality/Structured/Internet/Protocol/HTTP./unit_tests/proof_of_concept.pl
+
+That's it. For more information, see http://www.carrot-programming.org

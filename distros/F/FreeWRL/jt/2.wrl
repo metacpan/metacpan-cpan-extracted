@@ -1,0 +1,35 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# Simple script to see if javascript events are going back and forth.
+# shows a cube that changes color randomly.
+
+Shape {
+ geometry Box { }
+ appearance Appearance { material DEF MAT Material { } }
+}
+
+DEF TS TimeSensor {
+	cycleInterval 6
+	enabled TRUE
+	loop TRUE
+}
+
+DEF SCR Script {
+	url "javascript: function fraction(val,time) {
+		f = val*3.14;
+		color = new SFColor(0.5*Math.sin(f*2)+0.5,
+			0.5*Math.sin(f*3)+0.5,
+			0.5*Math.sin(f*5)+0.5);
+		return color
+	}
+	"
+	eventIn SFFloat fraction
+	eventOut SFColor color
+}
+
+ROUTE TS.fraction_changed TO SCR.fraction
+ROUTE SCR.color TO MAT.diffuseColor

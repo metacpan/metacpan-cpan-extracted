@@ -1,0 +1,519 @@
+=head1 NAME
+
+Bio::Genex::HotSpots - Methods for processing data from the GeneX DB
+linking table: HotSpots
+
+=head1 SYNOPSIS
+
+  use Bio::Genex::HotSpots;
+
+  # instantiating a linking table instance
+  my $HotSpots = Bio::Genex::HotSpots->new(id=>47,pkey_link=>'es_fk');
+  # or 
+  my $HotSpots = Bio::Genex::HotSpots->new(id=>47,pkey_link=>'usf_fk');
+
+  # retrieve data from the DB for all columns
+  $HotSpots->fetch();
+
+  # creating an instance, without pre-fetching all columns
+  my $HotSpots = new Bio::Genex::HotSpots(id=>47,
+                                              'pkey_link'=>'es_fk');
+
+  # creating an instance with pre-fetched data
+  my $HotSpots = new Bio::Genex::HotSpots(id=>47, 
+                                            'fetch_all'=>1,
+                                            'pkey_link'=>'es_fk');
+
+  # retrieving multiple instances via primary keys
+  my @objects = Bio::Genex::HotSpots->get_objects('pkey_link'=>'es_fk',
+                                                  23,57,98);
+
+
+  # retrieving all instances from a table
+  my @objects = Bio::Genex::HotSpots->get_objects('ALL');
+
+  # retrieving the primary key for an object, generically
+  my $primary_key = $HotSpots->id();
+
+  # retrieving other DB column attributes
+  my $es_fk_val = $HotSpots->es_fk();
+  $HotSpots->es_fk($value);
+
+  my $usf_fk_val = $HotSpots->usf_fk();
+  $HotSpots->usf_fk($value);
+
+  my $threshold_type_val = $HotSpots->threshold_type();
+  $HotSpots->threshold_type($value);
+
+
+=head1 DESCRIPTION
+
+Each Genex class has a one to one correspondence with a GeneX DB table
+of the same name (I<i.e.> the corresponding table for Bio::Genex::HotSpots is
+HotSpots).
+
+
+B<NOTE>: Class Bio::Genex::HotSpots is linking table class. This means
+that it represents a table in the Genex DB which has no primary
+key. Instead, there are two foreign keys that can be used to lookup a
+value from the database. In Bio::Genex::HotSpots, those two columns are
+'es_fk' and 'es_fk'. When an instance of
+Bio::Genex::HotSpots is instantiated, either via C<new()> or
+C<get_objects(@id_list)>, the 'C<pkey_link>' parameter must be
+specified as one of these two values, otherwise, an error will result.
+
+
+Most applications will first create an instance of Bio::Genex::HotSpots
+and then fetch the data for the object from the DB by invoking
+C<fetch()>. However, in cases where you may only be accessing a single
+value from an object the built-in L<delayed fetch|/DELAYED_FETCH>
+mechanism can be used. All objects are created without pre-fetching
+any data from the DB. Whenever an attribute of the object is accessed
+via a getter method, the data for that attribute will be fetched from
+the DB if it has not already been. Delayed fetching happens
+transparently without the user needing to enable or disable any
+features. 
+
+Since data is not be fetched from the DB I<until> it is accessed by
+the calling application, it could presumably save a lot of access time
+for large complicated objects when only a few attribute values are
+needed.
+
+=head1 ATTRIBUTES
+
+There are three different types of attributes which instances of
+Bio::Genex::HotSpots can access: I<raw> foreign key attributes,
+Obect-Oriented foreign key attributes, and simple column attributes.
+
+=over 4 
+
+=item Raw Foreign Keys Attributes
+
+=item Object Oriented Foreign Key Attributes
+
+This mode presents foreign key attributes in a special way, with all
+non-foreign key attributes presented normally. Foreign keys are first
+retrieved from the DB, and then objects of the appropriate classes are
+created and stored in slots. This mode is useful for applications that
+want to process information from the DB because it automates looking
+up information.
+
+Specifying the 'C<recursive_fetch>' parameter when calling C<new()>,
+modifies the behavior of this mode. The value given specifies the
+number of levels deep that fetch will be invoked on sub-objects
+created.
+
+=item Simple Column Attributes
+
+=back
+
+
+
+=head1 CLASS VARIABLES
+
+Class Bio::Genex::HotSpots defines the following utility variables for assisting
+programmers to access the HotSpots table.
+
+=over 4
+
+=item $Bio::Genex::HotSpots::LIMIT
+
+If defined, $LIMIT will set a limit on any select statements that can
+return multiple instances of this class (for example C<get_objects()>
+or any call to a C<ONE_TO_MANY> or C<LOOKUP_TABLE> foreign key
+accessor method).
+
+
+=item $Bio::Genex::HotSpots::USE_CACHE
+
+This variable controls whether the class will cache any objects
+created in calls to C<new()>. Objects are cached by primary key. The
+caching is very simple, and no effort is made to track whether
+different invocations of C<new()> are being made for an object with
+the same primary key value, but with different options set. If you
+desire to reinstantiate an object with a different set of parameters,
+you would need to undefine C<$USE_CACHE> first.
+
+
+=back
+
+
+B<WARNING>: variables other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.
+
+=head1 DELAYED FETCH
+
+It is possible to retrieve only the subset of attributes one chooses
+by simply creating an object instance and then calling the appropriate
+getter function. The object will automatically fetch the value from
+the DB when requested. This can potentially save time for large
+complicated objects. This triggers a separate DB query for each
+attribute that is accessed, whereas calling C<fetch()> will retrieve
+all fields of the object with a single query.
+
+For example:
+
+  my $HotSpots = Bio::Genex::HotSpots->new(id=>47);
+  my $val = $HotSpots->es_fk();
+
+The attribute's value is then cached in the object so any further calls
+to that attribute's getter method do not trigger a DB query.
+
+B<NOTE>: Methods may still return C<undef> if their value in
+the DB is C<NULL>.
+
+
+=head1 CLASS METHODS
+
+The following methods can all be called without first having an
+instance of the class via the Bio::Genex::HotSpots->methodname() syntax.
+
+=over 4
+
+=item new(%args)
+
+new() accepts the following arguments:
+
+=over 4
+
+=item id 
+
+Numeric or string value. The value of the primary key for looking up
+the object in the DB.
+
+
+=item pkey_link
+
+For linking tables this specifies which of the two possible values
+should be used as the primary key to fetch an instance from the
+DB. For class Bio::Genex::HotSpots, 'C<pkey_link>' can be either 'C<es_fk>' or 'C<usf_fk>'.
+
+=back
+
+
+=item table2pkey()
+
+For linking table classes, this method returns a hash table (not a
+hashref) that defines the fkey access map. Linking tables have no
+class-wide primary key, instead the column which is used to fetch rows
+from the DB is determined on a per-instance basis depending on which
+of the two linked-to tables is accessing the data. For example, in
+Bio::Genex::HotSpots if a method in class C<ExperimentSet> invokes its
+foreign key accessor function, the column 'usf_fk' will be
+used to fetch values from the DB.
+
+=item linking_table()
+
+Used by generic functions to determine if a specified class is a
+linking table class. For Bio::Genex::HotSpots it returns 1, since it I<is>
+a linking table class.
+
+
+=item table_name()
+
+Returns the name of the DB table represented by this class. For
+Bio::Genex::HotSpots it returns 'HotSpots';
+
+=item column2name()
+
+This method returns a hashref that translates DB column names into
+human readable format.
+
+=item name2column()
+
+This method returns a hashref that is a reverse lookup table to
+translate the human readable version of a DB column name back into the
+column_name. This is useful for preparing table output in CGI scripts:
+
+
+    %column2name = %{$class->column2name()};
+    if (exists $column2name{$_}) {
+      push(@column_copy,$column2name{$_});
+    }
+    
+    # now that we've translated the names, we sort them
+    @column_copy = sort @column_copy;
+    
+    # make a header element. 
+    push(@rows,th(\@column_copy));
+
+
+=item fkeys()
+
+This method returns a hashref that holds all the foreign key entries
+for the HotSpots table.
+
+=item column_names()
+
+This method returns an array ref which holds the names of all the
+columns in table HotSpots.
+
+
+    # first retrieve the data from the DB
+    $object = $full_module_name->new(id=>$id);
+    $object->fetch();
+
+    # now extract the data from the object
+    foreach (@{$class->column_names}) {
+    # we use this to temporarily relax the strict pragma
+    # to use symbolic references
+      no strict 'refs';
+      $tmp_values{$_} = $object->$_;
+
+    # back to our regularily scheduled strictness
+    }
+
+
+=item get_objects({pkey_link=>'es_fk'}, @id_list)
+
+=item get_objects('ALL')
+
+=item get_objects({column=>'col_name',value=>'val'})
+
+This method is used to retrieve multiple instances of class
+Bio::Genex::HotSpots simultaneously. For linking tables, there are three
+different ways to invoke this method.
+
+By passing in an C<@id_list>, get_objects() uses each element of the
+list as a primary key for the HotSpots table and returns a single
+instance for each entry. This form of the method requires a hash
+reference as the first argument. The hash must have the 'C<pkey_link>'
+key defined.
+
+B<WARNING>: Passing incorrect id values to C<get_objects()> will cause
+a warning from C<Bio::Genex::HotSpots::initialize()>. Objects will be
+created for other correct id values in the list.
+
+B<ERROR>: When using the @id_list form of this method with a linking
+table, the 'C<pkey_list>' attribute B<must> be specified, otherwise an
+error will result. This is because linking tables have two possible
+columns to lookup from.
+
+By passing the 'ALL' parameter, get_objects() returns an instance for
+every entry in the table, and therefore, 'C<pkey_list>' doesn't need
+to be specified.
+
+By passing a hash reference that contains the 'column' and 'name'
+keys, the method will return all objects from the DB whose that have
+the specified value in the specified column.
+
+B<NOTE>: When passing a hash reference with the 'column' and 'value'
+keys specified, it is not necessary to specify the 'C<pkey_link>'
+attribute.
+
+
+=back
+
+
+
+B<NOTE>: All objects must have the 'id' parameter set before attempting
+to use C<fetch()> or any of the objects getter functions.
+
+=head1 INSTANCE METHODS
+
+The following methods can only be called by first having valid
+instance of class Bio::Genex::HotSpots.
+
+=over 4
+
+
+=item fetch()
+
+This method triggers a DB query to retrieve B<ALL> columns from the DB
+associated with this object.
+
+
+=back
+
+
+
+B<WARNING>: methods other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.
+
+
+=head1 FOREIGN KEY ACCESSOR METHODS
+
+There are two major categories of foreign key accessor methods:
+I<Object Oriented> foreign key methods, and I<raw> foreign key
+methods. 
+
+Each foreign key column in the table is represented by B<two> methods,
+one OO method and one raw method. The raw method enables fethcing the
+exact numeric or string values stored in the DB. The OO method creates
+objects of the class the fkey column refers to. The idea is that if
+only the numeric fkey value is desired, the raw fkey method can be
+used. If it is necessary to get attributes from the table referred to
+by the fkey column, then the OO method should be invoked, and the
+necessary methods on that object can be queried.
+
+The names of the raw fkey methods is the same as the fkey columns in
+the DB table they represent (all fkey columns end in the suffix
+'_fk'). The OO methods have the same names as the column they
+represent, with the difference that they have the suffix '_obj'
+instead of '_fk'.
+
+So for example, in class Bio::Genex::ArrayMeasurement the
+'C<primary_es_fk>' column is represented by two methods, the raw
+method C<primary_es_fk()>, and the OO method C<primary_es_obj>.
+
+The following foreign key accessors are defined for class
+Bio::Genex::HotSpots:
+
+=over 4
+
+
+=back
+
+
+
+Every foreign key in a DB table belongs to a certain class of foreign
+keys. Each type of foreign key confers a different behavior on the
+class that contains it. The classifications used in Genex.pm are:
+
+=over 4
+
+=item *
+
+MANY_TO_ONE
+
+If a class contains a foreign key of this type it will not be visible
+to the API of that class, but instead it confers a special method to
+the class that it references. 
+
+For example, the Chromosome table has a MANY_TO_ONE foreign key,
+spc_fk, that refers to the species table. Class L<Bio::Genex::Chromosome>, has
+it\'s normal C<spc_fk()> attribute method, but no special foreign key
+accessor method. However, class L<Bio::Genex::Species> is given a special
+foreign key accessor method, C<chromosome_fk()> of type
+ONE_TO_MANY. When invoked, this method returns a list of objects of
+class L<Bio::Genex::Species>.
+
+=item *
+
+ONE_TO_MANY
+
+The inverse of type MANY_TO_ONE. It is not an attribute inherent to a
+given foreign key in any DB table, but instead is created by the
+existence of a MANY_TO_ONE foreign key in another table. See the above
+discussion about MANY_TO_ONE foreign keys.
+
+=item *
+
+LOOKUP_TABLE
+
+This type of key is similar to type ONE_TO_MANY. However, However the
+API will I<never> retrieve an object of this type. Instead it
+retrieves a matrix of values, that represent the list of objects. It
+is used in only two places in the API: L<Bio::Genex::ArrayMeasurement> and
+L<Bio::Genex::ArrayLayout> classes with the C<am_spots()> and C<al_spots()>
+accessor functions.
+
+=item *
+
+LINKING_TABLE
+
+Foreign keys of this type appear in tables without primary keys. The
+foreign keys are each of type LINKING_TABLE, and when invoked return
+an object of the class referred to by the foreign key.
+
+=item *
+
+FKEY
+
+A generic foreign key with no special properties. When invoked it returns
+an object of the class referred to by the foreign key.
+
+=back
+
+
+
+
+=head1 ATTRIBUTE METHODS
+
+These are the setter and getter methods for attributes in class
+Bio::Genex::HotSpots.
+
+B<NOTE>: To use the getter methods, you may either invoke the
+C<fetch()> method to retrieve all the values for an object, or else
+rely on L<delayed fetching|/DELAYED_FETCH> to retrieve the attributes
+as needed.
+
+=over 4
+
+
+=item id()
+
+C<id()> is a special attribute method that is common to all the Genex
+classes. This method returns the primary key of the given
+instance. Class Bio::Genex::HotSpots is a linking table and therefore it
+can I<two> possible columns that represent the 'id'
+('C<es_fk>' and 'C<usf_fk>'). When an instance of
+class Bio::Genex::HotSpots is created using either C<new()> or
+C<get_objects(@id_list)> the 'C<pkey_link>' attribute must specified
+as one of the two possible values.
+
+The C<id()> method can be useful in writing generic methods because it
+avoids having to know the name of the primary key column.
+
+=item es_fk()
+
+=item es_fk($value)
+
+Methods for the es_fk attribute. This attribute is the first
+possible value for the 'C<pkey_link>' attribute at object creation
+time.
+
+=item usf_fk()
+
+=item usf_fk($value)
+
+Methods for the usf_fk attribute. This attribute is the second
+possible value for the 'C<pkey_link>' attribute at object creation
+time.
+
+
+=item $value = threshold_type();
+
+=item threshold_type($value);
+
+Methods for the threshold_type attribute.
+
+
+=back
+
+
+
+B<WARNING>: methods other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.
+
+=head1 IMPLEMENTATION DETAILS
+
+These classes are automatically generated by the
+create_genex_classes.pl script.  Each class is a subclass of the
+Class::ObjectTemplate::DB class (which is in turn a subclass of
+Class::ObjectTemplate written by Sriram Srinivasan, described in
+I<Advanced Perl Programming>, and modified by Jason
+Stewart). ObjectTemplate implements automatic class creation in perl
+(there exist other options such as C<Class::Struct> and
+C<Class::MethodMaker> by Damian Conway) via an C<attributes()> method
+call at class creation time.
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+on Tue Jan 23 22:53:44 2001 by /home/jasons/work/GeneX-WWW-Installer/Genex/scripts/create_genex_class.pl --dir=/home/jasons/work/GeneX-WWW-Installer/Genex --target=HotSpots
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

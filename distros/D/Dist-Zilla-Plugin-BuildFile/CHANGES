@@ -1,0 +1,32 @@
+Revision History for Dist-Zilla-Plugin-BuildFile
+================================================
+
+v0.04 2013-02-13
+----------------
+
+* Date: 2013-02-13 13:03:45 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: 890145c5a99127f6c0e011e7af4b8ce268d707fb
+
+    Moved BuildFile.pm to dzil's preferred file path
+
+
+v0.03 2013-02-06
+----------------
+
+* Date: 2013-02-06 13:44:50 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: fbd6eb90c14bf02d34760f0269b07b71cbef3399
+
+    Update dist.ini to correctly scan for runtime dependencies
+
+* Date: 2013-02-06 12:36:47 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: cae7ae5b09f58b6d1737ad59286cffc18eca5a39
+
+    Update dist.ini to know about bin files
+
+
+===================================
+End of changes in the last 365 days
+===================================

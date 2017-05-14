@@ -25,4 +25,4 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-AndroidBackup
   license: http://www.gnu.org/copyleft/gpl.html
-version: 1.13
+version: 1.14

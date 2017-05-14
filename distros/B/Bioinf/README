@@ -1,0 +1,83 @@
+
+                           Bio Perl Subroutine library
+
+
+ Bioinf.pl (and Bioinf.pm made by convert_pl_to_pm.pl) is a Perl5 module for Bioinformatics.
+
+ Please look at the Headbox documentation down below for usage.
+
+ Bioinf is a module with the changed name of Bio.pl and Bio.pm to avoid name clash
+ for future development of Biological modules by other people
+
+
+Version
+   2.0  Aug 1998
+
+Version
+   1.8  July 1998
+
+Introduction
+
+
+References
+
+   http://cyrah.med.harvard.edu/~jong/bioperl.html
+   http://www.mrc-lmb.cam.ac.uk:80/genomes/jong/bioperl.html
+   ftp://ftp.mrc-lmb.cam.ac.uk/pub/genomes/jong/Software/Bio_lib
+   ftp://cyrah.med.harvard.edu/pub/
+
+
+#______________________________________________________________________
+# Title     : Bio (for Bio Perlogical) or bio_lib.pl
+# Usage     : require "Bio.pl"; ##<-- This is very slow, so you'd better
+#             use Bio;   <-- When you have Bio.pm module installed
+#
+#             or, copy the subroutines in your prog. or make a smaller lib files
+#               which are classified according to functions(like, Bio_Seq.pl
+#               for sequence handling, Bio_Array.pl for various array
+#               subroutines..), or make your own module out of this, do whatever
+#               you want....
+#
+# Function  : 1) This is a comprehensive perl subroutine library developed
+#                 under Bioperl project and others.
+#                 URL: http://cyrah.med.harvard.edu/Bioperlsub/
+#
+#             2) The design of this module is for simple layer biological
+#                 module than multilevel object oriented module.
+#
+#             3) This also serves as the depository database for various
+#                 perl subroutines or algorithms developed in
+#                 Bioinformatics and Genome projects.
+#
+#             4) You can copy any of the sub routines in this file, modify, use
+#                 in yours...
+#                 PLEASE MODIFY AS FREELY AS YOU WANT !! All has the
+#                 same PERL copyright
+#
+#             5) All the subroutines are tested in small files
+#                 If you want to have such single example program
+#                 to see how they really work, pls contact me( A Biomatic )
+#                 For example, a file called  'handle_arguments.pl' exists to
+#                 test the subroutine 'handle_arguments'. Usually you can find them
+#                 in  http://cyrah.med.harvard.edu/Bio.pl.html
+#
+# Example   : require "Bio.pl"; BUT, I recommand you take subroutines out and
+#             use it directly or modify in your programs.
+#             use Bio;
+#
+# Warning   : For the enhancement of Biology, Biomatics, and Science.
+#             This is a development companion.
+#             Class is for classification of my subroutines. If it is Bio, it can
+#             be useful for biological sequence data handling. If it's Utility,
+#             it can also be used for general purpose file handling stuff.
+#             File, Array, Hash,... are my classification items.
+# Keywords  : Biology, perl library, sequence handling lib
+# Options   : nothing (used as subroutine library or as Bio.pm module)
+#
+# Author    : J. Park, Jason Johnson, Sarah Teichmann, Alex Bateman,
+#               Astrid Reinhardt, and anybody contributed.
+#               jong@salt2.med.harvard.edu
+# Category  : Bio
+# Version   : 2.0    (Aug/1/1998)
+#------------------------------------------------------------------
+

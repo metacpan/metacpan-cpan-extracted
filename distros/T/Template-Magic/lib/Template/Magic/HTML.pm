@@ -1,5 +1,5 @@
 package Template::Magic::HTML ;
-$VERSION = 1.40 ;
+$VERSION = 1.39 ;
 use strict ;
 use 5.006_001 ;
 

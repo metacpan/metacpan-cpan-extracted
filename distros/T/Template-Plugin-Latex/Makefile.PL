@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w                                         # -*- perl -*-
 
 use strict;
+use warnings;
+
+use 5.010;
 
 use lib qw( ./lib );
 use Config;

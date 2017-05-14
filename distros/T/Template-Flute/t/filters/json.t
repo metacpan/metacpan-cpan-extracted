@@ -7,10 +7,12 @@ use warnings;
 
 use Test::More;
 use Template::Flute;
-use Class::Load qw(try_load_class);
 
-try_load_class('JSON')
-    or plan skip_all => "Missing JSON module.";
+eval "use JSON";
+
+if ($@) {
+    plan skip_all => "Missing JSON module.";
+}
 
 plan tests => 2;
 

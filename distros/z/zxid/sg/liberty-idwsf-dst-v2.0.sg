@@ -1,0 +1,199 @@
+# zxid/sg/liberty-idwsf-dst-v2.0.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-dst-v2.0.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+# N.B. This schema is meant to be included from other schemas. It is not standalone.
+
+#include(liberty-idwsf-utility-v2.0.xsd)
+#import(di12, urn:liberty:disco:2004-12,liberty-idwsf-disco-svc-v2.0.xsd)
+#import(sb20, urn:liberty:sb:2004-12,liberty-idwsf-soap-binding-v2.0.xsd)
+
+include(liberty-idwsf-utility-v2.0.xsd)
+import(di12, urn:liberty:disco:2003-08, liberty-idwsf-disco-svc-v2.0.xsd)
+#import(sb20, urn:liberty:sb:2004-12, liberty-idwsf-soap-binding-v2.0.xsd)
+
+ResourceID -> %di12:ResourceIDType
+EncryptedResourceID -> %di12:EncryptedResourceIDType
+
+&ResourceIDGroup: 
+  ResourceID?
+  EncryptedResourceID?
+  ;
+
+ChangeFormat:	 enum( ChangedElements CurrentElements ) ;
+@changeFormat:	 enum( ChangedElements CurrentElements All ) ;
+
+ItemData	 -> %ItemDataType
+%ItemDataType:
+  any*
+  @id?	 -> %xs:ID
+  @itemIDRef?	 -> %IDReferenceType
+  @notSorted?:	 enum( Now Never ) ;
+  @changeFormat?
+  ;
+
+Query	 -> %QueryType
+%QueryType:
+  &ResourceIDGroup?
+  Subscription*
+  QueryItem*:	 base(ItemSelectionType)
+    @count?	 -> %xs:nonNegativeInteger
+    @offset?	 -> %xs:nonNegativeInteger  default (0)
+    @setID?	 -> %IDType
+    @setReq?:	 enum( Static DeleteSet ) ;
+    ;
+  Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+QueryResponse	 -> %QueryResponseType
+%QueryResponseType:
+  Status
+  Data*:
+    any*
+    @id?	 -> %xs:ID
+    @itemIDRef?	 -> %IDReferenceType
+    @notSorted?:	 enum( Now Never ) ;
+    @changeFormat?
+    @remaining?	 -> %xs:integer
+    @nextOffset?	 -> %xs:nonNegativeInteger  default (0)
+    @setID?	 -> %IDType
+    ;
+  Extension*
+  @id?	 -> %xs:ID
+  @itemIDRef?	 -> %IDReferenceType
+  @timeStamp?	 -> %xs:dateTime
+  ;
+
+Create	 -> %CreateType
+%CreateType:
+  &ResourceIDGroup?
+  Subscription*
+  CreateItem+:
+    NewData?:
+      any*
+      ;
+    @id?	 -> %xs:ID
+    @itemID?	 -> %IDType
+    @objectType?	 -> %xs:NCName
+    ;
+  ItemSelection*
+  Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+CreateResponse	 -> %ResponseType
+
+%ResponseType:
+  Status
+  ItemData*
+  Extension*
+  @id?	 -> %xs:ID
+  @timeStamp?	 -> %xs:dateTime
+  @any
+  ;
+
+Delete	 -> %DeleteType
+%DeleteType:
+  &ResourceIDGroup?
+  DeleteItem+:
+    Select?	 -> %SelectType
+    @id?	 -> %xs:ID
+    @itemID?	 -> %IDType
+    @notChangedSince?	 -> %xs:dateTime
+    @objectType?	 -> %xs:NCName
+    @predefined?	 -> %xs:string
+    ;
+  Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+DeleteResponse	 -> %DeleteResponseType
+%DeleteResponseType:
+  Status
+  Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+Modify	 -> %ModifyType
+%ModifyType:
+  &ResourceIDGroup?
+  Subscription*
+  Modification+:
+    Select?	 -> %SelectType
+    NewData?:
+      any*
+      @any
+      ;
+    @id?	 -> %xs:ID
+    @itemID?	 -> %IDType
+    @notChangedSince?	 -> %xs:dateTime
+    @objectType?	 -> %xs:NCName
+    @overrideAllowed?	 -> %xs:boolean  default (0)
+    ;
+  ItemSelection*
+  Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+ModifyResponse	 -> %ResponseType
+
+%NotifyToType:
+  SecurityMechID*	 -> %xs:anyURI
+  Credential*:
+    any  processContents(lax)
+    @notOnOrAfter?	 -> %xs:dateTime
+    ;
+  Endpoint?	 -> %xs:anyURI
+  @id?	 -> %xs:ID
+  ;
+
+Subscription:
+  ItemSelection*
+  RefItem*:
+    @subscriptionID?	 -> %IDType
+    @ItemIDRef	 -> %IDReferenceType
+    ;
+  NotifyTo?	 -> %NotifyToType
+  NotifyAdminTo?	 -> %NotifyToType
+  Aggregation?	 -> %AggregationType
+  Trigger?	 -> %TriggerType
+  Extension*
+  @starts?	 -> %xs:dateTime
+  @expires?	 -> %xs:dateTime
+  @id?	 -> %xs:ID
+  @subscriptionID	 -> %IDType
+  @includeData?:	 enum( Yes No YesWithCommonAttributes ) ;
+  @any
+  ;
+
+Notify	 -> %NotifyType
+%NotifyType:
+  Notification*
+  Extension*
+  @id?	 -> %xs:ID
+  @timeStamp?	 -> %xs:dateTime
+  @any
+  ;
+
+NotifyResponse	 -> %NotifyResponseType
+%NotifyResponseType:
+  Status
+  Extension*
+  @id?	 -> %xs:ID
+  @any
+  ;
+
+Notification:
+  ItemData*
+  @id?	 -> %xs:ID
+  @subscriptionID	 -> %IDType
+  @expires?	 -> %xs:dateTime
+  @endReason?	 -> %xs:anyURI
+  ;
+
+#EOF

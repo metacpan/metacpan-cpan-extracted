@@ -1,0 +1,124 @@
+# ====================================================================
+# Copyright (c) 2000-2003 by Soheil Seyfaie. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+# ====================================================================
+
+# $Id: SWF.pm,v 1.11 2007/09/29 08:08:14 peterdd Exp $
+
+package SWF;
+use strict;
+use Carp 'croak';
+
+require DynaLoader;
+@SWF::ISA = qw(DynaLoader);
+
+$SWF::VERSION = '0.4.0-beta6_02';
+
+my @EXPORT_OK = qw(Action Bitmap Button Constants DisplayItem Fill Font Gradient Morph Movie MovieClip PrebuiltClip Shape Sound Text TextField);
+
+bootstrap SWF $SWF::VERSION;
+
+sub import{
+	my $self = shift;
+	my @modules = @_;
+
+	my $package = (caller())[0];
+	my @failed;
+
+	foreach my $module (@modules) {
+		my $code = "package $package; ";
+		if($module eq ':ALL'){
+			map{$code .= "use SWF::$_; "} @EXPORT_OK;
+		}else{
+			$code .= "use SWF::$module;";
+		}
+
+		eval($code);
+		if ($@) {
+			warn $@;
+			push(@failed, $module);
+		}
+	}
+	@failed and croak "could not import qw(" . join(' ', @failed) . ")";
+}
+
+
+1;
+__END__
+
+
+=head1 NAME
+
+SWF: an autoloadable interface module for Ming - a library for generating 
+ShockWave Flash format movies.
+
+=head1 SYNOPSIS
+
+	# Don't import other modules
+	use SWF;              
+
+	# import all SWF modules
+	use SWF qw(:ALL);
+
+	# import SWF::Shape and SWF::Movie only.
+	use SWF qw(Shape Movie);
+
+=head1 DESCRIPTION
+
+By default, SWF doesn't import other SWF classes. You may, however, instruct SWF to import all modules by using the following syntax:
+
+	use SWF qw(:ALL);
+
+=head1 METHODS
+
+=over 4
+
+=item SWF::setScale($scale);
+
+Sets scale to $scale.
+
+=item SWF::getScale();
+
+Get the current scale. 20 means 20 twips (1/20 of a pixel) and is the default value.
+
+=item SWF::setVersion($version);
+
+Sets SWF version for the header of flashfiles. Choose a value between 4 and 7 for your flashmovies. If you are unsure take 5.
+
+=item SWF::setCubicThreshold($num)
+
+Sets the threshold error for drawing cubic beziers.  Lower is more
+accurate, hence larger file size.
+
+=item SWF::setSWFCompression($level);
+
+Set output compression level.
+Returns previous value.
+$level is integer between 0 and 9.
+Note: This function is called automatic too by 
+	$movie->save($filename[,$level]) and
+	$movie->output([$level]) 
+if the optional parameter $level is given.
+
+=item SWF::useConstants($flags);
+
+?
+
+=back
+
+=head1 AUTHOR
+
+Soheil Seyfaie (soheil at users.sourceforge.net).
+
+=head1 SEE ALSO
+
+SWF.pm related modules: 
+SWF::Action, SWF::Bitmap, SWF::Button, SWF::Constants, SWF::DisplayItem, SWF::Fill, SWF::Font, 
+SWF::Gradient, SWF::Morph, SWF::Movie, SWF::MovieClip, SWF::PrebuiltClip, 
+SWF::Shape, SWF::Sound, SWF::TextField, SWF::Text, SWF::VideoStream
+
+other projects:
+SWF::Builder  - a pure perl alternative to Ming
+
+=cut

@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::_Browser;
 use Cache::FileCache;
 
 our @ISA     = (qw(Lemonldap::NG::Portal::_Browser));
-our $VERSION = '1.4.11';
+our $VERSION = '1.9.6';
 our $initDone;
 
 BEGIN {
@@ -291,7 +291,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =item Copyright (C) 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

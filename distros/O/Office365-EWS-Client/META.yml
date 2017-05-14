@@ -1,0 +1,31 @@
+---
+abstract: 'Office 365 Exchange Web Services client'
+author:
+  - 'Jesse Thompson <zjt@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  DateTime: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Office365-EWS-Client
+requires:
+  Carp: 0
+  EWS::Client: 0
+  EWS::Client::Role::SOAP: 0
+  Encode: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Iterator: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/zjt/Office365-EWS-Client.git
+version: 1.142410

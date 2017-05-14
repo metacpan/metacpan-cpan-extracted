@@ -1,0 +1,20 @@
+Revision history for HTML-Spelling-Site
+
+v0.0.5      2017-05-11
+    - Convert dist.ini to @SHLOMIF .
+    - Eliminate duplicates in the global whitelist and fix some other bugs.
+
+v0.0.4      2016-03-23
+    - Update the main synposis.
+    - Add HTML::Spelling::Site::Checker->test_spelling()
+
+v0.0.3      2016-03-12
+    - Improve the POD documentation.
+
+v0.0.2      2016-03-12
+    - Made the minimal version of perl 5.14.x to avoid CPAN testers' failures
+    on perl-5.8.9. E.g.:
+        - http://www.cpantesters.org/cpan/report/b1e11b0a-e7b4-11e5-9f96-14e8fbd2507e
+
+v0.0.1      2016-03-11
+    - First version, released on an unsuspecting world

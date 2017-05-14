@@ -1,0 +1,22 @@
+---
+abstract: "Implements the Perl 6 'is export(...)' trait"
+author:
+  - 'Damian Conway <DCONWAY@CPAN.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl6-Export
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Filter::Simple: '0'
+version: '0.009'

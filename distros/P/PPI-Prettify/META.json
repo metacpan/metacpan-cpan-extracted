@@ -1,0 +1,60 @@
+{
+   "abstract" : "A Perl HTML pretty printer to use with Google prettify CSS skins, no JavaScript required!",
+   "author" : [
+      "David Farrell <sillymoos@cpan.org> L<PerlTricks.com|http://perltricks.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PPI-Prettify",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Keywords" : "0",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "HTML::Entities" : "0",
+            "List::MoreUtils" : "0",
+            "PPI::Document" : "0",
+            "Perl::Critic::Utils" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/sillymoose/ppi-prettify",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sillymoose/ppi-prettify.git",
+         "web" : "https://github.com/sillymoose/ppi-prettify"
+      }
+   },
+   "version" : "0.07"
+}
+

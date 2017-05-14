@@ -1,0 +1,33 @@
+/* XPM */
+static char *text[] = {
+/* width height ncolors chars_per_pixel */
+"19 21 5 1",
+/* colors */
+"  s None c None",
+". c #FCFEFC",
+", c #C4C2C4",
+"X c #848284",
+"o c #040204",
+/* pixels */
+"                   ",
+"                   ",
+"  oooooooooooooooo ",
+"  o..........o,,,o ",
+"  o......o...o,o,o ",
+"  o.Xoo..ooX.o,,,o ",
+"  o.o.o..o.o.ooooo ",
+"  o.Xooo.ooX.o.,.o ",
+"  o........o.o,.,o ",
+"  o.Xoo..Xoo.o.,.o ",
+"  o.o....o.o.o,.,o ",
+"  o.Xoo..Xoo.o.,.o ",
+"  o..........o,.,o ",
+"  oooooooooooooooo ",
+"  o,,,o.,o,,,o,,,o ",
+"  o,o,o,.o,o,o,o,o ",
+"  o,,,o.,o,,,o,,,o ",
+"  oooooooooooooooo ",
+"                   ",
+"                   ",
+"                   "
+};

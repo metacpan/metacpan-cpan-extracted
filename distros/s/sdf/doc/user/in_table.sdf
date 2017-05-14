@@ -1,0 +1,28 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Tables
+
+!block topics
+Topic
+in_tbov
+in_tbfmt
+in_tbsty
+in_tbtit
+in_tbsiz
+in_tbpos
+in_tbrow
+in_tbcol
+in_tbcel
+in_tboth
+!endblock

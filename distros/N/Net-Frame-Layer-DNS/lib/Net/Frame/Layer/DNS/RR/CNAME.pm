@@ -24,7 +24,8 @@ sub new {
 
 sub getLength {
    my $self = shift;
-   return length($self->cname)
+   # Add 2 for first encoding length and trailing '\0' (see dnsAton())
+   return length($self->cname) + 2
 }
 
 sub pack {
@@ -87,7 +88,7 @@ Net::Frame::Layer::DNS::RR::CNAME - DNS Resource Record CNAME rdata type
    use Net::Frame::Layer::DNS::RR::CNAME;
 
    my $rdata = Net::Frame::Layer::DNS::RR::CNAME->new(
-      address => 'localhost',
+      cname => 'localhost',
    );
    $rdata->pack;
 
@@ -185,7 +186,7 @@ Michael Vincent
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2012, Michael Vincent
+Copyright (c) 2012-2017, Michael Vincent
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

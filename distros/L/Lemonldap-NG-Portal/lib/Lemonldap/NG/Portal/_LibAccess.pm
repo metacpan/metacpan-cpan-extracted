@@ -7,7 +7,7 @@ package Lemonldap::NG::Portal::_LibAccess;
 
 use strict;
 
-our $VERSION = '1.4.2';
+our $VERSION = '1.9.9';
 
 # Global variables
 our ( $defaultCondition, $locationCondition, $locationRegexp, $cfgNum ) =
@@ -28,7 +28,7 @@ BEGIN {
 # @param $uri URL string
 # @return True if granted
 sub _grant {
-    my ( $self, $uri ) = splice @_;
+    my ( $self, $uri ) = @_;
     $self->lmLog( "Evaluate access right on $uri", 'debug' );
     $uri =~ m{(\w+)://([^/:]+)(:\d+)?(/.*)?$} or return 0;
     my ( $protocol, $vhost, $port, $path );
@@ -40,7 +40,9 @@ sub _grant {
     return 0 if $self->{maintenance};
 
     # Check vhost maintenance mode
-    return 0 if $self->{vhostOptions}->{$vhost}->{vhostMaintenance};
+    return 0
+      if (  $self->{vhostOptions}
+        and $self->{vhostOptions}->{$vhost}->{vhostMaintenance} );
 
     $self->_compileRules()
       if ( $cfgNum != $self->{cfgNum} );
@@ -112,7 +114,7 @@ sub _compileRules {
 # @param $cond boolean expression
 # @return Compiled routine
 sub _conditionSub {
-    my ( $self, $cond ) = splice @_;
+    my ( $self, $cond ) = @_;
     return sub { 1 }
       if ( $cond =~ /^(?:accept|unprotect|skip)$/i );
     return sub { 0 }
@@ -127,7 +129,7 @@ sub _conditionSub {
 # @param options vhostOptions configuration item
 # @return arrayref of vhost and aliases
 sub _getAliases {
-    my ( $self, $vhost, $options ) = splice @_;
+    my ( $self, $vhost, $options ) = @_;
     my $aliases = [$vhost];
 
     if ( $options->{$vhost}->{vhostAliases} ) {

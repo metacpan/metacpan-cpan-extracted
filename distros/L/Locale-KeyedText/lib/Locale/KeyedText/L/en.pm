@@ -1,3 +1,4 @@
+#!perl
 use 5.008001;
 use utf8;
 use strict;
@@ -7,12 +8,9 @@ use warnings;
 ###########################################################################
 
 # Constant values used by packages in this file:
-my $TEXT_STRINGS = {
+use only 'Readonly' => '1.03-';
+Readonly my %TEXT_STRINGS => (
     # This group of strings is generic and can be used by any package:
-
-    'LKT_ARGS_BAD_PSEUDO_NAMED'
-        => q[<CLASS>.<METH>(): bad pseudo-named arguments list;]
-            . q[ it must have an even number of positional elements.],
 
     'LKT_ARG_UNDEF'
         => q[<CLASS>.<METH>(): argument <ARG> is undefined (or missing).],
@@ -86,23 +84,94 @@ my $TEXT_STRINGS = {
         => q[<CLASS>.<METH>(): can't invoke get_text_by_key() on]
            . q[ Locale::KeyedText Template module '<TMPL_MOD_NAME>':]
            . q[ <REASON>],
-};
+);
 
 ###########################################################################
 ###########################################################################
 
 { package Locale::KeyedText::L::en; # module
-    BEGIN {
-        our $VERSION = '2.001000';
-        $VERSION = eval $VERSION;
-    }
+    use version; our $VERSION = qv('1.0.1');
     sub get_text_by_key {
         my (undef, $msg_key) = @_;
-        return $TEXT_STRINGS->{$msg_key};
+        return $TEXT_STRINGS{$msg_key};
     }
 } # module Locale::KeyedText::L::en
 
 ###########################################################################
 ###########################################################################
 
-1;
+1; # Magic true value required at end of a reuseable file's code.
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Locale::KeyedText::L::en -
+Localization of Locale::KeyedText for English
+
+=head1 VERSION
+
+This document describes Locale::KeyedText::L::en version 1.0.1.
+
+=head1 SYNOPSIS
+
+I<This documentation is pending.>
+
+=head1 DESCRIPTION
+
+I<This documentation is pending.>
+
+=head1 INTERFACE
+
+I<This documentation is pending; this section may also be split into several.>
+
+=head1 DIAGNOSTICS
+
+I<This documentation is pending.>
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+I<This documentation is pending.>
+
+=head1 DEPENDENCIES
+
+This file requires any version of Perl 5.x.y that is at least 5.8.1.
+
+It also requires the Perl 5 packages L<version> and L<only>, which would
+conceptually be built-in to Perl, but aren't, so they are on CPAN instead.
+
+It also requires these Perl 5 packages that are on CPAN:
+L<Readonly-(1.03...)|Readonly>.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 SEE ALSO
+
+Go to L<Locale::KeyedText> for the majority of references.
+
+=head1 BUGS AND LIMITATIONS
+
+I<This documentation is pending.>
+
+=head1 AUTHOR
+
+Darren R. Duncan (C<perl@DarrenDuncan.net>)
+
+=head1 LICENCE AND COPYRIGHT
+
+This file is part of the Locale::KeyedText library.
+
+Locale::KeyedText is Copyright (c) 2003-2006, Darren R. Duncan.
+
+See the LICENCE AND COPYRIGHT of L<Locale::KeyedText> for details.
+
+=head1 ACKNOWLEDGEMENTS
+
+The ACKNOWLEDGEMENTS in L<Locale::KeyedText> apply to this file too.
+
+=cut

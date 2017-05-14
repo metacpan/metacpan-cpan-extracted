@@ -1,0 +1,196 @@
+%%START_PERL%%
+
+use Carp;
+use strict;
+
+%%GENEX_EXTRALIBS%%
+use CGI qw/:standard :html3 :Carp/; # LS's CGI thingie
+use CGI::Carp qw(fatalsToBrowser);
+use DBI;              # and the DBI module
+use Bio::Genex qw(timestamp);
+use Bio::Genex::DBUtils qw(create_select_sql);
+use Bio::Genex::HTMLUtils;
+
+# *** NOTE ***
+# even though we potentially use all of the other Bio::Genex::* classes
+# they are imported using an 'eval "require $class"' later on in the file
+# instead of being declared explicitly up front
+
+# ============  Executive / Important Decisions  ==========================
+my $current_time = timestamp();
+
+# vars for generating URLs, local temp storage
+my $www_server = '%%WWWHOST%%';
+my $cgi_bin = '%%GENEX_URL_EXAMPLE%%';
+my $tmp_dir = '%%SYSTMP%%';
+my $tmp_dir_url = '%%CGITMPURL%%';
+
+# start a connection using the default parameters
+my $dbh = Bio::Genex::current_connection();
+
+# ======= Start composing HTML page =====
+my $q = new CGI;
+
+print $q->header;
+ 
+# ===============  Get the params from the Web Page via CGI  ==============
+my $pkey = 'ALL';
+my $table = 'Chromosome';
+my (%columns,%column2name,%name2column);
+
+my $DEBUG = 0;
+my @arrays_to_fetch;
+if (param) {
+  $DEBUG = param('DEBUG') if defined param('DEBUG');
+  @arrays_to_fetch = param('ArraysToFetch');
+  unless (defined @arrays_to_fetch && scalar @arrays_to_fetch) {
+    print $q->h2("WHOA!!!, Something was wrong with your query");
+    print $q->end_html();
+    exit();
+  }
+}
+
+# ==========  Got all params, now do something useful with them ============
+# So that sets all the parameters for the search.  Now, depending on which 
+# button was pushed, we will either do the search and find out how many rows 
+# get returned or do the search and do the rest of the analysis, or simply 
+# download the data.  
+
+print  $q->start_html('Spot File Retrieval Page'), 
+  $q->h2('Spot File Retrieval Page');
+
+if ($DEBUG) {
+  print $q->table({-border => ''},
+		  caption('Values of CGI parameters'),
+		  Tr([th(['parameter name','parameter value']),
+		      td(['DEBUG', $DEBUG]),
+		      td(['ArraysToFetch', join ', ', @arrays_to_fetch]),
+		     ])
+		 );
+}
+
+my %ES;
+foreach my $array (@arrays_to_fetch) {
+  #
+  # SECURITY CHECK: the values in @arrays_to_fetch are retrieved from a WWW 
+  #   form and should not be trusted. We check them to make sure that
+  #   they are untampered, ie. they are of the form '87:213'
+  #
+  croak "Bad Array ID: $array" unless $array =~ /^\d+:\d+$/;
+
+  my ($es,$array) = split(':',$array);
+  if (exists $ES{$es}) {
+    push(@{$ES{$es}},$array);
+  } else {
+    $ES{$es} = [$array];
+  }
+}
+
+if ($DEBUG) {
+  foreach my $es (keys %ES) {
+    print p(), b("Will fetch arrays: " .  join(', ',@{$ES{$es}}) . " for experiment: " . $es);
+  }
+}
+
+# declare the sequence feature cache table
+my %SEQ_FEAT;
+foreach my $es_pk (keys %ES) {
+  my @rows;
+
+  # setup the where clause
+  my $WHERE .= '( ';
+  my $first = 1;
+  foreach my $am_fk (@{$ES{$es_pk}}) {
+    if ($first) {
+      $first = 0;
+    } else {
+      $WHERE .= ' OR ';
+    }
+    $WHERE .= "am_fk=$am_fk";
+  }
+  $WHERE .= ' )';
+  my $sql = create_select_sql($dbh,COLUMNS=>['usf_fk','am_fk','spot_value'],
+			      FROM=>['AM_Spots'],
+			      WHERE=>$WHERE,
+			     );
+  # execute the sql
+  my $sth = $dbh->prepare($sql) || die $DBI::errstr;
+  $sth->execute() || die $DBI::errstr;
+  my $rows = $sth->rows || die $DBI::errstr;
+
+  print p(b("Your query returned $rows rows for experiment $es_pk")) if $DEBUG;
+
+  my %results;
+  while (my ($usf_pk,$am_fk,$value) = $sth->fetchrow_array()) {
+    unless (exists $SEQ_FEAT{$usf_pk}) {
+
+      #
+      # *** HACK ALERT ***
+      #
+      # This is not the best way to preload the sequence feature cache
+      # but given the current DB layout, it's the only way
+      # if we ever get a sequence feature that we don't recognize
+      # we look at it's species and prefetch all the rest of the
+      # sequence features from the species. 
+      # 
+      # really what we want is a linking table from ArrayMeasurement
+      # to Species and precache them that way.
+      #
+
+      # first figure out the species
+      my $species_sql = create_select_sql($dbh,COLUMNS=>['spc_fk'],
+					  FROM=>['UserSequenceFeature'],
+					  WHERE=>"usf_pk=?",
+					 );
+      print p(b("Your species query is $species_sql")) if $DEBUG;
+
+      my $species_sth = $dbh->prepare($species_sql) || die $DBI::errstr;
+      $species_sth->execute($usf_pk) || die $DBI::errstr;
+      my $species = ($species_sth->fetchrow_array())[0];
+
+      # now get all the sequence features
+      my $seq_feat_sql = create_select_sql($dbh,
+                             COLUMNS=>['usf_pk','usf_name','usf_type'],
+			     FROM=>['UserSequenceFeature'],
+			     WHERE=>"spc_fk=?",
+				      );
+
+      print p(b("Your seq_feat query is $seq_feat_sql")) if $DEBUG;
+      my $seq_feat_sth = $dbh->prepare($seq_feat_sql) || die $DBI::errstr;
+      $seq_feat_sth->execute($species) || die $DBI::errstr;
+      while (my ($usf_pk,$usf_name,$usf_type) = $seq_feat_sth->fetchrow_array()) {
+	$SEQ_FEAT{$usf_pk} = [$usf_name,$usf_type];
+      }
+    }
+    $results{$usf_pk}->{$am_fk} = $value;
+  }
+  my $out_file_name = "$es_pk.txt";
+  my $out_file = "$tmp_dir/$out_file_name";
+  open(OUT,">$out_file") or die "Couldn't open $out_file for writing";
+  
+  my $time = localtime;
+  my $array_header = join("\t",@{$ES{$es_pk}});
+  print OUT <<"EOF";
+#
+# Data from ExperimentSet $es_pk, retrieved on $time
+#
+#Feature Name\tFeature Type\t$array_header
+EOF
+
+  foreach my $usf_pk (sort keys %results) {
+    my $out = "$SEQ_FEAT{$usf_pk}->[0]\t$SEQ_FEAT{$usf_pk}->[1]\t";
+    foreach my $am_fk (keys %{$results{$usf_pk}}) {
+      $out .= "$results{$usf_pk}->{$am_fk}\t";
+    }
+    # replace the final tab with an end of line
+    substr($out,-1) = "\n";
+    print OUT $out;
+  }
+  close(OUT);
+  print p('retrieve data for ' . a({-href=>"$tmp_dir_url/$out_file_name"},"experiment $es_pk"));
+}
+
+
+
+
+print $q->end_html;

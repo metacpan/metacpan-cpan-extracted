@@ -1,0 +1,18 @@
+# BUFR main sequence descriptors for encoding GPS products.
+# The first number is the number of descriptors following.
+# Following numbers are BUFR descriptors in FXXYYY format.
+
+[GBGPS]
+1 307022
+
+[GPSRO]
+1 310193
+
+[GPSRO2]
+1 310026
+
+[COST]
+1 307193
+
+[CHAMP]
+1 310193

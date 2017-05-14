@@ -12,7 +12,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::NextVersion;
 # ABSTRACT: Provide a version number by bumping the last git release tag
 
-our $VERSION = '2.041';
+our $VERSION = '2.042';
 
 use Dist::Zilla 4 ();
 use version 0.80 ();
@@ -205,7 +205,7 @@ Dist::Zilla::Plugin::Git::NextVersion - Provide a version number by bumping the 
 
 =head1 VERSION
 
-version 2.041
+version 2.042
 
 =head1 SYNOPSIS
 
@@ -283,7 +283,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 (or L<bug-Dist-Zilla-Plugin-Git@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Git@rt.cpan.org>).
 
 There is also a mailing list available for users of this distribution, at
-L<http://www.listbox.com/subscribe/?list_id=139292>.
+L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.

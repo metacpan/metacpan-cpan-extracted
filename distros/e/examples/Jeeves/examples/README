@@ -1,0 +1,10 @@
+Problem: Given a specification file, Test.sc, code generate some stuff
+according to some template.
+
+The run script chooses to use the template oo.template that happens
+to be in the template directory. 
+
+Run it and see what you get ! Compare the output to oo.template
+
+-Sriram
+(sriram@tcs.com)

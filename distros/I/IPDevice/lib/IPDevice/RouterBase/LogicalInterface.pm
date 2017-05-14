@@ -4,11 +4,11 @@
 ## router interface.
 ####
 
-package RouterBase::LogicalInterface;
-use RouterBase::Atom;
+package IPDevice::RouterBase::LogicalInterface;
+use IPDevice::RouterBase::Atom;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom);
+@ISA = qw(IPDevice::RouterBase::Atom);
 
 $VERSION = 0.01;
 
@@ -18,12 +18,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::LogicalInterface
+IPDevice::RouterBase::LogicalInterface
 
 =head1 SYNOPSIS
 
- use RouterBase::LogicalInterface;
- my $interface = new RouterBase::LogicalInterface(name => '0/1/2');
+ use IPDevice::RouterBase::LogicalInterface;
+ my $interface = new IPDevice::RouterBase::LogicalInterface(name => '0/1/2');
  $interface->set_ip('192.168.0.1', '255.255.255.252');
  
  my($ip, $mask) = $interface->get_ip();
@@ -32,7 +32,7 @@ RouterBase::LogicalInterface
 
 This module provides routines for storing informations regarding an logical
 IP router interface. If you have a pysical interface, use the
-L<RouterBase::Interface|RouterBase::Interface> implementation instead.
+L<IPDevice::RouterBase::Interface|IPDevice::RouterBase::Interface> implementation instead.
 
 =head1 CONSTRUCTOR AND METHODS
 
@@ -159,7 +159,7 @@ Safe the interface's prefix length.
 =cut
 sub set_pfxlen {
   my($self, $pfxlen) = @_;
-  $self->{mask} = IPv4::pfxlen2mask($pfxlen);
+  $self->{mask} = IPDevice::IPv4::pfxlen2mask($pfxlen);
 }
 
 
@@ -170,7 +170,7 @@ Returns the interface's prefix length.
 =cut
 sub get_pfxlen {
   my $self = shift;
-  return IPv4::mask2pfxlen($self->{mask});
+  return IPDevice::IPv4::mask2pfxlen($self->{mask});
 }
 
 

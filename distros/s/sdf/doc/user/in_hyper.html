@@ -1,0 +1,78 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Hypertext</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_custf.html">Previous Topic</A> | <A HREF="in_symb.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.7. Hypertext</H1>
+<HR>
+<H2><A NAME="Attributes">6.7.1. Attributes</A></H2>
+<P>Hypertext can be specified using the <EM>id</EM> and <EM>jump</EM> phrase attributes. The value of <EM>id</EM> is a text string which can include letters, digits, underscores and spaces. The value of <EM>jump</EM> is a World Wide Web (WWW) Uniform Resource Locator (URL).</P>
+<P>Commonly used jump formats are summarised below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Format</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>#</EM>xyz
+</TD>
+<TD>
+jump to <EM>xyz</EM> within this document
+</TD>
+</TR>
+<TR>
+<TD>
+abc
+</TD>
+<TD>
+jump to document <EM>abc</EM>
+</TD>
+</TR>
+<TR>
+<TD>
+abc<EM>#</EM>xyz
+</TD>
+<TD>
+jump to <EM>xyz</EM> within document <EM>abc</EM>
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+This is the only software you will ever need.
+See {{CMD[jump=&quot;#smartcmd&quot;]smartcmd}} for details.
+
+H2[id=&quot;smartcmd&quot;] smartcmd - Do What I Want Utility
+
+{{CMD:smartcmd}} is the best program ever written.
+It detects what you want to do next by ...
+</PRE>
+<P>If you want to specify a phrase as a hypertext target within &quot;normal&quot; paragraph text, use the N (for Normal) phrase style. For example:</P>
+<PRE>
+   The {{N[id='_option_o']-o option}} specifies ...
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Hypertext jumps are ignored when paper documents are being generated.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_custf.html">Previous Topic</A> | <A HREF="in_symb.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

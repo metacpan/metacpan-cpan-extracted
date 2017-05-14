@@ -1,0 +1,45 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	4	755	1321222152	1325022022	is_relevant.pl
+my $warn;			# AS 5.14.0 has dirty XML::Parser.  Skip as warn means fail.
+local $SIG{__WARN__} = sub { $warn = 1 };
+(eval 'use XML::Parser; XML::Parser->new( Style => "Tree" )->parsefile( "a.xml" )' or
+ eval 'use XML::LibXML; XML::LibXML->load_xml( location => "a.xml" )') && !$warn
+###	12	755	1321222152	1342994322	makepp_test_script.pl
+# A simple test of xml signatures.
+
+makepp;
+n_files 'n_files_0';
+
+c_printf '-oa.xml', q@%c%c%c%s@, 0xEF, 0xBB, 0xBF, <<XML; # keep BOM out of file transfer's sight
+<makepp	is='a' abbr="mpp"> <!--hopefully well documented-->great tool
+<for><![CDATA[ compiling & linking ]]></for><because> it provides <reliability/></because></makepp>
+XML
+
+makepp;
+1;
+###	11	644	1321222152	1321222152	RootMakeppfile
+override signature xml		# Just test that override is accepted
+
+.PHONY: all
+
+all: a1.xml a2.xml
+
+a1.xml: a.xml
+	&cp $< $@
+
+a2.xml: a.xml :signature xml-space
+	&cp $< $@
+###	8	644	1321222152	1321222152	a.xml
+<?xml version="1.0"?>
+<makepp abbr='mpp'  is="a">
+  great tool
+  <for> compiling &amp; linking</for>
+  <because> it provides
+    <reliability></reliability>
+  </because>
+</makepp>
+###	D	755	1321222152	1321222152	answers
+###	1	644	1321222152	1321222152	answers/n_files
+1 1 0
+###	1	644	1321222152	1321222152	answers/n_files_0
+2 1 0

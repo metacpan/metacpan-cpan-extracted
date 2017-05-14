@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+#$Id: replace,v 1.9 1998/01/26 16:48:19 schwartz Exp $
+#
+# replace - replaces things with thongs
+#
+# Demonstrates the use of module Startup.pm
+#
+# See also usage() of this file. General information at:
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/index.html
+#
+# Copyright (C) 1997 Martin Schwartz <schwartz@cs.tu-berlin.de>
+#
+
+my $PROGNAME = "replace";
+my $VERSION=do{my@R=('$Revision: 1.9 $'=~/\d+/g);sprintf"%d."."%d"x$#R,@R};
+my $DATE = ('$Date: 1998/01/26 16:48:19 $' =~ / ([^ ]*) /) && $1;
+
+use Getopt::Long;
+use Startup;
+
+my ($Startup, $text);
+my %opt = ();
+
+main: {
+   $|=1;
+   GetOptions (\%opt,
+      "overwrite",
+      "search=s",
+      "replace=s",
+      "mode=s",
+      "log",
+      "gimmick",
+      "src_base|source_base|source_dir=s",
+      "dest_base|destbase|destdir=s",
+      "from_stdin|from_0|from0",
+      "to_stdout|to_1|to1",
+      "filemode=s",
+      "dirmode=s",
+      "help",
+      "recurse|recursive",
+      "relative",
+      "suffix=s",   
+   );
+   usage() if $opt{"help"};
+   usage() if !defined $opt{"search"};
+   usage() if !defined $opt{"replace"};
+
+   fail(1) if !($Startup = new Startup);
+
+   $Startup -> init ({
+      SUB_FILES  => \&handle_files,
+      SUB_STREAM => \&handle_stream,
+      PROG_NAME  => $PROGNAME,
+      PROG_VER   => $VERSION,
+      FROM_STDIN => $opt{"from_stdin"},
+      SRCPATH    => $opt{"src_base"},
+      DESTPATH   => $opt{"dest_base"},
+      RECURSE    => $opt{"recurse"},
+      RELATIVE   => $opt{"relative"},
+      FILEMODE   => $opt{"filemode"},
+      DIRMODE    => $opt{"dirmode"},
+   });
+
+   $Startup->msg_silent(1) if $opt{"to_stdout"};
+   $Startup->allow_logging if $opt{"log"};
+   $Startup->open_log();
+   $Startup->log('s/'.$opt{"search"}.'/'.$opt{"replace"}.'/'.$opt{"mode"});
+   if ($opt{"to_stdout"}) {
+      $Startup->log("writing to STDOUT");
+   } elsif ($opt{"suffix"}) {
+      $Startup->log("output files get suffix \"".$opt{"suffix"}."\"");
+   }
+
+   $Startup->go(@ARGV);
+
+   $Startup->close_log();
+   exit 1;
+}
+
+sub handle_stream {
+   my ($dp) = @_;
+   $Startup->log("processing <STDIN>");
+   {
+      return $Startup->error("Nothing to do!") if -t STDIN;
+      undef $/;
+      $text = <STDIN>;
+   }
+   return 0 if !main_work("stdin.txt");
+1}
+
+sub handle_files {
+   my ($sp, $sf, $dp, $status) = @_;
+   $Startup->msg_reset();
+
+   $Startup->log("processing $sp/$sf");
+   $Startup->msg("Processing \"$sf\"");
+
+   return error ("File \"$sf\" doesn't exist!") if !$status;
+   return 1 if $status < 0;
+   {
+      return 0 if !open INFILE, "$sp/$sf";
+      my $len = read INFILE, $text, -s "$sp/$sf";
+      close INFILE;
+      return $Startup->error("Error when reading \"$sp/$sf\"")
+         if $len != -s "$sp/$sf"
+      ;
+   }
+   return 0 if !main_work("$dp/$sf");
+   $Startup->msg_finish("done");
+1}
+
+sub main_work {
+   my ($dp) = @_;
+   $dp = basename($dp) . $opt{"suffix"} if $opt{"suffix"};
+
+   my $find = $opt{"search"} || "";
+   my $replace = $opt{"replace"} || "";
+   my $mode = $opt{"mode"} || "g";
+   if (!$opt{"overwrite"}) {
+      return $Startup->error("File \"$dp\" already exists!") if -e $dp;
+   }
+
+   if ($opt{"gimmick"}) {
+      $replace = $Startup -> gimmick ($replace);
+   } 
+   eval '$text =~ s/$find/'."$replace/$mode";
+
+   if ($opt{"to_stdout"}) {
+      return print STDOUT $text;
+   } else {
+      return $Startup->error("Cannot open output file \"$dp\"")
+         if !open OUTFILE, ">$dp"
+      ;
+      my $status = print OUTFILE $text;
+      close OUTFILE;
+      return $Startup->error("Write error") if !$status;
+      return 1;
+   }
+}
+
+sub fail {
+   my ($num) = @_;
+   print "Strange error #$num! Exiting!\n"; exit 0;
+}
+
+sub basename {
+#
+# $basename = basename($filepath)
+#
+   (substr($_[0], rindex($_[0],'/')+1) =~ /(^[^.]*)/) && $1;
+}
+
+sub usage {
+   _print_usage (
+      "$PROGNAME V$VERSION ($DATE) - replace things in texts.\n"
+      ."usage: $PROGNAME {--option [arg]} --search pat --replace str file(s)",
+      [
+        "search     s  search pattern",
+        "replace    s  replace pattern",
+        "mode       s  substitute mode (i=ignore case, g=global) default g",
+        "log           write a logfile",
+        "gimmick       replace pattern shall be \"gimmicked\"",
+        "src_base   s  Regard this as start directory in relative mode",
+        "dest_base  s  Store output files based at this directory",
+        "from_stdin    Take input from stdin",
+        "to_stdout     Write output to stdout",
+        "filemode   s  New files get access mode s (default 0600)",
+        "dirmode    s  New directories get access mode s (default 0700)",
+        "overwrite     Overwrite existing files",
+        "recurse       Operate recursively on directories",
+        "relative      Store files relatively to destdir when in recurse mode",
+        "suffix     s  Output files shall get suffix 's' (not: '.s')",
+      ]
+   );
+   exit 0;
+}
+
+sub _print_usage {
+   my ($header, $bodylistR, $footer) = @_;
+   print "$header\n" if $header;
+   print map "   --$_\n", sort { lc($a) cmp lc($b) } @$bodylistR;
+   print "$footer\n" if $footer;
+}
+
+__END__
+
+=head1 NAME
+
+replace - substitutes text 
+
+Use perls regular expressions on a list of files.
+
+=head1 SYNOPSIS
+
+Example: 
+
+replace --search 'foo' --replace 'bar' --recurse --log *
+
+=head1 DESCRIPTION
+
+Replace is a utility to substitute text in a bunch of files. It is used
+also to demonstrate the use of perl module Startup. You can use perls 
+regular expressions as search and replace strings.
+
+usage: $PROGNAME {--option [arg]} file(s)
+
+   search     s  search pattern
+   replace    s  replace pattern
+   mode       s  substitute mode (i=ignore case, g=global) default g
+   log           write a logfile
+   gimmick       replace pattern shall be "gimmicked"
+   src_base   s  Regard this as start directory in relative mode
+   dest_base  s  Store output files based at this directory
+   from_stdin    Take input from stdin
+   to_stdout     Write output to stdout
+   filemode   s  New files get access mode s (default 0600)
+   dirmode    s  New directories get access mode s (default 0700)
+   overwrite     Overwrite existing files
+   recurse       Operate recursively on directories
+   relative      Store files relatively to destdir when in recurse mode
+   suffix     s  Give output files this suffix
+
+=head1 SEE ALSO
+
+L<Startup>
+
+=head1 AUTHOR
+
+Martin Schwartz E<lt>F<schwartz@cs.tu-berlin.de>E<gt>.
+
+=cut
+

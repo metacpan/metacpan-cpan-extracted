@@ -1,0 +1,67 @@
+{
+  "reporter": {
+    "name": "GARU",
+    "email": "garu@cpan.org"
+  },
+  "environment": {
+    "reporter": "rawsender 1.0",
+    "language": {
+      "name": "Perl 5",
+      "version": "5.24.1",
+      "archname": "darwin-2level",
+      "variables": {
+        "$^X": "/Users/garu/.plenv/versions/5.24.1/bin/perl5.24.1"
+      },
+      "toolchain": {
+        "ExtUtils::MakeMaker": "7.24",
+        "CPAN": "2.1101"
+      },
+      "build": "Summary of my perl5 (revision 5 version 24 subversion 1) configuration:\n\n Platform:\n osname=darwin, osvers=16.4.0, archname=darwin-2level\n uname='darwin bebop.local 16.4.0 darwin kernel version 16.4.0: thu dec 22 22:53:21 pst 2016; root:xnu-3789.41.3~3release_x86_64 x86_64 '\n config_args='-Dprefix=/Users/garu/.plenv/versions/5.24.1 -de -Dusedevel -A'eval:scriptdir=/Users/garu/.plenv/versions/5.24.1/bin''\n hint=recommended, useposix=true, d_sigaction=define\n useithreads=undef, usemultiplicity=undef\n use64bitint=define, use64bitall=define, uselongdouble=undef\n usemymalloc=n, bincompat5005=undef\n Compiler:\n cc='cc', ccflags ='-fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include',\n optimize='-O3',\n cppflags='-fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include'\n ccversion='', gccversion='4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.42.1)', gccosandvers=''\n intsize=4, longsize=8, ptrsize=8, doublesize=8, byteorder=12345678, doublekind=3\n d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=16, longdblkind=3\n ivtype='long', ivsize=8, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8\n alignbytes=8, prototype=define\n Linker and Libraries:\n ld='env MACOSX_DEPLOYMENT_TARGET=10.3 cc', ldflags =' -fstack-protector-strong -L/usr/local/lib'\n libpth=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/lib /usr/local/lib /usr/lib\n libs=-lpthread -ldbm -ldl -lm -lutil -lc\n perllibs=-lpthread -ldl -lm -lutil -lc\n libc=, so=dylib, useshrplib=false, libperl=libperl.a\n gnulibc_version=''\n Dynamic Linking:\n dlsrc=dl_dlopen.xs, dlext=bundle, d_dlsymun=undef, ccdlflags=' '\n cccdlflags=' ', lddlflags=' -bundle -undefined dynamic_lookup -L/usr/local/lib -fstack-protector-strong'\n\n Characteristics of this binary (from libperl):\n Compile-time options: HAS_TIMES PERLIO_LAYERS PERL_COPY_ON_WRITE\n PERL_DONT_CREATE_GVSV\n PERL_HASH_FUNC_ONE_AT_A_TIME_HARD PERL_MALLOC_WRAP\n PERL_PRESERVE_IVUV PERL_USE_DEVEL USE_64_BIT_ALL\n USE_64_BIT_INT USE_LARGE_FILES USE_LOCALE\n USE_LOCALE_COLLATE USE_LOCALE_CTYPE\n USE_LOCALE_NUMERIC USE_LOCALE_TIME USE_PERLIO\n USE_PERL_ATOF\n Built under darwin\n Compiled at Feb 16 2017 19:24:42\n %ENV:\n PERLDOC_PAGER=\"less\"\n @INC:\n /Users/garu/.plenv/versions/5.24.1/lib/perl5/site_perl/5.24.1/darwin-2level\n /Users/garu/.plenv/versions/5.24.1/lib/perl5/site_perl/5.24.1\n /Users/garu/.plenv/versions/5.24.1/lib/perl5/5.24.1/darwin-2level\n /Users/garu/.plenv/versions/5.24.1/lib/perl5/5.24.1\n ."
+    },
+    "system": {
+      "osname": "darwin",
+      "osversion": "16.4.0",
+      "hostname": "bebop",
+      "cpu_count": "1 [2 cores]",
+      "cpu_type": "Intel Core i5",
+      "cpu_description": "MacBook Air (1.3 GHz)",
+      "filesystem": "hfs",
+      "variables": {
+          "PERLDOC_PAGER": "less",
+          "PATH": "/Users/garu/.plenv/versions/5.24.1/bin:/usr/local/Cellar/plenv/2.1.1/libexec:/Users/garu/.vim/bin:/usr/local/opt/node@4/bin:/Users/garu/.gem/ruby/2.0.0/bin:/Users/garu/.plenv/shims:/Users/garu/Projects/colab55/mediatemple/mahout/apache-maven-3.3.3/bin:/Users/garu/.rakudobrew/bin:/Users/garu/.rakudobrew/moar-nom/install/share/perl6/site/bin/:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/garu/Projects/golang/bin"
+      }
+    }
+  },
+  "distribution": {
+    "name": "Data-Printer",
+    "version": "0.39",
+    "grade": "PASS",
+    "tests": 453,
+    "failures": 0,
+    "skipped": 2,
+    "todo": { "pass": 0, "fail": 0 },
+    "warnings": 2,
+    "duration": 8,
+    "output": {
+      "configure": "Checking if your kit is complete...\n Looks good\n Generating a Unix-style Makefile\n Writing Makefile for Data::Printer\n Writing MYMETA.yml and MYMETA.json",
+      "build": "cp lib/Data/Printer/Filter/DateTime.pm blib/lib/Data/Printer/Filter/DateTime.pm\n cp lib/Data/Printer/Filter/DB.pm blib/lib/Data/Printer/Filter/DB.pm\n cp lib/Data/Printer.pm blib/lib/Data/Printer.pm\n cp lib/Data/Printer/Filter/Digest.pm blib/lib/Data/Printer/Filter/Digest.pm\n cp lib/Data/Printer/Filter.pm blib/lib/Data/Printer/Filter.pm\n cp lib/DDP.pm blib/lib/DDP.pm\n Manifying 6 pod documents",
+      "test": "PERL_DL_NONLAZY=1 \"/Users/garu/.plenv/versions/5.24.1/bin/perl5.24.1\" \"-MExtUtils::Command::MM\" \"-MTest::Harness\" \"-e\" \"undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')\" t/*.t t/00-load.t ................. # Beginning Data::Printer tests in darwin with Perl 5.024001, /Users/garu/.plenv/versions/5.24.1/bin/perl5.24.1\n t/00-load.t ................. 1/1 # Testing Data::Printer 0.39\n t/00-load.t ................. ok\n t/00.2-begin_load.t ......... ok\n t/01-p.t .................... ok\n t/02-colors.t ............... ok\n t/02.2-autocolor.t .......... skipped: IO::Pty::Easy required for auto-colored tests\n t/03-conf.t ................. ok\n t/03-conf_not_ref.t ......... ok\n t/04-multiline.t ............ ok\n t/04-multiline2.t ........... ok\n t/05-obj.t .................. ok\n t/06-obj2.t ................. ok\n t/07-sort.t ................. ok\n t/08-deparse.t .............. ok\n t/09-alias.t ................ ok\n t/10-filter.t ............... ok\n t/11-aliased_with_filter.t .. ok\n t/12-filter_class.t ......... ok\n t/13-filter_datetime.t ...... ok\n t/13.2-filter_db.t .......... 1/? DBIx::Class::Storage::DBI::_warn_undetermined_driver(): This version of DBIC does not yet seem to supply a driver for your particular RDBMS and/or connection method ('DBM'). While we will attempt to continue anyway, the results are likely to be underwhelming. Please upgrade DBIC, and if this message does not go away, file a bugreport including the following info:\n {\n DBD => \"DBD::DBM\",\n DBD_VER => \"0.08\",\n DBIC_DRIVER => \"DBIx::Class::Storage::DBI\",\n DBIC_DSN => \"dbi:DBM(RaiseError=1):\",\n DBIC_VER => \"0.082840\",\n DBI_VER => \"1.636\"\n }\n t/13.2-filter_db.t .......... ok\n t/13.3-filter_digest.t ...... ok\n t/14-local_conf.t ........... ok\n t/15-rc_file.t .............. ok\n t/16-rc_file2.t ............. ok\n t/16.2-rc_overwrite.t ....... ok\n t/16.3-rc_env.t ............. ok\n t/16.4-rc_env2.t ............ ok\n t/16.5-rc_env3.t ............ ok\n t/17-parallel.t ............. ok\n t/18-class_method.t ......... ok\n t/19-tied.t ................. ok\n t/20-handles.t .............. ok\n t/21-ddp.t .................. ok\n t/22-class_method.t ......... ok\n t/23-caller_info.t .......... ok\n t/24-no_prototypes.t ........ ok\n t/25-weak.t ................. ok\n t/26-tainted.t .............. ok\n t/26.2-tainted_rc.t ......... *** WARNING *** taint mode on: skipping rc file '/tmp/YU_XhWUCAT/my_home/.dataprinter'.\n t/26.2-tainted_rc.t ......... ok\n t/26.7-unicode.t ............ ok\n t/27-pass_through.t ......... ok\n t/27.2-pass_through.t ....... ok\n t/27.3-pass_through-DDP.t ... ok\n t/27.4-pass_through-DDP.t ... ok\n t/28-void_return.t .......... ok\n t/29-output.t ............... ok\n t/30-print_escapes.t ........ ok\n t/31-bad_parameters.t ....... ok\n t/32-quote_keys.t ........... ok\n t/33-end_separator.t ........ ok\n t/33-separator.t ............ ok\n t/34-show_readonly.t ........ ok\n t/35-vstrings.t ............. ok\n t/36-valign.t ............... ok\n t/37-format.t ............... ok\n t/38-lvalue.t ............... ok\n t/39-seen_override.t ........ ok\n t/40-escape_chars.t ......... ok\n t/41-yaml.t ................. skipped: YAML::Syck not found.\n t/42-alignment.t ............ ok\n t/43-_is_number.t ........... ok\n t/44-number-colors.t ........ ok\n t/45-np.t ................... ok\n All tests successful.\n Files=62, Tests=453,  8 wallclock secs ( 0.30 usr  0.20 sys +  6.20 cusr  0.87 csys =  7.57 CPU)\n Result: PASS",
+      "install": "Manifying 6 pod documents\n Installing /Users/garu/.plenv/versions/5.24.1/lib/perl5/site_perl/5.24.1/Data/Printer.pm\n Installing /Users/garu/.plenv/versions/5.24.1/lib/perl5/site_perl/5.24.1/Data/Printer/Filter.pm\n Installing /Users/garu/.plenv/versions/5.24.1/man/man3/Data::Printer.3\n Installing /Users/garu/.plenv/versions/5.24.1/man/man3/Data::Printer::Filter.3\n Installing /Users/garu/.plenv/versions/5.24.1/man/man3/Data::Printer::Filter::DB.3\n Appending installation info to /Users/garu/.plenv/versions/5.24.1/lib/perl5/5.24.1/darwin-2level/perllocal.pod"
+    },
+    "prerequisites": [
+        { "phase": "test_requires", "name": "Test::More", "need": "0.88", "have": "1.302078" },
+        { "phase": "requires", "name": "Term::ANSIColor", "need": "3.0",  "have": "4.04"     },
+        { "phase": "requires", "name": "Scalar::Util",    "need": "0",    "have": "1.47"     },
+        { "phase": "requires", "name": "version",         "need": "0.77", "have": "0.9916"   },
+        { "phase": "requires", "name": "Sort::Naturally", "need": "0",    "have": "1.03"     },
+        { "phase": "requires", "name": "Package::Stash",  "need": "0.30", "have": "0.37"     },
+        { "phase": "requires", "name": "Carp",            "need": "0",    "have": "1.40"     },
+        { "phase": "requires", "name": "Clone::PP",       "need": "0",    "have": "1.06"     },
+        { "phase": "requires", "name": "File::HomeDir",   "need": "0.91", "have": "1.00"     },
+        { "phase": "requires", "name": "File::Spec",      "need": "0",    "have": "3.6301"   },
+        { "phase": "requires", "name": "File::Temp",      "need": "0",    "have": "0.2304"   },
+        { "phase": "requires", "name": "Fcntl",           "need": "0",    "have": "1.13"     }
+    ]
+  },
+  "comments": "This is a static push of a valid report so we can test the new CPAN Testers API"
+}

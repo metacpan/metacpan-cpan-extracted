@@ -1,0 +1,126 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: TBL Format
+
+H2: Purpose
+
+{{TBL}} format is a text-based format for storing tabular data.
+
+H2: Overview
+
+The basic rules are:
+
+* blank lines and comment lines are ignored,
+* the first data line specifies the record format,
+* each remaining data line specifies a single record.
+
+Comment lines begin with # as the first non-whitespace character.
+
+H2: Record Formats
+
+For a given table, all records have the same format.
+The record format is either:
+
+* {{delimited}} - fields are separated by a special character, or
+* {{fixed-width}} - fields are defined by column positions.
+
+An example of delimited format is given below.
+
+!block example
+# A simple TBL example
+Name:Age:Phone:Addr
+Bill:42:397 1234:14 Smith St, New Farm
+Sarah:37:892 4321:105 Brown St, Chelmer
+Joe:44:365 7890:6 Royal Av, Buranda
+!endblock
+
+An example of fixed-width format is given below.
+
+!block example
+# A simple TBL example
+Name    Age     Phone           Addr
+Bill    42      397 1234        14 Smith St, New Farm
+Sarah   37      892 4321        105 Brown St, Chelmer
+Joe     44      365 7890        6 Royal Av, Buranda
+!endblock
+
+Note: Tabs in fixed-width records are assumed to be 8 spaces wide.
+
+H2: Input Format Specification
+
+The first data line is called the {{input format specification}}.
+It specifies:
+
+* the name and order of the fields in each record
+* the record format - delimited or fixed-width
+
+Field names can contain:
+
+* alphanumeric characters (A-Z, a-z, 0-9)
+* the underscore character (_)
+
+If the first character after the first field name is a space or tab,
+the format is assumed to be {{fixed width}}. Otherwise, the format is
+{{delimited}} with fields separated by the special character found.
+
+H2: Multi-line Fields
+
+Generally, each data line specifies a single record.
+However, if the last field begins with the sequence '<<',
+then it is a multi-line field terminated by the first line
+beginning with '>>'. Multi-line fields are supported by both
+record formats.
+
+Within a multi-line field, blank lines and lines starting
+with # are treated as part of that field. i.e. it is not
+possible to embed a comment line within a multi-line field.
+
+An example of a table containing multi-line fields is given below.
+
+!block example
+# A simple TBL example with multi-line fields
+Name    Age     Phone           Addr
+Bill    42      397 1234        <<
+14 Smith St
+New Farm QLD 4005
+>>
+Sarah   37      892 4321        <<
+105 Brown St
+Chelmer QLD 4068
+>>
+Joe     44      365 7890        <<
+6 Royal Av
+Buranda QLD 4102
+>>
+!endblock
+
+H2: Special Characters in Fields
+
+For delimited fields:
+
+^ If a field contains the delimiter character or the double quote character,
+  it must be enclosed in double quotes.
++ A double quote character within a field is represented by two double quotes.
++ Leading whitespace is kept.
++ Trailing whitespace is kept.
+
+For fixed-width fields:
+
+^ Leading whitespace is kept.
++ Trailing whitespace is removed.
+
+Note: Multi-line fields are enclosed by the << and >> symbols so none
+of the rules above apply to them.
+
+!end_topic

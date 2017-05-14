@@ -1,0 +1,38 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: sdf Filter
+
+H2: Interface
+
+!filter_interface "sdf"
+
+H2: Description
+
+The {{sdf}} filter can be used to apply an arbitrary set of
+paragraph and/or phrase attributes to a section of text.
+
+H2: Examples
+
+To add change bars to a section of text, the sdf filter can be used
+in combination with the {{changed}} attribute as follows:
+
+!block example; lang='sdf'
+!block sdf; changed
+This text has been changed.
+
+And so has this.
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

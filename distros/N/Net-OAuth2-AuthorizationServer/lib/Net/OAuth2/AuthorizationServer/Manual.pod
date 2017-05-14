@@ -631,8 +631,7 @@ you can simplify parts of the process as the JWT will contain the client, user,
 and scope information (JWTs are also easy to debug: L<http://jwt.io>).
 
 When using JWTs expiry dates will be automatically checked (L<Mojo::JWT> has this
-built in to the decoding) and the hash returned from the call to ->oauth will
-look something like this:
+built in to the decoding). The claims hash looks something like this:
 
   {
     'iat'     => 1435225100,               # generation time
@@ -645,6 +644,33 @@ look something like this:
     'client'  => 'some client id',         # as returned from verify_auth_code
     'user_id' => 'some user id',           # as returned from verify_auth_code
   };
+
+If you wish to override the details set above you can pass a B<jwt_claims_cb>
+in the call to token. This will be passed the details that are used above, and
+any returned keys will override the defaults:
+
+  $Grant->token(
+    ...
+    jwt_claims_cb => sub {
+      my ( $args ) = @_;
+
+      return (
+        user_id => 'foo', # override default user_id
+        iss     => ...    # add extra claims
+      );
+    },
+  );
+
+the args hash passed to the callback looks like so:
+
+  {
+    user_id      => $user_id,
+    client_id    => $client_id,
+    type         => $type,
+    scopes       => $scopes_ref,
+    redirect_uri => $redirect_uri,
+    jti          => $jti,
+  }
 
 Since a call for an access token requires both the authorization code and the
 client secret you don't need to worry too much about protecting the authorization

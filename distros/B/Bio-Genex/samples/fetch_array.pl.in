@@ -1,0 +1,309 @@
+%%START_PERL%%
+
+use Carp;
+use strict;
+
+%%GENEX_EXTRALIBS%%
+use DBI;              # and the DBI module
+use CGI qw/:standard :html3 :Carp/; # LS's CGI thingie
+use CGI::Carp qw(fatalsToBrowser);
+
+use Bio::Genex qw(timestamp);
+use Bio::Genex::ArrayMeasurement;
+use Bio::Genex::DBUtils qw(create_select_sql);
+use Bio::Genex::HTMLUtils;
+
+# ============  Executive / Important Decisions  ==========================
+my $current_time = timestamp();
+
+# vars for generating URLs, local temp storage
+my $www_server = '%%WWWHOST%%';
+my $cgi_bin = '%%GENEX_URL_EXAMPLE%%';
+
+# start a connection using the default parameters
+my $dbh = Bio::Genex::current_connection();
+
+# ======= Start composing HTML page =====
+my $q = new CGI;
+
+print $q->header, 
+  $q->start_html('Array Viewer Page'), 
+  $q->h2('Arrays Retrieved from GeneX');
+
+
+
+# ===============  Get the params from the Web Page via CGI  ==============
+my (@experiments_to_fetch,$do_fetch,%columns,@column_names,%column2name,%name2column);
+
+# setup some useful aliases
+%column2name = %{Bio::Genex::ArrayMeasurement->column2name()};
+%name2column = %{Bio::Genex::ArrayMeasurement->name2column()};
+@column_names = @{Bio::Genex::ArrayMeasurement->column_names()};
+
+my $DEBUG = 0;
+my @am_types;
+if (param) {
+  @experiments_to_fetch = param('ExperimentsToFetch');
+  if (defined param('ONLY_ONE_ES') && scalar @experiments_to_fetch > 1) {
+    # the user has selected more than one experiment when the analysis 
+    # requires that only a single experiment be selected
+    print $q->h1("ERROR: More than one experiment was chosen");
+    print $q->p("Use the back button to reture to the form and chose only a single experiment");
+    print $q->end_html();
+    exit();
+  }
+
+  @am_types = param('AM_types');
+  $DEBUG = param('DEBUG') if defined param('DEBUG');
+
+  # And following can be as many different buttons and widgets and dohickies
+  # as we want to set all the params we want/need to compose the SQL
+
+  # get check box values
+  my @check_boxes = param('array_checkboxes');
+  foreach (@check_boxes) {
+    $columns{$_} = 1;
+  }
+
+  # and button type gets set here
+  $do_fetch = param('FETCH');
+   
+}
+
+# ==========  Got all params, now do something useful with them ============
+# So that sets all the parameters for the search.  Now, depending on which 
+# button was pushed, we will either do the search and find out how many rows 
+# get returned or do the search and do the rest of the analysis, or simply 
+# download the data.  
+
+if ($DEBUG) {
+  open(PARAM, ">/tmp/params.txt") or die "Couldn't open param file";
+  save_parameters(\*PARAM);
+
+  my $table = $q->table({-border => ''},
+			caption('Values of CGI parameters'),
+			Tr([th(['parameter name','parameter value']),
+			    td(['FETCH', $do_fetch]),
+			    td(['DEBUG', $DEBUG]),
+			    td(['ExperimentsToFetch', join ', ',@experiments_to_fetch]),
+			    td(['AM_types', join ', ',@am_types]),
+			   ])
+		       );
+  
+  print $table;
+
+  my @rows;
+  foreach (@column_names) {
+    push(@rows,td([$_, exists $columns{$_}]));
+  }
+  
+  print table({-border =>'',-cols=>2},
+		    caption('Values of checkbox parameters'),
+		    Tr(th(['parameter name','parameter value'])),
+		    Tr(\@rows));
+}
+
+########################################
+#
+# form the sql query based on the input parameters
+#
+
+########################################
+# 
+# @COLUMNS handles the list of column we want to retrieve 
+#    from the ExperimentSet table
+#
+
+# we start with two columns
+my @COLUMNS = ('name', 'am_pk');
+
+# now we add more columns based on the CGI parameters
+foreach (keys %columns) {
+  push(@COLUMNS,$_);
+}
+
+########################################
+# 
+# @FROM handles the list of tables from whic we want 
+#    to retrieve information 
+#
+
+# we start with one table
+my @FROM  = ('ArrayMeasurement');
+
+########################################
+# 
+# $WHERE handles the filter with which we restrict which
+#   experiment sets are returned
+#
+
+my $WHERE;
+
+my $array_where;
+
+print start_form(-action=>"$cgi_bin/fetch_spot.pl");
+  
+if ($DEBUG) {
+  # add an element to pass on the DEBUG flag
+  print hidden(-name=>'DEBUG',-value=>1);
+}
+
+foreach my $es_pk (@experiments_to_fetch) {
+  #
+  # SECURITY CHECK: the values in @experiments_to_fetch are retrieved 
+  #   from a WWW form and should not be trusted. We check them to make 
+  #   sure that they are untampered, ie. they are only digits
+  #
+  croak "Bad Experiment ID: $es_pk" unless $es_pk =~ /^\d+$/;
+
+  $WHERE = "primary_es_fk = $es_pk";
+
+  # we check to see if the user has restricted on the type
+  # of arrays to return. We do no filtering if the only option is 'All'
+#   print p(b("am_types = " . join(' ',@am_types))) if $DEBUG;
+
+  if (scalar @am_types > 1 || 
+      (scalar @am_types == 1 && $am_types[0] ne 'All_Types')) {
+
+    #
+    # SECURITY CHECK: the values in @am_types are retrieved from a WWW 
+    #   form and should not be trusted. We check them to make sure that
+    #   they are untampered, ie. they can only be single words, two words
+    #   separated by whitespace or three words separated by whitespace
+    #
+    foreach (@am_types) {
+      next if /All_Types/;
+      croak "Bad Type: $_" unless /^(\w+\s+){0,2}\w+$/;
+    }
+    my $type_where = q[(type='] . join(q[' OR type='], @am_types);
+    $type_where .= q[')];
+
+    $WHERE .= " AND ($type_where)";
+  }
+
+  # create the select command
+  my @args = (FROM=>\@FROM,COLUMNS=>\@COLUMNS);
+  push(@args,WHERE=>$WHERE) if defined $WHERE;
+  my $sql = create_select_sql($dbh,@args);
+  
+  print h2("Your query is: " . $sql) if $DEBUG;
+  
+  # execute the sql
+  my $sth = $dbh->prepare($sql) || die $DBI::errstr;
+  $sth->execute() || die $DBI::errstr;
+  my $rows = $sth->rows || die $DBI::errstr;
+  
+  if ($rows) {
+    my $response = "Your query returned $rows array";
+    
+    # check for good grammar
+    if ($rows > 1) {
+      $response .= 's';
+    } 
+    print h3($response);
+    
+    my @rows;
+    
+    ########################################
+    #
+    # make a header element that describes the experiment set
+    #
+    
+    # first get the experiment set name
+    $sql = create_select_sql($dbh,FROM=>['ExperimentSet'],
+			     COLUMNS=>['name'],
+			     WHERE=>"es_pk = $es_pk",
+			    );
+    my $array_ref = $dbh->selectall_arrayref($sql) || die $DBI::errstr;
+    # selectall_arrayref() returns a reference to an array
+    # of arrays, so we need '->[0][0]' to get a single value
+    my $es_name = $array_ref->[0][0];
+    
+    # now create the table Header, th() takes an array reference
+    push(@rows,th({-colspan=>scalar(@COLUMNS), -align=>'LEFT'},
+		  big("Arrays for Experiment: $es_name"))); 
+    
+    
+    ########################################
+    #
+    # make a header element with the column names
+    #
+    
+    # we take out the two columns we want first
+    #    grep() takes a list and a filter and returns another 
+    #       list consisting of only those items which pass the 
+    #       filter criteria.
+    my @column_copy = grep {$_ ne 'am_pk' && $_ ne 'name' } @COLUMNS;
+    
+    # translate the header to be readable
+    foreach (@column_copy) {
+      if (exists $column2name{$_}) {
+	$_ = $column2name{$_};
+      }
+    }
+    
+    # now sort them
+    @column_copy = sort @column_copy;
+    
+    # now make add 'Accession Number' and 'Array Name' 
+    # to the front of the list
+    unshift(@column_copy,'Accession Number', 'Array Name');
+    
+    # make a header element. 
+    push(@rows,th(\@column_copy));
+    
+    # Finally, go through the data rows one by one and table the results
+    while (my $hash_ref = $sth->fetchrow_hashref()) {
+      
+      # we take out the rows that we know exist, and order them
+      my $am_pk = $hash_ref->{'am_pk'};
+      my $am_name = $hash_ref->{'name'};
+      delete $hash_ref->{'am_pk'};
+      delete $hash_ref->{'name'};
+      
+      my @values = (checkbox(-label=>'',
+			     -name=>'ArraysToFetch',
+			     -checked=>1,
+			     -value=>"$es_pk:$am_pk"),
+		    $am_name);
+
+      # post process the query results
+      my %tmp_values = post_process($q,%{$hash_ref});
+
+      # the names in @column_copy are sorted, we loop through them
+      # and add the values from $hash_ref to @values in sorted order
+      # we use %name2column to faciliate the reverse name lookup
+      foreach (@column_copy){
+	next if /Accession Number|Array Name/;
+
+	push(@values, $tmp_values{$name2column{$_}});
+      }
+      
+      push(@rows,td({-align=>'CENTER'},\@values)); 
+    }
+    
+    # now contstruct the table, 
+    print table({-border=>''},
+		Tr(\@rows)	# Tr() distributes over an array reference
+	       );
+    print br(), hr({-noshade=>1, 
+		    -size=>5});
+
+
+  } else {
+    print h2("Sorry, no arrays matched your query");
+  }
+}
+
+print p(b("When you are finished making the selection, press the button below to Retrieve the data."));
+
+print table({-cols=>3,
+		 -align=>'CENTER',
+		},
+		Tr([td([submit(-name=>"FETCH",
+				   -value=>'Fetch Spot Data')]),
+		   ])
+	       );
+
+print $q->end_form;
+print $q->end_html;

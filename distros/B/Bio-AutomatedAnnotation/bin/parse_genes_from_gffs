@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+package Bio::AutomatedAnnotation::Main::ParseGenesFromGFFs;
+
+# ABSTRACT: Parse genes out of gff files
+# PODNAME: parse_genes_from_gffs
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+use Bio::AutomatedAnnotation::CommandLine::ParseGenesFromGFFs;
+
+Bio::AutomatedAnnotation::CommandLine::ParseGenesFromGFFs->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+parse_genes_from_gffs - Parse genes out of gff files
+
+=head1 VERSION
+
+version 1.133090
+
+=head1 SYNOPSIS
+
+Parse genes out of gff files
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

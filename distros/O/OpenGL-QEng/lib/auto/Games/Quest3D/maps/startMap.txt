@@ -1,0 +1,149 @@
+# map_adv_inn.txt - The start-up map and scenario begining and end point
+#
+###  $Id: $
+#
+map 0 0 0 xsize=>56, zsize=>40, start=>[4,4,90];
+in_last;
+
+level  0  0  0 zsize=>40, xsize=>56, y=>0;
+level  0  0  0 zsize=>40, xsize=>56, y=>8, texture=>'sand';
+
+inventory;
+#Shoes 4 4 90;
+#Key   4 4 90 type=>'green';
+#Key   4 4 90 type=>'silver';
+#Key   4 4 90 type=>'red';
+#Treasure 52 68 90 type=>'silver', count=>3;
+#Treasure 4 4 90 type=>'gold';
+#Treasure 76 52 90 type=>'copper', count=>5;
+#MappingKit 0 0 0;
+done;
+
+#Top wall
+wall  0  0   0 xsize=>56, texture=>'wall3';
+
+#bottom wall
+wall  0 40   0 xsize=>56, texture=>'wall3', tex_fs=>8;
+partof_last;
+sign  4 -0.5 180 texture=>'adv_inn', text=>'';
+done;
+
+#left wall
+wall  0  0 270 xsize=>40, texture=>'wall3', tex_fs=>8;
+partof_last;
+sign 20 -0.6 180 xsize=>3, ysize=>5, texture=>'tapestry', y=>4.5, text=>'';
+done;
+
+#right wall
+wall 56  0 270 xsize=>40, texture=>'wall3', tex_fs=>8;
+partof_last;
+sign 20  0.6   0 xsize=>3, ysize=>5, texture=>'tapestry', y=>4.5, text=>'';
+done;
+
+#top cluster of rooms
+beam  7.875 16.125 0;
+wall  8 16   0 xsize=>48, texture=>'wall3', tex_fs=>8;
+partof_last;
+door  2  0   0 state=>'locked', key=>'red';
+door 10  0   0 state=>'locked', key=>'green';
+door 18  0   0;
+opening 27.5 0 0 xsize=>1, ysize=>1, y=>5;
+door 34  0   0 state=>'locked', key=>'black';
+door 42  0   0 state=>'locked', key=>'wooden';
+done;
+wall  8  0 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+wall 16  0 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+wall 24  0 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+wall 32  0 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+partof_last;
+door 14 0 180 type=>'wall', swing=>-90,
+  color=>'slate gray', texture=>'wall3', tex_fs=>8, stretchi=>0,
+  event_script=>{open_wall=>"sub{$self->yaw(90);
+                                 $self->state('open');
+                                 $self->invalidate_map_view;}"};
+done;
+detector  36 4 0 visible=>1, range=>4,
+ near_script=>"sub{
+                 $self->send_event('map','maps/girlmap.txt');
+                 $self->send_event('go',4,76,0);
+               }";
+wall 40  0 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+wall 48  0 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+
+character 28 0.8 0 texture=>'child', y=>0, xsize=>3, ysize=>5,
+  range=>6,
+  near_script=>"sub{
+                 if    ($self->state eq 'unseen') {
+		   $self->state('seen');
+		   $self->send_event('cpush','yesno');
+		   $self->send_event('msg',
+		     qq/The gnomes have taken my dog and hidden him in their lair.\n/,
+		     qq/Will you please help me rescue him?\n/);
+		 }
+		 elsif ($self->state eq 'seen2') {
+		   $self->state('seen');
+		   $self->send_event('cpush','yesno');
+		   $self->send_event('msg',qq/Will you help me now?\n/);
+                 }
+		 elsif ($self->state eq 'done') {
+		   $self->send_event('msg',qq/Thank you for finding my dog\n/);
+                 }
+               }",
+  event_script=>
+   {answer=>"sub{
+     my ($self,$stash,$obj,$ev,$reply,@args) = @_;
+     if    ($reply eq 'No') {
+       $self->send_event('cpop');
+       $self->send_event('clear_msg');
+       $self->send_event('go',28,4,270);
+       $self->send_event('step',-7,0);
+       $self->send_event('turn',180);
+       $self->state('seen2');
+     }
+     elsif ($reply eq 'Yes') {
+       $self->send_event('cpop');
+       $self->send_event('clear_msg');
+       $self->send_event('open_wall');
+       $self->send_event('msg',\"Thank you\nI will take you there so we can find him\n\");
+       $self->send_event('msg',\"This mapping kit should help us find our way around\n\");
+       $self->send_event('give_team','MappingKit');
+       $self->state('done');
+       $self->send_event('map','maps/tunnel1.txt','fadein');
+       $self->send_event('go',4,4,90);
+       $self->send_event('auto',34,'step',2,0);
+     }
+   }",
+  };
+
+#bank
+beam  7.875 23.875 0;
+wall 16 24 180, texture=>'wall3', tex_fs=>8;
+partof_last;
+door  2 0 0 type=>'bar', state=>'locked', key=>'silver';
+done;
+wall  8 24 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+#wall 16 24 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+wall 16 24 270 xsize=>8, texture=>'wall3', tex_fs=>8;
+wall  8 32   0, texture=>'wall3', tex_fs=>8;
+bank 12 32 180;
+
+#bottom cluster of rooms
+# left set
+beam 32.125 23.875 0;
+wall 16 24   0 xsize=>16, texture=>'wall3', tex_fs=>8;
+wall 32 24 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+partof_last;
+door  6  0 180 state=>'locked', key=>'odd';
+door 14  0 180 state=>'locked', key=>'glass';
+done;
+wall 16 32   0 xsize=>16, texture=>'wall3', tex_fs=>8;
+
+# right set
+beam 39.875 23.875 0;
+wall 40 24   0 xsize=>16, texture=>'wall3', tex_fs=>8;
+wall 40 24 270 xsize=>16, texture=>'wall3', tex_fs=>8;
+partof_last;
+door  2  0   0 state=>'locked', key=>'rusty';
+door 10  0   0 state=>'locked', key=>'worn';
+done;
+wall 40 32   0 xsize=>16, texture=>'wall3', tex_fs=>8;

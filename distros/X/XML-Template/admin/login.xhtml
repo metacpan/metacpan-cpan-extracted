@@ -1,0 +1,57 @@
+<html xmlns:file="http://syrme.net/xml-template/file/v1"
+      xmlns:condition="http://syrme.net/xml-template/condition/v1">
+
+<file:include name="admin/header.xhtml"/>
+
+<body marginwidth="5" leftmargin="5" marginheight="5" topmargin="5">
+
+<table class="borders" align="center" width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td>
+  <table width="100%" border="0" cellspacing="1" cellpadding="3">
+    <tr class="title">
+      <td>Administrator Interface</td>
+    </tr>
+    <tr class="bg">
+      <td align="center">
+        <br/>
+        <form method="post" action="/admin/admin.xhtml">
+        <table class="borders" border="0" cellspacing="0" cellpadding="0"><tr><td>
+          <table width="100%" border="0" cellspacing="1" cellpadding="3">
+            <condition:if cond="${Exception.info}">
+            <tr bgcolor="pink">
+              <td colspan="2">
+                <font color="#ff0000">${Exception.info}</font>
+              </td>
+            </tr>
+            </condition:if>
+
+            <tr class="title">
+              <th colspan="2">Login</th>
+            </tr>
+            <tr class="main">
+             <th>Username:</th>
+             <td><input type="text" name="username"/></td>
+            </tr>
+            <tr class="main">
+              <th>Password:</th>
+              <td><input type="password" name="pwd"/></td>
+            </tr>
+            <tr class="title">
+              <td colspan="2" align="center"><input type="submit" name="Login" value="Login"/></td>
+            </tr>
+          </table>
+        </td></tr></table>
+
+        <font size="-1">(<i>Session will expire after 30 minutes of inactivity.</i>)</font>
+        <input type="hidden" name="request_uri" value="/admin/admin.xhtml"/>
+        </form>
+        <p/>
+      </td>
+    </tr>
+  </table>
+</td></tr></table>
+
+<file:include name="admin/footer.xhtml"/>
+
+</body>
+
+</html>

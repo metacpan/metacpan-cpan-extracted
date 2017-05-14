@@ -1,0 +1,85 @@
+=head1 NAME
+
+XMLUtils - a module for useful XML utilities for Genex DBs
+
+=head1 SYNOPSIS
+
+  use XMLUtils;
+
+  $out_string = pretty_print($in_string);
+  assert_element($dom_node, 'node_name');
+
+=head1 DESCRIPTION
+
+Methods for transforming information from a GeneX DB into XML.
+
+=pod
+
+
+
+=head1 FUNCTIONS
+
+
+=over 4
+
+
+=item pretty_print($string)
+
+=item pretty_print({INDENT=>$val,COLLAPSE=>[@list1],NO_ATTR_BALANCE=>[@list2]},$string)
+
+This function takes an XML string and reformats it. The function takes
+an optional first parameter anonymous hash reference that enables
+modification of the internal reformatting parameters.
+
+
+=over 4
+
+
+=item *
+
+INDENT
+
+The indent level in spaces. The defualt is 2.
+
+=item *
+
+COLLAPSE
+
+A list of tags that should have their beginning and end tags collapsed
+onto a single line. This will result in any intervening tags collapsed
+onto the same line. The default is C<('feature')>.
+
+
+=item *
+
+NO_ATTR_BALANCE
+
+A list of attribute names that should not be moved to a separate
+line. The default is C<('xml')>.
+
+
+=back
+
+
+=item assert_element($dom_node, $node_name);
+
+This raises an exception unless $dom_node is an obect of type
+XML::DOM::Node, and the tag name is $node_name.
+
+
+=pod
+
+
+
+=back
+
+
+
+=head1 AUTHOR
+
+Jason Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

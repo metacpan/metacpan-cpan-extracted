@@ -1,0 +1,35 @@
+
+=================
+uplug-treetagger
+=================
+
+This package includes configuration files for running TreeTagger from Uplug
+
+Supported languages are:
+Bulgarian, German, English, Spanish, Estonian, French, Italian, Latin, Dutch, Swahili
+(see share/systems/pre)
+
+
+INSTALLATION
+------------
+
+Downloading the TreeTagger from 
+http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html
+and tagging models is integrated into the Makefile.PL
+
+* Simply run:
+
+  perl Makefile.PL
+
+
+* If you run Uplug in a local directory (without explicitly installing):
+  Copy the share-directory to your local Uplug location
+
+  cp -R uplug-treetagger/share /path/to/uplug/home/dir/
+
+* otherwise run the usual installation steps
+
+  make
+  sudo make install
+
+

@@ -92,7 +92,7 @@ package Soy::command_print;
 use base 'Soy::base';
 1;
 
-package Soy::expression;
+package Soy::expressiong;
 use base 'Soy::base';
 1;
 
@@ -234,7 +234,7 @@ use base 'Soy::base';
 #                                                      }, 'Soy::command_foreach_ifempty' ),
 #                  'expression' => bless( {
 #                                           '' => '[1..10]'
-#                                         }, 'Soy::expression' ),
+#                                         }, 'Soy::expressiong' ),
 #                  'content' => [
 #                                 bless( {
 #                                          'matchline' => 1,
@@ -247,7 +247,7 @@ use base 'Soy::base';
 #                               ],
 #                  'local_var' => bless( {
 #                                          '' => '$i'
-#                                        }, 'Soy::expression' ),
+#                                        }, 'Soy::expressiong' ),
 #                  'srcfile' => 'test'
 #                }, 'Soy::command_foreach' );
 
@@ -292,7 +292,7 @@ use strict;
 use warnings;
 use Regexp::Grammars;
 use Plosurin::Grammar;
-use base 'Soy::expression';
+use base 'Soy::expressiong';
 
 sub new {
     my $class = shift;
@@ -301,7 +301,7 @@ sub new {
 
 1;
 
-package Soy::expression;
+package Soy::expressiong;
 use strict;
 use warnings;
 use Regexp::Grammars;

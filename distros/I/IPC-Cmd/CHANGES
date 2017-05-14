@@ -1,3 +1,12 @@
+0.98 Fri May 12 17:00:07 BST 2017
+
+  Enhancements:
+  * Added wait_loop_callback for run_forked()
+
+  Bug fixes:
+  * Only search in curdir in can_run() when on Win32
+    RT#105601
+
 0.96 Thu Jul 28 11:17:12 BST 2016
 
   Bug fixes:

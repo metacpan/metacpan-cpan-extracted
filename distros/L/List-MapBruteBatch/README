@@ -1,0 +1,47 @@
+NAME
+
+    List::MapBruteBatch - Do a brute-force batched map() though a list with
+    a callback
+
+SYNOPSIS
+
+        map_brute_batch($cb, \@list);
+        my @ret = map_brute_batch($cb, \@list, \$cb_success, \$cb_failure);
+
+DESCRIPTION
+
+    Firstly. Why would you use this?
+
+    You have some N number of items you want to process. You have some
+    function that can take those N, and it's much cheaper to do them in one
+    big batch than one at a time.
+
+    However, any one of the N items can fail, causing the entire batch of N
+    to fail with it. When that happens you either don't know which one
+    failed the batch, or finding out would be tedious.
+
+    This module provides a map()-like function to solve that problem. It'll
+    attempt to process a \@list you provide with a $cb function that you
+    provide.
+
+    If your $cb doesn't return true we bisect the \@list and call your $cb
+    on each half of the bisected list, and if those fail we repeat this
+    process until we're processing one item, which may also fail.
+
+    You can optionally provide $cb_success or $cb_failure callbacks,
+    those'll be called in map()-like fashion on items that fail or succeed,
+    respectively. You can use this to make the function return a list of
+    items showing which items ended up failing or succeeding.
+
+AUTHOR
+
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2013-2016 by Ævar Arnfjörð Bjarmason
+    <avar@cpan.org>
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

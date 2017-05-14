@@ -1,11 +1,11 @@
 package CPAN::Recent::Uploads;
-$CPAN::Recent::Uploads::VERSION = '0.10';
+$CPAN::Recent::Uploads::VERSION = '0.12';
 #ABSTRACT: Find the distributions recently uploaded to CPAN
 
 use strict;
 use warnings;
 use Carp;
-use YAML::Syck;
+use YAML::XS ();
 use File::Spec;
 use CPAN::Recent::Uploads::Retriever;
 
@@ -33,7 +33,7 @@ sub recent {
   OUTER: foreach my $foo ( @times ) {
     my $yaml = CPAN::Recent::Uploads::Retriever->retrieve( time => $foo, mirror => $mirror );
     my @yaml;
-    eval { @yaml = YAML::Syck::Load( $yaml ); };
+    eval { @yaml = YAML::XS::Load( $yaml ); };
     croak "Unable to process YAML\n" unless @yaml;
     my $record = shift @yaml;
     die unless $record;
@@ -81,7 +81,7 @@ CPAN::Recent::Uploads - Find the distributions recently uploaded to CPAN
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 SYNOPSIS
 

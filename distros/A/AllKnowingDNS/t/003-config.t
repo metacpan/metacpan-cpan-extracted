@@ -29,9 +29,9 @@ ok(defined($config->zone_for_ptr('7.c.e.2.3.4.e.f.f.f.b.d.9.1.2.0.0.c.c.c.e.0.0.
 ok(!defined($config->zone_for_ptr('7.c.e.2.3.4.e.f.f.f.b.d.9.1.2.0.1.c.c.c.e.0.0.1.8.8.d.4.1.0.0.2.ip6.arpa')),
    'different network not handled');
 
-ok(defined($config->zone_for_aaaa('.nutzer.raumzeitlabor.de')),
+ok(defined($config->zone_for_aaaa('ipv6-a-blah.nutzer.raumzeitlabor.de')),
    'network properly handled');
-ok(!defined($config->zone_for_aaaa('.servers.raumzeitlabor.de')),
+ok(!defined($config->zone_for_aaaa('ipv6-b-blah.servers.raumzeitlabor.de')),
    'different network not handled');
 
 done_testing;

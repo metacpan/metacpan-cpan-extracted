@@ -1,0 +1,196 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Finance::BeanCounter - Module for stock portfolio performance functions.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#database_layout">DATABASE LAYOUT</a></li>
+	<ul>
+
+		<li><a href="#the_stockinfo_table">THE STOCKINFO TABLE</a></li>
+		<li><a href="#the_stockprices_table">THE STOCKPRICES TABLE</a></li>
+		<li><a href="#the_fxprices_table">THE FXPRICES TABLE</a></li>
+		<li><a href="#the_stockportfolio_table">THE STOCKPORTFOLIO TABLE</a></li>
+		<li><a href="#the_indices_table">THE INDICES TABLE</a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Finance::BeanCounter - Module for stock portfolio performance functions.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ use Finance::BeanCounter;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>Finance::BeanCounter</strong> provides functions to <em>download</em>, <em>store</em> and
+<em>analyse</em> stock market data.</p>
+<p><em>Downloads</em> are available of current (or rather: 15 or 20
+minute-delayed) price and company data as well as of historical price
+data.  Both forms can be stored in an SQL database (for which we
+currently default to <strong>PostgreSQL</strong> though <strong>MySQL</strong> is supported as
+well; furthermore any database reachable by means of an <strong>ODBC</strong>
+connection should work).</p>
+<p><em>Analysis</em> currently consists of performance and risk
+analysis. Performance reports comprise a profit-and-loss (or 'p/l' in
+the lingo) report which can be run over arbitrary time intervals such
+as <code>--prevdate 'friday six months ago' --date 'yesterday'</code> -- in
+essence, whatever the wonderful <strong>Date::Manip</strong> module understands --
+as well as dayendreport which defaults to changes in the last trading
+day. A risk report show parametric and non-parametric value-at-risk
+(VaR) estimates.</p>
+<p>Most available functionality is also provided in the reference
+implementation <strong>beancounter</strong>, a convenient command-line script.</p>
+<p>The API might change and evolve over time. The low version number
+really means to say that the code is not in its final form yet, but it
+has been in use for well over four years.</p>
+<p>More documentation is in the Perl source code.</p>
+<p>
+</p>
+<hr />
+<h1><a name="database_layout">DATABASE LAYOUT</a></h1>
+<p>The easiest way to see the table design is to look at the content of
+the <strong>setup_beancounter</strong> script. It creates the five tables
+<em>stockinfo</em>, <em>stockprices</em>, <em>fxprices</em>, <em>portfolio</em> and
+<em>indices</em>. Note also that is supports the creation of database for
+both <strong>PostgreSQL</strong> and <strong>MySQL</strong>.</p>
+<p>
+</p>
+<h2><a name="the_stockinfo_table">THE STOCKINFO TABLE</a></h2>
+<p>The <em>stockinfo</em> table contains general (non-price) information and is
+index by <em>symbol</em>:</p>
+<pre>
+            symbol              varchar(12) not null,
+            name                varchar(64) not null,
+            exchange            varchar(16) not null,
+            capitalisation      float4,
+            low_52weeks         float4,
+            high_52weeks        float4,
+            earnings            float4,
+            dividend            float4,
+            p_e_ratio           float4,
+            avg_volume          int4</pre>
+<p>This table is updated by overwriting the previous content.</p>
+<p>
+</p>
+<h2><a name="the_stockprices_table">THE STOCKPRICES TABLE</a></h2>
+<p>The <em>stockprices</em> table contains (daily) price and volume
+information. It is indexed by both <em>date</em> and <em>symbol</em>:</p>
+<pre>
+            symbol              varchar(12) not null,
+            date                date,
+            previous_close      float4,
+            day_open            float4,
+            day_low             float4,
+            day_high            float4,
+            day_close           float4,
+            day_change          float4,
+            bid                 float4,
+            ask                 float4,
+            volume              int4</pre>
+<p>During updates, information is appended to this table.</p>
+<p>
+</p>
+<h2><a name="the_fxprices_table">THE FXPRICES TABLE</a></h2>
+<p>The <em>fxprices</em> table contains (daily) foreign exchange rates. It can be used to calculate home market values of foreign stocks:</p>
+<pre>
+            currency            varchar(12) not null,
+            date                date,
+            previous_close      float4,
+            day_open            float4,
+            day_low             float4,
+            day_high            float4,
+            day_close           float4,
+            day_change          float4</pre>
+<p>Similar to the <em>stockprices</em> table, it is index on <em>date</em> and <em>symbol</em>.</p>
+<p>
+</p>
+<h2><a name="the_stockportfolio_table">THE STOCKPORTFOLIO TABLE</a></h2>
+<p>The <em>portfolio</em> table contains contains the holdings information:</p>
+<pre>
+            symbol              varchar(16) not null,
+            shares              float4,
+            currency            varchar(12),
+            type                varchar(16),
+            owner               varchar(16),
+            cost                float(4),
+            date                date</pre>
+<p>It is indexed on <em>symbol,owner,date</em>.</p>
+<p>
+</p>
+<h2><a name="the_indices_table">THE INDICES TABLE</a></h2>
+<p>The <em>indices</em> table links a stock <em>symbol</em> with one or several
+market indices:</p>
+<pre>
+            symbol              varchar(12) not null,
+            stockindex          varchar(12) not null</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p><strong>Finance::BeanCounter</strong> and <strong>beancounter</strong> are so fresh that there are
+only missing features :)</p>
+<p>On a more serious note, this code (or its earlier predecessors) have
+been in use since the fall of 1998.</p>
+<p>Known bugs or limitations are documented in TODO file in the source
+package.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>beancounter.1</em>, <em>smtm.1</em>, <em>Finance::YahooQuote.3pm</em>,
+<em>LWP.3pm</em>, <em>Date::Manip.3pm</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Finance::BeanCounter.pm  (c) 2000 -- 2006 by Dirk Eddelbuettel &lt;<a href="mailto:edd@debian.org">edd@debian.org</a>&gt;</p>
+<p>Updates to this program might appear at 
+<em><a href="http://eddelbuettel.com/dirk/code/beancounter.html">http://eddelbuettel.com/dirk/code/beancounter.html</a></em>.</p>
+<p>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.  There is NO warranty whatsoever.</p>
+<p>The information that you obtain with this program may be copyrighted
+by Yahoo! Inc., and is governed by their usage license.  See
+<em><a href="http://www.yahoo.com/docs/info/gen_disclaimer.html">http://www.yahoo.com/docs/info/gen_disclaimer.html</a></em> for more
+information.</p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>The Finance::YahooQuote module by Dj Padzensky (on the web at
+<em><a href="http://www.padz.net/~djpadz/YahooQuote/">http://www.padz.net/~djpadz/YahooQuote/</a></em>) served as the backbone for
+data retrieval, and a guideline for the extension to the non-North
+American quotes which was already very useful for the real-time ticker 
+<em><a href="http://eddelbuettel.com/dirk/code/smtm.html">http://eddelbuettel.com/dirk/code/smtm.html</a></em>.</p>
+
+</body>
+
+</html>

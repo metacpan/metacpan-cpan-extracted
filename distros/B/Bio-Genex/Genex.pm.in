@@ -1,0 +1,716 @@
+package Bio::Genex;
+
+use strict;
+use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK $DBNAME $HOST $PORT $TRANSACTION $USER $PASSWORD $DBMS $_CURRENT_CONNECTION $LOCAL %TABLE2CLASS %DEBUG $RO_USERNAME $RO_PASSWORD $SU_USERNAME $SU_PASSWORD);
+use Carp;
+use DBI;
+use POSIX qw(strftime);
+require Exporter;
+
+use Bio::Genex::DBUtils qw(create_select_sql);
+use Bio::Genex::Fkey qw(:FKEY);
+
+@ISA = qw(Exporter);
+
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+@EXPORT_OK = qw(undefined timestamp $RO_USERNAME $RO_PASSWORD $SU_USERNAME $SU_PASSWORD);
+
+$VERSION = '2.6.0';
+
+# Preloaded methods go here.
+
+=head1 NAME
+
+Genex - Perl extension for processing data from a GeneX DB
+
+=head1 SYNOPSIS
+
+  use Bio::Genex;
+
+  # call with args to affect a single connection
+  $dbh = Bio::Genex::current_connection(USER=>'foo', PASSWORD=>'bar');
+  $dbh = Bio::Genex::_connect(DBNAME=>'test');
+
+  # reset the global variables to affect the default parameters 
+  #   for *all* connections
+  $Bio::Genex::USER        = 'foo';
+  $Bio::Genex::PASSWORD    = 'foobar';
+  $Bio::Genex::TRANSACTION = 1;
+
+  $dbh = Bio::Genex::current_connection();
+  $dbh = Bio::Genex::_connect();
+
+=head1 DESCRIPTION
+
+The Genex module is the gateway to the enitre Genex.pm suite of tools
+for accessing data in a GeneX DB. By itself it consists of two
+utilities for connecting to a GeneX DB, the caching method
+C<current_connection()> and the non-caching utility function
+C<_connect()>.
+
+The rest of the suite consists of utility modules and table
+modules. Most scripts which utilize Genex.pm are likely to include not
+only Genex itself, but also the helper modules, and one or more table
+modules. 
+
+=for html
+See the main <A HREF="index.html">index</A> for more information.
+
+=head1 CLASS VARIABLES
+
+=over 4
+
+=item %Bio::Genex::TABLE2CLASS
+
+A hash table that maps DB table names their respective class names in
+the Genex hierarchy.
+
+=cut
+
+%TABLE2CLASS = (
+ al_coating => 'AL_Coating',
+ al_defaultspotconcunits => 'AL_DefaultSpotConcUnits',
+ al_identifiercode => 'AL_IdentifierCode',
+ al_medium => 'AL_Medium',
+ al_spots => 'AL_Spots',
+ al_technologytype => 'AL_TechnologyType',
+ als_spottype => 'ALS_SpotType',
+ am_equationtype => 'AM_EquationType',
+ am_factorvalues => 'AM_FactorValues',
+ am_spotmeasurementunits => 'AM_SpotMeasurementUnits',
+ am_spots => 'AM_Spots',
+ am_suspectspots => 'AM_SuspectSpots',
+ am_type => 'AM_Type',
+ arraylayout => 'ArrayLayout',
+ arraymeasurement => 'ArrayMeasurement',
+ blasthits => 'BlastHits',
+ canonicalsequencefeature => 'CanonicalSequenceFeature',
+ chromosome => 'Chromosome',
+ citation => 'Citation',
+ citationlink => 'CitationLink',
+ contact => 'Contact',
+ contacttype => 'ContactType',
+ csf_type => 'CSF_Type',
+ ef_majorcategory => 'EF_MajorCategory',
+ ef_minorcategory => 'EF_MinorCategory',
+ es_quantityseriestype => 'ES_QuantitySeriesType',
+ es_treatmenttype => 'ES_TreatmentType',
+ experimentfactors => 'ExperimentFactors',
+ experimentset => 'ExperimentSet',
+ externaldatabase => 'ExternalDatabase',
+ grouplink => 'GroupLink',
+ groupsec => 'GroupSec',
+ hotspots => 'HotSpots',
+ hs_thresholdtype => 'HS_ThresholdType',
+ protocol => 'Protocol',
+ prt_type => 'PRT_Type',
+ relatedcsf => 'RelatedCSF',
+ sample => 'Sample',
+ sampleprotocols => 'SampleProtocols',
+ scanner => 'Scanner',
+ scn_modeldescription => 'SCN_ModelDescription',
+ smp_ageunits => 'SMP_AgeUnits',
+ smp_developmentstagename => 'SMP_DevelopmentStageName',
+ smp_developmentstageunits => 'SMP_DevelopmentStageUnits',
+ smp_geneticstatus => 'SMP_GeneticStatus',
+ smp_organismintactness => 'SMP_OrganismIntactness',
+ smp_organtype => 'SMP_OrganType',
+ smp_primarycelltype => 'SMP_PrimaryCellType',
+ smp_sexmatingtype => 'SMP_SexMatingType',
+ smp_tissuetype => 'SMP_TissueType',
+ software => 'Software',
+ spc_cellstructure => 'SPC_CellStructure',
+ spc_generalclassification => 'SPC_GeneralClassification',
+ species => 'Species',
+ spotlink => 'SpotLink',
+ spotter => 'Spotter',
+ spt_modeldescription => 'SPT_ModelDescription',
+ sw_name => 'SW_Name',
+ sw_type => 'SW_Type',
+ tl_factorvalues => 'TL_FactorValues',
+ treatment_ams => 'Treatment_AMs',
+ treatmentlevel => 'TreatmentLevel',
+ usercanonicallink => 'UserCanonicalLink',
+ usersec => 'UserSec',
+ usersequencefeature => 'UserSequenceFeature',
+ usf_externaldblink => 'USF_ExternalDBLink',
+ usf_type => 'USF_Type',
+);
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item timestamp();
+
+Returns a formatted timestring use POSIX::strftime(). The timeformat
+used is the ISO8601 conformant string: '%%ISO8601_DATE_FORMAT%%'.
+
+=cut
+
+sub timestamp {
+  return strftime('%%ISO8601_DATE_FORMAT%%',localtime);
+}
+
+
+=item current_connection(%args);
+
+Genex caches a single database handle.  Calling
+C<current_connection()> will call C<Bio::Genex::_connect()> if a connection
+has not yet been established or if the current connection parameters
+differ from the arguments passed into C<current_connection()>. Calling
+C<disconnect()> on the handle will invalidate the cache, and a
+subsequent call to C<current_connection()> will create a new database
+handle.
+
+Current accepted connection arguments:
+   USER
+   PASSWORD
+   DBNAME
+   HOST
+   PORT
+   DBMS
+   LOCAL
+   TRANSACTION
+
+C<USER> and C<PASSWORD> are the DB username and password, not the
+Unix ones.  C<HOST> and C<PORT> are used only if C<LOCAL> is
+FALSE. if C<LOCAL> is TRUE, the connection will be made to a DB on the
+local machine.
+
+If no arguments are passed, the connection parameters will default to
+the following global variables. Changing the value of one of these
+variables will affect *all* connections made from within the
+application (even by those made by Genex.pm library methods). The
+current default connection parameters are:
+
+   $Bio::Genex::USER        = '%%GENEX_RO_USER%%';
+   $Bio::Genex::PASSWORD    = '%%GENEX_RO_PASSWORD%%';
+   $Bio::Genex::DBNAME      = '%%DB_NAME%%';
+   $Bio::Genex::HOST        = '%%GENEX_HOST%%';
+   $Bio::Genex::PORT        = '%%GENEX_PORT%%';
+   $Bio::Genex::DBMS        = '%%GENEX_DBMS%%';
+   $Bio::Genex::LOCAL       = %%GENEX_LOCAL%%;
+   $Bio::Genex::TRANSACTION = 0;
+
+B<WARNING:> These variables are B<global!!!> This may have unforseen 
+consequences. 
+
+return value: a reference of type C<Bio::Genex::Connect>, which is a wrapper 
+around C<DBI::db> (a DBI database handle).  
+
+=back
+
+=cut
+
+#
+# these are set at install time
+#
+$RO_USERNAME = '%%GENEX_RO_USER%%';
+$SU_USERNAME = '%%GENEX_SU_USER%%';
+$RO_PASSWORD = '%%GENEX_RO_PASSWORD%%';
+$SU_PASSWORD = '%%GENEX_SU_PASSWORD%%';
+
+$USER        = '%%GENEX_RO_USER%%';
+$PASSWORD    = '%%GENEX_RO_PASSWORD%%';
+$DBNAME      = '%%DB_NAME%%';
+$HOST        = '%%GENEX_HOST%%';
+$PORT        = '%%GENEX_PORT%%';
+$DBMS        = '%%GENEX_DBMS%%';
+$LOCAL       = %%GENEX_LOCAL%%;
+$TRANSACTION = 0;
+
+sub current_connection {
+  my (%args) = @_;
+
+  # first we check if we need to invalidate the cached connection. We
+  # compare all arguments to the current connection and if any of them
+  # are different we disconnect() from the current handle
+  if (defined $_CURRENT_CONNECTION) {
+    my ($key,$val,$con_val);
+    while (($key,$val) = each %args) {
+      if ($key eq 'USER') {
+	$con_val = $_CURRENT_CONNECTION->user();
+      } elsif ($key eq 'DBNAME') {
+	$con_val = $_CURRENT_CONNECTION->db_name();
+      } elsif ($key eq 'HOST') {
+	$con_val = $_CURRENT_CONNECTION->db_host();
+      } elsif ($key eq 'PORT') {
+	$con_val = $_CURRENT_CONNECTION->user();
+      } elsif ($key eq 'DBMS') {
+	$con_val = $_CURRENT_CONNECTION->dbms();
+      } elsif ($key eq 'LOCAL') {
+	# for LOCAL we check the value of $dbh->host() 
+	$con_val = ($_CURRENT_CONNECTION->host() eq 'localhost' ? 1 : 0 );
+      } elsif ($key eq 'TRANSACTION') {
+	$con_val = $_CURRENT_CONNECTION->transaction();
+      }
+      unless ($con_val eq $val) {
+	if (defined $_CURRENT_CONNECTION) {
+	  $_CURRENT_CONNECTION->disconnect();
+	  undef $_CURRENT_CONNECTION;
+	}
+	last;
+      }
+    }
+  }
+  # now we check whether we still have a valid handle, if not create a new one
+  # and return the current handle
+  unless (defined $_CURRENT_CONNECTION) {
+    $_CURRENT_CONNECTION = Bio::Genex::_connect(@_);
+  }
+  return $_CURRENT_CONNECTION;
+}
+
+=pod
+
+=head1 INTERNAL FUNCTIONS
+
+=over 4
+
+=item _connect(%args);
+
+=pod
+
+This method is heavily depricated and should only be used if it is
+necessary to connect to more than one DB in a session, otherwise
+C<Bio::Genex::current_connection()> should B<always> be used. This method
+respects the same connection parameters and global variables as
+C<current_connection()>.
+
+return value: a reference of type C<Bio::Genex::Connect>, which is a wrapper 
+around C<DBI::db> (a DBI database handle).  
+
+=cut
+
+sub _connect {
+  return Bio::Genex::Connect->new(@_);
+}
+
+=item undefined($object,$attribute_name);
+
+B<FOR INTERNAL USE ONLY>. 
+
+This method is the magic behind delayed fetching of attributes. Call
+it at your own risk, or better yet, don\'t call it, let Genex.pm call it for you. 
+
+
+
+=back
+
+
+
+=cut
+
+sub undefined {
+  my ($self,$attr) = @_;
+
+  #
+  # Sanity checks. This whole delayed_fetch thing is some heavy duty black
+  # magic, and infinite recursion is often the price of failure. So we
+  # maintain a lot of state about what we've fetched already.
+  #
+  
+  #
+  # NOTE: we use the ObjectTemplate::get_attribute() method
+  #   to access the values, because we don't want to trigger
+  #   Bio::Genex::undefined() for one of them.
+  # 
+
+  # check whether this attribute was already fetched by a previous
+  # call to undefined()
+  my $attr_hash = $self->get_attribute('fetched_attr');
+  return undef if exists $attr_hash->{$attr};
+
+  # if id hasn't been set, send a warning
+  unless (defined $self->get_attribute('id')) {
+    warn "Can't use delayed fetch unless ID is defined";
+    return undef;
+  }
+
+  #
+  # OK. We're past all the hurdles, now we need to check whether
+  # fkeys should be fetched as values from tables or as objects
+  #
+
+  my $dbh = Bio::Genex::current_connection();
+  my $pkey_name = $self->pkey_name();
+  my $fkeys = $self->fkeys();
+  my $fkey_ref = $fkeys->{$attr} if exists $fkeys->{$attr};
+  my $fkey_obj2raw = $self->fkey_obj2raw();
+
+  my ($val,$sql);
+  # do something special if we need to retrieve an fkey object
+  if (defined $fkey_ref) {
+    if ($fkey_ref->fkey_type() eq FKEY_FKEY_OO ||
+	$fkey_ref->fkey_type() eq FKEY_MTO_OO ||
+	$fkey_ref->fkey_type() eq FKEY_LT_OO ||
+	$fkey_ref->fkey_type() eq FKEY_LINK_OO) {
+      # first get the fkey value from the DB column
+      # we first test the raw fkey method to see if it has the value
+      my $raw_fkey_name = $fkey_obj2raw->{$attr};
+      if (defined $raw_fkey_name && 
+	  defined $self->get_attribute($raw_fkey_name)) {
+	$val = $self->get_attribute($raw_fkey_name);
+      } else {
+	# if the raw fkey method doesn't have the value, look it up
+	$sql = "SELECT $raw_fkey_name FROM " . $self->table_name() . " WHERE ";
+	$sql .= "$pkey_name = " . $self->get_attribute('id');
+	$val = $dbh->selectall_arrayref($sql)->[0][0];
+	confess $DBI::errstr if $dbh->err;
+
+	# now that we have the raw value, store it in the raw attribute
+	$self->set_attribute($raw_fkey_name,$val) if defined $val;
+      }
+
+      if (defined $val) {
+	if ($val =~ /^\s*$/) {
+	  # don't create objects for bogus whitespace entries
+	  $val = undef;
+	} else {
+	  # now return an object of the right class
+	  my $class = 'Bio::Genex::' . $fkey_ref->table_name();
+	  eval "require $class;";
+	  $val = $class->new(id=>$val);
+	}
+      }
+    } elsif ($fkey_ref->fkey_type() eq FKEY_OTM_LT_OO) {
+      my $class = 'Bio::Genex::' . $fkey_ref->table_name();
+      eval "require $class";
+      die "Bio::Genex::undefined: Couldn't load class: $class: $@" if $@;
+      $val = $class->get_matrix($self->get_attribute('id'));
+    } elsif ($fkey_ref->fkey_type() eq FKEY_OTM_OO ||
+	     $fkey_ref->fkey_type() eq FKEY_OTM_LINK_OO) {
+      my $pkey_val = $self->get_attribute('id');
+      my $column_name = $fkey_ref->pkey_name();
+      croak "Couldn't find fkey for $pkey_name in " . $fkey_ref->table_name()
+	unless defined $column_name;
+      my $calling_class = $self->table_name();
+      my $class_to_fetch = 'Bio::Genex::' . $fkey_ref->table_name();
+      eval "require $class_to_fetch";
+      croak "Bio::Genex::undefined: Couldn't require $class_to_fetch: $@" 
+	if $@;
+
+      my @args = (column=>$column_name,
+		  value=>$pkey_val,
+		 );
+      {
+	no strict 'refs';
+
+	if ($class_to_fetch->linking_table) {
+	  my $t2pk_ref = $class_to_fetch->table2pkey();
+	  push(@args,pkey_link=>$t2pk_ref->{$calling_class});
+	} 
+	$val = $class_to_fetch->get_all_objects({@args},'ALL');
+      }
+    } elsif ($fkey_ref->fkey_type() eq FKEY_OTM_LT ||
+	     $fkey_ref->fkey_type() eq FKEY_OTM ||
+	     $fkey_ref->fkey_type() eq FKEY_OTM_LINK) {
+      # for the raw interface we retrieve only the ids
+      my @args = (COLUMNS=>[$fkey_ref->pkey_name()],
+		  FROM=>[$fkey_ref->table_name()],
+		  WHERE=>"$pkey_name = " . $self->get_attribute('id'));
+      my $class = 'Bio::Genex::' . $fkey_ref->table_name();
+      {
+	no strict 'refs';
+	push(@args,LIMIT=>$ {$class .'::LIMIT'})
+	  if defined $ {$class .'::LIMIT'};
+      }
+      my $dbh = Bio::Genex::current_connection();
+      $sql = create_select_sql($dbh,@args);
+      $val = $dbh->selectall_arrayref($sql)->[0];
+      confess $DBI::errstr if $dbh->err;
+    } else {
+      # How did we get here???
+      croak "Unknown fkey type " . $fkey_ref->fkey_type();
+    }
+  } else {
+    # we're fetching a simple column value
+
+    # check if all attributes were fetched already via fetch()
+    # we don't want to trigger any warnings if the attribute
+    # has been fetched, but it's value is undef
+    return undef if $self->get_attribute('fetched');
+
+    # check to see that the column exists, before fetching it
+    croak "Bio::Genex::undefined: Unknown column: $attr"
+      unless grep {$_ eq $attr} @{$self->column_names()};
+
+    $sql = "SELECT $attr FROM " . $self->table_name() . " WHERE ";
+    $sql .= "$pkey_name = \'" . $self->get_attribute('id') . "\'";
+    $val = $dbh->selectall_arrayref($sql)->[0][0];
+    confess $DBI::errstr if $dbh->err;
+  }  
+   
+  # update sanity check variables, we have now attempt to fetch $attr
+  # for this object, so even if the value was undef, don't try again
+  $attr_hash->{$attr} = 1;
+  $self->fetched_attr($attr_hash);
+    
+  # return the value we fetched
+  return $val;
+}
+
+package Bio::Genex::Connect;
+
+use strict;
+use vars qw(@ISA %_IMPL);
+use Carp;
+use DBI;
+
+require Exporter;
+
+@ISA = qw(DBI::db Exporter);
+
+#
+# Bio::Genex::Connect
+# Preloaded methods go here.
+
+=head1 NAME
+
+Bio::Genex::Connect - Perl extension to DBI::db
+
+=head1 SYNOPSIS
+
+  use Bio::Genex;
+
+  # to start a connection
+  $dbh = Bio::Genex::current_connection(%args);
+
+  # to test a connection
+  my $db_name = $dbh->db_name();
+  my $db_host = $dbh->db_host();
+  my $db_port = $dbh->db_port();
+  my $dbms = $dbh->dbms();
+  my $user = $dbh->user();
+  my $transaction = $dbh->transaction();
+  my $hash_ref = $dbh->tables();
+
+  # any DBI::db methods also work
+  my $sql = $dbh->quote($gnarly_string);
+  my $sth = $dbh->prepare($sql);
+
+  # any DBI::db attributes also work
+  $dbh->{Taint} = 1;
+
+  # to cancel a connection, and set $dbh == undef
+  $dbh->disconnect();
+
+=head1 DESCRIPTION
+
+The Bio::Genex::Connect module is a private class used by Genex.pm.  The
+main purpose of this class is to protect against users accidentally
+calling C<disconnect()> on a database handle that is being cached by
+Genex.pm.
+
+Therefore the class defines a method, C<disconnect()> that invalidates
+the database handle cache before calling <DBI::disconnect()>. For
+convenience, the class also provides helper methods for accessing
+attributes about the connection, C<dbms()>, C<db_name()>,
+C<db_host()>, C<db_port()>, C<user()>, and C<transaction()>. 
+
+The C<tables()> method is a cache of the tables known to exist for this
+DB handle.
+
+=head1 METHODS
+
+=over 4
+
+=item dbms()
+
+Returns the type of database management system to which the database
+handle is currently connected.
+
+=cut
+
+sub dbms {
+  my $self = shift;
+  if (scalar @_) {
+    $_IMPL{$self}->{DBMS} = shift;
+  } 
+  return $_IMPL{$self}->{DBMS};
+}
+
+
+=pod
+
+=item db_name()
+
+Returns the name of database to which the database handle is currently
+connected.
+
+=cut
+
+sub db_name {
+  my $self = shift;
+  if (scalar @_) {
+    $_IMPL{$self}->{DB_NAME} = shift;
+  } 
+  return $_IMPL{$self}->{DB_NAME};
+}
+
+
+=pod
+
+=item db_host()
+
+Returns the hostname of the computer to which the database handle is
+currently connected. It returns 'localhost' if it is a LOCAL connection.
+
+=cut
+
+sub db_host {
+  my $self = shift;
+  if (scalar @_) {
+    $_IMPL{$self}->{DB_HOST} = shift;
+  } 
+  return $_IMPL{$self}->{DB_HOST};
+}
+
+=pod
+
+=item db_port()
+
+Returns the port number to which the database handle is currently
+connected. It returns undef if it is a LOCAL connection.
+
+=back
+
+=cut
+
+sub db_port {
+  my $self = shift;
+  if (scalar @_) {
+    $_IMPL{$self}->{PORT} = shift;
+  } 
+  return $_IMPL{$self}->{PORT};
+}
+
+=pod
+
+=item user()
+
+Returns the username which the database handle is currently connected as.
+
+=back
+
+=cut
+
+sub user {
+  my $self = shift;
+  if (scalar @_) {
+    $_IMPL{$self}->{USER} = shift;
+  } 
+  return $_IMPL{$self}->{USER};
+}
+
+=pod
+
+=item transaction()
+
+Returns the true if the DB handle is in a transaction.
+
+=back
+
+=cut
+
+sub transaction {
+  my $self = shift;
+  if (scalar @_) {
+    $_IMPL{$self}->{TRANSACTION} = shift;
+  } 
+  return $_IMPL{$self}->{TRANSACTION};
+}
+
+sub tables {
+  my $self = shift;
+  if (scalar @_) {
+    $_IMPL{$self}->{TABLES} = shift;
+  } 
+  return $_IMPL{$self}->{TABLES};
+}
+
+sub new {
+  my ($class,%args) = @_;
+
+  # we default these to the global variables in case the user has
+  # changed them to affect all connections
+  my $USER        = $args{USER}        || $Bio::Genex::USER;
+  my $PASSWORD    = $args{PASSWORD}    || $Bio::Genex::PASSWORD;
+  my $DBNAME      = $args{DBNAME}      || $Bio::Genex::DBNAME;
+  my $HOST        = $args{HOST}        || $Bio::Genex::HOST;
+  my $PORT        = $args{PORT}        || $Bio::Genex::PORT;
+  my $DBMS        = $args{DBMS}        || $Bio::Genex::DBMS;
+  my $LOCAL       = $args{LOCAL}       || $Bio::Genex::LOCAL;
+  my $TRANSACTION = $args{TRANSACTION} || $Bio::Genex::TRANSACTION;
+
+  my $dbh;
+  my $dbargs = {AutoCommit => 1, PrintError => 1};
+  $dbargs->{AutoCommit} = 0 if $TRANSACTION;
+
+  my $connect_string  = "dbi:$DBMS:dbname=$DBNAME";
+  $connect_string .= ";host=$HOST;port=$PORT" 
+    unless $LOCAL;
+
+  $dbh =  DBI->connect($connect_string,
+		       $USER,
+		       $PASSWORD,
+		       $dbargs);
+
+  die "Couldn't connect to $DBNAME: $DBI::errstr" 
+    if $DBI::err;
+
+  bless $dbh, $class;
+  $dbh->db_name($DBNAME);
+  $dbh->user($USER);
+  $dbh->transaction($TRANSACTION);
+  $dbh->dbms($DBMS);
+  $dbh->tables({});
+
+  # if LOCAL is specified we ignore HOST and PORT
+  if ($LOCAL) {
+    $dbh->db_host('localhost');
+    $dbh->db_port(undef);
+  } else {
+    $dbh->db_host($HOST);    
+    $dbh->port($PORT);
+  }
+  return $dbh;
+}
+
+#   The main purpose of this class is to protect against users accidentally 
+#   calling disconnect on a database handle that is being cached by Genex.pm
+#
+#   Therefore the class defines a single method, disconnect() that 
+#   invalidates the database handle cache before calling DBI::disconnect().
+sub disconnect {
+  my $self = shift;
+  $self->SUPER::disconnect();
+
+  # this invalidates the cache and forces a new connection.
+  # not sure what to do if there is an error on the disconnect, 
+  # so for now I proceed and undefine $Bio::Genex::_CURRENT_CONNECTION
+  if (defined $Bio::Genex::_CURRENT_CONNECTION &&
+      $Bio::Genex::_CURRENT_CONNECTION == $self) {
+    undef $Bio::Genex::_CURRENT_CONNECTION;
+  }
+}
+
+1;
+__END__
+
+
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1)
+
+=cut

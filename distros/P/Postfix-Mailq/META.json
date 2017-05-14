@@ -1,0 +1,42 @@
+{
+   "abstract" : "a fast and reliable mailq-like utility for postfix",
+   "author" : [
+      "Cosimo Streppone <cosimo@opera.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Postfix-Mailq",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-postfix-mailq@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Postfix-Mailq"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cosimo/perl5-postfix-mailq.git",
+         "web" : "http://github.com/cosimo/perl5-postfix-mailq"
+      }
+   },
+   "version" : "0.01"
+}
+

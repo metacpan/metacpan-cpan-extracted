@@ -1,0 +1,18 @@
+---
+abstract: 'A Catalyst Model to interact with the CPAN API'
+author:
+  - 'Dylan Lloyd <dylan@dylansserver.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-MetaCPAN
+requires:
+  Catalyst::Plugin::Cache: 0.12
+  MetaCPAN::API: 0.43
+version: 0.001

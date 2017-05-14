@@ -1,0 +1,232 @@
+=head1 NAME
+
+Data::Type::Docs::Howto - Point to point recipes how to get things done
+
+=head1 TYPICAL SCENARIOS
+
+Here some words on major fields where perl and B<Data::Type> may be used. Generally you may use L<Data::Type::Guard> (drawback: currently inferior problem reports) for a group of types, or use C<valid()> one by one. Prompting the user when he made mistakes is best done with the C<summary()> function (supports localized texts) or by simply translating the thrown exceptions to B<non-programmer-style> instructions.
+
+=head2 CGI
+
+Web formfields ares definitivly the painmaker number one. Testing whether the user entered what you want is no more a difficult task. B<Data::Type> also helps you to provide this nice B<red marks> near incorrect input fields, to point the user what was wrong. A fictive form
+
+  <form method="POST" enctype="application/x-www-form-urlencoded" action="/cgi-bin/applyform.cgi"> 
+    <input type="text" name="firstname"/>
+    <input type="text" name="email"/>
+    <input type="text" name="social_id"/>
+    <input type="text" name="contacts"/>
+    <input type="submit" value="OK"> 
+  </form> 
+
+The corresponding F</cgi-bin/applyform.cgi> would look like
+
+  use Data::Type qw(:all);
+
+  use Data::Type::Guard;
+
+    my $dtg = Data::Type::Guard->new
+    (
+      tests =>
+      {
+        email =>       STD::EMAIL( 1 ),
+        firstname =>   STD::WORD,
+        social_id =>   [ STD::NUM, STD::VARCHAR( 10 ) ],
+        contacts =>    sub { my %args = @_; exists $args{lucy} },
+      }
+    );
+
+    cgi_error( "You made a mistake in one of the form fields. Please review your input." ) unless $dtg->inspect( $cgi->Params );
+
+and alternativ for F</cgi-bin/applyform.cgi>:
+
+    my %problems;
+
+    use Data::Iter 'iter'; # exports 'iter'
+
+    foreach my $i ( iter { email => STD::EMAIL( 1 ), firstname => STD::WORD  } )
+    {
+      try
+      {
+	  valid $cgi->param( $i->KEY ), $i->VALUE;
+      }
+      catch Error with
+      { 
+	  my $dte = shift;
+
+	  $problems{ $i->KEY } = sprintf "%s is not %s", $i->KEY, $dte->info;
+      };
+    }
+
+    generate_cgi__form( annotate => \%problems );
+
+[Note] B<iter()> is a function from the L<Data::Iter> (CPAN).
+
+[Info] Visit the F<contrib/cgi_application_datatype_verifier.pl> under the distributions root directory. It provides a machine-independant approach to type verification. Via this cgi-script you install Data::Type on one machine and all others with network access can harness it (even from another language then perl).
+
+=head2 DBI
+
+Imagine you want to test whether all email addresses in an existing database are active/valid. Since no known database vendor has a custom "email" datatype included AFAIK, B<Data::Type> shines here:
+
+  use Data::Type qw(:all);
+
+    my $dbh = DBI->new( ... );
+
+    my $sth = $dbh->do( 'SELECT userid, lastname, email FROM customers' ) or die $DBI::err;
+
+    while( my $href = $sth->fetchrow_hashref )
+    {
+      try
+      {
+	  valid $href->{social_id}, STD::NUM, STD::VARCHAR( 10 );
+
+	  valid $href->{email}, STD::EMAIL;
+      }
+      catch Error with
+      { 
+	  $dbh->do( sprintf "DELETE FROM customers WHERE userid = %s", $href->{userid} );
+      };
+    }
+
+[Note] This would have been easier to use an L<Data::Type::Guard> object, but its verbose.
+
+=head2 Class properties
+
+  my $g = Data::Type::Guard->new( 
+
+    tests =>
+    {
+      email => STD::EMAIL, 
+      firstname => STD::WORD,
+      lastname  => STD::WORD,
+      sex => STD::GENDER,
+      countrycode => STD::NUM,
+      age => STD::NUM,
+      contacts => sub { my %args = @_; exists $args{lucy} },				
+    }
+  );
+
+  my $h = Human->new( email => 'j@d.de', firstname => 'john', lastname => 'doe', sex => 'male', countrycode => '123123', age => 12 );
+
+  $h->contacts( { lucy => '110', john => '123' } );
+
+  printf "%s is ok", $h->firstname if $g->inspect( $h );
+
+If one is really adventerous enough to use L<Class::Maker> (i use it!) one could use following extension to its 'class' function:
+
+ class 'Human',
+ {
+   public =>
+   {
+      string => [qw(email firstname lastname sex)],
+
+      num => [qw(age countrycode)],
+
+      hash => [qw(contacts)],
+   },
+   types =>
+   {
+      email => STD::EMAIL, 
+
+      firstname => STD::WORD,
+
+      lastname  => STD::WORD,
+
+      sex => STD::GENDER,
+
+      countrycode => STD::NUM,
+
+      age => STD::NUM,
+
+      contacts => sub { my %args = @_; exists $args{lucy} },		
+   }
+ };
+
+ ... create $g and $h as above ...
+
+ $g->inspect( $h );
+
+[Note] L<Class::Maker> has soon more documentation on it.
+
+=head2 Getopt
+
+  use Getopt::Long;
+
+    my %options = ();
+
+    my @config = qw/help|? man recipient=s firstname=s count=s/;
+
+    my $ctypes = { recipient => STD::EMAIL, firstname => STD::WORD, count => STD::NUM };
+
+       GetOptions( \%options, @config ) or pod2usage(2);
+
+       my $g = Data::Type::Guard->new( tests => $ctypes );
+
+       die "invalid parameter type found\n" unless $g->inspect( \%options );
+
+B<[NOTE]> C<recipient=s> is already some loose valuetype definition. So a more integrated L<Getopt::Long> 
+could someday use Data::Type types like C<recipient=STD::EMAIL>. Anybody interested, hands up?
+
+=head2 Perl data
+
+  sub my_function
+  {
+    my %params = @_;
+
+    try
+    {
+      valid $params{one}, STD::NUM, STD::VARCHAR( 10 );
+
+      valid $params{three}, STD::VARCHAR( 2 );
+    }
+    catch Error with
+    { 
+      my $e = shift;
+
+      print "Expected '%s' %s at %s line %s\n", $e->value, $e->type->info, $e->file, $e->line;
+
+      Carp::croak "invalid parameters";
+    };
+  }
+
+  my_function( one => 123, two => 3247, three => 'xxxx' );
+
+=head1 LOCALIZATION
+
+The default initialized locale handle resides in C<$Data::Type->lh> (read only). Visit L<Locale::Maketext> manual for more material. So a simple warning would look like:
+
+  warn $Data::Type->lh->maketext( "Can't open file [_1]: [_2]\n", $f, $! );
+
+while the lexicon in B<Data::Type::L18N::de> would look like
+
+  our %Lexicon =
+  (
+     "Can't open file [_1]: [_2]\n" => "Problem beim öffnen der Datei [_1]. Grund: [_2]\n",
+  );
+
+Here a complete template for your own locale:
+
+  package Data::Type::L18N::de;
+
+    our @ISA = qw(Data::Type::L18N);
+
+    use strict;
+
+    our %Lexicon =
+    (
+      __current_locale__ => 'deutsch',
+
+      "Can't open file [_1]: [_2]\n" => "Problem beim öffnen der datei [_1]. Grund: [_2]\n",
+
+      "error occured" => "Ein Fehler ist aufgetreten",
+    );
+
+
+=head1 CONTACT
+
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+
+=head1 AUTHOR
+
+Murat Uenalan, <muenalan@cpan.org>
+
+

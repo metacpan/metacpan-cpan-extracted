@@ -58,6 +58,8 @@ sub value {
     if ($string =~ /\$/) { # DWIM
         $string = eval $string;
         Plagger->context->log(error => $@) if $@;
+
+        $string = "$string"; # stringify ::Content
         utf8::encode($string) if utf8::is_utf8($string);
     }
 
@@ -148,7 +150,7 @@ don't use I<content_dynamic>.
 
   content_dynamic: "Entry from [% entry.author | html %]"
 
-If you want to dyncamically generate the content of widget, use
+If you want to dynamically generate the content of widget, use
 I<content_dynamic> instead. Value of the content_dynamic is compiled
 and rendered using Template-Toolkit. Required, if you don't use
 I<content>.

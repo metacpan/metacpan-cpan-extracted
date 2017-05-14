@@ -1,0 +1,14 @@
+Source: libdownsexta-perl
+Section: perl
+Priority: standard
+Maintainer: Hugo Morago Martín <morago@ono.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: https://launchpad.net/~morago
+
+Package: libdownsexta-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, libwww-perl (>= 6.04-1), libxml-simple-perl (<= 2.20-1)
+Description: Obtener URL de los videos de La Sexta
+ Este módulo implementa un modo sencillo de obtener las 
+ urls e información de los videos de La Sexta

@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/MooX-Struct>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.015	2017-05-11
+
+ - Updated: Eliminate dependency on Data::OptList.
+ - Updated: Eliminate dependency on Scalar::Does. (Use Type::Tiny instead,
+   which Scalar::Does depended on anyway.)
+ - Updated: Eliminate dependency on Sub::Install. (Use Exporter::Tiny
+   instead, which Scalar::Does depended on anyway.)
+
 0.014	2017-01-31
 
  [ Bug Fixes ]

@@ -1,4 +1,4 @@
-# $Id: Store.pm,v 1.2 1999/11/30 20:36:57 lstein Exp $
+# $Id: Store.pm,v 1.6 2002/06/28 20:31:59 lstein Exp $
 
 # Prototype support library for storing Boulder streams.
 # Basic design is as follows:
@@ -135,9 +135,11 @@ this call stores the stone at the indicated position, replacing whatever
 was there before.
 
 If no record number is provided, this call will look for the presence
-of a 'record_no' tag in the stone itself and put it back in that position.
-This allows you to pull a stone out of the database, modify it, and then
-put it back in without worrying about its record number.
+of a 'record_no' tag in the stone itself and put it back in that
+position.  This allows you to pull a stone out of the database, modify
+it, and then put it back in without worrying about its record number.
+If no record is found in the stone, then the effect is identical to
+write_record().
 
 The record number of the inserted stone is returned from this call, or
 -1 if an error occurred.
@@ -201,7 +203,7 @@ You can mix query types in the parameter provided to B<query()>.
 For example, here's how to look up all stones in which the sex is
 male and the age is greater than 30:
 
-	$db->query('sex'=>'M',eval=>'<age> > 30');
+	$db->query('sex'=>'M',EVAL=>'<age> > 30');
 
 When a query is in effect, B<read_record()> returns only Stones
 that satisfy the query.  In an array context, B<read_record()> 
@@ -259,6 +261,8 @@ use Carp;
 use Fcntl;
 use DB_File;
 
+$VERSION = '1.20';
+
 @ISA = 'Boulder::Stream';
 $lockfh='lock00000';
 $LOCK_SH = 1;
@@ -287,6 +291,7 @@ sub new {
 	'delim'=>'=',
 	'record_stop'=>"\n",
 	'line_end'=>'&',
+        'index_delim'=>' ',
 	'subrec_start'=>"\{",
 	'subrec_end'=>"\}"
 	},$package;
@@ -412,7 +417,7 @@ sub write_record {
 	@value = $stone->get($key);
 	$key = $self->escapekey($key);
 	foreach $value (@value) {
-	    if (ref $value && $value->{'.name'}) {
+	    if (ref $value && defined $value->{'.name'}) {
 		$value = $self->escapeval($value);
 		push(@lines,"$key$self->{delim}$value");
 	    } else {
@@ -432,11 +437,7 @@ sub write_record {
 sub put {
     my($self,$stone,$record_no) = @_;
     croak 'Usage: put($stone [,$record_no])' unless defined $stone;
-
-    croak "Record number not specified in Boulder::Store::put()"
-      unless defined($record_no) || defined($stone->get('record_no'));
-
-    $record_no = $stone->get('record_no') if $record_no eq '';
+    $record_no = $stone->get('record_no') unless defined($record_no);
     $self->write_record($stone,$record_no);
 }
 
@@ -513,14 +514,14 @@ sub read_one_record {
 sub read_record {
     my($self,@tags) = @_;
     my $query = $self->{'query_test'};
-    local($s);
+    my $s;
 
     if (wantarray) {
 	my(@result);
 	while (!$self->done) {
 	    $s = $self->read_one_record(@tags);
 	    next unless $s;
-	    next if $query && !(&$query);
+	    next if $query && !($query->($s));
 	    push(@result,$s);
 	}
 	return @result;
@@ -529,7 +530,7 @@ sub read_record {
 	    $s = $self->read_one_record(@tags);
 	    next unless $s;
 	    return $s unless $query;
-	    return $s if &$query;
+	    return $s if $query->($s);
 	}
 	return undef;
     }
@@ -642,7 +643,7 @@ sub query {
 	}
 
     }
-    $perlcode = 'sub {' . join(' && ',@expressions) . ';}' if @expressions;
+    $perlcode = 'sub { my $s = shift;' . join(' && ',@expressions) . ';}' if @expressions;
     $perlcode = 'sub {1;}' unless @expressions;
     
     # The next step either looks up a compiled query or
@@ -684,7 +685,7 @@ sub _write_nested {
 	@value = $stone->get($key);
 	$key = $self->escapekey($key);
 	foreach $value (@value) {
-	    if (ref $value && $value->{'.name'}) {
+	    if (ref $value && defined $value->{'.name'}) {
 		$value = $self->escapeval($value);
 		push(@lines,"$key$self->{delim}$value");
 	    } else {
@@ -824,13 +825,13 @@ sub add_index {
     grep($oldindices{$_}++,$self->indexed_keys);
     my (@newindices) = grep(!$oldindices{$_},@indices);
     $self->reindex_some_keys(@newindices);
-    $self->{'index'}->{'.INDICES'}=join(" ",keys %oldindices,@newindices);
+    $self->{'index'}->{'.INDICES'}=join($self->{'index_delim'},keys %oldindices,@newindices);
 }
 
 # Return the indexed keys as an associative array (convenient)
 sub indexed_keys {
     my $self = shift;
-    return split(" ",$self->{'index'}->{'.INDICES'});
+    return split($self->{'index_delim'},$self->{'index'}->{'.INDICES'});
 }
 
 # Reindex all records that contain records involving the provided indices.

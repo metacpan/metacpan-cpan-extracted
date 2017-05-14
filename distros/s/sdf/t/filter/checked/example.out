@@ -1,0 +1,21 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Some text before.
+E[orig_style='E']#
+E[orig_style='E']# A header
+E[orig_style='E']#
+E[orig_style='E']  Some example
+E[orig_style='E']    text.
+E[orig_style='E']  Back to indent of 2.
+N[orig_style='N']Some middle text.
+E[orig_style='E']  Some 
+E[orig_style='E']    {{1[]example}} text.
+E[orig_style='E']  Some [\[more]\]
+E[orig_style='E']  {\{example}\} text.
+E[orig_style='E']  Yet another block of
+E[orig_style='E']{{1[]example}} text.
+E[orig_style='E']123456789a 23456789b 23456789c 23456789d 23456789e 23456789f 23456789g 23456789h
+E[orig_style='E']123456789A 23456789B 23456789C 23456789D 23456789E 23456789F 23456789G 23456789H
+E80[orig_style='E80']123456789a 23456789b 23456789c 23456789d 23456789e 23456789f 23456789g 23456789h
+E80[orig_style='E80']123456789A 23456789B 23456789C 23456789D 23456789E 23456789F 23456789G 23456789H
+N[orig_style='N']Some text after.

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#$Id: dcshare 793 2011-06-17 16:51:17Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/dcshare $
+#$Id: dcshare 990 2012-12-28 20:35:04Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/dcshare $
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ run dc client with file sharing
  unix adc:
  dcshare adc://dc.hub.com:412 /share
  win nmdc:
- dcshare dc.hub.com c:/pub c:/distr
+ dcshare dchub://dc.hub.com c:/pub c:/distr
 
  manual build filelist:
  dcshare /share /sharemore
@@ -62,8 +62,12 @@ edit config.pl
 perl dcshare
 
 =cut
+
 use 5.10.0;
 use strict;
+no strict qw(refs);
+use warnings "NONFATAL" => "all";
+no warnings qw(uninitialized);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = $Data::Dumper::Useqq = $Data::Dumper::Indent = 1;
 use Time::HiRes qw(time sleep);
@@ -96,7 +100,7 @@ Net::DirectConnect::filelist->new( log => $log, %{ $config{dc} || {} } )->fileli
 my @dc;
 @dc = map {
   Net::DirectConnect->new(
-    modules            => ['filelist'],
+    #modules            => ['filelist'],
     share              => \@dirs,
     'filelist_builder' => ( join ' ', $^X, $0, 'filelist' ),
     'log'              => $log,
@@ -106,14 +110,15 @@ my @dc;
     worker   => sub {
       my $dc = shift;
     },
-    %{ $config{dc} || {} },
+    %{ $config{dc}      || {} },
+    %{ $config{dcshare} || {} },
     'host' => $_,
     )
   } (
   grep {
     $_
-    } @hosts ? @hosts : psmisc::array( $config{dc}{host} ),
+  } @hosts ? @hosts : psmisc::array( $config{dc}{host} ),
   );
-while ( @dc = grep { $_ and $_->active() } @dc ) {
-  $_->work() for @dc;
+while ( @_ = grep { $_ and $_->active() } @dc ) {
+  $_->work() for @_;
 }

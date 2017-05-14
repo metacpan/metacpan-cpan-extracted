@@ -1,0 +1,10 @@
+Revision history for Perl extension XAO::DO::FS::Glue::MySQL.
+
+1.0 - 9-Aug-2002
+    Works fine, tested in some real-life projects. No problems found
+    during about 2 weeks testing.
+
+0.01 - 5-Jul-2002
+    Started. Passes tests, works about 2 times faster then DBI/DBD
+    driver, needs testing in mod_perl, re-connecting on failures and
+    yet more testing :)

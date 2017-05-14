@@ -1,0 +1,25 @@
+---
+abstract: 'A Catalyst Model for DBIx::Raw'
+author:
+  - 'Adam Hopkins <srchulo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Model-DBIx-Raw
+requires:
+  Carp: '0'
+  Catalyst::Component::InstancePerContext: '0'
+  Catalyst::Model: '0'
+  DBIx::Raw: '0.08'
+  Moose: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/srchulo/Catalyst--Model--DBIx--Raw/issues
+version: '0.004'

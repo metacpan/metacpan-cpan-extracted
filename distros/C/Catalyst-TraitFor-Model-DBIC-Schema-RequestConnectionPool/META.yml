@@ -1,0 +1,34 @@
+---
+abstract: 'Create a schema for each unique calling context, defined by your model'
+author:
+  - 'Gareth Kirwan <gbjk@cpan.org>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Test: 0
+  DBI: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::Schema: 0
+  FindBin: 0
+  HTTP::Request::Common: 0
+  Moose: 0
+  Test::More: 0
+  base: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Model-DBIC-Schema-RequestConnectionPool
+requires:
+  Catalyst::Component::InstancePerContext: 0
+  Moose::Role: 0
+  MooseX::MarkAsMethods: 0
+  Scalar::Util: 0
+version: 0.1000

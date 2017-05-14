@@ -1,0 +1,119 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+use 5.008;
+use File::Basename;
+use File::Find ();
+use File::ShareDir ();
+
+our $VERSION = '0.09';
+
+my $BROWSER = $ENV{BROWSER} || 'w3m';
+my %BROWSER_OPTION_MAP = (
+    w3m  => [qw(-T text/html)],
+    lynx => ['-stdin'],
+);
+
+my $doc_dir = $ENV{CPPREF_DOCROOT} || '';
+if (! $doc_dir) {
+    eval {
+	$doc_dir = File::ShareDir::dist_dir('cppref');
+    };
+}
+
+my $name = shift @ARGV || 'start';
+
+$name =~ s{::}{/}g;
+$name .= '/start'
+    if -d "$doc_dir/$name";
+
+# try by name
+open_browser("$doc_dir/$name.html")
+    if -e "$doc_dir/$name.html";
+
+my @cand;
+my %cand_dir;
+File::Find::find(
+    {
+        wanted => sub {
+            my $fn = $_;
+            return if $cand_dir{dirname($fn)};
+            return unless $fn =~ m{/$name(?:\.|$)}i;
+	    if (-d $fn) {
+		push @cand, "$fn/start.html";
+		$cand_dir{$fn} = 1;
+	    } else {
+		push @cand, $fn;
+	    }
+        },
+        no_chdir => 1,
+    },
+    $doc_dir,
+);
+if (@cand == 0) {
+    print STDERR "no document found for: $name\n";
+    exit 1;
+} elsif (@cand == 1) {
+    open_browser($cand[0]);
+} else {
+    pipe my $rfh, my $wfh
+        or die "failed to create pipe:$!";
+    my $pid = fork;
+    die "fork failed:$!"
+        unless defined $pid;
+    unless ($pid) {
+        print $wfh <<"EOT";
+<title>Search results    [C++ Reference]</title>
+<div class="breadcrumbs">
+<span class="bchead">You are here: </span><a href="$doc_dir/start.html"  title="start">C++ Reference</a> &raquo; Search results
+</div>
+<ul>
+EOT
+        for my $cand (@cand) {
+            my $name = $cand;
+            $name =~ s{$doc_dir/}{};
+            $name =~ s{(/start|)\.html$}{};
+            $name =~ s{/}{ &raquo; }g;
+            printf $wfh qq{<li><a href="%s">%s</a></li>\n}, $cand, $name;
+        }
+        print $wfh <<"EOT";
+</ul>
+EOT
+        exit 0;
+    }
+    open STDIN, '<&', $rfh
+        or die "cannot dup STDIN:$!";
+    close $rfh;
+    open_browser(@{ $BROWSER_OPTION_MAP{$BROWSER} || [] });
+}
+
+sub open_browser {
+    exec $BROWSER, @_;
+    die "failed to exec browser ($BROWSER):$!";
+}
+
+__END__
+
+=head1 NAME
+
+cppref - man-style access to cppreference.com documents (using w3m)
+
+=head1 SYNOPSIS
+
+  % cppref        # prints top page
+  % cppref vector # prints vector docs
+
+=head1 AUTHOR
+
+Kazuho Oku
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+The documents are from http://www.cppreference.com/ (under Creative Commons Attribution 3.0 license).
+
+=cut

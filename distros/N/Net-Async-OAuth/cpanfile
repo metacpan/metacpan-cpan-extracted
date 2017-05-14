@@ -1,0 +1,6 @@
+requires 'MIME::Base64';
+requires 'URI::Escape';
+requires 'Scalar::Util';
+requires 'namespace::clean';
+requires 'Digest::SHA';
+requires 'List::UtilsBy';

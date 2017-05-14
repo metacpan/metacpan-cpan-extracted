@@ -1,0 +1,40 @@
+#!/usr/bin/perl -w
+
+use CORBA::MICO;
+use Error qw(:try);
+
+use strict;
+
+my $ior = shift || Usage();
+my $orb = CORBA::ORB_init("mico-local-orb");
+
+my $obj = $orb->string_to_object($ior);
+my $repoid = $obj->_repoid();
+
+if ($obj->_non_existent()) {
+	print "Object non reachable !!\n";
+	print "Repository ID: $repoid\n";
+}
+else {
+	print "Object is Alive !!\n";
+	print "Repository ID: $repoid\n";
+}
+
+sub Usage
+{
+	print <<USAGE;
+Usage: $0 <IOR>
+IOR can be specified in any of the valid formats supported by MICO
+
+    IOR:...
+    file://localhost/tmp/account.ior
+    http://localhost/account.ior
+    corbaloc:....
+    corbaname:...
+    iioploc:...
+    iiopname:...
+
+USAGE
+	exit(1);
+}
+

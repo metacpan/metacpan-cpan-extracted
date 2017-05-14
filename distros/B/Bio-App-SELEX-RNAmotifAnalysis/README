@@ -1,0 +1,210 @@
+NAME
+
+        Bio::App::SELEX::RNAmotifAnalysis - Cluster SELEX sequences and calculate their structures
+
+SYNOPSIS
+
+        RNAmotifAnalysis --fastq seqs.fq --cpus 4 --run
+
+DESCRIPTION
+
+        This module pipelines steps in the analysis of SELEX (Systematic Evolution
+        of Ligands through EXponential enrichment) data.
+    
+        This main module creates scripts to do the following:
+    
+        (1) Cluster similar sequences based on edit distance.
+    
+        (2) Align sequences within each cluster (using mafft).
+    
+        (3) Calculate the secondary structure of the aligned sequences (using
+            RNAalifold, from the Vienna RNA package)
+    
+        (4) Build covariance models using cmbuild from Infernal.
+    
+        Another useful utility installed with this distribution is
+        "selex_covarianceSearch" for doing iterative refinements of
+        covariance models.
+    
+        If you want to use files that simply list sequences, then use
+        the "--simple" flag instead of the "--fastq" flag.
+    
+        This script assumes that you've already done all of the quality
+        control of your sequences beforehand. If the FASTQ format is
+        used, quality scores are ignored.
+
+EXAMPLE USE
+
+        RNAmotifAnalysis --infile seqs.fq --cpus 4 --run
+    
+        This will cluster the sequences found in 'seqs.fq' and create a FASTA file
+        for each one. The FASTA files will be grouped into batches (i.e. one per
+        cpu requested) that will be placed in a separate directory for each batch,
+        and processed within that directory. At the end of processing, for each
+        cluster there will be a covariance model and postscript illustration
+        files. The batch script used to process each batch will be located in the
+        respective batch directory.  To produce the scripts without running them,
+        simply exclude the --run flag from the command line.
+    
+        The output file contains names that contain four period delimited values
+          For example, 2.3.1.5 means
+              that this is the second cluster
+              this is the third sequence in the cluster
+              there is one copy of this sequences
+              it is an edit distance of 5 from the reference sequence
+
+CONFIGURATION AND ENVIRONMENT
+
+        As written, this code makes heavy use of UNIX utilities and is
+        therefore only supported on UNIX-like environemnts (e.g. Linux, UNIX, Mac
+        OS X).
+    
+        Install Infernal, MAFFT, and the RNA Vienna package ahead of time and add
+        the directories containing their executables to your PATH, so that the
+        first time you run RNAmotifAnalysis.pm the configuration file (cluster.cfg)
+        that is generated will have all of the correct parameters. Otherwise,
+        you'll need to update the configuration file manually.
+    
+        To update the PATH environment variable with the directory '/usr/local/myapps/bin/',
+        update your .bashrc file, thus:
+    
+            echo 'export PATH=/usr/local/myapps/bin:$PATH' >> ~/.bashrc.
+    
+        Now, every time you open a new terminal window, the PATH environment
+        variable will contain '/usr/local/myapps/bin/'. To make your new .bashrc
+        file effective immediately (i.e. without having to open a new terminal
+        window), use the following command:
+    
+            source ~/.bashrc
+
+INSTALLATION
+
+        These installation instructions assume being able to open and use a
+        terminal window on Linux.
+    
+        (0) Some systems need several dependencies installed ahead of time.
+    
+            You may be able to skip this step. However, if subsequent steps don't
+            work, then be sure that some basic libraries are installed, as shown
+            below (or ask a system administrator to take care of it). For the
+            applicable distribution, open a terminal and then type the commands as
+            indicated:
+    
+            For RedHat or CentOS 5.x systems (tested on CentOS 5.5)
+    
+                    sudo yum install gcc
+    
+            For RedHat or CentOS 6.x systems (tested on "Minimal Desktop" CentOS 6.0)
+    
+                    sudo yum install gcc
+                    sudo yum install perl-devel
+    
+            For Ubuntu systems (tested on Ubuntu 12-04 LTS)
+    
+                    sudo apt-get install curl
+    
+            For Debian 5.x systems:
+    
+                    sudo apt-get install gcc
+                    sudo apt-get install make
+    
+        (1) Install the non-Perl dependencies:
+            (Versions shown are those that we've tested. Please contact us if
+            newer versions do not work.)
+    
+            Infernal            1.0.2    (http://infernal.janelia.org/)
+            MAFFT               6.849b   (http://mafft.cbrc.jp/alignment/software/)
+            RNA Vienna package  1.8.4    (http://www.tbi.univie.ac.at/~ivo/RNA/)
+    
+            After installing these, make sure all of the foloowing executables are
+            in directories within your PATH:
+    
+                cmbuild
+                cmcalibrate
+                cmsearch
+                cmalign
+                mafft
+                RNAalifold
+    
+        (2) Use a CPAN client to install Bio::App::SELEX::RNAmotifAnalysis.
+    
+            Here we demonstrate the use of cpanminus to install it to a local Perl module directory. These instructions assume absolutely no experience with cpanminus.
+    
+                  1. Download cpanminus
+    
+                        curl -LOk http://xrl.us/cpanm
+    
+    
+                  2. Make it executable
+    
+                        chmod u+x cpanm
+    
+    
+                  3. Make a local lib/perl5 directory (if it doesn't already exist)
+    
+                        mkdir -p ~/lib/perl5
+    
+    
+                  4. Add relevant directories to your PERL5LIB and PATH environment
+                     variables by adding the following text to your ~/.bashrc
+                     file:
+    
+    
+                        # Set PERL5LIB if it doesn't already exist
+                        : ${PERL5LIB:=~/lib/perl5}
+    
+                        # Prepend to PERL5LIB if directory not already found in PERL5LIB
+                        if ! echo $PERL5LIB | egrep -q "(^|:)~/perl5/lib/perl5($|:)"; then
+                            export PERL5LIB=~/lib/perl5:$PERL5LIB;
+                        fi
+    
+                        # Prepend to PATH if directory not already found in PATH
+                        if ! echo $PATH | egrep -q "(^|:)~/perl5/bin($|:)"; then
+                            export PATH=~/bin:$PATH;
+                        fi
+    
+    
+                  5. Update environment variables immediately
+    
+                        source ~/.bashrc
+    
+    
+                  6. Install Module::Build
+    
+                        ./cpanm Module::Build
+    
+    
+                  7. Install Text::LevenshteinXS (even if you already have it installed elsewhere)
+    
+                        ./cpanm Text::LevenshteinXS
+    
+    
+                  8. Install Bio::App::SELEX::RNAmotifAnalysis
+    
+                        ./cpanm Bio::App::SELEX::RNAmotifAnalysis
+    
+    
+        Please contact the author if, after consulting this documentation and
+        searching Google with error messages, you still encounter difficulties
+        during the installation process.
+
+INCOMPATIBILITIES
+
+        Windows:     lacks necessary *nix utilities
+        SGI:         problems with compiled dependency Text::LevenshteinXS
+        Sun/Solaris: problems with compiled dependency Text::LevenshteinXS
+        BSD:         problems with compiled dependency Text::LevenshteinXS
+
+BUGS AND LIMITATIONS
+
+         There are no known bugs in this module.
+         Please report problems to molecules <at> cpan <dot> org
+         Patches are welcome.
+
+RELATED PUBLICATIONS
+
+        Ditzler MA, Lange MJ, Bose D, Bottoms CA, Virkler KF, et al. (2013) High-
+        throughput sequence analysis reveals structural diversity and improved
+        potency among RNA inhibitors of HIV reverse transcriptase. Nucleic Acids
+        Res 41(3):1873-1884. doi: 10.1093/nar/gks1190
+

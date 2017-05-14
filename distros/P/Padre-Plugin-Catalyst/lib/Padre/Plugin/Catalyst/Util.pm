@@ -1,13 +1,17 @@
 package Padre::Plugin::Catalyst::Util;
+BEGIN {
+  $Padre::Plugin::Catalyst::Util::VERSION = '0.13';
+}
+
+# ABSTRACT: A collection of utility functions
+
 use strict;
 use warnings;
 
 # some code used all around the Plugin
-use Cwd         ();
-use File::Spec  ();
-use Padre::Util ('_T');
-
-our $VERSION = '0.09';
+use Cwd        ();
+use File::Spec ();
+use Padre::Wx  ();
 
 # get the Catalyst project name, so we can
 # figure out the development server's name
@@ -43,8 +47,8 @@ sub get_document_base_dir {
 
 	unless ($doc) {
 		Wx::MessageBox(
-			_T('Could not open current document. Please make sure you have at least one document open.'),
-			_T('Catalyst project dir not found'), Wx::wxOK, $main
+			Wx::gettext('Could not open current document. Please make sure you have at least one document open.'),
+			Wx::gettext('Catalyst project dir not found'), Wx::wxOK, $main
 		);
 		return;
 	}
@@ -96,8 +100,8 @@ sub get_plugin_menu_item_by_label {
 sub toggle_server_menu {
 	my $toggle = shift;
 
-	my $menu_start = get_plugin_menu_item_by_label( _T('Start Web Server') );
-	my $menu_stop  = get_plugin_menu_item_by_label( _T('Stop Web Server') );
+	my $menu_start = get_plugin_menu_item_by_label( Wx::gettext('Start Web Server') );
+	my $menu_stop  = get_plugin_menu_item_by_label( Wx::gettext('Stop Web Server') );
 	if ( $menu_start and $menu_stop ) {
 		$menu_start->Enable($toggle);
 		$menu_stop->Enable( !$toggle );
@@ -108,10 +112,10 @@ sub toggle_menu_items {
 	my ( $toggle, $is_server_on ) = (@_);
 
 	#TODO: caching this on startup would probably make things marginally faster
-	my $menu_helpers = get_plugin_menu_item_by_label( _T('Create new...') );
-	my $menu_start   = get_plugin_menu_item_by_label( _T('Start Web Server') );
-	my $menu_stop    = get_plugin_menu_item_by_label( _T('Stop Web Server') );
-	my $menu_update  = get_plugin_menu_item_by_label( _T('Update Application Scripts') );
+	my $menu_helpers = get_plugin_menu_item_by_label( Wx::gettext('Create new...') );
+	my $menu_start   = get_plugin_menu_item_by_label( Wx::gettext('Start Web Server') );
+	my $menu_stop    = get_plugin_menu_item_by_label( Wx::gettext('Stop Web Server') );
+	my $menu_update  = get_plugin_menu_item_by_label( Wx::gettext('Update Application Scripts') );
 
 	$menu_helpers->Enable($toggle) if $menu_helpers;
 	$menu_update->Enable($toggle)  if $menu_update;
@@ -125,4 +129,39 @@ sub toggle_menu_items {
 	}
 }
 
-42;
+1;
+
+__END__
+=pod
+
+=head1 NAME
+
+Padre::Plugin::Catalyst::Util - A collection of utility functions
+
+=head1 VERSION
+
+version 0.13
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Breno G. de Oliveira <garu@cpan.org>
+
+=item *
+
+Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Breno G. de Oliveira.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

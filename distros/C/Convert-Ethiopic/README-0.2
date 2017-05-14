@@ -1,0 +1,16 @@
+This is the development release for the next Convert-Ethiopic.
+As such not all classes and methods are fully implemented and
+services may be unreliable.  This version is the basis for
+Zobel-0.20 which is complete and underdoing testing.
+
+Module documentation (POD) has not been updated.
+
+The inter for the Number, String, File and date classes
+are fairly similar.  If Convert::Ethiopic::System "in"
+and "out" handles are passed when the respective classes
+are instantiated, they will be used.  If not the default
+input system is assumed to be "SERA" and the default
+output system is assumed to be "UTF8".  This will be
+configurable in the final release.
+
+Examine the bin/ scripts for usage.

@@ -7,8 +7,6 @@ use warnings;
 use Params::Validate qw/:all/;
 use base 'Algorithm::FloodControl::Backend';
 
-our ($VERSION) = '$Revision: 2609 $' =~ m{ \$Revision: \s+ (\S+) }mx;
-
 =head2 increment
 
 =cut

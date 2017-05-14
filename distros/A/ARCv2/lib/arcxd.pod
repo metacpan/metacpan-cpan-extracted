@@ -1,0 +1,212 @@
+=head1 NAME
+
+arcxd - standalone ARCv2 server 
+
+=head1 DESCRIPTION
+
+This file is the scripts, which can be used, to start the ARCv2 server from the command line.
+
+=head1 SYNOPSIS
+
+This are some examples how to run the ARCv2 server.
+
+=over 4
+
+=item arcxd
+
+Start the ARCv2 server. The server will listen on the DefaultPort and all local addresses.
+It will read the configuration file, located in the ConfigPath. After successful listening, 
+it will fork into the background.
+
+=item arcxd -p 1234
+
+Same as L<arcxd> but listens on port 1234.
+
+=item arcxd -d 5
+
+Stay in foreground and log messages to stderr.
+
+=item arcxd -P arcxd.pid 
+
+Let arcxd store the pid of the master process in arcxd.pid.
+
+=back
+
+=head1 USAGE
+
+Some parameters can be supplied to this scripts. The most of them come from the configuration file.
+
+By default arcxd fork itself into background. If you want to run arcx in the foreground set the -d option.
+
+The scheme looks like this:
+
+arcxd [-d <loglevel>] [-p <port>] [-F <config file>] [-v]
+
+=head2 Parameter
+
+=over 4
+
+=item -d <loglevel>
+
+Let the server put its log output to "stderr" and set the log level to <loglevel>. Also tells the server to do not fork into the background.
+
+=item -p <port>
+
+On which port the server shall listen on. (override the one from the configuration file and the default port). Change this for testing purposes.
+
+=item -P <pid_file>
+
+Where should the Net::Server store the PID of the master process.
+
+=item -F <config file>
+
+Specify the configuration file, to fill ARCv2 appropriately. Default is arcxd.conf in the default path $Arc::Default Path.
+
+=item -v
+
+The verbose option. If this option is set, arcxd is verbose in its context. This option does not influence the ARCv2 object. Use -d for it.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+=head2 Example:
+
+ [main]
+   service = arc
+   timeout = 30
+
+ [arcd]
+   host = 0
+   post = 4242
+
+   max_requests = 1000
+   min_servers = 5
+   max_servers = 50
+   max_spare_servers = 10
+   min_spare_servers = 2
+
+   pid_file = /var/run/arcxd.pid
+   
+   sasl_mechanisms = <<EOM
+ GSSAPI
+ PLAIN
+ EOM
+
+ [commands]
+   uptime = Arc::Command::Uptime
+   whoami = Arc::Command::Whoami
+   copy = Arc::Command::Get
+   cp = Arc::Command::Get
+   get = Arc::Command::Get
+   put = Arc::Command::Put
+   test = Arc::Command::Test
+   help = Arc::Command::Help
+   h = Arc::Command::Help
+   hlp = Arc::Command::Help
+
+ [logging]
+   level = 7
+   destination = syslog
+
+The configuration file is based on .ini format, known from Windows (sorry). 
+In perl we can parse it, using Config::IniFiles. The configuration file is divided into
+several sections. Each section can have a several number of key/value pairs.
+
+=head2 main
+
+=over 4
+
+=item service
+
+The name of the service the SASL authentication mechanism shall use.
+
+=item timeout
+
+Timeout in seconds to wait for data in control and command connection.
+
+=back
+
+=head2 arcd
+
+=over 4
+
+=item host
+
+Here you can specify the address the server shall wait for connections. 0 lets the server listen on all interface on the host. 
+
+=item port
+
+On which port the server shall listen on, can be overridden by the mentioned -p option.
+
+=item max_requests
+
+=item min_servers
+
+=item max_servers
+
+=item max_spare_servers
+
+=item min_spare_servers
+
+These variables define the preforking behaviour. See L<Net::Server::PreFork> 
+for more detailed descriptions.
+
+=item sasl_mechanisms
+
+A list of the possible SASL mechanisms, the server can supply to the clients. Can be filled by using the multi-line-string method known from perl.
+
+=back
+
+=head2 commands
+
+=over 4
+
+=item B<Command Name> = B<Command Class>
+
+The section [commands] defines the assignments of command names to their command class. Each line is a command in ARCv2. A class can be assigned to more than one name.
+
+=back
+
+=head2 logging
+
+=over 4
+
+=item loglevel
+
+This option specifies the login level of ARCv2. Default is 5, whereas 7 is the highest (DEBUG) and 1 is the lowest.
+
+=item destination
+
+This option defines the log output destination. Possible values are "stderr" and "syslog". 
+
+=back
+
+=head1 SEE ALSO
+
+L<Arc>, L<Arc::Command>, L<Arc::Connection>, 
+L<Arc::Connection::Server>, L<Arc::Connection::Client>,
+L<arcx>, L<arcxd>, L<Authen::SASL>, L<Authen::SASL::Cyrus>
+L<Net::Server::PreFork>
+
+=head1 AUTHOR
+
+ Patrick Boettcher <patrick.boettcher@desy.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003-5 Patrick Boettcher <patrick.boettcher@desy.de> and others.
+All rights reserved.
+Zeuthen, Germany, (old) Europe
+
+ This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+ Special thanks go to:
+DESY Zeuthen, in particular:
+
+- Wolfgang Friebel for bleeding edge testing and heavy bug reporting (and the idea of reimplementing ARC).
+
+- Waltraut Niepraschk and Andreas Haupt for their help and support during the development. 
+
+=cut

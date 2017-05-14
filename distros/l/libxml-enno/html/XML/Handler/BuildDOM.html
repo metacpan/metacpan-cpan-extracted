@@ -1,0 +1,45 @@
+<HTML><HEAD><TITLE>XML::Handler::BuildDOM - PerlSAX handler that creates XML::DOM document structures</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::Handler::BuildDOM - PerlSAX handler that creates XML::DOM document structures
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> use XML::Handler::BuildDOM;
+ use XML::Parser::PerlSAX;
+
+</PRE><PRE> my $handler = new XML::Handler::BuildDOM (KeepCDATA =&gt; 1);
+ my $parser = new XML::Parser::PerlSAX (Handler =&gt; $handler);
+
+</PRE><PRE> my $doc = $parser-&gt;parsefile ("file.xml");
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::Handler::BuildDOM creates <A HREF="../DOM.html">XML::DOM</A> document structures 
+(i.e. <A HREF="../DOM/Document.html">XML::DOM::Document</A>) from PerlSAX events.
+
+<P>This class used to be called <A>XML::PerlSAX::DOM</A> prior to libxml-enno 1.0.1.
+
+<H2><A NAME="CONSTRUCTOR_OPTIONS">CONSTRUCTOR OPTIONS
+
+</A></H2><P>The XML::Handler::BuildDOM constructor supports the following options:
+
+<DL><DT><A NAME="_KeepCDATA_1_"><STRONG><P>* KeepCDATA =&gt; 1 
+
+</STRONG></A><DD>If set to 0 (default), CDATASections will be converted to regular text.
+
+<DT><A NAME="_Document_doc_"><STRONG><P>* Document =&gt; $doc
+
+</STRONG></A><DD>If undefined, start_document will extract it from Element or DocType (if set),
+otherwise it will create a new XML::DOM::Document.
+
+<DT><A NAME="_Element_elem_"><STRONG><P>* Element =&gt; $elem
+
+</STRONG></A><DD>If undefined, it is set to Document. This will be the insertion point (or parent)
+for the nodes defined by the following callbacks.
+
+<DT><A NAME="_DocType_doctype_"><STRONG><P>* DocType =&gt; $doctype
+
+</STRONG></A><DD>If undefined, start_document will extract it from Document (if possible).
+Otherwise it adds a new XML::DOM::DocumentType to the Document.
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:31 2000</FONT></I></BODY></HTML>

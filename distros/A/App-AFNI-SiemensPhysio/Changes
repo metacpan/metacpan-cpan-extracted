@@ -1,0 +1,19 @@
+Changelog for App-AFNI-SiemensPhysio
+
+0.004 2014-12-09T13:42:05
+ - Spell Siemens correctly!
+
+0.003 2014-12-08T20:02:45
+ - put bin in lib, update docs
+ - readme work
+ - update dist info
+
+0.002 2014-12-08T17:15:29
+ - move RetroTS output, add demo, update readme
+ - add data, update readme, add options
+ - add readme
+
+0.001 2014-12-05T20:48:43
+ - add save prefix, add type to retroTS, use Getopts::Long
+ - init
+

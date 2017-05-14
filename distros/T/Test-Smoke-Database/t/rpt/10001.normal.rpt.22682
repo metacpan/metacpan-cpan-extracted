@@ -1,0 +1,118 @@
+Newsgroups: perl.daily-build.reports
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.daily-build.reports:15711
+Return-Path: <h.m.brand@hccnet.nl>
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 20295 invoked by uid 76); 10 Apr 2004 10:23:48 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Sat, 10 Apr 2004 03:23:48 -0700
+Received: (qmail 19348 invoked by uid 225); 10 Apr 2004 10:23:45 -0000
+Delivered-To: daily-build-reports@perl.org
+Received: (qmail 19341 invoked by alias); 10 Apr 2004 10:23:45 -0000
+X-Spam-Status: No, hits=0.3 required=7.0
+	tests=UPPERCASE_25_50
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Sat, 10 Apr 2004 03:23:45 -0700
+Received: (qmail 20261 invoked by uid 1005); 10 Apr 2004 10:23:43 -0000
+Delivered-To: perlmail-smokers-reports@onion.perl.org
+Received: (qmail 20232 invoked by uid 76); 10 Apr 2004 10:23:39 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Sat, 10 Apr 2004 03:23:39 -0700
+Received: (qmail 19259 invoked by uid 225); 10 Apr 2004 10:23:33 -0000
+Delivered-To: smokers-reports@perl.org
+Received: (qmail 19253 invoked by alias); 10 Apr 2004 10:23:33 -0000
+X-Spam-Status: No, hits=0.3 required=7.0
+	tests=UPPERCASE_25_50
+X-Spam-Check-By: la.mx.develooper.com
+Received: from smtp-out1.xs4all.nl (HELO smtp-out1.xs4all.nl) (194.109.24.11)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Sat, 10 Apr 2004 03:23:32 -0700
+Received: from localhost (procura.xs4all.nl [213.84.163.145])
+	by smtp-out1.xs4all.nl (8.12.10/8.12.10) with SMTP id i3AANT4D014233
+	for <smokers-reports@perl.org>; Sat, 10 Apr 2004 12:23:29 +0200 (CEST)
+Message-ID: <200404101023.i3AANT4D014233@smtp-out1.xs4all.nl>
+Content-transfer-encoding: quoted-printable
+Mime-version: 1.0
+Subject: Smoke [5.9.2] 22682 FAIL(X) AIX 4.3.3.0/ML11 (PPC/1 cpu)
+Content-type: text/plain; charset="iso-8859-1"
+To: smokers-reports@perl.org
+Date: Sat, 10 Apr 2004 12:23 +0200
+Approved: news@nntp.perl.org
+From: h.m.brand@hccnet.nl (H.Merijn Brand)
+
+Automated smoke report for 5.9.2 patch 22682
+i2: PPC_604e (PPC/1 cpu)
+    on        AIX - 4.3.3.0/ML11
+    using     xlc version 5.0.2.7
+    smoketime 13 hours 2 minutes (average 1 hour 37 minutes)
+
+Summary: FAIL(X)
+
+O =3D OK  F =3D Failure(s), extended report at the bottom
+X =3D Failure(s) under TEST but not under harness
+? =3D still running or test results not (yet) available
+Build failures during:       - =3D unknown or N/A
+c =3D Configure, m =3D make, M =3D make (after miniperl), t =3D make test-p=
+rep
+
+   22682     Configuration (common) none
+----------- ---------------------------------------------------------
+O O O O O O=20
+O O O O O O -Duse64bitint
+O O O X O O -Dusethreads -Duseithreads
+O O O O O O -Dusethreads -Duseithreads -Duse64bitint
+| | | | | +- LC_ALL =3D EN_US.UTF-8 -DDEBUGGING
+| | | | +--- PERLIO =3D perlio -DDEBUGGING
+| | | +----- PERLIO =3D stdio  -DDEBUGGING
+| | +------- LC_ALL =3D EN_US.UTF-8
+| +--------- PERLIO =3D perlio
++----------- PERLIO =3D stdio
+
+
+Failures:
+[stdio] -DDEBUGGING -Dusethreads -Duseithreads
+Inconsistent test results (between TEST and harness):
+    ../ext/Time/HiRes/t/HiRes.t.............FAILED at test 17
+
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_15426'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_15432'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_15438'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16180'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16186'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16192'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16228'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16234'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16240'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16676'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16856'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16894'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16906'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16964'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16970'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_16976'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17116'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17122'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17128'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17230'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17434'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17652'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17668'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17674'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_17680'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_18772'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_18808'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_18846'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_18960'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_18998'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_19178'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_4006'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_4042'
+MANIFEST did not declare 'ext/Encode/t/.UTF-16BE_32_4080'
+MANIFEST did not declare 'rm.sh'
+MANIFEST did not declare 'rmf.sh'
+
+--=20
+Report by Test::Smoke v1.19-RC1#671 running on perl 5.8.3
+(Reporter v0.013 / Smoker v0.014)
+

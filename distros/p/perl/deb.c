@@ -9,8 +9,10 @@
  */
 
 /*
- * "Didst thou think that the eyes of the White Tower were blind?  Nay, I
- * have seen more than thou knowest, Gray Fool."  --Denethor
+ * 'Didst thou think that the eyes of the White Tower were blind?  Nay,
+ *  I have seen more than thou knowest, Grey Fool.'        --Denethor
+ *
+ *     [p.853 of _The Lord of the Rings_, V/vii: "The Pyre of Denethor"]
  */
 
 /*
@@ -29,6 +31,7 @@ Perl_deb_nocontext(const char *pat, ...)
 #ifdef DEBUGGING
     dTHX;
     va_list args;
+    PERL_ARGS_ASSERT_DEB_NOCONTEXT;
     va_start(args, pat);
     vdeb(pat, &args);
     va_end(args);
@@ -42,6 +45,7 @@ void
 Perl_deb(pTHX_ const char *pat, ...)
 {
     va_list args;
+    PERL_ARGS_ASSERT_DEB;
     va_start(args, pat);
 #ifdef DEBUGGING
     vdeb(pat, &args);
@@ -59,18 +63,13 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
     const char* const display_file = file ? file : "<free>";
     const long line = PL_curcop ? (long)CopLINE(PL_curcop) : 0;
 
-#ifdef USE_5005THREADS
-    PerlIO_printf(Perl_debug_log, "0x%"UVxf" (%s:%ld)\t",
-		  PTR2UV(thr),
-		  (file ? file : "<free>"),
-		  (long)CopLINE(PL_curcop));
-#else
+    PERL_ARGS_ASSERT_VDEB;
+
     if (DEBUG_v_TEST)
 	PerlIO_printf(Perl_debug_log, "(%ld:%s:%ld)\t",
 		      (long)PerlProc_getpid(), display_file, line);
     else
 	PerlIO_printf(Perl_debug_log, "(%s:%ld)\t", display_file, line);
-#endif /* USE_5005THREADS */
     (void) PerlIO_vprintf(Perl_debug_log, pat, *args);
 #else
     PERL_UNUSED_CONTEXT;
@@ -93,6 +92,8 @@ Perl_debstackptrs(pTHX)
 		  PTR2UV(PL_mainstack), PTR2UV(AvARRAY(PL_curstack)),
 		  PTR2UV(PL_mainstack), PTR2UV(AvFILLp(PL_curstack)),
 		  PTR2UV(AvMAX(PL_curstack)));
+#else
+    PERL_UNUSED_CONTEXT;
 #endif /* DEBUGGING */
     return 0;
 }
@@ -112,8 +113,11 @@ S_deb_stack_n(pTHX_ SV** stack_base, I32 stack_min, I32 stack_max,
 	I32 mark_min, I32 mark_max)
 {
 #ifdef DEBUGGING
-    register I32 i = stack_max - 30;
+    I32 i = stack_max - 30;
     const I32 *markscan = PL_markstack + mark_min;
+
+    PERL_ARGS_ASSERT_DEB_STACK_N;
+
     if (i < stack_min)
 	i = stack_min;
     
@@ -131,7 +135,7 @@ S_deb_stack_n(pTHX_ SV** stack_base, I32 stack_min, I32 stack_max,
 	if (markscan <= PL_markstack + mark_max && *markscan < i) {
 	    do {
 		++markscan;
-		PerlIO_putc(Perl_debug_log, '*');
+		(void)PerlIO_putc(Perl_debug_log, '*');
 	    }
 	    while (markscan <= PL_markstack + mark_max && *markscan < i);
 	    PerlIO_printf(Perl_debug_log, "  ");
@@ -187,7 +191,8 @@ static const char * const si_names[] = {
     "DESTROY",
     "WARNHOOK",
     "DIEHOOK",
-    "REQUIRE"
+    "REQUIRE",
+    "MULTICALL"
 };
 #endif
 
@@ -210,7 +215,9 @@ Perl_deb_stack_all(pTHX)
     for (;;)
     {
         const size_t si_name_ix = si->si_type+1; /* -1 is a valid index */
-        const char * const si_name = (si_name_ix >= sizeof(si_names)) ? "????" : si_names[si_name_ix];
+        const char * const si_name =
+            si_name_ix < C_ARRAY_LENGTH(si_names) ?
+            si_names[si_name_ix] : "????";
 	I32 ix;
 	PerlIO_printf(Perl_debug_log, "STACK %"IVdf": %s\n",
 						(IV)si_ix, si_name);
@@ -234,9 +241,8 @@ Perl_deb_stack_all(pTHX)
 		 */
 
 		I32 i, stack_min, stack_max, mark_min, mark_max;
-		I32 ret_min, ret_max;
 		const PERL_CONTEXT *cx_n = NULL;
-		const PERL_SI      *si_n;
+		const PERL_SI *si_n;
 
 		/* there's a separate stack per SI, so only search
 		 * this one */
@@ -283,27 +289,25 @@ Perl_deb_stack_all(pTHX)
 		}
 
 		mark_min  = cx->blk_oldmarksp;
-		ret_min   = cx->blk_oldretsp;
 		if (cx_n) {
 		    mark_max  = cx_n->blk_oldmarksp;
-		    ret_max   = cx_n->blk_oldretsp;
 		}
 		else {
 		    mark_max = PL_markstack_ptr - PL_markstack;
-		    ret_max  = PL_retstack_ix;
 		}
 
 		deb_stack_n(AvARRAY(si->si_stack),
 			stack_min, stack_max, mark_min, mark_max);
 
-		if (ret_max > ret_min) {
+		if (CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_SUB
+			|| CxTYPE(cx) == CXt_FORMAT)
+		{
+		    const OP * const retop = cx->blk_sub.retop;
+
 		    PerlIO_printf(Perl_debug_log, "  retop=%s\n",
-			    PL_retstack[ret_min]
-				? OP_NAME(PL_retstack[ret_min])
-				: "(null)"
+			    retop ? OP_NAME(retop) : "(null)"
 		    );
 		}
-
 	    }
 	} /* next context */
 
@@ -323,11 +327,5 @@ Perl_deb_stack_all(pTHX)
 }
 
 /*
- * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: t
- * End:
- *
- * ex: set ts=8 sts=4 sw=4 noet:
+ * ex: set ts=8 sts=4 sw=4 et:
  */

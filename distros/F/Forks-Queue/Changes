@@ -1,8 +1,15 @@
 Revision history for Forks-Queue
 
+0.08	2017-05-12
+	Bundle with Net::Objwrap
+	  - provides proxy access to queue on remote host
+
+0.07	2017-05-03
+	Test and bug fixes, including RT#121460
+
 0.06	2017-04-28
-        Support global settings for queues in %OPTS, environment variables
-        Test fixes
+	Support global settings for queues in %OPTS, environment variables
+	Test fixes
 
 0.05	2017-04-22
 	Improved threading support (inspired by comments from MARIOROY)
@@ -13,20 +20,20 @@ Revision history for Forks-Queue
 
 0.03	2017-03-17
 	Refactored SQLite implementation to improve random access inserts.
-        More functions that emulate Thread::Queue
-          - limit
-          - dequeue_timed(TIMEOUT[,COUNT])
+	More functions that emulate Thread::Queue
+	  - limit
+	  - dequeue_timed(TIMEOUT[,COUNT])
 
 0.02	2017-03-13
 	Adding more functions that emulate Thread::Queue methods
-          - enqueue / dequeue
+	  - enqueue / dequeue
 	  - get_nb dequeue_nb, pop_nb, shift_nb non-blocking dequeue functions
-          - peek([INDEX])
-          - extract([INDEX[,COUNT]])
-          - insert(INDEX,LIST)
-        clear  method to empty a queue
-        unshift  method to put items at front of queue
-        Support list => \@items option to all constructors
+	  - peek([INDEX])
+	  - extract([INDEX[,COUNT]])
+	  - insert(INDEX,LIST)
+	clear  method to empty a queue
+	unshift  method to put items at front of queue
+	Support list => \@items option to all constructors
 
 0.01	2017-03-01
-	Initial release. File, shared memory, SQLite implementations
+	release. File, shared memory, SQLite implementations

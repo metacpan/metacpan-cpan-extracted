@@ -1,0 +1,14 @@
+lib/Class/Methodist.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/41-use.t
+t/42-scalar.t
+t/43-list.t
+t/44-object.t
+t/45-hash.t
+t/46-object.t
+t/47-hash-of-lists.t
+t/48-initialization.t
+t/49-enum.t

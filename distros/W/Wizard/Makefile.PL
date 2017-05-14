@@ -8,28 +8,11 @@ use vars qw($opt_config);
 Getopt::Long::GetOptions('config');
 
 my $ok = 1;
-my %prereq;
-
-my @check_mods = qw(Data::Dumper HTML::EP File::Spec File::Path Symbol);
-
-foreach my $mod (@check_mods) {
-    $prereq{$mod} = 0;
-    print "Checking for $mod ... ";
-    if (!eval " require $mod ") {
-	$ok = 0;
-	print "\nYou don't have installed the $mod module.\n";
-    } else {
-	print "ok\n";
-    }
-}
-
-unless ($ok) {
-    print q{
-Missing modules are available from any CPAN mirror, in particular
-	ftp://ftp.funet.fi/pub/languages/perl/CPAN/modules/by-module
-};
-    exit 1;
-}
+my %prereq =
+    ( 'Data::Dumper' => 0,
+      'HTML::EP' => 0,
+      'File::Spec' => 0,
+      );
 
 my $cfg;
 if (-f "lib/Wizard/Examples/Apache/Config.pm") {
@@ -43,15 +26,18 @@ if (!$cfg  ||  $opt_config) {
 die "Failed to create directory lib/Wizard/Examples/Apache: $!"
     unless ((-d "lib/Wizard/Examples/Apache")  or
 	    mkdir("lib/Wizard/Examples/Apache", 0755));
-my $dump = Data::Dumper->new([$cfg],
-			     ["Wizard::Examples::Apache::Config::config"]);
-$dump->Indent(1);
-if (!open(FILE, ">lib/Wizard/Examples/Apache/Config.pm")  or
-    !(print FILE ("package Wizard::Examples::Apache::Config;\n",
-		  $dump->Dump()))  or
-    !close(FILE)) {
-    die "Failed to create file lib/Wizard/Examples/Apache/Config.pm: $!";
-}
+eval {
+    require Data::Dumper;
+    my $dump = Data::Dumper->new([$cfg],
+				 ["Wizard::Examples::Apache::Config::config"]);
+    $dump->Indent(1);
+    if (!open(FILE, ">lib/Wizard/Examples/Apache/Config.pm")  or
+	!(print FILE ("package Wizard::Examples::Apache::Config;\n",
+		      $dump->Dump()))  or
+	!close(FILE)) {
+	die "Failed to create file lib/Wizard/Examples/Apache/Config.pm: $!";
+    }
+};
 
 my $icfg;
 if (-f "lib/Wizard/Examples/ISDN/Config.pm") {
@@ -65,16 +51,17 @@ if (!$icfg  ||  $opt_config) {
 die "Failed to create directory lib/Wizard/Examples/ISDN: $!"
     unless ((-d "lib/Wizard/Examples/ISDN")  or
 	    mkdir("lib/Wizard/Examples/ISDN", 0755));
-my $dump = Data::Dumper->new([$icfg],
-			     ["Wizard::Examples::Apache::ISDN::config"]);
-$dump->Indent(1);
-if (!open(FILE, ">lib/Wizard/Examples/ISDN/Config.pm")  or
-    !(print FILE ("package Wizard::Examples::ISDN::Config;\n",
-		  $dump->Dump()))  or
-    !close(FILE)) {
-    die "Failed to create file lib/Wizard/Examples/ISDN/Config.pm: $!";
-}
-
+eval {
+    my $dump = Data::Dumper->new([$icfg],
+				 ["Wizard::Examples::Apache::ISDN::config"]);
+    $dump->Indent(1);
+    if (!open(FILE, ">lib/Wizard/Examples/ISDN/Config.pm")  or
+	!(print FILE ("package Wizard::Examples::ISDN::Config;\n",
+		      $dump->Dump()))  or
+	!close(FILE)) {
+	die "Failed to create file lib/Wizard/Examples/ISDN/Config.pm: $!";
+    }
+};
 
 my %opts = ('NAME'         => 'Wizard',
 	    'VERSION_FROM' => 'lib/Wizard.pm',

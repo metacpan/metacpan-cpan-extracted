@@ -1,0 +1,4 @@
+Object::By - a generic base class
+
+This is an experimental module. It is used by Object::Episode, Package::Aspect, Text::Placeholder and a yet to be released bigger project.
+

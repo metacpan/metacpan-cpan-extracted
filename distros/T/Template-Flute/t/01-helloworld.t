@@ -2,9 +2,7 @@
 
 use strict;
 use warnings;
-
-use Test::More tests => 3;
-use Test::Fatal;
+use Test::More tests => 2;
 
 use Template::Flute;
 use Template::Flute::Specification::XML;
@@ -41,13 +39,9 @@ my $flute = new Template::Flute(specification => $ret,
 							  values => {hello => 'Hello World'},
 );
 
-is (exception(
-    sub {
-        $ret = $flute->process();
-    }),
-    undef,
-    "No exception on running Template::Flute process."
-);
+eval {
+	$ret = $flute->process();
+};
 
 ok($ret =~ /Hello World/);
 

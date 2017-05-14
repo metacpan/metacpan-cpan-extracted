@@ -16,7 +16,7 @@ Implements a simple filesystem spool mechanism to temporarily store incoming and
 
 =cut
 
-$VERSION = '0.2';
+$VERSION = "0.161";
 
 =head1 METHODS
 

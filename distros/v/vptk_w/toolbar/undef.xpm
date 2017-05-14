@@ -1,0 +1,40 @@
+/* XPM */
+static char *toolbar/undef[] = {
+/* width height ncolors chars_per_pixel */
+"24 24 9 1",
+/* colors */
+"o s None c None",
+"  c black",
+". c #FC0204",
+"X c #9C6264",
+"O c #CC3234",
+"+ c #FC9E34",
+"@ c #9C0204",
+"# c #CC0204",
+"$ c #FC6204",
+/* pixels */
+"oooooooooooooooooooooooo",
+"oooooooooooooooooooooooo",
+"oooooX#Xooooooooo#oooooo",
+"ooooo#+.@oooooo#@ooooooo",
+"oooooo#..@oooo#@oooooooo",
+"oooooooo#.@oo#@ooooooooo",
+"ooooooooo#.@#@oooooooooo",
+"oooooooooo#.@ooooooooooo",
+"ooooooooo#.@.@oooooooooo",
+"oooooooo#.@oo.@ooooooooo",
+"ooooooo#.@oooo.@oooooooo",
+"ooooooO$#oooooo.oooooooo",
+"oooooO+.@ooooooo.ooooooo",
+"oooooO.@oooooooooooooooo",
+"oooooo@oooooooooo.oooooo",
+"oooooooooooooooooooooooo",
+"oooooooooooo ooooooo  oo",
+"oooooooooooo ooooooo ooo",
+"oo o o   oo  oo   o   oo",
+"oo o o o o o o    oo ooo",
+"oo o o o o o o ooooo ooo",
+"oo   o o o   oo   oo ooo",
+"oooooooooooooooooooooooo",
+"oooooooooooooooooooooooo"
+};

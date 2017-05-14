@@ -1,6 +1,7 @@
 /* -*- mode: C++; c-file-style: "bsd" -*- */
 
 #include "pmico.h"
+#undef minor
 
 struct SystemExceptionRec {
     char *repoid;
@@ -177,6 +178,24 @@ static BuiltinExceptionRec builtin_exceptions[] = {
     { "IDL:omg.org/CORBA/TypeCode/BadKind:1.0",
       "CORBA::TypeCode::BadKind",
       PMICO_TYPECODE_BAD_KIND },
+    { "IDL:omg.org/DynamicAny/DynAny/InvalidValue:1.0",
+      "DynamicAny::DynAny::InvalidValue",
+      (PMicoBuiltinException)0 },
+    { "IDL:omg.org/DynamicAny/DynAny/TypeMismatch:1.0",
+      "DynamicAny::DynAny::TypeMismatch",
+      (PMicoBuiltinException)0 },
+    { "IDL:omg.org/DynamicAny/DynAnyFactory/InconsistentTypeCode:1.0",
+      "DynamicAny::DynAnyFactory::InconsistentTypeCode",
+      (PMicoBuiltinException)0 },
+    { "IDL:omg.org/CORBA/ORB/InvalidName:1.0",
+      "CORBA::ORB::InvalidName",
+      (PMicoBuiltinException)0 },
+    { "DL:omg.org/CORBA/TypeCode/InvalidName:1.0",
+      "CORBA::TypeCode::InvalidName",
+      (PMicoBuiltinException)0 },
+    { "IDL:omg.org/CORBA/TypeCode/BadKind:1.0",
+      "CORBA::TypeCode::InvalidName",
+      (PMicoBuiltinException)0 },
 };
 
 static const int num_builtin_exceptions =
@@ -190,21 +209,14 @@ pmico_throw (SV *e)
 {
     dSP;
 
-    SAVETMPS;
-    
-    PUSHMARK(sp);
+    PUSHMARK(SP);
     XPUSHs(sv_2mortal(e));
     PUTBACK;
   
-    perl_call_pv("Error::throw", G_DISCARD);
+    call_pv("Error::throw", G_DISCARD);
     
     fprintf(stderr,"panic: Exception throw returned!");
     exit(1);
-    
-    SPAGAIN;
-    
-    FREETMPS;
-    LEAVE;
 }
 
 const char *
@@ -212,6 +224,7 @@ pmico_find_exception (const char *repoid)
 {
     SV **svp;
     
+    CM_DEBUG(("pmico_find_exception(repoid='%s')\n",repoid));
     if (!exceptions_hv)
 	return NULL;
 
@@ -226,9 +239,10 @@ void
 pmico_setup_exception (const char *repoid, const char *pkg,
 		       const char *parent)
 {
-   string varname;
+    std::string varname;
    SV *sv;
 
+   CM_DEBUG(("pmico_setup_exception(repoid='%s',pkg='%s',parent='%s')\n",repoid,pkg,parent));
    // Check if this package has been set up (FIXME: this isn't really
    // necessary, since we do it in define_exception)
    if (!exceptions_hv)
@@ -236,12 +250,12 @@ pmico_setup_exception (const char *repoid, const char *pkg,
    else if (pmico_find_exception (repoid))
        return;
 
-   varname = string ( pkg ) + "::_repoid";
-   sv = perl_get_sv ((char *)varname.c_str(), TRUE);
+   varname = std::string ( pkg ) + "::_repoid";
+   sv = get_sv ((char *)varname.c_str(), TRUE);
    sv_setsv (sv, newSVpv((char *)repoid, 0));
 
-   varname = string ( pkg ) + "::ISA";
-   AV *av = perl_get_av ((char *)varname.c_str(), TRUE);
+   varname = std::string ( pkg ) + "::ISA";
+   AV *av = get_av ((char *)varname.c_str(), TRUE);
    av_push (av, newSVpv((char *)parent, 0));
 
    hv_store (exceptions_hv, (char *)repoid, strlen(repoid), 
@@ -251,12 +265,13 @@ pmico_setup_exception (const char *repoid, const char *pkg,
 void
 pmico_init_exceptions (void)
 {
-    for (int i=1; i<num_system_exceptions; i++) {
+    int i;
+    for ( i=1; i<num_system_exceptions; i++) {
 	pmico_setup_exception (system_exceptions[i].repoid,
 			       system_exceptions[i].package,
 			       "CORBA::SystemException");
     }
-    for (int i=1; i<num_builtin_exceptions; i++) {
+    for ( i=1; i<num_builtin_exceptions; i++) {
 	pmico_setup_exception (builtin_exceptions[i].repoid,
 			       builtin_exceptions[i].package,
 			       "CORBA::UserException");
@@ -290,7 +305,10 @@ pmico_system_except (const char *repoid, CORBA::ULong minor,
 	text = system_exceptions[0].text;
     }
 
-    PUSHMARK(sp);
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
     XPUSHs(sv_2mortal(newSVpv(pkg, 0)));
 
     XPUSHs(sv_2mortal(newSVpv("-text", 0)));
@@ -314,24 +332,24 @@ pmico_system_except (const char *repoid, CORBA::ULong minor,
     case CORBA::COMPLETED_MAYBE:
         status_str = "COMPLETED_MAYBE";
 	break;
+    default:
+	status_str = "unknown_COMPLETED_status";
     }
     XPUSHs(sv_2mortal(newSVpv(status_str, 0)));
     
     PUTBACK;
-    int count = perl_call_method("new", G_SCALAR);
+    int count = call_method("new", G_SCALAR);
     SPAGAIN;
     
-    if (count != 1) {
-	while (count--)
-	    (void)POPs;
-	PUTBACK;
+    if (count != 1)
 	croak("Exception constructor returned wrong number of items");
-    }
     
-    SV *sv = POPs;
+    SV *sv = newSVsv( POPs );
     PUTBACK;
+    FREETMPS;
+    LEAVE;
 
-    return newSVsv(sv);
+    return sv;
 }
 
 
@@ -341,6 +359,7 @@ pmico_user_except (const char *repoid, SV *value)
 {
     dSP;
 
+    CM_DEBUG(("pmico_user_except('%s')\n",repoid));
     if (value)
 	sv_2mortal(value);
     const char *pkg = pmico_find_exception (repoid);
@@ -349,7 +368,10 @@ pmico_user_except (const char *repoid, SV *value)
 	return 	pmico_system_except ( "IDL:omg.org/CORBA/UNKNOWN:1.0", 
 				      0, CORBA::COMPLETED_MAYBE );
 
-    PUSHMARK(sp);
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
 
     XPUSHs(sv_2mortal(newSVpv((char *)pkg, 0)));
 
@@ -358,20 +380,18 @@ pmico_user_except (const char *repoid, SV *value)
     }
 
     PUTBACK;
-    int count = perl_call_method("new", G_SCALAR);
+    int count = call_method("new", G_SCALAR);
     SPAGAIN;
     
-    if (count != 1) {
-	while (count--)
-	    (void)POPs;
-	PUTBACK;
+    if (count != 1)
 	croak("Exception constructor returned wrong number of items");
-    }
     
-    SV *sv = POPs;
+    SV *sv = newSVsv( POPs );
     PUTBACK;
+    FREETMPS;
+    LEAVE;
     
-    return newSVsv(sv);
+    return sv;
 }
 
 SV *

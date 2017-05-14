@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    find_first_of    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2009-10-09T00:50:15-0700" />
+<meta name="keywords" content="stl,algorithm,find_first_of" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/stl/algorithm/find_first_of?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=stl:algorithm" />
+<link rel="edit" title="Edit this page" href="/wiki/stl/algorithm/find_first_of?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/stl/algorithm/find_first_of" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/stl/algorithm/find_first_of" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/stl/algorithm/find_first_of" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='stl:algorithm';var JSINFO = {"id":"stl:algorithm:find_first_of","namespace":"stl:algorithm"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../stl/start.html"  title="stl:start">C++ Standard Template Library</a> &raquo; <a href="../../stl/algorithm/start.html"  title="stl:algorithm:start">C++ Algorithms</a> &raquo; <a href="../../stl/algorithm/find_first_of.html"  title="stl:algorithm:find_first_of">find_first_of</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="find_first_of" id="find_first_of">find_first_of</a></h2>
+<div class="level2">
+
+<p>
+Syntax:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    <span class="co2">#include &lt;algorithm&gt;</span>
+    forward_iterator find_first_of<span class="br0">&#40;</span> forward_iterator start<span class="sy0">,</span> forward_iterator end<span class="sy0">,</span> forward_iterator2 find_start<span class="sy0">,</span> forward_iterator2 find_end <span class="br0">&#41;</span><span class="sy0">;</span>
+    forward_iterator find_first_of<span class="br0">&#40;</span> forward_iterator start<span class="sy0">,</span> forward_iterator end<span class="sy0">,</span> forward_iterator2 find_start<span class="sy0">,</span> forward_iterator2 find_end<span class="sy0">,</span> BinPred bp <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+The find_first_of() function searches for the first occurence of any element
+between find_start and find_end. The data that are searched are those between
+start and end.
+</p>
+
+<p>
+If any element between find_start and find_end is found, an iterator pointing
+to that element is returned. Otherwise, an iterator pointing to end is
+returned.
+</p>
+
+<p>
+For example, the following code searches for a 9, 4, or 7 in an array of
+integers:
+</p>
+<pre class="c code c++" style="font-family:monospace;">   <span class="kw4">int</span> nums<span class="br0">&#91;</span><span class="br0">&#93;</span> <span class="sy0">=</span> <span class="br0">&#123;</span> 0<span class="sy0">,</span> 1<span class="sy0">,</span> 2<span class="sy0">,</span> 3<span class="sy0">,</span> 4<span class="sy0">,</span> 5<span class="sy0">,</span> 6<span class="sy0">,</span> 7<span class="sy0">,</span> 8<span class="sy0">,</span> 9<span class="sy0">,</span> 10 <span class="br0">&#125;</span><span class="sy0">;</span>
+   <span class="kw4">int</span><span class="sy0">*</span> result<span class="sy0">;</span>
+   <span class="kw4">int</span> start <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+   <span class="kw4">int</span> end <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span>
+&nbsp;
+   <span class="kw4">int</span> targets<span class="br0">&#91;</span><span class="br0">&#93;</span> <span class="sy0">=</span> <span class="br0">&#123;</span> 9<span class="sy0">,</span> 4<span class="sy0">,</span> 7 <span class="br0">&#125;</span><span class="sy0">;</span>
+   result <span class="sy0">=</span> find_first_of<span class="br0">&#40;</span> nums <span class="sy0">+</span> start<span class="sy0">,</span> nums <span class="sy0">+</span> end<span class="sy0">,</span> targets <span class="sy0">+</span> 0<span class="sy0">,</span> targets <span class="sy0">+</span> 3 <span class="br0">&#41;</span><span class="sy0">;</span>
+   <span class="kw1">if</span><span class="br0">&#40;</span> <span class="sy0">*</span>result <span class="sy0">==</span> nums<span class="br0">&#91;</span>end<span class="br0">&#93;</span> <span class="br0">&#41;</span> <span class="br0">&#123;</span>
+     <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Did not find any of { 9, 4, 7 }&quot;</span> <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span>
+   <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+     <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Found a matching target: &quot;</span> <span class="sy0">&lt;&lt;</span> <span class="sy0">*</span>result <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span>
+   <span class="br0">&#125;</span></pre>
+<p>
+Related Topics: <a href="../../stl/algorithm/adjacent_find.html" class="wikilink1" title="stl:algorithm:adjacent_find">adjacent_find</a>, <a href="../../stl/algorithm/find.html" class="wikilink1" title="stl:algorithm:find">find</a>, <a href="../../stl/algorithm/find_end.html" class="wikilink1" title="stl:algorithm:find_end">find_end</a>, <a href="../../stl/algorithm/find_if.html" class="wikilink1" title="stl:algorithm:find_if">find_if</a>, <a href="../../c/string/strpbrk.html" class="wikilink1" title="c:string:strpbrk">strpbrk</a>
+</p>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        stl/algorithm/find_first_of.txt &middot; Last modified: 10/09/2009 00:50 by 124.255.102.233      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

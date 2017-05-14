@@ -1,0 +1,35 @@
+Tests:
+------
+
+What happens if you give a URL to check in with to a file that has not been checked out?
+
+Are newlines etc accepted in the comments box?
+
+Does a big download/upload work?
+Does the locking work?
+Does the unlocking work? (after unlock and after commit)
+What should cvs status say after cvs admin -l?
+Does the upload refreshing page work?
+
+
+Screens:
+-------
+
+screen_name	implementing procedure
+
+Login Page	login_user		user name not set.
+Show status	show_status		file not found or edit not specified o
+Lockowner_returning lockowner_returning	edit=start, file already out, user=owner
+Not Implemented not_implemented
+Discard Lock	discard_lock		edit=discard-lock
+Edit Text	show_file_for_edit_text (NI) NEVER
+(Submit Text Changes submit_text_changes	method=post, edit!=upload-and-unlock)
+Prepare Edit Binary     show_file_for_edit_binary edit=start, file not out.
+Already Checked Out show_file_for_edit_binary	edit=start, file out
+Lock And Download Binary	lock_and_download	edit=lock-and-download
+Download Checked Out File	download_checked_out_file edit=download-file
+Upload Form	upload_form	edit=upload-form
+Save Upload	save_upload
+Upload And Unlock upload_and_unlock
+Die Page	die_page
+

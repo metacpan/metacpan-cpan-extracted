@@ -1,0 +1,24 @@
+$HELP::HEADER
+
+<h2>What's a "Database Schema Update"?</h2>
+
+Obviously you installed a newer version of JaM, which is always
+a good idea. Sometimes new versions of JaM need updated database
+objects, e.g. new columns or new tables or something similar.
+<p>
+JaM detected that you use a newer version of JaM with an older
+version of the database objects. JaM automatically can update your
+database schema. Although JaM is very carefully in updating your
+data it can happen, that the update procedure fails, possibly
+damaging your data.
+<p>
+So you may want to make an update of your JaM database before
+proceeding. Use the following command to make a full backup
+of a MySQL database:
+<p>
+<pre>
+  mysqldump -q -u <i>username</i> -p <i>password</i> \\
+            <i>database_name</i> > backup.sql
+</pre>
+
+$HELP::FOOTER

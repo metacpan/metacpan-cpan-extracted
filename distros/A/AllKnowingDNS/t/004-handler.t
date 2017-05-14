@@ -57,6 +57,18 @@ is($rr->type, 'AAAA', 'RR type is AAAA');
 is($rr->rdatastr, '2001:4d88:100e:ccc0:219:dbff:fe43:2ec7', 'RR ok');
 
 ################################################################################
+# Check resolving hostnames to A records
+################################################################################
+
+$qname = 'ipv6-0219dbfffe432ec7-blah.nutzer.raumzeitlabor.de';
+$qclass = 'IN';
+$qtype = 'A';
+$peerhost = 'testsuite';
+($rcode, $ans, $auth, $add) = reply_handler($config, 0, $qname, $qclass, $qtype, $peerhost);
+is($rcode, 'NOERROR', 'no error when handling query');
+is(scalar @$ans, 0, 'zero answer RRs');
+
+################################################################################
 # A pathetic example for resolving hostname to AAAA record: a /112 net
 ################################################################################
 

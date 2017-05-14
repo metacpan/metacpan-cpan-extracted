@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::CDA;
 use strict;
 use Lemonldap::NG::Portal::SharedConf qw(:all);
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.9.1';
 use base ('Lemonldap::NG::Portal::SharedConf');
 
 *EXPORT_OK   = *Lemonldap::NG::Portal::SharedConf::EXPORT_OK;
@@ -74,7 +74,7 @@ compatible portals with Cross Domain Authentication.
     print '<input type="hidden" name="url" value="'.$portal->param('url').'">';
     # Next, login and password
     print 'Login : <input name="user"><br>';
-    print 'Password : <input name="password" type="password" autocomplete="off">';
+    print 'Password : <input name="password" type="password">';
     print '<input type="submit" value="go" />';
     print '</form>';
   }
@@ -123,9 +123,9 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2007, 2008, 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2007-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =item Copyright (C) 2008 by Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
 

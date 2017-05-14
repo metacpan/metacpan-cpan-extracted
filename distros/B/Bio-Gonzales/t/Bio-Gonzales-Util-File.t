@@ -1,6 +1,7 @@
 use warnings;
 use Test::More;
 use Data::Dumper;
+use File::Slurp qw/slurp/;
 use File::Spec::Functions qw/catfile/;
 use File::Temp qw/tempfile tmpnam tempdir/;
 use File::Which;

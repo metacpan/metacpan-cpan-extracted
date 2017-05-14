@@ -1,11 +1,12 @@
 package Net::Easypost::Shipment;
-$Net::Easypost::Shipment::VERSION = '0.18';
+$Net::Easypost::Shipment::VERSION = '0.19';
+use Carp qw/croak/;
+use Types::Standard qw/ArrayRef HashRef InstanceOf Str/;
+
 use Moo;
 with qw/Net::Easypost::PostOnBuild/;
 with qw/Net::Easypost::Resource/;
-
-use Carp qw/croak/;
-use Types::Standard qw/ArrayRef HashRef InstanceOf Str/;
+use namespace::autoclean;
 
 has [qw/from_address to_address/] => (
    is       => 'ro',
@@ -39,7 +40,7 @@ has 'options' => (
    isa => HashRef[Str],
 );
 
-sub _build_fieldnames { 
+sub _build_fieldnames {
     return [qw/to_address from_address parcel customs_info scan_form rates options/];
 }
 
@@ -76,7 +77,7 @@ sub serialize {
    return {
        map { $self->role . "[$_][id]" => $self->$_->id }
        grep { defined $self->$_ }
-          qw(to_address from_address parcel)
+          qw(to_address from_address parcel customs_info)
    };
 }
 
@@ -93,12 +94,12 @@ sub clone {
 sub buy {
    my ($self, %options) = @_;
 
-   my $rate; 
-   if ( exists $options{rate} && $options{rate} eq 'lowest' ) {
-      ($rate) = 
+   my $rate;
+   if (exists $options{rate} && $options{rate} eq 'lowest') {
+      ($rate) =
          sort { $a->{rate} <=> $b->{rate} } @{ $self->rates };
-   } 
-   elsif ( exists $options{service_type} ) {
+   }
+   elsif (exists $options{service_type}) {
       ($rate) =
          grep { $options{service_type} eq $_->service } @{ $self->rates };
    }
@@ -106,9 +107,9 @@ sub buy {
       croak "Missing 'service' or 'rate' from options hash";
    }
 
-   unless ( $rate ) {
+   unless ($rate) {
       my $msg = "Allowed services and rates for this shipment are:\n";
-      foreach my $rate ( @{ $self->rates } ) {
+      foreach my $rate (@{ $self->rates }) {
          $msg .= sprintf("\t%-15s: %4.2f\n", $rate->service, $rate->rate);
       }
 
@@ -148,19 +149,19 @@ Net::Easypost::Shipment
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
 Net::Easypost::Shipment->new
 
-=head1 NAME 
+=head1 NAME
 
 Net::Easypost::Shipment
 
 =head1 ATTRIBUTES
 
-=over 4 
+=over 4
 
 =item to_address
 
@@ -194,7 +195,7 @@ Array of shipping options, may not be supported by all carriers
 
 =head1 METHODS
 
-=over 4 
+=over 4
 
 =item _build_fieldnames
 

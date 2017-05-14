@@ -1,8 +1,26 @@
 package Test::Smoke::Database::Parsing;
 
 # Copyright 200x A.Barbet alian@cpan.org  All rights reserved.
-# $Date: 2003/08/19 10:37:24 $
+# $Date: 2004/04/19 15:15:38 $
 # $Log: Parsing.pm,v $
+# Revision 1.14  2004/04/19 15:15:38  alian
+# fix on warnings
+#
+# Revision 1.13  2004/04/14 22:30:49  alian
+# parse 1.19 style reports
+#
+# Revision 1.12  2003/11/07 17:42:22  alian
+# Avoid warnings when create graph
+#
+# Revision 1.11  2003/11/07 17:33:41  alian
+# - link to web archive when delete a report
+# - skip report with only '? ? ? ?'
+#
+# Revision 1.10  2003/09/16 15:41:50  alian
+#  - Update parsing to parse 5.6.1 report
+#  - Change display for lynx
+#  - Add top smokers
+#
 # Revision 1.9  2003/08/19 10:37:24  alian
 # Release 1.14:
 #  - FORMAT OF DATABASE UPDATED ! (two cols added, one moved).
@@ -25,24 +43,6 @@ package Test::Smoke::Database::Parsing;
 # Revision 1.7  2003/08/15 15:12:28  alian
 # Update update_ref with SQL request from admin_smokedb
 #
-# Revision 1.6  2003/08/14 08:48:35  alian
-# Don't save line with only t | ? | -
-#
-# Revision 1.5  2003/08/07 18:01:06  alian
-# Remove =20 at end of line
-#
-# Revision 1.4  2003/08/06 19:20:51  alian
-# Add proto to methods
-#
-# Revision 1.3  2003/08/06 18:50:42  alian
-# New interfaces with DB.pm & Display.pm
-#
-# Revision 1.2  2003/08/02 12:38:09  alian
-# Remove unused package
-#
-# Revision 1.1  2003/07/30 22:08:02  alian
-# Code from Database.pm
-#
 
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
@@ -54,7 +54,7 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-$VERSION = ('$Revision: 1.9 $ ' =~ /(\d+\.\d+)/)[0];
+$VERSION = ('$Revision: 1.14 $ ' =~ /(\d+\.\d+)/)[0];
 
 my $moii = qr/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;
 my $date = qr/^Date: \w{0,3},? {0,2}(\d{1,2}) ($moii) (\d\d\d\d) (\d\d:\d\d:?\d?\d?)/;
@@ -80,6 +80,7 @@ sub parse_import {
     $nb++;
     # skip backup file or already defined report
     next if (/~$/ or ( /(\d+)\.rpt/ && $k{$1}));
+    my $id = $1;
     my $ref = parse_rpt($_);
     if (!defined($ref)) { 
       warn "Can't read/parse $_\n" if ($self->{opts}->{debug});
@@ -95,7 +96,7 @@ sub parse_import {
 	  $k{$_->{id}}=1;
 	}
       } elsif ($ref == -2) {
-	warn "\t".basename($_)." Seems to be a DEAD report, will be unlink\n"
+	warn "\thttp://nntp.x.perl.org/group/perl.daily-build.reports/$id seems to be a DEAD report, will be unlink\n"
 	  if ($self->{opts}->{verbose});
 	unlink $_;
       } elsif ($ref == -3) {
@@ -281,7 +282,11 @@ sub parse_rpt($) {
   }
   return undef if (!$cont);
   my $irix = 0;
-  my $re = qr/(?:\w|-|\?) /;
+  my $re = qr/(?:O|F|m|M|c|-|t|X|\?)/;
+  my $reEs = qr/$re /;
+  my $re4Smoke = qr/$reEs{3,5}$re/;
+  my $re2Smoke = qr/$re $re/;
+
   foreach my $l (split(/\n/, $cont)) {
     $content.=$l;
     chomp($l);
@@ -315,10 +320,12 @@ sub parse_rpt($) {
 	return undef;
       }
     }
+    # patchlevel os osver
     elsif ($l=~/Automated smoke report for patch (\d*) on (.*)$/) {
       ($h{smoke},$h{os}, $h{osver}) = ($1,$2,"??");
       if ($l=~/(irix\d*)$/) { $irix = 1; $h{os}=$1;}
     }
+    # patchlevel
     elsif ($l=~/Automated smoke report for patch (\d*)$/) {
       ($h{smoke}) = ($1);
     }
@@ -326,21 +333,45 @@ sub parse_rpt($) {
       $irix=0;
       $h{osver} = $1 if ($l=~/^ - (.*)$/);
     }
+
+    # @20040125: 1.19 style reports
+    elsif ($l=~/Automated smoke report for .* patch (\d+)$/) {
+      $h{smoke} = $1;
+    }
+    elsif ($l=~m!^.+:\s+.*\((.+)(?:/\d+ cpus?)?\)$!) {
+      $h{archi} = $1;
+    }
+    elsif ($l=~/^\s+on\s+(.*) - (.*)$/) {
+      ($h{os}, $h{osver}) = ($1, $2);
+    }
+    elsif ($l=~/^\s+using\s+(.*) version (.*)$/) {
+      ($h{cc}, $h{ccver}) = ($1, $2);
+    }
+    # End 1.19 style for now
+
+    # os osver cc ccver
     elsif ($l=~/on (.*) using (.*) version (.*)$/) {
       ($h{os}, $h{cc},$h{ccver},$h{osver}) = ($1,$2,$3,"??");
     }
+    # ccver
     elsif ($l=~/using (.*) version (.*)$/) {
       ($h{cc}, $h{ccver}) = ($1,$2);
     }
-    # A line of result
-    elsif (($l=~/^($re{3,}(?:\w|-|\?)) +(-.+)$/)
-	    || ($l=~/^($re{3,}(?:\w|-|\?))$/)) {
-      my $ree = qr/[\?\-t]\s/;
-      next if (!$1 or $1=~/$ree{3,3}[\?\-t]/ );
+    # A line of result (not 5.6.1)
+    elsif (($l=~/^($re4Smoke) +(-.+)$/) || ($l=~/^($re4Smoke)$/)) {
+      next if $1 eq '- - - -' or $1 eq '? ? ? ?';
       $have_result = 1;
       my $c = ( $2 ? $2 : ' ');
       $h{"build"}{$c} = $1;
     }
+
+    # A line of result (5.6.1)
+    elsif (($l=~/^($re2Smoke) +(-.+)$/) || ($l=~/^($re2Smoke)$/)) {
+      $have_result = 1;
+      my $c = ( $2 ? $2 : ' ');
+      $h{"build"}{$c} = $1;
+    }
+
     # Matrix
     elsif (!$fail && $l=~/^[\| ]*\+-+ (.*)$/ && $1!~/^-*$/) {
       push(@{$h{matrix}}, $1) if ($1 ne 'Configuration');
@@ -402,19 +433,25 @@ sub update_ref(\%) {
   }
 
   # Guess if we use gcc
-  my $isgcc = ($ref->{cc}=~/gcc/ ? 1 : 0);
+  my $isgcc = (defined($ref->{cc}) && $ref->{cc}=~/gcc/ ? 1 : 0);
   $isgcc = 1 if (!$isgcc && $ref->{cc}=~/cc/ && ( $ref->{ccver}=~/^2\.9/ ||
 						  $ref->{ccver}=~/^3\./));
   $isgcc = 1 if !$isgcc and $ref->{ccver} and $ref->{ccver}=~/^egcs-/;
 
   # cc
   if (!$ref->{cc}) { $ref->{cc}="??"; }
-  elsif ($isgcc && $ref->{cc}=~m!/([^/]*)$!) { $ref->{cc}=$1; }
+  elsif ($isgcc && $ref->{cc}=~m!/([^/]+ .+)$!) { $ref->{cc}=$1; }
+  elsif ($isgcc && $ref->{cc}=~m!/([^/]+)$!) { $ref->{cc}=$1; }
   elsif ($ref->{cc}=~m/^\s?(.*)\s?$/) { $ref->{cc}=$1; }
 
   # ccver
   if (!$ref->{ccver} || $ref->{ccver}=~m!cc: Error:!) {
     $ref->{ccver}="??" if !$mj;
+  } elsif ($ref->{ccver} eq 'gcc') {
+    $ref->{ccver}='2.95.3' if ($ref->{os} eq 'solaris' &&
+			       ($ref->{osver}=~m'2.7' ||
+				$ref->{osver}=~m'2.8'));
+    $ref->{ccver} = '??' if ( $ref->{ccver} eq 'gcc');
   } else { # cut of long info about gcc
     $ref->{ccver}=~s/3\.2-/3.2./g;
     $ref->{ccver}=~s/^egcs-//g;
@@ -422,6 +459,8 @@ sub update_ref(\%) {
     $ref->{ccver}=~s/\(prerelease\)//g;
     $ref->{ccver}=~s/\(release\)//g;
   }
+
+#  print Data::Dumper->Dump([$ref]) if ($ref->{ccver}=~/^gcc/);
 
   # cc (2) => Extract ccache info from cc and append it to ccver
   #if ($isgcc && $ref->{cc}=~/^ccache (.*)/) {
@@ -440,7 +479,8 @@ sub update_ref(\%) {
     $ref->{archi} = $2;
 #    if ($ref->{archi}=~m!^([^-]*)-!) { $ref->{archi} = $1; }
     $ref->{archi} = "i386" if ($ref->{archi}=~/^i.86/ or
-			       $ref->{os} eq 'cygwin'or
+			       $ref->{archi} eq 'x86' or
+			       $ref->{os} eq 'cygwin' or
 			       $ref->{os} eq 'mswin32');
   } else { # set architecture for report before 1.16 of Test-Smoke
     if ( ($ref->{os} eq 'solaris') or
@@ -470,14 +510,21 @@ sub update_ref(\%) {
 
   # perl tested (version) - For report before Test::Smoke 1.17
   if (!$ref->{version} || $ref->{version} eq '5.?.?') {
-    if ($ref->{smoke}>17675) {
+    if ($ref->{smoke}>17675 && $ref->{smoke}<22318) {
       $ref->{version} = '5.9.0';
+    } elsif ($ref->{smoke}>17675 && $ref->{smoke}<22523) {
+      $ref->{version} = '5.9.1';
+    } elsif ($ref->{smoke}>17675) {
+      $ref->{version} = '5.9.2';
     } else { $ref->{version} = '5.8.0'; }
   }
 
   # date: rewrite it for mysql
-  if ($ref->{date}=~$date) {
-    $ref->{date}= sprintf("%4d-%02d-%02d %s",$3, $month{$2}, $1, $4); # 1997-10-04 22:23:00;
+  if ($ref->{date} && $ref->{date}=~$date) { # 1997-10-04 22:23:00
+    $ref->{date}= sprintf("%4d-%02d-%02d %s",$3, $month{$2}, $1, $4);
+  } else {
+ #    print STDERR "bad date for ",Data::Dumper->Dump( [$ref] )
+ #     if ($self->{opts}->{debug});
   }
 
   # os
@@ -498,6 +545,12 @@ sub update_ref(\%) {
       $ref->{author} = 'merijn@l1.procura.nl';
     }
   }
+
+  # remove -Uuseperlio for blead
+  if ($ref->{version} =~/^5\.9/ && $ref->{build}) {
+    delete $ref->{build}{'-Uuseperlio'} if ($ref->{build}{'-Uuseperlio'});
+  }
+
   return $ref;
 }
 
@@ -548,14 +601,14 @@ Return undef if no file or if file doesn't exist;
 
 =item B<update_ref> I<ref of hash>
 
-Update the reference to set particular values to cc, ccver, arch name, etc from 
-buggy reports.
+Update the reference to set particular values to cc, ccver, arch name, etc 
+from buggy reports.
 
 =back
 
 =head1 VERSION
 
-$Revision: 1.9 $
+$Revision: 1.14 $
 
 =head1 AUTHOR
 

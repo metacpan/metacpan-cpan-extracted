@@ -7,6 +7,7 @@
 # $node1->equals ($node2, $cmp) or 
 #   print "Difference found! Context:" . $cmp->context . "\n";
 #
+use strict;
 
 package CmpDOM;
 
@@ -44,8 +45,8 @@ sub skipReadOnly
 
 sub sameType
 {
-    shift if @_ > 2;
-    my ($x, $y) = @_;
+    my ($self, $x, $y) = @_;
+
     return 1 if (ref ($x) eq ref ($y));
 
     $self->fail ("wrong type " . ref($x) . " != " . ref($y));
@@ -143,6 +144,16 @@ sub equals
 
 package XML::DOM::Node;
 
+sub get_prop_byname
+{
+    my ($self, $propname) = @_;
+    my $pkg = ref ($self);
+
+    no strict 'refs';
+    my $hfields = \ %{"$pkg\::HFIELDS"};
+    $self->[$hfields->{$propname}];
+}
+
 sub equals
 {
     my ($self, $other, $cmp) = @_;
@@ -154,7 +165,7 @@ sub equals
     if ($hasKids)
     {
 	$cmp->pushContext ("C");
-	return 0 unless $self->{C}->equals ($other->{C}, $cmp);
+	return 0 unless $self->[_C]->equals ($other->[_C], $cmp);
 	$cmp->popContext;
     }
     return 0 unless $cmp->sameReadOnly ($self->isReadOnly,
@@ -163,8 +174,8 @@ sub equals
     for my $prop (@{$self->getCmpProps})
     {
 	$cmp->pushContext ($prop);	
-	my $p1 = $self->{$prop};
-	my $p2 = $other->{$prop};
+	my $p1 = $self->get_prop_byname ($prop);
+	my $p2 = $other->get_prop_byname ($prop);
 	if (ref ($p1))
 	{
 	    return 0 unless $p1->equals ($p2, $cmp);
@@ -191,91 +202,91 @@ package XML::DOM::Attr;
 
 sub getCmpProps
 {
-    [Name, Specified];
+    ['Name', 'Specified'];
 }
 
 package XML::DOM::ProcessingInstruction;
 
 sub getCmpProps
 {
-    [Target, Data];
+    ['Target', 'Data'];
 }
 
 package XML::DOM::Notation;
 
 sub getCmpProps
 {
-    return [Name, Base, SysId, PubId];
+    return ['Name', 'Base', 'SysId', 'PubId'];
 }
 
 package XML::DOM::Entity;
 
 sub getCmpProps
 {
-    return [NotationName, Parameter, Value, SysId, PubId];
+    return ['NotationName', 'Parameter', 'Value', 'SysId', 'PubId'];
 }
 
 package XML::DOM::EntityReference;
 
 sub getCmpProps
 {
-    return [EntityName, Parameter];
+    return ['EntityName', 'Parameter'];
 }
 
 package XML::DOM::AttDef;
 
 sub getCmpProps
 {
-    return [Name, Type, Required, Implied, Quote, Default, Fixed];
+    return ['Name', 'Type', 'Required', 'Implied', 'Quote', 'Default', 'Fixed'];
 }
 
 package XML::DOM::AttlistDecl;
 
 sub getCmpProps
 {
-    return [Name, A];
+    return ['ElementName', 'A'];
 }
 
 package XML::DOM::ElementDecl;
 
 sub getCmpProps
 {
-    return [Name, Model];
+    return ['Name', 'Model'];
 }
 
 package XML::DOM::Element;
 
 sub getCmpProps
 {
-    return [TagName, A];
+    return ['TagName', 'A'];
 }
 
 package XML::DOM::CharacterData;
 
 sub getCmpProps
 {
-    return [Data];
+    return ['Data'];
 }
 
 package XML::DOM::XMLDecl;
 
 sub getCmpProps
 {
-    return [Version, Encoding, Standalone];
+    return ['Version', 'Encoding', 'Standalone'];
 }
 
 package XML::DOM::DocumentType;
 
 sub getCmpProps
 {
-    return [Entities, Notations, Name, SysId, PubId, Internal];
+    return ['Entities', 'Notations', 'Name', 'SysId', 'PubId', 'Internal'];
 }
 
 package XML::DOM::Document;
 
 sub getCmpProps
 {
-    return [XmlDecl, Doctype];
+    return ['XmlDecl', 'Doctype'];
 }
 
 1;

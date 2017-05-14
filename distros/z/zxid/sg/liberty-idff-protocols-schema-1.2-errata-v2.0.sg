@@ -1,0 +1,200 @@
+# zxid/sg/liberty-idff-protocols-schema-1.2-errata-v2.0.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idff-protocols-schema-1.2-errata-v2.0.sg,v 1.4 2009-09-05 02:23:41 sampo Exp $
+#
+# N.B. In order to remove dependency on metadata, all instances
+# of %m12:entityIDType have been replaced with %xs:anyURI, which
+# is what the former expands to in the metadata schema. This makes
+# world a simpler and better place.
+
+target(ff12, urn:liberty:iff:2003-08)
+
+import(sa11, urn:oasis:names:tc:SAML:1.0:assertion,oasis-sstc-saml-schema-assertion-1.1.xsd)
+import(sp11, urn:oasis:names:tc:SAML:1.0:protocol,oasis-sstc-saml-schema-protocol-1.1.xsd)
+import(xenc, http://www.w3.org/2001/04/xmlenc#, http://www.w3.org/TR/xmlenc-core/xenc-schema.xsd)
+#import(ac,   urn:liberty:ac:2003-08, liberty-authentication-context-1.2-errata-v1.0.xsd)
+import(ac,   urn:liberty:ac:2004-12, liberty-authentication-context-v2.0.xsd)
+
+#include(liberty-idff-utility-v1.0.xsd)   necessary definitions have been inline expanded
+
+Extension        -> %ff12:extensionType
+%extensionType:
+  any+  ns(##other)  processContents(lax)
+  ;
+
+ProviderID	 -> %xs:anyURI
+AffiliationID	 -> %xs:anyURI
+AuthnRequest	 -> %ff12:AuthnRequestType
+%AuthnRequestType:	 base(sp11:RequestAbstractType)
+  ff12:Extension*
+  ff12:ProviderID
+  ff12:AffiliationID?
+  ff12:NameIDPolicy?
+  ff12:ForceAuthn?	 -> %xs:boolean
+  ff12:IsPassive?	 -> %xs:boolean
+  ff12:ProtocolProfile?
+  ff12:AssertionConsumerServiceID?	 -> %xs:string
+  ff12:RequestAuthnContext?
+  ff12:RelayState?
+  ff12:Scoping?
+  @consent?	 -> %xs:string
+  ;
+
+%NameIDPolicyType:	 enum( none onetime federated any ) ;
+NameIDPolicy	 -> %ff12:NameIDPolicyType
+
+%AuthnContextComparisonType:	 enum( exact minimum maximum better ) ;
+
+%ScopingType:
+  ff12:ProxyCount?	 -> %xs:nonNegativeInteger
+  ff12:IDPList?
+  ;
+Scoping	 -> %ff12:ScopingType
+
+RelayState	 -> %xs:string
+
+ProtocolProfile	 -> %xs:anyURI
+
+RequestAuthnContext:
+  ff12:AuthnContextClassRef+     -> %xs:anyURI
+  ff12:AuthnContextStatementRef+ -> %xs:anyURI
+  ff12:AuthnContextComparison?   -> %ff12:AuthnContextComparisonType
+  ;
+
+AuthnResponse	 -> %ff12:AuthnResponseType
+%AuthnResponseType:	 base(sp11:ResponseType)
+  ff12:Extension*
+  ff12:ProviderID
+  ff12:RelayState?
+  @consent?	 -> %xs:string
+  ;
+
+Assertion	 -> %ff12:AssertionType
+%AssertionType:	 base(sa11:AssertionType)
+  @InResponseTo?	 -> %xs:NCName
+  ;
+
+%SubjectType:	 base(sa11:SubjectType)
+  ff12:IDPProvidedNameIdentifier?
+  ;
+Subject	 -> %ff12:SubjectType
+
+EncryptableNameIdentifier	 -> %ff12:EncryptableNameIdentifierType
+%EncryptableNameIdentifierType:	 base(sa11:NameIdentifierType)
+  @IssueInstant?	 -> %xs:dateTime
+  @Nonce?	 -> %xs:string
+  ;
+
+EncryptedNameIdentifier	 -> %ff12:EncryptedNameIdentifierType
+%EncryptedNameIdentifierType:
+  xenc:EncryptedData
+  xenc:EncryptedKey?
+  ;
+
+AuthenticationStatement	 -> %ff12:AuthenticationStatementType
+%AuthenticationStatementType:	 base(sa11:AuthenticationStatementType)
+  ff12:AuthnContext?:
+      ff12:AuthnContextClassRef?	 -> %xs:anyURI
+      ac:AuthenticationContextStatement?
+      ff12:AuthnContextStatementRef?	 -> %xs:anyURI
+      ;
+  @ReauthenticateOnOrAfter?	 -> %xs:dateTime
+  @SessionIndex	 -> %xs:string
+  ;
+
+AuthnRequestEnvelope	 -> %ff12:AuthnRequestEnvelopeType
+%AuthnRequestEnvelopeType:	 base(ff12:RequestEnvelopeType)
+  ff12:AuthnRequest
+  ff12:ProviderID
+  ff12:ProviderName?	 -> %xs:string
+  ff12:AssertionConsumerServiceURL	 -> %xs:anyURI
+  ff12:IDPList?
+  ff12:IsPassive?	 -> %xs:boolean
+  ;
+%RequestEnvelopeType:
+  ff12:Extension*
+  ;
+
+IDPList	 -> %ff12:IDPListType
+%IDPListType:
+  ff12:IDPEntries
+  ff12:GetComplete?
+  ;
+IDPEntry:
+  ff12:ProviderID
+  ff12:ProviderName?	 -> %xs:string
+  ff12:Loc	 -> %xs:anyURI
+  ;
+IDPEntries:
+  ff12:IDPEntry+
+  ;
+GetComplete	 -> %xs:anyURI
+
+AuthnResponseEnvelope	 -> %ff12:AuthnResponseEnvelopeType
+%AuthnResponseEnvelopeType:	 base(ff12:ResponseEnvelopeType)
+  ff12:AuthnResponse
+  ff12:AssertionConsumerServiceURL	 -> %xs:anyURI
+  ;
+%ResponseEnvelopeType:
+  ff12:Extension*
+  ;
+RegisterNameIdentifierRequest	 -> %ff12:RegisterNameIdentifierRequestType
+%RegisterNameIdentifierRequestType:	 base(sp11:RequestAbstractType)
+  ff12:Extension*
+  ff12:ProviderID
+  ff12:IDPProvidedNameIdentifier
+  ff12:SPProvidedNameIdentifier?
+  ff12:OldProvidedNameIdentifier
+  ff12:RelayState?
+  ;
+
+IDPProvidedNameIdentifier	 -> %sa11:NameIdentifierType
+SPProvidedNameIdentifier	 -> %sa11:NameIdentifierType
+OldProvidedNameIdentifier	 -> %sa11:NameIdentifierType
+
+RegisterNameIdentifierResponse	 -> %ff12:StatusResponseType
+%StatusResponseType:	 base(sp11:ResponseAbstractType)
+  ff12:Extension*
+  ff12:ProviderID
+  sp11:Status
+  ff12:RelayState?
+  ;
+
+FederationTerminationNotification	 -> %ff12:FederationTerminationNotificationType
+%FederationTerminationNotificationType:	 base(sp11:RequestAbstractType)
+  ff12:Extension*
+  ff12:ProviderID
+  sa11:NameIdentifier
+  @consent?	 -> %xs:string
+  ;
+
+LogoutRequest         -> %ff12:LogoutRequestType
+%LogoutRequestType:   base(sp11:RequestAbstractType)
+  ff12:Extension*
+  ff12:ProviderID
+  sa11:NameIdentifier
+  ff12:SessionIndex*  -> %xs:string
+  ff12:RelayState?
+  @consent?           -> %xs:string
+  @NotOnOrAfter?      -> %xs:dateTime
+  ;
+LogoutResponse	 -> %ff12:StatusResponseType
+
+NameIdentifierMappingRequest	 -> %ff12:NameIdentifierMappingRequestType
+%NameIdentifierMappingRequestType:	 base(sp11:RequestAbstractType)
+  ff12:Extension*
+  ff12:ProviderID
+  sa11:NameIdentifier
+  ff12:TargetNamespace  -> %xs:anyURI
+  @consent?             -> %xs:string
+  ;
+
+NameIdentifierMappingResponse	 -> %ff12:NameIdentifierMappingResponseType
+%NameIdentifierMappingResponseType:	 base(sp11:ResponseAbstractType)
+  ff12:Extension*
+  ff12:ProviderID
+  sp11:Status
+  sa11:NameIdentifier?
+  ;
+
+# EOF

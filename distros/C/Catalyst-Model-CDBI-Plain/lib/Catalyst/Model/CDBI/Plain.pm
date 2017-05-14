@@ -1,12 +1,12 @@
 package Catalyst::Model::CDBI::Plain;
 
 use strict;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use base qw[Class::DBI Catalyst::Base];
 
 sub new {
     my ( $class, $c ) = @_;
-    return Catalyst::Base::new( $class, $c );
+    return Catalyst::Base->new( $class, $c );
 }
 
 1;
@@ -54,6 +54,16 @@ anything up or create relationships; this is left to the user. This
 module can be used with existing C<Class::DBI> classes, so that they can
 be used with Catalyst, or as a way of writing CDBI-based Model classes
 within Catalyst.
+
+=head2 METHODS 
+
+=over 4
+
+=item new
+
+Overrides the constructor to create a Catalyst::Base object, rather than a CDBI object.
+
+=back
 
 =head1 AUTHOR
 

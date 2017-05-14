@@ -1,0 +1,10 @@
+The usual:
+
+	perl Makefile.PL
+	make
+	make test
+	sudo make install
+
+Still haven't gotten all the install nits sorted out yet, so you might not be
+able to get this running unless you have good Perl and Catalyst knowledge.
+

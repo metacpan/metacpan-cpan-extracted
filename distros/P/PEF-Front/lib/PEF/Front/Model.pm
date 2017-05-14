@@ -661,6 +661,15 @@ C<Location> headers specifys new location for redirect.
 
 Sets Content-Type header.
 
+=item B<answer_data>
+
+Replaces answer hash with C<answer_data> field before encoding to JSON. 
+It can be only B<ARRAY> or B<HASH> reference.
+
+=item B<answer_http_response>
+
+Uses supplied HTTP response object as handler response.
+
 =back
 
 When method is called like C</ajax> then it means JSON format answer. 

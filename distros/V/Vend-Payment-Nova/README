@@ -1,0 +1,74 @@
+Vend-Payment-Nova
+==============================
+
+The Vend::Payment::Nova module implements the nova() routine for using
+Nova IC payment services with Interchange. It is compatible on a call level
+with the other Interchange payment modules -- in theory (and even usually in
+practice) you could switch from CyberCash to Nova with a few configuration
+file changes.
+
+To enable this module, place this directive in C<interchange.cfg>:
+
+    Require module Vend::Payment::Nova
+
+This I<must> be in interchange.cfg or a file included from it.
+
+NOTE: Make sure CreditCardAuto is off (default in Interchange demos).
+
+The mode can be named anything, but the C<gateway> parameter must be set
+to C<nova>. To make it the default payment gateway for all credit
+card transactions in a specific catalog, you can set in C<catalog.cfg>:
+
+    Variable   MV_PAYMENT_MODE  nova
+
+It uses several of the standard settings from Interchange payment. Any time
+we speak of a setting, it is obtained either first from the tag/call options,
+then from an Interchange order Route named for the mode, then finally a
+default global payment variable, For example, the C<id> parameter would
+be specified by:
+
+    [charge mode=nova merhcant_id=YourMerchantID]
+
+or
+
+    Route nova merhcant_id YourMerchantID
+
+or with only Nova as a payment provider
+
+    Variable MV_PAYMENT_ID     YourMerchantID
+
+A fully valid catalog.cfg entry to work with the standard demo would be:
+
+    Variable MV_PAYMENT_MODE      nova
+    Variable MV_PAYMENT_MERCHANT_ID  YourMerchantID 
+    Variable MV_PAYMENT_USER_ID      YourUserID
+    Variable MV_PAYMENT_PIN          YourUserPIN 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::SSLeay
+ 
+    or
+  
+  LWP::UserAgent and Crypt::SSLeay
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Murray Nesbitt (murray AT cpan.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

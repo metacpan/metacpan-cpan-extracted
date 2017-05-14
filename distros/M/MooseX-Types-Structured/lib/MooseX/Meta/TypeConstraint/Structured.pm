@@ -2,6 +2,8 @@ package ## Hide from PAUSE
  MooseX::Meta::TypeConstraint::Structured;
 # ABSTRACT: Structured type constraints
 
+our $VERSION = '0.36';
+
 use Moose;
 use Devel::PartialDump;
 use MooseX::Meta::TypeCoercion::Structured;
@@ -367,7 +369,7 @@ MooseX::Meta::TypeConstraint::Structured - Structured type constraints
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =for stopwords parameterize
 
@@ -460,7 +462,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-L<irc://irc.perl.org/#moose>.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 

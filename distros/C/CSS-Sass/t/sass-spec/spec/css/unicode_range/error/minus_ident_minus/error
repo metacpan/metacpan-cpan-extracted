@@ -1,4 +1,0 @@
-Error: Expected end of identifier.
-  a: u+123-abc-def;
-              ^
-  /sass/spec/css/unicode_range/error/minus_ident_minus/input.scss 2:15

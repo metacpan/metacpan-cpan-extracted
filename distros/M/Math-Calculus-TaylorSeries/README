@@ -1,0 +1,31 @@
+Math::Calculus::TaylorSeries version 0.1
+========================================
+
+Math::Calculus::TaylorSeries takes an algebraic expression (e.g. in
+the form sin(x)) and finds the first N elements of its Taylor series
+(x - x^3/6 + x^5/120 - ...). It understands the operators +, -, *, /
+and ^ (raising to a power) as well as the functions sin, cos, tan, sec,
+cosec, cot, sinh, cosh, tanh, sech, cosech, coth, asin, acos, atan,
+asinh, acosh, atanh, ln and exp. Functions are valid either side of all
+operators.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl 5.6.0 or greater and the modules
+Math::Calculus::Expression and Math::Calculus::Differentiate.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jonathan Worthington
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

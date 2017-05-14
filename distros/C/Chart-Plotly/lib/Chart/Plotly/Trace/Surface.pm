@@ -6,7 +6,7 @@ use Chart::Plotly::Trace::Attribute::Contours;
 use Chart::Plotly::Trace::Attribute::Lighting;
 use Chart::Plotly::Trace::Attribute::Lightposition;
 
-our $VERSION = '0.011';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 sub TO_JSON {
     my $self = shift;
@@ -121,7 +121,7 @@ Chart::Plotly::Trace::Surface
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

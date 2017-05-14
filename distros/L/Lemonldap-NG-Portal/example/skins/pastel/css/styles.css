@@ -37,7 +37,8 @@ color:#336699;
 #page {
 margin:20px 40px;
 padding:0;
-background:#fff;
+background-color: rgb(255,255,255);
+background-color: rgba(255,255,255,0.8);
 border:1px solid #C6D880;
 text-align:center;
 box-shadow:0 3px 6px rgba(0, 0, 0, 0.25);
@@ -235,6 +236,7 @@ box-shadow:0 3px 6px rgba(0, 0, 0, 0.25);
 border-radius:10px 10px 10px 10px;
 -moz-border-radius:10px 10px 10px 10px;
 -webkit-border-radius:10px 10px 10px 10px;
+background-color: rgb(255,255,255);
 margin:10px 50px;
 padding:0;
 clear:both;

@@ -1,0 +1,115 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Filters
+
+H2: Overview
+
+The filters available are summarised below.
+
+!block table; tags="FILT"; groups
+Name            Purpose
+General:
+table           tabular data
+note            a note
+quote           a quotation
+abstract        the abstract for a paper
+title           title block for a memo, fax or minutes
+Line based:
+example         fixed-width text (e.g. source code)
+verbatim        fixed-width text, ignoring embedded symbols
+ascii_graphic   fixed-width text, wide enough for ASCII graphics
+nofill          a set of lines
+address         an address
+Components:
+front           front section of a document
+about           about section of a document
+appendix        change headings to appendix style
+plain           change headings to plain style
+Formatting:
+box             surround a region of text with a box
+changed         mark a block of text as changed
+sections        paragraphs are sections
+namevalues      format a set of name-value pairs (e.g. as used in a title block)
+sdf             apply arbitrary phrase attributes to text
+pod             embedded POD
+File processing:
+comment         ignore text
+topics          include a set of sub-topics
+inline          embed text into target format (e.g. [[HTML]])
+script          execute text as a [[Perl]] script
+end             process text at the end
+Configuration:
+langdefs        define vgrind-like language definitions
+define          define a block of variables
+default         provide defaults for a block of variables
+simple          generic filter for building others
+datestrings     define strings used within dates
+Help:
+hlp_header      table of jumps at the top of a help topic
+hlp_window      contents of a help popup window
+!endblock
+
+Further details on these are provided below.
+
+# Define the help to be placed after each filter interface
+!macro FILTER_INTERFACE_END
+See {{SECT:Understanding Filter Interfaces}}, if necessary.
+!endmacro
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'HTML_TOPICS_MODE'} || $var{'HTML_SUBTOPICS_MODE'}
+    # do nothing
+!elsif $var{'OPT_TARGET'} eq 'html' || $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!block topics
+Topic
+filters/fabout
+filters/fabstrac
+filters/faddress
+filters/fappendi
+filters/fascii_g
+filters/fbox
+filters/fchanged
+filters/fcomment
+filters/fdatestr
+filters/fdefault
+filters/fdefine
+filters/fend
+filters/fexample
+filters/ffront
+filters/fhlp_hea
+filters/fhlp_win
+filters/finline
+filters/flangdef
+filters/fnameval
+filters/fnofill
+filters/fnote
+filters/fplain
+filters/fpod
+filters/fquote
+filters/fscript
+filters/fsdf
+filters/fsection
+filters/fsimple 
+filters/ftable
+filters/ftitle
+filters/ftopics
+filters/fverbati
+!endblock
+
+!if !($var{'HTML_TOPICS_MODE'} || $var{'HTML_SUBTOPICS_MODE'})
+!off paragraph h2top
+!endif

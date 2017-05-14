@@ -27,14 +27,14 @@ void newCONSTSUB(HV *stash, char *name, SV *sv);
 
 // Encapsulates Perl/MICO's knowledge about a particular interface
 struct PMicoIfaceInfo {
-    PMicoIfaceInfo (string _pkg, 
+    PMicoIfaceInfo (std::string _pkg, 
 		    CORBA::InterfaceDef *_iface,
 		    CORBA::InterfaceDef::FullInterfaceDescription *_desc)
 
 	: pkg(_pkg), iface(_iface), desc(_desc)
     {
     }
-    string pkg;			// owned
+    std::string pkg;			// owned
     CORBA::InterfaceDef_var iface; // owned
     CORBA::InterfaceDef::FullInterfaceDescription_var desc; // owned
 };
@@ -63,7 +63,7 @@ SV *              pmico_user_except     (const char *repoid, SV *value);
 // are catching internally
 SV *              pmico_builtin_except (CORBA::Exception *ex);
 // Throw a user exception object as a Perl exception
-void              pmico_throw           (SV *e);
+void              pmico_throw           (SV *e) __attribute__((noreturn));
 
 // Create an exception object for an exception thrown by the POA
 
@@ -99,3 +99,19 @@ void              pmico_objref_destroy   (CORBA::Object *obj);
 bool              pmico_to_any           (CORBA::Any *res, SV *sv);
 // Create a SV (perl data structure) from an Any
 SV *              pmico_from_any         (CORBA::Any *any);
+// Create a "CORBA::Any" SV from an Any
+SV *              pmico_any_to_sv        (CORBA::Any *any);
+// Create a "DynamicAny::DynAny" SV from an DynAny
+SV *		  pmico_dyn_any_to_sv	 (DynamicAny::DynAny *dynany);
+// Convert CORBA::TCKind to string representation
+const char* const TCKind_to_str( CORBA::TCKind kind );
+
+//-------------------------------------------------------------------
+void cm_log( const char* format, ... );
+#define CM_DEBUG(v)	cm_log v
+
+//-------------------------------------------------------------------
+/*!
+ * mutex to serialize servant calls from MICO
+ */
+extern MICOMT::Mutex cmPerlEntryLock;

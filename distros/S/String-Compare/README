@@ -1,0 +1,33 @@
+String::Compare - A module to see how much two strings are alike.
+
+This module was created when I needed to merge the information
+between two databases, and I had to find who were who in each database,
+but the names weren't always equals, sometimes there were differences.
+
+The problem was that I need to choose the right person, so I must see how
+much the different names are alike. I've tried testing char by char, but situations
+like the described in the synopsis showed me that wasn't enough. So I created a
+set of tests to give a more accurate pontuation of how much the  names are alike.
+
+The result is in percentage. If the strings are exactly equal, it would return 1,
+if they have nothing in common, it would return 0.
+
+CHANGES
+
+0.2 - word_by_word tries all the words of the other string for each word to get the
+better result.
+
+INSTALATION
+
+perl Makefile.PL
+make test
+make install
+
+SEE ALSO
+
+perldoc String::Compare (after installing it:)
+
+COPYRIGHT
+
+This module was created by "Daniel Ruoso" <daniel@ruoso.com> and is licensed under
+the GNU GPL or the Artistic License.

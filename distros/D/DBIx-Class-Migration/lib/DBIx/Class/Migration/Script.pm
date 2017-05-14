@@ -34,6 +34,9 @@ has schema_class => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa => 'Str',
 has target_dir => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa=> 'Str',
   predicate=>'has_target_dir', env_prefix=>ENV_PREFIX, cmd_aliases => 'dir');
 
+has sandbox_dir => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa=> 'Str',
+  predicate=>'has_sandbox_dir', env_prefix=>ENV_PREFIX);
+
 has username => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa => 'Str',
   default => '', env_prefix=>ENV_PREFIX, cmd_aliases => 'U');
 
@@ -168,6 +171,11 @@ sub _build_migration {
     $args{db_sandbox_builder_class} = $plus ? $class : "DBIx::Class::Migration::$class";
   }
 
+  # Because this attribute uses the ENV thing, its always going to meet the 'has'
+  # Requirement, but it will be '' so we can also check for truthiness.
+  $args{db_sandbox_dir} = $self->sandbox_dir
+    if $self->has_sandbox_dir && $self->sandbox_dir;
+  
   return $self->migration_class->new(%args);
 }
 
@@ -323,6 +331,15 @@ L<File::ShareDir> for more information.
 Uses L<MooseX::Attribute::ENV> to let you populate values from %ENV.  Uses key
 DBIC_MIGRATION_TARGET_DIR
 
+=head2 sandbox_dir
+
+Accepts Str.  Optional
+
+Used if you wish to build the sandbox (if you are building one) in a location that
+is not the 'target_dir'.  For example you might do this to make it easier to not
+accidentally check the sandbox into the repository or if you are reusing it across
+several projects.
+
 =head2 username
 
 Accepts Str.  Not Required
@@ -446,7 +463,7 @@ computer (and if not it is trivial to install).
 You can change this to either 'PostgresqlSandbox' or 'MySQLSandbox', which will
 create a sandbox using either L<DBIx::Class::Migration::MySQLSandbox> or 
 L<DBIx::Class::Migration::PostgresqlSandbox> (which in term require the separate
-installation of either L<Test::mysqld> or L<Test::postgresql>).  If you are
+installation of either L<Test::mysqld> or L<Test::PostgreSQL>).  If you are
 using one of those open source databases in production, its probably a good
 idea to use them in development as well, since there are enough small
 differences between them that could make your code break if you used sqlite for

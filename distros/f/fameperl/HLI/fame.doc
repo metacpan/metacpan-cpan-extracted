@@ -1,0 +1,245 @@
+FAME C HLI 7.5 extensions for Perl 5
+
+Technical Notes
+
+Fernando Trias
+Board of Governors of the 
+Federal Reserve System
+m1fxt00@frb.gov
+
+August 26, 1993 (initial Fame 6.0 and Perl 4 version)
+May 11, 1994 (added 7.5 functions)
+Dec 1994 (convert to Perl 5)
+
+
+Summary: 
+-------
+1.  All but 6 C HLI 7.5 functions are fully implemented in native
+    perl code.  Not implemented: cfmlsts, cfmrdfa, cfmrrng, cfmrsts,
+    cfmwrng, cfmwsts.
+
+2.  For implementations with the FRB extensions, all hli_* functions 
+    are implemented fully.  famedbpath is also implemented.
+
+3.  New perl-like functions have been added (FAME Utilities).
+
+4.  Values of hli.h are available.
+
+
+C HLI
+-----
+
+Most functions:
+
+The typical C HLI function is translated directly to perl. 
+For example, to call cfmddes from C HLI, you would use:
+
+  cfmddes(&status,dbkey,desc);
+
+In fameperl, you would use:
+
+  &cfmddes($status,$dbkey,$desc);
+
+Perl makes no distinction between pointers and values.  Thus, all
+variables (whether output or input) are specified the same way.
+Perl takes care of modifing those values it has to modify.
+
+
+Special functions:
+
+There are exceptions.  Functions which use a range (or other
+array with a limited and fixed length) are called with one variable
+for every array element.  Thus, cfmsrng would be called from C as:
+
+  cfmsrng(&status,freq,&sy,&sp,&ey,&ep,range,&numobs);
+
+From perl, each element of range must be specified.  Thus, you would
+use the following:
+
+  &cfmsrng($status,$freq,$sy,$sp,$ey,$ep,$range1,$range2,
+			  $range3,$numobs);
+
+The functions which require this type of array expansion are: 
+cfmrstr, cfmsbm, cfmsfis, cfmsnm, cfmspm, cfmwstr.
+
+Some functions have not been implemented.  See Summary for a list.
+
+
+hli.h:
+
+Values of hli.h are accessed by adding a & in front of the name.
+Thus, HDAILY becomes &HDAILY.  To access these macros, you must
+use the perl command:
+
+  require "hli.ph";
+
+Make sure that hli.ph is in your current directory or in the
+perl library directory.  See your systems administrator to see
+which applies to your system.
+
+
+FAME Utilities
+--------------
+
+There are several functions to assist perl users in rapidly
+getting and updating FAME data.  Most of the C HLI functions
+that write or read data are not implemented.  In their place,
+you should use the functions described in this section.
+
+When missing value translation is not specified, 
+missing values are returned as string "NA", "ND", "NC" if the
+values are numeric; this will evaluate to a zero in a numeric
+context.  For strings, "" is returned.  
+
+
+&famestart;
+
+  Initialize the fame hli
+
+ 
+&famestop;
+
+  Terminate the fame hli
+
+
+$dbkey = &fameopen($name);
+
+$dbkey = &fameopen($name,$mode);
+
+  Open a FAME database.  First, look at the FAME databse directory
+  as given by famedbpath.  If the database is not there, then try
+  to open it in the current directory.  Returns -1 on error.
+
+
+&fameclose($dbkey);
+
+  Close database.
+
+
+$type = &famegettype($dbkey,$objnam);
+
+  Get an object's type
+	
+
+$freq = &famegetfreq($dbkey,$objnam);
+
+  Get an object's frequency
+
+
+@list = $famegetinfo($dbkey,$objnam);
+
+  Get info (as returned by cfmwhat) with:
+
+     ($class,$type,$freq,$basis,$observ,$fyear,$fprd,
+      $lyear,$lprd,$cyear,$cmonth,$cday,$myear,$mmonth,
+      $mday,$desc,$doc) = @list
+
+  The following table describes the order of your parameters for
+  easy reference in an array context:
+
+       Name             #
+       ------------    ---
+       class            0
+       type             1
+       freq             2
+       basis            3
+       observed         4
+       first year       5
+       first period     6
+       last year        7
+       last period      8
+       create year      9
+       create month    10
+       create day      11
+       modify year     12
+       modify month    13
+       modify day      14
+       description     15
+       documentation   16
+
+
+@data = &fameread($dbkey,$objnam,$syear,$sprd,$eyear,$eprd);
+
+  Read data for the given range of dates.
+
+
+@data = &famereadn($dbkey,$objnam,$numobs,$range1,$range2,$range3
+                   $tmiss,$mistt1,$mistt2,$mistt3);
+
+  Read a given number of value starting with the values of a
+  given range.  Get the rangex values with the functions
+  cfmsrng, cfmsfix.  This function will read the whole range of
+  values, but only store numobs of them.  You can get the
+  value of numobs when setting the range.  The missing value
+  variables must contain data even if no translation is being
+  done.
+
+
+&famewrite($dbkey,$objnam,$year,$prd,@list);
+
+  Writes out all the elements of @list into the object staring
+  with the given date.  
+
+
+Source Code
+-----------
+
+1. The source code is written in C and CLI (a common language interface).
+   It does not use the standard Perl 5 extension macros because the code
+   was originally written for both Perl and Tcl.  Because it uses CLI,
+   a lot of the code is the same for both interfaces.
+
+2. fame.c is the primary program which is compiled with the following C
+   files generated by cliperl from fame.cli:
+   a) fameperl.h  -- fxn declarations
+   b) fame.i      -- interface code 
+   c) fameinit.i  -- perl function registration code
+   d) fame.xtra   -- any extra code
+   e) fameval.i fameset.i -- set/get variables
+
+3. hli.ph is derived from hli.h.  You may wish to hand-modify this file
+   by removing any sub's which don't define constants.
+
+4. This software was developed at the Federal Reserve Board, Washington,
+   D.C., and is in the public domain, except for any components derived
+   from software by Fame Information Systems.  
+
+
+Supported functions
+-------------------
+
+The following functions are supported by this version of perl.  The
+order of the parameters is given.  For almost all cases, the order
+of the parameters is the same as in the C HLI definition.  See the
+C HLI manual for the meaning of each parameter.  Parameters which
+are fixed length arrays have been "flattened".  Thus, when an
+"int range[3]" is expected in the C HLI, fameperl expects a
+"$range1,$range2,$range3".  Note that all perl arrays are flattened,
+so that if you have an array @range with only three values, you can
+enter "@range".  However, if the array has more than three values,
+the extra values will replace the parameters which follow.
+
+
+Perl 5
+------
+
+The interface has been rewritten to conform with the new Perl 5 calling
+conventions.  I've converted the code and the Makefile.  However,
+I have not converted my ".cli" code to the ".xs" code which comes with
+Perl because it is too much work for virtually no benefit.  Such as
+change could be significantly automated (and I may do it some day); the
+only shortcoming is that the same code will compile into Tcl program as
+it is now, but not if I convert it to the ".xs" format.
+
+
+Bugs and Errors
+---------------
+
+There's a name inconsisteny between the Fame CHLI library and perl.  Both
+have an object named "Error".  You may have to edit the perl executable
+and change all occurences of "Error" to something like "ErroX".  A
+simpler solution would be for Fame to get its symbolic binding right.
+
+Fame also handles some functions as #define's in hli.h.  This is not the
+best coding practice and I cannot guarantee that further versions of
+Fame will not do this also and possibly confuse this extension.

@@ -11,8 +11,18 @@ use vars qw(@ISA);
 @ISA = qw( XML::XQL::PrimitiveType );
 
 use strict;
-use Date::Manip;
 use Carp;
+
+BEGIN
+{
+    # Date::Manip relies on setting of $TZ. 
+    unless (defined $ENV{TZ})
+    {
+	$ENV{TZ} = "EST5EDT";
+	warn "XML::XQL::Date - setting timezone \$ENV{TZ} to EST5EDT (east coast USA.) Set your TZ environment variable to avoid this message.";
+    }
+}
+use Date::Manip;
 
 BEGIN {
     # add date() implementation to XQL engine.

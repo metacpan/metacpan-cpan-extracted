@@ -1,0 +1,162 @@
+# map of available images for building new scenarios
+###  $Id: $
+#
+map 0 0 0 xsize=>56, zsize=>40, start=>[24,12,90];
+in_last;
+
+level 0 0 0 zsize=>56, xsize=>40;
+level 0 0 0 zsize=>56, xsize=>40, texture=>'sand', y=>8;
+
+#Top wall
+wall   0  0   0 xsize=>16;
+wall  16  0   0 xsize=>16, texture=>'blue_wallpaper';
+wall  32  0   0 texture=>'gray_blocks';
+wall  40  0   0 texture=>'mossy_blocks';
+wall  48  0   0 texture=>'stone2';
+
+wall 32  8 0 texture=>'wall3';
+wall 40  8 0 texture=>'stone-dark';
+partof_last;
+opening 2 0 0;
+done;
+wall 48  8 0 texture=>'wood2';
+
+#left wall
+wall   0  0 270 xsize=>40;
+in_last;
+Key 17   -1 0 type=>'red',    y=>2,   hang=>0;
+Key 18   -1 0 type=>'black',  y=>2,   hang=>1;
+Key 19   -1 0 type=>'iron',   y=>2,   hang=>0;
+Key 20   -1 0 type=>'green',  y=>2,   hang=>1;
+Key 17   -1 0 type=>'brass',  y=>3.5, hang=>0;
+Key 18   -1 0 type=>'glass',  y=>3.5, hang=>1;
+Key 19   -1 0 type=>'wooden', y=>3.5, hang=>0;
+Key 20   -1 0 type=>'odd',    y=>3.5, hang=>1;
+Key 16.5 -1 0 type=>'toothy', y=>5,   hang=>0;
+Key 17.5 -1 0 type=>'silver', y=>5,   hang=>1;
+Key 18.5 -1 0 type=>'heavy',  y=>5,   hang=>0;
+Key 19.5 -1 0 type=>'round',  y=>5,   hang=>1;
+Key 20.5 -1 0 type=>'gold',   y=>5,   hang=>0;
+Key 16.5 -1 0 type=>'rusty',  y=>6.5, hang=>1;
+Key 17.5 -1 0 type=>'old',    y=>6.5, hang=>0;
+Key 18.5 -1 0 type=>'worn',   y=>6.5, hang=>1;
+Key 19.5 -1 0 type=>'red plastic',   y=>6.5, hang=>0;
+Key 20.5 -1 0 type=>'green plastic', y=>6.5, hang=>1;
+done;
+
+wall 16 0 270 xsize=>24,
+ texture=>['','blue_wallpaper','','wall-grey','',''];
+partof_last;
+door 10 0 0 swing=>-90, texture=>'door2', name=>'props door';
+partof_last;
+sign  2 -0.1 180 texture=>'sand', text=>'Props', ysize=>0.7, xsize=>1.4, y=>4.75;
+done;
+done;
+wall 0 40 0 xsize=>24;
+
+box 8 24 90 ysize=>4, zsize=>3, xsize=>3 ;
+in_last;
+MappingKit 0 0 0 y=>4;
+done;
+
+Key 2 2 0 type=>'brass';
+Helmet 4 2 0;
+Sword  2 4 0;
+Robe   4 4 0 ;
+Shoes  6 2 0 ;
+Letter 6 4 0 ;
+Lamp   6 6 0 ;
+Knife  2 6 0 ;
+MappingKit 4 6 0 ;
+Treasure 8 2 0 type=>'copper', count=>1;
+Treasure 8 4 0 type=>'silver', count=>1;
+Treasure 8 6 0 type=>'gold', count=>1;
+Treasure 8 8 0 type=>'gem', count=>1;
+Treasure 10 2 0 type=>'poster', count=>1;
+chest 4 12 270 state=>'open', hinge=>70, name=>'props chest';
+
+wall 16 24 270 xsize=>16;
+wall 16 24   0 xsize=>16,
+ texture=>['','blue_wallpaper','','wall-grey','',''];
+
+partof_last;
+door 2 0 0 swing=>-90, texture=>'door2';
+partof_last;
+sign  2 -0.1 180 texture=>'sand', text=>'Cast', ysize=>0.7, xsize=>1.3, y=>4.75;
+done;
+done;
+
+sign  31.5 30 270 texture=>'sand', text=>'Boy', ysize=>0.7, xsize=>1;
+character 31.5 28 W texture=>'boy';
+
+sign  16.5 36 E texture=>'sand', text=>'Head', ysize=>0.7, xsize=>1.3;
+character 20 39.2 0 texture=>'head';
+
+wall 24 40 90;
+wall 32 0 270 xsize=>32,
+ texture=>['','wall-grey','','blue_wallpaper','',''];
+partof_last;
+door 10 0 0 texture=>'door2';
+partof_last;
+sign  2 0.1 0 texture=>'sand', text=>'Scenes', ysize=>0.7, xsize=>1.8, y=>4.75;
+done;
+done;
+
+sign  36 31.5 S texture=>'sand', text=>'Night', ysize=>0.7, xsize=>1.6;
+detector  36 30 0 visible=>1,
+ range=>3,
+ near_script=>"sub{ $self->send_event('map','maps/night.txt'); }";
+
+sign  44 31.5 S texture=>'sand', text=>'New Tunnel', ysize=>0.7, xsize=>2.5;
+detector 44 30 0 visible=>1,
+ range=>3,
+ near_script=>"sub{
+                 $self->send_event('map','maps/tunnel2.txt');
+                 $self->send_event('go',4,4,90);
+               }";
+
+#level 48 0 0 zsize=>8, xsize=>8;
+#level 48 0 0 zsize=>8, xsize=>8, texture=>'sand', y=>8;
+sign  55.5 4 W texture=>'sand', text=>'Outside', ysize=>0.7, xsize=>2;
+detector  53 4 0 visible=>1,
+ range=>3,
+ near_script=>"sub{ $self->send_event('map','maps/fieldmap.txt'); }";
+
+wall 56 0 270;
+wall 40 16 0 xsize=>8;
+partof_last;
+opening 2 0 0;
+done;
+wall 40 16 270 xsize=>16;
+wall 48 16 270 xsize=>16;
+wall 24 32 0;
+wall 32 32 0 texture=>'bathroom';
+wall 40 32 0 texture=>'pine';
+
+#map 48.5 8.5 0 file=>'maps/hex.txt';
+archwall 48 8 270;
+wall 56  8 270 texture=>'sand';
+partof_last;
+door 2 0 0 texture=>'h1';
+sign 4 0.6 0 texture=>'carpet', text=>'The Hive',
+  ysize=>0.7, xsize=>1.7, y=>5;
+done;
+wall 56 16 180 texture=>'sand';
+level 48 8 0 xsize=>8, zsize=>8, texture=>'ceiling_tile', y=>8;
+level 48 8 0 xsize=>8, zsize=>8, texture=>'carpet',       y=>0;
+detector  54 12 0 visible=>1,
+ range=>3,
+ near_script=>"sub{
+                 $self->send_event('map','maps/hex.txt');
+                 $self->send_event('go',6,6,0);
+               }";
+
+inventory;
+MappingKit 4 6 0;
+Key 0 0 0 type=>'red',    hang=>0;
+Key 0 0 0 type=>'iron',   hang=>0;
+Key 0 0 0 type=>'brass',  hang=>0;
+Key 0 0 0 type=>'wooden', hang=>0;
+done;
+
+done;

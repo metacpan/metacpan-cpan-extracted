@@ -14,27 +14,19 @@ need_root_and_prepare();
 my $name = 'split-transactions';
 urpmi_addmedia("$name $::pwd/media/$name");    
 
-test_urpmi("--auto --split-length 1 c d", <<'EOF', <<'EOF');
-Preparing...
-      1/4: a
-      2/4: b
-Preparing...
-      3/4: c
-Preparing...
-      4/4: d
-EOF
-Preparing...
-      1/4: b
-      2/4: a
-Preparing...
-      3/4: c
-Preparing...
-      4/4: d
-EOF
+test_urpmi("--auto --split-length 1 c d",
+	acceptable_trans_orders(4,
+				[ [ qw(a b) ], ['c'], ['d'] ],
+				[ [ qw(a b) ], ['d'], ['c'] ],
+				[ [ qw(b a) ], ['c'], ['d'] ],
+				[ [ qw(b a) ], ['d'], ['c'] ],
+				[ ['d'], [ qw(b a) ], ['c'] ],
+				[ ['d'], [ qw(a b) ], ['c'] ],
+	));
 check_installed_names('a', 'b', 'c', 'd');
 
 sub test_urpmi {
-    my ($para, $wanted_a, $wanted_b) = @_;
+    my ($para, @wanted) = @_;
     my $s = run_urpm_cmd("urpmi $para");
     print $s;
 
@@ -43,5 +35,16 @@ sub test_urpmi {
     $s =~ s/^SECURITY.*//gm;
     $s =~ s/^\n//gm;
 
-    ok($s eq $wanted_a || $s eq $wanted_b, "$wanted_a in $s");
+    ok(member($s, @wanted), "$wanted[0] in $s");
+}
+
+sub acceptable_trans_orders {
+    my ($total, @solutions) = @_;
+    my @res;
+    foreach (@solutions) {
+        my $count = 0;
+	    push @res, join("\n", map {
+		    ("Preparing...", map { $count++; "      $count/$total: $_" } @$_) } @$_) . "\n";
+    }
+    @res;
 }

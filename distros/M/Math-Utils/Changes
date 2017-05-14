@@ -1,5 +1,10 @@
 Revision history for Math-Utils
 
+1.10
+	10 May 2017
+	- Extended pl_evaluate() to allow lists of values for the X terms.
+	  Lists may be of values or of ARRAY refs.
+	- Added tests in 16-evaluate.t for the list cases.
 1.09
 	11 May 2016
 	- New function fsum(), using Kahan's summation algorithm.

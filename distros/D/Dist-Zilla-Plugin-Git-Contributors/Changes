@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Git-Contributors
 
+0.030     2017-05-12 15:57:35Z
+          - remove spaces from config data dumped to META, which parses badly
+            on older YAML decoders in the toolchain
+
 0.029     2016-10-14 01:12:15Z
           - also include empty (file-less) commits; broken since 0.010
 

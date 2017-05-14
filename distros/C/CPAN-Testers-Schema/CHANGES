@@ -1,5 +1,48 @@
 Changelog for CPAN-Testers-Schema
 
+0.008     2017-05-13 10:53:47+02:00 Europe/Paris
+
+    [Fixed]
+
+    - Updated metabase users table to add unique constraint to user
+      GUID. The source table has multiple mappings for a single user,
+      but as @bingos pointed out: This means that some e-mails for
+      a user are completely inaccurate, bordering on malicious (since
+      authors cannot get in touch with testers). The new table has only
+      one mapping per GUID, and we can then update that mapping if
+      a tester complains.
+
+0.007     2017-05-12 17:52:23+02:00 Europe/Paris
+
+    [Added]
+
+    - Add a "created" field to the TestReport table to keep track of
+      when the test report was created
+    - Auto serialize the TestReport to/from JSON
+    - Add the ID and created date/time to the JSON test report
+    - Add a table to hold the old Metabase user information so we can
+      find name/email for legacy clients
+    - Add a conversion method from Metabase::Fact to the new test
+      report. This allows legacy clients to send in Metabase reports and
+      be updated to the new test report format.
+
+
+0.006     2017-05-12 10:02:58+02:00 Europe/Paris
+
+    [Added]
+
+    - TestReport table for storing new test reports as JSON documents
+    - cpantesters-schema script for deploying the new database schema
+      [Github #2]
+    - Add `updated` column to raw test reports to keep track of when
+      they were updated
+
+    [Fixed]
+
+    - Fixed all the MySQL foreign key constraints. Foreign key columns
+      need to be exactly the same column type as their foreign
+      counterpart.
+
 0.005     2016-12-11 00:36:54-06:00 America/Chicago
 
     [Fixed]

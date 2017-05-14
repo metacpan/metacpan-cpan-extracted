@@ -10,8 +10,9 @@ use Catmandu::Util qw(data_at);
 use Datahub::Factory;
 use namespace::clean;
 use Datahub::Factory::PipelineConfig;
+use Datahub::Factory::Fixer::Condition;
 
-use Data::Dumper qw(Dumper);
+#use Data::Dumper qw(Dumper);
 
 sub abstract { "Transport data from a data source to a datahub instance" }
 
@@ -50,8 +51,14 @@ sub execute {
       $pcfg = Datahub::Factory->pipeline($arguments);
       $opt = $pcfg->opt;
   } catch {
-      $logger->fatal($_);
-      exit 1;
+        my $error_msg;
+        if ($_->can('message')) {
+              $error_msg = $_->message;
+        } else {
+              $error_msg = $_;
+        }
+        $logger->fatal($error_msg);
+        exit 1;
   };
 
   # Load modules
@@ -59,20 +66,26 @@ sub execute {
   try {
       $import_module = Datahub::Factory->importer($opt->{importer})->new($opt->{oimport});
   } catch {
-      $logger->fatal(sprintf('%s at [plugin_importer_%s]', $_, $opt->{'importer'}));
-      exit 1;
-  };
-  try {
-      $fix_module = Datahub::Factory->fixer($opt->{fixer})->new({"file_name" => $opt->{fixes}});
-  } catch {
-      $logger->fatal(sprintf('%s at [plugin_fixter_%s]', $_, $opt->{'fixer'}));
-      exit 1;
+        my $error_msg;
+        if ($_->can('message')) {
+              $error_msg = sprintf('%s at [plugin_importer_%s]', $_->message, $opt->{'importer'});
+        } else {
+              $error_msg = sprintf('%s at [plugin_importer_%s]', $_, $opt->{'importer'});
+        }
+        $logger->fatal($error_msg);
+        exit 1;
   };
   try {
       $export_module = Datahub::Factory->exporter($opt->{exporter})->new($opt->{oexport});
   } catch {
-      $logger->fatal(sprintf('%s at [plugin_exporter_%s]', $_, $opt->{'exporter'}));
-      exit 1;
+        my $error_msg;
+        if ($_->can('message')) {
+              $error_msg = sprintf('%s at [plugin_exporter_%s]', $_->message, $opt->{'exporter'});
+        } else {
+              $error_msg = sprintf('%s at [plugin_exporter_%s]', $_, $opt->{'exporter'});
+        }
+        $logger->fatal($error_msg);
+        exit 1;
   };
 
   # Perform import/fix/export
@@ -82,10 +95,31 @@ sub execute {
   # Not that errors here are _not_ fatal => continue running
   # till all records have been processed
   my $counter = 0;
-  $import_module->importer->each(sub {
+ 
+  # $import_module->importer might also generate to-catch errors
+  $import_module->each(sub {
       my $item = shift;
       $counter++;
       my $f = try {
+          try {
+                my $cond = Datahub::Factory::Fixer::Condition->new(
+                    'options' => $opt,
+                    'item'    => $item
+                );
+                # Load the correct fixer here, we have the data here
+                $fix_module = $cond->fix_module;
+          } catch {
+                my $error_msg;
+                if ($_->can('message')) {
+                    $error_msg = $_->message;
+                } else {
+                    $error_msg = $_;
+                }
+                $logger->fatal($error_msg);
+                exit 1;
+          };
+
+          # Execute the fix
           $fix_module->fixer->fix($item);
       } catch {
           my $error_msg;
@@ -141,80 +175,18 @@ __END__
 Datahub::Factory::Command::transport - Implements the 'transport' command.
 
 =head1 DESCRIPTION
+
 This command allows datamanagers to (a) fetch data from a (local) source (b)
 transform the data to LIDO using a fix (c) upload the LIDO transformed data to
 a Datahub instance.
 
 =head1 COMMAND LINE INTERFACE
 
-=head2 Options
-
 =over
 
-=item C<--importer NAME>
+=item C<--pipeline>
 
-The importer which fetches data from a Collection Registration system.
-Currently only "Adlib" and "TMS" are supported options.
-All C<--oimport> arguments are tied to the specific importer used.
-
-=item C<--fixes PATH>
-
-The path to the Catmandu Fix files to transform the data.
-
-=item C<--exporter NAME>
-
-The exporter that will do something with your data. It is possible to
-print to C<STDOUT> in a specific format ("YAML" and "LIDO" are supported)
-or to export to a Datahub instance.
-All C<--oexport> arguments are tied to the specific exporter used.
-
-=item C<--oimport file_name=PATH>
-
-The path to a flat file containing data. This option is only relevant when
-the input is an Adlib XML export file.
-
-=item C<--oimport db_user=VALUE>
-
-The database user. This option is only relevant when
-the input is an TMS database.
-
-=item C<--oimport db_passowrd=VALUE>
-
-The database user password. This option is only relevant when
-the input is an TMS database.
-
-=item C<--oimport db_name=VALUE>
-
-The database name. This option is only relevant when
-the input is an TMS database.
-
-=item C<--oimport db_host=VALUE>
-
-The database host. This option is only relevant when
-the input is an TMS database.
-
-=item C<--oexport datahub_url=VALUE>
-
-The URL to the datahub instance. This should be a FQDN ie. http://datahub.lan/
-
-=item C<--oexport oauth_client_id=VALUE>
-
-The client public ID. Used for OAuth authentication of the Datahub endpoint.
-
-=item C<--oexport oauth_client_secret=VALUE>
-
-The client secret passphrase. Used for OAuth authentication of the Datahub
-endpoint.
-
-=item C<--oexport oauth_username=VALUE>
-
-The username of the Datahub user. Used for OAuth authentication of the Datahub
-endpoint.
-
-=item C<--oexport oauth_password=VALUE>
-
-The password of the Datahub user. Used for OAuth authentication of the Datahub
-endpoint.
+Location of the pipeline configuration file.
 
 =back
 
@@ -262,19 +234,98 @@ Supported I<Exporter> plugins:
 
 =head3 Plugin configuration
 
+    [Importer]
+    plugin = OAI
+
+    [plugin_importer_OAI]
+    endpoint = https://oai.my.museum/oai
+
+    [Fixer]
+    plugin = Fix
+
+    [plugin_fixer_Fix]
+    file_name = '/home/datahub/my.fix'
+    id_path = 'lidoRecID.0._'
+
+    [Exporter]
+    plugin = LIDO
+
+    [plugin_exporter_LIDO]
+
 All plugins have their own configuration options in sections called
 C<[plugin_type_name]> where C<type> can be I<importer>, I<exporter>
-or I<fixer> and C<name> is the name of the plugin (see above).
+or I<fixer> and C<name> is the name of the plugin.
 
-For a list of supported and required options, see the plugin documentation.
+All plugins define their own options as parameters to the respective
+plugin. All possible parameters are valid items in the configuration
+section.
 
-The C<[plugin_fixer_Fix]> has two options: C<id_path> and C<file_name>.
+If a plugin requires no options, you still need to create the (empty)
+configuration section (e.g. C<[plugin_exporter_LIDO]> in the above
+example).
+
+=head4 Fixer plugin
+
+    [plugin_fixer_Fix]
+    condition = record.institution_name
+    fixers = MSK, GRO
+    id_path = record.id
+
+    [plugin_fixer_Fix]
+    file_name = /home/datahub/my.fix
+    id_path = record.id
+
+The C<[plugin_fixer_Fix]> can directly load a fix file (via the option
+C<file_name>) or can be configured to conditionally load a different
+fix file to support multiple fix files for the same data stream (e.g.
+when two institutions with different data models use the same API
+endpoint). This is done by setting the C<condition> and C<fixers>
+options.
 
 The C<id_path> option contains the path (in Fix syntax) of the identifier of
 each record in your data after the fix has been applied, but before it is
 submitted to the I<Exporter>. It is used for reporting and logging.
 
-C<file_name> points to the location of your Fix file.
+=head4 Conditional fixers
+
+    [plugin_fixer_Fix]
+    condition = record.institution_name
+    fixers = MSK, GRO
+    id_path = 'lidoRecID.0._'
+
+    [plugin_fixer_GRO]
+    condition = 'Groeningemuseum'
+    file_name = '/home/datahub/gro.fix'
+
+    [plugin_fixer_MSK]
+    condition = 'Museum voor Schone Kunsten Gent'
+    file_name = '/home/datahub/msk.fix'
+
+If you want to separate the data stream into multiple (smaller) streams with
+a different fix file for each stream, you can do this by setting the appropriate
+options in the C<[plugin_fixer_Fix]> block. Note that C<id_path> is still mandatory.
+
+Set C<condition> to the Fix-compatible path in the original stream that holds
+the condition you want to use to split the stream.
+
+Provide a comma-separated list of fixer plugins in C<fixers>.
+
+For every fixer plugin in C<fixers>, create a configuration block called
+C<[plugin_fixer_name]> and provide the following options:
+
+=over
+
+=item C<condition>
+
+The value that the C<condition> from C<[plugin_fixer_Fix]> must have for
+the record to belong to this block.
+
+=item C<file_name>
+
+The location of the fix file that must be executed for every record in this
+block.
+
+=back
 
 =head4 Example configuration file
 
@@ -283,7 +334,6 @@ C<file_name> points to the location of your Fix file.
 
   [Fixer]
   plugin = Fix
-  id_path = 'administrativeMetadata.recordWrap.recordID.0._'
 
   [Exporter]
   plugin = Datahub
@@ -294,7 +344,7 @@ C<file_name> points to the location of your Fix file.
 
   [plugin_fixer_Fix]
   file_name = '/tmp/msk.fix'
-  id_path = ''
+  id_path = 'record.id'
 
   [plugin_exporter_Datahub]
   datahub_url = https://my.thedatahub.io
@@ -306,13 +356,9 @@ C<file_name> points to the location of your Fix file.
 
 =head1 AUTHORS
 
-=over
+Pieter De Praetere <pieter@packed.be>
 
-=item Pieter De Praetere <pieter@packed.be>
-
-=item Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
-
-=back
+Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
 
 =head1 COPYRIGHT
 

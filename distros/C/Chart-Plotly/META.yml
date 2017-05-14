@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Chart-Plotly
   repository: https://github.com/pablrod/p5-Chart-Plotly.git
-version: '0.011'
+version: '0.012'
 x_contributors:
   - 'weatherwax <s.g.lobo@hotmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

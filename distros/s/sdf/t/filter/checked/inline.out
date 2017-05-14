@@ -1,0 +1,9 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Some text before.
+__inline[target='raw']Some inline
+__inline[target='raw']text.
+N[orig_style='N']Some middle text.
+__inline[target='raw']Some more
+__inline[target='raw']inline text.
+N[orig_style='N']Some text after.

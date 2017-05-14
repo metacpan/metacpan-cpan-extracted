@@ -16,16 +16,6 @@ has 'conf' => (
     required => 1
 );
 
-has 'release' => (
-    is      => 'rw',
-    default => 1,
-);
-
-has 'pkg_name' => (
-    is      => 'rw',
-    isa     => 'Str',
-);
-
 sub config {
     my ( $self, $key, $value ) = @_;
     die 'key must be passed'   unless $key;
@@ -33,17 +23,6 @@ sub config {
 
     return () unless $self->conf->{$key};
     return $self->conf->{$key}->{$value} || ();
-}
-
-sub get_package_name {
-    my ($self, $module) = @_;
-
-    if ($self->pkg_name) {
-        return $self->pkg_name;
-    }
-    else {
-        return $self->package_name( $module->{module} );
-    }
 }
 
 no Mouse::Role;

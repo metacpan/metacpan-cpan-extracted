@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NET::IPFilter - Perl extension for Accessing eMule / Bittorrent IPFilter.dat Files and checking a given IP against this ipfilter.dat IP Range. IT uses conversion from IP to long integers in Perl and afterwards compairing these long integer
+ranges against the calculated number of the given IP</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#dependencie">DEPENDENCIE</a></li>
+		<li><a href="#export">EXPORT</a></li>
+	</ul>
+
+	<li><a href="#see_also_torrent">SEE ALSO TORRENT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>NET::IPFilter - Perl extension for Accessing eMule / Bittorrent IPFilter.dat Files and checking a given IP against this ipfilter.dat IP Range. IT uses conversion from IP to long integers in Perl and afterwards compairing these long integer
+ranges against the calculated number of the given IP</p>
+<p>Warning: Please Update your Sources. Current Version fixed a very critical bug that prevents Program from working correctly.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use NET::IPFilter;</pre>
+<pre>
+ my $ipfilter = '/home/user/files/ipfilter.dat';
+ my $IP = &quot;3.3.19.81&quot;; # :)</pre>
+<pre>
+ my $obj = NET::IPFilter-&gt;new(  ipfilter        =&gt; $ipfilter,
+                                tmpdir          =&gt; '/var/tmp',
+                                force_init      =&gt; '0'
+);</pre>
+<pre>
+ my $isValid    = $obj-&gt;isValid($IP);   #  1 not to be blocked | 0 to be blocked
+print $isValid;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><table cellspacing="0" cellpadding="0"><tr><td>my $obj = NET::IPFilter-&gt;new(<td>ipfilter<td>=&gt; $ipfilter,
+<tr><td><td>tmpdir<td>=&gt; '/var/tmp',
+<tr><td><td>force_init<td>=&gt; '0'
+<tr><td>);</table></p>
+<p>ipfilter can be an absolute file in the filesystem or an uri. the uri filename can be a normal textfile
+or a gzip compressed file</p>
+<p>tmpdir classifies a folder where to store some temporary files</p>
+<p>force_init can be 0 or 1 where 1 means that all files are downloaded again ( if uri is an http-link )</p>
+<p>This current version is intended to be used on Linux/Unix OS System. My new Version NET::IPFilterSimple will be
+usable for both Linux/Unix and Windows. As i have no solaris or MAC i dont know how to fix the module to bring it to
+life on that mashines</p>
+<p>
+</p>
+<h2><a name="dependencie">DEPENDENCIE</a></h2>
+<p>use Carp;
+use strict;
+use 5.008008;
+use HTTP::Request;
+use LWP::UserAgent;
+use Compress::Zlib;
+use Fcntl ':flock';</p>
+<p>
+</p>
+<h2><a name="export">EXPORT</a></h2>
+<pre>
+        beautifyRawIPfromIPFilter - this function beautifies ips in the form of 222.223.208.000 to 222.223.208.0 - not used in programm</pre>
+<pre>
+        readIPFilterFile - this is the function that reads and simply preparses the ipfilter.dat file
+        
+        httpGetStore - function that downloads the ipfilter.dat file if the uri is an http link
+        
+        _ip2long - transfers an ip to a long var ( in perl its a long integer )</pre>
+<pre>
+        _long2ip - transfers an long integer back to an ip adress - not used in programm</pre>
+<pre>
+        isValid - checks a given ip against the ipfilter.dat file</pre>
+<pre>
+        gunzip - uncompression of an gzipped/zipped ipfilter.dat file in the form of ipfilter.dat.gz</pre>
+<pre>
+        _init - initialising functions</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also_torrent">SEE ALSO TORRENT</a></h1>
+<p>eMule | BitTorrent | Torrent Sites using ipfilter.dat perl modules</p>
+<p><a href="http://www.zoozle.net">http://www.zoozle.net</a></p>
+<p><a href="http://www.zoozle.org">http://www.zoozle.org</a></p>
+<p><a href="http://www.zoozle.biz">http://www.zoozle.biz</a></p>
+<p><a href="http://search.cpan.org/author/SENGER/">http://search.cpan.org/author/SENGER/</a></p>
+<p>NET::IPFilterSimple</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Sebastian Enger, bigfish82 |ät! gmail?com</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2008 by Sebastian Enger</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.</p>
+<p>If you find an algorithm that is faster then mine than please send it to my 
+email address.</p>
+<p>Currently i am going to release a module NET::IPFilterSimple that i hope is some ms faster than NET::IPFilter
+=cut
+</p>
+
+</body>
+
+</html>

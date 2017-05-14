@@ -8,38 +8,6 @@ Revision history for Class::MakeMethods.
 
 =head1 CHANGES
 
-=head2 Version 1.010
-
-=over 4
-
-=item 2004/09/06
-
-Moved get_declarations() and associated documentation from Standard module to superclass.
-
-=item 2004/09/03
-
-Developed test.pl test harness with recursive file search to fix Windows "command line too long" errors.
-
-=item 2004/09/01
-
-Moved Template::TextBuilder and Template::DiskCache into Utility:: namespace.
-
-Added support for defaults with -- and -param to Standard get_declarations().
-
-=item 2004/08/12
-
-Began testing and integrating tied-value patches from Dominique Dumont.
-
-=item 2004/04/27
-
-Added method types to Evaled::Hash.
-
-=item 2004/04/23
-
-Added skeleton of a new Evaled::Hash class.
-
-=back
-
 =head2 Version 1.009
 
 =over 4
@@ -52,7 +20,7 @@ Released to CPAN as Class-MakeMethods-1.009.tar.gz.
 
 =item 2003/09/22
 
-Added support for lvalue methods to Template and Template::Generic. Added a few tests to demonstrate they're working. Added an example to Docs::Examples.
+Added support for lvalue methods to Template and Template::Generic. Added a few tests to demonstrate it's working. Added an example to Docs::Examples.
 
 Added Emulator::accessors and compatibility tests.
 

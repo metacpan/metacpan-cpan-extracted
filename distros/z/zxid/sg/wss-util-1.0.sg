@@ -1,0 +1,38 @@
+# zxid/sg/wss-util-1.0.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: wss-util-1.0.sg,v 1.2 2007-09-30 05:10:03 sampo Exp $
+
+target(wsu, http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd)
+ns(xs,http://www.w3.org/2001/XMLSchema)
+
+%tTimestampFault:	 enum( wsu:MessageExpired ) ;
+
+@Id	 -> %xs:ID
+
+&@commonAtts: 
+  @wsu:Id?
+  @id?	 -> %xs:anyURI
+  @ID?	 -> %xs:anyURI
+  @any
+  ;
+
+%AttributedDateTime:	 base(xs:string)
+  &@wsu:commonAtts
+  ;
+
+%AttributedURI:	 base(xs:anyURI)
+  &@wsu:commonAtts
+  ;
+
+%TimestampType:
+  wsu:Created?
+  wsu:Expires?
+  any*  ns(##other)  processContents(lax)
+  &@wsu:commonAtts
+  ;
+
+Timestamp -> %wsu:TimestampType
+Expires	  -> %wsu:AttributedDateTime
+Created	  -> %wsu:AttributedDateTime
+
+#EOF

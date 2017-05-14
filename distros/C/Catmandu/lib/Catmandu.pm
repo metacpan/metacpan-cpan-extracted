@@ -2,7 +2,7 @@ package Catmandu;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0504';
+our $VERSION = '1.0506';
 
 use Catmandu::Env;
 use Catmandu::Util qw(:is);
@@ -149,6 +149,40 @@ sub import_from_string {
     my $name  = shift;
     my %opts  = ref $_[0] ? %{$_[0]} : @_;
     $class->_env->importer($name, %opts, file => \$str)->to_array();
+}
+
+sub define_importer {
+    my $class   = shift;
+    my $name    = shift;
+    my $package = shift;
+    my $options = ref $_[0] ? $_[0] : {@_};
+    $class->config->{importer}{$name}
+        = {package => $package, options => $options};
+}
+
+sub define_exporter {
+    my $class   = shift;
+    my $name    = shift;
+    my $package = shift;
+    my $options = ref $_[0] ? $_[0] : {@_};
+    $class->config->{exporter}{$name}
+        = {package => $package, options => $options};
+}
+
+sub define_store {
+    my $class   = shift;
+    my $name    = shift;
+    my $package = shift;
+    my $options = ref $_[0] ? $_[0] : {@_};
+    $class->config->{store}{$name}
+        = {package => $package, options => $options};
+}
+
+sub define_fixer {
+    my $class = shift;
+    my $name  = shift;
+    my $fixes = ref $_[0] ? $_[0] : [@_];
+    $class->config->{fixer}{$name} = $fixes;
 }
 
 1;
@@ -521,6 +555,69 @@ Return value should be an array of hashes.
         my $record = Catmandu->importer('JSON', file => \$json)->to_array()
     }
 
+=head2 define_importer
+
+Configure a new named importer.
+
+    Catmandu->define_importer(books => CSV => (fields => 'title,author,publisher'));
+    Catmandu->importer(books => (file => 'mybooks.csv'))->each(sub {
+        my $book = shift;
+        say $book->{title};
+    });
+
+    # this is equivalent to
+
+    Catmandu->config->{importer}{books} = {
+        package => 'CSV',
+        options => {
+            fields => 'title,author,publisher',
+        },
+    }
+
+=head2 define_exporter
+
+Configure a new named exporter.
+
+    Catmandu->define_exporter('books', 'CSV', fix => 'capitalize(title)');
+    my $csv = Catmandu->export_to_string({title => 'nexus'}, 'books');
+
+    # this is equivalent to
+
+    Catmandu->config->{exporter}{books} = {
+        package => 'CSV',
+        options => {
+            fix => 'capitalize(title)',
+        },
+    }
+
+=head2 define_store
+
+Configure a new named store.
+
+    Catmandu->define_store(mydb => MongoDB => (database_name => 'mydb'));
+    Catmandu->store->bag('books')->get(1234);
+
+    # this is equivalent to
+
+    Catmandu->config->{store}{mydb} = {
+        package => 'MongoDB',
+        options => {
+            database_name => 'mydb',
+        },
+    }
+
+=head2 define_fixer
+
+Configure a new named fixer.
+
+    Catmandu->define_fixer('cleanup', [
+        'trim(title)',
+        'capitalize(title)',
+        'remove_field(junk)',
+        # ...
+    ]);
+    Catmandu->fixer('cleanup')->fix($record);
+
 =head1 EXPORTS
 
 =over
@@ -672,6 +769,20 @@ Christian Pietsch, C<< christian.pietsch at uni-bielefeld.de >>
 Dave Sherohman, C<< dave.sherohman at ub.lu.se >>
 
 Jakob Voss, C<< nichtich at cpan.org >>
+
+Snorri Briem, C<< snorri.briem at ub.lu.se >>
+
+Johann Rolschewski, C<< jorol at cpan.org >>
+
+Pieter De Praetere, C<< pieter.de.praetere at helptux.be >>
+
+Doug Bell
+
+Upsana, C<< me at upasana.me >>
+
+Stefan Weil
+
+Tom Hukins
 
 =head1 QUESTIONS, ISSUES & BUG REPORTS
 

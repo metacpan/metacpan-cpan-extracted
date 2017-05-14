@@ -32,7 +32,7 @@ subtest 'AddressCreationProperties' => sub {
 };
 
 subtest 'AddressVerificationFailure' => sub {
-   plan tests => 1;
+   plan tests => 2;
 
    my $address = Net::Easypost::Address->new(
       name    => 'John Smith',
@@ -45,10 +45,16 @@ subtest 'AddressVerificationFailure' => sub {
       $address->verify
    } qr/Unable to verify address, failed with message:/,
    'Fake address fails to verify';
+
+   throws_ok {
+      my $easypost = Net::Easypost->new;
+      $easypost->verify_address();
+   } qr/verify_address expects/, 
+   'Handles invalid params ok';
 };
 
 subtest 'AddressVerificationSuccess' => sub {
-   plan tests => 1;
+   plan tests => 2;
 
    my $address = Net::Easypost::Address->new(
       name    => 'John Smith',
@@ -60,6 +66,11 @@ subtest 'AddressVerificationSuccess' => sub {
    lives_ok {
       $address->verify,
    } 'Real address verifies';
+
+   lives_ok {
+      my $easypost = Net::Easypost->new;
+      $easypost->verify_address($address);
+   } 'Address passed to base object verifies';
 };
 
 subtest 'AddressMerge' => sub {

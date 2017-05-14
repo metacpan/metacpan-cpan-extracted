@@ -1,11 +1,25 @@
 QUICK DESCRIPTION
-   Sybase::Xfer transfers data between two Sybase servers 
-   with multiple options like specifying a where_clause, 
-   a smart auto_delete option, pump data from a perl sub
-   to name a few.
-   
-   Also comes with a command line wrapper, sybxfer.
-	
+ Bulk copies data into a Sybase  table.  Data  sources  can  include  a)
+ another Sybase table, b) the results of any sql, c) the  return  values
+ from a perl subroutine called repetitively, or d) a  flat  file.  Comes
+ with robust error reporting, handling, and intercepting and  perl  call
+ back hooks to intercept  data  before  it's  sent  to  the  server  and
+ after (if errors.)
+ 
+ Also comes with a command line wrapper, sybxfer.
+
+SYNOPSIS
+ #!/usr/bin/perl
+    use Sybase::Xfer;
+    my %switches = (-from_server=>'CIA', -to_server=>'NSA', -table => 'x-files');
+    my $h = Sybase::Xfer->new( %switches );
+    my %status = $h->xfer(-return=>"HASH");
+    print "xref failed. $status{last_error_msg}\n" unless $status{ok};
+ 
+ #!/bin/ksh
+    sybxfer -from_server 'CIA' -to_server 'NSA' -table 'x-files'  
+    if [[ $? != 0 ]]; then print "transfer problems"; fi
+
 
 INSTALLATION (the usual)
    perl Makefile.PL [ LIB=<alternate installation> ]
@@ -19,65 +33,180 @@ DEPENDENCIES
 
    Requires packages:
       Sybase::DBlib
-      Getopt::Long
-      Tie::IxHash
-
-
-SYNOPSIS
-   #from perl
-      #!/usr/bin/perl5.005
-      use Sybase::Xfer;
-      $h = new Sybase::Xfer( %options );
-      $h->xfer();
-      $h->done();
-
-   #from shell
-      #!/usr/ksh
-      sybxfer <options> 
- 
-
-DESCRIPTION (from the pod)
-
-If you're in an environment with multiple servers and you don't want
-to use cross-server joins then this module may be worth a gander. It 
-transfers data from one server to another server row-by-row in memory 
-w/o using an intermediate file. 
-
-To juice things up it can take data from any set of sql commands as 
-long as the output of the sql matches the definition of the target table.
-And it can take data from a perl subroutine if you're into that. 
-
-It also has some smarts to delete rows in the target table before the
-data is transferred by several methods. See the -truncate_flag, -delete_flag
-and -auto_delete switches. 
-
-Everything is controlled by switch settings sent has a hash to the module.
-In essence one describes the from source and the to source and the module
-takes it from there. 
-
-Error handling: 
-
-An attempt was made to build in hooks for robust error reporting via perl
-callbacks. By default, it will print to stderr the data, the column names,
-and their datatypes upon error. This is especially useful when sybase reports
-attempt to load an oversized row warning message. 
-
- 
-Auto delete: 
-
-More recently the code has been tweaked to handle the condition where data
-is bcp'ed into a table but the row already exists and the desired result 
-to replace the row. Originally, the -delete_flag option was meant for this
-condition. ie. clean out the table via the -where_clause before the bcp in
-was to occur. If this is action is too drastic, however, by using the 
--auto_delete option one can be more precise and force only those rows about
-to be inserted to be deleted before the bcp in begins. It will bcp the 'key'
-information to a temp table, run a delete (in a loop so as not to blow any 
-log space) via a join between the temp table and target table and then begin
-the bcp in. It's weird but in the right situation it may be exactly what 
-you want. Typically used to manually replicate a table.
 
 
 CONTACTS
-   my e-mail: stephen.sprague@msdw.com 
+   my e-mail: stephen.sprague@morganstanley.com
 
+
+
+CHANGE LOG:
+-----------------------
+Version 0.62  01-MAR-2003  It Lives!!!
+-----------------------
+* added switch --textsize for use with 
+  bulk inserting text/images.
+  (rocco ditaranto & jon freeman)
+
+* fixed binary/varbinary/image/timestamp column 
+  xfer bug.  (rocco ditaranto)
+
+* added switch --packetsize for potentially
+  increasing bulk insert performance. 
+
+* fixed bug with Sybase::ObjectInfo.pm where
+  allownulls was always returning true.
+  (chris anecelle)
+
+* fixed bug with misreporting a float that
+  underflowed/overflowed was due to non-numeric
+  data.(Harjit Johal)
+
+* made Xfer.pm warnings (-w) compliant.
+  (Jun Wu)
+
+* fixed bug with specifying shortcut switches 
+  -T & -D for both source and target.
+
+* removed dependency on DBD::Sybase. Seems it
+  didn't play nice with Sybase::CTlib under some
+  conditions. 
+
+* fixed bug with xferring identity columns and
+  requesting the target server to create new ones.
+  ie. xfer now undef's the corresponding value.
+
+* xfer now explicitly extends the input record
+  with undef's if it's shorter than the target
+  table.
+
+
+pending:
+   * new switch --method {bcp | insert | sybbcp}  
+     (andrew lowery)
+
+   * new switch --filter "{ regex[N] => '[!] /expr/',
+                            firstrow => n,
+                            maxrows  => n}"
+
+     if regex specified w/o N, then it is applied to each
+     column of each row. if regex is specifed with N it is
+     applied to that column only where N is the column number
+     in target table.  (khalid taha)
+
+   * db2 support 
+
+
+
+
+------------------------
+Version 0.53  07-NOV-2001
+------------------------
+* added "sysUser=>u, sysPwd=>p" to the -truncate
+  and -drop_and_recreate_indices switches.
+  This is useful if the bcp needs to be run under a
+  different user than the truncate/create indices
+  user.  (abhijit subhedar)
+
+* added optimization to -delete, -truncate, and
+  -auto_delete logic to skip operation if target
+  table empty. (joe melillo)
+
+* added logic to -from_file s/t if file ends in .gz/.ZIP
+  to pipe through zcat. (khalid taha)
+
+* added new switch -from_file_pack_format 'format'. Where
+  format is passed to the unpack command to determine the
+  fields to transfer to target. This switch is mutex with
+  -from_file_delimeter. (mark dootson)
+
+
+------------------------
+Version 0.52  10-SEP-2001
+------------------------
+* corrected more errors in deadlock retry logic (Tom Cornell)
+  a) {ok} hash status wasn't properly set
+  b) rows transferred to target incorrectly set
+ 
+* -from_file can now accept a reference  (Graham Ward)
+  if reference subclassed from IO::File then xfer will
+  read input from it. Useful for reading from sockets.
+  
+
+
+
+------------------------
+Version 0.51  15-JUN-2001
+------------------------
+* added -to_database documentation (Suresh Balakrishnan)
+
+* added use 5.005. (Merijn Broeren)
+
+* added new option -timeout [secs] (Ron Isaacson)
+
+* added new option,
+  -drop_and_recreate_indices | dari [syts:server.database]
+  instructs xfer to drop the indices on the target table 
+  before the transfer begins and to recreate them after
+  the transfer is complete. 
+
+* defined scalar return context of method xfer as follows:
+  0 = success w/o any hitches
+ >0 = success w/ n number of rows not transferred
+ -1 = aborted. unrecoverable error
+ -2 = aborted. interrupt signal
+ -3 = aborted. timeout signal
+
+* added above scalar return code as 4th element to 
+  list return context. ie. array is as follows:
+  [0] = num rows read from source
+  [1] = num rows transferred to target
+  [2] = last known error message
+  [3] = scalar return code
+
+* new switch added. -return=> 'HASH' | 'ARRAY' | 'SCALAR'
+  default is SCALAR if called in scalar context and 
+  ARRAY if called in list context. This is backward
+  compatible default behavior. However, if HASH is specified
+  the method will now return:
+    {rows_read}        = number of rows read from target  
+    {rows_transferred} = number of rows transferred to target
+    {last_error_msg}   = last error message encountered   
+    {scalar_return}    = scalar return. see above.
+    {ok}               = 1 if all rows were transferred regardless
+                         of retries or warnings along the way.
+                       = 0 if not
+
+* added 'Xfer info' portion to std out. This echoes
+  -from_table, -to_table and logs pre-xfer activities
+  like deleting rows, truncating table, dropping indices
+  etc.
+
+* can now specify -to_table as:
+  [source.][server.][database.][owner.][table]
+  where source = 'Sybase' is the only supported source right
+  now. -to_table settings override -to_server, -to_database
+  settings. 
+
+* fixed double mapping bug when using -from_file_map. Also,
+  can now use -from_file_map with any source.
+
+* fixed bug with -retry_verbose (Ilya Shulimovich)
+
+* fixed bug when using -from_file and
+  file had trailing null fields. (Thomas Boccafola)
+
+* rigorous deadlock testing performed by Ilya Shulimovich (i think)
+
+* huge thanks to Ron Isaacson for enlightening me on many
+  various perl oddities and for volunteering to help me 
+  with more releases of this module. Hell, he's even starting
+  in own xfer module that'll stretch past this one.
+
+* documentation on error handling expanded. 
+  
+* added documentation in the bugs section that -to_tables
+  residing on Sybase Openserver's are not supported for the
+  target table.
+  (Peter Somu)
+  

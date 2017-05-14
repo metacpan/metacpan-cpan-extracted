@@ -26,7 +26,7 @@
 	];
 	doap:name            "Cache-Moustache";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-cache-moustache>;
@@ -50,7 +50,7 @@
 			rdfs:label "Cache::CacheTester no longer requires Cache::Cache."@en;
 		], [
 			a doap-changeset:Bugfix, doap-changeset:Documentation;
-			rdfs:label "The 'empty' method erroneously asserted that its return value was 0 or 1.";
+			rdfs:label "The `empty` method erroneously asserted that its return value was 0 or 1.";
 		], [
 			a doap-changeset:Addition, doap-changeset:Documentation;
 			rdfs:label "Mention that keys beginning '~~~~' will not have their values stored.";
@@ -113,4 +113,28 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Cache-Moustache-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-006>
+	a                    doap:Version;
+	rdfs:label           "The Horseshoe";
+	dc:identifier        "Cache-Moustache-0.006"^^xsd:string;
+	dc:issued            "2017-05-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Copyright 2017.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor optimizations.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "`remove` shouldn't ever return empty in a list context.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow `remove` to be called with a regular expression parameter.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Cache-Moustache-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
 

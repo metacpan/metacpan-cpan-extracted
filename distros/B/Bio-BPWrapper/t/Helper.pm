@@ -12,7 +12,8 @@ use File::Basename qw(dirname basename); use File::Spec;
 require Exporter;
 our (@ISA, @EXPORT);
 @ISA = qw(Exporter);
-@EXPORT = qw(run_bio_program test_file_name);
+@EXPORT = qw(run_bio_program run_bio_program_nocheck test_file_name
+             test_no_arg_opts test_one_arg_opts);
 
 my $debug = $^W;
 
@@ -33,7 +34,11 @@ sub run_bio_program($$$$;$)
 	$other_opts) = @_;
     $other_opts = {} unless defined $other_opts;
     $other_opts->{do_test} = 1 unless exists $other_opts->{do_test};
-    my $full_data_filename = test_file_name($data_filename);
+
+    my $full_data_filename = '';
+    if ($data_filename ne '/dev/null') {
+	$full_data_filename = test_file_name($data_filename);
+    }
 
     my $full_check_filename = File::Spec->catfile($dirname, 'check-data',
 						  "${bio_program}-${check_filename}");
@@ -48,8 +53,8 @@ sub run_bio_program($$$$;$)
 
     my $err_filename = $ext_file->('err');
 
-    my $cmd = "$EXECUTABLE_NAME $full_bio_progname $run_opts $full_data_filename " .
-	"2>$err_filename";
+    my $cmd = "$EXECUTABLE_NAME $full_bio_progname $run_opts $full_data_filename" .
+	" 2>$err_filename";
     print $cmd, "\n" if $debug;
     my $output = `$cmd`;
     print "$output\n" if $debug;
@@ -57,8 +62,9 @@ sub run_bio_program($$$$;$)
     my $test_rc = $other_opts->{exitcode} || 0;
     if ($other_opts->{do_test}) {
 	Test::More::note("testing " . $other_opts->{note}) if $other_opts->{note};
-	Test::More::note( "running $bio_program $run_opts $data_filename" );
-	Test::More::is($rc, $test_rc, "command ${bio_program} executed giving exit code $test_rc");
+	Test::More::note( "running $bio_program $run_opts $full_data_filename" );
+	Test::More::is($rc, $test_rc,
+		       "command ${bio_program} executed giving exit code $test_rc\n$cmd\n");
     }
     return $rc if $rc;
 
@@ -104,6 +110,61 @@ sub run_bio_program($$$$;$)
 	}
     }
 }
+
+# Runs a bioprogram but skips output checking
+sub run_bio_program_nocheck($$$;$)
+{
+    my ($bio_program, $data_filename, $run_opts, $other_opts) = @_;
+    $other_opts = {} unless defined $other_opts;
+    $other_opts->{do_test} = 1 unless exists $other_opts->{do_test};
+
+    my $full_data_filename = '';
+    if ($data_filename ne '/dev/null') {
+	$full_data_filename = test_file_name($data_filename);
+    }
+
+    my $full_bio_progname = File::Spec->catfile($dirname, '..', 'bin', $bio_program);
+
+    my $err_filename = "$$.err";
+
+    my $cmd = "$EXECUTABLE_NAME $full_bio_progname $run_opts $full_data_filename" .
+	" 2>$err_filename";
+    print $cmd, "\n" if $debug;
+    my $output = `$cmd`;
+    print "$output\n" if $debug;
+    my $rc = $CHILD_ERROR >> 8;
+    my $test_rc = $other_opts->{exitcode} || 0;
+    if ($other_opts->{do_test}) {
+	Test::More::note("testing " . $other_opts->{note}) if $other_opts->{note};
+	Test::More::note( "running $bio_program $run_opts $full_data_filename" );
+	Test::More::is($rc, $test_rc, "command ${bio_program} executed giving exit code $test_rc");
+    }
+    return $rc;
+}
+
+sub test_no_arg_opts($$$) {
+    my ($bio_program, $data_filename, $notes) = @_;
+    Test::More::note( "Testing ${bio_program} single-letter options on ${data_filename}" );
+    for my $opt (keys %$notes) {
+	run_bio_program($bio_program, $data_filename, "--${opt}", "opt-${opt}.right",
+			{note=>$notes->{$opt}});
+    }
+}
+
+
+sub test_one_arg_opts($$$) {
+    my ($bio_program, $data_filename, $opts) = @_;
+
+    for my $tup (@$opts) {
+	my ($opt, $arg, $note) = @$tup;
+	Test::More::note( "Testing ${bio_program} option-value options on ${data_filename}" );
+
+	run_bio_program($bio_program, $data_filename, "--$opt $arg",
+			"opt-$opt.right", {note=>$note});
+    }
+}
+
+
 
 # Demo program
 unless(caller) {

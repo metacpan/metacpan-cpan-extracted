@@ -732,5 +732,3 @@ they switched all their manuscripts to DocBook. L<Pod::PseudoPod> is now
 the primary parser for PseudoPod, and includes
 L<Pod::PseudoPod::DocBook> to generate DocBook output suitable for
 submission to O'Reilly.
-
-=end

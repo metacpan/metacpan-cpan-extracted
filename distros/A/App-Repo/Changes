@@ -1,0 +1,6 @@
+0.08: added -p option to refresh packages; removed Mojolicious::Plugin::Directory
+0.06: CydiaIcon.png is copied to same directory as Packages.gz, used as repository icon in Cydia on iOS; Packages.gz now containFile Size and Filename fields
+0.02: changed usage; repo now goes into backgroud by default
+0.09: using system ar, until i fix perl ar setup
+
+

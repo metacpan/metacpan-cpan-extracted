@@ -1,0 +1,18 @@
+---
+abstract: 'EasyLists for Squid(Guard)'
+author:
+  - 'Axel Miesen <mail@am42.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-elsquid
+requires:
+  Config::IniFiles: '0'
+  perl: '5.010'
+version: '0.15'

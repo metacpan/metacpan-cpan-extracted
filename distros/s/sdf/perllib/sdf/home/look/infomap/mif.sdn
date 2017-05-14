@@ -1,0 +1,180 @@
+# $Id$
+#
+# >>Title::	Infomap MIF Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# This module provides the mif objects required for the infomap look.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Inherit what we can from the simple look
+!use "look/simple/mif.sdn"
+
+# Tune the change bar positioning
+!define MIF_CH_BAR_POSITION "NearestEdge"
+
+################ General formatting rules ###################
+
+# Place lines above each information block (level 3 heading).
+# Note that we have to tranfer the top attribute so that the
+# line stays on the same page as the heading.
+!on paragraph '[HAP]3'   ;; \
+    if ($attr{'top'}) { \
+        &PrependText("Line[keep_next;top=$attr{'top'}]"); \
+        delete $attr{'top'}; \
+    } \
+    else { \
+        &PrependText("Line[keep_next]"); \
+    }
+
+# Place lines at the end of each information map (level 2 section)
+!if MIF_BOOK_MODE
+    !on paragraph '[HAP]2';; if ($level >= 3 && !$attr{'component'}) \
+        {&PrependText("Line[keep_prev]")}
+    !macro DOC_COMPONENT_END
+        !if $var{'DOC_COMPONENT'} eq 'pretoc'
+            Line[keep_prev; wide]
+        !else
+            Line[keep_prev]
+        !endif
+    !endmacro
+!else
+    !on paragraph '[HAP][12]';; if ($level >= 3) {&PrependText("Line[keep_prev]")}
+    !block end
+    !if $level >= 3
+    Line[keep_prev]
+    !endif
+    !endblock
+!endif
+
+# Place level 2 headings at the start of a new page unless the
+# previous heading was level 1. Also prepend "continued on next page"
+# if this heading simply contines a previous one.
+!on paragraph '[HAP]2';; \
+    if (!defined($attr{'top'})) {\
+        $attr{'top'} = 1 unless $level == 1; \
+    } \
+    if ($attr{'continued'}) { \
+        &PrependText("CONTINUED:Continued on next page"); \
+    }
+
+
+
+################ Override the heading paragraph formats ###################
+
+!targetobject "Para"; "h1_Heading"; "h1_Heading"; \
+  Alignment=Center; \
+  LIndent=0; \
+  NumFormat='H:Chapter <n+\>. '; \
+  SpAfter="12.0 pt"
+
+!targetobject "Para"; "h2_Heading"; "h2_Heading"; \
+  AutoNum=0; \
+  FontSize="16.0 pt"; \
+  LIndent=0; \
+  NumFormat=""; \
+  SpBefore="12.0 pt"
+
+!targetobject "Para"; "h3_Heading"; "h3_Heading"; \
+  AutoNum=0; \
+  FontFamily=Times; \
+  FontSize="11.0 pt"; \
+  LIndent=0; \
+  NumFormat=""; \
+  PlacementStyle="SideheadTop"; \
+  SpAfter="10.0 pt"; \
+  SpBefore="10.0 pt"
+
+!targetobject "Para"; "h4_Heading"; "h3_Heading"; \
+  PlacementStyle=Normal; \
+  SpAfter="6.0 pt"
+
+!targetobject "Para"; "h5_Heading"; "b0_Body"; \
+  FontUnderlining="FSingle"; \
+  PlacementStyle="RunIn"; \
+  RunInDefaultPunct=": "
+
+!targetobject "Para"; "a1_Appendix"; "a1_Appendix"; \
+  Alignment=Center; \
+  LIndent=0; \
+  NumFormat='A:Appendix <A+\>. '; \
+  SpAfter="12.0 pt"
+
+!targetobject "Para"; "p1_PlainHeading"; "p1_PlainHeading"; \
+  Alignment=Center; \
+  SpAfter="12.0 pt"
+
+# Other than the first level, appendix and plain headings are the same as
+# the normal headings
+!targetobject "Para"; "a2_Appendix";     "h2_Heading"
+!targetobject "Para"; "a3_Appendix";     "h3_Heading"
+!targetobject "Para"; "a4_Appendix";     "h4_Heading"
+!targetobject "Para"; "p2_PlainHeading"; "h2_Heading"
+!targetobject "Para"; "p3_PlainHeading"; "h3_Heading"
+!targetobject "Para"; "p4_PlainHeading"; "h4_Heading"
+
+# NoTOC versions for headings excluding from the contents
+!targetobject "Para"; "h1_HeadingNoTOC";      "h1_Heading"; AcrobatLevel=0
+!targetobject "Para"; "h2_HeadingNoTOC";      "h2_Heading"; AcrobatLevel=0
+!targetobject "Para"; "h3_HeadingNoTOC";      "h3_Heading"; AcrobatLevel=0
+!targetobject "Para"; "h4_HeadingNoTOC";      "h4_Heading"; AcrobatLevel=0
+!targetobject "Para"; "a1_AppendixNoTOC";     "a1_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "a2_AppendixNoTOC";     "a2_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "a3_AppendixNoTOC";     "a3_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "a4_AppendixNoTOC";     "a4_Appendix"; AcrobatLevel=0
+!targetobject "Para"; "p1_PlainHeadingNoTOC"; "p1_PlainHeading"; AcrobatLevel=0
+!targetobject "Para"; "p2_PlainHeadingNoTOC"; "p2_PlainHeading"; AcrobatLevel=0
+!targetobject "Para"; "p3_PlainHeadingNoTOC"; "p3_PlainHeading"; AcrobatLevel=0
+!targetobject "Para"; "p4_PlainHeadingNoTOC"; "p4_PlainHeading"; AcrobatLevel=0
+
+
+################ Override phrase formats ###################
+
+# Make attribute labels the same as level 3 headings
+!targetobject "Phrase"; "AttributeLabel"; "AttributeLabel"; \
+  Family=Times; \
+  Size="11.0 pt"
+
+
+################ Override reference page frames ###################
+
+!targetobject "Frame"; "Note Above";; \
+  Height=17;\
+  Pen=4; \
+  PenWidth=0.5; \
+  LineY=6; \
+  LineLength=DOC_FULL_WIDTH
+
+!targetobject "Frame"; "Note Below";; \
+  Height=17;\
+  Pen=4; \
+  PenWidth=0.5; \
+  LineY=6; \
+  LineLength=DOC_FULL_WIDTH
+
+
+################ Template specific stuff ###################
+
+!block parastyles
+Name        To
+CONTINUED   Continued
+!endblock
+
+!targetobject "Para"; "Continued"; "b0_Body"; \
+  Alignment=Right; \
+  FontAngle=Italic; \
+  FontSize=10; \
+  WithPrev=1

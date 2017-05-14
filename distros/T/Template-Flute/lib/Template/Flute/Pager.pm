@@ -5,7 +5,6 @@ use warnings;
 
 use Moo;
 use Sub::Quote;
-use Data::Page;
 
 =head1 NAME
 
@@ -13,23 +12,23 @@ Template::Flute::Pager - Data::Page class for Template::Flute
 
 =head1 SYNOPSIS
 
-    $pager = Template::Flute::Pager->new;
+    $paginator = Template::Flute::Paginator->new;
 
     # set page size
-    $pager->page_size(10);
+    $paginator->page_size(10);
 
     # retrieve number of pages
-    $pager->pages;
+    $paginator->pages;
 
-    # retrieve current page (numering starts at 1)
-    $pager->current_page;
+    # retrieve current page (starting with 1)
+    $paginator->current_page;
 
     # retrieve global position numbers for current page
-    $pager->position_first;
-    $pager->position_last;
+    $paginator->position_first;
+    $paginator->position_last;
 
-    # select a page (numbering starts at 1)
-    $pager->select_page(5);
+    # select a page (starting with 1)
+    $paginator->select_page;
 
 =head1 ATTRIBUTES
 
@@ -42,7 +41,7 @@ Pager iterator.
 has iterator => (
     is => 'rw',
     lazy => 1,
-    default => quote_sub q{return Data::Page->new;},
+#    default => quote_sub q{return Data::Pager->new;},
 );
 
 =head2 page_size
@@ -113,7 +112,7 @@ sub current_page {
 
 =head2 select_page {
 
-Select page.  Page numbering starts at 1.
+Select page, starting from 1.
 
 =cut
 
@@ -126,8 +125,6 @@ sub select_page {
 
 =head2 position_first
 
-Returns global position number of first item on current page.
-
 =cut
 
 sub position_first {
@@ -137,8 +134,6 @@ sub position_first {
 }
 
 =head2 position_last
-
-Returns global position number of last item on current page.
 
 =cut
 
@@ -223,7 +218,7 @@ Stefan Hornburg (Racke), <racke@linuxia.de>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2010-2014 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

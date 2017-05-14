@@ -1,0 +1,229 @@
+=head1 NAME
+
+Java::Import::Design - The design of the Java::Import Module
+
+=head1 MOTIVATIONS
+
+The original motivation for writing this module came out of a project I was working on during my previous employment.
+We had built a system in which a major part was implimented using EJBs on a J2EE server.  In addition, we had a large
+component of the system, that already existed, and was written in Perl.  We did not want to scrap our Perl work but
+it was becoming more tedious to maintain two implimentations as more and more things were being added to the system.  
+So, we decided that the major pieces of business logic would reside on the J2EE server and the Perl would be modified
+to make calls to the server.  After some time and experimentation we began to realize that the memory footprint as well
+as the amount of time needed to make calls to the server using existing Perl to Java integration sulutions were just
+not acceptable.  We therefore set out to find some other way.  We tried all sorts of things but in the end we couldn't 
+find anything that met our requirements and therefore decided to keep the origional system of doing things.
+
+While at that job we never did find a suitable way to integrate our two systems.  However, the problem still haunted me.  
+It wasn't until the end of my career at that company that I saw an announcement for Google's first Summer of Code.  It 
+just so happened that as Google was announcing their brand new program that I had begun to play with the GNU GCJ suite 
+of Java tools and came up with the idea of taking advantage of their ability to natively compile Java code for use with
+Perl.  This may not have been a new idea but I couldn't find anything that would help me so I decided to write and submit
+a proposal to Google.  Well, I was accepted and you now have Java::Import.
+
+When I began to work on this project I started by creating my own namespace instead of stepping on the toes of the other 
+existing Java/Perl integration project, Inline::Java.  I did this primarily because I wanted a clean slate on which I 
+could fully explore the nuances of GCJ, in particular it's CNI interface.  As I worked my module started to evolve into 
+it's own beast and at that point it seemed locigal to keep my own namespace.  It is not my intention to replace 
+Inline::Java and I still think that in te future much of the work I have done can be used by Inline::Java as an option
+to use GCJ specific functionality.
+
+=head1 DESIGN DETAILS
+
+=head2 Wrapping Java Reflection
+
+The main device used by this module for interacting with Java is Java reflection itself.  This is done through a Java
+class that wraps the operations that can be carried out by Java reflection.  The main interface to this class is:
+
+  public class ObjectWrapper {
+    public ObjectWrapper ();
+    public boolean perl_isa (String classname);
+    public boolean can (String methodname);
+    public String toString ();
+    public boolean isArray ();
+    public ObjectWrapper invokeMethod (String methodname, ArgumentArray arguments);
+    public ObjectWrapper getLastThrownException ();
+    public ObjectWrapper getField (String fieldname);
+    public void setField (String fieldname, ObjectWrapper value);
+    public ObjectWrapper getLastStaticThrownException ();
+    public ObjectWrapper newClassInstance (String classname, ArgumentArray arguments);
+    public ObjectWrapper invokeStaticMethod (String classname, String methodname, ArgumentArray arguments);
+    public ArrayWrapper newJavaArray (String classname, int numberElements);
+  }
+
+The interface is as follows:
+
+=over 4
+
+=item ObjectWrapper()
+
+The default Constructor
+
+=item boolean perl_isa ( String classname )
+
+Returns whether the Object held by this ObjectWrapper instance can be assigned to classname.
+
+=item boolean can ( String methodname )
+
+Returns whether the Object held by this ObjectWrapper instance can perform methodname.
+
+=item String toString ( )
+
+Calls toString () on the Object held by this instancce of ObjectWrapper.
+
+=item boolean isArray ( ) 
+
+Returns whether the Object held by this instance of ObjectWrapper is a Java Array.
+
+=item ObjectWrapper invokeMethod ( String methodname, ArgumentArray arguments )
+
+Invokes methodname on the wrapped Java Object with the incluuded arguments and returns the wrapped return value.
+
+=item ObjectWrapper getLastThrownException ( )
+
+Returns the last wrapped exception thrown by the wrapped Object.
+
+=item ObjectWrapper getField ( String fieldname )
+
+Returns the wrapped Object corresponding to fieldname
+
+=item void setField ( String fieldname, ObjectWrapper value )
+
+Sets the field wrapped by this Object to the Object wrapped by value.
+
+=item ObjectWrapper getLastStaticThrownException ( )
+
+Returns the last wrapped exception thrown by a static method.
+
+=item ObjectWrapper newClassInstance ( String classname, ArgumentArray arguments ) 
+
+Calls the constructor on class classname with arguments and returns the wrapped return value
+
+=item ObjectWrapper invokeStaticMethod ( String classname, String methodname, ArgumentArray arguments )
+
+Calls classname.staticmethod and returns the wrapped return value
+
+=item ArrayWrapper newJavaArray ( String classname, int numberElements ) 
+
+Creates a Java array numberElements long which can hold elements of type classname
+
+=back
+
+This interface is then wrapped using SWIG and made available to Perl as a pseudo class via the Java::Wrapper package.
+
+=head2 Intercepting Calls to Java Classes
+
+When Java::Import is "used" you must give it a list of Java classes that you intend on using, incidentially these classes must
+also be reachable from the standard Java CLASSPATH variable.  The Java::Import package then dynamically sets up a namaspace for
+each class you specify.  For instance, the following code will setup two Perl namespaces "java::lang::StringBuffer" and
+"org::myorg::mypackage::MyClass":
+
+  use Java::Import qw (
+    java.lang.StringBuffer
+    org.myorg.mypackage.MyClass
+  );
+
+These new namespaces will each inherit from a Perl Proxy class that will intercept all method calls and forward them to the above 
+explained ObjectWrapper class bound under the Java::Wrapper namespace.  This is done by catching method calls to the 
+evaled namespace through the inherited classes AUTOLOAD method.  Once in AUTOLOAD, the method is extrapolated, the arguments are
+wrapped, invokeMethod is called, and finally the return value is wrapped in a Perl Proxy so that all calls to it may also be
+intercepted.  'new' works in a similar way except that it is explicitly defined instead of AUTOLOADed and the newInstance method
+is called on ObjectWrapper instead of invokeMethod.  In addition static methods are handled via autoloading as well but produce 
+calls to invokeStaticMethod.
+
+=head2 Capturing Java Exceptions
+
+If a Java method throws an exception it is caught by the ObjectWrapper class and stored internally.  After every call to a Java 
+method the ObjectWrapper is asked whether it has caught an exception by either calling getLastThrownException or 
+getLastStaticThrownException, depending on what type of method was called.  If an exception is returned by one of the previous 
+method calls it is wrapped in a Perl Proxy and thrown by a call to 'die'.  The calling Perl program can then access the thrown
+exception via the $@ variable and test what type is is by calling it's 'isa' method.  Exception objects are just like any other
+Java Objects including having their method calls intercepted and passed onto Java reflection.
+
+=head2 Java Arrays
+
+Reflection calls to Java arrays are handled by the ArrayWrapper class with the following interface:
+
+  public class ArrayWrapper extends ObjectWrapper {
+    public ArrayWrapper (String containsclass, int numelements);
+    public int getSize ();
+    public void set (ObjectWrapper value, int index);
+    public ObjectWrapper get (int index);
+    public String toString ();
+    public static ArrayWrapper getObjectAsArray (ObjectWrapper array);
+  }
+
+=over 4
+
+=item ArrayWrapper ( String containsclass, int numelements )
+
+Constructor to create a Java array object for holding numelements of type containsclass.
+
+=item int getSize ( )
+
+Returns the size of the contained array.
+
+=item void set ( ObjectWrapper value, int index )
+
+Sets element index of the contained array object to value.
+
+=item ObjectWrapper get ( int index )  
+
+Returns the element at index of the contained object.
+
+=item String toString ( )
+
+Calls toString on every element and returns the concatenaded value.
+
+=item ArrayWrapper getObjectAsArray ( ObjectWrapper array ) 
+
+Casts array to type ArrayWrapper and returns the value.  Returns null/undef if the cast fails.
+
+=back
+
+Everytime an ObjectWrapper is returned from a Java method it's isArray method is called to check if it is an array.  
+If true, getObjectAsArray is called and the resulting value is tied to the TieJavaArray Perl class to allow Perl
+style array acces to occur.  The tied refference is then returned.  This allow something like the following to work:
+
+  my $sb_class = java::lang::Class->forName(jstring("java.lang.StringBuffer"));
+  my $constructors = $sb_class->getConstructors();
+  
+  foreach my $constructor ( @$constructors ) {
+    if ( $constructor->isa('java::lang::reflect::Constructor') ) {
+      print "$constructor\n";
+    }
+  }
+
+The TieJavaArray Perl class allows accary access calls to b routed to the propper methods on the Java ArrayWrapper class.
+
+If a Java array is necessary as an argument to a method you can create one with the Java::Import::newJavaArray method.  You 
+give it as arguments, the type of the array and the number of elements it will hold.  The return value is a tied array refference
+that can be use just as the one in the example above, as well as passed into method as arguments.
+
+=head2 Arguments
+
+Arguments to Java classes are handled by the ArgumentArray class.  To the user of a Java class in Perl this isn't even known.  The
+main purpose of the ArgumentArray is to allow the invokeMethod, invokeStaticMethod and newInstance methods to take an arbitrary 
+amount of arguments.  This class is a simple wrapper around an array.  When one of the invoke methods is called, the Perl Proxy 
+packages the arguments into an ArgumentArray and passes them to the propper ObjectWrapper method for processing.  The ArgumentArray
+can only hold elements of type ObjectWrapper; this is why ArrayWrapper inherits from ObjectWrapper.
+
+=head2 Primitives
+
+Java Primitives are as of yet an unresolved matter.  With the exception of the char, boolean, String (kind of primitive), and
+byte types precision is almost certainly lost when converting from Java to Perl.  This is due to the difference in size.
+
+When passing primitives into a Java method they must first be wrapped in their Object form.  This is done by calling the 
+corresponding Java::Import::jXXX method where XXX is the java primitive type being wrapped.  For instance, to pass an int value
+into a Java method you must first call Java::Import::jint($n) and pass the returned wrapped Object instead.
+
+=head1 FUTURE STEPS
+
+Since GCJ's CNI interface has more in common with C++ (In fact it is C++) it may make more sense for some of this 
+functionailty to meld with the Inline::CPP module instead of Inline::Java.  This is something that I am currently 
+working on and is not covered in the proposal for this project so is not covered in this document. Please watch CPAN
+for work on this module.
+
+=head1 CONTACT
+
+David Rusek <rusekd@cpan.org>

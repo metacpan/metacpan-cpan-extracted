@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: Business-ReportWriter
+version: 0.09
+author:
+  - Kaare Rasmussen <kar at jasonic.dk>
+abstract: ! >-
+  A Business Oriented ReportWriter. Currently supports PDF and OpenOffice
+  Calc.
+license: perl
+requires:
+  OpenOffice::OOBuilder: 0
+  PDF::API2: 0.40
+  perl: 5.8.3
+provides:
+  Business::ReportWriter:
+    file: lib/Business/ReportWriter.pm
+  Business::ReportWriter::OOCalc:
+    file: lib/Business/ReportWriter/OOCalc.pm
+  Business::ReportWriter::Pdf:
+    file: lib/Business/ReportWriter/Pdf.pm
+  Pdf:
+    file: lib/Business/ReportWriter/Pdf.pm
+generated_by: Module::Build version 0.26

@@ -55,7 +55,7 @@ resources:
   bugtracker: https://github.com/miyagawa/cpanminus/issues
   homepage: https://github.com/miyagawa/cpanminus
   repository: https://github.com/miyagawa/cpanminus.git
-version: '1.9004'
+version: '1.9005'
 x_contributors:
   - 'Aaron Moses <mosesa02@localhost.localdomain>'
   - 'Alessandro Ghedini <al3xbio@gmail.com>'

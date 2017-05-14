@@ -409,4 +409,107 @@ use Scalar::Util 'refaddr';
   is @{$dom->find('#list dd')}, 2;
 }
 
+{
+  my $dom = Template::Lace::DOM->new(qq[
+    <html>
+      <head>
+        <title></title>
+      </head>
+      <body>
+        <p id='story'>...</p>
+      </body>
+    </html>
+  ]);
+
+  $dom->title('CTX')
+    ->ctx(\my @cap, sub {
+        my ($self, $data) = @_;
+        $_->at('#story')->content($data);
+      }, "Don't look down");
+
+  is $dom->at('title')->content, 'CTX';
+  is $dom->at('#story')->content, 'Don&#39;t look down';
+  ok $cap[0];
+}
+
+#do
+{
+  my $dom = Template::Lace::DOM->new(q[
+    <section>
+      <h2>title</h2>
+      <ul id='stuff'>
+        <li></li>
+      </ul>
+      <ul id='stuff2'>
+        <li>
+          <a class='link'>Links</a> and Info: 
+          <span class='info'></span>
+        </li>
+      </ul>
+
+      <ol id='ordered'>
+        <li></li>
+      </ol>
+      <dl id='list'>
+        <dt>Name</dt>
+        <dd id='name'></dd>
+        <dt>Age</dt>
+        <dd id='age'></dd>
+      </dl>
+      <a>Link</a>
+    </section>
+  ]);
+
+  $dom->do(
+    'section h2' => sub { $_->content('<blick>Wrathful Hound</blick>') },
+    '#stuff', [qw/aaa bbbb ccc/],
+    '#stuff2', [
+      { link=>'1.html', info=>'one' },
+      { link=>'2.html', info=>'two' },
+      { link=>'3.html', info=>'<b>three</b>' },
+    ],
+    '#ordered', sub { $_->fill([qw/11 22 33/]) },
+    '#list', +{
+      name=>'joe', 
+      age=>'32',
+    },
+    'a@href' => 'localhost://aaa.html',
+  );
+
+  is @{$dom->find('#stuff li')}, 3;
+  is @{$dom->find('#stuff2 li')}, 3;
+  is @{$dom->find('#ordered li')}, 3;
+  is @{$dom->find('#list dd')}, 2;
+}
+
 done_testing;
+
+__END__
+
+  my $dom = Template::Lace::DOM->new(q[
+    <section>
+      <h2 data-page='title'>title</h2>
+      <ul>
+        <li data-page='todos'
+          data-todo='title'>TODOS</li>
+      </ul>
+      <ul>
+        <li data-page='status'>
+          <a data-status='infolink'
+            data-status='description'>Links</a>
+          and Info:<span data-status='details'>Details</span>
+        </li>
+      </ul>
+
+      <ol id='ordered'>
+        <li></li>
+      </ol>
+      <dl id='list'>
+        <dt>Name</dt>
+        <dd id='name'></dd>
+        <dt>Age</dt>
+        <dd id='age'></dd>
+      </dl>
+    </section>
+  ]);
+

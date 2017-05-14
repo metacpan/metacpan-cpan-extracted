@@ -1,0 +1,33 @@
+/* XPM */
+static char *scale[] = {
+/* width height ncolors chars_per_pixel */
+"19 21 5 1",
+/* colors */
+". c #FCFEFC",
+"x c #C4C2C4",
+"X c #848284",
+"o c #040204",
+"  s None c None",
+/* pixels */
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+" XXXXXXXXXXXXXXXXX ",
+" Xoooooooooooooooo ",
+" Xoxxxxxxxxxxxxxxx ",
+" Xoxxxxxxxxxxxxxxx ",
+" Xoxxxxxxxxxxxxxxx ",
+" Xoxxxxxoxxxxxoxxx ",
+" Xoxxxxxoxxoxxoxxx ",
+" XoxxxxxxxoXoxxxxx ",
+" Xoxxxxxxox.Xoxxxx ",
+" Xoxxxxxox...Xoxxx ",
+" Xo.....ox...Xo... ",
+"  xxxxxxoXXXXXoxxx ",
+"        ooooooo    ",
+"                   ",
+"                   ",
+"                   "
+};

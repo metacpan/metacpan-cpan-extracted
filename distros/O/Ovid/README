@@ -1,0 +1,46 @@
+This is the README file for Ovid, which recursively builds CPAN modules and all dependent modules as
+RPM files.
+
+Each RPM that Ovid generates lists all its required files so rpm tools like apt-get (the rpm version),
+urpm, yum and others can find and install them as dependencies.
+Ovid puts an end to manual dependency chasing madness!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternately, if you are on an RPM based system, type the following to build an RPM file:
+
+  rpmbuild -ta Ovid-<version>.tar.gz
+
+For a version 0.01, you would type
+
+  rpmbuild -ta Ovid-0.01.tar.gz
+
+After the RPM is built, type:
+
+  rpm -i /path/to/rpm/file
+
+
+DEPENDENCIES
+
+This module requires that the CPAN module be installed and configured.
+It also uses the following standard perl modules:
+
+  Exporter
+  File::Basename
+  POSIX
+  File::Copy
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Gyepi Sam <gyepi@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ArrayMeasurement" db_column="type"  cv_table="AM_Type">
+  <comment type="definition">This controlled
+vocabulary describes what type of data is stored in the AM_Spots table
+for this AM. The two major classifications are 'primary' and 'derived'
+and each of those has further sub-classifications.
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. The values are
+used during data import.</comment>
+<term name="primary_raw"
+        description="the unmodified numbers directly from the instrument"/>
+<term name="derived_other"
+        description="an AM derived mathematically from other primary
+measurements, that are not replicate averages or ratios"/>
+<term name="derived_ratio"
+        description="a ratio of two values is reported, between the
+averaged values of treatment replicates and the averaged value of
+control replicates for the Treatment that reference this AM as its
+derived ratio AM"/> 
+<term name="derived_averaged_replicate"
+        description="an AM whose spot values have been computed by
+averaging across the spot values for all 'background_corrected' AM's in
+the same replicate grouping"/>
+<term name="background"
+        description="refers to an ArrayMeasurement that represents the
+per-spot background (noise) values"/> 
+<term name="background_corrected"
+        description="the primary raw value has had the background subtracted"/>
+<term name="primary_no_data"
+        description="an AM that has no associated AMS rows but
+contains the sample info. For data that has been submitted as a
+derived averaged replicate"/> 
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->
+
+

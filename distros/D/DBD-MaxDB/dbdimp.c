@@ -7,23 +7,14 @@
 
 \if EMIT_LICENCE
 
-    ========== licence begin  GPL
-    Copyright (c) 2001-2005 SAP AG
+    ========== licence begin  SAP
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+    (c) Copyright 2001-2006 SAP AG
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    All rights reserved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     ========== licence end
+
 
 
 
@@ -222,6 +213,8 @@ typedef enum
     DBD_ERR_VALUE_OVERFLOW_D,
     DBD_ERR_PARAMETER_NOT_SET_D,
     DBD_ERR_PARAMETER_IS_NOT_INPUT_D,
+    DBD_ERR_FETCH_UNKNOWN,
+    DBD_ERR_FEATURE_NOT_SUPPORTED
 }dbd_maxdb_errorcode;    
 
 typedef struct dbd_maxdb_errordata
@@ -248,7 +241,11 @@ static dbd_maxdb_errordata errordata[] =
     { DBD_ERR_VALUE_OVERFLOW_D,          -11010 ,  "",     "Value overflow for column/paramter %d."},
     { DBD_ERR_PARAMETER_NOT_SET_D,       -11011 ,  "07002","Parameter/Column (%d) not bound."},
     { DBD_ERR_PARAMETER_IS_NOT_INPUT_D,  -11012 ,  "07002","Parameter for column (%d) is not an out/inout parameter."},
+    { DBD_ERR_FETCH_UNKNOWN  , 		       -11013 ,  "",     "Internal fetch error. Indicator value is: %d."},
+    { DBD_ERR_FEATURE_NOT_SUPPORTED  ,   -11014 ,  "",     "Feature \"%s\" is not supported."},
 };
+
+static int dbd_maxdb_st_blob_read2 (SV *sth, imp_sth_t *imp_sth, int field, long offset, long len, SV *destrv, long destoffset, SQLDBC_Length *indicator);
 
 static SV* referenceDefaultValue  = NULL;
 
@@ -262,6 +259,26 @@ static void dbd_maxdb_delete_params(dbd_maxdb_bind_param* params, int parCnt) {
   }
 }
 
+static void hexDump(char* buffer, int bufferLen){
+	int i;
+  PerlIO_stdoutf("\n HEXDUMP: >");
+	for (i=0; i<bufferLen; i++){
+     PerlIO_stdoutf( "%02.2X", (unsigned char)buffer[i]);
+  }
+  PerlIO_stdoutf( "<\n");
+}
+/*
+static SQLDBC_StringEncodingType_Encoding getEncoding (SV* val, imp_dbh_t *imp_dbh){
+	if (val){
+		if (SvUTF8(val)) 
+		  return SQLDBC_StringEncodingType_Encoding_UTF8; 
+		else
+		  return SQLDBC_StringEncodingType_Encoding_Ascii;
+	} else {
+		  return imp_dbh->m_stmt_encoding;
+	 }	
+}
+*/
 /***************************************************************************
  *
  *  Name:    dbd_init
@@ -365,6 +382,7 @@ int dbd_maxdb_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *url, char *user, char
   char *host,*dbname;
   D_imp_drh_from_dbh;
   int i, usernameLen, passwdLen;
+  SQLDBC_StringEncodingType_Encoding usernameEncoding = SQLDBC_StringEncodingType_Encoding_Ascii;
   
   DBD_MAXDB_METHOD_ENTER(imp_dbh, dbd_maxdb_db_login6); 
 
@@ -406,6 +424,7 @@ int dbd_maxdb_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *url, char *user, char
                            };
       imp_dbh->m_connprop = SQLDBC_ConnectProperties_new_SQLDBC_ConnectProperties();
       imp_dbh->m_stmt = NULL;
+      imp_dbh->m_readlongcompletly = SQLDBC_FALSE;
      
       sv_key = hv_delete(hash, "HOST", 4, 0); /* avoid later STORE */ 
       host = SvPV(sv_key, svl); 
@@ -413,6 +432,17 @@ int dbd_maxdb_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *url, char *user, char
       sv_key = hv_delete(hash, "DBNAME", 6, 0); /* avoid later STORE */ 
       dbname = SvPV(sv_key, svl); 
 
+      sv_key = hv_delete(hash, ENCODING, sizeof(ENCODING)-1, 0); /* avoid later STORE */ 
+      if (sv_key && SvIV(sv_key)== ENCODING_UTF8){
+	      	usernameEncoding =  SQLDBC_StringEncodingType_Encoding_UTF8;
+    	    SQLDBC_ConnectProperties_setProperty  ( imp_dbh->m_connprop, "UNICODE", "1"); 
+	    } else {
+	      	usernameEncoding =  SQLDBC_StringEncodingType_Encoding_Ascii;
+	    } 
+      if (DBIc_DBISTATE(imp_dbh)->debug >= 2){
+              PerlIO_printf(DBIc_LOGPIO(imp_dbh), "        user/password encoding is %s\n",
+                            (usernameEncoding==SQLDBC_StringEncodingType_Encoding_UTF8)?"UTF8":"ASCII");
+      }      
       if (user && !*user){
         sv_key = hv_delete(hash, "USERNAME", 8, 0); /* avoid later STORE */ 
         if (sv_key){
@@ -446,17 +476,24 @@ int dbd_maxdb_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *url, char *user, char
     dbd_maxdb_internal_error(dbh, DBD_ERR_INITIALIZATION_FAILED_S, "missing imp_dbh handle");
     DBD_MAXDB_METHOD_RETURN(imp_dbh, dbd_maxdb_db_login6, SQLDBC_FALSE); 
   } 
-
+  
+  
   /* upper/lower case hanndling for username/password */
   if (user &&(usernameLen = strlen(user))){
     if (user[0]!= '"' || user[usernameLen-1] != '"'){
       for (i=0; i<usernameLen; i++) user[i]=toupper(user[i]);
-    }
+    } else {
+    	user[usernameLen-1]= 0;
+    	user++;
+    }	
   }
 
   if (password && (passwdLen = strlen(password))){
     if (password[0]!= '"' || password[passwdLen-1] != '"'){
       for (i=0; i<passwdLen; i++) password[i]=toupper(password[i]);
+    } else {
+    	password[passwdLen-1]= 0;
+    	password++;
     }
   }
 
@@ -479,11 +516,13 @@ int dbd_maxdb_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *url, char *user, char
     dbd_maxdb_internal_error(dbh, DBD_ERR_INITIALIZATION_FAILED_S, "Cannot get connection from environment");
     DBD_MAXDB_METHOD_RETURN(imp_dbh, dbd_maxdb_db_login6, SQLDBC_FALSE); 
   }
-  if (! SQLDBC_Connection_connectASCII(imp_dbh->m_connection, 
+
+  if (! SQLDBC_Connection_connectNTS(imp_dbh->m_connection, 
                                        host, 
                                        dbname, 
                                        user, 
                                        password, 
+                                       usernameEncoding,
                                        imp_dbh->m_connprop)==SQLDBC_OK){
     dbd_maxdb_sqldbc_error(dbh, SQLDBC_Connection_getError(imp_dbh->m_connection)) ;
     DBD_MAXDB_METHOD_RETURN(imp_dbh, dbd_maxdb_db_login6, SQLDBC_FALSE); 
@@ -590,29 +629,6 @@ int dbd_maxdb_db_disconnect(SV* dbh, imp_dbh_t* imp_dbh) {
 
 /***************************************************************************
  *
- *  Name:    dbd_discon_all
- *
- *  Purpose: Disconnect all database handles at shutdown time
- *
- *  Input:   dbh - database handle being disconnected
- *           imp_dbh - drivers private database handle data
- *
- *  Returns: TRUE for success, FALSE otherwise; do_error has already
- *           been called in the latter case
- *
- **************************************************************************/
-
-int dbd_discon_all (SV *drh, imp_drh_t *imp_drh) {
-#if defined(dTHR)
-  dTHR;
-#endif
-    DBD_MAXDB_METHOD_ENTER(imp_drh, dbd_discon_all); 
-    DBD_MAXDB_METHOD_RETURN(imp_drh, dbd_discon_all, SQLDBC_FALSE); 
-}
-
-
-/***************************************************************************
- *
  *  Name:    dbd_db_destroy
  *
  *  Purpose: Our part of the dbh destructor
@@ -682,25 +698,27 @@ static dbd_maxdb_cmdKeywordTable dbh_sqlmodeTab [ ]= {
 #define DBD_MAXDB_SQLMODETABLESIZE  (sizeof(dbh_sqlmodeTab) /sizeof(dbd_maxdb_cmdKeywordTable))
 
 typedef enum {    
-  dbd_maxdb_option_autocommit     =  1,
-  dbd_maxdb_option_isolationlevel =  2,
-  dbd_maxdb_option_kernelversion  =  3,
-  dbd_maxdb_option_unicodedb      =  4,
-  dbd_maxdb_option_sdkversion     =  5,
-  dbd_maxdb_option_sqlmode        =  6,
-  dbd_maxdb_option_libraryversion =  7,
-  dbd_maxdb_option_unknown        =  -1
+  dbd_maxdb_option_autocommit       =  1,
+  dbd_maxdb_option_isolationlevel   =  2,
+  dbd_maxdb_option_kernelversion    =  3,
+  dbd_maxdb_option_unicodedb        =  4,
+  dbd_maxdb_option_sdkversion       =  5,
+  dbd_maxdb_option_sqlmode          =  6,
+  dbd_maxdb_option_libraryversion   =  7,
+  dbd_maxdb_option_readlongcomplete =  8,
+  dbd_maxdb_option_unknown          =  -1
 }dbd_maxdb_option;
 
 
 static dbd_maxdb_cmdKeywordTable dbh_optionTab [ ]= {
-      { dbd_maxdb_option_autocommit,     {"AUTOCOMMIT"        ,sizeof("AUTOCOMMIT")-1}},
-      { dbd_maxdb_option_isolationlevel, {"MAXDB_ISOLATIONLEVEL"    ,sizeof("MAXDB_ISOLATIONLEVEL")-1}},
-      { dbd_maxdb_option_kernelversion,  {"MAXDB_KERNELVERSION"     ,sizeof("MAXDB_KERNELVERSION")-1}},
-      { dbd_maxdb_option_libraryversion, {"MAXDB_LIBRARYVERSION"    ,sizeof("MAXDB_LIBRARYVERSION")-1}},
-      { dbd_maxdb_option_sdkversion,     {"MAXDB_SDKVERSION"        ,sizeof("MAXDB_SDKVERSION")-1}},
-      { dbd_maxdb_option_sqlmode,        {"MAXDB_SQLMODE"           ,sizeof("MAXDB_SQLMODE")-1}},
-      { dbd_maxdb_option_unicodedb,      {"MAXDB_UNICODE"           ,sizeof("MAXDB_UNICODE")-1}},
+      { dbd_maxdb_option_autocommit,       {"AUTOCOMMIT"                ,sizeof("AUTOCOMMIT")-1}},
+      { dbd_maxdb_option_isolationlevel,   {"MAXDB_ISOLATIONLEVEL"      ,sizeof("MAXDB_ISOLATIONLEVEL")-1}},
+      { dbd_maxdb_option_kernelversion,    {"MAXDB_KERNELVERSION"       ,sizeof("MAXDB_KERNELVERSION")-1}},
+      { dbd_maxdb_option_libraryversion,   {"MAXDB_LIBRARYVERSION"      ,sizeof("MAXDB_LIBRARYVERSION")-1}},
+      { dbd_maxdb_option_readlongcomplete, {"MAXDB_READ_LONG_COMPLETE"  ,sizeof("MAXDB_READ_LONG_COMPLETE")-1}},
+      { dbd_maxdb_option_sdkversion,       {"MAXDB_SDKVERSION"          ,sizeof("MAXDB_SDKVERSION")-1}},
+      { dbd_maxdb_option_sqlmode,          {"MAXDB_SQLMODE"             ,sizeof("MAXDB_SQLMODE")-1}},
+      { dbd_maxdb_option_unicodedb,        {"MAXDB_UNICODE"             ,sizeof("MAXDB_UNICODE")-1}},
     };
 
 #define DBD_MAXDB_OPTIONTABLESIZE  (sizeof(dbh_optionTab) /sizeof(dbd_maxdb_cmdKeywordTable))
@@ -778,6 +796,11 @@ int dbd_maxdb_db_STORE_attrib(SV* dbh, imp_dbh_t* imp_dbh, SV* keysv, SV* values
              erg = SQLDBC_TRUE;
              break;
           }
+          case dbd_maxdb_option_readlongcomplete:{
+             imp_dbh->m_readlongcompletly = SvTRUE(valuesv);
+             erg = SQLDBC_TRUE;
+             break;
+          }
           case dbd_maxdb_option_sqlmode:{
             char* sqlmode = SvPV(valuesv, vl);
             SQLDBC_ConnectProperties_setProperty  ( imp_dbh->m_connprop, "SQLMODE", sqlmode);  
@@ -847,6 +870,10 @@ SV* dbd_maxdb_db_FETCH_attrib(SV* dbh, imp_dbh_t* imp_dbh, SV* keysv) {
       }
       case dbd_maxdb_option_unicodedb:{
             result = (SQLDBC_Connection_isUnicodeDatabase (imp_dbh->m_connection))?&PL_sv_yes:&PL_sv_no; 
+            break;
+      }
+      case dbd_maxdb_option_readlongcomplete:{
+            result = (imp_dbh->m_readlongcompletly)?&PL_sv_yes:&PL_sv_no; 
             break;
       }
       case dbd_maxdb_option_libraryversion :{
@@ -940,6 +967,30 @@ SV* dbd_maxdb_db_getSQLMode(SV* dbh){
 
 /***************************************************************************
  *
+ *  Name:    dbd_maxdb_db_getSQLMode
+ *
+ *  Purpose: retrieves the SQL Mode of the underlaying database.
+ *
+ *  Input:   dbh - connect handle
+ *
+ *  Returns: the sqlmode
+ *
+ **************************************************************************/
+SV* dbd_maxdb_db_getVersion(SV* dbh){
+#if defined(dTHR)
+  dTHR;
+#endif
+    D_imp_dbh(dbh);
+    char* msg;
+    SV* result;
+    
+    DBD_MAXDB_METHOD_ENTER (imp_dbh, dbd_maxdb_db_getVersion);    
+    result = sv_2mortal(newSViv(SQLDBC_Connection_getKernelVersion(imp_dbh->m_connection))); 
+    DBD_MAXDB_METHOD_RETURN_SV (imp_dbh, dbd_maxdb_db_getVersion, result);    
+}
+
+/***************************************************************************
+ *
  *  Name:    dbd_maxdb_db_executeUpdate
  *
  *  Purpose: handles execute immediate command without parameters
@@ -949,7 +1000,7 @@ SV* dbd_maxdb_db_getSQLMode(SV* dbh){
  *  Returns: resultcount
  *
  **************************************************************************/
-int dbd_maxdb_db_executeUpdate( SV *dbh, char *statement )
+int dbd_maxdb_db_executeUpdate( SV *dbh, SV *stmt )
 {
 #if defined(dTHR)
   dTHR;
@@ -957,9 +1008,12 @@ int dbd_maxdb_db_executeUpdate( SV *dbh, char *statement )
    D_imp_dbh(dbh);
    SQLDBC_Int4 rc=0;
    SQLDBC_Retcode retcode;
-   
-   DBD_MAXDB_METHOD_ENTER (imp_dbh, dbd_maxdb_db_executeUpdate);    
 
+   STRLEN lna;
+   char *statement = SvOK(stmt) ? SvPV(stmt,lna) : "";
+   SQLDBC_StringEncodingType_Encoding stmtEncoding = (SvUTF8(stmt))?SQLDBC_StringEncodingType_Encoding_UTF8 : SQLDBC_StringEncodingType_Encoding_Ascii;
+
+   DBD_MAXDB_METHOD_ENTER (imp_dbh, dbd_maxdb_db_executeUpdate);    
    if (!DBIc_ACTIVE(imp_dbh)) {
       dbd_maxdb_internal_error(dbh, DBD_ERR_SESSION_NOT_CONNECTED);
       DBD_MAXDB_METHOD_RETURN (imp_dbh, dbd_maxdb_db_executeUpdate, DBD_MAXDB_ERROR_RETVAL);  
@@ -973,7 +1027,7 @@ int dbd_maxdb_db_executeUpdate( SV *dbh, char *statement )
     } 
    }
 
-   retcode = SQLDBC_Statement_executeASCII (imp_dbh->m_stmt, statement);
+   retcode = SQLDBC_Statement_executeNTS (imp_dbh->m_stmt, statement,stmtEncoding);
    if (retcode != SQLDBC_OK && retcode != SQLDBC_NO_DATA_FOUND){
      dbd_maxdb_sqldbc_error(dbh, SQLDBC_Statement_getError(imp_dbh->m_stmt));
      DBD_MAXDB_METHOD_RETURN (imp_dbh, dbd_maxdb_db_executeUpdate, DBD_MAXDB_ERROR_RETVAL);  
@@ -1010,6 +1064,7 @@ int dbd_maxdb_st_prepare(SV* sth, imp_sth_t* imp_sth, char* statement, SV* attri
   dTHR;
 #endif
   D_imp_dbh_from_sth;
+  SQLDBC_StringEncodingType_Encoding stmtEncoding = SQLDBC_StringEncodingType_Encoding_Ascii;
   imp_sth->m_rowSetSize=1;
   imp_sth->m_rowSetSizeChanged=SQLDBC_TRUE;
   imp_sth->m_fetchSize=0;
@@ -1028,6 +1083,23 @@ int dbd_maxdb_st_prepare(SV* sth, imp_sth_t* imp_sth, char* statement, SV* attri
     DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_prepare, SQLDBC_FALSE); 
   }
 
+
+/*start experimental*/
+	if (attribs) {
+	  HV* hash = (HV*)SvRV(attribs);
+	  SV *sv_key;
+	
+	  sv_key = hv_delete(hash, ENCODING, sizeof(ENCODING)-1, 0);
+	  if (sv_key && SvIV(sv_key)== ENCODING_UTF8){
+	   	stmtEncoding =  SQLDBC_StringEncodingType_Encoding_UTF8;
+		} 
+	}
+  if (DBIc_DBISTATE(imp_dbh)->debug >= 3)
+    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "           StatementEncoding => %s\n",
+                  (stmtEncoding==SQLDBC_StringEncodingType_Encoding_Ascii)?"ASCII":"UTF-8");
+  
+/*end experimental*/
+ 
   if (!imp_sth->m_prepstmt){
     imp_sth->m_prepstmt = SQLDBC_Connection_createPreparedStatement (imp_dbh->m_connection);
     if (!imp_sth->m_prepstmt) {
@@ -1035,7 +1107,7 @@ int dbd_maxdb_st_prepare(SV* sth, imp_sth_t* imp_sth, char* statement, SV* attri
       DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_prepare, SQLDBC_FALSE); 
     }
   }
-  if (SQLDBC_PreparedStatement_prepareASCII  (imp_sth->m_prepstmt, statement) != SQLDBC_OK) {
+  if (SQLDBC_PreparedStatement_prepareNTS  (imp_sth->m_prepstmt, statement, stmtEncoding) != SQLDBC_OK) {
     dbd_maxdb_sqldbc_error(sth, SQLDBC_PreparedStatement_getError(imp_sth->m_prepstmt));
     DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_prepare, SQLDBC_FALSE); 
   }
@@ -1206,7 +1278,12 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
   SQLDBC_UInt2 colcnt = DBIc_NUM_FIELDS(imp_sth);
 
   DBD_MAXDB_METHOD_ENTER(imp_sth, dbd_maxdb_registerResultSet); 
-  
+
+  if (DBIc_NUM_FIELDS(imp_sth) < 0) {
+    dbd_maxdb_internal_error(sth, DBD_ERR_INITIALIZATION_FAILED_S, "Wrong number of columns");
+    DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_registerResultSet, SQLDBC_FALSE); 
+  }
+
   if (imp_sth->m_cols){
     /*already registered*/
     return SQLDBC_TRUE;
@@ -1226,10 +1303,10 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
         case SQLDBC_SQLTYPE_STRA          :
         case SQLDBC_SQLTYPE_STRE          :
         case SQLDBC_SQLTYPE_LONGA         :
-        case SQLDBC_SQLTYPE_LONGE         : 
+        case SQLDBC_SQLTYPE_LONGE         :
         case SQLDBC_SQLTYPE_STRUNI        :
         case SQLDBC_SQLTYPE_LONGUNI       : {
-          collen = DBIc_LongReadLen(imp_sth); 
+          collen = 0; 
           break;
         }
         case SQLDBC_SQLTYPE_FIXED         :
@@ -1237,6 +1314,11 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
         case SQLDBC_SQLTYPE_SMALLINT      :
         case SQLDBC_SQLTYPE_INTEGER       : {
           collen = SQLDBC_ResultSetMetaData_getColumnLength (imp_sth->m_rsmd, column) + 2;
+          break;
+        }
+        case SQLDBC_SQLTYPE_UNICODE    : 
+        case SQLDBC_SQLTYPE_VARCHARUNI    : {
+          collen = 4*SQLDBC_ResultSetMetaData_getColumnLength (imp_sth->m_rsmd, column);
           break;
         }
         case SQLDBC_SQLTYPE_BOOLEAN       : {
@@ -1266,11 +1348,11 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
   for (column = 1; column <= colcnt; column++) {
     dbd_maxdb_bind_column *m_col = &imp_sth->m_cols[column-1];
     SQLDBC_Int4    ColumnLength = SQLDBC_ResultSetMetaData_getColumnLength (imp_sth->m_rsmd, column);
-    SQLDBC_SQLType   ColumnType = SQLDBC_ResultSetMetaData_getColumnType (imp_sth->m_rsmd, column);
+    m_col->columnType = SQLDBC_ResultSetMetaData_getColumnType (imp_sth->m_rsmd, column);
     m_col->hostType = SQLDBC_HOSTTYPE_ASCII;
     m_col->chopBlanks = SQLDBC_FALSE;
     
-    switch (ColumnType) {
+    switch (m_col->columnType) {
         case SQLDBC_SQLTYPE_FIXED         :
         case SQLDBC_SQLTYPE_NUMBER        :
         case SQLDBC_SQLTYPE_SMALLINT      :
@@ -1290,12 +1372,10 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
         break;
         }
         case SQLDBC_SQLTYPE_CHA           :               
-        case SQLDBC_SQLTYPE_CHE           :
-        case SQLDBC_SQLTYPE_UNICODE       :{
+        case SQLDBC_SQLTYPE_CHE           :{
         m_col->chopBlanks = SQLDBC_TRUE;
         break; 
         }
-
         case SQLDBC_SQLTYPE_VARCHARA      :
         case SQLDBC_SQLTYPE_VARCHARE      :
         case SQLDBC_SQLTYPE_DATE          :
@@ -1303,8 +1383,12 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
         case SQLDBC_SQLTYPE_TIMESTAMP     : {
         break;
         }
-        case SQLDBC_SQLTYPE_VARCHARUNI    : {
-        break;
+        case SQLDBC_SQLTYPE_VARCHARUNI    :
+        case SQLDBC_SQLTYPE_UNICODE       :{
+        m_col->hostType = SQLDBC_HOSTTYPE_UTF8;
+        ColumnLength *= 4;    
+        m_col->chopBlanks = SQLDBC_TRUE;
+        break; 
         }
         case SQLDBC_SQLTYPE_BOOLEAN       : {
         m_col->hostType =   SQLDBC_HOSTTYPE_INT1;
@@ -1317,7 +1401,7 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
         case SQLDBC_SQLTYPE_STRB          :
         case SQLDBC_SQLTYPE_LONGB         : {
         m_col->hostType = SQLDBC_HOSTTYPE_BINARY;
-        ColumnLength = DBIc_LongReadLen(imp_sth);
+        ColumnLength = 0;
         break;
         }
         case SQLDBC_SQLTYPE_STRA          :
@@ -1327,13 +1411,19 @@ static int dbd_maxdb_registerResultSet(SV* sth, imp_sth_t* imp_sth){
         case SQLDBC_SQLTYPE_STRUNI        :
         case SQLDBC_SQLTYPE_LONGUNI       : {
         m_col->hostType = SQLDBC_HOSTTYPE_ASCII;
-        ColumnLength = DBIc_LongReadLen(imp_sth);
+        ColumnLength = 0;
         break;
         }
     }
     
-    m_col->buf = &imp_sth->m_fetchBuf[allColumnsLength];
-    m_col->bufLen = ColumnLength+1;
+    if (ColumnLength==0){
+	    m_col->buf = NULL;
+	    m_col->bufLen = 0;
+	  }else {
+	    m_col->buf = &imp_sth->m_fetchBuf[allColumnsLength];
+	    m_col->bufLen = ColumnLength+1;
+	  }
+	  
     if (SQLDBC_ResultSet_bindColumn (imp_sth->m_resultset,
                                      column,
                                      m_col->hostType,
@@ -1374,6 +1464,7 @@ int dbd_maxdb_st_execute(SV* sth, imp_sth_t* imp_sth) {
   }
   
   exec_rc = SQLDBC_PreparedStatement_executeASCII (imp_sth->m_prepstmt); 
+  imp_sth->m_rowNotFound= SQLDBC_FALSE;
   if ( exec_rc != SQLDBC_OK && exec_rc != SQLDBC_NO_DATA_FOUND) {
     dbd_maxdb_sqldbc_error(sth, SQLDBC_PreparedStatement_getError(imp_sth->m_prepstmt)) ;
     DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_execute, DBD_MAXDB_ERROR_RETVAL); 
@@ -1406,6 +1497,10 @@ int dbd_maxdb_st_execute(SV* sth, imp_sth_t* imp_sth) {
     DBIc_ACTIVE_on(imp_sth);
     
   } else {
+    if (exec_rc == SQLDBC_NO_DATA_FOUND){
+      imp_sth->m_rowNotFound= SQLDBC_TRUE;
+      DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_execute, 0); 
+    }
     if (imp_sth->m_hasOutValues= SQLDBC_TRUE){
       /*handling out parameters*/
        int paramIndex;
@@ -1434,6 +1529,7 @@ int dbd_maxdb_st_execute(SV* sth, imp_sth_t* imp_sth) {
                 break;
               }  
               default:{
+/*
                  if ( m_param->indicator >= (SQLDBC_Length)bufLen) { 
                    dbd_maxdb_internal_error(sth, DBD_ERR_LONG_COLUMN_TRUNCATED_D, paramIndex+1);
                    DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_execute, DBD_MAXDB_ERROR_RETVAL); 
@@ -1441,6 +1537,27 @@ int dbd_maxdb_st_execute(SV* sth, imp_sth_t* imp_sth) {
                  if (m_param->indicator >= 0){
                    while (m_param->indicator >= 0 && buf[m_param->indicator]==' ')  --m_param->indicator;
                  }
+                break;
+*/                
+                 
+                if (m_param->indicator >= (SQLDBC_Length)bufLen 
+                    || m_param->indicator == SQLDBC_NO_TOTAL) { 
+							    if (!DBIc_has(imp_sth, DBIcf_LongTruncOk)) {
+					         	dbd_maxdb_internal_error(sth, DBD_ERR_LONG_COLUMN_TRUNCATED_D, paramIndex+1);
+					          DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_execute, DBD_MAXDB_ERROR_RETVAL); 
+							    }
+    		          m_param->indicator = bufLen-1;
+		            }
+				        if (m_param->indicator < 0) {
+				           dbd_maxdb_internal_error(sth, DBD_ERR_FETCH_UNKNOWN, m_param->indicator);
+				           DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_execute, DBD_MAXDB_ERROR_RETVAL); 
+				        }
+                if (m_param->indicator > 0){
+                   while (m_param->indicator >= 0 && buf[m_param->indicator-1]==' ')  --m_param->indicator;
+                }
+                if ( m_param->hostType == SQLDBC_HOSTTYPE_UTF8){
+                  SvUTF8_on(m_param->value);
+                }
                 break;
               }
            }
@@ -1478,6 +1595,7 @@ AV* dbd_maxdb_st_fetch(SV* sth, imp_sth_t* imp_sth) {
 #if defined(dTHR)
   dTHR;
 #endif
+  D_imp_dbh_from_sth;
   int colIndex;
   SQLDBC_Retcode rc;
   SQLDBC_RowSet *rowset = 0;
@@ -1521,18 +1639,69 @@ AV* dbd_maxdb_st_fetch(SV* sth, imp_sth_t* imp_sth) {
   for (colIndex = 0; colIndex < colcnt; ++colIndex) {
     dbd_maxdb_bind_column *m_col = &imp_sth->m_cols[colIndex];
     SV *sv = AvARRAY(av)[colIndex];
-    
+    long readLen = DBIc_LongReadLen(imp_sth);  
+
     if (m_col->indicator == SQLDBC_NULL_DATA) {
       SvOK_off(sv);
       continue;
     }
 
-    if ( m_col->indicator >= m_col->bufLen) { 
-      if (!DBIc_has(imp_sth, DBIcf_LongTruncOk)) {
-        dbd_maxdb_internal_error(sth, DBD_ERR_LONG_COLUMN_TRUNCATED_D, colIndex+1);
-        DBD_MAXDB_METHOD_RETURN_AV(imp_sth, dbd_maxdb_st_fetch, Nullav); 
+    if (   m_col->indicator >= m_col->bufLen) { 
+      /*
+       * you should be here only in case of a blob/clob column. 
+       */
+       
+      /*first bind was done with host type binary or ascii and length 0 to 
+        get the size of the blob/clob column only. No rebind with the 
+        full size and the output type.
+       */   	
+       
+      switch (m_col->columnType) {
+        case SQLDBC_SQLTYPE_STRB          :
+        case SQLDBC_SQLTYPE_LONGB         : {
+          m_col->hostType = SQLDBC_HOSTTYPE_BINARY;
+		      if (imp_dbh->m_readlongcompletly == SQLDBC_TRUE) {   
+		      	readLen = m_col->indicator;  	
+		      }
+          break;
+        }
+        case SQLDBC_SQLTYPE_STRA          :
+        case SQLDBC_SQLTYPE_STRE          :
+        case SQLDBC_SQLTYPE_LONGA         :
+        case SQLDBC_SQLTYPE_LONGE         :{
+          m_col->hostType = SQLDBC_HOSTTYPE_ASCII;
+		      if (imp_dbh->m_readlongcompletly == SQLDBC_TRUE) {   
+		      	readLen = m_col->indicator;  	
+		      }
+          break;
+        }
+        case SQLDBC_SQLTYPE_STRUNI        :
+        case SQLDBC_SQLTYPE_LONGUNI       : {
+          m_col->hostType = SQLDBC_HOSTTYPE_UTF8;
+		      if (imp_dbh->m_readlongcompletly == SQLDBC_TRUE) {   
+		      	readLen = 4* m_col->indicator;  	
+		      }
+          break;
+        }
+      }   
+
+      if(! dbd_maxdb_st_blob_read2 (sth, imp_sth, colIndex, 0,
+                    readLen, newRV_noinc(sv), 0, &m_col->indicator) ){
+         DBD_MAXDB_METHOD_RETURN_AV(imp_sth, dbd_maxdb_st_fetch, Nullav); 
       }
-      m_col->indicator = m_col->bufLen-1;
+      if (   m_col->indicator > readLen
+      	   ||m_col->indicator == SQLDBC_NO_TOTAL) {       
+	      if (!DBIc_has(imp_sth, DBIcf_LongTruncOk)) {
+	        dbd_maxdb_internal_error(sth, DBD_ERR_LONG_COLUMN_TRUNCATED_D, colIndex+1);
+	        DBD_MAXDB_METHOD_RETURN_AV(imp_sth, dbd_maxdb_st_fetch, Nullav); 
+	      }
+  		}
+	    m_col->indicator = 0;
+	    continue;
+    }
+    if (m_col->indicator < 0) {
+       dbd_maxdb_internal_error(sth, DBD_ERR_FETCH_UNKNOWN, m_col->indicator);
+       DBD_MAXDB_METHOD_RETURN_AV(imp_sth, dbd_maxdb_st_fetch, Nullav); 
     }
 
     if (m_col->chopBlanks && ChopBlanks && m_col->indicator > 0){
@@ -1546,6 +1715,11 @@ AV* dbd_maxdb_st_fetch(SV* sth, imp_sth_t* imp_sth) {
         sv_setiv(sv, (int)*(m_col->buf));
         break;
       }  
+      case SQLDBC_HOSTTYPE_UTF8:{
+        sv_setpvn(sv, m_col->buf, m_col->indicator);
+        SvUTF8_on(sv);
+        break;
+      } 
       default:{
         sv_setpvn(sv, m_col->buf, m_col->indicator);
         break;
@@ -1810,7 +1984,7 @@ int dbd_maxdb_st_STORE_attrib(SV* sth, imp_sth_t* imp_sth, SV* keysv, SV* values
           }
           case sth_maxdb_option_CursorName:{
              char* cursorname = SvPV(valuesv,kl);
-             SQLDBC_PreparedStatement_setCursorName (imp_sth->m_prepstmt, cursorname, kl, SQLDBC_StringEncodingType_Encoding_Ascii) ;
+             SQLDBC_PreparedStatement_setCursorName (imp_sth->m_prepstmt, cursorname, kl, SQLDBC_StringEncodingType_Encoding_UTF8) ;
              erg = SQLDBC_TRUE;
              break;
           }
@@ -1858,7 +2032,7 @@ SV* dbd_maxdb_st_FETCH_attrib(SV* sth, imp_sth_t* imp_sth, SV* keysv) {
         if( SQLDBC_PreparedStatement_getCursorName (
                           imp_sth->m_prepstmt, 
                           cname, 
-                          SQLDBC_StringEncodingType_Encoding_Ascii, 
+                          SQLDBC_StringEncodingType_Encoding_UTF8, 
                           cnameLen, 
                           &bufferLength) != SQLDBC_OK){
                break;
@@ -1907,7 +2081,7 @@ SV* dbd_maxdb_st_FETCH_attrib(SV* sth, imp_sth_t* imp_sth, SV* keysv) {
         if( SQLDBC_PreparedStatement_getTableName( 
                           imp_sth->m_prepstmt,
                           cname,  
-                          SQLDBC_StringEncodingType_Encoding_Ascii, 
+                          SQLDBC_StringEncodingType_Encoding_UTF8, 
                           cnameLen, 
                           &bufferLength) != SQLDBC_OK){
              break;
@@ -1929,12 +2103,21 @@ SV* dbd_maxdb_st_FETCH_attrib(SV* sth, imp_sth_t* imp_sth, SV* keysv) {
         char *cname = (char*) alloca(cnameLen); 
         result = newRV(sv_2mortal((SV*)av));
         for(i = 1; i<=colcnt; i++) {
+#ifdef SQLDBC_FEATURE_METADATA_COLUMNLABEL
+          if (SQLDBC_ResultSetMetaData_getColumnLabel (imp_sth->m_rsmd,
+                                                      i,
+                                                      cname,
+                                                      SQLDBC_StringEncodingType_Encoding_UTF8,
+                                                      cnameLen,
+                                                      &colnamelen) != SQLDBC_OK) {
+#else
           if (SQLDBC_ResultSetMetaData_getColumnName (imp_sth->m_rsmd,
                                                       i,
                                                       cname,
-                                                      SQLDBC_StringEncodingType_Encoding_Ascii,
+                                                      SQLDBC_StringEncodingType_Encoding_UTF8,
                                                       cnameLen,
                                                       &colnamelen) != SQLDBC_OK) {
+#endif
             dbd_maxdb_internal_error(sth, DBD_ERR_CANNOT_GET_COLUMNNAME_D, i);
             break;
           }
@@ -2064,16 +2247,21 @@ SV* dbd_maxdb_st_FETCH_attrib(SV* sth, imp_sth_t* imp_sth, SV* keysv) {
  *           be called in the latter case
  *
  **************************************************************************/
-
 int dbd_maxdb_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field, long offset,
                       long len, SV *destrv, long destoffset) {
+   SQLDBC_Length ind = 0;
+   return dbd_maxdb_st_blob_read2(sth, imp_sth, field, offset, len, destrv, destoffset, &ind);
+
+}
+
+int dbd_maxdb_st_blob_read2 (SV *sth, imp_sth_t *imp_sth, int field, long offset,
+                      long len, SV *destrv, long destoffset, SQLDBC_Length *indicator) {
 #if defined(dTHR)
   dTHR;
 #endif
   SV *bufsv;
   SQLDBC_Retcode rc;
   SQLDBC_RowSet *rowset = 0;
-  SQLDBC_Length ind;
   dbd_maxdb_bind_column *m_col;
 
   DBD_MAXDB_METHOD_ENTER(imp_sth, dbd_maxdb_st_blob_read); 
@@ -2092,7 +2280,7 @@ int dbd_maxdb_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field, long offset,
                                           field+1,
                                           m_col->hostType,
                                           ((char *)SvPVX(bufsv)) + destoffset,
-                                          &ind,
+                                          indicator,
                                           len,
                                           offset+1,
                                           SQLDBC_FALSE)) == SQLDBC_NOT_OK) {
@@ -2101,14 +2289,30 @@ int dbd_maxdb_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field, long offset,
   }
   
   if (rc == SQLDBC_NO_DATA_FOUND) {
-    ind = 0;
+    *indicator = 0;
   }
 
-  SvCUR_set(bufsv, destoffset+DBD_MAXDB_MIN(ind,len));
-  *SvEND(bufsv) = '\0'; 
-  
+	if (*indicator >= 0 && *indicator<len){
+	  len = *indicator;
+	} 
+
+  switch(m_col->hostType) {
+    case SQLDBC_HOSTTYPE_UTF8:{
+      SvCUR_set(bufsv, destoffset+len);
+      *SvEND(bufsv) = '\0'; 
+      SvUTF8_on(bufsv);
+      break;
+    } 
+    default:{
+		  SvCUR_set(bufsv, destoffset+len);
+			*SvEND(bufsv) = '\0'; 
+      break;
+    }
+  }
+      
   DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_st_blob_read, SQLDBC_TRUE); 
 }
+
 
 /***************************************************************************
  *
@@ -2208,10 +2412,17 @@ int dbd_maxdb_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
             parameter->hostType = SQLDBC_HOSTTYPE_BINARY;
             parameter->value = newSVsv(value);
             break; 
-          } default : {
+          }  
+          default : {
+						if (SvUTF8(value)){
+        	  	parameter->hostType = SQLDBC_HOSTTYPE_UTF8;
+						} else {
+	   					parameter->hostType = SQLDBC_HOSTTYPE_ASCII;
+						}
             parameter->value = newSVsv(value);
             break; 
           } 
+
        }
    }
    
@@ -2232,17 +2443,31 @@ int dbd_maxdb_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 
        switch (SQLDBC_ParameterMetaData_getParameterType (imp_sth->m_paramMetadata, index)) {
           case SQLDBC_SQLTYPE_STRB          :
-          case SQLDBC_SQLTYPE_LONGB         : 
+          case SQLDBC_SQLTYPE_LONGB         :{
+            parameter->hostType = SQLDBC_HOSTTYPE_BINARY;
+            paramlen = DBIc_LongReadLen(imp_sth); 
+            break;
+          } 
           case SQLDBC_SQLTYPE_STRA          :
           case SQLDBC_SQLTYPE_STRE          :
           case SQLDBC_SQLTYPE_LONGA         :
-          case SQLDBC_SQLTYPE_LONGE         : 
-          case SQLDBC_SQLTYPE_STRUNI        :
-          case SQLDBC_SQLTYPE_LONGUNI       : {
+          case SQLDBC_SQLTYPE_LONGE         :{
             parameter->hostType = SQLDBC_HOSTTYPE_ASCII;
             paramlen = DBIc_LongReadLen(imp_sth); 
             break;
+          }  
+          case SQLDBC_SQLTYPE_STRUNI        :
+          case SQLDBC_SQLTYPE_LONGUNI       : {
+            parameter->hostType = SQLDBC_HOSTTYPE_UTF8;
+            paramlen = DBIc_LongReadLen(imp_sth); 
+            break;
           }
+          case SQLDBC_SQLTYPE_VARCHARUNI    :
+      	  case SQLDBC_SQLTYPE_UNICODE       : {
+            parameter->hostType = SQLDBC_HOSTTYPE_UTF8;
+            paramlen = 4*SQLDBC_ParameterMetaData_getParameterLength (imp_sth->m_paramMetadata, index);
+	          break;
+	        }
           case SQLDBC_SQLTYPE_FIXED         :
           case SQLDBC_SQLTYPE_NUMBER        :
           case SQLDBC_SQLTYPE_SMALLINT      :
@@ -2257,12 +2482,19 @@ int dbd_maxdb_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
             paramlen = SQLDBC_ParameterMetaData_getParameterLength (imp_sth->m_paramMetadata, index) + 6; /*-[0-9]+.[0-9]+E[-][0-9][0-9]*/
             break;
           }
+          case (SQLDBC_SQLTYPE_CHB): 
+          case (SQLDBC_SQLTYPE_VARCHARB): {
+            parameter->hostType = SQLDBC_HOSTTYPE_BINARY;
+            paramlen = SQLDBC_ParameterMetaData_getParameterLength (imp_sth->m_paramMetadata, index);
+            break;          
+          }
           case SQLDBC_SQLTYPE_BOOLEAN       : {
             parameter->hostType = SQLDBC_HOSTTYPE_INT1;
             paramlen = 1;    
             break;
           } 
           default : {
+            parameter->hostType = SQLDBC_HOSTTYPE_ASCII;
             paramlen = SQLDBC_ParameterMetaData_getParameterLength (imp_sth->m_paramMetadata, index);
             break;
           }
@@ -2299,3 +2531,30 @@ int dbd_maxdb_db_executeInternal( SV *dbh, SV *sth, char *statement ){
   DBD_MAXDB_METHOD_RETURN(imp_sth, dbd_maxdb_db_executeInternal, erg); 
 }
 
+/***************************************************************************
+ *
+ *  Name:    dbd_discon_all
+ *
+ *  Purpose: Disconnect all database handles at shutdown time
+ *
+ *  Input:   dbh - database handle being disconnected
+ *           imp_dbh - drivers private database handle data
+ *
+ *  Returns: TRUE for success, FALSE otherwise; do_error has already
+ *           been called in the latter case
+ *
+ **************************************************************************/
+
+int dbd_discon_all (SV *drh, imp_drh_t *imp_drh) {
+#if defined(dTHR)
+    dTHR;
+#endif
+  D_imp_xxh(drh);
+
+  DBD_MAXDB_METHOD_ENTER(imp_drh, dbd_discon_all); 
+  /* The disconnect_all concept isn't supported */
+  if (!dirty && !SvTRUE(perl_get_sv("DBI::PERL_ENDING",0))) {
+     dbd_maxdb_internal_error((SV*)imp_drh, DBD_ERR_FEATURE_NOT_SUPPORTED, "disconnect_all");
+  }
+  DBD_MAXDB_METHOD_RETURN(imp_drh, dbd_discon_all, DBD_MAXDB_ERROR_RETVAL); 
+}

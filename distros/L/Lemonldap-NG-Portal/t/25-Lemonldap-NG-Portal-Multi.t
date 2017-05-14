@@ -63,6 +63,7 @@ $ENV{REQUEST_URI}          = '/';
 $ENV{QUERY_STRING}         = '';
 $ENV{REMOTE_ADDR}          = '127.0.0.1';
 $ENV{HTTP_ACCEPT_LANGUAGE} = 'en';
+$ENV{HTTP_ACCEPT}          = 'text/html';
 
 my ( $test, $testU );
 {
@@ -78,8 +79,10 @@ my ( $test, $testU );
             {
                 globalStorage        => 'Apache::Session::File',
                 domain               => 'example.com',
-                authentication       => 'Multi 1;2',
-                userDB               => 'Multi 1;2',
+                authentication       => 'Multi',
+                multiAuthStack       => '1;2',
+                userDB               => 'Multi',
+                multiUserDBStack     => '1;2',
                 passwordDB           => 'Null',
                 registerDB           => 'Null',
                 cookieName           => 'lemonldap',
@@ -91,6 +94,7 @@ my ( $test, $testU );
                 setSessionInfo       => sub { PE_OK },
                 portal               => 'http://abc',
                 sessionInfo          => { uid => 't', },
+                timeout              => 0,
                 userNotice           => sub { },
                 user                 => 'jdoe',
             }
@@ -113,8 +117,10 @@ my ( $test, $testU );
             {
                 globalStorage        => 'Apache::Session::File',
                 domain               => 'example.com',
-                authentication       => 'Multi 1;2',
-                userDB               => 'Multi 1;2',
+                authentication       => 'Multi',
+                multiAuthStack       => '1;2',
+                userDB               => 'Multi',
+                multiUserDBStack     => '1;2',
                 passwordDB           => 'Null',
                 registerDB           => 'Null',
                 cookieName           => 'lemonldap',
@@ -124,6 +130,7 @@ my ( $test, $testU );
                 hiddenAttributes     => '',
                 portal               => 'http://abc',
                 sessionInfo          => { uid => 't', },
+                timeout              => 0,
                 userNotice           => sub { },
                 user                 => 'jdoe',
             }
@@ -142,8 +149,10 @@ my ( $test, $testU );
             {
                 globalStorage        => 'Apache::Session::File',
                 domain               => 'example.com',
-                authentication       => 'Multi 1;2',
-                userDB               => 'Multi 3;4',
+                authentication       => 'Multi',
+                multiAuthStack       => '1;2',
+                userDB               => 'Multi',
+                multiUserDBStack     => '3;4',
                 passwordDB           => 'Null',
                 registerDB           => 'Null',
                 cookieName           => 'lemonldap',
@@ -153,6 +162,7 @@ my ( $test, $testU );
                 hiddenAttributes     => '',
                 portal               => 'http://abc',
                 sessionInfo          => { uid => 't', },
+                timeout              => 0,
                 userNotice           => sub { },
                 user                 => 'jdoe',
             }
@@ -171,8 +181,10 @@ my ( $test, $testU );
             {
                 globalStorage        => 'Apache::Session::File',
                 domain               => 'example.com',
-                authentication       => 'Multi 1 1==0;2 1==0',
-                userDB               => 'Multi 3;4',
+                authentication       => 'Multi',
+                multiAuthStack       => '1 1==0;2 1==0',
+                userDB               => 'Multi',
+                multiUserDBStack     => '3;4',
                 passwordDB           => 'Null',
                 registerDB           => 'Null',
                 cookieName           => 'lemonldap',
@@ -182,6 +194,7 @@ my ( $test, $testU );
                 hiddenAttributes     => '',
                 portal               => 'http://abc',
                 sessionInfo          => { uid => 't', },
+                timeout              => 0,
                 userNotice           => sub { },
                 user                 => 'jdoe',
             }
@@ -197,8 +210,10 @@ my ( $test, $testU );
             {
                 globalStorage        => 'Apache::Session::File',
                 domain               => 'example.com',
-                authentication       => 'Multi 1;2 1==0',
-                userDB               => 'Multi 3;4',
+                authentication       => 'Multi',
+                multiAuthStack       => '1;2 1==0',
+                userDB               => 'Multi',
+                multiUserDBStack     => '3;4',
                 passwordDB           => 'Null',
                 registerDB           => 'Null',
                 cookieName           => 'lemonldap',
@@ -208,6 +223,7 @@ my ( $test, $testU );
                 hiddenAttributes     => '',
                 portal               => 'http://abc',
                 sessionInfo          => { uid => 't', },
+                timeout              => 0,
                 userNotice           => sub { },
                 user                 => 'jdoe',
             }
@@ -223,8 +239,10 @@ my ( $test, $testU );
             {
                 globalStorage        => 'Apache::Session::File',
                 domain               => 'example.com',
-                authentication       => 'Multi 1;2 1==1',
-                userDB               => 'Multi 3;4',
+                authentication       => 'Multi',
+                multiAuthStack       => '1;2 1==1',
+                userDB               => 'Multi',
+                multiUserDBStack     => '3;4',
                 passwordDB           => 'Null',
                 registerDB           => 'Null',
                 cookieName           => 'lemonldap',
@@ -234,6 +252,7 @@ my ( $test, $testU );
                 hiddenAttributes     => '',
                 portal               => 'http://abc',
                 sessionInfo          => { uid => 't', },
+                timeout              => 0,
                 userNotice           => sub { },
                 user                 => 'jdoe',
             }

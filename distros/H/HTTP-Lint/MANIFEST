@@ -1,0 +1,8 @@
+Build.PL			Build script
+lib/HTTP/Lint.pm		Check HTTP messages and transactions for protocol violations
+lib/HTTP/Lint/UserAgent.pm	HTTP User agent that warns for suspicious transactions
+MANIFEST			This list of files
+META.yml			Distribution Metadata
+t/pod.t				POD test
+t/require.t			Compilation test
+t/lint.t			Functional test

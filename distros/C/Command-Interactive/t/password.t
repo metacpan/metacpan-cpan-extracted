@@ -8,20 +8,22 @@ use File::Temp ();
 use Test::More (tests => 3);
 use Test::NoWarnings;
 use Test::Exception;
-use Command::Interactive;;
+use Command::Interactive;
 
 my $password = Command::Interactive::Interaction->new({
-        expected_string => 'password:',
-        response        => 'secret',
-        is_required     => 1,
+    expected_string => 'password:',
+    response        => 'secret',
+    is_required     => 1,
 });
 
 my $response = Command::Interactive::Interaction->new({
-        expected_string => 'Password accepted',
-        is_required     => 1,
+    expected_string => 'Password accepted',
+    is_required     => 1,
 });
 
-my $command = Command::Interactive->new({interactions => [$password, $response],});
+my $command = Command::Interactive->new({
+    interactions => [$password, $response],
+});
 
 my ($tempfh, $tempfile) = File::Temp::tempfile(
     CLEANUP => 1,

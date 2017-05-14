@@ -1,27 +1,29 @@
 ---
-abstract: 'compiles Perl TT2 templates to standalone Lua modules for OpenResty'
+abstract: "OpenResty/Lua template framework implementing Perl's TT2 templating language"
 author:
-  - 'Yichun Zhang <agentzh@openresty.org>'
-build_requires: {}
+  - 'Yichun Zhang (agentzh), <agentzh@gmail.com>, OpenResty Inc.'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  IPC::Run3: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
-license: perl
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.18'
+license: artistc
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Lemplate
 no_index:
   directory:
-    - eg
+    - inc
+    - t
 requires:
-  File::Find::Rule: '0'
-  Template: '0'
-  perl: v5.8.1
+  File::Find::Rule: 0
+  Filter::Util::Call: 0
+  Template: 2.14
+  perl: 5.10.1
 resources:
-  bugtracker: https://github.com/openresty/lemplate/issues
-  homepage: https://github.com/openresty/lemplate
-  repository: https://github.com/openresty/lemplate.git
-version: '0.07'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  repository: https://github.com/openresty/test-nginx
+version: '0.11'

@@ -4,7 +4,7 @@ package Bio::Gonzales::Graphics::Glyph::colorfulBox;
 use strict;
 use base qw(Bio::Graphics::Glyph::generic);
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 sub my_description {
     return <<END;

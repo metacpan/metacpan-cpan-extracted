@@ -5,11 +5,12 @@ use Tk::Label;
 use Tk::Button;
 use Tk::Toplevel;
 
+use base qw (Tk::Frame);
+use vars qw ($VERSION);
+use strict;
 use Carp;
 
-use strict;
-
-use base qw (Tk::Frame);
+$VERSION = '0.01';
 
 Tk::Widget->Construct ('Menustrip');
 
@@ -18,8 +19,6 @@ sub Populate
     my ($this, %p_Options) = (shift, @_);
 
     my $l_DefaultFont = delete $p_Options {'-font'} || '-*-Times-Medium-R-Normal--*-140-*-*-*-*-*-*';
-
-printf ("Font = [%s]\n", $l_DefaultFont);
 
     my $l_SubRef = sub
        {

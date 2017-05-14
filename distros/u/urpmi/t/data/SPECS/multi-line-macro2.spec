@@ -6,9 +6,6 @@ Name: multi-linux-macro
 Version: 1
 Release: 1
 License: x
-Group: x
-Url: x
-BuildRoot: %{_tmppath}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT

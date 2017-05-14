@@ -1,0 +1,7 @@
+
+use OpenGL ':all';
+use OpenGL::Image;
+use Math::Trig;
+use File::ShareDir;
+
+Image::Magick module; 6.3.5 or newer is recommended. 

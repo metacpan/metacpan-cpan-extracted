@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Imager/GIF.pm
+t/00-load.t

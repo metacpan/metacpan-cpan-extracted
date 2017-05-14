@@ -1,0 +1,54 @@
+#!../../perl
+#
+while(<>) {
+  chop;
+  next unless s/^#\s*define\s+//;
+  s%/\*.*%%;
+  @v=split;
+  next if $#v != 1;
+  next if $v[1] =~ /["]/;
+  next if $v[0] =~ /[()]/;
+  push(@list,$v[0]);
+}
+
+print <<EOF;
+static double
+#ifdef HAS_PROTOTYPE
+constant(WIN32PREFIX char *name, int arg)
+#else
+constant(name, arg)
+char *name;
+int arg;
+#endif
+{
+    errno = 0;
+    switch (*name) {
+EOF
+
+$p="";
+foreach (sort(@list)) {
+  if (substr($_,0,1) ne $p) {
+    $p=substr($_,0,1);
+    print "    case '$p':\n";
+  }
+  print <<EOF;
+        if (strEQ(name, "$_")) {
+#ifdef $_
+          return $_;
+#else
+          goto not_there;
+#endif
+        }
+EOF
+}
+
+print <<EOF;
+    }
+    errno = EINVAL;
+    return 0;
+ 
+not_there:
+    errno = ENOENT;
+    return 0;
+}
+EOF

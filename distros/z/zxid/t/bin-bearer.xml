@@ -1,0 +1,58 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org /soap/envelope/"
+         xmlns:sb="urn:liberty:sb:20 05-11"
+         xmlns:pp="urn:liberty:id-sis-pp:2003- 08"
+         xmlns:sec="urn:liberty:security:2005-11"
+         xmlns:wsse="http://docs.oasis-open.org/wss/20 04/01/oasis-200401-wss-wssecur
+ity-secext-1.0.xsd"
+         xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis- 200401-wss-wssecurity-utility-
+1.0.xsd"
+         xmlns:wsa="http://www.w3.org/2005/03/ addressing">
+ <s:Header>
+   <!-- see Liberty SOAP Binding Specification for which headers
+       are required and optional -->
+   <wsa:MessageID wsu:Id="mid">...</wsa:MessageID>
+   <wsa:To wsu:Id="to">...</wsa:To>
+   <wsa:Action wsu:Id="action">...</wsa:Action>
+   <wsse:Security mustUnderstand="1">
+    <wsu:Timestamp wsu:Id="ts">
+      <wsu:Created>2005-06-17T04:49:17Z</wsu:Created >
+    </wsu:Timestamp>
+    <!-- Custom binary security token -->
+    <wsse:BinarySecurityToken
+        ValueType="anyNSPrefix:ServiceSess ionContext"
+        EncodingType="http://docs.oasis-open. org/wss/2004/01/oasis-200401-w ss
+                  -soap-message-security-1.0#Base64 Binary"
+        wsu:Id="bst" >
+      mQEMAzRniWkAAAEH9RWir0eKDkyFAB7PoFazx3ftp0vWwbbzqXdgcX8fpEqSr1v4
+      YqUc7OMiJcBtKBp3+jlD4HPUaurIqHA0vrdmMpM+sF2BnpND118f/mXCv3XbWhiL
+      VT4r9ytfpXBluelOV93X8RUz4ecZcDm9e+IEG+pQjnvgrSgac1NrW5K/CJEOUUjh
+      oGTrym0Ziutezhrw/gOeLVtkywsMgDr77gWZxRvw01w1ogtUdTceuRBIDANj+KVZ
+      vLKlTCaGAUNIjkiDDgti=
+    </wsse:BinarySecurityToken>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig #">
+     <ds:SignedInfo>
+       <!-- in general include a ds:Reference for each wsa: header
+           added according to SOAP binding -->
+       <!-- include the MessageID in the signature -->
+       <ds:Reference URI="#mid">...</ds:Reference>
+       <!-- include the To in the signature -->
+       <ds:Reference URI="#to">...</ds:Reference>
+       <!-- include the Action in the signature -->
+       <ds:Reference URI="#action">...</ds:Reference>
+       <!-- include the Timestamp in the signature -->
+       <ds:Reference URI="#ts">...</ds:Reference>
+       <!-- bind security token -->
+       <ds:Reference URI="#bst">...</ds:Reference>
+       <ds:Reference URI="#MsgBody">
+         <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1 "/>
+         <ds:DigestValue>YgGfS0pi56pu...</ds:DigestValue>
+       </ds:Reference>
+      </ds:SignedInfo>
+      ...
+    </ds:Signature>
+   </wsse:Security>
+ </s:Header>
+ <s:Body wsu:Id="MsgBody">
+   <!-- payload -->
+ </s:Body>
+</s:Envelope>

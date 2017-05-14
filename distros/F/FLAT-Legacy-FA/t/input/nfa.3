@@ -1,0 +1,31 @@
+# $Revision: 1.1 $ $Date: 2006/02/24 21:27:16 $ $Author: estrabd $
+
+START   :: 0
+FINAL   :: 2
+EPSILON :: epsilon
+
+0:
+epsilon 1,3
+b 2
+
+1:
+a 2,4
+
+2:
+b 5
+
+3:
+c 2,6
+
+4:
+epsilon 5
+a 2,4     # loops back to itself
+
+5:
+a 4
+b 5       # loops back to itself
+c 6 
+
+6: 
+a 5
+c 6       # loops back to itself

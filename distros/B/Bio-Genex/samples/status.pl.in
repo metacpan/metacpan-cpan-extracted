@@ -1,0 +1,73 @@
+%%START_PERL%%
+
+# Copyright (c) 2001 National Center for Genome Resources
+# all rights reserved
+
+# author: Jason E. Stewart (jes@ncgr.org || jason@openinformatics.com)
+use Config;
+
+%%GENEX_EXTRALIBS%%
+use Bio::Genex;
+use Bio::Genex::DBUtils qw(:CREATE);
+use Bio::Genex::Config;
+use Bio::Genex;
+use Class::ObjectTemplate;
+use Class::ObjectTemplate::DB;
+use DBI;
+use DBD::Pg;
+use XML::DOM;
+use Term::ReadKey;
+use CGI qw(:standard);
+
+my $q = CGI->new();
+my %Config = %{$Bio::Genex::Config};
+my $title = 'GeneX Server Installation Status Page';
+print $q->header(), 
+  $q->start_html(-title=>$title), 
+  $q->h1($title);
+
+print $q->h2('GeneX Server Information');
+print $q->table({-border => ''},
+#		caption('Values of CGI parameters'),
+		Tr([th(['Version','Date of Version', 'Installation Date', 'Installed By']),
+		    td([$Config{GENEX_SERVER_VERSION}, $Config{GENEX_SERVER_VERSION_DATE}, $Config{GENEX_SERVER_INSTALLATION_DATE}, $Config{GENEX_SERVER_INSTALLED_BY}]),
+		   ])
+	       );
+my $dbh = Bio::Genex::current_connection();
+my $sql = create_select_sql($dbh,
+			    FROM=>['GenexAdmin'],
+			    COLUMNS=>['version_number','version_date','install_date', 'installed_by','description'],
+			   );
+my ($db_version, $db_version_date,$db_install_date,$db_installed_by,$description) =
+  @{$dbh->selectall_arrayref($sql)->[0]};
+
+print $q->h2('GeneX Database Information');
+print $q->table({-border => ''},
+		Tr([th(['Version','Date of Version', 'Installation Date', 'Installed By', 'Description']),
+		    td([$db_version, $db_version_date,$db_install_date,$db_installed_by,$description]),
+		   ])
+	       );
+
+my ($PERL_PATH) = '%%START_PERL%%' =~ m/^\#\!(.*)$/;
+print $q->h2('Perl Information');
+print $q->table({-border => ''},
+		Tr([th(['Path to Interpreter', 'Version']),
+		    td([$PERL_PATH, $::Config{version}]),
+		   ]));
+
+print $q->h2('Perl Module Information');
+print $q->table({-border => ''},
+		Tr([th(['Module Name', 'Version']),
+		    td(['Bio::Genex', $Bio::Genex::VERSION]),
+		    td(['Class::ObjectTemplate', $Class::ObjectTemplate::VERSION]),
+		    td(['Class::ObjectTemplate::DB', $Class::ObjectTemplate::DB::VERSION]),
+		    td(['CGI', $CGI::VERSION]),
+		    td(['DBI', $DBI::VERSION]),
+		    td(['DBD::Pg', $DBD::Pg::VERSION]),
+		    td(['XML::DOM', $XML::DOM::VERSION]),
+		    td(['Term::ReadKey', $Term::ReadKey::VERSION]),
+		   ])
+	       );
+
+print $q->end_html();
+

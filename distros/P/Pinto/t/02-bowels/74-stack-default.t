@@ -7,8 +7,8 @@ use lib 't/lib';
 use Pinto::Tester;
 
 #------------------------------------------------------------------------------
-subtest 'stack default' => sub {
-    
+
+{
     my $t = Pinto::Tester->new;
     $t->stack_is_default_ok('master');
 
@@ -29,8 +29,7 @@ subtest 'stack default' => sub {
         'There is no default stack at all';
 
     $t->path_not_exists_ok( [qw(modules)] );
-
-};
+}
 
 #------------------------------------------------------------------------------
 

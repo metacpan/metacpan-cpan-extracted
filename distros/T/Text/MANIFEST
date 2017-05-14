@@ -1,7 +1,0 @@
-Changes
-lib/Text/Format.pm
-lib/Text/NWrap.pm
-t/format.t
-t/justify.t
-MANIFEST
-Makefile.PL

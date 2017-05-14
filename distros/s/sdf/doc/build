@@ -1,0 +1,87 @@
+#!/usr/local/bin/perl5
+#
+# >>Title::     Build Documentation
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+use Cwd;
+!require "sdf/name.pl";
+
+# The root directory for documents
+$DOC_ROOT = cwd();
+
+# The formats to build for each document
+%FMTS = (
+    "paper/sdfintro",   ['pdf', 'html'],
+    "quickref/qr_sdf",  ['pdf', 'html'],
+    "user/ug_sdf",      ['book -zpdf', 'topics'],
+    "guru/gg_sdf",      ['book -zpdf', 'topics'],
+    "ref/re_sdf",       ['book -zpdf', 'topics'],
+    "genhtml/index",    ['pdf', 'html'],
+    "podusers/index",   ['pdf', 'html'],
+    "release/rn_sdf",   ['pdf', 'topics'],
+    "faq/faq",          ['pdf', 'html'],
+);
+
+# Symbolic names for sets of documents
+%TAGS = (
+    "all",      [sort keys %FMTS],
+);
+
+# Check the usage
+unless (@ARGV) {
+    print "usage: build [-l] list_of_docs\n";
+    exit 1;
+}
+
+# Check for the local flag
+$local_docs = '';
+if ($ARGV[0] eq '-l') {
+    $local_docs = '-DLOCAL_DOCS';
+    shift;
+}
+
+# Generate the documents
+while (defined($doc = shift(@ARGV))) {
+
+    # Expand symbolic names
+    if ($TAGS{$doc}) {
+        unshift(@ARGV, @{$TAGS{$doc}});
+        next;
+    }
+
+    # Get the formats to generate for this document
+    @fmts = @{$FMTS{$doc}};
+    unless (@fmts) {
+        print "error: unknown document '$doc'\n";
+        next;
+    }
+
+    # Change to the directory holding the document
+    ($dir, $file) = &NameSplit($doc);
+    chdir "$DOC_ROOT/$dir";
+    print "CHANGED TO: ", `pwd`;
+
+    # Generate the required outputs
+    for $fmt (@fmts) {
+        print "EXECUTING: sdf -2$fmt $file\n";
+        system("sdf -2$fmt $file");
+    }
+}
+
+# Update the document catalog and INSTALL notes
+chdir $DOC_ROOT;
+print "CHANGED TO: ", `pwd`;
+print "EXECUTING: sdf -2html $local_docs catalog\n";
+system("sdf -2html $local_docs catalog");
+print "EXECUTING: sdf -2txt -o- -csdf user/in_insta.sdf > ../INSTALL\n";
+system("sdf -2txt -o- -csdf user/in_insta.sdf > ../INSTALL");

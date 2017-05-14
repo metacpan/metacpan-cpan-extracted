@@ -1,0 +1,434 @@
+=head1 NAME
+
+Arc::Command - Abstract base class for ARCv2 commands
+
+=head1 DESCRIPTION
+
+ARC allows non-privileged users to run privileged commands on the server.
+The server decides if the user is allowed to run this command through ACL.
+
+This file is a part of the Perl ARCv2 module suite. ARCv2 is a 
+rewrite of ARC by R.Toebbicke, CERN, Switzerland in Perl. 
+
+=head1 ABSTRACT
+
+From ARC by R. Toebbicke, modified by me:
+User requests are shipped from a client machine to a server using a
+SASL-authenticated socket connection. The purpose is to convey
+requests such as privileged commands (e.g. AFS, Crontab) to be executed on the
+server under appropriate privileges. Given that all privileges are
+confined to the server and the server can be programmed as to filter and
+check the command to be executed, the client machine can be less trusted
+than the server.
+
+Because ARC-v1-Commands are written in perl anyway, implementing the client/server
+in perl makes sense. Platform-independence and "easy-to-read" source code are welcome
+too. This package provides two perl command line scripts (arcx, arcxd). They can
+be used for working with the ARC server from the command line, resp. to start the
+server.
+
+=head1 SYNOPSIS
+
+This module is part of the module suite ARCv2.
+
+This is the command module from ARCv2. If we would use C++, we would say
+this is an abstract class of an ARC Command. All commands used by ARCv2 should
+derive from this class.
+
+=head1 HOW DOES IT WORKS
+
+This abstract class is the base class for all existing ARCv2 commands and 
+should be the base class for all new ARCv2 commands.
+ 
+When starting the ARCv2 Server you have to pass a important hash:
+
+ $arc = new Arc::Server ( 
+    [..] Arc::Server vars [..],
+   connection_vars => { 
+      commands => { 
+        'pv' => 'Arc::Command::Pv'
+      } 
+   }
+ )  
+ 
+ resp.
+
+ $arc->{connection_vars}->{commands}
+
+This hash describes the assignment of B<Command Name> and B<Command Class>. 
+When a client has authenticated and wants to run a command, it will send 
+the B<Command Name> and suitable, optional parameters. The server will look into 
+the commands hash and creates an object of the B<Command Class> 
+associated with B<Command Name>.
+
+ my $perlcmd = $this->{commands}->{$cmd};
+ [..]
+ eval "require $perlcmd;"
+ [..]
+ (fork)
+ my $ret = eval
+ {
+  my $object = new $perlcmd(
+    _username => $this->{_username},
+    _peeraddr => $this->{peeraddr},
+    _peerport => $this->{peerport},
+    _peername => $this->{peername},
+    _cmd => $cmd,
+    logfileprefix => "command",
+  );
+  $object->Execute(@a);
+  $cmderr = $object->IsError();
+
+  return -1;
+ };
+ 
+When everything went alright, the command will be executed. The command runs
+in a separate process. Therefore STDIN, STDOUT and STDERR are duped to two
+pipes, one for the in, one for the out direction. In the parent process data
+from the encrypted network command connection is read from and written to these pipes.
+Same situation on the client side, STDIN and STDOUT are used to put and get the 
+data through the network.
+ 
+                   encrypted
+          /--->>---| net- |--->>-----\   
+        / /---<<---| work |---<<-----\ \
+      / /                              \ \
+     | |     in                         | |    p2
+  |--------|->>--\                  |--------|->>--\ 
+  | Client | out   \                | Server | p1    \
+  |--------|-<<-\    \              |--------|-<<-\    \ 
+                /|\  \|/                          /|\  \|/
+               |--------|                       |-----------|
+               |  User  |                       |  Command  |
+               |--------|                       |-----------|
+ 
+This design makes it easy for ARCv2 Commands to get input and produce output.
+
+B<Example>:
+ sub Execute 
+ {
+  while ($_ = <STDIN>) { # ends on EOF
+     s/a/b/g; print;
+  }
+ }
+ 
+If you want to implement a new Command for ARCv2 you have to derive from 
+Arc::Command and override the sub C<Execute>. See existing Arc::Command::* 
+classes for examples. To get your Command recognised you have to assign a 
+B<Command Name> to your command class. ARCv2 ignores the return code of
+B<Execute>. If your command runs into an error use the _SetError function 
+and return immediately. This is what ARCv2 will evaluate and send to the
+client.
+
+B<Example>:
+ sub Execute
+ {
+  my $this = shift;
+  my $pw = <>;
+  if ($pw ne "klaus") {
+	  return $this->_SetError("Wrong password.");
+  }
+ }
+ 
+In ARCv2 some standard commands are already implemented: C<Arc::Command::Get>,
+C<Arc::Command::Put>, C<Arc::Command::Uptime>, C<Arc::Command::Whoami>,
+C<Arc::Command::Test>.
+
+By default, these classes are mapped to B<Command Names> as follows (in the 
+default arcxd.conf for arcxd):
+  uptime => Arc::Command::Uptime,
+  whoami => Arc::Command::Whoami,
+  copy   => Arc::Command::Get,
+  cp     => Arc::Command::Get,
+  get    => Arc::Command::Get,
+  put    => Arc::Command::Put,
+  test   => Arc::Command::Test,
+  help   => Arc::Command::Help,
+ 
+B<Caution>: Especially take care of the C<Arc::Command::Get> and 
+C<Arc::Command::Put> in production environment. As ARCv2 will probably
+run as root and by default the Get and Put command do NOT have an access
+control, everyone can get or put any files from/to your ARCv2 server.
+
+There are some member variables, which contain information about the 
+client. See 'Class VARIABLES' for a complete list of them. These values 
+are filled by Arc::Connection::Server, when the client wants to run a command.
+
+
+=head1 Class VARIABLES
+
+=head3 PUBLIC MEMBERS
+
+=over 2
+
+=item logfileprefix I<reimplemented from Arc>
+
+B<Default value>: "command"
+
+=back 
+
+=over 2
+
+=item logdestination I<inherited from Arc>
+
+B<Description>: Where should all the log output go to ('stderr','syslog')
+
+B<Default value>: 'syslog'
+
+=item loglevel I<inherited from Arc>
+
+B<Description>: loglevel is combination of bits (1=AUTH,2=USER,4=ERR,8=CMDDEBUG,16=VERBSIDE,32=DEBUG) see _Log method
+
+B<Default value>: 7
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PROTECTED MEMBERS
+
+=over 2
+
+=item _cmd 
+
+B<Description>: user runs this command
+
+B<Default value>: undef
+
+=item _commands 
+
+B<Description>: the "available commands"-hash from the server, 
+
+B<Default value>: {}
+
+=item _mech 
+
+B<Description>: user uses this authentication mechanism (e.g. GSSAPI)
+
+B<Default value>: undef
+
+=item _peeraddr 
+
+B<Description>: users ip address
+
+B<Default value>: undef
+
+=item _peername 
+
+B<Description>: users host address in sockaddr_in format
+
+B<Default value>: undef
+
+=item _peerport 
+
+B<Description>: users port
+
+B<Default value>: undef
+
+=item _realm 
+
+B<Description>: the name of the realm, to which the user belongs (SASL)
+
+B<Default value>: ""
+
+=item _username 
+
+B<Description>: user, who has authenticated against ARCv2 Server by using SASL
+
+B<Default value>: ""
+
+=back 
+
+=over 2
+
+=item _error I<inherited from Arc>
+
+B<Description>: contains the error message
+
+B<Default value>: undef
+
+=item _syslog I<inherited from Arc>
+
+B<Description>: log to syslog or to STDERR
+
+B<Default value>: 1
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PRIVATE MEMBERS
+
+=head1 Class METHODS
+
+=head3 PUBLIC METHODS
+
+=over 2
+
+=item Execute ( ... (parameter from users request) ) 
+
+B<Description>: execute this command.
+This function is called by the ARCv2 Server when the user wants 
+to execute this command. 
+
+
+B<Returns:> true if the command has succeeded, false (and please set _SetError) if not.
+
+
+=back 
+
+=over 2
+
+=item DESTROY (  ) I<inherited from Arc>
+
+B<Description>: Destructor
+
+
+=item IsError (  ) I<inherited from Arc>
+
+B<Description>: User function to get the error msg.
+
+
+B<Returns:> the error message if any otherwise undef
+
+
+B<Example:>
+
+unless (my $err = $arc->IsError()) { .. } else { print STDERR $err; }
+
+
+=item Log ( $facility, ... (message) ) I<inherited from Arc>
+
+B<Description>: Log function.
+Logs messages to 'logdestination' if 'loglevel' is is set appropriatly.
+loglevel behaviour has changed in the 1.0 release of ARCv2, the "Arc"-class can export
+LOG_AUTH (authentication information), LOG_USER (connection information), LOG_ERR (errors), 
+LOG_CMD (ARCv2 addition internal command information), LOG_SIDE (verbose client/server-specific
+information), LOG_DEBUG (verbose debug information). It possible to combine the 
+levels with or (resp. +) to allow a message to appear when not all loglevels are 
+requested by the user.
+Commonly used for logging errors from application level.
+
+
+B<Returns:> always false
+
+
+B<Example:>
+
+return $arc->Log(LOG_ERR,"Message");
+
+
+=item new ( %hash, key => val, ... ) I<inherited from Arc>
+
+B<Description>: Constructor. 
+Initializes the object and returns it blessed.
+For all sub classes, please override C<_Init> to check the 
+parameter which are passed to the C<new> function. This
+is necessary because you are not able to call the the new method of a
+parent class, when having a class name (new $class::SUPER::new, does not work.).
+
+
+B<Returns:> blessed object of the class
+
+
+B<Example:>
+
+my $this = new Arc::Class ( key => value, key2 => value2 );
+
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PROTECTED METHODS
+
+=over 2
+
+=item _Debug ( ... (message) ) I<inherited from Arc>
+
+B<Description>: Debug function.
+Logs messages with "DEBUG" 
+
+
+B<Returns:> always false
+
+
+B<Example:>
+
+$this->_Debug("hello","world"); # message will be "hello world"
+
+
+=item _Init ( %hash, key => val, ... ) I<inherited from Arc>
+
+B<Description>: Init function (initializes class context)
+Module dependent initialization, every subclass shall override it
+and call the _Init of its SUPER class. This method is called by the new method of C<Arc>.
+
+
+B<Returns:> true, if all passed values are in their definition scope, otherwise false
+
+
+B<Example:>
+
+see source code of any non-abstract sub class of Arc
+
+
+=item _SetError ( ... (message)  ) I<inherited from Arc>
+
+B<Description>: SetError function.
+This function prepends the error message (@_) to an existing error message (if any) and
+logs the message with LOG_ERR facility.
+Use this function for setting an error from class level. Users should use IsError 
+to get the message if a function failed.
+
+
+B<Returns:> always false
+
+
+B<Example:>
+
+return $this->_SetError("User is not allowed to do this."); # breaks when an error occured
+
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PRIVATE METHODS
+
+=head1 SEE ALSO
+
+L<Arc>, L<Arc::Command>, L<Arc::Connection>, 
+L<Arc::Connection::Server>, L<Arc::Connection::Client>,
+L<arcx>, L<arcxd>, L<Authen::SASL>, L<Authen::SASL::Cyrus>
+L<Net::Server::PreFork>
+
+=head1 AUTHOR
+
+ Patrick Boettcher <patrick.boettcher@desy.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003-5 Patrick Boettcher <patrick.boettcher@desy.de> and others.
+All rights reserved.
+Zeuthen, Germany, (old) Europe
+
+ This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+ Special thanks go to:
+DESY Zeuthen, in particular:
+
+- Wolfgang Friebel for bleeding edge testing and heavy bug reporting (and the idea of reimplementing ARC).
+
+- Waltraut Niepraschk and Andreas Haupt for their help and support during the development. 
+
+=cut

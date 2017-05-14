@@ -1,13 +1,19 @@
 =head1 NAME
 
-Flower - pasive agent
+Flower - passive agent
 
 =head1 VERSION
 
-Version 0.02
-
+Version 0.10
 
 =head1 SYNOPSIS
+
+ start up your elasticsearch
+
+ sudo /etc/init.d/elasticsearch start
+
+ now ready to go ahead
+
 
  git clone https://github.com/santex/Flower.git;
  cd Flower;
@@ -18,6 +24,12 @@ Version 0.02
  ip=127.0.0.1;
 
  perl $pwd"/bin/flower" --ip $ip --filepath $pwd"/data/"
+
+ Then visit L<https://127.0.0.1:2222> in your browser.
+
+ test urls passive log
+ L<https://127.0.0.1:2222/q/name>
+ L<https://127.0.0.1:2222/q/class>
 
 
 =cut
@@ -33,7 +45,7 @@ use Mojo::Server::Daemon;
 use EV;
 use AnyEvent;
 use Data::UUID;
-
+use Mojolicious::Plugin::SimpleSession;
 # This method will run once at server start
 sub startup {
   my $self = shift;
@@ -42,9 +54,12 @@ sub startup {
   my $r = $self->routes;
 
   # Normal route to controller
-  $r->route('/')->to('interface#root');
-  $r->route('/about')->to('interface#root');
+  $r->route('/')->to('interface#root',set=>{});
+  $r->route('/about')->to('interface#root',set=>{});
 
+
+  $r->route('/q/:type')->to('rest#query');
+  #$r->route('/q/:type')->to('rest#query');
   # RESTful routes
   # routes for the remote nodes to hit
   #$r->route('/REST/1.0/:file')->to('upload#store');
@@ -62,7 +77,7 @@ sub startup {
 
 
 1;
-# ABSTRACT: your pasive agent arround the web
+# ABSTRACT: your passive agent arround the web
 =head1 AUTHOR
 
 Hagen Geissler, C<< <santex at cpan.org> >>

@@ -1,0 +1,342 @@
+#!/usr/local/bin/perl
+# $Id$
+$VERSION{'PUBLIC'} = '2.000';
+$VERSION{''.__FILE__} = '$Revision$';
+#
+# >>Title::     Batch Processing Utility
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{CMD:sdfbatch}} is a preprocessor for {{CMD:fmbatch}},
+# [[FrameMaker]]'s command-line driven batch processing utility.
+#
+# >>Description::
+# Given a set of [[FrameMaker]] documents, {{CMD:sdfbatch}} can be used to:
+#
+# * change the formatting of the documents (ala {{Use Formats From}})
+# * update the documents (i.e. cross-references, etc.)
+# * print the documents
+# * save the documents in a nominated file format
+#
+# !SDF_OPT_HELP
+#
+# To change formatting, use the -f option to specify the file
+# to import the formats from. The -F option can be used to
+# specify what formats are imported. The argument to the -F
+# option is a set of the characters in the table below.
+#
+# !block table; format=28
+# Character  Meaning
+# p          Paragraph formats
+# f          Font formats
+# l          Page layouts
+# c          Cross references
+# v          Variables
+# r          Reference page contents
+# t          Table formats
+# x          Conditional text
+# k          Color
+# m          math
+# B          Preserve manual page breaks
+# O          Preserve other formatting overrides
+# !endblock
+#
+# By default, all formats are imported.
+#
+# To update documents, use the -u option.
+#
+# To print documents, use the -p option. If a parameter is not provided,
+# the file will be printed to the default printer. To print to a
+# [[PostScript]] file, specify the "file" keyword as the parameter.
+# Alternatively, the parameter is the name of a {{print settings}} file.
+#
+# When generating a [[PostScript]] file, the paper size can be specified
+# using the -P option. The default value is {{global}}. The paper size
+# name is actually mapped to a {{print settings}} file called
+# {{paper_size}}.{{fmver}} in the {{FILE:stdlib}} library directory.
+# {{fmver}} is typically either fm4 or fm5, depending on which version
+# of FrameMaker you are using.
+#
+# To save documents, use the -s option. By default, this saves each file.
+# To change the extension, supply an argument to the -s option.
+#
+# To specify a different format, use the -S option. Possible
+# values are:
+#
+# * m - MIF
+# * a - line-oriented ASCII
+# * t - paragraph-oriented ASCII
+# * d - Frame document
+# * l - View-Only Frame document
+# * - - file's current format [default]
+#
+# Take care with the file extension - any existing files will be
+# replaced without warning.
+#
+# The -n option causes the generated {{CMD:fmbatch}} file to be output.
+# i.e. fmbatch is not called. This option is useful for debugging.
+#
+# The -t option enables the user to tune the time-out used when
+# waiting for the print driver to generate a PostScript file.
+# The default value is 300 seconds (i.e. 5 minutes).
+#
+# A combination of the f, u, p and s options can be supplied if more
+# that one operation is required per file. For example, you may
+# wish to import formats and then save the resultant file. For
+# each file, the operations are always done in the following order:
+#
+# ^ formatting
+# + updating
+# + printing
+# + saving
+#
+# Note: Not all of the values documented for the -F and -S options
+# may be supported in Frame versions before 4.0 and additional
+# values may be supported in future versions. As such, the
+# values supplied to these options are simply embedded in the
+# generated {{CMD:sdfbatch}} file. i.e. no checking is done on the value.
+# This behaviour is considered a feature.
+#
+# >>Examples::
+#
+# To format and print a set of files:
+#
+# V:	sdfbatch -fmyfmts.doc -p *.doc
+#
+# To convert mif files to binary files:
+#
+# V:	sdfbatch -sdoc -Sd *.mif
+#
+# To copy Frame variables from a file to a set of files:
+#
+# V:	sdfbatch -fvariable.mif -Fv -s *.doc
+#
+# >>Limitations::
+#
+# >>Resources::
+#
+# >>Implementation::
+#
+
+require "sdf/app.pl";
+
+########## Initialisation ##########
+
+# define configuration
+%app_config = (
+    'inifile',	'sdfbatch.ini',
+    'libdir',   'sdf/home',
+);
+
+# define options
+@app_option = @app_option_core;
+push(@app_option, (
+	#'Name|Spec|Help',
+	'fmt_file|STR|formats file',
+	'fmt_what;F|STR|formats to import',
+	'update_doc|BOOL|update documents',
+	'print_doc|STR;;-|print documents',
+	'paper_size;P|STR;global|paper size name',
+	'save_ext|STR;;-|save extension',
+	'save_fmt;S|STR;-|save file format',
+	'no_action|BOOL|output the batch file (instead of calling fmbatch)',
+    'timeout|INT;300|timeout for printer driver to generate ps',
+));
+
+# setup default values for:
+# * the path of the Frame executables
+# * the fmbatch command to use
+# * the FrameMaker extension to use
+# * the temporary file
+#$fmhome = $ENV{'FMHOME'} ? $ENV{'FMHOME'} : "/usr/frame";
+$fmbatch = "fmbatch -i";
+$fmext = "fm5";
+$tmp_file = "/tmp/sdfbatch$$";
+
+# ini-file handler
+sub iniProcess {
+    local($fname, *data) = @_;
+#   local();
+    local($section, %values);
+
+    for $section (sort keys %data) {
+        if ($section eq 'Frame') {
+            %values = &AppSectionValues($data{$section});
+            $fmbatch = $values{'fm_batch'} if $values{'fm_batch'} ne '';
+            $fmext = $values{'fm_ext'}     if $values{'fm_ext'}   ne '';
+            delete $data{$section};
+        }
+        else {
+            delete $data{$section};
+        }
+    }
+}
+
+# handle options
+&AppInit('frame_file ...', 'generate fmbatch input file', 'SDF',
+  'iniProcess') || &AppExit();
+
+# set up print settings file, if any
+if ($print_doc && $print_doc ne '-') {
+    if ($print_doc eq 'file') {
+        $prt_file = "$app_lib_dir/stdlib/$paper_size.$fmext";
+    }
+    else {
+	    $prt_file = $print_doc;
+    }
+}
+
+# This is the set of filenames collected during argument processing
+@doc_files = ();
+
+########## Argument Processing ##########
+
+sub argProcess {
+	local($doc_file) = @_;
+#	local();
+	
+    push(@doc_files, $doc_file);
+	push(@batch, "Open \"$doc_file\"");
+	if ($fmt_file) {
+	  	push(@batch,
+		  "UseFormatsFrom $fmt_what \"$doc_file\" \"$fmt_file\"");
+	}
+	if ($update_doc) {
+		push(@batch, "Update \"$doc_file\"");
+	}
+	if ($print_doc) {
+		if ($prt_file) {
+			push(@batch, "Print \"$doc_file\" \"$prt_file\"");
+		}
+		else {
+			push(@batch, "Print \"$doc_file\"");
+		}
+	}
+	if ($save_ext) {
+		if ($save_ext eq '-' && $save_fmt eq '-') {
+			push(@batch, "Save \"$doc_file\"");
+		}
+		elsif ($save_ext eq '-') {
+			$new_file =  $doc_file;
+			push(@batch, "SaveAs $save_fmt \"$doc_file\" \"$new_file\"");
+		}
+		else {
+			$new_file =  &NameSubExt($doc_file, $save_ext);
+			push(@batch, "SaveAs $save_fmt \"$doc_file\" \"$new_file\"");
+		}
+	}
+	push(@batch, "Quit \"$doc_file\"");
+
+	# return result
+	return 0;
+}
+
+########## Main Program ##########
+
+# Build the batch file
+@batch = ();
+push(@batch, "Open \"$fmt_file\"") if $fmt_file;
+push(@batch, "Open \"$prt_file\"") if $prt_file;
+&AppProcess('argProcess');
+push(@batch, "Quit \"$fmt_file\"") if $fmt_file;
+push(@batch, "Quit \"$prt_file\"") if $prt_file;
+
+# If requested, output the batch file
+if ($no_action) {
+    printf "%s\n", join("\n", @batch);
+}
+
+# Otherwise, pass it to fmbatch for execution
+else {
+    # call fmbatch
+    unless (open(FMBATCH, "|$fmbatch > $tmp_file")) {
+        &AppExit("fatal", "failed to pipe data to fmbatch");
+    }
+    printf FMBATCH "%s\n", join("\n", @batch);
+
+    # clean up
+    close(FMBATCH);
+    if ($? || $debug) {
+        unless (open(TMPFILE, $tmp_file)) {
+            &AppExit("app_warning", "unable to open tmp file '$tmp_file'");
+        }
+        else {
+            print <TMPFILE>;
+            close(TMPFILE);
+        }
+    }
+    unlink($tmp_file);
+
+    # Rename the ps files, if necessary
+    if ($print_doc eq 'file' && $fmext ne 'fm4') {
+        for $doc_file (@doc_files) {
+            &RenamePS($doc_file);
+        }
+    }
+}
+
+# Exit the program
+&AppExit();
+
+########## Support Routines ##########
+
+# Signam handler for alarms
+$timed_out = 0;
+sub handle_alarms {
+    $timed_out = 1;
+}
+
+# Rename a PostScript file from the form xx.out.ps to the form xx.ps.
+# {{base_ext}} is the orginal filename without the ps (e.g. xx.out).
+sub RenamePS {
+    local($base_ext) = @_;
+#   local();
+    local($base, $ext);
+    local($old_name, $new_name);
+
+    # Get the filenames
+    if ($base_ext =~ /\.(\w+)$/) {
+        $base = $`;
+        $ext = $1;
+    }
+    else {
+        $base = $base_ext;
+        $ext = '';
+    }
+    $old_name = "$base_ext.ps";
+    $new_name = "$base.ps";
+
+    # Setup the alarm handler for RenamePS timeouts
+    $timed_out = 0;
+    $SIG{'ALRM'} = 'handle_alarms';
+    alarm($timeout);
+
+    # Wait until the print driver has finished, if necessary
+    unless (-f $old_name) {
+        print STDERR "waiting for '$old_name' to finish printing\n";
+        until (-f $old_name) {
+            last if $timed_out;
+            sleep(1);
+            print STDERR ".";
+        }
+        print STDERR "\n";
+    }
+
+    # Rename the file, if possible
+    if ($timed_out) {
+        &AppMsg("app_warning", "'$old_name' not found after $timeout seconds");
+    }
+    else {
+        rename($old_name, $new_name) ||
+          &AppMsg("app_warning", "unable to rename '$old_name' to '$new_name':$!");
+    }
+}

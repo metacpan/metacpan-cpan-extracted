@@ -1,0 +1,37 @@
+Revision History for Plack-Middleware-BotDetector
+=================================================
+
+v1.20170315.1614 2017-03-15
+---------------------------
+
+commit a320402a4cb1fd75a451bebd6caf9f7443537822
+Author: chromatic <chromatic@wgz.org>
+Date:   Wed Mar 15 09:13:25 2017 -0700
+
+    Updates to improve prereqs and install speed.
+
+1.20160917.1822 2016-09-17
+--------------------------
+
+commit 37108adfc10d47515a50530352c520d84a0db3f3
+Author: chromatic <chromatic@wgz.org>
+Date:   Sat Sep 17 11:21:40 2016 -0700
+
+    Added a couple more tiny optimizations.
+    
+    Again, if this module did anything more than it does, they probably
+    wouldn't be worth it.
+
+commit 388140bbb2ae620e8394c6e578c66766c07fa186
+Author: chromatic <chromatic@wgz.org>
+Date:   Sat Sep 17 11:15:37 2016 -0700
+
+    Added minor optimizations.
+    
+    These are very, very small -- but this is middleware, so even the modest
+    expense can add up over time. Given that this is essentially one
+    effective line of code, the balance seems appropriate.
+
+===================================
+End of changes in the last 365 days
+===================================

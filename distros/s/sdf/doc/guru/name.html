@@ -1,0 +1,101 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: name.pl - Name Processing Library</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="dict.html">Previous Topic</A> | <A HREF="misc.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="name.pl">2.4. name.pl - Name Processing Library</A></H1>
+<HR>
+<H2><A NAME="Purpose">2.4.1. Purpose</A></H2>
+<P>This library provides support for file-name processing. With careful use, the routines provide portability across <A HREF="http://www.cis.ohio-state.edu/hypertext/faq/usenet/unix-faq/faq/top.html">Unix</A>-like and <A HREF="http://www.microsoft.com/windows">Windows</A>-like file-naming systems.</P>
+<HR>
+<H2><A NAME="Interface">2.4.2. Interface</A></H2>
+<PRE>
+require &quot;name.pl&quot;;
+
+$<A HREF="#name_NAME_OS">NAME_OS</A> = ...
+
+$<A HREF="#name_NAME_OS">NAME_OS</A> = ...
+
+%<A HREF="#name_NAME_DIR_TABLE">NAME_DIR_TABLE</A> = ...
+
+%<A HREF="#name_NAME_PATH_TABLE">NAME_PATH_TABLE</A> = ...
+
+$<A HREF="#name_NAME_DIR_SEP">NAME_DIR_SEP</A> = ...
+
+$<A HREF="#name_NAME_PATH_SEP">NAME_PATH_SEP</A> = ...
+
+&amp;<A HREF="#name_NameOS">NameOS</A>();
+
+$result =
+&amp;<A HREF="#name_NameIsAbsolute">NameIsAbsolute</A>($name);
+
+$result =
+&amp;<A HREF="#name_NameAbsolute">NameAbsolute</A>($name);
+
+$found_name =
+&amp;<A HREF="#name_NameFind">NameFind</A>($name, @dirs);
+
+($dir, $base, $ext, $short) =
+&amp;<A HREF="#name_NameSplit">NameSplit</A>($name);
+
+&amp;<A HREF="#name_NamePathComponentSplit">NamePathComponentSplit</A>();
+
+$name =
+&amp;<A HREF="#name_NameJoin">NameJoin</A>($dir, $base, $ext);
+
+$new_name =
+&amp;<A HREF="#name_NameSubExt">NameSubExt</A>($name, $new_ext);
+
+&amp;<A HREF="#name_NameLoadConversionRules">NameLoadConversionRules</A>(*table, $validate);
+
+$full =
+&amp;<A HREF="#name_NameFindOrGenerate">NameFindOrGenerate</A>($name, $dir_list_ref, $ext_list_ref, $context);
+
+$full =
+&amp;<A HREF="#name_NameFindInDirectory">NameFindInDirectory</A>($dir, $base, $ext_list_ref, $context);
+
+</PRE>
+<HR>
+<H2><A NAME="Description">2.4.3. Description</A></H2>
+<P><STRONG><A NAME="name_NAME_OS">NAME_OS</A></STRONG> returns the current operating system style, either <EM>unix</EM> or <EM>dos</EM>. <STRONG><A NAME="name_NAME_DIR_TABLE">NAME_DIR_TABLE</A></STRONG> and <STRONG><A NAME="name_NAME_PATH_TABLE">NAME_PATH_TABLE</A></STRONG> are lookup tables of directory and path separators for different operating system styles. <STRONG><A NAME="name_NAME_DIR_SEP">NAME_DIR_SEP</A></STRONG> and <STRONG><A NAME="name_NAME_PATH_SEP">NAME_PATH_SEP</A></STRONG> are the respective separators for <EM>NAME_OS</EM>.</P>
+<P><STRONG><A NAME="name_NameOS">NameOS</A></STRONG> returns the SDF version of the OS name.</P>
+<P><STRONG><A NAME="name_NameIsAbsolute">NameIsAbsolute</A></STRONG> returns 1 if the name is in absolute (or non-relative) format.</P>
+<P><STRONG><A NAME="name_NameAbsolute">NameAbsolute</A></STRONG> returns the absolute name for a file.</P>
+<P><STRONG><A NAME="name_NameFind">NameFind</A></STRONG> searches the directories for a file with the name given. If found, the combined name (directory + local name) is returned. If the name is absolute, the file is checked to exist. i.e. the directories are not searched. In either case, if the file is not found, an empty string is returned.</P>
+<P><STRONG><A NAME="name_NameSplit">NameSplit</A></STRONG> extracts components from a name. <EM>short</EM> is the name without the directory.</P>
+<P><STRONG><A NAME="name_NamePathComponentSplit">NamePathComponentSplit</A></STRONG> completely splits a path into its component parts. Returns a list of the parts.</P>
+<P><STRONG><A NAME="name_NameJoin">NameJoin</A></STRONG> builds a name from its components. If the base name is already absolute, the directory is not prepended.</P>
+<P><STRONG><A NAME="name_NameSubExt">NameSubExt</A></STRONG> substitutes the extension on a name.</P>
+<P><STRONG><A NAME="name_NameLoadConversionRules">NameLoadConversionRules</A></STRONG> loads a table of conversion rules to be used by <STRONG><A NAME="name_NameFindOrGenerate">NameFindOrGenerate</A></STRONG>. The fields in <EM>@table</EM> are:</P>
+<UL>
+<LI><EM>Context</EM> - the driver for which this conversion applies
+<LI><EM>To</EM> - the destination figure format
+<LI><EM>From</EM> - the original figure format
+<LI><EM>Action</EM> - the command to use to do the conversion.</UL>
+<P>Rules do not chain, so defining rules for A-&gt;B and B-&gt;C do not imply that A will be converted to C. If <EM>validate</EM> is set, the table is validated.</P>
+<P><STRONG><A NAME="name_NameFindOrGenerate">NameFindOrGenerate</A></STRONG> searches a list of directories for a file with one of the list of extensions. The extensions are searched for in the order given. If <EM>NameLoadConversionRules</EM> has been called, this routine will attempt to generate a file in the current directory using the nominated <EM>context</EM>, if any. If a file was found or generated, the combined name (directory + local name) is returned. If the name is absolute, the file is checked to exist. i.e. the directories are not searched. In either case, if the file is not found, an empty string is returned.</P>
+<P><STRONG><A NAME="name_NameFindInDirectory">NameFindInDirectory</A></STRONG> attempts to find a file directory <EM>dir</EM> using <EM>base</EM> and the set of extensions given by <EM>$ext_list_ref</EM>. For each base.ext combination, if it doesn't find that file, it tries to generate a file of that name in the current directory using:</P>
+<UL>
+<LI>the conversion rules loaded by <STRONG><A NAME="name_NameLoadConversionRules">NameLoadConversionRules</A></STRONG>
+<LI>the files called <EM>base.*</EM> in the <EM>dir</EM> directory
+<LI>the <EM>context</EM></UL>
+<P>If the file is found or generated, its name is returned, otherwise an empty string is returned.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>If the base already has an extension, the extension list isn't used.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="dict.html">Previous Topic</A> | <A HREF="misc.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

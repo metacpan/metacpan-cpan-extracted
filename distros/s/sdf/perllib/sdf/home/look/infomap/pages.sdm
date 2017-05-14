@@ -1,0 +1,37 @@
+# $Id$
+#
+# >>Title::	Pages Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 08-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{pages}} is an [[SDF]] module containing configuration data
+# common to styles in the {{infomap}} look.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Inherit what we can from the simple look
+!use "look/simple/pages"
+
+# Adjust the header/footer size and positioning
+!define PAGE_FIRST_FOOTER_HEIGHT  '0.50in'
+!define PAGE_FIRST_FOOTER_GAP     '0.25in'
+!define PAGE_RIGHT_HEADER_HEIGHT  '0.50in'
+!define PAGE_RIGHT_HEADER_GAP     '0.25in'
+!define PAGE_RIGHT_FOOTER_HEIGHT  '0.50in'
+!define PAGE_RIGHT_FOOTER_GAP     '0.25in'
+
+# Adjust the sidehead size
+!define OPT_SIDEHEAD_WIDTH "90pt"
+!define OPT_SIDEHEAD_GAP   "10pt"

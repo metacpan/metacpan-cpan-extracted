@@ -1,0 +1,165 @@
+#!/usr/local/bin/perl
+# $Id$
+$VERSION{'PUBLIC'} = '2.000';
+$VERSION{''.__FILE__} = '$Revision$';
+#
+# >>Title::     Command Line Interface Utility
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{CMD:sdfcli}} extracts command line interface (CLI) information from
+# applications and formats it into [[SDF]].
+#
+# >>Description::
+# !SDF_OPT_STD
+#
+# {{CMD:sdfcli}} executes each argument with a -h flag and converts
+# the resultant output to nicely formatted [[SDF]]. An argument of "-"
+# specifies that the help should be read from standard input.
+#
+# Formatting is done as follows:
+#
+# ^ lines are tagged as {{Example}} paragraphs, with the
+#   first line formatted to wrap option usage specifications nicely
+# + if a line is found that starts with 'options:', it is replaced
+#   with a {{Body}} paragraph saying "The options are:", and the
+#   following lines are formatted as a table of codes and descriptions
+# + if a line is found that starts with 'aliases:', it is replaced
+#   with a {{Body}} paragraph saying "The aliases are:", and the
+#   following lines are formatted as a table of names and descriptions
+# + each option code in the table is formatted as a hypertext
+#   jump to a tag called {{cmd_opt}} where:
+#
+#   - {{cmd}} is the command name
+#   - {{opt}} is the option code
+#
+# The -w option specifies at what column to wrap option specifications.
+# The default is 50 - this is the best for output imported into the
+# [[Mincom]] templates.
+#
+# >>Limitations::
+# The table formats used are hard coded.
+#
+# >>Resources::
+#
+# >>Implementation::
+#
+
+require "sdf/app.pl";
+
+########## Initialisation ##########
+
+# define configuration
+%app_config = (
+    'libdir',   'sdf/home',
+);
+
+# define options
+push(@app_option, (
+    #'Name|Spec|Help',
+    'wrap|INT;50|column at which to wrap option specifications',
+));
+
+# handle options
+&AppInit('utility ...', "format a utility's command line interface into SDF",
+  'SDF') || &AppExit();
+
+########## Processing ##########
+
+sub argProcess {
+    local($ARGV) = @_;
+#   local();
+    local(@help, $line, $spec, $length, @option_specs);
+    local($code, $desc);
+    local($base);
+    
+    # Get the help for this utility, unless given already in STDIN
+    if ($ARGV eq "-") {
+        @help = <STDIN>;
+    }
+    else {
+        unless (open(HELP, "$ARGV -h|")) {
+            &AppMsg("abort", "failed to execute '$ARGV'");
+            return;
+        }
+        @help = <HELP>;
+        close(HELP);
+    }
+
+    # Nicely wrap option specifications on the first line
+    @option_specs = split(/\] /, shift(@help));
+    $spec = shift(@option_specs);
+    print "E:$spec";
+    $length = length($spec);
+    while ($spec = shift(@option_specs)) {
+        if ($length + length($spec) < $wrap) {
+            print "] $spec";
+            $length += length($spec) + 2;
+        }
+        else {
+            print "]\nE:         $spec";
+            $length = length($spec) + 9;
+        }
+    }
+
+    # Get the command name
+    $base = (&NameSplit($ARGV))[1];
+
+    # Format the rest
+    while ($line = shift(@help)) {
+        if ($line =~ /^options:/) {
+            print "\nThe options are:\n\n";
+            print "!block table; format=28\n";
+            print "Option:Description\n";
+            while ($_ = shift(@help)) {
+                if (/^aliases:/) {
+                    unshift(@help, $_);
+                    last;
+                }
+                elsif (/^\s*$/) {
+                    print $_;
+                }
+                else {
+                    # strip the long option name & format
+                    ($code, $desc) = /^-(\w), --\w+\s+(.*)$/;
+                    print "{{N[jump='#${base}_$code']-$code}}:$desc\n";
+                }
+            }
+            print "!endblock\n";
+        }
+        elsif ($line =~ /^aliases:/) {
+            print "\nThe aliases are:\n\n";
+            print "!block table; format=28\n";
+            print "Alias:Description\n";
+            while ($_ = shift(@help)) {
+                if (/^options:/) {
+                    unshift(@help, $_);
+                    last;
+                }
+                elsif (/^\s*$/) {
+                    print $_;
+                }
+                else {
+                    ($code, $desc) = /^\+(\w+)\s+(.*)$/;
+                    print "$code:$desc\n";
+                }
+            }
+            print "!endblock\n";
+        }
+        else {
+            print "E:$line";
+        }
+    }
+}
+
+&AppProcess('argProcess');
+&AppExit();

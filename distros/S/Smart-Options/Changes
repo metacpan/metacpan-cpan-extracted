@@ -1,5 +1,8 @@
 Revision history for Perl extension Smart::Options
 
+0.061 2017-05-11T13:16:43Z
+    - fix coerce (method chain)
+
 0.06 2017-05-02T12:49:20Z
     - support environment
     - support negate fields

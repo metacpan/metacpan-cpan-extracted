@@ -1,0 +1,72 @@
+TITLE
+    XLSperl - use Perl "one-liners" with Microsoft Excel files
+
+DESCRIPTION
+  Background
+    Perl "one-liners" have a great many uses for quick data processing
+    tasks, often replacing the UNIX tools "grep", "sed", and "awk". For
+    example, a simple "grep" function can be written as:
+
+     perl -lne '/pattern/ and print' file.txt
+
+    which improves on the standard "grep" function by allowing the extended
+    features of Perl regular expressions to be used.
+
+    However, this form of processing is only suitable for data that can be
+    read (or needs to be written) in plain text format. XLSperl lets you use
+    the same commands to process and create Microsoft Excel files, e.g. the
+    following command will "grep" an Excel document:
+
+     XLSperl -lne '/pattern/ and print' file.xls
+
+  Usage
+    Basic usage of XLSperl is as follows:
+
+     XLSperl [options] -e 'perl_code' file1.xls file2.xls ... fileX.xls
+ 
+    Additionally Microsoft Excel files can be piped in to XLSperl
+
+     cat file.xls | XLSperl [options] -e 'perl_code'
+
+  Options
+    Options to XLSperl mirror the standard options to "perl" - for full
+    usage details please read the XLSperl manpage (perldoc XLSperl) after
+    installation.
+
+
+INSTALLATION
+    To install XLSperl, use the standard Perl module installation procedure:
+    
+     perl Makefile.PL
+     make
+     make test
+     make install
+    
+    XLSperl requires the following modules to be installed:
+    
+     Spreadsheet::ParseExcel
+     Spreadsheet::WriteExcel::Simple
+     Variable::Alias
+    
+    Note that binary packages for Windows, Linux x86, and Mac OSX (Intel)
+    are available from http://perl.jonallen.info/projects/xlstools
+
+SEE ALSO
+    XLSperl homepage - <http://perl.jonallen.info/xlstools>
+    *Excel on the Command Line* talk slides -
+    <http://perl.jonallen.info/talks>
+    *Minimal Perl* by Tim Maher - <http://minimalperl.com>
+
+AUTHOR
+    Written by Jon Allen <jj@jonallen.info>
+
+COPYRIGHT and LICENSE
+    Copyright (C) 2007-2008 Jon Allen
+
+    This software is licensed under the terms of the Artistic License
+    version 2.0.
+
+    For full license details, please read the file 'artistic-2_0.txt'
+    included with this distribution, or see
+    http://www.perlfoundation.org/legal/licenses/artistic-2_0.html
+

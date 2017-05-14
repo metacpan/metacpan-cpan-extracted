@@ -1,0 +1,9 @@
+# The java code is in java/eai/test.wrl
+
+Shape {
+	geometry Sphere { }
+	appearance Appearance { 
+		material DEF MAT Material {
+		}
+	}
+}

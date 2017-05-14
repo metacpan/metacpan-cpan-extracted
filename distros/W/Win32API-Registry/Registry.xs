@@ -903,6 +903,7 @@ _RegQueryValueExA( hKey, sName, pNull, ouType, opData, iolData )
 	/* Traim trailing '\0' from REG*_SZ values if iolData was C<[]>: */
 	if(  RETVAL  &&  NULL != opData  &&  NULL != ouType
 	 &&  ( REG_SZ == *ouType || REG_EXPAND_SZ == *ouType )
+	 &&  *iolData >= 1  /* RT#37750 */
 	 &&  null_arg(ST(5))  &&  '\0' == opData[*iolData-1]  )
 	    --*iolData;
     OUTPUT:
@@ -940,6 +941,7 @@ _RegQueryValueExW( hKey, swName, pNull, ouType, opData, iolData )
 	if(  RETVAL  &&  NULL != opData  &&  NULL != ouType
 	 &&  ( REG_SZ == *ouType || REG_EXPAND_SZ == *ouType )
 	 &&  null_arg(ST(5))
+	 &&  *iolData >= sizeof(WCHAR) /* RT#37750 */
 	 &&  L'\0' == ((WCHAR *)opData)[(*iolData/sizeof(WCHAR))-1]  )
 	    *iolData -= sizeof(WCHAR);
     OUTPUT:

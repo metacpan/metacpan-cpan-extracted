@@ -1,0 +1,72 @@
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#	'encoding' => 'iso-8859-1',
+	'status' => 'tagTnT',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+     'tagger' => {
+      'language' => 'swedish',
+      'startup base' => 'tnt_',
+     },
+     'output' => {
+        'attribute' => 'pos',
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n\n",
+        'tag delimiter' => '\s+',
+	'encoding' => 'iso-8859-1',
+     },
+     'input' => {
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n\n",
+     },
+     'output replacements' => {
+        '(\G|\A|\n)\%\%[^\n]*(\Z|\n)' => '',
+     },
+  },
+  'module' => {
+    'program' => 'uplug-tag',
+    'location' => '$UplugBin',
+    'name' => 'TnT tagger (swedish)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'attr' => 'parameter:output:attribute',
+      'lang' => 'parameter:tagger:language',
+       'char' => 'output:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'inroot' => 'input:text:root',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk),language=sv)'
+	  },
+       },
+       'parameter' => {
+          'output' => {
+	     'attribute' => 'optionmenu (pos,tnt)',
+	  }
+       }
+  }
+}

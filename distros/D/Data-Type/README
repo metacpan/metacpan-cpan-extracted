@@ -1,307 +1,120 @@
 NAME
 
-Data::Type - versatile data and value types
+  Data::Type - robust and extensible data- and valuetype system
 
 VERSION
 
-0.01.04 (Tue Jan 14 13:24:28 2003)
+  0.02.01 (Wed Dec 1 21:33:51 2004)
 
 DESCRIPTION
 
-This module supports versatile data and value types. Out of the ordinary it supports 
-parameterised types (like databases have i.e. VARCHAR(80) ). When you try to feed a 
-typed variable against some odd data, this module explains what he would have expected. 
+  This module delivers an easy, generic and unified interface to type
+  related CPAN modules. They all have one common purpose: reporting if data
+  has some "characteristics". And this module wraps that with a clean api.
 
 SYNOPSIS
 
-	use Data::Type qw(:all);
-	use Error qw(:try);
-	
-	try
-	{
-		verify $email		, EMAIL;
-		verify $homepage	, URI('http');
-		verify $server_ip	, IP('v4');
-		verify $cc			, CREDITCARD( 'MASTERCARD', 'VISA' );
-		verify $answer_a	, YESNO;
-		verify $gender		, GENDER;
-		verify 'one'		, ENUM( qw(one two three) );
-		verify [qw(two six)], SET( qw(one two three four five six) ) );
+    use Data::Type qw(:is +ALL);
 
-		verify 'A35231AH1'	, CINS;
-		verify '14565935'	, ISSN;		
-		verify 'DE'			, LANGCODE;		
-		verify 'German'		, LANGNAME;
-		
-		verify '012345678905', UPC();
-		verify '5276440065421319', CREDITCARD( 'MASTERCARD' ) );
+    is STD::EMAIL or warn;
 
-		verify 'ATGCAAAT'	, BIO::DNA;				
-		verify 'AUGGGAAAU'	, BIO::RNA;		
+    warn if isnt STD::CREDITCARD( 'MASTERCARD', 'VISA' );
 
-		verify '01001001110110101', BINARY;
-		verify '0F 0C 0A', HEX;
-
-		verify '234'		, NUM( 20 );
-		verify '1' 			, BOOL( 'true' );
-		verify '100'		, INT;
-		verify '1.1'		, REAL;
-
-		my $foo = bless( \'123', 'SomeThing' );
-			
-		verify $foo 		, REF;
-		verify $foo			, REF( qw(SomeThing Else) );
-		verify [ 'bar' ]	, REF( 'ARRAY' );
-
-		verify ' ' x 20		, VARCHAR( 20 );
-		verify '2001-01-01'	, DATE( 'MYSQL' );
-		verify '16 Nov 94 22:28:20 PST'	, DATE( 'DATEPARSE' );
-		verify '9999-12-31 23:59:59', DATETIME;
-		verify '1970-01-01 00:00:00', TIMESTAMP;
-		verify '-838:59:59'	, TIME;
-		verify '2155'		, YEAR;
-		verify '69'			, YEAR(2);
-		verify '0' x 20		, TINYTEXT;
-		verify '0' x 20		, MEDIUMTEXT;
-		verify '0' x 20		, LONGTEXT;
-		verify '0' x 20		, TEXT;
-	}
-	catch Type::Exception with
-	{	
-		my $e = shift;
-		
-		printf "Expected '%s' %s at %s line %s\n",
-			$e->value, 
-			$e->type->info, 
-			$e->was_file, 
-			$e->was_line;
-
-		foreach my $entry ( testplan( $e->type ) )
-		{
-			printf "\texpecting it %s %s ", $entry->[1] ? 'is' : 'is NOT', $entry->[0]->info();
-		}
-	};
-
-		# believe it or not, this really works
-		
-	foreach ( EMAIL, WORD, CREDITCARD( 'MASTERCARD', 'VISA' ), BIO::DNA, HEX )
-	{
-		print $_->info;						
-		print $_->usage;					
-		print $_->export;					# does it have other names
-		print $_->choice;					# what are my choice i.e. [yes,no]
-		print $_->isa( 'IType::Business' ); # is it a Business related type ?
-		print $_->VERSION;					# first apperance in Data::Type release
-	}
-		
-		# tied interface (alias 'typ')
-		
-	try
-	{			
-		typ ENUM( qw(DNA RNA) ), \( my $a, my $b );
-
-		print "a is typ'ed" if istyp( $a );
-
-		$a = 'DNA';		# $alias only accepts 'DNA' or 'RNA'
-		$a = 'RNA';		
-		$a = 'xNA';		# throws exception 
-		
-		untyp( $alias );
-	}
-	catch Type::Exception ::with
-	{
-		printf "Expected '%s' %s at %s line %s\n",
-			$e->value, 
-			$e->type->info, 
-			$e->was_file, 
-			$e->was_line;
-	};
-		
-	my $g = Data::Type::Guard->new( 
-
-		allow => [ 'Human', 'Others' ],		# blessed objects of that type
-		
-		tests =>
-		{
-			email		=> EMAIL( 1 ),		# mxcheck ON ! see Email::Valid
-			firstname	=> WORD,
-			social_id	=> [ NUM, VARCHAR( 10 ) ],
-			contacts	=> sub { my %args = @_; exists $args{lucy} },				
-		}
-	);
-	
-	$g->inspect( $h );
-
-		# compact version
-		
-	overify { email => EMAIL( 1 ), firstname => WORD }, $object_a, $object_b;
-	
-	print toc();
-	
-	print catalog();
+    try
+    {
+      valid( '9999-12-31 23:59:59', DB::DATETIME );
+    }
+    catch Data::Type::Exception with
+    {
+      print $e->to_string foreach @_;
+    };
 
 EXAMPLES
 
-Visit the 't' directory.
-
-KEYWORDS
-
-data types, data manipulation, data patterns, form data, user input, tie
+  Visit the Data::Type::Docs::Howto to explore how to use this module for
+  DBI, CGI, Getopt and more scenarios.
 
 INSTALLATION
 
-To install this module type the following:
+  I highly recommend to use CPAN for one-stop-shop installation:
 
-   I highly recommend to use CPAN for one-stop-shop installation:
-   
-   perl -MCPAN -e "install Data::Type"
-   
+  perl -MCPAN -e "install Data::Type"
 
+SUPPORTED TYPES
 
-TYPES and FILTERS
+  All types are grouped and though belong to a collection. The collection is
+  identified by a short id. All members are living in a namespace that is
+  prefixed with it (uppercased).
 
-perl -e "use Data::Type qw(:all); print catalog()" lists all supported types:
+  Standard Collection ('STD')
+     This is a heterogenous collection of datatypes which is loaded by
+     default. It contains various issues from CPAN modules (i.e. business,
+     creditcard, email, markup, regexps and etc.) and some everyday things.
+     See Data::Type::Collection::Std.
 
-Data::Type 0.01.04 supports 39 types:
+  W3C/XML-Schema Collection ('W3C')
+     A nearly 1-to-1 use of XML::Schema datatypes. It is nearly complete and
+     works off the shelf. Please visit the XMLSchema
+     <http://www.w3.org/TR/xmlschema-2/> homepage for sophisticated
+     documentation. See Data::Type::Collection::W3C.
 
-  BINARY                   - binary code
-  BOOL                     - a true or false value
-  CINS            0.01.03  - a CUSIP International Numbering System Number
-  BIO::CODON      0.01.03  - a DNA (default) or RNA nucleoside triphosphates triplet
-  CREDITCARD               - is one of a set of creditcard type (DINERS, BANKCARD, VISA, ..
-  DATE            0.01.01  - a date (mysql or Date::Parse conform)
-  DATETIME                 - a date and time combination
-  DEFINED         0.01.04  - a defined (not undef) value
-  DK::YESNO                - a simple answer (ja, nein)
-  BIO::DNA        0.01.03  - a dna sequence
-  DOMAIN          0.01.04  - a network domain name
-  EMAIL                    - an email address
-  ENUM                     - a member of an enumeration
-  GENDER                   - a gender male, female
-  HEX                      - hexadecimal code
-  INT                      - an integer
-  IP              0.01.04  - an IP (V4, V6, MAC) network address
-  ISSN            0.01.03  - an International Standard Serial Number
-  LANGCODE        0.01.03  - a Locale::Language language code
-  LANGNAME        0.01.03  - a language name
-  LONGTEXT                 - text with a max length of 4294967295 (2^32 - 1) characters (..
-  MEDIUMTEXT               - text with a max length of 16777215 (2^24 - 1) characters (al..
-  NUM                      - a number
-  PORT            0.01.04  - a network port number
-  QUOTED                   - a quoted string
-  REAL                     - a real
-  REF                      - a reference to a variable
-  BIO::RNA        0.01.03  - a rna sequence
-  SET                      - a set (can have a maximum of 64 members (mysql))
-  TEXT                     - blob with a max length of 65535 (2^16 - 1) characters (alias..
-  TIME                     - a time (mysql)
-  TIMESTAMP                - a timestamp (mysql)
-  TINYTEXT                 - text with a max length of 255 (2^8 - 1) characters (alias my..
-  UPC             0.01.03  - standard (type-A) Universal Product Code
-  URI                      - an http uri
-  VARCHAR                  - a string with limited length of choice (default 60)
-  WORD                     - a word (without spaces)
-  YEAR                     - a year in 2- or 4-digit format
-  YESNO                    - a simple answer (yes, no)
+  Database Collection ('DB')
+     Common database table types (VARCHAR, TINYTEXT, TIMESTAMP, etc.). See
+     Data::Type::Collection::DB.
 
-And 4 filters:
+  Biological Collection ('BIO')
+     Everything that is related to biological matters (DNA, RNA, etc.). See
+     Data::Type::Collection::Bio.
 
-  CHOMP              - chomps
-  LC                 - lower cases
-  STRIP              - strip
-  UC                 - upper cases
+  Chemistry Collection ('CHEM')
+     Everything that is related to chemical matters (Atoms, etc.). See
+     Data::Type::Collection::Chem.
 
-TYPES BY GROUP
+  Perl5 Collection ('PERL')
+     Reserved and undecided. See Data::Type::Collection::Perl.
 
- Logic
-  BIO::CODON, BIO::DNA, BIO::RNA, DEFINED, DOMAIN, EMAIL, IP, LANGCODE, LANGNAME, PORT, REF, URI
+  Perl6 Apocalypse Collection ('PERL6')
+     Placeholder for the Apocalypse and Synopsis 6 suggested datatypes for
+     perl6. See Data::Type::Collection::Perl6.
 
- Database
-   Logic
-      ENUM, SET
-
-   Time or Date related
-      DATE, DATETIME, TIME, TIMESTAMP, YEAR
-
-   String
-      LONGTEXT, MEDIUMTEXT, TEXT, TINYTEXT
-
- Business
-  CINS, CREDITCARD, ISSN, UPC
-
- W3C
-   String
-      BINARY, HEX
-
- Numeric
-  BOOL, INT, NUM, REAL
-
- String
-  DK::YESNO, GENDER, QUOTED, VARCHAR, WORD, YESNO
-
-
-GROUP "Database"
-These are types identical to mysql database builtin types.
-
-CREDITCARD
-
-This type isn't tested at all and nobody should rely on it without rigorous testing.
-
-Supported are: 'Diners Club', 'Australian BankCard', 'VISA', 'Discover/Novus', 'JCB', 'MasterCard', 'Carte Blache', 'American Express'. 
-They are parameterised as: DINERS, BANKCARD, VISA, DISCOVER, JCB, MASTERCARD, BLACHE, AMEX.
-
-CONTRIBUTIONS
-
-The author is happy to receive more types (formats) and add to this library. If you
-have a algorithm/regex for validating it, the better. Just email me.
+  [Note] "ALL" is a an alias for all available collections at once.
 
 PREREQUISITES
-   Class::Maker (0.05.10), 
-   Error (0.15), 
-   IO::Extended (0.05), 
-   Tie::ListKeyedHash (0.41), 
-   Iter (0)
-   
-  and for types
-   Business::ISSN 0.90 by ISSN
-   Net::IPv6Addr 0.2 by IP
-   Locale::Language 2.02 by LANGCODE, LANGNAME
-   Business::CINS 1.13 by CINS
-   Email::Valid 0.14 by EMAIL
-   Date::Parse 2.23 by DATE
-   Business::CreditCard 0.27 by CREDITCARD
-   Regexp::Common 1.20 by INT, IP, QUOTED, REAL, URI
-   Business::UPC 0.02 by UPC
-   
+
+  Following modules get automatically installed via the CPAN module. See
+  INSTALLATION above. Data::Type has a mechanism for delayed loading of
+  modules. This means modules are loaded only when the used types require
+  them, not all at once.
+
+  Class::Maker (0.05.17), Regexp::Box (0.01), Error (0.15), IO::Extended
+  (0.06), Tie::ListKeyedHash (0.41), Data::Iter (0), Class::Multimethods
+  (1.70), Attribute::Util (0.01), DBI (1.30), Text::TabularDisplay (1.18),
+  String::ExpandEscapes (0.01), XML::LibXSLT (1.53), Locale::Language
+  (2.21), Business::CreditCard (0.27), Email::Valid (0.15), Business::UPC
+  (0.04), HTML::Lint (1.26), Business::CINS (1.13), Date::Parse (2.27),
+  Net::IPv6Addr (0.2), Business::ISSN (0.90), Regexp::Common (2.113),
+  X500::DN (0.28), Locale::SubCountry (0), XML::Schema (0.07), XML::Parser
+  (2.34), Pod::Find (0.24)
+
+READON
+
+  Visit the Data::Type main documentation or advance directly to the
+  Data::Type::Docs manpage.
+
+CONTACT
+
+  Sourceforge <http://sf.net/projects/datatype> is hosting a project
+  dedicated to this module. And I enjoy receiving your
+  comments/suggestion/reports also via <http://rt.cpan.org> or
+  <http://testers.cpan.org>.
 
 AUTHOR
 
-Murat Ünalan, <murat.uenalan@cpan.org>
+  Murat Uenalan, <muenalan@cpan.org>
 
 COPYRIGHT/LICENSE
 
-(c) 2002 by Murat Ünalan. All rights reserved. Note: This program is
-free software; you can redistribute it and/or modify it under the same
-terms as perl itself
+  (c) 2004 by Murat Uenalan. All rights reserved. Note: This program is free
+  software; you can redistribute it and/or modify it under the same terms as
+  perl itself
 
-
-LAST CHANGES 0.01.04
-
-  * added dverify( ) which is die'ing instead of throwing exceptions to the people:
-  
-        dverify( $email, EMAIL ) or die $!;
-	
-  * renamed 'choice' method for Type:: types to 'param'.
-  
-  * Some minor changes
-    - Type::* package now supports new method C< sub depends {qw(CPAN::aModule)} > for retrieval of
-	a dependency tree, which type made Data::Type require what.
-	- added Data::Verify::depends() which returns a dependency list for types requiring other modules.
-	
-  * New (or updated) types:
-
-  DEFINED         0.01.04  - a defined (not undef) value
-  DOMAIN          0.01.04  - a network domain name
-  IP              0.01.04  - an IP (V4, V6, MAC) network address
-  PORT            0.01.04  - a network port number
-   

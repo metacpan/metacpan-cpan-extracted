@@ -1,0 +1,1022 @@
+<<if: ZXIDBOOK>>
+<<else: >>ZXID Low Level ("Raw") API
+##########################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-raw.pd,v 1.5 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-RAW 01>>
+<<define: ZXDOC=ZXID Raw API>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. This document describes the low level API.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+Here we describe the general philosophy of the ZXID low level
+APIs. Some function level documentation is available from
+<<link:../ref/html/index.html: Function reference>>.
+
+Before you barge head first to use the raw API, you should
+check if the +easy+ and simple API in <<link:zxid-simple.html: zxid_simple()>>
+meets your needs. Or you may be able to use
+<<link:../mod_auth_saml/mod_auth_saml.html: mod_auth_saml>>
+and not have to program at all.
+
+Happy hacking!
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+<<htmlpreamble: <title>ZXID Low Level ("Raw") API</title><link type="text/css" rel=stylesheet href="zx.css"><body><h1>ZXID Low Level ("Raw") API</h1> >>
+
+12 Full Native C API
+====================
+<<fi: >>
+
+The generated aspects of the native C API are in c/*-data.h, for example
+
+  c/zx-sa-data.h
+
+Studying this file is very instructive.<<footnote: emacs tip: run
+`make tags' and then try hitting M-. while cursor is over a struct
+or function name in c/zx-sa-data.h - this makes navigation painless.>>
+
+12.1 C Data Structures
+----------------------
+
+From .sg a header (NN-data.h) is generated. This header contains structs that
+represent the data of the elements. Each element and attribute
+generates its own node. Even trivial nodes like strings have to be
+kept this way because the nodes form basis of remembering the ordering
+of data. This ordering is needed for exclusive XML canonicalization,
+and thus for signature verification.<<footnote: It's unfortunate that
+the XML standards do not make this any easier. Without order
+maintenance requirement, it would be possible to represent trivial
+child elements directly as struct fields. An approach that tried to do
+just this is available from CVS tag GEN_LALR (ca. 29.5.2006).>>
+
+Any missing data is represented by NULL pointer.
+
+Any repeating data is kept as a linked list, in reverse order of being
+seen in the data stream.<<footnote: Reverse order is just an
+optimization - or an artifact of simply adding latest element to the
+head of the list. If this bothers you, it's easy enough to reverse the
+list afterwards. Linked list is simple and works well for data whose
+order does not matter much (we use separate pointer for remembering
+the canonicalization order) and where random access is not needed, or
+cardinality is low enough so that simple pointer chasing is efficient
+enough.>>
+
+<<ignore: *** Problem here: how to preserve ordering of elements. We need to
+   * do SO canonicalization as there are new elements, yet we would like
+   * to maintain WO as much as possible, especially for elements for which
+   * we do not have schema ("any" elements). Always reverse any elem list?
+>>
+
+Simple elements and all attributes are represented by simple string node
+(even if they are booleans or integers).
+
+*Example*
+
+Consider following XML
+
+  <ds:Signature>
+     <ds:SignedInfo>
+       <ds:CanonicalizationMethod
+           Algorithm="http://w3.org/xml-exc-c14n#"/>
+       <ds:SignatureMethod
+           Algorithm="http://w3.org/xmldsig#rsa-sha1"/>
+       <ds:Reference
+           URI="#RrcrNwFIw6n">
+         <ds:Transforms>
+           <ds:Transform
+               Algorithm="http://w3.org/xml-exc-c14n#"/>
+           <ds:Transform
+               Algorithm="http://w3.org/xmldsig#env-sig"/></>
+         <ds:DigestMethod
+             Algorithm="http://w3.org/xmldsig#sha1"/>
+         <ds:DigestValue>lNIzVMrp8CwTE=</></></>
+     <ds:SignatureValue>GeMp7LS...vnjn8=</></>
+
+Decoding would produce the data structure in Fig-<<see: fig:decode-data>>. You
+should also look at c/zx-sa-data.h to see the structs involved in this
+example.
+
+<<dot: decode-data: Typical data structure produced by decode.
+
+// This graph crashes dot 1.12, but works in dot 2.8, seems to crash 2.20.2
+
+size="11.0,6.0"
+margin=0
+rankdir=LR
+
+{ rank=same; siginfo; sigval; }
+{ rank=same; canonmeth; sigmeth; ref; }
+//{ rank=same; canonmeth; sigmeth; ref; digmeth; digval; }
+//{ rank=same; xforms; xform_env; xform_c14n; }
+//{ rank=same; xform_env; xform_c14n; digmeth; digval; }
+{ rank=same; xforms; digmeth; digval; }
+{ rank=same; xform_c14n; xform_env; }
+
+sig [shape=record,label="zx_ds_Signature_s|{|{<f_kids>gg.kids|<f_siginfo>SignedInfo|<f_sigval>SignatureValue|KeyInfo (0)|Object (0)|Id (0)}}"];
+siginfo [shape=record,label="zx_ds_SignedInfo_s|{|{<f_kids>gg.kids|<f_wo>gg.g.wo|<f_canonmeth>CanonicalizationMethod|<f_sigmeth>SignatureMethod|<f_ref>Reference|Id (0)}}"];
+
+canonmeth [shape=record,label="zx_ds_CanonicalizationMethod_s|{|{<f_wo>gg.g.wo|Algorithm\n\"http://w3.org/xml-exc-c14n#\"}}"];
+
+sigmeth [shape=record,label="zx_ds_SignatureMethod_s|{|{<f_wo>gg.g.wo|Algorithm\n\"http://w3.org/xmldsig#rsa-sha1\"}}"];
+
+ref [shape=record,label="zx_ds_Reference_s|{|{<f_kids>gg.kids|gg.g.wo (0)|<f_xforms>Transforms|<f_digmeth>DigestMethod|<f_digval>DigestValue|Id (0)|Type (0)|URI\n\"#RrcrNwFIw6n\"}}"];
+
+xforms [shape=record,label="zx_ds_Transforms_s|{|{<f_kids>gg.kids|<f_wo>gg.g.wo|gg.g.n (0)|<f_xform>Transform}}"];
+
+xform_c14n [shape=record,label="zx_ds_Transform_s|{|{<f_wo>gg.g.wo|gg.g.n (0)|XPath (0)|<f_c14n_algo>Algorithm\n\"http://w3.org/xml-exc-c14n#\"}}"];
+
+xform_env [shape=record,label="zx_ds_Transform_s|{|{gg.g.wo (0)|<f_n>gg.g.n|XPath (0)|Algorithm\n\"http://w3.org/xmldsig#env-sig\"}}"];
+
+xforms:f_xform -> xform_env
+xform_env:f_n -> xform_c14n
+
+digmeth [shape=record,label="zx_ds_DigestMethod_s|{|{<f_wo>gg.g.wo|Algorithm\n\"http://w3.org/xmldsig#sha1\"}}"];
+digval [shape=record,label="zx_elem_s|{|{gg.g.wo (0)|content\n\"lNIzVMrp8CwTE=\"}}"];
+
+sigval [shape=record,label="zx_ds_SignatureValue_s|{|{gg.g.wo (0)|gg.content\n\"GeMp7LS...vnjn8=\"|Id (0)}}"];
+
+sig:f_siginfo -> siginfo
+sig:f_sigval  -> sigval
+
+siginfo:f_canonmeth -> canonmeth
+siginfo:f_sigmeth -> sigmeth
+siginfo:f_ref -> ref
+
+ref:f_xforms -> xforms
+ref:f_digmeth -> digmeth
+ref:f_digval -> digval
+
+sig:f_kids ->siginfo [weight=0,arrowhead=empty,color=red]
+
+siginfo:f_wo ->sigval [weight=0,arrowhead=empty,color=red]
+siginfo:f_kids -> canonmeth [weight=0,arrowhead=empty,color=red]
+canonmeth:f_wo -> sigmeth [weight=0,arrowhead=empty,color=red]
+sigmeth:f_wo -> ref [weight=0,arrowhead=empty,color=red]
+
+ref:f_kids -> xforms [weight=0,arrowhead=empty,color=red]
+xforms:f_wo -> digmeth [weight=0,arrowhead=empty,color=red]
+digmeth:f_wo -> digval [weight=0,arrowhead=empty,color=red]
+
+xforms:f_kids -> xform_c14n [weight=0,arrowhead=empty,color=red]
+xform_c14n:f_wo -> xform_env [weight=0,arrowhead=empty,color=red]
+
+>>
+
+There are two pointer systems at play here. The black solid arrows
+depict the logical structure of the XML document. For each child
+element there is a struct field that simply points to the child. If
+there are multiple occurrences of the child, as in
+~sig->SignedInfo->Reference->Transforms->Transform~, the children are
+kept in a linked list connected by gg.g.n (next) fields.<<footnote:
+This linked list may be in inverted order depending on the phase of
+the moon and position of the trams in Helsinki. Until implementation
+matures, its better not to depend on the ordering.>>
+
+The +wire order+ structure, depicted by red hollow arrows, is
+maintained using gg.kids as root and gg.g.n for next pointer. For example
+~sig->SignedInfo->Reference->Transforms~ keeps its kids, the
+~zx_ds_Transform~ objects, in the original order hanging from the kids
+and linked with the gg.g.n field. As can be seen, the order kept with gg.g.n
+fields can be different than the one kept using <<tt: n>> (next)
+fields. <<footnote: Sometime before R1.0 the scheme changed to only
+have gg.g.n pointers and making even wireorder lists use them. Thus
+wo pointers no longer exist.>>
+
+What's more, the kids list can contain dissimilar objects, witness
+~sig->SignedInfo->Reference->gg.kids~. The wire order representation
+is only captured when decoding the document and is mainly useful for
+correctly canonicalizing the document for signature verification. If
+you are building a data structure in your own program, you typically
+will not set the gg.kids and gg.g.wo fields.
+
+In the diagram, the objects of type ~zx_str~ were collapsed to
+double quoted strings. Superfluous gg.kids, gg.g.wo, and gg.g.n fields
+were omitted: they exist in all structures, but are not shown when
+they are ~NULL~. The ~NULL~ is depicted as zero (0).<<footnote: All
+this gg.g business is just C's way of referencing the fields of a
+common base type of element objects.>>
+
+
+<<notacountry: so wo>>
+
+12.1.1 Handling XML Namespaces
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An annoying feature of XML documents is that they have variable
+namespace prefixes. The namespace prefix for the unqualified elements
+is taken to be the one specified in target() directive of the .sg
+input. Name of an element in C code is formed by prefixing the element
+by the namespace prefix and an underscore.
+
+Attributes will only have namespace prefix if such was expressly
+specified in .sg input.
+
+When decoding, the actual namespace prefixes are recorded. The wire
+order encoder knows to use these recorded prefixes so that accurate
+canonicalization for XMLDSIG can be produced.
+
+If the message on wire uses wrong namespaces, the wrong ones are
+remembered so that canonicalization for signature validation will work
+irrespective. The ability to accept wrong namespaces only works as
+long as there is no ambiguity as to which tag was meant - there are
+some tags that need namespace information to distinguish. If you hit
+one of these then either you get lucky and the one that is arbitrarily
+picked by the decoder happens to be the correct one, or you are stuck
+with no easy way to make it right. Of course the XML document was
+wrong to start with so theoretically this is not a concern. Generally
+the more schemata that are simultaneously generated to one package, the
+greater the risk of collisions between tags.
+
+The schema order encoder always uses the prefixes defined
+using target() directives in .sg files. The runtime notion of
+namespaces is handled by ~ns_tab~ field of the decoding and encoding
+context.  It is initialized to contain all namespaces known by virtue
+of .sg declarations.  The runtime assigned prefixes are held in a
+linked list hanging from <<tt: n>> (next) field of ~struct
+zx_ns_s~. (*** more work needed here)
+
+The code generation creates a file, such as c/zx-ns.c, which contains
+initialization for the table. The main program should point the ~ns_tab~
+field of context as follows:
+
+  main {
+    struct zx_ctx* ctx;
+    ...
+    ctx->ns_tab = zx_ns_tab;   /* Here zx_ is the prefix chosen in code generation */
+  }
+
+Consider the following evil contortion
+
+  <e:E xmlns:e="uri">
+    <h:H xmlns:h="uri"/>
+    <b:B xmlns:b="uri">
+      <e:C xmlns:e="uri"/>
+      <e:D xmlns:e="iru">
+        <e:F xmlns:e="uri"/></></></>
+
+Assuming the ~ns_tab~ assigns prefix <<tt: y>> to the namespace
+URI, we would have following data structure as a result of a decode
+
+<<dot: ns-data,,: Decode of XML and resulting namespace structures.
+margin=0
+//rankdir=LR
+
+{ rank=same; ns_tab; e; h; b; }
+{ rank=same; H; B; }
+{ rank=same; C; D; }
+
+ns_tab [shape=record,label="{ns_tab|{y|uri|<uri_n>}|{z|iru|<iru_n>}}"]
+
+e [shape=record,label="e|uri|<n>"]
+h [shape=record,label="h|uri|<n>"]
+b [shape=record,label="b|uri|0"]
+i [shape=record,label="e|iru|0"]
+
+ns_tab:uri_n -> e
+ns_tab:iru_n -> i
+e:n -> h
+h:n -> b
+
+E -> H [style=bold]
+E -> B [style=bold]
+B -> C [style=bold]
+B -> D [style=bold]
+D -> F [style=bold]
+
+E -> e [color=red,arrowhead=empty]
+H -> h [color=red,arrowhead=empty]
+B -> b [color=red,arrowhead=empty]
+C -> e [color=red,arrowhead=empty]
+D -> i [color=red,arrowhead=empty]
+F -> e [color=red,arrowhead=empty]
+>>
+
+The red hollow arrows indicate how the elements reference the
+namespaces. Since none of the elements used the prefix originally
+specified in the schema grammar target() directive, we ended up
+allocating "alias" nodes for the uri. However, since E and C use the
+same prefix, they share the alias node. Things get interesting with D:
+it redefines the prefix e to mean different namespace URI, "iru", which
+happens to be an alias of prefix z.
+
+Later, when wire order canonical encode is done, the red thin arrows
+are chased to determine the namespaces. However, we need to keep a
+separate "seen" stack to track whether parent has already declared the
+prefix and URI. E would declare xmlns:e="uri", but C would not because
+it had already been "seen". However, F would have to declare it again
+because the xmlns:e="iru" in D masks the declaration. The ~zx_ctx~
+structure is used to track the namespaces and "seen" status
+through out decoders and encoders.
+
+<<dot: seen-data,,: Seen data structure (blue dotted and green dashed arrows) in the end of decoding F. S=seen, SN=seen_n.
+margin=0
+//rankdir=LR
+
+{ rank=same; ns_tab; ee; e; h; b; }
+{ rank=same; H; B; }
+{ rank=same; C; D; }
+
+ns_tab [shape=record,label="{ns_tab|{P|URI|S|SN|N}|{y|uri|0|0|<uri_n>}|{z|iru|0|0|<iru_n>}}"]
+
+e [shape=record,label="e|uri|0|0|<n>"]
+ee [shape=record,label="e|uri|<s>|0|<n>"]
+h [shape=record,label="h|uri|0|<sn>|<n>"]
+b [shape=record,label="b|uri|0|<sn>|0"]
+i [shape=record,label="e|iru|<s>|0|0"]
+
+ctx [shape=record,label="{ctx|{|{<ns>ns_tab|<sn>seen_n}}}"]
+
+ns_tab:uri_n -> ee
+ns_tab:iru_n -> i
+ee:n -> e
+e:n -> h
+h:n -> b
+
+E -> H [style=bold]
+E -> B [style=bold]
+B -> C [style=bold]
+B -> D [style=bold]
+D -> F [style=bold]
+
+E -> e [color=red,arrowhead=empty]
+H -> h [color=red,arrowhead=empty]
+B -> b [color=red,arrowhead=empty]
+C -> e [color=red,arrowhead=empty]
+D -> i [color=red,arrowhead=empty]
+F -> ee [color=red,arrowhead=empty]
+
+ns_tab -> ctx:ns [arrowhead=none,arrowtail=normal]
+b -> ctx:sn [color=blue,style=dotted,arrowhead=none,arrowtail=normal]
+b:sn -> h [color=blue,style=dotted]
+h:sn -> ee [color=blue,style=dotted]
+ee:s -> i [color=green,style=dashed]
+i:s -> e [color=green,style=dashed]
+>>
+
+Here we can see how the ~seen_n~ list, represented by the blue dotted
+arrows, was built: at the head of the list, ~ctx->seen_n~, is the last
+seen prefix, namely b (because, although the meaning of e at F was
+different, e as a prefix had already been seen earlier at E), followed
+by other prefixes in inverse order of first occurrence.<<footnote: This
+is a mere artifact of implementation: it's cheapest to add to the head
+of the list. This may change in future.>> The green dashed arrows from
+e:uri to e:iru and then on to second e:uri reflect the fact that e:uri
+(second) was put to the list first (when we were at E), but later, at
+D, a different meaning, iru, was given to prefix e. Finally at F we
+give again a different meaning for e, thus pushing to the "seen stack"
+another node. Although e at E and at F have namespace URI, "uri", we are
+not able to use the same node because we need to keep the stack order.
+Thus we are forced to allocate two identical nodes.
+
+12.1.2 Handling any and anyAttribute
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since our aim is to be lax in what we accept, every element can handle
+unexpected additional attributes as well as unexpected elements. Thus
+whether the schema specifies any or anyAttribute or not, we handle
+everything as if they were there. However, when attributes and
+elements are received outside of their expected context, they are
+simply treated as strings with string names. This is true even for
+those attributes and elements that would be recognizable in their
+proper context.
+
+The any extension points, as well as some bookkeeping data
+are hidden inside ~ZX_ELEM_EXT~ macro. If you tinker with
+this macro, be sure you know what you are doing. If you want
+to add your own specific fields to all structs, redefining
+~ZX_ELEM_EXT~ may be appropriate, but if you want to add more
+fields only to some specific structures, you can define
+a macro of form
+
+  TPF_EEE_EXT
+
+and put in it whatever fields you want. These fields will be
+initialized to zero when the structure is created, but are not touched
+in any other way by the generated code. In particular, if some of your
+fields are pointers, it will be your responsibility to free them. The
+standard free functions will not understand to free them. See the data
+structure walking functions, below for one way to accomplish this.
+
+12.1.3 Root data structure
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The root data structure
+
+  struct zx_root_s;
+
+is a special structure that has a field for every top level
+recognizable element.
+
+12.1.4 Per element data structures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*** TBW
+
+12.1.5 Memory Allocation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+After decoding all string data points directly into the input buffer,
+i.e. strings are NOT copied. Be sure to not free the input buffer
+until you are done processing the data structure. If you need to take
+a copy of the strings, you will need to walk the data structure as a
+post processing step and do your copies. This can be done using
+
+  void TPF_dup_strs_len_NS_EEE(struct zx_dec_ctx* c, struct TPF_NS_EEE_s* x);
+
+The structures are allocated via ZX_ZALLOC() macro, which
+by default calls zx_zalloc() function, which in turn
+uses system malloc(3). However, you can redefine the
+macro to use whatever other allocation scheme you desire.
+
+The generated libraries never free(3) memory. In many programming
+patterns, this is actually desirable: for example a CGI program can
+count on dying - the process exit(2) will free all the memory.
+
+If you need to free(3) the data structure, you will need to walk it
+using
+
+  void TPF_free_len_NS_EEE(struct zx_dec_ctx* c,
+                           struct TPF_NS_EEE_s* x,
+                           int free_strings);
+  void zx_free_any(struct zx_dec_ctx* c,
+                   struct zx_note_s* n,
+                   int free_strs);
+
+The zx_free_any() works by having a gigantic switch statement that calls
+the appropriate specific free function.
+
+You can deep clone the data structure with
+
+  void TPF_deep_clone_NS_EEE(struct zx_dec_ctx* c,
+                             struct TPF_NS_EEE_s* x,
+                             int dup_strings);
+  struct zx_note_s* zx_clone_any(struct zx_dec_ctx* c,
+                                 struct zx_note_s* n,
+                                 int dup_strs);
+
+The zx_clone_any() works by having a gigantic switch statement that calls
+the appropriate specific free function.
+
+12.2 Decoder as Recursive Descent Parser
+----------------------------------------
+
+The entry point to the decoder is
+
+  struct zx_root_s* zx_DEC_root(struct zx_dec_ctx* c,
+                                struct zx_ns_s* dummy,
+                                int n_decode);
+
+The decoding context holds pointer to the raw data and must be
+initialized prior to calling the decoder. The third argument specifies
+how many recognized elements are decoded before returning. Usually you
+would specify 1 to consume one top level element from the
+stream.<<footnote: The second argument, the dummy namespace, is
+meaningless for root node, but makes sense for element decoders. For
+root you can simply supply 0 (NULL).>>
+
+The returned data structure, ~struct zx_root_s~, contains
+one pointer for each type of top level element that can
+be recognized. The ~tok~ field of the returned value
+identifies the last top level element recognized and can
+be used to dispatch to correct request handler:
+
+  zx_prepare_dec_ctx(c, TPF_ns_tab, start_ptr, end_ptr);
+  struct TPF_root_s* x = TPF_DEC_root(c, 0, 1);
+  switch (x->gg.g.tok) {
+  case TPF_NS_EEE_ELEM: return process_EEE_req(x->NN_EEE);
+  }
+
+When processing responses, it is generally already known
+which type of response you are expecting, so you can simply
+check for NULLness of the respective pointer in the returned
+data structure.
+
+Internally zx_DEC_root() works much the same way: it scans
+a beginning of an element from the stream, looks up the token
+number corresponding to the element name, and switches on
+that, calling element specific decoder functions (see next
+section) to do the detailed processing.
+
+In the above code fragment, you should note the call to
+zx_prepare_dec_ctx() which initializes the decoder machinery.
+It takes +ns_tab+ argument, which specifies which namespaces
+will be recognized. This table MUST match the TPF_DEC_root()
+function you call (i.e. both must have been generated as
+part of the same xsd2sg.pl invocation). The other arguments
+are the start of the buffer to decode and pointer one past
+the end of the buffer to decode.
+
+12.2.1 Element Decoders
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For each recognizable element there is a function of form
+
+  struct TPF_NS_EEE_s* zx_DEC_NS_EEE(struct zx_dec_ctx* c);
+
+where TPF is the prefix, NS is the namespace prefix, and
+EEE is the element name. For example:
+
+  struct zx_se_Envelope_s* zx_DEC_se_Envelope(struct zx_ctx* c);
+
+These functions work much the same way as the root decoder. You
+should consult dec-templ.c for the skeleton of the decoder. Generally
+you should not be calling element specific decoders: they
+exist so that zx_DEC_root() can call them. They have somewhat
+nonintuitive requirements, for example the opening <, the
+namespace prefix, and the element name must have already been
+scanned from the input stream by the time you call element
+specific decoder.
+
+12.2.2 Decoder Extension Points
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The generated code is instrumented with following macros
+
+ZX_ATTR_DEC_EXT(ss):: Extension point called just after decoding known attribute
+ZX_XMLNS_DEC_EXT(ss):: Extension point called just after decoding xmlns attribute
+ZX_UNKNOWN_ATTR_DEC_EXT(ss):: Extension point called just after decoding unknown attr
+ZX_START_DEC_EXT(x):: Extension point called just after decoding element name
+    and allocating struct, but before decoding any of the attributes.
+ZX_END_DEC_EXT(x):: Extension point called just after decoding the entire element.
+ZX_START_BODY_DEC_EXT(x):: Extension point called just after decoding element tag, including attributes, but before decoding the body of the element.
+ZX_PI_DEC_EXT(pi):: Extension point called just after decoding processing instruction
+ZX_COMMENT_DEC_EXT(comment):: Extension point called just after decoding comment
+ZX_CONTENT_DEC(ss):: Extension point called just after decoding string content
+ZX_UNKNOWN_ELEM_DEC_EXT(elem):: Extension point called just after decoding unknown element
+
+Following macros are available to the extension points
+
+TPF:: Type prefix (as specified by  -p during code generation)
+EL_NAME:: Namespaceful element name (NS_EEE)
+EL_STRUCT:: Name of the struct that describes the element
+EL_NS:: Namespace prefix of the element (as seen in input schema)
+EL_TAG:: Name of the element without any namespace qualification.
+
+12.3 Exclusive Canonical Encoder (Serializer)
+---------------------------------------------
+
+The encoder receives a C data structure and generates a gigantic
+string containing an XML document corresponding to the data structure
+and the input schemata. The XML document conforms to the rules of
+exclusive XML canonicalization and hence is useful as input to XMLDSIG.
+
+One encoder is generated for each root node specified at the code
+generation. Often these encoders share code for interior nodes.
+
+The encoders allow two pass rendering. You can first use the length
+computation method to calculate the amount of storage needed and
+then call one of the rendering functions to actually render. Or
+if you simply have large enough buffer, you can just render directly.
+
+The encoders take as argument next free position in buffer
+and return a char pointer one past the last byte used. Thus
+you can discover the length after rendering by subtracting the
+pointers. This is guaranteed to result same length as returned
+by the length computation method.<<footnote: This is a useful
+sanity check. If the two ever disagree, please report a bug.>>
+You can also call the next encoder with the return value
+of the previous encoder to render back-to-back elements.
+
+The XML namespace and XML attribute handling of the encoders
+is novel in that the specified sort is done already at code
+generation time, i.e. the renderers are already in the order
+that the sort mandates.
+
+For attributes we know the sort order directly from the schema
+because [XML-C14N], sec 2.2, p.7, specifies that they
+sort first by namespace URI and then by name, both of which
+we know from the schema.
+
+For ~xmlns~ specifications the situation is similarly easy in the
+schema order encoder case because we know the namespace prefixes
+already at code generation time. However, for the wire order encoder
+we actually need a runtime sort because we can not control which
+namespace prefixes get used. However, for both cases we can make a
+pretty good guess about which namespaces might need to be declared at
+any given element: the element's own namespace and namespaces of each
+of its attributes. That's all, and it's all known at code generation
+time. At runtime we only need to check if the namespace has already
+been seen at outer layer.
+
+12.3.1 Length computation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Compute length of an element (and its subelements). The XML attributes
+and elements are processed in schema order.
+
+  int TPF_LEN_SO_NS_EEE(struct zx_ctx* c,
+                        struct TPF_NS_EEE_s* x);
+
+For example:
+
+  int zx_LEN_SO_se_Envelope(struct zx_ctx* c,
+                            struct zx_se_Envelope_s* x);
+
+Compute length of an element (and its subelements). The XML namespaces
+and elements are processed in wire order.
+
+  int TPF_LEN_WO_NS_EEE(struct zx_ctx* c,
+                        struct TPF_NS_EEE_s* x);
+
+For example:
+
+  int zx_LEN_WO_se_Envelope(struct zx_ctx* c,
+                            struct zx_se_Envelope_s* x);
+
+12.3.2 Encoding in schema order
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Render an element into string. The XML elements are processed in
+schema order. The xmlns declarations and XML attributes are always
+sorted per [XML-EXC-C14N] rules.<<footnote: The sort is actually done
+already at code generation time by xsd2sg.pl.>> This is what you
+generally want for rendering new data structure to a string. The wo
+pointers are not used.
+
+  char* TPF_ENC_SO_NS_EEE(struct zx_ctx* c,
+                          struct TPF_NS_EEE_s* x,
+                          char* p);
+
+For example:
+
+  char* zx_ENC_SO_se_Envelope(struct zx_ctx* c,
+                              struct zx_se_Envelope_s* x,
+                              char* p);
+
+Since it is a very common requirement to allocate correct
+sized buffer and then render an element, a helper function
+is provided to do this in one step.
+
+  struct zx_str* zx_EASY_ENC_SO_se_Envelope(struct zx_ctx* c,
+                                    struct zx_se_Envelope_s* x);
+
+The returned string is allocated from allocation arena described
+by ~zx_ctx~.
+
+12.3.3 Encoding in wire order
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Render element into string. The XML elements are
+processed in wire order by chasing wo pointers. This is what you want
+for validating signatures on other people's XML documents. If the wire
+representation was schema invalid, e.g. elements were in wrong order,
+the wire representation is still respected, except for xmlns
+declarations and XML attributes, which are always sorted, per exc-c14n
+rules. For each element a function is generated as follows
+
+  char* TPF_ENC_WO_NS_EEE(struct zx_ctx* c,
+                          struct TPF_NS_EEE_s* x,
+                          char* p);
+
+For example
+
+  char* zx_ENC_WO_se_Envelope(struct zx_ctx* c,
+                              struct zx_se_Envelope_s* x,
+                              char* p);
+
+A helper function is also available
+
+  struct zx_str* zx_EASY_ENC_WO_se_Envelope(struct zx_ctx* c,
+                                    struct zx_se_Envelope_s* x);
+
+12.4 Signatures (XMLDSIG)
+-------------------------
+
+12.4.1 Signature Generation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*** TBW
+
+12.4.2 Signature Validation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For signature validation you need to walk the decoded data structure
+to locate the signature as well as the references and pass them to
+zxsig_validate(). The validation involves wire order exclusive
+canonical encoding of the referenced XML blobs, computation of SHA1 or
+MD5 checksums over them, and finally computation of SHA1 check sum
+over the <SignedInfo> element and validation of the actual
+<SignatureValue> against that. The validation involves public key
+decryption using the signer's certificate.
+
+A nasty problem in exclusive canonicalization is that the namespaces
+that are needed in the blob may actually appear in the containing XML
+structures, thus in order to know the correct meaning of a namespace
+prefix, we need to perform the +seen+ computation for all elements
+outside and above the blob of interest.<<footnote: This is yet another
+indication of how botched the XML namespace concept is. Or this could
+have been fixed in the exclusive canonicalization spec by not using
+namespace prefixes at all.>>
+
+To verify signature, you have to do certain amount of preparatory work
+to locate the signature and the data that was signed. Generally what
+should be signed will be evident from protocol specifications or from
+the security requirements of your application environment. Conversely,
+if there is a signature, but it does not reference the appropriate
+elements, its worthless and you might as well reject the document
+without even verifying the signature.
+
+*Example*
+
+    struct zxsig_ref refs[1];
+    cf = zxid_new_conf("/var/zxid/");
+    ent = zxid_get_ent_from_file(cf, "YV7HPtu3bfqW3I4W_DZr-_DKMP4.");
+    
+    refs[0].ref = r->Envelope->Body->ArtifactResolve
+                   ->Signature->SignedInfo->Reference;
+    refs[0].blob = (struct zx_elem_s*)r->Envelope->Body->ArtifactResolve;
+    res = zxsig_validate(cf->ctx, ent->sign_cert,
+                         r->Envelope->Body->ArtifactResolve->Signature,
+                         1, refs);
+    if (res == ZXSIG_OK) {
+      D("sig vfy ok %d", res);
+    } else {
+      ERR("sig vfy failed due to(%d)", res);
+    }
+
+This code illustrates
+
+1. You have to determine who signed and provide the entity
+   object that corresponds to the signer. Often you
+   would determine the entity from <Issuer> element somewhere
+   inside the message.
+
+   The entity is used for retrieving the signing certificate.
+   Another alternative is that the signature itself contains
+   a <KeyInfo> element and you extract the certificate from
+   there. You would still need to have a way to know if you
+   trust the certificate.
+
+2. You have to prepare the refs array. It contains pairs of
+   <SignedInfo><Reference> specifications combined with the
+   actual elements that are signed. Generally the URI
+   XML attribute of the <Reference> element points to the
+   data that was signed. However, it is application dependent
+   what type of ID XML attribute the URI actually references
+   or the URI could even reference something outside the
+   document. It would be way too unreliable for the
+   zxsig_validate() to attempt guessing how to locate the
+   signed data: therefore we push the responsibility to
+   you. Your code will have to walk the data to locate
+   all referenced bits and pieces.
+
+   In the above example, locating the one signed bit was
+   very easy: the specification says where it is (and this
+   location is fixed so there really is no need to check
+   the URI either).
+
+   You pass the length of the refs array and the array
+   itself as two last arguments to zxsig_validate().
+
+3. You need to locate the <Signature> element in the document
+   and pass it as argument to zxsig_validate(). Usually
+   a protocol specification will say where the <Signature>
+   element is to be found, so locating it is not difficult.
+
+4. The return value will indicate validation status. ZXSIG_OK,
+   which has numerical value of 0, indicates success. Other
+   nonzero values indicate various kinds of failure.
+
+12.4.3 Certificate Validation and Trust Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Trust models for TLS and signature validation are separate. TLS layer
+is handled mainly by libcurl or in case of ClientTLS, by the https web
+server (which is not part of zxid).
+
+In signature validation the primary trust mechanism is that entity's
+metadata specifies the signing certificate and there is no
+Certification Authority check at all.<<footnote: If you develop CA
+check, please submit patches to ZXID project.>>
+This model works well if you control the admission
+to your CoT. However, ZXID ships by default with the
+automatic CoT feature turned on, thus anyone can get
+added to the CoT and therefore signature with any
+certificate they declare is "valid". This hardly
+is acceptable for anything involving money.
+
+12.5 Data Accessor Functions
+----------------------------
+
+Simple read access to data should, in C, be done by
+simply referencing the fields of the struct, e.g.
+
+  if (!r->EntitiesDescriptor->EntityDescriptor)
+      goto bad_md;
+
+*** TBW
+
+12.6 Memory Allocation and Free
+-------------------------------
+
+*** TBW
+
+12.7 Walking the data structure
+-------------------------------
+
+*** TBW
+
+12.9 Thread Safety
+------------------
+
+All generated libraries are designed to be thread safe, provided
+that the underlying libc APIs, such as malloc(3) are thread safe.
+
+
+15 Creating New Interfaces Using ZXID Methodology
+=================================================
+
+The ZXID code generation methodology can be used to create
+interfaces to any XML document or protocol that can be
+described as a Schema Grammar (which includes any document
+that can be expressed as XML Schema - XSD). The general
+steps are
+
+1. Convert .xsd file to .sg, or write the .sg directly. For conversion,
+   you would typically use a command like
+
+     ~/pd/xsd2sg.pl <foo.xsd >foo.sg
+
+2. Tweak and rationalize the resulting .sg file. In ideal world
+   any construct expressible as .xsd should be nicely representable,
+   but in practise some work better than others, thus you can create
+   a much nicer interface if you invest in some manual tweaking.
+
+   Note that the tweaked .sg still is able to represent the
+   same document as the original .xsd described, though
+   often the tweaking causes some relaxation.
+
+   Most common tweaks
+
+   a. If the .xsd is written so that the targeted namespace is
+      also the default namespace, you should introduce
+      a namespace prefix because this is needed during
+      code generation to keep different C identifiers
+      from clashing with each other. Ideally you
+      should coordinate the namespace prefixes globally
+      so that even two different projects will not clash.
+
+   b. Where the choice construct is used, indicated
+      by pipey symbol (|) in the .sg file, you
+      should refactor these into sequences of
+      zero-or-one occurrence (?) instances of the alternatives
+      of the choice. This is needed because for the foreseeable
+      future xsd2sg.pl has a limitation in code generation
+      feature. If the choice has maxOccurs="unbounded"
+      you should use (*) instead.
+
+   c. xml:lang and other similar attributes may need to
+      be factored open to be just of type %xs:string. This
+      is a bug in xsd2sg.pl
+      
+3. "Connect" the schema to bigger framework. Usually this
+   means adding your schema grammar to the ZX_SG variable
+   in zxid/Makefile and supplying additional -r flags
+   in ZX_ROOT variable. This allows your new schema to
+   be visible at top level.
+
+   If your schema is meant to extend leafs or interior nodes of
+   the parse tree, such as SOAP Body, you would edit
+   the SOAP schema to accept your
+   new protocol elements in the Body. Or that the generic SOAP
+   header can accept your specific header schemata, or that
+   the SAML attribute definitions accept your kind of
+   attributes - whatever makes sense in your context.
+
+   Alternative to this is to create an entirely new
+   monolithic encoder decoder, i.e. instead of extending
+   the existing ZXID project to accommodate your new
+   protocol, you just start a new project that uses the
+   same methodology. You should see how the SAML protocol
+   part is separated from the SAML metadata parsing and
+   from the WSF parsing in the existing project.
+
+17 Code Generation Tools
+========================
+
+Main work horse of code generation is xsd2sg.pl, which serves multiple
+purposes
+
+1. Build hashes of all declarations in .sg input. Each hash element consists
+   of array of elements and attributes, as well as groups and attribute groups.
+   The type of array element sis determined from prefix, per .sg rules.
+2. Expand groups and attribute groups
+3. Evaluate each element wrt its type and generate
+   a. C data structures
+   b. Decoder grammar
+   c. Token descriptions for perfect hash and lexical analyzer
+   d. Encoder C code
+
+The code to build hashes is interwoven in the code that generates .xsd
+from .sg. The rest of the generation happens in a function called
+generate().
+
+Typical command line (to generate SAML 2.0 protocol engine)
+
+  ~/plaindoc/xsd2sg.pl -d -gen saml2 -p zx_ \
+       -r saml:Assertion -r se:Envelope \
+       -S \
+       sg/saml-schema-assertion-2.0.sg \
+       sg/saml-schema-protocol-2.0.sg \
+       sg/xmldsig-core.sg \
+       sg/xenc-schema.sg \
+       sg/soap11.sg \
+       >/dev/null
+
+<<ignore: ~/plaindoc/xsd2sg.pl -d -gen saml2 -p zx_ -r saml:Assertion -r se:Envelope -S sg/saml-schema-assertion-2.0.sg sg/saml-schema-protocol-2.0.sg sg/xmldsig-core.sg sg/xenc-schema.sg sg/soap11.sg >/dev/null >>
+
+To generate SAML 2.0 Metadata engine you would issue
+
+  ~/plaindoc/xsd2sg.pl -d -gen saml2md -p zx_ \
+       -r md:EntityDescriptor -r md:EntitiesDescriptor \
+       -S \
+       sg/saml-schema-assertion-2.0.sg \
+       sg/saml-schema-metadata-2.0.sg \
+       sg/xmldsig-core.sg \
+       sg/xenc-schema.sg \
+       >/dev/null
+
+<<ignore: ~/plaindoc/xsd2sg.pl -d -gen saml2md -p zx_ -r md:EntityDescriptor -r md:EntitiesDescriptor -S sg/saml-schema-assertion-2.0.sg sg/saml-schema-metadata-2.0.sg sg/xmldsig-core.sg sg/xenc-schema.sg >/dev/null >>
+
+17.1 Special Support for Specific Programming Languages
+-------------------------------------------------------
+
+While C code generation is the main output, and this can always be
+converted to other languages using SWIG, sometimes a more natural
+language interface can be built by directly generating it.
+
+We plan to enhance the code generation to do something like this. At
+least direct hash-of-hashes-of-arrays-of-hashes type data-structure
+generation for benefit of some scripting languages is planned.
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+18 ZXID SP
+==========
+
+*** warning: not checked lately, may be wrong!
+
+<<table: ZXID SP URLs
+URL          Description
+============ =======================================================
+/zxid        Same as o=M. Main convenience entry point
+/zxid?o=M    SSO with CDC; or management if already logged in
+/zxid?o=C    Common Domain Cookie (CDC) reader, usually under common domain host name.
+/zxid?o=E    SSO after CDC read; or management if already logged in.
+/zxid?o=P    HTTP POST end point. Used for forms and last part of POST profile SSO.
+/zxid?o=Q    HTTP binding (POST or redirect) request end point (e.g. SLO, MNI).
+/zxid?o=S    SOAP end point (HTTP POST)
+/zxid?o=B    Get SP metadata (or combined SP and IdP metadata if proxying).
+>>
+
+96 License
+==========
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+96.2 Specification IPR
+----------------------
+
+ZXID is based on open SAML and Liberty specifications. The parties
+that have developed these specifications, including Symlabs, have made
+Royalty Free (RF) licensing commitment. Please ask OASIS and Liberty
+Alliance for the specifics of their IPR policies and IPR disclosures.
+
+Some protocols, such as WS-Trust and WS-Federation enjoy Microsoft's
+pledge<<footnote: If you have a reference to where this pledge can be
+found, please let me know so it can be included here.>> that they will
+not sue you even if you implement these specifications. You should
+evaluate yourself whether this is good enough for your situation.
+
+<<zxid-ref.pd>>
+
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

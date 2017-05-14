@@ -1,0 +1,111 @@
+# $Id: README,v 1.2 1998/04/29 06:34:46 jake Exp $
+
+		       ------------------------
+		       Perl 5 Byacc Patches 0.6
+		       ------------------------
+
+This is a set of patches to perl-byacc1.8.2 which cause it to generate
+a Perl 5 class implementing a parser (instead of a file full of global
+data and procedures). It's nice if you want to be squeaky clean, and
+very nice if you have a need for multiple parsers or multiple
+instances of a parser in one program.
+
+			  How to install it
+			  -----------------
+
+1. Get perl-byacc1.8.2 and unpack it. See
+
+     http://www.perl.com/CPAN/src/misc/perl-byacc1.8.2.tar.gz
+
+2. Patch byacc with
+
+     cd perl-byacc1.8.2
+     patch < ../perl5-byacc-patches-0.6/patch
+
+3. Compile perl-byacc1.8.2 as usual.
+
+
+			    How to use it
+			    -------------
+
+You invoke byacc a little differently:
+
+  1. -P now takes a package name argument, and the output file is
+     written as {package name}.pm.
+
+  2. You can pass a -5 argument to get a somewhat faster parser under
+     Perl 5.005 (using 'my Dog $spot' and 'use fields'). By the way,
+     parsers generated with these patches are thread-safe (all package
+     variables are static data), although of course you will break
+     that if you do something non-thread-safe in your lexer or
+     actions.
+
+You must write your parser a little differently:
+
+  1. Your &yylex and &yyerror procedures can (optionally) take an
+     extra argument, which is passed from &yyparse (see below).
+
+  2. Your &yylex procedure no longer side-effects $yylval; instead,
+     it must return a list containing the token and the value.
+
+  3. Your top-level rule can assign a value to $$, and this value will
+     be returned as the value of &yyparse (see below).
+
+And you must write the code that uses the parser differently too:
+
+  1. Use 'use Parser' (or whatever package you put in -P)
+     instead of 'require "y.tab.pl"'.
+
+  2. Create a new parser object with
+
+     $p = Parser->new($yylex, $yyerror, $yydebug);
+
+     The first two arguments are references to your &yylex and
+     &yyerror procedures, respectively. The third is true or false to
+     enable or disable debugging output.
+
+     Although you may wind up sticking your &yylex and &yyerror in the
+     parser package in most cases, this is more composable if you want
+     to do something weird.
+
+  3. Start a parse by calling
+
+     $val = $p->yyparse($s);
+
+     Here $s is an optional "stream" argument which represents the
+     state of the text you're scanning. Depending on what you want to
+     do, this could be a filehandle reference, a string, some object
+     you cooked up, or whatever.
+
+     The argument is passed down to &yylex and &yyerror. &yylex should
+     use it to get characters, and &yyerror should examine it to
+     generate a meaningful message.
+
+  4. $p->yyparse returns the value that your top-level rule assigned
+     to $$, instead of true or false to indicate success or
+     failure. This obviates the need to side-effect global variables
+     to return values from the parser. You should use exceptions to
+     handle error conditions.
+
+
+			       Example
+			       -------
+
+I've include two examples: an ultra-simple calculator and a random
+text generator. Type 'make' to build the parsers.
+
+
+			       Copying
+			       -------
+
+This code is in the public domain--use it and redistribute it as you
+like. I would appreciate acknowledgement of some kind (or at the very
+least an email) if you use it in something that is widely used or
+distributed.
+
+
+			  Bugs and feedback
+			  -----------------
+
+Send them to Jake Donham (donham@linex.com). I'd love to hear from you
+if you find these patches useful.

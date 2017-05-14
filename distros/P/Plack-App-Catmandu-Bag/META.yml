@@ -1,0 +1,36 @@
+---
+abstract: 'Plack application that wraps a REST API around a Catmandu::Bag'
+author:
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-Catmandu-Bag
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Catmandu: '1.0506'
+  JSON: '0'
+  Plack: '1.0042'
+  Router::Simple: '0.17'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Plack-App-Catmandu-Bag/issues
+  homepage: https://github.com/LibreCat/Plack-App-Catmandu-Bag
+  repository: https://github.com/LibreCat/Plack-App-Catmandu-Bag.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

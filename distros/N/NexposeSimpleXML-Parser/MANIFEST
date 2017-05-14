@@ -1,0 +1,21 @@
+Makefile.PL
+README
+AUTHORS
+MANIFEST
+lib/NexposeSimpleXML/Parser/Host.pm
+lib/NexposeSimpleXML/Parser/Session.pm
+lib/NexposeSimpleXML/Parser.pm
+lib/NexposeSimpleXML/Parser.pod
+lib/NexposeSimpleXML/Parser/Host/Service.pm  
+lib/NexposeSimpleXML/Parser/ScanDetails.pm
+lib/NexposeSimpleXML/Parser/Vulnerability.pm
+lib/NexposeSimpleXML/Parser/Reference.pm
+lib/NexposeSimpleXML/Parser/Fingerprint.pm
+t/00-load.t
+t/01-pod.t
+t/02-modules.t
+t/parser.t
+t/Test.pm
+t/Test/Parser.pm
+t/test1.xml
+META.yml                                 Module meta-data (added by MakeMaker)

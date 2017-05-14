@@ -1,5 +1,114 @@
 Revision history for Perl extension Catalyst::Plugin::Session
 
+0.40 2015-01-26
+      - Add a flag so that a storage can finalize during finalize_header rather
+      than finalize_body.  This is to enable storages that need to write to the
+      HTTP header (such as the cookie based store).
+
+0.39 2013-10-16
+      - Fixed a bug when "expiry_threshold" is non-zero, where changes to the
+      session were not saved.
+
+0.38 2013-09-18
+      - New feature: "expiry_threshold" which allows you more control over when
+      this plugin checks and updates the expiration date for the session.
+      This is useful when you have high traffic and need to reduce the number
+      of session expiration hits (like if you are using a database for sessions
+      and your db is getting pounded).
+
+0.37 2013-02-25
+      - Fix t/live_verify_address.t to skip if Catalyst::Plugin::Authentication
+        is not installed, fixing RT#81506.
+
+0.36 2012-10-19
+       - Re-pack with new Module::Install which doesn't get
+         MYMETA.yaml wrong.
+       - Remove use of Plack::Middleware::ForceEnv from the tests
+          as it was not used / needed
+
+0.35 2012-04-24
+        - Implement a 'change_session_expires' method (gshank)
+
+        - Fixed bug from last version where session does not persist
+          across a redirect
+
+0.34 2012-03-30
+        - Fixed up t/live_verify_address.t per https://rt.cpan.org/Ticket/Display.html?id=71142
+        - Merged in dpetrov's 0.32 changes (extend_session_expire)
+
+0.33 2012-03-08
+        - Note that flash is deprecated / not recommended due to it's
+          inherent races. Point out Catalyst::Plugin::StatusMessage instead
+
+0.32 2011-06-08
+        - Fix handling with enables verify_address and add related test
+
+0.31 2010-10-08
+        - Fix session being loaded by call to dump_these in debug mode
+          (RT#58856)
+
+0.30 2010-06-24
+        - Fix Makefile.PL's is_upgrading_needed() routine (RT #58771)
+
+0.29 2009-11-04
+        - Fix session being deleted when you have a new session after session
+          expiry when calling session_is_valid method. Tests for this.
+        - Allow ->session to be used as a setter method so that you can say
+          ->session( key => $value );
+
+0.28 2009-10-29
+        - Fix session fixation test with LWP 5.833 by calling $cookie_jar->set_cookie
+          rather than manually stuffing the cookie in the request.
+
+0.27 2009-10-08
+        - Release 0.26_01 as stable without further changes.
+
+0.26_01 2009-10-06
+        - Move actions out of the root application class in tests as this
+          is deprecated.
+        - Change configuration key to 'Plugin::Session' by default. The
+          old 'session' key is still supported, but will issue a warning
+          in a future release.
+
+0.26 2009-08-19
+        - Remove Test::MockObject from the test suite as prone to failing on
+          some platforms and perl versions due to it's UNIVERSAL:: package
+          dependencies.
+
+0.25 2009-07-08
+        - Add the a change_session_id method which can be called after
+          authentication to change the user's session cookie whilst preserving
+          their session data. This can be used to provide protection from
+          Session Fixation attacks. (kmx)
+
+0.24 2009-06-23
+        - Be more paranoid about getting values of $c->req to avoid issues
+          with old Test::WWW::Mechanize::Catalyst.
+        - Check we have a modern version of TWMC before doing the tests which
+          need it.
+
+0.23 2009-06-16
+        - Add the verify_user_agent config parameter (kmx)
+        - Add a test case to prove that logging in with a session cookie still
+          causes a new cookie to be issued for you, proving that the code is
+          not vulnerable to a session fixation attack. (t0m)
+
+0.22 2009-05-13
+        - INSANE HACK to ensure B::Hooks::EndOfScope inlines us a new method right now
+          in Catalyst::Plugin::Session::Test::Store for Catalyst 5.80004 compatibility.
+
+          This change does not in any way affect normal users - it is just due to the
+          fairly crazy way that Catalyst::Plugin::Session::Test::Store works, and that
+          module is _only_ used for unit testing session store plugins pre-installation.
+
+          Session::Test::Store should be replaced with a more sane solution, and other
+          CPAN modules using it moved away from using it, but this change keeps stops
+          new Catalyst breaking other distributions right now.
+
+0.21 2009-04-30
+        - Hide the internal packages in Catalyst::Plugin::Session::Test::Store from PAUSE.
+        - Convert from CAF to Moose with Moosex::Emulate::Class::Accessor::Fast
+
 0.20 2009-02-05
         - No code changes since 0.19_01 dev release.
         - Add IDEAS.txt which is an irc log of discussion about the next-generation

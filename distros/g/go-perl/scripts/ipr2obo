@@ -1,0 +1,2 @@
+#!/bin/sh
+go2fmt.pl -p obo_xml -x ipr_to_oboxml -w obo_xml $@

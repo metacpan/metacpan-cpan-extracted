@@ -1,0 +1,80 @@
+
+=pod
+
+Schema and Model
+
+=head1 OVERVIEW
+
+Introduction to Schema and Model
+
+=head2 Schema
+
+A schema contains a list of (module) Models, described below. 
+It is a collective concept rather than any detailed ones.
+
+=head2 Model
+
+a Model, presenting a table in database and a module in code, is a concrete
+concept. There are 2 kinds of attributes
+
+
+=over 4
+
+=item * directive attribute
+
+mainly helpful for this system
+
+=item * value attribute
+
+there are 2 kinds of values.
+
+=over 2
+
+=item * slot
+
+
+
+=item * child
+
+
+=back
+
+=back
+
+=head1 MODULES
+
+=head2 AutoCode::Schema
+
+AutoCode::Schema presents the concept of Schema.
+
+=head2 AutoCode::ModuleModel
+
+=head3 AutoCode::ModuleModel::add_array_attribute
+
+=head3 AutoCode::ModuleModel::add_array_child
+
+AutoCode::ModuleModel::add_array_slot
+AutoCode::ModuleModel::add_scalar_attribute
+AutoCode::ModuleModel::add_scalar_child
+AutoCode::ModuleModel::add_scalar_slot
+AutoCode::ModuleModel::get_all_directive_attributes
+AutoCode::ModuleModel::get_all_value_attributes
+AutoCode::ModuleModel::get_array_attributes
+AutoCode::ModuleModel::get_array_children
+AutoCode::ModuleModel::get_array_slots
+AutoCode::ModuleModel::get_directive_attribute
+AutoCode::ModuleModel::get_scalar_attributes
+AutoCode::ModuleModel::get_scalar_children
+AutoCode::ModuleModel::get_scalar_slots
+AutoCode::ModuleModel::get_value_attribute
+AutoCode::ModuleModel::remove_array_attributes
+AutoCode::ModuleModel::remove_array_children
+AutoCode::ModuleModel::remove_array_slots
+AutoCode::ModuleModel::remove_scalar_attributes
+AutoCode::ModuleModel::remove_scalar_children
+AutoCode::ModuleModel::remove_scalar_slots
+AutoCode::ModuleModel::schema
+AutoCode::ModuleModel::type
+
+=cut
+

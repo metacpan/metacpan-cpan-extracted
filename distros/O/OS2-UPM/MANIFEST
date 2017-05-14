@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+UPM.pm
+UPM.xs
+test.pl

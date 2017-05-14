@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use ARGV::Struct;
+use Data::Dumper;
+print Dumper(ARGV::Struct->new->parse);

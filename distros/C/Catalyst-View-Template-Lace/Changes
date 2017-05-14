@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Catalyst::View::Template::Lace
 
+0.002   12 May 2017
+        - Update required version of Template::Lace
+        - Fixed bug in the Uri roles
+        - undocumented prototype for embedding the response of a public
+          path into your template.  See the Users view under the /t directory.
+        
 0.001   25 April 2017
         - First usable version, with caveats (its still earlly access)
 

@@ -2,7 +2,8 @@
 abstract: 'Load IOEvents and IOMuxer so that they work together.'
 author:
   - 'Chad Granum <exodist@cpan.org>'
-build_requires: {}
+build_requires:
+  Test2::Bundle::Extended: '0.000070'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -21,5 +22,5 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Plugin-IOSync/issues
   repository: http://github.com/Test-More/Test2-Plugin-IOSync/
-version: '0.000005'
+version: '0.000007'
 x_serialization_backend: 'YAML::Tiny version 1.70'

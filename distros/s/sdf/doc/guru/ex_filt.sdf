@@ -1,0 +1,144 @@
+H1: Creating New Filters
+
+H2: Using Event Processing
+
+SDF's event processing feature makes it easy to create
+a new filter from an existing one. For example, the
+following lines make {{grid}} a variation of the
+{{FILT:table}} filter:
+
+E:!on filter 'grid';; \
+E:    $name='table'; $params.="; style='grid'"
+
+H2: Using Perl
+
+Perl subroutines can be used to implement filter logic.
+An SDF filter called {{xxx}} is mapped to a Perl subroutine
+called {{xxx}}_Filter within the SDF_USER package.
+The subroutine has the following interface:
+
+E:       xxx_Filter(*text, %param);
+
+:where:
+
+* {{@text}} is the text (original in and result out)
+* {{%param}} is the set of parameters (name-value pairs).
+
+For example, the Perl implementation of the {{FILT:appendix}} filter is:
+
+!block Perl
+sub appendix_Filter {
+    local(*text, %param) = @_;
+
+    # change headings
+    unshift(@text, '!on paragraph \'H\d\'; __appendix; $style =~ s/H/A/');
+    push   (@text, '!off paragraph __appendix');
+}
+!endblock
+
+The {{FILE:perllib/sdf/filters.pl}} file within the SDF distribution
+contains lots of examples of filters implemented as Perl subroutines.
+
+
+H2: Adding Parameters
+
+Parameters can be declared in a Perl array called _{{xxx}}_FilterParams.
+The array is a table in {{FMT:TBL}} format which contains
+the following fields:
+
+!block table
+Field   Description
+Name    The parameter name
+Type    The parameter type
+Rule    The parameter validation rule, if any
+!endblock
+
+Parameter types and rules follow the same conventions
+as macro argument types and rules. Refer to
+{{SECT:Creating New Macros}} for details.
+
+For example, the parameters for the {{FILT:example}} filter are declared
+like this:
+
+!block Perl
+@_example_FilterParams = (
+    'Name       Type        Rule',
+    'skipheader boolean',
+    'lang       string',
+    'wide       boolean',
+    'listitem   integer',
+    'pure       boolean',
+);
+!endblock
+
+
+H2: Arbitary Parameters
+
+Occasionally, it is useful to support arbitary parameters.
+To do this, specify ('ANY') as the value of the parameter table.
+For example, the {{FILT:sdf}} filter can be used to apply an
+arbitary set of attributes to a block of text. Its parameter table is:
+
+!block Perl
+@_sdf_FilterParams = ('ANY');
+!endblock
+
+
+H2: Data Models
+
+If the text is a table, the filter typically has a data model
+(i.e. validation table) called {{xxx_FilterModel}}.
+To speed up processing, model validation is only done
+in verbose mode. For example, the {{FILT:define}} filter
+is defined as follows:
+
+!block Perl
+# define - variable definitions
+@_define_FilterParams = (
+    'Name       Type        Rule',
+    'family     string      <\w+>',
+    'export     boolean',
+);
+@_define_FilterModel = (
+    'Field      Category    Rule',
+    'Name       key         <\w+>',
+    'Value      optional',
+);
+sub define_Filter {
+    local(*text, %param) = @_;
+    local(@tbl, @flds, $rec, %values);
+    local($family, $export, $name);
+
+    # Parse and validate the data
+    @tbl = &'TableParse(@text);
+    @text = ();
+    &_FilterValidate(*tbl, *_define_FilterModel) if $validate;
+
+    # Process the data
+    $family = $param{'family'};
+    $family .= '_' if $family ne '';
+    $export = $param{'export'};
+    (@flds) = &'TableFields(shift @tbl);
+    for $rec (@tbl) {
+        %values = &'TableRecSplit(*flds, $rec);
+        $name = $family . $values{'Name'};
+        push(@text, "!define $name $values{'Value'}");
+        push(@text, "!export $name") if $export;
+    }
+}
+!endblock
+
+
+H2: Dynamic Filter Loading
+
+Most filters are either built-in or defined in a library or
+module which is loaded at the top of a document. The {{FILT:script}}
+filter makes it easy to embed Perl code within an SDF file,
+and library and module files are simply normal SDF files.
+
+However, if SDF is asked to apply a filter which it does not know about,
+it looks for a file called {{filter_name}}.sdp and dynamically
+loads the filter from that file if it can. This feature is useful
+for complex filters which are rarely used.
+
+See the {{FILE:stdlib/module.sdp}} file for an example.

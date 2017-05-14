@@ -6,7 +6,7 @@ Kafka::Cluster - object interface to manage a test kafka cluster.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Cluster> version 1.001013 .
+This documentation refers to C<Kafka::Cluster> version 1.02 .
 
 =cut
 
@@ -19,7 +19,7 @@ use warnings;
 
 # ENVIRONMENT ------------------------------------------------------------------
 
-our $VERSION = '1.001013';
+our $VERSION = '1.02';
 
 use Exporter qw(
     import
@@ -812,9 +812,8 @@ sub data_cleanup {
 #-- private functions ----------------------------------------------------------
 
 sub _clear_tainted {
-    my ( $str ) = @_;
 
-    $str =~ /(.+)/;
+    $_[0] =~ /(.+)/;
 
     return $1;
 }

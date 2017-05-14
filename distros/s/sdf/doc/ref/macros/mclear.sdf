@@ -1,0 +1,35 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: clear Macro
+
+H2: Interface
+
+!macro_interface "clear"
+
+H2: Description
+
+The {{clear}} macro resets text wrapping around a figure.
+
+H2: Examples
+
+!block example
+!import "mylogo"; align="right"
+Some text.
+!clear
+!endblock
+
+H2: Limitations & Future Directions
+
+{{html}} is the only target which currently supports wrapping text
+around figures.

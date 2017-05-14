@@ -1,0 +1,30 @@
+---
+abstract: 'A simple interface to the iTransact payment gateway.'
+author:
+  - 'JT Smith <jt@plainblack.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: iTransact-Lite
+no_index:
+  directory:
+    - author.t
+requires:
+  Any::Moose: 0.13
+  Digest::HMAC_SHA1: 1.01
+  LWP: 6.02
+  LWP::Protocol::https: 6.02
+  Mozilla::CA: 20110409
+  Ouch: 0.0400
+  Test::More: 0
+  XML::Hash::LX: 0.06
+resources:
+  bugtracker: http://github.com/rizen/iTransact-Lite/issues
+  repository: git://github.com/rizen/iTransact-Lite.git
+version: 0.0101

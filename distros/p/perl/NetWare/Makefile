@@ -86,7 +86,7 @@ NLM_VERSION    = 3,20,0
 
 
 # Here comes the CW tools - TO BE FILLED TO BUILD WITH CW -
-MODULE_DESC     = "Perl 5.8.9 for NetWare"
+MODULE_DESC     = "Perl 5.24.1 for NetWare"
 CCTYPE          = CodeWarrior
 C_COMPILER		= mwccnlm -c
 CPP_COMPILER	= mwccnlm
@@ -285,9 +285,7 @@ NW_CFG_VARS = \
 		"static_ext=$(STATIC_EXT)"		\
 		"dynamic_ext=$(DYNAMIC_EXT)"		\
 		"nonxs_ext=$(NONXS_EXT)"		\
-		"use5005threads=$(USE_5005THREADS)"	\
 		"useithreads=$(USE_ITHREADS)"		\
-		"usethreads=$(USE_5005THREADS)"		\
 		"usemultiplicity=$(USE_MULTI)"		\
 		"ld=$(LINK)"			\
 		"base_import=$(BASE_IMPORT_FILES)"	\
@@ -314,14 +312,12 @@ IO_NLM		= $(AUTODIR)\IO\IO.NLM
 OPCODE_NLM	= $(AUTODIR)\Opcode\Opcode.NLM
 SDBM_FILE_NLM = $(AUTODIR)\SDBM_File\SDBM_File.NLM
 POSIX_NLM	= $(AUTODIR)\POSIX\POSIX.NLM
-ATTRS_NLM	= $(AUTODIR)\attrs\attrs.NLM
-THREAD_NLM	= $(AUTODIR)\Thread\Thread.NLM
+ATTRIBUTES_NLM	= $(AUTODIR)\attributes\attributes.NLM
 B_NLM		= $(AUTODIR)\B\B.NLM
 DUMPER_NLM	= $(AUTODIR)\Data\Dumper\Dumper.NLM
 PEEK_NLM	= $(AUTODIR)\Devel\Peek\Peek.NLM
 RE_NLM		= $(AUTODIR)\re\re.NLM
 BYTELOADER_NLM	= $(AUTODIR)\ByteLoader\ByteLoader.NLM
-DPROF_NLM	= $(AUTODIR)\Devel\DProf\DProf.NLM
 GLOB_NLM	= $(AUTODIR)\File\Glob\Glob.NLM
 HOSTNAME_NLM	= $(AUTODIR)\Sys\Hostname\Hostname.NLM
 CWD_NLM			= $(EXTDIR)\Cwd\Cwd.NLM
@@ -331,6 +327,7 @@ MIMEBASE64_NLM		= $(EXTDIR)\MIME\Base64\Base64.NLM
 XSAPITEST_NLM		= $(EXTDIR)\XS\APItest\APItest.NLM
 XSTYPEMAP_NLM		= $(EXTDIR)\XS\Typemap\Typemap.NLM
 UNICODENORMALIZE_NLM 	= $(EXTDIR)\Unicode\Normalize\Normalize.NLM
+UNICODECOLLATE_NLM 	= $(EXTDIR)\Unicode\Collate\Collate.NLM
 
 EXTENSION_NLM	= 		\
 		$(FCNTL_NLM)	\
@@ -339,15 +336,13 @@ EXTENSION_NLM	= 		\
 		$(SOCKET_NLM)	\
 		$(OPCODE_NLM)	\
 		$(B_NLM)		\
-		$(ATTRS_NLM)	\
+		$(ATTRIBUTES_NLM)	\
 		$(SDBM_FILE_NLM)	\
 		$(POSIX_NLM)	\
-		$(THREAD_NLM)	\
 		$(DUMPER_NLM)	\
 		$(GLOB_NLM)		\
 		$(PEEK_NLM)		\
 		$(RE_NLM)	\
-		$(DPROF_NLM)	\
 		$(HOSTNAME_NLM)		\
 		$(CWD_NLM)		\
 		$(STORABLE_NLM)		\
@@ -467,7 +462,7 @@ INST_NW_TOP2 = $(INST_NW_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-INST_VER	= \5.8.9
+INST_VER	= \5.24.1
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -505,15 +500,6 @@ USE_IMP_SYS	= define
 # else USE_STDIO will be defined.
 #USE_PERLIO	= define
 #USE_STDIO = define
-#
-# WARNING! This option is deprecated and will eventually go away (enable
-# USE_ITHREADS instead).
-#
-# uncomment to enable threads-capabilities.  This is incompatible with
-# USE_ITHREADS, and is only here for people who may have come to rely
-# on the experimental Thread support that was in 5.005.
-#
-#USE_5005THREADS= define
 
 # For now let this be here
 #
@@ -555,14 +541,6 @@ CRYPT_FLAG	= -DHAVE_DES_FCRYPT
 PERL_MALLOC	= undef
 !ENDIF
 
-!IF "$(USE_5005THREADS)" == ""
-USE_5005THREADS	= undef
-!ENDIF
-
-!IF "$(USE_5005THREADS)" == "define"
-USE_ITHREADS	= undef
-!ENDIF
-
 !IF "$(USE_IMP_SYS)" == "define"
 PERL_MALLOC	= undef
 !ENDIF
@@ -583,16 +561,15 @@ USE_IMP_SYS	= undef
 USE_PERLCRT	= undef
 !ENDIF
 
-!IF "$(USE_IMP_SYS)$(USE_MULTI)$(USE_5005THREADS)" == "defineundefundef"
+!IF "$(USE_IMP_SYS)$(USE_MULTI)" == "defineundef"
 USE_MULTI	= define
 !ENDIF
 
 !IF "$(USE_ITHREADS)$(USE_MULTI)" == "defineundef"
 USE_MULTI	= define
-USE_5005THREADS	= undef
 !ENDIF
 
-!IF "$(USE_MULTI)$(USE_5005THREADS)" != "undefundef"
+!IF "$(USE_MULTI)" != "undef"
 BUILDOPT	= $(BUILDOPT) -DPERL_IMPLICIT_CONTEXT
 !ENDIF
 
@@ -604,17 +581,13 @@ BUILDOPT	= $(BUILDOPT) -DPERL_IMPLICIT_SYS
 PROCESSOR_ARCHITECTURE	= x86
 !ENDIF
 
-!IF "$(USE_5005THREADS)" == "define"
-ARCHNAME	= NetWare-$(PROCESSOR_ARCHITECTURE)-thread
-!ELSE
 !IF "$(USE_MULTI)" == "define"
 ARCHNAME	= NetWare-$(PROCESSOR_ARCHITECTURE)-multi
 !ELSE
 ARCHNAME	= NetWare-$(PROCESSOR_ARCHITECTURE)
 !ENDIF
-!ENDIF
 
-!IF "$(USE_MULTI)$(USE_5005THREADS)" != "undefundef"
+!IF "$(USE_MULTI)" != "undef"
 ADD_BUILDOPT	= $(ADD_BUILDOPT) -DPERL_IMPLICIT_CONTEXT
 !ENDIF
 
@@ -680,30 +653,23 @@ PERLIMPLIB	= ..\perl.lib
 MINIPERL	= ..\miniperl.exe
 CONFIGPM	= ..\lib\Config.pm
 MINIMOD		= ..\lib\ExtUtils\Miniperl.pm
-X2P			= ..\x2p\a2p.nlm
 
 PL2BAT		= ..\win32\bin\pl2bat.pl
 
 UTILS		=			\
 		..\utils\h2ph		\
 		..\utils\splain		\
-		..\utils\dprofpp	\
 		..\utils\perlbug	\
 		..\utils\pl2pm 		\
 		..\utils\c2ph		\
 		..\utils\h2xs		\
 		..\utils\perldoc	\
-		..\utils\perlcc		\
-		..\pod\checkpods	\
 		..\pod\pod2html		\
-		..\pod\pod2latex	\
 		..\pod\pod2man		\
 		..\pod\pod2text		\
 		..\pod\pod2usage	\
 		..\pod\podchecker	\
-		..\pod\podselect	\
-		..\x2p\find2perl	\
-		..\x2p\s2p		
+		..\pod\podselect
 
 MAKE		= nmake -nologo
 #NMAKE       = $(C_COMPILER) $(INCLUDE) $(NLM_INCLUDES) $(COMPLER_FLAGS) $(ADD_LOCDEFS) $(ERROR_FLAG) $(*F).c -o $@
@@ -723,10 +689,13 @@ MICROCORE_SRC	=		\
 		..\deb.c	\
 		..\doio.c	\
 		..\doop.c	\
+		..\dquote.c	\
 		..\dump.c	\
 		..\globals.c	\
 		..\gv.c		\
+		..\mro_core.c	\
 		..\hv.c		\
+		..\keywords.c	\
 		..\locale.c	\
                 ..\mathoms.c    \
 		..\mg.c		\
@@ -748,11 +717,11 @@ MICROCORE_SRC	=		\
 		..\scope.c	\
 		..\sv.c		\
 		..\taint.c	\
+		..\time64.c	\
 		..\toke.c	\
 		..\universal.c	\
 		..\utf8.c	\
-		..\util.c	\
-		..\xsutils.c
+		..\util.c
 
 #EXTRACORE_SRC	= $(EXTRACORE_SRC) perllib.c
 
@@ -768,13 +737,6 @@ NW_SRC	= $(NW_SRC) .\$(CRYPT_SRC)
 
 DLL_SRC		= $(DYNALOADER).c
 
-X2P_SRC		=		\
-		..\x2p\a2p.c	\
-		..\x2p\hash.c	\
-		..\x2p\str.c	\
-		..\x2p\util.c	\
-		..\x2p\walk.c
-
 CORE_NOCFG_H	=		\
 		..\av.h		\
 		..\cop.h	\
@@ -785,6 +747,7 @@ CORE_NOCFG_H	=		\
 		..\gv.h		\
 		..\handy.h	\
 		..\hv.h		\
+		..\hv_func.h	\
 		..\iperlsys.h	\
 		..\mg.h		\
 		..\nostdio.h	\
@@ -793,7 +756,6 @@ CORE_NOCFG_H	=		\
 		..\perl.h	\
 		..\perlapi.h	\
 		..\perlsdio.h	\
-		..\perlsfio.h	\
 		..\perly.h	\
 		..\pp.h		\
 		..\proto.h	\
@@ -808,18 +770,16 @@ CORE_NOCFG_H	=		\
 		..\XSUB.h	\
 		..\EXTERN.h	\
 		..\perlvars.h	\
-		..\intrpvar.h	\
-		..\thrdvar.h	
+		..\intrpvar.h
 		
 CORE_H		= $(CORE_NOCFG_H) .\config.h
 
 DLL_OBJ		= $(DLL_SRC:.c=.obj)
-X2P_OBJ		= $(X2P_SRC:.c=.obj)
 
-DYNAMIC_EXT	= Socket IO Fcntl Opcode SDBM_File POSIX attrs Thread B re \
-		Data/Dumper Devel/Peek ByteLoader Devel/DProf File/Glob \
+DYNAMIC_EXT	= Socket IO Fcntl Opcode SDBM_File POSIX attributes B re \
+		Data/Dumper Devel/Peek ByteLoader File/Glob \
 		Storable/Storable List/Util MIME/Base64/Base64 XS/APItest/APItest \
-		XS/Typemap/Typemap Unicode/Normalize/Normalize Sys/Hostname
+		XS/Typemap/Typemap Unicode/Collate/Collate Unicode/Normalize/Normalize Sys/Hostname
 
 STATIC_EXT	= DynaLoader
 NONXS_EXT	= Errno
@@ -831,15 +791,13 @@ OPCODE		= $(EXTDIR)\Opcode\Opcode
 SDBM_FILE	= $(EXTDIR)\SDBM_File\SDBM_File
 IO			= $(EXTDIR)\IO\IO
 POSIX		= $(EXTDIR)\POSIX\POSIX
-ATTRS		= $(EXTDIR)\attrs\attrs
-THREAD		= $(EXTDIR)\Thread\Thread
+ATTRIBUTES		= $(EXTDIR)\attributes\attributes
 B			= $(EXTDIR)\B\B
 RE			= $(EXTDIR)\re\re
 DUMPER		= $(EXTDIR)\Data\Dumper\Dumper
 ERRNO		= $(EXTDIR)\Errno\Errno
 PEEK		= $(EXTDIR)\Devel\Peek\Peek
 BYTELOADER	= $(EXTDIR)\ByteLoader\ByteLoader
-DPROF		= $(EXTDIR)\Devel\DProf\DProf
 GLOB		= $(EXTDIR)\File\Glob\Glob
 HOSTNAME	= $(EXTDIR)\Sys\Hostname\Hostname
 CWD			= $(EXTDIR)\Cwd\Cwd
@@ -849,6 +807,7 @@ MIMEBASE64		= $(EXTDIR)\MIME\Base64\Base64
 XSAPITEST		= $(EXTDIR)\XS\APItest\APItest
 XSTYPEMAP		= $(EXTDIR)\XS\Typemap\Typemap
 UNICODENORMALIZE	= $(EXTDIR)\Unicode\Normalize\Normalize
+UNICODECOLLATE	= $(EXTDIR)\Unicode\Collate\Collate
 
 ERRNO_PM_NW	= $(LIBDIR)\Errno.pm
 
@@ -859,14 +818,12 @@ EXTENSION_C	= 		\
 		$(SDBM_FILE).c	\
 		$(IO).c		\
 		$(POSIX).c	\
-		$(ATTRS).c	\
-		$(THREAD).c	\
+		$(ATTRIBUTES).c	\
 		$(RE).c		\
 		$(DUMPER).c	\
 		$(PEEK).c	\
 		$(B).c		\
 		$(BYTELOADER).c	\
-		$(DPROF).c	\
 		$(GLOB).c	\
 		$(HOSTNAME).c \
 		$(CWD).c	\
@@ -882,7 +839,6 @@ EXTENSION_NPM =	\
 
 POD2HTML	= $(PODDIR)\pod2html
 POD2MAN		= $(PODDIR)\pod2man
-POD2LATEX	= $(PODDIR)\pod2latex
 POD2TEXT	= $(PODDIR)\pod2text
 
 #
@@ -897,8 +853,7 @@ all : .cleanoldfiles .\nwconfig.h $(CONFIGPM) $(NLM_NAME) $(EXTENSION_NLM) $(EXT
 	$(MINIPERL) -I..\lib config_sh.PL $(NW_CFG_VARS) config.nw5 > ..\config.sh
 
 # this target is for when changes to the main config.sh happen
-# edit config.{b,v,g,w}c and make this target once for each supported
-# compiler (e.g. `dmake CCTYPE=BORLAND regen_config_h`)
+# edit config.wc and make this target
 regen_config_h:
 	perl config_sh.PL $(NW_CFG_VARS) $(NW_CFGSH_TMPL) > ..\config.sh
 	cd ..
@@ -926,47 +881,6 @@ $(MINIPERL) :
 
 $(MINIMOD) : $(MINIPERL) ..\minimod.pl
 	cd .. && miniperl minimod.pl > lib\ExtUtils\Miniperl.pm
-
-..\x2p\a2p$(o) : ..\x2p\a2p.c
-	@echo $(MPKMESSAGE)...$(BLDMESG)...$@
-	$(C_COMPILER) $(COMPLER_FLAGS) $(NLM_INCLUDES) -I..\x2p $(ADD_LOCDEFS) $(ERROR_FLAG) $*.c -o $@
-    @echo Built $(@)
-
-..\x2p\hash$(o) : ..\x2p\hash.c
-	@echo $(MPKMESSAGE)...$(BLDMESG)...$@
-	$(C_COMPILER) $(COMPLER_FLAGS) $(NLM_INCLUDES) -I..\x2p $(ADD_LOCDEFS) $(ERROR_FLAG) $*.c -o $@
-    @echo Built $(@)
-	
-..\x2p\str$(o) : ..\x2p\str.c
-	@echo $(MPKMESSAGE)...$(BLDMESG)...$@
-	$(C_COMPILER) $(COMPLER_FLAGS) $(NLM_INCLUDES) -I..\x2p $(ADD_LOCDEFS) $(ERROR_FLAG) $*.c -o $@
-    @echo Built $(@)
-
-..\x2p\util$(o) : ..\x2p\util.c
-	@echo $(MPKMESSAGE)...$(BLDMESG)...$@
-	$(C_COMPILER) $(COMPLER_FLAGS) $(NLM_INCLUDES) -I..\x2p $(ADD_LOCDEFS) $(ERROR_FLAG) $*.c -o $@
-    @echo Built $(@)
-
-..\x2p\walk$(o) : ..\x2p\walk.c
-	@echo $(MPKMESSAGE)...$(BLDMESG)...$@
-	$(C_COMPILER) $(COMPLER_FLAGS) $(NLM_INCLUDES) -I..\x2p $(ADD_LOCDEFS) $(ERROR_FLAG) $*.c -o $@
-    @echo Built $(@)
-	
-$(X2P) : $(MINIPERL) $(X2P_OBJ)
-	@echo Building $@..........
-	$(MINIPERL) ..\x2p\find2perl.PL
-	$(MINIPERL) ..\x2p\s2p.PL
-# Linker definitions and lining come here for CODEWARRIOR
-    @echo $(BASE_IMPORT_FILES) > $*.def
-    @echo MODULE clib >> $*.def
-    @echo Import @perl.imp >> $*.def
-!ifdef USE_XDC
-	$(MPKTOOL) $(XDCFLAGS) $*.xdc
-	@echo Import Mp.imp >> $*.def
-	@echo xdcdata $*.xdc >> $*.def
-!endif
-##    $(LINK) $(LDFLAGS) $(BS_CFLAGS) -desc "Awk to Perl Translator" $(X2P_OBJ) $(BLDDIR)\clibstuf.obj -commandfile $*.def -o $@ 
-    $(LINK) $(LDFLAGS) -desc "Awk to Perl Translator" $(X2P_OBJ) $(BLDDIR)\clibstuf.obj -commandfile $*.def -o $@ 
 
 $(EXTDIR)\DynaLoader\dl_netware.xs: dl_netware.xs
 	copy dl_netware.xs $(EXTDIR)\DynaLoader\dl_netware.xs
@@ -1094,12 +1008,12 @@ $(PERLIMPLIB): perllib.imp
 #	$(XCOPY) $(PERLIMPLIB) $(COREDIR)
 #	@echo $(PERLIMPLIB) Done
 
-perllib.imp : $(MINIPERL) $(CONFIGPM) ..\global.sym ..\pp.sym ..\makedef.pl
+perllib.imp : $(MINIPERL) $(CONFIGPM) ..\embed.fnc ..\makedef.pl
 #	$(MINIPERL) -w ..\makedef.pl PLATFORM=netware FILETYPE=def $(ADD_BUILDOPT) \
-#	    CCTYPE=$(CCTYPE) > perllib.def
+#	    CCTYPE=$(CCTYPE) TARG_DIR=..\ > perllib.def
 	@echo (Perl) > perl.imp
   	$(MINIPERL) -w ..\makedef.pl PLATFORM=netware FILETYPE=imp $(BS_CFLAGS) $(DEFINES) $(ADD_BUILDOPT) \
-	    CCTYPE=$(CCTYPE) >> perl.imp
+	    CCTYPE=$(CCTYPE) TARG_DIR=..\ >> perl.imp
 	copy perl.imp $(COREDIR)
   
 $(DLL_OBJ) : $(DYNALOADER).c $(CORE_H) $(EXTDIR)\DynaLoader\dlutils.c
@@ -1238,12 +1152,6 @@ $(BYTELOADER_NLM):
 	$(MAKE)
 	cd ..\..\netware
 
-$(DPROF_NLM):
-	cd $(EXTDIR)\Devel\$(*B)
-	..\..\..\miniperl -I..\..\..\lib Makefile.PL PERL_CORE=1 INSTALLDIRS=perl
-	$(MAKE)
-	cd ..\..\..\netware
-
 $(GLOB_NLM):
 	cd $(EXTDIR)\File\$(*B)
 	..\..\..\miniperl -I..\..\..\lib Makefile.PL PERL_CORE=1 INSTALLDIRS=perl
@@ -1256,13 +1164,7 @@ $(POSIX_NLM):
 	$(MAKE)
 	cd ..\..\netware
 
-$(THREAD_NLM):
-	cd $(EXTDIR)\$(*B)
-	..\..\miniperl -I..\..\lib Makefile.PL PERL_CORE=1 INSTALLDIRS=perl
-	$(MAKE)
-	cd ..\..\netware
-
-$(ATTRS_NLM):
+$(ATTRIBUTES_NLM):
 	cd $(EXTDIR)\$(*B)
 	..\..\miniperl -I..\..\lib Makefile.PL PERL_CORE=1 INSTALLDIRS=perl
 	$(MAKE)
@@ -1405,7 +1307,7 @@ nwclean:
 	-del /f /q *.obj *.map *.link *.options *.nlm *.sym *.xdc *.err *.lib *.def *.pdb *.bs
 	cd ..\..\
 
-utils: $(BLDDIR)\$(NLM_NAME8).$(NLM_EXT) $(X2P)
+utils: $(BLDDIR)\$(NLM_NAME8).$(NLM_EXT)
 	cd ..\utils
 	$(MAKE) PERL=$(MINIPERL)
 	cd ..\pod
@@ -1413,15 +1315,12 @@ utils: $(BLDDIR)\$(NLM_NAME8).$(NLM_EXT) $(X2P)
 	copy ..\README.cygwin .\perlcygwin.pod
 	copy ..\README.dos .\perldos.pod
 	copy ..\README.hpux .\perlhpux.pod
-#	copy ..\README.machten .\perlmachten.pod
 	copy ..\README.os2 .\perlos2.pod
 	copy ..\vms\perlvms.pod .\perlvms.pod
 	copy ..\README.win32 .\perlwin32.pod
 	copy ..\README.netware .\perlnw5.pod
 	$(MAKE) -f ..\win32\pod.mak converters
 
-	cd ..\lib
-	$(MINIPERL) lib_pm.PL
 	cd ..\netware
 	$(MINIPERL) $(PL2BAT) $(UTILS)
 
@@ -1433,30 +1332,25 @@ distclean: clean nwclean
 	-del /f /q $(EXTDIR)\DynaLoader\dl_win32.xs
 	-del /f /q $(EXTDIR)\DynaLoader\DynaLoader.pm
 	-del /f /q $(EXTDIR)\DynaLoader\XSLoader.pm
-	-del /f /q $(LIBDIR)\.exists $(LIBDIR)\attrs.pm $(LIBDIR)\DynaLoader.pm
+	-del /f /q $(LIBDIR)\.exists $(LIBDIR)\attributes.pm $(LIBDIR)\DynaLoader.pm
 	-del /f /q $(LIBDIR)\XSLoader.pm
 	-del /f /q $(LIBDIR)\Fcntl.pm $(LIBDIR)\IO.pm $(LIBDIR)\Opcode.pm
 	-del /f /q $(LIBDIR)\ops.pm $(LIBDIR)\Safe.pm
 	-del /f /q $(LIBDIR)\SDBM_File.pm $(LIBDIR)\Socket.pm $(LIBDIR)\POSIX.pm
 	-del /f /q $(LIBDIR)\B.pm $(LIBDIR)\O.pm $(LIBDIR)\re.pm
 	-del /f /q $(LIBDIR)\Data\Dumper.pm $(LIBDIR)\ByteLoader.pm
-	-del /f /q $(LIBDIR)\Devel\Peek.pm $(LIBDIR)\Devel\DProf.pm
+	-del /f /q $(LIBDIR)\Devel\Peek.pm
 	-del /f /q $(LIBDIR)\File\Glob.pm
 	-del /f /q $(LIBDIR)\Unicode\Normalize.pm
+	-del /f /q $(LIBDIR)\Unicode\Collate.pm
 	-rmdir /s /q $(LIBDIR)\IO
-	-rmdir /s /q $(LIBDIR)\Thread
 	-rmdir /s /q $(LIBDIR)\B
 	-rmdir /s /q $(LIBDIR)\Data
 	-del /f /q $(PODDIR)\*.html
 	-del /f /q $(PODDIR)\*.bat
 	cd ..\utils
-	-del /f /q h2ph splain perlbug pl2pm c2ph h2xs perldoc dprofpp
+	-del /f /q h2ph splain perlbug pl2pm c2ph h2xs perldoc
 	-del /f /q *.bat
-	cd ..\netware
-	cd ..\x2p
-	-del /f /q find2perl s2p
-	-del /f /q *.bat *.exe
-	-del /f /q *.obj *.map *.link *.xdc *.err
 	cd ..\netware
 	-del /f /q ..\config.sh ..\splittree.pl dlutils.c config.h.new
 	-del /f /q $(CONFIGPM)
@@ -1514,4 +1408,3 @@ clean :
 	-@erase $(DLL_OBJ)
 	-@erase ..\*$(o) ..\*.lib ..\*.exp *$(o) *.lib *.exp *.res
 	-@erase ..\t\*.exe ..\t\*.dll ..\t\*.bat
-	-@erase ..\x2p\*.nlm ..\x2p\*.bat

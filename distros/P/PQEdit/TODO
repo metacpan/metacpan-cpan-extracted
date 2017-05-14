@@ -1,0 +1,16 @@
+                                            $Date: 1998/03/13 23:10:00 $
+
+These are features that would be nice to have and might even happen someday.
+The order of items does not reflect priority.
+
+  o  More control of the 'Look and Feel' of the HTML page (colors, fonts, etc.).
+  o  Other types of database servers (PostgreSQL, mSQL, mySQL, etc.).
+     (Note: this depends on there being a version of RDBAL and RDBAL::Schema
+     for the database in question).
+
+  o  More documentation
+
+  o  More tests
+
+  o  Fix bugs, if there are any...
+

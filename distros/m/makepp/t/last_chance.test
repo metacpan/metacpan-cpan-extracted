@@ -1,0 +1,59 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	4	755	1308567017	1308567017	makepp_test_script.pl
+makepp qw(default dir/all);
+n_files 'n_files_0';
+makepp '--rm_stale';	# Make sure that the wildcard doesn't match the last_chance targets
+1;
+###	16	644	1308566871	965331711	Makeppfile
+$(phony default): file1 x
+
+f%ile2x: f%ile2
+	&cp $< $@
+
+f%ile3x: f%ile3
+	&cp $< $@
+
+file% other%: :last_chance
+	&echo $X $@ -o $@
+	&echo other$@ -o $(word 2, $(outputs))
+
+$(phony x): file1 file2 other3
+
+X := $(first_available file2)	# Instance the rule for file2
+X := $(wildcard file*)		# file1 and file3 aren't instanced yet
+###	D	755	1308566871	1308564810	dir/
+###	12	644	1308566871	1308564770	dir/Makeppfile
+# These rules must not match a, which is a normal file
+
+$(phony all): a b/ c/
+
+%/: :last-chance
+	&mkdir $(output)
+	&touch $(output).last-chance
+
+# TODO: file_info marks every matching output as a directory, so later "%: %.yes" never matches
+%/: %.yes
+	&mkdir $(output)
+	&touch $(output).normal
+###	0	644	1308566871	1308564299	dir/a
+###	0	644	1308566871	1308564717	dir/b.yes
+###	D	755	1308567039	1308567040	answers/
+###	1	644	1308566871	965332255	answers/file1
+file2 file2x file1
+###	1	644	1308566871	965332253	answers/file2
+file2 file2x file2
+###	1	644	1308566871	965332260	answers/file3
+file2 file2x file3
+###	1	644	1308567026	1308567026	answers/n_files
+0 2 0
+###	1	644	1308567039	1308567039	answers/n_files_0
+8 3 0
+###	1	644	1308566871	965332255	answers/other1
+otherfile1
+###	1	644	1308566871	965332253	answers/other2
+otherfile2
+###	1	644	1308566871	965332260	answers/other3
+otherfile3
+###	D	755	1308566871	1308564725	answers/dir/
+###	0	644	1308566871	1308564808	answers/dir/b.normal
+###	0	644	1308566871	1308564819	answers/dir/c.last-chance

@@ -32,9 +32,9 @@
 
   Undefined value assigned to typeglob
 
-  Possible Y2K bug: %d format string following '19'
-
   Reference is already weak			[Perl_sv_rvweaken] <<TODO
+
+  vector argument not supported with alpha versions
 
   Mandatory Warnings
   ------------------
@@ -58,7 +58,7 @@ $x = 1 + $a[0] ; # a
 no warnings 'uninitialized' ;
 $x = 1 + $b[0] ; # a
 EXPECT
-Use of uninitialized value in integer addition (+) at - line 4.
+Use of uninitialized value $a[0] in integer addition (+) at - line 4.
 ########
 # sv.c (sv_2iv)
 package fred ;
@@ -73,7 +73,7 @@ $A *= 2 ;
 no warnings 'uninitialized' ;
 $A *= 2 ;
 EXPECT
-Use of uninitialized value in integer multiplication (*) at - line 10.
+Use of uninitialized value $A in integer multiplication (*) at - line 10.
 ########
 # sv.c
 use integer ;
@@ -82,7 +82,7 @@ my $x *= 2 ; #b
 no warnings 'uninitialized' ;
 my $y *= 2 ; #b 
 EXPECT
-Use of uninitialized value in integer multiplication (*) at - line 4.
+Use of uninitialized value $x in integer multiplication (*) at - line 4.
 ########
 # sv.c (sv_2uv)
 package fred ;
@@ -98,7 +98,7 @@ no warnings 'uninitialized' ;
 $B = 0 ;
 $B |= $A ;
 EXPECT
-Use of uninitialized value in bitwise or (|) at - line 10.
+Use of uninitialized value $A in bitwise or (|) at - line 10.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -108,7 +108,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; 
 $x = 1 | $b[$Y] ;
 EXPECT
-Use of uninitialized value in bitwise or (|) at - line 4.
+Use of uninitialized value within @a in bitwise or (|) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -118,7 +118,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; 
 $x = 1 & $b[$Y] ;
 EXPECT
-Use of uninitialized value in bitwise and (&) at - line 4.
+Use of uninitialized value within @a in bitwise and (&) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -128,7 +128,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; 
 $x = ~$b[$Y] ;
 EXPECT
-Use of uninitialized value in 1's complement (~) at - line 4.
+Use of uninitialized value within @a in 1's complement (~) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -136,7 +136,7 @@ my $x *= 1 ; # d
 no warnings 'uninitialized' ;
 my $y *= 1 ; # d
 EXPECT
-Use of uninitialized value in multiplication (*) at - line 3.
+Use of uninitialized value $x in multiplication (*) at - line 3.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -144,7 +144,7 @@ $x = 1 + $a[0] ; # e
 no warnings 'uninitialized' ;
 $x = 1 + $b[0] ; # e
 EXPECT
-Use of uninitialized value in addition (+) at - line 3.
+Use of uninitialized value $a[0] in addition (+) at - line 3.
 ########
 # sv.c (sv_2nv)
 package fred ;
@@ -158,7 +158,7 @@ $A *= 2 ;
 no warnings 'uninitialized' ;
 $A *= 2 ;
 EXPECT
-Use of uninitialized value in multiplication (*) at - line 9.
+Use of uninitialized value $A in multiplication (*) at - line 9.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -166,7 +166,7 @@ $x = $y + 1 ; # f
 no warnings 'uninitialized' ;
 $x = $z + 1 ; # f
 EXPECT
-Use of uninitialized value in addition (+) at - line 3.
+Use of uninitialized value $y in addition (+) at - line 3.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -182,7 +182,7 @@ $x = chop $y ; # h
 no warnings 'uninitialized' ;
 $x = chop $z ; # h
 EXPECT
-Use of uninitialized value in scalar chop at - line 3.
+Use of uninitialized value $y in scalar chop at - line 3.
 ########
 # sv.c (sv_2pv)
 package fred ;
@@ -198,7 +198,7 @@ no warnings 'uninitialized' ;
 $C = "" ;
 $C .= $A ;
 EXPECT
-Use of uninitialized value in concatenation (.) or string at - line 10.
+Use of uninitialized value $A in concatenation (.) or string at - line 10.
 ########
 # perlbug 20011116.125
 use warnings 'uninitialized';
@@ -207,9 +207,9 @@ $foo = join '', $a, "\n";
 $foo = "$a\n";
 $foo = "a:$a\n";
 EXPECT
-Use of uninitialized value in join or string at - line 4.
-Use of uninitialized value in concatenation (.) or string at - line 5.
-Use of uninitialized value in concatenation (.) or string at - line 6.
+Use of uninitialized value $a in join or string at - line 4.
+Use of uninitialized value $a in concatenation (.) or string at - line 5.
+Use of uninitialized value $a in concatenation (.) or string at - line 6.
 ########
 # sv.c 
 use warnings 'numeric' ;
@@ -287,26 +287,56 @@ Subroutine main::fred redefined at - line 5.
 # sv.c
 use warnings 'printf' ;
 open F, ">".($^O eq 'VMS'? 'NL:' : '/dev/null') ;
-printf F "%z\n" ;
-my $a = sprintf "%z" ;
+printf F "%y\n" ;
+my $a = sprintf "%y" ;
 printf F "%" ;
 $a = sprintf "%" ;
 printf F "%\x02" ;
 $a = sprintf "%\x02" ;
+printf F "%lly" ;
+$a = sprintf "%lly" ;
+printf F "%25lly" ;
+$a = sprintf "%25lly" ;
+printf F "%+2Ly" ;
+$a = sprintf "%+2Ly" ;
+printf F "%+2ll" ;
+$a = sprintf "%+2ll" ;
+printf F "%+2L\x03" ;
+$a = sprintf "%+2L\x03" ;
 no warnings 'printf' ;
-printf F "%z\n" ;
-$a = sprintf "%z" ;
+printf F "%y\n" ;
+$a = sprintf "%y" ;
 printf F "%" ;
 $a = sprintf "%" ;
 printf F "%\x02" ;
 $a = sprintf "%\x02" ;
+printf F "%lly" ;
+$a = sprintf "%lly" ;
+printf F "%25lly" ;
+$a = sprintf "%25lly" ;
+printf F "%+2Ly" ;
+$a = sprintf "%+2Ly" ;
+printf F "%+2ll" ;
+$a = sprintf "%+2ll" ;
+printf F "%+2L\x03" ;
+$a = sprintf "%+2L\x03" ;
 EXPECT
-Invalid conversion in printf: "%z" at - line 4.
-Invalid conversion in sprintf: "%z" at - line 5.
+Invalid conversion in printf: "%y" at - line 4.
+Invalid conversion in sprintf: "%y" at - line 5.
 Invalid conversion in printf: end of string at - line 6.
 Invalid conversion in sprintf: end of string at - line 7.
 Invalid conversion in printf: "%\002" at - line 8.
 Invalid conversion in sprintf: "%\002" at - line 9.
+Invalid conversion in printf: "%lly" at - line 10.
+Invalid conversion in sprintf: "%lly" at - line 11.
+Invalid conversion in printf: "%25lly" at - line 12.
+Invalid conversion in sprintf: "%25lly" at - line 13.
+Invalid conversion in printf: "%+2Ly" at - line 14.
+Invalid conversion in sprintf: "%+2Ly" at - line 15.
+Invalid conversion in printf: "%+2ll" at - line 16.
+Invalid conversion in sprintf: "%+2ll" at - line 17.
+Invalid conversion in printf: "%+2L\003" at - line 18.
+Invalid conversion in sprintf: "%+2L\003" at - line 19.
 ########
 # sv.c
 use warnings 'misc' ;
@@ -315,40 +345,6 @@ no warnings 'misc' ;
 *b = undef ;
 EXPECT
 Undefined value assigned to typeglob at - line 3.
-########
-# sv.c
-use warnings 'y2k';
-use Config;
-BEGIN {
-    unless ($Config{ccflags} =~ /Y2KWARN/) {
-	print "SKIPPED\n# perl not built with -DPERL_Y2KWARN";
-	exit 0;
-    }
-    $|=1;
-}
-my $x;
-my $yy = 78;
-$x     = printf  "19%02d\n", $yy;
-$x     = sprintf "#19%02d\n", $yy;
-$x     = printf  " 19%02d\n", 78;
-$x     = sprintf "19%02d\n", 78;
-$x     = printf  "319%02d\n", $yy;
-$x     = sprintf "319%02d\n", $yy;
-no warnings 'y2k';
-$x     = printf  "19%02d\n", $yy;
-$x     = sprintf "19%02d\n", $yy;
-$x     = printf  "19%02d\n", 78;
-$x     = sprintf "19%02d\n", 78;
-EXPECT
-Possible Y2K bug: %d format string following '19' at - line 16.
-Possible Y2K bug: %d format string following '19' at - line 13.
-1978
-Possible Y2K bug: %d format string following '19' at - line 14.
-Possible Y2K bug: %d format string following '19' at - line 15.
- 1978
-31978
-1978
-1978
 ########
 # sv.c
 use warnings 'numeric' ;
@@ -367,20 +363,53 @@ EXPECT
 Argument "\x{100}\x{200}" isn't numeric in negation (-) at - line 3.
 ########
 # sv.c
-open F, ">".($^O eq 'VMS'? 'NL:' : '/dev/null') ;
-use warnings 'printf';
-$a = "a\nb";
-$s = sprintf "%4s", $a;
-printf F "%4s", $a;
-$s = sprintf "%-4s", $a;
-printf F "%-4s", $a;
-$s = sprintf "%*s", -4, $a;
-no warnings 'printf';
-$s = sprintf "%4s", $a;
-printf F "%4s", $a;
-$s = sprintf "%-4s", $a;
-printf F "%-4s", $a;
+use warnings 'numeric' ;
+$a = "\x{100}\x{1000}" x 10; $b = $a < 1;
+no warnings 'numeric' ;
+$a = "\x{100}\x{1000}" x 10; $b = $a < 1;
 EXPECT
-Newline in left-justified string for sprintf at - line 7.
-Newline in left-justified string for printf at - line 8.
-Newline in left-justified string for sprintf at - line 9.
+Argument "\x{100}\x{1000}\x{100}\x{1000}\x{100}..." isn't numeric in numeric lt (<) at - line 3.
+########
+# sv.c
+use warnings 'redefine' ;
+use utf8;
+use open qw( :utf8 :std );
+sub frèd {}  
+sub jòè {} 
+*frèd = \&jòè;
+no warnings 'redefine' ;
+sub jìm {} 
+*jìm = \&jòè ;
+EXPECT
+Subroutine main::frèd redefined at - line 7.
+########
+# sv.c
+use warnings 'redefine' ;
+use utf8;
+use open qw( :utf8 :std );
+sub ｆ렏 {}  
+sub 조Ȩ {} 
+*ｆ렏 = \&조Ȩ ;
+no warnings 'redefine' ;
+sub 짐 {} 
+*짐 = \&조Ȩ ;
+EXPECT
+Subroutine main::ｆ렏 redefined at - line 7.
+########
+# sv.c
+my $x = "a_c";
+++$x;
+use warnings "numeric";
+$x = "a_c"; ++$x;
+$x = ${ qr/abc/ }; ++$x;
+$x = "123x"; ++$x;
+$x = "123e"; ++$x;
+$x = 0; ++$x; # none of these should warn
+$x = "ABC"; ++$x;
+$x = "ABC123"; ++$x;
+$x = " +10"; ++$x;
+EXPECT
+Argument "a_c" isn't numeric in preincrement (++) at - line 5.
+Argument "(?^:abc)" isn't numeric in preincrement (++) at - line 6.
+Argument "123x" isn't numeric in preincrement (++) at - line 7.
+Argument "123e" isn't numeric in preincrement (++) at - line 8.

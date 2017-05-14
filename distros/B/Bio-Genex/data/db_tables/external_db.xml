@@ -1,0 +1,35 @@
+<?xml version="1.0" standalone="yes" ?>
+<!DOCTYPE DB [
+  <!ELEMENT  DB
+  			  (external_database*)                         >
+  <!ELEMENT  external_database
+  			  EMPTY                                        >
+  <!ATTLIST  external_database
+  	       name       CDATA                              #REQUIRED
+  	       parameterized_url        
+  			  CDATA                              #IMPLIED
+  	       main_url   CDATA                              #IMPLIED  >
+]>
+<DB>
+<external_database name="SWISS-PROT" 
+  main_url="http://www.ebi.ac.uk/swissprot/" 
+  parameterized_url="http://srs.ebi.ac.uk/srs6bin/cgi-bin/wgetz?-e+[SWALL-ID:'%%ID%%']" />
+<external_database name="SGD"
+  parameterized_url="http://genome-www.stanford.edu/cgi-bin/dbrun/SacchDB?find+SGDID+%%ID%%"
+  main_url="http://genome-www.stanford.edu/Saccharomyces/" />
+<external_database name="dbEST"
+  main_url="http://www.ncbi.nlm.nih.gov/dbEST/" 
+  parameterized_url="http://www.ncbi.nlm.nih.gov/irx/cgi-bin/birx_doc?dbest_cu+%%ID%%" />
+<external_database name="PIR" 
+  main_url="http://www-nbrf.georgetown.edu/pirwww/"
+  parameterized_url="http://www-nbrf.georgetown.edu/cgi-bin/pirwww/nbrfget?uid=%%ID%%" />
+<external_database name="PDB"
+  main_url="http://www.rcsb.org/pdb/" 
+  parameterized_url="http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=%%ID%%" />
+<external_database name="NCBI_Protein" 
+  main_url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=Protein" 
+  parameterized_url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=Protein&amp;dopt=GenPept&amp;list_uids=%%ID%%" />
+<external_database name="GenBank" 
+  main_url="http://www.ncbi.nlm.nih.gov/Genbank/index.html" 
+  parameterized_url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=Nucleotide&amp;dopt=GenBank&amp;list_uids=%%ID%%" />
+</DB>

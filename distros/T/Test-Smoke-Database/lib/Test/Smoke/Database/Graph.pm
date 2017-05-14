@@ -2,8 +2,16 @@ package Test::Smoke::Database::Graph;
 
 # module Test::Smoke::Database - Create graph about smoke database
 # Copyright 2003 A.Barbet alian@alianwebserver.com.  All rights reserved.
-# $Date: 2003/08/19 10:37:24 $
+# $Date: 2003/11/07 17:34:01 $
 # $Log: Graph.pm,v $
+# Revision 1.10  2003/11/07 17:34:01  alian
+# Return undef if fetch by-config failed
+#
+# Revision 1.9  2003/09/16 15:41:50  alian
+#  - Update parsing to parse 5.6.1 report
+#  - Change display for lynx
+#  - Add top smokers
+#
 # Revision 1.8  2003/08/19 10:37:24  alian
 # Release 1.14:
 #  - FORMAT OF DATABASE UPDATED ! (two cols added, one moved).
@@ -60,7 +68,7 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(prompt);
-$VERSION = ('$Revision: 1.8 $ ' =~ /(\d+\.\d+)/)[0];
+$VERSION = ('$Revision: 1.10 $ ' =~ /(\d+\.\d+)/)[0];
 
 my $debug = 0;
 my $font = '/usr/X11R6/share/enlightenment/themes/Blue_OS/ttfonts/arial.ttf';
@@ -148,7 +156,7 @@ sub percent_configure_all {
 		 title           => '% of successful make test each month',
 		 y_max_value     => 100,
 		 y_tick_number   => 10,
-		 x_label_skip    => (scalar @{@{$ref}[0]})/8,,
+		 x_label_skip    => 3,
 		 legend_spacing => 40,
 		 axis_space => 20,
 		 t_margin => 40,
@@ -179,7 +187,7 @@ sub configure_per_smoke {
 		 title           => 'make test run/pass all tests each month',
 		 y_max_value     => 40000,
 		 y_tick_number   => 10,
-		 x_label_skip    => (scalar @{@{$ref}[0]})/8,
+		 x_label_skip    => 3,
 		 types => [qw(lines area )],
 		 shadowclr       => 'dred',
 		 transparent     => 0,
@@ -203,10 +211,10 @@ sub configure_per_os {
   my $req = "select os,sum(nbc) from builds ";
   $req.="where smoke > $self->{LIMIT} " if ($self->{LIMIT});
   $req.="group by os order by 2";
-  my $ref = $self->fetch_array($req,10);
+  my $ref = $self->fetch_array($req,2);
   # no info about this config. Can't create graph
   if (!ref($$ref[1]) || ref($$ref[1] ne 'ARRAY')) {
-    warn __PACKAGE__." not enough data to make configure per os graph.";
+    warn __PACKAGE__." not enough data to make graph with \"$req\".";
     return;
   }
   my @a = @{$$ref[1]};
@@ -286,7 +294,7 @@ sub os_by_smoke {
 		 title           => 'Number of distinct smoke machine each month',
 		 y_max_value     => 50,
 		 y_tick_number   => 10,
-		 x_label_skip    => scalar @{@{$ref}[0]}/10,
+		 x_label_skip    => 3,
 		 y_label_position => 0,
 		 axis_space => 20,
 		 # shadows
@@ -384,10 +392,9 @@ sub fetch_array {
   my $ref = $self->{DBH}->selectall_arrayref($request);
   print STDERR "1:",Data::Dumper->Dump($ref) if ($debug);
   foreach (@$ref) {
-    my @l=@$_;
-    next if (($limit && $l[1] < $limit) or (!$l[1] or !$l[0]));
+    next if (($limit && $_->[1] < $limit) or (!$_->[1] and !$_->[0]));
     my $i = 0;
-    foreach (@l) { push( @{$tab[$i++]}, $_);  }
+    foreach my $v (@$_) { push( @{$tab[$i++]}, $v);  }
   }
 
   print STDERR "2:",Data::Dumper->Dump([ \@tab ]) if ($debug);
@@ -422,7 +429,8 @@ sub create_html {
 #------------------------------------------------------------------------------
 sub stats_cpan {
   my $self = shift;
-  my $content = get("http://testers.cpan.org/search?request=by-config");
+  my $content = get("http://testers.cpan.org/search?request=by-config")
+    or return undef;
   my @liste;
   my ($perl, $os, $osver, $archi);
   foreach (split(/<tr>/, $content)) {
@@ -552,7 +560,7 @@ Construct a new Test::Smoke::Database::Graph object and return it.
 
 =head1 VERSION
 
-$Revision: 1.8 $
+$Revision: 1.10 $
 
 =head1 AUTHOR
 

@@ -1,7 +1,9 @@
 package Mesos::Scheduler;
-use Mesos::Messages;
 use Moo;
-use namespace::autoclean;
+use strict;
+use warnings;
+
+with 'Mesos::Role::Scheduler';
 
 sub registered {}
 sub reregistered {}

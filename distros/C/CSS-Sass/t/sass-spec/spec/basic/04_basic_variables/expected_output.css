@@ -1,12 +1,9 @@
 a {
   color: red;
-  background: "blue";
-}
+  background: "blue"; }
 
 foo {
-  a: 1 2 before;
-}
+  a: 1 2 before; }
 
 foo {
-  a: 1 2 before;
-}
+  a: 1 2 before; }

@@ -15,7 +15,7 @@ CSS::Sass - Compile .scss files using libsass
     my $css = $sass->compile_file('styles.scss');
 
     # Add custom function to use inside your Sass code
-    sub foobar { CSS::Sass::Value::String->new('blue') }
+    sub foobar { CSS::Sass::Type::String->new('blue') }
     $sass->options->{sass_functions}->{'foobar'} = \ &foobar;
 
     # Compile string and get css output and source-map json
@@ -74,8 +74,8 @@ CSS::Sass - Compile .scss files using libsass
 # DESCRIPTION
 
 CSS::Sass provides a perl interface to libsass, a fairly complete Sass
-compiler written in C++. It is currently around ruby sass 3.3/3.4 feature parity and
-heading towards full 3.4 compatibility. It can compile .scss and .sass files.
+compiler written in C++. It is currently somewhere around ruby sass 3.3/3.4
+feature parity and heading towards 3.4. It can compile .scss and .sass files.
 
 # OBJECT ORIENTED INTERFACE
 
@@ -164,7 +164,7 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
 
     Set the linefeed string used for css output.
 
-- `indent`
+- `indentation`
 
     Set the indentation string used for css output.
 
@@ -178,10 +178,6 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
     Setting this option enables the source-map generating. The file will not
     actually be created, but its content will be returned to the caller. It
     will also enable sourceMappingURL comment by default. See `no_src_map_url`.
-
-- `source_map_file_urls`
-
-    Render source entries in the source map json as file urls (`file:///`).
 
 - `source_map_root`
 
@@ -211,7 +207,7 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
 - `plugin_paths`
 
     This is an arrayref that holds a list of paths to search for third-party
-    plugins. It will automatically load any &lt;dll> or &lt;so> library within that
+    plugins. It will automatically load any <dll> or <so> library within that
     directory. This is currently a highly experimental libsass feature!
 
 - `dont_die`
@@ -225,20 +221,20 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
     function should be the function's Sass signature and the value should be a
     Perl subroutine reference. This subroutine will be called whenever the
     function is used in the Sass being compiled. The arguments to the subroutine
-    are [CSS::Sass::Value](https://metacpan.org/pod/CSS::Sass::Value) objects, which map to native perl types if possible.
-    You can return either [CSS::Sass::Value](https://metacpan.org/pod/CSS::Sass::Value) objects or supported native perl data
-    structures. `undef` is an equivalent of CSS::Sass::Value::Null->new.
+    are [CSS::Sass::Type](https://metacpan.org/pod/CSS::Sass::Type) objects, which map to native perl types if possible.
+    You can return either [CSS::Sass::Type](https://metacpan.org/pod/CSS::Sass::Type) objects or supported native perl data
+    structures. `undef` is an equivalent of CSS::Sass::Type::Null->new.
 
     The function is called with an `eval` statement so you may use "die" to
-    throw errors back to libsass (`CSS::Sass::Value::Error`).
+    throw errors back to libsass (`CSS::Sass::Type::Error`).
 
     A simple example:
 
         sass_functions => {
             'append_hello($str)' => sub {
                 my ($str) = @_;
-                die '$str should be a string' unless $str->isa("CSS::Sass::Value::String");
-                return CSS::Sass::Value::String->new($str->value . " hello");
+                die '$str should be a string' unless $str->isa("CSS::Sass::Type::String");
+                return CSS::Sass::Type::String->new($str->value . " hello");
                 # equivalent to return $str->value . " hello";
             }
         }
@@ -286,7 +282,7 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
 - `Sass_Value` Types
 
     Sass knowns various `Sass_Value` types. We export the constants for completeness.
-    Each type is mapped to a package inside the `CSS::Sass::Value` namespace.
+    Each type is mapped to a package inside the `CSS::Sass::Type` namespace.
 
         # Value types
         SASS_ERROR
@@ -309,11 +305,11 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
     native data types from your custom functions or use the datastructures
     to access maps and lists.
 
-        undef; # same as CSS::Sass::Value::Null->new;
-        42; # same as CSS::Sass::Value::Number->new(42);
-        "foobar"; # same as CSS::Sass::Value::String->new("foobar");
-        [ 'foo', 'bar' ]; # same as CSS::Sass::Value::List->new('foo', 'bar');
-        { key => 'value' }; # same as CSS::Sass::Value::Map->new(key => 'value');
+        undef; # same as CSS::Sass::Type::Null->new;
+        42; # same as CSS::Sass::Type::Number->new(42);
+        "foobar"; # same as CSS::Sass::Type::String->new("foobar");
+        [ 'foo', 'bar' ]; # same as CSS::Sass::Type::List->new('foo', 'bar');
+        { key => 'value' }; # same as CSS::Sass::Type::Map->new(key => 'value');
 
     We bless native return values from custom functions into the correct package.
 
@@ -366,7 +362,7 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
 
 # SEE ALSO
 
-[CSS::Sass::Value](https://metacpan.org/pod/CSS::Sass::Value)
+[CSS::Sass::Type](https://metacpan.org/pod/CSS::Sass::Type)
 
 [The Sass Home Page](http://sass-lang.com/)
 
@@ -376,8 +372,8 @@ heading towards full 3.4 compatibility. It can compile .scss and .sass files.
 
 # AUTHOR
 
-David Caldwell &lt;david@porkrind.org>  
-Marcel Greter &lt;perl-libsass@ocbnet.ch>
+David Caldwell <david@porkrind.org>  
+Marcel Greter <perl-libsass@ocbnet.ch>
 
 # LICENSE
 

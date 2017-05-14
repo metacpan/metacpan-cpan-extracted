@@ -2,7 +2,7 @@ package Flower::Chronos;
 use strict;
 use warnings;
 use Data::Printer;
-our $VERSION = "0.01";
+
 
 use Flower::Chronos::Logger;
 use Flower::Chronos::Tracker;
@@ -55,51 +55,3 @@ sub track {
 }
 
 1;
-__END__
-
-=encoding utf-8
-
-=head1 NAME
-
-Flower::Chronos - automatic time tracking application
-
-=head1 SYNOPSIS
-
-  use Flower::Chronos;
-
-
-=head1 DESCRIPTION
-
-Flower::Chronos is a class used in C<Flower>.
-
-Flower is a meshed P2P client running between trusted peers on a LAN
-or WAN network.
-
-
-=head1 STATUS
-
-Flower is not yet operational.
-
-=head1 SYNOPSIS
-
-  git clone git://github.com/santex/Flower.git
-  cd Flower
-  perl Makefile.PL
-  make
-  script/flower <your-ip-address> 2222
-
-Then visit L<http://127.0.0.1:2222> in your browser.
-
-=head1 AUTHOR
-
-Hagen Geissler, E<lt>santex@cpan.orgE<gt>
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
-
-
-

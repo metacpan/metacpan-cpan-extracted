@@ -1,0 +1,54 @@
+#!/usr/local/bin/perl
+
+
+use strict;
+use Getopt::Long;
+use XML::Checker;
+use XML::Checker::Parser;
+
+
+my %expat_options = (KeepCDATA => 1);#, Handlers => { Unparsed => \&my_Unparsed_handler });
+my $parser = new XML::Checker::Parser (%expat_options);
+my %unique_h;
+
+unless (@ARGV) {
+    usage();
+    exit;
+}
+
+local $XML::Checker::FAIL = \&fail_handler;
+foreach my $f (@ARGV) {
+    $parser->parsefile ($f);
+}
+
+map{print STDERR "$_\n"}values %unique_h;
+print STDERR "DONE\n";
+
+my $status = scalar(keys %unique_h);
+exit $status;
+
+
+# code < 200, invalid xml element/attr?
+# code >= 200, a warning or info message?
+sub fail_handler {
+    my $code = shift;
+    my $msg = shift;
+    my @context = @_;
+    my $k = "ERROR-CODE=$code: $msg";
+    if ($code < 200) {
+        $unique_h{$k} = sprintf("$k\n\tContext: %s",join(", ",@context));
+    }
+}
+
+sub usage {
+print <<EOM;
+
+$0 xml_file
+
+  to validate xml using dtd specified in the xml file.
+  Error code and offending element are printed in STDERR stream.
+  it returns exit status to indicate if any error in xml.
+
+EOM
+
+}

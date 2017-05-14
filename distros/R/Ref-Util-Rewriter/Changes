@@ -1,0 +1,8 @@
+0.003   2016-04-29
+        * Add warning.
+
+0.002   2016-04-29
+        * Ugh. Fix indexing by adding PodWeaver to the dist.ini.
+
+0.001   2016-04-24
+        * First version.

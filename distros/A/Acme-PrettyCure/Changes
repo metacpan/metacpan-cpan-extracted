@@ -1,37 +1,5 @@
 Revision history for Perl extension Acme::PrettyCure
 
-0.1     Sun Feb 03 09:38:02 2013
-        - add title "DokiDoki Precure"
-        - change Any::Moose to Moo
-
-0.08    Sun Nov 04 12:00:00 2012
-        - support image method
-
-0.072   Sun Oct 21 13:00:26 2012
-        - fix bug when use Moose
-
-0.07    Sat Oct 06 16:43:55 2012
-        - fixed suite transform message
-        - support colorize transform
-
-0.06    Tue Oct 02 23:36:18 2012
-        - add 'challenge_with_jankenpon' to CurePeace. thanks to @maka2_donzoko
-
-0.05    Sun Jun 10 23:12:50 2012
-        - add title "Smile Precure"
-        - add girl "CureEcho"
-        - add group "AllStarNewStage"
-
-0.04    Sat Oct 25 01:56:22 2011
-        - add title "Suite Precure"
-        - add girl "CureFlower"
-        - add group "AllStarDX3"
-        - fixed challenge at transform
-
-0.03    Wed Dec 08 14:38:40 2010
-        - add TV series info. thanks to yappo
-        - CureBlack and CureWhite is 15 years old at MaxHeart
-
 0.02    Mon Dec 06 03:24:30 2010
         - fixed bugs
         - add 'AllStarDX1', 'AllStarDX2' teams

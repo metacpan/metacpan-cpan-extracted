@@ -1,0 +1,54 @@
+---
+abstract: 'Backend processes for CPAN Testers data and operations'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '1.001005'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Testers-Backend
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - old
+    - share
+    - t
+    - xt
+provides:
+  CPAN::Testers::Backend:
+    file: lib/CPAN/Testers/Backend.pm
+    version: '0.001'
+  CPAN::Testers::Backend::Base:
+    file: lib/CPAN/Testers/Backend/Base.pm
+    version: '0.001'
+  CPAN::Testers::Backend::Migrate::MetabaseUsers:
+    file: lib/CPAN/Testers/Backend/Migrate/MetabaseUsers.pm
+    version: '0.001'
+requires:
+  Beam::Runner: '0.010'
+  Beam::Wire: '1.020'
+  CPAN::Testers::Schema: '0.008'
+  DBI: '0'
+  Getopt::Long: '2.36'
+  Import::Base: '0.012'
+  Log::Any: '1.046'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/cpan-testers/cpantesters-backend/issues
+  homepage: https://github.com/cpan-testers/cpantesters-backend
+  repository: https://github.com/cpan-testers/cpantesters-backend.git
+version: '0.001'
+x_authority: cpan:PREACTION
+x_serialization_backend: 'YAML::Tiny version 1.69'

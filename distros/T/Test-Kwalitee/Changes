@@ -1,5 +1,10 @@
 Revision history for Test-Kwalitee
 
+1.26      2017-05-11 12:04:49Z
+    - bump Test::More prereq for (fully) working subtests
+    - properly detect the xt/ caller condition when running kwalitee_ok
+      directly (RT#120824)
+
 1.25      2017-02-28 03:21:28Z
     - fix test to not rely on . in @INC
 

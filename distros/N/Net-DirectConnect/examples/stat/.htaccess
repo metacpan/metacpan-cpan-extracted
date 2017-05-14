@@ -8,3 +8,11 @@
   Allow from all
  </FilesMatch>
  Deny from all
+
+<IfDefine MODPERL2>
+#  AddHandler perl-script .cgi
+#  PerlOptions +ParseHeaders
+#  PerlResponseHandler ModPerl::Registry
+## if Registry have bugs (partially disable mod_perl)
+  PerlResponseHandler ModPerl::PerlRun
+</IfDefine>

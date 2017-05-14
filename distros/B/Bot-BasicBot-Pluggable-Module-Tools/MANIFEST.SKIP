@@ -1,0 +1,9 @@
+Build
+Makefile
+.tar.gz
+_build
+blib
+infobot.conf
+.storable
+loader.settings
+.svn

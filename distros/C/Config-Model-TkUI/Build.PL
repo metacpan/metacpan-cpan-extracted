@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2016 by Dominique Dumont.
+# This software is Copyright (c) 2008-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -51,7 +51,7 @@ my $build = Module::Build->new
   },
   'requires' => {
     'Carp' => '0',
-    'Config::Model' => '2.084',
+    'Config::Model' => '2.095',
     'Config::Model::ObjTreeScanner' => '0',
     'Log::Log4perl' => '1.11',
     'Path::Tiny' => '0',

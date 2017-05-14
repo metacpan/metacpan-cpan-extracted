@@ -1,0 +1,20 @@
+#!/bin/csh -f
+
+if ($#argv != 1) then
+	echo "Usage: mkblank label"
+	exit 1
+endif
+
+if (-e /usr/local/dump/tapes/$1) then
+	echo use recycle instead
+	exit 1
+endif
+
+mt -f /dev/nrst0 rew
+
+# this is required for FreeBSD 2.1 with the WANGTEK  5150ES
+mt -f /dev/nrst0 blocksize 0
+
+echo "BLANK\
+$*" | dd of=/dev/nrst0 bs=112b conv=sync
+

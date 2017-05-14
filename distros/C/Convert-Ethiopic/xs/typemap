@@ -1,0 +1,39 @@
+float	T_FLOAT
+int *	T_PV
+long int *	T_PV
+long int	T_LONG
+boolean	T_BOOL
+enum Languages T_IV
+enum HTMLEscapes T_IV
+
+Convert::Ethiopic::System	H_OBJECT
+Convert::Ethiopic::String	H_OBJECT
+Convert::Ethiopic::Number	H_OBJECT
+Convert::Ethiopic::File		H_OBJECT
+Convert::Ethiopic::Date		H_OBJECT
+Convert::Ethiopic::Char		H_OBJECT
+
+
+INPUT
+
+
+H_OBJECT
+        if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+        	$var = (HV*)SvRV( $arg );
+        else{
+                warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+                XSRETURN_UNDEF;
+        }
+
+
+OUTPUT
+
+H_OBJECT
+
+	# $arg = newRV((SV*)$var);
+	# sv_setref_pv ( $arg, CLASS, (void*)$var );
+	$arg =  sv_bless (
+		# sv_2mortal(newRV((SV*)$var)),
+		newRV((SV*)$var),
+		gv_stashpv(CLASS, TRUE)
+	);

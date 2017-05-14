@@ -1,105 +1,60 @@
-NAME
-    Project::Euler - Solutions for <http://projecteuler.net>
+Project-Euler
 
-VERSION
-    version 0.20
 
-SYNOPSIS
-        use Project::Euler::Problem::P001;
-        my $problem1 = Project::Euler::Problem::P001->new;
+This module is intended to provide solutions to the Project Euler problems
+(http://projecteuler.net) using modern perl best practices and object
+oriented programming.  For this reason I will be making heavy use of the
+Moose module(s) to wrap the solutions into objects.
 
-        $problem1->solve;
-        print $problem1->status;
+Eventually I plan on making a GUI front-end (most likely using PL/TKk to make
+it easy to use and debug.
 
-DESCRIPTION
-    This is the base class which will eventually be responsible for
-    displaying the interface to interact with the solutions implemented so
-    far.
 
-    For now, you will have to manually import the problem_solutions and
-    solve them manually.
+This will be my first module I upload to CPAN and, sadly, the first time I'll
+make extensive use of tests so I have a lot of ground to cover in order to make
+this happen.
 
-LIBRARIES
-    These libraries are used by the problem solutions:
 
-    1   Project::Euler::Lib::Utils
 
-    2   Project::Euler::Lib::Types
 
-PROBLEMS
-    These problems are fully implemented so far (extending the base class
-    Project::Euler::Problem::Base)
+INSTALLATION
 
-    1   Project::Euler::Problem::P001
+To install this module, run the following commands:
 
-    2   Project::Euler::Problem::P002
+	perl Makefile.PL
+	make
+	make test
+	make install
 
-    3   Project::Euler::Problem::P003
+SUPPORT AND DOCUMENTATION
 
-    4   Project::Euler::Problem::P004
+After installing, you can find documentation for this module with the
+perldoc command.
 
-    5   Project::Euler::Problem::P005
+    perldoc Project::Euler
 
-AUTHOR
-    Adam Lesperance <lespea@gmail.com>
+You can also look for information at:
 
-SUPPORT
-    You can find documentation for this module with the perldoc command.
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-Euler
 
-      perldoc Project::Euler
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Project-Euler
 
-  Websites
-    *   Search CPAN
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Project-Euler
 
-        <http://search.cpan.org/dist/Project-Euler>
+    Search CPAN
+        http://search.cpan.org/dist/Project-Euler/
 
-    *   AnnoCPAN: Annotated CPAN documentation
 
-        <http://annocpan.org/dist/Project-Euler>
+COPYRIGHT AND LICENCE
 
-    *   CPAN Ratings
+Copyright (C) 2009 Adam Lesperance
 
-        <http://cpanratings.perl.org/d/Project-Euler>
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
 
-    *   CPAN Forum
-
-        <http://cpanforum.com/dist/Project-Euler>
-
-    *   RT: CPAN's Bug Tracker
-
-        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-Euler>
-
-    *   CPANTS Kwalitee
-
-        <http://cpants.perl.org/dist/overview/Project-Euler>
-
-    *   CPAN Testers Results
-
-        <http://cpantesters.org/distro/P/Project-Euler.html>
-
-    *   CPAN Testers Matrix
-
-        <http://matrix.cpantesters.org/?dist=Project-Euler>
-
-    *   Source Code Repository
-
-        The code is open to the world, and available for you to hack on.
-        Please feel free to browse it and play with it, or whatever. If you
-        want to contribute patches, please send me a diff or prod me to pull
-        from your repository :)
-
-        <git://github.com/lespea/Project-Euler>
-
-  Bugs
-    Please report any bugs or feature requests to "bug-project-euler at
-    rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-Euler>. I will
-    be notified, and then you'll automatically be notified of progress on
-    your bug as I make changes.
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2010 by Adam Lesperance.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+See http://dev.perl.org/licenses/ for more information.
 

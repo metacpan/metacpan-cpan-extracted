@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+use threads;
+use threads::shared;
+
+use CORBA::MICO ids => [ 'IDL:Callback:1.0' => undef, 'IDL:Sender:1.0' => undef ];
+
+package Worker;
+
+sub _run
+{
+  my ($callback, $mess) = @_;
+  while(1) {
+    print "sending reply ``$mess'' to the client.\n";
+    $callback->reply($mess);
+    sleep 1;
+  }
+}
+
+# Implementation for interface Sender
+package Sender_impl;
+
+@Sender_impl::ISA = qw(POA_Sender);
+
+use Error qw(:try);
+
+sub new
+{
+  my $class = shift;
+  bless {}, $class;
+}
+
+sub message
+{
+  my ($self, $obj, $msg) = @_;
+
+  print "client send message ``$msg''\n";
+
+  threads->new(\&Worker::_run, $obj, $msg);
+}
+
+package main;
+
+$orb = CORBA::ORB_init("mico-local-orb");
+$poa = $orb->resolve_initial_references("RootPOA");
+
+my $servant = new Sender_impl;
+my $ref = $orb->object_to_string ($poa->servant_to_reference ($servant));
+open (OUT, ">object.ref"); print OUT "$ref"; close OUT;
+#my $id = $poa->activate_object($servant);
+
+$poa->_get_the_POAManager->activate;
+
+print "server started.\n";
+$orb->run ();
+
+exit(0);

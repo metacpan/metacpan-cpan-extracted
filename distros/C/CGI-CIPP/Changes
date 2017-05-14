@@ -1,0 +1,36 @@
+$Id: Changes,v 1.7 2001/02/04 09:27:09 joern Exp $
+
+0.07 joern
+	- no caching of perl syntax errors
+
+0.06  Sat Mar 18 2000 joern
+	- all file operations use now flock() to prevent corrupt
+	  cache files
+
+0.05  Sun Feb 20 2000 joern
+	- bugfix: internal redirects did not pass CGI parameters
+	  correctly
+	- bugfix: internal redirects did connect to a database again
+
+0.04  Sun Oct 10 1999 joern
+	- added some hints to the documentation about configuring
+	  CGI::CIPP in combination with the Apache webserver
+
+0.03  Sun Oct 3 1999 joern
+	- simply forgotten to add README to MANIFEST, so the README
+	  was not part of the dist file
+
+0.02  Sat Oct 2 1999 joern
+	- database configuration is given as a nice hash reference,
+	  instead of the Apache style configuration parameters.
+	  It's more Perl style than Apache style now :)
+
+0.01  Fri Sep 11 1999 joern
+	- first internal version, mainly copied from Apache::CIPP
+	  and modified to run without Apache. I replaced the
+	  Apache request object with a object of CGI::CIPP
+	  and reimplemented the needed Apache methods in the
+	  CGI::CIPP class. This way I need not to change
+	  CIPP.pm itself. It has no idea of where it works,
+	  under CGI::CIPP or Apache::CIPP.
+

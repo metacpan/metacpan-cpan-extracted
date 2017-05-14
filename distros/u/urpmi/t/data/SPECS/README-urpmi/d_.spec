@@ -3,9 +3,6 @@ Name: d_
 Version: 1
 Release: 1
 License: x
-Group: x
-Url: x
-BuildRoot: %{_tmppath}/%{name}
 Obsoletes: d <= 1
 Provides: d > 1
 

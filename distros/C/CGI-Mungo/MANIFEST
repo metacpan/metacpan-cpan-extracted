@@ -9,10 +9,13 @@ lib/CGI/Mungo/Response.pm
 lib/CGI/Mungo/Response/Base.pm
 lib/CGI/Mungo/Response/NotModified.pm
 lib/CGI/Mungo/Response/Raw.pm
+lib/CGI/Mungo/Response/SimpleTemplate.pm
 lib/CGI/Mungo/Response/TemplateToolkit.pm
 lib/CGI/Mungo/Session.pm
 lib/CGI/Mungo/Utils.pm
+Makefile.PL
 MANIFEST			This list of files
+META.yml
 README
 root/templates/genericerror.html
 script/example_cgi_apps/hello_world.cgi
@@ -22,6 +25,3 @@ t/00_use.t
 t/01_mungo.t
 t/02_response_raw.t
 t/03_pod.t
-Makefile.PL
-META.yml
-META.json

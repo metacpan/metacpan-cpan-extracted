@@ -1,14 +1,11 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         GMail-IMAPD
-version:      0.93
+version:      0.94
 version_from: lib/GMail/IMAPD.pm
 installdirs:  site
 requires:
-    Crypt::SSLeay:                 
-    HTTP::Cookies:                 
-    HTTP::Request:                 
-    LWP::UserAgent:                
+    Mail::Webmail::Gmail:          1.09
 
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+generated_by: ExtUtils::MakeMaker version 6.30_01

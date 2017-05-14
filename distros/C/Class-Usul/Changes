@@ -1,5 +1,8 @@
 Revision history for Class::Usul
 
+0.82.1    2017-05-13 00:07:42
+          - Hate toolchain code. Create schema fix
+
 0.81.1    2017-05-01 04:46:18
           - Protect db admin password from spaces
           - Adds all option to schema creation

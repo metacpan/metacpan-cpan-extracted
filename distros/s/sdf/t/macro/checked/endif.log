@@ -1,0 +1,2 @@
+endif.sdf error, macro on 4: !endif not expected
+endif.sdf error, EOF at 20: !endif missing for !if on line 9

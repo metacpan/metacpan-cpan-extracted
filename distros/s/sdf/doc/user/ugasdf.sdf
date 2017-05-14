@@ -1,0 +1,35 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: About This Manual
+
+H2: Purpose
+
+This manual provides an introduction to [[SDF]] - a documentation
+system for software developers.
+
+H2: Scope
+
+This manual contains a tutorial-style introduction to the
+commonly used features in [[SDF]].
+
+The following documents may also be of interest:
+
+* [[SDF_DOC_WP]]
+* [[SDF_DOC_QR]]
+* [[SDF_DOC_REF]]
+* [[SDF_DOC_GG]].
+
+H2: Amendments
+
+!SDF_AMENDMENTS

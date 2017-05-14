@@ -13,7 +13,7 @@ method.
 
 =cut
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 use base qw( GSM::SMS::TransportRouter::TransportRouter );
 use Log::Agent;

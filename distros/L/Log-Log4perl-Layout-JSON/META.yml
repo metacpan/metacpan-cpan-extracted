@@ -35,5 +35,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Log4perl-Layout-JSON
   homepage: http://search.cpan.org/dist/Log-Log4perl-Layout-JSON/
   repository: git://github.com/mschout/Log-Log4perl-Layout-JSON
-version: '0.50'
+version: '0.51'
 x_serialization_backend: 'YAML::Tiny version 1.69'

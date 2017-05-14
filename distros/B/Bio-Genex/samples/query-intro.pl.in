@@ -1,0 +1,244 @@
+%%START_PERL%%
+
+use Carp;
+use strict;
+
+%%GENEX_EXTRALIBS%%
+use DBI;
+use CGI qw(:standard :html3);
+use CGI::Carp qw(fatalsToBrowser);
+use Bio::Genex;
+use Bio::Genex::DBUtils qw(create_select_sql assert_table_defined);
+use Bio::Genex::HTMLUtils;
+use Bio::Genex::ExperimentSet;
+
+# set up the global connection variables for Bio::Genex::connect()
+my $www_server = '%%WWWHOST%%';
+my $cgi_bin = '%%GENEX_URL_EXAMPLE%%';
+
+# start a connection using the default parameters
+my $dbh = Bio::Genex::current_connection();
+
+assert_table_defined($dbh,'Species');
+assert_table_defined($dbh,'Contact');
+assert_table_defined($dbh,'ExperimentSet');
+assert_table_defined($dbh,'AL_TechnologyType');
+
+my $exp_set_names_sql = create_select_sql($dbh,COLUMNS=>['es_pk','name'], 
+					  FROM=>['ExperimentSet']);
+my @exp_set_names;
+my $array_ref = $dbh->selectall_arrayref($exp_set_names_sql) || die $DBI::errstr;
+if (defined $array_ref) {
+  foreach (@{$array_ref}) {
+    push(@exp_set_names,$_);
+  }
+} else {
+  die "Couldn't get ExperimentSet names";
+}
+
+#
+# This gets the technology types. Currently it gets *all* types even
+#  if there are no experiment sets in the DB of that type
+#
+my $tech_types_sql = create_select_sql($dbh,COLUMNS=>['term_string'], 
+					  FROM=>['AL_TechnologyType']);
+my @tech_types;
+$array_ref = $dbh->selectall_arrayref($tech_types_sql) || die $DBI::errstr;
+if (defined $array_ref) {
+  foreach (@{$array_ref}) {
+    push(@tech_types,$_);
+  }
+} else {
+  die "Couldn't get Technology Types";
+}
+
+my $species_names_sql = create_select_sql($dbh,COLUMNS=>['spc_pk','common_names'], 
+					  FROM=>['Species']);
+my @species_names;
+if ($array_ref = $dbh->selectall_arrayref($species_names_sql)) {
+  foreach (@{$array_ref}) {
+    push(@species_names,$_);
+  }
+} else {
+  die "Couldn't get Species names";
+}
+
+my $data_provider_names_sql = create_select_sql($dbh,
+		      COLUMNS=>['us_pk','contact_person'], 
+		      FROM=>['Contact','UserSec'], 
+		      WHERE=>q[type='data provider' AND con_fk=con_pk]);
+
+# my $data_provider_names_sql = create_select_sql($dbh,
+# 					COLUMNS=>['con_pk','contact_person'], 
+# 					FROM=>['Contact'], 
+# 					WHERE=>q[type='data provider']);
+my @data_provider_names;
+if ($array_ref = $dbh->selectall_arrayref($data_provider_names_sql)) {
+  foreach (@{$array_ref}) {
+    push(@data_provider_names,$_);
+  }
+} else {
+  die "Couldn't get Contact names";
+}
+
+my (%labels,@values);
+
+my $STYLE =<<END;
+H1 {
+	font-size: 50pt;
+	alignment: center;
+	color: blue;
+}
+
+H2 {
+	font-size: 30pt;
+	font-style: italic;
+}
+
+P {
+	font-size: 12;
+	font-family: serif;
+	alignment: left;
+	indent: 20pt;
+}
+P.Alert {
+	font-size: 18;
+	font-style: bold;
+	font-family: serif;
+	alignment: left;
+	indent: 20pt;
+}
+END
+
+print header,
+  start_html(-title => 'GeneX Database Query Form',
+#	     -style => {-code => $STYLE},
+	    ),
+  h1({-align=>'CENTER'},'GeneX Database Query Form');
+
+print start_multipart_form(-action=>"$cgi_bin/fetch_es.pl", -method=>'POST');
+
+print b('Data Set Filters'), ' for the ', b('GeneX'), ' Database', br();
+
+if (param) {
+  print hidden(-name=>'ONLY_ONE_ES',-value=>1) if defined param('ONLY_ONE_ES');
+  print hidden(-name=>'DEBUG',-value=>1) if param('DEBUG');
+}
+
+print p('Use these selections to filter the data you are requesting'), br();
+
+
+$labels{'All_Experiments'} = 'All Experiments';
+foreach (@exp_set_names) {
+  $labels{"$_->[0]"} = $_->[1];
+}
+
+@values = sort by_label keys %labels;
+print scrolling_list(-name =>'Experiments',
+		     -multiple=>1, 
+		     -size=>7,
+		     -default=>['All_Experiments'],
+		     -labels=>\%labels,
+		     -value=>\@values,
+		    );
+
+undef %labels;
+$labels{'All_Species'} = 'All Species';
+foreach (@species_names) {
+  $labels{"$_->[0]"} = $_->[1];
+}
+
+@values = sort by_label keys %labels;
+print scrolling_list(-name =>'Species',
+		     -multiple=>1, 
+		     -size=>7,
+		     -default=>['All_Species'],
+		     -labels=>\%labels,
+		     -value=>\@values,
+		    );
+
+undef %labels;
+$labels{'All_Providers'} = 'All Data Providers';
+foreach (@data_provider_names) {
+  $labels{"$_->[0]"} = $_->[1];
+}
+
+@values = sort by_label keys %labels;
+print scrolling_list(-name =>'DataProviders',
+		     -multiple=>1, 
+		     -size=>7,
+		     -labels=>\%labels,
+		     -value=>\@values,
+		     -defaults=>['All_Providers'],
+		    );
+
+undef %labels;
+$labels{'All_Technologies'} = 'All Technologies';
+foreach (@tech_types) {
+  $labels{"$_->[0]"} = $_->[1];
+}
+
+@values = sort by_label keys %labels;
+print scrolling_list(-name =>'Tech',
+		     -multiple=>1, 
+		     -size=>7,
+		     -default=>['All_Technologies'],
+		     -labels=>\%labels,
+		     -value=>\@values,
+		    );
+
+sub by_label {
+  return 1 if $::b =~ /^All_/;
+  return -1 if $::a =~ /^All_/;
+  return $::a <=> $::b;
+}
+
+print <<'EOF';
+<center>(For multiples:
+<FONT COLOR="#0000FF">Mac - Cmd+Click</FONT> |||
+<FONT COLOR="#7A03B3">Windows - Ctrl+Click</FONT> ||| 
+<FONT COLOR="#008000">Unix - Click</FONT>)
+</center>
+<P>
+EOF
+
+print p('You can restrict the output of your query by un/checking the following options.'), br();
+
+undef %labels;
+
+print checkbox_group(-name=>'experiment_checkboxes',
+		     -rows=>3,
+		     -columns=>5,
+		     -value=> Bio::Genex::ExperimentSet->column2name(),
+		     -default=>['biology_description','treatment_type','submission_date'],
+		    );
+
+print hr({-noshade=>1, 
+	     -size=>5});
+
+print p(b("When you are finished making the selection, press the button below to Retrieve the data."));
+
+print table({-cols=>3,
+		 -align=>'CENTER',
+		},
+		Tr([td([submit(-name=>"FETCH",
+				   -value=>'Retrieve Data')]),
+		   ])
+	       );
+
+print end_form;
+print end_html;
+
+sub make_checkbox {
+  my %values = @_;
+  my $string;
+  while (my ($key,$val) = each %values) {
+    $string .= "<TD><INPUT TYPE=\"checkbox\" NAME=\"$val->[0]\" VALUE=\"$key\"";
+    if ($val->[1]) {
+      $string .= ' CHECKED';
+    }
+    $string .= ">$val->[0]</TD>";
+  }
+  $string .= "\n";
+  return $string;
+}

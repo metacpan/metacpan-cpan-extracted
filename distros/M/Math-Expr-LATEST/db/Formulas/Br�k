@@ -1,0 +1,19 @@
+Titel: Bråkdivision
+Name: BrDiv
+VL: (a/b)/(c/d)
+HL: (a*d)/(b*c)
+B: $vl = Div1-for-2,0(1)
+B: $vl = DblInv-for-0,0,0
+B: $vl = Div1-back-1,0(2)
+
+Titel:Addition av bråk
+Name: BrAdd
+VL: a/b+c/d
+HL:((a*d)+(b*c))/(b*d)
+B: $vl = Mult1-back-0
+B: $vl = Div3-back-1,1,1 'b=b'
+B: $vl = Mult1-back-1,0
+B: $vl = Div3-back-1,1,1 'b=d'
+B: $vl = Div1-back-0,0,0(1)
+B: $vl = Div1-back-1,0,0(1)
+B: $vl = MultAss-for-(1)(4)(3)

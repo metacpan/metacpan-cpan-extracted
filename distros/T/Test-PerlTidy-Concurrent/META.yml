@@ -1,0 +1,22 @@
+---
+abstract: 'Concurrent L<Test::PerlTidy> test executor.'
+author:
+  - 'Dmitry Lukiyanchuk <wtertius@gmail.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-PerlTidy-Concurrent
+requires:
+  Test::Builder: 0
+  Test::PerlTidy: 0
+resources:
+  homepage: https://github.com/wtertius/Test-PerlTidy-Concurrent
+  repository: https://github.com/wtertius/Test-PerlTidy-Concurrent.git
+version: 0.1.1

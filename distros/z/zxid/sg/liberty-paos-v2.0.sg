@@ -1,0 +1,26 @@
+# zxid/sg/saml-schema-ecp-2.0.sg
+# Slightly edited, 7.2.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-paos-v2.0.sg,v 1.4 2009-09-05 02:23:41 sampo Exp $
+
+target(paos,urn:liberty:paos:2006-08)
+ns(xs,http://www.w3.org/2001/XMLSchema)
+import(e,http://schemas.xmlsoap.org/soap/envelope/,http://schemas.xmlsoap.org/soap/envelope/)
+#include(lu,liberty-utility-v2.0.xsd)
+
+Request	 -> %paos:RequestType
+%RequestType:
+  @responseConsumerURL	 -> %xs:anyURI
+  @service	 -> %xs:anyURI
+  @messageID?	 -> %xs:string   #%lu:IDType
+  @e:mustUnderstand
+  @e:actor
+  ;
+
+Response	 -> %paos:ResponseType
+%ResponseType:
+  @refToMessageID?	 -> %xs:string  #%lu:IDType
+  @e:mustUnderstand
+  @e:actor
+  ;
+
+#EOF

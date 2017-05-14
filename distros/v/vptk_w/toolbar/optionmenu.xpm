@@ -1,0 +1,32 @@
+/* XPM */
+static char * optionmenu_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"20 20 6 1",
+/* colors */
+"  s None c None",
+". c #FCFEFC",
+"X c #000000",
+"o c #C4C2C4",
+"O c #848284",
+"+ c #545254",
+/* pixels */
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"  ...............X  ",
+"  .oooooooooooooOX  ",
+"  .ooo+oooooooooOX  ",
+"  .oo+o+ooooooooOX  ",
+"  .oo+o+ooo...ooOX  ",
+"  .o+++++oo+++ooOX  ",
+"  .o+ooo+oooooooOX  ",
+"  .oooooooooooooOX  ",
+"  .OOOOOOOOOOOOOOX  ",
+"  XXXXXXXXXXXXXXXX  ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    "};

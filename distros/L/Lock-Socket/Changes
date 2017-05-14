@@ -1,0 +1,40 @@
+0.0.6 (2014-09-19)
+
+    API Changes:
+        - Object API no longer attempts automatic per-user lock.
+          Attributes are taken exactly as they are specified.
+
+    New Features:
+        - New functions: lock_user_socket() and try_lock_user_socket()
+          that take over the per-user role previously in the object
+          class itself.
+
+    Enhancements:
+        - Make exported functions non-anonymous
+
+    Bug Fixes:
+        - Darwin (MacOS?) also only configures 127.0.0.1/32
+
+0.0.4 (2014-09-15)
+
+    API Changes:
+       - Default to 127.0.0.1 on *BSD systems
+
+    New Features:
+       - None.
+
+    Enhancements:
+       - More informative exception messages
+       - Add a demonstration "example/solo" command
+       - Use CARP_NOT to generate errors from caller perspective
+       - Minor code, testing, and documentation improvements
+
+    Bug Fixes:
+       - try_lock_socket now actually returns 'undef' (intead of '0')
+         as it said in the documentation. Although this is actually an
+         API change the end result should not be different, and no-one
+         is using this yet anyway.
+
+0.0.2 (2014-09-13)
+
+    Initial Release.

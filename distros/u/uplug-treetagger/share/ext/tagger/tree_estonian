@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# THESE VARIABLES HAVE TO BE SET:
+ROOT=${UPLUGSHARE}/ext/tree-tagger
+BIN=$ROOT/bin
+CMD=$ROOT/cmd
+LIB=$ROOT/lib
+
+OPTIONS="-token -lemma -sgml"
+
+TAGGER=${BIN}/tree-tagger
+TOKENIZER=${CMD}/utf8-tokenize.pl
+MWL=${CMD}/mwl-lookup.pl
+ABBR_LIST=${LIB}/estonian-abbreviations
+PARFILE=${LIB}/estonian.par
+MWLFILE=${LIB}/estonian-mwls
+
+$TOKENIZER -a $ABBR_LIST $* |
+$MWL -f $MWLFILE |
+$TAGGER $OPTIONS $PARFILE
+

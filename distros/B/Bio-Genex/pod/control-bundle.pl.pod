@@ -1,0 +1,56 @@
+=head1 NAME
+
+B<control-bundle.pl>: a CGI script for creating a Gene Expression
+Markup Language (GeneXML) control bundle file.
+
+=head1 SYNOPSIS
+
+  control-bundle.pl?species=4&user=jes&password=foo
+
+=head1 DESCRIPTION
+
+This CGI script takes returns a page of content type 'text/xml' which
+should cause the browser to prompt for file save. 
+
+=head1 PARAMETERS
+
+=over 4
+
+=item species=$spc_id
+
+Passed directly to L<xml-write.pl> as a --species option.
+
+=item user=$login_name
+
+Passed directly to L<xml-write.pl> as --user option.
+
+=item password=$password
+
+Passed directly to L<xml-write.pl> as --password option.
+
+=head1 IMPLEMENTATION
+
+The script calls L<xml-write.pl> internally to generate the GeneXML
+file. It I<does not> currently specifies either the --include_usf or
+the --include_al options which means that neither user sequence
+feature information nor array layout information will be included in
+the control bundle file.
+
+=head1 BUGS
+
+It will not provide a graceful error if the user and password field do
+not match.
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Jun 19 00:43:39 MDT 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).

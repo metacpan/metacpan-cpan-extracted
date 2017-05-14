@@ -1,0 +1,93 @@
+<title>ZXID IdP Attribute Selection / Privacy Manager</title>
+<link type="text/css" rel=stylesheet href="an.css">
+<h1 class=zxtop>ZXID Attribute Selection / Privacy Manager</h1>
+
+<!--IF(SSO)-->
+<p>About to login/SSO to <b>!!SP_DPY_NAME</b> (<a
+href="!!SP_EID">!!SP_EID</a>). Please select which attributes to
+release (you consent to release of these attributes).
+<!--ELSE(SSO)-->
+<!--FI(SSO)-->
+
+Log of your !!NLOG last transactions at IdP:
+
+<table>
+<tr><th>When</th><th>SP</th><th>ID</th><th>What</th></tr>
+<!--REPEAT_LOG-->
+<tr><td>!!when</td><td>!!sp</td><td>!!id</td><td>!!what</td></tr>
+<!--END_REPEAT_LOG-->
+</table>
+
+<div class=zxerr>!!ERR</div>
+<div class=zxmsg>!!MSG</div>
+<div class=zxdbg>!!DBG</div>
+
+<form method=post>
+
+<!--IF(SSO)-->
+<!--ELSE(SSO)-->
+Currently active Service Provider View:
+<select name=spview>
+<option value=common !!selectedcommon> Common attributes
+<!--REPEAT_SP-->
+<option value=!!sp !!selectedsp> !!spnice (!!sp)
+<!--END_REPEAT_SP-->
+</select>
+<input type=submit name=switchsp value="Switch Service Provider"><br>
+<!--FI(SSO)-->
+
+Currently active persona:
+<select name=pers>
+<option value=primary> Primary
+<!--REPEAT_PP-->
+<option value=!!pp !!selectedpp> !!pp
+<!--END_REPEAT_PP-->
+<option value=newpers> Create New Persona
+</select>
+<input type=submit name=switchpers value="Switch Persona"><br>
+
+<table>
+<tr><th>Attribute</th><th>Value</th><th>Authority</th><th>Requested / Send</th><th>Your internal memo</th></tr>
+<tr><th>Username</th><td>!!au <i>(can not change)</i></td><td>Internal</td><td>Not sent</td><td>n.a.</td></tr>
+<tr><th>Change Password</th><td><input name=ap>
+    <i>(min. 5 characters)</i></td><td>Internal</td><td>Not sent</td><td>n.a.</td></tr>
+
+<!--REPEAT_ATTR-->
+<tr><th>!!at</th>
+    <td><input name=!!at value="!!val" size=40></td>
+    <td>!!auth</td>
+    <td><input type=checkbox name=share!!at !!shareat> Send</td>
+    <td><input name=memo!!at value="!!memo" size=40></td></tr>
+<!--END_REPEAT_ATTR-->
+
+<tr><th>New <input name=newat></th>
+    <td><input name=newval size=40></td>
+    <td>Self asserted</td>
+    <td><input type=checkbox name=sharenew checked> Send</td>
+    <td><input name=memonew size=40></td></tr>
+
+</table>
+
+<!--IF(SSO)-->
+<p><input type=submit name=ok value="Proceed with Login">
+<a href="html/zxidp-user-terms.html">Terms and Conditions for Users</a>
+<!--ELSE(SSO)-->
+<p><input type=submit name=oksave value="Save Settings">
+<a href="html/zxidp-user-terms.html">Terms and Conditions for Users</a>
+<!--FI(SSO)-->
+
+<p><input type=submit name=delok value="Delete User"><input type=checkbox name=del> Really (no further confirmation)
+
+<input type=hidden name=s value="!!s">
+<input type=hidden name=ar value="!!ar">
+<input type=hidden name=zxrfr value="!!zxrfr">
+<input type=hidden name=zxidpurl value="!!zxidpurl">
+
+</form>
+
+<div class=zxbot>
+<a class=zx href="http://zxid.org/">ZXID.org</a>
+| <a class=zx href="http://www.tas3.eu/">TAS3.eu</a>
+| <a class=zx href="zxiddash.pl">User Dashboard</a>
+- <i>$Id$</i>
+</div>

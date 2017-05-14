@@ -21,6 +21,25 @@ has pid_rcf_object         => (is => 'ro');
 has client       => (is => 'lazy');
 has path         => (is => 'lazy');
 
+sub BUILDARGS {
+    # Required options are dependent on chosen PID module
+    my ($class, %args) = @_;
+    my @required;
+    if ($args{'pid_module'} eq 'lwp') {
+        @required = qw(pid_lwp_url);
+    } elsif ($args{'pid_module'} eq 'rcf') {
+        @required = qw(pid_username pid_password pid_rcf_container_name pid_rcf_object);
+    }
+    foreach my $req (@required) {
+        if (!defined($args{$req})) {
+            Catmandu::BadArg->throw(
+                message => sprintf('Missing required argument %s for %s.', $req, $args{'pid_module'})
+            );
+        }
+    }
+    return \%args;
+}
+
 sub _build_path {
     my $self = shift;
     return $self->client->path;

@@ -1,0 +1,48 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: title Filter
+
+H2: Interface
+
+!filter_interface "title"
+
+H2: Description
+
+The {{title}} filter is used to build the title block for
+memos, faxes, etc.
+
+The {{type}} parameter can be used to override the document type.
+For PostScript output, the value is displayed in a box above
+the rest of the title.
+
+The {{toc}} parameter is used to request a table of contents.
+The value is the level of headings to include in the contents.
+
+The {{format}} attribute is used to fine tune the layout of
+the columns within the table for format where a table is used
+(e.g. plain text).
+
+H2: Examples
+
+!block example; lang='sdf'
+!block title
+Name        Value
+Date:       [[DATE:DOC_MODIFIED]]
+To:         Joe Bloggs, Sue Brown, Maree Jones
+Copy:       David Smith
+From:       Neil Armstrong
+Subject:    Solar System Information
+Ref. No:    XY.002/GUI/96
+!endblock
+!endblock

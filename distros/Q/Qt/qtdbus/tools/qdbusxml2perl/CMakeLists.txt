@@ -1,0 +1,6 @@
+SET(qdbusxml2perl_SRCS qdbusxml2perl.cpp )
+
+ADD_EXECUTABLE(qdbusxml2perl ${qdbusxml2perl_SRCS})
+TARGET_LINK_LIBRARIES (qdbusxml2perl ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${QT_QTXML_LIBRARY})
+
+INSTALL(TARGETS qdbusxml2perl DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

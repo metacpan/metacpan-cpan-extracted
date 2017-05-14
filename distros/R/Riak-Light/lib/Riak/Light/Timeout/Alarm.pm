@@ -9,7 +9,7 @@
 ## no critic (RequireUseStrict, RequireUseWarnings)
 package Riak::Light::Timeout::Alarm;
 {
-    $Riak::Light::Timeout::Alarm::VERSION = '0.12';
+    $Riak::Light::Timeout::Alarm::VERSION = '0.052';
 }
 ## use critic
 
@@ -18,7 +18,7 @@ use Time::HiRes qw(alarm);
 use Riak::Light::Util qw(is_windows);
 use Carp;
 use Moo;
-use Types::Standard -types;
+use MooX::Types::MooseLike::Base qw<Num Str Int Bool Object>;
 with 'Riak::Light::Timeout';
 
 # ABSTRACT: proxy to read/write using Alarm as a timeout provider ( Not Safe: can clobber previous alarm )
@@ -43,15 +43,25 @@ sub BUILD {
 }
 
 sub clean {
-    $_[0]->socket->close;
-    $_[0]->is_valid(0);
+    my $self = shift;
+    $self->socket->close;
+    $self->is_valid(0);
 }
+
+around [qw(sysread syswrite)] => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    if ( !$self->is_valid ) {
+        $! = ECONNRESET;    ## no critic (RequireLocalizedPunctuationVars)
+        return;
+    }
+
+    $self->$orig(@_);
+};
 
 sub sysread {
     my $self = shift;
-    $self->is_valid
-      or $! = ECONNRESET,
-      return;    ## no critic (RequireLocalizedPunctuationVars)
 
     my $buffer;
     my $seconds = $self->in_timeout;
@@ -80,9 +90,6 @@ sub sysread {
 
 sub syswrite {
     my $self = shift;
-    $self->is_valid
-      or $! = ECONNRESET,
-      return;    ## no critic (RequireLocalizedPunctuationVars)
 
     my $seconds = $self->out_timeout;
     my $result  = eval {
@@ -114,25 +121,15 @@ Riak::Light::Timeout::Alarm - proxy to read/write using Alarm as a timeout provi
 
 =head1 VERSION
 
-version 0.12
+version 0.052
 
 =head1 DESCRIPTION
 
   Internal class
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Tiago Peczenyj <tiago.peczenyj@gmail.com>
-
-=item *
-
-Damien Krotkine <dams@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

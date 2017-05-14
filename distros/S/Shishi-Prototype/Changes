@@ -1,0 +1,19 @@
+Revision history for Perl extension Shishi::Prototype.
+
+0.04 - Fri Aug  2 11:39:57 BST 2002
+    - Grmph. Fun with sticky tags.
+
+0.03 - Fri Aug  2 11:20:01 BST 2002
+    - Add debug method for dumping.
+    - REMOVED RECURSION! YAY!
+
+0.02  Wed Jul  3 14:37:10 BST 2002
+    - Add as_dot method for graphing.
+    - Fixed a few small bugs.
+    - Restructured execute loop, prelude to removing recursion
+    - Separated match object and parser object.
+
+0.01  Sun Jun 30 14:58:05 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-AX -n Shishi::Prototype
+

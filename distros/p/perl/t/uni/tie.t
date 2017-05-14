@@ -1,13 +1,11 @@
 #!perl -w
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
-        chdir 't';
-        @INC = '../lib';
-    }
+    chdir 't' if -d 't';
+    require './test.pl';
 }
 
-use Test::More tests => 9;
+plan (tests => 10);
 use strict;
 
 {
@@ -44,6 +42,19 @@ foreach my $t ("ASCII", "B\366se") {
 }
 
 {
-    local $TODO = "Need more tests!";
+    use utf8;
+    use open qw( :utf8 :std );
+    package Tìè::UTF8 {
+        sub TIESCALAR {
+            return bless {}, shift;
+        }
+    }
+    
+    my $t;
+    tie $t, 'Tìè::UTF8';
+    is ref(tied($t)), 'Tìè::UTF8', "Tie'ing to a UTF8 package works.";
+}
+{
+    local $::TODO = "Need more tests!";
     fail();
 }

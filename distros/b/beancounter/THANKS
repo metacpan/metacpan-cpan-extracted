@@ -1,0 +1,67 @@
+Andreas Wuest <AndreasWuest@gmx.de>
+	for suggestions and testing around early versions 
+kristian orlopp <orlopp@lmb.uni-muenchen.de>
+	missing Debian dependency on libdbd-pg-perl (if ODBC is not used)
+Horst.Timmermann@t-online.de (Horst Timmermann)
+	for spotting a buglet in setup_beancounter in the 0.2.0 release
+Adrian Johnson <asj@bigpond.net.au>
+        for also spotting this, and a few more buglets leading to 0.2.1
+Evelyn Mitchell <efm@tummy.com>
+        for pointing out the need for additional $dbh->commit() calls
+        and for the missing beancounter table insert in setup_beancounter
+Mathias Weidner <mathias@weidner.in-bad-schmiedeberg.de>
+	for initial MySQL patches, numerous design discussions + suggestions
+        and the patch to allow 'update' to either insert or update
+Max Bott <Max.Bott@affa.gov.au> 
+	for the bug report on quotes in company name's (DatabaseInfoData)   
+Peter Kim <pykim@gte.net>
+        for the update-in-batches-of-100 patch 
+Ken Neighbors <ken@nsds.com> 
+        for two patched: correct documentation for beancounter, and adapt 
+	BeanCounter's backpopulate to a change at Yahoo in BeanCounter.pm
+Martin Weulersse <martin@alpha.weulersse.de>
+        for noticing a problem with the 'active' field under MySQL
+Bud Rogers <budr@sirinet.net>
+        for pointing out that datetime no longer works for PostgreSQL 7.3.*
+Thomas Walter 
+        for a bug report concerning a change in Yahoo!'s historical FX data
+	as well as for a fine patch correcting a logic error in the SQL code
+	in GetPriceData which affected the status report if securities had
+	multiple positions across portfolios
+Robert A. Schmied
+        for a thoughtful set of patches to beancounter, BeanCounter.pm
+	setup_beancounter and update_beancounter. First Grand Slam winner :)
+	And even more so for continued suggestions, testing and patches.
+Mike Castle
+        for a patch with more consistent upper/lower case use in BeanCounter
+Joao Pedro
+        for noting that password should be passwd in example.beancounterrc
+Phil Homewood
+        for a patch dealing with 'times 100' scaling in FX rates 
+Joao Antunes Costa for two patches testing for NAs in db updates, and
+        ensuring firewall proxy information is set
+Kevin Kim 
+        for patches integrating beancounter with smtm
+Matthew Jurgens
+	for a patch letting the non-US historical run batches of just 
+        under 200 data points to accomodate a Yahoo! restriction
+Oliver Muth
+        for noticing that beancounter still used 'password' in the docs
+        for the optional 'passwd' argument for db connections
+Rene Cunningham 
+        for a patch to prevent a division-by-zero if adjusted close was zero
+Pieter du Preez
+        for a very comprehensive patch set that improved my code a lot
+Jesse Chu
+        for noticing that closes weren't set to adj closes in backpopulating
+Doug Laidlaw
+        for an updated rpm spec file
+Yanko Punchev
+        for yet another fix to parsing daily capitalization
+Warren Thomposn
+        for a patch correcting default currency behaviour
+David Jensen
+        for passing on an Ubuntu bug report on an error in the manual page
+
+and all the kind folks who dropped a line to either report a bug, and/or 
+say that they liked the program... 

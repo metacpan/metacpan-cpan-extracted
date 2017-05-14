@@ -1,0 +1,52 @@
+Name: Potens
+Def: $a^b$ Multiplicerar a med sig själv b gånger. Tex $3^5=3*3*3*3*3$.
+Type: \^\(Real,Real\)
+Out: Real
+PrMathML: "<msup><mrow>$p[0]</mrow>$p[1]</msup>";
+NoParamMathML: $i==1;
+
+Name: Addition
+Def: $a+b$ Startar i $a$ och går $b$ steg framåt längs tallinjen.
+Type: \+\(Real(,Real)+\)
+Out: Real
+Prop: Ass, Com
+PrMathML: "<mrow>".join ("<mo>+</mo>", @p)."</mrow>";
+
+Name: Divition
+Type: \/\(Real,Real\)
+Out: Real
+Simp: a*inv(b)
+PrMathML: "<mfrac> $p[0] $p[1]  </mfrac>";
+NoParamMathML: 1
+
+Name: Subtraktion
+Type: \-\(Real,Real\)
+Out: Real
+Simp: a+neg(b)
+PrMathML: "<mrow>".join ("<mo>-</mo>", @p)."</mrow>";
+
+Name: Multiplikation
+Def: $a*b$ adderar a till sig själv b gånger. Tex $2*4=2+2+2+2$.
+Type: \*\(Real(,Real)+\)
+Out: Real
+Prop: Ass, Com
+PrMathML: "<mrow>".join ("<mo>*</mo>", @p)."</mrow>";
+
+Name: Invärs
+Def: Invärsen $inv(a)$ definieras genom ekvationen $a*inv(a)=1$.
+Type: inv\(Real\)
+Out: Real
+PrMathML: "<mfrac> <mn>1</mn> $p[0] </mfrac>";
+
+Name: Negation
+Def: Negationen $neg(a)$ definieras genom ekvationen $a+neg(a)=0$.
+Type: neg\(Real\)
+Out: Real
+PrMathML: my ($p1,$p2)=("",""); if($self->{'Opps'}[0]{'Type'} eq 'Opp') {$p1='<mo fence="true">(</mo>';$p2='<mo fence="true">)</mo>'}; '<mrow><mo fence="true">(</mo><mo>-</mo>'.$p1.$p[0].$p2.'<mo fence="true">)</mo></mrow>';
+
+Name: Kvadratroten
+Def: Rooten $sqrt(a)$ definieras av ekvationen $a=sqrt(a)^2$.
+Type: sqrt\(Real\)
+Out: Real
+PrMathML: "<msqrt>$p[0].</msqrt>";
+

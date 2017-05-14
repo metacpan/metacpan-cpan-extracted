@@ -1,5 +1,8 @@
 Revision history for Perl module NetRabbitMQPerl
 
+0.05 2017-05-12
+    - [fix] install failures due to dependencies not listed
+
 0.04 2017-04-28
     - [add] return delivery_tag with basic_get (GH #2, GH #3)
       thanks to Ben Kaufman for the patch

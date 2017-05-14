@@ -1,7 +1,7 @@
 use Test::More;
 use MARC::Spec;
 
-my $parser = MARC::Spec->parse('084$a{$2=\bcl}');
+my $parser = MARC::Spec::parse('084$a{$2=\bcl}');
 
 # checking field
 ok $parser->field->tag eq '084', 'field tag';

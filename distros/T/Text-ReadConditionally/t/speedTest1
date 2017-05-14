@@ -1,0 +1,7 @@
+.# For loop just to see how long this takes.
+.let iter := 10000
+.echo Before empty for - iterations \v{iter}
+.for -i0 i := 0 ;; i < iter ;; i++
+.#.eval i is \v{i}
+.done
+After for

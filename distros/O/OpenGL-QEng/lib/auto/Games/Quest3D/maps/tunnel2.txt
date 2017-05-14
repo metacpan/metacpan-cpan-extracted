@@ -1,0 +1,85 @@
+# Map of a long tunnel - used to transition to a scenario
+#
+###  $Id: $
+
+map 0 0 0 xsize=>8, zsize=>80, start=>[4,4,90];
+in_last;
+
+level 0 0 0 zsize=>80, xsize=>8, texture=>'green_tile';
+level 0 0 0 zsize=>80, xsize=>8, y=>8, texture=>'sand';
+
+#left
+wall   0  0 270 texture=>'gray_blocks';
+wall   0  8 270 texture=>'gray_blocks';
+wall   0 16 270 texture=>'gray_blocks';
+in_last;
+#sconce 1 -0.5 180;
+done;
+wall   0 24 270 texture=>'mossy_blocks';
+wall   0 32 270 texture=>'mossy_blocks';
+in_last;
+#sconce 1 -0.5 180;
+done;
+
+wall   0 40 270 texture=>'mossy_blocks';
+wall   0 48 270 texture=>'mossy_blocks';
+in_last;
+#sconce 1 -0.5 180;
+done;
+
+wall   0 56 270 texture=>'mossy_blocks';
+wall   0 64 270 texture=>'mossy_blocks';
+in_last;
+#sconce 1 -0.5 180;
+done;
+
+archwall   0 72 270;
+#right wall;
+wall  8  0 270 texture=>'interstices';
+wall  8  8 270 texture=>'interstices';
+in_last;
+#sconce 1 0.5 0;
+done;
+wall  8 16 270 texture=>'pine';
+wall  8 24 270 texture=>'pine';
+in_last;
+#sconce 1 0.5 0;
+done;
+
+wall  8 32 270 texture=>'fabric';
+wall  8 40 270 texture=>'fabric';
+in_last;
+#sconce 1 0.5 0;
+done;
+
+wall  8 48 270 texture=>'fabric';
+wall  8 56 270 texture=>'fabric';
+in_last;
+#sconce 1 0.5 0;
+done;
+
+wall  8 64 270;
+wall  8 72 270;
+
+#Top wall
+archwall   0  0 0;
+
+#Bottom wall
+wall   0 80 0;
+
+sconce 7.5  8 270;
+sconce 0.5 15 90;
+sconce 7.5 30 270;
+sconce 0.5 45 90;
+sconce 7.5 60 270;
+sconce 1.5 79 180;
+sconce 6.5 79 180;
+
+detector 4 70 0 visible=>1, range=>6,
+ near_script=>"sub{
+                 $self->send_event('map','maps/new_quests.txt');
+                 $self->send_event('go',24,12,90);
+                 $self->send_event('clear_msg');
+               }";
+
+done;

@@ -5,14 +5,14 @@ WriteMakefile(
     NAME         => 'WWW::Google::Translate',
     VERSION_FROM => 'lib/WWW/Google/Translate.pm',
     PREREQ_PM    => {
-        'JSON'           => '2.27',
-        'LWP::UserAgent' => '5.835',
         'URI'            => '1.56',
+        'JSON'           => '2.27',
         'Readonly'       => '1.03',
+        'Storable'       => 0,
         'HTTP::Status'   => 0,
-        'Sys::Hostname'  => 0,
-        'File::Spec'     => 0,
         'Data::Dumper'   => '2.128',
+        'Sys::Hostname'  => 0,
+        'LWP::UserAgent' => '5.835',
     },
     (
         $] >= 5.005

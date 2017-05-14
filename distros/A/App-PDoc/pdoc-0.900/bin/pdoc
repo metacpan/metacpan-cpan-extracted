@@ -1,0 +1,214 @@
+#!/usr/bin/env perl
+
+#  PODNAME: pdoc
+# ABSTRACT: typeset pandoc documents with document-specific, default options
+
+# pdoc
+#
+# What this script does:
+# 1. Get the first argument passed to it
+# 2. Slurp that file and leave @ARGV intact
+# 3. Grep all lines "<!--+ (--some-pandoc-option) +-->" from that file
+# 4. Grep all lines "<!--& (some post processing action) &-->" from that file
+# 5. join them into a command to be executed:
+#    a) if there are commands to be executed, attach them with &&'s
+#    b) else, don't.
+# 6. Send that command off to the shell
+
+
+# What to do with your pandoc files
+# ---------------------------------
+# Sprinkle <!--+ --pandoc-option1 --pandoc--option2 +--> all over your file
+# as your would use them on the shell
+#
+# If you want your file to be typeset using those options, run
+#     pdoc file.pandoc
+#
+# If you want standard processing of that file, run pandoc as usual:
+#     pandoc file.pandoc
+
+# Daniel Bruder <daniel.bruder[@]gmail.com>
+# WTFPL License <http://sam.zoy.org/wtfpl/>
+
+$_    = do{ local(@ARGV => $/) = $ARGV[0]; <> };            # Slurp the file
+@opts = join " "        => m/<!--\+\s*(.*?)\s*\+-->/g;      # Get <!--+X+-->
+@exec = join " && \\\n" => m/<!--&\s*(.*?)\s*&-->/g;        # Get <!--&X&-->
+@cmd  = join " && \\\n" => "pandoc @opts @ARGV", @exec;     # Construct cmd
+exec @cmd                                                   # exec cmd
+
+
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+pdoc - typeset pandoc documents with document-specific, default options
+
+=head1 VERSION
+
+version 0.900
+
+=head1 SYNOPSIS
+
+This is just a small executable and a hack to pandoc:
+you can use it to set document-specific, default options for pandoc
+in the typesetting process.
+Of course, you can safely ignore these settings and return to the standard way of doing things at all times.
+
+=head1 USAGE
+
+Usage is absolutely straight-forward:
+
+=head2 Usage on the commandline
+
+If you want your file to be typeset using the document-specific default options, run
+
+     pdoc file.pandoc
+
+If you want standard processing of that file, simply run pandoc as usual:
+
+     pandoc file.pandoc
+
+=head2 Setting document-specific options
+
+=head3 Setting options
+
+Sprinkle C<<< <!--+ --pandoc-option1 --pandoc--option2 +--> >>> all over your pandoc file -- just as your would use them on the shell.
+C<<< pdoc >>> will read these and add them to the commandline that is passed to a standard pandoc typesetting.
+
+=head3 Defining post-processing behavior
+
+Use C<<< <!--& (some post processing action) &--> >>> as the special markup to C<<< pdoc >>> for post-processing options. These will be concatenated to the pandoc-commandline that is generated via C<<< && >>>, just like so:
+
+     % pandoc --option1 --option2 && your-command-1 && your-command2
+
+=head1 INTERNAL WORKINGS
+
+This is just a simple hack reading out specially marked comments in your pandoc source. Everything will stay usable as always. When typesetting in the standard manner, these comments are simply ignored.
+
+See the executable for the details.
+
+=head1 EXTRAS
+
+=head2 Shell variables
+
+You can use shell variables as usual, e.g. C<<< $HOME >>>, etc.
+
+=head2 Use policies
+
+When doing more complicatd things (see example below) I like to use so-called I<pandoc-policies> (as I call them).
+
+I keep a folder C<<< ~/.pandoc/policies >>> next to C<<< ~/.pandoc/templates >>> containing files like C<<< ~/.pandoc/policies/columns.latex >>> (handling column-layouts) C<<< ~/.pandoc/policies/squeeze.latex >>> (for whitespace squeezing), and so on...
+
+All of these policies are to be included by C<<< pandoc >>>'s C<<< -H / --include-in-header= >>>-switch, so it makes:
+
+     % pandoc -H $HOME/.pandoc/policies/squeeze.latex -o document.{pdf,pandoc}
+
+=head1 EXAMPLE
+
+Suppose you have a squeeze and a columns-policy in your policy-folder, your document might look like this:
+
+     % John Doe
+     % Interesting topic
+     % 01/01/2013
+ 
+     <!--+ 
+         --include-in-header=$HOME/.pandoc/policies/squeeze.latex
+         --include-in-header=$HOME/.pandoc/policies/columns.latex
+      +-->
+ 
+     # Regular pandoc/markdown Heading 1
+ 
+     * A list
+     * of things
+     * etc.
+
+=head2 Extended example using post-processing options
+
+Here is a somewhat more complicated example: the cheat-sheet generator that I'm currently using while learning for my final examination:
+
+     % Parsing -- Summary
+     % Daniel B.
+     % Oct/Nov 2012
+ 
+     <!-- Default options                                               -->
+     <!-- ===============                                               -->
+     <!--+ -H $HOME/.pandoc/templates/policies/{squeeze,columns}.latex +-->
+     <!--+ -sSN --toc                                                  +-->
+     <!--+ -Vfontsize:8pt,a4paper,twocolumn,landscape                  +-->
+     <!--+ -o parsing.pdf                                              +-->
+ 
+     <!-- Unused options (regular comments)                             -->
+     <!-- =================================                             -->
+     <!-- -H $HOME/.pandoc/templates/policies/columns.latex            +-->
+     <!-- -H $HOME/.pandoc/templates/policies/chapterstyle.latex       +-->
+     <!-- -H $HOME/.pandoc/templates/policies/numbering.latex          +-->
+ 
+     <!-- Post-typeset exec                                             -->
+     <!-- =================                                             -->
+     <!--& pdfnup --nup 1x2 --no-landscape parsing.pdf --outfile parsing.pdf  &-->
+     <!--& open parsing.pdf                                                   &-->
+ 
+     ------------------------------------------------------------------------------
+ 
+     # Part I: Basics
+     ## Chapter 1: What exactly is Parsing?
+     Text goes here....
+
+This cheat-sheet generator can simply be called using C<<< pdoc cheatsheet.pandoc >>> and will additionally use pdfjam to squeeze even more of the resulting pdf pages together. On a Mac, it will additionally open the file after the final pdfjam rendering for quality inspection ;-).
+
+=head3 Things to note
+
+=over
+
+=item *
+
+Note how several policies are grouped together on shell level, using curly-bracket expansion: 
+
+=back
+
+     -H $HOME/.pandoc/templates/policies/{squeeze,columns}.latex
+
+=over
+
+=item *
+
+Also note, how additional options are set via C<<< pandoc >>>'s C<<< -V >>>-switch, and how even more options are smuggled in into C<<< pandoc >>>'s own latex template. (The latter you can find using C<<< pandoc -D latex >>>) in using
+
+=back
+
+     -Vfontsize:8pt,a4paper,twocolumn,landscape
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+pandoc: L<http://johnmacfarlane.net/pandoc/>
+
+=item *
+
+pdfjam: L<http://go.warwick.ac.uk/pdfjam>
+
+=back
+
+=head1 AUTHOR
+
+DBR <dbr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by DBR.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut
+
+
+__END__
+

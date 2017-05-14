@@ -1,16 +1,19 @@
-#!/usr/bin/perl -w
-
-# $Id: 240abort.t,v 1.2 2004/12/01 13:00:50 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
 
 BEGIN {
-  plan tests => 16;
+  eval "use BSD::Resource";
+  unless (exists $INC{"BSD/Resource.pm"})
+    {
+      plan skip_all => "BSD::Resource not installed";
+      exit 0;
+    }
 }
+
+plan tests => 16;
 
 use Net::FTPServer::InMem::Server;
 
@@ -69,9 +72,9 @@ foreach my $mode ('A', 'I')
        Proto => "tcp")
 	or die "socket: $!";
 
-    for (my $i = 0; $i < 10000; ++$i)
+    for (my $i = 0; $i < 50_000; ++$i)
       {
-	$sock->print ("This is line $i.\r\n");
+	$sock->printf ("This is line %d. %s\r\n", $i, "a" x 1_000);
       }
     $sock->close;
 
@@ -124,3 +127,5 @@ foreach my $mode ('A', 'I')
 
 print OUTFD0 "QUIT\r\n";
 $_ = <INFD1>;
+
+__END__

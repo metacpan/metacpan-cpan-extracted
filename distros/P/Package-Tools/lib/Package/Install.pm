@@ -3,7 +3,7 @@ use strict;
 use base qw(Package::Base);
 use Data::Dumper;
 use ExtUtils::MakeMaker;
-use Package::Configure;
+use Package::Install::Configure;
 use Term::ANSIColor;
 
 sub init {
@@ -11,7 +11,7 @@ sub init {
 
   $self->SUPER::init(%arg);
 
-  $self->configure(Package::Configure->new(%arg)) unless $self->configure();
+  $self->configure(Package::Install::Configure->new(%arg)) unless $self->configure();
 }
 
 =head2 compile_manifest()
@@ -67,7 +67,7 @@ sub compile_manifest {
  Usage   : $obj->write_makefile(%arg)
  Function: calls ExtUtils::MakeMaker's WriteMakefile() with provided %arg,
            as well as PL_FILES and EXE_FILES as determined by
-           Package::Configure (config file [PL_FILES] [EXE_FILES]
+           Package::Install::Configure (config file [PL_FILES] [EXE_FILES]
            sections).
  Returns :
  Args    : an anonymous hash of WriteMakefile() args.  See
@@ -104,7 +104,7 @@ sub write_makefile {
 =head2 configure()
 
  Usage   : $obj->configure($newval)
- Function: holds a Package::Configure instance
+ Function: holds a Package::Install::Configure instance
  Example : 
  Returns : value of configure (a scalar)
  Args    : on set, new value (a scalar or undef, optional)

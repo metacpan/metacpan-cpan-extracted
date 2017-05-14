@@ -1,0 +1,22 @@
+# $Revision: 1.1 $ $Date: 2006/02/24 21:27:16 $ $Author: estrabd $
+# NFA 7
+
+START   :: 0       # start state
+FINAL   :: 2       # end states
+EPSILON :: epsilon # how epsilon transition is represented
+
+0:
+epsilon 3
+a 1
+
+1:
+b 2,5
+
+2: 
+
+3:
+b 4
+
+4:
+epsilon 2
+a 1

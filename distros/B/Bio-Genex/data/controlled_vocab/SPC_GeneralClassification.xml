@@ -1,0 +1,85 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Species" db_column="general_classification" 
+   cv_table="SPC_GeneralClassification">
+  <comment type="definition">This table provides the restricted
+vocabulary for the column general classification in the table
+Sample. It is used to  provide a searchable and controlled vocabulary
+to help minimize the screens the curation tool presents to the
+experimenter and to allow grouping of larger experiment sets on a
+broader taxonomic scale..         
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They regulate
+which fields are displayed in the organism details screen.</comment>  
+<term name="animal:amphibian"
+        description="the classifications of amphibious animals"/>
+<term name="animal:fish"
+        description=""/>
+<term name="animal:bird"
+        description=""/>
+<term name="animal:insect"
+        description=""/>
+<term name="animal:mammal"
+        description="the classification for multicellular developmentally staged warm-blooded nucleated organisms"/>
+<term name="animal:mammal:human"
+        description=""/>
+<term name="animal:mammal:rodentia"
+        description=""/>
+<term name="animal:marsupial"
+        description=""/>
+<term name="animal:metazoa:flatworm"
+        description=""/>
+<term name="animal:metazoa:nematode"
+        description=""/>
+<term name="animal:metazoa:roundworm"
+        description=""/>
+<term name="animal:monotreme"
+        description=""/>
+<term name="virus"
+        description=""/>
+<term name="eukaryote"
+        description="the classifications of nucleated organisms"/>
+<term name="eukaryote:apicomplexa"
+        description=""/>
+<term name="eukaryote:dictyosteliida"
+        description=""/>
+<term name="eukaryote:fungi"
+        description=""/>
+<term name="eukaryote:fungi:saccharomyces"
+        description=""/>
+<term name="plant:angiosperm"
+        description="the classification of the multicellular photosynthetic nucleated organisms"/>
+<term name="plant:angiosperm:dicot"
+        description=""/>
+<term name="plant:angiosperm:dicot:brassicaceae"
+        description=""/>
+<term name="plant:angiosperm:dicot:brassicaceae:arabidopsis"
+        description=""/>
+<term name="plant:angiosperm:dicot:legume"
+        description=""/>
+<term name="plant:angiosperm:dicot:solanaceae"
+        description=""/>
+<term name="plant:angiosperm:monocot:grass"
+        description=""/>
+<term name="plant:angiosperm:monocot:grass:cereal"
+        description=""/>
+<term name="plant:bryophyte"
+        description=""/>
+<term name="plant:fern"
+        description=""/>
+<term name="plant:gymnosperm:dicot"
+        description=""/>
+<term name="prokaryote"
+        description=""/>
+<term name="prokaryote:archaebacteria"
+        description=""/>
+<term name="prokaryote:eubacteria"
+        description=""/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

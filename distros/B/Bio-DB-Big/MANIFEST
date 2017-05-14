@@ -1,0 +1,27 @@
+.travis.yml
+Build.PL
+Changes
+cpanfile
+lib/Bio/DB/Big.pm
+lib/Bio/DB/Big.pod
+lib/Bio/DB/Big.xs
+lib/Bio/DB/Big/AutoSQL.pm
+lib/Bio/DB/Big/AutoSQLField.pm
+lib/Bio/DB/Big/File.pod
+LICENSE
+MANIFEST			This list of files
+ppport.h
+README
+README.md
+t/00load.t
+t/01open.t
+t/05remote.t
+t/10bigwig.t
+t/20bigbed.t
+t/30autosql.t
+t/data/test.bb
+t/data/test.bed
+t/data/test.bw
+typemap
+META.yml
+META.json

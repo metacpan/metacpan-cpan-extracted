@@ -2,14 +2,11 @@
 abstract: 'only fatpack a script'
 author:
   - 'Shoichi Kaji <skaji@cpan.org>'
-build_requires:
-  Capture::Tiny: '0'
-  File::pushd: '0'
-  Test::More: '0.98'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,8 +29,9 @@ resources:
   bugtracker: https://github.com/skaji/App-FatPacker-Simple/issues
   homepage: https://github.com/skaji/App-FatPacker-Simple
   repository: https://github.com/skaji/App-FatPacker-Simple.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'Kazuho Oku <kazuhooku@gmail.com>'
   - 'perlancar <perlancar@gmail.com>'
-x_static_install: '1'
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

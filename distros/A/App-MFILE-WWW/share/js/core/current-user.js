@@ -80,8 +80,8 @@ define ([
         priv = cf('currentUserPriv'),
         flag1;
 
-    console.log("current-user: ce is ", ce);
-    console.log("current-user: priv is " + priv);
+    // console.log("current-user: ce is ", ce);
+    // console.log("current-user: priv is " + priv);
 
     if (ce) {
         $.extend(cu, ce)
@@ -90,7 +90,7 @@ define ([
     // current-user function
     return function (sw, arg) { 
         if (sw === 'obj') {
-            console.log('current-user function called with "obj"');
+            // console.log('current-user function called with "obj"');
             if (arg) {
                 console.log('NOTICE: setting current user object to ', arg);
                 cu = arg;
@@ -100,7 +100,7 @@ define ([
             return cu.nick ? cu : null;
         }
         if (sw === 'priv') {
-            console.log('current-user function called with "priv"');
+            // console.log('current-user function called with "priv"');
             if (arg) {
                 console.log('NOTICE: setting current user priv to ' + arg);
                 priv = arg;
@@ -109,14 +109,14 @@ define ([
             return priv;
         }
         if (sw === 'flag1') {
-            console.log('current-user function called with "flag1"');
+            // console.log('current-user function called with "flag1"');
             if (arg || arg === 0) {
                 console.log('NOTICE: setting current user flag1 to ' + arg);
                 flag1 = arg;
             }
             return flag1;
         }
-        console.log('current-user function called with no arguments');
+        // console.log('current-user function called with no arguments');
         return {
             'obj': cu,
             'priv': priv,

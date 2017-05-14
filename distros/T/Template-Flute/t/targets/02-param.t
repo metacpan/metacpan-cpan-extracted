@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Warnings;
+use Test::More tests => 8;
 
 use Template::Flute;
 
@@ -99,28 +98,3 @@ $output = $flute->process();
 
 ok($output =~ m%href="/$link_value"%, $output);
 ok($output =~ m%>$link_descriptions[1]<%, $output);
-
-# op=prepend
-$spec_xml = <<'EOF';
-<specification name="link">
-<list name="links" class="linklist" iterator="links">
-<param name="link" target="href" op="prepend"/>
-<param name="description" class="link"/>
-</list>
-</specification>
-EOF
-
-$template = qq{<html><div class="linklist"><a href="/" class="link">$link_descriptions[0]</a></div></html>};
-
-
-$flute = Template::Flute->new(specification => $spec_xml,
-							  template => $template,
-							  values => {links => [{link => $link_value,
-													   description => $link_descriptions[1]}]});
-
-$output = $flute->process();
-
-ok($output =~ m%href="$link_value/"%, $output);
-ok($output =~ m%>$link_descriptions[1]<%, $output);
-
-done_testing;

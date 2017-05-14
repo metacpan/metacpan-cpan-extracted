@@ -1,0 +1,108 @@
+# $Id$
+#
+# >>Title::	Manual Style
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{manual}} is an [[SDF]] style for manuals.
+#
+# >>Description::
+#
+# >>Limitations::
+# As [[FrameMaker]] has difficult with total page counts for a book,
+# the total page count is not currently output if a manual is being generated.
+#
+
+# Load the cover page definitions
+!use "covers"
+
+# Provide the default cover page setting
+!default DOC_COVER "manual"
+
+# Assume two-sided documents, by default
+!default DOC_TWO_SIDES
+
+# Assume numbering per section, by default
+!default OPT_NUMBER_PER_COMPONENT
+
+# Build the borders
+!default OPT_BORDERS 1
+!build_borders
+
+# Define the number of header/footer lines
+!default OPT_HEADINGS 4
+
+# Setup defaults to eliminate warning messages for files without a title
+!block default; family="DOC"
+Name            Value
+NAME            ''
+TYPE            ''
+PROJECT         ''
+ID              ''
+URL             ''
+!endblock
+
+# Define the first page footer
+!define PAGE_FIRST_FOOTER_INNER0  ''
+!define PAGE_FIRST_FOOTER_INNER1  ''
+!define PAGE_FIRST_FOOTER_INNER2  ''
+!define PAGE_FIRST_FOOTER_INNER3  ''
+!define PAGE_FIRST_FOOTER_CENTER0 ''
+!define PAGE_FIRST_FOOTER_CENTER1 ''
+!define PAGE_FIRST_FOOTER_CENTER2 ''
+!define PAGE_FIRST_FOOTER_CENTER3 ''
+!define PAGE_FIRST_FOOTER_OUTER0  ''
+!define PAGE_FIRST_FOOTER_OUTER1  ''
+!define PAGE_FIRST_FOOTER_OUTER2  ''
+!define PAGE_FIRST_FOOTER_OUTER3  ''
+
+# Define the right page header
+!define PAGE_RIGHT_HEADER_INNER1   ''
+!define PAGE_RIGHT_HEADER_INNER2   ''
+!define PAGE_RIGHT_HEADER_CENTER1  ''
+!define PAGE_RIGHT_HEADER_CENTER2  ''
+!define PAGE_RIGHT_HEADER_OUTER1   '{{B:{{PARATEXT:H1,A1,P1}}}}'
+!define PAGE_RIGHT_HEADER_OUTER2   '{{PARATEXT:H2,A2,P2}}'
+
+# Define the right page footer
+#!define PAGE_RIGHT_FOOTER_INNER0   '{{PARASHORT:}}'
+!define PAGE_RIGHT_FOOTER_INNER0   '[[$var{"DOC_PROJECT"}]]'
+!define PAGE_RIGHT_FOOTER_INNER1   '[[DOC_ID]]'
+!define PAGE_RIGHT_FOOTER_INNER2   '[[CONCISE:DOC_MODIFIED]]'
+!define PAGE_RIGHT_FOOTER_INNER3   "[[c]] [[DOC_OWNER]]"
+!define PAGE_RIGHT_FOOTER_CENTER0  ''
+!define PAGE_RIGHT_FOOTER_CENTER1  ''
+!define PAGE_RIGHT_FOOTER_CENTER2  '{{A[size="12pt"][[$var{"DOC_STATUS"} && $var{"DOC_STATUS"} ne "Final" ? " ($var{\'DOC_STATUS\'})" : ""]]}}'
+!define PAGE_RIGHT_FOOTER_CENTER3  ''
+!define PAGE_RIGHT_FOOTER_OUTER0   ''
+!define PAGE_RIGHT_FOOTER_OUTER1   ''
+!define PAGE_RIGHT_FOOTER_OUTER2   "{{B[size='12pt']{{PAGENUM:}}}}"
+!define PAGE_RIGHT_FOOTER_OUTER3   ''
+
+# Build the left page as a mirror of the right page
+!left_mirror_right_page
+
+# Adjust the headers for derived components
+!define PAGE_TOC_RIGHT_HEADER_OUTER1   '{{B:[[DOC_TITLE]]}}'
+!define PAGE_TOC_RIGHT_HEADER_OUTER2   '[[DOC_TOC_TITLE]]'
+!define PAGE_TOC_LEFT_HEADER_OUTER1    '{{B:[[DOC_TITLE]]}}'
+!define PAGE_TOC_LEFT_HEADER_OUTER2    '[[DOC_TOC_TITLE]]'
+!define PAGE_IX_RIGHT_HEADER_OUTER1    '{{B:[[DOC_TITLE]]}}'
+!define PAGE_IX_RIGHT_HEADER_OUTER2    '[[DOC_TOC_TITLE]]'
+!define PAGE_IX_LEFT_HEADER_OUTER1     '{{B:[[DOC_TITLE]]}}'
+!define PAGE_IX_LEFT_HEADER_OUTER2     '[[DOC_TOC_TITLE]]'
+
+# Adjust the headers for special components after the contents
+!define PAGE_PRECHAPTER_RIGHT_HEADER_OUTER1   '{{B:[[DOC_TITLE]]}}'
+!define PAGE_PRECHAPTER_RIGHT_HEADER_OUTER2   '{{PARATEXT:P2}}'
+!define PAGE_PRECHAPTER_LEFT_HEADER_OUTER1    '{{B:[[DOC_TITLE]]}}'
+!define PAGE_PRECHAPTER_LEFT_HEADER_OUTER2    '{{PARATEXT:P2}}'

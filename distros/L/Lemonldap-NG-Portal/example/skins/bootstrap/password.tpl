@@ -9,6 +9,7 @@
     <TMPL_IF NAME="AUTH_URL">
       <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
     </TMPL_IF>
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
     <TMPL_IF NAME="LOGIN">
     <div class="form-group input-group">

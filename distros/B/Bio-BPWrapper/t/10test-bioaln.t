@@ -2,80 +2,77 @@
 use rlib '.';
 use strict; use warnings;
 use Test::More;
+use Config;
 use Helper;
-note( "Testing bioaln single-letter options on test-bioaln.cds" );
 
 
+# option background (background needs special care)
 my %notes = (
-    a => 'average percent identity',
-    c => 'codon view',
-    g => 'remove gapped sites',
-    l => 'length of an alignment',
-    m => 'match view',
-    n => 'number of aligned sequences',
-    u => 'remove redundant sequences',
-    v => 'show only variable sites',
-    A => 'concatenate aln files',
-    B => 'extract conserved blocks',
-    D => 'DNA alignment',
-    F => 'set display name flat',
-    L => 'list all sequence IDs',
-    T => 'extract third site',
+    'avpid' => 'average percent identity',
+    'codon-view' => 'codon view',
+    'conblocks' => 'extract conserved blocks',
+    'concat' => 'concatenate aln files',
+    'dna2pep' => 'CDS alignment to protein alignment',
+    'length' => 'length of an alignment',
+    'listids' => 'list all sequence IDs',
+    'match' => 'match view',
+    'noflatname' => 'set display name flat',
+    'nogaps' => 'remove gapped sites',
+    'numseq' => 'number of aligned sequences',
+    'select-third' => 'extract third site',
+    'uniq' => 'remove redundant sequences',
+    'varsites' => 'show only variable sites',
 );
 
-# option b (background needs special care)
-for my $letter (qw(a c g l m n u v A B D F L T)) {
-    run_bio_program('bioaln', 'test-bioaln.cds', "-${letter}", "opt-${letter}.right");
-}
+test_no_arg_opts('bioaln', 'test-bioaln.cds', \%notes);
 
+my $opts = [
+    ['aln-index', 'B31,1',
+     "get align column index of seq 'B31', residue 1"],
+    ['consensus', '90',
+     'add a 90% consensus sequence'],
+    ['delete', 'JD1,118a',
+     'delete sequences JD1, 118a'],
+    ['erasecol', 'B31',
+     'Erase sites gapped at B31'],
+    ['output', 'fasta',
+     'output a FASTA alignments'],
+    ['pick', 'JD1,118a,N40',
+     'pick sequences JD1, 118a, N40'],
+    ['refseq', 'B31',
+     'change reference (or first) sequence'],
+    ['window', '60',
+     'average identifies for sliding windows of 60']
+    ];
 
-note( "Testing bioaln option-value options on test-bioaln.cds" );
-
-%notes = (
-    d => 'delete sequences JD1, 118a',
-    o => 'output a FASTA alignments',
-    p => 'pick sequences JD1, 118a, N40',
-    w => 'average identifies for sliding windows of 60',
-    r => 'change reference (or first) sequence',
-    C => 'add a 90% consensus sequence',
-    E => 'Erase sites gapped at B31',
-    I => "get align column index of seq 'B31', residue 1",
-);
-
-
-for my $tup (#[ 'd', 'JD1,118a'],
-#	     ['o', 'fasta'],
-#	     ['p', 'JD1,118a,N40'],
-#	     ['w', '60'],
-#	     ['r', 'B31'],
-#	     ['C', '90'],
-#	     ['E', 'B31'],
-	     ['I', 'B31,1'])
-{
-    run_bio_program('bioaln', 'test-bioaln.cds', "-$tup->[0] $tup->[1]",
-		    "opt-$tup->[0].right", {note=>$notes{$tup->[0]}});
-}
+test_one_arg_opts('bioaln', 'test-bioaln.cds', $opts);
 
 note( "Testing other bioaln option-value options" );
 
-%notes = (
-    i => "input is a FASTA alignment",
-    s => "alignment slice from 80-100",
-    P => "Back-align CDS sequence according to protein alignment",
-);
-
 my $nuc = test_file_name('test-bioaln-pep2dna.nuc');
-for my $triple (['i', 'fasta', 'test-bioaln-pep2dna.nuc'],
-		['s', '80,100', 'test-bioaln.aln'],
-		['P', $nuc, 'test-bioaln-pep2dna.aln'])
+for my $tuple (['input', 'fasta', 'test-bioaln-pep2dna.nuc',
+		 "input is a FASTA alignment"],
+		['slice', '80,100', 'test-bioaln.aln',
+		 "alignment slice from 80-100"],
+		['pep2dna', $nuc, 'test-bioaln-pep2dna.aln',
+		 "Back-align CDS sequence according to protein alignment"])
 {
-    run_bio_program('bioaln', $triple->[2], "-$triple->[0] $triple->[1]",
-		    "opt-$triple->[0].right", {note=>$notes{$triple->[0]}});
+    run_bio_program('bioaln', $tuple->[2], "--$tuple->[0] $tuple->[1]",
+		    "opt-$tuple->[0].right", {note=>$tuple->[3]});
 }
 
 
+%notes = (
+    'bootstrap' => "bootstrap",
+    'permute-states' => "permute-states",
+    'uppercase' => "Make an uppercase alignment",
+    'resample' => "Resample",
+);
 
-# Need to convert:
-# M S U
-# ['R', '3'])
+
+for my $opt (keys %notes) {
+    run_bio_program_nocheck('bioaln', 'test-bioaln.cds', "--${opt}",
+			    {note=>$notes{$opt}});
+}
+
 done_testing();

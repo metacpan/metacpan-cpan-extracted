@@ -12,6 +12,7 @@ use Curses::UI ;
 
 use strict ;
 use vars qw/$hw/;
+use lib 't/lib';
 
 my $arg = shift || '';
 my ( $log, $show ) = (0) x 2;
@@ -39,7 +40,6 @@ ok(1,"Config::Model::CursesUI loaded") ;
 my $model = Config::Model -> new ( );
 
 my $inst = $model->instance (root_class_name => 'Master',
-		  model_file      => 't/test_model.pm',
 		  instance_name   => 'test1');
 ok($inst,"created dummy instance") ;
 

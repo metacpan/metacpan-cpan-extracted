@@ -2,12 +2,10 @@
 
 use strict;
 use warnings;
-
 use autodie;
 use Test::More;
-use File::Spec;
 
-use constant PROBLEM_PATH => File::Spec->catdir(qw/ lib  Project  Euler  Problem /);
+use constant PROBLEM_PATH => 'lib/Project/Euler/Problem/';
 
 
 my @files;
@@ -22,7 +20,7 @@ plan tests => (scalar @files * (2 + 7 + 3));
 #  Make sure all of the defined problems load okay
 for  my $problem  (@files) {
     my $mod = sprintf('Project::Euler::Problem::%s', $problem);
-    #diag( "Testing $problem" );
+    diag( "Testing $mod" );
 
     # TESTS -> 2
     use_ok( $mod );
@@ -38,7 +36,7 @@ for  my $problem  (@files) {
     ok ( $problem->help_message  , 'Help_message is set correctly'   );
 
     # TESTS -> 3
-    ok ( $problem->solve        , "$mod ran without errors"         );
-    ok ( $problem->solved_status, "$mod solved correctly"           );
-    is ( $problem->solved_answer, $problem->solved_wanted, "$mod gave the incorrect answer");
+    ok ( $problem->solve         , "$mod ran without errors"         );
+    ok ( $problem->solved_status , "$mod solved correctly"           );
+	is ( $problem->solved_wanted, $problem->solved_answer, "$mod gave the incorrect answer");
 }

@@ -15,6 +15,7 @@ my $FR_Full_pm = File::Spec->catfile(qw(lib Number Phone FR Full.pm));
 if (-d '.git' || ! -f $FR_Full_pm) {
 	print "Building in author mode\n";
 	$build_module = 'inc::Build::Author';
+	unshift @INC, '.';
     require inc::Build::Author;
 }
 

@@ -9,7 +9,7 @@
 ## no critic (RequireUseStrict, RequireUseWarnings)
 package Riak::Light::Timeout::SelectOnRead;
 {
-    $Riak::Light::Timeout::SelectOnRead::VERSION = '0.12';
+    $Riak::Light::Timeout::SelectOnRead::VERSION = '0.052';
 }
 ## use critic
 
@@ -19,7 +19,7 @@ use Time::HiRes;
 use Config;
 use Carp;
 use Moo;
-use Types::Standard -types;
+use MooX::Types::MooseLike::Base qw<Num Str Int Bool Object>;
 
 with 'Riak::Light::Timeout';
 
@@ -31,31 +31,44 @@ has out_timeout => ( is => 'ro', isa      => Num, default => sub {0.5} );
 has select => ( is => 'ro', default => sub { IO::Select->new } );
 
 sub BUILD {
+    my $self = shift;
 
     #carp "Should block in Write Operations, be careful";
 
-    $_[0]->select->add( $_[0]->socket );
+    $self->select->add( $self->socket );
 }
 
 sub DEMOLISH {
-    $_[0]->clean();
+    my $self = shift;
+    $self->clean();
 }
 
 sub clean {
-    $_[0]->select->remove( $_[0]->socket );
-    $_[0]->socket->close;
+    my $self = shift;
+    $self->select->remove( $self->socket );
+    $self->socket->close;
     $! = ETIMEDOUT;    ## no critic (RequireLocalizedPunctuationVars)
 }
 
 sub is_valid {
-    scalar $_[0]->select->handles;
+    my $self = shift;
+    scalar $self->select->handles;
 }
+
+around [qw(sysread syswrite)] => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    if ( !$self->is_valid ) {
+        $! = ECONNRESET;    ## no critic (RequireLocalizedPunctuationVars)
+        return;
+    }
+
+    $self->$orig(@_);
+};
 
 sub sysread {
     my $self = shift;
-    $self->is_valid
-      or $! = ECONNRESET,
-      return;          ## no critic (RequireLocalizedPunctuationVars)
 
     return $self->socket->sysread(@_)
       if $self->select->can_read( $self->in_timeout );
@@ -67,9 +80,7 @@ sub sysread {
 
 sub syswrite {
     my $self = shift;
-    $self->is_valid
-      or $! = ECONNRESET,
-      return;    ## no critic (RequireLocalizedPunctuationVars)
+
     $self->socket->syswrite(@_);
 }
 
@@ -86,7 +97,7 @@ Riak::Light::Timeout::SelectOnRead - proxy to read/write using IO::Select as a t
 
 =head1 VERSION
 
-version 0.12
+version 0.052
 
 =head1 DESCRIPTION
 
@@ -100,19 +111,9 @@ version 0.12
 
   version 0.001
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Tiago Peczenyj <tiago.peczenyj@gmail.com>
-
-=item *
-
-Damien Krotkine <dams@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,49 @@
+!init OPT_LOOK='infomap'; OPT_STYLE='manual'
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+# TO DO:
+# * add "Special Symbols" to "Language overview"
+# * add verbatim stuff to "Example Paragraphs"
+# * add enum lists to "Lists"
+# * add "Automatic Figure Conversion" to "Figures"
+# * add "target via drivers" stuff to "Generating Outputs"?
+
+# Load the configuration
+!define SDF_ROOT "../"
+!inherit "sdf"
+
+# Define variables
+!define DOC_NAME    "SDF"
+!define DOC_TYPE    "User Guide"
+!define DOC_AUTHOR  "Ian Clatworthy"
+!define DOC_TOC     2
+!define DOC_IX
+
+# Build the title page
+!build_title
+
+# When we're creating help, make the level 2 headings the topics
+!if $var{'OPT_TARGET'} eq 'hlp'
+!on paragraph '[HAP]2';; $attr{'top'} = 1
+!endif
+
+# Include the document components
+!include "ugasdf.sdf"; about
+!include "in_start.sdf"
+!include "in_overv.sdf"
+!include "in_parag.sdf"
+!include "in_fg.sdf"
+!include "in_tb.sdf"
+!include "in_sdadv.sdf"
+!include "credits.sdf"; appendix

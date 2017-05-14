@@ -23,8 +23,10 @@ Net::Whois::Object - Object encapsulating RPSL data returned by Whois queries
 =head1 SYNOPSIS
 
     use Net::Whois::RIPE;
+    use Net::Whois::Object;
 
-    my @objects = Net::Whois::Generic->query('AS30781');
+    my @objects = Net::Whois::Object->query('AS30781');
+
 
     # Or you can use the previous way
 
@@ -53,13 +55,13 @@ Before you had to filter objects using the class() method.
     # Then to only get the Person object (and ignore Information objects)
     my ($person) = grep {$_->class() eq 'Person'} Net::Whois::Object->new($iterator);
 
-But now the query() from Net::Whois::Generic method allows you to filter more easily
+But now the query() method allows you to filter more easily
 
-    my ($person) = Net::Whois::Generic->query('POLK-RIPE', { type => 'person' });
+    my ($person) = Net::Whois::Object->query('POLK-RIPE', { type => 'person' });
 
 You can even use the query() filtering capabilities a little further
 
-    my @emails = Net::Whois::Generic->query('POLK-RIPE', { type => 'person', attribute => 'e_mail' });
+    my @emails = Net::Whois::Object->query('POLK-RIPE', { type => 'person', attribute => 'e_mail' });
 
 Please note, that as soon as you use the attribute filter, the values returned
 are strings and no more Net::Whois::Objects.
@@ -416,7 +418,7 @@ sub attribute_is {
     return defined $self->_TYPE()->{$type}{$attribute} ? 1 : 0;
 }
 
-=head2 B<filtered_attributes( $attribute )>
+=head2 B<hidden_attributes( $attribute )>
 
 Accessor to the filtered_attributes attribute (attributes to be hidden)
 Accepts an optional attribute to be added to the filtered_attributes array,
@@ -701,11 +703,7 @@ sub _object_factory {
     if ( $object->{attributes} ) {
         for my $a ( @{ $object->{attributes} } ) {
             my $method = $a->[0];
-	    if( my $ref = eval { $object_returned->can( $method ) } ) {
-		$object_returned->$ref( $a->[1] );
-	    } else {
-		carp "Unknown method '$method' for object $class (Did the Database schema changed ?)"
-	    }
+            $object_returned->$method( $a->[1] );
         }
     }
 

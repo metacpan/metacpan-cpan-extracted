@@ -1,10 +1,10 @@
 package Sidef {
 
     use 5.014;
-    our $VERSION = '3.00';
+    our $VERSION = '3.01';
 
-    our $SPACES      = 0;    # the current number of spaces
-    our $SPACES_INCR = 4;    # the number of spaces incrementor
+    our $SPACES      = 0;    # the current number of indentation spaces
+    our $SPACES_INCR = 4;    # the number of indentation spaces
 
     our @NAMESPACES;         # will keep track of declared modules
     our %INCLUDED;           # will keep track of included modules
@@ -430,7 +430,9 @@ package Sidef {
       ? $_[0]->{module}
       : $_[0];
 };
+
 *UNIVERSAL::DESTROY = sub { };
+
 *UNIVERSAL::AUTOLOAD = sub {
     my ($self, @args) = @_;
 

@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.122'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.123'
                                       },
                       'requires' => {
                                       'Dist::Zilla' => '5',
@@ -17,6 +17,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Breaks' => '0',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.004',
                                       'Dist::Zilla::Plugin::CheckIssues' => '0',
+                                      'Dist::Zilla::Plugin::CheckMetaResources' => '0',
                                       'Dist::Zilla::Plugin::CheckPrereqsIndexed' => '0.019',
                                       'Dist::Zilla::Plugin::CheckSelfDependency' => '0',
                                       'Dist::Zilla::Plugin::CheckStrictVersion' => '0',
@@ -128,7 +129,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::Deep' => '0',
-                                   'Test::More' => '0.88',
+                                   'Test::More' => '0.96',
                                    'Test::Tester' => '0.108',
                                    'Test::Warnings' => '0.009',
                                    'if' => '0',

@@ -1,0 +1,205 @@
+#! /usr/bin/perl
+# $Id: debarnacle,v 1.6 2002/05/15 19:41:18 itz Exp $
+
+require 5.6.1;
+
+use DB_File 1.75;
+use Fcntl 1.03;
+use File::Find;
+use DirHandle;
+use FileHandle 2.00;
+use Cwd 2.04 qw(fastcwd);
+use Getopt::Std 1.02;
+use File::Glob 0.991 qw(bsd_glob GLOB_QUOTE GLOB_BRACE);
+
+use strict;
+no strict qw(refs);
+
+# configuration and command line parsing
+sub usage {
+    print STDERR <<"EOF";
+Usage: debarnacle [ -v VERBOSITY | -C CONFIGDIR | -c CACHESIZE | -d | -p | -q | -h ][ ROOT ]
+   -d: do not process filenames from packages
+   -p: do not process filenames from plugins
+   -q: be quiet (overrides -v)
+   -h: print this summary and exit
+EOF
+    exit 2;
+}
+
+our $opt_v = 1;
+our $opt_C = '';
+our $opt_q = 0;
+our $opt_d = 0;
+our $opt_p = 0;
+our $opt_c = 0;
+our $opt_h = 0;
+our $root = '/';
+
+getopts('dpqv:C:c:h') or usage;
+usage if $opt_h;
+scalar(@ARGV) < 2 or usage;
+$root = $ARGV[0] if $ARGV[0];
+
+$opt_v = 0 if $opt_q;
+# the strange path below gets substituted by make, so the default is
+# whatever has been passed to Makefile.PL as $ENV{sysconfdir} (or /etc
+# as the default default)
+our $pkgconfdir = $opt_C || "//etc///debarnacle";
+
+# a crufty way to get the number of all packages :(
+our @dpkg_lists = bsd_glob("/var/lib/dpkg/info/*.list");
+if (!$opt_c) {
+    $DB_BTREE->{cachesize} = 2000 * scalar @dpkg_lists;
+} else {
+    $DB_BTREE->{cachesize} = $opt_c;
+}
+
+sub chomped_date {
+    my $date = `date`;
+    chomp $date;
+    return $date;
+}
+
+# create a database of files
+our $dbname;
+$SIG{'INT'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { unlink $dbname if $dbname; exit 1; };
+$dbname = `tempfile --directory /var/tmp`;
+chomp $dbname;
+
+our %filez;
+tie (%filez, 'DB_File', $dbname, O_RDWR|O_CREAT, 0600, $DB_BTREE)
+    or die "can't tie DB_File: $!";
+
+# read a skip-list 
+our $fh_prune = FileHandle->new("<$pkgconfdir/prune");
+defined $fh_prune or die "can't open $pkgconfdir/prune: $!";
+our %prunes = ();
+PRUNE:
+    while (my $prune = $fh_prune->getline()) {
+        next PRUNE if $prune =~ /^ *\#/;
+        next PRUNE if $prune =~ /^ *$/;
+        chomp $prune;
+        $prunes{$prune} = 1;
+    }
+
+# enter the current name returned by find() into the database.  Stop
+# descending into directories present in %prunes.
+sub enter_file {
+    $filez{$File::Find::name} = '?';
+    $File::Find::prune = 1 if $prunes{$File::Find::name};
+}
+
+# translate an absolute pathname into canonical form (resolves symlinks
+# in the directory part, but not in the base part).  Do it fast: cache
+# as much as possible, and exploit form of filenames.
+our %canonical_dirs = ();
+our $last_dir = '';
+our $last_canonical = '';
+sub canonical {
+    my $f = $_[0];
+    return '/' if $f eq '/.';
+    $f =~ m:^/((.*)/)?([^/]*)$: ;
+    my $dir = '/' . ($2 || '');
+    my $base = $3;
+    return "/$base" if $dir eq '/';
+    return "$last_canonical/$base" if $dir eq $last_dir;
+    $last_dir = $dir;
+    $last_canonical = $canonical_dirs{$dir};
+    if (!defined $last_canonical) {
+        chdir $dir;
+        $canonical_dirs{$dir} = $last_canonical = fastcwd;
+    }
+    return "$last_canonical/$base";
+}
+
+# enter an explanation for files in the list referenced by $list.  If
+# the file wasn't present in the database, mark it as missing.
+sub explain {
+    my ($reason, $list) = @_;
+    foreach my $f (@{$list}) {
+        $f = canonical $f;
+        my $current = $filez{$f};
+        my $new_val = '!';
+        $current = $new_val = "?$reason" if !defined $current;
+        $filez{$f} = $new_val if $current =~ /^\?/;
+    }
+}
+
+# enter all existing files
+print STDERR (&chomped_date(), " Listing exisiting files\n") if $opt_v > 0;
+find(\&enter_file, $root);
+
+# match additional globs (avoids missing reports about files under pruned directories)
+print STDERR (&chomped_date(), " Adding globs\n") if $opt_v > 1;
+our $fh_globs = FileHandle->new("<$pkgconfdir/globs");
+defined $fh_globs or die "can't open $pkgconfdir/globs: $!";
+ GLOB_LINE:
+    while (my $glob_line = $fh_globs->getline()) {
+        next GLOB_LINE if $glob_line =~ /^\s*\#/ ;
+        next GLOB_LINE if $glob_line =~ /^\s*$/ ;
+        chomp $glob_line;
+        foreach my $f (bsd_glob($glob_line, &GLOB_BRACE|&GLOB_QUOTE)) {
+            $filez{$f} = '?';
+        }
+    }
+$fh_globs->close();
+
+
+# process dpkg's packages
+if (!$opt_d) {
+    print STDERR (&chomped_date(), " Processing files in packages\n") if $opt_v > 0;
+    foreach my $nextlist (@dpkg_lists) {
+        my @pkgfiles = ();
+        $nextlist =~ s:.*/([^/]*)\.list$:$1: ;
+        print STDERR (&chomped_date(), " Processing package $nextlist\n") if $opt_v > 1;
+        foreach my $pkgfile qw (list conffiles postinst postrm preinst prerm shlibs md5sums config templates) {
+            my $fullpkgfile = "/var/lib/dpkg/info/$nextlist.$pkgfile";
+            push @pkgfiles, $fullpkgfile if -f $fullpkgfile;
+        }
+        my $fh_list = FileHandle->new("</var/lib/dpkg/info/$nextlist.list");
+        defined $fh_list or die "can't list package $nextlist: $!";
+        while (my $pkgfile = $fh_list->getline()) {
+            chop $pkgfile;
+            push @pkgfiles, $pkgfile;
+        }
+        $fh_list->close();
+        &explain("dpkg: $nextlist", \@pkgfiles);
+    }
+}
+
+# process plugins
+if (!$opt_p) {
+    print STDERR (&chomped_date(), " Processing file lists from plugins\n") if $opt_v > 0;
+    our $dh_plugins = DirHandle->new("$pkgconfdir/plugin.d");
+    defined $dh_plugins or die "can't open $pkgconfdir/plugin.d: $!";
+  PLUGIN:
+    while (my $plugin = $dh_plugins->read()) {
+        next PLUGIN if $plugin !~ /^[A-Z][-_a-zA-Z0-9]*\.pm$/;
+        print STDERR (&chomped_date(), " Processing plugin $plugin\n") if $opt_v > 1;
+        require "$pkgconfdir/plugin.d/$plugin";
+        $plugin =~ s/\.pm$// ;
+        my $plug_list = &{"Debian::Debarnacle::${plugin}::get_list"}();
+        &explain("plugin: $plugin", $plug_list);
+    }
+    $dh_plugins->close();
+}
+
+# print report
+print STDERR (&chomped_date(), " Generating report\n") if $opt_v > 0;
+REPORT:
+while (my ($name, $expl) = each %filez) {
+    next REPORT unless $expl =~ /^\?/;
+    if (length $expl == 1) {
+        print "$name: unexplained\n";
+    } else {
+        print "$name: missing for ";
+        print substr($expl, 1);
+        print "\n";
+    }
+}
+
+END { unlink $dbname if $dbname; }
+
+no warnings qw(digit);
+our $VERSION = '$Date: 2002/05/15 19:41:18 $ '; $VERSION =~ s|^\$Date:\s*([0-9]{4})/([0-9]{2})/([0-9]{2})\s.*|\1.\2.\3| ;

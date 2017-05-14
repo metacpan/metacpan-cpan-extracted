@@ -1,0 +1,151 @@
+#! /bin/sh
+#
+# NAME
+#     make-rel -- make a software release
+#
+# SYNOPSIS
+usage="make-rel SYMBOLIC_TAG MODULE"
+#
+# DESCRIPTION
+#
+#     `make-rel' exports MODULE from CVS using SYMBOLIC_TAG and
+#     creates a distribution from it.
+#
+#     `make-rel' can tell the difference between `autoconf' style
+#     packages, Perl, and Python packages and create them accordingly.
+#
+#     For `autoconf' packages, `make-rel' edits the SYMBOLIC_TAG into
+#     `configure.in', runs `autoconf', `./configure', and then
+#     performs a `make dist'.
+#
+#     For Perl packages, `make-rel' edits the SYMBOLIC_TAG into the
+#     file identified in `Makefile.PL' as the `VERSION_FROM' file,
+#     runs `perl Makefile.pl' and `make dist'.
+#
+#     For Python packages, `make-rel' edits the SYMBOLIC_TAG into
+#     `setup.py'.
+#
+#     SYMBOLIC_TAGs of the form ``r([0-9]+)m([0-9]+)(.*)'' are
+#     reformatted to ``\1.\2\3'' to translate between CVS/RCSs
+#     requirement against using `.' in a tag name.  For example, a
+#     symbolic tag `r0m1b1' is reformatted to `0.1b1'.
+#
+#     The leading `r' of a SYMBOLIC_TAG is removed.  Underscores (`_')
+#     are translated to periods (`.').
+#
+# $Id: make-rel,v 1.1 2002/08/02 14:54:50 kmacleod Exp $
+#
+
+AUTOCONF="/usr/bin/autoconf"
+GREP="/usr/bin/grep"
+PERL="/usr/bin/perl"
+AWK="/usr/bin/awk"
+CVS="/usr/bin/cvs"
+PWD_CMD="/bin/pwd"
+SED="/bin/sed"
+TR="/usr/bin/tr"
+
+if [ $# != 2 ]; then
+    echo "$usage"
+    exit 0
+fi
+
+SYMBOLIC_TAG="$1"
+MODULE="$2"
+
+set -e
+set -x
+
+original_dir="`$PWD_CMD`"
+
+release="`echo \"$SYMBOLIC_TAG\" | $SED -e 's/r\([0-9]\{1,\}\)m\([0-9]\{1,\}\)\(.*\)/\1.\2\3/'`"
+release="`echo \"$release\" | $SED -e 's/^r//' | $TR '_' '.'`"
+
+mkdir /tmp/dist-$$
+
+cd /tmp/dist-$$
+
+$CVS export -r $SYMBOLIC_TAG -d dist $MODULE
+
+cd dist
+
+if [ -f configure.in ]; then
+    mv configure.in ..
+
+    # edit the SYMBOLIC_TAG into `configure.in', translating to a
+    # ``cleaner'' release number
+    $SED <../configure.in >configure.in \
+      -e 's/^VERSION=.*$/VERSION='"$release"'/'
+
+    echo "$release" >.release
+
+    $AUTOCONF
+
+    ./configure
+
+    make dist
+
+    cd ..
+elif [ -f Makefile.PL ]; then
+    perl <<'EOF'
+use ExtUtils::Manifest;
+($missfile, $missentry) = ExtUtils::Manifest::fullcheck;
+die "make-rel: release does not check against manifest\n"
+    if ($#{$missfile} != -1 || $#{$missentry} != -1);
+EOF
+    if [ $? != 0 ]; then
+	exit 1;
+    fi
+
+    VERSION_FROM="`$SED -n -e \"/VERSION_FROM/s/.*'\(.*\)',/\1/p\" Makefile.PL`"
+
+    mv $VERSION_FROM ..
+    $SED <../`basename $VERSION_FROM` >$VERSION_FROM \
+      -e '/VERSION = /s/0\.00/'"$release"'/'
+
+    for ii in `find . -name \*.pm`; do
+	mv $ii ..
+	$SED <../`basename $ii` >$ii \
+	  -e '/VERSION = /s/0\.00/'"$release"'/'
+    done
+
+    if [ -f $MODULE.spec ]; then
+	$SED <$MODULE.spec >$MODULE-$release.spec \
+	  -e 's/@VERSION@/'"$release"'/g'
+	mv MANIFEST ..
+	$SED <../MANIFEST >MANIFEST \
+	  -e "/^$MODULE.spec$/a\\
+$MODULE-$release.spec
+"
+    fi
+
+    perl Makefile.PL
+
+    make dist
+
+    mv $MODULE-$release.tar.gz ..
+
+    cd ..
+elif [ -f setup.py ]; then
+    mv setup.py ..
+    $SED <../setup.py >setup.py \
+      -e '/version = /s/0\.0\.0/'"$release"'/'
+
+    python setup.py sdist
+
+    mv dist/$MODULE-$release.tar.gz ..
+    cd ..
+else
+    echo "Unknown package type"
+    cd ..
+    rm -rf dist-$$
+    exit 1
+fi
+
+chmod a-w *.tar.gz
+
+mv *.tar.gz $original_dir
+
+cd ..
+
+rm -rf dist-$$

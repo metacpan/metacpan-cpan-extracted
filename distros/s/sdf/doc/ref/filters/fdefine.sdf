@@ -1,0 +1,51 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: define Filter
+
+H2: Interface
+
+!filter_interface "define"
+
+H2: Description
+
+The {{define}} filter is a convenient way of calling the
+{{MAC:define}} macro for several variables.
+
+The {{family}} parameter is often used to specify a common prefix.
+
+The {{export}} parameter can be used to export the variables to
+the target document system. See the {{MAC:export}} macro for further
+details on variable exporting.
+
+H2: Examples
+
+!block example; lang='sdf'
+!block define
+Name            Value
+COMPANY_NAME    ACME Mining
+COMPANY_PHONE   1234 5678
+!endblock
+!endblock
+
+A simpler version is:
+
+!block example; lang='sdf'
+!block define; family="COMPANY"
+Name    Value
+NAME    ACME Mining
+PHONE   1234 5678
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

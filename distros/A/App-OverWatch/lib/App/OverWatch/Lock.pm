@@ -44,7 +44,7 @@ App::OverWatch::Lock - Lock object
 
 =head1 VERSION
 
-version 0.1
+version 0.003
 
 =head1 ATTRIBUTES
 

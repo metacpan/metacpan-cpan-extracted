@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+use 5.010;
 
 use strict;
 use warnings;
@@ -21,9 +22,9 @@ my $builder = Module::Build->new(
 			     'test-files/test-bioaln.cds.slice*.aln',
 			     'test-bioseq.nuc.sed', 't/test-bioseq.nuc.sed',
 			     'test-bioaln.cds.slice*.aln',
-			     '*.fas',
+			     '*.fas', '*.err',
 			     't/check-data/*.err'],
-    create_makefile_pl  => 'passthrough',
+    create_makefile_pl  => 'traditional',
     dist_abstract       =>
     'wrappers of popular BioPerl classes (`Bio::SeqIO`, `Bio::Seq`, `Bio::AlignIO`, `Bio::SimpleAlign',
     dist_version_from   => 'lib/Bio/BPWrapper.pm',
@@ -40,7 +41,7 @@ my $builder = Module::Build->new(
     },
 
     configure_requires  => {
-        'Module::Build' => '0.4211',
+        'Module::Build' => '0.4214',
 
     },
     build_requires => {

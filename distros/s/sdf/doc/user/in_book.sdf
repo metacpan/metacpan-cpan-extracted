@@ -1,0 +1,36 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Book Mode
+
+By default, {{CMD:sdf}} processes each argument as a single document.
+i.e. a single stream of paragraphs is passed to the {{format driver}}
+for conversion. This mode is good enough for most documents.
+
+In {{book mode}}, {{CMD:sdf}} processes each argument as a "book".
+i.e. a set of {{MAC:include}} macros specifying the chapters.
+In this mode, a shell script is generated which treats each chapter
+as a "pseudo-document". This mode is required when:
+
+^ you wish to generate a [[FrameMaker]] book
+
++ you want to generate a list of figures, list of tables or index
+
++ each chapter has a fancy cover page.
+
+Book mode can be activated via {{CMD:sdf}}'s -b option.
+
+Note: The {{VAR:OPT_BOOK}} variable can be used to check if book mode is
+active. However, it cannot be used to enable or disable the mode.
+
+!end_topic

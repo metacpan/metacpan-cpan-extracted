@@ -1,0 +1,840 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: sdf - SDF Conversion Utility</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="in_prog.html">Previous Topic</A> | <A HREF="sdfapi.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="sdf">11.2. sdf - SDF Conversion Utility</A></H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P><A HREF="../ref/sdf.html">sdf</A> converts <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> files to other document formats.</P>
+<HR>
+<H2><A NAME="Usage">Usage</A></H2>
+<PRE>
+usage  : sdf [+alias] [-h[help]] [-o[out_ext]]
+         [-l[log_ext]] [-2 format] [-D variable,..]
+         [-n split_level] [-f flag,..]
+         [-I include_path,..] [-p prefilter]
+         [-a parameters] [-P[plang]]
+         [-N[line_numbers]] [-r report] [-L locale]
+         [-k look] [-s style] [-S page_size]
+         [-c config] [-u uses,..] [-H head_level]
+         [-d driver] [-y post_filter]
+         [-z post_process,..] [-t target]
+         [-v[verbose]] [-T trace_levels,..]
+         [-w width] [-Y library_path,..]
+         sdf_file ...
+purpose: convert an sdf file to another format
+version: 2.001beta1    (SDF 2.001beta1)
+</PRE>
+<P>The options are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Option</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_h">-h</A>
+</TD>
+<TD>
+display help on options
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_o">-o</A>
+</TD>
+<TD>
+output file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_l">-l</A>
+</TD>
+<TD>
+log file extension
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_2">-2</A>
+</TD>
+<TD>
+the output format you want
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_D">-D</A>
+</TD>
+<TD>
+define variables
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_n">-n</A>
+</TD>
+<TD>
+heading level to autosplit into topics
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_f">-f</A>
+</TD>
+<TD>
+define flags (i.e. DOC_* variables)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_I">-I</A>
+</TD>
+<TD>
+search path for include files, templates, etc.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_p">-p</A>
+</TD>
+<TD>
+pre-filter input file from each argument
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_a">-a</A>
+</TD>
+<TD>
+parameters for the pre-filter
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_P">-P</A>
+</TD>
+<TD>
+pre-filter as a programming language
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_N">-N</A>
+</TD>
+<TD>
+number lines in pretty-printed source code
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_r">-r</A>
+</TD>
+<TD>
+report to pre-filter the input with
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_L">-L</A>
+</TD>
+<TD>
+locale
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_k">-k</A>
+</TD>
+<TD>
+look library
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_s">-s</A>
+</TD>
+<TD>
+style of document
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_S">-S</A>
+</TD>
+<TD>
+page size for paper documents
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_c">-c</A>
+</TD>
+<TD>
+configuration library
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_u">-u</A>
+</TD>
+<TD>
+modules to use
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_H">-H</A>
+</TD>
+<TD>
+initial heading level
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_d">-d</A>
+</TD>
+<TD>
+format driver - default is expand
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_y">-y</A>
+</TD>
+<TD>
+filter to post-filter the output with
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_z">-z</A>
+</TD>
+<TD>
+list of post processing actions to do
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_t">-t</A>
+</TD>
+<TD>
+logical target format
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_v">-v</A>
+</TD>
+<TD>
+verbose mode
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_T">-T</A>
+</TD>
+<TD>
+debugging trace levels
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_w">-w</A>
+</TD>
+<TD>
+width for text-based outputs
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="#sdf_Y">-Y</A>
+</TD>
+<TD>
+search path for libraries
+</TD>
+</TR>
+</TABLE>
+
+<P>The aliases are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Alias</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+mc
+</TD>
+<TD>
+generate a MIMS chapter
+</TD>
+</TR>
+<TR>
+<TD>
+ms
+</TD>
+<TD>
+generate a MIMS spec
+</TD>
+</TR>
+<TR>
+<TD>
+mt
+</TD>
+<TD>
+generate a MIMS topic
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2doc_fm
+</TD>
+<TD>
+generate Frame binary format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2dvi_sgml
+</TD>
+<TD>
+generate DVI format via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2fvo_fm
+</TD>
+<TD>
+generate FrameViewer format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2hlp_mif
+</TD>
+<TD>
+generate Windows Help input files via MIF
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2html_
+</TD>
+<TD>
+generate a HTML document
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2html_dir
+</TD>
+<TD>
+generate an SDF directory in HTML
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2html_fm
+</TD>
+<TD>
+generate a HTML document via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2html_topics
+</TD>
+<TD>
+generate HTML topics
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2htx_
+</TD>
+<TD>
+generate MIMS HTX format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2info_sgml
+</TD>
+<TD>
+generate GNU info format via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2latex_pod
+</TD>
+<TD>
+generate LaTeX format via POD
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2latex_sgml
+</TD>
+<TD>
+generate LaTeX format via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2lyx_sgml
+</TD>
+<TD>
+generate a LyX file via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2man_pod
+</TD>
+<TD>
+generate Man page format via POD
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2mf6_
+</TD>
+<TD>
+generate MIMS F6 help format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2mif_
+</TD>
+<TD>
+generate Frame MIF format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2pdf_mif
+</TD>
+<TD>
+generate PostScript and PDF via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2pod_
+</TD>
+<TD>
+generate POD format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2ps_fm
+</TD>
+<TD>
+generate PostScript via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2ps_fmbook
+</TD>
+<TD>
+generate PostScript via a FrameMaker book
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2ps_pod
+</TD>
+<TD>
+generate PostScript via POD
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2ps_sgml
+</TD>
+<TD>
+generate PostScript via SGML
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2rtf_fm
+</TD>
+<TD>
+generate RTF format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2rtf_mif
+</TD>
+<TD>
+generate RTF format via MIF
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2rtf_sgml
+</TD>
+<TD>
+generate RTF format via SGML format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2sdf_expand
+</TD>
+<TD>
+generate expanded SDF
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2sdf_raw
+</TD>
+<TD>
+generate raw SDF
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2sgml_
+</TD>
+<TD>
+generate SGML format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2txt_
+</TD>
+<TD>
+generate plain text format
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2txt_fm
+</TD>
+<TD>
+generate plain text format via FrameMaker
+</TD>
+</TR>
+<TR>
+<TD>
+sdf2txt_pod
+</TD>
+<TD>
+generate plain text format via POD
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P><A NAME="sdf_h">The -h option provides help. If it is specified without a parameter, a brief description of each option is displayed. To display the attributes for an option, specify the option letter as a parameter.</A></P>
+<P><A NAME="sdf_o">By default, generated output goes to standard output. To direct output to a file per input file, use the -o option to specify an extension for output files. If the -o option is specified without a parameter, an extension of <EM>out</EM> is assumed.</A></P>
+<P><A NAME="sdf_l">Likewise, error messages go to standard error by default. Use the -l option to create a log file per input file. If the -l option is specified without a parameter, an extension of <EM>log</EM> is assumed.</A></P>
+<P><A NAME="sdf_2">The -2 option is a convenient way of specifying the alias (collection of options) which generates the output you want. e.g.</A></P>
+<PRE>
+     sdf -2html abc
+</PRE>
+<P>is equivalent to:</P>
+<PRE>
+     sdf +sdf2html abc
+</PRE>
+<P><A NAME="sdf_D">The -D option is used to define variables. These are typically used for controlling conditional text and substituting text which changes. The format used is:</A></P>
+<PRE>
+ -Dvariable1=value1,variable2=value2
+</PRE>
+<P><A NAME="sdf_f">A flag is a shorthand way of specifying variables in the DOC family. i.e. -ftoc=3 is equivalent to -DDOC_TOC=3. The format of the -f option is:</A></P>
+<PRE>
+ -fflag1=value1,flag2=value2
+</PRE>
+<P>If a variable or flag is specified without a value, 1 is assumed.</P>
+<P>To generate <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A> topics, the command is:</P>
+<PRE>
+     sdf -2topics abc
+</PRE>
+<P><A NAME="sdf_n">By default, this will create sub-topics for each heading already in a separate file. It will also <EM>autosplit</EM> level 1 headings into sub-topics. The -n option can be used to control which level headings are split at:</A></P>
+<UL>
+<LI>1 autosplits on level 1 headings (the default)
+<LI>2 autosplits on level 2 headings
+<LI>3 autosplits on level 3 headings
+<LI>0 disables autosplitting.</UL>
+<P><A NAME="sdf_I">Include files are searched for in the current directory, then in the directories given by the -I option, then in the default library directory.</A></P>
+<P>By default, <A HREF="../ref/sdf.html">sdf</A> is configured to <EM>prefilter</EM> files with certain extensions. For example:</P>
+<PRE>
+ sdf mytable.tbl
+</PRE>
+<P>is equivalent to executing <A HREF="../ref/sdf.html">sdf</A> on a file which only contains:</P>
+<PRE>
+ !include &quot;mytable.pl&quot;; table
+</PRE>
+<P><A NAME="sdf_p">The -p option can be used to explicitly prefilter files or to override the default prefilter used. The -a option can be used to specify prefilter parameters. For example:</A></P>
+<PRE><A NAME="sdf_a">
+ sdf -aformat='15,75,10' mytable.tbl
+</A></PRE>
+<P><A NAME="sdf_P">The -P option prefilters the input files as programming languages. The parameter is the language to use. If none is provided, the extension is assumed to be the language name. For example:</A></P>
+<PRE>
+ sdf -P myapp.c
+</PRE>
+<P>is equivalent to executing <A HREF="../ref/sdf.html">sdf</A> on a file which only contains:</P>
+<PRE>
+ !include &quot;myapp.c&quot;; example; wide; lang='c'
+</PRE>
+<P><A NAME="sdf_N">The -N option adds line numbers at the frequency given. The default fequency is 1. i.e. every line.</A></P>
+<P><A NAME="sdf_r">The -r option pre-filters each input by running the nominated report. Reports are stored in <EM>sdr</EM> files and are searched for using the usual rules.</A></P>
+<P><A NAME="sdf_L">The -L option can be used to specify a <EM>locale</EM>. The default locale name is specified in <TT>sdf.ini</TT>. Locale naming follows POSIX conventions (i.e. language_country), so the locale name for American english is <EM>en_us</EM>. The information for each locale is stored in the <TT>locale</TT> directory, so you'll need to have to look in there to see what locales are available. (As the default locale can be set in <TT>sdf.ini</TT>, this isn't as ugly as it first sounds.)</A></P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>At the moment, a locale file simply contains a list of language specific strings. Ultimately, it should be extended to support localisation of date and time formats.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P><A NAME="sdf_k">The -k option is used to specify a <EM>look</EM>. The default look library is specified in <TT>sdf.ini</TT>.</A></P>
+<P><A NAME="sdf_s">The -s option can be used to specify a document <EM>style</EM>. Typical values are:</A></P>
+<UL>
+<LI><EM>document</EM> - a technical document
+<LI><EM>memo</EM> - a memo
+<LI><EM>fax</EM> - a facsimile
+<LI><EM>minutes</EM> - minutes of a meeting.</UL>
+<P><A NAME="sdf_S">The -S option is used to specify the page size. Values supported include:</A></P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Width</STRONG>
+</TD>
+<TD>
+<STRONG>Height</STRONG>
+</TD>
+<TD>
+<STRONG>Comment</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+global
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+will fit on either A4 or letter
+</TD>
+</TR>
+<TR>
+<TD>
+A3
+</TD>
+<TD>
+29.7cm
+</TD>
+<TD>
+42.0cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+A4
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+29.7cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+A5
+</TD>
+<TD>
+14.8cm
+</TD>
+<TD>
+21.0cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+B4
+</TD>
+<TD>
+25.7cm
+</TD>
+<TD>
+36.4cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+B5
+</TD>
+<TD>
+17.6cm
+</TD>
+<TD>
+25.0cm
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+letter
+</TD>
+<TD>
+8.5in
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+legal
+</TD>
+<TD>
+8.5in
+</TD>
+<TD>
+14.0in
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+tabloid
+</TD>
+<TD>
+11.0in
+</TD>
+<TD>
+17.0in
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>Additional page sizes can be configured in <TT>sdf.ini</TT>. To specify a rotated version of a named page size, append an <EM>R</EM>. For example, A4R implies a width of 29.7cm and a height of 21cm. A custom page size can also be specified using the format:</P>
+<PRE>
+     {{width}}x{{height}}
+</PRE>
+<P>where <EM>width</EM> and <EM>height</EM> are the respective sizes in points.</P>
+<P><A NAME="sdf_c">The -c option is used to specify a configuration library.</A></P>
+<P><A NAME="sdf_u">A list of modules to use can be specified via the -u option.</A></P>
+<P><A NAME="sdf_H">The initial heading level to start on can be specified via the -H option. If is useful if you want to preview how a topic will be displayed without regenerating the complete document.</A></P>
+<P><A NAME="sdf_d">The -d option is used to specify the format driver. Values supported include:</A></P>
+<UL>
+<LI><EM>expand</EM> - format as expanded text (the default)
+<LI><EM>mif</EM> - Maker Interchange Format
+<LI><EM>pod</EM> - Plain Old Documentation (as used by <A HREF="http://www.perl.com/perl/index.html">Perl</A>).</UL>
+<P>Additional drivers can be configured in <TT>sdf.ini</TT>.</P>
+<P><A NAME="sdf_y">The -y option can to used to specify a post-filter.</A></P>
+<P><A NAME="sdf_z">The -z option can be used to specify a list of post-processing actions you want to execute on each output file after it is generated. The actions supported include:</A></P>
+<UL>
+<LI><EM>ps</EM> - generate PostScript
+<LI><EM>doc</EM> - generate a Frame (binary) file
+<LI><EM>fvo</EM> - generate a Frame View-Only file
+<LI><EM>txt</EM> - generate a text file
+<LI><EM>rtf</EM> - generate an RTF file
+<LI><EM>clean</EM> - delete the output file (must be last).</UL>
+<P>Additional actions can be configured in <TT>sdf.ini</TT>. By convention, the generated files are given the same names as the action keywords.</P>
+<P><A NAME="sdf_t">The -t option is used to specify the logical target format. If none is specified, the default is the first post processing action, if any. Otherwise, the default is the format driver name.</A></P>
+<P><A NAME="sdf_v">The -v option enables verbose mode. This is useful for debugging problems related to post processing. In particular, post processing actions containing the pattern <EM>clean</EM> are skipped in verbose mode. You can also switch off the post processing messages by using a verbose value of -1. Values higher than 1 switch on additional trace messages as follows:</A></P>
+<UL>
+2 - show how names of files and libraries are resolved
+<BR>
+3 - show the directories searched for libraries
+<BR>
+4 - show the directories searched for modules
+<BR>
+5 - show the directories searched for normal files.</UL>
+<P><A NAME="sdf_T">The -T option can be used to switch on debug tracing. The parameter is a comma-separated list of name-value pairs where each name is a <EM>tracing group</EM> and each value is the level of tracing for that group. To get the trace output provided by the -v option, one can use the <EM>user</EM> group like this:</A></P>
+<PRE>
+  sdf -Tuser=2 ...
+</PRE>
+<P>This is slightly different from the -v option in that intermediate files are not implicitly kept. Additional tracing groups will be added over time (probably one per output driver).</P>
+<P><A NAME="sdf_w">The -w option is used to specify the width for text-based outputs.</A></P>
+<P>The -z, -D, -f and -I options are list options. i.e. multiple values can be separated by commas and/or the options can be supplied multiple times.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>Convert <TT>mydoc.sdf</TT> to a technical document in mif format, output is <TT>mydoc.mif</TT>:</P>
+<PRE>
+ sdf -2mif mydoc.sdf
+</PRE>
+<P>Convert <TT>mydoc.sdf</TT> to online documentation in <A HREF="http://www.frame.com">FrameViewer</A> format, output is <TT>mydoc.fvo</TT>:</P>
+<PRE>
+ sdf -2fvo mydoc.sdf
+</PRE>
+<P>Convert <TT>mydoc.sdf</TT> to online documentation in HTML, output is <TT>mydoc.html</TT>:</P>
+<PRE>
+ sdf -2html mydoc.sdf
+</PRE>
+<P>The following command will build the reference documentation for a SDF module in HTML:</P>
+<PRE>
+ sdf -2html abc.sdm
+</PRE>
+<HR>
+<H2><A NAME="Limitations and future directions">Limitations and future directions</A></H2>
+<P>Many of the default post processing (-z) actions only works on <A HREF="http://www.cis.ohio-state.edu/hypertext/faq/usenet/unix-faq/faq/top.html">Unix</A> as <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> for <A HREF="http://www.microsoft.com/windows">Windows</A> does not support batch conversion.</P>
+<P>Topics mode has several limitations:</P>
+<UL>
+<LI>only documents in the current directory can be converted
+<LI>all sub-topics must also be in the current directory.</UL>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_prog.html">Parent Topic</A> | <A HREF="in_prog.html">Previous Topic</A> | <A HREF="sdfapi.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

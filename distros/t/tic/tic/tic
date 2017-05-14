@@ -1,0 +1,297 @@
+#!/usr/bin/perl 
+
+use strict;
+use IO::Select;
+use IO::Stty;
+use Term::ReadKey;
+use Net::OSCAR;
+use POSIX qw(strftime);
+
+use Tic::Constants; # Super-magical happy land!
+use Tic::Bindings;
+use Tic::Common;
+use Tic::Commands;
+use Tic::Events;
+
+ReadMode(3);
+
+mkdir($ENV{HOME}."/.tic", "0700") unless (-d $ENV{HOME} . "/.tic");
+
+my $aliases = undef;   # Aliases
+my $commands = undef;  # Commands
+my $bindings = DEFAULT_BINDINGS; 
+my $mappings = DEFAULT_MAPPINGS;
+my $config = DEFAULT_OUTPUT;
+
+my $state = undef;     # State information
+$state->{"bindings"} = $bindings;
+$state->{"mappings"} = $mappings;
+$state->{"config"} = $config;
+
+my $aim = Net::OSCAR->new();
+#$aim->timeout(1);
+$state->{"aim"} = $aim;
+
+setup_readline();
+setup_callbacks();
+setup_commands();
+setup_aim();
+#load_config();
+
+Tic::Events->set_state($state);
+Tic::Commands->set_state($state);
+Tic::Bindings->set_state($state);
+Tic::Common->set_state($state);
+
+# Autoflush stdout.
+$| = 1;
+
+login();
+
+while (1) {
+	$aim->do_one_loop();
+	check_readline();
+}
+
+sub login {
+	my ($user,$pass);
+	$user = query("login: ");
+	$pass = query("password: ", 1);
+	$state->{"signon"} = 1;
+	$aim->signon($user,$pass);
+	$state->{"sn"} = $user;
+	#$aim->newconn(Screenname => $user, Password => $pass);
+}
+
+# init functions
+
+sub setup_callbacks {
+	$aim->set_callback_admin_error(\&event_admin_error);
+	$aim->set_callback_admin_ok(\&event_admin_ok);
+	$aim->set_callback_buddy_in(\&event_buddy_in);
+	$aim->set_callback_buddy_info(\&event_buddy_info);
+	$aim->set_callback_buddy_out(\&event_buddy_out);
+	$aim->set_callback_buddylist_error(\&event_buddylist_error);
+	$aim->set_callback_buddylist_ok(\&event_buddylist_ok);
+	$aim->set_callback_chat_buddy_in(\&event_chat_buddy_in);
+	$aim->set_callback_chat_buddy_out(\&event_chat_buddy_out);
+	$aim->set_callback_chat_closed(\&event_chat_closed);
+	$aim->set_callback_chat_im_in(\&event_chat_im_in);
+	$aim->set_callback_chat_invite(\&event_chat_invite);
+	$aim->set_callback_chat_joined(\&event_chat_joined);
+	$aim->set_callback_connection_changed(\&event_connection_changed);
+	$aim->set_callback_error(\&event_error);
+	$aim->set_callback_evil(\&event_evil);
+	$aim->set_callback_im_in(\&event_im_in);
+	$aim->set_callback_im_ok(\&event_im_ok);
+	$aim->set_callback_rate_alert(\&event_rate_alert);
+	$aim->set_callback_signon_done(\&event_signon_done);
+}
+
+sub setup_readline {
+	$state->{"input"} = IO::Select->new();
+	$state->{"input"}->add(\*STDIN);
+}
+
+sub setup_aim {
+	#$aim->timeout(1);
+}
+
+sub setup_commands {
+	$commands = {
+		"alias"                   => \&command_alias,
+		"echo"                    => \&command_echo,
+		"buddylist"               => \&command_buddylist,
+		"default"                 => \&command_default,
+		"undefault"               => \&command_undefault,
+		"info"                    => \&command_info,
+		"login"                   => \&command_login,
+		"msg"                     => \&command_msg,
+		"quit"                    => \&command_quit,
+		"unalias"                 => \&command_unalias,
+		"who"                     => \&command_who,
+		"log"                     => \&command_log,
+		"timestamp"               => \&command_timestamp,
+		"sn"                      => \&command_sn,
+
+	};
+	$aliases = {
+		"a" => "/alias",
+		"m" => "/msg",
+		"i" => "/info",
+		"b" => "/buddylist",
+		"w" => "/who",
+	};
+
+	$state->{"aliases"} = $aliases;
+	$state->{"commands"} = $commands;
+}
+
+# Nonblocking readline
+sub check_readline { 
+	my $char;
+	$char = ReadKey(-1);
+	if (defined($char)) {
+		if ($char eq "\n") {
+			my $line = $state->{"input_line"};
+			real_out("\n");
+			$state->{"input_line"} = undef;
+			$state->{"input_position"} = 0;
+			command($line);
+			return;
+		}
+
+		# Returned (string, char, extrahash)
+		my ($ret, $foo, $extra) =  handle_keys($state->{"input_line"},
+								               $state->{"input_position"},
+								               $char);
+		#print STDERR "$ret / $foo / $extra\n";
+		if (defined($ret)) {
+			my $pos = $state->{"input_position"}; 
+			my $back = length($ret) - $pos;
+			if (defined($extra->{"-print"})) {
+				real_out($extra->{"-print"});
+			}
+			real_out("\r\e[2K" . $ret);
+			real_out("\e[".$back."D") if ($back > 0);
+			$state->{"input_line"} = $ret;
+		} else {
+			if (defined($extra->{"-print"})) {
+				real_out($extra->{"-print"});
+			}
+		}
+	}
+}
+
+# blocking readline
+sub readline {
+   my ($hide) = shift;
+   my ($char, $line);
+   while (1) {
+      $char = getc();
+      last if ($char eq "\n");
+      $line = handle_keys($line, length($line), $char);
+   }
+
+   return $line;
+}
+
+# Handle keys... and strife!
+sub handle_keys {
+   my ($line, $pos, $char) = @_;
+	my $extra;
+
+	if ($state->{"escape"}) {
+		$state->{"escape_string"} .= $char;
+		if ($state->{"escape_expect_ansi"}) {
+			$state->{"escape_expect_ansi"} = 0 if ($char =~ m/[a-zA-Z]/);
+		}
+		$state->{"escape_expect_ansi"} = 1 if ($char eq '[');
+		$state->{"escape"} = 0 unless ($state->{"escape_expect_ansi"});
+
+		unless ($state->{"escape_expect_ansi"}) {
+			my $estring = $state->{"escape_string"};
+
+			$state->{"escape_string"} = undef;
+			my (@foo) = execute_binding("\e".$estring);
+			#print STDERR "Escape ret: " . scalar(@foo) . "\n";
+			return @foo;
+		}
+		return undef;
+	}
+
+   if ($char eq "\e") {                   # Escape
+		$state->{"escape"} = 1;
+		$state->{"escape_string"} = undef;
+
+		# Return undef becuase we don't know what to do yet.
+		return undef; 
+	} 
+
+	if (ord($char) <= 26) {                # Control characters
+		($line, $char, $extra) = execute_binding($char);
+	}
+
+
+	if ((defined($char)) && (ord($char) >= 32)) {
+		$line = substr($line,0,$state->{"input_position"}) . $char . 
+			     substr($line,$state->{"input_position"});
+		$state->{"input_position"}++;
+		#print STDERR "Position: " . $state->{"input_position"} . "\n";
+	}
+
+   return ($line, $char, $extra);
+}
+
+sub command {
+	my ($cmd,$args) = split(/\s+/, $_[0], 2);
+
+   if ($cmd =~ s!^/!!) {
+		#out("<$cmd>");
+		if (defined($commands->{$cmd})) { 
+			&{$commands->{$cmd}}($state, $args);
+		} elsif (defined($aliases->{$cmd})) {
+			$state->{"recursion_check"}++;
+			if ($state->{"recursion_check"} > 10) {
+				out("Too much recursion in this alias. Aborting execution");
+				return;
+			}
+			($cmd, $args) = $aliases->{$cmd} . " " . $args;
+			command($cmd,$args);
+			$state->{"recursion_check"}--;
+		} else {
+			out("Unknown command, \"$cmd\"");
+		}
+	} elsif ($cmd !~ m/^$/) {
+	   if ($_[0] =~ s/^;(.)/$1/) {
+			if (($state->{"last_from"}) && ($_[0] =~ m/./)) {
+				command_msg($state,$state->{"last_from"}, $_[0]);
+				#$aim->send_im($state->{"last_from"}, $_[0]);
+			} else {
+				error("No one has messaged you yet, how am I supposed to know who messaged you last?");
+			}
+		} else {
+			if ($state->{"default"}) {
+				#$aim->send_im($state->{"default"}, $_[0]);
+				command_msg($state,$state->{"default"}, $_[0]);
+			}
+		}
+	}
+}
+
+sub execute_binding {
+	my ($key) = shift;  # Could be a series, ESC-w
+	$key = prettify_key($key);
+	#print "Prettified key: $key\n";
+	if (defined($bindings->{$key})) {
+		#print STDERR "Key: $key\n";
+		if (ref($mappings->{$bindings->{$key}}) eq 'CODE') {
+			return &{$mappings->{$bindings->{$key}}}($state);
+		} else {
+			error("Unimplemented function, " . $bindings->{$key});
+		}
+	}
+	return ($state->{"input_line"}, undef, undef);
+}
+
+sub prettify_key {
+	my ($key) = shift;
+
+	# Return ^X for control characters like CTRL+A and such.
+	if (length($key) == 1) {     # Should only ever be control codes...
+		if (ord($key) <= 26) {    # Control codes
+			return "^" . chr(65 + ord($key) - 1);
+		}
+	}
+
+	# Return ESC-X for escape shenanigans, like ESC-w
+	if (length($key) == 2) {
+		my ($p,$k) = split("", $key);
+		if ($p eq "\e") {     # Escape character
+			return "ESC-" . $k;
+		}
+	}
+
+	# Ok, it's not ^X or ESC-X, it's gotta be some ansi funk.
+	return KEY_CONSTANTS->{$key};
+}

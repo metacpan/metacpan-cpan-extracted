@@ -1,5 +1,8 @@
 Revision history for Perl extension IPDevice.
 
+0.04  Wed Jun 25 20:40:00 2004
+	- Namespace naming fix.
+
 0.03  Wed Jun 20 20:40:00 2004
 	- Huge update, practically all classes have been
 	  massively extended.

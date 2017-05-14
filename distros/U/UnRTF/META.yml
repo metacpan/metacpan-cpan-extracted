@@ -1,0 +1,21 @@
+---
+abstract: 'A Perl wrapper around unrtf tool'
+author:
+  - 'Joenio Costa <joenio@colivre.coop.br>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UnRTF
+requires:
+  Modern::Perl: 0
+  Moose: 0
+  Test::Class: 0
+  base: 0
+version: 0.001

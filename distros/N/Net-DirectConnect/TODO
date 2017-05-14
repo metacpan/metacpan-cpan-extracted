@@ -1,5 +1,6 @@
-# $Id: TODO 779 2011-05-20 19:58:56Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/TODO $
+# $Id: TODO 904 2011-10-17 18:10:43Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/TODO $
 
+debian: libio-socket-inet6-perl libio-socket-ssl-perl 
 
 dont add to share downloaded filelists
 
@@ -62,3 +63,16 @@ adjustable: delete user from hash when quit
 dont get shared
 
 dcstat: json, xml output, json input
+
+
+STA  2 20 Reconnecting too fast, you have to wait 20 seconds before reconnecting. =[Generic login/access error]
+
+STA  2 22 [CZ] Uzivatel s vasim nickem je jiz na hubu, zkuste se pripojit pozdeji. Muzete tez navstivit hub dchub://a-new-star.cz:411 /// [EN] Nickname is already in use. Try to connect later or visit dchub://a-new-star.cz:411 =[Nick taken]
+ISTA 243 У\sвас\sдолжно\sбыть\sрасшарено\sне\sменее\s1\sгигабайта\sинформации.\sСкопируйте\sв\sинтернет\sбраузер\sссылку\shttp://wiki.san.ru/w/index.php?oldid=1665\sи\sознакомm?
+
+<Модератор> Минимальный интервал между поисковыми запросами:45сек., попробуйте чуть позже.
+
+
+<ЗВЁЗДНЫЙ> Пожалуйста не используйте поиск так часто!
+<Модератор> Минимальный интервал между поисковыми запросами:45сек., попробуйте чуть позже.
+<Страж> Bad nickname: Wait 48sec before reconnecting!! 49.00123

@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+#Copyright (c) 2010 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+use Carp;
+
+use 5.010;
+use Getopt::Long;
+use Pod::Usage;
+use List::MoreUtils qw/any/;
+use Bio::Gonzales::Util::Text qw/ccount/;
+use Bio::Gonzales::Seq::IO qw/faiterate faspew/;
+use Bio::Perl;
+my (
+    $is_revcom_seq, $help,      $length,  @id,       $desc,        $seq,
+    $only_id,       $only_head, $verbose, $only_len, $is_inverted, $count,
+    $only_char
+);
+
+my $shift_id = 0;
+GetOptions(
+    "only_headers|oh" => \$only_head,
+    "filter_length=s" => \$length,
+    "filter_id=s"     => \@id,
+    "filter_seq=s"    => \$seq,
+    "filter_desc=s"   => \$desc,
+    "list_ids|i"      => \$only_id,
+    "list_length|l"   => \$only_len,
+    "list_char|c"     => \$only_char,
+    "help|h|?"        => \$help,
+    "shift_id=i"      => \$shift_id,
+    "verbose|v"       => \$verbose,
+    "revcom"          => \$is_revcom_seq,
+    "invert"          => \$is_inverted,
+    "num_ids|n"       => \$count,
+) or pod2usage( -verbose => 2 );
+
+pod2usage( -verbose => 2, -noperldoc => 1 ) if $help;
+
+my @files = @ARGV;
+
+push @files, \*STDIN
+    unless (@files);
+
+for my $file (@files) {
+    my $seqin;
+    if ( $file && -f $file ) {
+        say STDERR "Using file $file";
+    } elsif ( ref $file ) {
+        say STDERR "Using STDIN";
+    } else {
+        confess "file does not exist: $file";
+    }
+
+    $seqin = faiterate($file);
+
+    my $seqout = \*STDOUT;
+
+    if ( $seq && $is_revcom_seq ) {
+        print STDERR $seq;
+        $seq = reverse_complement_as_string($seq);
+        say STDERR " -> $seq";
+    }
+
+    @id = map {qr/$_/} @id;
+
+    my $number_of_seqs = 0;
+    while ( my $so = $seqin->() ) {
+        if (
+            ( !$length || eval( $so->length . $length ) )
+            && (
+                   ( @id && any { $so->id =~ /$_/ } @id )
+                || ( $seq  && $so->seq  =~ /$seq/ )
+                || ( $desc && $so->desc =~ /$desc/ )
+
+            )
+            || ( !( @id || $seq || $desc ) && ( $count || $only_id || $only_head || $only_len || $only_char ) )
+            )
+        {
+            say STDERR $so->id . " matches."
+                if ($verbose);
+
+            if ($shift_id) {
+                my $desc;
+                my $id;
+                for ( my $i = 0; $i < $shift_id && $so->desc =~ /(\S+)\s+/g; $i++ ) {
+                    $id   = $1;
+                    $desc = $';
+                }
+                $so->id($id);
+                $so->desc($desc);
+            }
+
+            if ($only_id) {
+                say $so->id;
+            } elsif ($only_head) {
+                say $so->id . " " . $so->desc;
+            } elsif ($only_len) {
+                say $so->length . "\t" . $so->id;
+            } elsif($only_char) {
+                my $char_count = ccount($so->seq);
+                say $so->id . ": " . join(", ", (map { $_ . " => " . $char_count->{$_} } sort keys %$char_count), "sum: " . $so->length);
+            } elsif ($count) {
+                $number_of_seqs++;
+            } else {
+                faspew( $seqout, $so );
+            }
+        }
+    }
+
+    say STDERR $number_of_seqs if ($count);
+}
+
+__END__
+
+=head1 NAME
+
+fasta-grep - grep fasta files
+
+=head1 SYNOPSIS
+
+    ./fasta-grep [OPTIONS] [--help] <fasta-file>
+
+=head1 DESCRIPTION
+
+find regex in id-header or sequence or specifiy a length condition to select
+matching fasta sequences. All options, except length, are joined by "or".
+
+To modify the regex to be case insensitive put C<(?i)> in front of it (see
+also C<man perlre>)
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--only_headers|--oh>
+
+Print only fasta headers.
+
+=item B<< --filter_length <len> >>
+
+With len '>=', '<=', '>', '==', ...
+
+=item B<< --filter_id <id_regex> >>
+
+=item B<< --filter_seq <seq_regex> >>
+
+=item B<< --filter_desc <desc_regex> >>
+
+=item B<< --list_ids | -i >>
+
+Extract the ids of the fasta file
+
+=item B<< --list_length | -l >>
+
+Print length and id of every seq
+
+=item B<< --list_char | -c >>
+
+Show character distributions for every sequence
+
+=item B<--verbose | -v>
+
+Print matching ids to STDERR
+
+=item B<< --shift_id <N> >>
+
+Removes [ID_1] - [ID_N] in fasta header where the header has the form:
+
+    >[ID_1] [ID_2] ... [ID_N] description
+
+=item B<--help>
+
+Display this msg.
+
+=back
+
+=head1 AUTHOR
+
+jw bargsten, C<< <joachim.bargsten at wur.nl> >>
+
+=cut

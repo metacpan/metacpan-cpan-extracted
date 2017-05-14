@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fcf5189ebc80b864e49ef442dcfa7206abf0fadd Changes
+SHA1 0950a6e6fb2fcac88e2e58b3b9c6922ffff64bd6 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 00b6d7d897bb55163bf02b4e15865e9870c9254c MANIFEST
+SHA1 b1905daa63150840fad037b75a6b12876c46bc2d META.json
+SHA1 447118b848aa91c3e956fb686514d80cccf673e7 META.yml
+SHA1 4baf1ee2665f9032219d5fcf804e34f0823997ea Makefile.PL
+SHA1 d5f6bf687d23544b88026bb095189d56c8d67757 README
+SHA1 9aede955ec80a36fc88a9a114e383658052a9119 cpanfile
+SHA1 787b3e13ade1168619a98e19a6c1f0da0b78c446 dist.ini
+SHA1 5ce00254e8691fcd1b722a10f684c046d1688038 examples/accounts.pl
+SHA1 361916514ad1f96fd07504ca2f7eb0a0907e9687 examples/cancel-all.pl
+SHA1 2023a568d133bbf8a5f2d416921f67e7c2060bb2 examples/ghtoken.pl
+SHA1 ce12e31274d8ff4524d58f1f4b64610349a3af29 examples/jobs.pl
+SHA1 17eefede86244ed363f6453685ed88188e9bebf6 examples/users.pl
+SHA1 0155b04b42603258524485292c81da81b84482f3 lib/Net/Async/TravisCI.pm
+SHA1 fc60b4d5351bf2ff190647f0f87d9bf7b50ee82a lib/Net/Async/TravisCI.pod
+SHA1 1a109117d89f997b0544659f2fb7456075746d86 lib/Net/Async/TravisCI/Account
+SHA1 c41b6241647a87c753f913f76f6a5e40dadf4248 lib/Net/Async/TravisCI/Account.pm
+SHA1 54cc1e6899e3779f86b550f9a40f04a4a51dbe9a lib/Net/Async/TravisCI/Annotation.pm
+SHA1 d42fbdf78d0a50c7a1a2ca4e33547ad9bd1d2dab lib/Net/Async/TravisCI/Branch.pm
+SHA1 fbadd4851c37b9b7366ffae40af8c9580649fda5 lib/Net/Async/TravisCI/Build.pm
+SHA1 e4c4821890c552aa7d777b7bb04f3e08b8dc0100 lib/Net/Async/TravisCI/Commit.pm
+SHA1 d136fb55663a75265202d1a487d5e4e3cb0e6f0e lib/Net/Async/TravisCI/Config.pm
+SHA1 7a9fbf29bb61206dcfbb42fba3b30ede560710d0 lib/Net/Async/TravisCI/Job.pm
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 5f77fa266d9362e2d34650776dc9cf16b461dd1e t/00-compile.t
+SHA1 82f2803eb4d55554f3f0bf8bc0b3288b05af4ac6 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJZFI1XAAoJEG2WkcbynxAlcW8QAML7OyXM3gfrWVT769jFuIwI
+jpPXCwBU8r2aC1ivRaVqMSbru5LSCE01GZ38x9E27NQdfbUiLThyNPsoX0AVE5xC
+GPOjJspu82MrG5SkOI/iRQStW3VFrFlm9IF4dQ1qPD7012I8m4mcyFLlrS1Kfmcz
+vStgzPEAgZXT1JLSh2+lzEDz7FP8nfgXQ9TpSGWd+O36oY5fFVikzU4yo3B/O+VK
+MPN2D8cqH1sPFfzXrQ3iG7UULCJ644Eicm89TubRU651AsZ71hADiZSs7lcTsgPN
+OkuEUdn18/yrtnIoA3bCqtubf8axvvskTNZqdNcz8ualYD2w4sW1dpiEO/Jb+RBO
+IpfIUdq+MMbdD16KaJLjoylJKoFWp+/Itm+ugPZ3SgxLj/xb/BfMqhwwxP01ZwRF
+zubjmGrK1KvFP4DvXjWKSIjcHz4kr+bwvVUgKKtFJhBpJXoOtQrI0Z6TjPlwGVwi
+zDKhKerajQ2QSQAEVyUIVweChkcrdZnb+63u8xu4s/Q2G7OJJt97mCpygr/QMQOR
+0YQYJIoKrznwe4Deu08mrb34EcPYKYsuoY9Q7sku8LRQg/kY6Upog0ty1ry9/DlG
+BUkzF63qYgA/4ntBPUUS4boJQgZReN3aj3twAaVsoUAhVkr+kim2P2Earpw9MO5L
+thiNfRsClV+/aB0FgVny
+=A+Fy
+-----END PGP SIGNATURE-----

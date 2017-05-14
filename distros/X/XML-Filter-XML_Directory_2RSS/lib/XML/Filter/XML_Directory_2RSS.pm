@@ -70,7 +70,11 @@ SAX2 filter for generating RSS from the output of XML::Directory::SAX.
 
 =item *
 
-This package has very limited support for RSS modules. I'm workin' on it.
+The channel items node is returned in alphabetical order. Hopefully, this will be a configurable option shortly.
+
+=item *
+
+Until I can get some sort of definitive answer about whether or not the I<thr:children> element can be nested, there isn't much point in setting the XML::Directory I<depth> option to anything greater than '1'. If you do, it will be honoured by XML::Directory but ignored by the filter.
 
 =back
 
@@ -84,7 +88,7 @@ use XML::Filter::XML_Directory_2RSS::Items;
 
 use Carp;
 
-$XML::Filter::XML_Directory_2RSS::VERSION = '0.9.1';
+$XML::Filter::XML_Directory_2RSS::VERSION = '0.9.02';
 
 =head1 OBJECT METHODS
 
@@ -485,10 +489,78 @@ sub start_element {
   $self->on_enter_start_element($data) || return;
 
   if ($data->{Name} =~ /^(file|directory)$/) {
-    $self->start_item($data);
-  }
 
-  return 1;
+    $self->{'__dlevel'} ++;
+
+    if (! $self->{'__dlevel'}) {
+      return 1;
+    }
+
+    elsif ($self->{'__dlevel'} == 1) {
+
+      $self->SUPER::start_element({Name       => "item",
+				   Attributes => $self->rdf_about($self->make_link($data))});
+
+      # title element
+
+      $self->SUPER::start_element({Name=>"title"});
+
+      if ($self->{'__handlers'}{'title'}) {
+	$self->{'__handlers'}{'description'}->parse_uri($self->build_uri());
+      }
+      
+      elsif ($self->{'__callbacks'}{'title'}) {
+	$self->SUPER::characters({Data=>&{$self->{'__callbacks'}{'title'}}($self->build_uri(),$data->{Attributes}->{'{}name'}->{Value})});
+      }
+      
+      else {
+	$self->SUPER::characters({Data=>$data->{Attributes}->{'{}name'}->{Value}});
+      }
+
+      $self->SUPER::end_element({Name=>"title"});
+
+      # link element
+
+      $self->SUPER::start_element({Name=>"link"});
+      $self->SUPER::characters({Data=>$self->make_link($data)});
+      $self->SUPER::end_element({Name=>"link"});
+
+      # description element
+
+      $self->SUPER::start_element({Name=>"description"});
+
+      if ($self->{'__handlers'}{'description'}) {
+	$self->{'__handlers'}{'description'}->parse_uri($self->build_uri());
+      }
+      
+      elsif ($self->{'__callbacks'}{'description'}) {
+	$self->SUPER::characters({Data=>&{$self->{'__callbacks'}{'description'}}($self->build_uri())});
+      }
+
+      else { }
+
+      $self->SUPER::end_element({Name=>"description"});
+
+      # thr:children elements
+
+      if ($data->{Name} eq "directory") {
+	$self->SUPER::start_element({Name=>"thr:children"});
+	$self->SUPER::start_element({Name=>"rdf:Seq"});
+      }
+
+    }
+
+    elsif ($self->{'__dlevel'} == 2) {
+      $self->SUPER::start_element({Name       => "rdf:li",
+				   Attributes => $self->rdf_resource($self->make_link($data))});
+      $self->SUPER::end_element({Name=>"rdf:li"});
+    }
+
+    else {
+      carp "Depth of directory listing exceeds limit. Skipping ".$self->build_uri($data)."\n";
+    }
+  }
+  
 }
 
 sub end_element {
@@ -496,21 +568,32 @@ sub end_element {
   my $data = shift;
 
   $self->on_enter_end_element($data);
-  
+
   if ($data->{Name} eq "head") {
     $self->add_meta_data();
   }
 
-  if (($self->{'__start'}) && 
-      ($self->{'__rlevel'} > $self->{'__start'}) && 
-      (! $self->{'__skip'})) {
-    
+  if (($self->{'__start'}) && (! $self->{'__skip'})) {
     if ($data->{Name} =~ /^(file|directory)$/) {
+
       $self->prune_cwd($data);
-      $self->end_item($data);
+      	
+      if ($self->{'__dlevel'} == 1) {
+
+	if ($data->{Name} eq "directory") {
+	  $self->SUPER::end_element({Name=>"rdf:Seq"});
+	  $self->SUPER::end_element({Name=>"thr:children"});
+	}
+	
+	$self->SUPER::end_element({Name=>"item"});
+      }
+
+      if ($self->{'__dlevel'}) {
+	$self->{'__dlevel'} --;
+      }
     }
   }
-  
+
   $self->on_exit_end_element($data);
 }
 
@@ -519,84 +602,6 @@ sub characters {
   my $data = shift;
 
   $self->on_characters($data);
-}
-
-sub start_item {
-  my $self = shift;
-  my $data = shift;
-
-  # am i a child?
-
-  if (($self->{'__wasa'} eq "directory") && 
-      ($self->{'__ima_level'} > $self->{'__wasa_level'})) {
- 
-    $self->SUPER::start_element({Name=>"thr:children"});
-    $self->SUPER::start_element({Name=>"rdf:Seq"});
-    $self->{'__children'}->{($self->{'__wasa_level'})} = 1;
-  }
-
-  $self->SUPER::start_element({Name       => "item",
-			       Attributes => $self->rdf_about($self->make_link($data))});
-
-  # title element
-  
-  $self->SUPER::start_element({Name=>"title"});
-  
-  if ($self->{'__handlers'}{'title'}) {
-    $self->{'__handlers'}{'description'}->parse_uri($self->build_uri());
-  }
-  
-  elsif ($self->{'__callbacks'}{'title'}) {
-    $self->SUPER::characters({Data=>&{$self->{'__callbacks'}{'title'}}($self->build_uri(),$data->{Attributes}->{'{}name'}->{Value})});
-  }
-  
-  else {
-    $self->SUPER::characters({Data=>$data->{Attributes}->{'{}name'}->{Value}});
-  }
-  
-  $self->SUPER::end_element({Name=>"title"});
-  
-  # link element
-  
-  $self->SUPER::start_element({Name=>"link"});
-  $self->SUPER::characters({Data=>$self->make_link($data)});
-  $self->SUPER::end_element({Name=>"link"});
-  
-  # description element
-  
-  $self->SUPER::start_element({Name=>"description"});
-  
-  if ($self->{'__handlers'}{'description'}) {
-    $self->{'__handlers'}{'description'}->parse_uri($self->build_uri());
-  }
-  
-  elsif ($self->{'__callbacks'}{'description'}) {
-    $self->SUPER::characters({Data=>&{$self->{'__callbacks'}{'description'}}($self->build_uri())});
-  }
-  
-  else { }
-  
-  $self->SUPER::end_element({Name=>"description"});
-  
-  return 1;
-}
-
-sub end_item {
-  my $self = shift;
-  my $data = shift;
-
-  # do i have children?
-
-  if (($data->{Name} eq "directory") && 
-      ($self->{'__children'}{$self->{'__rlevel'}})) {
-
-    $self->SUPER::end_element({Name=>"rdf:Seq"});
-    $self->SUPER::end_element({Name=>"thr:children"});
-    delete $self->{'__children'}{$self->{'__rlevel'}};
-  }
-
-  $self->SUPER::end_element({Name=>"item"});
-  return 1;
 }
 
 sub add_meta_data {
@@ -612,20 +617,19 @@ sub add_meta_data {
     $self->SUPER::characters({Data=>$self->{'__channel'}{$_}});
     $self->SUPER::end_element({Name=>$_});
   }
-
-  # Generator data for the nice people at Syndic8
-
+ 
   if ($self->{'__generator'}) {
     
     $self->SUPER::start_prefix_mapping({Prefix=>"admin",NamespaceURI=>$self->ns_map("admin")});
+
     $self->SUPER::start_element({Name       => "admin:generatorAgent",
 				 Attributes => $self->rdf_resource($self->{'__generator'})});
     $self->SUPER::end_element({Name=> "admin:generatorAgent"});
+
     $self->SUPER::end_prefix_mapping({Prefix=>"admin"});
   }
 
   # Some basic Dublin Core elements
-  # More to come...
 
   foreach my $el ("rights","publisher","creator") {
     next if (! defined($self->{'__channel'}{$_}));
@@ -701,7 +705,7 @@ sub add_channel_items {
 					       depth   => $self->{'__depth'},
 					       detail  => $self->{'__detail'});
   
-  $xml_directory->order_by($self->{'__orderby'});
+  $xml_directory->order_by("a");
   $xml_directory->parse_dir($self->{'__path'});
 
   $self->SUPER::end_element({Name=>"rdf:Seq"});
@@ -758,11 +762,11 @@ sub add_textinput {
 
 =head1 VERSION
 
-0.9.1
+0.9.02
 
 =head1 DATE
 
-May 24, 2002
+May 15, 2002
 
 =head1 AUTHOR
 

@@ -1,0 +1,41 @@
+---
+name: Bio-PrimerDesigner
+version: 0.07
+author:
+  - 'Sheldon McKay <mckays@cshl.edu>; Ken Youens-Clark <kclark@cshl.edu>'
+abstract: Design PCR primers using primer3 and epcr
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+requires:
+  Class::Base: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  LWP::UserAgent: 0
+  Readonly: 0
+provides:
+  Bio::PrimerDesigner:
+    file: lib/Bio/PrimerDesigner.pm
+    version: 0.65
+  Bio::PrimerDesigner::Remote:
+    file: lib/Bio/PrimerDesigner/Remote.pm
+    version: 0.65
+  Bio::PrimerDesigner::Result:
+    file: lib/Bio/PrimerDesigner/Result.pm
+    version: 0.65
+  Bio::PrimerDesigner::Tables:
+    file: lib/Bio/PrimerDesigner/Tables.pm
+    version: 0.65
+  Bio::PrimerDesigner::epcr:
+    file: lib/Bio/PrimerDesigner/epcr.pm
+    version: 0.65
+  Bio::PrimerDesigner::ispcr:
+    file: lib/Bio/PrimerDesigner/ispcr.pm
+    version: 0.65
+  Bio::PrimerDesigner::primer3:
+    file: lib/Bio/PrimerDesigner/primer3.pm
+    version: 0.65
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

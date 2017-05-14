@@ -1,0 +1,10 @@
+Revision history for perl module Attach::Stuff
+
+
+0.93200645424259 2015-03-16
+
+- Add stroke_width parameter
+
+0.652389025389315 2015-03-05
+
+- Initial release

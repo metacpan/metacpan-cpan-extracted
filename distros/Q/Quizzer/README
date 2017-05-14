@@ -1,0 +1,79 @@
+What is quizzer?
+----------------
+
+Quizzer is a system for computer aided exercise presentation to students.
+It is based on Joey Hess's great Debconf package that has very good 
+template management.
+
+What is a quiz?
+---------------
+
+A quiz is a file containing a set of questions that the user has to answer.
+Questions are represented by structured templates. A quiz file can contain
+virtually any number of question. Templates must be defined with an easy
+to understand syntax.
+
+How to write exercises (quizzes)?
+---------------------------------
+
+The syntax of quizzes is very simple. This is an example quiz:
+
+---> cut here <---
+Template: quiz/domanda1
+Type: select
+Choices: ls -l, ls -w, ls
+Level: low
+Description: Quale di questi comandi mostra gli attributi estesi di un file?
+Answer: ls -l
+---> cut here <---
+
+Let's see every element in detail:
+
+1) For every quiz you have to define the Template
+attribute, that is the template category and name:
+
+Template: quiz/domanda1
+
+All question must have a template category of "quiz" and a template name of
+domanda(n) where n is a progressive number.
+
+* IMPORTANT: "quiz" and "domanda(n)" are values HARDCODED in the program, 
+so, unless you modify the program, you have to use those words for the 
+template name.
+
+2) You have to define the type of the question:
+
+Type: select
+
+that is what kind of alternatives you offer to the people who will try the 
+quiz. Valid alternatives can be: String, select, multiselect, boolean ...
+
+3) If there are multiple alternatives you can list them in a choices field
+separated by commas:
+
+Choices: ls -l, ls -w, ls
+
+4) The level field identifies the difficulty of the question. It can be
+low, medium, high and critical. 
+
+Level: low
+
+5) The description field is the question itself:
+
+Description: Quale di questi comandi mostra gli attributi estesi di un file?
+
+6) The answer field is the correct answer:
+
+Answer: ls -l
+
+Multilingual features
+---------------------
+
+Quizzes can be defined in a multilingual fashion by appending the language
+suffix to the "description" attribute of the template. Es.
+
+Description: Quale di questi comandi mostra gli attributi estesi di un file?
+Description-de: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+If a description-(lang) is missing for some question, Quizzer will use the 
+standard "description" value.

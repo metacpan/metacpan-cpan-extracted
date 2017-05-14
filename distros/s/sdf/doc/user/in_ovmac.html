@@ -1,0 +1,110 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Macros</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovphr.html">Previous Topic</A> | <A HREF="in_ovvar.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>2.4. Macros</H1>
+<HR>
+<H2><A NAME="Introduction">2.4.1. Introduction</A></H2>
+<P>A <EM>macro</EM> is a command which can be embedded within <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A>. Macros begin with an exclamation mark (!) as the first non-whitespace character on a line. Some examples are:</P>
+<PRE>
+  !use &quot;delphi&quot;
+  !define DOC_AUTHOR &quot;Joe Bloggs&quot;
+  !build_title
+</PRE>
+<HR>
+<H2><A NAME="Commonly used macros">2.4.2. Commonly used macros</A></H2>
+<P>Some commonly used macros are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Macro</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+init <EM>variables</EM>
+</TD>
+<TD>
+initialise variables
+</TD>
+</TR>
+<TR>
+<TD>
+define <EM>variable</EM> [<EM>expression</EM>]
+</TD>
+<TD>
+set a variable's value
+</TD>
+</TR>
+<TR>
+<TD>
+build_title
+</TD>
+<TD>
+build a title page
+</TD>
+</TR>
+<TR>
+<TD>
+block <EM>filter</EM>
+</TD>
+<TD>
+begin a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+endblock
+</TD>
+<TD>
+end a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+include <EM>file</EM>[; <EM>filter</EM>]
+</TD>
+<TD>
+include another file
+</TD>
+</TR>
+<TR>
+<TD>
+import <EM>file</EM>[; <EM>parameters</EM>]
+</TD>
+<TD>
+import a figure
+</TD>
+</TR>
+</TABLE>
+
+<P>A complete list of the supported macros and their parameters is given in the <A HREF="../ref/re_sdf.html">SDF Reference</A> manual.</P>
+<HR>
+<H2><A NAME="Creating new macros">2.4.3. Creating new macros</A></H2>
+<P>The easiest way to create a new macro is to use the <A HREF="../ref/mmacro.html">macro</A> and <A HREF="../ref/mendmacr.html">endmacro</A> macros. For example:</P>
+<PRE>
+!macro MY_MACRO
+This text will appear whenever the author calls !MY_MACRO.
+!endmacro
+</PRE>
+<P>Macros can also be implemented by a Perl subroutine which generates the SDF text to be inserted when the macro is called. See the <A HREF="../guru/gg_sdf.html">SDF Guru Guide</A> for further details.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovphr.html">Previous Topic</A> | <A HREF="in_ovvar.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

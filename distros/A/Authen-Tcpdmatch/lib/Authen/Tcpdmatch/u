@@ -1,0 +1,7 @@
+grammar.yp:use NetAddr::IP;
+	Lexer.pm-:use Parse::Lex;
+Lexer.pm-:use Attribute::Handlers;
+Tcpdmatch.pm:	eval "use Authen::Tcpdmatch::Tcpdmatch$algorithm" ;
+TcpdmatchRD.pm:use Attribute::Handlers;
+TcpdmatchYapp.pm-:use Parse::Lex;
+YappParser.pm-:use Parse::Yapp::Driver;

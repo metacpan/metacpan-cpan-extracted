@@ -1,0 +1,15 @@
+.# Title: read from named stream
+.# NewOpt: PipeOK 1
+Line 1
+.include -s words 5_read_5.inc
+.read -s words line
+.echo \v{line}
+.read -s words line
+.echo \v{line}
+.close -s words
+.#
+.include -s echo | echo The man in the moon
+.read -s echo line
+.echo \v{line}
+.close -s echo
+EOF

@@ -1,0 +1,14 @@
+# $Id: TODO,v 1.1.1.1 2001/07/26 18:33:27 petef Exp $
+
+* Better comments maybe?
+
+* Try to use EXPN and/or VRFY
+
+* Check characters in email address for RFC compliance
+
+* Make an object that would be used to verify the email address, and have
+  PrintError and other methods
+
+* Fix PREREQ_PM in Makefile.PL to actually point to the version numbers 
+  required (I didn't have time to look through the respective ChangeLogs)
+

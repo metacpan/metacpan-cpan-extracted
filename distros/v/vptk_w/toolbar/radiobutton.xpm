@@ -1,0 +1,32 @@
+/* XPM */
+static char *radiobutton[] = {
+/* width height ncolors chars_per_pixel */
+"19 21 4 1",
+/* colors */
+". c #FCFEFC",
+"  s None c None",
+"X c #848284",
+"o c #040204",
+/* pixels */
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"       XXXX        ",
+"     XXooooXX      ",
+"    Xoo....oo.     ",
+"    Xo...... .     ",
+"   Xo...oo... .    ",
+"   Xo..oooo.. .    ",
+"   Xo..oooo.. .    ",
+"   Xo...oo... .    ",
+"    Xo...... .     ",
+"    X  ....  .     ",
+"     ..    ..      ",
+"       ....        ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   "
+};

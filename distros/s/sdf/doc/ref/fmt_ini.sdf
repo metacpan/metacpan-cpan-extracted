@@ -1,0 +1,40 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: INI Format
+
+H2: Purpose
+
+INI files are used to store simple configuration information for scripts.
+
+H2: Description
+
+An INI file contains of a series of sections. Each section begins
+with a header enclosed in '[' and ']'. Comment lines begin with
+';' or '#' as the first non-whitespace character. Blank lines before
+a section or at the end of a section are ignored.
+
+H2: Examples
+
+A sample file is:
+
+!block example
+[Drivers]
+Format  Library     Subroutine  Book
+mif     sdf2mif.pl  MifFormat   MifBook
+raw     sdf2raw.pl  RawFormat
+
+[PostProcessing]
+ps     = &SdfBatch("-pfile")
+doc    = &SdfBatch("-sdoc -Sd")
+!endblock

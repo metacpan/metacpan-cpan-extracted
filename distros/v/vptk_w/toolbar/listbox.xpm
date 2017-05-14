@@ -1,0 +1,25 @@
+/* XPM */
+static char * listbox_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"20 14 5 1",
+/* colors */
+"  s None c None",
+". c #040204",
+"X c #C4C2C4",
+"o c #FCFEFC",
+"O c #848284",
+/* pixels */
+"                    ",
+"                    ",
+"  ................  ",
+"  .XXXXXXXX.XXXXX.  ",
+"  .XXXXXXXX.Xo.oO.  ",
+"  .X....XXX.X...O.  ",
+"  .XXXXXXXX.OOOOO.  ",
+"  .X......X.......  ",
+"  .XXXXXXXX.XXXXX.  ",
+"  .X.....XX.X...O.  ",
+"  .XXXXXXXX.Xo.oO.  ",
+"  .XXXXXXXX.OOOOO.  ",
+"  ................  ",
+"                    "};

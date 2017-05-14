@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use strict;
+
+=head1 NAME
+
+hopjobd - hopkins job daemon
+
+=head1 DESCRIPTION
+
+=cut
+
+use Getopt::Compact;
+
+use Hopkins;
+
+# use Getopt::Compact to process any command-line options.
+# we use Getopt::Compact instead of Getopt::Long simply for
+# the nifty built-in help option that displays usage info.
+
+my $go = new Getopt::Compact name => 'gsjobd', struct => [
+	[ [ 'c', 'conf' ],		'XML config file',							'=s' ],
+	[ [ 'l', 'l4pconf' ],	'log4perl config file',						'=s' ],
+	[ [ 's', 'scan' ],		'config file scan interval (in seconds)',	'=i' ],
+	[ [ 'p', 'poll' ],		'queue poll interval (in seconds)',			'=i' ]
+];
+
+my $global	= $go->opts;
+my $file	= delete $global->{conf};
+
+# defaults
+$global->{l4pconf}	||= '/etc/hopkins/log4perl.conf';
+$global->{scan}		||= 30;
+$global->{poll}		||= 30;
+$global->{conf}		= [ XML => { file => $file || '/etc/hopkins/hopkins.xml' } ];
+
+my $hopkins = new Hopkins $global;
+
+$hopkins->run;
+

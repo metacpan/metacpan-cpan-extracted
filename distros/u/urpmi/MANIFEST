@@ -1,6 +1,7 @@
 gurpmi
 gurpmi.desktop.in
 gurpmi.pm
+gurpm/RPMProgressDialog.pm
 gurpmi2
 inst.list
 Makefile.PL
@@ -89,11 +90,13 @@ pod/8/urpmi.pod
 pod/8/urpmi.addmedia.pod
 pod/5/urpmi.cfg.pod
 pod/5/urpmi.files.pod
-pod/8/urpmi.recover.pod
 pod/8/urpmi.removemedia.pod
 pod/8/urpmi.update.pod
 pod/8/urpmihowto.pod
 pod/8/urpmq.pod
+polkit/org.mageia.urpmi.update.policy.in
+polkit/org.mageia.gurpmi2.policy.in
+polkit/Makefile
 rpm-find-leaves
 rurpme
 rurpmi
@@ -482,7 +485,6 @@ urpmf
 urpmi
 urpmi.addmedia
 urpmi.bash-completion
-urpmi.recover
 urpmi.removemedia
 urpmi.schema
 urpmi.update

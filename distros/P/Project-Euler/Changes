@@ -1,39 +1,5 @@
 Revision history for Project-Euler
 
-
-0.20        08/26/2010 12:32:23 AM (CDT)
-    *   Move to Dist::Zilla
-    *   Massive cleanup of documentation
-    *   Removed Lib/MultipleCheck
-    *   Added Lib/Utils to hold common utility functions
-    *   Added / fixed many of the tests
-    *   Removed tests duplicated by Dist::Zilla
-
-
-0.1.6
-    *   Don't index the scripts directory
-    *   Have name_test also validate perldoc statement is correct
-
-  # Lib::Types (0.1.2)
-    *   Cleaned up POD
-
-  # Problem::Base (0.2.3)
-    *   Added 'more_info' attribute
-            Used if a problem wants to give some additional information
-            about a solved problem
-    *   Cleaned up POD
-
-  # Problem::P002 (0.1.3)
-    *   Set more_info to the list of fib numbers used in the sum
-
-  # Problem::P003 (0.1.1)
-    *   Set more_info to the list of prime factors for the number
-
-  # Problem::P004 (0.1.0)
-    *   Created problem 4 which finds the highest palindrome created by the
-            product of 2 x-digit numbers
-
-
 0.1.5  12/12/2009 06:49:29 PM (CST)
     *   Completely re-ordered tests using sub-directories for logical seperation
     *   Moved maintainer tests to xt/release

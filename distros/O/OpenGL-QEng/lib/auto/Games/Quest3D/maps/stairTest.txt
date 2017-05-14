@@ -1,0 +1,30 @@
+map 0 0 0 xsize=>32, zsize=>32, start=>[2,2,90];
+in_last;
+
+level 0 0 90, xsize=>32, zsize=>32, y=>0;
+level 0 0 90, xsize=>32, zsize=>32, texture=>'sand', y=>8;
+
+wall 32 24 270;
+wall 0 24 270;
+wall 0 16 270;
+wall 32 8 270;
+wall 0 8 270;
+wall 32 0 270;
+wall 0 0 270;
+wall 24 32 0;
+wall 24 0 0;
+wall 16 32 0;
+wall 16 0 0;
+wall 8 32 0;
+wall 8 0 0;
+wall 0 32 0;
+wall 0 0 0;
+stair 0 24 0 type=>'up';
+detector 4 25 0 visible=>0, range=>4,
+ near_script=>"sub{ $self->send_event('slide',2,8,32) }";
+
+stair 40 16 270 type=>'down',y=>-7.9;
+detector 40 16 0 visible=>0, range=>4,
+ near_script=>"sub{ $self->send_event('slide',48,-8,18) }";
+
+done;

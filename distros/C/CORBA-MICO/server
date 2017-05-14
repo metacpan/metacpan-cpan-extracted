@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use CORBA::MICO ids => [ 'IDL:Account:1.0' => undef ];
+use CORBA::MICO ids => [ 'IDL:Bank:1.0' => undef ];
 
 my %counters = ();
 my @servers;
@@ -33,7 +33,7 @@ sub destroy {
 
 package MyCounter;
 
-@MyCounter::ISA = qw(PlainCounter POA_Account::AcctCounter);
+@MyCounter::ISA = qw(PlainCounter POA_Bank::AcctCounter);
 
 package MyServantActivator;
 
@@ -59,7 +59,7 @@ sub etherealize {
 
 package MyAccount;
 
-@MyAccount::ISA = qw(POA_Account::Account);
+@MyAccount::ISA = qw(POA_Bank::Account);
 
 use Error qw(:try);
 
@@ -74,6 +74,7 @@ sub new {
 		      nickname => 'Sneezy'
 		     };
     $self->{appearance} = [ map { [ (0..9) ] } 0..5 ];
+    $self->{something} = "";
 
     $self;
 }
@@ -107,15 +108,29 @@ sub get_pref_any {
     my ($self,$d) = @_;
 
     if ($d eq "pt_color") {
-	return new CORBA::Any (CORBA::TypeCode->new('IDL:Account/Account/Color:1.0'),
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Account/Color:1.0'),
 			       $self->{prefs}->{favorite_color});
     } elsif ($d eq "pt_lotnum") {
-	return new CORBA::Any (CORBA::TypeCode->new('IDL:Account/Account/numbers:1.0'),
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Account/numbers:1.0'),
 			       $self->{prefs}->{lottery_numbers});
     } elsif ($d eq "pt_nickname") {
 	return new CORBA::Any (CORBA::TypeCode->new('IDL:CORBA/String:1.0'),
 			       $self->{prefs}->{nickname});
     }
+}
+
+sub get_da_struct {
+    my $self = shift;
+
+    my $res = {
+      lval => 17,
+      sval => "seventeen",
+      fval => "17.03",
+      enval => "da_enum_2",
+    };
+
+    
+    return new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Account/da_struct:1.0'), $res );
 }
 
 sub deposit {
@@ -127,7 +142,7 @@ sub withdraw {
     my ($self,$amount) = @_;
 
     if ($amount > $self->{current_balance}) {
-	throw Account::Account::InsufficientFunds
+	throw Bank::Account::InsufficientFunds
 	    overdraft => $amount - $self->{current_balance};
 	
     } else {
@@ -140,7 +155,7 @@ sub balance {
 };
 
 sub counter {
-    $poa->create_reference("IDL:Account/AcctCounter:1.0");
+    $poa->create_reference("IDL:Bank/AcctCounter:1.0");
 }
 
 sub add {
@@ -172,6 +187,14 @@ sub _get_prefs {
 sub _set_prefs {
     my ($self,$p) = @_;
     $self->{prefs} = $p;
+}
+
+###
+sub set_new_get_old {
+    my ($self,$smth) = @_;
+    my $old = $self->{something};
+    $self->{something} = $$smth;
+    $$smth = $old;
 }
 
 package main;
@@ -218,7 +241,7 @@ close OUT;
 $root_poa->_get_the_POAManager->activate;
 $poa->_get_the_POAManager->activate;
 
-print "The daily maximum is: ", Account::DAILY_MAX, "\n";
+print "The daily maximum is: ", Bank::DAILY_MAX, "\n";
 
 $orb->run ();
 

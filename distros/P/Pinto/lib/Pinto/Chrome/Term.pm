@@ -11,12 +11,12 @@ use Term::ANSIColor;
 use Term::EditorEdit;
 use File::Which qw(which);
 
-use Pinto::Types qw(Io ANSIColorPalette);
-use Pinto::Util qw(user_palette itis throw is_interactive);
+use Pinto::Types qw(Io ANSIColorSet);
+use Pinto::Util qw(user_colors itis throw is_interactive);
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -24,16 +24,16 @@ extends qw( Pinto::Chrome );
 
 #-----------------------------------------------------------------------------
 
-has color => (
+has no_color => (
     is      => 'ro',
     isa     => Bool,
-    default => sub { !$ENV{PINTO_NO_COLOR} },
+    default => sub { !!$ENV{PINTO_NO_COLOR} || 0 },
 );
 
-has palette => (
+has colors => (
     is      => 'ro',
-    isa     => ANSIColorPalette,
-    default => sub { user_palette() },
+    isa     => ANSIColorSet,
+    default => sub { user_colors() },
     lazy    => 1,
 );
 
@@ -53,12 +53,6 @@ has stderr => (
     lazy    => 1,
 );
 
-has has_made_progress => (
-    is      => 'rw',
-    isa     => Bool,
-    default => 0,
-);
-
 #-----------------------------------------------------------------------------
 
 sub _build_stdout {
@@ -70,17 +64,10 @@ sub _build_stdout {
     return $stdout if not -t STDOUT;
     return $stdout if not $pager;
 
-    my @pager_options = $ENV{PINTO_PAGER_OPTIONS} ?
-        ( $ENV{PINTO_PAGER_OPTIONS} ) : ();
-
-    open my $pager_fh, q<|->, $pager, @pager_options
+    open my $pager_fh, q<|->, $pager
         or throw "Failed to open pipe to pager $pager: $!";
 
-
-    my $io = bless $pager_fh, 'IO::Handle';    # HACK!
-    $io->autoflush(1);
-
-    return $io;
+    return bless $pager_fh, 'IO::Handle';    # HACK!
 }
 
 #------------------------------------------------------------------------------
@@ -105,8 +92,6 @@ sub diag {
     my ( $self, $msg, $opts ) = @_;
 
     $opts ||= {};
-
-    return if $self->quiet;
 
     $msg = $msg->() if ref $msg eq 'CODE';
 
@@ -133,8 +118,6 @@ sub show_progress {
     $self->stderr->autoflush;    # Make sure pipes are hot
 
     print { $self->stderr } '.' or croak $!;
-
-    $self->has_made_progress(1);
 }
 
 #-----------------------------------------------------------------------------
@@ -142,7 +125,6 @@ sub show_progress {
 sub progress_done {
     my ($self) = @_;
 
-    return unless $self->has_made_progress;
     return unless $self->should_render_progress;
 
     print { $self->stderr } "\n" or croak $!;
@@ -187,7 +169,7 @@ sub colorize {
 
     return ''      if not $string;
     return $string if not defined $color_number;
-    return $string if not $self->color;
+    return $string if $self->no_color;
 
     my $color = $self->get_color($color_number);
 
@@ -201,7 +183,7 @@ sub get_color {
 
     return '' if not defined $color_number;
 
-    my $color = $self->palette->[$color_number];
+    my $color = $self->colors->[$color_number];
 
     throw "Invalid color number: $color_number" if not defined $color;
 
@@ -252,7 +234,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -260,7 +245,7 @@ Pinto::Chrome::Term - Interface for terminal-based interaction
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -268,7 +253,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

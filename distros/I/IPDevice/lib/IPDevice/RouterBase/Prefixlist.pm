@@ -3,12 +3,12 @@
 ## This file provides a class for holding informations about a prefixlist.
 ####
 
-package RouterBase::Prefixlist;
-use RouterBase::Atom;
-use RouterBase::PrefixlistEntry;
+package IPDevice::RouterBase::Prefixlist;
+use IPDevice::RouterBase::Atom;
+use IPDevice::RouterBase::PrefixlistEntry;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom);
+@ISA = qw(IPDevice::RouterBase::Atom);
 
 $VERSION = 0.01;
 
@@ -18,12 +18,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::Prefixlist
+IPDevice::RouterBase::Prefixlist
 
 =head1 SYNOPSIS
 
- use RouterBase::Prefixlist;
- my $pfxlist = new RouterBase::Prefixlist;
+ use IPDevice::RouterBase::Prefixlist;
+ my $pfxlist = new IPDevice::RouterBase::Prefixlist;
  $pfxlist->set_name('Prefixlist Name');
  $pfxlist->add_prefix('permit', '192.168.0.0/22', '20', '24');
 
@@ -113,8 +113,8 @@ Returns TRUE on success, otherwise FALSE.
 =cut
 sub add_prefix {
   my($self, $seq, $permden, $pfx, $le, $ge) = @_;
-  #print "DEBUG: RouterBase::Prefixlist::add_prefix(): $permden, $pfx\n";
-  my $pe = new RouterBase::PrefixlistEntry;
+  #print "DEBUG: IPDevice::RouterBase::Prefixlist::add_prefix(): $permden, $pfx\n";
+  my $pe = new IPDevice::RouterBase::PrefixlistEntry;
   $pe->set_toplevel($self->toplevel);
   $pe->set_parent($self->parent);
   $pe->set_sequence($seq ? $seq : ($self->{sequencenumber} + 5));
@@ -129,7 +129,7 @@ sub add_prefix {
 
 =head2 get_prefix($prefix)
 
-Returns the L<RouterBase::PrefixlistEntry|RouterBase::PrefixlistEntry> object.
+Returns the L<IPDevice::RouterBase::PrefixlistEntry|IPDevice::RouterBase::PrefixlistEntry> object.
 
 =cut
 sub get_prefix {
@@ -143,7 +143,7 @@ sub get_prefix {
 Walks through all prefixlist entries calling the function $func.
 Args passed to $func are:
 
-I<$prefix>: The L<RouterBase::PrefixlistEntry|RouterBase::PrefixlistEntry>.
+I<$prefix>: The L<IPDevice::RouterBase::PrefixlistEntry|IPDevice::RouterBase::PrefixlistEntry>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped.
@@ -153,7 +153,7 @@ sub foreach_prefix {
   my($self, $func, %data) = @_;
   for my $prefixno (keys %{$self->{prefixlist}}) {
     my $prefix = $self->{prefixlist}->{$prefixno};
-    #print "DEBUG: RouterBase::Prefixlist::foreach_prefix(): Pfx $prefixno\n";
+    #print "DEBUG: IPDevice::RouterBase::Prefixlist::foreach_prefix(): Pfx $prefixno\n";
     return FALSE if !$func->($prefix, %data);
   }
   return TRUE;

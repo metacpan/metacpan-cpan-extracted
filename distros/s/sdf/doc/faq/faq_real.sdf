@@ -1,0 +1,95 @@
+H1: SDF in the real world
+
+H2: How stable is SDF?
+
+Other than some syntax changes introduced in 2.000beta10
+to make SDF more palatable for users of Perl's POD format,
+the core SDF code hasn't changed much since early 1996.
+Within Mincom, people have been using SDF on a daily
+basis for at least 4 or 5 years now.
+
+
+H2: How many people are using SDF?
+
+At the moment (February 98), my guess is that SDF has 50-100
+users within [[Mincom]] and a few hundred within other organisations.
+Excluding Mincom, SDF has active users within a large number of countries
+including Australia, Belgium, Canada, Denmark, England, Germany, France, Italy,
+New Zealand, Norway, Russia and the USA.
+
+
+H2: What is SDF being used for?
+
+Within [[Mincom]], SDF is used for a large number of purposes including:
+
+* The user documentation for Mincom's flagship product, MIMS Open Enterprise.
+  This is a large documentation suite containing over 11,000
+  A4 pages and over 10,000 HTML topics with over 144,000
+  hypertext jumps. All of the hypertext is automatically
+  generated, greatly reducing the maintenance cost of
+  the online documentation.
+
+* All of the documents produced by the MIMS Technology Research (MTR)
+  group within the last 3 years, i.e. a few hundred documents, and
+  a Web-based project information system for all MTR projects.
+  (The MTR group is the home of SDF.)
+
+* Embedded documentation within C and C++ code.
+
+* Documentation for Delphi components developed in-house.
+
+* Documentation for Perl modules developed in-house.
+
+* The documentation for SDF itself.
+
+Outside of Mincom, SDF is also used for many things including:
+
+* The SSLeay FAQ ({{http://www.psy.uq.edu.au/~ftp/Crypto/}})
+
+* All of the documentation produced by Cryptsoft Pty Ltd
+  ({{http://www.cryptsoft.com}})
+
+* Documentation for the Ultimate editor
+  ({{http://http://www.ufs.com.au/}})
+
+* The Fulcrum Consulting Group ({{http://www.fulcrum.com.au}}) are using SDF
+  for automatically generating periodic customer reports for
+  publishing in a variety of formats, and also for internal procedures.
+
+* Lots of other interesting things I'm unable to mention
+  until I get permission to do so.
+
+Note: If you are using SDF and would like to be mentioned above,
+send me some email.
+
+SDF can also be used to convert documentation in Perl's POD
+format to any output format supported by SDF. For example,
+the HTML produced by SDF for Perl's documentation is available
+at {{http://www.mincom.com/mtr/perl/catalog.html}}.
+
+
+H2: What new developments are expected for SDF in the future?
+
+My current priorites are:
+
+^ Supporting existing SDF users (by email and bug fixes).
++ Developing the next generation of SDF called {{PRD:SimpleDoc}}.
+
+The key objectives of SimpleDoc are:
+
+* upwards compatibility with SDF
+* a new architecture which supports:
+  - multiple input parsers (SDF, XML and POD)
+  - output formatters which are decoupled from the input format
+* Perl 5 modules
+* better performance
+* support for XML output (in addition to XML input)
+* support for HTML-Help output
+* support for Java-Help output
+* better LaTeX output.
+
+As always, my time is limited, so if one or more of the above features
+interests you, let me know so I can prioritise things accordingly.
+
+Further information on SimpleDoc is available on the web. The URL is
+{{http://www.mincom.com/mtr/simpledoc/}}.

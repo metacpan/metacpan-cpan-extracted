@@ -1,0 +1,9 @@
+package Agent::Test;
+
+use vars qw( @ISA );
+@ISA = qw( Agent );
+
+sub agent_main {
+	$self = shift;
+	return $self;
+}

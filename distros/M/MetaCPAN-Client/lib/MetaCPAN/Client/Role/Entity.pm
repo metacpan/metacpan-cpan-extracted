@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Role::Entity;
 # ABSTRACT: A role for MetaCPAN entities
-$MetaCPAN::Client::Role::Entity::VERSION = '2.012000';
+$MetaCPAN::Client::Role::Entity::VERSION = '2.014000';
 use Moo::Role;
 
 use JSON::PP;
@@ -42,6 +42,12 @@ sub BUILDARGS {
     }
 
     for my $k ( @{ $known_fields->{arrayref} } ) {
+        # fix the case when we expect an array ref but get a scalar because
+        # the result array had one element and we received a scalar
+        if ( defined($args{data}{$k}) and !is_ref($args{data}{$k}) ) {
+            $args{data}{$k} = [ $args{data}{$k} ]
+        }
+
         delete $args{data}{$k}
             unless is_arrayref( $args{data}{$k} ); # warn?
     }
@@ -83,7 +89,7 @@ MetaCPAN::Client::Role::Entity - A role for MetaCPAN entities
 
 =head1 VERSION
 
-version 2.012000
+version 2.014000
 
 =head1 DESCRIPTION
 

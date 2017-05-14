@@ -1,4 +1,3 @@
-# $Id: Makefile.PL,v 1.5 2005/02/22 16:17:31 rwmj Exp $
 # -*- perl -*-
 
 # Net::FTPServer A Perl FTP Server
@@ -29,6 +28,13 @@ use ExtUtils::MakeMaker;
 #
 # NB. 'status' field is either 'required', for modules which are
 # required, or anything else for modules which are optional.
+
+# OS check
+if( $^O eq 'MSWin32' ){
+    printf STDERR "No support for OS $^O.\n";
+    #This message should be exact: http://wiki.cpantesters.org/wiki/CPANAuthorNotes
+    exit 1;
+}
 
 my %modules
   = (
@@ -70,9 +76,8 @@ my %modules
      'DBI' =>
      { status => "optional",
        message =>
-       "DBI is missing. This module is required to run the test suite,\n".
-       "and also if you want to run the FTP server against a PostgreSQL\n".
-       "database.\n"
+       "DBI is missing. if you want to run the FTP server against a\n".
+       "PostgreSQL database.\n"
      },
      'Digest::MD5' =>
      { status => "optional",
@@ -111,6 +116,7 @@ my %modules
      'Socket' => { status => "required" },
      'Sys::Hostname' => { status => "required" },
      'Sys::Syslog' => { status => "required" },
+     'Test::More' => { status => "required" },
     );
 
 $| = 1;
@@ -209,7 +215,7 @@ my @args = (
 	    dist =>
 	    {
 	     COMPRESS => 'gzip --force --best',
-	     PREOP => 'cp Net-FTPServer.spec $(DISTVNAME)',
+#	     PREOP => 'cp Net-FTPServer.spec $(DISTVNAME)',
 	    },
 
 	    clean =>
@@ -219,12 +225,12 @@ my @args = (
 
 	    realclean =>
 	    {
-	     FILES => 'Net-FTPServer.spec',
+#	     FILES => 'Net-FTPServer.spec',
 	    },
 
 	    depend =>
 	    {
-	     dist => 'Net-FTPServer.spec',
+#	     dist => 'Net-FTPServer.spec',
 	     #'Net-FTPServer.spec' => "lib/Net/FTPServer.pm",
 	     #Makefile => "lib/Net/FTPServer.pm",
 	    },
@@ -251,9 +257,48 @@ my @args = (
 	     'Sys::Hostname'	=> '0',
 	     'Sys::Syslog'	=> '0',
 	    },
-	   );
+	    BUILD_REQUIRES => {
+	      'Test::More'	=> '0',
+	    },
 
-WriteMakefile @args;
+	    LICENSE => 'gpl',
+	    MIN_PERL_VERSION => '5.005',
+	    META_MERGE => {
+	      resources => {
+	        repository => 'https://github.com/ryochin/p5-net-ftpserver',
+	      },
+	    },
+);
+
+WriteMakefile1(@args);
+
+sub WriteMakefile1 {  #Compatibility code for old versions of EU::MM. Written by Alexandr Ciornii, version 0.23. Added by eumm-upgrade.
+  my %params=@_;
+  my $eumm_version=$ExtUtils::MakeMaker::VERSION;
+  $eumm_version=eval $eumm_version;
+  die "EXTRA_META is deprecated" if exists $params{EXTRA_META};
+  die "License not specified" if not exists $params{LICENSE};
+  if ($params{AUTHOR} and ref($params{AUTHOR}) eq 'ARRAY' and $eumm_version < 6.58) {
+    $params{META_ADD}->{author}=$params{AUTHOR};
+    $params{AUTHOR}=join(', ',@{$params{AUTHOR}});
+  }
+  if ($params{BUILD_REQUIRES} and $eumm_version < 6.5503) {
+    #EUMM 6.5502 has problems with BUILD_REQUIRES
+    $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{BUILD_REQUIRES}} };
+    delete $params{BUILD_REQUIRES};
+  }
+  delete $params{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
+  delete $params{MIN_PERL_VERSION} if $eumm_version < 6.48;
+  delete $params{META_MERGE} if $eumm_version < 6.46;
+  delete $params{META_ADD} if $eumm_version < 6.46;
+  delete $params{LICENSE} if $eumm_version < 6.31;
+  delete $params{AUTHOR} if $] < 5.005;
+  delete $params{ABSTRACT_FROM} if $] < 5.005;
+  delete $params{BINARY_LOCATION} if $] < 5.005;
+
+  WriteMakefile(%params);
+}
+
 
 package MY;
 
@@ -276,7 +321,7 @@ sub libscan
 sub postamble
   {
     '
-sysconfdir	= /etc
+sysconfdir	= $(DESTDIR)/etc
 
 check-manifest:
 	@for d in `find -type d -name CVS`; \
@@ -291,13 +336,20 @@ check-manifest:
 
 install ::
 	@if [ ! "${NOCONF}" ]; then \
-          mkdir -p $(sysconfdir); \
-	  if [ ! -f $(sysconfdir)/ftpd.conf ]; then \
-	    install -c -m 0644 ftpd.conf $(sysconfdir)/ftpd.conf; \
+	  if [ -w `dirname $(sysconfdir)` ]; then \
+	    mkdir -p $(sysconfdir); \
+	    if [ -w $(sysconfdir) ]; then \
+	      if [ ! -f $(sysconfdir)/ftpd.conf ]; then \
+	        install -c -m 0644 etc/ftpd.conf $(sysconfdir)/ftpd.conf; \
+	        echo "Installing $(sysconfdir)/ftpd.conf"; \
+	      else \
+	        install -c -m 0644 etc/ftpd.conf $(sysconfdir)/ftpd.conf.dist; \
+	        echo "Old configuration file $(sysconfdir)/ftpd.conf not overwritten."; \
+	        echo "New configuration file installed as $(sysconfdir)/ftpd.conf.dist"; \
+	      fi; \
+	    fi; \
 	  else \
-	    install -c -m 0644 ftpd.conf $(sysconfdir)/ftpd.conf.new; \
-	    echo "Old configuration file $(sysconfdir)/ftpd.conf not overwritten."; \
-	    echo "New configuration file installed as $(sysconfdir)/ftpd.conf.new"; \
+	    echo "notice: ftpd.conf was not installed because you don\'t have write permission to $(sysconfdir)."; \
 	  fi; \
 	fi
 	@echo

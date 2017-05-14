@@ -1,0 +1,350 @@
+# zxid/sg/wsf-soap11.sg
+# $Id: wsf-soap11.sg,v 1.15 2010-01-08 02:10:09 sampo Exp $
+# Heavily edited, 27.5.2006, Sampo Kellomaki (sampo@iki.fi)
+# 26.2.2007, merged saml20-soap11.sg and di-soap11.sg to only
+#            one SOAP processor. --Sampo
+# 3.3.2007, added XACML support --Sampo
+# 22.11.2009, added TAS3 support --Sampo
+#
+# Mega SOAP processor for Web Services and SSO Frameworks
+#
+# Main purpose of this schema is to permit direct, one pass, parsing of
+# of SAML and WSF content in SOAP envelope. Thus relevant SOAP extension
+# points have been replaced with actual SAML and WSF elements.
+#
+# When you add new SOAP messages, you need to add them here, to the body.
+# See also zxid/c/zx-e-data.h, which is generated.
+
+target(e, http://schemas.xmlsoap.org/soap/envelope/)
+ns(xs,    http://www.w3.org/2001/XMLSchema)
+ns(a,     http://www.w3.org/2005/08/addressing)
+ns(sbf,   urn:liberty:sb)
+ns(b,     urn:liberty:sb:2006-08)
+ns(b12,   urn:liberty:sb:2003-08)
+ns(di,    urn:liberty:disco:2006-08)
+ns(di12,  urn:liberty:disco:2003-08)
+ns(lu,    urn:liberty:util:2006-08)
+ns(dap,   urn:liberty:id-sis-dap:2006-08:dst-2.1)
+ns(ps,    urn:liberty:ps:2006-08)
+ns(im,    urn:liberty:ims:2006-08)
+ns(as,    urn:liberty:sa:2006-08)
+ns(wsse,  http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd)
+ns(xasp,  urn:oasis:xacml:2.0:saml:protocol:schema:os)
+ns(xaspcd1, urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol:cd-01)
+ns(mm7,   http://www.3gpp.org/ftp/Specs/archive/23_series/23.140/schema/REL-6-MM7-1-4)
+ns(cb,    urn:liberty:id-sis-cb:2004-10)
+ns(gl,    urn:liberty:id-sis-gl:2005-07)
+ns(dp,    urn:liberty:dp:2006-12)
+ns(pmm,   urn:liberty:pmm:2006-12)
+ns(prov,  urn:liberty:prov:2006-12)
+ns(shps,  urn:liberty:shps:2006-12)
+ns(idp,   urn:liberty:idp:2006-12)
+ns(idhrxml, urn:id-sis-idhrxml:2007-06:dst-2.1)
+ns(demomed, urn:x-demo:me:2006-01)
+ns(tas3,  http://tas3.eu/tas3/200911/)
+
+Envelope -> %e:Envelope
+%Envelope:
+  e:Header?
+  e:Body
+  @id? -> %xs:ID
+  any*
+  @any?
+  ;
+
+Header -> %e:Header
+%Header:
+  paos:Request?
+  paos:Response?
+  ecp:Request?
+  ecp:Response?
+  ecp:RelayState?
+  sbf:Framework?
+  b:Sender?
+  a:MessageID?
+  wsse:Security?
+  tas3:Status?
+  a:RelatesTo?
+  a:ReplyTo?
+  a:From?
+  a:FaultTo?
+  a:To?
+  a:Action?
+  a:ReferenceParameters?
+  b:Framework?
+  b:TargetIdentity?
+  b:CredentialsContext?
+  b:EndpointUpdate?
+  b:Timeout?
+  b:ProcessingContext?
+  b:Consent?
+  b:UsageDirective?
+  b:ApplicationEPR?
+  b:UserInteraction?
+  b:RedirectRequest?
+  b12:Correlation?
+  b12:Provider?
+  b12:ProcessingContext?
+  b12:Consent?
+  b12:UsageDirective?
+  mm7:TransactionID?
+  tas3:Credentials?
+  tas3:ESLPolicies?
+  @id? -> %xs:ID
+  any*
+  @any?
+  ;
+
+Body -> %e:Body
+%Body:
+  sp:ArtifactResolve?
+  sp:ArtifactResponse?
+  sp:ManageNameIDRequest?
+  sp:ManageNameIDResponse?
+  sp:LogoutRequest?
+  sp:LogoutResponse?
+  sp:NameIDMappingRequest?
+  sp:NameIDMappingResponse?
+  sp:AttributeQuery?
+  sp:AuthnQuery?
+  sp:AuthzDecisionQuery?
+  sp:AssertionIDRequest?
+  sp:Response?
+  sp:AuthnRequest?
+  sp11:Request?
+  sp11:Response?
+  ff12:RegisterNameIdentifierRequest?
+  ff12:RegisterNameIdentifierResponse?
+  ff12:FederationTerminationNotification?
+  ff12:LogoutRequest?
+  ff12:LogoutResponse?
+  ff12:NameIdentifierMappingRequest?
+  ff12:NameIdentifierMappingResponse?
+  xasp:XACMLAuthzDecisionQuery?
+  xasp:XACMLPolicyQuery?
+  xaspcd1:XACMLAuthzDecisionQuery?
+  xaspcd1:XACMLPolicyQuery?
+  xac:Request?
+  xac:Response?
+  di:Query?
+  di:QueryResponse?
+  di12:Query?
+  di12:QueryResponse?
+  di12:Modify?
+  di12:ModifyResponse?
+  e:Fault?
+  di:SvcMDAssociationAdd?
+  di:SvcMDAssociationAddResponse?
+  di:SvcMDAssociationDelete?
+  di:SvcMDAssociationDeleteResponse?
+  di:SvcMDAssociationQuery?
+  di:SvcMDAssociationQueryResponse?
+  di:SvcMDRegister?
+  di:SvcMDRegisterResponse?
+  di:SvcMDDelete?
+  di:SvcMDDeleteResponse?
+  di:SvcMDQuery?
+  di:SvcMDQueryResponse?
+  di:SvcMDReplace?
+  di:SvcMDReplaceResponse?
+  dap:Create?
+  dap:CreateResponse?
+  dap:Query?
+  dap:QueryResponse?
+  dap:Modify?
+  dap:ModifyResponse?
+  dap:Delete?
+  dap:DeleteResponse?
+  dap:Notify?
+  dap:NotifyResponse?
+  ps:AddEntityRequest?
+  ps:AddEntityResponse?
+  ps:AddKnownEntityRequest?
+  ps:AddKnownEntityResponse?
+  ps:AddCollectionRequest?
+  ps:AddCollectionResponse?
+  ps:AddToCollectionRequest?
+  ps:AddToCollectionResponse?
+  ps:RemoveEntityRequest?
+  ps:RemoveEntityResponse?
+  ps:RemoveCollectionRequest?
+  ps:RemoveCollectionResponse?
+  ps:RemoveFromCollectionRequest?
+  ps:RemoveFromCollectionResponse?
+  ps:ListMembersRequest?
+  ps:ListMembersResponse?
+  ps:QueryObjectsRequest?
+  ps:QueryObjectsResponse?
+  ps:GetObjectInfoRequest?
+  ps:GetObjectInfoResponse?
+  ps:SetObjectInfoRequest?
+  ps:SetObjectInfoResponse?
+  ps:TestMembershipRequest?
+  ps:TestMembershipResponse?
+  ps:ResolveIdentifierRequest?
+  ps:ResolveIdentifierResponse?
+  ps:Notify?
+  ps:NotifyResponse?
+  im:IdentityMappingRequest?
+  im:IdentityMappingResponse?
+  as:SASLRequest?
+  as:SASLResponse?
+  mm7:SubmitReq?
+  mm7:SubmitRsp?
+  mm7:DeliverReq?
+  mm7:DeliverRsp?
+  mm7:CancelReq?
+  mm7:CancelRsp?
+  mm7:ReplaceReq?
+  mm7:ReplaceRsp?
+  mm7:extendedCancelReq?
+  mm7:extendedCancelRsp?
+  mm7:extendedReplaceReq?
+  mm7:extendedReplaceRsp?
+  mm7:DeliveryReportReq?
+  mm7:DeliveryReportRsp?
+  mm7:ReadReplyReq?
+  mm7:ReadReplyRsp?
+  mm7:RSErrorRsp?
+  mm7:VASPErrorRsp?
+  mm7:QueryStatusReq?
+  mm7:QueryStatusRsp?
+  cb:Query?
+  cb:QueryResponse?
+  cb:Create?
+  cb:CreateResponse?
+  cb:Delete?
+  cb:DeleteResponse?
+  cb:Modify?
+  cb:ModifyResponse?
+  cb:Notify?
+  cb:NotifyResponse?
+  cb:ReportUsage?
+  cb:ReportUsageResponse?
+  gl:Query?
+  gl:QueryResponse?
+  gl:Create?
+  gl:CreateResponse?
+  gl:Delete?
+  gl:DeleteResponse?
+  gl:Modify?
+  gl:ModifyResponse?
+  gl:Notify?
+  gl:NotifyResponse?
+  demomed:StoreObjectRequest?
+  demomed:StoreObjectResponse?
+  demomed:GetObjectListRequest?
+  demomed:GetObjectListResponse?
+  demomed:GetObjectRequest?
+  demomed:GetObjectResponse?
+  demomed:DeleteObjectRequest?
+  demomed:DeleteObjectResponse?
+  pmm:Provision?
+  pmm:ProvisionResponse?
+  pmm:PMActivate?
+  pmm:PMActivateResponse?
+  pmm:PMDeactivate?
+  pmm:PMDeactivateResponse?
+  pmm:PMDelete?
+  pmm:PMDeleteResponse?
+  pmm:PMUpdate?
+  pmm:PMUpdateResponse?
+  pmm:PMGetStatus?
+  pmm:PMGetStatusResponse?
+  pmm:PMSetStatus?
+  pmm:PMSetStatusResponse?
+  prov:PMERegister?
+  prov:PMERegisterResponse?
+  prov:PMEUpload?
+  prov:PMEUploadResponse?
+  prov:PMEDownload?
+  prov:PMEDownloadResponse?
+  prov:PMEEnable?
+  prov:PMEEnableResponse?
+  prov:PMEDisable?
+  prov:PMEDisableResponse?
+  prov:PMEDelete?
+  prov:PMEDeleteResponse?
+  prov:PMEGetInfo?
+  prov:PMEGetInfoResponse?
+  prov:PMGetStatus?
+  prov:PMGetStatusResponse?
+  prov:PMSetStatus?
+  prov:PMSetStatusResponse?
+  prov:PMGetDescriptor?
+  prov:PMGetDescriptorResponse?
+  prov:PMActivate?
+  prov:PMActivateResponse?
+  prov:PMDeactivate?
+  prov:PMDeactivateResponse?
+  prov:PMRegisterDescriptor?
+  prov:PMRegisterDescriptorResponse?
+  prov:PMUpdate?
+  prov:PMUpdateResponse?
+  prov:PMDelete?
+  prov:PMDeleteResponse?
+  prov:Poll?
+  prov:PollResponse?
+  prov:UpdateEPR?
+  prov:UpdateEPRResponse?
+  idp:GetAssertion?
+  idp:GetAssertionResponse?
+  idp:GetProviderInfo?
+  idp:GetProviderInfoResponse?
+  idp:CreatedStatus?
+  idp:CreatedStatusResponse?
+  shps:Delete?
+  shps:DeleteResponse?
+  shps:GetStatus?
+  shps:GetStatusResponse?
+  shps:Query?
+  shps:QueryResponse?
+  shps:Invoke?
+  shps:InvokeResponse?
+  shps:QueryRegistered?
+  shps:QueryRegisteredResponse?
+  shps:Register?
+  shps:RegisterResponse?
+  shps:SetStatus?
+  shps:SetStatusResponse?
+  shps:Update?
+  shps:UpdateResponse?
+  shps:Poll?
+  shps:PollResponse?
+  shps:ProxyInvoke?
+  shps:ProxyInvokeResponse?
+  idhrxml:Create?
+  idhrxml:CreateResponse?
+  idhrxml:Query?
+  idhrxml:QueryResponse?
+  idhrxml:Modify?
+  idhrxml:ModifyResponse?
+  idhrxml:Delete?
+  idhrxml:DeleteResponse?
+  idhrxml:Notify?
+  idhrxml:NotifyResponse?
+  @id? -> %xs:ID
+  ;
+
+@mustUnderstand -> %xs:boolean
+@actor          -> %xs:anyURI
+@encodingStyle  -> %xs:anyURI
+&@encodingStyle: 
+  @e:encodingStyle?
+  ;
+
+Fault	 -> %e:Fault
+%Fault:
+  e:faultcode   -> %xs:QName
+  e:faultstring -> %xs:string
+  e:faultactor? -> %xs:anyURI
+  e:detail?     -> %e:detail
+  ;
+
+%detail:
+  lu:Status*
+  any*
+  @any
+  ;
+
+#EOF

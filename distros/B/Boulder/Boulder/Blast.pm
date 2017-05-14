@@ -168,6 +168,10 @@ FASTA format.  This will be the first set of non-whitespace
 characters following the ">" character.  In other words, the search
 sequence "name".
 
+=item Blast_query_length
+
+The length of the query sequence, in base pairs.
+
 =item Blast_db
 
 The Unix filesystem path to the subject database.
@@ -459,7 +463,7 @@ $VERSION = 1.01;
 
 sub new {
   my $self = shift;
-  my $self = bless {},$self unless ref $self;
+  $self = bless {},$self unless ref $self;
   $self->_open(@_);
   return $self;
 }
@@ -484,10 +488,9 @@ sub read_record {
   my $stone = new Stone;
   local $/ = "\n"; # normalize input stream
 
-  return unless my $line = <$fh>;
+  return unless defined(my $line = <$fh>);
   croak "Doesn't look like a BLAST stream to me - top line = '$_'" unless $line=~/BLAST/;
   return unless my ($program,$version,$date) = $line=~ /^(\S+) (\S+) \[([^\]]+)\]/;
-  my $stone = new Stone;
 
   $stone->insert ( Blast_version      => $version,
 		   Blast_program      => lc $program,

@@ -1,0 +1,20 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+policy_no_dot
+	Policy violation: file names containing /../, /./, or // aren't allowed.
+	Offending file name: '$file_name'
+
+policy_only_relative
+	Policy violation: absolute file names aren't allowed.
+	Offending file name: '$file_name'
+
+invalid_symbol_name
+	A symbol name contains illegal characters (outside of \w).
+	Symbol: '%s'
+
+invalid_subroutine_name
+	A subroutine name contains illegal characters (outside of [\w:]).
+	Subroutine: '%s'

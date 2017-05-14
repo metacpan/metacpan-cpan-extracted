@@ -1,0 +1,614 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>beancounter - Stock portfolio performance monitor tool</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsys">SYNOPSYS</a></li>
+	<li><a href="#commands">COMMANDS</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#tutorial">TUTORIAL</a></li>
+	<li><a href="#more_detailed_command_description">MORE DETAILED COMMAND DESCRIPTION</a></li>
+	<li><a href="#more_detailed_option_description">MORE DETAILED OPTION DESCRIPTION</a></li>
+	<li><a href="#system_overview">SYSTEM OVERVIEW</a></li>
+	<ul>
+
+		<li><a href="#database_requirements">DATABASE REQUIREMENTS</a></li>
+		<li><a href="#config_file">CONFIG FILE</a></li>
+		<li><a href="#odbc_configuration">ODBC CONFIGURATION</a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>beancounter - Stock portfolio performance monitor tool</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsys">SYNOPSYS</a></h1>
+<p>beancounter [options] command [command_arguments ...]</p>
+<p>
+</p>
+<hr />
+<h1><a name="commands">COMMANDS</a></h1>
+<pre>
+ addindex index args       add stock(s) to market index 'indx'
+ addportfolio sym:nb:fx:type:o:pp:pd ... 
+                           add 'nb' stocks of company with symbol 'sym'
+                           that are listed in currency 'fx' to the 
+                           portfolio with optional 'type' and 'owner'
+                           info, purchase price 'pp' and date 'pd'; 
+                           see below for a complete example
+ allreports                combines dayendreport, status and risk 
+ addstock arg ...          add stock(s) with symbol arg to the database
+ advancement               report on unrealized gains from lows
+ backpopulate  arg ...     fill with historic data for given stock(s)
+ checkdbconnection         test if connection to db can be established
+ dailyjob                  combines update, dayendreport, status + risk 
+ dayendreport              reports p/l changes relative to previous day
+ deactivate symbol ...     set stock(s) inactive in stockinfo table
+ delete arg ...            delete given stock(s) from database
+ destroydb                 delete the BeanCounter database
+ fxbackpopulate  arg ...   fill with historic data for currency(ies)
+ lsportfolio               list portfolio data
+ plreport                  run an portfolio p/l report rel. to any day
+ quote arg ...             report current data for given stock(s)
+ retracement               report unrealized losses from highs (drawdowns)
+ risk                      display a portfolio risk report
+ split arg ...             split-adjust price history and portfolio
+ status                    status summary report for portfolio
+ update                    update the database with day's data
+ warranty                  display the short GNU GPL statement</pre>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<pre>
+ --help                    show this help
+ --verbose                 more verbose operation, debugging
+ --date date               report for this date (today)
+ --prevdate date           relative to this date (yesterday)
+ --currency fx             set home currency
+ --restriction sql         impose SQL restriction
+ --extrafx fx1,fx2,...     additional currencies to load
+ --forceupdate date        force db to store new price info with date
+ --rcfile file             use different configuration file
+ --[no]fxupdate            enforce/suppress FX update, default is update
+ --[no]commit              enforce/suppress database update, default is commit
+ --[no]equityupdate        enforce/suppress Equity update, default is update
+ --[no]ubcfx               use/skip FX from UBC's Sauder school, default skip
+ --splitby arg             split stock history + position by this factor [2]
+ --dbsystem system         use db backend system, default is PostgreSQL
+ --dbname name             use db name, default is beancounter</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>beancounter</strong> gathers and analyses stock market data to evaluate
+portfolio performance.  It has several modes of operation. The first
+main mode is data gathering: both current data (e.g. end-of-day
+closing prices) and historical price data (to back-populate the
+database) can be retrieved both automatically and efficiently with
+subsequent local storage in a relational database system (either
+<em>PostgreSQL</em>, <em>MySQL</em> or <em>SQLite</em>) though any other system with an
+<em>ODBC</em> driver could be used). The second main mode is data analysis
+where the stored data is evaluated to provide performance
+information. Several canned reports types are already available.</p>
+<p>Data is retrieved very efficiently in a single batch query per Yahoo!
+host from the Yahoo! Finance web sites using Finance::YahooQuote
+module (where version 0.18 or newer is required for proxy
+support). Support exists for North America (i.e. US and Canada),
+Europe (i.e. the Continent as well as Great Britain), several Asian
+stock markets, Australia and New Zealand.</p>
+<p><strong>beancounter</strong> can aggregate the change in value for the entire
+portfolio over arbitrary time horizons (provided historical data has
+either been gathered or has been backpopulated). Using the powerful
+date-parsing routine available to Perl (thanks to the <em>Date::Manip</em>
+modules), you can simply say 'from six months ago to today' (see below
+for examples).</p>
+<p><strong>beancounter</strong> has been written and tested under Linux. It should run
+under any standard Unix as long as the required Perl modules are
+installed, as as long as the database backend is found.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<pre>
+ beancounter update --forceupdate today</pre>
+<pre>
+    This updates the database: it extends timeseries data (such as
+    open, low, high, close, volume) with data for the current day,
+    and overwrites static data (such as capital, price/earnings, ...) 
+    with current data. All stocks held in the database are updated
+    (unless the --restriction argument instructs otherwise). The 
+    --forceupdate option lets the program corrects incorrect dates 
+    returned from Yahoo! (which happens every now and so often), but
+    be careful to correct for this on public holidays. Note that 
+    the --restriction argument will be applied to the portfolio table,
+    whereas the overall selection comes from the stockinfo table.</pre>
+<pre>
+ beancounter addportfolio SUNW:100:USD:401k:joe:85.50:19991117 \
+                          IBM:100:USD:401k:joe:90.25:20000320  \
+                          SPY:50:USD:ira:joe:142.25:20000620</pre>
+<pre>
+    This adds the two stocks Sun and IBM to the 401k portfolio of Joe,
+    as well as SP500 'Spiders' to his IRA portfolio. The stocks are
+    also added to the general stock info tables via an implicit call
+    of the stockinfo command.</pre>
+<pre>
+ beancounter addstock LNUX RHAT COR.TO</pre>
+<pre>
+    This adds these three Linux companies to the database without adding
+    them to any specific portfolios.</pre>
+<pre>
+ beancounter backpopulate --prevdate '1 year ago' \
+                          --date 'friday 1 week ago' IBM SUNW HWP</pre>
+<pre>
+    This backpopulates the database with historic prices for three
+    hardware companies. Note how the date specification is very general
+    thanks to the underlying Date::Manip module.</pre>
+<pre>
+ beancounter fxbackpopulate --prevdate '1 year ago' \
+                          --date 'friday 1 week ago' CAD EUR GBP</pre>
+<pre>
+    This backpopulates the database with historic prices for these
+    three currencies. Note how the date specification is very general
+    thanks to the underlying Date::Manip module.</pre>
+<pre>
+    Unfortunately, Yahoo! is a little bone-headed in its implementation
+    of historic FX rates -- these are stored to only two decimals 
+    precision, just like stockprices. Unfortunately, convention is to
+    use at least four if not six. Because of the limited information, 
+    risk from FX changes will be underestimated.</pre>
+<pre>
+ beancounter plreport --prevdate '1 month ago' --date 'today' \
+                        --restriction &quot;owner='joe'&quot;</pre>
+<pre>
+    This calculates portfolio profits or losses over the last month. It
+    also imposes the database restriction that only stocks owned by
+    'joe' are to be included.</pre>
+<pre>
+ beancounter status --restriction &quot;type='401k'&quot;</pre>
+<pre>
+    This shows a portfolio status report with the restriction that only
+    stocks from the '401k' account are to be included.</pre>
+<pre>
+ beancounter risk --prevdate &quot;6 month ago&quot;</pre>
+<pre>
+    This shows a portfolio risk report. This tries describes the 
+    statistically plausible loss which should be exceeded only 1 out
+    of 100 times (see below for more details).</pre>
+<pre>
+ beancounter dailyjob --forceupdate today</pre>
+<pre>
+    Run a complete 'job': update the database, show a day-end profit/loss
+    report, show a portfolio status report and show a riskreport. In the
+    update mode, override a potentially wrong date supplied by Yahoo!
+    with the current date.</pre>
+<pre>
+ beancounter split --splitby 3 --prevdate 1990-01-01 ABC CDE</pre>
+<pre>
+    Split-adjusts the (hypothetical) stocks ABC and CDE by a factor
+    of three: price data in the database is divided by three, volume
+    increased by 3 and similarly, in the portfolio shares are increased
+    and cost is descreased.  Default dates are --prevdate and --date
+    which may need adjusting.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="tutorial">TUTORIAL</a></h1>
+<p>The following few paragraphs will illustrate the use of
+<strong>beancounter</strong>.  We will set up two fictional accounts for two
+brothers Bob and Bill (so that we can illustrate the 'owner' column).
+The prices below are completely fictitious, as are the portfolios.</p>
+<p>We suppose that <strong>beancounter</strong> is installed and that the
+<strong>setup_beancounter</strong> command has been run. We can then create a
+two-stock (computer hardware) portfolio for Bob as follows:</p>
+<pre>
+ beancounter addportfolio SUNW:100:USD:401k:bob:85.50:19991117 \
+                          IBM:100:USD:401k:bob:90.25:20000320</pre>
+<p>Here we specify that 100 shares each of Sun and IBM, priced in US
+Dollars, are in Bob's portfolio which is tagged as a 401k retirement
+account. The (fictitious) purchase price and date are also given.</p>
+<p>Let's suppose that Bill prefers networking equipment, and that he has
+a brokerage account in Canada:</p>
+<pre>
+ beancounter addportfolio CSCO:100:USD:spec:bill:78.00:19990817 \
+                          NT:200:CAD:spec:bill:cad:90.25:20000212</pre>
+<p>Now we can backpopulate the database from 1998 onwards for all four stocks:</p>
+<pre>
+ beancounter backpopulate --prevdate 19980101 CSCO IBM NT SUNW</pre>
+<p>With this historical data in place, we now compare how Bob's portfolio
+would have fared over the last 18 months:</p>
+<pre>
+ beancounter plreport --prevdate '18 months ago' \
+                        --restriction &quot;owner='bob'&quot;</pre>
+<p>Note how we use double quotes to protect the arguments, and how the
+SQL restriction contains a further single quote around the literal
+string.</p>
+<p>We can also review the performance for Bill at the most recent trading
+day:</p>
+<pre>
+ beancounter dayendreport --restriction &quot;owner='bill'&quot;</pre>
+<p>or the status of holdings and their respective values:</p>
+<pre>
+ beancounter dayendreport --restriction &quot;owner='bill'&quot;</pre>
+<p>Similarly, a risk reports can be run on this portfolios per</p>
+<pre>
+ beancounter risk --restriction &quot;owner='bill'&quot;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="more_detailed_command_description">MORE DETAILED COMMAND DESCRIPTION</a></h1>
+<p><strong>addportfolio</strong> is the most important 'position entry' command. As
+with other commands, several arguments can be given at the same
+time. For each of these, records are separated using a colon and
+specify, in order, stock symbol, number of stocks held, currency,
+account type, account owner, purchase price and purchase date.  Only
+the first three arguments are required, the others are
+optional. Executing <strong>addportfolio</strong> implicitly executes <strong>addstock</strong>. 
+The account type column can be used to specify whether the account 
+is, e.g., a tax-sheltered retirement account, or it could be used to
+denote the brokerage company is it held at.</p>
+<p><strong>plreport</strong> retrieves the most recent quotes(s). This is useful for
+illiquid securities which might not have traded that day, or if a
+public holiday occurred, or if there was a data error at Yahoo!. Two
+dates can be specified which determine the period over which the
+profit or loss is computed. This will fail if price data (or currency
+data in the case of foreign stocks data) data is not available for
+either of those two dates. This may be restrictive for foreign stocks
+where we cannot backpopulate due to lack of public data source for
+historical currency quotes. Major currencies can be retrieved from 
+Yahoo!, but only to two decimals precisions.</p>
+<p><strong>dayendreport</strong> is similar to <strong>plreport</strong> but is always over a one-day
+period.  It also uses only one date record by calculating performance
+given the 'previous close' data.</p>
+<p><strong>status</strong> shows holdings amounts, total position values, annualized 
+returns in percentages and holding periods in days. Note that the 
+annualized returns can appear excessive if, e.g., a ten-day return 
+from a recently purchased stock is extrapolated to an annual time 
+period.</p>
+<p><strong>risk</strong> shows a portfolio risk report which describes the
+statistically plausible loss which should be exceeded only 1 out of
+100 times.  In other words, the loss estimate has a critical level of
+99%. This risk level is estimated via two methods. The first is
+non-parametric and assumes no particular model or distribution; it
+computes the 1% quintile of the return distribution and displays it as
+well as the corresponding asset value at risk.  The second method uses
+the standard Value-at-Risk (VaR) approach. This uses the 1% critical
+value of the Normal distribution and implicitly assumes a normal
+distribution for returns. See <code>http://www.gloriamundi.org</code> for more
+introduction and references. If the distribution of normalitty was
+perfectly true, both measures would coincide. A large difference
+between the two estimates would indicate that the return distribution
+might be rather non-normal.  Another view of the riskiness of a given
+position is provided by the last column with the 'margVaR' heading. It
+shows the marginal Value-at-Risk. Marginal VaR is commonly defined as
+the risk contribution of the given position to the total portfolio,
+and calculated as the difference in the VaR of the full portfolio and
+the VaR of an otherwise identical portfolio with the given position
+removed.  Note that calculating marginal VaR is fairly slow (on the
+order of <code>O(n^3)</code> ].</p>
+<p><strong>retracement</strong> shows a 'drawdown' report. Drawdown is commonly defined
+as the percentage loss relative to the previous high. The default
+period is used, but can be altered with the <strong>--date</strong> and
+<strong>--prevdate</strong> options. The default period is also corrected for the
+actual holding period. In other words, if a stock has been held for
+two months, only those two months are used instead of the default of
+six months -- but if the last months has been selected via
+<strong>--prevdate</strong> then it is used.  For short positions, the analysis is
+inverted and relative to the previous low. The report displays each
+stock, the number of shares held, the current price and holdings
+value. The next two columns show the maximum price attained in the
+examined period, and the percent decline relative to it. The last
+column shows the unrealized loss relative to the maximum price over
+the period. The aggregate holdings value, percent decline and
+unrealized loss are shown as well.</p>
+<p><strong>advancement</strong> does the opposite of drawdown -- it computes unrealized
+gains relative to the minimum price in the period. The discussion in
+the preceding paragraph applies `but inverted'.</p>
+<p><strong>lsportfolio</strong> simply lists the content of the portfolio table.
+A SQL restriction can be imposed.</p>
+<p><strong>addindex</strong> adds stocks a the index table. Currently, no further
+analysis references this table.</p>
+<p><strong>addstock</strong> adds stocks to the database. From then on data will be
+retrieved for the given <code>symbol(s)</code> and stored in the database whenever 
+the <strong>update</strong> command is executed.</p>
+<p><strong>backpopulate</strong> fills the database with historic prices for the given
+symbols and date period. Note that this works well for stocks and
+mutual fund. Options have no historic data stored. Currencies are
+stored with limited precision as noted above.</p>
+<p><strong>quote</strong> simply shows a price quote  for the given symbol(s).</p>
+<p><strong>update</strong> updates the database with quotes for all stocks for the 
+given day. No output is generated making the command suitable for 
+<strong>cron</strong> execution.</p>
+<p><strong>dailyjob</strong> is a simple convenience wrapper around <strong>update</strong>,
+<strong>dayendreport</strong>, <strong>status</strong> and <strong>risk</strong>,</p>
+<p><strong>allreports</strong> is a another covenience wrapper around <strong>dayendreport</strong>, 
+<strong>status</strong> and <strong>risk</strong>.</p>
+<p><strong>deactivate</strong> will set the active column in stockinfo for the given
+<code>symbol(s)</code> to false thereby inhibiting any further updates of symbol(s).
+The existing data for <code>symbol(s)</code> is retained. Use this when a stock is
+acquired, delisted, or you simply want to stop tracking it -- but do 
+not want to purge the historical data.</p>
+<p><strong>split</strong> adjusts the price database, and the portfolio holdings, for 
+stock splits.  The default factor is 2, this can be adjusted with the
+option <strong>--splitby</strong>. The dates arguments can be set with <strong>--prevdate</strong>
+and <strong>--date</strong>.</p>
+<p><strong>delete</strong> removes the given symbols from the database.</p>
+<p><strong>destroydb</strong> deletes the BeanCounter database.</p>
+<p><strong>checkdbconnection</strong> simply opens and closes the database handle, and
+returns a specified exit code which can then be tested. This is used
+in the <strong>setup_beancounter</strong> command.</p>
+<p><strong>warranty</strong> display a short GNU General Public License statement.</p>
+<p>
+</p>
+<hr />
+<h1><a name="more_detailed_option_description">MORE DETAILED OPTION DESCRIPTION</a></h1>
+<p><strong>--currency</strong> can be used to select a different <em>home</em> currency. 
+Instead of having all values converted to the default currency, the
+selected currency is used.</p>
+<p><strong>--date</strong> allows to choose a different reference date. This is then be
+be used by commands working on a date, or date period, such as
+<strong>plreport</strong>, <strong>dayendreport</strong>, <strong>backpopulate</strong>, <strong>fxbackpopulate</strong> or
+<strong>status</strong>. <strong>--prevdate</strong> allows to choose a different start date for
+return calculations, or data gathering.</p>
+<p><strong>--restriction</strong> can be used to restrict the database selection. The
+argument must be a valid part of valid SQL statement in the sense that
+existing columns and operators have to be employed. The argument to
+this option will be completed with a leading <em>and</em>. The SQL
+restriction will typcally be over elements of the <em>portfolio</em> table
+which comprises the columns <em>symbol</em>, <em>shares</em>, <em>currency</em>,
+<em>type</em>, <em>owner</em>, <em>cost</em> and <em>date</em>. A simple example would be
+<em>currency='CAD'</em>. Note that this has to protected by double quotes
+<em>``I</em> on the command-line.</p>
+<p><strong>--extrafx</strong> allows to gather data on additional currency rates beyond
+those automatically selected as shares are listed in them. A typical
+example would be for a European investor wanting to convert from the
+EUR in which the shares are listed into one of the member currencies
+which <strong>beancounter</strong> would no longer retrieve as shares are no longer
+listed in these.</p>
+<p><strong>--forceupdate</strong> allows to overwrite an potentially wrong date in the
+database update. Unfortunately, it appears that Yahoo!  occasionally
+reports correct prices with an incorrect date such as the previous
+day's. In such a case, this option, along with an argument such as
+'today' can override the bad date datapoint and avoid a hole in the
+database. The downside of this approach is that it would ``double'' the
+previous data in the case of a public holiday, or even if it was run
+the weekend. A somewhat smarter comparison to previously stored data
+might prevent that, but would be more complex to implement.</p>
+<p><strong>--rcfile</strong> allows to specify a resource file different from the
+default <em>~/.beancounterrc</em>.</p>
+<p><strong>--dbsystem</strong> allows to switch to a different database backend. The
+default is <strong>PostgreSQL</strong> but <strong>MySQL</strong> and <strong>SQLite</strong> are also
+supported. For <strong>SQLite</strong>, the default is now version 3.* but the
+previous version -- which is not binarily compatible -- is supported
+as well with argument 'SQLite2'.</p>
+<p><strong>--dbsystem</strong> allows to switch to an alternate database. The default
+is 'beancounter'. This can be useful for testing new features.</p>
+<p><strong>--fxupdate</strong> is a boolean switch to enforece updates of FX rates during
+'update'. The default is 'true' but '--nofxupdate' can be used to suppress
+the update of foreign exchange rates.</p>
+<p>Similarly, <strong>--equityupdate</strong> is a boolean switch to enforece, or
+suppress updates of Equity (i.e. stock) data during 'update'. The
+default is 'true' but '--noequityupdate' can be used to suppress the
+update of foreign exchange rates.</p>
+<p><strong>--ubcfx</strong> is a boolean switch to use the 'PACIFIC' FX rate service from the
+Sauder School at UBC. This is useful when the default FX rate service at
+Yahoo! is erratic, or unreliable. While the PACIFIC server provides a wider
+variety of exchange rates, Yahoo! can still be useful as it can provide more
+columns (open/high/low). However, during most of 2005, Yahoo! has been
+unrealiable for the exchange rates and has not provided historical FX
+data. On the other hand, the UBC service does not run on Canadian holidays so
+it cannot really server as a full substitute. Contributions for a new data
+acquisition, maybe via www.oanda.com would be welcome.</p>
+<p><strong>--splitby</strong> can be used to set a stock split factor other than the default
+of 2.</p>
+<p><strong>--host</strong> can be used to point to a machine containing the PostgreSQL
+or MySQL database. The machine can be remote, or it can be the actual
+machine <strong>beancounter</strong> is running on. If a hostname is given, tcp/ip
+connection are used. If no hostname is given, the default value of
+'localhost' implies that local socket connections are used which may
+be easier to employ for less experienced adatabase users.</p>
+<p>Also, <strong>--commit</strong> is a boolean switch to suppress actual
+database updates if the negated <strong>--nocommit</strong> is selected. This is
+useful mostly in debugging contexts.</p>
+<p>The <strong>--verbose</strong> and <strong>--debug</strong> switches can be used in debugging an
+testing, and <strong>--help</strong> triggers the display of help message.</p>
+<p>
+</p>
+<hr />
+<h1><a name="system_overview">SYSTEM OVERVIEW</a></h1>
+<p>The following section details some of the database and configuration
+options.</p>
+<p>
+</p>
+<h2><a name="database_requirements">DATABASE REQUIREMENTS</a></h2>
+<p><strong>beancounter</strong> currently depends on either PostgreSQL, MySQL, SQLite
+(version 2 or 3) or any other database for which an ODBC driver is
+available (though the required tables would have to created manually
+in the ODBC case). Yet another DB backend could be added provided
+suitable Perl DBI drivers are available. For PostgreSQL, MySQL and
+SQLite, the <strong>setup_beancounter</strong> script can create and initialize the
+database, form the required tables and fills them with some example
+data. It is a starting point for local modifications.</p>
+<p>The connection to the database is made via a dedicated function in the
+<strong>BeanCounter.pm</strong> module, changes would only have to be made there.
+As of this writing the <strong>Perl DBI</strong> (the database-independent interface
+for Perl) is used along the DBI drivers for PostgreSQL, MySQL, SQLite
+and ODBC. Ports for Oracle, Sybase, ... are encouraged.</p>
+<p>
+</p>
+<h2><a name="config_file">CONFIG FILE</a></h2>
+<p>A configuration file <em>~/.beancounterrc</em> is read if found. It
+currently supports the following options:</p>
+<dl>
+<dt><strong><a name="item_currency_to_specify_into_which_home_currency_holdi"><em>currency</em> to specify into which home currency holdings and
+profits/losses have to be converted</a></strong>
+
+<dt><strong><a name="item_resides"><em>host</em> to specify the database server on which the
+<strong>BeanCounter</strong> database resides (this is needed only for the alternate
+connection via the DBI-Pg driver in case DBI-ODBC is not used)</a></strong>
+
+<dt><strong><a name="item_user_to_specify_the_userid_for_the_database_connec"><em>user</em> to specify the userid for the database connection; if
+needed. If not specified, the current user id is used.</a></strong>
+
+<dt><strong><a name="item_passwd_to_specify_the_password_for_the_database_co"><em>passwd</em> to specify the password for the database connection,
+if needed.</a></strong>
+
+<dt><strong><a name="item_sqlite2"><em>dbsystem</em> to select a database backend, e.g. to switch from
+PostgreSQL to MySQL or SQLite or SQLite2 (the previous format of
+SQLite).</a></strong>
+
+<dt><strong><a name="item_dbsystem_to_select_a_different_default_database_na"><em>dbsystem</em> to select a different default database name other
+than the default of 'beancounter'</a></strong>
+
+<dt><strong><a name="item_proxy_to_specify_the_address_of_a_firewall_proxy_s"><em>proxy</em> to specify the address of a firewall proxy server if
+one is needed to connect to the Internet.</a></strong>
+
+<dt><strong><a name="item_firewall_to_specify_a_firewallid_3afirewallpasswd_"><em>firewall</em> to specify a firewallid:firewallpasswd combination,
+if needed.</a></strong>
+
+<dt><strong><a name="item_odbc_is_a_switch_to_turn_odbc_connection_on_or_off"><em>odbc</em> is a switch to turn ODBC connection on or off</a></strong>
+
+<dt><strong><a name="item_dsn_to_use_a_different_data_source_name_when_odbc_"><em>dsn</em> to use a different data source name when ODBC is used</a></strong>
+
+<dd>
+<p>An example file <em>example.beancounterrc</em> should have come with the 
+sources (or the Debian package); please consult this file for more
+examples.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="odbc_configuration">ODBC CONFIGURATION</a></h2>
+<p>There are now several ODBC systems available for Linux / Unix. The
+following <em>~/.odbc.ini</em> work with the <strong>iODBC</strong> library and the
+<strong>PostgreSQL</strong> ODBC driver on my Debian GNU/Linux system:</p>
+<pre>
+   [ODBC Data Sources]
+   beancounter = BeanCounter Database</pre>
+<pre>
+   [beancounter]
+   Driver       = /usr/lib/libpsqlodbc.so
+   Database     = beancounter
+   Servername   = localhost</pre>
+<pre>
+   [ODBC]
+   InstallDir = /usr/lib</pre>
+<p>Alternatively, the <strong>unixODBC</strong> library can be used with the following
+scheme for <em>/etc/odbcinst.ini</em> (or <em>~/.odbcinst.ini</em>) to define the
+Postgres database drivers</p>
+<pre>
+   [PostgreSQL]
+   Description     = PostgreSQL ODBC driver for Linux and Windows
+   Driver          = /usr/lib/postgresql/lib/libodbcpsql.so
+   Setup           = /usr/lib/odbc/libodbcpsqlS.so
+   Debug           = 0
+   CommLog         = 0
+   FileUsage       = 1</pre>
+<p>after which <em>/etc/odbc.ini</em> (or <em>~/.odbc.ini</em>) can be used to define
+actual data sources as follows:</p>
+<pre>
+   [PostgreSQL]
+   Description     = PostgreSQL template1
+   Driver          = PostgreSQL
+   Trace           = No
+   TraceFile       = /tmp/odbc.log
+   Database        = template1
+   Servername      = localhost
+   UserName        =
+   Password        =
+   Port            = 5432
+   Protocol        = 6.4
+   ReadOnly        = Yes
+   RowVersioning   = No
+   ShowSystemTables= No
+   ShowOidColumn   = No
+   FakeOidIndex    = No
+   ConnSettings    =</pre>
+<pre>
+   [beancounter]
+   Description     = Beancounter DB (Postgresql)
+   Driver          = Postgresql
+   Trace           = No
+   TraceFile       =
+   Database        = beancounter
+   Servername      = some.db.host.com
+   UserName        =
+   Password        =
+   Port            = 5432
+   Protocol        = 6.4
+   ReadOnly        = No
+   RowVersioning   = No
+   ShowSystemTables= No
+   ShowOidColumn   = No
+   FakeOidIndex    = No
+   ConnSettings    =</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p><strong>Finance::BeanCounter</strong> and <strong>beancounter</strong> are so fresh that there are
+only missing features :) Seriously, check the TODO list. This code or
+its predecessors have been used by the author since the end of 1998.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>Finance::BeanCounter.3pm</em>, <em>smtm.1</em>, <em>Finance::YahooQuote.3pm</em>,
+<em>LWP.3pm</em>, <em>Date::Manip.3pm</em>, <em>Statistics::Descriptive.3pm</em>,
+<em>setup_beancounter.1</em>, <em>update_beancounter.1</em>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>beancounter is (c) 2000 - 2006 by Dirk Eddelbuettel &lt;<a href="mailto:edd@debian.org">edd@debian.org</a>&gt;</p>
+<p>Updates to this program might appear at 
+<em><a href="http://dirk.eddelbuettel.com/code/beancounter.html">http://dirk.eddelbuettel.com/code/beancounter.html</a></em>.</p>
+<p>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.  There is NO warranty whatsoever.</p>
+<p>The information that you obtain with this program may be copyrighted
+by Yahoo! Inc., and is governed by their usage license.  See
+<em><a href="http://www.yahoo.com/docs/info/gen_disclaimer.html">http://www.yahoo.com/docs/info/gen_disclaimer.html</a></em> for more
+information.</p>
+<p>Equivalently, foreign exchange rates from <em><a href="http://fx.sauder.ubc.ca">http://fx.sauder.ubc.ca</a></em>
+are for academic research and teaching. See
+<em><a href="http://fx.sauder.ubc.ca/about.html">http://fx.sauder.ubc.ca/about.html</a></em> for more details.</p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>The Finance::YahooQuote module, originally written by Dj Padzensky
+(and on the web at <em><a href="http://www.padz.net/~djpadz/YahooQuote/">http://www.padz.net/~djpadz/YahooQuote/</a></em> as well
+as at <em><a href="http://dirk.eddelbuettel.com/code/yahooquote">http://dirk.eddelbuettel.com/code/yahooquote</a></em>) serves as the
+backbone for data retrieval, which was also already very useful for the
+real-time ticker <em><a href="http://dirk.eddelbuettel.com/code/smtm.html">http://dirk.eddelbuettel.com/code/smtm.html</a></em>.</p>
+
+</body>
+
+</html>

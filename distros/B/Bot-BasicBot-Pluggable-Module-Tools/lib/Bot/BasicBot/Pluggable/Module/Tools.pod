@@ -1,0 +1,15 @@
+=pod
+
+=head1 NAME
+
+Bot::BasicBot::Pluggable::Module::Tools - a miscellany of useful plugins for Bot::BasicBot::Pluggable
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2005, Simon Wistow
+
+=cut

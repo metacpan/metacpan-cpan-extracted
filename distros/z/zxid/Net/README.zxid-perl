@@ -1,0 +1,66 @@
+README.zxid-perl
+$Id: README.zxid-perl,v 1.5 2009-10-16 13:36:33 sampo Exp $
+
+This is the perl module hierarchy for libzxid.
+
+It is included inside zxid distribution, zxid-0.x.tgz. Net::SAML and
+ZXID are further described in README.zxid and on web at zxid.org
+
+  zxid.org
+  zxid/README.zxid
+  zxid/INSTALL.zxid
+  zxid/zxid-perl.pd: Using ZXID from Perl
+  zxid/zxidhlo.pl: Example code
+
+Install
+=======
+
+* Generally you should follow the INSTALL.zxid instructions
+* The perl specific part (after compiling libzxid) is more or less
+
+     cd zxid/Net
+     perl Makefile.PL
+     make
+     make test      # Very sparse tests, sorry
+     make install
+
+* If you want low level perl interfaces to encoders and decoders
+
+     cd zxid/Raw
+     perl Makefile.PL
+     make
+     make test      # Very sparse tests, sorry
+     make install
+
+  WARNING: Low level interface is baroque, and consequently, it
+  will take a lot of disk space, RAM and CPU to build it: 100 MB
+  would not be exageration and over an hour (on 1GHz CPU). Build
+  time memory consumption of single cc1 process will be over
+  256 MB of RAM. You have been warned.
+
+* If you want low level perl interfaces to metadata
+
+     cd zxid/Metadata
+     perl Makefile.PL
+     make
+     make test      # Very sparse tests, sorry
+     make install
+
+  WARNING: This is also very heavy to build.
+
+Current major modules are
+=========================
+
+* Net::SAML - The high level interfaces for Single Sign-On (SSO)
+* Net::SAML::Raw - Low level assertion and protocol manipulation interfaces
+* Net::SAML::Metadata - Low level metadata manipulation interfaces
+
+Planned modules
+===============
+
+* Net::WSF - The high level interfaces for Web Services Frameworks (WSF)
+* Net::WSF::Raw - The low level interfaces for WSF variants
+* Net::WSF::WSC - The high level interfaces for Web Services Clients
+* Net::WSF::WSC:Raw
+
+--Sampo

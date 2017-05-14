@@ -33,16 +33,16 @@
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "2.128",
-            "File::Spec" : "0",
             "HTTP::Status" : "0",
             "JSON" : "2.27",
             "LWP::UserAgent" : "5.835",
             "Readonly" : "1.03",
+            "Storable" : "0",
             "Sys::Hostname" : "0",
             "URI" : "1.56"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "version" : "0.10"
 }

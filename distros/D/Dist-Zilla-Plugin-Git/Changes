@@ -1,5 +1,9 @@
 Revision history for Dist::Zilla::Plugin::Git
 
+2.042     2017-05-12 16:29:18Z
+ - remove spaces from config data dumped to META, which parses badly on older
+   YAML decoders in the toolchain
+
 2.041     2016-11-16 03:36:23Z
  - log the git version *properly* into metadata (thanks so much to Dan Book
    for noticing so quickly!)

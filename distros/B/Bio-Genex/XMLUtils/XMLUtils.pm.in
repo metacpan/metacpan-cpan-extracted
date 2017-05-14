@@ -1,0 +1,1232 @@
+#
+# XMLUtils.pm
+#   a module for useful database utilities
+#
+package Bio::Genex::XMLUtils;
+
+use strict;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $DEBUG);
+use subs qw(create_element create_id);
+use Carp;
+use DBI;
+use CGI qw(:standard);
+
+use Bio::Genex;
+use Bio::Genex::DBUtils qw(:ASSERT);
+use XML::DOM;
+
+require Exporter;
+
+=head1 NAME
+
+XMLUtils - a module for useful XML utilities for Genex DBs
+
+=head1 SYNOPSIS
+
+  use XMLUtils;
+
+  $out_string = pretty_print($in_string);
+  assert_element($dom_node, 'node_name');
+
+=head1 DESCRIPTION
+
+Methods for transforming information from a GeneX DB into XML.
+
+=cut
+
+@ISA = qw(Exporter);
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+@EXPORT_OK = qw(pretty_print assert_element db2xml);
+
+$DEBUG = 1;
+
+$VERSION = '0.04';
+
+=pod
+
+
+
+=head1 FUNCTIONS
+
+
+=over 4
+
+
+=item pretty_print($string)
+
+=item pretty_print({INDENT=>$val,COLLAPSE=>[@list1],NO_ATTR_BALANCE=>[@list2]},$string)
+
+This function takes an XML string and reformats it. The function takes
+an optional first parameter anonymous hash reference that enables
+modification of the internal reformatting parameters.
+
+
+=over 4
+
+
+=item *
+
+INDENT
+
+The indent level in spaces. The defualt is 2.
+
+=item *
+
+COLLAPSE
+
+A list of tags that should have their beginning and end tags collapsed
+onto a single line. This will result in any intervening tags collapsed
+onto the same line. The default is C<('feature')>.
+
+
+=item *
+
+NO_ATTR_BALANCE
+
+A list of attribute names that should not be moved to a separate
+line. The default is C<('xml')>.
+
+
+=back
+
+
+=cut
+
+
+sub pretty_print {
+  my $INDENT = 2;
+  my %COLLAPSING      = ('feature'=>1);
+  my %NO_ATTR_BALANCE = ('xml'=>1);
+
+  # check if we're called with a parameter
+  if (ref($_[0]) eq 'HASH') {
+    # we were called with an anonymous hash as the first parameter
+    # grab it and parse the parameter => value pairs
+    my %hash = %{shift(@_)};
+    $INDENT = $hash{INDENT} if exists $hash{INDENT}; 
+    if (exists $hash{COLLAPSE}) {
+      croak "Must use array ref for COLLAPSE" 
+	unless ref($hash{COLLAPSE}) eq 'ARRAY';
+      %COLLAPSING = map {$_, 1} @{[$hash{COLLAPSE}]};
+    }
+    if (exists $hash{NO_ATTR_BALANCE}) {
+      croak "Must use array ref for NO_ATTR_BALANCE" 
+	unless ref($hash{NO_ATTR_BALANCE}) eq 'ARRAY';
+      %NO_ATTR_BALANCE = map {$_, 1} @{[$hash{NO_ATTR_BALANCE}]};
+    }
+  }
+
+  # Now get the string
+  my $xml_string = shift;
+#  $xml_string =~ s/\n//g;
+
+  # break the tags apart by adding newlines
+  $xml_string =~ s/>[\s\n]*</>\n</mg;
+  $xml_string =~ s/>([^\n])/>\n\1/mg;
+  $xml_string =~ s/([^\n])</\1\n</mg;
+  my @tags = split("\n",$xml_string);
+  my $out_string;
+  my $IN_COMMENT=0;
+  my $balance = 0;
+  my ($padding,$tag_name);
+  my $looking_for = '';
+  TAG: foreach my $tag (@tags) {
+    ($tag_name) = $tag =~ m|^<[/?!]?(\w+)|;
+    if ($IN_COMMENT || !defined $tag_name) {
+      if ($tag =~ /^<!--/) {
+	$IN_COMMENT = 1;
+      } elsif ($tag =~ /-->/) {
+	$IN_COMMENT = 0;	
+      } 
+      #	warn "no tag name for tag: $tag\n";      
+      $out_string .= "$tag\n";
+      next TAG;
+    }
+
+    if ($looking_for) {
+      if ($tag_name eq $looking_for) {
+	$looking_for = '';
+	$out_string .= "$tag\n";
+      } else {
+	$out_string .= $tag;
+      }
+    } elsif (exists $COLLAPSING{$tag_name}) {
+      $looking_for = $tag_name;
+      $out_string .= "$padding$tag";
+    } else {
+      $balance -= $INDENT if $tag =~ m|^</.*>$|;	# close tag
+      $padding = ' ' x $balance;
+
+      # don't modify balance on <?...> or <!...> or <.../> tags
+      # the [^>]* insures we won't wrap or indent a tag pair with CDATA
+      # e.g. <desc>description</desc> will stay on a single line
+      $balance += $INDENT if $tag =~ m|^<[^/!?][^>]*[^/]>$|m; # open tag
+
+      # move each attribute to it's own line unless instructed not to
+      $tag =~ s|\"\s+([^\"])|"\"\n$padding        $1"|eg 
+	unless exists $NO_ATTR_BALANCE{$tag_name};
+      $out_string .= "$padding$tag\n";
+    }
+  }
+  return $out_string;
+}
+
+
+package Bio::Genex::AL_Spots;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::AM_FactorValues;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::AM_Spots;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::AM_SuspectSpots;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::ArrayLayout;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::ArrayMeasurement;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::BlastHits;
+sub db2xml {
+  my ($hit_db,$doc) = @_;
+  assert_blasthit($hit_db);
+
+  my $hit_node = $doc->create_element('hit');
+  $hit_node->setAttribute('match_name',$hit_db->match_accession);
+  $hit_node->setAttribute('e_score',$hit_db->expect_value);
+  return $hit_node;
+
+}
+
+package Bio::Genex::Citation;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::ControlledVocab;
+use vars qw($a $b);
+sub all2xml {
+  my ($class,$doc) = @_;
+
+  my $vocab_list = $doc->get_vocabulary_list_node ();
+  my @vocabs = get_vocabs();
+  foreach my $vocab (@vocabs) {
+    my $node = Bio::Genex::ControlledVocab->db2xml($doc,$vocab);
+    $vocab_list->appendChild($node);
+  }
+}
+
+sub db2xml {
+  my ($class_name,$doc,$vocab_name) = @_;
+
+  # create the node, and add it to the tree
+  my $vocab_node = $doc->create_element('controlled_vocabulary');
+  $vocab_node->setAttribute(qualifier=>$vocab_name);
+
+  # get the data from the DB
+  my $class = "Bio::Genex::$vocab_name";
+
+  # we sort the terms 
+  my @objs = sort {$a->term_string cmp $b->term_string}
+    $class->get_all_objects();
+
+  foreach my $term (@objs) {
+    my $term_string = $term->term_string();
+    # don't add empty terms
+    next if $term_string =~ /^\s*$/;
+
+    # create the node, and add it to the tree
+    my $node = $doc->create_element('term');
+    $vocab_node->appendChild($node);
+    $node->setAttribute(name=>$term_string);
+
+    # don't add empty descriptions
+    next if $term->description =~ /^\s*$/;
+    $node->setAttribute(description=>$term->description);
+  }
+  return $vocab_node;
+}
+
+package Bio::Genex::ExperimentFactors;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::ExperimentSet;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::ExternalDatabase;
+sub db2xml {
+  my ($db,$doc) = @_;
+  assert_externaldb($db);
+
+  my $db_list_node = $doc->get_header_list_node('external_database_list');
+  my $db_node = $doc->create_element('external_database');
+  foreach my $col (@{column_names()}) {
+    $db_node->setAttribute($col,$db->$col());
+  }
+  my $id = $doc->create_id('ExternalDatabase',$db->name);
+  return $db_node;
+}
+
+package Bio::Genex::GroupLink;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::HotSpots;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::Protocol;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::Sample;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::SampleProtocols;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::Scanner;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::Software;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::SpotLink;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::Spotter;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::TL_FactorValues;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::TreatmentLevel;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::Treatment_AMs;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+package Bio::Genex::USF_ExternalDBLink;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+
+package Bio::Genex::Chromosome;
+sub db2xml {
+  my ($chr_db,$doc) = @_;
+  assert_chromosome($chr_db);
+
+  my $chrom = $doc->create_element('chromosome');
+  foreach my $col (qw(name length)) {
+    $chrom->setAttribute($col,$chr_db->$col());
+  }
+  return $chrom;
+}
+
+package Bio::Genex::UserSequenceFeature;
+sub db2xml {
+  my ($usf_db,$doc) = @_;
+  return undef;
+}
+
+sub all2xml {
+  my ($class,$spc_db,$GENEXML_doc) = @_;
+  my $usf_list_node = $GENEXML_doc->get_header_list_node('usf_list');
+
+  # for debugging
+  my $USF_LIMIT = 0;
+  if ($Bio::Genex::XMLUtils::DEBUG) {
+    $USF_LIMIT = 10;
+    $Bio::Genex::UserSequenceFeature::LIMIT = $USF_LIMIT;
+    $Bio::Genex::DBUtils::DEBUG = 1;
+  }
+
+  # we know that usersequencefeature_obj() is defined to return an
+  # array reference (which may reference an empty array), so it is
+  # safe to directly interpolate and call 'scalar' to check for the
+  # existence of data
+  my @usf_list;
+  my $code = sub {
+    @usf_list = @{$spc_db->usersequencefeature_obj};
+  };
+  if ($Bio::Genex::XMLUtils::PROFILE) {
+    my $t = timeit(1, $code);
+    print STDERR "Time for retrieving USF data = ", timestr($t), "\n";
+  } else {
+    $code->();
+  }
+
+  #
+  # We first check whether there are any USF to write
+  #   if there aren't, we return without creating any elements
+  #
+  unless (scalar @usf_list) {
+    warn "No UserSequenceFeatures for species ", 
+      $spc_db->primary_scientific_name(), "\n";
+    return;
+  }
+
+  #
+  # If we've gotten here, then there are USF values to write out
+  #
+
+  my $usf_doc = Bio::Genex::GeneXML::USF->new();
+  my ($USF_node) = $usf_doc->getDocumentElement();
+
+  # parse the cvs_id string and set the other attributes
+  my $cvs_id = $USF_node->getAttribute('cvs_id');
+  my ($id,$filename,$revision,$date,$time,$author,$state) = split(' ',$cvs_id);
+  $USF_node->setAttribute('date',$date);
+  $USF_node->setAttribute('version',$revision);
+
+  # first add the DBs, so that we can look them up later
+  my @dbs = Bio::Genex::DBUtils::fetch_db_ids_for_species($spc_db->spc_pk);
+  foreach my $db (@dbs) {
+    $GENEXML_doc->lookup_id('ExternalDatabase',$db,1);
+  }
+
+  # create the link to the data file
+  my ($usf_file_name,$file_id) = $GENEXML_doc->add_external_file('USF');
+  print STDERR "Printing USF data to $usf_file_name\n";
+  my $data_node = $GENEXML_doc->create_element('data');
+  $data_node->setAttribute('external_file_id',$file_id);
+  $usf_list_node->appendChild($data_node);
+
+  # species_id
+  my $species_id = $GENEXML_doc->lookup_id('Species',$spc_db->spc_pk);
+  $USF_node->setAttribute('species_id',$species_id);
+
+  #
+  # We keep track of some useful info for timing feedback
+  my $i;
+  require Benchmark;
+  my $initial_time = new Benchmark;
+  my $total = scalar @usf_list;
+  $total = $USF_LIMIT if $USF_LIMIT && $Bio::Genex::XMLUtils::DEBUG;
+  foreach my $usf_db (@usf_list) {
+    # handle the timing feedback
+    $i++;
+    if ($i % 250 == 0) {
+      my $time_str = timestr(timediff(new Benchmark,$initial_time));
+      my ($cur_time) = $time_str =~ /(\d+)\s+wallclock secs/;
+      print STDERR "Processing USF number $i, ";
+      my $time_left = $cur_time * ($total/$i) - $cur_time;
+      if ($time_left <= 0) {
+	print STDERR "finished\n";
+      } else {
+	printf STDERR "%5.2f secs remaining for processing\n", $time_left;
+      }
+    }
+
+    # do the real work
+    my $usf_node = $usf_doc->createElement('sequence_feature');
+    foreach my $col (qw(chromosome
+			start_position
+			end_position
+			usf_name
+			usf_type
+			other_name
+			other_type
+			short_description)) {
+      $usf_node->setAttribute($col,$usf_db->$col());
+    }
+    if (defined $usf_db->sequence()) {
+      my $seq_node = $usf_doc->createElement('sequence');
+      $seq_node->addText($usf_db->sequence());
+      $usf_node->appendChild($seq_node);
+    }
+    if (defined $usf_db->clone_name()) {
+      my $clone_node = $usf_doc->createElement('clone');
+      $clone_node->addText($usf_db->clone_name());
+      $usf_node->appendChild($clone_node);
+    }
+
+    # blast scores
+
+    # we know that blasthits_obj() is defined to return an array
+    # reference (which may reference an empty array), so it is safe to
+    # directly interpolate and call 'scalar' to check for the
+    # existence of data
+    if (scalar @{$usf_db->blasthits_obj}) {
+      my $blast_node = $usf_doc->createElement('blast_scores');
+      $usf_node->appendChild($blast_node);
+
+      # make a list of blast scores
+      foreach my $hit_db (@{$usf_db->blasthits_obj}) {
+	$blast_node->appendChild($hit_db->db2xml($usf_doc));
+      }
+    }
+
+    # DB accession numbers
+
+    # we know that usf_externaldblink_obj() is defined to return an
+    # array reference (which may reference an empty array), so it is
+    # safe to directly interpolate and call 'scalar' to check for
+    # the existence of data
+    if (scalar @{$usf_db->usf_externaldblink_obj}) {
+      my $database_list_node = $usf_doc->createElement('database_accession_nums');
+      $usf_node->appendChild($database_list_node);
+
+      # make a list of DB nums
+      foreach my $db_link (@{$usf_db->usf_externaldblink_obj}) {
+	my $database_node = $usf_doc->createElement('database');
+	$database_list_node->appendChild($database_node);
+	
+	my $db_id = $GENEXML_doc->lookup_id('ExternalDatabase',
+					    $db_link->db_name) ||
+	  die "do_usf: Couldn't get DB ID for ", $db_link->db_name();
+	$database_node->setAttribute('accession_num',$db_link->external_identifier);
+	$database_node->setAttribute('database_id',$db_id);
+      }
+    }
+
+    # contact_id
+    my $con_fk = $usf_db->con_fk; 
+    if (defined $con_fk && $con_fk !~ /^\s*$/) {
+      $usf_node->setAttribute('contact_id',
+			      $GENEXML_doc->lookup_id('Contact',$con_fk,1));
+    }
+
+    # sample_id
+    my $smp_fk = $usf_db->smp_fk; 
+    if (defined $smp_fk && $smp_fk !~ /^\s*$/) {
+      $usf_node->setAttribute('sample_id',
+			      $GENEXML_doc->lookup_id('Sample',$smp_fk));
+    }
+
+    $usf_node->setAttribute('id',$GENEXML_doc->create_id('UserSequenceFeature',
+					   $usf_db->usf_pk));
+    $USF_node->appendChild($usf_node);
+  }
+  return $usf_doc;
+}
+
+package Bio::Genex::UserSec;
+sub db2xml {
+  my ($us_db,$doc) = @_;
+  assert_usersec($us_db);
+
+  my $us_node = $doc->create_element('user');
+  foreach my $col (@{column_names()}) {
+    next if $col =~ /us_pk/;
+    $us_node->setAttribute($col,$us_db->$col());
+  }
+  return $us_node;
+}
+
+package Bio::Genex::GroupSec;
+sub db2xml {
+  my ($gs_db,$doc) = @_;
+  assert_groupsec($gs_db);
+
+  my $gs_node = $doc->create_element('group');
+  foreach my $col (@{column_names()}) {
+    next if $col =~ /gs_pk/;
+    $gs_node->setAttribute($col,$gs_db->$col());
+  }
+
+  my $group_node_list = $doc->get_header_list_node('group_list');
+  $group_node_list->appendChild($gs_node);
+
+  my $id = $doc->create_id('Group',$gs_db->gs_pk);
+  $gs_node->setAttribute('id',$id);
+
+  # now add the group members
+  # we know that grouplink_obj() is defined to return an
+  # array reference (which may reference an empty array), so it is
+  # safe to directly interpolate and call 'scalar' to check for
+  # the existence of data
+  if (scalar @{$gs_db->grouplink_obj}) {
+    foreach my $gl_db (@{$gs_db->grouplink_obj}) {
+      if (defined $gl_db->us_obj()) {
+	$gs_node->appendChild($gl_db->us_obj->db2xml($doc));
+      } else {
+	warn("Bio::Genex::GroupSec::db2xml: bogus UserSec: ", 
+	     $gl_db->us_fk, "\n");
+      }
+    }
+  }
+  return $gs_node;
+}
+
+package Bio::Genex::Contact;
+sub all2xml {
+  my ($class,$doc) = @_;
+  foreach my $con_db (Bio::Genex::Contact->get_all_objects()) {
+    my $node = $con_db->db2xml($doc);
+  }
+}
+
+sub db2xml {
+  my ($con_db,$doc) = @_;
+  assert_contact($con_db);
+
+  my $con_node_list = $doc->get_header_list_node('contact_list');
+  my @columns = @{Bio::Genex::Contact->column_names()};
+
+  my $con_node = $doc->create_element('contact');
+  $con_node_list->appendChild($con_node);
+  foreach my $col (@columns) {
+#    next if $col =~ /^type$/;
+#    next if $col =~ /^last_updated$/;
+    next if $col =~ /^con_pk$/;
+    my $text = $con_db->$col();
+    next if not defined $text or $text =~ /^\s*$/;
+
+    my $node = $doc->create_element($col);
+    $con_node->appendChild($node);
+    $node->addText($text);
+  }
+#  $con_node->setAttribute('last_updated',$con_db->last_updated);
+#  $con_node->setAttribute('type',$con_db->type);
+  my $id = $doc->create_id('Contact',$con_db->con_pk);
+  $con_node->setAttribute('id',$id);
+  return $con_node;
+}
+
+package Bio::Genex::Species;
+sub db2xml {
+  my ($spc_db,$doc,$usf_file_name) = @_;
+  assert_species($spc_db);
+
+  my $species_list_node = $doc->get_header_list_node('species_list');
+
+  # make the tag
+  my $species_node = $doc->create_element('species');
+  $species_list_node->appendChild($species_node);
+    
+  my $id = $doc->create_id('Species', $spc_db->spc_pk);
+  $species_node->setAttribute('id',$id);
+
+  # handle the attributes
+  foreach my $col (qw(primary_scientific_name
+		      is_sequenced_genome
+		      is_circular_genome
+		      num_chromosomes
+		      general_classification
+		      cell_structure)) {
+    my $text = $spc_db->$col();
+    next unless defined $text && $text !~ /^\s*$/;
+    $species_node->setAttribute($col,$text);
+  }
+    
+  # handle the elements
+  foreach my $col (qw(scientific_aliases
+		      common_names
+		      genome_size
+		      ncbi_taxonomy_acc
+		      relevant_urls
+		      comments)) {
+    # we only write out these columns if they have information
+    my $text = $spc_db->$col();
+    next unless defined $text && $text !~ /^\s*$/;
+
+    my $node = $doc->create_element($col);
+    $species_node->appendChild($node);
+    $node->addText($text);
+  }
+    
+  # handle the chromosomes
+  my $chrom_list_node = $doc->create_element('chromosome_list');
+  $species_node->appendChild($chrom_list_node);
+
+  # we know that chromosome_obj() is defined to return an array
+  # reference (which may reference an empty array), so it is safe to
+  # directly interpolate and call 'scalar' to check for the
+  # existence of data
+  unless (scalar @{$spc_db->chromosome_obj}) {
+    warn "no Chromosomes for species ", 
+      $spc_db->primary_scientific_name(), "\n";
+  } else {
+    foreach my $chrom_db (@{$spc_db->chromosome_obj}) {
+      my $chrom = $chrom_db->db2xml($doc);
+      $chrom_list_node->appendChild($chrom);
+    }
+  }
+
+  if (defined $usf_file_name) {
+    # do the user sequence features
+    my $usf_doc = Bio::Genex::UserSequenceFeature->all2xml($spc_db, $doc);
+
+    # write out the data to file
+    open(USF,">$usf_file_name") or die "do_usf: Couldn't open $usf_file_name for writing";
+    print USF Bio::Genex::XMLUtils::pretty_print($usf_doc->toString());
+    close(USF);
+  }
+
+  $id = $doc->create_id('Species', $spc_db->spc_pk);
+  $species_node->setAttribute('id',$id);
+  return $species_node;
+}
+
+package Bio::Genex::GeneXML;
+use strict;
+use vars qw(@ISA $AUTOLOAD $ENCODING $DEBUG
+	    $GENEXML_DIR $GENEXML_DOCTYPE $GENEXML_DTD $GENEXML
+	    $GENEXML_VERSION
+	   );
+use Carp;
+use DBI;
+use File::Basename;
+use Class::ObjectTemplate 0.2;
+require Exporter;
+
+$DEBUG = 1;
+@ISA = qw(Class::ObjectTemplate Exporter);
+attributes qw(_parser _doc _id no_dtd empty _file_num directory file_name_prefix _USF _ALS _AMS _file_list);
+
+BEGIN {
+  $ENCODING = 'UTF-8';
+  $GENEXML_DIR = '%%GENEXML_DIR%%';
+
+  ###
+  ### Package variables for <GENEXML>
+  ###
+  $GENEXML_DTD = $GENEXML_DIR . '/genexml.dtd';
+  open(GENEXML,$GENEXML_DTD) 
+    or die "$0: Couldn't open $GENEXML_DTD for reading";
+
+  $GENEXML_DOCTYPE = '<!DOCTYPE GENEXML [' . "\n";
+  undef $/;			# slurp the file into a single scalar
+  $GENEXML_DOCTYPE .= <GENEXML>;
+  close(GENEXML);
+  $GENEXML_DOCTYPE .= "\n" . ']>';
+
+  $GENEXML = <<"END";
+<?xml version="1.0"  encoding="$ENCODING" standalone="no"?>
+$GENEXML_DOCTYPE
+
+<GENEXML cvs_id="&VERSION;">
+  <header>
+    <misc_list/>
+    <genex_info>
+      <controlled_vocabulary_list/>
+    </genex_info>
+  </header>
+</GENEXML>
+END
+
+  # this is silly to have to parse the document just to get the entity
+  # but, hey, it's simple ...
+  my $p = XML::DOM::Parser->new();
+  my $d = $p->parse($GENEXML);
+  $GENEXML_VERSION = $d->getEntity('VERSION')->getValue();
+}
+
+#
+# initialize()
+#   Parameters: called by new() with a single argument, the new
+#      Bio::Genex::GeneXML object.  
+#
+#   Side Effects: creates a new XML::DOM::Parser object and stores it
+#      in the _parser attribute. creates a new XML::DOM::Document object
+#      and stores it in the _doc attribute.
+#
+#   Return Value: The Bio::Genex::GeneXML object
+#
+sub initialize {
+  my $self = shift;
+
+  my $doc;
+  my $parser = XML::DOM::Parser->new();
+  if ($self->empty) {
+    $doc = $parser->parse(<<"GENEXML");
+<?xml version="1.0"  encoding="$ENCODING" standalone="yes"?>
+<GENEXML cvs_id="$GENEXML_VERSION"/>
+GENEXML
+  } elsif ($self->no_dtd) {
+    $doc = $parser->parse(<<"GENEXML");
+<?xml version="1.0"  encoding="$ENCODING" standalone="yes"?>
+<GENEXML cvs_id="$GENEXML_VERSION">
+  <header>
+    <misc_list/>
+    <genex_info>
+      <controlled_vocabulary_list/>
+    </genex_info>
+  </header>
+</GENEXML>
+GENEXML
+  } else {
+    $doc = $parser->parse($GENEXML);
+  }
+
+  # initialize the state methods
+  my $_file_num = 0;
+  $self->_file_num(\$_file_num);
+  my $_USF = 0;
+  $self->_USF(\$_USF);
+  my $_ALS = 0;
+  $self->_ALS(\$_ALS);
+  my $_AMS = 0;
+  $self->_AMS(\$_AMS);
+  $self->_file_list([]);
+
+  # store the parser and doc for later use
+  $self->_parser($parser);
+  $self->_doc($doc);
+  $self->_id({});
+  return $self;
+}
+
+sub add_external_file {
+  my ($doc,$type,$name_info) = @_;
+  $name_info = '' unless defined $name_info;
+  my $external_file_list_node = $doc->get_header_list_node('external_file_list');
+  my $external_file_node = $doc->create_element('external_file');
+
+  my $FILE_NUM_REF = $doc->_file_num();
+  my $id = "ExternalFile:$$FILE_NUM_REF:LOCAL";
+  $FILE_NUM_REF++;
+  $external_file_node->setAttribute(id=>$id);
+
+  # create the name of the external file. Each file consists of 4 pieces:
+  # 
+  #   $name _ $type _ $num . $ext
+  #
+  # where $name is either the experiment set name or 'control-bundle'.
+  #       $type is USF/ALS/AMS
+  #       $num  is a two digit number
+  #       $ext  is 'ext' for external files
+  #
+  # example 'control-bundle_AMS_03.ext'
+  #
+  my $file_name = $doc->directory() . '/';
+  my $FILE_NAME = $doc->file_name_prefix();
+  my $USF_REF = $doc->_USF();
+  my $ALS_REF = $doc->_ALS();
+  my $AMS_REF = $doc->_AMS();
+  $file_name .= $FILE_NAME;	# print the $name
+  $file_name .= "_${type}_";	# print the $type
+  if ($type eq 'USF') {		# print the $num
+    $file_name .= sprintf("%.2d", $$USF_REF++);
+  } elsif ($type eq 'ALS') {
+    $file_name .= sprintf("%.2d", $$ALS_REF++);
+  } elsif ($type eq 'AMS') {
+    $file_name .= sprintf("%.2d", $$AMS_REF++);
+  }
+  $file_name .= '.ext';		# print the $ext
+  my $FILE_LIST_REF = $doc->_file_list();
+  push(@{$FILE_LIST_REF},$file_name);
+
+  # we use relative pathnames in the tag
+  $external_file_node->setAttribute(file_name=> basename($file_name));
+  $external_file_list_node->appendChild($external_file_node);
+  return ($file_name,$id);
+}
+
+=item get_genexml_node();
+
+Description: A convenience method for retrieving the root node of the
+GeneXML document. 
+
+Return Value: XML::DOM::Element representing the <GENEXML>
+
+Errors: Will call die() on error
+
+=cut
+
+sub get_genexml_node {
+  my $DOC = shift;
+  my $node = $DOC->getDocumentElement();
+  $DOC->assert_element($node,'GENEXML');
+  return $node;
+}
+
+=item get_header_node();
+
+Description: A convenience method for retrieving the <header> node of
+the GeneXML document.
+
+Return Value: XML::DOM::Element representing the <header>
+
+Errors: Will call die() on error
+
+=cut
+
+sub get_header_node {
+  my $DOC = shift;
+  my ($node) = $DOC->getElementsByTagName ('header');
+  $DOC->assert_element($node,'header');
+  return $node;
+}
+
+=item get_genex_info_node();
+
+Description: A convenience method for retrieving the <genex_info> node of
+the GeneXML document.
+
+Return Value: XML::DOM::Element representing the <genex_info>
+
+Errors: Will call die() on error
+
+=cut
+
+sub get_genex_info_node {
+  my $DOC = shift;
+  my ($node) = $DOC->getElementsByTagName ('genex_info');
+  $DOC->assert_element($node,'genex_info');
+  return $node;
+}
+
+=item get_vocabulary_list_node();
+
+Description: A convenience method for retrieving the
+<controlled_vocabulary_list> node of the GeneXML document.
+
+Return Value: XML::DOM::Element representing the
+<controlled_vocabulary_list>
+
+Errors: Will call die() on error
+
+=cut
+
+sub get_vocabulary_list_node {
+  my $DOC = shift;
+  my ($node) = $DOC->getElementsByTagName ('controlled_vocabulary_list');
+  $DOC->assert_element($node,'controlled_vocabulary_list');
+  return $node;
+}
+
+=item get_misc_list_node();
+
+Description: A convenience method for retrieving the <misc_list> node of
+the GeneXML document.
+
+Return Value: XML::DOM::Element representing the <misc_list>
+
+Errors: Will call die() on error
+
+=cut
+
+sub get_misc_list_node {
+  my $DOC = shift;
+  my ($node) = $DOC->getElementsByTagName ('misc_list');
+  $DOC->assert_element($node,'misc_list');
+  return $node;
+}
+
+=item get_header_list_node($list_name);
+
+Description: A convenience method for retrieving the <$list_name> node from within the <header> of the GeneXML document.
+
+Side Effects: Will create <$list_name> if it does not already exist
+
+Return Value: XML::DOM::Element representing the <$list_name>
+
+Errors: Will call die() on error
+
+=cut
+
+sub get_header_list_node {
+  my ($DOC,$node_list_name) = @_;
+
+  # get the node_list
+  my @nodes = $DOC->getElementsByTagName($node_list_name);
+  die "get_header_list_node: Too many $node_list_name lists" 
+    if scalar @nodes > 1;
+  my $node_list;
+  if (scalar @nodes < 1) {
+    $node_list = $DOC->create_element($node_list_name);
+    my $header = $DOC->get_header_node();
+    $header->appendChild($node_list);
+  } else {
+    $node_list = $nodes[0];
+  }
+  $DOC->assert_element($node_list,$node_list_name);
+  return $node_list;
+}
+
+=item get_genex_info_list_node($list_name);
+
+Description: A convenience method for retrieving the <$list_name> node from within the <genex_info> of the GeneXML document.
+
+Side Effects: Will create <$list_name> if it does not already exist
+
+Return Value: XML::DOM::Element representing the <$list_name>
+
+Errors: Will call die() on error
+
+=cut
+
+sub get_genex_info_list_node {
+  my ($DOC,$node_list_name) = @_;
+
+  # get the node_list
+  my @nodes = $DOC->getElementsByTagName($node_list_name);
+  die "get_genex_info_list_node: Too many $node_list_name lists" 
+    if scalar @nodes > 1;
+  my $node_list;
+  if (scalar @nodes < 1) {
+    $node_list = $DOC->create_element($node_list_name);
+    my $genex_info = $DOC->get_genex_info_node();
+    $genex_info->appendChild($node_list);
+  } else {
+    $node_list = $nodes[0];
+  }
+  $DOC->assert_element($node_list,$node_list_name);
+  return $node_list;
+}
+
+=item assert_element($dom_node, $node_name);
+
+This raises an exception unless $dom_node is an obect of type
+XML::DOM::Node, and the tag name is $node_name.
+
+
+=cut
+
+sub assert_element {
+  my ($doc,$node,$name) = @_;
+  croak "Not a valid DOM Element node" unless 
+    ref($node) eq 'XML::DOM::Element' &&
+      $node->getTagName() eq $name;
+}
+
+=item create_id($table_name, $pkey);
+
+Creates an ID value for entering into a document based on $table_name
+and $pkey.
+
+=cut
+
+sub create_id {
+  my ($doc,$table_name,$pkey) = @_;
+  my $ID = $doc->_id();
+  my $key = "$table_name:$pkey";
+  $ID->{$key} = $key;
+  return $key;
+}
+
+=item lokup_id($table_name, $pkey, $create);
+
+Creates an ID value for entering into a document based on $table_name
+and $pkey.
+
+=cut
+
+#
+# lookup_id($table_name,$pkey,$create)
+#    if the $pkey primary key entry does not exist in the %ID lookup table for 
+#    the table $table_name, it will add the data to the XML file by calling
+#    that classes add_genexml_entry() method.
+#
+#    $create indicates whether lookup_id() should add the data for the entry
+#    if it does not yet exist in the XML file.
+#
+# return value: the ID value to be entered into the XML tag
+#
+sub lookup_id {
+  my ($doc,$table_name,$pkey,$create) = @_;
+  $create = 0 unless defined $create;
+
+  my $ID = $doc->_id();
+
+  my $id = $ID->{"$table_name:$pkey"};
+  if ((! defined $id) && $create) {
+    print STDERR "lookup_id: Creating new key for $table_name:  $pkey\n" 
+      if $DEBUG;
+
+    # call the class method for adding the data
+    if (grep {m/$table_name/io} qw(Contact ExternalDatabase)) {
+      my $class = 'Bio::Genex::' . $table_name;
+      my $obj = $class->new(id=>$pkey);
+      $obj->db2xml($doc);
+    } else {
+      carp "Bio::Genex::XMLUtils::lookup_id: create not implemented for $table_name\n";
+      return undef;
+    }
+
+    # enter the information in the lookup table
+    $id = $doc->create_id($table_name,$pkey);
+  }
+  return $id;
+}
+
+=item create_element($name);
+
+A convenience method to create an XML::DOM::Element node named $name,
+that will die() unless successful.
+
+=cut
+
+sub create_element {
+  my ($doc,$name) = @_;
+  my $node = $doc->createElement($name) or 
+    die "Bio::Genex::XMLUtiles::create_element: couldn't create $name";
+}
+
+sub AUTOLOAD {
+  my $self = shift;
+  my $method = $AUTOLOAD;
+  $method =~ s/.*://;		# strip fully-qualified portion
+
+  # if we couldn't handle it, we'll assume the Document can
+  my $doc = $self->_doc();
+  {
+    no strict 'refs';
+    return $doc->$method(@_);
+  }
+}
+# Autoload methods go after =cut, and are processed by the autosplit program.
+
+package Bio::Genex::GeneXML::USF;
+use strict;
+use vars qw(@ISA $AUTOLOAD $ENCODING $DEBUG
+	    $GENEXML_DIR $USF_DOCTYPE $USF_DTD $USF $USF_VERSION
+	   );
+use Carp;
+use DBI;
+use Class::ObjectTemplate 0.2;
+require Exporter;
+
+$DEBUG = 1;
+@ISA = qw(Class::ObjectTemplate Bio::Genex::GeneXML Exporter);
+
+BEGIN {
+  $ENCODING = 'UTF-8';
+  $GENEXML_DIR = '%%GENEXML_DIR%%';
+
+  ###
+  ### Package variables for <GENEXML>
+  ###
+  $USF_DTD = $GENEXML_DIR . '/usf.dtd';
+  open(USF,$USF_DTD) 
+    or die "$0: Couldn't open $USF_DTD for reading";
+
+  $USF_DOCTYPE = '<!DOCTYPE USF [' . "\n";
+  undef $/;			# slurp the file into a single scalar
+  $USF_DOCTYPE .= <USF>;
+  close(USF);
+  $USF_DOCTYPE .= "\n" . ']>';
+
+  $USF = <<"END";
+<?xml version="1.0"  encoding="$ENCODING" standalone="no"?>
+$USF_DOCTYPE
+
+<USF cvs_id="&VERSION;"/>
+END
+
+  my $p = XML::DOM::Parser->new();
+  my $d = $p->parse($USF);
+  $USF_VERSION = $d->getEntity('VERSION')->getValue();
+}
+
+#
+# initialize()
+#   Parameters: called by new() with a single argument, the new
+#      Bio::Genex::GeneXML object.  
+#
+#   Side Effects: creates a new XML::DOM::Parser object and stores it
+#      in the _parser attribute. creates a new XML::DOM::Document object
+#      and stores it in the _doc attribute.
+#
+#   Return Value: The Bio::Genex::GeneXML object
+#
+sub initialize {
+  my $self = shift;
+
+  my $doc;
+  my $parser = XML::DOM::Parser->new();
+  if ($self->no_dtd || $self->empty) {
+    $doc = $parser->parse(<<"USF");
+<?xml version="1.0"  encoding="$ENCODING" standalone="yes"?>
+<USF cvs_id="$USF_VERSION"/>
+USF
+  } else {
+    $doc = $parser->parse($USF);
+  }
+
+  # store the parser and doc for later use
+  $self->_parser($parser);
+  $self->_doc($doc);
+  $self->_id({});
+  return $self;
+}
+
+
+1;
+__END__
+
+=pod
+
+
+
+=back
+
+
+
+=head1 AUTHOR
+
+Jason Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

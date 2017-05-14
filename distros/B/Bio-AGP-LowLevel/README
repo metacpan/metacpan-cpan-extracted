@@ -1,0 +1,128 @@
+NAME
+    Bio::AGP::LowLevel - functions for dealing with AGP files
+
+SYNOPSIS
+     $lines_arrayref = agp_parse('my_agp_file.agp');
+
+     agp_write( $lines => 'my_agp_file.agp');
+
+DESCRIPTION
+    functions for working with AGP files.
+
+FUNCTIONS
+    All functions below are EXPORT_OK.
+
+  str_in
+      Usage: print "it's valid" if str_in($thingy,qw/foo bar baz/);
+      Desc : return 1 if the first argument is string equal to at least one of the
+             subsequent arguments
+      Ret  : 1 or 0
+      Args : string to search for, array of strings to search in
+      Side Effects: none
+
+      I kept writing this over and over in validation code and got sick of it.
+
+  is_filehandle
+      Usage: print "it's a filehandle" if is_filehandle($my_thing);
+      Desc : check whether the given thing is usable as a filehandle.
+             I put this in a module cause a filehandle might be either
+             a GLOB or isa IO::Handle or isa Apache::Upload
+      Ret  : true if it is a filehandle, false otherwise
+      Args : a single thing
+      Side Effects: none
+
+  agp_parse
+      Usage: my $lines = agp_parse('~/myagp.agp',validate_syntax => 1, validate_identifiers => 1);
+      Desc : parse an agp file
+      Args : filename or filehandle, hash-style list of options as 
+                           validate_syntax => if true, error
+                               if there are any syntax errors,
+                           validate_identifiers => if true, error
+                              if there are any identifiers that
+                              CXGN::Tools::Identifiers doesn't recognize
+                              IMPLIES validate_syntax
+                           error_array => an arrayref.  if given, will push
+                              error descriptions onto this array instead of
+                              using warn to print them to stderr
+      Ret  : undef if error, otherwise return an
+             arrayref containing line records, each of which is like:
+             { comment => 'text' } if a comment,
+             or if a data line:
+             {  objname  => the name of the object being assembled
+                           (same for every record),
+                ostart   => start coordinate for this component (object),
+                oend     => end coordinate for this component   (object),
+                partnum  => the part number appearing in the 4th column,
+                linenum  => the line number in the file,
+                type     => letter type present in the file (/[ADFGNOPUW]/),
+                typedesc => description of the type, one of:
+                             - (A) active_finishing
+                             - (D) draft
+                             - (F) finished
+                             - (G) wgs_finishing
+                             - (N) known_gap
+                             - (O) other
+                             - (P) predraft
+                             - (U) unknown_gap
+                             - (W) wgs_contig
+                ident    => identifier of the component, if any,
+                length   => length of the component,
+                is_gap   => 1 if the line is some kind of gap, 0 if it
+                            is covered by a component,
+                gap_type => one of:
+                     fragment: gap between two sequence contigs (also
+                        called a "sequence gap"),
+                     clone: a gap between two clones that do not overlap.
+                     contig: a gap between clone contigs (also called a
+                        "layout gap").
+                     centromere: a gap inserted for the centromere.
+                     short_arm: a gap inserted at the start of an
+                        acrocentric chromosome.
+                     heterochromatin: a gap inserted for an especially
+                        large region of heterochromatic sequence (may also
+                        include the centromere).
+                     telomere: a gap inserted for the telomere.
+                     repeat: an unresolvable repeat.
+                cstart   => start coordinate relative to the component,
+                cend     => end coordinate relative to the component,
+                linkage  => 'yes' or 'no', only set for type of 'N',
+                orient   => '+', '-', 0, or 'na'
+                            orientation of the component
+                            relative to the object,
+             }
+
+      Side Effects: unless error_array is given, will print error
+                    descriptions to STDERR with warn()
+      Example:
+
+  agp_write
+      Usage: agp_write($lines,$file);
+      Desc : writes a properly formatted AGP file
+      Args : arrayref of line records to write, with the line records being
+                 in the same format as those returned by agp_parse above,
+             filename or filehandle to write to,
+      Ret :  nothing meaningful
+
+      Side Effects: dies on failure.  if you gave it a filehandle, does
+                    not close it
+      Example:
+
+  agp_format_part( $record )
+    Format a single AGP part line (string terminated with a newline) from
+    the given record hashref.
+
+  agp_contigs
+      Usage: my @contigs = agp_contigs( agp_parse($agp_filename) );
+      Desc : extract and number contigs from a parsed AGP file
+      Args : arrayref of AGP lines, like those returned by agp_parse() above
+      Ret  : list of contigs, in the same order as they occur in the
+             file, formatted as:
+                [ agp_line_hashref, agp_line_hashref, ... ],
+                [ agp_line_hashref, agp_line_hashref, ... ],
+                ...
+
+AUTHOR(S)
+    Robert Buels
+
+    Sheena Scroggins
+

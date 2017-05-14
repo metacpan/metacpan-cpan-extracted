@@ -1,5 +1,11 @@
 Revision history for Mastodon::Client
 
+0.011     2017-05-10 15:59:57+01:00 Europe/London
+
+  * Fixes:
+    * Fix an issue with data preparation, which made authentication
+      impossible (thanks @whiteisthenewblack!)
+
 0.010     2017-05-08 00:15:59+01:00 Europe/London
 
   * Fixes:

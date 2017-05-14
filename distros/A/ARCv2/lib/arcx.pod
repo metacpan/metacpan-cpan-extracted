@@ -1,0 +1,161 @@
+=head1 NAME
+
+arcx - ARCv2 client command line interface 
+
+=head1 DESCRIPTION
+
+This file is a basic command line interface for the ARCv2.
+
+=head1 SYNOPSIS
+
+The command line interface arcx:
+
+=over 4
+
+=item arcx 
+
+Connect to the default host, on the default port and start the interactive 
+ARC-shell (Term::ReadLine).
+
+=item arcx -h arcserver -p 1234 vos release scripts
+
+Connection arcserver:1234 and run the ARCv2 command "vos" with the
+parameters "release scripts"
+
+=item cat /etc/passwd | arcx put /default/etc/passwd
+
+Pipe the content of /etc/passwd through the encrypted connection and let
+the server write the content to /default/etc/passwd.
+
+=item arcx get /default/etc/passwd > /etc/passwd
+
+Read the /default/etc/passwd on the server machine and write it locally
+to /etc/passwd.
+
+=back
+
+=head1 USAGE
+
+As usual a command line interface has some parameters to influence the behaviour.
+
+The scheme looks like this:
+
+arcx [-h <hostname>] [-p <port>] [-l <loglevel] [-L <logdestination] [-n] [-v] [-S <service>] [-F -f <history>] [-u|-U <username>] [-a|-A <authname>] [-w|-W <password>] [-s <mech>] [-t <timeout in sec>] [-r <string>] [command [command-arguments]]
+
+=head2 Parameter
+
+=over 4
+
+=item -h <hostname>
+
+The hostname, where the ARCv2 server is running. If no -h option is given, arcx will use the one chosen at compile time ($Arc::DefaultHost).
+
+=item -p <port>
+
+The port, where the ARCv2 server is listening. If no -p option is given, arcx will use the one given at compile time ($Arc::DefaultPort).
+
+=item -L <logdestination>
+
+This option defines the log output destination. Possible values are "stderr" and "syslog". Default is "syslog". -L does not refer to the -v option and arcx.
+
+=item -l <loglevel>
+
+This option specifies the logging level of ARCv2. Default is 5, whereas 7 is the highest (DEBUG) and 1 is the lowest.
+
+=item -v
+
+The verbose option. If this option is set, arcx is verbose in its context. This option does not influence the ARCv2 object. Use -l and -L for it.
+
+=item -n
+
+Do nothing, only try to authenticate.
+
+=item -F
+
+Do not save the commands typed in the interactive mode in the history file. 
+
+=item -f <history>
+
+Use the specified file to save command history.
+
+=item -S <service>
+
+This option sets the service name for SASL authentication. Default is "arc". This option has to be change on the server as well.
+
+=item -u
+
+Ask for username and use it for authentication.
+
+=item -U <username>
+
+Use the <username> for authentication.
+
+=item -a
+
+Ask for a authorization name.
+
+=item -A <authname>
+
+Use the <authname> for authorisation.
+
+=item -w
+
+Ask for a password (Only if SASL needs one).
+
+=item -W <password>
+
+Use the <password> for authentication. (Only if an appropriate mechanism is used. (eg. PLAIN)).
+
+=item -s <mechanism>
+
+For authentication use the given <mechanism>. (Default: let the server decide.)
+
+=item -t <timeout>
+
+Timeout in seconds to wait for data in control and command connection.
+
+=item -r <string>
+
+<string> is going to be written to the established command connection, when command is used. (Do not wait for user input on STDIN).
+
+eg.: arcx -r "data" test 
+results in "at".
+
+=item command
+
+Run this ARCv2 command. Run "help" to see, which commands are available.
+
+=item command-arguments
+
+Some ARCv2 command can handle arguments. They should go here.
+
+=back
+
+=head1 SEE ALSO
+
+L<Arc>, L<Arc::Command>, L<Arc::Connection>, 
+L<Arc::Connection::Server>, L<Arc::Connection::Client>,
+L<arcx>, L<arcxd>, L<Authen::SASL>, L<Authen::SASL::Cyrus>
+L<Net::Server::PreFork>
+
+=head1 AUTHOR
+
+ Patrick Boettcher <patrick.boettcher@desy.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003-5 Patrick Boettcher <patrick.boettcher@desy.de> and others.
+All rights reserved.
+Zeuthen, Germany, (old) Europe
+
+ This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+ Special thanks go to:
+DESY Zeuthen, in particular:
+
+- Wolfgang Friebel for bleeding edge testing and heavy bug reporting (and the idea of reimplementing ARC).
+
+- Waltraut Niepraschk and Andreas Haupt for their help and support during the development. 
+
+=cut

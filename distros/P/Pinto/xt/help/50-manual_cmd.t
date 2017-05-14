@@ -54,7 +54,6 @@ sub run_cmd_and_trap {
     my (@args) = @_;
     my $program_name = 'pinto';
 
-    local $ENV{PINTO_HOME} = undef;
     my @cmd = ( "perl", "-Ilib", "bin/${program_name}" );
 
     diag("\$ $program_name @args");

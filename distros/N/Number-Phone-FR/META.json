@@ -4,7 +4,7 @@
       "Olivier Mengué <dolmen@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "perl_5"
    ],
@@ -39,11 +39,11 @@
    "provides" : {
       "Number::Phone::FR" : {
          "file" : "lib/Number/Phone/FR.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Number::Phone::FR::Full" : {
          "file" : "lib/Number/Phone/FR/Full.pm",
-         "version" : "0.0815091"
+         "version" : "0.0917109"
       },
       "Number::Phone::FR::Simple" : {
          "file" : "lib/Number/Phone/FR.pm"
@@ -59,5 +59,6 @@
          "url" : "https://github.com/dolmen/p5-Number-Phone-FR.git"
       }
    },
-   "version" : "0.0815091"
+   "version" : "0.0917109",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

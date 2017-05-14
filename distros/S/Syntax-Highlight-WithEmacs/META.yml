@@ -1,0 +1,40 @@
+---
+abstract: 'syntax-highlight source code using Emacs'
+author:
+  - 'Ailin Nemui <ailin at devio dot us>'
+build_requires:
+  Cwd: 0
+  Devel::Hide: 0
+  Test::More: 0
+  Test::Most: 0
+  ok: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Syntax-Highlight-WithEmacs
+no_index:
+  namespace:
+    - Convert::Color
+provides:
+  Syntax::Highlight::WithEmacs:
+    file: lib/Syntax/Highlight/WithEmacs.pm
+    version: 0.2
+recommends:
+  Convert::Color::XTerm: 0
+requires:
+  CSS::Tiny: 0
+  Carp: 0
+  File::Temp: 0
+  Hash::Util: 0
+  IPC::Run: 0
+  Moops: 0
+  Term::ANSIColor: 0
+  XML::LibXML: 0
+  warnings: 0
+version: 0.2

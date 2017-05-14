@@ -1,0 +1,16 @@
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+
+lib/Data/TDMA/Constants.pm
+lib/Data/TDMA/Day/Epoch/Frame/Slot.pm
+lib/Data/TDMA/Day/Epoch/Frame.pm
+lib/Data/TDMA/Day/Epoch.pm
+lib/Data/TDMA/Day.pm
+lib/Data/TDMA.pm
+
+t/00_day.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

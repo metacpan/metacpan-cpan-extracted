@@ -1,0 +1,74 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: FindFile</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_sub.html">Parent Topic</A> | <A HREF="sappendt.html">Previous Topic</A> | <A HREF="sformatt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>12.3. FindFile</H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P>This routine is used to search for include files, imported objects, configuration modules and templates.</P>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<PRE>
+  $fullname = &amp;FindFile($filename, $image);
+</PRE>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>If <EM>filename</EM> is not found, <EM>fullname</EM> should be an empty string. If the file is found, the pathname of the file is returned, otherwise the empty string is returned. If <EM>image</EM> is true, a target-specific set of extensions is searched for, complete with implicit image format conversion.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>The default implementation is:</P>
+<PRE>
+<B>sub</B> FindFile {
+    <B>local</B>($filename, $image) = @_;
+    <B>local</B>($fullname);
+
+    <I># Get the list of directories to search</I>
+    <B>use</B> Cwd;
+    <B>my</B> @dirs = (<TT>'.'</TT>);
+    <B>my</B> $dir = $var{'DOC_DIR'};
+    <B>push</B>(@dirs, $dir) <B>if</B> $dir <B>ne</B> cwd();
+    <B>push</B>(@dirs, @include_path, <TT>&quot;$'sdf_lib/stdlib&quot;</TT>, $'sdf_lib);
+
+    <I># Do the search</I>
+    <B>if</B> ($image) {
+        <B>my</B> $context = $var{'OPT_TARGET'};
+        <B>my</B> @exts = @{$'SDF_IMAGE_EXTS{$context} || $'SDF_IMAGE_EXTS{'ps'}};
+        <B>return</B> &amp;'NameFindOrGenerate($filename, \@dirs, \@exts, $context);
+    }
+    <B>else</B> {
+        <B>return</B> &amp;'NameFind($filename, @dirs);
+    }
+}
+</PRE>
+<P>In order to tightly integrate <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> with certain development environments, it is occasionally necessary to override this routine in a configuration module. For example:</P>
+<PRE>
+!block script
+sub FindFile {
+    local($filename, $image) = @_;
+    local($fullname);
+
+    # Search using our SCM
+    $fullname = &amp;'SearchSCM($filename, $image);
+
+    # Return result
+    return $fullname;
+}
+!endblock
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_sub.html">Parent Topic</A> | <A HREF="sappendt.html">Previous Topic</A> | <A HREF="sformatt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

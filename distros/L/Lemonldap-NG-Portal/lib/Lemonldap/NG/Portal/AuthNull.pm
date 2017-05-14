@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::AuthNull;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.9.1';
 
 ## @apmethod int authInit()
 # Does nothing
@@ -142,7 +142,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =item Copyright (C) 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

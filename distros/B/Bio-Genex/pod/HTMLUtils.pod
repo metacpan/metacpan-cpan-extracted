@@ -1,0 +1,123 @@
+=head1 NAME
+
+HTMLUtils - a module for useful HTML utilities for Genex DBs
+
+=head1 SYNOPSIS
+
+  use HTMLUtils;
+
+  %new_hash = post_process(%args);
+
+  $html_string = objs2table(HEADER=>1, CGI=>$cgi, OBJECTS=>\@obj_list);
+
+=head1 DESCRIPTION
+
+Methods for transforming information from a GeneX DB into HTML.
+
+=pod
+
+
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item post_process($cgi,%args)
+
+Begin to post-process information from a Genex table before writing it
+to an HTML table. In order to write HTML we use CGI.pm, so any calling
+routine must pass in the current CGI object.
+
+Currently, C<post_process()> handles the following tasks:
+
+=over 4 
+
+=item *
+
+Lookup foreign key values from the appropriate table.
+
+=item *
+
+Change the output of fkeys to be hyperlinks to the cgi script for that table type.
+
+=item *
+
+Modify URLs and email addresses to be active hyperlinks.
+
+=item *
+
+Filter out sensitive information such as login names and passwords.
+
+
+=back
+
+
+
+
+
+For example, after generating a Genex object, we can create a
+hyperlinked HTML table output for that object by doing the following:
+
+    # we need a CGI object
+    my $q = new CGI;
+
+    my $object = Bio::Genex::Species->new(id=>25);
+    foreach (@{Bio::Genex::Species->column_names()}) {
+      no strict 'refs';
+      $tmp_values{$_} = $object->$_;
+    }
+
+    # call post_process() to HTML'ize the values
+    %tmp_values = post_process($q,%tmp_values);
+
+    # make a header that's human readable
+    my @rows;
+    my @keys = keys %{Bio::Genex::Species->column2name()};
+    my @values = values %{Bio::Genex::Species->column2name()};
+    push(@rows,td([@values]));	
+
+    # add the data in the same order of the header
+    push(@rows,td([@tmp_values{@keys}]));	
+
+    # now contstruct the table, 
+    print $q->html_start("Information for Species: $object->primary_scientific_name");
+    print $q->table({-border=>''},
+	  	    Tr(\@rows)	# Tr() distributes over an array reference
+		   );
+    print $q->html_end();
+
+
+=item objs2table(HEADER=>1, CGI=>$cgi, OBJECTS=>\@obj_list)
+
+Returns an HTML string encoding the list of objects as an HTML table
+rows using the $cgi object. Each attribute will be printed out as a
+separate column for each object. Before printing the value for each
+object the data will be fed through C<post_process()>.
+
+The 'HEADER' parameter pair is optional and specifies that a human
+readable header row should be included as the first row of the table
+output.
+
+B<NOTE>: The returned string must still be wrapped by a $cgi->table()
+function call. This is so that the application can pass optional
+parameters to the table call.
+
+B<CAUTION>: it is assumed that all the objects in @obj_list are of
+the same class.
+
+=pod
+
+
+
+=back
+
+
+
+=head1 AUTHOR
+
+Jason Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

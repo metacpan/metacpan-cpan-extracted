@@ -1,0 +1,37 @@
+Siebel-Integration-Com
+
+Version 0.02
+
+The Siebel::Integration::Com modules are designed to remove the different method calls and eror checking between the COM Data Control and COM Data Server interfaces. 
+Changing between the two interfaces only requires a change in the parameters to Siebel::Integration::Com->new() rather than a rewrite of all calls.
+Beyond just replicating the base functions of the interfaces it is hoped that additional methods will be added to these modules to extend the functionality provided by the Siebel COM framework.
+
+All methods that have been exposed keep the same names so there is no additional learning curve, you can program in Perl using the same method names as eScript
+
+REQUIREMENTS
+
+Requires windows
+Siebel Dedicated Client or more specificly, sstchca.dll - This provides COM interface to Siebel application. This DLL is provided by Siebel and gets registered on your system when you install Siebel Dedicated (Thick) Client. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+TESTS
+
+Since allmost tests require the login details to Siebel to get a full set of tests please modify test.t and set the %inputs hash and if write tests are needed the %testData hash. 
+Set the constants at the top of the script to enable the desired testing. Thin or Thick and the the specific tests under the connection type.
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Kyle Mathers
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.

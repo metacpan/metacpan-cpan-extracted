@@ -1,0 +1,76 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Creating a New Format Driver
+
+H2: Overview
+
+The steps are:
+
+^ Pick an existing driver to copy.
++ Copy it.
++ Make the necessary changes.
++ Update the {{FILE:sdf.ini}} file in the bin directory.
+
+Simple, really! :-)
+
+Good drivers to start from are {{FILE:totxt.pl}},
+{{FILE:tohtml.pl}} and {{FILE:tomif.pl}}.
+The drivers can be found in the {{perllib/sdf}} directory of
+the SDF distribution.
+
+H2: Required Skills
+
+The following skills are required to write a format driver:
+
+^ Good knowledge of the target format.
++ Perl programming.
+
+It also helps if one has a look at {{SECT:SDFAPI}} before beginning.
+
+
+H2: Driver Architecture Overview
+
+An SDF driver interacts with the core SDF system as follows:
+
+^ The {{FILE:sdf.ini}} file configures SDF so that the relevant driver
+  is loaded and called, when necessary.
+
++ Each driver is implemented by a single subroutine which is
+  responsible for initialising itself, processing the input,
+  finalising things and returning the output.
+
++ The input should be processed by:
+  ^^ calling the {{SdfNextPara}} routine within a while loop
+  ++ for each paragraph, calling the {{SdfNextSection}} routine
+     within a while loop.
+
+
+H2: Some General Comments
+
+If you are considering writing a driver, it might be a good idea
+to let people on the SDF mailing lists know. If you're lucky,
+someone else might have started a driver for the same output
+format or be willing to assist you develop a new one.
+Likewise, if you're having problems, send email to
+{{EMAIL:sdf-bugs@mincom.com}}. Chances are, an SDF guru will
+try to help.
+
+As a rule, it is a good idea to use configuration files to
+define the mappings from SDF entities to target entities.
+In this way, people can override the default mappings
+without changing your driver.
+
+Depending on your skills, the amount of changes you need to make,
+and your knowledge of SDF, the driver can take anything from 10
+minutes to 10 weeks. Good luck. :-)

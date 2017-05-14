@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::IssuerDBNull;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.9.1';
 
 ## @method void issuerDBInit()
 # Do nothing
@@ -80,9 +80,9 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2009-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2009, 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2009-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

@@ -1,0 +1,145 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: Conversion Variables</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_var.html">Parent Topic</A> | <A HREF="in_var.html">Previous Topic</A> | <A HREF="var_doc.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>13.2. Conversion Variables</H1>
+<HR>
+<H2><A NAME="Purpose">Purpose</A></H2>
+<P>These variables control the conversion process.</P>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Init-only:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_CONFIG
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the configuration library
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_LOOK
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the look library
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_STYLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+the type of a document
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_TARGET
+</TD>
+<TD>
+string
+</TD>
+<TD>
+target format
+</TD>
+</TR>
+<TR>
+<TD>
+OPT_NUMBER
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+line numbering frequency (when pretty-printing programming languages)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Processing:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DEFAULT_TABLE_STYLE
+</TD>
+<TD>
+string
+</TD>
+<TD>
+default style for tables (initially <EM>columns</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+DEFAULT_TAB_SIZE
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+default tab size (initially 8)
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>init-only</EM> variables can only be set via <A HREF="../ref/sdf.html">sdf</A>'s -D option or via the <A HREF="../ref/minit.html">init</A> macro on the top line of a file.</P>
+<P>The <EM>processing</EM> variables control the processing of <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> text before it is passed to a format driver for conversion.</P>
+<P><EM>DEFAULT_TAB_SIZE</EM> is used when tabs are converted to spaces within <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> files.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_var.html">Parent Topic</A> | <A HREF="in_var.html">Previous Topic</A> | <A HREF="var_doc.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

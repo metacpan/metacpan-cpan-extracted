@@ -13,7 +13,7 @@ package Lemonldap::NG::Portal::_Multi;
 use Lemonldap::NG::Portal::Simple;
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.4.8';
+our $VERSION = '1.9.1';
 
 ## @cmethod Lemonldap::NG::Portal::_Multi new(Lemonldap::NG::Portal::Simple portal)
 # Constructor
@@ -25,7 +25,7 @@ sub new {
     weaken $self->{p};
 
     # Browse authentication and userDB configuration
-    my @stack = ( $portal->{authentication}, $portal->{userDB} );
+    my @stack = ( $portal->{multiAuthStack}, $portal->{multiUserDBStack} );
     for ( my $i = 0 ; $i < 2 ; $i++ ) {
         $stack[$i] =~ s/^Multi\s*//;
         foreach my $l ( split /;/, $stack[$i] ) {
@@ -83,12 +83,7 @@ sub try {
         # Run subroutine
         $res = $self->{p}->$s();
 
-        # Stop if no error, or if confirmation needed, or if form not filled
-        return $res
-          if ( $res <= 0
-            or $res == PE_CONFIRM
-            or $res == PE_FIRSTACCESS
-            or $res == PE_FORMEMPTY );
+        return $res if $self->stop( $type, $res );
     }
     unless ( $self->next($type) ) {
         return ( $ci ? $res : $self->{res} );
@@ -101,6 +96,34 @@ sub try {
     ) if ($ci);
     $res = $self->replay( $sub, $type );
     return $res;
+}
+
+## @method protected boolean stop(int type, int res)
+# Call specific backend to know if multi process should stop
+# @param type 0 for authentication, 1 for userDB
+# @param res return code of last executed sub
+# return true if process should stop
+sub stop {
+    my ( $self, $type, $res ) = @_;
+
+    # Stop if no error, or if confirmation needed, or if form not filled
+    return 1
+      if ( $res <= 0
+        or $res == PE_CONFIRM
+        or $res == PE_FIRSTACCESS
+        or $res == PE_FORMEMPTY );
+
+    # Check specific backend stop method
+    my $stopSub = $self->{stack}->[$type]->[0]->{m} . "::stop";
+
+    my $ret = 0;
+    eval { $ret = $self->{p}->$stopSub($res); };
+    if ($@) {
+        $self->{p}->lmLog( $@, 'debug' );
+        return 0;
+    }
+
+    return $ret;
 }
 
 ## @method protected boolean next(int type)
@@ -143,6 +166,7 @@ sub replay {
         qw(authInit extractFormInfo userDBInit getUser setAuthSessionInfo
         setSessionInfo setMacros setGroups setPersistentSessionInfo
         setLocalGroups authenticate authFinish)
+
       )
     {
         push @subs, $_;

@@ -1,0 +1,51 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# Chain of boxes
+
+DEF TS TimeSensor {
+	loop TRUE 
+}
+
+DEF GR Transform {
+	rotation 1 1 0 0.5
+	children [
+	   Shape {
+		appearance Appearance {
+		 material Material {
+			diffuseColor 0.8 0.8 0
+		 }
+		}
+		geometry Text { string [
+		"Cube"
+		]}
+	   }
+	]
+}
+
+DEF CRS Script {
+	eventIn SFTime tick
+	eventOut MFNode nod
+	field SFInt32 count 0
+	url [
+	"javascript:
+	    function tick(val,time) {
+		a = count++;
+		if(a<3) {return 0;};
+		a -= 3;
+		n = Browser.createVrmlFromString(
+\"Shape { appearance Appearance { material Material { diffuseColor 0.8 0 0 } } geometry Box { size 0.8 0.8 0.8 } } \"
+		);
+		nod = n;
+	   }
+	"
+	]
+}
+
+ROUTE TS.cycleTime TO CRS.tick
+ROUTE CRS.nod TO GR.children
+
+

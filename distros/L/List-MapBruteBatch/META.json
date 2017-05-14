@@ -1,0 +1,66 @@
+{
+   "abstract" : "Do a brute-force batched C<map()> though a list with a callback",
+   "author" : [
+      "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "List-MapBruteBatch",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.566",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-List-MapBruteBatch@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=List-MapBruteBatch"
+      },
+      "homepage" : "http://metacpan.org/release/List-MapBruteBatch",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/list-mapbrutebatch.git",
+         "web" : "http://github.com/avar/list-mapbrutebatch"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::XS version 2.32"
+}
+

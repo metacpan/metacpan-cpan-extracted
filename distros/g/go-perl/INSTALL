@@ -1,0 +1,371 @@
+INSTALL
+=======
+
+If you have never installed a perl module before, you may want to seek
+help from a friendly nearby perl programmer or sys admin. The
+instructions below aren't guaranteed to work on all systems. These
+instructions are for Linux/Unix and Mac OS X. Other users have
+installed successfully on PCs before; we are unable to provide
+installation instruction, but the protocols below may work.
+
+You will of course need perl in order to run this; perl5.8 is required
+(version 5.6.x should also work, but go-perl is no longer tested with
+this setup)
+
+There's a lot of instructions here. There are a number of different
+ways to set up go-perl; the best way for you depends on your
+experience of perl and how your system is set up. These ways are
+described as different protocols below. Hopefully you should only need
+to follow one protocol to get going!
+
+Protocol I - set up via CPAN installer
+--------------------------------------
+
+If you are already familiar with installing CPAN modules, go-perl is
+no different from any other. If you aren't, you may wish to experiment
+now.
+
+Try typing the following:
+
+----------
+perl -MCPAN -e shell
+install GO::Parser
+----------
+
+The following may also work:
+
+----------
+cpan GO::Parser
+----------
+
+If this is the first time using the CPAN installer, you will be asked
+a barrage of questions. You are best to answer with the defaults - you
+can always change this later.
+
+If you do NOT have access to the system-wide perl directories on your
+system (these will typically be in /Library or /usr/local), then you
+should either get some help setting up CPAN for use with your system,
+OR you should follow an alternate protocol below. (You may wish to
+modify the value of PREFIX to ~ in the CPAN setup, as detailed in
+protocol III)
+
+If you are on OS X you may need to do this:
+
+----------
+sudo cpan GO::Parser
+----------
+
+Providing you do have write-access to these directories, the above
+commands should hopefully go smoothly. When installing go-perl, you
+may be asked if you wish to also install Data::Stag and IO::String -
+you should answer 'yes'
+
+After this, you should be ready to use go-perl! The scripts should be
+in your path and the libraries should be in the standard place. You
+may wish to start by trying "map2slim" or "go2obo_xml"
+
+There are certain applications that require additional third-party
+modules. All these are available from CPAN, and can be installed in
+the above manner. For example, if you try and use the
+go-filter-subset.pl script to generate a PNG image of an ontology
+subgraph, the system will complain you do not have the module
+"GraphViz" installed. To install this, simply type:
+
+----------
+perl -MCPAN -e shell
+install GraphViz
+----------
+
+Depending on what you use go-perl for, you may not ever need to
+install other CPAN modules
+
+Protocol II - Manual installation
+---------------------------------
+
+these are step-by-step manual installation instructions. These should
+be followed if protocol I does not work for you
+
+Installing required modules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+go-perl requires the Data::Stag module in order to run. You can
+download this module from here:
+
+http://search.cpan.org/~cmungall/Data-Stag/
+
+(version 0.07 or higher is required; these docs assume you have
+downloaded 0.08)
+
+Data::Stag in turn requires the following module:
+
+http://search.cpan.org/~gaas/IO-String/
+
+After downloading, type the following instructions to install IO-String:
+
+----------
+cd ~
+tar -zxvf IO-String-1.06
+cd IO-String-1.06
+perl Makefile.PL
+make test
+----------
+
+If you have permission to install system-wide, you should then type:
+
+----------
+make install
+----------
+
+On Mac OS X, you may need to type
+
+----------
+sudo make install
+----------
+
+If you do not have permission to install perl modules in the default
+directory on your system, you need to follow protocol III
+
+Once you have installed IO::String, you can install Data::Stag - the
+directions are the same:
+
+----------
+cd ~
+tar -zxvf Data-Stag-0.08.tar.gz
+cd Data-Stag-0.08
+perl Makefile.PL
+make test
+make install
+----------
+
+Once you have installed Data::Stag, you are now ready to install
+go-perl
+
+NOTE: There are certain applications that require additional
+third-party modules (all available from CPAN); if you run into
+problems running any of these applications, see the section
+"Additional Modules" below
+
+Installing go-perl
+~~~~~~~~~~~~~~~~~~
+
+If you are reading this, then presumably you have unpacked the
+distribution - either the go-perl distribution, or the go-dev
+distribution that contains go-perl.
+
+To install the modules system wide, type this:
+
+----------------
+cd go-perl-0.02
+perl Makefile.PL
+make test
+make install
+----------------
+
+The first command may tell you that you have certain optional modules
+missing - these may not be required. If you do require them, see
+"Additional Modules" below
+
+If the system complains when you type "make install" you may not have
+sufficient permissions. In this case you need to use the modules from
+your home directory
+
+
+Additional Modules
+~~~~~~~~~~~~~~~~~~
+
+You may need additional modules for running certain scripts in certain
+modes. You can obtain all these from this website:
+
+http://www.cpan.org/
+
+Protocol III - installing modules in your home directory
+-------------------------------------------------------
+
+If you do not have sufficient permission to install system-wide, there
+is a third method you can try, which is to install IO::String,
+Data::Stag and go-perl in your home directory. To do this, you need to
+set the PREFIX variable when installing.
+
+First download Data::Stag and IO::String from CPAN, as detailed in
+protocol II.
+
+Then try this:
+
+----------
+setenv PERL5LIB "${PERL5LIB}:$HOME/lib/perl5/site_perl/5.8.0/
+cd ~
+tar -zxvf IO-String-1.06
+cd IO-String-1.06
+perl Makefile.PL PREFIX=~
+make test
+make install
+cd ~
+tar -zxvf Data-Stag-0.08.tar.gz
+cd Data-Stag-0.08
+perl Makefile.PL PREFIX=~
+make test
+make install
+make install
+cd
+cd go-perl-0.02
+perl Makefile.PL PREFIX=~
+make test
+make install
+----------
+
+If this works, then place this in your startup file:
+
+----------
+setenv PERL5LIB "${PERL5LIB}:$HOME/lib/perl5/site_perl/5.8.0/
+setenv PATH "${PATH}:$HOME/bin"
+----------
+
+You may need to modify the above, depending on your
+setup. Instructions for this are outwith the scope of this
+document. Try consulting online sources, such as:
+
+http://www.perl.com/pub/a/2002/04/10/mod_perl.html
+
+
+Additional Modules
+------------------
+
+Certain applications (for example, those involving XML parsing) will
+require additional modules from CPAN. If you are going on to install
+go-db-perl and/or AmiGO you will probably need a few extra modules.
+
+If this is the case, you are strongly advised to use the CPAN
+auto-installer. Once you have set this up, installing perl modules
+will be *much* easier.
+
+To use this, type:
+--------------------
+perl -MCPAN -e shell
+--------------------
+
+Then follow the setup instructions
+
+Then type:
+--------------------
+install <<Module name here>>
+quit
+--------------------
+
+You can use the CPAN installer to install go-perl itself; just type
+--------------------
+perl -MCPAN -e shell
+install go-perl
+--------------------
+
+This is the easiest way of keeping up to date with go-perl releases
+
+
+Using go-perl as part of go-dev
+-------------------------------
+
+go-perl is part of the wider go-dev distribution, although it can be
+used independently. go-dev also includes go-db-perl (for GO MySQL DB
+access) and an xml library (for converting to other XML based formats
+such as OWL), the AmiGO web application and the schema for the GO
+MySQL db
+
+If you are using all of go-dev, you may need to alter the instructions
+above (for example, your go-perl library may be unpacked in
+~/go-dev/go-perl). You may also need to set GO_ROOT:
+
+The GO_ROOT environment variable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using go-perl as part of the wider go-dev distribution,
+there are some applications that require you to specify the location
+of go-dev using the GO_ROOT env var
+
+bash shells:
+
+----------
+export GO_ROOT=$HOME/go-dev
+----------
+
+other shells:
+
+----------
+setenv GO_ROOT $HOME/go-dev
+----------
+
+It is a good idea to put this in your startup file
+
+Installing from CVS
+-------------------
+
+You can get the latest bleeding-edge version of go-perl from the
+go-dev cvs tree. See http://www.godatabase.org/dev for details
+
+Once you have checked out go-dev/go-perl, do the usual thing (if
+you're installing from cvs it's assumed you're a bleeding edge user
+and know how to do this):
+
+cd ~/cvs/go-dev/go-perl
+perl Makefile.PL
+make test
+setenv GO_ROOT ~/cvs/go-dev
+setenv PERL5LIB "$PERL5LIB:~/cvs/go-dev/go-perl"
+
+The assumption is that if you are using cvs you want to use the
+working copy; if you want to install from cvs, instead do the
+following steps:
+
+cd go-dev/go-perl
+perl Makefile.PL
+make GO/xsl
+make test
+make install
+
+The "make GO/xsl" stage is not strictly necessary; if you omit it you
+will get warnings. You can ignore these, but if you ever want to use
+the XSL you will need to check out go-dev/xml and set the GO_ROOT
+environment variaable as above.
+
+Note that none of this is necessary if you install from CPAN - the
+installation of the XSL is taken care of automatically
+
+Documentation
+-------------
+
+For full documentation, see the doc/ directory, or look online
+
+http://www.godatabase.org/dev
+
+Mailing List
+------------
+
+http://lists.sourceforge.net/lists/listinfo/gmod-ontol-sw-dev
+
+
+Installing Documentation Locally
+--------------------------------
+
+it's unlikely you'll need to do this: you can always browse the pod
+documentation online at:
+
+http://www.godatabase.org/dev/pod
+
+The documentation can be installed in a web-viewable directory; this
+is best done in a directory that is visible as $BASE_URL/dev/pod
+
+Just type
+
+----------
+cd go-perl
+perl Makefile.PL
+make pod
+cp -pR pod/* $HTTP_DOCUMENT_ROOT/dev/pod
+----------
+
+substituting HTTP_DOCUMENT_ROOT with the root path of the WWW
+documents on your webserver
+
+You can now browse the documentation:
+http://www.yourhost.com/dev/pod
+
+(You may also wish to copy the whole go-dev distribution under the
+/dev/ directory)

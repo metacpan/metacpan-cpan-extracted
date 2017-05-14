@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 use strict 'vars';
 use LWP::UserAgent;
@@ -73,22 +73,25 @@ sub process_text ($$$) {
   my ($chunk,$response,$protocol) = @_;
   my ($position,$remainder);
   $BUFFER .= $chunk;
+
   if ($COUNT) {
     print $1,"\n" if $BUFFER=~/^(\d+)\n/;
     $GOT = $MAX;
     return;
   }
-  if ($VERBOSE) {
-    while ($BUFFER=~/^\s+\d+ (\w+)\n\n(.*)\ngi/mg) {
-      print "$1\t$2\n";
+  elsif ($DB =~ /^[mt]$/) {
+    while ($BUFFER=~/^\s+(\d+) (.+)$/mg) {
+      print $VERBOSE ? "$1\t$2" : $1,"\n";
       $position = pos($BUFFER);
       $GOT++;
     }
-  } else {
-    while ($BUFFER=~/^\s+\d+ (\w+)\n\n/mg) {
-      print "$1\n";
-      $GOT++;
+  }
+  
+  else {
+    while ($BUFFER=~/^\s+\d+ (\w+)\n\n(.*)\ngi/mg) {
+      print $VERBOSE ? "$1\t$2" : $1,"\n";
       $position = pos($BUFFER);
+      $GOT++;
     }
   }
   substr($BUFFER,0,$position) = '';

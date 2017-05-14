@@ -1,0 +1,443 @@
+#!/usr/bin/perl
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+  
+use warnings;
+use strict;
+
+# Copyright (c) 2006 Randy Smith
+# $Id: vsoapc,v 1.8 2007/07/03 21:10:57 perlstalker Exp $
+our $VERSION = "0.4.0";
+
+use Pod::Usage;
+use Getopt::Long qw(:config require_order);
+use Term::ReadKey;
+use FindBin;
+use Config::IniFiles;
+use SOAP::Lite
+#    on_fault=> sub { my ($soap, $res) = @_;
+#                if (ref $res) {
+#                    #print "res: "; use Data::Dumper; print Dumper $res;
+#                    die "Error: ", $res->faultstring, "\n"
+#                } else {
+#                    print "soap: "; use Data::Dumper; print Dumper $soap;
+#                    if ($soap->transport->status =~ /^200 /) {
+#                       # Fault when everything is OK?
+#                    } else {
+#                        die "Error: ", $soap->transport->status, "\n";
+#                    }
+#                }
+#		     };
+;
+our $DEBUG = 0;
+our $c_sec = 'vsoapc';
+
+BEGIN {
+
+    our @etc_dirs = (
+                      "$FindBin::Bin/../etc",   "$FindBin::Bin",
+                      "$FindBin::Bin/..",       "$FindBin::Bin/vuser",
+                      "$FindBin::Bin/../vuser", "$FindBin::Bin/../etc/vuser",
+                      '/usr/local/etc',         '/usr/local/etc/vuser',
+                      '/etc',                   '/etc/vuser',
+    );
+}
+
+use vars qw(@etc_dirs);
+
+use lib ( map { "$_/extensions" } @etc_dirs );
+use lib ( map { "$_/lib" } @etc_dirs );
+
+use VUser::ExtLib qw(:config);
+use VUser::Log qw(:levels);
+
+## Get signal names
+use Config;
+defined $Config{sig_name} || die "No sigs?";
+my ( %signo, @signame, $i );
+$i = 0;
+foreach my $name ( split( ' ', $Config{sig_name} ) ) {
+    $signo{$name} = $i;
+    $signame[$i] = $name;
+    $i++;
+}
+
+## Load the config file
+my $config_file;
+my $username = '';
+my $password = undef;
+my $curses = 0;
+my $ip = '';
+my $version = 0;
+my $help = 0;
+
+GetOptions('username|u=s' => \$username,
+	   'password|p=s' => \$password,
+	   'curses!'       => \$curses,
+	   'version'      => \$version,
+	   'config=s'     => \$config_file,
+	   'debug|d+'     => \$DEBUG,
+	   'help!'        => \$help
+	   );
+
+if ( defined $config_file ) {
+    die "FATAL: config file: $config_file not found" unless ( -e $config_file );
+} else {
+    for my $etc_dir (@etc_dirs) {
+        if ( -e "$etc_dir/vuser.conf" ) {
+            $config_file = "$etc_dir/vuser.conf";
+            last;
+        }
+    }
+}
+
+if ( not defined $config_file ) {
+    die "Unable to find a vuser.conf file in "
+      . join( ", ", @etc_dirs ) . ".\n";
+}
+
+my %cfg;
+tie %cfg, 'Config::IniFiles', ( -file => $config_file );
+
+our $log = VUser::Log->new(\%cfg, 'vsoapc');
+
+if (not $DEBUG) {
+    # Only load the debug from the config file if we haven't turned
+    # debugging on from the cmd line    
+    $DEBUG = VUser::ExtLib::strip_ws($cfg{'vuser'}{'debug'}) || 0;
+    $DEBUG = VUser::ExtLib::check_bool($DEBUG) unless $DEBUG =~ /^\d+$/;
+}
+my $debug = $DEBUG;
+
+if (not $username) {
+    # Guess the username.
+    $username = getlogin || (getpwuid($<))[0] || die "Unable to determine username. Use --username\n";
+}
+
+pod2usage() if $help;
+
+if ($version) {
+    print "Version: $VERSION\n";
+    exit;
+}
+
+if (check_bool ($cfg{$c_sec}{'require authentication'}) and not $password) {
+    print "Password: ";
+    ReadMode('noecho'); # Turn off character echo
+    $password = ReadLine(0);
+    chomp $password;
+    ReadMode(0); # Reset the tty
+    print "\n";
+}
+
+print "vsoapc $VERSION\n" if $debug;
+
+my $keyword = shift @ARGV || 'help';
+my $action = shift @ARGV;
+
+print "Keyword: $keyword Action: $action\n" if $DEBUG >= 1;
+
+# Actions cannot start with -
+if (defined $action
+    and $action =~ /^-/) {
+    unshift @ARGV, $action;
+    $action = '';
+}
+
+$action = '' unless defined $action;
+
+# Ok. Now it's time to do the action.
+our $uri = strip_ws($cfg{$c_sec}{'uri'}) || 'urn:/VUser';
+our $proxy = strip_ws($cfg{$c_sec}{'proxy'});
+our $service = strip_ws($cfg{$c_sec}{'service'});
+
+my $soap;
+if ($service) {
+    $log->log (LOG_INFO, "Attempting to connect to $service");
+    $soap = SOAP::Lite->service($service);
+} else {
+    $log->log (LOG_INFO, "Attempting to connect to $proxy for $uri");
+    $soap = SOAP::Lite
+    -> uri ($uri)
+    -> proxy ($proxy);
+}
+
+$log->log (LOG_DEBUG, "Credentials: %s, %s", $username, defined $password? $password : 'undef');
+
+# Log sends back info in the SOAP headers including a ticket that
+# is sent back through the headers for the other task functions
+if ($debug) {
+    use Data::Dumper; print Dumper $soap;
+}
+my $authinfo = $soap
+    #SOAP::Lite->service($service)
+    -> login ($username, $password)
+    ;# -> result;
+    
+if ($debug) {
+    use Data::Dumper; print Dumper $authinfo;
+    $log->log (LOG_DEBUG, "Login: $authinfo");
+}
+
+if (not $authinfo) {
+    die "Invalid login\n";
+}
+
+if ($keyword eq 'help') {
+    show_help($action);
+} else {
+    my %opts = create_opts($keyword, $action);
+    ## Now translate the options into SOAP::Data objects in a magical way
+    my @params = hash2soap(%opts);
+    if ($debug) {
+        print "SOAP params: ";
+        use Data::Dumper; print Dumper \@params;
+    }
+    # Do action
+    my $soap_auth = SOAP::Header->name("authinfo", $authinfo);
+    #my $soap_auth = SOAP::Data->name("authinfo", $authinfo);
+    
+    my $call = #$soap
+        SOAP::Lite->uri($uri)->proxy($proxy)
+	   -> call("$keyword\_$action", $soap_auth, @params);
+	if ($debug) {
+	    print "\$call: "; use Data::Dumper; print Dumper $call;
+	}
+	
+	my @results = $call->valueof("//results");
+	#my @results = $call->paramsout();
+	if ($debug > 1) {
+	    print "RS: "; use Data::Dumper; print Dumper \@results;
+	}
+	
+	display_resultSet(@results);
+}
+
+sub display_resultSet {
+    my @results = @_;
+    $log->log(LOG_DEBUG, "Displaying ResultSet");
+    foreach my $result (@results) {
+        if ($debug > 2) {
+            print '$result: ';
+            use Data::Dumper; print Dumper $result;
+        }
+        # Psuedo-hashes here ---v
+        # {'ResultSet'} is a []
+        my $result_sets = $result->{'results'}{'ResultSet'};
+        my $sets;
+        if (ref $result_sets eq 'ARRAY') {
+            $sets = $result_sets;
+        } else {
+            $sets = [$result_sets];
+        }
+        foreach my $rs (@$sets) { 
+            my $cols = $rs->{'columns'}{'item'};
+            my $values = $rs->{'values'}{'item'};
+            my @rows = ();
+            if ($debug > 2) {
+                print '$values: ';
+                use Data::Dumper; print Dumper $values;
+            }
+            if (ref $values eq 'HASH') {
+                push @rows, $values;
+            } elsif (ref $values eq 'ARRAY') {
+                @rows = @{ $values };
+            }
+            if ($debug > 2) {
+                print '$rows: ';
+                use Data::Dumper; print Dumper \@rows;
+            }
+            for (my $i = 0; $i < @rows; $i++) {
+                print "\n" if ($i > 0);
+                for (my $j = 0; $j < @$cols; $j++) {
+                    #use Data::Dumper; print Dumper $rows[$i];
+                    printf("%s: %s\n", $cols->[$j], $rows[$i]{'item'}[$j]);
+                }
+            }
+        }
+    }
+}
+
+sub hash2soap {
+    my %opts = @_;
+    
+    my @params = ();
+    
+    foreach my $key (keys %opts) {
+        my $data = SOAP::Data->name($key => $opts{$key});
+        push @params, $data;
+    }
+    
+    return @params;
+}
+
+sub show_help
+{
+    my $keyword = shift;
+
+    if (not $keyword) {
+	   my @keywords = #$soap
+	       SOAP::Lite->uri($uri)->proxy($proxy)
+	       -> call ('get_keywords', SOAP::Header->new(authinfo => $authinfo))
+	       -> valueof('//keywords');
+	   
+	   if ($debug) {
+	       print "Keywords: ";
+	       use Data::Dumper; print Dumper \@keywords;
+	   }
+	   
+	   foreach my $key (@keywords) {
+	       #if ($debug) { print "Key: "; use Data::Dumper; print Dumper $key; }
+	       my $descr = $key->{description} || 'No description';
+	       printf ("%8s - %s\n", $key->{keyword}, $descr);
+	   }
+    } else {
+	    print "Options marked with '*' are required.\n";
+
+        if ($debug) {
+            use Data::Dumper; print Dumper $soap;
+            $log->log(LOG_DEBUG, "Service: %s / %s", $service, $soap->service);
+        }
+
+	   my @actions = #$soap
+	       #SOAP::Lite->service($service)
+	       SOAP::Lite->uri($uri)->proxy($proxy)
+           -> call ('get_actions', SOAP::Header->name(authinfo => $authinfo),
+	                      SOAP::Data->name('keyword' => $keyword))
+	       -> valueof('//actions');
+	   if ($debug) {
+	       print '@actions: ';
+	       use Data::Dumper; print Dumper \@actions;
+	   }
+	   foreach my $action (@actions) {
+	       my $descr = $action->{description} || 'No description';
+	       printf ("%8s - %s\n", $action->{action}, $descr);
+	       my @options = #$soap
+	           SOAP::Lite->uri($uri)->proxy($proxy)
+		       -> call ('get_options', SOAP::Header->new(authinfo => $authinfo),
+		                      SOAP::Data->name('keyword' => $keyword),
+		                      SOAP::Data->name('action' => $action->{action}))
+		       -> valueof('//options');
+	       foreach my $option (@options) {
+	           next if $option eq '';
+		       my $descr = $option->{description} || 'No description';
+		       printf("\t%-16s %s - %s\n",
+		              "--".$option->{option},
+		              ($option->{required}? '*': ' '),
+		              $descr);
+	       }
+	   }
+    }
+}
+
+# Create options from meta data and options list.
+sub create_opts
+{
+    my $keyword = shift;
+    my $action = shift;
+
+    $log->log(LOG_DEBUG, "Creating options for $keyword | $action");
+
+    my @options = #$soap
+        SOAP::Lite->uri($uri)->proxy($proxy)
+        -> get_options (SOAP::Header->name('authinfo' => $authinfo),
+	                    SOAP::Data->name('keyword' => $keyword),
+	                    SOAP::Data->name('action' => $action)
+	                    )
+        -> valueof('//options');
+
+    if ($debug) {
+        print "Raw options: ";
+        use Data::Dumper; print Dumper \@options;
+    }
+
+    # This should be the same (or very similar to) what's done in
+    # VUser::ExtHandler
+    my %opts = ();
+    my @opt_defs = ();
+
+    foreach my $opt (@options) {
+        next if $opt eq '';
+	   my $gopt_type = '';
+
+	   my $type = $opt->{type};
+	   if ($type eq 'string') {
+	       $gopt_type = '=s';
+	   } elsif ($type eq 'integer') {
+	       $gopt_type = '=i';
+	   } elsif ($type eq 'counter') {
+	       $gopt_type = '+';
+	   } elsif ($type eq 'boolean') {
+	       $gopt_type = '!';
+	   } elsif ($type eq 'float') {
+	       $gopt_type = '=f';
+	   }
+
+	   my $def = $opt->{option}.$gopt_type;
+	   push @opt_defs , $def;
+    }
+
+    if (@opt_defs) {
+	   GetOptions(\%opts, @opt_defs);
+    }
+    return %opts;
+}
+    
+__END__
+
+=head1 NAME
+
+vsoapd - vuser SOAP daemon.
+
+=head1 SYNOPSIS
+
+=head1 OPTIONS
+
+=head1 DESCRIPTION
+
+=head1 CONFIGURATION
+
+ [vsoapc] 
+ # Server to connect to. The protocol must match the transport
+ # used by the vsoapd server. (vsoapd defaults to HTTP.)
+ proxy = http://localhost:8000/
+ 
+ # Path to a generated wsdl file for vsoapd.
+ service = /path/to/vuser.wsdl
+ 
+ # Set to 'yes' if vsoapd required authentication
+ require authentication = no
+
+=head1 BUGS
+
+Despite what one may think, both 'proxy' and 'service' need to be set.
+SOAP::Lite needs the WSDL so that it can handle the custom data types
+but using ->service() calls seems to fail after the first call. Some
+enterprising soul should try to find out why ->service() does not work
+at fix it.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Randy Smith <perlstalker@vuser.org>
+
+=head1 LICENSE
+
+ This file is part of vsoapd.
+ 
+ vsoapd is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ vsoapd is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with vsoapd; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+=cut

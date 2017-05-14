@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+use File::Find;
+
+# Check the usage
+unless (@ARGV) {
+    print "usage: mkplhtml all\n";
+    print "  or   mkplhtml dir1 ...\n";
+    exit 1;
+}
+
+# Traverse the directories
+my @dirs = $ARGV[0] eq 'all' ? ('ext', 'lib', 'pod', 'vms', 'utils') : @ARGV;
+find(\&wanted, @dirs);
+
+# Build the catalog
+print "building the catalog...\n";
+system("sdf -2html catalog");
+
+# Convert each .pm and .pod file
+sub wanted {
+    if (/\.(pm|pod)$/ || $File::Find::dir eq 'utils' && /\.PL$/) {
+        my $depth = scalar(split(/\//, $File::Find::dir));
+        print "$File::Find::name (depth: $depth)\n";
+        system("sdf -2html -cperl -DPERL_DIR_DEPTH=$depth $_");
+    }
+}

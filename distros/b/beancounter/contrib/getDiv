@@ -1,0 +1,135 @@
+#!/usr/bin/perl -w
+#
+# contributed to beancounter by 
+# Joao Antunes Costa <joao.costa /AT/ fidelizarte /DOT/ pt
+#
+# copyright Joao Antunes Costa <joao.costa /AT/ fidelizarte /DOT/ pt
+
+use strict;
+use LWP::Simple;
+use HTML::TreeBuilder;
+use HTML::FormatText;
+use Date::Calc qw (Delta_Days);
+
+
+my $symbol = shift || die("Usage:\n\tgetDiv symbol\n");
+my ($second, $minute, $hour, $day, $month, $year) = localtime(time);
+$month++;
+$month = "0$month" if ($month < 10);
+$day = "0$day" if ($day < 10);
+$year+=1900;
+
+my $URL = "http://finance.yahoo.com/q/hp?s=$symbol&a=00&b=1&c=1980&d=$month&e=$day&f=$year&g=v";
+
+my $content;
+if (defined ($content = get $URL)) {
+  my $tree = HTML::TreeBuilder->new;
+  $tree->parse($content);
+  my $txt = HTML::FormatText->new;
+  my @text = reverse(split("\n", $txt->format($tree)));
+
+  my $work = 0;
+  my $IsSplit = 0;
+  my $lastDate;
+  my $firstDate = "1980-01-01";
+  my $ratio = 0;
+  my $lastRatio = 0;
+  my $sql;
+  my ($one, $two);
+
+
+  foreach (@text) {
+    chomp($_);
+    $work = 0 if (/Adj Close/i);
+    if ($work) {
+      s/^ +| +$//;
+
+      if (/^(\d[^:]+):([^s]+)/i) {
+          $IsSplit = 1;
+          $one = $1;
+          $two = $2;
+          $one =~ s/^\s+|\s+$//;
+          $two =~ s/^\s+|\s+$//;
+      }
+
+      if (/^\d.+\d$/ && $IsSplit) {
+          $IsSplit = 0;
+          $lastDate = FormatDate($_);
+          $ratio = $two / $one;
+          if (DateOk($firstDate, $lastDate) || $lastRatio != $ratio) {
+            $lastRatio = $ratio;
+            #print "$ratio at $lastDate\n";
+            $sql = "UPDATE stockprices SET day_open = day_open * $ratio, day_low = day_low * $ratio, day_high = day_high * $ratio, day_close = day_close * $ratio, volume = volume * $ratio WHERE symbol = '$symbol' AND date < '$lastDate';\n";
+            print $sql;
+            $firstDate = $lastDate;
+          } else {
+            warn "Ignoring $two/$one split at $lastDate for $symbol\n";
+          }
+      }
+
+    }
+    $work = 1 if (/Close price/i);
+  }
+} else {
+  die "could not get $symbol\n";
+}
+
+
+sub DateOk {
+my ($firstDate, $lastDate) = @_;
+
+#print "checking $firstDate vs $lastDate\n";
+my @d1 = split "-", $firstDate;
+my @d2 = split "-", $lastDate;
+my $days = abs(Delta_Days ($d1[0], $d1[1], $d1[2], $d2[0], $d2[1], $d2[2]));
+return 1 if ($days > 40);
+return 0;
+}
+
+sub FormatDate {
+my $date = shift;
+my @date = split("-", $date);
+#print "Formatting $date\n";
+
+if ($date[2] > 85) {$date[2] = "19".$date[2];} else {$date[2] = "20".$date[2];}
+
+return $date[2] . "-" . GetMonth($date[1]) . "-" . stuff($date[0]);
+}
+
+sub stuff {
+my $day = shift;
+return "0$day" if (length($day) == 1);
+return $day;
+}
+
+sub GetMonth {
+my $month = shift;
+if ( $month =~ /Jan/i) {
+return "01";
+} elsif ( $month =~ /Feb/i) {
+return "02";
+} elsif ( $month =~ /Mar/i) {
+return "03";
+} elsif ( $month =~ /Apr/i) {
+return "04";
+} elsif ( $month =~ /May/i) {
+return "05";
+} elsif ( $month =~ /Jun/i) {
+return "06";
+} elsif ( $month =~ /Jul/i) {
+return "07";
+} elsif ( $month =~ /Aug/i) {
+return "08";
+} elsif ( $month =~ /Sep/i) {
+return "09";
+} elsif ( $month =~ /Oct/i) {
+return "10";
+} elsif ( $month =~ /Nov/i) {
+return "11";
+} elsif ( $month =~ /Dec/i) {
+return "12";
+} else {
+die("Unrecognized month string ($month)");
+}
+}
+

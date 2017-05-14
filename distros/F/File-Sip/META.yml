@@ -1,0 +1,31 @@
+---
+abstract: "file parser intended for big files that don't fit into main memory."
+author:
+  - 'Alexis Sukrieh <sukria@sukria.net>'
+build_requires:
+  File::Basename: 0
+  File::Spec: 0
+  Test::More: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Sip
+requires:
+  Carp: 0
+  Encode: 0
+  IO::File: 0
+  Moo: 0
+  feature: 0
+resources:
+  bugtracker: https://github.com/Weborama/File-Sip/issues
+  homepage: https://github.com/Weborama/File-Sip/wiki
+  repository: git://github.com/Weborama/File-Sip.git
+version: 0.003

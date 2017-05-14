@@ -1,0 +1,8 @@
+type,Street,City,State,Zip,UID
+home,"123 Main St",Ourtown,IN,45789,101
+office,"123 State st",Ourtown,IN,45789,101
+home,"77 Third St",Ourtown,IN,45766,102
+office,"642 Broadway",Ourtown,IN,45766,102
+home,"23 Fourth St",Ourtown,IN,45799,103
+office,"976 washington",Ourtown,IN,45789,103
+vacation,"55 Beach bvld",Naples,FL,10899,103

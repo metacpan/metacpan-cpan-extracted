@@ -1,0 +1,96 @@
+# zxid/sg/oasis-sstc-saml-schema-protocol-1.1.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: oasis-sstc-saml-schema-protocol-1.1.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(sp11, urn:oasis:names:tc:SAML:1.0:protocol)
+
+import(sa11, urn:oasis:names:tc:SAML:1.0:assertion, oasis-sstc-saml-schema-assertion-1.1.xsd)
+import(ds,   http://www.w3.org/2000/09/xmldsig#, http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd)
+
+ns(xs,http://www.w3.org/2001/XMLSchema)
+
+%RequestAbstractType:
+  sp11:RespondWith*
+  ds:Signature?
+  @RequestID	 -> %xs:ID
+  @MajorVersion	 -> %xs:integer
+  @MinorVersion	 -> %xs:integer
+  @IssueInstant	 -> %xs:dateTime
+  ;
+RespondWith	 -> %xs:QName
+
+Request	 -> %sp11:RequestType
+%RequestType:	 base(sp11:RequestAbstractType)
+  sp11:Query?
+  sp11:SubjectQuery?
+  sp11:AuthenticationQuery?
+  sp11:AttributeQuery?
+  sp11:AuthorizationDecisionQuery?
+  sa11:AssertionIDReference+
+  sp11:AssertionArtifact+
+  ;
+
+AssertionArtifact -> %xs:string
+
+Query	 -> %sp11:QueryAbstractType
+
+SubjectQuery	 -> %sp11:SubjectQueryAbstractType
+%SubjectQueryAbstractType: base(sp11:QueryAbstractType)
+  sa11:Subject
+  ;
+
+AuthenticationQuery	  -> %sp11:AuthenticationQueryType
+%AuthenticationQueryType: base(sp11:SubjectQueryAbstractType)
+  @AuthenticationMethod?  -> %xs:anyURI
+  ;
+
+AttributeQuery	 -> %sp11:AttributeQueryType
+%AttributeQueryType:	 base(sp11:SubjectQueryAbstractType)
+  sa11:AttributeDesignator*
+  @Resource?	 -> %xs:anyURI
+  ;
+
+AuthorizationDecisionQuery	 -> %sp11:AuthorizationDecisionQueryType
+%AuthorizationDecisionQueryType: base(sp11:SubjectQueryAbstractType)
+  sa11:Action+
+  sa11:Evidence?
+  @Resource	 -> %xs:anyURI
+  ;
+
+%ResponseAbstractType:
+  ds:Signature?
+  @ResponseID	 -> %xs:ID
+  @InResponseTo? -> %xs:NCName
+  @MajorVersion	 -> %xs:integer
+  @MinorVersion	 -> %xs:integer
+  @IssueInstant	 -> %xs:dateTime
+  @Recipient?	 -> %xs:anyURI
+  ;
+
+Response	 -> %sp11:ResponseType
+%ResponseType:	 base(sp11:ResponseAbstractType)
+  sp11:Status
+  sa11:Assertion*
+  ;
+
+Status	 -> %sp11:StatusType
+%StatusType:
+  sp11:StatusCode
+  sp11:StatusMessage?
+  sp11:StatusDetail?
+  ;
+
+StatusCode	 -> %sp11:StatusCodeType
+%StatusCodeType:
+  sp11:StatusCode?
+  @Value	 -> %xs:QName
+  ;
+
+StatusMessage	 -> %xs:string
+
+StatusDetail	 -> %sp11:StatusDetailType
+%StatusDetailType:
+  any*  processContents(lax)
+  ;
+
+#EOF

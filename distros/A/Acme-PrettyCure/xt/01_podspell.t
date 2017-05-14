@@ -19,11 +19,5 @@ all_pod_files_spelling_ok('lib');
 __DATA__
 Kan Fushihara
 kan@mfac.jp
-Kazuhiro
-Osawa
-Hannyaharamitu
-Makamaka
 Acme::PrettyCure
 hiroine
-precure
-tv

@@ -5,7 +5,7 @@ use warnings;
 package CPAN::Common::Index::LocalPackage;
 # ABSTRACT: Search index via custom local CPAN package flatfile
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent 'CPAN::Common::Index::Mirror';
 
@@ -13,7 +13,10 @@ use Class::Tiny qw/source/;
 
 use Carp;
 use IO::Uncompress::Gunzip ();
-use Path::Tiny;
+use File::Basename ();
+use File::Copy ();
+use File::Spec;
+use File::stat ();
 
 #pod =attr source (REQUIRED)
 #pod
@@ -44,7 +47,9 @@ sub BUILD {
 
 sub cached_package {
     my ($self) = @_;
-    my $package = path( $self->cache, path( $self->source )->basename );
+    my $package = File::Spec->catfile(
+        $self->cache, File::Basename::basename($self->source)
+    );
     $package =~ s/\.gz$//;
     $self->refresh_index unless -r $package;
     return $package;
@@ -52,19 +57,21 @@ sub cached_package {
 
 sub refresh_index {
     my ($self) = @_;
-    my $source = path( $self->source );
+    my $source = $self->source;
+    my $basename = File::Basename::basename($source);
     if ( $source =~ /\.gz$/ ) {
-        ( my $uncompressed = $source->basename ) =~ s/\.gz$//;
-        $uncompressed = path( $self->cache, $uncompressed );
-        if ( !-f $uncompressed or $source->stat->mtime > $uncompressed->stat->mtime ) {
+        ( my $uncompressed = $basename ) =~ s/\.gz$//;
+        $uncompressed = File::Spec->catfile( $self->cache, $uncompressed );
+        if ( !-f $uncompressed
+              or File::stat::stat($source)->mtime > File::stat::stat($uncompressed)->mtime ) {
             IO::Uncompress::Gunzip::gunzip( map { "$_" } $source, $uncompressed )
               or Carp::croak "gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n";
         }
     }
     else {
-        my $dest = path( $self->cache, $source->basename );
-        $source->copy($dest)
-          if !-e $dest || $source->stat->mtime > $dest->stat->mtime;
+        my $dest = File::Spec->catfile( $self->cache, $basename );
+        File::Copy::copy($source, $dest)
+          if !-e $dest || File::stat::stat($source)->mtime > File::stat::stat($dest)->mtime;
     }
     return 1;
 }
@@ -88,7 +95,7 @@ CPAN::Common::Index::LocalPackage - Search index via custom local CPAN package f
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,173 @@
+H1: 2.000beta8a
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+H3: Overview
+
+The enhancements are:
+
+!block sections
+* List formatting changes
+* Multiple records per row in a table
+* Programming languages filters
+* Dynamic filter loading
+* Variable access in where attributes
+* Generalised file extensions for references columns
+* New images
+* Class value functions
+* Component directory files
+* The catalog macro
+* MIMS specific formats
+* Reporting.
+!endblock
+
+Further details are provided below.
+
+H3: List formatting changes
+
+Following readability feedback:
+
+* the default list item indent has been reduced to 18 points
+* the size of bullets has been increased
+* dashes are now used for 2nd level list items (and 4th and 6th).
+
+H3: Multiple records per row in a table
+
+The {{FILT:table}} filter now supports the {{wrap}} attribute which
+puts multiple physical records into a single row.
+The wrap attribute is also supported by class filters.
+
+This feature is useful for producing online HTML indexes.
+
+H3: Programming languages filters
+
+If a filter matches the name of a programming language, 
+the text is formatted as an example in that language, e.g.
+
+E:!block C
+E:int i;
+E:!endblock
+
+is now implicitly:
+
+E:!block example; lang='C'
+E:int i;
+E:!endblock
+
+H3: Dynamic filter loading
+
+If a filter is not found, SDF now looks for a file called
+{{filter_name}}.sdp and dynamically loads the filter from
+that file if it can. See the {{FILE:stdlib/module.sdp}} file
+for an example.
+
+H3: Variable access in where attributes
+
+Variables can now be accessed in the where attribute of the
+{{FILT:table}} filter and class filters.
+For example:
+
+E: !define MODULE_CODE "XYZ"
+E: ...
+E: !include "../document.reg"; references; compact; \
+E:   where='$o{"Reference"} =~ /$var{"MODULE_CODE"}/'; \
+E:   columns="PS,REF:Reference,DOC:Document,CONCISE:Date"
+
+H3: Generalised file extensions for references columns
+
+If a reference attribute is all uppercase (e.g. TXT), a clickable image
+for a file with that (lowercase) extension (e.g. mydoc.txt) is generated,
+using an image matching the extension name (e.g. txt.gif).
+Likewise, an all uppercase attribute with a leading underscore (e.g. _DIR)
+generates an image for a HTML file with that suffix (e.g. mydoc_dir.html)
+using an image matching the extension name (e.g. dir.gif).
+
+This feature has been added so that SDF doesn't need to be extended
+every time a new file type needs to be included in a document catalog.
+
+H3: New images
+
+The following images have been added to the images library:
+
+!block table
+File        Comments
+dir.gif     for _dir.html files (see below)
+htx.gif     for [[MIMS]] .htx files
+mf6.gif     for [[MIMS]] F6 help files
+!endblock
+
+H3: Class value functions
+
+Calculation functions can now be defined for a class.
+(Previously, calculation functions were only supported for
+an attribute-class combination.)
+
+This feature is used to support arbitary file extensions
+for the references class (see above).
+
+H3: Component directory files
+
+As large documents often contain lots of topics,
+SDF now provides an option for generating a HTML
+file which displays the topic directory tree for a document.
+
+The command is:
+
+E:   sdf -2_dir mydoc
+
+This creates a file called mydoc_dir.html.
+A web browser can then be used to view the
+topic hierarchy and view the SDF files used to
+build a document.
+
+Note: Once a browser has downloaded an SDF file,
+it is easy to load it into your preferred editor.
+However, if you wish to change the master copy of
+an SDF file, you will need to save your changes
+to the appropriate location (on the server, say).
+
+H3: The catalog macro
+
+The new catalog macro can be used to build a catalog
+of loaded objects. Filtering is provided on the name
+making it easy to produce online HTML indexes.
+
+H3: MIMS specific formats
+
+The following output formats are now supported:
+
+* {{mf6}} - [[MIMS]] F6 help
+* {{htx}} - [[MIMS]] HTX files.
+
+H3: Reporting
+
+SDF now supports a generalised mechanism for producing a report
+on an SDF file. See the {{FILE:stdlib/sdf_dir.sdr}} report file
+for an example.
+
+This feature is used to support the -2_dir option (see above).
+
+H2: Fixes
+
+The word wrapping algorithm used by txt format has been fixed so
+that really long words (e.g. URLs) that don't fit on any line no
+longer wrap onto the next line unless doing so is better that
+leaving the word on the current line.
+
+Formatting of title blocks for txt format is better.
+
+The label attribute now works for headings in txt format.
+
+The objects attribute for the {{FILT:table}} filter has been added back
+in as an alias for the coltags attribute.
+
+H2: Incompatibilities
+
+The changes to list formatting mean that documents with
+lists will be formatted differently, e.g. a given document
+might have page breaks in different places.
+
+The SDF logo images are now named sdflogo.gif and sdflogo.bmp,
+rather than sdf.gif and sdf.bmp.

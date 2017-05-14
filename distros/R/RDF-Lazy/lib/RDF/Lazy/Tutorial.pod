@@ -1,6 +1,18 @@
+#PODNAME:  RDF::Lazy::Tutorial
+#ABSTRACT: Tutorial to get started with RDF::Lazy
+
+__END__
+=pod
+
 =head1 NAME
 
 RDF::Lazy::Tutorial - Tutorial to get started with RDF::Lazy
+
+=head1 VERSION
+
+version 0.081
+
+=encoding utf-8
 
 =head1 A short introduction to RDF::Lazy as RDF templating system
 
@@ -15,7 +27,7 @@ an RDF node in an RDF graph. Every nody can be stringified to its value:
 
 There are three kinds of nodes:
 
-=over
+=over 4
 
 =item resource nodes
 
@@ -77,4 +89,16 @@ C<foaf:Person> node, one can get another resource linked via C<foaf:knows>:
         $another_person = $x->foaf_knows;
     }
 
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
+

@@ -1,0 +1,90 @@
+<title>ZXID IdP Recover Password</title>
+<link type="text/css" rel=stylesheet href="an.css">
+<body bgcolor=white>
+<h1 class=zxtop>ZXID IdP Recover Password</h1>
+
+<div class=zxerr>!!ERR</div>
+<div class=zxmsg>!!MSG</div>
+<div class=zxdbg>!!DBG</div>
+
+<form method=post xaction="zxidrecoverpw.pl">
+<table>
+
+<tr><th>Field</th><th>Value</th><th>Required?</th></tr>
+<tr><th>Username</th><td><input name=au value="!!au"></td><td>Required</td></tr>
+
+<tr><th>Reg. Source IP</th><td>!!ip</i></td><td>Detected</td></tr>
+
+<tr><th>Intervention</th>
+    <td><select name=ivent>
+<option value=choose>Choose an intervention
+<option value=block>Block the account
+<option value=human>Have a human contact me to reset the password
+<option value=auto>Reset the password and email it to me
+</select></td>
+    <td>Required</td></tr>
+
+<tr><th>Email</th>
+    <td><input name=email value="!!email" size=40></td>
+    <td>Optional</td></tr>
+
+<tr><th>IM / Skype</th>
+    <td><input name=im value="!!im"></td>
+    <td>Optional</td></tr>
+
+<tr><th>Phone (international)</th>
+    <td><input name=tel value="!!tel">
+    <i>(e.g. +15035470202)</i></td>
+    <td>Optional</td></tr>
+
+<tr><th colspan=3>Comments or special requests (internal use, reply at our discretion)</th></tr>
+<tr><td colspan=3><textarea name=comment cols=80 rows=3>!!comment</textarea></td></tr>
+
+</table>
+
+Your password will be reset and sent to your email address on our file
+(email on this form may be used by a human if the automatic process
+does not work).
+
+<p>After this page, you will be redirected to where you came from,
+usually the login page.  Please read your email (checking spam if you
+do not receive a mail soon) before attempting to login again. If human
+intervention is required, you will not be able to login until the
+human has processed your request.
+
+<p>Depending on policy this may be automatic process or involve human
+review and may take from anywhere between 30min to several days (in
+case of human review). If your email on file is incorrect, the
+contacts you provide on this form may help us to be in touch with you.
+
+<p>All password change attempts are logged.
+
+<!--EMAIL_BODY
+Your new password is available at
+
+<a href="!!pwurl">!!pwurl</a>
+
+Please login with the new password within 24h to prevent expiration.
+
+To prevent exposure of the password, delete this mail as soon as
+you have confirmed that the new password works.
+
+If you do not wish to receive passwords by email, please request
+human intervention when resetting your password.
+END_EMAIL_BODY-->
+
+<p><input type=submit name=ok value="Agree to terms and conditions and request intervention">
+<a href="html/zxidp-user-terms.html">Terms and Conditions for Users</a>
+
+<input type=hidden name=ar value="!!ar">
+<input type=hidden name=zxrfr value="!!zxrfr">
+<input type=hidden name=zxidpurl value="!!zxidpurl">
+
+</form>
+
+<div class=zxbot>
+<a class=zx href="http://zxid.org/">ZXID.org</a>
+| <a class=zx href="http://www.tas3.eu/">TAS3.eu</a>
+| <a class=zx href="zxiddash.pl">User Dashboard</a>
+- <i>$Id$</i>
+</div>

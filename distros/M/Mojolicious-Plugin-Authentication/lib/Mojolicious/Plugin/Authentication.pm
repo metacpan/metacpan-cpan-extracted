@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 package Mojolicious::Plugin::Authentication;
-$Mojolicious::Plugin::Authentication::VERSION = '1.31';
+$Mojolicious::Plugin::Authentication::VERSION = '1.32';
 use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
@@ -30,7 +30,9 @@ sub register {
     my $current_user_fn   = $args->{current_user_fn} || 'current_user';
     my $load_user_cb      = $args->{load_user};
     my $validate_user_cb  = $args->{validate_user};
-    my $fail_render       = $args->{fail_render};
+
+    my $fail_render = ref $args->{fail_render} eq 'CODE'
+       ? $args->{fail_render} : sub { $args->{fail_render} };
 
     # Unconditionally load the user based on uid in session
     my $user_loader_sub = sub {
@@ -73,7 +75,11 @@ sub register {
     $app->routes->add_condition(authenticated => sub {
         my ($r, $c, $captures, $required) = @_;
         my $res = (!$required or $c->is_user_authenticated);
-        $c->render(%$fail_render) if $fail_render and !$res;
+
+        unless ($res) {
+          my $fail = $fail_render->(@_);
+          $c->render(%{$fail}) if $fail;
+        }
         return $res;
     });
 
@@ -153,13 +159,15 @@ sub register {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
 Mojolicious::Plugin::Authentication - A plugin to make authentication a bit easier
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -261,6 +269,25 @@ it be used. May reduce site latency in some cases.
 =item current_user_fn (optional)
 
 Set the name for the C<current_user()> helper function
+
+=item fail_render (optional)
+
+Specify what is to be rendered when the authenticated condition is not met.
+
+Set to a coderef which will be called with the following signature:
+
+    sub {
+        my ($routes, $controller, $captures, $required) = @_;
+        ...
+        return $hashref;
+    }
+
+The return value of the subroutine will be ignored if it evaluates to false.
+If it returns a hash reference, it will be dereferenced and passed as-is
+to the controller's C<render> function. If you return anything else, you are
+going to have a bad time.
+
+If set directly to a hash reference, that will be passed to C<render> instead.
 
 =back
 

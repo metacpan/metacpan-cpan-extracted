@@ -1,0 +1,35 @@
+---
+abstract: 'Plack Middleware to integrate with Mozilla Persona (Auth by email)'
+author:
+  - 'João Bolila <bolila@cpan.org>'
+build_requires:
+  Plack::Test: 0
+  Test::Compile: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Auth-BrowserID
+no_index:
+  directory:
+    - examples
+requires:
+  HTTP::Request::Common: 6.04
+  JSON: 2.90
+  LWP::Protocol::https: 6.04
+  LWP::UserAgent: 6.05
+  Mozilla::CA: 20130114
+  Net::Ping: 2.36
+  Plack::Middleware::Session: 0.21
+  Plack::Response: 1.0029
+  Plack::Util::Accessor: 0
+resources:
+  bugtracker: https://github.com/jbolila/Plack-Middleware-Auth-BrowserID/issues
+  repository: https://github.com/jbolila/Plack-Middleware-Auth-BrowserID
+version: 0.0.7
+x_authority: cpan:BOLILA

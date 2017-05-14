@@ -12,7 +12,7 @@ rurpmi is similar to urpmi, but has a stripped-down set of features. It's
 intended to be used by users without root privileges but with sudo rights
 on it, preventing any abuse of this tool to compromise the system.
 
-With rurpmi, you can't install arbitrary rpm files; moreoever the
+With rurpmi, you can't install arbitrary rpm files; moreover the
 B<--keep> and B<--verify-rpm> options are forced, and
 several dangerous options are forbidden (B<--root>, B<--use-distrib>,
 B<--env>, B<--allow-nodeps>, B<--allow-force>, B<--force>, B<--noscripts>,

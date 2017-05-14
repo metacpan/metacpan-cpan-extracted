@@ -1,0 +1,56 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: dict.pl - Dictionary Library</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="app.html">Previous Topic</A> | <A HREF="name.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="dict.pl">2.3. dict.pl - Dictionary Library</A></H1>
+<HR>
+<H2><A NAME="Purpose">2.3.1. Purpose</A></H2>
+<P>This library provides support for reading and processing dictionaries stored in text files.</P>
+<HR>
+<H2><A NAME="Interface">2.3.2. Interface</A></H2>
+<PRE>
+require &quot;dict.pl&quot;;
+
+@<A HREF="#dict_DICT_DFLT_REPORT">DICT_DFLT_REPORT</A> = ...
+
+@<A HREF="#dict_dict_rest">dict_rest</A> = ...
+
+$success =
+&amp;<A HREF="#dict_DictFetch">DictFetch</A>($file, $begin, $delimiter, $end, $prefix);
+
+$ok =
+&amp;<A HREF="#dict_DictPrint">DictPrint</A>($strm, $level, $buffer_name, $bufref, @report);
+
+</PRE>
+<HR>
+<H2><A NAME="Description">2.3.3. Description</A></H2>
+<P>A dictionary is a collection of items where each item has:</P>
+<UL>
+<LI>a unique key
+<LI>a description</UL>
+<P><STRONG><A NAME="dict_DICT_DFLT_REPORT">DICT_DFLT_REPORT</A></STRONG> is the default report for <STRONG><A NAME="dict_DictPrint">DictPrint</A></STRONG>. It:</P>
+<UL>
+<LI>outputs items in the order found, separated by blank lines
+<LI>outputs each item as:<UL>
+<LI>key on one line
+<LI>description on the next</UL></UL>
+<P><STRONG><A NAME="dict_dict_rest">dict_rest</A></STRONG> is the set of lines in the last file processed by <STRONG><A NAME="dict_DictFetch">DictFetch</A></STRONG> which are not in the dictionary.</P>
+<P><STRONG><A NAME="dict_DictFetch">DictFetch</A></STRONG> inputs filename as a dictionary.</P>
+<P><STRONG><A NAME="dict_DictPrint">DictPrint</A></STRONG> outputs a dictionary using report. If no report is specified, <STRONG><A NAME="dict_DICT_DFLT_REPORT">DICT_DFLT_REPORT</A></STRONG> is used.</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="app.html">Previous Topic</A> | <A HREF="name.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

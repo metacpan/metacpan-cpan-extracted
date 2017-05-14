@@ -1,12 +1,104 @@
 Change History for libxml-enno:
 
-  Entries in this file may have module specific prefixes, e.g DOM for XML::DOM,
+  Some entries in this file have module specific prefixes, e.g DOM for XML::DOM,
   XQL for XML::XQL and CHK for XML::Checker.
 
   See Changes.DOM, Changes.XQL and Changes.Checker for the change history prior
-  to libxml-enno.
+  to libxml-enno 1.00.
 
-1.00 (enno)
+1.02 (enno)
+- This release fixes some installation related stuff.
+
+- Changed =head3 pod directives to =head2 in XML/Checker.pm
+  This used to cause warnings when generating the man pages with pod2man.
+- Changed dependency of XML::Parser::PerlSAX to require version 0.07.
+  libxml-perl 0.06 had a bad version number, causing a warning when doing 'make'.
+- Removed the libxml-enno.ppd file from the distribution. As Matt Sergeant
+  pointed out, these PPD files are platform dependant and you can generate
+  them yourselves with 'make ppd'. If you still need one, try Simon Oliver's 
+  website (see below.)
+
+1.01 (enno) 2/17/2000
+- This release contains XML::DOM 1.27, XML::XQL 0.63 and XML::Checker 0.09.
+
+- Added FAQ.xml (Needs more stuff.)
+- Added dependencies in Makefile.PL for LWP::UserAgent and XML::Parser::PerlSAX.
+  See Makefile.PL for details.
+- Fixed XML::Filter::SAXT (a PerlSAX that works like Unix' tee command.) 
+- Renamed XML::DOM::PerlSAX to XML::Handler::BuildDOM. A warning will be issued
+  with -w if your code uses XML::DOM::PerlSAX. The reason for this change 
+  is that the new name is more consistent with how other PerlSAX related
+  classes are named.
+  Also added a test case for it in t/build_dom.t.
+- Added XML::Filter::DetectWS, a first stab at a PerlSAX filter that detects
+  ignorable whitespace. Needs more testing!
+- Added XML::Filter::Reindent, a first stab at a PerlSAX filter that removes and
+  inserts whitespace into the PerlSAX event stream to reindent the XML document
+  for pretty printing functionality. Needs more testing!
+- Added XML::Handler::Composer. Yet another XML printer/writer that has several
+  features missing in other implementations. 
+  See docs for details. Needs more testing!
+- Added bin/pretty.pl, an XML pretty printer that uses the previous 3 classes.
+- Added XML::UM for encoding support when printing XML. Needs more testing!
+- Added XML::Handler::PrintEvents for debugging PerlSAX filters/producers.
+- Added a PPM description called: libxml-enno.ppd
+  I have no idea whether or how it works, so let me know!
+  (Thanks to Simon Oliver <Simon.Oliver@umist.ac.uk>, who has more package 
+   files at http://www.bi.umist.ac.uk/packages)
+
+- DOM: Reimplemented all Node types as a blessed array reference instead of a
+  blessed hash reference. This should speed things up and consume less memory.
+  Downside is that the code is harder to read and it's harder to extend the Node 
+  classes.
+- DOM: In XML::DOM::Element, attributes are stored in a NamedNodeMap with the
+  hash key 'A' (i.e. _A). Previously, the NamedNodeMap object was created even 
+  if there were no attributes. For speed and memory reasons, we now create the 
+  NamedNodeMap objects only when needed.
+- DOM: The parsefile() method of XML::DOM::Parser now supports URLs.
+  It uses LWP to download the remote file. See XML::DOM::Parser documentation
+  for more info. This probably belongs in XML::Parser.
+- DOM: Added new test cases in t/dom_jp_*.t and a Japanese XML file in
+  samples/minutes.xml.
+  (Thanks to OKABE, Keiichi <okabe@isl.ntt.co.jp>)
+- DOM: Added support for parameter entity references (e.g. %pent;) in the DTD.
+  If the reference points to a SYSTEM entity and XML::Parser read and expanded
+  it (ParseParamEnt=1) and XML::DOM::Parser option ExpandParamEnt=0, then it will
+  still add the contents of the entity to the DTD, but the nodes are flagged as
+  'Hidden'. In this case, it will also add an EntityReference node to the DTD.
+  The Hidden nodes are skipped when printing, so this way you can suppress the
+  expansion of external parameter entity references. Note that we still want to
+  add these hidden nodes to the DTD, because they might contain e.g. ENTITY
+  declarations that can be referenced further in the document.
+  See new testcase t/dom_extent.t.
+  (Thanks to Guillaume Rouchy <rouchyg@gatwick.geco-prakla.slb.com>)
+
+- XQL: all XML::XQL::Operator classes now 'use fields', which makes them faster
+  and smaller (see man fields(3) and man base(3)).
+- XQL: the minus '-' sign is now allowed in XQL function names etc.
+- XQL: added the XQL+ document() method, which creates XML::DOM::Documents
+  on the fly. The document() parameter can be a simple string (i.e. filename or 
+  URL) or a query that evaluates to a bunch of filenames. 
+  See XML::XQL for details. See also new test case: t/xql_document.t
+- XQL: added the following methods which were found in the XPath spec to XQL+:
+  round, floor, ceiling, concat, starts-with, contains, substring-before,
+  substring-after, substring (not the same as substr, the index is 1-based!),
+  translate, string-length (similar to length, but is also a method),
+  normalize-space, sum. Also added ends-with, which is not part of XPath.
+  See XML::XQL(3) for details.
+- XQL: added XML::XQL::Query::dispose(). Call dispose on your query object to
+  clean up circular references after you're done and avoid memory leaks.
+
+- CHK: error 103 (undefined attribute) was not detected in all cases.
+  (Thanks to Mark Hewis <mark@talbat.demon.co.uk>)
+- CHK: error 103 - The error context used to contain the hash key 'Elem', 
+  but since all other errors use 'Element', this was changed to 'Element'
+  as well.
+- CHK: The parsefile() method of XML::Checker::Parser now supports URLs.
+  It uses LWP to download the remote file. See XML::Checker::Parser documentation
+  for more info.
+- CHK: Fixed attlist_decl() handler to use 'ElementName' instead of 'EntityName'.
+
+1.00 (enno) 10/26/1999
 - This is the first version of libxml-enno. It contains
   XML::DOM 1.26, XML::XQL 0.62 and XML::Checker 0.08.
   See Changes.DOM, Changes.XQL and Changes.Checker for the change history prior

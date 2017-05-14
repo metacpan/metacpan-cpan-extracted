@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/TraitFor/Model/DBIC/Schema/RequestConnectionPool.pm
+t/01-use.t
+t/02-connection_pool.t
+t/lib/WookieSchema.pm
+t/lib/WookieSchema/Wookie.pm
+t/lib/WookieServe.pm
+t/lib/WookieServe/Controller/Root.pm
+t/lib/WookieServe/Model/Wookies.pm

@@ -1,0 +1,46 @@
+Revision History for Dist-Zilla-Plugin-Git-Tag-ForRelease
+=========================================================
+
+v0.0.5 2013-02-13
+-----------------
+
+* Date: 2013-02-13 12:51:58 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: fbccf3d3a98e0ae6981b0f397c30eef1b646a863
+
+    Updated to new dzil standards
+
+
+v0.04 2013-02-12
+----------------
+
+* Date: 2013-02-12 16:51:18 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: eb1ff4cf0e61b6897570801c0d11891fdaae16e5
+
+    Fixed logging issues
+
+
+v0.03 2013-02-06
+----------------
+
+* Date: 2013-02-06 13:45:32 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: dc48e702ff244b68a5186ff9cffdd35ec655eeb5
+
+    Update dist.ini to correctly scan for runtime dependencies
+
+
+v0.02 2013-02-06
+----------------
+
+* Date: 2013-02-06 11:23:11 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: cffafeabc2eee5d3c427d33a56b4312988dc473e
+
+    Made is_trial lazy
+
+
+===================================
+End of changes in the last 365 days
+===================================

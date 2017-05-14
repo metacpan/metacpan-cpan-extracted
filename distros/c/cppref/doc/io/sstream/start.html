@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    C++ String Streams    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2009-04-15T08:41:10-0700" />
+<meta name="keywords" content="io,sstream,start" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/io/sstream/start?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=io:sstream" />
+<link rel="edit" title="Edit this page" href="/wiki/io/sstream/start?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/io/sstream/start" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/io/sstream/start" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/io/sstream/start" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='io:sstream';var JSINFO = {"id":"io:sstream:start","namespace":"io:sstream"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../io/start.html"  title="io:start">C++ I/O</a> &raquo; <a href="../../io/sstream/start.html"  title="io:sstream:start">C++ String Streams</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h1><a name="c_string_streams" id="c_string_streams">C++ String Streams</a></h1>
+<div class="level1">
+
+<p>
+
+String streams are similar to the &lt;iostream&gt; and &lt;fstream&gt; libraries,
+except that string streams allow you to perform I/O on strings instead
+of streams. The &lt;sstream&gt; library provides functionality similar to
+<a href="../../c/io/sscanf.html" class="wikilink1" title="c:io:sscanf">sscanf</a> and <a href="../../c/io/sprintf.html" class="wikilink1" title="c:io:sprintf">sprintf</a> in the standard C library.
+</p>
+
+<p>
+Three main classes are available in &lt;sstream&gt;:
+
+</p>
+<ul>
+<li class="level1"><div class="li"> stringstream - allows input and output</div>
+</li>
+<li class="level1"><div class="li"> istringstream - allows input only</div>
+</li>
+<li class="level1"><div class="li"> ostringstream - allows output only</div>
+</li>
+</ul>
+
+<p>
+
+String streams are actually subclasses of iostreams, so all of the
+functions available for iostreams are also available for
+stringstream. See the <a href="../../io/start.html" class="wikilink1" title="io:start">C++ I/O functions</a> for more information.
+</p>
+
+<p>
+In addition, string streams also supply the following functions:
+
+</p>
+<table class="inline">
+	<tr class="row0">
+		<td class="col0"><a href="../../io/sstream/constructors.html" class="wikilink1" title="io:sstream:constructors">Constructors</a></td><td class="col1">create new string streams</td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"><a href="../../io/sstream/operators.html" class="wikilink1" title="io:sstream:operators">Operators</a></td><td class="col1">read from and write to string streams</td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"><a href="../../io/sstream/rdbuf.html" class="wikilink1" title="io:sstream:rdbuf">rdbuf</a></td><td class="col1">get the buffer for a string stream</td>
+	</tr>
+	<tr class="row3">
+		<td class="col0"><a href="../../io/sstream/str.html" class="wikilink1" title="io:sstream:str">str</a></td><td class="col1">get or set the stream&#039;s string</td>
+	</tr>
+</table>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        io/sstream/start.txt &middot; Last modified: 04/15/2009 08:41 by 89.155.39.234      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

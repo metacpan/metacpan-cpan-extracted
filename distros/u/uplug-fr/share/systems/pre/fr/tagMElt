@@ -1,0 +1,58 @@
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'tagMElt',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+     'tagger' => {
+       'program' => 'MElt',
+       'input'   => 'stdin',
+     },
+     'output' => {
+        'attribute' => 'melt',
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n\n",
+        'tag delimiter' => '\/',
+     },
+     'input' => {
+	'encoding' => 'utf8',
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n\n",
+     },
+  },
+  'module' => {
+    'program' => 'uplug-tag',
+    'location' => '$UplugBin',
+    'name' => 'MElt tagger (french)',
+    'stdout' => 'text',
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+      'lang' => 'parameter:tagger:language',
+       'attr' => 'parameter:output:attribute',
+       'char' => 'output:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'inroot' => 'input:text:root',
+    }
+  },
+}

@@ -1,0 +1,12 @@
+! THIS FILE CONTAINS DELIBERATELY ERRONEOUS DATA
+! use by unit test t030detecterror.t
+%obsolete ; GO:0015000
+ %tricarboxylic acid cycle ; GO:0006099 ; synonym:citric acid cycle ; synonyn:Krebs cycle
+! SPELL ERROR
+  %high-potential iron-sulfur carrier ; synonym:krebs cycle
+! NO ID
+%not-polyferredoxin ; GO:0015000
+! CLASH on acc
+ %tricarboxylic acid cycle ; GO:0009999 ; synonym:citric acid cycle ; synonym:Krebs cycle
+! CLASH on term - this is not detected at parser level
+  %coenzyme A metabolism ; GO:0006763 ; synonym:pantothenate metabolism

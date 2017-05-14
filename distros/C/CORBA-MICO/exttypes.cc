@@ -5,7 +5,7 @@
 #include <ctype.h>
 
 SV *
-ll_from_longlong (long long val)
+ll_from_longlong (CM_longlong val)
 {
     SV *rv;
     SV *result = newSV(0);
@@ -20,7 +20,7 @@ ll_from_longlong (long long val)
 }
 
 SV *
-ull_from_ulonglong (unsigned long long val)
+ull_from_ulonglong (unsigned CM_longlong val)
 {
     SV *rv;
     SV *result = newSV(0);
@@ -49,7 +49,7 @@ ld_from_longdouble (long double val)
 }
 
 /* Some rough-and-ready equivalents for library functions to convert
- * long longs and long doubles to and from strings The long double
+ * CM_longlongs and long doubles to and from strings The long double
  * stuff is in particular somewhat bad. It usually gets the last
  * bit wrong (glibc uses a multiple precision library for this, it may
  * be hard to do better sticking within the long double type)
@@ -58,10 +58,10 @@ ld_from_longdouble (long double val)
  * of the layout of the long double type.
  */
 
-long long
+CM_longlong
 longlong_from_string (const char *str)
 {
-    long long val = 0;
+    CM_longlong val = 0;
     int negate = 0;
       
     while (*str) {
@@ -80,8 +80,8 @@ longlong_from_string (const char *str)
 
     while (*str) {
 	if (isdigit (*str)) {
-	    val += *str - '0';
 	    val *= 10;
+	    val += *str - '0';
 	} else if (!isspace (*str))
 	    break;
 	str++;
@@ -94,7 +94,7 @@ longlong_from_string (const char *str)
 }
 
 char *
-longlong_to_string (long long val)
+longlong_to_string (CM_longlong val)
 {
     int length = 2;
     char *str;
@@ -135,10 +135,10 @@ longlong_to_string (long long val)
     return str;
 }
 
-unsigned long long
+unsigned CM_longlong
 ulonglong_from_string (const char *str)
 {
-    unsigned long long val = 0;
+    unsigned CM_longlong val = 0;
       
     while (*str) {
 	if (*str == '+') {
@@ -152,8 +152,8 @@ ulonglong_from_string (const char *str)
 
     while (*str) {
 	if (isdigit (*str)) {
-	    val += *str - '0';
 	    val *= 10;
+	    val += *str - '0';
 	} else if (!isspace (*str))
 	    break;
 	str++;
@@ -163,7 +163,7 @@ ulonglong_from_string (const char *str)
 }
 
 char *
-ulonglong_to_string (unsigned long long val)
+ulonglong_to_string (unsigned CM_longlong val)
 {
     int length = 2;
     char *str;

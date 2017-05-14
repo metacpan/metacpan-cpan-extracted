@@ -1,0 +1,490 @@
+!init OPT_CONFIG="sdf"; SDF_ROOT="../"
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 25-Feb-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+# Define variables
+!define DOC_NAME     "Generating HTML Using SDF"
+!define DOC_AUTHOR   "Ian Clatworthy ({{EMAIL:ianc@mincom.com}}), Research Architect, {{ORG[expand]Mincom}}"
+
+# Build the title
+!build_title
+
+H1: Introduction
+
+SDF is a useful tool for generating HTML documents for several reasons:
+
+^ SDF provides a high-level language for documentation including macros,
+  filters, variables, conditional text and event processing
+
++ SDF is more readable than HTML, making it much easier to maintain
+
++ Unlike HTML, SDF documents can contain user defined style names
+  allowing authors to specify a document in a logical manner
+
++ SDF provides the features required to create any HTML document.
+
+For a general overview of SDF, see
+{{DOC: The SDF Document Development System}}.
+For a general introduction to the core features in SDF,
+see the {{DOC: SDF User Guide}}.
+
+This tutorial supplements these documents by providing:
+
+* an overview of how SDF documents are converted to HTML documents
+* details on how to customise the generated HTML.
+
+
+H1: Generating HTML
+
+H2: Generating a Single Document
+
+To generate HTML for F<myfile.sdf>, the command is:
+
+>   sdf -2html myfile
+
+This will create a single html file called F<myfile.html>.
+
+H2: Changing the Output Extension
+
+By default, SDF creates HTML files with an output extension of {{html}}.
+To specify a different extension, use the -o option like this:
+
+>   sdf -2html -ohtm myfile
+
+H2: Sending Output to Standard Output
+
+To send output to standard output, use the -o option like this:
+
+>   sdf -2html -o- myfile
+
+H2: Changing the Default Extension
+
+If you are generating HTML for a system which only supports 8.3 filenames,
+you may wish to set the default extension to be {{htm}} like this:
+
+>   sdf -2html -DHTML_EXT=htm myfile
+
+If you are working on a system which only supports 8.3 filenames,
+you may wish to permanently set the {{HTML_EXT}} variable within
+the F<sdf.ini> configuration file, so that you don't need to specify
+it every time.
+
+Unlike using the -o option, this approach changes the output extension
+on all HTML files generated, including sub-topics.
+
+H2: Generating a Set of Topics
+
+For large documents, it is often much better to generate a set of
+topics rather than a large HTML file.
+To do this, the command is:
+
+>   sdf -2topics myfile
+
+This will create:
+
+* a HTML file called F<myfile.html> which contains a table of contents
+* a HTML file for each topic.
+
+H2: Controlling Topic Breaks
+
+If you want to manually control how a document is split into
+topics, simply include other sdf files which contain headings.
+These manual topics, if any, can be supplemented with automatically
+generated topics. By default, level 1 headings are used as topic
+breaks, in addition to the manual ones. The -n (or --split_level)
+option can be used to change this:
+
+* -n0 disables autosplitting
+* -n2 uses level 1-2 headings to autosplit
+* -n3 uses level 1-3 headings to autosplit
+* etc.
+
+
+H1: Customising the Generated HTML
+
+The following files are used to convert SDF to HTML:
+
+!block table
+File            Directory       Purpose
+html.sdn        stdlib          tuning file for HTML generation
+tohtml.pl       perllib/sdf     output driver for HTML generation
+!endblock
+
+The tuning file contains:
+
+* the mapping tables used to convert SDF
+  paragraph and phrase styles to HTML entities
+
+* the default definitions of macros, variables, etc.
+
+H2: Paragraph and Phrase Style Mappings
+
+If you want to create new paragraph and phrase styles and/or
+override the default mapping, you can edit the tuning file.
+Alternatively, create a site-specific tuning file and {{MAC:use}}
+it at the top of each document.
+
+H2: Output Driver Enhancements
+
+On some occasions, the conversion rules are too complicated
+for mapping tables and need to be coded into the output driver
+as Perl logic. If you need to edit the output driver, please
+forward the patches to me so that everyone can benefit from
+your enhancements.
+
+H2: General Customisations
+
+On most occasions, the generated HTML can be easily customised by
+overriding the default values of variables and macros.
+In particular, you can customise:
+
+!block sections
+. Colours, Logos, Backgrounds and Separators
+. Titles and Table of Contents
+. Headers and Footers
+!endblock
+
+Furthermore, if you really need it, {{SECT:Inline HTML}} can be
+used to generate any HTML you like.
+
+Note: If you override a macro, it is probably a good idea to start with
+the default definition in the HTML tuning file, F<stdlib/html.sdn>.
+
+H2: Topics Mode Variables
+
+When customising the generated HTML, it is occasionally necessary
+to know whether a single document or set of topics is being
+generated. The following variables can be tested to determine this.
+
+!block table
+Variable                Description
+HTML_TOPICS_MODE        the table of contents for a set of topics is being \
+                        generated
+HTML_SUBTOPICS_MODE     the actual sub-topics are being generated
+!endblock
+                        
+These variables represent the two passes of the topic generation process.
+
+
+H1: Colours, Logos, Backgrounds and Separators
+
+H2: Colours
+
+The following variables can be used to customise the colours used:
+
+!block table
+Variable                Description
+HTML_BG_COLOR           the background colour
+HTML_TEXT_COLOR         the colour of normal text
+HTML_LINK_COLOR         the colour of links
+HTML_VLINK_COLOR        the colour of visited links
+!endblock
+
+For example:
+
+>  !define HTML_BG_COLOR   COLOR_WHITE
+>  !define HTML_LINK_COLOR '00ff00'
+
+The value of each variable is the hexidecimal number representing
+the required RGB (Red Green Blue) combination. For convenience,
+the following set of color variables are provided:
+
+!block table
+Variable      Value
+COLOR_WHITE   'ffffff'
+COLOR_BLACK   '000000'
+COLOR_RED     'ff0000'
+COLOR_GREEN   '00ff00'
+COLOR_BLUE    '0000ff'
+COLOR_YELLOW  'ffff00'
+COLOR_MAGENTA 'ff00ff'
+COLOR_CYAN    '00ffff'
+COLOR_GREY    'c0c0c0'
+!endblock
+
+H2: Logos
+
+The following variables can be used to add a logo:
+
+!block table
+Variable        Description
+DOC_LOGO        the default logo to use
+DOC_HTML_LOGO   the logo to use at the top of each document
+DOC_TOPIC_LOGO  the logo to use at the top of each topic
+!endblock
+
+To add a logo to the main document and all its topics, simply
+set the DOC_LOGO variable. Alternatively, different logos can
+be specified by using the DOC_HTML_LOGO and/or the DOC_TOPIC_LOGO
+variables.
+
+H2: Background Images
+
+The following variables can be used to customise the background image, if any:
+
+!block table
+Variable                Description
+HTML_BG_IMAGE           the URL of the file to use as the background image
+HTML_BG_FIXED           if set, scrolling of the background image is disabled
+!endblock
+
+Note: These HTML features may not be supported by all browsers.
+
+H2: Section Separators
+
+By default, SDF places a line above each section within a document.
+If you want to use an alternative separator, override the
+{{HTML_PRE_SECTION}} macro like this:
+
+!block example
+    !macro HTML_PRE_SECTION
+         !import "fancy_line.gif"
+    !endmacro
+!endblock
+
+Section boundaries are determined using the heading level specified
+by the HTML_SECTION_LEVEL variable. To put a section separator above level
+2 (and 1) headings, you can {{MAC:define}} this variable
+in your document or specify it on the command line like this:
+
+>   sdf -2html -DHTML_SECTION_LEVEL=2 myfile
+
+When a single document is being generated, the default level is 1.
+When sub-topics are being generated, the default level is 2.
+
+Note: A value of 0 turns off section boundaries.
+
+
+H1: Titles and Table of Contents
+
+H2: HTML Title String
+
+To customise the title string generated by the {{MAC:build_title}} macro,
+set the HTML_TITLE variable {{after}} calling {{MAC:build_title}}.
+
+Alternatively, you can override the definition of the
+{{HTML_BUILD_TITLE}} macro before {{MAC:build_title}} is called.
+The default definition is:
+
+!block example
+!macro HTML_BUILD_TITLE
+  !if HTML_SUBTOPICS_MODE
+    !if DOC_PROJECT
+      !define HTML_TITLE \
+        "$var{'DOC_PROJECT'}: $var{'HTML_MAIN_TITLE'}: $var{'DOC_TITLE'}"
+    !else
+      !define HTML_TITLE "$var{'HTML_MAIN_TITLE'}: $var{'DOC_TITLE'}"
+    !endif
+  !elsif DOC_PROJECT
+    !define HTML_TITLE "$var{'DOC_PROJECT'}: $var{'DOC_TITLE'}"
+  !else
+    !define HTML_TITLE DOC_TITLE
+  !endif
+!endmacro
+!endblock
+
+H2: Title Section
+
+To customise the title section generated by the {{MAC:build_title}} macro,
+override the definition of the {{build_html_cover}} macro.
+For example:
+
+!block example
+    !macro build_html_cover
+        [align=Center]DOC_TITLE
+    !endmacro
+!endblock
+
+H2: Table of Contents Section
+
+To customise the title of the table of contents, override the
+DOC_TOC_TITLE variable like this:
+
+>  !define DOC_TOC_TITLE 'Contents'
+
+Alternatively, you can completely control the presentation of
+the table of contents by overriding the {{toc_html}} filter.
+For example:
+
+!block example
+!block script
+sub toc_html_Filter {
+    local(*text, %param) = @_;
+#   local();
+
+    # Make top level section titles bigger
+    @text = grep(s/^L1/P2/ || $_, @text);
+
+    # Prepend a section separator and a title
+    unshift(@text, "!HTML_PRE_SECTION", "P1[notoc;align=Center]Contents");
+}
+!endblock
+!endblock
+
+See the {{DOC: SDF Guru Guide}} for further information on
+writing your own filters.
+
+
+H1: Headers and Footers
+
+You can override the default headers and footers by defining
+the following macros:
+
+* HTML_HEADER - header on a HTML document (or main topic)
+* HTML_FOOTER - footer on a HTML document (or main topic)
+* HTML_TOPIC_HEADER - header on a HTML topic
+* HTML_TOPIC_FOOTER - footer on a HTML topic.
+
+For example:
+
+!block verbatim
+    !macro HTML_FOOTER
+        Line:
+        [align='Right']
+        {{This page was last updated on [[DATE:DOC_MODIFIED]]}}
+    !endmacro
+!endblock
+
+H2: The Default Header/Footer Macros
+
+The default HTML_HEADER and HTML_FOOTER definitions are shown below.
+
+!block verbatim
+    !macro HTML_HEADER
+        !HTML_NAVIGATE
+    !endmacro
+    !macro HTML_FOOTER
+        !HTML_PRE_SECTION
+        !HTML_NAVIGATE
+    !endmacro
+!endblock
+
+Likewise, the default header and footer on sub-topics share a
+macro called HTML_TOPIC_NAVIGATE. Therefore, it is usually
+sufficient to override HTML_NAVIGATE and/or HTML_TOPIC_NAVIGATE
+instead of overriding the HTML_HEADER/HTML_FOOTER and
+HTML_TOPIC_HEADER/HTML_TOPIC_FOOTER macros respectively.
+
+H2: The Default Navigation Macros
+
+The default implementation of the HTML_NAVIGATE macro provides
+the following jumps when topics are being generated:
+
+. Previous Topic
+. Next Topic
+
+The default implementation of the HTML_TOPIC_NAVIGATE macro provides
+the following jumps:
+
+. Contents
+. Parent Topic
+. Previous Topic
+. Next Topic
+
+In addition, the navigation macros can optionally provide
+the following jumps:
+
+. Home
+. Catalog
+. Search
+
+H2: Customising the Navigation Macros
+
+Instead of simply overriding the HTML_NAVIGATE and HTML_TOPIC_NAVIGATE
+macros, it is also possible to customise their output by defining the
+variables below:
+
+!block table
+Variable                Description
+HTML_URL_HOME           URL of the home page
+HTML_URL_CATALOG        URL of the catalog page
+HTML_URL_SEARCH         URL of the search page
+!endblock
+
+For example:
+
+>  !define HTML_URL_HOME   "../index.html"
+>  !define HTML_URL_SEARCH "../search.html"
+
+If one or more of these variables are set, the default navigate macros
+will output a second line containing jumps to the respective pages.
+
+H2: Customising Navigation Text
+
+If you are generally happy with the default headers and footers
+but want to change the text to another language, say, you can set
+the following variables:
+
+!block table
+Variable                Default_Value
+HTML_TEXT_CONTENTS      Contents
+HTML_TEXT_PARENT        Parent
+HTML_TEXT_PREVIOUS      Previous Topic
+HTML_TEXT_NEXT          Next Topic
+HTML_TEXT_HOME          Home
+HTML_TEXT_CATALOG       Catalog
+HTML_TEXT_SEARCH        Search
+!endblock
+
+The HOME, CATALOG and SEARCH variables only apply if the corresponding
+URL variables are set.
+
+H2: Pre-header and Post-footer Tuning
+
+The generated HTML can be tuned by using the HTML_PRE_HEADER
+and HTML_POST_FOOTER variables. These variables contain HTML
+to be added immediately after the <BODY> and immediately before
+the </BODY> tags respectively. For example, a page-like border can be
+added to the generated HTML like this:
+
+>  !define HTML_PRE_HEADER  '<blockquote>'
+>  !define HTML_POST_HEADER '</blockquote>'
+
+
+H1: Inline HTML
+
+As HTML is constantly evolving and contains features which SDF
+doesn't explicitly support (e.g. frames), it is occasionally necessary
+to directly embed native HTML. To do this, use the {{FILT:inline}} filter.
+For example:
+
+!block verbatim
+    !block inline
+    <P>
+    My name is <B>Bill</B>.
+    !endblock
+!endblock
+
+If you want to use embedded expressions (enclosed in E<2[> and E<2]>)
+and macros within the inline text, add the {{expand}} parameter like this:
+
+!block verbatim
+    !block inline; expand
+        !if DATE
+            <P>
+            The date is [[DATE:DOC_START]].
+        !else
+            <P>
+            The time is [[TIME:DOC_START]].
+        !endif
+    !endblock
+!endblock
+
+Likewise, you can use the INLINE phrase style within a paragraph
+to embed HTML within a paragraph. For example:
+
+>  My name is {{INLINE:<B>Bill</B>}}.
+
+
+H1: Feedback
+
+If you have any feedback on SDF or this tutorial, please let me know.

@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+# $Revision: $
+
+$type   = $ARGV[0] eq "-lr" ? (shift @ARGV, "BottomUp") : "TopDown";
+$method = $ARGV[0] eq "-dfa" ? (shift @ARGV, "DFA") : "PDA";
+
+die "usage: ppar [-lr] [-dfa] grammar parser-name scanner-name [namespace]\n" if ! @ARGV;
+
+use Scanner::Scanner;
+use Parser::Parser;
+
+$grammar = $ARGV[1];
+die "Must know name of parser" if ! $grammar;
+$scanner = $ARGV[2];
+die "Must know name of scanner" if ! $scanner;
+$space = $ARGV[3] || "main";
+
+($grammar_file = $grammar) =~ s,::,/,g;
+($grammar_name = $grammar) =~ s,.*::([^:]+)$,$1,;
+open(GRAMMAR, "> $grammar_file.pm") || die "Can't output to $grammar_file.pm";
+
+print GRAMMAR <<"EOF";
+package $grammar;
+
+require 5.001;
+use Scanner::Scanner;
+use Parser::Parser;
+use Parser::${type}::$method;
+package $space;
+use $scanner;
+package $grammar;
+
+sub Parse {
+    my \$scanner = \$_[0];
+    if (! ref \$scanner) {
+        \$scanner = new $scanner \$scanner;
+    }
+    Parser::${type}::${method}::Parse(\\\%${space}::$grammar_name, \$scanner,
+        \$_[1] || "start", \$_[2]);
+}
+
+package $space;
+
+EOF
+
+if ($ARGV[0] =~ /\.y$/) {
+    use Parser::Input::Yacc;
+    use Scanner::Stream::Handle;
+
+    open(YACC_INPUT, $ARGV[0]) || die "Can't open yacc grammar file";
+    while (<YACC_INPUT>) {
+        last if /^#\%\%$/;
+        print GRAMMAR;
+    }
+
+    $gram_file = "grm$$.pl";
+    open(TEMP, "> $gram_file") || die "Can't write to temp file!";
+
+    my $input = new Scanner::Stream::Handle \*YACC_INPUT;
+    Parser::Input::Yacc::Convert(\*TEMP, $input, $grammar_name,
+                                 $method eq "DFA");
+    close TEMP;
+    $cleanup_grammar_file = 1;
+} else {
+    $gram_file = $ARGV[0];
+}
+
+# Convert grammar to state table if a DFA
+if ($method eq "DFA") {
+    use Parser::Table;
+    eval "use Parser::${type}::Table";
+    eval "use $scanner";
+    require $gram_file;
+
+    eval "Parser::${type}::Table::Generate(\\\*GRAMMAR, \\\%$grammar_name, \"$grammar_name\")";
+} else {
+    open(INPUT, $gram_file) || die "Can't open grammar file";
+    print GRAMMAR <INPUT>;
+    close INPUT;
+}
+
+unlink $gram_file if $cleanup_grammar_file;
+close GRAMMAR;
+
+exit 0;

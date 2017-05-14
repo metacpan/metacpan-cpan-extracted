@@ -1,0 +1,11 @@
+CHANGES
+Graph.pm
+MANIFEST			This list of files
+Makefile.PL
+README
+demos/test.pl
+demos/test_bars.pl
+demos/test_bars_3d.pl
+demos/test_linegraph.pl
+demos/topgfx.pl
+t/00_test.t

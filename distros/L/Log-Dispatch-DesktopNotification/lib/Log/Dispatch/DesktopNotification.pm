@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-package Log::Dispatch::DesktopNotification; # git description: v0.01-6-g47bff86
+package Log::Dispatch::DesktopNotification; # git description: v0.02-12-gd103704
 # ABSTRACT: Send log messages to a desktop notification system
-$Log::Dispatch::DesktopNotification::VERSION = '0.02';
+
+our $VERSION = '0.03';
+
 use Module::Load qw/load/;
 use Module::Load::Conditional qw/can_load/;
-use namespace::clean;
+use namespace::clean 0.19;
 
 #pod =head1 SYNOPSIS
 #pod
@@ -36,7 +38,7 @@ sub new {
 #pod graphically notify a user on the current system.
 #pod
 #pod On MacOS X, that will be L<Log::Dispatch::MacGrowl>. On other systems,
-#pod L<Log::Dispatch::Gtk2::Notify> will be returned if it is available and usable.
+#pod L<Log::Dispatch::Desktop::Notify> will be returned if it is available and usable.
 #pod Otherwise, L<Log::Dispatch::Null> will be returned.
 #pod
 #pod =cut
@@ -47,16 +49,11 @@ sub output_class {
         load $mod; return $mod;
     }
 
-    if (can_load(modules => { Gtk2 => undef }) && Gtk2->init_check) {
-        my $mod = 'Log::Dispatch::Gtk2::Notify';
-        return $mod if can_load(modules => { $mod => undef });
-    }
-
-    my $mod = 'Log::Dispatch::Null';
+    my $mod = 'Log::Dispatch::Desktop::Notify';
     load $mod; return $mod;
 }
 
-#pod =head1 BUGS
+#pod =head1 LIMITATIONS
 #pod
 #pod Currently only supports Mac OS X and systems on which notification-daemon is
 #pod available (most *N*Xes).
@@ -65,7 +62,7 @@ sub output_class {
 #pod
 #pod =for :list
 #pod * L<Log::Dispatch>
-#pod * L<Log::Dispatch::Gtk2::Notify>
+#pod * L<Log::Dispatch::Desktop::Notify>
 #pod * L<Log::Dispatch::MacGrowl>
 #pod * L<Log::Dispatch::Null>
 #pod
@@ -85,7 +82,7 @@ Log::Dispatch::DesktopNotification - Send log messages to a desktop notification
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -109,10 +106,10 @@ Returns the name of a L<Log::Dispatch::Output> class that is suitable to
 graphically notify a user on the current system.
 
 On MacOS X, that will be L<Log::Dispatch::MacGrowl>. On other systems,
-L<Log::Dispatch::Gtk2::Notify> will be returned if it is available and usable.
+L<Log::Dispatch::Desktop::Notify> will be returned if it is available and usable.
 Otherwise, L<Log::Dispatch::Null> will be returned.
 
-=head1 BUGS
+=head1 LIMITATIONS
 
 Currently only supports Mac OS X and systems on which notification-daemon is
 available (most *N*Xes).
@@ -127,7 +124,7 @@ L<Log::Dispatch>
 
 =item *
 
-L<Log::Dispatch::Gtk2::Notify>
+L<Log::Dispatch::Desktop::Notify>
 
 =item *
 
@@ -139,21 +136,36 @@ L<Log::Dispatch::Null>
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-DesktopNotification>
+(or L<bug-Log-Dispatch-DesktopNotification@rt.cpan.org|mailto:bug-Log-Dispatch-DesktopNotification@rt.cpan.org>).
+
 =head1 AUTHOR
 
 Florian Ragwitz <rafl@debian.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTORS
+
+=for stopwords Karen Etheridge Christian Garbs
+
+=over 4
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Christian Garbs <mitch@cgarbs.de>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2009 by Florian Ragwitz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=head1 CONTRIBUTOR
-
-=for stopwords Karen Etheridge
-
-Karen Etheridge <ether@cpan.org>
 
 =cut

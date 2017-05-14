@@ -1,0 +1,124 @@
+<HTML>
+<HEAD>
+<TITLE>Sys::OutPut Perl Module</TITLE>
+</HEAD>
+<BODY>
+<H1>Sys::OutPut Perl Module</H1>
+<HR>
+<PRE>
+       Sys::OutPut -- Perl module to help make output easier.
+
+
+</PRE>
+<H2>SYNOPSIS</H2><PRE>
+         <STRONG>usage</STRONG> <STRONG>Sys::OutPut;</STRONG>
+
+         <STRONG>talk</STRONG> <STRONG>$fmtstr</STRONG> <STRONG>[,</STRONG> <STRONG>@args];</STRONG>
+
+         <STRONG>out</STRONG>  <STRONG>$fmtstr</STRONG> <STRONG>[,</STRONG> <STRONG>@args];</STRONG>
+
+         <STRONG>put</STRONG>  <STRONG>$fmtstr</STRONG> <STRONG>[,</STRONG> <STRONG>@args];</STRONG>
+
+         <STRONG>err</STRONG>  <STRONG>$fmtstr</STRONG> <STRONG>[,</STRONG> <STRONG>@args];</STRONG>
+
+         <STRONG>debug</STRONG> <STRONG>$fmtstr</STRONG> <STRONG>[,</STRONG> <STRONG>@args];</STRONG>
+
+         <STRONG>$Sys::OutPut::quiet</STRONG> <STRONG>=</STRONG> <STRONG>$::quiet;</STRONG>
+
+         <STRONG>$Sys::OutPut::debug</STRONG> <STRONG>=</STRONG> <STRONG>$::debug;</STRONG>
+
+
+
+</PRE>
+<H2>DESCRIPTION</H2><PRE>
+       These subroutines will make generating output to <STRONG>STDOUT</STRONG>
+       and <STRONG>STDERR</STRONG> easier.
+
+       All of the routines treat the <EM>$fmtstr</EM> argument as a <EM>printf</EM>
+       format string, with <EM>@args</EM> as the format string arguments.
+
+       The <STRONG>talk</STRONG> routine generates output to <STRONG>STDERR</STRONG> only if the
+       variable <STRONG>$Sys::OutPut::quiet</STRONG> is non-null and non-zero.
+
+       The <STRONG>out</STRONG> routine generates output to <STRONG>STDOUT</STRONG>, with a <EM>newline</EM>
+       appended to &lt;$fmtstr&gt;, if it is not already terminated
+       with one.
+
+       The <STRONG>put</STRONG> routine generates output to <STRONG>STDOUT</STRONG>, without any
+       additional trailing newline.
+
+       The <STRONG>err</STRONG> routine generates output to <STRONG>STDERR</STRONG>, with a <EM>newline</EM>
+       appended if needed.
+
+       The <STRONG>debug</STRONG> routine generates output to <STRONG>STDERR</STRONG> only if the
+       variable <STRONG>$Sys::OutPut::debug</STRONG> is non-null and non-zero,
+       which is also returned as the result.  This allows for
+       convenient usages such as in the following example:
+
+           <STRONG>sub</STRONG> <STRONG>foo</STRONG> <STRONG>{</STRONG>
+               <STRONG>...</STRONG>
+               <STRONG>return</STRONG> <STRONG>if</STRONG> <STRONG>debug</STRONG> <STRONG>"Stopping</STRONG> <STRONG>now.";</STRONG>
+               <STRONG>...</STRONG>
+               <STRONG>next</STRONG> <STRONG>if</STRONG> <STRONG>debug</STRONG> <STRONG>"Skipping</STRONG> <STRONG>further</STRONG> <STRONG>processing";</STRONG>
+               <STRONG>...</STRONG>
+           <STRONG>}</STRONG>
+
+       <STRONG>$Sys::OutPut::debug</STRONG> variables are initialized from their
+       corresponding main variables <STRONG>$::quiet</STRONG> and <STRONG>$::debug</STRONG>,
+       respectively, unless they are already defined.
+
+
+</PRE>
+<H2>AUTHOR</H2><PRE>
+       Alan K. Stebbens &lt;aks@sgi.com&gt;
+
+
+</PRE>
+<H2>BUGS</H2><PRE>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

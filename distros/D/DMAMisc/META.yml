@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                DMAMisc
+version:             1.01-3
+abstract:            Misc support classes for DMA projects
+license:             ~
+author:              
+    - Dale Amon
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBI:                           0
+    Exporter:                      0
+    Fault::DebugPrinter:           0
+    Fault::Errorhandler:           0
+    POSIX:                         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

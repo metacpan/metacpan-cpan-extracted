@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AWS-SNS-Confess,
+version 0.001:
+
+  Publish errors to an SNS topic
+
+This software is copyright (c) 2012 by Tristan Havelick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

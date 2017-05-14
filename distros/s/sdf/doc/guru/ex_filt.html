@@ -1,0 +1,149 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: Creating New Filters</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_mac.html">Previous Topic</A> | <A HREF="ex_para.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.3. Creating New Filters</H1>
+<HR>
+<H2><A NAME="Using Event Processing">1.3.1. Using Event Processing</A></H2>
+<P>SDF's event processing feature makes it easy to create a new filter from an existing one. For example, the following lines make <EM>grid</EM> a variation of the <A HREF="../ref/ftable.html">table</A> filter:</P>
+<PRE>
+!on filter 'grid';; \
+    $name='table'; $params.=&quot;; style='grid'&quot;
+</PRE>
+<HR>
+<H2><A NAME="Using Perl">1.3.2. Using Perl</A></H2>
+<P>Perl subroutines can be used to implement filter logic. An SDF filter called <EM>xxx</EM> is mapped to a Perl subroutine called <EM>xxx</EM>_Filter within the SDF_USER package. The subroutine has the following interface:</P>
+<PRE>
+       xxx_Filter(*text, %param);
+</PRE>
+<P>where:</P>
+<UL>
+<LI><EM>@text</EM> is the text (original in and result out)
+<LI><EM>%param</EM> is the set of parameters (name-value pairs).</UL>
+<P>For example, the Perl implementation of the <A HREF="../ref/fappendi.html">appendix</A> filter is:</P>
+<PRE>
+<B>sub</B> appendix_Filter {
+    <B>local</B>(*text, %param) = @_;
+
+    <I># change headings</I>
+    <B>unshift</B>(@text, <TT>'!on paragraph \'H\d\'</TT>; __appendix; $style =~ s/H/A/');
+    <B>push</B>   (@text, <TT>'!off paragraph __appendix'</TT>);
+}
+</PRE>
+<P>The <TT>perllib/sdf/filters.pl</TT> file within the SDF distribution contains lots of examples of filters implemented as Perl subroutines.</P>
+<HR>
+<H2><A NAME="Adding Parameters">1.3.3. Adding Parameters</A></H2>
+<P>Parameters can be declared in a Perl array called _<EM>xxx</EM>_FilterParams. The array is a table in <A HREF="../ref/fmt_tbl.html">TBL</A> format which contains the following fields:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Field</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Name
+</TD>
+<TD>
+The parameter name
+</TD>
+</TR>
+<TR>
+<TD>
+Type
+</TD>
+<TD>
+The parameter type
+</TD>
+</TR>
+<TR>
+<TD>
+Rule
+</TD>
+<TD>
+The parameter validation rule, if any
+</TD>
+</TR>
+</TABLE>
+
+<P>Parameter types and rules follow the same conventions as macro argument types and rules. Refer to <A HREF="ex_mac.html">Creating New Macros</A> for details.</P>
+<P>For example, the parameters for the <A HREF="../ref/fexample.html">example</A> filter are declared like this:</P>
+<PRE>
+@_example_FilterParams = (
+    <TT>'Name       Type        Rule'</TT>,
+    <TT>'skipheader boolean'</TT>,
+    <TT>'lang       string'</TT>,
+    <TT>'wide       boolean'</TT>,
+    <TT>'listitem   integer'</TT>,
+    <TT>'pure       boolean'</TT>,
+);
+</PRE>
+<HR>
+<H2><A NAME="Arbitary Parameters">1.3.4. Arbitary Parameters</A></H2>
+<P>Occasionally, it is useful to support arbitary parameters. To do this, specify ('ANY') as the value of the parameter table. For example, the <A HREF="../ref/fsdf.html">sdf</A> filter can be used to apply an arbitary set of attributes to a block of text. Its parameter table is:</P>
+<PRE>
+@_sdf_FilterParams = (<TT>'ANY'</TT>);
+</PRE>
+<HR>
+<H2><A NAME="Data Models">1.3.5. Data Models</A></H2>
+<P>If the text is a table, the filter typically has a data model (i.e. validation table) called <EM>xxx_FilterModel</EM>. To speed up processing, model validation is only done in verbose mode. For example, the <A HREF="../ref/fdefine.html">define</A> filter is defined as follows:</P>
+<PRE>
+<I># define - variable definitions</I>
+@_define_FilterParams = (
+    <TT>'Name       Type        Rule'</TT>,
+    <TT>'family     string      &lt;\w+&gt;'</TT>,
+    <TT>'export     boolean'</TT>,
+);
+@_define_FilterModel = (
+    <TT>'Field      Category    Rule'</TT>,
+    <TT>'Name       key         &lt;\w+&gt;'</TT>,
+    <TT>'Value      optional'</TT>,
+);
+<B>sub</B> define_Filter {
+    <B>local</B>(*text, %param) = @_;
+    <B>local</B>(@tbl, @flds, $rec, %values);
+    <B>local</B>($family, $export, $name);
+
+    <I># Parse and validate the data</I>
+    @tbl = &amp;'TableParse(@text);
+    @text = ();
+    &amp;_FilterValidate(*tbl, *_define_FilterModel) <B>if</B> $validate;
+
+    <I># Process the data</I>
+    $family = $param{'family'};
+    $family .= <TT>'_'</TT> <B>if</B> $family <B>ne</B> <TT>''</TT>;
+    $export = $param{'export'};
+    (@flds) = &amp;'TableFields(<B>shift</B> @tbl);
+    <B>for</B> $rec (@tbl) {
+        %values = &amp;'TableRecSplit(*flds, $rec);
+        $name = $family . $values{'Name'};
+        <B>push</B>(@text, <TT>&quot;!define $name $values{'Value'}&quot;</TT>);
+        <B>push</B>(@text, <TT>&quot;!export $name&quot;</TT>) <B>if</B> $export;
+    }
+}
+</PRE>
+<HR>
+<H2><A NAME="Dynamic Filter Loading">1.3.6. Dynamic Filter Loading</A></H2>
+<P>Most filters are either built-in or defined in a library or module which is loaded at the top of a document. The <A HREF="../ref/fscript.html">script</A> filter makes it easy to embed Perl code within an SDF file, and library and module files are simply normal SDF files.</P>
+<P>However, if SDF is asked to apply a filter which it does not know about, it looks for a file called <EM>filter_name</EM>.sdp and dynamically loads the filter from that file if it can. This feature is useful for complex filters which are rarely used.</P>
+<P>See the <TT>stdlib/module.sdp</TT> file for an example.</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_mac.html">Previous Topic</A> | <A HREF="ex_para.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

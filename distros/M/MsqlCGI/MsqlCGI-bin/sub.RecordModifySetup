@@ -1,0 +1,185 @@
+#####################################################################
+# package RecordModifySetup
+#
+# This file is part of the MsqlCGI package.  The routines in this file
+# are dedicated to setting up a record modification.
+# 
+# Author: Alex Tang <altitude@cic.net> 
+# Copyright 1996 Alex Tang and CICNet, Inc.
+#####################################################################
+
+package RecordModifySetup;
+
+
+#####################################################################
+# sub DoRecModifySetup
+#
+# This Set's up the modify screen.
+#####################################################################
+sub DoRecModifySetup {
+  local ( $dbh, $priKeys ) = @_;
+
+  $query = &RecActions::CreateExplicitQuery
+  	( "SELECT", $priKeys );
+  &main::DPrint ( "Doing Query: <pre>$query</pre>" );
+  $sth = $dbh->Query ( $query ) || 
+  	&main::Error ( "Query Failed in DoRecModify. $Msql::db_errstr" );
+  
+  $nRows = $sth->numrows;
+  $nCols = $sth->numfields;
+
+  $nRows = $sth->numrows;
+
+  if ( $nRows > 1 ) {
+    &main::Error ( "UUGH, this shouldn't have happened.  Trying to modify
+    more than one Entry..." );
+  }
+
+  $sth->DataSeek ( 0 ) || 
+      &main::Error ( "Failed DataSeek ( 0 ). $Msql::db_errstr" );
+  
+  ( @fieldArray = $sth->FetchRow() ) || 
+      &main::Error ( "Failed FetchRow for row 0 $Msql::db_errstr" );
+
+	# Setup the Primary Key.  We MUST include the primary key so we
+	# know which record to modify...
+  $priKeyArrNum = $main::tableInfo->{'priKeyArrNum'};
+  $priKey = $fieldArray[$priKeyArrNum];
+
+
+  if ( $main::tableInfo->{'RecordModifySetupTemplate'} ) {
+    &Template::DoTemplate ( $main::tableInfo->{'RecordModifySetupTemplate'}, 
+    			    "RECORD_MODIFY_SETUP", $sth );
+  } else {
+    print &DoStandardAction 
+    	( "RECORD_MODIFY_SETUP", $sth );
+
+    print &Template::GetHTMLFooter();
+  }
+}
+
+############################################################################
+# DoCGIHeader
+#
+# This returns the standard CGIHeader, as well as the Primary Key value.
+############################################################################
+sub DoCGIHeader {
+  my ( $strRet ) = &Template::GetCGIHeader ( "RecModify" );
+  $strRet .= <<"  EOF";
+    <input type=hidden name="_MsqlCGI_priKey" value="$priKey">
+  EOF
+  return $strRet;
+}
+
+############################################################################
+# The Standard Action...
+############################################################################
+sub DoStandardAction {
+  my ( $type, $sth ) = @_;
+  my ( $strRet ) = "";
+
+  $strRet .= &DoCGIHeader();
+  $strRet .= <<"  EOF";
+
+    <table width=100% border>
+      <tr>
+	<td>
+	  <table cellspacing=0>
+	    <tr>
+	      <th width=10%>Field Name</th>
+	      <th width=5%>&nbsp;</th>
+	      <th width=85%>Value</th>
+	    </tr>
+	    <tr>
+	      <td colspan=3><hr></td>
+	    </tr>
+
+  EOF
+
+  for ( $nFieldCount = 0; $nFieldCount <= $#{$main::tData}; $nFieldCount++ ) {
+    if ( $main::tData->[$nFieldCount]->{'dispFieldWhenModify'} ) {
+      ( $strMod, $strData ) = 
+      	&CreateCGIString ( $sth, $main::tData->[$nFieldCount]->{'fieldName'} );
+      
+      #( $strMod, $strData ) = &MsqlCGI::CreateCGIString 
+      #	( $main::tableInfo, $main::tData->[$nFieldCount], "MODIFY",
+      # $fieldArray[$nFieldCount], $sth );
+
+      $strRet .= <<"      EOF";
+	    <tr>
+	      <td><font size=-1>$main::tData->[$nFieldCount]->{'description'}</font></td>
+	      <td>$strMod</td>
+	      <td>$strData</td>
+	    </tr>
+	    <tr>
+	      <td colspan=3><hr></td>
+	    </tr>
+
+      EOF
+    }
+  }
+  $strRet .= <<"  EOF";
+	  </table>
+	</td>
+      </tr>
+    </table>
+    <p>
+    <center>
+  EOF
+
+  $strRet .= &DoCGIFooter();
+  return $strRet;
+}
+
+sub CreateCGIString {
+  my ( $sth, $fieldName ) = @_;
+  $elementNum = &MsqlCGI::GetElementStructNumber ( $fieldName );
+  ( $strMod, $strData ) = &MsqlCGI::CreateCGIString 
+       ( $main::tData->[$elementNum], 
+	 "MODIFY",
+         $fieldArray[$elementNum], 
+	 $sth );
+  $strData .= &AddVariableToList ( $main::tData->[$elementNum]->{'fieldName'} );
+
+  return ( $strMod, $strData );
+}
+
+sub DoCGIFooter {
+  return <<"  EOF";
+      <input type=submit value="Modify Record">
+      <input type=reset value="Reset All Fields">
+  EOF
+
+}
+
+
+############################################################################
+# AddVariableToList
+#
+# If a variable appears on the ModifyRecord Page, we keep track of that
+# variable name.  We need to do this because the designer/admin doesn't
+# have to put all of the fields on the page if they are using explicit
+# control.
+#
+# The problem lies in how we normally specify a field as blank.  Usually,
+# a blank field indicates that no data should be put into that field (a
+# null field).  However, if a blank field is NOT entered into the
+# associative array that's returned by cgi-lib's ReadParse() function.
+# Hence, a dilemma arises:  How do we distinguish between a field that
+# appears in the HTML page but has be returned "blank" and a field that
+# does not appear in the HTML page.  
+#
+# My answer for now is to create a set of hidden variables that contains
+# the name of each field that is included in the HTML page.  That is what
+# this function is for.  it just returns a string that contains an HTML
+# anchor which has the NAME set to "_MsqlCGI_variableIncluded" and the
+# value is the fieldname.
+############################################################################
+sub AddVariableToList {
+  my ( $fieldName ) = @_;
+  return <<"  EOF";
+    <input type=hidden name="_MsqlCGI_variableIncluded" value="$fieldName">
+  EOF
+}
+
+1;

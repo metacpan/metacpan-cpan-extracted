@@ -8,10 +8,12 @@ use warnings;
 use POSIX;
 use Test::More;
 use Template::Flute;
-use Class::Load qw(try_load_class);
 
-try_load_class('Number::Format')
-    or plan skip_all => "Missing Number::Format module.";
+eval "use Number::Format";
+
+if ($@) {
+    plan skip_all => "Missing Number::Format module.";
+}
 
 plan tests => 3;
 
@@ -36,8 +38,7 @@ $flute = Template::Flute->new(specification => $xml,
 
 $ret = $flute->process();
 
-ok($ret =~ m%<div class="text">USD 30.00</div>%, "Currency filter without options")
-    || diag "Output: $ret";
+ok($ret =~ m%<div class="text">USD 30.00</div>%, "Output: $ret");
 
 # currency filter (options: int_curr_symbol)
 %currency_options = (int_curr_symbol => '$');
@@ -49,8 +50,7 @@ $flute = Template::Flute->new(specification => $xml,
 
 $ret = $flute->process();
 
-ok($ret =~ m%<div class="text">\$ 30.00</div>%, "Currency filter with currency symbol option")
-    || diag "Output: $ret";
+ok($ret =~ m%<div class="text">\$ 30.00</div>%, "Output: $ret");
 
 # currency filter (European style of display)
 %currency_options = (int_curr_symbol => 'EUR',
@@ -66,5 +66,4 @@ $flute = Template::Flute->new(specification => $xml,
 
 $ret = $flute->process();
 
-ok($ret =~ m%<div class="text">10.200,00 EUR</div>%, "Currency filter with European style of display")
-    || diag "Output: $ret";
+ok($ret =~ m%<div class="text">10.200,00 EUR</div>%, "Output: $ret");

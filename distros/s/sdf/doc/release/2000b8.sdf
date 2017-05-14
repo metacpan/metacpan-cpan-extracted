@@ -1,0 +1,1056 @@
+H1: 2.000beta8
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+There are lots of new things in this version.
+The general enhancements are:
+
+!block sections
+. Easier enumerated values
+. Look improvements
+. Style rationalisation
+. More build_title control variables
+. Miscellaneous things.
+!endblock
+
+The table enhancements are:
+
+!block sections
+. Easier column widths
+. Heading/footing rows for tables
+. Table positioning
+. Table filtering and sorting
+. Landscape tables
+. Column alignment
+. Cell attributes
+. Spreadsheet calculations.
+!endblock
+
+The page formatting enhancements are:
+
+!block sections
+. Arbitrary page sizes
+. Headers and footers
+. Header/footer special tags
+. Header/footer borders
+. Page backgrounds
+. Page layout variables
+. Page control within a book.
+!endblock
+
+The configuration enhancements are:
+
+!block sections
+. FrameMaker templates are no longer required
+. Event processing enhancements.
+!endblock
+
+Details are given below.
+
+Note: For {{html}} and {{txt}} targets, this release is slightly faster
+than the previous one. For {{mif}} (and {{ps}}), this release may be
+slightly slower (as SDF templates, not FrameMaker ones, are
+now used).
+
+
+H3: Easier enumerated values
+
+Enumerated values no longer need to be quoted.
+In a set of name-value pairs, if an expression is a single word where:
+
+* the first character is uppercase
+* the remaining characters are lowercase
+
+then the word is assumed to be an enemerated value and
+it is automatically converted to a string. For example,
+the following two lines are now equivalent:
+
+E:   P1[align="Center"] My Title
+E:   P1[align=Center] My Title
+
+
+H3: Look improvements
+
+The overall appearance (i.e. look) of an SDF document can be
+controlled via the -k option or the OPT_LOOK variable.
+SDF now supports the following looks:
+
+* {{simple}} - the default look, useful for general documentation
+
+* {{fancy}} - QSD-like look, but without any logos
+
+* {{infomap}} - look based on Information Mapping[[tm]]
+
+* {{overhead}} - look suitable for overhead transparencies.
+
+Note: For backwards compatibility, {{plain}} is now an alias for
+{{simple}}.
+
+H3: Style rationalisation
+
+SDF now supports the styles (i.e. document types) below.
+
+!block table; groups
+Style           Purpose
+General:
+document        a normal document
+manual          a manual
+paper           a technical paper
+Administration:
+admin           generic administration document
+fax             a fascimile
+memo            a memorandum
+newslttr        a newsletter
+minutes         minutes of a meeting
+Miscellaneous:
+listing         a source code listing
+!endblock
+
+The {{MAC:build_title}} macro is used to build the cover page
+for the general styles.
+The {{FILT:title}} filter is used to build the title block
+for the administation styles.
+The miscellaneous styles do not have a title.
+
+Adding new styles for a look is now much easier than it
+was previously. Furthermore, {{manual}} is now just another
+style rather than a special mode.
+
+
+H3: More build_title control variables
+
+{{MAC:build_title}} now supports the following variable:
+
+* {{DOC_COVER}} - the logical name of the cover page to use.
+
+Supported DOC_COVER values and their meanings are given below:
+
+!block table
+Value       Meaning
+original    SDF's original cover page layout
+project     a cover page useful for project documentation
+manual      the cover page used when OPT_STYLE is manual
+paper       the cover page used when OPT_STYLE is paper
+!endblock
+
+The {{manual}} cover supports a new macro called {{DOC_OFFICES}},
+i.e. if DOC_OFFICES is defined, its contents are appended after
+the inside cover page.
+
+
+H3: Miscellaneous things
+
+The {{SDF What's Planned}} document and {{bugs.html}}
+have been replaced by the {{DOC:SDF Bug Database}}.
+In fact, the organisation of the documentation has
+been improved quite a bit.
+
+Any document can now be converted to a FrameMaker book, i.e.
+it is no longer necessary to specially organise files in
+order to create a FrameMaker book.
+
+Tables of style {{columns}} (the default) now have
+a thin line above group rows.
+
+Tables can now be specified as list items by using the {{listitem}}
+parameter of the {{FILT:table}} filter. The value is the logical
+indent of the list (e.g. 1, 2, etc.). When generating HTML
+which contains a table within a numbered list, the {{listitem}}
+parameter is necessary in order to prevent the numbering from
+resetting.
+
+#The new {{MAC:continued}} macro can be used to continue a heading
+#onto another page (as is standard practice within Information Mapping).
+
+The new {{box}} filter can be used to place a box around one or
+more lines of text.
+
+The new {{center}} filter can be used to center a region of text.
+
+The new paragraph attribute called {{wide}} can be used to
+specify that a paragraph straddles the side-head area in addition
+to the main text area. Likewise. class filters (e.g. terms, references, etc.)
+now also support the {{wide}} attribute.
+
+By default, SDF automatically generates an {{id}} attribute for
+all headings in the table of contents. However, it is occasionally
+necessary to disable this, particularly when the same heading
+appears multiple times in a file.
+The new paragraph attribute {{noid}} can be used to prevent an
+{{id}} being generated for a paragraph.
+
+The title for an administration-style document can now be changed
+by either setting the DOC_TYPE variable or by using the new {{type}}
+parameter to the {{FILT:title}} filter. For example, if you want
+the title "Urgent Memo" rather than the default "MEMORANDUM" for
+a memo, you can now do the following:
+
+E:!init OPT_STYLE="memo"
+E:!block title; type="Urgent Memo"
+E:{{usual name-values pairs go here ...}}
+E:!endblock
+
+The {{FILT:title}} filter now also supports a {{format}} parameter
+which can be used to tune the column widths, when necessary.
+
+RTF can now be generated via FrameMaker by using the new {{sdf2fmrtf}}
+alias, i.e. the command is (say):
+
+E:   sdf -2fmrtf myfile.sdf
+
+When RTF is generated via FrameMaker, Word's standard style names are
+used, where possible. This makes it easier to import the RTF file
+into an existing Word document.
+
+Lists of tables and lists of figures can now be generated for normal
+documents, i.e. it is no longer necessary to use a FrameMaker book
+to build these lists.
+
+The new variable {{TXT_MARGIN}} can be used to control the width
+for {{txt}} output. Likewise, the new variable {{POD_MARGIN}} can
+be used to control the width of tables for {{pod}} format.
+
+The new {{bugtrack}} module can be used to build a simple
+bug tracking system like SDF's bug database.
+
+The new {{namevalues}} macro can be used to output a set of
+name-value pairs for an object. The parameters are:
+
+* the class name
+* the object name
+* a comma-separated list of attribute names.
+
+For example:
+
+E:!namevalues 'bugs'; 'sd0001'; 'Priority,Status,Type'
+
+Finer control over object catalog formatting is now available
+via the new {{style}} and {{headings}} attributes. {{style}}
+is the table style to use. The default value is {{plain}}.
+If {{headings}} is set, column headings are output.
+(By default, they are not.)
+
+
+H3: Easier column widths
+
+SDF now supports {{dynamic}} column widths for paper documentation, i.e.
+if a width is not specified for a column, then the column is
+sized based on the text within it and the space available.
+Proportional column widths are also supported.
+
+The {{format}} attribute of the {{FILT:table}} filter is either:
+
+* a single number, in which case each digit represents 10% of the
+  width available to the table, or
+
+* a comma-separated list of column width specifications.
+
+Examples of the column width specifications now supported are given below.
+
+!block table
+Value       Meaning
+30pt        an exact size (other supported units are cm, mm, " and in)
+30%         a percentage of the size available
+30          a percentage of the size available (% is implicit)
+10-20       dynamic size between 10% and 20% of the total width
+-20         dynamic size between 0% and 20% of the total width
+10-         dynamic size between 10% and 100% of the total width
+-           dynamic size between 0% and 100% of the total width
+3*          3 units of the remaining space
+*           same as 1*
+!endblock
+
+For example, in the table below, the second column will be
+twice the size of the last column.
+
+!block example
+!block  table; format="20,2*,10,*"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; format="20,2*,10,*"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+
+If a column is not given a size, the following rules are used:
+
+^ The last unspecified column size is implicitly '*' (i.e. the rest),
+  unless the {{narrow}} attribute is set, in which case the size
+  is implicitly '-' (i.e. as much as needed).
+
++ The other unknown sizes are implicitly '-'.
+
+For example, the first and third columns in the table below
+will be dynamically sized. The first column will take as
+much space as required and the last column will expand so
+that the table takes the full width of the text area.
+
+!block example
+!block  table; format=",30,,10"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; format=",30,,10"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+
+However, in the example below, each column will only take
+as much space is required, making the table narrower
+than it would be otherwise.
+
+!block example
+!block  table; narrow
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; narrow
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+
+If an = character is used in place of a - character for a column
+width, then those columns will be equalised in size.
+For example, the second and forth columns in the table
+below will be made equal in size.
+
+!block example
+!block  table; format="20,5=30,10,="
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; format="20,5=30,10,="
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+
+Note: As previously, the {{format}} parameter has no impact on HTML
+generation, i.e. all columns in HTML remain dynamically sized.
+Dynamic sizing is also ignored for {{txt}} and {{pod}} targets.
+
+
+H3: Heading/footing rows for tables
+
+The {{FILT:table}} filter now supports the following attributes:
+
+* {{headings}} - the number of heading rows at the top of the table
+* {{footings}} - the number of footing rows at the end of the table.
+
+If the {{headings}} attribute is not defined, then as previously done,
+the column headings are generated using the column names given on
+the {{parsing}} line. For example, the column headings in the table
+below will be {{Name}} and {{Age}}:
+
+!block example
+!block table
+Name    Age
+Bill    42
+!endblock
+!endblock
+
+Alternatively, if the {{headings}} attribute is defined,
+then that number of {{data}} rows are used as the column headings,
+i.e. the parsing line is not used to build the column headings.
+For example, the column headings in the table below will be
+{{"Title"}} and {{Age}} (remembering that a filter attribute is
+implicitly given the value 1 is no value is supplied).
+
+!block example
+!block table; headings
+A       B
+"Title" Age
+Bill    42
+Sally   23
+!endblock
+!endblock
+
+Likewise, the column headings below will be {{Preferred Title}} and
+{{Likely Age}} with each heading taking 2 rows.
+
+!block example
+!block table; headings=2
+A           B
+Preferred   Likely
+Title       Age
+Bill        42
+Sally       23
+!endblock
+!endblock
+
+Collectively, these new attributes improve things in several ways:
+
+* heading rows can now include non-alphanumeric characters
+* macros (e.g. change bars) can be applied to heading rows
+* multi-line heading and footing rows are now supported.
+
+
+H3: Table positioning
+
+The horizontal alignment and vertical placement of a table can be
+controlled by setting the {{align}} and {{placement}} parameters
+of the {{FILT:table}} filter respectively.
+The permitted {{align}} values are:
+
+!block table
+Value       Meaning
+Left        left-align the table
+Center      center the table
+Right       right-align the table
+Inner       align the table with the inner margin
+Outer       align the table with the outer margin
+!endblock
+
+Note: The {{wide}} parameter changes the left indent of a table
+to include the sidehead of a page. Therefore, the {{wide}}
+parameter will impact the horizontal positioning of any
+table which is not right-aligned.
+
+The permitted {{placement}} values are:
+
+!block table
+Value       Meaning
+Float       next column if necessary
+Pagetop     top of the next page
+Columntop   top of the next column
+Lefttop     top of the next left-hand page
+Righttop    top of the next right-hand page
+!endblock
+
+
+H3: Table filtering and sorting
+
+Tables can now be filtered and sorted by using the new {{where}}
+and {{sort}} attributes of the {{FILT:table}} filter.
+These attributes are also supported by the class filters (e.g.
+terms, references).
+In either case, filtering is done before sorting.
+
+The {{where}} attribute takes an expression which is evaluated
+for each record. Special symbols available are:
+
+!block table
+Symbol      Meaning
+$_          the current record
+$o{"xyz"}   the value of column xyz
+!endblock
+
+{{sort}} takes a comma-separated list of column names to sort on.
+If no columns are specified, the data is sorted using
+all columns in the order in which they appear. All sorting
+is done alphabetically - numeric sorting is not supported.
+
+
+H3: Landscape tables
+
+Landscape tables are now supported via the {{landscape}} parameter of
+the {{FILT:table}} filter. The value is the height allocated to
+the area in which the table is placed. If a unit is not specified,
+the value is assumed to be a percentage of the text column height.
+For convenience, a value of 1 implies a full page table.
+Some examples are given below.
+
+!block table
+Value               Meaning
+landscape="50pt"    height allocated to table is 50 points
+landscape="50%"     half page table
+landscape=50        half page table (% is the default units)
+landscape=1         full page table (1 implies 100%)
+landscape           full page table (syntactic shorthand for above)
+!endblock
+
+Note: This feature is currently {{B:use at your own risk}}.
+In particular, long tables and table titles confuse it badly.
+Furthermore, the {{align}} and {{placement}} parameters are
+effectively ignored for landscape tables.
+
+
+H3: Column alignment
+
+The {{colaligns}} parameter of the {{FILT:table}} filter can now be used
+to control the alignment of text within columns of a table.
+For example:
+
+!block example
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+!endblock
+
+The output is:
+
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+
+The value of {{colaligns}} is usually a sequence of the letters
+{{L}}, {{C}} and {{R}} (which mean what one would expect).
+If you prefer, a comma-separated list of the values {{Left}}, {{Center}}
+and {{Right}} can be specified. For example:
+
+!block example
+!block  table; colaligns="Left,Center,Center,Right"
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+!endblock
+
+
+H3: Cell attributes
+
+Cells within a table can now be given attributes by preceding the
+cell value with a semicolon-separated list of name-value pairs
+enclosed in square brackets. For example:
+
+!block example
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       [align=Left]B       C           [bgcolor=Green]1.0
+X       Hello dear world    Y           [bgcolor=Red]10.2
+!endblock
+!endblock
+
+The output is:
+
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       [align=Left]B       C           [bgcolor=Green]1.0
+X       Hello dear world    Y           [bgcolor=Red]10.2
+!endblock
+
+The cell attributes supported are given below.
+
+!block table; groups
+Name        Value
+General:
+align       horizontal alignment (Left, Center, Right)
+valign      vertical alignment (Top, Middle, Bottom, Baseline)
+cols        the number of columns this cell spans (default is 1)
+rows        the number of rows this cell spans (default is 1)
+bgcolor     background colour of cell (see below)
+PS only:
+fill        background colour fill percentage
+truling     ruling setting for top of cell
+bruling     ruling setting for bottom of cell
+lruling     ruling setting for left of cell
+rruling     ruling setting for right of cell
+angle       angle of text (0, 90, 180, 270)
+HTML only:
+nowrap      disable word wrap for this cell
+Special:
+sdf         treat the cell text as SDF (rather than as phrase text)
+tag         phrase tag to apply to cell text
+paratag     paragraph style to apply to cell text
+!endblock
+
+For PS (i.e. MIF) generation, the supported colour values are
+{{Black}}, {{White}}, {{Red}}, {{Green}},
+{{Blue}}, {{Yellow}}, {{Cyan}} and {{Magenta}}.
+If a different colour is specified, it is ignored.
+The supported fill values are 100, 90, 70, 50, 30, 10 and 3.
+If a fill value is not specified, 100% fill is used.
+
+For HTML generation, any of the HTML colours names
+(including those supported for PS generation) or the "#rrggbb" form
+can be used.
+
+The permitted ruling values are {{Vthin}}, {{Thin}}, {{Medium}},
+{{Thick}} and {{Double}}.
+
+The {{sdf}}, {{tag}} and {{paratag}} attributes control the way in which the
+cell text is converted to SDF:
+
+^ If {{sdf}} is set, the cell text is already SDF.
++ Otherwise if {{tag}} is set, the SDF paragraph is paratag:E<2{>tag:textE<2}>.
++ Otherwise, the paragraph is paratag:text.
+
+{{tag}} is usually set via the {{tags}} or {{groups}} parameters
+of the {{FILT:table}} filter.
+
+Note: {{paratag}} is not yet implemented.
+
+
+H3: Spreadsheet calculations
+
+{{The spreadsheet expression evaluator and the documentation below
+was written by Tim Hudson ({{EMAIL:tjh@cryptsoft.com}})}}.
+
+Spreadsheet style calculations have been introduced into SDF using the
+standard {{E<2[> E<2]>}} syntax with a prefix of {{+}} (or {{=}}) indicating
+that the expression is to be evaluated by the calculation routines.
+
+This extension has been loosely modelled on [[Microsoft]] {{Excel}}[[r]]
+in terms of the initial functions supported and the syntax used.
+
+Note: Calculation support for a table can be disabled by adding in 
+an attribute of {{nocalcs}} (otherwise the pointers required to table
+data that are needed when doing spreadsheet calculations occur for each
+table cell).
+
+Each {{cell}} in a table has an {{cellid}} which is made up of a
+single uppercase letter indicating the column index and a number
+indicating the row index (counting from 1 and excluding the
+heading rows). The upper left {{cell}} is hence {{A1}}.
+
+An example grid indicating {{cellid}}s:
+
+!block table; narrow
+Title1:Title2:Title3:Title4:Title5
+A1:B1:C1:D1:E1
+A2:B2:C2:D2:E2
+A3:B3:C3:D3:E3
+...:...:...:...:...
+A100:B100:C100:D100:E100
+!endblock
+
+A range of {{cellid}}s is specified using the syntax {{:cellid1:cellid2}}.
+For example: {{:A1:C1}} is exactly the same as {{A1,B1,C1}}
+
+An expression consists of a combination of standard Perl operators
+and spreadsheet functions and {{cellid}}s or {{cellid}} ranges.
+
+Standard Perl operators include:
+
+* + - * /
+
+Spreadsheet functions use the syntax {{FUNCTION(ARG1,ARG2,...ARGN)}}.
+
+The following functions are supported:
+
+* {{AVERAGE}} - the average - SUM(ARGS)/COUNT(ARGS)
+* {{SUM}} - the sum of the args - same as ARG1+ARG2+...+ARGN
+* {{MIN}} - the minumum argument value 
+* {{MAX}} - the maximum argument value
+* {{COUNT}} - the number of arguments
+* {{PRODUCT}} - the product of the args - same as ARG1*ARGN*...*ARGN
+* {{ROWSUM}} - the {{SUM}} of all the cells in the row to the left of 
+               the current cell
+* {{ROWPROD}} - the {{PRODUCT}} of all the cells in the row to the 
+                left of the current cell
+* {{COLSUM}} - the {{SUM}} of all the cells in the column above the 
+               current cell
+* {{COLPROD}} - the {{PRODUCT}} of all the cells in the column above the 
+                current cell
+
+A simple example:
+
+!block example
+!block table; style="grid"
+Count         Price        Total
+10            5            [\[=A1*B1]\]
+15            5.23         [\[=ROWPROD]\]
+[\[=COLSUM]]   [\[=B1+B2]\]   [\[=COLSUM]\]
+!endblock
+!endblock
+
+Which generates the result below. (Ok, summing two prices is
+meaningless, but it illustrates the syntax.)
+
+!block table; style="grid"
+Count         Price        Total
+10            5            [[=A1*B1]]
+15            5.23         [[=ROWPROD]]
+[[=COLSUM]]   [[=B1+B2]]   [[=COLSUM]]
+!endblock
+
+NB: 
+values are available until the next table is processed so
+you can refer to data inside {{normal}} paragraphs after 
+the table like this [\[=A1]\] which evaluates to [[=A1]]
+NE:
+
+A spreadsheet expression will recursively evaluate any expressions
+contained in {{cells}} that are used in an expression. In the example
+above, the expression in {{cell}} {{C3}} depends on the results of the
+expression in {{cell}} {{C1}} and {{C2}}.
+
+
+H3: Arbitrary page sizes
+
+Generally speaking, SDF can now support arbitrary page sizes.
+The catch is that the page size must now be specified up front
+via the OPT_PAGE_SIZE variable on the {{MAC:init}} line or via
+{{CMD:sdf}}'s -S option. (Previously, the (no longer
+supported) DOC_PAGE_SIZE variable could be
+specified anywhere in the document.)
+
+The supported values of OPT_PAGE_SIZE are given below.
+The default page size is {{global}}.
+
+!block table
+Name    Width   Height  Comment
+global  21.0cm  11.0in  will fit on either A4 or letter
+A3      29.7cm  42.0cm 
+A4      21.0cm  29.7cm
+A5      14.8cm  21.0cm
+B4      25.7cm  36.4cm
+B5      17.6cm  25.0cm
+letter  8.5in   11.0in
+legal   8.5in   14.0in
+tabloid 11.0in  17.0in
+!endblock
+
+Note: {{global}} is 0.23" narrower than {{letter}} and 1.76cm shorter
+than {{A4}}.
+
+New page sizes can be defined in {{FILE:sdf.ini}}.
+A rotated version is also available for each page size.
+Rotated sizes are named with an appended R.
+For example, the rotated A4 size is called A4R.
+
+
+H3: Headers and footers
+
+SDF now provides 3 ways of controlling headers and footers:
+
+* The OPT_HEADINGS variable (high level control)
+* PAGE_{{page}}_{{HF}}_{{ICO}}{{n}} variables (medium level control)
+* PAGE_{{page}}_{{HF}} macros (low level control)
+
+:where:
+
+* {{page}} is FIRST, RIGHT or LEFT
+* {{HF}} is HEADER or FOOTER
+* {{ICO}} is INNER, CENTER or OUTER
+* {{n}} is the line number within the header or footer (usually 1 or 2).
+
+The meaning of each page type is explained below.
+
+!block table
+Page    Usage
+FIRST   the first page in the document
+RIGHT   the page used for single-sided documents and the right hand side of double-sided documents
+LEFT    the left hand side of double-sided documents; ignored for single-sided documents
+!endblock
+
+Supported OPT_HEADINGS values and their meanings are given below:
+
+!block table
+Value       Meaning
+0           no header, no footer
+1           single line header, single line footer
+2           two line header and two line footer
+3           two line header and three line footer
+4           two line header and four line footer
+!endblock
+
+
+H3: Header/footer special tags
+
+The following special tags are supported within headers and footers:
+
+!block table
+Tag             Meaning
+PAGENUM         current page number
+PAGECOUNT       highest page number
+PARATEXT        paragraph text (e.g. Hardware requirements)
+PARANUM         paragraph number (e.g. Appendix A)
+PARANUMONLY     paragraph number only (e.g. A)
+PARASHORT       value of {{short}} attribute of paragraph
+PARALAST        text of last paragraph on page with the nominated style
+!endblock
+
+The {{PARA*}} tags require a comma separated list of paragraph styles
+to be nominated as the text of the phrase, e.g. E<2{>PARATEXT:H1,A1,P1E<2}>.
+
+The {{PARASHORT}} tag is useful for placing an alternative heading
+in a header, say. For example, you might set up your header to include
+E<2{>PARASHORT:H1E<2}> and have the following text in your document:
+
+E:  H1[short='Getting started'] Getting started with SDF
+
+The {{PARALAST}} tag is useful for producing dictionary-like headers.
+
+
+H3: Header/footer borders
+
+High level control over header/footer borders is provided by
+the OPT_BORDERS variable. The supported values and their meanings
+are given below:
+
+!block table
+Value       Meaning
+0           no header/footer borders
+1           line below header, line above footer
+2           lines above and below header, line above footer
+!endblock
+
+Finer control is available by setting the following variables:
+
+!block table
+Name                         Value
+PAGE_{{page}}_HEADER_BORDER  border specification string
+PAGE_{{page}}_FOOTER_BORDER  border specification string
+!endblock
+
+where {{page}} is either FIRST, RIGHT or LEFT.
+
+A {{border specification}} string is a comma-separated list
+of attributes which collectively describe the border.
+The format of each attribute is name[=value].
+The supported attributes are:
+
+* {{top}} - a line above the area
+* {{bottom}} - a line below the area
+* {{box}} - a box around the area
+* {{radius}} - for a box, the radius of the corner.
+
+For {{top}}, {{bottom}} and {{box}}, the value of the
+attribute is the line width in points.
+
+
+H3: Page backgrounds
+
+In order to support fancy background images, SDF supports
+the following variables:
+
+!block table
+Name                         Value
+PAGE_{{page}}_BACKGROUND     the logical image name
+!endblock
+
+where {{page}} is either FIRST, RIGHT or LEFT.
+
+When [[FrameMaker]] is being used to generate [[PostScript]],
+the image name is mapped to a master page called {{backgrnd}} within a file
+called {{backgrnd}}.mif.
+
+Note: At the moment, objects from the master page
+(excluding TextRects) are directly transferred to the
+generated MIF file. This means that objects in the
+lower right hand corner of an A4 master page will not
+will be positioned nicely if the paper size is changed
+to A5, say.
+
+
+H3: Page layout variables
+
+Page margins can now be controlled via the following variables:
+
+!block table
+Name                Value
+OPT_MARGIN_TOP      size of the margin above the header, if any
+OPT_MARGIN_BOTTOM   size of the margin below the footer, if any
+OPT_MARGIN_INNER    size of the inner margin
+OPT_MARGIN_OUTER    size of the outer margin
+!endblock
+
+The positioning of headers and footers can now be controlled via
+the following variables:
+
+!block table
+Name                         Value
+PAGE_{{page}}_HEADER_HEIGHT  height of the area allocated to the header
+PAGE_{{page}}_HEADER_GAP     size of the gap between the header area and the text area
+PAGE_{{page}}_FOOTER_HEIGHT  height of the area allocated to the footer
+PAGE_{{page}}_FOOTER_GAP     size of the gap between the text area and the footer area
+!endblock
+
+where {{page}} is either FIRST, RIGHT or LEFT.
+
+After the margins and header/footer are allocated, the remaining text
+area contains 1 or more text columns and an optional side head.
+The layout of these is controlled by the following variables:
+
+!block table
+Name                Value
+OPT_COLUMNS         numbers of text columns
+OPT_COLUMN_GAP      space between columns
+OPT_SIDEHEAD_WIDTH  size allocated to the sidehead
+OPT_SIDEHEAD_GAP    space between the side-head and first text column
+!endblock
+
+The following read-only variables provide information on the
+page layout:
+
+!block table
+Name                    Value
+DOC_PAGE_WIDTH          width of page
+DOC_PAGE_HEIGHT         height of page
+DOC_FULL_WIDTH          width of text area including the side-head
+DOC_TEXT_WIDTH          width of text area available for text columns
+DOC_TEXT_HEIGHT         height of text area
+DOC_COLUMN_WIDTH        width of a text column
+!endblock
+
+All the information variables are in units of points.
+The text area is the area allocated to text, excluding the header
+and footer (if any) on the RIGHT page.
+
+
+H3: Page control within a book
+
+When a book is being generated, each component of the book
+may have its own FIRST, RIGHT and LEFT pages, i.e. all of
+the macros and variables above support an extended set of
+{{page}} values {{component}}_{{FRL}} where:
+
+* {{component}} is the name of the component
+* {{FRL}} is FIRST, RIGHT or LEFT.
+
+The component names supported are given below.
+
+!block table
+Name                Meaning
+FRONT               the cover component
+PRETOC              components before the contents
+TOC                 the table of contents
+LOF                 the list of figures
+LOT                 the list of tables
+PRECHAPTER          components before the chapters
+CHAPTER             a normal chapter
+APPENDIX            an appendix
+PREIX               components before the index
+IX                  the index
+!endblock
+
+If a component does not have a component-specific macro/variable
+defined, then the generic macro/variable is used.
+
+
+H3: FrameMaker templates are no longer required
+
+Previously, SDF produced MIF documents by merging
+generated MIF paragraphs into FrameMaker templates.
+This approach was easy to implement but maintaining
+the FrameMaker templates was difficult as
+every look required several templates for {{each}} page size!
+
+FrameMaker templates can still be used but are no longer
+needed, nor recommended. Instead, the definitions of
+paragraph styles, phrase styles, table styles and graphic
+(border) frames is now done via {{SDF templates}}.
+SDF templates have the following advantages:
+
+^ Templates can be parameterised so that
+  a single template can support any number of page sizes.
+
++ Each look only requires a single template, rather than
+  a template for each component of a FrameMaker book.
+
++ Templates can inherit definitions from other templates,
+  making it much easier to create and maintain templates.
+
++ Each definition supports inheritance, so a new paragraph
+  style, say, can be defined in terms of the differences
+  between it and a parent style.
+
+The new {{sdtgen}} command can be used to build an SDF
+template from a FrameMaker one. Typically, {{sdtgen}} is
+used to create an initial template which is then simplified via
+definition inheritance and template inheritance.
+
+
+H3: Event processing enhancements
+
+The following new symbols are now available within event processing
+for paragraphs:
+
+!block table
+Symbol      Meaning
+$level      the current heading level ({{before}} this paragraph)
+$prev_style the style of the previous paragraph
+$prev_text  the text of the previous paragraph
+%prev_attr  the attributes of the previous paragraph
+!endblock
+
+These symbols make it much easier to do some really nice things.
+For example, the following rule can be used 
+to put level 2 headings on a new page unless
+the heading is the first one within a chapter:
+
+!block example
+!on paragraph '[HAP]2';; if ($level != 1) {$attr{'top'} = 1}
+!endblock
+
+
+H2: Fixes
+
+Tim Hudson has contributed a number of fixes to this release including:
+
+* this version should now work with Perl 5 again - the previous
+  version triggered a Perl 5 syntax error
+
+* the {{IMPORT}} pragma now supports filename extension adding ala
+  the {{MAC:import}} macro
+
+* centred figures now work as expected in HTML
+
+* numerous Windows help generation fixes/enhancements.
+
+Other fixes include:
+
+* the renaming of xx.out.ps to xx.ps is now done by {{CMD:sdfbatch}},
+  so failures (due to lack of disk space, say) are now handled much
+  better than they previously were
+
+* topics mode now generates an error if the heading of a topic
+  is duplicated within a file (see {{SECT:Miscellaneous things}} above)
+
+* headings containing a ? character should no longer cause problems
+
+* some bugs in {{CMD:sdfget}}'s extraction of documentation from C code
+  have been fixed (thanks to Keith Ponting).
+
+H2: Incompatibilities
+
+As the default page size is now {{global}} rather than {{A4}},
+page breaks may occur slightly earlier than they previously did.
+The advantage of changing to {{global}} is that documents
+should now print successfully on US letter paper.
+
+Memos, faxes, minutes and newsletters no longer have the company
+address in the top right hand corner. (I'll fix this soon, but it
+is not a high priority at the moment.)
+
+As {{txt}} and {{pod}} outputs use a different algorithm for
+deciding column widths when a table does not have a format parameter,
+some table cells may no longer fit when these output formats are used.
+
+The table attribute previously called {{headings}} has been
+renamed to {{parseline}} to better reflect its purpose and to
+make way for the new meaning.
+
+The DOC_TOCTEXT variable has been renamed to DOC_TOC_TITLE.
+The DOC_TOCGRAPHIC variable has been renamed to DOC_TOC_GRAPHIC.
+
+The {{newsletter}} style has been renamed to {{newslttr}}.
+
+{{overhead}} is now a look, rather than a style. The overhead look
+is untested and rarely used, so use it at your own risk.
+
+The aliases {{sdf2htmls}} and {{sdf2txts}} have been renamed to
+{{sdf2fmhtml}} and {{sdf2fmtxt}} respectively.
+
+{{FILE:/usr/local/bin/perl5}} is now the default perl interpreter used.

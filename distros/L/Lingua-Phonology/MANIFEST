@@ -3,6 +3,8 @@ CHANGES
 README
 TODO
 Makefile.PL
+META.yml
+META.json
 Phonology.pm
 Phonology/Common.pm
 Phonology/Features.pm
@@ -29,5 +31,3 @@ t/08lingrules.t
 t/09word.t
 t/test.xml
 t/test_rules.xml
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

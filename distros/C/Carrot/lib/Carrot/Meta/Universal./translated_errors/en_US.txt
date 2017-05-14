@@ -1,0 +1,15 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+hyperseded_target_fetch
+	A hyperseded method could not be obtained.
+	Target method name: %s
+	Instance class: %s
+	Method class: %s
+
+superseded_target_fetch
+	A superseded method could not be obtained.
+	Target method name: %s
+	Method class: %s

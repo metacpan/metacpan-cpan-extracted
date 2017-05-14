@@ -1,0 +1,314 @@
+** 2000-06-06 RELEASE 2.48
+
+- Make launche without -c overlay with more useful semantics.
+
+
+** 2000-04-18 RELEASE 2.47
+
+- getpwuid via ENVY_[RE]UID*
+
+- Try to convert ENVY_BASE to an absolute path.
+
+- Documentation tweaks.
+
+
+** 1999-10-14 RELEASE 2.46
+
+- Improved installation instructions.
+
+- Removed LD_LIBRARY_PATH from the default configuration.
+
+- Deprecated wrapper.
+
+
+** 1999-09-03 RELEASE 2.45
+
+- 'launche': a replacement for wrapper.
+
+
+** 1999-08-30 RELEASE 2.44
+
+- Emergency fix for wrapper.
+
+
+** 1999-08-27 RELEASE 2.43
+
+- Trace activity mode (--trace) to show exactly what is happening.
+
+- Avoid storing warnings which will not be output.
+
+
+** 1999-08-04 RELEASE 2.42
+
+- Clearly distinguish errors from warnings.
+
+- Error reporting wasn't happening: repaired.
+
+- Fixed malformed REx detected by perl 5.5.58.
+
+
+** 1999-07-21 RELEASE 2.41
+
+- Re-search ENVY_PATH when assigned in the First dimension.
+
+- Avoid whoami.
+
+
+** 1999-07-14 RELEASE 2.40
+
+- Doc tweaks.
+
+
+** 1999-07-14 RELEASE 2.39
+
+Many suggestions from redletter@iname.com:
+
+- Sane exit statuses for envy.pl.
+
+- Change 'echo' to just print instead of acting like a warning.
+
+- Upgraded "Variable '$var' not set" to be an error instead of a
+warning. Also, -strict option to upgrade all warnings to errors.
+
+- Documentation clean up.
+
+
+** 1999-06-21 RELEASE 2.38
+
+- Built okay with 5.004_05.  Update documentation.
+
+
+** 1999-06-15 RELEASE 2.37
+
+- ENVY_PATH is now used only to find the First dimension.  Moreover,
+it is required that ENVY_PATH be re-assigned in First.  This should
+make it possible to switch between First dimensions correctly.  (Based
+on insightful feedback from Alexander.Shugayev@db.com!)
+
+
+** 1999-06-09 RELEASE 2.36
+
+- Significant ergonomic improvements to wrapper. (Kudos to
+Alexander.Shugayev@db.com & Vicky.Nayer@db.com)
+
+- Assure order of ENVY_PATH when switching between environments.
+
+- Warnings for stupid dimension names.
+
+- Quell warnings emitted by unload all.
+
+- s/depreciated/deprecated/g
+
+- Versions 2.34 & 2.35 were for prerelease testing.
+
+
+** 1999-05-13 RELEASE 2.33 [STABLE]
+
+- Change default $PATH to /bin:/usr/bin (suggested by
+binkley@bigfoot.com),
+
+- New FAQ entry: how to manage perl releases with envy.
+
+
+** 1999-05-07 RELEASE 2.32 [STABLE]
+
+- Change default $PATH to /bin.
+
+
+** 1999-05-06 RELEASE 2.31 [STABLE]
+
+- Keep the first components of $PATH set to Conf.pm $env0{PATH}
+(suggested by Chris Fumai).  This closes the door on malicious
+binaries (named 'ls' for example).
+
+- Repaired 'envy unload all'.
+
+
+** 1999-02-08 RELEASE 2.30 [STABLE]
+
+- Doc tweaks.
+
+
+** 1999-02-04 RELEASE 2.29 [STABLE]
+
+- ENVY_PATH is no longer reset when unloading.  (Kudos to Sasha! :-)
+Added regression tests.
+
+- Doc tweaks.
+
+
+** 1998-12-31 RELEASE 2.28 [STABLE]
+
+- Fixed 'envy reload'.
+
+
+** 1998-12-10 RELEASE 2.27 [STABLE]
+
+- Fixed $db->all_matching (list & paths were broken?).
+
+- Tweak 'envy show' to ignore the current environment a bit better.
+
+
+** 1998-11-24 RELEASE 2.26 [STABLE]
+
+- Factored out parts of envy.pl to Envy::UI library.
+
+- Tweaks for smoother dimension swapping.
+
+
+** 1998-11-20 RELEASE 2.25 [STABLE]
+
+- Extra check for VERSION mismatch between envy.pl & Envy::DB.
+
+- Tweaks for login.IN (patrick@rcsm.ece.mcgill.ca).
+
+
+** 1998-11-08 RELEASE 2.24 [BETA]
+
+- New short-cuts: 'unenvy' for quick unload and $ENVY_VERBOSE to set
+the default verbosity level.
+
+- Envy modules are now reference counted for more accurate dependency
+tracking.  (One of Tony's satoris!)  As a side effect, the symantics
+of ENVY_STATE have changed slightly (but it is still mostly backward
+compatibile).
+
+- Very long (>1000 characters) envy state variables are now split into
+easily digestable chunks.  Added tests.  (Thanks Tony!)
+
+- Implemented an optimal differencing algorithm to minimize
+environment changes.
+
+- Downgraded some errors to manditory warnings.
+
+- Significant Envy::DB API improvements.
+
+
+** 1998-10-21 RELEASE 2.23 [STABLE]
+
+- Descriptions are now displayed in 'envy list'. (Thanks Tony!)  Moved
+full-paths to 'envy show paths'.
+
+- Add -v option to wrapper.
+
+
+** 1998-09-26 RELEASE 2.22
+
+- Set $LOGNAME in wrapper if not already set.
+
+- Announce new mailing list: envy@listbox.com!
+
+
+** 1998-09-13 RELEASE 2.21
+
+- Documentation updates.
+
+- Improved configuration and installation.
+
+
+** 1998-09-12 RELEASE 2.20
+
+- Simplified configuration even more.  Once you install envy once, it
+will remember the installation settings across subsequent upgrades.
+
+
+** 1998-09-11 RELEASE 2.19
+
+- Fixed configuration problem with re-installing.  Added tests.
+
+- 'envied' shows loaded envies in a tree layout!
+
+
+
+** 1998-09-03 RELEASE 2.18
+
+- Tweaked handling of 'First' dimension.
+
+
+** 1998-09-01 RELEASE 2.17
+
+- Append and assignment were ambiguous and assignment took precedence.
+Append is now assumed.  Added tests.
+
+- Envies found in .priv directories are hidden from the listing.
+
+- Fixed 5.004-ish warnings.
+
+
+** 1998-08-31 RELEASE 2.16
+
+- A fairly large amount of work (mostly in the form of deep pondering)
+has gone into this release.  Please consider it BETA and test
+it carefully!
+
+- Replaced bizarre installation instructions with much simpler.
+
+- Improved start-up time.
+
+- More documentation: envy help and FAQ.pod
+
+- Changes to the ENVY_PATH are now reflected (immediately) when
+loading multiple envys during a single invokation.
+
+- Added support for *.site configuration files.  This allows per-site
+customization of default settings (like xemacs).
+
+- Switched default umask to 002.  Should be part of site
+configuration?
+
+
+** 1998-03-05 RELEASE 2.15
+
+- Fixed handling of $HOME/.envy.
+
+- Improvements to Envy::Load.
+
+
+** 01-16-98 RELEASE 2.13
+
+- I've been waiting for the code to stabilize.  This release seems
+very stable so I am releasing it.  The csh support still needs to be
+brought up to date and better documentation is in the works.
+
+- Phased out support for backward-compatible envy state environment
+variables.
+
+
+** 12-20-97 RELEASE 2.10
+
+- Envys that set ETOP are treated specially.  Only one should be
+loadable at the same time.
+
+- Added support for 'echo' in envy files.
+
+- Components are no longer removed from ENVY_PATH.
+
+- Logging of all envious activity to $ETOP/var/envy.log.
+
+- Improved organization of *.part2.
+
+- Adding multiple components with += incorrectly occurred in the
+reverse order.  Fixed.
+
+- Adjusted dependency tracking to reduce false warnings.
+
+- '.' is no longer added to the front of the PATH by default.
+
+
+** 12-13-97 RELEASE 2.07
+
+- Slightly better dependency tracking.  Avoids unloading ETOP during
+'unload all'.
+
+- envy load/unload now accept multiple targets on the command line
+
+- More whitespace stricture in envy files.
+
+- Slightly improved error messages.
+
+- Factored 'wrapper' to use INITIAL_ENV.
+
+
+** 11-24-97 RELEASE 2.06
+
+- Initial public release.

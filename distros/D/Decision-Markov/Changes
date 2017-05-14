@@ -1,5 +1,9 @@
 Revision history for Perl extension Decision::Markov.
 
+0.03  Tue Sep 07 14:22:00 2004
+	- Fixed an error in the computation of discount factors.
+        - Fixed test script.
+
 0.02  Mon Sep 30 18:00:00 2002
 	- Improved the test script
 

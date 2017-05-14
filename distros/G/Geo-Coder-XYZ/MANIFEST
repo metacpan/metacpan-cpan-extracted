@@ -1,0 +1,37 @@
+Changes
+ignore.txt
+lib/Geo/Coder/XYZ.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/10-new.t
+t/boiler.t
+t/ca.t
+t/carp.t
+t/changes.t
+t/coverage.t
+t/critic.t
+t/cv.t
+t/dist.t
+t/gv.t
+t/kwalitee.t
+t/manifest.t
+t/metrics.t
+t/namespaces.t
+t/noplan.t
+t/pod-cm.t
+t/pod.t
+t/port.t
+t/prereq.t
+t/snippets.t
+t/spelling.t
+t/strict.t
+t/uk.t
+t/unused.t
+t/used.t
+t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

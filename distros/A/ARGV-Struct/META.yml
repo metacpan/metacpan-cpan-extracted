@@ -1,0 +1,19 @@
+---
+abstract: 'Parse complex data structures passed in ARGV'
+author:
+  - 'Jose Luis Martinez <joseluis.martinez@capside.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ARGV-Struct
+requires:
+  Moose: '0'
+version: '0.03'

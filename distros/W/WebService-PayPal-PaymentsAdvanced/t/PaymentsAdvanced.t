@@ -8,7 +8,9 @@ use Test::Fatal;
 use Test::LWP::UserAgent;
 
 use HTTP::Message::PSGI;
+use HTTP::Response ();
 use LWP::ConsoleLogger::Easy qw( debug_ua );
+use LWP::UserAgent ();
 use Path::Tiny qw( path );
 use WebService::PayPal::PaymentsAdvanced;
 use WebService::PayPal::PaymentsAdvanced::Mocker;
@@ -16,6 +18,7 @@ use WebService::PayPal::PaymentsAdvanced::Mocker;
 use lib 't/lib';
 use Util;
 
+## no critic (ProhibitCallsToUnexportedSubs)
 {
     my $ua = LWP::UserAgent->new();
     debug_ua($ua);

@@ -1,0 +1,151 @@
+$Id: README,v 1.5 2001/10/27 15:17:28 joern Exp $
+
+NAME
+	JaM - Just a Mailer
+
+SYNOPSIS
+	bin/jam.pl
+
+DESCRIPTION
+	The working title for this piece of software is:
+
+	"Highly Secure Personal Free Highspeed Archiving
+	 Gtk Perl Mailer Against Micro$oftism"
+
+	which describes its purpose in a nutshell.
+
+	But, primarily, it is: Just a Mailer. ;)
+	
+	It is designed exactly for Unix users like me. If other
+	Unix users at least like reading mail my way, they may
+	like this program, too ;)
+	
+	JaM handles big mail folders, has a powerful filter engine
+	and a lean and quick Gtk+ GUI. It uses a MySQL database
+	to store its data, which makes JaM capable of handling
+	huge mail folders very quickly.
+	
+	If you're using Netscape Messenger and are fed up with its
+	bugs, JaM is for you, because it can import your mail from
+	the Netscape nsmail folder.
+	
+	Generally JaM is not designed to have any feature a mail
+	client possibly may have!
+
+PREREQUISITES
+	1. An up and running MySQL database
+	
+	Currently only MySQL is supported as the storage backend.
+	Attaching other RDMBS is possible but not currently realized.
+	
+	2. Gtk+ version 1.2 or better
+	
+	JaM uses the Gtk+ toolkit for its gui.
+	
+	3. html2ps
+	
+	html2ps is used for printing mails.
+	
+	4. A bunch of Perl modules:
+	
+	  DBI 1.20
+	  DBD::mysql
+	  Date::Manip
+	  Gtk
+	  Gtk::HTML
+	  MIME::Entity
+	  MIME::Parser
+	  MIME::Types
+	  MIME::WordDecoder
+	  Net::POP3
+	  Net::SMTP
+	  Storable
+	  Unicode::String
+
+	I recommend using the powerfull CPAN module to install
+	these modules automatically. JaM ships with a CPAN Bundle
+	file which contains the modules listed above, so installation
+	of these may be as easy as to write:
+	
+	  # perl -MCPAN -Ilib -e "install Bundle::JaM"
+
+	after extracting the JaM archive and changing to the created
+	installation directory.
+
+	Unfortunately the DBD::MySQL CPAN distribution is currently
+	experimental, so the Bundle has to point explicitely to
+	the stable Msql-Mysql-modules distribution, what makes CPAN
+	automatic version check fail. If you repeatedly install the
+	JaM Bundle CPAN will always install DBD::MySQL, although it
+	is installed already. You can interrupt via Ctrl+C when the
+	installer asks you which drivers should be installed.
+	
+	Also installation of Gtk::HTML isn't easy, because it needs
+	a lot of installed libraries. I know, that makes satisfying JaM's
+	prerequisites a really hard task. But such is life, folks ;)
+	SuSE 7.2 provides all needed libraries, just struggle arround
+	with YaST a bit, if you're a lucky SuSE 7.2 owner ;)
+
+	JaM will crash unpredictable if any of the needed modules are
+	missing. There is no startup check routine, because some modules
+	are loaded at runtime when needed.
+
+INSTALLATION
+	There is no installation program. Just extract the archive
+	wherever you want, eg. in /usr/local, and set a symlink to
+	the version you want to use (the JaM archive creates a directory
+	which includes the version number):
+	
+	  # cd /usr/local
+	  # tar xfz /tmp/JaM-x.xx.tar.gz
+	  # ln -s JaM-x.xx/ JaM
+
+	Install needed Perl modules, if not already done:
+	
+	  # cd JaM
+	  # perl -MCPAN -Ilib -e "install Bundle::JaM"
+
+	Now you can start JaM using:
+	
+	  /usr/local/JaM/bin/jam.pl
+
+	You can set a symlink inside a common bin directory. JaM find
+	its installation directory automatically.
+	
+	  # cd /usr/local/bin
+	  # ln -s /usr/local/JaM/bin/jam.pl .
+
+	On first startup JaM recognizes, that the MySQL database needs to
+	be initialized. It asks you some questions and will create
+	the database for you. A help text will guide you through this.
+	
+	It then creates a .JaMrc file inside the users home directory, which
+	contains the MySQL connection information. All other files of JaM
+	did not to be writable by the user, so you can install JaM in a
+	read only system area. Multiuser access is no problem at all.
+	
+	You also may set the JAMRC environment variable pointing to another
+	.JaMrc file. This way multiple database instances per user are
+	supported.
+
+UPDATING TO NEWER VERSION
+	Updating is as easy as installing. Just extract the archive where
+	you installed JaM and recreate the symlink, so that the new
+	directory will be used.
+	
+	On next startup JaM will check your database schema version. If
+	the schema needs to be updated, JaM suggests you to make a backup
+	of your MySQL database. Then it can update the schema automatically.
+	Update across several versions of JaM is supported.
+
+AUTHOR
+	Joern Reder <joern@zyn.de>
+
+COPYRIGHT
+	Copyright (C) 2001 by Joern Reder, All Rights Reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+SEE ALSO
+	perl(1).

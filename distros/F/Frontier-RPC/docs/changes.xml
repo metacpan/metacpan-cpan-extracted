@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="changes.xsl" type="text/xsl"?>
+<!-- $Id: changes.xml,v 1.2 2001/04/23 19:08:39 kmacleod Exp $ -->
+<changes title="History of Changes">
+  <devs>
+    <person name="Ken MacLeod" email="ken@bitsko.slc.ut.us" id="bitsko"/>
+  </devs>
+
+ <release version="0.07" date="(not yet final)">
+  <action dev="bitsko" type="update">
+    Added prototype 'docs/changes.xml'.</action>
+  <action dev="bitsko" type="update">
+    Corrected COPYING to be "same terms as Perl" (ie. Artistic and
+    GPL).</action>
+  <action dev="bitsko" type="update"
+      due-to="Joe Johnston" due-to-email="jjohn@oreilly.com"
+      due-to-type="code contribution">
+    Added Frontier::Responder CGI responder.</action>
+  <action dev="bitsko" type="update"
+      due-to="Tim Peoples" due-to-email="tep@colltech.com"
+      due-to-type="code contribution">
+    Merged POD for Apache::XMLRPC.</action>
+  <action dev="bitsko" type="update">
+    Added 'examples/validator1-daemon.pl' validation suite.</action>
+  <action dev="bitsko" type="update"
+      due-to="Ed Hill" due-to-email="ed-hill@uiowa.edu"
+      due-to-type="code contribution">
+    Added Apache::XMLRPC.</action>
+  <action dev="bitsko" type="update"
+      due-to="Nick Bauman" due-to-email="nick.bauman@eliancecorp.com"
+      due-to-type="code contribution">
+    Added type checking for newly created special data types.</action>
+  <action dev="bitsko" type="update"
+      due-to="John Posner" due-to-email="jjp@connix.com"
+      due-to-type="suggestion">
+    Serialize blessed array and hash references as &lt;array> and
+    &lt;struct>s.</action>
+  <action dev="bitsko" type="update"
+      due-to="John Posner" due-to-email="jjp@connix.com"
+      due-to-type="suggestion">
+    Frontier::Daemon now supports use_objects.</action>
+  <action dev="bitsko" type="fix"
+      due-to="John Posner" due-to-email="jjp@connix.com"
+      due-to-type="bug report">
+    Create an Integer special object for &lt;int>s (was just
+    &lt;i4>s).</action>
+  <action dev="bitsko" type="fix"
+      due-to="John Posner" due-to-email="jjp@connix.com"
+      due-to-type="bug report">
+    'use_objects' wasn't working.</action>
+
+ </release>
+ 
+</changes>

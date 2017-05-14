@@ -11,22 +11,26 @@ use_ok 'RDF::Lazy';
 my $graph = RDF::Lazy->new;
 isa_ok $graph, 'RDF::Lazy';
 
-$graph = RDF::Lazy->new( undef );
-isa_ok $graph, 'RDF::Lazy';
-is $graph->size, 0, 'empty graph';
-
 my $lit = $graph->uri( literal("Geek & Poke") );
 isa_ok $lit, 'RDF::Lazy::Literal';
-isa_ok $lit->graph, 'RDF::Lazy', '->graph';
-
-ok ($lit->is_literal && !$lit->is_resource && !$lit->is_blank, '->is_literal');
+ok ($lit->is_literal && !$lit->is_resource && !$lit->is_blank, 'is_literal');
 is $lit->str, 'Geek & Poke', 'stringify literal';
 is $lit->esc, 'Geek &amp; Poke', 'HTML escape literal';
 is $lit->type, undef, 'untyped literal';
 
 is $graph->literal("Geek & Poke")->str, $lit->str, 'construct via ->literal';
 
-my ($l1, $l2);
+#diag('language tags');
+my $l1 = $graph->literal("bill","en-GB");
+my $l2 = $graph->literal("check","en-US");
+is "$l1", "bill", 'literal with language code';
+is $l1->lang, 'en-gb';
+is $l2->lang, 'en-us';
+ok $l1->is_en_gb && !$l2->is_en_gb, 'is_en_gb';
+ok !$l1->is_en_us && $l2->is_en_us, 'is_en_us';
+ok $l1->is_en_ && $l2->is_en_ && !$l1->is_en, 'is_en_';
+ok $l1->is('@') && $l1->is('@en-'), 'is(...)';
+
 $l1 = $graph->literal("love","en");
 ok $l1->is_en && $l1->is_en_, 'is_en_ and is_en';
 
@@ -76,9 +80,8 @@ my $a = $graph->resource('http://example.org/alice');
 $obj = $a->foaf_name;
 is_deeply( "$obj", 'Alice', 'literal object');
 
-# this was a bug
-$obj = $a->blablabla;
-ok !$a->blablabla, 'no result without prefix';
+$obj = $a->zonk;
+is_deeply( "$obj", 'foo', 'property with default namespace');
 
 isa_ok( $graph->namespaces, 'RDF::NS' );
 
@@ -96,21 +99,17 @@ $graph->add( statement(
   iri('http://example.org/alice'), iri('http://example.org/zonk'), literal('doz'),
 ));
 
-$obj = $a->x_zonk('@fr');
+$obj = $a->zonk('@fr');
 is_deeply( "$obj", 'bar', 'property with filter');
 #$obj
 
-# FIXME: outcome depends on hash ordering
-# $obj = $a->x_zonk('@en','');
-# is_deeply( "$obj", 'doz', 'property with filter');
+$obj = $a->zonk('@en','');
+is_deeply( "$obj", 'doz', 'property with filter');
 
-my $ttl = $a->ttl;
-ok $ttl, '->ttl';
 
-#use RDF::NS;
-$a->graph->namespaces( RDF::NS->new );
-#note explain $a->graph->namespaces;
-#is $a->ttl, $ttl, 'namespaces';
+# TODO: Test dumper
+my $d = $a->ttl;
+ok $d, 'has dump';
 
 done_testing;
 

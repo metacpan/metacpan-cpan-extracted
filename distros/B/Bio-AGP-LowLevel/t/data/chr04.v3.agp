@@ -1,0 +1,163 @@
+S.lycopersicum-chr4	1	50000	1	N	50000	clone	no	
+S.lycopersicum-chr4	50001	176391	2	F	C04SLm0098C07.1	1	126391	+
+S.lycopersicum-chr4	176392	226391	3	N	50000	contig	no	
+S.lycopersicum-chr4	226392	357123	4	F	C04HBa0190C13.1	1	130732	+
+S.lycopersicum-chr4	357124	407123	5	N	50000	clone	yes	
+S.lycopersicum-chr4	407124	457123	6	N	50000	clone	no	
+S.lycopersicum-chr4	457124	507123	7	N	50000	contig	no	
+# this is a comment in the file
+S.lycopersicum-chr4	507124	560050	8	F	C04HBa0078J04.1	1	52927	+
+S.lycopersicum-chr4	560051	610050	9	N	50000	contig	no	
+S.lycopersicum-chr4	610051	763673	10	F	C04HBa0082D04.1	1	153623	+
+S.lycopersicum-chr4	763674	813673	11	N	50000	contig	no	
+S.lycopersicum-chr4	813674	863673	12	N	50000	clone	no	
+S.lycopersicum-chr4	863674	913673	13	N	50000	contig	no	
+S.lycopersicum-chr4	913674	963673	14	N	50000	clone	no	
+S.lycopersicum-chr4	963674	1013673	15	N	50000	clone	yes	
+S.lycopersicum-chr4	1013674	1138117	16	F	C04SLm0132C12.1	1	124444	+
+S.lycopersicum-chr4	1138118	1188117	17	N	50000	clone	no	
+S.lycopersicum-chr4	1188118	1238117	18	N	50000	contig	no	
+S.lycopersicum-chr4	1238118	1407562	19	F	C04HBa0049A17.1	1	169445	+
+S.lycopersicum-chr4	1407563	1457562	20	N	50000	clone	no	
+S.lycopersicum-chr4	1457563	1507562	21	N	50000	contig	no	
+S.lycopersicum-chr4	1507563	1557562	22	N	50000	clone	no	
+S.lycopersicum-chr4	1557563	1732069	23	F	C04SLm0030C09.1	1	174507	+
+S.lycopersicum-chr4	1732070	1737069	24	N	5000	clone	no	
+S.lycopersicum-chr4	1737070	1765765	25	F	C04HBa0114G11.1	1	28696	+
+S.lycopersicum-chr4	1765766	1877406	26	F	C04HBa0050I18.1	2001	113641	+
+S.lycopersicum-chr4	1877407	1989558	27	F	C04HBa0036C23.1	2001	114152	+
+S.lycopersicum-chr4	1989559	2069130	28	F	C04HBa0008H22.1	2001	81572	+
+S.lycopersicum-chr4	2069131	2119130	29	N	50000	contig	no	
+S.lycopersicum-chr4	2119131	2204372	30	F	C04HBa0024G05.1	1	85242	+
+S.lycopersicum-chr4	2204373	2330833	31	F	C04HBa0020F17.1	2001	128461	+
+S.lycopersicum-chr4	2330834	2380833	32	N	50000	clone	yes	
+S.lycopersicum-chr4	2380834	2430833	33	N	50000	clone	no	
+S.lycopersicum-chr4	2430834	2480833	34	N	50000	contig	no	
+S.lycopersicum-chr4	2480834	2634028	35	F	C04HBa0203L19.1	1	153195	+
+S.lycopersicum-chr4	2634029	2684028	36	N	50000	clone	no	
+S.lycopersicum-chr4	2684029	2734028	37	N	50000	contig	no	
+S.lycopersicum-chr4	2734029	2784028	38	N	50000	clone	no	
+S.lycopersicum-chr4	2784029	2834028	39	N	50000	clone	no	
+S.lycopersicum-chr4	2834029	2884028	40	N	50000	contig	no	
+S.lycopersicum-chr4	2884029	3001253	41	F	C04HBa0114C15.1	1	117225	+
+S.lycopersicum-chr4	3001254	3127487	42	F	C04SLm0143K21.1	2001	128234	+
+S.lycopersicum-chr4	3127488	3177487	43	N	50000	contig	no	
+S.lycopersicum-chr4	3177488	3322175	44	F	C04HBa0311A10.1	1	144688	+
+S.lycopersicum-chr4	3322176	3372175	45	N	50000	clone	no	
+S.lycopersicum-chr4	3372176	3422175	46	N	50000	contig	no	
+S.lycopersicum-chr4	3422176	3472175	47	N	50000	clone	no	
+S.lycopersicum-chr4	3472176	3590122	48	F	C04HBa0147F16.1	1	117947	-
+S.lycopersicum-chr4	3590123	3729565	49	F	C04HBa0308B07.2	1	139443	-
+S.lycopersicum-chr4	3729566	3779565	50	N	50000	contig	no	
+S.lycopersicum-chr4	3779566	3829565	51	N	50000	clone	no	
+S.lycopersicum-chr4	3829566	3954605	52	F	C04HBa0027G19.1	1	125040	+
+S.lycopersicum-chr4	3954606	4113037	53	F	C04HBa0198L24.1	2001	160432	+
+S.lycopersicum-chr4	4113038	4122718	54	F	C04HBa0119A16.1	2001	11681	+
+S.lycopersicum-chr4	4122719	4284882	55	F	C04HBa0031H05.1	2001	164164	+
+S.lycopersicum-chr4	4284883	4334882	56	N	50000	clone	no	
+S.lycopersicum-chr4	4334883	4384882	57	N	50000	contig	no	
+S.lycopersicum-chr4	4384883	4506206	58	F	C04SLm0033N19.1	1	121324	+
+S.lycopersicum-chr4	4506207	4620759	59	F	C04HBa0107M13.1	2001	116553	+
+S.lycopersicum-chr4	4620760	4670759	60	N	50000	clone	yes	
+S.lycopersicum-chr4	4670760	4746817	61	F	C04HBa0134D05.1	1	76058	+
+S.lycopersicum-chr4	4746818	4898451	62	F	C04HBa0128G23.1	2001	153634	+
+S.lycopersicum-chr4	4898452	4948451	63	N	50000	clone	no	
+S.lycopersicum-chr4	4948452	4998451	64	N	50000	contig	no	
+S.lycopersicum-chr4	4998452	5048451	65	N	50000	clone	no	
+S.lycopersicum-chr4	5048452	5098451	66	N	50000	clone	yes	
+S.lycopersicum-chr4	5098452	5148451	67	N	50000	clone	no	
+S.lycopersicum-chr4	5148452	5198451	68	N	50000	contig	no	
+S.lycopersicum-chr4	5198452	5248451	69	N	50000	clone	no	
+S.lycopersicum-chr4	5248452	5298451	70	N	50000	contig	no	
+S.lycopersicum-chr4	5298452	5348451	71	N	50000	clone	no	
+S.lycopersicum-chr4	5348452	5398451	72	N	50000	clone	yes	
+S.lycopersicum-chr4	5398452	5516739	73	F	C04HBa0029F16.1	1	118288	+
+S.lycopersicum-chr4	5516740	5566739	74	N	50000	clone	no	
+S.lycopersicum-chr4	5566740	5616739	75	N	50000	contig	no	
+S.lycopersicum-chr4	5616740	5666739	76	N	50000	clone	no	
+S.lycopersicum-chr4	5666740	5716739	77	N	50000	clone	yes	
+S.lycopersicum-chr4	5716740	5836776	78	F	C04HBa0006E18.1	1	120037	+
+S.lycopersicum-chr4	5836777	5936489	79	F	C04HBa0158A08.1	2001	101713	+
+S.lycopersicum-chr4	5936490	5986489	80	N	50000	contig	no	
+S.lycopersicum-chr4	5986490	6036489	81	N	50000	clone	no	
+S.lycopersicum-chr4	6036490	6086489	82	N	50000	clone	no	
+S.lycopersicum-chr4	6086490	6136489	83	N	50000	contig	no	
+S.lycopersicum-chr4	6136490	6186489	84	N	50000	clone	no	
+S.lycopersicum-chr4	6186490	6236489	85	N	50000	clone	no	
+S.lycopersicum-chr4	6236490	6286489	86	N	50000	contig	no	
+S.lycopersicum-chr4	6286490	6336489	87	N	50000	clone	no	
+S.lycopersicum-chr4	6336490	6423048	88	F	C04HBa0080D03.1	2001	88559	-
+S.lycopersicum-chr4	6423049	6548498	89	F	C04HBa0078E04.1	1	125450	-
+S.lycopersicum-chr4	6548499	6598498	90	N	50000	contig	no	
+S.lycopersicum-chr4	6598499	6648498	91	N	50000	clone	no	
+S.lycopersicum-chr4	6648499	6798170	92	F	C04HBa0291F09.1	1	149672	+
+S.lycopersicum-chr4	6798171	6848170	93	N	50000	clone	no	
+S.lycopersicum-chr4	6848171	6898170	94	N	50000	contig	no	
+S.lycopersicum-chr4	6898171	6948170	95	N	50000	clone	no	
+S.lycopersicum-chr4	6948171	6998170	96	N	50000	clone	yes	
+S.lycopersicum-chr4	6998171	7048170	97	N	50000	clone	yes	
+S.lycopersicum-chr4	7048171	7098170	98	N	50000	clone	yes	
+S.lycopersicum-chr4	7098171	7215731	99	F	C04HBa0132O11.1	1	117561	+
+S.lycopersicum-chr4	7215732	7265731	100	N	50000	contig	no	
+S.lycopersicum-chr4	7265732	7315731	101	N	50000	clone	no	
+S.lycopersicum-chr4	7315732	7365731	102	N	50000	clone	no	
+S.lycopersicum-chr4	7365732	7415731	103	N	50000	contig	no	
+S.lycopersicum-chr4	7415732	7465731	104	N	50000	clone	no	
+S.lycopersicum-chr4	7465732	7515731	105	N	50000	clone	yes	
+S.lycopersicum-chr4	7515732	7565731	106	N	50000	clone	no	
+S.lycopersicum-chr4	7565732	7615731	107	N	50000	contig	no	
+S.lycopersicum-chr4	7615732	7672094	108	F	C04HBa0255I02.1	1	56363	+
+S.lycopersicum-chr4	7672095	7722094	109	N	50000	contig	no	
+S.lycopersicum-chr4	7722095	7772094	110	N	50000	clone	no	
+S.lycopersicum-chr4	7772095	7822094	111	N	50000	contig	no	
+S.lycopersicum-chr4	7822095	7872094	112	N	50000	clone	no	
+S.lycopersicum-chr4	7872095	7922094	113	N	50000	contig	no	
+S.lycopersicum-chr4	7922095	7972094	114	N	50000	clone	no	
+S.lycopersicum-chr4	7972095	8072546	115	F	C04HBa0053M02.1	1	100452	+
+S.lycopersicum-chr4	8072547	8200136	116	F	C04SLm0129D14.1	2001	129590	+
+S.lycopersicum-chr4	8200137	8250136	117	N	50000	clone	no	
+S.lycopersicum-chr4	8250137	8300136	118	N	50000	contig	no	
+S.lycopersicum-chr4	8300137	8350136	119	N	50000	clone	no	
+S.lycopersicum-chr4	8350137	8400136	120	N	50000	contig	no	
+S.lycopersicum-chr4	8400137	8472598	121	F	C04HBa0110L05.1	1	72462	+
+S.lycopersicum-chr4	8472599	8522598	122	N	50000	contig	no	
+S.lycopersicum-chr4	8522599	8572598	123	N	50000	clone	no	
+S.lycopersicum-chr4	8572599	8622598	124	N	50000	contig	no	
+S.lycopersicum-chr4	8622599	8672598	125	N	50000	clone	no	
+S.lycopersicum-chr4	8672599	8722598	126	N	50000	contig	no	
+S.lycopersicum-chr4	8722599	8772598	127	N	50000	clone	no	
+S.lycopersicum-chr4	8772599	8822598	128	N	50000	clone	yes	
+S.lycopersicum-chr4	8822599	8872598	129	N	50000	clone	yes	
+S.lycopersicum-chr4	8872599	8922598	130	N	50000	clone	no	
+S.lycopersicum-chr4	8922599	8972598	131	N	50000	contig	no	
+S.lycopersicum-chr4	8972599	9022598	132	N	50000	clone	no	
+S.lycopersicum-chr4	9022599	9072598	133	N	50000	contig	no	
+S.lycopersicum-chr4	9072599	9122598	134	N	50000	clone	no	
+S.lycopersicum-chr4	9122599	9172598	135	N	50000	contig	no	
+S.lycopersicum-chr4	9172599	9222598	136	N	50000	clone	no	
+S.lycopersicum-chr4	9222599	9272598	137	N	50000	contig	no	
+S.lycopersicum-chr4	9272599	9322598	138	N	50000	clone	no	
+S.lycopersicum-chr4	9322599	9372598	139	N	50000	clone	yes	
+S.lycopersicum-chr4	9372599	9422598	140	N	50000	clone	no	
+S.lycopersicum-chr4	9422599	9472598	141	N	50000	contig	no	
+S.lycopersicum-chr4	9472599	9522598	142	N	50000	clone	no	
+S.lycopersicum-chr4	9522599	9572598	143	N	50000	contig	no	
+S.lycopersicum-chr4	9572599	9622598	144	N	50000	clone	no	
+S.lycopersicum-chr4	9622599	9723170	145	F	C04HBa0331L22.1	1	100572	+
+S.lycopersicum-chr4	9723171	9773170	146	N	50000	contig	no	
+S.lycopersicum-chr4	9773171	9823170	147	N	50000	clone	no	
+S.lycopersicum-chr4	9823171	9873170	148	N	50000	contig	no	
+S.lycopersicum-chr4	9873171	9923170	149	N	50000	clone	no	
+S.lycopersicum-chr4	9923171	9973170	150	N	50000	contig	no	
+S.lycopersicum-chr4	9973171	10103830	151	F	C04SLm0096K04.1	1	130660	+
+S.lycopersicum-chr4	10103831	10191122	152	F	C04HBa0106F07.1	2001	89292	+
+S.lycopersicum-chr4	10191123	10240818	153	F	C04HBa0068N05.1	2001	51696	+
+S.lycopersicum-chr4	10240819	10290818	154	N	50000	contig	no	
+S.lycopersicum-chr4	10290819	10340818	155	N	50000	clone	no	
+S.lycopersicum-chr4	10340819	10472294	156	F	C04SLm0059M16.1	1	131476	+
+S.lycopersicum-chr4	10472295	10522294	157	N	50000	contig	no	
+S.lycopersicum-chr4	10522295	10600846	158	F	C04HBa0219H08.1	1	78552	+
+S.lycopersicum-chr4	10600847	10650846	159	N	50000	contig	no	
+S.lycopersicum-chr4	10650847	10700846	160	N	50000	clone	no	
+S.lycopersicum-chr4	10700847	10750846	161	N	50000	contig	no	
+S.lycopersicum-chr4	10750847	10800846	162	N	50000	clone	no	

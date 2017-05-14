@@ -1,0 +1,17 @@
+HTTP/Handle version 0.01
+========================
+
+This module allows you to easily make HTTP requests and handle data yourself. This is useful for mp3 streams and a host of other uses. 
+
+What it does is handle sending the request and parsing the response headers and then allows you to grab the socket descriptor and read data as you please.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+After installation, see perldoc HTTP::Handle for how to use it.

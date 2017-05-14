@@ -1,0 +1,215 @@
+*** writemain.sh~	Wed Feb 08 16:44:20 1995
+--- writemain.sh	Tue Oct 10 17:02:48 1995
+***************
+*** 51,56 ****
+--- 51,76 ----
+  
+  
+  sed '/Do not delete this line--writemain depends on it/q' miniperlmain.c
++ 
++ 
++ if test X"$args" != "X" ; then
++     for ext in $args ; do
++ 	: $ext will either be 'Name' or 'Name1/Name2' etc
++ 	: convert ext into cname and mname
++ 	mname=`echo $ext   | sed 's!/!::!g'`
++ 	cname=`echo $mname | sed 's!:!_!g'`
++ 
++ 	echo "EXTERN_C void boot_${cname} _((CV* cv));"
++     done
++ fi
++ 
++ cat << 'EOP'
++ 
++ static void
++ xs_init()
++ {
++ EOP
++ 
+  if test X"$args" != "X" ; then
+      echo "    char *file = __FILE__;"
+      ai=''
+***************
+*** 62,68 ****
+  	mname=`echo $ext   | sed 's!/!::!g'`
+  	cname=`echo $mname | sed 's!:!_!g'`
+  
+! 	echo "    {   extern void boot_${cname} _((CV* cv));"
+  	if test "$ext" = "DynaLoader"; then
+  	    : Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
+  	    : boot_DynaLoader is called directly in DynaLoader.pm
+--- 82,88 ----
+  	mname=`echo $ext   | sed 's!/!::!g'`
+  	cname=`echo $mname | sed 's!:!_!g'`
+  
+! 	echo "    {"
+  	if test "$ext" = "DynaLoader"; then
+  	    : Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
+  	    : boot_DynaLoader is called directly in DynaLoader.pm
+*** miniperlmain.c~	Thu Sep 28 00:00:28 1995
+--- miniperlmain.c	Tue Oct 10 16:55:34 1995
+***************
+*** 2,18 ****
+--- 2,33 ----
+   * "The Road goes ever on and on, down from the door where it began."
+   */
+  
++ #ifdef __cplusplus
++ extern "C" {
++ #endif
++ 
+  #include "EXTERN.h"
+  #include "perl.h"
+  
++ #ifdef __cplusplus
++ }
++ #  define EXTERN_C extern "C"
++ #else
++ #  define EXTERN_C extern
++ #endif
++ 
+  static void xs_init _((void));
+  static PerlInterpreter *my_perl;
+  
+  int
++ #ifndef CAN_PROTOTYPE
+  main(argc, argv, env)
+  int argc;
+  char **argv;
+  char **env;
++ #else  /* def(CAN_PROTOTYPE) */
++ main(int argc, char **argv, char **env)
++ #endif  /* def(CAN_PROTOTYPE) */
+  {
+      int exitstatus;
+  
+***************
+*** 46,53 ****
+  
+  /* Register any extra external extensions */
+  
+  static void
+  xs_init()
+  {
+-     /* Do not delete this line--writemain depends on it */
+  }
+--- 61,69 ----
+  
+  /* Register any extra external extensions */
+  
++ /* Do not delete this line--writemain depends on it */
++ 
+  static void
+  xs_init()
+  {
+  }
+*** lib/ExtUtils/xsubpp~	Thu Jun 22 07:25:32 1995
+--- lib/ExtUtils/xsubpp	Tue Oct 10 18:53:10 1995
+***************
+*** 312,318 ****
+  
+  sub Q {
+      my($text) = @_;
+!     $text =~ tr/#//d;
+      $text =~ s/\[\[/{/g;
+      $text =~ s/\]\]/}/g;
+      $text;
+--- 312,318 ----
+  
+  sub Q {
+      my($text) = @_;
+!     $text =~ s/^\#//gm;
+      $text =~ s/\[\[/{/g;
+      $text =~ s/\]\]/}/g;
+      $text;
+***************
+*** 783,788 ****
+--- 783,791 ----
+  # print initialization routine
+  print qq/extern "C"\n/ if $cplusplus;
+  print Q<<"EOF";
++ ##ifdef __cplusplus
++ #extern "C"
++ ##endif
+  #XS(boot_$Module_cname)
+  #[[
+  #    dXSARGS;
+*** h2xs.SH~	Thu Sep 28 00:00:18 1995
+--- h2xs.SH	Tue Oct 10 18:34:02 1995
+***************
+*** 294,302 ****
+--- 294,308 ----
+  warn "Writing $ext$modpname/$modfname.xs\n";
+  
+  print XS <<"END";
++ #ifdef __cplusplus
++ extern "C" {
++ #endif
+  #include "EXTERN.h"
+  #include "perl.h"
+  #include "XSUB.h"
++ #ifdef __cplusplus
++ }
++ #endif
+  
+  END
+  if( $path_h ){
+*** minimod.PL~	Mon Feb 13 17:15:46 1995
+--- minimod.PL	Tue Oct 10 20:15:04 1995
+***************
+*** 53,65 ****
+      my($pname);
+      my($dl) = canon('/','DynaLoader');
+      print $head;
+      print "	char *file = __FILE__;\n";
+      foreach $_ (@exts){
+  	my($pname) = canon('/', $_);
+  	my($mname, $cname);
+  	($mname = $pname) =~ s!/!::!g;
+  	($cname = $pname) =~ s!/!__!g;
+! 	print "\t{   extern void boot_${cname} _((CV* cv));\n";
+  	if ($pname eq $dl){
+  	    # Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
+  	    # boot_DynaLoader is called directly in DynaLoader.pm
+--- 53,76 ----
+      my($pname);
+      my($dl) = canon('/','DynaLoader');
+      print $head;
++ 
++     foreach $_ (@exts){
++ 	my($pname) = canon('/', $_);
++ 	my($mname, $cname);
++ 	($mname = $pname) =~ s!/!::!g;
++ 	($cname = $pname) =~ s!/!__!g;
++ 	print "EXTERN_C void boot_${cname} _((CV* cv));\n";
++     }
++ 
++     my ($tail1,$tail2) = ( $tail =~ /\A(.*\n)(\s*\}.*)\Z/s );
++     print $tail1;
+      print "	char *file = __FILE__;\n";
+      foreach $_ (@exts){
+  	my($pname) = canon('/', $_);
+  	my($mname, $cname);
+  	($mname = $pname) =~ s!/!::!g;
+  	($cname = $pname) =~ s!/!__!g;
+! 	print "\t{\n";
+  	if ($pname eq $dl){
+  	    # Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
+  	    # boot_DynaLoader is called directly in DynaLoader.pm
+***************
+*** 70,76 ****
+  	}
+  	print "\t}\n";
+      }
+!     print $tail;
+  }
+  
+  sub canon{
+--- 81,87 ----
+  	}
+  	print "\t}\n";
+      }
+!     print $tail2;
+  }
+  
+  sub canon{

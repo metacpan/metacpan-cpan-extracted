@@ -39,7 +39,7 @@ mkdir .depending
 # This script should be called with 
 #     sh ./makedepend MAKE=$(MAKE)
 case "$1" in 
-	MAKE=*) eval $1 ;;
+	MAKE=*) eval $1; shift ;;
 esac
 
 export PATH || (echo "OOPS, this isn't sh.  Desperation time.  I will feed myself to sh."; sh \$0; kill \$\$)
@@ -131,25 +131,63 @@ for file in `$cat .clist`; do
     *)   finc= ;;
     esac
     $echo "Finding dependencies for $filebase$_o."
-    ( $echo "#line 1 \"$file\""; \
-      $sed -n <$file \
-	-e "/^${filebase}_init(/q" \
-	-e '/^#line/d' \
-	-e '/^#/{' \
-	-e 's|/\*.*$||' \
-	-e 's|\\$||' \
-	-e p \
+    # Below, we strip out all but preprocessor directives.
+    # We have to take care of situations like
+    #       #if defined(FOO) BAR   /* comment line 1
+    #                                 more comment lines */
+    # If we just delete text starting from the '/*' to the end of line, we will
+    # screw up cases like
+    #      #if defined(FOO)    /* comment */ \
+    #          && defined(BAR) /* comment */ \
+    #          && defined(BAZ) /* comment */ \
+    #               etc.
+    # Also, in lines like
+    #      #defined FOO(a,b)    a/**/b
+    # the comment may be important and so needs to be retained.
+    # This code processes the single-line comments first; it assumes there is
+    # at most one straightforward comment per continued preprocessor line,
+    # replacing each non-empty comment (and its surrounding white space) by a
+    # single space.  (sed only has a greedy '*' quantifier, so this doesn't
+    # work right if there are multiple comments per line, and strings can look
+    # like comments to it; both are unlikely in a preprocessor statement.) Any
+    # continuation line is joined, and the process repeated on the enlarged
+    # line as long as there are continuations.  At the end, if there are any
+    # comments remaining, they are either completely empty or are like the
+    # first situation.  The latter are just deleted by first deleting to the
+    # end of line (including preceding white space) things that start with '/*'
+    # and the next char isn't a '*'; then things that start with '/**', but the
+    # next char isn't a '/'.  (Subsequent lines of the comment are irrelevant
+    # and get dropped.)  At the end, we unjoin very long lines to avoid
+    # preprocessor limitations
+    ( $echo "#line 2 \"$file\"";                               \
+      $sed -n <$file                                           \
+	-e "/^${filebase}_init(/q"                             \
+        -e ': tstcont'                                         \
+	-e '/^[ 	]*#/s|[ 	]*/\*..*\*/[ 	]*| |' \
+        -e '/\\$/{'                                            \
+            -e 'N'                                             \
+            -e 'b tstcont'                                     \
+        -e '}'                                                 \
+	-e 's/\\\n//g'                                         \
+	-e '/^#line/d'                                         \
+	-e '/^[ 	]*#/{'                                 \
+	    -e 's|[ 	]*/\*[^*].*$||'                        \
+	    -e 's|[ 	]*/\*\*[^/].*$||'                      \
+            -e 's/.\{255\}/&\\\n/g'                           \
+	    -e p                                               \
 	-e '}' ) >UU/$file.c
 
-    if [ "$osname" = os390 -a "$file" = perly.c ]; then
-        $echo '#endif' >>UU/$file.c
-    fi
+    # We're not sure why this was there; the #endif is extraneous on modern z/OS
+    #if [ "$osname" = os390 -a "$file" = perly.c ]; then
+    #   $echo '#endif' >>UU/$file.c
+    #fi
 
     if [ "$osname" = os390 ]; then
         $cppstdin $finc -I. $cppflags $cppminus <UU/$file.c |
         $sed \
     	    -e '/^#.*<stdin>/d' \
 	    -e '/^#.*"-"/d' \
+	    -e '/^#.*git_version\.h/d' \
 	    -e 's#\.[0-9][0-9]*\.c#'"$file.c#" \
 	    -e 's/^[	 ]*#[	 ]*line/#/' \
 	    -e '/^# *[0-9][0-9]* *[".\/]/!d' \
@@ -170,6 +208,7 @@ for file in `$cat .clist`; do
 	    -e '/^#.*"-"/d' \
 	    -e '/^#.*"\/.*\/"/d' \
 	    -e '/: file path prefix .* never used$/d' \
+	    -e '/^#.*git_version\.h/d' \
 	    -e 's#\.[0-9][0-9]*\.c#'"$file.c#" \
 	    -e 's/^[	 ]*#[	 ]*line/#/' \
 	    -e '/^# *[0-9][0-9]* *[".\/]/!d' \
@@ -179,39 +218,17 @@ for file in `$cat .clist`; do
            -e 's|\.c\.c|.c|' $uwinfix .cout .cerr| \
         $uniq | $sort | $uniq >> .deptmp
     fi
+    echo "$filebase\$(OBJ_EXT): $@" >> .deptmp
 done
 
 $sed <$mf >$mf.new -e '1,/^# AUTOMATICALLY/!d'
 
-$MAKE shlist || ($echo "Searching for .SH files..."; \
-	$echo *.SH | $tr ' ' $trnl | $egrep -v '\*' >.shlist)
-
-# Now extract the dependencies on makedepend.SH and Makefile.SH
-# (they should reside in the main Makefile):
-rm -f .shlist.old
-mv .shlist .shlist.old
-$egrep -v '^makedepend\.SH' <.shlist.old >.shlist
-rm -f .shlist.old
-mv .shlist .shlist.old
-$egrep -v '^Makefile\.SH' <.shlist.old >.shlist
-rm -f .shlist.old
-mv .shlist .shlist.old
-$egrep -v '^perl_exp\.SH' <.shlist.old >.shlist
-rm -f .shlist.old
-mv .shlist .shlist.old
-$egrep -v '^config_h\.SH' <.shlist.old >.shlist
-rm .shlist.old
-
 if $test -s .deptmp; then
-    for file in `cat .shlist`; do
-	$echo `$expr X$file : 'X\(.*\).SH'`: $file $TOP/config.sh \; \
-	    $sh $file >> .deptmp
-    done
     $echo "Updating $mf..."
     $echo "# If this runs make out of memory, delete /usr/include lines." \
 	>> $mf.new
     if [ "$osname" = vos ]; then
-        $sed 's|.incl.c|.h|' .deptmp >.deptmp.vos
+        $sed 's|\.incl\.c|.h|' .deptmp >.deptmp.vos
         mv -f .deptmp.vos .deptmp
     fi
     $sed 's|^\(.*\$(OBJ_EXT):\) *\(.*/.*\.c\) *$|\1 \2; '"$defrule \2|" .deptmp \
@@ -234,10 +251,6 @@ else
        $sed -f .hsed >> $mf.new
     <.deptmp $sed -n 's|h:#include "\(.*\)".*$|h: \1|p' | \
        $sed -f .hsed >> $mf.new
-    for file in `$cat .shlist`; do
-	$echo `$expr X$file : 'X\(.*\).SH'`: $file $TOP/config.sh \; \
-	    $sh $file >> $mf.new
-    done
 fi
 $rm -f $mf.old
 $cp $mf $mf.old
@@ -245,15 +258,9 @@ $rm -f $mf
 $cp $mf.new $mf
 $rm $mf.new
 $echo "# WARNING: Put nothing here or make depend will gobble it up!" >> $mf
-$rm -rf .deptmp UU .shlist .clist .hlist .hsed .cout .cerr
+$rm -rf .deptmp UU .clist .hlist .hsed .cout .cerr
 rmdir .depending
 
 !NO!SUBS!
 $eunicefix makedepend
 chmod +x makedepend
-case `pwd` in
-*SH)
-    $rm -f ../makedepend
-    ln makedepend ../makedepend
-    ;;
-esac

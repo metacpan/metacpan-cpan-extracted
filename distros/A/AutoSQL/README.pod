@@ -1,0 +1,55 @@
+
+=head1 AutoSQL
+
+empowering database project developers
+
+=head2 Objective
+
+=head2 Archiecture
+
+
+        User
+    ------------
+    AdaptorFactory
+    DBAdaptor
+    ----------
+    ObjectAdaptor
+    ===
+    DBMS
+
+
+=head2 Software Prerequisite
+
+You need to install firstly the below softare and Perl modules on your system,
+and make it accessable in your project environment.
+
+Software - MySQL
+
+CPAN Module - 
+    DBI
+    DBD::mysql
+    AutoCode
+    AutoSQL - just this one
+    
+=head2 Usage
+
+I hope you have some experience on database development, preferably with 
+Ensembl or Bioperl-db projects, since this is really not easy for computer 
+newbies to understand.
+
+
+Two ways to get customized DBAdaptor
+
+=over 4
+
+=item 1
+
+You customize one for yourself. See Contact::DBSQL::DBAdaptor
+
+=item 2 
+
+use AdaptorFactory. See t/adaptorfactory.t
+
+=back
+
+=cut

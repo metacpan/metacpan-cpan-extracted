@@ -11,7 +11,7 @@ use MIME::Lite;
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '1.4.2';
+our $VERSION = '1.9.8';
 
 ## @method string gen_password(string regexp)
 # Generate a complex password based on a regular expression
@@ -33,14 +33,14 @@ sub gen_password {
 # @param html optional set content type to HTML
 # @return boolean result
 sub send_mail {
-    my ( $self, $mail, $subject, $body, $html ) = splice @_;
+    my ( $self, $mail, $subject, $body, $html ) = @_;
 
     # Set charset
     my $charset = $self->{mailCharset} ? $self->{mailCharset} : "utf-8";
 
     # Encode the body with the given charset
-    $body    = encode( $charset, $body );
-    $subject = encode( $charset, $subject );
+    $body    = encode( $charset, decode( 'utf-8', $body ) );
+    $subject = encode( $charset, decode( 'utf-8', $subject ) );
 
     # Debug messages
     $self->lmLog( "SMTP From " . $self->{mailFrom}, 'debug' );
@@ -52,7 +52,7 @@ sub send_mail {
       if $self->{mailReplyTo};
 
     # Encode the subject
-    $subject = encode_base64($subject);
+    $subject = encode_base64( $subject, '' );
     $subject =~ s/\s//g;
     $subject = "=?$charset?B?" . $subject . "?=";
 
@@ -132,7 +132,7 @@ sub send_mail {
 # @param user the value of the user key in session
 # @return the first session id found or nothing if no session
 sub getMailSession {
-    my ( $self, $user ) = splice @_;
+    my ( $self, $user ) = @_;
 
     my $moduleOptions = $self->{globalStorageOptions} || {};
     $moduleOptions->{backend} = $self->{globalStorage};
@@ -157,7 +157,7 @@ sub getMailSession {
 # @param mail the value of the mail key in session
 # @return the first session id found or nothing if no session
 sub getRegisterSession {
-    my ( $self, $mail ) = splice @_;
+    my ( $self, $mail ) = @_;
 
     my $moduleOptions = $self->{globalStorageOptions} || {};
     $moduleOptions->{backend} = $self->{globalStorage};

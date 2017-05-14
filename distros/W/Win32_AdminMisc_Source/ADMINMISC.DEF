@@ -1,0 +1,3 @@
+LIBRARY AdminMisc
+EXPORTS
+	boot_Win32__AdminMisc

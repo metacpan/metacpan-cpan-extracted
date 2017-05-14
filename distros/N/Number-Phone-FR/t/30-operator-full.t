@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use lib '.';
 require t::lib::Numeros;
 
 

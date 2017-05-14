@@ -1,0 +1,3 @@
+inherit.sdf warning, macro on 22: unable to find library 'abc'
+inherit.sdf warning, macro on 26: unable to find library 'xyz/qwe'
+inherit.sdf warning, macro on 30: unable to find '/qwe/xyz/xyz.sdm'

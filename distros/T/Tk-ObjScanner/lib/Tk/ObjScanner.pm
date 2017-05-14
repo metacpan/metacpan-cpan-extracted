@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Tk::ObjScanner;
-$Tk::ObjScanner::VERSION = '2.016';
+$Tk::ObjScanner::VERSION = '2.017';
 require 5.006;
 
 use strict;
@@ -113,7 +113,7 @@ sub _scan {
 
 sub _isa {
     #return UNIVERSAL::isa(@_);
-    return (reftype($_[0]) // '') eq $_[1] ;
+    return (reftype($_[0]) || '') eq $_[1] ;
 }
 
 sub Populate {
@@ -611,29 +611,31 @@ Tk::ObjScanner - a GUI to scan any perl data structure or object
 
 =head1 SYNOPSIS
 
-  # regular use
-  use Tk::ObjScanner;
+    # regular use
+    use Tk::ObjScanner;
 
-  my $scanner = $mw->ObjScanner( -caller => $object, 
-                                 -title=>"windows") -> pack ;
+    my $mw  = MainWindow->new;
 
-  my $mw -> ObjScanner
-  (
-   -caller 	    => $object,
-   -title 	    => 'demo setting the scanner options',
-   -background 	    => 'white',
-   -selectbackground => 'beige',
-   -foldImage 	    => $mw->Photo(-file => Tk->findINC('folder.xpm')),
-   -openImage 	    => $mw->Photo(-file => Tk->findINC('openfolder.xpm')),
-   -itemImage 	    => $mw->Photo(-file => Tk->findINC('textfile.xpm')),
-  )
-  -> pack(-expand => 1, -fill => 'both') ;
+    my $scanner1 = $mw->ObjScanner(
+        -caller => $object,
+        -title=>"windows"
+    )->pack;
 
-  # non-intrusive scan style
+    my $scanner2 = $mw->ObjScanner(
+        -caller             => $object,
+        -title              => 'demo setting the scanner options',
+        -background         => 'white',
+        -selectbackground   => 'beige',
+        -foldImage          => $mw->Photo(-file => Tk->findINC('folder.xpm')),
+        -openImage          => $mw->Photo(-file => Tk->findINC('openfolder.xpm')),
+        -itemImage          => $mw->Photo(-file => Tk->findINC('textfile.xpm')),
+    )->pack( -expand => 1, -fill => 'both' ) ;
 
-  # user code to produce data
-  Tk::ObjScanner::scan_object($mydata) ;
-  # resume user code
+    # non-intrusive scan style
+
+    # user code to produce data
+    Tk::ObjScanner::scan_object($mydata) ;
+    # resume user code
 
 =head1 DESCRIPTION
 
@@ -788,11 +790,22 @@ The idea to use B::Deparse to view code ref.
 
 =back
 
+=head1 CONTRIBUTORS
+
+Many thanks to Achim Bohnet for all the tests, patches (and reports) he 
+made. Many improvements were made thanks to his efforts.
+
+Thanks to Rudi Farkas for the 'watch' patch.
+
+Thanks to Slavec Rezic for the pseudo-hash prototype.
+
+Thanks to heytitle for the documentation fixes
+
 =head1 AUTHOR
 
 Dominique Dumont, ddumont@cpan.org
 
-Copyright (c) 1997-2004,2007 Dominique Dumont. All rights reserved.
+Copyright (c) 1997-2004,2007,2014,2017 Dominique Dumont. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

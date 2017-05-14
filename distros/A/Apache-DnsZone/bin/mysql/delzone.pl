@@ -33,6 +33,7 @@ unless ($dom_id =~ /^\d+$/) {
 $dbh->do("delete from rec_count where domain = ?", undef, $dom_id);
 $dbh->do("delete from soa where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_A where domain = ?", undef, $dom_id);
+$dbh->do("delete from records_AAAA where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_CNAME where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_MX where domain = ?", undef, $dom_id);
 $dbh->do("delete from records_NS where domain = ?", undef, $dom_id);

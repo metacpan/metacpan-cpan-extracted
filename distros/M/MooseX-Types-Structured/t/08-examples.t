@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Requires 'MooseX::Types::DateTime';
+use Test::Needs 'MooseX::Types::DateTime';
 plan tests => 10;
 
 {

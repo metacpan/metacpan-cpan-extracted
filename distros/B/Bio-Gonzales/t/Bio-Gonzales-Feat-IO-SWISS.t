@@ -3,10 +3,8 @@ use Test::More;
 use Data::Dumper;
 
 BEGIN { use_ok('Bio::Gonzales::Feat::IO::SWISS'); }
-use Bio::Gonzales::Util::Cerial;
 
-
-my $swissin = Bio::Gonzales::Feat::IO::SWISS->new(file => "t/data/uniprot_trembl.dat", mode => '<', check_crc64 => 1 );
+my $swissin = Bio::Gonzales::Feat::IO::SWISS->new("t/data/uniprot_trembl.dat");
 
 my %acc = (
   A0A171 => 1,
@@ -46,7 +44,6 @@ while ( my $f = $swissin->next_feat ) {
 
 is( ( grep { $_ > 1 } values %acc ), ( scalar keys %acc ) );
 
-yspew("test.json", \%feats);
 #my @entries;
 #{
 #local $/ = "\n//\n";

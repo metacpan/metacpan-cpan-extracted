@@ -3,11 +3,8 @@ Name: a
 Version: 2
 Release: 1
 License: x
-Group: x
-Url: x
-Suggests: suggested_b
-Suggests: suggested_c
-BuildRoot: %{_tmppath}/%{name}
+Recommends: suggested_b
+Recommends: suggested_c
 
 %description
 x

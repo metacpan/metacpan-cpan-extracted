@@ -2,7 +2,8 @@ package RMI::Client::ForkedPipes;
 
 use strict;
 use warnings;
-our $VERSION = $RMI::VERSION; 
+use version;
+our $VERSION = qv('0.1');
 
 use base 'RMI::Client';
 
@@ -69,10 +70,6 @@ sub new {
 =head1 NAME
 
 RMI::Client::ForkedPipes - an RMI::Client implementation with a private out-of-process server
-
-=head1 VERSION
-
-This document describes RMI::Clinet::ForkedPipes v0.10.
 
 =head1 SYNOPSIS
 

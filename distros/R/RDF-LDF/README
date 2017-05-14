@@ -35,7 +35,7 @@ SYNOPSIS
     
         while (my $statement = $iterator->()) {
             # $model is a RDF::Trine::Statement
-        } 
+        }
 
 DESCRIPTION
 
@@ -57,7 +57,7 @@ CONFIGURATION
           my $store = RDF::Trine::Store->new_with_config({
                   storetype => 'LDF',
                   url => [ $url1, $url2, $url3 ]
-          });    
+          });
       
           # or
       

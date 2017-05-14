@@ -1,0 +1,32 @@
+Swarm Readme
+if you are reading this - ++ for bravery. There is much to do in swarm.
+
+Padre::Plugin::Swarm 
+	Needs a preferences dialog. In the very least a way to pick the 
+	default transport  Multicast/IRC/XMPP/etc
+
+[still needs identity management see ::Swarm::Identity]
+In progress. -submersible
+
+    wx  agent/service/transport layers to have their own identity, 
+	outbound messages will be stamped w/ user / service / transport
+	identity via UI -> Service -> Transport (duh)
+	
+	
+Next step is to get the transport layer:
+	a) installable by the masses
+	b) cross linkable via ::Gateway
+	c) a single padre::service that can be called easily from padre to 
+		subscribe/unsubscribe new channels.
+		
+
+After which:
+
+Fun things. 
+	a) factor our chat in a plugin
+	b) start on collaboration channel / client spec
+	c) start on Swarm::Geometry and SwarmVerse / SwarmSpace
+	d) .. implement asteroids
+	e) .... implement anti-pacman
+	
+	

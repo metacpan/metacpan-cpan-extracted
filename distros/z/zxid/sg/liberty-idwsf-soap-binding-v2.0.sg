@@ -1,0 +1,116 @@
+# zxid/sg/liberty-idwsf-soap-binding-v2.0.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-soap-binding-v2.0.sg,v 1.8 2009-11-24 23:53:40 sampo Exp $
+
+target(b,    urn:liberty:sb:2006-08)
+import(sp,   urn:oasis:names:tc:SAML:2.0:protocol)
+import(wsu,  http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd,wss-util-1.0.xsd)
+import(a,    http://www.w3.org/2005/08/addressing,ws-addr-1.0.xsd)
+import(lu,   urn:liberty:util:2006-08,liberty-idwsf-utility-v2.0.xsd)
+import(e,    http://schemas.xmlsoap.org/soap/envelope/)
+import(sa11, urn:oasis:names:tc:SAML:1.0:assertion)
+import(sa,   urn:oasis:names:tc:SAML:2.0:assertion)
+import(ff12, urn:liberty:iff:2003-08)
+import(xa,   urn:oasis:names:tc:xacml:2.0:policy:schema:os, http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd)
+import(tas3sol, http://tas3.eu/tas3sol/200911/)
+
+&@hdr:
+  @wsu:Id?
+  @e:mustUnderstand?
+  @e:actor?
+  @id? -> %xs:anyURI
+  ;
+
+Framework	 -> %b:FrameworkType
+%FrameworkType:
+  any*  processContents(lax)
+  @version	 -> %xs:string
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+Sender	 -> %b:SenderType
+%SenderType:
+  @providerID      -> %xs:anyURI
+  @affiliationID?  -> %xs:anyURI
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+TargetIdentity	 -> %b:TargetIdentityType
+%TargetIdentityType:
+  sa:Assertion?
+  sa:EncryptedAssertion?
+  sa11:Assertion?
+  ff12:Assertion?
+  any*  processContents(lax)
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+CredentialsContext	 -> %b:CredentialsContextType
+%CredentialsContextType:
+  sp:RequestedAuthnContext?
+  b:SecurityMechID*	 -> %xs:anyURI
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+EndpointUpdate	 -> %b:EndpointUpdateType
+%EndpointUpdateType:	 base(a:EndpointReferenceType)
+  @updateType?	 -> %xs:anyURI
+  ;
+
+Timeout	 -> %b:TimeoutType
+%TimeoutType:
+  @maxProcessingTime	 -> %xs:integer
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+ProcessingContext	 -> %b:ProcessingContextType
+%ProcessingContextType:	 base(xs:anyURI)
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+Consent	 -> %b:ConsentType
+%ConsentType:
+  @uri	 -> %xs:anyURI
+  @timestamp?	 -> %xs:dateTime
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+UsageDirective	 -> %b:UsageDirectiveType
+%UsageDirectiveType:
+  xa:Obligation*
+  tas3sol:Dict?
+  any+  ns(##other)  processContents(lax)
+  @ref	 -> %xs:IDREF
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+#  tas3sol:Obligations?
+
+ApplicationEPR	 -> %a:EndpointReferenceType
+
+UserInteraction	 -> %b:UserInteractionHeaderType
+%UserInteractionHeaderType:
+  b:InteractionService* -> %a:EndpointReferenceType
+  @interact?	 -> %xs:string  default (interactIfNeeded)
+  @language?	 -> %xs:NMTOKENS
+  @redirect?	 -> %xs:boolean  default (0)
+  @maxInteractTime? -> %xs:integer
+  &@b:hdr        # Added by Sampo
+  @any
+  ;
+
+RedirectRequest	 -> %b:RedirectRequestType
+%RedirectRequestType:
+  @redirectURL	 -> %xs:anyURI
+  &@b:hdr        # Added by Sampo
+  ;
+
+#EOF

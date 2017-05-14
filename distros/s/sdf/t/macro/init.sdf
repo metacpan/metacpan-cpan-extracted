@@ -1,0 +1,9 @@
+!init OPT_STYLE="memo"
+# This file tests the init macro
+
+The new document style is [[OPT_STYLE]].
+
+# This should produce a warning as OPT_STYLE is now readonly
+!define OPT_STYLE "fax"
+
+The final document style is [[OPT_STYLE]].

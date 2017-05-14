@@ -1,0 +1,32 @@
+!init OPT_LOOK='infomap'; OPT_STYLE='manual'
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+# Load the configuration
+!define SDF_ROOT "../"
+!inherit "sdf"
+
+# Define variables
+!define DOC_NAME    "SDF"
+!define DOC_TYPE    "Guru Guide"
+!define DOC_AUTHOR  "Ian Clatworthy"
+!define DOC_TOC     2
+!define DOC_IX
+
+# Build the title page
+!build_title
+
+# Include the document components
+!include "about.sdf"; about
+!include "in_ex.sdf"
+!include "in_api.sdf"

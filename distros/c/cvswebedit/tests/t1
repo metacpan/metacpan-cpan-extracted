@@ -1,0 +1,19 @@
+#! /usr/local/bin/perl
+
+use FileHandle;
+require 'tests/common.pl';
+
+print "# This test ensures can start the script\n";
+
+my $debug =1;
+my $fh = new FileHandle "perl cvswebedit.pl < /dev/null | ";
+
+status(defined $fh, "Couldn't start the script");
+
+print "# This test ensures you are prompted to log in if no user name is supplied\n";
+my @ans = <$fh>;
+my $grep = grep /Please log in/, @ans;
+
+status($grep == 1, "no log in prompt");
+
+

@@ -1,0 +1,10 @@
+Build.PL
+lib/Bio/AGP/LowLevel.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/basic.t
+t/data/chr04.v3.agp
+t/data/chr09.v1.agp
+t/data/test_seq_assembly.agp
+META.yml

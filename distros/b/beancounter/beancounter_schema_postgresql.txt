@@ -1,0 +1,181 @@
+--
+-- PostgreSQL database dump
+--
+
+SET SESSION AUTHORIZATION 'postgres';
+
+--
+-- TOC entry 3 (OID 2200)
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+SET SESSION AUTHORIZATION 'edd';
+
+SET search_path = public, pg_catalog;
+
+--
+-- TOC entry 4 (OID 20101)
+-- Name: beancounter; Type: TABLE; Schema: public; Owner: edd
+--
+
+CREATE TABLE beancounter (
+    "version" character varying(12) NOT NULL,
+    data_last_updated timestamp with time zone
+);
+
+
+--
+-- TOC entry 5 (OID 20104)
+-- Name: stockinfo; Type: TABLE; Schema: public; Owner: edd
+--
+
+CREATE TABLE stockinfo (
+    symbol character varying(12) DEFAULT ''::character varying NOT NULL,
+    name character varying(64) DEFAULT ''::character varying NOT NULL,
+    exchange character varying(16) DEFAULT ''::character varying NOT NULL,
+    capitalisation real,
+    low_52weeks real,
+    high_52weeks real,
+    earnings real,
+    dividend real,
+    p_e_ratio real,
+    avg_volume integer,
+    active boolean DEFAULT true
+);
+
+
+--
+-- TOC entry 6 (OID 20111)
+-- Name: stockprices; Type: TABLE; Schema: public; Owner: edd
+--
+
+CREATE TABLE stockprices (
+    symbol character varying(12) DEFAULT ''::character varying NOT NULL,
+    date date,
+    previous_close real,
+    day_open real,
+    day_low real,
+    day_high real,
+    day_close real,
+    day_change real,
+    bid real,
+    ask real,
+    volume integer
+);
+
+
+--
+-- TOC entry 7 (OID 20115)
+-- Name: fxprices; Type: TABLE; Schema: public; Owner: edd
+--
+
+CREATE TABLE fxprices (
+    currency character varying(12) DEFAULT ''::character varying NOT NULL,
+    date date,
+    previous_close real,
+    day_open real,
+    day_low real,
+    day_high real,
+    day_close real,
+    day_change real
+);
+
+
+--
+-- TOC entry 8 (OID 20119)
+-- Name: portfolio; Type: TABLE; Schema: public; Owner: edd
+--
+
+CREATE TABLE portfolio (
+    symbol character varying(16) DEFAULT ''::character varying NOT NULL,
+    shares real,
+    currency character varying(12),
+    "type" character varying(16),
+    "owner" character varying(16),
+    cost real,
+    date date
+);
+
+
+--
+-- TOC entry 9 (OID 20123)
+-- Name: cash; Type: TABLE; Schema: public; Owner: edd
+--
+
+CREATE TABLE cash (
+    name character varying(16) DEFAULT ''::character varying NOT NULL,
+    value double precision,
+    currency character varying(12),
+    "type" character varying(12),
+    "owner" character varying(16),
+    cost double precision,
+    date date
+);
+
+
+--
+-- TOC entry 10 (OID 20127)
+-- Name: indices; Type: TABLE; Schema: public; Owner: edd
+--
+
+CREATE TABLE indices (
+    symbol character varying(12) DEFAULT ''::character varying NOT NULL,
+    stockindex character varying(12) DEFAULT ''::character varying NOT NULL
+);
+
+
+--
+-- TOC entry 11 (OID 20110)
+-- Name: stockinfo_pkey; Type: INDEX; Schema: public; Owner: edd
+--
+
+CREATE UNIQUE INDEX stockinfo_pkey ON stockinfo USING btree (symbol);
+
+
+--
+-- TOC entry 12 (OID 20114)
+-- Name: stockprices_pkey; Type: INDEX; Schema: public; Owner: edd
+--
+
+CREATE UNIQUE INDEX stockprices_pkey ON stockprices USING btree (symbol, date);
+
+
+--
+-- TOC entry 13 (OID 20118)
+-- Name: fxprices_pkey; Type: INDEX; Schema: public; Owner: edd
+--
+
+CREATE UNIQUE INDEX fxprices_pkey ON fxprices USING btree (currency, date);
+
+
+--
+-- TOC entry 14 (OID 20122)
+-- Name: portfolio_pkey; Type: INDEX; Schema: public; Owner: edd
+--
+
+CREATE UNIQUE INDEX portfolio_pkey ON portfolio USING btree (symbol, "owner", date);
+
+
+--
+-- TOC entry 15 (OID 20126)
+-- Name: cash_pkey; Type: INDEX; Schema: public; Owner: edd
+--
+
+CREATE UNIQUE INDEX cash_pkey ON cash USING btree (name, "type", "owner", date);
+
+
+SET SESSION AUTHORIZATION 'postgres';
+
+--
+-- TOC entry 2 (OID 2200)
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA public IS 'Standard public namespace';
+
+

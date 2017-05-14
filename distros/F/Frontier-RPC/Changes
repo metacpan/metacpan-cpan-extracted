@@ -1,0 +1,95 @@
+Revision history for Perl extension Frontier::RPC.
+
+`*' indicates backward incompatible changes
+
+0.07
+	- Added prototype 'docs/changes.xml' and XSLT stylesheet,
+	  stylesheet contributed by Laurent Bossavit, based on
+	  changes.xml from Apache XML's Cocoon
+	- Corrected COPYING to be "same terms as Perl" (ie. Artistic
+	  and GPL)
+	- Added Frontier::Responder CGI responder, contributed by Joe
+	  Johnston <jjohn@oreilly.com>
+	- Merged POD for Apache::XMLRPC, contributed by Tim Peoples
+	  <tep@colltech.com>
+	- Added examples/validator1-daemon.pl validation suite
+	- Added Apache::XMLRPC, contributed by Ed Hill
+          <ed-hill@uiowa.edu>
+	- Added type checking for newly created special data types,
+	  contributed by Nick Bauman <nick.bauman@eliancecorp.com>
+	- serialize blessed array and hash references as <array> and
+	  <struct>s, suggested by John Posner <jjp@connix.com>
+	- Frontier::Daemon now supports use_objects, suggested by John
+	  Posner
+        - Added docs/make-rel to create releases from CVS
+	- fixes
+	  - create an Integer special object for <int>s (was just
+	    <i4>s), reported by John Posner
+	  - use_objects wasn't working, reported by John Posner
+	  - an explicity-specified String type now correctly 
+	    encodes < > & and "
+
+0.06  Sat Nov 20 17:09:40 CST 1999
+	- Nick Bauman <nixnixnix@yahoo.com> sent in a patch to add
+	  Integer, Float, and String objects to avoid implicit
+	  conversion errors.
+	- add encoding options to Frontier::Client and Frontier::RPC2;
+	  suggested by Skip Montanaro <skip@mojam.com>
+	- "Jon Frisby" <jfrisby@everyone.net> sent in a patch to add a
+	  proxy option to Frontier::Client
+	- add debug option to Frontier::Client
+	- support new options in rpc-client.pl example
+	- support key, value pairs or hashes for options
+	- add example script for using XML-RPC over pipes and as a
+	  CGI; CGI changes were provided by Jon Frisby
+	  <jfrisby@everyone.net>
+	- fixes
+	  - values without types are now parsed properly, reported by
+	    Sean Brown <sean@westcar.com>
+	  - corrupted results when untyped values appear in <struct>s;
+	    reported by Bas A. Schulte <bas@yournews.nl>
+	  - Frontier::RPC2: fix uninitialized use of `encoding_';
+	    also reported by Bas A. Schulte <bas@yournews.nl>
+
+	Note: the error:
+
+	  Modification of a read-only value attempted at
+	  /usr/lib/perl5/site_perl/XML/Parser/Expat.pm line 126.
+
+	was a bug in the XML::Parser module that is fixed in the
+	latest version of XML::Parser.
+
+0.05  Tue Apr 13 14:58:00 CDT 1999
+	- add a prerequisit for XML::Parser in Makefile.PL
+	- fixes
+	  - use a new test for encoding ints, doubles, and strings
+	    fixing a bug where some strings were encoded as <double>
+	  - warnings from perl -w
+
+0.04  Tue Feb  2 09:45:17 CST 1999
+	- add shortcuts for boolean, date, and base64 types to
+	  Frontier::RPC2 too
+	- fixes
+	  - fix encoding of nested hashes
+	  - fix decoding of long strings
+
+0.03  Thu Jan 28 15:10:35 CST 1999
+	- Move server handler from Frontier::Daemon to Frontier::RPC2
+	  so it can be used from other transports
+	- Frontier::Client: Added support for boolean, double, date,
+	  and base64 data types
+
+0.02  Tue Jan 19 13:08:05 CST 1999
+	- updated README, added a QUICK USAGE GUIDE, updated required
+	  Perl modules, and updated mailing list info
+	- added a simpler client demo, `examples/states-client.pl'
+	- upgraded to newer version of XML::Parser API
+	* rpc-client.pl, Frontier::Client.pm: use full URL instead of
+	  HOST and PORT
+	- recognize <name> tags for parameters
+	- fixes
+	  - add Content-Type: text/xml header
+
+0.01  Mon Apr 13 10:57:31 1998
+	- original version; created by h2xs 1.18
+

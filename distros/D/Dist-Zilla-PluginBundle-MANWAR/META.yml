@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ no_index:
 provides:
   Dist::Zilla::PluginBundle::MANWAR:
     file: lib/Dist/Zilla/PluginBundle/MANWAR.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Dist::Zilla::Plugin::AutoPrereqs: '0'
   Dist::Zilla::Plugin::GithubMeta: '0'
@@ -36,5 +36,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Dist-Zilla-PluginBundle-MANWAR.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

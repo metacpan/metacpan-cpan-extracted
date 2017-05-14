@@ -1,9 +1,16 @@
 package CPAN::Packager::Script;
 use Mouse;
+use Pod::Usage;
 use CPAN::Packager;
-use CPAN::Packager::FileUtil qw(dir file slurp);
+use Path::Class;
 
 with 'MouseX::Getopt';
+
+has 'help' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
 
 has 'dry_run' => (
     is      => 'rw',
@@ -17,21 +24,14 @@ has 'module' => (
 );
 
 has 'builder' => (
-    is       => 'rw',
-    isa      => 'Str',
-    required => 1,
-);
-
-has 'downloader' => (
     is      => 'rw',
     isa     => 'Str',
-    default => 'CPAN',
+    default => 'Deb',
 );
 
 has 'conf' => (
-    is       => 'rw',
-    isa      => 'Str',
-    required => 1,
+    is  => 'rw',
+    isa => 'Str',
 );
 
 has 'always_build' => (
@@ -45,31 +45,26 @@ has 'modulelist' => (
     isa => 'Str',
 );
 
-has 'verbose' => (
-    is      => 'rw',
-    isa     => 'Bool',
-    default => 0,
-);
-
 sub run {
     my $self = shift;
+    if ( $self->help ) {
+        pod2usage(2);
+    }
+    die 'conf is required param' unless $self->conf;
 
-    unless ( $self->builder eq "Deb" || $self->builder eq "RPM" ) {
+    unless( $self->builder eq "Deb" || $self->builder eq "RPM") {
         die 'builder option value must be Deb or RPM';
     }
 
     my $packager = CPAN::Packager->new(
         builder      => $self->builder,
-        downloader   => $self->downloader,
         conf         => $self->conf,
         always_build => $self->always_build,
         dry_run      => $self->dry_run,
-        verbose      => $self->verbose,
     );
 
     if ( $self->modulelist ) {
-        my $module_list = file( $self->modulelist );
-        my @modules = slurp($module_list, {chomp=>1});
+        my @modules = file( $self->modulelist )->slurp( chomp => 1 );
         @modules = grep { $_ !~ /^#/ } @modules;
         my $built_modules;
         foreach my $module (@modules) {

@@ -1,0 +1,56 @@
+H1: Language Issues
+
+H2: How do I enter an empty row in a table?
+
+TBL format ignores blanks lines, so to enter an empty
+line, you need to enter an empty cell like this:
+
+!block verbatim
+!block table
+Big     Small
+A       a
+{{}}
+B       b
+!endblock
+!endblock
+
+The result is:
+
+!block table
+Big     Small
+A       a
+{{}}
+B       b
+!endblock
+
+
+H2: How do I enter a multi-line cell in a table?
+
+By beginning a cell with a << symbol like this:
+
+!block example
+!block table
+Option  Description
+-g      <<
+        This option produces the following:
+
+        !import "g_code"
+>>
+-v      verbose mode
+!endblock
+!endblock
+
+!block note
+^ The cell is terminated by a >> symbol at the beginning of a line.
++ You can place any SDF you like within the cell.
++ Whitespace is generally ignored at the beginning of lines, so you can
+  put the cell contents under its column heading if you want to.
++ If the multi-line cell is not the last one within the row,
+  you currently need to format the table using delimited format rather
+  than fixed width format.
+!endblock
+
+#H2: How Does SDF Generate Hypertext Targets for Headings?
+#
+#By default, SDF uses the heading text to generate a hypertext
+#target name.

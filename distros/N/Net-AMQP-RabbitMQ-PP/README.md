@@ -26,7 +26,7 @@ Like [Net::RabbitMQ](https://metacpan.org/pod/Net::RabbitMQ) but pure perl rathe
 
 # VERSION
 
-0.04
+0.05
 
 # SUBROUTINES/METHODS
 

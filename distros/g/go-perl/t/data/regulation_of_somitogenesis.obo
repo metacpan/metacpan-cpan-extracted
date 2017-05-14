@@ -1,0 +1,201 @@
+format-version: 1.2
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+default-namespace: test
+
+[Term]
+id: GO:0001756
+name: somitogenesis
+namespace: biological_process
+def: "The formation of mesodermal clusters that are arranged segmentally along the anterior posterior axis of an embryo." [ISBN:0721662544]
+synonym: "formation of mesodermal clusters" EXACT []
+is_a: GO:0009952  ! anterior/posterior pattern formation
+is_a: GO:0035282  ! segmentation
+relationship: part_of GO:0043009 ! chordate embryonic development
+
+[Term]
+id: GO:0003002
+name: regionalization
+namespace: biological_process
+def: "The pattern specification process by which an axis or axes is subdivided in space to define an area or volume in which specific patterns of cell differentiation will take place or in which cells interpret a specific environment." [GOC:dph, GOC:isa_complete]
+is_a: GO:0007389  ! pattern specification process
+
+[Term]
+id: GO:0007275
+name: multicellular organismal development
+namespace: biological_process
+def: "The biological process whose specific outcome is the progression of an organism over time from an initial condition (e.g. a zygote or a young adult) to a later condition (e.g. a multicellular animal or an aged adult)." [GOC:ems, GOC:isa_complete]
+comment: Note that this term was 'developmental process'.
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_plant  ! Plant GO slim
+is_a: GO:0032501  ! multicellular organismal process
+is_a: GO:0032502  ! developmental process
+
+[Term]
+id: GO:0007389
+name: pattern specification process
+namespace: biological_process
+def: "The developmental processes that result in the creation of defined areas or spaces within an organism to which cells respond and eventually are instructed to differentiate." [GOC:go_curators, GOC:isa_complete, ISBN:0521436125]
+synonym: "pattern biosynthesis" RELATED []
+synonym: "pattern formation" RELATED []
+is_a: GO:0032502  ! developmental process
+relationship: part_of GO:0007275 ! multicellular organismal development
+
+[Term]
+id: GO:0008150
+name: biological_process
+namespace: biological_process
+def: "Those processes specifically pertinent to the functioning of integrated living units: cells, tissues, organs, and organisms. A process is a collection of molecular events with a defined beginning and end." [GOC:go_curators, GOC:isa_complete]
+comment: Note that, in addition to forming the root of the biological process ontology, this term is recommended for use for the annotation of gene products whose biological process is unknown. Note that when this term is used for annotation, it indicates that no information was available about the biological process of the gene product annotated as of the date the annotation was made; the evidence code ND, no data, is used to indicate this.
+subset: goslim_candida  ! Candida GO slim
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+subset: goslim_plant  ! Plant GO slim
+subset: goslim_yeast  ! Yeast GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "biological process unknown" NARROW []
+synonym: "physiological process" EXACT []
+
+[Term]
+id: GO:0009790
+name: embryonic development
+namespace: biological_process
+def: "The process whose specific outcome is the progression of an embryo from its formation until the end of its embryonic life stage. The end of the embryonic stage is organism-specific. For example, for mammals, the process would begin with zygote formation and end with birth. For insects, the process would begin at zygote formation and end with larval hatching. For plant zygotic embryos, this would be from zygote formation to the end of seed dormancy. For plant vegetative embryos, this would be from the initial determination of the cell or group of cells to form an embryo until the point when the embryo becomes independent of the parent plant." [GOC:go_curators, GOC:isa_complete, GOC:mtg_sensu]
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_plant  ! Plant GO slim
+synonym: "embryogenesis" EXACT []
+synonym: "embryogenesis and morphogenesis" BROAD []
+synonym: "embryonal development" EXACT []
+is_a: GO:0032502  ! developmental process
+relationship: part_of GO:0007275 ! multicellular organismal development
+
+[Term]
+id: GO:0009792
+name: embryonic development ending in birth or egg hatching
+namespace: biological_process
+def: "The process whose specific outcome is the progression of an embryo over time, from zygote formation until the end of the embryonic life stage. The end of the embryonic life stage is organism-specific and may be somewhat arbitrary; for mammals it is usually considered to be birth, for insects the hatching of the first instar larva from the eggshell." [GOC:go_curators, GOC:isa_complete, GOC:mtg_sensu]
+synonym: "embryogenesis (sensu Metazoa)" EXACT []
+synonym: "embryonic development (sensu Metazoa)" RELATED []
+is_a: GO:0009790  ! embryonic development
+
+[Term]
+id: GO:0009952
+name: anterior/posterior pattern formation
+namespace: biological_process
+def: "The regionalization process by which specific areas of cell differentiation are determined along the anterior-posterior axis." [GOC:dph, GOC:go_curators, GOC:isa_complete]
+synonym: "anterior/posterior pattern specification" NARROW []
+is_a: GO:0003002  ! regionalization
+
+[Term]
+id: GO:0014807
+name: regulation of somitogenesis
+namespace: biological_process
+def: "Any process that modulates the frequency, rate or extent of somitogenesis." [GOC:mtg_muscle]
+relationship: part_of GO:0001756  ! somitogenesis
+is_a: GO:0050793  ! regulation of developmental process
+
+[Term]
+id: GO:0032501
+name: multicellular organismal process
+namespace: biological_process
+def: "The biological processes, occurring at the level of the organism, pertinent to the function of the organism." [GOC:curators, GOC:isa_complete]
+subset: goslim_goa  ! GOA and proteome slim
+subset: goslim_pir  ! PIR GO slim
+synonym: "organismal physiological process" EXACT []
+is_a: GO:0008150  ! biological_process
+disjoint_from: GO:0009987  ! cellular process
+disjoint_from: GO:0051704  ! multi-organism process
+
+[Term]
+id: GO:0032502
+name: developmental process
+namespace: biological_process
+def: "A biological process whose specific outcome is the progression of an integrated living unit: a cell, tissue, organ, or organism over time from an initial condition to a later condition." [GOC:isa_complete]
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "development" NARROW []
+is_a: GO:0008150  ! biological_process
+
+[Term]
+id: GO:0035282
+name: segmentation
+namespace: biological_process
+def: "The regionalization process that divides an organism or part of an organism into a series of semi-repetitive parts, or segments, often arranged along a longitudinal axis." [PMID:10611687, PMID:9706689]
+is_a: GO:0003002  ! regionalization
+
+[Term]
+id: GO:0043009
+name: chordate embryonic development
+namespace: biological_process
+def: "The process whose specific outcome is the progression of the embryo over time, from zygote formation through a stage including a notochord and neural tube until birth or egg hatching." [GOC:mtg_sensu]
+synonym: "embryonic development (sensu Vertebrata)" EXACT []
+is_a: GO:0009792  ! embryonic development ending in birth or egg hatching
+
+[Term]
+id: GO:0045995
+name: regulation of embryonic development
+namespace: biological_process
+def: "Any process that modulates the frequency, rate or extent of embryonic development." [GOC:go_curators]
+is_a: GO:0050793  ! regulation of developmental process
+relationship: part_of GO:0009790 ! embryonic development
+
+[Term]
+id: GO:0050789
+name: regulation of biological process
+namespace: biological_process
+def: "Any process that modulates the frequency, rate or extent of a biological process. Biological processes are regulated by many means; examples include the control of gene expression, protein modification or interaction with a protein or substrate molecule." [GOC:ai, GOC:go_curators]
+subset: goslim_generic  ! Generic GO slim
+subset: goslim_goa  ! GOA and proteome slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "regulation of physiological process" EXACT []
+is_a: GO:0065007  ! biological regulation
+
+[Term]
+id: GO:0050793
+name: regulation of developmental process
+namespace: biological_process
+def: "Any process that modulates the frequency, rate or extent of development, the biological process whose specific outcome is the progression of a multicellular organism over time from an initial condition (e.g. a zygote, or a young adult) to a later condition (e.g. a multicellular animal or an aged adult)." [GOC:go_curators]
+subset: gosubset_prok  ! Prokaryotic GO subset
+is_a: GO:0050789  ! regulation of biological process
+relationship: part_of GO:0032502 ! developmental process
+
+[Term]
+id: GO:0065007
+name: biological regulation
+namespace: biological_process
+def: "Any process that modulates the frequency, rate or extent of any biological process, quality or function." [GOC:isa_complete]
+subset: goslim_pir  ! PIR GO slim
+subset: gosubset_prok  ! Prokaryotic GO subset
+synonym: "regulation" BROAD []
+is_a: GO:0008150  ! biological_process
+
+[Typedef]
+id: part_of
+name: part of
+namespace: gene_ontology
+is_transitive: true
+
+[Typedef]
+id: regulates
+name: regulates
+transitive_over: part_of
+
+[Typedef]
+id: negatively_regulates
+name: negatively_regulates
+is_a: regulates
+transitive_over: part_of
+
+[Typedef]
+id: positively_regulates
+name: positively_regulates
+is_a: regulates
+transitive_over: part_of
+

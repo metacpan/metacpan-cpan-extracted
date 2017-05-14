@@ -2,7 +2,7 @@ package CPAN::Packager::Extractor;
 use Mouse;
 use Archive::Extract;
 use CPAN::Packager::Home;
-use CPAN::Packager::FileUtil qw(dir);
+use Path::Class qw(dir);
 
 has 'extract_dir' => (
     is      => 'rw',
@@ -13,7 +13,7 @@ has 'extract_dir' => (
 
 sub BUILD {
     my $self = shift;
-    File::Path::mkpath($self->extract_dir);
+    $self->extract_dir->mkpath;
 }
 
 sub extract {

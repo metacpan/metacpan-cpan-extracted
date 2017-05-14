@@ -1,10 +1,12 @@
-package RDF::Lazy;
-use strict;
+﻿use strict;
 use warnings;
+package RDF::Lazy;
+{
+  $RDF::Lazy::VERSION = '0.081';
+}
+#ABSTRACT: Lazy typing access to RDF data
+
 use v5.10.1;
-
-our $VERSION = '0.09';
-
 use RDF::Trine::Model;
 use RDF::NS qw(20120827);
 use CGI qw(escapeHTML);
@@ -251,8 +253,6 @@ sub uri {
 
     if ( $node =~ /^<(.*)>$/ ) {
         return RDF::Lazy::Resource->new( $self, $1 );
-    } elsif ( $node =~ qr{^(https?://.*)} ) {
-        return RDF::Lazy::Resource->new( $self, $1 );
     } elsif ( $node =~ /^_:(.*)$/ ) {
         return RDF::Lazy::Blank->new( $self, $1 );
     } elsif ( $node =~ /^\[\s*\]$/ ) {
@@ -371,9 +371,7 @@ sub _query {
     $subject = $self->uri($subject)
         unless blessed($subject) and $subject->isa('RDF::Lazy::Node');
 
-    if (defined $property) {
-        $property = $self->uri($property) // return;
-    }
+    $property = $self->uri($property) if defined $property;
     $property = $property->trine if defined $property;
 
     my @res;
@@ -383,7 +381,6 @@ sub _query {
     } elsif ($dir eq 'rev') {
         @res = $self->{model}->subjects( $property, $subject->trine );
     }
-
 
     @res = map { $self->uri( $_ ) } @res;
 
@@ -403,7 +400,6 @@ sub _relrev {
         # get objects / subjects
         my ($property,@filter) = @_;
         $all = 1 if ($property and not ref $property and $property =~ s/^(.+[^_])_$/$1/);
-
         return $self->_query( $all, $type, $subject, $property, @filter );
     } else {
         # get all predicates
@@ -438,11 +434,18 @@ sub _serialize {
 }
 
 1;
-__END__
+
+
+
+=pod
 
 =head1 NAME
 
 RDF::Lazy - Lazy typing access to RDF data
+
+=head1 VERSION
+
+version 0.081
 
 =head1 SYNOPSIS
 
@@ -610,8 +613,6 @@ L<RDF::Helper> and L<RDF::TrineShortcuts> provide similar APIs. Another similar 
 for PHP and Python is Graphite: http://graphite.ecs.soton.ac.uk/,
 http://code.google.com/p/python-graphite/.
 
-=encoding utf-8
-
 =head1 AUTHOR
 
 Jakob Voß <voss@gbv.de>
@@ -624,3 +625,7 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+
+__END__
+

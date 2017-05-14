@@ -53,7 +53,7 @@ with 'Pinto::Role::Schema::Result';
 
 #-------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-------------------------------------------------------------------------------
 
@@ -146,41 +146,48 @@ before is_default => sub {
 };
 
 #------------------------------------------------------------------------------
-# TODO: All methods below that operate on the head should be moved into the
-# Revision class, since that is where the data actually is.  For convenience,
-# the Stack class can have the same methods, but they should just delegate to
-# the Revision class.
-#------------------------------------------------------------------------------
 
 
 sub get_distribution {
     my ( $self, %args ) = @_;
 
-    my $cache  = $args{cache};
-    my $target = $args{target} or throw 'Invalid arguments';
-    return $cache->{$target} if $cache && exists $cache->{$target};
 
-    my $dist;
-    if ( itis( $target, 'Pinto::Target::Distribution' ) ) {
+    my $cache = $args{cache};
+    my $spec  = $args{spec} or throw 'Invalid arguments';
+    return $cache->{$spec} if $cache && exists $cache->{$spec};
 
-        my $attrs = { prefetch => 'distribution'};
-        my $where = {'distribution.author'  => $target->author, 'distribution.archive' => $target->archive};
 
-        return unless my $reg = $self->head->search_related( registrations => $where, $attrs )->first;
-        $dist = $reg->distribution;
+    if ( itis( $spec, 'Pinto::DistributionSpec' ) ) {
+
+        my $attrs = { prefetch => [qw(distribution)], distinct => 1 };
+        my $where = {
+            'distribution.author'  => $spec->author,
+            'distribution.archive' => $spec->archive
+        };
+
+        my $reg = $self->head->search_related( registrations => $where, $attrs )->first;
+        return if not defined $reg;
+
+        my $dist = $reg->distribution;
+        $cache->{$spec} = $dist if $cache;
+        return $dist;;
     }
-    elsif ( itis( $target, 'Pinto::Target::Package' ) ) {
+    elsif ( itis( $spec, 'Pinto::PackageSpec' ) ) {
 
-        my $attrs = { prefetch     => 'distribution' };
-        my $where = { package_name => $target->name  };
+        my $attrs = { prefetch     => [qw(package distribution)] };
+        my $where = { package_name => $spec->name };
 
-        return unless my $reg = $self->head->find_related( registrations => $where, $attrs );
-        return unless $target->is_satisfied_by($reg->package->version);
-        $dist = $reg->distribution;
+        my $reg = $self->head->find_related( registrations => $where, $attrs );
+        return if not defined $reg;
+
+        return if $reg->package->version < $spec->version;
+
+        my $dist = $reg->distribution;
+        $cache->{$spec} = $dist if $cache;
+        return $dist;
     }
 
-    $cache->{$target} = $dist if $cache;
-    return $dist;
+    throw 'Invalid arguments';
 }
 
 #------------------------------------------------------------------------------
@@ -257,10 +264,9 @@ sub duplicate_registrations {
     my ( $self, %args ) = @_;
 
     my $new_rev = $args{to};
-    my $old_rev = $args{from} || $self->head;
 
     my $new_rev_id = $new_rev->id;
-    my $old_rev_id = $old_rev->id;
+    my $old_rev_id = $self->head->id;
 
     debug "Copying registrations for stack $self to $new_rev";
 
@@ -479,53 +485,7 @@ sub diff {
     return Pinto::Difference->new( left => $left, right => $right );
 }
 
-#-----------------------------------------------------------------------------
-
-sub distributions {
-    my ($self) = @_;
-
-    return $self->head->distributions;
-}
-
-#-----------------------------------------------------------------------------
-
-sub packages {
-    my ($self) = @_;
-
-    return $self->head->packages;
-}
-
-#-----------------------------------------------------------------------------
-
-sub roots {
-    my ($self) = @_;
-
-    my @dists = $self->distributions->all;
-    my $tpv   = $self->target_perl_version;
-    my %is_prereq_dist;
-    my %cache;
-
-    # Algorithm: Visit each distribution and resolve each of its
-    # dependencies to the prerequisite distribution (if it exists).
-    # Any distribution that is a prerequisite cannot be a root.
-
-    for my $dist ( @dists ) {
-        for my $prereq ($dist->prerequisites) {
-            # TODO: When we support suggested/recommended prereqs
-            # those will have to be skipped too.  See here for more
-            # discussion: https://github.com/thaljef/Pinto/issues/158
-            next if $prereq->is_test or $prereq->is_develop;
-            next if $prereq->is_core(in => $tpv) or $prereq->is_perl;
-            my %args = (target => $prereq->as_target, cache => \%cache);
-            next unless my $prereq_dist = $self->get_distribution(%args);
-            $is_prereq_dist{$prereq_dist} = 1;
-        }
-    }
-
-    return grep { not $is_prereq_dist{$_} } @dists;
-}
-
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 sub mark_as_default {
     my ($self) = @_;
@@ -701,7 +661,7 @@ sub default_properties {
     };
 }
 
-#-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 sub numeric_compare {
     my ( $stack_a, $stack_b ) = @_;
@@ -717,7 +677,7 @@ sub numeric_compare {
     return $r;
 }
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 sub string_compare {
     my ( $stack_a, $stack_b ) = @_;
@@ -750,7 +710,7 @@ sub to_string {
         T => sub { truncate_text( $self->head->message_title,      $_[0] ) },
         b => sub { $self->head->message_body },
         j => sub { $self->head->username },
-        u => sub { $self->head->datetime_local->strftime( $_[0] || '%c' ) },
+        u => sub { $self->head->datetime->strftime( $_[0] || '%c' ) },
     );
 
     $format ||= $self->default_format();
@@ -778,7 +738,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -786,19 +749,21 @@ Pinto::Schema::Result::Stack - Represents a named set of Packages
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 METHODS
 
-=head2 get_distribution( target => $target )
+=head2 get_distribution( spec => $dist_spec )
 
-Given a L<Pinto::Target::Package>, returns the L<Pinto::Schema::Result::Distribution>
-which contains the package with the same name as the target B<and the same or higher 
-version as the target>.  Returns nothing if no such distribution is found in 
+Given a L<Pinto::PackageSpec>, returns the L<Pinto::Schema::Result::Distribution>
+which contains the package with the same name as the spec B<and the same or higher 
+version as the spec>.  Returns nothing if no such distribution is found in 
 this stack.
 
-Given a L<Pinto::Target::Distribution>, returns the L<Pinto::Schema::Result::Distribution>
-from this stack with the same author id and archive attributes as the target.  
+=head2 get_distribution( spec => $pkg_spec )
+
+Given a L<Pinto::DistributionSpec>, returns the L<Pinto::Schema::Result::Distribution>
+from this stack with the same author id and archive attributes as the spec.  
 Returns nothing if no such distribution is found in this stack.
 
 You can also pass a C<cache> argument that must be a reference to a hash.  It will
@@ -885,7 +850,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

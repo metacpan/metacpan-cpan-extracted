@@ -1,0 +1,31 @@
+---
+abstract: 'Check HTTP messages and transactions for protocol violations'
+author:
+  - 'Lubomir Rintel <lkundrak@v3.sk>'
+build_requires:
+  HTTP::Message: 0
+  Test::Deep: 0
+  Test::Pod: 1.0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Lint
+provides:
+  HTTP::Lint:
+    file: lib/HTTP/Lint.pm
+  HTTP::Lint::Message:
+    file: lib/HTTP/Lint.pm
+  HTTP::Lint::UserAgent:
+    file: lib/HTTP/Lint/UserAgent.pm
+requires:
+  HTTP::Message: 0
+  LWP::UserAgent: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Lint
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/lkundrak/http-lint
+version: 1.1

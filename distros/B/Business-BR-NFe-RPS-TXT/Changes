@@ -1,0 +1,17 @@
+Revision history for perl module Business::BR::NFe::RPS::TXT
+
+0.0124 2013-06-04
+
+ - Correct dates on this changelog!
+
+0.0122 2013-06-03
+
+ - add this Changes file
+
+0.012 2012-09-20
+
+ - support for RPS-M type
+
+0.01 2012-09-18
+
+ - Initial release

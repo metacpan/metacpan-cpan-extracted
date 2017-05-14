@@ -1,0 +1,14 @@
+GENERATING NEW PARSERS
+
+To regenerate a parser module from the grammar, do
+
+  perl -MParse::RecDescent - <grammar> XML::Template::Parser::<module>
+
+where <grammar> is the grammar file and <module> is the name of the Perl 
+module to generate.
+
+NOTE: You must adjust the namespace in the new parser module so that it
+doesn't conflict with the namespaces in the other parser modules.  To do
+this replace the string "namespace000001" in the new parser module with
+"namespace00000x"  where x is a number not already used by the other
+parser modules.

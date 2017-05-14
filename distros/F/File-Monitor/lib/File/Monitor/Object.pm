@@ -4,14 +4,13 @@ use strict;
 use warnings;
 use Carp;
 use File::Spec;
-use Scalar::Util qw(weaken);
 use Fcntl ':mode';
 
 use File::Monitor::Delta;
 
 use base qw(File::Monitor::Base);
 
-our $VERSION = '1.00';
+use version; our $VERSION = qv('0.0.2');
 
 my @STAT_FIELDS;
 my @INFO_FIELDS;
@@ -19,167 +18,205 @@ my $CLASS;
 
 BEGIN {
 
-  @STAT_FIELDS = qw(
-   dev inode mode num_links uid gid rdev size atime mtime ctime
-   blk_size blocks
-  );
+    @STAT_FIELDS = qw(
+        dev inode mode num_links uid gid rdev size atime mtime ctime
+        blk_size blocks
+    );
 
-  @INFO_FIELDS = (
-    @STAT_FIELDS, qw(
-     error
-     )
-  );
+    @INFO_FIELDS = ( @STAT_FIELDS, qw(
+        error files
+    ) );
 
-  no strict 'refs';
+    my @ATTR = qw(
+        name
+    );
 
-  # Accessors for info
-  for my $info ( @INFO_FIELDS ) {
-    *$info = sub {
-      my $self = shift;
-      croak "$info attribute is read-only" if @_;
-      return $self->{_info}->{$info};
-    };
-  }
+    my $IS_ARRAY = qr{^files$};
+
+    no strict 'refs';
+
+    # Accessors for info
+    for my $info (@INFO_FIELDS) {
+        if ($info =~ $IS_ARRAY) {
+            *$info = sub {
+                my $self = shift;
+                croak "$info is read-only" if @_;
+                return @{ $self->{_info}->{$info} || [ ] };
+            };
+        } else {
+            *$info = sub {
+                my $self = shift;
+                croak "$info is read-only" if @_;
+                return $self->{_info}->{$info};
+            };
+        }
+    }
+
+    for my $attr (@ATTR) {
+        *$attr = sub {
+            my $self = shift;
+            croak "$attr is read-only" if @_;
+            return $self->{$attr};
+        };
+    }
 }
 
-sub owner {
-  my $self = shift;
-  croak "name attribute is read-only" if @_;
-  return $self->{owner};
+sub _guess_class {
+    return $CLASS if $CLASS;
+    
+    my %stand_in = (
+        'File::Monitor::Object::Linux'  => qr/linux/
+    );
+
+    # Class to bless our objects to
+    $CLASS = __PACKAGE__;
+
+    # Attempt to find a platform specific stand-in
+    SI: while ( my ($module, $check) = each %stand_in ) {
+        if ( $^O =~ $check ) {
+            eval "require $module";
+            next SI if $@;
+            if ( my $class = $module->_stand_in ) {
+                $CLASS = $class;
+                last SI;
+            }
+        }
+    }
+
+    return $CLASS;
 }
 
-sub name {
-  my $self = shift;
-  croak "name attribute is read-only" if @_;
-  return $self->owner->_make_absolute( $self->{name} );
-}
+sub new {
+    my $class = shift;
+    
+    $class = _guess_class();
+    my $self = bless { }, $class;
+    $self->_initialize(@_);
 
-sub files {
-  my $self = shift;
-  croak "files attribute is read-only" if @_;
-  my $monitor = $self->owner;
-  return
-   map { $monitor->_make_absolute( $_ ) }
-   @{ $self->{_info}->{files} || [] };
+    return $self;
 }
 
 sub _initialize {
-  my $self = shift;
-  my $args = shift;
+    my $self = shift;
+    my $args;
 
-  # Normalize the args
+    # Normalize the args
 
-  $self->SUPER::_initialize( $args );
-  $self->_install_callbacks( $args );
+    if (ref $_[0] eq 'HASH') {
+        # Hash ref containing all arguments
+        $args = shift;
 
-  $self->{_info}->{virgin} = 1;
+        croak "When options are supplied as a hash there may be no other arguments"
+            if @_;
 
-  my $name = delete $args->{name}
-   or croak "The name option must be supplied";
+        croak "The name option must be supplied"
+            unless exists $args->{name};
+    } else {
+        # File/dir name, optional callback
+        my $name     = shift or croak "A filename must be specified";
+        my $callback = shift;
 
-  $self->{owner} = delete $args->{owner}
-   or croak "A " . __PACKAGE__ . " must have an owner";
+        $args = {
+            name    => $name
+        };
 
-  # Build our object
-  $self->{name} = $self->owner->_canonical_name( $name );
+        # If a callback is defined install it for all changes
+        $args->{callback}->{change} = $callback
+            if defined $callback;
+    }
 
-  # Avoid circular references
-  weaken $self->{owner};
+    $self->SUPER::_initialize( $args );
+    $self->_install_callbacks( $args );
 
-  for my $opt ( qw(files recurse) ) {
-    $self->{_options}->{$opt} = delete $args->{$opt};
-  }
+    # Build our object
+    $self->{name}            = $self->_canonical_name( delete $args->{name} );
+    $self->{_info}->{virgin} = 1;
 
-  $self->_report_extra( $args );
+    for my $opt (qw(files recurse)) {
+        $self->{_options}->{$opt} = delete $args->{$opt};
+    }
+
+    $self->_report_extra( $args );
 }
 
 sub _read_dir {
-  my $self = shift;
-  my $dir  = shift;
+    my $self = shift;
+    my $dir  = shift;
 
-  opendir( my $dh, $dir ) or die "Can't read $dir ($!)";
-  my @files = map { File::Spec->catfile( $dir, $_ ) }
-   sort
-   grep { $_ !~ /^[.]{1,2}$/ } readdir( $dh );
-  closedir( $dh );
+    opendir(my $dh, $dir) or die "Can't read $dir ($!)";
+    my @files = map { File::Spec->catfile($dir, $_) }
+                sort
+                grep { $_ !~ /^[.]{1,2}$/ }
+                readdir($dh);
+    closedir($dh);
 
-  return @files;
+    return @files;
 }
 
 sub _stat {
-  my $self = shift;
-  my $name = shift;
+    my $self = shift;
+    my $name = shift;
 
-  return stat $name;
+    return stat $name;
 }
 
 # Scan our target object
 sub _scan_object {
-  my $self = shift;
-  my $name = $self->name;
-  my %info;
+    my $self = shift;
+    my $name = $self->name;
+    my %info;
 
-  eval {
-    @info{@STAT_FIELDS} = $self->_stat( $name );
+    eval {
+        @info{@STAT_FIELDS} = $self->_stat( $name );
 
-    if ( defined $info{mode} && S_ISDIR( $info{mode} ) ) {
-      my $monitor = $self->owner;
-
-      # Do directory specific things
-      if ( $self->{_options}->{files} ) {
-
-        # Expand one level
-        $info{files} = [ map { $monitor->_make_relative( $_ ) }
-           $self->_read_dir( $name ) ];
-      }
-      elsif ( $self->{_options}->{recurse} ) {
-
-        # Expand whole directory tree
-        my @work = $self->_read_dir( $name );
-        while ( my $obj = shift @work ) {
-          push @{ $info{files} }, $monitor->_make_relative( $obj );
-          if ( -d $obj ) {
-
-            # Depth first to simulate recursion
-            unshift @work, $self->_read_dir( $obj );
-          }
+        if (defined $info{mode} && S_ISDIR( $info{mode} )) {
+            # Do directory specific things
+            if ( $self->{_options}->{files} ) {
+                # Expand one level
+                $info{files} = [ $self->_read_dir( $name ) ];
+            } elsif ( $self->{_options}->{recurse} ) {
+                # Expand whole directory tree
+                my @work = $self->_read_dir( $name );
+                while ( my $obj = shift @work ) {
+                    push @{ $info{files} }, $obj;
+                    if (-d $obj) {
+                        # Depth first to simulate recursion
+                        unshift @work, $self->_read_dir( $obj );
+                    }
+                }
+            }
         }
-      }
-    }
-  };
+    };
 
-  $info{error} = $@;
+    $info{error} = $@;
 
-  return \%info;
+    return \%info;
 }
 
 sub scan {
-  my $self = shift;
+    my $self = shift;
 
-  my $info    = $self->_scan_object;
-  my $name    = $self->name;
-  my @changes = ();
+    my $info = $self->_scan_object;
+    my $name = $self->name;
+    my @changes = ( );
 
-  unless ( delete $self->{_info}->{virgin} ) {
+    unless (delete $self->{_info}->{virgin}) {
+        # Already done one scan, so now we compute deltas
+        my $change = File::Monitor::Delta->new( {
+            object      => $self,
+            old_info    => $self->{_info},
+            new_info    => $info
+        } );
 
-    # Already done one scan, so now we compute deltas
-    my $change = File::Monitor::Delta->new(
-      {
-        object   => $self,
-        old_info => $self->{_info},
-        new_info => $info
-      }
-    );
-
-    if ( $change->is_change ) {
-      $self->_make_callbacks( $change );
-      push @changes, $change;
+        if ($change->is_change) {
+            $self->_make_callbacks( $change );
+            push @changes, $change;
+        }
     }
-  }
 
-  $self->{_info} = $info;
+    $self->{_info} = $info;
 
-  return @changes;
+    return @changes;
 }
 
 1;
@@ -190,11 +227,28 @@ File::Monitor::Object - Monitor a filesystem object for changes.
 
 =head1 VERSION
 
-This document describes File::Monitor::Object version 1.00
+This document describes File::Monitor::Object version 0.0.2
 
 =head1 SYNOPSIS
 
-Created by L<File::Monitor> to monitor a single file or directory.
+May be used directly to monitor a single file or directory.
+
+    use File::Monitor::Object;
+
+    # Watch a file
+    $object = File::Monitor::Object->new( 'somefile.txt' );
+
+    # First call to scan just captures a snapshot of file/directory
+    # state; doesn't return any results
+    $object->scan;
+
+    # Later, check for any changes
+    if ( my $change = $object->scan ) {
+        # Object changed
+    }
+
+May also be used with L<File::Monitor> to monitor multiple files and
+directories.
 
     use File::Monitor;
     use File::Monitor::Object;
@@ -202,23 +256,24 @@ Created by L<File::Monitor> to monitor a single file or directory.
     my $monitor = File::Monitor->new();
 
     for my $file ( @files ) {
-        $monitor->watch( $file );
+        my $object = File::Monitor::Object->new( $file );
+        $monitor->set_watcher( $object );
     }
 
     # First scan just finds out about the monitored files. No changes
     # will be reported.
-    $monitor->scan;
+    $object->scan;
 
     # Later perform a scan and gather any changes
-    for my $change ( $monitor->scan ) {
+    for my $change ( $object->scan ) {
         # $change is a File::Monitor::Delta
     }
 
 =head1 DESCRIPTION
 
-Monitors changes to a single file or directory. Don't create a
-C<File::Monitor::Object> directly; instead call C<watch> on
-L<File::Monitor>.
+Monitors changes to a single file or directory. For many applications it
+may be more convenient to use the interface provided by L<File::Monitor>
+which allows multiple files and directories to be monitored.
 
 A C<File::Monitor::Object> represents a single file or directory. The
 corresponding file or directory need not exist; a file being created is
@@ -272,8 +327,98 @@ scans I<will> take a long time.
 
 =item C<< new( $args ) >>
 
-Create a new C<File::Monitor::Object>. Don't call C<new> directly; use
-instead L<< File::Monitor->watch >>.
+Create a new C<File::Monitor::Object>. The passed hash reference
+contains various options as follows:
+
+    my $object = File::Monitor::Object->new( {
+        name        => $file_or_directory_name,
+        recurse     => $should_recurse_directory,
+        files       => $should_read_files_in_directory,
+        callback    => {
+            $some_event => sub {
+                # Handler for $some_event
+            },
+            $other_event => sub {
+                # Handler for $other_event
+            }
+        }
+    } );
+
+Here are those options in more detail:
+
+=over
+
+=item C<name>
+
+The name of the file or directory to be monitored. Relative paths will
+be made absolute relative to the current directory at the time of the
+call. This option is mandatory; C<new> will croak if it is missing.
+
+=item C<recurse>
+
+If this is a directory and C<recurse> is true monitor the entire
+directory tree below this directory.
+
+=item C<files>
+
+If this is a directory and C<files> is true monitor the files and
+directories immediately below this directory but don't recurse down the
+directory tree.
+
+Note that if you specify C<recurse> or C<files> only the I<names> of
+contained files will be monitored. Changes to the contents of contained
+files are not detected.
+
+=item C<callback>
+
+Provides a reference to a hash of callback handlers the keys of which
+are the names of events as described in L<File::Monitor::Delta>.
+
+=back
+
+Callback subroutines are called with the following arguments:
+
+=over
+
+=item C<$name>
+
+The name of the file or directory that has changed.
+
+=item C<$event>
+
+The type of change. If the callback was registered for a specific event
+it will be passed here. The actual event may be one of the events below
+the specified event in the event hierarchy. See L<File::Monitor::Delta>
+for more details.
+
+=item C<$delta>
+
+The L<File::Monitor::Delta> object that describes this change.
+
+=back
+
+As a convenience C<new> may be called with a simpler form of arguments:
+
+    my $obj = File::Monitor::Object->new( $name );
+
+is equivalent to
+
+    my $obj = File::Monitor::Object->new( {
+        name    => $name
+    } );
+
+And
+
+    my $obj = File::Monitor::Object->new( $name, $callback );
+
+is eqivalent to
+
+    my $obj = File::Monitor::Object->new( {
+        name        => $name
+        callback    => {
+            change      => $callback
+        }
+    } );
 
 =item C<< scan() >>
 
@@ -286,6 +431,9 @@ if no changes occurred.
         # $change is a File::Monitor::Delta that describes all the
         # changes to the monitored file or directory.
     }
+
+Any callbacks that are registered will have been triggered before
+C<scan> returns.
 
 When C<scan> is first called the current state of the monitored
 file/directory will be captured but no change will be reported.

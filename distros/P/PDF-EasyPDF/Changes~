@@ -1,0 +1,6 @@
+Revision history for Perl extension PDF::EasyPDF.
+
+0.03  Sat Feb 25 21:28:47 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n PDF::EasyPDF
+

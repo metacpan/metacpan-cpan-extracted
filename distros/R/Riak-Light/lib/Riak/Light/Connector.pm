@@ -9,12 +9,12 @@
 ## no critic (RequireUseStrict, RequireUseWarnings)
 package Riak::Light::Connector;
 {
-    $Riak::Light::Connector::VERSION = '0.12';
+    $Riak::Light::Connector::VERSION = '0.052';
 }
 ## use critic
 
 use Moo;
-use Types::Standard -types;
+use MooX::Types::MooseLike::Base qw<Num Str Int Bool Object>;
 require bytes;
 
 # ABSTRACT: Riak Connector, abstraction to deal with binary messages
@@ -25,18 +25,24 @@ sub perform_request {
     my ( $self, $message ) = @_;
     my $bytes = pack( 'N a*', bytes::length($message), $message );
 
+    print "Size of the Request " . bytes::length($message) . "\n";
+
     $self->_send_all($bytes);    # send request
 }
 
 sub read_response {
-    my ($self) = @_;
-    my $length = $self->_read_length();    # read first four bytes
-    return unless ($length);
-    $self->_read_all($length);    # read the message
+    my $self   = shift;
+    my $lenght = $self->_read_lenght();    # read first four bytes
+
+    return unless ($lenght);
+
+    print "Size of the Response $lenght\n";
+
+    $self->_read_all($lenght);             # read the message
 }
 
-sub _read_length {
-    my ($self) = @_;
+sub _read_lenght {
+    my $self = shift;
 
     my $first_four_bytes = $self->_read_all(4);
 
@@ -98,25 +104,15 @@ Riak::Light::Connector - Riak Connector, abstraction to deal with binary message
 
 =head1 VERSION
 
-version 0.12
+version 0.052
 
 =head1 DESCRIPTION
 
   Internal class
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Tiago Peczenyj <tiago.peczenyj@gmail.com>
-
-=item *
-
-Damien Krotkine <dams@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

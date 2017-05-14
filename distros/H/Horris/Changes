@@ -1,0 +1,41 @@
+Revision history for Horris
+
+v0.1.2  2011-02-12
+    * re Documenting
+    * merge CLI scripts
+
+v0.1.1  2011-02-11
+    * Added "what's that"(a.k.a '뭠마' || 'ㅁㅁ') feature to 'Hit plugin'
+
+0.1.0
+    * Rewrite plugins
+        * Join
+        * PeekURL
+        * Poller
+        * Relay
+    * Added plugins
+        * Echo
+        * Eval
+        * Hit
+        * Kspell
+        * PowerManager
+        * RPC
+        * Retry
+        * Twitter
+    * Added CLI utility
+
+0.0.1
+    * forked 'Morris'
+    * given name 'Horris'
+    * replace pluggable logic
+        self implementation => "MooseX::Role::Pluggable"
+
+0.01000_02
+    * Fix PeekURL plugin's regular expression to search for charsets
+
+0.01000_01 - 11 Nov 2009
+    * First public release (it's been used in production in my company
+      for over a year)
+    * Please note that this was intended as a toy... Patches, improvements
+      are welcome.
+    * Also, some parts are hardcoded with Japanese text. You've been warned.

@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::PasswordDBDemo;
 use strict;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.9.1';
 
 ## @apmethod int passwordDBInit()
 # Check the use of AuthDemo

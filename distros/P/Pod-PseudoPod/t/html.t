@@ -62,14 +62,13 @@ Grindelwald to drive the cog train to Murren. Can you repeat that?
 P: Mmmm, no, Brain, don't think I can.
 EOPOD
 
-is($results, <<'EOHTML', "multiple paragraphs");
-<p>B: Now, Pinky, if by any chance you are captured during this mission,
-remember you are Gunther Heindriksen from Appenzell. You moved to
-Grindelwald to drive the cog train to Murren. Can you repeat that?</p>
+my $html =
+  '<p>B: Now, Pinky, if by any chance you are captured during this mission, '
+. 'remember you are Gunther Heindriksen from Appenzell. You moved to '
+. "Grindelwald to drive the cog train to Murren. Can you repeat that?</p>\n\n"
+. "<p>P: Mmmm, no, Brain, don't think I can.</p>\n\n";
 
-<p>P: Mmmm, no, Brain, don't think I can.</p>
-
-EOHTML
+is($results, $html, "multiple paragraphs");
 
 initialize($parser, $results);
 $parser->parse_string_document(<<'EOPOD');
@@ -92,8 +91,7 @@ is($results, <<'EOHTML', "simple bulleted list");
 
 <li>P: Gee, Brain, what do you want to do tonight?</li>
 
-<li>B: The same thing we do every night, Pinky. Try to take over the
-world!</li>
+<li>B: The same thing we do every night, Pinky. Try to take over the world!</li>
 
 </ul>
 
@@ -121,8 +119,7 @@ is($results, <<'EOHTML', "numbered list");
 
 <li>1. P: Gee, Brain, what do you want to do tonight?</li>
 
-<li>2. B: The same thing we do every night, Pinky. Try to take over the
-world!</li>
+<li>2. B: The same thing we do every night, Pinky. Try to take over the world!</li>
 
 </ol>
 
@@ -248,12 +245,11 @@ $parser->parse_string_document(<<'EOPOD');
 
 A plain paragraph with aN<footnote entry> and css tags.
 EOPOD
-is($results, <<"EOHTML", "css footnote entity in a paragraph");
-<p>A plain paragraph with a<font class="footnote"> (footnote: footnote
-entry)</font> and css tags.</p>
 
-EOHTML
+$html = '<p>A plain paragraph with a<font class="footnote"> (footnote: '
+      . "footnote entry)</font> and css tags.</p>\n\n";
 
+is($results, $html, "css footnote entity in a paragraph");
 
 initialize($parser, $results);
 $parser->add_css_tags(1);
@@ -262,11 +258,11 @@ $parser->parse_string_document(<<'EOPOD');
 
 A plain paragraph with a U<http://test.url.com/stuff/and/junk.txt>.
 EOPOD
-is($results, <<"EOHTML", "URL entity in a paragraph");
-<p>A plain paragraph with a <font
-class="url">http://test.url.com/stuff/and/junk.txt</font>.</p>
 
-EOHTML
+$html = '<p>A plain paragraph with a <font class="url">'
+      . "http://test.url.com/stuff/and/junk.txt</font>.</p>\n\n";
+
+is($results, $html, "URL entity in a paragraph");
 
 initialize($parser, $results);
 $parser->parse_string_document(<<'EOPOD');
@@ -319,7 +315,7 @@ $parser->parse_string_document(<<'EOPOD');
 A plain paragraph with B<bold text>.
 EOPOD
 is($results, <<"EOHTML", "Bold text in a paragraph");
-<p>A plain paragraph with <b>bold text</b>.</p>
+<p>A plain paragraph with <strong>bold text</strong>.</p>
 
 EOHTML
 
@@ -330,7 +326,7 @@ $parser->parse_string_document(<<'EOPOD');
 A plain paragraph with I<italic text>.
 EOPOD
 is($results, <<"EOHTML", "Italic text in a paragraph");
-<p>A plain paragraph with <i>italic text</i>.</p>
+<p>A plain paragraph with <em>italic text</em>.</p>
 
 EOHTML
 
@@ -352,7 +348,7 @@ $parser->parse_string_document(<<'EOPOD');
 A plain paragraph with a F<filename>.
 EOPOD
 is($results, <<"EOHTML", "File name in a paragraph");
-<p>A plain paragraph with a <i>filename</i>.</p>
+<p>A plain paragraph with a <em>filename</em>.</p>
 
 EOHTML
 

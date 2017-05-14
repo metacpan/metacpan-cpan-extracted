@@ -20,7 +20,7 @@ This is used internally by XML::Filter::XML_Directory_2RSS.
 package XML::Filter::XML_Directory_2RSS::Base;
 use strict;
 
-$XML::Filter::XML_Directory_2RSS::Base::VERSION = 0.9.1;
+$XML::Filter::XML_Directory_2RSS::Base::VERSION = 0.9;
 
 use Carp;
 
@@ -112,31 +112,25 @@ sub on_enter_start_element {
   my $self = shift;
   my $data = shift;
 
-  $self->{'__rlevel'} ++;
+  $self->{'__level'} ++;
   $self->{'__last'} = $data->{Name};
 
   if ($data->{Name} eq "head") {
       $self->{'__head'} = 1;
   }
 
-  if (($self->{'__head'}) && ($data->{Name} eq "orderby")) {
-    $self->{'__orderby'} = $data->{'Attributes'}->{'{}code'}->{'Value'};
-  }
-
   if ((! $self->{'__start'}) && ($data->{Name} eq "directory")) {
-    $self->{'__start'} = $self->{'__rlevel'};
+    $self->{'__start'} = 1;
     return;
   }
   
   return unless $self->{'__start'};
 
+  #  map { print STDERR " "; } (0..$self->{'__level'});
+  #  print STDERR "[$self->{'__level'}] $data->{Name} : $data->{Attributes}->{'{}name'}->{Value}\n";
+
   if (($data->{'Name'} =~ /^(file|directory)$/) && (! $self->{'__skip'})) {
-
-    $self->{'__wasa'} = $self->{'__ima'};
-    $self->{'__wasa_level'} = $self->{'__ima_level'};
-
-    $self->{'__ima'}       = $1;
-    $self->{'__ima_level'} = $self->{'__rlevel'};
+    $self->{'__ima'} = $1;
     $self->_compare($data->{Attributes}->{'{}name'}->{Value});
   }
 
@@ -164,11 +158,13 @@ sub on_exit_end_element {
   my $self = shift;
   my $data = shift;
 
-  if ($self->{'__skip'} == $self->{'__rlevel'}) {
+
+  if ($self->{'__skip'} == $self->{'__level'}) {
     $self->{'__skip'} = 0;
   }
 
-  $self->{'__rlevel'} --;
+  $self->{'__level'} --;
+
   return 1;
 }
 
@@ -269,11 +265,11 @@ sub rdf_about {
 
 =head1 VERSION
 
-0.9.1
+0.9
 
 =head1 DATE
 
-May 24, 2002
+May 14, 2002
 
 =head1 AUTHOR
 

@@ -13,9 +13,8 @@ use vars qw(@ISA $me $VERSION);
 use Log::Scrubber qw(disable $SCRUBBER scrubber :Carp scrubber_add_scrubber);
 @ISA     = qw(Business::OnlinePayment::HTTPS);
 $me      = 'Business::OnlinePayment::DLocal';
-$VERSION = '0.001';
 
-# VERSION
+our $VERSION = '0.004'; # VERSION
 # PODNAME: Business::OnlinePayment::DLocal
 # ABSTRACT: Business::OnlinePayment::DLocal - DLocal (astropay) backend for Business::OnlinePayment
 
@@ -307,6 +306,9 @@ sub _send_request {
     my %content = %$content;
     my %remap_fields = $self->field_map();
 
+    $self->_dlocal_scrubber_add_card($content{'card_number'});
+    scrubber_add_scrubber({'cc_cvv='.$content{'cvv2'}=>'cc_cvv=DELETED'});
+
     my $message = '';
     foreach my $key ( @{$config->{'control'}} ) { $message .= $content{$remap_fields{$key}}//''; }
     local $content{'control'} = uc(hmac_sha256_hex(pack('A*',$message), pack('A*',$content{'password2'})));
@@ -439,6 +441,19 @@ sub set_defaults {
     $self->api_version('4.0')                   unless $self->api_version;
 }
 
+sub _default_scrubber {
+    my $cc = shift;
+    my $del = substr($cc,0,6).('X'x(length($cc)-10)).substr($cc,-4,4); # show first 6 and last 4
+    return $del;
+}
+
+sub _dlocal_scrubber_add_card {
+    my ( $self, $cc ) = @_;
+    return if ! $cc;
+    my $scrubber = $self->{_scrubber};
+    scrubber_add_scrubber({$cc=>&{$scrubber}($cc)});
+}
+
 1;
 
 __END__
@@ -451,7 +466,7 @@ Business::OnlinePayment::DLocal - Business::OnlinePayment::DLocal - DLocal (astr
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 METHODS
 

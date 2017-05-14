@@ -1,0 +1,107 @@
+# $Id$
+#
+# >>Title::     Defines Module
+#
+# >>Copyright::
+# Copyright (c) 1996-1997, Tim Hudson (tjh@mincom.com)
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# ??-???-96 tjh     Initial writing
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:defines}} is the [[SDF]] module for
+# simplifying the definition of products and sections.
+#
+# >>Description::
+# This contains the following interesting uses of the "simple" filter:
+#
+# * product_defines - given a data table with two pipe (|) separated
+#                     columns defines for each product are automatically
+#                     created. 
+# * section_defines - define section names as variables
+#
+# For example:
+#
+# !block example
+# !block product_defines
+# product1:url1
+# product2:url2
+# !endblock
+# !endblock
+# 
+# becomes
+#
+# !block example
+# !block products; data
+# Name:Jump
+# product1:url1
+# product2:url2
+# !endblock
+# !define product1 "{{PRD:product1}}"
+# !define product2 "{{PRD:product2}}"
+# !endblock
+#
+# which lets you use the neat syntax of [\[product1]\] and [\[product2]\] to
+# refer to products and get the hypertext links inserted appropriately.
+#
+# >>Limitations::
+#
+
+#
+# product defines  ... adds a filter product_defines that takes a 
+#                      "normal" products block and adds in a define
+#                      for each product
+#
+!on filter "product_defines";; \
+        $name='simple'; \
+        $params.=';pre="!block products<SEMICOLON> data#Name|Jump"'; \
+        $params.=';exec="&AddProduct(\$line)"'; \
+        $params.=';post="!endblock#!DefineProducts"'
+
+!on filter "section_defines";; \
+        $name='simple'; \
+        $params.=";exec='\"!define \$line \\\"{{SECT:\$line}}\\\"\"'";
+
+!block script
+
+@products=();
+
+sub AddProduct {
+        local ($line)=@_;
+
+        if ($simple_debug) {
+            print STDERR "AddProduct: $line\n";
+        }
+
+        $line =~ s/\[\[(.*)\]\]/$var{$1}/g;
+
+        ($prod,$value)=split(/\|/,$line,2);
+
+        # do simple variable substitution so that we can
+        # use [[VAR]] in lots of places that are useful
+        # even when building more complex things
+        #$value =~ s/\[\[(.*)\]\]/$var{$1}/g;
+
+        push(@products,$prod);
+
+        return $line;
+}
+
+sub DefineProducts_Macro {
+        local(@text);
+
+        if ($simple_debug) {
+            print STDERR "DefineProducts -> " . join(",",@products) . "\n";
+        }
+
+        for $prod (@products) {
+                push(@text,"!define $prod \"{{PRD:$prod}}\"");
+        }
+
+        return (@text);
+}
+!endblock

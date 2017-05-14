@@ -1,3 +1,4 @@
+#!perl
 use 5.008001;
 use utf8;
 use strict;
@@ -29,4 +30,4 @@ use Locale::KeyedText;
 ###########################################################################
 ###########################################################################
 
-1;
+1; # Magic true value required at end of a reuseable file's code.

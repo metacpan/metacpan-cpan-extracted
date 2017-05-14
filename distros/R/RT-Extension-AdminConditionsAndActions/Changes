@@ -1,5 +1,8 @@
 Revision history for RT-Extension-AdminConditionsAndActions
 
+1.03 2017-05-11
+ - Add rt_too_new 4.4.2 due to being cored
+
 1.02 2016-10-21
  - Update documentation
 

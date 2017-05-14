@@ -23,5 +23,5 @@ BEGIN {
     }
 
     eval { This::Will::Not::Work->new };
-    like($@, qr/^Unsupported REPR type:\ \(\?\^\:\)/, '... got the expected error');
+    like($@, qr/^Invalid BLESS args for This\:\:Will\:\:Not\:\:Work\, unsupported REPR type \(REGEXP\)/, '... got the expected error');
 }

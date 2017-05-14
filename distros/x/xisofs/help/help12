@@ -1,0 +1,1 @@
+Omit version numbers from ISO9660 file names. This may violate the ISO9660 standard, but no one really uses the version numbers anyway. Use with caution.

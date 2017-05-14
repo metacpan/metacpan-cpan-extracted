@@ -2,7 +2,7 @@ package Test2::Plugin::OpenFixPerlIO;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000007';
 
 use Carp qw/cluck/;
 use PerlIO;

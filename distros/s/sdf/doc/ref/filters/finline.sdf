@@ -1,0 +1,53 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: inline Filter
+
+H2: Interface
+
+!filter_interface "inline"
+
+H2: Description
+
+The {{inline}} filter is used to pass a section of text directly
+to a target documentation system.
+
+The {{target}} parameter is used to specify which target system
+the nominated text is to be passed to.
+The default target is {{html}}.
+
+The {{expand}} parameter can be used to request expansion of
+SDF expressions (enclosed in E<2[> and E<2]>) within the text.
+
+H2: Examples
+
+To embed [[HTML]] within an SDF document:
+
+!block example; lang='sdf'
+!block inline
+  add arbitrary HTML here ...
+!endblock
+!endblock
+
+SDF expressions can be expand like this:
+
+!block example; lang='sdf'
+!define VERB "is"
+...
+!block inline; expand
+<P>
+This HTML [[VERB]] expanded.
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

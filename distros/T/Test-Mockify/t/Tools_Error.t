@@ -15,7 +15,6 @@ sub testPlan{
     $self->test_ErrorWithoutMockedMethod();
     $self->test_ErrorWithoutMockedMethodAndDataBlock();
     $self->test_ErrorWithMockedMethod();
-
     return;
 }
 #------------------------------------------------------------------------
@@ -28,8 +27,6 @@ sub test_ErrorWithoutMessage {
         qr/^Message is needed at .*Tools.pm line \d+.$/,
         "$SubTestName - tests if Error works well"
     );
-    ;
-
     return;
 }
 #------------------------------------------------------------------------
@@ -42,8 +39,6 @@ sub test_ErrorWithoutMockedMethod {
         qr/^$RegEx/sm,
         "$SubTestName - tests if Error works well"
     );
-    ;
-
     return;
 }
 #------------------------------------------------------------------------
@@ -56,8 +51,6 @@ sub test_ErrorWithMockedMethod {
         qr/^$RegEx$/,
         "$SubTestName - tests if Error works well"
     );
-    ;
-
     return;
 }
 #------------------------------------------------------------------------
@@ -70,8 +63,6 @@ sub test_ErrorWithoutMockedMethodAndDataBlock {
         qr/^$RegEx$/,
         "$SubTestName - tests if Error works well"
     );
-    ;
-
     return;
 }
 

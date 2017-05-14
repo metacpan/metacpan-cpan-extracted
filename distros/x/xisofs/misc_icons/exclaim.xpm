@@ -1,0 +1,62 @@
+/* XPM */
+static char *exclaim[] = {
+/* width height num_colors chars_per_pixel */
+"    39    42        6            1",
+/* colors */
+". c #000000",
+"# c #848400",
+"a c #848484",
+"b c #c6c6c6",
+"c c #ffff00",
+"d c None",
+/* pixels */
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddd###ddddddddddddddddddd",
+"dddddddddddddddd#ccb.dddddddddddddddddd",
+"ddddddddddddddd#ccccb.adddddddddddddddd",
+"ddddddddddddddd#ccccc.aaddddddddddddddd",
+"dddddddddddddd#ccccccb.aadddddddddddddd",
+"dddddddddddddd#ccccccc.aadddddddddddddd",
+"ddddddddddddd#ccccccccb.aaddddddddddddd",
+"ddddddddddddd#ccccccccc.aaddddddddddddd",
+"dddddddddddd#ccccccccccb.aadddddddddddd",
+"dddddddddddd#cccb...bccc.aadddddddddddd",
+"ddddddddddd#cccc.....cccb.aaddddddddddd",
+"ddddddddddd#cccc.....cccc.aaddddddddddd",
+"dddddddddd#ccccc.....ccccb.aadddddddddd",
+"dddddddddd#ccccc.....ccccc.aadddddddddd",
+"ddddddddd#cccccc.....cccccb.aaddddddddd",
+"ddddddddd#cccccc#...#cccccc.aaddddddddd",
+"dddddddd#cccccccb...bccccccb.aadddddddd",
+"dddddddd#cccccccc...cccccccc.aadddddddd",
+"ddddddd#ccccccccc#.#ccccccccb.aaddddddd",
+"ddddddd#cccccccccb.bccccccccc.aaddddddd",
+"dddddd#ccccccccccc.ccccccccccb.aadddddd",
+"dddddd#ccccccccccccccccccccccc.aadddddd",
+"ddddd#cccccccccccb..bcccccccccb.aaddddd",
+"ddddd#ccccccccccc....cccccccccc.aaddddd",
+"dddd#cccccccccccc....ccccccccccb.aadddd",
+"dddd#ccccccccccccb..bccccccccccc.aadddd",
+"dddd#ccccccccccccccccccccccccccc.aaaddd",
+"dddd#ccccccccccccccccccccccccccb.aaaddd",
+"ddddd#ccccccccccccccccccccccccb.aaaaddd",
+"dddddd#........................aaaaaddd",
+"ddddddddaaaaaaaaaaaaaaaaaaaaaaaaaaadddd",
+"dddddddddaaaaaaaaaaaaaaaaaaaaaaaaaddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd",
+"ddddddddddddddddddddddddddddddddddddddd"
+};
+SIMPLE  =                    T                                                  
+BITPIX  =                    8                                                  
+NAXIS   =                    2                                                  
+NAXIS1  =                   39                                                  
+NAXIS2  =                   42                                                  
+HISTORY Written by XV 3.10a                                                     
+END                                                                             

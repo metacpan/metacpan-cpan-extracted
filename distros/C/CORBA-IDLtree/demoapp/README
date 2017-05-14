@@ -1,0 +1,13 @@
+#!/bin/sh
+# 
+# This here idl2cpp.pl is for demo purposes only.
+# For a production tool that uses CORBA:IDLtree, see the
+# idl2ada.pl that is part of the GNU Ada CORBA Kit at
+# http://projects.sourceforge.net/orbitada/
+#
+# Here's how to run the idl2cpp on the demo IDL file:
+
+perl -I.. idl2cpp.pl myfile.idl
+
+# A file, myfile.h, will be produced.
+

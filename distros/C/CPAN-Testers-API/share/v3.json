@@ -1,0 +1,553 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "3.0",
+    "title": "CPAN Testers API 3.0",
+    "description": "API to submit and manipulate test reports",
+    "termsOfService": "http://cpantesters.org/api/license",
+    "contact": {
+      "name": "CPAN Testers core team",
+      "email": "admin@cpantesters.org",
+      "url": "cpantesters.org"
+    },
+    "license": {
+      "name": "perl",
+      "url": "https://dev.perl.org/licenses/"
+    }
+  },
+  "host": "api.cpantesters.org",
+  "basePath": "/v3",
+  "schemes": [ "http" ],
+  "consumes": [ "application/json" ],
+  "produces": [ "application/json" ],
+  "tags": [
+      {
+          "name": "Release",
+          "description": "Per-release test summary data"
+      },
+      {
+          "name": "Upload",
+          "description": "CPAN uploads data"
+      },
+      {
+          "name": "Report",
+          "description": "CPAN report submissions"
+      }
+  ],
+
+  "paths": {
+    "/report": {
+      "post": {
+        "tags": ["Report"],
+        "description": "Submit a new report to CPAN Testers",
+        "x-mojo-to": {
+          "controller": "Report",
+          "action": "report_post"
+        },
+        "operationId": "v3_report_post",
+        "parameters": [{
+          "name": "report",
+          "in": "body",
+          "required": true,
+          "schema": { "$ref": "#/definitions/NewReport" }
+        }],
+        "responses": {
+          "201": {
+            "description": "report was created",
+            "schema": { "$ref": "#/definitions/AcceptedReports" }
+          },
+          "303": {
+            "description": "duplicate report",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "401": {
+            "description": "invalid credentials",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "400": {
+            "description": "report contains errors",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": { "$ref": "#/definitions/Error" }
+          }
+        }
+      }
+    },
+
+    "/report/{id}": {
+      "get": {
+        "tags": ["Report"],
+        "description": "Fetch report data from CPAN Testers",
+        "x-mojo-to": {
+          "controller": "Report",
+          "action": "report_get"
+        },
+        "operationId": "v3_report_get",
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "description": "The CPAN Testers report id (like 01be7be2-2aec-11e7-a074-e1beba07c9dd)",
+          "type": "string",
+          "required": true
+        }],
+        "responses": {
+          "200": {
+            "description": "Report details",
+            "schema": { "$ref": "#/definitions/Report" }
+          },
+          "400": {
+            "description": "report id is invalid",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "404": {
+            "description": "The specified report was not found",
+            "schema": { "$ref": "#/definitions/Error" }
+          }
+        }
+      }
+    },
+
+    "/release": {
+     "get": {
+       "tags": [ "Release" ],
+       "operationId": "v3_release_all",
+       "summary": "Get summary test report info about all CPAN releases",
+       "x-mojo-to": {
+         "controller": "Release",
+         "action": "release"
+       },
+       "responses": {
+         "400": {
+           "description": "The request or parameters are incorrect"
+         },
+         "200": {
+           "description": "A list of release objects",
+           "schema": {
+             "type": "array",
+             "title": "ReleasesArray",
+             "items": { "$ref": "#/definitions/Release" }
+           }
+         }
+       }
+     }
+    },
+
+    "/release/dist/{dist}": {
+      "get": {
+        "tags": [ "Release" ],
+        "operationId": "v3_release_dist",
+        "summary": "Get summary test report info for releases of a distribution",
+        "x-mojo-to": {
+          "controller": "Release",
+          "action": "release"
+        },
+        "parameters": [
+          { "$ref": "#/parameters/since" },
+          {
+            "name": "dist",
+            "in": "path",
+            "description": "The CPAN distribution name (like 'CPAN-Testers-Schema')",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/paths/~1release/get/responses/200" },
+          "400": { "$ref": "#/paths/~1release/get/responses/400" },
+          "404": {
+            "description": "The distribution was not found"
+          }
+        }
+      }
+    },
+
+    "/release/author/{author}": {
+      "get": {
+        "tags": [ "Release" ],
+        "operationId": "v3_release_author",
+        "summary": "Get summary test report info for releases by an author",
+        "x-mojo-to": {
+          "controller": "Release",
+          "action": "release"
+        },
+        "parameters": [
+          { "$ref": "#/parameters/since" },
+          {
+            "name": "author",
+            "in": "path",
+            "description": "The CPAN author name (like 'PREACTION')",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/paths/~1release/get/responses/200" },
+          "400": { "$ref": "#/paths/~1release/get/responses/400" },
+          "404": {
+            "description": "The distribution was not found"
+          }
+        }
+      }
+    },
+
+    "/upload": {
+      "get": {
+        "tags": [ "Upload" ],
+        "operationId": "v3_upload_all",
+        "summary": "Get all uploads to CPAN",
+        "description": "This route gets uploads to CPAN. Asking for a WebSocket will subscribe to a feed of new uploads.",
+        "x-mojo-to": {
+          "controller": "Upload",
+          "action": "get"
+        },
+        "parameters": [
+          { "$ref": "#/parameters/since" }
+        ],
+        "responses": {
+          "400": {
+            "description": "The request or parameters are incorrect"
+          },
+          "200": {
+            "description": "An array of objects describing uploads",
+            "schema": {
+              "type": "array",
+              "title": "UploadsArray",
+              "items": { "$ref": "#/definitions/Upload" }
+            }
+          }
+        }
+      }
+    },
+
+    "/upload/dist/{dist}": {
+      "get": {
+        "tags": [ "Upload" ],
+        "operationId": "v3_upload_dist",
+        "summary": "Get uploads for a dist",
+        "description": "This route gets uploads to CPAN for a specific distribution. Asking for a WebSocket will subscribe to a feed of new uploads.",
+        "x-mojo-to": {
+          "controller": "Upload",
+          "action": "get"
+        },
+        "parameters": [
+          { "$ref": "#/parameters/since" },
+          {
+            "name": "dist",
+            "in": "path",
+            "description": "The CPAN distribution name (like 'CPAN-Testers-Schema')",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/paths/~1upload/get/responses/200" },
+          "400": { "$ref": "#/paths/~1upload/get/responses/400" },
+          "404": {
+            "description": "The distribution was not found"
+          }
+        }
+      }
+    },
+
+    "/upload/author/{author}": {
+      "get": {
+        "tags": [ "Upload" ],
+        "operationId": "v3_upload_author",
+        "summary": "Get uploads for an author",
+        "description": "This route gets uploads to CPAN for the specific author. Asking for a WebSocket will subscribe to a feed of new uploads.",
+        "x-mojo-to": {
+          "controller": "Upload",
+          "action": "get"
+        },
+        "parameters": [
+          { "$ref": "#/parameters/since" },
+          {
+            "name": "author",
+            "in": "path",
+            "description": "The CPAN author name (like 'PREACTION')",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/paths/~1upload/get/responses/200" },
+          "400": { "$ref": "#/paths/~1upload/get/responses/400" },
+          "404": {
+            "description": "The author was not found"
+          }
+        }
+      }
+    }
+  },
+
+  "parameters": {
+    "since": {
+      "name": "since",
+      "in": "query",
+      "type": "string",
+      "format": "date-time",
+      "description": "Only send records that have been updated since the given date/time"
+    }
+  },
+
+  "definitions": {
+    "NewReport": {
+      "type": "object",
+      "required": [ "reporter", "environment", "distribution" ],
+      "properties": {
+        "reporter": { "$ref": "#/definitions/Reporter" },
+        "environment": { "$ref": "#/definitions/Environment" },
+        "distribution": { "$ref": "#/definitions/Distribution" }
+      }
+    },
+    "Report": {
+      "description": "CPAN Testers report",
+      "allOf": [
+        { "$ref": "#/definitions/NewReport" },
+        {
+          "type": "object",
+          "required": ["id"],
+          "properties": {
+              "id": { "type": "string" },
+              "created": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "Reporter": {
+      "type": "object",
+      "required": ["email"],
+      "properties": {
+        "name":  { "type": "string" },
+        "email": { "type": "string" }
+      }
+    },
+    "Environment": {
+      "type": "object",
+      "required": ["language", "system"],
+      "properties": {
+        "language": { "$ref": "#/definitions/Language" },
+        "system": { "$ref": "#/definitions/System" },
+        "reporter": { "type": "string" },
+        "toolchain": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "Language": {
+      "type": "object",
+      "discriminator": "name",
+      "required": ["name", "version", "archname"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Perl 5", "Perl 6"]
+        },
+        "archname":  { "type": "string" },
+        "build":     { "type": "string" },
+        "version":   { "type": "string" },
+        "variables": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "Perl 5": {
+      "type": "object",
+      "description": "Language data for Perl 5 reports",
+      "allOf": [
+        { "$ref": "#/definitions/Language" },
+        {
+          "type": "object",
+          "properties": {
+            "commit_id": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "Perl 6": {
+      "type": "object",
+      "description": "Language data for Perl 6 reports",
+      "allOf": [
+        { "$ref": "#/definitions/Language" },
+        {
+          "type": "object",
+          "properties": {
+            "implementation": { "type": "string" },
+            "backend": {
+              "type": "object",
+              "properties": {
+                "engine":  { "type": "string" },
+                "version": { "type": "string" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "System": {
+      "type": "object",
+      "required": ["osname"],
+      "properties": {
+        "osname":          { "type": "string" },
+        "osversion":       { "type": "string" },
+        "hostname":        { "type": "string" },
+        "cpu_count":       { "type": "string" },
+        "cpu_type":        { "type": "string" },
+        "cpu_description": { "type": "string" },
+        "filesystem":      { "type": "string" },
+        "variables": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "Distribution": {
+      "type": "object",
+      "required": ["name", "version", "grade", "output"],
+      "properties": {
+        "name":    { "type": "string" },
+        "version": { "type": "string" },
+        "grade": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "NA", "UNKNOWN"]
+        },
+        "tests":    { "type": "integer", "minimum": 0 },
+        "failures": { "type": "integer", "minimum": 0 },
+        "skipped":  { "type": "integer", "minimum": 0 },
+        "todo":     {
+          "type": "object",
+          "required": ["pass", "fail"],
+          "properties": {
+            "pass": { "type": "integer", "minimum": 0 },
+            "fail": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "duration": { "type": "integer", "minimum": 0 },
+        "comments": { "type": "string" },
+        "output": { "$ref": "#/definitions/TestOutput" },
+        "prerequisites": {
+          "description": "A list of prerequisites",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Prerequisite"
+          }
+        }
+      }
+    },
+    "TestOutput": {
+      "type": "object",
+      "description": "At least one of the properties must be set",
+      "properties": {
+        "uncategorized": { "type": "string" },
+        "configure":     { "type": "string" },
+        "build":         { "type": "string" },
+        "test":          { "type": "string" },
+        "install":       { "type": "string" }
+      }
+    },
+    "Prerequisite": {
+      "type": "object",
+      "required": ["phase", "name", "need"],
+      "properties": {
+        "phase": { "type": "string" },
+        "name":  { "type": "string" },
+        "need":  { "type": "string" },
+        "have":  { "type": "string" }
+      }
+    },
+    "AcceptedReports": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "status": { "type": "string" },
+        "id": { "type": "string" }
+      }
+    },
+
+    "Error": {
+      "title": "OpenAPI Error Object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string", "description": "Human readable description of the error" },
+              "path": { "type": "string", "description": "JSON pointer to the input data where the error occur" }
+            }
+          }
+        }
+      }
+    },
+
+    "Release": {
+      "type": "object",
+      "title": "Release",
+      "description": "A summary of test reports for a single CPAN release",
+      "properties": {
+        "dist": {
+          "type": "string",
+          "description": "The distribution name"
+        },
+        "version": {
+          "type": "string",
+          "description": "The distribution release version"
+        },
+        "author": {
+          "type": "string",
+          "description": "The CPAN ID of the author who released this version of this distribution"
+        },
+        "pass": {
+          "type": "integer",
+          "description": "The number of test passes for this release"
+        },
+        "fail": {
+          "type": "integer",
+          "description": "The number of test failures for this release"
+        },
+        "na": {
+          "type": "integer",
+          "description": "The number of NA results for this release, which means the release does not apply to the tester's machine due to OS, Perl version, or other conditions"
+        },
+        "unknown": {
+          "type": "integer",
+          "description": "The number of unknown reports for this release"
+        }
+      }
+    },
+
+    "Upload": {
+      "type": "object",
+      "title": "Upload",
+      "description": "A release to CPAN",
+      "properties": {
+        "dist": {
+          "type": "string",
+          "description": "The distribution name"
+        },
+        "version": {
+          "type": "string",
+          "description": "The distribution release version"
+        },
+        "author": {
+          "type": "string",
+          "description": "The CPAN ID of the author who released this version of this distribution"
+        },
+        "filename": {
+          "type": "string",
+          "description": "The filename on PAUSE, without the author directory"
+        },
+        "released": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date/time the file was released to CPAN, in UTC"
+        }
+      }
+    }
+  }
+}

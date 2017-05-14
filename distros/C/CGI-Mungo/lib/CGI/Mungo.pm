@@ -9,17 +9,18 @@ CGI::Mungo - Very simple CGI web framework
 
 =head1 SYNOPSIS
 
+	use CGI::Mungo;
 	my $options = {
 		'responsePlugin' => 'Some::Class'
 	};
-	my $m = App->new($options);
+	my $m = CGI::Mungo->new($options);
+	my $actions = {
+		"default" => sub{},	#do nothing
+		"list" => \&someSub(),	#use a named sub
+		"add" => sub{my $var = 1;}	#use an anonymous sub
+	};
+	$m->setActions($actions);
 	$m->run();	#do this thing!
-	###########################
-	package App;
-	use base qw(CGI::Mungo);
-	sub handleDefault{
-		#add code here for landing page
-	}
 
 =head1 DESCRIPTION
 
@@ -32,13 +33,13 @@ everything you need.
 
 use strict;
 use warnings;
+use Digest::SHA1;
 use Carp;
-use Class::Load qw(is_class_loaded);
 use base qw(CGI::Mungo::Base CGI::Mungo::Utils CGI::Mungo::Log);
 use CGI::Mungo::Response;
 use CGI::Mungo::Session;	#for session management
 use CGI::Mungo::Request;
-our $VERSION = "1.9";
+our $VERSION = "1.701";
 #########################################################
 
 =head2 new(\%options)
@@ -63,13 +64,14 @@ sub new{
 	my($class, $options) = @_;
 	if($options->{'responsePlugin'}){	#this option is mandatory
 		my $self = $class->SUPER::new();
+		$self->{'_actions'} = {};
 		$self->{'_options'} = $options;
-		my $sessionClass = $self->__getFullClassName("Session");
+		my $sessionClass = $class . "::Session";
 		if($self->getOption('sessionClass')){
 			$sessionClass = $self->getOption('sessionClass');
 		}
 		$self->{'_session'} = $sessionClass->new();	
-		my $requestClass = $self->__getFullClassName("Request");
+		my $requestClass = $class . "::Request";
 		if($self->getOption('requestClass')){
 			$requestClass = $self->getOption('requestClass');
 		}
@@ -141,6 +143,32 @@ sub getRequest{
 		confess("No request object found");
 	}
 	return $request;
+}
+#########################################################
+
+=pod
+
+=head2 setActions(\%actions)
+
+	my %actions = (
+		'default' => \&showMenu().
+		'list' => \%showList() 
+	)
+	$m->setActions(\%actions);
+
+Sets the actions of the web application using a hash reference. The names of the keys in the hash
+reference will match the value of the given "action" form field from the current request. Hash reference values
+can be references to subs or annoymous subs.
+
+An action of 'default' can be used when a visitor does not request a specific action.
+
+=cut
+
+###########################################################
+sub setActions{
+	my($self, $actions) = @_;
+	$self->{'_actions'} = $actions;
+	return 1;
 }
 #########################################################
 
@@ -242,11 +270,7 @@ This methood is required for the web application to deal with the current reques
 It should be called after any setup is done.
 
 If the response object decides that the response has not been modified then this 
-method will not run any action functions.
-
-The action sub run will be determined by first checking the actions hash if previously
-given to the object then by checking if a method prefixed with "handle" exists in the
-current class.
+method will not run any action functions. 
 
 =cut
 
@@ -260,20 +284,17 @@ sub run{	#run the code for the given action
 		if($self->getOption('debug')){
 			$self->log("Using action: '$action'");
 		}
-		my $subName = "handle" . ucfirst($action);	#add prefix for security
-		my $class = ref($self);
-		if($class->can($subName)){	#default action sub exists
-			$self->log('Using action from auto default');	
+		my $actions = $self->_getActions();
+		my $actionSub = $actions->{$action};
+		if($actionSub){	#got some code to execute
 			eval{
-				$self->$subName();
+				&$actionSub($self);
 			};
 			if($@){	#problem with sub
 				$response->setError("<pre>" . $@ . "</pre>");
 			}
 		}
 		else{	#no code to execute
-			$response->code(404);
-			$response->message('Not Found');
 			$response->setError("No action sub found for: $action");
 		}
 	}
@@ -302,19 +323,13 @@ sub getOption{
 	return $value;
 }
 ###########################################################
-# Private methods
-#########################################################
-sub __getFullClassName{
-	my($self, $name) = @_;
-	no strict 'refs';
-	my $class = ref($self);
-	my $baseClass = @{$class . "::ISA"}[0];	#get base classes
-	my $full = $baseClass . "::" . $name;	#default to base class
-	if(is_class_loaded($class . "::" . $name)){
-		$full = $class . "::" . $name
-	}
-	return $full;
+sub createEtag{
+	my $self = shift;
+	my $request = $self->getRequest();
+	return $self->__getActionDigest() . "-" . $request->getDigest();
 }
+###########################################################
+# Private methods
 #########################################################
 sub __getActionDigest{
 	my $self = shift;
@@ -369,7 +384,7 @@ sub _checkReferer{	#simple referer check for very basic security
 	my $self = shift;
 	my $result = 0;
 	my $host = $ENV{'HTTP_HOST'};
-	if($host && $ENV{'HTTP_REFERER'} && $ENV{'HTTP_REFERER'} =~ m/^(http|https):\/\/$host/){	#simple check here
+	if($ENV{'HTTP_REFERER'} && $ENV{'HTTP_REFERER'} =~ m/^(http|https):\/\/$host/){	#simple check here
 		$result = 1;
 	}
 	else{

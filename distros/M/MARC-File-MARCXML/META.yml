@@ -1,0 +1,26 @@
+---
+abstract: 'MARCXML implementation for MARC records'
+author:
+  - 'The National Library of Finland <kk-unix-admins@helsinki.fi>'
+build_requires:
+  Dist::Zilla::Plugin::ReadmeFromPod: v0.33.0
+  Fennec: v2.17.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MARC-File-MARCXML
+requires:
+  MARC::Record: v2.0.0
+  XML::DOM: v1.4.0
+  XML::Writer: v0.612.0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/natlibfi/marc-file-marcxml/issues
+  homepage: https://github.com/natlibfi/marc-file-marcxml
+  repository: git://git@github.com:natlibfi/marc-file-marcxml.git
+version: 1.0.0

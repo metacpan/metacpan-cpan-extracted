@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+
+use Pod::Simplify;
+
+$x = new Pod::Simplify;
+
+$col=0;
+$lmargin=5;
+if($ENV{COLUMNS}) {
+  $width = $ENV{COLUMNS}-4;
+} else {
+  $width = 75;
+}
+
+sub output_flow {
+  if($col<$lmargin) {
+    print " " x ($lmargin-$col);
+    $col=$lmargin;
+  }
+  foreach(@_) {
+    next if !length;
+    if((length($_) + $col) > $width) {
+      print "\n";
+      print " " x $lmargin;
+      $col = $lmargin;
+    }
+    $col += length($_)+1;
+    s/(.)/$1\x08$1/g if $bold;
+    s/(.)/$1\x08_/g if $underline;
+    print $_." ";
+  }
+}
+
+sub output_verb {
+  my($text,$indent) = @_;
+  if( $col < $indent ) {
+    print " " x ($indent-$col);
+    $col=$indent;
+  }
+  $text =~ s/\n/ "\n" .(" " x $indent)/ges;
+  $text =~ s/ +$//;
+  print $text;
+  $col = length($text)-rindex($text,"\n")-1;
+}
+
+sub flowed {
+  my($out);
+  foreach $i (@_) {
+    if(ref $i eq "ARRAY") {
+      my(@i) = (@$i);
+      my($c) = shift @i;
+      
+      if($c eq "X" or $c eq "R") {
+        flowed(@{$i[0]});
+      } else {
+      
+        $bold++ if $c eq "B";
+        $underline++ if $c eq "I";
+      
+        flowed(@i);
+
+        $bold-- if $c eq "B";
+        $underline-- if $c eq "I";
+      }      
+    } else {
+      output_flow(split(/\s+/,$i));
+    }
+  }
+}
+
+@listtype=();
+
+$idx=0;
+
+sub doindex {
+  foreach (@_) {
+    if(ref $_ eq "ARRAY") {
+      my(@i) = @$_;
+      my($i) = shift @i;
+      if( $i eq "X") {
+        shift @i; # discard printable block
+        $idx++;
+        $name = join("/",@{$i[0]});
+        $name =~ s/([^A-Za-z0-9_])/ "%".sprintf("%.2X",ord($1)) /ge;
+        foreach (@i) {
+          $idx{join("/",@$_)} = [$name,$idx,"perlvar.pod"];
+        }
+        #print "Index: ",Simplify::dumpout([@i]),"\n";
+      } else {
+        doindex(@i);
+      }
+    }
+  }
+}
+
+# See if the column is too far over for the specified left margin
+# equivalent in uglieness and rationale to TeX's "slug".
+sub check_slug {
+  if( $col > $lmargin) {
+    output_flow("[]");
+  }
+}
+
+sub dump2 {
+  my($par,$line,$pos,$cmd,$var1,$var2) = @_;
+  
+  #print "cmd = $cmd\n";
+  
+  if( $cmd eq "begin" ) {
+    if($var1 eq "list") {
+      $lmargin+=5;
+      $width-=5;
+      unshift(@listtype,$var2);
+      unshift(@listnum,1);
+    }
+    elsif($var1 eq "pod") {
+    }
+  }
+  elsif( $cmd eq "end" ) {
+    if($var1 eq "list") {
+      $lmargin-=5;
+      $width+=5;
+      shift(@listtype);
+      shift(@listnum);
+    }
+    elsif($var1 eq "pod") {
+    }
+  }
+  elsif( $cmd eq "item") {
+    $lmargin -= 5;
+    if($listtype[0] == 2) {
+      output( ($listnum[0]++) . ". ");
+    }
+    check_slug;
+    flowed(@$var2);
+    $lmargin += 5;
+    if( $col > $lmargin-2 ) {
+      print "\n";
+      $col=0;
+    } 
+    print "\n";
+    $col=0;
+  }
+  elsif( $cmd eq "head") {
+    #print "<HR><H$var1>", flowed(@$var2), "</H$var1>\n";
+    $underline++;
+    $lmargin -= 2;
+    check_slug;
+    flowed(@$var2);
+    $lmargin += 2;
+    $underline--;
+    print "\n\n";
+    $col=0;
+  }
+  elsif( $cmd eq "verb") {
+    check_slug;
+    output_verb($var1."\n\n",$lmargin+3);
+  }
+  elsif( $cmd eq "flow") {
+    check_slug;
+    flowed(@$var2);
+    print "\n\n";
+    $col=0;
+  }
+}
+
+$x->parse_from_file_by_name("newvar.pod",\&dump2);
+$x->parse_from_file_by_name("newfunc.pod",\&dump2);
+
+##write index
+#foreach (sort keys %idx) {
+#  print join(" ",$_,@{$idx{$_}}),"\n";
+#}
+#
+#dump2(@_) while(@_=splice(@results,0,6));

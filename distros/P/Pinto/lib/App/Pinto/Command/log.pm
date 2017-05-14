@@ -11,7 +11,7 @@ use base 'App::Pinto::Command';
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -22,11 +22,7 @@ sub command_names { return qw(log history) }
 sub opt_spec {
     my ( $self, $app ) = @_;
 
-    return ( 
-    	[ 'stack|s=s'    => 'Show history for this stack'  ],
-      [ 'with-diffs|d' => 'Show a diff for each revision'], 
-      [ 'diff-style=s' => 'Diff style (concise|detailed)' ],
-    );
+    return ( [ 'stack|s=s' => 'Show history for this stack' ], );
 }
 
 #------------------------------------------------------------------------------
@@ -51,7 +47,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -59,7 +58,7 @@ App::Pinto::Command::log - show the revision logs of a stack
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 SYNOPSIS
 
@@ -69,7 +68,9 @@ version 0.12
 
 !! THIS COMMAND IS EXPERIMENTAL !!
 
-This command shows the revision logs for the stack.
+This command shows the commit logs for the stack.  To see the precise
+changes in any particular commit, use the L<App::Pinto::Command::show>
+command.
 
 =head1 COMMAND ARGUMENTS
 
@@ -88,14 +89,6 @@ be shown.
 
 =over 4
 
-=item --with-diffs
-
-=item -d
-
-For each revision, also show the diff from the previous revision.
-If the C<PINTO_DETAILED_DIFF> environment varaible is set to a 
-true value, a detailed diff will be shown.
-
 =item --stack NAME
 
 =item -s NAME
@@ -113,7 +106,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

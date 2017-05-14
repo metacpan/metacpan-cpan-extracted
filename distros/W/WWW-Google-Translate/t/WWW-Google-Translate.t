@@ -28,6 +28,7 @@ BEGIN {
         source      => 'en',
         target      => 'ja',
         format      => 'text',
+        model       => 'mnt',
         q           => 'hello',
         prettyprint => 1,
     );

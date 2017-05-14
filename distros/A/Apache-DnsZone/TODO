@@ -83,7 +83,7 @@
 [Fixed] DnsZone::Debug needs to be worked on && export Debug from DnsZone.pm && get rid of DnsZone::Debug
 [Fixed] Update SQL to include authentication tables
 [Fixed] Install documentation
-[Fixed] $VERSION in all files: ($VERSION) = qq$Revision: 1.19 $ =~ /([\d\.]+)/;
+[Fixed] $VERSION in all files: ($VERSION) = qq$Revision: 1.23 $ =~ /([\d\.]+)/;
 [Fixed] Remove old data in sql/mysql.sql
 [Fixed] Check_before needs Debug?
 [Fixed] Howto make a set of templates?
@@ -91,6 +91,8 @@
 [Fixed] Cname *'s anyway
 [Fixed] Length of records can be exceeded?
 [Fixed] Color of fields in view_domain should be changeable via PerlSetVar. Apache::DnsZone::Config has defaults, remember to write docs for this
+[Fixed] PTR support (for ipv4)
+[Fixed] AAAA support using Net::IP for expanding addresses (including bin/ for AAAA)
 
 For 1.0 to be released (So far):
 
@@ -104,9 +106,20 @@ Forgotten password feature?
 
 Admintools (change password,)
 
-AAA support
-
-PTR support
-
 Crypted passwords in the database (tools need to use this)
 
+ENUM instead of int(1) in mysql? (too much work)
+
+code audit
+
+clearer documentation
+
+PTR bin/ support! addreverse.pl
+
+RP records
+
+Debug numbers cleared up
+
+Split out all dns_(set|update|del)_RECORDTYPE into Apache::DnsZone::DNS::RECORDTYPE for easier addition of more records
+
+sql upgrade scripts

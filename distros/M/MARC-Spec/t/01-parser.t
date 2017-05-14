@@ -1,7 +1,7 @@
 use Test::More;
 use MARC::Spec::Parser;
 
-my $parser = MARC::Spec->parse('006[0-3]/1-3{LDR/0=\A|LDR/0=\X}{LDR/1!=\X}');
+my $parser = MARC::Spec::parse('006[0-3]/1-3{LDR/0=\A|LDR/0=\X}{LDR/1!=\X}');
 
 # checking field
 ok $parser->field->tag eq '006', 'field tag';

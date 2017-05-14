@@ -9,7 +9,7 @@ Bio::Gonzales - Speedy functions to manipulate biological data
 
 =cut
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 
 =head1 SYNOPSIS
@@ -37,7 +37,7 @@ into a array of L<Bio::Gonzales::Seq> objects.
 
 =head1 DESCRIPTION
 
-THIS IS THE ALPHA STAGE, SO BEWARE. MY TIMELINE IS TO GET THE DOCUMENTATION DONE TILL JULY 2014.
+THIS IS THE ALPHA STAGE, SO BEWARE. MY TIMELINE IS TO GET THE DOCUMENTATION DONE TILL MARCH 2013.
 
 Motivation for this package is the lack of speed or ease of use or both in other modules.
 
@@ -55,11 +55,11 @@ Motivation for this package is the lack of speed or ease of use or both in other
 
 =head3 L<Bio::Gonzales::Feat>
 
-=head3 L<Bio::Gonzales::Project::Functions>
-
 =head2 Stable, but undocumented
 
 =head3 L<Bio::Gonzales::Project>
+
+=head3 L<Bio::Gonzales::Project::Functions>
 
 =head3 L<Bio::Gonzales::MiniFeat>
 

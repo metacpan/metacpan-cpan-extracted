@@ -1,0 +1,41 @@
+#
+# number of incrementals per full dump.  (full days)
+#fd = 6.5
+fd = 3.5
+#
+high = 40
+med = 10
+low = 3
+#
+rooti = low
+rootf = low/fd
+worki = med
+workf = med/fd
+#
+#filesystem	host		os	ifreq 	ivalue	ffreq	fvalue
+#
+
+
+/work		earth		hp-ux	12h	worki	4d	workf*8
+/		earth		hp-ux	12h	rooti	5d	rootf*10
+
+/		mars		hp-ux	12h	rooti	4d	rootf*8
+
+/		venus		hp-ux	12h	rooti	4d	rootf*8
+
+/		saturn		sunos	12h	low	4d	low/fd*8
+/usr		saturn		sunos	12h	low	4d	low/fd*8
+/var		saturn		sunos	12h	med	5d	med/fd*10
+/x		saturn		sunos	12h	med	5d	med/fd*10
+average saturn / /usr
+average saturn /var /x
+
+/z		jupiter		hp-ux	12h	high	6d	high/fd*12
+/		jupiter		hp-ux	12h	rooti	4d	rootf*8
+
+/		neptune		hp-ux	12h	rooti	4d	rootf*8
+
+/		mercury		hp-ux	12h	rooti	4d	rootf*8
+
+/		io		hp-ux	12h	rooti	4d	rootf*8
+

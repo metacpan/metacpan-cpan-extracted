@@ -1,0 +1,302 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: misc.pl - Miscellaneous Library</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="name.html">Previous Topic</A> | <A HREF="parse.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="misc.pl">2.5. misc.pl - Miscellaneous Library</A></H1>
+<HR>
+<H2><A NAME="Purpose">2.5.1. Purpose</A></H2>
+<P>This library provides miscellaneous routines.</P>
+<HR>
+<H2><A NAME="Interface">2.5.2. Interface</A></H2>
+<PRE>
+require &quot;misc.pl&quot;;
+
+%<A HREF="#misc_misc_date_strings">misc_date_strings</A> = ...
+
+$result =
+&amp;<A HREF="#misc_MiscCheckRule">MiscCheckRule</A>($_, $rule, $type);
+
+($action, $what) =
+&amp;<A HREF="#misc_MiscDoAction">MiscDoAction</A>($action, $what);
+
+$newtext =
+&amp;<A HREF="#misc_MiscTextWrap">MiscTextWrap</A>($text, $wrap, $prefix, $suffix, $keep_spaces);
+
+$result =
+&amp;<A HREF="#misc_MiscDateFormat">MiscDateFormat</A>($fmt, $time, $msg_type);
+
+$mixed =
+&amp;<A HREF="#misc_MiscUpperToMixed">MiscUpperToMixed</A>($upper);
+
+$upper =
+&amp;<A HREF="#misc_MiscMixedToUpper">MiscMixedToUpper</A>($mixed);
+
+</PRE>
+<HR>
+<H2><A NAME="Description">2.5.3. Description</A></H2>
+<P><STRONG><A NAME="misc_misc_date_strings">misc_date_strings</A></STRONG> contains the string lists used by <STRONG><A NAME="misc_MiscDateFormat">MiscDateFormat</A></STRONG> indexed by the symbols (e.g. 'month') used by that routine.</P>
+<P><STRONG><A NAME="misc_MiscCheckRule">MiscCheckRule</A></STRONG> checks a <EM>rule</EM> for a value <EM>$_</EM>. If an execution error is detected, an appropriate error is output. The result of the code executed is returned as <EM>result</EM>. If <EM>rule</EM> is an empty string, <EM>type</EM> is used to lookup a default rule for that type, if any. If <EM>rule</EM> is still an empty string, 1 is returned.</P>
+<P><STRONG><A NAME="misc_MiscDoAction">MiscDoAction</A></STRONG> executes a block of Perl code (<EM>action</EM>). If an execution error is detected, an appropriate error is output using <EM>what</EM> to name the block of code that failed. The result of the code executed is returned as <EM>result</EM>. <EM>action</EM> is only executed if it exists. If it does not, 1 is returned.</P>
+<P><STRONG><A NAME="misc_MiscTextWrap">MiscTextWrap</A></STRONG> wraps a text string at a margin given by <EM>wrap</EM>. <EM>prefix</EM> is the string to begin each wrapped line. <EM>suffix</EM> is the string to terminate each wrapped line.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG></P>
+<UL>
+<LI><EM>prefix</EM> is not added to the first line
+<LI><EM>suffix</EM> is not added to the last line
+<LI><EM>wrap</EM> includes <EM>prefix</EM> but excludes <EM>suffix</EM></UL>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<P><STRONG><A NAME="misc_MiscDateFormat">MiscDateFormat</A></STRONG> formats a date-time value. <EM>fmt</EM> is a string containing the symbols below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+<TD>
+<STRONG>Example</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$day
+</TD>
+<TD>
+day number in month
+</TD>
+<TD>
+6 or 22
+</TD>
+</TR>
+<TR>
+<TD>
+$day0
+</TD>
+<TD>
+day number in month zero-padded
+</TD>
+<TD>
+06 or 22
+</TD>
+</TR>
+<TR>
+<TD>
+$month
+</TD>
+<TD>
+month name
+</TD>
+<TD>
+January
+</TD>
+</TR>
+<TR>
+<TD>
+$smonth
+</TD>
+<TD>
+abbreviated month name
+</TD>
+<TD>
+Jan
+</TD>
+</TR>
+<TR>
+<TD>
+$monthnum
+</TD>
+<TD>
+month number (1..12)
+</TD>
+<TD>
+6 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$monthnum0
+</TD>
+<TD>
+month number zero-padded (01..12)
+</TD>
+<TD>
+06 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$year
+</TD>
+<TD>
+year
+</TD>
+<TD>
+1995
+</TD>
+</TR>
+<TR>
+<TD>
+$syear
+</TD>
+<TD>
+abbreviated year
+</TD>
+<TD>
+95
+</TD>
+</TR>
+<TR>
+<TD>
+$weekday
+</TD>
+<TD>
+weekday name
+</TD>
+<TD>
+Monday
+</TD>
+</TR>
+<TR>
+<TD>
+$sweekday
+</TD>
+<TD>
+abbreviated weekday name
+</TD>
+<TD>
+Mon
+</TD>
+</TR>
+<TR>
+<TD>
+$hour
+</TD>
+<TD>
+hour (1..24)
+</TD>
+<TD>
+6 or 14
+</TD>
+</TR>
+<TR>
+<TD>
+$hour0
+</TD>
+<TD>
+hour zero-padded (01..24)
+</TD>
+<TD>
+06 or 14
+</TD>
+</TR>
+<TR>
+<TD>
+$shour
+</TD>
+<TD>
+hour (1..12)
+</TD>
+<TD>
+6 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$shour0
+</TD>
+<TD>
+hour zero-padded (01..12)
+</TD>
+<TD>
+06 or 12
+</TD>
+</TR>
+<TR>
+<TD>
+$ampm
+</TD>
+<TD>
+am or pm
+</TD>
+<TD>
+am
+</TD>
+</TR>
+<TR>
+<TD>
+$AMPM
+</TD>
+<TD>
+AM or PM
+</TD>
+<TD>
+PM
+</TD>
+</TR>
+<TR>
+<TD>
+$minute
+</TD>
+<TD>
+minute (0..59)
+</TD>
+<TD>
+0 or 42
+</TD>
+</TR>
+<TR>
+<TD>
+$minute0
+</TD>
+<TD>
+minute zero-padded (00..59)
+</TD>
+<TD>
+00 or 42
+</TD>
+</TR>
+<TR>
+<TD>
+$second
+</TD>
+<TD>
+second (0..59)
+</TD>
+<TD>
+0 or 42
+</TD>
+</TR>
+<TR>
+<TD>
+$second0
+</TD>
+<TD>
+second zero-padded (00..59)
+</TD>
+<TD>
+00 or 42
+</TD>
+</TR>
+</TABLE>
+
+<P><EM>time</EM> is a number of seconds since January 1, 1970. <EM>msg_type</EM> is the type of message, if any, to output when a bad format is found.</P>
+<P><STRONG><A NAME="misc_MiscUpperToMixed">MiscUpperToMixed</A></STRONG> converts a name in an uppercase form (e.g. MY_STRING) to a mixed-case form (e.g. MyString).</P>
+<P><STRONG><A NAME="misc_MiscMixedToUpper">MiscMixedToUpper</A></STRONG> converts a name in a mixed-case form (e.g. MyString) to an uppercase form (e.g. MY_STRING).</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="name.html">Previous Topic</A> | <A HREF="parse.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

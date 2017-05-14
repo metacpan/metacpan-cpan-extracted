@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.003';
+our $VERSION = '0.20';
 
 # method that extracts the items from the remote content and returns them
 sub extract {

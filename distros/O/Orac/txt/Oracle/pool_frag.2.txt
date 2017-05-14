@@ -1,0 +1,2 @@
+*** If "Value" > 20
+*** Problem with Fragmentation? Dynamic SQL? Shared pool?

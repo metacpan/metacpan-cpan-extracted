@@ -1,0 +1,66 @@
+# $Id$
+#
+# >>Title::     SDF Directory Report
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 07-Apr-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# This report generates a directory (tree) of the components (files)
+# included in an SDF document.
+#
+# >>Description::
+#
+# >>Limitations::
+
+# >>Resources::
+#
+# >>Implementation::
+#
+
+
+# Report state
+$sdf_dir_level = 0;
+@sdf_dir_output = ();
+
+# Report event routine
+sub sdf_dir_ReportEvent {
+    local($event) = @_;
+#   local();
+    local($file);
+
+    # We're only interested in the _bof_ and _eof_ macros
+    next unless $event eq 'macro';
+    if ($name eq '_bof_') {
+        $file = $args;
+        $file =~ s/'//g;
+        if ($file eq $var{'DOC_SHORT'}) {
+            $sdf_dir_level = 0;
+            @sdf_dir_output = ("N:{{A[jump='$file']$file}} components:");
+        }
+        else {
+            $file =~ s#^\./##;
+            $sdf_dir_level++;
+            push(@sdf_dir_output, "L$sdf_dir_level" . "[jump='$file'] $file")
+                if $file =~ /\.sdf$/;
+        }
+    }
+    elsif ($name eq '_eof_') {
+        $sdf_dir_level--;
+    }
+}
+
+# Report end routine
+sub sdf_dir_ReportEnd {
+    return @sdf_dir_output;
+}
+
+# package return value
+1;

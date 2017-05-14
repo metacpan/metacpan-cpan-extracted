@@ -1,0 +1,215 @@
+<<if: ZXIDBOOK>>
+<<else: >>Building a Circle-of-Trust Using ZXID
+#####################################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-cot.pd,v 1.6 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-COT 01>>
+<<define: ZXDOC=Building Circles-of-Trust using ZXID>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. This document explains creating CoT.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+ZXID, out of box, starts with default URL (Entity ID), metadata for
+couple of test servers, and demo certificates already configured. The
+Auto-CoT feature that automatically adds IdPs to the Circle-of-Trust
+is enabled.
+
+These are good settings for a demo, but if you want to run any serious
+operation, you will need to address the certificates, trust, and
+admission of partners to the circle of trust yourself. You will also
+need to get others to add your site to their configuration.
+
+When done for high value or liability services, all of this becomes
+rather serious business and you may want to hire a consultant to
+help getting it all right.
+
+(One day I hope this documentation is so good that no consultant
+is needed. Right now this is just a place holder.)
+
+If you are setting up zxididp, see zxid-idp.pd for more specific
+instructions.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+
+2 Metadata of Your Own Site
+===========================
+
+Others can obtain the metadata of your site by accessing
+a URL that is the entity ID of your site, for example:
+
+  https://sp1.zxid.org/zxidhlo?o=B
+
+If they want a file, you can capture the output of the http
+operation in a file, for example
+
+  curl https://sp1.zxid.org/zxidhlo?o=B >mymeta.xml
+  wget -O mymeta.xml https://sp1.zxid.org/zxidhlo?o=B
+
+or just access the URL with web browser and save the page.
+
+2 zxcot - tool
+==============
+
+  Usage: zxcot [options] [dir]
+       zxcot -a [options] [dir] <meta.xml
+       curl https://site.com/metadata.xml | zxcot -a [options] [dir]
+       zxcot -g https://site.com/metadata.xml [options] [dir]
+       zxcot -p https://site.com/metadata.xml
+  [dir]            CoT directory. Default /var/zxid/cot
+  -a               Add metadata from stdin
+  -g URL           Do HTTP(S) GET to URL and add as metadata (if compiled w/libcurl)
+  -n               Dryrun. Do not actually add the metadata. Instead print it to stdout.
+  -s               Swap columns, for easier sorting by URL
+  -p ENTID         Print sha1 name corresponding to an entity ID.
+  -v               Verbose messages.
+  -q               Be extra quiet.
+  -d               Turn on debugging.
+  -h               This help message
+  --               End of options
+
+
+3 Auto-CoT Feature and Well Known Location Method
+=================================================
+
+Automatic Circle-of-Trust (Auto-CoT) feature allows other parties
+metadata to be automatically fetched on the fly as needed. The
+fetch is made by using the entity ID of the other party as
+a URL. This is known as the Well Known Location (WKL) method,
+see [SAML2meta] section 4.1 "Publication and Resolution via Well-Known Location",
+p.29, for normative description of this method. Auto-CoT
+makes setting up the Circle-of-Trust very easy, but has its
+drawbacks: anyone can join, connectivity between entities
+is needed, and WKL method needs to be supported and enabled in the
+partner's server.
+
+When ZXID ships, it has Auto-CoT enabled. To disable Auto-CoT,
+you need to set in your configuration string or file
+
+  MD_FETCH=0
+
+9 Circle-of-Trust: Create a Federation with Other Partners
+==========================================================
+
+<<fi: >>
+
+TBD - This chapter to be written
+
+10 Certificates and PKI Trust
+=============================
+
+*** TBD - This chapter should be elaborated to be a certificate tutorial with
+following contents:
+
+* Intro to certs and private keys
+* Generating self signed cert
+* Generating certificate signing request and using it to obtain
+  commercially issued cert
+* Installing root certs so you can recognize other people's certs
+* Client TLS considerations
+
+For the time being, the short answer is that ZXID uses OpenSSL and
+PEM format certificates. You can use same techniques as you would use for
+Apache / mod_ssl for acquiring certificates.
+
+You should NEVER password protect your private key. There will not
+be any opportunity to supply the password. You should instead protect
+your private key using Unix filesystem permissions. See OpenSSL.org
+or modssl.org FAQs for further information, including how to remove
+a password if you accidentally enabled it.
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+97 FAQ extract
+==============
+
+See zxid-faq.pd for full story.
+
+(*** These answers also appear in main FAQ in README.zxid)
+
+97.9.2 Quick command for looking at certificate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes you get warning messages (in browser) or signature
+validation errors (in IdP end) because the Subject field of the
+certificate does not match your actual domain name. You can
+check this with
+
+  openssl x509 -text </var/zxid/pem/ssl-nopw-cert.pem | grep Subject:
+
+If the domain name is different, then you need to obtain a certificate
+with correct domain name, see next question.
+
+97.9.3 Self signed certificate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID ships with zxid.pem which gets by default copied to /var/zxid/pem
+under various different names. This is fine for testing, but disastrous
+for production or security sentitive use as the private key corresponding
+to zxid.pem certificate is of public knowledge (it is distributed with
+every copy of ZXID) - it offers no security and no non-repudiation
+what-so-ever.
+
+For production or security sensitive install you need to either
+
+1. Obtain certificates from an official certification authority,
+   usually a commercial one. ZXID uses same certificate format as
+   Apache (i.e. the pem format), so aquiring certificates is easi. Or,
+
+2. Generate your own certificate. The simplest case is a self signed
+   certificate:
+
+     openssl req -new -x509 -nodes -keyout pkey.pem -out cert.pem
+     cat cert.pem pkey.pem >/var/zxid/pem/ssl-nopw-cert.pem
+
+The cat step is there because you need to supply both certificate
+and the private key in same file for ZXID to understand it.
+
+> Warning: Although ZXID wants to see the private key in the same
+> file as the certificate, you MUST NOT give this concatenated
+> file to any outsider. Others have legitimate need to know your
+> certificate, but they MUST NOT know your private key. If they
+> ask, you should take special care to delete the private key from
+> the file prior to giving it to them. Often those who need to
+> get your certificate, actually need your metadata: just tell them
+> to fetch it from the Well Known Location URL (i.e. the Entity ID
+> of your SP). ZXID will never leak the private key to the metadata.
+
+
+96 License
+==========
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Copyright (c) 2010-2011 Sampo Kellomäki (sampo@iki.fi), All Rights Reserved.
+Copyright (c) 2012-2015 Synergetics (sampo@synergetics.be), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+<<zxid-ref.pd>>
+
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

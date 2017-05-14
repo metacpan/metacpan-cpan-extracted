@@ -1,0 +1,60 @@
+%module{Mesos};
+#include <SchedulerDriver.hpp>
+#include <ProxyScheduler.hpp>
+#include <XS/MesosUtils.hpp>
+#include <string>
+#include <vector>
+
+
+%name{Mesos::XS::SchedulerDriver} class mesos::perl::SchedulerDriver
+{
+
+%{
+
+static void
+_xs_init(SV* self, mesos::FrameworkInfo framework, std::string master, mesos::perl::MesosChannel* channel, ...)
+    PPCODE:
+        if (SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV) {
+            mesos::perl::SchedulerDriver* driver;
+            // make sure channel ref gets incremented
+            mesos::perl::ProxyScheduler* proxy = new mesos::perl::ProxyScheduler(channel->share());
+            if (items > 4) {
+                mesos::Credential credential( toMsg<mesos::Credential>(ST(4)) );
+                driver = new mesos::perl::SchedulerDriver(framework, master, credential, proxy);
+            } else {
+                driver = new mesos::perl::SchedulerDriver(framework, master, proxy);
+            }
+            sv_magic(SvRV(self), Nullsv, PERL_MAGIC_ext,
+                             (const char*) driver, 0);
+        }
+
+%}
+
+~SchedulerDriver();
+
+Status start();
+
+Status stop(bool failover = false);
+
+Status abort();
+
+Status requestResources(std::vector<mesos::Request> requests);
+
+Status launchTasks(std::vector<mesos::OfferID> offerIds, std::vector<mesos::TaskInfo> tasks, mesos::Filters filters = mesos::Filters());
+
+Status launchTask(mesos::OfferID offerId, std::vector<mesos::TaskInfo> tasks, mesos::Filters filters = mesos::Filters());
+
+Status killTask(mesos::TaskID taskId);
+
+Status declineOffer(mesos::OfferID offerId, mesos::Filters filters);
+
+Status reviveOffers();
+
+Status sendFrameworkMessage(mesos::ExecutorID executorId, mesos::SlaveID slaveId, std::string data);
+
+Status reconcileTasks(std::vector<mesos::TaskStatus> statuses);
+
+Status status()
+    %code{% RETVAL = THIS->status_; %};
+
+};

@@ -31,8 +31,6 @@ my ( $opt, $usage ) = describe_options(
   [ 'verbose|v', "print extra stuff" ],
   [ 'db_only'     => 'create only the database, do not run any blast cmd' ],
   [ 'db_prefix=s' => 'set this as db_prefix for the blast db name' ],
-  [ 'db_hashidx'     => 'pass hash_index cmd to makeblastdb' ],
-  [ 'db_parseids'     => 'pass parse_seqids to makeblastdb' ],
   [
     "type" => hidden => {
       one_of => [
@@ -47,7 +45,7 @@ my ( $opt, $usage ) = describe_options(
     }
   ],
   [ 'use_db=s' => 'use preexisting database' ],
-  [ 'opt|o=s@', "add these options to the blast search, e.g. --opt '-evalue 10e-5' or -o '-outfmt 7'" ],
+  [ 'opt|o=s@', "add these options to the blast search, e.g. --opt '-evalue 10e-5'" ],
   [ 'help',     "print usage message and exit" ],
   [ 'wd=s',     "set working dir, use temp dir as default" ],
 );
@@ -75,8 +73,7 @@ if ( $opt->use_db ) {
     seq_file   => $sfile,
     alphabet   => $blast_type{ $opt->type }[ALPHABET],
     wd         => $dir,
-    hash_index => $opt->db_hashidx,
-    parse_seqids => $opt->db_parseids,
+    hash_index => 0
   };
   $opts->{db_prefix} = $opt->db_prefix if ( $opt->db_prefix );
   $db_location = makeblastdb($opts);

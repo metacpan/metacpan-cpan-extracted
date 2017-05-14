@@ -1,0 +1,5 @@
+__tuning[]
+__endtuning[]
+E[orig_style='E']# This file tests the include macro
+E[orig_style='E']
+E[orig_style='E']!include "include.sdf"; example

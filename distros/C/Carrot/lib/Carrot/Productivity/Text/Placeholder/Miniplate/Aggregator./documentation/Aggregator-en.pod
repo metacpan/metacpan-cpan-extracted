@@ -1,0 +1,52 @@
+﻿=pod
+
+=head1 NAME
+
+Carrot::Productivity::Text::Placeholder::Miniplate::Aggregator - groups groups
+
+=head1 SYNOPSIS
+
+	$class_names->provide(
+		my $template_class = '::Productivity::Text::Placeholder::Template');
+
+	my $template = $template_class->constructor(
+		my $aggregator = '::Aggregator');
+	$aggregator->add_group(
+		my $file_name = '::OS::Unix::File::Name',
+		my $file_properties = '::OS::Unix::File::Properties',
+		);
+	$template->compile('[=file_timestamp_modification=] / [=file_name_only=] / [=file_owner_name=] / [=file_mode_rwx=]');
+
+	$aggregator->set_subject('/tmp/test.dat');
+	print ${$template->execute()}, "<-\n";
+
+=head1 DESCRIPTION
+
+Provides the placeholders of the registered groups. Rationale: there are cases where you want to set the subject only once.
+
+=head1 METHOD REFERENCE (API)
+
+=over 8
+
+=item subject(...)
+
+Is forwarded to registered groups.
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

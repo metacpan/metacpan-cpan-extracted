@@ -1,0 +1,100 @@
+#!/bin/ksh
+
+launche_usage() {
+  /bin/cat <<EOF
+usage: launche [-v] [-c] [envy1] ... -- <shell cmd>
+
+  -c   Clean the environment to precisely simulate the execution of
+       commands run by cron.
+  -v   Increment debugging level.
+EOF
+  exit
+}
+
+if [[ $# -eq 0 ]]; then
+  echo "launche: no parameters";
+  launche_usage;
+fi
+
+typeset -i la_cron=0
+typeset -i la_verbose=0
+la_startup=#STARTUP#
+typeset -i la_loadstartup=0
+la_toload=
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  -c) la_cron=1 ;;
+
+  -v) la_verbose=$(($la_verbose + 1)) ;;
+
+  --) shift; break ;;
+
+  -*) echo "launche: unknown option '$1' (ignored)" ;;
+
+  *)
+    if [[ "$1" = "$la_startup" ]]; then
+      la_loadstartup=1
+    fi
+    la_toload="$la_toload $1"
+    ;;
+  esac
+
+  shift
+done
+
+if [[ $# -eq 0 ]]; then
+  echo "launche: execute what command?"
+  launche_usage;
+fi
+
+if [[ $la_cron -ne 0 ]]; then
+  if [[ $la_verbose -ne 0 ]]; then
+    echo "launche: cleansing the environment"
+  fi
+  la_LOGNAME=$LOGNAME
+  la_HOME=$HOME
+  eval `/bin/env | /bin/sed -e 's/^\([^=]*\)\=.*$/unset \1;/g'`
+  LOGNAME=$la_LOGNAME;  export LOGNAME
+  HOME=$la_HOME;        export HOME
+  SHELL=/bin/sh;        export SHELL
+  unset la_LOGNAME la_HOME
+else
+  # overlay
+  ENVY_PATH=#SHSEARCH#
+  ENVY_STATE=
+  ENVY_DIMENSION=
+fi
+
+if [[ $la_loadstartup -ne 0 ]]; then
+  echo "launche: $la_startup is already loaded automatically (ignored)"
+else
+  la_toload="$la_startup $la_toload"
+fi
+
+# Is it unlikely that LOGNAME or HOME will be unprepared, however,
+# better safe than sorry:
+if [[ x$LOGNAME = x  ]]; then   LOGNAME='root'; export LOGNAME;   fi
+if [[ x$HOME = x ]]; then       HOME=/home/$LOGNAME; export HOME; fi
+
+#INITIAL_ENV#
+
+ENVY_CONTEXT="$*"; export ENVY_CONTEXT
+
+la_dirname=`dirname $0`
+la_envy=$la_dirname/envy.pl
+if [[ -x $la_envy ]]; then
+  if [[ x$la_toload != x ]]; then
+    if [ $la_verbose -ne 0 ]; then
+      echo 'launche: eval `'"$la_envy -v$la_verbose load $la_toload"'`'
+    fi
+    eval `$la_envy -v$la_verbose load $la_toload`
+  fi
+else
+  echo "launche: 'envy' not found at $la_envy: PANIC"
+  exit
+fi
+
+if [ $la_verbose -ne 0 ]; then echo "launche: $*"; fi
+unset la_cron la_verbose la_startup la_toload la_loadstartup la_dirname la_envy
+$*

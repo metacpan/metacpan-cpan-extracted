@@ -1,0 +1,39 @@
+Revision history for Perl extension Myco.
+
+0.01 Nov 29 2004
+
+    - first public alpha release
+
+1.0  Feb 20 2006
+
+    - first mature release version
+
+1.1  Feb 28 2006 - interim version
+
+    - Revised developer documentation
+    - minor tweaks to Makefile.PL
+
+1.2  Mar 17 2006 - interim version
+
+    - added Changes file
+    - Added new util class for miscellaneous subroutines
+    - Enhanced Make/build/test process:
+        - now utilizing Module::Install to automate dependency installs
+        - added install target to copy myco.conf-dist to the local /etc
+          directory
+        - scripted optional installation of of bin/* scripts
+        - beware ugly hack to script around test/no test choices
+    - Refactored Myco::Config to use Config::General to parse files.
+    - removed unsused exception classes from Myco::Exception
+    - removed VERSION info from all class variables and all pod
+
+1.21  Mar 17 2006 - interim version
+
+    - renamed all scripts in bin directory to bin/myco-*
+    
+1.22  Mar 31 2006 - interim version
+
+    - made minor tweaks to be compatible woth Tangram 2.10
+    - cleaned up some problems left-over from last release
+    - renamed all scripts in bin/ to bin/myco-*
+    - fixed randomly inserted bug regarding SCHEMA_CLASSES config entry

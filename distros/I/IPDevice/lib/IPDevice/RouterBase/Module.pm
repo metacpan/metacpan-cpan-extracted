@@ -3,12 +3,12 @@
 ## This file provides a class for holding informations about a router module.
 ####
 
-package RouterBase::Module;
-use RouterBase::Atom;
-use RouterBase::Interface;
+package IPDevice::RouterBase::Module;
+use IPDevice::RouterBase::Atom;
+use IPDevice::RouterBase::Interface;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom);
+@ISA = qw(IPDevice::RouterBase::Atom);
 
 $VERSION = 0.01;
 
@@ -18,12 +18,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::Module
+IPDevice::RouterBase::Module
 
 =head1 SYNOPSIS
 
- use RouterBase::Module;
- my $module = new RouterBase::Module;
+ use IPDevice::RouterBase::Module;
+ my $module = new IPDevice::RouterBase::Module;
  $module(0)->interface(1)->set_encapsulation('ppp');
 
 =head1 DESCRIPTION
@@ -104,7 +104,7 @@ sub get_description {
 
 =head2 set_number($name)
 
-Defines the module number. When created via any class from the RouterBase
+Defines the module number. When created via any class from the IPDevice::RouterBase
 namespace, this is automatically set.
 
 =cut
@@ -179,7 +179,7 @@ sub interface {
   my($self, $intno) = @_;
   my $iface = $self->{interfaces}->{$intno};
   if (!$iface) {
-    $iface = new RouterBase::Interface(name => $intno);
+    $iface = new IPDevice::RouterBase::Interface(name => $intno);
     $iface->set_toplevel($self->toplevel);
     $iface->set_parent($self->parent);
     $iface->set_name($intno);  # Set a default name.
@@ -194,7 +194,7 @@ sub interface {
 Walks through all interfaces calling the function $func.
 Args passed to $func are:
 
-I<$interface>: The L<RouterBase::Interface|RouterBase::Interface>.
+I<$interface>: The L<IPDevice::RouterBase::Interface|IPDevice::RouterBase::Interface>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped and the function returns
@@ -205,7 +205,7 @@ sub foreach_interface {
   my($self, $func, %data) = @_;
   for my $intno (sort {$a <=> $b} keys %{$self->{interfaces}}) {
     my $iface = $self->{interfaces}->{$intno};
-    #print "DEBUG: RouterBase::Module::foreach_interface(): Iface $intno\n";
+    #print "DEBUG: IPDevice::RouterBase::Module::foreach_interface(): Iface $intno\n";
     return FALSE if !$func->($iface, %data);
   }
   return TRUE;
@@ -214,10 +214,10 @@ sub foreach_interface {
 
 =head2 foreach_unit($func, $data)
 
-Walks through all L<RouterBase::LogicalInterface|RouterBase::LogicalInterface>
+Walks through all L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface>
 calling the function $func. Args passed to $func are:
 
-I<$unit>: The L<RouterBase::LogicalInterface|RouterBase::LogicalInterface>.
+I<$unit>: The L<IPDevice::RouterBase::LogicalInterface|IPDevice::RouterBase::LogicalInterface>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, list evaluation will be stopped.
@@ -227,7 +227,7 @@ sub foreach_unit {
   my($self, $func, %data) = @_;
   for my $intno (sort {$a <=> $b} keys %{$self->{interfaces}}) {
     my $int = $self->{interfaces}->{$intno};
-    #print "DEBUG: RouterBase::Module::foreach_unit(): Interface $intno\n";
+    #print "DEBUG: IPDevice::RouterBase::Module::foreach_unit(): Interface $intno\n";
     return FALSE if !$int->foreach_unit($func, %data);
   }
   return TRUE;

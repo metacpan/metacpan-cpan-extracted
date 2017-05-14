@@ -1,0 +1,39 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: output Macro
+
+H2: Interface
+
+!macro_interface "output"
+
+H2: Description
+
+The {{output}} macro dynamically changes the output file being used.
+It can be used in the following ways:
+
+^ output "filename"
++ output ">filename"
++ output "-"
+
+The first form changes the output file to be filename.
+The second form appends the output onto the filename given.
+The third form closes the (current) output file, if any.
+
+H2: Examples
+
+To be completed...
+
+H2: Limitations & Future Directions
+
+{{html}} is the only target which currently supports this macro.

@@ -1,0 +1,24 @@
+---
+abstract: 'Easier Looping over resultsets'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Test::DBIx::Class: '0.52'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-ResultSet-SetControl
+requires:
+  Moo: '2.003001'
+resources:
+  bugtracker: https://github.com/jjn1056/DBIx-Class-ResultSet-SetControl/issues
+  homepage: https://github.com/jjn1056/DBIx-Class-ResultSet-SetControl
+  repository: https://github.com/jjn1056/DBIx-Class-ResultSet-SetControl.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,61 @@
+/* XPM */
+static char *info[] = {
+/* width height num_colors chars_per_pixel */
+"    43    41        6            1",
+/* colors */
+". c #000000",
+"# c #0000ff",
+"a c #848484",
+"b c #c6c6c6",
+"c c None",
+"d c #ffffff",
+/* pixels */
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccaaaaaaaaccccccccccccccccccc",
+"cccccccccccccaaabddddddbaaacccccccccccccccc",
+"cccccccccccaabddddddddddddbaacccccccccccccc",
+"ccccccccccabddddddddddddddddbaccccccccccccc",
+"cccccccccadddddddb####bddddddd.cccccccccccc",
+"ccccccccadddddddd######dddddddd.ccccccccccc",
+"cccccccaddddddddd######ddddddddd.cccccccccc",
+"ccccccabdddddddddb####bdddddddddb.ccccccccc",
+"ccccccadddddddddddddddddddddddddd.acccccccc",
+"cccccabddddddddddddddddddddddddddb.accccccc",
+"cccccadddddddddd#######ddddddddddd.accccccc",
+"cccccadddddddddddd#####ddddddddddd.aacccccc",
+"cccccadddddddddddd#####ddddddddddd.aacccccc",
+"cccccadddddddddddd#####ddddddddddd.aacccccc",
+"cccccadddddddddddd#####ddddddddddd.aacccccc",
+"cccccabddddddddddd#####ddddddddddb.aacccccc",
+"ccccccaddddddddddd#####dddddddddd.aaacccccc",
+"ccccccabdddddddddd#####dddddddddb.aaacccccc",
+"cccccccadddddddd#########ddddddd.aaaccccccc",
+"cccccccc.dddddddddddddddddddddd.aaaaccccccc",
+"ccccccccc.dddddddddddddddddddd.aaaacccccccc",
+"cccccccccc.bddddddddddddddddb.aaaaccccccccc",
+"ccccccccccc..bddddddddddddb..aaaacccccccccc",
+"cccccccccccca...bddddddb...aaaaaccccccccccc",
+"cccccccccccccaaa...bddd.aaaaaaacccccccccccc",
+"cccccccccccccccaaaa.ddd.aaaaacccccccccccccc",
+"cccccccccccccccccca.ddd.aaccccccccccccccccc",
+"cccccccccccccccccccc.dd.aaccccccccccccccccc",
+"ccccccccccccccccccccc.d.aaccccccccccccccccc",
+"cccccccccccccccccccccc..aaccccccccccccccccc",
+"cccccccccccccccccccccccaaaccccccccccccccccc",
+"ccccccccccccccccccccccccaaccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc",
+"ccccccccccccccccccccccccccccccccccccccccccc"
+};
+SIMPLE  =                    T                                                  
+BITPIX  =                    8                                                  
+NAXIS   =                    2                                                  
+NAXIS1  =                   43                                                  
+NAXIS2  =                   41                                                  
+HISTORY Written by XV 3.10a                                                     
+END                                                                             

@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::_LDAP 'ldap';    #link protected ldap
 use Lemonldap::NG::Portal::_WebForm;
 use Lemonldap::NG::Portal::UserDBLDAP;      #inherits
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.3';
 use base qw(Lemonldap::NG::Portal::_WebForm);
 
 *_formateFilter = *Lemonldap::NG::Portal::UserDBLDAP::formateFilter;
@@ -49,7 +49,11 @@ sub authenticate {
 
     # Remember password if password reset needed
     $self->{oldpassword} = $self->{password}
-      if ( $res == PE_PP_CHANGE_AFTER_RESET );
+      if (
+        $res == PE_PP_CHANGE_AFTER_RESET
+        or (    $res == PE_PP_PASSWORD_EXPIRED
+            and $self->{ldapAllowResetExpiredPassword} )
+      );
 
     # Unbind if there was an error
     unless ( $res == PE_OK ) {
@@ -92,6 +96,20 @@ sub authForce {
 # @return display type
 sub getDisplayType {
     return "standardform";
+}
+
+## @method boolean stop
+# Define which error codes will stop Multi process
+# @param res error code
+# @return result 1 if stop is needed
+sub stop {
+    my ( $self, $res ) = @_;
+
+    return 1
+      if ( $res == PE_PP_PASSWORD_EXPIRED
+        or $res == PE_PP_ACCOUNT_LOCKED
+        or $res == PE_PP_CHANGE_AFTER_RESET );
+    return 0;
 }
 
 1;

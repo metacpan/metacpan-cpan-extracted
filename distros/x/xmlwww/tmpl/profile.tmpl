@@ -1,0 +1,21 @@
+<tmpl_include header.tmpl>
+
+<tmpl_var form_start>
+
+<table class="inline">
+	<tr><td>Login</td><td><tmpl_var field_login></td></tr>
+	<tmpl_if register>
+		<tr><td>Password</td><td><tmpl_var field_pass></td></tr>
+		<tr><td>Confirm password</td><td><tmpl_var field_password2></td></tr>
+	</tmpl_if>
+	<tr><td>First name</td><td><tmpl_var field_fname></td></tr>
+	<tr><td>Last name</td><td><tmpl_var field_sname></td></tr>
+	<tr><td>Birth date</td><td><tmpl_var field_birth> (YYYY-MM-DD)</td></tr>
+	<tr><td>INN</td><td><tmpl_var field_inn></td></tr>
+</table>
+
+<input class="<tmpl_var styleclass>_button" type="submit" value="<tmpl_if register>Register<tmpl_else>Save</tmpl_if>" />
+
+<tmpl_var form_end>
+
+<tmpl_include footer.tmpl>

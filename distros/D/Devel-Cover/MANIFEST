@@ -16,6 +16,7 @@ bin/cpancover
 bin/gcov2perl
 dist.ini
 docs/BUGS
+docs/CONTRIBUTING.md
 docs/RELEASE
 docs/TODO
 docs/cpancover
@@ -72,11 +73,11 @@ t/regexp/regexp_eval.t
 test_output/cover/accessor.5.010000
 test_output/cover/alias.5.010000
 test_output/cover/alias1.5.010000
+test_output/cover/and.5.010000
+test_output/cover/and.5.012000
+test_output/cover/and.5.016000
 test_output/cover/bigint.5.010000
 test_output/cover/branch_return_sub.5.010000
-test_output/cover/bug_and.5.010000
-test_output/cover/bug_and.5.012000
-test_output/cover/bug_and.5.016000
 test_output/cover/change.5.010000
 test_output/cover/cond_and.5.010000
 test_output/cover/cond_branch.5.010000
@@ -166,9 +167,9 @@ tests/Taint.pm
 tests/accessor
 tests/alias
 tests/alias1
+tests/and
 tests/bigint
 tests/branch_return_sub
-tests/bug_and
 tests/change.t
 tests/cond_and
 tests/cond_branch

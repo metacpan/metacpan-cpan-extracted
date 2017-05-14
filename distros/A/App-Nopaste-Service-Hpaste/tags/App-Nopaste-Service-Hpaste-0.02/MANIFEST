@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+dist.ini~
+lib/App/Nopaste/Service/Hpaste.pm
+lib/App/Nopaste/Service/Hpaste.pm~
+t/000-load.t

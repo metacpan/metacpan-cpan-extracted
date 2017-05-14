@@ -62,7 +62,7 @@ USAGE
     fields are "username", "name" and "email" (see "verify" for more
     information).
 
-    The method takes either a comma seperated string or a reference to an
+    The method takes either a comma separated string or a reference to an
     array.
 
     This must be called before "login_url".
@@ -87,7 +87,8 @@ USAGE
     If the signature is successfully verified, *verify* returns a reference
     to a hash containing the following values.
 
-    * id
+    *   id
+
         The unique user id of the Bitcard user on your site. It's a 128bit
         number as a 40 byte hex value.
 
@@ -95,16 +96,20 @@ USAGE
         other user data fields are optional, see "info_required" and
         "info_optional").
 
-    * username
+    *   username
+
         The unique username of the Bitcard user.
 
-    * name
+    *   name
+
         The user's display name.
 
-    * email
+    *   email
+
         The user's email address.
 
-    * ts
+    *   ts
+
         The timestamp at which the signature was generated, expressed as
         seconds since the epoch.
 
@@ -145,12 +150,21 @@ USAGE
     Get/set the version of the Bitcard protocol to use. The default version
     is 3.
 
+  $bc->api_secret( $secret )
+    Get/set the api_secret (needed for some API calls, add_invite for
+    example).
+
+  $bc->add_invite
+    Returns a hashref with "invite_url" and "invite_key". Can be used for
+    "invitation only" sites where you have to login before you can access
+    the site.
+
 LICENSE
-    *Authen::Bitcard* is free software; you may redistribute it and/or
-    modify it under the same terms as Perl itself.
+    *Authen::Bitcard* is distributed under the Apache License; see the
+    LICENSE file in the distribution for details.
 
 AUTHOR & COPYRIGHT
-    Except where otherwise noted, *Authen::Bitcard* is Copyright 2004-2006
+    Except where otherwise noted, *Authen::Bitcard* is Copyright 2004-2010
     Develooper LLC, ask@develooper.com.
 
     Parts are Copyright 2004 Six Apart Ltd, cpan@sixapart.com.

@@ -1,11 +1,10 @@
 package urpm::signature;
 
-# $Id: signature.pm 253617 2009-03-05 11:18:45Z tv $
 
 use strict;
 use urpm::msg;
 use urpm::media;
-use urpm::util;
+use urpm::util qw(any basename);
 
 
 =head1 NAME
@@ -104,7 +103,7 @@ sub _check {
 		    $invalid_sources{$filepath} = N("Missing signature (%s)", $verif);
 		}
 	    } elsif ($urpm::args::options{usedistrib} && $medium->{virtual}) {
-		$urpm->{info}(N("SECURITY: Medium \"%s\" has no key (%s)!", $verif));
+		$urpm->{info}(N("SECURITY: Medium \"%s\" has no key (%s)!", $medium->{name}, $verif));
 	    } else {
 		$invalid_sources{$filepath} = N("Medium without key (%s)", $verif);
 	    }
@@ -123,7 +122,6 @@ sub _check {
 
 1;
 
-__END__
 
 =back
 

@@ -1,0 +1,162 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Sizing Columns
+
+H2: Dynamic Sizing
+
+SDF supports dynamic column widths for paper documentation, i.e.
+if a width is not specified for a column, then the column is
+sized based on the text within it and the space available.
+As a result, it is rarely necessary to explicitly size columns.
+
+H2: The format Attribute
+
+The {{format}} attribute of the {{FILT:table}} filter is used
+to specify column widths for paper documentation. Its value
+is either:
+
+* a single number, in which case each digit represents 10% of the
+  width available to the table, or
+
+* a comma-separated list of column width specifications.
+
+For example, to specify 3 columns with widths of 20%, 10% and
+30% respectively:
+
+E:!block table; format=213
+E:Name   Age Address
+E:Bill   42  123 Main Road
+E:Joe    21  456 Queen Street
+E:!endblock
+
+The result is:
+
+!block table; format=213
+Name    Age Address
+Bill    42  123 Main Road
+Joe     21  456 Queen Street
+!endblock
+
+Note: The {{format}} parameter has no impact on HTML
+generation - all columns in HTML are currently dynamically sized.
+
+H2: Column Width Specifications
+
+Examples of the column width specifications supported are given below.
+
+!block table
+Value       Meaning
+30pt        an exact size (other supported units are cm, mm, " and in)
+30%         a percentage of the size available
+30          a percentage of the size available (% is implicit)
+10-20       dynamic size between 10% and 20% of the total width
+-20         dynamic size between 0% and 20% of the total width
+10-         dynamic size between 10% and 100% of the total width
+-           dynamic size between 0% and 100% of the total width
+3*          3 units of the remaining space
+*           same as 1*
+!endblock
+
+For example, in the table below, the second column will be
+twice the size of the last column.
+
+!block example
+!block  table; format="20,2*,10,*"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; format="20,2*,10,*"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+
+H2: Default Sizing Rules and Narrow Tables
+
+If a column is not given a size, the following rules are used:
+
+^ The last unspecified column size is implicitly '*' (i.e. the rest),
+  unless the {{narrow}} attribute is set, in which case the size
+  is implicitly '-' (i.e. as much as needed).
+
++ The other unknown sizes are implicitly '-'.
+
+For example, the first and third columns in the table below
+will be dynamically sized. The first column will take as
+much space as required and the last column will expand so
+that the table takes the full width of the text area.
+
+!block example
+!block  table; format=",30,,10"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; format=",30,,10"
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+
+However, in the example below, each column will only take
+as much space is required, making the table narrower
+than it would be otherwise.
+
+!block example
+!block  table; narrow
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; narrow
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+
+H2: Equalised Column Widths
+
+If an = character is used in place of a - character for a column
+width, then those columns will be equalised in size.
+For example, the second and forth columns in the table
+below will be made equal in size.
+
+!block example
+!block  table; format="20,5=30,10,="
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+!endblock
+
+The output is:
+
+!block  table; format="20,5=30,10,="
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock

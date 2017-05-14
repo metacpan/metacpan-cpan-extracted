@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use Moose;
+use Getopt::Long;
+my($gff,$goterms,$iprlookup,$in,$out,$pathways);
+GetOptions(
+    'f=s' => \$gff,
+    'goterms' => \$goterms,
+    'iprlookup' => \$iprlookup,
+    'i=s' => \$in,
+    'pathways' => \$pathways,
+    'outfile=s' => \$out
+);
+system("touch input_proteins.gff");
+system("touch $out");
+1;

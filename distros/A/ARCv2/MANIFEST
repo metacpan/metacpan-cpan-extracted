@@ -1,0 +1,33 @@
+lib/Arc.pm
+lib/Arc.pod
+lib/Arc/Command.pm
+lib/Arc/Command.pod
+lib/Arc/Command/Get.pm
+lib/Arc/Command/Put.pm
+lib/Arc/Command/Test.pm
+lib/Arc/Command/Uptime.pm
+lib/Arc/Command/Whoami.pm
+lib/Arc/Command/Help.pm
+lib/Arc/Connection.pm
+lib/Arc/Connection.pod
+lib/Arc/Connection/Client.pm
+lib/Arc/Connection/Client.pod
+lib/Arc/Connection/Server.pm
+lib/Arc/Connection/Server.pod
+lib/Arc/Server.pm
+lib/Arc/Server.pod
+lib/arcx.pod
+lib/arcxd.pod
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/arcx
+scripts/arcx.conf
+scripts/arcxd
+scripts/arcxd.conf
+scripts/object.pl
+scripts/PBConfig.pm
+scripts/arcxd.init.d.solaris
+t/arc1.t
+META.yml                                 Module meta-data (added by MakeMaker)

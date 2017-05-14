@@ -13,14 +13,12 @@ builder {
     mount '/oauth' => builder {
         enable 'OAuth', 
             on_success => sub {
-                my ( $self, $token ) = @_;
+                my ( $self, $oauth_data ) = @_;
 
-                my $userinfo = Plack::Middleware::OAuth::UserInfo->new( config => $self->config , token => $token );
-                if( $token->is_provider('Twitter')  || $token->is_provider('GitHub') || $token->is_provider('Google') ) {
-                    my $info = $userinfo->ask( $token->provider );
-                    return $self->to_yaml( $info );
-                }
-                return $self->render( 'Error' );
+                $self->render( 'Success' );
+                $self->to_json( $oauth_data );
+                $self->to_yaml( $oauth_data );
+                $self->redirect( '/another_path' );
             },
 
             # providers => 'eg/providers.yml',  # this also works
@@ -40,7 +38,7 @@ builder {
                     client_secret => '',
                     scope         => 'https://www.google.com/m8/feeds/'
                 },
-                'GitHub' => {
+                'Github' => {
                     client_id => '',
                     client_secret => '',
                     scope => 'user,public_repo'

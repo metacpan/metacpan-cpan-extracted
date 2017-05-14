@@ -1,0 +1,241 @@
+# zxid/sg/saml-schema-metadata-2.0.sh .sg
+# Slightly edited, 27.5.2006, Sampo Kellomaki (sampo@iki.fi)
+# 22.11.2009, added shib metadata support --Sampo
+# $Id: saml-schema-metadata-2.0.sg,v 1.4 2009-11-24 23:53:40 sampo Exp $
+
+target(md,urn:oasis:names:tc:SAML:2.0:metadata)
+import(ds,http://www.w3.org/2000/09/xmldsig#,http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+import(xenc,http://www.w3.org/2001/04/xmlenc#,http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd)
+import(sa,urn:oasis:names:tc:SAML:2.0:assertion,saml-schema-assertion-2.0.xsd)
+ns(idpdisc,urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol)
+# import(xml,http://www.w3.org/XML/1998/namespace,http://www.w3.org/2001/xml.xsd)
+ns(xs,  http://www.w3.org/2001/XMLSchema)
+ns(xml, http://www.w3.org/XML/1998/namespace)
+ns(shibmd, urn:mace:shibboleth:metadata:1.0)
+
+%entityIDType:	 base(xs:anyURI) ;
+
+%localizedNameType:	 base(xs:string)
+  @xml:lang? -> %xs:string  #@xml:lang vs. @lang   ***
+  #@lang? -> %xs:string
+  ;
+
+%localizedURIType:	 base(xs:anyURI)
+  @xml:lang? -> %xs:string  #@xml:lang vs. @lang   ***
+  #@lang? -> %xs:string
+  ;
+
+Extensions	 -> %md:ExtensionsType
+%ExtensionsType:
+  shibmd:Scope*
+  shibmd:KeyAuthority*
+  idpdisc:DiscoveryResponse*
+  any+
+  ;
+
+# What about IndexedEndpointType as needed in idpdisc,urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol --Sampo
+
+%EndpointType:
+  any*
+  @Binding	 -> %xs:anyURI
+  @Location	 -> %xs:anyURI
+  @ResponseLocation?	 -> %xs:anyURI
+  @index?	 -> %xs:unsignedShort
+  @isDefault?	 -> %xs:boolean
+  @any
+  ;
+
+EntitiesDescriptor	 -> %md:EntitiesDescriptorType
+%EntitiesDescriptorType:
+  ds:Signature?
+  md:Extensions?
+  md:EntityDescriptor*         # these were originally choice unbounded
+  md:EntitiesDescriptor*
+  @validUntil?	 -> %dateTime
+  @cacheDuration?	 -> %duration
+  @ID?	 -> %xs:ID
+  @Name?	 -> %xs:string
+  ;
+
+EntityDescriptor	 -> %md:EntityDescriptorType
+%EntityDescriptorType:
+  ds:Signature?
+  md:Extensions?
+  md:RoleDescriptor*                 # following were originally choice unbounded
+  md:IDPSSODescriptor*
+  md:SPSSODescriptor*
+  md:AuthnAuthorityDescriptor*
+  md:AttributeAuthorityDescriptor*
+  md:PDPDescriptor*
+  md:AffiliationDescriptor*
+  md:Organization?
+  md:ContactPerson*
+  md:AdditionalMetadataLocation*
+  @entityID	 -> %md:entityIDType
+  @validUntil?	 -> %dateTime
+  @cacheDuration?	 -> %duration
+  @ID?	 -> %xs:ID
+  @any
+  ;
+
+Organization	 -> %md:OrganizationType
+%OrganizationType:
+  md:Extensions?
+  md:OrganizationName+
+  md:OrganizationDisplayName+
+  md:OrganizationURL+
+  @any
+  ;
+
+OrganizationName	 -> %md:localizedNameType
+OrganizationDisplayName	 -> %md:localizedNameType
+OrganizationURL	 -> %md:localizedURIType
+
+ContactPerson	 -> %md:ContactType
+%ContactType:
+  md:Extensions?
+  md:Company?
+  md:GivenName?
+  md:SurName?
+  md:EmailAddress*
+  md:TelephoneNumber*
+  @contactType	 -> %md:ContactTypeType
+  @any
+  ;
+
+Company	 -> %xs:string
+GivenName	 -> %xs:string
+SurName	 -> %xs:string
+EmailAddress	 -> %xs:anyURI
+TelephoneNumber	 -> %xs:string
+
+%ContactTypeType:	 enum( technical support administrative billing other ) ;
+
+AdditionalMetadataLocation	 -> %md:AdditionalMetadataLocationType
+%AdditionalMetadataLocationType:	 base(xs:anyURI)
+  @namespace	 -> %xs:anyURI
+  ;
+
+RoleDescriptor	 -> %md:RoleDescriptorType
+%RoleDescriptorType:
+  ds:Signature?
+  md:Extensions?
+  md:KeyDescriptor*
+  md:Organization?
+  md:ContactPerson*
+  @ID?	 -> %xs:ID
+  @validUntil?	 -> %dateTime
+  @cacheDuration?	 -> %duration
+  @protocolSupportEnumeration	 -> %xs:anyURI
+  @errorURL?	 -> %xs:anyURI
+  @any
+  ;
+
+KeyDescriptor	 -> %md:KeyDescriptorType
+%KeyDescriptorType:
+  ds:KeyInfo
+  md:EncryptionMethod*
+  @use?	 -> %md:KeyTypes
+  ;
+
+%KeyTypes:	 enum( encryption signing ) ;
+EncryptionMethod	 -> %xenc:EncryptionMethodType
+%SSODescriptorType:	 base(md:RoleDescriptorType)
+  md:ArtifactResolutionService*
+  md:SingleLogoutService*
+  md:ManageNameIDService*
+  md:NameIDFormat*
+  ;
+
+ArtifactResolutionService	 -> %md:EndpointType
+SingleLogoutService	 -> %md:EndpointType
+ManageNameIDService	 -> %md:EndpointType
+NameIDFormat	 -> %xs:anyURI
+
+IDPSSODescriptor	 -> %md:IDPSSODescriptorType
+%IDPSSODescriptorType:	 base(md:SSODescriptorType)
+  md:SingleSignOnService+
+  md:NameIDMappingService*
+  md:AssertionIDRequestService*
+  md:AttributeProfile*
+  sa:Attribute*
+  @WantAuthnRequestsSigned?	 -> %xs:boolean
+  ;
+
+SingleSignOnService	 -> %md:EndpointType
+NameIDMappingService	 -> %md:EndpointType
+AssertionIDRequestService	 -> %md:EndpointType
+AttributeProfile	 -> %xs:anyURI
+
+SPSSODescriptor	 -> %md:SPSSODescriptorType
+%SPSSODescriptorType:	 base(md:SSODescriptorType)
+  md:AssertionConsumerService+
+  md:AttributeConsumingService*
+  @AuthnRequestsSigned?	 -> %xs:boolean
+  @WantAssertionsSigned?	 -> %xs:boolean
+  ;
+
+AssertionConsumerService	 -> %md:EndpointType
+
+AttributeConsumingService	 -> %md:AttributeConsumingServiceType
+%AttributeConsumingServiceType:
+  md:ServiceName+
+  md:ServiceDescription*
+  md:RequestedAttribute+
+  @index	 -> %xs:unsignedShort
+  @isDefault?	 -> %xs:boolean
+  ;
+
+ServiceName	 -> %md:localizedNameType
+ServiceDescription	 -> %md:localizedNameType
+
+RequestedAttribute	 -> %md:RequestedAttributeType
+%RequestedAttributeType:	 base(sa:AttributeType)
+  @isRequired?	 -> %xs:boolean
+  ;
+
+AuthnAuthorityDescriptor	 -> %md:AuthnAuthorityDescriptorType
+%AuthnAuthorityDescriptorType:	 base(md:RoleDescriptorType)
+    md:AuthnQueryService+
+    md:AssertionIDRequestService*
+    md:NameIDFormat*
+  ;
+
+AuthnQueryService	 -> %md:EndpointType
+
+PDPDescriptor	 -> %md:PDPDescriptorType
+%PDPDescriptorType:	 base(md:RoleDescriptorType)
+  md:AuthzService+
+  md:AssertionIDRequestService*
+  md:NameIDFormat*
+  ;
+
+AuthzService	 -> %md:EndpointType
+
+AttributeAuthorityDescriptor	 -> %md:AttributeAuthorityDescriptorType
+%AttributeAuthorityDescriptorType:	 base(md:RoleDescriptorType)
+  md:AttributeService+
+  md:AssertionIDRequestService*
+  md:NameIDFormat*
+  md:AttributeProfile*
+  sa:Attribute*
+  ;
+
+AttributeService	 -> %md:EndpointType
+
+AffiliationDescriptor	 -> %md:AffiliationDescriptorType
+%AffiliationDescriptorType:
+  ds:Signature?
+  md:Extensions?
+  md:AffiliateMember+
+  md:KeyDescriptor*
+  @affiliationOwnerID	 -> %md:entityIDType
+  @validUntil?	 -> %dateTime
+  @cacheDuration?	 -> %duration
+  @ID?	 -> %xs:ID
+  @any
+  ;
+
+AffiliateMember	 -> %md:entityIDType
+
+#EOF

@@ -1,0 +1,3 @@
+---
+perl: 5.20.3
+deps: dzil

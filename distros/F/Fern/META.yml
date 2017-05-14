@@ -1,0 +1,20 @@
+---
+abstract: 'XML tree creator'
+author:
+  - 'Various employees of the Washington University Genome Institute'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fern
+requires:
+  Exporter: 0
+  Scalar::Util: 0
+  Test::Most: 0
+  override: 0
+version: 0.2

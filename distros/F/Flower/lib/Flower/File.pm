@@ -1,10 +1,9 @@
 package Flower::File;
 
-use 5.12.0;
 
 use strict;
 use warnings;
-
+use feature qw(say);
 use Carp qw/confess/;
 
 use overload '""' => \&to_string;

@@ -1,11 +1,11 @@
 package Package::groups ;
-$VERSION = 2.40 ;
+$VERSION = 2.21 ;
 use 5.006_001 ;
 use strict ;
 
 ; use Class::groups
 ; our @ISA = qw| Class::groups |
-
+   
 ; 1
 
 __END__
@@ -16,7 +16,7 @@ __END__
 
 Object::groups - Pragma to implement group of properties
 
-=head1 VERSION 2.40
+=head1 VERSION 2.21
 
 Included in OOTools 2.21 distribution.
 

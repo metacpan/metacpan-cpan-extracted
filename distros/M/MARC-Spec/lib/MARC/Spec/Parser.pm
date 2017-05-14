@@ -10,7 +10,7 @@ require MARC::Spec::Comparisonstring;
 require MARC::Spec::Subspec;
 use namespace::clean;
 
-our $VERSION = '0.1.4';
+our $VERSION = '1.0.0';
 
 has spec => (
     is => 'rw',

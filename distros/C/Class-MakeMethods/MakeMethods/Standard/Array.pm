@@ -176,7 +176,7 @@ sub new {
       }
       return $self;
     }
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 ########################################################################
@@ -235,7 +235,7 @@ sub scalar {
 	$self->[$index];
       }
     }
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 ########################################################################
@@ -355,7 +355,7 @@ sub array {
 	array_splicer( $self->[$index], @_ );
       }
     }
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 ########################################################################
@@ -457,7 +457,7 @@ sub hash {
 				   $self->[$index]
       }
     }
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 ########################################################################
@@ -534,7 +534,7 @@ sub object {
 	}
       }
     }
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 ########################################################################

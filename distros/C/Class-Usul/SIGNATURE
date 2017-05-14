@@ -15,15 +15,15 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 fb2ed095c65c22ad1c147a20785bbd83e626c109 Build.PL
-SHA1 5807fcbdee7b6d367c33c741a19fff26db6a0dc5 Changes
+SHA1 92bc719fe155b8c81a686c26cf398db506d10570 Changes
 SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
 SHA1 c87e97b52b55a9271839abe39a7240571ef395cc MANIFEST
-SHA1 883c7c57d718c728a5e7d8850a49f41958541b8c META.json
-SHA1 fc0b0a9a490e78086fd9dd614ad169f114e057d1 META.yml
-SHA1 e3ff180fb5b7345f82e5d4fdc8aa58be54ddc411 README
+SHA1 58c82e1d8c2af5defdb5e5e25131f6bb4c7e5c69 META.json
+SHA1 80f71cc43529c248b2e24bdeaec54e1e05e10106 META.yml
+SHA1 ce009557601c2ec0e754f4528d19ebc6692b028e README
 SHA1 9a90ad2af3871614e9492d804905f5cad788b495 examples/usul_cli
 SHA1 fe35dbfb5d7299dbf1ebdc7a8ac4f01beb5dcc8c examples/usul_lock
-SHA1 e47245bca6017655b13760150634b083cfdd5e2d lib/Class/Usul.pm
+SHA1 de1b11604d2a3b2f007f59ea1a2cd0aeccadecc2 lib/Class/Usul.pm
 SHA1 fb8d5d5ddd027fba5d77f41bf73b2f4a2cb840c9 lib/Class/Usul/Config.pm
 SHA1 5b8dd0f078535dfb2a5022d856ff83b1a6823348 lib/Class/Usul/Config/Programs.pm
 SHA1 85dc77fcb70029606b891f0a51c915f08f3fec47 lib/Class/Usul/Constants.pm
@@ -43,7 +43,7 @@ SHA1 fe85b8e569932cff52c6e36232149c54e60d0568 lib/Class/Usul/Options.pm
 SHA1 2116a460b47cbcacabf4e7d2d89d7569e86c97b2 lib/Class/Usul/Programs.pm
 SHA1 dbd609728de81174acf7576ef81273f3454bffe7 lib/Class/Usul/Response/IPC.pm
 SHA1 6ffea9ec622180ff34618fb5c5c9e9a138b39c32 lib/Class/Usul/Response/Table.pm
-SHA1 b4b12b86c15e7896daf9f964ba55b83ba368a0d1 lib/Class/Usul/Schema.pm
+SHA1 24b6ed06b6803def6b5ed478401e06ea86cb5bb0 lib/Class/Usul/Schema.pm
 SHA1 360c4c33735652ba7fed20dca457a59ccc84feab lib/Class/Usul/Time.pm
 SHA1 ab8019c0861af607d2907650fc93a4aa59b976cd lib/Class/Usul/TraitFor/ConnectInfo.pm
 SHA1 b271553beae66083c2825082fa65709b8f40a5aa lib/Class/Usul/TraitFor/DebugFlag.pm
@@ -85,11 +85,11 @@ SHA1 f3fa9441b5e9f62574c7fd1d1fcde932496c6c4f t/test.sh
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJZBq+PAAoJEK492j4Im1Bp8lMH/iBJD5mk+VTq+RRKJi/2vj/3
-dJP8uXevckKW2EFqZpC55h8TqzylS+qyKpsfPObLHwlZg7hqGni6/zgV+F5pX3ue
-LBs/B4GVELqX/rz8e4ExRszfRHzCRboe57YgOft32+T/aw+wHA/k2zplkopAhq76
-3Z/9Teiw30W6DwBfrzOTShK12qUHT+Fj1hsniGBUdS044BPSqzOYvnLofqIkX6lI
-sJIviz2oZcNpCUAyofl0KoBiUB78nYANGtGj2WvL855gWsoMleBfYo967GsvpVHQ
-1Y03UhscGFkQQvl2GsEMdbgbZ86sr18N+MEqa1dT8apyXy5FavDOamDL5d5ZypA=
-=dZ7V
+iQEcBAEBAgAGBQJZFkBCAAoJEK492j4Im1BpRUkH+wSoDV9WZ2O+r+sy0x0P9L7O
+XPrm+P8/fYUvK9wRk/iKypxgtx4vMwBL/fnL4Dg9rh7Tl66ySU36S+aFbE4qCBNv
+VWE9KHGjjZjL2TmpnmvGoHNlwcQcnmOXEq/3CQwE99eWPtywKAUi+8AbfQWhKgNX
+1YGAV0vWNxeoasL9UX4s7d1iiC2OFOHgk7pAQ1cXnsTvobDt5uBpavVA18qjCAYG
+zA+WNCW/tmhOA/fSDSTEUR9AaSOh3ax2G+t3exqqgoOgV2PT4WyaLUDRqdaEUusj
+82C3dmehrWyRgNWvbwAi71Tlglul3lRezhTCaRDEhVYj84Xm9cVjHkSlKbqURcQ=
+=uuNs
 -----END PGP SIGNATURE-----

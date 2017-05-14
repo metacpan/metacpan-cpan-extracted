@@ -1,0 +1,30 @@
+---
+abstract: 'A Perl HTML pretty printer to use with Google prettify CSS skins, no JavaScript required!'
+author:
+  - 'David Farrell <sillymoos@cpan.org> L<PerlTricks.com|http://perltricks.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PPI-Prettify
+requires:
+  B::Keywords: '0'
+  Carp: '0'
+  Exporter: '0'
+  HTML::Entities: '0'
+  List::MoreUtils: '0'
+  PPI::Document: '0'
+  Perl::Critic::Utils: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/sillymoose/ppi-prettify
+  repository: https://github.com/sillymoose/ppi-prettify.git
+version: '0.07'

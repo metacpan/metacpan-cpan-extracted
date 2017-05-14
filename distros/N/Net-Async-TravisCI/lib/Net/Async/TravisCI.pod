@@ -1,0 +1,127 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::TravisCI
+at lib/Net/Async/TravisCI.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::TravisCI - interact with the Travis CI API
+
+=head1 VERSION
+
+version 0.002
+
+=head1 DESCRIPTION
+
+Does things to Travis. Terrible, nasty things, most of which are sadly not yet documented.
+
+=head2 configure
+
+Applies configuration, which at the moment would involve zero or more of the following
+named parameters:
+
+=over 4
+
+=item * token - a L<TravisCI token|https://blog.travis-ci.com/2013-01-28-token-token-token>
+
+=back
+
+=head2 endpoints
+
+Returns the hashref of API endpoints, loading them on first call from the C<share/endpoints.json> file.
+
+=head2 endpoint
+
+Processes the given endpoint as a template, using the named parameters
+passed to the method.
+
+=head2 http
+
+Returns the HTTP instance used for communicating with Travis.
+
+Currently autocreates a L<Net::Async::HTTP> instance.
+
+=head2 auth_info
+
+Returns authentication info as parameters suitable for the L</http> methods.
+
+=head2 api_key
+
+Github API key.
+
+=head2 token
+
+Travis token.
+
+=head2 mime_type
+
+MIME type to use for requests. Hardcoded default to C<travis-ci.2+json>.
+
+=head2 base_uri
+
+Base URI for Travis requests.
+
+Hardcoded to the B<private> Travis CI server, L<https://api.travis-ci.com>.
+
+=head2 http_get
+
+Issues an HTTP GET request.
+
+=head2 http_post
+
+Performs an HTTP POST request.
+
+=head2 github_token
+
+Sets the github token.
+
+=head2 accounts
+
+Retrieves accounts.
+
+=head2 users
+
+Retrieves users.
+
+=head2 jobs
+
+Retrieves jobs.
+
+=head2 cancel_job
+
+Cancels a specific job by ID.
+
+=head2 pusher_auth
+
+Deals with pusher auth, used for tailing logs.
+
+=head2 pusher
+
+Handles the pusher instance.
+
+=head2 config
+
+Applies Travis config.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.

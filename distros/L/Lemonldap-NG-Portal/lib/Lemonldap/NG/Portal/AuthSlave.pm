@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::_Slave;
 use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::AuthNull;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.9.1';
 our @ISA     = qw(Lemonldap::NG::Portal::AuthNull);
 
 ## @apmethod int extractFormInfo()
@@ -20,7 +20,7 @@ sub extractFormInfo {
     my $self = shift;
 
     return PE_FORBIDDENIP
-      unless ( $self->checkIP );
+      unless ( $self->checkIP and $self->checkHeader );
 
     my $user_header = $self->{slaveUserHeader};
     $user_header = 'HTTP_' . uc($user_header);
@@ -91,7 +91,7 @@ compatible portals with Apache authentication.
 
 =head1 DESCRIPTION
 
-This library just overload few methods of Lemonldap::NG::Portal::Simple to 
+This library just overload few methods of Lemonldap::NG::Portal::Simple to
 create sessions for anonymous users.
 
 See L<Lemonldap::NG::Portal::Simple> for usage and other methods.
@@ -131,7 +131,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2011-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

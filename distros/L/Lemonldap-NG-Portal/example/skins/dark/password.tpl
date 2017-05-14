@@ -10,6 +10,7 @@
     <TMPL_IF NAME="AUTH_URL">
       <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
     </TMPL_IF>
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
     <h3><lang en="Change your password" fr="Changez votre mot de passe" /></h3>
 

@@ -61,116 +61,121 @@ for \my %upload ( $data{ Upload }->@* ) {
     $upload{ released } = $dt->datetime . 'Z';
 }
 
-subtest 'all uploads' => sub {
-    $t->get_ok( '/v1/upload' )
-      ->status_is( 200 )
-      ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[0..2] ] )
-      ->or( sub { diag explain $_[0]->tx->res->json } );
+subtest '/v1/upload' => \&_test_api, '/v1';
+subtest '/v3/upload' => \&_test_api, '/v3';
 
-    subtest 'since' => sub {
-        $t->get_ok( '/v1/upload?since=2016-11-19T03:05:00Z' )
+sub _test_api( $base ) {
+    subtest 'all uploads' => sub {
+        $t->get_ok( $base . '/upload' )
           ->status_is( 200 )
-          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[1..2] ] )
+          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[0..2] ] )
           ->or( sub { diag explain $_[0]->tx->res->json } );
+
+        subtest 'since' => sub {
+            $t->get_ok( $base . '/upload?since=2016-11-19T03:05:00Z' )
+              ->status_is( 200 )
+              ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[1..2] ] )
+              ->or( sub { diag explain $_[0]->tx->res->json } );
+        };
     };
-};
 
-subtest 'by dist' => sub {
-    $t->get_ok( '/v1/upload/dist/My-Dist' )
-      ->status_is( 200 )
-      ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[0,1] ] );
-
-    subtest 'since' => sub {
-        $t->get_ok( '/v1/upload/dist/My-Dist?since=2016-11-19T03:05:00Z' )
+    subtest 'by dist' => sub {
+        $t->get_ok( $base . '/upload/dist/My-Dist' )
           ->status_is( 200 )
-          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}[1] ] );
+          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[0,1] ] );
+
+        subtest 'since' => sub {
+            $t->get_ok( $base . '/upload/dist/My-Dist?since=2016-11-19T03:05:00Z' )
+              ->status_is( 200 )
+              ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}[1] ] );
+        };
+
+        subtest 'dist not found' => sub {
+            $t->get_ok( $base . '/upload/dist/NOT_FOUND' )
+              ->status_is( 404 )
+              ->json_is( {
+                  errors => [ { message =>  'Distribution "NOT_FOUND" not found', 'path' => '/' } ],
+              } );
+        };
     };
 
-    subtest 'dist not found' => sub {
-        $t->get_ok( '/v1/upload/dist/NOT_FOUND' )
-          ->status_is( 404 )
-          ->json_is( {
-              errors => [ { message =>  'Distribution "NOT_FOUND" not found', 'path' => '/' } ],
-          } );
-    };
-};
-
-subtest 'by author' => sub {
-    $t->get_ok( '/v1/upload/author/PREACTION' )
-      ->status_is( 200 )
-      ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[0,2] ] );
-
-    subtest 'since' => sub {
-        $t->get_ok( '/v1/upload/author/PREACTION?since=2016-11-19T03:05:00Z' )
+    subtest 'by author' => sub {
+        $t->get_ok( $base . '/upload/author/PREACTION' )
           ->status_is( 200 )
-          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}[2] ] );
+          ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}->@[0,2] ] );
+
+        subtest 'since' => sub {
+            $t->get_ok( $base . '/upload/author/PREACTION?since=2016-11-19T03:05:00Z' )
+              ->status_is( 200 )
+              ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Upload}[2] ] );
+        };
+
+        subtest 'author not found' => sub {
+            $t->get_ok( $base . '/upload/author/NOT_FOUND' )
+              ->status_is( 404 )
+              ->json_is( {
+                  errors => [ { message =>  'Author "NOT_FOUND" not found', path => '/' } ],
+              } );
+        };
     };
 
-    subtest 'author not found' => sub {
-        $t->get_ok( '/v1/upload/author/NOT_FOUND' )
-          ->status_is( 404 )
-          ->json_is( {
-              errors => [ { message =>  'Author "NOT_FOUND" not found', path => '/' } ],
-          } );
+    subtest 'input validation' => sub {
+
+        subtest '"since" must be an ISO8601 date/time' => sub {
+            $t->get_ok( $base . '/upload/dist/My-Dist?since=Sat Nov 19 14:18:40 2016' )
+              ->status_is( 400 )
+              ->json_has( '/errors' )
+              ->or( sub { diag explain shift->tx->res->json } );
+        };
     };
-};
 
-subtest 'input validation' => sub {
+    subtest 'websocket feeds' => sub {
+        my @warnings;
+        local $SIG{__WARN__} = sub( @warns ) { push @warnings, @warns };
 
-    subtest '"since" must be an ISO8601 date/time' => sub {
-        $t->get_ok( '/v1/upload/dist/My-Dist?since=Sat Nov 19 14:18:40 2016' )
-          ->status_is( 400 )
-          ->json_has( '/errors' )
-          ->or( sub { diag explain shift->tx->res->json } );
-    };
-};
-
-subtest 'websocket feeds' => sub {
-    my @warnings;
-    local $SIG{__WARN__} = sub( @warns ) { push @warnings, @warns };
-
-    my $broker = Mojolicious->new;
-    $broker->routes->websocket( '/sub/*topic' )->to( cb => sub( $c ) {
-        state $peers = [];
-        push $peers->@*, $c;
-        $t->app->log->info( "Added 1, Got " . ( scalar @$peers ) . " peers" );
-        $_->send( 'Got topic: ' . $c->stash( 'topic' ) ) for $peers->@*;
-        $c->on( finish => sub( $c, $tx ) {
-            $peers = [ grep { $_ ne $c } $peers->@* ],
-            $t->app->log->info( "Lost 1, Got " . ( scalar @$peers ) . " peers" );
+        my $broker = Mojolicious->new;
+        $broker->routes->websocket( '/sub/*topic' )->to( cb => sub( $c ) {
+            state $peers = [];
+            push $peers->@*, $c;
+            $t->app->log->info( "Added 1, Got " . ( scalar @$peers ) . " peers" );
+            $_->send( 'Got topic: ' . $c->stash( 'topic' ) ) for $peers->@*;
+            $c->on( finish => sub( $c, $tx ) {
+                $peers = [ grep { $_ ne $c } $peers->@* ],
+                $t->app->log->info( "Lost 1, Got " . ( scalar @$peers ) . " peers" );
+            } );
+            $c->finish if $c->stash( 'topic' ) =~ /STOP$/;
         } );
-        $c->finish if $c->stash( 'topic' ) =~ /STOP$/;
-    } );
-    my $broker_t = Test::Mojo->new( $broker );
+        my $broker_t = Test::Mojo->new( $broker );
 
-    my $broker_url = $broker->ua->server->nb_url;
-    $t->app->config->{broker} = 'ws://' . $broker_url->host_port;
+        my $broker_url = $broker->ua->server->nb_url;
+        $t->app->config->{broker} = 'ws://' . $broker_url->host_port;
 
-    $t->websocket_ok( '/v1/upload' )
-      ->message_ok
-      ->message_is( 'Got topic: upload/dist', 'default to all uploaded dists' )
-      ;
+        $t->websocket_ok( $base . '/upload' )
+          ->message_ok
+          ->message_is( 'Got topic: upload/dist', 'default to all uploaded dists' )
+          ;
 
-    my $peer = Test::Mojo->new( $t->app );
-    $peer->websocket_ok( '/v1/upload/dist/Statocles' )
-      ->message_ok
-      ->message_is( 'Got topic: upload/dist/Statocles' )
-      ->finish_ok;
+        my $peer = Test::Mojo->new( $t->app );
+        $peer->websocket_ok( $base . '/upload/dist/Statocles' )
+          ->message_ok
+          ->message_is( 'Got topic: upload/dist/Statocles' )
+          ->finish_ok;
 
-    $t->message_ok
-      ->message_is( 'Got topic: upload/dist/Statocles', 'got another message' )
-      ->finish_ok
-      ;
+        $t->message_ok
+          ->message_is( 'Got topic: upload/dist/Statocles', 'got another message' )
+          ->finish_ok
+          ;
 
-    $t->websocket_ok( '/v1/upload/author/STOP' )
-      ->message_ok
-      ->message_is( 'Got topic: upload/author/STOP' )
-      ->finish_ok
-      ;
+        $t->websocket_ok( $base . '/upload/author/STOP' )
+          ->message_ok
+          ->message_is( 'Got topic: upload/author/STOP' )
+          ->finish_ok
+          ;
 
-    ok !@warnings, '... and we did it without warnings'
-        or diag explain \@warnings;
-};
+        ok !@warnings, '... and we did it without warnings'
+            or diag explain \@warnings;
+    };
+}
 
 done_testing;
 

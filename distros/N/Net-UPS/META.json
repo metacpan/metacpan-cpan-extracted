@@ -1,0 +1,78 @@
+{
+   "abstract" : "Implementation of UPS Online Tools API in Perl",
+   "author" : [
+      "Sherzod B. Ruzmetov <sherzodr@cpan.org>",
+      "Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-UPS",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Struct" : "0.58",
+            "Encode" : "0",
+            "File::Spec" : "0",
+            "IO::File" : "0",
+            "IO::Socket::SSL" : "0",
+            "IO::Socket::SSL::Utils" : "0",
+            "LWP::UserAgent" : "0",
+            "Mozilla::CA" : "0",
+            "Scalar::Util" : "0",
+            "Task::Weaken" : "0",
+            "XML::Simple" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Data::Printer" : "0",
+            "File::Temp" : "0",
+            "HTTP::Response" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Time::HiRes" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/NET-A-PORTER/Net-UPS.git",
+         "web" : "https://github.com/NET-A-PORTER/Net-UPS.git"
+      }
+   },
+   "version" : "0.16"
+}
+

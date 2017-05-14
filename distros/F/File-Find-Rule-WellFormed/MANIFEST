@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+lib/File/Find/Rule/WellFormed.pm
+README
+t/oo.t
+t/func.t
+t/data/one.xml
+t/data/two.xml

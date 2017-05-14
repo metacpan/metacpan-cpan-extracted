@@ -8,7 +8,7 @@ use Devel::Cover::DB;
 use Devel::Cover::Html_Common "launch";
 use Devel::Cover::Truth_Table;
 
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.25'; # VERSION
 our $LVERSION = do { eval '$VERSION' || "0.001" };  # for development purposes
 
 #-------------------------------------------------------------------------------
@@ -751,7 +751,7 @@ Devel::Cover::Report::Html_minimal - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -809,7 +809,7 @@ Devel::Cover
 
 =head1 LICENCE
 
-Copyright 2001-2016, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2017, Paul Johnson (paul@pjcj.net)
 
 This software is free. It is licensed under the same terms as Perl itself.
 

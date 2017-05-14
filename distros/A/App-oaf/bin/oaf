@@ -1,0 +1,177 @@
+#!perl
+
+#
+# Output as Format: read from stdin and output it as code in the given format
+# https://github.com/sshaw/output-as-format
+#
+# Based of of copy-as-format for Emacs: https://github.com/sshaw/copy-as-format
+#
+# Copyright (c) 2017 Skye Shaw
+#
+# This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+our $VERSION = '0.01';
+
+sub HELP_MESSAGE {
+    my $out = shift;
+    print $out <<USAGE
+usage: oaf [-mps] [-f format] [-l lang]
+Output stdin as code in the given format
+  -f FORMAT Format to output, defaults to markdown
+  --help    Display this message
+  -l LANG   Programming language of stdin, if supported by FORMAT
+  -m        Force multiline output, if supported by FORMAT
+  -p        Print the supported formats and exit
+  -s        Force single line output, if supported by FORMAT
+  --version Print the version
+USAGE
+}
+
+sub VERSION_MESSAGE {
+  my $out = shift;
+  print $out "Output as Format v$VERSION\n";
+}
+
+sub html_escape {
+  my $text = shift;
+  my %escapes = ('&' => '&amp;', '<' => '&lt;');
+
+  $$text =~ s/[&<]/$escapes{$&}/eg;
+}
+
+sub disqus {
+  my ($snippet, undef, $lang) = @_;
+  html_escape(\$snippet);
+
+  printf "<pre><code class='%s'>\n%s</code></pre>\n", $lang || '', $snippet;
+}
+
+sub github {
+  my ($snippet, $multiline, $lang) = @_;
+
+  if ($multiline) {
+    printf "```%s\n%s```\n", $lang || '', $snippet;
+  } else {
+    printf '`%s`', $snippet;
+  }
+}
+
+sub hipchat {
+  my $snippet = shift;
+  printf '/code %s', $snippet;
+}
+
+sub html {
+  my ($snippet, $multiline, $lang) = @_;
+  html_escape(\$snippet);
+
+  if ($multiline) {
+    printf "<pre><code>\n%s</code></pre>", $snippet;
+  }
+  else {
+    printf '<code>%s</code>', $snippet;
+  }
+}
+
+sub jira {
+  my ($snippet, $multiline, $lang) = @_;
+  if ($multiline) {
+    printf "{code%s}\n%s{code}\n", $lang ? ":$lang" : '', $snippet;
+  }
+  else {
+    printf '{{%s}}', $snippet;
+  }
+}
+
+sub markdown {
+  my ($snippet, $multiline) = @_;
+
+  if ($multiline) {
+    $snippet =~ s/^/' ' x 4/gme;
+    print $snippet;
+  }
+  else {
+    printf '`%s`', $snippet;
+  }
+}
+
+sub mediawiki {
+  my ($snippet, $multiline, $lang) = @_;
+
+  my $markup = sprintf '<syntaxhighlight lang="%s"', $lang || '';
+  $markup .= ' inline' unless $multiline;
+  $markup .= sprintf ">\n%s</syntaxhighlight>", $snippet;
+  print $markup;
+}
+
+sub slack {
+  my ($snippet, $multiline) = @_;
+
+  if ($multiline) {
+    printf "```\n%s```\n", $snippet;
+  } else {
+    $snippet =~ s/^\s+|\s+$//g;
+    printf '`%s`', $snippet;
+  }
+}
+
+my %options;
+my %formats = (bitbucket => \&github,
+               disqus    => \&disqus,
+               github    => \&github,
+               gitlab    => \&github,
+               hipchat   => \&hipchat,
+               html      => \&html,
+               jira      => \&jira,
+               markdown  => \&markdown,
+               mediawiki => \&mediawiki,
+               slack     => \&slack);
+
+HELP_MESSAGE(*STDERR) && exit 1 unless getopts('f:ml:ps', \%options);
+
+if ($options{p}) {
+  local $,=', ';
+  local $\= "\n";
+
+  print sort keys %formats;
+
+  exit;
+}
+
+my $lang = $options{l} || $ENV{OAF_LANG};
+
+my $multiline = $options{m};
+$multiline = 0 if $options{s};
+
+my $format = $options{f} || $ENV{OAF_FORMAT} || 'markdown';
+die "unknown format '$format'\n" unless $formats{lc $format};
+
+my @indents;
+my $snippet = '';
+
+while (<STDIN>) {
+  s/\t/' ' x 8/eg;
+  $snippet .= $_;
+  push @indents, /^(\s*)/ && length $1;
+}
+
+exit 1 unless @indents;
+
+# Remove the minimum amount of leading white space
+my $trim = (sort { $a <=> $b } @indents)[0];
+$snippet =~ s/^\s{$trim}//mg;
+
+# Remove newline for single line input
+chomp $snippet if @indents == 1;
+
+$multiline = @indents > 1 ? 1 : 0 unless defined($multiline);
+
+$formats{lc $format}->($snippet, $multiline, $lang);

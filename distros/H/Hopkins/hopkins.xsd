@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="hopkins" type="hopkins" />
+
+	<xs:complexType name="hopkins">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="plugin" type="plugin" />
+			<xs:element name="database" type="database" />
+			<xs:element name="queue" type="queue" />
+			<xs:element name="task" type="task" />
+			<xs:element name="state" type="state" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="state">
+		<xs:sequence>
+			<xs:element name="root" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="plugin">
+		<xs:sequence>
+			<xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="database">
+		<xs:all>
+			<xs:element name="dsn" />
+			<xs:element name="user" />
+			<xs:element name="pass" />
+			<xs:element name="options" type="dboptions" minOccurs="0" />
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="dboptions">
+		<xs:sequence>
+			<xs:element name="option" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="options">
+		<xs:sequence>
+			<xs:element name="option" type="option" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="option">
+		<xs:all>
+			<xs:element name="choices" type="choices" minOccurs="0" />
+		</xs:all>
+
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="value" type="xs:string" />
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="bool" />
+					<xs:enumeration value="text" />
+					<xs:enumeration value="combo" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="choices">
+		<xs:sequence>
+			<xs:element name="choice" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="json" />
+					<xs:enumeration value="xml" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="src" type="xs:string" />
+		<xs:attribute name="root" type="xs:string" />
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="value" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="queue">
+		<xs:sequence>
+			<xs:element name="concurrency" type="xs:integer" />
+		</xs:sequence>
+
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="onerror">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="halt" />
+					<xs:enumeration value="freeze" />
+					<xs:enumeration value="shutdown" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="task">
+		<xs:all>
+			<xs:element name="cmd" type="xs:string" minOccurs="0" />
+			<xs:element name="class" type="xs:string" minOccurs="0" />
+			<xs:element name="queue" type="xs:string" />
+			<xs:element name="schedule" type="schedule" minOccurs="0" />
+			<xs:element name="options" type="options" minOccurs="0" />
+			<xs:element name="chain" type="chain" minOccurs="0" />
+		</xs:all>
+
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="run">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="serial" />
+					<xs:enumeration value="parallel" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="enabled">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="yes" />
+					<xs:enumeration value="no" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="stack">
+			<xs:simpleType>
+				<xs:union>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="yes" />
+							<xs:enumeration value="no" />
+						</xs:restriction>
+					</xs:simpleType>
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="-1" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:union>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="onerror">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="disable" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="schedule">
+		<xs:sequence>
+			<xs:element name="cron" type="xs:string" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="chain">
+		<xs:all>
+			<xs:element name="options" type="options" minOccurs="0" />
+			<xs:element name="chain" type="chain" minOccurs="0" />
+		</xs:all>
+
+		<xs:attribute name="task" type="xs:string" />
+	</xs:complexType>
+</xs:schema>

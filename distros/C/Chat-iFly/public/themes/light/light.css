@@ -1,0 +1,402 @@
+
+/**
+ * @file
+ * CSS Stylesheet for the DrupalChat modules 'light' theme.
+ * 
+ * Author: Fenda
+ */
+
+/* IE6 Hack */
+*html #drupalchat {
+  display: none;
+}
+
+#drupalchat-wrapper {
+  bottom: 0;
+  height: 29px;
+  margin: 0 1%;
+  position: fixed;
+  right: 0;
+  z-index: 9999; /*--Keeps the panel on top of all other elements--*/
+}
+#drupalchat {
+  /*background: #e5e5e5;*/
+  /*border: 1px solid #b5b5b5;*/
+  border-bottom: none;
+  float: left;
+  font-family: Arial, sans-serif;
+}
+#drupalchat ul {
+  /*border-top: 1px solid #fff;*/ /*--Gives the bevel feel on the panel--*/
+  float: right;
+  list-style: none;
+  margin: 0;
+  padding: 0; 
+  width: 100%;
+}
+#drupalchat ul li {
+  background: #e5e5e5;
+  float: left;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  list-style: none;
+  margin-right: 10px;
+  border-top: 1px solid #b5b5b5;
+}
+#drupalchat ul li.last a {
+  border-right: none;
+}
+
+#drupalchat ul li a {
+  border-left: 1px solid #b5b5b5;
+  border-right: 1px solid #b5b5b5;  
+  color: #333;
+  float: left;
+  height: 16px;
+  line-height: 16px;
+  padding: 6px;
+  position: relative;
+  text-decoration: none;
+  width: auto;
+}
+#drupalchat ul li a:hover {
+  background-color: #fff;
+}
+#drupalchat ul li a.active { /*--Active state when sub-panel is open--*/
+  background: #fff url(images/subpanel_bar.png) repeat-x center 1px;
+  border-top: none; 
+  height: 18px;
+  margin-top: -2px; /*--Push it up 2px to attach the active button to sub-panel--*/
+  position: relative;
+  z-index: 200; /*--Keeps the active link on top of the sub-panel--*/
+}
+
+#drupalchat ul li a.active span.subpanel_title_text {
+	float: left;
+	margin-top: 2px;
+}
+
+#drupalchat img.icon {
+	float: left;
+	margin-right: 6px;
+	padding: 0;
+}
+
+#drupalchat ul li a.chat {
+	width: 188px;
+	border-right: 1px solid #b5b5b5;
+}
+#drupalchat ul li a.chatboxhead {
+	width: 213px;
+}
+
+#drupalchat ul li div a { /*--Reset link style for sub-panel links--*/
+  color: #222;
+  float: none;
+  height: auto;
+  padding: 0;
+  position: static;
+  width: auto;
+}
+#drupalchat ul li div a:hover {
+  text-decoration: underline;
+  /*color: #fff;*/
+}
+#drupalchat .subpanel {
+  border: 1px solid #b5b5b5;  
+  bottom: 29px;
+  display: none;  /*--Hide by default--*/
+  left: 0px;
+  overflow: hidden;
+  position: absolute;
+  width: 150px;
+}
+#drupalchat #chatpanel .subpanel {
+  width: 200px;
+}
+#drupalchat .chatbox .subpanel {
+  width: 239px;
+}
+
+/* Subpanel title */
+#drupalchat .subpanel_title {
+  background: #222;
+  color: #fff;
+  cursor: pointer;  
+  font-weight: bold;
+  padding: 3px 4px 3px 8px;
+  font-size: 13px;
+}
+#drupalchat .subpanel_title div.status-1{
+  display: block;
+  float: left;
+  background: url(images/online.png) no-repeat 100% center;
+  height: 9px;
+  width: 9px;
+  overflow: hidden;
+  margin-top: 5px;
+  margin-right: 6px;  
+}
+#drupalchat .subpanel_title div.status-0{
+  display: block;
+  float: left;
+  background: url(images/offline.png) no-repeat 100% center;
+  height: 9px;
+  width: 9px;
+  overflow: hidden;
+  margin-top: 5px;
+  margin-right: 6px;  
+}
+#drupalchat .subpanel_title span {
+  filter: alpha(opacity=100); /* For IE */
+  opacity: 1;
+  -moz-opacity: 1;
+  font-size: 16px;
+  font-weight: bold;
+  float: right;
+  line-height: 0.6em;
+  padding: 5px 4px 0 4px;
+}
+#drupalchat .subpanel_title span.min {
+	padding: 2px 4px 0 4px;
+}
+#drupalchat .subpanel_title:hover span.min {
+  filter: alpha(opacity=75); /* For IE */
+  opacity: 0.75;
+  -moz-opacity: 0.75;
+}
+#drupalchat .subpanel_title span:hover {
+  filter: alpha(opacity=75); /* For IE */
+  opacity: 0.75;
+  -moz-opacity: 0.75;
+}
+#drupalchat .subpanel_title span.options {
+  background: url(images/options.png) no-repeat 6px center;
+  width: 12px;
+  height: 12px;
+}
+#drupalchat .subpanel ul { 
+  background: #fff;
+  border: none;
+  margin: 0;
+  overflow: auto;
+  width: 100%;
+}
+#drupalchat .subpanel li {
+  background: #fff;
+  clear: both;
+  display: block;
+  float: none; /*--Reset float--*/
+  margin: 0;
+  overflow: hidden;
+  padding: 0; 
+  position: static;  /*--Reset relative positioning--*/  
+}
+#drupalchat .subpanel li:hover {
+  background: #EEE;
+}
+#drupalchat .subpanel li a span {
+  float: left;
+  margin: 0 8px;
+  padding-left: 20px;
+}
+#drupalchat .subpanel li a {
+	border: none;
+  display: block;
+	font-weight: normal;
+  height: 22px;
+  line-height: 22px;
+  margin: 0;
+  padding: 3px 0 3px 8px; 
+}
+#drupalchat .subpanel li a:hover {
+	background: transparent;
+	text-decoration: none;
+}
+#drupalchat .subpanel li.status-1 a {
+	background: url(images/online.png) no-repeat 95% center;
+}
+#drupalchat .subpanel li.status-2 a {
+  background: url(images/idle.png) no-repeat 95% center;
+}
+#drupalchat .subpanel li.link a {
+  padding-left: 8px;
+}
+
+#drupalchat ul li a.chatboxhead {
+  padding: 6px 18px 6px 8px;  
+}
+
+/* Chat options */
+#drupalchat .subpanel .chat_options {
+	background: #F9F9F9;
+	border-bottom: 1px solid #b5b5b5;
+	border-top: 1px solid #b5b5b5;
+	/*border: 1px solid #ccc;*/
+	overflow: hidden;
+	position: relative;
+}
+#drupalchat .subpanel .item-list {
+	/*border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;*/
+}
+#drupalchat .subpanel .chat_options a {
+	border-left: none;
+	border-right: 1px solid #999;
+	color: #333;
+	float: left;
+	padding: 3px 8px 3px 19px;
+}
+#drupalchat .subpanel .chat_options a.status-1 {
+  background: url(images/online_black.png) no-repeat 6px center;
+} 
+#drupalchat .subpanel .chat_options a.status-2 {
+  background: url(images/idle_black.png) no-repeat 6px 49%;
+} 
+#drupalchat .subpanel .chat_options a.chat_loading {
+	background: url(images/loading.gif) no-repeat 4px center;
+}
+#drupalchat .subpanel .chat_options a.options {
+	background: url(images/options.png) no-repeat 6px center;
+}
+
+/* Chatbox */ 
+.chatbox {
+  display: none;
+  position: absoloute;
+  z-index: 9999;
+}
+#drupalchat ul li a.chatboxblink {
+  background-color: #516ea6;
+	color: #fff;
+}
+.chatboxcontent {
+  background-color: #fff;
+  color: #fff;
+  height: 200px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  padding: 7px;
+}
+
+.chatboxinput {
+  background-color: #fff;
+  border-top: 1px solid #b5b5b5;
+  padding: 5px;
+}
+.drupalchat_userOffline {
+  background-color: #fff;
+  color: #C00;
+  font-size: 11px;
+  height: 15px;
+  width: 239px;
+  display: none;
+  text-align: center;
+  border-top-color: #EEE;
+  border-top-style: solid;
+  border-top-width: 1px;
+}
+.chatboxtextarea {
+  border: 1px solid #b5b5b5;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  resize: none;
+  width: 226px;
+}
+.chatboxtextareaselected {
+  border: 1px solid #b5b5b5;
+  width: 226px;
+}
+.chatboxusername {
+  font-size: 13px;
+  margin-top: 3px;
+  border-top: 1px solid #EDEDED;
+  padding-top: 3px;
+  width: 215px;
+}
+.chatboxusername a {
+	border: none !important;
+	font-weight: bold; 
+}
+.chatboxusername a:hover {
+	color: #333 !important;
+}
+.chatboxtime {
+  color: #777;
+  float: right;
+  font-size: 9px;
+  font-weight: normal;
+}
+.chatboxcontent p {
+  clear: both;
+  color: #222;
+  font-size: 13px;
+  line-height: 21px;
+  margin: 0 4px;
+  text-align: left;
+  width: 210px;
+}
+#drupalchat .drupalchatnousers {
+  display: block !important;
+  font-weight: normal !important;
+  height: 22px !important;
+  line-height: 22px !important;
+  margin: 0 !important;
+  padding: 3px 0 3px 8px !important;
+  color: #222 !important;
+  cursor: pointer;
+}
+#drupalchat .drupalchatnousers:hover {
+  /*color: #FFF !important;*/
+}
+#drupalchat .drupalchat_popup{
+  width: 70px;
+  /*height: 100px;*/
+  position: absolute;
+  display: none;
+  z-index: 200;
+  background: #FFF;
+  border: 1px solid #b5b5b5;
+  border-bottom: 2px solid #b5b5b5;
+}
+#drupalchat .drupalchat_popup ul { 
+  background: #fff;
+  border: none;
+  margin: 0;
+  overflow: auto;
+  width: 100%;
+}
+#drupalchat .drupalchat_popup li {
+  background: #fff;
+  clear: both;
+  display: block;
+  float: none; /*--Reset float--*/
+  margin: 0;
+  overflow: hidden;
+  padding: 0; 
+  position: static;  /*--Reset relative positioning--*/  
+}
+#drupalchat .drupalchat_popup li:hover {
+  background: #516ea6;
+}
+#drupalchat .drupalchat_popup li a span {
+  float: left;
+  margin: 0 8px;
+  padding-left: 20px;
+}
+#drupalchat .drupalchat_popup li a {
+	border: none;
+  display: block;
+	font-weight: normal;
+  height: 12px;
+  line-height: 12px;
+  margin: 0;
+  padding: 3px 0 3px 8px; 
+}
+#drupalchat .drupalchat_popup li a:hover {
+	background: transparent;
+	text-decoration: none;
+}

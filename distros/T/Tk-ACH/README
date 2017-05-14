@@ -1,0 +1,90 @@
+
+	This is alpha software.  Use it only if you
+	know what you are doing.  Patches welcome :-)
+
+Author: Achim Bohnet <ach@mpe.mpg.de>
+Maintainer: Alexander Becker <asb@cpan.org>
+Previus maintainer: Ye Wenbin <wenbinye@gmail.com>
+
+Modules
+=======
+
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+Tk::ACH        n/a   Dummy module to reserve the namespace        ASB
+
+Scripts:
+
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+ptktrl	       rdpO  pTk shell: TRL support & persistent history   ACH
+
+Note:
+	o ptktrl does only work on Unix systems.
+	o ptktrl works best with Term::ReadLine::GNU.
+
+History
+=======
+
+Version: 0.08 2016-11-14
+    o removed Tk::FcyEntry, as it was moved to its own distro
+	o removed all old tests, because they were only related to Tk::FcyEntry
+	o added a dummy test for Tk::ACH
+	o moved ACH.pm to lib folder
+
+Version: 0.07 2016-09-29
+    o added Tk::ACH dummy module to be able to request the distribution namespace
+
+Version: 0.06 2016-09-29
+    o removed Tk::FileEntry, as it was moved to its own distro
+
+Version: 0.05 2016-09-28
+    o changed tests to skip if no display is available (RT #117714)
+    o partially replaced Test by Test::More
+
+Version: 0.04 08-Mar-2008
+    o ptktrl shows eval result after sending input.
+
+Version: 0.03
+
+	o ptksh renamed to ptktrl.  There is now a better ptksh
+	  available in Tk > V800.006.  ptktrl has the (only)
+	  advantage that one can has on vi-editing mode when
+	  Term::ReadLine::Gnu is installed.
+
+	o Added t/basic.t tests: derived from Tk800 t/create.t
+
+	o make 'o' command work as documented
+
+Version: 0.02 09-Apr-1998
+
+	o ptksh
+		o POD updates and markup adapted to 'perl/Tk' standard
+		o 'o' cmd extention:
+		  -  rest of 'o' line splitted with split "". So
+		     ptksh> o $w  opt1 opt2 ...    # accepts input like qw(...)
+		  -  ptksh> o $w  /regexp/         # list all option of $w
+							 matching regexp
+		o ./.ptksh_init file sourced on startup
+		o $ARGV[0] sourced on startup (please make sure there
+		  is no MainLoop otherwise ptksh will hang)
+
+	o FileEntry.pm & FcyEntry.pm
+		o minor POD corrections additions
+		o use Tk::<colname>() instead of hardcoded colors
+
+	o ex/
+		o added fcyentry example script
+
+	o Start for application widgets (not ready for public)
+		alpha/Tk/App.pm
+		alpha/Tk/App/Main.pm
+		alpha/Tk/App/Widget.pm
+		...
+
+Version: 0.01	19-Jan-1998
+
+	o ptksh: added utility functions p, u, o to ptksh
+
+	o FileEntry:  Creation of FileSelect is delayed until
+	              it's really needed.

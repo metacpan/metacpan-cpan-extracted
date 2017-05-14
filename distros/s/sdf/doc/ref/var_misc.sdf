@@ -1,0 +1,56 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Miscellaneous Variables
+
+H2: Purpose
+
+These variables are generally useful.
+
+H2: Interface
+
+!block table; groups; format=325
+Name                Type        Purpose
+Characters:
+c                   string      copyright character
+tm                  string      trademark character
+rtm                 string      registered trademark character
+nbsp                string      non-breaking space
+Environment:
+SDF_VERSION         string      product version string (e.g. 2.000 beta1)
+SDF_HOME            string      library/configuration directory
+Expression formats:
+FORMAT_UPPER        string      convert a string to uppercase
+FORMAT_LOWER        string      convert a string to lowercase
+FORMAT_FULL         string      format to a complete date-time format
+FORMAT_TIME         string      format to a time only
+FORMAT_DATE         string      format to a date only
+FORMAT_CONCISE      string      format to a concise date only
+FORMAT_YEAR         string      format to a 4-digit year
+!endblock
+
+H2: Description
+
+The {{character}} variables are the preferred way of
+including the respective symbols. A format-specific configuration file
+can override the default definitions of these symbols.
+
+The {{environment}} variables can be used to find out which version
+of SDF is executing and where it is installed.
+
+The {{expression format}} variables define bits of Perl code to
+format variables or expressions. They can be defined in a
+configuration file - your system adminstrator may wish to
+configure date formatting to suit local conventions.
+
+!end_topic

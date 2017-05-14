@@ -1,0 +1,20 @@
+
+<html>
+
+  [% INCLUDE _header.tt2 title = "Create a new ${TABLE.desc().0}" %]
+
+<body>
+
+  <h1>Create a new [% TABLE.desc().0 %]</h1>
+  [% IF ROW.validationError() %]
+    <br>
+    Could not create a new [% TABLE.desc().0 %]. Please correct the errors
+    below and try again.
+    <br>
+  [% END %]
+  <form action="create" method="post">
+    [% INCLUDE _form.tt2 BUTTON_NAME='Create' %]
+  </form>
+
+</body>
+

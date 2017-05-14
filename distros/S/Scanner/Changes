@@ -1,0 +1,172 @@
+libscanner-perl (0.02-5) unstable; urgency=low
+
+  * Fixed bug in info method printout of calibrator ivar; improved the 
+    format of the info output to make it more intelligible.
+
+ -- Dale Amon <amon@vnl.com>  Wed, 24 Sep 2008 11:42:29 +0100
+
+libscanner-perl (0.02-4) unstable; urgency=low
+
+  * Shift files to vendor install dirs instead of site install.
+
+ -- Dale Amon <amon@vnl.com>  Thu, 28 Aug 2008 20:31:34 +0100
+
+libscanner-perl (0.02-3) unstable; urgency=low
+
+  * Added dh_perl to rules and ${perl:Depends} to control file.
+
+ -- Dale Amon <amon@vnl.com>  Thu, 21 Aug 2008 02:01:45 +0100
+
+libscanner-perl (0.02-2) unstable; urgency=low
+
+  * Split Page into Page and Format classes. Changed code to
+    create format objects from a format string "L:10x12" for
+    example and pass around that information in a Format object.
+    Also added SCANNER_AUTO_SHUTDOWN environment variable support.
+
+ -- Dale Amon <amon@vnl.com>  Tue, 19 Aug 2008 19:27:46 +0100
+
+libscanner-perl (0.02-1) unstable; urgency=low
+
+  * Combined Scanner, Page and Job classes in one package.
+    Major updates to the package metafiles.
+
+ -- Dale Amon <amon@vnl.com>  Wed,  6 Aug 2008 22:25:16 +0100
+
+libscanner-perl (0.01-13) unstable; urgency=low
+
+  * Fixed a dumb mistake. I did not type in the full conditional
+    for the DEBUG that I tested, I only had the if defined part.
+    I have added the if DEBUG true part now.
+
+ -- Dale Amon <amon@vnl.com>  Sun, 20 Jan 2008 18:29:00 +0000
+
+libscanner-perl (0.01-12) unstable; urgency=low
+
+  * Added $::DEBUG global so that diagnostic print of the generated
+    scan command line may be turned on if needed.
+
+ -- Dale Amon <amon@vnl.com>  Sun, 20 Jan 2008 17:02:56 +0000
+
+libscanner-perl (0.01-11) unstable; urgency=low
+
+  * Add support for hp5590 scanner. It cannot do 150dpi, only
+    100,200,300,600,1200,2400dpi are valid.
+
+ -- Dale Amon <amon@vnl.com>  Sun,  6 May 2007 14:25:46 +0100
+
+libscanner-perl (0.01-10) unstable; urgency=low
+
+  * Now uses $SCANNER Environment variable contents, if
+    defined, as the default scanner string.
+
+ -- Dale Amon <amon@vnl.com>  Tue,  1 May 2007 14:18:25 +0100
+
+libscanner-perl (0.01-9) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:08:29 +0100
+
+libscanner-perl (0.01-8) unstable; urgency=low
+
+  * Now sets the environment variable required by the Mustek.
+    Handles shutdown of the Mustek to turn off the lamp.
+    Fixes a bug that prevented the use of ampersand in a file
+    name. Bug occurred at the system call of convert.
+
+ -- Dale Amon <amon@islandone.org>  Tue,  4 Jul 2006 20:36:19 +0100
+
+libscanner-perl (0.01-7) unstable; urgency=low
+
+  * I finally got around to fixing the Mustek scanner problem. It does
+    not support the scanimage --source arg, so I created a page source
+    of "NotApplicable" which suppresses use of --source. For the gt68xx
+    this will over ride any setting the user might make.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 16 Apr 2006 19:15:30 +0100
+
+libscanner-perl (0.01-6) unstable; urgency=low
+
+  * Umax uses flatbed where hp used normal. I generalized
+    _setPageSource to convert one to the other depending on
+    the type, hp or umax. Type is now parsed from the scanner
+    string by _setScanner. Also fixed some minor bugs in
+    the mostly unused default*****Is class methods.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 25 Aug 2005 20:57:16 +0100
+
+libscanner-perl (0.01-5) unstable; urgency=low
+
+  * Added support for a modifiable dpi value. Default is still 150 dpi.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 10 Jul 2005 19:56:00 -0400
+
+libscanner-perl (0.01-4) unstable; urgency=low
+
+  * Added support for specifiying the scanner device and
+    page source. I can now use automatic document feeder
+    for those scanners which support it.
+  * It does not yet actually check validity on scanner
+    device or page source string.
+
+ -- Dale Amon <amon@islandone.org>  Sun, 26 Jun 2005 21:39:56 -0400
+
+libscanner-perl (0.01-3) unstable; urgency=low
+
+  * Started signing packages again.
+  * Two steps back: scanimage no longer supports generalized 
+    resolution and colour depth settings. I've temporarily
+    hardwired this package to only work with UMAX.
+
+ -- Dale Amon <amon@islandone.org>  Mon, 28 Feb 2005 13:54:03 +0000
+
+libscanner-perl (0.01-2) unstable; urgency=low
+
+  * Completed documentation and synced it with Specifications.
+
+ -- Dale Amon <amon@islandone.org>  Mon, 30 Aug 2004 17:11:50 +0100
+
+libscanner-perl (0.01-1) unstable; urgency=low
+
+  * Initial release and created.
+
+ -- Dale Amon <amon@islandone.org>  Thu, 19 Aug 2004 17:56:00 +0100
+
+libscanner-page-perl (0.01-5) unstable; urgency=low
+
+  * Remove erroneous perl build pre-depends from control file.
+
+ -- Dale Amon <amon@islandone.org>  Sat,  2 Sep 2006 00:04:28 +0100
+
+libscanner-page-perl (0.01-4) unstable; urgency=low
+
+  * Now has a check for attempt to set zero hieght or width.
+
+ -- Dale Amon <amon@islandone.org>  Tue,  4 Jul 2006 20:39:10 +0100
+
+libscanner-page-perl (0.01-3) unstable; urgency=low
+
+  * Started signing packages again.
+
+ -- Dale Amon <amon@islandone.org>  Wed,  8 Sep 2004 18:41:27 +0100
+
+libscanner-page-perl (0.01-2) unstable; urgency=low
+
+  * Completed documentation and added it to Specification.
+
+ -- Dale Amon <amon@islandone.org>  Mon, 30 Aug 2004 16:13:01 +0100
+
+libscanner-page-perl (0.01-1) unstable; urgency=low
+
+  * Initial release and created.
+
+ -- Dale Amon <amon@islandone.org>  Tue, 18 Aug 2004 11:26:00 +0100
+
+Local variables:
+mode: debian-changelog
+End:
+
+Local variables:
+mode: debian-changelog
+End:

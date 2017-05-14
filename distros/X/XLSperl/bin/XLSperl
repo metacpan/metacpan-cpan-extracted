@@ -1,0 +1,501 @@
+#! /Users/jj/bin/perl
+
+# XLSperl - use "perl -e" commands with Microsoft Excel files
+#
+# Copyright (C) 2007-2008 Jon Allen <jj@jonallen.info>
+#
+# This software is licensed under the terms of the Artistic
+# License version 2.0.
+#
+# For full license details, please read the file 'artistic-2_0.txt' 
+# included with this distribution, or see
+# http://www.perlfoundation.org/legal/licenses/artistic-2_0.html
+
+
+#--Load required modules and activate Perl's safety features----------
+
+use strict;
+use warnings;
+use bytes;
+use open IN => ":raw";
+use Getopt::Long;
+use IO::Handle;
+use Spreadsheet::ParseExcel;
+use Spreadsheet::ParseExcel::Utility qw/int2col/;
+use Variable::Alias qw/alias/;
+
+our $VERSION = "0.7";
+
+
+#--Define global variables-------------------------------------------------
+
+use vars qw/$WS $ROW $COL $COLNUM $CELL @F %F/;
+
+
+#--Main program code-------------------------------------------------------
+
+MAIN: {  
+  my %options;
+  Getopt::Long::Configure('bundling');
+  GetOptions( \%options, qw/e=s l n p x a F=s w/,
+    'm=s' => sub{ eval qq{use $_[1] ()}; die $@ if $@;},
+    'M=s' => sub{ my ($m,$a) = split /=/,$_[1],2;
+                  if ($a) {
+                    eval qq{use $m split(/,/,q{$a})}; die $@ if $@;
+                  } else {
+                    eval qq{use $m}; die $@ if $@;
+                  }
+                },
+    'v'   => sub{ print "This is XLSperl, version $VERSION\n"; exit } );
+  die(qq{Usage: $0 [options] -e "code" <file.xls>\n}) unless ($options{e});
+  
+  no strict 'refs';
+  *{__PACKAGE__ . '::XLSprint'} = \&XLSperl::printer::XLSprint;
+  *{'IO::Handle::XLSprint'}     = \&XLSperl::printer::XLSprint;
+  use strict 'refs';
+
+  my $eval_function = create_eval_handler(%options);
+
+  $\ = "\n" if ($options{l});
+
+  if ($options{n} or $options{p}) {
+    $eval_function = make_loop( perl       => $eval_function,
+                                autosplit  => $options{a},
+                                splitregex => $options{F},
+                                autoline   => $options{l} ); 
+  }
+  
+  $eval_function->(); 
+}
+
+
+#--make_loop---------------------------------------------------------------
+#
+# Purpose: Converts an eval function into a loop, iterating over files
+#          in @ARGV
+#
+#--------------------------------------------------------------------------
+
+sub make_loop {
+  my %args      = @_;
+  my $next_file = file_iterator();
+  return sub {
+    while (my $data = $next_file->()) {
+      my $excel = Spreadsheet::ParseExcel::Workbook->Parse(\$data);
+      if ($excel->{Worksheet}) {
+        loop_xls(%args, xls=>$excel);
+      } else {
+        if (open my $fh,'<',\$data) {
+          loop_text(%args, fh=>$fh);
+        }
+      }    
+    }
+  }
+}
+
+
+#--file_iterator-----------------------------------------------------------
+#
+# Purpose: Returns a function to loop through <ARGV>, returning file contents
+#
+#--------------------------------------------------------------------------
+
+sub file_iterator {
+  return sub {
+    local $/ = undef;
+    my $file = <>;
+    return $file or undef;
+  }
+}
+
+
+#--loop_xls----------------------------------------------------------------
+#
+# Purpose: Loops through XLS file, executing $args{perl}
+#
+#--------------------------------------------------------------------------
+
+sub loop_xls {
+  my %args = @_;
+  foreach my $worksheet (@{$args{xls}->{Worksheet}}) {
+    $WS = $worksheet->{Name};
+    my ($row_min,$row_max) = $worksheet->RowRange();
+    my ($col_min,$col_max) = $worksheet->ColRange();
+    foreach my $row ($row_min .. $row_max) {
+      $ROW = $row + 1;
+      if ($args{autosplit}) {
+        @F = map {$_ && $_->Value() || undef} @{$worksheet->{Cells}[$row]};
+        @F = map {$_ && chomp;$_} @F if ($args{autoline});
+        
+        # Make the %F hash an alias for @F, i.e. $F{A} == $F[0]
+        for (0 .. $#F) {
+          alias($F[$_],$F{int2col($_)});
+        }
+        
+        undef $_;  # What should $_ be if autosplitting an Excel file?        
+        $args{perl}->();
+      } else {
+        foreach my $col ($col_min .. $col_max) {
+          $COLNUM = $col + 1;
+          $COL    = int2col($col);
+          if (my $cell = $worksheet->Cell($row,$col)) {
+            $CELL = int2col($col).$ROW;
+            $_    = $cell->Value();
+            chomp if ($args{autoline});
+            $args{perl}->();
+          }
+        }          
+      }
+    }
+  }
+}
+
+
+#--loop_text----------------------------------------------------------------
+#
+# Purpose: Loops through text file, executing $args{perl}
+#
+#--------------------------------------------------------------------------
+
+sub loop_text {
+  #warn "loop_text() called\n";
+  my %args = @_;
+  while ($_ = $args{fh}->getline) {
+    chomp if ($args{autoline});
+    if ($args{autosplit}) {
+      if ($args{splitregex}) {
+        @F = split $args{splitregex};
+      } else {
+        @F = split;
+      }
+    }
+    $args{perl}->();
+  }
+}
+
+
+#--Subroutine to create cell exec function ---------------------------
+
+sub create_eval_handler {
+  my %args    = @_;
+  # Create and return a coderef (closure) to ensure that the Perl code
+  # in $args{e} is only evaluated once - using a direct eval in the
+  # input loop will cause any END{} blocks to be defined multiple times.
+  my $handler = eval '
+    return sub {  
+      EVAL: {
+        no strict;
+        '.(($args{w})?'use warnings;':'no warnings;').$args{e}.';
+        print if ($args{p});      
+      }
+    }
+  ';
+  die($@) if ($@);
+  return $handler;
+}
+
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+package XLSperl::printer;
+
+use strict;
+use warnings;
+use Scalar::Util qw/openhandle/;
+use Spreadsheet::WriteExcel::Simple;
+
+our %XLSobject;
+
+END {
+  foreach (keys %XLSobject) {
+    print {$XLSobject{$_}{FH}} $XLSobject{$_}{XLS}->data;
+  }
+}
+
+sub XLSprint {
+  my $currfh = select();
+  my $handle;
+  {
+    no strict 'refs';
+    $handle = openhandle($_[0]) ? shift : \*$currfh;
+    use strict 'refs';
+  }
+  @_ = $_ unless @_;
+  
+  unless ($XLSobject{$handle}) {
+    my $XLSfile = Spreadsheet::WriteExcel::Simple->new();
+    $XLSobject{$handle}{FH}  = $handle;
+    $XLSobject{$handle}{XLS} = $XLSfile;
+  }
+  
+  $XLSobject{$handle}{XLS}->write_row(\@_);
+}
+
+
+#--------------------------------------------------------------------------
+
+=head1 NAME
+
+XLSperl - use Perl "one-liners" with Microsoft Excel files
+
+=head1 SYNOPSYS
+
+ XLSperl [options] -e '...' file1.xls file2.xls ... fileX.xls
+ cat file.txt | XLSperl [options] -e '...'
+
+=head1 DESCRIPTION
+
+=head2 Background
+
+Perl "one-liners" have a great many uses for quick data processing tasks,
+often replacing the UNIX tools C<grep>, C<sed>, and C<awk>. For example,
+a simple "grep" function can be written as:
+
+ perl -lne '/pattern/ and print' file.txt
+
+which improves on the standard C<grep> function by allowing the extended
+features of Perl regular expressions to be used.
+
+However, this form of processing is only suitable for data that can be
+read (or needs to be written) in plain text format. XLSperl lets you use
+the same commands to process and create Microsoft Excel files, e.g. the
+following command will "grep" an Excel document:
+
+ XLSperl -lne '/pattern/ and print' file.xls
+
+=head2 Usage
+
+Basic usage of XLSperl is as follows:
+
+ XLSperl [options] -e 'perl_code' file1.xls file2.xls ... fileX.xls
+ 
+Additionally Microsoft Excel files can be piped in to XLSperl
+
+ cat file.xls | XLSperl [options] -e 'perl_code'
+
+=head2 Options
+
+Options to XLSperl mirror the standard options to C<perl>:
+
+=over
+
+=item -n
+
+Assumes an input loop which will iterate over each cell in 
+the spreadsheet, assigning $_ with the cell's value.
+
+=item -a
+
+Changes the input loop to process Excel files row by row, splitting 
+column values to @F and %F.
+
+=item -F
+
+Sets input record separator when processing text files (defaults to 
+splitting on whitespace)
+
+=item -l
+
+Automated line-end processing - chomps the value of each cell and sets 
+$/ to "\n"
+
+=item -p
+
+Prints the value of $_ after each iteration of the input loop
+
+=item -e <perl_code>
+
+Perl code to execute on each iteration of the input loop (required)
+
+=item -m
+
+=item -M
+
+The C<-m> and C<-M> options load additional modules into XLSperl in the
+same way as the C<-m> and C<-M> options to C<perl> (see L<http://perldoc.perl.org/perlrun.html>.
+
+=item -w
+
+Enables warnings
+
+=item -v
+
+Prints version number and exits
+
+=back
+
+=head2 Special variables
+
+XLSperl adds the following special varables:
+
+=over
+
+=item $WS
+
+Worksheet name
+
+=item $ROW
+
+Current row (1 .. x)
+
+=item $COL
+
+Current column name (A .. x)
+
+=item $COLNUM
+
+Current column number (1 .. x)
+
+=item $CELL
+
+Current cell (A1 .. ZZx)
+
+=item @F
+
+Array of cell values (in autosplit mode)
+
+=item %F
+
+Hash of cell values (in autosplit mode). Entries in %F are aliases
+for the corresponding elements of @F, so modifying $F{A} will also
+update the value of $F[0] and vice-versa.
+
+=back
+
+=head2 Exported functions
+
+XLSperl adds the following new functions for use in your Perl code:
+
+=over
+
+=item XLSprint( cell_1, cell_2, ... cell_X );
+
+Outputs a row of data in Excel format. Usage is as follows:
+
+ # Print row to default filehandle
+ XLSprint @F;
+ 
+ # Print row to named filehandle
+ XLSprint STDERR @F;
+ XLSprint $fh,@F;
+
+Note that once a filehandle has been used with the XLSprint function,
+to avoid corruption of the generated Excel file the 'normal' print 
+function should not be used on that filehandle, i.e. do not do this:
+
+ XLSprint STDERR @errors;
+ warn "An error happened";
+
+=back
+
+=head2 Examples
+
+=over
+
+=item Use a regular expression to extract data from a spreadsheet
+
+ XLSperl -nle "/[A-Z](\d+)\d/ and print $1" cells.xls
+
+=item Basic conversion from XLS to CSV
+
+ XLSperl -nale 'print join ",",@F' file.xls >file.csv
+
+=item More correct conversion from XLS to CSV (thanks to Sam Vilain):
+
+ XLSperl -MText::CSV_XS -nale 'BEGIN{$c=Text::CSV_XS->new} if ($w ne $WS){open CSV,">$ARGV.$WS.csv" or die $!;$w = $WS} $c->print(\*CSV,\@F)' file1.xls file2.xls
+
+=item Extract a single row from a spreadsheet
+
+ cat file1.xls | XLSperl -nle 'print if ($ROW == 2)'
+
+=item Convert a text file to Excel format, removing comment lines
+
+ XLSperl -F: -nale 'next if /^#/; XLSprint @F' /etc/passwd >passwd.xls
+
+=back
+
+=head1 SYSTEM REQUIREMENTS
+
+XLSperl binary packages have no external dependencies, and have been tested on
+the following platforms:
+
+=over
+
+=item *
+
+Linux i686 (tested on Ubuntu version 6.0.6)
+
+=item *
+
+Microsoft Windows (tested on Windows XP SP 2)
+
+=item *
+
+Mac OS X (tested on OS X 10.5.3, Intel CPU only)
+
+=back
+
+To run XLSperl from source, the following CPAN modules must be installed:
+
+=over
+
+=item *
+
+Spreadsheet::ParseExcel (tested with version 0.28)
+
+=item *
+
+Spreadsheet::WriteExcel::Simple (tested with version 1.04)
+
+=item *
+
+Variable::Alias (tested with version 0.01)
+
+=back
+
+XLSperl has been tested with Perl versions 5.8.8 and 5.10.0.
+
+=head1 TODO
+
+=over
+
+=item *
+
+Include a mechanism for creation and in-place editing of Excel documents.
+
+=item *
+
+Ability to use XLSperl as a command interpreter (C<#! /usr/bin/XLSperl> in scripts).
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item XLSperl homepage - L<http://perl.jonallen.info/xlstools>
+
+=item I<Excel on the Command Line> talk slides - L<http://perl.jonallen.info/talks>
+
+=item I<Minimal Perl> by Tim Maher - L<http://minimalperl.com>
+
+=back
+
+=head1 AUTHOR
+
+Written by Jon Allen <jj@jonallen.info>
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2007 Jon Allen
+
+This software is licensed under the terms of the Artistic
+License version 2.0.
+
+For full license details, please read the file 'artistic-2_0.txt' 
+included with this distribution, or see
+http://www.perlfoundation.org/legal/licenses/artistic-2_0.html
+
+=cut

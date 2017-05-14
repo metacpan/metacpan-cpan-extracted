@@ -1,0 +1,8 @@
+TODO:
+
+1) Write a proper test suite.
+
+2) Improve parsing of the LSF output. I was going to use it as an excuse to
+try Parse::RecDescent when i get the time.
+
+3) Everything else!

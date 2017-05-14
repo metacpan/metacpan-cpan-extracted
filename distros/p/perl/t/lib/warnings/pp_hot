@@ -44,9 +44,6 @@
   Deep recursion on anonymous subroutine 	[Perl_sub_crush_depth]
     $a = sub { &$a if $a++ < 200} &$a
 
-  Possible Y2K bug: about to append an integer to '19' [pp_concat]
-    $x     = "19$yy\n";
-
   Use of reference "%s" as array index [pp_aelem]
     $x[\1]
 
@@ -62,6 +59,15 @@ no warnings 'unopened' ;
 print $f $a;
 EXPECT
 print() on unopened filehandle abc at - line 4.
+########
+# pp_hot.c [pp_print]
+use warnings 'unopened' ;
+$SIG{__WARN__} = sub { warn $_[0] =~ s/\0/\\0/rug; };
+print {"a\0b"} "anc";
+print {"\0b"} "anc";
+EXPECT
+print() on unopened filehandle a\0b at - line 4.
+print() on unopened filehandle \0b at - line 5.
 ########
 # pp_hot.c [pp_print]
 use warnings 'io' ;
@@ -93,6 +99,24 @@ Filehandle FH opened only for input at - line 19.
 Filehandle FOO opened only for input at - line 20.
 ########
 # pp_hot.c [pp_print]
+$SIG{__WARN__} = sub { warn $_[0] =~ s/\0/\\0/rug; };
+use warnings 'io' ;
+my $file = "./xcv" ; unlink $file ;
+open (FH, ">$file") or die $! ;
+close FH or die $! ;
+die "There is no file $file" unless -f $file ;
+open ("a\0b", "<$file") or die $! ;
+print {"a\0b"} "anc" ;
+open ("\0b", "<$file") or die $! ;
+print {"\0b"} "anc" ;
+close "a\0b" or die $! ;
+close "\0b" or die $! ;
+unlink $file ;
+EXPECT
+Filehandle a\0b opened only for input at - line 9.
+Filehandle \0b opened only for input at - line 11.
+########
+# pp_hot.c [pp_print]
 use warnings 'closed' ;
 close STDIN ;
 print STDIN "anc";
@@ -119,7 +143,7 @@ my $fh = *STDOUT{IO};
 close STDOUT or die "Can't close STDOUT";
 print $fh "Shouldn't print anything, but shouldn't SEGV either\n";
 EXPECT
-print() on closed filehandle at - line 7.
+print() on closed filehandle __ANONIO__ at - line 7.
 ########
 # pp_hot.c [pp_print]
 package foo;
@@ -145,7 +169,7 @@ my @b = @$a;
 no warnings 'uninitialized' ;
 my @c = @$a;
 EXPECT
-Use of uninitialized value in array dereference at - line 4.
+Use of uninitialized value $a in array dereference at - line 4.
 ########
 # pp_hot.c [pp_rv2hv]
 use warnings 'uninitialized' ;
@@ -154,7 +178,7 @@ my %b = %$a;
 no warnings 'uninitialized' ;
 my %c = %$a;
 EXPECT
-Use of uninitialized value in hash dereference at - line 4.
+Use of uninitialized value $a in hash dereference at - line 4.
 ########
 # pp_hot.c [pp_aassign]
 use warnings 'misc' ;
@@ -179,6 +203,19 @@ opendir STDIN, "." ; $a = <STDIN> ;
 closedir STDIN;
 no warnings 'closed' ;
 opendir STDIN, "." ; $a = <STDIN> ;
+$a = <STDIN> ;
+EXPECT
+readline() on closed filehandle STDIN at - line 3.
+readline() on closed filehandle STDIN at - line 4.
+	(Are you trying to call readline() on dirhandle STDIN?)
+########
+# pp_hot.c [Perl_do_readline]
+use warnings 'closed' ;
+close STDIN        ; $a .= <STDIN> ;
+opendir STDIN, "." ; $a .= <STDIN> ;
+closedir STDIN;
+no warnings 'closed' ;
+opendir STDIN, "." ; $a .= <STDIN> ;
 $a = <STDIN> ;
 EXPECT
 readline() on closed filehandle STDIN at - line 3.
@@ -269,37 +306,11 @@ a($x . $y);	# should warn twice
 $x .= $y;	# should warn once
 $y .= $y;	# should warn once
 EXPECT
-Use of uninitialized value in concatenation (.) or string at - line 5.
-Use of uninitialized value in concatenation (.) or string at - line 6.
-Use of uninitialized value in concatenation (.) or string at - line 6.
-Use of uninitialized value in concatenation (.) or string at - line 7.
-Use of uninitialized value in concatenation (.) or string at - line 8.
-########
-# pp_hot.c [pp_concat]
-use warnings 'y2k';
-use Config;
-BEGIN {
-    unless ($Config{ccflags} =~ /Y2KWARN/) {
-	print "SKIPPED\n# perl not built with -DPERL_Y2KWARN";
-	exit 0;
-    }
-}
-my $x;
-my $yy = 78;
-$x     = "19$yy\n";
-$x     = "19" . $yy . "\n";
-$x     = "319$yy\n";
-$x     = "319" . $yy . "\n";
-$yy = 19;
-$x     = "ok $yy\n";
-$yy = 9;
-$x     = 1 . $yy;
-no warnings 'y2k';
-$x     = "19$yy\n";
-$x     = "19" . $yy . "\n";
-EXPECT
-Possible Y2K bug: about to append an integer to '19' at - line 12.
-Possible Y2K bug: about to append an integer to '19' at - line 13.
+Use of uninitialized value $x in concatenation (.) or string at - line 5.
+Use of uninitialized value $x in concatenation (.) or string at - line 6.
+Use of uninitialized value $y in concatenation (.) or string at - line 6.
+Use of uninitialized value $y in concatenation (.) or string at - line 7.
+Use of uninitialized value $y in concatenation (.) or string at - line 8.
 ########
 # pp_hot.c [pp_aelem]
 {
@@ -332,3 +343,17 @@ print $x[$b];
 EXPECT
 OPTION regex
 Use of reference ".*" as array index at - line 7.
+########
+use warnings 'misc';
+use constant FOO => { a => 1 };
+() = $_[FOO->{a}];
+
+EXPECT
+########
+use warnings 'misc';
+use constant FOO => {};
+() = $_[FOO];
+
+EXPECT
+OPTION regex
+Use of reference "HASH\(0x\w+\)" as array index at - line 3.

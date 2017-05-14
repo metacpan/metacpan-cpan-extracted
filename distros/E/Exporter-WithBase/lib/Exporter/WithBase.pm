@@ -3,7 +3,7 @@ use warnings;
 
 package Exporter::WithBase;
 # ABSTRACT: Like Exporter, but add a '-base' flag to declare a class as a child
-$Exporter::WithBase::VERSION = '0.03';
+$Exporter::WithBase::VERSION = '1.00';
 use Exporter 5.57 ();
 
 sub import

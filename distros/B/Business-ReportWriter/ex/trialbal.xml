@@ -1,0 +1,158 @@
+<perldata>
+ <hashref>
+  <item key="database">
+   <hashref>
+    <item key="dbtype">Pg</item>
+    <item key="dbname">Name of Database</item>
+    <item key="host">Host Name</item>
+    <item key="password">Database Password</item>
+    <item key="username">Database User</item>
+   </hashref>
+  </item>
+  <item key="search">
+   <hashref>
+    <item key="!Fields">number, gl_acctname.name,
+       &apos;Produktgruppe &apos; || coalesce(to_char(dim2,&apos;999&apos;), &apos;-ingen-&apos;) AS text,
+        sum(entereddr) AS debit, sum(enteredcr) AS credit,
+        sum(entereddr) - sum(enteredcr) AS total</item>
+    <item key="!TabJoin">gl_acctname JOIN gl_chartofaccount using (ac_id)
+        JOIN gl_acctgrid ON (coa_id = dim1)
+        JOIN gl_journal USING (ag_id)
+        JOIN gl_batch USING (batch_id)</item>
+    <item key="!Table">gl_journal, gl_acctgrid, gl_chartofaccount, gl_acctname</item>
+    <item key="$group">number, dim2, gl_acctname.name</item>
+    <item key="$order">number, dim2</item>
+    <item key="$values">
+     <arrayref>
+      <item key="0">00000</item>
+      <item key="1">99999</item>
+      <item key="2">2002-1-1</item>
+      <item key="3">2002-12-31</item>
+     </arrayref>
+    </item>
+    <item key="$where">number BETWEEN ? AND ? 
+        AND accountingdate BETWEEN ? AND ?</item>
+   </hashref>
+  </item>
+  <item key="report">
+   <hashref>
+    <item key="locale">da_DK</item>
+    <item key="papersize">A4</item>
+   </hashref>
+  </item>
+  <item key="breaks">
+   <hashref>
+    <item key="_total">
+     <hashref>
+      <item key="format">%.2f</item>
+      <item key="order">1</item>
+      <item key="text"></item>
+      <item key="total">
+       <arrayref>
+        <item key="0">debit</item>
+        <item key="1">credit</item>
+        <item key="2">total</item>
+       </arrayref>
+      </item>
+      <item key="xpos">5</item>
+     </hashref>
+    </item>
+    <item key="number">
+     <hashref>
+      <item key="font">
+       <hashref>
+        <item key="face">Helvetica-Bold-iso</item>
+        <item key="size">10</item>
+       </hashref>
+      </item>
+      <item key="format">%.2f</item>
+      <item key="order">0</item>
+      <item key="text">Konto $number: $name </item>
+      <item key="total">
+       <arrayref>
+        <item key="0">debit</item>
+        <item key="1">credit</item>
+        <item key="2">total</item>
+       </arrayref>
+      </item>
+      <item key="xpos">5</item>
+     </hashref>
+    </item>
+   </hashref>
+  </item>
+  <item key="fields">
+   <arrayref>
+    <item key="0">
+     <hashref>
+      <item key="font">
+       <hashref>
+        <item key="face">Helvetica-iso</item>
+        <item key="size">10</item>
+       </hashref>
+      </item>
+      <item key="name">text</item>
+      <item key="text">Name</item>
+      <item key="xpos">10</item>
+     </hashref>
+    </item>
+    <item key="1">
+     <hashref>
+      <item key="align">right</item>
+      <item key="depends">$debit &gt; 0.00</item>
+      <item key="function">sprintf(&quot;%.2f&quot;, $debit)</item>
+      <item key="name">debit</item>
+      <item key="text">Debit</item>
+      <item key="xpos">140</item>
+     </hashref>
+    </item>
+    <item key="2">
+     <hashref>
+      <item key="align">right</item>
+      <item key="depends">$credit &gt; 0.00</item>
+      <item key="function">sprintf(&quot;%.2f&quot;, $credit)</item>
+      <item key="name">credit</item>
+      <item key="text">Credit</item>
+      <item key="xpos">170</item>
+     </hashref>
+    </item>
+    <item key="3">
+     <hashref>
+      <item key="align">right</item>
+      <item key="depends">$total &gt; 0.00</item>
+      <item key="function">sprintf(&quot;%.2f&quot;, $total)</item>
+      <item key="name">total</item>
+      <item key="text">Total</item>
+      <item key="xpos">200</item>
+     </hashref>
+    </item>
+   </arrayref>
+  </item>
+  <item key="page">
+   <hashref>
+    <item key="header">
+     <hashref>
+      <item key="font">
+       <hashref>
+        <item key="face">Helvetica-Bold-iso</item>
+        <item key="size">14</item>
+       </hashref>
+      </item>
+      <item key="number">
+       <hashref>
+        <item key="align">right</item>
+        <item key="text">Side: </item>
+        <item key="xpos">200</item>
+       </hashref>
+      </item>
+      <item key="text">
+       <hashref>
+        <item key="text">Råbalance</item>
+        <item key="xpos">5</item>
+       </hashref>
+      </item>
+     </hashref>
+    </item>
+   </hashref>
+  </item>
+ </hashref>
+</perldata>

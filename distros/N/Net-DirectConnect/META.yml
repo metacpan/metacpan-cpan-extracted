@@ -1,27 +1,33 @@
---- #YAML:1.0
-name:               Net-DirectConnect
-version:            0.10
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: unknown
+author:
+  - unknown
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    DBD::SQLite:          0
-    DBI:                  0
-    IO::Compress::Bzip2:  0
-    lib::abs:             0
-    MIME::Base32:         0
-    Net::DirectConnect::TigerHash:  0
-    Time::HiRes:          0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-DirectConnect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::RHash: 0
+  DBD::SQLite: 0
+  DBI: 0
+  IO::Compress::Bzip2: 0
+  IO::Socket::IP: 0
+  IO::Socket::SSL: 0
+  JSON: 0
+  JSON::XS: 0
+  MIME::Base32: 0
+  Sys::Sendfile: 0
+  Time::HiRes: 0
+  lib::abs: 0
+version: 0.14

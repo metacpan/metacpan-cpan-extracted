@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+ex-packer - the automated Exherbo Perl module packager
+
+=head1 DESCRIPTION
+
+ex-packager is a tool that automatically packages perl modules into exherbo
+exheres. Currently, this only works for Perl modules, but other scripting
+languages are planned (Ruby, Python...Haskell even?).
+
+=head1 USAGE
+
+exp-packer [-hvs] [--stdout] [-o filename] [[perl module]...]
+
+B<--help -h>
+
+=over 4
+
+=item Prints help text
+
+=back
+
+B<--version -v>
+
+=over 4
+
+=item Prints version number
+
+=back
+
+B<--silent -s>
+
+=over 4
+
+=item Disables verbose output
+
+=back
+
+B<--out -o filename>
+
+=over 4
+
+=item Specify an output file
+
+=back
+
+B<--stdout>
+
+=over 4
+
+=item Print output to stdout
+
+=back
+
+=head1 CONFIGURATION
+
+The configuration file is located in ~/.exherbo-packager.yml. If it does not
+exist when you run ex-packer, it will be created for you. Feel free to edit it
+by hand, it's fairly self explanatory.
+
+=head1 SEE ALSO
+
+Exherbo::Packager
+
+=head1 AUTHOR
+
+William Orr <will@worrbase.com>
+
+=cut
+
+use 5.010;
+use warnings;
+use strict;
+
+use Exherbo::Packager;
+use Getopt::Long;
+use Ouch;
+use Pod::Usage;
+
+use constant CONFIG_LOC => $ENV{HOME}."/.exherbo-packager.yml";
+
+my ($help, $vers, $silent, $stdout, $output);
+our $VERSION = '1.0';
+
+GetOptions('help|h' => \$help, 'version|v' => \$vers, 'silent|s' => \$silent, 'stdout' => \$stdout, 'out|o=s' => \$output);
+
+if ($help) {
+    pod2usage(1);
+    exit(0);
+}
+
+if ($vers) {
+    say "ex-packer version $VERSION";
+    exit(0);
+}
+
+if ( not -f CONFIG_LOC ) {
+    say STDERR "Initializing config file\n" if not $silent;
+    Exherbo::Packager::init_config;
+    say STDERR "Wrote config to".Exherbo::Packager::CONFIG_LOC if not $silent;
+}
+
+parse_args(@ARGV);
+
+if ($output and @ARGV != 1) {
+    barf("--out is only valid with a single perl module");
+}
+
+foreach my $arg (@ARGV) {
+    $output = Exherbo::Packager::get_outfile_name($arg) if not $output;
+
+    ouch(400, "Exheres already exists at $output!") if ( -f $output);
+
+    if (not $stdout) {
+        open($fh, '>', $output) or ouch(400, "Could not open $output for
+            write");
+    } else {
+        $output = "stdout";
+        open($fh, '>&', \*STDOUT) or ouch(400, "Could not open stdout for
+            write");
+    }
+
+    say STDERR "Generating exheres for $arg" if not $silent;
+    Exherbo::Packager::gen_template($arg, $fh);
+    say STDERR "Wrote out exheres $output" if not $silent;
+
+    close($fh);
+}
+
+sub parse_args {
+    foreach (@_) {
+        if (not /^\w+(?:::\w+)*$/) {
+            barf("$_ is not a valid perl module name");
+        }
+    }
+}

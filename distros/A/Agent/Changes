@@ -1,0 +1,70 @@
+Agent Perl Change Log
+---------------------
+
+December 15, 1998
+   *	3.2.0 released.
+   *	Version scheme changed to <major>.<minor>.<micro>
+
+November 05, 1998
+   *	TCP transport now enables Cycle when no Address is passed.
+
+October 24, 1998
+   +	added pod to example agents.
+   +	added TCP transport 'KeepAlive' features.
+   *	fixed identity().
+
+October 22, 1998
+   *	Revamped README & INSTALL and added a couple of example agents.
+   *	TCP transport now requires a 'Cycle' argument to find a free port.
+
+October 4, 1998
+   *	3.01k released.  Won't even hint at it being the last one. :-)
+   +	added 'From' arg to Agent::Transport::TCP::recv()
+   *	made Static agent use localtime() instead of a system call
+
+October 2, 1998
+   *	3.01j alpha release (the last one??).
+   +	Added Thread and Safe .readme files.
+   *	updated ex.pl w/ command-line opts for Safe & Thread
+
+September 17, 1998
+   *	Major overhaul of execution in Safe compartments.  'Compartment'
+	need no longer be passed to run().
+   *	'File' arg of new() now takes an IO::Handle object.
+
+September 7, 1998
+   *	All 'Safe' arguments changed to 'Compartment' for compatability
+	with Tom.
+   +	Added support for Thread.pm.
+   *	Renamed from 'SpaceFree' to 'FreeSpace' for completions' sake :-)
+   *	Cleaned up Makefile.PL
+
+August 8, 1998
+   -	Removed $hostname, and $ipaddr from Agent's namespace.
+   -	store() no longer deletes $self->{Server}.
+
+July 30, 1998
+   *	Finished updating examples.
+   *	Fixed Agent::run().
+
+June 19-22, 1998
+   +	Addition of the Agent::Transport package
+   *	Replaced Agent::TCPIP with Agent::Transport::TCP
+   *	Major rewrite of Agent::Message
+   -	Cleaned out Agent's namespace (removed 'Tell', 'Listen', and
+	some other stuff).
+   *	Updated _some_ of the example agents.
+
+May 3, 1998
+   +	more patches to comply to Class::Tom.
+   +	added SpaceFree example agent.
+   *	revamped INSTALL
+
+March 26, 1998
+   +	added documentation for Agent and Agent::Message.
+   +	added SUBJECT in Agent::Message.
+   +	added '$obj->Reply' to Agent.
+
+
++---
+ Steve Purkis <spurkis@engsoc.carleton.ca>

@@ -1,0 +1,24 @@
+---
+author:
+  - 'Yung-chung Lin <henearkrxern@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Similarity
+no_index:
+  directory:
+    - inc
+requires:
+  Algorithm::LCS: 0
+  HTML::DOM: 0
+  XML::DOM: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.2.0

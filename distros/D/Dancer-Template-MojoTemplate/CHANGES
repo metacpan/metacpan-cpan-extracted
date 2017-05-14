@@ -1,0 +1,15 @@
+0.2.0   2011-05-25
+
+    [BUG FIXES]
+    * Added Mojo::Template to the prereqs. Fixes:
+        https://rt.cpan.org/Public/Bug/Display.html?id=68452
+    
+    [ENHANCEMENTS]
+    * Added basic tests
+    * Added this changelog.
+    * Cleaned up Readme 
+
+
+0.1.0   2011-01-29
+
+    Initial Release

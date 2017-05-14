@@ -1,0 +1,2931 @@
+<<if: ZXIDBOOK>>
+<<else: >>97 ZXID FAQ
+======
+
+> N.B. Some of these FAQs are repeated in the topic specific documentation,
+> e.g. zxid-java.pd.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+<<htmlpreamble: <title>ZXID FAQ</title><link type="text/css" rel=stylesheet href="zx.css"><body><h1>ZXID FAQ</h1> >>
+<<fi: >>
+
+<<ignore: $Id: zxid-faq.pd,v 1.6 2010-01-08 02:10:09 sampo Exp $ >>
+
+97.1 Compilation Problems
+-------------------------
+
+(*** also in INSTALL.zxid)
+
+* Makefile tries to compile a bunch of check programs early in the
+  compilation to detect common problems with missing headers (include
+  files) and missing libraries.
+* If the checks fail, you need to adjust the -I and -L flags in Makefile
+  variables CDIR and LIBS (around line 123)
+* Alternately you can create localconf.mk file that will be
+  included by the main Makefile and put your modifications there.
+* ZXID dependency libraries are libcurl, openssl (libssl, libcrypto), and zlib
+* Although compiling the dependency libraries from source is adviced,
+  usually you can use the versions that are supplied with your distribution.
+  However in this case you MUST install also the headers. Usually these
+  are called "development" packages.
+* zxid assumes openssl, libcurl, Java, and Apache to be installed
+  in the locations where source distributions of those packages
+  install them in their default configuration (e.g. /usr/local/ssl,
+  /usr/local/httpd, etc.)
+* Many distributions (e.g. Ubuntu, Redhat, SUSE, ...) choose to install
+  those libraries in different places, thus requiring distribution
+  specific edits to localconf.mk
+* If you have difficulty in finding the headers and libraries (or whether
+  a package is installed at all), try the following commands
+
+    find / -name 'stdio.h'
+    find / -name 'libc.*'
+    find / -name 'zlib.h'
+    find / -name 'libz.*'
+    find / -name 'opensslv.h'
+    find / -name 'libssl.*'
+    find / -name 'libcrypto.*'
+    find / -name 'curlver.h'
+    find / -name 'libcurl.*'
+    find / -name 'ap_release.h'
+    find / -name 'apr_version.h'
+    find / -name 'libapr-1.*'
+    find / -name 'servlet-api.jar'
+
+  If you find more than one of any of the above, you need to be extra
+  careful about which one you use.
+
+97.1.1 OpenSSL not found: you need to create localconf.mk
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID does NOT have a configure script. It ships with a notion
+of "standard" locations for the three dependency libraries,
+but if these libraries are not where it expects to find them,
+then typically you see (n.b. lines were folded for presentation):
+
+  make
+  If you get compilation errors, try: make help
+  gcc -g -fpic -fmessage-length=0 -Wno-unused-label -Wno-unknown-pragmas
+     -fno-strict-aliasing -D_REENTRANT -DDEBUG -DUSE_CURL -DUSE_OPENSSL
+     -DLINUX -I/tmp/zxid-0.20 -I/usr/local/ssl/include -I/usr/local/include
+     -c -o zxid.o zxid.c
+  zxid.c:34:23: curl/curl.h: No such file or directory
+  In file included from zxid.c:38:
+  zx.h:26:25: openssl/rsa.h: No such file or directory
+  ...
+
+What happened is that OpenSSL for some reason is not in the location
+where standard OpenSSL distribution would install it (as indicated by
+-I/usr/local/ssl/include flag that ships with ZXID Makefile). You need
+to determine where OpenSSL is installed in your case. You can use
+
+  find / -name rsa.h -ls
+
+to locate candidates.
+
+For example, if it turns out that OpenSSL is installed in /opt/ssl, then
+you need to create a localconf.mk file that indicates this location:
+
+  echo OPENSSL_ROOT=/opt/ssl >>localconf.mk
+
+There are several other make variables you may need to tweak. In the
+above example, we also notice that libcurl was not found where
+expected. This would be fixed like this
+
+  echo CURL_ROOT=/opt/curl >>localconf.mk
+
+Net result? ZXID does not try to guess where the libraries are. It
+makes you do the foot work of locating the correct libraries (some
+people have more than one instance installed) and prepare the
+localconf.mk. This may seem like a lot of work, but in my experience,
+fixing GNU autohell configure scripts that guess wrong is thousand
+times more frustrating. The system is dumb by design so you, as a human,
+do not have to try to second guess it - you are in control.
+
+97.1.2 Missing gperf
+~~~~~~~~~~~~~~~~~~~~
+
+  gcc -g -fpic -fmessage-length=0 -Wno-unused-label -Wno-unknown-pragmas -fno-strict-aliasing -D_REENTRANT -DDEBUG -DUSE_CURL -DUSE_OPENSSL -DLINUX -I/c/cvs/zxid_cvs -I/usr/local/ssl/include -I/usr//include   -c -o c/zx-a-aux.o c/zx-a-aux.c
+  c/zx-a-aux.c: In function "zx_NEW_a_Action":
+  c/zx-a-aux.c:80: error: "zx_a_Action_ELEM" undeclared (first use in this function)
+
+This happens because c/zx-const.h was misgenerated (it should not happen at
+all if you do not supply ENA_GEN=1) and does not include the necessary defines.
+c/zx-const.h should have more than 1900 lines and look something like
+
+  /* generated file, do not edit! zx_ _ATTR */
+  #ifndef _zx__ATTR
+  #define _zx__ATTR
+  #define zx_use_ATTR     0
+  #define zx_used_ATTR    1
+  #define zx_sequence_ATTR        2
+  ...
+  #define zx_wantDSEPR_ATTR       347
+  #define zx_ZX_TOK_NOT_FOUND_ATTR        348
+  #define zx__ATTR_MAX    349
+  #endif
+  /* generated file, do not edit! zx_ _ELEM */
+  #ifndef _zx__ELEM
+  #define _zx__ELEM
+  #define zx_ds_Y_ELEM    0
+  #define zx_gl_Y_ELEM    1
+  #define zx_gl_esrd_ELEM 2
+  ...
+  #define zx_wst_OnBehalfOf_ELEM  1629
+  #define zx_ZX_TOK_NOT_FOUND_ELEM        1630
+  #define zx__ELEM_MAX    1631
+  #endif
+
+97.1.3 make samlmod gives "incompatible types in assignment"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Should not happen with version 0.21 or later. See zxidnoswig.h
+for explanation of the problem.
+
+97.1.4 Perl compiled with different compiler than zxid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** this section also appears in zxid-perl.pd)
+
+Perl modules generally want to be compiled with the same C compiler
+and options as were used to compile perl itself (see perl -V). If this
+happens to be different than the compiler you have defined in CC
+variable (gcc by default, near top of Makefile or in localconf.mk), you may
+get an error like:
+
+  cd Net; perl Makefile.PL && make
+  Warning: -L.. changed to -L/home/sampo/zxid/Net/..
+  Writing Makefile for Net::SAML
+  make[1]: Entering directory `/home/sampo/zxid/Net'
+  cc -c  -I.. -I/apps/openssl/std/include -I/apps/include -D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBUGGING -fno-strict-aliasing -pipe -Wdeclaration-after-statement -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O2 -march=i586 -mtune=i686 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -g -Wall -pipe   -DVERSION=\"\" -DXS_VERSION=\"\" -fPIC "-I/usr/lib/perl5/5.8.8/i586-linux-thread-multi/CORE"   SAML_wrap.c
+  /bin/sh: cc: command not found
+  make[1]: *** [SAML_wrap.o] Error 127
+  make[1]: Leaving directory `/zxid/Net'
+  make: *** [samlmod] Error 2
+
+*Solutions*
+
+1. Compile zxid with compiler that was used for perl, e.g.
+
+     make CC=the-compiler-that-perl-wants
+
+2. Recompile perl using the compiler that you want to use for zxid
+
+3. Tinker with PATH environment variable so that both C compilers
+   are found. However, using two different compilers is not really supported.
+
+In general these types of problems happen when you use perl installed
+by your distribution, but have later compiled a gcc of your own. It may
+even be that you never installed the distribution cc - in that case
+consider installing it and then trying approaches 1 or 3.
+
+A similar situation can arise with incompatibility of the compiler and
+options used for dependency libraries, such as OpenSSL or libcurl, and
+those used for compiling zxid itself.
+
+97.1.5 All files under zx missing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** this section also appears in zxid-java.pd and zxid-perl.pd)
+
+You need to symlink zx to zxid source directory, thus
+
+  ln -s . zx
+
+If you do not have it, then you will get a lot of file inclusion errors for
+headers that are supposed to be in path starting by zx/
+
+The symlink is there to keep all handwritten source files on top
+level of directory for ease of development, yet allow inclusions to go
+through ~zx~ subdirectory. When zxid is installed, it goes to
+/usr/include/zx. Hence the symlink keeps the includes the same whether
+developing or using installed version.
+
+97.1.6 Compiler Warnings
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** this section also appears in zxid-java.pd and zxid-perl.pd)
+
+If you compile zxid with compiler warnings turned on (CFLAGS += -Wall),
+you will see quite a number of warnings, most of which are
+unwarranted. Since the warnings are unwarranted, I ship zxid Makefile
+with warnings turned off. If this bothers you, feel free to investigate
+the warnings and report to me any issues you uncover.
+
+Following warnings in partuclar are unwarranted:
+
+1. Any unusued variable warnings, especially in generated code. Most
+   common of these is ~se~ variable (see enc-templ.c).
+2. "Suggest parenthesis around assignment when used as truth value." I
+   rely on C language operator precedence. Also, in most cases the
+   assignment is the only expression in the truth test - there simply
+   is no opportunity for ambiguity -- and no justified case for gcc to
+   warn about this.
+3. "Suggest parenthesis around && when used in ||". I rely on C
+   language operator precedence, hence the suggestion is redundant.
+
+Some warnings you may want to worry about
+
+A. "int format, long int arg". On 32 bit platforms int and long
+   are both 32 bits so this warning is not an issue. On 64 bit platforms,
+   however, there may be cause for worry.
+
+97.1.7 SWIG and Java Problems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** this section also appears in zxid-java.pd)
+
+javac -J-Xmx128m -g zxid.java zxidjava/*.java
+zxidjava/zxidjni.java:159: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_pub_enc(zx_ctx c, zx_str plain, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                              ^
+zxidjava/zxidjni.java:164: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_pub_dec(zx_ctx c, zx_str ciphered, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                                 ^
+zxidjava/zxidjni.java:169: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_priv_dec(zx_ctx c, zx_str ciphered, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                                  ^
+zxidjava/zxidjni.java:174: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_priv_enc(zx_ctx c, zx_str plain, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                               ^
+This was due to missing SWIG generated classes. Probably interrupted file transfer.
+
+javac -J-Xmx128m -g zxid.java zxidjava/*.java
+zxid.java:24: cannot find symbol
+symbol  : method new_conf(java.lang.String)
+location: class zxidjava.zxidjni
+      cf = zxidjni.new_conf("/var/zxid/");
+                  ^
+zxid.java:27: cannot find symbol
+symbol  : method url_set(zxidjava.zxid_conf,java.lang.String)
+location: class zxidjava.zxidjni
+      zxidjni.url_set(cf, url);
+             ^
+zxid.java:28: cannot find symbol
+
+jar cf zxidjava.jar *.class
+jar cf /tmp/zxidjava.jar zxidjava/*.class
+
+javac -J-Xmx128m -g zxid.java                
+zxid.java:187: cannot access zxid_conf
+bad class file: /Library/Java/Extensions/zxidjava.jar(zxid_conf.class)
+class file contains wrong class: zxidjava.zxid_conf
+Please remove or make sure it appears in the correct subdirectory of the classpath.
+  public static int mgmt_screen(zxid_conf cf, zxid_cgi cgi, zxid_ses ses, char op)
+                                ^
+1 error
+
+Underscore in linking error
+
+./zxid-java.sh 
+Start...
+Exception in thread "main" java.lang.NoSuchMethodError: zxidjava.zxidjni.new_conf(Ljava/lang/String;)Lzxidjava/zxid_conf;
+        at zxid.main(zxid.java:24)
+
+This was due to finding some old copies from system paths.
+
+java -classpath .:zxidjava -Djava.library.path=zxidjava zxid 
+Start...
+Exception in thread "main" java.lang.UnsatisfiedLinkError: _zxid_new_conf
+        at zxidjava.zxidjniJNI._zxid_new_conf(Native Method)
+        at zxidjava.zxidjni.new_conf(zxidjni.java:586)
+        at zxid.main(zxid.java:24)
+
+97.1.8 SWIG and Perl Problems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** this section also appears in zxid-perl.pd)
+
+ZXID is tested and known to work with SWIG version 1.3.40. It is known not
+to work with SWIG-2.0.4. The telltale sign is
+
+  perl -MNet::SAML -e 'print Net::SAML::call($cf,$ses,$svctype,$url,0,0,$soap)'
+  TypeError in method 'zxid_call', argument 5 of type 'char const *'
+
+SWIG version should not be a concern for those using .tgz distributions of
+ZXID as the tar gzip archives already contain the files generated by SWIG.
+Also installs from cpan should not be affected.
+
+97.2 Platform Specifics
+-----------------------
+
+If your Unix platform is not mentioned, you should try saying just
+
+  make
+
+which will compile with Linux options. These options actually
+are pretty close to pure POSIX compile so you should get very close
+to working configuration.
+
+97.2.1 Linux
+~~~~~~~~~~~~
+
+Native development platform. Just say
+
+  make
+
+Seems there are some "improvements" that distributions have made. ZXID
+adopts the policy of expecting dependency modules where the module
+author meant it to be installed by default - for example OpenSSL by
+default installs in /usr/local/ssl (naming is historic, but has stuck).
+Many distros tinker with these paths. This means you need to create
+a localconf.mk.
+
+Redhat used to have an issue with Net::SAML (make samlmod). This has
+since been fixed, please see zxidnoswig.h for explanation.
+
+No doubt, distros will eventually pick up ZXID and provide it as a package.
+Once that happens they will solve any path issues accoring to their
+disto policy and that is fine, just do not ask me to comply with any
+such policy.
+
+97.2.2 FreeBSD
+~~~~~~~~~~~~~~
+
+No target available on Makefile, but a port is available from
+http://www.freshports.org/security/zxid/
+
+97.2.3 Solaris (Sparc)
+~~~~~~~~~~~~~~~~~~~~~~
+
+  make TARGET=sol8
+  make TARGET=xsol8    # Cross compile for Solaris (e.g. on Linux host)
+
+97.2.4 MacOS X (PowerPC?)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  make TARGET=macosx
+
+97.2.5 Windows Using MinGW
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  make zxid.dll TARGET=xmingw    # Cross compile on Linux host (best supported)
+  make zxid.dll TARGET=mingw     # Native compile for mingw target in Cygwin environment
+
+Either way, the net result is native Windows DLL that does not have
+Cygwin library dependencies or GPL encumberation.
+
+See Makefile for further mingw notes.
+
+97.2.6 Windows Using Cygwin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  make TARGET=cygwin
+
+Very experimental (as of Oct 2007) native build for Cygwin.
+
+Cygwin appears to not have neither flock(2) nor lockf(2). This is
+strange because at least one of these is implemented on MinGW.
+Current workaround is to define flock() to be empty macro. This
+of course means there is no file locking. There are 3 known races
+where things can go wrong
+
+1. Audit logs can get garbled. This does not stop ZXID from working,
+   but may make log analysis more complicated.
+2. Auto-CoT metadata writes can get garbled. This is very unprobable,
+   but if it happens, the ZXID deployment will not work towards
+   affected IdP. Nothing to worry about really.
+3. Locking is used to protect against updates of zxid.conf while
+   zxid is running. Again any corruption is very unlikely. Nothing
+   to worry about.
+
+The results of Cygwin compile may be GPL encumbered due to libraries.
+
+97.2.7 Windows Using MSVC
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Never been done (as of Oct 2007), but probably this is not very
+difficult given that MinGW port already has addressed many Windows
+platform issues. Please send any success reports, and receipes, my way.
+
+As of June 2010 the MSVC support has improved. The sed dependency
+was removed and any C language constructs that MSVC has indigestion with
+have been removed. We are still aiming at Makefile based
+build using Microsoft's cl compiler. You should try
+
+  make TARGET=win32cl
+
+If you manage to build it using some IDE project, please contribute
+the project file. For ongoing maintenance, it would be good if the
+project was a text file to which new source code files and be added
+easily *without using the IDE*, i.e. using simple text editor.
+
+97.3 Configuration Questions
+----------------------------
+
+(*** Some of these may be repeated in zxid-conf.pd)
+
+1. Q: In mod_auth_saml, what is the relation between ZXIDConf and httpd.conf?
+
+   A: httpd.conf can contain ZXIDConf directives. Those directives are
+   processed as if they came from /var/zxid/zxid.conf file (which is
+   processed first, before and ZXIDConf directives), except that if you
+   specify ZXIDConf "PATH=/your/path", this triggers reporcessing of
+   the zxid.conf (from the new path).
+
+2. Q: In mod_auth_saml, what is the relation between the +port+ in ZXIDConf
+   and the +port+ in the httpd.conf?
+
+   A: The ports must agree. ZXID configuration must match the way the
+   Apache layer is configured.
+
+3. Q: Multiple roles of same entity, acting as SP, WSC, and WSP for
+   different services
+
+   Asa:
+   > Part of what you are saying is that the service
+   > registration is WSC.  This is rather confusing since the case is a WSP
+   > acting as a WSC of the Discovery Service.   For the ClientLib thus far,
+   > I have chosen to think of service registration as a WSP to WSP.  What is
+   > the downside to this approach?
+
+   Conor:
+   > Service registrations can't be done WSP to WSP with any Liberty protocol
+   > (in fact, we don't define any such method of invocation as the invoking
+   > party is always  a WSC for the intent of that message - there's no
+   > problem with a WSP in turn being a WSC of another service instance, just
+
+   Right. You can don WSC role whenever convenient. There is nothing confusing
+   about WSP of one service being WSC of another service. Perhaps the
+   confusion would be avoided if everybody fully qualified their descriptions
+   until common convention about less than fully qualified roles emerges.
+
+   Entity E1, an ID-DAP WSP (primary role), will act as Discovery WSC
+   (secondary role) to perform metadata registration. This same entity E1
+   will also have SP interface (another secondary role) which allows
+   the user to trigger discovery association, again E1 acting in secondary
+   role of Discovery WSC.
+
+   No confusion as far as I can see.
+
+4. Q: What the "Entity ID" and the "Service Type" should be?
+
+   While entityID and Service Type selection are flexible and there is sophisticated
+   philosophy behind them, the short answers are:
+
+   a. entityID should be the URL from which your metadata can be fetched. The
+      URL should match the entityID field inside the metadata document. In
+      zxid deployments the entityID usually ends in "?o=B" and be beginning
+      part depends on the URL configuration parameter.
+   b. Service Type should be the namespace URI of the (first) top level child
+      of SOAP envelope Body element.
+
+
+97.3.1 No certificates appear in metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Q: +I've been trying to set up ZXID's mod_auth_saml on an OS X server. The
+EntityDescriptor XML doesn't seem to contain the public x.509 cert.+
+
+A: The metadata (the URL ending in o=B) will not have certificates if
+none actually were available. Thus visualizing the metadata in
+a brower is a good way to check whether it is finding the certs. So
+it is a feature ;-)
+
+Q: +Does mod_auth_saml use the cert from /var/zxid/pem/ssl-nopw-cert.pem?+
+
+A: The certs for metadata live in files
+
+/var/zxid/pem/sign-nopw-cert.pem
+/var/zxid/pem/enc-nopw-cert.pem
+
+In more recent versions (current is 0.38, which version were you using?)
+ZXID will automatically generate self signed certs if the certs are
+not installed yet. However it may fail to write them to the filesystem
+due to permissions problem. You should check that the user as which
+Apache runs can indeed read from and write to /var/zxid/pem directory.
+
+If you want to use officially issued certificates, you will of course
+need to place them in the two files mentioned. Please note that the
+files should be concatenation of certificate and the private key. Due
+to this and the practise of not using password on the private keys
+you should pay attention to protecting these files with filesystem
+permissions - the caveat is that if you protect too well then
+even the apache process can't read them. Recommended permissions are
+
+  chown APACHEUSER /var/zxid/pem
+  chmod -R 02750 /var/zxid/pem
+
+where APACHEUSER is distribution dependent unix user account used to
+run the apache httpd process. You can do `ps axu | grep httpd' to see
+what user apache runs as (common ones are "www-data" and "apache").
+
+97.3.2 Skipping IdP Selection: Hardwiring the IdP
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+> I was hoping that you could answer a question for me about mod_auth_saml. 
+> I have it installed on CentOS5 with Apache and every request to our
+> protected URL does bring up the IDP selection screen.  Since we only want
+> customers to use the sole IDP we have configured, we'd like to
+> automatically redirect to the IDP instead of having the users's click a
+> login button.
+>
+> Is there a setting for zxid.conf or Apache that I need to set so it will
+> always redirect to the sole IDP if a session needs to be created without
+> presenting that IDP selection screen?
+
+This in fact is possible. It is a bit convoluted (and not documented)
+in that it effectively works by simulating submission of the
+IdP selection screen, with the form fields and all. This is done
+by setting DEFAULTQS configuration option. For example, following
+
+ ZXIDConf "DEFAULTQS=l0https://idp.tas3.eu/zxididp%25%33%66o%25%33%3dB=1%26fc=1%26fn=prstnt"
+
+would simulate clicking login button for idp.tas3.eu. Note the URL
+escaping that needs to be applied: %25%33%66 is decoded by the
+configuration layer to mean "%3f", which is how at query string
+layer the question mark needs to be escaped. The %26 means
+ampersand that separates the arguments at querystring layer. It
+is encoded only once. Hope this is not too confusing.
+
+> >   The big question is which IdP? If for your
+> > user base there is only one, then user can be redirected to that one
+> > without any further ado and if they are already logged in at the IdP,
+> > they will be redirected back without user having to interact (otherwise
+> > user needs to log into the IdP and then he is redirected back).
+> In this case, it'll be an internal IdP, totally private.
+
+Ok, that makes it easy. With mod_auth_saml you may want to set the
+configuration option DEFAULTQS=l2EEE=1 where EEE is the EntityID URL
+of the IdP. Without mod_auth_saml, upon user clicking "Login using SAML",
+you would formulate to zxid_simple() call a query string containing
+"l2EEE=1". Then redirect to the return value.
+
+
+97.3.3 Web Service Provider Metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The metadata is needed in the web service call mainly to know the
+certificates. The endpoints in the metadata are ignored for purposes
+of the web service call as the endpoint is supplied by the EPR.
+
+Since SAML defines a metadata format with certificates (and SAML
+relevant endpoints), the convention is that web service call consults
+the SAML metadata for the certificates.
+
+It is very common for same service to be accessible as a web GUI (SAML
+SP) and web service (ID-WSF WSP), therefore it is considered
+convenient for the SAML metadata to be used.
+
+If the service does not want to be SAML SP and only wants to be ID-WSF
+WSP, then it still needs to supply the SAML SP metadata just for the
+purpose of the certificates (the SAML SP end point URLs will not be
+used).
+
+> My service only wants to be a ID-WSF WSP. For example, Custodix want
+> to be able to call a SOA Gateway web service, and the SOA Gateawy
+> knows nothing about SAML, etc.
+
+> I need to ensure that ZXID will process necessary soap headers and
+> accept or reject as appriorate.
+
+You still need to generate metadata. Since your service does not have
+SAML SP facet, you can't (directly) use o=B method (but see my example
+zxidwspdemo.java how it still supports o=B). However you can just hand
+edit a metadata file (perhaps using something from o=B as a template).
+
+If you place the hand edited metadata in the right file on WSC side,
+using
+
+   .zxcot -a <meta.xml
+
+then no dynamic metadata fetch will be attempted and you
+do not need to support o=B.
+
+See also zxid-idp.pd for registration of EPR and bootstrap.
+
+97.3.4 Two site in same domain: sessions interfere
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If two sites share a domain, they also share cookies. To avoid the
+cookies intefering with each other, use the SES_COOKIE_NAME
+configuration option to set the cookies different (the default is
+ZXIDSES). You may also have similar issue WRT PTM_COOKIE_NAME.
+
+One particular instance of this issue manifests when IdP and SP
+run on same host. On SP log right after SSO you may see
+
+  zx E get_ses: File(/var/zxid/ses/MMSESNULVSoj4lBYsqYhxCvXodNLM/.ses) not found errno=2 err(No such file or directory). flags=0x0 0, euid=443 egid=443 cwd(/var/zxid/webroot/zxid.org)
+  zx d No session(MMSESNULVSoj4lBYsqYhxCvXodNLM) active op(P)
+
+This is because the IdP already set the session cookie (IdP sessions
+usually start with "MMSES") and the SP is errornously picking it up
+and then not finding the corresponding session in its session store.
+
+97.3.5 Using HTTP or SOCKS proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID uses libcurl as its underlying HTTP client. Although ZXID does
+not offer any proxy related options, it respects the environment
+variables ~https_proxy~, ~all_proxy~, and ~no_proxy~, because libcurl sees
+them and uses them. Thus you can
+
+  all_proxy=corpproxy:1080 zxcot -g https://some.external.com/url
+  all_proxy=corpproxy:1080 zxcall ...
+
+or you can set the variables more permently
+
+  export all_proxy=corpproxy:1080
+  export no_proxy=localhost
+  zxcot -g https://external.url/
+
+See libcurl documentation at curl.haxx.se for more information.
+
+97.4 API Questions
+------------------
+
+1. *Q*: What do I need to pass in as +enve+ argument to zxidjni.wsc_prepare_call()?
+
+   *A*: zxidjni.wsc_prepare_call() has some auto detection. If you pass entire
+   SOAP <e:Envelope>, then it will just add some headers. If you pass <e:Body>
+   it will add <e:Envelope> and headers. If you pass anything else, it
+   assumes that is meant to be content of the body and will add
+   <e:Envelope><e:Headers>...</><e:Body>your stuff</></>
+
+2. *Q*: What exactly is a "sha1 name"?
+
+   *A*: Since ZXID (originally) uses filesystem as backend, a method
+   for generating filesystem-safe strings, to be used as filenames,
+   was needed. Further, there was occasionally requirement that each
+   different file have different name. Solution to these problems
+   is to hash the whatever part that is unique and use safe base64 [RFC3548]
+   encoding of the hash as the filename.
+
+   They are not very human friendly, but they are filesystem safe
+   and unique as required. They are also constant width, which tends
+   to make directory listing prettier, and also handles anomalously
+   long Entity IDs gracefully.
+
+   sha1 hashing is much less error prone than trying to escape or squash
+   the various Entity IDs, Name IDs, and who-know-what to be filesystem
+   safe. Add to the squasing  bugs, the convolutions of ensuring uniqueness
+   and dealing with too long input and you should see why sha1 names are
+   the most secure, easiest to implement, approach.
+
+   See also sha1_safe_base64() in zxutil.c
+
+97.4 Common Mistakes
+--------------------
+
+1.  When I try accessing https://sp1.zxidsp.org:8443/zxidtest.sh nothing happens!
+
+    Assuming you have the web server correctly running, the most common
+    gotcha is that zxidhlo has dynamic linking problem.
+    See <<see: ZXID-Installing-CannedTutorialRunningZXIDasCGIundermini_httpd-AccessingZXID>>
+    subsection "Dynamic Linking Problems", for explanation and resolution.
+
+2.  Single Logout does not end the IdP session (i.e. IdP does
+    not force you to supply password when you do SSO next time).
+
+    Usual cause is that the management form (the one with the SLO buttons)
+    does not have correct or any session ID. Do a view source on the
+    the page and look for field called "s". The session ID is
+    supposed to be extracted from the Single Sign-On result. For
+    zxid_simple() you need to parse the returned LDIF and
+    take the sesid. Pass that to zxid_fed_mgmt() as second argument.
+
+3.  Login buttons do nothing.
+
+    A possible cause is that the entity ID is not passed from
+    the IdP selection form. If the form is using POST method,
+    you must make sure you actually read the HTTP body and
+    pass its contents to the zxid_simple() as the ~qs~ argument.
+
+4.  The SP Login, a.k.a. IdP selection, page shows, but SSO does not work
+
+    a. Your configuration does not match actual URL used to
+       access the zxid system. For the zxidhlo family of
+       examples you MUST edit the configuration string
+       to match your situation. Watch out for domain name
+       and port number.
+
+    b. Connectivity issue prevents IdP from fetching metadata.
+       Make sure your domain name is resolvable at IdP (e.g.
+       add it to /etc/hosts). See also next point.
+
+    c. IdP is not configured to get your metadata automatically.
+       You have to configure your metadata to the IdP manually.
+       How to do this depends on IdP product. Do not ask us.
+
+    d. You supplied IdP URL that, in fact, is not the well known
+       location for fetching IdP metadata. Or the IdP does
+       not have well known location enabled. In the latter
+       case you will need to install the IdP metadata
+       manually (*** procedure to be documented). See [SAML2meta]
+       section 4.1 "Publication and Resolution via Well-Known Location",
+       p.29, for normative description of this method.
+
+    e. Connectivity issue at web browser level. Make sure your
+       web browser can resolve both SP and IdP domain names.
+       Edit /etc/hosts as needed on the machine where the browser runs.
+
+    f. Personal firewall blocks access. Check firewall set up on
+       * browser machine
+       * SP machine
+       * IdP machine
+
+5.  The SP Login, a.k.a. IdP selection, page does not show at all
+
+    a. Connectivity issue at web browser level. Make sure your
+       web browser can resolve both SP and IdP domain names.
+       Edit /etc/hosts as needed.
+
+    b. Personal firewall blocks access. Check firewall set up on
+       * browser machine
+       * SP machine
+
+    c. You deployed the zxid in some other URL than you thought.
+       Double check your webserver or servlet container
+       configuration and be sure you understand where
+       zxid is supposed to appear. Be sure you are editing
+       the right configuration - some people run multiple
+       web servers in their machine and get confused about
+       which one actually is active on which port and where
+       the configuration files are located.
+
+    d. ZXID lacks execute permissions, dynamic link libraries
+       are missing (use "ldd zxid" to check), or CGI permission
+       setup prevents it from running. See previous bullet.
+
+6.  Mystery configuration problems. Double check /var/zxid/zxid.conf
+    or consider removing it if you do not understand what it does.
+    Double check the conf string if using zxid_simple() interface.
+
+7.  Writes a user...
+
+    > Once it has been compiled, I copied the files zxidhlo.php and zxid.php
+    > to /var/www/zxid (my webroot). I accessed zxidhlo.php?o=E with my browser
+    > and I saw a page asking for IDP metadata. But when I looked at
+    > the /var/log/apache2/error.log, I found these: 
+    > 
+    >  tb77f96c0 zxidmeta.c:352 zxid_get_ent_by_sha1_name zxid d Trying 
+    >    sha1_name(cot) open (vopen_fd_from_path): No such file or directory 
+
+    Did you create the /var/zxid hierarchy (make dir) and make sure your
+    web user (nobody?) has write permission to the ~log~ directory? Or did
+    you configure it to use some other directory than /var/zxid?
+
+8.  What is this /var/zxidcot directory?
+
+    It is supposed to be /var/zxid/cot
+
+    When configuring PATH, did you forget trailing slash? E.g.
+
+      "PATH=/var/zxid&URL=..."    # WRONG!
+      "PATH=/var/zxid/&URL=..."   # Right
+
+9.  *Q1:* I get rejection due to NotOnOrAfter or NotBefore. I think I have
+    synchronized the clocks on IdP and SP. Log messages are
+
+      t  zxidsso.c:466 zxid_validate_cond     zx d ssof: NotOnOrAfter ok. Time to expiry 21900 secs
+      t  zxidsso.c:476 zxid_validate_cond     zx E ssof: NotBefore rejected with slop of 7300. Time to validity 21600 secs
+
+    *A1:* This seems awful lot like a timezone issue. Slop is ZXID config
+    parameter that defines the tolerance. I recently reduced it from 1 day
+    to 3 hours because I got feeback that it was security issue to have
+    such overbroad tolerance (which it is, but 1 day slop allows people
+    with bad time zone configs to still have initial success - may be
+    I go back to one day).
+
+    On both IdP and SP, run
+
+      TZ=GMT date
+
+    and see if that is about 6 hour difference. I stronly suspect other
+    machine being correctly on GMT (which does not even have concept
+    of summer time that causes so much productivity losss :-) and other
+    is on something like US Central time (your guess if summer time error applies).
+
+    You can synchronize using
+
+      TZ=GMT ntpdate pool.ntp.org
+
+    (there may be server closer to you than Finland)
+
+    *Q2:* I double checked the clocks, the SP and IdP are very close to our NTP
+    server, within 100ms or so.  Why would it say there's a slop of 7300
+    seconds?
+
+    *A2:* Slop is just tolerance. The real problem is "Time to validity 21600 secs".
+    If you can't get the clocks to synchronize, you can increase
+    the config option BEFORE_SLOP=22000 in /var/zxid/zxid.conf. This
+    of course has some security implications.
+
+    *Q3:* My time zone is set to CDT on both machines. Is it possible that
+    Shibboleth is using GMT and zxid is using my local time?  (Or the
+    other way around)   21600 seconds seems too obvious to
+    be a real clock skew.  If both systems have the same locale settings, then
+    something in software must be choosing the wrong time zone.
+
+    I set TIMEOUT_FATAL=0 and it does work.  I get my nid and my login session
+    is working!  So, major hurtle accomplished, but I think I'd like to get to
+    the bottom of this and find out what the real problem is.
+
+    *A3:* 21600 seems very obvious timezone issue.
+
+    On Unix the timezone behavior of a process is determined by setting
+    of TZ environment variable. To my best knowledge I always use gmtime(3)
+    which to my best understanding ignores the TZ environment variable.
+    However, it is possible that I errornously or the Shib IdP use
+    localtime(3), which will take TZ in account. Therefore I recommend
+    launching all processes with environment TZ=GMT (see the date
+    example above).
+ 
+97.4.2 Doubts
+~~~~~~~~~~~~~
+
+How to decode auto_flags
+
+  0x1d54   1 = debug; d = FORMT + FORMF + MGMTC; 5 = METAC + LOGINC; 4 = SOAPC
+
+97.5 Consent
+------------
+
+A frequent concern among the business people and lawyer types is
+whether the architecture provides for consent by the user. Usually
+this is related to (avoidance of) liability. If the system can be
+said to have gathered the consent of the user, we are safe.
+
+Unfortunately the standards do not mandate an uniform user interface,
+thus there is no single specific way how the consent is gathered or
+determined: it depends from business situation and application to
+another. Fortunately the Liberty and SAML 2.0 architectures provide
+plenty of ways and hooks to gather and convey the consent. Consider the
+following:
+
+1. When arriving to SP, user chooses IdP for SSO. This act
+   of course manifests user's intent to perform SSO.
+
+2. IdP can ask the user whether he wants to perform SSO to
+   the SP (IdP can make this question even if user is already
+   logged in to the IdP, though most demos omit the question
+   in the already logged in case).
+
+   At this point the IdP may also ask whether the user
+   wants to create a federation so that the SP can track
+   the user. Creating federation is consenting to be
+   tracked by the SP.
+
+   If the federation already exists, the IdP can still
+   offer a choice: should the federation be used
+   this time, i.e. does the user consent to be tracked
+   this time specifically.
+
+   If user does not consent to federation and use of
+   federation this time, but still consents to SSO,
+   the SSO will be made using a temporary name ID.
+
+3. If user gives any Personally Identifying Information
+   to the SP (beyond the federated pseudonym), then
+   the SP may be able to "connect the dots" and
+   correlate user's actions on the SP with his actions
+   in some other systems (technically this is called
+   collusion).
+
+   In a very technical sense users should be aware
+   of this risk or the implication and therefore by
+   providing such information they are effectively
+   consenting to be correlated across systems.
+
+   However, lawyers would probably say that if
+   the SP intends to correlate, it should state
+   so to the user at the time the information is
+   asked so that the user can make an informed decision.
+   If, after being informed, the user still supplies
+   the information, then user is clearly
+   consenting to the information being used for
+   the stated purpose, i.e. correlation.
+
+4. When user starts to use an ID web service, the user is
+   consenting to this service being visible to at least
+   some parties (why use the service if you did not
+   intend this).
+
+   To make this consent explicit, the user interface
+   of the ID Web Service can ask.
+
+   Also, the Discovery Service can ask consent using
+   the Liberty Interaction Service. It is quite
+   appropriate for the DS to ask this consent
+   because it allows the ACL to be set correctly
+   right from the beginning, when the service is
+   registered.
+
+5. When the user later accesses an SP that needs to
+   contact an ID Web Service, it could be
+   construed that the user, by using the SP
+   at all, is effectively consenting that the SP
+   may access the ID Web Services of the user.
+
+   If this is not enough, the Discovery Service
+   can use the Interaction Service on per service
+   invocation basis to ask if the user consents
+   to the specific request.
+
+   Finally, the actual ID Web Service can also
+   invoke the Interaction Service to ask the
+   user to consent to the specific request,
+   or otherwise enforce its policies.
+
+6. When using People Service, the inviter (Alice)
+   consents to the access by the invitee (Bob)
+   by requesting an invitation string from the
+   system.
+
+   Once the invitation has been sent (and
+   accepted by invitee) there is no easy way
+   to collect consent from inviter on per
+   request basis. For example Alice may not
+   be online at the time when Bob accesses
+   her resource.
+
+   Alice can later revoke Bob's invitation,
+   but in the window between Alice sending
+   the invite and revoking it, Bob can access
+   Alice's resource without Alice actively
+   consenting to every access.
+
+   Of course the resource can implement ACL
+   policies, like only allowing Bob to access
+   the resource a limited number of times,
+   such as once.
+
+7. When the invitee (Bob) uses inviter's (Alice's)
+   ID Web Services (resources), Bob has
+   consented to some form of tracking by
+   Alice's resources by accepting the
+   invite. Further consent may be obtained
+   by Bob's own IdP, see bullet 2.
+
+97.6 Deployment Planning
+------------------------
+
+Here is a rudimentary decision tree for deployment planning
+
+1. List your applications
+   a. Any provided by external partner?
+   b. Non web apps
+2. Document your existing identity stores and approaches to
+   a. User provisioning (when someone is employed)
+   b. Application provisioning (when someone starts using app)
+   c. Authorization: how do you know who is supposed to be
+      doing what?
+   d. Deprovisioning: what happens when someone is fired?
+   e. Login? Per app? Harmonized user names? Enterprise SSO?
+3. Document your goal: federated SAML SSO ¸ber alles :-)
+   a. Do you want to run IdP?
+   b. Could you out-source IdP?
+   c. Will your partners / customers be running their own IdPs?
+   d. Will you participate (or run) single CoT or do you
+      need to consider cross CoT inter-operation (e.g. IdP proxying)
+
+To be continued...
+
+97.7 Use of Signing and Crypto, Security Concerns
+-------------------------------------------------
+
+97.7.1 How is mod_auth_saml better than HTTP Basic Auth that it claims to emulate? HTTP Basic Auth does not address transport encryption. Is mod_auth_saml HTTP Basic Auth emulation vulnearable due to this?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+> I have looked at HTTP basic auth and it does not provide any
+> transport level security, is it secure to use HTTP basic auth with
+> certificates? is it common to do it that way?
+
+HTTP-Basic is a method for authenticating a user using username and
+password. This is orthogonal to whether the connection is encrypted.
+Most common current practise is to combine HTTP-Basic-Auth with TLS (SSL)
+encryption. This is considered safe, to the extent that passwords
+can ever be safe. mod_auth_saml keeps the TLS encryption part intact,
+but improves on the password insecurity part by either allowing
+nonpassword authentication, such as Yubikey token, or at least allowing
+one password disclosed to only one party (the IdP), rather than multiple
+passwords at multiple parties (the weakness of the latter approach
+is that the users tend to use the same passwords at the multiple
+parties, allowing each party to impersonate the user at the other
+party - and then there is the guessable password vulnearability).
+
+97.7.2 Receipe for debugging signature validation problems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This mail thread fragment discusses how to debug signature problems
+between ZXID deployments. If the signer is not ZXID, then you
+need to figure out how to get it to print the canonicalized
+form. Often this turns out to be surprisingly difficult because
+the signing end uses some library which does not document
+how this vital debugging information can be obtained.
+
+<<logoutput:
+> > Message digest does not match because canonicalizations
+> > are different. You can dig the canonicalized forms of body from /var/zxid/log/xml.dbg
+> > There should be one entry from time when signature is created and another from time
+> > the signature validation was attempted. The two are different.
+> >
+> > BTW, I usually run
+> >
+> > tailf /var/zxid/log/xml.dbg | ./xml-pretty.pl
+> >
+
+> The failure appears in log as:
+>
+> <!-- XMLBEG 1548:46  zxsig.c:308 zxsig_validate  zx d call:  VFY FAIL CANON BLOB len=337 -->
+> <a:MessageID xmlns:a="http://www.w3.org/2005/08/addressing" 
+> xmlns:e="http://schemas.xmlsoap.org/soap/envelope/" 
+> xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+> wsu:Id="MID" e:actor="http://schemas.xmlsoap.org/soap/actor/next" 
+> e:mustUnderstand="1">urn:MlQY4jARBIitwHPf6vIIyk_LZ</a:MessageID>
+> <!-- XMLEND 1548:46 -->
+>
+> now what?
+
+Yes, this is the failure, but somewhere earlier in the log (perhaps in different server - the
+WSC server), there should be block labelled similar to
+
+<!-- XMLBEG 13098:108  zxsig.c:124 zxsig_sign   zx d call:  SIG CANON len=337 -->
+...
+<!-- XMLEND 13098:108 -->
+
+You can find it quickly by searching backwards for something like the message ID or timestamp
+string.
+
+That block indicates how the signer canonicalized the blob. I claim the two will turn
+out to be different. Once the difference is known, I can investigate whether it is
+my bug or due to somehow malformed or incomplete input.
+>>
+
+97.7.3 Signature validation problems in body
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In typical web service call, using zxid_call() API, the programmer supplies
+a fragment of payload XML. This can be a source of canonicalization problems.
+
+ZXID will attempt to canonicalize it on basis of well formed XML and if it is not
+well formed, it will almost certainly give unpredictable results.
+
+Another common problem is omitting namespace declarations: ZXID considers
+all XML to have namespace, and if it does not find a namespace, then it will
+fabricate one. By supplying a namespace declaration, you control the situation
+instead of relying on unpredictable fabricated one.
+
+97.7.4 VFY FAIL CANON SIGINFO
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The logs say VFY FAIL CANON SIGINFO
+
+Basically a signature has message digests at two layers: 1. over
+payload data (e.g. #BDY), 2. over the <SignedInfo> element. The latter
+is what gets private key encrypted when signature is made. The
+encrypted value appears in <SignatureValue>.
+
+The validation decrypts <SignatureValue> with public key from cert. If
+the public key does not match the private key, you will get, if you
+are lucky, a padding error, which you were getting earlier. But if you
+are not lucky, you will just get garbage decrypt.
+
+The garbage decrypt is then compared against message digest computed
+over <SignedInfo>.
+
+This is reported as VFY FAIL CANON SIGINFO, which may be misleading if
+the real reson was garbage decrypt. However, it would be the right
+error message in case the <SignatureValue> decrypt was valid, but the
+<SignedInfo> had actually been tampered with.
+
+I would concentrate the investigation on the theory of garbage decrypt
+due to wrong certificate.
+
+The certificate for signature validation is chosen on basis of
+<Sender> header's ~providerID~ XML attribute.
+
+97.7.5 Perils of Turning Off AuthnReq Signing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Q: In response to signature problems relating to missing root
+authority certificate and AuthnRequest, other vendor is proposing
+that they do not require signed requests for web applications. Is it
+possible to turn off the need for certificates?
+
+A: Yes. In SP's zxid.conf, set AUTHN_REQ_SIGN=0
+
+However, this opens the IdP to a variant of unsolicited
+request attack as they would not know if the request is coming from
+a legitimate source. It saves the request signature verification cost,
+but allows Denial of Service by incurring SAML assertion generation and
+signing cost. You could argue that these cancel each other out. In any
+case the user would be entering the password to legitimate place: the IdP,
+so this is not really a phising attack.
+
+If IdP is buggy and blindly trusts the AssertionConsumerServiceURL
+field in the authentication request, not verifying the request
+signature could lead to inappropriate party being able to obtain the
+SSO assertion.  Unless the assertion is encrypted (the default in
+ZXID), this could lead to that party gaining knowledge of the
+attributes passed in that assertion. It is not uncommon for IdPs to be
+buggy in this way (as of 2012). Such bug constitutes a violation of
+SAML2 specs, but may not be caught in software testing as everything
+seems to work. Only negative testing would catch it. (Needless to say,
+zxididp paid attention to this detail.)
+
+97.8 Audit Trail
+----------------
+
+1. How can I see what attributes the single sign on assertion contains?
+
+   From IdP side (assuming zxididp, for other IdPs consult respective documentation):
+
+   a.  Locate the SSOA7N line from IdP activity log, e.g.
+
+         grep SSOA7N /var/zxid/log/act
+
+       which might return (single line, linewrap is only for this document)
+
+         PP - 20100112-144157.750 20100112-144157.750 127.0.0.1:- \
+         9u_7LsQjkz0VaXKucmx1_sYjQnM - AWTILy8_0yre96om7n4H-4fMW ENC \
+         zxidp U K SSOA7N - -
+
+   b.  The 8th field is the assertion ID, here AWTILy8_0yre96om7n4H-4fMW. With
+       A7N ID you can grep the issued assertions, e.g.
+
+         grep -l AWTILy8_0yre96om7n4H-4fMW /var/zxid/idplog/issue/*/a7n/*
+
+       which might return something like
+
+         /var/zxid/idplog/issue/9u_7LsQjkz0VaXKucmx1_sYjQnM/a7n/MxevnQGqKFwyBTPUZ-hI7m1PR-Q
+
+       This file contains the assertion in plain text. You can inspect it to
+       see what NameID is sent and what attributes are sent. One convenient command is
+
+         grep -l AWTILy8_0yre96om7n4H-4fMW /var/zxid/idplog/issue/*/a7n/* \
+            | xargs cat | ./xml-pretty.pl
+
+   From SP side the steps would be
+
+   i.  Locate FEDSSO line
+
+         grep SSOA7N /var/zxid/log/act
+
+       which might return (single line, linewrap is only for this document)
+
+         PP - 20100112-144639.184 20100112-144157.501 -:- \
+         xsKJr3DL7sUPDdbdqgC2H_eP-UM - AWTILy8_0yre96om7n4H-4fMW \
+         FIrFwFdR4wO2UFLQZl8c3LlUW      zx O K FEDSSO MSES6GOG4ta-nQdYlRVJriv24dj8 -
+
+   ii. The 8th field is the assertion ID. To locate the assertion in the rely
+       audit trail of the SP you can grep as follows:
+
+         grep -l AWTILy8_0yre96om7n4H-4fMW /var/zxid/log/rely/*/a7n/* \
+            | xargs cat | ./xml-pretty.pl
+
+97.9 Vendor products
+--------------------
+
+97.9.1 Symlabs Federated Identity Suite (SFIS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Interoperates. SP and IdP.
+
+Metadata import to IdP?
+
+What I usually do is
+
+  cd /opt/SYMfiam/3.0.x/conf/symdemo-idpa
+  echo 'sp: zxid-sp1$https://sp1.zxidsp.org:8443/zxid?o=B$$' >>cot.ldif
+
+Double check with text editor that the file is sensible.
+Note that the single quotes are essential as the dollars
+are to be interpretted literally, as separators.
+
+  cd pem
+  wget https://sp1.zxidsp.org:8443/zxid?o=B >zxid-sp1.xml
+
+Here the intent is to fetch the metadata from the SP and
+store it in a file whose name (without .xml extension)
+matches the first component of the sp: line. I am not
+100% on the wget syntax. You can also use browser
+to fetch the metadata and simply Save as under the
+correct name.
+
+  cd /opt/SYMfiam/3.0.x/conf/symdemo-idpa/start.sh restart
+
+This should restart the IdP server process and cause a
+refresh of the metadata it may have cached. You may
+want to
+
+  tail -f /opt/SYMfiam/3.0.x/conf/symdemo-idpa/log/debug.log
+
+to see if its getting indigestion.
+
+N.B. FIAM seems to have NameID encryption on by default, Turn
+this off by editing slimidp.ldif:
+
+  encnids: 0
+
+If this is not done, the SSO will fail (with what appears like signature
+error).
+
+97.9.2 Shibboleth and OpenSAML
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Shibboleth 2.1.5 IdP interoperates since 0.65. Earlier versions
+interoperated in some configurations.
+
+Many Shibboleth SPs interoperate (exact version numbers lost).
+
+97.9.3 Lasso and Authentic
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Used to work, may be still does. Not tested in recent memory.
+
+97.9.4 OpenSSO
+~~~~~~~~~~~~~~
+
+Used to work, may be still does. Not tested in recent memory.
+
+97.9.5 simpleSAMLphp
+~~~~~~~~~~~~~~~~~~~~
+
+Interoperates, but as of Sept 2010, simpleSAMLphp IdP has problems with
+EncryptedAssertions. Nothing ZXID can do (but you can turn off the
+encryption if you are willing to assume the consequences).
+
+simpleSAMLphp SP works.
+
+97.9.6 Ping
+~~~~~~~~~~~
+
+Not tested in recent memory.
+
+97.9.7 SiteMinder
+~~~~~~~~~~~~~~~~~
+
+CRLF emitting. Works since 0.65.
+
+97.9.8 Bouncing Castle vs. OpenSSL Padding Problem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There is a XML ENC padding problem between OpenSSL and Bouncing Castle
+Java Crypto Library. See OpenSSL bug number 1067:
+http://rt.openssl.org/Ticket/Display.html?user=guest&;pass=guest&id=1067
+
+<<logoutput:
+
+From: 	sampo@symlabs.com
+To: 	rt@openssl.org, xml-encryption@w3.org
+Cc: 	eric@projectliberty.org, sampo@symlabs.com
+Subject: 	OpenSSL symmetric crypto padding check incompatible with XMLENC
+Date: 	Thu, 12 May 2005 20:22:50 +0000
+
+Please find below a patch, with spec reference, against OpenSSL 0.9.7g.
+
+It could be argued that XMLENC spec is wrong in insisting on unpredictable
+values for the padding because this allows padding to be used as a
+covert channel. However, to deploy interoperable implementations it seems
+patching OpenSSL is the right thing to do. It has been observed that
+other crypto libraries, such as bouncing castle (a pure Java
+implementation) do not set all padding bytes to OpenSSL's satisfaction.
+
+--Sampo
+
+--- evp_enc.c~ 2005-01-28 14:03:53.000000000 +0000
++++ evp_enc.c 2005-05-12 03:26:44.000000000 +0000
+@@ -509,6 +509,21 @@
+EVPerr(EVP_F_EVP_DECRYPTFINAL,EVP_R_BAD_DECRYPT);
+return(0);
+}
++#ifdef PADDING_CHECK
++ /* Following loop checks that all padding has known value,
++ * presumably to prevent covert channel or some form of
++ * chosen text attack. However this check is in violation
++ * of [XMLENC] specification section 5.2 subsection
++ * "Padding", which states that only last octet of the
++ * block matters and values of other octets are not
++ * predictable. Thus to implement XMLENC decryption with
++ * openssl it is necessary to disable this code.
++ * -- 11.5.2005, Sampo Kellomaki (sampo@symlabs.com)
++ *
++ * [XMLENC] D. Eastlake, ed., XML Encryption Syntax and
++ * Processing, W3C Recommendation 10. Dec. 2002,
++ * http://www.w3.org/TR/2002/REC-xmlenc-core-20021210 */
++
+for (i=0; i<n; i++)
+{
+if (ctx->final[--b] != n)
+@@ -517,6 +532,7 @@
+return(0);
+}
+}
++#endif
+n=ctx->cipher->block_size-n;
+for (i=0; i<n; i++)
+out[i]=ctx->final[i];
+
+-----------
+
+OpenSSL is complying with various other standards with its current
+behaviour. For example PKCS#7.
+
+If the EVP functions are being called directly (instead of inside
+OpenSSL in its PKCS#7 code for example) you can disable the padding
+altogether EVP_CIPHER_CTX_set_padding() and perfom padding and pad
+checking at an application level.
+
+Steve.
+>>
+
+Since ZXID version 0.65 (Oct 2010), this has been addressed via
+the EVP_CIPHER_CTX_set_padding() route.
+
+97.9.7 Active Directory Federation Services (ADFS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID 1.02 SP has been confirmed to work with ADFS IdP (STS,
+unknown verion in April 2012).
+
+Sometimes ADFS IdP does not emit assertion at all. There seems to be
+some configuration change in ADFS viz its default install that is
+needed to get it to emit SAML2. Symptom may be the following ZXID
+debug log (see Apache error.log, catalina.out, or
+/var/tmp/zxid.stderr, depending on your installation) entries:
+
+  p2192    zxlog.c:682 zxlog_blob    zx d dec_redir_post nosig: LOGBLOB15(<samlp:Response) len=3994 path(/var/zxid/log/rely/hJ7us-0hhS2XLwl3VTPZoStmgRY/wir/n4CfarJbNloArnYTCI1BfOmIHg4)
+  p2192  zxidlib.c:540 zxid_saml_ok  zx E SAML Fail what(SAMLresp) SC1(urn:oasis:names:tc:SAML:2.0:status:Responder)
+
+although this could be caused by other errors that send status. Basically
+you can check the file indicated by the path on the LOGBLOB15 line and
+verify that it does not have Assertion. The Status element may also
+have human readable error string, though in the specific case of ADFS refusing
+to send assertion, no human readable error was supplied. At any
+rate, the status code 
+
+  urn:oasis:names:tc:SAML:2.0:status:Responder
+
+signifies that the error happened due to the IdP (which is responding
+to the AuthnRequest, hence "Responder") and that the request sent by
+SP was considered OK.
+
+Sometimes ADFS IdP emits an assertion without NameID (or EncryptedID)
+element, which makes it difficult for other SAML2 compliant SPs to
+work. Symptom may be the following ZXID debug log (see Apache
+error.log, catalina.out, or /var/tmp/zxid.stderr, depending on your
+installation) entries:
+
+  p18379 zxidlib.c:662 zxid_chk_sig zx d No signature in Response
+  p18379 zxidlib.c:595 zxid_decrypt_nameid zx E ssof: Neither NameID nor EncryptedID available 0
+  p18379 zxidsso.c:617 zxid_sp_sso_finalize zx E ssof: SSO failed: assertion does not have Subject->NameID. 0x0
+
+Reportedly the fix at ADFS IdP side is
+
+> "Create a claim rule to set the PartnerImmutableID as the the unique identifier.
+> This should then send it as the SAML NameID in assertion."
+
+97.10 Known Bugs
+----------------
+
+Following are known limitations. We document them here
+because we do not plan to fix them in foreseeable future.
+
+1. Namespace qualified XML attributes have underscore instead of colon
+
+97.11 Mysterious Error Messages
+-------------------------------
+
+"Random number generator not seeded!!!"
+
+This warning indicates that randomize() was not able to read
+/dev/random or /dev/urandom, possibly because your system does not
+have them or they are differently named. You can still use SSL, but
+the encryption will not be as strong. Investigate setting up
+EGD (entropy gathering daemon) or PRNG (Pseudo Random Number
+Generator). Both are available on the net.
+
+"msg 123: 1 - error:140770F8:SSL routines:SSL23_GET_SERVER_HELLO:unknown proto"
+
+SSLeay error string. First number (123) is PID, second number (1) indicates
+the position of the error message in SSLeay error stack. You often see
+a pile of these messages as errors cascade.
+
+"msg 123: 1 - error:02001002::lib(2) :func(1) :reason(2)"
+
+The same as above, but you didn't call load_error_strings() so SSLeay
+couldn't verbosely explain the error. You can still find out what it
+means with this command:
+
+     /usr/local/ssl/bin/ssleay errstr 02001002
+
+97.11.1 snprintf() multibyte character related errors in log
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is due to locale setting. Try
+
+  export LANG=C
+
+This will disable any UTF-8 processing in sprintf().
+
+BTW, Win32 native _snprintf() on does not nul terminate if buffer is
+full. Gotcha! All zxid code has additional manual nul termination,
+just in case.
+
+97.11.2 My own messages are redirected back to me
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In several SAML profiles a HTTP redirect is performed to
+send the user to other party, usually with a request or
+response in the query string.
+
+A mysterious error is when you see yourself receiving
+as input the stuff that was supposed to be sent to the
+other end. The way this happens is, if for some reason the
+other party's URL can not be determined, then the
+Location header will only consist of the query string
+that you are trying to send. Without domain name part
+of the URL, the browser will redirect back to the
+web site where the redirection came from. This is
+called "local redirect" and is usually the cause
+of you receiving your own output as input.
+
+To fix this, make sure you have the other site's metadata
+and make sure it parses and loads correctly. If that
+does not resolve the problem, see if the metadata
+has any binding for the operation you are trying.
+No binding will result in no URL.
+
+97.12 Certificates and Private Keys
+-----------------------------------
+
+97.12.1 Password is being asked for private key
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is normal behaviour if your private key is encrypted. Either
+you have to supply the password or you have to use unencrypted
+private key.
+
+One way to remove password is
+
+  openssl rsa -in key.pem -out keyout-nopw.pem
+
+For this to work, key.pem must have only the private key. On the other
+hand, for ZXID to work, the file must have both certificate and
+private key. You will need to use your favorite text editor to
+accomplish this.
+
+Scan OpenSSL.org for the FAQ for full explanation on how to
+remove password from the private key.
+
+97.12.2 Quick command for looking at certificate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in zxid-cot.pd)
+
+Sometimes you get warning messages (in browser) or signature
+validation errors (in IdP end) because the Subject field of the
+certificate does not match your actual domain name. You can
+check this with
+
+  openssl x509 -text </var/zxid/pem/ssl-nopw-cert.pem | grep Subject:
+
+If the domain name is different, then you need to obtain a certificate
+with correct domain name, see next question.
+
+97.12.3 Self signed certificate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in zxid-cot.pd)
+
+ZXID ships with zxid.pem which gets by default copied to /var/zxid/pem
+under various different names. This is fine for testing, but disastrous
+for production or security sentitive use as the private key corresponding
+to zxid.pem certificate is of public knowledge (it is distributed with
+every copy of ZXID) - it offers no security and no non-repudiation
+what-so-ever.
+
+For production or security sensitive install you need to either
+
+1. Obtain certificates from an official certification authority,
+   usually a commercial one. ZXID uses same certificate format as
+   Apache (i.e. the pem format), so aquiring certificates is easi. Or,
+
+2. Generate your own certificate. The simplest case is a self signed
+   certificate:
+
+     openssl req -new -x509 -nodes -keyout pkey.pem -out cert.pem
+     cat cert.pem pkey.pem >/var/zxid/pem/ssl-nopw-cert.pem
+
+The cat step is there because you need to supply both certificate
+and the private key in same file for ZXID to understand it.
+
+> Warning: Although ZXID wants to see the private key in the same
+> file as the certificate, you MUST NOT give this concatenated
+> file to any outsider. Others have legitimate need to know your
+> certificate, but they MUST NOT know your private key. If they
+> ask, you should take special care to delete the private key from
+> the file prior to giving it to them. Often those who need to
+> get your certificate, actually need your metadata: just tell them
+> to fetch it from the Well Known Location URL (i.e. the Entity ID
+> of your SP). ZXID will never leak the private key to the metadata.
+
+97.12.4 Installing CA Certificates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some versions of libcurl apparently do not respect setting
+CURLOPT_SSL_VERIFYHOST to 0 and thus require a CA certificate to be
+trusted. This may result SSL connection error messages like
+
+  CURLcode(35) CURLerr(SSL connect error)
+
+See: http://gagravarr.org/writing/openssl-certs/others.shtml#ca-openssl
+
+To fix this
+
+1.  Determine what is your OpenSSL library's directory ("OPENSSLDIR")
+
+      strace -e file openssl version 2>&1 | grep openssl.cnf
+
+    may result
+
+     open("/apps/openssl/0.9.8g/ssl/openssl.cnf", O_RDONLY|O_LARGEFILE) = 3
+
+    Here the /apps/openssl/0.9.8g/ssl/ is the ~OPENSSLDIR~.
+
+2.  Download from the certificate authority their certificate
+    in PEM format ("Apache" format) and save it in OPENSSLDIR/cert.pem
+
+
+3.  Check
+
+      openssl verify -CApath OPENSSLDIR/certs/ OPENSSLDIR/cert.pem
+
+    which should in successful case print
+
+      /apps/openssl/0.9.8g/ssl/certs/the_ca.pem: OK
+
+    If the hash is not right, it will print something like
+
+      /apps/openssl/0.9.8g/ssl/certs/the_ca.pem: /C=US/O=TheCA/OU=TheCA
+      error 18 at 0 depth lookup:self signed certificate
+      OK
+
+4.  Alternative approach using certs/ directory with hashes. Save the
+    certificate under OPENSSLDIR/certs with any name (say, the_ca.pem)
+
+5.  Create a hash
+
+      cd OPENSSLDIR
+      ln -s the_ca.pem `openssl x509 -hash -noout -in the_ca.pem`.0
+
+6.  Check: see step 3, substituting cert.pem with the_ca.pem.
+
+97.13 Author's Pet Peeves
+-------------------------
+
+1. What is Schema Grammar (.sg) and why are you using it?
+   * Schema Grammar is a compact formal description of XML documents. It is
+     mostly bidirectionally convertible to XML Schema (XSD) and captures
+     the useful essence of most XML schemata.
+   * Schema Grammars are intuitive and compact, often allowing the
+     essence to be understood at glance, and even most complex cases
+     being only about 50% of the volume of the corresponding XSD.
+   * We use Schema Grammar descriptions because they are more human readable
+     than XSD and still equally amenable to automated code generation.
+   * Schema Grammar descriptions are usually converted using xsd2sg.pl, which is
+     part of the PlainDoc distribution.
+   * See http://mercnet.pt/plaindoc
+   * N.B. You do not need xsd2sg.pl or PlainDoc if you just want to compile and use ZXID.
+
+2. What is PlainDoc (.pd)?
+   * PlainDoc is a document preparation system that uses intuitive plain text files
+     with minimal markup to generate PDF and HTML outputs.
+   * We use PlainDoc because it makes it easy to maintain documentation.
+   * See http://mercnet.pt/plaindoc
+   * N.B. You do not need PlainDoc if you just want to compile and use ZXID.
+
+3. How come zxid is so heavy to compile?
+   * SAML 2.0 and related specs have a lot of functionality and detail, even
+     if you really only need 1% of it. We do not wish to arbitrate which
+     functionality is best or most needed, so we simply provide it all.
+   * A lot of the code is generated, thus the input for C compiler is well
+     in excess of half a million lines of code (of which only about 6k
+     were written by a human).
+   * Some of the generated files are gigantic, e.g. Net/SAML/zxid_wrap.c
+     is over 380k lines. Compiler has to process all of this as a single
+     compilation unit.
+   * gcc and gnu ld were, perhaps, not designed to process this large inputs
+     efficiently. Often the implementation strategy of keeping
+     everything in memory will cause a smaller machines to swap.
+   * My 1GHz CPU, 256 MB RAM machine definitely swaps and thus
+     takes about 45 minutes to compile all this stuff.
+   * I recommend at least 1GB RAM and 3GHz CPU for development
+     machine. On such machine, you should be able to build in about 10 min.
+
+4. Why do you not use ./configure and GNU autoconf?
+   * ~autoconf~ is not for everyone. World does not stop without
+     ~autoconf~. Or indeed need ~autoconf~. It is Yet Another Dependency
+     I Do Not Need (YADIDNN).
+   * I find the GNU ~autoconf~ stuff much more difficult to understand than
+     my own ~Makefile~. Why should I debug ~autoconf~ when I could
+     spend the time debugging my ~Makefile~ or the actual code?
+   * I find resolving problems much easier at source code and ~Makefile~ level
+     than trying to debug a million line script generated by some system
+     I do not understand (perhaps some hardcore ~autoconf~ advocate could
+     try to convince me and educate me, but I doubt).
+   * My policy is to only support systems I have first hand experience with,
+     or I have trustworthy friends to rely on. It does not help me
+     to have a system that tries to guess +gazillion irrelevant variables+
+     to an unpredictable state. It's much easier to stick to standards like
+     POSIX and make sure you have predictable results from predictable inputs.
+   * If the deterministic and predictable results are wrong, they can
+     at least be debugged and fixed with a finite amount of work.
+   * Supporting all relevant systems manually is not that much of work. The
+     inhabitants of the irrelevant systems can support themselves, probably
+     learning a great deal on the side.
+
+97.13.1 What does ZXID aim at - an answer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A recent (Sept 2006) conversation that touched on the aims of ZXID project:
+
+> Q: So just generally, what are your goals for it, are you interested in making
+> it work well with what other people are producing (e.g. SAML -> WSF
+> cross-over), etc? I'm certainly assuming the answer's yes to that.
+
+I aim at full stack client side implementation. ID-FF, SAML 2.0, WSF
+(both versions). The generation technique I use will yield the
+encoders and decoders for both WSP and WSC, but the hand written
+higher level logic will at first be only written for SP and WSC. 
+Some WSP support has now been written as well (complete WSP support
+was completed as of July 2007).
+
+It is Apache licensed project, of course, so if someone contributes
+the IdP and WSP capabilities, I'll merge them into the
+distribution. (IdP and Discovery exist in the distribution as of
+Janyary 2010.)
+
+I am interested to have it working with other people's code at 3 levels:
+
+1. Over-the-wire interoperability
+2. I have split the functionality of the SP from the WSC such that
+   zxid SP could probably be used with someone else's WSC and someone
+   else's SP would reasonably easily be able to use zxid WSC.
+3. Interfaces to non IdM parts of the complete system, typically
+   used to implement the application layer, shall be
+   plentiful: C/C++ API, Net::SAML/mod_perl, php - whatever you
+   can SWIGify.
+
+One thing I am NOT interested in is "layered" stack. I strongly
+believe it's better each vertically integrated slice is implemented by
+one mind. Thus, except for lowest HTTP, TLS, and TCP/IP layers, my SP,
+or WSC, or WSP, handles the whole depth of the stack - SOAP,
+signature, and app interface layers (of course the actual app should
+be its own layer and probably user written). That is by design.
+
+I have found in practise that if you attempt a layered stack, you have
+impedance mismatches between the modules at different layers because
+they were designed and written by different minds. By having vertical
+integration I avoid impedance mismatches. This is the reason why
+monolithic TCP/IP implementations tend to be better than explicitly
+layered, such as the streams approach.
+
+Now, if someone else wanted to take my generated encoders and
+decoders and use them as a "layer" in their layered stack, I guess
+I would not have any issue. If you do that, please let me know
+because I would have to commit to API stability at that layer.
+I am willing to do that once there are real projects that depend
+on it, but until then I still may redesign those APIs, after
+all, I am at revision 0.4 :-)
+
+In the end, it seems that ZXID is actually somewhat layered approach -
+what I mean by "vertical integration" is that all the layers are
+designed and controlled by the same mind.
+
+> Q: I gather that it's SAML 2.0 at the moment, which I can't offer any test
+> capability for, but if you get to SAML 1.1, I'm happy to set up some kind of
+> IdP test capability for that.
+
+In SSO world SAML 1.1 and ID-FF 1.2 capabilities are definitely on the
+road map. In ID-WSF world, I'll probably start with 2.0 DS-WSC (don't
+we all) followed by ID-DAP WSC and then tackle 1.1 after
+that.<<footnote: As of version 0.18, July 2007, both WSC and WSP roles
+of ID-DAP as well as ID-HR-XML have been implemented. Discovery client
+was implemented as well. This means the generic WSC and WSP support is
+there.>>
+
+97.13.2 Annoyances and improvement ideas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** http://systoilet.wordpress.com/2010/09/29/i-hate-saml/)
+
+There is a lot of commonality that is not leveraged, especially in the
+way service end points are chosen given the metadata.  The descriptors
+are nearly identical so casting them to one should work.
+
+Many of the SAML2 responses are nearly identical. Rather than
+construct them fully formally, we could have just one "SAML any
+response" function. Perhaps this could be supported by some schema
+grammar level aliasing feature: if an element derives from base type
+without adding anything at all of its own, we might as well only
+generate code for the base type.
+
+Namespace aliasing scheme would allow us to consider two versions of
+schema the same. It seems to be fairly common that the schema
+changes are so minor that there is no justification for two
+different decoding engines.
+
+97.13.3 Non-obvious SAML
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+1.  Destination XML attribute is needed in redirect and POST bindings.
+
+2.  Assertion//SubjectConfirmationData/@InResponseTo XML attribute
+    is needed in SSO assertions, unless the SSO was unsolicited.
+    SAML is not very explicit about this, [SAML2core], ll.729-732
+    describes it as optional, but [SAML2prof], ll.580-582 and
+    ll.559-560 seem to imply this requirement.
+
+3.  Some deployments use POST binding for many more things than
+    officially sanctioned by SAML [SAML2conf], Table 1 "Possible
+    Implementations", p.6. None of the offical profiles, see
+    [SAML2conf], Table 2 "Feature Matrix", p.9, require support
+    for POST for sending or receiving Single Logout or Manage NameID
+    requests. Nor is sending AuthnRequest using POST officially
+    sanctioned. Using artifact profile for anything else than
+    fetching the SSO assertion is not official. Never-the-less,
+    some of these bindings are perfectly implementable and some
+    deployments actually use them. ZXID may support some of them,
+    especially the POST bindings, if it is easy to do so, but
+    we make no commitment beyound official SAML conformance.
+
+4.  In SAML SOAP bindings it is bit unclear if the caller needs
+    to be authenticated. Currently ZXID solves this by signing
+    the SOAP requests (see SSO_SOAP_SIGN configuration options).
+    Other approaches are using HTTP Basic authentication,
+    using Client-TLS, or simply not authenticating the peer.
+
+5.  Interpretation of metadata KeyDescriptor/EncryptionMethod
+
+    Algos on [SAML2conf], section 4.2 "XML Encryption Algorithms",
+    ll.252-253.
+
+    The interpretation in [SAML2meta], section 2.4.1.1 "Element
+    <KeyDescriptor>", ll.621-624, p.16, and the example
+    on l.1117.
+
+    Since the <EncryptionMethod> can appear several times, it
+    would seem reasonable to specify it once for assymmetric crypto
+    and once for symmetric crypto. If specified, then for each
+    of the cases, only one of the allowed algos may be used.
+    If not specified, then any algo authorized in [SAML2conf]
+    is allowed. If specified, but the algo is not authorized
+    by [SAML2conf], then implementation is nonconformant.
+
+6.  The selection of protocol binding for return path of
+    SSO is non-trivial. The Authentication Request may
+    specify any number of parameters like ProtocolBinding
+    or Index. Generally it should not be specified at
+    all, leaving the decision to the IdP, or it should
+    be specified using the Index method.
+
+7.  When passing around Name IDs or storing them in database,
+    remember to store all components, including NameQualifier
+    and SPNameQualifier.
+
+8.  Single Logout: IdP should not call originator of SLO when
+    it is logging out everybody.
+
+9.  SAML Redirect binding signs the base64 and URL encoded
+    payload. This is problematic as there is no canonical
+    way to URL encode, i.e. some implementations encode
+    more than others. When signature needs to be verified,
+    CGI or other layer of processing may already have
+    removed the URL encoding, thus breaking the signature.
+    Correct implementation requires capturing the URL encoded
+    version of ~SAMLRequest~ or ~SAMLResponse~ field
+    as it came from wire and using that for signature
+    verification. This is what ZXID does, but historically
+    some implementations have tried to URL reencode for
+    signature verification, resulting "it depends" type
+    bugs where sometimes it works when sender's URL
+    encoding happens to match the URL encoding the receiver
+    applies. Of course all of this could have been avoided
+    had the design been to sign the base64 encoded form
+    prior to URL encoding. And URL encoding would not
+    have been needed at all if safebase64 ([RFC3548], sec 4)
+    encoding had been used in the first place.
+
+10. SAML SimpleSignPOST binding may superficially seem
+    similar to Redirect binding in the signature area. Well,
+    it is not. SimpleSign signs the payload data prior to
+    base64 (and URL) encoding. This avoids the bug that
+    easily creeps into Redirect signature verification,
+    see above. Downside is that the payload can't really be
+    binary, unless you base64 encode twice.
+
+11. EncryptedAssertion and EncryptedID: how is the EncryptedKey
+    found?
+
+    a. The EncryptedData/KeyInfo/RetrievalMethod references the Id attribute of
+       the EncryptedKey element, which is sister of the EncryptedData.
+       Shibboleth 2010 can be kludged to work with this method if
+       EncryptedKey element has Recipient XML attribute equal to the
+       EntityID of the SP. This is nowhere well documented, but appears
+       to work.
+
+    b. EncryptedKey is child of EncryptedData/KeyInfo, i.e.
+       EncryptedData/KeyInfo/EncryptedKey. Shibboleth SP appears to use
+       this latter method as of 2010. Scott ackowledged method (a) as
+       also valid and will fix Shibboleth SP.
+
+    See saml-core-2.0-os.pdf, sec 2.2.4 Element <EncryptedID>, p.14, l.495
+    specifies that EncryptedData and EncryptedKey are sister elements.
+    See also ll.515-521 for schema fragment.
+    Sec 2.3.4 Element <EncryptedAssertion> on p.17 contains similar language.
+    as does 2.7.3.2 Element <EncryptedAttribute> on p.31.
+
+<<ignore:
+ Oliver: 2010-09-06 08:06:29 DEBUG OpenSAML.MessageDecoder.SAML2 [30]: extracting issuer from SAML 2.0 protocol message
+2010-09-06 08:06:29 DEBUG OpenSAML.MessageDecoder.SAML2 [30]: message from (https://zxidp.org/idp)
+2010-09-06 08:06:29 DEBUG OpenSAML.MessageDecoder.SAML2 [30]: searching metadata for message issuer...
+2010-09-06 08:06:29 DEBUG OpenSAML.SecurityPolicyRule.MessageFlow [30]: evaluating message flow policy (replay checking on, expiration 60)
+2010-09-06 08:06:29 DEBUG XMLTooling.StorageService [30]: inserted record (R6AEwkbaM6nahxpvSNOyr0dTe) in context (MessageFlow)
+2010-09-06 08:06:29 DEBUG Shibboleth.SSO.SAML2 [30]: processing message against SAML 2.0 SSO profile
+2010-09-06 08:06:29 ERROR Shibboleth.SSO.SAML2 [30]: Unable to locate an encrypted key.
+Sampo: Ok, looking for encrypted key.
+? This is is what I sent on the wire.
+Oliver: ok let me make a diff and see if that is what i received
+Sampo: If we analyze this you can see that EncryptedKey is sister element of EncryptedData element.
+Oliver: ok it is exactly identical to what i have in the log
+Sampo: The KeyInfo of the EncryptedData references #EK39 and the EncryptedKey has Id attribute EK39
+? That is the mechanism by which it is supposed to find the encrypted key.
+? Now the next step is that EncryptedKey itself has KeyInfo that contains X509 certificate.
+? That certificate is supposed to be your SP's encryption certificate, taken from your metadata.
+? Do you follow me?
+Oliver: yes
+Sampo: Now, at cursory inspection the cert in the message matches the cert in your metadata.
+? Can you spot any error here?
+Oliver: let me do a diff to double check ... one sec
+Sampo: Your metadata says you are using same certificate for encryption and signing.
+? Next verification would be to see if your metadata matches the certificate actually used by SP at this step.
+? I think the log messages that Scott provides are too terse to analyze this problem. Giving one blanket "Unable to locate an encrypted key" error message for all potential points of failure outlined thus far is not sufficient.
+? I have to go eat now. I hope these ideas help. I'll be back in an hour.
+? You do have credentials on zxidp.org so you can reproduce all this at will, right?
+Oliver: i am checking ... but so far everything looks identical to what is in the log
+? i have an account there yes
+Sampo: Good. Talk to you in an hour.
+Oliver: enjoy your lunch
+Sampo: I'm back
+Oliver: hey
+? double checked the certs in fhe configuration and compared them to what you were sending and they are identical
+Sampo: Next theory why it is not working?
+Oliver: as you might have noticed ... i am not an saml expert ... so I don&apos;t really have a theory why it is not working
+? the strange thing is that it seems to work fine with protectnetwork and the kantara idp
+Sampo: Huh, I actually thought you were SAML knowledgeable or at least wanted to learn and become SAML expert?
+Oliver: i am doing the system administration for kantara ... and very much interested in saml and learning more about it
+? but still far from being an expert
+Sampo: Can you capture the wire message from protect network?
+? For example turn off JavaScript and perform the login. When it stops on the POST page, save that page so you can see what the IdP is sending to the SP.
+Oliver: sure let me login via protect network and capture it ... once sec
+? i can see the wire message in the logs
+? just once sec
+* Oliver posted file protect-network.debug to members of this chat
+? here is what i got from them
+Sampo: THe assertion is not encrypted at all!
+? That leaves them open to attacks by infected web browsers.
+? The so called active intemediary man in the middle attack.
+? Can you make similar verification to see if Kantara IdP encrypts the assertion?
+Oliver: oh you wanted the encrypted version?
+Sampo: If encrypted version was passed on the wire, I want to see it.
+? If https is used, the most reliable place to capture is stopthe POST flow just before the form with the assertion is posted to the SP. Give me the content of the SAMLResponse form field.
+Oliver: ok let me try the turn off  javascript  thing then
+* Oliver posted file encrypted.txt to members of this chat
+? this is the enctypted version from protect network
+Sampo: Analyzing...
+? Ok, I see the difference: I use EncryptedData/KeyInfo/RetrievalMethod to designate the EncryptedKey where as protectednet uses EncryptedData/KeyInfo/EncryptedKey
+? Schemawise both appear valid and I support both in my SP.
+Oliver: ok
+Sampo: Which code does protect-network use?
+Oliver: so you think it is a bug in shibboleth?
+Sampo: protected-network uses shibboleth?
+Oliver: no that is our sp
+? i don&apos;t know what they use
+Sampo: Yes, I think it is bug in shibboleth SP. It should accept either way of doing it.
+Oliver: ok so maybe we should forward that info to scott
+Sampo: What software do you use for Kantara IdP?
+Oliver: simplesamlphp
+Sampo: Can you capture their output and see how they designate the EncryptedKey?
+Oliver: sure you want the decrypted version only right?
+Sampo: Meanwhile, I will add to my IdP an option to generate it the EncryptedData/KeyInfo/EncryptedKey way.
+? Since the problem is with encryption, I want the encrypted version.
+* Oliver posted file encrypted.txt to members of this chat
+? oops sorry wrong file
+? one sec
+* Oliver posted file encrypted-simplesamlphp.txt to members of this chat
+Sampo: Fundamentally this is a bug in xml-enc and saml specs in not specifying only one way of doing it.
+Oliver: the second one is the correct file (the one that says simplesamlphp) the first one was the one from protecnetwork
+Sampo: Yes, I am looking at it...
+? The encrytped-simplesamlphp.txt does not contain encrypted assertion (or ancrypted anything).
+? If this really is what you captured from the POST SAMLResponse field, then your IdP is vulnearable to the MITM attack.
+? You are using the POST binding in all cases, right?
+Oliver: yes
+? one sec looking at the xml
+Sampo: That is important because encrypting the assertion is not needed in artifact binding.
+Oliver: yes i see the encrypted is missing
+? i need to update the software on the ipd anyway. so i will try to get this to work right during that maintenance
+? thanks for pointing that out
+Sampo: See saml-bindings-2.0-os.pdf, sec 3.5.5.2 Security Considerations, p.24, ll.847-851
+? After publication it was understood that the SHOULD NOT could be eliminated if EncryptedAssertion is used.
+Oliver: noted
+Sampo: See saml-core-2.0-os.pdf, sec 2.2.4 Element <EncryptedID>, p.14, l.495 specifies that EncryptedData and EncryptedKey are sister elements. Thus this really appears to be a bug in shibboleth SP.
+? See also ll.515-521 for schema fragment.
+Oliver: ok
+Sampo: Sec 2.3.4 Element <EncryptedAssertion> on p.17 contains similar language.
+Oliver: so what do we do? include scott in the loop?
+Sampo: Please raise this issue with Scott.
+Oliver: ok
+? will do
+Sampo: Meanwhile I will implement an option to be spec noncompliant so that it still works with his buggy code.
+Oliver: ok sent him an email
+? lets see what he says
+Sampo: It is quite sad that sec 6 SAML and XML Encryption Syntax and Processing, p.73, does not provide any clarification on this matter either. The core spec does not provide a single example of EncryptedID or EncryptedAssertion. Seems OASIS SSTC was pretty sloppy when defining this part of the spec.
+Oliver: yes that should be defined in detail
+Sampo: Umm, it seems you did not Cc me in the mail. Please let me know what he replies.
+Oliver: oops sorry
+? yes will forward the answer as soon as i get it
+Sampo: Little progress now:
+? opensaml::FatalProfileException at (http://kantarainitiative.org/Shibboleth.sso/SAML2/POST)
+ 
+Unable to locate satisfiable bearer SubjectConfirmation in assertion.
+? I guess that means it is at least able to decrypt. Can you paste there the corresponding log lines?
+Oliver: oncesec
+* Oliver posted file shibd.log to members of this chat
+Sampo: 2010-09-06 12:13:16 ERROR OpenSAML.SecurityPolicyRule.BearerConfirmation [30]: bearer confirmation failed with recipient mismatch
+? I have a hunch on this. I'll check the specs.
+Oliver: ok
+Sampo: Is there any way I could just use http request to a CGI to obtain a tail of your log?
+Oliver: we don&apos;t have anything setup right now
+Sampo: There may be a good policy reason why not to set up such log access, but if there is no rule against it, it would be pretty trivial php or perl CGI script to write.
+? Think about that while I think about BearerConfirmation :-)
+Oliver: yes would not be too hard to write a little php for that but I would have to check with joni if she is ok with it
+? i think there have a national holiday there today though
+? they
+Sampo: Hope that means Scott has time to read mails :-)
+Oliver: true
+Sampo: One step further.
+? shibsp::ConfigurationException at (http://kantarainitiative.org/Shibboleth.sso/SAML2/cookie:982a07ae)
+ 
+Shibboleth handler invoked at an unconfigured location.
+Oliver: just sent you the responce from scott
+? do you want the logs from the errorﬂ
+? ?
+Sampo: At least the tail of the log from DEBUG Shibboleth.SSO.SAML2 [30]: extracting issuer from SAML 2.0 assertion onwards
+? Hopefully that is so little you can just paste it here.
+Oliver: one sec
+Sampo: I'll check Scott's response...
+Oliver: 2010-09-06 12:52:36 DEBUG Shibboleth.SSO.SAML2 [46]: extracting issuer from SAML 2.0 assertion
+2010-09-06 12:52:36 DEBUG OpenSAML.SecurityPolicyRule.MessageFlow [46]: evaluating message flow policy (replay checking on, expiration 60)
+2010-09-06 12:52:36 DEBUG XMLTooling.StorageService [46]: inserted record (Ajq-JsiQEM4thfqIZ4T911pUp) in context (MessageFlow)
+2010-09-06 12:52:36 DEBUG OpenSAML.SecurityPolicyRule.XMLSigning [46]: validating signature profile
+2010-09-06 12:52:36 DEBUG XMLTooling.TrustEngine.ExplicitKey [46]: attempting to validate signature with the peer&apos;s credentials
+2010-09-06 12:52:36 DEBUG XMLTooling.TrustEngine.ExplicitKey [46]: signature validated with credential
+2010-09-06 12:52:36 DEBUG OpenSAML.SecurityPolicyRule.XMLSigning [46]: signature verified against message issuer
+2010-09-06 12:52:36 DEBUG OpenSAML.SecurityPolicyRule.BearerConfirmation [46]: assertion satisfied bearer confirmation requirements
+2010-09-06 12:52:36 DEBUG Shibboleth.SSO.SAML2 [46]: decrypted NameID: &lt;sa:NameID xmlns:sa=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot; Format=&quot;urn:oasis:names:tc:SAML:2.0:nameid-format:transient&quot; NameQualifier=&quot;https://zxidp.org/idp&quot; SPNameQualifier=&quot;https://kantarainitiative.org/shibboleth-sp&quot;&gt;TdDu9HPCRGB3cdEaRgVtdgmkD&lt;/sa:NameID&gt;
+2010-09-06 12:52:36 DEBUG Shibboleth.SSO.SAML2 [46]: SSO profile processing completed successfully
+2010-09-06 12:52:36 DEBUG Shibboleth.SSO.SAML2 [46]: extracting pushed attributes...
+2010-09-06 12:52:36 DEBUG Shibboleth.AttributeExtractor.XML [46]: skipping unmapped NameID with format (urn:oasis:names:tc:SAML:2.0:nameid-format:transient)
+2010-09-06 12:52:36 INFO Shibboleth.AttributeExtractor.XML [46]: skipping unmapped SAML 2.0 Attribute with Name: urn:liberty:disco:2006-08:DiscoveryEPR, Format:urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+2010-09-06 12:52:36 INFO Shibboleth.AttributeExtractor.XML [46]: skipping unmapped SAML 2.0 Attribute with Name: idpinfo, Format:urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+2010-09-06 12:52:36 INFO Shibboleth.AttributeExtractor.XML [46]: skipping unmapped SAML 2.0 Attribute with Name: cn, Format:urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+2010-09-06 12:52:36 INFO Shibboleth.AttributeExtractor.XML [46]: skipping unmapped SAML 2.0 Attribute with Name: zxididp, Format:urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+2010-09-06 12:52:36 DEBUG Shibboleth.SSO.SAML2 [46]: resolving attributes...
+2010-09-06 12:52:36 DEBUG Shibboleth.AttributeResolver.Query [46]: found AttributeStatement in input to new session, skipping query
+2010-09-06 12:52:36 DEBUG Shibboleth.SessionCache [46]: creating new session
+2010-09-06 12:52:36 DEBUG Shibboleth.SessionCache [46]: storing new session...
+2010-09-06 12:52:36 DEBUG XMLTooling.StorageService [46]: inserted record (session) in context (_a1e19c299c142bf732871dbff386f7d9)
+2010-09-06 12:52:36 DEBUG XMLTooling.StorageService [46]: inserted record (TdDu9HPCRGB3cdEaRgVtdgmkD) in context (NameID)
+2010-09-06 12:52:36 DEBUG XMLTooling.StorageService [46]: inserted record (Ajq-JsiQEM4thfqIZ4T911pUp) in context (_a1e19c299c142bf732871dbff386f7d9)
+2010-09-06 12:52:36 INFO Shibboleth.SessionCache [46]: new session created: ID (_a1e19c299c142bf732871dbff386f7d9) IdP (https://zxidp.org/idp) Protocol(urn:oasis:names:tc:SAML:2.0:protocol) Address (93.108.147.200)
+2010-09-06 12:52:36 DEBUG Shibboleth.SSO.SAML2 [46]: ACS returning via redirect to: cookie%3A982a07ae
+Sampo: It appears SP side session was created all right.
+? I think we are now at the point where SAML is no longer involved. 
+Oliver: yes I still need to map some attributes but looks allright
+Sampo: Where did that cookie%3A982a07ae come from?
+? It appears that the equals sign got URI escaped and perhaps that is throwing it off?
+Oliver: is there maybe a ? missing?
+Sampo: That could be, as well.
+? Lets entertain the theory that cookie%3A982a07ae came from the RelayState field and investigate how it was passed in AuthnRequest and Response.
+Oliver: but then the same thing should happen with the protect network
+Sampo: If you look at the original HTTP redirect that is made to convey AuthnRequest, you can see QueryString argument RelayState=cookie%3A8cd0ff4c
+? So clearly your SP (or WAYF service?) already passes it in that format. As far as I have understood the protocol, I am not supposed to decode it (nor reencode).
+? If I intercept a POST, I can see the field <input name="RelayState" value="cookie%3A982a07ae" type="hidden">
+? Perhaps the field should have been <input name="RelayState" value="cookie=982a07ae" type="hidden">
+? I.e. the RelayState gets encoded twice because the browser, when posting the form will encode again.
+Oliver: i think it needs to be a :
+? this is what i am getting from protect network
+? &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;en&quot;&gt;
+ 
+    &lt;body onload=&quot;document.forms[0].submit()&quot;&gt;
+        &lt;noscript&gt;
+            &lt;p&gt;
+                &lt;strong&gt;Note:&lt;/strong&gt; Since your browser does not support JavaScript,
+                you must press the Continue button once to proceed.
+            &lt;/p&gt;
+        &lt;/noscript&gt;
+        
+        &lt;form action=&quot;http://kantarainitiative.org/Shibboleth.sso/SAML2/POST&quot; method=&quot;post&quot;&gt;
+ 
+            &lt;div&gt;
+                &lt;input type=&quot;hidden&quot; name=&quot;RelayState&quot; value=&quot;cookie:109e37f6&quot;/&gt;
+? ...
+Sampo: Hex 3a is a colon? Not equals?
+Oliver: i think so yes
+? looked it up
+Sampo: I'll try this and see if it fixes...
+Oliver: ok
+Sampo: It went through!
+? But I landed back on the Current Members page where I had started by clicking the Log In.
+? The Log In still appears.
+Oliver: yes probably some attribute mapping missing hold on
+Sampo: How do I know that I am logged in?
+? Shouldn't Single Logout button of some sort appear (and Log In disappear)?
+Oliver: yes your username appears
+? hold one one second
+? need to logout and login to try it
+Sampo: But how can I logout? I do not see any logout button?
+Oliver: no i do have to logout to try it here
+Sampo: So zap cookies is the only way?
+Oliver: 2010-09-06 13:34:04 DEBUG Shibboleth.AttributeDecoder.NameID [28]: decoding NameIDAttribute (persistent-id) from SAML 2 NameID with Format (urn:oasis:names:tc:SAML:2.0:nameid-format:persistent)
+2010-09-06 13:34:04 INFO Shibboleth.AttributeExtractor.XML [28]: skipping unmapped SAML 2.0 Attribute with Name: urn:liberty:disco:2006-08:DiscoveryEPR, Format:urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+2010-09-06 13:34:04 INFO Shibboleth.AttributeExtractor.XML [28]: skipping unmapped SAML 2.0 Attribute with Name: idpinfo, Format:urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+2010-09-06 13:34:04 INFO Shibboleth.AttributeExtractor.XML [28]: skipping unmapped SAML 2.0 Attribute with Name: zxididp, Format:urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+Sampo: FYI, the page I am using for these tests: http://kantarainitiative.org/confluence/display/GI/Current+Members
+? Those attributes can be safely ignored for time being.
+Oliver: where do you pass the username?
+? what attribute?
+? and format?
+Sampo: No attribute. I pass pseudonymous NameID.
+? That appears in Subject element of the SAML assertion.
+? In your log 2010-09-06 13:34:04 DEBUG Shibboleth.AttributeDecoder.NameID [28]: decoding NameIDAttribute (persistent-id) from SAML 2 NameID with Format (urn:oasis:names:tc:SAML:2.0:nameid-format:persistent)
+? would appear to correspond to that.
+Oliver: ok so let me try to map NameID to our username
+Sampo: But perhaps we need to take a step back at this point: assume a random user of zxidp.org wants to access kantara. How would kantara know that user (identified by persistent pseudonym) is in fact a user that is allowed to access Kantara?
+? I vaguely recollect that last time I asked this question, the answer was that Kantara does not care.
+Oliver: all end up in the standard user group first
+? where you see the same as if you were not logged in
+? and then you contact staff and ask to be assigned to another group
+Sampo: But you should see at least the logout button or some indication that you are logged in.
+Oliver: yes you see your username where it says login etc
+? can edit your profile
+? etc.
+Sampo: "username"? Is that something Kantara assigns internally?
+Oliver: it is something like omaerz@protectnetwork.com
+Sampo: Are you expecting the IdP to pass you that?
+Oliver: yes
+Sampo: That looks like globally unique id, a correlation handle.
+Oliver: that is why i was looking at the attributes
+Sampo: That  is privacy hostile.
+Oliver: that is the way the shibboleth plugin for confluence works
+Sampo: Liberty Alliance spent 8 years engineering relationshipwise pseudonymous privacy friendly protocols and now you want global correlation handle.
+Oliver: we can map that username, name and email address if we get it from an idp
+? i don&apos;t
+? the people who implement the plugin do
+? i was only asked to set that system up in that way
+Sampo: Basically my IdP will give you persistent pseudonym. That allows you to keep your local database that knows some things about me.
+? Towards some other SP the IdP will give a different pseudonym so that the other site can not correlate information with Kantara.
+? This is very important for privacy.
+? In the end it reduces to what is the minimum amount of information that Kantara needs to know about me.
+Oliver: ok
+Sampo: Perhaps some email is needed, but I would hope to use different email at each SP.
+Oliver: email is optional and you can fill it in manually in confluence
+Sampo: How tightly are the mailinglists integrated to the web site?
+Oliver: same with name
+? no mailman integration
+Sampo: Ok, so I can SSO with IdP and then selectively supply the pieces of information and the versions of those pieces just for Kantara.
+Oliver: do you know of a saml module for mailman?
+Sampo: In that case, wouldn't it work well to just use the persistent pseudonym as username?
+Oliver: the only thing i need to get this to work is a username
+? yes let me try
+? what does that pseudonym look like?
+Sampo: Base64 encoded 128bit random number.
+Oliver: i have to make sure they are unique ... so some other idp does not give us the same username
+? i.e. you second ipd
+? idp
+Sampo: <sa:NameID xmlns:sa="urn:oasis:names:tc:SAML:2.0:assertion" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="https://zxidp.org/idp" SPNameQualifier="https://kantarainitiative.org/shibboleth-sp">FRsLTG-ZdKuVJ-Pes_MiQ44cz</sa:NameID>
+? In this XML snippet you see NameQualifier.
+? That is essentially the namespace inside which the 128bit thing (FRsLTG-ZdKuVJ-Pes_MiQ44cz) is unique.
+? So to form your username, you could concatenate the two. You could even use @ character as a separator, but that still would not make it workable email.
+? BTW, the SPNameQualifier for you is always same. But for IdP serving multiple SPs that also forms important part of the namespace.
+? Another approach you could take is simply do a sha1 hash over the canonical serialization of the whole NameID element.
+? and use that as username.
+? When SAML was designed, the choice was to identify IdP by a URL rather than just domain name. This makes it difficult to construct any meaningful email address that would include IdP identification.
+? You can talk to Scott about that. May be he remembers why this design was adopted.
+Oliver: hmm this is really ugly: https://zxidp.org/idp!https://kantarainitiative.org/shibboleth-sp!frsltg-zdkuvj-pes_miq44cz
+? also this will break confluence
+Sampo: That would be a bug in Confluence, IMNSHO.
+Oliver: like when click on a user to see his profile
+? is it really such a big deal if you passed some unique identifier that looks more like an email address?
+? i mean you could stick the id in there
+Sampo: How about this: FRsLTG-ZdKuVJ-Pes_MiQ44cz@yBeCTPt0NQ2vMuI-srKw5h4N2i8
+Oliver: something like sp!frsltg-zdkuvj-pes_miq44cz@zxidp.org
+? or that
+Sampo: where  the FR stuff is the persistent pseudonym and the yBe stuff is safe_base64 encoded sha1 hash of https://zxidp.org/idp
+Oliver: sure
+Sampo: Personally I would find  FRsLTG-ZdKuVJ-Pes_MiQ44cz@zxidp.org ok as long as you do not make any assumption that you can actually send mail there :-0
+Oliver: no
+? it is not used as an email address
+? the email address CAN be passed as an attribute but that is optional
+? if it is passed then only to pre-populate the email field in confluence the very first time somebody logs in
+Sampo: If you adopt that convention it would be really cool if you also documented it so that could become a widely adopted solution and convention to this problem in the confluence and even wider world.
+? What attribute others are passing to you to pick the user name?
+Oliver: you mean the  FRsLTG-ZdKuVJ-Pes_MiQ44cz type usernames?
+Sampo: Does anyone else try to pass you persistent pseudonym?
+Oliver: protectnetwork is passing &lt;protectnetwork username&gt;@protectnetwork.com
+? kantara idp is passing the username without the @... at the then
+? end
+Sampo: I guess what I am saying that if there is some industry convention (that I do not know about), I could pass the pseudonym the same way.
+? So for kantaraidp you need to add the @idp.ki
+? ?
+Oliver: i guess i could add it
+Sampo: What is the name of the attribute protectnetwork uses to pass this?
+Oliver: hold on let me look it up
+? http://www.protectnetwork.org/support/policies/attribute-release-policy
+? we do not user firstname lastname though
+? as the confluence plugin expects the whole name in one field
+? so urn:oid:1.3.6.1.4.1.5923.1.1.1.6 is what we use for the username
+? they do not pass the email
+? to us
+Sampo: That is, urn:mace:dir:attribute-def:eduPersonPrincipalName .
+Oliver: but they do not pass it to us
+? for whatever reason
+? they pass it to others
+Sampo: In urn:oid:1.3.6.1.4.1.5923.1.1.1.6 they the pass the email like thing.
+Oliver: yes
+Sampo: So they do not pass email attribute, but pass in eduPersonPrincipalName something that most of the time is the email.
+Oliver: they do not pass either one
+? neither the real email nor the first + lastname in one field
+Sampo: Ok, decision now: do I reconfig my IdP to pass in urn:oid:1.3.6.1.4.1.5923.1.1.1.6 something like FRsLTG-ZdKuVJ-Pes_MiQ44cz@zxidp.org 
+Oliver: sure that looks good
+Sampo: or do you just add the @zxidp.org to the persistent pseudonym I pass to you (i.e. no change for me)?
+? I take it that you pick the first option. Very well. It will take me perhaps 20min or so.
+Oliver: ok that would really be the best solution
+? i am looking at a way how i could put the name together on my side
+Sampo: I suspect there are other sysadmins who would appreciate this as well.
+Oliver: but it would probably take longer that 20 mins
+? this is the config for shib + confluence
+? https://studio.plugins.atlassian.com/wiki/display/SHBL/How+to+Shibbolize+Confluence
+? ok gotta run to the store will be back in 30 mins
+Sampo: Ok, I'll do the same. Back in 30 min.
+? Back.
+Oliver: oral exam
+? oops wrong window
+Sampo Kellom‰ki: I am now sending urn:oid:1.3.6.1.4.1.5923.1.1.1.6 but I still am not considered logged in.
+Oliver: let me look at the log one sec
+? was the format
+? you are sending it as urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
+? added it to the attribute map and now it works
+Sampo Kellom‰ki: Should I tweak my code to send something other than unspec?
+Oliver: no it is fine i added it to the attribute map
+Sampo Kellom‰ki: I see protectednetwork sent urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+? Perhaps I do the same.
+Oliver: ok
+Sampo Kellom‰ki: Ok, now I see my login succeed.
+? I'll implement the Recipient work around Scott suggests.
+Oliver: just forwarded you another mail from scott that i have received
+Sampo Kellom‰ki: In the Recipient case it is not clear what should go to that field.
+Oliver: i don&apos;t know either
+? :(
+Sampo Kellom‰ki: I'll put the EntotyID URL and we will see.
+? Works with the Recipient workaround.
+? On the Kantara site, where can I edit my test user's profile?
+? I notice you lowercase the persistent pseudonym when you form the username. You realize that my uniqueness guarantee assumes full 64 character characterset. By lowercasing you loose nearly one bit of search space :-)
+? Out of 128.
+? I guess you are still ok, statistically speaking.
+Oliver: that is an intersting point
+? i wonder if confluence does that or the shib plugin
+? you can edit your userprofile when you click on your name
+? and then there should be a dropdown menu with the item profile
+? once on your profile you need to click on the edit link
+Sampo Kellom‰ki: No doubt this needs JavaScript...
+? The user name appears in the "Full Name" field. Is there no provision for human readable nick name?
+Oliver: you can just overwrite that
+? click on the edit link
+? it is put in there if no name is passed from the idp
+? confluence probably needs something in there
+Sampo Kellom‰ki: The internal federated username is just initial value for Full Name - I see.
+Oliver: yup
+Sampo Kellom‰ki: Ok, appears to work.
+? I'll make a new release of zxid and upgrade idp.tas3.eu to the latest and greatest. Then we can consider this issue closed for time being.
+Oliver: cool
+>>
+
+97.13.4 Non-obvious ID-WSF
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1.  Should you include Sender SOAP header? Conor says usually
+    not. But how do you then know SOAP request issuer? Perhaps
+    from some field of the signature?
+
+2.  In case bearer token is <EncryptedAssertion>, how is
+    env->Header->Security->SecurityTokenReference->KeyIdentifier
+    populated (normally it would be populated from Assertion->ID)?
+
+97.13.5 Non-obvious XML Exclusive Canonicalization (XML-EXC-C14N)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+XML Exclusive Canonicalization bugs cause vast majority of signature
+failures (once trivial configuration issues like using wrong
+certificates are taken care of). Here are some gotchas:
+
+1.  XML namespace prefixes must be tracked correctly and they
+    can alter at every layer, even reusing already used
+    prefixes.
+
+2.  InclusiveNamespaces/@PrefixList namespaces must always be
+    rendered. However, if the list inclides a prefix that in
+    fact has not been declared in parent node of the canonicalization,
+    then this prefix is supposed to be ignored (says Scott Cantor, 20101005).
+    I have not found any specification references saying this to be
+    the case. In fact [XML-EXC-C14N] section 3, bullet 2, and section
+    3.1, bullet 3.2.1, seem to imply otherwise. However if the prefix
+    has not been declared, it is not easy to see how the spec could
+    be satisfied (unless a bug leaks the declaration from inside
+    the canonicalized element, such as ~ds~ from embedded signature).
+
+3.  Pay attention to line end canonicalization ([XML-C14N], section 1.1
+    "Terminology", 3rd bullet): CRLF to LF. Many implementations
+    only ever produce NL, or avoid producing any superfluous whitespace at
+    all (best strategy to avoid interop problems), and therefore work fine
+    until the day when CRLF emitting implementation appears.
+
+4.  Namespace declarations are ordered by namespace prefix, while
+    namespaced attributes are ordered by namespace URI. Gotcha!
+
+<<ignore:
+
+Seems this thread is vendors (even if some are open
+source) galore, so here goes my blurb...
+
+I'm sorry ZXID.org documentation is seen
+as "disgusting". At least it was found.
+
+The criticism is bit unconstructive as it does not give
+me any idea about what the gaps were or why it was not
+palatable.
+
+At any rate, I recommend starting from top level
+of the documentation (left hand column of zxid.org web site)
+before drilling to the low level reference sections that
+were linked in the article.
+
+If you find a gap, just mail zxid.user@lists.unh.edu
+or me: sampo@zxidp.org
+
+Regarding the claimed segfault: I would love to receive
+a bug report on this (and any claims should cite version
+number). As of zxid-0.76 I challenge the critiquer
+to reproduce the problem. Only that way things get
+fixed.
+
+Re SAML not open: I find SAML itself is fully open, albeit
+complex and with too much alternative/optional behaviour
+opening scope for bugs.
+
+The real evil comes from XML (agree with critiquer),
+especially its namespace mechanism and the underspecified
+canonicalization mechanism. It does not help that the
+committee overseeing XML-DSIG and canonicalization
+are not open to clarifications. You can report to them
+any number of bugs in their specs and they will find
+a reason to not publish errata.
+
+The interested reader should check my <a href="http://zxid.org/html/zxid-faq.html#-ZXIDFAQ-AuthorsPetPeeves-NonobviousXMLExclusiveCanonicalizationXMLEXCC14N">FAQ</a>.
+
+Cheers,
+--Sampo
+
+>>
+
+97.13.6 I do not want to know service type, but I want to call the service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Q:: Can I create a new ~struct zx_a_EndpointReference_s~ (~zxid_epr~ since 0.69)
+    from scratch where i can set the url that can be get from\\
+    zxidjni.get_epr_address(cf, epr)?
+
+A:: EPRs are complex objects. Even if you created a blank EPR with just
+    URL in it, it would not be all that useful without the <Metadata> and
+    especially <SecurityContext> with token within.
+
+Gulyx:: Ok i see, however as we discussed the statement:
+
+      zxid_epr epr = zxidjni.get_epr(cf, zxses, "x-recurs", null, null, null, 1);
+
+    may be moven from the axis2 zxid module to the application level
+    in this way the developer can choose.
+
+    What i am saying is that a developer of a web service client
+    can explicitely define a url, or may use your disco in order to look
+    for the most appropriate one
+
+Sampo:: Explicitly defining URL is inadequate unless you also define
+    the security token to access the service.  Generally creating security
+    token without consulting discovery (or ID Mapper service in more
+    general context) is not feasible.  Therefore having a simple
+    constructor for EPR accomplishes very little.
+
+Gulyx:: What i am saying is that is due to the developer of a web service client choose
+
+Sampo:: If you know the URL (and the service has been registered to
+    discovery), then you can get the EPR with
+    zxidjni.get_epr(cf, ses, svc_type, URL, null, null, 1).
+
+Gulyx:: an explicit url or look for one from a disco
+    thus this part of the zxidapi should be used (in case) at the application layer
+
+Sampo:: Rather than look for URL from disco, why not just get the EPR
+    from disco, i.e. call get_epr()?
+
+Gulyx:: and not in the zxid security module
+
+Sampo:: What would you do with the EPR created by the constructor?
+
+Gulyx:: well it is ok to use zxidjni.get_epr(cf, ses, svc_type, URL,
+    null, null, 1).  However is not always given that "svc_type"
+    is known/available what happen if it is not provided?  that it may be
+    possible i understand that is important from a discovery point of view
+    but the coould be the case in which the developer of a web service
+    client do not want to use it or does not know it he would only contat
+    that URL
+
+Sampo:: If you do not know service type, how do you know what kind of
+    SOAP body you are supposed to send to the service?  Developer of the
+    web service ultimately is the authority that decides what the service
+    type URI. If he does not know it, he can just invent it.
+
+Gulyx:: for example because i am executing a RPC and i got all the information from the wsdl
+    in this case i simply need a URL
+    isn't it ?
+
+Sampo:: As a general rule, if web service developer has poor
+    imagination in inventing a service type URI, I recommend using the
+    namespace URI of the top level element in the SOAP body.
+
+Gulyx:: sampo i am not saying that what you are proposing is wrong
+    i am just sayin that in some cases people do not use the service type.
+
+Sampo:: To speak RPC, you do need to know how to format the SOAP body
+    according to the RPC marshalling conventions.  Clearly you need to
+    know what the body looks like, therefore you should know its
+    namespace.
+
+Gulyx:: and the zxid module in axis shuould support both
+
+Sampo:: If people do not use service type, then they can not get registered in discovery.
+
+Gulyx:: so the case in which the developer (at the application level)
+    specified the service type and the case when he does not
+
+Sampo:: If they are not registered in discovery, how do you propose to
+    generate the token for accessing the web service?
+
+Gulyx:: Recap
+
+    * service MUST have a service type
+    * service MUST register to a disco with a service type
+    * clients SHOULD know the service type and MAY use it in order to look for a service
+    * client MAY contact directly a service without knowing a service type
+
+Sampo:: I claim that client can not contact the service without
+    knowing what the SOAP body looks like.
+
+Gulyx:: Of course, but they can also do it from the wsdl as i said above
+
+Sampo:: Yes, knowing WSDL constitutes knowing what the SOAP body is.
+    If you know WSDL, you know what the namespace URI of the top level
+    element of the SOAP body is.  Now if you follow the convention that
+    the namespace is the service-type, then you are done.
+
+Gulyx:: So a client may not know the service type
+
+Sampo:: If the service developer chose a service type different from
+    the namespace, then you have to find out from the documentation the
+    service developer provided.
+
+Gulyx:: I am only proposing to include into the zxid axis2 module both
+    the possibility possibilities with and without service type
+
+Sampo:: If you want to support the without service type case, then you
+    should program in the axis2 module automatic derivation of the service
+    type using the rule that the namespace of the top level element is the
+    service type.
+
+Gulyx:: Well if is it possible to forge from the service url an
+    "appropriate" epr that i can pass to the zxidjni.wsc_prepare_call I
+    would prefere what do you think?
+
+Sampo:: If you "forge" wrong, then things will not work.
+
+Gulyx:: if the automatic derivation is wrong ,  then things will not work too :-D
+
+Sampo:: Having a default rule like using top level namespace as service
+    type will work if that indeed was the convention everybody uses.  But
+    there is no universal agreement that this is always the convention.
+
+Gulyx:: exactely
+
+Sampo:: In practise in Liberty it has been the convention, but there is no guarantee.
+
+Gulyx:: so having something like zxidjni.get_defaultEpr(URL)
+
+Sampo:: Why are you so hell bent in not wanting to know the service type?
+
+Gulyx:: would be useful
+
+Sampo:: What service type do you not know?
+
+Gulyx:: i want service type and i am almost supporting it into the
+    module i am just saying that people that i hope would use the module
+    may not use service type
+
+Sampo:: If the people want to play in TAS3, they need to know the
+    service type. Knowing it is a requirement to join TAS3.
+
+Gulyx:: so i would that the module supports both the cases.  I was
+    referring people out of TAS3. I mean if we realese the zxid module for
+    apache, I assume that axis2 users may prefer zxid module instead of
+    rampart so i would include this feature into the module too.
+
+Sampo:: Ok, if you do not want to make TAS3 web service calls and do
+    not want to use identities or security tokens, then plain EPR with
+    just URL would be good enough.
+
+Gulyx:: right
+
+97.14 Best Practises
+--------------------
+
+1.  Each entity chooses its own Entity ID. When you are setting
+    up a SP, you choose your Entity ID and the IdP(s) MUST be
+    able to adapt to your choice. Similarily, an IdP decides
+    its own Entity ID and all SPs MUST be able to adapt to it.
+
+2.  Entity IDs MUST be unique within a Circle of Trust (CoT). Given
+    that CoT relationships may change from time to time, its best
+    to choose Entity ID so that it is globally unique. If Entity ID
+    contains a domain name as a component, then the +globally unique+
+    property tends to be enforced by the domain name allocation
+    system.
+
+3.  Entity ID SHOULD be the Well Known Location (WKL), i.e. the
+    URL from which the metadata can be fetched.
+
+4.  Providing metadata by URL, ideally by the Entity ID, SHOULD
+    always be enabled. This greatly facilitates configuration.
+
+5.  <KeyDescriptor> elements should have ~use~ XML attribute
+
+6.  After you get an installation to work, be sure to review whether
+    the default configuration is appropriate for production use
+
+    a. Decide whether you want to run open federation, see MD_FETCH
+       config option (default: 1=open federation)
+    b. Prune your Circle of Trust. Use zxcot(8) tool to list who you
+       trust and delete the misfits.
+    c. Check validity time tolerances you accept: BEFORE_SLOP
+       and AFTER_SLOP. The defaults are rather generous for
+       production use.
+    d. Review that you did not turn off any signature
+       validation just to get it to work (SIG_FATAL=0, NOSIG_FATAL=0
+       and similar config options). All signature
+       validations are there for reason and you should not
+       go to production if any of them fail.
+    e. Check permissions on /var/zxid/pem and think whether
+       your private keys, including web server SSL one,
+       are protected. Could they have been compromised
+       during trial period?
+    f. Check that your public image is conveyed right in your metadata,
+       e.g. NICE_NAME, ORG_NAME, ORG_URL, and FEDUSERNAME_SUFFIX (if
+       used, generally only on IdP). However, be forewarned
+       that changing these on last minute changes your metadata and you may
+       need to engage in an additional round of metadata exchanges
+       when you go to production.
+    g. Make sure you have a solution in place to keep your audit trail
+       in case you ever have to go to court. See zxid-log.pd for
+       details. You may also want to think about encrypting or deleting some
+       items after a while to reduce your liability for breaches.
+
+97.15 Cardspace / Infocard / DigitalMe Tutorial
+-----------------------------------------------
+
+N.B. zxid.org does not yet support Infocard, but since we
+are starting the investigation, we thought to share
+some of it in next sections...
+
+97.15.1 Installing DigitalMe and Firefox plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+DigitalMe by Bandit project is an open source Infocard
+implementation, providing functionality roughly similar to
+CardSpace. You can download it from
+
+  http://www.bandit-project.org/index.php/Digital_Me
+
+rpm2cpio digitalme-0.4.1238-2.1.i586.rpm | cpio -di
+
+97.15.2 Setting up IdP account
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For one InfoCard aware IdP, please see: http://www.cdatazone.org/index.php?/archives/27-Managed-Infocard-Demo.html
+
+1. Register at the IdP site (e.g. https://www.ctindustries.net/icard/index.php)
+2. Download the card ("Retrieve Managed Card" link (savea as "cdatamanaged.crd" by default).
+3. Install the card to DigitalMe
+
+97.15.3 Yubikey Support
+~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID supports the yubikey USB One Time Password (OTP) tokens from yubico.com.
+The token should be personalized such that the prefix of the ticket is the
+UID and the remainder is the ticket proper. The AES128 shared secret in hex is
+populated in UID/.yk directory. See also zxid-log.pd for description.
+
+You would typically plan the user names, taking in account the yubikey modhex 
+restrictions, and then use ykpersonalize to create thephysical tokens. At the
+same time you would generate and record the AES128 shared secrets to the .yk
+files (and inside the yubikey USB tokens themselves, of course).
+
+The contents of the .yk file is 32 hexadecimal digits (ascii 0-9a-f)
+representing 128 bits of key information.
+
+The value is not hashed, salted, or nonced, so it needs to be carefully
+protected by the filesystem permissions.
+
+97.16.9 Legal
+~~~~~~~~~~~~~
+
+Microsoft promises to not sue you: http://www.microsoft.com/interop/osp/default.mspx
+
+97.17 Attributes
+----------------
+
+Q:: I want to read the attributes that come in the assertion. How do I do that?
+
+A:: You get attributes back as an LDIF entry as return value of zxid_simple()
+    The attributes are also available by reparsing the assertion, which gets
+    stored in /var/zxid/rely hierarchy.
+
+    /var/zxid/ses/SuzZQS5Ub/.ses file contains the path to the assertion file.
+
+Q:: In the zxid directory you store some users. What does the extension .mni stand for?
+    Why is the info stored? I assume it is some sort of local cache. I would like
+    to store the attributes there too. How do I do that?
+
+A:: The .mni file is used to support Manage NameID requests. In normal operation of ZXID
+    it really is not needed, but to support some of the SAML conformance test requests
+    it is needed.
+
+    Rather than store attributes in that directory, I'd suggest reparsing
+    the assertion when you need them. But if you must, you could create a
+    file of your own in that directory. We of course need a naming
+    convention that prevents naming conflicts with future versions of
+    ZXID: Your file extension should start by ".x-", for example:
+    "attributes.x-attr"
+
+Q:: The ldif returned by zxid_simple() is perfect for my needs, but
+    nothing is being stored in log/rely directory. Could be some
+    configuration issue? Also, can I have zxid automatically store the
+    ldif file returned zxid_simple()?
+
+A:: The log/rely should be populated by default, but if the directory
+    structure itself is missing, may be it does not work. Try make dirs.
+    Or check that web server user's permissions allow writing there.
+
+A:: Re ldif cached: the logic is supposed to be that the zxid_simple() will
+    be called to protect every page, therefore its return value is available
+    on every page.
+
+    If you do not call it every time, but instead bootstrap some sort of
+    app specific session, then you would store the LDIF (or the attributes
+    parsed out of it) to that app specific session.
+
+97.17 SOAP Binding
+------------------
+
+97.17.1 Axis2 wants wsa:Action header
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The recommended course of action is to change Axis2 config such that it does not
+require wsa:Action header. All the necessary information for dispatch of
+the SOAP message is already available on the top child element of SOAP Body element.
+
+HTTP Action header and the wsa:Action SOAP header are historical design errors
+as they effectively duplicate information from the top child of the Body. Exactly
+how this duplication is to be done is poorly specified and great source of
+interoperability problems.
+
+Please point me to a specification document (with line number or section reference)
+where wsa:Action is specified as mandatory. Remember that Axis2 is just an implementation
+and just because Axis2 happens to want it, does not make it required by any standard.
+If you can show it to be mandatory, then point me to document that specifies what
+the proper value would be.
+
+Historically many web service specs have been silent on the value of wsa:Action as
+they were designed not to use wsa:Action. When people the try to use wsa:Action,
+they end up inventing the value themselves and, voila, you have an interoperability
+mess.
+
+If you really want to have a wsa:Action  header, you can generate one yourself:
+
+    zxid_call(...,"<e:Envelope><e:Header><a:Action>...</a:Action></e:Header>
+                   <e:Body>...</e:Body></e:Envelope>", ...)
+
+In other words, the zxid_call() family of functions will accept full SOAP envelope if
+you give it one. It will then add the TAS3 specific headers to it, but it will preserve
+the headers you supplied as long as there is no conflict.
+
+98 Support
+==========
+
+98.1 Mailing list and forums
+----------------------------
+
+* Official ZXID mailing list is zxid.user@lists.unh.edu
+* The archives can be seen at http://listproc.unh.edu/archives/zxid.user
+
+98.2 Bugs
+---------
+
+Mail the author or mailing list until we get bug tracking set up. Or volunteer.
+
+98.3 Developer access
+---------------------
+
+We use +git+ for source code. Anonymous access is available
+
+  git clone git://zxid.org/zxid    # Main ZXID source
+  git clone git://zxid.org/pd      # Plaindoc (pd2tex) and xsd2sg.pl tools
+
+Commit access needs to be manually configured and is not
+anonymous. If you contribute significantly, please write the author. Others
+can send patches (good way to show you are worthy of git commit access)
+to me. I've heard some mixed experiences about open source
+sites like sourceforge. If you run such site and want to
+host ZXID Project, please contact me.
+
+If you just always want the latest source: get the tar ball from
+the downloads section of the web site (zxid.org).
+
+98.9 Commercial Support
+-----------------------
+
+Following companies provide consultancy and support contracts for
+ZXID:
+
+* symlabs.com
+* Mercnet, Lda.
+* Levelview, Lda.
+
+
+<<ignore:
+
+Tutorial: http://simplesamlphp.org/docs/1.6/simplesamlphp-sp
+
+https://openidp.feide.no/simplesaml/module.php/core/loginuserpass.php?AuthState=_d165e5c0c137e655159f87fae7ea8223462b087b45
+
+
+Kantara Initiative project web site (confluence) accepts TAS3 IdP authentication.
+
+This means that you can use your Yubikey or other credentials you may have
+at idp.tas3.eu to login. Here's how it works:
+
+1. Start from http://kantarainitiative.org/confluence/dashboard.action
+
+2. Click "Log In" link in the top right of that page.
+
+3. On the "Select Your Home Organization" screen choose "TAS3 IdP" from
+the popup and click Select.
+
+4. You will now land on TAS3 IdP authentication screen. Use your Yubikey or
+username and password to login.
+
+5. You will see a post screen taking you back to KI web site. You are now
+logged in. Your pseudonymous username will appear in top right
+of that page. It something like this
+
+fc5y3apqom8upyicon7g6qztx@idp.tas3.eu
+
+6. Click on the username and choose "Profile" to edit the screen name
+to be nicer to users (in the internal database the pseudonym
+continues to be used so you do not need to worry about the
+screen name being acceptable, e.g. duplicate).
+
+7. Once you have your federation enabled Kantara account, you can use
+it to join Kantara Work Groups. Their policy is that you do not have
+to be Kantara member to login to the site and see the public part
+of their work. However, to contribute to their work you need to
+be a member (mainly for IPR reasons - to ensure free to implement and use).
+This is done by "elevating" the status of your federated login. It is
+done by Kantara, not by idp.tas3.eu
+
+Cheers,
+--Sampo
+
+
+
+Shawn O'Connor <soconnor@falconknight.com> said:
+> Any ideas? Thanks!
+
+What was being attempted?
+
+What was the ZXID version and what was the counter part
+software and version?
+
+If this was SSO attempt, then I would
+be inclined to belive the error message, more below.
+ 
+>        -Shawn
+> 
+> Begin forwarded message:
+> 
+> > From: Denis Shaposhnikov <dsh@falconknight.com>
+> > Date: May 25, 2012 11:05:52 AM PDT
+> > To: Shawn O'Connor <soconnor@falconknight.com>
+> > Subject: Re: Fwd: Test
+> > 
+> > On 25/05/12 20:01, Shawn O'Connor wrote:
+> > 
+> >> Did it work?
+> > 
+> > I see next error messages:
+> > 
+> > p79064 zxidmeta.c:127 zxid_mk_ent       zx E ssof: Metadata did not have any certificates! Incomplete metadata? 0
+> > 
+
+Have you checked
+
+A. Is there metadata for the IdP in the /var/zxid/cot directory? (Directory
+   may vary due to your configuration.)
+   - If not: perhaps some firewalling or name resolution problem is
+     preventing the metadata from being fetched - or perhaps the IdP
+     in remote end does not support metadata fetch using Well Known
+     Location method?
+   - If you suspect any of the above, please attempt manual metadata
+     exchange (try running zxcot -h for brief summary)
+B. If the metadata is there, does it actually have certs? If not, ask
+   remote IdP to produce metadata that has certs. It may well be
+   configuration error in their end.
+C. If the metadata fetching is working OK, but the permissions in
+   /var/zxid/cot are not allowing the SP to write the metadata (or more
+   rarely read metadata that was already written), you could get error
+   messages of this nature.
+
+> > p79064    zxsig.c:317 zxsig_validate    zx E ssof: No certificate supplied. Only hashes (and hence canonicalization) verified. 0
+> > p79064  zxidsso.c:400 zxid_sigres_map   zx E ssof: Bad cert. 5
+> > p79064  zxidsso.c:677 zxid_sp_sso_finalize      zx E ssof: Fail SSO due to failed signature sigres=5
+
+Presumably the message was signed, but if there is no certificate
+to validate signature against, it will fail. There are ways to configure
+ZXID to ignore this problem, but they should not be used in a production
+deployment.
+
+> > p79064  zxidsso.c:732 zxid_sp_sso_finalize      zx E ssof: SSO fail (P)
+> > p79064  zxidspx.c:110 zxid_sp_dispatch  zx d ret=0 ses=0x7fffffffe200
+> > p79064  zxidspx.c:117 zxid_sp_dispatch  zx d *** FAIL, should send back to IdP select 0
+> > 
+> > I don't know what does it mean. Should I ask on the zxid's forum?
+
+I think it means what it says, but before you ask ZXID forum, you should
+make more complete investigation on the IdP metadata.
+
+Cheers,
+--Sampo
+
+
+>>
+
+<<ignore:
+
+Karthik Sudarshan <ksudarshan@xtivia.com> said:
+> Hi all,
+>     I have downloaded the latest version of zxid (1.16) and compiled
+
+Rest of the list: sorry folks, I did not announce it, but there is a
+new release available :-)
+
+There will be another before christmas.
+
+> against Apache 2.2  on Ubuntu to get the mod_auth_saml.so. I have
+> registered an IDP in my COT using the zxcot utility. I can see that in my
+> dropdown list on the IDP selection page as well.
+> 
+> I want to be able to bypass the IDP selection page and directly go to the
+> IDP login page. For that I used the DEFAULTQS configuration option and it
+> does not seem to work.
+> 
+> My option in the apache conf file for the <Location> is  as below:
+> 
+> DEFAULTQS=10https://<hostname>/<path>/metadata.xml
+
+The correct syntax is the query string syntax as if a form
+had been submitted. Try the following
+
+DEFAULTQS=l0https://<host>/<path>/idp.xml=1%26fp=1
+
+Please note
+
+1. The l0... stuff must end with "=1"
+
+2. If there are any other fields you would like to pass, you need
+   to include them in the query string, but you need to URI escape
+   characters, such as ampersand ("&") with %26 (percent 26).
+
+3. One other field in particular that you may want to pass is
+   fr (aka RelayState) which will control the redirection
+   after SSO if you have configured REDIR_TO_CONTENT=1
+
+Cheers,
+--Sampo
+
+> I tried to give this in the zxid.conf file as well, and that didn't work
+> either.
+> 
+> Can someone please suggest how to set this configuration correctly?
+> 
+> Regards,
+> Karthik
+
+>>
+
+<<ignore:
+
+From:	<sampo@hig.no>
+To:	<kyfranke@hig.no>
+Cc:	<sampo@hig.no>, <luk@synergetics.be>, <kgreene@cellmail.com>
+Date:	Tue, 3 Dec 2013 20:34:18 +0000 -- arrived: Ti 3.12. 20h34 -- 5.98K
+Subject:	Re: Fwd: Multi-use SSL certificates: More flexibility with Internet security
+Katrin Franke <katrin.franke@hig.no> said:
+> You know this all?
+
+What is there to know (do not expect me to read the links - I do not do
+this for Luk and I do not do it for you unless it seems exceptionally
+relevant)?
+
+The wildcard certs are a technique where several web sites share
+a certificate, and consequently the private key.
+
+Sharing private key increases exposure and chances of private key
+compromise. As a very minor additional threat, if private key
+is compromised, any number of bogus domains can be generated
+under the compromised wildcard cert (subject to DNS level safeguards).
+
+The increased exposure may not be as bad as it sounds as
+many or even all of the sites that are wildcarded, may be
+virtualhosted off single server, thus rendering the private
+key compromise threat equivalent to single server cert compromise.
+
+Or even if not single server, the servers may be under competent
+administration by same authority. For example, if I choose to
+put two sites, that I otherwise might virtualhost, on different
+servers, but I continue to apply same security and sysadmin
+regime on both servers, then the security has not significantly
+deteriorated when compared to virtualhosting on single server case.
+
+Depending on competence of sysadmin on virtualhosting provider,
+I would assess that CA compromise is bigger threat. Diginotar of Belgium
+even got caught pants down on this, but the problem is much
+more widespread.
+
+The Snowden revelations confirmed what I had been preaching for
+years: NSA will compromise the CAs. Thus the matter of wildcard certs
+has to be put in the perspective of the CA providers themselves
+being compromised.
+
+Net/net: no security hole that was not previously known
+and not need to chage ZXID (or Syn e2eTA) code. Additional mention
+of this threat in the manuals my be warranted, but is not urgent.
+
+Nothing new under the sun.
+
+Cheers,
+--Sampo
+
+P.S. On second reading it seems they try to sell multiuse
+certs: IMHO, all certs should be multiuse, and technically
+they can be if parties agree to ignore the restriction
+attribute fields in the certs. They are just trying to
+sell as a feature the fact that savy people have already
+bypassed their business model.
+
+>>
+
+<<ignore:
+
+
+
+>>

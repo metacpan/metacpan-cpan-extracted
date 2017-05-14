@@ -1,0 +1,69 @@
+                     Storm-Tracker
+                     -------------
+
+Storm-Tracker is a collection of Perl modules designed to work with
+tropical storm advisories issued by NOAA.  The modules maintain an
+insert and query only file based database.  Examples of the type
+of advisories this collection can work with can be found at
+ftp://ftp://ftp.met.fsu.edu in the /pub/weather/tropical/WTNT3/ and 
+/pub/weather/tropical/WTPZ3/ directories.
+
+This collection is still very much in the beta stage.  It is possible 
+that future maintenance and development will be assumed by Dr. Paul Rusher's
+group within the meteorology department of Florida University.
+
+PREREQUISITES
+
+All modules were developed on a system running Solaris 2.5.1. and
+perl version 5.005_02.  The modules contain only perl code and
+should run on any flavor of UNIX.  The code directly manipulates
+file paths and therefore will not run under windows without modification. 
+
+The Storm-Tracker bundle requires the following modules be installed.
+
+	IO::Dir
+	IO::File
+	File::Path
+
+These packages should be available on CPAN if not in the core distribution.
+
+INSTALLATION
+
+You install the Storm-Tracker bundle as usual by running:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DOCUMENTATION
+
+POD style documentation is included in all modules.
+These are normally converted to manual pages and
+installed as part of the "make install" process.  You should also be
+able to use the 'perldoc' utility to extract and read documentation
+from the module files directly.
+
+
+SUPPORT
+
+The Storm-Tracker bundle is not currently supported.  Dr. Ruscher
+or one of his associates may take on the task, but then again he/they
+might not.  It is my hope that even without support the modules
+will prove useful to someone else, even if only as a starting place.
+Please insure that any significant improvements or additions are
+posted to CPAN for everyone's benefit. 
+
+AVAILABILITY
+ 
+The current version of Storm-Tracker should be available from CPAN:
+ 
+     http://www.cpan.org/
+
+
+COPYRIGHT
+
+	1999 Jimmy Carpenter. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,18 +1,18 @@
 #!/usr/bin/perl -w
 $ARGV[0] ? sleep $ARGV[0] : do { print "arg count"; exit 1; };
 
-# Fancier Version (based on Abagail's template):
-# !/usr/bin/perl -w
+Fancier Version (based on Abagail's template):
+#!/usr/bin/perl -w
 
 #
-# $Id: sleep,v 1.1.1.1 2001/06/06 08:55:06 sdague Exp $
+# $Id: sleep,v 1.2 2004/08/05 14:17:44 cwest Exp $
 #
 # $Log: sleep,v $
-# Revision 1.1.1.1  2001/06/06 08:55:06  sdague
-# initial import
+# Revision 1.2  2004/08/05 14:17:44  cwest
+# cleanup, new version number on website
 #
-# Revision 1.1  2001/05/14 00:49:39  sdague
-# added more files
+# Revision 1.1  2004/07/23 20:10:16  cwest
+# initial import
 #
 # Revision 1.0  1999/02/26 12:56:05  randy
 # Initial revision
@@ -20,7 +20,7 @@ $ARGV[0] ? sleep $ARGV[0] : do { print "arg count"; exit 1; };
 
 use strict;
 
-my ($VERSION) = '$Revision: 1.1.1.1 $' =~ /([.\d]+)/;
+my ($VERSION) = '$Revision: 1.2 $' =~ /([.\d]+)/;
 
 if (@ARGV) {
     if ($ARGV [0] eq '-?') {
@@ -84,11 +84,11 @@ I<sleep> has no known bugs.
 =head1 REVISION HISTORY
 
     $Log: sleep,v $
-    Revision 1.1.1.1  2001/06/06 08:55:06  sdague
-    initial import
+    Revision 1.2  2004/08/05 14:17:44  cwest
+    cleanup, new version number on website
 
-    Revision 1.1  2001/05/14 00:49:39  sdague
-    added more files
+    Revision 1.1  2004/07/23 20:10:16  cwest
+    initial import
 
     Revision 1.0  1999/02/26 12:54:05  randy
     Initial revision

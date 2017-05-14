@@ -1,0 +1,24 @@
+# $Id$
+#
+# >>Title::     Czech (CP1250) Locale
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date       Who         Change
+# 02-June-97 Jan Tomasek
+# -----------------------------------------------------------------------
+#
+
+# Generated list titles
+!define DOC_TOC_TITLE           "Obsah"
+!define DOC_LOF_TITLE           "Seznam obrázkù"
+!define DOC_LOT_TITLE           "Seznam tabulek"
+
+# Navigation strings
+!define HTML_TEXT_CONTENTS      "Obsah"
+!define HTML_TEXT_PARENT        "Nadøazené téma"
+!define HTML_TEXT_PREVIOUS      "Pøedcházející téma"
+!define HTML_TEXT_NEXT          "Následující téma"
+!define HTML_TEXT_HOME          "Úvod"
+!define HTML_TEXT_CATALOG       "Katalog"
+!define HTML_TEXT_SEARCH        "Hledat"

@@ -1,6 +1,6 @@
 
 /*
- * Copyright © 2001 Novell, Inc. All Rights Reserved.
+ * Copyright Â© 2001 Novell, Inc. All Rights Reserved.
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Artistic License, as specified in the README file.
@@ -32,7 +32,7 @@ typedef long perl_key;
 // Ananth, 3 Sept 2001
 typedef struct nw_cond { long waiters; unsigned int sem; } perl_cond;
 
-#if (defined (USE_ITHREADS) || defined (USE_5005THREADS)) && defined(MPK_ON)
+#if defined (USE_ITHREADS) && defined(MPK_ON)
 #ifdef __cplusplus
 extern "C"
 {
@@ -154,7 +154,7 @@ typedef unsigned long perl_mutex;
 #endif	//#if 0
 
 //Following has to be defined CHKSGP
-#if defined(PERLDLL) && defined(USE_DECLSPEC_THREAD) && (!defined(__BORLANDC__) || defined(_DLL))
+#if defined(PERLDLL) && defined(USE_DECLSPEC_THREAD)
 extern __declspec(thread) void *PL_current_context;
 #define PERL_SET_CONTEXT(t)   		(PL_current_context = t)
 #define PERL_GET_CONTEXT		PL_current_context

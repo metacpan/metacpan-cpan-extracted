@@ -1,0 +1,72 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Notes</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_parag.html">Parent Topic</A> | <A HREF="in_lists.html">Previous Topic</A> | <A HREF="in_fg.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>3.4. Notes</H1>
+<HR>
+<H2><A NAME="Short Notes">3.4.1. Short Notes</A></H2>
+<P>The paragraph tag for adding a single paragraph note is <EM>Note</EM>. For example:</P>
+<PRE>
+  Note: Life is too short to waste time being unhappy.
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Life is too short to waste time being unhappy.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Changing the Label">3.4.2. Changing the Label</A></H2>
+<P>You can change the label for a note by using the <EM>label</EM> paragraph attribute. For example:</P>
+<PRE>
+  Note[label='Important: '] Life is too short to drink bad wine.
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Important: </STRONG>Life is too short to drink bad wine.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Long Notes">3.4.3. Long Notes</A></H2>
+<P>If the note requires more than one paragraph, use the <A HREF="../ref/fnote.html">note</A> filter. For example:</P>
+<PRE>
+  !block note
+  Life is too short to:
+
+  * waste time being unhappy
+  * worry about yesterday.
+  !endblock
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Life is too short to:</P>
+<UL>
+<LI>waste time being unhappy
+<LI>worry about yesterday.</UL>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="The NB/NE Tags">3.4.4. The NB/NE Tags</A></H2>
+<P>Before the <A HREF="../ref/fnote.html">note</A> filter existed, long notes were created by using the NB (Note Begin) and NE (Note End) tags. For example:</P>
+<PRE>
+  NB: Life is too short to:
+
+  * waste time being unhappy
+  * worry about yesterday.
+
+  NE:
+</PRE>
+<P>These paragraph styles are still supported, although the <A HREF="../ref/fnote.html">note</A> filter is now the recommended way of specifying long notes.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_parag.html">Parent Topic</A> | <A HREF="in_lists.html">Previous Topic</A> | <A HREF="in_fg.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

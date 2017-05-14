@@ -1,0 +1,503 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Other Table Goodies</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tbrow.html">Previous Topic</A> | <A HREF="in_tbss.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.7. Other Table Goodies</H1>
+<HR>
+<H2><A NAME="Column alignment">5.7.1. Column alignment</A></H2>
+<P>The <EM>colaligns</EM> parameter of the <A HREF="../ref/ftable.html">table</A> filter can be used to control the alignment of text within columns of a table. For example:</P>
+<PRE>
+!block  table; colaligns=&quot;LCCR&quot;
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN='Left'>
+<STRONG>Name</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column2</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column3</STRONG>
+</TD>
+<TD ALIGN='Right'>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+A
+</TD>
+<TD ALIGN='Center'>
+B
+</TD>
+<TD ALIGN='Center'>
+C
+</TD>
+<TD ALIGN='Right'>
+1.0
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+X
+</TD>
+<TD ALIGN='Center'>
+Hello dear world
+</TD>
+<TD ALIGN='Center'>
+Y
+</TD>
+<TD ALIGN='Right'>
+10.2
+</TD>
+</TR>
+</TABLE>
+
+<P>The value of <EM>colaligns</EM> is usually a sequence of the letters <EM>L</EM>, <EM>C</EM> and <EM>R</EM> (which mean what one would expect). If you prefer, a comma-separated list of the values <EM>Left</EM>, <EM>Center</EM> and <EM>Right</EM> can be specified. For example:</P>
+<PRE>
+!block  table; colaligns=&quot;Left,Center,Center,Right&quot;
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+</PRE>
+<P>Likewise, the <EM>colvaligns</EM> parameter can be used to control the vertical alignment of text within columns of a table. The value is either:</P>
+<UL>
+<LI>a comma-separated list of the values <EM>Top</EM>, <EM>Middle</EM>, <EM>Bottom</EM> and <EM>Baseline</EM>, or
+<LI>a sequence of the letters T, M, B (Bottom) and L (baseLine).</UL>
+<P>Baseline alignment means that the base of the first line of the text in each cell is aligned (HTML only).</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>For a variety of reasons, the default vertical alignment for cells in a HTML table is <EM>Middle</EM>, while the default vertical alignment for tables in most other formats is <EM>Top</EM>. As most tables contain rows which fit on one line, this inconsistency is not usually a problem. However, if you want consistent vertical alignment for a complex table across all formats, you need to use the <EM>colvaligns</EM> parameter to override the default behaviour.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Column tagging">5.7.2. Column tagging</A></H2>
+<P>In a similar way, columns can be tagged with a phrase style by using the <EM>coltags</EM> attribute. For example:</P>
+<PRE>
+!block table; coltags=&quot;B,EMAIL&quot;
+Purpose         Email
+Information     sdf-users@mincom.com
+Bug reporting   sdf-users@mincom.com
+!endblock
+</PRE>
+<P>The result is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+<TD>
+<STRONG>Email</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<B>Information</B>
+</TD>
+<TD>
+<A HREF="mailto:sdf-users@mincom.com">sdf-users@mincom.com</A>
+</TD>
+</TR>
+<TR>
+<TD>
+<B>Bug reporting</B>
+</TD>
+<TD>
+<A HREF="mailto:sdf-users@mincom.com">sdf-users@mincom.com</A>
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Table filtering and sorting">5.7.3. Table filtering and sorting</A></H2>
+<P>Tables can be filtered and sorted by using the <EM>where</EM> and <EM>sort</EM> attributes of the <A HREF="../ref/ftable.html">table</A> filter. These attributes are also supported by the class filters (e.g. terms, references). In either case, filtering is done before sorting.</P>
+<P>The <EM>where</EM> attribute takes an expression which is evaluated for each record. Special symbols available are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$_
+</TD>
+<TD>
+the current record
+</TD>
+</TR>
+<TR>
+<TD>
+$o{&quot;xyz&quot;}
+</TD>
+<TD>
+the value of column xyz
+</TD>
+</TR>
+<TR>
+<TD>
+$var{&quot;abc&quot;}
+</TD>
+<TD>
+the value of variable abc
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+ !define MODULE_CODE &quot;XYZ&quot;
+ ...
+ !include &quot;../mydata.tbl&quot;; table; \
+   where='$o{&quot;Code&quot;} =~ /$var{&quot;MODULE_CODE&quot;}/'
+</PRE>
+<P><EM>sort</EM> takes a comma-separated list of column names to sort on. If no columns are specified, the data is sorted using all columns in the order in which they appear. All sorting is done alphabetically - numeric sorting is not supported.</P>
+<HR>
+<H2><A NAME="Deleting and selecting columns">5.7.4. Deleting and selecting columns</A></H2>
+<P>The <A HREF="../ref/ftable.html">table</A> filter supports the following parameters for changing the columns actually displayed:</P>
+<UL>
+<LI><EM>delete</EM> - a comma-separated list of columns to delete
+<LI><EM>select</EM> - the comma-separated list of columns to display.</UL>
+<P>These parameters are often used in combination with the <EM>where</EM> parameter. For example:</P>
+<PRE>
+  # Display the open bugs, sorted by priority
+  H1: Open Defects
+  !include 'mybugs.tbl'; table; \
+           where='$o{&quot;Status&quot;} eq &quot;Open&quot;'; \
+           sort='Priority'; \
+           delete='Status'
+</PRE>
+<P>If both <EM>delete</EM> and <EM>select</EM> are specified, <EM>select</EM> has precedence.</P>
+<HR>
+<H2><A NAME="Macros inside tables">5.7.5. Macros inside tables</A></H2>
+<P>Macros can be used inside tables. In particular:</P>
+<UL>
+<LI>rows can now be conditionally included or excluded
+<LI>rows can be marked as changed.</UL>
+<P>For example:</P>
+<PRE>
+!block table
+Code    Description
+BTW     By the way
+!block changed
+RTFM    Read the (fine) manual
+!endblock
+!if ALL_TERMS
+SOS     Save our souls
+!endif
+!endblock
+</PRE>
+<HR>
+<H2><A NAME="Landscape tables">5.7.6. Landscape tables</A></H2>
+<P>Landscape tables are supported via the <EM>landscape</EM> parameter of the <A HREF="../ref/ftable.html">table</A> filter. The value is the height allocated to the area in which the table is placed. If a unit is not specified, the value is assumed to be a percentage of the text column height. For convenience, a value of 1 implies a full page table. Some examples are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=&quot;50pt&quot;
+</TD>
+<TD>
+height allocated to table is 50 points
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=&quot;50%&quot;
+</TD>
+<TD>
+half page table
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=50
+</TD>
+<TD>
+half page table (% is the default units)
+</TD>
+</TR>
+<TR>
+<TD>
+landscape=1
+</TD>
+<TD>
+full page table (1 implies 100%)
+</TD>
+</TR>
+<TR>
+<TD>
+landscape
+</TD>
+<TD>
+full page table (syntactic shorthand for above)
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>This feature is currently <B>use at your own risk</B>. In particular, long tables and table titles confuse it badly. Furthermore, the <EM>align</EM> and <EM>placement</EM> parameters are effectively ignored for landscape tables.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Cell attributes">5.7.7. Cell attributes</A></H2>
+<P>Cells within a table can now be given attributes by preceding the cell value with a semicolon-separated list of name-value pairs enclosed in square brackets. For example:</P>
+<PRE>
+!block  table; colaligns=&quot;LCCR&quot;
+Name    Column2             Column3     Column4
+A       [align=Left]B       C           [bgcolor=Green]1.0
+X       Hello dear world    Y           [bgcolor=Red]10.2
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN='Left'>
+<STRONG>Name</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column2</STRONG>
+</TD>
+<TD ALIGN='Center'>
+<STRONG>Column3</STRONG>
+</TD>
+<TD ALIGN='Right'>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+A
+</TD>
+<TD ALIGN='Left'>
+B
+</TD>
+<TD ALIGN='Center'>
+C
+</TD>
+<TD ALIGN='Right' BGCOLOR='Green'>
+1.0
+</TD>
+</TR>
+<TR>
+<TD ALIGN='Left'>
+X
+</TD>
+<TD ALIGN='Center'>
+Hello dear world
+</TD>
+<TD ALIGN='Center'>
+Y
+</TD>
+<TD ALIGN='Right' BGCOLOR='Red'>
+10.2
+</TD>
+</TR>
+</TABLE>
+
+<P>The cell attributes supported are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>General:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+align
+</TD>
+<TD>
+horizontal alignment (Left, Center, Right)
+</TD>
+</TR>
+<TR>
+<TD>
+valign
+</TD>
+<TD>
+vertical alignment (Top, Middle, Bottom, Baseline)
+</TD>
+</TR>
+<TR>
+<TD>
+cols
+</TD>
+<TD>
+the number of columns this cell spans (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+rows
+</TD>
+<TD>
+the number of rows this cell spans (default is 1)
+</TD>
+</TR>
+<TR>
+<TD>
+bgcolor
+</TD>
+<TD>
+background colour of cell (see below)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>PS only:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+fill
+</TD>
+<TD>
+background colour fill percentage
+</TD>
+</TR>
+<TR>
+<TD>
+truling
+</TD>
+<TD>
+ruling setting for top of cell
+</TD>
+</TR>
+<TR>
+<TD>
+bruling
+</TD>
+<TD>
+ruling setting for bottom of cell
+</TD>
+</TR>
+<TR>
+<TD>
+lruling
+</TD>
+<TD>
+ruling setting for left of cell
+</TD>
+</TR>
+<TR>
+<TD>
+rruling
+</TD>
+<TD>
+ruling setting for right of cell
+</TD>
+</TR>
+<TR>
+<TD>
+angle
+</TD>
+<TD>
+angle of text (0, 90, 180, 270)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>HTML only:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+nowrap
+</TD>
+<TD>
+disable word wrap for this cell
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Special:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+sdf
+</TD>
+<TD>
+treat the cell text as SDF (rather than as phrase text)
+</TD>
+</TR>
+<TR>
+<TD>
+tag
+</TD>
+<TD>
+phrase tag to apply to cell text
+</TD>
+</TR>
+<TR>
+<TD>
+paratag
+</TD>
+<TD>
+paragraph style to apply to cell text
+</TD>
+</TR>
+</TABLE>
+
+<P>For PS (i.e. MIF) generation, the supported colour values are <EM>Black</EM>, <EM>White</EM>, <EM>Red</EM>, <EM>Green</EM>, <EM>Blue</EM>, <EM>Yellow</EM>, <EM>Cyan</EM> and <EM>Magenta</EM>. If a different colour is specified, it is ignored. The supported fill values are 100, 90, 70, 50, 30, 10 and 3. If a fill value is not specified, 100% fill is used.</P>
+<P>For HTML generation, any of the HTML colours names (including those supported for PS generation) or the &quot;#rrggbb&quot; form can be used.</P>
+<P>The permitted ruling values are <EM>Vthin</EM>, <EM>Thin</EM>, <EM>Medium</EM>, <EM>Thick</EM> and <EM>Double</EM>.</P>
+<P>The <EM>sdf</EM>, <EM>tag</EM> and <EM>paratag</EM> attributes control the way in which the cell text is converted to SDF:</P>
+<OL>
+<LI>If <EM>sdf</EM> is set, the cell text is already SDF.
+<LI>Otherwise if <EM>tag</EM> is set, the SDF paragraph is paratag:{{tag:text}}.
+<LI>Otherwise, the paragraph is paratag:text.</OL>
+<P><EM>tag</EM> is usually set via the <EM>tags</EM> or <EM>groups</EM> parameters of the <A HREF="../ref/ftable.html">table</A> filter.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG><EM>paratag</EM> is not yet implemented.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tbrow.html">Previous Topic</A> | <A HREF="in_tbss.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

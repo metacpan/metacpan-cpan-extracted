@@ -1,0 +1,151 @@
+#!/usr/bin/perl -w
+
+# This script create lib/Qt.pm from %{include_dir}/QtCore/qnamespace.h
+
+
+sub create_qt_pm {
+
+open FF, "<".$prefix."/QtCore/qnamespace.h" or die "Can not open for read file ".$prefix."/QtCore/qnamespace.h\n";;
+open QT, ">lib/Qt.pm" or die "Can not create file lib/Qt.pm\n";
+
+
+#print QT "#!/usr/bin/perl -w\n";
+print QT "# this file generated automaticaly from QtCore/qnamespace.h\n";
+print QT "package Qt;\n\n";
+print QT "require Exporter;\n";
+print QT "our \@ISA = qw(Exporter);\n";
+print QT "our \@EXPORT = qw(METHOD SLOT SIGNAL CONNECT TR TRUtf8);\n";
+print QT "our \@EXPORT_OK = \@EXPORT;\n\n";
+print QT "sub METHOD { return '0'.\$_[0]; }\n";
+print QT "sub SLOT { return '1'.\$_[0]; }\n";
+print QT "sub SIGNAL { return '2'.\$_[0]; }\n";
+print QT "sub CONNECT { return Qt::QObject::st_connect(\@_)}\n";
+print QT "# for detail about tr see qobject.h & qmetaobject.h\n";
+print QT "sub TR { return Qt::QString::st_fromLatin1(\$_[0]); }\n";
+print QT "sub TRUtf8 { return Qt::QString::st_fromUtf8(\$_[0]); }\n";
+
+print QT "\n";
+my $open_enum = 0;
+my %enums;
+my $cnt;
+my $cl = 'Qt';
+my $enum_name;
+my $prev_row = '';
+
+$classes{$cl}{module} = 'Qt';
+$classes{$cl}{obj} = 0;
+$classes{$cl}{base} = '';
+$classes{$cl}{fnc} = 0;
+$classes{$cl}{dest} = -1;
+
+while ( my $row = <FF> ) {
+	if ( $row =~ /^ *Q_DECLARE_FLAGS/ ) {
+		$row =~ /Q_DECLARE_FLAGS ?\(([0-9A-Za-z_]+), ([0-9A-Za-z_]+)\)$/;
+		my ($flag1, $flag2) = ($1, $2);
+		unless ( $std_type{$cl.'::'.$flag2} ) {
+			print "??? undef enum ", $cl.'::'.$flag2, "\n";
+		}
+		unless ( $std_type{$cl.'::'.$flag1} ) {
+			$std_type{$cl.'::'.$flag1} = 7 ;
+			printf TM "%s\tT_ENUM\n", $cl.'::'.$flag1;
+			$classes{$cl}{sin_enums}{$flag1} = $flag2;
+		}
+		next;
+	};
+	if ( $prev_row ) {
+		$row = $prev_row.' '.$row;
+		$prev_row = '';
+	}
+   unless ( $row =~ /^#/ or $row =~ /^\s*\/\// ) {
+		if ( $open_enum ) {
+			if ( $row =~ /\s+};/ ) {
+				$open_enum = 0;
+			}
+			else {
+				if ( $row =~ /^\s+,?([0-9A-Za-z_]+)( += +([0-9A-Za-z:_| ]+))?,?( +\/\/.+)?$/ ) {
+					my $ss = $1;
+					unless ( $2 ) {
+						$cnt++;
+						print QT "use constant $ss => $cnt;\n";
+						$enums{$ss} = $cnt;
+					}
+					else {
+						my $dd = $3;
+						$dd =~ s/^Qt:://g;
+						if ( $dd =~ /^[0-9]+$/ ) {
+							$cnt = $dd;
+							printf QT "use constant $ss => $cnt; # decimal dig\n";
+							$enums{$ss} = $cnt;
+						}
+						elsif ( $dd =~ /^0x\w+$/ ) {
+							$cnt = hex $dd;
+							printf QT "use constant $ss => $cnt; # = $dd\n";
+							$enums{$ss} = $cnt;
+						}
+						elsif ( defined $enums{$dd} ) {
+							$cnt = $enums{$dd}; # ???
+							printf QT "use constant $ss => $cnt; # = $dd\n";
+							$enums{$ss} = $cnt;
+						}
+						elsif ( $dd =~ /[0-9A-Za-z_]+ +\|/ ) {
+							my @sd = split /\|/, $dd;
+							$cnt = 0;
+							foreach my $aa ( @sd ) {
+								$aa =~ s/^\s*(\S+)\s*$/$1/;
+								if ( $aa =~ /^0x\w+$/ ) {
+									$cnt |= hex $aa;
+									# printf QT "# $aa = %s\n", hex $aa;
+								}
+								elsif ( defined $enums{$aa} ) {
+									$cnt |= $enums{$aa};
+									# printf QT "# $aa = %s\n", $enums{$aa};
+								}
+								else {
+									print QT "# undef $aa ???\n";
+								}
+							}
+							print QT "use constant $ss => $cnt; # = $dd\n";
+							$enums{$ss} = $cnt;
+						}
+						else {
+							print QT "use constant $ss => undef; # = $dd\n";
+						}
+					}
+					$classes{$cl}{enums}{$enum_name}{$ss} = $cnt;
+				}
+			}
+		}
+		if ($row =~ /\s+enum\s+(\w+)\s+{/ ) {
+			$open_enum++;
+			$cnt = -1;
+			$enum_name = $1;
+			print QT "# enum $1 \n";
+			my $qq = "#define ".$cl."__$1 ".$cl."::".$1;
+			$redefine{$qq}++ unless $redefine{$qq};
+			$std_type{$cl.'::'.$1} = 7;
+			printf TM "%s\tT_ENUM\n", $cl.'::'.$1;
+			next;
+		}
+		if ( $row =~ /\s+enum/ ) {
+			$prev_row = $row;
+			next;
+		}
+		if ( $row =~ /class Q_CORE_EXPORT QInternal/ ) {
+			print QT "\npackage QInternal;\n\n" ;
+			$cl = 'QInternal';
+			$classes{$cl}{module} = 'Qt';
+			$classes{$cl}{obj} = 0;
+			$classes{$cl}{base} = '';
+			$classes{$cl}{fnc} = 0;
+			$classes{$cl}{dest} = -1;
+			next
+		};
+   }
+}
+
+
+print QT "\n\n1;\n";
+
+}
+
+1;

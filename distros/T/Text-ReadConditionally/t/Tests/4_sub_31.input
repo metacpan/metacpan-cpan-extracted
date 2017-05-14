@@ -1,0 +1,34 @@
+.# Title: Recursive sub
+.# This recurses more than once.
+Line 1
+.#
+.# Set a0, should be 'outer value' at the end
+.let a0 := 'outer value'
+.#
+.# Straight sub
+.sub s1
+in Sub 1
+.done
+.#
+.# Recursive sub
+.sub rec
+.local a0 a1
+.let a0 := _ARGS[0]; a1 := _ARGS[1]
+.echo In rec:  a0: \v{a0}; a1: \v{a1}
+.if _ARGS[1] > 0
+.s1
+.let a1--
+.echo Recurse: .rec bill \v{a1}
+.# This will recurse but not again
+.rec bill \v{a1}
+.echo DONE Recurse: .rec bill \v{a1}
+.fi
+.#
+.let a0 := _ARGS[0]; a1 := _ARGS[1]
+.echo End of rec: a0: \v{a0}; a1: \v{a1}
+.done
+.#
+.rec fred 10
+.let na := count(_ARGS)
+.eval Last .rec returned. Last a0='\v{a0}' This num args=\v{na}
+EOF

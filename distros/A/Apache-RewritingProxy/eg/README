@@ -1,0 +1,31 @@
+SpellingProxy.pm and ChefProxy.pm are just dirtly little
+proofs of concept.  They show that different text handlers 
+can be written to actually process the text parts of the web pages
+that are displayed through RewritingProxy.pm
+
+Why would one do this?
+
+Good question.  Several people have expressed an interest in writing 
+different filters to do stuff like write a web proxy for Palm Pilots
+and Wireless Internet phones.  In order to do this, custom handlers
+have to be possible.  I have started with making room for text handlers
+(since I need to write some of them first).  I will then make room for 
+custom image handlers (to get rid of frivolous images/ads/etc. when 
+they are not needed/visible) and custom link handlers.
+
+How would one do this?
+
+Another good question.  Simply make a package just like the examples with 
+a textHandler most likely doing something quite different.  Put 
+that package either in the default perl module path or in the mod_perl 
+path (usually in the server root/lib/perl/Apache).  Put something like
+the following in the httpd.conf file:
+
+<Location /wherever>
+SetHandler perl-script
+PerlHandler Apache::YourProxyPackage
+PerlSendHeader On
+</Location>
+
+Restart the server and your proxy should magically work and do all 
+sorts of wonderful things to the text content.

@@ -1,0 +1,44 @@
+
+%%Form:entry%%
+
+<H1>Database Test</H1>
+
+<PRE>
+Number: %%Text:num:5,10%%
+
+Text: %%Textarea:name:2,30%%
+
+                %%Submit:OK%%
+</PRE>
+			  
+%%Form%%
+
+%%--------------------------------------------%%
+
+%%Form:reply%%
+
+<H1>Entry submitted</H1>
+
+%%Form%%
+
+%%--------------------------------------------%%
+
+%%Action:reply%%
+
+store:msql:localhost,test
+insert into test (num,name)
+  values (%%num%%, '%%name%%')
+  
+%-------%
+
+%%Action%%
+
+%%--------------------------------------------%%
+
+%%Fields%%
+
+num:required
+
+%%Fields%%
+
+

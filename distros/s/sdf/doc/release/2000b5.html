@@ -1,0 +1,89 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta5</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b6.html">Previous Topic</A> | <A HREF="2000b4c.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>18. 2.000beta5</H1>
+<P ALIGN="Left"><A HREF="#2.000beta5 - Enhancements">Enhancements</A> | <A HREF="#2.000beta5 - General Fixes">General Fixes</A> | <A HREF="#2.000beta5 - HTML Fixes">HTML Fixes</A> | <A HREF="#2.000beta5 - HLP Fixes">HLP Fixes</A> | <A HREF="#2.000beta5 - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000beta5 - Enhancements">18.1. Enhancements</A></H2>
+<H3><A NAME="Performance">18.1.1. Performance</A></H3>
+<P>Performance is now 2-3 times faster for most documents. There is still some work to do here, but the performance is now &quot;respectable&quot; (rather than &quot;disappointing&quot;).</P>
+<H3><A NAME="Perl 5">18.1.2. Perl 5</A></H3>
+<P>This release has been tested with Perl 5.002 and is configured to use it, by default. However:</P>
+<UL>
+<LI>the odd &quot;eval&quot; buglet still (randomly?) appears when using Perl 5
+<LI>the <CMD>mif2rtf</CMD> script has <STRONG>not</STRONG> been tested.</UL>
+<P>If you wish to use Perl 4 instead, you will need to change the top line of the scripts in the <TT>bin</TT> directory after installing SDF.</P>
+<H3><A NAME="Newsletters">18.1.3. Newsletters</A></H3>
+<P>There is now a new style called <EM>newsletter</EM>.</P>
+<P>The <A HREF="../ref/ftitle.html">title</A> filter now supports a <EM>toc</EM> parameter for specifying a table of contents. For example:</P>
+<PRE>
+!block title; toc=$var{'OPT_TARGET'} eq 'html' ? 2 : 0
+Name    Value
+Title   My Newsletter
+Editor  Me
+!endblock
+</PRE>
+<P>This produces a title block for a newsletter and only gives it a table of contents when the target is <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A>.</P>
+<H3><A NAME="Pre-Filtering">18.1.4. Pre-Filtering</A></H3>
+<P><A HREF="../ref/sdf.html">sdfcvt</A>'s -p option prefilters the input file for each argument. The (optional) parameter is the filter to use. For example:</P>
+<PRE>
+        sdfcvt -ptable mytable.tbl
+</PRE>
+<P>is equivalent to executing <A HREF="../ref/sdf.html">sdfcvt</A> on a file which only contains:</P>
+<PRE>
+        !include &quot;mytable.pl&quot;; table
+</PRE>
+<P>File extensions can be mapped to filters in <TT>sdfcvt.ini</TT>. For example, <TT>sdfcvt.ini</TT> now contains the following:</P>
+<PRE>
+[PreFilters]
+Name    Aliases     Module
+table   tbl
+module  sdm,sde     frmodule
+</PRE>
+<P>As <EM>tbl</EM> is mapped to <EM>table</EM>, creating nicely formatted tables is now quite easy. For example:</P>
+<PRE>
+        sdfcvt -p -aformat='15,75,10' mytable.tbl
+</PRE>
+<P>(The -a option can be used to specify prefilter parameters.)</P>
+<P>For a given prefilter, a module can be configured in <TT>sdfcvt.ini</TT> to be loaded before the filter is applied. As a result, it's possible to do really clever things via autoloaded filters. Examples include:</P>
+<UL>
+<LI>automatically documenting SDF modules
+<LI>converting other formats to SDF on the fly.</UL>
+<P>For example, the following command will build the reference documentation for a SDF module in <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A> (real soon now):</P>
+<PRE>
+ sdfcvt +sdf2html -p abc.sdm
+</PRE>
+<HR>
+<H2><A NAME="2.000beta5 - General Fixes">18.2. General Fixes</A></H2>
+<P>The <A HREF="../ref/sdf.html">sdf2txt</A> stuff now works.</P>
+<HR>
+<H2><A NAME="2.000beta5 - HTML Fixes">18.3. HTML Fixes</A></H2>
+<P>Empty cells now look better. (This was supposed to be fixed by the previous release but I had missed a few.)</P>
+<P>Paragraphs with multiple anchors are now handled better (although the odd problem probably remains with this stuff).</P>
+<P>If a table of contents is requested and SDF doesn't know the &quot;right&quot; place for it, it is now prepended (rather than being dumped).</P>
+<P>Title blocks for correspondence look much better now.</P>
+<HR>
+<H2><A NAME="2.000beta5 - HLP Fixes">18.4. HLP Fixes</A></H2>
+<P>Absolute path names for libraries now correctly go into HPJ files. / characters are now also mapped to \ characters.</P>
+<P>Title blocks for correspondence look much better now.</P>
+<HR>
+<H2><A NAME="2.000beta5 - Incompatibilities">18.5. Incompatibilities</A></H2>
+<P>None.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b6.html">Previous Topic</A> | <A HREF="2000b4c.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

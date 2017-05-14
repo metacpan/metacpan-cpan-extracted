@@ -1,0 +1,73 @@
+NAME
+
+    DBIx::XML::DataLoader
+
+VERSION 
+
+    1.0b
+
+DESCRIPTION
+
+    DBIx::XML::DataLoader is a tool for loading data from a xml
+    document into any DB datasource. It will also load data into a xml
+    document from a DB datasource. 
+
+    The module uses a custom map file written in xml to holding the information
+     needed to traverse the xml data source and load the data into the 
+    appropriate DB datasource. 
+
+    With this system there is no real limitation to the type of xml document holding 
+    your data. There is also no limitation to the number of DB datasources that can be 
+    loaded from one xml document.
+
+
+WARNING 
+
+    This is beta software and should be used with caution.
+
+DEPENDENCIES
+
+     DBI
+     LWP::UserAgent
+     XML::XPath
+     XML::Simple
+
+INSTALLATION
+		
+    This module will install like any other perl module.
+    to install from with in the main directory 
+    from command line type perl Makefile.PL
+
+    Then edit the resulting make file Makefile
+
+    then type
+
+    make
+    make test  # currently there are no tests included
+    make install
+
+
+EXAMPLES
+     
+     You will find a example directory inside this distribution.
+     The examples use the DBD::CVS as the driver. This should
+     make the examples functional anywhere the CVS driver is installed.
+    
+    
+STATUS AND SUPPORT
+
+     This is a beta version of DBIx::XML::DataLoader .
+     Development has been mostly done with a Oracle database.
+     I have also tested this code using mysql. I have done no
+     testing with other DB drivers although I assume things should
+     work fine using other drivers. 
+
+     Further information can be found at http://www.theperlprogrammer.com/
+     Please report bugs and other problems to webacres@yahoo.com
+
+SEE ALSO 
+    Pod produced man pages
+
+  
+
+

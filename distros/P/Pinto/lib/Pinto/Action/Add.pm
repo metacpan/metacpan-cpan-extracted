@@ -13,7 +13,7 @@ use Pinto::Types qw(AuthorID FileList);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -67,6 +67,8 @@ sub BUILD {
     throw "Some archives are missing or unreadable"
         if @missing or @unreadable;
 
+    $self->stack->assert_not_locked;
+
     return $self;
 }
 
@@ -75,12 +77,13 @@ sub BUILD {
 sub execute {
     my ($self) = @_;
 
+    my ( @successful, @failed );
     for my $archive ( $self->archives ) {
 
         try {
             $self->repo->svp_begin;
             my $dist = $self->_add($archive);
-            push @{$self->affected}, $dist if $dist;
+            push @successful, $dist ? $dist : ();
         }
         catch {
             throw $_ unless $self->no_fail;
@@ -90,6 +93,7 @@ sub execute {
 
             $self->error("$_");
             $self->error("Archive $archive failed...continuing anyway");
+            push @failed, $archive;
         }
         finally {
             my ($error) = @_;
@@ -99,7 +103,7 @@ sub execute {
 
     $self->chrome->progress_done;
 
-    return $self;
+    return @successful;
 }
 
 #------------------------------------------------------------------------------
@@ -119,7 +123,7 @@ sub _add {
     }
 
     $self->notice( "Registering $dist on stack " . $self->stack );
-    ($dist, undef, undef) = $self->pull( target => $dist );    # Registers dist and pulls prereqs
+    $self->pull( target => $dist );    # Registers dist and pulls prereqs
 
     return $dist;
 }
@@ -180,7 +184,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -188,7 +195,7 @@ Pinto::Action::Add - Add a local distribution into the repository
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -196,7 +203,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,18 +1,16 @@
 package Tk::TabFrame;
 
 use Tk;
-
 use Tk::ChildNotification;
 use Tk::Frame;
 use Tk::Label;
 
-use vars qw ($VERSION @ISA);
-
+use base qw (Tk::Derived Tk::Frame);
+use vars qw ($VERSION);
 use strict;
+use Carp;
 
-$VERSION = '1.01';
-
-@ISA = qw (Tk::Derived Tk::Frame);
+$VERSION = '0.01';
 
 Tk::Widget->Construct ('TabFrame');
 

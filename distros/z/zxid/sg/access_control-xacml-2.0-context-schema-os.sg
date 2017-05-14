@@ -1,0 +1,103 @@
+# zxid/sg/access_control-xacml-2.0-context-schema-os.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: access_control-xacml-2.0-context-schema-os.sg,v 1.3 2009-08-25 16:22:45 sampo Exp $
+
+target(xac, urn:oasis:names:tc:xacml:2.0:context:schema:os)
+import(xa,  urn:oasis:names:tc:xacml:2.0:policy:schema:os, http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd)
+
+Request	 -> %xac:RequestType
+%RequestType:
+  xac:Subject+
+  xac:Resource+
+  xac:Action
+  xac:Environment
+  ;
+
+Response -> %xac:ResponseType
+%ResponseType:
+  xac:Result+
+  ;
+
+Subject -> %xac:SubjectType
+%SubjectType:
+  xac:Attribute*
+  @SubjectCategory? -> %xs:anyURI  # default (urn:oasis:names:tc:xacml:1.0:subject-category:access-subject)
+  ;
+
+Resource -> %xac:ResourceType
+%ResourceType:
+  xac:ResourceContent?
+  xac:Attribute*
+  ;
+
+ResourceContent -> %xac:ResourceContentType
+%ResourceContentType:
+  any*  processContents(lax)
+  @any? # ns(##any)
+  ;
+
+Action -> %xac:ActionType
+%ActionType:
+  xac:Attribute*
+  ;
+
+Environment -> %xac:EnvironmentType
+%EnvironmentType:
+  xac:Attribute*
+  ;
+
+Attribute       -> %xac:AttributeType
+%AttributeType:
+  xac:AttributeValue+
+  @AttributeId  -> %xs:anyURI
+  @DataType     -> %xs:anyURI
+  @Issuer?      -> %xs:string
+  ;
+
+AttributeValue -> %xac:AttributeValueType
+#%AttributeValueType:
+#  any*  processContents(lax)
+#  @any? # ns(##any)
+#  ;
+%AttributeValueType: base(xs:string)  ;  # Sampo: we need some real world content
+
+Result -> %xac:ResultType
+%ResultType:
+  xac:Decision
+  xac:Status?
+  xa:Obligations?
+  @ResourceId? -> %xs:string
+  ;
+
+Decision -> %xac:DecisionType
+%DecisionType: enum( Permit Deny Indeterminate NotApplicable ) ;
+
+Status  -> %xac:StatusType
+%StatusType:
+  xac:StatusCode
+  xac:StatusMessage?
+  xac:StatusDetail?
+  ;
+
+StatusCode  -> %xac:StatusCodeType
+%StatusCodeType:
+  xac:StatusCode?
+  @Value  -> %xs:anyURI
+  ;
+
+StatusMessage  -> %xs:string
+
+StatusDetail   -> %xac:StatusDetailType
+%StatusDetailType:
+  any*  processContents(lax)
+  ;
+
+MissingAttributeDetail  -> %xac:MissingAttributeDetailType
+%MissingAttributeDetailType:
+  xac:AttributeValue*
+  @AttributeId  -> %xs:anyURI
+  @DataType     -> %xs:anyURI
+  @Issuer?      -> %xs:string
+  ;
+
+#EOF

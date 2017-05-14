@@ -1,0 +1,643 @@
+flf2a$ 6 5 16 0 30
+//-----------------------------------------------------------//
+//                                                           //
+//    .dBBBBP dBBBBBBP dBBBBBb   dBBBBBb                     //
+//    BP                    BB       dBP                     //
+//    `BBBBb   dBP      dBP BB   dBBBBK                      //
+//       dBP  dBP      dBP  BB  dBP  BB                      //
+//  dBBBBP'  dBP      dBBBBBBB dBP  dB'                      //
+//                                                           //
+//                dBBBBBBP dBBBBBb   dBBBP  dBP dBP          //
+//                             dBP         dBP.dBP           //
+//                dBP     dBBBBK   dBBP   dBBBBP'            //
+//               dBP     dBP  BB  dBP    dBP BB              //
+//              dBP     dBP  dB' dBBBBP dBP dB'              //
+//                                                           //
+//                 -=[ The Figlet Font ]=-                   //
+//                                                           //
+//  [ Version 1.0 ]                                          //
+//                                                           //
+//  1994, by Peter L. Buschman                               //
+//                                                           //
+//  Please send all comments to the author at:               //
+//                                                           //
+//                                                           //
+//                        97buschmanp@alma.edu               //
+//                        plbuschm@nyx.cs.du.edu             //
+//                                                           //
+//  OAS AAS LLS!                                             //
+//-----------------------------------------------------------//
+Height, Up_ht, Maxlength, SmushMode, CommentCount
+
+     $$$@
+    $$$ @
+   $$$  @
+  $$$   @
+ $$$    @
+$$$     @@ 
+     $dBP@
+    $dBP @
+   $dBP  @
+  $dBP   @
+ $       @
+$dBP     @@!
+       @
+ $dP dP@
+$dP dP @
+       @
+       @
+       @@"
+$     d88P  @
+$ d88888888P@
+$d8B88888BP @
+$  d88P     @
+            @
+     _      @@#
+  $.===.@
+  $: |  @
+  $`===.@
+  $  | :@
+  $`==='@
+  $  "  @@$
+ $dP  dP@
+ $   dP @
+ $  dP  @
+ $ dP   @
+ $dP  dP@
+        @@%
+  .BBb'  @
+  B..    @
+  >BP    @
+ .B      @
+..`BB'   @
+         @@&
+$   @
+$dBP@
+$BP @
+    @
+    @
+    @@'
+    $.BBb.@
+   $dBP   @
+  $dBP    @
+ $dBP     @
+$dBP      @
+$`BBb     @@(
+     $dBB.@
+    $  dBP@
+   $  dBP @
+  $  dBP  @
+ $  dBP   @
+$`BBB'    @@)
+$    .. @
+$  .::dP@
+$  dBBP:@
+$  :dBBb@
+$  dP::'@
+$       @@*
+   $    @
+  $     @
+ $  dBP @
+$dBBBBBP@
+$ dBP   @
+        @@+
+   $ @
+  $  @
+ $   @
+$    @
+$$dBP@
+$$BP @@,
+   $$$$$@
+  $$$$$$@
+ $$$$$$$@
+$dBBBBBP@
+$$$$$$$$@
+        @@-
+    @
+   $@
+  $ @
+ $  @
+$dBP@
+    @@.
+       $__@
+     $_dBP@
+   $_dBP  @
+ $_dBP    @
+$dBP      @
+          @@/
+    $dBBBBP@
+   $dB'.BP @
+  $dB:.BP  @
+ $dB'.BP   @
+$dBBBBP    @
+           @@0
+ $dBBBb @
+        @
+  $dBP  @
+ $dBP   @
+$dBP    @
+        @@1
+ $dBBBBb@
+ $      @
+  $dBBP @
+ $dBP__ @
+$dBBBBP @
+        @@2
+  $dBBBBb@
+  $      @
+  $ dBBBP@
+ $   dBP @
+$dBBBBP  @
+         @@3
+  $dBP dBP@
+ $    dBP @
+$dBBBBBP  @
+    dBP   @
+   dBP    @
+          @@4
+    $dBBBBBP@
+   $        @
+  $dBBBBBP  @
+ $    dBP   @
+$dBBBBBP    @
+            @@5
+   $dBBBBP@
+  $dP     @
+ $dP dBP  @
+$dP  dP   @
+$VBBBP    @
+          @@6
+$dBBBBb @
+        @
+  $dBP  @
+ $dBP   @
+$dBP    @
+        @@7
+    $dBBBb@
+   $dP  dP@
+  $dPBBBP @
+ $dP  dP  @
+$ VBBBP   @
+          @@8
+   $dBBBBb@
+  $dP  dBP@
+  $VBBBBP @
+ $    dP  @
+$ dBBBP   @
+          @@9
+    $ @
+   $  @
+  $dBP@
+ $    @
+$dBP  @
+      @@:
+$     @
+$     @
+$  dBP@
+$     @
+$ dBP @
+$dBP  @@;
+     @
+$ dP @
+$dP  @
+$Vb  @
+$ Vb @
+     @@<
+        @
+  $dBBBP@
+ $      @
+$dBBBP  @
+        @
+        @@=
+     @
+$Vb  @
+$`Bb @
+$ dP @
+$dP  @
+     @@>
+$dBBBBb@
+$Vb dBP@
+   dBP @
+       @
+$dBP   @
+       @@?
+   $       @
+  $dBBBBBBb@
+ $dBP _  dB@
+$dBP  " dB'@
+$VBBBBBBB' @
+           @@@
+ $dBBBBBb @
+   $   BB @
+  $dBP BB @
+ $dBP  BB @
+$dBBBBBBB @
+          @@A
+   $dBBBBb@
+   $   dBP@
+  $dBBBK' @
+ $dB' db  @
+$dBBBBP'  @
+          @@B
+    $dBBBP@
+   $      @
+  $dBP    @
+ $dBP     @
+$dBBBBP   @
+          @@C
+    $dBBBBb@
+   $    dB'@
+  $dBP dB' @
+ $dBP dB'  @
+$dBBBBB'   @
+           @@D
+    $dBBBP @
+   $       @
+  $dBBP    @
+ $dBP      @
+$dBBBBP    @
+           @@E
+    $dBBBBP@
+   $       @
+  $dBBBP   @
+ $dBP      @
+$dBP       @
+           @@F
+    $dBBBBb@
+   $       @
+  $dBBBB   @
+ $dB' BB   @
+$dBBBBBB   @
+           @@G
+    $dBP dBP@
+            @
+  $dBBBBBP  @
+ $dBP dBP   @
+$dBP dBP    @
+            @@H
+    $dBP@
+   $    @
+  $dBP  @
+ $dBP   @
+$dBP    @
+        @@
+        dBP@I
+           @
+      dBP  @
+ $dB'dBP   @
+$dBBBBP    @
+           @@J
+   $ dBP dBP@
+    dBP.d8P @
+  $dBBBBP'  @
+ $dBP BB    @
+$dBP dB'    @
+            @@K
+    $dBP@
+   $    @
+  $dBP  @
+ $dBP   @
+$dBBBBP @
+        @@L
+     $dBBBBBBb@
+    $  '   dB'@
+   $dB'dB'dB' @
+  $dB'dB'dB'  @
+ $dB'dB'dB'   @
+              @@M
+    $dBBBBb@
+   $    dBP@
+  $dBP dBP @
+ $dBP dBP  @
+$dBP dBP   @
+           @@N
+    $dBBBBP@
+   $dB'.BP @
+  $dB'.BP  @
+ $dB'.BP   @
+$dBBBBP    @
+           @@O
+  $dBBBBBb@
+  $    dB'@
+  $dBBBP' @
+ $dBP     @
+$dBP      @
+          @@P
+    $dBBBBP@
+   $dB'.BP @
+  $dB'.BP  @
+ $dB'.BB   @
+$dBBBB'B   @
+           @@Q
+  $dBBBBBb@
+  $    dBP@
+  $dBBBBK'@
+ $dBP  BB @
+$dBP  dB' @
+          @@R
+  .dBBBBP@
+  BP     @
+  `BBBBb @
+     dBP @
+dBBBBP'  @
+         @@S
+$ dBBBBBBP@
+          @
+  $dBP    @
+ $dBP     @
+$dBP      @
+          @@T
+    $dBP dBP@
+   $        @
+  $dBP dBP  @
+ $dBP_dBP   @
+$dBBBBBP    @
+            @@U
+  dBP dP@
+        @
+$dB .BP @
+ BB.BP  @
+ BBBP   @
+        @@V
+    $dBPdBPdBP@
+   $          @
+  $dBPdBPdBP  @
+ $dBPdBPdBP   @
+$dBBBBBBBP    @
+              @@W
+$`Bb  .BP@
+ $   .BP @
+  $dBBK  @
+ $dB'    @
+$dB' dBP @
+         @@X
+$dBP dBP@
+   $dBP @
+  $dBP  @
+ $dBP   @
+$dBP    @
+        @@Y
+$dBBBBBP@
+        @
+  $dBP  @
+ $dBP   @
+$dBBBBP @
+        @@Z
+     $dBBb $@
+    $dBP  $ @
+   $dBP  $  @
+  $dBP  $   @
+ $dBP  $    @
+$dBBBP$     @@[
+       @
+`Bb    @
+ `Bb   @
+  `Bb  @
+   `Bb$@
+       @@\
+     $dBBP$@
+    $ dBP$ @
+   $ dBP$  @
+  $ dBP$   @
+ $ dBP$    @
+$VBBP$     @@]
+ $dBb @
+$dP`Bb@
+      @
+      @
+      @
+      @@^
+     $$$@
+    $$$$@
+   $$$$$@
+  $$$$$$@
+ $$$$$$$@
+$dBBBBBP@@_
+    @
+$dBb@
+$`BP@
+$ ' @
+    @
+    @@`
+ $dBBBBBb@
+       BB@
+  $dBP BB@
+ $dBP  BB@
+$dBBBBBBB@
+         @@a
+   $dBBBBb@
+   $   dBP@
+  $dBBBK' @
+ $dB' db  @
+$dBBBBP'  @
+          @@b
+    $dBBBP@
+   $      @
+  $dBP    @
+ $dBP     @
+$dBBBBP   @
+          @@c
+    $dBBBBb@
+   $    dBP@
+  $dBP dBP @
+ $dBP dBP  @
+$dBBBBBP   @
+           @@d
+    $dBBBP @
+   $       @
+  $dBBP    @
+ $dBP      @
+$dBBBBP    @
+           @@e
+    $dBBBBP@
+   $       @
+  $dBBBP   @
+ $dBP      @
+$dBP       @
+           @@f
+    $dBBBBb@
+   $       @
+  $dBBBB   @
+ $dB' BB   @
+$dBBBBBB   @
+           @@g
+    $dBP dBP@
+   $        @
+  $dBBBBBP  @
+ $dBP dBP   @
+$dBP dBP    @
+            @@h
+    $dBP@
+   $    @
+  $dBP  @
+ $dBP   @
+$dBP    @
+        @@i
+        dBP@
+           @
+      dBP  @
+ $dB'dBP   @
+$dBBBBP    @
+           @@j
+    $dBP dBP@
+   $d8P.dBP @
+  $dBBBBP   @
+ $dBP BB    @
+$dBP dBP    @
+            @@k
+    $dBP@
+   $    @
+  $dBP  @
+ $dBP   @
+$dBBBBP @
+        @@l
+    $dBBBBBBb@
+   $      dBP@
+  $dBPdBPdBP @
+ $dBPdBPdBP  @
+$dBPdBPdBP   @
+             @@m
+    $dBBBBb@
+   $    dBP@
+  $dBP dBP @
+ $dBP dBP  @
+$dBP dBP   @
+           @@n
+    $dBBBBP@
+   $dBP.BP @
+  $dBP.BP  @
+ $dBP.BP   @
+$dBBBBP    @
+           @@o
+  $dBBBBBb@
+  $    dB'@
+  $dBBBP' @
+ $dBP     @
+$dBP      @
+          @@p
+    $dBBBBP@
+   $dBP.BP @
+  $dBP.BP  @
+ $dBP.BB   @
+$dBBBB'B   @
+           @@q
+  $dBBBBBb@
+  $    dBP@
+  $dBBBBK @
+ $dBP  BB @
+$dBP  dB' @
+          @@r
+  .dBBBBP@
+  BP     @
+  `BBBBb @
+     dBP @
+dBBBBP'  @
+         @@s
+ $dBBBBBBP@
+          @
+  $dBP    @
+ $dBP     @
+$dBP      @
+          @@t
+    $dBP dBP@
+   $        @
+  $dBP dBP  @
+ $dBP_dBP   @
+$dBBBBBP    @
+            @@u
+   dBP dP@
+         @
+$dB .BP  @
+ BB.BP   @
+ BBBP    @
+         @@v
+    $dBPdBPdBP@
+   $          @
+  $dBPdBPdBP  @
+ $dBPdBPdBP   @
+$dBBBBBBBP    @
+              @@w
+`Bb  .BP@
+    .BP @
+  dBBK  @
+ dB'    @
+dB' dBP @
+        @@x
+$dBP dBP@
+    dBP @
+   dBP  @
+  dBP   @
+ dBP    @
+        @@y
+$dBBBBBP@
+        @
+  $dBP  @
+ $dBP   @
+$dBBBBP @
+        @@z
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@
+@
+@
+@
+@
+@
+@@

@@ -1,0 +1,6 @@
+[% UNLESS NO_HEADER %]<head>[% END %]
+  <title>[% title %]</title>
+  <script src="[% REQUEST.location() %]/js/prototype.js" language="javaScript"></script>
+  <script src="[% REQUEST.location() %]/js/validate.js" language="javaScript"></script>
+  <link href="[% REQUEST.location() %]/css/style.css" rel="stylesheet" type="text/css">
+[% UNLESS NO_HEADER %]<head>[% END %]

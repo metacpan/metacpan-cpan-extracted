@@ -1,0 +1,694 @@
+<<if: ZXIDBOOK>>
+<<else: >>ZXID ID-WSF API (SOAP Web Services)
+###############
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-wsf.pd,v 1.4 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-WSF 01>>
+<<define: ZXDOC=ZXID Id-WSF API>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. This document describes the API for making
+ID-WSF identity web services calls, i.e. SOAP calls. Discovery and
+providing a service are also covered.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+Here we describe the general philosophy of the ZXID ID-WSF
+APIs. Some function level documentation is available from
+<<link:../ref/html/index.html: Function reference>>.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+<<htmlpreamble: <title>ZXID ID-WSF API (SOAP Web Services)</title><link type="text/css" rel=stylesheet href="zx.css"><body><h1>ZXID ID-WSF API (SOAP Web Services)</h1> >>
+
+13 ID-WSF Features of ZXID
+==========================
+
+<<fi: >>
+
+13.1 EPR Cache
+--------------
+
+Calling an ID Web Service requires an Endpoint Reference (EPR) that
+indicates not only the URL of the web service, but also the security
+mechanism and any tokens or credentials required by the security
+mechanism, collectively called the +metadata+ of the EPR.<<footnote:
+While the role of the EPR metadata is broadly similar to SAML
+metadata, the two should not be confused.>>
+
+An EPR can be obtained from two sources
+
+1. From the SSO assertion containing an attribute statement that
+   has the EPR. This is called the +bootstrap+ method.
+
+2. By calling the discovery service.
+
+Either way, the EPRs are cached in the SSO session as files
+with paths like
+
+  /var/zxid/ses/SESID/SVCTYPE,SHA1
+
+where +SESID+ is the SSO session ID (safe base64 of a random number).
++SVCTYPE+ and +SHA1+ form a unique file name inside the session directory.
++SVCTYPE+ component allows easy identification of the EPRs that are
+relevant for calling a given service. The +SHA1+ component is a SHA1 hash
+over the canonical XML representation of the EPR.
+
+When bootstrap EPRs are present in the SSO assertion, they are
+automatically extracted to the EPR cache (internally
+zxid_snarf_eprs_from_ses() is called). Generally this will yield at
+least bootstrap EPR for discovery service. Later, when
+calling web services, discovery is automatically performed
+as needed and the results are automatically populated to the
+EPR cache (internally zxid_cache_epr() is called).
+
+When calling higher level WSC APIs, the discovery will happen
+automatically, but if you work in terms of lower level APIs,
+you can obtain an EPR by calling zxid_get_epr() which will
+first consult the cache, and if there is a miss, then try discovering
+the EPR using discovery service EPR, if any (usually one was obtained
+as bootstrap during the SSO).
+
+13.2 High level WSC API
+-----------------------
+
+The high level API is based on the idea of constructing
+the SOAP body (the payload) as a string and passing that
+to function that performs the SOAP call and returns
+response.
+
+  01 cf = zxid_new_conf_to_cf(CONF);
+  02
+  03 res = zxid_simple_cf(cf, cl, qs2, 0, 0x1fff);
+  04 switch (res[0]) {
+  05 default:
+  06   ERR("Unknown zxid_simple() response(%s)", res);
+  07 case 'd': break; /* Logged in case */
+  08 }
+  09 sid = strstr(res, "sesid: ");
+  10 zxid_get_ses(cf, &sess, sid);
+
+  11 env = zxid_callf(cf, &sess, 0,0,0, zx_xmlns_idhrxml,
+  12         "<idhrxml:Modify>"
+  13           "<idhrxml:ModifyItem>"
+  14             "<idhrxml:Select>%s</idhrxml:Select>"
+  15             "<idhrxml:NewData>%s</idhrxml:NewData>"
+  16           "</idhrxml:ModifyItem>"
+  17         "</idhrxml:Modify>", cgi.select, cgi.data);
+  18 ZXID_CHK_STATUS(env, idhrxml_ModifyResponse,
+  19                 hrxml_resp = "Modify failed"; break);
+  20 hrxml_resp = "Modify OK";
+
+On lines 1-10 a single sign on is done to prepare the
+session and EPR cache.
+
+13.2.1 zxid_callf() - Make SOAP call with specified body
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  env = zxid_callf(cf, ses, svctype, url, di_opt, az_cred, fmt, ...)
+
+zxid_callf() first creates the body of the SOAP call
+by expanding the format string (which may involve additional
+arguments). Next it parses the string into XML data structure.
+If the format string uses unresolved namespaces, they are
+resolved using the svctype argument.
+
+Next zxid_callf() will attempt to locate an EPR for
+the service type. This may already be in cache, or
+discovery step may be performed.
+
+Then zxid_callf() augments the XML data structure with
+Liberty ID-WSF mandated headers. It will look at the
+security mechanism and token specified in the EPR and
+perform appropriate steps to create WS-Security header
+and apply signature as needed.
+
+Finally a SOAP call is made. The result is XML parsed
+and returned as SOAP envelope object.
+
+cf:: Configuration object, see zxid_new_conf_to_cf()
+ses:: Session object, used to locate EPRs, see zxid_get_ses()
+svctype:: Service type and namespace that is applicable
+    to the body. This is one of the constants from c/zx-ns.h
+url:: (Optional) If provided, this argument has to match either
+    the ProviderID, EntityID, or actual service endpoint URL.
+di_opt:: (Optional) Additional discovery options for selecting the
+    service, query string format
+az_cred:: (Optional) Additional authorization credentials or
+    attributes, query string format. These credentials will be populated
+    to the attribute pool in addition to the ones obtained from SSO and
+    other sources. Then a PDP is called to get an authorization decision
+    (as well as obligations we pledge to support). See also PEPMAP
+    configuration option. This implementes generalized (application
+    independent) Requestor Out and Requestor In PEPs. To implement
+    application dependent PEP features you should call zxid_az() directly.
+fmt:: printf style format string that is used to describe
+    the body of the call as a string. If fmt contains
+    format specifiers, then additional arguments
+    are used to expand these.
+
+Return value:: SOAP envelope as a string.
+
+> N.B. Although the request body is formulated as a string,
+> you can only use XML constructs whose schema is known to
+> ZXID. The resulting XML must be validly parseable by ZXID.
+
+13.2.2 ZXID_CHK_STATUS() - Macro for checking OK status
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  ZXID_CHK_STATUS(env, resp_tag, abort-action);
+  ZXID_CHK_STATUS(env, idhrxml_ModifyResponse, break);
+
+In ID-WSF web services it is very common that the overall
+outcome of the operation is expressed by <Status> element
+at top level. This macro makes it easy to check the status.
+
+If status is NOT "OK", then +abort-action+ is invoked. This
+would be whatever needed in your program to report error
+and abort further processing of the response. It could
+be a ~break~, ~return~, or even a ~goto~ statement.
+
+env:: SOAP envelope representing the response
+resp_tag:: The response tag as it appears as a child of env->Body
+abort-action:: Statement, or statements, used to report error and abort processing.
+
+There is no return value. This macro is "procedural".
+
+13.3 Low Level WSC API
+----------------------
+
+Typical code for calling a web service at low level
+
+  01 #include <zx/errmac.h>
+  02 #include <zx/zxid.h>
+  03 #include <zx/zxidconf.h>
+  04 #include <zx/saml2.h>
+  05 #include <zx/wsf.h>
+  06 #include <zx/c/zx-ns.h>
+  07
+  08 struct zx_e_Envelope_s* env;
+  09 struct zx_a_EndpointReference_s* epr;
+  10 epr = zxid_get_epr(cf, ses, zx_xmlns_dap, 1);
+  11 if (epr) {
+  12   env = zx_NEW_e_Envelope(cf->ctx);
+  13   env->Header = zx_NEW_e_Header(cf->ctx);
+  14   env->Body = zx_NEW_e_Body(cf->ctx);
+  15   env->Body->Query = zxid_mk_dap_query(cf, ...); /* See ID-DAP inteface */
+  16   env = zxid_wsc_call(cf, ses, epr, env);        /* The beef */
+  17   if (env->dap_QueryResponse)
+  18     D("Result is LDIF(%.*s)",
+  19        env->Body->dap_QueryResponse->Data->LDIF->gg.content->len,
+  20        env->Body->dap_QueryResponse->Data->LDIF->gg.content->s);
+  21 }
+
+1. On line 10 zxid_get_epr() is used with following arguments
+   cf:: Configuration object
+   ses:: Session object (generallly obtained from SSO)
+   zx_xmlns_dap:: The +service type+ of the service that is
+       to be called. Generally this is same as the namespace
+       URI. The include <zx/c/zx-ns.h> contains macros,
+       such as ~zx_xmlns_dap~, for the namespaces supported
+       by zxid. Alternatively you could simply supply the string.
+   1:: The last argument ("1", one) is an iterator index that, in case of
+       multiple EPRs allows you to pick which one to use.
+       Most common usage is to simply supply 1 which picks
+       the first one.<<footnote: However, the ordering of the
+       eprs in not currently well defined and may change
+       from one version of ZXID to another.>>
+
+13.3.1 zxid_get_epr() - Obtain EPR fron cache or by discovery
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  epr = zxid_get_epr(cf, ses, svctype, n);
+
+See if an EPR for service +svctype+ is available
+in current session EPR cache. If not, see if discovery
+EPR is available and try to discover the EPR for
+the +svctype+. Note that the discovery is transparent
+to the programmer - indeed programmer can not know
+whether EPR was served from cache (where it may have
+appeared by virtue of a bootstrap) or whether it
+was discovered.
+
+cf:: Configuration object, see zxid_new_conf_to_cf()
+ses:: Session object, used to locate EPRs in cache, see zxid_get_ses()
+svctype:: Service type (usually namespace of the service).
+    This is one of the constants from c/zx-ns.h
+n:: Ordinal. If more than one EPR is available, specifies
+    which one is desired. Usually 1 is supplied, to pick the first EPR.
+
+Return Value:: An EPR object (URL of the service, security mechanism,
+    and possibly security token (SAML assertion)).
+
+See also:: zxid_get_epr_address() for extracting URL as a string
+
+13.4 ID-DAP Interface
+---------------------
+
+The ID-DAP search filters and data model are very similar to
+LDAP, see [RFC2251] for further explanation.
+
+13.4.1 Short example of using low level API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  env->Body->dap_Query
+    = zxid_mk_dap_query(cf,
+          0,   /* No tests */
+          zxid_mk_dap_query_item(cf,
+                                 zxid_mk_dap_select(cf,
+                                                    0,  /* DN from ID-WSF */
+                                                    "objecttype=svcprofile",
+                                                    0,  /* all attributes */
+                                                    1,  /* chase symlinks */
+                                                    ZXID_DAP_SCOPE_SUBTREE,
+                                                    0,  /* no size limit */
+                                                    0,  /* no time limit */
+                                                    0), /* return data */
+                                 0,  /* regular data entries */
+                                 0,  /* No predefined operation */
+                                 0,  /* No sorting. */
+                                 0,  /* No changed since specification. */
+                                 0,  /* Do not include LDAP common attributes. */
+                                 0,  /* Start from first result (offset == 0) */
+                                 0,  /* Return all results (count == 0) */
+                                 0,  /* Do not request snapshot */
+                                 0,  /* Do not refer to snapshot */
+                                 0), /* No contingent item ID reference */
+          0);  /* No subscriptions */
+
+As can be seen, it is common to specify nearly all arguments as 0,
+relying on default values. Thus the code typically appears
+without comments as
+
+  env->Body->dap_Query
+    = zxid_mk_dap_query(cf, 0,
+          zxid_mk_dap_query_item(cf,
+              zxid_mk_dap_select(cf, 0, "objecttype=svcprofile",
+                                 0, 1, ZXID_DAP_SCOPE_SUBTREE, 0, 0, 0),
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  /* 10 zeroes here */
+          0);  /* No subscriptions */
+
+
+13.4.2 Fully winded example of using low level API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As a query can also have test and subscription clauses, the
+fully winded example becomes quite onerous. Of course for many
+daily tasks you will not need all the frills, or you can
+just use the simple API instead.
+
+  env->Body->dap_Query
+    = zxid_mk_dap_query(cf,
+          zxid_mk_dap_test_item(cf,
+                                zxid_mk_dap_testop(cf,
+                                                   0,  /* DN from ID-WSF */
+                                                   "objecttype=svcprofile",
+                                                   0,  /* all attributes */
+                                                   1,  /* chase symlinks */
+                                                   ZXID_DAP_SCOPE_SUBTREE,
+                                                   0,  /* no size limit */
+                                                   0,  /* no time limit */
+                                                   0), /* return data */
+                                0,   /* regular data entries */
+                                0),  /* No predefined operation */
+          zxid_mk_dap_query_item(cf,
+                                 zxid_mk_dap_select(cf,
+                                                    0,  /* DN from ID-WSF */
+                                                    "objecttype=svcprofile",
+                                                    0,  /* all attributes */
+                                                    1,  /* chase symlinks */
+                                                    ZXID_DAP_SCOPE_SUBTREE,
+                                                    0,  /* no size limit */
+                                                    0,  /* no time limit */
+                                                    0), /* return data */
+                                 0,  /* regular data entries */
+                                 0,  /* No predefined operation */
+                                 0,  /* No sorting. */
+                                 0,  /* No changed since specification. */
+                                 0,  /* Do not include LDAP common attributes. */
+                                 0,  /* Start from first result (offset == 0) */
+                                 0,  /* Return all results (count == 0) */
+                                 0,  /* Do not request snapshot */
+                                 0,  /* Do not refer to snapshot */
+                                 0), /* No contingent item ID reference */
+          zxid_mk_dap_subscription(cf,
+              "subsID",
+              0,  /* No item ID reference */
+              zxid_mk_dap_resquery(cf,
+                                   zxid_mk_dap_select(cf,
+                                                      0,  /* DN from ID-WSF */
+                                                      "objecttype=svcprofile",
+                                                      0,  /* all attributes */
+                                                      1,  /* chase symlinks */
+                                                      ZXID_DAP_SCOPE_SUBTREE,
+                                                      0,  /* no size limit */
+                                                      0,  /* no time limit */
+                                                      0), /* return data */
+                                   0,  /* regular data entries */
+                                   0,  /* No predefined operation */
+                                   0,  /* No sorting. */
+                                   0,  /* No changed since specification. */
+                                   0,  /* Do not include LDAP common attributes. */
+                                   0), /* No contingent item ID reference */
+              0, /* No notification aggregation spec. */
+              0, /* No notification trigger spec. */
+              0, /* Subscription starts immediately. */
+              0, /* Subscription never expires. */
+              1, /* Include changed data in the notifications. */
+              0, /* Use notification reference for administrative notifications. */
+              "http://host/notif_sink")
+          );
+
+13.4.3 zxid_mk_dap_query()
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  struct zx_dap_Query_s* zxid_mk_dap_query(struct zxid_conf* cf,
+                                           struct zx_dap_TestItem_s* tis,
+                                           struct zx_dap_QueryItem_s* qis,
+                                           struct zx_dap_Subscription_s* subs);
+
+13.4.4 zxid_mk_dap_query_item()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  struct zx_dap_QueryItem_s* zxid_mk_dap_query_item(struct zxid_conf* cf,
+                                                    struct zx_dap_Select_s* sel,
+                                                    char* objtype,
+                                                    char* predef,
+                                                    char* sort,
+                                                    char* changed_since,
+                                                    int incl_common_attrs,
+                                                    int offset,
+                                                    int count,
+                                                    char* setreq,
+                                                    char* setid,
+                                                    char* contingent_itemidref);
+
+sel:: Selection expression, see zxid_mk_dap_select().
+objtype:: Either "entry", or "_Subsciption". The former is used for
+    searching and manipulating the normal attribute data while the
+    latter is used for manipulating subscription objects. Specifying
+    NULL selects "entry".
+predef:: Predefined serverside operation identifier. This
+    is server dependent, but you can think of it as a stored procedure.
+    If you pass predef, it is common to leave sel and objtype
+    as NULL and vice versa, i.e. you should pass NULL as
+    predef unless you know your server to expect otherwise.
+sort:: String specifying sorting of the result set. See ID-DAP
+    specification for further details. N.B. Not all servers
+    support sorting. Pass NULL if you do not need sorting.
+changed_since:: LDAP date time string specifying that only
+    entries that have changed since specified moment
+    should be returned.
+incl_common_attrs:: If 1 (true), "common" LDAP attributes such
+    as modificationtime are included. If you do not need these
+    attributes you can save the server some work and also
+    some network transmission overhead by not requesting
+    these attributes, i.e. pass 0 (false).
+offset:: If search matches multiple entries, the zero based
+    index of the first entry to return. Pass 0 to get the
+    beginning of the result set.
+count:: Maximum number of entries to return in the response. 0 means return
+    all. +offset+ and +count+ allow pagination through large
+    result set. N.B. +count+ is very different from +sizelimit+
+    that you may specify in zxid_mk_dap_select(). The latter
+    causes the actual backend search operation to abort or return
+    partial result set if the result would be too large and
+    is unsuitable for pagination.
+setreq:: Request creation of a result set snapshot for pagination.
+    N.B. It is possible to paginate through large result
+    set even without creating a snapshot, but the results
+    may be inconsistent because the underlying data may change
+    between queries that paginate through it. Creating
+    a snapshot avoids this problem. Whether pagination with
+    or without snapshot is cheaper depends on the backend
+    implementation. +setreq+ is specified on the first query
+    that referes to the snapshot. The subsequent queries
+    referring to the same snapshot will specify +setid+. The
+    two are mutually exclusive: if +setid+ is specified
+    the +setreq+ must be NULL.
+setid:: If you are paginating through a result set snapshot
+    created using +setreq+, then you must specify +setid+
+    in subsequent queries that refer to same snapshot.
+    When specifying +setreq+, you muse leave +setid+ as NULL.
+contingent_itemidref:: A query item can be made contingent
+    on a test item, i.e. the query will only be made if the
+    test succeeded. If you want this, you must pass the
+    item ID of the test item here. Passing NULL means that
+    no such dependency exists. N.B. The server side
+    implementation of the tests may actually require a query
+    to be made anyway.
+
+13.4.5 zxid_mk_dap_select()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  struct zx_dap_Select_s* zxid_mk_dap_select(struct zxid_conf* cf,
+                                             char* dn,
+                                             char* filter,
+                                             char* attributes,
+                                             int deref_aliases,
+                                             int scope,
+                                             int sizelimit,
+                                             int timelimit,
+                                             int typesonly);
+
+dn:: Distinguished or relative distinguished name. Since ID-DAP usually
+    uses the identity conveyed using ID-WSF headers to determine
+    the distinguished name, it is common to pass simply a NULL.
+filter:: LDAP filter to apply. NULL if none.
+attributes:: List of attributes to return. NULL means return all attributes.
+deref_aliases:: Boolean: whether the server should chase any
+    "symlinks", i.e. an entry may appear at some location as
+    an alias that is just a pointer to the real location of the entry.
+    This is usually what you want so pass 1 (true).
+scope:: The scope of the ID-DAP search.
+    ZXID_DAP_SCOPE_BASE (0):: Only what is pointed to by DN, e.g. one
+        entry. The default.
+    ZXID_DAP_SCOPE_SINGLE  (1):: Single level of directory right under DN.
+    ZXID_DAP_SCOPE_SUBTREE (2):: Full subtree search under the DN.
+sizelimit:: Maximum number of entries to return. 0 means no limit. This
+    is intended to stop the server from accidentally performing
+    expensive queries. N.B. +sizelimit+ is different from +count+,
+    see zxid_mk_dap_query_item(), the latter is meant for pagination
+    of a large result set without aborting it.
+timelimit:: Maximum number of seconds to spend in the search. 0 means no limit.
+typesonly:: If true, only attribute names are returned, without their
+    values. This allows an existence test to be performed without
+    passing the values over the network. Usually you want the
+    values so you would pass 0 (false).
+
+13.4.6 zxid_mk_dap_test_item()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  struct zx_dap_TestItem_s* zxid_mk_dap_test_item(struct zxid_conf* cf,
+                                                  struct zx_dap_TestOp_s* tstop,
+                                                  char* objtype,
+                                                  char* predef);
+
+tstop:: See zxid_mk_dap_testop().
+objtype:: See +objtype+ in zxid_mk_dap_query_item().
+predef:: See +predef+ in zxid_mk_dap_query_item().
+
+13.4.7 zxid_mk_dap_testop()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  struct zx_dap_TestOp_s* zxid_mk_dap_testop(struct zxid_conf* cf,
+                                             char* dn,
+                                             char* filter,
+                                             char* attributes,
+                                             int deref_aliases,
+                                             int scope,
+                                             int sizelimit,
+                                             int timelimit,
+                                             int typesonly);
+
+See description of zxid_mk_dap_select(). For ID-DAP protocol the
+Select and TestOp are defined to be the same. However, this need not be
+the case for Data Services Template (DST) based services in
+general. Hence, the data types for Select and TestOp are different
+(although very similar) and two separate constructors are needed.
+
+13.4.8 zxid_mk_dap_subscription()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  struct zx_dap_Subscription_s* zxid_mk_dap_subscription(struct zxid_conf* cf,
+                                                         char* subsID,
+                                                         char* itemidref,
+                                                         struct zx_dap_ResultQuery_s* rq,
+                                                         char* aggreg,
+                                                         char* trig,
+                                                         char* starts,
+                                                         char* expires,
+                                                         int incl_data,
+                                                         char* admin_notif,
+                                                         char* notify_ref);
+
+subsID:: Subscription ID
+itemidref:: When subscribing to data described by a query item,
+    create item, or modify item, the reference to the relevant item.
+    NULL if no such item exists, in which case +rq+ is usually specified.
+rq:: Result query that identifies the data of interest for the
+    subscription. See zxid_mk_dap_resquery(). Pass NULL if the
+    data is identified otherwise, e.g. via +itemidref+.
+aggreg:: Notification aggregation mode. Implementation dependent. Pass NULL.
+    Notification aggregation is an optimization where some notification
+    may be delayed a little so that it can be sent more optimally
+    in same message with other notifications that may happen a little
+    later. This functionality need not be supported by the backend
+    implementations.
+trig:: Implementation dependent notification triggers. Pass NULL.
+starts:: Start date time of the subscription. NULL means subscription
+    starts immediately.
+expires:: End data time of the subscription. NULL means the subscription
+    will not expire.
+incl_data:: If 1 (true), the notifications resulting from the
+    subscription will contain the changed data (push model). If
+    0 (false), the notification will just say that something changed,
+    but interested party will need to perform a separate query
+    to retrieve the data (pull model).
+admin_notif:: Administrative notification address. If NULL, the
+    +notify_ref+ will be used for administrative notifications
+    as well.
+notify_ref:: Notification address.
+
+13.4.9 zxid_mk_dap_resquery()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  struct zx_dap_ResultQuery_s* zxid_mk_dap_resquery(struct zxid_conf* cf,
+                                                    struct zx_dap_Select_s* sel,
+                                                    char* objtype,
+                                                    char* predef,
+                                                    char* sort,
+                                                    int incl_common_attr,
+                                                    char* changed_since,
+                                                    char* contingent_itemidref);
+
+See description of zxid_mk_dap_query_item().
+
+
+13.5 ID Messaging Interface
+---------------------------
+
+13.6 ID Geo Location Interface
+------------------------------
+
+13.7 Contact Book Interface
+---------------------------
+
+13.8 People Service Interface
+-----------------------------
+
+13.9 Interface to Conor's Demo Media Service
+--------------------------------------------
+
+13.10 ID-SIS Data Service for HR-XML
+------------------------------------
+
+HR-XML defines a XML document format that can be used for data
+interchange in the Human Resources world. The essence of HR-XML is to
+represent CV (Curriculum Vitae, a.k.a. Resume) in structured form.
+
+At the moment (June 2007) HR-XML does not define any standard way to
+pass these documents around. In CV 2007 conference organized by EIfE-L
+in Paris, an idea was canvassed: use Liberty Data Service to exchange
+HR-XML documents. I tried to implement such service during the
+conference, but only got it working at the air port after the
+conference.
+
+This service is a good example of how to apply ZXID to implement
+your own services.
+
+*Files*
+
+  sg/hr-xml-sampo.sg   - A slightly modified version of HR-XML schema
+  sg/id-hrxml.sg       - Liberty DST 2.1 based data service for HR-XML
+  zxidhrxmlwsc.c       - Web Services Client for HR-XML
+  zxidhrxmlwsp.c       - Web Services Provider for HR-XML
+
+*Running demo*
+
+1. Set up your /etc/hosts. At least you need sp1.zxidsp.org
+   and you may also need your IdPs domain name (e.g. idp.symdemo.com).
+
+2. Start your IdP and DS (not supplied with ZXID)
+
+    cd /opt/SYMfiam/std
+    conf/test-idp3/start.sh start log
+
+   Next you need to cause the id-hr-xml services to be registered
+   in the discovery service. This depends on product. (*** fix)
+
+   Then you need to create an association for id-hr-xml service
+   for some test user.
+
+3. Start the web services client
+
+    mini_httpd -p 8443 -c 'zxid*' -S -E zxid.pem -l tmp/mini.stderr &
+    tail -f tmp/zxid.stderr&
+
+4. Start the web services provider
+
+    mini_httpd -p 8444 -c 'zxid*' -S -E zxid.pem -l tmp/mini2.stderr &
+    tail -f tmp/zxid2.stderr&
+
+5. Start browsing from
+
+    https://sp1.zxidsp.org:8443/zxidhrxmlwsc?o=E
+
+6. Login using the test user that has the association
+
+7. Paste <Candidate> element in HR-XML Data form field and click Create. This
+   creates a Candidate record in the WSP.
+
+8. Click Query. This queries the WSP for the record we saved in previous step.
+   You should see the record appear in the HR-XML Response field.
+
+http://s-idp.liberty-iop.org:8881/N
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+96 License
+==========
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+96.2 Specification IPR
+----------------------
+
+ZXID is based on open SAML and Liberty specifications. The parties
+that have developed these specifications, including Symlabs, have made
+Royalty Free (RF) licensing commitment. Please ask OASIS and Liberty
+Alliance for the specifics of their IPR policies and IPR disclosures.
+
+Some protocols, such as WS-Trust and WS-Federation enjoy Microsoft's
+pledge<<footnote: If you have a reference to where this pledge can be
+found, please let me know so it can be included here.>> that they will
+not sue you even if you implement these specifications. You should
+evaluate yourself whether this is good enough for your situation.
+
+<<zxid-ref.pd>>
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

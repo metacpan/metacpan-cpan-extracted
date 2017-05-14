@@ -1,0 +1,92 @@
+#!/bin/csh -f
+
+#alias compress /usr/local/bin/compress 
+alias compress /usr/bin/gzip -2
+alias ping /sbin/ping -c 2
+alias rsh /usr/local/dump/rsh
+#set NO_PING
+set PS_PPID = 4
+set PS_PID = 3
+set ps = "ps -lx"
+@ sleeptime = 30
+#set echoargs
+
+set host = "$1"
+set file = "$2"
+set date1 = "$3"
+set date2 = "$4"
+eval set ddargs = "$5"
+set ddout = "$6"
+set rshout = "$7"
+set dumptype = "$8"
+set hostos = "$9"
+set compression = "$argv[10]"
+set timeout_rsh = "$argv[11]"
+set thishost = "`hostname`"
+
+if ($?echoargs) then
+    echo -n args: 
+    foreach i ($argv:q) 
+	    echo -n " $i"
+    end
+    echo ""
+endif
+
+if ($timeout_rsh) then
+	set rsh_timeout = "-t 3600"
+else 
+	set rsh_timeout = ""
+endif
+
+if ("$host" == "$thishost") then
+	set host = "localhost"
+else
+	if (! $?NO_PING) then
+		ping $host >/dev/null
+		set ping = $status
+		if ("$ping" != "0") then
+			echo "Could not verify that $host is up. (ping failed)"
+			echo "Could not verify that $host is up. (ping failed)" > $rshout
+			echo "Could not verify that $host is up. (ping failed)" | dd $ddargs conv=sync >& $ddout
+			echo "no_dump_done could not ping" >> $ddout
+			exit 1
+		endif
+	endif
+
+	(rsh $host -n $rsh_timeout echo y >& /tmp/rou$$ &)
+	while ($sleeptime > 0) 
+		if (-f /tmp/rou$$ && ! -z /tmp/rou$$) then
+			goto wait_over
+		endif
+		sleep 1
+		@ sleeptime --
+	end
+wait_over:
+	set a = `cat /tmp/rou$$`
+	/bin/rm -f /tmp/rou$$
+	set killlist = `$ps | awk '$'$PS_PPID'=='$$'{print $'$PS_PID'}'`
+	(kill -1 $killlist) >& /dev/null
+
+	if ("$a" != "y") then
+		echo "Could not verify that $host is up. (rsh failed)"
+		echo "Could not verify that $host is up. (rsh failed)" > $rshout
+		echo "Could not verify that $host is up. (rsh failed)" | dd $ddargs conv=sync >& $ddout
+		echo "no_dump_done could not rsh" >> $ddout
+		exit 1
+	endif
+endif
+
+date > $rshout
+rcp dump.remote "$host":/tmp/dump.remote
+rsh $host -n $rsh_timeout chmod +x /tmp/dump.remote
+
+echo $host $file $date1 "$date2" $ddargs $ddout $rshout $dumptype $hostos >> $rshout
+
+if ($compression) then
+	(rsh $host -n $rsh_timeout /bin/csh /tmp/dump.remote $file $date1 "$date2" $dumptype $hostos 0 | (compress -v | dd $ddargs) >& $ddout) >>& $rshout
+else 
+	(rsh $host -n $rsh_timeout /bin/csh /tmp/dump.remote $file $date1 "$date2" $dumptype $hostos 1 | dd $ddargs >& $ddout) >>& $rshout
+endif
+
+
+date >> $rshout

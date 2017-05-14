@@ -1,0 +1,30 @@
+# NAME
+ 
+
+Patterns::ChainOfResponsibility - A perlish variation on the "GoF" Design Pattern
+
+# SYNOPSIS
+
+See [Patterns::ChainOfResponsibility::Role::Handler](http://search.cpan.org/perldoc?Patterns::ChainOfResponsibility::Role::Handler) for detailed example or
+review the tests.
+
+# DESCRIPTION
+
+For now you can review the wikipedia article:
+
+http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern
+ 
+
+# AUTHOR
+
+John Napiorkowski `<jjnapiork@cpan.org>` 
+ 
+
+# LICENSE & COPYRIGHT
+ 
+
+Copyright 2011, John Napiorkowski `<jjnapiork@cpan.org>`
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+ 

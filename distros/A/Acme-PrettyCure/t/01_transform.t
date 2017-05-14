@@ -5,20 +5,14 @@ use Test::More;
 
 use Acme::PrettyCure;
 
-my @girls = Acme::PrettyCure->girls('AllStar');
+my @members = Acme::PrettyCure->members('AllStar');
 
-my $output;
-open my $OUT, '>', \$output;
-local *STDOUT = $OUT;
-
-for my $member (@girls) {
+for my $member (@members) {
     is $member->name, $member->human_name;
-    next if ref($member) =~ /Cure(Black|White|Bloom|Egret|Melody|Rhythm)/;
+    next if ref($member) =~ /Cure(Black|White|Bloom|Egret)/;
     $member->transform;
     is $member->name, $member->precure_name;
 }
-
-close($OUT);
 
 done_testing;
 

@@ -1,0 +1,46 @@
+H1: Creating New Phrase Styles
+
+H2: Using Event Processing
+
+SDF's event processing feature makes it easy to create
+a new phrase style from an existing one. For example, the
+following line makes {{LIB}} an alias of the {{S}} style:
+
+E:!on phrase 'LIB';; $style='S'
+
+
+H2: Using Mapping Tables
+
+SDF uses the {{phrasestyles}} filter to define the mapping between
+an SDF phrase style and a target phrase style.
+For example:
+
+!block example; pure
+!block phrasestyles
+Name    To
+
+# Emphasis
+A       Default
+B       Bold
+I       Italic
+N       Normal
+U       Underline
+E       Filename
+JUMP    Jump
+1       =I
+2       =B
+3       =U
+S       =2
+SUB     Subscript
+SUP     Superscript
+!endblock
+!endblock
+
+
+H2: Creating New Target Phrase Styles
+
+SDF makes it easy to define new target phrase styles
+by inheriting configuration details from an existing style.
+
+See the {{FILE:look/simple/mif.sdn}} file in the SDF distribution
+for examples.

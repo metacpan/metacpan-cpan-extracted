@@ -1,0 +1,135 @@
+
+        +==========================================================+
+        |                                                          |
+        |            Tied INI extension for Win32 Perl             |
+        |                                                          |
+        |              -----------------------------               |
+        |                                                          |
+        |              by Dave Roth <rothd@roth.net>               |
+        |                                                          |
+        |                                                          |
+        |    Copyright (c) 1998 Dave Roth. All rights reserved.    |
+        |    Courtesy of Roth Consulting                           |
+        |    http://www.roth.net/consult/                          |                            |
+        |                                                          |
+        +==========================================================+
+
+
+
+Following in tradition...
+                 ********************************************
+                *                                            *
+                *    Use under GNU General Public License    *
+                *                                            *
+                *          Details can be found at:          *
+                *    http://www.gnu.org/copyleft/gpl.html    *
+                *                                            *
+                 ********************************************
+
+        ----------------------------------------------------------------
+NOTICE: I do not guarantee ANYTHING with this package. If you use it you
+        are doing so AT YOUR OWN RISK! I may or may not support this
+        depending on my time schedule.
+        ----------------------------------------------------------------
+        
+        
+    
+BENEFITS
+    What is the deal with this?
+    - This will tie an ini file into a hash so that you can easily update
+      and edit the ini file by editing a simply hash.
+    - You can create ini files or edit existing ini files.
+
+KNOWN PROBLEMS:
+    What known problems does this thing have?
+    - None thus far.
+
+
+HOW TO INSTALL:
+    - IF you are using the ActiveState version of Win32 Perl:
+        a) Make a directory perl\lib\win32\tie\
+        b) Copy the INI.PM file into the directory in step a
+        c) Rename the file INI_XXX.PLL to INI.PLL
+        d) Make a directory perl\lib\auto\win32\tie\ini\
+        e) Copy the INI.PLL file into the directory in step d
+
+    - IF you are using the core distribution of Win32 Perl:
+        a) Make a directory perl\lib\site\win32\tie\
+        b) Copy the INI.PM file into the directory in step a
+        c) Rename the file INI_CORE.DLL to INI.DLL
+        d) Make a directory perl\lib\site\auto\win32\tie\ini\
+        e) Copy the INI.DLL file into the directory in step d
+
+    That is it!
+
+
+
+PARSE EXCEPTIONS:
+    If you are lucky enough to get a parse exception when you use this
+    extension then that means that the particular build of this extension is
+    not compatible with your build of Win32 Perl. What you need to do is
+    download a compatible build of the extension from our FTP site.
+    The way you do this is first discovering your Win32 Perl build by using
+    the following command:
+        perl -v
+    There will be a build number listed. Next download the updated version
+    of this extension for that build number. You will need the one which
+    either matches your build number or is the closest smaller build number.
+    For example there are builds for 307 and 311. If you are using Win32 Perl
+    build 313 you would download the extension built for 311 (since 311 and
+    313 are compatible). However if you have Win32 Perl build 310 you would
+    download the 307 build (builds 307 - 310 are all compatible).
+
+    Crazy, eh? I am hoping that the builds will cease to change the way
+    extensions are managed so we don't have this build breaking anymore. :)
+
+
+GENERAL USE:
+    When you want to modify an INI file you can tie the file to a hash
+    like this:
+
+      use Win32::Tie::Ini;
+
+      tie( %File, "Win32::Tie::Ini", "c:/myfile.ini" ) || die "failed ($!).\n";
+
+    That is it!
+    Now you can access the values in in the INI file by means of the hash.
+    Keep in mind that if you reference a section in the ini file then
+    you are going to retrieve a hash reference to the keys of that section.
+    What this means is that if your ini file looks like:
+        [Section 1]
+        key1=value1
+        key2=value2
+
+        [Section 2]
+        key_a=value_a
+        key_b=value_b
+
+    Then to print [Section 1] key1 you would:
+        print $File{'Section 1'}->{key1};
+
+    If you want to change the value of [Section 2] key_b you would:
+        $File{'Section 2'}->{key_b} = "My new value";
+
+    If you want to get a list of all of the sections try:
+        @Sections = keys( %File );
+
+    And if you want a list of keys for section [Section 2] then try this:
+        @Keys = keys( %{$File{'Section 2'}} );
+
+        In this example keep in mind that the value returned by
+        $File{'Section 2'} will be a hash reference. So to look at it as a
+        hash you must force it's context into a hash:
+            %{ $File{'Section 2'} }
+
+
+    Once you are finished with the hash you need to:
+        untie %File;
+
+
+    For more examples check out the test.pl script!
+
+
+
+
+Last updated 980312

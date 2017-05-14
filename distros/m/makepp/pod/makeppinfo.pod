@@ -1,0 +1,269 @@
+=head1 NAME
+
+makeppinfo -- What makepp knows about files
+
+=for vc $Id: makeppinfo.pod,v 1.15 2012/10/14 15:16:31 pfeiffer Exp $
+
+=head1 DESCRIPTION
+
+=for genindex '[-$][-?\w]+' makeppinfo.pod
+
+B<?:>E<nbsp>L<-?|/_>,E<nbsp>
+B<A:>E<nbsp>L<-A|/a_filename>,
+  L<--args-file|/a_filename>,
+  L<--arguments-file|/a_filename>,E<nbsp>
+B<D:>E<nbsp>L<-d|/d>,
+  L<--dates|/d>,
+  L<--decode-dates|/d>,E<nbsp>
+B<F:>E<nbsp>L<-f|/f>,
+  L<--force|/f>,E<nbsp>
+B<H:>E<nbsp>L<-h|/_>,
+  L<--help|/_>,E<nbsp>
+B<K:>E<nbsp>L<-k|/k_list>,
+  L<--keylist|/k_list>,
+  L<--keys|/k_list>,E<nbsp>
+B<M:>E<nbsp>L<$MAKEPPINFOFLAGS|/_makeppinfoflags>,E<nbsp>
+B<Q:>E<nbsp>L<-q|/q>,
+  L<--quiet|/q>,E<nbsp>
+B<T:>E<nbsp>L<-t|/t>,
+  L<--traverse|/t>,E<nbsp>
+B<U:>E<nbsp>L<-u|/u>,
+  L<--unremembered|/u>,E<nbsp>
+B<V:>E<nbsp>L<-V|/v>,
+  L<--version|/v>
+
+B<makeppinfo> I<option> [file ...]
+
+B<mppi> I<option> [file ...]
+
+Makepp remembers detailed information about the files it scanned and/or built.
+For the built files it remembers everything that was relevant, which includes
+their dependencies.  This information is stored in the F<.makepp> subdirectory
+along the file it pertains to.  It has the form of key-value pairs.  In some
+cases the value will again be a list of associated pairs, typically the
+signature and the file.
+
+If both C<ENV_DEPS> and C<ENV_VALS> get displayed, they are merged into a
+two column table.
+
+If both C<DEP_SIGS> and C<SORTED_DEPS> get displayed, they are merged into a
+two column table (in this order which gives a better layout).  Each dependency
+has a C<SIGNATURE> which is only C<timestamp,size>, used only to check if the
+file must be rescanned.  For dangling symlinks, instead of the linkee's
+signature, the link's own signature is determined in this way, and a C<0>
+prepended to mark this special case.  The interesting information is stored in
+some other key, for the built in signatures as follows:
+
+=over
+
+=item *
+
+C<C_MD5_SUM> for C<C> or C<c_compilation_md5>
+
+=item *
+
+C<MD5_SUM> for C<md5>
+
+=item *
+
+C<SHARED_OBJECT> for C<shared_object>
+
+=item *
+
+C<V_MD5_SUM> for C<verilog_synthesis_md5>
+
+=item *
+
+C<XML_MD5_SUM> for C<xml>
+
+=item *
+
+C<XML_SPACE_MD5_SUM> for C<xml_space>
+
+=back
+
+These signature lists are the most frequent reason for rebuilding a file, so
+you might like to check, whether the signature stored for a dependency matches
+the current C<BUILD_SIGNATURE> of that file.  If the signatures and everything
+else matches, that is the basis for getting a file from (one of) your
+L<repositories|makepp_repositories> or L<build cache|makepp_build_cache> if it
+is found there.  The details depend on the applicable L<build check
+method|makepp_build_check>.
+
+You will encounter two kinds of signatures: simple ones consist of two comma
+separated numbers, which are the timestamp in file system format (seconds
+since 1970) and the size.  For some files makepp will additionally have the
+relevant smart signature which is a base64 encoded (letters, digits, slash and
+plus) MD5 sum of the plain or digested file contents.
+
+This command is partially a makepp debug tool.  The list of keys varies
+depending on which scanner, build check and signature was used.  To fully
+understand the output, you may need to look at the source code.  That said,
+there is also some generally interesting information to be gotten.
+
+Valid options are:
+
+=over
+
+=item -A I<filename>
+
+=item --args-file=I<filename>
+
+=item --arguments-file=I<filename>
+
+Read the file and parse it as possibly quoted whitespace- and/or newline-separated options.
+
+=item -d
+
+=item --dates
+
+=item --decode-dates
+
+In the simple signatures prepend the 1st number, the raw date-time, with its
+human readable form in parentheses.
+
+=item -f
+
+=item --force
+
+Display info even when it is invalid because of inexistent or modified file.
+In this case the key C<SIGNATURE> is replaced by C<invalidated_SIGNATURE> and
+the value indicates in parentheses that the file was deleted or what signature
+the file now has.
+
+=item -?
+
+=item -h
+
+=item --help
+
+Print out a brief summary of the options.
+
+=item -k I<list>
+
+=item --keys=I<list>
+
+=item --keylist=I<list>
+
+The I<list> specifies one or more space separated Shell style patterns (with
+[xyz], ?, *, {a,bc,def}).  Remember to protect these from your Shell by
+quoting.  These are matched against the keys.  Each pattern may be preceded
+with an exclamation mark (C<!>) or a caret (C<^>) to exclude the matched keys
+from those selected before instead of adding them to the selection.  If the
+first pattern starts with an exclamation mark, it operates on all keys.
+
+    --keys='COMMAND CWD'	# How was this built and where (relative to file).
+
+If you want only filenames (useful with C<-t|--traverse>) select an inexistent
+key like "none".
+
+=item -q
+
+=item --quiet
+
+Don't list file and key names.  Repeat to also omit warnings.
+
+=item -t
+
+=item --traverse
+
+Also output the same information for each file in SORTED_DEPS (recursively if
+repeated).
+
+=item -u
+
+=item --unremembered
+
+Traverse dependencies of the given files, but instead of showing their info,
+from all the involved directories list only those files not remembered for
+these targets.  The idea here is to help you spot no longer needed files.
+Somewhat surprisingly this will include the Makefiles from those directories,
+because these are mostly not a dependency.
+
+Giving this option twice will also go to far away directories which are not
+output relatively, like F</usr/include>.
+
+=item -V
+
+=item --version
+
+Print out the version number.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 General
+
+Each L<build check method|makepp_build_check> documents how to see what they
+base their decision on.  Finding the paths of the dependencies is the same in
+all cases, so it is shown here.  If you build to a different directory,
+finding the path of the inputs requires a translation relative to CWD.
+E.g. either short or long form:
+
+    makeppinfo --keys='CWD SORTED_DEPS' obj/b.o
+    mppi -k'CWD SORTED_DEPS' obj/b.o
+    obj/b.o:
+    CWD=../src
+    SORTED_DEPS=
+ 	b.c
+	inc/b.h
+ 	/usr/bin/gcc
+
+CWD is the directory relative to file, from where it was built.  That
+directory is the one from where all relative paths in SORTED_DEPS start.  This
+means that under the same directory we have inputs F<src/b.c> and
+F<src/inc/b.h> and an output F<obj/b.o>.  From the viewpoint of F<b.o>, the
+inputs are F<../src/b.c> and F<../src/inc/b.h>.  It does not matter that we
+gave a relative path for F<b.o>, the information shown would be the same, had
+we first changed to F<obj>.
+
+=head2 The reason for a rebuild
+
+In some cases makepp may be repeatedly rebuilding a seemingly up to date file.
+If C<makepplog> does not help here, this command gives you the exact state of
+affairs:
+
+    makeppinfo --traverse somefile
+    mppi -t somefile
+
+When this reproducibly happens, issue this command before and after, and
+compare the outputs.  The things that differ are the reason of the rebuild.
+
+=head2 Proving Consistency
+
+Sometimes you will change your Makefiles and wonder if they still do the same
+thing.  Here's a command that tells you exactly how makepp built F<somefile>:
+
+    makeppinfo --traverse --traverse --keys='CWD COMMAND' somefile
+    mppi -ttk'CWD SORTED_DEPS' somefile
+
+This will recursively traverse over all dependencies of F<somefile> and tell
+you in which directory it issued which command.  By running this after the old
+and after the new build and comparing the outputs, you can see what changed.
+
+The same works for testing a new version of makepp, though some older versions
+would handle whitespace in command continuation lines differently, and there
+was a bug in sort order, which can make the files come out in a different
+order.  If this is the case for you, let the Shell assemble the sorted
+arguments:
+
+    makeppinfo --keys='CWD COMMAND' `makeppinfo --traverse --traverse --keys=none somefile|tr -d :|sort`
+    mppi -k'CWD SORTED_DEPS' `mppi -ttknone somefile|tr -d :|sort`
+
+=head1 ENVIRONMENT
+
+Makeppinfo looks at the following environment variable:
+
+=over 4
+
+=item $MAKEPPINFOFLAGS
+
+Any flags in this environment variable are interpreted as command line options
+before any explicit options.  Quotes are interpreted like in makefiles.
+
+=back
+
+=head1 AUTHOR
+
+Daniel Pfeiffer (occitan@esperanto.org)

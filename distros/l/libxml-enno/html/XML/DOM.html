@@ -16,13 +16,18 @@
 </PRE><PRE> for (my $i = 0; $i &lt; $n; $i++)
  {
      my $node = $nodes-&gt;item ($i);
-     my $href = $node-&gt;getAttribute ("HREF");
+     my $href = $node-&gt;getAttributeNode ("HREF");
      print $href-&gt;getValue . "\n";
  }
 
-</PRE><PRE> $doc-&gt;printToFile ("out.xml");
+</PRE><PRE> # Print doc file
+ $doc-&gt;printToFile ("out.xml");
 
-</PRE><PRE> print $doc-&gt;toString;
+</PRE><PRE> # Print to string
+ print $doc-&gt;toString;
+
+</PRE><PRE> # Avoid memory leaks - cleanup circular references for garbage collection
+ $doc-&gt;dispose;
 
 </PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
 
@@ -51,6 +56,10 @@ XML::DOM::Parser option <I>KeepCDATA</I> to 1 will store CDATASections in
 CDATASection nodes, instead of converting them to Text nodes.
 Subsequent CDATASection nodes will be merged into one. Let me know if this
 is a problem.
+
+<P>When using XML::Parser 2.27 and above, you can suppress expansion of
+parameter entity references (e.g. %pent;) in the DTD, by setting <I>ParseParamEnt</I>
+to 1 and <I>ExpandParamEnt</I> to 0. See <A HREF="#_Hidden_Nodes_">Hidden Nodes</A> for details.
 
 <P>A Document has a tree structure consisting of <I>Node</I> objects. A Node may contain
 other nodes, depending on its type.
@@ -123,7 +132,7 @@ of the DOM Level 1 Specification:
 
 <LI><A HREF="DOM/ValParser.html">XML::DOM::ValParser</A> - A validating XML parser that creates XML::DOM::Documents. It uses <A HREF="Checker.html">XML::Checker</A> to check against the DocumentType (DTD)
 
-<LI><A HREF="DOM/PerlSAX.html">XML::DOM::PerlSAX</A> - A PerlSAX handler that creates XML::DOM::Documents.
+<LI><A HREF="Handler/BuildDOM.html">XML::Handler::BuildDOM</A> - A PerlSAX handler that creates XML::DOM::Documents.
 
 </UL><P><HR><H1><A NAME="XML_DOM_package">XML::DOM package
 
@@ -190,6 +199,14 @@ previous value. The getIgnoreReadOnly method simply returns its current value.
  };
  XML::DOM::ignoreReadOnly ($oldIgnore);     # restore previous value
 
+</PRE><P>Another way to do it, using a local variable:
+
+<PRE> { # start new scope
+    local $XML::DOM::IgnoreReadOnly = 1;
+    ... do whatever you want, don't worry about exceptions ...
+ } # end of scope ($IgnoreReadOnly is set back to its previous value)
+    
+</PRE><PRE>
 </PRE><DT><A NAME="isValidName_name_"><STRONG><P>isValidName (name)
 
 </STRONG></A><DD>Whether the specified name is a valid "Name" as specified in the XML spec.
@@ -231,7 +248,7 @@ DOM tree is built by the XML::DOM::Parser.
 
 </PRE><DD>This style is sometimes desired when using XHTML. 
 (Note the extra space before the slash "/")
-See http://www.w3.org/TR/WD-html-in-xml Appendix C for more details.
+See <A HREF="http://www.w3.org/TR/xhtml1">http://www.w3.org/TR/xhtml1</A> Appendix C for more details.
 
 </DL><P>By default XML::DOM compresses all empty Element tags (style 0.)
 You can control which style is used for a particular Element by calling
@@ -303,6 +320,31 @@ AttlistDecl object.
 </STRONG></A><DD>Comments in the DOCTYPE section are not kept in the right place. They will become
 child nodes of the Document.
 
+<DT><A NAME="_Hidden_Nodes_"><STRONG><P>* Hidden Nodes
+
+</STRONG></A><DD>Previous versions of XML::DOM would expand parameter entity references
+(like <B>%pent;</B>), so when printing the DTD, it would print the contents
+of the external entity, instead of the parameter entity reference.
+With this release (1.27), you can prevent this by setting the XML::DOM::Parser
+options ParseParamEnt =&gt; 1 and ExpandParamEnt =&gt; 0.
+
+<P>When it is parsing the contents of the external entities, it *DOES* still add
+the nodes to the DocumentType, but it marks these nodes by setting
+the 'Hidden' property. In addition, it adds an EntityReference node to the
+DocumentType node.
+
+<P>When printing the DocumentType node (or when using to_expat() or to_sax()), 
+the 'Hidden' nodes are suppressed, so you will see the parameter entity
+reference instead of the contents of the external entities. See test case
+t/dom_extent.t for an example.
+
+<P>The reason for adding the 'Hidden' nodes to the DocumentType node, is that
+the nodes may contain &lt;!ENTITY&gt; definitions that are referenced further
+in the document. (Simply not adding the nodes to the DocumentType could
+cause such entity references to be expanded incorrectly.)
+
+<P>Note that you need XML::Parser 2.27 or higher for this to work correctly.
+
 </DL><P><HR><H1><A NAME="SEE_ALSO">SEE ALSO
 
 </A></H1><P>The Japanese version of this document by Takanori Kawai (Hippo2000)
@@ -334,4 +376,4 @@ to enno@att.com instead.)
 
 <P>Thanks to Clark Cooper for his help with the initial version.
 
-<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:23 1999</FONT></I></BODY></HTML>
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:18 2000</FONT></I></BODY></HTML>

@@ -1,0 +1,635 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use feature ':5.10';
+
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Config::IniFiles;
+
+use File::Basename;
+use File::Path qw(make_path);
+
+use App::elsquid;
+
+our $VERSION = 0.15;
+
+my $progname = basename($0);
+my $configfile = '/etc/elsquid.conf';
+
+
+if (@ARGV == 0) {
+    say "$progname: No action requested. Try --help?";
+    exit 0;
+}
+
+my %opts;
+GetOptions(\%opts,
+           "all",
+           "Allmost-all",
+           "download",
+           "createlists",
+           "newdbfiles",
+           "permissions",
+           "reload",
+           "squidguardconf",
+           "exampleconf",
+           "help") || pod2usage(-verbose => 1);
+
+
+if ($opts{help}) {
+    pod2usage(-msg     => "$progname version $VERSION",
+              -exitval => 0);
+}
+
+if ($opts{all} || $opts{'Allmost-all'}) {
+    $opts{download}    = 1 if $opts{all};
+    $opts{createlists} = 1;
+    $opts{newdbfiles}  = 1;
+    $opts{permissions} = 1;
+    $opts{reload}      = 1;
+}
+
+
+
+
+if ($opts{exampleconf}) {
+    if (-e $configfile) {
+        die "$configfile: Already existent\n";
+    }
+
+    open(my $file, ">", $configfile) || die $!;
+
+    print $file <<EOF;
+[squidguard]
+dbhome   = /var/lib/squidguard/db
+user   = proxy
+group  = proxy
+executable = /usr/bin/squidGuard
+redirect_url = http://192.168.1.2/blank.gif
+
+[squid]
+reload_cmd = systemctl reload squid3
+dstdomain_blacklist = /etc/squid3/elsquid-black.txt
+dstdomain_whitelist = /etc/squid3/elsquid-white.txt
+
+[easylists]
+download_dir = /tmp
+list_url = https://easylist-downloads.adblockplus.org/easylist.txt
+list_url = https://easylist-downloads.adblockplus.org/easylistgermany.txt
+
+#[extra]
+#domain = facebook.com
+#domain = ebay.com
+#url = example.org/test123
+#expression = \&foo=42
+
+#[white]
+#domain = ...
+#url = ...
+#expression = ...
+EOF
+
+    close $file;
+
+    say "Created: $configfile";
+    say "Please edit to fit your needs.";
+    exit 0;
+}
+
+
+
+
+unless (-r $configfile ) {
+    say "No configuration available.";
+    say "Consider creating an example $configfile with '$progname -e'.";
+        
+    exit 1;
+}
+
+my $cfg = Config::IniFiles->new( -file => $configfile )
+    || die "@Config::IniFiles::errors\n";
+
+my %config = (
+    dbhome   => $cfg->val('squidguard', 'dbhome') // '/var/lib/squidguard/db',
+    dbsubdir => 'elsquid', # We dont want to make this configurable
+    user  => $cfg->val('squidguard', 'user') // 'proxy',
+    group => $cfg->val('squidguard', 'group') // 'proxy',
+    executable => $cfg->val('squidguard', 'executable')
+        // '/usr/bin/squidGuard',
+    redirect_url => $cfg->val('squidguard', 'redirect_url')
+        // 'http://192.168.1.2/blank.gif',
+
+    reload_cmd => $cfg->val('squid', 'reload_cmd')
+        // 'systemctl reload squid3',
+    dstdomain_blacklist => $cfg->val('squid', 'dstdomain_blacklist')
+        // '/etc/squid3/elsquid-black.txt',
+    dstdomain_whitelist => $cfg->val('squid', 'dstdomain_whitelist')
+        // '/etc/squid3/elsquid-white.txt',
+
+    download_dir => $cfg->val('easylists', 'download_dir') // '/tmp',
+    list_urls => [$cfg->val('easylists', 'list_url')],
+
+    extra_domains => [$cfg->val('extra', 'domain')],
+    extra_urls => [$cfg->val('extra', 'url')],
+    extra_expressions => [$cfg->val('extra', 'expression')],
+
+    white_domains => [$cfg->val('white', 'domain')],
+    white_urls => [$cfg->val('white', 'url')],
+    white_expressions => [$cfg->val('white', 'expression')],
+);
+
+# remove trailing whitespace from all simple values:
+foreach (keys %config) {
+    $config{$_} =~ s/s+$//;
+}
+
+
+if ($opts{download}) {
+    defined qx/ wget --version / || die "Please install wget, then try again\n";
+
+    -d $config{download_dir} ||
+        die "Download directory $config{download_dir} does not exist\n";
+
+    foreach my $url ( @{$config{list_urls}} ) {
+        my @wget = (
+            'wget',
+            '-q',
+            '-O', File::Spec->catfile($config{download_dir}, basename($url)),
+            $url
+        );
+
+        say "@wget";
+        my $result = system( @wget );
+        ($result >> 8) == 0 || die "wget failed\n";
+    }
+}
+
+
+
+if ($opts{createlists}) {
+    my $elsquid_dbhome = File::Spec->catfile($config{dbhome},
+                                             $config{dbsubdir});
+    
+    foreach (qw(black white)) {
+        my $targetdir = File::Spec->catfile($elsquid_dbhome, $_);
+        
+        unless (-d $targetdir) {
+            warn "Creating target directory: $targetdir\n";
+            make_path $targetdir || die $!;
+        }
+    }
+
+    open(my $black_domains, ">", "$elsquid_dbhome/black/domains")     || die $!;
+    open(my $black_urls,    ">", "$elsquid_dbhome/black/urls")        || die $!;
+    open(my $black_expressions, ">", "$elsquid_dbhome/black/expressions") || die $!;
+
+    open(my $squid_blacklist, ">", "$config{dstdomain_blacklist}") || die $!;
+    open(my $squid_whitelist, ">", "$config{dstdomain_whitelist}") || die $!;
+
+
+    open(my $white_domains, ">", "$elsquid_dbhome/white/domains")     || die $!;
+    open(my $white_urls,    ">", "$elsquid_dbhome/white/urls")        || die $!;
+    open(my $white_expressions, ">", "$elsquid_dbhome/white/expressions") || die $!;
+
+    
+    my @inputfiles = map {
+        File::Spec->catfile($config{download_dir}, basename $_)
+      } @{$config{list_urls}};
+    
+    my %domains;
+    my %urls;
+    my %expressions;
+    
+    my $num_unparsable = 0;
+    $| = 1;
+
+    foreach my $inputfile (@inputfiles) {
+        chomp( my $num_lines = qx/ awk 'END{print NR}' $inputfile / );
+        say "Processing: $inputfile ($num_lines lines)";
+        open(my $file, "<", $inputfile) || die $!;
+
+
+        my $line_count = 0;
+        while (<$file>) {
+            $line_count++;
+            print "\r$line_count";
+            chomp;
+            my $result = parse_line($_);
+
+            if (exists $result->{n}) { # Not parsable
+                $num_unparsable++;
+                next;
+            }
+            
+            $domains{$result->{d}} = 1     if exists $result->{d};
+            $urls{$result->{u}}    = 1     if exists $result->{u};
+            $expressions{$result->{e}} = 1 if exists $result->{e};
+        }
+        print "\n";
+        
+        close $file;
+    } # foreach inputfile
+
+
+
+    # Add extra domains/urls/expressions:
+
+    foreach ( @{$config{extra_domains}}  ) {
+        $domains{$_} = 1;
+    }
+    foreach ( @{$config{extra_urls}}  ) {
+        $urls{$_} = 1;
+    }
+    foreach ( @{$config{extra_expressions}}  ) {
+        $expressions{$_} = 1;
+    }
+
+    
+    
+    # Eliminate more special domains
+    # (we dont want ads.evil.com if we already have evil.com):
+
+    say "Eliminating more special domains...";
+    
+    my @sorted = sort { reverse($a) cmp reverse($b) } keys %domains;
+
+    my $num_elim = 0;
+    while (_eliminate_special(\@sorted)) {
+        $num_elim++;
+        print "\r$num_elim";
+    }
+    print "\n";
+
+
+    # Create white lists:
+    
+    say $white_domains     $_   foreach sort @{$config{white_domains}};
+    say $white_urls        $_   foreach sort @{$config{white_urls}};
+    say $white_expressions $_   foreach sort @{$config{white_expressions}};
+
+    say $squid_whitelist ".$_"  foreach sort @{$config{white_domains}};
+
+
+
+    
+    # Create black lists:
+    say $black_domains    $_   foreach @sorted;
+    say $squid_blacklist ".$_" foreach @sorted;
+
+    say $black_urls        $_ foreach sort keys %urls;
+    say $black_expressions $_ foreach sort keys %expressions;
+
+    
+    close $black_domains;
+    close $black_urls;
+    close $black_expressions;
+
+    close $white_domains;
+    close $white_urls;
+    close $white_expressions;
+
+    close $squid_blacklist;
+    close $squid_whitelist;
+
+    
+    say "\nSummary:";
+    say "========";
+    say "Blacklisted domains:     " . @sorted;
+    say "Blacklisted urls:        " . keys %urls;
+    say "Blacklisted expressions: " . keys %expressions;
+    say "Whitelisted domains:     " . @{$config{white_domains}};
+    say "Whitelisted urls:        " . @{$config{white_urls}};
+    say "Whitelisted expressions: " . @{$config{white_expressions}};
+    say "Unparsable:  $num_unparsable";
+    print "\n";
+}
+
+sub _eliminate_special {
+    my $ref = $_[0];
+    
+    for (my $i = 0; $i < @$ref - 1; $i++) {
+        my $current = $ref->[$i];
+        my $next    = $ref->[$i+1];
+
+        #say "Is $next =~ $current ?";
+        my $current_re = quotemeta($current);
+        if ($next =~ /.*$current_re$/) {
+            #say "YES";
+            splice @$ref, $i+1, 1;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+if ($opts{newdbfiles}) {
+
+    foreach (qw(black/domains black/urls white/domains white/urls)) {
+        my @squidguard = (
+            $config{executable},
+            '-C',
+            File::Spec->catfile($config{dbsubdir}, $_)
+        );
+        
+        say "@squidguard";
+        my $result = system( @squidguard );
+    }
+}
+
+
+
+if ($opts{permissions}) {
+    my $targetdir = File::Spec->catfile($config{dbhome}, $config{dbsubdir});
+
+    my @chown = (
+        'chown',
+        '-R',
+        "$config{user}:$config{group}",
+        $targetdir
+    );
+    
+    say "@chown";
+    my $result = system( @chown );
+}
+
+
+
+if ($opts{reload}) {
+    my $reload_cmd = $config{reload_cmd};
+    say $reload_cmd;
+    my $result = system( $reload_cmd );
+}
+
+
+
+if ($opts{squidguardconf}) {
+    my $line = ('-' x 35) . ' 8< ' . ('-' x 35);
+    
+    say "*** Suggested configuration snippet for squidguard:";
+    say $line;
+    print <<EOF;
+dest elsquid-black {
+    domainlist     $config{dbsubdir}/black/domains
+    urllist        $config{dbsubdir}/black/urls
+    expressionlist $config{dbsubdir}/black/expressions
+    redirect 301:$config{redirect_url}
+}
+
+dest elsquid-white {
+    domainlist     $config{dbsubdir}/white/domains
+    urllist        $config{dbsubdir}/white/urls
+    expressionlist $config{dbsubdir}/white/expressions
+}
+
+acl {
+    default {
+        pass  elsquid-white !elsquid-black all
+    }
+}
+EOF
+    say $line;
+
+    say "\n";
+    say "*** Suggested configuration snippet for squid:";
+    say $line;
+    print <<EOF;
+acl elsquid-black dstdomain "$config{dstdomain_blacklist}"
+acl elsquid-white dstdomain "$config{dstdomain_whitelist}"
+
+http_access deny CONNECT elsquid-black !elsquid-white
+deny_info TCP_RESET elsquid-black
+
+url_rewrite_program $config{executable}
+url_rewrite_children 5
+EOF
+    say $line;
+}
+
+
+
+
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+elsquid - EasyLists for Squid(Guard)
+
+=head1 USAGE
+
+ elsquid [OPTIONS]
+
+=head1 DESCRIPTION
+
+B<elsquid> utilizes the EasyLists (L<https://easylist.github.io/>) to
+create database files for central adblocking with Squid/SquidGuard.
+Amongst others, it can download and convert these lists, and install
+the resulting files.
+
+All example configs, default settings, etc. were only tested under a
+Debian Jessie Linux system. But with appropriate adjustments in the config
+it should work with other distros, too.
+
+Typically you will run this program as root. Feel free to audit the code
+before!
+
+
+
+=head1 OPTIONS
+
+Options can be used with a single '-' and can be abbreviated.
+
+=over
+
+=item B<--all>
+
+Same as B<--download> B<--createlists> B<--newdbfiles> B<--permissions> B<--reload>.
+
+=item B<--Almost-all>
+
+Same as B<--all> but without the download.
+
+=item B<--download>
+
+Download easylists from configured urls.
+
+=item B<--createlists>
+
+Process downloaded easylists and create squid(guard)
+domain/url/expression lists.
+
+=item B<--newdbfiles>
+
+Generate new squidguard database files for more performance.
+
+=item B<--permissions>
+
+Fix permissions/ownership (files must belong to proxy user).
+
+=item B<--reload>
+
+Reload squid.
+
+=item B<--squidguardconf>
+
+Dump suggested configuration snippets for Squid and SquidGuard.
+
+=item B<--exampleconf>
+
+Create an example F</etc/elsquid.conf> (unless there is already one present).
+
+=item B<--help>
+
+Print this page.
+
+=back
+
+
+=head1 CONFIGURATION FILE
+
+B<elsquid>'s configuration file is F</etc/elsquid.conf>.
+
+Please create an example as a starting point with B<--exampleconf>
+if you don't already have one.
+
+The syntax is INI-style. It uses the following sections/directives:
+
+
+=head2 Section C<[squidguard]>
+
+=over 4
+
+=item C<dbhome>
+
+Root of SquidGuards database hierarchy. Defaults to
+F</var/lib/squidguard/db>.
+
+B<elsquid> will put the generated files here, with the following hierarchy:
+
+  elsquid
+  |-- black
+  |   |-- domains
+  |   |-- expressions
+  |   `-- urls
+  `-- white
+      |-- domains
+      |-- expressions
+      `-- urls
+
+
+=item C<user>, C<group>
+
+User and group of the Squid process. Used for chmod'ing the generated files.
+Defaults to C<proxy>/C<proxy>.
+
+=item C<executable>
+
+Full path to the squidGuard executable. Defaults to C</usr/bin/squidGuard>.
+
+=item C<redirect_url>
+
+Redirect URL that is returned by squidGuard in case of blocking.
+This is only needed to dump an example config snippet.
+Defaults to C<http://192.168.1.2/blank.gif>, which is probably not what you
+want :-)
+
+=back
+
+=head2 Section C<[squid]>
+
+=over 4
+
+=item C<reload_cmd>
+
+The command needed to reload the Squid service.
+Defaults to C<systemctl reload squid3>.
+
+=item C<dstdomain_blacklist>
+
+B<elsquid> also writes the domain blacklist into this file. This is intended
+for direct use with a Squid acl to get better results when blocking
+HTTPS-requests.
+
+Defaults to F</etc/squid3/elsquid-black.txt>.
+
+=item C<dstdomain_whitelist>
+
+Analogous to C<dstdomain_blacklist>.
+
+Defaults to F</etc/squid3/elsquid-white.txt>.
+
+
+=back
+
+=head2 Section C<[easylists]>
+
+=over 4
+
+=item C<download_dir>
+
+Directory where the downloaded files go to. Defaults to C</tmp>.
+
+=item C<list_url>
+
+URL of an easylist to use. Can be repeated. No default here.
+
+I personally use:
+
+=over 4
+
+=item C<list_url = https://easylist-downloads.adblockplus.org/easylist.txt>
+
+=item C<list_url = https://easylist-downloads.adblockplus.org/easylistgermany.txt>
+
+=back
+
+The basenames of the urls have to be unique. If they're not... write me
+an e-mail :-)
+
+=back
+
+=head2 Section C<[extra]>
+
+Here you can put additional domains/urls/expressions to block.
+
+The following keys can be repeated:
+
+=over 4
+
+=item C<domain>
+
+=item C<url>
+
+=item C<expression>
+
+=back
+
+
+=head2 Section C<[white]>
+
+Here you can put domains/urls/expressions you really don't want to block.
+
+Same syntax as in C<[extra]>.
+
+
+=head1 FILES
+
+=over
+
+=item F</etc/elsquid.conf>
+
+=back
+
+=head1 SEE ALSO
+
+L<http://http://www.squidguard.org/>, L<http://http://www.squid-cache.org/>
+
+
+=head1 AUTHOR
+
+Axel Miesen <miesen@quadraginta-duo.de>

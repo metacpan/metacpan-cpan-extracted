@@ -12,13 +12,13 @@ libxml-enno Overview
 
 <CENTER>
 <H2>
-Overview of libxml-enno
+Overview of libxml-enno 1.01
 </H2>
 </CENTER>
 <body>
 This is a high level overview of libxml-enno. 
 It contains the main modules <B>XML::DOM, XML::XQL</B> and <B>XML::Checker</B>
-and a few new packages:
+and a few other packages:
 <P>
 
 <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
@@ -42,7 +42,7 @@ with:
 <LI> 
 <a href="XML/DOM/ValParser.html">XML::DOM::ValParser</a> (validating parser)
 <LI>
-or from PerlSAX events with <a href="XML/DOM/PerlSAX.html">XML::DOM::PerlSAX</a>
+or from PerlSAX events with <a href="XML/Handler/BuildDOM.html">XML::Handler::BuildDOM</a>
 </OL>
 <LI>
 Print XML (document subtree) to file or string
@@ -79,6 +79,20 @@ and the check() method of <a href="XML/DOM/Node.html">XML::DOM::Node</a>.
 </TD>
 </TR>
 <TR BGCOLOR="white" ID="TableRowColor">
+<TD WIDTH="20%"><B><A HREF="XML/Filter/DetectWS.html">XML::Filter::DetectWS</A></B></TD>
+<TD>
+PerlSAX filter that detects ignorable whitespace and, optionally, filters it. 
+(<b>Not well tested!</b>)
+</TD>
+</TR>
+<TR BGCOLOR="white" ID="TableRowColor">
+<TD WIDTH="20%"><B><A HREF="XML/Filter/Reindent.html">XML::Filter::Reindent</A></B></TD>
+<TD>
+PerlSAX filter that can re-indent XML files. 
+This class derives from XML::Filter::DetectWS (<b>Not well tested!</b>).
+</TD>
+</TR>
+<TR BGCOLOR="white" ID="TableRowColor">
 <TD WIDTH="20%"><B><A HREF="XML/Filter/SAXT.html">XML::Filter::SAXT</A></B></TD>
 <TD>
 Splits PerlSAX event stream into two or more PerlSAX event streams
@@ -86,9 +100,36 @@ Splits PerlSAX event stream into two or more PerlSAX event streams
 </TD>
 </TR>
 <TR BGCOLOR="white" ID="TableRowColor">
+<TD WIDTH="20%"><B><A HREF="XML/Handler/BuildDOM.html">XML::Handler::BuildDOM</A></B></TD>
+<TD>
+Previously called XML::DOM::PerlSAX. It was renamed for consistency with other
+PerlSAX handlers.
+</TD>
+</TR>
+<TR BGCOLOR="white" ID="TableRowColor">
+<TD WIDTH="20%"><B><A HREF="XML/Handler/Composer.html">XML::Handler::Composer</A></B></TD>
+<TD>
+Yet another XML printer. This one supports printing to other encodings. 
+(<b>Not well tested!</b>).
+</TD>
+</TR>
+<TR BGCOLOR="white" ID="TableRowColor">
+<TD WIDTH="20%"><B><A HREF="XML/Handler/PrintEvents.html">XML::Handler::PrintEvents</A></B></TD>
+<TD>
+Prints all PerlSAX events it receives to stdout. Useful when debugging PerlSAX
+event filters/producers.
+</TD>
+</TR>
+<TR BGCOLOR="white" ID="TableRowColor">
 <TD WIDTH="20%"><B><A HREF="XML/RegExp.html">XML::RegExp</A></B></TD>
 <TD>
 Contains regular expressions for validating XML tokens.
+</TD>
+</TR>
+<TR BGCOLOR="white" ID="TableRowColor">
+<TD WIDTH="20%"><B><A HREF="XML/UM.html">XML::UM</A></B></TD>
+<TD>
+Convert UTF-8 strings to any encoding supported by XML::Encoding.
 </TD>
 </TR>
 </TABLE>

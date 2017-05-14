@@ -106,7 +106,7 @@ __END__
 
 =head1 NAME
 
-Datahub::Factory::CLI - The App::Cmd class for the Datahub::Factory aplpication
+Datahub::Factory::CLI - The App::Cmd class for the Datahub::Factory application
 
 =head1 SEE ALSO
 

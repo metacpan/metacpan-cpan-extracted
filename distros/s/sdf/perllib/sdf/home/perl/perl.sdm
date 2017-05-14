@@ -1,0 +1,147 @@
+# $Id$
+#
+# >>Title::     Perl Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 25-Jun-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{perl}} is the [[SDF]] library module for building
+# the [[Perl]] documentation suite.
+#
+# >>Description::
+#
+# >>Limitations::
+# 
+
+# Set the default html root location
+!if $var{'PERL_DIR_DEPTH'} ne ''
+    !default PERL_HTML_ROOT "../" x $var{'PERL_DIR_DEPTH'}
+    !script $var{'PERL_HTML_ROOT'} =~ s/\/$//
+!else
+    !default PERL_HTML_ROOT "/perl"
+!endif
+
+# Title page details
+!define DOC_DISTRIBUTION    "UNLIMITED CIRCULATION"
+!define DOC_PROJECT         "Perl 5.004_03"
+!define DOC_PRODUCT         "User Contributed Perl Documentation"
+
+# HTML configuration variables
+!define HTML_BG_COLOR       COLOR_WHITE
+!define HTML_URL_CATALOG    "$var{'PERL_HTML_ROOT'}/catalog.html"
+
+# Add a logo
+!define DOC_LOGO            "oracamel"
+!define DOC_LOGO_BASE       "$var{'PERL_HTML_ROOT'}/"
+
+# Define a footer
+!macro HTML_FOOTER
+Line:
+[align=Center;size=9]
+The Perl camel is a trademark of
+{{A[jump="http://www.ora.com"] O'Reilly and Associates}}.[[nl]]
+This document was generated using
+{{A[jump="http://www.mincom.com/mtr/sdf/"] SDF [[SDF_VERSION]]}}.
+!endmacro
+
+# Copyright stuff
+!macro DOC_COPYRIGHT
+    Copyright [[c]] [[_DOC_YEAR]], [[DOC_OWNER]]
+
+    This manual may be distributed under Perl's Artistic License.
+!endmacro
+
+
+################# Link Generation Stuff #####################
+
+# Give each top level enumerated list item a hypertext id based on
+# its first "word"
+!on paragraph 'LI1';; \
+    unless ($attr{'noid'} || $attr{'id'} ne '') { \
+        $text =~ /^\S+/; \
+        $attr{'id'} = "item_" . &TextToId($&); \
+    }
+
+# Generate hypertext links for Perl things
+!on phrase 'PERLDOC';; $style = 'A'; \
+    $attr{'jump'} = "$var{'PERL_HTML_ROOT'}/pod/$text.html"
+
+# Detect other perl documents in the main perl document
+!if $var{'FILE_BASE'} eq 'perl'
+!on paragraph 'E';; \
+    if ($attr{'verbatim'}) {$text = &Escape($text); delete $attr{'verbatim'}} \
+    $text =~ s/ (perl\w+)/ {{PERLDOC:$1}}/g
+!endif
+
+# This routine provides the Perl-specific URL generation rules for L phrases.
+!block script
+sub BuildLinkUrl {
+    my($page, $sect, $entry) = @_;
+    my($url);
+    my($dir);
+
+    # Get the html root directory
+    my $html_root = $var{'PERL_HTML_ROOT'};
+
+    # If the page looks like standard documentation, assume it is
+    if ($page =~ /^perl/) {
+        $url = "$html_root/pod/$page.html";
+    }
+
+    # If the page looks like a library, assume it is
+    elsif ($page =~ /^[A-Z]/ || $page =~ /^[a-z]+$/) {
+        $page =~ s,::,/,g;
+        if ($perl_ext_docs{$page}) {
+            $dir = "ext";
+        }
+        else {
+            $dir = $perl_vms_docs{$page} ? "vms" : "lib";
+        }
+        $url = "$html_root/$dir/$page.html";
+    }
+
+    # Otherwise, assume its in the current directory
+    else {
+        $url = $page ne '' ? "$page.html" : '';
+    }
+
+    # Add the section/entry, if any
+    if ($entry ne '') {
+        $entry =~ s/\(\)$//;
+        $url .= "#item_" . &TextToId($entry);
+    }
+    else {
+        $url .= "#$sect" if $sect ne '';
+    }
+    return $url;
+}
+
+# Build the list of extension & vms docs
+# Note: this will only work when relative URLs are being created. Oh well ...
+use File::Find;
+%perl_ext_docs = ();
+%perl_vms_docs = ();
+find(\&perl_wanted, "$var{'PERL_HTML_ROOT'}/ext", "$var{'PERL_HTML_ROOT'}/vms");
+sub perl_wanted {
+    if ($File::Find::name =~ m#/ext/(.*)\.(pod|pm)$#) {
+        $perl_ext_docs{$1}++;
+    }
+    elsif ($File::Find::name =~ m#/vms/(.*)\.(pod|pm)$#) {
+        $perl_vms_docs{$1}++;
+    }
+}
+!endblock
+
+################# Index Generation Stuff #####################
+
+# A poor man's index :-)
+!on phrase ''       ;; if (length($text) < 50) {$attr{'index'} = $text}
+!on phrase '[HAP]\d';; $attr{'index'} = $text

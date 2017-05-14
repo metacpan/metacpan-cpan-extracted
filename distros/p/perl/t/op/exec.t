@@ -6,7 +6,26 @@ BEGIN {
     require './test.pl';
 }
 
-# supress VMS whinging about bad execs.
+my $vms_exit_mode = 0;
+
+if ($^O eq 'VMS') {
+    if (eval 'require VMS::Feature') {
+        $vms_exit_mode = !(VMS::Feature::current("posix_exit"));
+    } else {
+        my $env_unix_rpt = $ENV{'DECC$FILENAME_UNIX_REPORT'} || '';
+        my $env_posix_ex = $ENV{'PERL_VMS_POSIX_EXIT'} || '';
+        my $unix_rpt = $env_unix_rpt =~ /^[ET1]/i; 
+        my $posix_ex = $env_posix_ex =~ /^[ET1]/i;
+        if (($unix_rpt || $posix_ex) ) {
+            $vms_exit_mode = 0;
+        } else {
+            $vms_exit_mode = 1;
+        }
+    }
+}
+
+
+# suppress VMS whinging about bad execs.
 use vmsish qw(hushed);
 
 $| = 1;				# flush stdout
@@ -17,9 +36,7 @@ $ENV{LANGUAGE} = 'C';		# Ditto in GNU.
 my $Is_VMS   = $^O eq 'VMS';
 my $Is_Win32 = $^O eq 'MSWin32';
 
-skip_all("Tests mostly usesless on MacOS") if $^O eq 'MacOS';
-
-plan(tests => 21);
+plan(tests => 24);
 
 my $Perl = which_perl();
 
@@ -85,7 +102,7 @@ is( $echo_out, "ok\n", 'piped echo emulation');
 
 is( system(qq{$Perl -e "exit 0"}), 0,     'Explicit exit of 0' );
 
-my $exit_one = $Is_VMS ? 4 << 8 : 1 << 8;
+my $exit_one = $vms_exit_mode ? 4 << 8 : 1 << 8;
 is( system(qq{$Perl "-I../lib" -e "use vmsish qw(hushed); exit 1"}), $exit_one,
     'Explicit exit of 1' );
 
@@ -106,6 +123,21 @@ is( <<`END`,                    "ok\n",     '<<`HEREDOC`' );
 $Perl -le "print 'ok'"
 END
 
+{
+    local $_ = qq($Perl -le "print 'ok'");
+    is( readpipe, "ok\n", 'readpipe default argument' );
+}
+
+package o {
+    use subs "readpipe";
+    sub readpipe { pop }
+    ::is `${\"hello"}`, 'hello',
+         'overridden `` interpolates [perl #115330]';
+    ::is <<`119827`, "ls\n",
+l${\"s"}
+119827
+        '<<`` respects overrides and interpolates [perl #119827]';
+}
 
 TODO: {
     my $tnum = curr_test();

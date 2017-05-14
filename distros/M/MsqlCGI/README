@@ -1,0 +1,116 @@
+This is the readme file for MsqlCGI version 0.8.  It explains quickly how
+to setup MsqlCGI.  PLEASE PLEASE PLEASE read the documentation at the web
+site:
+
+	http://petrified.cic.net/MsqlCGI/
+
+This file assumes that you have read the documentation on the site.
+
+If you're reading this file and don't have the full package, you can
+ftp the MsqlCGI package from 
+
+	ftp://petrified.cic.net/pub/MsqlCGI
+
+---------------------------------------------------------------------------
+#################
+# Installation: #
+#################
+First off, let me apologize for not having a better installation program
+available.  I will create one for the "1.0" version.
+
+
+1: Copy all the files in the "MsqlCGI-bin" directory to a CGI capable
+   directory.  Actually, I recommend that you copy those files into a
+   SUB-Directory of your CGI capable directory.  For example:
+
+	cd <MsqlCGI Source Tree>
+   	cp -rp MsqlCGI-bin /usr/local/etc/httpd/cgi-bin/MsqlCGI
+
+2: Copy the files in the "images" to a web accessible HTML directory.
+
+3: Edit the file "MsqlCGI.conf" (which should now be in your CGI capable
+   directory as per step 1).
+
+4: Edit the MsqlCGI.pl and CreateDef.pl files.  They have one variable
+   that you need to edit:
+
+   	$MSQLCGI_CONF: The full path name to the MsqlCGI.conf file
+
+5: Create a table definition file for your MiniSQL table by running the
+   "CreateDef.pl" program from a UNIX command line.  This program is
+   interactive, and should not be run with any arguments.  It will create
+   a Table Definition file as it's output.  
+
+6: Move the Table Definition file created in step 4 into the directory
+   defined in the MsqlCGI.conf file as the  "$defaultTableDefDir"
+   variable.
+
+7: From your web browser, run the MsqlCGI program.  The URL should look
+   something like: 
+
+   	http://host.domain/path/MsqlCGI.pl?TableDefinitionFileName
+
+   For Example if: 
+   
+      * You put the MsqlCGI program files in the "cgi-bin/MsqlCGI"
+        URL directory 
+      * You named your Table Definition file "Test.def".
+      * Your host name is ack.somewhere.com
+
+   Your URL would look something like this:
+
+   	http://ack.somewhere.com/cgi-bin/MsqlCGI/MsqlCGI.pl?Test.def
+
+--------------------------------------------------------------------------
+####################
+# Sample Database: #
+####################
+
+There is a sample database contained in the "SampleDB" directory.  It is
+the same database as used in the "Sample Databases" on the official
+MsqlCGI site:  
+
+	http://petrified.cic.net/MsqlCGI/SampleDB.html
+	
+You can use this as your testbed if you would like.  Here are the steps
+involved:
+
+1: Perform steps 1-3 from above
+
+2: Create a MiniSQL database called "MsqlCGITest".  Currently, MsqlCGI
+   does not have the capability to create tables, so you'll have to use
+   the unix "msqladmin" program or something similar.  As root, issue the
+   command:
+
+   	msqladmin create MsqlCGITest
+
+3: Add the sample data that's in the file "SampleDB/TestDB.msql" into the
+   database.  change directory into the "SampleDB" directory and then
+   Issue the command:
+
+   	msql < TestDB.msql
+
+4: From your web browser, run the MsqlCGI program with the name of the
+   Table Definition file "TestDB.def".  You can either create the URL with
+   the full pathname to the TestDB.def file, or you can copy the
+   TestDB.def file into the directory as defined by the
+   "$defaultTableDefDir" variable in the MsqlCGI.conf file.
+
+
+Please remember, MsqlCGI isn't quite finished yet, so some aspects of it
+are rather rough around the edges.  I hope to get these worked out as soon
+as possible.  
+
+Lastly, if you make changes to the source code, please let me know.  I'm
+always up for contributions. :)
+
+If you have any questions, look at the official MsqlCGI web site:
+
+	http://petrified.cic.net/MsqlCGI/
+
+Feel free to send email to me at <altitude@cic.net> as well.
+
+Good Luck!
+
+...alex...
+

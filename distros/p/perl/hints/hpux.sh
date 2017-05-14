@@ -157,7 +157,7 @@ case `$cc -v 2>&1`"" in
 		done
 	    [ -z "$cc_found" ] && cc_found=`which cc`
 	    what $cc_found >&4
-	    ccversion=`what $cc_found | awk '/Compiler/{print $2}/Itanium/{print $6,$7}/for Integrity/{print $6}'`
+	    ccversion=`what $cc_found | awk '/Compiler/{print $2}/Itanium/{print $6,$7}/for Integrity/{print $6,$7}'`
 	    case "$ccflags" in
                "-Ae "*) ;;
 		*)  ccflags="-Ae $cc_cppflags"
@@ -213,26 +213,38 @@ case "$usemorebits" in
     $define|true|[yY]*) use64bitint="$define"; uselongdouble="$define" ;;
     esac
 
+# There is a weird pre-C99 long double (a struct of four uin32_t)
+# in HP-UX 10.20 but beyond strtold() there's no support for them
+# for example in <math.h>.
+case "$uselongdouble" in
+    $define|true|[yY]*)
+	if [ "$xxOsRevMajor" -lt 11 ]; then
+	    cat <<EOM >&4
+
+*** uselongdouble (or usemorebits) is not supported on HP-UX $xxOsRevMajor.
+*** You need at least HP-UX 11.0.
+*** Cannot continue, aborting.
+EOM
+	    exit 1
+	fi
+	;;
+    esac
+
+# Configure long double scan will detect the HP-UX 10.20 "long double"
+# (a struct of four uin32_t) and think it is IEEE quad.  Make it not so.
+if [ "$xxOsRevMajor" -lt 11 ]; then
+    d_longdbl="$undef"
+    longdblsize=8 # Make it double.
+fi
+
 case "$archname" in
     IA64*)
 	# While here, override so=sl auto-detection
 	so='so'
 	;;
-    *)
-	case "$uselongdouble" in
-	    *) ;;
-	    $define|true|[yY]*)
-		cat <<EOM >&4
-
-*** long doubles are not (yet) supported on HP-UX (any version)
-*** Until it does, we cannot continue, aborting.
-EOM
-		exit 1 ;;
-	    esac
-	;;
     esac
 
-case "$use64bitint" in
+case "$use64bitall" in
     $define|true|[Yy])
 
 	if [ "$xxOsRevMajor" -lt 11 ]; then
@@ -243,6 +255,15 @@ case "$use64bitint" in
 *** Cannot continue, aborting.
 EOM
 	    exit 1
+	    fi
+
+	if [ $xxOsRev -eq 1100 ]; then
+	    # HP-UX 11.00 uses only 48 bits internally in 64bit mode, not 64
+	    # force min/max to 2**47-1
+	    sGMTIME_max=140737488355327
+	    sGMTIME_min=-62167219200
+	    sLOCALTIME_max=140737488355327
+	    sLOCALTIME_min=-62167219200
 	    fi
 
 	# Set libc and the library paths
@@ -266,6 +287,16 @@ EOM
 
 	case "$ccisgcc" in
 	    $define|true|[Yy])
+		# The fixed socket.h header file is wrong for gcc-4.x
+		# on PA-RISC2.0W, so Sock_type_t is size_t which is
+		# unsigned long which is 64bit which is too long
+		case "$gccversion" in
+		    4*) case "$archname" in
+			    PA-RISC*) socksizetype=int ;;
+			    esac
+			;;
+		    esac
+
 		# For the moment, don't care that it ain't supported (yet)
 		# by gcc (up to and including 2.95.3), cause it'll crash
 		# anyway. Expect auto-detection of 64-bit enabled gcc on
@@ -282,14 +313,18 @@ EOM
 					ldflags="$ldflags -mlp64"
 					;;
 				    esac
-				    ;;
+				;;
 			    esac
 			;;
 		    esac
 		;;
 	    *)
-		ccflags="$ccflags +DD64"
-		ldflags="$ldflags +DD64"
+		case "$use64bitall" in
+		    $define|true|[yY]*)
+			ccflags="$ccflags +DD64"
+			ldflags="$ldflags +DD64"
+			;;
+		    esac
 		;;
 	    esac
 
@@ -366,6 +401,8 @@ EOM
 regexec_cflags=''
 doop_cflags=''
 op_cflags=''
+opmini_cflags=''
+perlmain_cflags=''
     fi
 
 case "$ccisgcc" in
@@ -403,7 +440,7 @@ case "$ccisgcc" in
 	    fi
 	;;
 
-    *)	# HP's compiler cannot combine -g and -O
+    *)
 	case "$optimize" in
 	    "")           optimize="+O2 +Onolimit" ;;
 	    *O[3456789]*) optimize=`echo "$optimize" | sed -e 's/O[3-9]/O2/'` ;;
@@ -416,6 +453,21 @@ case "$ccisgcc" in
 		    ;;
 	    esac
 	case "$archname" in
+	    PA-RISC2.0)
+		case "$ccversion" in
+		    B.11.11.*)
+			# opmini.c and op.c with +O2 makes the compiler die
+			# of internal error, for perlmain.c only +O0 (no opt)
+                        # works.
+			case "$optimize" in
+			*O2*)	opt=`echo "$optimize" | sed -e 's/O2/O1/'`
+				opmini_cflags="optimize=\"$opt\""
+				op_cflags="optimize=\"$opt\""
+				perlmain_cflags="optimize=\"\""
+				;;
+			esac
+		    esac
+		;;
 	    IA64*)
 		case "$ccversion" in
 		    B3910B*A.06.0[12345])
@@ -425,6 +477,19 @@ case "$ccisgcc" in
 			# maint (5.8.8+) and blead (5.9.3+)
 			# -O1/+O1 passed all tests (m)'05 [ 10 Jan 2005 ]
 			optimize="$opt"			;;
+			B3910B*A.06.15)
+			# > cc --version
+			# cc: HP C/aC++ B3910B A.06.15 [May 16 2007]
+			# Has optimizing problems with +O2 for blead (5.17.4),
+			# see https://rt.perl.org:443/rt3/Ticket/Display.html?id=103668.
+			#
+			# +O2 +Onolimit +Onoprocelim  +Ostore_ordering \
+			# +Onolibcalls=strcmp
+			# passes all tests (with/without -DDEBUGGING) [Nov 17 2011]
+			case "$optimize" in
+				*O2*) optimize="$optimize +Onoprocelim +Ostore_ordering +Onolibcalls=strcmp" ;;
+				esac
+			;;
 		    *)  doop_cflags="optimize=\"$opt\""
 			op_cflags="optimize=\"$opt\""	;;
 		    esac
@@ -509,9 +574,38 @@ EOF
     fi
 EOCBU
 
+cat >config.arch <<'EOCBU'
+# This script UU/config.arch will get 'called-back' by Configure after
+# all other configurations are done just before config.h is generated
+case "$archname:$optimize" in
+  PA*:*-g*[-+]O*|PA*:*[-+]O*-g*)
+    case "$ccflags" in
+      *DD64*) ;;
+      *) case "$ccversion" in
+	  # Only on PA-RISC. B3910B (aCC) is not faulty
+	  # B.11.* and A.10.* are
+	  [AB].1*)
+	      # cc: error 1414: Can't handle preprocessed file foo.i if -g and -O specified.
+	      echo "HP-UX C-ANSI-C on PA-RISC does not accept both -g and -O on preprocessed files" >&4
+	      echo "when compiling in 32bit mode. The optimizer will be disabled." >&4
+	      optimize=`echo "$optimize" | sed -e 's/[-+]O[0-9]*//' -e 's/+Onolimit//' -e 's/^ *//'`
+	      ;;
+	  esac
+      esac
+  esac
+EOCBU
+
 cat >UU/uselargefiles.cbu <<'EOCBU'
 # This script UU/uselargefiles.cbu will get 'called-back' by Configure
 # after it has prompted the user for whether to use large files.
+
+case "$archname:$use64bitall:$use64bitint" in
+    *-LP64*:undef:define)
+	archname=`echo "$archname" | sed 's/-LP64/-64int/'`
+	echo "Archname changed to $archname"
+	;;
+    esac
+
 case "$uselargefiles" in
     ""|$define|true|[yY]*)
 	# there are largefile flags available via getconf(1)
@@ -633,7 +727,7 @@ Either you must upgrade to HP-UX 11 or install a posix thread library:
 
 or
 
-    PTH package from e.g. http://hpux.tn.tudelft.nl/hppd/hpux/alpha.html
+    PTH package from e.g. http://hpux.connect.org.uk/hppd/hpux/Gnu/pth-2.0.7/
 
 Cannot continue, aborting.
 EOM
@@ -681,7 +775,6 @@ if [ $xxOsRevMajor -lt 11 ]; then
     d_asctime_r="$undef"
     fi
 
-
 # fpclassify () is a macro, the library call is Fpclassify
 # Similarly with the others below.
 d_fpclassify='define'
@@ -700,3 +793,22 @@ case "$d_oldpthreads" in
 	d_strerror_r_proto='undef'
 	;;
     esac
+
+# H.Merijn says it's not 1998 anymore: ODBM is not needed,
+# and it seems to be buggy in HP-UX anyway.
+i_dbm=undef
+
+# In HP-UXes prior to 11.23 strtold() returned a HP-UX
+# specific union called long_double, not a C99 long double.
+case "`grep 'double strtold.const' /usr/include/stdlib.h`" in
+*"long double strtold"*) ;; # strtold should be safe.
+*) echo "Looks like your strtold() is non-standard..." >&4
+   d_strtold=undef ;;
+esac
+
+# In pre-11 HP-UXes there really isn't isfinite(), despite what
+# Configure might think. (There is finite(), though.)
+case "`grep 'isfinite' /usr/include/math.h`" in
+*"isfinite"*) ;;
+*) d_isfinite=undef ;;
+esac

@@ -1,0 +1,28 @@
+---
+abstract: 'easy generation of UTF-8 fractions'
+author:
+  - 'Richard Harris <RJH@cpan.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-Fraction
+requires:
+  Carp: 0
+  Exporter: 0
+  Unicode::Subscript: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/richardjharris/Unicode-Fraction/issues
+  repository: git://github.com/richardjharris/Unicode-Fraction.git
+version: 0.2

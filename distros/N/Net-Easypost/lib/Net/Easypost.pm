@@ -1,9 +1,6 @@
 package Net::Easypost;
-$Net::Easypost::VERSION = '0.18';
-use Data::Dumper;
+$Net::Easypost::VERSION = '0.19';
 use Carp qw(croak);
-use Hash::Merge::Simple qw(merge);
-use Moo;
 
 use Net::Easypost::Address;
 use Net::Easypost::Label;
@@ -11,6 +8,9 @@ use Net::Easypost::Parcel;
 use Net::Easypost::Rate;
 use Net::Easypost::Request;
 use Net::Easypost::Shipment;
+
+use Moo;
+use namespace::autoclean;
 
 # ABSTRACT: Perl client for the Easypost web service
 
@@ -76,8 +76,8 @@ sub get_label {
     my ($self, $label_filename) = @_;
 
     my $resp = $self->requester->post(
-        '/postage/get', 
-        { label_file_name => $label_filename } 
+        '/postage/get',
+        { label_file_name => $label_filename }
     );
 
     return Net::Easypost::Label->new(
@@ -93,8 +93,8 @@ sub get_label {
 sub list_labels {
     my ($self) = @_;
 
-    my $resp = $self->requester->get( 
-        $self->requester->_build_url('/postage/list') 
+    my $resp = $self->requester->get(
+        $self->requester->_build_url('/postage/list')
     );
 
     return $resp->{postages};
@@ -115,7 +115,7 @@ Net::Easypost - Perl client for the Easypost web service
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -148,10 +148,30 @@ version 0.18
       weight => 10.0,
    );
 
+   my $customs_info = Net::Easypost::CustomsInfo->new(
+       customs_signer   => 'Steve Brule',
+       contents_type    => 'merchandise',
+       restriction_type => 'none',
+       customs_certify  => 1,
+       eel_ppc          => 'NOEEI 30.37(a)',
+       customs_items => [
+	   Net::Easypost::CustomsItem->new(
+	       code             => '111111',
+	       description	=> 'T-Shirt',
+	       quantity		=> 1,
+	       weight		=> 5,
+	       value		=> 10,
+	       hs_tariff_number => '123456',
+	       origin_country	=> 'US',
+	   )
+       ]
+   );
+
    my $shipment = Net::Easypost::Shipment->new(
-      to_address   => $to,
-      from_address => $from,
-      parcel       => $parcel,
+       to_address   => $to,
+       from_address => $from,
+       parcel       => $parcel,
+       customs_info => $customs_info,
    );
 
    my $ezpost = Net::Easypost->new;
@@ -173,7 +193,7 @@ recommend using L<Try::Tiny> in your implementation.
 
 API key:
 
-You must have your API key stored in an environment variable named 
+You must have your API key stored in an environment variable named
 EASYPOST_API_KEY
 
 =head1 ATTRIBUTES
@@ -261,14 +281,7 @@ input parameters.
 
 =head1 SUPPORT
 
-Please report any bugs or feature requests to "bug-net-easypost at
-rt.cpan.org", or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Easypost>.  I will
-be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-Or, if you wish, you may report bugs/features on Github's Issue Tracker.
-L<https://github.com/mrallen1/Net-Easypost/issues>
+Please report any bugs or feature requests to L<https://github.com/mcmillhj/Net-Easypost/issues>
 
 =head1 SEE ALSO
 

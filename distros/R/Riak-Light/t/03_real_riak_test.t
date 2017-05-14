@@ -12,7 +12,7 @@ use Riak::Light;
 use JSON;
 
 subtest "simple get/set/delete test" => sub {
-    plan tests => 13;
+    plan tests => 12;
 
     my ( $host, $port ) = split ':', $ENV{RIAK_PBC_HOST};
 
@@ -53,10 +53,6 @@ subtest "simple get/set/delete test" => sub {
         "should fetch the text from Riak"
     );
 
-    my $vclock = $client->get_vclock( foo => "baz" );
-
-    ok $vclock, "should return vclock=$vclock";
-
     #ok(!$@, "should has no error - foo => bar is undefined");
 };
 
@@ -88,10 +84,10 @@ subtest "get keys" => sub {
     $client->get_keys( $bucket => sub { push @keys, $_[0] } );
 
     @keys = sort @keys;
-    is( scalar @keys, 3,     'should return 3 items' );
-    is( $keys[0],     'bam', '..bam' );
-    is( $keys[1],     'bar', '..bar' );
-    is( $keys[2],     'baz', '..baz' );
+    is( scalar @keys, 3 );
+    is( $keys[0],     'bam' );
+    is( $keys[1],     'bar' );
+    is( $keys[2],     'baz' );
 };
 
 subtest "sequence of 1024 get/set" => sub {

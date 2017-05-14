@@ -1,0 +1,63 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: example Filter
+
+H2: Interface
+
+!filter_interface "example"
+
+H2: Description
+
+The {{example}} filter is used to specify a section of fixed-width text.
+Unlike the {{FILT:verbatim}} filter, embedded SDF symbols (like E<2{>)
+are relevant.
+
+The {{skipheader}} parameter is useful when an external file is being
+included as an example, but you do not want the header comment in
+the example. The {{lang}} parameter, if any, is used to determine
+the commenting conventions. If no language is specified, comments
+are assumed to start with a # and be terminated by the end of line.
+
+The {{lang}} parameter can be used to pretty-print programming languages.
+In practice, this means:
+
+* comments are output in italics
+* keywords are output in bold.
+
+Note: The {{FILT:langdefs}} filter is used to configure the information
+the pretty-printing feature needs to know. A large number of languages
+are predefined in the {{FILE:stdlib/langdefs.sdm}} file.
+
+The {{wide}} parameter can be used to ensure that at least 80 characters
+are output on a line before it is wrapped.
+
+The {{listitem}} parameter can be used to specify that this block
+of text is part of a list. The value is the logical
+indent of the list (e.g. 1, 2, etc.).
+
+The {{pure}} parameter can be used to escape special SDF symbols
+(like E<2{>) embedded within the text.
+
+H2: Examples
+
+!block example; lang='sdf'
+
+# Include myfile.c but exclude the copyright, revision history, etc.
+!include "myfile.c"; example; skipheader; lang='c'
+
+# Pretty-print the same file
+!include "myfile.c"; example; wide; lang='c'
+!endblock
+
+#H2: Limitations & Future Directions

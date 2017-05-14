@@ -1,0 +1,31 @@
+# zxid/sg/xacml-2.0-profile-saml2.0-v2-schema-protocol-cd-1.sg
+# Evolution version to send policies in request
+# Slightly edited, 5.11.2009, Sampo Kellomaki (sampo@iki.fi)
+# $Id$
+
+target(xaspcd1,urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol:cd-01)
+import(sp, urn:oasis:names:tc:SAML:2.0:protocol, http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=security)
+import(xac, urn:oasis:names:tc:xacml:2.0:context:schema:os, http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd)
+import(xa, urn:oasis:names:tc:xacml:2.0:policy:schema:os, http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd)
+import(xasacd1, urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:assertion:cd-01, xacml-2.0-profile-saml2.0-v2-schema-assertion-cd-1.xsd)
+
+XACMLAuthzDecisionQuery -> %xaspcd1:XACMLAuthzDecisionQueryType
+%XACMLAuthzDecisionQueryType:	 base(sp:RequestAbstractType)
+  xac:Request
+  xa:Policy*
+  xa:PolicySet*
+  xasacd1:ReferencedPolicies?
+  @InputContextOnly?	 -> %boolean  default (false)
+  @ReturnContext?	 -> %boolean  default (false)
+  @CombinePolicies?	 -> %boolean  default (true)
+  ;
+
+XACMLPolicyQuery -> %xaspcd1:XACMLPolicyQueryType
+%XACMLPolicyQueryType:	 base(sp:RequestAbstractType)
+  xac:Request?
+  xa:Target?                  # Sampo: was in official, but not cd1
+  xa:PolicySetIdReference?
+  xa:PolicyIdReference?
+  ;
+
+#EOF

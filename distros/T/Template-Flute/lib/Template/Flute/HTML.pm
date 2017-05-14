@@ -47,7 +47,7 @@ sub new {
 	$self = {%args, containers => {}, lists => {}, pagings => {}, forms => {},
 			 params => {}, values => {}, query => {}, file => undef};
 	
-	bless $self, $class;
+	bless $self;
 }
 
 =head1 METHODS
@@ -108,7 +108,7 @@ sub list {
 }
 
 =head2 forms
-
+	
 Returns list of L<Template::Flute::Form> objects for this template.
 
 =cut
@@ -424,7 +424,6 @@ sub _parse_handler {
                        img => {link_att => 'src'},
                        link => {link_att => 'href'},
                        script => {link_att => 'src'},
-                       form => {link_att => 'action'},
                    );
 
         # adjust links to static files
@@ -675,30 +674,19 @@ sub _elt_indicate_replacements {
 			$elt->{"flute_$name"}->{rep_sub} = \&hook_html;
 			return;
 		}
-        elsif (($sob->{op} eq 'prepend' || $sob->{op} eq 'append') && ! $sob->{target}) {
+        elsif ($sob->{op} eq 'append' && ! $sob->{target}) {
             $elt->{"flute_$name"}->{rep_text_orig} = $elt->text_only;
             my $joiner = '';
             if (exists $sob->{joiner}) {
                 $joiner = $sob->{joiner};
             }
-            if ($sob->{op} eq 'append') {
-                $elt->{"flute_$name"}->{rep_sub} = sub {
-                    my ($elt, $str) = @_;
-                    $str ||= '';
-                    if (! $joiner || $str =~ /\S/) {
-                        $elt->set_text($elt->{"flute_$name"}->{rep_text_orig} . $joiner . $str);
-                    }
-                };
-            }
-            else {
-                $elt->{"flute_$name"}->{rep_sub} = sub {
-                    my ($elt, $str) = @_;
-                    $str ||= '';
-                    if (! $joiner || $str =~ /\S/) {
-                        $elt->set_text($str . $joiner . $elt->{"flute_$name"}->{rep_text_orig});
-                    }
-                };
-             };
+            $elt->{"flute_$name"}->{rep_sub} = sub {
+                my ($elt, $str) = @_;
+				$str ||= '';
+                if (! $joiner || $str =~ /\S/) {
+                    $elt->set_text($elt->{"flute_$name"}->{rep_text_orig} . $joiner . $str);
+                }
+            };
         }
         elsif ($sob->{op} eq 'toggle' && exists $sob->{args}
                && $sob->{args} eq 'tree') {
@@ -711,14 +699,11 @@ sub _elt_indicate_replacements {
                 return;
             };
         }
-        elsif ($sob->{op} eq 'keep') {
-            $elt->{"flute_$name"}->{rep_sub} = \&_keep;
-        }
 	}
-
+	
 	if ($sob->{target}) {
 		if (exists $sob->{op}) {
-			if ($sob->{op} eq 'append' || $sob->{op} eq 'prepend') {
+			if ($sob->{op} eq 'append') {
 				# keep original values around. The target could be a
 				# wildcard.
 				foreach my $attribute (keys %{ $elt->atts }) {
@@ -834,13 +819,9 @@ sub _set_selected {
                 $text = $record_value;
             }
             if (defined $value and
-                defined $record_value) {
-                if (ref($value) eq 'ARRAY') {
-                    $att{selected} = 'selected' if grep { $record_value eq $_ } @$value;
-                }
-                elsif ($record_value eq $value) {
-                    $att{selected} = 'selected';
-                }
+                defined $record_value and
+                $record_value eq $value) {
+                $att{selected} = 'selected';
             }
 			
 			$elt->insert_new_elt('last_child', 'option',
@@ -920,16 +901,6 @@ sub hook_html {
 	return;
 }
 
-sub _keep {
-    my ($elt, $value) = @_;
-
-    if ($value) {
-        $elt->set_text($value);
-    }
-
-    return;
-}
-
 sub _fix_script_tags {
     my $parsed = shift;
     # script tags should not be escaped. Please note that this should
@@ -948,7 +919,7 @@ Stefan Hornburg (Racke), <racke@linuxia.de>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2010-2014 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

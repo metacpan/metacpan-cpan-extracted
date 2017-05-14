@@ -1,0 +1,20 @@
+<module name="zxidwspaxismod" class="zxidjava.zxidwspaxismod">
+ <InFlow>
+   <handler name="zxidwspaxisin" class="zxidjava.zxidwspaxisin">
+     <order phase="Security"/>
+     <!-- order phase="PreDispatch"/ -->
+   </handler>
+ </InFlow>
+
+ <OutFlow>
+   <handler name="zxidwspaxisout" class="zxidjava.zxidwspaxisout">
+     <order phase="Security"/>
+   </handler>
+ </OutFlow>
+
+ <OutFaultFlow>
+ </OutFaultFlow>
+
+ <InFaultFlow>
+ </InFaultFlow>
+</module>

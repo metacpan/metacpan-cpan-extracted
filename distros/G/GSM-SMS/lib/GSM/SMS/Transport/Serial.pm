@@ -4,7 +4,7 @@ use vars qw( $VERSION $AUTLOAD );
 
 use base qw( GSM::SMS::Transport::Transport );
 
-$VERSION = '0.2';
+$VERSION = "0.161";
 
 =head1 NAME
 
@@ -265,8 +265,8 @@ sub ping {
 sub get_info {
 	my ($self) = @_;
 
-	my $revision = '$Revision: 1.5 $';
-	my $date = '$Date: 2002/12/13 21:29:11 $';
+	my $revision = '$Revision: 1.7 $';
+	my $date = '$Date: 2003/01/11 14:16:34 $';
 
 print <<EOT;
 Serial transport $VERSION
@@ -437,7 +437,7 @@ sub _register {
 	my $stime = time;
 	do {
 		$res = $self->_at("AT+CREG?\r", $__TO , "+CREG");
-		if ( $res=~/1/i ) {
+		if ( $res=~/1/i || $res=~/5/i ) {
 			$registered++;
 		}
 	}

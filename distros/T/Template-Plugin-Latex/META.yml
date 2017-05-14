@@ -22,4 +22,4 @@ requires:
   LaTeX::Encode: '0.02'
   LaTeX::Table: '0'
   Template: '2.16'
-version: '3.11'
+version: '3.12'

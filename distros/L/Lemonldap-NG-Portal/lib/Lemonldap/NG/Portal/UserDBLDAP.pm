@@ -9,7 +9,7 @@ use strict;
 use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_LDAP 'ldap';    #link protected ldap
 
-our $VERSION = '1.4.9';
+our $VERSION = '1.9.3';
 
 ## @method int userDBInit()
 # Transform ldapGroupAttributeNameSearch in ARRAY ref
@@ -76,6 +76,7 @@ sub search {
         base   => $self->{ldapBase},
         scope  => 'sub',
         filter => $self->{LDAPFilter},
+        deref  => $self->{ldapSearchDeref} || 'find',
         attrs  => \@attrs,
     );
     $self->lmLog(

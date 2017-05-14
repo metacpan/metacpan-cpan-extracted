@@ -1,0 +1,552 @@
+# This is a Vroom slide file.
+#
+# Run `vroom --vroom` to start
+# See `perldoc Vroom` for complete details.
+#
+---- config
+# Basic config options.
+title: Vroom!
+indent: 5
+height: 18
+width: 69
+auto_size: 1
+skip: 0
+
+vimrc:
+  set listchars=
+
+# The following options are for Gvim usage.
+# vim: gvim
+# gvimrc: |
+#   set fuopt=maxhorz,maxvert
+#   set guioptions=egmLtT
+#   set guifont=Bitstream_Vera_Sans_Mono:h18
+#   set guicursor=a:blinkon0-ver25-Cursor
+#   colorscheme default
+
+---- center
+DBIx::PreQL
+
+Less terrible dynamic SQL
+
+----
+== Less terrible?
+
++* SQL is a complex, powerful language with many variants.
++* Many attempts have been made to reduce the drudgery of
+   maintaining many similar queries.
++* They all have short-comings...
+
+----replace
+== SQL Automation
+== What has been tried?
+
+* Object Relational Mapping (ORM)
+  * DBIx::Class
+  * ActiveRecord
+
++
+== SQL Automation
+== What has been tried?
+
+* Programmatic query builders
+   * SQL::Abstract
+
++
+== SQL Automation
+== What has been tried?
+
+* Mason templates
+   * A big blob of legacy code that shall remain nameless
+
++
+== SQL Automation
+== What has been tried?
+
+* Hand-rolled dynamic queries
+   * All over the place
+
+----perl
+# DBIx::Class  --- ORM
+package MyApp::Schema::Result::CD;
+use base qw/DBIx::Class::Core/;
+
+__PACKAGE__->load_components(qw/InflateColumn::DateTime/);
+__PACKAGE__->table('cd');
+__PACKAGE__->add_columns(qw/ cdid artistid title year /);
+__PACKAGE__->set_primary_key('cdid');
+__PACKAGE__->belongs_to(artist => 'MyApp::Schema::Result::Artist', 'artistid');
+
+1;
+# ------------------------
+use MyApp::Schema;
+my $schema = MyApp::Schema->connect($dbi_dsn, $user, $pass, \%dbi_params);
+my @all_artists = $schema->resultset('Artist')->all;
+
+# Create a result set to search for artists.
+# This does not query the DB.
+my $johns_rs = $schema->resultset('Artist')->search(
+    # Build your WHERE using an SQL::Abstract structure:
+    { name => { like => 'John%' } }
+);
+
+# Fetch the next available row.
+my $first_john = $johns_rs->next;
+
+# Specify ORDER BY on the query.
+my $first_john_cds_by_title_rs = $first_john->cds(
+    undef,
+    { order_by => 'title' }
+);
+
+----
+== ORM
+
+ORM is the Vietnam of computer science.
+
+    Although it may seem trite to say it, Object/Relational Mapping
+    is the Vietnam of Computer Science. It represents a quagmire which
+    starts well, gets more complicated as time passes, and before long
+    entraps its users in a commitment that has no clear demarcation
+    point, no clear win conditions, and no clear exit strategy.
+  
+http://blogs.tedneward.com/2006/06/26/The+Vietnam+Of+Computer+Science.aspx
+
+----perl
+
+    use SQL::Abstract;
+ 
+    my $sql = SQL::Abstract->new;
+ 
+    my %where = (
+        requestor => 'inna',
+        worker    => ['nwier', 'rcwe', 'sfz'],
+        status    => { '!=', 'completed' }
+    );
+ 
+    my($stmt, @bind) = $sql->select('tickets', '*', \%where);
+ 
+----
+== Programmatic query builders
+
++* Miss a large part of SQL functionality.
++   or
+* Are at least as complex as SQL
++* You need to know the generator language.
++* You need to know SQL anyway.
++* If something doesn't work right, the SQL generation process
+  is obfuscated.
+
+----perl
+# Mason Templates (Really!)
+<%method COUNT>
+<%args>
+    $wh => ''
+</%args>
+    select count(*)
+    from tbl_number_pile
+    where number in
+     (select number from tbl_number_pile where pile_owner = ?
+      union
+      select number from tbl_special_app where account_id = ?
+      union
+      select number from tbl_boring_app inner join tbl_stuff using (thing_id) where account_id = ?)
+<% $wh | n %>
+</%method>
+
+----
+== Mason Templates (Really!)
+
++* HTML::Mason is really meant for HTML
++* Need I say more?
+
+----perl
+# Hand Rolled
+sub contacts_between_dates {
+    my ($class, $acct_id, $uid, $start_date, $end_date, $is_admin) = @_;
+
+    my @wheres = (
+        'tbl_contact.account_id = ?',
+        'tbl_call_log.call_start >= ?::timestamp',
+        q{tbl_log.start < (?::date + '1 day'::interval)::date},
+        q{tbl_contact.status = 'active'},
+    );
+    my @params = ($acct_id, $start_date, $end_date);
+    my $join   = _permission_where(\@wheres, \@params, $uid, $is_admin);
+    my $wheres = join "\n           AND ", @wheres;
+
+    return qq{
+        SELECT tbl_contact.name, tbl_contact.contact_id,
+               COUNT(tbl_log.call_id) AS count
+          FROM tbl_contact
+         INNER JOIN tbl_log USING (contact_id)$join
+         WHERE $wheres
+         GROUP BY tbl_contact.name, tbl_contact.contact_id
+         ORDER BY count desc
+         LIMIT 10
+    }, @params;
+}
+
+----
+== Hand Rolled Code
+
++* Copy and paste reuse
++* Never twice the same
+
+----
+== What have we learned from all this?
+
++* Managing SQL is HARD
++* SQL dialects impose a heavy tax on tool makers.
++* Every attempt to hide SQL forces compromises.
+  * Limited/strange schemas
+  * Cannot apply to existing database
+  * Complex configuration
+  * Hard to troubleshoot
++* Powerful systems inevitably reinvent SQL
+  * Expressiveness vs Simplicity
+
+----
+== What have we learned from all this?
+
++
+== EVERYTHING IS TERRIBLE
+
+----
+== Less terrible dynamic SQL
+
+    If they think you’re crude, go technical;
+    if they think you’re technical, go crude.
+    I’m a very technical boy.
+    So I decided to get as crude as possible.
+
+         --from Johnny Mnemonic by William Gibson
+
+----
+
+== So, what's the plan?
++* Keep it simple, stupid.
++* Keep related things together.
++* Don't hide your SQL.  Flaunt it.
+
+
+----
+== Add a few familiar symbols
+
+  *  means ALWAYS
+  &  means ALL
+  |  means ANY
+  #  means COMMENT
+
+  ?? is a PLACEHOLDER
+  !! is a DEPENDENCY
+  ~ NEGATES a dependency
+  = fancy placeholder EQAULITY
+  ! fancy placeholder INEQAULITY
+  " placeholder LITERAL INTERPOLATION
+  @ placeholder for ARRAY types
+
+----perl
+#  Write some SQL:
+
+my $sql = <<END_SQL;
+  *    SELECT number
+  *    FROM
+  *     ( SELECT number
+  *       FROM tbl_phone_numbers
+  *       WHERE
+  *             owner = ?account_id?
+
+  &         AND substr(number,1,3) IN (   !toll_free!
+  &               SELECT npa              !toll_free!
+  &               FROM tbl_conf_npa       !toll_free!
+  &               WHERE tolltype='free'   !toll_free!
+  &         )                             !toll_free!
+
+  &         AND number like ?region?||'%' !~toll_free!
+
+  *       ORDER by random()
+  &       LIMIT ?limit?
+  *     ) AS random_numbers
+  *     ORDER BY quality_score DESC
+END_SQL
+
+----perl
+#   Collect your data
+
+my %data = (
+    account_id => $account_id,
+    region     => $region,
+    toll_free  => $region =~ /toll-free|tfn/i,
+    limit      => $limit
+ );
+
+my @numbers;
+eval {
+    my ($query, @params) = DBIx::PreQL->build_query( query => $sql, data => \%data );
+
+    @numbers = $dbh->selectall_array($query, @params);
+    1;
+} or do{
+    confess("DB error getting numbers by region $account_id $region: $@");
+};
+
+----perl
+#     BEFORE
+
+my $sql = EOF;
+SELECT number FROM
+    ( SELECT number
+      FROM tbl_phone_numbers
+      WHERE owner = ?
+EOF
+if ($region =~ /toll-free|tfn/i ){
+    $sql .= ' AND substr(number,1,3) in (select npa from tbl_conf_npa where tolltype='free')';
+}else {
+    $sql .= " AND number LIKE ?||'%'";
+    push @where_values, $region;
+}
+$sql .= ' ORDER BY random()';
+if ($limit){
+    $sql .= " LIMIT $limit";
+}
+$sql .= ") as random_numbers ORDER BY quality_score DESC";
+my @numbers;
+eval {
+    @numbers = $dbh->selectall_array($sql, @where_values);
+    1;
+} or do{
+    confess("DB error getting numbers by region $account_id $region: $@");
+};
+
+-----
+#  AFTER:
+
+my $sql = <<END_SQL;
+  *    SELECT number
+  *    FROM
+  *     ( SELECT number
+  *       FROM tbl_phone_numbers
+  *       WHERE
+  *             owner = ?account_id?
+
+  &         AND substr(number,1,3) IN (   !toll_free!
+  &               SELECT npa              !toll_free!
+  &               FROM tbl_conf_npa       !toll_free!
+  &               WHERE tolltype='free'   !toll_free!
+  &         )                             !toll_free!
+
+  &         AND number like ?region?||'%' !~toll_free!
+
+  *       ORDER by random()
+  &       LIMIT ?limit?
+  *     ) AS random_numbers
+  *     ORDER BY quality_score DESC
+END_SQL
+
+my %data = (
+    account_id => $account_id,
+    region     => $region,
+    toll_free  => $region =~ /toll-free|tfn/i,
+    limit      => $limit
+ );
+
+my @numbers;
+eval {
+    my ($query, @params) = DBIx::PreQL->build_query( query => $sql, data => \%data );
+
+    @numbers = $dbih->selectall_array($query, @params);
+    1;
+} or do{
+    confess("DB error getting numbers by region $account_id $region: $@");
+};
+
+----
+
+== Bonus Features
+
+== Better living through heuristics.
+
+----
+== Handle trailing commas
+
+When a line starts with FROM, we remove a trailing comma
+(if present) from the previous line.
+
+So you can write queries like this without weird punctuation:
+
+    *   SELECT
+    *     number,
+    |     name,   !want_name!  !want_address!
+    |     street,              !want_address!
+    |     city,   !want_city!  !want_address!
+    |     state,  !want_state! !want_address!
+    |     zip,    !want_zip!   !want_address!
+    *   FROM at_number_pool_2
+
+----
+== Handle leading "AND"
+
+
+When a line starts with AND and the previous line ends in WHERE,
+we replace the 'AND' with 3 spaces.
+
+
+So you can write queries like this without strange gymnastics:
+
+    *   SELECT
+    *     number,
+    *   FROM tbl_numbers
+    *   WHERE
+    &     AND number like ?region_filter?
+    &     AND name  like ?name_filter?
+    &     AND quality_score >=  ?min_quality?
+
+
+----
+== THE END
+
++== or is it?
+
+----
+== Advanced Features
+
++* Additional Placeholder Magic
+  * ?=?
+  * ?!?
+  * ?@?
+  * ?"?
+  * Literal SQL
++* Custom tags
+  * wanted lists
+  * wanted function
++* Return parameter keys instead of values
+
+----
+== Placeholder Magic
+== ?=? - Placeholder equals
+
+Handle complex equivalence:
+
+ &  AND order_id  ?=order?
+
+Given data{order} = 'BOB12345'
+   SQL becomes:
+      AND order_id = ?  
+   with 'BOB12345' in the params array.
+
+Given data{order} = \'NULL'
+   SQL becomes:
+      AND order_id is NULL
+   with nothing in the params array.
+
+----
+== Placeholder Magic
+== ?!? - Placeholder does not equal
+
+Handle complex not-equal writing:
+
+ &  AND order_id  ?!order?
+
+Given data{order} = 'BOB12345'
+   SQL becomes:
+      AND order_id <> ?  
+   with 'BOB12345' in the params array.
+
+Given data{order} = \'NULL'
+   SQL becomes:
+      AND order_id is not NULL
+   with nothing in the params array.
+
+
+----
+== Placeholder Magic
+== ?@? - Placeholder Array
+
+Handle lists
+
+ &  ARRAY[monster] <@ ?@bestiary?
+
+Given data{bestiary} = ['dragon', 'giant', 'cookie'];
+   SQL becomes:
+      ARRAY[monster]  <@  ?
+   with ('dragon', 'giant', 'cookie') in the params array.
+
+----
+== Placeholder Magic
+== ?"? - Placeholder Interpolation
+
+Do direct interpolation of placeholder content.
+
+ &  AND order_id = ?"order?
+
+Given data{order} = "'BOB12345'";
+   SQL becomes:
+      AND order_id =  'BOB12345'
+   with nothing in the params array.
+
+Given data{order} = \"'BOB12345'";
+   SQL becomes:
+      AND order_id =  'BOB12345'
+   with nothing in the params array.
+
+----
+== Placeholder Magic
+== Literal SQL
+
+Each placeholder mode accepts a scalar reference as a data value.
+When a reference is found in a value, we do literal interpolation,
+with minor adustemnts suiting the type of placeholder
+
+    query => 'foo <=  ?foo?'
+  + data  => {foo => \'now()'}
+ =================
+    'foo <= now()'
+
+----
+== Custom Tags
+
+Tags don't have to be * & or |
+
+First, there is the amazing comment tag:  #
++Okay, that was boring.
+
++Also, any group of non-space characters can form a tag.
+
+Tags that start with & and | must satisfy both the custom tag
+and the &/| condition.
+
+----
+== Custom Tags continued
+
+We decide whether to keep a tag line by checking the 'wanted'
+argument to build_query().
+
+wanted can be a simple array ref, with a list of tags to include.
+
+Or it can be a code ref that returns true when we want to
+include a tag.
+
+----
+== Custom Tags continued
+
+For maximum safety when using custom tags, use the 'known_tags'
+option to declare what tags can be expected in a query.
+
+This feature is powerful enough that you can even get away with
+doing stupid things like using SQL keywords as tag names.
+Even so, don't do it.
+
+----
+== Get Params By Name
+
+Final feature - I promise.
+
+When calling build_query(), specify 'keep_keys' as true to get
+a list of parameter names instead of parameter values.
+
+
+----
+== THE END
+
+

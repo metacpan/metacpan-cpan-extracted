@@ -3,39 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <CommandChannel.hpp>
-
-void* _tied_object_to_ptr(pTHX_ SV* obj_sv, const char* var, const char* pkg, int unsafe) {
-    if (!SvROK(obj_sv) || (SvTYPE(SvRV(obj_sv)) != SVt_PVHV)) {
-        if (unsafe) return NULL;
-        Perl_croak(aTHX_ "%s is not a blessed reference of type %s", var, pkg);
-    }
-
-    SV* tied_hash = SvRV(obj_sv);
-    MAGIC* ext_magic = mg_find(tied_hash, PERL_MAGIC_ext);
-    if (!ext_magic) {
-        if (unsafe) return NULL;
-        Perl_croak(aTHX_ "%s has not been initialized by %s", var, pkg);
-    }
-
-    return  (void*) ext_magic->mg_ptr;
-}
-
-void* unsafe_tied_object_to_ptr(pTHX_ SV* obj_sv) {
-    return _tied_object_to_ptr(aTHX_ obj_sv, NULL, NULL, 1);
-}
-
-void* tied_object_to_ptr(pTHX_ SV* obj_sv, const char* var, const char* pkg) {
-    return _tied_object_to_ptr(aTHX_ obj_sv, var, pkg, 0);
-}
-
-SV* ptr_to_tied_object(pTHX_ void* ptr, const char* pkg) {
-    HV* stash = gv_stashpv(pkg, GV_ADDWARN);
-    SV* attr_hash = (SV*) newHV();
-    sv_magic(attr_hash, Nullsv, PERL_MAGIC_ext, (const char*) ptr, 0);
-    return sv_bless(newRV_noinc(attr_hash), stash);
-}
-
+#include <MesosChannel.hpp>
 
 std::string sv_to_string(SV* sv) {
     if (SvTYPE(sv) != SVt_PV)

@@ -1,74 +1,29 @@
-OpenThought Engine - Web Application Engine             http://openthought.net
-                                                        eric at openthought.net
+OpenThought                                         http://openthought.net
+Eric Andreychek                                     eric at openthought.net
 
-OpenThought is a powerful and flexible web application environment.
-OpenThought applications are different from other web applications in that all
-communication between the browser and the server is performed in the
-background.  This gives a browser the ability to receive data from the server
-without ever reloading the currently loaded document.  Data received can be
-displayed automatically on the existing page, can access JavaScript functions
-and variables, and can load new pages.  Additionally, OpenThought completely
-manages all of your session data for you.  These features give the look and
-feel of a full-blown application instead of just an ordinary Web page.
+Description
+-----------
 
-Uses Apache 1.x or 2.x / mod_perl 1.x, 2.x, or CGI / Perl 5
+OpenThought is a library which implements an API for AJAX/Remote Scripting,
+which means you can send data to and from the browser without needing to reload
+the page.  OpenThough strives to provide a simple yet powerful and flexible
+means for creating such applications.  Further, it's compatible with a wide
+range of browsers, from Internet Explorer 4+, Netscape 4+, Mozilla/Firefox,
+Safari, Opera, Konqeueror, and others.
 
-Currently known to work with:
- Netscape 4.x, 6.x
- Mozilla 0.8.x, 0.9.x, 1.x
- IE 4.x, 5.x, 6.x
- Opera 6.x
- Konqueror 3.x
+For more information, see the online documentation, or simply install it and
+run 'perldoc OpenThought'.
 
-After installation, use 'perldoc OpenThought' for instructions on how to create
-applications using OpenThought.  Additionally, you can use the demo application
-as an example.
+Installation
+------------
 
-Requires the following Perl Packages:
- HTML::Template
- OpenPlugin
- OpenThought::XML2Hash
- XML::Parser
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-Files:
- Changelog   - List of changes made to OpenThought
- FAQ         - Frequently Asked Questions, and the answers to them
- INSTALL     - How to go about installing OpenThought
- LICENSE     - The license OpenThought has been released under
- Makefile.PL - The OpenThought Makefile
- README      - This file
- TODO        - Some ideas I'd like to incorporate into OpenThought
+  cp js/OpenThought.js /var/www/$DOCUMENT_ROOT (if not done above)
 
- demo_app/   - Location of the OpenThought demo application
-   demo.pl         - OpenThought demo instance script
-   Demo.pm         - OpenThought demo application
+  (optional: install the demo app)
+  cp -ra examples/SoulFoodCafe /var/www/$DOCUMENT_ROOT
 
-     templates/  - Templates for the demo application
-       demo-template.html - Template for the main application
-
- lib/       - location of the main openthought config file & modules
-   Serializer.pm - Serialize / Deserialize data coming to and from the browser
-   Template.pm   - Module used to build & display templates, uses HTML::Template
-
- openthought/
-    etc/    - various openthought components
-      OpenThought.conf        - Main OpenThought config file
-      OpenThought-httpd.conf  - OpenThought's Apache configuration directives
-
-    share/OpenThought/templates/ - Templates required for the OpenThought Engine
-      index-template.html   - OpenThought Index template
-      main-template.js      - Main OpenThought Javascript library
-
-COPYRIGHT
-
-Copyright (c) 2000-2003 Eric Andreychek.  All rights reserved.
-
-
-ExtUtils::AutoInstall is
-    Copyright 2001, 2002 by Autrijus Tang <autrijus@autrijus.org>.
-
-File::NCopy is
-    Copyright (c) 1998 Gabor Egressy. All rights reserved.
-
-Text::Template is
-    Copyright (c) 2003 Mark Jason Dominus. All rights reserved.

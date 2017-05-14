@@ -1,0 +1,153 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use warnings;
+use strict;
+
+use Mojolicious::Lite;
+use File::Find;
+use File::Path;
+use Getopt::Std;
+use App::Repo::Daemon qw< daemonize >;
+use App::Repo qw< digest packages >;
+use open qw<:encoding(UTF-8)>;
+
+my %switch = ();
+$0 = "repo";
+getopts('s:d:hp', \%switch);
+
+
+sub start {
+
+    my $packages = packages($switch{d});
+    my $base_dir = $switch{d}; $base_dir =~ s/(\/deb)//;
+
+    system("rm -rf $base_dir/Packages*");
+    open(my $fh,">>", "$base_dir/Packages") || die "cant open $base_dir/Packages: $!";
+    
+    for my $package (@$packages){
+        for(@$package){
+            print $fh "$_\n";
+        }
+    };
+    close $fh;
+    system("cd $base_dir && cp Packages Packages.txt && gzip Packages");
+
+    my $repo_icon_path = sub {
+        my $repo_lib_dir = `perldoc -l App::Repo`; chomp $repo_lib_dir;
+        $repo_lib_dir =~ s/\.pm/\/CydiaIcon\.png/;
+        return $repo_lib_dir;
+    };
+    
+    my $repo_icon = $repo_icon_path->();
+    unless( -f "$base_dir/CydiaIcon.png" ){
+        system("cp $repo_icon $base_dir/");
+    }
+
+    if( defined $switch{p} ){ say "refreshed"; return }
+
+    say "starting $0: PID $$";
+
+    daemonize();
+
+    app->static->paths->[0] = $base_dir;
+    any '/' => sub {
+        shift->reply->static('Packages.txt');
+    };
+
+    app->start('daemon');
+
+#plugin( 'Directory', root => "$base_dir" )->start('daemon', '-l', "http://*:3000");
+}
+
+sub usage {
+    my $help = <<'END_MESSAGE';
+
+    USAGE:
+            -start repo
+            repo -d /path/to/deb
+
+            -stop repo
+            repo -stop
+
+            -check if repo is running
+            repo -status
+
+            -update packages list
+            repo -d /path/to/deb -p
+
+            -see documentation
+            perldoc repo
+
+            -see this help 
+            repo -h
+END_MESSAGE
+
+    print $help;
+}
+
+
+
+if(defined $switch{d}){
+    start();
+} elsif(defined $switch{h}){
+    usage();
+} elsif( defined $switch{s} ){
+    my $pids = ' ';
+    my @ps = grep{ /repo/ } qx{ ps aux };
+    for(@ps){
+        push my @pid, split(" ", $_);
+        if( $pid[10] eq $0 ){
+            $pids .= " $pid[1]" unless $pid[1] eq $$;
+        }
+    }
+
+    if($switch{s} eq 'top'){
+        system("kill -9 $pids");
+        say "killed $0: PID $pids";
+        exit;
+    }
+
+    if($switch{s} eq 'tatus'){
+        if($pids eq ' '){
+            say "$0: not running";
+        } else { say "$0 running: PID $pids" }
+    }
+}
+
+
+=head1 NAME
+
+repo - Creates list of Debian packages and starts APT repository on port 3000.
+
+=head1 DESCRIPTION 
+
+'repo' creates MD5, SHA1 and SHA256 hashes of each package in 'deb' directory, checks control file and use it to create Packages.gz file needed by APT client to read content of repository, then starts repository running on Mojolicious server ( port 3000 ).
+
+=head1 OPTIONS
+
+Pass full path to 'deb' directory containing Debian packages with -d parameter. Repo will generate 'Packages.gz' file in a same directory where 'deb' is located and will run in background. When deb direcroy content is changed use -r option to update packages list without need to restart repo.
+
+start:                  C<repo -d /path/to/deb>
+
+stop:                   C<repo -stop>
+
+status:                 C<repo -status>
+
+update packages list:   C<repo -d /path/to/deb -p>
+
+help:                   C<repo -h>
+
+=head1 AUTHOR
+
+Zdenek Bohunek E<lt>zed448@icloud.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2016 by Zdenek Bohunek
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,5 @@
+do{ my $x = {
+       'Bio-Gonzales-*' => 1,
+       'blib' => 1
+     };
+$x; }

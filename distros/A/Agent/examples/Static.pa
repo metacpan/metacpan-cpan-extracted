@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+##
+# The Static Agent - an example agent that hosts other agents.
+# Steve Purkis <spurkis@engsoc.carleton.ca>
+# March 24, 1998.
+##
+
+package Agent::Static;
+@ISA = qw( Agent );
+use Agent;	# redundant
+use Safe;
+
+
+##
+# Constructor:
+
+sub new {
+	my ($class, %args) = @_;
+	my $self = {};
+	foreach (keys(%args)) { $self->{"$_"} = $args{"$_"}; }
+	bless $self, $class;
+}
+
+
+##
+# agent_main - Main agent program.  Waits for incoming requests, and hosts
+#	any agents it recieves.  One might conceivably do a double fork()
+#	and run this in the background on UN*X machines.
+##
+sub agent_main {
+	my ($self, @args) = @_;
+
+	print "Starting Static agent.\n";
+
+	# first, get a Transport address:
+	my %args;
+	$args{Medium} = $self->{Medium} || 'TCP';
+	$args{Address} = $self->{Address} if $self->{Address};
+	my $tcp = new Agent::Transport( %args ) or die
+	   "Couldn't get a tcp transport address: $!!\n";
+	print "Got tcp address: " . $tcp->address . "\n";
+
+	print "Waiting for an agent...\n" if $self->{verbose};
+	while (1) {
+		my @msg = $self->getmsg($tcp) or next;
+		$self->host_agent(@msg);
+		print "Waiting for an agent...\n" if $self->{verbose};
+	}
+	print "Shuting down Static agent.\n";
+}
+
+
+##
+# getmsg - internal.  Waits for a incoming message, & returns it.
+
+sub getmsg {
+	my ($self, $trans) = @_;		# all agents & subs are oo
+	my $rmt = 'hi there!';
+	my ($from, @incoming) = $trans->recv( Timeout => 120, From => \$rmt) or return;
+	chomp $from;
+	unless (@incoming) {
+		warn "No data in message from $rmt!\n";
+		return;
+	}
+	my ($d, $addr, $med) = split(/\s+/, $from);
+
+	my @t = localtime(time);
+	my $time = "$t[2]\:$t[1]\:$t[0] $t[5]\-$t[4]\-$t[3]";
+	print "Message recv'd from '$from' ($rmt) at $time\n" if $self->{verbose};
+	print "Body:\n", @incoming, "\n" if $self->{verbose} > 1;
+	return @incoming;
+}
+
+
+##
+# host_agent - internal.  Executes an agent in the standard fashion.
+
+sub host_agent {
+	my $self = shift;
+	my $stored = join('', @_);
+	my (%args, $agent, $str);
+
+	$args{Stored} = $stored;
+	$args{Thread} = 1 if $self->{Thread};
+
+	$str .= ($self->{Thread})
+		   ? "Trying to execute agent asynchronously."
+		   : "Executing agent.";
+
+	if ($self->{Cpt}) {
+		$str .= " Using a Safe compartment.";
+		$args{Compartment} = new Safe();
+	}
+
+	print "$str\n" if $self->{verbose};
+	$agent = new Agent(%args) or return;
+
+	delete @args{'Stored', 'Compartment'};	# they only take up space now
+	$agent->run(%args);
+	($@)
+	   ? print "Error running Agent: $@.\n"
+	   : print "Finished running Agent.\n";
+}
+
+1;
+
+
+__END__
+
+=head1 NAME
+
+Agent::Static - an example static agent.
+
+=head1 SYNOPSIS
+
+use Agent;
+
+my $agent = new Agent( Name => 'Static', %args );
+$agent->run;
+
+=head1 DESCRIPTION
+
+The static agent remains local to one machine and acts as a host for other
+[transportable] agents.  It is an example of how one might recieve incoming
+agents in a distributed environment.
+
+The idea here is that a remote agent wishes to relocate to another host, and
+has packed itself up via the store() method.  The remote agent sends the
+static agent a message containing its store()'d self, which the static agent
+then unpacks and executes.
+
+=head1 PARAMETERS
+
+The following arguments may be passed when creating a new static agent:
+
+Address   =>  address to [attempt to] register
+Medium    =>  address medium
+Cpt       =>  use Safe compartments?
+Thread    =>  attempt to run agents in asynchronous threads
+verbose   =>  verbose
+
+All arguments are optional.  The static agent will try to register
+TCP / 127.0.0.1:24368 if no medium/address is passed.
+
+=head2 
+
+=head1 NOTES
+
+A static agent will accept messages of the form:
+
+	From: E<lt>addressE<gt> [E<lt>mediumE<gt>]
+	E<lt>stored perl agentE<gt>
+
+At the moment, as TCP is the only medium currently available, the
+E<lt>addressE<gt> and E<lt>mediumE<gt> are meaningless.
+
+=head1 SEE ALSO
+
+The other sample agents distributed with Agent Perl.
+
+=head1 AUTHOR
+
+Steve Purkis E<lt>F<spurkis@engsoc.carleton.ca>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1997, 1998 Steve Purkis.  All rights reserved.  This package
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=head1 THANKS
+
+The usual: perl5-agents people, most notably James Duncan.
+
+=cut
+

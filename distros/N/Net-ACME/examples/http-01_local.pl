@@ -10,7 +10,7 @@ use Net_ACME_Example ();
 
 Net_ACME_Example::do_example(
     sub {
-        my ( $domain, $cmb_ar, $key_jwk ) = @_;
+        my ( $domain, $cmb_ar, $reg ) = @_;
 
         return if @$cmb_ar > 1;
 
@@ -24,7 +24,7 @@ Net_ACME_Example::do_example(
 
         my $handler = $c->create_handler(
             $docroot,
-            $key_jwk,
+            $reg->key(),    #jwk
         );
 
         return $c;

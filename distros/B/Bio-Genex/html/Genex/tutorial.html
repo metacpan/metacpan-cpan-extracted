@@ -1,0 +1,166 @@
+<HTML><HEAD><TITLE>Genex Tutorial</TITLE>
+</HEAD><BODY>
+<H1>Tutorial for Genex.pm</H1>
+<P>This is an ever expanding tutorial on the use of the Genex.pm
+module. If you have suggestions for improving this content, please
+mail the author.
+</P>
+
+<H1>Overview</H1>
+
+<P>
+Genx is distributed with an Application Programmer's Interface (API)
+written in Perl and distributed under the perl package, Genex.pm. The
+API was built with a one class per table approach, so that each table
+in the database (DB) is represented by a single perl class in the
+'Genex' namespace (listed in table 1). A large subset of the classes
+represent the Genex controlled vocabulary tables--each of which
+regulates the accepted values of a single column for a single table
+(listed in table 2).  Lastly, there are three utility modules (listed
+in table 3) for help with common data access and data conversion
+tasks.
+</P>
+<P>
+A common task would be to investigate the data in a single row in a DB
+table, for example the ExperimentSet table. To accomplish this we
+would create a Bio::Genex::ExperimentSet instance and set it's 'id'
+attribute to the value desired:
+<P>
+
+<PRE>
+$exp_set =  Bio::Genex::ExperimentSet->new(id=>$pkey); 
+</PRE>
+
+<P>
+Now that we have the object we can access the data stored in that row
+of the DB by simply using accessor methods on the object. Each method
+has the same name as the DB column it accesses:
+</P>
+<PRE>
+$bio_desc = $exp_set->biology_description();
+$rel_date = $exp_set->release_date();
+</PRE>
+<P>
+For situtations were it is necessary to fetch multiple rows from the
+DB, each class provides a get_object() method that can be utilized in
+three modes: 1) passing a list of primary key values to fetch; 2)
+passing the keyword 'ALL', to retrieve all entries from the table, and
+3) specifying a column and value to use for restricting the objects:
+</P>
+<PRE>
+@exp_sets1 = Bio::Genex::ExperimentSet->get_objects(4,7,21); 
+@exp_sets2 = Bio::Genex::ExperimentSet->get_objects('ALL'); 
+@exp_sets3 = Bio::Genex::ExperimentSet->get_objects({column=>'is_public',
+                                                value=>1}); 
+</PRE>
+
+<H2>More Complex Queries</H2>
+<P>
+This interface works well for simple DB queries, but many applications
+need access to a richer set of DB commands. Genex is designed so that
+it can be implemented on top of many different database management
+systems (DBMSs). So far it has been tested on Sybase and
+PostgreSQL. One problem with this approach is the heterogenious nature
+of the Structured Query Lanquage (SQL) accross differrent DBMSs. To
+handle this problem, a simple SQL wrapper layer is provided by the
+Bio::Genex::DBUtils module for creating SQL for DB inserts and selects:
+</P>
+<PRE>
+$dbh = Bio::Genex::current_connection(); # get a DB handle
+$sql = create_insert_sql($dbh,
+                         TABLE=>'Contact',
+                         COLUMNS=>['contact_person','url']);
+$sth = $dbh->prepare($sql);
+$sth->execute('Patrick O. Brown','http://www.stanford.edu/')
+
+$sql = create_select_sql($dbh,
+                         COLUMNS=>['name'],
+                         FROM=>['ArrayMeasurement'],
+                         WHERE=>"am_pk = 34");
+@arrays = $dbh->selectall_array($sql);
+</PRE>
+<P>
+The Bio::Genex::current_connection() function provides a cached DB handle
+to the default Genex DB that was specified during installation. This
+makes it simple to change the location and name of the DB and not have
+to modify any of the applications built to access it.
+</P>
+
+<H2>Writing Output as XML or HTML</H2>
+<P>
+One of the primary uses of the Genex DB is as a data repository that
+users around the world can use to retrieve information. We have
+written an XML based exchanged format, the Genex Expression Markup
+Language (GEML), as the medium of data transmission. To facilitate
+data input and output from XML, we have included an XMLUtils module.
+</P>
+<P>
+Another important use is to display the contents of data in the DB to
+the users, and since the WWW browser has become the de facto standard
+for information retrieval and browsing we have included an HTMLUtils
+module to render Genex objects as HTML.
+</P>
+
+<H2>CGI Example</H2>
+<P>
+To provide a final concrete example for using the Genex modules we
+will build a simple perl CGI script that will enable browsing of any
+DB table, displaying either a single entry from a table or all
+entries:
+</P>
+<PRE>
+use Bio::Genex;
+use Bio::Genex::HTMLUtils qw(objs2html);
+
+# start a DB connection
+$dbh = Bio::Genex::current_connection();
+
+# start the HTML page and get the DB accession number from the script
+$query = new CGI;
+$pkey = param('AccessionNumber');
+$table = param('Table');
+
+# start the output
+print $query->header, $query->h2("$table Entries Retrieved from GeneX");
+print $query->p("Your query returned " . scalar @objects . " $table entries");
+
+# import the namespace for this class, and retrieve the objects
+$class = 'Bio::Genex::' . $table;
+eval "require $class";
+if ($pkey eq 'ALL') {
+  push(@objects, $class->get_objects('ALL'));
+} else {
+  push(@objects, $class->new(id=>$pkey));
+}
+
+# make the table, and end the page
+$html = objs2table(HEADER=>1,CGI=>$query,OBJECTS=>\@objects);
+print $query->table({-border=>''},$html), $query->end_html;
+</PRE>
+<P>
+An example of the output of this script is shown in Figure 1.
+</P>
+
+<HR>
+<IMG SRC="exp_set_tab.gif" ALT="genex screen shot">
+<P ALIGN="CENTER"><B>Figure 1.</B> Output of sample code</P>
+<HR>
+<H2>More Details</H2>
+<P>
+Each module has accompanying documentation in both Perl pod format
+(Plain Old Documentation) and HTML, as well as a general overview of
+the entire API, and a short tutorial for using the Genex classes. Each
+module also includes a set of automated regression tests which allows
+testing of the entire system before installation, which provide
+further details of how to use the Genex.pm API. See the main <A
+HREF="index.html">index</A> for more details.
+</P>
+
+<H3>Author and Copyright</H3>
+<P>
+This tutorial was written by Jason E. Stewart
+(<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>), and all the material
+is copyright &copy; 2000 the <A HREF="http://www.ncgr.org/">National
+Center for Genome Resources</A>.</P>
+
+</BODY></HTML>

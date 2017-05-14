@@ -1,0 +1,58 @@
+  JPERL Beta
+
+  PERL Access routines in Java
+
+  ---------------------------------------------------------------------
+  Copyright (c) 1998, S Balamurugan, Texas Instruments India.
+  All Rights Reserved.
+  ---------------------------------------------------------------------
+
+  Permission to  use, copy, modify, and  distribute this  software and
+  its documentation for  NON-COMMERCIAL  purposes and without fee   is
+  hereby granted provided that  this  copyright notice appears  in all
+  copies.  Please  refer LICENCE  for  further  important  copyright
+  and licensing information.
+
+  BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+  FOR  THE PROGRAM.  THE   PROGRAM IS  PROVIDED ON   AN "AS  IS" BASIS
+  WITHOUT  WARRANTY OF  ANY     KIND, EITHER EXPRESSED   OR   IMPLIED,
+  INCLUDING,  BUT   NOT   LIMITED  TO,   THE  IMPLIED   WARRANTIES  OF
+  MERCHANTABILITY AND FITNESS FOR  A PARTICULAR PURPOSE. THE AUTHOR OR
+  TEXAS INSTRUMENTS  SHALL NOT BE LIABLE FOR  ANY  DAMAGES SUFFERED BY
+  LICENSEE AS  A RESULT   OF  USING, MODIFYING OR   DISTRIBUTING  THIS
+  SOFTWARE OR ITS DERIVATIVES.
+
+  ---------------------------------------------------------------------
+
+
+  The package contains the following directories
+      cpp/       (directory containing cpp interface to perl)
+      java/      (directory containing java interface to perl)
+      bin/       (includes solaris version of libperl.so and jp.class)
+      c_examples (example c program accessing PERL
+      j_examples (example java program accessing PERL)
+
+
+  if you are planning to use PERL in JAVA, read README_java. 
+
+  if you are planning to use PERL in C, read README_c. Yeah, there are
+  Perl APIs which let you do this, but you need to know a lot of function
+  and macros to use the APIs. Besides stack manipulation, argument ordering,
+  ... are a problem. The cpp/ directory includes a simple and easy to use
+  interface. Just four function calls and you are set to go ...
+ 
+  The directories contain compile_<x> scripts that tell you how
+  to compile the example code and java native interface. A pre-compiled
+  solaris library is also available under bin/
+  
+  You need JDK 1.1.4, g++, Perl 5.002 or higher.
+
+  Support :
+
+  You can send me your bug reports, future enhancements etc., at 
+  sbm@india.ti.com. Or better still, make the enhancements and send me a 
+  copy. Support is not guaranteed though!
+
+  Author : S Balamurugan, Texas Instruments India.
+
+  Date   : 20/04/1998

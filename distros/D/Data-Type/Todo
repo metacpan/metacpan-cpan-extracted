@@ -1,53 +1,9 @@
 todo
 {
-	Write a Class::Maker extension for verifying if the attributes match its types (This can be done
-	with a flexible (reflex-inspecting) bouncer).
-}
-
-todo
-{
-	- Implement decision table for bouncer-like (bouncer is far too simple for the new possibilities)
-	scenarios. This can be done via Decision::Table after Data::Type::Guard gave us his opinion.
-}
-
-todo
-{
-	overify() / Data::Type::Guard should report which member failed
-}
-
-todo
-{
-	Filter::'s should also have delayed calls via AUTOLOAD like Type::
-}
-
-todo
-{
-	Add some localization. Like DE::PHONE which is Type::DE::phone etc.
-	
-	Should use Locale::Maketext
-}
-
-todo
-{
-	Pay a round of usefull ->usage information to the types.
-}
-
-todo
-{
-	Prepare api for casting of types. 
-	Suggestion: my $a_castedto_b = TYPE_A->cast( TYPE_B );
-}
-step
-{
-	added Type::UNIVERSAL::cast()
-}
-
-todo
-{
 	More types
-	
+
 use Business::ISSN qw( is_valid_checksum );
-        
+
   #verify the checksum
   if( is_valid_checksum('01234567') ) { ... }
 
@@ -65,7 +21,7 @@ is( $ismn->is_valid
 use Business::DE::Konto;
   my $konto = Business::DE::Konto->new(BLZ => 12345678, KONTO => 1234567890));
   $konto->check();
-  
+
 use Business::ISIN;
 
     my $isin = new Business::ISIN 'US459056DG91';
@@ -93,7 +49,7 @@ use Business::UPC;
 use Business::CINS;
   $cn = Business::CINS->new('035231AH2');
   print "Looks good.\n" if $cn->is_valid;
-  
+
 use Business::IBAN;
   use Locale::Country;
   my $cc = country2code('Germany');
@@ -131,26 +87,137 @@ use Business::IBAN;
 MARKUP( XML; HTML )
 SOURCE( Perl, Java etc. )
 }
+partial
+{
+        win32 compatibles are inserted, but MARKUP and SOURCE still missing.
+}
+partial
+{
+       XML added.
+}
 
 todo
 {
 	refactor names to terminus technicii from http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#datatype
 }
+done
+{
+	sufficiently done.
+}
+
+todo
+{
+	recognize new types via their VERSION in release.pl, so we could place them via templates
+}
+done
 
 bug
 {
-	Type::Exception's new isn't called when Failure::Type is thrown/created ?
+   dverify doesn't work, seee basic.t.
+
+   Somehow the try catch block isn't entered.
+}
+done
+{
+   was silly ';' missing after catch block ! This is a FOP (frequently occuring problem) with the
+   Error module syntax sugar. 
+   
+   todo
+   {
+	FOP should be included into the FAQ.
+   }
+   done
+
 }
 
-todo( DOCU )
+todo
 {
-	Write Tutorial/FAQ
-	  * 'How to add new types' or 'How to add my custom types'
-	  * How could i use D::T to assure valid function parameters
-	    - with Params::Validate
-		
-		  validate( @_, { foo => { type => REF( 'ARRAY' ) } );
+   HTML doesn't validate.
 
+   In future via HMTL::Tidy. But requires a Perl Wrapper copyright by Charles Reitzel.
+
+   Tidy available at http://tidy.sourceforge.net/
+}
+partial
+{
+	crashes on my system. commented out until someone comes with a better HTML validating module.
+	HTML::Validator looks a bit old to me.
+}
+partial
+{
+	HTML::Lint's Test::HTML::Lint seems to be the solution.
+}
+done
+
+todo
+{
+	- guard.t and typ.t test fail. Looks like a change in Class::Maker default handler return value
+	behaviour is the cause.
+}
+done
+{
+	fixed bug in Class::Maker after 0.05.17
+}
+
+todo
+{
+	Type::Exception's new isn't called when Failure::Type is thrown/created ?
+}
+partial
+{
+	But now the caller line is wrong. This should be fixed via Error::Depth modification.
+}
+partial
+{
+   no general remedy for that. Seems like the user has to set $Error::Depth.
+}
+
+todo
+{
+	Add DYNAMIC( 'soap://mytype.wsdl?p1=bla;p2=bli' ) type, which is just a proxy for a soap-service
+	propagated type testing.
+}
+
+todo(CONTRIBUTIONS)
+{
+     * This module is extendable, but this needs documenation and a good introduction.
+       + Tutorials / round trip (everyday problems)
+         - Validation of form data
+         - Validating class properties
+         - Database type verification
+     * HOWTO's
+      - Add custom datatype
+     * Publication
+      - Introductional article with the focus on perl.com and "the perl review"
+}
+
+todo
+{
+	_translate should really translate "back and forth" type pkgname <> imported name (respecting
+	export).
+}
+comment
+{
+	_translate renamed. Still uptodate?
+}
+
+todo
+{
+        Add new type
+                OS::PATH( 'UNIX|OSX|WIN' ) - a valid path string
+}
+comment
+{
+	with option mdircheck => 1|0 will try to create and remove
+	the directory in a temporary dir to see if it is really
+	creatable.
+}
+comment
+{
+	File::Spec->catfile( qw(dir file) ) returns dir/file, where the slash is automatically
+	the systems correct path separator. This could be used to get OS::PATH( 'CURRENT' ) working.
+
+	Also Path::Class should be helpfull then.
 }
 
 todo
@@ -160,12 +227,484 @@ todo
 
 todo
 {
-	recognize new types via their VERSION in release.pl, so we could place them via templates
+	overify() / Data::Type::Guard should report which member failed
+}
+
+todo
+{
+	Add some localization. Like DE::PHONE which is Type::DE::phone etc.
+
+	Should use Locale::Maketext
+}
+comment
+{
+	PHONE should be default lang, and PHONE::DE is explicit localized version.
+}
+partial
+{
+	<type>::DE is implemented
+}
+
+todo
+{
+	types ->info() should give usable info even we have no object instance, but
+	package names as $this.
+}
+done
+{
+	->desc()	static text
+	->info()	instance information
+	->doc()		extensive documentation  of the type
+	->usage() 	complete type invocation usage
+	->default()	default parameter list used instead of empty @_'s_
+}
+
+todo
+{
+	summary() is returning confusing describtion in DOMAIN, because
+	the test's ok( ) procedure is not linear. Dont know how to solve
+	that easily.
+}
+comment
+{
+	may be subst multiple regex with only one.
+}
+comment
+{
+	DOMAIN type regex matching should be stuffed in a facet (otherwise shitty summaries)
+}
+done
+{
+	Regexp::Common *again* had a excellent RFC regexp for that.
+}
+
+todo
+{
+	dverify/is wasnt creating any correct errors, but returned correctly
+	true or false.
+}
+done
+{
+	@Data::Type::err is holding the list of negative exceptions. 
+}
+
+MILESTONE( "W3C XML SCHEMA TYPES" )
+{ 
+	Now we have a CPAN RC.
+}
+reached
+
+todo
+{
+	Geneerate for each collection a new namespace instead of using everywhere Data::Type::Object::xxx, because
+	leads to name conflicts when different collection have the same package name.
 }
 done
 
 todo
 {
-	_translate should really translate "back and forth" type pkgname <> imported name (respecting
-	export).
+	Somehow detecting of failures in export names. This is the confusing output when codegen isnt generating the
+	proxy sub:
+
+	"====================================================================================================
+	Use of inherited AUTOLOAD for non-method Data::Type::VARCHAR() is deprecated at test.pl line 91, <DATA> line 4454.
+	Can't locate class method 'Data::Type::VARCHAR' via package 'Data::Type' at test.pl line 91"
+}
+
+todo
+{
+	add a C<Collection>-wide export prefix, so $Data::Type::Collection::W3C::export_prefix = 'W3C' would lead to
+        all type export names starting with "W3C::".
+}
+done
+
+todo
+{
+	add EMAIL( alias_for_at => qr/@|\sat\s|\(at\)|<at>/ ) option, so 'obfuscated' emails are detectable.
+}
+comment
+{
+	Not sure if this isnt just good for spam-dogs.
+}
+comment
+{
+	see Email::Valid::Loose etc.
+}
+
+todo
+{
+	Option to apply codefilter to translate
+      
+           my VARCHAR(80) $e, $e2, $ex;
+
+        to
+
+           typ VARCHAR(80), \( my $e, $e2, $ex );
+
+        for mimicing a "builtin" type support via the tie interface.
+}
+comment
+{
+	aware conflicts with "use types;"
+}
+comment
+{
+	contact Arthur bergman if C<Data::Type> could marry the C<types> pragma.
+}
+
+todo
+{
+	delayed loading of type dependencies (modules) first time the type is used.
+}
+comment
+{
+	There were this cut+autoload+eval modules on CPAN ?! Or use eval "use Module" unless $INC{Module};
+}
+done
+{
+	implemented simple lazy loading of modules
+}
+
+todo
+{
+	Api tests which use Class::Maker::Reflection to inspect packages
+	and validate if the abstract interface was correctly implemented.
+}
+
+todo
+{
+	Use Pod::Select Pod::XML to generate the pod documentation of datatype/filters as an xml resource.
+}
+
+todo
+{
+	Write an Data::Type->add( ) function which allows to easily add custom types.
+
+	->add( facets => qw(), interfaces => qw(), desc => , info => , usage => ...
+}
+
+todo
+{
+	Eliminate tricks flagged with "dirty"
+}
+
+todo(BUG)
+{
+	->test of datatypes requires invocation of facets via Data::Type::ok for correct summary generation. 
+
+	THIS MEANS: ALL ->test() DATATYPE METHODS MUST BE CLEANED FROM DIRECT C<throw Exception>. POSSIBLE
+	SOLUTION: EVERYTHING STUFFED IN FACETS:
+
+	OR ANY IDEA ? 
+}
+comment
+{
+	For now use of "private facets" is recommended.
+}
+
+todo(PRIO => 10)
+{
+	Extend Data::Type::IType with a 'exporter' method which des the namespace/name resolution and takes
+	the part of exporting (which is bulkly done by C<codegen()>).
+
+	NOTE This will fix the $Data::Type::Collection::*::prefix."ID" parts from C<export> method.
+}
+comment
+{	
+	DEFINITION Collection datatypes should implement its own interface.
+
+	Example
+
+		package Data::Type::Collection::Bio;
+
+		package Data::Type::ICBio;
+
+			our @ISA = qw(Data::Type::IType);
+			
+			sub prefix : method { 'BIO::' }
+		
+			sub exported : method
+			{
+				map { __PACKAGE__->prefix().$_ } $this->export;
+			}	
+
+		package Data::Type::Object::rna;
+
+			our @ISA = qw(Data::Type::ICBio);
+}
+
+todo
+{
+	Create a type for strong passwords with Data::Password or whatever.
+	
+Articles:
+	See http://www.microsoft.com/security/articles/password.asp.
+	See http://www.perlmonks.org/index.pl?node_id=278236
+	http://www.perlmonks.org/index.pl?node_id=278798
+
+Make sure you create a password that:
+
+	Is at least seven characters in length, and the longer the better. 
+	Includes upper and lower case letters, numerals, symbols 
+	Has at least one symbol character in the second through sixth position 
+	Has at least four different characters in your password (no repeats) 
+	Looks like a sequence of random letters and numbers 
+	
+Make sure you:
+
+	Don't use ANY PART of your logon name for your password 
+	Don't use any actual word or name in ANY language 
+	Don't use numbers in place of similar letters 
+	Don't reuse any portion of your old password 
+	Don't use consecutive letters or numbers like "abcdefg" or "234567" 
+	Don't use adjacent keys on your keyboard like "qwerty" 
+
+Usage:
+
+	SEC::PASSWD( minlength => 10, symbolchars => 1, diversity => 4, random => 1, ... )
+
+	SEC::PASSWD( strength => 'strong|medium|weak' );
+}
+comment
+{
+	use from CPAN Data::Password::BasicCheck. It looks good.
+}
+
+todo
+{
+	detected SSN::Validate on CPAN to be next candidate to be supported in this suite.
+}
+
+todo
+{
+	also Data::Types should be included. Well, we have a 'cast'able value type now.
+}
+
+todo
+{
+	fill all the desc(), info(), usage() etc with comprehensive docu. Then CPAN release.
+}
+
+todo
+{
+	CHEM::ATOM
+	
+	See CPAN Chemistry::Atom:
+
+@ELEMENTS = qw(
+    n
+    H                                                                   He
+    Li  Be                                          B   C   N   O   F   Ne
+    Na  Mg                                          Al  Si  P   S   Cl  Ar
+    K   Ca  Sc  Ti  V   Cr  Mn  Fe  Co  Ni  Cu  Zn  Ga  Ge  As  Se  Br  Kr
+    Rb  Sr  Y   Zr  Nb  Mo  Tc  Ru  Rh  Pd  Ag  Cd  In  Sn  Sb  Te  I   Xe
+);
+
+}
+done
+
+todo
+{
+	cite http://www.perlmonks.org/index.pl?node_id=295306
+}
+
+todo
+{
+	write GetOpt extension which adds Data::Type support to parameters.
+}
+
+todo
+{
+	Create Regexp::Box
+}
+done
+
+todo
+{
+	Put in some mechanism to prefix all datatype export names. So one could
+	define a generale namespace like
+
+	use Data::Type from => 't::';
+
+		die unless is t::STD::EMAIL;
+
+	[Note] For people scarring the the namespace pollution could conflict somewhere.
+
+		die unless is __STD::EMAIL;
+
+	[Note] Or maybe just a prefixed string like '__' or '~' ?
+}
+done
+{
+	See EXPORT / OPTIONS / MASTER PREFIX.
+}
+
+todo
+{
+	Integrate Email::Valid::Loose into STD::EMAIL.
+
+	  die unless is STD::EMAIL( loose => 1 );
+}
+
+todo
+{
+	->summary with emptry parameters dies without informative message. There must be a "default summary" which can be used within the documentation. 
+
+Check the capibility of ->choice and ->default for that.
+}
+done
+{
+	Not viable because the test procedure is dependant on parameters. Not alle procedures have a default parameter.
+}
+
+todo
+{
+
+	sub _test
+	{
+		my $this = shift;
+
+		Data::Type->filter( [ 'uc' ] );
+
+
+       sucks!
+
+       ----
+
+       Better add method
+
+	 sub filters ( return ( [ 'lc' ], [ 'strip', ' ' ] ) }
+
+        and then call via
+
+         Data::Type::OBject::Interfacet::test
+
+        to filter $Data::Type::val.
+
+       ---
+ 
+       Helps reflecting which filters are applied (automatically added to the docu).       	
+}
+done
+
+todo
+{
+	add <result> method which contains the 'parsing/extracting' results which
+        are for *free* because they are byproduct of the regex matching or whatever.
+
+	See L<Regexp::Common>.
+}
+comment
+{
+	Needs some clarification/definition in the ::RFC.
+}
+
+todo
+{
+  Documentaton:
+
+	* clean $scalar = bla() headers and change to 
+
+         =head function( )
+
+           $b = function();
+           @a = function(1);
+
+        style.
+
+  Complete
+
+	* Type/Docs/RFC.pod
+        - Type/Facet.pm
+        - Type/Field.pm
+        - Type/Filter.pm
+}
+partial
+{
+	still
+
+        - Type/Facet.pm
+        - Type/Field.pm
+        - Type/Filter.pm
+}
+partial
+{
+	still
+
+        - Type/Field.pm
+}
+
+todo
+{
+  shell> perldoc STD::VARCHAR
+
+        would be great but is very brute to namespaces etc.
+
+  shell> Data::Type::STD::VARCHAR
+
+  is better?
+
+  shell> perldoc Data::Type::Collection::Std;
+
+  is ok though?
+}
+
+todo(Data::Type::Docs::RFC)
+{
+	Methods all _private or not? _test is but others?
+}
+
+todo
+{
+  write test for L<Data::Type/summary()>.
+}
+
+todo
+{
+	allow aliases DB_VARCHAR instead of DB::VARCHAR.
+}
+partial
+{
+	But exports doesnt work now. 
+
+          sub DB::VARCHAR ...
+
+	is now 
+
+	  sub DB_VARCHAR
+   
+        [Note] in the first case we have 'export' for free. In the second case it now gets eval'ed within Data::Type:: and
+        DB_VARCHAR is accessible via Data::Type::DB_VARCHAR.
+
+	HMmmmmm..... ? Is this bad ?
+}
+partial
+{
+	No full blown control via the L<Data::Type/EXPORT/MASTER PREFIX> option.
+}
+
+todo
+{
+	Somewhat i would love to write
+
+	  $_ = cgi->param->{input};
+
+	  warn unless is( 'std.varchar.de', option1 => 1, option2 => 2, ... );
+
+	or 
+
+	  warn unless is( 'bio.dna', option1 => 1, option2 => 2, ... );
+
+	or 
+
+	  try 
+	  { 
+	    valid 'ATGC', 'bio.dna', option1 => 1, option2 => 2, ...; 
+	  }
+	  catch Error with 
+	  { 
+
+	  };
+
+        My gut says is less error prone and easier to read. Syntactic sugar is sometimes too annoying.
 }

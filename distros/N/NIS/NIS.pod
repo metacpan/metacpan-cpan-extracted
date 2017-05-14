@@ -1,0 +1,116 @@
+=head1 NAME
+
+Net::NIS - Interface to Sun's Network Information Service
+
+=head1 DESCRIPTION
+
+The Net::NIS interface comes in two parts.  The first part is the raw
+implementation of the NIS API.  The second is the object interface,
+described in L<Net::NIS::Table>.  This document describes the NIS API
+implementation.
+
+The NIS package implements all functions described in the L<ypclnt(3N)>
+manual page.
+
+The following commands have been implemented:
+
+=over 5
+
+=item yp_bind($domain)
+
+Bind the process to a NIS server for the domain $domain.  This
+function is rarely needed.  See L<yp_bind(3N)>.
+
+=item yp_unbind($domain)
+
+Unbind the process from the specified $domain.  This function is also
+rarely required.  See L<yp_unbind(3N)>.
+
+=item $domain = yp_get_default_domain()
+
+Return the host's local domain.  (The same as the L<domainname>
+program).  See L<yp_get_default_domain(3N)>.
+
+=item ($status, $value) = yp_match($domain, $map, $key)
+
+Return the $value for the given $key in the $map for the domain
+$domain.  The $key must be an exact match for an item in the map (I<i.e.>
+yp_match does no partial matching.  The $value is only valid if
+$status is equal to $YP_SUCCESS.
+
+=item ($status, $key, $value) = yp_first($domain, $map)
+
+Return the first key-value pair from $map in $domain.  As the NIS maps
+are stored in a DBM table, the order of the returned values is
+not obvious.
+
+=item ($status, $key, $value) = yp_next($domain, $map, $key)
+
+Return the next key-value pair from $map in $domain.  The $key must be
+provided from the previous L<yp_first> or L<yp_next>.  The
+L<yp_first>/L<yp_next> method is not recommended, as under some
+circumstances, entries can be skipped or returned twice.  L<yp_all> is
+a better interface to use.
+
+=item ($status, \%values) = yp_all($domain, $map)
+
+The L<yp_all> call returns an entire map in the %values associative
+array.
+
+=item ($status, $order) = yp_order($domain, $map)
+
+This function returns the order number for $domain.  Whatever that is.
+It mustn't be very important, since it's not implemented on NIS+
+servers running in "YP-compatibility mode".  I put it in for
+completeness.
+
+=item ($status, $name) = yp_master($domain, $map)
+
+Returns the machine name of the master server for a map.
+
+=item $error = yperr_string($status)
+
+Returns a string representation of the error code passed in $status.
+
+=item $status = ypprot_err($code)
+
+Translates a NIS name service protocol error code to a ypclnt layer
+error code.  Only used for the C version of L<yp_all>, and it is only
+implemented here for completeness.
+
+=back
+
+=head1 ERROR CODES
+
+The $status variable returned by the above functions can have one of
+the following values:
+
+  $Net::NIS::ERR_ACCESS		Access violation
+  $Net::NIS::ERR_BADARGS	Args to function are bad
+  $Net::NIS::ERR_BADDB		yp data base is bad
+  $Net::NIS::ERR_BUSY		Database is busy
+  $Net::NIS::ERR_DOMAIN		Can't bind to a server which serves this domain
+  $Net::NIS::ERR_KEY		No such key in map
+  $Net::NIS::ERR_MAP		No such map in server's domain
+  $Net::NIS::ERR_NODOM		Local domain name not set
+  $Net::NIS::ERR_PMAP		Can't communicate with portmapper
+  $Net::NIS::ERR_NOMORE		No more records in map database
+  $Net::NIS::ERR_RESRC		Local resource allocation failure
+  $Net::NIS::ERR_RPC		RPC failure
+  $Net::NIS::ERR_YPBIND		Can't communicate with ypbind
+  $Net::NIS::ERR_YPERR		Internal yp server or client interface error
+  $Net::NIS::ERR_YPSERV		Can't communicate with ypserv
+  $Net::NIS::ERR_VERS		YP version mismatch
+
+=head1 AUTHOR
+
+Copyright (c) 1995 Rik Harris (B<rik.harris@fulcrum.com.au>). All
+rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The Network Information Service (NIS) was formerly known as Sun Yellow
+Pages (YP). The functionality of the two remains the same; only the   
+name has changed.  The name Yellow Pages is a registered trademark in
+the United Kingdom of British Telecommunications plc, and may not be  
+used without permission.
+

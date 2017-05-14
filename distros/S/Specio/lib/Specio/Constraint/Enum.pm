@@ -3,7 +3,7 @@ package Specio::Constraint::Enum;
 use strict;
 use warnings;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use B ();
 use Role::Tiny::With;
@@ -87,7 +87,7 @@ Specio::Constraint::Enum - A class for constraints which require a string matchi
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,4 @@
+0.03      2012-02-22 00:17:05 Europe/London
+
+- Added minor POD fixes
+- Changed API to throw errors in the perspective of the caller

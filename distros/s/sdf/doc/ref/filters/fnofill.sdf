@@ -1,0 +1,49 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-May-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: nofill Filter
+
+H2: Interface
+
+!filter_interface "nofill"
+
+H2: Description
+
+The {{nofill}} filter is used to format a set of lines, i.e.
+lines are separated by newline characters.
+
+Note: The {{FILT:address}} filter
+may be a better choice that nofill in certain cases.
+Unlike nofill, address is mapped to ADDRESS tags when
+HTML is generated. (It's then up to the browser to decide
+how the address is formatted.)
+
+H2: Examples
+
+!block example; lang='sdf'
+!block nofill
+Mr I.M. Lucky
+B.Sc. (Computing)
+B.Fun. (Eating)
+!endblock
+!endblock
+
+The output is:
+
+!block nofill
+Mr I.M. Lucky
+B.Sc. (Computing)
+B.Fun. (Eating)
+!endblock
+
+#H2: Limitations & Future Directions

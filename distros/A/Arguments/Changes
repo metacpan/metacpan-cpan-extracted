@@ -1,0 +1,10 @@
+Revision history for Perl extension Arguments.
+
+0.02   Thu Oct  4 15:13:00 2001
+	- Proper error messages matching core messages.
+	- Updated all files.  Ready for CVS, then CPAN.
+	  Has documentation.  Needs tests.
+
+0.01  Thu Oct  4 15:02:36 2001
+	- original version; created by h2xs 1.21 with options
+		-AX -n Arguments

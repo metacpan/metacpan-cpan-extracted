@@ -1,0 +1,14 @@
+Test Start
+Calling .routine
+In routine; loop i = 1 .. 9
+In while i = 1
+In while i = 2
+In while i = 3
+In while i = 4
+In while i = 5
+In while i = 6
+In while i = 7
+In while i = 8
+In while i = 9
+End of loop/routine
+EOF

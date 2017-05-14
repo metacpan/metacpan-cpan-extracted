@@ -1,0 +1,113 @@
+Installing CORBA::MICO on win32 platforms                        2002/11/21
+=========================================
+
+This document describes how to perform a native win32 build (ie. not based
+on a Unix emulation layer like CYGWIN for example) of the CORBA::MICO Perl
+interface on win32 platforms.
+
+
+Requirements
+------------
+
+The installation procedure below has been tested using the following
+configuration:
+
+- Visual Studio 6.0 (SP5)
+- Mico 2.3.7 sources, compiled with the above
+- ActivePerl 5.6.1 Build 633
+- Windows 2000 Server (SP2)
+
+
+Of course your setup may differ, but generally you should keep the
+following in mind when attempting to build CORBA::MICO on win32:
+
+
+- When building stuff for Perl, it is definitely recommended to use
+  the same compiler environment that was used for building your Perl
+  distribution.  
+  For a binary Perl distribution like ActivePerl (from ActiveState) this
+  means using Microsoft's Visual Studio development suite.
+  
+  If you build Perl from sources using another compiler environment, you
+  will most probably have to modify the compiler/linker settings in the
+  CONFIG.win32 file, and perhaps the Makefile.PL itself.
+  
+  (Tell us the recipe if you succeed: http://corba-mico.sourceforge.net)
+  
+- You should compile MICO from its source distribution following the
+  procedure described in its README-WIN32 file, then leave the resulting
+  source-tree untouched until you've successfully finished building and
+  installing the CORBA::MICO Perl interface.
+  
+  This ensures that any required win32 MICO header files and libraries
+  will be available during compilation of CORBA::MICO.
+
+- Avoid spaces or any unusual characters in the directory paths that lead
+  to the Perl distribution or the MICO source tree. Use slashes '/', not
+  backslashes '\', when specifying paths in configuration parameters.
+
+Here we go:
+
+
+Installation
+------------
+
+The win32 build procedure for MICO Perl interface tries to stick as closely
+as possible to the general build procedure of most CPAN modules, ie. the
+same used for building CORBA::MICO on Unix systems.
+
+One difference however is guessing the location of MICO's header- and
+compiled library files, which are required for compiling CORBA::MICO.
+In contrast to Unix, there is no "standard" location for those files on
+win32 systems (like /lib, /usr/lib, /usr/include, etc.)
+
+Therefore you have to specify the location of your win32 build of MICO
+in a separate configuration file (CONFIG.win32)
+
+The procedure for installing CORBA::MICO on win32 platforms is as follows:
+
+
+1. Edit the CONFIG.win32 file and set MICOPREFIX to the root directory
+   of your MICO source hierarchy.
+   
+   For example:
+   
+        MICOPREFIX = c:/mico
+    
+   You normally shouldn't have to modify the other parameters (compiler &
+   linker flags) in the CONFIG.win32 file if you are using ActivePerl and
+   the Visual Studio C++ compiler environment.
+  
+  
+2. Then you proceed as usual:
+
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+   (Note: By the time of this writing, 'nmake test' is not implemented yet!)
+
+
+Internals
+---------
+
+Makefile.PL makes the following assumptions concerning MICO, when building
+the Perl interface for a win32 system:
+
+- The $MICOPREFIX/MakeVars.win32 file is used for determining the MICO
+  version. (On Unix, MICO's version is determined from the
+  $MICOPREFIX/lib/mico-setup.sh script, which can't be used in win32 as
+  it requires a Bourne-compatible shell)
+
+- During CORBA::MICO compilation MICO's header files are expected to be
+  located under $MICOPREFIX/include
+  
+- The MICO.dll has to be linked against the $MICOPREFIX/mico$VERSION.lib or
+  $MICOPREFIX/orb/mico$VERSION or $MICOPREFIX/lib/mico$VERSION.lib library
+
+
+
+Good luck!
+
+(Nico Mack - neckelatius@users.sourceforge.net)

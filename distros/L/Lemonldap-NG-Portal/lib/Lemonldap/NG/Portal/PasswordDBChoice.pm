@@ -9,7 +9,7 @@ use strict;
 use Lemonldap::NG::Portal::_Choice;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.1';
 
 ## @apmethod int passwordDBInit()
 # Does nothing

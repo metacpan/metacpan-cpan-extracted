@@ -1,0 +1,51 @@
+# $Id: README,v 1.1.1.1 2001/07/26 18:33:27 petef Exp $
+
+NAME
+    Mail::Verify - Utility to verify an email address
+
+SYNOPSIS
+        use Mail::Verify;
+
+DESCRIPTION
+    `Mail::Verify' provides a function CheckAddress function for verifying
+    email addresses. First the syntax of the email address is checked, then
+    it verifies that there is at least one valid MX server accepting email
+    for the domain. Using the Net::DNS manpage and the IO::Socket manpage a
+    list of MX records (or, falling back on a hosts A record) are checked to
+    make sure at least one SMTP server is accepting connections.
+
+ERRORS
+    Here are a list of return codes and what they mean:
+
+    0
+    The email address appears to be valid.
+
+    1
+    No email address was supplied.
+
+    2
+    There is a syntaxical error in the email address.
+
+    3
+    There are no DNS entries for the host in question (no MX records or A
+    records).
+
+    4
+    There are no live SMTP servers accepting connections for this email
+    address.
+
+EXAMPLES
+    This example shows obtaining an email address from a form field and
+    verifying it.
+
+      use CGI qw/:standard/;
+      use Mail::Verify;
+      my $q = new CGI;
+      [...]
+      my $email = $q->param("emailaddr");
+      my $email_ck = Mail::Verify::CheckAddress( $email );
+      if( $email_ck ) {
+          print '<h1>Form input error: Invalid email address.</h1>';
+      }
+      [...]
+

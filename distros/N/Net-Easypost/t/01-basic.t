@@ -2,7 +2,6 @@
 
 use strict;
 use Test::More tests => 13;
-use Data::Dumper;
 
 use Net::Easypost;
 use Net::Easypost::Address;

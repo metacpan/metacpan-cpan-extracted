@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 8;
 use Template::Flute;
 
 package ObjectTest;
@@ -29,7 +29,7 @@ sub computed_value {
 
 package main;
 
-my ($spec, $html, $flute, $out, $obj, $list, $computed);
+my ($spec, $html, $flute, $out, $obj, $computed);
 
 $spec = q{<specification>
 <list name="list" iterator="test">
@@ -56,10 +56,6 @@ for my $value (0, 1, ' ', 'test') {
     );
 
     $out = $flute->process();
-
-    $list = $flute->template->list('list');
-
-    isa_ok($list, 'Template::Flute::List');
 
     ok ($out =~ m%<div class="value">$value</div>%,
         "basic list param test with: $value")

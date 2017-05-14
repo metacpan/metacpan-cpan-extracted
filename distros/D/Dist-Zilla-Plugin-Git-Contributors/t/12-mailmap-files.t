@@ -66,7 +66,7 @@ use GitSetup;
                                 include_releaser => 1,
                                 order_by => 'name',
                                 paths => [],
-                                'git --version' => ignore,
+                                git_version => ignore,
                             },
                         },
                         name => 'Git::Contributors',

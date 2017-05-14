@@ -31,7 +31,7 @@ To get Perl 5 module (MyApp, for example), just run the following command:
 
         plosurin.p5 -package MyApp < example.soy > MyApp.pm
 
-Use template in your Perl 5 programm:
+Use template in your Perl 5 program:
 
         use MyApp;
         print &MyApp::mytest_Hello();
@@ -192,7 +192,7 @@ package Plosurin;
 use strict;
 use warnings;
 use v5.10;
-our $VERSION = '0.1';
+our $VERSION = '0.1.2';
 use Regexp::Grammars;
 use Plosurin::Grammar;
 use Plosurin::Context;

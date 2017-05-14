@@ -1,5 +1,5 @@
 use strict;
-use inc::Module::Install 0.46;
+use inc::Module::Install;
 name 'IP-QQWry';
 all_from 'lib/IP/QQWry.pm';
 requires version => 0;

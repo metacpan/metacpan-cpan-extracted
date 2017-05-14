@@ -1,8 +1,16 @@
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(../lib uni .);
-    require "case.pl";
+    unless (defined &DynaLoader::boot_DynaLoader) {
+      print("1..0 # miniperl: no Unicode::Normalize");
+      exit(0);
+    }
+    require "uni/case.pl";
 }
 
-casetest("Title", \%utf8::ToSpecTitle, sub { ucfirst $_[0] },
-	 sub { my $a = ""; ucfirst ($_[0] . $a) });
+use feature 'unicode_strings';
+
+casetest(0, # No extra tests run here,
+	"Titlecase_Mapping",
+        ucfirst                        => sub { ucfirst $_[0] },
+	ucfirst_with_appended_null_arg => sub { my $a = ""; ucfirst ($_[0] . $a) }
+       );

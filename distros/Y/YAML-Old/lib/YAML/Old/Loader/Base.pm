@@ -3,6 +3,7 @@ package YAML::Old::Loader::Base;
 use YAML::Old::Mo;
 
 has load_code     => default => sub {0};
+has preserve      => default => sub {0};
 has stream        => default => sub {''};
 has document      => default => sub {0};
 has line          => default => sub {0};
@@ -19,11 +20,14 @@ has indent        => default => sub {0};
 has major_version => default => sub {0};
 has minor_version => default => sub {0};
 has inline        => default => sub {''};
+has numify        => default => sub {0};
 
 sub set_global_options {
     my $self = shift;
     $self->load_code($YAML::LoadCode || $YAML::UseCode)
       if defined $YAML::LoadCode or defined $YAML::UseCode;
+    $self->preserve($YAML::Preserve) if defined $YAML::Preserve;
+    $self->numify($YAML::Numify) if defined $YAML::Numify;
 }
 
 sub load {

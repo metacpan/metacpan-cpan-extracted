@@ -1,26 +1,28 @@
 package DTL::Fast::Filter;
-use strict; use utf8; use warnings FATAL => 'all'; 
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Entity';
 
 use DTL::Fast::Template;
 
 sub new
 {
-    my( $proto, $parameter, %kwargs)  = @_;
-    
+    my ( $proto, $parameter, %kwargs) = @_;
+
     $proto = ref $proto || $proto;
-    
-    $kwargs{'parameter'} = $parameter // [];
-    
+
+    $kwargs{parameter} = $parameter // [ ];
+
     die $proto->get_parse_error("Parameter must be an ARRAY reference")
-        if ref $kwargs{'parameter'} ne 'ARRAY';
+        if (ref $kwargs{parameter} ne 'ARRAY');
 
     my $self = $proto->SUPER::new(%kwargs);
-    
+
     return $self->parse_parameters();
 }
 
-sub parse_parameters{return shift;}
+sub parse_parameters {return shift;}
 
 sub filter
 {

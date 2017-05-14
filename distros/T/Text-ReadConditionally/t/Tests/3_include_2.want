@@ -1,0 +1,22 @@
+Line 1
+Included: _LineNumber = 2
+Included: _FileName = t/Tests/3_include_2.inc
+Included: _IncludeDepth = 2
+Include something else
+Level 2 Inc
+Included: _LineNumber = 4
+Included: _FileName = t/Tests/3_include_2.1_inc
+Included: _IncludeDepth = 3
+allfiles = t/Tests/3_include_2.input:t/Tests/3_include_2.inc:t/Tests/3_include_2.1_inc
+allnumbers = 3:6:9
+Back again
+Included: _LineNumber = 8
+Included: _FileName = t/Tests/3_include_2.inc
+Included: _IncludeDepth = 2
+allfiles = t/Tests/3_include_2.input:t/Tests/3_include_2.inc
+allnumbers = 3:11
+
+Back to top level file
+allfiles = t/Tests/3_include_2.input
+allnumbers = 6
+Line end

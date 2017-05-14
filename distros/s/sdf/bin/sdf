@@ -1,0 +1,603 @@
+#!/usr/local/bin/perl
+# $Id$
+$VERSION{'PUBLIC'} = '2.001beta1';
+$VERSION{''.__FILE__} = '$Revision$';
+#
+# >>Title::     SDF Conversion Utility
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{CMD:sdf}} converts [[SDF]] files to other document formats.
+#
+# >>Description::
+# !SDF_OPT_STD
+#
+# The -2 option is a convenient way of specifying the alias (collection
+# of options) which generates the output you want. e.g.
+#
+# V:     sdf -2html abc
+#
+# is equivalent to:
+#
+# V:     sdf +sdf2html abc
+#
+# The -D option is used to define variables. These are typically
+# used for controlling conditional text and substituting text which
+# changes. The format used is:
+#
+# V: -Dvariable1=value1,variable2=value2
+#
+# A flag is a shorthand way of specifying variables in the DOC family.
+# i.e. -ftoc=3 is equivalent to -DDOC_TOC=3.
+# The format of the -f option is:
+#
+# V: -fflag1=value1,flag2=value2
+#
+# If a variable or flag is specified without a value, 1 is assumed.
+#
+# To generate [[HTML]] topics, the command is:
+#
+# V:     sdf -2topics abc
+#
+# By default, this will create sub-topics for each heading already in a
+# separate file. It will also {{autosplit}} level 1 headings into sub-topics.
+# The -n option can be used to control which level headings are split at:
+#
+# * 1 autosplits on level 1 headings (the default)
+# * 2 autosplits on level 2 headings
+# * 3 autosplits on level 3 headings
+# * 0 disables autosplitting.
+#
+# Include files are searched for in the current directory,
+# then in the directories given by the -I option,
+# then in the default library directory.
+#
+# By default, {{CMD:sdf}} is configured to {{prefilter}} files with
+# certain extensions. For example:
+#
+# V: sdf mytable.tbl
+#
+# is equivalent to executing {{CMD:sdf}} on a file which only contains:
+#
+# V: !include "mytable.pl"; table
+#
+# The -p option can be used to explicitly prefilter files or to
+# override the default prefilter used. The -a option can be used
+# to specify prefilter parameters. For example:
+#
+# V: sdf -aformat='15,75,10' mytable.tbl
+#
+# The -P option prefilters the input files as programming languages.
+# The parameter is the language to use. If none is provided, the
+# extension is assumed to be the language name. For example:
+#
+# V: sdf -P myapp.c
+#
+# is equivalent to executing {{CMD:sdf}} on a file which only contains:
+#
+# V: !include "myapp.c"; example; wide; lang='c'
+#
+# The -N option adds line numbers at the frequency given.
+# The default fequency is 1. i.e. every line.
+#
+# The -r option pre-filters each input by running the nominated report.
+# Reports are stored in {{sdr}} files and are searched for using the
+# usual rules.
+#
+# The -L option can be used to specify a {{locale}}.
+# The default locale name is specified in F<sdf.ini>.
+# Locale naming follows POSIX conventions (i.e. language_country), so
+# the locale name for American english is {{en_us}}.
+# The information for each locale is stored in the F<locale> directory,
+# so you'll need to have to look in there to see what locales are
+# available. (As the default locale can be set in F<sdf.ini>, this
+# isn't as ugly as it first sounds.)
+# 
+# Note: At the moment, a locale file simply contains a list of language
+# specific strings. Ultimately, it should be extended to
+# support localisation of date and time formats.
+#
+# The -k option is used to specify a {{look}}.
+# The default look library is specified in {{FILE:sdf.ini}}.
+#
+# The -s option can be used to specify a document {{style}}.
+# Typical values are:
+#
+# * {{document}} - a technical document
+# * {{memo}} - a memo
+# * {{fax}} - a facsimile
+# * {{minutes}} - minutes of a meeting.
+#
+# The -S option is used to specify the page size.
+# Values supported include:
+#
+# !block table
+# Name    Width   Height  Comment
+# global  21.0cm  11.0in  will fit on either A4 or letter
+# A3      29.7cm  42.0cm 
+# A4      21.0cm  29.7cm
+# A5      14.8cm  21.0cm
+# B4      25.7cm  36.4cm
+# B5      17.6cm  25.0cm
+# letter  8.5in   11.0in
+# legal   8.5in   14.0in
+# tabloid 11.0in  17.0in
+# !endblock
+# 
+# Additional page sizes can be configured in {{FILE:sdf.ini}}.
+# To specify a rotated version of a named page size, append an {{R}}.
+# For example, A4R implies a width of 29.7cm and a height of 21cm.
+# A custom page size can also be specified using the format:
+#
+# V:     {{width}}x{{height}}
+#
+# where {{width}} and {{height}} are the respective sizes in points.
+#
+# The -c option is used to specify a configuration library.
+#
+# A list of modules to use can be specified via the -u option.
+#
+# The initial heading level to start on can be specified via
+# the -H option. If is useful if you want to preview how a
+# topic will be displayed without regenerating the complete
+# document.
+#
+# The -d option is used to specify the format driver.
+# Values supported include:
+# 
+# * {{expand}} - format as expanded text (the default)
+# * {{mif}} - Maker Interchange Format
+# * {{pod}} - Plain Old Documentation (as used by [[Perl]]).
+#
+# Additional drivers can be configured in {{FILE:sdf.ini}}.
+#
+# The -y option can to used to specify a post-filter.
+#
+# The -z option can be used to specify a list of post-processing
+# actions you want to execute on each output file after it is
+# generated. The actions supported include:
+#
+# * {{ps}} - generate PostScript
+# * {{doc}} - generate a Frame (binary) file
+# * {{fvo}} - generate a Frame View-Only file
+# * {{txt}} - generate a text file
+# * {{rtf}} - generate an RTF file
+# * {{clean}} - delete the output file (must be last).
+#
+# Additional actions can be configured in {{FILE:sdf.ini}}.
+# By convention, the generated files are given the same names
+# as the action keywords.
+#
+# The -t option is used to specify the logical target format.
+# If none is specified, the default is the first post processing
+# action, if any. Otherwise, the default is the format driver name.
+#
+# The -v option enables verbose mode. This is useful for debugging
+# problems related to post processing. In particular, post processing
+# actions containing the pattern {{clean}} are skipped in verbose mode.
+# You can also switch off the post processing messages by using a
+# verbose value of -1. Values higher than 1 switch on additional
+# trace messages as follows:
+#
+# . 2 - show how names of files and libraries are resolved
+# . 3 - show the directories searched for libraries
+# . 4 - show the directories searched for modules
+# . 5 - show the directories searched for normal files.
+#
+# The -T option can be used to switch on
+# debug tracing. The parameter is a comma-separated list of name-value
+# pairs where each name is a {{tracing group}} and each value is the
+# level of tracing for that group. To get the trace output provided
+# by the -v option, one can use the {{user}} group like this:
+#
+# >  sdf -Tuser=2 ...
+#
+# This is slightly different from the -v option in that intermediate
+# files are not implicitly kept. Additional tracing groups will be
+# added over time (probably one per output driver).
+#
+# The -w option is used to specify the width for text-based outputs.
+#
+# The -z, -D, -f and -I options are list options. i.e. multiple values
+# can be separated by commas and/or the options can be supplied
+# multiple times.
+#
+# >>Examples::
+# 
+# Convert {{FILE:mydoc.sdf}} to a technical document in mif format,
+# output is {{FILE:mydoc.mif}}:
+# 
+# V: sdf -2mif mydoc.sdf
+# 
+# Convert {{FILE:mydoc.sdf}} to online documentation in {{PRD:FrameViewer}}
+# format, output is {{FILE:mydoc.fvo}}:
+#
+# V: sdf -2fvo mydoc.sdf
+# 
+# Convert {{FILE:mydoc.sdf}} to online documentation in HTML,
+# output is {{FILE:mydoc.html}}:
+#
+# V: sdf -2html mydoc.sdf
+# 
+# The following command will build the reference documentation
+# for a SDF module in HTML:
+#
+# V: sdf -2html abc.sdm
+#
+# >>Limitations::
+# Many of the default post processing (-z) actions only works on [[Unix]] as
+# [[FrameMaker]] for [[Windows]] does not support batch conversion.
+#
+# Topics mode has several limitations:
+# * only documents in the current directory can be converted
+# * all sub-topics must also be in the current directory.
+#
+# >>Resources::
+#
+# >>Implementation::
+#
+
+require "sdf/app.pl";
+require "sdf/parse.pl";
+
+########## Initialisation ##########
+
+# define configuration
+%app_config = (
+    'inifile',  'sdf.ini',
+    'libdir',   'sdf/home',
+);
+
+# Table of format mappings
+%format_mappings = ();
+
+# routine for handling the 2 option
+sub MyToAlias {
+    local($arg) = @_;
+
+    my $alias = $format_mappings{$arg} || $arg;
+    &AppMsg("app", "formatting using '$alias'") if $verbose;
+    unshift(@ARGV, "+sdf2$alias");
+}
+
+# define options
+push(@app_option, (
+    #'Name|Spec|Help',
+    'format;2|ROUTINE-MyToAlias;|the output format you want',
+    'variable;D|STRHASH|define variables',
+    'split_level;n|INT|heading level to autosplit into topics',
+    'flag|STRHASH|define flags (i.e. DOC_* variables)',
+    'include_path;I|STRLIST|search path for include files, templates, etc.',
+    'prefilter|STR|pre-filter input file from each argument',
+    'parameters;a|STR|parameters for the pre-filter',
+    'plang;P|STR;;-|pre-filter as a programming language',
+    'line_numbers;N|INT;;1|number lines in pretty-printed source code',
+    'report|STR|report to pre-filter the input with',
+    'locale;L|STR|locale',
+    'look;k|STR|look library',
+    'style|STR|style of document',
+    'page_size;S|STR|page size for paper documents',
+    'config|STR|configuration library',
+    'uses|STRLIST|modules to use',
+    'head_level;H|INT|initial heading level',
+    'driver|STR;expand|format driver - default is expand',
+    'post_filter;y|STR|filter to post-filter the output with',
+    'post_process;z|STRLIST|list of post processing actions to do',
+    'target|STR|logical target format',
+    'verbose|INT;;1|verbose mode',
+    'trace_levels;T|STRHASH|debugging trace levels',
+    'width|INT|width for text-based outputs',
+    'library_path;Y|STRLIST|search path for libraries',
+));
+
+# configuration tables
+%prefilter_for = ();
+%post_processing = ();
+%predefined_vars = ();
+
+# ini-file handler
+sub iniProcess {
+    local($fname, *data) = @_;
+#   local();
+    local($section, @pagesizes, @prefilters, @drivers, @conversions);
+
+    for $section (sort keys %data) {
+        if ($section eq 'Frame') {
+            %values = &AppSectionValues($data{$section});
+            $sdf_fmext = $values{'fm_ext'};
+            delete $data{$section};
+        }
+        elsif ($section eq 'PageSizes') {
+            @pagesizes = &TableParse(split(/\n/, $data{$section}));
+            &SdfLoadPageSizes(@pagesizes);
+            delete $data{$section};
+        }
+        elsif ($section eq 'PreFilters') {
+            @prefilters = &TableParse(split(/\n/, $data{$section}));
+            &LoadPreFilters(@prefilters);
+            delete $data{$section};
+        }
+        elsif ($section eq 'Drivers') {
+            @drivers = &TableParse(split(/\n/, $data{$section}));
+            &SdfLoadDrivers(@drivers);
+            delete $data{$section};
+        }
+        elsif ($section eq 'PostProcessing') {
+            %post_processing = &AppSectionValues($data{$section});
+            delete $data{$section};
+        }
+        elsif ($section eq 'Variables') {
+            %predefined_vars = &AppSectionValues($data{$section});
+            delete $data{$section};
+        }
+        elsif ($section eq 'FormatMappings') {
+            %format_mappings = &AppSectionValues($data{$section});
+            delete $data{$section};
+        }
+        elsif ($section eq 'Conversions') {
+            @conversions = &TableParse(split(/\n/, $data{$section}));
+            &NameLoadConversionRules(*conversions, $verbose);
+            delete $data{$section};
+        }
+    }
+}
+
+# Prefilter validation rules
+@_PREFILTER_RULES = &TableParse(
+    'Field      Category',
+    'Name       key',
+    'Aliases    optional',
+);
+
+# This routine loads the prefilters
+sub LoadPreFilters {
+    local(@data) = @_;
+#   local();
+    local(@fld, $rec, %value);
+    local($name, $alias);
+
+    # Validate the table
+    &TableValidate(*data, *_PREFILTER_RULES);
+
+    # Process the prefilter table
+    @fld = &TableFields(shift(@data));
+    for $rec (@data) {
+        %value = &TableRecSplit(*fld, $rec);
+        $name = $value{'Name'};
+        $prefilter_for{$name} = $name;
+        for $alias (split(/,/, $value{'Aliases'})) {
+            $prefilter_for{$alias} = $name;
+        }
+    }
+}
+
+# handle options
+&AppInit('sdf_file ...', 'convert an sdf file to another format', 'SDF',
+  'iniProcess') || &AppExit();
+
+# Initialise the tracing levels
+%app_trace_level = %trace_levels;
+$app_trace_level{"user"} = $verbose if $verbose > $app_trace_level{"user"};
+
+# Initialise the SDF module to use the correct search paths
+@sdf_include_path = @include_path;
+@sdf_library_path = @library_path;
+$sdf_lib = $app_lib_dir;
+
+# Check the page size is defined or in the form width"x"height
+if ($page_size ne '') {
+    unless ($sdf_pagesize{$page_size} || $page_size =~ /^[\d\.]+x[\d\.]+$/) {
+        &AppExit("fatal", "page size '$page_size' not supported.");
+    }
+}
+
+# Check the format driver is defined
+unless ($sdf_driver{$driver}) {
+    &AppExit("fatal", "format driver '$driver' not supported.");
+}
+
+# Check the post processing actions are configured and define the
+# matching variables
+for $action (@post_process) {
+    unless ($post_processing{$action}) {
+        &AppExit("fatal", "post-processing '$action' not supported.");
+    }
+    $name = $action;
+    $name =~ tr/a-z/A-Z/;
+    $variable{"OPT_PP_$name"} = 1;
+}
+
+# Assign a default logical target, if necessary
+if ($target eq '') {
+    $target = @post_process ? $post_process[0] : $driver;
+}
+
+# Make the predefined variables
+for $var (keys %predefined_vars) {
+    $variable{$var} = $predefined_vars{$var};
+}
+
+# Map flags to variables
+while (($flag, $value) = each %flag) {
+    $flag =~ tr/a-z/A-Z/;
+    $flag = "DOC_$flag";
+    $variable{$flag} = $value unless defined $variable{$flag};
+}
+
+# When pretty-printing programming languages, 'listing' is the style used
+$style = 'listing' if $plang ne '';
+
+# Map the key configuration options to variables
+$variable{'OPT_LOCALE'} = ($locale eq '.' ? '' : $locale) if $locale ne '';
+$variable{'OPT_LOOK'} = ($look eq '.' ? '' : $look) if $look ne '';
+$variable{'OPT_STYLE'} = ($style eq '.' ? '' : $style) if $style ne '';
+$variable{'OPT_CONFIG'} = $config;
+$variable{'OPT_DRIVER'} = $driver;
+$variable{'OPT_TARGET'} = $target;
+$variable{'OPT_EXT'} = $out_ext;
+$variable{'OPT_NUMBER'} = $line_numbers;
+$variable{'OPT_REPORT'} = $report;
+$variable{'OPT_SPLIT_LEVEL'} = $split_level;
+$variable{'OPT_HEAD_LEVEL'} = $head_level;
+$variable{'OPT_PAGE_SIZE'} = $page_size if $page_size ne '';
+$variable{'OPT_WIDTH'} = $width if $width ne '';
+
+# Map other interesting things to variables. Note that we let the
+# user override these things on the command line if they want to.
+$variable{'SDF_VERSION'} = $app_product_version unless $variable{'SDF_VERSION'};
+$variable{'SDF_HOME'}    = $app_lib_dir         unless $variable{'SDF_HOME'};
+
+# When regression testing, make sure that version changes don't cause problems
+if ($variable{'SDF_TEST'}) {
+    $variable{'SDF_VERSION'} = 'x.y';
+}
+
+# When testing, '.' can be used to clear the look and/or style
+$look  = '' if $look  eq '.';
+$style = '' if $style eq '.';
+
+########## Argument Processing ##########
+
+sub argProcess {
+    local($ARGV) = @_;
+    local($main_arg_err);
+    local($msg_cursor, %msg_counts);
+    local($new, @new);
+
+    # If no output is nominated but post-processing is requested,
+    # just do the post processing on the input files
+    return 0 if @post_process && $out_ext eq '';
+
+    # Get the current message cursor
+    $msg_cursor = &AppMsgNextIndex();
+
+    # Generate result
+    @new = &GenerateDocument($ARGV);
+
+    # Check for problems
+    %msg_counts = &AppMsgCounts($msg_cursor);
+    if ($msg_counts{'error'} ||
+        $msg_counts{'abort'} ||
+        $msg_counts{'fatal'} ) {
+        return 1;
+    }
+
+    # Output result
+    for $new (@new) {
+        print "$new\n";
+    }
+    return 0;
+}
+
+# This routine generates a document
+sub GenerateDocument {
+    local($ARGV) = @_;
+    local(@new);
+    local($file_ext);
+    local($filter, $module);
+    local($lang);
+    local($input_str);
+    local($ok_sdf, @sdf_data);
+
+    # Read SDF file or generate using build information
+    $file_ext = (&NameSplit($ARGV))[2];
+    $filter = $prefilter ne '' ? $prefilter : $prefilter_for{$file_ext};
+    if ($plang ne '') {
+        $lang = $plang eq '-' ? $file_ext : $plang;
+        @sdf_data = (
+            "!_bof_ '$ARGV'",
+            "!include '$ARGV'; example; wide; pure; lang='$lang'",
+            "!_eof_");
+        $sdf_data[1] .= "; $parameters" if $parameters ne '';
+    }
+    elsif ($filter ne '') {
+
+        # When prefiltering pod, assume the main parameter
+        if ($filter eq 'pod') {
+            $filter .= "; main";
+        }
+
+        $filter .= "; $parameters" if $parameters ne '';
+        @sdf_data = ("!_bof_ '$ARGV'");
+        push(@sdf_data, "!include '$ARGV'; $filter", "!_eof_");
+    }
+    else {
+        ($ok_sdf, @sdf_data) = &SdfFetch($ARGV);
+        unless ($ok_sdf) {
+            &AppMsg('abort', "error fetching sdf file '$ARGV'");
+            return ();
+        }
+    }
+
+    # Generate and return the required format
+    @new = &SdfConvert(*sdf_data, $driver, *uses, %variable);
+
+    # Post filter the output, if requested
+    if ($post_filter ne '') {
+        &AppMsg("object", "'$post_filter' post filtering...") if $verbose >= 0;
+        require "sdf/post_$post_filter.pl";
+        $fn = $post_filter . "_PostFilter";
+        @new = eval {&$fn(*new)};
+        &AppMsg('failed', $@) if $@;
+    }
+
+    # Return result
+    return @new;
+}
+
+# This is called AFTER output streams have been closed for each argument
+sub argPostProcess {
+    local($ARGV, $main_arg_err) = @_;
+#   local();
+    local($action);
+
+    # If an error occurred in the main processing routine or there
+    # is nothing to do, just return
+    return if $main_arg_err || scalar(@post_process) == 0;
+
+    # Ensure the necessary variables are exported to the 'user' package
+    # Note: If post-processing is the only thing requested, the output
+    # extension is taken from the input filename
+    $SDF_USER'short = (&NameSplit($ARGV))[1];
+    $SDF_USER'out_ext = $out_ext eq '' ? (&NameSplit($ARGV))[2] : $out_ext;
+    $SDF_USER'width = $SDF_USER'var{'OPT_WIDTH'};
+    $SDF_USER'title = $SDF_USER'var{'DOC_TITLE'};
+    $SDF_USER'title =~ s/['\\]/\\$&/g;
+    $SDF_USER'project = $SDF_USER'var{'DOC_PROJECT'};
+    $SDF_USER'project =~ s/['\\]/\\$&/g;
+    $SDF_USER'product = $SDF_USER'var{'DOC_PRODUCT'};
+    $SDF_USER'product =~ s/['\\]/\\$&/g;
+    $SDF_USER'section = $SDF_USER'var{'DOC_SECTION'} || 1;
+
+    # Do the post processing
+    for $action (@post_process) {
+        if (!defined($post_processing{$action})) {
+            &AppExit("failed", "unknown special command '$action'");
+        }
+        else {
+            next if $verbose && $action =~ /clean/;
+            &AppMsg("object", "'$action' post processing...") if $verbose >= 0;
+            package SDF_USER;
+            eval $'post_processing{$'action};
+            if ($@) {
+                &'AppMsg('abort', "error in '$action' post processing: $@");
+            }
+        }
+    }
+}
+# switch back to the main package
+package main;
+
+########## Main Program ##########
+
+&AppProcess('argProcess', 'argPostProcess', 'sdf');
+&AppExit();

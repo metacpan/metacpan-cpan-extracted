@@ -118,6 +118,7 @@ sub communication_error {
         host            => 'localhost',
         port            => $port,
         RETRY_BACKOFF   => $RETRY_BACKOFF * 2,
+        dont_load_supported_api_versions => 1,
     );
     $producer = Kafka::Producer->new(
         Connection  => $connect,
@@ -174,6 +175,7 @@ sub testing {
         host            => 'localhost',
         port            => $port,
         RETRY_BACKOFF   => $RETRY_BACKOFF * 2,
+        dont_load_supported_api_versions => 1,
     );
 
 #-- simple start
@@ -220,7 +222,7 @@ sub testing {
 
 # key
     send_ERROR_MISMATCH_ARGUMENT( $topic, $partition, 'Some value', $_ )
-        foreach @not_empty_string;
+        foreach grep { !( _ARRAY0( $_ ) && @$_ == 1 ) } @not_empty_string;
 
 # compression_codec
     send_ERROR_MISMATCH_ARGUMENT( $topic, $partition, 'Some value', 'Some key', $_ )

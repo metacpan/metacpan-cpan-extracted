@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="cml.xsl"?>
+<!DOCTYPE molecule SYSTEM "http://www.xml-cml.org/cml.dtd">
+<molecule id="91-22-5" convention="DictOrgChem">	
+  <float title="BoilingPoint" units="degrees Celsius">237.1</float>	
+  <float title="MeltingPoint" units="degrees Celsius">-14.9</float>        
+  <float title="Density" units="g/ml">1.098</float>        
+  <float title="DipoleMoment" units="Debeye">2.2</float>	  
+  <string title="Stoichiometry">C9H7N</string>      	  
+  <float title="MolecularWeight" units="g/mol">129.2</float>    
+</molecule>

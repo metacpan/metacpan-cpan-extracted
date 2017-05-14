@@ -4,7 +4,7 @@
       "TrackingSoft LLC <sgladkov@trackingsoft.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -43,9 +43,8 @@
             "Data::Validate::IP" : "0.24",
             "Exception::Class" : "1.37",
             "Exporter" : "5.62",
-            "IO::Compress::Gzip" : "2.008",
+            "Gzip::Faster" : "0.19",
             "IO::Select" : "1.17",
-            "IO::Uncompress::Gunzip" : "2.008",
             "List::Util" : "1.19",
             "Params::Util" : "1.07",
             "Scalar::Util" : "1.19",
@@ -98,43 +97,43 @@
    "provides" : {
       "Kafka" : {
          "file" : "lib/Kafka.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Connection" : {
          "file" : "lib/Kafka/Connection.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Consumer" : {
          "file" : "lib/Kafka/Consumer.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Exceptions" : {
          "file" : "lib/Kafka/Exceptions.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::IO" : {
          "file" : "lib/Kafka/IO.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Int64" : {
          "file" : "lib/Kafka/Int64.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Internals" : {
          "file" : "lib/Kafka/Internals.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Message" : {
          "file" : "lib/Kafka/Message.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Producer" : {
          "file" : "lib/Kafka/Producer.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       },
       "Kafka::Protocol" : {
          "file" : "lib/Kafka/Protocol.pm",
-         "version" : "1.001013"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -149,6 +148,6 @@
          "web" : "http://github.com/TrackingSoft/Kafka"
       }
    },
-   "version" : "1.001013",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,5 +1,5 @@
 package Log::Dispatch::FileRotate;
-$Log::Dispatch::FileRotate::VERSION = '1.25';
+$Log::Dispatch::FileRotate::VERSION = '1.26';
 # ABSTRACT: Log to Files that Archive/Rotate Themselves
 
 require 5.005;
@@ -677,7 +677,7 @@ Log::Dispatch::FileRotate - Log to Files that Archive/Rotate Themselves
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -909,6 +909,16 @@ except to quote (from the man page):
 compression, signal based rotates, proper test suite
 
 Could possibly use Logfile::Rotate as well/instead.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Log::Dispatch::File::Stamped> - log directly to timestamped files
+
+=back
 
 =head1 HISTORY
 

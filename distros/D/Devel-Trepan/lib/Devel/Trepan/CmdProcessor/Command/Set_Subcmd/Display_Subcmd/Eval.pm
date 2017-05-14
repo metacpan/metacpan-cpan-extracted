@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2015 Rocky Bernstein <rocky@cpan.org>
 use warnings; no warnings 'redefine'; no warnings 'once';
-use rlib '../../../..';
+use rlib '../../../../../..';
+
+# eval "use Data::Dumper::Perltidy";
 
 package Devel::Trepan::CmdProcessor::Command::Set::Display::Eval;
 
@@ -25,7 +27,7 @@ my $param = join('|', @DISPLAY_TYPES);
 our $HELP   = <<"HELP";
 =pod
 
-B<set display eval> {B<concise>|B<dprint>|B<dumper>|B<tidy>}
+B<set display eval> {B<concise>|B<ddp>|B<dumper>|B<tidy> [printer options]}
 
 Set how you want evaluation results to be shown.
 
@@ -38,7 +40,7 @@ order tried by default on startup.>
 =over
 
 =item *
-C<dprint> E<mdash> L<Data::Printer>
+C<ddp> E<mdash> L<Data::Printer>
 
 =item *
 C<tidy> E<mdash> L<Data::Dumper::Perltidy>
@@ -54,14 +56,23 @@ C<dumper> E<mdash> L<Data::Dumper>
 See the respective display manual pages for how to influence display
 for a given module.
 
+=head2 Examples:
+
+    set display eval dumper
+    set display eval ddp  # works only if Data::Printer is around
+    set display eval ddp { colored => 0 }
+    set display eval tidy    # works if Data::Dumper::Perltidy is around
+    set display eval tidy -nst -mbl=2 -pt=0 -nola
+
 =head2 See also:
 
-L<C<set display eval>|Devel::Trepan::CmdProcessor::Command::Set::Display::Eval>,
-L<C<eval>|Devel::Trepan::CmdProcessor::Command::Eval>, and
+L<C<show display eval>|Devel::Trepan::CmdProcessor::Command::Show::Display::Eval>,
+L<C<eval>|Devel::Trepan::CmdProcessor::Command::Eval>,
 L<C<set auto eval>|Devel::Trepan::CmdProcessor::Command::Set::Auto::Eval>,
+L<Data::Dumper::Perltidy>, and
+L<Data::Printer>.
 
 =cut
-
 HELP
 
 our $MIN_ABBREV = length('ev');
@@ -79,11 +90,21 @@ sub run($$)
 {
     my ($self, $args) = @_;
     my $proc = $self->{proc};
-    my $evaltype = $args->[3];
+    my @args = @{$args};
+    my $evaltype = $args[3];
     my @result = grep($_ eq $evaltype, @DISPLAY_TYPES);
     if (1 == scalar @result) {
         my $key = $self->{subcmd_setting_key};
         $proc->{settings}{$key} = $evaltype;
+	my $argc = scalar @args;
+	if ($argc > 4) {
+	    my $dp_args = join(' ', @{$args[4..$argc-1]});
+	    if ($evaltype eq 'ddp') {
+		eval("use Data::Printer $dp_args");
+	    } elsif ($evaltype eq 'tidy') {
+		eval "$Data::Dumper::Perltidy::ARGV = '$dp_args'";
+	    }
+	}
     } else {
         my $or_list = join(', or ', map{"'$_'"} @DISPLAY_TYPES);
         $proc->errmsg("Expecting either $or_list; got ${evaltype}");
@@ -93,17 +114,19 @@ sub run($$)
 }
 
 unless (caller) {
-  # Demo it.
-  # require_relative '../../mock'
-
-  # # FIXME: DRY the below code
-  # my $cmd =
-  #   Devel::Trepan::MockDebugger::sub_setup(__PACKAGE__, 0);
-  # $cmd->run(@$cmd->prefix + ('off'));
-  # $cmd->run(@$cmd->prefix + ('ofn'));
-  # $cmd->run(@$cmd->prefix);
-  # print $cmd->save_command(), "\n";
-
+    require Devel::Trepan::CmdProcessor;
+    my $cmdproc = Devel::Trepan::CmdProcessor->new();
+    my $subcmd  =  Devel::Trepan::CmdProcessor::Command::Set->new($cmdproc, 'set');
+    my $parent_cmd =  Devel::Trepan::CmdProcessor::Command::Set::Display->new($subcmd, 'display');
+    my $cmd   =  __PACKAGE__->new($parent_cmd, 'eval');
+    # Add common routine
+    foreach my $field (qw(min_abbrev name)) {
+	printf "Field %s is: %s\n", $field, $cmd->{$field};
+    }
+    my @args = qw(set display eval dumper);
+    $cmd->run(\@args);
+    @args = qw(set display eval concise);
+    $cmd->run(\@args);
 }
 
 1;

@@ -9,12 +9,12 @@ use MooseX::MarkAsMethods ( autoclean => 1 );
 use Path::Class qw(dir);
 use File::Which qw(which);
 
-use Pinto::Util qw(throw mask_uri_passwords);
+use Pinto::Util qw(throw mask_url_passwords);
 use Pinto::Constants qw($PINTO_MINIMUM_CPANM_VERSION);
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ has cpanm_exe => (
 
 #-----------------------------------------------------------------------------
 
-requires qw( execute targets mirror_uri );
+requires qw( execute targets mirror_url );
 
 #-----------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ after execute => sub {
 
     # Wire cpanm to our repo
     my $opts = $self->cpanm_options;
-    $opts->{mirror} = $self->mirror_uri;
+    $opts->{mirror} = $self->mirror_url;
     $opts->{'mirror-only'} = '';
 
     # Process other cpanm options
@@ -86,7 +86,7 @@ after execute => sub {
     }
 
     # Scrub passwords from the command so they don't appear in the logs
-    my @sanitized_cpanm_opts = map { mask_uri_passwords($_) } @cpanm_opts;
+    my @sanitized_cpanm_opts = map { mask_url_passwords($_) } @cpanm_opts;
     $self->info( join ' ', 'Running:', $self->cpanm_exe, @sanitized_cpanm_opts );
 
     # Run cpanm
@@ -103,7 +103,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -111,7 +114,7 @@ Pinto::Role::Installer - Something that installs packages
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -119,7 +122,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@
 
 # t/003_load_project.t - check project module loading
 
-use Test::More;
+use Test::More skip_all => 'API has changed. This is not available any more';
 use Data::Dumper;
 my $t = 0;
 

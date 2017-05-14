@@ -1,0 +1,52 @@
+# zxid/sg/liberty-idwsf-security-mechanism-v1.2.sg
+# Slightly edited, 14.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-security-mechanisms-v1.2.sg,v 1.3 2009-09-05 02:23:41 sampo Exp $
+
+target(sec12, urn:liberty:sec:2003-08)
+import(sa11, urn:oasis:names:tc:SAML:1.0:assertion, oasis-sstc-saml-schema-assertion-1.1.xsd)
+import(ff12, urn:liberty:iff:2003-08,liberty-idff-protocols-schema-1.2-errata-v3.0.xsd)
+import(di12, urn:liberty:disco:2003-08,liberty-idwsf-disco-svc-v1.2.xsd)
+import(ds, http://www.w3.org/2000/09/xmldsig#, http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+
+ValidityRestrictionCondition       -> %sec12:ValidityRestrictionConditionType
+%ValidityRestrictionConditionType: base(sa11:ConditionAbstractType)
+  sec12:NumberOfUses -> %xs:integer
+  ;
+
+ProxySubject -> %sa11:SubjectType
+
+ProxyTransitedStatement -> %sa11:SubjectStatementAbstractType
+
+ProxyInfoConfirmationData -> %sec12:ProxyInfoConfirmationType
+%ProxyInfoConfirmationType:
+  sa11:AssertionIDReference
+  sec12:Issuer	 -> %xs:string
+  sec12:IssueInstant	 -> %xs:dateTime
+  ds:Signature?
+  @id?	 -> %xs:ID
+  ;
+
+SessionContext -> %sec12:SessionContextType
+%SessionContextType:
+  sec12:SessionSubject   -> %ff12:SubjectType
+  sec12:ProviderID       -> %xs:anyURI    #  %md:entityIDType
+  ff12:RequestAuthnContext?
+  @SessionIndex?         -> %xs:string
+  @AuthenticationInstant -> %xs:dateTime
+  @AssertionIssueInstant -> %xs:dateTime
+  ;
+
+SessionContextStatement       -> %sec12:SessionContextStatementType
+%SessionContextStatementType: base(sa11:SubjectStatementAbstractType)
+    sec12:ProxySubject?
+    sec12:SessionContext
+  ;
+
+ResourceAccessStatement       -> %sec12:ResourceAccessStatementType
+%ResourceAccessStatementType: base(sa11:SubjectStatementAbstractType)
+  &di12:ResourceIDGroup
+  sec12:ProxySubject
+  sec12:SessionContext?
+  ;
+
+#EOF

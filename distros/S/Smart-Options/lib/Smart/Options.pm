@@ -2,7 +2,7 @@ package Smart::Options;
 use strict;
 use warnings;
 use 5.010001;
-our $VERSION = '0.06';
+our $VERSION = '0.061';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -98,6 +98,8 @@ sub coerce {
         type => $type,
         generater => $generater,
     };
+
+    $self;
 }
 
 sub usage { $_[0]->{usage} = $_[1]; $_[0] }

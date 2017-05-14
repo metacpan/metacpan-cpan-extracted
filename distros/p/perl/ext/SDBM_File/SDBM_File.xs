@@ -2,14 +2,16 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "sdbm/sdbm.h"
+#include "sdbm.h"
+
+#define fetch_key 0
+#define store_key 1
+#define fetch_value 2
+#define store_value 3
 
 typedef struct {
 	DBM * 	dbp ;
-	SV *    filter_fetch_key ;
-	SV *    filter_store_key ;
-	SV *    filter_fetch_value ;
-	SV *    filter_store_value ;
+	SV *    filter[4];
 	int     filtering ;
 	} SDBM_File_type;
 
@@ -17,7 +19,6 @@ typedef SDBM_File_type * SDBM_File ;
 typedef datum datum_key ;
 typedef datum datum_value ;
 
-#define sdbm_TIEHASH(dbtype,filename,flags,mode) sdbm_open(filename,flags,mode)
 #define sdbm_FETCH(db,key)			sdbm_fetch(db->dbp,key)
 #define sdbm_STORE(db,key,value,flags)		sdbm_store(db->dbp,key,value,flags)
 #define sdbm_DELETE(db,key)			sdbm_delete(db->dbp,key)
@@ -28,20 +29,28 @@ typedef datum datum_value ;
 
 MODULE = SDBM_File	PACKAGE = SDBM_File	PREFIX = sdbm_
 
+PROTOTYPES: DISABLE
+
 SDBM_File
-sdbm_TIEHASH(dbtype, filename, flags, mode)
+sdbm_TIEHASH(dbtype, filename, flags, mode, pagname=NULL)
 	char *		dbtype
 	char *		filename
 	int		flags
 	int		mode
+	char *		pagname
 	CODE:
 	{
 	    DBM * 	dbp ;
 
 	    RETVAL = NULL ;
-	    if ((dbp = sdbm_open(filename,flags,mode))) {
-	        RETVAL = (SDBM_File)safemalloc(sizeof(SDBM_File_type)) ;
-    	        Zero(RETVAL, 1, SDBM_File_type) ;
+	    if (pagname == NULL) {
+	        dbp = sdbm_open(filename, flags, mode);
+	    }
+	    else {
+	        dbp = sdbm_prep(filename, pagname, flags, mode);
+	    }
+	    if (dbp) {
+	        RETVAL = (SDBM_File)safecalloc(1, sizeof(SDBM_File_type));
 		RETVAL->dbp = dbp ;
 	    }
 	    
@@ -54,15 +63,12 @@ sdbm_DESTROY(db)
 	SDBM_File	db
 	CODE:
 	if (db) {
+	    int i = store_value;
 	    sdbm_close(db->dbp);
-	    if (db->filter_fetch_key)
-		SvREFCNT_dec(db->filter_fetch_key) ;
-	    if (db->filter_store_key)
-		SvREFCNT_dec(db->filter_store_key) ;
-	    if (db->filter_fetch_value)
-		SvREFCNT_dec(db->filter_fetch_value) ;
-	    if (db->filter_store_value)
-		SvREFCNT_dec(db->filter_store_value) ;
+	    do {
+		if (db->filter[i])
+		    SvREFCNT_dec_NN(db->filter[i]);
+	    } while (i-- > 0);
 	    safefree(db) ;
 	}
 
@@ -103,54 +109,34 @@ sdbm_FIRSTKEY(db)
 datum_key
 sdbm_NEXTKEY(db, key)
 	SDBM_File	db
-	datum_key	key;
 
 int
 sdbm_error(db)
 	SDBM_File	db
+	ALIAS:
+	sdbm_clearerr = 1
 	CODE:
-	RETVAL = sdbm_error(db->dbp) ;
+	RETVAL = ix ? sdbm_clearerr(db->dbp) : sdbm_error(db->dbp);
 	OUTPUT:
 	  RETVAL
-
-int
-sdbm_clearerr(db)
-	SDBM_File	db
-	CODE:
-	RETVAL = sdbm_clearerr(db->dbp) ;
-	OUTPUT:
-	  RETVAL
-
 
 SV *
 filter_fetch_key(db, code)
 	SDBM_File	db
 	SV *		code
 	SV *		RETVAL = &PL_sv_undef ;
+	ALIAS:
+	SDBM_File::filter_fetch_key = fetch_key
+	SDBM_File::filter_store_key = store_key
+	SDBM_File::filter_fetch_value = fetch_value
+	SDBM_File::filter_store_value = store_value
 	CODE:
-	    DBM_setFilter(db->filter_fetch_key, code) ;
+	    DBM_setFilter(db->filter[ix], code);
 
-SV *
-filter_store_key(db, code)
-	SDBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_store_key, code) ;
-
-SV *
-filter_fetch_value(db, code)
-	SDBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_fetch_value, code) ;
-
-SV *
-filter_store_value(db, code)
-	SDBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_store_value, code) ;
-
+BOOT:
+        {
+            HV *stash = gv_stashpvs("SDBM_File", 1);
+            newCONSTSUB(stash, "PAGFEXT", newSVpvs(PAGFEXT));
+            newCONSTSUB(stash, "DIRFEXT", newSVpvs(DIRFEXT));
+            newCONSTSUB(stash, "PAIRMAX", newSVuv(PAIRMAX));
+        }

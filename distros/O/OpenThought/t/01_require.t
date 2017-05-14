@@ -5,13 +5,5 @@
 use strict;
 use Test::More  tests => 1;
 
-use lib ".";
-use lib "./t";
-
-# Since OpenThoughtTests also loads OpenThought, use eval to catch any errors.
-# In this particular file, we want the test to show the failure, as opposed to
-# the script not compiling.
-eval { require "OpenThoughtTests.pm"; };
-
 require_ok( 'OpenThought' );
 

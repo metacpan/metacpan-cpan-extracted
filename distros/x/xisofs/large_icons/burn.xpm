@@ -1,0 +1,74 @@
+/* XPM */
+static char *Image1[] = {
+/* width height num_colors chars_per_pixel */
+"    28    27       33            1",
+/* colors */
+". c #222222",
+"# c #284615",
+"a c #4c4f4f",
+"b c #6f6f6f",
+"c c #20f810",
+"d c #45bc61",
+"e c #90928b",
+"f c #a0af6a",
+"g c #04e9d9",
+"h c #36e6d9",
+"i c #9ca89c",
+"j c #83cfca",
+"k c #a5a5a5",
+"l c #adadad",
+"m c #a9cea9",
+"n c #a2d3c8",
+"o c #ffff00",
+"p c #f3f335",
+"q c #d2d29e",
+"r c #b5b5b5",
+"s c #b5ceb5",
+"t c #b5bdbd",
+"u c #bdbdbd",
+"v c #cecebd",
+"w c #c6c6c6",
+"x c #cecece",
+"y c #d6d6d6",
+"z c #dedede",
+"A c #ebebeb",
+"B c #f7f7f7",
+"C c #fffff7",
+"D c None",
+"E c #000000",
+/* pixels */
+"DDDDDDDDDDDDDDAAAAADDDDDDDDD",
+"DDDDDDDDDDDAxxfffiikkyDDDDDD",
+"DDDDDDDDDBukjhooqwwbbbbBDDDD",
+"DDDDDDDDDicdggooqwwwwkebDDDD",
+"DDDDDDDDlcccgghoqwwwwwwwbBDD",
+"DDDDDDDrjsccdghoqwwwwwAxibDD",
+"DDDDDDAjgjmccghoqwwwxzzwebxD",
+"DDDDDDwjjgjmcchoqwwwzzulkbkD",
+"DDDDDzkwwnjjmccfeewAyureliay",
+"DDDDDziwwwwjjtb...bAwlirik.x",
+"DDDDDziwwwwwje.CCC.ellukulax",
+"DDDDDzerlulrue.CCC.ewwwwwwax",
+"DDDDDzeklilkke.CCC.ewwwwwwax",
+"DDDDDzelirilwwb...bwwwwwwwax",
+"DDDzyweklilwyAuefegnwwwwwlby",
+"DDzlkkeiklwzzwwqpfhgjwwwwbkD",
+"DzluwwueexyzwwwqpcmggjwwkbyD",
+"ArABBBBrxxAwwwwqoccjggnwebDD",
+"AlzwxxxxkywwwwwvpccjgggeEbDD",
+"AlzwxxxxxeluwwwqpoccjggabbDD",
+"Alzbaaaaaaabkkwqpoc#aaaebbDD",
+"Alzuuuuuuuuwk..####bbeeebbDD",
+"AlzdcdwwwwwwwrlbbbbeuweebbDD",
+"AlzdddwwwwwwwwwwwwwwwwebbiDD",
+"AirllllllllllllllllllleaiDDD",
+"Bi.....................kDDDD",
+"DAxxxxxxxxxxxxxxxxxxxxxDDDDD"
+};
+SIMPLE  =                    T                                                  
+BITPIX  =                    8                                                  
+NAXIS   =                    2                                                  
+NAXIS1  =                   28                                                  
+NAXIS2  =                   27                                                  
+HISTORY Written by XV 3.10a                                                     
+END                                                                             

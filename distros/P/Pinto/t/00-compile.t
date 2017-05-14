@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.051
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.039
 
-use Test::More;
+use Test::More  tests => 119 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-plan tests => 134 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+
 
 my @module_files = (
     'App/Pinto.pm',
@@ -24,9 +24,7 @@ my @module_files = (
     'App/Pinto/Command/list.pm',
     'App/Pinto/Command/lock.pm',
     'App/Pinto/Command/log.pm',
-    'App/Pinto/Command/look.pm',
     'App/Pinto/Command/manual.pm',
-    'App/Pinto/Command/merge.pm',
     'App/Pinto/Command/migrate.pm',
     'App/Pinto/Command/new.pm',
     'App/Pinto/Command/nop.pm',
@@ -35,8 +33,6 @@ my @module_files = (
     'App/Pinto/Command/pull.pm',
     'App/Pinto/Command/register.pm',
     'App/Pinto/Command/rename.pm',
-    'App/Pinto/Command/reset.pm',
-    'App/Pinto/Command/revert.pm',
     'App/Pinto/Command/roots.pm',
     'App/Pinto/Command/stacks.pm',
     'App/Pinto/Command/statistics.pm',
@@ -44,7 +40,6 @@ my @module_files = (
     'App/Pinto/Command/unlock.pm',
     'App/Pinto/Command/unpin.pm',
     'App/Pinto/Command/unregister.pm',
-    'App/Pinto/Command/update.pm',
     'App/Pinto/Command/verify.pm',
     'Pinto.pm',
     'Pinto/Action.pm',
@@ -59,8 +54,6 @@ my @module_files = (
     'Pinto/Action/List.pm',
     'Pinto/Action/Lock.pm',
     'Pinto/Action/Log.pm',
-    'Pinto/Action/Look.pm',
-    'Pinto/Action/Merge.pm',
     'Pinto/Action/New.pm',
     'Pinto/Action/Nop.pm',
     'Pinto/Action/Pin.pm',
@@ -68,15 +61,12 @@ my @module_files = (
     'Pinto/Action/Pull.pm',
     'Pinto/Action/Register.pm',
     'Pinto/Action/Rename.pm',
-    'Pinto/Action/Reset.pm',
-    'Pinto/Action/Revert.pm',
     'Pinto/Action/Roots.pm',
     'Pinto/Action/Stacks.pm',
     'Pinto/Action/Statistics.pm',
     'Pinto/Action/Unlock.pm',
     'Pinto/Action/Unpin.pm',
     'Pinto/Action/Unregister.pm',
-    'Pinto/Action/Update.pm',
     'Pinto/Action/Verify.pm',
     'Pinto/ArchiveUnpacker.pm',
     'Pinto/Chrome.pm',
@@ -86,20 +76,17 @@ my @module_files = (
     'Pinto/Constants.pm',
     'Pinto/Database.pm',
     'Pinto/Difference.pm',
-    'Pinto/DifferenceEntry.pm',
+    'Pinto/DistributionSpec.pm',
     'Pinto/Exception.pm',
     'Pinto/Globals.pm',
-    'Pinto/IndexReader.pm',
+    'Pinto/IndexCache.pm',
     'Pinto/IndexWriter.pm',
     'Pinto/Initializer.pm',
-    'Pinto/Locator.pm',
-    'Pinto/Locator/Mirror.pm',
-    'Pinto/Locator/Multiplex.pm',
-    'Pinto/Locator/Stratopan.pm',
     'Pinto/Locker.pm',
     'Pinto/Migrator.pm',
     'Pinto/ModlistWriter.pm',
     'Pinto/PackageExtractor.pm',
+    'Pinto/PackageSpec.pm',
     'Pinto/PrerequisiteWalker.pm',
     'Pinto/Remote.pm',
     'Pinto/Remote/Action.pm',
@@ -110,19 +97,20 @@ my @module_files = (
     'Pinto/Result.pm',
     'Pinto/RevisionWalker.pm',
     'Pinto/Role/Committable.pm',
+    'Pinto/Role/FileFetcher.pm',
     'Pinto/Role/Installer.pm',
     'Pinto/Role/PauseConfig.pm',
     'Pinto/Role/Plated.pm',
     'Pinto/Role/Puller.pm',
     'Pinto/Role/Schema/Result.pm',
     'Pinto/Role/Transactional.pm',
-    'Pinto/Role/UserAgent.pm',
     'Pinto/Schema.pm',
     'Pinto/Schema/Result/Ancestry.pm',
     'Pinto/Schema/Result/Distribution.pm',
     'Pinto/Schema/Result/Package.pm',
     'Pinto/Schema/Result/Prerequisite.pm',
     'Pinto/Schema/Result/Registration.pm',
+    'Pinto/Schema/Result/RegistrationChange.pm',
     'Pinto/Schema/Result/Revision.pm',
     'Pinto/Schema/Result/Stack.pm',
     'Pinto/Schema/ResultSet/Distribution.pm',
@@ -133,12 +121,9 @@ my @module_files = (
     'Pinto/Server/Responder/Action.pm',
     'Pinto/Server/Responder/File.pm',
     'Pinto/Server/Router.pm',
-    'Pinto/Shell.pm',
+    'Pinto/SpecFactory.pm',
     'Pinto/Statistics.pm',
     'Pinto/Store.pm',
-    'Pinto/Target.pm',
-    'Pinto/Target/Distribution.pm',
-    'Pinto/Target/Package.pm',
     'Pinto/Types.pm',
     'Pinto/Util.pm'
 );
@@ -184,9 +169,9 @@ foreach my $file (@scripts)
 { SKIP: {
     open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
     my $line = <$fh>;
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!.*?\bperl\b\s*(.*)$/;
 
-    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    my @flags = $1 ? split(/\s+/, $1) : ();
 
     my $stderr = IO::Handle->new;
 
@@ -207,7 +192,6 @@ foreach my $file (@scripts)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
+is(scalar(@warnings), 0, 'no warnings found') if $ENV{AUTHOR_TESTING};
 
 

@@ -1,0 +1,1755 @@
+#!/usr/bin/perl -w
+
+#
+#   beancounter --- A stock portfolio performance monitoring tool
+#
+#   Copyright (C) 1998 - 2010  Dirk Eddelbuettel <edd@debian.org>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+#   $Id: beancounter,v 1.92 2010/06/13 21:55:54 edd Exp $
+
+# adjust @INC to let the current development version be found first
+BEGIN { @INC = ( ".", @INC ) }
+use strict;			# be careful out there, son
+use Date::Manip;		# general date parsing / calcs
+use English;			# explicit variable names
+use Getopt::Long;		# long options
+use vars qw($help $debug $verbose $fxarg $datearg $prevdatearg 
+	    $rcfile $sqlrestriction $extrafx $updatedate
+	    $dbsystem $dbname $fxupdate $commit $equityupdate
+	    $hostarg $ubcfx $splitby);
+
+use Finance::BeanCounter;	# beancounter functions
+
+my $rcsversion = sprintf("%d.%d", q$Revision: 1.92 $ =~ /(\d+)\.(\d+)/); 
+
+my $version = "0.8.10";		# updated from the debian/rules Makefile
+my $db_min_schema = "0.6.0";	# minimum version of the database that we need
+my $date =			# inner expression below is updated by RCS
+  sprintf("%s", q$Date: 2010/06/13 21:55:54 $ =~ /\w*: (\d*\/\d*\/\d*)/);
+
+my $rcfile = $ENV{HOME} . "/.beancounterrc";
+
+($prevdatearg, $datearg, $equityupdate, $fxupdate, $commit, 
+ $ubcfx, $splitby, $hostarg) = 
+    ("6 month ago", "today", 1, 1, 1, 0, 2, "localhost");
+
+my %options = ("help" 		=> \$help,
+	       "debug"		=> \$debug,
+	       "currency=s"	=> \$fxarg,
+	       "date=s"		=> \$datearg,
+	       "prevdate=s"	=> \$prevdatearg,
+	       "restriction=s"	=> \$sqlrestriction,
+	       "dbsystem=s"	=> \$dbsystem,
+	       "dbname=s"	=> \$dbname,
+	       "extrafx=s"	=> \$extrafx,
+	       "rcfile=s"	=> \$rcfile,
+	       "commit!"	=> \$commit,
+	       "forceupdate=s"	=> \$updatedate,
+	       "fxupdate!"	=> \$fxupdate,
+	       "equityupdate!"	=> \$equityupdate,
+	       "splitby=s"	=> \$splitby,
+	       "host=s"		=> \$hostarg,
+	       "ubcfx!"		=> \$ubcfx,
+	       "verbose"	=> \$verbose);
+
+help_and_exit() if (!GetOptions(%options) or $help or $#ARGV < 0);
+$OUTPUT_AUTOFLUSH = 1;
+
+my $command = shift @ARGV;
+
+my %Config = GetConfig($rcfile, $debug, $verbose, $fxarg,
+		       $extrafx, $updatedate, $dbsystem, $dbname, 
+		       $fxupdate, $commit, $equityupdate, $ubcfx,
+		       $hostarg, $command);
+
+my $dbh = ConnectToDb();
+
+if (TestInsufficientDatabaseSchema($dbh, $db_min_schema)) {
+  warn "Database schema is not current. Please run 'update_beancounter'\n";
+} elsif (!ParseDate($datearg)) {
+  warn "Please correct the invalid --date argument $datearg.\n";
+} elsif (!ParseDate($prevdatearg)) {
+  warn "Please correct the invalid --prevdate argument $prevdatearg.\n";
+} else {
+  if ($command =~ /^plreport$/) {
+    portfolio_report($sqlrestriction);
+  } elsif ($command =~ /^backpopulate$/) {
+    backpopulate(@ARGV);
+  } elsif ($command =~ /^fxbackpopulate$/) {
+    fxbackpopulate(@ARGV);
+  } elsif ($command =~ /^addindex$/) {
+    add_index(@ARGV);
+  } elsif ($command =~ /^addstock$/) {
+    add_stock(@ARGV);
+  } elsif ($command =~ /^addportfolio$/) {
+    add_portfolio(@ARGV);
+  } elsif ($command =~ /^advancement$/) {
+    portfolio_retracement($sqlrestriction, "advance");
+  } elsif ($command =~ /^allreports$/) {
+    day_end_report($sqlrestriction);
+    portfolio_status($sqlrestriction);
+    portfolio_risk($sqlrestriction);
+    portfolio_retracement($sqlrestriction, "advance");
+    portfolio_retracement($sqlrestriction, "retrace");
+  } elsif ($command =~ /^dayendreport$/) {
+    day_end_report($sqlrestriction);
+  } elsif ($command =~ /^dailyjob$/) {
+    portfolio_update($sqlrestriction);
+    day_end_report($sqlrestriction);
+    portfolio_status($sqlrestriction);
+    portfolio_risk($sqlrestriction);
+  } elsif ($command =~ /^delete$/) {
+    delete_stock(@ARGV);
+  } elsif ($command =~ /^destroydb$/) {
+    deletedb(@ARGV);		# does not return
+  } elsif ($command =~ /^quote$/) {
+    quote(@ARGV);
+  } elsif ($command =~ /^retracement$/) {
+    portfolio_retracement($sqlrestriction, "retrace");
+  } elsif ($command =~ /^risk$/) {
+    portfolio_risk($sqlrestriction);
+  } elsif ($command =~ /^status$/) {
+    portfolio_status($sqlrestriction);
+  } elsif ($command =~ /^update$/) {
+    portfolio_update($sqlrestriction);
+  } elsif ($command =~ /^lsportfolio$/) {
+    lsportfolio($sqlrestriction);
+  } elsif ($command =~ /^lspositions$/) {
+    lspositions($sqlrestriction);
+  } elsif ($command =~ /^deactivate$/) {
+    inactive_stock(@ARGV);
+  } elsif ($command =~ /^split$/) {
+    split_stock(@ARGV);
+  } elsif ($command =~ /^checkdbconnection$/) {
+    CloseDB($dbh) or die("Cannot close db handle!\n");
+    print "Successfully connected to database from beancounter script.\n"
+	if $Config{debug};
+    exit 1;
+  } elsif ($command =~ /^warranty$/) {
+    warranty();
+  } else {
+    warn "Ignoring unknown command '$command'\n";
+  }
+}
+
+CloseDB($dbh);
+
+exit 0;
+
+# ---------------------- local functions ------------------------------------
+
+sub help_and_exit {
+  my $pmVersion = BeanCounterVersion;
+  print STDERR "
+beancounter -- A stock portfolio performance monitoring tool
+
+beancounter version $version (RCS $rcsversion and $pmVersion) of $date
+Copyright (C) 1998 - 2006 by Dirk Eddelbuettel <edd\@debian.org>
+beancounter comes with ABSOLUTELY NO WARRANTY. This is free software, 
+and you are welcome to redistribute it under certain conditions. 
+Please try '$PROGRAM_NAME warranty' for more details, or visit the
+website at   http://www.gnu.org/philosophy/free-sw.html 
+
+Usage:
+    beancounter [options] command [args]
+
+Commands:
+    addindex index symbol1 [symbol2 [...]]	        
+				add stock(s) to market index 'index' 
+    addportfolio symbol:nb:fx[:type:owner:price:date] [...]	
+                                add n stock of s in currency fx to portfolio
+				optional type, owner, purchase price and
+                                purch. date can also be given (see example)
+    addstock symbol ...		add stock(s) to database 
+    advancement  	        report unrealized gains from lows
+    allreports			combines, dayendreport, status and risk
+    backpopulate  symbol ...	fill with historic data for given stock(s)
+    checkdbconnection		test if connection to db can be established
+    fxbackpopulate  symbol ...	fill with historic data for currency(ies)
+    dailyjob			combines update, dayendreport, status + risk
+    dayendreport		reports changes relative to the previous day
+    deactivate symbol ...       set stock(s) inactive in stockinfo table
+    delete arg ...		delete given stock(s) from database
+    destroydb			delete the BeanCounter database
+    lsportfolio                 list portfolio data
+    plreport			p/l portfolio report against any other day
+    retracement			report unreal. losses from highs (drawdowns)
+    quote arg ...		report current data for given stock(s)
+    risk			display a portfolio risk report 
+    split arg ...               split-adjust price history and portfolio
+    status			status report for a given date
+    update			update the database with current day's data
+    warranty			display short GNU GPL statement
+
+Options:
+    --help			show this help
+    --verbose			more verbose operation, mostly for debugging
+    --date date			use this as reference date for selected report
+    --prevdate date		use this as the previous reference date
+    --currency fx		use fx as the home currency
+    --restriction sql		impose this SQL restriction
+    --extrafx fx1,fx2           additional currencies to load
+    --forceupdate date		force db to store new price info with date
+    --[no]fxupdate 		enforce/suppress FX update [fxupdate]
+    --[no]commit	        enforce/suppress database update [commit]
+    --[no]equityupdate 		enforce/suppress Equity update, [update]
+    --[no]ubcfx 		use/skip FX from UBC's Sauder school [skip]
+    --splitby arg               split stock history + position by factor [2]
+    --rcfile file		use different configuration file
+    --dbsystem system		use db backend system, default is PostgreSQL
+    --dbname name		use db name, default is beancounter
+
+Examples:
+    beancounter update --forceupdate today
+    beancounter addportfolio IBM:100:USD:401k:joe:121.4:20011205 VOD.L:50:GBP
+    beancounter addstock CBOT LNUX RHAT COR.TO
+    beancounter backpopulate MSFT IBM --prevdate 19940101 --date 19981231
+    beancounter fxbackpopulate EUR --prevdate 20010101 --date yesterday
+    beancounter dayendreport --restriction \"type = '401k'\"
+    beancounter status --date 20000816 --restriction \"currency='USD'\"
+    beancounter split --splitby 3 --prevdate 1990-01-01 ABC CDE
+
+\n";
+  exit 1;
+}
+
+sub warranty {
+  my $BeanCounterVersion = BeanCounterVersion;
+  open (FILE, "< $PROGRAM_NAME");
+  my $over = 0;			# have we already had comment lines?
+  while (<FILE>) {		# show header
+    last if (m/\$Id/);		# quit if we reach the RCS code
+    next unless (m/^\#\s+/ or $over);
+    $over = 1;			# note the new state
+    $ARG =~ s/^\#//;		# minus the leading '#'
+    print STDERR $ARG;
+  }
+  close(FILE);
+  print STDERR "   beancounter version $version ($BeanCounterVersion) as of $date\n\n";
+}
+
+sub build_lines {
+  my $len = shift;
+  my $tl = "=" x $len;		# thick line
+  my $fl = "-" x $len;		# fine line
+  return ($tl,$fl);
+}
+
+sub display_report {
+  my ($pretty_date, $pretty_prev_date, $prices, $prev_prices,
+      $fx_prices, $prev_fx_prices, $shares, $fx, $pricedate) = @_;
+  my ($tl,$fl) = build_lines(79);
+
+  print "$tl\n" . "Profit / loss\t\t  from $pretty_prev_date" .
+    "\tto $pretty_date  abs, rel change" . "\n$fl\n";
+  my (%value, %value_prev);
+  foreach my $key (sort keys %$shares) {
+    my ($name,$count) = split /:/, $key;
+    if (Date_Cmp($pricedate->{$name}, $Config{lastbizday}) != 0) {
+      $value{$name} += $shares->{$key} * $prices->{$name} 
+	* $fx_prices->{$fx->{$name}} / $fx_prices->{$Config{currency}};
+      $value_prev{$name} += $shares->{$key} * $prices->{$name} 
+	* $fx_prices->{$fx->{$name}}/$fx_prices->{$Config{currency}};
+    } elsif ( defined($prev_prices->{$name}) ) {
+      $value{$name} += $shares->{$key} * $prices->{$name} 
+	* $fx_prices->{$fx->{$name}} / $fx_prices->{$Config{currency}};
+      $value_prev{$name} += $shares->{$key} * $prev_prices->{$name} 
+	* $prev_fx_prices->{$fx->{$name}}/$prev_fx_prices->{$Config{currency}};
+    } else {
+      $value{$name} += $shares->{$key} * $prices->{$name}
+	* $fx_prices->{$fx->{$name}} / $fx_prices->{$Config{currency}};
+      $value_prev{$name} += $shares->{$key}
+	* $prev_fx_prices->{$fx->{$name}}/$prev_fx_prices->{$Config{currency}};
+    }
+  }
+  my ($assets, $assets_prev) = (0,0);
+  foreach my $name (sort keys %value) {
+    my $value = $value{$name};
+    my $value_prev = $value_prev{$name};
+    print "$name $value_prev\n" if $Config{verbose};
+    if (Date_Cmp($pricedate->{$name}, $Config{lastbizday}) != 0) {
+      printf("%*s %3s %19s %10.2f %8.2f\n", 
+	     -18, substr($name,0,17), $fx->{$name}, 
+	     " (from $pricedate->{$name})",
+	     $value, $prices->{$name}); 
+    } elsif ( ($value_prev == 0) || (!defined($prev_prices->{$name})) ) {
+      printf("%*s %3s %20s %10.2f %8.2f %8.2f %7s\n", 
+	     -18, substr($name,0,17), $Config{currency}, 
+	     "(no price available)",
+	     $value, $prices->{$name}, 
+	     $value-$value_prev, 
+	     "N/A"); 
+    } else {
+      printf("%*s %3s %10.2f %8.2f %10.2f %8.2f %8.2f %6.2f%%\n", 
+	     -18, substr($name,0,17), $Config{currency}, 
+	     $value_prev, $prev_prices->{$name},
+	     $value, $prices->{$name}, 
+	     $value-$value_prev, 
+	     100*($value/$value_prev-1)*Sign($value)); 
+    }
+    $assets += $value;
+    $assets_prev += $value_prev;
+  }
+  print "$fl\n";
+  printf("%-16s   %3s %10.2f          %10.2f      %12.2f %6.2f%%\n", 
+	 "Grand Total",  $Config{currency}, $assets_prev, $assets, 
+	 $assets-$assets_prev, 100*($assets/$assets_prev-1));
+  print "$tl\n";
+}
+
+sub display_status {
+  my ($date, $pretty_date, $prices, $pricedates, $fx_prices, $shares, $fx,
+      $cost, $pdate, $cash) = @_;
+
+  my ($tl,$fl) = build_lines(79);
+  print "$tl\n" . "\t\t\tPortfolio Status on $pretty_date\n$fl\n";
+  printf("%*s %6s %14s %16s %11s %9s\n%s\n",
+	 -18, "Name", "Shares", "Close", "Position", "Held", 
+	 "Return", $fl);
+  my (%value, %totalshares);
+  foreach my $key (sort keys %$shares) {
+    my ($name,$count) = split /:/, $key;
+    $value{$name} += $shares->{$key} * $prices->{$name} 
+      * $fx_prices->{$fx->{$name}} / $fx_prices->{$Config{currency}};
+    $totalshares{$name} += $shares->{$key};
+  }
+  my ($assets,$weightedreturn,$assetbase,$err) = (0,0,0,0);
+  foreach my $name (sort keys %value) {
+    my $value = $value{$name};
+    my ($daysheld,$return) = ("", "");
+    if (defined($pdate->{$name})) { # if we have a purchase date
+      $daysheld = Delta_Format(DateCalc($pdate->{$name}, $date, \$err, 2), "approx", 0, "%dt");
+      if (defined($cost->{$name}) and $daysheld >= 0) {
+ 	$return = ($prices->{$name} / $cost->{$name} - 1) 
+	  * 100 * Sign($totalshares{$name});
+ 	# annualise if held longer than > 1 year
+	$return *= 365 / $daysheld if ($daysheld > 365);
+	# weigh returns by the invested amount, not the current value
+	# NB this omits possible changes in the FX rate
+	my $invested = $value / $prices->{$name} * $cost->{$name};
+	$weightedreturn += $return * $invested;
+	$assetbase += $invested;
+      }
+    }
+    printf("%*s %6d   %3s %8.2f   %3s %10.2f  %s %s\n", 
+	   -18, substr($name,0,17), 
+	   $totalshares{$name},  
+	   $fx->{$name}, 
+	   $prices->{$name},
+	   $Config{currency}, 
+	   $value,
+	   $daysheld ne "" ? sprintf("%5d days", $daysheld) : $daysheld, 
+	   $return ne ""   ? sprintf("%8.1f%%", $return) : $return);
+    $assets += $value;
+  }
+
+  foreach my $name (sort keys %{$cash}) { # cash part
+    my $value = $cash->{$name}{value} * $fx_prices->{$cash->{$name}{fx}} 
+      / $fx_prices->{$Config{currency}}; # adjust for FX
+    $assets += $value;
+    $assetbase += $value;
+
+    printf("%*s %s %3s %10.2f\n", 
+	   -16, substr($name,0,16), " " x 25,
+	   $Config{currency},
+	   $value,
+	  );
+  }
+
+  print "$fl\n";
+  printf("%-16s %29s %10.2f %20s\n", 
+	 "Grand Total",  $Config{currency}, $assets, 
+	 $assetbase ? sprintf("%20.2f%%",$weightedreturn/$assetbase) : "NaN");
+  print "$fl\n";
+  print "Returns are annualized if the holding period exceeds one year.\n";
+  print "$tl\n";
+
+}
+
+sub display_longstatus {
+  my ($date, $pretty_date, $prices, $pricedates, $fx_prices, $shares, $fx,
+      $cost, $pdate, $cash) = @_;
+
+  my ($tl,$fl) = build_lines(79);
+  print "$tl\n" . "\t\t\tPortfolio Status on $pretty_date\n$fl\n";
+  printf("%*s %6s %14s %16s %11s %9s\n%s\n",
+	 -18, "Name", "Shares", "Close", "Position", "Held", 
+	 "Return", $fl);
+  my (%value, %totalshares);
+  foreach my $key (sort keys %$shares) {
+    my ($name,$count) = split /:/, $key;
+    $value{$key} += $shares->{$key} * $prices->{$name} 
+      * $fx_prices->{$fx->{$name}} / $fx_prices->{$Config{currency}};
+  }
+  my ($assets,$weightedreturn,$assetbase,$err) = (0,0,0,0);
+  foreach my $key (sort keys %value) {
+    my ($name,$count) = split /:/, $key;
+    my $value = $value{$key};
+    my ($daysheld,$return,$fxthen,$fxnow) = ("", "", 1.0, 1.0);
+    if (defined($pdate->{$key})) { # if we have a purchase date
+      $daysheld = Delta_Format(DateCalc($pdate->{$key}, $date, \$err, 2), "approx", 0, "%dt");
+      if (defined($cost->{$key}) and $daysheld >= 0 and $cost->{$key} != 0) {
+	if ($fx->{$name} ne $Config{currency}) {
+	  $fxthen = GetFXDatum($dbh, $pdate->{$key}, $fx->{$name});
+	  $fxnow = GetFXDatum($dbh, $date, $fx->{$name});
+	}
+ 	$return = (($prices->{$name} * $fxnow) / ($cost->{$key} * $fxthen) - 1)
+	  * 100 * Sign($shares->{$key});
+ 	# annualise if held longer than > 1 year
+	$return *= 365 / $daysheld if ($daysheld > 365);
+	# weigh returns by the invested amount, not the current value
+	# NB this omits possible changes in the FX rate
+	my $invested = $value / $prices->{$name} * $cost->{$key};
+	$weightedreturn += $return * $invested;
+	$assetbase += $invested;
+      }
+    }
+    printf("%*s %6d   %3s %8.2f   %3s %10.2f  %s %s\n", 
+	   -18, substr($name,0,17), 
+	   $shares->{$key},  
+	   $fx->{$name}, 
+	   $prices->{$name},
+	   $Config{currency}, 
+	   $value,
+	   $daysheld ne "" ? sprintf("%5d days", $daysheld) : $daysheld, 
+	   $return ne ""   ? sprintf("%8.1f%%", $return) : $return);
+    $assets += $value;
+  }
+
+  foreach my $name (sort keys %{$cash}) { # cash part
+    my $value = $cash->{$name}{value} * $fx_prices->{$cash->{$name}{fx}} 
+      / $fx_prices->{$Config{currency}}; # adjust for FX
+    $assets += $value;
+    $assetbase += $value;
+
+    printf("%*s %s %3s %10.2f\n", 
+	   -16, substr($name,0,16), " " x 25,
+	   $Config{currency},
+	   $value,
+	  );
+  }
+
+  print "$fl\n";
+  printf("%-16s %29s %10.2f %20s\n", 
+	 "Grand Total",  $Config{currency}, $assets, 
+	 $assetbase ? sprintf("%20.2f%%",$weightedreturn/$assetbase) : "NaN");
+  print "$fl\n";
+  print "Returns are annualized if the holding period exceeds one year.\n";
+  print "$tl\n";
+
+}
+
+sub display_riskreport {
+  my ($pretty_date, $pretty_prev_date, $var, $pos, $vol, $quintile, $fx, 
+      $crit, $margvar) = @_;
+
+  my (%var);
+  my ($varsum, $assets) = 0;
+  foreach my $pkey (keys %$pos) {
+    if (defined($pos->{$pkey}) && defined($vol->{$pkey})) {
+      $var{$pkey} = $crit * sqrt($pos->{$pkey}**2 * $vol->{$pkey}**2);
+      $varsum += $crit * sqrt($pos->{$pkey}**2 * $vol->{$pkey}**2);
+      $assets += $pos->{$pkey};
+    }
+  }
+
+  my ($tl,$fl) = build_lines(79);
+  print "$tl\n" . "            Portfolio Risk on $pretty_date " .
+    "going back to $pretty_prev_date\n$fl\n";
+  printf("%*s %15s  %13s %10s %9s %7s\n%s\n",
+	 -18, "Name", "Position", "1% Profit/Loss", "Volatility", 
+	 "VaR", "margVaR", $tl); 
+
+  foreach my $pkey (sort keys %$pos) {
+    printf("%-18s %3s %11s %7s %7s %10s %9s %7d\n", 
+	   substr($pkey,0,17), 
+	   $Config{currency},	# NOT $fx->{$pkey}, !!
+	   defined($pos->{$pkey})
+	   ? sprintf("%11.2f", $pos->{$pkey})
+	   : 'N/A',
+	   defined($quintile->{$pkey}) 
+	   ? sprintf("%6.1f%%", 100*$quintile->{$pkey})
+	   : 'N/A',
+	   defined($quintile->{$pkey}) 
+	   ? sprintf("%7d", $pos->{$pkey}*$quintile->{$pkey}) 
+	   : 'N/A',
+	   defined($vol->{$pkey})
+	   ? sprintf("%9.1f%%", 100*sqrt(252)*$vol->{$pkey})
+	   : 'N/A', 
+	   defined($var{$pkey})
+	   ? sprintf("%8d", -($var{$pkey}))
+	   : 'N/A',
+	  $margvar->{$pkey});
+  }
+  printf("$fl\n%-18s %3s %11.2f  %24.1f%%  %8d\n$fl\n", 
+	 "Portfolio level", $Config{currency}, $assets,
+	 $var/$crit/$assets*100*sqrt(252), # back volatility out of VaR
+	 -$var);
+  printf("%s is %4.1f%% of assets, or %5.1f%% of VaR sum of %13d\n%s\n", 
+	 "Portfolio VaR", $var/$assets*100, $var/$varsum*100, -$varsum, $tl);
+  print 
+"VaR calculations use a 99% confidence level and 1-day horizon.  Marginal VaR is\nthe change to the portfolio VaR attributable to adding this position. Computing\nthe 1% quintile of the return distribution,  which can be viewed as a non-para-\nmetric VaR estimate, requires at least 100 observations.\n";
+  printf("$tl\n");
+}
+
+sub split_stock {
+  my @arg = @_;
+
+  my ($date, $prev_date, $pretty_date, $pretty_prev_date) 
+    = GetTodaysAndPreviousDates();
+
+  print "Splitting stockprices by $splitby from $prev_date to $date:";
+  my $stmt  = qq{select date, previous_close, day_open, day_low, day_high, day_close, 
+                        bid, ask, volume
+	         from stockprices 
+	         where symbol = ? 
+	         and date <= ? 
+	         and date >= ?
+	         and day_close > 0
+	         order by date
+	        };
+  print "split_stock():\n\$stmt = $stmt\n" if $Config{debug};
+  my $sth = $dbh->prepare($stmt);
+
+  foreach my $arg (sort @arg) {
+    print " $arg ";
+    my $rv = $sth->execute($arg, $date, $prev_date);
+    my $dr = $sth->fetchall_arrayref;	# get data
+    $sth->finish;
+    for (my $i=0; $i<scalar(@{$dr}); $i++) { # add returns
+      my $cmd = "update stockprices set";
+      $cmd.= " previous_close = $dr->[$i][1]/$splitby," 
+	if defined($dr->[$i][1]);
+      $cmd.= " day_open = $dr->[$i][2]/$splitby," 
+	if defined($dr->[$i][2]);
+      $cmd.= " day_low = $dr->[$i][3]/$splitby," 
+	if defined($dr->[$i][3]);
+      $cmd.= " day_high = $dr->[$i][4]/$splitby," 
+	if defined($dr->[$i][4]);
+      $cmd.= " day_close = $dr->[$i][5]/$splitby," 
+	if defined($dr->[$i][5]);
+      $cmd.= " bid = $dr->[$i][6]/$splitby," 
+	if defined($dr->[$i][6]);
+      $cmd.= " ask = $dr->[$i][7]/$splitby," 
+	if defined($dr->[$i][7]);
+      $cmd.= " volume = $dr->[$i][8]*$splitby," 
+	if defined($dr->[$i][8]);
+      $cmd.= "where symbol     = '$arg' ";
+      $cmd.= "and date         = '$dr->[$i][0]'";
+      $cmd =~ s/,where/ where/;
+      print "$cmd\n" if $Config{debug};
+      if ($Config{commit}) {
+	$dbh->do($cmd) or warn "Failed for $arg with $cmd\n";
+	$dbh->commit();
+      }
+    }
+  }
+  print " Done.\n";
+
+  print "Adjusting portfolio by $splitby:";
+  $stmt  = qq{select shares, cost
+	      from portfolio 
+              where symbol = ?
+             };
+  print "split_stock():\n\$stmt = $stmt\n" if $Config{debug};
+  $sth = $dbh->prepare($stmt);
+
+  foreach my $arg (sort @arg) {
+    print " $arg ";
+    my $rv = $sth->execute($arg);
+    my $dr = $sth->fetchall_arrayref;	# get data
+    $sth->finish;
+    for (my $i=0; $i<scalar(@{$dr}); $i++) { # add returns
+      my $cmd = "update portfolio set";
+      $cmd.= " shares = $dr->[$i][0]*$splitby,";
+      $cmd.= " cost = $dr->[$i][1]/$splitby," 
+	if defined($dr->[$i][1]);
+      $cmd.= "where symbol  = '$arg' ";
+      $cmd.= "and   shares  = '$dr->[$i][0]' ";
+      $cmd.= "and   cost    = '$dr->[$i][1]' " if defined($dr->[$i][1]);
+      $cmd =~ s/,where/ where/;
+      print "$cmd\n" if $Config{debug};
+      if ($Config{commit}) {
+	$dbh->do($cmd) or warn "Failed for $arg with $cmd\n";
+	$dbh->commit();
+      }
+    }
+  }
+  print " Done.\n";
+}
+
+sub lsportfolio {
+  my @arg = @_;
+  # statement for listing out portfolio
+  my $stmt = qq{select * from portfolio };
+
+  # optional sql clauses for listing out portfolio
+  if ($sqlrestriction) {
+    $stmt = $stmt . qq{where $sqlrestriction };
+  } elsif ($fxarg) {
+    $stmt = $stmt . qq{where currency='$fxarg' };
+  } elsif ($datearg ne "today") {
+    $stmt = $stmt . qq{where date='$datearg' };
+  } else {			# need a default clause
+    $stmt = $stmt . qq{where date > '1970-01-01' };
+  }
+  $stmt = $stmt . 
+    qq{and symbol in (select symbol from stockinfo where active) } .
+    qq{order by date};
+
+  print "Portfolio listing sql statement:\n$stmt\n" if $Config{verbose};
+
+  my ($tl,$fl) = build_lines(79);
+
+  # perform the access
+  my $sth = $dbh->prepare($stmt);
+  my $rows = $sth->execute;
+  if ( defined($rows) and $rows > 0 ) {
+    # print the results
+    print "$tl\n\t\t\tPortfolio listing\n$fl\n";
+    printf "%-10.10s%8.8s%8.8s%12.12s%12.12s%12.12s%17.17s\n$fl\n",
+        "Symbol", "Shares", "FX", "  Type", "  Owner", "    Cost", "    Date";
+    while (my @row_ary = $sth->fetchrow_array) {
+      my ($stock, $nb, $fx, $type, $owner, $cost, $date) = @row_ary;
+      printf "%-10.10s%8d%8s%12s%12s%12.2f%17s\n",
+       $stock, $nb, $fx, $type, $owner, $cost, $date;
+    }
+    print "$tl\n";
+  }
+  $sth->finish;
+}
+
+sub lspositions {
+  my $res = shift;
+
+  my ($date, $prev_date, $pretty_date, $pretty_prev_date) 
+    = GetTodaysAndPreviousDates();
+  my ($fx, $prices, $prev_prices, $shares, $pricedate) 
+    = GetPriceData($dbh,$date,$res);
+  $fx->{'home currency'} = $Config{currency};
+
+  my ($tl,$fl) = build_lines(79);
+
+  # statement for listing out portfolio
+  my $stmt = qq{select p.symbol, p.shares, p.currency, p.type, p.owner, } .
+    qq{p.cost, p.date, s.name from portfolio p, stockinfo s };
+
+  # optional sql clauses for listing out portfolio
+  if ($sqlrestriction) {
+    $stmt = $stmt . qq{where $sqlrestriction };
+  } else {			# need a default clause
+    $stmt = $stmt . qq{where p.date > '1970-01-01' };
+  }
+  if ($fxarg) {
+    $stmt = $stmt . qq{and p.currency='$fxarg' };
+  }
+  $stmt = $stmt . 
+    qq{and s.active } .
+    qq{and p.symbol = s.symbol } .
+    qq{order by p.date};
+
+  print "Portfolio listing sql statement:\n$stmt\n" if $Config{verbose};
+
+  # perform the access
+  my $sth = $dbh->prepare($stmt);
+  my $rows = $sth->execute;
+
+  if ( defined($rows) and $rows > 0 ) {
+    # print the results
+    print "$tl\n\t\t\t\tPortfolio listing\n$fl\n";
+    printf "%-7.7s%7.7s%5.5s%8.8s%8.8s%8.8s%12.12s%8.8s%11s\n$fl\n",
+        "Symbol", "Shares", "FX", "  Type", "  Owner", "    Cost", "    Date",
+	" Price", " Net";
+    my $sum = 0;
+    while (my @row_ary = $sth->fetchrow_array) {
+      my ($fxthen,$fxnow) = (1.0,1.0);
+      my ($stock, $nb, $fx, $type, $owner, $cost, $pfdate, $name) = @row_ary;
+      if ($fx ne $Config{currency}) {
+	$fxthen = GetFXDatum($dbh, $pfdate, $fx);
+	$fxnow = GetFXDatum($dbh, $date, $fx);
+	print "Running SQL for $pfdate and $fx: $fxthen -> $fxnow\n" if $Config{debug};
+      }
+      my $pnl = $nb * ($prices->{$name}*$fxnow - $cost*$fxthen);
+      printf "%-7.7s%7d%5s%8s%8s%8.2f%12s%8.2f%11.2f\n",
+       $stock, $nb, $fx, $type, $owner, $cost, $pfdate, $prices->{$name}, $pnl;
+      $sum = $sum + $pnl;
+    }
+    printf "$fl\nTotal profit or loss\t\t\t\t\t%18.2f\n$tl\n", $sum;
+  }
+  $sth->finish;
+}
+
+sub day_end_report {
+  my $res = shift;
+
+  # day-end report is always relative to the previous day, we enforce previous
+  # date of 24 hrs before given date by unsetting any cmdline argument that 
+  # there might have been as the function will then return previous biz day
+  my $prevdatesaved = $prevdatearg;
+  $prevdatearg = undef; 
+
+  my ($date, $prev_date, $pretty_date, $pretty_prev_date) 
+    = GetTodaysAndPreviousDates();
+  my ($fx, $prices, $prev_prices, $shares, $pricedate) 
+    = GetPriceData($dbh,$date,$res);
+  $fx->{'home currency'} = $Config{currency};
+
+  my ($fx_prices) = GetFXData($dbh, $date, $fx);
+  my ($prev_fx_prices) = GetFXData($dbh, $prev_date, $fx);
+  display_report($pretty_date, $pretty_prev_date, $prices, $prev_prices,
+		 $fx_prices, $prev_fx_prices, $shares, $fx, $pricedate);
+
+  $prevdatearg = $prevdatesaved; # and reset any potential cmdline arg
+}
+
+sub portfolio_retracement {
+  my ($res, $mode) = @_;
+
+  ## need to do a sanity checks on the date
+  die "Error: '$prevdatearg' not prior to '$datearg'.\n"
+    unless (Date_Cmp(ParseDate($prevdatearg), ParseDate($datearg)) < 0);
+  my $err = 0;
+  die "Error: '$prevdatearg' is not at least 30 days prior to '$datearg'.\n"
+    unless (Delta_Format(DateCalc(ParseDate($prevdatearg), ParseDate($datearg),
+				  \$err, 2), "approx", 0, "%dt") > 30);
+
+  my ($date, $prev_date, $pretty_date, $pretty_prev_date) 
+    = GetTodaysAndPreviousDates();
+
+  my ($fx, $prices, $tmp1, $shares, $pricedate) = 
+    GetPriceData($dbh,$date,$res);
+
+  $fx->{'home currency'} = $Config{currency};
+  my ($fx_prices)      = GetFXData($dbh, $date, $fx);
+
+  my ($highprev, $lowprev) = GetRetracementData($dbh, $date, $prev_date,
+						$res, $fx_prices);
+
+  my (%value, %totalshares);
+  foreach my $key (sort keys %$shares) {
+    my ($name,$count) = split /:/, $key;
+    $value{$name} += $shares->{$key} * $prices->{$name} 
+      * $fx_prices->{$fx->{$name}} / $fx_prices->{$Config{currency}};
+    $totalshares{$name} += $shares->{$key};
+  }
+
+  my $text = ($mode eq "advance") ? "Advances" : "Retracement";
+
+  my ($tl,$fl) = build_lines(79);
+  my ($totaldown, $weightedup, $assetbase) = (0,0,0);
+  print "$tl\n";
+  printf("%-17s", $text);
+  print " shares    price    value   $prev_date to $date  unreal. ";
+  print "" . ($mode eq "advance") ? "gain" : "loss";
+  print "\n$fl\n";
+  foreach (sort keys %$prices) {
+    my ($downperc,$downamount,$refprice);
+    $refprice = $highprev->{$ARG}; # compare to recent high, or low for short
+    if (($mode eq "retrace" and $totalshares{$ARG} < 0) or   # or inverse of it
+	($mode eq "advance" and $totalshares{$ARG} > 0)) {   # if advance
+      $refprice = $lowprev->{$ARG};
+    }
+
+    $downperc = $prices->{$ARG}/$refprice - 1;
+    $downamount = $totalshares{$ARG} * ($prices->{$ARG} - $refprice)
+      * $fx_prices->{$fx->{$ARG}} / $fx_prices->{$Config{currency}};
+    printf("%-17s %6d %8.2f %10.2f %8.2f %10.2f%%  %12.2f\n",
+	   substr($ARG, 0, 17), 
+	   $totalshares{$ARG}, $prices->{$ARG}, $value{$ARG},
+	   $refprice, 100*$downperc, $downamount);
+    $totaldown += $downamount;
+    $assetbase += $value{$ARG};
+  }
+  print "$fl\n";
+  printf("%-29s     %10.2f            %8.2f%% %13.2f\n",
+	 "Aggregate", $assetbase,
+	 100*$totaldown/$assetbase, $totaldown);
+  print "$tl\n";
+}
+
+sub portfolio_risk {
+  my $res = shift;
+  my $crit = 2.326348;		# 1% critical value of the Normal distribution
+  #my $crit = 1.644584;		# 5% critical value of the Normal distribution
+
+  ## need to do a sanity checks on the date
+  die "Error: '$prevdatearg' not prior to '$datearg'.\n"
+    unless (Date_Cmp(ParseDate($prevdatearg), ParseDate($datearg)) < 0);
+  my $err = 0;
+  die "Error: '$prevdatearg' is not at least 30 days prior to '$datearg'.\n"
+    unless (Delta_Format(DateCalc(ParseDate($prevdatearg), ParseDate($datearg),
+				  \$err, 2), "approx", 0, "%dt") > 30);
+
+  my ($date, $prev_date, $pretty_date, $pretty_prev_date) 
+    = GetTodaysAndPreviousDates();
+
+  my ($fx, $prices, $tmp1, $shares, $pricedate) = 
+    GetPriceData($dbh,$date,$res);
+
+  $fx->{'home currency'} = $Config{currency};
+  my ($fx_prices)      = GetFXData($dbh, $date, $fx);
+
+  my ($var, $pos, $vol, $quintile, $margvar) = 
+    GetRiskData($dbh, $date, $prev_date, $res, $fx_prices, $crit);
+
+  display_riskreport($pretty_date, $pretty_prev_date, $var, $pos, 
+		     $vol, $quintile, $fx, $crit, $margvar);
+}
+
+sub portfolio_status {
+  my $res = shift;
+
+  my ($date, $prev_date) = GetTodaysAndPreviousDates();
+  # override with optional dates, if supplied
+  $date      = UnixDate(ParseDate($datearg),    "%Y%m%d") if ($datearg); 
+  # create 'prettier' non-ISO 8601 form
+  my $pretty_date = UnixDate(ParseDate($date), "%d %b %Y");
+
+  my ($fx, $prices, $prev_prices, $shares, $pricedates, $cost, $pdate) = 
+    GetPriceData($dbh,$date,$res);
+
+  $fx->{'home currency'} = $Config{currency};
+  my ($fx_prices)      = GetFXData($dbh, $date, $fx);
+
+  my $cash = GetCashData($dbh, $date, $res);
+
+  display_longstatus($date, $pretty_date, $prices, $pricedates,
+		     $fx_prices, $shares, $fx, $cost, $pdate, $cash);
+}
+
+# portfolio_report -- with two "free" dates, ie from last month to last week
+sub portfolio_report {
+  my $res = shift;
+
+  ## need to do a sanity check on the date
+  unless (Date_Cmp(ParseDate($prevdatearg), ParseDate($datearg)) < 0) {
+    warn "Error: Date $prevdatearg not prior to date $datearg\n";
+  }
+
+  my ($date, $prev_date, $pretty_date, $pretty_prev_date) 
+    = GetTodaysAndPreviousDates();
+
+  my ($fx, $prices, $tmp1, $shares, $pricedate) = 
+    GetPriceData($dbh,$date,$res);
+  my ($tmp2, $prev_prices, $tmp3, $tmp4, $prev_pricedate) = 
+    GetPriceData($dbh,$prev_date,$res);
+
+  $fx->{'home currency'} = $Config{currency};
+  my ($fx_prices)      = GetFXData($dbh, $date, $fx);
+  my ($prev_fx_prices) = GetFXData($dbh, $prev_date, $fx);
+
+  display_report($pretty_date, $pretty_prev_date, $prices, $prev_prices,
+		 $fx_prices, $prev_fx_prices, $shares, $fx, $pricedate,
+		 $prev_pricedate);
+}
+
+sub portfolio_update {
+  my $res = shift;
+  UpdateFXviaUBC($dbh, $res) if $Config{fxupdate} and $Config{ubcfx};
+  UpdateFXDatabase($dbh, $res) if $Config{fxupdate}; # update FX db
+  UpdateDatabase($dbh, $res) if $Config{equityupdate};
+}
+
+sub backpopulate {
+  my @arg = @_;
+  my $fromdate = 19990101;	# default to start in Jan of 1999
+  my $todate = UnixDate(ParseDate("yesterday"),"%Y%m%d");
+
+  $fromdate = UnixDate(ParseDate($prevdatearg),"%Y%m%d") if ($prevdatearg); 
+  $todate   = UnixDate(ParseDate($datearg),"%Y%m%d") if ($datearg); 
+
+  my $stmt = qq{ select symbol from stockinfo where symbol = ? };
+  my $sth;
+  if (@arg) {
+    $sth = $dbh->prepare($stmt);
+  }
+  foreach my $symbol (@arg) {
+    # we need to query the DB to see if this symbol was registered
+    my $rv = $sth->execute(uc $symbol);
+
+    # Yahoo only returns .csv for non-us stocks in 200 data point lots
+    my @startdates;
+    my @enddates;
+
+    # build an array pair of start and endates which increment from
+    # $fromdate to $todate in about 190 business day steps
+    my $yahoostartdate = $fromdate;
+    my $yahooenddate = substr DateCalc($yahoostartdate,
+				       "+190 business days"),0,8;
+
+    # enter/continue this loop if end date is still further 
+    # out than $yahooenddate
+    while ($yahooenddate < $todate) {
+      print "Date Pair: $yahoostartdate to $yahooenddate\n" 
+	if $Config{verbose};
+      push @startdates,$yahoostartdate;
+      push @enddates,$yahooenddate;
+      # move the start date of the next pair to 1 past end of the last pair
+      $yahoostartdate = substr DateCalc($yahooenddate,
+					"+1 business days"),0,8;
+      # calculate the next end date - add 190 business days
+      $yahooenddate = substr DateCalc($yahoostartdate,
+				      "+190 business days"),0,8;	
+
+    }
+
+    # get the last date pair which will end precisely on $todate
+    if ($yahooenddate >= $todate) {
+      # this date range does not require any breaking up
+
+      print "Final Date Pair: $yahoostartdate to $todate\n" 
+	if $Config{verbose};
+      push @startdates,$yahoostartdate;
+      push @enddates,$todate;
+    }
+
+    # write all the stocks we find into the db
+    while (my $r = $sth->fetch) {
+      # roughly, if a symbol has a non-us exchange ie it has a dot in 
+      # the symbol name then yahoo will only give us 200 data points at 
+      # one go so we need to loop through the various dates
+      if ($r->[0]=~/.+\..+/) {
+        # loop through the startdates/enddates array pairs getting 
+	#the data as we go
+        while ($yahoostartdate=pop @startdates) {
+	  # get the matching end date as well
+	  $yahooenddate=pop @enddates;
+	  print "   Adding $r->[0] from $yahooenddate to $yahoostartdate\n";
+	  my @arr = GetHistoricalData($r->[0], 
+				      $yahoostartdate, $yahooenddate);
+          PrintHistoricalData($r->[0], @arr) if $Config{verbose};
+          DatabaseHistoricalData($dbh, $r->[0], @arr);
+        }
+      } else {
+      	print "   Adding $r->[0] from $fromdate to $todate\n";
+        my @arr = GetHistoricalData($r->[0], $fromdate, $todate);
+        PrintHistoricalData($r->[0], @arr) if $Config{verbose};
+        DatabaseHistoricalData($dbh, $r->[0], @arr);
+      }
+    }
+    $sth->finish;
+  }
+}
+
+sub fxbackpopulate {
+  my @arg = @_;
+  my $fromdate = 20000101;	# default to start in Jan of 2000
+  my $todate = UnixDate(ParseDate("yesterday"),"%Y%m%d");
+
+  $fromdate = UnixDate(ParseDate($prevdatearg),"%Y%m%d") if ($prevdatearg); 
+  $todate   = UnixDate(ParseDate($datearg),"%Y%m%d") if ($datearg); 
+
+  if ($Config{ubcfx}) {		# if we use PACIFIC at UBC's Sauder School
+    my $aref = GetUBCFXData(\@arg, $fromdate, $todate);
+    #print "   backpopulating ", join(" ",@arg), 
+    #	" from $fromdate to $todate\n" if $Config{debug};
+    #no equiv. here: #PrintHistoricalData($iso, @arr) if $Config{verbose};
+    DatabaseHistoricalUBCFX($dbh, $aref, @arg);
+    ##DatabaseHistoricalFXData($dbh, GetYahooCurrency($iso), @arr);
+  } else {
+    foreach my $iso (@arg) {
+#       my $fx = GetYahooCurrency($iso);
+#       if (defined($fx) and $fx ne "") {
+      print "   backpopulating $iso (rel. to $Config{currency}) ".
+	  "from $fromdate to $todate\n";
+      my $aref = GetOandAFXData($iso, $fromdate, $todate);
+      PrintHistoricalData($iso, @{$aref}) if $Config{verbose};
+      DatabaseHistoricalOandAFX($dbh, $aref, @arg);
+
+# 	  #if $Config{debug};
+# 	my (@arr) = GetHistoricalData($fx, $fromdate, $todate);
+# 	PrintHistoricalData($fx, @arr) if $Config{verbose};
+# 	DatabaseHistoricalFXData($dbh, $fx, @arr);
+#       } else {
+# 	print "** Ignoring $iso which is not currently known to " .
+# 	  "the internal tables\n";
+#       }
+     }
+  }
+}
+
+
+sub quote {
+  my @arg = @_;
+  my @data = GetDailyData(@arg); 	# fetch data 
+  my %data = ParseDailyData(@data); 	# fill assoc. array
+  ReportDailyData(%data);		# report data
+}
+
+
+sub add_index {
+  my @arg = @_;
+  my $index = shift @arg;	# get the index argument
+  foreach my $arg (@arg) {	# and loop over the stocks
+    my $cmd = "insert into indices values ( '$arg', '$index' );";
+    print "$cmd\n" if $Config{verbose};
+    $dbh->do($cmd) or warn "\nFailed with $cmd\n";
+    $dbh->commit();		# the ODBC driver needs that for a weird reason
+  }
+}
+
+
+sub add_stock {
+  my @arg = @_;
+  my @data = GetDailyData(@arg);
+  my %data = ParseDailyData(@data);
+  ReportDailyData(%data) if $Config{verbose};
+  DatabaseInfoData($dbh, %data);
+  DatabaseDailyData($dbh, %data);
+}
+
+
+sub add_portfolio {
+  my @arg = @_;
+
+  # statement for insertion into portfolio
+  my $stmt = qq{insert into portfolio values ( ?, ?, ?, ?, ?, ?, ? );};
+  my $sth;
+
+  # statement to check if this symbol already in info
+  my $infostmt = qq{ select symbol from stockinfo where symbol = ? };
+  my $infosth;
+  if (@arg) {
+    $infosth = $dbh->prepare($infostmt);
+  }
+  my @symbol;
+
+  foreach my $arg (@arg) {	# and loop over the stocks
+    my ($stock,$nb,$fx,$type,$owner,$cost,$date) 
+      = (undef, undef, undef, undef, undef, undef, undef);
+    print "Inserting $arg\n" if $Config{verbose};
+    ($stock,$nb,$fx,$type,$owner,$cost,$date) = split /:/, $arg;
+    $stock = uc $stock;		# uppercase it
+    $fx = $Config{currency} unless defined($fx);
+    if (defined($stock) and defined($nb)) {
+      if (!defined($sth)) {
+	$sth = $dbh->prepare($stmt);
+      }
+      $sth->execute($stock, $nb, $fx, $type, $owner, $cost, $date);
+      $sth->finish;
+      $dbh->commit();		# the ODBC driver needs that for a weird reason
+    } else {
+      warn "Ignoring invalid argument $arg\n";
+    }
+
+    $infosth->execute($stock);
+    push @symbol, $stock unless ($infosth->fetch);
+    $infosth->finish;
+  }
+
+  if ($#symbol > -1) {		# if there are symbols to be added
+    add_stock(@symbol)		# make sure 'new' stocks get added to DB
+  }
+}
+
+
+# set 'active' field false in stockinfo table for 'symbol'
+# no sql restrictions are applicable to the stockinfo table
+sub inactive_stock {
+  my @arg = @_;    # array of stock symbols
+  # statement to check if this symbol already in info
+  my $infostmt = qq{select symbol,active from stockinfo where symbol=?;};
+  my $infosth = $dbh->prepare($infostmt);
+
+  printf STDERR "infostmt:%s\n", $infostmt if $Config{verbose};
+
+  ## for all arguments
+  ##   if stock is 1) in info table and 2) active then deactive it
+  ##   else report condition a) not in table or b) not active
+  my @symbol;
+  foreach my $arg (@arg) {	# and loop over the stocks
+    my $stock = uc $arg;	# uppercase it
+
+    print "Checking stock $stock\n" if $Config{verbose};
+    $infosth->execute($stock);
+
+    my ($symb, $active) = $infosth->fetchrow_array;
+    $infosth->finish;
+    if (! $symb) {
+      printf STDERR "Symbol %s not in database, cannot deactive\n", $stock;
+    } else {
+      if ($active == 1) {
+        push @symbol, $symb;
+      } else {
+        printf STDERR "Symbol %s is already deactivated\n", $symb;
+      }
+    }
+  }
+
+  # statement for updating stockinfo table
+  my $stmt = qq{update stockinfo set active='false' where symbol=?;};
+  my $sth = $dbh->prepare($stmt);
+  print STDERR "inactive stock sql statement:\n$stmt\n" if $Config{verbose};
+
+  if ($Config{commit}) {
+    ## with $stock(s) in @symbol do the deed
+    foreach my $stk (@symbol) {
+      print STDERR "Inactivating stock $stk\n" if $Config{verbose};
+      # perform the access
+      $sth->execute($stk);
+      $sth->finish;
+      $dbh->commit();        # the ODBC driver needs that for a weird reason
+    }
+  }
+}
+
+
+sub delete_stock {
+  my @arg = @_;
+
+  foreach my $arg (@arg) {	# and loop over the stocks
+    foreach my $table (qw/ stockinfo stockprices indices portfolio/) {
+      my $cmd = "delete from $table where symbol = '$arg';";
+      print "$cmd\n" if $Config{verbose};
+      $dbh->do($cmd) or warn "\nFailed with $cmd\n";
+      $dbh->commit();		# the ODBC driver needs that for a weird reason
+    }
+  }
+}
+
+
+sub deletedb {			# this unfortunately is PostgreSQL specific
+  CloseDB($dbh);		# or we won't be able to close
+  if (lc $Config{dbsystem} eq "mysql") {
+    system("mysqladmin drop $Config{dbname}")
+      or warn("Could not delete MySQL database $Config{dbname}");
+    ## bad return value, will trigger die() even on success
+  } elsif (lc $Config{dbsystem} eq "postgresql") {
+    #  system("psql -q -c \"drop database beancounter\"") == 0 
+    system("dropdb $Config{dbname}")	# requires PostgreSQL >= 7.1
+      or warn("Could not delete Postgresql database $Config{dbname}");
+    ## bad return value, will trigger die() even on success
+  } elsif (lc $Config{dbsystem} eq "sqlite" or 		# sqlite v3
+	   lc $Config{dbsystem} eq "sqlite2") {		# sqlite v2
+    unlink($Config{dbname}) 
+      or warn("Could not remove SQLite database $Config{dbname}");
+  }
+  exit(0);
+}
+
+
+__END__				# that's it, folks!  Documentation below
+
+#---- Documentation ---------------------------------------------------------
+
+=head1 NAME
+
+beancounter - Stock portfolio performance monitor tool
+
+=head1 SYNOPSYS
+
+beancounter [options] command [command_arguments ...]
+
+=head1 COMMANDS
+
+ addindex index args       add stock(s) to market index 'indx'
+ addportfolio sym:nb:fx:type:o:pp:pd ... 
+                           add 'nb' stocks of company with symbol 'sym'
+                           that are listed in currency 'fx' to the 
+			   portfolio with optional 'type' and 'owner'
+                           info, purchase price 'pp' and date 'pd'; 
+                           see below for a complete example
+ allreports		   combines dayendreport, status and risk 
+ addstock arg ...          add stock(s) with symbol arg to the database
+ advancement  		   report on unrealized gains from lows
+ backpopulate  arg ...	   fill with historic data for given stock(s)
+ checkdbconnection	   test if connection to db can be established
+ dailyjob		   combines update, dayendreport, status + risk 
+ dayendreport		   reports p/l changes relative to previous day
+ deactivate symbol ...     set stock(s) inactive in stockinfo table
+ delete arg ...	   	   delete given stock(s) from database
+ destroydb                 delete the BeanCounter database
+ fxbackpopulate  arg ...   fill with historic data for currency(ies)
+ lsportfolio               list portfolio data
+ plreport                  run an portfolio p/l report rel. to any day
+ quote arg ...             report current data for given stock(s)
+ retracement  		   report unrealized losses from highs (drawdowns)
+ risk			   display a portfolio risk report
+ split arg ...             split-adjust price history and portfolio
+ status			   status summary report for portfolio
+ update                    update the database with day's data
+ warranty		   display the short GNU GPL statement
+
+=head1 OPTIONS
+
+ --help                    show this help
+ --verbose		   more verbose operation, debugging
+ --date date               report for this date (today)
+ --prevdate date           relative to this date (yesterday)
+ --currency fx		   set home currency
+ --restriction sql	   impose SQL restriction
+ --extrafx fx1,fx2,...     additional currencies to load
+ --forceupdate date        force db to store new price info with date
+ --rcfile file		   use different configuration file
+ --[no]fxupdate  	   enforce/suppress FX update, default is update
+ --[no]commit	  	   enforce/suppress database update, default is commit
+ --[no]equityupdate        enforce/suppress Equity update, default is update
+ --[no]ubcfx    	   use/skip FX from UBC's Sauder school, default skip
+ --splitby arg             split stock history + position by this factor [2]
+ --dbsystem system         use db backend system, default is PostgreSQL
+ --dbname name	           use db name, default is beancounter
+
+=head1 DESCRIPTION
+
+B<beancounter> gathers and analyses stock market data to evaluate
+portfolio performance.  It has several modes of operation. The first
+main mode is data gathering: both current data (e.g. end-of-day
+closing prices) and historical price data (to back-populate the
+database) can be retrieved both automatically and efficiently with
+subsequent local storage in a relational database system (either
+F<PostgreSQL>, F<MySQL> or F<SQLite>) though any other system with an
+F<ODBC> driver could be used). The second main mode is data analysis
+where the stored data is evaluated to provide performance
+information. Several canned reports types are already available.
+
+Data is retrieved very efficiently in a single batch query per Yahoo!
+host from the Yahoo! Finance web sites using Finance::YahooQuote
+module (where version 0.18 or newer is required for proxy
+support). Support exists for North America (i.e. US and Canada),
+Europe (i.e. the Continent as well as Great Britain), several Asian
+stock markets, Australia and New Zealand. 
+
+B<beancounter> can aggregate the change in value for the entire
+portfolio over arbitrary time horizons (provided historical data has
+either been gathered or has been backpopulated). Using the powerful
+date-parsing routine available to Perl (thanks to the F<Date::Manip>
+modules), you can simply say 'from six months ago to today' (see below
+for examples).
+
+B<beancounter> has been written and tested under Linux. It should run
+under any standard Unix as long as the required Perl modules are
+installed, as as long as the database backend is found.
+
+=head1 EXAMPLES
+
+ beancounter update --forceupdate today
+
+    This updates the database: it extends timeseries data (such as
+    open, low, high, close, volume) with data for the current day,
+    and overwrites static data (such as capital, price/earnings, ...) 
+    with current data. All stocks held in the database are updated
+    (unless the --restriction argument instructs otherwise). The 
+    --forceupdate option lets the program corrects incorrect dates 
+    returned from Yahoo! (which happens every now and so often), but
+    be careful to correct for this on public holidays. Note that 
+    the --restriction argument will be applied to the portfolio table,
+    whereas the overall selection comes from the stockinfo table.
+
+ beancounter addportfolio IBM:100:USD:401k:joe:90.25:20000320  \
+                          SPY:50:USD:ira:joe:142.25:20000620
+
+    This adds IBM to the 401k portfolio of Joe, as well as SP500
+    'Spiders' to his IRA portfolio. The stocks are also added to the
+    general stock info tables via an implicit call of the stockinfo
+    command.
+
+ beancounter addstock LNUX RHAT COR.TO
+
+    This adds these three Linux companies to the database without adding
+    them to any specific portfolios.
+
+ beancounter backpopulate --prevdate '1 year ago' \
+                          --date 'friday 1 week ago' IBM MSFT HWP
+
+    This backpopulates the database with historic prices for three
+    hardware companies. Note how the date specification is very general
+    thanks to the underlying Date::Manip module.
+
+ beancounter fxbackpopulate --prevdate '1 year ago' \
+                          --date 'friday 1 week ago' CAD EUR GBP
+
+    This backpopulates the database with historic prices for these
+    three currencies. Note how the date specification is very general
+    thanks to the underlying Date::Manip module.
+
+    Unfortunately, Yahoo! is a little bone-headed in its implementation
+    of historic FX rates -- these are stored to only two decimals 
+    precision, just like stockprices. Unfortunately, convention is to
+    use at least four if not six. Because of the limited information, 
+    risk from FX changes will be underestimated.
+
+ beancounter plreport --prevdate '1 month ago' --date 'today' \
+			--restriction "owner='joe'"
+
+    This calculates portfolio profits or losses over the last month. It
+    also imposes the database restriction that only stocks owned by
+    'joe' are to be included.
+
+ beancounter status --restriction "type='401k'"
+
+    This shows a portfolio status report with the restriction that only
+    stocks from the '401k' account are to be included.
+
+ beancounter risk --prevdate "6 month ago"
+
+    This shows a portfolio risk report. This tries describes the 
+    statistically plausible loss which should be exceeded only 1 out
+    of 100 times (see below for more details).
+
+ beancounter dailyjob --forceupdate today
+
+    Run a complete 'job': update the database, show a day-end profit/loss
+    report, show a portfolio status report and show a riskreport. In the
+    update mode, override a potentially wrong date supplied by Yahoo!
+    with the current date.
+
+ beancounter split --splitby 3 --prevdate 1990-01-01 ABC CDE
+
+    Split-adjusts the (hypothetical) stocks ABC and CDE by a factor
+    of three: price data in the database is divided by three, volume
+    increased by 3 and similarly, in the portfolio shares are increased
+    and cost is descreased.  Default dates are --prevdate and --date
+    which may need adjusting.
+
+=head1 TUTORIAL
+
+The following few paragraphs will illustrate the use of
+B<beancounter>.  We will set up two fictional accounts for two
+brothers Bob and Bill (so that we can illustrate the 'owner' column).
+The prices below are completely fictitious, as are the portfolios.
+
+We suppose that B<beancounter> is installed and that the
+B<setup_beancounter> command has been run. We can then create a
+two-stock (computer hardware) portfolio for Bob as follows:
+
+ beancounter addportfolio SPY:50:USD:401k:bob:142.25:20000620 \
+                          IBM:100:USD:401k:bob:90.25:20000320
+
+Here we specify that 100 shares each of SPY and IBM, priced in US
+Dollars, are in Bob's portfolio which is tagged as a 401k retirement
+account. The (fictitious) purchase price and date are also given.
+
+Let's suppose that Bill prefers networking equipment, and that he has
+a brokerage account in Canada:
+
+ beancounter addportfolio CSCO:100:USD:spec:bill:78.00:19990817 \
+                          NT.TO:200:CAD:spec:bill:cad:90.25:20000212
+
+Now we can backpopulate the database from 1998 onwards for all four stocks:
+
+ beancounter backpopulate --prevdate 19980101 CSCO IBM NT.TO SPY
+
+With this historical data in place, we now compare how Bob's portfolio
+would have fared over the last 18 months:
+
+ beancounter plreport --prevdate '18 months ago' \
+  			--restriction "owner='bob'"
+
+Note how we use double quotes to protect the arguments, and how the
+SQL restriction contains a further single quote around the literal
+string.
+
+We can also review the performance for Bill at the most recent trading
+day:
+
+ beancounter dayendreport --restriction "owner='bill'"
+
+or the status of holdings and their respective values:
+
+ beancounter dayendreport --restriction "owner='bill'"
+
+Similarly, a risk reports can be run on this portfolios per
+
+ beancounter risk --restriction "owner='bill'"
+
+=head1 MORE DETAILED COMMAND DESCRIPTION
+
+B<addportfolio> is the most important 'position entry' command. As
+with other commands, several arguments can be given at the same
+time. For each of these, records are separated using a colon and
+specify, in order, stock symbol, number of stocks held, currency,
+account type, account owner, purchase price and purchase date.  Only
+the first three arguments are required, the others are
+optional. Executing B<addportfolio> implicitly executes B<addstock>. 
+The account type column can be used to specify whether the account 
+is, e.g., a tax-sheltered retirement account, or it could be used to
+denote the brokerage company is it held at.
+
+B<plreport> retrieves the most recent quotes(s). This is useful for
+illiquid securities which might not have traded that day, or if a
+public holiday occurred, or if there was a data error at Yahoo!. Two
+dates can be specified which determine the period over which the
+profit or loss is computed. This will fail if price data (or currency
+data in the case of foreign stocks data) data is not available for
+either of those two dates. This may be restrictive for foreign stocks
+where we cannot backpopulate due to lack of public data source for
+historical currency quotes. Major currencies can be retrieved from 
+Yahoo!, but only to two decimals precisions.
+
+B<dayendreport> is similar to B<plreport> but is always over a one-day
+period.  It also uses only one date record by calculating performance
+given the 'previous close' data.
+
+B<status> shows holdings amounts, total position values, annualized 
+returns in percentages and holding periods in days. Note that the 
+annualized returns can appear excessive if, e.g., a ten-day return 
+from a recently purchased stock is extrapolated to an annual time 
+period.
+
+B<risk> shows a portfolio risk report which describes the
+statistically plausible loss which should be exceeded only 1 out of
+100 times.  In other words, the loss estimate has a critical level of
+99%. This risk level is estimated via two methods. The first is
+non-parametric and assumes no particular model or distribution; it
+computes the 1% quintile of the return distribution and displays it as
+well as the corresponding asset value at risk.  The second method uses
+the standard Value-at-Risk (VaR) approach. This uses the 1% critical
+value of the Normal distribution and implicitly assumes a normal
+distribution for returns. See C<http://www.gloriamundi.org> for more
+introduction and references. If the distribution of normalitty was
+perfectly true, both measures would coincide. A large difference
+between the two estimates would indicate that the return distribution
+might be rather non-normal.  Another view of the riskiness of a given
+position is provided by the last column with the 'margVaR' heading. It
+shows the marginal Value-at-Risk. Marginal VaR is commonly defined as
+the risk contribution of the given position to the total portfolio,
+and calculated as the difference in the VaR of the full portfolio and
+the VaR of an otherwise identical portfolio with the given position
+removed.  Note that calculating marginal VaR is fairly slow (on the
+order of O(n^3) ].
+
+B<retracement> shows a 'drawdown' report. Drawdown is commonly defined
+as the percentage loss relative to the previous high. The default
+period is used, but can be altered with the B<--date> and
+B<--prevdate> options. The default period is also corrected for the
+actual holding period. In other words, if a stock has been held for
+two months, only those two months are used instead of the default of
+six months -- but if the last months has been selected via
+B<--prevdate> then it is used.  For short positions, the analysis is
+inverted and relative to the previous low. The report displays each
+stock, the number of shares held, the current price and holdings
+value. The next two columns show the maximum price attained in the
+examined period, and the percent decline relative to it. The last
+column shows the unrealized loss relative to the maximum price over
+the period. The aggregate holdings value, percent decline and
+unrealized loss are shown as well.
+
+B<advancement> does the opposite of drawdown -- it computes unrealized
+gains relative to the minimum price in the period. The discussion in
+the preceding paragraph applies `but inverted'.
+
+B<lsportfolio> simply lists the content of the portfolio table.
+A SQL restriction can be imposed.
+
+B<addindex> adds stocks a the index table. Currently, no further
+analysis references this table.
+
+B<addstock> adds stocks to the database. From then on data will be
+retrieved for the given symbol(s) and stored in the database whenever 
+the B<update> command is executed.
+
+B<backpopulate> fills the database with historic prices for the given
+symbols and date period. Note that this works well for stocks and
+mutual fund. Options have no historic data stored. Currencies are
+stored with limited precision as noted above.
+
+B<quote> simply shows a price quote  for the given symbol(s).
+
+B<update> updates the database with quotes for all stocks for the 
+given day. No output is generated making the command suitable for 
+B<cron> execution.
+
+B<dailyjob> is a simple convenience wrapper around B<update>,
+B<dayendreport>, B<status> and B<risk>,
+
+B<allreports> is a another covenience wrapper around B<dayendreport>, 
+B<status> and B<risk>.
+
+B<deactivate> will set the active column in stockinfo for the given
+symbol(s) to false thereby inhibiting any further updates of symbol(s).
+The existing data for symbol(s) is retained. Use this when a stock is
+acquired, delisted, or you simply want to stop tracking it -- but do 
+not want to purge the historical data.
+
+B<split> adjusts the price database, and the portfolio holdings, for 
+stock splits.  The default factor is 2, this can be adjusted with the
+option B<--splitby>. The dates arguments can be set with B<--prevdate>
+and B<--date>.
+
+B<delete> removes the given symbols from the database.
+
+B<destroydb> deletes the BeanCounter database.
+
+B<checkdbconnection> simply opens and closes the database handle, and
+returns a specified exit code which can then be tested. This is used
+in the B<setup_beancounter> command.
+
+B<warranty> display a short GNU General Public License statement.
+
+=head1 MORE DETAILED OPTION DESCRIPTION
+
+B<--currency> can be used to select a different I<home> currency. 
+Instead of having all values converted to the default currency, the
+selected currency is used.
+
+B<--date> allows to choose a different reference date. This is then be
+be used by commands working on a date, or date period, such as
+B<plreport>, B<dayendreport>, B<backpopulate>, B<fxbackpopulate> or
+B<status>. B<--prevdate> allows to choose a different start date for
+return calculations, or data gathering.
+
+B<--restriction> can be used to restrict the database selection. The
+argument must be a valid part of valid SQL statement in the sense that
+existing columns and operators have to be employed. The argument to
+this option will be completed with a leading I<and>. The SQL
+restriction will typcally be over elements of the I<portfolio> table
+which comprises the columns I<symbol>, I<shares>, I<currency>,
+I<type>, I<owner>, I<cost> and I<date>. A simple example would be
+I<currency='CAD'>. Note that this has to protected by double quotes
+I<"I> on the command-line.
+
+B<--extrafx> allows to gather data on additional currency rates beyond
+those automatically selected as shares are listed in them. A typical
+example would be for a European investor wanting to convert from the
+EUR in which the shares are listed into one of the member currencies
+which B<beancounter> would no longer retrieve as shares are no longer
+listed in these.
+
+B<--forceupdate> allows to overwrite an potentially wrong date in the
+database update. Unfortunately, it appears that Yahoo!  occasionally
+reports correct prices with an incorrect date such as the previous
+day's. In such a case, this option, along with an argument such as
+'today' can override the bad date datapoint and avoid a hole in the
+database. The downside of this approach is that it would "double" the
+previous data in the case of a public holiday, or even if it was run
+the weekend. A somewhat smarter comparison to previously stored data
+might prevent that, but would be more complex to implement.
+
+B<--rcfile> allows to specify a resource file different from the
+default I<~/.beancounterrc>. 
+
+B<--dbsystem> allows to switch to a different database backend. The
+default is B<PostgreSQL> but B<MySQL> and B<SQLite> are also
+supported. For B<SQLite>, the default is now version 3.* but the
+previous version -- which is not binarily compatible -- is supported
+as well with argument 'SQLite2'.
+
+B<--dbname> allows to switch to an alternate database. The default
+is 'beancounter'. This can be useful for testing new features.
+
+B<--fxupdate> is a boolean switch to enforece updates of FX rates during
+'update'. The default is 'true' but '--nofxupdate' can be used to suppress
+the update of foreign exchange rates.
+
+Similarly, B<--equityupdate> is a boolean switch to enforece, or
+suppress updates of Equity (i.e. stock) data during 'update'. The
+default is 'true' but '--noequityupdate' can be used to suppress the
+update of foreign exchange rates.
+
+B<--ubcfx> is a boolean switch to use the 'PACIFIC' FX rate service from the
+Sauder School at UBC. This is useful when the default FX rate service at
+Yahoo! is erratic, or unreliable. While the PACIFIC server provides a wider
+variety of exchange rates, Yahoo! can still be useful as it can provide more
+columns (open/high/low). However, during most of 2005, Yahoo! has been
+unrealiable for the exchange rates and has not provided historical FX
+data. On the other hand, the UBC service does not run on Canadian holidays so
+it cannot really server as a full substitute. Contributions for a new data
+acquisition, maybe via www.oanda.com would be welcome.
+
+B<--splitby> can be used to set a stock split factor other than the default
+of 2.
+
+B<--host> can be used to point to a machine containing the PostgreSQL
+or MySQL database. The machine can be remote, or it can be the actual
+machine B<beancounter> is running on. If a hostname is given, tcp/ip
+connection are used. If no hostname is given, the default value of
+'localhost' implies that local socket connections are used which may
+be easier to employ for less experienced adatabase users. 
+
+Also, B<--commit> is a boolean switch to suppress actual
+database updates if the negated B<--nocommit> is selected. This is
+useful mostly in debugging contexts.
+
+The B<--verbose> and B<--debug> switches can be used in debugging an
+testing, and B<--help> triggers the display of help message. 
+
+=head1 SYSTEM OVERVIEW
+
+The following section details some of the database and configuration
+options.
+
+=head2 DATABASE REQUIREMENTS
+
+B<beancounter> currently depends on either PostgreSQL, MySQL, SQLite
+(version 2 or 3) or any other database for which an ODBC driver is
+available (though the required tables would have to created manually
+in the ODBC case). Yet another DB backend could be added provided
+suitable Perl DBI drivers are available. For PostgreSQL, MySQL and
+SQLite, the B<setup_beancounter> script can create and initialize the
+database, form the required tables and fills them with some example
+data. It is a starting point for local modifications.
+
+The connection to the database is made via a dedicated function in the
+B<BeanCounter.pm> module, changes would only have to be made there.
+As of this writing the B<Perl DBI> (the database-independent interface
+for Perl) is used along the DBI drivers for PostgreSQL, MySQL, SQLite
+and ODBC. Ports for Oracle, Sybase, ... are encouraged.
+
+=head2 CONFIG FILE
+
+A configuration file F<~/.beancounterrc> is read if found. It
+currently supports the following options:
+
+=over 8
+
+=item I<currency> to specify into which home currency holdings and
+profits/losses have to be converted
+
+=item I<host> to specify the database server on which the
+B<BeanCounter> database resides (this is needed only for the alternate
+connection via the DBI-Pg driver in case DBI-ODBC is not used)
+
+=item I<user> to specify the userid for the database connection; if
+needed. If not specified, the current user id is used.
+
+=item I<passwd> to specify the password for the database connection,
+if needed.
+
+=item I<dbsystem> to select a database backend, e.g. to switch from
+PostgreSQL to MySQL or SQLite or SQLite2 (the previous format of
+SQLite).
+
+=item I<dbname> to select a different default database name other
+than the default of 'beancounter'
+
+=item I<proxy> to specify the address of a firewall proxy server if
+one is needed to connect to the Internet.
+
+=item I<firewall> to specify a firewallid:firewallpasswd combination,
+if needed.
+
+=item I<odbc> is a switch to turn ODBC connection on or off
+
+=item I<dsn> to use a different data source name when ODBC is used
+
+An example file F<example.beancounterrc> should have come with the 
+sources (or the Debian package); please consult this file for more
+examples.
+
+=back
+
+=head2 ODBC CONFIGURATION
+
+There are now several ODBC systems available for Linux / Unix. The
+following F<~/.odbc.ini> work with the B<iODBC> library and the
+B<PostgreSQL> ODBC driver on my Debian GNU/Linux system:
+
+   [ODBC Data Sources]
+   beancounter = BeanCounter Database
+
+   [beancounter]
+   Driver       = /usr/lib/libpsqlodbc.so
+   Database     = beancounter
+   Servername   = localhost
+
+   [ODBC]
+   InstallDir = /usr/lib
+
+Alternatively, the B<unixODBC> library can be used with the following
+scheme for F</etc/odbcinst.ini> (or F<~/.odbcinst.ini>) to define the
+Postgres database drivers
+
+   [PostgreSQL]
+   Description     = PostgreSQL ODBC driver for Linux and Windows
+   Driver          = /usr/lib/postgresql/lib/libodbcpsql.so
+   Setup           = /usr/lib/odbc/libodbcpsqlS.so
+   Debug           = 0
+   CommLog         = 0
+   FileUsage       = 1
+
+after which F</etc/odbc.ini> (or F<~/.odbc.ini>) can be used to define
+actual data sources as follows:
+
+   [PostgreSQL]
+   Description     = PostgreSQL template1
+   Driver          = PostgreSQL
+   Trace           = No
+   TraceFile       = /tmp/odbc.log
+   Database        = template1
+   Servername      = localhost
+   UserName        =
+   Password        =
+   Port            = 5432
+   Protocol        = 6.4
+   ReadOnly        = Yes
+   RowVersioning   = No
+   ShowSystemTables= No
+   ShowOidColumn   = No
+   FakeOidIndex    = No
+   ConnSettings    =
+
+   [beancounter]
+   Description     = Beancounter DB (Postgresql)
+   Driver          = Postgresql
+   Trace           = No
+   TraceFile       =
+   Database        = beancounter
+   Servername      = some.db.host.com
+   UserName        =
+   Password        =
+   Port            = 5432
+   Protocol        = 6.4
+   ReadOnly        = No
+   RowVersioning   = No
+   ShowSystemTables= No
+   ShowOidColumn   = No
+   FakeOidIndex    = No
+   ConnSettings    =
+
+
+=head1 BUGS
+
+B<Finance::BeanCounter> and B<beancounter> are so fresh that there are
+only missing features :) Seriously, check the TODO list. This code or
+its predecessors have been used by the author since the end of 1998.
+
+=head1 SEE ALSO
+
+F<Finance::BeanCounter.3pm>, F<smtm.1>, F<Finance::YahooQuote.3pm>,
+F<LWP.3pm>, F<Date::Manip.3pm>, F<Statistics::Descriptive.3pm>,
+F<setup_beancounter.1>, F<update_beancounter.1>.
+
+=head1 COPYRIGHT
+
+beancounter is (c) 2000 - 2006 by Dirk Eddelbuettel <edd@debian.org>
+
+Updates to this program might appear at 
+F<http://dirk.eddelbuettel.com/code/beancounter.html>.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.  There is NO warranty whatsoever.
+
+The information that you obtain with this program may be copyrighted
+by Yahoo! Inc., and is governed by their usage license.  See
+F<http://www.yahoo.com/docs/info/gen_disclaimer.html> for more
+information.
+
+Equivalently, foreign exchange rates from F<http://fx.sauder.ubc.ca>
+are for academic research and teaching. See
+F<http://fx.sauder.ubc.ca/about.html> for more details.
+
+=head1 ACKNOWLEDGEMENTS
+
+The Finance::YahooQuote module, originally written by Dj Padzensky
+(and on the web at F<http://www.padz.net/~djpadz/YahooQuote/> as well
+as at F<http://dirk.eddelbuettel.com/code/yahooquote>) serves as the
+backbone for data retrieval, which was also already very useful for the
+real-time ticker F<http://dirk.eddelbuettel.com/code/smtm.html>.
+
+=cut

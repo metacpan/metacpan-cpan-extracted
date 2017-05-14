@@ -1,14 +1,19 @@
 # tr.t
+$|=1;
+
+use utf8;
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
+    set_up_inc('../lib');
 }
 
-plan tests => 118;
+plan tests => 164;
 
-my $Is_EBCDIC = (ord('i') == 0x89 & ord('J') == 0xd1);
+# Test this first before we extend the stack with other operations.
+# This caused an asan failure due to a bad write past the end of the stack.
+eval { my $x; die  1..127, $x =~ y/// };
 
 $_ = "abcdefghijklmnopqrstuvwxyz";
 
@@ -23,12 +28,108 @@ is($_, "abcdefghijklmnopqrstuvwxyz",    'lc');
 tr/b-y/B-Y/;
 is($_, "aBCDEFGHIJKLMNOPQRSTUVWXYz",    'partial uc');
 
+eval 'tr/a/\N{KATAKANA LETTER AINU P}/;';
+like $@,
+     qr/\\N\{KATAKANA LETTER AINU P} must not be a named sequence in transliteration operator/,
+     "Illegal to tr/// named sequence";
+
+eval 'tr/\x{101}-\x{100}//;';
+like $@,
+     qr/Invalid range "\\x\{0101}-\\x\{0100}" in transliteration operator/,
+     "UTF-8 range with min > max";
+
+SKIP: {   # Test literal range end point special handling
+    unless ($::IS_EBCDIC) {
+        skip "Valid only for EBCDIC", 24;
+    }
+
+    $_ = "\x89";    # is 'i'
+    tr/i-j//d;
+    is($_, "", '"\x89" should match [i-j]');
+    $_ = "\x8A";
+    tr/i-j//d;
+    is($_, "\x8A", '"\x8A" shouldnt match [i-j]');
+    $_ = "\x90";
+    tr/i-j//d;
+    is($_, "\x90", '"\x90" shouldnt match [i-j]');
+    $_ = "\x91";    # is 'j'
+    tr/i-j//d;
+    is($_, "", '"\x91" should match [i-j]');
+
+    $_ = "\x89";
+    tr/i-\N{LATIN SMALL LETTER J}//d;
+    is($_, "", '"\x89" should match [i-\N{LATIN SMALL LETTER J}]');
+    $_ = "\x8A";
+    tr/i-\N{LATIN SMALL LETTER J}//d;
+    is($_, "\x8A", '"\x8A" shouldnt match [i-\N{LATIN SMALL LETTER J}]');
+    $_ = "\x90";
+    tr/i-\N{LATIN SMALL LETTER J}//d;
+    is($_, "\x90", '"\x90" shouldnt match [i-\N{LATIN SMALL LETTER J}]');
+    $_ = "\x91";
+    tr/i-\N{LATIN SMALL LETTER J}//d;
+    is($_, "", '"\x91" should match [i-\N{LATIN SMALL LETTER J}]');
+
+    $_ = "\x89";
+    tr/i-\N{U+6A}//d;
+    is($_, "", '"\x89" should match [i-\N{U+6A}]');
+    $_ = "\x8A";
+    tr/i-\N{U+6A}//d;
+    is($_, "\x8A", '"\x8A" shouldnt match [i-\N{U+6A}]');
+    $_ = "\x90";
+    tr/i-\N{U+6A}//d;
+    is($_, "\x90", '"\x90" shouldnt match [i-\N{U+6A}]');
+    $_ = "\x91";
+    tr/i-\N{U+6A}//d;
+    is($_, "", '"\x91" should match [i-\N{U+6A}]');
+
+    $_ = "\x89";
+    tr/\N{U+69}-\N{U+6A}//d;
+    is($_, "", '"\x89" should match [\N{U+69}-\N{U+6A}]');
+    $_ = "\x8A";
+    tr/\N{U+69}-\N{U+6A}//d;
+    is($_, "\x8A", '"\x8A" shouldnt match [\N{U+69}-\N{U+6A}]');
+    $_ = "\x90";
+    tr/\N{U+69}-\N{U+6A}//d;
+    is($_, "\x90", '"\x90" shouldnt match [\N{U+69}-\N{U+6A}]');
+    $_ = "\x91";
+    tr/\N{U+69}-\N{U+6A}//d;
+    is($_, "", '"\x91" should match [\N{U+69}-\N{U+6A}]');
+
+    $_ = "\x89";
+    tr/i-\x{91}//d;
+    is($_, "", '"\x89" should match [i-\x{91}]');
+    $_ = "\x8A";
+    tr/i-\x{91}//d;
+    is($_, "", '"\x8A" should match [i-\x{91}]');
+    $_ = "\x90";
+    tr/i-\x{91}//d;
+    is($_, "", '"\x90" should match [i-\x{91}]');
+    $_ = "\x91";
+    tr/i-\x{91}//d;
+    is($_, "", '"\x91" should match [i-\x{91}]');
+
+    # Need to use eval, because tries to compile on ASCII platforms even
+    # though the tests are skipped, and fails because 0x89-j is an illegal
+    # range there.
+    $_ = "\x89";
+    eval 'tr/\x{89}-j//d';
+    is($_, "", '"\x89" should match [\x{89}-j]');
+    $_ = "\x8A";
+    eval 'tr/\x{89}-j//d';
+    is($_, "", '"\x8A" should match [\x{89}-j]');
+    $_ = "\x90";
+    eval 'tr/\x{89}-j//d';
+    is($_, "", '"\x90" should match [\x{89}-j]');
+    $_ = "\x91";
+    eval 'tr/\x{89}-j//d';
+    is($_, "", '"\x91" should match [\x{89}-j]');
+}
+
 
 # In EBCDIC 'I' is \xc9 and 'J' is \0xd1, 'i' is \x89 and 'j' is \x91.
 # Yes, discontinuities.  Regardless, the \xca in the below should stay
 # untouched (and not became \x8a).
 {
-    no utf8;
     $_ = "I\xcaJ";
 
     tr/I-J/i-j/;
@@ -37,13 +138,33 @@ is($_, "aBCDEFGHIJKLMNOPQRSTUVWXYz",    'partial uc');
 }
 #
 
-
 ($x = 12) =~ tr/1/3/;
 (my $y = 12) =~ tr/1/3/;
 ($f = 1.5) =~ tr/1/3/;
 (my $g = 1.5) =~ tr/1/3/;
 is($x + $y + $f + $g, 71,   'tr cancels IOK and NOK');
 
+# /r
+$_ = 'adam';
+is y/dam/ve/rd, 'eve', '/r';
+is $_, 'adam', '/r leaves param alone';
+$g = 'ruby';
+is $g =~ y/bury/repl/r, 'perl', '/r with explicit param';
+is $g, 'ruby', '/r leaves explicit param alone';
+is "aaa" =~ y\a\b\r, 'bbb', '/r with constant param';
+ok !eval '$_ !~ y///r', "!~ y///r is forbidden";
+like $@, qr\^Using !~ with tr///r doesn't make sense\,
+  "!~ y///r error message";
+{
+  my $w;
+  my $wc;
+  local $SIG{__WARN__} = sub { $w = shift; ++$wc };
+  local $^W = 1;
+  eval 'y///r; 1';
+  like $w, qr '^Useless use of non-destructive transliteration \(tr///r\)',
+    '/r warns in void context';
+  is $wc, 1, '/r warns just once';
+}
 
 # perlbug [ID 20000511.005]
 $_ = 'fred';
@@ -69,7 +190,7 @@ is(length $x, 3);
 
 $x =~ tr/A/B/;
 is(length $x, 3);
-if (ord("\t") == 9) { # ASCII
+if ($::IS_ASCII) { # ASCII
     is($x, 256.66.258);
 }
 else {
@@ -83,7 +204,7 @@ is($x, 256.193.258);
 
 $x =~ tr/A/B/;
 is(length $x, 3);
-if (ord("\t") == 9) { # ASCII
+if ($::IS_ASCII) { # ASCII
     is($x, 256.193.258);
 }
 else {
@@ -162,10 +283,6 @@ is($_, '...d.f...j.l...p');
 eval "tr/m-d/ /";
 like($@, qr/^Invalid range "m-d" in transliteration operator/,
               'reversed range check');
-
-eval '$1 =~ tr/x/y/';
-like($@, qr/^Modification of a read-only value attempted/,
-              'cannot update read-only var');
 
 'abcdef' =~ /(bcd)/;
 is(eval '$1 =~ tr/abcd//', 3,  'explicit read-only count');
@@ -259,7 +376,6 @@ is(sprintf("%vd", $a), '196.172.200');
 
 # UTF8 range tests from Inaba Hiroto
 
-# Not working in EBCDIC as of 12674.
 ($a = v300.196.172.302.197.172) =~ tr/\x{12c}-\x{130}/\xc0-\xc4/;
 is($a, v192.196.172.194.197.172,    'UTF range');
 
@@ -290,9 +406,8 @@ is($a, "X");
 ($a = "\x{200}") =~ tr/\x00-\x{100}/X/cs;
 is($a, "X");
 
-
-# Tricky on EBCDIC: while [a-z] [A-Z] must not match the gap characters,
-# (i-j, r-s, I-J, R-S), [\x89-\x91] [\xc9-\xd1] has to match them,
+# Tricky on EBCDIC: while [a-z] [A-Z] must not match the gap characters (as
+# well as i-j, r-s, I-J, R-S), [\x89-\x91] [\xc9-\xd1] has to match them,
 # from Karsten Sperling.
 
 $c = ($a = "\x89\x8a\x8b\x8c\x8d\x8f\x90\x91") =~ tr/\x89-\x91/X/;
@@ -304,7 +419,7 @@ is($c, 8);
 is($a, "XXXXXXXX");
 
 SKIP: {
-    skip "not EBCDIC", 4 unless $Is_EBCDIC;
+    skip "EBCDIC-centric tests", 4 unless $::IS_EBCDIC;
 
     $c = ($a = "\x89\x8a\x8b\x8c\x8d\x8f\x90\x91") =~ tr/i-j/X/;
     is($c, 2);
@@ -465,3 +580,67 @@ is($s, "AxBC", "utf8, DELETE");
     is($c, "\x20\x30\x40\x50\x60", "tr/\\x00-\\x1f//d");
 }
 
+($s) = keys %{{pie => 3}};
+SKIP: {
+    if (!eval { require XS::APItest }) { skip "no XS::APItest", 2 }
+    my $wasro = XS::APItest::SvIsCOW($s);
+    ok $wasro, "have a COW";
+    $s =~ tr/i//;
+    ok( XS::APItest::SvIsCOW($s),
+       "count-only tr doesn't deCOW COWs" );
+}
+
+# [ RT #61520 ]
+#
+# under threads, unicode tr within a cloned closure would SEGV or assert
+# fail, since the pointer in the pad to the swash was getting zeroed out
+# in the proto-CV
+
+{
+    my $x = "\x{142}";
+    sub {
+	$x =~ tr[\x{142}][\x{143}];
+    }->();
+    is($x,"\x{143}", "utf8 + closure");
+}
+
+# Freeing of trans ops prior to pmtrans() [perl #102858].
+eval q{ $a ~= tr/a/b/; };
+ok 1;
+SKIP: {
+    no warnings "deprecated";
+    skip "no encoding", 1 unless eval { require encoding; 1 };
+    eval q{ use encoding "utf8"; $a ~= tr/a/b/; };
+    ok 1;
+}
+
+{ # [perl #113584]
+
+    my $x = "Perlα";
+    $x =~ tr/αα/βγ/;
+    { no warnings 'utf8'; print "# $x\n"; } # No note() to avoid wide warning.
+    is($x, "Perlβ", "Only first of multiple transliterations is used");
+}
+
+# tr/a/b/ should fail even on zero-length read-only strings
+use constant nullrocow => (keys%{{""=>undef}})[0];
+for ("", nullrocow) {
+    eval { $_ =~ y/a/b/ };
+    like $@, qr/^Modification of a read-only value attempted at /,
+        'tr/a/b/ fails on zero-length ro string';
+}
+
+# Whether they're permitted or not, non-modifying tr/// should not write
+# to read-only values, even with funky flags.
+{ # [perl #123759]
+	eval q{ ('a' =~ /./) =~ tr///d };
+	ok(1, "tr///d on PL_Yes does not assert");
+	eval q{ ('a' =~ /./) =~ tr/a-z/a-z/d };
+	ok(1, "tr/a-z/a-z/d on PL_Yes does not assert");
+	eval q{ ('a' =~ /./) =~ tr///s };
+	ok(1, "tr///s on PL_Yes does not assert");
+	eval q{ *x =~ tr///d };
+	ok(1, "tr///d on glob does not assert");
+}
+
+1;

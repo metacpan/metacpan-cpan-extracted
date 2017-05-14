@@ -3,7 +3,6 @@ package Net::Whois::RIPE;
 use 5.006;
 use warnings;
 use strict;
-use Net::Whois::Generic;
 use IO::Socket::INET;
 use IO::Select;
 use Iterator;
@@ -28,11 +27,11 @@ Net::Whois::RIPE - a pure-Perl implementation of the RIPE Database client.
 
 =head1 VERSION
 
-Version 2.006000
+Version 2.005002
 
 =cut
 
-our $VERSION = 2.006000;
+our $VERSION = 2.005002;
 
 =head1 SYNOPSIS
 
@@ -50,11 +49,17 @@ The usage should remain mostly the same:
   my $whois = Net::Whois::RIPE->new( %options );
   $iterator = $whois->query( 'AS333' );
 
+If you prefer to manipulate full-fledged objects you can now use
+
+  use Net::Whois::Object;
+
+  my @objects = Net::Whois::Object->query( 'AS333' );
+
 From version 2.005000 you can also use the  Net::Whois::Generic interface 
 that mimics Net::Whois::Object while offering access to data from other sources
 than RIPE (AFRINIC, APNIC)
 
-  use Net::Whois::RIPE;
+  use Net::Whois::Object;
 
   my @objects = Net::Whois::Generic->query( 'ORG-AFNC1-AFRINIC' );
 

@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 use vars qw/$VERSION/;
 
 BEGIN {
-    our $VERSION = '2.0.4'; # VERSION
+    our $VERSION = '2.0.10'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
@@ -31,7 +31,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 2.0.4
+version 2.0.10
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Beginners might want to look at L<MarpaX::ESLIF::Introduction>.
 
 Returns an instance of MarpaX::ESLIF, noted C<$eslif> below.
 
-C<$loggerInterface> is an optional parameter that, when set, must be an object instance that can do the methods documented in L<MarpaX::ESLIF::Logger::Interface>.
+C<$loggerInterface> is an optional parameter that, when its exists, must be an object instance that can do the methods documented in L<MarpaX::ESLIF::Logger::Interface>, or C<undef>.
 
 An example of logging implementation can be a L<Log::Any> adapter.
 

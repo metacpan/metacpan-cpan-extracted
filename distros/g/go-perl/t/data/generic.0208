@@ -1,0 +1,147 @@
+!version: $Revision: 1.1 $
+!date: $Date: 2004/06/09 00:21:15 $
+!GO_slim_name: generic go_slim
+!GO_slim_version: 1.0
+!GO_slim_date: 20020826
+!GO_slim_authors: Suparna Mundodi and Amelia Ireland
+!GO_slim_contact: smundodi@acoma.stanford.edu
+!type: % is_a is a
+!type: < part_of Part of
+$Gene_Ontology ; GO:0003673
+ <biological_process ; GO:0008150
+  %behavior ; GO:0007610
+  %biological_process unknown ; GO:0000004
+  %cell communication ; GO:0007154
+   %cell recognition ; GO:0008037
+   %cell-cell signaling ; GO:0007267
+   %host-pathogen interaction ; GO:0030383
+   %response to endogenous stimulus ; GO:0009719
+   %response to external stimulus ; GO:0009605
+    %response to abiotic stimulus ; GO:0009628
+    %response to biotic stimulus ; GO:0009607
+   %signal transduction ; GO:0007165
+  %cell growth and/or maintenance ; GO:0008151
+   %cell cycle ; GO:0007049
+   %cell growth ; GO:0016049
+   %cell organization and biogenesis ; GO:0016043
+    %cytoplasm organization and biogenesis ; GO:0007028
+     %organelle organization and biogenesis ; GO:0006996
+      %mitochondrion organization and biogenesis ; GO:0007005
+      %cytoskeleton organization and biogenesis ; GO:0007010
+   %cell proliferation ; GO:0008283
+   %chemi-mechanical coupling ; GO:0006943 ; synonym:mechanochemical coupling
+   %cell homeostasis ; GO:0019725
+   %metabolism ; GO:0008152
+    %amino acid and derivative metabolism ; GO:0006519
+    %biosynthesis ; GO:0009058 ; synonym:anabolism
+    %carbohydrate metabolism ; GO:0005975
+    %catabolism ; GO:0009056
+    %coenzymes and prosthetic group metabolism ; GO:0006731
+    %electron transport ; GO:0006118 ; synonym:electron transfer
+    %energy pathways ; GO:0006091
+    %lipid metabolism ; GO:0006629
+    %nucleobase, nucleoside, nucleotide and nucleic acid metabolism; GO:0006139
+     %DNA metabolism ; GO:0006259
+     %transcription ; GO:0006350
+    %protein metabolism ; GO:0019538 ; synonym:protein metabolism and modification
+     %protein biosynthesis ; GO:0006412, GO:0006416, GO:0006453; synonym:translation
+     %protein modification ; GO:0006464
+    %secondary metabolism ; GO:0019748  
+   %response to stress ; GO:0006950
+   %transport ; GO:0006810
+    %ion transport ; GO:0006811
+    %protein transport ; GO:0015031
+  %death ; GO:0016265
+   %cell death ; GO:0008219
+  %development ; GO:0007275
+   %cell differentiation ; GO:0030154
+   %embryonic development; GO:0009790 
+   %morphogenesis; GO:0009653   
+   <regulation of gene expression, epigenetic ; GO:0040029
+   %growth ; GO:0040007
+   %reproduction ; GO:0000003
+  %physiological processes ; GO:0007582
+  %viral life cycle ; GO:0016032 ; synonym:viral infection ; synonym:viral replication cycle
+ <cellular_component ; GO:0005575
+  %cell ; GO:0005623
+   <intracellular ; GO:0005622 ; synonym:protoplasm
+    <chromosome ; GO:0005694
+    <cilium ; GO:0005929
+    <cytoplasm ; GO:0005737
+     <cytoplasmic chromosome ; GO:0000229
+     <cytoplasmic vesicle ; GO:0016023
+     <cytoskeleton ; GO:0005856
+     <cytosol ; GO:0005829
+     <endoplasmic reticulum ; GO:0005783 ; synonym:ER
+     <endosome ; GO:0005768
+     <Golgi apparatus ; GO:0005794 ; synonym:Golgi complex
+     <lipid particle ; GO:0005811 ; synonym:lipid droplet
+     <microtubule organizing center ; GO:0005815
+     <mitochondrion ; GO:0005739
+     <peroxisome ; GO:0005777
+     <plastid ; GO:0009536
+     <ribosome ; GO:0005840
+     <vacuole ; GO:0005773
+      <lysosome ; GO:0005764
+    <nucleus ; GO:0005634
+     <nuclear chromosome ; GO:0000228
+     <nuclear membrane ; GO:0005635 ; synonym:nuclear envelope
+     <nucleolus ; GO:0005730
+     <nucleoplasm ; GO:0005654
+    <plasma membrane ; GO:0005886 ; synonym:cell membrane; synonym:cytoplasmic membrane
+    <thylakoid ; GO:0009579
+  %cellular_component unknown ; GO:0008372
+  %external encapsulating structure ; GO:0030312
+   %cell envelope ; GO:0030313
+   %cell wall ; GO:0005618
+  %extracellular ; GO:0005576
+  <extracellular matrix ; GO:0005578
+  <extracellular space ; GO:0005615
+  %unlocalized ; GO:0005941
+ <molecular_function ; GO:0003674
+  %antioxidant activity ; GO:0016209
+  %apoptosis regulator activity ; GO:0016329
+  %binding ; GO:0005488
+   %calcium ion binding ; GO:0005509
+   %carbohydrate binding ; GO:0030246
+   %lipid binding ; GO:0008289
+   %nucleic acid binding ; GO:0003676
+    %DNA binding ; GO:0003677
+     %chromatin binding ; GO:0003682 
+     %transcription factor activity ; GO:0003700, GO:0000130
+    %nuclease activity ; GO:0004518 ; EC:3.1.-.-
+    %RNA binding ; GO:0003723
+    %translation factor activity, nucleic acid binding ; GO:0008135
+   %nucleotide binding ; GO:0000166
+   %oxygen binding ; GO:0019825
+   %protein binding ; GO:0005515
+    %cytoskeletal protein binding ; GO:0008092
+     %actin binding ; GO:0003779
+  %cell adhesion molecule activity ; GO:0005194
+  %chaperone activity ; GO:0003754, GO:0003757, GO:0003758, GO:0003760, GO:0003761
+  %chaperone regulator activity ; GO:0030188
+  %defense/immunity protein activity ; GO:0003793
+  %catalytic activity ; GO:0003824
+   %kinase; GO:0016301
+    %protein kinase activity ; GO:0004672
+   %hydrolase; GO:0016787
+    %peptidase activity ; GO:0008233 ; EC:3.4.-.- ; synonym:hydrolase\, acting on peptide bonds ; synonym:peptide hydrolase ; synonym:protease
+    %protein phosphatase activity ; GO:0004721 ; EC:3.1.3.16
+   %transferase; GO:0016740
+  %enzyme regulator activity ; GO:0030234
+  %molecular_function unknown ; GO:0005554
+  %motor activity ; GO:0003774
+  %protein stabilization activity ; GO:0017028
+  %protein tagging activity ; GO:0008638
+  %signal transducer activity ; GO:0004871
+   %receptor binding ; GO:0005102 ; synonym:receptor ligand
+   %receptor activity ; GO:0004872
+  %nutrient reservoir activity ; GO:0045735
+  %structural molecule activity ; GO:0005198
+  %transcription regulator activity ; GO:0030528
+  %translation regulator; GO:0045182
+  %transporter activity ; GO:0005215
+   %electron transporter activity ; GO:0005489 
+   %ion channel activity ; GO:0005216
+   %neurotransmitter transporter activity ; GO:0005326
+  %triplet codon-amino acid adaptor activity ; GO:0030533

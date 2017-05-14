@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use CPAN::Packager::Config::Schema;
 use Kwalify;
-use Log::Log4perl qw(:easy);
 
 sub validate {
     my ( $class, $config ) = @_;
@@ -20,7 +19,8 @@ sub _validate_config {
         }
     }
     else {
-        WARN("Kwalify is not installed. Skipping the config validation.");
+        warn "Kwalify is not installed. Skipping the config validation."
+            if $^W;
     }
 }
 

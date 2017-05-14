@@ -1,0 +1,36 @@
+YAML-Accessor version 0.3
+==========================
+
+I saw a need to integrate Class::Accessor with YAML::XS. You
+may not see this need, but I wanted it and I use it for a piece
+of code that sorely needs it. Here you go. Use it or don't.
+
+People on IRC said it was a horrible idea. I rather like it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  YAML::XS
+  Class::Accessor
+  Params::Validate
+  common::sense
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Jane A. Avriette <jane@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+And while you're distributing software, drink more beer.

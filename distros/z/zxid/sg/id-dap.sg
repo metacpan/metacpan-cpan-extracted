@@ -1,0 +1,152 @@
+# id-dap.sg  --  Authorative ID-DAP 1.0 Service Schema
+# Author: Sampo Kellomaki (sampo@symlabs.com)
+# http://www.w3.org/2001/03/webdata/xsv
+# $Id: id-dap.sg,v 1.2 2007-06-19 15:17:04 sampo Exp $
+# This schema reflects Liberty ID Directory Access Protocol,
+# version 1.0-07 of 11.10.2006
+
+target(dap,     urn:liberty:id-sis-dap:2006-08:dst-2.1)
+import(dst,     urn:liberty:dst:2006-08,      liberty-idwsf-dst-v2.1.xsd)
+import(subs,    urn:liberty:ssos:2006-08,     liberty-idwsf-subs-v1.0.xsd)
+import(lu,      urn:liberty:util:2006-08,     liberty-idwsf-utility-v2.0.xsd)
+
+Create         -> %dap:CreateType
+CreateResponse -> %dap:CreateResponseType
+Query          -> %dap:QueryType
+QueryResponse  -> %dap:QueryResponseType
+Modify         -> %dap:ModifyType
+ModifyResponse -> %dap:ModifyResponseType
+Delete         -> %dap:DeleteType
+DeleteResponse -> %dap:DeleteResponseType
+Notify         -> %dap:NotifyType
+NotifyResponse -> %dap:NotifyResponseType
+
+%SelectType:
+    dap:dn?            -> %xs:string
+    dap:filter?        -> %xs:string
+    @scope?        -> %xs:integer  default(0)
+    @sizelimit?    -> %xs:integer  default(0)
+    @timelimit?    -> %xs:integer  default(0)
+    @attributes?   -> %xs:string
+    @typesonly?    -> %xs:boolean  default(false)
+    @derefaliases? -> %xs:integer  default(0)
+    ;
+
+%TestOpType:      base(dap:SelectType) ;
+%SortType:        base(xs:string) ;
+%TriggerType:     base(xs:string) ;
+%AggregationType: base(xs:string) ;
+
+%AppDataType:
+  dap:LDIF?
+  dap:Subscription?
+  ;
+
+LDIF: base(xs:string)
+  &@dst:localizedLeafAttributes
+  ;
+
+%CreateType:          base(dst:RequestType)
+  dap:Subscription*
+  dap:CreateItem+
+  dap:ResultQuery*
+  ;
+
+CreateItem            -> %dap:CreateItemType
+%CreateItemType:
+  dap:NewData?
+  &@dst:CreateItemAttributeGroup
+  ;
+
+NewData               -> %dap:AppDataType
+
+%CreateResponseType:  base(dap:DataResponseType) ;
+%DataResponseType:    base(dst:DataResponseBaseType)
+  dap:ItemData*
+  ;
+
+%QueryType:      base(dst:RequestType)
+  dap:TestItem*
+  dap:QueryItem*
+  dap:Subscription*
+  ;
+
+TestItem         -> %dap:TestItemType
+%TestItemType:   base(dst:TestItemBaseType)
+  dap:TestOp?    -> %dap:TestOpType
+  ;
+
+QueryItem        -> %dap:QueryItemType
+%QueryItemType:  base(dap:ResultQueryType)
+  &@dst:PaginationAttributeGroup
+  ;
+
+%QueryResponseType:  base(dst:DataResponseBaseType)
+  dst:TestResult*
+  dap:Data*
+  ;
+
+Data             -> %dap:DataType
+%DataType:       base(dap:ItemDataType)
+  &@dst:PaginationResponseAttributeGroup
+  ;
+
+%ModifyType:          base(dst:RequestType)
+  dap:Subscription*
+  dap:ModifyItem+
+  dap:ResultQuery*
+  ;
+
+ModifyItem            -> %dap:ModifyItemType
+%ModifyItemType:
+  dap:Select?
+  dap:NewData?
+  &@dst:ModifyItemAttributeGroup
+  ;
+
+%ModifyResponseType:  base(dap:DataResponseType) ;
+
+%DeleteType:          base(dst:RequestType)
+  dap:DeleteItem+
+  ;
+
+DeleteItem            -> %dap:DeleteItemType
+%DeleteItemType:      base(dst:DeleteItemBaseType)
+  dap:Select?
+  ;
+
+%DeleteResponseType:  base(lu:ResponseType) ;
+
+Select                -> %dap:SelectType
+
+ResultQuery           -> %dap:ResultQueryType
+%ResultQueryType:     base(dst:ResultQueryBaseType)
+  dap:Select?
+  dap:Sort?           -> %dap:SortType
+  ;
+
+ItemData              -> %dap:ItemDataType
+%ItemDataType:        base(dap:AppDataType)
+  &@dst:ItemDataAttributeGroup
+  ;
+
+Subscription          -> %dap:SubscriptionType
+%SubscriptionType:    base(subs:SubscriptionType)
+  dap:ResultQuery*
+  dap:Aggregation?    -> %dap:AggregationType
+  dap:Trigger?        -> %dap:TriggerType
+  ;
+
+%NotifyType:          base(dst:RequestType)
+  dap:Notification*
+  &@subs:NotifyAttributeGroup
+  ;
+
+Notification          -> %dap:NotificationType
+%NotificationType:    base(subs:NotificationType)
+  dap:ItemData*
+  ;
+
+%NotifyResponseType:  base(subs:NotifyResponseType) ;
+
+#EOF

@@ -1,6 +1,6 @@
 package Net::WebSocket;
 
-our $VERSION = '0.03';
+our $VERSION = '0.031';
 
 =encoding utf-8
 
@@ -16,27 +16,29 @@ Net::WebSocket - WebSocket in Perl
 
     syswrite $inet, $handshake->create_header_text() . "\x0d\x0a" or die $!;
 
+    #You can parse HTTP headers however you want;
+    #Net::WebSocket makes no assumptions about this.
     my $req = HTTP::Response->parse($hdrs_txt);
 
     #XXX More is required for the handshake validation in production!
     my $accept = $req->header('Sec-WebSocket-Accept');
     $handshake->validate_accept_or_die($accept);
 
-    my $parser = Net::WebSocket::ParseFilehandle->new(
-        $inet,
+    #See below about IO::Framed
+    my $parser = Net::WebSocket::Parser->new(
+        IO::Framed::Read->new($inet),
         $leftover_from_header_read,     #can be nonempty on the client
     );
 
+    my $iof_w = IO::Framed::Write->new($inet);
+
     my $ept = Net::WebSocket::Endpoint::Client->new(
         parser => $parser,
+        out => $iof_w,
+    );
 
-        #Include this *only* for blocking I/O. Ordinarily, control frame
-        #responses (e.g., pong, close) are queued up to be sent
-        #whenever whichever filehandle is ready to accept data.
-        #That’s for non-blocking I/O; if you’re using blocking I/O, then
-        #you can include this parameter to have those responses sent
-        #immediately.
-        out => $inet,
+    $iof_w->write(
+        Net::WebSocket::Frame::text->new( payload_sr => \'Hello, world' )
     );
 
     #Determine that $inet can be read from …
@@ -64,8 +66,8 @@ a UNIX socket, ordinary TCP/IP, some funky C<tie()>d object, or whatever.
 
 Net::WebSocket also “has no opinions” about how you should do I/O or HTTP
 headers. As a result of this “bare-bones” approach, Net::WebSocket can likely
-fit your project; however, it won’t absolve you of the need to know the
-WebSocket protocol itself. There are some examples
+fit your project; however, it won’t absolve you of the need to know some
+things aboutthe WebSocket protocol itself. There are some examples
 of how you might write complete applications (client or server)
 in the distribution’s C<demo/> directory.
 
@@ -82,39 +84,43 @@ solution would likely allow.
 
 Here are the main modules:
 
-=head2 L<Net::WebSocket::Handshake::Server>
+=over
 
-=head2 L<Net::WebSocket::Handshake::Client>
+=item L<Net::WebSocket::Handshake::Server>
+
+=item L<Net::WebSocket::Handshake::Client>
 
 Logic for handshakes. These are probably most useful in tandem with
 modules like L<HTTP::Request> and L<HTTP::Response>.
 
 
-=head2 L<Net::WebSocket::Endpoint::Server>
+=item L<Net::WebSocket::Endpoint::Server>
 
-=head2 L<Net::WebSocket::Endpoint::Client>
+=item L<Net::WebSocket::Endpoint::Client>
 
 The highest-level abstraction that this distribution provides. It parses input
 and responds to control frames and timeouts. You can use this to receive
 streamed (i.e., fragmented) transmissions as well.
 
-=head2 L<Net::WebSocket::Streamer::Server>
+=item L<Net::WebSocket::Streamer::Server>
 
-=head2 L<Net::WebSocket::Streamer::Client>
+=item L<Net::WebSocket::Streamer::Client>
 
 Useful for sending streamed (fragmented) data rather than
 a full message in a single frame.
 
-=head2 L<Net::WebSocket::Parser>
+=item L<Net::WebSocket::Parser>
 
 Translate WebSocket frames out of a filehandle into useful data for
 your application.
 
-=head2 Net::WebSocket::Frame::*
+=item Net::WebSocket::Frame::*
 
 Useful for creating raw frames. For data frames (besides continuation),
 these will be your bread-and-butter. See L<Net::WebSocket::Frame::text>
 for sample usage.
+
+=back
 
 =head1 IMPLEMENTATION NOTES
 
@@ -143,12 +149,19 @@ peculiarities of certain proxies. We now just use Perl’s C<rand()>
 built-in.
 
 (You should probably use TLS if cryptographically secure masking is something
-you care about?)
+you actually care about?)
 
 =head2 Text vs. Binary
 
 Recall that in some languages—like JavaScript!—the difference between
 “text” and “binary” is much more significant than for us in Perl.
+
+=head2 Use of L<IO::Framed>
+
+CPAN’s L<IO::Framed> provides a straightforward interface for chunking up
+data from byte streams into frames. You don’t have to use it (which is why
+it’s not listed as a requirement), but you’ll need to provide an equivalent
+interface if you don’t.
 
 =head1 EXTENSION SUPPORT
 
@@ -180,8 +193,6 @@ can do in your application.
 =head1 TODO
 
 =over
-
-=item * Convert all plain C<die()>s to typed exceptions.
 
 =item * Add tests, especially for extension support.
 

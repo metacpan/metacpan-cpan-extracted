@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="organism_intactness" cv_table="SMP_OrganismIntactness">
+  <comment type="definition">This table gives the restricted vocabulary for the column organism intactness in the table sample and is used to delineate whether the entire organism was used to prepare the sample or the fraction that was used	
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They regulate
+the visibility of other details of the sample screen, such as organ
+type, tissue type, and primary cell type.</comment>  
+<term name="intact"
+        description="the entire organism was used to prepare the sample"/>
+<term name="dissected"
+        description="some part of the organism was dissected out and sample was prepared from that dissected part"/>
+<term name="subcellular"
+        description="the sample was prepared from an organelle or similar subcellular fraction"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

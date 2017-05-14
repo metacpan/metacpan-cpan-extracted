@@ -1,0 +1,37 @@
+NAME
+    Dist::Zilla::Plugin::ReportPhase - Report whats going on.
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+    In your dist.ini:
+
+      [ReportPhase / Phase_Begins]
+
+      ...
+
+      [ReportPhase / Phase_Ends]
+
+DESCRIPTION
+    This plugin was written to give the author some idea of the order that
+    various roles are invoked under different conditions. So, ReportPhase
+    implements every major role, and reports when it is being invoked. For
+    best results it should be used as both the very first, and the very last
+    plugin listed in dist.ini, as it will then report entering and exiting
+    every phase.
+
+    Other than this phase reporting, this plugin has no use.
+
+ATTRIBUTES
+    NONE
+
+AUTHOR
+    Stirling Westrup <swestrup@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Stirling Westrup.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

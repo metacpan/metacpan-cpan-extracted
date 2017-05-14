@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Lingua/TreeTagger/Filter.pm
+lib/Lingua/TreeTagger/Filter/Element.pm
+lib/Lingua/TreeTagger/Filter/Result.pm
+lib/Lingua/TreeTagger/Filter/Result/Hit.pm
+t/00-load.t
+t/Filter.t
+t/Element.t
+t/Result.t
+t/Hit.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

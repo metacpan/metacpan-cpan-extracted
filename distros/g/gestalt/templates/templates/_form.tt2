@@ -1,0 +1,31 @@
+    <table>
+    [% FOREACH fName = TABLE.fields() %]
+    [% f = TABLE.field(fName) %]
+      <tr>
+        <td>[% f.desc %]</td>
+        <td>
+        [% IF f.fkey %]
+          [% fTable = TABLE.fkeyTable(fName) %]
+          [% FROWS = fTable.getRowsByPKey() %]
+          <select name="[% fName %]">
+          [% FOREACH FROW = FROWS %]
+            [% INCLUDE _fkeyInput.tt2 fieldName = fName field = f %]
+          [% END %]
+          </select>
+          <a href="../[% fTable.componentName() %]">Edit</a>
+        [% ELSE %]
+          [% INCLUDE _fieldInput.tt2 fieldName = fName field = f %]
+        [% END %]
+        </td>
+        <td>
+          [% ROW.getValidationError( fName ) %]
+        </td>
+      </tr>
+    [% END %]
+    [% IF BUTTON_NAME %]
+    <tr>
+      <td colspan="2"><input type="submit" name="action" value="[% BUTTON_NAME %]"></td>
+    </tr>
+    [% END %]
+    </table>
+

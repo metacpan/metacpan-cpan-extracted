@@ -1,0 +1,35 @@
+App::elsquid
+============
+
+This is the App::elsquid package. It provides the command line tool 'elsquid',
+which utilizes the EasyLists (https://easylist.github.io/) to
+create database files for central adblocking with Squid/SquidGuard.
+Amongst others, it can download and convert these lists, and install
+the resulting files.
+
+
+INSTALLATION
+
+Install this module as you would install any perl module library, 
+by running these commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DOCUMENTATION
+
+See the Changes file for a list of recent changes. POD style documentation 
+should be included in all relevant modules and scripts. These are normally 
+converted to manual pages end installed as part of the "make install" process.
+You should also be able to use the 'perldoc' utility to extract documentation 
+from the module files directly.
+
+
+COPYRIGHT 
+
+Copyright (C) 2016 Axel Miesen.
+All rights reserved.  This package is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,90 @@
+README for Net::ICal::VTIMEZONES
+================================
+
+This module isn't really a module at all. It's a set of data files
+for timezones across platforms. These are derived from the Olsen
+timezone database on Unix systems. They're expressed here in
+the VTIMEZONE format specified by RFC 2445. 
+
+With proper use of Net::ICal and these files, you can use these
+files to find out the UTC offset and daylight-savings-time
+switchover information for any timezone in the world. 
+These are intended to be used on any platform that Perl runs on.
+However, they've been tested mostly on Unix variants. For more
+information on bug reporting, read on. 
+
+================================================================
+WARNING: THIS IS AN ALPHA RELEASE. 
+If it breaks, you get to keep both pieces. 
+If you have trouble with it, please submit a bug report
+to the reefknot-devel list. Thanks.
+
+We know the installer is somewhat odd; it will, for example,
+install the VTIMEZONE files on "make" instead of "make install".
+If you have ExtUtils::MakeMaker wizardry, please help us fix
+this.
+================================================================
+
+INSTALLING:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+This process will attempt to determine whether you already have
+the VTIMEZONE files installed by Evolution.  Usually, they live
+in /usr/share/libical-evolution/zoneinfo.  If you do, it'll
+assume those are authoritative and will just write out a
+Net::ICal::Config noting this information. If you don't already
+have a set of VTIMEZONE files, it will install them in
+$PREFIX/share/zoneinfo.
+
+To install in your own local directory, do "perl Makefile.PL
+PREFIX=/home/myuser"; this will put the timezone files
+in /home/myuser/share/zoneinfo.
+
+(Obviously, this is somewhat unix-specific. We don't intend it to
+be, and we've left space in the installer for other OSes. Please
+feel free to mail patches for your OS to the developers' list.)
+
+BUG REPORTING:
+
+We expect that most bug reports for this package will have to do
+with the installer scripts, not with the actual timezone files.
+If you have a problem with the actual timezone information, feel
+free to tell us, but we may not be able to do much about it. (See
+"A note on sources" below for why.)
+
+Anyway: Bug reports should go to the packager, <srl@cpan.org>,
+with a CC to <reefknot-devel@lists.sf.net>. If you want to
+discuss your bug in a sustained fashion, you should probably join
+the developers' list, since the list is moderated. See
+http://reefknot.sf.net for more details on how to join.
+
+A NOTE ON SOURCES:
+
+These data files were originally created by the "libical" package
+distributed with the Evolution groupware client. Sources for that
+package are available in the GNOME CVS repository. For more information
+on that repository, see
+
+    http://developer.gnome.org/tools/cvs.html
+
+It is not our intention to fork the timezone files; this archive is
+simply a repackaging of those files for more convenient use by Perl
+users on multiple platforms. For full credits information, see
+the original libical sources.  
+
+LICENSE:
+
+These data files are released under the GNU General Public
+License, in keeping with the license options of libical. 
+For more information, see the file COPYING in this archive.
+
+AUTHOR:
+
+Shane Landrum, <srl@cpan.org>, and the rest of the Reefknot team.
+For more information on the Reefknot project, which builds
+standards-compatible calendaring tools in Perl, see
+http://reefknot.sf.net. 

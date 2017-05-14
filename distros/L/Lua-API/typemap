@@ -1,0 +1,67 @@
+const char *					T_STRING
+const char * const *				T_STRING
+char *						T_PV
+const void *					T_PTROBJ
+lua_Alloc					T_PTROBJ
+lua_CFunction					T_PTROBJ
+const lua_Debug *				T_CLASS_PTR
+lua_Debug *					T_CLASS_PTR
+luaL_Buffer *					T_CLASS_PTR
+lua_Hook					T_PTROBJ
+lua_Integer					T_IV
+lua_Number					T_DOUBLE
+lua_Reader					T_PTROBJ
+lua_State *					T_CLASS_PTR
+lua_Writer					T_PTROBJ
+void **						T_PTROBJ
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+        if (sv_derived_from($arg, \"${ntype}\")) {
+            STRLEN len;
+            char  *s = SvPV((SV*)SvRV($arg), len);
+
+            if (len != sizeof($var))
+                croak(\"Size %d of packed data != expected %d\",
+                        len, sizeof($var));
+            $var = *($type *)s;
+        }
+        else
+            croak(\"$var is not of type ${ntype}\")
+T_CLASS_STRUCT
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype) =~ s/luaL?_(.*)Ptr/Lua::API::$1/; \$ntt}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = ($type) s;
+	}
+	else
+	    croak(\"$var is not of type ${(my $ntt=$ntype) =~ s/luaL?_(.*)Ptr/Lua::API::$1/; \$ntt}\")
+T_CLASS_PTR
+        if (sv_derived_from($arg, \"${(my $ntt=$ntype) =~ s/luaL?_(.*)Ptr/Lua::API::$1/; \$ntt}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"${(my $ntt=$ntype) =~ s/luaL?_(.*)Ptr/Lua::API::$1/; \$ntt}\")
+
+T_STRING
+	$var = ($type)SvPV_nolen($arg)
+
+
+#############################################################################
+OUTPUT
+T_CLASS_STRUCT
+	sv_setref_pvn($arg, \"${(my $ntt=$ntype) =~ s/luaL?_(.*)Ptr/Lua::API::$1/; \$ntt}\", (char *)&$var, sizeof($var));
+T_OPAQUE_STRUCT
+        sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));
+T_CLASS_PTR
+        sv_setref_iv($arg, \"${(my $ntt=$ntype) =~ s/luaL?_(.*)Ptr/Lua::API::$1/; \$ntt}\", PTR2IV($var));
+T_STRING
+	sv_setpvn($arg, $var, $var ? strlen($var) : 0 );
+

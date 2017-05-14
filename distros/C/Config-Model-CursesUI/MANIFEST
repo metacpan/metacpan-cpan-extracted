@@ -5,5 +5,5 @@ README
 Build.PL
 lib/Config/Model/CursesUI.pm
 t/curses_ui.t
-t/test_model.pm
+t/lib/Config/Model/models/Master.pl
 META.json

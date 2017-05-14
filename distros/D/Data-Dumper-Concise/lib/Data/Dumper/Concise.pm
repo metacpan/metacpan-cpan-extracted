@@ -2,7 +2,7 @@ package Data::Dumper::Concise;
 
 use 5.006;
 
-$VERSION = '2.022';
+our $VERSION = '2.023';
 
 require Exporter;
 require Data::Dumper;
@@ -13,6 +13,7 @@ BEGIN { @ISA = qw(Exporter) }
 
 sub DumperObject {
   my $dd = Data::Dumper->new([]);
+  $dd->Trailingcomma(1) if $dd->can('Trailingcomma');
   $dd->Terse(1)->Indent(1)->Useqq(1)->Deparse(1)->Quotekeys(0)->Sortkeys(1);
 }
 
@@ -43,6 +44,7 @@ is equivalent to:
     local $Data::Dumper::Deparse = 1;
     local $Data::Dumper::Quotekeys = 0;
     local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Trailingcomma = 1;
     warn Dumper($var);
   }
 
@@ -58,7 +60,7 @@ Data::Dumper::Concise will give you:
         use warnings;
         use strict 'refs';
         'fleem';
-    }
+    },
   }
 
 instead of the default Data::Dumper output:
@@ -70,6 +72,11 @@ instead of the default Data::Dumper output:
   };
 
 (note the tab indentation, oh joy ...)
+
+(The trailing comma on the last element of an array or hash is enabled by a new
+feature in Data::Dumper version 2.159, which was first released in Perl 5.24.
+Using Data::Dumper::Concise with an older version of Data::Dumper will still
+work, but you won't get those commas.)
 
 If you need to get the underlying L<Dumper> object just call C<DumperObject>.
 

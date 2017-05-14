@@ -1,0 +1,29 @@
+/* XPM */
+static char *paste[] = {
+/* width height ncolors chars_per_pixel */
+"17 17 5 1",
+/* colors */
+". c #FCFEFC",
+"  s None c None",
+"X c #BCBEBC",
+"o c #7C7E7C",
+"O c #040204",
+/* pixels */
+"                 ",
+"    OOOO         ",
+" OOOXXXXOOOo     ",
+"OXoOOOOOOooOo    ",
+"OXoooooooooOo    ",
+"OXooXOOOOOOOOOO  ",
+"OXooXO........O  ",
+"OXooXO.OOOOOO.Oo ",
+"OXooXO........Oo ",
+"OXooXO........Oo ",
+"OXooXO.OOOOOO.Oo ",
+"OXooXO........Oo ",
+" OOOOO.OO.....Oo ",
+" XoooO........Oo ",
+"     OOOOOOOOOOo ",
+"       ooooooooo ",
+"                 "
+};

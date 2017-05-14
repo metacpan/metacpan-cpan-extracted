@@ -82,6 +82,7 @@ t/recursive.t
 t/resources/t-a-test.jpeg
 t/resources/t-a-test.jpg
 t/resources/test.png
+t/strike.t
 t/templates.t
 t/testfile/attachment.png
 t/testfile/broken.muse
@@ -92,6 +93,7 @@ t/testfile/epub-meta.muse
 t/testfile/for-epub.muse
 t/testfile/invalid.muse
 t/testfile/slides.muse
+t/testfile/strike.muse
 t/testfile/test.muse
 t/tex.t
 t/tex/headers.muse

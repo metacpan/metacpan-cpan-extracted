@@ -1,0 +1,302 @@
+<HTML>
+<HEAD>
+<TITLE>Win32::Exchange::SMTP::Security</TITLE>
+<LINK REL="stylesheet" HREF="../../../../../Active.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Exchange::SMTP::Security - Microsoft Exchange SMTP Virtual Server Access Lists</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <UL>
+      <LI><A HREF="#functions">Functions</A></LI>
+        <UL>
+          <LI>Exchange 2000</LI>
+          <UL>
+            <LI><A HREF="#function_new">new</A></LI>
+            <LI><A HREF="#function_Bind">Bind</A></LI>
+            <LI><A HREF="#function_GetIpSecurityList">GetIpSecurityList</A></LI>
+            <LI><A HREF="#function_GetIpRelayList">GetIpRelayList</A></LI>
+            <LI><A HREF="#function_RetrieveList">RetrieveList</A></LI>
+            <LI><A HREF="#function_IpListManip">IpListManip</A></LI>
+            <LI><A HREF="#function_SetDefaultAction">SetDefaultAction</A></LI>
+            <LI><A HREF="#function_DomainListManip">DomainListManip</A></LI>
+            <LI><A HREF="#function_Release">Release</A></LI>
+          </UL>
+        </UL>
+
+    </UL>
+
+    <LI><A HREF="#examples">EXAMPLES</A></LI>
+    <LI><A HREF="#notes">NOTES</A></LI>
+    <UL>
+
+        <LI><A HREF="#incompatibilities">Incompatibilities</A></LI>
+        <LI><A HREF="#bugs and limitations">Bugs and Limitations</A></LI>
+    </UL>
+
+    <LI><A HREF="#see also">SEE ALSO</A></LI>
+    <LI><A HREF="#authors">AUTHORS</A></LI>
+    <LI><A HREF="#version">VERSION</A></LI>
+</UL>
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::Exchange::SMTP::Security - Exchange 2000 SMTP Protocol functions (Relays and IP Blocks)</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  #no offense to the owner of 123.123.123.0    :)  just a sample
+  @addlist = ('123.123.123.0,255.255.255.0',
+              '192.168.1.199'
+             );
+  @dellist = ('123.123.123.0,255.255.255.0',
+              '192.168.1.199'
+             );
+  @ovrlist = ('123.123.123.123',
+             );
+  $IpSec = Win32::Exchange::SMTP::Security->new() ||
+      die " - error creating new object\n';
+  $IpSec->Bind($exchange_server,$dom_controller) ||
+      die " - error binding to new object\n';
+
+  $IpSec->GetIpRelayList(\%relay) ||
+      die " - error connecting to Relay IP list object\n';
+   print "access to the Relay mail on the SMTP interface is ".$relay{'defaultaction'}."ed by default\n\n";
+   #denyed is a typo, but oh well
+   foreach $ip (@{$relay{'iplist'}}) {
+     print "  $ip\n";
+   }
+  $IpSec->IpListManip("add",\@addlist) &&
+      print " - hey look, I just added some IPs to the list (Relay)\n';
+  $IpSec->IpListManip("delete",\@dellist) &&
+      print " - hey look, I just deleted some IPs to the list (Relay)\n';
+  $IpSec->IpListManip("overwrite",\@ovrlist) &&
+      print " - hey look, I just overwrote the current list with a new set of IPs (Relay)\n';
+  $IpSec->IpListManip("reset",[]) &&
+      print " - hey look, I just reset the current domain and IP list with null set of IPs and Domains (Relay)\n';
+  $IpSec->GetIpSecurityList(\%security) ||
+      die " - error connecting to Relay IP list object\n';
+  print "access to the SMTP interface is ".$security{'defaultaction'}."ed by default\n\n";#denyed is a typo, but oh well
+  foreach $ip (@{$security{'iplist'}}) {
+    print "  $ip\n";
+  }
+
+  $IpSec->IpListManip("add",\@addlist) &&
+      print " - hey look, I just added some IPs to the list (Security)\n';
+  $IpSec->IpListManip("delete",\@dellist) &&
+      print " - hey look, I just deleted some IPs to the list (Security)\n';
+  $IpSec->IpListManip("overwrite",\@ovrlist) &&
+      print " - hey look, I just overwrote the current list with a new set of IPs (Security)\n';
+  $IpSec->IpListManip("reset",[]) &&
+      print " - hey look, I just reset the current domain and IP list with null set of IPs and Domains (Security)\n';
+</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+Wow, it was sure nice of Microsoft to expose the interface for this.  I now have a new way of blocking SPAM!!!
+Well, now that I've blocked ~1000 IPs and a few class A,B and C address spaces, I leave it to you to help
+protect your organization from those that would consume your valuable bandwidth and piss off your users in the form of
+unsolicited e-mail.<BR>
+<BR>
+This module uses Win32::OLE exclusively (and technically is just a wrapper for the
+underlying OLE calls) so feel free to look at them, and make a suggestion or two.<BR>
+<BR>
+Exchange 2000 access to the SMTP protocol access restrictions were provided in Exchange Server post SP3 as a hotfix,
+and should be rolled into SP4 whenever they decide to release that service pack.<BR>
+<BR>
+All methods return 0 (or undef) on failure and 1 for success unless otherwise noted.<BR>
+<P>
+<H2><A NAME="functions">Functions</A></H2>
+<DL>
+<DT><STRONG><A NAME="function_new">$provider = Win32::Exchange::SMTP::Security-&gt;new();</A></STRONG><BR>
+<DD>
+The <A HREF="#item_new"><CODE>new()</CODE></A> class method starts a new instance of an Exchange SMTP Protocol object.
+It returns a reference to this object or <B>undef</B> if the creation fails.<BR>
+<BR>
+$IpSec = Win32::Exchange::SMTP::Security-&gt;new();<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_Bind">$IpSec-&gt;<CODE>Bind($exchange_server,$instance,[$dom_controller]);</CODE></A></STRONG><BR>
+<DD>
+You must bind to the object after creating a new object..  I may do away with this, and just have it as part of the new
+function.
+<BR>
+$instance is added since your Exchange server may have additional SMTP interfaces that you want to bind to.  1, is the first
+instance. <BR>
+<BR>
+If you omit the domain controller as the third parameter, the function performs a search for a close Domain Controller using WMI
+to determine the best possible, most up to date, and well-connected server -- if more than one fits these criteria, the first
+available is used.  This search is performed with <A HREF="../../Exchange.html#function_FindCLoseDC">Win32::Exchange::FindCloseDC()</A><BR>
+<BR>
+$IpSec-&gt;Bind("EXCH2",1,"DC1");#first and maybe only instance<BR>
+$IpSec-&gt;Bind("EXCH2",2,"DC1");#second smtp server<BR>
+$IpSec-&gt;Bind("EXCH2",2);#second smtp server, omitting the DC..  the function is forced to find a close server<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_SetDefaultAction">$IpSec-&gt;SetDefaultAction("grant"|"deny");</A></STRONG><BR>
+<DD>
+After using the <A HREF="function_GetIpSecurityList">GetIPSecurityList</A> or <A HREF="function_GetIpRelayList">GetIPRelayList</A>
+you can set the default action for either Security List, depending on which security list you have loaded.<BR>
+<BR>
+Note:  If you change this setting (from "grant" to "deny", or vice versa), you effectively wipe out any block/grant
+lists that were previously entered.  Please be careful.<BR>
+<BR>
+$IpSec-&gt;GetIpSecurityList() ||  die " - error connecting to Security list object\n';<BR>
+$IpSec-&gt;SetDefaultAction("grant");<BR>
+<BR>
+$IpSec-&gt;GetIpRelayList() ||  die " - error connecting to Relay list object\n';<BR>
+$IpSec-&gt;SetDefaultAction("deny");<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_GetIpSecurityList">$IpSec-&gt;<CODE>GetIpSecurityList();</CODE></A></STRONG><BR>
+<DD>
+This function loads the Security (Access list) for mail servers to that are allowed to talk to this server on port 25.<BR>
+<BR>
+<BR>
+As well, it returns loaded list of security lists into a hash for later comsumption (maybe as a backup before
+you are about to make a drastic change through this module) either as the second parameter or the return value.<BR>
+<BR>
+<DT><STRONG><A NAME="function_GetRelayIpList">[%listresults] = $IpSec-&gt;<CODE>GetIpRelayList([%listresults]);</CODE></A></STRONG><BR>
+<DD>
+This function loads the Relay (Access list) for mail servers to that are allowed to relay mail off of this server into
+the object.  Please be incredibly careful with this.  You typically don't want to allow relaying, because that helps
+the spread of unsolicited email, and may lead to your server being blocked by people who don't like the fact that you allow realying,
+sometimes referred to as an "Open Relay".  Again, allowing a relay is usually bad....  very bad.<BR>
+<BR>
+As well, it returns loaded list of security lists into a hash for later comsumption (maybe as a backup before
+you are about to make a drastic change through this module) either as the second parameter or the return value. <BR>
+<BR>
+Internally (inside your firewall), it might be less offensive, but is still something you don't normally need/want to
+do.  Use your skills (and this module) wisely and help out the internet community by curbing the tide of "open relays".<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_RetrieveList">[%list] = $IpSec-&gt;<CODE>RetrieveList([\%list]);</CODE></A></STRONG><BR>
+<DD>
+This function gets the loaded list of IPs (Relay or Security) into a hash for later comsumption (maybe as a backup before
+you are about to make a drastic change through this module).  This function is called by default when you load either of
+the 2 lists that this module supports <A HREF="function_GetIpSecurityList">Security</A> or <A HREF="function_GetIpRelayList">Relay</A>,
+and must be called after one of these 2 functions or it will fail.<BR>
+<BR>
+This function either returns the list as the result, like so...<BR>
+<BR>
+%list = $IpSec-&gt;RetrieveList() ||  die " - error retrieving the list object\n';<BR>
+<BR>
+- or -<BR>
+<BR>
+$IpSec-&gt;RetrieveList(%list) ||  die " - error error retrieving the list object\n';<BR>
+<BR>
+if ($list1{'defaultaction'} eq 'grant') {<BR>
+  print "SMTP Blocks\n";<BR>
+} else {<BR>
+  print "SMTP Grants\n";<BR>
+}<BR>
+<BR>
+foreach $key (keys %list) {<BR>
+&nbsp;&nbsp;if (ref($list{$key}) eq "ARRAY") {<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;foreach $entry (@{$list{$key}}) {<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print "  $entry\n";<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;} else {<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;print "$key - $list{$key}\n";<BR>
+&nbsp;&nbsp;}<BR>
+}<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_IPListManip">$IpSec-&gt;<CODE>IPListManip(\@list,'add'|'delete'|'overwrite');</CODE></A></STRONG><BR>
+<DD>
+This function takes 2 paramaters, the first is the list of IPs that you want to modify the SMTP Virtual server with,
+and the second is that action you want it to take.  This function performs the action on the currently loaded IPList (Relay or Security),
+expecting the list to contain IPs, or IP ranges.<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_DomainListManip">$IpSec-&gt;<CODE>DomainListManip(\@list,'add'|'delete'|'overwrite');</CODE></A></STRONG><BR>
+<DD>
+This function takes 2 paramaters, the first is the list of IPs that you want to modify the SMTP Virtual server with,
+and the second is that action you want it to take.  This function performs the action on the currently loaded IPList (Relay or Security),
+expecting the list to contain domain names.  Microsoft suggests this is not a recommended option, due to slower response times because Exchange
+will need to perform a DNS lookup every time a connection is established to guarantee that the IP does not belong to a blocked domain name.
+Consider yourself warned.<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_Release">$IpSec<CODE>->Release();</CODE></A></STRONG><BR>
+<DD>
+This function releases your connection to the SMTP Virtual server for your object.  After releasing your connection, you will need to perform
+a bind to start using this object again.
+<BR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<pre>
+None currently..
+</PRE>
+<H1><A NAME="notes">NOTES</A></H1>
+<UL>
+  <LI>I would think this goes without saying, but:</LI>
+  <UL>
+    <LI>Test this module in a test environment before touching your production environment.</LI>
+    <LI>You need Administrative rights to do most if not all of these tasks, on the Exchange and AD servers</LI>
+    <LI>I am not responsible for mistakes in this module, misuse of this code (though I will take criticism, if you can argue that I have done something bad)</LI>
+    <LI>If you find a mistake, or bug please inform me of the mistake or a possible solution you have found.</LI>
+  </UL>
+</UL>
+<H2><A NAME="incompatabilities">Incompatabilities</A></H2>
+<UL>
+  <LI>None known of yet...</LI>
+</UL>
+
+<H2><A NAME="bugs and limitations">Bugs and Limitations</A></H2>
+<UL>
+  <LI>the Exchange 2000 client tools are required in order to use this module.</LI>
+  <LI>Service Pack 3 (or greater, if/when released) for Exchange 2000 is required as well as the hotfix referenced <A HREF="http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3B810913">here</A>.</LI>
+</UL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<UL>
+  <LI><A HREF="../../Exchange.html">Win32::Exchange</A></LI>
+  <LI><A HREF="../../Exchange/Mailbox.html">Win32::Exchange::Mailbox</A></LI>
+  <LI><A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wss/wss/_exch2k_welcome_to_exchange.asp">The Exchange 2000 SDK</A></LI>
+  <LI><A HREF="http://aspn.activestate.com/ASPN/Mail/">Activestate Mailing List Archive (it's a great place to answer your own questions)</A></LI>
+  <LI><A HREF="http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3B810913">Post SP3 Hotfix that allows programmatic access to the SMTP Virtual Server's access list</A></LI>
+</UL>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+I hope this module helps someone else out there combat SPAM, or is able to help you in some other way.<BR>
+<BR>
+Thanks for taking the time to read all of this..<BR>
+<BR>
+I'd like to extend thanks to the following:<BR>
+<UL>
+  <LI>Dave Roth, in part for advice and comments on my code, and then also for finding this hotfix via Google Groups!</LI>
+  <LI>Andy Webb, for his constructive criticism, for brainstorming new functionality to the module, and bug testing my code "while at lunch".</LI>
+  <LI>Jan Dubois jand@activestate.com and Everyone at Activestate for Win32::OLE, without which this module wouldn't be possible.</LI>
+  <LI>Activestate, for having the mailing list archive chock-full-o' source code and answers to questions asked and answered way too many times!</LI>
+  <LI>Microsoft...  for exposing the Exchange 2000 SMTP Access List interface, &lt;sarcasm&gt;and for NOT releasing it until after SP3&lt;/sarcasm&gt;</LI>
+</UL>
+<BR>
+<P>Please send questions, comments or suggestions about this module to Steven Manross &lt;<A HREF="mailto:steven@manross.net">steven@manross.net</A>&gt.</P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>Version 0.003     May 3, 2003</P>
+<H1><A NAME="copyright">Copyright</A></H1>
+Microsoft, Active Directory, ADSI, Windows, Windows NT, MSDN, and Exchange are either registered trademarks or trademarks of Microsoft Corporation in the United States and/or other countries.<BR>
+<BR>
+<BR>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Exchange::SMTP::Security - Microsoft Exchange SMTP Virtual Server Access Lists</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+</BODY>
+</HTML>

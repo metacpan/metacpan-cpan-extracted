@@ -1,0 +1,770 @@
+.TH FROGBAK 1 "May 17, 1995"
+.AT 3
+.SH NAME
+frogbak \- schedule and execute backups for a small network
+.SH SYNOPSIS
+.B frogbak
+.RI [ -dryrun ]
+.RI [ -summary ]
+.RI [ -future 
+.IR #h | #d | #w | #m ]
+.RI [ "-control control_file" ]
+.br
+.B mkblank 
+.I tapename
+.br
+.B recycle
+.I tapename
+.RI [ tapename ...]
+.br
+.B sum_covered
+.I control_file
+.RI [ control_file ...]
+.br
+.B send_offsite
+.SH DESCRIPTION
+These programs provide frogbak services for small networks.  The algorithms
+they use were designed for the following environment: one tape drive,
+20 GB of disk space, several kinds of computers, and a lazy programmer who
+was paranoid about dumps.
+The closer an environment is to that, the better the system will
+work for you.
+.LP
+The basic design is that the system choses when to do what kind of dump.
+It does two kinds of dumps: incrementals and fulls.  Unlike a differential,
+an incremental dump saves the files modified from the time of the last dump
+at the 
+.I same
+dump level to the present rather than the files modified from the time
+of the last dump at a 
+.I lower
+level to the presetn.  These dumps are organized into three separate
+tracks.  The tracks are independent of one another such that an incremental
+in one track does not affect the coverage of an incremental in another
+track.
+Two of the tracks have only incrementals and the last has only full
+dumps.  This setup means that each file gets saved onto two tapes
+by the incremental tracks.  This notion of tracks is a convienient way to 
+think about the behavior of
+.BR frogbak ,
+but it is not how the behavior is implemented: it is implemented by making
+the incrementals save the files modified between now and the incremental 
+before the last one.
+.LP
+To restore a filesystem, the last good full dump must be read first.  If a 
+full dump is bad, just ignore it and skip to the previous one.  After the
+full dump, every other incremental from the time of the full dump until
+the present must be read.  If an incremental is bad, switch to the other
+track.
+.LP
+It is not expected that dumps will be bad.  Exabyte and DAT media seem to
+be very reliable in comparison to the 9-track tapes used last decade.
+However, 
+.B frogbak
+performs the dumps on live filesystems and thus sometimes the dump data
+will be bad even though the media is okay.  
+.LP
+The choice of dumps is specified with a control file.  For each filesystem,
+the control file specifies:
+.IP
+The frequency of incremental dumps.  This places a limit on
+how often a dump is performed.  Dumps will not occur more often
+than the specified rate.
+.IP 
+The importance of incremental dumps.  The importance is combined with
+the lenght of time it has been since an incremental dump has been done
+compared to specified frequency of dumps to produce a rating number.
+The formula is something like 
+.I rating
+= 
+.I time since last dump
+/
+.I frequency
+*
+.I importance.
+Thus if the frequency is two days, the importance is 
+.IR 50 ,
+and it has been ten days since an incremental dump, then
+the 
+.I rating
+would be 10/2*50 = 250.
+.IP 
+The frequency and importance of full dumps.
+.LP
+The ratings for both incremental and full dumps are compared on a 
+filesystem by filesytem basis.  For each filesystem, either the full
+dump or the incremental will be discarded from consideration at this
+point.
+.LP
+The ratings for all of the filesystems are then sorted and dumps are
+performed in order, based on these priorities.
+.SH CONTROL FILES
+There are four types of lines that can be in the control files.  They
+are: comments, variable assignments, filesystem control lines, and 
+average statements.
+.LP
+Any line beginning with a hash 
+.RB ( # )
+symbol is a comment.
+.LP
+Any line beginning with a legal (C-style) identifier followed by an
+equals 
+.RB ( = ) 
+is a variable assignment.  Variable references may be made in variable
+assignments and in the dump valuation columns.  Variables are recognized
+because the only other symbols that may occur in those locations are 
+numbers and math operatators like times
+.RB ( * ) 
+and plus
+.RB ( + ).
+.LP
+Filesystem control lines are made up of seven whitespace-separated
+fields:
+.TP 20
+.B filesystem
+Names the filesystem to be dumped.  
+.TP 
+.B host
+Names the system that the filesystem is on.
+.TP 
+.B os
+Names the dump program to be used to dump the filesystem.  The
+current legal values for the os field are:
+.BR solaris ,
+.BR sunos ,
+.BR freebsd ,
+.BR netbsd ,
+.BR hpux ,
+.BR hp-ux ,
+.BR mach ,
+.BR domain ,
+.BR ultrix ,
+.BR sony ,
+.BR linux , 
+.BR gtar , 
+.BR dostar , 
+.BR targtar , 
+and
+.BR xenix .  
+Dumps can be done with the GNU tar program.  On linux it is the default and
+is called tar, on other systems it is called tar.  DOS filesystems can be
+dumped with gtar if they are mounted on a unix system.  The current dostar
+setup assumes that the tar program is really GNU tar.
+.TP
+.B ifreq
+Specifies the frequency of incremental dumps.  The format is 
+.I <number><unit>
+Where 
+.I <number>
+is a decimal number and 
+.I <unit> 
+is one of
+.BR h ,
+.BR d ,
+.BR w ,
+or
+.BR m ;
+corrosponding to hours, days, weeks, and months.
+.TP
+.B ivalue
+Specifies the relative value of doing an incremental dump on this
+filesystem after a duration equal to the 
+.BR ifreq .
+.TP
+.B ffreq
+Specifies the frequency of doing a full dump.  Same format as 
+.BR ifreq .
+.TP
+.B fvalue
+Specifies the value of doing a full dump of this filesystem after a
+duration equal to the
+.BR ffreq .
+.LP
+I recommend setting all of the frequencies at one day.  That way you can
+tell if everything is getting dumped or not.  I further recommend
+setting a variable to be the relative importance of doing full dumps.
+Then when the 
+.B ivalue 
+is set to 
+.IR x ,
+and the 
+.B fvalue
+is set to
+.IR x/fd ,
+the number of full dumps per incremental can be varied by changing
+the value of 
+.IR fd .
+This allows the dump system to be tuned easily.
+.LP
+The last sort of line is an 
+average
+statment.  The syntax of an average statement is 
+.B average
+.I system-name
+.I filesystem-1
+.I filesystem-2
+.I etc...
+Normally, the each filesystem for a given system is considered independently.  
+This means that they may not be near each other on the tape and, futher, they
+may not both make it onto the same tape if the tape runs out.  It is easier
+to restor if everything you need is on the same tape and still easier if it
+is grouped together.  The average statement causes the averaged dumps to be
+placed sequentially on the tape.  Their ratings are averaged.
+.SH RECORDS
+Every time a dump is performed a record of the dump is stored in a
+file that lists dumps done for that filesystem.  The records for
+full dumps and incrementail dumps are stored separately.  Full dumps
+are named by transforming all the slashes 
+.RB ( / ) 
+in the filesystem name to dots
+.RB ( . ).
+Thus 
+.I /usr/local
+becomes 
+.IR usr.local.full .
+As a special case, the root filesystem becomes simply
+.IR .full .
+Make sure you use the 
+.B -a 
+option to 
+.BR ls (1)
+when listing the directories.
+.LP
+Incremental dumps are similarly named, but with 
+.B .incr 
+instead of
+.BR .full .
+.LP
+All of the records for a given system are stored in 
+.IB /master_path/ records /hostname. 
+The 
+.I master_path 
+is the path to the top of the 
+.B frogbak
+system's directory.  At Berkeley Research and Trading, that is
+.BR /y/adm/dump .
+Thus to find out when the last incremental of
+.B /y
+was performed, look in 
+.BR /y/adm/dump/records/troy/y.incr .
+.LP
+The filesystem dump record files have the following format:
+.IP
+.I FROM-DATE TO-DATE TAPE-NAME FILE-NUMBER # COMMENT
+.LP
+The 
+.I FROM-DATE
+beginning of the time covered by that particular dump.
+On full dumps, the 
+.I FROM-DATE
+is simply 
+.BR 0 .
+The 
+.I TAPE-NAME
+is the symbolic name of the tape that the dump is on.
+It is the name that was given as an argument to 
+.BR mkblank ,
+and is, hopefully, written on the side of the tape.
+The 
+.I FILE-NUMBER
+field specifies how many files must be skipped over on that 
+tape to get to that dump.  Thus if 
+.I FILE-NUMBER 
+is 17 and you wanted to restore 
+that dump, you would need to use
+.B mt -f 
+.I device
+.B fsf 17
+to get to that dump.
+.LP
+Although logically the incrementals can be divided into to 
+tracks, they are not stored that way in the records database.  In
+fact, the logical division is just an artifact that that incremental
+dumps cover backwards to the incremental dump prior to the previous
+one.
+.LP 
+To find out when something has been backed up, both the 
+.B .full
+and 
+.B .incr
+records files must be examined.  They give the times and coverages
+for the filesystems.  To find out if a particular file was backed up,
+the dump tape must be read.  No index of files saved is kept.
+.SH TAPES
+The information about each dump performed is also stored grouped by what
+tape it is on.  In the directory 
+.IB /master_path/ tapes,
+information about each dump tape is stored.  This information includes
+tape write speed performance figures and other tidbits.
+.LP
+This information substantially duplicates the information in the
+.B records
+directory.
+.SH RESTORES
+Each different kind of system uses a different dump program and thus
+a different restore program.  The basic idea is that on the system
+that was dumped, give a command that pipes the dump output from the
+tape into the restore program.  
+.LP
+It is usually easiest to forward the tape to the correct file before
+logging onto the system to be restored.  
+The number of files to forward
+over is listed as the forth field in the system dump records database.
+On
+.B hp-ux 
+systems, the command is 
+.B "mt -t /dev/rmt/0mn fsf" 
+.IR "number_of_files_to_skip".  
+On BSD-based systems, the command is usually
+.B "mt -f /dev/nrst0" 
+.IR "number_of_files_to_skip". 
+.LP
+The blocksize used to write the tapes is specified in the beginning
+of the 
+.B frogbak
+program file.  The value that I use is 112 blocks, or 
+.RB 56 k .
+This size
+is not arbitrary.  On Suns, sizes above 127 blocks are not reliable.
+Exabytes physically write data in 
+.RB 8 k 
+chunks.  Larger block sizes have
+less system overhead and are generally faster.  
+.RB 56 k 
+is the
+largest multiple of 
+.RB 8 k
+smaller than 128 blocks.
+.LP
+Dumps can be written in several different formats depending on the
+type of system being dumped.  In general the
+.BR dump (8) 
+command is used, but on Apollos the 
+.BR wbak (1) 
+command is used, and on Xenix
+.BR cpio (1) 
+is used.
+The command needed to restore depends on what was used. 
+On some servers, compresssion is possible in which case the dump
+must be uncompressed to restore.
+.LP
+At Berkeley Research and Trading the command needed to restore 
+most systems is:
+.B remsh 
+.I server
+.BI "-n dd if=" /dev/rmt/0mn
+.BI "ibs=" 112 b
+.BR "| /etc/restore -ivf -" .
+.LP
+Each of the different programs used to do the dumps handles restores
+in a different way.  With 
+.BR wbak (1)
+and 
+.BR cpio (1),
+the set of files to be restored must be specified on the command line.
+With 
+.BR restore (8),
+the set of files to be restored can be chosen interactivly 
+.RB ( -i 
+flag).
+.LP
+Obviously, you must load the right tape before trying to restore from
+it.  Hopefully, each tape will have a paper label that identifies it.
+If it doesn't or, if the label is incorrect, you can identify a dump
+tapes by copying off the first file.  The first file on each dump tape
+specifies the tape name and it lists which dumps are going to be attempted.
+If you loose your dump tape database, you may need to use this method
+to restore it.
+.SH UTILITIES
+There are several utilities that are part of the 
+.B frogbak
+package.  They are 
+.B sum_covered 
+which adds up how much disk space is backed up by
+a control file; 
+.B recycle 
+which marks the tape as erased;
+.B send_offsite
+which figures out which tapes are not needed to do a full 
+restore; 
+and
+.B mkblank
+which names a tape. 
+.LP
+The 
+.B sum_covered
+command is useful for partitioning the clients among several
+servers because 
+.B frogbak
+doesn't do it for you.
+As arguments, you must provide the names of control files.
+.LP
+The 
+.B mkblank
+command must be run to initialize blank tapes.  Tapes must be
+initialized before
+.B frogbak
+is run.
+The argument to 
+.B mkblank
+is the name for the tape.  Each tape should have a unique name.
+I recommend that the name be a short string followed by a three
+digit sequence number.  In case it isn't obvious, the tape must
+be in the drive when you run 
+.BR mkblank .
+.LP 
+Although it is possible to just keep buying new tapes, it is not
+neccesary.  The 
+.B recycle
+program lets 
+.B frogbak 
+know that the dumps on the recycled tape no longer exist and that it
+is okay to overwrite the tape.  
+The arguments to 
+.B recycle 
+are the list of tapes (by name) that should be marked as recycled.
+Nothing is done to the actual tape when it is marked
+recycled; the database is updated.
+.LP
+It can be difficult to figure out which tapes are potentially 
+required to do a restored.  The 
+.B send_offsite
+program will figure out what tapes are not required to do a
+full restore of everything (assuming, of course that all the tapes
+are good).  Using, 
+.BR send_offsite ,
+it is easy to pick which tapes can be sent away.  It also shows
+you how many tapes it has been since every system was covered by
+a full dump.  Only the last few most recent un-needed tapes are 
+shown.
+.SH DAILY TASKS
+It is possible to run 
+.B frogbak
+from 
+.BR cron (1).
+However, a labeled blank or recycled tape must be put in the drive
+prior to running
+.BR frogbak .
+Tapes which are not either labeled blank or recycled will be rejected.
+.LP
+Blank tapes are made with with the
+.B mkblank
+utility.  Recycled tapes are made with the 
+.B recycle 
+program.
+.LP
+It is important that the output from 
+.B frogbak
+be examined each day. 
+If all the dumps run at somewhat standard priorities, then you can
+tell if something has not been dumped recently because its priority
+will be off.  If priorities are not standardized, every failure must
+be checked.
+.LP 
+There is no warning system built into 
+.BR frogbak .
+You have to be very careful to watch what it does to make sure that
+nothing gets neglected.
+.SH EXAMPLES
+.LP
+Initialize a new tape and dump to it:
+.IP 
+.nf
+.RI # " mkblank SEQ-037"
+.RI # " frogbak"
+.LP
+Recycle an old tape and dump to it:
+.IP
+.nf
+.RI # " recycle SEQ-016"
+.RI # " frogbak"
+.LP
+Check to see how much disk space is being backed up:
+.IP
+.RI # " sum_covered control.*"
+.LP
+.RB "Restore a single file from a " dump "(8) full dump:"
+.IP
+.RI % " rlogin system_to_be_restored -l root"
+.RI # " rsh system_with_tape -n mt -t /dev/rmt/0mn fsf 8"
+.RI # " rsh system_with_tape -n dd if=/dev/rmt/0mn | restore -ivf -"
+Verify and Initialize tape.
+Dumped from: Sun May  2 20:02:00 1993
+Extract directories from tape
+Initialize symbol table.
+restore > ls
+.:
+2 *./        2 *../   16384  dev/  10240  etc/  18433  tmp/
+
+restore > cd tmp
+restore > ls
+./tmp:
+18433  ./                18610  backup.ddout5679  18641  dump.remote
+\0\0\0\02 *../               18643  backup.list5679   18644  rou5688
+18434  5176              18608  bkup.log
+
+restore > add bkup.log
+Make node ./tmp
+restore > add dump.remote
+restore > extract
+Extract requested files
+extract file ./tmp/bkup.log
+extract file ./tmp/dump.remote
+Add links
+Set directory mode, owner, and times.
+set owner/mode for '.'? [yn] n
+.RI "restore > " quit
+.SH OPTIONS
+.B Frogbak
+supports a few options:
+.TP 22
+.B -dryrun
+Specifies that dumps should not be performed.  Instead, 
+.B frogbak
+looks at its control file and at the records files and figures
+out what dumps it would do.  All of its figuring is sent to
+standard output for debugging puposes.
+.TP 
+.B -summary
+Like the 
+.B -dryrun
+option except that just the proposed set of dumps is printed.  Please
+note that the summary you get is a summary of what would happen if you
+ran 
+.B frogbak
+right now.  If 
+.B frogbak
+is invoked from
+.BR cron (8),
+then it is likely that the actions that are reported now will not match
+the actions that will actaully occur.
+.TP
+.BI -future " amount_of_time"
+Specifies that 
+.B frogbak
+should pretend that the time is really sometime in the future.  This is
+for use with the 
+.B -summary
+option.  The 
+.I amount_of_time
+string is in the same format as the dump periods in the control file:
+a number followed by the units: 
+.IR h , 
+.IR d , 
+.IR w , 
+or 
+.I m 
+for hours, days, weeks,
+or months.
+.TP
+.BI -control " control_file"
+Specifies that 
+.BI control. control_file 
+should be used intead of 
+.BI control. hostname.
+.SH CONFIGURATION
+The real options are the configuration variables
+like compression must be specified by changing the 
+.B frogbak 
+program file itself 
+.RB ( frogback
+is written in 
+.BR perl (1)).
+.LP
+.B $do_compress 
+turns compression on and off.  Compresssion is very handy and I recommend
+using it when you can.  Using it requires a device driver that allows 
+odd-sized blocks to be written to tape and the end of the dump.
+Also, the 
+.BR compress (1) 
+program that comes with most operating systems is annoyingly slow.  The
+latest versions of compress are much faster and should be used.
+.LP
+The 
+.B $eject
+options controls whether the tape is ejected after a successful 
+dump. 
+.LP
+If you have installed a version of
+.BR rsh (1)
+that allows you to specifiy a timeout, turn on 
+.BR $timeout_rsh .
+.SH ENVIRONMENT
+There are no ENVIRONMENT variables that are used by the
+.B frogbak 
+system.
+.SH PORTS
+The 
+.B frogbak
+system can be thought of as having a server and clients.  It is not
+really a \*Qclient-server\*U system, but since tape drives are often
+on servers and clients are often what is being backed up, the analogy
+holds some water.
+.PP
+The server currently works with SunOS 4.*, Mach 2.6, and HP-UX 8.*.  The
+client side currently supports:
+.TP 12
+.B sunos
+Sun-3, and Sun-4 running SunOS 4.*.  The 
+.BR dump (8) 
+program is used.
+.TP
+.B mach
+Mach 2.6 running on i386 systems.  The 
+.BR dump (8)
+program is used.
+.TP 
+.B hp-ux
+HP-UX 8.* on HP9000/400, HP9000/700, and HP9000/800 systems.  The
+.BR dump (8)
+program is used.
+.TP
+.B ultrix
+Ultrix 3.* and 4.* running on MIPS-based systems.  The 
+.BR dump (8)
+program is used.
+.TP
+.B sony
+Sony's BSD4.3 OS running on their NEWS systems.  The
+.BR dump (8)
+program is used.
+.TP
+.B xenix
+SCO Xenix running on a i386.  The 
+.BR cpio (1)
+program is used.
+.TP
+.B domain
+Apollo Domain OS version 9.6 and above.  The 
+.BR wbak (1)
+program is used.
+.SH PORTING
+The 
+.B frogbak
+system is kinda a pain to move around.  Each of the files must be
+customized for each site.
+Most, if not all, of the portability switches are in the first few
+lines of each file.
+When modifying the 
+.B frogbak
+file itself, search for uses of the various strings like \*QSun-OS\*U,
+and \*Qsunos\*U.
+.LP
+Please send any portability changes back for incorporation.
+.SH OFFSITE
+It is critically important that dumps be stored off-site. 
+Unfortuantly, 
+.B frogbak
+does not provide any help in chosing which tapes should go off-site.
+In fact, it makes it difficult because each tape is a grab-bag of what
+was highest priority at the time the tape was written.
+.SH BUGS
+This system is not very well designed or implemented.  It is very
+cranky.  However it does work reliably.  The major bugs have to do
+with the design.
+.LP
+The dump sequence, although pretty good, is not optimal.  A better
+sequence would be a replicated towers-of-hanoi.  The dump sequence
+does not start off smoothly \*- until every system has been both
+full and incremental dumped, 
+.B frogbak 
+does things in a somewhat odd order.
+.LP
+When using 
+.BR frogbak ,
+nothing prevents systems from being overlooked.
+.LP
+Using the default 
+.BR rsh (1)
+program 
+.RB ( remsh "(1) on HP-UX)," 
+it is easy for a system to hang the dumps.  Rsh does not have
+a timeout on input and if the remote system being dumped crashes,
+.B frogbak
+will hang.  The solution for this is to replace 
+.BR rsh (1) 
+with a special version that has timeouts.
+.LP
+The 
+.B frogbak
+system is only as good as the dump program that is used.  The
+BSD 
+.BR dump (8)
+program can write bogus dumps when used on a live filesystem.  This
+usually is not a problem because everything is dumped so many times.
+.LP
+The 
+.B /etc/dumpdates
+file is faked when using
+.BR dump (8).
+Somtimes the original 
+.B /etc/dumpdates
+file is not restored and annoying email is sent by 
+.BR frogbak .
+.SH FILES
+.TP 20
+.B /y/adm/dump
+The top of the 
+.B frogbak 
+commands and records tree at 
+Berkeley Research and Trading.
+.TP
+.BI records /hostname
+The directory of information about dumps of 
+.IR hostname.
+.TP
+.BR tapes /
+The directory of information about each dump tape.
+.TP
+.BR recycled /
+The directory of old information about tapes that have been recycled.
+.TP
+.BR logs /
+The directory of dump output logs.  This should be cleaned 
+occaisionaly because they can be fairly large.
+.TP
+.B dump.remote
+A script that runs on the system to be dumped.  Its standard output must
+a dump and nothing else.
+.TP
+.B dump.local
+A shell script that copies 
+.B dump.remote 
+to the system that is going to be dump and then runs it.
+.BI control. hostname
+The control file for 
+.IR hostname .
+.TP
+.BI backup.log. NNNN
+Dump log files for invocations of 
+.B frogbak 
+that did not complete cleanly.
+.TP
+.B /dev/rmt/0mn
+Tape device on HP-UX.
+.TP
+.B /dev/nrst0
+Tape device on SunOS.
+.SH CREDITS
+Thanks are due to Bruce Markey for figuring out how to tune 
+.BR frogbak . 
+Thanks are due to Larry Hubble for allowing a generous copyright
+notice to be applied to 
+.BR frogbak .
+.SH AVAILABILITY
+The copyright on this system is a bit murky.  Some work was done on it
+on behalf of TRW Financial Systems and they did not give me permission
+to take the changes with me.  I would be most surprised if they
+objected.
+.LP
+Berkeley Research and Trading has disclaimed any rights to 
+.B frogbak
+that they might have.
+.SH AUTHOR
+.I David Muir Sharnoff\ \ \ \ <muir@idiom.berkeley.ca.us>
+.SH SEE ALSO
+.BR dump (8),
+.BR restore (8),
+.BR dd (1),
+.BR rsh (1),
+.BR mt (1).

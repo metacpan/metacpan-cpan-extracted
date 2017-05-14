@@ -328,8 +328,8 @@ sub create_schema : method { # Create databases and edit credentials
 
    $self->output( $text, AS_PARA );
    $self->yorn( '+Create database schema', $default, TRUE, 0 ) or return OK;
-   $self->connect_options;
    $self->edit_credentials;
+   $self->connect_options;
    $self->drop_database;
    $self->drop_user;
    $self->create_user;

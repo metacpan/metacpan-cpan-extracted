@@ -1,0 +1,8 @@
+Makefile(\.old)?$
+^\.config
+CVS/.*
+\.cvsignore
+^blib/.*
+^ta/.*
+pm_to_blib
+.*\.(c|o|bs)$

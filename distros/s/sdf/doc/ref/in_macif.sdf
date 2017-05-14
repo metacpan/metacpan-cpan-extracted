@@ -1,0 +1,116 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Understanding Macro Interfaces
+
+H2: Overview
+
+H3: General Syntax
+
+The general syntax for using this macro is shown first, including
+the order of the arguments, if any.
+
+H3: Arguments
+
+If a macro has one or more arguments, these are listed
+in a table containing the following columns:
+
+* {{Name}} - the argument name
+* {{Type}} - the argument type
+* {{Default}} - the default value, if any
+* {{Rule}} - the pattern, if any, used to validate the value.
+
+H3: Argument Types
+
+The supported set of argument types are:
+
+!block table; groups
+Type            Description
+Common:
+string          a string
+integer         an integer
+boolean         either 1 or 0
+Special:
+symbol          a symbolic name
+filter          a filter name
+rest            the rest of the arguments
+eventid         an event tag
+condition       a logical expression
+!endblock
+
+The special types are needed for some of SDF's built-in
+macros including {{MAC:define}}, {{MAC:include}}, {{MAC:on}}
+and {{MAC:if}} - they are rarely needed for normal macros.
+
+H3: Default Values
+
+For default values within argument tables:
+
+* the empty string means there is no default
+* the symbol _NULL_ means the default is the empty string.
+
+H2: Rules
+
+H3: Rule Types
+
+If you wish, arguments can be validated using a rule.
+Rules are either:
+
+!block sections
+* Patterns
+* General Perl Expressions.
+!endblock
+
+H3: Patterns
+
+A {{pattern}} is a Perl regular expression which the argument
+value is matched against. Patterns are enclosed in angle brackets
+to differentiate them from normal Perl expressions.
+Typical patterns are given in the table below.
+
+!block table
+Pattern     Explanation
+<\w+>       one or more characters in A-Z, a-z, 0-9 and '_'
+<\d{4}>     a 4 digit number
+<on|off>    a string which is either "on" or "off"
+<XMIT-.*>   a string which begins with "XMIT-"
+!endblock
+
+H3: General Perl Expressions
+
+More complex rules are required when:
+
+* the regular expression does not apply to the whole value
+* the regular expression is case-insensitive.
+
+In these cases, a general Perl expression can be used as the rule.
+Within the expression, $_ is the value of the argument.
+Examples are:
+
+!block table
+Expression      Explanation
+/\d/            a digit exists somewhere in the string
+/^(on|off)$/i   value is either "on" or "off" (case insensitive)
+!endblock
+
+!block note
+A pattern is simply a short-hand notation for the general
+Perl expression below:
+
+E:	/^(pattern)$/
+
+Pattern notation is provided as it makes rules easier
+to read and write. (Pattern-style validation typically covers
+80% or more of validation rules so improving the readability of
+patterns has a large impact on the overall readability.)
+!endblock

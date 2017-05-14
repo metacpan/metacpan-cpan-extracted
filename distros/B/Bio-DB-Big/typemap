@@ -1,0 +1,7 @@
+TYPEMAP
+Bio::DB::Big::File      T_PTROBJ
+Bio::DB::Big::Iterator  T_PTROBJ
+z_off_t			      T_UV
+const uint8_t *		T_PV
+const int8_t *		T_PV
+const uint32_t *  T_PV

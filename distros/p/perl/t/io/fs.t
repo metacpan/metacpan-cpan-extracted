@@ -7,10 +7,14 @@ BEGIN {
 }
 
 use Config;
-use File::Spec::Functions;
 
-my $Is_MacOS  = ($^O eq 'MacOS');
 my $Is_VMSish = ($^O eq 'VMS');
+
+if ($^O eq 'MSWin32') {
+    # under minitest, buildcustomize sets this to 1, which means
+    # nlinks isn't populated properly, allow our tests to pass
+    ${^WIN32_SLOPPY_STAT} = 0;
+}
 
 if (($^O eq 'MSWin32') || ($^O eq 'NetWare')) {
     $wd = `cd`;
@@ -18,24 +22,33 @@ if (($^O eq 'MSWin32') || ($^O eq 'NetWare')) {
 elsif ($^O eq 'VMS') {
     $wd = `show default`;
 }
+elsif ( $^O =~ /android/ || $^O eq 'nto' ) {
+    # On Android and Blackberry 10, pwd is a shell builtin, so plain `pwd`
+    # won't cut it
+    $wd = `sh -c pwd`;
+}
 else {
     $wd = `pwd`;
 }
 chomp($wd);
 
+die "Can't get current working directory" if(!$wd);
+
 my $has_link            = $Config{d_link};
 my $accurate_timestamps =
     !($^O eq 'MSWin32' || $^O eq 'NetWare' ||
       $^O eq 'dos'     || $^O eq 'os2'     ||
-      $^O eq 'mint'    || $^O eq 'cygwin'  ||
-      $^O eq 'amigaos' || $wd =~ m#$Config{afsroot}/# ||
-      $Is_MacOS
+      $^O eq 'cygwin'  || $^O eq 'amigaos' ||
+	  $wd =~ m#$Config{afsroot}/#
      );
 
 if (defined &Win32::IsWinNT && Win32::IsWinNT()) {
     if (Win32::FsType() eq 'NTFS') {
         $has_link            = 1;
         $accurate_timestamps = 1;
+    }
+    else {
+        $has_link            = 0;
     }
 }
 
@@ -49,7 +62,7 @@ $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 my $skip_mode_checks =
     $^O eq 'cygwin' && $ENV{CYGWIN} !~ /ntsec/;
 
-plan tests => 51;
+plan tests => 61;
 
 my $tmpdir = tempfile();
 my $tmpdir1 = tempfile();
@@ -64,21 +77,18 @@ elsif ($^O eq 'VMS') {
     `if f\$search("$tmpdir.dir") .nes. "" then delete/nolog/noconfirm $tmpdir.dir;`;
     `create/directory [.$tmpdir]`;
 }
-elsif ($Is_MacOS) {
-    rmdir "$tmpdir"; mkdir "$tmpdir";
-}
 else {
     `rm -f $tmpdir 2>/dev/null; mkdir $tmpdir 2>/dev/null`;
 }
 
-chdir catdir(curdir(), $tmpdir);
+chdir $tmpdir;
 
 `/bin/rm -rf a b c x` if -x '/bin/rm';
 
 umask(022);
 
 SKIP: {
-    skip "bogus umask", 1 if ($^O eq 'MSWin32') || ($^O eq 'NetWare') || ($^O eq 'epoc') || $Is_MacOS;
+    skip "bogus umask", 1 if ($^O eq 'MSWin32') || ($^O eq 'NetWare');
 
     is((umask(0)&0777), 022, 'umask'),
 }
@@ -176,7 +186,7 @@ SKIP: {
 }
 
 SKIP: {
-    skip "no fchmod", 5 unless ($Config{d_fchmod} || "") eq "define";
+    skip "no fchmod", 7 unless ($Config{d_fchmod} || "") eq "define";
     ok(open(my $fh, "<", "a"), "open a");
     is(chmod(0, $fh), 1, "fchmod");
     $mode = (stat "a")[2];
@@ -190,12 +200,26 @@ SKIP: {
         skip "no mode checks", 1 if $skip_mode_checks;
         is($mode & 0777, $newmode, "perm restored");
     }
+
+    # [perl #122703]
+    close $fh;
+    $! = 0;
+    ok(!chmod(0666, $fh), "chmod through closed handle fails");
+    isnt($!+0, 0, "and errno was set");
 }
 
 SKIP: {
-    skip "no fchown", 1 unless ($Config{d_fchown} || "") eq "define";
+    skip "no fchown", 3 unless ($Config{d_fchown} || "") eq "define";
     open(my $fh, "<", "a");
-    is(chown(-1, -1, $fh), 1, "fchown");
+    is(chown($<, $(, $fh), 1, "fchown");
+
+    # [perl #122703]
+    # chown() behaved correctly, but there was no test for the chown()
+    # on closed handle case
+    close $fh;
+    $! = 0;
+    ok(!chown($<, $(, $fh), "chown on closed handle fails");
+    isnt($!+0, 0, "and errno was set");
 }
 
 SKIP: {
@@ -233,11 +257,16 @@ isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');
 
 SKIP: {
-    skip "no futimes", 4 unless ($Config{d_futimes} || "") eq "define";
+    skip "no futimes", 6 unless ($Config{d_futimes} || "") eq "define";
     open(my $fh, "<", 'b');
     $foo = (utime 500000000,500000000 + $delta, $fh);
     is($foo, 1, "futime");
     check_utime_result();
+    # [perl #122703]
+    close $fh;
+    ok(!utime(500000000,500000000 + $delta, $fh),
+       "utime fails on a closed file handle");
+    isnt($!+0, 0, "and errno was set");
 }
 
 
@@ -254,6 +283,10 @@ sub check_utime_result {
  SKIP: {
 	skip "filesystem atime/mtime granularity too low", 2
 	    unless $accurate_timestamps;
+
+     if ($^O eq 'vos') {
+	    skip ("# TODO - hit VOS bug posix-2055 - access time does not follow POSIX rules for an open file.", 2);
+     }
 
 	print "# atime - $atime  mtime - $mtime  delta - $delta\n";
 	if($atime == 500000000 && $mtime == 500000000 + $delta) {
@@ -281,7 +314,7 @@ sub check_utime_result {
 		is( $atime, 500000001,          'atime' );
 		is( $mtime, 500000000 + $delta, 'mtime' );
 	    }
-	    elsif ($^O eq 'beos') {
+	    elsif ($^O eq 'haiku') {
             SKIP: {
 		    skip "atime not updated", 1;
 		}
@@ -309,7 +342,7 @@ is(unlink('b'), 1, "unlink b");
 is($ino, undef, "ino of unlinked file b should be undef");
 unlink 'c';
 
-chdir $wd || die "Can't cd back to $wd";
+chdir $wd || die "Can't cd back to '$wd' ($!)";
 
 # Yet another way to look for links (perhaps those that cannot be
 # created by perl?).  Hopefully there is an ls utility in your
@@ -376,11 +409,6 @@ SKIP: {
 	close (FH); open (FH, ">>$tmpfile") or die "Can't reopen $tmpfile";
     }
 
-    SKIP: {
-        if ($^O eq 'vos') {
-	    skip ("# TODO - hit VOS bug posix-973 - cannot resize an open file below the current file pos.", 5);
-	}
-
 	is(-s $tmpfile, 200, "fh resize to 200 working (filename check)");
 
 	ok(truncate(FH, 0), "fh resize to zero");
@@ -413,7 +441,14 @@ SKIP: {
 	is(-s $tmpfile, 100, "fh resize by IO slot working");
 
 	close FH;
-    }
+
+	my $n = "for_fs_dot_t$$";
+	open FH, ">$n" or die "open $n: $!";
+	print FH "bloh blah bla\n";
+	close FH or die "close $n: $!";
+	eval "truncate $n, 0; 1" or die;
+	ok !-z $n, 'truncate(word) does not fall back to file name';
+	unlink $n;
 }
 
 # check if rename() can be used to just change case of filename
@@ -429,7 +464,7 @@ SKIP: {
     # this works on win32 only, because fs isn't casesensitive
     ok(-e 'X', "rename working");
 
-    1 while unlink 'X';
+    unlink_all 'X';
     chdir $wd || die "Can't cd back to $wd";
 }
 
@@ -455,6 +490,38 @@ ok(-d $tmpdir1, "rename on directories working");
 
     map chown(+()), ('')x68;
     ok(1, "extend sp in pp_chown");
+}
+
+# Calling unlink on a directory without -U and privileges will always fail, but
+# it should set errno to EISDIR even though unlink(2) is never called.
+SKIP: {
+    if (is_miniperl && !eval 'require Errno') {
+        skip "Errno not built yet", 3;
+    }
+    require Errno;
+
+    my $tmpdir = tempfile();
+    if (($^O eq 'MSWin32') || ($^O eq 'NetWare')) {
+        `mkdir $tmpdir`;
+    }
+    elsif ($^O eq 'VMS') {
+        `create/directory [.$tmpdir]`;
+    }
+    else {
+        `mkdir $tmpdir 2>/dev/null`;
+    }
+
+    # errno should be set even though unlink(2) is not called
+    local $!;
+    is(unlink($tmpdir), 0, "can't unlink directory without -U and privileges");
+    is(0+$!, Errno::EISDIR(), "unlink directory without -U sets errno");
+
+    rmdir $tmpdir;
+
+    # errno should be set by failed lstat(2) call
+    $! = 0;
+    unlink($tmpdir);
+    is(0+$!, Errno::ENOENT(), "unlink non-existent directory without -U sets ENOENT");
 }
 
 # need to remove $tmpdir if rename() in test 28 failed!

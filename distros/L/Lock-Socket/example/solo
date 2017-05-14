@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use lib '../lib';
+use Lock::Socket qw/lock_user_socket/;
+
+die "usage: $0 PORT COMMAND...\n"
+  unless $#ARGV >= 1;
+
+# Unset close-on-exec
+$^F = 3;
+
+my $port = shift @ARGV;
+$port += $> if $^O =~ m/bsd$/ or $^O eq 'darwin';
+
+my $lock = lock_user_socket($port);
+printf "Have lock on %s:%d\n", $lock->addr, $lock->port;
+
+exec @ARGV
+  or die "exec: $!";

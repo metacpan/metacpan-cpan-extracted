@@ -1,23 +1,25 @@
 #!/usr/bin/perl
 
 package Catalyst::Plugin::Session;
-use base qw/Class::Accessor::Fast/;
 
-use strict;
-use warnings;
-
+use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
 use MRO::Compat;
 use Catalyst::Exception ();
 use Digest              ();
 use overload            ();
 use Object::Signature   ();
 use Carp;
+use List::Util qw/ max /;
 
-our $VERSION = '0.20';
+use namespace::clean -except => 'meta';
+
+our $VERSION = '0.40';
+$VERSION = eval $VERSION;
 
 my @session_data_accessors; # used in delete_session
-BEGIN {
-    __PACKAGE__->mk_accessors(
+
+__PACKAGE__->mk_accessors(
         "_session_delete_reason",
         @session_data_accessors = qw/
           _sessionid
@@ -32,8 +34,17 @@ BEGIN {
           _tried_loading_session_data
           _tried_loading_session_expires
           _tried_loading_flash_data
+          _needs_early_session_finalization
           /
-    );
+);
+
+sub _session_plugin_config {
+    my $c = shift;
+    # FIXME - Start warning once all the state/store modules have also been updated.
+    #$c->log->warn("Deprecated 'session' config key used, please use the key 'Plugin::Session' instead")
+    #    if exists $c->config->{session}
+    #$c->config->{'Plugin::Session'} ||= delete($c->config->{session}) || {};
+    $c->config->{'Plugin::Session'} ||= $c->config->{session} || {};
 }
 
 sub setup {
@@ -65,11 +76,13 @@ sub check_session_plugin_requirements {
 sub setup_session {
     my $c = shift;
 
-    my $cfg = ( $c->config->{session} ||= {} );
+    my $cfg = $c->_session_plugin_config;
 
     %$cfg = (
         expires        => 7200,
         verify_address => 0,
+        verify_user_agent => 0,
+        expiry_threshold => 0,
         %$cfg,
     );
 
@@ -79,14 +92,14 @@ sub setup_session {
 sub prepare_action {
     my $c = shift;
 
-    if (    $c->config->{session}{flash_to_stash}
+    $c->maybe::next::method(@_);
+
+    if (    $c->_session_plugin_config->{flash_to_stash}
         and $c->sessionid
         and my $flash_data = $c->flash )
     {
         @{ $c->stash }{ keys %$flash_data } = values %$flash_data;
     }
-
-    $c->maybe::next::method(@_);
 }
 
 sub finalize_headers {
@@ -94,6 +107,12 @@ sub finalize_headers {
 
     # fix cookie before we send headers
     $c->_save_session_expires;
+
+    # Force extension of session_expires before finalizing headers, so a pos
+    # up to date. First call to session_expires will extend the expiry, subs
+    # just return the previously extended value.
+    $c->session_expires;
+    $c->finalize_session if $c->_needs_early_session_finalization;
 
     return $c->maybe::next::method(@_);
 }
@@ -104,7 +123,8 @@ sub finalize_body {
     # We have to finalize our session *before* $c->engine->finalize_xxx is called,
     # because we do not want to send the HTTP response before the session is stored/committed to
     # the session database (or whatever Session::Store you use).
-    $c->finalize_session;
+    $c->finalize_session unless $c->_needs_early_session_finalization;
+    $c->_clear_session_instance_data;
 
     return $c->maybe::next::method(@_);
 }
@@ -118,7 +138,27 @@ sub finalize_session {
     $c->_save_session;
     $c->_save_flash;
 
-    $c->_clear_session_instance_data;
+}
+
+sub _session_updated {
+    my $c = shift;
+
+    if ( my $session_data = $c->_session ) {
+
+        no warnings 'uninitialized';
+        if ( Object::Signature::signature($session_data) ne
+            $c->_session_data_sig )
+        {
+            return $session_data;
+        } else {
+            return;
+        }
+
+    } else {
+
+        return;
+
+    }
 }
 
 sub _save_session_id {
@@ -132,26 +172,27 @@ sub _save_session_expires {
     my $c = shift;
 
     if ( defined($c->_session_expires) ) {
-        my $expires = $c->session_expires; # force extension
 
-        my $sid = $c->sessionid;
-        $c->store_session_data( "expires:$sid" => $expires );
+        if (my $sid = $c->sessionid) {
+
+            my $current  = $c->_get_stored_session_expires;
+            my $extended = $c->session_expires;
+            if ($extended > $current) {
+                $c->store_session_data( "expires:$sid" => $extended );
+            }
+
+        }
     }
 }
 
 sub _save_session {
     my $c = shift;
 
-    if ( my $session_data = $c->_session ) {
+    if ( my $session_data = $c->_session_updated ) {
 
-        no warnings 'uninitialized';
-        if ( Object::Signature::signature($session_data) ne
-            $c->_session_data_sig )
-        {
-            $session_data->{__updated} = time();
-            my $sid = $c->sessionid;
-            $c->store_session_data( "session:$sid" => $session_data );
-        }
+        $session_data->{__updated} = time();
+        my $sid = $c->sessionid;
+        $c->store_session_data( "session:$sid" => $session_data );
     }
 }
 
@@ -167,7 +208,7 @@ sub _save_flash {
                 delete $flash_data->{$key};
             }
         }
-        
+
         my $sid = $c->sessionid;
 
         my $session_data = $c->_session;
@@ -188,7 +229,7 @@ sub _load_session_expires {
     $c->_tried_loading_session_expires(1);
 
     if ( my $sid = $c->sessionid ) {
-        my $expires = $c->get_session_data("expires:$sid") || 0;
+        my $expires =  $c->_get_stored_session_expires;
 
         if ( $expires >= time() ) {
             $c->_session_expires( $expires );
@@ -214,7 +255,8 @@ sub _load_session {
             $c->_session($session_data);
 
             no warnings 'uninitialized';    # ne __address
-            if (   $c->config->{session}{verify_address}
+            if (   $c->_session_plugin_config->{verify_address}
+                && exists $session_data->{__address}
                 && $session_data->{__address} ne $c->request->address )
             {
                 $c->log->warn(
@@ -223,6 +265,17 @@ sub _load_session {
                       . $c->request->address . ")"
                 );
                 $c->delete_session("address mismatch");
+                return;
+            }
+            if (   $c->_session_plugin_config->{verify_user_agent}
+                && $session_data->{__user_agent} ne $c->request->user_agent )
+            {
+                $c->log->warn(
+                        "Deleting session $sid due to user agent mismatch ("
+                      . $session_data->{__user_agent} . " != "
+                      . $c->request->user_agent . ")"
+                );
+                $c->delete_session("user agent mismatch");
                 return;
             }
 
@@ -250,7 +303,7 @@ sub _load_flash {
         if ( my $flash_data = $c->_flash )
         {
             $c->_flash_key_hashes({ map { $_ => Object::Signature::signature( \$flash_data->{$_} ) } keys %$flash_data });
-            
+
             return $flash_data;
         }
     }
@@ -274,6 +327,24 @@ sub _clear_session_instance_data {
     my $c = shift;
     $c->$_(undef) for @session_data_accessors;
     $c->maybe::next::method(@_); # allow other plugins to hook in on this
+}
+
+sub change_session_id {
+    my $c = shift;
+
+    my $sessiondata = $c->session;
+    my $oldsid = $c->sessionid;
+    my $newsid = $c->create_session_id;
+
+    if ($oldsid) {
+        $c->log->debug(qq/change_sessid: deleting session data from "$oldsid"/) if $c->debug;
+        $c->delete_session_data("${_}:${oldsid}") for qw/session expires flash/;
+    }
+
+    $c->log->debug(qq/change_sessid: storing session data to "$newsid"/) if $c->debug;
+    $c->store_session_data( "session:$newsid" => $sessiondata );
+
+    return $newsid;
 }
 
 sub delete_session {
@@ -316,33 +387,85 @@ sub session_expires {
 
 sub extend_session_expires {
     my ( $c, $expires ) = @_;
-    $c->_extended_session_expires( my $updated = $c->calculate_extended_session_expires( $expires ) );
-    $c->extend_session_id( $c->sessionid, $updated );
-    return $updated;
+
+    my $threshold = $c->_session_plugin_config->{expiry_threshold} || 0;
+
+    if ( my $sid = $c->sessionid ) {
+        my $expires = $c->_get_stored_session_expires;
+        my $cutoff  = $expires - $threshold;
+
+        if (!$threshold || $cutoff <= time || $c->_session_updated) {
+
+            $c->_extended_session_expires( my $updated = $c->calculate_initial_session_expires() );
+            $c->extend_session_id( $sid, $updated );
+
+            return $updated;
+
+        } else {
+
+            return $expires;
+
+        }
+
+    } else {
+
+        return;
+
+    }
+
+}
+
+sub change_session_expires {
+    my ( $c, $expires ) = @_;
+
+    $expires ||= 0;
+    my $sid = $c->sessionid;
+    my $time_exp = time() + $expires;
+    $c->store_session_data( "expires:$sid" => $time_exp );
+}
+
+sub _get_stored_session_expires {
+    my ($c) = @_;
+
+    if ( my $sid = $c->sessionid ) {
+        return $c->get_session_data("expires:$sid") || 0;
+    } else {
+        return 0;
+    }
+}
+
+sub initial_session_expires {
+    my $c = shift;
+    return ( time() + $c->_session_plugin_config->{expires} );
 }
 
 sub calculate_initial_session_expires {
-    my $c = shift;
-    return ( time() + $c->config->{session}{expires} );
+    my ($c) = @_;
+    return max( $c->initial_session_expires, $c->_get_stored_session_expires );
 }
 
 sub calculate_extended_session_expires {
     my ( $c, $prev ) = @_;
-    $c->calculate_initial_session_expires;
+    return ( time() + $prev );
 }
 
 sub reset_session_expires {
     my ( $c, $sid ) = @_;
-    
+
     my $exp = $c->calculate_initial_session_expires;
     $c->_session_expires( $exp );
+    #
+    # since we're setting _session_expires directly, make load_session_expires
+    # actually use that value.
+    #
+    $c->_tried_loading_session_expires(1);
     $c->_extended_session_expires( $exp );
     $exp;
 }
 
 sub sessionid {
     my $c = shift;
-    
+
     return $c->_sessionid || $c->_load_sessionid;
 }
 
@@ -386,10 +509,21 @@ sub validate_session_id {
 sub session {
     my $c = shift;
 
-    $c->_session || $c->_load_session || do {
+    my $session = $c->_session || $c->_load_session || do {
         $c->create_session_id_if_needed;
         $c->initialize_session_data;
     };
+
+    if (@_) {
+      my $new_values = @_ > 1 ? { @_ } : $_[0];
+      croak('session takes a hash or hashref') unless ref $new_values;
+
+      for my $key (keys %$new_values) {
+        $session->{$key} = $new_values->{$key};
+      }
+    }
+
+    $session;
 }
 
 sub keep_flash {
@@ -398,7 +532,7 @@ sub keep_flash {
     (@{$href}{@keys}) = ((undef) x @keys);
 }
 
-sub _flash_data { 
+sub _flash_data {
     my $c = shift;
     $c->_flash || $c->_load_flash || do {
         $c->create_session_id_if_needed;
@@ -424,7 +558,7 @@ sub flash {
 
 sub clear_flash {
     my $c = shift;
-    
+
     #$c->delete_session_data("flash:" . $c->sessionid); # should this be in here? or delayed till finalization?
     $c->_flash_key_hashes({});
     $c->_flash_keep_keys({});
@@ -450,8 +584,13 @@ sub initialize_session_data {
             __updated => $now,
 
             (
-                $c->config->{session}{verify_address}
-                ? ( __address => $c->request->address )
+                $c->_session_plugin_config->{verify_address}
+                ? ( __address => $c->request->address||'' )
+                : ()
+            ),
+            (
+                $c->_session_plugin_config->{verify_user_agent}
+                ? ( __user_agent => $c->request->user_agent||'' )
                 : ()
             ),
         }
@@ -473,7 +612,7 @@ sub create_session_id_if_needed {
 
 sub create_session_id {
     my $c = shift;
-    
+
     my $sid = $c->generate_session_id;
 
     $c->log->debug(qq/Created session "$sid"/) if $c->debug;
@@ -518,7 +657,7 @@ sub dump_these {
     (
         $c->maybe::next::method(),
 
-        $c->sessionid
+        $c->_sessionid
         ? ( [ "Session ID" => $c->sessionid ], [ Session => $c->session ], )
         : ()
     );
@@ -634,17 +773,18 @@ requests.
 This method will automatically create a new session and session ID if none
 exists.
 
-=item session_expires
+You can also set session keys by passing a list of key/value pairs or a
+hashref.
 
-=item session_expires $reset
+    $c->session->{foo} = "bar";      # This works.
+    $c->session(one => 1, two => 2); # And this.
+    $c->session({ answer => 42 });   # And this.
+
+=item session_expires
 
 This method returns the time when the current session will expire, or 0 if
 there is no current session. If there is a session and it already expired, it
 will delete the session and return 0 as well.
-
-If the C<$reset> parameter is true, and there is a session ID the expiry time
-will be reset to the current time plus the time to live (see
-L</CONFIGURATION>). This is used when creating a new session.
 
 =item flash
 
@@ -655,6 +795,15 @@ The flash data will be cleaned up only on requests on which actually use
 $c->flash (thus allowing multiple redirections), and the policy is to delete
 all the keys which haven't changed since the flash data was loaded at the end
 of every request.
+
+Note that use of the flash is an easy way to get data across requests, but
+it's also strongly disrecommended, due it it being inherently plagued with
+race conditions. This means that it's unlikely to work well if your
+users have multiple tabs open at once, or if your site does a lot of AJAX
+requests.
+
+L<Catalyst::Plugin::StatusMessage> is the recommended alternative solution,
+as this doesn't suffer from these issues.
 
     sub moose : Local {
         my ( $self, $c ) = @_;
@@ -677,7 +826,7 @@ of every request.
         my ( $self, $c ) = @_;
 
         if ( exists $c->flash->{beans} ) { # false
-        
+
         }
     }
 
@@ -721,7 +870,8 @@ expiry time for the whole session).
 
 For example:
 
-    __PACKAGE__->config->{session}{expires} = 1000000000000; # forever
+    __PACKAGE__->config('Plugin::Session' => { expires => 10000000000 }); # "forever"
+    (NB If this number is too large, Y2K38 breakage could result.)
 
     # later
 
@@ -731,6 +881,39 @@ Will make the session data survive, but the user will still be logged out after
 an hour.
 
 Note that these values are not auto extended.
+
+=item change_session_id
+
+By calling this method you can force a session id change while keeping all
+session data. This method might come handy when you are paranoid about some
+advanced variations of session fixation attack.
+
+If you want to prevent this session fixation scenario:
+
+    0) let us have WebApp with anonymous and authenticated parts
+    1) a hacker goes to vulnerable WebApp and gets a real sessionid,
+       just by browsing anonymous part of WebApp
+    2) the hacker inserts (somehow) this values into a cookie in victim's browser
+    3) after the victim logs into WebApp the hacker can enter his/her session
+
+you should call change_session_id in your login controller like this:
+
+      if ($c->authenticate( { username => $user, password => $pass } )) {
+        # login OK
+        $c->change_session_id;
+        ...
+      } else {
+        # login FAILED
+        ...
+      }
+
+=item change_session_expires $expires
+
+You can change the session expiration time for this session;
+
+    $c->change_session_expires( 4000 );
+
+Note that this only works to set the session longer than the config setting.
 
 =back
 
@@ -750,7 +933,7 @@ application.
 
 =item setup_session
 
-This method populates C<< $c->config->{session} >> with the default values
+This method populates C<< $c->config('Plugin::Session') >> with the default values
 listed in L</CONFIGURATION>.
 
 =item prepare_action
@@ -860,6 +1043,9 @@ dumped objects if session ID is defined.
 
 =item extend_session_expires
 
+Note: this is *not* used to give an individual user a longer session. See
+'change_session_expires'.
+
 =item extend_session_id
 
 =item get_session_id
@@ -869,6 +1055,8 @@ dumped objects if session ID is defined.
 =item session_is_valid
 
 =item set_session_id
+
+=item initial_session_expires
 
 =back
 
@@ -894,12 +1082,12 @@ the store.
 
 =head1 CONFIGURATION
 
-    $c->config->{session} = {
+    $c->config('Plugin::Session' => {
         expires => 1234,
-    };
+    });
 
 All configuation parameters are provided in a hash reference under the
-C<session> key in the configuration hash.
+C<Plugin::Session> key in the configuration hash.
 
 =over 4
 
@@ -908,10 +1096,28 @@ C<session> key in the configuration hash.
 The time-to-live of each session, expressed in seconds. Defaults to 7200 (two
 hours).
 
+=item expiry_threshold
+
+Only update the session expiry time if it would otherwise expire
+within this many seconds from now.
+
+The purpose of this is to keep the session store from being updated
+when nothing else in the session is updated.
+
+Defaults to 0 (in which case, the expiration will always be updated).
+
 =item verify_address
 
-When true, C<<$c->request->address>> will be checked at prepare time. If it is
+When true, C<< $c->request->address >> will be checked at prepare time. If it is
 not the same as the address that initiated the session, the session is deleted.
+
+Defaults to false.
+
+=item verify_user_agent
+
+When true, C<< $c->request->user_agent >> will be checked at prepare time. If it
+is not the same as the user agent that initiated the session, the session is
+deleted.
 
 Defaults to false.
 
@@ -946,6 +1152,11 @@ The time when the session was first created.
 
 The value of C<< $c->request->address >> at the time the session was created.
 This value is only populated if C<verify_address> is true in the configuration.
+
+=item __user_agent
+
+The value of C<< $c->request->user_agent >> at the time the session was created.
+This value is only populated if C<verify_user_agent> is true in the configuration.
 
 =back
 
@@ -1000,11 +1211,8 @@ changes by request a
 
 =back
 
-If this is a concern in your application, a soon-to-be-developed locking
-solution is the only safe way to go. This will have a bigger overhead.
-
-For applications where any given user is only making one request at a time this
-plugin should be safe enough.
+For applications where any given user's session is only making one request
+at a time this plugin should be safe enough.
 
 =head1 AUTHORS
 
@@ -1020,7 +1228,19 @@ Tomas Doran (t0m) C<bobtfish@bobtfish.net> (current maintainer)
 
 Sergio Salvi
 
+kmx C<kmx@volny.cz>
+
+Florian Ragwitz (rafl) C<rafl@debian.org>
+
+Kent Fredric (kentnl)
+
 And countless other contributers from #catalyst. Thanks guys!
+
+=head1 Contributors
+
+Devin Austin (dhoss) <dhoss@cpan.org>
+
+Robert Rothenberg <rrwo@cpan.org> (on behalf of Foxtons Ltd.)
 
 =head1 COPYRIGHT & LICENSE
 

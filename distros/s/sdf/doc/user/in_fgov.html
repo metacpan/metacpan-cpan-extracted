@@ -1,0 +1,169 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Overview</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_fg.html">Parent Topic</A> | <A HREF="in_fg.html">Previous Topic</A> | <A HREF="in_fggen.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>4.1. Overview</H1>
+<HR>
+<H2><A NAME="Features">4.1.1. Features</A></H2>
+<P>SDF supports a range of features related to figures:</P>
+<UL>
+<LI>figures can be imported in a variety of formats including:<UL>
+<LI>EPS - Encapsulated PostScript
+<LI>WMF - Windows MetaFile
+<LI>MIF - Maker Interchange Format
+<LI>GIF - Graphics Interchange Format
+<LI>JPEG - JPEG File Interchange Format
+<LI>PNG - Portable Network Graphic Format
+<LI>BMP - Windows Bitmap Format</UL>
+<LI>logos can be easily added to title pages and online headers
+<LI>figure positioning can be controlled
+<LI>text can be wrapped around figures.</UL>
+<HR>
+<H2><A NAME="Importing Figures Into SDF Documents">4.1.2. Importing Figures Into SDF Documents</A></H2>
+<P>The <A HREF="../ref/mimport.html">import</A> macro is usually used to import a figure. The syntax is:</P>
+<PRE>
+  !import &quot;filename&quot; <EM>[; parameters]</EM>
+</PRE>
+<P>For example:</P>
+<PRE>
+  !import &quot;sdfarch&quot;
+</PRE>
+<HR>
+<H2><A NAME="Importing a Figure Into Paragraph Text">4.1.3. Importing a Figure Into Paragraph Text</A></H2>
+<P>To import a figure into the middle of a paragraph, the IMPORT phrase style is used. The syntax is:</P>
+<PRE>
+    {{IMPORT:filename}}, or
+    {{IMPORT[parameters]filename}}
+</PRE>
+<P>For example:</P>
+<PRE>
+Please visit our {{IMPORT:new}} web site!
+</PRE>
+<HR>
+<H2><A NAME="Figure Extensions">4.1.4. Figure Extensions</A></H2>
+<P>It is generally best <EM>not</EM> to specify an extension for the filename containing the figure, as SDF will then use the best format it can find. The search rules are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>When generating</STRONG>
+</TD>
+<TD>
+<STRONG>The search order is</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+PostScript
+</TD>
+<TD>
+epsi, eps, wmf, mif, gif
+</TD>
+</TR>
+<TR>
+<TD>
+HTML
+</TD>
+<TD>
+jpeg, jpg, png, gif
+</TD>
+</TR>
+<TR>
+<TD>
+Windows Help
+</TD>
+<TD>
+bmp
+</TD>
+</TR>
+</TABLE>
+
+<P>So a GIF file is all that is necessary if you are generating PostScript and HTML. However, if SDF finds an EPS file when it is generating PostScript, it will use that instead.</P>
+<HR>
+<H2><A NAME="Adding Logos">4.1.5. Adding Logos</A></H2>
+<P>The default implementations of the <A HREF="../ref/mbuild_t.html">build_title</A> macro, <A HREF="../ref/ftitle.html">title</A> filter and HTML header macros provide an easy way to add a company logo: by defining variables. The variables are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_LOGO
+</TD>
+<TD>
+the default logo
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TITLE_LOGO
+</TD>
+<TD>
+used in the title of a PostScript document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_ADMIN_LOGO
+</TD>
+<TD>
+used in the title of a PostScript admin. document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_HTML_LOGO
+</TD>
+<TD>
+used in the title of a HTML document
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_TOPIC_LOGO
+</TD>
+<TD>
+used in the header of a HTML topic
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_MANUAL_LOGO
+</TD>
+<TD>
+used on the front cover of a PostScript manual
+</TD>
+</TR>
+<TR>
+<TD>
+DOC_COMPONENT_LOGO
+</TD>
+<TD>
+used on the cover of each chapter in a PostScript manual
+</TD>
+</TR>
+</TABLE>
+
+<P>In each case, the value of the variable is the filename containing the figure.</P>
+<P>If a given logo variable is not set, DOC_LOGO is used if it is set. Therefore, a company logo can be added to most SDF documents by simply defining DOC_LOGO is a configuration module (or library) which is loaded into every SDF document via the <A HREF="../ref/muse.html">use</A> (or <A HREF="../ref/minherit.html">inherit</A>) macro.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_fg.html">Parent Topic</A> | <A HREF="in_fg.html">Previous Topic</A> | <A HREF="in_fggen.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

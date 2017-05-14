@@ -1,0 +1,56 @@
+Business::ReportWriter 0.09
+===========================
+
+SYNOPSIS
+The idea is to produce reports based on data that are extracted from a
+database. The extraction is performed with DBIx::Recordset so the syntax
+is the same as that package uses.
+
+I include two sample XML files. The first file (trialbal.xml) is a report
+for Trial Balance from the FreeMoney project.
+The second (inventory.xml) is _very_ simple; it's only there to show
+some of the basic posibilities in ReportWriter. Theres also a database
+included. Fire it into PostgreSQL and run ReportWriter.
+
+In the XML file there are sections for 
+- Database. You'll want to change this to your settings
+- Extraction criteria (The "search" section)
+- Page header
+- Breaks (this is where Report Writer will make a nice total for you)
+- Fields
+
+
+INSTALLATION
+To install this module type the following:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+
+LICENSE
+Business::ReportWriter is copyright (c) 2004-2005 Kaare Rasmussen 
+(kar at kakidata dot)
+
+This module is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 1, or (at your option) any later version,
+or
+
+b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+the GNU General Public License or the Artistic License for more details.
+
+You should have received a copy of the Artistic License with this
+module, in the file ARTISTIC.  If not, I'll be glad to provide one.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA

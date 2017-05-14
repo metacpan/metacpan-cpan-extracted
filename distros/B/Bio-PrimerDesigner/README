@@ -40,8 +40,9 @@ SYNOPSIS
       #
       # Make sure the design was successful
       #
-      die( "No primers found\n", $results->raw_data )
-          unless $results->left;
+      if ( !$results->left ) {
+          die "No primers found\n", $results->raw_data;
+      }
 
       #
       # Get results (single primer set)
@@ -69,8 +70,12 @@ METHODS
   binary_path
     Gets/sets path to the primer3 binary.
 
-  program
-    Gets/sets which program to use.
+  design
+    Makes the primer design or e-PCR request. Returns an
+    Bio::PrimerDesigner::Result object.
+
+  epcr_example
+    Run test e-PCR job. Returns an Bio::PrimerDesigner::Results object.
 
   list_aliases
     Lists aliases for primer3 input/output options
@@ -81,32 +86,35 @@ METHODS
   method
     Gets/sets method of accessing primer3 or epcr binaries.
 
-  url
-    Gets/sets the URL for accessing the remote binaries.
-
-  design
-    Makes the primer design or e-PCR request. Returns an
-    Bio::PrimerDesigner::Result object.
-
-  verify
-    Tests local installations of primer3 or e-PCR to ensure that they are
-    working properly.
-
-  epcr_example
-    Run test e-PCR job. Returns an Bio::PrimerDesigner::Results object.
+  os_is_unix
+    Returns 1 if it looks like the operating system is a Unix variant,
+    otherwise returns 0.
 
   primer3_example
     Runs a sample design job for primers. Returns an
     Bio::PrimerDesigner::Results object.
 
+  program
+    Gets/sets which program to use.
+
+  run
+    Alias to "design."
+
+  url
+    Gets/sets the URL for accessing the remote binaries.
+
+  verify
+    Tests local installations of primer3 or e-PCR to ensure that they are
+    working properly.
+
 AUTHORS
-    Copyright (C) 2003,2008 Sheldon McKay <mckay@cshl.edu>, Ken Y. Clark
-    <kclark@cpan.org>.
+    Copyright (C) 2003-2009 Sheldon McKay <mckays@cshl.edu>, Ken
+    Youens-Clark <kclark@cpan.org>.
 
 LICENSE
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; version 2.
+    Free Software Foundation; version 3 or any later version.
 
     This program is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -115,7 +123,7 @@ LICENSE
 
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
-    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 SEE ALSO
     Bio::PrimerDesigner::primer3, Bio::PrimerDesigner::epcr.

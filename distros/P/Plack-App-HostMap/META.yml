@@ -1,0 +1,24 @@
+---
+abstract: 'Map multiple Plack apps by host '
+author:
+  - 'Adam Hopkins <srchulo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-HostMap
+requires:
+  Carp: '0'
+  Domain::PublicSuffix: '0'
+  Plack::Component: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/srchulo/Plack--App--HostMap/issues
+version: '0.006'

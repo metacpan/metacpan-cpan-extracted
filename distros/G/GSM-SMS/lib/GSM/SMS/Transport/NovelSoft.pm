@@ -19,7 +19,7 @@ use vars qw( $VERSION $AUTOLOAD );
 
 use base qw( GSM::SMS::Transport::Transport );
 
-$VERSION = '0.2';
+$VERSION = "0.161";
 
 use Carp;
 use HTTP::Request::Common qw(POST);
@@ -98,8 +98,8 @@ sub new {
 sub get_info {
 	my ($self) = @_;
 
-	my $revision = '$Revision: 1.1.1.1 $';
-	my $date = '$Date: 2002/10/15 20:53:38 $';
+	my $revision = '$Revision: 1.2 $';
+	my $date = '$Date: 2003/01/11 14:16:34 $';
 
 print <<EOT;
 NovelSoft transport $VERSION

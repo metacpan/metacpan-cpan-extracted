@@ -32,7 +32,7 @@ TEST 'validate';
             '256' => ['Wrong header format, \'>\' not in the beginning.'],
             '125' => ['Found unknown characters: >>|7110565||36987.1|234174_1<<'],
             '275' => [ 'Wrong header format, \'>\' not in the beginning.', 'No sequence after header.' ],
-            '270' => ['ID is ambiguous. M-domain1']
+            '270' => ['ID is ambiguous.']
         },
         $d
     );

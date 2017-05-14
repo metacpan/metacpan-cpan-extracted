@@ -4,7 +4,7 @@ use vars qw( $VERSION );
 
 use base qw( GSM::SMS::Transport::Transport );
 
-$VERSION = '0.2';
+$VERSION = "0.161";
 
 =head1 NAME
 

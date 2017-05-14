@@ -1,0 +1,15 @@
+align	Alignment of element
+alink	Color of unvisited link
+background	Background image URL
+bgcolor	Background Color
+border	Thickness of the border
+cellpadding	Table cell padding
+cellspacing	Table cell spacing
+color	Text Color
+height	Initial height
+hspace	Horizontal space around element
+size	Font size
+valign	Vertical alignment
+vlink	Color of visited link
+vspace	Vertical space around element
+width	Width of the element

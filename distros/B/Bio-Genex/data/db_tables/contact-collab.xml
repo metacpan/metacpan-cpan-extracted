@@ -1,0 +1,87 @@
+<contact_list>
+  <contact
+    contact_person="Mary O'Connell"
+    type="experiment_set_provider"
+    organization="New Mexico State University"
+    org_mail_address="New Mexico State University
+    AGHT Department
+    Box 3Q
+    Las Cruces, NM  88003-8002"
+    contact_person_email="moconnel@nmsu.edu"
+    contact_person_phone="+1 (505) 646-5172"
+  />
+  <contact
+    contact_person="Sandra Micheletto"
+    type="experiment_set_provider"
+    organization="New Mexico State University"
+    org_mail_address="New Mexico State University
+    AGHT Department
+    Box 3Q
+    Las Cruces, NM  88003-8002"
+    contact_person_email="samichel@cs.nmsu.edu"
+    contact_person_phone="+1 (505) 646-5172"
+  />
+  <contact
+    contact_person="Cheryl Willman"
+    type="experiment_set_provider"
+    organization="UNM Cancer Research Center"
+    org_mail_address="UNM Cancer Research Center
+    2325 Camino de Salud
+    Albuquerque, NM  87131"
+    contact_person_email="cwillman@salud.unm.edu"
+    contact_person_phone="+1 (505) 272-5622"
+  />
+  <contact
+    contact_person="Maggie Werner-Washburne"
+    type="experiment_set_provider"
+    organization="UNM Biology Department"
+    org_mail_address="UNM Biology Department
+    Castetter Hall, Room 167
+    Albuquerque, NM  87131"
+    contact_person_email="maggieww@unm.edu"
+    contact_person_phone="+1 (505) 277-9338"
+  />
+  <contact
+    contact_person="George S. Davidson"
+    type="experiment_set_provider"
+    organization="Sandia National Laboratory"
+    org_mail_address="Sandia National Laboratory
+    P.O. Box 5800
+    Albuquerque, NM  87185-0318"
+    contact_person_email="Email:  gsdavid@sandia.gov"
+    contact_person_phone="+1 (505) 844-7902"
+  />
+  <contact
+    contact_person="Richard W. Michelmore"
+    type="experiment_set_provider"
+    organization="University of California, Davis"
+    org_mail_address="University of California, Davis
+    Vegetable Crops Department
+    131 Ashmundson Hall
+    One Shield Avenue
+    Davis, CA  956116"
+    contact_person_email="michelmore@vegmail.ucdavis.edu"
+    contact_person_phone="+1 (530) 752-1729"
+  />
+  <contact
+    contact_person="Maria J. Harrison"
+    type="experiment_set_provider"
+    organization="Samuel Roberts Noble Foundation"
+    org_mail_address="Samuel Roberts Noble Foundation
+    P.O. Box 2180
+    Ardmore, OK  73402"
+    contact_person_email="mjharrison@noble.org"
+    contact_person_phone="+1 (580) 223-5810"
+  />
+  <contact
+    contact_person="Suzanne B. Sandmeyer"
+    type="experiment_set_provider"
+    organization="University of California, Irvine"
+    org_mail_address="University of California, Irvine
+    Biological Chemistry
+    D240, D288 MED SCI I
+    Irvine, CA  92697-1700"
+    contact_person_email="Email:  sbsandme@uci.edu"
+    contact_person_phone="+1 (949) 824-7571, Ext. 6052"
+  />
+</contact_list>

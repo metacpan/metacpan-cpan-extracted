@@ -1,0 +1,49 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ExperimentSet" db_column="treatment_type" cv_table="ES_TreatmentType">
+  <comment type="definition">This table provides the restricted vocabulary for the column treatment type in the table Experiment Set and allows the data provider to specify his main purpose in performing the experiment	
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. This currently
+affects the quantity series entry.</comment>
+<term name="time_series"
+        description="data collected as time points"/>
+<term name="quantity_series"
+        description="data collected as an ordered series of
+quantitative values, such as varying temperature, amount of light,
+concentration of a drug, nutrient, toxin, or chemical"/>
+<term name="strain_comparison"
+        description="a comparison of different strains of the same organism"/>
+<term name="taxonomy_comparison"
+        description="a comparison of organisms from differing taxa"/>
+<term name="developmental_stage_comparison"
+        description="comparisons of profiles from different
+developmental stages"/> 
+<term name="mutant_wt_comparison"
+        description="a comparison of a mutant to it's wild type"/>
+<term name="pathology_comparison"
+        description="a comparison of tissues of differing pathologies"/>
+<term name="tissue_comparison"
+        description="a comparison of different tissues from the same organism"/>
+<term name="infection_comparison"
+        description="a comparison of pre- and post-infected samples"/>
+<term name="isolate_comparison"
+        description="a comparison of more than one genotype or ecotype
+observation"/>
+<term name="symbiont_comparison"
+        description="a comparison of an isolated sample and the sample
+and it's symbiotic partner, such as a plant and it's associated
+mycorrhizal fungus"/> 
+<term name="multidimensional"
+        description="several variables have equal importance in the
+experimental design"/> 
+<term name="miscellaneous"
+        description="the experimental variable does not fall into one
+of the defined sets"/> 
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

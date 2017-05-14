@@ -1,0 +1,23 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+monad_without_modularity
+	A package requests a monad but it doesn't provide the method
+	->modularity_configure().
+	Package: %s
+	Monad: %s
+
+too_early_individuality
+	﻿A package requests individuality too early. During BEGIN the
+	package isn't fully available, yet. No variables from outside
+	BEGIN exists yet and the ones from inside BEGIN will not exist
+	later (=outside). Inside and outside are different times for
+	this particular block.
+
+	Package: '%s'
+
+modularity_failed
+	while managing the file
+	'%s'

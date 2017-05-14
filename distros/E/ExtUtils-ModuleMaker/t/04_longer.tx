@@ -1,0 +1,46 @@
+# t/04_longer.t;
+
+$|++; 
+print "1..1";
+my($test) = 1;
+
+use ExtUtils::ModuleMaker;
+
+chdir 'blib';
+&ExtUtils::ModuleMaker::Check_Dir ("testing");
+chdir 'testing';
+
+  use ExtUtils::ModuleMaker;
+
+  Generate_Module_Files (
+                         NAME     => 'Sample2::Module::Foo',
+                         ABSTRACT => 'a sample module',
+                         AUTHOR   => {NAME    => 'A. U. Thor',
+                                      EMAIL   => 'a.u.thor@a.galaxy.far.far.away',
+                                      CPANID  => 'AUTHOR',
+                                      WEBSITE => 'http://a.galaxy.far.far.away/modules',
+                                     },
+                         VERSION  => 0.01,
+                         LICENSE  => 'perl',
+                         EXTRA_MODULES=> [
+                                          {
+                                           NAME     => 'Sample2::Module::Bar',
+                                           ABSTRACT => 'a second module',
+                                          },
+                                          {
+                                           NAME     => 'Sample2::Baz',
+                                           ABSTRACT => 'a third module',
+                                          },
+                                         ],
+  );
+
+chdir 'Sample2/Module/Foo';
+
+# 1 files exist ?
+(1) ? print "ok $test\n" : print "not ok $test\n";
+#(-e 'MANIFEST') ? print "ok $test\n" : print "not ok $test\n";
+$test++;
+
+
+# end of t/04_longer.t
+

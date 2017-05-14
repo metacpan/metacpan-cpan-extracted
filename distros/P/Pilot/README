@@ -1,0 +1,64 @@
+Perl modules for accessing PalmPilot(tm) data
+
+This information has been reverse engineered.  It's correctness is in
+no way guaranteed.
+
+Usage: There are two sets of modules.  One is the "Pilot" module,
+which is simply for dealing with PalmPilots in general.  Right now, it
+allows you to install new apps (without having to run instapp), and it
+will tell you the date/time of the last HotSync.  This module requires
+Win32::Registry (available with ActiveWare's port).
+
+To use the Pilot module, simply say, for example:
+
+    use Pilot;
+
+    my $pilot = new Pilot 'd:\pilot\wieglej';        # example
+
+    print Pilot::DateText($pilot->LastSync), "\n";
+
+    $pilot->Install("d:\\sample.prc");
+
+The other set is for processing PalmPilot databases.  These modules do
+not currently supporting writing back changed data.  That is planned
+for a future release.
+
+Using these modules requires setting up a database descriptor.  The
+only reason that I use descriptors is so that I can process multiple
+categories into _different_ hashes, without having to read the
+database multiple times (which is a fairly slow process at the
+moment).
+
+Here is an example that prints out all of the names in the Address
+Book.  This example assumes that you have no two records with the same
+First/Last name.  If that were to happen, it would simply ignore the
+latter definition.
+
+    use Pilot::AddrBook;
+
+    %hash = ();
+
+    $db   = new Pilot::AddrBook;
+
+    $db->Read('d:\pilot\wieglej\address\address.dat',
+              "Personal" =>
+                { "Object"       => \%hash,
+                  "Keysep"       => " ",
+                  "Keyfields"    => [ "Last", "First" ],
+                });
+
+    foreach $key (sort keys %hash) {
+        print $key, "\n";
+    }
+
+Note that these modules are in a very rough stage of development at
+the moment.  There is support code in AddrBook for reading/writing
+BBDB databases using the precise same record format.  At the moment it
+is still under development.
+
+Also, there is a CGI script named "tasklist.pl", which can be used for
+viewing your task list over the Web.  I intend to support forms-based
+editing in the future, but that is also currently not working.
+
+09/16/97
+johnw@borland.com

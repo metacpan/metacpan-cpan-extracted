@@ -1,0 +1,1099 @@
+<<if: ZXIDBOOK>>
+<<else: >>Java JNI Interface to ZXID
+##########################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-java.pd,v 1.7 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-JAVA 02>>
+<<define: ZXDOC=ZXID Java Interface>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. This document describes the Java glue.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+Most Java +Servlets+ can be SSO enabled without any additional
+programming effort. zxidsrvlet.java provides a fully packaged SSO
+component that can be added to any servlet deployment (e.g. under
+Tomcat) to provide SSO functionality just by configuring the servlet
+engine (e.g. Tomcat). The zxidappdemo.java provides an example of how
+this is done.
+
+The Java glue for ZXID was generated using swig(1), however, the swig
+interface is not a retrofit: the whole ZXID API was designed to
+be easily swiggifiable.
+
+The main aim of the glue is supporting the easy and simple API, see
+<<link:zxid-simple.html: zxid_simple()>> for general
+reference. Only differences and language specifics are covered in this
+document.
+
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+
+9 Java Native API (JNI): zxidjava package and zxidjni class
+===========================================================
+
+<<fi: >>
+
+9.1 Installing Binaries or from Package
+---------------------------------------
+
+Currently (2011) ZXID.org itself does not distribute relevant binaries. However,
+we may in future. You are also welcome to contribute binaries so we distribute
+them, or point people to them in this documentation.
+
+(*** WIP)
+
+9.1.1 TAS3 Distributions
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are TAS3 (http://www.tas3.eu/) deployer, you should use
+T3-SSO-ZXID-JAVA from their component pool.
+
+9.2 Building the JNI from Source
+--------------------------------
+
+The steps are
+
+  wget http://zxid.org/zxid-0.4x.tgz  # Remember to check for latest version
+  tar xf zxid-0.40.tgz
+  cd zxid-0.40
+  make javazxid                       # Also builds libzxid and main distribution
+
+You must have set ~JNI_INC~ variable correctly in the Makefile (or in
+localconf.mk) and ~javac~ must be in path (or you must set ~JAVAC~
+variable). For the servlet or Tomcat support, you must make sure
+~SERVLET_PATH~ points to your servlet-api.jar file. The ZXID Java
+interface has been mainly tested with ~j2sdk1.4.2~ and some versions
+of Java SDK 1.5 and 1.6.
+
+> *Advanced compile*:
+> If you have done changes that require regeneration of the
+> zxidjava/zxid_wrap.c file you should build with
+> 
+>  <<tt: make javazxid ENA_GEN=1 >>
+> 
+> but this requires that you have swig(1) installed. Depending
+> on the changes, it may also require xsd2sg.pl and gperf(1),
+> see "Compilation for Experts" section, above, for full
+> explanation. As of January 2007, all of the Java JNI interface
+> is swig(1) generated - there are no human authored files. However,
+> we anticipate building a helper Java library to facilitate
+> use of the JNI - contributions welcome.
+
+After compilation, just copy the class files and the libzxidjni.so
+to suitable locations in your system (Makefile lacks any specific
+Java installation target because the author has not yet made up his
+mind about what makes sense). When you run Java programs that
+use the zxidjni class, you must make sure the libzxidjni.so is
+found by the dynamic linker - usually this means setting ~LD_LIBRARY_PATH~
+environment variable. The zxid-java.sh shell script demonstrates
+how to do this for the example CGI program zxid.java.
+
+9.1.1 MacOS X: JNI Notes
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The resulting library is called libzxidjni.jnilib
+* You may need to supply additional arguments to
+  java command:
+
+    java -classpath .:zxidjava -Djava.library.path=zxidjava zxid
+
+* On Mac, it seems ~export LD_LIBRARY_PATH=zxidjava~ is not needed.
+
+
+9.2 Java Servlet Example Using Tomcat
+-------------------------------------
+
+Consider following example +payload+ servlet (from zxidappdemo.java):
+
+<<ignore: perl -ne 'printf "%02d %s", ++$i, $_' <zxidappdemo.java >>
+
+<<code:
+01 import zxidjava.*;   // Pull in the zxidjni.az() API
+02 import java.io.*;
+03 import javax.servlet.*;
+04 import javax.servlet.http.*;
+05 
+06 public class zxidappdemo extends HttpServlet {
+07     public void doGet(HttpServletRequest req, HttpServletResponse res)
+08      throws ServletException, IOException
+09     {
+10      String fullURL = req.getRequestURI();
+11      if (req.getQueryString() != null)
+12          fullURL += "?" + req.getQueryString();
+13      System.err.print("Start ZXID App Demo GET("+fullURL+")...\n");
+14      HttpSession ses = req.getSession(false);  // Important: do not allow automatic session.
+15      if (ses == null) {                        // Instead, redirect to sso servlet.
+16          res.sendRedirect("sso?o=E&fr=" + fullURL);
+17          return;
+18      }
+19      
+20      res.setContentType("text/html");
+21      res.getOutputStream().print("<title>ZXID Demo App Protected Content</title><body><h1>ZXID Demo App Protected Content at " + fullURL + "</H1>\n");
+22 
+23      // Render logout buttons (optional)
+24 
+25      res.getOutputStream().print("[<a href=\"sso?gl=1&s="+ses.getValue("sesid")+"\">Local Logout</a> | <a href=\"sso?gr=1&s="+ses.getValue("sesid")+"\">Single Logout</a>]\n");
+26 
+27      // The SSO servlet will have done one iteration of authorization. The following
+28      // serves to illustrate, how to explicitly call a PDP from your code.
+29 
+30      if (zxidjni.az("PATH=/var/zxid/", "Action=Show", ses.getValue("sesid").toString()) == 0) {
+31          res.getOutputStream().print("<p><b>Denied.</b> Normally page would not be shown, but we show the session attributes for debugging purposes.\n");
+32          //res.setStatus(302, "Denied");
+33      } else {
+34          res.getOutputStream().print("<p>Authorized.\n");
+35      }
+36 
+37      // Render protected content page (your application starts working)
+38 
+39      res.getOutputStream().print("<pre>HttpSession dump:\n");
+40      String[] val_names = ses.getValueNames();
+41      for (int i = 0; i < val_names.length; ++i) {
+42          res.getOutputStream().print(val_names[i] + ": " + ses.getValue(val_names[i]) + "\n");
+43      }
+44      
+45      res.getOutputStream().print("</pre>");
+46     }
+47 }
+>>
+
+On lines 14-18 we check whether the servlet session is active. If it
+is, there is nothing more to do and we proceed to the application,
+on line 20. However, if the session does not exist yet, we trigger
+Single Sign-On by redirecting the user to /sso (this must match
+the configuration in servlet/WEB-INF/web.xml). A very important
+part of the redirect is supplying the +fr+ query string parameter (l.16)
+which allows the SSO servlet to redirect the user back to the
+original application after the SSO. The o=E query string parameter
+is needed as well and will trigger the IdP selection screen. Alternatively
+you could supply your own IdP selection screen.
+
+On first attempt to access the protected content, the if on l.15 will
+trigger, sending the user to the Single Sign-On. On second attempt (i.e.
+just after the SSO) the if will not fire and application can start its
+normal operation, outputting the protected content page (l.20).
+
+On line 25 we render the logout buttons. This is optional, but your
+web site user interface should include these buttons somewhere. It is
+important that the query strings for the buttons indicate the
+operation (gl=1 means local logout, gr=1 means Single Logout (SLO) and
+the session ID (s=...)  which you can obtain from the servlet session
+under name "sesid". Clicking these links will send the user to the
+SSO servlet with appropriate information to end the session. After
+logout, the user will land on IdP selection screen, where he can
+login again, if desired.
+
+On ll.30-35 we perform an optional authorization check. Usually, if
+configured, an authorization step is taken already during the SSO
+servlet phase. However, sometimes the generic authorization is
+not specific enough and the application wants to make an explicit
+authorization request to a PDP. Calling zxidjni.az() accomplishes
+just that. It is pulled in by the import statement on l.1. The
+first argument is a configuration string, which usually has just one
+argument: the ZXID directory PATH (normally "/var/zxid/"),
+but it could contain additional options such as
+
+PDP_CALL_URL:: URL of the PDP to call. Default is not to call any
+    PDP, i.e. attempting to call zxidjni.az() without this set
+    in either /var/zxid/zxid.conf configuration file or in the
+    conf string is futile.
+NEED:: Comma separated list of the attributes needed for decision.
+    If an attribute or a wild card is not listed in the NEED or WANT,
+    it is not passed to the PDP. Thus, it is not sufficient to
+    supply an attribute in query string: it is also necessary
+    to list it, or a wild card, in NEED or WANT as well as in PEPMAP.
+WANT:: Comma separated list of the attributes useful (but not needed)
+    for decision.
+PEPMAP:: How tp pass attributes from attribute pool, or the query
+    string argument, to the PDP. If attribute or wild card is not
+    listed in the PEPMAP, it is not passed to the PDP.
+
+It is important that you address NEED and PEPMAP in your configuration.
+Without them the attributes supplied in query string argument
+will not be passed on to the PDP.
+
+The second argument ("Action=Show") allows you to pass in attributes
+that were not part of the context before. Each attribute is considered
+accoring to NEED, WANT, and PEPMAP configurations and is classified
+as belonging in Subject, Resource, Action, or Environment categories.
+You would typically supply using thsi argument the specifics of
+the application dependent operation that is to be authorized.
+
+The third argument specifies the ZXID session ID, which is used to
+fetch some additional attributes.
+
+9.2.1 Configuring SSO Servlet to Tomcat
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to your own applet that redirects to the SSO servlet,
+you need to configure Tomcat to recognize both your applet and
+the SSO applet. This is typically done by editing servlet/WEB-INF/web.xml
+file (servlet/WEB-INF/web.xml in zxid source tree). Consider
+
+<<code:
+01 <web-app>
+02 
+03   <display-name>ZXID SSO Servlet Example</display-name>
+04   <description>SSO capability for other servlets.</description>
+05 
+06   <servlet>
+07     <servlet-name>zxidsrvlet</servlet-name>
+08     <servlet-class>zxidsrvlet</servlet-class>
+09     <init-param>
+10       <param-name>ZXIDConf</param-name>
+11       <param-value>PATH=/home/sampo/sidemo/zxid/sp.employeedata.eu:8444/</param-value>
+12     </init-param>
+13   </servlet>
+14 
+15   <servlet-mapping>
+16     <servlet-name>zxidsrvlet</servlet-name>
+17     <url-pattern>/sso</url-pattern>
+18   </servlet-mapping>
+19 
+20   <servlet>
+21     <servlet-name>zxidappdemo</servlet-name>
+22     <servlet-class>zxidappdemo</servlet-class>
+23     <init-param>
+24       <param-name>ZXIDConf</param-name>
+25       <param-value>PATH=/home/sampo/sidemo/zxid/sp.employeedata.eu:8444/</param-value>
+26     </init-param>
+27   </servlet>
+28 
+29   <servlet-mapping>
+30     <servlet-name>zxidappdemo</servlet-name>
+31     <url-pattern>/appdemo</url-pattern>
+32   </servlet-mapping>
+33 
+34 </web-app>
+>>
+
+Here lines 20-32 represent your own payload application.  The
+<servlet-name> is used to match together <servlet> and the
+<servlet-mapping> sections. <servlet-class> points to the Java class
+file that implements the servler, in this case zxidappdemo.class.
+You can pass configuration data using <init-data> element: use ZXIDConf
+as <param-name> and ZXID configruation syntax for <param-value>. These
+configuration options are additive to default config and previously read config
+files, such as /var/zxid/zxid.conf. You only need to specify what changes
+viz-a-viz the already read configuration. You application needs to
+use the getServletConfig().getInitParameter("ZXIDConf") Java method to actually
+pull in the config string. If your servlet hardcodes the config string,
+then the <init-params> does not have any effect.
+
+> N.B. Unlike in Apache2 httpd.conf where ZXIDConf directive
+> can appear multiple times, you can have only one init param
+> called "ZXIDConf". Thus if you have more than one parameter,
+> you have to combine them using URL syntax, i.e. with "&" (ampersand) as separator,
+> but this in turn causes complication because "&" is used in XML entity
+> escapes, so actually you have to write &amp;, for example:
+>
+>   <init-param>
+>     <param-name>ZXIDConf</param-name>
+>     <param-value>PATH=/home/sampo/sidemo/zxid/sp.employeedata.eu:8444/&amp;URL=sp.employeedata.eu:8444/e2eTA/sso&amp;NICE_NAME=Nice+Example</param-value>
+>   </init-param>
+>
+> Confused yet?
+
+Finally <url-pattern> specifies where in the web servers hierarchy the
+servlet will appear. Here you have to realize that the pattern will be
+prefixed by the directory path where the servlet lives (i.e. in our
+example the actual path is /zxidservlet/appdemo).
+
+ll.06-18 represent the SSO servlet. As can be seen, the corresponding
+class file is zxidsrvlet.class, which you will find at top level
+of the zxid distribution after compiling. The <url-pattern>
+and the servlet directory MUST match the redirection on l.16
+of the servlet code example above. If application servlet and
+the SSO servlet live in the same directory, mere local redirect
+will do the trick, as illustrated on l.16.
+
+The <url-pattern> also MUST correspond to the URL parameter in the
+/var/zxid/zxid.conf file (the URL parameter is also prefix of the
+EntityID which is also the Well Know Location (WKL) for metadata
+exchange).
+
+9.3 Running as servlet under Tomcat
+-----------------------------------
+
+> N.B. Servlet is known to run under JBOSS as well.
+
+ZXID distribution contains subdirectory called ~servlet~. You should
+link this into webapps directory of Tomcat servlet container
+
+  cd ~/apache-tomcat-5.5.20/webapps
+  ln -s ~/zxid-0.34/servlet zxidservlet
+
+and also
+
+  cd ~/apache-tomcat-5.5.20/webapps/zxidservlet/WEB-INF
+  ln -s ../.. classes
+
+You also need to set ~allowLinking~ flag in 
+apache-tomcat-5.5.20/conf/context.xml (the ~reloadable~
+flag avoids having to restart Tomcat if you recompile
+the .class file):
+
+  <Context allowLinking="true" 
+reloadable="true">...
+
+In Tomcat6 the file might be /etc/tomcat6/context.xml
+
+> N.B. It has been reported that on Tomcat6 this is broken and
+> symlinks can not be made to work, so your only option is to
+> simply copy the files over, e.g.
+>
+>   cd /var/lib/tomcat6/webapps
+>   cp -r ~/zxid-1.10/servlet zxidservlet
+>   cd /var/lib/tomcat6/webapps/zxidservlet/WEB-INF
+>   mkdir classes # if not existing yet
+>   cp -r ~/zxid-1.10/*.class ~/zxid-0.34/zxidjava classes/
+>   sudo cp ~/zxid-1.10/zxidjava/libzxidjni.so /usr/lib
+>   sudo chmod a+rx /usr/lib/libzxidjni.so
+
+The file servlet/WEB-INF/web.xml describes the example zxid
+application. The actual application lives in servlet/WEB-INF/classes
+which is actually just a symlink back to the top level of the ZXID
+distribution. Therefore the zxidhello.class file appears on the top
+level and the wrapper classes, which are scoped in ~zxidjava~ package,
+appear in zxidjava/ subdirectory. From the servlet container's
+perspective the directory appears to be
+apache-tomcat-5.5.20/webapps/zxidservlet/WEB-INF/classes/zxidjava
+
+After ~make javazxid~ and restart of Tomcat (~killall java;
+apache-tomcat-5.5.20/bin/startup.sh~), you can access the application
+using URL (defined in servlet/WEB-INF/web.xml)
+
+  make javazxid
+  export JAVA_HOME=/apps/java/j2sdk1.4.2
+  export LD_LIBRARY_PATH=~/zxid-0.34/zxidjava:$LD_LIBRARY_PATH
+  cd ~/apache-tomcat-5.5.20      # Need to be here to avoid class path problems
+  killall java; bin/startup.sh
+  tail -f ~/apache-tomcat-5.5.20/logs/catalina.out &
+  http://sp1.zxidsp.org:8080/zxidservlet/zxidHLO?o=E
+
+N.B. You should make sure sp1.zxidsp.org resolves to the machine
+where you are running Tomcat, e.g. localhost (127.0.0.1).
+
+9.4 Using ZXID with AXIS2
+-------------------------
+
+ axis2-1.4.1-war.zip
+ zxidservlet/META-INF/module.xml
+ /d/sampo/apache-tomcat-5.5.20/webapps/axis2/WEB-INF/services/META-INF/services.xml
+ /d/sampo/apache-tomcat-5.5.20/webapps/axis2/WEB-INF/conf/axis2.xml
+
+9.5 Programming with ZXID Java API
+----------------------------------
+
+For detailed usage examples of the Java interface you should study
+the zxid.java file.
+
+The Java interface is contained in a package called ~zxidjava~. This
+package contains the main wrapper class ~zxidjni~ as well as a number
+of data type specific classes. The ~zxidjni~ class is just
+a container for procedural zxid API - all methods of this class
+are static.
+
+To start using the ZXID Java interface you need to do two
+things:
+
+  import zxidjava.*;
+
+somewhere near top of your program pulls in the zxidjava package,
+including the zxidjni class. Then you need to have a static
+initializer somewhere in your program to pull in the libzxidjni.so:
+
+  public class myprog {
+    static {
+      System.loadLibrary("zxidjni");
+    }
+
+    public static void main(String argv[]) throws java.io.IOException
+    {
+      // ...
+    }
+  }
+
+From here on you can call the C API procedures as static methods
+of the zxidjni class, e.g:
+
+  cf = zxidjni.new_conf("/var/zxid/");
+
+Note that the ~zxid_~ prefix is omitted in favour of the ~zxidjni~
+class name qualifier.
+
+9.5.1 Integrating SSO Directly to Your Java Servlet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Although zxidsrvlet.java provides a "no programming required"
+SSO integration for Servlet, just like mod_auth_saml provides
+for Apache httpd, sometimes you will want to integrate SSO
+directly into your servlet, e.g. to avoid distributing a second
+servlet.
+
+(*** also in zxid-simple.pd)
+
+Consider
+
+  01 import zxidjava.*;
+  02 import java.io.*;
+  03 import javax.servlet.*;
+  04 import javax.servlet.http.*;
+  05 public class zxidhlo extends HttpServlet {
+  06   static { System.loadLibrary("zxidjni"); }
+  07   static final String conf
+  08     = "PATH=/var/zxid/&URL=http://sp1.zxidsp.org:8080/zxidservlet/zxidHLO";
+  09   public void do_zxid(HttpServletRequest req, HttpServletResponse res, String qs)
+  10                       throws ServletException, IOException {
+  11     String ret = zxidjni.simple(conf, qs, 0xd54);
+  12     switch (ret.charAt(0)) {
+  13     case 'L':  /* Redirect: ret == "LOCATION: urlCRLF2" */
+  14       res.sendRedirect(ret.substring(10, ret.length() - 4));
+  15       return;
+  16     case '<':
+  17       switch (ret.charAt(1)) {
+  18       case 's':  /* <se:  SOAP envelope */
+  19       case 'm':  /* <m20: metadata */
+  20         res.setContentType("text/xml");
+  21         break;
+  22       default:
+  23         res.setContentType("text/html");
+  24       break;
+  25       }
+  26       res.setContentLength(ret.length());
+  27       res.getOutputStream().print(ret);
+  28       break;
+  29     case 'd': /* Logged in case */
+  30       //my_parse_ldif(ret);
+  31       res.setContentType("text/html");
+  32       res.getOutputStream().print(zxidjni.fed_mgmt(conf, sesid, 0xd54));
+  33       break;
+  34     default:
+  35       System.err.print("Unknown zxid_simple() response:");
+  36       System.err.print(ret);
+  37     }
+  38   }
+  39   public void doGet(HttpServletRequest req, HttpServletResponse res)
+  40                     throws ServletException, IOException {
+  41     // LECP/ECP PAOS header checks
+  42     do_zxid(req, res, req.getQueryString());
+  43   }
+  44   public void doPost(HttpServletRequest req, HttpServletResponse res)
+  45                      throws ServletException, IOException {
+  46     String qs;
+  47     int len = req.getContentLength();
+  48     byte[] b = new byte[len];
+  49     int got = req.getInputStream().read(b, 0, len);
+  50     qs = new String(b, 0, got);
+  51     do_zxid(req, res, qs);
+  52   }
+  53 }
+
+9.6 Known Problems and Limitations
+----------------------------------
+
+The zx_str type is generally NOT nul terminated. We try to
+map these in the SWIG type maps, but any function returning
+char* currently maps to Java String type, yet there is no
+way of knowing how long the string type is. Therefore
+it's not safe to call functions returning char*. For example,
+consider
+
+  int zx_LEN_SO_sa_Action(struct zx_ctx* c, struct zx_sa_Action_s* x);
+  char* zx_ENC_SO_sa_Action(struct zx_ctx* c, struct zx_sa_Action_s* x, char* p);
+  struct zx_str* zx_EASY_ENC_SO_sa_Action(struct zx_ctx* c, struct zx_sa_Action_s* x);
+
+The intent of the LEN_SO plus ENC_SO pair is that you first compute
+length, allocate sufficient buffer, and then render the encoding into
+the buffer. The ENC_SO in fact returns char* one past the end of the
+string. It is NOT safe to cal ENC_SO from Java because the SWIG
+generated interface would make Java believe that the char* one past
+end of string is a C string in its own right. Thus the only
+safe one to call is the EASY_ENC_SO variant.
+
+9.7 Troubleshooting class loader
+--------------------------------
+
+9.7.1 Symlinks
+~~~~~~~~~~~~~~
+
+If you get
+
+  java.lang.ClassNotFoundException: zxidhlo
+        org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1355)
+        org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1201)
+        org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+        org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+        org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+        org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+        org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+        org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+        org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+        java.lang.Thread.run(Thread.java:595)
+
+Then you forgot to turn on the symlinks (see ~allowLinking~, above). Or you
+forgot to make the symlinks (e.g. ln -s ../.. classes). Alternately can
+just copy the files and directories to the right place in the Tomcat tree.
+See section "Running as servlet under Tomcat", above.
+
+Following is another manifestation of the same problem:
+
+  javax.servlet.ServletException: Wrapper cannot find servlet class zxidappdemo or a class it depends on
+	org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+	org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+	org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+	org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+	org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+	org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+	org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+	java.lang.Thread.run(Thread.java:534)
+
+  root cause
+
+  java.lang.ClassNotFoundException: zxidappdemo
+	org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1355)
+	org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1201)
+	org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+	org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+	org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+	org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+	org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+	org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+	org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+	java.lang.Thread.run(Thread.java:534)
+
+Overall, it is incomprehensible why Tomcat developers hate symlinks so
+much that they make every effort to deny the developers benefit of
+this useful mechanism.
+
+In Tomcat6 the symlink enablement receipe of Tomcat5 apparently does
+not work any longer and the web is full of confused users who loose
+hours and days wrestling with this problem. If you are stuck with
+this, do yourself a favor: just copy the directory and files that the
+symlink would have pointed to. Its suboptimal, but in the end of the
+day it works.
+
+It is also worthwhile to explicitly check that the classes it is
+looking for have actually been compiled.
+
+9.7.2 Class Path or Java Version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you get
+
+  javax.servlet.ServletException: Error allocating a servlet instance
+	org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+	org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+	org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+	org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+	org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+	org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+	org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+	java.lang.Thread.run(Thread.java:534)
+
+  root cause
+
+  java.lang.NoClassDefFoundError: javax/servlet/http/HttpServlet
+        java.lang.ClassLoader.defineClass1(Native Method)
+        java.lang.ClassLoader.defineClass(ClassLoader.java:620)
+        java.security.SecureClassLoader.defineClass(SecureClassLoader.java:124)
+        java.net.URLClassLoader.defineClass(URLClassLoader.java:260)
+        java.net.URLClassLoader.access$100(URLClassLoader.java:56)
+        java.net.URLClassLoader$1.run(URLClassLoader.java:195)
+        java.security.AccessController.doPrivileged(Native Method)
+        java.net.URLClassLoader.findClass(URLClassLoader.java:188)
+        java.lang.ClassLoader.loadClass(ClassLoader.java:306)
+        sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:268)
+        java.lang.ClassLoader.loadClass(ClassLoader.java:251)
+        org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1270)
+        org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1201)
+        org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+        org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+        org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+        org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+        org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+        org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+        org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+        java.lang.Thread.run(Thread.java:595)
+
+Then the problem is with class path. Apparently running the startup.sh script from anywhere
+else than top level of Tomcat distribution produces the above error.
+
+If, however, you get
+
+  javax.servlet.ServletException: Error allocating a servlet instance
+	org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+	org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+	org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+	org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+	org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+	org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+	org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+	java.lang.Thread.run(Thread.java:534)
+
+  root cause
+
+  java.lang.UnsupportedClassVersionError: zxidappdemo (Unsupported major.minor version 50.0)
+	java.lang.ClassLoader.defineClass0(Native Method)
+	java.lang.ClassLoader.defineClass(ClassLoader.java:537)
+	java.security.SecureClassLoader.defineClass(SecureClassLoader.java:123)
+	org.apache.catalina.loader.WebappClassLoader.findClassInternal(WebappClassLoader.java:1815)
+	org.apache.catalina.loader.WebappClassLoader.findClass(WebappClassLoader.java:869)
+	org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1322)
+	org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1201)
+	org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+	org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+	org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+	org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+	org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+	org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+	org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+	java.lang.Thread.run(Thread.java:534)
+
+the reason is that you have compiled the zxidappdemo.class (and/or other classes) with
+newer version of Java that what is running the Tomcat server, e.g. compiled with
+Java 1.6, running with Java 1.4. This is a common problem, just search the web.
+
+Some common Java class version numbers:
+
+* Java 6 (1.6): Version 50.0
+* Java 5 (1.5): Version 49.0
+* Java 1.4.2: Version 48.0
+
+9.7.3 LD_LIBRARY_PATH
+~~~~~~~~~~~~~~~~~~~~~
+
+If you get
+
+  javax.servlet.ServletException: Error instantiating servlet class zxidhlo
+	org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+	org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+	org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+	org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+	org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+	org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+	org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+	java.lang.Thread.run(Thread.java:534)
+
+  root cause
+
+  java.lang.UnsatisfiedLinkError: no zxidjni in java.library.path
+        java.lang.ClassLoader.loadLibrary(ClassLoader.java:1517)
+        java.lang.Runtime.loadLibrary0(Runtime.java:788)
+        java.lang.System.loadLibrary(System.java:834)
+        zxidhlo.<clinit>(zxidhlo.java:20)
+        sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:39)
+        sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:27)
+        java.lang.reflect.Constructor.newInstance(Constructor.java:274)
+        java.lang.Class.newInstance0(Class.java:308)
+        java.lang.Class.newInstance(Class.java:261)
+        org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+        org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+        org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+        org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+        org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+        org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+        org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+        java.lang.Thread.run(Thread.java:534)
+
+Then it is not finding zxidjava/libzxidjni.so. Either say
+
+  export LD_LIBRARY_PATH=~/zxid-0.34/zxidjava:$LD_LIBRARY_PATH
+
+or place libzxidjni.so in $CATALINA_HOME/shared/lib or even /usr/lib
+(perhaps overkill, but if you are desperate). Make sure the library
+has at least read and execute permissions for the tomcat user, or make
+it world readable and executable. Note that the library file name
+really is libzxidjni.so despite the misleading exception suggesting
+just "zxidjni".
+
+9.7.4 Native Library Already Loaded
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you get
+
+  java.lang.UnsatisfiedLinkError: Native Library /home/sampo/zxid/zxidjava/libzxidjni.so already loaded in another classloader
+        java.lang.ClassLoader.loadLibrary0(ClassLoader.java:1551)
+        java.lang.ClassLoader.loadLibrary(ClassLoader.java:1511)
+        java.lang.Runtime.loadLibrary0(Runtime.java:788)
+        java.lang.System.loadLibrary(System.java:834)
+        zxidhlo.<clinit>(zxidhlo.java:20)
+        sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:39)
+        sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:27)
+        java.lang.reflect.Constructor.newInstance(Constructor.java:274)
+        java.lang.Class.newInstance0(Class.java:308)
+        java.lang.Class.newInstance(Class.java:261)
+        org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:105)
+        org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+        org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+        org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:664)
+        org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+        org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+        org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+        java.lang.Thread.run(Thread.java:534)
+
+Then ... ? Currently it seems you have to restart Tomcat.
+
+See
+
+* http://forums.sun.com/thread.jspa?threadID=633985  (gone 20131111)
+* https://forums.oracle.com/message/6471947 (still works 20131111)
+
+In essence the Java environment has arbitrary restriction that same
+library can not be used twice, e.g. due to two instances of same
+application. Most trivial way around this is to create two copies
+of the libzxidjni.so with different names.
+
+From comment 7 on https://forums.oracle.com/message/6471947:
+
+<<code:
+public String getMacAddress() throws IOException {
+if(m_EthoLib == null) {
+try {
+ClassLoader sysCL = getClass().getClassLoader().getSystemClassLoader();
+Class cb = sysCL.loadClass("settings.EthZeroMacAddress");
+EthZeroMacAddress Q = (EthZeroMacAddress) cb.newInstance();
+m_EthoLib = Q;
+} catch(ClassNotFoundException e) {
+throw new IOException(e.getMessage());
+} catch (InstantiationException e) {
+throw new IOException(e.getMessage());
+} catch (IllegalAccessException e) {
+throw new IOException(e.getMessage());
+}
+}
+return m_EthoLib.getMACaddress();
+}
+>>
+
+<<email:
+From: Diana Penciuc <dianapenciuc@gmail.com>
+Date: 2013/11/18
+Subject: zxidjava.dll call from java web application
+To: sampo@zxid.org
+
+Hi Sampo,
+
+I understand you did not receive my previous email, so here we go again:
+
+I basically followed the procedure indicated here :
+http://code.google.com/p/static-dll-bootstrapper/
+
+The main idea is to create a jar containing a class from which I make the
+call to load the library. Then put this jar in the common class loader
+folder under the glassfish web server (which is ../domain/lib).
+
+I also send you an exemple of a web application I used for testing (from
+which I make the call to the class loaded in glassfish).
+
+See you soon,
+Diana
+>>
+
+9.7.5 Win32 Java loanLibrary() error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  java.lang.UnsatisfiedLinkError: Given procedure could not be found
+
+  -mno-cygwin
+  -Wl,--add-stdcall-alias
+
+No documented solution to this mystery error. It is believed to come
+from Windows dynamic linker.
+
+9.7.6 Mystery
+~~~~~~~~~~~~~
+
+java.lang.IllegalArgumentException: Document base /var/lib/tomcat6/webapps/e2eTA does not exist or is not a readable directory
+       at org.apache.naming.resources.FileDirContext.setDocBase(FileDirContext.java:142)
+       at org.apache.catalina.core.StandardContext.resourcesStart(StandardContext.java:4249)
+       at org.apache.catalina.core.StandardContext.start(StandardContext.java:4418)
+       at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:791)
+       at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:771)
+       at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:546)
+       at org.apache.catalina.startup.HostConfig.deployDirectory(HostConfig.java:1041)
+       at org.apache.catalina.startup.HostConfig.deployDirectories(HostConfig.java:964)
+       at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:502)
+       at org.apache.catalina.startup.HostConfig.check(HostConfig.java:1345)
+       at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:303)
+       at org.apache.catalina.util.LifecycleSupport.fireLifecycleEvent(LifecycleSupport.java:119)
+       at org.apache.catalina.core.ContainerBase.backgroundProcess(ContainerBase.java:1337)
+       at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1601)
+       at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1610)
+       at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.run(ContainerBase.java:1590)
+       at java.lang.Thread.run(Thread.java:636)
+07-Feb-2012 11:52:49 org.apache.catalina.core.StandardContext resourcesStart
+SEVERE: Error starting static Resources
+java.lang.IllegalArgumentException: Document base /var/lib/tomcat6/webapps/e2eTA does not exist or is not a readable directory
+       at org.apache.naming.resources.FileDirContext.setDocBase(FileDirContext.java:142)
+       at org.apache.catalina.core.StandardContext.resourcesStart(StandardContext.java:4249)
+       at org.apache.catalina.core.StandardContext.start(StandardContext.java:4418)
+       at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:791)
+       at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:771)
+       at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:546)
+       at org.apache.catalina.startup.HostConfig.deployDirectory(HostConfig.java:1041)
+       at org.apache.catalina.startup.HostConfig.deployDirectories(HostConfig.java:964)
+       at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:502)
+       at org.apache.catalina.startup.HostConfig.check(HostConfig.java:1345)
+       at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:303)
+       at org.apache.catalina.util.LifecycleSupport.fireLifecycleEvent(LifecycleSupport.java:119)
+       at org.apache.catalina.core.ContainerBase.backgroundProcess(ContainerBase.java:1337)
+       at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1601)
+       at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1610)
+       at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.run(ContainerBase.java:1590)
+       at java.lang.Thread.run(Thread.java:636)
+
+Yet the directory /var/lib/tomcat6/webapps/e2eTA does exist and has WEB-INF subdirectory
+with web.xml in it.
+
+Seems the problem was that the e2eTA was a symlink. Despite being correctly made
+and despite <Context allowLinking="true" reloadable="true"> being set, it still
+would not work until I copied the link's destination to its place.
+
+Potentially permissions error, says google, and this indeed seemed to fix it.
+
+9.8 Logging and Debugging Tips
+------------------------------
+
+In case you add debug prints, the stderr (System.err) output
+appears to go by default to apache-tomcat-5.5.20/logs/catalina.out
+
+9.8.1 Debugging libzxidjni.so under jdb and gdb
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Debugging the JNI C code would appear to require running java or jdb
+under gdb and setting break points in the C code. Unfortunately this
+appears to be particularly tricky. A possible approach is to introduce
+a sleep(1) in the C code and then use gdb to attach to the java
+process. Unfortunately even this method does not seem to allow us to
+set break points.
+
+  export LD_LIBRARY_PATH=zxidjava:$LD_LIBRARY_PATH
+  export QUERY_STRING='e=https%3A%2F%2Fidp.symdemo.com%3A8880%2Fidp.xml&l2=+Login+%28SAML20%3APOST%29+&fc=1&fn=prstnt&fq=&fy=&fa=&fm=exact'
+
+N.B. In following "$" means Unix shell prompt, "%" gdb prompt, and ">"
+jdb prompt.
+
+  $ gdb jdb
+  % set env LD_LIBRARY_PATH=zxidjava
+  % set env QUERY_STRING=e=https%3A%2F%2Fidp.symdemo.com%3A8880%2Fidp.xml&l2=+Login+%28SAML20%3APOST%29+&fc=1&fn=prstnt&fq=&fy=&fa=&fm=exact
+  % r zxid
+  > stop at zxid:24
+  > run
+  > next      # or step
+  > print cf
+  > cont
+
+9.8.2 Enabling core dumps
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+How to debug
+
+  *** glibc detected *** /usr/lib/jvm/java-6-openjdk/bin/java: free(): invalid pointer: 0x09c2120c ***
+
+* First enable them at system level
+    ulimit -c unlimited
+
+* Enable glibc to dump core on malloc/free errors
+  - export MALLOC_CHECK_=3   # Note trailing underscore
+  - or edit /etc/default/tomcat6: echo 'MALLOC_CHECK_=3' >>/etc/default/tomcat6
+  - or add to code mallopt(M_CHECK_ACTION, 3). In case of Java program you do it like
+	zxidjni.set_opt(cf, 7, 3);  // Cause glibc malloc/free to dump core on error
+
+* The cores should go to current working directory, but under Tomcat
+  detemining this seems to be a nightmare. You can solve this by setting
+  systemwide default core path to known value, e.g:
+
+    echo '/tmp/core' > /proc/sys/kernel/core_pattern   # On Linux
+
+<<ignore:
+/usr/lib/jvm/java-6-openjdk/bin/java
+-Djava.util.logging.config.file=/var/lib/tomcat6/conf/logging.properties
+-Djava.awt.headless=true
+-Xmx128m
+-XX:+UseConcMarkSweepGC
+-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+-Djava.endorsed.dirs=/usr/share/tomcat6/endorsed
+-classpath /usr/share/tomcat6/bin/bootstrap.jar
+-Dcatalina.base=/var/lib/tomcat6
+-Dcatalina.home=/usr/share/tomcat6
+-Djava.io.tmpdir=/tmp/tomcat6-tmp
+org.apache.catalina.startup.Bootstrap start
+>>
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+96 License
+==========
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Copyright (c) 2010-2011 Sampo Kellomäki (sampo@iki.fi), All Rights Reserved.
+
+See file COPYING for complete information.
+
+97 FAQ extract
+==============
+
+See zxid-faq.pd for full story.
+
+97.1 Compilation Problems
+-------------------------
+
+97.1.5 All files under zx missing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in README.zxid FAQ)
+
+You need to symlink zx to zxid source directory, thus
+
+  ln -s . zx
+
+If you do not have it, then you will get a lot of file inclusion errors for
+headers that are supposed to be in path starting by zx/
+
+The symlink is there to keep all hand written source files on top
+level of directory for ease of development, yet allow inclusions to go
+through ~zx~ subdirectory. When zxid is installed, it goes to
+/usr/include/zx. Hence the symlink keeps the includes the same whether
+developing or using installed version.
+
+97.1.6 Compiler Warnings
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in README.zxid FAQ)
+
+If you compile zxid with compiler warnings turned on (CFLAGS += -Wall),
+you will see quite a number of warnings, most of which are
+unwarranted. Since the warnings are unwarranted, I ship zxid Makefile
+with warnings turned off. If this bothers you, feel free to investigate
+the warnings and report to me any issues you uncover.
+
+Following warnings in partuclar are unwarranted:
+
+1. Any unusued variable warnings, especially in generated code. Most
+   common of these is ~se~ variable (see enc-templ.c).
+2. "Suggest parenthesis around assignment when used as truth value." I
+   rely on C language operator precedence. Also, in most cases the
+   assignment is the only expression in the truth test - there simply
+   is no opportunity for ambiguity -- and no justified case for gcc to
+   warn about this.
+3. "Suggest parenthesis around && when used in ||". I rely on C
+   language operator precedence, hence the suggestion is redundant.
+
+Some warnings you may want to worry about
+
+A. "int format, long int arg". On 32 bit platforms int and long
+   are both 32 bits so this warning is not an issue. On 64 bit platforms,
+   however, there may be cause for worry.
+
+97.1.7 SWIG and Java Problems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(*** also appears in README.zxid FAQ)
+
+javac -J-Xmx128m -g zxid.java zxidjava/*.java
+zxidjava/zxidjni.java:159: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_pub_enc(zx_ctx c, zx_str plain, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                              ^
+zxidjava/zxidjni.java:164: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_pub_dec(zx_ctx c, zx_str ciphered, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                                 ^
+zxidjava/zxidjni.java:169: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_priv_dec(zx_ctx c, zx_str ciphered, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                                  ^
+zxidjava/zxidjni.java:174: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_priv_enc(zx_ctx c, zx_str plain, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                               ^
+This was due to missing SWIG generated classes. Probably interrupted file transfer.
+
+javac -J-Xmx128m -g zxid.java zxidjava/*.java
+zxid.java:24: cannot find symbol
+symbol  : method new_conf(java.lang.String)
+location: class zxidjava.zxidjni
+      cf = zxidjni.new_conf("/var/zxid/");
+                  ^
+zxid.java:27: cannot find symbol
+symbol  : method url_set(zxidjava.zxid_conf,java.lang.String)
+location: class zxidjava.zxidjni
+      zxidjni.url_set(cf, url);
+             ^
+zxid.java:28: cannot find symbol
+
+jar cf zxidjava.jar *.class
+jar cf /tmp/zxidjava.jar zxidjava/*.class
+
+javac -J-Xmx128m -g zxid.java                
+zxid.java:187: cannot access zxid_conf
+bad class file: /Library/Java/Extensions/zxidjava.jar(zxid_conf.class)
+class file contains wrong class: zxidjava.zxid_conf
+Please remove or make sure it appears in the correct subdirectory of the classpath.
+  public static int mgmt_screen(zxid_conf cf, zxid_cgi cgi, zxid_ses ses, char op)
+                                ^
+1 error
+
+Underscore in linking error
+
+./zxid-java.sh 
+Start...
+Exception in thread "main" java.lang.NoSuchMethodError: zxidjava.zxidjni.new_conf(Ljava/lang/String;)Lzxidjava/zxid_conf;
+        at zxid.main(zxid.java:24)
+
+This was due to finding some old copies from system paths.
+
+java -classpath .:zxidjava -Djava.library.path=zxidjava zxid 
+Start...
+Exception in thread "main" java.lang.UnsatisfiedLinkError: _zxid_new_conf
+        at zxidjava.zxidjniJNI._zxid_new_conf(Native Method)
+        at zxidjava.zxidjni.new_conf(zxidjni.java:586)
+        at zxid.main(zxid.java:24)
+
+
+
+97.2 Passing Java Session between Servlets
+------------------------------------------
+
+At Java session level session can only be shared within same servlet
+container. So limited sharing of data between servlets is possible.
+
+However, to cross the servlet container boundary, currently only
+method is to pass the ZXID level session ID and then recreate the
+session from persistent storage using ZXID APIs. Cumbersome, but
+doable. Effectively you would repeat the work done on ll.61-66 of
+zxidsrvlet.java.
+
+<<references:
+
+[SAML2core] "Assertions and Protocols for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-core-2.0-os
+
+
+>>
+
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

@@ -1,0 +1,58 @@
+# $Id$
+#
+# >>Title::     Text Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 14-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# The {{stdlib/txt.sdn}} module defines [[SDF]] configuration details for
+# generating plain text files.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Set the margin
+!default TXT_MARGIN OPT_WIDTH
+
+# Make TXT a restricted variable family
+!restrict 'TXT'
+
+# Declare document variables
+!block variables; family="TXT"; export
+Name                        Type            Rule
+MARGIN                      integer
+HDG_UL_OFF                  boolean
+!endblock
+
+# Define paragraph styles
+!block parastyles
+Name        To                      Attributes
+!endblock
+
+# Define phrase styles
+!block phrasestyles
+Name    To
+!endblock
+
+# Default build_title output
+!macro build_txt_cover
+P1: [[DOC_TITLE]]
+!if DOC_STATUS
+N: [[DOC_ID]] ([[DOC_STATUS]])
+!elsif DOC_ID
+N: [[DOC_ID]]
+!endif
+!if DOC_AUTHOR
+N: [[join(", ", grep(/\w/, @var{'DOC_AUTHOR', 'DOC_AUTHOR2', 'DOC_AUTHOR3'}))]]
+!endif
+!endmacro

@@ -134,7 +134,7 @@ use strict;
 use Data::Dumper;
 use Carp qw(cluck);
 
-our $VERSION = '0.03';
+our $VERSION = '0.01';
 
 =head1 METHODS
 

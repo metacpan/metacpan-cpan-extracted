@@ -239,7 +239,6 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
   tconvp->errors[0]                    = '\0';
   /* Last byte can never change, because we do an strncpy */
   tconvp->errors[TCONV_ERROR_SIZE - 1] = '\0';
-
   /* 1. trace */
   traces                       = getenv(TCONV_ENV_TRACE);
   tconvp->traceb               = (traces != NULL) ? (atoi(traces) != 0 ? 1 : 0) : 0;
@@ -283,7 +282,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
   /* 5. options - we always end up in an "external"-like configuration */
   if (tconvOptionp != NULL) {
 
-    TCONV_TRACE(tconvp, "%s - validation user option", funcs);
+    TCONV_TRACE(tconvp, "%s - validating user option", funcs);
 
     /* Charset */
     if (tconvOptionp->charsetp != NULL) {

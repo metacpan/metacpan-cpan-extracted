@@ -1,0 +1,29 @@
+---
+abstract: 'English to Korean translate utility'
+author:
+  - 'hshong <hshong@perl.kr>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200003, CPAN::Meta::Converter version 2.110390'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-eng2kor
+requires:
+  Any::Moose: 0
+  Const::Fast: 0
+  Encode: 0
+  Getopt::Long: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Pod::Usage: 0
+  URI::Escape: 0
+  namespace::autoclean: 0
+  utf8: 0
+version: v0.0.2

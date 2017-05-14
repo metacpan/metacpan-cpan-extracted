@@ -1,0 +1,14 @@
+# The java code is in java/eai/test.wrl
+
+Group {
+children [
+	Shape {
+		geometry Sphere { }
+		appearance Appearance { 
+			material DEF MAT Material {
+			}
+		}
+	}
+	DEF TS TouchSensor { }
+]
+}

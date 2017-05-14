@@ -1,0 +1,53 @@
+Inconsistencies
+---------------
+
+1. a name ending in "a?" means that the "a?" is not used in calling
+the function within perl, but that it really calls a wrapper C function
+with the "a" appended (which calls the C HLI).  If using an older 
+version of mus, then perl will show the "a" as required, but it 
+really is not.
+
+2. a name ending in "!" cannot be implemented
+
+3. a FAULT of "7.5" means the function is new in 7.5 and is not
+linked into the fameperl
+
+4. a FAULT of "not in 6.0" means the function is not documented
+in the 6.0 manual.  The parameter order is taken from the 
+header file and may not be correct.
+
+5. everthing else either has flattened arrays or behaves differently
+for each data type.
+
+NAME       FAULT
+--------   -----
+cfmawl     7.5
+cfmgatt    value
+cfmlsts!   range,lenary
+cfmopre    7.5
+cfmopwk    not in 6.0
+cfmrdfa!   valary,range
+cfmrdfr    not in 6.0
+cfmrdsr    7.5
+cfmrdst    not in 6.0
+cfmrmev    7.5
+cfmrrng!   valary,range
+cfmrng     not in 6.0
+cfmrstra?  range
+cfmrsts!   strary,range
+cfmsatt    value
+cfmsbma?   range
+cfmsdma?   range
+cfmsfis    range
+cfmsinp    not in 6.0
+cfmsnm     nmistt
+cfmsopt    not in 6.0
+cfmspma?   range
+cfmsrng    range
+cfmssln    7.5
+cfmwrng!   range,valary
+cfmwstr    range,strary 
+cfmwsts!   strary,range
+cfmwtfr    not in 6.0
+cfmwtsr    not in 6.0
+cfmwtst    not in 6.0

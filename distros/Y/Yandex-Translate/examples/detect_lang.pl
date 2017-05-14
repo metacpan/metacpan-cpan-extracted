@@ -1,5 +1,6 @@
 use strict;
 use Yandex::Translate;
+use utf8;
 
 my $tr =  Yandex::Translate->new;
 
@@ -12,7 +13,7 @@ $tr->set_key($key);
 # I do not like it because It does not detect the right lan sometimes, 
 # but do not follow my idea and try to be 'Diligent' (James Axl).
 
-$tr->set_hint([qw{en ru ar tr});
+$tr->set_hint([qw{en ru ar tr}]);
 
 $tr->set_text('Hello');
 print $tr->detect_lang(), "\n";
@@ -22,3 +23,4 @@ print $tr->detect_lang(), "\n";
 
 $tr->set_text('السلام عليكم');
 print $tr->detect_lang(), "\n";
+

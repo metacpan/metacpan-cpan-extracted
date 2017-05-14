@@ -1,0 +1,50 @@
+==================================================
+Changes from 2005-02-12 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0200 at 2015-02-10 09:30:10 +0000
+-------------------------------------------
+
+  Change: 16f31a8d88306201a10fbdbf8811ae0351ba0fa5
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-10 04:26:06 +0000
+
+    added support for orders 
+
+  Change: f9c6ce38e4384a4a31fa12b4fd4863076127c27e
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-09 14:06:12 +0000
+
+    added get_buy_price, get_sell_price, and get_spot_price methods 
+
+  Change: 5ee897bd6b770e3e3b6efe610f98f26176e11093
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-07 03:50:47 +0000
+
+    Moose is required for Function::Parameters types feature 
+
+-------------------------------------------
+version 0.0100 at 2015-02-07 08:44:25 +0000
+-------------------------------------------
+
+  Change: bf385b6f7898dc4398c2461894c8003da716a062
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-07 03:44:25 +0000
+
+    add transaction methods like send_money, transfer_money,
+    request_money, etc 
+
+-------------------------------------------
+version 0.0001 at 2015-02-06 08:12:28 +0000
+-------------------------------------------
+
+  Change: 237cb13402d0373e00a60eb5980fa856d3392d0d
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-06 03:12:28 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

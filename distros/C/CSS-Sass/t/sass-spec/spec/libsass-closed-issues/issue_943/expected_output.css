@@ -1,9 +1,6 @@
 @media (min-width: 10px) {
   .puppy:hover {
-    display: none;
-  }
-}
+    display: none; } }
 
 .puppy {
-  background-color: red;
-}
+  background-color: red; }

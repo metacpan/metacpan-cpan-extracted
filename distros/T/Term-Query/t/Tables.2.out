@@ -1,0 +1,18 @@
+Use of uninitialized value at blib/lib/Term/Query.pm line 242.
+Use of uninitialized value at blib/lib/Term/Query.pm line 242, <STDIN> chunk 1.
+Use of uninitialized value at blib/lib/Term/Query.pm line 242, <STDIN> chunk 2.
+Use of uninitialized value at blib/lib/Term/Query.pm line 242, <STDIN> chunk 3.
+Use of uninitialized value at blib/lib/Term/Query.pm line 242, <STDIN> chunk 4.
+Use of uninitialized value at blib/lib/Term/Query.pm line 242, <STDIN> chunk 5.
+The input "IBM" fails to match any of the allowed keywords:
+Use of uninitialized value at /usr/share/lib/perl5/site_perl/Array/PrintCols.pm line 58, <STDIN> chunk 6.
+query_table returned 1
+  $int1 = "4"
+  $int2 = "5"
+  $num3 = "3.1415"
+  $yn4 = "yes"
+  $yn5 = "no"
+Use of uninitialized value at t/Tables.t line 28, <STDIN> chunk 6.
+  $key6 = ""
+Use of uninitialized value at t/Tables.t line 28, <STDIN> chunk 6.
+  $nonkey7 = ""

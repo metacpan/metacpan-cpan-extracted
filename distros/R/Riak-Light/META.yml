@@ -2,7 +2,6 @@
 abstract: 'Fast and lightweight Perl client for Riak'
 author:
   - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
-  - 'Damien Krotkine <dams@cpan.org>'
 build_requires:
   Module::Build: 0.3601
   Test::Exception: 0
@@ -14,26 +13,25 @@ configure_requires:
   ExtUtils::MakeMaker: 6.30
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Riak-Light
-recommends:
-  JSON::XS: 0
 requires:
   Carp: 0
   Const::Fast: 0
   Google::ProtocolBuffers: 0
   JSON: 0
   Moo: 0
+  MooX::Types::MooseLike::Base: 0
+  Params::Validate: 0
   Time::Out: 0
-  Type::Params: 0
-  Types::Standard: 0
+  namespace::autoclean: 0
   perl: 5.012
 resources:
   bugtracker: https://github.com/Weborama/Riak-Light/issues
   homepage: https://github.com/Weborama/Riak-Light
-  repository: git://github.com/Weborama/Riak-Light.git
-version: 0.12
+  repository: git://github.com///github.com/Weborama/Riak-Light.git
+version: 0.052

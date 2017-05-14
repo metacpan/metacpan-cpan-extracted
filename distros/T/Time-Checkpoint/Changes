@@ -1,0 +1,15 @@
+Version 0.02 - Original release ca. 17 Aug 2004
+	Initial implementation
+
+Version 0.1 - Sun Oct  9 03:24:58 EDT 2011
+	Updated to push to github, cleaned up so I could live with it.
+	Eked out 3% improvement in execution speed through use of 'state' feature.
+	Found a minor bug in a test.
+	There's now relatively little difference in overhead between using a callback and not using
+		a callback, except the actual callback code itself.
+
+Version 0.35 - See above version.
+	Consolidated a versioning error on PAUSE (which was my fault, I guess.)
+
+Version 0.36 - Updated attribution
+	Removed common::sense

@@ -22,6 +22,8 @@ This module requires these other modules and libraries:
  Perl6::Pod::Lib
  Perl6::Pod
 
+apt-get install libhttp-server-simple-perl
+
 COPYRIGHT AND LICENCE
 
 

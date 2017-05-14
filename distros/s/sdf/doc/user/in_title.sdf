@@ -1,0 +1,78 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Building a title
+
+Each document style category has a different way of building a title section:
+
+* {{administration}} styles use the {{FILT:title}} filter
+* {{general}} styles use the {{MAC:build_title}} macro
+* {{miscellaneous}} styles do not have a title.
+
+Refer to {{SECT:Document styles}} for a summary of the styles available
+and the category of each style.
+
+H2: The title filter
+
+The {{FILT:title}} filter generates a title block for administration-style
+documents like memos and faxes. For example:
+
+!block example; pure
+!block title
+Name        Value
+Date:       [[DATE:DOC_MODIFIED]]
+To:         Joe Bloggs, Sue Brown, Maree Jones
+Copy:       David Smith
+From:       Neil Armstrong
+Subject:    Solar System Information
+Ref. No:    XY.002/GUI/96
+!endblock
+!endblock
+
+Refer to the documentation on the {{FILT:title}} filter within the
+{{DOC:SDF Reference}} for further details.
+
+H2: The build_title macro
+
+The {{MAC:build_title}} macro tunes the layout and content of the
+title section for each target format. Typically:
+
+* paper-based documents have all the title information formatted on
+  a page (or two)
+* online documents only have the essential title information formatted
+  in a few lines.
+
+By convention, parameters are passed to {{MAC:build_title}} via
+predefined variable names. For example:
+
+!block example
+  !define DOC_NAME           "GalaxyBuilder"
+  !define DOC_TYPE           "User Guide"
+  !define DOC_AUTHOR         "Joe Bloggs"
+  !build_title
+!endblock
+
+H2: Variables used by build_title
+
+The following variables are commonly defined before {{MAC:build_title}}
+is called:
+
+!block table
+Variable            Description
+DOC_NAME            the title, excluding the type (e.g. SDF)
+DOC_TYPE            the title type (e.g. User Guide)
+DOC_AUTHOR          the author
+!endblock
+
+Refer to the documentation on the {{MAC:build_title}} macro within the
+{{DOC:SDF Reference}} for further details.

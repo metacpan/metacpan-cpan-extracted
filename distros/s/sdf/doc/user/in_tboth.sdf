@@ -1,0 +1,248 @@
+H1: Other Table Goodies
+
+H2: Column alignment
+
+The {{colaligns}} parameter of the {{FILT:table}} filter can be used
+to control the alignment of text within columns of a table.
+For example:
+
+!block example
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+!endblock
+
+The output is:
+
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+
+The value of {{colaligns}} is usually a sequence of the letters
+{{L}}, {{C}} and {{R}} (which mean what one would expect).
+If you prefer, a comma-separated list of the values {{Left}}, {{Center}}
+and {{Right}} can be specified. For example:
+
+!block example
+!block  table; colaligns="Left,Center,Center,Right"
+Name    Column2             Column3     Column4
+A       B                   C           1.0
+X       Hello dear world    Y           10.2
+!endblock
+!endblock
+
+Likewise, the {{colvaligns}} parameter can be used
+to control the vertical alignment of text within columns of a table.
+The value is either:
+
+* a comma-separated list of the values {{Top}}, {{Middle}}, {{Bottom}}
+  and {{Baseline}}, or
+* a sequence of the letters T, M, B (Bottom) and L (baseLine).
+
+Baseline alignment means that the base of the first line of the text
+in each cell is aligned (HTML only).
+
+Note: For a variety of reasons, the default vertical alignment for
+cells in a HTML table is {{Middle}}, while the default vertical
+alignment for tables in most other formats is {{Top}}. As most tables
+contain rows which fit on one line, this inconsistency is not usually
+a problem. However, if you want consistent vertical alignment for a
+complex table across all formats, you need to use the {{colvaligns}}
+parameter to override the default behaviour.
+
+H2: Column tagging
+
+In a similar way, columns can be tagged with a phrase style by
+using the {{coltags}} attribute. For example:
+
+!block example
+!block table; coltags="B,EMAIL"
+Purpose         Email
+Information     sdf-users@mincom.com
+Bug reporting   sdf-users@mincom.com
+!endblock
+!endblock
+
+The result is:
+
+!block table; coltags="B,EMAIL"
+Purpose         Email
+Information     sdf-users@mincom.com
+Bug reporting   sdf-users@mincom.com
+!endblock
+
+
+H2: Table filtering and sorting
+
+Tables can be filtered and sorted by using the {{where}}
+and {{sort}} attributes of the {{FILT:table}} filter.
+These attributes are also supported by the class filters (e.g.
+terms, references).
+In either case, filtering is done before sorting.
+
+The {{where}} attribute takes an expression which is evaluated
+for each record. Special symbols available are:
+
+!block table
+Symbol      Meaning
+$_          the current record
+$o{"xyz"}   the value of column xyz
+$var{"abc"} the value of variable abc
+!endblock
+
+For example:
+
+E: !define MODULE_CODE "XYZ"
+E: ...
+E: !include "../mydata.tbl"; table; \
+E:   where='$o{"Code"} =~ /$var{"MODULE_CODE"}/'
+
+{{sort}} takes a comma-separated list of column names to sort on.
+If no columns are specified, the data is sorted using
+all columns in the order in which they appear. All sorting
+is done alphabetically - numeric sorting is not supported.
+
+H2: Deleting and selecting columns
+
+The {{FILT:table}} filter supports the following parameters for
+changing the columns actually displayed:
+
+* {{delete}} - a comma-separated list of columns to delete
+* {{select}} - the comma-separated list of columns to display.
+
+These parameters are often used in combination with the {{where}}
+parameter. For example:
+
+!block verbatim
+  # Display the open bugs, sorted by priority
+  H1: Open Defects
+  !include 'mybugs.tbl'; table; \
+           where='$o{"Status"} eq "Open"'; \
+           sort='Priority'; \
+           delete='Status'
+!endblock
+
+If both {{delete}} and {{select}} are specified, {{select}} has precedence.
+
+H2: Macros inside tables
+
+Macros can be used inside tables. In particular:
+
+* rows can now be conditionally included or excluded
+* rows can be marked as changed.
+
+For example:
+
+!block verbatim
+!block table
+Code    Description
+BTW     By the way
+!block changed
+RTFM    Read the (fine) manual
+!endblock
+!if ALL_TERMS
+SOS     Save our souls
+!endif
+!endblock
+!endblock
+
+H2: Landscape tables
+
+Landscape tables are supported via the {{landscape}} parameter of
+the {{FILT:table}} filter. The value is the height allocated to
+the area in which the table is placed. If a unit is not specified,
+the value is assumed to be a percentage of the text column height.
+For convenience, a value of 1 implies a full page table.
+Some examples are given below.
+
+!block table
+Value               Meaning
+landscape="50pt"    height allocated to table is 50 points
+landscape="50%"     half page table
+landscape=50        half page table (% is the default units)
+landscape=1         full page table (1 implies 100%)
+landscape           full page table (syntactic shorthand for above)
+!endblock
+
+Note: This feature is currently {{B:use at your own risk}}.
+In particular, long tables and table titles confuse it badly.
+Furthermore, the {{align}} and {{placement}} parameters are
+effectively ignored for landscape tables.
+
+
+H2: Cell attributes
+
+Cells within a table can now be given attributes by preceding the
+cell value with a semicolon-separated list of name-value pairs
+enclosed in square brackets. For example:
+
+!block example
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       [align=Left]B       C           [bgcolor=Green]1.0
+X       Hello dear world    Y           [bgcolor=Red]10.2
+!endblock
+!endblock
+
+The output is:
+
+!block  table; colaligns="LCCR"
+Name    Column2             Column3     Column4
+A       [align=Left]B       C           [bgcolor=Green]1.0
+X       Hello dear world    Y           [bgcolor=Red]10.2
+!endblock
+
+The cell attributes supported are given below.
+
+!block table; groups
+Name        Value
+General:
+align       horizontal alignment (Left, Center, Right)
+valign      vertical alignment (Top, Middle, Bottom, Baseline)
+cols        the number of columns this cell spans (default is 1)
+rows        the number of rows this cell spans (default is 1)
+bgcolor     background colour of cell (see below)
+PS only:
+fill        background colour fill percentage
+truling     ruling setting for top of cell
+bruling     ruling setting for bottom of cell
+lruling     ruling setting for left of cell
+rruling     ruling setting for right of cell
+angle       angle of text (0, 90, 180, 270)
+HTML only:
+nowrap      disable word wrap for this cell
+Special:
+sdf         treat the cell text as SDF (rather than as phrase text)
+tag         phrase tag to apply to cell text
+paratag     paragraph style to apply to cell text
+!endblock
+
+For PS (i.e. MIF) generation, the supported colour values are
+{{Black}}, {{White}}, {{Red}}, {{Green}},
+{{Blue}}, {{Yellow}}, {{Cyan}} and {{Magenta}}.
+If a different colour is specified, it is ignored.
+The supported fill values are 100, 90, 70, 50, 30, 10 and 3.
+If a fill value is not specified, 100% fill is used.
+
+For HTML generation, any of the HTML colours names
+(including those supported for PS generation) or the "#rrggbb" form
+can be used.
+
+The permitted ruling values are {{Vthin}}, {{Thin}}, {{Medium}},
+{{Thick}} and {{Double}}.
+
+The {{sdf}}, {{tag}} and {{paratag}} attributes control the way in which the
+cell text is converted to SDF:
+
+^ If {{sdf}} is set, the cell text is already SDF.
++ Otherwise if {{tag}} is set, the SDF paragraph is paratag:E<2{>tag:textE<2}>.
++ Otherwise, the paragraph is paratag:text.
+
+{{tag}} is usually set via the {{tags}} or {{groups}} parameters
+of the {{FILT:table}} filter.
+
+Note: {{paratag}} is not yet implemented.

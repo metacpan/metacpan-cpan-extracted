@@ -1,0 +1,16 @@
+__tuning[]
+__endtuning[]
+E[orig_style='E']Hello world.
+E[orig_style='E']
+E[orig_style='E']How are
+E[orig_style='E']you?
+H1[orig_style='H1']Heading 1
+E[orig_style='E']Name    Value
+E[orig_style='E']xyz     42
+E[orig_style='E']abc     "My favorite station"
+H2[orig_style='H2']Heading 2
+E[orig_style='E']!block define
+E[orig_style='E']Name    Value
+E[orig_style='E']xyz     42
+E[orig_style='E']abc     "My favorite station"
+E[orig_style='E']!endblock

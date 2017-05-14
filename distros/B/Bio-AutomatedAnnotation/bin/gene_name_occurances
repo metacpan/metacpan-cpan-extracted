@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+package Bio::AutomatedAnnotation::Main::GeneNameOccurances;
+
+# ABSTRACT: Create a spreadsheet with gene name occurances
+# PODNAME: gene_name_occurances
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+use Bio::AutomatedAnnotation::CommandLine::GeneNameOccurances;
+
+Bio::AutomatedAnnotation::CommandLine::GeneNameOccurances->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gene_name_occurances - Create a spreadsheet with gene name occurances
+
+=head1 VERSION
+
+version 1.133090
+
+=head1 SYNOPSIS
+
+Create a spreadsheet with gene name occurances
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

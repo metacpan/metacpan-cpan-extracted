@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/Helper/MetaCPAN.pm
+lib/Catalyst/Model/MetaCPAN.pm

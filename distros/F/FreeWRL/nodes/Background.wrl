@@ -1,0 +1,26 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+Background {
+	skyAngle [0 0.5 1.0 1.5 2.0 2.5]
+	skyColor [0 0 0 
+		  1 0 0
+		  0 1 0
+		  0 0 1
+		  1 1 0
+		  1 0 1
+		  0 1 0]
+	backUrl "tex.jpg"
+	frontUrl "tex.jpg"
+	topUrl "tex.jpg"
+	bottomUrl "tex.jpg"
+}
+
+Shape {
+	geometry Box { }
+	appearance Appearance {material Material {diffuseColor 0.7 0 0}}
+}

@@ -1,0 +1,55 @@
+Line 1
+In rec:  a0: fred; a1: 10
+in Sub 1
+Recurse: .rec bill 9
+In rec:  a0: bill; a1: 9
+in Sub 1
+Recurse: .rec bill 8
+In rec:  a0: bill; a1: 8
+in Sub 1
+Recurse: .rec bill 7
+In rec:  a0: bill; a1: 7
+in Sub 1
+Recurse: .rec bill 6
+In rec:  a0: bill; a1: 6
+in Sub 1
+Recurse: .rec bill 5
+In rec:  a0: bill; a1: 5
+in Sub 1
+Recurse: .rec bill 4
+In rec:  a0: bill; a1: 4
+in Sub 1
+Recurse: .rec bill 3
+In rec:  a0: bill; a1: 3
+in Sub 1
+Recurse: .rec bill 2
+In rec:  a0: bill; a1: 2
+in Sub 1
+Recurse: .rec bill 1
+In rec:  a0: bill; a1: 1
+in Sub 1
+Recurse: .rec bill 0
+In rec:  a0: bill; a1: 0
+End of rec: a0: bill; a1: 0
+DONE Recurse: .rec bill 0
+End of rec: a0: bill; a1: 1
+DONE Recurse: .rec bill 1
+End of rec: a0: bill; a1: 2
+DONE Recurse: .rec bill 2
+End of rec: a0: bill; a1: 3
+DONE Recurse: .rec bill 3
+End of rec: a0: bill; a1: 4
+DONE Recurse: .rec bill 4
+End of rec: a0: bill; a1: 5
+DONE Recurse: .rec bill 5
+End of rec: a0: bill; a1: 6
+DONE Recurse: .rec bill 6
+End of rec: a0: bill; a1: 7
+DONE Recurse: .rec bill 7
+End of rec: a0: bill; a1: 8
+DONE Recurse: .rec bill 8
+End of rec: a0: bill; a1: 9
+DONE Recurse: .rec bill 9
+End of rec: a0: fred; a1: 10
+Last .rec returned. Last a0='outer value' This num args=0
+EOF

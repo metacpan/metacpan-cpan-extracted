@@ -1,0 +1,40 @@
+###########################################################################
+# Myco configuration file.
+# This uses the apache-style config directives.
+# See Config::General for syntax rules
+###########################################################################
+
+<<include my_myco_app.conf-example>>
+
+# entity schema declaration for use in Myco::Schema.
+<schema>
+    # Schema that are basic to a myco installation are recorded
+    # directly in Myco::Schema. Please schema here that are add-ons,
+    # apps, etc.
+    # For multiple values, specify several lines
+    <SCHEMA_ENTITY_CLASSES>
+        #FooClass1
+        #FooClass2
+    </SCHEMA_ENTITY_CLASSES>
+</schema>
+
+<database>
+    DB_DSN
+    DB_USER
+    DB_PASSWORD
+    # command args used to recycle the database
+    DB_DROP_CMD
+    DB_CREATE_CMD
+</database>
+
+# Object event logging (just 'write' logging at present)
+<evlog>
+    # Master logging system on/off switch
+    EVLOG 1
+    # Log events for these classes
+    # For multiple values, specify several lines
+    <EVLOG_CLASSES>
+        Myco::Entity::SampleEntity
+        Myco::Entity::SampleEntityAddress
+    </EVLOG_CLASSES>   
+</evlog>

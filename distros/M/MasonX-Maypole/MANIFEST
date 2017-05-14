@@ -29,7 +29,6 @@ doc/templates/factory/view_related
 doc/templates/maypole.css
 lib/MasonX/Maypole.pm
 lib/MasonX/Maypole/View.pm
-lib/MasonX/Maypole/Application.pm
 Makefile.PL
 MANIFEST
 META.yml

@@ -1,0 +1,68 @@
+{
+   "abstract" : "because we are too hip to use LWP::UserAgent",
+   "author" : [
+      "Sergey Romanov <sromanov@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alt-CPAN-Uploader-tinyua",
+   "no_index" : {
+      "directory" : [
+         "lib/CPAN",
+         "bin"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alt::Assert" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long::Descriptive" : "0.084",
+            "HTTP::Tiny::Multipart" : "0",
+            "HTTP::Tiny::UA" : "0",
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49",
+            "Term::ReadKey" : "0",
+            "URI" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sergeyromanov/p5-alt-cpan-uploader-tinyua/issues"
+      },
+      "homepage" : "https://github.com/sergeyromanov/p5-alt-cpan-uploader-tinyua",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sergeyromanov/p5-alt-cpan-uploader-tinyua.git",
+         "web" : "https://github.com/sergeyromanov/p5-alt-cpan-uploader-tinyua"
+      }
+   },
+   "version" : "0.000001"
+}
+

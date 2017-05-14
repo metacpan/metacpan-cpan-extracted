@@ -1,0 +1,549 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title id=my_title>市区天气预报·杭州日报</title>
+<link rel="stylesheet" type="text/css" href="http://www.hangzhou.com.cn/extra/css/uniform.css" media="all" >
+<link href="../../../tplimg/hzrbcss.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color: #FFF3F5;
+}
+.ff {
+	font-family: "Courier New", Courier, mono;
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: bold;
+	font-variant: normal;
+	color: #330033;
+	text-decoration: none;
+}
+.founder {	font-family: "宋体";
+	font-size: 12px;
+	font-style: normal;
+	font-weight: bold;
+	color: #330033;
+	text-decoration: none;
+}
+.founder1 {	font-family: "宋体";
+	font-size: 12px;
+	font-style: normal;
+	font-weight: normal;
+	color: #330033;
+	text-decoration: none;
+}
+.bt1 {
+	font-family: "宋体";
+	font-size: 24px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: bold;
+	font-variant: normal;
+	color: #333333;
+}
+.bt3 {
+	font-family: "宋体";
+	font-size: 16px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: bold;
+	font-variant: normal;
+	color: #000000;
+}
+.bt4 {
+	font-family: "宋体";
+	font-size: 12px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: bold;
+	font-variant: normal;
+	color: #000000;
+}
+.bt2 {
+	font-family: "宋体";
+	font-size: 16px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: bold;
+	font-variant: normal;
+	color: #666666;
+}
+.xilan_content_tt {font-size: 14px; line-height: 21px; margin: auto; padding: 10px;}
+.STYLE1 {font-size: 12px}
+.STYLE2 {color: #DE0018}
+p {text-indent: 1em;}
+
+-->
+</style>
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function MM_reloadPage(init) { //reloads the window if Nav4 resized
+ if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
+ document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
+ else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
+}
+MM_reloadPage(true);
+
+function MM_findObj(n, d) { //v4.01
+ var p,i,x; if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+ d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+ if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+ for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+ if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_showHideLayers() { //v6.0
+ var i,p,v,obj,args=MM_showHideLayers.arguments;
+ for (i=0; i<(args.length-2); i+=3) if ((obj=MM_findObj(args[i]))!=null) { v=args[i+2];
+ if (obj.style) { obj=obj.style; v=(v=='show')?'visible':(v=='hide')?'hidden':v; }
+ obj.visibility=v; }
+}
+//-->
+</script>
+<script language="javascript">
+function MM_swapImgRestore() { //v3.0
+ var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_preloadImages() { //v3.0
+ var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+ var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+ if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+ var p,i,x; if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+ d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+ if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+ for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+ if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+
+ var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+ if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+
+</script>
+<script language=JavaScript>
+<!--
+document.write("<div id=detail style=position:absolute;width:300px;></div>");
+//-->
+</script>
+</head>
+<SPAN id=leveldiv title=点击查看内容 
+style="BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; Z-INDEX: 100; LEFT: 233px; BORDER-BOTTOM-WIDTH: 0px; WIDTH: 210px; CURSOR: hand; POSITION: absolute; TOP: 123px; HEIGHT: 34px; BORDER-RIGHT-WIDTH: 0px"></SPAN>
+
+<body onLoad="initialize();initMPPage();">
+</DIV>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#E6001A">
+ <tr>
+ <td><table width="894" border="0" cellpadding="0" cellspacing="0" bgcolor="EA0041">
+ <tr>
+ <td width="96" background="../../../tplimg/szbzhzrbmain_r1_c9bk.jpg"><a href="http://www.hangzhou.com.cn" target="_blank"><img src="../../../tplimg/szbzhzrbmain_r1_c1.jpg" width="96" height="25" border="0" id="logoImg"></a></td>
+ <td width="24" background="../../../tplimg/szbzhzrbmain_r1_c9bk.jpg"><img src="../../../tplimg/szbzhzrbmain_r1_c9.jpg" width="24" height="25"></td>
+ <td align="center" background="../../../tplimg/szbzhzrbmain_r1_c9bk.jpg"><table width="750" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td><iframe scrolling="no" frameborder="0" id="dh" src="http://www.hangzhou.com.cn/inc_hzw/inc_hzrb/danghang.htm" width="748" height="21" allowtransparency="yes" align="middle" >
+ <script language='javascript' src='http://61.153.3.62:8060/iSystem/HitStatistic/out/ArticleHitServlet?siteid=1&nodeid=5&nodename=%30%31&channelid=1&articleid=1031827&author=&title=%E5%B8%82%E5%8C%BA%E5%A4%A9%E6%B0%94%E9%A2%84%E6%8A%A5&pubtime=%32%30%31%31%2D%30%33%2D%31%32' remote=yes></script>
+ </iframe></td>
+ </tr>
+ </table></td>
+ </tr>
+ </table></td>
+ <td align="center"><table width="100" height="15" border="0" cellpadding="0" cellspacing="0">
+ <tr>
+ <td><a href="http://www.hangzhou.com.cn" target="_blank"><img src="../../../tplimg/szbzhzrbmain_r2_c47.jpg" width="110" height="7" border="0"></a></td>
+ </tr>
+ </table></td>
+ </tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#DB0119">
+ <tr>
+ <td width="278" align="right" background="../../../tplimg/szbzhzrbmain_r5_c1.jpg"><img src="../../../tplimg/szbzhzrbmain_r5_c5.jpg" width="278" height="113"></td>
+ <td width="542" background="../../../tplimg/szbzhzrbmain_r5_c1.jpg"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="89" align="center" valign="bottom" background="../../../tplimg/szbzhzrbmain_r5_c13.jpg"><table width="468" height="60" border="0" cellpadding="0" cellspacing="0" bgcolor="#000000">
+ <tr>
+ <td align="center" bgcolor="#DE0018"><script type="text/javascript" src="http://go.hangzhou.com.cn/go/73.js" charset="utf-8"></script></td>
+ </tr>
+ </table></td>
+ </tr>
+ <tr>
+ <td height="24"><img src="../../../tplimg/szbzhzrbmain_r6_c13n.jpg" width="542" height="24"></td>
+ </tr>
+ </table></td>
+ <td background="../../../tplimg/szbzhzrbmain_banbak.jpg"><img src="../../../tplimg/szbzhzrbmain_r5_c42.jpg" width="184" height="113"></td>
+ </tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+ <tr valign="top">
+ <td width="361"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td background="../../../tplimg/szbzhzrbmain_r7_c3.jpg"><img src="../../../tplimg/szbzhzrbmain_r7_c1.jpg" width="9" height="38"></td>
+ <td align="center" background="../../../tplimg/szbzhzrbmain_r7_c3.jpg"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr align="center">
+ <td width="120" class="le_12color"><strong>2011年3月12日</strong></td>
+ <td width="2"><img src="../../../tplimg/szbzhzrbmain_r7_c3span.jpg" width="2" height="22"></td>
+ <td width="112" class="le_12color"><a href="#*.htm" onClick="goPrePeriod()" class="le_12color">上一期</a>&nbsp;&nbsp;<a href="#*.htm" onClick="goNextPeriod()" class="le_12color">下一期</a></td>
+ <td width="2"><img src="../../../tplimg/szbzhzrbmain_r7_c3span.jpg" width="2" height="22"></td>
+ <td valign="top" class="le_14black"><strong class="le_14color"><a href="#" title="鼠标点击，显示日历牌" class="STYLE2" style="cursor:hand;" onClick="autoShowDate();">按日期查找</a></strong> </td>
+ </tr>
+ </table></td>
+ <td align="right" background="../../../tplimg/szbzhzrbmain_r7_c3.jpg"><img src="../../../tplimg/szbzhzrbmain_r7_c19.jpg" width="8" height="38"></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td width="9" valign="top" background="../../../tplimg/szbzhzrbmain_r13_c1.jpg"><img src="../../../tplimg/szbzhzrbmain_r8_c1.jpg" width="9" height="72"></td>
+ <td align="center" valign="top" bgcolor="#FFFFFF"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td align="center"><MAP NAME="pagepicmap"><Area coords="267,19,289,19,289,22,267,22,267,19,267,25,313,25,313,44,267,44,267,25" shape="polygon" href="./content_1031827.htm"><Area coords="5,61,116,61,116,91,5,91,5,61,75,87,116,87,116,96,75,96,75,87,5,61,123,57,155,57,155,98,123,98,123,57" shape="polygon" href="content_1031828.htm"><Area coords="1,102,190,102,190,227,1,227,1,102,1,102,190,102,190,102,1,102,1,102" shape="polygon" href="content_1031829.htm"><Area coords="302,173,305,173,305,196,302,196,302,173,212,154,299,154,299,196,212,196,212,154,302,173,201,200,313,200,313,303,201,303,201,200,201,119,313,119,313,154,201,154,201,119,201,200" shape="polygon" href="content_1031830.htm"><Area coords="57,236,123,236,123,250,57,250,57,236,132,236,173,236,173,250,132,250,132,236,57,236,167,246,187,246,187,252,167,252,167,246" shape="polygon" href="content_1031831.htm"><Area coords="201,321,313,321,313,352,201,352,201,321,228,308,313,308,313,321,228,321,228,308" shape="polygon" href="content_1031832.htm"><Area coords="1,353,70,353,70,471,1,471" shape="polygon" href="content_1031833.htm"><Area coords="207,368,294,368,294,379,207,379,207,368,212,386,239,386,239,398,212,398,212,386,207,368,212,403,239,403,239,415,212,415,212,403,207,368,212,421,244,421,244,432,212,432,212,421,207,368,212,438,252,438,252,450,212,450,212,438,207,368,212,455,255,455,255,467,212,467,212,455,207,368,229,470,250,470,250,476,229,476,229,470,207,368,255,360,313,360,313,476,255,476,255,360" shape="polygon" href="content_1031834.htm"><Area coords="138,391,190,391,190,499,80,499,80,433,138,433,138,391,80,391,190,391,190,391,80,391,80,391" shape="polygon" href="content_1031835.htm"><Area coords="1,262,69,262,69,345,1,345" shape="polygon" href="content_1031836.htm"><Area coords="80,262,190,262,190,383,80,383,80,262,80,262,80,262,80,297,80,297,80,262" shape="polygon" href="content_1031837.htm"><Area coords="259,61,308,61,308,79,259,79,259,61,286,87,308,87,308,96,286,96,286,87" shape="polygon" href="content_1031838.htm"><Area coords="174,61,240,61,240,79,174,79,174,61,203,87,240,87,240,95,203,95,203,87" shape="polygon" href="content_1031839.htm"><Area coords="210,481,308,481,308,489,210,489,210,481,290,490,310,490,310,497,290,497,290,490" shape="polygon" href="content_1031840.htm"><Area coords="201,307,223,307,223,319,201,319" shape="polygon" href="content_1031841.htm"></MAP><img src=../../../page/1/2011-03/12/01/2011031201_brief.jpg border=0 USEMAP=#PagePicMap></td>
+ </tr>
+ </table>
+ <table width="100%" height="30" border="0" cellpadding="0" cellspacing="0">
+ <tr align="center">
+ <td width="150" class="le_12color"><strong class="le_14black">
+ 01：要闻  
+</strong></td>
+ <td width="2"><img src="../../../tplimg/szbzhzrbmain_r7_c3span.jpg" width="2" height="22"></td>
+ <td width="120" class="le_14black"><strong class="le_12black">
+ <a class=preart href="node_6.htm"><span class='le_12color'>下一版</span></a>
+</strong></td>
+ <td width="2"><img src="../../../tplimg/szbzhzrbmain_r7_c3span.jpg" width="2" height="22"></td>
+ <td><a href=../../../page/1/2011-03/12/01/2011031201_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a></td>
+ </tr>
+ </table></td>
+ <td width="8" valign="top" background="../../../tplimg/szbzhzrbmain_r13_c19.jpg"><img src="../../../tplimg/szbzhzrbmain_r8_c19.jpg" width="8" height="72"></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td width="9"><img src="../../../tplimg/szbzhzrbmain_r32_c1.jpg" width="9" height="16"></td>
+ <td height="16" background="../../../tplimg/szbzhzrbmain_r32_c3.jpg"><img src="../../../tplimg/szbzhzrbmain_r32_c3.jpg" width="344" height="16"></td>
+ <td width="8"><img src="../../../tplimg/szbzhzrbmain_r32_c19.jpg" width="8" height="16"></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="6"> </td>
+ </tr>
+ </table>
+ <table width="315" border="0" align="center" cellpadding="0" cellspacing="1">
+ <tr>
+ <td height="26" valign="bottom" background="../../../tplimg/szbzhzrbmain_r22_c35.jpg" bgcolor="F2FAFF"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td width="17"><img src="../../../tplimg/szbzhzrbmain_r34_c3.jpg" width="17" height="33"></td>
+ <td valign="top" background="../../../tplimg/szbzhzrbmain_r34_c7.jpg"><table width="100%" height="28" border="0" cellpadding="0" cellspacing="0">
+ <tr>
+ <td><span class="le_14color"><strong class="le_15color">本版主要新闻</strong></span></td>
+ </tr>
+ </table></td>
+ <td width="3"><img src="../../../tplimg/szbzhzrbmain_r34_c18.jpg" width="3" height="33"></td>
+ </tr>
+ </table></td>
+ </tr>
+ <tr>
+ <td bgcolor="#FFEEEE">
+ <table  width="100%" border="0" cellpadding="6" cellspacing="1" bgcolor="#EDBCBC">
+ <tr>
+ <td bgcolor="#FFFFFF"><TABLE cellSpacing=0 cellPadding=1 border=0 width="90%" > <TBODY> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=./content_1031827.htm><div style="display:inline" id=mp1031827>市区天气预报</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031828.htm><div style="display:inline" id=mp1031828>把抢救生命放在第一位迅速开展抗灾救灾工作</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031829.htm><div style="display:inline" id=mp1031829>十一届全国人大四次会议举行第三次全体会议</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031830.htm><div style="display:inline" id=mp1031830>创新抢占中国IP领域制高点</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031831.htm><div style="display:inline" id=mp1031831>云计算重要性堪比高铁</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031832.htm><div style="display:inline" id=mp1031832>赢于创新 杨蓥晖</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031833.htm><div style="display:inline" id=mp1031833>93.9分</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031834.htm><div style="display:inline" id=mp1031834>日本8.8级强震</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031835.htm><div style="display:inline" id=mp1031835>学习两个《测评体系》争创全国文明城市</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031836.htm><div style="display:inline" id=mp1031836>开创杭州统计工作新局面</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031837.htm><div style="display:inline" id=mp1031837>深入开展区县协作加快城乡统筹发展</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031838.htm><div style="display:inline" id=mp1031838>“电子烟”戒烟成了水中月</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031839.htm><div style="display:inline" id=mp1031839>玉皇山南综合整治今年内容不少</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> <tr> <TD class=default valign="top" width="26"> <img src="../../../tplimg/szbzhzrbmain_r38_c6.jpg" width="20" height="8"> </TD> <td class=default valign="top"> <a href=content_1031840.htm><div style="display:inline" id=mp1031840>840名浙江赴日游客，全部平安！</div></a> </td> </TR> <tr> <td height="6" colspan="2"><img src="../../../tplimg/szbzhzrbmain_r40_c4.jpg" width="100%" height="3"></td> </tr> </TBODY> </TABLE> </td>
+ </tr>
+ </table></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="10"> </td>
+ </tr>
+ </table>
+ <table width="335" height="40" border="0" align="center" cellpadding="0" cellspacing="0">
+ <tr>
+ <td width="75"><strong class="founder">技术支持 ：</strong></td>
+ <td width="167" class="founder1"><a href="http://www.idoican.com.cn/" target="_blank" class="founder1">北京方正阿帕比技术有限公司</a></td>
+ <td width="93"><a href="http://www.idoican.com.cn/" target="_blank"><img src="../../../tplimg/88.gif" border="0" width="77" height="25" align="absmiddle"></a></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="10"></td>
+ </tr>
+ </table>
+ <table width="326" border="0" align="center" cellpadding="0" cellspacing="0">
+ <tr>
+ <td><script type="text/javascript" src="http://go.hangzhou.com.cn/go/157.js" charset="utf-8"></script></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="10"></td>
+ </tr>
+ </table></td>
+ <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td width="381" background="../../../tplimg/szbzhzrbmain_r7_c32.jpg"><table width="381" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td width="140" background="../../../tplimg/szbzhzrbmain_r7_c32.jpg"><a href="../../../../hzrb/paperindex.htm"><img src="../../../tplimg/szbzhzrbmain_r7_c21.jpg" alt="杭州日报" width="140" height="53" border="0"></a></td>
+ <td width="111" background="../../../tplimg/szbzhzrbmain_r7_c32.jpg"><a href="../../../../dskb/paperindex.htm"><img src="../../../tplimg/szbzhzrbmain_r7_c27.jpg" alt="都市快报" width="111" height="53" border="0"></a></td>
+ <td width="130" background="../../../tplimg/szbzhzrbmain_r7_c32.jpg"><a href="../../../../mrsb/paperindex.htm"><img src="../../../tplimg/szbzhzrbmain_r7_c29n.jpg" alt="每日商报" width="130" height="53" border="0"></a></td>
+ <td width="130" background="../../../tplimg/szbzhzrbmain_r7_c32.jpg"><a href="../../../../dszb/paperindex.htm"><img src="../../../tplimg/szbzhzrbmain_r7_c30n.jpg" alt="都市周报" width="107" height="53" border="0"></a></td>
+ </tr>
+ </table></td>
+ <td align="right" background="../../../tplimg/szbzhzrbmain_r7_c32.jpg"><table width="155" border="0" cellpadding="0" cellspacing="4">
+ <tr>
+ <td align="right"><span class="le_12white">杭州日报报业集团主办</span></td>
+ </tr>
+ </table></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="27" background="../../../tplimg/szbzhzrbmain_r9_c21.jpg" bgcolor="FF2268"><table width="98%" border="0" align="center" cellpadding="0" cellspacing="0">
+ <tr>
+ <td width="250" class="le_12white"><table width="225" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <!-- 天宇搜索开始-->
+ <script language="javascript" src="../../../tplimg/cgcmd.js"></script>
+ <form action="http://search.hangzhou.com.cn/wse/cgwse/login3.jsp" method="post" name="searchForm" target="_blank">
+ <td width=14></td>
+ <td nowrap><input name="anyWord" type="text" class="inbox" onKeyPress="if(event.keyCode==13){DoSearch();return false;}" size="15" maxlength="256" /></td>
+ <td nowrap><img src="../../../tplimg/szbzsearch.gif" value="搜索" style="cursor:hand " onclick="DoSearch();return false;" width="38" height="22" ></td>
+ <td align="left" nowrap><a href="javascript:advSearch();" class="le_12white" onClick="isRealDisconn = false;">高级搜索</a></td>
+ <input type="hidden" name="db">
+ <input type="hidden" name="searchFields">
+ <input type="hidden" name="mycmd">
+ </form>
+ </tr>
+ <!-- 天宇搜索结束-->
+ </table></td>
+ <td align="left" class="le_12white"><strong><a href="node_1.htm" target="_self" class="le_12white">版面概览</a><span onMouseOver="document.getElementById('bmdh').style.display = 'block';" onMouseOut="document.getElementById('bmdh').style.display = 'none';"></span> | <span onMouseOver="document.getElementById('bmdh').style.display = 'block';" onMouseOut="document.getElementById('bmdh').style.display = 'none';">版面导航</span> |<span onMouseOver="document.getElementById('btdh').style.display = 'block';" onMouseOut="document.getElementById('btdh').style.display = 'none';"> 标题导航</span></strong></td>
+ <td width="60" align="right" class="le_12white"><strong><a href="../../../../hzrb/paperindex.htm" class="le_12white"> 返回主页</a></strong></td>
+ </tr>
+ </table></td>
+ </tr>
+ <tr>
+ <td height="3" bgcolor="#000000"> </td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="27" bgcolor="FFABAB"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td width="20" align="center"> </td>
+ <td class="le_12black"><table width="218" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td class="le_12black"><a class=preart href="content_1031828.htm"><span class='le_12black'>下一篇</span></a></td>
+ </tr>
+ </table></td>
+ <script language=JavaScript type=text/javascript>
+function zoomIn() {
+ newZoom= parseInt(ozoom.style.zoom)+10+'%'
+ ozoom.style.zoom =newZoom;
+ } 
+function zoomOut() {
+ newZoom= parseInt(ozoom.style.zoom)-10+'%'
+ ozoom.style.zoom =newZoom;
+ } 
+ </script>
+ <td width="300" class="le_12black">字体：<a onClick="zoomIn();" href=#>放大<img height=16 src="../../../tplimg/zoomin.gif" width=16 align=absMiddle border=0></a> <a onClick="zoomOut();" href=#>缩小<img height=16 src="../../../tplimg/zoomout.gif" width=16 align=absMiddle border=0></a> <a onClick="ozoom.style.zoom='100%';" href=#>默认<img height=16 src="../../../tplimg/zoomact.gif" width=16 align=absMiddle border=0></a> <a href="javascript:;" onClick="readTxt()" name="read" class="le_12black"><img src="../../../tplimg/szbzread.gif" width="20" height="12" border="0" align="absmiddle">朗读</a></td>
+ </tr>
+ </table></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="4"></td>
+ </tr>
+ </table>
+ <table width="96%" border="0" align="center" cellpadding="0" cellspacing="0">
+ <tr>
+ <td align="center"><script type="text/javascript" src="http://go.hangzhou.com.cn/go/259.js" charset="utf-8"></script></td>
+ </tr>
+ </table>
+ <table id=my_content width="100%" border="0" align="center" cellpadding="8" cellspacing="0">
+ <tr>
+ <td valign="top"><table width="100%" border="0" cellpadding="15" cellspacing="1" bgcolor="EDBCBC">
+ <tr>
+ <td height="26" valign="bottom" bgcolor="#FFF3F5"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td align="center"> <table  cellspacing=0 cellpadding=5 width=100% border=0> <tbody> <tr valign=top> <td class="bt2" align=center style="color: #827E7B;"></td> </TR> <tr valign=top> <td  class="bt1" align=center>市区天气预报</td> </TR> <tr valign=top> <td class="bt2" align=center style="color: #827E7B;"></td> </TR> <tr valign=top> <td class="bt4" align=center> 2011-03-12 </td> </tr> </tbody> </table> </td>
+ </tr>
+ <tr>
+ <td align="center" class="le_ht14black"><span class="font6">
+ 
+ </span></td>
+ </tr>
+ <tr>
+ <td align="left"><script language=javascript>
+								if(picResCount>0){
+									document.getElementById("picres").style.display="block";
+									document.write("<br>");
+								}
+ 			 				</script>
+ <DIV id=ozoom style="zoom:100%;FLOAT: left;">
+ <table  width="100%" border="0" class="xilan_content_tt"> <tr> <td class="xilan_content_tt"><founder-content><P>&nbsp;&nbsp;市区天气预报</P><P>&nbsp;&nbsp;今天上午阴天，下午起阴转多云，偏南风3级左右，今天白天最高气温20摄氏度，平均相对湿度65%。明天多云转阴有阵雨，偏南风3-4级，气温9摄氏度到20摄氏度。</P></founder-content> <INPUT type=checkbox value=0 name=titlecheckbox sourceid="" style="display:none"> </td> </tr> </table> 
+ </div></td>
+ </tr>
+ </table></td>
+ </tr>
+ </table></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" align="center" cellpadding="8" cellspacing="0">
+ <tr>
+ <td valign="top"><table width="100%" border="0" cellpadding="4" cellspacing="0" bgcolor="#FFABAB">
+ <tr>
+ <td class="le_12black"><table width="218" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td class="le_12black"><a class=preart href="content_1031828.htm"><span class='le_12black'>下一篇</span></a></td>
+ </tr>
+ </table></td>
+ <td width="288" class="le_12black">字体：<a onClick="zoomIn();" href=#>放大<img height=16 src="../../../tplimg/zoomin.gif" width=16 align=absMiddle border=0></a> <a onClick="zoomOut();" href=#>缩小<img height=16 src="../../../tplimg/zoomout.gif" width=16 align=absMiddle border=0></a> <a onClick="ozoom.style.zoom='100%';" href=#>默认<img height=16 src="../../../tplimg/zoomact.gif" width=16 align=absMiddle border=0></a> 　 <a href="javascript:;" onClick="readTxt()" name="read" class="le_12black"><img src="../../../tplimg/szbzread.gif" width="20" height="12" border="0" align="absmiddle">朗读</a></td>
+ </tr>
+ </table></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="10"></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" align="center" cellpadding="8" cellspacing="0">
+ <tr>
+ <script type="text/javascript">
+function recommend()
+{
+	var url = window.document.location;
+	window.open("mailto:?subject="+"%CD%C6%BC%F6%D2%BB%C6%AA%BA%C3%CE%C4%D5%C2%B8%F8%C4%E3"+"&body="+"%CD%F8%D6%B7%A3%BA"+url);
+}
+function printf()
+{
+	document.execCommand("print");
+}
+function favorite()
+{
+	var url = window.document.location;
+	var title = window.document.title;
+	if (window.sidebar)
+	{ 
+		window.sidebar.addPanel(title, url,""); 
+	}
+	else if(document.all)
+	{
+		window.external.AddFavorite(url, title);
+	}
+	else if(window.opera && window.print)
+	{
+		return true;
+	}
+}
+ </script>
+ <td align="center" valign="top" class="le_14color">[<a href="#" class="le_14color" onclick="recommend()">推荐好友</a>] [<a href="#" onclick="printf()" class="le_14color">打印本页</a>] [<a href="#" onclick="favorite()" class="le_14color">收藏本文</a>] [<a href="../../../../index.htm" class="le_14color">返回首页</a>] </td>
+ </tr>
+ </table>
+ <table width="96%" border="0" align="center" cellpadding="0" cellspacing="0">
+ <tr>
+ <td align="center"><script type="text/javascript" src="http://go.hangzhou.com.cn/go/189.js" charset="utf-8"></script></td>
+ </tr>
+ </table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="14"></td>
+ </tr>
+ </table></td>
+ </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+ <td height="122" valign="top" background="../../../tplimg/szbzhzrbmain_bqbak.jpg"><table width="1004" border="0" align="center" cellpadding="0" cellspacing="0">
+ <tr>
+ <td><iframe scrolling="no" frameborder="0" id="dh2" src="http://www.hangzhou.com.cn/inc_hzw/inc_hzrb/copyright.htm" width="1004" height="122" allowtransparency="yes" align="middle" ></iframe></td>
+ </tr>
+ </table></td>
+ </tr>
+ <iframe name="TTSPlayeriframe" id="TTSPlayeriframe" height="0" width="0" border="0" frameborder="0" src=""></iframe>
+</table>
+<div id=daydh style="display:none; position:absolute; left:150px; top:165px;">
+<form name=CLD style="padding:0px;margin:0px;">
+<table width="200" align=center border="0" cellpadding="1" cellspacing="1" bgcolor="#FFFFFF">
+ <tr class="default" align=center>
+ <td height=15 colspan=7 bgcolor="#FFABAB"><table width="100%" border="0" cellpadding="2" cellspacing="0">
+ <tr align="center">
+ <td align="left" nowrap><img src="../../../tplimg/d1.gif" width="7" height="11" style="cursor:hand;" onClick="turnpage(SY,0)"></td>
+ <td><select class=jumpmenu onChange=changeMPCld() name=SY>
+ <script language=JavaScript>
+					for(i=2006;i<2051;i++)
+					document.write('<option>'+i+'</option>')
+ 			</script>
+ </select>
+ </td>
+ <td><img src="../../../tplimg/d.gif" width="7" height="11" style="cursor:hand;" onClick="turnpage(SY,1)"></td>
+ <td align="center" nowrap><img src="../../../tplimg/d1.gif" width="7" height="11" style="cursor:hand;" onClick="turnpage(SM,0)"></td>
+ <td><select class=jumpmenu onChange=changeMPCld() name=SM>
+ <script language=JavaScript>
+				<!-- 
+					for(i=1;i<13;i++) document.write('<option>'+i+'</option>')
+				//-->
+ 			</script>
+ </select>
+ </td>
+ <td><img src="../../../tplimg/d.gif" width="7" height="11" style="cursor:hand;" onClick="turnpage(SM,1)"></td>
+ <td align="right" nowrap><strong><font id=GZ fface="Arial, Helvetica, sans-serif"></font></strong></td>
+ </tr>
+ </table></td>
+ </tr>
+ <tr align=middle bgcolor="#FFF3F5" class="default">
+ <td align="center" class="default"><b><font face="Arial, Helvetica, sans-serif">日</font></b></td>
+ <td align="center" class="default"><b><font face="Arial, Helvetica, sans-serif">一</font></b></td>
+ <td align="center" class="default"><b><font face="Arial, Helvetica, sans-serif">二</font></b></td>
+ <td align="center" class="default"><b><font face="Arial, Helvetica, sans-serif">三</font></b></td>
+ <td align="center" class="default"><b><font face="Arial, Helvetica, sans-serif">四</font></b></td>
+ <td align="center" class="default"><b><font face="Arial, Helvetica, sans-serif">五</font></b></td>
+ <td align="center" class="default"><b><font face="Arial, Helvetica, sans-serif">六</font></b> </td>
+ </tr>
+ <script language=JavaScript>
+		<!--
+			var gNum;
+			for(i=0;i<6;i++) 
+			{
+				document.write('<tr align=center>');
+				for(j=0;j<7;j++) 
+				{
+					gNum = i*7+j;
+					document.write('<td bgcolor="#FFABAB" class="default" align=center id="GD' + gNum +'" style="cursor: default;" width="14%"><a href="" id="CD' + gNum + '"><span class="date" style="font-family:Verdana, Arial;font-size:11px;"><font _onMouseOver="mOvr(' + gNum +')" onMouseOut="mOut()" id="SD' + gNum +'"');
+					document.write('></font></span></a><br><font id="LD' + gNum + '" size=2 class=pt9 style=display:none></font></td>');
+				}
+				document.write('</tr>');
+			}
+		//-->
+ 	</script>
+ </table>
+</form>
+</div>
+<!-------bmdh版面导航------>
+<div id=bmdh style="display:none; position:absolute; left:50%; margin-left:50px; top:210px; filter:alpha(opacity=90);" onMouseOver="document.getElementById('bmdh').style.display = 'block';" onMouseOut="document.getElementById('bmdh').style.display = 'none';">
+ <TABLE width="200px" border=0 cellPadding=2 cellSpacing=0 bgcolor="#FFFFFF"> <TBODY> <TR id=row_black5 onMouseOver="Javascript:focus_row_black(5)" onMouseOut="Javascript:blur_row_black(5)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_5.htm class="black" id=pageLink>第01版：要闻</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/01/2011031201_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black6 onMouseOver="Javascript:focus_row_black(6)" onMouseOut="Javascript:blur_row_black(6)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_6.htm class="black" id=pageLink>第02版：要 闻</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/02/2011031202_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black7 onMouseOver="Javascript:focus_row_black(7)" onMouseOut="Javascript:blur_row_black(7)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_7.htm class="black" id=pageLink>第03版：聚焦全国两会</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/03/2011031203_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black8 onMouseOver="Javascript:focus_row_black(8)" onMouseOut="Javascript:blur_row_black(8)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_8.htm class="black" id=pageLink>第04版：国内·国际新闻</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/04/2011031204_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black9 onMouseOver="Javascript:focus_row_black(9)" onMouseOut="Javascript:blur_row_black(9)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_9.htm class="black" id=pageLink>第05版：都市·热线新闻</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/05/2011031205_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black10 onMouseOver="Javascript:focus_row_black(10)" onMouseOut="Javascript:blur_row_black(10)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_10.htm class="black" id=pageLink>第06版：热线新闻·市民大学堂</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/06/2011031206_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black11 onMouseOver="Javascript:focus_row_black(11)" onMouseOut="Javascript:blur_row_black(11)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_11.htm class="black" id=pageLink>第07版：财经新闻</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/07/2011031207_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black12 onMouseOver="Javascript:focus_row_black(12)" onMouseOut="Javascript:blur_row_black(12)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_12.htm class="black" id=pageLink>第08版：文化·体育新闻</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/08/2011031208_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black13 onMouseOver="Javascript:focus_row_black(13)" onMouseOut="Javascript:blur_row_black(13)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_13.htm class="black" id=pageLink>第09版：公告</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/09/2011031209_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black14 onMouseOver="Javascript:focus_row_black(14)" onMouseOut="Javascript:blur_row_black(14)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_14.htm class="black" id=pageLink>第10版：娱乐新闻</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/10/2011031210_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black15 onMouseOver="Javascript:focus_row_black(15)" onMouseOut="Javascript:blur_row_black(15)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_15.htm class="black" id=pageLink>第11版：西湖副刊</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/11/2011031211_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> <TR id=row_black16 onMouseOver="Javascript:focus_row_black(16)" onMouseOut="Javascript:blur_row_black(16)"> <TD align=left>&nbsp;</TD> <TD align=left height=24 class="black" >&nbsp;<a href=node_16.htm class="black" id=pageLink>第12版：广告</a></TD> <TD width=28 align=middle noWrap> <a href=../../../page/1/2011-03/12/12/2011031212_pdf.pdf><IMG height=16 src="../../../tplimg/pdf.gif" width=16 border=0></a> </TD> </TR> </TBODY> </TABLE></div>
+<!-------bmdh版面导航END------>
+<!-- -------------------------标题导航-------------->
+<DIV id=btdh style="display:none; position:absolute; left:50%; margin-left:80px; top:210px; filter:alpha(opacity=90);" onMouseOver="document.getElementById('btdh').style.display = 'block';" onMouseOut="document.getElementById('btdh').style.display = 'none';">
+ <TABLE border=0 cellPadding=2 cellSpacing=0 bgcolor="#FFFFFF" width=277> <tbody> <tr height=27px id=row_black1031827 onMouseOver="Javascript:focus_row_black(1031827)" onMouseOut="Javascript:blur_row_black(1031827)"> <td width=10px></td> <td class="black"> <a href=./content_1031827.htm>市区天气预报</a> </td></TR> <tr height=27px id=row_black1031828 onMouseOver="Javascript:focus_row_black(1031828)" onMouseOut="Javascript:blur_row_black(1031828)"> <td width=10px></td> <td class="black"> <a href=content_1031828.htm>把抢救生命放在第一位迅速开展抗灾救灾工作</a> </td></TR> <tr height=27px id=row_black1031829 onMouseOver="Javascript:focus_row_black(1031829)" onMouseOut="Javascript:blur_row_black(1031829)"> <td width=10px></td> <td class="black"> <a href=content_1031829.htm>十一届全国人大四次会议举行第三次全体会议</a> </td></TR> <tr height=27px id=row_black1031830 onMouseOver="Javascript:focus_row_black(1031830)" onMouseOut="Javascript:blur_row_black(1031830)"> <td width=10px></td> <td class="black"> <a href=content_1031830.htm>创新抢占中国IP领域制高点</a> </td></TR> <tr height=27px id=row_black1031831 onMouseOver="Javascript:focus_row_black(1031831)" onMouseOut="Javascript:blur_row_black(1031831)"> <td width=10px></td> <td class="black"> <a href=content_1031831.htm>云计算重要性堪比高铁</a> </td></TR> <tr height=27px id=row_black1031832 onMouseOver="Javascript:focus_row_black(1031832)" onMouseOut="Javascript:blur_row_black(1031832)"> <td width=10px></td> <td class="black"> <a href=content_1031832.htm>赢于创新 杨蓥晖</a> </td></TR> <tr height=27px id=row_black1031833 onMouseOver="Javascript:focus_row_black(1031833)" onMouseOut="Javascript:blur_row_black(1031833)"> <td width=10px></td> <td class="black"> <a href=content_1031833.htm>93.9分</a> </td></TR> <tr height=27px id=row_black1031834 onMouseOver="Javascript:focus_row_black(1031834)" onMouseOut="Javascript:blur_row_black(1031834)"> <td width=10px></td> <td class="black"> <a href=content_1031834.htm>日本8.8级强震</a> </td></TR> <tr height=27px id=row_black1031835 onMouseOver="Javascript:focus_row_black(1031835)" onMouseOut="Javascript:blur_row_black(1031835)"> <td width=10px></td> <td class="black"> <a href=content_1031835.htm>学习两个《测评体系》争创全国文明城市</a> </td></TR> <tr height=27px id=row_black1031836 onMouseOver="Javascript:focus_row_black(1031836)" onMouseOut="Javascript:blur_row_black(1031836)"> <td width=10px></td> <td class="black"> <a href=content_1031836.htm>开创杭州统计工作新局面</a> </td></TR> <tr height=27px id=row_black1031837 onMouseOver="Javascript:focus_row_black(1031837)" onMouseOut="Javascript:blur_row_black(1031837)"> <td width=10px></td> <td class="black"> <a href=content_1031837.htm>深入开展区县协作加快城乡统筹发展</a> </td></TR> <tr height=27px id=row_black1031838 onMouseOver="Javascript:focus_row_black(1031838)" onMouseOut="Javascript:blur_row_black(1031838)"> <td width=10px></td> <td class="black"> <a href=content_1031838.htm>“电子烟”戒烟成了水中月</a> </td></TR> <tr height=27px id=row_black1031839 onMouseOver="Javascript:focus_row_black(1031839)" onMouseOut="Javascript:blur_row_black(1031839)"> <td width=10px></td> <td class="black"> <a href=content_1031839.htm>玉皇山南综合整治今年内容不少</a> </td></TR> <tr height=27px id=row_black1031840 onMouseOver="Javascript:focus_row_black(1031840)" onMouseOut="Javascript:blur_row_black(1031840)"> <td width=10px></td> <td class="black"> <a href=content_1031840.htm>840名浙江赴日游客，全部平安！</a> </td></TR> </tbody></TABLE> 
+<!-- -------------------------标题导航 END -------------->
+</DIV>
+<!--------------------文章页比较特殊，需要增加这个组件--------->
+ <script language=JavaScript> OBJ_MP_CONFIG.content_htm_jump = "node_5.htm"; </script>
+</body>
+<script type="text/javascript" src="../../../tplimg/basejs.js" remote="yes"></script>
+<SCRIPT language=Javascript src="../../../tplimg/prototype.js"></SCRIPT>
+<SCRIPT language=Javascript src="../../../tplimg/mp.js"></SCRIPT>
+<SCRIPT language=Javascript src="../../../tplimg/calendar2.js"></SCRIPT>
+<SCRIPT language=Javascript src="../../../tplimg/range.js"></SCRIPT>
+</html>
+<!--enpproperty <founder-date>2011-03-12</founder-date><founder-author></founder-author><founder-title>市区天气预报</founder-title><founder-nodename></founder-nodename><founder-keyword></founder-keyword><founder-ip></founder-ip><founder-ChannelID>1</founder-ChannelID><founder-imp>0</founder-imp><founder-subtitle></founder-subtitle><founder-type>1</founder-type><founder-introtitle></founder-introtitle><founder-pagepicurl>hzrb/page/1/2011-03/12/01/icon_2011031201_brief.jpg</founder-pagepicurl><founder-pagenum>01</founder-pagenum><founder-papername>杭州日报</founder-papername><founder-nodeid>5</founder-nodeid><founder-paperhead>hzrb/logo/</founder-paperhead> /enpproperty-->

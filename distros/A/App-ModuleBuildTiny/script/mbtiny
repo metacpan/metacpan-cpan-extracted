@@ -12,7 +12,7 @@ mbtiny - A standalone authoring script for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,14 @@
+#!/usr/local/bin/perl -w
+
+BEGIN { unshift(@INC, "../blib", "./blib"); }
+require Net::NISPlus::Table;
+
+$test = Net::NISPlus::Table->new("test");
+foreach ('a'..'z')
+{
+  print "adding key=$_ value=$_\n";
+  $test->add('key' => $_, 'value' => $_);
+}
+
+print "adding bulk\n";
+$test->add(['key', 'value'], ['A', 'a'], ['B', 'b'], ['C', 'c']);

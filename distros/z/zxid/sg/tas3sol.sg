@@ -1,0 +1,10 @@
+# zxid/sg/tas3.sg
+# Created, 22.11.2009, Sampo Kellomaki (sampo@iki.fi)
+# $Id$
+
+target(tas3sol, http://tas3.eu/tas3sol/200911/)
+
+Obligations: ;
+Dict: ;
+
+#EOF

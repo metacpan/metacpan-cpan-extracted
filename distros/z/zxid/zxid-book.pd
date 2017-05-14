@@ -1,0 +1,298 @@
+ZXID Book
+#########
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-book.pd,v 1.1 2009-08-25 16:22:44 sampo Exp $>>
+<<class: book!a4paper!!ZXID Book 34!!lineno>>
+
+<<ignore:
+
+This file is the top level aggregation point for all ZXID documentation,
+especially for purposes of producing a unified PDF.
+
+pd2tex -pdfonly -DZXIDBOOK=1 zxid-book.pd
+
+>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0,
+Liberty ID-WSF 2.0, and XACML 2.0 stacks and aims at implementing all
+popular federation and ID Web Services protocols. It is a C
+implementation with minimal external dependencies - OpenSSL, CURL, and
+zlib - ensuring easy deployment (no DLLhell). Due to its small
+footprint and efficient and accurate schema driven implementation, it
+is suitable for embedded and high volume applications. Language
+bindings to all popular highlevel languages such as PHP, Perl, and
+Java, are provided via SWIG. ZXID implements, as of January 2011, SP,
+IdP, Discovery, WSC, WSP, and PEP roles. ZXID.org is the reference
+implementation of TAS3.eu project.
+
+ZXID.org ist eine C-Bibliothek, die den vollständigen SAML
+2.0-Stack implementiert und alle populären
+Identitätsverwaltungs-Protokolle wie Liberty ID-FF 1.2,
+WS-Federation, WS-Trust und ID-Webservices wie Liberty ID-WSF 1.1 und
+2.0 implementieren will. Sie beruht auf Schema-basierter
+Code-Erzeugung, woraus eine genaue Implementation resultiert. SWIG
+wird verwendet, um Schnittstellen zu Skriptsprachen wie Perl, PHP und
+Python sowie zu Java bereitzustellen. Sie kann als SP, IdP, Discovery, WSC,
+WSP und PEP fungieren.
+
+A biblioteca de gestão de identidades ZXID.org é uma
+implementação, em C, das normas SAML 2.0, Liberty ID-WSF 2.0, e XACML 2.0
+com dependências externas mínimas - OpenSSL, CURL, e zlib -
+facilitando uma implantação fácil sem "inferno dos
+DLL". Sendo económica em consumo de recursos é indicada para
+aplicações embutidas ou de grande volume e de performance. A
+biblioteca é disponibilizada para todos as linguagens de
+programação de alto nível como, p.ex., PHP, Perl, e Java,
+atravez de interfáces SWIG. ZXID de hoje (Jan 11) pode funcionar
+nos papeis SP (Provedor de Serviços), IdP (Provedor de Identidade),
+Discovery (catálogo de serviços), WSC (Cliente de Serviços
+Web), WSP (Provedor de Serviços Web), e PEP (Ponto de
+Enforçamento de Políticas). ZXID.org é a implementação de
+referência do projecto TAS3.eu.
+
+La librería de gestión de identidades ZXID.org es una
+implementación en C de las normas SAML 2.0, Liberty ID-WSF 2.0, y
+XAML 2.0 con dependencias externas mínimas - OpenSSL, CURL, y zlib
+- que elimina el "infierno DLL" en su implantación. Como ZXID es
+muy económica, es apta para aplicaciones embebidas o de gran
+volumen y envergadura. Los lenguajes de programación de alto nivel,
+como Perl, PHP, y Java, son soportados con generador de interfaces
+SWIG. Hoy (Enero 2011) el ZXID soporta los roles SP (proveedor de
+servicios), IdP (proveedor de identidades), Discovery (catalogo de
+servicios), WSC (cliente de los servicios web), WSP (proveedor de
+servicios web) y PEP (Punto de Enforco de Politicas). ZXID.org es
+el implantacion de referencia del proyecto TAS3.eu.
+
+ZXID.org on verkkohenkilöllisyyden ja -tunnisteiden
+hallintakirjasto joka tukee SAML 2.0 (sisäänkirjaantuminen),
+Liberty ID-WSF 2.0 (henkilöllisyyteen pohjautuvat webbipalvelut),
+ja XACML 2.0 (auktorisointi) standardeja. ZXID vaatii vain OpenSSL,
+CURL ja zlib kirjastot joten se välttää "DLL
+helvetti"-ongelman.  Skemapohjaisena C toteutuksena se on tarkka ja
+taloudellinen ja kelpaa sulautettuihin ja erittäin kovaa
+suorituskykyä vaativiin sovelluksiin. Se tukee korkeantason
+kieliä - kuten Perliä, PHP:tä, ja Javaa - SWIG generoiduin
+rajapinnoin. ZXID tukee (Tammikuu 2011) SP (palveluntarjoaja), IdP
+(henkilöllisyydenvarmentaja), Service Discovery
+(palvelunpaikannus), WSC (webbipalvelunkutsuja), WSP
+(webbipalveluntarjoaja) ja PEP (politiikantoteutuspiste) rooleja.
+ZXID.org on TAS3.eu projektin referenssitoteutus.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+1.1 ZXID Documentation Set
+--------------------------
+
+The present book is mainly amalgamation of the following documents, which
+you may want to consult separately.
+
+<<doc-inc.pd>>
+
+
+2 Install (package or from source)
+==================================
+
+<<zxid-install.pd>>
+
+6 Configuring Runtime
+=====================
+
+ZXID, out-of-box, needs very little configuration. Generally you
+only need to decide the URL of your web site.
+
+Compile time configuration, based on ~Makefile~ and zxidconf.h
+is possible but generally should not be attempted, unless the
+intent is embedded system running without any configuration file.
+
+In addition to setting runtime configure options, you will need to
+join a Circle of Trust - or create your own. This is explained
+in the "Circle-of-Trust" chapter, below.
+
+If you are interested in using mod_auth_saml Apache module,
+you can perform some of the configuration in the Apache httpd.conf
+file as explained in <<link:../mod_auth_saml/mod_auth_saml.html: mod_auth_saml>>.
+
+You should remember that some of the configuration will happen in the
+web server level, see your web server's configuration reference, e.g. httpd.conf
+
+<<zxid-conf.pd>>
+
+9 Circle-of-Trust: Create a Federation with Other Partners
+==========================================================
+
+<<zxid-cot.pd>>
+
+11 ZXID Logging and Audit Trail
+===============================
+
+<<zxid-log.pd>>
+
+12 mod_auth_saml: Apache SSO without Programming
+===============================================
+
+<<mod_auth_saml.pd>>
+
+13 Simple API: Easy way to SSO
+=============================
+
+The ZXID library provides two main APIs: the Simple and the Raw. The
+ZXID Simple API is meant to get you going with minimal understanding about
+SAML or SSO. It tries to encapsulate as much of the control flow as
+possible. You only need to learn this API, not the underlying protocol.
+
+<<zxid-simple.pd>>
+
+8 Raw API: Full Control, You Decide
+===================================
+
+<<zxid-raw.pd>>
+
+19 Identity Web Services
+========================
+
+<<zxid-wsf.pd>>
+
+20 Function Reference (generated from source)
+=============================================
+
+<<ref/index.pd>>
+
+11 ZXID Java and Tomcat Bindings
+================================
+
+<<zxid-java.pd>>
+
+12 Net::SAML - ZXID Perl Bindings
+=================================
+
+<<zxid-perl.pd>>
+
+13 php_zxid
+===========
+
+<<zxid-php.pd>>
+
+14 Apache Compilation Tips
+==========================
+
+While I am not a guru in Apache set ups and others will do this much
+better, not to speak of the official documentation, I still find that
+to ensure initial success of the new installer, some help may be in order.
+
+Consider this receipe only one of many possible setups and not
+necessarily even the best. The receipe worked for me in August 2006. If
+you come much later, things may have changed.
+
+This Apache setup aims to illustrate
+
+* CGI invocation of zxid C binary
+* mod_php5 invocation of zxid.php
+* mod_perlinvocation of zxid.pl
+* CGI invocation of zxid.pl (alternative to mod_perl)
+* Support mod_auth_saml
+
+<<apache.pd>>
+
+15 Mediawiki Integration Tips
+=============================
+
+<<mediawiki-zxid.pd>>
+
+16 ZXID Testing Plan
+====================
+
+<<testplan.pd>>
+
+18 FAQ
+======
+
+<<zxid-faq.pd>>
+
+19 License
+==========
+
+<<zxid-license.pd>>
+
+17 Protocol Schema and Examples
+===============================
+
+<<schemata.pd>>
+
+<<zxid-ref.pd>>
+
+<<doc-end.pd>>
+
+<<EOF: >>
+
+Vuokko_Kellomäki
+ <vuokko.kellomaki@clockworks.fi> said:
+> On 28.1.2011 5:36, sampo@zxidp.org wrote:
+> >>> Pitäisi siivota ZXID.org dokumentaatiota. Mahdollisesti uudelleen kirjoittaa
+> >>> asuun jonka tavallisempikin ihminen ymmärtää.
+> 
+> Vilkaisin dokumentaatiota, eikä tämä tavallinen ihminen 
+> ymmärtänyt siitä yhtään mitään... edes sitä, mistä kaikessa on 
+> kysymys!
+
+Juuri siksi tarvitsen apua. Dokumentaation tulisi toivottavasti aueta
+tietokone tietoisille ihmisille ilman että heidän tarvitsisi olla identiteetin
+hallinta spesialisteja. Osa dokumentaatiosta on suunnittelu tasolla (=bisnes ihmisten
+pitäisi ymmärtää), osa sysadmin tasolla, osa sovellusohjelmoija tasolla,
+osa systeemiohjelmoija tasolla, ja osa guru tasolla. Olisi hyvä jos lukija ymmärtäisi
+mitkä osat ovat relevantteja hänelle ja mitä ei edes ole tarkoituskaan ymmärtää.
+
+Myös zxid.org:n etusivun viestiä pitäisi varmaan selkeyttää jotta useimmat ihmiset
+ymmärtäisivät mistä on kysymys.
+
+Paketoin koko kasan kirja muotoon:
+
+http://zxid.org/zxid-book-34.pdf
+
+Ehkä sitä on helpompi ymmärtää.
+
+> >>>
+> >>> Paljonko sillä 3k budjetilla saa?
+> 50 sivua käännöstä tai 100 sivua editointia, sivu = 1800 
+> merkkiä välilyönteineen.
+> 
+> >
+> > Kannatta katsoa zxid.org etusivun "Documentation" osaa.
+> >
+> > Itse teksti on Plandoc formaatissa, eli tavallisina teksti tiedostoina joiden pääte on .pd
+> >
+> > Versionhallintaan käytän Gittiä. Sivulta löytyvästä anon git osoitteesta
+> > löytyvät myös .pd tiedostot.
+> 
+> En saa anon git -osoitetta auki.
+
+Onko sinulla skype osoitetta. Tarvittava git koulutus on helpointa antaa skype chat session
+välityksellä.
+
+Windowsissa tarvitaan yleenä putty (ssh) ja tortoisegit (Unixissa tietysty vain ssh ja git, jotka
+ovat vakiovarusteita). git on tärkeä, koska käytän sitä kaikessa luovassa toiminnassani. Eli
+joudut melko suurella todennäköisyydellä opettelemaan jonkun git variantin.
+
+Tekstitiedostoista PDF:ään tarvitaan perl ja LaTeX systeemi ja joitain kuvan käsittely
+ohjelmia. En usko että kannattaa asentaa näitä ellei sinulla ole jo LaTeX kokemusta.
+
+--Sampo
+
+> Vuokko
+> 
+> 
+> ******************************
+> Vuokko Kellomäki
+> kääntäjä - translator fi-en-fi
+> vuokko.kellomaki@clockworks.fi
+> 
+> Clockworks Oy
+> Peltosaarentie 2 A 7, FI-05840 Hyvinkää
+> puh./tel. +358 40 564 2298
+> www.clockworks.fi

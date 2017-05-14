@@ -1,6 +1,6 @@
 use strict;
 use lib -e 't' ? 't' : 'test';
-use TestYAML tests => 35;
+use TestYAML tests => 38;
 $^W = 1;
 
 use YAML::Old::Error;
@@ -35,15 +35,6 @@ __DATA__
 - foo
 # The next line contains an escape character
 - bell -><%CNTL-G%><-
-
-=== YAML_PARSE_ERR_NO_FINAL_NEWLINE
-+++ error: YAML_PARSE_ERR_NO_FINAL_NEWLINE
-+++ yaml
-# Test msg_no_newline
----
-- one
-- two
-- three
 
 === YAML_PARSE_ERR_BAD_MAJOR_VERSION
 +++ error: YAML_PARSE_ERR_BAD_MAJOR_VERSION
@@ -114,6 +105,12 @@ __DATA__
 +++ yaml
 ---
 - &X=y 42
+
+=== YAML_PARSE_ERR_BAD_ANCHOR
++++ error: YAML_PARSE_ERR_BAD_ANCHOR
++++ yaml
+---
+- &
 
 #---
 #error: YAML_PARSE_ERR_BAD_NODEX
@@ -207,6 +204,12 @@ Test::YAML::Dump({});
 ---
 - *foo=bar
 
+=== YAML_PARSE_ERR_BAD_ALIAS
++++ error: YAML_PARSE_ERR_BAD_ALIAS
++++ yaml
+---
+- *
+
 === YAML_PARSE_ERR_MANY_ALIAS
 +++ error: YAML_PARSE_ERR_MANY_ALIAS
 +++ yaml
@@ -263,6 +266,15 @@ bar
 
 === YAML_LOAD_WARN_DUPLICATE_KEY
 +++ error: YAML_LOAD_WARN_DUPLICATE_KEY
++++ yaml
+---
+foo: bar
+bar: boo
+foo: baz
+boo: bah
+
+=== Test duplicate key message
++++ error: YAML::Old Warning: Duplicate map key 'foo' found. Ignoring.
 +++ yaml
 ---
 foo: bar
@@ -386,3 +398,11 @@ foo: bar
 ---
 - |0
  foo
+
+=== YAML_PARSE_ERR_NONSPACE_INDENTATION
++++ error: YAML_PARSE_ERR_NONSPACE_INDENTATION
++++ yaml
+---
+some:
+  	data-preceded-with-tab: abc
+

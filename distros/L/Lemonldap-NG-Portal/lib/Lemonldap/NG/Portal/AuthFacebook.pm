@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::_Browser;
 use URI::Escape;
 
 our @ISA     = (qw(Lemonldap::NG::Portal::_Browser));
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.3';
 our $initDone;
 
 BEGIN {
@@ -88,13 +88,11 @@ sub extractFormInfo {
         {
             $self->{sessionInfo}->{_facebookToken} = $access_token;
 
-            # Get fields (see https://developers.facebook.com/tools/explorer)
-            my @fields = ( 'id', 'username' );
+     # Get mandatory fields (see https://developers.facebook.com/tools/explorer)
+            my @fields = ('id');
 
             # Look at wanted fields
-            my %vars =
-              ( %{ $self->{exportedVars} },
-                %{ $self->{facebookExportedVars} } );
+            my %vars = %{ $self->{facebookExportedVars} };
             if ( $self->get_module('user') =~ /^Facebook/ ) {
                 push @fields, map { /^(\w+)$/ ? ($1) : () } values %vars;
             }
@@ -128,13 +126,10 @@ sub extractFormInfo {
                 return PE_ERROR;
             }
 
-            # Look if a field can be used to trace user
-            unless ( $self->{user} = $datas->{username} ) {
-                $self->lmLog( 'Unable to get Facebook username', 'warn' );
-                unless ( $self->{user} = $datas->{id} ) {
-                    $self->lmLog( 'Unable to get Facebook id', 'error' );
-                    return PE_ERROR;
-                }
+            # Use id fieldto trace user
+            unless ( $self->{user} = $datas->{id} ) {
+                $self->lmLog( 'Unable to get Facebook id', 'error' );
+                return PE_ERROR;
             }
             $self->{_facebookDatas} = $datas;
 
@@ -158,7 +153,7 @@ sub extractFormInfo {
     # Build Facebook redirection
     # TODO: use a param to use "publish_stream" or not
     my $check_url = $self->fb()->get_authorization_url(
-        scope   => ['offline_access'],
+        scope   => [ 'public_profile', 'email' ],
         display => 'page',
     );
     print $self->redirect($check_url);

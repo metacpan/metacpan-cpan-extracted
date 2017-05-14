@@ -3,14 +3,15 @@
 #======================================================================#
 package Tk::ColumnButton;
 
-use strict;
-
-use Carp;
-
 use Tk::Frame;
 use Tk;
 
 use base qw (Tk::Frame);
+use vars qw ($VERSION);
+use strict;
+use Carp;
+
+$VERSION = '0.02';
 
 Tk::Widget->Construct ('ColumnButton');
 
@@ -754,15 +755,13 @@ sub columnwidth
 #======================================================================#
 package Tk::__ListContainer;
 
-use strict;
-
-use Carp;
-
 use Tk::TiedListbox;
 use Tk::Frame;
 use Tk;
 
 use base qw (Tk::Frame);
+use strict;
+use Carp;
 
 Tk::Widget->Construct ('__ListContainer');
 
@@ -918,15 +917,13 @@ sub see
 #======================================================================#
 package Tk::Columns;
 
-use strict;
-
-use Carp;
-
 use Tk::Frame;
 use Tk::Pane;
 use Tk;
 
 use base qw (Tk::Frame);
+use strict;
+use Carp;
 
 Tk::Widget->Construct ('Columns');
 
@@ -1277,9 +1274,11 @@ sub __update
 
 sub __delete
    {
-    foreach my $l_Column ($_[0]->lists())
+    my $this = shift;
+
+    foreach my $l_Column ($this->lists())
        {
-        next unless ($_[1] ne '');
+        next unless ($_[0] ne '');
         $l_Column->delete (@_);
        }
    }
@@ -1359,6 +1358,12 @@ sub get # This returns a list of references to row data arrays
     return (@l_Return);
    }
 
+sub index
+   {
+    my ($l_Column) = (shift->lists());
+
+    return (defined ($l_Column) ? $l_Column->index (@_) : undef);
+   }
 
 sub indexedbutton
    {
@@ -2152,6 +2157,8 @@ under the same terms as Perl itself.
 =item B<July 4, 1999>: fixed scrollbar redisplay failure after insertion bug
 
 =item B<September 1, 1999>: Rewrite with legacy support
+
+=item B<November 25, 1999>: Fixed index and delete methods
 
 =back
 

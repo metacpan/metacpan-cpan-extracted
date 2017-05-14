@@ -1,0 +1,47 @@
+---
+abstract: 'A Perl 6 implementation'
+author:
+  - 'FlÃ¡vio S. Glock <fglock@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: v6
+no_index:
+  directory:
+    - t
+    - inc
+  namespace:
+    - Lit
+    - Val
+  package:
+    - Apply
+    - Bind
+    - CompUnit
+    - Decl
+    - For
+    - If
+    - Index
+    - Lookup
+    - Main
+    - Method
+    - Pair
+    - Sig
+    - Sub
+    - Use
+    - While
+provides:
+  v6:
+    file: lib/v6.pm
+requires:
+  Encode: '0'
+  Filter::Util::Call: '0'
+  FindBin: '0'
+  Term::ReadLine: '0'
+version: '0.047'

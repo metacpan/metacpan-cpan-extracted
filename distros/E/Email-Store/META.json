@@ -1,0 +1,55 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-Store",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::DBI" : "v3.0.3",
+            "Class::DBI::DATA::Schema" : 0,
+            "DBD::SQLite" : 0,
+            "Email::Address" : "1.8",
+            "Email::Date" : "1.1",
+            "Email::MIME" : "1.8",
+            "Email::MessageID" : 0,
+            "Email::Simple" : "1.92",
+            "File::Slurp" : 0,
+            "MIME::Parser" : 0,
+            "Mail::ListDetector" : "0.31",
+            "Module::Pluggable" : "2.6",
+            "Module::Pluggable::Ordered" : "1",
+            "SQL::Translator" : 0,
+            "Time::Piece" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.257"
+}

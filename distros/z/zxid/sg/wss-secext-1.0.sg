@@ -1,0 +1,104 @@
+# zxid/sg/wss-secext-1.0.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: wss-secext-1.0.sg,v 1.6 2009-11-20 20:27:13 sampo Exp $
+
+target(wsse, http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd)
+import(wsu,  http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd,wss-util-1.0.xsd)
+import(xml,  http://www.w3.org/XML/1998/namespace,http://www.w3.org/2001/xml.xsd)
+import(ds,   http://www.w3.org/2000/09/xmldsig#,http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+import(e,    http://schemas.xmlsoap.org/soap/envelope/)
+import(sa11, urn:oasis:names:tc:SAML:1.0:assertion)
+import(sa,   urn:oasis:names:tc:SAML:2.0:assertion)
+import(ff12, urn:liberty:iff:2003-08)
+import(sec,  urn:liberty:security:2006-08)
+ns(xs,   http://www.w3.org/2001/XMLSchema)
+
+&@header:
+  @wsu:Id?
+  @e:mustUnderstand?
+  @e:actor?
+  ;
+
+%AttributedString:	 base(xs:string)
+  @wsu:Id?
+  @any
+  ;
+%PasswordString:	 base(wsse:AttributedString)
+  @Type?	 -> %xs:anyURI
+  ;
+%EncodedString:	 base(wsse:AttributedString)
+  @EncodingType?	 -> %xs:anyURI
+  ;
+
+%UsernameTokenType:
+  wsse:Username	 -> %wsse:AttributedString
+  any*  processContents(lax)
+  @wsu:Id?
+  @any
+  ;
+
+%BinarySecurityTokenType:	 base(wsse:EncodedString)
+  @ValueType?	 -> %xs:anyURI
+  ;
+
+%KeyIdentifierType:	 base(wsse:EncodedString)
+  @ValueType?	 -> %xs:anyURI
+  ;
+
+%tUsage: xs:anyURI* ;
+@Usage   -> %wsse:tUsage
+
+%ReferenceType:
+  @URI?	 -> %xs:anyURI
+  @ValueType?	 -> %xs:anyURI
+  @any
+  ;
+
+%EmbeddedType:
+  any*  processContents(lax)
+  @ValueType?	 -> %xs:anyURI
+  @any
+  ;
+
+%SecurityTokenReferenceType:
+  wsse:KeyIdentifier?
+  any*  processContents(lax)
+  @wsu:Id?
+  @wsse:Usage?
+  @any
+  ;
+
+%SecurityHeaderType:
+  ds:Signature?
+  sa:Assertion?
+  sa:EncryptedAssertion?
+  sa11:Assertion?
+  ff12:Assertion?
+  #sec:Token?  assertion is used directly
+  wsse:BinarySecurityToken?       # Useful for X509 and binary bearer sec mechs
+  wsse:SecurityTokenReference?    # Useful for SAML bearer sec mech
+  wsu:Timestamp?
+  &@wsse:header
+  any*  processContents(lax)
+  @any
+  ;
+
+%TransformationParametersType:
+  any*  processContents(lax)
+  @any
+  ;
+
+UsernameToken	 -> %wsse:UsernameTokenType
+BinarySecurityToken	 -> %wsse:BinarySecurityTokenType
+Reference	 -> %wsse:ReferenceType
+Embedded	 -> %wsse:EmbeddedType
+KeyIdentifier	 -> %wsse:KeyIdentifierType
+SecurityTokenReference   -> %wsse:SecurityTokenReferenceType
+Security	 -> %wsse:SecurityHeaderType
+TransformationParameters -> %wsse:TransformationParametersType
+Password	 -> %wsse:PasswordString
+Nonce            -> %wsse:EncodedString
+
+%FaultcodeEnum:	 enum( wsse:UnsupportedSecurityToken wsse:UnsupportedAlgorithm wsse:InvalidSecurity wsse:InvalidSecurityToken wsse:FailedAuthentication wsse:FailedCheck wsse:SecurityTokenUnavailable ) ;
+
+# EOF

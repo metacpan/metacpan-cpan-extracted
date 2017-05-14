@@ -1,0 +1,48 @@
+Template: quiz/domanda1
+Type: Note
+Level: high
+Description: "Tra poco vi troverete nell'editor Vi! Dovrete modificare tutte le occorrenze della stringa 'linux' con la stringa 'windows'. (Attenzione! Qualsiasi altra modifica fara' fallire il test !!!"
+Answer: 0
+Answer_description: 
+ 
+ Due possibili soluzioni:
+ 	
+ 	%s/linux/windows/g 
+ 		oppure 
+ 	1,$s/linux/windows/g
+ 
+Exercise: /usr/share/Quizzer/vi-subst.tar.gz
+
+Template: quiz/domanda2
+Type: Note
+Level: high
+Description: "Tra poco vi troverete nella shell bash. Potrete cercare, con ogni mezzo il file 'xinput' e copiarlo nella vostra directory di lavoro."
+Answer: 0
+Answer_description: 
+	
+ Due possibili soluzioni:
+ 
+ find / -name xinput
+ 	seguito da 
+ cp /etc/X11/xinit/xinitrc.d/xinput . 
+ 
+ 	oppure 
+ 
+ locate xinput
+ 	seguito da 
+ cp /etc/X11/xinit/xinitrc.d/xinput .
+ 
+Exercise: /usr/share/Quizzer/search-n-copy.tar.gz
+
+Template: quiz/domanda3
+Type: Note
+Level: high
+Description: "Tra poco vi troverete nella shell bash. Nella vostra directory di lavoro sara' stato decompresso l'archivio contenente i sorgenti della shell tchsh, versione 6.10. Dovrete effettuare tutte le operazioni necessarie per compilare il pacchetto e ottenere, alla fine del lavoro, l'eseguibile tcsh*"
+Answer: 0
+Answer_description: 
+ 
+ Una soluzione corretta:
+ 
+ 	./configure; make
+ 
+Exercise: /usr/share/Quizzer/compile-tcsh.tar.gz

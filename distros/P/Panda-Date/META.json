@@ -28,20 +28,20 @@
       },
       "configure" : {
          "requires" : {
+            "CPP::panda::lib" : "v1.0.0",
             "ExtUtils::MakeMaker" : "6.76",
-            "Panda::Install" : "v1.2.6",
-            "Panda::Lib" : "v1.3.0",
-            "Panda::Time" : "v3.1.0",
-            "Panda::XS" : "v2.1.5"
+            "Panda::Install" : "v1.2.7",
+            "Panda::Time" : "v3.1.2",
+            "Panda::XS" : "v2.1.7"
          }
       },
       "runtime" : {
          "requires" : {
+            "CPP::panda::lib" : "v1.0.0",
             "Panda::Export" : "0",
-            "Panda::Install" : "v1.2.6",
-            "Panda::Lib" : "v1.3.0",
-            "Panda::Time" : "v3.1.0",
-            "Panda::XS" : "v2.1.5",
+            "Panda::Install" : "v1.2.7",
+            "Panda::Time" : "v3.1.2",
+            "Panda::XS" : "v2.1.7",
             "perl" : "5.010000"
          }
       },
@@ -54,5 +54,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v3.0.5"
+   "version" : "v3.0.6"
 }

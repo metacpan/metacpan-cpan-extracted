@@ -1,4 +1,0 @@
-Error: Expected hex digit or "?".
-  a: U+;
-       ^
-  /sass/spec/css/unicode_range/error/no_digits/input.scss 2:8

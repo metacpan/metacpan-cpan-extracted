@@ -433,6 +433,10 @@ for more advanced polynonial operations L<Math::Polynomial> is recommended.
     $y = pl_evaluate(\@coefficients, $x);
     @yvalues = pl_evaluate(\@coefficients, \@xvalues);
 
+You can also use lists of the X values or X array references:
+
+    @yvalues = pl_evaluate(\@coefficients, \@xvalues, \@primes, $x, @negatives);
+
 Returns either a y-value for a corresponding x-value, or a list of
 y-values on the polynomial for a corresponding list of x-values,
 using Horner's method.
@@ -442,15 +446,12 @@ using Horner's method.
 sub pl_evaluate
 {
 	my @coefficients = @{$_[0]};
-	my $xval_ref = $_[1];
-
-	my @xvalues;
 
 	#
 	# It could happen. Someone might type \$x instead of $x.
 	#
-	@xvalues = (ref $xval_ref eq "ARRAY")? @$xval_ref:
-		(((ref $xval_ref eq "SCALAR")? $$xval_ref: $xval_ref));
+	my @xvalues = map{(ref $_ eq "ARRAY")? @$_:
+			((ref $_ eq "SCALAR")? $$_: $_)} @_[1 .. $#_];
 
 	#
 	# Move the leading coefficient off the polynomial list

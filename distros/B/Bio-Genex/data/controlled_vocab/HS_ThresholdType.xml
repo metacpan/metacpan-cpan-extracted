@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="HotSpots" db_column="threshold_type" cv_table="HS_ThresholdType">
+  <comment type="definition">This vocabulary describes what criteria were used to establish a threshold for significant variation	
+</comment>
+<term name="fold_over"
+        description="the ratio (greater than one) of the treatment to control after background correction, displayed with a preceding plus sign"/>
+<term name="fold_under"
+        description="the inverse of ratio (less than one) of the
+treatment to control after background correction, displayed with a minus sign preceding it"/>
+<term name="up_regulated"
+        description="a given gene increases its expression relative to
+the control"/>
+<term name="down_regulated"
+        description="a given gene decreases its expression relative to
+the control"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2016 by Dominique Dumont.
+# This software is Copyright (c) 2008-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::HashEditor;
-$Config::Model::Tk::HashEditor::VERSION = '1.361';
+$Config::Model::Tk::HashEditor::VERSION = '1.362';
 use strict;
 use warnings;
 use Carp;

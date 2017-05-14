@@ -1,0 +1,7 @@
+BUGS
+
+* All XML files need to be run thru fix_xml.pl to remove invalid characters.
+
+Ex: cat test.xml | perl fix_xml.pl > fixed.xml
+
+

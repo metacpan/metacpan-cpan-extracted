@@ -1,0 +1,212 @@
+
+0.01  Wed Jul  3 19:19:46 2002
+	- original version; created by h2xs 1.21 with options
+		-n Data::Type -X
+
+0.01.01
+
+  Migrated from 'Data::Verify' to 'Data::Type' namespace
+  Removed the pre-alpha disclaimer from README
+  This now is alpha software
+
+  added IType::W3C Interface where types from http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/ are implemented
+  changed 'Function' namespace to 'Facet' conforming w3c
+
+  added HEX, BINARY types
+
+0.01.02
+
+  * Introduced various changes, thanks to https://rt.cpan.org/Ticket/Display.html?id=1930
+    posted by Henrik Tougaard via RT
+
+    - 'DATE' type now accepts parameters DATE( [ 'MYSQL','DATEPARSE' ] ) where MYSQL (default) is the
+	mysql builtin data type behaviour and DATAPARSE leads to Data::Parse's str2time function use.
+	- Introduced locale support (added empty package Data::Type::Locale)
+	- separated localizable type parameters to methods, so they are overridable through inheriting
+	localized types:
+	
+	Example Type::dk_yesno vs Type::yesno (snipped sourcecode):
+
+	{
+	package Type::yesno;
+
+		our @ISA = qw(IType::String);
+	
+		sub info
+		{	
+			my $this = shift;
+					
+			return sprintf q{a simple answer (%s)}, join( ', ', $this->choice ) ;
+		}
+	
+		sub choice { qw(yes no) }
+	
+	package Type::dk_yesno;
+
+		our @ISA = qw(Type::yesno);
+		
+		sub export { qw(DK::YESNO) };
+			
+		sub choice { qw(mand kvinde) }
+	}
+	
+  * Export names for types are now accessible via 'export' method ( dk_yesno => DK::YESNO for instance ).
+	
+  * Types now have their own $VERSION
+
+  * Some minor changes
+    - rename IType:: info() to desc() for better distinguishing in toc(), because of a bug during
+      @ISA traversal and IType:: identification (added _unique_ordered for using only unique desc's).
+    - toc() now lists also export alias's
+    - regex's are now centralized and accessible via Regex::list( 'key' );
+
+0.01.03
+
+  * Changed the Data::Type::Guard attribute 'types' to 'allow', because was ambiguous with types per se.
+
+  * New group IType::Business (see toc).
+
+  * Some minor changes
+   - toc() now sorts types alphanumeretically
+   - IType:: Groups also get version
+   - added type version number to catalog() output
+
+0.01.04
+
+  * added dverify( ) which is die'ing instead of throwing exceptions to the people:
+
+        dverify( $email, EMAIL ) or die $!;
+	
+  * renamed 'choice' method for Type:: types to 'param'.
+
+  * Some minor changes
+    - Type::* package now supports new method C< sub depends {qw(CPAN::aModule)} > for retrieval of
+	a dependency tree, which type made Data::Type require what.
+	- added Data::Verify::depends() which returns a dependency list for types requiring other modules.
+
+0.1.5
+
+  * Introduced:
+    - %Data::Type::alias holds alias names for types (these listed by export method) ie.
+
+       package Type::something;
+
+       sub export { qw( a1 a2 ) }
+
+      results $Data::Type::alias{a1} returning 'something' etc.
+
+    - New version numbering with cvs revision number ( <main version>.<cvs revision> )
+
+  * Bugfixes:
+
+    - forgot dverify() to export.
+
+0.1.6
+
+  * Added complains(), an alias to testplan() (which is planned to become deprecated).
+
+0.1.12
+
+  * Facet:: now could have C<usage()> method
+  * Facet::match now has new syntax match( REGEX, DESC ) while DESC is a clear textual
+  describtion of the REGEX function. This is used for complain().
+
+0.01.15
+  * verify now uses $_ per default, if only one argument is given.
+
+  * matches() introduced as an alias for dverify(). It exported per default.
+
+  * renamed matches() to is()
+
+  * Added Locale::Maketext localization.
+    - Accessible via $Data::Type::lh->maketext( )
+    - Served through Data::Type::L18N packages.
+    [Note] In first line, this is for international error reports. This
+    should help promptig ie. Webusers in front of an cgi-form.
+
+  * Renamed everything from 
+	Type:: to Data::Type::
+	Filter:: to Data::Type::Filter::
+	Facet:: to Data::Type::Facet
+
+  [Note] Now we don't pollute anyones namespace. Everything is beneath
+  C<Data::Type>.
+
+  * C<Data::Type::IType::UNIVERSAL> got C<alias()> method which returns
+    the exported name of that type.
+
+  * 'summary()' is the new name of 'testplan()' (which was 'complains()').
+    'testplan' is removed from the export symbols and 'summary() was added
+    instead
+
+  * C<pass> and C<fail> renamed to C<ok> and C<nok> (more intuitive).
+
+  * Renamed type "OS::PATH" export name to "PATH"
+
+  * Removed 'alias()' method from IType::UNIVERSAL because export() does the same.
+
+  * Renamed Data::Type::IType::UNIVERSAL to Data::Type::IType.
+
+  * C<summary()> 
+    - now returns Data::Type::Entry objects instead of simple aref.
+    - new usage: ( VALUE, ENTRY || [ ENTRY, ... ] )
+
+  * t/describe.t renamed to t/summary.t
+
+  * removed C<nok()>
+    - C<ok> now takes a bool argument if awaiting success/fail
+
+  * Usage changed: C<verify( $value, $test )>
+                   C<dverify( $value, $test )>
+
+  * Data::Type::Exception now has public C<catched> which holds the array
+  of preceding exceptions which induced it.
+
+  * @Data::Type::err holds the list of negative exceptions when C<dverify>
+  alias C<is> fails. Syntactic sugar:
+
+    unless( shift and is BIO::DNA )
+    {
+        print Dumper \@Data::Type::err;
+    }
+
+  LOCALE
+    - Types suffix the l18n language code: TYPE::DE for "de" (german).
+    
+    [Note] You would need an implicit Data::Type::L18N::de package.
+    Only C<type export> names with a correspondent ::L18N::xx package should
+    be allowed. This may not make sense when no localization is needed,
+    but it will prevent consufion.
+
+    - Data::Type::l18n_list() returns the implemented localized packages
+
+  FACETS
+    - move C<Data::Type::Facet::Proxy> to C<Data::Type::Facet>
+    - now every Facet isa C<Data::Type::IFacet> (empty)
+
+  API
+    - renamed C<verify> to C<valid>
+    - Data::Type::Facet::match has new usage
+    - Data::Type->filter now wants list of [ 'filtername', @args ]
+    - Data::Type::Object::*->test and Data::Type::Filter::*->test now doesnt take any args. Instead Data::Type::value is
+      consequently used.
+    - added C<isnt> as an alias for C<no is( TYPE )>
+    - Relaced 'IType' with 'Interface', so we got 'Data::Type::Interface' instead of 'Data::Type::IType'
+      Replaced 'IFacet' with 'Facet::Interface', so we now have 'Data::Type::Facet::Interface'
+
+  REGEXPS
+    - Every regex now lives in $Data::Type::Regex::registry
+    - Dynamic regex generation via coderef support (with arguments).
+    - Access via C<Data::Type::Regex->request( )>. This is a step further to facadeless
+    gateway to Regexp::Common (Hopefully will save a lot maintainance time).
+
+	moved Data::Type::Exception related objects to Data/Type/Exception.pm
+
+	added the HTML type (thanks to HMTM::Lint)
+
+	Rename/prefixed the Data::Type::Object:: packages with std_ for Collection
+	  - STD::, W3C::, BIO::, CHEM:: and DB::
+
+0.02.01
+
+    [Major] Data::Type::Regex moved to a independant module "Regexp::Box". See CPAN.

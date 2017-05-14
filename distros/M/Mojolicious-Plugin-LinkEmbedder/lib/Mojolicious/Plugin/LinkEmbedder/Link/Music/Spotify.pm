@@ -1,5 +1,30 @@
 package Mojolicious::Plugin::LinkEmbedder::Link::Music::Spotify;
+
+=head1 NAME
+
+Mojolicious::Plugin::LinkEmbedder::Link::Music::Spotify - Spotify link
+
+=head1 DESCRIPTION
+
+L<https://developer.spotify.com/technologies/widgets/spotify-play-button/>
+
+This class inherit from L<Mojolicious::Plugin::LinkEmbedder::Link::Music>.
+
+=cut
+
 use Mojo::Base 'Mojolicious::Plugin::LinkEmbedder::Link::Music';
+
+=head1 ATTRIBUTES
+
+=head2 media_id
+
+Returns a normalized spotify link.
+
+=head2 provider_name
+
+Returns "Spotify".
+
+=cut
 
 has media_id => sub {
   my $self = shift;
@@ -12,6 +37,14 @@ has media_id => sub {
 
 sub provider_name {'Spotify'}
 
+=head1 METHODS
+
+=head2 pretty_url
+
+Returns a L<https://open.spotify.com> link with L</media_id>.
+
+=cut
+
 sub pretty_url {
   my $self     = shift;
   my $url      = Mojo::URL->new('https://open.spotify.com');
@@ -21,6 +54,12 @@ sub pretty_url {
   $url->path(join '/', split ':', $media_id);
   $url;
 }
+
+=head2 to_embed
+
+Returns the HTML code for an iframe embedding this movie.
+
+=cut
 
 sub to_embed {
   my $self     = shift;
@@ -40,42 +79,10 @@ sub to_embed {
   );
 }
 
-1;
-
-=encoding utf8
-
-=head1 NAME
-
-Mojolicious::Plugin::LinkEmbedder::Link::Music::Spotify - Spotify link
-
-=head1 DESCRIPTION
-
-L<https://developer.spotify.com/technologies/widgets/spotify-play-button/>
-
-This class inherit from L<Mojolicious::Plugin::LinkEmbedder::Link::Music>.
-
-=head1 ATTRIBUTES
-
-=head2 media_id
-
-Returns a normalized spotify link.
-
-=head2 provider_name
-
-Returns "Spotify".
-
-=head1 METHODS
-
-=head2 pretty_url
-
-Returns a L<https://open.spotify.com> link with L</media_id>.
-
-=head2 to_embed
-
-Returns the HTML code for an iframe embedding this movie.
-
 =head1 AUTHOR
 
 Marcus Ramberg
 
 =cut
+
+1;

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,14 +16,13 @@ name: Config-Model-CursesUI
 provides:
   Config::Model::CursesUI:
     file: lib/Config/Model/CursesUI.pm
-    version: '1.105'
+    version: '1.106'
   Config::Model::CursesUI::AbortWizard:
     file: lib/Config/Model/CursesUI.pm
 requires:
-  Config::Model: '1.233'
+  Config::Model: '2.095'
   Curses::UI: '0.9606'
-  Exception::Class: '0'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
-version: '1.105'
+version: '1.106'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

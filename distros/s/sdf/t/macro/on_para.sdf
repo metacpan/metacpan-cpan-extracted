@@ -1,0 +1,32 @@
+# This file tests the on macro (for paragraphs)
+
+# Try changing the style
+H1: Heading 1 before on
+!on paragraph '';; $style =~ s/H/P/
+H1: Heading 1 after on
+
+# Try conditionally changing the text
+H2: Heading 2 before on
+!on paragraph 'H2';; $text =~ tr/a-z/A-Z/
+H2: Heading 2 after on
+
+# Try conditionally setting some attributes
+H3: Heading 3 before on
+!on paragraph 'H[23]';; $attr{'notoc'} = 1; $attr{'nopb'} = 1
+H3: Heading 3 after on
+
+H4: Heading 4 after on
+
+H1: Another H1
+H2: Another H2
+H3: Another H3
+
+# Try prepending/appending some text
+!on paragraph 'Note';; $attr{'id'}++; &PrependText('E:Some prepended example text.', '!message "prepending"; "Warning"')
+!on paragraph 'Note';; $attr{'id'}++; &AppendText('N:Some appended normal text.')
+
+Note: This note should have
+an example paragraph prepended and
+a normal paragraph appended!
+
+Some ending text.

@@ -4,3 +4,5 @@ Revision history for Perl extension Class::Proxy.
 	- original version; created by h2xs 1.21 with options
 		-A -X -a -n Class::Proxy
 
+0.01.04
+   - Class::Listener in Makefile.PL inserted

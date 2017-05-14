@@ -1,0 +1,68 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Headers and Footers
+
+Note: The documentation below explains how this feature is
+implemented in SDF 2.000. A better solution might be implemented
+in SDF 2.001. Therefore, avoid using the stuff below if you can.
+
+The document templates supplied with [[SDF]] have headers and
+footers containing [[FrameMaker]] variables. As such, you can control most
+of the information displayed in the headers and footers by setting
+{{host variables}}. See the configuration files for examples.
+
+The variables used in the {{plain}} templates are summarised below.
+
+!block table; groups
+Variable        Description
+front page:
+FooterA         footer left
+FooterB         footer centre
+FooterC         footer right
+normal pages:
+Header1         header left - line 1
+Header2         header left - line 2
+Header3         header centre - line 1
+Header4         header centre - line 2
+Running_H_F_1   header right - line 1
+Running_H_F_2   header right - line 2
+Running_H_F_3   footer left - line 1
+Running_H_F_4   footer left - line 2
+Footer1         footer centre - line 1
+Footer2         footer centre - line 2
+Footer3         footer right - line 2
+!endblock
+
+!if MINCOM_ONLY
+The variables used in the {{qsd*}}
+templates are summarised below.
+
+!block table
+Variable        Description
+#Header1         header inside - line 1
+#Header2         header inside - line 2
+#Header3         header centre - line 1
+#Header4         header centre - line 2
+Running_H_F_1   header outside - line 1
+Running_H_F_2   header outside - line 2
+Running_H_F_3   footer inside - line 1
+Running_H_F_4   page number prefix
+Footer1         footer inside - line 2
+Footer2         footer inside - line 3
+Footer3         footer inside - line 4
+Footer4         footer centre
+!endblock
+!endif
+
+!end_topic

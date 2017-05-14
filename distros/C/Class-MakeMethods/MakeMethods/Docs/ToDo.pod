@@ -65,15 +65,6 @@ Finish tests for Standard and Composite modules.
 
 =item *
 
-It does not appear to be possible to assign subroutine names to
-closures within Perl. As a result, debugging output from Carp and
-similar sources will show all generated methods as "ANON()" rather
-than "YourClass::methodname()".
-
-UPDATE: There now seem to be fixes for this which should be integrated: See the new Sub::Name module and http://perlmonks.org/index.pl?node_id=304883
-
-=item *
-
 For scalar methods (and others) it would be nice to have a simple
 bounds-checking interface to approve or reject (with an exception)
 new values that were passed in.
@@ -183,7 +174,7 @@ Finish building Class::MakeMethods::ClassInherit subclass.
 
 Need to work out how to capture changes for non-scalar values. For
 example, if a subclass inherits an array accessor and then pops
-it, is there some way to provide them with copy-on-write?
+it, do they get copy-on-write?
 
 =item *
 

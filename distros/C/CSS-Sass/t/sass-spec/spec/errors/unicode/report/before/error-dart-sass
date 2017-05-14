@@ -1,4 +1,0 @@
-Error: expected "{".
-öüäöüäöü{a:c
-            ^
-  /sass/spec/errors/unicode/report/before/input.scss 1:13

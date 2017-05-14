@@ -1,0 +1,19 @@
+# $Id: typemap,v 1.2 1995/04/25 09:17:50 rik Exp $
+nis_name		T_PV
+name_pos		T_IV
+nis_object		T_PTROBJ
+nis_error		T_IV
+netobj			T_NETOBJ
+
+#############################################################################
+INPUT
+T_NETOBJ
+	if (SvPOK($arg)) {
+            $var.n_bytes=SvPV($arg, $var.n_len);
+	}
+	else
+	    croak(\"$var is not a valid cookie\");
+#############################################################################
+OUTPUT
+T_NETOBJ
+	sv_setpvn((SV*)$arg, $var.n_bytes, $var.n_len);

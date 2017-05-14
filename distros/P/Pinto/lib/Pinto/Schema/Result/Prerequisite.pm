@@ -55,13 +55,22 @@ with 'Pinto::Role::Schema::Result';
 
 #------------------------------------------------------------------------------
 
-use Pinto::Target::Package;
+use Pinto::PackageSpec;
 
 use overload ( '""' => 'to_string' );
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
+
+#------------------------------------------------------------------------------
+
+__PACKAGE__->inflate_column(
+    'package_version' => {
+        inflate => sub { version->parse( $_[0] ) },
+        deflate => sub { $_[0]->stringify() },
+    }
+);
 
 #------------------------------------------------------------------------------
 # NOTE: We often convert a Prerequsite to/from a PackageSpec object. They don't
@@ -79,14 +88,14 @@ sub FOREIGNBUILDARGS {
 
 #------------------------------------------------------------------------------
 
-has as_target => (
+has as_spec => (
     is       => 'ro',
-    isa      => 'Pinto::Target::Package',
+    isa      => 'Pinto::PackageSpec',
     init_arg => undef,
     lazy     => 1,
     handles  => [qw(is_core is_perl)],
     default  => sub {
-        Pinto::Target::Package->new(
+        Pinto::PackageSpec->new(
             name    => $_[0]->package_name,
             version => $_[0]->package_version
         );
@@ -98,14 +107,7 @@ has as_target => (
 sub to_string {
     my ($self) = @_;
 
-    return $self->as_target->to_string;
-}
-
-#------------------------------------------------------------------------------
-
-for my $phase ( qw(configure build test runtime develop) ) {
-    no strict 'refs';
-    *{__PACKAGE__ . "::is_$phase"} = sub {shift->phase eq $phase};
+    return $self->as_spec->to_string;
 }
 
 #------------------------------------------------------------------------------
@@ -129,7 +131,7 @@ Pinto::Schema::Result::Prerequisite - Represents a Distribution -> Package depen
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 NAME
 
@@ -210,7 +212,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -11,8 +11,8 @@ sub register {
     my($self, $context) = @_;
     $context->register_hook(
         $self,
-        'publish.entry.fixup' => \&add_entry,
-        'publish.init'        => \&initialize,
+        'publish.entry' => \&add_entry,
+        'publish.init'  => \&initialize,
     );
 }
 
@@ -119,7 +119,7 @@ Plagger::Plugin::Publish::LivedoorClip - Post to livedoor clip automatically
 
 This plugin automatically posts feed updates to livedoor clip
 L<http://clip.livedoor.com/>. It supports automatic tagging as well. It
-might be handy for syncronizing delicious feeds into livedoor clip.
+might be handy for synchronizing delicious feeds into livedoor clip.
 
 =head1 AUTHOR
 

@@ -1,0 +1,40 @@
+File for listing pending schema modifications
+
+Mon Oct 23 13:26:42 MST 2000
+FIXED ==> * species:num_chromosomes should be char(3)
+
+Tue Oct 10 10:15:04 MST 2000
+* create pkey index on al_spots
+* Sample:con_fk should be seed_supplier_con_fk
+
+Mon Oct  9 16:23:26 MST 2000
+* do we want an ExperimentSet:description column
+FIXED ==> * change ArrayMeasurement:hybridization_id to 
+  hybridization_name varchar(128)
+FIXED ==> * ensure ArrayMeasurement:name has sufficient length for
+  experiment_set_name:hybridization_id:am_type:channel combination
+    experitment_set_name ==> 24 (CT restriction)
+    hybridization_id     ==> 48 (DB restriction)
+    am_type ==> 11 {p_raw,p_bkgd,p_bkgd_corr,p_no_data,d_other,d_ratio,d_avg}
+    channel ==> 3 {cy3,cy5}
+    ==> 24:48:11:3 ==> 86 (96 for padding)
+FIXED ==> * change ArrayMeasurement:equation_type length to 48
+* shouldn't scn_fk ==> scanner_fk, sptr_fk ==> spotter_fk, scan_* ==> scanner_*
+
+Wed Oct  4 22:36:18 MST 2000
+FIXED ==> * AL_Spots -- {x,y,grid}_image_location need to be varchar not int
+
+* ExternalDatabase -- having name as the primary key name messes up
+  the convention of using _pk and _fk
+
+Mon Sep 18 11:55:41 MST 2000
+* USF - rename con_fk ==> clone_supplier_con_fk
+
+
+### *** emacs file mode definition ***
+### Local Variables: 
+### mode:text
+### mode:filladapt
+### End: 
+
+

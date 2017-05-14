@@ -6,7 +6,7 @@ require Exporter;
 
 @EXPORT = qw( BITMAP_WIDTH BITMAP_HEIGHT BITMAP_HEIGHT_DOUBLE OTABitmap_makestream OTABitmap_fromfile OTABitmap_fromb64 );
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 use constant BITMAP_WIDTH  			=> 72;
 
@@ -48,9 +48,9 @@ sub OTABitmap_fromfile {
 					   ||
 					   $image->Get('height') == BITMAP_HEIGHT_DOUBLE
 					);
-	
+
 	# convert to monochrome
-	$image->Set(magick => 'mono');
+	$image->Set("magick" => "mono");
 	my $monochrome = $image->ImageToBlob( );
 
 	# reverse bitorder

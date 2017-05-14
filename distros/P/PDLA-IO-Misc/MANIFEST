@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST			This list of files
+misc.pd
+t/01-checkmanifest.t
+t/misc.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDLA/IO/Misc.pm                mod=PDLA::IO::Misc pd=misc.pd (added by pdlpp_mkgen)

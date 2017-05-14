@@ -1,0 +1,16 @@
+# This file specifies win32 specific options for building CORBA::MICO
+
+# !!! IMPORRTANT !!!
+# You must set MICOPREFIX to MICO's root source directory !
+
+# MICOPREFIX = c:/mico
+
+
+# The values below specify win32-specific compiler & linker
+# options. You normally shouldn't have to change these!
+
+CC			= cl
+CCFLAGS		= -nologo -GX -GR -TP
+LDDLFLAGS	= -nologo -dll
+DEFINE		= -D_WINDOWS -DWIN32
+XSOPT		= -C++ -nolinenumbers

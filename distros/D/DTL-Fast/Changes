@@ -1,5 +1,10 @@
 Revision history for Perl extension DTL::Fast.
 
+2017.1 - Tue 9 Mar 2017
+    - Changed versioning to the year-based
+    - Fixed bug with SSI security warning
+    - Added die_on_missing_path option to the DTL::Fast::Context
+
 1.623 - Tue 23 Feb 2017
     - Removed test with incorrect utf symbols, because they are not accepted by perl 5.26
 

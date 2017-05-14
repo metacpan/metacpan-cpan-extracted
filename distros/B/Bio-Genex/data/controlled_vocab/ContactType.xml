@@ -1,0 +1,44 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Contact" db_column="type" cv_table="ContactType">
+  <comment type="definition">This table provides the restricted vocabulary for the type column in the table Contact and delimits the field in which contact information is being provided	
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They regulate
+the sub-setting of which contact entries are displayed in the scanner,
+software, and spotter screens.</comment> 
+<term name="sample_organism_provider"
+        description="information is being provided about the source of the RNA or cDNA target used in the experiments"/>
+<term name="technology_spotter"
+        description="information is being provided about the source of
+the spotter used to deposit DNA on the media"/>
+<term name="technology_array"
+        description="information is being provided about the source of the array"/>
+<term name="technology_scanner"
+        description="information is being provided about the source of the scanner used to collect the primary raw data"/>
+<term name="software_image_analysis"
+        description="information is being provided about the source of the image analysis software used to provide primary data"/>
+<term name="software_scanner"
+        description="information is being provided about the source of
+the scanner software"/>
+<term name="software_spotter"
+        description="information is being provided about the source of
+the spotter software"/>
+<term name="clone_provider"
+        description="information is being provided about the source of
+the nucleic acid deposited on the array"/>
+<term name="experiment_set_provider"
+        description="information is being provided about the source of the experiment set."/>
+<term name="curator"
+        description="a curator on the GeneX project"/>
+<term name="developer"
+        description="a developer on the GeneX project"/>
+<term name="test_user"
+        description="a user testing the GeneX project"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

@@ -1,0 +1,36 @@
+---
+abstract: 'Debug::Statements provides an easy way to insert and enable debug statements.'
+author:
+  - 'Chris Koknat <chris.koknat@gmail.com>'
+build_requires:
+  FindBin: '0'
+  Getopt::Long: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Output: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Debug-Statements
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Dumpvalue: '0'
+  Exporter: '0'
+  PadWalker: '0'
+  Test::Perl::Critic: '0'
+  Test::Pod: '0'
+  Time::HiRes: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+version: '1.005'

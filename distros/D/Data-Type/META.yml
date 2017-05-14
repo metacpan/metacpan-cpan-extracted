@@ -1,0 +1,48 @@
+--- #YAML:1.0
+name:               Data-Type
+version:            0.02.02
+abstract:           robust and extensible data- and valuetype system
+author:
+    - muenalan@cpan.org
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Attribute::Util:      0.01
+    Business::CINS:       1.13
+    Business::CreditCard:  0.27
+    Business::ISSN:       0.90
+    Business::UPC:        0.04
+    Class::Maker:         0.05.17
+    Class::Multimethods:  1.70
+    Data::Iter:           0
+    Date::Parse:          2.27
+    DBI:                  1.30
+    Email::Valid:         0.15
+    Error:                0.15
+    HTML::Lint:           1.26
+    IO::Extended:         0.06
+    Locale::Language:     2.0
+    Locale::SubCountry:   
+    Net::IPv6Addr:        0.2
+    Pod::Find:            0.24
+    Regexp::Box:          0.01
+    Regexp::Common:       2.113
+    String::ExpandEscapes:  0.01
+    Text::TabularDisplay:  1.18
+    Tie::ListKeyedHash:   0.41
+    X500::DN:             0.28
+    XML::LibXSLT:         1.53
+    XML::Parser:          2.34
+    XML::Schema:          0.07
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

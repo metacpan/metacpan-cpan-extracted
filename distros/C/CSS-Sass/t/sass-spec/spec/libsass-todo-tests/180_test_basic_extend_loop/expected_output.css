@@ -1,7 +1,5 @@
 .foo, .bar {
-  a: b;
-}
+  a: b; }
 
 .bar, .foo {
-  c: d;
-}
+  c: d; }

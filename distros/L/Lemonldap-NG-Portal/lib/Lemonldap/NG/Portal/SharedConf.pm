@@ -16,7 +16,7 @@ use URI::Split qw(uri_split);
 *EXPORT_TAGS = *Lemonldap::NG::Portal::Simple::EXPORT_TAGS;
 *EXPORT      = *Lemonldap::NG::Portal::Simple::EXPORT;
 
-our $VERSION = '1.4.2';
+our $VERSION = '1.9.9';
 use base qw(Lemonldap::NG::Portal::Simple);
 our $confCached;
 
@@ -89,6 +89,7 @@ sub getConf {
             $re->add($quotedVhost);
 
             # Add aliases
+            $confCached->{vhostOptions}->{$vhost} ||= {};
             if ( $confCached->{vhostOptions}->{$vhost}->{vhostAliases} ) {
                 foreach my $alias ( split /\s+/,
                     $confCached->{vhostOptions}->{$vhost}->{vhostAliases} )
@@ -172,7 +173,7 @@ compatible portals using a central configuration database.
     print '<input type="hidden" name="url" value="'.$portal->param('url').'">';
     # Next, login and password
     print 'Login : <input name="user"><br>';
-    print 'Password : <input name="password" type="password" autocomplete="off">';
+    print 'Password : <input name="password" type="password">';
     print '<input type="submit" value="go" />';
     print '</form>';
   }
@@ -271,11 +272,11 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2006, 2007, 2008, 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2005-2015 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2006, 2009, 2010, 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2006-2015 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

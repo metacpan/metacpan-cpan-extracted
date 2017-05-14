@@ -1,0 +1,1010 @@
+# $Id$
+#
+# >>Title::	Overhead MIF Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# This module provides the mif objects required for the overhead look.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+################ Useful constants ###################
+
+# Define useful list indent values
+!define _LI1 $var{'OPT_LIST_INDENT'}*1 . "pt"
+!define _LI2 $var{'OPT_LIST_INDENT'}*2 . "pt"
+!define _LI3 $var{'OPT_LIST_INDENT'}*3 . "pt"
+!define _LI4 $var{'OPT_LIST_INDENT'}*4 . "pt"
+!define _LI5 $var{'OPT_LIST_INDENT'}*5 . "pt"
+!define _LI6 $var{'OPT_LIST_INDENT'}*6 . "pt"
+
+# Define center and right tabs
+# (Should the right tab use AREA_WIDTH?)
+!define _TABC $var{'DOC_FULL_WIDTH'}/2 . "pt"
+!define _TABR $var{'DOC_FULL_WIDTH'} . "pt"
+
+
+################ Core paragraph formats ###################
+
+# Define the root 'Para' format
+!targetobject "Para"; "b0_Body";; \
+  Alignment=Left; \
+  AutoNum=0; \
+  BlockSize=2; \
+  BotSepAtIndent=0; \
+  BotSepOffset='0.0"'; \
+  BotSeparator=""; \
+  CellAlignment=Top; \
+  CellBMarginFixed=0; \
+  CellLMarginFixed=0; \
+  CellMargins="0.0 pt 0.0 pt 0.0 pt 0.0 pt"; \
+  CellRMarginFixed=0; \
+  CellTMarginFixed=0; \
+  FIndent='0.5"'; \
+  FIndentOffset='0.0"'; \
+  FIndentRelative=0; \
+  FontAngle=Regular; \
+  FontCase="FAsTyped"; \
+  FontChangeBar=0; \
+  FontColor=Black; \
+  FontDW="0.0%"; \
+  FontDX="0.0%"; \
+  FontDY="0.0%"; \
+  FontFamily=Times; \
+  FontLocked=0; \
+  FontOutline=0; \
+  FontOverline=0; \
+  FontPairKern=Yes; \
+  FontPosition="FNormal"; \
+  FontSeparation=0; \
+  FontShadow=0; \
+  FontSize="24.0 pt"; \
+  FontStrike=0; \
+  FontUnderlining="FNoUnderlining"; \
+  FontVar=Regular; \
+  FontWeight=Regular; \
+  HyphenMaxLines=2; \
+  HyphenMinPrefix=3; \
+  HyphenMinSuffix=3; \
+  HyphenMinWord=5; \
+  Hyphenate=Yes; \
+  LIndent='0.5"'; \
+  Language="UKEnglish"; \
+  Leading="2.0 pt"; \
+  LetterSpace=0; \
+  LineSpacing=Fixed; \
+  Locked=0; \
+  MaxWordSpace=110; \
+  MinWordSpace=90; \
+  NextTag=""; \
+  OptWordSpace=100; \
+  Placement=Anywhere; \
+  PlacementStyle=Normal; \
+  RIndent='0.0"'; \
+  RunInDefaultPunct=". "; \
+  SpAfter="6.0 pt"; \
+  SpBefore="12.0 pt"; \
+  TabStop='0.5",1.0",1.5",2.0",2.5",3.0",3.5"'; \
+  TopSepAtIndent=0; \
+  TopSepOffset='0.0"'; \
+  TopSeparator=""; \
+  UseNextTag=0; \
+  WithNext=0; \
+  WithPrev=0
+
+
+# Define the other 'Para' formats
+!targetobject "Para"; "f0_FirstBody"; "b0_Body"; \
+  FontFamily=Helvetica; \
+  SpAfter="14.0 pt"; \
+  SpBefore="14.0 pt"
+
+!targetobject "Para"; "fn_Footnote"; "b0_Body"; \
+  BlockSize=1; \
+  FIndent='0.0"'; \
+  FontSize="10.0 pt"; \
+  LIndent='0.0"'; \
+  SpAfter="0.0 pt"; \
+  SpBefore="3.0 pt"; \
+  TabStop=""
+
+!targetobject "Para"; "Footer"; "b0_Body"; \
+  BlockSize=1; \
+  FIndent='0.0"'; \
+  FontPairKern=0; \
+  FontSize="10.0 pt"; \
+  HyphenMinPrefix=2; \
+  HyphenMinSuffix=2; \
+  Hyphenate=0; \
+  LIndent='0.0"'; \
+  MaxWordSpace=125; \
+  MinWordSpace=75; \
+  SpAfter="0.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop="$var{'_TABC'}/Center,$var{'_TABR'}/Right"
+
+!targetobject "Para"; "Header"; "Footer"
+
+
+################ Heading paragraph formats ###################
+
+!targetobject "Para"; "h1_Heading"; "b0_Body"; \
+  FIndent='0.0"'; \
+  FontAngle=Oblique; \
+  FontFamily=Helvetica; \
+  FontSize="36.0 pt"; \
+  Hyphenate=0; \
+  Placement="RPageTop"; \
+  SpAfter="32.0 pt"; \
+  SpBefore="32.0 pt"; \
+  TabStop="$var{'_TABR'}/Right/. "; \
+  WithNext=Yes
+
+!targetobject "Para"; "h2_Heading"; "h1_Heading"; \
+  FontAngle=Regular; \
+  FontSize="30.0 pt"; \
+  FontWeight=Bold; \
+  Placement=Anywhere; \
+  SpAfter="17.0 pt"; \
+  SpBefore="24.0 pt"; \
+  TabStop='0.5",1.0",1.5",2.0",2.5",3.0"'
+
+!targetobject "Para"; "h3_Heading"; "h2_Heading"; \
+  FIndent='0.5"'; \
+  FontSize="12.0 pt"; \
+  SpAfter="8.0 pt"; \
+  SpBefore="12.0 pt"
+
+!targetobject "Para"; "h4_Heading"; "h3_Heading"; \
+  FontSize="11.0 pt"
+
+!targetobject "Para"; "a1_Appendix"; "h1_Heading"; \
+  FontAngle=Regular; \
+  FontSize="18.0 pt"; \
+  FontWeight=Bold; \
+  LIndent='1.583"'; \
+  Placement="PageTop"; \
+  SpAfter="8.0 pt"; \
+  SpBefore="12.0 pt"; \
+  TabStop='1.6"'
+
+!targetobject "Para"; "a2_Appendix"; "h2_Heading"; \
+  FontSize="14.0 pt"; \
+  SpAfter="8.0 pt"; \
+  SpBefore="12.0 pt"
+
+!targetobject "Para"; "a3_Appendix"; "h3_Heading"; \
+  AutoNum=Yes; \
+  FIndent='0.0"'; \
+  NumAtEnd=0; \
+  NumFormat='A:<A\>.<n\>.<n+\>\\t'
+
+!targetobject "Para"; "a4_Appendix"; "h4_Heading"; \
+  FontSize="12.0 pt"
+
+!targetobject "Para"; "p1_PlainHeading"; "h1_Heading"; \
+  FontAngle=Regular; \
+  FontSize="18.0 pt"; \
+  FontWeight=Bold; \
+  Placement="PageTop"; \
+  SpAfter="8.0 pt"; \
+  SpBefore="12.0 pt"; \
+  TabStop='0.5",1.0",1.5",2.0",2.5",3.0"'
+
+
+################ List paragraph formats ###################
+
+!targetobject "Para"; "l0_ListBody"; "b0_Body"; \
+  BlockSize=3; \
+  FIndent='0.7"'; \
+  LIndent='0.7"'; \
+  SpAfter="14.0 pt"; \
+  SpBefore="14.0 pt"; \
+  TabStop='0.7"'
+
+!targetobject "Para"; "l1_ListBody"; "l0_ListBody"; \
+  FIndent='1.0"'; \
+  FontSize="12.0 pt"; \
+  LIndent='1.2"'; \
+  SpAfter="0.0 pt"; \
+  SpBefore="6.0 pt"; \
+  TabStop='1.2"'
+
+!targetobject "Para"; "l2_ListBody"; "l1_ListBody"; \
+  FIndent='1.5"'; \
+  LIndent='1.7"'; \
+  TabStop='1.7"'
+
+!targetobject "Para"; "u0_Unordered"; "b0_Body"; \
+  AutoNum=Yes; \
+  BlockSize=3; \
+  FontFamily=Helvetica; \
+  LIndent='0.7"'; \
+  NumAtEnd=0; \
+  NumFormat='\xa5 \\t'; \
+  NumberFont="Bullet Symbol"; \
+  SpAfter="14.0 pt"; \
+  SpBefore="14.0 pt"; \
+  TabStop='0.7"'
+
+!targetobject "Para"; "u1_Unordered"; "u0_Unordered"; \
+  FIndent='1.0"'; \
+  FontFamily=Times; \
+  LIndent='1.2"'; \
+  SpAfter="6.0 pt"; \
+  SpBefore="6.0 pt"; \
+  TabStop='1.2"'
+
+!targetobject "Para"; "u2_Unordered"; "u1_Unordered"; \
+  FIndent='1.5"'; \
+  LIndent='1.7"'; \
+  SpAfter="14.0 pt"; \
+  SpBefore="14.0 pt"; \
+  TabStop='1.7"'
+
+!targetobject "Para"; "oi0_OrderedInit"; "u0_Unordered"; \
+  NumFormat='L:<n=1\>.\\t'; \
+  NumberFont=Bold; \
+  TabStop='0.8"'
+
+!targetobject "Para"; "oi1_OrderedInit"; "oi0_OrderedInit"; \
+  FIndent='1.0"'; \
+  FontFamily=Times; \
+  FontSize="12.0 pt"; \
+  LIndent='1.2"'; \
+  NumFormat='M:<n=1\>.\\t'; \
+  NumberFont=""; \
+  SpAfter="0.0 pt"; \
+  SpBefore="6.0 pt"; \
+  TabStop='1.2"'
+
+!targetobject "Para"; "oi2_OrderedInit"; "oi1_OrderedInit"; \
+  FIndent='1.5"'; \
+  LIndent='1.7"'; \
+  NumFormat='N:<n=1\>.\\t'; \
+  TabStop='1.7"'
+
+!targetobject "Para"; "on0_OrderedNext"; "oi0_OrderedInit"; \
+  NumFormat='L:<n+\>.\\t'
+
+!targetobject "Para"; "on1_OrderedNext"; "oi1_OrderedInit"; \
+  NumFormat='M:<n+\>.\\t'
+
+!targetobject "Para"; "on2_OrderedNext"; "oi2_OrderedInit"; \
+  NumFormat='N:<n+\>.\\t'
+
+!targetobject "Para"; "s0_SimpleList"; "l0_ListBody"; \
+  FontFamily=Helvetica
+
+!targetobject "Para"; "s1_SimpleList"; "l1_ListBody"; \
+  FIndent='1.2"'; \
+  FontSize="24.0 pt"; \
+  SpAfter="6.0 pt"
+
+!targetobject "Para"; "s2_SimpleList"; "l2_ListBody"; \
+  FIndent='1.7"'; \
+  FontSize="24.0 pt"; \
+  SpAfter="14.0 pt"; \
+  SpBefore="14.0 pt"
+
+
+################ Figure/table paragraph formats ###################
+
+!targetobject "Para"; "CellBody"; "b0_Body"; \
+  FIndent='0.0"'; \
+  FontSize="18.0 pt"; \
+  Hyphenate=0; \
+  LIndent='0.0"'; \
+  Leading="4.0 pt"; \
+  SpAfter="0.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop=""
+
+!targetobject "Para"; "CellHeading"; "CellGroup"; \
+  Alignment=Left; \
+  AutoNum=0; \
+  BlockSize=2; \
+  BotSepAtIndent=0; \
+  BotSepOffset='0.0"'; \
+  BotSeparator=""; \
+  CellAlignment=Top; \
+  CellBMarginFixed=0; \
+  CellLMarginFixed=0; \
+  CellMargins="0.0 pt 0.0 pt 0.0 pt 0.0 pt"; \
+  CellRMarginFixed=0; \
+  CellTMarginFixed=0; \
+  FIndent='0.0"'; \
+  FIndentOffset='0.0"'; \
+  FIndentRelative=0; \
+  FontAngle=Regular; \
+  FontCase="FAsTyped"; \
+  FontChangeBar=0; \
+  FontColor=Black; \
+  FontDW="0.0%"; \
+  FontDX="0.0%"; \
+  FontDY="0.0%"; \
+  FontFamily=Times; \
+  FontLocked=0; \
+  FontOutline=0; \
+  FontOverline=0; \
+  FontPairKern=Yes; \
+  FontPosition="FNormal"; \
+  FontSeparation=0; \
+  FontShadow=0; \
+  FontSize="18.0 pt"; \
+  FontStrike=0; \
+  FontUnderlining="FNoUnderlining"; \
+  FontVar=Regular; \
+  FontWeight=Bold; \
+  HyphenMaxLines=2; \
+  HyphenMinPrefix=3; \
+  HyphenMinSuffix=3; \
+  HyphenMinWord=5; \
+  Hyphenate=0; \
+  LIndent='0.0"'; \
+  Language="UKEnglish"; \
+  Leading="4.0 pt"; \
+  LetterSpace=0; \
+  LineSpacing=Fixed; \
+  Locked=0; \
+  MaxWordSpace=110; \
+  MinWordSpace=90; \
+  NextTag=""; \
+  OptWordSpace=100; \
+  Placement=Anywhere; \
+  PlacementStyle=Normal; \
+  RIndent='0.0"'; \
+  RunInDefaultPunct=". "; \
+  SpAfter="0.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop=""; \
+  TopSepAtIndent=0; \
+  TopSepOffset='0.0"'; \
+  TopSeparator=""; \
+  UseNextTag=0; \
+  WithNext=0; \
+  WithPrev=0
+
+!targetobject "Para"; "ft_FigureTitle"; "b0_Body"; \
+  Alignment=Center; \
+  AutoNum=Yes; \
+  BotSeparator="Table Rule"; \
+  FIndent='0.0"'; \
+  FontSize="10.0 pt"; \
+  Hyphenate=0; \
+  LIndent='0.0"'; \
+  Leading="0.0 pt"; \
+  NumAtEnd=0; \
+  NumFormat='F:Figure <n+\>. '; \
+  NumberFont=Bold; \
+  SpAfter="16.0 pt"; \
+  TabStop=""
+
+!targetobject "Para"; "tf_TableFootnote"; "ta_TableAnchor"; \
+  Alignment=Left; \
+  AutoNum=0; \
+  BlockSize=1; \
+  BotSepAtIndent=0; \
+  BotSepOffset='0.0"'; \
+  BotSeparator=""; \
+  CellAlignment=Top; \
+  CellBMarginFixed=0; \
+  CellLMarginFixed=0; \
+  CellMargins="0.0 pt 0.0 pt 0.0 pt 0.0 pt"; \
+  CellRMarginFixed=0; \
+  CellTMarginFixed=0; \
+  FIndent='0.6"'; \
+  FIndentOffset='0.0"'; \
+  FIndentRelative=0; \
+  FontAngle=Regular; \
+  FontCase="FAsTyped"; \
+  FontChangeBar=0; \
+  FontColor=Black; \
+  FontDW="0.0%"; \
+  FontDX="0.0%"; \
+  FontDY="0.0%"; \
+  FontFamily=Times; \
+  FontLocked=0; \
+  FontOutline=0; \
+  FontOverline=0; \
+  FontPairKern=Yes; \
+  FontPosition="FNormal"; \
+  FontSeparation=0; \
+  FontShadow=0; \
+  FontSize="10.0 pt"; \
+  FontStrike=0; \
+  FontUnderlining="FNoUnderlining"; \
+  FontVar=Regular; \
+  FontWeight=Regular; \
+  HyphenMaxLines=2; \
+  HyphenMinPrefix=3; \
+  HyphenMinSuffix=3; \
+  HyphenMinWord=5; \
+  Hyphenate=Yes; \
+  LIndent='0.6"'; \
+  Language="UKEnglish"; \
+  Leading="2.0 pt"; \
+  LetterSpace=0; \
+  LineSpacing=Fixed; \
+  Locked=0; \
+  MaxWordSpace=110; \
+  MinWordSpace=90; \
+  NextTag=""; \
+  OptWordSpace=100; \
+  Placement=Anywhere; \
+  PlacementStyle=Normal; \
+  RIndent='0.25"'; \
+  RunInDefaultPunct=". "; \
+  SpAfter="0.0 pt"; \
+  SpBefore="3.0 pt"; \
+  TabStop=""; \
+  TopSepAtIndent=0; \
+  TopSepOffset='0.0"'; \
+  TopSeparator=""; \
+  UseNextTag=0; \
+  WithNext=0; \
+  WithPrev=0
+
+!targetobject "Para"; "tt_TableTitle"; "b0_Body"; \
+  AutoNum=Yes; \
+  FIndent='0.6"'; \
+  FontSize="11.0 pt"; \
+  Hyphenate=0; \
+  LIndent='1.2"'; \
+  NumAtEnd=0; \
+  NumFormat='T:TABLE <n+\>. '; \
+  SpAfter="0.0 pt"; \
+  SpBefore="11.0 pt"; \
+  TabStop=""
+
+
+################ Miscellaneous paragraph formats ###################
+
+!targetobject "Para"; "e0_Example"; "b0_Body"; \
+  FontFamily=Courier; \
+  FontPairKern=0; \
+  FontSize="18.0 pt"; \
+  Hyphenate=0; \
+  Language="NoLanguage"; \
+  Leading="0.0 pt"; \
+  MaxWordSpace=100; \
+  MinWordSpace=100; \
+  SpAfter="0.0 pt"; \
+  SpBefore="0.0 pt"
+
+!targetobject "Para"; "et_ExampleTitle"; "b0_Body"; \
+  AutoNum=Yes; \
+  BotSeparator="Table Rule"; \
+  FIndent='0.6"'; \
+  FontSize="11.0 pt"; \
+  Hyphenate=0; \
+  LIndent='0.6"'; \
+  Leading="0.0 pt"; \
+  NumAtEnd=0; \
+  NumFormat='E:Example <n+\>. '; \
+  NumberFont=Bold; \
+  SpAfter="18.0 pt"; \
+  SpBefore="13.0 pt"; \
+  TabStop=""
+
+!targetobject "Para"; "gl_Glossary"; "b0_Body"; \
+  FontFamily=Helvetica; \
+  FontSize="10.0 pt"; \
+  LIndent='1.5"'; \
+  SpAfter="2.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop='1.5"'
+
+!targetobject "Para"; "si_StepInit"; "oi0_OrderedInit"; \
+  FontFamily=Times; \
+  FontSize="12.0 pt"; \
+  NumFormat='S:<n=1\>.\\t'; \
+  SpAfter="0.0 pt"; \
+  SpBefore="6.0 pt"; \
+  TabStop='0.7"'
+
+!targetobject "Para"; "sn_StepNext"; "si_StepInit"; \
+  NumFormat='S:<n+\>.\\t'
+
+!targetobject "Para"; "st_StepTitle"; "sn_StepNext"; \
+  AutoNum=0; \
+  FontWeight=Bold; \
+  NumAtEnd=""; \
+  NumFormat=""; \
+  NumberFont=""
+
+
+################ Cover page & title block paragraph formats ###################
+
+!targetobject "Para"; "da_DocAction"; "b0_Body"; \
+  FontSize="14.0 pt"; \
+  FontWeight=Bold; \
+  SpAfter="10.0 pt"; \
+  SpBefore="20.0 pt"; \
+  TabStop=""
+
+!targetobject "Para"; "dc_DocCode"; "da_DocAction"; \
+  Alignment=Center; \
+  AutoNum=Yes; \
+  FontSize="18.0 pt"; \
+  NumAtEnd=0; \
+  NumFormat="Document No: "; \
+  SpAfter="200.0 pt"; \
+  SpBefore="40.0 pt"
+
+!targetobject "Para"; "dn_DocName"; "dk_DocSkip"; \
+  Alignment=Center; \
+  AutoNum=0; \
+  BlockSize=2; \
+  BotSepAtIndent=0; \
+  BotSepOffset='0.0"'; \
+  BotSeparator=""; \
+  CellAlignment=Top; \
+  CellBMarginFixed=0; \
+  CellLMarginFixed=0; \
+  CellMargins="0.0 pt 0.0 pt 0.0 pt 0.0 pt"; \
+  CellRMarginFixed=0; \
+  CellTMarginFixed=0; \
+  FIndent='0.5"'; \
+  FIndentOffset='0.0"'; \
+  FIndentRelative=0; \
+  FontAngle=Regular; \
+  FontCase="FAsTyped"; \
+  FontChangeBar=0; \
+  FontColor=Black; \
+  FontDW="0.0%"; \
+  FontDX="0.0%"; \
+  FontDY="0.0%"; \
+  FontFamily=Helvetica; \
+  FontLocked=0; \
+  FontOutline=0; \
+  FontOverline=0; \
+  FontPairKern=Yes; \
+  FontPosition="FNormal"; \
+  FontSeparation=0; \
+  FontShadow=0; \
+  FontSize="18.0 pt"; \
+  FontStrike=0; \
+  FontUnderlining="FNoUnderlining"; \
+  FontVar=Regular; \
+  FontWeight=Bold; \
+  HyphenMaxLines=2; \
+  HyphenMinPrefix=3; \
+  HyphenMinSuffix=3; \
+  HyphenMinWord=5; \
+  Hyphenate=Yes; \
+  LIndent='0.5"'; \
+  Language="UKEnglish"; \
+  Leading="2.0 pt"; \
+  LetterSpace=0; \
+  LineSpacing=Fixed; \
+  Locked=0; \
+  MaxWordSpace=110; \
+  MinWordSpace=90; \
+  NextTag=""; \
+  OptWordSpace=100; \
+  Placement=Anywhere; \
+  PlacementStyle=Normal; \
+  RIndent='0.0"'; \
+  RunInDefaultPunct=". "; \
+  SpAfter="80.0 pt"; \
+  SpBefore="20.0 pt"; \
+  TabStop='0.5",1.0",1.5",2.0",2.5",3.0",3.5"'; \
+  TopSepAtIndent=0; \
+  TopSepOffset='0.0"'; \
+  TopSeparator=""; \
+  UseNextTag=0; \
+  WithNext=0; \
+  WithPrev=0
+
+!targetobject "Para"; "dp_DocProject"; "dn_DocName"; \
+  FontFamily=Times; \
+  SpAfter="40.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop=""
+
+!targetobject "Para"; "ds_DocStatus"; "dp_DocProject"; \
+  SpAfter="20.0 pt"; \
+  SpBefore="20.0 pt"
+
+!targetobject "Para"; "dt_DocType"; "ds_DocStatus"; \
+  SpAfter="6.0 pt"; \
+  SpBefore="12.0 pt"
+
+!targetobject "Para"; "du_DocAuthor"; "dt_DocType"; \
+  FontAngle=Italic; \
+  FontWeight=Regular; \
+  SpAfter="40.0 pt"; \
+  SpBefore="40.0 pt"
+
+!targetobject "Para"; "dw_DocWho"; "du_DocAuthor"; \
+  Alignment=Left; \
+  AutoNum=Yes; \
+  FIndent='1.0"'; \
+  FontAngle=Regular; \
+  FontSize="12.0 pt"; \
+  FontWeight=Bold; \
+  LIndent='1.0"'; \
+  NumAtEnd=Yes; \
+  NumFormat="............................ ...................."; \
+  SpAfter="10.0 pt"; \
+  SpBefore="10.0 pt"; \
+  TabStop='2.0"'
+
+!targetobject "Para"; "dg_DocGeneral"; "b0_Body"; \
+  Alignment=Center; \
+  FIndent='1.0"'; \
+  FontSize="14.0 pt"; \
+  LIndent='1.0"'; \
+  SpAfter="15.0 pt"; \
+  SpBefore="15.0 pt"; \
+  TabStop='2.0"'
+
+!targetobject "Para"; "dg_DocText"; "dg_DocGeneral"; \
+  FIndent='0.5"'; \
+  FontFamily=Helvetica; \
+  LIndent='0.5"'; \
+  TabStop='0.5",1.0",1.5",2.0",2.5",3.0",3.5"'
+
+!targetobject "Para"; "j2_Heading"; "dg_DocText"; \
+  Alignment=Right; \
+  Hyphenate=0; \
+  SpAfter="8.0 pt"; \
+  SpBefore="32.0 pt"; \
+  TabStop='1.5"'; \
+  WithNext=Yes
+
+# This definition currently causes problems as SDF's escaping
+# mechanisms cannot yet handle the embedded ] in the NumFormat attribute
+#!targetobject "Para"; "re_Reference"; "j2_Heading"; \
+#  Alignment=Left; \
+#  AutoNum=Yes; \
+#  FontSize="10.0 pt"; \
+#  LIndent='1.0"'; \
+#  NumAtEnd=0; \
+#  NumFormat='R:[<n+\>]\\t'; \
+#  SpBefore="8.0 pt"; \
+#  TabStop='1.0",1.5",2.0",2.5",3.0"'; \
+#  WithNext=0
+
+!targetobject "Para"; "t3_TableRow"; "b0_Body"; \
+  FontFamily=Helvetica; \
+  FontSize="18.0 pt"; \
+  LIndent='2.5"'; \
+  SpAfter="2.0 pt"; \
+  SpBefore="0.0 pt"; \
+  TabStop='2.5",3.5",4.5",5.5"'
+
+!targetobject "Para"; "tg_TableGroup"; "t3_TableRow"; \
+  FontWeight=Bold; \
+  LIndent='1.5"'; \
+  Leading="4.0 pt"; \
+  SpAfter="4.0 pt"; \
+  TabStop='1.5",2.5",3.5",4.5",5.5"'
+
+!targetobject "Para"; "th_TableHeader"; "tg_TableGroup"; \
+  FontUnderlining="FSingle"; \
+  LIndent='0.5"'; \
+  Leading="2.0 pt"; \
+  SpAfter="6.0 pt"; \
+  SpBefore="14.0 pt"; \
+  TabStop='2.5",3.5",4.5",5.5"'; \
+  WithNext=Yes
+
+!targetobject "Para"; "xt_ExerciseTitle"; "th_TableHeader"; \
+  AutoNum=Yes; \
+  FIndent='0.0"'; \
+  FontUnderlining="FNoUnderlining"; \
+  FontWeight=Regular; \
+  Hyphenate=0; \
+  NumAtEnd=0; \
+  NumFormat='X:Exercise <n+\>.\\t'; \
+  NumberFont=Normal; \
+  Placement="RPageTop"; \
+  SpAfter="8.0 pt"; \
+  SpBefore="32.0 pt"; \
+  TabStop='1.25"'
+
+!targetobject "Para"; "xt_Extract"; "b0_Body"; \
+  FIndent='1.0"'; \
+  FontAngle=Italic; \
+  LIndent='1.0"'; \
+  RIndent='1.0"'; \
+  SpAfter="14.0 pt"; \
+  SpBefore="14.0 pt"
+
+
+################ Phrase formats ###################
+
+# Define the root 'Phrase' format
+!targetobject "Phrase"; "Emphasis";; \
+  Angle=Italic; \
+  Locked=0; \
+  PairKern=Yes
+
+
+# Define the other 'Phrase' formats
+!targetobject "Phrase"; "Bold"; "Emphasis"; \
+  Angle=""; \
+  ChangeBar=0; \
+  Color=Black; \
+  DW="0.0%"; \
+  Overline=0; \
+  Position="FNormal"; \
+  Separation=0; \
+  Strike=0; \
+  Weight=Bold
+
+!targetobject "Phrase"; "Bold 9 pt"; "Bold"; \
+  Angle=Regular; \
+  Size="9.0 pt"
+
+!targetobject "Phrase"; "Bold helvetica"; "Bold 9 pt"; \
+  Size="12.0 pt"
+
+!targetobject "Phrase"; "Bold italic"; "Bold helvetica"; \
+  Angle=Italic; \
+  Size="11.0 pt"; \
+  Weight=Regular
+
+!targetobject "Phrase"; "Bullet Symbol"; "Bold italic"; \
+  Angle=Regular; \
+  Outline=0; \
+  Shadow=0; \
+  Size="12.0 pt"; \
+  Weight=Bold
+
+!targetobject "Phrase"; "Callout"; "Bullet Symbol"; \
+  Size="10.0 pt"; \
+  Weight=Regular
+
+!targetobject "Phrase"; "DiagramBold"; "Callout"; \
+  Outline=""; \
+  Shadow=""; \
+  Size="11.0 pt"; \
+  Underlining="FNoUnderlining"; \
+  Weight=Bold
+
+!targetobject "Phrase"; "DiagramStd"; "DiagramBold"; \
+  Weight=Regular
+
+!targetobject "Phrase"; "Emphasis 9 pt"; "Emphasis"; \
+  ChangeBar=0; \
+  Color=Black; \
+  DW="0.0%"; \
+  Overline=0; \
+  Position="FNormal"; \
+  Separation=0; \
+  Size="9.0 pt"; \
+  Strike=0; \
+  Weight=Regular
+
+!targetobject "Phrase"; "EquationVariables"; "Emphasis"; \
+  PairKern=""
+
+!targetobject "Phrase"; "Italic"; "Emphasis"
+
+!targetobject "Phrase"; "Reference document"; "Emphasis"; \
+  ChangeBar=0; \
+  Color=Black; \
+  DW="0.0%"; \
+  Overline=0; \
+  Position="FNormal"; \
+  Separation=0; \
+  Size="11.5 pt"; \
+  Strike=0; \
+  Weight=Regular
+
+!targetobject "Phrase"; "Run-In Heading"; "Reference document"; \
+  Angle=Regular; \
+  Outline=0; \
+  Shadow=0; \
+  Size="11.0 pt"; \
+  Weight=Bold
+
+!targetobject "Phrase"; "Subscript"; "Emphasis"; \
+  Angle=""; \
+  Position="FSubscript"
+
+!targetobject "Phrase"; "Superscript"; "Subscript"; \
+  Position="FSuperscript"
+
+!targetobject "Phrase"; "Symbol"; "Superscript"; \
+  Angle=Regular; \
+  ChangeBar=0; \
+  Color=Black; \
+  DW="0.0%"; \
+  Overline=0; \
+  Position="FNormal"; \
+  Separation=0; \
+  Size="11.0 pt"; \
+  Strike=0; \
+  Weight=Regular
+
+!targetobject "Phrase"; "Fixed"; "Underline"; \
+  Size="12.0 pt"; \
+  Underlining="FNoUnderlining"
+
+!targetobject "Phrase"; "Normal"; "Fixed"; \
+  Size=""
+
+
+################ Table formats ###################
+
+# Define the root 'Table' format
+!targetobject "Table"; "Format A";; \
+  Alignment=Left; \
+  AltShadePeriod=2; \
+  BRuling=""; \
+  BlockSize=2; \
+  BodyColor=Black; \
+  BodyFill=15; \
+  BodyRowRuling=""; \
+  BodySeparation=0; \
+  CellMargins="6.0 pt 4.0 pt 6.0 pt 2.0 pt"; \
+  ColumnRuling=""; \
+  HFColor=Black; \
+  HFFill=15; \
+  HFRowRuling=""; \
+  HFSeparation=0; \
+  InitNumBodyRows=3; \
+  InitNumColumns=3; \
+  InitNumFRows=0; \
+  InitNumHRows=1; \
+  LIndent='0.117"'; \
+  LRuling=""; \
+  LastBRuling=0; \
+  Locked=0; \
+  NumByColumn=0; \
+  Placement=Anywhere; \
+  RIndent='0.0"'; \
+  RRuling=""; \
+  RulingPeriod=4; \
+  SeparatorRuling=""; \
+  ShadeByColumn=0; \
+  ShadePeriod=2; \
+  SpAfter="2.0 pt"; \
+  SpBefore="12.0 pt"; \
+  TRuling=Thin; \
+  TitleGap="3.0 pt"; \
+  TitlePlacement="InHeader"; \
+  XColor=Black; \
+  XColumnNum=1; \
+  XColumnRuling=""; \
+  XFill=15; \
+  XRowRuling=""; \
+  XSeparation=0
+
+
+# Define the other 'Table' formats
+!targetobject "Table"; "Columns"; "Box"; \
+  Alignment=Left; \
+  AltShadePeriod=2; \
+  BRuling="Very Thin"; \
+  BlockSize=4; \
+  BodyColor=Black; \
+  BodyFill=15; \
+  BodyRowRuling=""; \
+  BodySeparation=0; \
+  CellMargins="6.0 pt 4.0 pt 6.0 pt 2.0 pt"; \
+  ColumnRuling="Very Thin"; \
+  HFColor=Black; \
+  HFFill=15; \
+  HFRowRuling=""; \
+  HFSeparation=0; \
+  InitNumBodyRows=5; \
+  InitNumColumns=3; \
+  InitNumFRows=0; \
+  InitNumHRows=1; \
+  LIndent='0.5"'; \
+  LRuling="Very Thin"; \
+  LastBRuling=0; \
+  Locked=0; \
+  NumByColumn=0; \
+  Placement=Anywhere; \
+  RIndent='0.0"'; \
+  RRuling="Very Thin"; \
+  RulingPeriod=4; \
+  SeparatorRuling="Very Thin"; \
+  ShadeByColumn=0; \
+  ShadePeriod=2; \
+  SpAfter="2.0 pt"; \
+  SpBefore="4.0 pt"; \
+  TRuling="Very Thin"; \
+  TitleGap="3.0 pt"; \
+  TitlePlacement=None; \
+  XColor=Black; \
+  XColumnNum=1; \
+  XColumnRuling="Very Thin"; \
+  XFill=15; \
+  XRowRuling=""; \
+  XSeparation=0
+
+!targetobject "Table"; "Format B"; "Format A"; \
+  SpBefore="4.0 pt"; \
+  TRuling=""; \
+  TitlePlacement=None
+
+!targetobject "Table"; "Format IC1"; "Format A"; \
+  BRuling=Medium; \
+  BodyRowRuling="Very Thin"; \
+  InitNumBodyRows=14; \
+  InitNumColumns=2; \
+  LIndent='0.55"'; \
+  LRuling=Thin; \
+  LastBRuling=Yes; \
+  RRuling=Thin; \
+  SeparatorRuling=Medium; \
+  TRuling=Medium; \
+  XColumnRuling=Thin; \
+  XRowRuling="Very Thin"
+
+!targetobject "Table"; "Grid"; "Format IC1"; \
+  BRuling="Very Thin"; \
+  BlockSize=4; \
+  ColumnRuling="Very Thin"; \
+  InitNumBodyRows=5; \
+  InitNumColumns=3; \
+  LIndent='0.5"'; \
+  LRuling="Very Thin"; \
+  LastBRuling=0; \
+  RRuling="Very Thin"; \
+  SeparatorRuling=Double; \
+  SpBefore="4.0 pt"; \
+  TRuling="Very Thin"; \
+  TitlePlacement=None; \
+  XColumnRuling="Very Thin"
+
+!targetobject "Table"; "Plain"; "Format A"; \
+  BRuling="Very Thin"; \
+  BlockSize=4; \
+  InitNumBodyRows=5; \
+  LIndent='0.5"'; \
+  SeparatorRuling="Very Thin"; \
+  SpBefore="4.0 pt"; \
+  TRuling="Very Thin"; \
+  TitlePlacement=None
+
+!targetobject "Table"; "Rows"; "Plain"; \
+  BodyRowRuling="Very Thin"; \
+  SeparatorRuling=Thin; \
+  XRowRuling="Very Thin"
+
+!targetobject "Table"; "Shade"; "Rows"; \
+  BodyRowRuling=""; \
+  ColumnRuling="Very Thin"; \
+  HFFill=5; \
+  LRuling="Very Thin"; \
+  RRuling="Very Thin"; \
+  SeparatorRuling="Very Thin"; \
+  XColumnRuling="Very Thin"; \
+  XRowRuling=""
+
+!targetobject "Table"; "Shade1"; "Shade"; \
+  AltShadePeriod=1; \
+  ShadePeriod=1; \
+  XFill=6
+
+!targetobject "Table"; "Shade2"; "Shade1"; \
+  BRuling=Thin; \
+  ColumnRuling=Thin; \
+  HFFill=4; \
+  LRuling=Thin; \
+  RRuling=Thin; \
+  SeparatorRuling=Thin; \
+  TRuling=Thin; \
+  XColumnRuling=Thin; \
+  XFill=5
+

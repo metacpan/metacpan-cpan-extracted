@@ -1,0 +1,5 @@
+#compiling jp.java
+javac jp.java
+
+#compiling native code
+g++ -G -I../cpp -I/usr/local/java/include -I/usr/local/java/include/solaris -o ../bin/libjperl.so ../cpp/jperl.c jp.c `perl -MExtUtils::Embed -e ccopts -e ldopts`

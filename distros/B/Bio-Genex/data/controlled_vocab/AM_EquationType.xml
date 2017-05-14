@@ -1,0 +1,26 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary   db_table="ArrayMeasurement" db_column="equation_type" cv_table="AM_EquationType">
+  <comment type="definition">Information required in the Array Measurement Table, used to describe the manipulation of the raw data"	
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They regulate
+the 'equation' box.</comment>
+<term name="user_defined_symbolic"
+        description="is explicitly written by the data provider"/>
+<term name="background_correction_method"
+        description="the method used for subtracting the background
+from the raw data"/>
+<term name="proprietary"
+        description="an unreleased algorithm such as used by Affymetrix"/>
+<term name="genex_predefined"
+        description="is an equation explicitly supported by NCGR"/>
+<term name="user_defined_free_text"
+        description="is explicitly written by the data provider"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

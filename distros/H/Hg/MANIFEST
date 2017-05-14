@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Hg.pm
+lib/Hg/Repository.pm
+lib/Hg/Revision.pm
+t/10_hg_repository.t
+t/20_hg_revision.t

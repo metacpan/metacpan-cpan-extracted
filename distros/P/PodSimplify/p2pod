@@ -1,0 +1,183 @@
+#!/usr/bin/perl -I.
+
+use Pod::Simplify;
+
+$x = new Pod::Simplify;
+
+$col=0;
+$lmargin=0;
+$width = 75;
+
+$canwrap = 0;
+sub output_flow {
+	my(@out) = @_;
+	if($col<$lmargin) {
+		print " " x ($lmargin-$col);
+		$col=$lmargin;
+	}
+	foreach(@out) {
+		next if !length;
+		if($canwrap and (length($_) + $col) > $width) {
+			print "\n";
+			print " " x $lmargin;
+			$col = $lmargin;
+		}
+		$canwrap = (substr($_,-1,1) eq " ");
+		$col += length($_);
+		print $_;
+	}
+}
+
+sub output_verb {
+	my($text,$indent) = @_;
+	if( $col < $indent ) {
+		print " " x ($indent-$col);
+		$col=$indent;
+	}
+	$text =~ s/\n/ "\n" .(" " x $indent)/ges;
+	$text =~ s/ +$//;
+	print $text;
+	$col = length($text)-rindex($text,"\n")-1;
+}
+
+sub flowed {
+	my($out);
+	foreach $i (@_) {
+		if(ref $i eq "ARRAY") {
+			my(@i) = (@$i);
+			my($c) = shift @i;
+			
+			if($c eq "X" or $c eq "R") {
+				output_flow("$c<");
+				flowed(@{$i[0]});
+				unless( @i == 2 and @{$i[1]} == 1 and $i[1]->[0] eq $i[0]->[0]) {
+					foreach (@i[1..$#i]) {
+						output_flow(";".join("/",grep((s/([;\/\\])/\\$1/g,1),@$_)));
+					}
+				}
+				output_flow(">");
+			} else {
+				output_flow("$c<");
+				flowed(@i);
+				output_flow(">");
+			}			
+		} else {
+			$i =~ s/([<>])/'E<' . $Pod::Simplify::ASCII2Escape{$1} . '>'/ge;
+			output_flow(split(/(\S+\s*)/,$i));
+		}
+	}
+}
+
+@listtype=();
+
+$idx=0;
+
+sub doindex {
+	foreach (@_) {
+		if(ref $_ eq "ARRAY") {
+			my(@i) = @$_;
+			my($i) = shift @i;
+			if( $i eq "X") {
+				shift @i; # discard printable block
+				$idx++;
+				$name = join("/",@{$i[0]});
+				$name =~ s/([^A-Za-z0-9_])/ "%".sprintf("%.2X",ord($1)) /ge;
+				foreach (@i) {
+					$idx{join("/",@$_)} = [$name,$idx,"perlvar.pod"];
+				}
+				#print "Index: ",Pod::Simplify::dumpout([@i]),"\n";
+			} else {
+				doindex(@i);
+			}
+		}
+	}
+}
+
+sub end_paragraph {
+	print "\n\n";
+	$col=0;
+}
+
+sub dump2 {
+	my($par,$line,$pos,$cmd,$var1,$var2) = @_;
+	
+	if( $cmd eq "begin" ) {
+		if($var1 eq "list") {
+			output_flow("=begin list ".$var1->[0]);
+		}
+		elsif($var1 eq "pod") {
+			$file = $var2->[1];
+			output_flow("=begin pod");
+		}
+		elsif($var1 eq "file") {
+			# Don't output actual file block
+			output_flow("=comment Beginning of file $var2");
+		}
+		else {
+			output_flow("=begin $var1 $var2");
+		}
+		end_paragraph;
+	}
+	elsif( $cmd eq "end" ) {
+		if($var1 eq "list") {
+			output_flow("=end list");
+			end_paragraph;
+		}
+		elsif($var1 eq "pod") {
+			output_flow("=end pod");
+			end_paragraph;
+		}
+		elsif($var1 eq "file") {
+			# Don't output actual file block
+			output_flow("=comment End of file $var2");
+			end_paragraph;
+		}
+		else {
+			output_flow("=end $var1 $var2");
+			end_paragraph;
+		}
+	}
+	elsif( $cmd eq "item") {
+		output_flow("=item ");
+		if($var1->[0] eq "bullet") {
+			output_flow( "* " );
+		} elsif($var1->[0] eq "number") {
+			output_flow( $var1->[1] . ". ");
+		}
+		flowed( @$var2 );
+		end_paragraph;
+	}
+	elsif( $cmd eq "head") {
+		output_flow("=head$var1 ");
+		flowed(@$var2);
+		end_paragraph;
+	}
+	elsif( $cmd eq "verb") {
+		$var1 =~ s/^/\t/mg;
+		#output_verb($var1."\n\n",$lmargin+8);
+		print $var1;
+		end_paragraph;
+	}
+	elsif( $cmd eq "flow") {
+		flowed(@$var2);
+		end_paragraph;
+	}
+	elsif( $cmd eq "index") {
+		output_flow("=index ");
+		end_paragraph;
+	}
+	elsif( $cmd eq "comment") {
+		output_flow("=comment ");
+		print $var1;
+		end_paragraph;
+	}
+	elsif( $cmd eq "warn" ) {
+		output_flow("=comment Warning near line $line of $file: $var1");
+		end_paragraph;
+	} else {
+		output_flow("=comment pod2text error near line $line of $file:\n\tUnknown parsed command `$cmd'");
+		end_paragraph;
+	}
+}
+
+$x->parse_from_file_by_name($ARGV[0] || "pod/perlvar.pod",\&dump2);

@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+use strict; use warnings;
+use feature 'say';
+
+use Pod::Usage;
+use Getopt::Long;
+use feature 'say';
+use App::AFNI::SiemensPhysio;
+
+=head1 NAME
+
+siemphysdat - chop Siemens Physiologic Monitoring Unit (PMU) physio files to MR timing for AFNI's retroTS
+
+
+=head1 SYNOPSIS
+
+
+ siemphysdat [options] phsyiofile1 physiofile2 MRdir/
+
+Options:
+
+  -s [alt+z],alt-z,seq+z,               # slice order
+     seq-z,filename 
+
+  -o prefix                             # where to save files,
+                                        # trailing slash are important
+
+  -r [matlab]|McRetroTs|                # retoTS method
+     show    | none 
+
+  -t [none],MR,Phys,all                 # trust times&samplerate
+                                        # dont compare to index count
+
+
+C<-r none> is useful if you only want the *dat files
+
+C<-t MR> is useful for testing against data/
+
+C<-t Phys> is useful for forcing a sampling rate
+
+=head1 OUTPUT
+
+=over
+
+=item C<*dat> 
+
+chopped volrage meassurements with triggers removed, 
+
+=item C<*slibase.1D> 
+
+RVT from AFNI's RetroTS ready for C<afni_proc.py> or C<3dretroicor>
+
+=back
+
+
+
+=head1 DESCRIPTION
+
+=begin html
+
+<img src="https://raw.githubusercontent.com/LabNeuroCogDevel/siemphysdat/master/icon.png"></img>
+
+=end html
+
+B<siemphysdat> will chop two physio files given timing of DICOMS in MRdir and save in a format RetroTS.m likes.
+
+
+=head2 SEE ALSO
+
+App::AFNI::SiemensPhysio
+
+=cut
+
+
+
+
+# read in arguments
+my $type      ='matlab';
+my $oprefix   ='';
+my $sliceOrder='alt+z';
+my $trustIdx='none';
+
+GetOptions('retrotype:s'=>\$type, 
+           'oprefix:s'=>\$oprefix,
+           'sliceOrder:s'=>\$sliceOrder,
+           'trustIdx:s'=>\$trustIdx,
+           ) or pod2usage(1);
+
+# now that we've removed the options
+# check for inputs
+pod2usage(1) if $#ARGV<2;
+for (@ARGV) { die "cannot read  '$_', should be physio file or MR dir:" if ! -r $_ }
+my ($pfile1,$pfile2,@MRs) = @ARGV;
+
+
+# intialize object
+my $p = App::AFNI::SiemensPhysio->new({
+          VERB=>1,
+          sliceOrder=>$sliceOrder, 
+          prefix=>$oprefix, 
+          trustIdx=>$trustIdx
+});
+
+# read in MR
+if ( -d $MRs[0] ){
+   $p->readMRdir($MRs[0]);
+   warn "only using first MR directory ($MRs[0])"  if $#MRs>0;
+} else {
+   die "using MRfiles is not implemented!\nln -s the files into a directory and use that";
+}
+
+# read in the physio files
+for(@ARGV[0..1]){
+   $p->readPhysio($_);
+   $p->writeMRPhys;
+}
+
+# get RVT
+$p->retroTS($type)
+

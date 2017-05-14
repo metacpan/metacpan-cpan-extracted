@@ -12,6 +12,12 @@ to STDERR.
 
 	perl script.pl file.xml
 
+- pretty.pl
+
+  Uses XML::Filter::Reindent and XML::Handler::Composer to 
+  pretty print your XML file.
+  These classes need some work so don't expect too much...
+
 - testCheckerParser.pl
 
   Uses XML::Checker::Parser to parse the file.

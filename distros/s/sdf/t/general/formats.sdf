@@ -1,0 +1,13 @@
+# This file tests variable/expression formatting
+
+#!define FORMAT_UPPER 'tr/a-z/A-Z/, $_'
+#!define FORMAT_LOWER 'tr/A-Z/a-z/, $_'
+#!define FORMAT_YEAR  '&FormatTime(\'$year\', $_)'
+
+!define abc 'Hello World'
+
+[[abc]] in uppercase is [[UPPER:abc]].
+
+[[abc]] in lowercase is [[LOWER:abc]].
+
+This file was last modified in [[YEAR:DOC_MODIFIED]].

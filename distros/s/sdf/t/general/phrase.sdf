@@ -1,0 +1,7 @@
+# This file tests object tagging
+
+Some text with an {{implicit}} style.
+
+Some text with an {{B: explicit}} style or {{U:two}}.
+
+Some text with an {{EX: example}} style or {{EX:   two}}.

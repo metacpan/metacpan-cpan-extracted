@@ -1,0 +1,29 @@
+<m:EntityDescriptor xmlns:m="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://auth.orange.fr"><m:IDPSSODescriptor WantAuthnRequestsSigned="false" errorURL="http://www.orange.fr/" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><m:KeyDescriptor use="signing"><ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>MIIE4TCCA8mgAwIBAgIBAjANBgkqhkiG9w0BAQQFADCBqzELMAkGA1UEBhMCRlIx
+DDAKBgNVBAgTA04vQTEQMA4GA1UEBxMHTGFubmlvbjEXMBUGA1UEChMORnJhbmNl
+IFRlbGVjb20xFDASBgNVBAsTC09yYW5nZSBMYWJzMRswGQYDVQQDExJBdXRoZW50
+aWNhdGlvbiBBUEkxMDAuBgkqhkiG9w0BCQEWIWdhZWwuZ291cm1lbGVuQG9yYW5n
+ZS1mdGdyb3VwLmNvbTAeFw0wODAyMjExMjA3MThaFw0xODAyMTgxMjA3MThaMIGr
+MQswCQYDVQQGEwJGUjEMMAoGA1UECBMDTi9BMRAwDgYDVQQHEwdMYW5uaW9uMRcw
+FQYDVQQKEw5GcmFuY2UgVGVsZWNvbTEUMBIGA1UECxMLT3JhbmdlIExhYnMxGzAZ
+BgNVBAMTEkF1dGhlbnRpY2F0aW9uIEFQSTEwMC4GCSqGSIb3DQEJARYhZ2FlbC5n
+b3VybWVsZW5Ab3JhbmdlLWZ0Z3JvdXAuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA4Qdfv/IlnrAfqr+41ya0WQWsDP6hFgfLNlfdFMQmqBtPrTcs
+Jy2gK3D7nSqfQCOOTasjr5XKlL4lBDD/iMZcHt+7MnCpPUMQtIDtUPnstHg8ZGct
+I8Bzazw7bnwcf9/itA+eBkI3ujaeUHLn/q139oO9+zt3wTgUR0ONU6hCEzb8igUB
+2d/I6rjELU/s1NYIfFbvxHhzd8+qFjlS/0OjxHZXVrZfxKwfK8zLbfh73Mrl+PvH
+kXhwy6Tl9qbrJgQsTstRhCjSue8LncclRih7Y52AMepZKr1dkS2VT8sdk+BFwu8X
+OIbhEEsZs/uSwCm65g7vLjQqBREdj+goDlAEgQIDAQABo4IBDDCCAQgwHQYDVR0O
+BBYEFA8kJ6TLJ/UF+rJ1eWXh8zBuiFLwMIHYBgNVHSMEgdAwgc2AFA8kJ6TLJ/UF
++rJ1eWXh8zBuiFLwoYGxpIGuMIGrMQswCQYDVQQGEwJGUjEMMAoGA1UECBMDTi9B
+MRAwDgYDVQQHEwdMYW5uaW9uMRcwFQYDVQQKEw5GcmFuY2UgVGVsZWNvbTEUMBIG
+A1UECxMLT3JhbmdlIExhYnMxGzAZBgNVBAMTEkF1dGhlbnRpY2F0aW9uIEFQSTEw
+MC4GCSqGSIb3DQEJARYhZ2FlbC5nb3VybWVsZW5Ab3JhbmdlLWZ0Z3JvdXAuY29t
+ggECMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEEBQADggEBACGAgPnND6en/Ye8
+50x6JSMu5d1Sd4EJFtWDoDdoiJGrJGbvrqM1beEFYdbZvafU+NtXf9mdy5dYwgsS
+JEY86jhAp63fqGaYXjMenAEsNXQVbhWFd3KEOCLA6mE1LuCbOMbSuwIePETLZjpZ
+lPgiBoWu3FTbk0q5/1lqMRllDElfpckOK2n8MsH6j53Hndw7E+M5f0XFRx8edZZU
+q6qBOguDFWbfBCY3Eh/odaL0L/mGpVXVGGdgTaX23Jc4yJilYX36nwuaZgGZvyfB
+XjFq+ValmkO1qXLHFgk9MKG7RpB4tr5BmmkxXLgL3ucR4L1o5JpFssXxgY7ZGv04
+XENoj7o=</ds:X509Certificate></ds:X509Data></ds:KeyInfo></m:KeyDescriptor><m:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://auth.orange.fr/managenameid" ResponseLocation="https://s-idp.liberty-iop.org:8881/IDP-JR"/><m:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</m:NameIDFormat>
+<m:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://auth.orange.fr/sso"/></m:IDPSSODescriptor>
+</m:EntityDescriptor>

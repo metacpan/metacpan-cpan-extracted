@@ -1,0 +1,44 @@
+Testing configurations
+----------------------
+
+This module was tested on a Windows 2003 Server contacting an Exchange 5.5, 2000 and 2003 Server
+  -They were both connected to a Windows 2003 Mixed Mode NT Domain (same domain).
+  -The client Windows 2003 Server had the Exchange System Manager and Exchange 5.5
+   Administrator loaded (The Exchange 5.5 Admin program is optional).
+    -This is necessary to load the underlying Classes and DLLs for making these manipulations.
+------------------------------------------------------------------------------------------
+This module was tested on a Windows 2000 Server, contacting an Exchange 2000 Server.
+  -They were both connected to a Windows 2000 Native Mode NT Domain (same domain).
+  -The client Windows 2000 Server had the Exchange System Manager and Exchange 5.5
+   Administrator loaded (The Exchange 5.5 Admin program is optional).
+    -This is necessary to load the underlying Classes and DLLs for making these manipulations.
+------------------------------------------------------------------------------------------
+This module was also tested on a Windows 2000 Server, contacting an Exchange 5.5 Server.
+  -They were both connected to a Windows 2000 Native Mode NT Domain.
+  -The client Windows 2000 Server had:
+      -the Exchange 5.5 Administrator loaded,
+      -ADsSecurity.dll registered (from the ADSI SDK).
+         -this makes ACE manipulation possible in Perl.
+
+------------------------------------------------------------------------------------------
+
+Windows NT 4 clients are supported, but not suggested.  Please see the "readme.txt" for my pleas
+to get you to use Windows 2000 clients.
+  NT4 Client PCs need to have:
+      -ADSI 2.5 loaded on them in order for this module to work correctly.
+      -The ADSI SDK ("Software Development Kit", this is a different download from ADSI 2.5)
+       DLL ADsSecurity.dll registered on their system for this module to set
+       permissions on 5.5 mailboxes.
+      -NT4 Clients that wish to manipulate Exchange 2000 Mailboxes need to have the 
+       Exchange System Manager loaded on the client.  The Exchange 5.5 Admin program
+       is optional.
+      -Service Pack 6a is suggested, but not believed to be mandatory.
+
+***  No part of this module was tested on an NT4 Domain, or with NT4 clients connecting
+     to Exchange 5.5 or 2000 mailboxes.
+       -I don't have any NT4 Domains, or NT4 clients lying around to test on right now. :(
+          -The Exchange 5.5 methods should work fine (with the exceptions noted
+           in the readme.txt).
+          -The Exchange 2000 methods should work fine (with the exceptions noted
+           in the readme.txt).
+

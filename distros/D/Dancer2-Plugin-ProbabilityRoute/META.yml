@@ -1,0 +1,25 @@
+---
+abstract: 'plugin to define behavior with probability matching rules'
+author:
+  - 'Alexis Sukrieh <sukria@sukria.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-ProbabilityRoute
+requires:
+  Carp: '0'
+  Dancer2::Plugin: '0'
+  Digest::OAT: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sukria/Dancer2-Plugin-ProbabilityRoute/issues
+  homepage: https://github.com/sukria/Dancer2-Plugin-ProbabilityRoute/wiki
+  repository: git://github.com/sukria/Dancer2-Plugin-ProbabilityRoute.git
+version: '0.03'

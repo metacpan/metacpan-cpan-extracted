@@ -1,0 +1,37 @@
+# $Id$
+#
+# >>Title::     Deutsch
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 23-Oct-98 ianc    Added date strings
+# 12.Nov 97 alo
+# 19-Aug-97 ianc
+# -----------------------------------------------------------------------
+#
+
+# Generated list titles
+!define DOC_TOC_TITLE           "Inhaltsverzeichnis"
+!define DOC_LOF_TITLE           "Abbildungsverzeichnis"
+!define DOC_LOT_TITLE           "Verzeichnis der Tabellen"
+
+# Navigation strings
+!define HTML_TEXT_CONTENTS      "Inhalt"
+!define HTML_TEXT_PARENT        "Zurück"
+!define HTML_TEXT_PREVIOUS      "Voriger Eintrag"
+!define HTML_TEXT_NEXT          "Nächster Eintrag"
+!define HTML_TEXT_HOME          "Home"
+!define HTML_TEXT_CATALOG       "Katalog"
+!define HTML_TEXT_SEARCH        "Suchen"
+
+# Date string values
+!block datestrings
+Symbol   Values
+month    "Januar Februar Marz April Mai Juni Juli August September Oktober November Dezember"
+smonth   "Jan    Feb     Mar  Apr   Mai Jun  Jul  Aug    Sep       Okt     Nov      Dez"
+weekday  "Montag Dienstag Mittwoch Donnerstag Freitag Samstag Sonntag"
+sweekday "Montag Dienstag Mittwoch Donnerstag Freitag Samstag Sonntag"
+ampm     ""
+AMPM     ""
+!endblock

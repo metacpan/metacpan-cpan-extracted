@@ -21,10 +21,11 @@ use App::Basis;
 use App::Basis::Config;
 use Data::UUID;
 use Net::Graylog::Client qw( valid_levels);
+use Data::Dumper;
 
 use Test::More tests => 2;
 
-my $SERVER   = 'sei';
+my $SERVER   = '10.1.1.102';
 my $USER     = 'test';
 my $PASSWORD = 'password';
 
@@ -38,10 +39,10 @@ sub add_data {
 
     my $started = time();
     note("Creating messages with tag:$uuid and key $key");
-    my $graylog = Net::Graylog::Client->new( url => "http://$SERVER:12202/gelf" );
+    my $graylog = Net::Graylog::Client->new( url => "http://$SERVER:12201/gelf" );
 
     foreach my $lvl ( valid_levels() ) {
-        my ( $s, $c ) = $graylog->$lvl(
+        my ( $s, $c ) = $graylog->send(
             message  => "a $lvl message with key $key",
             tag      => $uuid,
             counter  => $events_created + 1,
@@ -62,53 +63,53 @@ SKIP: {
     if ( $ENV{AUTHOR_TESTING} ) {
 
         subtest 'authors_own' => sub {
-            plan tests => 7;
+            plan tests => 6;
             my ( $resp, $messages );
 
             # this is a uniq key for this series of tests
             my $ukey = $$ . "-" . time();
 
             my $url = "http://$SERVER:12900";
-            my $api = Net::Graylog::API->new( url => $url, user => 'test', password => 'Passw0rd1', timeout => 2 );
+            my $api = Net::Graylog::API->new( url => $url, user => $USER, password => $PASSWORD, timeout => 2 );
 
-            # $resp = $api->system();
-            # my $system = $resp->{json};
-            # ok( $system && $system->{facility}, 'The system responds' );
+            $resp = $api->system();
+            my $system = $resp->{json};
+            ok( $system && $system->{facility}, 'The system responds' );
 
             # $resp = $api->counts_total;
             # ok( $resp->{code} == 200 && $resp->{json} && $resp->{json}->{events} >= $events_created,
-            #     "counts_total: There are more than $events_created events" );
+            #    "counts_total: There are more than $events_created events" );
 
             # # we need to add some data for the search tests
             my $events_created = add_data($ukey);
 
             # give graylog a second or so to store and process the messages
-            sleep 1;
+            sleep 4;
 
             # find events that have our key
-            $resp = $api->search_absolute_search_absolute( query => $ukey, from => '2014-03-20 00:00:00', to => '2015-01-01 00:00:00' );
+            $resp = $api->search_absolute_search_absolute( query => $ukey, from => '2017-01-01 00:00:00', to => '2018-01-01 00:00:00' );
             $messages = $resp->{json}->{messages};
             ok( $resp->{code} == 200 && $resp->{json} && scalar @{$messages} == $events_created,
-                "search_absolute_search_absolute: found $events_created created events absolutely found"
+                "search_absolute_search_absolute: found $events_created created events absolutely found: " . scalar@{$messages}
             );
             # if ( $messages && scalar @{$messages} != $events_created ) {
             #     diag( scalar( @{$messages} ) . " / $events_created events" );
             #     diag( "issue data: " . p($resp) );
             # }
 
-            # badly formatted dates should cause a 400 response from the server, these date fields are not
-            # validated though
-            $resp = $api->search_absolute_search_absolute( query => $ukey, from => '2014:00:00', to => '2015-01:00' );
-            ok( $resp->{code} == 400, "search_absolute_search_absolute: correct badly formatted date response" );
-
-            sleep 1;
-            $resp = $api->search_keyword_search_keyword( query => $ukey, keyword => 'last hour' );
-            $messages = $resp->{json}->{messages};
-            ok( $resp->{code} == 200 && $resp->{json} && scalar @{$messages}, "search_keyword_search_keyword: found some events found in last hour" );
-            # if ( $messages && scalar @{$messages} != $events_created ) {
-            #     diag( scalar( @{$messages} ) . " / $events_created events" );
-            #     diag( "issue data: " . p($resp) );
-            # }
+#            # badly formatted dates should cause a 400 response from the server, these date fields are not
+#            # validated though
+#            $resp = $api->search_absolute_search_absolute( query => $ukey, from => '2017:01:01', to => '2018-01-01 00:00:00' );
+#            ok( $resp->{code} == 400, "search_absolute_search_absolute: correct badly formatted date response" );
+#
+#            sleep 1;
+#            $resp = $api->search_keyword_search_keyword( query => $ukey, keyword => 'last hour' );
+#            $messages = $resp->{json}->{messages};
+#            ok( $resp->{code} == 200 && $resp->{json} && scalar @{$messages}, "search_keyword_search_keyword: found some events found in last hour" );
+#            # if ( $messages && scalar @{$messages} != $events_created ) {
+#            #     diag( scalar( @{$messages} ) . " / $events_created events" );
+#            #     diag( "issue data: " . p($resp) );
+#            # }
 
             # cannot test streams until we have some
             $resp = $api->streams_get();

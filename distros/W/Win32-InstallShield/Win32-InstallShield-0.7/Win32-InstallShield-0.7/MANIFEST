@@ -1,0 +1,15 @@
+lib/Win32/InstallShield.pm
+t/operations.t
+t/add.ism
+t/del.ism
+t/update.ism
+t/purge.ism
+t/original.ism
+t/attribute.ism
+t/summary.ism
+MANIFEST
+Makefile.PL
+README
+Changes
+examples/find_property.pl
+examples/modify.pl

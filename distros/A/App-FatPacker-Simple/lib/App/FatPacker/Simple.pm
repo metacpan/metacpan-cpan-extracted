@@ -14,7 +14,7 @@ use Getopt::Long qw(:config no_auto_abbrev no_ignore_case);
 use Perl::Strip;
 use Pod::Usage 'pod2usage';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our $IGNORE_FILE = [
     qr/\.pod$/,
@@ -186,7 +186,7 @@ sub collect_files {
                 return;
             }
         }
-        if (!/\.(?:pm|ix|al)$/) {
+        if (!/\.(?:pm|ix|al|pl)$/) {
             $self->warning("skip non perl module file $relative");
             return;
         }

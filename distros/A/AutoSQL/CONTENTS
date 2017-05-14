@@ -1,0 +1,18 @@
+
+
+
+===================
+
+t/translate_datatype.t
+    AutoSQL::SQLGenerator::_translate_datatype
+
+t/sqlgenerator.pl
+    generate_table_sql
+    _get_tables_from_schema
+    
+---------------
+
+t/objectadaptor.t
+    This is 
+    using Contact::DBSQL::DBAdaptor, but not the AdaptorFactory!
+    

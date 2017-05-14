@@ -1,0 +1,8 @@
+0.01 Nov 15 1999 - Original version
+
+Lots of undocumented changes...
+
+0.24 Apr 22 2015 - Change function prototype of hashmatch
+     	    	 - Added dependency in Astro::Time
+		 - Allowed test to run non-interactively
+		 - Updated README

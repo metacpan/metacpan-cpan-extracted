@@ -176,7 +176,4 @@ method type, or the method may not have been installed sucesfully.
 
 See L<Class::MakeMethods> for general information about this distribution. 
 
-For distribution, installation, support, copyright and license 
-information, see L<Class::MakeMethods::Docs::ReadMe>.
-
 =cut

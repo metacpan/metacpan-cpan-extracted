@@ -1,5 +1,11 @@
 Change history for Net-Easypost
 
+0.19        2017-05-13
+            - Add support for CustomsInfo & CustomsItem object to support international shipping
+            - Remove default Country of US
+            - Updated Net::Easypost::Address to support all fields returned in the API
+            - Address verification is currently broken; apparently it hasn't worked since v2 of the Easypost API was released ... oops.
+
 0.18        2016-01-05
             - Add JSON as dependency in dist.ini
 0.17        2016-01-05

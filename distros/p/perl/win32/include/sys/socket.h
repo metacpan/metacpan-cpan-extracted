@@ -6,16 +6,11 @@
 #ifndef  _INC_SYS_SOCKET
 #define  _INC_SYS_SOCKET
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define WIN32_LEAN_AND_MEAN
 #ifdef __GNUC__
 #  define Win32_Winsock
 #endif
 #include <windows.h>
-
 
 /* Too late to include winsock2.h if winsock.h has already been loaded */
 #ifndef _WINSOCKAPI_
@@ -23,15 +18,170 @@ extern "C" {
      /* winsock2 only for 4.00+ */
 #    include <winsock.h>
 #  else
-#  include <winsock2.h>
+#    include <winsock2.h>
+     /* We need to include ws2tcpip.h to get the IPv6 definitions.
+      * It will in turn include wspiapi.h.  Later versions of that
+      * header in the Windows SDK generate C++ template code that
+      * can't be compiled with VC6 anymore.  The _WSPIAPI_COUNTOF
+      * definition below prevents wspiapi.h from generating this
+      * incompatible code.
+      */
+#    define _WSPIAPI_COUNTOF(_Array) (sizeof(_Array) / sizeof(_Array[0]))
+#    include <ws2tcpip.h>
+
+#    ifndef SIO_GET_INTERFACE_LIST_EX
+
+#      ifndef MSG_WAITALL
+#        define MSG_WAITALL     0x8
+#      endif
+
+       /* The ws2tcpip.h header included in VC6 doesn't define the
+        * sin6_scope_id member of sockaddr_in6.  We define our own
+        * version and redefine sockaddr_in6 to point to this one
+        * instead for compiling e.g. Socket.xs.
+        */
+
+       struct my_sockaddr_in6 {
+           short   sin6_family;        /* AF_INET6 */
+           u_short sin6_port;          /* Transport level port number */
+           u_long  sin6_flowinfo;      /* IPv6 flow information */
+           struct in_addr6 sin6_addr;  /* IPv6 address */
+           u_long sin6_scope_id;       /* set of interfaces for a scope */
+       };
+#      define sockaddr_in6 my_sockaddr_in6
+
+       /* Provide implementations of IN6ADDR_SETANY() and IN6ADDR_SETLOOPBACK
+        * that also initialize the sin6_scope_id field.
+        */
+#      undef IN6ADDR_SETANY
+#      define IN6ADDR_SETANY(x) {\
+(x)->sin6_family = AF_INET6; \
+(x)->sin6_port = 0; \
+(x)->sin6_flowinfo = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr)    ) = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr) + 1) = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr) + 2) = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr) + 3) = 0; \
+(x)->sin6_scope_id = 0; \
+}
+
+#      undef IN6ADDR_SETLOOPBACK
+#      define IN6ADDR_SETLOOPBACK(x) {\
+(x)->sin6_family = AF_INET6; \
+(x)->sin6_port = 0; \
+(x)->sin6_flowinfo = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr)    ) = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr) + 1) = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr) + 2) = 0; \
+*((u_long *)((x)->sin6_addr.s6_addr) + 3) = 1; \
+(x)->sin6_scope_id = 0; \
+}
+
+#      ifndef IPV6_HDRINCL
+#        define IPV6_HDRINCL            2
+#      endif
+#      ifndef IPV6_UNICAST_HOPS
+#        define IPV6_UNICAST_HOPS       4
+#      endif
+#      ifndef IPV6_MULTICAST_IF
+#        define IPV6_MULTICAST_IF       9
+#      endif
+#      ifndef IPV6_MULTICAST_HOPS
+#        define IPV6_MULTICAST_HOPS     10
+#      endif
+#      ifndef IPV6_MULTICAST_LOOP
+#        define IPV6_MULTICAST_LOOP     11
+#      endif
+#      ifndef IPV6_ADD_MEMBERSHIP
+#        define IPV6_ADD_MEMBERSHIP     12
+#      endif
+#      ifndef IPV6_DROP_MEMBERSHIP
+#        define IPV6_DROP_MEMBERSHIP    13
+#      endif
+#      ifndef IPV6_JOIN_GROUP
+#        define IPV6_JOIN_GROUP         IPV6_ADD_MEMBERSHIP
+#      endif
+#      ifndef IPV6_LEAVE_GROUP
+#        define IPV6_LEAVE_GROUP        IPV6_DROP_MEMBERSHIP
+#      endif
+#      ifndef IPV6_PKTINFO
+#        define IPV6_PKTINFO            19
+#      endif
+#      ifndef IPV6_HOPLIMIT
+#        define IPV6_HOPLIMIT           21
+#      endif
+#      ifndef IPV6_PROTECTION_LEVEL
+#        define IPV6_PROTECTION_LEVEL   23
+#      endif
+
+       /* The ws2tcpip.h header included in MinGW includes ipv6_mreq already */
+#      ifndef __GNUC__
+         typedef struct ipv6_mreq {
+             struct in_addr6 ipv6mr_multiaddr;
+             unsigned int    ipv6mr_interface;
+         } IPV6_MREQ;
+#      endif
+
+#      ifndef EAI_AGAIN
+#        define EAI_AGAIN       WSATRY_AGAIN
+#      endif
+#      ifndef EAI_BADFLAGS
+#        define EAI_BADFLAGS    WSAEINVAL
+#      endif
+#      ifndef EAI_FAIL
+#        define EAI_FAIL        WSANO_RECOVERY
+#      endif
+#      ifndef EAI_FAMILY
+#        define EAI_FAMILY      WSAEAFNOSUPPORT
+#      endif
+#      ifndef EAI_MEMORY
+#        define EAI_MEMORY      WSA_NOT_ENOUGH_MEMORY
+#      endif
+#      ifndef EAI_NODATA
+#        define EAI_NODATA      WSANO_DATA
+#      endif
+#      ifndef EAI_NONAME
+#        define EAI_NONAME      WSAHOST_NOT_FOUND
+#      endif
+#      ifndef EAI_SERVICE
+#        define EAI_SERVICE     WSATYPE_NOT_FOUND
+#      endif
+#      ifndef EAI_SOCKTYPE
+#        define EAI_SOCKTYPE    WSAESOCKTNOSUPPORT
+#      endif
+
+#      ifndef NI_NOFQDN
+#        define NI_NOFQDN       0x01
+#      endif
+#      ifndef NI_NUMERICHOST
+#        define NI_NUMERICHOST  0x02
+#      endif
+#      ifndef NI_NAMEREQD
+#        define NI_NAMEREQD     0x04
+#      endif
+#      ifndef NI_NUMERICSERV
+#        define NI_NUMERICSERV  0x08
+#      endif
+#      ifndef NI_DGRAM
+#        define NI_DGRAM        0x10
+#      endif
+
+#    endif
+
+#  endif
 #endif
+
+/* Early Platform SDKs have an incorrect definition of EAI_NODATA */
+#if (EAI_NODATA == EAI_NONAME)
+#  undef EAI_NODATA
+#  define EAI_NODATA WSANO_DATA
 #endif
 
-#include "win32.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define  ENOTSOCK	WSAENOTSOCK
-
-#ifdef USE_SOCKETS_AS_HANDLES
+#include "errno2.h"
 
 #ifndef PERL_FD_SETSIZE
 #define PERL_FD_SETSIZE		64
@@ -56,16 +206,6 @@ typedef struct	Perl_fd_set {
 
 #define PERL_FD_ISSET(n,p) \
     ((p)->bits[(n)/PERL_NFDBITS] &   ((unsigned)1 << ((n)%PERL_NFDBITS)))
-
-#else	/* USE_SOCKETS_AS_HANDLES */
-
-#define Perl_fd_set	fd_set
-#define PERL_FD_SET(n,p)	FD_SET(n,p)
-#define PERL_FD_CLR(n,p)	FD_CLR(n,p)
-#define PERL_FD_ISSET(n,p)	FD_ISSET(n,p)
-#define PERL_FD_ZERO(p)		FD_ZERO(p)
-
-#endif	/* USE_SOCKETS_AS_HANDLES */
 
 SOCKET win32_accept (SOCKET s, struct sockaddr *addr, int *addrlen);
 int win32_bind (SOCKET s, const struct sockaddr *addr, int namelen);
@@ -167,7 +307,6 @@ void win32_endservent(void);
 #define setprotoent	win32_setprotoent
 #define setservent	win32_setservent
 
-#ifdef USE_SOCKETS_AS_HANDLES
 #undef fd_set
 #undef FD_SET
 #undef FD_CLR
@@ -178,7 +317,6 @@ void win32_endservent(void);
 #define FD_CLR(n,p)	PERL_FD_CLR(n,p)
 #define FD_ISSET(n,p)	PERL_FD_ISSET(n,p)
 #define FD_ZERO(p)	PERL_FD_ZERO(p)
-#endif	/* USE_SOCKETS_AS_HANDLES */
 
 #endif	/* WIN32SCK_IS_STDSCK */
 

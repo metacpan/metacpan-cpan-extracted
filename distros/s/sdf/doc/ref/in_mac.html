@@ -1,0 +1,494 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: use Macro</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="fverbati.html">Previous Topic</A> | <A HREF="mblock.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6. Macros</H1>
+<HR>
+<H2><A NAME="Overview">6.1. Overview</A></H2>
+<P>The macros available are summarised below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>General:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mbuild_t.html">build_title</A>
+</TD>
+<TD>
+build a title page
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mblock.html">block</A>
+</TD>
+<TD>
+begin a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mendbloc.html">endblock</A>
+</TD>
+<TD>
+end a block of text
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/minclude.html">include</A>
+</TD>
+<TD>
+include another file
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mexecute.html">execute</A>
+</TD>
+<TD>
+include output from a command
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Variables:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/minit.html">init</A>
+</TD>
+<TD>
+initialise variables (before loading configuration files)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mdefine.html">define</A>
+</TD>
+<TD>
+set a variable
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mdefault.html">default</A>
+</TD>
+<TD>
+set a variable (if not already set)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mundef.html">undef</A>
+</TD>
+<TD>
+clear a variable
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mexport.html">export</A>
+</TD>
+<TD>
+export a variable to the format driver (and/or mark it for later exporting)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mrestric.html">restrict</A>
+</TD>
+<TD>
+declare a restricted family of variables
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Figures:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mimport.html">import</A>
+</TD>
+<TD>
+import an external object (e.g. figure)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mclear.html">clear</A>
+</TD>
+<TD>
+reset text wrapping around a figure
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Libraries:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/minherit.html">inherit</A>
+</TD>
+<TD>
+inherit entities from a library
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/muse.html">use</A>
+</TD>
+<TD>
+load a library module
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Macros:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mmacro.html">macro</A>
+</TD>
+<TD>
+begin a macro definition
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mendmacr.html">endmacro</A>
+</TD>
+<TD>
+end a macro definition
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/minsert.html">insert</A>
+</TD>
+<TD>
+call a macro
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Classes:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mclass.html">class</A>
+</TD>
+<TD>
+define a class of objects
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mcatalog.html">catalog</A>
+</TD>
+<TD>
+build a catalog from objects already loaded
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Conditional text:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mif.html">if</A>
+</TD>
+<TD>
+begin conditional text
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/melsif.html">elsif</A>
+</TD>
+<TD>
+begin a conditional section
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/melse.html">else</A>
+</TD>
+<TD>
+begin alternative section
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mendif.html">endif</A>
+</TD>
+<TD>
+end conditional text
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/melseif.html">elseif</A>
+</TD>
+<TD>
+same as elsif
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Event processing:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mon.html">on</A>
+</TD>
+<TD>
+specify processing for an event
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/moff.html">off</A>
+</TD>
+<TD>
+disable processing previously specified
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>File processing:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/moutput.html">output</A>
+</TD>
+<TD>
+dynamically change the output file used
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mscript.html">script</A>
+</TD>
+<TD>
+execute a line of <A HREF="http://www.perl.com/perl/index.html">Perl</A>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mmessage.html">message</A>
+</TD>
+<TD>
+output a message during execution
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mline.html">line</A>
+</TD>
+<TD>
+change message parameters
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mslide_d.html">slide_down</A>
+</TD>
+<TD>
+decrease heading levels (e.g. H2 -&gt; H3)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mslide_u.html">slide_up</A>
+</TD>
+<TD>
+increase heading levels (e.g. H2 -&gt; H1)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Extraction:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mgetdoc.html">getdoc</A>
+</TD>
+<TD>
+extract documentation embedded in source code
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mgetcode.html">getcode</A>
+</TD>
+<TD>
+extract source code (i.e. non-documentation) from a file
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mgetcli.html">getcli</A>
+</TD>
+<TD>
+extract command-line interface information
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mperlapi.html">perlapi</A>
+</TD>
+<TD>
+extract API information from a <A HREF="http://www.perl.com/perl/index.html">Perl</A> library
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Miscellaneous:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mjumps.html">jumps</A>
+</TD>
+<TD>
+generates lines of jumps
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/msubsect.html">subsections</A>
+</TD>
+<TD>
+specify the subsections for a topic
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mcontinu.html">continued</A>
+</TD>
+<TD>
+continue a heading from a previous page
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/mend_top.html">end_topic</A>
+</TD>
+<TD>
+mark the end of a topic
+</TD>
+</TR>
+</TABLE>
+
+<P>Further details on these are provided below.</P>
+<P><A HREF="mblock.html">block Macro</A></P>
+<P><A HREF="mbuild_t.html">build_title Macro</A></P>
+<P><A HREF="mcatalog.html">catalog Macro</A></P>
+<P><A HREF="mclass.html">class Macro</A></P>
+<P><A HREF="mclear.html">clear Macro</A></P>
+<P><A HREF="mcontinu.html">continued Macro</A></P>
+<P><A HREF="mdefault.html">default Macro</A></P>
+<P><A HREF="mdefine.html">define Macro</A></P>
+<P><A HREF="melse.html">else Macro</A></P>
+<P><A HREF="melseif.html">elseif Macro</A></P>
+<P><A HREF="melsif.html">elsif Macro</A></P>
+<P><A HREF="mend_top.html">end_topic Macro</A></P>
+<P><A HREF="mendbloc.html">endblock Macro</A></P>
+<P><A HREF="mendif.html">endif Macro</A></P>
+<P><A HREF="mendmacr.html">endmacro Macro</A></P>
+<P><A HREF="mexecute.html">execute Macro</A></P>
+<P><A HREF="mexport.html">export Macro</A></P>
+<P><A HREF="mgetcli.html">getcli Macro</A></P>
+<P><A HREF="mgetcode.html">getcode Macro</A></P>
+<P><A HREF="mgetdoc.html">getdoc Macro</A></P>
+<P><A HREF="mif.html">if Macro</A></P>
+<P><A HREF="mimport.html">import Macro</A></P>
+<P><A HREF="minclude.html">include Macro</A></P>
+<P><A HREF="minherit.html">inherit Macro</A></P>
+<P><A HREF="minit.html">init Macro</A></P>
+<P><A HREF="minsert.html">insert Macro</A></P>
+<P><A HREF="mjumps.html">jumps Macro</A></P>
+<P><A HREF="mline.html">line Macro</A></P>
+<P><A HREF="mmacro.html">macro Macro</A></P>
+<P><A HREF="mmessage.html">message Macro</A></P>
+<P><A HREF="moff.html">off Macro</A></P>
+<P><A HREF="mon.html">on Macro</A></P>
+<P><A HREF="moutput.html">output Macro</A></P>
+<P><A HREF="mperlapi.html">perlapi Macro</A></P>
+<P><A HREF="mrestric.html">restrict Macro</A></P>
+<P><A HREF="mscript.html">script Macro</A></P>
+<P><A HREF="mslide_d.html">slide_down Macro</A></P>
+<P><A HREF="mslide_u.html">slide_up Macro</A></P>
+<P><A HREF="msubsect.html">subsections Macro</A></P>
+<P><A HREF="mundef.html">undef Macro</A></P>
+<P><A HREF="muse.html">use Macro</A></P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="fverbati.html">Previous Topic</A> | <A HREF="mblock.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

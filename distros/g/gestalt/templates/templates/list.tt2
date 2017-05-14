@@ -1,0 +1,69 @@
+
+<html>
+
+  [% INCLUDE _header.tt2 title = "Listing ${TABLE.desc().1}" %]
+
+<body>
+
+  <h1>Listing [% TABLE.desc().1 %]</h1>
+
+  <table width="80%">
+    <tr>
+      <td align="left">
+        [% FOREACH fKey = TABLE.foreignKeys() %]
+          [% fTable = TABLE.fkeyTable( fKey ) %]
+          <a href="../[% fTable.componentName() %]">[% fTable.desc().1 %]</a>[% UNLESS loop.last %] | [% END %]
+        [% END %]
+      </td>
+      <td align="right">
+        [% INCLUDE _auth.tt2 %]
+      </td>
+    </tr>
+  </table>
+  <br><br>
+  <a href="create">Create</a><br>
+  <br>
+  <form action="search" method="get">
+    <b>Search:</b> <input type="text" name="pattern" value="[% PATTERN %]"> <input type="submit" value="Search">
+  </form>
+
+  [% USE page = Page( BOOK.rows, BOOK.pageSize, BOOK.pageNum ) %]
+  [% INCLUDE _pager.tt2 %]
+
+  <table>
+    <tr>
+    [% FOREACH fName = TABLE.summaryFields() %]
+      [% f = TABLE.field(fName) %]
+      <td><b>[% f.desc %]</b></td>
+    [% END %]
+      <td><b>Edit</b></td>
+      <td><b>View</b></td>
+      <td><b>Delete</b></td>
+    </tr>
+    [% FOREACH ROW = page.splice(ROWS) %]
+    <tr>
+      [% FOREACH fName = TABLE.summaryFields() %]
+        [% f = TABLE.field( fName ) %]
+        <td>
+        [% IF f.fkey %]
+          [% INCLUDE _fkeyDisplay.tt2 fieldName = fName field = f %]
+        [% ELSE %]
+          [% INCLUDE _fieldDisplay.tt2 fieldName = fName field = f %]
+        [% END %]
+        </td>
+      [% END %]
+      <td><a href="edit?[% FOREACH pKey = TABLE.primaryKeys() %][% pKey %]=[% ROW.$pKey() %][% UNLESS loop.last %]&[% END %][% END %]">Edit</a></td>
+      <td><a href="show?[% FOREACH pKey = TABLE.primaryKeys() %][% pKey %]=[% ROW.$pKey() %][% UNLESS loop.last %]&[% END %][% END %]">View</a></td>
+      <td><a href="delete?[% FOREACH pKey = TABLE.primaryKeys() %][% pKey %]=[% ROW.$pKey() %][% UNLESS loop.last %]&[% END %][% END %]" onClick="return confirm('Are you sure you want to delete this?');">Delete</a></td>
+    </tr>
+    [% END %]
+  </table>
+  <br>
+  [% FOREACH rTable = TABLE.referingTables() %]
+    <a href="../[% rTable.componentName() %]">[% rTable.desc().1 %]</a> 
+  [% END %]
+  <br><br>
+  [% INCLUDE _pager.tt2 %]
+
+</body>
+

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Java-Import
+version: 0.03
+author:
+  - David Rusek <rusekd@cpan.org>
+abstract: Perl library for calling Java from Perl
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

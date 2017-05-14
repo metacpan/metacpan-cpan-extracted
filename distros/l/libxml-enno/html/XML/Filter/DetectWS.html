@@ -1,0 +1,134 @@
+<HTML><HEAD><TITLE>XML::Filter::DetectWS - A PerlSAX filter that detects ignorable whitespace</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::Filter::DetectWS - A PerlSAX filter that detects ignorable whitespace
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> use XML::Filter::DetectWS;
+
+</PRE><PRE> my $detect = new XML::Filter::DetectWS (Handler =&gt; $handler,
+					 SkipIgnorableWS =&gt; 1);
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>This a PerlSAX filter that detects which character data contains 
+ignorable whitespace and optionally filters it.
+
+<P>Note that this is just a first stab at the implementation and it may
+change completely in the near future. Please provide feedback whether
+you like it or not, so I know whether I should change it.
+
+<P>The XML spec defines ignorable whitespace as the character data found in elements
+that were defined in an &lt;!ELEMENT&gt; declaration with a model of 'EMPTY' or
+'Children' (Children is the rule that does not contain '#PCDATA'.)
+
+<P>In addition, XML::Filter::DetectWS allows the user to define other whitespace to 
+be <I>ignorable</I>. The ignorable whitespace is passed to the PerlSAX Handler with
+the <B>ignorable_whitespace</B> handler, provided that the Handler implements this 
+method. (Otherwise it is passed to the characters handler.)
+If the <B>SkipIgnorableWS</B> is set, the ignorable whitespace is simply
+discarded.
+
+<P>XML::Filter::DetectWS also takes xml:space attributes into account. See below
+for details.
+
+<P>CDATA sections are passed in the standard PerlSAX way (i.e. with surrounding
+start_cdata and end_cdata events), unless the Handler does not implement these
+methods. In that case, the CDATA section is simply passed to the characters 
+method.
+
+<P><HR><H1><A NAME="Constructor_Options">Constructor Options
+
+</A></H1><DL><DT><A NAME="_SkipIgnorableWS_Default_0_"><STRONG><P>* SkipIgnorableWS (Default: 0)
+
+</STRONG></A><DD>When set, detected ignorable whitespace is discarded.
+
+<DT><A NAME="_Handler_"><STRONG><P>* Handler
+
+</STRONG></A><DD>The PerlSAX handler (or filter) that will receive the PerlSAX events from this 
+filter.
+
+</DL><P><HR><H1><A NAME="Current_Implementation">Current Implementation
+
+</A></H1><P>When determining which whitespace is ignorable, it first looks at the
+xml:space attribute of the parent element node (and its ancestors.) 
+If the attribute value is "preserve", then it is *NOT* ignorable.
+(If someone took the trouble of adding xml:space="preserve", then that is
+the final answer...)
+
+<P>If xml:space="default", then we look at the &lt;!ELEMENT&gt; definition of the parent
+element. If the model is 'EMPTY' or follows the 'Children' rule (i.e. does not
+contain '#PCDATA') then we know that the whitespace is ignorable.
+Otherwise we need input from the user somehow.
+
+<P>The idea is that the API of DetectWS will be extended, so that you can
+specify/override e.g. which elements should behave as if xml:space="preserve" 
+were set, and/or which elements should behave as if the &lt;!ELEMENT&gt; model was
+defined a certain way, etc.
+
+<P>Please send feedback!
+
+<P>The current implementation also detects whitespace after an element-start tag,
+whitespace before an element-end tag. 
+It also detects whitespace before an element-start and after an element-end tag
+and before or after comments, processing instruction, cdata sections etc.,
+but this needs to be reimplemented.
+In either case, the detected whitespace is split off into its own PerlSAX
+characters event and an extra property 'Loc' is added. It can have 4 possible
+values:
+
+<DL><DT><A NAME="_1_WS_START_whitespace_immediately_after_element_start_tag_"><STRONG><P>* 1 (WS_START) - whitespace immediately after element-start tag
+
+</STRONG></A><BR><STRONG>* 2 (WS_END) - whitespace just before element-end tag
+
+</STRONG><BR><STRONG>* 3 (WS_ONLY) - both WS_START and WS_END, i.e. it's the only text found between the start and end tag and it's all whitespace
+
+</STRONG><BR><STRONG>* 0 (WS_INTER) - none of the above, probably before an element-start tag,
+after an element-end tag, or before or after a comment, PI, cdata section etc.
+
+</STRONG><DD>Note that WS_INTER may not be that useful, so this may change.
+
+</DL><P><HR><H1><A NAME="xml_space_attribute">xml:space attribute
+
+</A></H1><P>The XML spec states that: A special attribute
+named xml:space may be attached to an element
+to signal an intention that in that element,
+white space should be preserved by applications.
+In valid documents, this attribute, like any other, must be 
+declared if it is used.
+When declared, it must be given as an 
+enumerated type whose only
+possible values are "default" and "preserve".
+For example:
+
+<PRE> &lt;!ATTLIST poem   xml:space (default|preserve) 'preserve'&gt;
+
+</PRE><P>The value "default" signals that applications'
+default white-space processing modes are acceptable for this element; the
+value "preserve" indicates the intent that applications preserve
+all the white space.
+This declared intent is considered to apply to all elements within the content
+of the element where it is specified, unless overriden with another instance
+of the xml:space attribute.
+
+<P>The root element of any document
+is considered to have signaled no intentions as regards application space
+handling, unless it provides a value for 
+this attribute or the attribute is declared with a default value.
+
+<P>[... end of excerpt ...]
+
+<P><HR><H1><A NAME="CAVEATS">CAVEATS
+
+</A></H1><P>This code is highly experimental! 
+It has not been tested well and the API may change.
+
+<P>The code that detects of blocks of whitespace at potential indent positions
+may need some work. See 
+
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
+&lt;<I>enno@att.com</I>&gt;. 
+
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:29 2000</FONT></I></BODY></HTML>

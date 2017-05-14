@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use strict;
+
+use Cache::FileCache;
+use YAML;
+
+my $namespace = shift || die "usage: cache-dump <namespace> [ <key1> ... ]\n";
+
+my $cache = new Cache::FileCache {
+	cache_root		=> '/var/lib/hopkins/',
+	namespace		=> $namespace,
+	directory_umask	=> 0077
+};
+
+print 'count: ' . $cache->size . "\n";
+
+my @keys = scalar(@ARGV) ? @ARGV : $cache->get_keys;
+
+print "keys:\n";
+print "  $_\n" foreach $cache->get_keys;
+print "\n";
+
+my $data = { map { $_ => $cache->get($_) } @keys };
+
+print Dump($data);
+
+

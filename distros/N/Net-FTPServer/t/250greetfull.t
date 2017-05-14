@@ -1,17 +1,9 @@
-#!/usr/bin/perl -w
-
-# $Id: 250greetfull.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 3;
 use POSIX qw(dup2);
 use IO::Handle;
 use Sys::Hostname;
 use FileHandle;
-
-BEGIN {
-  plan tests => 3;
-}
 
 use Net::FTPServer::InMem::Server;
 
@@ -46,3 +38,5 @@ ok (m($hostname));
 print OUTFD0 "QUIT\r\n";
 $_ = <INFD1>;
 ok (/^221/);
+
+__END__

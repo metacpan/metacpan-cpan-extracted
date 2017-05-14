@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2016, Paul Johnson (paul@pjcj.net)
+ * Copyright 2001-2017, Paul Johnson (paul@pjcj.net)
  *
  * This software is free.  It is licensed under the same terms as Perl itself.
  *
@@ -66,6 +66,8 @@ extern "C" {
 struct unique {  /* Well, we'll be fairly unlucky if it's not */
     OP *addr,
         op;
+    /* include hashed file location information, where available (cops) */
+    size_t fileinfohash;
 };
 
 #define KEY_SZ sizeof(struct unique)
@@ -192,13 +194,52 @@ static int cpu() {
 
 #endif /* HAS_GETTIMEOFDAY */
 
+/*
+ * http://codereview.stackexchange.com/questions/85556/simple-string-hashing-algorithm-implementation
+ * https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+ * http://www.isthe.com/chongo/tech/comp/fnv/index.html#public_domain
+ *
+ *   FNV hash algorithms and source code have been released into the
+ *   public domain. The authors of the FNV algorithmm took deliberate
+ *   steps to disclose the algorhtm in a public forum soon after it was
+ *   invented. More than a year passed after this public disclosure and the
+ *   authors deliberatly took no steps to patent the FNV algorithm. Therefore
+ *   it is safe to say that the FNV authors have no patent claims on the FNV
+ *   algorithm as published.
+ *
+*/
+
+/* Fowler/Noll/Vo (FNV) hash function, variant 1a */
+static size_t fnv1a_hash(const char* cp)
+{
+    size_t hash = 0x811c9dc5;
+    while (*cp) {
+        hash ^= (unsigned char) *cp++;
+        hash *= 0x01000193;
+    }
+    return hash;
+}
+
+#define FILEINFOSZ 1024
+
 static char *get_key(OP *o) {
     static struct unique uniq;
+    static char mybuf[FILEINFOSZ];
 
     uniq.addr          = o;
     uniq.op            = *o;
     uniq.op.op_ppaddr  = 0;  /* we mess with this field */
     uniq.op.op_targ    = 0;  /* might change            */
+    if (o->op_type == OP_NEXTSTATE || o->op_type == OP_DBSTATE) {
+        /* cop, has file location information */
+        char *file = CopFILE((COP *)o);
+        long  line = CopLINE((COP *)o);
+        snprintf(mybuf, FILEINFOSZ - 1, "%s:%ld", file, line);
+        uniq.fileinfohash = fnv1a_hash(mybuf);
+    } else {
+        /* no file location information available */
+        uniq.fileinfohash = 0;
+    }
 
     return (char *)&uniq;
 }
@@ -618,18 +659,21 @@ static void dump_conditions(pTHX) {
  * This function will find the skipped op if there is one
  */
 static OP *find_skipped_conditional(pTHX_ OP *o) {
+    OP *right,
+       *next;
+
     if (o->op_type != OP_OR && o->op_type != OP_AND)
         return NULL;
 
     /* Get to the end of the "a || b || c" block */
-    OP *right = OpSIBLING(cLOGOP->op_first);
+    right = OpSIBLING(cLOGOP->op_first);
     while (right && OpSIBLING(cLOGOPx(right)))
         right = OpSIBLING(cLOGOPx(right));
 
     if (!right)
         return NULL;
 
-    OP *next = right->op_next;
+    next = right->op_next;
     while (next && next->op_type == OP_NULL)
         next = next->op_next;
 
@@ -645,7 +689,6 @@ static OP *find_skipped_conditional(pTHX_ OP *o) {
     /* if ($a || $b) or unless ($a && $b) */
     if (o->op_type == next->op_type)
         return NULL;
-
 
     if ((next->op_flags & OPf_WANT) != OPf_WANT_VOID)
         return NULL;
@@ -839,6 +882,8 @@ static void cover_logop(pTHX) {
                 next = (PL_op->op_type == OP_XOR)
                     ? PL_op->op_next
                     : right->op_next;
+                while (next && next->op_type == OP_NULL)
+                    next = next->op_next;
 #else
                 next = PL_op->op_next;
 #endif
@@ -908,6 +953,43 @@ static void cover_logop(pTHX) {
         }
     }
 }
+
+#if PERL_VERSION > 16
+/* A sequence of variable declarations may have been optimized
+ * to a single OP_PADRANGE. The original sequence may span multiple lines,
+ * but only the first line has been marked as covered for now.
+ * Mark other OP_NEXTSTATE inside the original sequence of statements.
+ */
+static void cover_padrange(pTHX) {
+    dMY_CXT;
+    OP *next,
+       *orig;
+    if (!collecting(Statement)) return;
+    next = PL_op->op_next;
+    orig = OpSIBLING(PL_op);
+
+    /* Ignore padrange preparing subroutine call. */
+    while (orig && orig != next) {
+        if (orig->op_type == OP_ENTERSUB) return;
+        orig = orig->op_next;
+    }
+    orig = OpSIBLING(PL_op);
+    while (orig && orig != next) {
+        if (orig->op_type == OP_NEXTSTATE) {
+            cover_statement(aTHX_ orig);
+        }
+        orig = orig->op_next;
+    }
+}
+
+static OP *dc_padrange(pTHX) {
+    dMY_CXT;
+    check_if_collecting(aTHX_ PL_curcop);
+    NDEB(D(L, "dc_padrange() at %p (%d)\n", PL_op, collecting_here(aTHX)));
+    if (MY_CXT.covering) cover_padrange(aTHX);
+    return MY_CXT.ppaddr[OP_PADRANGE](aTHX);
+}
+#endif
 
 static OP *dc_nextstate(pTHX) {
     dMY_CXT;
@@ -1037,6 +1119,9 @@ static void replace_ops (pTHX) {
 #endif
     PL_ppaddr[OP_DBSTATE]   = dc_dbstate;
     PL_ppaddr[OP_ENTERSUB]  = dc_entersub;
+#if PERL_VERSION > 16
+    PL_ppaddr[OP_PADRANGE]  = dc_padrange;
+#endif
     PL_ppaddr[OP_COND_EXPR] = dc_cond_expr;
     PL_ppaddr[OP_AND]       = dc_and;
     PL_ppaddr[OP_ANDASSIGN] = dc_andassign;
@@ -1180,6 +1265,13 @@ static int runops_cover(pTHX) {
                 cover_current_statement(aTHX);
                 break;
             }
+
+#if PERL_VERSION > 16
+            case OP_PADRANGE: {
+		cover_padrange(aTHX);
+		break;
+            }
+#endif
 
             case OP_COND_EXPR: {
                 cover_cond(aTHX);

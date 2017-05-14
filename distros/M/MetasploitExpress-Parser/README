@@ -1,0 +1,41 @@
+MetasploitExpress-Parser
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDS / SETUP
+
+    $ cpan
+    cpan> install CPAN
+    exit
+    cpan> install Bundle::CPAN
+    exit
+    cpan> install Object::InsideOut
+    cpan> install XML::LibXML
+    cpan> install Test::More ( if you want to run the tests ) 
+
+NOTE
+
+Metasploit Express has a small bug in the XML output, therefore you must run the output through a small perl script to clean it up.
+
+    cat file.xml | fix_xml.pl > fixed.xml
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc MetasploitExpress::Parser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Joshua D. Abraham
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

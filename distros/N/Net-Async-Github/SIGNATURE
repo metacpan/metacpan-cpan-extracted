@@ -1,0 +1,73 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9d66891831ffb8b5e303904630c74cc97b2a5abf Changes
+SHA1 afa44ef604de7458176072f4e70afd4156f4f4ba INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 4996cabe5608cbff16cfa0f9e1c2da199cefc187 MANIFEST
+SHA1 eea7d0f1e6d1fb674ee8af5d9cbc30d386c05254 META.json
+SHA1 cd673a5da089944b444de330532dc1e8f97e13bc META.yml
+SHA1 fe22e32f59e7a16f624af83d75635d61bdc0037c Makefile.PL
+SHA1 8082379c3e55a81d45337c5ee1aa8cf2d67c6604 README
+SHA1 346089e741cf75bfb5aa2cd01c2ca571975ca5ab api.json
+SHA1 dc0a4a6bd4d5a944b560dc3dd1274117b41896a6 cpanfile
+SHA1 9046a47927445bbe9049a21cd8ef7f5d36123c82 dist.ini
+SHA1 70e7be6c6db860935158b6d486d022ff51573ad8 examples/cache.pl
+SHA1 6e005987cbc7a0947daf26ce087715c1da405842 examples/current_user.pl
+SHA1 d077a8ef73ba6370e36fb021793f4983f348df67 examples/ratelimit.pl
+SHA1 cffcff26a14aaa68027d3fd828377ac950bcb477 examples/repos.pl
+SHA1 f5d619a1858793f0347d82332aac1aae9c445792 examples/users.pl
+SHA1 25f7b27652825bfc81f9122bdd5a19d6b11ffba4 lib/Net/Async/Github.pm
+SHA1 e7f3b09a71c87ad99f0d2a6b3a8dbeffcd84c0ab lib/Net/Async/Github.pod
+SHA1 dc9cf460c82bb9b623d5392733d6004f56eb953f lib/Net/Async/Github/Branch.pm
+SHA1 73d3aaaa17576b351f24760d9abfa726bbfcf0c4 lib/Net/Async/Github/Branch.pod
+SHA1 34aede0367a4858c9d5b87f714e26cb0815bc5ef lib/Net/Async/Github/Common.pm
+SHA1 c89ab8f3b314fb571fb1242e953fa4cd2b6f80af lib/Net/Async/Github/Plan.pm
+SHA1 d9704180e24761b6313b9e4bcdff7f6eb8d5f033 lib/Net/Async/Github/Plan.pod
+SHA1 8884b7a318b45d9062eea7cbf0516e613cc73da2 lib/Net/Async/Github/RateLimit.pm
+SHA1 89fccf155454ebb3976dd4e98168d351a2c13ae7 lib/Net/Async/Github/RateLimit/Core.pm
+SHA1 4afa3e7d3c1070a8656e48615e660aa4c158b4c8 lib/Net/Async/Github/Repository.pm
+SHA1 5ffd6eeab44fc389c4f0fadefcff696495882af1 lib/Net/Async/Github/Repository.pod
+SHA1 6e61eda8f5a5e398822343a1912db3fcc81b3561 lib/Net/Async/Github/User.pm
+SHA1 d882aab6129705da7ec086b2b98eba92f81fe749 lib/Net/Async/Github/User.pod
+SHA1 21663aa2a33bb83d8846b3c78d74a1952b79e14b mkobj.pl
+SHA1 b9b25488c22506ba0b7219e47a2ed2aee82006f3 share/endpoints.json
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 24ddf74837b9bbdc511d8169dd0c9f96b71c4c81 t/00-compile.t
+SHA1 03e830a748ae8fe0f7bbb0a8f717af239c4cbe57 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJZFI0gAAoJEG2WkcbynxAlI4sP/1TP916/FH1DZ0MWz0rMfjmh
+hLAMPjhauoOJp7MfSY5cdBIGpjEj52Jf4CYZjyQj7N0YKvEvMvzZIAzNR3lV/Cz6
+G0ofEEdg0qMyUB2ZP4PAex74kJacHsBKRFNNqnmsvSqEmHigbM4L+wF18g5aq9Vb
+vOE1t0aej8IVSWYyFuV+yt601Kbk0ovS7eROjIyR+Sal6uk6hQzXBRIP+9l844eR
+NRYYKUixAQpJ85vtowGxKTj9A20FAJtwzEl0PiSqLQDIx+kWwzf3M27Bo1tRI8t9
+7zdH+6VP43Oxw29ituUyRvHYxMFKjCDod7wLmvy3FMIjtcxnLupuxsq2OeQ0Lec0
+bx/QAnc4ljxjaeNG1IcTJmJ/590ZEtW1EjJB9+P5TCQ7AOMDMcNbNdelyulOCctL
+ZE53w+cRVAjmM264CE5GuYzU2OvZskExfnoJw321CEj43YitEisuxGnjFL4bBBRn
+caqSGG+DAckNhnFRHv5hOjRs/E48/AfeTs+72mmPp0MBQiHhmeQjlOrfcDUE/s0k
+NQcl9SFJyanKxaucvoEvQJZabLrEVHUhDPQLhXlahAxIBLtX1dN2xKhtsYSZ8h9N
+NU07nDKCyqYQV+Dpde0GGLJkpqj7YU1vPQocGnvSOiH44bC6jH/n4tqTMEoDjrul
+LSOCui3NEcYcI0YzS7WY
+=goH4
+-----END PGP SIGNATURE-----

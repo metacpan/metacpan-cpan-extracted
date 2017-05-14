@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+<TITLE>XMLUtils - a module for useful XML utilities for Genex DBs</TITLE>
+<LINK REV="made" HREF="mailto:jasons@amadeus.avesthagen.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>XMLUtils - a module for useful XML utilities for Genex DBs</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use XMLUtils;</PRE>
+<PRE>
+  $out_string = pretty_print($in_string);
+  assert_element($dom_node, 'node_name');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Methods for transforming information from a GeneX DB into XML.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_pretty_print"><CODE>pretty_print($string)</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG>pretty_print({INDENT=&gt;$val,COLLAPSE=&gt;[@list1],NO_ATTR_BALANCE=&gt;[@list2]},$string)</STRONG><BR>
+<DD>
+This function takes an XML string and reformats it. The function takes
+an optional first parameter anonymous hash reference that enables
+modification of the internal reformatting parameters.
+<UL>
+<LI>
+INDENT
+<P>The indent level in spaces. The defualt is 2.</P>
+<P></P>
+<LI>
+COLLAPSE
+<P>A list of tags that should have their beginning and end tags collapsed
+onto a single line. This will result in any intervening tags collapsed
+onto the same line. The default is <CODE>('feature')</CODE>.</P>
+<P></P>
+<LI>
+NO_ATTR_BALANCE
+<P>A list of attribute names that should not be moved to a separate
+line. The default is <CODE>('xml')</CODE>.</P>
+<P></P></UL>
+<DT><STRONG><A NAME="item_assert_element">assert_element($dom_node, $node_name);</A></STRONG><BR>
+<DD>
+This raises an exception unless $dom_node is an obect of type
+XML::DOM::Node, and the tag name is $node_name.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jason Stewart (<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,26 @@
+Revision history for Chorus::Expert
+
+1.03    2015-12-14
+		- Some tests added (Chorus::Frame : get - set - delete - getZ - getN - fmatch - weaken
+		- Frame method inherits() renamed to _inherits()
+		- bug 90530 : fixed - pod test only if $ENV{AUTHOR_TESTING}
+
+1.02    2013-12-18
+        - Chorus::Frame : DESTROY debbuged (unblessed reference)
+        - Chorus::Frame : method _inherits() added
+        - Chorus::Frame : fmatch() new syntax fmatch(slot => 'SLOT_NAME') or fmatch(slot => ['SLOT1_NAME', 'SLOT2_NAME'])
+        - Chorus::Frame : fmatch() optimized with %INSTANCES
+        - Chorus::Frame : _push() method added
+        - Chorus::Frame : bug fixed with set + multiple inheritance
+        - Chorus::Sample::Cursors : Added        
+        - bug 90530 should be fixed
+        - bug 90166 fixed
+        
+1.01    2013-11-21
+        - Chorus::Frame - new syntax : fmatch( slots => $slots , from => $subset )
+        - Chorus::Engine - new methods last(), reorder(), solved()
+        
+0.01    2013-11-08
+        - First release to CPAN
+        
+        

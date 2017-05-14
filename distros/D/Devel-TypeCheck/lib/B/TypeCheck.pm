@@ -50,6 +50,10 @@ our $all = FALSE;
 our $ugly = FALSE;
 our $continue = FALSE;
 
+# Whether logical operations require an Upsilon (TRUE) or a Nu (FALSE)
+our $relax = FALSE;
+our $inferLogop = undef;
+
 # Symbol to type lookup for global symbols
 our $glob2type;
 
@@ -80,6 +84,8 @@ sub compile {
 	    $ugly = TRUE;
 	} elsif ($o eq "-main") {
 	    $mainRoot = TRUE;
+	} elsif ($o eq "-relax") {
+	    $relax = TRUE;
 	} elsif ($o eq "-all") {
 	    $continue = TRUE;
 	    $all = TRUE;
@@ -210,8 +216,16 @@ sub smash {
 
     my $result;
 
+    if ($#results == 0) {
+	$results[0] = $env->find($results[0]);
+    }
+
     if ($#results == 0 && $results[0]->is(Devel::TypeCheck::Type::O())) {
 	# There's a single array in the results.  Just pass it on.
+	$result = $results[0];
+    } elsif ($#results == 0 && $results[0]->isa("Devel::TypeCheck::Type::Var")) {
+	# There's a single array in the results.  Just pass it on.
+	myUnify($env, $results[0], $env->genOmicron());
 	$result = $results[0];
     } else {
 	# Mash everything in @results together and hope for the best.
@@ -243,7 +257,7 @@ sub typeOpChildren {
     my @results;
     
     if ($op->flags & B::OPf_KIDS()) {
-	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $op->first(); $$kid; $kid = $kid->sibling()) {
 	    # Type the kid
 	    my ($s, $r) = typeOp($kid, $pad2type, $env, $cv, $context);
 	
@@ -280,7 +294,7 @@ sub typeOpChildren_ {
     my @returns;
     
     if ($op->flags & B::OPf_KIDS()) {
-	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $op->first(); $$kid; $kid = $kid->sibling()) {
 	    # Type the kid
 	    my ($s, $r) = typeOp($kid, $pad2type, $env, $cv, $context);
 	    
@@ -318,13 +332,13 @@ sub typeOpChildrenSkip {
     my @results;
     
     if ($op->flags & B::OPf_KIDS()) {
-	my $start = $op->first;
+	my $start = $op->first();
 	while ($skip != 0) {
-	    $start = $start->sibling;
+	    $start = $start->sibling();
 	    $skip--;
 	}
 
-	for (my $kid = $start ; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $start ; $$kid; $kid = $kid->sibling()) {
 	    # Type the kid
 	    my ($s, $r) = typeOp($kid, $pad2type, $env, $cv, $context);
 	
@@ -352,7 +366,7 @@ sub typeRest {
 
     my @rets;
 
-    for ( ; $$kid; $kid = $kid->sibling) {
+    for ( ; $$kid; $kid = $kid->sibling()) {
 	my ($t, $r) = typeOp($kid, $pad2type, $env, $cv, SCALAR());
 	push(@rets, $r) if ($r);
     }
@@ -366,13 +380,13 @@ sub typeProto {
     my $index = 0;
     my @rets;
     if ($op->flags & B::OPf_KIDS()) {
-	my $type = $op->first->type;
+	my $type = $op->first()->type();
 	if ($type != OP_PUSHMARK() &&
 	    $type != OP_NULL()) {
 	    die("Operator is not a function-call type.  Cannot use typeProto()");
 	}
 	
-	for (my $kid = $op->first->sibling; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $op->first()->sibling(); $$kid; $kid = $kid->sibling()) {
 	    my ($t, $r);
 	    if (($proto[$index]) == $ANY) {
 		$r = typeRest($kid, $pad2type, $env, $cv);
@@ -399,8 +413,8 @@ sub typeProtoOp {
     my $index = 0;
     my @rets;
     if ($op->flags & B::OPf_KIDS()) {
-	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
-	    next if ($kid->type == OP_NULL());
+	for (my $kid = $op->first(); $$kid; $kid = $kid->sibling()) {
+	    #next if ($kid->type() == OP_NULL());
 
 	    my ($t, $r);
 	    if (($proto[$index]) == $ANY) {
@@ -435,7 +449,7 @@ sub rvConflate {
 
     # If $ref is a VAR, unify $ref and RHO($XX), and be done with the
     # sordid business
-    if ($ref->type == Devel::TypeCheck::Type::VAR()) {
+    if ($ref->type() == Devel::TypeCheck::Type::VAR()) {
 	myUnify($env, $ref, $env->genRho($XX));
 	return $XX;
     }
@@ -557,7 +571,10 @@ sub constructConst {
   RETRY_CONST:
     my $class = B::class($sv);
 
-    if ($class eq "PV") {
+    if ($class eq "PV" || $class eq "BM") {
+	# BM seems to be the "substring" constant type.  BM probably
+	# stands for Boyer-Moore, but it's not actually documented
+	# anywhere that I can find.
 	return $PV;
 
     } elsif ($class eq "IV") {
@@ -573,6 +590,7 @@ sub constructConst {
     } elsif ($class eq "PVMG") {
 	# We have no idea how this might be used, so punt, but make
 	# sure whatever uses it, uses it consistently.
+	verbose("Found magic, ignoring");
 	return $env->fresh();
 
     } elsif ($class eq "PVNV") {
@@ -584,7 +602,7 @@ sub constructConst {
 	goto RETRY_CONST;
 
     } else {
-	die("Cannot construct a type for referent type $class");
+	confess("Cannot construct a type for referent type $class");
     }
 }
 
@@ -621,10 +639,10 @@ sub extractConstList {
     my ($op, $cv) = @_;
     my @ret;
 
-    for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
-	next if ($kid->type == OP_PUSHMARK());
+    for (my $kid = $op->first(); $$kid; $kid = $kid->sibling()) {
+	next if ($kid->type() == OP_PUSHMARK());
 
-	if ($kid->type != OP_CONST()) {
+	if ($kid->type() != OP_CONST()) {
 	    return undef;
 	}
 
@@ -639,8 +657,8 @@ sub opAssign {
     my ($env, $op, $f, $a) = @_;
 
     # This is also an assignment operator
-    if (($op->first->flags & B::OPf_REF()) &&
-	($op->first->flags & B::OPf_MOD())) {
+    if (($op->first()->flags & B::OPf_REF()) &&
+	($op->first()->flags & B::OPf_MOD())) {
 	myUnify($env, $a, $f);
     }
 }
@@ -684,6 +702,33 @@ sub arithmetic {
     }
 }
 
+sub SVOP2SV {
+    my ($op, $cv) = @_;
+
+    if (! $op->isa("B::SVOP")) {
+	die "operator is not a SVOP";
+    }
+
+    my $sv = $op->sv;
+    my $class = B::class($sv);
+
+    if ($class eq "SPECIAL") {
+	$sv = (($cv->PADLIST()->ARRAY())[1]->ARRAY)[$op->targ];
+    }
+
+    return ${$sv->object_2svref()};
+}
+
+sub inferNu {
+    my $env = $_[0];
+    return $env->freshNu();
+}
+
+sub inferUpsilon {
+    my $env = $_[0];
+    return $env->freshUpsilon();
+}
+
 sub typeOp {
     my ($op, $pad2type, $env, $cv, $context) = @_;
 
@@ -693,8 +738,6 @@ sub typeOp {
 
     verbose(" " x $depth, ($context)?"S":"L", ":", $op->name, " {");
 
-    # verbose(" " x $depth, $op->name, " {");
-
     my ($realResult, $realReturn);
 
     confess("op is null") if (!defined($op));
@@ -703,7 +746,7 @@ sub typeOp {
     confess("cv is null") if (!defined($cv));
     confess("context is null") if (!defined($context));
 
-    my $t = $op->type;
+    my $t = $op->type();
 
   RETRY:
     if ($t == OP_LIST()     || # This one almost always gets optimized out
@@ -715,7 +758,7 @@ sub typeOp {
         $t == OP_SCOPE()) {
 
 	my $c = $context;
-	$c = LIST() if ($t == OP_LIST() && $op->first->type == OP_PUSHMARK());
+	$c = LIST() if ($t == OP_LIST() && $op->first()->type() == OP_PUSHMARK());
 
         ($realResult, $realReturn) = typeOpChildren($op, $pad2type, $env, $cv, $c);
 
@@ -728,10 +771,10 @@ sub typeOp {
 	    # Hack for ex-list
             $t = $op->targ;
             goto RETRY;
-	} elsif ($op->can(first) && $op->first->can(sibling) && ($op->first->sibling->can(type)) && ($op->first->sibling->type == OP_READLINE())) {
+	} elsif ($op->can("first") && $op->first()->can("sibling") && ($op->first()->sibling()->can("type")) && ($op->first()->sibling()->type() == OP_READLINE())) {
 	    # Hack for readline.  Act like this is an sassign from the readline to the first argument
-	    my ($t0, $r0) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
-	    my ($t1, $r1) = typeOp($op->first->sibling, $pad2type, $env, $cv, SCALAR());
+	    my ($t0, $r0) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
+	    my ($t1, $r1) = typeOp($op->first()->sibling(), $pad2type, $env, $cv, SCALAR());
 
 	    ($realResult, $realReturn) = (myUnify($env, $t0, $t1), myUnify($env, $r0, $r1));
         } else {
@@ -782,33 +825,80 @@ sub typeOp {
 	my @params;
 	my @rets;
 	my $root = $op;
-	if ($root->first->type == OP_NULL()) {
-	    $root = $root->first;
+	my $first = undef;
+	my $last = undef;
+	if ($root->first()->type() == OP_NULL()) {
+	    $root = $root->first();
 	}
 	if ($root->flags & B::OPf_KIDS()) {
-	    for (my $kid = $root->first; $$kid; $kid = $kid->sibling) {
-		if ($kid->type != OP_PUSHMARK()) {
+	    for (my $kid = $root->first(); $$kid; $kid = $kid->sibling()) {
+		if ($kid->type() != OP_PUSHMARK()) {
+		    $first = $kid if (!defined($first));
 		    my ($s, $r) = typeOp($kid, $pad2type, $env, $cv, $context);
 
 		    push(@params, $s) if (defined($s));
 		    push(@rets, $r) if (defined($r));
 		}
+		$last = $kid;
 	    }
 	}
 
 	# The function is always the last operator to the ENTERSUB operand
 	my $fnArg = pop(@params);
-	
-	# Use rvConflate to extract CV from a ref to a GV or a ref to a CV
-	my $fnType = rvConflate($env, $fnArg, $env->genZeta(smash(\@params, $env), $env->fresh()));
 
+	# Null-reduce
+	while ($last->type() == OP_NULL()) {
+	    $last = $last->first();
+	}
+
+	# Figure out what kind of function call this is.
+	my $name = undef;
+	if ($last->type() == OP_GV()) {
+	    my $class = B::class($last);
+
+	    my $gv;
+	    if ($class eq "PADOP") {
+		$gv = (($cv->PADLIST->ARRAY)[1]->ARRAY)[$last->padix];
+	    } elsif ($class eq "SVOP") {
+		$gv = $op->gv;
+	    }
+
+	    $name = $gv->STASH->NAME . "::" . $gv->NAME;
+	} elsif ($last->type() == OP_METHOD_NAMED()) {
+	    if ($first->type() == OP_CONST()) {
+		my $ft = constructConst($first->sv, $cv, $first, $env);
+		
+		if ($ft == $PV) {
+		    $name = SVOP2SV($first, $cv) . "::" . SVOP2SV($last, $cv);
+		} else {
+		    die "OP_METHOD_NAMED used with a non-PV name";
+		}
+	    } else {
+		verbose "OP_METHOD_NAMED used with a non-constant name";
+	    }
+	} elsif ($last->type() == OP_METHOD()) {
+	    die "can't deal with references to methods yet";
+	}
+	
+	if (defined($name)) {
+	    verbose(" " x $depth, "function name is $name");
+	}
+
+	# Use rvConflate to extract CV from a ref to a GV or a ref to a CV
+
+	my $returnType;
+
+	$returnType = $env->fresh;
+
+	my $fnType = rvConflate($env, $fnArg, $env->genZeta(smash(\@params, $env), $returnType));
+	
 	($realResult, $realReturn) = ($fnType->derefReturn, myUnify($env, @rets));
 	
     } elsif ($t == OP_ENTEREVAL() || 
 	     $t == OP_DOFILE()) {
-
+	
 	# Make sure we're passing it a PV
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $PV);
 
 	# Generate a new type variable, since the return might be anything
@@ -819,7 +909,7 @@ sub typeOp {
 	# The first operand is a dead pushmark, so just ignore it
 
 	# The second operand is the list
-	my ($t, $r) = typeOp($op->first->sibling, $pad2type, $env, $cv, LIST());
+	my ($t, $r) = typeOp($op->first()->sibling(), $pad2type, $env, $cv, LIST());
 
 	# Promote $t to a homogeneous list
 	myUnify($env, $t, $env->genOmicron($env->freshKappa));
@@ -832,7 +922,7 @@ sub typeOp {
 	    my $pad = $pad2type->get($targ, $env);
 	    myUnify($env, $pad, $t->derefHomogeneous);
 	} else {
-	    my ($t0, $r0) = typeOp($op->first->sibling->sibling, $pad2type, $env, $cv, SCALAR());
+	    my ($t0, $r0) = typeOp($op->first()->sibling()->sibling(), $pad2type, $env, $cv, SCALAR());
 	    
 	    # project the scalar for the reference
 
@@ -863,7 +953,7 @@ sub typeOp {
     } elsif ($t == OP_INT()) {
 
 	# Can be used as a coercion from DV to IV, so accept Nu
-	my ($ot, $or) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ot, $or) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $ot, $env->freshNu);
 	($realResult, $realReturn) = ($IV, $or);
 
@@ -873,12 +963,17 @@ sub typeOp {
 	     $t == OP_POSTDEC()) {
 	# Unary number operators
 
-	my ($ot, $or) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ot, $or) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $ot, $env->freshNu);
 	($realResult, $realReturn) = ($ot, $or);
 
-    } elsif ($t == OP_NOT()      ||
-	     $t == OP_NEGATE()   ||
+    } elsif ($t == OP_NOT()) {
+
+	my ($ot, $or) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
+	myUnify($env, $ot, &$inferLogop($env));
+	($realResult, $realReturn) = ($IV, $or);
+	
+    } elsif ($t == OP_NEGATE()   ||
 	     $t == OP_I_NEGATE() ||
 	     $t == OP_I_PREINC() ||
 	     $t == OP_I_PREDEC() ||
@@ -887,7 +982,7 @@ sub typeOp {
 	     $t == OP_COMPLEMENT()) {
 	# Unary number operators that are strict in IV
 
-	my ($ot, $or) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ot, $or) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $ot, $IV);
 	($realResult, $realReturn) = ($IV, $or);
 
@@ -897,7 +992,7 @@ sub typeOp {
 	my $class = B::class($op);
 
 	if ($class eq "UNOP") {
-	    my ($ot, $or) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	    my ($ot, $or) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $ot, $env->freshNu)
 	}
 
@@ -907,7 +1002,7 @@ sub typeOp {
 	     $t == OP_NE()) {
 
 	# Have to be able to compare pointers
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 
 	if ((defined($ft) && $ft->is(Devel::TypeCheck::Type::PV())) || (defined($lt) && $lt->is(Devel::TypeCheck::Type::PV()))) {
@@ -931,7 +1026,7 @@ sub typeOp {
 	# Both sides should be unified with Nu, and resulting
 	# expression type is Nu.
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 	
 	($realResult, $realReturn) = (arithmetic($env, $ft, $lt),
@@ -947,7 +1042,7 @@ sub typeOp {
 
     } elsif ($t == OP_DIVIDE()) {
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 	
 	# Bind both to an incomplete Nu value.
@@ -968,7 +1063,7 @@ sub typeOp {
 	     $t == OP_OCT()   ||
 	     $t == OP_ABS()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	
 	# Bind to an incomplete Nu value.
 	$t = myUnify($env, $t, $env->freshNu);
@@ -995,7 +1090,7 @@ sub typeOp {
 	     $t == OP_RIGHT_SHIFT()) {
 	# Binary number operators that are strict in IV
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 	
 	myUnify($env, $ft, $IV);
@@ -1027,7 +1122,7 @@ sub typeOp {
 	# Both sides should be unified with PV, but resulting
 	# expression type is NV.
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 	
 	myUnify($env, $ft, $PV);
@@ -1040,7 +1135,7 @@ sub typeOp {
 	# Both sides should be unified with Ka, and resulting
 	# expression type is PV.
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 	
 	myUnify($env, $ft, $env->freshUpsilon);
@@ -1052,7 +1147,7 @@ sub typeOp {
 
     } elsif ($t == OP_GELEM()) {
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 
 	myUnify($env, $ft, $env->freshEta($env));
@@ -1121,7 +1216,7 @@ sub typeOp {
 
     } elsif ($t == OP_RV2GV()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	
 	# Guarantee that we can dereference something
 	myUnify($env, $t, $env->freshRho());
@@ -1133,40 +1228,40 @@ sub typeOp {
 
     } elsif ($t == OP_RV2SV()) {
 
-        my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+        my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 
 	# cheat
-	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first->type == OP_PADSV());
+	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first()->type() == OP_PADSV());
 
 	my $d = rvConflate($env, $t, $env->freshKappa());
 	($realResult, $realReturn) = ($d, $r);
 
     } elsif ($t == OP_RV2AV()) {
 	
-        my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+        my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 
 	# cheat
-	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first->type == OP_PADSV());
+	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first()->type() == OP_PADSV());
 
 	my $d = rvConflate($env, $t, $env->genOmicron);
 	($realResult, $realReturn) = ($d, $r);
 
     } elsif ($t == OP_RV2HV()) {
 	
-        my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+        my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 
 	# cheat
-	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first->type == OP_PADSV());
+	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first()->type() == OP_PADSV());
 
 	my $d = rvConflate($env, $t, $env->genChi);
 	($realResult, $realReturn) = ($d, $r);
 
     } elsif ($t == OP_RV2CV()) {
 	
-        my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+        my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 
 	# cheat
-	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first->type == OP_PADSV());
+	myUnify($env, $t, $env->genRho($env->fresh)) if ($op->first()->type() == OP_PADSV());
 
 	my $d = rvConflate($env, $t, $env->freshZeta);
 	($realResult, $realReturn) = ($d, $r);
@@ -1197,42 +1292,86 @@ sub typeOp {
     } elsif ($t == OP_PROTOTYPE()) {
 
 	# XXX revisit this
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $env->freshZeta);
 
 	($realResult, $realReturn) = ($PV, $r);
 
     } elsif ($t == OP_REFGEN()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my $newType = $env->genOmicron();
 
-	if ($t->is(Devel::TypeCheck::Type::O())) {
-	    # If the operand is an array, return an array of references, after $t
-	    ($realResult, $realReturn) = ($t->referize($env), $r);
-	} else {
-	    # Otherwise, return RHO( operand type )
-	    ($realResult, $realReturn) = ($env->genRho($t), $r);
+	my @returns;
+
+	for (my $kid = $op->first()->first()->sibling;
+	     $$kid;
+	     $kid = $kid->sibling()) {
+	    my ($type, $return) = typeOp($kid, $pad2type, $env, $cv, LIST());
+
+	    push(@returns, $return);
+
+	    $type = $env->find($type);
+
+	    verbose("found type ", myPrint($type, $env));
+
+	    if ($type->isa("Devel::TypeCheck::Type::Var")) {
+		$type = $env->genOmicron();
+	    }
+
+	    my $optype = $kid->type();
+
+	    # If the incoming type is an array or hash and not an
+	    # actual reference...
+	    if (($type->is(Devel::TypeCheck::Type::O()) ||
+		 $type->is(Devel::TypeCheck::Type::H())) &&
+	        !($optype == OP_RV2AV() ||
+		  $optype == OP_RV2HV() ||
+		  $optype == OP_PADAV() ||
+		  $optype == OP_PADHV())) {
+		my $tmptype = $type->referize($env);
+
+		if (!$tmptype->homogeneous() &&
+		    $tmptype->arity == 0) {
+		    $tmptype = $env->genOmicron($env->genRho($env->fresh));
+		}
+
+		$newType = $newType->append($tmptype, $env);
+		verbose("referizing to ", myPrint($newType, $env));
+	    } else {
+		$newType = $newType->append($env->genRho($type), $env);
+		verbose("generating reference ", myPrint($newType, $env));
+	    }
 	}
+
+	if (!$newType->homogeneous() &&
+	    $newType->arity == 1) {
+	    verbose("dereferencing");
+	    $newType = $newType->derefIndex(0, $env);
+	}
+
+	verbose("realResult is ", myPrint($newType, $env));
+	$realResult = $newType;
+	$realReturn = myUnify($env, @returns);
 
     } elsif ($t == OP_SREFGEN()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	($realResult, $realReturn) = ($env->genRho($t), $r);
 
     } elsif ($t == OP_REF()) {
 
 	# Can be passed anything
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	
 	# Returns a string
 	($realResult, $realReturn) = ($PV, $r);
 
     } elsif ($t == OP_BLESS()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	
-	if (${$op->first->sibling}) {
-	    my ($st, $sr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	if (${$op->first()->sibling()}) {
+	    my ($st, $sr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $st, $PV);
 	    $r = myUnify($env, $r, $sr);
 	}
@@ -1241,7 +1380,7 @@ sub typeOp {
 
     } elsif ($t == OP_ANONLIST()) {
 
-	($realResult, $realReturn) = typeOpChildren($op->first, $pad2type, $env, $cv, LIST());
+	($realResult, $realReturn) = typeOpChildren($op->first(), $pad2type, $env, $cv, LIST());
 
     } elsif ($t == OP_AELEMFAST()) {
 
@@ -1267,7 +1406,7 @@ sub typeOp {
 	($realResult, $realReturn) = ($ary->derefIndex($elt, $env), undef);
     
     } elsif ($t == OP_AELEM()) {
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 
 	# Last must be an IV
@@ -1276,7 +1415,7 @@ sub typeOp {
 	my $t;
 
 	# If last is a constant:
-	if ($op->last->type == OP_CONST()) {
+	if ($op->last->type() == OP_CONST()) {
 	    # First must be an undistinguished Omicron.
 	    my $list = $env->genOmicron();
 	    myUnify($env, $ft, $list);
@@ -1313,15 +1452,17 @@ sub typeOp {
 
     } elsif ($t == OP_HELEM()) {
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
 
 	# Last must be a non-reference scalar
 	myUnify($env, $lt, $env->freshUpsilon);
 	
-	if ($op->last->type == OP_CONST()) {
+	my $t;
+
+	if ($op->last->type() == OP_CONST()) {
 	    my $hash = $env->genChi();
-	    $hash->homogeneous;
+
 	    myUnify($env, $ft, $hash);
 
 	    if ($hash->homogeneous) {
@@ -1340,21 +1481,32 @@ sub typeOp {
        
     } elsif ($t == OP_SASSIGN()) {
 	
-	# At this point the type check is flow insensitive, and we're
-	# not doing any subtyping.  Thus, all we have to do is unify
-	# both sides with each other.
+	if (B::class($op) ne "UNOP") {
+	    
+	    # At this point the type check is flow insensitive, and we're
+	    # not doing any subtyping.  Thus, all we have to do is unify
+	    # both sides with each other.
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
-	my ($lt, $lr) = typeOp($op->last, $pad2type, $env, $cv, SCALAR());
+	    my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
+	    my ($lt, $lr) = typeOp($op->last(), $pad2type, $env, $cv, SCALAR());
 
-	($realResult, $realReturn) =
-	  (myUnify($env, $ft, $lt),
-	   myUnify($env, $fr, $lr));
+	    ($realResult, $realReturn) =
+	      (myUnify($env, $ft, $lt),
+	       myUnify($env, $fr, $lr));
+	} else {
+
+	    # Unless SASSIGN is a UNOP because of an ORASSIGN or an
+	    # ANDASSIGN higher up in the tree.  This, of course, makes
+	    # no sense and the SASSIGN isn't even used.
+
+	    ($realResult, $realReturn) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
+
+	}
 
     } elsif ($t == OP_AASSIGN()) {
 
 	# Infer array for lhs
-	my ($lt, $lr) = typeOp($op->first, $pad2type, $env, $cv, LIST());
+	my ($lt, $lr) = typeOp($op->first(), $pad2type, $env, $cv, LIST());
 	#myUnify($env, $lt, $env->genOmicron());
 
 	# Infer array for rhs
@@ -1379,11 +1531,11 @@ sub typeOp {
 	# First is always the pushre pmop, second is the string, and
 	# third is the count.  
 	if ($context == SCALAR() &&
-	    !defined($op->first->pmreplroot())) {
+	    !defined($op->first()->pmreplroot())) {
 	    warn("split in a scalar context is deprecated");
 	}
 
-	my $pmreplroot = $op->first->pmreplroot();
+	my $pmreplroot = $op->first()->pmreplroot();
 
 	# To simplify things, just make the return a homogeneous list of non-reference scalars.
 	my $result = $env->genOmicron($env->freshUpsilon);
@@ -1399,11 +1551,11 @@ sub typeOp {
         }
 
 	# Make sure the string getting split up is a PV or number, not a ref.
-	my ($st, $sr) = typeOp($op->first->sibling, $pad2type, $env, $cv, SCALAR());
+	my ($st, $sr) = typeOp($op->first()->sibling(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $st, $env->freshUpsilon);
 
 	# This last thing will always be an integer.
-	my ($ct, $cr) = typeOp($op->first->sibling->sibling, $pad2type, $env, $cv, SCALAR());
+	my ($ct, $cr) = typeOp($op->first()->sibling()->sibling(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $ct, $IV);
 	
 	($realResult, $realReturn) = ($result, myUnify($env, $sr, $cr));
@@ -1413,13 +1565,13 @@ sub typeOp {
 	# First is a pushmark, second is a PV, rest are type checked
 	# in a list context but not unified.  There is potential for
 	# loss of precision here.
-	my ($t, $r) = typeOp($op->first->sibling, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first()->sibling(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $PV);
 
 	my @rets;
 	push(@rets, $r) if ($r);
 
-	for (my $kid = $op->first->sibling->sibling; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $op->first()->sibling()->sibling(); $$kid; $kid = $kid->sibling()) {
 	    ($t, $r) = typeOp($kid, $pad2type, $env, $cv, LIST());
 	    push(@rets, $r) if ($r);
 	}
@@ -1431,7 +1583,7 @@ sub typeOp {
 	my ($t, $r) = (undef, undef);
 
 	if ($op->flags & B::OPf_KIDS()) {
-	    ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $t, $PV);
 	}
 
@@ -1448,7 +1600,7 @@ sub typeOp {
 	if (${$op->pmreplstart}) {
 	    ($t, $r) = typeOp($op->pmreplstart, $pad2type, $env, $cv, SCALAR());
 	} else {
-	    my $cur = $op->first;
+	    my $cur = $op->first();
 	    if ($op->flags & B::OPf_STACKED()) {
 		($t, $r) = typeOp($cur, $pad2type, $env, $cv, SCALAR());
 		myUnify($env, $t, $PV);
@@ -1465,7 +1617,7 @@ sub typeOp {
 
     } elsif ($t == OP_SUBSTCONT()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $PV);
 	
 	($realResult, $realReturn) = ($PV, $r);
@@ -1491,11 +1643,11 @@ sub typeOp {
 	my @types;
 	my @rets;
 
-	my ($ft, $fr) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($ft, $fr) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 
 	if (!($ft->is(Devel::TypeCheck::Type::O()) ||
 	      $ft->is(Devel::TypeCheck::Type::X()))) {
-	    myUnify($env, $ft, $env->freshNu());
+	    myUnify($env, $ft, &$inferLogop($env));
 	}
 
 	push(@rets, $fr) if (defined($fr));
@@ -1503,12 +1655,16 @@ sub typeOp {
 	# Remaining operands should unify together if the result wants something
 	my $test = $op->flags & 3;
 	
+	if ($t == OP_AND() || $t == OP_OR()) {
+	    push(@types, &$inferLogop($env));
+	}
+
 	my $ctx = $context;
 
 	$ctx = SCALAR() if ($test == 2);
 	$ctx = LIST() if ($test == 3);
 
-	for (my $kid = $op->first->sibling; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $op->first()->sibling(); $$kid; $kid = $kid->sibling()) {
 	    my ($t, $r) = typeOp($kid, $pad2type, $env, $cv, $ctx);
 	    push(@types, $t) if (defined($t));
 	    push(@rets, $r) if (defined($r));
@@ -1527,12 +1683,18 @@ sub typeOp {
 	my ($r, $missing) = typeProtoOp($op, $pad2type, $env, $cv, ($env->freshKappa, $env->freshKappa));
 	($realResult, $realReturn) = ($IV, $r);
 
+    } elsif ($t == OP_ORASSIGN() ||
+	     $t == OP_ANDASSIGN()) {
+
+	my ($r, $missing) = typeProtoOp($op, $pad2type, $env, $cv, ($IV, $IV));
+	($realResult, $realReturn) = ($IV, $r);
+
     } elsif ($t == OP_SCALAR()) {
 
 	# Get ready for an ugly hack
-	my $cur = $op->first;
+	my $cur = $op->first();
 
-	$cur = $cur->sibling if (($cur->type == 0) && (${$cur->sibling}));
+	$cur = $cur->sibling() if (($cur->type() == 0) && (${$cur->sibling()}));
 
 	my ($t, $r) = typeOp($cur, $pad2type, $env, $cv, SCALAR());
 
@@ -1552,7 +1714,7 @@ sub typeOp {
     } elsif ($t == OP_AV2ARYLEN()) {
 	
 	# Infer undistinguished AV type for operand
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $env->genOmicron());
 
 	# Return IV type
@@ -1561,7 +1723,7 @@ sub typeOp {
     } elsif ($t == OP_SHIFT()     ||
 	     $t == OP_POP()) {
 	
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $env->genOmicron($env->freshKappa));
 
 	# Return the homogeneous type of $t.
@@ -1570,12 +1732,12 @@ sub typeOp {
     } elsif ($t == OP_UNSHIFT() ||
 	     $t == OP_PUSH()) {
 
-	my ($t, $r) = typeOp($op->first->sibling, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first()->sibling(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $env->genOmicron($env->freshKappa));
 
 	my @returns = ($r);
 	my @results = ();
-	for (my $kid = $op->first->sibling->sibling; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $op->first()->sibling()->sibling(); $$kid; $kid = $kid->sibling()) {
 	    my ($t, $r) = typeOp($kid, $pad2type, $env, $cv, LIST());
 	    push(@results, $t) if (defined($t));
 	    push(@returns, $r) if (defined($r));
@@ -1631,6 +1793,7 @@ sub typeOp {
 
     } elsif ($t == OP_CHDIR()  ||
 	     $t == OP_CHROOT() ||
+	     $t == OP_QUOTEMETA() ||
 	     $t == OP_UNLINK()) {
 	
 	my ($r, $missed) = typeProto($op, $pad2type, $env, $cv, ($PV));
@@ -1796,7 +1959,7 @@ sub typeOp {
 	# check.
 	my ($t, $r) = (undef, undef);
 	if ($op->flags & B::OPf_KIDS) {
-	    ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $t, $PV);
 	}
 
@@ -1818,7 +1981,6 @@ sub typeOp {
 	     $t == OP_LCFIRST() ||
 	     $t == OP_UC() ||
 	     $t == OP_LC() ||
-	     $t == OP_QUOTEMETA() ||
 	     $t == OP_READLINK()) {
 
 	my ($r, $missed) = typeProtoOp($op, $pad2type, $env, $cv, ($PV));
@@ -1852,20 +2014,20 @@ sub typeOp {
 
 	# homogenize aggregate data types, sort of like push, pop, shift, and unshift.
 	my ($t, $r);
-	if ($op->first->targ == OP_AELEM()) {
+	if ($op->first()->targ == OP_AELEM()) {
 	    my $list = $env->genOmicron($env->freshKappa);
-	    ($t, $r) = typeOp($op->first->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first()->first(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $t, $list);
 
-	    my ($t0, $r0) = typeOp($op->first->sibling, $pad2type, $env, $cv, SCALAR());
+	    my ($t0, $r0) = typeOp($op->first()->sibling(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $t0, $IV);
 	    myUnify($env, $r0, $r);
-	} elsif ($op->first->targ == OP_HELEM()) {
+	} elsif ($op->first()->targ == OP_HELEM()) {
 	    my $list = $env->genChi($env->freshKappa);
-	    ($t, $r) = typeOp($op->first->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first()->first(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $t, $list);
 
-	    my ($t0, $r0) = typeOp($op->first->first->sibling, $pad2type, $env, $cv, SCALAR());
+	    my ($t0, $r0) = typeOp($op->first()->first()->sibling(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $t0, $env->freshUpsilon);
 	    myUnify($env, $r0, $r);
 	} else {
@@ -1916,7 +2078,7 @@ sub typeOp {
 	# the argument, if there is one.
 	my ($t, $r) = (undef, undef);
 	if ($op->flags & B::OPf_KIDS()) {
-	    ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	}
 
 	# Generate a type of ref to var
@@ -1929,7 +2091,7 @@ sub typeOp {
 	# internally consistent.
 	my ($t, $r) = (undef, undef);
 	if ($op->flags & B::OPf_KIDS()) {
-	    ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	}	
 
 	($realResult, $realReturn) = (undef, $r);
@@ -1951,7 +2113,7 @@ sub typeOp {
 
 	my ($t, $r);
 	if ($op->flags & B::OPf_KIDS()) {
-	    ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	}
 
 	($realResult, $realReturn) = (undef, $r);
@@ -1970,18 +2132,18 @@ sub typeOp {
     } elsif ($t == OP_GREPWHILE() ||
 	     $t == OP_MAPWHILE()) {
 	
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	($realResult, $realReturn) = (contextPick($context, $t, $env->freshKappa), $r);
 
     } elsif ($t == OP_CUSTOM()) {
 	
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	($realResult, $realReturn) = ($env->fresh, $r);
 
     } elsif ($t == OP_FLIP() ||
 	     $t == OP_FLOP()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, $context);
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, $context);
 	myUnify($env, ,$t, $env->genOmicron());
 	($realResult, $realReturn) = ($t, $r);
 
@@ -1989,13 +2151,13 @@ sub typeOp {
 	     $t == OP_UNTIE() ||
 	     $t == OP_LOCK()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	($realResult, $realReturn) = ($IV, $r);
 
     } elsif ($t == OP_CHOP() ||
 	     $t == OP_CHOMP()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, LIST());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, LIST());
 	($realResult, $realReturn) = ($env->genOmicron($env->freshUpsilon), $r);
 
     } elsif ($t == OP_SORT()) {
@@ -2003,15 +2165,15 @@ sub typeOp {
 	my ($t, $r);
 
 	# If the first argument is a scope or a bareword
-	if ($op->first->sibling->type == OP_NULL() &&
-	    ($op->first->sibling->first->type == OP_SCOPE() ||
-	     ($op->first->sibling->first->type == OP_CONST() &&
-	      $op->first->sibling->first->private & 64) ||
-	     ($op->first->sibling->first->type == OP_NULL() &&
-	      $op->first->sibling->first->first->type == OP_ENTER()))) {
+	if ($op->first()->sibling()->type() == OP_NULL() &&
+	    ($op->first()->sibling()->first()->type() == OP_SCOPE() ||
+	     ($op->first()->sibling()->first()->type() == OP_CONST() &&
+	      $op->first()->sibling()->first()->private & 64) ||
+	     ($op->first()->sibling()->first()->type() == OP_NULL() &&
+	      $op->first()->sibling()->first()->first()->type() == OP_ENTER()))) {
 	    # Type it but don't do anything
-	    typeOp($op->first, $pad2type, $env, $cv, SCALAR());
-	    typeOp($op->first->sibling, $pad2type, $env, $cv, SCALAR());
+	    typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
+	    typeOp($op->first()->sibling(), $pad2type, $env, $cv, SCALAR());
 
 	    # Type the rest
 	    ($t, $r) = typeOpChildrenSkip($op, $pad2type, $env, $cv, LIST(), 2);
@@ -2089,7 +2251,7 @@ sub typeOp {
 	#   return the list type
 	my ($realReturn, $missing) = typeProtoOp($op, $pad2type, $env, $cv, ($selection, $list));
 	
-	my $consts = extractConstList($op->first, $cv);
+	my $consts = extractConstList($op->first(), $cv);
 
 	# If the slice is an array of constants
 	if (defined($consts)) {
@@ -2107,11 +2269,11 @@ sub typeOp {
 	# If we're in a scalar context and there is only one operand
 	# describing the projection, dereference the type for the
 	# zeroth index.  This works if it's a tuple, since the
-	# assertion about $op->first->first->sibling->sibling ensures
+	# assertion about $op->first()->first()->sibling()->sibling() ensures
 	# that there is only one element in the $realResult.  The type
 	# at the zeroth index may also be the homogeneous type.
 	if ($context == SCALAR() &&
-	    $op->first->first->sibling->sibling->isa("B::NULL")) {
+	    $op->first()->first()->sibling()->sibling()->isa("B::NULL")) {
 	   $realResult = $realResult->derefIndex(0, $env);
 	}
 	
@@ -2127,7 +2289,7 @@ sub typeOp {
 
 	# List repeat
 	if ($op->private & 64) {
-	    ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, LIST());
+	    ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, LIST());
 
 	    @rets = ($r);
 	    if (${$op->last}) {
@@ -2142,7 +2304,7 @@ sub typeOp {
 	    ($realResult, $realReturn) = ($t, myUnify($env, @rets));
 	} else {
 	    # PV repeat
-	    ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	    ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	    myUnify($env, $t, $PV);
 	    push(@rets, $r0) if ($r);
 
@@ -2192,7 +2354,7 @@ sub typeOp {
 
     } elsif ($t == OP_MKDIR()) {
 
-	my ($r, $missing) = typeProtoOp($op, $pad2type, $env, $cv, ($PV, $IV));
+	my ($r, $missing) = typeProto($op, $pad2type, $env, $cv, ($PV, $IV));
 	($realResult, $realReturn) = ($IV, $r);	
 
     } elsif ($t == OP_READDIR()) {
@@ -2388,9 +2550,9 @@ sub typeOp {
     } elsif ($t == OP_HSLICE()) {
 
 	my $hash = $env->genChi($env->freshKappa);
-	my $select = $env->genOmicron($IV);
+	my $select = $env->genOmicron($PV);
 	my ($r, $missing) = typeProto($op, $pad2type, $env, $cv, ($select, $hash));
-	($realResult, $realReturn) = ($env->genOmicron($hash->subtype), $r);
+	($realResult, $realReturn) = ($env->genOmicron($hash->derefHomogeneous()), $r);
 
     } elsif ($t == OP_ANONHASH()) {
 
@@ -2414,14 +2576,14 @@ sub typeOp {
 	my @results;
 	my @returns;
 
-	my $subop = $op->first->sibling;
+	my $subop = $op->first()->sibling();
 
 	# Type the first as an integer
 	my ($t, $r) = typeOp($subop, $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $IV);
 
         # Smash the rest in to a list
-	for (my $kid = $subop->sibling; $$kid; $kid = $kid->sibling) {
+	for (my $kid = $subop->sibling(); $$kid; $kid = $kid->sibling()) {
 	    # Type the kid
 	    my ($s, $r) = typeOp($kid, $pad2type, $env, $cv, LIST());
 	
@@ -2453,7 +2615,7 @@ sub typeOp {
 
     } elsif ($t == OP_LENGTH()) {
 
-	my ($t, $r) = typeOp($op->first, $pad2type, $env, $cv, SCALAR());
+	my ($t, $r) = typeOp($op->first(), $pad2type, $env, $cv, SCALAR());
 	myUnify($env, $t, $PV);
 	($realResult, $realReturn) = ($IV, $r);
 
@@ -2462,7 +2624,7 @@ sub typeOp {
 	# OP_LEAVEEVAL() is here implicitly
 	# OP_THREADSV() is here implicitly
 	
-	warn("Typing for OP ", $t, " is unimplemented\n");
+	verbose("Typing for OP ", $t, " is unimplemented\n");
 
 	# Try to do something sane depending on context
 	if ($context == SCALAR()) {
@@ -2473,9 +2635,9 @@ sub typeOp {
 
     }
 
-    #if ($realReturn != undef) {
-    #    verbose(" " x $depth, "  ", "non-null return value ", myPrint($env->find($realReturn), $env));
-    #}
+    if (defined($realReturn)) {
+        verbose(" " x $depth, "  ", "non-null return value ", myPrint($env->find($realReturn), $env));
+    }
 
     verbose(" " x $depth, "} = ", $realResult?myPrint($env->find($realResult), $env):"void");
     $depth -= $depthIncrement;
@@ -2500,6 +2662,7 @@ sub typecheck {
 
 sub B::GV::subscribe {
     my ($this) = @_;
+
     no strict 'refs';
     my $refname = $this->STASH->NAME . "::" . $this->NAME;
     if (*{$refname}{CODE}) {
@@ -2516,7 +2679,66 @@ sub B::GV::subscribe {
     }
 }
 
+sub checkCV {
+    my ($env, $op, $cv, $name) = @_;
+
+    my $storedDepth = $depth;
+    $depth = 0;
+
+    # Ad-hoc change to localize *_
+    $glob2type->del("main::_");
+
+    eval {
+	$depth = 0;
+	my ($t, $r) = typecheck($op, $cv, $env);
+	# glob->get always returns an Eta
+	my $p = $glob2type->get("main::_", $env)->derefOmicron();
+
+	if (defined($p)) {
+	    print("  Parameter type of $name is ", myPrint($p, $env), "\n");
+	} else {
+	    print("  Parameter type of $name is undefined\n");
+	}
+
+	if (defined($t)) {
+	    print("  Result type of $name is ", myPrint($t, $env), "\n");
+	} else {
+	    print("  Result type of $name is undefined\n");
+	}
+	if (defined($r)) {
+	    print("  Return type of $name is ", myPrint($r, $env), "\n");
+
+	    # Assign type to the current CV
+	    my $iType = $glob2type->get($name, $env)->derefZeta();
+	    my $infType = $env->genZeta($p, $r);
+	    myUnify($env, $iType, $infType);
+	} else {
+	    print("  Return type of $name is undefined\n");
+	}
+	print("\n");
+    };
+	
+    if ($@) {
+	if ($@ =~ /^TYPE ERROR:/ && $continue) {
+	    print($@, "\n");
+	} else {
+	    die($@);
+	}
+    }
+
+    # Ad-hoc change to localize *_
+    $glob2type->del("main::_");
+
+    $depth = $storedDepth;
+}
+
 sub callback {
+    if ($relax) {
+	$inferLogop = \&inferUpsilon;
+    } else {
+	$inferLogop = \&inferNu;
+    }
+
     for my $name (@modules) {
 	no strict 'refs';
 	B::walksymtable(\%{$name}, 'subscribe', sub { return FALSE() }, $name);
@@ -2565,58 +2787,14 @@ sub callback {
 #	next unless (blessed($i));
 	my $i = shift(@list);
 	print("  $i\n");
-	my ($t, $r);
-
-	# Ad-hoc change to localize *_
-	$glob2type->del("main::_");
-
-	eval {
-	    $depth = 0;
-	    ($t, $r) = typecheck($roots{$i}->{'op'}, $roots{$i}->{'cv'}, $env);
-	    # glob->get always returns an Eta
-	    my $p = $glob2type->get("main::_", $env)->derefOmicron();
-
-	    if (defined($p)) {
-		print("  Parameter type of $i is ", myPrint($p, $env), "\n");
-	    } else {
-		print("  Parameter type of $i is undefined\n");
-	    }
-
-	    if (defined($t)) {
-		print("  Result type of $i is ", myPrint($t, $env), "\n");
-	    } else {
-		print("  Result type of $i is undefined\n");
-	    }
-	    if (defined($r)) {
-		print("  Return type of $i is ", myPrint($r, $env), "\n");
-
-		# Assign type to the current CV
-		my $iType = $glob2type->get($i, $env)->derefZeta();
-		my $infType = $env->genZeta($p, $r);
-		myUnify($env, $iType, $infType);
-	    } else {
-		print("  Return type of $i is undefined\n");
-	    }
-	    print("\n");
-	};
-	
-	if ($@) {
-	    if ($@ =~ /^TYPE ERROR:/ && $continue) {
-		print($@, "\n");
-	    } else {
-		die($@);
-	    }
-	}
-		
-
-	# Ad-hoc change to localize *_
-	$glob2type->del("main::_");
+	checkCV($env, $roots{$i}->{'op'}, $roots{$i}->{'cv'}, $i)
     }
 
     my ($i, $t);
 
-
-    print STDOUT ("Global Symbol Table Types:\nName                Type\n------------------------------------------------------------------------------\n");
+    print STDOUT ("Global Symbol Table Types:\n");
+    print STDOUT ("Name                Type\n");
+    print STDOUT ("------------------------------------------------------------------------------\n");
 
     format STDOUT =
 @<<<<<<<<<<<<<<<<<< @*

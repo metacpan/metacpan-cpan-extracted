@@ -1,0 +1,67 @@
+Acme::Time::Asparagus
+
+We have a clock in our kitchen that has vegetables rather than numbers.
+You can see a picture of it at http://www.drbacchus.com/images/clock.jpg
+Pretty cool, huh?
+
+Sarah, our 4 year old, does not yet know how to tell time, and the other
+night I told her that she needed to be ready to go somewhere by
+asparagus. This got me thinking that it would be amusing to have a
+module for conversion from regular time to vegetable time. And, if I got
+particularly bored, the other direction.
+
+So what is this really good for? Um. It's in the Acme namespace. It's
+purely for my amusement.
+
+Note that there are also a wide variety of sushi clocks available -
+thanks to DrForr for this tip - which you can pick up at
+http://www.sushiclock.com/
+
+Rich 'DrBacchus' Bowen
+21 April, 2002, at about Tomato past Brussels Sprout.
+
+  use Acme::Time::Asparagus;
+  print veggietime("2:53");
+
+Displays "Red Pepper before Carrot"
+
+This package also contains Acme::Time::Aubergine (vegatable clock in
+British English) and Acme::Time::DimSum (a dim sum clock), and
+Acme::Time::FooClock, which lets you create your own clock module by
+providing a list of objects appearing on the clock.
+
+---------------------
+
+Version 1.02 adds 'before' as well as 'after', so that one has 'Onion
+before Brussel Sprout', rather than 'Onion after Corn'. And now you can
+just call veggietime() and have it default to the current time. Thanks
+to sockmonk and phydeaux for appropriate VeggieTales quotes.
+
+---------------------
+
+Version 1.04 is the result of a patch from Kate Pugh, of London.pm,
+demonstrating that there are other people in the world that are just as
+silly as me. So there. Now this module speaks British English as well as
+American English. You say tomato, I say tomato.
+
+---------------------
+
+Version 1.10 is a major rearrangement. The desire was to be able to
+create clock modules for any arbitrary clock without working very hard
+at it. Seems like a lot of trouble to go to, but there you have it. So,
+we have a new Acme::Time::FooClock which provides the guts, and then
+various other modules which implement a particular clock. Please make
+your own clocks, and further pollute the world with silly code.
+
+----------------------
+
+Version 1.16 fixes the broken 1.15 release, which claimed to provide a
+veggietime command line script, but didn't, and so broke stuff. Also,
+1.15 seems to have never made it into revision control, which is odd. So
+if such a script ever existed, I don't know where it went. Not that it
+would be difficult to make a new one ...
+
+----------------------
+
+Version 1.17 and 1.18 adds the veggietime script for reals.
+

@@ -1,0 +1,22 @@
+---
+abstract: 'Mojo::Template wrapper for Dancer'
+author:
+  - 'James Aitken <jaitken@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-MojoTemplate
+requires:
+  Dancer::Template::Abstract: 0
+  Mojo::Template: 0
+resources:
+  bugtracker: https://github.com/LoonyPandora/Dancer-Template-MojoTemplate/issues
+  repository: git://github.com/LoonyPandora/Dancer-Template-MojoTemplate.git
+version: 0.2.0

@@ -1,0 +1,209 @@
+# zxid/sg/saml-schema-protocol-2.0.sg
+# $Id: saml-schema-protocol-2.0.sg,v 1.5 2008-02-23 03:59:31 sampo Exp $
+#
+# N.B. This file is not a direct conversion. Instead it has been manually
+# edited to make it simpler and to facilitate code generation.
+
+target(sp,urn:oasis:names:tc:SAML:2.0:protocol)
+import(sa,urn:oasis:names:tc:SAML:2.0:assertion,saml-schema-assertion-2.0.xsd)
+import(ds,http://www.w3.org/2000/09/xmldsig#,http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+ns(xs, http://www.w3.org/2001/XMLSchema)
+
+%RequestAbstractType:
+  sa:Issuer?
+  ds:Signature?
+  sp:Extensions?
+  @ID	 -> %xs:ID
+  @Version	 -> %xs:string
+  @IssueInstant	 -> %xs:dateTime
+  @Destination?	 -> %xs:anyURI
+  @Consent?	 -> %xs:anyURI
+  ;
+
+Extensions	 -> %sp:ExtensionsType
+%ExtensionsType:
+  any+
+  ;
+
+%StatusResponseType:
+  sa:Issuer?
+  ds:Signature?
+  sp:Extensions?
+  sp:Status
+  @ID	 -> %xs:ID
+  @InResponseTo? -> %xs:NCName
+  @Version	 -> %xs:string
+  @IssueInstant	 -> %xs:dateTime
+  @Destination?	 -> %xs:anyURI
+  @Consent?	 -> %xs:anyURI
+  ;
+
+Status	 -> %sp:StatusType
+%StatusType:
+  sp:StatusCode
+  sp:StatusMessage?
+  sp:StatusDetail?
+  ;
+
+StatusCode	 -> %sp:StatusCodeType
+%StatusCodeType:
+  sp:StatusCode?
+  @Value	 -> %xs:anyURI
+  ;
+
+StatusMessage	 -> %xs:string
+
+StatusDetail	 -> %sp:StatusDetailType
+%StatusDetailType:
+  any*
+  ;
+
+AssertionIDRequest	 -> %sp:AssertionIDRequestType
+%AssertionIDRequestType: base(sp:RequestAbstractType)
+  sa:AssertionIDRef+
+  ;
+
+SubjectQuery	 -> %sp:SubjectQueryAbstractType
+%SubjectQueryAbstractType: base(sp:RequestAbstractType)
+  sa:Subject
+  ;
+
+AuthnQuery	 -> %sp:AuthnQueryType
+%AuthnQueryType:	 base(sp:SubjectQueryAbstractType)
+  sp:RequestedAuthnContext?
+  @SessionIndex?	 -> %xs:string
+  ;
+
+RequestedAuthnContext	 -> %sp:RequestedAuthnContextType
+%RequestedAuthnContextType:
+  sa:AuthnContextClassRef*
+  sa:AuthnContextDeclRef*
+  @Comparison?	 -> %sp:AuthnContextComparisonType
+  ;
+
+%AuthnContextComparisonType:	 enum( exact minimum maximum better ) ;
+
+AttributeQuery	 -> %sp:AttributeQueryType
+%AttributeQueryType:	 base(sp:SubjectQueryAbstractType)
+  sa:Attribute*
+  ;
+
+AuthzDecisionQuery	 -> %sp:AuthzDecisionQueryType
+%AuthzDecisionQueryType: base(sp:SubjectQueryAbstractType)
+  sa:Action+
+  sa:Evidence?
+  @Resource	 -> %xs:anyURI
+  ;
+
+AuthnRequest	 -> %sp:AuthnRequestType
+%AuthnRequestType:	 base(sp:RequestAbstractType)
+  sa:Subject?
+  sp:NameIDPolicy?
+  sa:Conditions?
+  sp:RequestedAuthnContext?
+  sp:Scoping?
+  @ForceAuthn?	 -> %xs:boolean
+  @IsPassive?	 -> %xs:boolean
+  @ProtocolBinding?	 -> %xs:anyURI
+  @AssertionConsumerServiceIndex?	 -> %xs:unsignedShort
+  @AssertionConsumerServiceURL?	 -> %xs:anyURI
+  @AttributeConsumingServiceIndex?	 -> %xs:unsignedShort
+  @ProviderName?	 -> %xs:string
+  ;
+
+NameIDPolicy	 -> %sp:NameIDPolicyType
+%NameIDPolicyType:
+  @Format?	 -> %xs:anyURI
+  @SPNameQualifier?	 -> %xs:string
+  @AllowCreate?	 -> %xs:boolean
+  ;
+
+Scoping	 -> %sp:ScopingType
+%ScopingType:
+  sp:IDPList?
+  sp:RequesterID*
+  @ProxyCount?	 -> %xs:nonNegativeInteger
+  ;
+
+RequesterID	 -> %xs:anyURI
+
+IDPList	 -> %sp:IDPListType
+%IDPListType:
+  sp:IDPEntry+
+  sp:GetComplete?
+  ;
+
+IDPEntry	 -> %sp:IDPEntryType
+%IDPEntryType:
+  @ProviderID	 -> %xs:anyURI
+  @Name?	 -> %xs:string
+  @Loc?	 -> %xs:anyURI
+  ;
+
+GetComplete	 -> %xs:anyURI
+
+Response	 -> %sp:ResponseType
+%ResponseType:	 base(sp:StatusResponseType)
+  sa:Assertion?
+  sa:EncryptedAssertion?
+  ;
+
+ArtifactResolve	 -> %sp:ArtifactResolveType
+%ArtifactResolveType:	 base(sp:RequestAbstractType)
+  sp:Artifact
+  ;
+
+Artifact	 -> %xs:string
+
+ArtifactResponse	 -> %sp:ArtifactResponseType
+%ArtifactResponseType:	 base(sp:StatusResponseType)
+  sp:Response?
+  any?
+  ;
+
+ManageNameIDRequest	 -> %sp:ManageNameIDRequestType
+%ManageNameIDRequestType:	 base(sp:RequestAbstractType)
+  sa:NameID?
+  sa:EncryptedID?
+  sp:NewID?
+  sp:NewEncryptedID?
+  sp:Terminate?
+  ;
+
+NewID	 -> %xs:string
+
+NewEncryptedID	 -> %sa:EncryptedElementType
+
+Terminate	 -> %sp:TerminateType
+
+ManageNameIDResponse	 -> %sp:StatusResponseType
+
+LogoutRequest	 -> %sp:LogoutRequestType
+%LogoutRequestType:	 base(sp:RequestAbstractType)
+  sa:BaseID?
+  sa:NameID?
+  sa:EncryptedID?
+  sp:SessionIndex*
+  @Reason?	 -> %xs:string
+  @NotOnOrAfter?	 -> %xs:dateTime
+  ;
+
+SessionIndex	 -> %xs:string
+
+LogoutResponse	 -> %sp:StatusResponseType
+
+NameIDMappingRequest	 -> %sp:NameIDMappingRequestType
+%NameIDMappingRequestType:	 base(sp:RequestAbstractType)
+  sa:BaseID?
+  sa:NameID?
+  sa:EncryptedID?
+  sp:NameIDPolicy
+  ;
+
+NameIDMappingResponse	 -> %sp:NameIDMappingResponseType
+%NameIDMappingResponseType:	 base(sp:StatusResponseType)
+  sa:NameID?
+  sa:EncryptedID?
+  ;
+
+#EOF

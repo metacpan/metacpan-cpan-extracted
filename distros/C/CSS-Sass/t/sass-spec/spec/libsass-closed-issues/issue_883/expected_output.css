@@ -1,10 +1,6 @@
 @foo {
   div {
-    font: a;
-  }
-}
+    font: a; } }
 @bar {
   div {
-    color: b;
-  }
-}
+    color: b; } }

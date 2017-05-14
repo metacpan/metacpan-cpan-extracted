@@ -5,6 +5,7 @@ use warnings;
 
 use Catmandu::Importer::OAI;
 use Moo;
+use URI::Split qw(uri_join);
 
 with 'Datahub::Factory::Importer';
 
@@ -12,31 +13,37 @@ has endpoint           => (is => 'ro', required => 1);
 has metadata_prefix    => (is => 'ro', default => sub {
     return 'oai_lido';
 });
-has handler            => (is => 'ro');
-has set                => (is => 'ro');
-has from               => (is => 'ro');
-has until              => (is => 'ro');
-has username           => (is => 'ro');
-has password           => (is => 'ro');
-#has pid_module         => (is => 'ro', default => 'lwp');
-has pid_username       => (is => 'ro');
-has pid_password       => (is => 'ro');
-has pid_lwp_realm      => (is => 'ro');
-has pid_lwp_url        => (is => 'ro');
+has handler                => (is => 'ro');
+has set                    => (is => 'ro');
+has from                   => (is => 'ro');
+has until                  => (is => 'ro');
+has username               => (is => 'ro');
+has password               => (is => 'ro');
+has pid_module             => (is => 'ro', default => 'rcf');
+has pid_username           => (is => 'ro');
+has pid_password           => (is => 'ro');
+has pid_lwp_realm          => (is => 'ro');
+has pid_lwp_base_url       => (is => 'ro');
 has pid_rcf_container_name => (is => 'ro');
 
 
 sub _build_importer {
     my $self = shift;
-    my $importer = Catmandu::Importer::OAI->new(
+    my $options = {
         url            => $self->endpoint,
         handler        => $self->handler,
         metadataPrefix => $self->metadata_prefix,
         from           => $self->from,
         until          => $self->until,
         set            => $self->set,
-        username       => $self->username,
-        password       => $self->password,
+    };
+    if (defined($self->username)) {
+        $options->{'username'} = $self->username;
+        $options->{'password'} = $self->password;
+    }
+
+    my $importer = Catmandu::Importer::OAI->new(
+       $options
     );
     $self->prepare();
     return $importer;
@@ -55,11 +62,13 @@ sub prepare {
 sub __pids {
     my $self = shift;
     my $pid = Datahub::Factory->module('PID')->new(
-        pid_module             => 'rcf',
+        pid_module             => $self->pid_module,
         pid_username           => $self->pid_username,
         pid_password           => $self->pid_password,
         pid_rcf_container_name => $self->pid_rcf_container_name,
-        pid_rcf_object         => 'PIDS_MSK_UTF8.csv'
+        pid_rcf_object         => 'PIDS_MSK_UTF8.csv',
+        pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'PIDS_MSK_UTF8.csv'),
+        pid_lwp_realm          => $self->pid_lwp_realm,
     );
     $pid->temporary_table($pid->path);
 }
@@ -67,11 +76,13 @@ sub __pids {
 sub __creators {
     my $self = shift;
     my $pid = Datahub::Factory->module('PID')->new(
-        pid_module             => 'rcf',
+        pid_module             => $self->pid_module,
         pid_username           => $self->pid_username,
         pid_password           => $self->pid_password,
         pid_rcf_container_name => $self->pid_rcf_container_name,
-        pid_rcf_object         => 'CREATORS_MSK_UTF8.csv'
+        pid_rcf_object         => 'CREATORS_MSK_UTF8.csv',
+        pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'CREATORS_MSK_UTF8.csv'),
+        pid_lwp_realm          => $self->pid_lwp_realm,
     );
     $pid->temporary_table($pid->path);
 }
@@ -79,11 +90,13 @@ sub __creators {
 sub __aat {
     my $self = shift;
     my $pid = Datahub::Factory->module('PID')->new(
-        pid_module             => 'rcf',
+        pid_module             => $self->pid_module,
         pid_username           => $self->pid_username,
         pid_password           => $self->pid_password,
         pid_rcf_container_name => $self->pid_rcf_container_name,
-        pid_rcf_object         => 'AAT_UTF8.csv'
+        pid_rcf_object         => 'AAT_UTF8.csv',
+        pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'AAT_UTF8.csv'),
+        pid_lwp_realm          => $self->pid_lwp_realm,
     );
     $pid->temporary_table($pid->path, 'record - object_name');
 }
@@ -106,6 +119,7 @@ Datahub::Factory::Importer::MSK - Import data from the MSK L<OAI-PMH|https://www
         url                    => 'https://endpoint.msk.be/oai',
         metadataPrefix         => 'oai_lido',
         set                    => '2011',
+        pid_module             => 'rcf',
         pid_username           => 'datahub',
         pid_password           => 'datahub',
         pid_rcf_container_name => 'datahub',
@@ -130,7 +144,15 @@ Provide C<pid_username>, C<pid_password> and C<pid_rcf_container_name>.
 
 =head1 PARAMETERS
 
-Only the C<endpoint> parameter is required.
+The C<endpoint> parameter and some L<PID module parameters|Datahub::Factory::Module::PID> are required.
+
+To link PIDs (Persistent Identifiers) to MSK records, it is necessary to use the PID module to fetch a
+CSV from either a Rackspace Cloud Files (protected by username and password) instance or a public web
+site. Depending on whether you choose Rackspace or a Web site, different options must be set. If an
+option is not applicable for your selected module, you can skip the parameter or set it to C<undef>.
+
+The CSV files are converted to sqlite tables inside C</tmp> and can be used in your fixes. See L<msk.fix|https://github.com/VlaamseKunstcollectie/Datahub-Fixes/blob/master/msk.fix>
+for an example.
 
 =over
 
@@ -139,6 +161,7 @@ Only the C<endpoint> parameter is required.
 URL of the OAI endpoint.
 
 =item handler( sub {} | $object | 'NAME' | '+NAME' )
+
 Handler to transform each record from XML DOM (L<XML::LibXML::Element>) into
 Perl hash.
 
@@ -170,17 +193,43 @@ Optionally, a I<must_be_older_than> date.
 
 Optionally, a I<must_be_younger_than> date.
 
+=item C<username>
+
+=item C<password>
+
+=back
+
+=head2 PID options
+
+=over
+
+=item C<pid_module>
+
+Choose the PID module you want to use. Set to I<rcf> to use Rackspace Cloud Files, or to
+I<lwp> to use a public web site.
+
 =item C<pid_username>
 
-Provide your Rackspace Cloud Files username.
+Provide your Rackspace Cloud Files username. If you selected I<lwp>, provide an optional
+username (for HTTP Basic Authentication).
 
 =item C<pid_password>
 
-Provide your Rackspace Cloud Files api key.
+Provide your Rackspace Cloud Files api key. For I<lwp>, an optional password.
 
 =item C<pid_rcf_container_name>
 
-Provide the container name that holds the PID CSV's.
+Provide the container name that holds the PID CSV's for I<rcf>.
+
+=item C<pid_lwp_realm>
+
+For I<lwp>, provide (optionally) the HTTP Basic Authentication Realm.
+
+=item C<pid_lwp_base_url>
+
+For I<lwp>, provide the URL where the CSV's are stored. This URL is used in addition
+to the name of the CSV file to create the URL where the file can be fetched from (i.e
+C<my $url = $pid_lwp_base_url + $csv_file_name>).
 
 =back
 

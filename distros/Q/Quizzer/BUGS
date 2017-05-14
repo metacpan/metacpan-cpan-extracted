@@ -1,0 +1,4 @@
+- The Noninteractive and Web frontends probably don't work very well.
+- There are problems in answer's quoting when answer contains strange 
+characters.
+- ...

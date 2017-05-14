@@ -6,7 +6,7 @@ use List::Util qw( shuffle );
 use Carp;
 
 our @ISA = qw( AI::MicroStructure::RemoteList );
-our $VERSION = '1.001';
+our $VERSION = '0.20';
 
 sub init {
     my ($self, $data) = @_;
@@ -86,15 +86,15 @@ AI::MicroStructure::List - Base class for simple lists of names
     1;
 
     =head1 NAME
-    
+
     AI::MicroStructure::beatles - The fab four structure
-    
+
     =head1 DESCRIPTION
-    
+
     Ladies and gentlemen, I<The Beatles>. I<(hysteric cries)>
 
     =cut
-    
+
     __DATA__
     # names
     john paul

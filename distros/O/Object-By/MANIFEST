@@ -1,0 +1,25 @@
+Changes
+INSTALL
+lib/Object/By/Array.pm
+lib/Object/By/Array.pod
+lib/Object/By/Array_Accessor.pm
+lib/Object/By/Array_Clone_Recursive.pm
+lib/Object/By/Existing_Reference.pm
+lib/Object/By/Existing_Reference.pod
+lib/Object/By/Hash.pm
+lib/Object/By/Hash.pod
+lib/Object/By/Hash_Accessor.pm
+lib/Object/By/Hash_Clone_Recursive.pm
+lib/Object/By/Scalar.pm
+lib/Object/By/Scalar.pod
+lib/Object/By/Scalar_Accessor.pm
+lib/Object/By/Typeglob.pm
+lib/Object/By/Typeglob.pod
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_scalar.t
+t/02_array.t
+t/03_hash.t
+Todo.txt
+META.yml                                 Module meta-data (added by MakeMaker)

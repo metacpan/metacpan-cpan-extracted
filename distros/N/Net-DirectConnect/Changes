@@ -1,4 +1,21 @@
-# $Id: Changes 817 2011-07-04 16:12:36Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/Changes $
+# $Id: Changes 989 2012-12-28 20:32:32Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/Changes $
+0.14:
+adcs hub works
+
+0.13:
+
+0.12: 
+small speed fixes
+
+0.11: 
+lot of fixes, better select (cpu usage)
+unfinished adc ipv6 support
+unfinished acds support
+both automatic on client, but manual for hub:
+# $config{dc}{dev_ipv6} = 1; 
+# $config{dc}{protocol} = 'acds'; 
+
+
 0.10: 
 non blocking connect fixed
 

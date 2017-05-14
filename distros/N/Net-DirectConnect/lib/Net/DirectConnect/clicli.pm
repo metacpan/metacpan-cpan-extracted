@@ -1,4 +1,4 @@
-#$Id: clicli.pm 785 2011-05-24 21:08:08Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/lib/Net/DirectConnect/clicli.pm $
+#$Id: clicli.pm 919 2011-10-21 21:57:00Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/lib/Net/DirectConnect/clicli.pm $
 package    #hide from cpan
   Net::DirectConnect::clicli;
 use strict;
@@ -6,7 +6,7 @@ use Net::DirectConnect;
 use Data::Dumper;    #dev only
 $Data::Dumper::Sortkeys = 1;
 no warnings qw(uninitialized);
-our $VERSION = ( split( ' ', '$Revision: 785 $' ) )[1];
+our $VERSION = ( split( ' ', '$Revision: 919 $' ) )[1];
 use base 'Net::DirectConnect';
 
 sub init {
@@ -58,8 +58,9 @@ sub init {
   $self->{$_} ||= $self->{'parent'}{$_} for qw(  Nick  );
   #$self->{'NickList'} ||= {};
   #$self->{'IpList'}   ||= {};
+  $self->module_load('filelist');
   #$self->{'PortList'} ||= {};
-  $self->log( 'info', "Incoming client $self->{'host'}:$self->{'port'} via ", ref $self ) if $self->{'incoming'};
+  #$self->log( 'info', "Incoming client $self->{'host'}:$self->{'port'} via ", ref $self ) if $self->{'incoming'};
   #$self->{'parse'} = undef if $self->{'parse'} and !keys %{ $self->{'parse'} };
   #$self->{'parse'} ||= {
   local %_ = (
@@ -112,7 +113,7 @@ sub init {
         $self->{'sendbuf'} = 0;
         $self->cmd( 'Key', $self->{'key'} );
       }
-      $self->cmd('file_select'), $self->log( "get:[filename:", $self->{'filename'}, '; fileas:', $self->{'fileas'}, "]" )
+      $self->file_select(), $self->log( "get:[filename:", $self->{'filename'}, '; fileas:', $self->{'fileas'}, "]" )
         if $self->{'direction'} eq 'Download';
       $self->{'get'} = $self->{'filename'} . '$' . ( $self->{'file_recv_from'} || 1 ),
         $self->{'adcget'} =

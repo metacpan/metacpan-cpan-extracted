@@ -1,0 +1,8 @@
+#include "orig_module.idl"
+module A
+{
+   struct typeb {
+    type  x;
+   };
+};
+

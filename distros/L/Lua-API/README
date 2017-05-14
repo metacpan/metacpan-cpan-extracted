@@ -1,0 +1,69 @@
+Lua::API
+========
+
+Lua is a simple, expressive, extension programming language that is
+easily embeddable.  Lua::API module provides Perl bindings to Lua’s
+C-based embedding API.  It allows Perl routines to be called from Lua
+as if they were written in C, and allows Perl routines to directly
+manipulate the Lua interpreter and its environment.  It presents a
+very low-level interface (essentially equivalent to the C interface),
+so is aimed at developers who need that sort of access.
+
+INSTALLATION
+
+This package requires Lua 5.1.X libraries and headers.  On most modern
+*nix systems which uses pkg-config, the following will work:
+
+   perl Makefile.PL
+
+If this fails to find the library, specify the location of the
+includes and library as follows:
+
+   perl Makefile.PL LUA_INC=-I/my/include/dir LUA_LIBS='-L/my/lib/dir -llua'
+
+Note that on systems which support multiple versions of lua, the
+include directory and library name may contain the version
+
+
+   perl Makefile.PL \
+   		   LUA_INC=-I/usr/include/lua5.1 \
+   		   LUA_LIBS='-llua5.1'
+
+
+If this part is successful:
+
+   make
+   make test
+   make install
+
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  ExtUtils::PkgConfig (optional)
+  Lua 5.1
+
+COPYRIGHT AND LICENCE
+
+--8<--8<--8<--8<--
+
+Copyright (C) 2010 Smithsonian Astrophysical Observatory
+
+This file is part of Lua-API
+
+Lua-API is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->8-->8-->8-->8--

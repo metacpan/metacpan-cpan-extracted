@@ -1,0 +1,14 @@
+--- lib/Perlbal/BackendHTTP.pm.old	2009-11-06 16:42:13.000000000 -0800
++++ lib/Perlbal/BackendHTTP.pm	2009-11-06 16:43:22.000000000 -0800
+@@ -456,6 +456,11 @@
+     if ($te && $te !~ /\bidentity\b/i) {
+         $hd->header("Content-Length", undef);
+     }
++    
++    my $svc = $self->{service};
++    if(ref($svc) && UNIVERSAL::can($svc,'can')) {
++      $svc->run_hook('modify_response_headers', $self);
++    }
+ 
+     my Perlbal::HTTPHeaders $rqhd = $self->{req_headers};
+ 

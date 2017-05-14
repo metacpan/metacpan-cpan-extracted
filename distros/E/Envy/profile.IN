@@ -1,0 +1,53 @@
+# .[bash_][z]profile -  ksh/zsh/bash/sh generic startup file
+#
+# Do the absolute minimum to set $ETOP with envy.pl and
+# then proceed to $ETOP/../profile, etc.
+#
+# test with bash: env -i HOME=$HOME $SHELL --login
+# test with ksh : ?
+#
+# set -x
+
+#INITIAL_ENV#
+
+if [ x$HOME = x ]; then echo "PANIC: HOME is not set"; exit; fi
+
+if [ -s $HOME/.custom/startup.name ]; then
+  startup=`cat $HOME/.custom/startup.name`
+fi
+if [ -s $HOME/.custom/startup ]; then
+  startup=`cat $HOME/.custom/startup`
+fi
+if [ x$startup = x ]; then startup=#STARTUP#; fi
+
+ENVY_CONTEXT=STARTUP
+ENVY=#ENVY.PL#
+test -x $ENVY || echo Envy not found at $ENVY: PANIC
+
+$ENVY load $startup > /tmp/mod.$$
+. /tmp/mod.$$
+rm /tmp/mod.$$
+
+if [ x$ETOP = x ]; then
+  ETOP=#ETOP#; export ETOP
+  echo "Environment variable ETOP not set in startup module $startup"
+  echo "Defaulting to $ETOP..."
+fi
+
+safe_symlink() {
+  if [ -f $2 -a '!' -h $2 ]; then mv $2 $2.bak.$$; fi
+  rm -f $2
+  ln -s $1 $2
+}
+
+#SAFE_SYMLINK#
+
+if [ '!' -d $HOME/.custom ]; then mkdir .custom; fi;
+maybe_touch_file() {
+  if [ '!' -f $1 ]; then touch $1; fi
+}
+maybe_touch_file $HOME/.custom/startup
+maybe_touch_file $HOME/.custom/profile
+maybe_touch_file $HOME/.custom/shrc
+
+. $ETOP/etc/login/profile.part2

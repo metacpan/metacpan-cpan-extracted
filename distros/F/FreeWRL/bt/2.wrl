@@ -1,0 +1,42 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# Browser object in Perl: test 
+
+Shape {
+	appearance Appearance {material Material {diffuseColor 0.8 0 0}}
+	geometry DEF T Text {  }
+}
+
+DEF TS TimeSensor {
+	cycleInterval 1
+	loop TRUE
+}
+
+DEF S Script {
+	eventOut MFString str
+	eventIn SFTime foo
+	url [
+	"javascript:
+	 function foo() {
+	 	str = new MFString(\"Name: \"+Browser.getName(),
+				   \"Version: \"+Browser.getVersion(),
+				   \"FrameRate: \"+Browser.getCurrentFrameRate());
+	 }
+	"
+	"perl_tjl_xxx1:
+	  foo => sub {
+	  	print 'S Init
+';
+	  	$t->{str} = [\"Name: \".$Browser->getName,
+			\"Version: \".$Browser->getVersion,
+			\"FrameRate: \".$Browser->getCurrentFrameRate];
+	  }
+	"]
+}
+
+ROUTE TS.cycleTime TO S.foo
+ROUTE S.str TO T.string

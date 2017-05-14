@@ -1,0 +1,13 @@
+cjk-tokenizer/cjk-hanconvert.cc
+cjk-tokenizer/cjk-hanconvert.h
+cjk-tokenizer/cjk-tokenizer.cc
+cjk-tokenizer/cjk-tokenizer.h
+cjk-tokenizer/makefile
+cjk-tokenizer/test.cc
+lib/Lingua/CJK/Tokenizer.pm
+Makefile.PL
+MANIFEST			This list of files
+t/tokenizer.t
+Tokenizer.xs
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

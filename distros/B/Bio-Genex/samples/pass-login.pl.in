@@ -1,0 +1,145 @@
+%%START_PERL%% -wT
+#
+# File: pass-login.pl
+#
+# This script can either be called with no parameters or with
+# a user login name and password. If called with no parameters,
+# this script displays a login panel to request a login name and 
+# password. If called with a login name and password, the script 
+# takes that information and directly called the pass-auth-login.pl 
+# script, allowing the user to bypass the login panel.
+#
+# Original code by William Anderson (wxa@ncgr.org)
+#
+# Programmer: Jason E. Stewart (jes@ncgr.org)
+#
+# script copyright (c) 2000 by NCGR.
+# All rights reserved.
+
+use strict;
+%%GENEX_EXTRALIBS%%
+
+use CGI qw(:standard :html3 :netscape);
+
+# Clean up the enviroment for Taint mode
+$ENV{PATH} = "/bin:/usr/bin";
+delete @ENV{ 'IFS','CDPATH','ENV','BASH_ENV' };
+
+$|++;
+
+my $q = CGI->new();
+
+# See if there are any CGI parameters provided. 
+if (param) {
+  # Extract and validate the parameters if provided.
+  # Note that I allow only alpha characters (both upper and
+  # lower case) and numeric digits.
+  my ($username)   = param('User_Name') =~ /^([a-zA-Z_0-9]+)$/;
+  my ($password)   = param('Password') =~ /^([a-zA-Z_0-9]+)$/;
+
+  if ($username eq "") {
+    #print "Error! I found an invalid value for User Name!!<br>\n";
+    system ("./pass-invalid-login.pl","User_Name=");
+    exit 0;
+  }				# end if
+  if ($password eq "") {
+    #print "Error! I found an invalid value for Password!!<br>\n";
+    system ("./pass-invalid-login.pl","User_Name=$username");
+    exit 0;
+  }				# end if
+
+
+  # Call the authentication script
+  #print "./auth-login.pl, User_Name=$username, Password=$password<br>\n";
+  system ("./pass-auth-login.pl","User_Name=$username","Password=$password");
+} else {
+	# Display the input form
+	print <<EofHTML;
+Content-type: text/html
+
+<html><head><title>GeneX Password Modification Login</title></head>
+<body bgcolor=#ffffff>
+<div align=center>
+  <h2>Login To Genex </h2>
+</div>
+<p>
+
+In order to modify your existing DB password, you must first
+authenticate yourself. After authentication, you will be provided with
+an opportunity to modify your password.
+</p>
+
+<div align=center>
+<form action=./pass-auth-login.pl method=post>
+<table>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> Login Name:</td>
+    <td><input type=text name=User_Name size=20 maxlength=20></td>
+  </tr>
+  <tr>
+    <td width=20>&nbsp</td>
+    <td> Password:</td>
+    <td><input type=password name=Password size=20 maxlength=20></td>
+  </tr>
+  <tr>
+    <td colspan=3 align=center>
+      <input type=submit value=\"Login to GeneX\">
+    </td>
+  </tr>
+</table>
+</div>
+<hr>
+<div align=center>
+<font size=-2>
+Copyright &copy; 2000<br>by NCGR<br>All Rights Reserved
+</font>
+</div>
+</body></html>
+
+EofHTML
+
+}
+
+__END__
+
+=head1 NAME
+
+B<pass-login.pl>: a CGI script for downloading a Gene Expression
+Markup Language (GeneXML) experiment set files to the curation tool.
+
+=head1 SYNOPSIS
+
+  pass-login.pl
+
+=head1 DESCRIPTION
+
+This CGI script can either take no CGI parameters or can take a user 
+name and password parameter. 
+
+If no parameters are provided. the script provides a login field and a
+password field. The generated HTML form calls pass-auth-login.pl when
+the button is clicked. pass-auth-login.pl will call pass-mod.pl if the
+user properly authenticates his or herself.
+
+If the user name and password CGI parameters are provided, the script 
+extracts these parameters and directly calls the pass-auth-login.pl script
+directly, passing the script the parameters, allowing the user to 
+bypass the login screen if they have already logged on.
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Nov  6 12:09:31 MST 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

@@ -1,15 +1,15 @@
 SYNOPSIS
-      my $config = Package::Configure->new();
+      my $config = Package::Install::Configure->new();
       my $value1 = $config->setting1();               #get
       $config->setting1('a new value for setting 1'); #set
 
 DESCRIPTION
-    Package::Configure - Access package configuration values from
+    Package::Install::Configure - Access package configuration values from
     command-line options (Getopt::Long style), previously specified cached
     settings, or default values. This package is a kindred spirit to the GNU
     automake and autoconf tools.
 
-    When a Package::Configure object is instantiated, the following
+    When a Package::Install::Configure object is instantiated, the following
     happens:
 
       1. A. If F<pkg_config.cache> exists, load it into L</ini()> accessor as a
@@ -44,7 +44,7 @@ CONFIGURATION FILES pkg_config.in AND pkg_config.cache
 
   RESERVED VARIABLES
     These variables have a built-in function and are reserved for use by
-    Package::Configure.
+    Package::Install::Configure.
 
     * help * interactive
 
@@ -53,7 +53,7 @@ CONFIGURATION FILES pkg_config.in AND pkg_config.cache
     said parameters.
 
   DECLARING CONFIGURATION VARIABLES
-    Package::Configure recognizes variables in the following INI
+    Package::Install::Configure recognizes variables in the following INI
     sections:
 
     for single value parameters:

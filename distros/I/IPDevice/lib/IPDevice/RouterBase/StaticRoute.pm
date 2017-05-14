@@ -4,12 +4,12 @@
 ## entry.
 ####
 
-package RouterBase::StaticRoute;
-use RouterBase::Atom;
-use IPv4;
+package IPDevice::RouterBase::StaticRoute;
+use IPDevice::RouterBase::Atom;
+use IPDevice::IPv4;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom);
+@ISA = qw(IPDevice::RouterBase::Atom);
 
 $VERSION = 0.01;
 
@@ -19,12 +19,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::StaticRoute
+IPDevice::RouterBase::StaticRoute
 
 =head1 SYNOPSIS
 
- use RouterBase::StaticRoute;
- my $route = new RouterBase::StaticRoute;
+ use IPDevice::RouterBase::StaticRoute;
+ my $route = new IPDevice::RouterBase::StaticRoute;
  $route->set_network('192.168.0.0', '255.255.255.0');
  $route->set_destination('10.10.10.1);
 
@@ -69,10 +69,10 @@ Returns FALSE if the prefix is invalid, otherwise TRUE.
 sub set_prefix {
   my($self, $prefix) = @_;
   return FALSE if $prefix !~ /^([^\/]+)\/(\d+)$/;
-  return FALSE if !IPv4::check_ip($1);
-  return FALSE if !IPv4::check_prefixlen($2);
+  return FALSE if !IPDevice::IPv4::check_ip($1);
+  return FALSE if !IPDevice::IPv4::check_prefixlen($2);
   $self->{network} = $1;
-  $self->{mask}    = IPv4::pfxlen2mask($2);
+  $self->{mask}    = IPDevice::IPv4::pfxlen2mask($2);
   return TRUE;
 }
 
@@ -84,7 +84,7 @@ Returns the IP prefix.
 =cut
 sub get_prefix {
   my $self = shift;
-  my $pfxlen = IPv4::mask2pfxlen($self->{mask});
+  my $pfxlen = IPDevice::IPv4::mask2pfxlen($self->{mask});
   return "$self->{network}/$pfxlen";
 }
 
@@ -96,7 +96,7 @@ Set the IP network address and, optionally, the mask.
 =cut
 sub set_network {
   my($self, $network, $mask) = @_;
-  return FALSE if !IPv4::check_ip($network);
+  return FALSE if !IPDevice::IPv4::check_ip($network);
   $self->{network} = $network;
   $self->{mask}    = $mask if $mask;
   $self->{mask}    = '255.255.255.0' if !$mask;
@@ -144,7 +144,7 @@ Returns TRUE if the ip is valid, otherwise FALSE.
 =cut
 sub set_prefixlen {
   my($self, $ip) = @_;
-  return FALSE if !IPv4::check_ip($ip);
+  return FALSE if !IPDevice::IPv4::check_ip($ip);
   $self->{dest} = $ip;
 }
 

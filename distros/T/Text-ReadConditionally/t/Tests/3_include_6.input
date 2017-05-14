@@ -1,0 +1,6 @@
+.# Title: include with spaces
+.# Argument also has spaces - protect with single quote
+Line 1
+.let arg := 'Bilbo Baggins'
+.include '3_include_6 .inc' 'arg with spaces' '\v{arg}'
+Back to first file

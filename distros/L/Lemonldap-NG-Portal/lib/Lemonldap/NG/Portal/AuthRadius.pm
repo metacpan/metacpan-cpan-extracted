@@ -10,7 +10,7 @@ package Lemonldap::NG::Portal::AuthRadius;
 use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_WebForm;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.9.1';
 use base qw(Lemonldap::NG::Portal::_WebForm);
 
 ## @apmethod int authInit()

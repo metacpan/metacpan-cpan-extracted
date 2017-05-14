@@ -1,0 +1,65 @@
+# $Id$
+#
+# >>Title::	Paper Style
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{paper}} is an [[SDF]] style for white papers.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Load the cover page definitions
+!use "covers"
+
+# Override the cover page setting
+!define DOC_COVER "paper"
+
+# Remove the sidehead
+!define OPT_SIDEHEAD_WIDTH 0
+!define OPT_SIDEHEAD_GAP   0
+
+# Build the borders
+!default OPT_BORDERS 0
+!build_borders
+
+# Define the number of header/footer lines
+!default OPT_HEADINGS 1
+
+# Define the first page footer
+!define PAGE_FIRST_FOOTER_INNER1  ''
+!define PAGE_FIRST_FOOTER_INNER2  ''
+!define PAGE_FIRST_FOOTER_CENTER1  "{{PAGENUM:}}"
+!define PAGE_FIRST_FOOTER_CENTER2 ''
+!define PAGE_FIRST_FOOTER_OUTER1  ''
+!define PAGE_FIRST_FOOTER_OUTER2  ''
+
+# Define the right page header
+!define PAGE_RIGHT_HEADER_INNER1   ''
+!define PAGE_RIGHT_HEADER_INNER2   ''
+!define PAGE_RIGHT_HEADER_CENTER1  ''
+!define PAGE_RIGHT_HEADER_CENTER2  ''
+!define PAGE_RIGHT_HEADER_OUTER1   '{{I[family=Times][[DOC_NAME]]}}'
+!define PAGE_RIGHT_HEADER_OUTER2   ''
+
+# Define the right page footer
+!define PAGE_RIGHT_FOOTER_INNER1   ''
+!define PAGE_RIGHT_FOOTER_INNER2   ''
+!define PAGE_RIGHT_FOOTER_CENTER1  "{{PAGENUM:}}"
+!define PAGE_RIGHT_FOOTER_CENTER2  ''
+!define PAGE_RIGHT_FOOTER_OUTER1   ''
+!define PAGE_RIGHT_FOOTER_OUTER2   ''
+
+# Build the left page as a mirror of the right page
+!left_mirror_right_page

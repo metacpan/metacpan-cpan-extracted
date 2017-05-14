@@ -1,0 +1,9 @@
+Installation:
+
+standard:
+
+perl Makefile.PL
+make
+make install
+
+See http://www.kitefamily.co.uk/projects/gestalt for further details.

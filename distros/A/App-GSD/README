@@ -1,0 +1,56 @@
+NAME
+    App::GSD - boost productivity by blocking distracting websites
+
+VERSION
+    version 0.4
+
+SYNOPSIS
+     use App::GSD;
+     my $app = App:GSD->new({ block => [qw(foo.com bar.com baz.com)] });
+     $app->work; # sites are now blocked
+     $app->play; # unblocked
+
+METHODS
+  new ( \%args )
+    The following arguments are accepted:
+
+    block
+        An arrayref of hostnames to block, without a 'www.' prefix (if
+        present) as these will be blocked automatically.
+
+    hosts_file
+        Path to the hosts file (e.g. '/etc/hosts'), overriding the module's
+        guess based on current operating system.
+
+    network_command
+        A reference to an array passable to "system()" that will restart the
+        network, e.g.
+
+         ['/etc/init.d/network', 'restart']
+
+  work
+    Set work mode - block the sites specified.
+
+  play
+    Set play mode - unblock sites.
+
+  blocklist
+    Return the blocklist, with 'www.' and non-'www.' versions included.
+
+  network_command
+    Return user-specified network command as arrayref, or undef if none
+    specified.
+
+  hosts_file
+    Return path to hosts file.
+
+METHODS
+AUTHOR
+    Richard Harris <RJH@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Richard Harris.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

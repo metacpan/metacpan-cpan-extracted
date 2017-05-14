@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+errors.err
+lib/Unknown/Values.pm
+lib/Unknown/Values/Instance.pm
+lib/Unknown/Values/Instance/Fatal.pm
+rebuild
+t/basic.t
+t/bits.t
+t/fatal.t
+t/logic.t
+t/math.t

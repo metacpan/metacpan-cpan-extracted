@@ -1,0 +1,32 @@
+---
+name: Bot-Infobot
+version: 1.0
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: a Bot::BasicBot::Pluggable based replacement for the venerable infobot
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  AnyDBM_File: 0
+  Bot::BasicBot::Pluggable: 0.50
+  Config::Tiny: 0
+  DBI: 0
+  Module::Pluggable: 0
+  Test::More: 0
+  Text::CSV: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Bot::Infobot::Config:
+    file: lib/Bot/Infobot/Config.pm
+  Bot::Infobot::Importer::DBI:
+    file: lib/Bot/Infobot/Importer/DBI.pm
+  Bot::Infobot::Importer::DBM:
+    file: lib/Bot/Infobot/Importer/DBM.pm
+  Bot::Infobot::Importer::Factpack:
+    file: lib/Bot/Infobot/Importer/Factpack.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

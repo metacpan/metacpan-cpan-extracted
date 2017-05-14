@@ -1,0 +1,36 @@
+{
+   "abstract" : "A wrapper around Gearmans administrative protocol",
+   "author" : [
+      "Moritz Grosch <moritz.grosch@autinity.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Gearman-Administrative",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/autinitysystems/Net-Gearman-Administrative/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/autinitysystems/Net-Gearman-Administrative.git",
+         "web" : "https://github.com/autinitysystems/Net-Gearman-Administrative"
+      }
+   },
+   "version" : "0.00101"
+}
+

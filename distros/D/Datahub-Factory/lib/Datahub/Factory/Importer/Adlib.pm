@@ -29,10 +29,10 @@ Datahub::Factory::Importer::Adlib - Import data from L<Adlib|http://www.adlibsof
 
 =head1 SYNOPSIS
 
-    use Datahub::Factory::Importer::Adlib;
+    use Datahub::Factory;
     use Data::Dumper qw(Dumper);
 
-    my $adlib = Datahub::Factory::Importer::Adlib->new(
+    my $adlib = Datahub::Factory->importer('Adlib')->new(
         file_name => '/tmp/export.xml',
         data_path => 'recordList.record.*'
     );

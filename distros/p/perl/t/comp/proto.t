@@ -14,9 +14,11 @@ BEGIN {
     @INC = '../lib';
 }
 
+# We need this, as in places we're testing the interaction of prototypes with
+# strict
 use strict;
 
-print "1..141\n";
+print "1..215\n";
 
 my $i = 1;
 
@@ -276,6 +278,7 @@ testing \&a_sub, '&';
 
 sub a_sub (&) {
     print "# \@_ = (",join(",",@_),")\n";
+    return unless defined $_[0];
     &{$_[0]};
 }
 
@@ -283,10 +286,26 @@ sub tmp_sub_1 { printf "ok %d\n",$i++ }
 
 a_sub { printf "ok %d\n",$i++ };
 a_sub \&tmp_sub_1;
+a_sub \(&tmp_sub_1);
 
 @array = ( \&tmp_sub_1 );
 eval 'a_sub @array';
 print "not " unless $@;
+printf "ok %d\n",$i++;
+eval 'a_sub \@array';
+print "not " unless $@ =~ /Type of arg/;
+printf "ok %d\n",$i++;
+eval 'a_sub \%hash';
+print "not " unless $@ =~ /Type of arg/;
+printf "ok %d\n",$i++;
+eval 'a_sub \$scalar';
+print "not " unless $@ =~ /Type of arg/;
+printf "ok %d\n",$i++;
+eval 'a_sub \($list, %of, @refs)';
+print "not " unless $@ =~ /Type of arg/;
+printf "ok %d\n",$i++;
+eval 'a_sub undef';
+print "not " if $@;
 printf "ok %d\n",$i++;
 
 ##
@@ -307,6 +326,17 @@ a_subx &tmp_sub_2;
 eval 'a_subx @array';
 print "not " unless $@;
 printf "ok %d\n",$i++;
+my $bad =
+    qr/Type of arg 1 to .* must be subroutine \(not subroutine entry\)/;
+eval 'a_subx &tmp_sub_2()';
+print "not " unless $@ =~ $bad;
+printf "ok %d - \\& prohibits &foo()\n",$i++;
+eval 'a_subx tmp_sub_2()';
+print "not " unless $@ =~ $bad;
+printf "ok %d - \\& prohibits foo()\n",$i++;
+eval 'a_subx tmp_sub_2';
+print "not " unless $@ =~ $bad;
+printf "ok %d - \\& prohibits foo where foo is an existing sub\n",$i++;
 
 ##
 ##
@@ -378,6 +408,11 @@ a_hash_ref %hash;
 print "not " unless $hash{'b'} == 2;
 printf "ok %d\n",$i++;
 
+%hash = ( a => 1);
+a_hash_ref +(%hash);
+print "not " unless $hash{'b'} == 2;
+printf "ok %d\n",$i++;
+
 ##
 ##
 ##
@@ -397,6 +432,16 @@ sub array_ref_plus (\@@) {
 print "not " unless @array == 4;
 print @array;
 
+@array = ('a');
+{ my @more = ('x');
+  array_ref_plus +(@array), @more; }
+print "not " unless @array == 4;
+print @array;
+
+##
+##
+##
+
 my $p;
 print "not " if defined prototype('CORE::print');
 print "ok ", $i++, "\n";
@@ -407,9 +452,25 @@ print "ok ", $i++, "\n";
 print "# CORE::open => ($p)\nnot " if ($p = prototype('CORE::open')) ne '*;$@';
 print "ok ", $i++, "\n";
 
-print "# CORE:Foo => ($p), \$@ => `$@'\nnot " 
+print "# CORE::Foo => ($p), \$@ => '$@'\nnot " 
     if defined ($p = eval { prototype('CORE::Foo') or 1 }) or $@ !~ /^Can't find an opnumber/;
 print "ok ", $i++, "\n";
+
+eval { prototype("CORE::a\0b") };
+print "# CORE::a\\0b: \$@ => '$@'\nnot " 
+    if $@ !~ /^Can't find an opnumber for "a\0b"/;
+print "ok ", $i++, "\n";
+
+eval { prototype("CORE::\x{100}") };
+print "# CORE::\\x{100}: => ($p), \$@ => '$@'\nnot " 
+    if $@ !~ /^Can't find an opnumber for "\x{100}"/;
+print "ok ", $i++, "\n";
+
+"CORE::Foo" =~ /(.*)/;
+print "# \$1 containing CORE::Foo => ($p), \$@ => '$@'\nnot " 
+    if defined ($p = eval { prototype($1) or 1 })
+    or $@ !~ /^Can't find an opnumber/;
+print "ok ", $i++, " - \$1 containing CORE::Foo\n";
 
 # correctly note too-short parameter lists that don't end with '$',
 #  a possible regression.
@@ -482,11 +543,11 @@ star(\*FOO, sub {
 	print "ok $i - star(\\*FOO)\n";
     }); $i++;
 star2 FOO, BAR, sub {
-    print "not " unless $_[0] eq 'FOO' and $_[1] eq 'BAR';
+    print "not " unless $_[0] eq 'FOO' and $_[1] eq 'quux';
     print "ok $i - star2 FOO, BAR\n";
 }; $i++;
 star2(Bar::BAZ, FOO, sub {
-	print "not " unless $_[0] eq 'Bar::BAZ' and $_[1] eq 'FOO';
+	print "not " unless $_[0] eq 'quuz' and $_[1] eq 'FOO';
 	print "ok $i - star2(Bar::BAZ, FOO)\n"
     }); $i++;
 star2 BAR(), FOO, sub {
@@ -532,6 +593,22 @@ star2(\*FOO, \*BAR, sub {
 	print "ok $i - star2(\*FOO, \*BAR)\n";
     }); $i++;
 
+# [perl #118585]
+# Test that multiple semicolons are treated as one with *
+sub star3(;;;*){}
+sub star4( ; ; ; ; *){}
+print "not " unless eval 'star3 STDERR; 1';
+print "ok ", $i++, " star3 STDERR\n";
+print "not " unless eval 'star4 STDERR; 1';
+print "ok ", $i++, " star4 STDERR\n";
+
+# [perl #2726]
+# Test that prototype binding is late
+print "not " unless eval 'sub l564($){ l564(); } 1';
+print "ok ", $i++, " prototype checking not done within initial definition\n";
+print "not " if eval 'sub l566($); sub l566($){ l566(); } 1';
+print "ok ", $i++, " prototype checking done if sub pre-declared\n";
+
 # test scalarref prototype
 sub sreftest (\$$) {
     print "not " unless ref $_[0];
@@ -542,6 +619,29 @@ sub sreftest (\$$) {
     sreftest my $sref, $i++;
     sreftest($helem{$i}, $i++);
     sreftest $aelem[0], $i++;
+    sreftest sub { [0] }->()[0], $i++;
+    sreftest my $a = 'quidgley', $i++;
+    print "not " if eval 'return 1; sreftest(3+4)';
+    print "ok ", $i++, ' - \$ with invalid argument', "\n";
+}
+
+# test single term
+sub lazy (+$$) {
+    print "not " unless @_ == 3 && ref $_[0] eq $_[1];
+    print "ok $_[2] - non container test\n";
+}
+sub quietlazy (+) { return shift(@_) }
+sub give_aref { [] }
+sub list_or_scalar { wantarray ? (1..10) : [] }
+{
+    my @multiarray = ("a".."z");
+    my %bighash = @multiarray;
+    lazy(\@multiarray, 'ARRAY', $i++);
+    lazy(\%bighash, 'HASH', $i++);
+    lazy({}, 'HASH', $i++);
+    lazy(give_aref, 'ARRAY', $i++);
+    lazy(3, '', $i++); # allowed by prototype, even if runtime error
+    lazy(list_or_scalar, 'ARRAY', $i++); # propagate scalar context
 }
 
 # test prototypes when they are evaled and there is a syntax error
@@ -549,20 +649,22 @@ sub sreftest (\$$) {
 # string "parse error".
 #
 for my $p ( "", qw{ () ($) ($@) ($%) ($;$) (&) (&\@) (&@) (%) (\%) (\@) } ) {
-  no warnings 'prototype';
+  my $warn = "";
+  local $SIG{__WARN__} = sub {
+    my $thiswarn = join("",@_);
+    return if $thiswarn =~ /^Prototype mismatch: sub main::evaled_subroutine/;
+    $warn .= $thiswarn;
+  };
   my $eval = "sub evaled_subroutine $p { &void *; }";
   eval $eval;
   print "# eval[$eval]\nnot " unless $@ && $@ =~ /(parse|syntax) error/i;
   print "ok ", $i++, "\n";
+  if ($warn eq '') {
+     print "ok ", $i++, "\n";
+  } else {
+    print "not ok ", $i++, "# $warn \n";
+  }
 }
-
-# Not $$;$;$
-print "not " unless prototype "CORE::substr" eq '$$;$$';
-print "ok ", $i++, "\n";
-
-# recv takes a scalar reference for its second argument
-print "not " unless prototype "CORE::recv" eq '*\\$$$';
-print "ok ", $i++, "\n";
 
 {
     my $myvar;
@@ -574,6 +676,8 @@ print "ok ", $i++, "\n";
     sub myref (\[$@%&*]) { print "# $_[0]\n"; return "$_[0]" }
 
     print "not " unless myref($myvar)   =~ /^SCALAR\(/;
+    print "ok ", $i++, "\n";
+    print "not " unless myref($myvar=7) =~ /^SCALAR\(/;
     print "ok ", $i++, "\n";
     print "not " unless myref(@myarray) =~ /^ARRAY\(/;
     print "ok ", $i++, "\n";
@@ -609,32 +713,182 @@ print "ok ", $i++, "\n";
 
 # check that obviously bad prototypes are getting warnings
 {
-  use warnings 'syntax';
+  local $^W = 1;
   my $warn = "";
   local $SIG{__WARN__} = sub { $warn .= join("",@_) };
   
   eval 'sub badproto (@bar) { 1; }';
   print "not " unless $warn =~ /Illegal character in prototype for main::badproto : \@bar/;
-  print "ok ", $i++, "\n";
+  print "ok ", $i++, " checking badproto - (\@bar)\n";
 
   eval 'sub badproto2 (bar) { 1; }';
   print "not " unless $warn =~ /Illegal character in prototype for main::badproto2 : bar/;
-  print "ok ", $i++, "\n";
+  print "ok ", $i++, " checking badproto2 - (bar)\n";
   
   eval 'sub badproto3 (&$bar$@) { 1; }';
   print "not " unless $warn =~ /Illegal character in prototype for main::badproto3 : &\$bar\$\@/;
-  print "ok ", $i++, "\n";
+  print "ok ", $i++, " checking badproto3 - (&\$bar\$\@)\n";
   
   eval 'sub badproto4 (@ $b ar) { 1; }';
-  print "not " unless $warn =~ /Illegal character in prototype for main::badproto4 : \@\$bar/;
-  print "ok ", $i++, "\n";
+  # This one emits two warnings
+  print "not " unless $warn =~ /Illegal character in prototype for main::badproto4 : \@ \$b ar/;
+  print "ok ", $i++, " checking badproto4 - (\@ \$b ar) - illegal character\n";
+  print "not " unless $warn =~ /Prototype after '\@' for main::badproto4 : \@ \$b ar/;
+  print "ok ", $i++, " checking badproto4 - (\@ \$b ar) - prototype after '\@'\n";
+
+  eval 'sub badproto5 ($_$) { 1; }';
+  print "not " unless $warn =~ /Illegal character after '_' in prototype for main::badproto5 : \$_\$/;
+  print "ok ", $i++, " checking badproto5 - (\$_\$) - illegal character after '_'\n";
+  print "not " if $warn =~ /Illegal character in prototype for main::badproto5 : \$_\$/;
+  print "ok ", $i++, " checking badproto5 - (\$_\$) - but not just illegal character\n";
+
+  eval 'sub badproto6 (bar_) { 1; }';
+  print "not " unless $warn =~ /Illegal character in prototype for main::badproto6 : bar_/;
+  print "ok ", $i++, " checking badproto6 - (bar_) - illegal character\n";
+  print "not " if $warn =~ /Illegal character after '_' in prototype for main::badproto6 : bar_/;
+  print "ok ", $i++, " checking badproto6 - (bar_) - shouldn't add \"after '_'\"\n";
+
+  eval 'sub badproto7 (_;bar) { 1; }';
+  print "not " unless $warn =~ /Illegal character in prototype for main::badproto7 : _;bar/;
+  print "ok ", $i++, " checking badproto7 - (_;bar) - illegal character\n";
+  print "not " if $warn =~ /Illegal character after '_' in prototype for main::badproto7 : _;bar/;
+  print "ok ", $i++, " checking badproto7 - (_;bar) - shouldn't add \"after '_'\"\n";
+
+  eval 'sub badproto8 (_b) { 1; }';
+  print "not " unless $warn =~ /Illegal character after '_' in prototype for main::badproto8 : _b/;
+  print "ok ", $i++, " checking badproto8 - (_b) - illegal character after '_'\n";
+  print "not " unless $warn =~ /Illegal character in prototype for main::badproto8 : _b/;
+  print "ok ", $i++, " checking badproto8 - (_b) - just illegal character\n";
+
+  eval 'sub badproto9 ([) { 1; }';
+  print "not " unless $warn =~ /Missing '\]' in prototype for main::badproto9 : \[/;
+  print "ok ", $i++, " checking for matching bracket\n";
+
+  eval 'sub badproto10 ([_]) { 1; }';
+  print "not " if $warn =~ /Missing '\]' in prototype for main::badproto10 : \[/;
+  print "ok ", $i++, " checking badproto10 - ([_]) - shouldn't trigger matching bracket\n";
+  print "not " unless $warn =~ /Illegal character after '_' in prototype for main::badproto10 : \[_\]/;
+  print "ok ", $i++, " checking badproto10 - ([_]) - should trigger after '_' warnings\n";
 }
 
 # make sure whitespace in prototypes works
 eval "sub good (\$\t\$\n\$) { 1; }";
 print "not " if $@;
 print "ok ", $i++, "\n";
+# [perl #118629]
+{
+  my $warnings = 0;
+  local $SIG{__WARN__} = sub { $warnings++;};
+  $::{ckproto_test} = ' $ $ ';
+	eval 'sub ckproto_test($$){1;}';
+  print "not " if $warnings;
+  print "ok ", $i++, " Check that ckproto ignores spaces in comparisons\n";
+}
 
+# Ought to fail, doesn't in 5.8.1.
 eval 'sub bug (\[%@]) {  } my $array = [0 .. 1]; bug %$array;';
 print "not " unless $@ =~ /Not a HASH reference/;
-print "ok ", $i++, " # TODO Ought to fail, doesn't in 5.8.2\n";
+print "ok ", $i++, "\n";
+
+# [perl #75904]
+# Test that the following prototypes make subs parse as unary functions:
+#  * \sigil \[...] ;$ ;* ;\sigil ;\[...]
+# [perl #118585]
+# As a special case, make sure that ;;* is treated the same as ;*
+print "not "
+ unless eval 'sub uniproto1 (*) {} uniproto1 $_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto2 (\$) {} uniproto2 $_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto3 (\[$%]) {} uniproto3 %_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto4 (;$) {} uniproto4 $_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto5 (;*) {} uniproto5 $_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto6 (;\@) {} uniproto6 @_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto7 (;\[$%@]) {} uniproto7 @_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto8 (+) {} uniproto8 $_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto9 (;+) {} uniproto9 $_, 1' or warn $@;
+print "ok ", $i++, "\n";
+print "not "
+ unless eval 'sub uniproto10 (;;;*) {} uniproto10 $_, 1' or warn $@;
+print "ok ", $i++, " - uniproto10 (;;;*)\n";
+print "not "
+ unless eval 'sub uniproto11 ( ; ; ; * ) {} uniproto10 $_, 1' or warn $@;
+print "ok ", $i++, " - uniproto11 ( ; ; ;  *)\n";
+print "not "
+ unless eval 'sub uniproto12 (;;;+) {} uniproto12 $_, 1' or warn $@;
+print "ok ", $i++, " - uniproto12 (;;;*)\n";
+print "not "
+ unless eval 'sub uniproto13 ( ; ; ; + ) {} uniproto13 $_, 1' or warn $@;
+print "ok ", $i++, " - uniproto13 ( ; ; ; * )\n";
+
+
+# Test that a trailing semicolon makes a sub have listop precedence
+sub unilist ($;)  { $_[0]+1 }
+sub unilist2(_;)  { $_[0]+1 }
+sub unilist3(;$;) { $_[0]+1 }
+print "not " unless (unilist 0 || 5) == 6;
+print "ok ", $i++, "\n";
+print "not " unless (unilist2 0 || 5) == 6;
+print "ok ", $i++, "\n";
+print "not " unless (unilist3 0 || 5) == 6;
+print "ok ", $i++, "\n";
+
+{
+  # Lack of prototype on a subroutine definition should override any prototype
+  # on the declaration.
+  sub z_zwap (&);
+
+  local $SIG{__WARN__} = sub {
+    my $thiswarn = join "",@_;
+    if ($thiswarn =~ /^Prototype mismatch: sub main::z_zwap/) {
+      print 'ok ', $i++, "\n";
+    } else {
+      print 'not ok ', $i++, "\n";
+      print STDERR $thiswarn;
+    }
+  };
+
+  eval q{sub z_zwap {return @_}};
+
+  if ($@) {
+    print "not ok ", $i++, "# $@";
+  } else {
+    print "ok ", $i++, "\n";
+  }
+
+
+  my @a = (6,4,2);
+  my @got  = eval q{z_zwap(@a)};
+
+  if ($@) {
+    print "not ok ", $i++, " # $@";
+  } else {
+    print "ok ", $i++, "\n";
+  }
+
+  if ("@got" eq "@a") {
+    print "ok ", $i++, "\n";
+  } else {
+    print "not ok ", $i++, " # >@got<\n";
+  }
+}
+
+# [perl #123514] prototype with no arguments
+$_ = sub ($$$$$$$) {};
+@_ = (1, 2, 3, prototype(), 4, 5, 6);
+print "not " unless "@_" eq '1 2 3 $$$$$$$ 4 5 6';
+print "ok ", $i++, " - [perl #123514] (got @_)\n";

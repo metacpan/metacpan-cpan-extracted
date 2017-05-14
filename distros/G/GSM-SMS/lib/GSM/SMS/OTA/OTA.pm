@@ -6,7 +6,7 @@ require Exporter;
 @EXPORT = qw(	OTAdecode_8bit
 				OTAencode_8bit); 
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 sub OTAdecode_8bit {
         my ($ud) = @_;

@@ -1,0 +1,70 @@
+# fieldmap - Map of crossing a field to enter a structure - used to transition to a scenario
+###  $Id: fieldmap.txt 102 2007-07-05 21:21:36Z overmars $
+#  
+map 0 0 0 xsize=>56, zsize=>80, start=>[28,76,270];
+in_last;
+
+level  0  0 0 texture=>'lawn',     xsize=>32, zsize=>80;
+level  0  0 0 texture=>'sky',      xsize=>32, zsize=>80, y=>8;
+level 32 16 0 texture=>'lawn',     xsize=>24, zsize=> 8;
+level 32 16 0 texture=>'sky',      xsize=>24, zsize=> 8, y=>8;
+level 32 24 0 texture=>'aqua',     xsize=>24, zsize=>56;
+level 32 24 0 texture=>'sky',      xsize=>24, zsize=>56, y=>8;
+level 32 0 0  texture=>'bathroom', xsize=>32, zsize=>16;
+level 32 0 0  texture=>'sand',     xsize=>32, zsize=>16, y=>8;
+
+#        
+#top wall
+wall   0  0   0;
+wall   8  0   0;
+wall  16  0   0;
+wall  24  0   0;
+wall  32  0   0;
+wall  40  0   0;
+wall  48  0   0;
+archwall  32  0 270;
+door      32  2 270;
+wall  32  8 270;
+wall  32 16   0;
+wall  40 16   0;
+wall  48 16   0;
+
+#left wall
+wall   0  0 270 texture=>'horizon';
+wall   0  8 270 texture=>'horizon';
+wall   0 16 270 texture=>'horizon';
+wall   0 24 270 texture=>'horizon';
+wall   0 32 270 texture=>'horizon';
+wall   0 40 270 texture=>'horizon';
+wall   0 48 270 texture=>'horizon';
+wall   0 56 270 texture=>'horizon';
+wall   0 64 270 texture=>'horizon';
+wall   0 72 270 texture=>'horizon';
+
+wall  56  0 270;
+
+wall  56  8 270;
+wall  56 16 270 texture=>'horizon2';
+wall  56 24 270 texture=>'horizon2';
+wall  56 32 270 texture=>'horizon2';
+wall  56 40 270 texture=>'horizon2';
+wall  56 48 270 texture=>'horizon2';
+wall  56 56 270 texture=>'horizon2';
+wall  56 64 270 texture=>'horizon2';
+wall  56 72 270 texture=>'horizon2';
+
+wall   0 80   0 texture=>'horizon';
+wall   8 80   0 texture=>'horizon';
+wall  16 80   0 texture=>'horizon';
+wall  24 80   0 texture=>'horizon';
+wall  32 80   0 texture=>'horizon';
+wall  40 80   0 texture=>'horizon';
+wall  48 80   0 texture=>'horizon';
+
+detector 50 10 0 visible=>1, range=>8,
+ near_script=>"sub{
+                 $self->state('far');
+                 $self->send_event('map','maps/new_quests.txt');
+                 $self->send_event('go',24,14,90);
+               }";
+done;

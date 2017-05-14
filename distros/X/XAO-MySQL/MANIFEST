@@ -1,0 +1,22 @@
+CHANGES
+README
+MySQL.pm
+MySQL.xs
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+test.pl
+ -------------------------------------------
+bench/bench.pl
+bench/results-20020705-am-workstation.txt
+ -------------------------------------------
+testcases/base.pm
+testcases/basic.pm
+testcases/collection.pm
+testcases/config.pm
+testcases/fields.pm
+testcases/index.pm
+testcases/linkage.pm
+testcases/lists.pm
+testcases/placeholders.pm
+testcases/search.pm

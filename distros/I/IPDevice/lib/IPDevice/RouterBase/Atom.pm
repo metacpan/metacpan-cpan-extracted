@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
 ####
-## This file provides a base class for RouterBase elements (atoms).
+## This file provides a base class for IPDevice::RouterBase elements (atoms).
 ####
 
-package RouterBase::Atom;
-use IPv4;
+package IPDevice::RouterBase::Atom;
+use IPDevice::IPv4;
 use strict;
 use vars qw($VERSION);
 
@@ -16,18 +16,18 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::Atom
+IPDevice::RouterBase::Atom
 
 =head1 SYNOPSIS
 
  package MyPackage;
- use RouterBase::Atom;
+ use IPDevice::RouterBase::Atom;
  use vars qw($VERSION @ISA);
- @ISA = qw(RouterBase::Atom);
+ @ISA = qw(IPDevice::RouterBase::Atom);
 
 =head1 DESCRIPTION
 
-This module provides a base class for RouterBase elements (atoms).
+This module provides a base class for IPDevice::RouterBase elements (atoms).
 
 =head1 CONSTRUCTOR AND METHODS
 

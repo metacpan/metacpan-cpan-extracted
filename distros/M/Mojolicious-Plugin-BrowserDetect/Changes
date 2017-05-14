@@ -1,0 +1,12 @@
+Revision history for Mojolicious::Plugin::BrowserDetect
+
+0.003  2013-02-21
+  - add missing dependency (HTTP::BrowserDetect)
+
+0.002  2013-02-03
+  - helper instead of hook (Thanks, Nils)
+    (https://github.com/uwe/mojolicious-plugin-browserdetect/pull/1)
+
+0.001  2013-02-01
+  - initial version
+

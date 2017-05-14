@@ -1,0 +1,2 @@
+[% META author = 'darren chamberlain' %]
+I am [% template.name %].

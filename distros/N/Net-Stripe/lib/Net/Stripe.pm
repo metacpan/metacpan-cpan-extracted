@@ -1,5 +1,5 @@
 package Net::Stripe;
-$Net::Stripe::VERSION = '0.32';
+$Net::Stripe::VERSION = '0.33';
 use Moose;
 use Class::Load;
 use Kavorka;
@@ -736,7 +736,7 @@ Net::Stripe - API client for Stripe.com
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -1677,7 +1677,7 @@ Rusty Conover
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Rusty Conover Sachin Sebastian Tom Eliaz
+=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold E. Choroba Florian Heyer Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Rusty Conover Sachin Sebastian Tom Eliaz
 
 =over 4
 
@@ -1704,6 +1704,14 @@ Dimitar Petrov <mitakaa@gmail.com>
 =item *
 
 Dylan Reinhold <dylan@gasdasoftware.com>
+
+=item *
+
+E. Choroba <choroba@matfyz.cz>
+
+=item *
+
+Florian Heyer <info@heyer-it.de>
 
 =item *
 

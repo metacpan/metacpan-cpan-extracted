@@ -4,14 +4,13 @@ use 5.006_001;
 
 use strict;
 
-our($VERSION, $XS_VERSION, @ISA, @EXPORT_OK);
+our($VERSION, @ISA, @EXPORT_OK);
 
-$VERSION = 1.06_01;
-$XS_VERSION = "1.03";
+$VERSION = "1.34";
 
 use Carp;
 use Exporter ();
-use XSLoader ();
+use XSLoader;
 
 BEGIN {
     @ISA = qw(Exporter);
@@ -29,7 +28,7 @@ sub opset_to_hex ($);
 sub opdump (;$);
 use subs @EXPORT_OK;
 
-XSLoader::load 'Opcode', $XS_VERSION;
+XSLoader::load();
 
 _init_optags();
 
@@ -66,7 +65,7 @@ sub _init_optags {
 
 	# Split into lines, keep only indented lines
 	my @lines = grep { m/^\s/    } split(/\n/);
-	foreach (@lines) { s/--.*//  } # delete comments
+	foreach (@lines) { s/(?:\t|--).*//  } # delete comments
 	my @ops   = map  { split ' ' } @lines; # get op words
 
 	foreach(@ops) {
@@ -289,8 +288,8 @@ invert_opset function.
 
 =head1 TO DO (maybe)
 
-    $bool = opset_eq($opset1, $opset2)	true if opsets are logically eqiv
-
+    $bool = opset_eq($opset1, $opset2)	true if opsets are logically
+					equivalent
     $yes = opset_can($opset, @ops)	true if $opset has all @ops set
 
     @diff = opset_diff($opset1, $opset2) => ('foo', '!bar', ...)
@@ -309,37 +308,44 @@ invert_opset function.
 
     rv2sv sassign
 
-    rv2av aassign aelem aelemfast aslice av2arylen
+    rv2av aassign aelem aelemfast aelemfast_lex aslice kvaslice
+    av2arylen
 
-    rv2hv helem hslice each values keys exists delete
+    rv2hv helem hslice kvhslice each values keys exists delete
+    aeach akeys avalues multideref
 
-    preinc i_preinc predec i_predec postinc i_postinc postdec i_postdec
-    int hex oct abs pow multiply i_multiply divide i_divide
-    modulo i_modulo add i_add subtract i_subtract
+    preinc i_preinc predec i_predec postinc i_postinc
+    postdec i_postdec int hex oct abs pow multiply i_multiply
+    divide i_divide modulo i_modulo add i_add subtract i_subtract
 
-    left_shift right_shift bit_and bit_xor bit_or negate i_negate
-    not complement
+    left_shift right_shift bit_and bit_xor bit_or nbit_and
+    nbit_xor nbit_or sbit_and sbit_xor sbit_or negate i_negate not
+    complement ncomplement scomplement
 
     lt i_lt gt i_gt le i_le ge i_ge eq i_eq ne i_ne ncmp i_ncmp
     slt sgt sle sge seq sne scmp
 
     substr vec stringify study pos length index rindex ord chr
 
-    ucfirst lcfirst uc lc quotemeta trans chop schop chomp schomp
+    ucfirst lcfirst uc lc fc quotemeta trans transr chop schop
+    chomp schomp
 
     match split qr
 
     list lslice splice push pop shift unshift reverse
 
-    cond_expr flip flop andassign orassign and or xor
+    cond_expr flip flop andassign orassign dorassign and or dor xor
 
-    warn die lineseq nextstate scope enter leave setstate
+    warn die lineseq nextstate scope enter leave
 
-    rv2cv anoncode prototype
+    rv2cv anoncode prototype coreargs anonconst
 
-    entersub leavesub leavesublv return method method_named -- XXX loops via recursion?
+    entersub leavesub leavesublv return method method_named
+    method_super method_redir method_redir_super
+     -- XXX loops via recursion?
 
-    leaveeval -- needed for Safe to operate, is safe without entereval
+    leaveeval -- needed for Safe to operate, is safe
+		 without entereval
 
 =item :base_mem
 
@@ -374,14 +380,15 @@ used to implement a resource attack (e.g., consume all available CPU time).
 
 These ops enable I<filehandle> (rather than filename) based input and
 output. These are safe on the assumption that only pre-existing
-filehandles are available for use.  To create new filehandles other ops
-such as open would need to be enabled.
+filehandles are available for use.  Usually, to create new filehandles
+other ops such as open would need to be enabled, if you don't take into
+account the magical open of ARGV.
 
     readline rcatline getc read
 
     formline enterwrite leavewrite
 
-    print sysread syswrite send recv
+    print say sysread syswrite send recv
 
     eof tell seek sysseek
 
@@ -393,11 +400,14 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     gvsv gv gelem
 
-    padsv padav padhv padany
+    padsv padav padhv padcv padany padrange introcv clonecv
 
-    rv2gv refgen srefgen ref
+    once
 
-    bless -- could be used to change ownership of objects (reblessing)
+    rv2gv refgen srefgen ref refassign lvref lvrefslice lvavref
+
+    bless -- could be used to change ownership of objects
+	     (reblessing)
 
     pushre regcmaybe regcreset regcomp subst substcont
 
@@ -411,9 +421,15 @@ These are a hotchpotch of opcodes still waiting to be considered
     sselect select
     pipe_op sockpair
 
-    getppid getpgrp setpgrp getpriority setpriority localtime gmtime
+    getppid getpgrp setpgrp getpriority setpriority
+    localtime gmtime
 
     entertry leavetry -- can be used to 'hide' fatal errors
+
+    entergiven leavegiven
+    enterwhen leavewhen
+    break continue
+    smartmatch
 
     custom -- where should this go
 
@@ -434,26 +450,28 @@ beyond the scope of the compartment.
 
 These ops are related to multi-threading.
 
-    lock threadsv
+    lock
 
 =item :default
 
 A handy tag name for a I<reasonable> default set of ops.  (The current ops
 allowed are unstable while development continues. It will change.)
 
-    :base_core :base_mem :base_loop :base_io :base_orig :base_thread
+    :base_core :base_mem :base_loop :base_orig :base_thread
+
+This list used to contain :base_io prior to Opcode 1.07.
 
 If safety matters to you (and why else would you be using the Opcode module?)
 then you should not rely on the definition of this, or indeed any other, optag!
-
 
 =item :filesys_read
 
     stat lstat readlink
 
-    ftatime ftblk ftchr ftctime ftdir fteexec fteowned fteread
-    ftewrite ftfile ftis ftlink ftmtime ftpipe ftrexec ftrowned
-    ftrread ftsgid ftsize ftsock ftsuid fttty ftzero ftrwrite ftsvtx
+    ftatime ftblk ftchr ftctime ftdir fteexec fteowned
+    fteread ftewrite ftfile ftis ftlink ftmtime ftpipe
+    ftrexec ftrowned ftrread ftsgid ftsize ftsock ftsuid
+    fttty ftzero ftrwrite ftsvtx
 
     fttext ftbinary
 
@@ -497,7 +515,8 @@ information about your system but not be able to change it.
 
     utime chmod chown
 
-    fcntl -- not strictly filesys related, but possibly as dangerous?
+    fcntl -- not strictly filesys related, but possibly as
+	     dangerous?
 
 =item :subprocess
 
@@ -528,6 +547,14 @@ SystemV Interprocess Communications:
 
     shmctl shmget shmread shmwrite
 
+=item :load
+
+This tag holds opcodes related to loading modules and getting information
+about calling environment and args.
+
+    require dofile 
+    caller runcv
+
 =item :still_to_be_decided
 
     chdir
@@ -541,10 +568,9 @@ SystemV Interprocess Communications:
     tied -- can be used to access object implementing a tie
     pack unpack -- can be used to create/use memory pointers
 
-    entereval -- can be used to hide code from initial compile
-    require dofile 
+    hintseval -- constant op holding eval hints
 
-    caller -- get info about calling environment and args
+    entereval -- can be used to hide code from initial compile
 
     reset
 

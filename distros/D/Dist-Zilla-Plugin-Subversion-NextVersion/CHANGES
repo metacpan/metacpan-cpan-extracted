@@ -1,0 +1,44 @@
+==================================================
+Changes from 2012-12-23 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.003 at 2013-12-23 12:42:38 +0000
+------------------------------------------
+
+  Change: 518bfecc920ea998fef645003a7ab16a1d9bdd54
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-12-23 13:40:20 +0000
+
+    -try ENV{'V'} _before_ call to max_version -stringify version object
+    before passing it to next_version 
+
+------------------------------------------
+version 1.002 at 2013-08-26 06:32:47 +0000
+------------------------------------------
+
+  Change: 90f0080ba6136efe45827d5ef883dd14555809cc
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-26 08:32:47 +0000
+
+    -explicitly specify SVN::Client as prereq 
+
+------------------------------------------
+version 1.001 at 2013-08-19 11:26:01 +0000
+------------------------------------------
+
+  Change: d7297d541b64e47d4834ed952ca3c824defcd384
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-19 13:26:01 +0000
+
+    -add .gitignore 
+
+  Change: b9c46c1b5e20e93e27b7c8e86896928c9177663f
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-19 13:20:44 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

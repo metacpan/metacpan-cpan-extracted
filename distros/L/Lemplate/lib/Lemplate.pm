@@ -4,12 +4,13 @@
 # ABSTRACT: compiles Perl TT2 templates to standalone Lua modules for OpenResty
 
 package Lemplate;
+
 use strict;
 use warnings;
 use Template 2.14;
 use Getopt::Long;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.11';
 
 use Lemplate::Parser;
 
@@ -298,61 +299,7 @@ sub print_usage_and_exit {
 }
 
 sub runtime_source_code {
-    require Lemplate::Runtime;
-    require Lemplate::Runtime::Compact;
-
-    unshift @_, "standard" unless @_;
-
-    my ($runtime, $ajax, $json, $xhr, $xxx, $compact) = map { defined $_ ? lc $_ : "" } @_[0 .. 5];
-
-    my $Lemplate_Runtime = $compact ? "Lemplate::Runtime::Compact" : "Lemplate::Runtime";
-
-    if ($runtime eq "standard") {
-        $ajax ||= "xhr";
-        $json ||= "json2";
-        $xhr ||= "ilinsky";
-    }
-    elsif ($runtime eq "jquery") {
-        $ajax ||= "jquery";
-    }
-    elsif ($runtime eq "yui") {
-        $ajax ||= "yui";
-        $json ||= "yui";
-    }
-    elsif ($runtime eq "legacy") {
-        $ajax ||= "xhr";
-        $json ||= "json2";
-        $xhr ||= "gregory";
-        $xxx = 1;
-    }
-    elsif ($runtime eq "lite") {
-    }
-
-    $ajax = "xhr" if $ajax eq 1;
-    $xhr ||= 1 if $ajax eq "xhr";
-    $json = "json2" if $json eq 1;
-    $xhr = "ilinsky" if $xhr eq 1;
-
-    my @runtime;
-
-    push @runtime, $Lemplate_Runtime->kernel if $runtime;
-
-    push @runtime, $Lemplate_Runtime->json2 if $json =~ m/^json2?$/i;
-
-    push @runtime, $Lemplate_Runtime->ajax_xhr if $ajax eq "xhr";
-    push @runtime, $Lemplate_Runtime->ajax_jquery if $ajax eq "jquery";
-    push @runtime, $Lemplate_Runtime->ajax_yui if $ajax eq "yui";
-
-    push @runtime, $Lemplate_Runtime->json_json2 if $json =~ m/^json2?$/i;
-    push @runtime, $Lemplate_Runtime->json_json2_internal if $json =~ m/^json2?[_-]?internal$/i;
-    push @runtime, $Lemplate_Runtime->json_yui if $json eq "yui";
-
-    push @runtime, $Lemplate_Runtime->xhr_ilinsky if $xhr eq "ilinsky";
-    push @runtime, $Lemplate_Runtime->xhr_gregory if $xhr eq "gregory";
-
-    push @runtime, $Lemplate_Runtime->xxx if $xxx;
-
-    return join ";", @runtime;
+    die "generating a separate runtime not supported yet";
 }
 
 #-------------------------------------------------------------------------------
@@ -485,46 +432,53 @@ end
 
 context_meta = { __index = context_meta }
 
-local function stash_get(stash, k)
-    local v
-    if type(k) == "table" then
-        v = stash
-        for i = 1, #k, 2 do
-            local key = k[i]
-            local typ = k[i + 1]
-            if type(typ) == "table" then
-                local value = v[key]
-                if type(value) == "function" then
-                    return value(unpack(typ))
-                end
-                if value then
-                    return value
-                end
-                if key == "size" then
-                    if type(v) == "table" then
-                        return #v
-                    else
-                        return 1
-                    end
-                else
+-- XXX debugging function:
+-- local function xxx(data)
+--     io.stderr:write("\n" .. require("cjson").encode(data) .. "\n")
+-- end
+
+local function stash_get(stash, expr)
+    local result
+
+    if type(expr) ~= "table" then
+        result = stash[expr]
+        if type(result) == "function" then
+            return result()
+        end
+        return result or ''
+    end
+
+    result = stash
+    for i = 1, #expr, 2 do
+        local key = expr[i]
+        if type(key) == "number" and key == math_floor(key) and key >= 0 then
+            key = key + 1
+        end
+        local val = result[key]
+        local args = expr[i + 1]
+        if args == 0 then
+            args = {}
+        end
+
+        if val == nil then
+            if not _M.vmethods[key] then
+                if type(expr[i + 1]) == "table" then
                     return error("virtual method " .. key .. " not supported")
                 end
-            end
-            if type(key) == "number" and key == math_floor(key) and key >= 0 then
-                key = key + 1
-            end
-            if type(v) ~= "table" then
                 return ''
             end
-            v = v[key]
+            val = _M.vmethods[key]
+            args = {result, unpack(args)}
         end
-    else
-        v = stash[k]
+
+        if type(val) == "function" then
+            val = val(unpack(args))
+        end
+
+        result = val
     end
-    if type(v) == "function" then
-        return v()
-    end
-    return v or ''
+
+    return result
 end
 
 local function stash_set(stash, k, v, default)
@@ -538,19 +492,109 @@ local function stash_set(stash, k, v, default)
     end
 end
 
+_M.vmethods = {
+    join = function (list, delim)
+        delim = delim or ' '
+        local out = {}
+        local size = #list
+        for i = 1, size, 1 do
+            out[i * 2 - 1] = list[i]
+            if i ~= size then
+                out[i * 2] = delim
+            end
+        end
+        return concat(out)
+    end,
+
+    first = function (list)
+        return list[1]
+    end,
+
+    keys = function (list)
+        local out = {}
+        i = 1
+        for key in pairs(list) do
+            out[i] = key
+            i = i + 1
+        end
+        return out
+    end,
+
+    last = function (list)
+        return list[#list]
+    end,
+
+    push = function(list, ...)
+        local n = select("#", ...)
+        local m = #list
+        for i = 1, n do
+            list[m + i] = select(i, ...)
+        end
+        return ''
+    end,
+
+    size = function (list)
+        if type(list) == "table" then
+            return #list
+        else
+            return 1
+        end
+    end,
+
+    sort = function (list)
+        local out = { unpack(list) }
+        table.sort(out)
+        return out
+    end,
+
+    split = function (str, delim)
+        delim = delim or ' '
+        local out = {}
+	local start = 1
+	local sub = string.sub
+	local find = string.find
+	local sstart, send = find(str, delim, start)
+        local i = 1
+	while sstart do
+	    out[i] = sub(str, start, sstart-1)
+            i = i + 1
+	    start = send + 1
+	    sstart, send = find(str, delim, start)
+	end
+	out[i] = sub(str, start)
+	return out
+    end,
+}
+
+_M.filters = {
+    html = function (s, args)
+        s = gsub(s, "&", '&amp;', "jo")
+        s = gsub(s, "<", '&lt;', "jo");
+        s = gsub(s, ">", '&gt;', "jo");
+        s = gsub(s, '"', '&quot;', "jo"); -- " end quote for emacs
+        return s
+    end,
+
+    lower = function (s, args)
+        return string.lower(s)
+    end,
+
+    upper = function (s, args)
+        return string.upper(s)
+    end,
+}
+
 function _M.process(file, params)
     local stash = params
     local context = {
         stash = stash,
         filter = function (bits, name, params)
             local s = concat(bits)
-            if name == "html" then
-                s = gsub(s, "&", '&amp;', "jo")
-                s = gsub(s, "<", '&lt;', "jo");
-                s = gsub(s, ">", '&gt;', "jo");
-                s = gsub(s, '"', '&quot;', "jo"); -- " end quote for emacs
-                return s
+            local f = _M.filters[name]
+            if f then
+                return f(s, params)
             end
+            return error("filter '" .. name .. "' not found")
         end
     }
     context = setmetatable(context, context_meta)
@@ -579,8 +623,14 @@ This is still under early development. Check back often.
 
 =head1 Synopsis
 
+From the command-line:
+
+    lemplate --compile path/to/lemplate/directory/ > myapp/templates.lua
+
+From OpenResty Lua code:
+
     local templates = require "myapp.templates"
-    ngx.print(tempaltes.process("homepage.tt2", { var1 = 32, var2 = "foo" }))
+    ngx.print(templates.process("homepage.tt2", { var1 = 32, var2 = "foo" }))
 
 From the command-line:
 
@@ -591,22 +641,21 @@ From the command-line:
 Lemplate is a templating framework for OpenResty/Lua that is built over
 Perl's Template Toolkit (TT2).
 
-Lemplate parses TT2 templates using the TT2 Perl framework, but with a
-twist. Instead of compiling the templates into Perl code, it compiles
-them into Lua that can run on OpenResty.
+Lemplate parses TT2 templates using the TT2 Perl framework, but with a twist.
+Instead of compiling the templates into Perl code, it compiles them into Lua
+that can run on OpenResty.
 
-Lemplate then provides a Lua runtime module for processing
-the template code. Presto, we have full featured Lua
-templating language!
+Lemplate then provides a Lua runtime module for processing the template code.
+Presto, we have full featured Lua templating language!
 
-Combined with OpenResty, Lemplate provides a really simple
-and powerful way to do web stuff.
+Combined with OpenResty, Lemplate provides a really simple and powerful way to
+do web stuff.
 
 =head1 HowTo
 
 Lemplate comes with a command line tool call C<lemplate> that you use to
-precompile your templates into a Lua module file. For example if you have
-a template directory called C<templates> that contains:
+precompile your templates into a Lua module file. For example if you have a
+template directory called F<templates> that contains:
 
     $ ls templates/
     body.tt2
@@ -724,17 +773,17 @@ or posting to the L</Community>.
 
 =back
 
-=head1 CREDIT
+=head1 Credit
 
 This project is based on Ingy dot Net's excellent L<Jemplate> project.
 
-=head1 AUTHOR
+=head1 Author
 
-Yichun Zhang (agentzh), E<lt>agentzh@gmail.comE<gt>, CloudFlare Inc.
+Yichun Zhang (agentzh), E<lt>agentzh@gmail.comE<gt>, OpenResty Inc.
 
 =head1 Copyright
 
-Copyright (C) 2016 Yichun Zhang (agentzh).  All Rights Reserved.
+Copyright (C) 2016-2017 Yichun Zhang (agentzh).  All Rights Reserved.
 
 Copyright (C) 1996-2014 Andy Wardley.  All Rights Reserved.
 
@@ -742,7 +791,8 @@ Copyright (c) 2006-2014. Ingy döt Net. All rights reserved.
 
 Copyright (C) 1998-2000 Canon Research Centre Europe Ltd
 
-This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =head1 See Also
 

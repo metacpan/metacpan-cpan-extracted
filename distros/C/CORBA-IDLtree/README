@@ -1,0 +1,223 @@
+This is CORBA::IDLtree, a module that builds abstract syntax trees
+from CORBA IDL.
+
+The main export is sub Parse_File which takes an IDL input file name
+as the parameter, and returns a reference to an array of references
+to the root nodes constructed (or 0 if there were syntax errors.)
+
+Parse_File uses two auxiliary data structures:
+  @include_path  - Paths where to look for included IDL files
+  %defines       - Symbol definitions for the preprocessor
+                   (cf. the -D switch on many C compilers)
+                   where -DSYM=VAL is represented as
+                   $defines{SYM} = VAL. -DSYM is represented as
+                   $defines{SYM} = 1.
+
+A further export is the sub Dump_Symbols which takes the return value
+of Parse_File as the parameter, and prints the trees constructed to
+stdout in IDL syntax.
+
+-----------------------------------------------------------------------------
+
+SYMBOL TREE STRUCTURE
+
+The following description of the structure of the symbol tree
+applies to CORBA::IDLtree versions >= 1.0.  The structure
+has been changed w.r.t. previous releases, for example the
+INTERFACE node now has an "abstract" flag. Also, all the
+scalars used as constants, e.g. $INTERFACE, have been changed to
+subroutines, e.g. &INTERFACE, to better express the constness
+of these values. However, it is intended to keep further
+changes to the user interface to a minimum, i.e. the IDLtree
+programming interface is now considered stable.
+
+
+A "thing" in the symbol tree can be either a reference to a node, or a
+reference to an array of references to nodes.
+
+A node is a five-element array with the elements
+  [0] => TYPE (MODULE|INTERFACE|STRUCT|UNION|ENUM|TYPEDEF...)
+  [1] => NAME
+  [2] => SUBORDINATES
+  [3] => COMMENT  (introduced in IDLtree version 1.2)
+  [4] => SCOPEREF
+
+Some IDL types are representable as a simple numeric constant;
+they do not require nodes.  We'll call these types "elementary".
+Elementary types are the scalar types, e.g. boolean, short,
+unsigned long long, any, string.
+
+Other IDL types cannot be represented in this way, they require
+more information. An enum, for example, requires the enumeration
+literals. These types are represented as nodes. The TYPE element
+contains a numeric ID identifying what IDL type the node represents.
+
+The NAME element, unless specified otherwise, simply holds the name string
+of the respective IDL syntactic item.
+
+The SUBORDINATES element depends on the node type.
+Sometimes an item in the SUBORDINATES may contain either a type ID or
+a reference to the defining node; we will call that a `type descriptor'.
+Which of the two alternatives is in effect can be determined via the
+isnode() function.
+
+Contents of SUBORDINATES:
+
+  MODULE or       Reference to an array of nodes (symbols) which are defined
+  INTERFACE       within the module or interface. In the case of INTERFACE,
+                  element [0] in this array will contain a reference to a
+                  further array which in turn contains references to the
+                  parent interface(s) if inheritance is used, or the null
+                  value if the current interface is not derived by
+                  inheritance. Element [1] is the "abstract" flag which is
+                  non-zero for interfaces declared abstract.
+
+  INTERFACE_FWD   Reference to the node of the full interface declaration.
+
+  STRUCT or       Reference to an array of node references representing the
+  EXCEPTION       member components of the struct or exception.
+                  Each member representative node is a quadruplet consisting
+                  of (TYPE, NAME, <dimref>, COMMENT).
+                  The <dimref> is a reference to a list of dimension numbers,
+                  or is 0 if no dimensions were given.
+
+  UNION           Similar to STRUCT/EXCEPTION, reference to an array of
+                  nodes. For union members, the member node has the same
+                  structure as for STRUCT/EXCEPTION.
+                  However, the first node contains a type descriptor for
+                  the discriminant type.
+                  The TYPE of a member node may also be CASE or DEFAULT.
+                  For CASE, the NAME is unused, and the SUBORDINATE contains
+                  a reference to a list of the case values for the following
+                  member node.
+                  For DEFAULT, both the NAME and the SUBORDINATE are unused.
+
+  ENUM            Reference to the array of enum value literals.
+                  If the global variable $enable_enum_comments is set then
+                  the elements in the array may be shaped differently:
+                  - If the enum literal is not followed by a comment then
+                    the element in the array is the enum literal as usual.
+                  - If the enum literal is followed by a comment then the
+                    element in the array is a reference to a tuple. In this
+                    tuple, the first element is the enum literal, and the
+                    second element is a reference to the comment list.
+                    Thus, when generating code for the literals, it is
+                    recommended to use the `ref' predicate to find out
+                    which of the two alternatives is in effect for each
+                    array element.
+
+  TYPEDEF         Reference to a two-element array: element 0 contains a
+                  reference to the type descriptor of the original type;
+                  element 1 contains a reference to an array of dimension
+                  numbers, or the null value if no dimensions are given.
+
+  SEQUENCE        As a special case, the NAME element of a SEQUENCE node
+                  does not contain a name (as sequences are anonymous
+                  types), but instead is used to hold the bound number.
+                  If the bound number is 0, then it is an unbounded
+                  sequence. The SUBORDINATES element contains the type
+                  descriptor of the base type of the sequence. This
+                  descriptor could itself be a reference to a SEQUENCE
+                  defining node (that is, a nested sequence definition.)
+                  Bounded strings are treated as a special case of sequence.
+                  They are represented as references to a node that has
+                  BOUNDED_STRING or BOUNDED_WSTRING as the type ID, the bound
+                  number in the NAME, and the SUBORDINATES element is unused.
+
+  CONST           Reference to a two-element array. Element 0 is a type
+                  descriptor of the const's type; element 1 is a reference
+                  to an array containing the RHS expression symbols.
+
+  FIXED           Reference to a two-element array. Element 0 contains the
+                  digit number and element 1 contains the scale factor.
+                  The NAME component in a FIXED node is unused.
+
+  VALUETYPE       [0] => $is_abstract (boolean)
+                  [1] => reference to a tuple (two-element list) containing
+                         inheritance related information:
+                         [0] => $is_truncatable (boolean)
+                         [1] => \@ancestors (reference to array containing
+                                references to ancestor nodes)
+                  [2] => \@members: reference to array containing references
+                         to tuples (two-element lists) of the form:
+                         [0] => 0|PRIVATE|PUBLIC
+                                A zero for this value means the element [1]
+                                contains a reference to a METHOD or ATTRIBUTE.
+                                In case of METHOD, the first element in the
+                                method node subordinates (i.e., the return
+                                type) may be FACTORY.
+                         [1] => reference to the defining node.
+                                In case of PRIVATE or PUBLIC state member,
+                                the defining node is the same as for STRUCT
+                                subordinates, namely a quadruplet containing:
+                                 [0] => member type id
+                                 [1] => member name
+                                 [2] => dimref (reference to dimensions list)
+                                 [3] => COMMENT element
+
+  VALUETYPE_BOX   Reference to the defining type node.
+
+  VALUETYPE_FWD   Subordinates unused.
+
+  NATIVE          Subordinates unused.
+
+  ATTRIBUTE       Reference to a two-element array; element 0 is the read-
+                  only flag (0 for read/write attributes), element 1 is a
+                  type descriptor of the attribute's type.
+
+  METHOD          Reference to a variable length array; element 0 is a type
+                  descriptor for the return type. Elements 1 and following
+                  are references to parameter descriptor nodes with the
+                  following structure:
+                      elem. 0 => parameter type descriptor
+                      elem. 1 => parameter name
+                      elem. 2 => parameter mode (IN, OUT, or INOUT)
+                  The last element in the variable-length array is a
+                  reference to the "raises" list. This list contains
+                  references to the declaration nodes of exceptions raised,
+                  or is empty if there is no "raises" clause.
+
+  INCFILE         Reference to an array of nodes (symbols) which are defined
+                  within the include file. The Name element of this node
+                  contains the include file name.
+
+  PRAGMA_PREFIX   Subordinates unused.
+
+  PRAGMA_VERSION  Version string.
+
+  PRAGMA_ID       ID string.
+
+  PRAGMA          This is for the general case of pragmas that are none
+                  of the above, i.e. pragmas unknown to IDLtree.
+                  The NAME holds the pragma name, and SUBORDINATES
+                  holds a reference to all further text appearing after
+                  the pragma name, if any.
+
+  REMARK          The SUBORDINATES of the node is unused.
+                  The NAME component contains a reference to a list of
+                  comment lines. In the case of a single-line comment, the
+                  list will contain only one element; in case of multi-
+                  line comments, each line is represented by a list entry.
+                  The lines in this list are not newline terminated; empty
+                  entries represent empty comment lines.
+
+
+The COMMENT element holds the comment text that follows the IDL declaration
+on the same line. Usually this is just a single line. However, if a multi-
+line comment is started on the same line after a declaration, the multi-line
+comment may extend to further lines - therefore we use a list of lines.
+The lines in this list are not newline terminated. The COMMENT field is a
+reference to this list, or contains the value 0 if no comment is present
+at the IDL item.
+
+The SCOPEREF element is a reference back to the node of the module or
+interface enclosing the current node. If the current node is already
+at the global scope level, then the SCOPEREF is 0. If the current node
+is inside an INCFILE, the SCOPEREF element points to the corresponding
+INCFILE node (the INCFILE reference was introduced in IDLtree version
+1.3.)  All nodes have this element except for the parameter nodes of
+methods and the component nodes of structs/unions/exceptions.
+
+-- Last updated: 2003/07/25
+-- okellogg@users.sourceforge.net
+

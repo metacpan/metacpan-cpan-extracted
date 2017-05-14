@@ -1,0 +1,63 @@
+# $Revision: 1.1 $ $Date: 2006/02/24 21:27:16 $ $Author: estrabd $
+# NFA 5
+
+START   :: 0                 # start state
+FINAL   :: 3,8,9,10,15       # end states
+EPSILON :: epsilon           # how epsilon transition is represented
+
+0:
+d 1
+c 6
+s 13
+
+1:
+o 2
+i 4
+
+2:
+g 3
+
+3:
+epsilon 9
+
+4:
+g 5
+
+5:
+
+6:
+a 7
+u 11
+
+7:
+t 8
+
+8:
+epsilon 9
+
+9:
+epsilon 10
+
+10:
+
+11:
+t 12
+
+12:
+
+13:
+k 14
+i 16
+
+14:
+y 15
+
+15:
+epsilon 10
+
+16:
+t 17
+
+17:
+
+18:

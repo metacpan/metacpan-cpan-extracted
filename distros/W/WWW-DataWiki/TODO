@@ -1,0 +1,47 @@
+===========================
+certainly
+===========================
+
+- ",edit" could have syntax highlighting. Either a CodeMirror plugin for N3,
+  or do it server-side (which would require porting my N3 highlighter from
+  PHP to Perl).
+- Resource should have a ->get_entity() method, which returns something that
+  does most of what WWW::DataWiki::View::General does now.
+- FOAF+SSL and ACL
+
+===========================
+consider
+===========================
+
+- allow graphs to contain { <> :ping <endpoint> .} triples which allow them to
+  ping endpoints other than PTSW.
+
+- DELETE /wikipage,version
+  + deletes a version
+  
+- DELETE /wikipage
+  + deletes graph if "Pragma: nuke" header is used
+
+- SEARCH / (with SPARQL ASK payload)
+  + returns list of wikipages where the ASK returns true (checking only
+    latest version of each page).
+
+- SEARCH /wikipage (with SPARQL ASK payload)
+  + returns list of versions where the ASK returns true.
+
+- LOCK /wikipage
+
+- UNLOCK /wikipage
+
+- POST /wikipage,acl (with RDF payload)
+  ACL /wikipage (with RDF payload)
+  + grant 
+
+- DELETE /wikipage,acl?uuid=...
+  + deny
+
+- GET /wikipage,acl
+  + retrieve
+
+- port from Catalyst to Magpie, which appears to be a better framework for
+  this project.

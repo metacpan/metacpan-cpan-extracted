@@ -1,0 +1,54 @@
+H2: Plain After Ordered
+
+^ 1a
+. 1b
+. 1c
++ 1d
+
+H2: Plain after Unordered
+
+* 1a
+. 1b
+. 1c
+* 1d
+
+H2: Mixed At the Same Level
+
+^ 1a
+* 1b
+* 1c
++ 1d
+
+H2: Plain Indent > 1
+
+. 1aaaaaaaaaaaaaaaaaaaaa
+... 3aaaaaaaaaaaaaaaaaaaaa
+.. 2aaaaaaaaaaaaaaaaaaaaa
+
+H2: Ordered Indent > 1
+
+^ 1a
+^^^ 3a
+^^ 2a
+++ 2b
++ 1b
+
+H2: Unordered Indent > 1
+
+* 1a
+*** 3a
+** 2a
+
+H2: Ordered With Starting Indent > 1
+
+^^^ 3a
+^^ 2a
+++ 2b
+^ 1a
+
+H2: Mixed With Starting Indent > 1
+
+... 3a
+^^ 2a
+++ 2b
+* 1a

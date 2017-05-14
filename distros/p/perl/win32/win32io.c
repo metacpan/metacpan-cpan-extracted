@@ -61,6 +61,11 @@ PerlIOWin32_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab
    s->fd     = PerlIO_fileno(PerlIONext(f));
   }
  PerlIOBase(f)->flags |= PERLIO_F_OPEN;
+
+ Perl_ck_warner_d(aTHX_
+		  packWARN(WARN_EXPERIMENTAL__WIN32_PERLIO),
+		  "PerlIO layer ':win32' is experimental");
+
  return code;
 }
 
@@ -79,9 +84,12 @@ PerlIOWin32_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const ch
   {
    char *path = SvPV_nolen(*args);
    DWORD  access = 0;
-   DWORD  share  = 0;
+   /* CRT uses _SH_DENYNO for open(), this the Win32 equivelent */
+   DWORD  share  = FILE_SHARE_READ | FILE_SHARE_WRITE;
    DWORD  create = -1;
    DWORD  attr   = FILE_ATTRIBUTE_NORMAL;
+   if (stricmp(path, "/dev/null")==0)
+    path = "NUL";
    if (*mode == '#')
     {
      /* sysopen - imode is UNIX-like O_RDONLY etc.
@@ -140,8 +148,6 @@ PerlIOWin32_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const ch
      SETERRNO(EINVAL,LIB$_INVARG);
      return NULL;
     }
-   if (!(access & GENERIC_WRITE))
-    share = FILE_SHARE_READ;
    h = CreateFile(path,access,share,NULL,create,attr,NULL);
    if (h == INVALID_HANDLE_VALUE)
     {
@@ -224,6 +230,7 @@ PerlIOWin32_read(pTHX_ PerlIO *f, void *vbuf, Size_t count)
    if (GetLastError() != NO_ERROR)
     {
      PerlIOBase(f)->flags |= PERLIO_F_ERROR;
+     PerlIO_save_errno(f);
      return -1;
     }
    else
@@ -247,6 +254,7 @@ PerlIOWin32_write(pTHX_ PerlIO *f, const void *vbuf, Size_t count)
  else
   {
    PerlIOBase(f)->flags |= PERLIO_F_ERROR;
+   PerlIO_save_errno(f);
    return -1;
   }
 }
@@ -317,18 +325,18 @@ PerlIOWin32_dup(pTHX_ PerlIO *f, PerlIO *o, CLONE_PARAMS *params, int flags)
 {
  PerlIOWin32 *os = PerlIOSelf(f,PerlIOWin32);
  HANDLE proc = GetCurrentProcess();
- HANDLE new;
- if (DuplicateHandle(proc, os->h, proc, &new, 0, FALSE,  DUPLICATE_SAME_ACCESS))
+ HANDLE new_h;
+ if (DuplicateHandle(proc, os->h, proc, &new_h, 0, FALSE,  DUPLICATE_SAME_ACCESS))
   {
    char mode[8];
-   int fd = win32_open_osfhandle((intptr_t) new, PerlIOUnix_oflags(PerlIO_modestr(o,mode)));
+   int fd = win32_open_osfhandle((intptr_t) new_h, PerlIOUnix_oflags(PerlIO_modestr(o,mode)));
    if (fd >= 0)
     {
      f = PerlIOBase_dup(aTHX_ f, o, params, flags);
      if (f)
       {
        PerlIOWin32 *fs = PerlIOSelf(f,PerlIOWin32);
-       fs->h  = new;
+       fs->h  = new_h;
        fs->fd = fd;
        fs->refcnt = 1;
        fdtable[fd] = fs;
@@ -342,7 +350,7 @@ PerlIOWin32_dup(pTHX_ PerlIO *f, PerlIO *o, CLONE_PARAMS *params, int flags)
     }
    else
     {
-     CloseHandle(new);
+     CloseHandle(new_h);
     }
   }
  return f;

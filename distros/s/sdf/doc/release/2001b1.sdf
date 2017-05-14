@@ -1,0 +1,160 @@
+H1: 2.001beta1
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+The enhancements are:
+
+!block sections
+. Better documentation
+. build_title enhancements
+. Library search path
+. Improved searching rules
+. Pretty printing enhancements
+. Localisation improvements
+. New verbose levels and debug tracing
+. Miscellaneous stuff
+!endblock
+
+H3: Better documentation
+
+The {{DOC:SDF Quick Reference}} has been greatly improved. It now
+documents 95% of SDF's features rather than the
+10% of features most frequently used.
+
+H3: build_title enhancements
+
+If DOC_CODE is set and DOC_NAME is not set, {{MAC:build_title}} will
+now lookup DOC_NAME via {{references}} data if it can.
+
+The separator between DOC_CODE and DOC_VERSION in DOC_ID can now be
+controlled by setting DOC_ID_SEP. The default value is '.'.
+
+H3: Library search path
+
+Previously, libraries had to be placed in the F<perllib/sdf/home> directory.
+Now, {{CMD:sdf}}'s new -Y option can be used to specify a
+comma-separated list of directories to search for libraries.
+For example, if you want {{CMD:sdf}} to search F<c:\mysdflib> and
+F<c:\> for libraries on a MS-DOS/Windows system, the command is:
+
+>  sdf -Yc:\mysdflib,c:\ ...
+
+If your search path for libraries is always the same, the C<SDFOPTS>
+environment variable can be used, e.g. the following sequence of
+commands will have the same effect as above:
+
+>  set SDFOPTS=-Yc:\mysdflib,c:\
+>  sdf ...
+
+H3: Improved searching rules
+
+Previously, libraries had to be placed in a fixed location but modules
+used the same search rules as normal files. Now that {{CMD:sdf}} supports
+a library search path, libraries, modules and normal files have different
+search rules. The new rules are:
+
+!block table
+File_type       Directories_searched
+libraries       current directory, document's directory, directories \
+                on the library path, F<perllib/sdf/home>
+modules         current directory, document's directory, directories \
+                on the module path, F<perllib/sdf/home>, \
+                F<perllib/sdf/home/stdlib>
+normal files    current directory, document's directory, directories \
+                on the include path, F<perllib/sdf/home>
+!endblock
+
+The library path and the module path are initialised by {{CMD:sdf}}'s -Y
+option. The include path is initialised by {{CMD:sdf}}'s -I option.
+Inheriting a library (via a configuration library or the
+{{MAC:inherit}} macro) appends the library's directory to the
+module path and the include path.
+
+H3: Pretty printing enhancements
+
+Language names are now case insensitive. The keywords for Perl, Java and
+IDL have also been improved. Python support has been added.
+
+H3: Localisation improvements
+
+Strings within dates and times can now be localised using the
+{{FILT:datestrings}} filter. See F<en_au.sdl> for an example.
+
+A Czech locale (cz_cz) is now provided (although it doesn't have
+localised date strings yet).
+
+H3: New verbose levels and debug tracing
+
+{{CMD:sdf}}'s -v option now supports additional verbose levels:
+
+. 2 - show how names of files and libraries are resolved
+. 3 - show the directories searched for libraries
+. 4 - show the directories searched for modules
+. 5 - show the directories searched for normal files.
+
+As before, level 1 shows the post-processing actions and leaves
+intermediate files around.
+
+In addition, {{CMD:sdf}}'s new -T option can be used to switch on
+debug tracing. The parameter is a comma-separated list of name-value
+pairs where each name is a {{tracing group}} and each value is the
+level of tracing for that group. To get the trace output provided
+by the -v option, one can use the {{user}} group like this:
+
+>  sdf -Tuser=2 ...
+
+This is slightly different from the -v option in that intermediate
+files are not implicitly kept. Additional tracing groups will be
+added over time (probably one per output driver).
+
+H3: Miscellaneous stuff
+
+Class filters now support a {{variables}} parameter which implicitly
+defines a variable for each object. The variable name is the same as
+the object name with non-alphanumeric characters replaced with '_'.
+(This feature should simplify configuration libraries for projects.)
+
+The {{MAC:jumps}} macro has been introduced as a more convenient form
+of the {{MAC:subsections}} macro.
+(This feature should simplify web pages for projects.)
+
+KP and KN have been added as paragraph styles. These are shorthands
+for N[keep_prev] and N[keep_next] respectively.
+
+SUB and SUP have been introduced as phrase styles for subscripts and
+superscripts respectively. (Consider these experimental features for
+now, as I haven't had a chance to test them.)
+
+H2: Fixes
+
+The {{SDF Templates}} link on the home page included in the distribution
+now points to the SDF web site as it should.
+
+Mac filename handling should finally be ok now. (However, installation
+instructions for the Mac are yet to be added.)
+
+Minor corrections have been made to the {{DOC:SDF User Guide}}.
+
+The conversion of PRN files to GIF files has been improved: a margin
+is no longer added as ps2gif is prone to incorrectly make it black.
+
+Books generated with the {{fancy}} look now have a correctly
+formatted table of contents.
+
+Java pretty printing has been fixed.
+
+H2: Incompatibilities
+
+The {{SECT: Improved search rules}} may introduce some unexpected
+incompatibilities, particularly if custom file searching was implemented.
+Previously, advanced users could customise the search rules (to integrate
+a configuration management system, say) by overriding the {{SUBR:FindFile}}
+subroutine. The default {{SUBR:FindFile}} subroutine no longer searches
+F<perllib/sdf/home/stdlib>, but otherwise, the search rule for normal
+files has not changed so custom {{SUBR:FindFile}} routines should still
+hopefully work. The new routine called {{FileModule}}
+will need to be overriden if your custom {{SUBR:FindFile}} is also
+needed for finding modules (or similar things like {{sdg}}, {{sdr}} and
+{{sdp}} files).

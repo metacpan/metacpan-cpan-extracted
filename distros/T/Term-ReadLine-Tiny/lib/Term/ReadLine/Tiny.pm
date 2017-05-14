@@ -5,7 +5,7 @@ Term::ReadLine::Tiny - Tiny implementation of ReadLine
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ require Term::ReadKey;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '1.07';
+	our $VERSION     = '1.08';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw();
 	our @EXPORT_OK   = qw();
@@ -123,6 +123,7 @@ sub new
 	$self->{features}->{gethistory} = 1;
 	$self->{features}->{sethistory} = 1;
 	$self->{features}->{changehistory} = 1;
+	$self->{features}->{utf8} = 1;
 
 	$self->newTTY($IN, $OUT);
 
@@ -375,29 +376,29 @@ sub readline
 		{
 			given ($esc)
 			{
-				when (/^\[(A|0A)/)
+				when (/^(\[|O)(A|0A)/)
 				{
 					$up->();
 				}
-				when (/^\[(B|0B)/)
+				when (/^(\[|O)(B|0B)/)
 				{
 					$down->();
 				}
-				when (/^\[(C|0C)/)
+				when (/^(\[|O)(C|0C)/)
 				{
 					$right->();
 				}
-				when (/^\[(D|0D)/)
+				when (/^(\[|O)(D|0D)/)
 				{
 					$left->();
 				}
-				when (/^\[(H|0H)/)
-				{
-					$home->();
-				}
-				when (/^\[(F|0F)/)
+				when (/^(\[|O)(F|0F)/)
 				{
 					$end->();
+				}
+				when (/^(\[|O)(H|0H)/)
+				{
+					$home->();
 				}
 				when (/^\[(\d)~/)
 				{
@@ -449,6 +450,7 @@ sub readline
 			$esc = undef;
 		}
 	}
+	utf8::encode($result) if defined($result) and utf8::is_utf8($result) and $self->{features}->{utf8};
 
 	Term::ReadKey::ReadMode('restore', $self->{IN});
 	$self->{readmode} = '';
@@ -465,7 +467,7 @@ adds lines to the history of input.
 sub addhistory
 {
 	my $self = shift;
-	if ($self->{features}->{utf8})
+	if (grep(":utf8", PerlIO::get_layers($self->{IN})))
 	{
 		for (my $i = 0; $i < @_; $i++)
 		{
@@ -583,7 +585,7 @@ I<changehistory> is present, default C<TRUE>. See C<changehistory> method.
 
 =item *
 
-I<utf8> is present. C<TRUE> if input file handle has C<:utf8> layer.
+I<utf8> is present, default C<TRUE>. See C<utf8> method.
 
 =back
 
@@ -628,8 +630,6 @@ sub newTTY
 	$out = \*STDOUT unless defined($out);
 	$self->{OUT} = $out;
 
-	$self->{features}->{utf8} = grep(":utf8", PerlIO::get_layers($in));
-
 	return ($self->{IN}, $self->{OUT});
 }
 
@@ -653,7 +653,15 @@ Returns copy of the history in Array.
 sub gethistory
 {
 	my $self = shift;
-	return @{$self->{history}};
+	my @result = @{$self->{history}};
+	if ($self->{features}->{utf8})
+	{
+		for (my $i = 0; $i < @result; $i++)
+		{
+			utf8::encode($result[$i]) if utf8::is_utf8($result[$i]);
+		}
+	}
+	return @result;
 }
 sub GetHistory
 {
@@ -670,7 +678,7 @@ rewrites all history by argument values.
 sub sethistory
 {
 	my $self = shift;
-	if ($self->{features}->{utf8})
+	if (grep(":utf8", PerlIO::get_layers($self->{IN})))
 	{
 		for (my $i = 0; $i < @_; $i++)
 		{
@@ -761,15 +769,32 @@ sub readkey
 			last;
 		}
 	}
+	utf8::encode($result) if defined($result) and utf8::is_utf8($result) and $self->{features}->{utf8};
 
 	Term::ReadKey::ReadMode('restore', $self->{IN});
 	$self->{readmode} = '';
 	return $result;
 }
 
+=head2 utf8([$enable])
+
+If C<$enable> is C<TRUE>, all read methods return that binary encoded UTF-8 string as possible.
+
+Returns the old value.
+
+=cut
+sub utf8
+{
+	my $self = shift;
+	my ($enable) = @_;
+	my $result = $self->{features}->{utf8};
+	$self->{features}->{utf8} = $enable if @_ >= 1;
+	return $result;
+}
+
 =head2 encode_controlchar($c)
 
-encodes if argument C<c> is a control character, otherwise returns argument C<c>.
+encodes if argument C<$c> is a control character, otherwise returns argument C<c>.
 
 =cut
 sub encode_controlchar
@@ -800,13 +825,14 @@ sub encode_controlchar
 __END__
 =head1 UTF-8
 
-C<Term::ReadLine::Tiny> fully supports UTF-8. If no input/output handle specified when calling C<new()> or C<newTTY()>,
+C<Term::ReadLine::Tiny> fully supports UTF-8. If no input/output file handle specified when calling C<new()> or C<newTTY()>,
 opens console input/output file handles with C<:utf8> layer by C<LANG> environment variable. You should set C<:utf8>
 layer explicitly, if input/output file handles specified with C<new()> or C<newTTY()>.
 
 	$term = Term::ReadLine::Tiny->new("", $in, $out);
 	binmode($term->IN, ":utf8");
 	binmode($term->OUT, ":utf8");
+	$term->utf8(0); # to get UTF-8 marked string as possible
 	while ( defined($_ = $term->readline("Prompt: ")) )
 	{
 		print "$_\n";

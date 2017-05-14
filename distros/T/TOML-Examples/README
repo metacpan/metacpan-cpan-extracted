@@ -1,0 +1,9 @@
+DESCRIPTION
+
+    This distribution contains various examples of TOML configuration files
+    in its per-dist share dir.
+
+SEE ALSO
+
+    https://github.com/toml-lang/toml
+

@@ -1,27 +1,41 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Net-FTPServer
-version:      1.122
-version_from: lib/Net/FTPServer.pm
-installdirs:  site
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-FTPServer
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    BSD::Resource:                 0
-    Carp:                          0
-    DynaLoader:                    0
-    Fcntl:                         0
-    Getopt::Long:                  0
-    IO::Dir:                       0
-    IO::File:                      0
-    IO::Handle:                    0
-    IO::Scalar:                    1.126
-    IO::Seekable:                  0
-    IO::Select:                    0
-    IO::Socket:                    0
-    IPC::Open2:                    0
-    POSIX:                         0
-    Socket:                        0
-    Sys::Hostname:                 0
-    Sys::Syslog:                   0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  BSD::Resource: 0
+  Carp: 0
+  DynaLoader: 0
+  Fcntl: 0
+  Getopt::Long: 0
+  IO::Dir: 0
+  IO::File: 0
+  IO::Handle: 0
+  IO::Scalar: 1.126
+  IO::Seekable: 0
+  IO::Select: 0
+  IO::Socket: 0
+  IPC::Open2: 0
+  POSIX: 0
+  Socket: 0
+  Sys::Hostname: 0
+  Sys::Syslog: 0
+  perl: 5.005
+resources:
+  repository: https://github.com/ryochin/p5-net-ftpserver
+version: 1.125

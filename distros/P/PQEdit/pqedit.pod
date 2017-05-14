@@ -1,0 +1,447 @@
+
+=head1 NAME
+
+pqedit.cgi - Web-based database table editor.
+
+=head1 SYNOPSIS
+
+'http://www.domain.edu/mod_perl/pqedit.cgi?B<server>=sqlserver
+&B<server_type>=I<oracle>
+&B<database>=mydb&B<table>=tablename&B<username>=user&B<password>=pwd
+&B<helppage>=http://www.domain.edu/helpfile.html
+&B<labels>=field1name;Field 1 Label,field2name;Field 2 Label
+&B<subedit_tables>=table1B<%2C>table2&B<button_subedit>=1
+&B<web_body_bgcolor>=html_bgcolor
+&B<web_textarea_columns>=number_of_columns
+&B<web_textarea_rows>=number_of_columns
+&B<begin_html_include>=/subweb_directory/html_to_include.html
+&B<middle_html_include>=/subweb_directory/html_to_include.html
+&B<end_html_include>=/subweb_directory/html_to_include.html
+&B<disable_lookup>=nonlookup_table&B<no_schemacache>=1
+&B<label_match>=label_match_string,label_match_string2,...
+&B<auto_field>=table,field,replacement;...
+&B<replace_field>=table,field,replacement;...
+&B<pq_B<fieldname>>=field_value&B<pqsearch_B<fieldname>>=1
+&B<pk_value>=tab_delimited_list_of_primary_key_values
+&B<Overview>=1
+&B<single_window>=ON
+&B<nondisplay>=table,field;...
+&B<readonly>=table,field;...
+&B<pqdebug>=1'
+
+
+  or
+
+<FORM METHOD="POST" ACTION="http://www.domain.edu/mod_perl/pqedit.cgi" NAME="PQ Edit">
+    <INPUT TYPE="hidden" NAME="B<server>" VALUE="sqlserver">
+    <INPUT TYPE="hidden" NAME="B<server_type>" VALUE="oracle">
+    <INPUT TYPE="hidden" NAME="B<database>" VALUE="mydb">
+    <INPUT TYPE="hidden" NAME="B<table>" VALUE="tablename">
+    <INPUT TYPE="hidden" NAME="B<username>" VALUE="user">
+    <INPUT TYPE="hidden" NAME="B<password>" VALUE="pwd">
+    <INPUT TYPE="hidden" NAME="B<helppage>" VALUE='http://www.domain.edu/helpfile.html'>
+    <INPUT TYPE="hidden" NAME="B<labels>" VALUE='field1name;Field 1 Label,field2name;Field 2 Label'>
+    <INPUT TYPE="hidden" NAME="B<subedit_tables>" VALUE="table1B<%2C>table2">
+    <INPUT TYPE="hidden" NAME="B<button_subedit>" VALUE="1">
+    <INPUT TYPE="hidden" NAME="B<web_body_bgcolor>" VALUE="html_bgcolor">
+    <INPUT TYPE="hidden" NAME="B<web_textarea_columns>" VALUE="number_of_columns">
+    <INPUT TYPE="hidden" NAME="B<web_textarea_rows>" VALUE="number_of_rows">
+    <INPUT TYPE="hidden" NAME="B<begin_html_include>" VALUE="/subweb_directory/html_to_include.html">
+    <INPUT TYPE="hidden" NAME="B<middle_html_include>" VALUE="/subweb_directory/html_to_include.html">
+    <INPUT TYPE="hidden" NAME="B<end_html_include>" VALUE="/subweb_directory/html_to_include.html">
+    <INPUT TYPE="hidden" NAME="B<disable_lookup>" VALUE="nonlookup_table">
+    <INPUT TYPE="hidden" NAME="B<label_match>" VALUE="label_match_string,label_match_string2,...">
+    <INPUT TYPE="hidden" NAME="B<replace_field>" VALUE="table,field,replacement;...">
+    <INPUT TYPE="hidden" NAME="B<no_schemacache>" VALUE="1">
+    <INPUT TYPE="hidden" NAME="B<pq_I<fieldname>>" VALUE="field value">
+    <INPUT TYPE="hidden" NAME="B<pqsearch_I<fieldname>>" VALUE="1">
+    <INPUT TYPE="hidden" NAME="B<pk_value>" VALUE="tab_delimited_list_of_primary_key_values">
+    <INPUT TYPE="hidden" NAME="B<Overview>" VALUE="1">
+    <INPUT TYPE="hidden" NAME="B<single_window>" VALUE="ON">
+    <INPUT TYPE="hidden" NAME="B<nondisplay>" VALUE="table,field;...">
+    <INPUT TYPE="hidden" NAME="B<readonly>" VALUE="table,field;...">
+    <INPUT TYPE="hidden" NAME="B<pqdebug>" VALUE="1">
+</FORM>
+
+B<All parameters are optional.>  pqedit.cgi may be run from a shell in offline mode.  It will then prompt you for the parameters:
+
+(offline mode: enter name=value pairs on standard input).
+
+=head1 ABSTRACT
+
+The pqedit.cgi perl script is a Perl CGI script designed to allow easy editing 
+of any Transact-SQL (Sybase or MS SQL server) or Oracle compliant database
+table.  It is designed to provide a web, CGI form interface for editing any
+arbitrary database table--sufficient information to provide a reasonable form
+interface is acquired dynamically from the database server itself.
+
+
+It runs on a web server as a Perl 5 CGI script that uses the CGI,
+Apache::Sybase::DBlib, Sybase::DBlib, Win32::ODBC, RDBAL,
+RDBAL::Schema modules.
+
+=head1 INSTALLATION:
+
+To install this package, just change to the directory in which this
+file is found and type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+And then copy pqedit.cgi to a place in your web directory tree that allows CGI scripts to run (if your web server supports mod_perl, a mod_perl location is preferred).  pqedit.cgi will be copied to your '/usr/local/bin' directory also.
+
+The mssql_pqweb.sql or sybase_pqweb.sql DDL scripts may be used to create the
+appropriate tables in the optional pqweb database.  See the comments at the top
+of these files for their usage.
+
+=head1 DESCRIPTION
+
+PQ Edit uses the RDBAL::Schema module to query the database for information about the tables and fields available.  Based on this information, it tries construct a reasonable interface for editing any table of interest.
+
+PQ Edit does not maintain a connection to the database--it reconnects to the database server on each action.  PQ Edit passes the username and password given to it to itself on each action so that it can reconnect to the database server.
+
+PQEdit assumes that there are not any tabs in any of the fields being displayed or edited (it will turn each tab into a space).
+
+PQEdit assumes that the names of the tables' fields do not have 15 underscores in a row as part of the name (Example: 'server.owner.table.my_______________field' is not allowed).
+
+If called with no CGI parameters, it will prompt the user for:
+
+=over 4
+
+=item server
+
+=item database
+
+=item table
+
+=item username
+
+=item password
+
+=back
+
+or some or all of these may be passed as CGI GET or POST parameters.
+
+=head1 PQEdit parameters
+
+=head2 server
+
+The name of the Transact-SQL database server (Sybase or MS SQL) to connect to.
+
+=head2 server_type=oracle
+
+This tells PQ Edit that it is an Oracle database which it is talking to.
+This parameter is mandatory for the correct working of PQ Edit with an Oracle
+database but should not be used for all Transact-SQL databases.
+
+=head2 database
+
+The name of the database on the database server that contains the table(s) to edit.
+
+=head2 table
+
+The name of the database table to start editing.
+
+=head2 username
+
+The username to use to login to the database server.
+
+=head2 password
+
+The password to use to login to the database server.
+
+=head2 helppage
+
+The URL of an HTML page which contain bookmarks which correspond to the names of the fields in the database.  If this parameter is given, then PQ Edit will make the labels of the form's fields into clickable links pointing to I<htmlpage>#I<fieldname>.  If a fieldname is part of a foreign key tuple, then the bookmark which will be used will consist of the field names seperated by ' and ' (Example: 'field1 and field2').
+
+The helppage value may also be retrieved from the optional pqweb database.
+
+=head2 labels
+
+This parameter may contain a list of comma seperated pairs of fields and their
+overridden labels.  The field;label pair is seperated by a semicolon.
+
+Example: labels=field1name;Field 1 Label,field2name;Field 2 Label
+
+=head2 subedit_tables
+
+A comma seperated list of tables that should be also made available for editing.  (NOTE: the HTML escaped form for comma is B<%2C>. )
+
+=head2 button_subedit
+
+When given a true value, B<1>, uses push buttons instead of radio buttons for selecting (and switching to) another table for editing.
+
+=head2 web_body_bgcolor
+
+An HTML background color, BGCOLOR, value for the displayed pages.
+
+=head2 web_textarea_columns
+
+The number of text columns to use for larger character fields.  Any character field larger than this value uses a text area CGI field instead of a text CGI field for editing.  The default is 61.
+
+=head2 web_textarea_rows
+
+The number of text rows to use for larger character fields.  The text area field will only be as large as is necessary based on the size of the character field--this value limits the maximum number of rows used.  The default is 2.
+
+=head2 begin_html_include
+
+A file which contains HTML to include near the beginning of the PQ Edit form.  The specification of this file should be the absolute path relative to the root of the web hierarchy.  Example: '/mydir/helpfile.html'.  This file should not contain the <HTML>, <BODY>, </BODY>, or </HTML> tags.
+
+=head2 middle_html_include
+
+A file which contains HTML to include near the middle of the PQ Edit form.  The specification of this file should be the absolute path relative to the root of the web hierarchy.  Example: '/mydir/helpfile.html'.  This file should not contain the <HTML>, <BODY>, </BODY>, or </HTML> tags.
+
+=head2 end_html_include
+
+A file which contains HTML to include near the end of the PQ Edit form.  The specification of this file should be the absolute path relative to the root of the web hierarchy.  Example: '/mydir/helpfile.html'.  This file should not contain the <HTML>, <BODY>, </BODY>, or </HTML> tags.
+
+=head2 disable_lookup
+
+A comma seperated list of tables that should B<NOT> used as Lookup Tables or to provide the values and labels for Pull Down Menus.  (NOTE: the HTML escaped form for comma is B<%2C>. ) 
+
+=head2 label_match
+
+A comma seperated list of strings to use to match field names against when lookup for the field to use as a label for lookup fields.  The default strings (in the order used for matching is: 'description', 'comment', '_name', 'label', 'desc' (feedback welcomed on this default list).
+
+So if the parent table used to create a lookup pulldown list has a field such as 'mydescription' or 'foo_comment' PQ Edit will use the field 'mydescription'.
+
+=head2 replace_field auto_field
+
+A semicolan seperated list of I<table>,I<field>,SQL:I<replacement> or
+I<table>,I<field>,VALUE:I<replacement> or I<table>,I<field>,I<replacement>.
+
+B<replace_field> always replaces a fields values whereas B<auto_field> only replaces values of fields which are left blank (NULL).  B<replace_field> fields are shown as read-only fields on the PQ Edit form.
+
+Specifies values for fields for B<insert>s or B<update>s.  The replacement portion is processed to replace variables in the list specified below as well as all variables of type $pq_I<field>.  If SQL: is specified, then the replacement is used as a valid command to be executed on the database server, with the resulting single value replacing that field's value for the B<insert> or B<update> operation.  If SQL: not is specified, then the replacement replaces that field's value for the B<insert> or B<update> operation.
+
+For example:
+
+pqedit.cgi?replace_field=I<main_table>,I<first_field>,SQL:I<select '$remote_address'>
+
+would execute: "select 'I<ip_address>'" on the database server and put the first value returned into the I<first_field> value for the insert or update statement of table I<main_table>.
+
+or
+
+pqedit.cgi?replace_field=main_table,first_field,VALUE:$remote_address $remote_user $pq_another_field
+
+would put 'I<ip_address> I<username> I<another_field>' into the I<first_field> value for the insert or update statement of table I<main_table>.
+
+Replacement variables:
+
+=over 4
+
+=item $pq_I<field>
+
+$pq_I<field> gives the current value (from the PQ Edit form) of some other table field from the same record.
+
+=item $referer
+
+The URL of the page the browser was viewing prior to fetching your script. Not available for all browsers. 
+
+=item $remote_address
+
+The dotted IP address of the remote host. 
+
+=item $remote_ident
+
+The identity-checking information from the remote host. Only available if the remote host has the identd daemon turned on. 
+
+=item $remote_host
+
+Either the remote host name or IP address. if the former is unavailable. 
+
+=item $remote_user
+
+The name given by the remote user during password authorization. 
+
+=item $script_name
+
+The script name as a partial URL, for self-refering scripts. 
+
+=item $server_name
+
+The name of the WWW server the script is running under. 
+
+=item $server_admin
+
+The name of the administrator of the WWW server the script is running under. 
+
+=item $server_software
+
+The name and version of the server software. 
+
+=item $virtual_host
+
+When using the virtual host feature of some servers, the name of the virtual host the browser is accessing. 
+
+=item $server_port
+
+The communications port the server is using. 
+
+=item $user_agent
+
+The identity of the remote user's browser software, e.g. "Mozilla/1.1N (Macintosh; I; 68K)" 
+
+=item $user_name
+
+Attempts to obtain the remote user's name, using a variety of environment variables. This only works with older browsers such as Mosaic. Netscape does not reliably report the user name! 
+
+=item $datetime
+
+The current date and time as a standard string.
+
+=item $unique_id
+
+The Apache web server generated unique ID.
+
+=back
+
+=head2 pq_fieldname
+
+Values for the fields are passed to PQ Edit in this format to provide default values for the form's fields.  Example, assuming database field: telephone_number is: pq_telephone_number='(314) 555-1111'.
+
+=head2 pqsearch_fieldname
+
+Setting this to one as well as setting the corresponding pq_I<fieldname>, will allow setting the search criteria for the record(s) to be displayed.  The 'Overview' option may be used with the pq_I<fieldname> and pqsearch_I<fieldname> options.
+
+=head2 Overview
+
+Setting this to one (1) will display an Overview ('View Search Set') window with the search parameters set by the pq_I<fieldname> and pqsearch_I<fieldname> parameters.
+
+=head2 single_window
+
+Value none or 'ON'.  Used to force disabling of multiple window frames.
+
+=head2 readonly
+
+A list of fields to display but not allow to be edited.
+
+=head2 nondisplay
+
+A list of fields to not display.
+
+=head2 no_schemacache
+
+When given a true value, B<1>, causes PQ Edit to not use the cached copy of the schema and to write out a new schema cache.  Note that this applies for the whole PQ Edit session.
+
+=head2 pqdebug
+
+When given a true value, B<1>, causes PQ Edit to run in a debugging mode.
+
+=head1 PQ Web Database Parameters
+
+An optional database may be used to store certain parameters used by PQEdit.
+
+The parameters that may be stored in the optional pqweb database are:
+
+=over 4
+
+=item helppage
+
+     The URL of the helppage to use.
+
+=item labels
+
+     The overridden labels for table fields
+
+=item web_body_bgcolor
+
+     The web pages background color.
+
+=back
+
+=head2 pqweb_server
+
+The name of the database server which contains the pqweb database.
+
+=head2 pqweb_database
+
+The name of the pqweb database.  This defaults to pqweb.
+
+=head2 pqweb_username
+
+The username to use when connecting to the pqweb database.  This account
+only needs 'select' permissions.
+
+=head2 pqweb_password
+
+The password to use when connecting to the pqweb database.
+
+=head2 pqweb_entry
+
+Which pqweb entry to use (the pqweb..pqweb.pq value).
+
+=head1 PQ Edit Frames
+
+When PQ Edit is in multiple window frame mode (single_window != 'ON'), the names of the frames which it uses are in the form:
+
+=over 4
+
+=item pqeditI<table> for Editing windows
+
+=item overviewI<table> for Overview windows
+
+=back
+
+If it is desired, a Frameset HTML window could be constructed prior to invoking PQ Edit which would contain the PQ Edit frames as subframes.
+
+=head1 AUTHOR INFORMATION
+
+Brian H. Dunford-Shore   brian@ibc.wustl.edu
+
+Copyright 1998, Washington University School of Medicine,
+Institute for Biomedical Computing.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. 
+
+Address bug reports and comments to:
+www@ibc.wustl.edu
+
+=head1 CREDITS
+
+Thanks very much to:
+
+B<David J. States> (states@ibc.wustl.edu)
+
+and
+
+B<Fyodor Krasnov> (fyodor@bws.aha.ru)
+
+     for suggestions and bug fixes.
+
+=head1 BUGS
+
+You really mean 'extra' features ;).  None known.
+
+=head1 TODO
+
+These are features that would be nice to have and might even happen someday (especially if YOU write it).
+
+=over 4
+
+=item More control of the 'Look and Feel' of the HTML page:
+
+(colors, fonts, etc.).
+
+=item Other types of database servers:
+
+(PostgreSQL, mSQL, mySQL, etc.).  (Note: this depends on there being a version
+of RDBAL and RDBAL::Schema for the database in question).
+
+=back
+
+=head1 SEE ALSO
+
+B<CGI> -- http://www.ibc.wustl.edu/perl5/other/CGI.html
+
+B<Sybase::DBlib> -- http://www.ibc.wustl.edu/perl5/other/sybperl.html
+
+B<RDBAL> -- http://www.ibc.wustl.edu/perl5/other/RDBAL.html
+
+B<RDBAL::Schema> -- http://www.ibc.wustl.edu/perl5/other/RDBAL/Schema.html
+
+=cut
+

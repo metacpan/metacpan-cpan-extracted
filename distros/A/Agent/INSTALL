@@ -1,0 +1,41 @@
+---------------------
+Installing Agent Perl
+---------------------
+
+Get Tom-2.04 AlphaThree and apply the patch (see below).  Note that Tom-3.00
+is incompatible with this version.
+
+In general, the following should work:
+
+	perl Makefile.PL
+	make
+	make install
+
+
+Apply the Patch
+---------------
+
+Included with this distribution is a patch for Tom.pm v2.04 AlphaThree.  To
+apply the patch go to Class-Tom-2.04's parent directory, and type:
+
+	patch -p0 < Tom.pm.patch-spurkis-a3-01
+
+Or just apply the patch manually - it's a simple two line fix.
+
+
+Note for Win32 Users
+--------------------
+
+If you don't have a make utility, try setting your PERL5LIB environment
+variable to point to the Agent Perl distribution.  If that doesn't work, try
+copying all of the .pm files into your site-perl directory, making sure to
+keep the directory structure intact.
+
+Anyone willing to compile a PPM for Agent Perl is more than welcome!
+
+
+Please read the README file before you start to play :-).
+
++---
+ Steve Purkis <spurkis@engsoc.carleton.ca>
+ October 30, 1998

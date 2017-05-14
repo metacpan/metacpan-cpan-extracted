@@ -8,7 +8,9 @@ Net::WebSocket::Parser - Parse WebSocket from a filehandle
 
 =head1 SYNOPSIS
 
-    my $parse = Net::WebSocket::Parser->new( $iof);
+    my $iof = IO::Framed::Read->new($fh);
+
+    my $parse = Net::WebSocket::Parser->new($iof);
 
     #See below for error responses
     my $frame = $parse->get_next_frame();
@@ -34,7 +36,9 @@ A call to this method yields one of the following:
 L<IO::Framed> was born out of work on this module; see that module’s
 documentation for the particulars of working with it. In particular,
 note the exceptions L<IO::Framed::X::EmptyRead> and
-L<IO::Framed::X::ReadError>.
+L<IO::Framed::X::ReadError>. (As described in L<Net::WebSocket>’s
+documentation, you can use an equivalent interface for frame chunking if you
+wish.)
 
 =head1 CUSTOM FRAMES SUPPORT
 

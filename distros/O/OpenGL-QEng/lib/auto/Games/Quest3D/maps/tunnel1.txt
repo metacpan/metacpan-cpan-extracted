@@ -1,0 +1,35 @@
+# Map of a long tunnel - used to transition to a scenario
+#
+###  $Id:  $
+
+map       0  0   0 xsize=>8, zsize=>80, start=>[4,4,90];
+in_last;
+
+level     0  0   0 zsize=>80, xsize=>8, y=>0, texture=>'green_tile';
+level     0  0   0 zsize=>80, xsize=>8, y=>8, texture=>'sand';
+
+#Top wall
+archwall  0  0   0;
+
+#Bottom wall
+wall      0 80   0;
+
+#left wall
+wall      0  0 270 xsize=>72;
+archwall  0 72 270;
+
+#right wall
+wall      8  0 270 xsize=>80;
+
+torch     2 15   0;
+torch     6 30   0;
+torch     2 45   0;
+torch     6 60   0;
+torch     2 75   0;
+detector  4 70   0
+ visible=>0, range=>6,
+ near_script=>"sub{
+   $self->send_event('map','maps/girlmap.txt');
+   $self->send_event('go',4,76,0);}
+   ";
+done;

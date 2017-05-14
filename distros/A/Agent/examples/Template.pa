@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+
+##
+# Agent::Template - insert brief description here.
+# Author <email@addr>
+# Date
+##
+
+package Agent::Template;
+@ISA = qw( Agent );
+
+
+##
+# The agent's constructor:
+
+sub new {
+	my ($class, %args) = @_;
+	my $self = {};
+	# copy all arguments into the new object:
+	foreach (keys(%args)) { $self->{"$_"} = $args{"$_"}; }
+	bless $self, $class;
+}
+
+
+##
+# The agent_main sub:
+
+sub agent_main {
+	my ($self, %args) = @_;
+
+	# This is the agent's main program.
+	# Most agents will want to obtain an address in a medium
+	# so that they have the ability to communicate.
+}
+
+
+##
+# Any aditional methods
+
+sub method {
+	my ($self, %args) = @_;
+
+	# Don't forget to include '$self' in *all* methods.  Agents
+	# are oo programs afterall.
+}
+
+1;	# needed for require() and use()
+
+
+__END__
+
+=head1 NAME
+
+Agent::Template - a template perl agent.
+
+=head1 SYNOPSIS
+
+Describe how your agent I<should> be used with some example code, i.e.:
+
+use Agent;
+
+my $agent = new Agent( Name => 'Template', %args );
+$agent->run;
+
+=head1 DESCRIPTION
+
+Describe what your agent does in this section.
+
+=head1 PARAMETERS
+
+Describe any parameters your constructor might take, i.e.:
+
+Param1 => description
+
+=head1 NOTES
+
+Anything the user might find useful to know.
+
+=head1 SEE ALSO
+
+Links to relevant documents here.
+
+=head1 AUTHOR
+
+Self evident.
+
+=head1 COPYRIGHT
+
+Copyright (c) 1997, 1998 Steve Purkis.  All rights reserved.  This package
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=head1 THANKS
+
+Mom, dad, fido (no, not the company!).
+
+=cut
+

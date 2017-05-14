@@ -1,7 +1,7 @@
 package Myco::Test::EntityTest;
 
 ###############################################################################
-# $Id: EntityTest.pm,v 1.1.1.1 2004/11/22 19:16:05 owensc Exp $
+# $Id: EntityTest.pm,v 1.3 2006/03/19 19:34:08 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ###############################################################################
@@ -14,7 +14,7 @@ Myco::Test::EntityTest - base class for Myco entity test classes
 
 =head1 SYNOPSIS
 
- ### Set up an entity test class (don't do this by hand!  Use mkentity!)
+ ### Set up an entity test class (don't do this by hand!  Use myco-mkentity!)
  ###
 
  package Myco::Foo::Test;
@@ -72,9 +72,9 @@ Myco::Test::EntityTest - base class for Myco entity test classes
  ###
 
  $ cd $MYCO_DISTRIB/driver
- $ ./testrun Myco::Foo::Test [-T]       # run tests
+ $ ./myco-testrun Myco::Foo::Test [-T]       # run tests
                                         # '-T' enables Tangram trace mode
- $ ./tktestrun Myco::Foo::Test          # run tests, GUI style
+ $ ./tkmyco-testrun Myco::Foo::Test          # run tests, GUI style
 
 =cut
 
@@ -257,7 +257,7 @@ with any tests unique to a given entity.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -267,10 +267,10 @@ Charles Owens <owensc@enc.edu>
 
 =head1 SEE ALSO
 
-L<Myco::Base::Entity|Myco::Base::Entity>,
+L<Myco::Entity|Myco::Entity>,
 L<Myco::Test::Suite|Myco::Test::Suite>,
-L<testrun|testrun>,
-L<tktestrun|tktestrun>,
+L<myco-testrun|testrun>,
+L<tkmyco-testrun|tktestrun>,
 L<Test::Unit::TestCase|Test::Unit::TestCase>
 
 =cut

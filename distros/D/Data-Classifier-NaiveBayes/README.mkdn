@@ -1,0 +1,66 @@
+# SYNOPSIS
+
+    my $classifier = Data::Classifier::NaiveBayes->new;
+
+    $classifier->train('token', "Some text to train with");
+    print $classifier->classify("Some text to find a match");
+
+# DESCRIPTION
+
+This a Naive Bayes classifer. The code for this project is largely and
+shamelessly based off of the work done by alexandru's stuff-classifier 
+originally written in Ruby.
+
+    https://github.com/alexandru/stuff-classifier
+
+The code was ported over to Perl and [Moose](http://search.cpan.org/perldoc?Moose). 
+
+For more information please see the following:
+
+    http://bionicspirit.com/blog/2012/02/09/howto-build-naive-bayes-classifier.html
+
+
+
+# ATTRIBUTES
+
+## tokenizer
+
+An access to [Data::Classifier::NaiveBayes::Tokenizer](http://search.cpan.org/perldoc?Data::Classifier::NaiveBayes::Tokenizer).
+
+## tokenizer_class
+
+A string to the tokenizer class name.
+
+## words($hash_ref)
+
+A key value pair of word counts by categories
+
+## categories($hash_ref)
+
+A key value pair of catogory counts.
+
+# METHODS
+
+## classify($phrase)
+
+This will return the highest probable category associated with the phrase.
+
+## train($category, $phrase)
+
+This will perform a word count and associate words with a category to later be
+classified.
+
+# SEE ALSO
+
+[Moose](http://search.cpan.org/perldoc?Moose) 
+
+# AUTHOR
+
+Logan Bell, `<logie@cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+Copyright 2012, Logan Bell
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

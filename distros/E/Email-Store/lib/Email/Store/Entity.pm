@@ -1,22 +1,23 @@
 package Email::Store::Entity;
+use strict;
 use base "Email::Store::DBI";
 Email::Store::Entity->table("entity");
 Email::Store::Entity->columns(Primary => qw/id/);
 Email::Store::Entity->columns(All => qw/id notes/); # notes is a hack.
-use Email::Address; 
+use Email::Address;
 use Email::MIME;
-use Module::Pluggable::Ordered 
+use Module::Pluggable::Ordered
     search_path => ["Email::Store::Entity::Correlator"];
 Email::Store::Entity->set_sql(distinct_entity => q{
-    SELECT     DISTINCT entity id
+    SELECT     DISTINCT entity, id
     FROM addressing
     WHERE name = ?    AND address = ?});
 Email::Store::Entity->set_sql(distinct_entity_for_name => q{
-    SELECT     DISTINCT entity id
+    SELECT     DISTINCT entity, id
     FROM addressing
     WHERE name = ?});
 Email::Store::Entity->set_sql(distinct_entity_for_address => q{
-    SELECT     DISTINCT entity id
+    SELECT     DISTINCT entity, id
     FROM addressing
     WHERE address = ?});
 sub on_store_order { 1 }
@@ -26,7 +27,7 @@ sub on_store {
     my $mime = Email::MIME->new($mail->message);
     for my $role (qw(To From Cc Bcc)) {
         my @addrs = Email::Address->parse($mime->header($role));
-        for my $addr (@addrs) { 
+        for my $addr (@addrs) {
             my $name = Email::Store::Entity::Name->find_or_create({
                 name => ($addr->name || " ")
             });
@@ -93,7 +94,7 @@ Email::Store::Entity - People in the address universe
 =head1 DESCRIPTION
 
 This file defines a number of concepts related to the people who send
-and receive mail. 
+and receive mail.
 
 An "entity" is a distinct "person", who may have multiple friendly names
 and/or multiple email addresses.
@@ -114,7 +115,7 @@ individual. C<Email::Store> only knows one such heuristic, and it's not
 a good one: it believes that a combination of email address and name
 represents a distinct individual. It doesn't know that C<simon-nospam@>
 and C<simon@> the same domain are the same person. This heuristic is
-implemented by C<Email::Store::Entity::Correlator::Trivial>. 
+implemented by C<Email::Store::Entity::Correlator::Trivial>.
 
 However, in the same way as the rest of C<Email::Store>, you can write
 your own correlators to determine how an addressing should be
@@ -123,7 +124,7 @@ allocated to an entity.
 A correlator must live in the C<Email::Store::Entity::Correlator>
 namespace, and implement the C<get_person_order> and C<get_person>
 methods. C<get_person> is called with a reference to the
-currently-selected entity and also the mail object, role name, 
+currently-selected entity and also the mail object, role name,
 and name and address objects involved. By examining the mail and the
 current list of addressings, your method can choose to find or create a
 more appropriate entity, and replace the reference accordingly.

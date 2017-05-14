@@ -1,0 +1,93 @@
+H1: Creating New Looks and Document Styles
+
+H2: Libraries and Modules
+
+SDF implements looks and document styles as follows:
+
+^ Each look is actually a library (within the {{look}} directory).
++ Each document style is actually a module (with an {{sds}} extension).
+
+As a result, looks and document styles have all the flexibility
+and features of normal libraries and modules.
+
+H2: Creating a New Look
+
+The easiest way to create a new look is to inherit details from
+an existing look. Typically, this involves 3 steps:
+
+!block sections
+^ Creating a library directory and module.
++ Overriding the pages module.
++ Overriding tuning modules.
+!endblock
+
+For example, the {{infomap}} look inherits
+most of its configuration details from the {{simple}} look.
+
+H2: Creating a library directory and module
+
+Each library needs its own directory and a {{main module}} within it.
+The {{FILE:look/infomap/infomap.sdm}} file is simply:
+
+!block example; pure
+# To remove the header/footer borders, uncomment the line below
+#!default OPT_BORDERS 0
+
+# Inherit the simple look
+!inherit "look/simple"
+!endblock
+
+H2: Overriding the pages module
+
+If the page layout is different, you will also need to override
+the {{pages.sdm}} module. For example, the
+{{FILE:look/infomap/pages.sdm}} file is:
+
+!block example; pure
+# Inherit what we can from the simple look
+!use "look/simple/pages"
+
+# Adjust the header/footer size and positioning
+!define PAGE_FIRST_FOOTER_HEIGHT  '0.50in'
+!define PAGE_FIRST_FOOTER_GAP     '0.25in'
+!define PAGE_RIGHT_HEADER_HEIGHT  '0.50in'
+!define PAGE_RIGHT_HEADER_GAP     '0.25in'
+!define PAGE_RIGHT_FOOTER_HEIGHT  '0.50in'
+!define PAGE_RIGHT_FOOTER_GAP     '0.25in'
+
+# Adjust the sidehead size
+!define OPT_SIDEHEAD_WIDTH "90pt"
+!define OPT_SIDEHEAD_GAP   "10pt"
+!endblock
+
+H2: Overriding tuning modules
+
+Each look can define a tuning module for each target format which
+supports looks. As tuning modules are simple modules named with an
+{{sdn}} extension, new tuning modules can easily reuse the configuration
+details in an existing tuning module.
+
+See the {{FILE:look/infomap/mif.sdn}} file for an example.
+
+
+H2: Creating a New Document Style
+
+To create a new document style, simply create a module file
+of the required name with an {{sds}} extension in the appropriate
+look library directory.
+
+For example, to create a new document style called {{article}}
+which is available in all looks, create a module file called
+{{article.sds}} in the {{look/simple}} directory.
+
+#Some of the variables you may wish to set in a document style
+#module are:
+#
+#!block table
+#Variable        Description
+#OPT_BORDERS     high level header/footer border control
+#OPT_HEADINGS    high level header/footer line count control
+#!endblock
+
+See the {{FILE:look/simple/*.sds}} files in the SDF distribution
+for examples.

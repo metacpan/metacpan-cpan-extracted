@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+
 
 use ExtUtils::MakeMaker;
 
@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "bin/servicelock"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "App::OverWatch",
   "PREREQ_PM" => {
     "Config::Tiny" => 0,
@@ -37,14 +36,14 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Spec" => 0,
-    "IO::Handle" => 0,
-    "IPC::Open3" => 0,
+    "DBD::Pg" => 0,
+    "DBD::SQLite" => 0,
+    "DBD::mysql" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,12 +52,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Config::Tiny" => 0,
+  "DBD::Pg" => 0,
+  "DBD::SQLite" => 0,
+  "DBD::mysql" => 0,
   "DBIx::Connector" => 0,
   "ExtUtils::MakeMaker" => 0,
-  "File::Spec" => 0,
   "Getopt::Long" => 0,
-  "IO::Handle" => 0,
-  "IPC::Open3" => 0,
   "Module::Load" => 0,
   "Moo" => 0,
   "Pod::Usage" => 0,

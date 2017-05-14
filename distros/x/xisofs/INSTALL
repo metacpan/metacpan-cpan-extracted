@@ -1,0 +1,18 @@
+xisofs v1.3 (c) Copyright 1997 Steve Sherwood
+---------------------------------------------
+
+Installation
+------------
+
+To install this software, simply edit the file install.pl and change the
+destination directories as required, save it and run. This will copy the
+scripts to the xisofs lib directoty which you have specified and pre-process
+the main file with the required directories.
+
+Running
+-------
+
+To run xisofs, ensure that X11 is running and type 'xisofs'. If you have not 
+run xisofs before, a file in the home directory will be created called
+'.xisofsrc' which contains defaults and configuration information.
+

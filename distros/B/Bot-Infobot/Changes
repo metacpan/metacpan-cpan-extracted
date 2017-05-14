@@ -1,0 +1,15 @@
+1.0 - Thurday 20th March, 2011
+   
+    Move to git
+    Fix documentation bug (Michael Alexander)
+    Fix way we load modules (Michael Alexander and Jess Robinson)
+    
+0.9 - Monday 25th April, 2005
+
+    Add ability to import old DBM style infobot storage.
+    Fix bug where we wouldn't fudge any karma for stuff that didn't have any comments.
+
+
+0.8 - Monday 18th April, 2005 
+
+    Initial release, finally

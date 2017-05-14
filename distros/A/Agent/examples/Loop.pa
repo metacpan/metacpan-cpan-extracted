@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+##
+# The Loop agent - a basic, recursive sample agent.
+# Steve Purkis <spurkis@engsoc.carleton.ca>
+# Jan 18, 1998.
+##
+
+package Agent::Loop;
+@ISA = qw( Agent );
+
+sub new {
+	my ($class, %args) = @_;
+	my $self = {};
+	foreach (keys(%args)) { $self->{"$_"} = $args{"$_"}; }
+	bless $self, $class;
+}
+
+sub agent_main {
+	my ($self, @args) = @_;
+
+	# first, get a Transport address:
+	my $tcp = new Agent::Transport(
+		Medium => 'TCP',
+		Cycle  => 1
+	) or die "Couldn't get a tcp transport address: $!!\n";
+	print "Got tcp address: " . $tcp->address . "\n" if $self->{verbose};
+
+	# start the message...
+	my $msg = new Agent::Message(
+		Body => [ $tcp->address . "\n", 'hi' ]
+	);
+
+	print "Started Loop agent.\n";
+
+	# should we start the loop, or wait for the remote to start?
+	if ($self->{Tell}) {
+		print "Initiating loop...\n";
+		$msg->add_dest( 'TCP', $self->{Tell} ) or die "Error: $!\n";
+		unless ($msg->send) {
+			print "Couldn't send message!\n";
+			return;
+		}
+	}
+
+	while (1) {	# loop till user/remote breaks
+		my @incoming = $tcp->recv(
+			Timeout => 120
+		) or die "Error: $!\n";
+		chop (my $remote = $incoming[0]);
+		print "got message from $remote.\n" if $self->{verbose};
+		$msg->add_dest( 'TCP', $remote) or die "Error: $!\n";
+		unless ($msg->send) {
+			print "Remote end stopped receiving\n";
+			return;
+		}
+	}
+}
+
+1;
+
+
+__END__
+
+=head1 NAME
+
+Agent::Loop - a basic, recursive sample agent.
+
+=head1 SYNOPSIS
+
+use Agent;
+
+my $agent = new Agent( Name => 'Loop', %args );
+$agent->run;
+
+=head1 DESCRIPTION
+
+transmits messages back & forth to & from another loop agent.
+
+The Loop agent repeatedly transmits messages back and forth with another
+Loop agent.  It is designed to demonstrate Agent Perl's messaging system to
+agent developers.
+
+=head1 PARAMETERS
+
+Host     =>  TCP address of other Loop agent
+verbose  =>  on/off
+
+=head1 SEE ALSO
+
+L<Agent>, L<Agent::Message>, L<Agent::Transport>.
+
+=head1 AUTHOR
+
+Steve Purkis E<lt>F<spurkis@engsoc.carleton.ca>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1997, 1998 Steve Purkis.  All rights reserved.  This package
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=cut

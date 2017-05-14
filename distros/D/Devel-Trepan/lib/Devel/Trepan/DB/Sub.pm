@@ -5,6 +5,8 @@ package DB;
 use warnings; no warnings 'redefine'; use utf8;
 no warnings 'once';
 use English qw( -no_match_vars );
+use version;
+use B;
 
 use constant SINGLE_STEPPING_EVENT =>   1;
 use constant NEXT_STEPPING_EVENT   =>   2;
@@ -52,10 +54,7 @@ sub subcall_debugger {
 	    $tid = eval { "[".threads->tid."]" };
 	}
 
-	local $OP_addr =
-	    ($HAVE_MODULE{'Devel::Callsite'} &&
-	     $Devel::Callsite::VERSION >= 0.08)
-	    ? Devel::Callsite::callsite(1) : undef;
+	local $OP_addr = Devel::Callsite::callsite(1);
 
 	$DB::subroutine =  $sub;
 	my $entry = $DB::sub{$sub};
@@ -134,7 +133,8 @@ sub subcall_debugger {
     }
 }
 
-sub check_for_stop() {
+sub check_for_stop()
+{
     my $brkpts = $DB::fn_brkpt{$sub};
     if ($brkpts) {
 	my @action = ();
@@ -171,10 +171,7 @@ sub check_for_stop() {
                 }
 		$DB::single = 1;
 		$DB::wantarray = wantarray;
-		local $OP_addr =
-		    ($HAVE_MODULE{'Devel::Callsite'} &&
-		     $Devel::Callsite::VERSION >= 0.08)
-		    ? Devel::Callsite::callsite(1) : undef;
+		local $OP_addr = Devel::Callsite::callsite(1);
 		&subcall_debugger() ;
                 last;
             }
@@ -240,12 +237,23 @@ sub DB::sub {
 
     if (defined($DB::running) && $DB::running == 1) {
 	local @DB::_ = @_;
+	local(*DB::dbline) = "::_<$DB::filename";
+
+	# FIXME: this isn't quite right;
+	$DB::addr = +B::svref_2object(\$DB::subroutine);
+
 	check_for_stop();
     }
+
+    # FIXME: this isn't quite right. For mysterious reasons $DB::wantarray
+    # is tracking the wrong frame and is always @
+    # $DB::wantarray = $DB::wantarray ? '@' : ( defined $wantarray ? '$' : '.' );
+    $DB::wantarray = '?';
 
     if ($DB::sub eq 'DESTROY' or
         substr($DB::sub, -9) eq '::DESTROY' or not defined wantarray) {
         &$DB::sub;
+	no warnings 'uninitialized';
         $DB::single |= pop(@stack);
         $DB::ret = undef;
     }
@@ -261,13 +269,15 @@ sub DB::sub {
 	}
 
         # Pop the single-step value back off the stack.
-        $DB::single |= $stack[ $stack_depth-- ];
-        if ($single & RETURN_EVENT) {
-            $DB::return_type = 'array';
-            @DB::return_value = @ret;
-            DB::DB($DB::sub) ;
-            return @DB::return_value;
-        }
+	if ($stack[$stack_depth]) {
+	    $DB::single |= $stack[ $stack_depth-- ];
+	    if ($single & RETURN_EVENT) {
+		$DB::return_type = 'array';
+		@DB::return_value = @ret;
+		DB::DB($DB::sub) ;
+		return @DB::return_value;
+	    }
+	}
         @ret;
     } else {
         # Called in array context. call sub and capture output.
@@ -335,6 +345,11 @@ sub DB::lsub : lvalue {
     local $stack_depth = $stack_depth + 1;    # Protect from non-local exits
     push_DB_single_and_set();
 
+    local(*DB::dbline) = "::_<$DB::filename";
+
+    # FIXME: this isn't quite right;
+    $DB::addr = +B::svref_2object(\$DB::subroutine);
+
     check_for_stop();
 
     if (wantarray) {
@@ -395,6 +410,7 @@ sub subs {
     my(@ret) = ();
     while (@_) {
       my $name = shift;
+      next unless $name;
       push @ret, [$DB::sub{$name} =~ /^(.*)\:(\d+)-(\d+)$/]
         if exists $DB::sub{$name};
     }

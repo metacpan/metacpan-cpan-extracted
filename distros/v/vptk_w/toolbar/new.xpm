@@ -1,0 +1,26 @@
+/* XPM */
+static char * new_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"17 17 3 1",
+/* colors */
+"  s None c None",
+". c #040204",
+"X c #FCFEFC",
+/* pixels */
+"                 ",
+"  ........       ",
+"  .XXXXXX..      ",
+"  .XXXXXX.X.     ",
+"  .XXXXXX....    ",
+"  .XXXXXXXXX.    ",
+"  .XXXXXXXXX.    ",
+"  .XXXXXXXXX.    ",
+"  .XXXXXXXXX.    ",
+"  .XXXXXXXXX.    ",
+"  .XXXXXXXXX.    ",
+"  .XXXXXXXXX.    ",
+"  .XXXXXXXXX.    ",
+"  ...........    ",
+"                 ",
+"                 ",
+"                 "};

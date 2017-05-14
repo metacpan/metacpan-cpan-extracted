@@ -86,6 +86,8 @@ foreach $cd(@{$cname}){
   print "$cd\n";
   if ($cd == 1){
     $res++;
+  }elsif ($cd == -8 && $dbh->{"MAXDB_UNICODE"}){
+    $res++;
   }else{
     $res--;
   }

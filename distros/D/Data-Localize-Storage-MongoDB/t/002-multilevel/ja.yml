@@ -1,0 +1,8 @@
+ja:
+    hello_world: 'こんにちは、世界！'
+    greetings:
+        hello: 'こんにちは、 {{name}}'
+        morning: 'おはよう、 {{name}}'
+        afternoon: 'こんにちは、 {{name}}'
+        evening: 'こんばんは、 {{name}}'
+

@@ -1,0 +1,122 @@
+# We just finished executing dot.profile, do all other non-critical
+# initialization.
+
+#-----------------------------------------------------------------------
+# Generic   
+#-----------------------------------------------------------------------
+if tty >/dev/null 2>&1 ; then tty=1; else tty=0; fi
+umask 2
+#-----------------------------------------------------------------------
+# xemacs
+#-----------------------------------------------------------------------
+if [ -s $HOME/.tilde ]; then :; else mkdir -m 700 $HOME/.tilde; fi
+/bin/rm -f $HOME/.tilde/*
+#-----------------------------------------------------------------------
+# Fix TTY
+#-----------------------------------------------------------------------
+if [ $tty -eq 1 ]; then
+	stty sane erase '^h' kill '^u' susp '^z'
+fi
+
+#---------------------------------------------------------------
+# Shell prompt
+#
+# $PROMPT contains control sequences specific to xterm or vt100
+# terminals.  Problems have been reported by folks who use Sun's
+# OpenWindows cmdtool.  If you are a cmdtool user then you
+# can write your own login scripts.  This is just an example.
+#---------------------------------------------------------------
+HOSTNAME=`hostname`
+case `basename $SHELL` in
+	ksh) PS1=$HOSTNAME:'$PWD$ '
+             PS2='>'
+             ENV=$HOME/.shrc
+             FPATH=
+             CDPATH=
+	     export PS1 PS2 ENV FPATH CDPATH
+	     ;;
+	bash)
+	     PS1='\[]2;\h:\W\][\u@\h] \w% '
+	     INPUTRC=$ETOP/etc/login/bash.inputrc
+	     export INPUTRC
+	     export PS1
+	     ;;
+	zsh) PROMPT='%{]2;%m:%2c%}%U[%n@%m] %2c%#%u ' 
+	     HISTSIZE=300
+	     DIRSTACKSIZE=30
+	     export PROMPT
+	     export HISTSIZE
+	     export DIRSTACKSIZE
+	     ;;
+	sh )
+esac
+
+#-----------------------------------------------------------------------
+# Custom profile
+#-----------------------------------------------------------------------
+module() {
+        eval `envy.pl $*`;
+	echo "*** Type 'envy' instead of module ***";
+}
+envy() { eval `envy.pl $*`; }
+
+ENVY_CONTEXT=site
+f=$ETOP/etc/login/profile.site; test -f $f && . $f
+ENVY_CONTEXT=custom
+f=$HOME/.custom/.profile; test -f $f && . $f
+f=$HOME/.custom/profile; test -f $f && . $f
+f=$HOME/.shrc; test -f $f && . $f
+
+#-----------------------------------------------------------------------
+# X Windows
+#-----------------------------------------------------------------------
+export LPDEST PRINTER DISPLAY
+
+chname=$HOME/.console.host
+prtname=$HOME/.myprinter
+stash_hostname() {
+  /bin/rm -f $chname $prtname
+  echo $HOSTNAME > $chname
+  if [ x$LPDEST = x ]; then
+    LPDEST=`ypmatch $HOSTNAME default_printer`
+    PRINTER=LPDEST
+  fi
+  echo $LPDEST > $prtname
+}
+
+ENVY_CONTEXT=desktop
+if [ $tty -eq 1 -a `tty` = '/dev/console' ]; then
+  if [ -f /etc/motd ] ; then cat /etc/motd; fi
+  stash_hostname
+
+  if [ -f $HOME/.custom/win.name ]; then win=`cat $HOME/.custom/win.name`; fi
+  if [ x$win = x ]; then win=fvwm95; fi
+  if [ '!' -r $ETOP/etc/desktop/$win ]; then
+    echo "Can't read $ETOP/etc/desktop/$win";
+    win=fvwm95
+  fi
+  if [ '!' -r $ETOP/etc/desktop/$win ]; then
+    echo "Can't read $ETOP/etc/desktop/$win";
+    echo
+    echo "Don't know how to start XWindows session"
+  else
+    . $ETOP/etc/desktop/$win
+  fi
+
+elif [ x$DISPLAY$DTUSERSESSION != x ]; then  # Exceed or CDE ?
+  stash_hostname;
+  envy load openwin;  #try the obvious
+
+else
+  # probably login through xterm or somesuch
+  if [ -f $chname ]; then
+    DISPLAY=`cat $chname`:0.0
+  fi
+  if [ -f $prtname ]; then
+    LPDEST=`cat $prtname`
+    PRINTER=$LPDEST
+  fi
+  echo "You may need to set your DISPLAY and LPDEST.  For example:"
+  echo "export DISPLAY=$DISPLAY"
+  echo "export LPDEST=$LPDEST"
+fi

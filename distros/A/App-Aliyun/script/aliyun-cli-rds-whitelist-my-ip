@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use v5.10;
+use FindBin qw/$Bin/;
+use lib "$Bin/../lib";
+use Data::Dumper;
+use MojoX::Aliyun;
+
+binmode(STDOUT, ':encoding(utf8)');
+binmode(STDERR, ':encoding(utf8)');
+
+my $group = shift @ARGV;
+die "perl $0 \$group_name" unless $group;
+
+use Sys::HostAddr;
+my $sysaddr = Sys::HostAddr->new();
+my $public_ip = $sysaddr->public();
+say "Adding $public_ip to RDS whitelist";
+
+die 'setup ENV ALIYUN_ACCESS_KEY, ALIYUN_ACCESS_SECRET, ALIYUN_REGION_ID'
+    unless $ENV{ALIYUN_ACCESS_KEY} and $ENV{ALIYUN_REGION_ID};
+my $aliyun = MojoX::Aliyun->new(
+    access_key => $ENV{ALIYUN_ACCESS_KEY},
+    access_secret => $ENV{ALIYUN_ACCESS_SECRET},
+    region_id => $ENV{ALIYUN_REGION_ID},
+);
+my $data = $aliyun->request('GET', 'rds', {
+    Action => 'DescribeDBInstances',
+});
+foreach my $db (@{ $data->{Items}->{DBInstance} }) {
+    say "# replace group $group with $public_ip on $db->{DBInstanceId}";
+    my $r = $aliyun->request('GET', 'rds', {
+        Action => 'ModifySecurityIps',
+        DBInstanceId => $db->{DBInstanceId},
+        SecurityIps => $public_ip,
+        DBInstanceIPArrayName => $group
+    });
+    say Dumper(\$r);
+}
+

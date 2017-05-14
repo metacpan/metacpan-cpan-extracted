@@ -3,56 +3,69 @@ use rlib '.';
 use strict; use warnings;
 use Test::More;
 use Helper;
-note( "Testing bioseq single-letter options on test-bioseq.nuc" );
 
 my %notes = (
-    d => 'delete by order',
-    g => 'remove gaps',
-    l => 'protein sequence length',
-    n => 'number of sequences',
-    r => 'reverse compliment sequence',
-    A => 'anonymize sequence IDs',
-    B => 'break into single-sequence files',
-    L => 'linearize fast sequence',
-    X => 'remove stop codons',
+    'anonymize' => 'anonymize sequence IDs',
+    'composition' => 'base composition',
+    'length' => 'protein sequence length',
+    'linearize' => 'linearize fast sequence',
+    'nogaps' => 'remove gaps',
+    'numseq' => 'number of sequences',
+    'removestop' => 'remove stop codons',
+    'revcom' => 'reverse compliment sequence',
 );
 
-for my $letter (qw(c g l n r A B C G L X)) {
-    run_bio_program('bioseq', 'test-bioseq.nuc', "-${letter}",
-		    "opt-${letter}.right", {note=>$notes{$letter}});
+# Filenames like
+# VS116:7:310... created on MSWindows using --break are invalid
+#
+if ($^O ne 'MSWin32') {
+    $notes{'break'} = 'break into single-sequence files';
 }
 
-note( "Testing bioseq option-value options on test-bioseq.nuc" );
-%notes = (
-    d => 'delete by order',
-    p => 'pick 1 sequence by order',
-    s => 'get subsequences',
-    t => 'translate dna',
-    R => 'reloop a sequence',
-);
+test_no_arg_opts('bioseq', 'test-bioseq.nuc', \%notes);
 
-for my $tup (['d', 'order:2'],
-	     ['p', 'order:2'],
-	     ['s', '10,20'],
-	     ['t', '1'],
-	     ['R', '3'],
-    )
-{
-    run_bio_program('bioseq', 'test-bioseq.nuc', "-$tup->[0] $tup->[1]",
-		    "opt-$tup->[0].right", {note=>$notes{$tup->[0]}});
+my $opts = [
+    ['delete', 'order:2', 'delete by order'],
+    ['pick', 'order:2', 'pick 1 sequence by order'],
+    ['subseq', '10,20', 'get subsequences'],
+    ['translate', '1', 'translate DNA'],
+    ['reloop', '3', 'reloop a sequence'],
+    ];
+
+test_one_arg_opts('bioseq', 'test-bioseq.nuc', $opts);
+
+my $multi_opts = [
+    ["--pick order:2,4", 'test-bioseq.nuc',
+     'pick-order-2,4.right', 'pick seqs by order delimited by commas'],
+    ["--pick order:2-4", 'test-bioseq.nuc',
+     'pick-order-2-4.right', 'pick seqs by order with range'],
+    ["--restrict EcoRI", 'test-bioseq-re.fas',
+     'restrict.right', 'restriction cut'],
+    ["--hydroB", 'test-bioseq.pep',
+     'hydroB.right', 'Hydrophobicity score'],
+    ["--input genbank --output fasta", "test-bioseq.gb",
+     "genbank2fast.right", "Genbank => fasta"],
+    ["--input genbank --feat2fas", "test-bioseq.gb",
+     "feat2fasta.right", "extract gens from a genbank file"]
+    ];
+
+    for my $tuple (@$multi_opts) {
+	my ($opts, $datafile, $check, $note) = @$tuple;
+	run_bio_program('bioseq', $datafile, $opts, $check, {note => $note});
+    }
+
+
+if ($ENV{'BPWRAPPER_INTERNET_TESTS'}) {
+    my $multi_opts = [
+	["--fetch 'X83553' --output genbank",
+	 'X83553.right', 'fetch Genbank file X8553']
+	];
+
+    for my $tuple (@$multi_opts) {
+	my ($opts, $check, $note) = @$tuple;
+	run_bio_program_nocheck('bioseq', '/dev/null', $opts, {note => $note});
+    }
 }
-
-# note( "Testing other bioaln option-value options" );
-# my $nuc = test_file_name('test-bioaln-pep2dna.nuc');
-# my $aln = test_file_name('test-bioaln-pep2dna.aln');
-# for my $triple (['i', 'fasta', 'test-bioaln-pep2dna.nuc'],
-# 		['s', '80,100', 'test-bioaln.aln'],
-# 		['P', $nuc, 'test-bioaln-pep2dna.aln'])
-# {
-#     run_bio_program('bioaln', $triple->[2], "-$triple->[0] $triple->[1]",
-# 		    "opt-$triple->[0].right");
-# }
-
 
 
 done_testing();

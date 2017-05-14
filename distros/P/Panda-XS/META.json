@@ -28,13 +28,15 @@
       },
       "configure" : {
          "requires" : {
+            "CPP::panda::lib" : "v1.0.0",
             "ExtUtils::MakeMaker" : "6.76",
-            "Panda::Install" : "v1.2.6"
+            "Panda::Install" : "v1.2.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Panda::Install" : "v1.2.6",
+            "CPP::panda::lib" : "v1.0.0",
+            "Panda::Install" : "v1.2.7",
             "perl" : "5.018000"
          }
       },
@@ -47,5 +49,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.1.6"
+   "version" : "v2.1.7"
 }

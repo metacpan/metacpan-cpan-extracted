@@ -2,16 +2,15 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(. ../lib);
+    require './test.pl';
+    set_up_inc('../lib');
 }
 
-require "test.pl";
-plan( tests => 31 );
+plan( tests => 35 );
 
-my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
 
 is(vec($foo,0,1), 0);
-is(length($foo), 0);
+is(length($foo), undef);
 vec($foo,0,1) = 1;
 is(length($foo), 1);
 is(unpack('C',$foo), 1);
@@ -68,7 +67,7 @@ ok(! $@);
 $@ = undef;
 eval { vec($foo, 1, 8) = 13 };
 ok(! $@);
-if ($Is_EBCDIC) {
+if ($::IS_EBCDIC) {
     is($foo, "\x8c\x0d\xff\x8a\x69"); 
 }
 else {
@@ -94,4 +93,37 @@ is($foo, "\x61\x62\x63\x34\x65\x66");
     my @r;
     $r[$_] = \ vec $s, $_, 1 for (0, 1);
     ok(!(${ $r[0] } != 0 || ${ $r[1] } != 1)); 
+}
+
+
+my $destroyed;
+{ package Class; DESTROY { ++$destroyed; } }
+
+$destroyed = 0;
+{
+    my $x = '';
+    vec($x,0,1) = 0;
+    $x = bless({}, 'Class');
+}
+is($destroyed, 1, 'Timely scalar destruction with lvalue vec');
+
+use constant roref => \1;
+eval { for (roref) { vec($_,0,1) = 1 } };
+like($@, qr/^Modification of a read-only value attempted at /,
+        'err msg when modifying read-only refs');
+
+
+{
+    # downgradeable utf8 strings should be downgraded before accessing
+    # the byte string.
+    # See the p5p thread with Message-ID:
+    # <CAMx+QJ6SAv05nmpnc7bmp0Wo+sjcx=ssxCcE-P_PZ8HDuCQd9A@mail.gmail.com>
+
+
+    my $x = substr "\x{100}\xff\xfe", 1; # a utf8 string with all ords < 256
+    my $v;
+    $v = vec($x, 0, 8);
+    is($v, 255, "downgraded utf8 try 1");
+    $v = vec($x, 0, 8);
+    is($v, 255, "downgraded utf8 try 2");
 }

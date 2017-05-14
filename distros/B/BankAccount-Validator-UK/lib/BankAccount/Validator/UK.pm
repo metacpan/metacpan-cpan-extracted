@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK;
 
-$BankAccount::Validator::UK::VERSION   = '0.28';
+$BankAccount::Validator::UK::VERSION   = '0.29';
 $BankAccount::Validator::UK::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK - Interface to validate UK bank account.
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
@@ -26,17 +26,17 @@ has mod        => (is => 'rw');
 has attempt    => (is => 'rw');
 has last_ex    => (is => 'rw');
 has trace      => (is => 'rw');
-has debug      => (is => 'ro', default => sub { return 0 });
-has last_check => (is => 'rw', default => sub { return 0 });
-has multi_rule => (is => 'ro', default => sub { return 0 });
-has sort_code  => (is => 'ro', default => sub { return BankAccount::Validator::UK::Rule::get_sort_codes() });
+has debug      => (is => 'ro', default => sub { 0 });
+has last_check => (is => 'rw', default => sub { 0 });
+has multi_rule => (is => 'ro', default => sub { 0 });
+has sort_code  => (is => 'ro', default => sub { BankAccount::Validator::UK::Rule::get_sort_codes() });
 
 =head1 DESCRIPTION
 
 The module uses the algorithm provided by VOCALINK to validate the bank sort code
 and account number.  It is  done by modulus  checking  method as specified in the
 document which is available on their website L<VOCALINK|https://www.vocalink.com/customer-support/modulus-checking>
-It currently supports the L<document|https://www.vocalink.com/media/2295/vocalink-validating-account-numbers-v410.pdf> v4.10 dated 6th Mar'2017.
+It currently supports the L<document|https://www.vocalink.com/media/2434/vocalink-validating-account-numbers-v420.pdf> v4.20 dated 12th Jun'2017.
 
 Institutions covered by this document are below:
 
@@ -58,6 +58,8 @@ Institutions covered by this document are below:
 
 =item * Citibank
 
+=item * Clear Bank
+
 =item * Clydesdale
 
 =item * Contis Financial Services
@@ -71,6 +73,8 @@ Institutions covered by this document are below:
 =item * Halifax
 
 =item * Hoares Bank
+
+=item * HSBC
 
 =item * Lloyds
 
@@ -101,6 +105,8 @@ Institutions covered by this document are below:
 =item * Unity Trust Bank
 
 =item * Virgin Bank
+
+=item * Williams & Glyn
 
 =item * Woolwich
 

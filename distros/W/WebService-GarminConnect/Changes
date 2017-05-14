@@ -1,5 +1,8 @@
 Revision history for WebService-GarminConnect
 
+1.0.5   2017-05-12
+        - Fix login to reflect changes on Garmin side
+
 1.0.4   2016-12-14
         - Fix login to reflect changes on Garmin side
 

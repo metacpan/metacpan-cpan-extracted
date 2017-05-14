@@ -23,7 +23,7 @@ has a copy of the page already.
 use strict;
 use warnings;
 use Carp;
-use base qw(CGI::Mungo::Response::Base);
+use base qw(CGI::Mungo::Response::Base CGI::Mungo::Log);
 #########################################################
 
 =head2 new($mungo)
@@ -38,7 +38,6 @@ sub new{
 	my $self = $class->SUPER::new($mungo);
 	bless $self, $class;
 	$self->code(304);
-	$self->message('Not Modified');
 	return $self;
 }
 #########################################################
@@ -64,14 +63,8 @@ sub display{	#this sub will display the page headers if needed
 #########################################################
 #FIXME not required
 #########################################################
-sub setTemplate{
-    return 1;   
-}
-#########################################################
-#FIXME not required
-#########################################################
 sub setError{
-    return 1;
+	return 1;
 }
 #########################################################
 #FIXME not required

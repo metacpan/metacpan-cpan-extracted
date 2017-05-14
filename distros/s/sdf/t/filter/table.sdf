@@ -1,0 +1,224 @@
+# This file tests the table filter
+
+# Test a simple table
+!block table
+Name    Age
+Bill    64
+Mary    53
+!endblock
+
+# Test the style parameter
+!block table; style="grid"
+Name    Age
+Bill    64
+Mary    53
+!endblock
+
+# Test the format parameter
+!block table; format=42
+Name        Age
+Bill Bloggs 64
+Mary Jones  53
+!endblock
+
+# Test the tags parameter
+!block table; tags="2,EMAIL"
+User:Email
+Tim:tjh
+Chris:cjm
+Ian:ianc
+!endblock
+
+# Test the parseline parameter
+!block table; parseline="User:Email"
+Tim:tjh
+Chris:cjm
+Ian:ianc
+!endblock
+
+# Test the niceheadings parameter
+!block table
+Name    Favorite_Drink
+Bob     red wine
+Paul    anything
+!endblock
+!block table; niceheadings=0
+Name    Favorite_Drink
+Bob     red wine
+Paul    anything
+!endblock
+
+# Test the groups parameter
+!block table
+Name    Favorite_Drink
+Family:
+Bob     red wine
+Robyn   white wine
+Friends:
+Paul    anything
+!endblock
+!block table; groups
+Name    Favorite_Drink
+Family:
+Bob     red wine
+Robyn   white wine
+Friends:
+Paul    anything
+!endblock
+
+# Test the noheadings parameter
+!block table; noheadings
+Dummy_Heading
+Just a body row
+Add another.
+!endblock
+
+# Test multi-line cells
+!block table
+Term            Definition
+OMT             <<
+                Object Modelling Technique - an object modelling
+                method developed by Rumbaugh
+>>
+VGA             <<
+                A PC graphics card standard
+                which defines certain sets of screen resolutions
+>>
+Port            <<
+                Take your pick from:
+
+                * an alcoholic drink
+                * a resting place for ships
+                * etc.
+>>
+!endblock
+
+# Try nested macros
+!block table
+one:two
+-l is the log:<<
+!import "foo.ps"
+-o is the output extension.
+
+E: example
+>>
+!endblock
+
+# Try macros around rows
+!block table
+Name    Value
+1       a
+!block sdf; changed
+2       b
+!endblock
+!if all
+3       c
+!endif
+!endblock
+
+# And conditional macros, in particular
+!define all
+!block table
+Name    Value
+1       a
+!block sdf; changed
+2       b
+!endblock
+!if all
+3       c
+!endif
+!endblock
+
+# Test multi-line headings and footings
+!block table; headings=3; footings
+A   B   C
+C++ C   B
+a   b   c
+85  75  73?
+q   w   e
+r   s   t
+!endblock
+
+# Test oncell processing
+!block script
+sub dump {
+        print STDERR "LAST $last_row,$last_col\n";
+        print STDERR "CELL[$row,$col]=$cell\n";
+        if ( ($row == $last_row) && ($col == $last_col) ) {
+                print STDERR "AT END OF TABLE\n";
+        }
+}
+!endblock
+!block table; oncell='&dump()';
+Name:Jump:Rubbish
+product1:url1:x
+product2:url2:y
+product3:url3:z
+!endblock
+
+# Test the wrap attribute
+!block table; wrap=3; groups; footings; headings=2
+A       B
+Big     Small
+Letter  One
+Vowels:
+A       a
+E       e
+I       i
+O       o
+U       u
+Others:
+B       b
+C       c
+D       d
+F       f
+G       g
+H       h
+Upper   Lower
+!endblock
+
+# Test continuation lines
+!block table
+A:B:C
+Hello \
+  world:A2
+Hi:How are:you\\
+Q:W:E:R
+S\\\
+X:Y\\\\
+   Z
+!endblock
+
+# Test non-last multi-line cells
+!block table
+one:two:three:four
+line1-1:two:three:<<
+large four
+E:example format four 
+>>
+line2-1:<<
+large two (2)
+E:example format for two
+>>:three:four
+line3-1:<<
+large two again
+E:example format 2+
+>>:<<
+large three too
+E:col3 example format
+>>:normal four
+!endblock
+
+# Test the select attribute
+!block table; select='A,C'
+A       B       C       D
+1       2       3       4
+5       6       7       8
+!endblock
+
+# Test the delete attribute
+!block table; delete='C'
+A       B       C       D
+1       2       3       4
+5       6       7       8
+!endblock

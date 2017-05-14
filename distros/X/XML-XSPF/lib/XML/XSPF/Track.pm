@@ -1,6 +1,6 @@
 package XML::XSPF::Track;
 
-# $Id: Track.pm 15 2006-05-04 19:18:24Z dsully $
+# $Id$
 
 use strict;
 use base qw(XML::XSPF::Base);

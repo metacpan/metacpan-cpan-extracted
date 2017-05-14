@@ -1,0 +1,58 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="dev_stage_name" cv_table="SMP_DevelopmentStageName">
+  <comment type="definition">This table provides the restricted vocabulary for the column developmental stage name in the table sample and is used to provide the stage as agreed upon by researchers in the particular field unless there is a more general ontology that can be referred to
+</comment>
+<term name="stationary_phase"
+        description="appropriate to single-celled organisms"/>
+<term name="synchronized_g0"
+        description="appropriate to single-celled organisms"/>
+<term name="synchronized_g1"
+        description="appropriate to single-celled organisms"/>
+<term name="synchronized_s1"
+        description="appropriate to single-celled organisms"/>
+<term name="synchronized_g2"
+        description="appropriate to single-celled organisms"/>
+<term name="synchronized_m_phase"
+        description="appropriate to single-celled organisms"/>
+<term name="early_log"
+        description="appropriate to single-celled organisms"/>
+<term name="mid_log"
+        description="appropriate to single-celled organisms"/>
+<term name="late_log"
+        description="appropriate to single-celled organisms"/>
+<term name="2_cell"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="4_cell"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="8_cell"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="16_cell"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="fertilized_oocytes"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="cultured_cell_line"
+        description="single cell type from an organism that is multi-celled and complex at maturity"/>
+<term name="unfertilized_oocyte"
+        description="single cell type from an organism that is multi-celled and complex at maturity"/>
+<term name="spermatids"
+        description="single cell type from an organism that is multi-celled and complex at maturity"/>
+<term name="mature_spermatozoa"
+        description="single cell type from an organism that is multi-celled and complex at maturity"/>
+<term name="morula"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="blastula_or_blastocyst"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="gastrula"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="embryonic"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+<term name="neural_tube_stage"
+        description="appropriate to multi-celled and developmentally staged organisms"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

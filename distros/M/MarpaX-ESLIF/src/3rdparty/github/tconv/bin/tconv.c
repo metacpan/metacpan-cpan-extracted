@@ -311,6 +311,11 @@ static void fileconvert(int outputFd, char *filenames,
     NULL;
   tconvOption.traceUserDatavp = NULL;
   
+#ifndef TCONV_NTRACE
+  /* For very early trace */
+  putenv("TCONV_ENV_TRACE=1");
+#endif
+
   tconvp = tconv_open_ext(tocodes, fromcodes, &tconvOption);
   if (tconvp == (tconv_t) -1) {
     GENERICLOGGER_ERRORF(NULL, "tconv_open_ext: %s", strerror(errno));

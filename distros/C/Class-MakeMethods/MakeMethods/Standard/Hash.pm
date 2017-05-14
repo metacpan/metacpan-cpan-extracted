@@ -123,7 +123,7 @@ sub new {
       }
       return $self;
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -181,7 +181,7 @@ sub scalar {
 	$self->{$hash_key} = shift;
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -304,7 +304,7 @@ sub array {
 	return array_splicer( $self->{$hash_key}, @_ );
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -410,7 +410,7 @@ sub hash {
 	return $self->{$hash_key};
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################
@@ -485,7 +485,7 @@ sub object {
 	$self->{$hash_key};
       }
     }
-  } (shift)->_get_declarations(@_)
+  } (shift)->get_declarations(@_)
 }
 
 ########################################################################

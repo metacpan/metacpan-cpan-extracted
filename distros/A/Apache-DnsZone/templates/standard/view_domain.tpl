@@ -12,6 +12,11 @@ $A_RR
 </tr>
 <tr>
 <td align="center">
+$AAAA_RR
+</td>
+</tr>
+<tr>
+<td align="center">
 $CNAME_RR
 </td>
 </tr>
@@ -23,6 +28,11 @@ $MX_RR
 <tr>
 <td align="center">
 $NS_RR
+</td>
+</tr>
+<tr>
+<td align="center">
+$PTR_RR
 </td>
 </tr>
 <tr>

@@ -1,0 +1,120 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2007 celmorlauren limited. All rights reserved. 
+# This program is free software; you can redistribute it and/or modify it under
+# the same terms as Perl itself.
+
+use strict;
+
+use Sendmail::M4::Utils;
+use Sendmail::M4::Mail8;
+
+=head1 NAME
+
+Sendmail::M4::mail8 - Stop fake MX and most spammers, sendmail M4 hack file
+
+=head1 STATUS
+
+Version 0.221 (early Beta)
+Very much a work in progress.
+
+=head1 SYNOPSIS
+
+Wrapper script for Mail8
+
+=head1 AUTHOR
+
+Ian McNulty, celmorlauren limited (registered in England & Wales 5418604). 
+
+email E<lt>development@celmorlauren.comE<gt>
+
+=head1 USES
+
+ Sendmail::M4::Utils
+ Sendmail::M4::Mail8    the worker module
+
+=head1 EXPORTS NOTHING
+
+=cut
+
+# min recommended setting for edge mail systems
+mail8_setup "paranoid", 2, @ARGV;
+
+=head1 CONFIGURATION
+
+Although this has been tested on celmorlauren's system, it is recommended that you also test it on your own system, to enable this, this program will need changing to suit your site. To keep this simple all you need do is to provide some values for the method B<testing_domains> example shown below.
+
+
+    testing_domains <<TESTING;
+    # 1st line is one of (OUR, OK, BAD)
+    OUR
+    # data lines have the format
+    # HELO, DOMAIN (resolves to), IP (connected from), RESOLVE {client_resolve}, FROM (mail from), RCPT (mail to)
+    # where an IP address does not resolve, use "0" in its DOMAIN field, and place FAIL in the RESOLVE field
+    # other values for RESOLVE are (OK FAIL FORGED TEMP)
+    #
+    # HELO              DOMAIN  IP          RESOLVE     FROM                        RCPT
+    mail.celmorlauren.com, 0, 80.176.153.184, FAIL, development@celmorlauren.com, development@celmorlauren.co.uk
+    mail.celmorlauren.co.uk, 0, 80.176.153.184, FAIL, development@celmorlauren.co.uk development@celmorlauren.com
+    TESTING    
+
+=cut
+testing_domains <<TESTING;
+# 1st line is one of (OUR, OK, BAD)
+OUR
+# data lines have the format
+# HELO, DOMAIN (resolves to), IP (connected from), RESOLVE {client_resolve}, FROM (mail from), RCPT (mail to)
+# where an IP address does not resolve, use "0" in its DOMAIN field, and place FAIL in the RESOLVE field
+# other values for RESOLVE are (OK FAIL FORGED TEMP)
+#
+# HELO              DOMAIN  IP          RESOLVE     FROM                        RCPT
+mail.celmorlauren.com, 0, 80.176.153.184, FAIL, development\@celmorlauren.com, development\@celmorlauren.co.uk
+mail.celmorlauren.co.uk, 0, 80.176.153.184, FAIL, development\@celmorlauren.co.uk, development\@celmorlauren.com
+
+OK
+mail1.contact.reed.co.uk,mail1.contact.reed.co.uk,217.64.230.1,OK,no-reply\@contact.reed.co.uk,development\@celmorlauren.com
+x1.develooper.com,x1.develooper.com,65.251.223.170,OK,<nobody\@pause.perl.org>,<development\@celmorlauren.com>
+mail.mynewbrand.net,mail.mynewbrand.net,203.121.67.132,OK,<info\@mynewbrand.com>,<ian\@daisymoo.com>
+
+BAD
+201-89-79-162.ctame700.dsl.brasiltelecom.net.br,201-89-79-162.ctame700.dsl.brasiltelecom.net.br,OK,ian\@dasiymoo.com,ian\@daisymoo.com
+host-196-205-239-96.static.link.com.eg,host-196.205.239.96.static.link.com.eg,196.205.239.96,FORGED,<ian\@daisymoo.com>,<ian\@daisymoo.com>
+u1582992.onlinehome-server.com,u1582992.onlinehome-server.com,82.165.237.114,OK,<anonymous\@u1582992.onlinehome-server.com>,<development\@celmorlauren.com>
+80.176.153.184,122-116-17-133.HINET-IP.hinet.net,122.116.17.133,OK,<rurur\@hotmail.com>,<development\@celmorlauren.com>
+192.168.254.207,122-116-17-133.HINET-IP.hinet.net,122.116.17.133,OK,<rurur\@hotmail.com>,<development\@celmorlauren.com>
+TESTING
+
+copyright;
+version_id;
+local_config;
+
+# Only on celmorlauren installed systems
+#PerlHelpers;
+
+# are we using the helper files anyway?
+# and are we testing
+#mail8_db "test";
+# or not testing
+#mail8_db;
+
+
+local_rulesets;
+
+# singal routine that checks HELO domain names
+inline 1;
+screen_domain;
+
+local_check_relay;
+local_check_mail;
+local_check_rcpt;
+check_data;
+
+# this supports addional Rules
+#screen_header(@_)
+screen_header;
+###############################################################################
+# Installation and testing
+ok "Is the generated code OK" or exit;
+
+install();
+
+test();

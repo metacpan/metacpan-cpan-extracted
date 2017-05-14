@@ -1,0 +1,19 @@
+---
+abstract: 'An easy to use Bread::Board container for MongoDB'
+author:
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MongoDBx-Bread-Board-Container
+requires:
+  Bread::Board: 0.17
+  MongoDB: 0.40
+version: 0.003

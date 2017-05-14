@@ -1,0 +1,42 @@
+HTML::CalendarMonthDB and frontend install instructions
+
+*********
+1. Install HTML::CalendarMonthDB.pm
+
+	A. If you do not have Date::Calc, install it (get it from CPAN).  You will also need DBI.
+	
+	B. After you have gunzipped and untarred this distribution, cd into the HTML-CalendarMonthDB-X.X directory.
+	
+	C. %> perl Makefile.PL
+	   if all goes well:
+	   %> make
+	   %> make install
+
+*********	
+2. Create postgres database tables:
+	
+	A. If you wish to use another database type, you will have to change the code a bit.  Sorry, I haven't had time to do this myself.
+
+	B. Run the setup_calendar.pl script included in the distribution.  This script will ask you for database information, and will create a postgres SQL script for you to run.  If the database is local, it will attempt to run the script if you so desire.  If this fails, please run the script manually.
+
+	C. For more information about the database set up, see IMPORTANT-README.
+
+*********
+3. If you wish to use the admin tool that comes with this distribution:
+	
+	A. Please note that this admin tool is only set up to handle one calendar (from database), not multiple ones.  
+
+	B. When you ran setup_calendar.pl, some environment variables were output that you should use in your webserver configuration.  If you are running apache, this should be simply a matter of cut-n-paste, restart webserver.  These environment variables can be found in CAL_ENV.list, which was output from the setup_calendar.pl script.
+
+	C. Place all files from the cgi/ directory within the distribution into an appropriate place.  They must all be in the same directory, unless you wish to change the code.
+
+	D. HTML::Template and URI::Escape need to be installed for these cgi scripts to run.
+	
+	E. You may wish to modify the .tmpl files, these are basically HTML containers for the calendar admin.
+
+	F. If you wish to publish the calendars to HTML, make sure the directory you have set in @ENV to publish to exists and that the user running your webserver has permissions to write in it.
+
+*********
+4. That's it!  This is the first, rough version.  All should work, but there may be things that should/could be done differently or better.  Please feel free to email me with comments/suggestions/questions. 
+
+- Matt Vella the_mcv@yahoo.com

@@ -1,0 +1,18 @@
+<title>ZXID IdP: Authentication</title>
+<link type="text/css" rel=stylesheet href="an.css"><body bgcolor=white>
+<form method=get action="!!URL">
+<h1 class=zxtop>ZXID IdP Authentication for Federated SSO</h1>
+<p>Entity ID of this IdP (click for the IdP metadata): <a href="!!EID">!!EID</a><br>
+<p>Login requested by !!SP_DPY_NAME (<a href="!!SP_EID">!!SP_EID</a>)
+<div class=zxerr>!!ERR</div><div class=zxmsg>!!MSG</div><div class=zxdbg>!!DBG</div>
+User NOT logged in, no session.
+<h3>Please authenticate using one of the following methods:</h3>
+<!--input type=checkbox name=at> Adjust attribute sharing after authentication-->
+<ol><li> Yubikey <a href="http://yubico.com"><img src="yubiright_16x16.gif" width=16 height=16 border=0></a>:<input name=au><input type=submit name=alp value=" Login ">
+<li> User: <input name=au> Password: <input type=password name=ap><input type=submit name=alp value=" Login ">
+<li><input type=submit name=an value=" Create New User "></ol>
+<input type=hidden name=fc value=1><input type=hidden name=fn value=prstnt><br>
+<input type=hidden name=fq value=""><input type=hidden name=fy value=""><input type=hidden name=fa value=""><input type=hidden name=fm value=""><input type=hidden name=fp value=0><input type=hidden name=ff value=0><!-- ZXID built-in defaults, see AN_TEMPL zxidconf.h-->
+<input type=hidden name=ar value="!!SSOREQ">
+<input type=hidden name=zxapp value="!!ZXAPP">
+</form><div class=zxbot><a href="http://zxid.org/">zxid.org</a>, !!VERSION</div>

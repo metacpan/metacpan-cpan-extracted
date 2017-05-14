@@ -1,6 +1,5 @@
 #pragma once
 #include <xs/xs.h>
-#include <xs/lib.h>
 #include <panda/time.h>
 #include <panda/date.h>
 
@@ -17,7 +16,7 @@ namespace xs { namespace date {
 using namespace panda::time;
 using namespace panda::date;
 using std::string_view;
-using xs::lib::sv2string_view;
+using xs::sv2string_view;
 
 const char*const DATE_CLASS    = "Panda::Date";
 const char*const DATEREL_CLASS = "Panda::Date::Rel";

@@ -1,0 +1,38 @@
+Geo::Coder::XYZ Version 0.01
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Geo::Coder::XYZ
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-XYZ
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Geo-Coder-XYZ
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Geo-Coder-XYZ
+
+    Search CPAN
+        http://search.cpan.org/dist/Geo-Coder-XYZ/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2017 Nigel Horne
+
+This program is released under the following licence: GPL

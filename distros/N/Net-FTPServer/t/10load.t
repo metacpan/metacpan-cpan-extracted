@@ -1,30 +1,29 @@
-#!/usr/bin/perl -w
-
-# $Id: 10load.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 17;
 
 BEGIN {
-  plan tests => 1;
+  use_ok("Net::FTPServer") || print "Bail out!\n";
+  use_ok("Net::FTPServer::DirHandle");
+  use_ok("Net::FTPServer::FileHandle");
+  use_ok("Net::FTPServer::Handle");
+  use_ok("Net::FTPServer::Full::Server");
+  use_ok("Net::FTPServer::Full::DirHandle");
+  use_ok("Net::FTPServer::Full::FileHandle");
+  use_ok("Net::FTPServer::RO::DirHandle");
+  use_ok("Net::FTPServer::RO::FileHandle");
+  use_ok("Net::FTPServer::RO::Server");
+  use_ok("Net::FTPServer::InMem::DirHandle");
+  use_ok("Net::FTPServer::InMem::FileHandle");
+  use_ok("Net::FTPServer::InMem::Server");
+  SKIP: {
+    skip "DBI not installed", 4 if not eval "require DBI; 1";
+    use_ok("Net::FTPServer::DBeg1::IOBlob");
+    use_ok("Net::FTPServer::DBeg1::Server");
+    use_ok("Net::FTPServer::DBeg1::DirHandle");
+    use_ok("Net::FTPServer::DBeg1::FileHandle");
+  };
 }
 
-use Net::FTPServer;
-use Net::FTPServer::DirHandle;
-use Net::FTPServer::FileHandle;
-use Net::FTPServer::Handle;
-use Net::FTPServer::DBeg1::IOBlob;
-use Net::FTPServer::DBeg1::Server;
-use Net::FTPServer::DBeg1::DirHandle;
-use Net::FTPServer::DBeg1::FileHandle;
-use Net::FTPServer::Full::Server;
-use Net::FTPServer::Full::DirHandle;
-use Net::FTPServer::Full::FileHandle;
-use Net::FTPServer::RO::DirHandle;
-use Net::FTPServer::RO::FileHandle;
-use Net::FTPServer::RO::Server;
-use Net::FTPServer::InMem::DirHandle;
-use Net::FTPServer::InMem::FileHandle;
-use Net::FTPServer::InMem::Server;
+diag( "Testing Net::FTPServer $Net::FTPServer::VERSION, Perl $], $^X" );
 
-ok (1);
+__END__

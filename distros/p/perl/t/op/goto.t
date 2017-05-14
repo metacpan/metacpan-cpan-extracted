@@ -5,33 +5,42 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = qw(. ../lib);
-    require "test.pl";
+    require "./test.pl"; require './charset_tools.pl';
 }
 
 use warnings;
 use strict;
-plan tests => 58;
+plan tests => 98;
 our $TODO;
+
+my $deprecated = 0;
+local $SIG{__WARN__} = sub { if ($_[0] =~ m/jump into a construct/) { $deprecated++; } else { warn $_[0] } };
 
 our $foo;
 while ($?) {
     $foo = 1;
   label1:
+    is($deprecated, 1, "following label1");
+    $deprecated = 0;
     $foo = 2;
     goto label2;
 } continue {
     $foo = 0;
     goto label4;
   label3:
+    is($deprecated, 1, "following label3");
+    $deprecated = 0;
     $foo = 4;
     goto label4;
 }
+is($deprecated, 0, "after 'while' loop");
 goto label1;
 
 $foo = 3;
 
 label2:
 is($foo, 2, 'escape while loop');
+is($deprecated, 0, "following label2");
 goto label3;
 
 label4:
@@ -60,7 +69,7 @@ sub bar {
 exit;
 
 FINALE:
-is(curr_test(), 16, 'FINALE');
+is(curr_test(), 20, 'FINALE');
 
 # does goto LABEL handle block contexts correctly?
 # note that this scope-hopping differs from last & next,
@@ -174,13 +183,18 @@ ok($ok, 'works correctly in a nested eval string');
 	A: { if ($false) { redo A; B: $ok = 1; redo A; } }
 	goto B unless $count++;
     }
+    is($deprecated, 0, "before calling sub a()");
     a();
     ok($ok, '#19061 loop label wiped away by goto');
+    is($deprecated, 1, "after calling sub a()");
+    $deprecated = 0;
 
     $ok = 0;
     my $p;
     for ($p=1;$p && goto A;$p=0) { A: $ok = 1 }
     ok($ok, 'weird case of goto and for(;;) loop');
+    is($deprecated, 1, "following goto and for(;;) loop");
+    $deprecated = 0;
 }
 
 # bug #9990 - don't prematurely free the CV we're &going to.
@@ -190,6 +204,57 @@ sub f1 {
     goto sub { $x=0; ok(1,"don't prematurely free CV\n") }
 }
 f1();
+
+# bug #99850, which is similar - freeing the subroutine we are about to
+# go(in)to during a FREETMPS call should not crash perl.
+
+package _99850 {
+    sub reftype{}
+    DESTROY { undef &reftype }
+    eval { sub { my $guard = bless []; goto &reftype }->() };
+}
+like $@, qr/^Goto undefined subroutine &_99850::reftype at /,
+   'goto &foo undefining &foo on sub cleanup';
+
+# When croaking after discovering that the new CV you're about to goto is
+# undef, make sure that the old CV isn't doubly freed.
+
+package Do_undef {
+    my $count;
+
+    # creating a new closure here encourages any prematurely freed
+    # CV to be reallocated
+    sub DESTROY { undef &undef_sub; my $x = sub { $count } }
+
+    sub f {
+        $count++;
+        my $guard = bless []; # trigger DESTROY during goto
+        *undef_sub = sub {};
+        goto &undef_sub
+    }
+
+    for (1..10) {
+        eval { f() };
+    }
+    ::is($count, 10, "goto undef_sub safe");
+}
+
+# make sure that nothing nasty happens if the old CV is freed while
+# goto'ing
+
+package Free_cv {
+    my $results;
+    sub f {
+        no warnings 'redefine';
+        *f = sub {};
+        goto &g;
+    }
+    sub g { $results = "(@_)" }
+
+    f(1,2,3);
+    ::is($results, "(1 2 3)", "Free_cv");
+}
+
 
 # bug #22181 - this used to coredump or make $x undefined, due to
 # erroneous popping of the inner BLOCK context
@@ -217,7 +282,7 @@ close $f;
 
 $r = runperl(prog => 'use Op_goto01; print qq[DONE\n]');
 is($r, "OK\nDONE\n", "goto within use-d file"); 
-unlink "Op_goto01.pm";
+unlink_all "Op_goto01.pm";
 
 # test for [perl #24108]
 $ok = 1;
@@ -250,7 +315,7 @@ exit;
 
 bypass:
 
-is(curr_test(), 5, 'eval "goto $x"');
+is(curr_test(), 9, 'eval "goto $x"');
 
 # Test autoloading mechanism.
 
@@ -389,6 +454,38 @@ moretests:
     }
 }
 
+# This bug was introduced in Aug 2010 by commit ac56e7de46621c6f
+# Peephole optimise adjacent pairs of nextstate ops.
+# and fixed in Oct 2014 by commit f5b5c2a37af87535
+# Simplify double-nextstate optimisation
+
+# The bug manifests as a warning
+# Use of "goto" to jump into a construct is deprecated at t/op/goto.t line 442.
+# and $out is undefined. Devel::Peek reveals that the lexical in the pad has
+# been reset to undef. I infer that pp_goto thinks that it's leaving one scope
+# and entering another, but I don't know *why* it thinks that. Whilst this bug
+# has been fixed by Father C, because I don't understand why it happened, I am
+# not confident that other related bugs remain (or have always existed).
+
+sub DEBUG_TIME() {
+    0;
+}
+
+{
+    if (DEBUG_TIME) {
+    }
+
+    {
+        my $out = "";
+        $out .= 'perl rules';
+        goto no_list;
+    no_list:
+        is($out, 'perl rules', '$out has not been erroneously reset to undef');
+    };
+}
+
+is($deprecated, 0, 'no warning was emmitted');
+
 # deep recursion with gotos eventually caused a stack reallocation
 # which messed up buggy internals that didn't expect the stack to move
 
@@ -401,7 +498,11 @@ sub recurse2 {
     my $x = shift;
     $_[0] ? +1 + recurse1($_[0] - 1) : 0
 }
+my $w = 0;
+$SIG{__WARN__} = sub { ++$w };
 is(recurse1(500), 500, 'recursive goto &foo');
+is $w, 0, 'no recursion warnings for "no warnings; goto &sub"';
+delete $SIG{__WARN__};
 
 # [perl #32039] Chained goto &sub drops data too early. 
 
@@ -431,12 +532,60 @@ a32039();
 
 # goto &foo not allowed in evals
 
-
 sub null { 1 };
 eval 'goto &null';
 like($@, qr/Can't goto subroutine from an eval-string/, 'eval string');
 eval { goto &null };
 like($@, qr/Can't goto subroutine from an eval-block/, 'eval block');
+ 
+# goto &foo leaves @_ alone when called from a sub
+sub returnarg { $_[0] };
+is sub {
+    local *_ = ["ick and queasy"];
+    goto &returnarg;
+}->("quick and easy"), "ick and queasy",
+  'goto &foo with *_{ARRAY} replaced';
+my @__ = byte_utf8a_to_utf8n("\xc4\x80");
+sub { local *_ = \@__; goto &utf8::decode }->("no thinking aloud");
+is "@__", chr 256, 'goto &xsub with replaced *_{ARRAY}';
+
+# And goto &foo should leave reified @_ alone
+sub { *__ = \@_;  goto &null } -> ("rough and tubbery");
+is ${*__}[0], 'rough and tubbery', 'goto &foo leaves reified @_ alone';
+
+# goto &xsub when @_ has nonexistent elements
+{
+    no warnings "uninitialized";
+    local @_ = ();
+    $#_++;
+    & {sub { goto &utf8::encode }};
+    is @_, 1, 'num of elems in @_ after goto &xsub with nonexistent $_[0]';
+    is $_[0], "", 'content of nonexistent $_[0] is modified by goto &xsub';
+}
+
+# goto &xsub when @_ itself does not exist
+undef *_;
+eval { & { sub { goto &utf8::encode } } };
+# The main thing we are testing is that it did not crash.  But make sure 
+# *_{ARRAY} was untouched, too.
+is *_{ARRAY}, undef, 'goto &xsub when @_ does not exist';
+
+# goto &perlsub when @_ itself does not exist [perl #119949]
+# This was only crashing when the replaced sub call had an argument list.
+# (I.e., &{ sub { goto ... } } did not crash.)
+sub {
+    undef *_;
+    goto sub {
+	is *_{ARRAY}, undef, 'goto &perlsub when @_ does not exist';
+    }
+}->();
+sub {
+    local *_;
+    goto sub {
+	is *_{ARRAY}, undef, 'goto &sub when @_ does not exist (local *_)';
+    }
+}->();
+
 
 # [perl #36521] goto &foo in warn handler could defeat recursion avoider
 
@@ -459,3 +608,169 @@ TODO: {
     }
 }
 
+is($deprecated, 0, "following TODOed test for #43403");
+
+#74290
+{
+    my $x;
+    my $y;
+    F1:++$x and eval 'return if ++$y == 10; goto F1;';
+    is($x, 10,
+       'labels outside evals can be distinguished from the start of the eval');
+}
+
+goto wham_eth;
+die "You can't get here";
+
+wham_eth: 1 if 0;
+ouch_eth: pass('labels persist even if their statement is optimised away');
+
+$foo = "(0)";
+if($foo eq $foo) {
+    goto bungo;
+}
+$foo .= "(9)";
+bungo:
+format CHOLET =
+wellington
+.
+$foo .= "(1)";
+SKIP: {
+    skip_if_miniperl("no dynamic loading on miniperl, so can't load PerlIO::scalar", 1);
+    my $cholet;
+    open(CHOLET, ">", \$cholet);
+    write CHOLET;
+    close CHOLET;
+    $foo .= "(".$cholet.")";
+    is($foo, "(0)(1)(wellington\n)", "label before format decl");
+}
+
+$foo = "(A)";
+if($foo eq $foo) {
+    goto orinoco;
+}
+$foo .= "(X)";
+orinoco:
+sub alderney { return "tobermory"; }
+$foo .= "(B)";
+$foo .= "(".alderney().")";
+is($foo, "(A)(B)(tobermory)", "label before sub decl");
+
+$foo = "[0:".__PACKAGE__."]";
+if($foo eq $foo) {
+    goto bulgaria;
+}
+$foo .= "[9]";
+bulgaria:
+package Tomsk;
+$foo .= "[1:".__PACKAGE__."]";
+$foo .= "[2:".__PACKAGE__."]";
+package main;
+$foo .= "[3:".__PACKAGE__."]";
+is($foo, "[0:main][1:Tomsk][2:Tomsk][3:main]", "label before package decl");
+
+$foo = "[A:".__PACKAGE__."]";
+if($foo eq $foo) {
+    goto adelaide;
+}
+$foo .= "[Z]";
+adelaide:
+package Cairngorm {
+    $foo .= "[B:".__PACKAGE__."]";
+}
+$foo .= "[C:".__PACKAGE__."]";
+is($foo, "[A:main][B:Cairngorm][C:main]", "label before package block");
+
+our $obidos;
+$foo = "{0}";
+if($foo eq $foo) {
+    goto shansi;
+}
+$foo .= "{9}";
+shansi:
+BEGIN { $obidos = "x"; }
+$foo .= "{1$obidos}";
+is($foo, "{0}{1x}", "label before BEGIN block");
+
+$foo = "{A:".(1.5+1.5)."}";
+if($foo eq $foo) {
+    goto stepney;
+}
+$foo .= "{Z}";
+stepney:
+use integer;
+$foo .= "{B:".(1.5+1.5)."}";
+is($foo, "{A:3}{B:2}", "label before use decl");
+
+$foo = "<0>";
+if($foo eq $foo) {
+    goto tom;
+}
+$foo .= "<9>";
+tom: dick: harry:
+$foo .= "<1>";
+$foo .= "<2>";
+is($foo, "<0><1><2>", "first of three stacked labels");
+
+$foo = "<A>";
+if($foo eq $foo) {
+    goto beta;
+}
+$foo .= "<Z>";
+alpha: beta: gamma:
+$foo .= "<B>";
+$foo .= "<C>";
+is($foo, "<A><B><C>", "second of three stacked labels");
+
+$foo = ",0.";
+if($foo eq $foo) {
+    goto gimel;
+}
+$foo .= ",9.";
+alef: bet: gimel:
+$foo .= ",1.";
+$foo .= ",2.";
+is($foo, ",0.,1.,2.", "third of three stacked labels");
+
+# [perl #112316] Wrong behavior regarding labels with same prefix
+sub same_prefix_labels {
+    my $pass;
+    my $first_time = 1;
+    CATCH: {
+        if ( $first_time ) {
+            CATCHLOOP: {
+                if ( !$first_time ) {
+                  return 0;
+                }
+                $first_time--;
+                goto CATCH;
+            }
+        }
+        else {
+            return 1;
+        }
+    }
+}
+
+ok(
+   same_prefix_labels(),
+   "perl 112316: goto and labels with the same prefix doesn't get mixed up"
+);
+
+eval { my $x = ""; goto $x };
+like $@, qr/^goto must have label at /, 'goto $x where $x is empty string';
+eval { goto "" };
+like $@, qr/^goto must have label at /, 'goto ""';
+eval { goto };
+like $@, qr/^goto must have label at /, 'argless goto';
+
+eval { my $x = "\0"; goto $x };
+like $@, qr/^Can't find label \0 at /, 'goto $x where $x begins with \0';
+eval { goto "\0" };
+like $@, qr/^Can't find label \0 at /, 'goto "\0"';
+
+sub TIESCALAR { bless [pop] }
+sub FETCH     { $_[0][0] }
+tie my $t, "", sub { "cluck up porridge" };
+is eval { sub { goto $t }->() }//$@, 'cluck up porridge',
+  'tied arg returning sub ref';

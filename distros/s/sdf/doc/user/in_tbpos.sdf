@@ -1,0 +1,36 @@
+H1: Positioning Tables
+
+H2: Horizontal Alignment
+
+The horizontal alignment of a table can be controlled by
+setting the {{align}} parameter of the {{FILT:table}} filter.
+The permitted values are:
+
+!block table
+Value       Meaning
+Left        left-align the table
+Center      center the table
+Right       right-align the table
+Inner       align the table with the inner margin
+Outer       align the table with the outer margin
+!endblock
+
+Note: The {{wide}} parameter changes the left indent of a table
+to include the sidehead of a page. Therefore, the {{wide}}
+parameter will impact the horizontal positioning of any
+table which is not right-aligned.
+
+H2: Vertical Positioning
+
+The vertical placement of a table can be controlled by
+setting the {{placement}} parameter of the {{FILT:table}} filter.
+The permitted values are:
+
+!block table
+Value       Meaning
+Float       next column if necessary
+Pagetop     top of the next page
+Columntop   top of the next column
+Lefttop     top of the next left-hand page
+Righttop    top of the next right-hand page
+!endblock

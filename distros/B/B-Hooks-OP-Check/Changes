@@ -1,45 +1,53 @@
-0.19  Sat, 10 Sep 2011 20:10:00 +0100
+Revision history for B-Hooks-OP-Check
+
+0.21      2017-05-11 14:19:03Z
+  * re-add the creation of B/Hooks/OP/Check/Install/Files.pm to installation
+
+0.20      2017-05-11 09:23:49Z
+  * convert packaging to Dist::Zilla (fixes RT#120431)
+
+0.19      2011-09-10 19:10:00Z
   * Fix hooking protocol, which was broken in a way that could result in losing
     checkers hooked in by other modules.
   * Add MYMETA.{json,yml} to MANIFEST.SKIP and .gitignore.
   * New repository location for release by Zefram.
 
-0.18  Mon, 06 Jul 2009 14:39:25 +0200
+0.18      2009-07-06 12:39:25Z
   * Require ExtUtils::Depends 0.302, which fixes linking problems on strawberry
     perl.
 
-0.17  Sun, 19 Apr 2009 10:06:40 +0200
+0.17      2009-04-19 08:06:40Z
   * Put the actual repository url in META.yml. D'OH!
 
-0.16  Sun, 19 Apr 2009 09:53:09 +0200
+0.16      2009-04-19 07:53:09Z
   * Explicitly declare testing dependency on Test::More (Closes RT#45133).
   * Specify bugtracker and repository urls in META.yml.
   * Upgrade ppport.h from 3.14_02 to 3.17.
 
-0.15  Tue, 11 Nov 2008 18:21:05 +0100
+0.15      2008-11-11 17:21:05Z
   * Require perl 5.8.1.
 
-0.14  Sun, 09 Nov 2008 22:22:15 +0100
+0.14      2008-11-09 21:22:15Z
   * Tell MakeMaker which symbols we'd like to export. Hopefully this will make
     linking against us work on Win32.
 
-0.13  Sun, 09 Nov 2008 03:36:27 +0100
+0.13      2008-11-09 02:36:27Z
   * Try to not dereference NULL.
 
-0.12  Sun, 19 Oct 2008 08:39:30 +0200
+0.12      2008-10-19 06:39:30Z
   * Use ppport.h to regain 5.6 compatibility.
 
-0.11  Thu, 16 Oct 2008 05:36:23 +0200
+0.11      2008-10-16 03:36:23Z
   * Allow removal of callbacks.
 
-0.10  Wed, 15 Oct 2008 23:22:25 +0200
+0.10      2008-10-15 21:22:25Z
   * Allow passing userdata to callbacks.
 
-0.03  Fri, 03 Oct 2008 08:07:26 +0200
+0.03      2008-10-03 06:07:26Z
   * Don't use Perl_check_t to be more portable.
 
-0.02  Thu, 02 Oct 2008 13:15:13 +0200
+0.02      2008-10-02 11:15:13Z
   * Ship inc/ by not ignoring it in MANIFEST.SKIP.
 
-0.01  Wed, 01 Oct 2008 11:56:01 +0200
+0.01      2008-10-01 09:56:01Z
   * Initial release.

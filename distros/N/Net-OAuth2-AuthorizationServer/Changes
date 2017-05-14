@@ -1,5 +1,9 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.15     2017-05-12
+        - Add support for jwt_claims_cb in call to ->token to allow the
+          override or addition of claims to the JWT
+
 0.14     2017-03-03
         - Additions and changes for handling modification of scopes, many
           thanks to Martin Renvoize for patches and assistance with this

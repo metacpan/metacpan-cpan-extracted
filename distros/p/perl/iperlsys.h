@@ -51,7 +51,11 @@
 #include "perlio.h"
 
 #ifndef Sighandler_t
+#  if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
+typedef Signal_t (*Sighandler_t) (int, siginfo_t*, void*);
+#  else
 typedef Signal_t (*Sighandler_t) (int);
+#  endif
 #endif
 
 #if defined(PERL_IMPLICIT_SYS)
@@ -73,9 +77,9 @@ typedef STDCHAR*	(*LPGetBase)(struct IPerlStdIO*, FILE*);
 typedef int		(*LPGetBufsiz)(struct IPerlStdIO*, FILE*);
 typedef int		(*LPGetCnt)(struct IPerlStdIO*, FILE*);
 typedef STDCHAR*	(*LPGetPtr)(struct IPerlStdIO*, FILE*);
-typedef char*		(*LPGets)(struct IPerlStdIO*, FILE*, char*, int);
-typedef int		(*LPPutc)(struct IPerlStdIO*, FILE*, int);
-typedef int		(*LPPuts)(struct IPerlStdIO*, FILE*, const char*);
+typedef char*		(*LPGets)(struct IPerlStdIO*, char*, int, FILE*);
+typedef int		(*LPPutc)(struct IPerlStdIO*, int, FILE*);
+typedef int		(*LPPuts)(struct IPerlStdIO*, const char *, FILE*);
 typedef int		(*LPFlush)(struct IPerlStdIO*, FILE*);
 typedef int		(*LPUngetc)(struct IPerlStdIO*, int,FILE*);
 typedef int		(*LPFileno)(struct IPerlStdIO*, FILE*);
@@ -221,14 +225,14 @@ struct IPerlStdIOInfo
 	(*PL_StdIO->pGetCnt)(PL_StdIO, (f))
 #define PerlSIO_get_ptr(f)						\
 	(*PL_StdIO->pGetPtr)(PL_StdIO, (f))
-#define PerlSIO_fputc(f,c)						\
-	(*PL_StdIO->pPutc)(PL_StdIO, (f),(c))
-#define PerlSIO_fputs(f,s)						\
-	(*PL_StdIO->pPuts)(PL_StdIO, (f),(s))
+#define PerlSIO_fputc(c,f)			\
+	(*PL_StdIO->pPutc)(PL_StdIO, (c),(f))
+#define PerlSIO_fputs(s,f)			\
+	(*PL_StdIO->pPuts)(PL_StdIO, (s),(f))
 #define PerlSIO_fflush(f)						\
 	(*PL_StdIO->pFlush)(PL_StdIO, (f))
-#define PerlSIO_fgets(s, n, fp)						\
-	(*PL_StdIO->pGets)(PL_StdIO, (fp), s, n)
+#define PerlSIO_fgets(s, n, f)						\
+	(*PL_StdIO->pGets)(PL_StdIO, s, n, (f))
 #define PerlSIO_ungetc(c,f)						\
 	(*PL_StdIO->pUngetc)(PL_StdIO, (c),(f))
 #define PerlSIO_fileno(f)						\
@@ -307,14 +311,16 @@ struct IPerlStdIOInfo
 #define PerlSIO_get_cnt(f)		0
 #define PerlSIO_get_ptr(f)		NULL
 #endif
-#define PerlSIO_fputc(f,c)		fputc(c,f)
-#define PerlSIO_fputs(f,s)		fputs(s,f)
+#define PerlSIO_fputc(c,f)		fputc(c,f)
+#define PerlSIO_fputs(s,f)		fputs(s,f)
 #define PerlSIO_fflush(f)		Fflush(f)
-#define PerlSIO_fgets(s, n, fp)		fgets(s,n,fp)
-#if defined(VMS) && defined(__DECC)
-     /* Unusual definition of ungetc() here to accomodate fast_sv_gets()'
+#define PerlSIO_fgets(s, n, f)		fgets(s,n,f)
+#if defined(__VMS)
+     /* Unusual definition of ungetc() here to accommodate fast_sv_gets()'
       * belief that it can mix getc/ungetc with reads from stdio buffer */
+START_EXTERN_C
      int decc$ungetc(int __c, FILE *__stream);
+END_EXTERN_C
 #    define PerlSIO_ungetc(c,f) ((c) == EOF ? EOF : \
             ((*(f) && !((*(f))->_flag & _IONBF) && \
             ((*(f))->_ptr > (*(f))->_base)) ? \
@@ -335,7 +341,7 @@ struct IPerlStdIOInfo
 #define PerlSIO_set_cnt(f,c)		PerlIOProc_abort()
 #endif
 #if defined(USE_STDIO_PTR) && defined(STDIO_PTR_LVALUE)
-#define PerlSIO_set_ptr(f,p)		FILE_ptr(f) = (p)
+#define PerlSIO_set_ptr(f,p)		(FILE_ptr(f) = (p))
 #else
 #define PerlSIO_set_ptr(f,p)		PerlIOProc_abort()
 #endif
@@ -366,7 +372,7 @@ typedef int		(*LPMakedir)(struct IPerlDir*, const char*, int);
 typedef int		(*LPChdir)(struct IPerlDir*, const char*);
 typedef int		(*LPRmdir)(struct IPerlDir*, const char*);
 typedef int		(*LPDirClose)(struct IPerlDir*, DIR*);
-typedef DIR*		(*LPDirOpen)(struct IPerlDir*, char*);
+typedef DIR*		(*LPDirOpen)(struct IPerlDir*, const char*);
 typedef struct direct*	(*LPDirRead)(struct IPerlDir*, DIR*);
 typedef void		(*LPDirRewind)(struct IPerlDir*, DIR*);
 typedef void		(*LPDirSeek)(struct IPerlDir*, DIR*, long);
@@ -472,9 +478,12 @@ typedef char*		(*LPENVGetenv_len)(struct IPerlEnv*,
 #endif
 #ifdef WIN32
 typedef unsigned long	(*LPEnvOsID)(struct IPerlEnv*);
-typedef char*		(*LPEnvLibPath)(struct IPerlEnv*, const char*);
-typedef char*		(*LPEnvSiteLibPath)(struct IPerlEnv*, const char*);
-typedef char*		(*LPEnvVendorLibPath)(struct IPerlEnv*, const char*);
+typedef char*		(*LPEnvLibPath)(struct IPerlEnv*, WIN32_NO_REGISTRY_M_(const char*)
+					STRLEN *const len);
+typedef char*		(*LPEnvSiteLibPath)(struct IPerlEnv*, const char*,
+					    STRLEN *const len);
+typedef char*		(*LPEnvVendorLibPath)(struct IPerlEnv*, const char*,
+					      STRLEN *const len);
 typedef void		(*LPEnvGetChildIO)(struct IPerlEnv*, child_IO_table*);
 #endif
 
@@ -540,12 +549,12 @@ struct IPerlEnvInfo
 #ifdef WIN32
 #define PerlEnv_os_id()						\
 	(*PL_Env->pEnvOsID)(PL_Env)
-#define PerlEnv_lib_path(str)					\
-	(*PL_Env->pLibPath)(PL_Env,(str))
-#define PerlEnv_sitelib_path(str)				\
-	(*PL_Env->pSiteLibPath)(PL_Env,(str))
-#define PerlEnv_vendorlib_path(str)				\
-	(*PL_Env->pVendorLibPath)(PL_Env,(str))
+#define PerlEnv_lib_path(str, lenp)				\
+	(*PL_Env->pLibPath)(PL_Env,WIN32_NO_REGISTRY_M_(str)(lenp))
+#define PerlEnv_sitelib_path(str, lenp)				\
+	(*PL_Env->pSiteLibPath)(PL_Env,(str),(lenp))
+#define PerlEnv_vendorlib_path(str, lenp)			\
+	(*PL_Env->pVendorLibPath)(PL_Env,(str),(lenp))
 #define PerlEnv_get_child_IO(ptr)				\
 	(*PL_Env->pGetChildIO)(PL_Env, ptr)
 #endif
@@ -566,9 +575,9 @@ struct IPerlEnvInfo
 
 #ifdef WIN32
 #define PerlEnv_os_id()			win32_os_id()
-#define PerlEnv_lib_path(str)		win32_get_privlib(str)
-#define PerlEnv_sitelib_path(str)	win32_get_sitelib(str)
-#define PerlEnv_vendorlib_path(str)	win32_get_vendorlib(str)
+#define PerlEnv_lib_path(str, lenp)	win32_get_privlib(WIN32_NO_REGISTRY_M_(str) lenp)
+#define PerlEnv_sitelib_path(str, lenp)	win32_get_sitelib(str, lenp)
+#define PerlEnv_vendorlib_path(str, lenp)	win32_get_vendorlib(str, lenp)
 #define PerlEnv_get_child_IO(ptr)	win32_get_child_IO(ptr)
 #define PerlEnv_clearenv()		win32_clearenv()
 #define PerlEnv_get_childenv()		win32_get_childenv()
@@ -590,6 +599,8 @@ struct IPerlEnvInfo
 */
 
 #if defined(PERL_IMPLICIT_SYS)
+
+struct utimbuf; /* prevent gcc warning about the use below */
 
 /* IPerlLIO		*/
 struct IPerlLIO;
@@ -628,7 +639,7 @@ typedef int		(*LPLIONameStat)(struct IPerlLIO*, const char*,
 typedef char*		(*LPLIOTmpnam)(struct IPerlLIO*, char*);
 typedef int		(*LPLIOUmask)(struct IPerlLIO*, int);
 typedef int		(*LPLIOUnlink)(struct IPerlLIO*, const char*);
-typedef int		(*LPLIOUtime)(struct IPerlLIO*, char*, struct utimbuf*);
+typedef int		(*LPLIOUtime)(struct IPerlLIO*, const char*, struct utimbuf*);
 typedef int		(*LPLIOWrite)(struct IPerlLIO*, int, const void*,
 			    unsigned int);
 
@@ -926,10 +937,10 @@ typedef int		(*LPProcExecv)(struct IPerlProc*, const char*,
 			    const char*const*);
 typedef int		(*LPProcExecvp)(struct IPerlProc*, const char*,
 			    const char*const*);
-typedef uid_t		(*LPProcGetuid)(struct IPerlProc*);
-typedef uid_t		(*LPProcGeteuid)(struct IPerlProc*);
-typedef gid_t		(*LPProcGetgid)(struct IPerlProc*);
-typedef gid_t		(*LPProcGetegid)(struct IPerlProc*);
+typedef Uid_t		(*LPProcGetuid)(struct IPerlProc*);
+typedef Uid_t		(*LPProcGeteuid)(struct IPerlProc*);
+typedef Gid_t		(*LPProcGetgid)(struct IPerlProc*);
+typedef Gid_t		(*LPProcGetegid)(struct IPerlProc*);
 typedef char*		(*LPProcGetlogin)(struct IPerlProc*);
 typedef int		(*LPProcKill)(struct IPerlProc*, int, int);
 typedef int		(*LPProcKillpg)(struct IPerlProc*, int, int);
@@ -1406,11 +1417,5 @@ struct IPerlSockInfo
 #endif	/* __Inc__IPerl___ */
 
 /*
- * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: t
- * End:
- *
- * ex: set ts=8 sts=4 sw=4 noet:
+ * ex: set ts=8 sts=4 sw=4 et:
  */

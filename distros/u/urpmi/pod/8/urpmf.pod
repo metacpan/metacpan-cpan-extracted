@@ -32,56 +32,6 @@ Prints a help message and exits.
 
 Prints the version number and exits.
 
-=item B<--env> I<directory>
-
-Use a different environment directly out of a bug report tarball.
-
-=item B<--excludemedia> I<medium1,...,mediumN>
-
-Do not use the given media.
-
-=item B<--literal>
-
-Match literally instead of interpreting the argument as a regular
-expression.
-
-=item B<-l>
-
-Equivalent to B<--literal>.
-
-=item B<--media> I<medium1,...,mediumN>
-
-Select specific media to be used, instead of defaulting to all available
-media (or all update media if B<--update> is used).
-
-=item B<--sortmedia> I<medium1,...,mediumN>
-
-Sort the given media, substrings may be used to simplify grouping.
-This way, C<media1> will be taken into account first, then C<media2>, and
-so on. Media which aren't listed are taken into account after the others.
-
-=item B<--synthesis> I<file>
-
-Use the given synthesis file instead of urpmi db for searching packages.
-
-=item B<--use-distrib> I<directory>
-
-Use the given distribution tree instead of urpmi db for searching packages.
-
-=item B<--uniq>
-
-Do not print identical lines twice.
-
-=item B<--update>
-
-Use only update media. This means urpmf will only search through media
-marked as update.
-
-=item B<--urpmi-root> I<directory>
-
-Use the file system tree rooted for urpmi database and rpm install. Contrary
-to B<--root>, the urpmi configuration comes from the rooted tree.
-
 =item B<--verbose>
 
 Verbose mode. urpmf will emit various messages related to the parsing of
@@ -91,6 +41,17 @@ media_info files for your media.
 
 If the urpmi or rpm db is busy, wait until it is available
 
+=back
+
+=head2 Query Options
+
+=over
+
+=item B<-l>, B<--literal>
+
+Match literally instead of interpreting the argument as a regular
+expression.
+
 =item B<-i>
 
 Ignore case distinctions in the patterns that follow.
@@ -99,6 +60,29 @@ Ignore case distinctions in the patterns that follow.
 
 Honor case distinctions in the patterns that follow. This is the default
 behaviour.
+
+
+=back
+
+=head2 Output Options
+
+=over
+
+=item B<--uniq>
+
+Do not print identical lines twice.
+
+
+=item B<-m>
+
+Print the name of the media in which the
+package has been found.
+
+=item B<-f>
+
+Print version, release and arch along with name
+of package. This modifies the effect of the I<--name> option.
+
 
 =item B<-F> I<string>
 
@@ -119,8 +103,7 @@ Prints the BuildHost tag.
 
 =item B<--buildtime>
 
-Prints the
-BuildTime tag.
+Prints the BuildTime tag.
 
 =item B<--conffiles>
 
@@ -188,9 +171,9 @@ Prints the Size tag.
 
 Prints the names of source rpms.
 
-=item B<--suggests>
+=item B<--recommends>
 
-Prints the Suggests tag.
+Prints the Recommends tag.
 
 =item B<--summary>
 
@@ -204,15 +187,11 @@ Prints the packages' URL.
 
 Prints the Vendor tag.
 
-=item B<-m>
+=back
 
-Print the name of the media in which the
-package has been found.
+=head2 Advanced Query Options
 
-=item B<-f>
-
-Print version, release and arch along with name
-of package. This modifies the effect of the I<--name> option.
+=over
 
 =item B<-e>
 
@@ -244,6 +223,67 @@ Right parenthesis to close a group expression.
 
 Includes debugging output.
 
+
+=back
+
+=head2 Media Selection
+
+=over
+
+=item B<--excludemedia> I<medium1,...,mediumN>
+
+Do not use the given media.
+
+=item B<--media> I<medium1,...,mediumN>
+
+Select specific media to be used, instead of defaulting to all available
+media (or all update media if B<--update> is used).
+
+=item B<--sortmedia> I<medium1,...,mediumN>
+
+Sort the given media, substrings may be used to simplify grouping.
+This way, C<media1> will be taken into account first, then C<media2>, and
+so on. Media which aren't listed are taken into account after the others.
+
+=item B<--synthesis> I<file>
+
+Use the given synthesis file instead of urpmi db for searching packages.
+
+=item B<--use-distrib> I<directory>
+
+Use the given distribution tree instead of urpmi db for searching packages.
+
+=item B<--update>
+
+Use only update media. This means urpmf will only search through media
+marked as update.
+
+=back
+
+=head2 Database Options
+
+=over
+
+=item B<--urpmi-root> I<directory>
+
+Use the file system tree rooted for urpmi database and rpm install. Contrary
+to B<--root>, the urpmi configuration comes from the rooted tree.
+
+=item B<--wait-lock>
+
+If the urpmi or rpm db is busy, wait until it is available
+
+=back
+
+=head2 Debugging Options
+
+=over
+
+=item B<--env> I<directory>
+
+Use a different environment directly out of a bug report tarball.
+
+
 =back
 
 =head1 FORMAT
@@ -267,7 +307,7 @@ line.
 =head1 EXAMPLE
 
 This command will list all C<perl-Apache> modules, and list them along
-with the media in which they're been found, nicely indented :
+with the media in which they're been found, nicely indented:
 
     urpmf --qf '%-30name is found in media %media' perl-Apache
 

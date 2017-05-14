@@ -1,0 +1,60 @@
+Revision History for Dist-Zilla-Plugin-ReportPhase
+==================================================
+
+v0.03 2013-02-13
+----------------
+
+* Date: 2013-02-13 12:43:12 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: 21aa3efdbe8e03cea12faa68c7b9b991a8ada3ae
+
+    Updated to new dzil standards
+
+* Date: 2013-02-13 11:59:07 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: e0d6510d229387b5a6377defbc4fff561a30af96
+
+    Moved ReportPhase.pm to lib so I could use MinimumPerl.
+
+
+v0.02 2013-02-12
+----------------
+
+* Date: 2013-02-12 18:02:12 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: c7b28137c57de995885f6666f5607ab1537fbf92
+
+    Fix dist.ini so that it sets the minimum perl needed correctly
+
+
+v0.01 2013-02-12
+----------------
+
+* Date: 2013-02-12 17:21:51 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: 58ce0d34ffce57c739d7101d941bf96bcdab10c1
+
+    Update ReportPhase to demand perl 5.006 minimum.
+
+* Date: 2013-02-12 17:18:28 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: d5553d1c43c9bd4c4b7af06afff458fa94303289
+
+    Updated dist.ini to remove critic tests we can't fix
+
+* Date: 2013-02-12 17:04:56 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: 598f796f88ca648a51fe65f2339136617c3e2395
+
+    Updated dist.ini to replace deprecated plugins
+
+* Date: 2013-02-12 16:54:08 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: 059a0ea0681d4eb911ff9f85ac534afcacce2265
+
+    Fixed logging issue
+
+
+===================================
+End of changes in the last 365 days
+===================================

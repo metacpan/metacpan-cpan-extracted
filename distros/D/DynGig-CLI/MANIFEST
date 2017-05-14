@@ -1,0 +1,25 @@
+Changes
+lib/DynGig/CLI/Schedule/Make.pm
+lib/DynGig/CLI/Schedule/Period.pm
+lib/DynGig/CLI/Cluster/Cache.pm
+lib/DynGig/CLI/Cluster/Server.pm
+lib/DynGig/CLI/Cluster/Client.pm
+lib/DynGig/CLI/Sequence/Run.pm
+lib/DynGig/CLI/Sequence/CTRL.pm
+lib/DynGig/CLI/Service.pm
+lib/DynGig/CLI/Multiplex/TCP.pm
+lib/DynGig/CLI/Multiplex/CMD.pm
+lib/DynGig/CLI/RCED.pm
+lib/DynGig/CLI/Watcher/Run.pm
+lib/DynGig/CLI/Watcher/Exclude.pm
+lib/DynGig/CLI/OpsDB.pm
+lib/DynGig/CLI/Range.pm
+lib/DynGig/CLI.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

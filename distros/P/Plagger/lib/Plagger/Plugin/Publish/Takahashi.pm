@@ -21,7 +21,7 @@ sub register {
 sub feed {
     my($self, $context, $args) = @_;
 
-    my $file  = $args->{feed}->id . '.xul';
+    my $file  = $args->{feed}->id_safe . '.xul';
     my $path  = File::Spec->catfile($self->conf->{dir}, $file);
     $context->log(info => "writing output to $path");
 
@@ -44,7 +44,7 @@ sub finalize {
 
 =head1 NAME
 
-Plagger::Plugin::Publish::Takahashi - produce takahasi output
+Plagger::Plugin::Publish::Takahashi - produce takahashi output
 
 =head1 SYNOPSIS
 

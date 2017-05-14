@@ -1,0 +1,5 @@
+__tuning[]
+__endtuning[]
+__object[Name='num1';value=42]Variable
+__object[Name='str2';value='hello world']Variable
+__object[Name='num2';value=77]Variable

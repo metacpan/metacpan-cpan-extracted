@@ -27,14 +27,15 @@ PMicoDispatcherCallback::callback (CORBA::Dispatcher *dispatcher, CORBA::Dispatc
     case CORBA::Dispatcher::Except:
 	ev = "Write";
 	break;
-    case CORBA::Dispatcher::All:
-	ev = "All"; /* Should never get here? */
-	break;
     case CORBA::Dispatcher::Remove:
 	ev = "Remove";
 	break;
     case CORBA::Dispatcher::Moved:
 	ev = "Moved";
+	break;
+    case CORBA::Dispatcher::All:
+    default:
+	ev = "All"; /* Should never get here? */
 	break;
     }
     
@@ -43,7 +44,7 @@ PMicoDispatcherCallback::callback (CORBA::Dispatcher *dispatcher, CORBA::Dispatc
     ENTER;
     SAVETMPS;
 
-    PUSHMARK(sp);
+    PUSHMARK(SP);
 
     XPUSHs(sv_2mortal(newSVpv((char *)ev, 0)));
     for (int i=0; i<av_len(_args); i++)
@@ -51,7 +52,7 @@ PMicoDispatcherCallback::callback (CORBA::Dispatcher *dispatcher, CORBA::Dispatc
 
     PUTBACK;
 
-    perl_call_sv(_callback, G_DISCARD);
+    call_sv(_callback, G_DISCARD);
 
     FREETMPS;
     LEAVE;

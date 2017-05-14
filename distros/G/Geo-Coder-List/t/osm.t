@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 21;
+use Test::Most tests => 24;
 use Test::NoWarnings;
 use Test::Number::Delta within => 1e-2;
 
@@ -38,12 +38,11 @@ OSM: {
 		delta_ok($location->{geometry}{location}{lat}, 38.991);
 		delta_ok($location->{geometry}{location}{lng}, -77.026);
 
-		# OSM is broken, putting Kent here fails
-		$location = $geocoderlist->geocode('Wisdom Hospice, Rochester, England');
+		$location = $geocoderlist->geocode('10 Downing St, London, UK');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
-		delta_ok($location->{geometry}{location}{lat}, 51.372);
-		delta_ok($location->{geometry}{location}{lng}, 0.50873);
+		delta_ok($location->{geometry}{location}{lat}, 51.50);
+		delta_ok($location->{geometry}{location}{lng}, -0.13);
 
 		# But putting it here succeeds!
 		$location = $geocoderlist->geocode('Rochester, Kent, England');
@@ -52,10 +51,28 @@ OSM: {
 		delta_ok($location->{geometry}{location}{lat}, 51.388);
 		delta_ok($location->{geometry}{location}{lng}, 0.50672);
 
-		$location = $geocoderlist->geocode(location => 'St Mary The Virgin, Minster, Thanet, Kent, England');
+		$location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
-		delta_ok($location->{geometry}{location}{lat}, 51.330);
-		delta_ok($location->{geometry}{location}{lng}, 1.31596);
+		delta_ok($location->{geometry}{location}{lat}, 39.00);
+		delta_ok($location->{geometry}{location}{lng}, -77.10);
+
+		# Check list context finds both Portland, ME and Portland, OR
+		my @locations = $geocoderlist->geocode('Portland, USA');
+
+		ok(scalar(@locations) > 1);
+
+		my ($maine, $oregon);
+		foreach my $state(map { $_->{'address'}->{'state'} } @locations) {
+			# diag($state);
+			if($state eq 'Maine') {
+				$maine++;
+			} elsif($state eq 'Oregon') {
+				$oregon++;
+			}
+		}
+
+		ok($maine == 1);
+		ok($oregon == 1);
 	}
 }

@@ -2,7 +2,7 @@ package Class::Usul;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.81.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.82.%d', q$Rev: 1 $ =~ /\d+/gmx );
 
 use Class::Usul::Constants  qw( FALSE TRUE );
 use Class::Usul::Functions  qw( data_dumper ns_environment );
@@ -74,7 +74,7 @@ Class::Usul - A base class providing config, locking, logging, and l10n
 
 =head1 Version
 
-Describes Class::Usul version v0.81.$Rev: 1 $
+Describes Class::Usul version v0.82.$Rev: 1 $
 
 =head1 Synopsis
 

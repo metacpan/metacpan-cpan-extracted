@@ -1,7 +1,7 @@
 package GSM::SMS::Support::SerialPort;
 use strict;
 
-our $VERSION = '0.1';
+our $VERSION = "0.161";
 
 use Log::Agent;
 

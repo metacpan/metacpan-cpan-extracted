@@ -1,0 +1,6 @@
+Revision history for Test::PerlTidy::Concurrent
+
+0.1.0   2014-03-07
+        * First public release.
+0.1.1   2014-03-07
+        * Add Changes file and github link to dist.ini.

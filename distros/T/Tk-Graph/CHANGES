@@ -1,0 +1,77 @@
+Revision history for Perl extension Tk::Graph.
+
+0.01 Tue Sep  1 01:12:30 2002
+	- first version for cpan
+
+0.02 Tue Sep 21 01:21:54 EST 2002
+	- corrected version for cpan
+
+0.03 Mon Nov 18 17:19:06 EST 2002
+	* Add Function 3d in Bars and Hbars
+	* new Options -threed and -light
+	* add the 3d function to axis and wire
+	* new method register
+	* method register return the actual cache, when call without value.
+
+	! switch off shadow when 3d = on
+	! set look on 10 when use register and look is off
+	! package to up
+	! Fix error y-axis
+	! Fix in coordinates for axis and wire
+	! Colors is changed from Lightoption ... fix
+	! Empty Field for Values in Bars and HBARS
+	! Fix in ballon routine
+	! Fix when values in hash == undef
+
+0.04 Mon Nov 18 17:19:06 EST 2002
+	* add this file to distribution	
+
+	! new version number for cpan
+
+0.05 Mon Nov 27 12:19:06 EST 2002
+	* add 3d to linegraph
+	* linegraph: thick = threed / 3
+	* fix 3d Grid y-axis
+
+	! remove error Message when elements is empty in balloon routine
+	! fix 3d lightning in linegraph
+	! add caller id in Error routine
+	! last y-axis was not black in HBARS
+	! Debug off
+	! Round with sprintf
+	! remove Rons Idea
+	! draw zero values in 3d
+	! colorchange fix value is empty
+	! double line if value empty
+	! calcualt without value in bars
+	! fix printvalue
+
+0.06 Wed Dec 12 12:19:06 EST 2002
+	* -look is default = 10
+	* error routine with sprintf
+	* add new range option in config
+	* rewrite bar routine (separatly sub)
+	* linegraph: thick = threed / 3
+
+	! Shadow for Bars
+	! write error message when widget doesn't pack
+	! -type value not correct display (Recursive error)
+	! read ref error
+	! remove rekursive Bug
+	! Remove double ends
+	! no added values in resize
+	! HBARS: no bar in 3d and zero value
+	! rewrite calc_x for better algoritm
+	! center bars
+	! remove line when zero value
+	! change docu (range)
+	! value zero doesn't drawing
+	! redraw was broken
+	! remove Balloon routine (Memory Leaks)
+	! remove error Message when elements is empty in balloon routine
+	! fix 3d lightning in linegraph
+	! add caller id in Error routine
+	! last y-axis was not black in HBARS
+	! Debug off
+	! Round with sprintf
+

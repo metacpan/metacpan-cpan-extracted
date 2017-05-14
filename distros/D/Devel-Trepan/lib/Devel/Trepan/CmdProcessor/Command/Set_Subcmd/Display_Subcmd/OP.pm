@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2012, 2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2012, 2014-2015 Rocky Bernstein <rocky@cpan.org>
 use warnings; no warnings 'redefine'; no warnings 'once';
 use rlib '../../../../../..';
 
@@ -25,20 +25,24 @@ our $IN_LIST      = 1;
 our $HELP         = <<'HELP';
 =pod
 
-Set to show the OP address in location status.
+B<set display op>
 
-The OP address is the address of the Perl Tree Opcode that is about
-to be run. It gives the most precise indication of where you are.
-This can be useful in disambiguating where among Perl several
-statements in a line you are at.
+Set to show the I<OP> address in location status.
 
-In the future we may also allow a breakpoint at a COP address.
+The OP address is the address of the Perl opcode tree that is about
+to be run. It gives the most precise indication of where you are, and
+can be useful in disambiguating where among Perl several
+statements in a line you.
+
+In a mult-statement line, the C<deparse> command will print just the
+current command.
 
 =head2 See also:
 
 L<C<show display op>|Devel::Trepan::CmdProcessor::Command::Show::Display::OP>,
-L<C<show line>|Devel::Trepan::CmdProcessor::Command::Show::Line>,
-L<C<show program>|Devel::Trepan::CmdProcessor::Command::Show::Program>, and
+L<C<deparse>|Devel::Trepan::CmdProcessor::Command::Deparse>,
+L<C<info line>|Devel::Trepan::CmdProcessor::Command::Info::Line>,
+L<C<info program>|Devel::Trepan::CmdProcessor::Command::Info::Line> and
 L<C<disassemble>|Devel::Trepan::CmdProcessor::Command::Disassemble>
 (via plugin L<Devel::Trepan::Disassemble>).
 =cut
@@ -49,32 +53,22 @@ our $MIN_ABBREV   = length('co');
 use constant MAX_ARGS => 1;
 our $SHORT_HELP   = "Set to show OP address in locations";
 
-sub run($$)
-{
-    my ($self, $args) = @_;
-    if ($DB::HAVE_MODULE{'Devel::Callsite'}) {
-        $self->SUPER::run($args);
-    } else {
-        $self->{proc}->errmsg("You need Devel::Callsite installed to run this");
-    }
-}
-
 unless (caller) {
     # Demo it.
     # DRY this.
     require Devel::Trepan::CmdProcessor;
     my $cmdproc = Devel::Trepan::CmdProcessor->new();
     my $subcmd  =  Devel::Trepan::CmdProcessor::Command::Set->new($cmdproc, 'set');
-    my $dispcmd =  Devel::Trepan::CmdProcessor::Command::Set::Display->new($subcmd, 'display');
-    my $opcmd   =  Devel::Trepan::CmdProcessor::Command::Set::Display::OP->new($dispcmd, 'op');
+    my $parent_cmd =  Devel::Trepan::CmdProcessor::Command::Set::Display->new($subcmd, 'display');
+    my $cmd   =  __PACKAGE__->new($parent_cmd, 'op');
     # Add common routine
     foreach my $field (qw(min_abbrev name)) {
-	printf "Field %s is: %s\n", $field, $opcmd->{$field};
+	printf "Field %s is: %s\n", $field, $cmd->{$field};
     }
     my @args = qw(set display op on);
-    $opcmd->run(\@args);
+    $cmd->run(\@args);
     @args = qw(set display op off);
-    $opcmd->run(\@args);
+    $cmd->run(\@args);
 }
 
 1;

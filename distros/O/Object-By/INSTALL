@@ -1,0 +1,10 @@
+Installation only makes sense to follow the development. Anything might
+change. Don't expect support for versions other than the current.
+
+Object::By is fairly straightforward in terms of
+installation.
+
+	perl Makefile.PL
+	make
+	make test
+	make install

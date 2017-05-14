@@ -1,0 +1,28 @@
+__tuning[]
+__endtuning[]
+__table[format='0%-100%,1*';style='plain']2
+__row[]Body
+__cell[cols=1;rows=1]
+N[orig_style='N']{{WID[jump='http://www.alpha.com']A}}
+__cell[cols=1;rows=1]
+N[orig_style='N']Alpha
+__row[]Body
+__cell[cols=1;rows=1]
+N[orig_style='N']{{WID[jump='http://www.gamma.com']C}}
+__cell[cols=1;rows=1]
+N[orig_style='N']Gamma
+__row[]Body
+__cell[cols=1;rows=1]
+N[orig_style='N']{{WID[]D}}
+__cell[cols=1;rows=1]
+N[orig_style='N']
+__row[]Body
+__cell[cols=1;rows=1]
+N[orig_style='N']{{WID[jump='http://www.epsilon.com']E}}
+__cell[cols=1;rows=1]
+N[orig_style='N']Epsilon
+__endtable[]
+N[orig_style='N']This paragraph contains a short form ({{WID[jump='http://www.alpha.com']A}}) and a long form ({{WIDGET[jump='http://www.alpha.com']Alpha}}) of a widget.
+N[orig_style='N']This paragraph contains {{WIDGET[jump='http://www.alpha.com']Alpha}} and {{WID[jump='http://www.beta.com']B}} widgets.
+N[orig_style='N']This paragraph contains {{WID[]F}} and {{WIDGET[]Omega}} widgets.
+N[orig_style='N']This paragraph contains {{WID[]F}} and {{WIDGET[]Omega}} widgets.

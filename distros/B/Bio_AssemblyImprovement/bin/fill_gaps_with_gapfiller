@@ -1,0 +1,125 @@
+#!/usr/bin/env perl
+package Bio::AssemblyImprovement::Bin::FillGapsWithGapFiller;
+
+# ABSTRACT: Given an assembly iteratively fill gaps
+# PODNAME: fill_gaps_with_gapfiller
+
+BEGIN { unshift( @INC, '../lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use File::Path 2.07 qw(make_path);
+use Cwd;
+use Bio::AssemblyImprovement::Scaffold::SSpace::PreprocessInputFiles;
+use Bio::AssemblyImprovement::FillGaps::GapFiller::Iterative;
+use Bio::AssemblyImprovement::Validate::Executable;
+
+my ( $assembly_file, $forward_reads_file, $reverse_reads_file, $insert_size, $threads, $gapfiller_exec, $debug, $output_directory, $help );
+
+GetOptions(
+    'a|assembly=s'        => \$assembly_file,
+    'f|forward_fastq=s'   => \$forward_reads_file,
+    'r|reverse_fastq=s'   => \$reverse_reads_file,
+    'i|insert_size=i'     => \$insert_size,
+    't|threads=i'	      => \$threads,
+    's|gapfiller_exec=s'  => \$gapfiller_exec,
+    'd|debug'             => \$debug,
+    'o|output_directory=s' => \$output_directory,
+    'h|help'              => \$help,
+);
+
+( defined($assembly_file) && defined($forward_reads_file) && defined($reverse_reads_file) && ( -e $assembly_file ) && ( -e $forward_reads_file ) && ( -e $reverse_reads_file ) && !$help ) or die <<USAGE;
+Usage: fill_gaps_with_gapfiller [options]
+Take in an assembly in FASTA format and reads in FASTQ format, then iteratively fill in the gaps with GapFiller.
+
+# outputs a file called contigs.scaffolded.fa
+fill_gaps_with_gapfiller -a contigs.fa -f 123_1.fastq -r 123_2.fastq 
+
+# use two threads (default 1)
+fill_gaps_with_gapfiller -a contigs.fa -f 123_1.fastq -r 123_2.fastq -t 2
+
+# Gzipped input files are accepted
+fill_gaps_with_gapfiller -a contigs.fa.gz -f 123_1.fastq.gz -r 123_2.fastq.gz
+
+# Insert size defaults to 250 if not specified
+fill_gaps_with_gapfiller -a contigs.fa -f 123_1.fastq -r 123_2.fastq -i 3000
+
+# This help message
+fill_gaps_with_gapfiller -h
+
+USAGE
+
+$debug           ||= 0;
+$insert_size     ||= 250;
+$threads		 ||= 1;
+$gapfiller_exec ||= '/software/pathogen/external/apps/usr/local/GapFiller_v1-11_linux-x86_64/GapFiller.pl';
+$gapfiller_exec = 'GapFiller.pl' unless(Bio::AssemblyImprovement::Validate::Executable->new()->does_executable_exist($gapfiller_exec));
+
+$output_directory ||= getcwd();
+make_path($output_directory);
+
+my @input_files = ( $forward_reads_file, $reverse_reads_file );
+
+my $preprocess_input_files = Bio::AssemblyImprovement::Scaffold::SSpace::PreprocessInputFiles->new(
+    input_files    => \@input_files,
+    input_assembly => $assembly_file
+);
+my $process_input_files_tmp_dir_obj = $preprocess_input_files->_temp_directory_obj();
+
+my $iterative_scaffolding = Bio::AssemblyImprovement::FillGaps::GapFiller::Iterative->new(
+    input_files     => $preprocess_input_files->processed_input_files,
+    input_assembly  => $preprocess_input_files->processed_input_assembly,
+    insert_size     => $insert_size,
+    threads			=> $threads,
+    gap_filler_exec  => $gapfiller_exec,
+    debug           => $debug,
+    _output_prefix  => 'gapfilled',
+    output_base_directory => $output_directory
+)->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fill_gaps_with_gapfiller - Given an assembly iteratively fill gaps
+
+=head1 VERSION
+
+version 1.160490
+
+=head1 SYNOPSIS
+
+Given an assembly and some reads in fastq format, try and fill in the gaps. Do multiple iterations with different values, and cleanup all intermediate files.
+
+   # outputs a file called contigs.scaffolded.fa
+   fill_gaps_with_gapfiller -a contigs.fa -f 123_1.fastq -r 123_2.fastq 
+   
+   # use two threads (default 1)
+   fill_gaps_with_gapfiller -a contigs.fa -f 123_1.fastq -r 123_2.fastq -t 2
+
+   # Gzipped input files are accepted
+   fill_gaps_with_gapfiller -a contigs.fa.gz -f 123_1.fastq.gz -r 123_2.fastq.gz
+
+   # Insert size defaults to 250 if not specified
+   fill_gaps_with_gapfiller -a contigs.fa -f 123_1.fastq -r 123_2.fastq -i 3000
+
+   # This help message
+   fill_gaps_with_gapfiller -h
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

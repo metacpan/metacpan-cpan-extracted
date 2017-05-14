@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
+                                      'Beam::Service' => '0',
                                       'Beam::Wire' => '1.019',
                                       'List::Util' => '1.33',
                                       'Module::Runtime' => '0',

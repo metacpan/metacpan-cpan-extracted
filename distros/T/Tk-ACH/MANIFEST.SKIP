@@ -1,0 +1,11 @@
+\.tkach\.prcs_aux$
+tkach\.prj$
+Makefile$
+^Tk-ACH
+pm_to_blib$
+\.orig$
+\.bak$
+\.old$
+^blib
+^tt
+^alpha

@@ -2,5 +2,4 @@
   output: "[\#{'squoted'}]";
   output: "\#{'squoted'}";
   output: "#{" squoted "}";
-  output: "['\#{'squoted'}']";
-}
+  output: "['\#{'squoted'}']"; }

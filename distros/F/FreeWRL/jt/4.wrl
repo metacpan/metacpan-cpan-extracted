@@ -1,0 +1,110 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+#
+# Based on the VRML97 spec
+
+
+
+PROTO Shuttle [ 
+    field        SFTime  rate      1
+    field        SFFloat distance  1
+    field        MFNode  children  [ ]
+    exposedField SFTime  startTime 0
+    exposedField SFTime  stopTime  0
+    field        SFBool  loop      TRUE
+] {
+    DEF F Transform { children IS children }
+    DEF T TimeSensor {
+        cycleInterval IS rate
+        startTime IS startTime
+        stopTime IS stopTime
+        loop IS loop
+    }
+
+    DEF S Script {
+        field    SFFloat    distance IS distance
+        eventOut MFVec3f    position
+
+        url "javascript:
+            function initialize() {
+                // constructor:setup interpolator,
+                pos1 = new SFVec3f(-distance, 0, 0);
+                pos2 = new SFVec3f(distance, 0, 0);
+                position = new MFVec3f(pos1, pos2, pos1);
+            }"
+    }
+
+    DEF I PositionInterpolator {
+        key [ 0, 0.5, 1 ]
+        keyValue [ -1 0 0, 1 0 0, -1 0 0 ]
+    }
+
+    ROUTE T.fraction_changed TO I.set_fraction
+    ROUTE I.value_changed TO F.set_translation
+    ROUTE S.position TO I.set_keyValue
+}
+
+PROTO Pendulum [
+    field        SFTime  rate      1
+    field        SFFloat maxAngle  3.14159
+    field        MFNode  children  [ ]
+    exposedField SFTime  startTime 0
+    exposedField SFTime  stopTime  0
+    field        SFBool  loop      TRUE
+] {
+    DEF F Transform { children IS children }
+    DEF T TimeSensor { 
+        cycleInterval IS rate
+        startTime IS startTime
+        stopTime IS stopTime
+        loop IS loop
+    }
+    DEF S Script {
+        field    SFFloat    maxAngle IS maxAngle
+        eventOut MFRotation rotation
+
+        url "javascript:
+            function initialize() {
+                // constructor:setup interpolator,
+                rot1 = new SFRotation(0, 0, 1, 0);
+                rot2 = new SFRotation(0, 0, 1, maxAngle/2);
+                rot3 = new SFRotation(0, 0, 1, maxAngle);
+                rotation = new MFRotation(rot1, rot2, rot3, 
+                                          rot2, rot1);
+            }"
+    }
+    DEF I OrientationInterpolator {
+        key [ 0, 0.25, 0.5, 0.75, 1 ]
+        keyValue [ 0 0 1 0, 
+                   0 0 1 1.57, 
+                   0 0 1 3.14, 
+                   0 0 1 1.57, 
+                   0 0 1 0 ]
+    }
+
+    ROUTE T.fraction_changed TO I.set_fraction
+    ROUTE I.value_changed TO F.set_rotation
+    ROUTE S.rotation TO I.set_keyValue
+}
+
+Transform {
+    translation -3 0 0
+    children Pendulum {
+        rate 3
+        maxAngle 6.28
+        children Shape { geometry Cylinder { height 5 } }
+    }
+}
+
+Transform {
+    translation 3 0 0
+    children Shuttle {
+        rate 2
+        children Shape { geometry Sphere { } }
+    }
+}
+
+

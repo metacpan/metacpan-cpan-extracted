@@ -1,0 +1,245 @@
+TYPEMAP
+
+INPUT
+
+O_OBJECT
+	$var = INT2PTR($type, pobj2class($arg, \"${(my $ttt = $type) =~ s/^(?:Perl)?([0-9A-Za-z_]+) \*/$1/;\$ttt}\", \"${Package}::$func_name\", \"$var\"));
+	if ( $var == NULL )
+	    XSRETURN_UNDEF;
+T_AV_OBJ
+        if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) ) {
+                AV *av = (AV*)SvRV($arg);
+                while ( av_len(av) > -1 ) {
+                        SV * rhv = av_pop(av);
+                        ${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt} * clv = INT2PTR( ${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt} *, pobj2class(rhv, \"${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt}\", \"${Package}::$func_name()\", \"AV[ ${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt} ]\"));
+                        if ( clv == NULL )
+                    		XSRETURN_UNDEF;
+                        $var << *clv;
+                }
+        }
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+		XSRETURN_UNDEF;
+	}
+T_AV_OBJPTR
+        if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) ) {
+                AV *av = (AV*)SvRV($arg);
+                while ( av_len(av) > -1 ) {
+                        SV * rhv = av_pop(av);
+                        ${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+) \* >/$1/;\$ttt} *clv = INT2PTR( ${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+) \* >/$1/;\$ttt} *, pobj2class(rhv, \"Qt::${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+) \* >/$1/;\$ttt}\",  \"${Package}::$func_name\", \"AV[ ${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+) \* >/$1/;\$ttt} ]\" ) );
+                        if ( clv == NULL )
+                                XSRETURN_UNDEF;
+                        $var << clv;
+                }
+        }
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+		XSRETURN_UNDEF;
+	}
+T_AV_INT
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+	{
+		AV *av = (AV*)SvRV( $arg );
+		while ( av_len(av) > -1 ) {
+			SV * rv = av_pop(av);
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt} intv = (${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt})SvIV( rv );
+			$var << intv;
+		}
+	}
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+		XSRETURN_UNDEF;
+	}
+T_AV_UINT
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+	{
+		AV *av = (AV*)SvRV( $arg );
+		while ( av_len(av) > -1 ) {
+			SV * rv = av_pop(av);
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z ]+)>$/$1/;\$ttt} uintv = (${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z ]+)>$/$1/;\$ttt})SvUV( rv );
+			$var << uintv;
+		}
+	}
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+		XSRETURN_UNDEF;
+	}
+T_AV_FLOAT
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) ) {
+		AV *av = (AV*)SvRV( $arg );
+		while ( av_len(av) > -1 ) {
+			SV * rv = av_pop(av);
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+)>$/$1/;\$ttt} floatv = (${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+)>$/$1/;\$ttt})SvNV( rv );
+			$var << floatv;
+		}
+	}
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+		XSRETURN_UNDEF;
+	}
+T_HV_OBJ_OBJ
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) ) {
+	    HV *hv = (HV*)SvRV( $arg );
+	    if ( hv_iterinit(hv) ) {
+		while ( HE *he = hv_iternext(hv) ) {
+			SV *key = HeSVKEY(he);
+			SV *val = HeVAL(he);
+			${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt} * clk;
+			${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} * clv;
+			if( sv_isobject(key) && (SvTYPE(SvRV(key)) == SVt_PVHV) && sv_isobject(val) && (SvTYPE(SvRV(val)) == SVt_PVHV) ) {
+                                HV *hvk = (HV*)SvRV( key );
+                                SV **ssvk = hv_fetch(hvk, \"_ptr\", 4, 0);
+                                if ( ssvk != NULL ) {
+                                        clk = INT2PTR( ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt} *,SvIV(*ssvk) );
+                                }
+				else {
+					warn( \"${Package}::$func_name() -- HV key->_ptr is NULL\" );
+					XSRETURN_UNDEF;
+				}
+                                HV *hvv = (HV*)SvRV( val );
+                                SV **ssvv = hv_fetch(hvv, \"_ptr\", 4, 0);
+                                if ( ssvv != NULL ) {
+                                        clv = INT2PTR( ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} *,SvIV(*ssvv) );
+                                }
+				else {
+					warn( \"${Package}::$func_name() -- HV val->_ptr is NULL\" );
+					XSRETURN_UNDEF;
+				}
+			}
+			else {
+				warn( \"${Package}::$func_name() -- HV{ ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt} , ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} } is not a blessed SV\" );
+				XSRETURN_UNDEF;
+			}
+			$var.insert(*clk, *clv);
+		}
+	    }
+	}
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an HV reference\" );
+		XSRETURN_UNDEF;
+	}
+T_HV_INT_OBJ
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+	{
+	    HV *hv = (HV*)SvRV( $arg );
+	    if ( hv_iterinit(hv) ) {
+		while ( HE *he = hv_iternext(hv) ) {
+			SV *key = HeSVKEY(he);
+			${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt} clk = (${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt})SvIV( key );
+			SV *val = HeVAL(he);
+			${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} * clv;
+			if( sv_isobject(val) && (SvTYPE(SvRV(val)) == SVt_PVHV) ) {
+                                HV *hvv = (HV*)SvRV( val );
+                                SV **ssvv = hv_fetch(hvv, \"_ptr\", 4, 0);
+                                if ( ssvv != NULL ) {
+                                        clv = INT2PTR( ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} *,SvIV(*ssvv) );
+                                }
+				else {
+					warn( \"${Package}::$func_name() -- HV val->_ptr is NULL\" );
+					XSRETURN_UNDEF;
+				}
+			}
+			else {
+				warn( \"${Package}::$func_name() -- HV{ int , ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} } is not a blessed SV\" );
+				XSRETURN_UNDEF;
+			}
+			// ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} * clv = (${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} *)SvIV((SV*)SvRV( val ));
+			$var.insert(clk, *clv);
+		}
+	    }
+	}
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an HV reference\" );
+		XSRETURN_UNDEF;
+	}
+OUTPUT
+
+O_OBJECT
+		$arg = class2pobj(PTR2IV($var), \"Qt::${(my $ttt = $type) =~ s/^([0-9A-Za-z_]+) \*/$1/;\$ttt}\", 1);
+		// $arg = sv_2mortal(class2pobj(PTR2IV($var), \"Qt::${(my $ttt = $type) =~ s/^([0-9A-Za-z_]+) \*/$1/;\$ttt}\", 1));
+T_AV_OBJ
+	{
+		AV *av = newAV();
+		int asize = $var.size();
+		for ( int i = 0 ; i < asize ; ++i ) {
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt} *clv = new ${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt} ( $var.at(i) );
+			SV *rhv = newSV(0);
+			rhv = class2pobj(PTR2IV(clv), \"Qt::${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt}\", 1);
+			av_push(av, rhv);
+		};
+		$arg = newRV_noinc((SV*)av);
+	};
+T_AV_OBJPTR
+	{
+		AV *av = newAV();
+		int asize = $var.size();
+		for ( int i = 0 ; i < asize ; ++i ) {
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+) \* >/$1/;\$ttt} *clv = $var.at(i);
+			SV *rhv = newSV(0);
+			rhv = class2pobj(PTR2IV(clv), \"Qt::${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+) \* >/$1/;\$ttt}\", 0);
+			av_push(av, rhv);
+		};
+		$arg = newRV_noinc((SV*)av);
+	};
+T_AV_INT
+	{
+		AV *av = newAV();
+		for ( int i = 0 ; i < $var.size() ; ++i ) {
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z_:]+)>/$1/;\$ttt} intv = $var.at(i);
+			SV *rv = newSV(0);
+			sv_setiv( rv, intv );
+			av_push(av, rv);
+		};
+		$arg = newRV_noinc((SV*)av);
+	};
+T_AV_UINT
+	{
+		AV *av = newAV();
+		for ( int i = 0 ; i < $var.size() ; ++i ) {
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z ]+)>/$1/;\$ttt} uintv = $var.at(i);
+			SV *rv = newSV(0);
+			sv_setuv( rv, uintv );
+			av_push(av, rv);
+		};
+		$arg = newRV_noinc((SV*)av);
+	};
+T_AV_FLOAT
+	{
+		AV *av = newAV();
+		for ( int i = 0 ; i < $var.size() ; ++i ) {
+			${(my $ttt = $type) =~ s/^[A-Za-z]+<([A-Za-z]+)>/$1/;\$ttt} floatv = $var.at(i);
+			SV *rv = newSV(0);
+			sv_setnv( rv, floatv );
+			av_push(av, rv);
+		};
+		$arg = newRV_noinc((SV*)av);
+	};
+T_HV_OBJ_OBJ
+	{
+		HV *hv = newHV();
+		${type}::const_iterator ii = $var.constBegin();
+		while ( ii != $var.constEnd() ) {
+			${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt} *clk = new ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt} ( ii.key() );
+			SV *rhvk = newSV(0);
+			rhvk = class2pobj(PTR2IV(clk), \"Qt::${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)([A-Za-z]+)(?:, |__)[A-Za-z]+>?/$1/;\$ttt}\", 1);
+			${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} *clv = new ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} ( ii.value() );
+			SV *rhvv = newSV(0);
+			rhvv = class2pobj(PTR2IV(clv), \"Qt::${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt}\", 1);
+			hv_store_ent(hv, rhvk, rhvv, 0);
+		}
+		$arg = newRV_noinc((SV*)hv);
+	}
+T_HV_INT_OBJ
+	{
+		HV *hv = newHV();
+		${type}::const_iterator ii = $var.constBegin();
+		while ( ii != $var.constEnd() ) {
+			SV *rvk = newSV(0);
+			sv_setiv( rvk, ii.key() );
+			${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} *clv = new ${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt} ( ii.value() );
+			SV *rhvv = newSV(0);
+			rhvv = class2pobj(PTR2IV(clv), \"Qt::${(my $ttt = $type) =~ s/^[A-Za-z]+(?:<|_)[A-Za-z]+(?:, |__)([A-Za-z]+)>?/$1/;\$ttt}\", 1);
+			hv_store_ent(hv, rvk, rhvv, 0);
+		}
+		$arg = newRV_noinc((SV*)hv);
+	}

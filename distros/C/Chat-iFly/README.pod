@@ -1,0 +1,27 @@
+=head1 DESCRIPTION
+
+A wrapper needed to authenticate to L<iflychat.com>.
+
+=head2 Setup
+
+You'll need to go here L<https://iflychat.com/iflyapi/index> and register for an API Key. You'll specify that using C<api_key> passed to the constructor.
+
+You'll need to copy the C<public> folder from this distribution onto your web server somewhere. You'll specify where that is using the C<static_asset_base_uri> passed tot he constructor.
+
+You'll need to build 2 things into your web server:
+
+=over
+
+=item Inline HTML
+
+You'll need to inline the result of C<render_html> into any web page where you want the chat to appear.
+
+=item AJAX Method
+
+You'll need to set up an ajax method in your app that returns the result of C<render_ajax>. You'll pass the URL where that can be found into the constructor using C<ajax_uri>.
+
+=back
+
+And finally you need to call C<update_settings> to tell the iFly servers what your settings are. 
+
+=cut

@@ -3,13 +3,14 @@ abstract: 'Implementation of WSRF'
 author:
   - 'Mark Mc Keown <Mark.McKeown@manchester.ac.uk>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.36
   Test::More: 0.42
   Test::Simple: 0.44
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.36
 distribution_type: module
-generated_by: 'Module::Install version 1.00'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +28,7 @@ no_index:
   test: []
 requires:
   Crypt::OpenSSL::RSA: 0.22
-  Crypt::OpenSSL::X509: 1.7
+  Crypt::OpenSSL::X509: 0.7
   DateTime::Format::Epoch: 0.11
   DateTime::Format::W3CDTF: 0.04
   DateTime::Locale: 0.41
@@ -35,6 +36,7 @@ requires:
   Digest::SHA1: 2.11
   HTTP::Daemon: 1.39
   HTTP::Daemon::SSL: 1.04
+  IO::Socket::SSL: 1.08
   List::MoreUtils: 0.22
   MIME::Base64: 3.07
   Params::Validate: 0.91
@@ -44,4 +46,4 @@ requires:
   XML::LibXML: 1.64
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.8.3.0
+version: 0.8.3.1

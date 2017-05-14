@@ -4,8 +4,8 @@
 
 <P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
 
-</A></H1><PRE> $saxt = new XML::Filter::SAXT ( { Handler =&gt; $out0 },
-				 { DocumentHandler =&gt; $out1 },
+</A></H1><PRE> $saxt = new XML::Filter::SAXT ( { Handler =&gt; $out1 },
+				 { DocumentHandler =&gt; $out2 },
 				 { DTDHandler =&gt; $out3,
 				   Handler =&gt; $out4 
 				 }
@@ -16,13 +16,13 @@
 
 </PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
 
-</A></H1><P>SAXT is like the Unix 'tee' command in that it splits the input stream
+</A></H1><P>SAXT is like the Unix 'tee' command in that it multiplexes the input stream
 to several output streams. In this case, the input stream is a PerlSAX event
 producer (like XML::Parser::PerlSAX) and the output streams are PerlSAX 
-handlers.
+handlers or filters.
 
 <P>The SAXT constructor takes a list of hash references. Each hash specifies
-and output handler. The hash keys can be: DocumentHandler, DTDHandler, 
+an output handler. The hash keys can be: DocumentHandler, DTDHandler, 
 EntityResolver or Handler, where Handler is a combination of the previous three
 and acts as the default handler.
 E.g. if DocumentHandler is not specified, it will try to use Handler.
@@ -32,24 +32,26 @@ E.g. if DocumentHandler is not specified, it will try to use Handler.
 </A></H2><P>In this example we use <A>XML::Parser::PerlSAX</A> to parse an XML file and
 to invoke the PerlSAX callbacks of our SAXT object. The SAXT object then
 forwards the callbacks to <A HREF="../Checker.html">XML::Checker</A>, which will 'die' if it encounters
-an error, and to <A HREF="../DOM/PerlSAX.html">XML::DOM::PerlSAX</A>, which will store the XML in an
+an error, and to <A>XML::Hqandler::BuildDOM</A>, which will store the XML in an
 <A HREF="../DOM/Document.html">XML::DOM::Document</A>.
 
 <PRE> use XML::Parser::PerlSAX;
  use XML::Filter::SAXT;
- use XML::DOM::PerlSAX;
+ use XML::Handler::BuildDOM;
  use XML::Checker;
 
 </PRE><PRE> my $checker = new XML::Checker;
- my $builder = new XML::DOM::PerlSAX (KeepCDATA =&gt; 1);
+ my $builder = new XML::Handler::BuildDOM (KeepCDATA =&gt; 1);
  my $tee = new XML::Filter::SAXT ( { Handler =&gt; $checker },
 				   { Handler =&gt; $builder } );
 
 </PRE><PRE> my $parser = new XML::Parser::PerlSAX (Handler =&gt; $tee);
  eval
  {
+    # This is how you set the error handler for XML::Checker
     local $XML::Checker::FAIL = \&amp;my_fail;
-    my $dom_document = $parser-&gt;parsefile ("file.xml");
+
+</PRE><PRE>    my $dom_document = $parser-&gt;parsefile ("file.xml");
     ... your code here ...
  };
  if ($@)
@@ -77,4 +79,4 @@ Package names and interfaces are subject to change.
 </A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
 &lt;<I>enno@att.com</I>&gt;. 
 
-<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:33 1999</FONT></I></BODY></HTML>
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:30 2000</FONT></I></BODY></HTML>

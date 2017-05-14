@@ -1,0 +1,23 @@
+README.zxid-php
+$Id: README.zxid-php,v 1.3 2009-10-16 13:36:33 sampo Exp $
+
+This is the PHP module for using libzxid. This php module is
+tightly integrated into the main ZXID project and distribution.
+
+Please see for further information
+
+  zxid.org
+  zxid/README.zxid
+  zxid/INSTALL.zxid
+  zxid/zxid-php.pd: Using ZXID from PHP
+  zxid/zxidhlo.php: Example code
+
+Install
+
+  cd zxid-X.Y
+  make dep
+  make              # creates libzxid
+  make phpzxid
+  make phpzxid_install
+
+--Sampo

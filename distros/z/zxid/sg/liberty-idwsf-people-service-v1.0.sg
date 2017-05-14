@@ -1,0 +1,229 @@
+# zxid/sg/liberty-idwsf-people-service-v1.0.sg
+# Slightly edited, 1.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-people-service-v1.0.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(ps, urn:liberty:ps:2006-08)
+import(lu,   urn:liberty:util:2006-08,liberty-idwsf-utility-v2.0.xsd)
+import(im,   urn:liberty:ims:2006-08,liberty-idwsf-idmapping-svc-v2.0.xsd)
+import(subs, urn:liberty:ssos:2006-08,liberty-idwsf-subs-v1.0.xsd)
+import(sec,  urn:liberty:security:2006-08,liberty-idwsf-security-mechanisms-v2.0.xsd)
+#import(sp,  urn:oasis:names:tc:SAML:2.0:protocol,saml-schema-protocol-2.0.xsd)
+
+%LocalizedDisplayNameType: base(xs:string)
+  @Locale      -> %xs:language
+  @IsDefault?  -> %xs:boolean
+  ;
+
+%TagType: base(xs:string)
+  @Ref    -> %xs:anyURI
+  ;
+
+ObjectID -> %ps:ObjectIDType
+TargetObjectID -> %ps:ObjectIDType
+%ObjectIDType: base(xs:anyURI) ;
+
+Object	 -> %ps:ObjectType
+%ObjectType:
+  ps:ObjectID?
+  ps:DisplayName+     -> %ps:LocalizedDisplayNameType
+  ps:Tag?             -> %ps:TagType
+  ps:Object*
+  ps:ObjectRef*	      -> %ps:ObjectIDType
+  @NodeType           -> %xs:anyURI
+  @CreatedDateTime?   -> %xs:dateTime
+  @ModifiedDateTime?  -> %xs:dateTime
+  ;
+
+PStoSPRedirectURL -> %ps:PStoSPRedirectURLType
+%PStoSPRedirectURLType:	base(xs:anyURI) ;
+
+SPtoPSRedirectURL -> %ps:SPtoPSRedirectURLType
+%SPtoPSRedirectURLType: base(xs:anyURI) ;
+
+QueryString -> %ps:QueryStringType
+%QueryStringType: base(xs:string) ;
+
+CreatePSObject: ;
+
+%RequestAbstractType:
+  @id        -> %xs:ID
+  ;
+
+%ResponseAbstractType:
+  lu:Status
+  @id        -> %xs:ID
+  @TimeStamp -> %xs:dateTime
+  ;
+
+AddEntityRequest       -> %ps:AddEntityRequestType
+%AddEntityRequestType: base(ps:RequestAbstractType)
+  ps:Object
+  ps:PStoSPRedirectURL?
+  ps:CreatePSObject?
+  ps:Subscription?
+  sec:TokenPolicy?
+  ;
+
+AddEntityResponse       -> %ps:AddEntityResponseType
+%AddEntityResponseType: base(ps:ResponseAbstractType)
+  ps:Object?
+  ps:SPtoPSRedirectURL?
+  ps:QueryString?
+  ;
+
+AddKnownEntityRequest       -> %ps:AddKnownEntityRequestType
+%AddKnownEntityRequestType: base(ps:RequestAbstractType)
+  ps:Object
+  sec:Token
+  ps:CreatePSObject?
+  ps:Subscription?
+  sec:TokenPolicy?
+  ;
+
+AddKnownEntityResponse       -> %ps:AddKnownEntityResponseType
+%AddKnownEntityResponseType: base(ps:ResponseAbstractType)
+  ps:Object?
+  ps:SPtoPSRedirectURL?
+  ps:QueryString?
+  ;
+
+AddCollectionRequest       -> %ps:AddCollectionRequestType
+%AddCollectionRequestType: base(ps:RequestAbstractType)
+  ps:Object
+  ps:Subscription?
+  ;
+
+AddCollectionResponse       -> %ps:AddCollectionResponseType
+%AddCollectionResponseType: base(ps:ResponseAbstractType)
+  ps:Object?
+  ;
+
+AddToCollectionRequest       -> %ps:AddToCollectionRequestType
+%AddToCollectionRequestType: base(ps:RequestAbstractType)
+  ps:TargetObjectID
+  ps:ObjectID+
+  ps:Subscription?
+  ;
+
+AddToCollectionResponse -> %ps:ResponseAbstractType
+
+RemoveEntityRequest       -> %ps:RemoveEntityRequestType
+%RemoveEntityRequestType: base(ps:RequestAbstractType)
+  ps:TargetObjectID+
+  ;
+
+RemoveEntityResponse -> %ps:ResponseAbstractType
+
+RemoveCollectionRequest -> %ps:RemoveCollectionRequestType
+%RemoveCollectionRequestType: base(ps:RequestAbstractType)
+  ps:TargetObjectID+
+  ;
+
+RemoveCollectionResponse -> %ps:ResponseAbstractType
+
+RemoveFromCollectionRequest       -> %ps:RemoveFromCollectionRequestType
+%RemoveFromCollectionRequestType: base(ps:RequestAbstractType)
+  ps:TargetObjectID
+  ps:ObjectID+
+  ps:Subscription?
+  ;
+
+RemoveFromCollectionResponse -> %ps:ResponseAbstractType
+
+ListMembersRequest        -> %ps:ListMembersRequestType
+%ListMembersRequestType: base(ps:RequestAbstractType)
+  ps:TargetObjectID?
+  ps:Subscription?
+  @Structured?	 -> %xs:anyURI
+  @Count?	 -> %xs:nonNegativeInteger
+  @Offset?	 -> %xs:nonNegativeInteger  default (0)
+  ;
+
+ListMembersResponse       -> %ps:ListMembersResponseType
+%ListMembersResponseType: base(ps:ResponseAbstractType)
+  ps:Object*
+  ;
+
+QueryObjectsRequest -> %ps:QueryObjectsRequestType
+%QueryObjectsRequestType: base(ps:RequestAbstractType)
+  ps:Filter	 -> %xs:string
+  ps:Subscription?
+  @Count?	 -> %xs:nonNegativeInteger
+  @Offset?	 -> %xs:nonNegativeInteger  default (0)
+  ;
+
+QueryObjectsResponse -> %ps:QueryObjectsResponseType
+%QueryObjectsResponseType: base(ps:ResponseAbstractType)
+  ps:Object*
+  ;
+
+GetObjectInfoRequest -> %ps:GetObjectInfoRequestType
+%GetObjectInfoRequestType: base(ps:RequestAbstractType)
+  ps:TargetObjectID?
+  ps:Subscription?
+  ;
+
+GetObjectInfoResponse -> %ps:GetObjectInfoResponseType
+%GetObjectInfoResponseType: base(ps:ResponseAbstractType)
+  ps:Object?
+  ;
+
+SetObjectInfoRequest -> %ps:SetObjectInfoRequestType
+%SetObjectInfoRequestType: base(ps:RequestAbstractType)
+  ps:Object+
+  ps:Subscription?
+  ;
+
+SetObjectInfoResponse -> %ps:ResponseAbstractType
+
+TestMembershipRequest -> %ps:TestMembershipRequestType
+%TestMembershipRequestType: base(ps:RequestAbstractType)
+  ps:TargetObjectID?
+  sec:Token
+  ps:Subscription?
+  ;
+
+%ResultType: base(xs:boolean) ;
+
+TestMembershipResponse -> %ps:TestMembershipResponseType
+%TestMembershipResponseType: base(ps:ResponseAbstractType)
+    ps:Result? -> %ps:ResultType
+  ;
+
+ResolveIdentifierRequest -> %ps:ResolveIdentifierRequestType
+%ResolveIdentifierRequestType: base(ps:RequestAbstractType)
+  ps:ResolveInput+
+  ;
+
+ResolveInput -> %ps:ResolveInputType
+%ResolveInputType: base(im:MappingInputType)
+  ps:TargetObjectID?
+  ;
+
+ResolveIdentifierResponse -> %ps:ResolveIdentifierResponseType
+%ResolveIdentifierResponseType: base(ps:ResponseAbstractType)
+  ps:ResolveOutput+
+  ;
+
+ResolveOutput -> %im:MappingOutputType
+
+Subscription -> %subs:SubscriptionType
+
+Notification -> %ps:NotificationType
+%NotificationType: base(subs:NotificationType)
+  ps:ItemData*
+  ;
+
+ItemData -> %ps:ItemDataType
+%ItemDataType:
+  ps:Object
+  ;
+
+Notify	 -> %ps:NotifyType
+%NotifyType: base(ps:RequestAbstractType)
+  ps:Notification*
+  &@subs:NotifyAttributeGroup
+  ;
+NotifyResponse	 -> %subs:NotifyResponseType
+
+#EOF

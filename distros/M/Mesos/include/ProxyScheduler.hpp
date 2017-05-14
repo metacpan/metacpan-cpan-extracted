@@ -1,10 +1,10 @@
 #ifndef PROXYSCHEDULER_HPP_
 #define PROXYSCHEDULER_HPP_
-#include <mesos/scheduler.hpp>
-#include <CommandDispatcher.hpp>
-#include <memory>
 #include <string>
 #include <vector>
+#include <memory>
+#include <mesos/scheduler.hpp>
+#include <PipeChannel.hpp>
 
 using namespace mesos;
 
@@ -14,9 +14,9 @@ namespace perl {
 class ProxyScheduler : public Scheduler
 {
 public:
-    CommandDispatcher* dispatcher_;
+    MesosChannel* channel_;
 
-    ProxyScheduler(CommandDispatcher* dispatcher);
+    ProxyScheduler(MesosChannel* channel = (new PipeChannel)): channel_(channel) {};
     virtual ~ProxyScheduler(){};
 
     virtual void registered(SchedulerDriver* driver,

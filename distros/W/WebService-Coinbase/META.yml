@@ -1,0 +1,32 @@
+---
+abstract: 'Coinbase (http://coinbase.com) API bindings'
+author:
+  - 'Naveed Massjouni <naveed@vt.edu>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Coinbase
+requires:
+  Crypt::Mac::HMAC: 0
+  Function::Parameters: 0
+  HTTP::Request::Common: 0
+  Moose: 0
+  Time::HiRes: 0
+  WebService::Client: 0.0204
+resources:
+  bugtracker: https://github.com/Crowdtilt/WebService-Coinbase/issues
+  repository: git://github.com/Crowdtilt/WebService-Coinbase.git
+version: 0.0200

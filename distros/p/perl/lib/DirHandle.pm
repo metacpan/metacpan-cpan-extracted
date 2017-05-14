@@ -1,6 +1,6 @@
 package DirHandle;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 =head1 NAME 
 
@@ -9,7 +9,7 @@ DirHandle - supply object methods for directory handles
 =head1 SYNOPSIS
 
     use DirHandle;
-    $d = new DirHandle ".";
+    $d = DirHandle->new(".");
     if (defined $d) {
         while (defined($_ = $d->read)) { something($_); }
         $d->rewind;
@@ -25,20 +25,6 @@ opendir(), closedir(), readdir(), and rewinddir() functions.
 The only objective benefit to using C<DirHandle> is that it avoids
 namespace pollution by creating globs to hold directory handles.
 
-=head1 NOTES
-
-=over 4
-
-=item *
-
-On Mac OS (Classic), the path separator is ':', not '/', and the 
-current directory is denoted as ':', not '.'. You should be careful 
-about specifying relative pathnames. While a full path always begins 
-with a volume name, a relative pathname should always begin with a 
-':'.  If specifying a volume name only, a trailing ':' is required.
-
-=back
-
 =cut
 
 require 5.000;
@@ -46,7 +32,7 @@ use Carp;
 use Symbol;
 
 sub new {
-    @_ >= 1 && @_ <= 2 or croak 'usage: new DirHandle [DIRNAME]';
+    @_ >= 1 && @_ <= 2 or croak 'usage: DirHandle->new( [DIRNAME] )';
     my $class = shift;
     my $dh = gensym;
     if (@_) {

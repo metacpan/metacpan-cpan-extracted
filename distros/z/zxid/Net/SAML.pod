@@ -1,0 +1,253 @@
+=head1 NAME
+
+Net::SAML - Perl extension for using SAML SSO
+
+=head1 SYNOPSIS
+
+  use Net::SAML;
+
+  $cf = Net::SAML::new_conf("/var/zxid/");
+  Net::SAML::url_set($cf, $url);
+  Net::SAML::set_opt($cf, 1 ,1);  # Turn on libzxid level debugging
+
+  $res = Net::SAML::simple_cf($cf, -1, $qs, undef, 0x1828);  # The main API
+
+  # Low level API (do not use without first understanding Net::SAML::simple_cf()
+
+  $cgi = Net::SAML::new_cgi($cf, $ENV{'QUERY_STRING'});
+  $sid = Net::SAML::zxid_cgi::swig_sid_get($cgi);
+  $ses = Net::SAML::fetch_ses($cf, $sid);
+
+  Net::SAML::parse_cgi($cgi, $qs);
+  $op = Net::SAML::zxid_cgi::swig_op_get($cgi);
+
+  $ses = Net::SAML::fetch_ses($cf, "");  # Just allocate an empty one
+  Net::SAML::del_ses($cf, $ses);
+  $sid = Net::SAML::zxid_ses::swig_sid_get($ses);
+  $nid = Net::SAML::zxid_ses::swig_nid_get($ses);
+
+  Net::SAML::lecp_check($cf, $cgi);
+  Net::SAML::cdc_read($cf, $cgi);
+
+  $url = Net::SAML::start_sso_url($cf, $cgi);
+  $ret = Net::SAML::sp_deref_art($cf, $cgi, $ses);
+
+  $req = Net::SAML::zxid_cgi::swig_saml_req_get($cgi);
+  $res = Net::SAML::zxid_cgi::swig_saml_resp_get($cgi);
+  $ret = Net::SAML::sp_dispatch($cf, $cgi, $ses, $res);
+
+  Net::SAML::send_sp_meta($cf, $cgi);
+  $idp = Net::SAML::load_cot_cache($cf);
+  $eid = Net::SAML::zxid_entity::swig_eid_get($idp);
+  $eid_len = Net::SAML::zxid_entity::swig_eid_len_get($idp);
+  $idp = Net::SAML::zxid_entity::swig_n_get($idp);
+
+  Net::SAML::sp_slo_redir($cf, $cgi, $ses);
+  Net::SAML::sp_slo_soap($cf, $cgi, $ses);
+
+  Net::SAML::sp_nireg_redir($cf, $cgi, $ses, 0);
+  Net::SAML::sp_nireg_soap($cf, $cgi, $ses, 0);
+
+  Net::SAML::OK;
+  Net::SAML::REDIR_OK;
+
+=head1 EXAMPLE
+
+You should see zxid-perl.pd, zxid-simple.pd, and zxid-conf.pd for more complete
+documentation. Here is a quick walk through of a typical SP usage:
+
+  01 use Net::SAML;
+  02 $| = 1; undef $/;  # Flush pipes, read all in at once
+  03 $url = "http://sp.tas3.pt:8082/zxidhlo.pl";  # Edit to match your situation
+  04 $conf = "PATH=/var/zxid/&URL=$url";
+  05 $cf = Net::SAML::new_conf_to_cf($conf);
+  06 $qs = $ENV{'QUERY_STRING'};
+  07 $qs = <STDIN> if $qs =~ /o=P/;
+  08 $res = Net::SAML::simple_cf($cf, -1, $qs, undef, 0x1828);
+  09 $op = substr($res, 0, 1);
+  10 if ($op eq 'L' || $op eq 'C') { print $res; exit; } # LOCATION (Redir) or CONTENT
+  11 if ($op eq 'n') { exit; } # already handled
+  12 if ($op eq 'e') { my_render_idpsel_screen(); exit; }
+  13 if ($op ne 'd') { die "Unknown Net::SAML::simple() res($res)"; }
+  14
+  15 ($sid) = $res =~ /^sesid: (.*)$/m;  # Extract a useful attribute from SSO output
+  16
+  17 print <<HTML
+  18 CONTENT-TYPE: text/html
+  19
+  20 <title>ZXID perl HLO SP Mgmt & Protected Content</title>
+  21 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  22 <link type="text/css" rel=stylesheet href="idpsel.css">
+  23 <body bgcolor=white><font face=sans>
+  24 
+  25 <h1>ZXID SP Perl HLO Management & Protected Content (user logged in, session active)</h1>
+  26 sesid: $sid
+  27 HTML
+  28     ;
+  29 print Net::SAML::fed_mgmt_cf($cf, undef, -1, $sid, 0x1900);
+  30 exit;
+  31
+  32 sub my_render_idpsel_screen {  # Replaces traditional login screen
+  33     print <<HTML;
+  34 CONTENT-TYPE: text/html
+  35
+  36 <title>ZXID SP PERL HLO SSO IdP Selection</title>
+  37 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  38 <link type="text/css" rel=stylesheet href="idpsel.css">
+  39 <body bgcolor=white><font face=sans>
+  40 <h1>ZXID SP Perl HLO Federated SSO IdP Selection (user NOT logged in, no session.)</h1>
+  41 <form method=get action="zxidhlo.pl">
+  42
+  43 <h3>Login Using New IdP</h3>
+  44
+  45 <i>A new IdP is one whose metadata we do not have yet. We need to know
+  46 the Entity ID in order to fetch the metadata using the well known
+  47 location method. You will need to ask the adminstrator of the IdP to
+  48 tell you what the EntityID is.</i>
+  49
+  50 <p>IdP URL <input name=e size=60><input type=submit name=l2 value=" Login ">
+  51 HTML
+  52 ;
+  53     print Net::SAML::idp_list_cf($cf, undef, 0x1c00);   # Get the IdP selection form
+  54     print <<HTML;
+  55 <h3>CoT configuration parameters your IdP may need to know</h3>
+  56
+  57 Entity ID of this SP: <a href="$url?o=B">$url?o=B</a> (Click on the link to fetch SP metadata.)
+  58
+  59 <input type=hidden name=fc value=1><input type=hidden name=fn value=prstnt>
+  60 <input type=hidden name=fq value=""><input type=hidden name=fy value="">
+  61 <input type=hidden name=fa value=""><input type=hidden name=fm value="">
+  62 <input type=hidden name=fp value=0><input type=hidden name=ff value=0>
+  63
+  64 </form><hr><a href="http://zxid.org/">zxid.org</a>
+  65 HTML
+  66     ;
+  67 }
+
+This example only demosntrates SSO.
+
+Lines 1-5 set up the configuration. See zxid-conf.pd for guidance.
+
+ll.6-7 reads in the CGI input the perl way.
+
+l.8 runs the SAML engine of ZXID. The engine will return result that
+is processed below. The magic constant 0x1828 sets some flags, see
+zxid-simple.pd for explanation. This explanation may be especially relevant
+if you plan to run as mod_perl process rather than as a CGI. With
+these flags you could eliminate the need to render the IdP selection
+screen.
+
+ll.9-13: interpret the return value. l.10 deals with parts of SAML
+protocol that need redirect or content. l.12 deals with rendering the
+IdP selection screen. This screen replaces the traditional login
+screen in most applications.
+
+l.15 demonstrates how to extract attributes from the return value. The ret
+is formatted as LDIF so it is very easy to parse with perl.
+
+ll.17-30 render the "protected content". Most protected content should
+contain also Single Logout button. This is accomplished on l.29.
+Protected content is where your normal application after SSO lives.
+You can rely in ZXID session mechanism and just show the content,
+or you could bootstrap your application's session mechanism here.
+
+ll.32-67 render the "idp selection" screen. This could have been
+automatically generated has the flags to Net::SAML::simple_cf()
+been different (see zxid-simple.pd for explanation).
+
+As can be seen, the most central logic for SSO is only about 10 lines. The
+rest is user interface.
+
+=head1 DESCRIPTION
+
+See zxid/zxid.pl for example use of this module.
+
+Consult zxid/README.zxid for detailed API descriptions. This
+pod is only a place holder - real documentation is in
+the README.zxid file.
+
+=head1 ZXID
+
+The above synopsis is just a tip of the iceberg. Net::SAML
+is part of a bigger project called ZXID. The code for the
+Net::SAML module was automagically generated from schema grammar
+sources and C header files of that project using SWIG.
+
+See http://zxid.org and zxid/README.zxid for further information.
+
+=head1 DIAGNOSTICS
+
+"Random number generator not seeded!!!"
+  This warning indicates that randomize() was not able to read
+  /dev/random or /dev/urandom, possibly because your system does not
+  have them or they are differently named. You can still use SSL, but
+  the encryption will not be as strong. Investigate setting up
+  EGD (entropy gathering daemon) or PRNG (Pseudo Random Number
+  Generator). Both are available on the net.
+
+"msg 123: 1 - error:140770F8:SSL routines:SSL23_GET_SERVER_HELLO:unknown proto"
+  SSLeay error string. First (123) number is PID, second number (1) indicates
+  the position of the error message in SSLeay error stack. You often see
+  a pile of these messages as errors cascade.
+
+"msg 123: 1 - error:02001002::lib(2) :func(1) :reason(2)"
+  The same as above, but you didn't call load_error_strings() so SSLeay
+  couldn't verbosely explain the error. You can still find out what it
+  means with this command:
+
+     /usr/local/ssl/bin/ssleay errstr 02001002
+
+Password is being asked for private key
+  This is normal behaviour if your private key is encrypted. Either
+  you have to supply the password or you have to use unencrypted
+  private key. Scan OpenSSL.org for the FAQ that explains how to
+  do this.
+
+=head1 AUTHOR
+
+Sampo Kellomäki <sampo@iki.fi>
+
+Please send well researched bug reports to the above address.
+General questions should be sent to me as well.
+
+=head1 VERSION
+
+This page documents version 0.5, as of 14.9.2006.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006 Sampo Kellomäki <sampo@symlabs.com>
+All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+While the source distribution of this perl module does not contain
+SSLeay or OpenSSL code, if you use this module you will use OpenSSL
+library. Please give Eric Young and OpenSSL team credit (as required by
+their licenses).
+
+And remember, you, and nobody else but you, are responsible for
+auditing this module and OpenSSL library for security problems,
+backdoors, and general suitability for your application.
+
+=head1 SEE ALSO
+
+  Net::WSF  -  Related perl module for ID Web Services Framework
+  <http://zxid.org/>  - ZXID Project home
+  <http://www.openssl.org/>                - OpenSSL source, documentation, etc
+  <http://www.w3c.org>                     - HTTP specifications
+  <http://www.ietf.org/rfc/rfc2617.txt>    - How to send password
+  <http://www.lothar.com/tech/crypto/>     - Entropy Gathering Daemon (EGD)
+  <http://www.aet.tu-cottbus.de/personen/jaenicke/postfix_tls/prngd.html>
+                           - pseudo-random number generating daemon (PRNGD)
+
+=cut

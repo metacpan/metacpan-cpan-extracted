@@ -1,0 +1,64 @@
+---
+abstract: 'OAuth2 services for Catalyst'
+author:
+  - 'Eden Cardim <edencardim@gmail.com>'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Controller: '0'
+  Catalyst::Controller::ActionRole: '0'
+  Catalyst::Model::DBIC::Schema: '0'
+  Catalyst::Plugin::Authentication: '0'
+  Catalyst::Plugin::ConfigLoader: '0'
+  Catalyst::Plugin::Session: '0'
+  Catalyst::Plugin::Session::State::Cookie: '0'
+  CatalystX::Test::MockContext: '0'
+  File::Spec: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  SQL::Translator: '0.11006'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+  lib: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strictures: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-OAuth2
+requires:
+  Class::Load: '0'
+  DBIx::Class: '0'
+  DBIx::Class::ResultSet: '0'
+  DBIx::Class::Schema: '0'
+  JSON::Any: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::NonMoose: '0'
+  MooseX::SetOnce: '0'
+  MooseX::Types::Common::String: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  base: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/perl-catalyst/CatalystX-OAuth2
+  repository: https://github.com/perl-catalyst/CatalystX-OAuth2.git
+version: '0.001004'

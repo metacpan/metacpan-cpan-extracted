@@ -1,7 +1,7 @@
 package Myco::Query::Part::Filter;
 
 ###############################################################################
-# $Id: Filter.pm,v 1.1.1.1 2004/11/22 19:16:02 owensc Exp $
+# $Id: Filter.pm,v 1.6 2006/03/19 19:34:08 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ###############################################################################
@@ -10,42 +10,51 @@ package Myco::Query::Part::Filter;
 
 Myco::Query::Part::Filter - a Myco entity class
 
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
-
 =head1 SYNOPSIS
 
   use Myco;
 
-  # Constructors. See Myco::Base::Entity for more.
-  my $obj = Myco::Query::Part::Filter->new;
+  # Constructors. See Myco::Entity for more.
+  my $filter = Myco::Query::Part::Filter->new;
 
-  # Accessors.
-  my $value = $obj->get_fooattrib;
-  $obj->set_fooattrib($value);
+  $filter->set_relevance( 1 ); # this filter is relevant to the query,
+                               # required, even
 
-  $obj->save;
-  $obj->destroy;
+  $filter->set_parts(
+                      [
+                        # starting with just one part...
+
+                        { remote => '$sample_base_entity_',
+                          attr => 'chicken',
+                          oper => '==',
+                          param => '$params{chk}' }
+                      ]
+                    );
+
+  # Note that 'set_parts' accepts a precompiled (see below) filter or clause
+  # object or just an attribute hash that is constructor-friendly.
+
+  # See Myco::Entity::SampleEntity for more on this 'poultry' example
+
+  # We must be able to nest filters inside of other filters, ad infinitum.
+  my $parent_filter = Myco::Query::Part::Filter->new
+                        ( relevance => 0,
+                          parts => [ $filter ], # here we're passing in a
+                                                # pre-compiled filter object
+                        );
+
+  # See below for examples of instance methods
+
 
 =head1 DESCRIPTION
 
-Blah blah blah... Blah blah blah... Blah blah blah...
-Blah blah blah blah blah... Blah blah...
+This class of object encapsulates L<Tangram::Filter> objects. It stores
+metadata about the filter object, facilitates the addition and removal of
+metadata, and gathers the metadata together when the time comes for
+L<Myco::QueryTemplate> to render these objects into usable Tangram query
+filters when a query is run. A key feature of this class is to recursively
+include other Myco::Query::Part::Filter objects into each other, via the
+L<parts> attribute.
 
 =cut
 
@@ -56,7 +65,7 @@ Blah blah blah blah blah... Blah blah...
 use warnings;
 use strict;
 use Myco::Exceptions;
-use Myco::Base::Entity::Meta;
+use Myco::Entity::Meta;
 
 ##############################################################################
 # Programatic Dependencies
@@ -73,7 +82,7 @@ use constant PART => 'Myco::Query::Part';
 # Inheritance & Introspection
 ##############################################################################
 use base qw( Myco::Query::Part );
-my $md = Myco::Base::Entity::Meta->new( name => __PACKAGE__ );
+my $md = Myco::Entity::Meta->new( name => __PACKAGE__ );
 
 ##############################################################################
 # Function and Closure Prototypes
@@ -87,7 +96,7 @@ my $md = Myco::Base::Entity::Meta->new( name => __PACKAGE__ );
 =head1 COMMON ENTITY INTERFACE
 
 Constructor, accessors, and other methods -- as inherited from
-Myco::Base::Entity.
+Myco::Entity.
 
 =cut
 
@@ -127,7 +136,7 @@ A listing of available attributes follows:
 
  type: transient
 
-An array of the parts of the query filter. These parts consist of clauses and
+An array reference of the parts of the query filter. These parts consist of clauses and
 (potentially) other filter objects.
 
 =cut
@@ -163,11 +172,11 @@ sub set_parts {
 
  type: transient - boolean (1 | 0)
 
-A boolean attribute that determines if a Filter is 'relevant', i.e. whether its
-inclusion in a query should be by default even if none of the params relevant
-to it were passed at query-run-time. On its own, this attribute is useless. To
-dynamically determine if a filter is relevant just prior to query-run-time,
-use $filter->is_relevant( %query_run_params ).
+A boolean attribute that determines if a Filter is 'relevant', i.e. whether
+its inclusion in a query should be by default even if none of the params
+relevant to it were passed at query-run-time. On its own, this attribute is
+useless. To dynamically determine if a filter is relevant just prior to
+query-run-time, use $filter->is_relevant( %query_run_params ).
 
 =cut
 
@@ -324,7 +333,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -332,11 +341,11 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<FILTER::Test|FILTER::Test>,
-L<Myco::Base::Entity|Myco::Base::Entity>,
+L<Myco::Query::Part::Filter::Test|Myco::Query::Part::Filter::Test>,
+L<Myco::Entity|Myco::Entity>,
 L<Myco|Myco>,
 L<Tangram|Tangram>,
 L<Class::Tangram|Class::Tangram>,
-L<mkentity|mkentity>
+L<myco-mkentity|mkentity>
 
 =cut

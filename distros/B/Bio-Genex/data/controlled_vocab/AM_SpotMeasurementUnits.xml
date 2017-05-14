@@ -1,0 +1,34 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary  db_table="ArrayMeasurement" db_column="spot_measurement_units" cv_table="AM_SpotMeasurementUnits">
+  <comment type="definition">This table is the restricted vocabulary for the column spot  measurement units in the table Array Measurements and gives the units in which the spot measurements in the array are given	
+</comment>
+<term name="fluorescent_units"
+        description="ABI instruments often give peak heights or intensities in these units"/>
+<term name="cpm"
+        description="counts per minute"/>
+<term name="photons_per_mm2"
+        description="photons emitted per square millimeter for chemiluminescence"/>
+<term name="cpm_per_mm2"
+        description="counts per minute per square millimeter of surface of emitted particles"/>
+<term name="fu_per_mm2"
+        description="fluorescence units measured per millimeter squared"/>
+<term name="photons_per_mm2"
+        description="photons emitted per square millimeter for chemiluminescence"/>
+<term name="mole"
+        description="total number of molecules"/>
+<term name="mol_per_mm2"
+        description="number of molecules per square millimeter of surface"/>
+<term name="enzyme_activity"
+        description="used in colorimetric assays in which linked enzymes provide the detectable product that is measured"/>
+<term name="intensity_per_pixel"
+        description="provided as the output by some software"/>
+<term name="intensity_per_pixels_per_mm2"
+        description="provided as the output by some software"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

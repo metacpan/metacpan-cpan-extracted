@@ -1,0 +1,30 @@
+{
+    "name": "fastQ_brew",
+    "abstract": "Provides methods for fastQ file manipulation",
+    "description": "Returns summary statistics and provides methods for filtering reads by length or quality",
+    "version": "1.0.2",
+    "release_status": "stable",
+    "author": [
+    "Damien OHalloran <damienoh@gwu.edu>"
+  ],
+    "license": ["gpl_2"],
+    "prereqs": {
+        "runtime": {
+            "requires": {
+                "perl": "5.006",
+                "List::Util": "0"
+            }
+        },
+        "build": {
+            "requires": {
+                "Test::More": "0"
+            }
+        }
+    },
+    "dynamic_config": 0,
+    "meta-spec": {
+        "version": "2",
+        "url": "https://metacpan.org/pod/CPAN::Meta::Spec"
+    },
+    "generated_by": "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001"
+}

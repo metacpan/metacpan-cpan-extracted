@@ -1,0 +1,59 @@
+This package makes up the generated MCV framework.
+
+It is made up of a Controller, a Table, and a Row.
+
+The dispatcher (which is part of the web-dispatcher package) dispatches
+requests over to the generated controller.
+
+The generated controller is actually quite bare-bones, as it inherits most of its
+functionality (CURD operations) from the Base Controller.
+
+The Controller's job is to interact with the various other objects (mostly tables,
+rows and templates - aka views) to make sure that the request is fulfilled sucessfuly.
+
+The Table provides an interface to the data that represents a database table,
+for example which columns are primary keys, which tables refer to this table,
+and which foreign keys this table has.
+
+The generated table provides the data itself, and inherits the interface from the
+Base Table.
+
+Likewise, the Row provides an interface to the rows within a given table,
+allowing access to the data stored within an actual row.
+
+Plugging in to Apache:
+
+The build/install process should create a configuration file which plugs directly
+into apache. The configuration file should look something like this:
+
+    #####
+    <Location /[% APP_NAME %]>
+        SetHandler perl-script
+        PerlHandler Apache::Request::Dispatcher
+        SetEnv DispatcherConf /data/[% APP_NAME %]/[% APP_NAME %].cfg
+    </Location>
+    PerlRequire conf.d/[% APP_NAME %].pl
+    #####
+
+The [% APP_NAME %].pl script should 'use' all generated Controllers/Tables/Rows as well
+as the dispatcher. This is because the dispatcher does not load modules of its
+own accord because that would be a security risk (URI's map to module names)
+
+The installation process should also install an application-specific configuration
+file.
+
+The name of which is defined by the environment variable "DispatcherConf".
+This configuration file defines things such as which database is used
+for this app, where the templates are stored, and what the default
+controller is called. An example is here:
+
+    #####
+    db_dsn="DBI:Pg:database=[% DATABASE_NAME %];host=[% DATABASE_HOST %]"
+    db_username=myUserName
+    db_password=myPassword
+
+    templatePath="/data/[% APP_NAME %]/templates"
+
+    defaultController=[% TABLES.0.moduleName %]
+    ######
+

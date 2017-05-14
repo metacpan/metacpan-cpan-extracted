@@ -1,0 +1,38 @@
+2006-08-07   Kaare Rasmussen <kar at jasonic dot dk>
+
+    Release 0.09
+
+    Refactoring and prettyfying modules and methods.
+    Made Pdf reports mode robust, especially concerning new page.
+
+    Release 0.06
+
+    Added shaded headlines and colored text.
+    Note. The method names are in a mess right now. It'll be sorted out
+    for the 0.10 release.
+
+    Release 0.05
+
+    Added better support for break headers.
+    Borrows some code from Andy Orr's PDF::Report. I only used a small
+    fraction of it anyway, and I plan to change and extend the use of
+    PDF::API2 in another direction.
+    Moved more methods into the base class. A new Writer module only
+    needs a handful of lines.
+
+    Release 0.04
+
+    Internal release.
+
+    Release 0.03
+
+    Spawned Business::ReportWriter from another project:
+    Business::Bof::Utility::ReportWriter.
+    Modularised the code and added PDF- and OOCalc- generation.
+    Lost PostScript in the process.
+    Added a lot of functionality
+
+    Release 0.02
+
+    Fixed a lot of bugs with font handling and more
+    Introduced a page total

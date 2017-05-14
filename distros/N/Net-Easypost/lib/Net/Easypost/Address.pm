@@ -1,31 +1,76 @@
 package Net::Easypost::Address;
-$Net::Easypost::Address::VERSION = '0.18';
-use Moo;
-with qw(Net::Easypost::PostOnBuild);
-with qw(Net::Easypost::Resource);
-
-use Carp qw/croak carp/;
+$Net::Easypost::Address::VERSION = '0.19';
+use Carp qw/croak/;
+use JSON::MaybeXS;
 use Scalar::Util;
 use overload
     '""'     => sub { $_[0]->as_string },
     '0+'     => sub { Scalar::Util::refaddr($_[0]) },
     fallback => 1;
+use Types::Standard qw(Bool Enum HashRef Str Undef);
 
-has [qw/street1 street2 city state zip phone name/] => (
-    is => 'rw',
+
+use Moo;
+with qw/Net::Easypost::PostOnBuild/;
+with qw/Net::Easypost::Resource/;
+use namespace::autoclean;
+
+has [qw/street1
+     street2
+     city
+     state
+     zip
+     country
+     carrier_facility
+     name
+     company
+     phone
+     email
+     federal_tax_id
+     state_tax_id/
+] => (
+    is  => 'rw',
+    isa => Str|Undef
 );
 
-has 'country' => (
-    is      => 'rw',
-    default => 'US',
+has 'residential' => (
+    is     => 'rw',
+    isa    => Bool,
+    coerce => sub { $_[0] ? JSON->true : JSON->false }
 );
 
-sub _build_fieldnames { 
-    return [qw/name street1 street2 city state zip phone country/];
+has 'verifications' => (
+    is  => 'rw',
+    isa => HashRef
+);
+
+has 'verify_adress' => (
+    is  => 'rw',
+    isa => Enum[qw/zip4 delivery/]
+);
+
+sub _build_fieldnames {
+    return [
+	qw/
+	street1
+	street2
+	city
+	state
+	zip
+	country
+	residential
+	carrier_facility
+	name
+	company
+	phone
+	email
+	federal_tax_id
+	state_tax_id
+	/
+    ];
 }
 
 sub _build_role { 'address' }
-
 sub _build_operation { '/addresses' }
 
 sub clone {
@@ -35,6 +80,18 @@ sub clone {
        map  { $_ => $self->$_ }
        grep { defined $self->$_ } @{ $self->fieldnames }
     );
+}
+
+sub serialize {
+   my ($self) = @_;
+
+   # want a hashref of e.g., address[name] => foo from all defined attributes
+   # verify[]=zip4|delivery - verify an address
+   return {
+       # (defined $self->verify_address ? "verify[]" => $self->verify : ()),
+       (map  { $self->role . "[$_]" => $self->$_ }
+       grep { defined $self->$_ } @{ $self->fieldnames })
+   };
 }
 
 sub as_string {
@@ -60,14 +117,10 @@ sub merge {
 
 sub verify {
     my ($self) = @_;
-    
-    if ($self->country ne 'US') {
-        carp "Verifying addresses outside US is not supported";
-        return $self;
-    }
+
     my $verify_response =
-       $self->requester->get( 
-          join '/', $self->operation, $self->id, 'verify' 
+       $self->requester->get(
+          join '/', $self->operation, $self->id, 'verify'
        );
 
     croak 'Unable to verify address, failed with message: '
@@ -95,7 +148,7 @@ Net::Easypost::Address
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -109,38 +162,69 @@ version 0.18
 
 =over 4
 
+=item mode
+
+ string: Set based on which api-key you used, either "test" or "production"
+
 =item street1
 
-A field for street information, typically a house number, a street name and a direction
+ string: First line of the address
 
 =item street2
 
-A field for any additional street information like an apartment or suite number
+ string: Second line of the address
 
 =item city
 
-The city in the address
+ string: City the address is located in
 
 =item state
 
-The U.S. state for this address
+ string: State or province the address is located in
 
 =item zip
 
-The U.S. zipcode for this address
-
-=item phone
-
-Any phone number associated with this address.  Some carrier services like Next-Day or Express
-require a sender phone number.
-
-=item name
-
-A name associated with this address.
+ string: ZIP or postal code the address is located in
 
 =item country
 
-The country code. Default to US.
+ string: ISO 3166 country code for the country the address is located in
+
+=item residential
+
+ boolean: Whether or not this address would be considered residential
+
+=item carrier_facility
+
+ string: The specific designation for the address (only relevant if the address is a carrier facility)
+
+=item name
+
+ string: Name of the person. Both name and company can be included
+
+=item company
+
+ string: Name of the organization. Both name and company can be included
+
+=item phone
+
+ string: Phone number to reach the person or organization
+
+=item email
+
+ string: Email to reach the person or organization
+
+=item federal_tax_id
+
+ string: Federal tax identifier of the person or organization
+
+=item state_tax_id
+
+ string: State tax identifier of the person or organization
+
+=item verifications
+
+ *CURRENTLY NOT IMPLEMENTED* Verifications: The result of any verifications requested
 
 =back
 

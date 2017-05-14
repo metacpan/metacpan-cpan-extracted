@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Sphinx/XML/Pipe2.pm
+t/basic.t
+t/basic.t~

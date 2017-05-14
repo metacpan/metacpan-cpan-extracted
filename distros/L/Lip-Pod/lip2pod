@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+
+=begin lip
+
+=for none
+###############################################################################
+###############################################################################
+
+=head1 DRIVER
+
+The main driver for the program allocates a parser from the 'lip' class defined
+earlier and calls it in a loop for the files named on the command line. If
+there were no files on the command line, then '-' (STDIN) is used.
+
+=cut
+
+use strict;
+use Lip::Pod;
+
+package main;
+
+my $parser = new Lip::Pod;
+
+$parser->parseopts( -want_nonPODs => 1, -process_cut_cmd => 1 );
+
+push @ARGV, '-' unless @ARGV;
+
+for (@ARGV) { $parser->parse_from_file($_); }
+
+exit 0;
+
+=for none
+###############################################################################
+###############################################################################
+
+=end lip
+
+=cut
+
+__END__
+
+
+=for none
+###############################################################################
+###############################################################################
+
+=head1 NAME
+
+lip2pod - Convert Literate Perl to POD
+
+
+=for none
+###############################################################################
+###############################################################################
+
+=head1 SYNOPSIS
+
+To capture the POD for later processing:
+
+  lip2pod Foo.pm > Foo-lip.pod
+
+To do something with it immediately:
+
+  lip2pod Foo.pm | pod2text
+
+
+=for none
+###############################################################################
+###############################################################################
+
+=head1 DESCRIPTION
+
+The B<lip2pod> program uses the B<Lip::Pod> module to extract the Literate
+Perl information from a file. Other documentation contained by the file is
+ignored. The prose and code of the input file are both reflected in the
+output. See L<Lip::Pod> for more information.
+
+
+=for none
+###############################################################################
+###############################################################################
+
+=head1 AUTHOR
+
+Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+
+
+=for none
+###############################################################################
+###############################################################################
+
+=head1 COPYRIGHT
+
+This program is free software. You may modify or redistribute it under the
+same terms as Perl itself.
+
+=cut
+

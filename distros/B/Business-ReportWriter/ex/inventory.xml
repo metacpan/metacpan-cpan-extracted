@@ -1,0 +1,138 @@
+<perldata>
+  <hashref>
+    <item key="database" >
+      <hashref>
+        <item key="dbtype" >Pg</item>
+        <item key="dbname" >test</item>
+        <item key="host" >localhost</item>
+        <item key="password" />
+        <item key="username" />
+      </hashref>
+    </item>
+    <item key="search" >
+      <hashref>
+        <item key="!Fields" >sku,quantity,description,category</item>
+        <item key="!Table" >inventory, products</item>
+        <item key="!TabJoin" >inventory JOIN products USING (sku)</item>
+        <item key="$order" >category</item>
+      </hashref>
+    </item>
+    <item key="report" >
+      <hashref>
+        <item key="locale" >en_US</item>
+        <item key="papersize" >A4</item>
+      </hashref>
+    </item>
+    <item key="breaks" >
+      <hashref>
+        <item key="quantity" >
+          <hashref>
+            <item key="font" >
+              <hashref>
+                <item key="face" >Helvetica-Bold</item>
+                <item key="size" >10</item>
+              </hashref>
+            </item>
+            <item key="format" >%.2f</item>
+            <item key="order" >0</item>
+            <item key="text" >Category $category</item>
+            <item key="total" >
+              <arrayref>
+                <item key="0" >quantity</item>
+              </arrayref>
+            </item>
+            <item key="xpos" >10</item>
+          </hashref>
+        </item>
+        <item key="_total" >
+          <hashref>
+            <item key="format" >%.2f</item>
+            <item key="order" >1</item>
+            <item key="text" />
+            <item key="total" >
+              <arrayref>
+                <item key="0" >quantity</item>
+              </arrayref>
+            </item>
+            <item key="xpos" >10</item>
+          </hashref>
+        </item>
+      </hashref>
+    </item>
+    <item key="fields" >
+      <arrayref>
+        <item key="0" >
+          <hashref>
+            <item key="font" >
+              <hashref>
+                <item key="face" >Helvetica</item>
+                <item key="size" >10</item>
+              </hashref>
+            </item>
+            <item key="name" >sku</item>
+            <item key="text" >Product</item>
+            <item key="xpos" >10</item>
+          </hashref>
+        </item>
+        <item key="1" >
+          <hashref>
+            <item key="name" >description</item>
+            <item key="text" >Description</item>
+            <item key="xpos" >40</item>
+          </hashref>
+        </item>
+        <item key="2" >
+          <hashref>
+            <item key="align" >right</item>
+            <item key="name" >quantity</item>
+            <item key="text" >Qty</item>
+            <item key="xpos" >200</item>
+          </hashref>
+        </item>
+      </arrayref>
+    </item>
+    <item key="page" >
+      <hashref>
+        <item key="header" >
+          <hashref>
+            <item key="font" >
+              <hashref>
+                <item key="face" >Helvetica-Bold</item>
+                <item key="size" >14</item>
+              </hashref>
+            </item>
+            <item key="number" >
+              <hashref>
+                <item key="align" >right</item>
+                <item key="text" >Page: </item>
+                <item key="xpos" >200</item>
+              </hashref>
+            </item>
+            <item key="text" >
+              <arrayref>
+                <item key="0" >
+                  <hashref>
+                    <item key="text" >Inventory List</item>
+                    <item key="xpos" >10</item>
+                  </hashref>
+                </item>
+              </arrayref>
+            </item>
+          </hashref>
+        </item>
+      </hashref>
+    </item>
+    <item key="body" >
+      <hashref>
+        <item key="font" >
+          <hashref>
+            <item key="face" >helvetica-bold</item>
+            <item key="size" >10</item>
+          </hashref>
+        </item>
+        <item key="ypos" >10</item>
+        <item key="heigth" >265</item>
+      </hashref>
+    </item>
+  </hashref>
+</perldata>

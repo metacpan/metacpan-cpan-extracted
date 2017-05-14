@@ -1,0 +1,46 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: end Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fdefine.html">Previous Topic</A> | <A HREF="fexample.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.13. end Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>end</STRONG>
+  ...
+  !endblock
+</PRE>
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>end</EM> filter is used to add a section of SDF onto the end of the document. This is particularly useful in configuration files when you want to:</P>
+<UL>
+<LI>load a &quot;exit&quot; configuration module
+<LI>provide defaults for variables not provided by authors within a document.</UL>
+<P>When several sections are added to the end using this macro, the sections are processed in a first-in-last-out order.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<PRE>
+<B>!block</B> end
+Line:
+N[align=Center] END OF DOCUMENT
+<B>!endblock</B>
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fdefine.html">Previous Topic</A> | <A HREF="fexample.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

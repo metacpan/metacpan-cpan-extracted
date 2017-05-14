@@ -1,0 +1,944 @@
+<?xml version="1.0"?>
+<!DOCTYPE AGENDA SYSTEM "agenda.dtd">
+<!-- Place comment here -->
+<AGENDA NAME="Sigma">
+  <MAAND ID="1/99" NAAM="Januari">
+    <PUNT TYPE="Borrel">
+      <TITEL>Nieuwjaarsborrel</TITEL>
+      <DATUM>4/1/1999</DATUM>
+      <ORG>Subfaculteit Scheikunde</ORG>
+      <INFO>
+        <PLAATS>kantine B-faculteit</PLAATS>
+        <TIJD>16.30</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="E-lezing">
+      <TITEL>Informed Chemistry: what can it do for synthesis?</TITEL>
+      <DATUM>13/1/1999</DATUM>
+      <ORG>Chemweb.Com</ORG>
+      <LINK URL="http://chemweb.vei.co.uk/"/>
+      <INFO>
+        <PLAATS>Internet</PLAATS>
+        <TIJD>16.00</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Borrel">
+      <TITEL>Nieuwjaarsborrel</TITEL>
+      <DATUM>13/1/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <INFO>
+        <PLAATS>Ul-kantine</PLAATS>
+        <TIJD>16.00</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>The development of oxidation state +IV for palladium in it's organometalic chemistry</TITEL>
+      <DATUM>25/1/1999</DATUM>
+      <ORG>Anorg. Chem. (NSR Center)</ORG>
+      <COMMENTAAR>
+        Spreker: Prof. dr. A.J. Canty, University of Tasmania<BR/>
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>A0004</PLAATS>
+        <TIJD>11.30-12.30</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Symposium">
+      <TITEL>Virtuele Universiteit of Universele Virtualiteit</TITEL>
+      <DATUM>26/1/1999</DATUM>
+      <ORG>Gemeente Nijmegen</ORG>
+      <INFO>
+        <PLAATS>Raadhuis Nijmegen</PLAATS>
+        <TIJD>13:30</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Promotie">
+      <TITEL>Exploring tertiary folding in RNA</TITEL>
+      <DATUM>28/1/1999</DATUM>
+      <ORG>KUN</ORG>
+      <COMMENTAAR>
+        Door M.H.Kolk<BR/>
+        Promotor: prof.dr.C.W.Hilbers<BR/>
+        Copromotor: dr. H.A.Heus
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>KUN Aula</PLAATS>
+        <TIJD>13:30 precies</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Sport">
+      <TITEL>Schaatsen</TITEL>
+      <DATUM>29/1/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/sport/" TYPE="local"/>
+      <INFO>
+        <PLAATS>Triavium</PLAATS>
+        <TIJD>va 14.00</TIJD>
+      </INFO>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="2/99" NAAM="Februari">
+    <PUNT>
+      <TITEL>Begin Voorjaarssemester</TITEL>
+      <DATUM>1/2/1999</DATUM>
+      <ORG>KUN</ORG>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>
+        "Nieuwe materialen op basis van organische synthese"
+      </TITEL>
+      <DATUM>2/2/1999</DATUM>
+      <ORG>NSR</ORG>
+      <COMMENTAAR>
+        Spreker: dr. Frank van Veggel, Laboratorium voor organische chemie,
+              Universiteit Twente<BR/>
+        Gastheer: Prof. dr. RJM Nolte
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>CZ I</PLAATS>
+        <TIJD>14.00</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>
+        "Transition metal catalysed carbon-carbon bond formation"
+      </TITEL>
+      <DATUM>2/2/1999</DATUM>
+      <ORG>NSR</ORG>
+      <COMMENTAAR>
+        Spreker: dr Paul CJ Kamer, Institute of Molecular Chemistry,
+                 University of Amsterdam<BR/>
+        Gastheer: Prof. dr. RJM Nolte
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>CZ I</PLAATS>
+        <TIJD>16.00</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>
+        "Novel approaches for the synthesis of druglike building blocks"
+      </TITEL>
+      <DATUM>3/2/1999</DATUM>
+      <ORG>NSR</ORG>
+      <COMMENTAAR>
+        Spreker: dr Floris PJT Rutjes, Institute of Molecular Chemistry,
+                 University of Amsterdam<BR/>
+        Gastheer: Prof. dr. RJM Nolte
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>CZ I</PLAATS>
+        <TIJD>10.00</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Borrel">
+      <TITEL>BBB-bestuurswisselborrel</TITEL>
+      <DATUM>4/2/1999</DATUM>
+      <ORG>BBB</ORG>
+      <LINK URL="http://www.sci.kun.nl/bbb/"/>
+      <INFO>
+        <PLAATS>Collegezalenrondgang</PLAATS>
+        <TIJD>16.30u</TIJD>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="Film">
+      <TITEL>Alien IV</TITEL>
+      <DATUM>4/2/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/film"/>
+      <COMMENTAAR>
+        Kosten: f1,50
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+        <TIJD>19.30u</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Deadline G-mi</TITEL>
+      <DATUM>5/2/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Cursus">
+      <TITEL>Sollicitatietraining</TITEL>
+      <DATUM>9/2/1999</DATUM>
+      <ORG>BBB</ORG>
+      <LINK URL="http://www.sci.kun.nl/bbb/"/>
+      <INFO>
+        <TIJD>10.30u-12.30u</TIJD>
+        <PLAATS>CZ N3</PLAATS>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Sigma avond</TITEL>
+      <DATUM>9/2/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <INFO>
+        <PLAATS>Cafe de Fiets</PLAATS>
+        <TIJD>21.00u</TIJD>
+      </INFO>           
+    </PUNT>
+    <PUNT TYPE="Symposium">
+      <TITEL>Natuurkunde in een Notendop</TITEL>
+      <DATUM>10/2/1999</DATUM>
+      <LINK URL="http://www.sci.kun.nl/marie/symposium/index.html"/>
+      <INFO>
+        <TIJD>9.30u-16.30u</TIJD>
+      </INFO>
+      <ORG>Marie Curie</ORG>
+    </PUNT>
+    <PUNT TYPE="Sport">
+      <TITEL>Tafelvoetbaltoernooi</TITEL>
+      <DATUM>10/2/1999</DATUM>
+      <INFO>
+        <TIJD>15.45u</TIJD>
+      </INFO>
+      <ORG>Thalia</ORG>
+      <COMMENTAAR>
+        Inschrijven bij Thalia<BR/>
+        Deelname toernooi gratis<BR/>
+        Aansluitend borrel (niet gratis)
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Borrel">
+      <TITEL>W en N Carnavals-Beestborrel</TITEL>
+      <DATUM>11/2/1999</DATUM>
+      <INFO><PLAATS>Marie-Curie kantine</PLAATS></INFO>
+      <ORG>Marie Curie</ORG>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>The Structure and Fluxional Behaviour of the Binary Carbonyls</TITEL>
+      <DATUM>11/2/1999</DATUM>
+      <ORG>Chemweb.Com</ORG>
+      <LINK URL="http://chemweb.vei.co.uk/"/>
+      <INFO>
+        <PLAATS>Internet</PLAATS>
+        <TIJD>17.00</TIJD>
+      </INFO>   
+    </PUNT>
+    <PUNT TYPE="Feest">
+      <TITEL>BeestFeest</TITEL>
+      <DATUM>11/2/1999</DATUM>
+      <INFO><PLAATS>Doornroosje</PLAATS></INFO>
+      <ORG>St. Beet</ORG>
+    </PUNT>
+    <PUNT TYPE="Vrij">
+      <TITEL>Carnavalsvakantie</TITEL>
+      <DATUM>15:19/2/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Sigma avond</TITEL>
+      <DATUM>23/2/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <INFO>
+        <PLAATS>Cafe de Fiets</PLAATS>
+        <TIJD>21.00u</TIJD>
+      </INFO>           
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Schilderijrestauraties</TITEL>
+      <DATUM>24/2/1999</DATUM>
+      <INFO>
+        <TIJD>16.00</TIJD>
+        <PLAATS>CZ N1</PLAATS>
+      </INFO>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/lex/" TYPE="local"/>
+      <ORG>Sigma</ORG>
+    </PUNT>
+    <PUNT TYPE="Symposium">
+      <TITEL>ICT aan de KUN en daarbuiten</TITEL>
+      <DATUM>26/2/1999</DATUM>
+      <INFO>
+        <TIJD>10.00</TIJD>
+        <PLAATS>Collegezalencomplex, Mercatorpad 1</PLAATS>
+      </INFO>
+      <LINK URL="http://www.dan.nl/cgi-bin/event?12291"/>
+      <ORG>IOWO</ORG>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="3/99" NAAM="Maart">
+    <PUNT TYPE="Sport">
+      <TITEL>Spelletjesavond</TITEL>
+      <DATUM>9/3/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/sport/" TYPE="local"/>
+      <INFO>
+        <PLAATS>Cafe de Fiets</PLAATS>
+        <TIJD>19.30</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Glas: helder en fascinerend, materie en fenomeen</TITEL>
+      <DATUM>9/3/1999</DATUM>
+      <ORG>Studium Generale</ORG>
+      <INFO>
+        <PLAATS>Collegezalencomplex</PLAATS>
+        <TIJD>20:00</TIJD>
+      </INFO>
+      <COMMENTAAR>
+        Sprekers: prof.dr. Carel L. Davidson en Louis Goosen<BR/>
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Feest">
+      <TITEL>Feest met A-faculteiten: Fantasy-Feest</TITEL>
+      <DATUM>10/3/1999</DATUM>
+      <ORG>Sigma, Thalia, Desda, Postelein, Svn 
+           en Sophia</ORG>
+      <INFO>
+        <TIJD>22.00</TIJD>
+        <PLAATS>Diogenes</PLAATS>
+      </INFO>
+      <COMMENTAAR>
+        entree:<BR/>
+                f2,50 voor leden<BR/>
+                f3,50 voor niet leden<BR/>
+                f1,00 voor Diogenes leden
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Excursie">
+      <TITEL>Glas: Bezoek aan de glasinstrumentenmakerij van de KUN</TITEL>
+      <DATUM>11/3/1999</DATUM>
+      <ORG>Studium Generale</ORG>
+      <INFO>
+        <PLAATS>Toernooiveld 1</PLAATS>
+        <TIJD>17:00</TIJD>
+      </INFO>
+      <COMMENTAAR>
+        Inschrijven verplicht.<BR/>
+	Inlichtingen:<BR/>
+	Monique van Haaster 024-3615912 en 024-3612726
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Cursus">
+      <TITEL>Wijnproeven</TITEL>
+      <DATUM>11/3/1999</DATUM>
+      <INFO>
+        <TIJD>17:00</TIJD>
+        <PRIJS>5,00</PRIJS>
+        <INSCHRIJVEN TYPE="Verplicht">Marjolijn of Irene</INSCHRIJVEN>
+      </INFO>
+      <COMMENTAAR>
+	Slechts een beperkt aantal mensen kan meedoen<BR/>
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Film">
+      <TITEL>South Park</TITEL>
+      <DATUM>11/3/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/film"/>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+        <TIJD>19.30u</TIJD>
+        <PRIJS>1,50</PRIJS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Promotie">
+      <TITEL>'Selection in neural information processing'</TITEL>
+      <DATUM>12/3/1999</DATUM>
+      <INFO>
+        <TIJD>13:30 Precies</TIJD>
+        <PLAATS>KUN Aula</PLAATS>
+      </INFO>
+      <COMMENTAAR>
+        P.J.L.J. van de Laar<BR/>
+        Promotor: prof.dr. C.C.A.M. Gielen<BR/>
+        Copromotor: dr. T.M. Heskes
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Symposium">
+      <TITEL>Sigma Symposium: Economie in de Erlenmyer</TITEL>
+      <DATUM>17/3/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+      </INFO>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/symposium/Main.html" TYPE="local"/>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Metal Ion Cage Complexes: Synthesis, Reactivity and Uses</TITEL>
+      <DATUM>17/3/1999</DATUM>
+      <ORG>Chemweb</ORG>
+      <INFO>
+        <TIJD>14:30</TIJD>
+        <PLAATS>Internet</PLAATS>
+      </INFO>
+      <LINK URL="http://chemweb.vei.co.uk/"/>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Victor Westhoff-lezing: "Over de toestand van
+        van natuur en milieu in Nederland en daarbuiten"</TITEL>
+      <DATUM>17/3/1999</DATUM>
+      <ORG>KUN</ORG>
+      <INFO>
+        <TIJD>14:30</TIJD>
+        <PLAATS>KUN Aula</PLAATS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Cursus">
+      <TITEL>Assessmenttraining</TITEL>
+      <DATUM>23/3/1999</DATUM>
+      <ORG>BBB</ORG>
+      <LINK URL="http://www.sci.kun.nl/bbb/"/>
+      <INFO>
+        <TIJD>10.30u-12.30u</TIJD>
+        <PLAATS>CZ N4</PLAATS>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>De Engelse Industri&euml;le Revolutie</TITEL>
+      <DATUM>24/3/1999</DATUM>
+      <ORG>SCN99</ORG>
+      <INFO>
+        <TIJD>14.00u</TIJD>
+        <PLAATS>CZ N6</PLAATS>
+        <COMMENTAAR>dr. A. Bots</COMMENTAAR>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Beheersing van afvalwaterlozing van de chemische industrie in UK</TITEL>
+      <DATUM>24/3/1999</DATUM>
+      <ORG>SCN99</ORG>
+      <INFO>
+        <TIJD>14.00u</TIJD>
+        <PLAATS>CZ N6</PLAATS>
+        <COMMENTAAR>dr. R. Leuven</COMMENTAAR>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="Cursus">
+      <TITEL>Keltische Week: Whiskey Proeven</TITEL>
+      <DATUM>24/3/1999</DATUM>
+      <ORG>SPC</ORG>
+      <INFO>
+        <TIJD>16.00u</TIJD>
+        <PLAATS>Cultuur Cafe</PLAATS>
+        <PRIJS>5,-</PRIJS>
+        <INSCHRIJVEN TYPE="Verplicht">tel. 3615908</INSCHRIJVEN>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Vergadering">
+      <TITEL>Ledenvergadering</TITEL>
+      <DATUM>31/3/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <INFO>
+        <TIJD>20.00u</TIJD>
+        <PLAATS>Bovenzaal cafe de Fiets</PLAATS>
+      </INFO>      
+    </PUNT>
+  </MAAND>
+  <MAAND ID="4/99" NAAM="April">
+    <PUNT TYPE="Excursie">
+      <TITEL>Grolsch</TITEL>
+      <DATUM>1/4/1999</DATUM>
+      <INFO>
+        <PLAATS>Enschede</PLAATS>
+        <TIJD>13.30</TIJD>
+      </INFO>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/lex/" TYPE="local"/>
+      <ORG>Sigma</ORG>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Studiereis lezing</TITEL>
+      <DATUM>1/4/1999</DATUM>
+      <ORG>SCN99</ORG>
+      <INFO>
+        <TIJD>16.00u</TIJD>
+        <PLAATS>CZ N6</PLAATS>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Deadline G-mi</TITEL>
+      <DATUM>1/4/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Vrij">
+      <TITEL>Goede Vrijdag</TITEL>
+      <DATUM>2/4/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Vrij">
+      <TITEL>2e Paasdag</TITEL>
+      <DATUM>5/4/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Sport">
+      <TITEL>Paaslympics</TITEL>
+      <DATUM>5/4/1999</DATUM>
+      <LINK URL="http://www.sci.kun.nl/beet/sportdag/"/>
+      <ORG>St. Beet en BeeVee</ORG>
+    </PUNT>
+    <PUNT TYPE="Borrel">
+      <TITEL>W en N Paas-Beestborrel</TITEL>
+      <DATUM>6/4/1999</DATUM>
+      <ORG>BBB en Leonardo</ORG>
+    </PUNT>
+    <PUNT TYPE="Film">
+      <TITEL>X-Files: Fight the Future</TITEL>
+      <DATUM>6/4/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/film"/>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+        <TIJD>19.30u</TIJD>
+        <PRIJS>1,50</PRIJS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Cursus">
+      <TITEL>Programmeren in C</TITEL>
+      <DATUM>7/4/1999</DATUM>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/internet/cursi.html" TYPE="local"/>
+      <ORG>Sigma</ORG>
+    </PUNT>
+    <PUNT TYPE="Vergadering">
+      <TITEL>Subfaculteits bestuursvergadering</TITEL>
+      <DATUM>7/4/1999</DATUM>
+      <INFO>
+        <PLAATS>CZ III</PLAATS>
+        <TIJD>16.15</TIJD>
+      </INFO>
+      <COMMENTAAR>Na afloop borrel</COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Studiereis lezing</TITEL>
+      <DATUM>7/4/1999</DATUM>
+      <ORG>SCN99</ORG>
+      <INFO>
+        <TIJD>13.30u</TIJD>
+        <PLAATS>CZ N1</PLAATS>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="Feest">
+      <TITEL>BeestFeest</TITEL>
+      <DATUM>8/4/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/beestfeest/"/>
+    </PUNT>
+    <PUNT TYPE="Kamp">
+      <TITEL>Weekendkamp</TITEL>
+      <DATUM>9:11/4/1999</DATUM>
+      <ORG>Sigma</ORG>
+    </PUNT>
+    <PUNT TYPE="Sport">
+      <TITEL>Darten met Thalia</TITEL>
+      <DATUM>13/4/1999</DATUM>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/sport/"/>
+      <ORG>Thalia en Sigma</ORG>
+      <INFO>
+        <PLAATS>All-In</PLAATS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Promotie">
+      <TITEL>In vivo 13C MR spectroscopy for human investigations</TITEL>
+      <DATUM>13/4/1999</DATUM>
+      <ORG>KUN</ORG>
+      <INFO>
+        <PLAATS>KUN-Aula/Congresgebouw</PLAATS>
+        <TIJD>15:30 precies</TIJD>
+      </INFO>
+      <COMMENTAAR>
+        Door: A.J.van den Bergh<BR/>
+        Promotor: prof.dr. A. Heerschap
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Uitreiking">
+      <TITEL>Van Melsenprijs</TITEL>
+      <DATUM>16/4/1999</DATUM>
+      <ORG>B-Faculteit</ORG>
+      <COMMENTAAR>Deze prijs wordt jaarlijks uitgereikt aan leerlingen uit 5-havo en 6-vwo,
+      voor experimenten uitgevoerd voor het schoolonderzoek.</COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Symposium">
+      <TITEL>Biologie symposium</TITEL>
+      <DATUM>16/4/1999</DATUM>
+      <COMMENTAAR>
+        <B>i.v.m. het biologie symposium is de UL-kantine vandaag gesloten</B>
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Ouderdag">
+      <TITEL>Ouderdag</TITEL>
+      <DATUM>17/4/1999</DATUM>
+      <ORG>Sigma</ORG>
+    </PUNT>
+    <PUNT TYPE="Conferentie">
+      <TITEL>Molecular Simulation '99</TITEL>
+      <DATUM>21/4/1999 - 4/5/199</DATUM>
+      <ORG>VEI</ORG>
+       <LINK URL="http://molsim.vei.co.uk/"/>
+      <COMMENTAAR>Internetconferentie met zeer veel (gratis) lezingen.</COMMENTAAR>
+      <INFO>
+        <PLAATS>Internet</PLAATS>
+        <PRIJS>GRATIS</PRIJS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Film">
+      <TITEL>Blade</TITEL>
+      <DATUM>22/4/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/film"/>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+        <TIJD>19.30u</TIJD>
+        <PRIJS>1,50</PRIJS>
+      </INFO>
+      <COMMENTAAR>
+        In de pauze is er koffie en thee. Neem zelf een kopje mee!
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Feest">
+      <TITEL>Pre-Batavierenrace feest</TITEL>
+      <DATUM>22/4/1999</DATUM>
+      <INFO>
+        <PLAATS>Kolpinghuis</PLAATS>
+        <TIJD>22.30u</TIJD>
+        <PRIJS>3,50</PRIJS>
+      </INFO>
+      <COMMENTAAR>
+        met <B>Midnight run</B>, Energieke studentenband uit Eindhoven<BR/>
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Sport">
+      <TITEL>Batavierenrace</TITEL>
+      <DATUM>24+25/4/1999</DATUM>
+      <LINK URL="http://snt.student.utwente.nl/~bata444/"/>
+      <ORG>St. Batavierenrace</ORG>
+      <COMMENTAAR>Schrijf je in bij een van de leden van de sportcie</COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Snuffelweek op de B-faculteit</TITEL>
+      <DATUM>27/4/1999</DATUM>
+      <ORG>BeeVee, Desda, Leonardo, Marie-Curie, Sigma, Thalia</ORG>
+      <INFO>
+        <TIJD>11.00-16.30</TIJD>
+        <PLAATS>Grasveld B-faculteit</PLAATS>
+      </INFO>
+      <COMMENTAAR>
+        Borrel om 15.00
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Show">
+      <TITEL>Karaokeshow</TITEL>
+      <DATUM>28/4/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <INFO>
+        <PLAATS>UL-kantine</PLAATS>
+        <TIJD>16.00</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Excursie">
+      <TITEL>Cap Gemini</TITEL>
+      <DATUM>29/4/1999</DATUM>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/lex/" TYPE="local"/>
+      <INFO>
+        <TIJD>12.00-16.30</TIJD>
+      </INFO>
+      <ORG>Sigma</ORG>
+    </PUNT>
+    <PUNT TYPE="Vrij">
+      <TITEL>Koninginnedag</TITEL>
+      <DATUM>30/4/1999</DATUM>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="5/99" NAAM="Mei">
+    <PUNT TYPE="Bussines Course">
+      <TITEL>Uiterste inschrijfdatum Unilever B.C.</TITEL>
+      <DATUM>5/5/1999</DATUM>
+      <LINK URL="http://www.businesscourse.nl/"/>
+      <COMMENTAAR>
+        De Bussiness Course is van 6-9 juli.
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Reis">
+      <TITEL>Studiereis naar Engeland en Schotland</TITEL>
+      <DATUM>2:16/5/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Vrij">
+      <TITEL>Meivakantie</TITEL>
+      <DATUM>3:7/5/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Chemische wapens</TITEL>
+      <DATUM>11/5/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <LINK URL="/sigma/Vereniging/lex/" TYPE="local" />
+      <INFO>
+        <TIJD>16.00</TIJD>
+        <PLAATS>CZN1</PLAATS>
+        <CONTACT EMAIL="pdankers@sci.kun.nl">Patricia Dankers</CONTACT>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Film">
+      <TITEL>The Truman show</TITEL>
+      <DATUM>11/5/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/film"/>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+        <TIJD>19.30u</TIJD>
+        <PRIJS>1,50</PRIJS>
+      </INFO>
+      <COMMENTAAR>
+        In de pauze is er koffie en thee. Neem zelf een kopje mee!
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Excursie">
+      <TITEL>Bijbels Openluchtmuseum</TITEL>
+      <DATUM>12/5/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <LINK URL="/sigma/Vereniging/lex/" TYPE="local" />
+      <INFO>
+        <TIJD>'s-middags</TIJD>
+        <PLAATS>Heilige Landstichting</PLAATS>
+        <CONTACT>Irene Reynhout</CONTACT>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Vrij">
+      <TITEL>Hemelvaart</TITEL>
+      <DATUM>13+14/5/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Sport">
+      <TITEL>Open Nederlandse Chemie Sportdagen</TITEL>
+      <DATUM>13+14/5/1999</DATUM>
+      <ORG></ORG>
+      <LINK URL="http://www.sci.kun.nl/sigma/Vereniging/sport/ONCS/" TYPE="local"/>
+    </PUNT>
+    <PUNT TYPE="Promotie">
+      <TITEL>NMR studies of fusarium solani pisi cutinase. 
+        Structure-mobility-function relationships</TITEL>
+      <DATUM>18/5/1999</DATUM>
+      <ORG>KUN</ORG>
+      <COMMENTAAR>
+        Door J.J. Prompers<BR/>
+        Promotor: prof.dr.C.W.Hilbers<BR/>
+        Copromotor: prof.dr.ir.H.A.M. Pepermans
+      </COMMENTAAR>
+      <INFO>
+        <PLAATS>KUN Aula</PLAATS>
+        <TIJD>13:30 precies</TIJD>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Show">
+      <TITEL>Soundmixshow</TITEL>
+      <DATUM>19/5/1999</DATUM>
+      <INFO>
+        <PLAATS>Cultureel Cafe</PLAATS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Colloquium">
+      <TITEL>The challenge of pragmatic process philosophy</TITEL>
+      <DATUM>19:21/5/1999</DATUM>
+      <URL LINK="http://www.kun.nl/fil-beta/ppp/"/>
+      <INFO>
+        <PLAATS>CZ II</PLAATS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Beurs">
+      <TITEL>BetaBedrijvenBeurs</TITEL>
+      <DATUM>20/5/1999</DATUM>
+      <ORG>BBB</ORG>
+      <LINK URL="http://www.sci.kun.nl/bbb/"/>
+      <INFO>
+        <PLAATS>Rondgang</PLAATS>
+      </INFO>      
+    </PUNT>
+    <PUNT TYPE="Feest">
+      <TITEL>Feest 2e jaars jaarraad</TITEL>
+      <DATUM>20/5/1999</DATUM>
+      <INFO>
+        <PLAATS>De Fiets</PLAATS>
+        <TIJD>21.00</TIJD>
+      </INFO>
+      <ORG>Jaarraad '97</ORG>
+    </PUNT>
+    <PUNT TYPE="Info">
+      <TITEL>Voorlichtingsbijeenkomst studie Natuurwetenschappen</TITEL>
+      <DATUM>21/5/1999</DATUM>
+      <INFO>
+        <PLAATS>A3012</PLAATS>
+        <TIJD>12.45-13.45</TIJD>
+      </INFO>
+      <COMMENTAAR>
+        Voor meer informatie neem contact op met:<BR/>
+        Dr. G. W. Vuister<BR/>
+        tel. 52321, UL 274<BR/>
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Vrij">
+      <TITEL>Pinksteren</TITEL>
+      <DATUM>24/5/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Het kriebelt 99</TITEL>
+      <DATUM>25:29/5/1999</DATUM>
+      <LINK URL="http://www.kun.nl/diogenes/het.kriebelt99"/>
+      <ORG>Diogenes &#38;amp SPC</ORG>
+      <COMMENTAAR>
+        Voor meer info kijk in het programmaboekje, volg de link of bel
+        Diogenes (3604842) of SPC (3612823)
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Borrel">
+      <TITEL>W &#38;amp; N Eindejaars-Beestborrel</TITEL>
+      <DATUM>26/5/1999</DATUM>
+      <INFO>
+        <PLAATS>Thalia kantine</PLAATS>
+      </INFO>
+      <ORG>Thalia</ORG>
+    </PUNT>
+    <PUNT TYPE="Film">
+      <TITEL>Freddie, de koele kikker</TITEL>
+      <DATUM>26/5/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/film"/>
+      <INFO>
+        <PLAATS>CZ N2</PLAATS>
+        <TIJD>19.30u</TIJD>
+        <PRIJS>1,50</PRIJS>
+      </INFO>
+      <COMMENTAAR>
+        In de pauze is er koffie en thee. Neem zelf een kopje mee!
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Info">
+      <TITEL>Voorlichtingsbijeenkomst predoctorale lerarenopleiding</TITEL>
+      <DATUM>26/5/1999</DATUM>
+      <INFO>
+        <PLAATS>CZN6</PLAATS>
+        <TIJD>16.00-17.00</TIJD>
+      </INFO>
+      <ORG>Unilo</ORG>
+      <COMMENTAAR>
+        De bijeenkomst zal gaan over inhoud en werkwijze v/d predoc. lerarenopl.<BR/>
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Feest">
+      <TITEL>Beestfeest</TITEL>
+      <DATUM>27/5/1999</DATUM>
+      <ORG>St. Beet</ORG>
+      <LINK URL="http://www.sci.kun.nl/beet/beestfeest/"/>
+      <INFO>
+        <PLAATS>Doornroosje</PLAATS>
+        <TIJD>21.30-4.00</TIJD>
+      </INFO>
+      <COMMENTAAR>
+        Entree gratis<BR/>
+        Garderobe: f1,=<BR/>
+        Bier: f2,75
+      </COMMENTAAR>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="6/99" NAAM="Juni">
+    <PUNT TYPE="Info">
+      <TITEL>KNCV-bedrijfseconomiedag</TITEL>
+      <DATUM>3/6/1999</DATUM>
+      <ORG>KNCV</ORG>
+      <INFO>
+        <PLAATS>Nijmegen</PLAATS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Deadline G-mi</TITEL>
+      <DATUM>4/6/1999</DATUM>
+    </PUNT>
+    <PUNT TYPE="Borrel">
+      <TITEL>Eindejaars borrel</TITEL>
+      <DATUM>7/6/1999</DATUM>
+      <INFO>
+        <PLAATS>UL-kantine</PLAATS>
+        <TIJD>16.00</TIJD>
+      </INFO>
+      <ORG>Sigma</ORG>
+      <COMMENTAAR>
+        Met speciale Sigma-onthulling
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Feest">
+      <TITEL>Feest 1e jaars jaarraad</TITEL>
+      <DATUM>9/6/1999</DATUM>
+      <INFO>
+        <PLAATS>cafe de Fiets</PLAATS>
+        <TIJD>21.30</TIJD>
+      </INFO>
+      <ORG>Jaarraad '98</ORG>
+      <COMMENTAAR>
+        Entree gratis
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="College">
+      <TITEL>Industri&#38;euml;le Chemie</TITEL>
+      <DATUM>14:18/6/1999</DATUM>
+      <INFO>
+        <PLAATS>CZ I</PLAATS>
+        <TIJD>10.00-15.00</TIJD>
+      </INFO>
+      <COMMENTAAR>
+        Meer informatie:<BR/>
+        Prof. dr. A. Bruggink<BR/>
+        tel. 53331 (secr. 52676)
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="">
+      <TITEL>Barbecue</TITEL>
+      <DATUM>22/6/1999</DATUM>
+      <ORG>Sigma</ORG>
+      <INFO>
+        <PRIJS>15,=</PRIJS>
+        <PLAATS>Wylerbergmeer</PLAATS>
+      </INFO>
+    </PUNT>
+    <PUNT TYPE="Lezing">
+      <TITEL>Dendritic Molecules, Concepts, Synthesis and Perspectives</TITEL>
+      <DATUM>25/6/1999</DATUM>
+      <INFO>
+        <PLAATS>CZ III</PLAATS>
+        <TIJD>14.00-15.00</TIJD>
+      </INFO>
+      <ORG>Nijmegen SON Research Institute</ORG>
+      <COMMENTAAR>
+        Spreker:<BR/>
+          Prof.Dr. G.R. Newkome<BR/>
+          Vice President for Research<BR/>
+          USF, Office of Research<BR/>
+          University of South Florida
+      </COMMENTAAR>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="7/99" NAAM="Juli">
+    <PUNT TYPE="Oratie">
+      <TITEL>Een magnetische blik op het leven</TITEL>
+      <DATUM>2/7/1999</DATUM>
+      <INFO>
+        <PLAATS>KUN-Aula</PLAATS>
+        <TIJD>15.00</TIJD>
+      </INFO>
+      <ORG>KUN</ORG>
+      <COMMENTAAR>
+        Spreker:<BR/>
+          dr. A. Heerschap<BR/>
+      </COMMENTAAR>
+    </PUNT>
+    <PUNT TYPE="Bussines Course">
+      <TITEL>Unilever Bussines Course</TITEL>
+      <DATUM>6:9/7/1999</DATUM>
+      <LINK URL="http://www.businesscourse.nl/"/>
+      <COMMENTAAR>
+        Inschrijving voor 5 mei.
+      </COMMENTAAR>
+    </PUNT>                                     
+    <PUNT TYPE="Vrij">
+      <TITEL>Zomervakantie</TITEL>
+      <DATUM>16/7/1999-31/8/1999</DATUM>
+      <COMMENTAAR>
+        Voor diegene die vakantie hebben:<BR/>
+        Veel plezier en tot volgend jaar!
+      </COMMENTAAR>
+    </PUNT>
+  </MAAND>
+  <MAAND ID="8/99" NAAM="Augustus">
+    <PUNT TYPE="Wedstrijd">
+      <TITEL>Essaywedstrijd voor studenten</TITEL>
+      <DATUM>31/8/1999</DATUM>
+      <ORG>KUN</ORG>
+      <COMMENTAAR>
+        Studenten kunnen meedoen aan een essaywedstrijd. Hiervoor dient een
+wetenschappelijk es-say te worden geschreven over het thema 'Met de ziel
+onder de arm. Over de lichamelijkheid van de geest'. Inleveren tot 1 september.<BR/>
+        Inl. Studium Generale Nijmegen 024-3615760
+      </COMMENTAAR>
+    </PUNT>
+  </MAAND>
+</AGENDA>

@@ -10,15 +10,24 @@
  <TMPL_IF NAME="browserIdEnabled">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
  </TMPL_IF>
- <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="SKIN_PATH">/<TMPL_VAR NAME="SKIN">/css/styles.css" />
- <link href="<TMPL_VAR NAME="SKIN_PATH">/common/favicon.ico" rel="icon" type="image/x-icon" />
- <link href="<TMPL_VAR NAME="SKIN_PATH">/common/favicon.ico" rel="shortcut icon" />
+ <!-- //if:cssminified
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="SKIN_PATH">/<TMPL_VAR NAME="SKIN">/css/styles.min.css" />
+ //else -->
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="SKIN_PATH">/<TMPL_VAR NAME="SKIN">/css/styles.css" />
+ <!-- //endif -->
+ <TMPL_INCLUDE NAME="../common/background.tpl">
+ <link href="<TMPL_VAR NAME="SKIN_PATH">/common/favicon.ico" rel="icon" type="image/vnd.microsoft.icon" sizes="16x16 32x32 48x48 64x64 128x128" />
+ <link href="<TMPL_VAR NAME="SKIN_PATH">/common/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" sizes="16x16 32x32 48x48 64x64 128x128" />
  <TMPL_IF NAME="PROVIDERURI">
   <link rel="openid.server" href="<TMPL_VAR NAME="PROVIDERURI">" />
   <link rel="openid2.provider" href="<TMPL_VAR NAME="PROVIDERURI">" />
  </TMPL_IF>
  <TMPL_INCLUDE NAME="../common/script.tpl">
- <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/portal.js"></script>
+ <!-- //if:jsminified
+  <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/portal.min.js"></script>
+ //else -->
+  <script type="text/javascript" src="<TMPL_VAR NAME="SKIN_PATH">/common/js/portal.js"></script>
+ <!-- //endif -->
  <TMPL_INCLUDE NAME="customhead.tpl">
 </head>
 <body>

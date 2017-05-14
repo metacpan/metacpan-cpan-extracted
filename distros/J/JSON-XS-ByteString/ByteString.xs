@@ -14,6 +14,17 @@
 #define CONCAT_PASTE(prefix, suffix) prefix ## suffix
 #define CONCAT(prefix, suffix) CONCAT_PASTE(prefix, suffix)
 
+static SV** visited;
+int visited_capacity;
+int visited_p;
+
+static inline void reserve_visited_capacity(){
+    if( visited_p >= visited_capacity ){
+        visited_capacity += visited_capacity / 4;
+        Renew(visited, visited_capacity, SV*);
+    }
+}
+
 static inline STRLEN estimate_str(unsigned char * str, STRLEN len){
     unsigned char * str_begin = str;
     STRLEN out_len = len+2;
@@ -401,9 +412,11 @@ MODULE = JSON::XS::ByteString		PACKAGE = JSON::XS::ByteString
 void
 encode_json(SV * data)
     PPCODE:
+        visited_p = 0;
         STRLEN need_size = estimate_normal(data);
         SV * out_sv = sv_2mortal(newSV(need_size));
         SvPOK_only(out_sv);
+        visited_p = 0;
         char * cur = (char*)encode_normal((unsigned char*)SvPVX(out_sv), data);
         SvCUR_set(out_sv, cur - SvPVX(out_sv));
         *SvEND(out_sv) = 0;
@@ -412,9 +425,11 @@ encode_json(SV * data)
 void
 encode_json_unblessed(SV * data)
     PPCODE:
+        visited_p = 0;
         STRLEN need_size = estimate_unblessed(data);
         SV * out_sv = sv_2mortal(newSV(need_size));
         SvPOK_only(out_sv);
+        visited_p = 0;
         char * cur = (char*)encode_unblessed((unsigned char*)SvPVX(out_sv), data);
         SvCUR_set(out_sv, cur - SvPVX(out_sv));
         *SvEND(out_sv) = 0;
@@ -435,3 +450,7 @@ decode_json(SV * json)
             PUSHs(&PL_sv_undef);
         else
             PUSHs(sv_2mortal(out));
+
+BOOT:
+    visited_capacity = 32;
+    Newx(visited, visited_capacity, SV*);

@@ -9,6 +9,4 @@ $t->get_ok('/embed?url=https://appear.in/your-room-name')
 
 $t->get_ok('/embed.json?url=https://appear.in/your-room-name')->json_is('/media_id', 'your-room-name');
 
-$t->get_ok('/embed?url=https://appear.in')->element_exists('a[target="_blank"]');
-
 done_testing;

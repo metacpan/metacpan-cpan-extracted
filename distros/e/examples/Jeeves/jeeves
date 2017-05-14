@@ -1,0 +1,126 @@
+#!/opt/bin/perl
+process_args();
+# Use "require" to allow process_args() to set @INC first
+require 'TemplateParser.pm';
+
+#-------------------------------------------------------------------------
+# Translate the template file to an intermediate Perl file. Skip
+# this step if the intermediate Perl file exists, and  is newer than 
+# the template.
+#-------------------------------------------------------------------------
+my $compile_template = 0;
+if (-e $inter_file) {
+    if ((-M $inter_file) >= (-M $template_file)) {
+        $compile_template = 1;
+    }
+} else {
+    $compile_template = 1;
+}
+if ($compile_template) {
+    if (TemplateParser->parse ($template_file, $inter_file) == 0) {
+        print STDERR ("Translated $template_file to $inter_file\n") if $verbose;
+    } else {
+        die "Could not parse template file - exiting\n";
+    }
+}
+#-------------------------------------------------------------------------
+# Parse the input specification file
+#-------------------------------------------------------------------------
+require "${spec_parser}.pm"; $spec_parser->import;
+$ROOT = $spec_parser->parse($spec_file);
+print STDERR ("Parsed $spec_file\n") if $verbose;
+$ROOT->print() if $debugging;
+#-------------------------------------------------------------------------
+# Eval the intermediate Perl file
+#-------------------------------------------------------------------------
+require $inter_file;
+die "$@\n" if $@;
+exit(0);
+
+#----------------------------------------------------------------------------
+sub process_args {
+    $verbose = 1; $debugging = 0;
+    $template_dir = $ENV{"JEEVESTEMPLATEDIR"};
+    $template_file = "jeeves.template"; # default
+    $spec_parser = "oo_schema";         # default
+    if (exists ($ENV{"JEEVESOPTIONS"})) {
+        print  "Using command line options from \"JEEVESOPTIONS\" \n";
+        @ARGV = split (/\s/,$ENV{"JEEVESOPTIONS"});
+    }
+    while (@ARGV) {
+        $a = shift @ARGV;
+        if ($a eq "-h") {
+            Usage();
+        } elsif ($a eq "-s") {
+            $spec_parser = shift @ARGV;
+        } elsif ($a eq "-d") {
+            $debugging = 1;
+        } elsif ($a eq "-q") {
+            $verbose = 0;
+        } elsif ($a =~ /^-[Tt]$/) {
+            $template_file = shift @ARGV ;
+        } elsif ($a eq "-ti") {
+            $inter_file = shift @ARGV ;
+        } elsif ($a eq "-D") {
+            my $code = shift @ARGV;    #-D foo=20 becomes ...
+            eval("\$$code");           #eval ("$foo=20")
+            die "Error in -D $code:\n$@\n" if $@;
+        } else {
+            $spec_file = $a;
+        }
+    }
+    $template_found = 0;
+    while (1) {
+        if ($template_file && (-e $template_file)) {
+            if (! $inter_file) {
+                $inter_file = "$template_file.pl";
+                $template_found = 1;
+                last;
+            }
+        }
+        if ($template_file !~ m'/') {
+            $template_file = "$template_dir/$template_file";
+        } else {
+            last;
+        }
+    }
+    if (! $template_found) {
+        print STDERR "Please specify a template file\n";
+        Usage();
+    }
+    if ((! $spec_file) || (! -e $spec_file)) {
+        print STDERR "Please specify a valid specification file\n";
+        Usage();
+    }
+    if (exists $ENV{"JEEVESLIBDIR"}) {
+        push (@INC, split(/:/, $ENV{"JEEVESLIBDIR"}));
+    }
+}
+
+#----------------------------------------------------------------------------
+sub Usage {
+    print STDERR <<"_EOT_";
+
+Usage: jeeves <options> <specification file>
+ where options are: 
+ -t <template file>            : Name of the template file. 
+                                 Default : "./jeeves.template"
+                                 Default template directory = ".", which
+                                 can be modified by setenv-ing
+                                 "JEEVESTEMPLATEDIR"
+ -q                            : Quiet Mode
+ -d                            : Set a debugging trace. This is NOT quiet!
+ -s <specification parser>     : Parser module that can parse the input
+                                 specification file
+                                 Default : "oo_schema"
+[-ti <intermediate perl file>] : jeeves translates the template file to
+                               : perl code. Default : "<template>.pl"
+-D var[=value]                 : Define variables on the command line 
+
+The command line can be specified in the envt. variable "JEEVESOPTIONS".
+
+The pathname to all Jeeves modules can be set in the envt. variable 
+    "JEEVESLIBDIR" (colon-separated);
+_EOT_
+    exit(1);
+}

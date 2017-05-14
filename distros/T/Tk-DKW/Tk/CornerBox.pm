@@ -1,18 +1,16 @@
 package Tk::CornerBox;
 
-use strict;
-
 use Tk::Canvas;
 use Tk::Frame;
 use Tk;
 
 use vars qw ($VERSION $TRIMCOUNT);
+use base qw (Tk::Frame);
+use strict;
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 $TRIMCOUNT = 3;
-
-use base qw (Tk::Frame);
 
 Tk::Widget->Construct ('CornerBox');
 

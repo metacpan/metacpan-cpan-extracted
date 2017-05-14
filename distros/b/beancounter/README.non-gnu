@@ -1,0 +1,147 @@
+
+		  Non-GNU Installation Notes for beancounter
+               (especially applicable for Solaris 2.x systems)
+
+
+Systems that don't have bash at /bin/sh and other non GNU utils may find the
+following guidance helpful. Such systems include SUN Solaris 2.x, and others
+that derive from the AT&T SVR4 UNIX baseline and many non-Linux systems.
+
+The general installation sequence remains unchanged.
+
+00. Read all the information files: README, beancounter.html
+    and BeanCounter.html
+0.  Install PostgreSQL
+1.  Configure PostgreSQL (create user(s) and allow TCP/IP db connections)
+2.  Start postgres database server daemon
+3.  Build, test and install all beancounter dependent perl modules
+    ( Date::Manip(5.35), DBI(1.16), DBD::Pg(0.93), HTML::Parser(2.20),
+    HTTP::Request(1.23), LWP::UserAgent(1.62), Statistics::Descriptive(2.4),
+    Text::ParseWords(3.1), Finance::YahooQuote, Data::Dumper, Getopt::Long )
+4.  perl -w Makefile.PL
+5.  setup_beancounter    # performs the initial db creation and config
+6.  update_beancounter   # performs required updates for new db schema
+7.  beancounter ready for your use, re-read usage instructions in
+    beancounter.html and BeanCounter.html
+
+NB: step 6. is REQUIRED even on an initial beancounter installation
+(yes, it should be called automatically by setup_beancounter at step 5).
+
+
+
+If, at step 5, you get message like:
+   setup_beancounter: syntax error at line 37: `progname=$' unexpected
+
+You aren't running a sh that understands bash syntax. You will need to
+get and install bash (on your own) or use the korn shell (ksh) that ships
+with SUN Solaris 2.x.
+
+To use ksh, the first line of each file setup_beancounter and
+update_beancounter should be changed to: #!/bin/ksh -e
+
+
+If, at step 5, you get the database error message like:
+   *** Error: No postgresql user 'ras'
+
+   We were unable to start psql as the user 'ras' does not exist
+   You need to create a Postgresql user 'ras' first:
+
+       Change to user postgres:            $ su - postgres
+       Create the user:                    # createuser ras -d -A
+       Exit from user postgres:            # exit
+
+   and then run this script again.
+
+You need to use the following postgresql create user command:
+/path-to-pgsql-bin/createuser ras -d -A
+
+If you get an error from createuser like:
+   createuser: invalid option: -d
+
+You are encountering the command line parameter 'out of order'
+problem. Please, send an email to Dirk about this if only to note the
+fact that this condition does occur in environments other than mine ;-).
+Please indicate your OS and shell in the message.
+
+Re-ordering the arguments as follows will solve it:
+/path-to-pgsql-bin/createuser -d -A ras
+
+NB: this situation will likely occur in the setup_beancounter and
+update_beancounter scripts as well, you can either make the changes
+listed below now, or fix each error one step at a time ...
+
+Then repeat step 5.
+
+
+If you continue to get the database error message above and are sure
+the user id is valid and the database daemon is running or if, at step
+5, you get an error from psql like:
+   psql: FATAL:  user "-l" does not exist
+or
+   psql: FATAL:  user "-c" does not exist
+or
+   psql: FATAL:  user "-q" does not exist
+
+You are encountering the parameter 'out of order' problem within
+the script. Both scripts will need changes as follows:
+
+For script setup_beancounter (3 places):
+change all occurrences of sequences like '$DBCOMMAND dbname -f'
+to
+sequences like '$DBCOMMAND -f dbname'
+where -f is the (all if multiple) flag option (-l, -q, ...)
+      dbname are parameters without a leading '-' (template1, beancounter, ...)
+
+There are 3 occurrences including the help message described above.
+
+For script update_beancounter, the correction is a bit different:
+Change the line:
+   query="select distinct symbol from stockinfo where active"
+to:
+   query="\t select distinct symbol from stockinfo where active"
+also change the line:
+   echo $query | $DBCOMMAND -t | grep -q "\b[[:digit:]]"
+to:
+   echo $query | $DBCOMMAND | grep -q "\b[[:digit:]]"
+
+This change is using the psql \t meta-command instead of the psql -t
+command line argument.
+
+Consider sending an email to Dirk about your need to do this if only
+to note the fact that this condition does occur in environments other
+than mine ;-). Please indicate your OS and shell in the message.
+
+
+If, when running update_beancounter at step 6, you get a message like:
+   grep: illegal option -- q
+   Usage: grep -hblcnsviw pattern file . . .
+
+You are using a non POSIX compliant grep. A GNU grep will work, as
+will the SUN Solaris grep at /usr/xpg4/bin. The SUN Solaris grep at
+/usr/5bin will not work.
+
+
+
+If, after giving it some personal sweat equity, you run into problem(s)
+that you are unable to resolve by yourself contact Dirk or myself, we
+will try to help you resolve them.  Dirk is the key for anything that
+relates to beancounter, including the database.  I, on the other hand
+can assist you with script portability issues on non-GNU systems such
+as Solaris and other ATT based UNIX systems.
+
+The assistance pleading message should include: the command line and
+all resulting output plus as much information about your environment,
+operating system and as much other info you deem appropriate for remote
+problem analysis and diagnosis.
+
+
+aloha,
+
+ras <ras@acm.org>
+
+
+ps -- constructive comments regarding this text, including variations
+due to other operating systems and the like are welcome. We prefer
+diffs created via 'diff -ub orig change' (but will accept diff -cb for
+those Solaris users that don't have the GNU diff) -- ras
+

@@ -1,0 +1,350 @@
+#!/usr/local/bin/perl
+
+# this program looks at the tapes files and figures out which
+# ones are no longer needed.  
+
+# copy these settings from the frogbak file
+$recorddir = "/usr/local/dump";
+$firstcentury = 1900;		# these specify the start of the "calendar".
+$firstyear = 89;		# which is good for 95 years.  (I'm lazy)
+$mintofirstsunday = 10080;	# minutes to first sunday of first yar (Don't ask)
+
+chdir($recorddir) || die "chdir $recorddir: $!";
+
+opendir(TAPES,"tapes") || die "opendir tapes: $!";
+
+&initTimeSubs();
+
+$not_all_known = 0;
+while ($t = readdir(TAPES)) {
+	next if ($t eq ".");
+	next if ($t eq "..");
+	$tape{$t} = 1;
+
+	$tapename = "";
+	$timing_found = 0;
+	$control_found = 0;
+	open(TF,"tapes/$t") || die "open $tapes/$t: $!";
+	while(<TF>) {
+		if (/^DUMP: (\S+) \((\S+)\)/) {
+			$timing{$1} = &cmin($2);
+			$timing_found = 1;
+			$tapename = $1;
+			next;
+		}
+		if (/^control file: (\S+)/) {
+			if (-e $1) {
+				$cfiles{$1}++;
+			} else {
+				print STDERR "Warning: control file $1 does not exist\n";
+			}
+			if ($tapename) {
+				$cfile{$tapename} = $1;
+				$control_found = 1;
+			} else {
+				print STDERR "Warning: tape file tapes/$t does not list control file\n";
+			}
+			last;
+		}
+		last if (/^-------/);
+	}
+	close(TF);
+	print STDERR "Warning: no proper label in $t\n" unless $timing_found;
+	unless ($control_found) {
+		$cfile{ $tapename ? $tapename : $t } = 'unknown';
+		$not_all_known = 1;
+	}
+}
+
+for $cf (sort keys %cfiles) {
+	open(CF,$cf) || die "open $cf: $!";
+	while(<CF>) {
+		next if /^#/;
+		next if /^$/;
+		next if /^average/;
+		next if /^\s*(\w+)\s*=\s*(.*)$/;
+		($file, $host, @rest) = split;
+		print STDERR "Warning syntax error, $cf line $.\n" 
+			unless $#rest == 4;
+
+		$filesys = "//$host/$file";
+		$file{$filesys} = $file;
+		$host{$filesys} = $host;
+	}
+	close(CF);
+}
+
+for $fs (sort keys %file) {
+	$full = &getdumphistname($host{$fs},$file{$fs},'full');
+
+	$lastfull = 0;
+	if (-e $full) {
+		open(FULL,$full) || die "open $full: $!";
+		while(<FULL>) {
+			if (/^0 (\S+) (\S+)/) {
+				$when = &cmin($1);
+				$tape = $2;
+				next;
+			}
+			die "Corrupt record file: $full, line $.\n";
+		}
+		close(FULL);
+		$mustkeep{$tape} += 1;
+		$lastfull{$fs} = $when;
+	}
+
+	$incr = &getdumphistname($host{$fs},$file{$fs},'incr');
+	if (-e $incr) {
+		open(INCR,$incr) || die "open $incr: $!";
+		while(<INCR>) {
+			if (/^\S+ (\S+) (\S+)/) {
+				$when = &cmin($1);
+				$tape = $2;
+				if ($when > $lastfull{$fs}) {
+					$mustkeep{$tape} += 1;
+				}
+				next;
+			}
+			die "Corrupt record file: $incr, line $.\n";
+		}
+	}
+}
+
+@ordered = (reverse sort {$timing{$a} <=> $timing{$b}} keys %timing);
+@offtapes = grep(! $mustkeep{$_}, @ordered);
+
+
+if ($not_all_known) {
+	print join("\n", reverse (@offtapes[ 0 .. ($#offtapes > 9 ? 9 : $#offtapes) ]));
+	print "\n";
+} else {
+	for $cf (sort keys %cfiles) {
+		$c = 0;
+		for $t (@offtapes) {
+			if ($cfile{$t} eq $cf) {
+				print "$t\n";
+				last if $c++ > 3;
+			}
+		}
+	}
+}
+
+exit(0);
+
+# 
+# convert a hostname:filesys:type triplet into a history file name.
+# examples:
+#	cae780:/home:full		becomes "records/cae780/home.full"
+#	bullet://lemmy/u/mfg:incr	becomes "records/lemmy/u.mfg.incr"
+#	bullet://lemmy:full		becomes "records/lemmy/.full"
+#	
+sub getdumphistname {
+	local ($host, $file, $type) = @_;
+	if ($file =~ m,^//([^/]*)/?(.*),) {
+		$host = $1;
+		$file = $2;
+		if ($file eq "") {
+			$file = "/";
+		}
+	}
+	if ($file =~ m,^/(.*),) {
+		$file = $1;
+	}
+	$file =~ s,/,_,g;
+	if (! -d "records/$host") {
+		&print ("warning: making directory records/$host\n");
+		mkdir("records/$host",0777)
+			|| warn "could not mkdir records/$host: $!\n";
+	}
+#	&logfile("records/" . $host . "/" . $file . "." . $type);
+	return "records/" . $host . "/" . $file . "." . $type;
+}
+
+#########################################################################
+# 
+#  	TIME MANIPULATION
+#
+#########################################################################
+
+# convert YY/MM/DD.HH:MM format to ctime format...
+sub ctime {
+	local($time) = $_[0];
+	local($year);
+	local($dow);
+	local($t);
+	if ($time == 0) {
+		return "epoch";
+	}
+	if ($time !~ m,(..)/(..)/(..)\.(..):(..), ) {
+		&print ("time malformed: $time \n");
+		return "Mon Feb 12 17:08:23 1990";
+	}
+	if ($1 >= $firstyear) {
+		$year = $firstcentury + $1;
+	} else {
+		$year = $firstcentury + 100 + $1;
+	}
+	$t = &cmin($time);
+	$dow = int((($t-$mintofirstsunday)/(24*60))%7);
+	print DEBUG "t = $t minstofs = $mintofirstsunday dow = $dow ctime = ";
+	printf DEBUG "%3s %3s %2d %02d:%02d:%02d %4d\n",
+ 		 $dayofweek[$dow],$month[$2],$3,$4,$5,  0, $year;
+	return sprintf("%3s %3s %2d %02d:%02d:%02d %4d",
+ 		 $dayofweek[$dow],$month[$2],$3,$4,$5,  0, $year);
+}
+#
+# convert the current time to the YY/MM/DD.HH:MM format.
+#
+sub now {
+   local($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+   local($now);
+   #
+   # $mon is in the form 0..11 NOT 1..12 !!!!
+   #
+   $mon += 1;
+   $now = sprintf("%02d/%02d/%02d.%02d:%02d",$year,$mon,$mday,$hour,$min);
+   if ($pretend_time) {
+	$now = &dint(&cmin($now)+&nUnits($pretend_time));
+	undef $pretend_time; # we only want this for the analysis
+   }
+   $now;
+}
+#
+# convert an integer into the YY/MM/DD.HH:MM format.
+#
+sub dint {
+	local($int) = $_[0];
+	#
+	# guess year...
+	#
+	local($yearguess) = int(($firstyear+ $int / (364 * 24 * 60)) %100) +1;
+	print DEBUG "first year guess: $yearguess\n";
+	while ($minstoyearfmt[$yearguess] >= $int) {
+		$yearguess -= 1;
+	}
+	print DEBUG "mins[year] = $minstoyearfmt[$yearguess]\n";
+	local($leftover) = $int - $minstoyearfmt[$yearguess];
+	print DEBUG "first leftover = $leftover.  24*60*364=".(20*60*364)."\n";
+	local($monthguess) = int(($leftover / 28 / 24 / 60)% 100) + 1;
+	print DEBUG "first monthguess = $monthguess\n";
+	while ($minstomonth[$monthguess] >= $leftover) {
+		$monthguess -= 1;
+	}
+	$leftover -= $minstomonth[$monthguess];
+	print DEBUG "2nd leftover = $leftover.  24*60*30=".(20*60*30)."\n";
+	local($days) = $leftover / (24 * 60);
+	print DEBUG sprintf ("dint %d = %02d/%02d/%02d.%02d:%02d\n", $int, 
+		$yearguess, $monthguess, $days,
+		($leftover % (24*60))/60, $leftover % 60);
+	return sprintf ("%02d/%02d/%02d.%02d:%02d", $yearguess, $monthguess,
+		$days, ($leftover % (24*60))/60, 
+		$leftover % 60);
+}
+
+#
+# convert the YY/MM/DD.HH:MM format into an integer.
+#
+sub cmin {
+	local($time) = $_[0];
+	if ($time !~ m,(..)/(..)/(..)\.(..):(..),) {
+		&print ("time malformed: $time \n");
+		return 0;
+	}
+	local($e) = 0;
+	local($year,$mon,$day,$hour,$min) = ($1,$2,$3,$4,$5);
+	if ($mon ge "02" && $leapyear{$year}) {
+		$e = 1;
+	}
+	print DEBUG "mon = $mon.\n";
+	print DEBUG "$minstoyearfmt[$year] + $minstomonth[$mon] + (($e+$day) *24 + $hour) * 60 + $min\n";
+	print DEBUG "cmin($_[0]) = ";
+	print DEBUG $minstoyearfmt[$year] + $minstomonth[$mon] 
+		+ (($e+$day) *24 + $hour) * 60 + $min;
+	print DEBUG "\n";
+	return $minstoyearfmt[$year] + $minstomonth[$mon] 
+		+ (($e+$day) *24 + $hour) * 60 + $min;
+}
+
+
+# 
+# convert a number+units string into minutes, eg: 3d.
+#
+sub nUnits
+{
+	local($freq) = @_;
+
+	if ($freq =~ m,^([0-9]*)h,) { return ($1 * 60); }
+	if ($freq =~ m,^([0-9]*)d,) { return ($1 * 60 * 24); }
+	if ($freq =~ m,^([0-9]*)w,) { return ($1 * 60 * 24 * 7); }
+	if ($freq =~ m,^([0-9]*)m,) { return ($1 * 60 * 24 * 30); }
+	if ($freq =~ m,^([0-9]*)y,) { return ($1 * 60 * 24 * 30 * 12); }
+	return 0;
+}
+
+#
+#	initialize arrays for the above routines.
+#
+
+sub initTimeSubs {
+	local($i);
+	local($j) = -364 * 24 * 60;
+	local($t) = $firstyear + $firstcentury;
+
+	for ($i = $t; $i <= $t + 95; $i++) {
+		if (($i % 4 == 0) && ($i % 100 != 0 || $i % 400 == 0)) {
+			$j += (365 * 24 * 60);
+			$leapyear[ $i % 100 ] = 1;
+		} else {
+			$j += (364 * 24 * 60);
+			$leapyear[ $i % 100 ] = 0;
+		}
+		$minstoyear   [ $i       ] = $j;
+		$minstoyearfmt[ $i % 100 ] = $j;
+	}
+	$month[12] = "Dec";
+	$month[11] = "Nov";
+	$month[10] = "Oct";
+	$month[9] = "Sep";
+	$month[8] = "Aug";
+	$month[7] = "Jul";
+	$month[6] = "Jun";
+	$month[5] = "May";
+	$month[4] = "Apr";
+	$month[3] = "Mar";
+	$month[2] = "Feb";
+	$month[1] = "Jan";
+	$daystomonth[12] = 31+28+31+30+31+30+31+31+30+31+30;
+	$daystomonth[11] = 31+28+31+30+31+30+31+31+30+31;
+	$daystomonth[10] = 31+28+31+30+31+30+31+31+30;
+	$daystomonth[9]  = 31+28+31+30+31+30+31+31;
+	$daystomonth[8]  = 31+28+31+30+31+30+31;
+	$daystomonth[7]  = 31+28+31+30+31+30;
+	$daystomonth[6]  = 31+28+31+30+31;
+	$daystomonth[5]  = 31+28+31+30;
+	$daystomonth[4]  = 31+28+31;
+	$daystomonth[3]  = 31+28;
+	$daystomonth[2]  = 31;
+	$daystomonth[1]  = 0;
+	$dayofweek[6] = "Sat";
+	$dayofweek[0] = "Sun";
+	$dayofweek[1] = "Mon";
+	$dayofweek[2] = "Tue";
+	$dayofweek[3] = "Wed";
+	$dayofweek[4] = "Thu";
+	$dayofweek[5] = "Fri";
+	for ($i = 1; $i <= 12; $i++) {
+		$minstomonth[$i] = $daystomonth[$i] * 24 * 60;
+	}
+	print DEBUG "min to first sun: $mintofirstsunday\n";
+	print DEBUG "@foo \n@bar \n";
+	$now = &now;
+	$nowi = &cmin($now);
+	print DEBUG "now = $now\n";
+	local($t) = &dint($nowi);
+	print DEBUG "dint(now) = $t\n";
+	$nowc = &ctime($now);
+	print DEBUG "nowc = $nowc\n";
+
+}
+
+sub print {}

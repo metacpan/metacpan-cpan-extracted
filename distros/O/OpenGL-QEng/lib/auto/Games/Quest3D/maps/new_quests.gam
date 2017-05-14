@@ -1,0 +1,15 @@
+#
+# possibilites demo...
+#
+GameState 0 0 0;
+partof_last;
+  Team 24 12 90;
+  MapHash 0 0 0;
+  partof_last;
+    Map 0 0 0 file=>'maps/night.txt';
+    Map 0 0 0 file=>'maps/tunnel2.txt';
+    Map 0 0 0 file=>'maps/fieldmap.txt';
+    Map 0 0 0 file=>'maps/hex.txt';
+    Map 0 0 0 file=>'maps/new_quests.txt';
+  done;
+done;

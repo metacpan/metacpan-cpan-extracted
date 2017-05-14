@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+package Bio::VertRes::Config::Main::BacteriaRegisterAndQCStudy;
+
+# ABSTRACT: Create config scripts for registering and QC of a prokaryote study
+# PODNAME: register_and_qc_study
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+use Bio::VertRes::Config::CommandLine::BacteriaRegisterAndQCStudy;
+
+Bio::VertRes::Config::CommandLine::BacteriaRegisterAndQCStudy->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+register_and_qc_study - Create config scripts for registering and QC of a prokaryote study
+
+=head1 VERSION
+
+version 1.133090
+
+=head1 SYNOPSIS
+
+Create config scripts for registering and QC a study
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

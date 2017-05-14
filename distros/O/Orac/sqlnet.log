@@ -1,0 +1,38 @@
+
+
+***********************************************************************
+Fatal NI connect error 12505, connecting to:
+ (DESCRIPTION=(CONNECT_DATA=(SID=pppweb)(CID=(PROGRAM=)(HOST=uks682)(USER=aduncan)))(ADDRESS_LIST=(ADDRESS=(PROTOCOL=ipc)(KEY=pppweb_test.uk.oracle.com))(ADDRESS=(COMMUNITY=tcp_community)(PROTOCOL=TCP)(Host=emea42.uk.oracle.com)(Port=1521))))
+
+  VERSION INFORMATION:
+	TNS for Solaris: Version 8.0.4.0.0 - Production
+	Unix Domain Socket IPC NT Protocol Adaptor for Solaris: Version 8.0.4.0.0 - Production
+	TCP/IP NT Protocol Adapter for Solaris: Version 8.0.4.0.0 - Production
+  Time: 12-AUG-99 10:28:41
+  Tracing not turned on.
+  Tns error struct:
+    nr err code: 12204
+    TNS-12204: TNS:received data refused from an application
+    ns main err code: 12564
+    TNS-12564: TNS:connection refused
+    ns secondary err code: 0
+    nt main err code: 0
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12505, connecting to:
+ (DESCRIPTION=(CONNECT_DATA=(SID=pppweb)(CID=(PROGRAM=)(HOST=uks682)(USER=aduncan)))(ADDRESS_LIST=(ADDRESS=(PROTOCOL=ipc)(KEY=pppweb_test.uk.oracle.com))(ADDRESS=(COMMUNITY=tcp_community)(PROTOCOL=TCP)(Host=emea42.uk.oracle.com)(Port=1521))))
+
+  VERSION INFORMATION:
+	TNS for Solaris: Version 8.0.4.0.0 - Production
+	Unix Domain Socket IPC NT Protocol Adaptor for Solaris: Version 8.0.4.0.0 - Production
+	TCP/IP NT Protocol Adapter for Solaris: Version 8.0.4.0.0 - Production
+  Time: 12-AUG-99 10:28:42
+  Tracing not turned on.
+  Tns error struct:
+    nr err code: 12204
+    TNS-12204: TNS:received data refused from an application
+    ns main err code: 12564
+    TNS-12564: TNS:connection refused

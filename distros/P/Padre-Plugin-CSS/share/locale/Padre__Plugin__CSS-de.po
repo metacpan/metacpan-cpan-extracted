@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-CSS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-18 23:57+0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Sebastian Willing\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+
+#: lib/Padre/Plugin/CSS.pm:25
+msgid "CSS Minifier"
+msgstr "CSS minimieren"
+
+#: lib/Padre/Plugin/CSS.pm:26
+msgid "Validate CSS"
+msgstr "CSS überprüfen"
+
+#: lib/Padre/Plugin/CSS.pm:38
+msgid "No Code"
+msgstr "Kein Code"
+
+#: lib/Padre/Plugin/CSS.pm:38
+msgid "Error"
+msgstr "Fehler"
+
+#: lib/Padre/Plugin/CSS.pm:47
+msgid "CSS is valid\n"
+msgstr "CSS ist korrekt\n"
+
+#: lib/Padre/Plugin/CSS.pm:49
+msgid "CSS is not valid\n"
+msgstr "CSS ist fehlerhaft\n"
+
+#: lib/Padre/Plugin/CSS.pm:50
+msgid "Errors:\n"
+msgstr "Fehler:\n"
+
+#: lib/Padre/Plugin/CSS.pm:60
+msgid "Failed to validate the code\n"
+msgstr "Fehler beim Überprüfen des Codes\n"
+

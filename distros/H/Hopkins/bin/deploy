@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+=head1 NAME
+
+deploy - hopkins database schema creation
+
+=head1 DESCRIPTION
+
+the deploy script will create the database schema usd by
+hopkins via SQL::Translator.  the only option that need be
+specified to the deploy script is what XML configuration
+file to use to determine the database connection info.
+
+=cut
+
+use Getopt::Compact;
+
+use Hopkins;
+use Hopkins::Config::XML;
+use Hopkins::Store::Schema;
+
+sub Hopkins::log_debug	{ }
+sub Hopkins::log_info	{ }
+sub Hopkins::log_warn	{ }
+sub Hopkins::log_error	{ }
+
+# use Getopt::Compact to process any command-line options.
+# we use Getopt::Compact instead of Getopt::Long simply for
+# the nifty built-in help option that displays usage info.
+
+my $godef =
+{
+	name => 'deploy',
+	struct =>
+	[
+		[ [ 'c', 'conf' ], 'XML config file',		'=s'	],
+		[ [ 'd', 'drop' ], 'drop existing tables',			]
+	]
+};
+
+my $go		= new Getopt::Compact %$godef;
+my $global	= $go->opts;
+
+# the configuration file is the only required argument
+die $go->usage if not defined $global->{conf};
+
+# parse the configuration, extract the database connection
+# options, then create a schema object that's connected to
+# the configured database
+
+my $config	= new Hopkins::Config::XML { file => $global->{conf} };
+my $status	= $config->load;
+
+if (not $status->parsed) {
+	print "deploy: unable to load configuration from $global->{conf}\n";
+	print $status->errmsg . "\n";
+	exit 1;
+}
+
+my $href	= $config->fetch('database');
+my $schema	= Hopkins::Store::Schema->connect(@$href{qw(dsn user pass options)});
+
+# deploy the schema to the connected database!  we're done!
+$schema->deploy({ add_drop_table => $global->{drop} });
+
+exit;
+
+=head1 AUTHOR
+
+Mike Eldridge <diz@cpan.org>
+
+=head1 LICENSE
+
+this library is free software.  you may distribute it
+and/or modify it under the same terms as perl itself.
+
+=cut
+

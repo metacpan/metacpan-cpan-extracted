@@ -1,0 +1,380 @@
+#!perl -w
+#
+# $Id: ptktrl 1.9 Mon, 06 Jul 1998 20:44:48 +0200 ach $
+#
+# POD documentation after __END__
+
+require 5.004;
+$| = 1;
+use strict;
+use vars '$VERSION';
+$VERSION = substr q$Revision: 1.9 $, 10;
+
+use Tk;
+use Term::ReadLine;
+use vars qw($mw);
+my $name = 'ptktrl';
+$mw = MainWindow->new;
+$mw->geometry('+20+20');
+
+print "\n    $name V$VERSION";
+my $prj = $0;  $prj =~ s|[^/]+$|tkach.prj|; # in my devel area?
+print "(devel) " if -e $prj;
+print " perl V$] Tk V$Tk::VERSION  MainWindow -> \$mw\n";
+print "\n\t\@INC:\n";
+foreach (@INC) { print "\t  $_\n" };
+print "\n";
+
+if ( -r ".${name}_init")
+  {
+    print "Reading .${name}_init ...\n";
+    do ".${name}_init";
+  }
+
+if (defined($ARGV[0]) && -r $ARGV[0])
+  {
+    print "Reading $ARGV[0] ...\n";
+    do $ARGV[0];
+  }
+
+my $term = new Term::ReadLine $name;
+
+die $term->ReadLine() . " does not support Tk loop\n"
+	unless ${$term->Features}{tkRunning};
+$term->tkRunning(1);
+
+if (${$term->Features}{ornaments})
+  {
+    local $^W=0;
+    $term->ornaments('md,me,,');
+  }
+
+## test if Tk is not blocked.
+#sub ptksh_test {
+#        print STDERR "I'm working behing the scene\n";
+#        $mw->after(1500,\&ptksh_test);
+#}
+#$mw->after(1500,\&ptksh_test);
+
+
+###
+### Loading history
+###
+my $histfile =  "$ENV{HOME}/.${name}_history";
+
+if ( -r $histfile and open(HIST, "<$histfile") ) {
+    while (<HIST>) {
+	chomp $_;
+        $term->addhistory($_);
+    }
+    close HIST;
+}
+
+###
+### Utility function
+###
+
+sub ptksh::_o
+  {
+    my $w = shift;
+    my $what = shift;
+
+    $what =~ s/^\s+//;
+    $what =~ s/\s+$//;
+    my (@opt) = split " ", $what;
+
+    require Tk::Pretty;
+
+    # check for regexp
+    if ($opt[0] =~ s|^/(.*)/$|$1|)
+      {
+	print "options matching /$opt[0]/:\n";
+        foreach ($w->configure())
+          {
+            print Tk::Pretty::Pretty($_),"\n" if $_->[0] =~ /\Q$opt[0]\E/;
+          }
+        return;
+    }
+
+    # list of options (allow as bar words)
+    foreach (@opt)
+      {
+	s/^['"]//;
+	s/,$//;
+	s/['"]$//;
+	s/^([^-])/-$1/;
+      }
+    if (length $what)
+      {
+	foreach (@opt)
+          {
+            print Tk::Pretty::Pretty($w->configure($_)),"\n";
+          }
+      }
+    else
+      {
+        foreach ($w->configure()) { print Tk::Pretty::Pretty($_),"\n" }
+      }
+    return;
+  }
+
+sub ptksh::_p {
+    foreach (@_) { print $_, "|\n"; }
+}
+
+my $u_init = 0;
+my %u_last = ();
+my $u_cnt;
+sub ptksh::_u {
+    my $module = shift;
+    if (defined($module) and $module ne '') {
+	$module = "Tk/".ucfirst($module).".pm" unless $module =~ /^Tk/;
+	print " --- Loading $module ---\n";
+	require "$module";
+	print $@ if $@;
+    } else {	
+        %u_last = () if defined $module;
+	$u_cnt = 0;
+	foreach (sort keys %INC) {
+	    next if exists $u_last{$_};
+            $u_cnt++;
+            $u_last{$_} = 1;
+	    #next if m,^/, and m,\.ix$,; # Ignore autoloader files
+	    #next if m,\.ix$,; # Ignore autoloader files
+	
+	    if (length($_) < 20 ) {
+		printf "%-20s -> %s\n", $_, $INC{$_};
+	    } else {
+		print "$_ -> $INC{$_}\n";
+	    }
+        }
+	print STDERR "No modules loaded since last 'u' command (or startup)\n"
+		unless $u_cnt;
+    }
+    return;
+}
+
+sub ptksh::_d
+  {
+    require Data::Dumper;
+    print Data::Dumper::Dumper(@_);
+    return;
+  }
+
+sub ptksh::_h
+  {
+    print <<'EOT';
+
+  ?		     print this message
+  d arg,...	     calls Data::Dumper::Dumper 
+  p arg,...	     print args, each on a line and "|\n" 
+  o $w /regexp/      print options of widget matching regexp
+  o $w [option ...]  print (all) options of widget
+  u xxx              xxx = string : load Tk::Xxx
+			    = ''     : list all modules loaded
+			    = undef  : list modules loaded since last u call
+				       (or after ptktrl startup)
+
+EOT
+    return;
+  }
+	
+###
+### Read and evaluate line from terminal
+###
+
+my ($line, $last) = ('', '');
+LINE: while ( defined($line = $term->readline("$name> ")) ) {
+    foreach ($line) {
+	last LINE if /^s*(exit)\b/;
+	last LINE if /^\s.*$/;
+
+        #$term->add_history($_) if $last ne $_;
+	#$last = $_;
+
+	last if s/^\?\s*$/ptksh::_h /;
+	last if s/^u(\s+|$)/ptksh::_u /;
+	last if s/^d\s+/ptksh::_d /;
+	last if s/^u\s+(\S+)/ptksh::_u('$1')/;
+	last if s/^p\s+(.*)$/ptksh::_p $1;/;
+	last if s/^o\s+(\S+)\s*?$/ptksh::_o $1;/;
+	last if s/^o\s+(\S+)\s*,?\s+(.*)?$/ptksh::_o $1, '$2';/;
+    }
+    #print "Line: ($line)\n";
+    use strict;  # so 'strict is loaded
+    %u_last = %INC unless $u_init++;
+    my $result = eval "{no strict; local \$^W=0; $line;}";
+    if ($@) {
+        print "$@\n";
+    }
+    elsif ($result) {
+        print $result, "\n";
+    }
+}
+print "\n" unless defined $line;
+
+###
+### Save History
+###
+END {
+  my $features = $term->Features;
+  if (exists $features->{getHistory} && $features->{getHistory})
+    { 
+      my @a= $term->GetHistory();
+      $#a-- if $a[-1] =~ /^(q$|x$|\s*exit\b)/; # chop off the exit command
+      @a= @a[($#a-50)..($#a)] if $#a > 50 ;
+
+      if( open HIST, ">$histfile" )
+        {
+          print HIST join("\n",@a), "\n";
+          close HIST;
+        }
+      else
+        {
+          print "Error: Unable to open history to '$histfile'\n";
+        }
+    }
+  else
+    {
+      print $term->ReadLine, " does not support a history records :-(\n";
+    }
+}
+
+
+__END__
+
+=head1 NAME
+
+ptktrl - Simple perl/Tk shell with cmd line editing and a persistent history
+
+
+=head1 SYNOPSIS
+
+  % ptktrl  ?I<scriptfile>?
+  ... version informations ...
+  ptktrl> $b=$mw->Button(-text=>'Hi',-command=>sub{print 'Hi'})
+  ptktrl> $b->grid
+  ptktrl> o $b
+  ... list of options ...
+  ptktrl> ...
+  ptktrl> ^D
+  %
+
+
+=head1 DESCRIPTION
+
+ptktrl is a simple perl/Tk shell to enter perl commands
+interactively.  When one starts ptktrl a L<MainWindow|Tk::MainWindow>
+is automaticly created. One can access it with I<$mw> on the command line.
+
+ptktrl supports command line editing and history via ReadLine interface
+(see L<Term::ReadLine>).  The last 50 commands entered are saved on
+exit to F<~/.ptktrl_history>.  The history file is loaded into history
+cache the next time you start ptktrl. 
+
+To exit ptktrl use: C<^D, exit,>  or C<quit>.
+
+The primary target of ptktrl is to experiment with perl/Tk
+widgets.  To debug perl/Tk programs use the more powerful the
+L<perl debugger|perldebug>.  Just enter ``O tk'' on debuggers
+command line to start the Tk eventloop.  The only advantage
+ptktrl has is that history file support and that
+a MainWindow is automaticly created.
+
+
+=head1 DEBUGGING SUPPORT
+
+ptktrl provides some convenience function to make browsing
+in perl/Tk widgets easier:
+
+=over 4
+
+=item B<?>
+
+displays a short help summary.
+
+=item B<d> ?I<args>, ...?
+
+Dumps recursicely arguments to stdout. (see L<Data::Dumper>).
+
+=item B<p> ?I<arg>, ...?
+
+appends "|\n" to each of it's arguments and prints it.
+If value is B<undef>, '(undef)' is printed to stdout.
+
+=item B<o> I<$widget> ?I<-option> ...?
+
+prints the option(s) of I<$widget> one on each line.
+If no options are given all options of the widget are
+listed.  See L<Tk::options> for more details on the
+format and contents of the returned list.
+
+=item B<o> I<$widget> B</>I<regexp>B</>
+
+Lists options of I<$widget> matching the
+L<regular expression|perlre> I<regexp>.
+
+=item B<u> ?I<class>?
+
+If no argument is given it lists the modules loaded
+by the commands you executed or since the last time you
+called C<u>.
+
+If argument is the empty string lists all modules that are
+loaded by ptktrl.
+
+If argument is a string, ``text'' it tried does a ``use Tk::Text''.
+
+=back
+
+=head1 ENVIRONMENT
+
+Same as for Term::ReadLine and perl. See L<Term::ReadLine> and
+L<perlrun/"ENVIRONMENT"> for further details.
+
+=head1 FILES
+
+=over 4
+
+=item F<.ptktrl_init>
+
+If found in current directory it is read in an evaluated
+after the mainwindow I<$mw> is created. F<.ptktrl_init>
+can contain any valid perl code.
+
+=item F<~/.ptktrl_history>
+
+Contains the last 50 lines entered in ptktrl session(s).
+
+=back
+
+
+=head1 BUGS
+
+Work only on Unix systems.
+
+Term::Readline::Perl command line history is broken when used
+in conjunction with perl/Tk.  Term::ReadLine::Gnu has no
+problems.
+
+B<Tk::MainLoop> function interactively entered or sourced in a
+init or script file will block ptktrl.
+
+
+=head1 SEE ALSO
+
+L<Tk|Tk>
+L<Term::ReadLine|Term::ReadLine>
+L<perldebug|perldebug>
+
+
+=head1 AUTHOR
+
+Achim Bohnet <F<ach@mpe.mpg.de>>
+
+Copyright (c) 1996-1998 Achim Bohnet. All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=cut
+

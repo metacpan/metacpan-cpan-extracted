@@ -1,0 +1,38 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Phrase Attributes
+
+The phrase attributes available are summarised below.
+
+!block table; tags="OATTR"; groups
+Name            Purpose
+Formatting:
+family          font family
+size            font size
+color           text colour
+bold            enable bold
+italics         enable italics
+underline       enable underline
+changed         enable change bars
+Objects:
+expand          replace an object name with its longer form
+shrink          replace an object name with its shorter form
+Hypertext:
+id              define a hypertext target
+jump            define a hypertext jump (i.e. URL)
+Indexes:
+index           define an index entry
+index_type      specify the index type
+Help specific:
+hlp.popup       jump to a popup window
+!endblock

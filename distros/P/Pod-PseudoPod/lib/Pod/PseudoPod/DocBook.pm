@@ -1,7 +1,7 @@
 package Pod::PseudoPod::DocBook;
 use strict;
 use vars qw( $VERSION );
-$VERSION = '0.15';
+$VERSION = '0.18';
 use Carp ();
 use base qw( Pod::PseudoPod );
 

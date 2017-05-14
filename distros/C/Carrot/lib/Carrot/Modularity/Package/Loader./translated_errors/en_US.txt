@@ -1,0 +1,17 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+package_loading_failed
+	Loading a package from a module file failed.
+	Package: %s
+	File: %s
+
+non_existent_package_file
+	A package file could not be found.
+	File: '%s'
+	Search Path: %s
+
+package_already_loaded
+	The package '%s' was loaded before. This is a fatal situation, because the arguments can no longer be passed to it.

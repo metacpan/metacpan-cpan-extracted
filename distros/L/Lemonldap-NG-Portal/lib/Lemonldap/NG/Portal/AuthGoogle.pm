@@ -15,7 +15,7 @@ use constant AXSPECURL      => 'http://openid.net/srv/ax/1.0';
 use constant GOOGLEENDPOINT => 'https://www.google.com/accounts/o8/id';
 
 our @ISA     = (qw(Lemonldap::NG::Portal::_Browser));
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.1';
 our $googleEndPoint;
 
 BEGIN {
@@ -77,7 +77,7 @@ sub checkGoogleSession {
     } $self->param();
 
     # Look at persistent database
-    my $id       = $self->_md5hash( $self->param('openid.claimed_id') );
+    my $id       = $self->param('openid.claimed_id');
     my $pSession = $self->getPersistentSession($id);
     my $gs;
 
@@ -85,8 +85,8 @@ sub checkGoogleSession {
     unless ( $self->{_AXNS} ) {
         if ( $pSession->data ) {
             $self->{user} = $pSession->data->{email};
-            while ( my ( $k, $v ) = each %{ $pSession->data } ) {
-                $gs->{$k} = $v;
+            foreach my $k ( keys %{ $pSession->data } ) {
+                $gs->{$k} = $pSession->data->{$k};
             }
         }
     }
@@ -214,7 +214,7 @@ sub extractFormInfo {
                 # b) if UserDB is Google, ask for exported variables
                 if ( $self->get_module('user') eq 'Google' ) {
                     my $u;
-                    while ( my ( $v, $k ) = each %{ $self->{exportedVars} } ) {
+                    foreach my $k ( values %{ $self->{exportedVars} } ) {
                         next if ( $k eq 'email' );
 
                         # Check if wanted attribute is known by Google

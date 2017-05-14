@@ -1,7 +1,19 @@
 Revision history for Pod::PseudoPod
 
+0.18 Aug 09, 2010
+    - improved HTML validity
+    - allowed more PP nesting after certain constructs
+
+0.17 Nov 28, 2010
+    - Removed Text::Wrap from Pod::PseudoPod::HTML altogether (RT #58784)
+
+0.16 Mar 29, 2010
+        - Remove Pod::Simple tests, Pod::PseudoPod is compatible with
+	  old and new versions of Pod::Simple, doesn't need to be
+          dictating the behavior of an external module.
+
 0.15 Jun 11, 2009
-	- Update Tutorial for change in maintainership.
+        - Update Tutorial for change in maintainership.
         - Further improvements to the DocBook formatter.
 
 0.14 Mar 20, 2007

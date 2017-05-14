@@ -1,0 +1,25 @@
+# zxid/sg/access_control-xacml-2.0-saml-protocol-schema-os.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: access_control-xacml-2.0-saml-protocol-schema-os.sg,v 1.3 2009-11-14 22:44:43 sampo Exp $
+
+target(xasp, urn:oasis:xacml:2.0:saml:protocol:schema:os)
+import(sp, urn:oasis:names:tc:SAML:2.0:protocol, http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=security)
+import(xac, urn:oasis:names:tc:xacml:2.0:context:schema:os, http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd)
+import(xa, urn:oasis:names:tc:xacml:2.0:policy:schema:os, http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd)
+
+XACMLAuthzDecisionQuery       -> %xasp:XACMLAuthzDecisionQueryType
+%XACMLAuthzDecisionQueryType: base(sp:RequestAbstractType)
+  xac:Request
+  @InputContextOnly? -> %xs:boolean  default (false)
+  @ReturnContext?    -> %xs:boolean  default (false)
+  ;
+
+XACMLPolicyQuery       -> %xasp:XACMLPolicyQueryType
+%XACMLPolicyQueryType: base(sp:RequestAbstractType)
+  xac:Request?
+  xa:Target?
+  xa:PolicySetIdReference?
+  xa:PolicyIdReference?
+  ;
+
+#EOF

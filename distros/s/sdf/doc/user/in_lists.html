@@ -1,0 +1,119 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Lists</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_parag.html">Parent Topic</A> | <A HREF="in_examp.html">Previous Topic</A> | <A HREF="in_notes.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>3.3. Lists</H1>
+<HR>
+<H2><A NAME="Overview">3.3.1. Overview</A></H2>
+<P><A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> supports 3 types of lists:</P>
+<UL>
+<LI><EM>unordered</EM> - items are bulleted
+<LI><EM>plain</EM> - items are not bulleted
+<LI><EM>ordered</EM> - items are labelled with numbers or letters.</UL>
+<P>As lists are so common, they are supported by a special syntax:</P>
+<PRE>
+   special_tag text
+</PRE>
+<P>where <EM>special_tag</EM> is a sequence of 1 to 6 special characters. Spaces or tabs between the tag and text are ignored.</P>
+<HR>
+<H2><A NAME="Unordered Lists">3.3.2. Unordered Lists</A></H2>
+<P>To define an unordered list, use the '*' character. For example:</P>
+<PRE>
+* peach
+* banana
+* mango.
+</PRE>
+<P>The result is:</P>
+<UL>
+<LI>peach
+<LI>banana
+<LI>mango.</UL>
+<HR>
+<H2><A NAME="Plain Lists">3.3.3. Plain Lists</A></H2>
+<P>To define a plain list, use the '.' character. For example:</P>
+<PRE>
+. peach
+. banana
+. mango.
+</PRE>
+<P>The result is:</P>
+<UL>
+peach
+<BR>
+banana
+<BR>
+mango.</UL>
+<HR>
+<H2><A NAME="Ordered Lists">3.3.4. Ordered Lists</A></H2>
+<P>To define an ordered list, use the '^' character for the first item and the '+' character for remaining items. For example:</P>
+<PRE>
+^ peach
++ banana
++ mango.
+</PRE>
+<P>The result is:</P>
+<OL>
+<LI>peach
+<LI>banana
+<LI>mango.</OL>
+<HR>
+<H2><A NAME="List Paragraphs">3.3.5. List Paragraphs</A></H2>
+<P>To nest a normal paragraph inside a list, use the '.' tag. For example:</P>
+<PRE>
+* peach
+. This is one of my favorites.
+</PRE>
+<P>The result is:</P>
+<UL>
+<LI>peach
+<BR>
+This is one of my favorites.</UL>
+<HR>
+<H2><A NAME="Nested Lists">3.3.6. Nested Lists</A></H2>
+<P>Lists can be nested up to 6 levels. The nesting level is taken from the number of special characters in the tag. For example:</P>
+<PRE>
+** a bulleted list at level 2
+^^^ an ordered list at level 3
+</PRE>
+<P>To nest normal paragraphs inside these lists, use plain list items. For example:</P>
+<PRE>
+** a bulleted list at level 2
+.. A normal paragraph at level 2.
+</PRE>
+<HR>
+<H2><A NAME="The \'-\' Special Tag">3.3.7. The '-' Special Tag</A></H2>
+<P>As a convenience, the '-' character can be used to specify a bulleted list at level 2. For example:</P>
+<PRE>
+* inputs:
+  - programmers
+  - pizza
+* outputs:
+  - software
+  - empty pizza boxes.
+</PRE>
+<P>The result is:</P>
+<UL>
+<LI>inputs:<UL>
+<LI>programmers
+<LI>pizza</UL>
+<LI>outputs:<UL>
+<LI>software
+<LI>empty pizza boxes.</UL></UL>
+<P>Likewise, the tags '--' to '-----' are equivalent to the tags '***' to '******'.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_parag.html">Parent Topic</A> | <A HREF="in_examp.html">Previous Topic</A> | <A HREF="in_notes.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

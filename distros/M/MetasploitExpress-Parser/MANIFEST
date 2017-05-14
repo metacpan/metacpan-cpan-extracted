@@ -1,0 +1,24 @@
+Makefile.PL
+README
+AUTHORS
+MANIFEST
+BUGS
+TODO
+fix_xml.pl
+lib/MetasploitExpress/Parser.pm
+lib/MetasploitExpress/Parser.pod
+lib/MetasploitExpress/Parser/Host.pm
+lib/MetasploitExpress/Parser/Session.pm
+lib/MetasploitExpress/Parser/ScanDetails.pm
+lib/MetasploitExpress/Parser/Task.pm
+lib/MetasploitExpress/Parser/Event.pm
+lib/MetasploitExpress/Parser/Report.pm
+lib/MetasploitExpress/Parser/Service.pm
+t/00-load.t
+t/test1.xml
+t/01-pod.t
+t/02-modules.t
+t/parser.t
+t/Test.pm
+t/Test/Parser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -101,10 +101,10 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::Deep::JSON" => 0,
     "Test::Fatal" => 0,
-    "Test::More" => 0,
+    "Test::More" => "0.96",
     "if" => 0
   },
-  "VERSION" => "0.43",
+  "VERSION" => "0.44",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -135,7 +135,7 @@ my %FallbackPrereqs = (
   "Test::Deep" => 0,
   "Test::Deep::JSON" => 0,
   "Test::Fatal" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.96",
   "Try::Tiny" => 0,
   "if" => 0,
   "strict" => 0,

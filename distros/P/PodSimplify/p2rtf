@@ -1,0 +1,7 @@
+#!/usr/bin/perl -I.
+
+use Pod::Simplify;
+use Pod::RTF;
+
+$x = new Pod::Simplify;
+$x->parse_from_file_by_name($ARGV[0] || "newfunc.pod",\&Pod::RTF::Format);

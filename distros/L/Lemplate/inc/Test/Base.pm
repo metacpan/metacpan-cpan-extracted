@@ -1,3 +1,4 @@
+#line 1
 package Test::Base;
 our $VERSION = '0.88';
 

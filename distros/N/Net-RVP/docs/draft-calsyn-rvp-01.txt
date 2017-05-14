@@ -1,0 +1,1758 @@
+
+          INTERNET-DRAFT                                      Martin Calsyn
+          Expires: Sept 1998                                 Lisa Dusseault
+                                                      Microsoft Corporation
+                                                                Gordon Mohr
+                                                                  Activerse
+
+                        RVP: A Presence Notification Protocol
+                               draft-calsyn-rvp-01.txt
+
+       1.   Status of this Memo
+
+          This document is an Internet-Draft.  Internet-Drafts are working
+          documents of the Internet Engineering Task Force (IETF), its
+          areas, and its working groups.  Note that other groups may also
+          distribute working documents as Internet-Drafts.
+
+          Internet-Drafts are draft documents valid for a maximum of six
+          months and may be updated, replaced, or obsoleted by other
+          documents at any time.  It is inappropriate to use Internet-
+          Drafts as reference material or to cite them other than as "work
+          in progress."
+
+          To view the entire list of current Internet-Drafts, please check
+          the "1id-abstracts.txt" listing contained in the Internet-Drafts
+          Shadow Directories on ftp.is.co.za (Africa), ftp.nordu.net
+          (Europe), munnari.oz.au (Pacific Rim), ds.internic.net (US East
+          Coast), or ftp.isi.edu (US West Coast).
+
+       2.   Abstract
+
+          A  new  kind of application is emerging on the Internet, driven
+          by the desire of individuals to know instantly whether another
+          individual is online,  to be notified when another individual
+          arrives online, and to send messages in ‘real time’.  These are
+          all special cases of the more general problem of Internet-wide
+          notification.
+
+          This protocol for facilitating rendezvous between users, known
+          herein as RVP, is designed  to enable such notifications and
+          messages across a loosely coupled (federated) constellation of
+          servers.  RVP is designed to address the need for notification in
+          a secure, reliable and scaleable fashion.  RVP encompasses the
+          client-server and server-server interactions.
+
+          The authors recognize that there is significant overlap with
+          between RVP and HTTP, though there are also significant
+          differences.  We expect RVP to evolve and either converge or
+          diverge with HTTP and/or other existing protocols.  The protocol
+          described in this document represents a very viable starting
+          point for a discussion of a standardized solution to the problem.
+
+          Comments on this draft are solicited and should be sent to the
+          authors or the RVP discussion list.  To join the RVP discussion
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 1]
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+          list, send email with the body "subscribe" to rvp-
+          request@iastate.edu.
+
+       3.   Contents
+
+          1. Status of this Memo.........................................1
+          2. Abstract....................................................1
+          3. Contents....................................................2
+          4. Introduction................................................4
+             4.1.  Problem to be solved..................................4
+             4.2.  Terminology...........................................4
+             4.3.  Definitions...........................................4
+             4.4.  Protocol Properties...................................5
+                4.4.1. General format....................................5
+                4.4.2. Minimal State.....................................5
+                4.4.3. Transport-Protocol Neutral........................6
+                4.4.4. Text-based........................................6
+          5. Overview of RVP Functionality...............................6
+                5.1.1. Naming and Location of RVP Objects................6
+                5.1.2. RVP Object Schemas................................7
+                5.1.3. RVP Clients.......................................7
+                5.1.4. Home Servers......................................8
+                5.1.5. Proxies...........................................8
+                5.1.6. Server-Server Interactions........................8
+                5.1.7. Subscriptions.....................................9
+                5.1.8. Multiple client issues...........................10
+          6. Security...................................................10
+             6.1.  Authentication.......................................10
+             6.2.  Content Protection...................................10
+             6.3.  Server-to-Server Security............................11
+             6.4.  Privacy Issues.......................................11
+          7. RVP Methods................................................11
+             7.1.  GET method (from HTTP)...............................11
+             7.2.  PUT method (from HTTP)...............................12
+             7.3.  MKCOL (from DAV).....................................12
+             7.4.  RMCOL (from DAV).....................................12
+             7.5.  ACL (from DAV).......................................12
+             7.6.  SUBSCRIBE (introduced here)..........................12
+                Reply-To header.........................................12
+                7.6.2. Notification-type header.........................12
+                7.6.3. Using XML to specify properties..................12
+             7.7.  UNSUBSCRIBE..........................................13
+             7.8.  NOTIFY...............................................13
+          8. Responses..................................................14
+             8.1.  GET response.........................................14
+             8.2.  SUBSCRIBE response...................................14
+                8.2.1. Privacy-level....................................14
+             8.3.  Refer................................................15
+          9. Transport Considerations for Datagrams and Connections.....15
+             9.1.  Choice of Transport..................................15
+                9.1.1. Matching Responses To Requests...................16
+             9.2.  UDP Retry Policy.....................................16
+             9.3.  Mixed-Transport Through Proxies......................17
+          10. Protocol Details..........................................17
+             10.1. Identity URLs, Location URLs, and default port.......17
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 2]
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+             10.2. Headers..............................................18
+                10.2.1.Accept-charset...................................18
+                10.2.2.Accept-encoding..................................18
+                10.2.3.Accept-Language..................................18
+                10.2.4.Allow............................................19
+                10.2.5.Authorization....................................19
+                10.2.6.Reply-To.........................................19
+                10.2.7.Content-Encoding.................................19
+                10.2.8.Content-Language.................................19
+                10.2.9.Content-Length...................................19
+                10.2.10.Content-Type....................................19
+                10.2.11.Date............................................19
+                10.2.12.From............................................19
+                10.2.13.Host............................................19
+                10.2.14.If-Modified-Since...............................20
+                10.2.15.If-Unmodified-Since.............................20
+                10.2.16.Last-Modified...................................20
+                10.2.17.Request-ID......................................20
+                10.2.18.Server..........................................20
+                10.2.19.Session-ID......................................20
+                10.2.20.Subscription-ID.................................20
+                10.2.21.Via.............................................20
+                10.2.22.XML-body........................................20
+             10.3. Responses............................................21
+             10.4. Proxying and Referral................................21
+             10.5. Peer to peer Messaging...............................22
+                10.5.1.Getting direct responses to requests.............23
+                10.5.2.Responding directly to notifications.............23
+                10.5.3.Receiving instant messages directly..............23
+                10.5.4.Receiving Requests Directly......................23
+             10.6. Proxy and Referral Conflicts.........................24
+          11. Examples..................................................24
+             11.1. Subscribing directly to status changes...............24
+             11.2. Subscribing through a proxy to a group:..............26
+             11.3. Setting ACLs on the status property..................27
+             11.4. Sending an instant message...........................27
+             11.5. Inviting a user to a session defined by SIP..........28
+          12. REFERENCES................................................28
+          13. Authors' Addresses........................................29
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 3]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+       4.   Introduction
+
+       4.1. Problem to be solved
+
+          With the rise of real-time interaction systems, including text,
+          audio and video over computer networks, there is a need for a
+          user to be able to determine if his or her peers are online.
+          Along with this need for status information, users wish to
+          exchange brief, perishable, and perhaps time-critical messages.
+
+          Users also want to exchange messages with groups of users with
+          common interests.  For instance, a given user might want to send
+          a message to all users currently logged in who have indicated
+          interest in a gaming session.  Like individual users, the online
+          status of a group can be published.
+          A similar need exists for reliable, secure notifications and
+          messages between people and automated processes, for business and
+          systems management purposes.
+          Existing protocols, such as SIP for session initiation, LDAP for
+          user information and SMTP for messaging, overlap somewhat with
+          the problem domain defined here.  However, these protocols lack
+          key features such as scalability, latency, data replication, and
+          integration.  This has led to many independent, centralized,
+          monolithic and incompatible vendor solutions.  The popularity of
+          these non-interoperable solutions is an indication of the need to
+          address the problem.
+
+          This draft is an attempt to address the problem space in a
+          generalized fashion that allows different server and client
+          implementations to interact within a secure internet-wide
+          infrastructure.
+
+          The PIP Requirements draft [3] discusses in more detail the
+          nature of this problem and requirements for solutions.
+       4.2. Terminology
+          In this document, the key words "MUST", "MUST NOT", "REQUIRED",
+          "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",
+          "MAY" and "OPTIONAL" are to be interpreted as described in RFC
+          2119 [1] and indicate requirement levels for compliant RVP
+          implementations.
+
+       4.3. Definitions
+
+          This specification uses a number of terms to refer to the roles
+          played by participants in RVP communications and the kinds of
+          messages passed between them.
+
+          Client: A software process or portion of a process which connects
+          to RVP server(s) but hosts no RVP objects. Client and server
+          functionality may exist within a single process.
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 4]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          Content: MIME-encapsulated data transmitted in the body of an RVP
+          transaction
+          Node:  A named vertex in an RVP tree, which can map to an object.
+
+          Property: A named attribute of an RVP object.
+
+          Request: A query for information initiated by a server or client
+          and targeted at a server.  Requests result in one or more
+          responses.
+
+          Response: The returned result of a request.  A server may return
+          one or more responses in answer to a request.
+
+          Server: A software process which can host RVP objects and can
+          accept connections from other entities sending messages to or
+          requesting data from those objects.  Alternatively, a pure proxy
+          server does not host RVP objects but can still accept connections
+          on behalf of another process which does host RVP objects.
+
+          Subscription: A subscription is a request that will result in
+          multiple responses, one for each change in the subscribed
+          property or one for each message sent to the subscribed object.
+
+          User: A single human; a person who might operate one or more
+          instances of the client software; a human represented by a RVP
+          ‘user’ object.
+
+       4.4. Protocol Properties
+
+          RVP is designed to be a useful notification protocol for various
+          purposes, but its primary purpose is notifying users of property
+          changes on other user objects.  This draft covers both generic
+          notification mechanisms and specific people presence issues.
+          Most of the generic notification mechanisms are discussed in this
+          draft.  Most of the specific people-presence issues are covered
+          in the user and group schemas of the schema draft [2].
+
+       4.4.1.    General format
+
+          The RVP protocol generally fits the HTTP [5] model.  Where we
+          have used HTTP protocol elements, we defer to the HTTP definition
+          of those elements.  RVP-specific information is general
+          transferred in new commands or by specifying the RVP namespace in
+          XML-formatted data within the XML body of an HTTP protocol
+          element.  Use of XML in this way might allow a RVP server to
+          coexist with an HTTP server.  XML is used in order to provide
+          flexibility and extensibility.
+
+          Parsing of messages should follow HTTP recommendations.  Port 80
+          may be used.
+
+       4.4.2.    Minimal State
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 5]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+          An effort has been made to minimize the amount of state that a
+          running server must maintain.  A server is required to maintain a
+          list of the subscriptions it currently holds while running.
+          Subscriptions for a given client may be discarded if the
+          connection to that client is broken, or if the publishing server
+          receives a message that the subscriber is offline, but the
+          publishing server should inform the subscriber that their
+          subscription was dropped.  For most objects, clients are required
+          to re-subscribe whenever reconnecting.
+
+          Issue: should subscriptions be dropped if the server goes down?
+
+       4.4.3.    Transport-Protocol Neutral
+
+          RVP is able to utilize both UDP and TCP as transport protocols.
+          Servers MUST implement both UDP and TCP transport. Clients MUST
+          support TCP and MAY support UDP interactions.
+
+          Abbreviated headers should be defined to facilitate UDP
+          interactions between servers for cases where the transaction will
+          fit wholly within the MTU.  Transactions between servers that do
+          not fit within the MTU are sent via TCP link.
+
+       4.4.4.    Text-based
+          RVP is text-based.  This allows easy implementation in languages
+          such as Tcl and Perl, allows easy debugging, and most
+          importantly, makes RVP flexible and extensible.
+
+       5.   Overview of RVP Functionality
+
+       5.1.1.    Naming and Location of RVP Objects
+
+          Every RVP object has an authoritative address, which is a URL.
+          This URL serves not only as a unique name, but also a pointer to
+          the location where the object usually resides.  For more
+          information on RVP URLs and finding addresses and servers, see
+          [4].
+
+          A single RVP server can host a hierarchy of nodes that correspond
+          to objects.  Each object must have certain properties, and each
+          node may have child nodes. A client or peer server can attempt
+          to:
+
+           - Get or put properties on objects
+           - Add or remove subscriptions on objects
+           - Create new child nodes
+           - Send notifications/messages to an object
+
+          All of the above operations are gated by access control entries
+          on each object.
+
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 6]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          A node has a persistent location in this hierarchy, on this
+          server, throughout its life.  If a set of content moves away from
+          a node and users should still be able to find that content, then
+          the server should link, refer or proxy to the new node.
+
+       5.1.2.    RVP Object Schemas
+
+          In order that clients can query known properties of objects, a
+          required minimal schema is defined for each object.  Individual
+          implementations and individual instances of servers can extend
+          this schema, but must implement the minimal schema.  The minimal
+          schema, along with schemas for user and group objects, are
+          defined separately in [2].
+
+       5.1.3.    RVP Clients
+
+          An RVP client is any endpoint process that uses the RVP protocol
+          on behalf of a user.  A client can also act as its server by
+          hosting rvp objects.  Clients that do not host objects can only
+          converse with servers.  Clients that do host objects can converse
+          with other clients as well as servers.  Note that Client-to-
+          client interaction may enhance performance, but it results in a
+          reduction in security by directly exposing client IP addresses.
+          In client-to-client interaction, both clients act as their own
+          servers.
+
+          In the remainder of this document, client requirements are for
+          the process or portion of a process that interfaces with the
+          user.  Server requirements are for the process or portion of a
+          process that hosts objects, subscribes directly to publishing
+          servers, or otherwise needs to be contacted directly.  Nothing
+          precludes a single process from acting as both client and server.
+          The referral and proxy mechanisms discussed later in this
+          document allow users who have their content hosted on a server
+          while offline to switch to hosting their own content while
+          online.
+
+          We require that a client be able to receive messages such as
+          instant messages and notifications.  This can be done in three
+          ways:
+          - The client maintains an open TCP connection to their proxy
+          server. All queries, subscriptions and notifications from outside
+          are sent to the proxy server, which sends messages to the client
+          as appropriate. The user's canonical RVP address as listed for
+          instant messages and the Reply-To address for subscriptions must
+          be on their proxy server which is also their home server, OR the
+          home server with the canonical address can refer to the proxy.
+          The user's RVP address as listed for queries and subscriptions
+          must be on their home server.
+
+           - The client listens an open port, accepting connections ONLY
+          from their home server.  All queries, subscriptions and
+          notifications from outside are sent to the server, and the server
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 7]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          opens up a connection to the client and sends whichever messages
+          are appropriate.  RVP address restrictions are as above.
+           - The client listens on an open port, accepting connections from
+          any source.  The client may now act as its own server.  Messages
+          that are sent to the home server may be redirected to the client.
+          The user can then be addressed at either their home server or at
+          their local client & server machine.  Any client that does this
+          must follow all RVP requirements for a server.
+
+          A client process representing a user must, as part of its
+          initialization, PUT values for properties to that user’s object
+          (wherever it is hosted).  These properties indicate the user’s
+          status and availability for various types of interactions.  The
+          same client process must update the properties as they change.
+
+          A client process representing an automated process could get and
+          put properties, subscribe to content, or send content out as part
+          of it’s operation.  Examples include a fortune-cookie server, a
+          system for announcing server status, or a stock transaction
+          system.
+
+       5.1.4.    Home Servers
+
+          A user's home server is the server that most consistently hosts
+          their data, particularly while the user is offline.  This is also
+          the server pointed to by the user's canonical RVP address.  The
+          home server may also act as a proxy.
+
+       5.1.5.    Proxies
+
+          Sending requests to a proxy can reduce network traffic.  The
+          proxy can maintain only one subscription for public data, which
+          means that if many of that proxy's users subscribe to the same
+          data, the number of messages is greatly reduced.
+
+          For controlled data, the proxy must send one subscription request
+          for every RVP object that wishes to subscribe, so that the
+          publishing server may check ACLs.  However, the number of
+          messages is still low: the publishing server need only send one
+          response to the proxy, which fans responses out to the individual
+          subscribers.
+
+          A proxy server may also be the home server for a user.  If the
+          proxy server is different from the home server, and the client
+          does not accept incoming connections from any source, then the
+          client must either maintain a connection to the proxy or listen
+          on a port accepting messages from the proxy.
+
+       5.1.6.    Server-Server Interactions
+
+          An RVP server can be any process that hosts RVP objects, proxies
+          RVP messages, or receives RVP messages directly from any sender.
+
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 8]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          Servers interact with other servers using the same protocol as
+          client-to-server interactions.
+
+          Upon receiving a message, a server may respond by processing that
+          message locally, updating its local persistent or dynamic data,
+          proxying the message, or responding with an error.
+
+          Because this represents a certain amount of dynamic state in the
+          server, the client must refresh subscriptions whenever restoring
+          a connection to a server and the server may throw away
+          subscriptions when a client disconnects.  Some connectionless
+          interactions with servers need to be refreshed periodically.
+
+          Client-server connections may be via UDP or TCP/IP and server-
+          server connections may be via UDP or TCP.  TCP and UDP
+          interactions and client-server/server-server interactions are
+          defined below in such a way to minimize dynamic server state
+          while preserving network bandwidth and giving the clients a
+          predictable level of reliability.
+
+       5.1.7.    Subscriptions
+
+          Subscriptions are usually registered ultimately at the server
+          that publishes information.  The exception is the case where a
+          proxy that receives a new subscription request already has a
+          subscription to that data AND the data is public.  Since the
+          proxy will already be getting notifications on that data, the
+          proxy can fan out notifications to individual end-points.  Since
+          the first subscription always goes to the publishing server, and
+          the response indicates whether the data is public or controlled,
+          the proxy knows how to handle additional subscriptions.
+
+          A subscription request always includes:
+           - The source of the subscription (for access control)
+           - The call-back address
+           - Desired timeout value for subscription
+          The response to a subscription always includes:
+           - Whether the events being subscribed to are public or
+          controlled
+           - What the subscription-ID is (so it can be referred to if it
+          needs to be cancelled)
+           - What timeout was assigned to the subscription
+          - Whether the subscription must be cancelled if the subscriber
+          goes offline
+
+          If a client subscribes to a proxy server which in turn subscribes
+          to a publishing server, then the client's RVP address is listed
+          as the source, but the proxy's address is listed as the call-back
+          address.  The subscription response (OK, failure) is proxied back
+          to the originator.
+
+
+
+          Calsyn, Dusseault & Mohr                                   [Page 9]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+
+          The subscription originator stores the timeout value (a date/time                    formatted with RFC 1123 as specified in schema draft), so that
+          the originator can refresh the subscription before it times out.
+          When the originator wishes to cancel the subscription, it can do
+          so by specifying the subscription-ID.  The same mechanism is used
+          when the client goes offline, for any subscriptions listed as
+          such.
+          Issues:  Can one person subscribe another person?  How should we
+          handle Reply-Tos that are different from the subscription
+          requester?
+
+       5.1.8.    Multiple client issues
+
+          The issues for multiple clients connected at the same time
+          haven't been worked out yet.  Which ones should receive instant
+          messages?  If one client is "idle" and one client is "busy" what
+          is the user marked as?
+
+          Is there any way for another user to query the status of a
+          particular client?  E.g. to see if the desktop is idle while the
+          laptop is active & vice-versa?  Also, idea of addressing IM's to
+          a particular online client?
+
+          If multiple clients are connected, and the home server refers to
+          one client, that client is primary.  Other clients must send
+          their status to the primary client.
+
+       6.   Security
+
+       6.1. Authentication
+
+          Users may log in to their home RVP server, but this is not
+          required.  Each request MAY contain user credentials, using HTTP
+          syntax, in order to authenticate the user to the server which
+          will actually process the request.
+
+          Upon receiving a request for the return or modification of
+          information, the server processing the request MUST validate the
+          authentication and honor any access control list entries which
+          might gate the completion of the request.
+          Return codes in HTTP style should be provided for indicating
+          insufficient access rights.
+
+       6.2. Content Protection
+          In addition to authentication contained in the headers and
+          intended for server authorization, the content (contained in the
+          entity) MAY be signed and or sealed according to prevailing MIME
+          encoding, signing and encryption standards.
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 10]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+
+          This content signing/sealing is the mechanism for ensuring
+          against message-stream modification, replay and/or repudiation.
+
+       6.3. Server-to-Server Security
+
+          Servers may exchange server credentials along with user
+          credentials. Servers which are acting on a request will use
+          embedded credentials to authenticate and authorize the requesting
+          user or process.  Server implementations MAY choose to support
+          SSL or other authentication mechanism, but this is generally
+          redundant and highly consumptive of CPU resources.
+
+          Private messages should be secured from endpoint to endpoint.
+
+       6.4. Privacy Issues
+
+          Each RVP server MUST support and honor ACLs placed on objects and
+          properties in order to preserve the privacy of users.  These ACLs
+          MUST allow the user to determine who may subscribe to, get
+          properties from, put properties to, make/delete nodes within, and
+          send messages to their user object and its child nodes.  The ACLs
+          MUST support access-granting and access-denying entries as
+          described in [6] and SHOULD also support the ask-first qualifier.
+          Ask-first is essentially a deny access control entry which alerts
+          the user to the access attempt and allows the user to grant
+          access to people who have been denied access by that entry.
+
+          RVP servers MUST NOT reveal the network address of a connected
+          user to any other server or client, except through a LINK
+          property set by the user.
+
+       7.   RVP Methods
+
+          RVP messages use the generic message format of RFC822. Messages
+          consist of a start-line, one or more header fields, an empty line
+          (CRLF), and an optional message-body.  The start-line contains the
+          method name, a URL, and protocol version information.
+          Generic message:
+   
+           [method] [URL] RVP/1.0
+            *message-header
+            CRLF
+            [message-body]
+
+       7.1. GET method (from HTTP)
+
+          The GET method conforms to HTTP 1.1.  Supported headers include
+          request-ID, Date, Expires, From Via, content-length, content-
+          type, authorization, organization, proxy-authorization, user-
+          agent.
+
+
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 11]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          In RVP, the GET method is used primarily to query properties such
+          as the directory entry of a user object, or the number of members
+          of a group object.  The property itself is listed in the XML-body
+          of the message.  Where the property is unique to RVP, RVP is
+          indicated as the namespace.
+
+          Responses to the GET method are as defined by HTTP.
+
+       7.2. PUT method (from HTTP)
+
+          The put method is used as in HTTP/1.1.  It is used in RVP
+          primarily to set property values that must be saved by the
+          server.  Once again, properties and values are identified via XML
+          syntax.  Responses to the PUT method are as defined by HTTP.
+
+       7.3. MKCOL (from DAV)
+
+          This method results in the creation of a new child node.  The
+          method is defined in [7].  Responses to MKCOL as used in RVP
+          should follow the DAV recommendations.
+
+       7.4. RMCOL (from DAV)
+
+          This method results in the removal of a node and all nodes and
+          properties within and below it.  Also defined in [7]. Responses
+          to RMCOL as used in RVP should follow the DAV recommendations.
+
+       7.5. ACL (from DAV)
+
+          See DAV ACL draft [6]
+
+       7.6. SUBSCRIBE (introduced here)
+
+          The Subscribe method is new and will be fully defined in this
+          document. This is a new semantic method in the space of methods
+          defined for HTTP and its derivatives.  Care has been taken to make
+          this method flexible enough to meet the needs of other applications,
+          which may require subscription and notification methods.
+ 
+          Responses to the SUBSCRIBE method are defined later in this
+          document.
+
+       7.6.1.    Reply-To header
+
+       7.6.2.    Notification-type header
+
+          The notification-type header is used to specify what the user
+          wants to subscribe to.  Events could include DEL, CREATE, MOVE,
+          ANY, or could be defined in a very granular way with "XML".  A
+          value of "XML" in the notification-type header indicates that the
+          notification-type is defined in the XML-body of the message.
+       7.6.3.    Using XML to specify properties
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 12]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          The body of the Subscribe message is text/XML, stating what
+          properties the subscriber wishes to subscribe to.  Using XML
+          makes subscriptions very flexible: users can subscribe to a
+          particular value of a property, or to a property being refreshed
+          as well as changed.  A subset of the full capabilities of XML
+          will be used by RVP implementations designed to do presence
+          information for people.  This subset is not yet fully defined and
+          the authors are aware that they need to work on it.
+          XML uses namespaces to avoid confusion in property names.  For
+          RVP-specific properties, the namespace is 'rvp:'.  Other possible
+          namespaces could be `dav:' or `http://www.iana.org/vcard/' or a
+          custom namespace like `http://host.org/namespaces/engineering'.
+
+          In the XML-body of subscriptions, the RVP-specific field "event-
+          type" is defined. The content of the event-type field could be
+          any of the following examples:
+            Value="offline"
+            Value=[any value of any property]
+            Query
+            Subscribe
+            Change
+            Update
+            Refresh
+            ...
+ 
+          The event-type is used along with the property field to indicate
+          what kind of event the subscriber is interested in.  For example,
+          if the property is "status" and the event-type is "change", this
+          is the way to monitor the online status of a user.  The
+          "value=..." is used when the subscriber wishes to be notified of
+          a specific value of a property.
+
+          A server implementation MUST support the "change" event-type.
+          The properties that must be supported are defined in the RVP
+          Schema specification [2].  There will be other event-types
+          defined which the implementation MAY support.
+
+          The examples below show the most common contents of an XML-body
+          (i.e. for subscribing to a user's status) and should also provide
+          an idea how new kinds of notifications could be defined.
+
+       7.7. UNSUBSCRIBE
+
+          This new method is used to cancel a subscription before it times
+          out.  The Subscription-ID (provided by the publishing server) is
+          used, along with the RVP address of the node being subscribed to,
+          to specify uniquely which subscription should be cancelled.
+
+          It is up to the server implementation to decide who can cancel
+          subscriptions.
+
+       7.8. NOTIFY
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 13]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+          The NOTIFY method is introduced for two reasons: it is how
+          subscriptions are responded to and how instant messages are sent.
+
+          It has been suggested that a notification protocol use POST to
+          send notifications and instant messages, because these types of
+          messages fit into the initial definition of POST.  However,
+          others argue that overloading an existing method causes problems
+          such as difficulties implementing firewall policies.  The issue
+          has not been closed yet.
+          The NOTIFY method also requires a Reply-To header.  It can use
+          XML to specify what are recommended to be taken upon reception of
+          the notification.
+
+       8.   Responses
+
+       8.1. GET response
+
+          200 OK
+
+          The GET response as used in RVP typically provides the value of
+          the property that was queried.  Format is like HTTP 1.1.
+
+          The value of the property queried is included in the body of the
+          response.  The format of the property is indicated by MIME type
+          in the content-type header.
+
+       8.2. SUBSCRIBE response
+
+          Responses to SUBSCRIBE methods must include a response code
+          (typically an error or OK/SUBSCRIBED).
+
+          A successful response to a SUBSCRIBE method must include privacy-
+          level and Subscription-ID headers.
+
+       8.2.1.    Privacy-level
+
+          The privacy-level of a subscription indicates whether this
+          subscription may be shared.
+
+          A privacy level of PUBLIC means that anybody can subscribe to the
+          same data, and will receive the same responses.  This can be used
+          by proxies to reduce the amount of messages: if a proxy receives
+          a second identical subscription to public data, the proxy need
+          not subscribe a second time, but can simply forward the incoming
+          data to all users subscribed to it.  The proxy is responsible for
+          maintaining a subscription list in this case.
+          A privacy level of CONTROLLED means that access to this
+          subscription is controlled, but all subscribers will receive the
+          same information.  A publishing server can use this to cut down
+          on the number of notifications sent for the data.  When a proxy
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 14]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          receives two identical subscriptions, the proxy must forward both
+          subscriptions so that the publishing server can return an error
+          if either of those subscriptions is not allowed.  The publishing
+          server now maintains the full list of subscribers, even if some
+          of those subscribers use the same proxy.  When sending out
+          notifications for that subscription, the publishing server can
+          send only one notification to each unique Reply-To address.  The
+          XML body of the notification must include a fan-out list with the
+          list of all subscribers known to the publishing server that had
+          that Reply-To address.  The proxy server need not maintain that
+          same subscription list, but if it does it should reconcile the
+          information with the received fan-out list.
+          PRIVATE information is access-controlled and may not be identical
+          for each subscriber, so no fan-out or single-instancing of
+          subscriptions may be done.
+
+       8.3. Refer
+
+          Could use HTTP response "302 Moved Temporarily" for refer
+
+       9.   Transport Considerations for Datagrams and Connections
+
+          RVP message transport differs from HTTP/1.1 in two prominent
+          ways:
+
+           - Like HTTP/1.1, TCP connections are assumed to be persistent,
+          and multiple requests on such connections may be pipelined --
+          sent before responses to earlier requests have been received.
+          However, RVP persistent TCP connections may carry requests and
+          responses in either direction, and the responses may be delivered
+          out-of-order relative to the requests that prompted them.
+
+           - RVP offers the option of using connectionless, unreliable UDP
+          as a transport.
+
+          Except as otherwise noted, the policies and error-recovery
+          behavior of RVP applications must comply with section 8 of the
+          HTTP/1.1 specification. [5]
+
+       9.1. Choice of Transport
+
+          An RVP client or server may choose to use either TCP or UDP when
+          sending a request to a remote server. A likely basis for making
+          the choice would be the size of the request (or expected
+          response) and the maximal transmission unit (MTU) between source
+          and destination: TCP's reliability becomes more useful with each
+          multiple of the MTU required to send a message.
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 15]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          Responses must use the same transport as the request which
+          generated them. (Loosening this requirement deserves further
+          investigation, as in the case where a small request, efficient to
+          send over UDP, generates a large response, best sent by TCP.
+          However, since this requires that the requestor accept inbound
+          TCP, and additionally must be ready for a response to be the
+          first message on an inbound connection, additional transport-
+          negotiation constructs may be necessary to enable this scenario.)
+
+          A mechanism (TBD) may be provided for a servers to specify that a
+          particular resource is only available through one or the other
+          transport.
+
+       9.1.1.    Matching Responses To Requests
+
+          RVP's UDP and persistent TCP pipelining allow the possibility
+          that responses to outstanding requests will arrive out-of-order.                              Additionally, UDP responses are not associated with a request via
+          a persistent connection, and if a request is retried while a
+          response is in transit, a requestor may receive duplicate
+          responses.
+
+          Thus, requests MAY include a "Request-ID" header, which, if
+          present, MUST be echoed in the response to a request.
+
+       9.2. UDP Retry Policy
+
+          When using UDP transport, responses serve as the confirmation
+          that the matching request was received. The lack of a timely
+          response indicates either that the request should be resent or
+          considered undeliverable, in accordance with the retry and
+          timeout policies the requestor has adopted.
+
+          RVP applications are free to choose their own policies for
+          resending unacknowledged requests, within the following
+          parameters:
+
+           - A single request should be resent no more than 10 times.
+           - A single request should be resent no more than once per
+          second.
+           - A single request should not be resent more than 90 seconds
+          after the initial send.
+           - If multiple retries fail to generate a received response
+          within the desired amount of time, an application should wait at
+          least 30 seconds before performing any operation which
+          effectively restarts the retry-cycle on a similar transaction
+          with the same remote host.
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 16]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+
+          For example, an acceptable retry policy within these parameters
+          would be: resend a request every 3 seconds, up to 5 times, until
+          a response is received; give up if no response is received within
+          30 seconds after the initial send, and refrain from sending a
+          similar request to the same destination until 60 seconds after
+          the initial send.
+
+          Beyond these guidelines, applications are free to choose their
+          own retry repetition, frequency, and timeout policies. By
+          separate, explicit agreement (through mechanisms unspecified),
+          communicating RVP programs may adopt retry policies outside these
+          parameters.
+
+          If responses are lost or delayed in transit, the responder may
+          receive duplicates of an already-handled request. Subsequent
+          requests from the same host and port, bearing the same "Request-
+          ID", MUST be handled in a way that renders them idempotent (as
+          defined in Section 9.1.2 of HTTP/1.1 [5]) within a reasonably
+          long time window. (The above retry parameters suggest 3-5 minutes
+          is a reasonably long window for recognizing duplicates.)
+
+          (Open issue: Does DNS provide a better model for UDP retries?)
+
+       9.3. Mixed-Transport Through Proxies
+
+          An RVP client may intially send a request via reliable TCP to its
+          proxy, which may then use unreliable UDP to forward that request
+          to its final destination. In all such cases, it is the
+          responsibility of the RVP application which chose UDP transport
+          to implement a retry and timeout policy. If a timely response is
+          not received, the proxy machine must return a 504 ("Gateway
+          Timeout") error-response to the request originator owed a
+          reliable response.
+
+       10.  Protocol Details
+
+       10.1.     Identity URLs, Location URLs, and default port
+
+          RVP identities and locations are both described as URL addresses,
+          as specified in RFC1738. The scheme of a RVP URL is "rvp", and
+          the syntax follows the "Common Internet Scheme Syntax" described
+          in Section 3.1 of RFC1738. Further information about RVP URLs is
+          available in [4].
+
+          It is always clear from context whether an RVP URL address is
+          being used as an identity or a location. An identity URL may also
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 17]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          be interpreted as the "canonical location" to interact with an
+          object.
+
+          For example, identity URLs are used in the "From" header, and as
+          the principals in ACLs. Location URLs are used in the "Reply-To"
+          header, and as the destination URLs of "LINK" properties (see
+          section 9.X). Location URLs are not typically visible or useful
+          for end-users.
+
+          If not explicitly specified, the default port value in an RVP URL
+          is XXXX. (TBD)
+
+       10.2.     Headers
+
+          Header fields follow the same generic header format as that given
+          in Section 3.1 of RFC 822 [5].  Each header field consists of a
+          name followed by a colon (":") and the field value. Field names
+          are case insensitive. The field value may be preceded by any
+          amount of leading white space (LWS), though a single space (SP)
+          is preferred. Header fields can be extended over multiple lines
+          by preceding each extra line with at least one SP or horizontal
+          tab (HT). Applications SHOULD follow HTTP "common form" when
+          generating these constructs, since there might exist some
+          implementations that fail to accept anything beyond the common
+          forms.
+
+          The order in which header fields are received is not significant
+          if the header fields have different field names. Multiple header
+          fields with the same field-name may be present in a message if
+          and only if the entire field-value for that header field is
+          defined as a comma-separated list (i.e., #(values)). It MUST be
+          possible to combine the multiple header fields into one "field-
+          name: field-value" pair, without changing the semantics of the
+          message, by appending each subsequent field-value to the first,
+          each separated by a comma. The order in which header fields with
+          the same field-name are received is therefore significant to the
+          interpretation of the combined field value, and thus a proxy MUST
+          NOT change the order of these field values when a message is
+          forwarded.
+
+          Field names are not case sensitive, although their values may be.
+
+
+       10.2.1.   Accept-charset
+
+
+          As in HTTP/1.1, support for the ISO-8859-1 character set can be
+          assumed.
+
+       10.2.2.   Accept-encoding
+
+          As in HTTP/1.1
+
+       10.2.3.   Accept-Language
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 18]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+          As in HTTP/1.1
+
+       10.2.4.   Allow
+
+          As in http/1.1: used in 405 (Method Not Allowed) response to
+          indicate which methods are allowed by a resource.  In RVP, the
+          resource will be either a RVP object or a property.
+
+       10.2.5.   Authorization
+
+          See section 14.8 of the HTTP/1.1 specification [5]
+
+       10.2.6.   Reply-To
+
+          Used with Subscribe, GET, notifications, etc. to specify where to
+          send a response.
+
+       10.2.7.   Content-Encoding
+
+          See section 14.12 of the HTTP/1.1 specification [5].
+
+       10.2.8.   Content-Language
+
+          See section 14.13 of the HTTP/1.1 specification [5].
+
+       10.2.9.   Content-Length
+
+          See section 14.14 of the HTTP/1.1 specification [5].
+
+       10.2.10.  Content-Type
+
+          See section 14.18 of the HTTP/1.1 specification [5].
+
+       10.2.11.  Date
+
+          See section 14.19 of the HTTP/1.1 specification [5].
+
+       10.2.12.  From
+
+          The RVP object that the message is from.  Can be different from
+          Reply-To.
+
+          Requests MUST contain this header.  Responses SHOULD contain this
+          header.  The 'From' header contains the RVP URL for the object
+          that represents the user or process that initiated the request.
+
+          See section 14.22 of the HTTP/1.1 specification [5].
+
+       10.2.13.  Host
+
+          See section 14.23 of the HTTP/1.1 specification [5]: The Host
+          request-header field specifies the Internet host and port number
+
+          Calsyn, Dusseault & Mohr                                  [Page 19]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          of the resource being requested, as obtained from the original
+          URL given by the user or referring resource.
+
+       10.2.14.  If-Modified-Since
+
+          See section 14.24 of the HTTP/1.1 specification [5].  Used as a
+          conditional in a GET request.
+
+       10.2.15.  If-Unmodified-Since
+
+          See section 14.28 of the HTTP/1.1 specification [5].  Used as a
+          conditional in a GET request.
+
+       10.2.16.  Last-Modified
+
+          See section 14.29 of the HTTP/1.1 specification [5].  Used in a
+          response to a GET request or the first response to a SUBSCRIBE.
+
+       10.2.17.  Request-ID
+
+
+          A token to uniquely identify a request to the requestor, opaque
+          to the destination of a request. When generating a response to a
+          request that has a "Request-ID" header, the "Request-ID" header
+          must be including verbatim in the response
+
+       10.2.18.  Server
+
+          See section 14.39 of the HTTP/1.1 specification [5].  Optionally
+          used to specify server software version.
+
+       10.2.19.  Session-ID
+
+          Sent with a NOTIFY message when there is no subscription-ID; used
+          to maintain context in replies to that notification.
+
+       10.2.20.  Subscription-ID
+
+          Sent with a successful response to a subscription message.  Used
+          in future notifications which result from that subscription, or
+          to cancel subscription.
+
+       10.2.21.  Via
+
+          As in HTTP/1.1, used when a message is proxied.
+
+       10.2.22.  XML-body
+
+          Used to specify ACL levels with the ACL method, and sometimes to
+          specify notification-type.  Not fully defined yet.  In
+          particular, the authors need to define what subset of all
+          possible XML semantics must be supported by an implementation.
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 20]
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          It must be possible for a simple implementation to refuse complex
+          XML bodies not defined as required in this draft.
+
+       10.3.     Responses
+
+          HTTP/1.1 responses are expanded to include these new codes or
+          enhanced meaning:
+          RVP/1.0 207 SUBSCRIBE
+          RVP/1.0 ??? REFER  (or we could use 302 "Moved Temporarily")
+
+          Existing HTTP/1.1 responses used in RVP:
+
+          HTTP/1.1 400 Bad Request  (bad syntax)
+          HTTP/1.1 401 Unauthorized (Need to get authenticated first)
+          HTTP/1.1 402 Forbidden (ACLs forbid user to do that)
+          HTTP/1.1 404 Not Found (object or property not found)
+          HTTP/1.1 501 Not Implemented (method not understood by server)
+          HTTP/1.1 503 Service Unavailable (i.e. too busy)
+
+       10.4.     Proxying and Referral
+
+          The default behavior for a RVP object on a server is for that
+          server to respond to queries and subscriptions and receive
+          instant messages for that object.  However, there are exceptional
+          circumstances.  Both servers and clients can optionally support
+          these features.
+
+          Each RVP object may have a property named "LINK".  The value of
+          the LINK property is [link-method], [RVP-URL].  When the property
+          is set using the PUT method, there may be a timeout property
+          included with standard timeout syntax (never, date/time, logout).
+          If the expiration is reached before the property value is
+          refreshed, the server should reset the LINK property to NULL.
+
+          The link-method can be PROXY, REFER, REFER-NOTIFICATIONS or LINK.
+          The RVP-URL must be a full URL, including DNS address and path.
+
+          Proxying a node means that rather than respond for the object,
+          the server will forward requests to the address listed in the
+          RVP-URL, and will also proxy replies. If the server is ever
+          unable to proxy because the host has become unavailable, it
+          should immediately timeout the LINK property and go back to
+          handling queries itself.   Proxies are intended to be used with
+          firewalls: a RVP proxy can sit on a firewall and route messages.
+
+          Referring an object means that the server will respond to any
+          request, subscription or instant message with a referral to the
+          address listed in the RVP-URL, requiring the originating client
+          of the request, subscription or message to repeat it to the
+          referred address.  It may be desirable for the server to PING the
+          referral address periodically to ensure that the referral is
+          still valid: if the host is no longer available the value of LINK
+          might go back to null.
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 21]
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          "REFER-NOTIFICATIONS" indicates that:
+           - Unsolicited messages to the user should go to the referral
+          address
+           - Requests should continue to come to the object's home
+           - Notifications in response to a subscription should continue to
+          be sent to the Reply-To specified in the subscription.  The
+          Reply-To address should always be tried first.
+
+          A LINK value of LINK typically indicates a link to the "real"
+          home of the content requested: this allows content to be linked
+          to from more than one node.  One node is the real home for the
+          object and all duplicate nodes link to the real home.
+          When an entity decides to start hosting an object by setting the
+          LINK field on that object's home node, it may wish to download
+          all the object data including the subscription list from the
+          server that was previously responsible for it. Ideally the GET
+          command which asks for all the node’s data would be bundled with
+          the PUT command which switches responsibility using the LINK
+          property.  If this is not possible, then the GET command should
+          be done before the PUT LINK property command, because once the
+          LINK property is in place the server will not respond directly to
+          requests for that node and its contents are effectively hidden.
+          The only request the server will respond directly to is a request
+          to reset the LINK property.
+
+          If the server does support the LINK property, then for any
+          message to that server, the server must check each node and sub-
+          node in the hierarchy starting from the root until it reaches the
+          target node, checking each node for a LINK entry.  If a LINK
+          entry is encountered at any point, the server needs to follow the
+          functionality defined by the link-method.
+          If the server does not support the LINK property at all, it
+          should respond to a PUT LINK command with an error that means
+          "property not supported".  If the server does not allow the
+          sender to modify the LINK property, it should respond with an
+          error that means "access denied".  If the server supports the
+          LINK property but not the PROXY functionality, then if it
+          receives a command to set the link_method of the LINK property to
+          PROXY, it should respond with an error that means "syntax not
+          supported".  Same thing if the REFER or LINK functionality is not
+          supported.
+
+       10.5.     Peer to peer Messaging
+
+          Peer to peer communication can be desirable to lighten the load
+          on servers.  This can be done in several ways.
+
+          Calsyn, Dusseault & Mohr                                  [Page 22]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+       10.5.1.   Getting direct responses to requests
+
+          When the client initiates communication by sending a message (a
+          query, subscription or instant message), the client can send the
+          message directly to the publishing server rather than to a proxy
+          server.  The sender header should include the full RVP Reply-To
+          URL (e.g rvp://lisadu.host2.com/lisadu) as well as the full RVP
+          identity of the user (e.g. rvp://rvp.host2.com/users/lisadu).
+          When the response comes, it comes directly back to the client. In
+          sending messages directly to the publishing server, the client
+          reveals its DNS address and is therefore more open to attack, but
+          the risk is limited by the fact that the IP address only goes to
+          targets chosen by the user.  If the initial message goes outside
+          a firewall, that firewall must be able to pass incoming RVP
+          messages (responses) to the RVP Reply-To URL.
+
+       10.5.2.   Responding directly to notifications
+
+          When the client receives a notification from a trusted source
+          through the client's local proxy and wishes to continue the
+          conversation, the client can choose to respond directly to that
+          source rather than through the local proxy.  Once again the
+          Reply-To header points to the client machine and the From header
+          points to the user's RVP object location.
+
+       10.5.3.   Receiving instant messages directly
+
+          If the client is willing to accept instant messages (unsolicited
+          notifications) directly, it should set the LINK property for its
+          RVP object on the server to REFER-NOTIFICATIONS plus its full
+          client-side RVP URL.  The timeout for this property should be set
+          to a reasonable value in case the client goes offline
+          unexpectedly.  When the server receives unsolicited notifications
+          (notifications which are not in response to a subscription) it
+          can respond with a referral message including the REFER-
+          NOTIFICATIONS and the client-side RVP URL.
+          If the client is willing to accept unsolicited notifications and
+          its server does not support the LINK property, then when the
+          server proxies instant messages the client can respond with a
+          success message and include the REFER-NOTIFICATIONS field,
+          timeout, and URL itself.  The proxy will forward this back to the
+          original sender, who can now start using the client URL until the
+          timeout listed.
+          Queries and subscriptions should still be sent to the Reply-To
+          address used in the original request message.
+
+       10.5.4.   Receiving Requests Directly
+
+          If a client wishes to handle queries and subscriptions to its
+          user object data as well, it must ask the server to refer all
+          messages, using the LINK property as outlined in the section on
+          "Proxying, Referring and Linking nodes".
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 23]
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+       10.6.     Proxy and Referral Conflicts
+
+          Note that the referral functionality allows clients to assume
+          responsibility for their own user’s nodes, which means that the
+          client becomes its own server.  In the case where a user switches
+          between clients (presumably on different hardware), this could
+          lead to conflict.  If client A sets the LINK property to proxy to
+          A, then client B tries to sets the LINK property to proxy to B,
+          what should happen?
+
+           - If B does not have sufficient access, server responds with an
+          error meaning "access denied".
+
+           - Or, if the server does not allow a client to take over node
+          which is already referred or proxied, the server can reply with
+          an error meaning "locked" or something like that
+
+           - Or, if the link_method of the LINK property is set to REFER,
+          the server responds with a referral to client A.
+
+           - Or, if the link_method of the LINK property is set to PROXY,
+          the server proxies the PUT command to client A.
+
+          When client A receives the PUT command for the LINK property,
+          either through proxy or directly, it realizes that another client
+          is trying to take control of the node.  The options for client A
+          are now:
+
+           - Reply with an error "access denied" which is either proxied or
+          sent directly to client B
+
+           - Reply with a success message which is either proxied or sent
+          directly to client B, after setting everything right on the
+          server by refreshing all data on the node, including setting the
+          LINK property to the new value given by client B.
+
+       11.  Examples
+
+       11.1.     Subscribing directly to status changes
+
+          This example shows a client acting as its own server in
+          subscribing directly to a user's RVP status.  In this case the
+          client MUST accept incoming connections because the publishing
+          server needs to send notifications back to the client.
+
+          Client to publishing server:
+
+            SUBSCRIBE rvp://host.com/joeuser rvp/1.0
+              Notification-type: XML
+              Reply-To: rvp://host2.com/lisadu
+              From: rvp://host2.com/lisadu
+              Content-type: text/XML
+              Content-length: xyz
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 24]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+              [CRLF]
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="rvp">
+                <property><rvp:status/></property>
+                <rvp:event-type>change</rvp:event-type>
+                <rvp:timeout> 06 Nov 1998 08:49:37 GMT </rvp:timeout>
+                <rvp:subscriber-id> rvp://host2.com/lisadu
+                  </rvp:subscriber-id>
+
+          Publishing server to client (success):
+
+            RVP/1.0 200 SUBSCRIBE
+              Subscription-ID: 84
+              Content-type: text/xml
+              From: rvp://host.com/joeuser
+              [CRLF]
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="rvp">
+                <property><rvp:status>online</rvp:status></property>
+                <rvp:event-type>change</rvp:event-type>
+                <rvp:timeout> 06 Nov 1998 08:49:37 GMT </rvp:timeout>
+                <privacy-level>controlled</privacy-level>
+
+          Notice in this example that the publishing server set a lower
+          timeout for the subscription than was requested by the
+          subscriber.
+
+          Notification sent as a result of this subscription:
+
+            NOTIFY rvp://host.com/joeuser
+              Subscription-ID: 84
+              Reply-To: rvp://host.com/joeuser
+              From: rvp://host.com/joeuser
+              Notification-type: XML
+              Content-type: text/XML
+              Content-length: xyz
+              [CRLF]
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="r">
+                <Property><rvp:status>online</rvp:status></property>
+                <rvp:event-type>change</rvp:event-type>
+          Refresh method for this subscription:
+
+            Not yet defined.
+
+          Unsubscribe method for this subscription:
+
+            UNSUBSCRIBE rvp://host.com/joeuser rvp/1.0
+              Call-id: 84
+
+       11.2.     Subscribing through a proxy to a group:
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 25]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          Message from client to proxy:
+
+            SUBSCRIBE rvp://host.com/groups/rvpdisc
+              Notification-type: XML
+              Reply-To: rvp://client.host2.com/lisadu
+              From: rvp://rvp.host2.com/lisadu
+              XML-body:
+                <?namespace name="rvp:" as="rvp">
+                <rvp:event-type>message</rvp:event-type>
+                <rvp:subscriber-id> rvp://rvp.host2.com/lisadu
+                  </rvp:subscriber-id>
+
+          Note that the Reply-To address is a URL to the user's client
+          machine, whereas the subscriber-id is a pointer to a user's RVP
+          object.  Sometimes these are the same, but in this case the
+          object is hosted on a RVP server, whereas the user receives
+          messages at their client.  Also note that no timeout is defined,
+          because the user wants to use the max or default timeout for that
+          subscription list.
+
+          Message from proxy to publishing server:
+
+            SUBSCRIBE rvp://host.com/groups/rvpdisc
+              Notification-type: XML
+              Reply-To: rvp://proxy.host2.com/lisadu
+              From: rvp://rvp.host2.com/lisadu
+              Via: RVP/1.0 rvp://proxy.host2.com/lisadu
+              Content-type: text/XML
+              Content-length: xyz
+              [CRLF]
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="rvp">
+                <rvp:event-type>message</rvp:event-type>
+                <rvp:subscriber-id>rvp://rvp.host2.com/lisadu
+                  </rvp:subscriber-id>
+
+          Successful response from publishing server to proxy:
+
+            RVP/1.0 200 SUBSCRIBE
+              Subscription-ID: 1238
+              Content-type: text/xml
+              Content-length: xyz
+              From: rvp://host.com
+              [CRLF]
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="rvp">
+                <rvp:event-type>message</rvp:event-type>
+                <rvp:timeout> 06 Nov 1998 08:49:37 GMT </rvp:timeout>
+                <privacy-level>controlled</privacy-level>
+
+          Response forwarded from proxy to client:
+
+            RVP/1.0 200 SUBSCRIBE
+              Subscription-ID: 1238
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 26]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+              Content-type: text/xml
+              Body:
+                [same body]
+
+          Notification from publishing server (list server) to proxy:
+
+            NOTIFY rvp://host.com/groups/rvpdisc RVP/1.0
+              Subscription-ID: 1238
+              Reply-To: rvp://fred.host3.com/fred
+              From: rvp://host3.com/users/fred
+              Notification-type: XML
+              XML-body:
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="r">
+                <r:event-type>Message</r:event-type>
+                <r:priority>high</r:priority>
+                <r:action>display</r:action>
+                <r:fanout>rvp://rvp.host2.com/lisadu</r:fanout>
+              Content-type: text/plain
+              [CRLF]
+              Hey everybody, I've got something important to say.
+
+          The same message is forwarded from the proxy to the subscriber,
+          minus the fan-out list.  The fan-out only shows one user, because
+          only one user on this proxy is currently subscribed to the list.
+
+          The original sender of the message is the user 'fred' on another
+          system.  His client machine address is listed as the Reply-To
+          because responses to messages to this list are intended to go to
+          the sender.  (On other lists, the Reply-To might be the list
+          itself, and the source would still be fred)
+
+       11.3.     Setting ACLs on the status property
+
+          Client to home server:
+
+            ACL rvp://host.com/joeuser RVP/1.0
+              Content-type: text/XML
+              [CRLF]
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="r">
+                <property><r:status></property>
+                <begin>
+                  grant subscribe rvp://host.com/lisadu
+                  deny subscribe rvp://host.com/baduser
+                </begin>
+
+       11.4.     Sending an instant message
+
+          Client to target's home server:
+
+            NOTIFY rvp://host.com/joeuser RVP/1.0
+              Reply-To: rvp://fred.host3.com/fred
+              From: rvp://host3.com/users/fred
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 27]
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+              Notification-type: XML
+              Session-ID: 4321
+              XML-body:
+                <?xml version="1.0"?>
+                <?namespace name="rvp:" as="r">
+                <r:event-type>Message</r:event-type>
+                <r:priority>high</r:priority>
+                <r:action>display</r:action>
+              Content-type: text/plain
+              Content-length: 7
+              [CRLF]
+              Hi Joe.
+
+          The action taken by the home server depends whether the home
+          server refers instant messages or proxies them. If the home
+          server proxies, it should send a notification to the client with
+          the Reply-To replaced by its own RVP address.  When it receives a
+          success message, and forward the success message back to
+          rvp://fred.host3.com/fred.
+
+          If the home server refers instant messages to Joe's proxy or to
+          Joe's machine, it replies back with a referral response:
+
+            RVP/1.0 ??? REFER
+              Session-ID: 4321
+              Referral-type: Notifications
+              Referral-address: rvp://proxy.host.com/joeuser RVP/1.0
+
+          The referral-type header indicates which kinds of messages should
+          go to the referred machine rather than to the home server.  The
+          only defined values so far are "notifications" and "all". In this
+          case, requests (queries & subscriptions) for information should
+          still go to the home server, but notifications (typically
+          intended for the user's eyes) should go to the referred address
+          IF THERE IS NO REPLY-TO SPECIFIED FOR THAT NOTIFICATION.
+
+          The session-ID can also be used for future messages in the
+          conversation between Joe and Fred, to provide context.
+
+       11.5.     Inviting a user to a session defined by SIP
+
+          Example is not done yet.  It will be a NOTIFY message with a
+          content-type of application/SIP and a body which is a SIP
+          message.
+
+       12.  REFERENCES
+
+          [1] S. Bradner, "Key words for use in RFCs to indicate
+          requirement levels," RFC 2119, Internet Engineering Task Force,
+          Mar. 1997.
+
+          [2] Dusseault L. and Bone J. "RVP Schemas", INTERNET-DRAFT <draft-
+          dusseault-rvp-schema-00.txt>, March 1998.
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 28]
+
+
+
+
+          INTERNET-DRAFT                RVP                   March 13, 1997
+
+
+          [3] Dusseault L., "Presence Information Protocol Requirements",
+          INTERNET-DRAFT <draft-dusseault-pipr-00.txt>, February 1998.
+
+          [4] Dusseault L. and Mohr G.  " Addressing and Location for RVP", 
+          INTERNET-DRAFT <draft-dusseault-rvp-addr-00.txt>, March 1998.
+
+          [5] Fielding R., Gettys J., Mogul J., Frystyk H. and Berners-Lee
+          T., "Hypertext Transfer Protocol -- HTTP/1.1", RFC 2068, January
+          1997.
+
+          [6] Leach P. J. and Goland Y. Y., "WebDAV ACL Protocol",
+          INTERNET-DRAFT <draft-ietf-webdav-acl-00.txt>, November 1997
+
+          [7] Goland Y. Y., Whitehead E. J., Faizi A., Carter S. R. and
+          Jensen D., "Extensions for Distributed Authoring on the World
+          Wide Web -- WEBDAV", INTERNET-DRAFT <draft-ietf-webdav-protocol-
+          07>, January 1998.
+
+       13.  Authors' Addresses
+
+
+          Martin Calsyn
+
+          Microsoft Corporation
+          One Microsoft Way
+          Redmond, WA 98052
+
+          EMail: martinca@microsoft.com
+          Fax: (425) 936-7329
+
+
+          Lisa Dusseault
+
+          Microsoft Corporation
+          One Microsoft Way
+          Redmond, WA 98052
+
+          EMail:  lisadu@microsoft.com
+          Fax: (425) 936-7329
+
+
+          Gordon Mohr
+
+          Activerse, Inc.
+          1301 W. 25th St
+          Suite 500
+          Austin, TX 78705
+
+          Email: gojomo@activerse.com
+
+
+
+
+
+
+
+
+          Calsyn, Dusseault & Mohr                                  [Page 29]

@@ -1,0 +1,110 @@
+*** If you wish to use the cgi admin tool included, you must have HTML::Template and URI::Escape. You can get them from CPAN.
+
+***** If you wish to use this module with database support (for persistant calendars), you MUST create the appropriate tables in your Postgres database (more databases to follow). ***** 
+
+-A perl script (setup_calendar.pl) has been included to help you with this task. 	-It will attempt to ask questions, then create a .sql script.  If you will be using a local database, it can also attempt to run the script for you.  The tables needed, as well as a initial empty calendar will be created.
+	-In addition, if you plan on using the cgi scripts included for calendar administration, you will probably want to take the environament variables output and add them to your webserver config.
+
+-Below is the database design, if you wish to add the tables manually.
+
+##############################################################################
+
+               List of relations
+          Name           |   Type   |  Owner   
+-------------------------+----------+----------
+ calendar                | table    | postgres
+ calendar_calendarid_seq | sequence | postgres
+ client                  | table    | postgres
+ client_clientid_seq     | sequence | postgres
+ event                   | table    | postgres
+ event_eventid_seq       | sequence | postgres
+(6 rows)
+
+
+                                             Table "calendar"
+      Attribute      |         Type          |                          Modifier                           
+---------------------+-----------------------+-------------------------------------------------------------
+ calendarid          | integer               | not null default nextval('"calendar_calendarid_seq"'::text)
+ clientid            | integer               | not null
+ name                | character varying(64) | not null
+ border              | integer               | 
+ width               | character varying(8)  | 
+ bgcolor             | character varying(12) | 
+ weekdaycolor        | character varying(12) | 
+ weekendcolor        | character varying(12) | 
+ todaycolor          | character varying(12) | 
+ weekdaybordercolor  | character varying(12) | 
+ weekendbordercolor  | character varying(12) | 
+ todaybordercolor    | character varying(12) | 
+ contentcolor        | character varying(12) | 
+ weekdaycontentcolor | character varying(12) | 
+ weekendcontentcolor | character varying(12) | 
+ todaycontentcolor   | character varying(12) | 
+ headercolor         | character varying(12) | 
+ weekdayheadercolor  | character varying(12) | 
+ weekendheadercolor  | character varying(12) | 
+ header              | character varying(64) | 
+ cellalignment       | character varying(12) | 
+ bordercolor         | character varying(12) | 
+Index: calendar_pkey
+
+                                        Table "client"
+ Attribute  |         Type          |                        Modifier                         
+------------+-----------------------+---------------------------------------------------------
+ clientid   | integer               | not null default nextval('"client_clientid_seq"'::text)
+ clientname | character varying(64) | not null
+Index: client_pkey
+
+                                        Table "event"
+ Attribute  |          Type          |                       Modifier                        
+------------+------------------------+-------------------------------------------------------
+ eventid    | integer                | not null default nextval('"event_eventid_seq"'::text)
+ eventtime  | time                   | 
+ calendarid | integer                | 
+ eventday   | integer                | not null
+ eventmonth | integer                | not null
+ eventyear  | integer                | not null
+ eventname  | character varying(128) | not null
+ eventdesc  | text                   | 
+ eventlink  | character varying(128) | 
+Index: event_pkey
+
+Sequence "calendar_calendarid_seq"
+   Attribute   |  Type   
+---------------+---------
+ sequence_name | name
+ last_value    | integer
+ increment_by  | integer
+ max_value     | integer
+ min_value     | integer
+ cache_value   | integer
+ log_cnt       | integer
+ is_cycled     | "char"
+ is_called     | "char"
+
+Sequence "client_clientid_seq"
+   Attribute   |  Type   
+---------------+---------
+ sequence_name | name
+ last_value    | integer
+ increment_by  | integer
+ max_value     | integer
+ min_value     | integer
+ cache_value   | integer
+ log_cnt       | integer
+ is_cycled     | "char"
+ is_called     | "char"
+
+Sequence "event_eventid_seq"
+   Attribute   |  Type   
+---------------+---------
+ sequence_name | name
+ last_value    | integer
+ increment_by  | integer
+ max_value     | integer
+ min_value     | integer
+ cache_value   | integer
+ log_cnt       | integer
+ is_cycled     | "char"
+ is_called     | "char"
+

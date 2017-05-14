@@ -1,0 +1,14 @@
+Revision history for DynGig-CLI
+
+0.04    2012-07-12
+        module not indexed caused by error in META.yml
+
+0.03    2012-07-12
+        error in manifest
+
+0.02    2012-07-02
+        add Schedule modules
+
+0.01    2012-06-29
+        First version. Various DynGig CLI modules moved here.
+

@@ -1,0 +1,101 @@
+#! /usr/local/bin/perl
+
+use strict;
+use FileHandle;
+
+
+use vars qw($module $script $debug $user $file1_rev1);
+require 'tests/common.pl';
+
+my $pathinfo = '/cvswebtests/file1';
+$ENV{'PATH_INFO'} = $path_info
+
+my $scriptdir = cwd();
+my $script='cvswebedit.pl';
+my $user='mrjc';
+my $debug =1;
+my $fh = new FileHandle "perl $script edit=start user=$user < /dev/null | ";
+
+die if !defined($fh);
+
+my @ans = <$fh>;
+close $fh;
+
+my $t3_not_created = grep /Path not recognised/, @ans;
+my $t3_already_exists = grep /$module/, @ans;
+
+print "# Checking to see whether $pathinfo already exists in CVS\n";
+if ($t3_not_created > 0) {
+    print "# it doesn't recreating it\n";
+
+    create_t3($module);
+
+    if ($debug) {
+	print @ans;
+    }
+    exit 1;
+} else {
+    print "#it does\n";
+}
+
+chdir $scriptdir || die $!;
+
+print "# trying again with file existing in CVS\n";
+
+$fh = new FileHandle "perl $script edit=start user=$user < /dev/null | ";
+
+die if !defined($fh);
+@ans = <$fh>;
+close $fh;
+
+my $t3_created = grep m!Edit $module/!, @ans;
+
+status(!$t3_not_created, "should have found file in CVS, didn't");
+
+print @ans;
+
+print "# checking whether user is given option to lock and download\n";
+my $unlocked_ok = grep /lock-and-download/, @ans;
+status($unlocked_ok, join("",@ans));
+
+
+
+sub create_t3 {
+
+# Create t3.
+    
+    use File::Path;
+    
+    my ($testmod) = @_;
+    my $testdir = '/tmp/'.$testmod;
+    
+    chdir $testdir || mkpath $testdir || die $!;
+    chdir $testdir;
+    
+    print "# importing into $testmod from $testdir\n";
+    my $import = `cvs import -m't3' $testmod mrjc initial`;
+    my $file = 'file1';
+    my $new = grep m/No conflicts/, $import;
+    my $old = grep m/conflicts created by this command/, $import;
+    
+    if (($old == 0) && ($new == 0)) {
+	status($new, $import);
+    }
+    
+    print "# checking out $testmod into $testdir\n";
+    my $checkout = `cvs checkout -d . $testmod`;
+    my $co_ok = grep m/Updating ./, $checkout;
+    status ($co_ok, $checkout);
+    
+    my $add_fh = new FileHandle $file, "w" || die $!;
+    print $add_fh $file1_rev1;
+    close $add_fh;
+    
+    print "# adding $file\n";
+    my $add = `cvs add -m"t3" $file`;
+# my $add_ok = grep m/
+    my $commit = `cvs commit -m"" $file`;
+    
+#my $commit_ok = grep //;
+    
+}

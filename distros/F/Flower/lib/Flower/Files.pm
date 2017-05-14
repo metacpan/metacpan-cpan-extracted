@@ -2,8 +2,6 @@ package Flower::Files;
 
 # a container holding the files for a node
 
-use 5.12.0;
-
 use strict;
 use warnings;
 
@@ -15,7 +13,7 @@ use Time::Duration qw/duration concise/;
 use Flower::File;
 
 use Carp qw/confess/;
-
+use feature qw(say);
 sub new {
 
   my $class = shift;

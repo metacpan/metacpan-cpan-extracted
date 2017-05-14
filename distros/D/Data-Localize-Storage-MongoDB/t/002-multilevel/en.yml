@@ -1,0 +1,7 @@
+en:
+    hello_world: 'Hello, World!'
+    greetings:
+        hello: 'Hello, {{name}}'
+        morning: 'Good morning, {{name}}'
+        afternoon: 'Good afternoon, {{name}}'
+        evening: 'Good evening, {{name}}'

@@ -1,0 +1,110 @@
+# NAME
+
+DBIx::Class::ResultSet::ModifyMethods - Wrap modifiers around your methods 
+
+# SYNOPSIS
+
+Given a [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx::Class::ResultSet) that consumes this component, such as the
+following:
+
+    package MySchema::ResultSet::Bar;
+
+    use strict;
+    use warnings;
+    use base 'DBIx::Class::ResultSet';
+
+    __PACKAGE__->load_components('ResultSet::ModifyMethods');
+
+    ## Additional custom resultset methods, if any
+
+    1;
+
+Then later when you have a resulset of that class:
+
+    my $rs = $schema->resultset('Bar');
+
+You can modify instance methods similarly to [Moose](https://metacpan.org/pod/Moose) method modifiers.
+
+    $rs->around( search => sub {
+      my ($orig, $rs, @args) = @_;
+      print "Search was called!";
+      return $rs->$orig(@args);
+    });
+
+The above would wrap the search method such that when someone called it on `$rs`
+you'd see "Search was called!"" in STDOUT
+
+# DESCRIPTION
+
+There may be times when you wish to hook a resultset before passing a resultset
+to another method.  Since the anonymous coderef can be a closure, this opens
+some possibilties for enabling observer style patterns.  You can also use this
+to modify `@args`, etc, just as in [Moose](https://metacpan.org/pod/Moose), or even change the return value.
+
+# METHODS
+
+This component defines the following methods.
+
+## around
+
+Arguments: $method||\\@methods, $coderef
+Returns: Wrapped ResultSet (A Proxy instance)
+
+Allows you to dynamically add a [Moose](https://metacpan.org/pod/Moose) style around method modifier for this
+single ResultSet only which wraps a method or arrayref of methods and grants
+you full control over how the wrapped method is called.  You can even use this
+to inspect and modify arguments.
+
+Example:
+
+    $rs->around( search => sub {
+      my ($orig, $rs, @args) = @_;
+      return $rs->$orig(@args);
+    });
+
+## before
+
+Arguments: $method||\\@methods, $coderef
+Returns: Wrapped ResultSet (A Proxy instance)
+
+Allows you to run some code before a method or arrayref of methods on your
+ResultSet instance before it actually runs.  You can't use this to modify
+incoming `args` to a method or control the method.  Use this to safely
+hook a method when you want to do something and not potentially effect the
+actually running of the wrapped method.
+
+    $rs->before( search => sub {
+      my ($rs, @args) = @_;
+      return $rs->$orig(@args);
+    });
+
+## after
+
+Arguments: $method||\\@methods, $coderef
+Returns: Wrapped ResultSet (A Proxy instance)
+
+Allows you to run some code before a method or arrayref of methods on your
+ResultSet instance after it actually runs.  You can't use this to modify
+incoming `args` to a method or control the method.  Use this to safely
+hook a method when you want to do something and not potentially effect the
+actually running of the wrapped method.
+
+    $rs->after( search => sub {
+      my ($rs, @args) = @_;
+      return $rs->$orig(@args);
+    });
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2017, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

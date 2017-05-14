@@ -1,0 +1,652 @@
+#! /bin/bash -e
+#
+#   setup_beancounter --- Example usage of the beancounter tool
+#  
+#   Copyright (C) 2000 - 2006  Dirk Eddelbuettel <edd@debian.org>
+#  
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#  
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#  
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+#   $Id: setup_beancounter,v 1.41 2006/03/22 04:15:28 edd Exp $
+
+#  If we really want to be independent of the underlying database, this 
+#  probably needs to written in Perl using DBI/DBD
+#
+#  This once started as being PostgreSQL specific ...
+#
+#  MySQL patches by Mathias Weidner <mathias@weidner.in-bad-schmiedeberg.de>
+#
+#  SQLite support was added some time in 2003.
+#
+#  As of 2005-04-13, two SQLite versions are supported: the new SQLite3 is the
+#  default, but with option -o $file, the previous version can be used.  This
+#  assumes a layout as on Debian systems, i.e.
+#
+#   				current v3	previous v2
+#      binary programs		sqlite3		sqlite
+#      Perl DBI Module		DBD::SQLite	DBD::SQLite2
+#
+#  i.e. a binary program 'sqlite3' is used to create a database for SQLite 3.*
+#  for which Perl code uses the DBD::SQLite module --- whereas 'sqlite' invokes
+#  the binary for the previous release SQLite 2.* for which Perl uses DBD::SQLite2
+#  If this differs on your system, you need to adjust the assignments of 
+#  DBCOMMAND below, and/or adjust BeanCounter.pm for the proper Perl module.
+
+# -------------------------- 'global' variables
+
+progname=$(basename $0)
+
+if [ "$USER" = "" ]
+then
+    USER=$(whoami)
+fi
+
+DATABASE='beancounter'
+VERSION='0.8.10'
+DBSYSTEM='PostgreSQL'
+#DBSYSTEM='MySQL'
+SCHEMA_ONLY=0
+
+DAYOFWEEK=$(date +"%u")
+if [ "$DAYOFWEEK" -gt 5 ] || [ "$DAYOFWEEK" -eq 1 ] 
+then
+    LASTBIZDAY="last friday"
+else
+    LASTBIZDAY="yesterday"
+fi
+
+# Dow Jones Industrial Average 
+# see for example http://www.amex.com/indexshares/index_shares_diamonds_list.stm
+DJIA="AA AXP T BA CAT C KO DIS DD EK XOM GE GM HPQ HD HON INTC IBM IP JNJ MCD MRK MSFT MMM JPM MO PG T UTX WMT"
+
+# S&P500 is at http://www.spglobal.com/ssindexmain500text.html
+# NASDAQ is at http://www.nasdaq.com/asp/nasdaq100_activity.stm
+# S&P/TSE60 is at http://www.spglobal.com/ssindexmaintsealpha.html
+# (NB that Canadian stocks need a .TO suffix, eg Air Canada becomes AC.TO)
+
+# --------------------------- shell functions below --------------------------
+function usage_and_exit
+{
+    cat<<EOF
+Created (and fill) database tables for beancounter
+Usage: $progname [-m] [-n databasename] [-h] 
+Options:
+    -m		Use MySQL instead of PostgreSQL
+    -n SOMENAME Create database as SOMENAME instead of beancounter
+    -l dbfile   Use SQLite3 (current version) as backend with file 'dbfile'
+    -o dbfile   Use SQLite (old v2) as backend with file 'dbfile'
+    -s		Schema only -- Do not fill the database
+    -h		Show this help
+EOF
+    exit 0
+}
+
+function execute
+{
+    echo -n "** Running:     "
+    echo "$1"
+    eval "$1"
+    echo
+}
+
+
+function create_mysql_tables
+{
+    echo | $DBCOMMAND $DATABASE <<EOF 
+
+    create table beancounter (
+	version			varchar(12) not null,
+   	data_last_updated	datetime
+    );
+    insert into beancounter values ('$VERSION', 'now');
+
+    CREATE TABLE fxprices (
+	currency varchar(12) NOT NULL default '',
+	date date default NULL,
+	previous_close float default NULL,
+	day_open float default NULL,
+	day_low float default NULL,
+	day_high float default NULL,
+	day_close float default NULL,
+	day_change float default NULL,
+	UNIQUE KEY fxprices_pkey(currency,date)
+    ) TYPE=MyISAM;
+
+    CREATE TABLE indices (
+	symbol varchar(12) NOT NULL default '',
+	stockindex varchar(12) NOT NULL default ''
+    ) TYPE=MyISAM;
+
+    CREATE TABLE portfolio (
+	symbol varchar(16) NOT NULL default '',
+	shares float default NULL,
+	currency varchar(12) default NULL,
+	type varchar(16) default NULL,
+	owner varchar(16) default NULL,
+	cost float default NULL,
+	date date default NULL,
+	UNIQUE KEY portfolio_pkey(symbol,owner,date)
+    ) TYPE=MyISAM;
+
+    CREATE TABLE stockinfo (
+	symbol varchar(12) NOT NULL default '',
+	name varchar(64) NOT NULL default '',
+	exchange varchar(16) NOT NULL default '',
+	capitalisation float default NULL,
+	low_52weeks float default NULL,
+	high_52weeks float default NULL,
+	earnings float default NULL,
+	dividend float default NULL,
+	p_e_ratio float default NULL,
+	avg_volume int(11) default NULL,
+	active bool default '1',
+	PRIMARY KEY (symbol)
+    ) TYPE=MyISAM;
+
+    CREATE TABLE stockprices (
+	symbol varchar(12) NOT NULL default '',
+	date date default NULL,
+	previous_close float default NULL,
+	day_open float default NULL,
+	day_low float default NULL,
+	day_high float default NULL,
+	day_close float default NULL,
+	day_change float default NULL,
+	bid float default NULL,
+	ask float default NULL,
+	volume numeric default NULL,
+	UNIQUE KEY stockprices_pkey(symbol,date)
+    ) TYPE=MyISAM;
+
+    create table cash (
+	name varchar(16) not null default '',
+	value float default null,
+	currency varchar(12) default null,
+	type varchar(12) default null,
+	owner varchar(16) default NULL,
+	cost float default NULL,
+	date date default NULL,
+	UNIQUE KEY cash_pkey(name,type,owner,date)
+    ) TYPE=MyISAM;
+    \q
+EOF
+}
+
+function create_postgres_tables
+{
+    echo | $DBCOMMAND $DATABASE <<EOF 
+
+	create table beancounter (
+	    version		varchar(12) not null,
+   	    data_last_updated	timestamp with time zone
+	);
+	insert into beancounter values('$VERSION', 'now');
+
+	create table stockinfo (
+	    symbol   		varchar(12) not null default '',
+	    name     		varchar(64) not null default '',
+	    exchange 		varchar(16) not null default '',
+	    capitalisation  	float4 default null,
+	    low_52weeks		float4 default null,
+	    high_52weeks	float4 default null,
+	    earnings		float4 default null,
+	    dividend		float4 default null,
+	    p_e_ratio		float4 default null,
+	    avg_volume		int4 default null,
+	    active		boolean default TRUE
+	);
+	create unique index stockinfo_pkey
+	    on stockinfo (symbol);
+
+	create table stockprices (
+	    symbol   		varchar(12) not null default '',
+	    date		date default null,
+	    previous_close	float4 default null,
+	    day_open		float4 default null,
+	    day_low		float4 default null,
+	    day_high		float4 default null,
+	    day_close		float4 default null,
+	    day_change		float4 default null,
+	    bid			float4 default null,
+	    ask			float4 default null,
+	    volume		numeric default null
+	);
+	create unique index stockprices_pkey
+	    on stockprices (symbol, date);
+
+	create table fxprices (
+	    currency   		varchar(12) not null default '',
+	    date		date default null,
+	    previous_close	float4 default null,
+	    day_open		float4 default null,
+	    day_low		float4 default null,
+	    day_high		float4 default null,
+	    day_close		float4 default null,
+	    day_change		float4 default null
+	);
+	create unique index fxprices_pkey
+	    on fxprices (currency, date);
+
+	create table portfolio (
+	    symbol   		varchar(16) not null default '',
+	    shares		float4 default null,
+	    currency		varchar(12) default null,
+	    type		varchar(16) default null,
+	    owner		varchar(16) default null,
+	    cost		float(4) default null,
+	    date		date default null
+	);
+	create unique index portfolio_pkey
+	    on portfolio (symbol, owner, date);
+
+	create table cash (
+	    name 		varchar(16) not null default '',
+	    value 		float default null,
+	    currency 		varchar(12) default null,
+	    type 		varchar(12) default null,
+	    owner 		varchar(16) default NULL,
+	    cost 		float default NULL,
+	    date 		date default NULL
+	);
+	create unique index cash_pkey 
+	    on cash (name,type,owner,date);
+
+	create table indices (
+	    symbol   		varchar(12) not null default '',
+	    stockindex		varchar(12) not null default ''
+	);
+	\q
+EOF
+}
+
+function create_sqlite_tables 
+{
+    echo | $DBCOMMAND $DATABASE <<EOF 
+
+	create table beancounter (
+	    version		varchar(12) not null,
+   	    data_last_updated	timestamp with time zone
+	);
+	insert into beancounter values('$VERSION', 'now');
+
+	create table stockinfo (
+	    symbol   		varchar(12) not null default '',
+	    name     		varchar(64) not null default '',
+	    exchange 		varchar(16) not null default '',
+	    capitalisation  	float4 default null,
+	    low_52weeks		float4 default null,
+	    high_52weeks	float4 default null,
+	    earnings		float4 default null,
+	    dividend		float4 default null,
+	    p_e_ratio		float4 default null,
+	    avg_volume		int4 default null,
+	    active		boolean default TRUE
+	);
+	create unique index stockinfo_pkey
+	    on stockinfo (symbol);
+
+	create table stockprices (
+	    symbol   		varchar(12) not null default '',
+	    date		date default null,
+	    previous_close	float4 default null,
+	    day_open		float4 default null,
+	    day_low		float4 default null,
+	    day_high		float4 default null,
+	    day_close		float4 default null,
+	    day_change		float4 default null,
+	    bid			float4 default null,
+	    ask			float4 default null,
+	    volume		numeric default null
+	);
+	create unique index stockprices_pkey
+	    on stockprices (symbol, date);
+
+	create table fxprices (
+	    currency   		varchar(12) not null default '',
+	    date		date default null,
+	    previous_close	float4 default null,
+	    day_open		float4 default null,
+	    day_low		float4 default null,
+	    day_high		float4 default null,
+	    day_close		float4 default null,
+	    day_change		float4 default null
+	);
+	create unique index fxprices_pkey
+	    on fxprices (currency, date);
+
+	create table portfolio (
+	    symbol   		varchar(16) not null default '',
+	    shares		float4 default null,
+	    currency		varchar(12) default null,
+	    type		varchar(16) default null,
+	    owner		varchar(16) default null,
+	    cost		float(4) default null,
+	    date		date default null
+	);
+	create unique index portfolio_pkey
+	    on portfolio (symbol, owner, date);
+
+	create table cash (
+	    name 		varchar(16) not null default '',
+	    value 		float default null,
+	    currency 		varchar(12) default null,
+	    type 		varchar(12) default null,
+	    owner 		varchar(16) default NULL,
+	    cost 		float default NULL,
+	    date 		date default NULL
+	);
+	create unique index cash_pkey 
+	    on cash (name,type,owner,date);
+
+	create table indices (
+	    symbol   		varchar(12) not null default '',
+	    stockindex		varchar(12) not null default ''
+	);
+EOF
+}
+
+function exit_if_exists
+{
+    set +e
+    if [ "$DBSYSTEM" = "MySQL" ]; then
+	result=`echo 'show databases'| $DBCOMMAND | grep $DATABASE`
+    elif [ "$DBSYSTEM" = "PostgreSQL" ]; then
+	result=`$DBCOMMAND template1 -l | grep $DATABASE`
+    elif [ "$DBSYSTEM" = "SQLite" ] || [ "$DBSYSTEM" = "SQLite3" ]; then
+	result=`test -f $DATABASE && ls -1 $DATABASE`
+    fi
+    set -e
+    if [ "$result" != "" ]
+    then
+	echo ""
+	echo "*** Error: Database exists ***"
+	echo ""
+	echo "The $DATABASE database already exists"
+	echo "This script is not needed to setup the database."
+	echo "You might still want to look at its source to write"
+	echo "your own script for populating the $DATABASE database."
+	echo ""
+	echo "If you want to delete the exiting database, use"
+	echo "    dropdb $DATABASE       	for PostgreSQL"
+	echo "    mysqladmin -f drop $DATABASE	for MySQL"
+	echo "    rm $DATABASE	                for SQLite, SQLite3"
+	echo ""
+	exit 1
+    fi
+}
+
+function exit_if_root
+{
+    if [ "$1" == "root" ]
+    then
+	echo ""
+	echo "*** Error: Root usage ***"
+	echo ""
+	echo "We do not recommend that you run this script as root"
+	echo "Please re-run it as a normal user to setup $DATABASE."
+	echo "If you insist, then please uncomment this test first."
+	echo ""
+	exit 1
+#    else
+#	echo "Good: We are not running as root"
+    fi
+}
+
+function exit_if_no_postgres_user
+{
+    set +e
+    ( $DBCOMMAND template1 -c "select * from pg_user;" | grep $1 ) \
+			    >/dev/null 2>&1 
+    if [ $? -eq 1 ]
+    then
+	echo ""
+	echo "*** Error: No postgresql user '$1'"
+	echo ""
+	echo "We were unable to start psql as the user '$1' does not exist"
+	echo "You need to create a Postgresql user '$1' first:"
+	echo ""
+	echo "    Change to user postgres:		$ su - postgres"
+	echo "    Create the user:       		# createuser $1 -d -A"
+	echo "    Exit from user postgres:		# exit"
+	echo ""
+	echo "and then run this script again."
+	echo ""
+	exit 1
+#    else
+#	echo "Good: Postgresql can be accessed by $1"
+    fi
+    set -e
+}
+
+function exit_if_no_mysql_user
+{
+    set +e
+    ( echo "select user from user;" | \
+	    $DBCOMMAND mysql | grep $1 ) >/dev/null 2>&1 
+    if [ $? -eq 1 ]
+    then
+	echo ""
+	echo "*** Error: No mysql user '$1'"
+	echo ""
+	echo "We were unable to start mysql as the user '$1' does not exist"
+	echo "You need to create a MySQL user '$1' first:"
+	echo ""
+	echo "    Change to super user (MySQL Admin):   $ su -"
+	echo "    Start mysql program with mysql db:    # mysql mysql"
+	echo "    Create the user:       grant all privileges on *.* to $USER@localhost;"
+	echo "    Exit from user mysql:                 > \q"
+	echo "    Exit from super user:                 # exit"
+	echo ""
+	echo "and then run this script again."
+	echo ""
+	echo "[ NB These instructions are currently approximative. Consult your manual. ]"
+	echo "[    And email me a better version :) ]"
+	exit 1
+#    else
+#	echo "Good: MySQL can be accessed by $1"
+    fi
+    set -e
+}
+  
+
+
+# ------------------------ 'main' code -------------------------------------
+
+while getopts ":mn:l:o:sh" opt
+do
+    case $opt in
+	m)
+	    DBSYSTEM='MySQL'
+	    echo "Now using $DBSYSTEM"
+	    ;;
+	n)
+	    DATABASE=$OPTARG
+	    echo "Now using database name $DATABASE"
+	    ;;
+	l)
+	    DBSYSTEM='SQLite'
+	    DATABASE=$OPTARG
+	    DBCOMMAND="sqlite3"
+	    echo "Now using (current) SQLite3 on $DATABASE"
+	    ;;
+	o)
+	    DBSYSTEM='SQLite2'
+	    DATABASE=$OPTARG
+	    DBCOMMAND="sqlite"
+	    echo "Now using (old) SQLite on $DATABASE"
+	    ;;
+	s)
+	    SCHEMA_ONLY=1
+	    ;;
+	h)
+	    usage_and_exit
+	    ;;
+	?)
+	    echo "Ignoring unknown argument, try '$progname -h' for help."
+	    ;;
+    esac
+done	    
+
+BEANCOUNTER="beancounter --dbsystem $DBSYSTEM --dbname $DATABASE"
+
+if [ "$DBSYSTEM" = "PostgreSQL" ]; then		# if Postgres 
+    if [ -z "$PASSWORD" ]; then
+	DBCOMMAND="psql -q"
+    else
+	DBCOMMAND="psql -q -W $PASSWORD"
+    fi
+elif [ "$DBSYSTEM" = "MySQL" ]; then 		# if MySQL
+    # mysql(1) arguments -- you could add host, port, ... here
+    if [ -z "$PASSWORD" ]; then
+	DBCOMMAND="mysql"
+    else
+	DBCOMMAND="mysql -p$PASSWORD"
+    fi
+elif [ "$DBSYSTEM" = "SQLite" ]; then 		# if SQLite v3
+    true					# nothing to do
+elif [ "$DBSYSTEM" = "SQLite2" ]; then 		# if SQLite v2
+    true					# nothing to do
+else
+    echo ""
+    echo "*** Error: Unsupported database system ***"
+    echo ""
+    echo "The backend $DBSYSTEM is not supported. Patches welcome..."
+    echo ""
+    exit 1
+fi
+
+# test if we are running this as root
+exit_if_root $USER
+
+# test if database can be accessed by user
+if [ "$DBSYSTEM" = "PostgreSQL" ]; then
+    exit_if_no_postgres_user $USER
+elif [ "$DBSYSTEM" = "MySQL" ]; then
+    exit_if_no_mysql_user $USER
+fi
+
+# test if $DATABASE exists and exit if true
+exit_if_exists
+
+if [ "$DBSYSTEM" = "PostgreSQL" ] || [ "$DBSYSTEM" = "MySQL" ]; then
+    echo "Creating $DATABASE database"
+    if [ "$DBSYSTEM" = "PostgreSQL" ]; then
+        execute "createdb $DATABASE"
+    elif [ "$DBSYSTEM" = "MySQL" ]; then
+        echo "create database $DATABASE;" | $DBCOMMAND 
+    # NB deleting db under MySQL is:  mysqladmin drop beancounter_test -p$PASSWORD
+    # grant access to $DATABASE db
+    #GRANT="grant select,delete,insert,update on $DATABASE.* to $USER@localhost"
+    #echo $GRANT | $DBCOMMAND
+    fi
+    echo ""
+fi
+
+echo "Creating $DATABASE database tables"
+if [ "$DBSYSTEM" = "PostgreSQL" ]; then
+    create_postgres_tables 
+elif [ "$DBSYSTEM" = "MySQL" ]; then
+    create_mysql_tables 
+elif [ "$DBSYSTEM" = "SQLite2" ] || [ "$DBSYSTEM" = "SQLite" ]; then
+    create_sqlite_tables
+fi
+
+if [ "$SCHEMA_ONLY" -eq 1 ]; then
+    echo "Schema created, exiting"
+    exit 0
+fi
+
+if [ "$DBSYSTEM" = "PostgreSQL" ] || [ "$DBSYSTEM" = "MySQL" ]; then
+    # testing database access from Perl
+    echo "Verifying database access from Perl"
+    set +e
+    $BEANCOUNTER checkdbconnection
+    rc="$?"
+    if [ "$rc" != 1 ]
+    then
+       echo "Failure --- please check database permission, possible"
+       echo "requirement of a password and other sources of failure"
+       echo "to establish a connection."
+       exit 1
+    fi
+    set -e
+fi
+
+# insert the DJIA stocks into the indices table
+echo "Filling $DATABASE database tables with DJIA stocks"
+execute "$BEANCOUNTER addindex DJIA $DJIA"
+
+# create an example of tech stocks
+echo "Filling $DATABASE (sample) portfolio"
+#execute "$BEANCOUNTER addportfolio CSCO:50:USD NT.TO:100:CAD SIE.DE:10:EUR CGE.PA:50:EUR"
+execute "$BEANCOUNTER addportfolio IBM:50:USD XOM:75:USD C:100:USD GOOG:25:USD"
+
+echo -n "Filling $DATABASE with stock info and most recent prices "
+echo "for DJIA stocks"
+execute "$BEANCOUNTER addstock $DJIA ^GSPC"
+
+echo "Filling $DATABASE with historical prices for example portfolio stocks"
+#execute "$BEANCOUNTER backpopulate --prevdate '1 year ago' --date '$LASTBIZDAY' CSCO NT.TO SIE.DE CGE.PA"
+execute "$BEANCOUNTER backpopulate --prevdate '1 year ago' --date '$LASTBIZDAY' IBM XOM C GOOG ^GSPC"
+
+echo "Filling $DATABASE with historical fx prices for EUR and CAD"
+execute "$BEANCOUNTER fxbackpopulate --ubcfx --prevdate '1 year ago' --date '$LASTBIZDAY' EUR CAD"
+
+echo "Running portfolio pl report on (sample) portfolio"
+execute "$BEANCOUNTER plreport --date '$LASTBIZDAY'"
+
+# dayendreport needs a db entry previous price which we don't get from 
+# all backpop routines / data combinations
+#echo "Running portfolio dayendreport on (sample) portfolio"
+#execute "$BEANCOUNTER dayendreport --date '$LASTBIZDAY'"
+
+echo "Running portfolio riskreport on (sample) portfolio"
+execute "$BEANCOUNTER risk --date '$LASTBIZDAY'"
+
+echo "Done."
+exit 0
+
+
+=head1 NAME
+
+setup_beancounter - Create and initialise BeanCounter databases
+
+=head1 SYNOPSIS
+
+setup_beancounter [-m] [-n NAME] [-n] [-h] 
+
+=head1 DESCRIPTION
+
+B<setup_beancounter> creates and initialises the databases used by 
+B<beancounter>. It also runs some initial reports to illustrate some 
+of the features of B<beancounter>.
+
+=head1 OPTIONS
+
+ -m        Use MySQL as the backend over the default PostgreSQL
+ -l dbfile Use SQLite \(version 3 or later\) with database file 'dbfile'
+ -o dbfile Use SQLite2 \(compatibility mode\) with database file 'dbfile'
+ -n name   Use name as the database instead of beancounter
+ -s        Do not fill the database, only create its schema
+ -h        Show a simple help message
+
+=head1 SEE ALSO
+
+B<beancounter>(1), B<BeanCounter>(1), B<update_beancounter>(1)
+
+=head1 AUTHOR
+
+Dirk Eddelbuettel edd@debian.org
+
+=cut

@@ -7,11 +7,11 @@ use MooseX::StrictConstructor;
 use MooseX::MarkAsMethods ( autoclean => 1 );
 
 use Pinto::Util qw(throw);
-use Pinto::Types qw(TargetList);
+use Pinto::Types qw(SpecList);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ extends qw( Pinto::Action );
 #------------------------------------------------------------------------------
 
 has targets => (
-    isa      => TargetList,
+    isa      => SpecList,
     traits   => [qw(Array)],
     handles  => { targets => 'elements' },
     required => 1,
@@ -38,21 +38,27 @@ sub execute {
 
     my $stack = $self->stack;
 
-    for my $target ( $self->targets ) {
+    my @dists = map { $self->_pin( $_, $stack ) } $self->targets;
 
-        throw "$target is not registered on stack $stack"
-            unless my $dist = $stack->get_distribution( target => $target );
+    return @dists;
+}
 
-        $self->notice("Pinning distribution $dist to stack $stack");
+#------------------------------------------------------------------------------
 
-        my $did_pin = $dist->pin( stack => $stack );
-        push @{$self->affected}, $dist if $did_pin;
+sub _pin {
+    my ( $self, $target, $stack ) = @_;
 
-        $self->warning("Distribution $dist is already pinned to stack $stack")
-            unless $did_pin;
-    }
+    my $dist = $stack->get_distribution( spec => $target );
 
-    return $self;
+    throw "$target is not registered on stack $stack" if not defined $dist;
+
+    $self->notice("Pinning distribution $dist to stack $stack");
+
+    my $did_pin = $dist->pin( stack => $stack );
+
+    $self->warning("Distribution $dist is already pinned to stack $stack") unless $did_pin;
+
+    return $did_pin ? $dist : ();
 }
 
 #------------------------------------------------------------------------------
@@ -69,7 +75,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -77,7 +86,7 @@ Pinto::Action::Pin - Force a package to stay in a stack
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -85,7 +94,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,141 @@
+# zxid/sg/liberty-metadata-v2.0.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-metadata-v2.0.sg,v 1.5 2009-09-05 02:23:41 sampo Exp $
+#
+# N.B. Older Liberty metadata, liberty-metadata-1.0-errata-v2.0.xsd,
+# urn:liberty:metadata:2003-08, is nearly identical to this one except
+# for the actual namespace URI. We therfore adopt convention of using
+# this new metadata even where strictly speaking the old one should be used.
+
+target(m20, urn:liberty:metadata:2004-12)
+import(ds,  http://www.w3.org/2000/09/xmldsig#,   http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+
+import(xs,  http://www.w3.org/2001/XMLSchema, http://www.w3.org/2001/xml.xsd)
+#import(xs,  http://www.w3.org/XML/1998/namespace, http://www.w3.org/2001/xml.xsd)
+# include(liberty-idwsf-utility-v2.0.xsd)
+
+Extension        -> %m20:extensionType
+%extensionType:
+  any+  ns(##other)  processContents(lax)
+  ;
+
+%entityIDType:	 base(xs:anyURI) ;
+
+%additionalMetadataLocationType:	 base(xs:anyURI)
+  @namespace?	 -> %xs:anyURI
+  ;
+
+%organizationNameType:	 base(xs:string)
+  @lang -> %xs:string  #@xml:lang   ***
+  ;
+
+%organizationDisplayNameType:	 base(xs:string)
+  @lang -> %xs:string  #@xml:lang   ***
+  ;
+
+%organizationType:
+  m20:OrganizationName+         -> %m20:organizationNameType
+  m20:OrganizationDisplayName+  -> %m20:organizationDisplayNameType
+  m20:OrganizationURL+          -> %m20:localizedURIType
+  m20:Extension?
+  ;
+
+%localizedURIType:	 base(xs:anyURI)
+  @lang -> %xs:string  #@xml:lang   ***
+  ;
+
+%contactType:
+  m20:Company?         -> %xs:string
+  m20:GivenName?       -> %xs:string
+  m20:SurName?         -> %xs:string
+  m20:EmailAddress*    -> %xs:anyURI
+  m20:TelephoneNumber* -> %xs:string
+  m20:Extension?
+  @libertyPrincipalIdentifier?	 -> %m20:entityIDType
+  @contactType	 -> %m20:attrContactType
+  ;
+
+%attrContactType: enum( technical administrative billing other ) ;
+
+%keyTypes:        enum( encryption signing ) ;
+
+%providerDescriptorType:
+  m20:KeyDescriptor*
+  m20:SoapEndpoint?	 -> %xs:anyURI
+  m20:SingleLogoutServiceURL?                           -> %xs:anyURI
+  m20:SingleLogoutServiceReturnURL?                     -> %xs:anyURI
+  m20:FederationTerminationServiceURL?                  -> %xs:anyURI
+  m20:FederationTerminationServiceReturnURL?            -> %xs:anyURI
+  m20:FederationTerminationNotificationProtocolProfile* -> %xs:anyURI
+  m20:SingleLogoutProtocolProfile*                      -> %xs:anyURI
+  m20:RegisterNameIdentifierProtocolProfile*            -> %xs:anyURI
+  m20:RegisterNameIdentifierServiceURL?                 -> %xs:anyURI
+  m20:RegisterNameIdentifierServiceReturnURL?           -> %xs:anyURI
+  m20:NameIdentifierMappingProtocolProfile*             -> %xs:anyURI
+  m20:NameIdentifierMappingEncryptionProfile*           -> %xs:anyURI
+  m20:Organization?                                     -> %m20:organizationType
+  m20:ContactPerson*                                    -> %m20:contactType
+  m20:AdditionalMetaLocation*	 -> %m20:additionalMetadataLocationType
+  m20:Extension?
+  ds:Signature?
+  @protocolSupportEnumeration -> %xs:string
+  @id?                        -> %xs:ID
+  @validUntil?                -> %xs:dateTime
+  @cacheDuration?             -> %xs:duration
+  ;
+
+KeyDescriptor	 -> %m20:keyDescriptorType
+%keyDescriptorType:
+  m20:EncryptionMethod?  -> %xs:anyURI
+  m20:KeySize?           -> %xs:integer
+  ds:KeyInfo?
+  m20:Extension?
+  @use?	 -> %keyTypes
+  ;
+
+EntitiesDescriptor -> %m20:entitiesDescriptorType
+%entitiesDescriptorType:
+  m20:EntityDescriptor{2,unbounded}
+  ;
+
+EntityDescriptor -> %m20:entityDescriptorType
+%entityDescriptorType:
+  m20:IDPDescriptor*          -> %m20:IDPDescriptorType
+  m20:SPDescriptor*           -> %m20:SPDescriptorType
+  m20:AffiliationDescriptor*  -> %m20:affiliationDescriptorType
+  m20:ContactPerson?          -> %m20:contactType
+  m20:Organization?           -> %m20:organizationType
+  m20:Extension?
+  ds:Signature?
+  @providerID                 -> %m20:entityIDType
+  @id?                        -> %xs:ID
+  @validUntil?                -> %xs:dateTime
+  @cacheDuration?             -> %xs:duration
+  ;
+
+%SPDescriptorType:	 base(m20:providerDescriptorType)
+    m20:AssertionConsumerServiceURL+:	 base(xs:anyURI)
+      @id          -> %xs:ID
+      @isDefault?  -> %xs:boolean  default (false)
+      ;
+    m20:AuthnRequestsSigned	 -> %xs:boolean
+  ;
+
+%IDPDescriptorType:	 base(m20:providerDescriptorType)
+    m20:SingleSignOnServiceURL        -> %xs:anyURI
+    m20:SingleSignOnProtocolProfile+  -> %xs:anyURI
+    m20:AuthnServiceURL?              -> %xs:anyURI
+  ;
+
+%affiliationDescriptorType:
+  m20:AffiliateMember+	 -> %m20:entityIDType
+  m20:Extension?
+  m20:KeyDescriptor*	 -> %m20:keyDescriptorType
+  ds:Signature?
+  @affiliationOwnerID	 -> %m20:entityIDType
+  @validUntil?	         -> %xs:dateTime
+  @cacheDuration?	 -> %xs:duration
+  @id?	 -> %xs:ID
+  ;
+
+#EOF

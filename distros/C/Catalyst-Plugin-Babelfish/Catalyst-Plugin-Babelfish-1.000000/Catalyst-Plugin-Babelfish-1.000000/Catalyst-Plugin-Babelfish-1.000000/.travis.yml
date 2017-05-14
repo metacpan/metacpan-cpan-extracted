@@ -1,0 +1,35 @@
+language: perl
+
+notifications:
+    recipients:
+        - mironov.igor@reg.ru
+        - a.gerasimov@reg.ru
+
+perl:
+    - "5.19"
+    - "5.18"
+    - "5.16"
+    - "5.14"
+    - "5.12"
+    - "5.10"
+
+before_install:
+    - "echo 'user REGRU' > ~/.pause"
+    - "git config user.email 'regru@example.com'"
+    - "git config user.name 'REG.RU LLC'"
+    - "cpanm -q -n Dist::Zilla"
+    - "cpanm -q -n Test::CPAN::Meta"
+    - "cpanm -q -n Test::Pod::Coverage"
+    - "cpanm -q -n Test::Pod"
+    - "cpanm -q -n Pod::Coverage::TrustPod"
+    - "cpanm -q -n Pod::Weaver::Plugin::Encoding"
+
+install:
+    - "dzil authordeps --missing | xargs cpanm -q -n && dzil listdeps --missing | xargs cpanm -q -n"
+
+script:
+    - "dzil smoke --release --author"
+
+branches:
+    only:
+        - master

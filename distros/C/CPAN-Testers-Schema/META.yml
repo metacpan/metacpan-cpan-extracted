@@ -4,16 +4,20 @@ author:
   - 'Oriol Soriano <oriolsoriano@gmail.com>'
   - 'Doug Bell <preaction@cpan.org>'
 build_requires:
+  CPAN::Testers::Fact::LegacyReport: '0'
+  CPAN::Testers::Fact::TestSummary: '0'
+  CPAN::Testers::Report: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  SQL::Translator: '0.11018'
   Test::Lib: '0'
   Test::More: '1.001005'
+  Test::Reporter: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -32,38 +36,52 @@ no_index:
 provides:
   CPAN::Testers::Schema:
     file: lib/CPAN/Testers/Schema.pm
-    version: '0.005'
+    version: '0.008'
   CPAN::Testers::Schema::Base:
     file: lib/CPAN/Testers/Schema/Base.pm
-    version: '0.005'
+    version: '0.008'
   CPAN::Testers::Schema::Result::LatestIndex:
     file: lib/CPAN/Testers/Schema/Result/LatestIndex.pm
-    version: '0.005'
+    version: '0.008'
+  CPAN::Testers::Schema::Result::MetabaseUser:
+    file: lib/CPAN/Testers/Schema/Result/MetabaseUser.pm
+    version: '0.008'
   CPAN::Testers::Schema::Result::Release:
     file: lib/CPAN/Testers/Schema/Result/Release.pm
-    version: '0.005'
+    version: '0.008'
   CPAN::Testers::Schema::Result::ReleaseStat:
     file: lib/CPAN/Testers/Schema/Result/ReleaseStat.pm
-    version: '0.005'
+    version: '0.008'
   CPAN::Testers::Schema::Result::Stats:
     file: lib/CPAN/Testers/Schema/Result/Stats.pm
-    version: '0.005'
+    version: '0.008'
+  CPAN::Testers::Schema::Result::TestReport:
+    file: lib/CPAN/Testers/Schema/Result/TestReport.pm
+    version: '0.008'
   CPAN::Testers::Schema::Result::Upload:
     file: lib/CPAN/Testers/Schema/Result/Upload.pm
-    version: '0.005'
+    version: '0.008'
   CPAN::Testers::Schema::ResultSet::Release:
     file: lib/CPAN/Testers/Schema/ResultSet/Release.pm
-    version: '0.005'
+    version: '0.008'
+  CPAN::Testers::Schema::ResultSet::TestReport:
+    file: lib/CPAN/Testers/Schema/ResultSet/TestReport.pm
+    version: '0.008'
   CPAN::Testers::Schema::ResultSet::Upload:
     file: lib/CPAN/Testers/Schema/ResultSet/Upload.pm
-    version: '0.005'
+    version: '0.008'
 requires:
   DBIx::Class: '0'
   DBIx::Class::Candy: '0'
+  DBIx::Class::InflateColumn::Serializer: '0.09'
   DateTime: '0'
   DateTime::Format::ISO8601: '0'
+  File::Share: '0'
   Import::Base: '0.012'
+  JSON::MaybeXS: '0'
   Log::Any: '1.045'
+  Path::Tiny: '0.072'
+  SQL::Translator: '0.11018'
   perl: '5.024'
   strict: '0'
   warnings: '0'
@@ -72,6 +90,8 @@ resources:
   bugtracker: https://github.com/cpan-testers/cpantesters-schema/issues
   homepage: https://github.com/cpan-testers/cpantesters-schema
   repository: https://github.com/cpan-testers/cpantesters-schema.git
-version: '0.005'
+version: '0.008'
 x_authority: cpan:PREACTION
+x_contributors:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

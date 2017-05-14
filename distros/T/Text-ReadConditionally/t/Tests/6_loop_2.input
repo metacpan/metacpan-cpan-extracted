@@ -1,0 +1,18 @@
+.# Nested loop at top level - not in function
+.# While and until loops
+.#
+Outer loop i = 1 .. 3
+.let i := 0
+.while -i10 ++i < 4
+.eval In while i = \v{i}
+.#
+Inner loop j = 1, 2
+.let j := 0
+.until -i4 ++j > 2
+.eval In until i = \v{i} j = \v{j}
+.done
+.#
+.eval End of outer. (while) i = \v{i}
+.done
+After end of Look
+EOF

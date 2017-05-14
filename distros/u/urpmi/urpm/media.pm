@@ -1,11 +1,10 @@
 package urpm::media;
 
-# $Id: media.pm 270394 2010-07-30 00:48:07Z misc $
 
 use strict;
-use urpm 'file_from_local_medium', 'is_local_medium';
+use urpm qw(file_from_local_medium is_local_medium);
 use urpm::msg;
-use urpm::util;
+use urpm::util qw(any append_to_file basename cat_ difference2 dirname intersection member output_safe begins_with copy_and_own file_size offset_pathname reduce_pathname);
 use urpm::removable;
 use urpm::lock;
 use urpm::md5sum;
@@ -182,29 +181,22 @@ sub _read_config__read_media_info {
 
 	my $media_cfg = $media_dir . '/media.cfg';
 	my $distribconf = MDV::Distribconf->new($media_cfg, undef) or next;
-	$distribconf->settree('mandriva');
+	$distribconf->settree('mageia');
 	$distribconf->parse_mediacfg($media_cfg) or next;
     
-	if (open(my $URLS, '<', $media_dir . '/url')) {
-	    local $_;
-	    while (<$URLS>) {
-		chomp($_);
-		foreach my $medium ($distribconf->listmedia) {
-		    my $medium_path = reduce_pathname($_ . '/' . $distribconf->getpath($medium, 'path'));
-		    $url2mediamap{$medium_path} = [$distribconf, $medium];
-		}
+	foreach (cat_($media_dir . '/url')) {
+	    chomp($_);
+	    foreach my $medium ($distribconf->listmedia) {
+		my $medium_path = reduce_pathname($_ . '/' . $distribconf->getpath($medium, 'path'));
+		$url2mediamap{$medium_path} = [$distribconf, $medium];
 	    }
 	}
 
-	if (open(my $MIRRORLISTS, '<', $media_dir . '/mirrorlist')) {
-	    local $_;
-	    while (<$MIRRORLISTS>) {
-		my $mirrorlist = $_;
-		chomp($mirrorlist);
-		foreach my $medium ($distribconf->listmedia) {
-		    my $medium_path = $distribconf->getpath($medium, 'path');
-		    $mirrorlist2mediamap{$mirrorlist}{$medium_path} = [ $distribconf, $medium ];
-		}
+	foreach my $mirrorlist (cat_($media_dir . '/mirrorlist')) {
+	    chomp($mirrorlist);
+	    foreach my $medium ($distribconf->listmedia) {
+		my $medium_path = $distribconf->getpath($medium, 'path');
+		$mirrorlist2mediamap{$mirrorlist}{$medium_path} = [ $distribconf, $medium ];
 	    }
 	}
     }
@@ -224,8 +216,13 @@ sub _associate_media_with_mediacfg {
     }
 }
 
-#- Loads /etc/urpmi/urpmi.cfg and performs basic checks.
-#- Does not handle old format: <name> <url> [with <path_hdlist>]
+=item read_config($urpm, $nocheck)
+
+Loads /etc/urpmi/urpmi.cfg and performs basic checks.
+It does not handle old format: <name> <url> [with <path_hdlist>]
+
+=cut
+
 sub read_config {
     my ($urpm, $nocheck) = @_;
     return if $urpm->{media}; #- media already loaded
@@ -534,7 +531,12 @@ sub _migrate_removable_url {
 }
 
 
-#- Writes the urpmi.cfg file.
+=item write_urpmi_cfg($urpm)
+
+Writes the urpmi.cfg file.
+
+=cut
+
 sub write_urpmi_cfg {
     my ($urpm) = @_;
 
@@ -570,26 +572,74 @@ sub _tempignore {
     $medium->{ignore} = $ignore;
 }
 
-#- read urpmi.cfg file as well as necessary synthesis files
-#- options :
-#-	root (deprecated, set directly $urpm->{root})
-#-	cmdline_skiplist
-#-      download_callback (used by _auto_update_media)
-#-
-#-	callback (urpmf)
-#-	nodepslist (for urpmq, urpmf: when we don't need the synthesis)
-#-	no_skiplist (urpmf)
-#-
-#-	synthesis (use this synthesis file, and only this synthesis file)
-#-
-#-	parallel
-#-	usedistrib (otherwise uses urpmi.cfg)
-#-	  media
-#-	  excludemedia
-#-	  sortmedia
-#-
-#-	  update
-#-	  searchmedia
+=item configure($urpm, %options)
+
+Read urpmi.cfg file as well as necessary synthesis files.
+
+Options :
+
+=over
+
+=item *
+
+root (deprecated, set directly $urpm->{root})
+
+=item *
+
+cmdline_skiplist
+
+=item *
+
+download_callback (used by _auto_update_media)
+
+=item *
+
+callback (urpmf)
+
+=item *
+
+nodepslist (for urpmq, urpmf: when we don't need the synthesis)
+
+=item *
+
+no_skiplist (urpmf)
+
+=item *
+
+synthesis (use this synthesis file, and only this synthesis file)
+
+=item *
+
+parallel
+
+=item *
+
+usedistrib (otherwise uses urpmi.cfg)
+
+=item *
+
+media
+
+=item *
+
+excludemedia
+
+=item *
+
+sortmedia
+
+=item *
+
+update
+
+=item *
+
+searchmedia
+
+=back
+
+=cut
+
 sub configure {
     my ($urpm, %options) = @_;
 
@@ -680,12 +730,12 @@ sub configure {
 	}
 	_auto_update_media($urpm, %options);
 
-	_pick_mirror_if_needed($urpm, $_, '') foreach non_ignored_media($urpm, $options{update});
+	_pick_mirror_if_needed($urpm, $_, '') foreach non_ignored_media($urpm);
 
-	parse_media($urpm, \%options) if !$options{nodepslist};
-
-    #- determine package to withdraw (from skip.list file) only if something should be withdrawn.
     if (!$options{nodepslist}) {
+	parse_media($urpm, \%options);
+
+	#- determine package to withdraw (from skip.list file) only if something should be withdrawn.
 	_compute_flags_for_skiplist($urpm, $options{cmdline_skiplist}) if !$options{no_skiplist};
 	_compute_flags_for_instlist($urpm);
     }
@@ -699,9 +749,57 @@ sub _auto_update_media {
     $options{callback} = delete $options{download_callback};
 
     foreach (grep { _is_remote_virtual($_) || $urpm->{options}{'auto-update'} } 
-	       non_ignored_media($urpm, $options{update})) {
+	       non_ignored_media($urpm)) {
 	_update_medium($urpm, $_, %options);
     }
+}
+
+
+=item needed_extra_media($urpm)
+
+Return 2 booleans telling whether nonfree & tainted packages are installed respectively.
+
+=cut
+
+sub needed_extra_media {
+    my ($urpm) = @_;
+    my $db = urpm::db_open_or_die_($urpm);
+    my ($nonfree, $tainted);
+    $db->traverse(sub {
+	my ($pkg) = @_;
+	return if $nonfree && $tainted;
+	my $rel = $pkg->release;
+	$nonfree ||= $rel =~ /nonfree$/;
+	$tainted ||= $rel =~ /tainted$/;
+    });
+    ($nonfree, $tainted);
+}
+
+sub is_media_to_add_by_default {
+    my ($urpm, $distribconf, $medium, $product_id, $nonfree, $tainted) = @_;
+    my $add_by_default = !$distribconf->getvalue($medium, 'noauto');
+    my @media_types = split(':', $distribconf->getvalue($medium, 'media_type'));
+    return $add_by_default if !@media_types;
+    if ($product_id->{product} eq 'Free') {
+	if (member('non-free', @media_types)) {
+	    $urpm->{log}(N("ignoring non-free medium `%s'", $medium));
+	    $add_by_default = 0;
+	}
+    } else {
+	my $non_regular_medium = intersection(\@media_types, [ qw(backports debug source testing) ]);
+	if (!$add_by_default && !$non_regular_medium) {
+	    my $medium_name = $distribconf->getvalue($medium, 'name') || '';
+	    if ($medium_name =~ /Nonfree/ && $nonfree) {
+		$add_by_default = 1;
+		$urpm->{log}(N("un-ignoring non-free medium `%s' b/c nonfree packages are installed", $medium_name));
+	    }
+	    if ($medium_name =~ /Tainted/ && $tainted) {
+		$add_by_default = 1;
+		$urpm->{log}(N("un-ignoring tainted medium `%s' b/c tainted packages are installed", $medium_name));
+	    }
+	}
+    }
+    $add_by_default;
 }
 
 sub non_ignored_media {
@@ -713,16 +811,13 @@ sub non_ignored_media {
 sub all_media_to_update {
     my ($urpm, $b_only_marked_update) = @_;
 
-    grep { !$_->{ignore}
-	     && !$_->{static} && !urpm::is_cdrom_url($_->{url}) && !$_->{iso}
-	     && (!$b_only_marked_update || $_->{update});
-	} @{$urpm->{media} || []};
+    grep {  !$_->{static} && !urpm::is_cdrom_url($_->{url}) && !$_->{iso} } non_ignored_media($urpm, $b_only_marked_update);
 }
 
 sub parse_media {
     my ($urpm, $options) = @_;
 
-    foreach (non_ignored_media($urpm, $options->{update})) {
+    foreach (non_ignored_media($urpm)) {
 	delete @$_{qw(start end)};
 	_parse_synthesis_or_ignore($urpm, $_, $options->{callback});
 
@@ -818,10 +913,17 @@ sub find_zeroconf_repository {
     return;
 }
 
-#- add a new medium, sync the config file accordingly.
-#- returns the new medium's name. (might be different from the requested
-#- name if index_name was specified)
-#- options: ignore, index_name, nolock, update, virtual, media_info_dir, mirrorlist, zeroconf, with-dir, xml-info, on_the_fly
+=item add_medium($urpm, $name, $url, $with_synthesis, %options)
+
+Add a new medium and sync the config file accordingly.
+
+It returns the new medium's name (might be different from the requested
+name if index_name was specified).
+
+Options: ignore, index_name, nolock, update, virtual, media_info_dir, mirrorlist, zeroconf, with-dir, xml-info, on_the_fly
+
+=cut
+
 sub add_medium {
     my ($urpm, $name, $url, $with_synthesis, %options) = @_;
 
@@ -936,16 +1038,45 @@ sub _register_media_cfg {
     }
 }
 
-#- add distribution media, according to url given.
-#- returns the list of names of added media.
-#- options :
-#- - initial_number : when adding several numbered media, start with this number
-#- - probe_with : force use of rpms instead of using synthesis
-#- - ask_media : callback to know whether each media should be added
-#- - only_updates : only add "update" media (used by rpmdrake)
-#- - mirrorlist
-#- - zeroconf
-#- other options are passed to add_medium(): ignore, nolock, virtual
+=item add_distrib_media($urpm, $name, $url, %options)
+
+Add distribution media, according to url given.
+Returns the list of names of added media.
+
+Options :
+
+=over
+
+=item *
+
+initial_number : when adding several numbered media, start with this number
+
+=item *
+
+probe_with : force use of rpms instead of using synthesis
+
+=item *
+
+ask_media : callback to know whether each media should be added
+
+=item *
+
+only_updates : only add "update" media (used by rpmdrake)
+
+=item *
+
+mirrorlist
+
+=item *
+
+zeroconf
+
+=back
+
+Other options are passed to add_medium(): ignore, nolock, virtual
+
+=cut
+
 sub add_distrib_media {
     my ($urpm, $name, $url, %options) = @_;
 
@@ -960,7 +1091,7 @@ sub add_distrib_media {
 	urpm::removable::try_mounting_medium_($urpm, $m) or $urpm->{error}(N("directory %s does not exist", $url));
 
 	$distribconf = MDV::Distribconf->new(file_from_file_url($url) || $url, undef);
-	$distribconf->settree('mandriva');
+	$distribconf->settree('mageia');
 
 	my $dir = file_from_local_medium($m);
 	my $media_cfg = reduce_pathname("$dir/" . $distribconf->getpath(undef, 'infodir') . '/media.cfg');
@@ -1007,6 +1138,7 @@ sub add_distrib_media {
 
     require urpm::mirrors;
     my $product_id = urpm::mirrors::parse_LDAP_namespace_structure(cat_('/etc/product.id'));
+    my ($nonfree, $tainted) = needed_extra_media($urpm);
 
     foreach my $media ($distribconf->listmedia) {
         my $media_name = $distribconf->getvalue($media, 'name') || '';
@@ -1024,14 +1156,8 @@ sub add_distrib_media {
 	    $is_update_media or next;
 	}
 
-        my $add_by_default = !$distribconf->getvalue($media, 'noauto');
-        my @media_types = split(':', $distribconf->getvalue($media, 'media_type'));
-        if ($product_id->{product} eq 'Free') {
-            if (member('non-free', @media_types)) {
-                $urpm->{log}(N("ignoring non-free medium `%s'", $media));
-                $add_by_default = 0;
-            }
-        }
+        my $add_by_default = is_media_to_add_by_default($urpm, $distribconf, $media, $product_id, $nonfree, $tainted);
+
 	my $ignore;
         if ($options{ask_media}) {
             $options{ask_media}->($media_name, $add_by_default) or next;
@@ -1062,6 +1188,12 @@ sub add_distrib_media {
 	);
 	++$medium_index;
     }
+
+    # associate newly added medias with their description in a media.cfg file
+    # @media content will be modified and then add_existing medium will take 
+    # care of copying the media to $urpm
+    _associate_media_with_mediacfg($urpm, [ map { name2medium($urpm, $_) } @newnames ]);
+
     return @newnames;
 }
 
@@ -1069,7 +1201,7 @@ sub _new_distribconf_and_download {
     my ($urpm, $medium) = @_;
 
     my $distribconf = MDV::Distribconf->new($medium->{url}, undef);
-    $distribconf->settree('mandriva');
+    $distribconf->settree('mageia');
 
     $urpm->{log}(N("retrieving media.cfg file..."));
     my $url = $medium->{url};
@@ -1241,16 +1373,24 @@ sub may_reconfig_urpmi {
     $reconfigured;
 }
 
-#- read a reconfiguration file for urpmi, and reconfigure media accordingly
-#- $rfile is the reconfiguration file (local), $name is the media name
-#-
-#- the format is similar to the RewriteRule of mod_rewrite, so:
-#-    PATTERN REPLACEMENT [FLAG]
-#- where FLAG can be L or N
-#-
-#- example of reconfig.urpmi:
-#-    # this is an urpmi reconfiguration file
-#-    /cauldron /cauldron/$ARCH
+=item reconfig_urpmi($urpm, $rfile, $medium)
+
+Read a reconfiguration file for urpmi, and reconfigure media accordingly.
+$rfile is the reconfiguration file (local), $name is the media name
+
+the format is similar to the RewriteRule of mod_rewrite, so:
+
+   PATTERN REPLACEMENT [FLAG]
+
+where FLAG can be L or N
+
+example of reconfig.urpmi:
+
+   # this is an urpmi reconfiguration file
+   /cauldron /cauldron/$ARCH
+
+=cut
+
 sub reconfig_urpmi {
     my ($urpm, $rfile, $medium) = @_;
     -r $rfile or return;
@@ -1860,21 +2000,64 @@ sub _update_medium {
     $rc;
 }
 
-#- Update the urpmi database w.r.t. the current configuration.
-#- Takes care of modifications, and tries some tricks to bypass
-#- the recomputation of base files.
-#- Recognized options :
-#-   all         : all medias are being rebuilt
-#- allow_failures: whereas failing to update a medium is non fatal
-#-   ask_retry   : function called when a download fails. if it returns true, the download is retried
-#-   callback    : UI callback
-#-   forcekey    : force retrieval of pubkey
-#-   force       : try to force rebuilding base files
-#-   nomd5sum    : don't verify MD5SUM of retrieved files
-#-   nopubkey    : don't use rpm pubkeys
-#-   probe_with  : probe synthesis or rpms
-#-   quiet       : download synthesis quietly
-#-   wait_lock   : block until lock can be acquired
+=item update_media($urpm, %options)
+
+Update the urpmi database w.r.t. the current configuration.
+Takes care of modifications, and tries some tricks to bypass
+the recomputation of base files.
+
+Recognized options :
+
+=over
+
+=item *
+
+all         : all medias are being rebuilt
+
+=item *
+
+allow_failures: whereas failing to update a medium is non fatal
+
+=item *
+
+ask_retry   : function called when a download fails. if it returns true, the download is retried
+
+=item *
+
+callback    : UI callback
+
+=item *
+
+forcekey    : force retrieval of pubkey
+
+=item *
+
+force       : try to force rebuilding base files
+
+=item *
+
+nomd5sum    : don't verify MD5SUM of retrieved files
+
+=item *
+
+nopubkey    : don't use rpm pubkeys
+
+=item *
+
+probe_with  : probe synthesis or rpms
+
+=item *
+
+quiet       : download synthesis quietly
+
+=item *
+
+wait_lock   : block until lock can be acquired
+
+=back
+
+=cut
+
 sub update_media {
     my ($urpm, %options) = @_;
 
@@ -1884,7 +2067,7 @@ sub update_media {
 	$_->{modified} ||= 1 foreach all_media_to_update($urpm);
     }
 
-    update_those_media($urpm, [ grep { $_->{modified} } non_ignored_media($urpm, $options{update}) ], %options);
+    update_those_media($urpm, [ grep { $_->{modified} } non_ignored_media($urpm) ], %options);
 }
 
 sub update_those_media {
@@ -2046,7 +2229,12 @@ sub try__maybe_mirrorlist {
     }
 }
 
-#- clean params and depslist computation zone.
+=item clean($urpm)
+
+Clean params and depslist computation zone.
+
+=cut
+
 sub clean {
     my ($urpm) = @_;
 
@@ -2061,7 +2249,6 @@ sub clean {
 
 1;
 
-__END__
 
 =back
 
@@ -2070,5 +2257,7 @@ __END__
 Copyright (C) 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
+
+Copyright (C) 2011-2015 Mageia
 
 =cut

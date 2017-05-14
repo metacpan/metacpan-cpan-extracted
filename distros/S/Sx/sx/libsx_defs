@@ -1,0 +1,68 @@
+# All configuration options are at the top.  The things you'll want to
+# look at are the CC variable, CFLAGS variable and the RANLIB
+# variable.
+#
+# On Suns and DECstations we use gcc because the code is ANSI and
+# their base compilers don't deal with ANSI code.
+#
+# On an SGI you can use plain old cc (or gcc if you feel like it and
+# you have it).  Using cc seems to also work on the RS/6000 (though
+# you may need the -xansi or -ansi flag). 
+CC     = gcc
+#CC     = cc
+
+
+# Using gcc it's nice to be real strict and compile with -Wall, for
+# production versions of the library you probably just want -O or -O2
+#
+# The -D_POSIX_SOURCE define is necessary on some systems (sun) 
+# and less necessary on some systems like SGI.
+#
+# The -DOPENGL_SUPPORT is still preliminary and not suggested for
+# general use (though if you do use it, I'd like to hear about it).
+#
+#
+# On an SGI running Irix 5.x, I use:
+#  CFLAGS = -O2 -D_POSIX_SOURCE
+#
+# On a sun w/sunos 4.1.1, I use:
+#  CFLAGS = -O2 -D_POSIX_SOURCE
+#
+# On a DECstation, I used:
+#  CFLAGS = -O2 -I/usr/include/mit
+#  
+# If you're daring, and you have OpenGL, try:
+#  CFLAGS = -g -D_POSIX_SOURCE -DOPENGL_SUPPORT
+#
+CFLAGS = -g -fpic -D_POSIX_SOURCE -DXAW3D -I/local/X11R6/include
+CPPFLAGS = -I..
+
+#
+# if you are on a System V (like the SGI) machine, just define RANLIB
+# to be something innocuous like `echo'. On a Sun or other BSD machine
+# (like a DECstation) we need to run the ranlib program.
+#
+RANLIB=ranlib
+#RANLIB=echo
+
+#
+# libraries we need to link with...
+#
+# For most machines, the standard link line is fine.  For some you'll
+# need to add -lXext, and if you compiled with -DOPENGL_SUPPORT, then
+# you'll need to add -lGL for _any_ program that links with libsx.
+#
+# For SGI and sun, the following is fine:
+#   LIBS   =  $(LIBSX) -lXaw -lXmu -lXt -lX11
+#
+# For a DECstation, use:
+#   LIBS   =  $(LIBSX) -lXaw -lXmu -lXt -lX11 -lXext
+#
+# Some other machines may need to append a -lm to the line.
+#
+# Again, if you're daring and have OpenGL, use:
+#   LIBS   =  $(LIBSX) -lXaw -lXmu -lXt -lX11 -lXext -lGL
+#
+LIBSX  = ./libsx.a
+#LIBS   =  $(LIBSX) -lXaw3d -lXmu -lXt -lX11
+LIBS   =  $(LIBSX) -L/usr/X11R6/lib/elf -lXaw -lXmu -lXt -lX11

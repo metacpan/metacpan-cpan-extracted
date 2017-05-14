@@ -1,0 +1,16 @@
+MANIFEST
+README
+Makefile.PL
+DataLoader.pm
+DataLoader/DB.pm
+DataLoader/Date.pm
+DataLoader/IsDefined.pm
+DataLoader/MapIt.pm
+DataLoader/XMLWriter.pm
+examples/query_db.pl  
+examples/test_date.pl  
+examples/test_isdefined.pl  
+examples/test_mapit.pl  
+examples/test_xmlwriter.pl  
+examples/xml_to_db.pl
+test.pl

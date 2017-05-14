@@ -1,7 +1,0 @@
-primer_designer.cgi -- installed on remote linux/unix webserver to provide 
-                 access to thr primer3 and e-PCR binaries.  Requires 
-                 a server-side installation of Bio::PrimerDesigner
-
-primer_designer.pl  -- script to demonstrate Bio::PrimerDesigner functions
-
-

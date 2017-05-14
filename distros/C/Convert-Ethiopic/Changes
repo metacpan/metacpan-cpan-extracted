@@ -1,5 +1,12 @@
 Revision history for Perl extension Convert::Ethiopic.
 
+0.20
+	- Major overhaul of the package and its interface.
+	- Ethiopic.xs is enhanced radically.
+	- String.pm, File.pm and Number.pm are added.
+	- Time.pm is Date.pm
+	- Cstocs.pm no longer maintained.
+
 0.12 Thu Feb 17 21:10:19 EST 2000
 	- moved ethiosys to ethiosysx for secondary fonts.
 	- added enumeration calls to BEGIN method.

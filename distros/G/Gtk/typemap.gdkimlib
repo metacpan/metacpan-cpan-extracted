@@ -1,0 +1,3 @@
+TYPEMAP
+
+Gtk::Gdk::ImlibImage	T_SimpleVal

@@ -1,392 +1,345 @@
-#!/usr/bin/perl
 # -*- perl -*-
 
 use strict;
 use warnings;
-use File::Basename;
-use File::Spec::Functions;
-use YAML::XS;
 
-################################################################################
-package DIR;
-################################################################################
+my (@dirs, @tests, @todos);
 
-sub new
-{
-	my $pkg = $_[0];
-	my $root = $_[1];
-	my $parent = $_[2];
-	my $opt = $_[3] || {};
-	return bless {
-		root => $root,
-		parent => $parent,
-		wtodo => $opt->{wtodo},
-		todo => $opt->{todo},
-		clean => $opt->{clean},
-		style => $opt->{style},
-		prec => $opt->{prec},
-		start => $opt->{start},
-		end => $opt->{end},
-	}, $pkg;
+my $die_first;
+my $redo_sass;
+my @surprises;
+
+my $do_nested;
+my $do_compact;
+my $do_expanded;
+my $do_compressed;
+my $variants;
+
+BEGIN {
+	$redo_sass = 0;
+	$do_nested = 1;
+	$do_compact = 1;
+	$do_expanded = 1;
+	$do_compressed = 1;
+	$variants = $do_nested
+	          + $do_compact
+	          + $do_expanded
+	          + $do_compressed;
 }
 
-sub query
-{
-	# check if we found the option
-	if (defined $_[0]->{$_[1]}) {
-		return $_[0]->{$_[1]};
-	}
-	# otherwise dispatch to parent
-	if (defined $_[0]->{parent}) {
-		return $_[0]->{parent}->query($_[1]);
-	}
-	# or not found
-	return undef;
-}
-
-################################################################################
-package SPEC;
-################################################################################
-
-use CSS::Sass;
-use Cwd qw(getcwd);
-use Carp qw(croak);
-use File::Spec::Functions;
-
-my $cwd = getcwd;
-my $cwd_win = $cwd;
-my $cwd_nix = $cwd;
-$cwd_win =~ s/[\/\\]/\\/g;
-$cwd_nix =~ s/[\/\\]/\//g;
-
-# everything is normalized
-my $norm_output = sub ($) {
-	$_[0] =~ s/(?:\r?\n)+/\n/g;
-	$_[0] =~ s/;(?:\s*;)+/;/g;
-	$_[0] =~ s/;\s*}/}/g;
-	# normalize debug entries
-	$_[0] =~ s/[^\n]+(\d+) DEBUG: /$1: DEBUG: /g;
-	# normalize directory entries
-	$_[0] =~ s/\/libsass-todo-issues\//\/libsass-issues\//g;
-	$_[0] =~ s/\/libsass-closed-issues\//\/libsass-issues\//g;
-	$_[0] =~ s/\Q$cwd_win\E[\/\\]t[\/\\]sass-spec[\/\\]/\/sass\//g;
-	$_[0] =~ s/\Q$cwd_nix\E[\/\\]t[\/\\]sass-spec[\/\\]/\/sass\//g;
-};
-
-# only flagged stuff is cleaned
-my $clean_output = sub ($) {
-	$_[0] =~ s/[\r\n\s	 ]+/ /g;
-	$_[0] =~ s/[\r\n\s	 ]+,/,/g;
-	$_[0] =~ s/,[\r\n\s	 ]+/,/g;
-};
-
-sub new
-{
-	my $pkg = $_[0];
-	my $root = $_[1];
-	my $file = $_[2];
-	my $test = $_[3];
-	return bless {
-		root => $root,
-		file => $file,
-		test => $test,
-	}, $pkg;
-}
-
-sub errors
-{
-	my ($spec) = @_;
-
-	local $/ = undef;
-	return -f catfile($spec->{root}->{root}, "status");
-}
-
-sub stderr
-{
-	my ($spec) = @_;
-
-	local $/ = undef;
-	my $path = catfile($spec->{root}->{root}, "error");
-	return "" unless -f $path;
-	open my $fh, "<:raw:utf8", $path or
-		croak "Error opening <", $path, ">: $!";
-	binmode $fh; my $stderr = join "\n", <$fh>;
-	# fully remove debug messaged from error
-	$stderr =~ s/[^\n]+(\d+) DEBUG: [^\n]*//g;
-	$norm_output->($stderr);
-	# clean todo warnings (remove all warning blocks)
-	$stderr =~ s/^(?:DEPRECATION )?WARNING(?:[^\n]+\n)*\n*//gm;
-	$stderr =~ s/\n.*\Z//s;
-	utf8::decode($stderr);
-	return $stderr;
-}
-
-sub stdmsg
-{
-	my ($spec) = @_;
-
-	local $/ = undef;
-	my $path = catfile($spec->{root}->{root}, "error");
-	return '' unless -f $path;
-	open my $fh, "<:raw:utf8", $path or
-		croak "Error opening <", $path, ">: $!";
-	binmode $fh; my $stderr = join "\n", <$fh>;
-	$norm_output->($stderr);
-	if ($spec->{test}->{wtodo}) {
-		# clean todo warnings (remove all warning blocks)
-		$stderr =~ s/^(?:DEPRECATION )?WARNING(?:[^\n]+\n)*\n*//gm;
-	}
-	# clean error messages
-	$stderr =~ s/^Error(?:[^\n]+\n)*\n*//gm;
-	$stderr =~ s/\n.*\Z//s;
-	utf8::decode($stderr);
-	return $stderr;
-}
-
-sub expected
-{
-	my ($spec) = @_;
-
-	local $/ = undef;
-	my $path = catfile($_[0]->{root}->{root}, "expected_output.css");
-	open my $fh, "<:raw:utf8", $path or
-		croak "Error opening <", $path, ">: $!";
-	binmode $fh; return join "", <$fh>;
-
-}
-
-sub expect
-{
-	my $css = $_[0]->expected;
-	return "" unless defined $css;
-	utf8::decode($css);
-	$norm_output->($css);
-	if ($_[0]->query('clean')) {
-		$clean_output->($css);
-	}
-	return $css;
-}
-
-sub result
-{
-	$_[0]->css || $_[0]->err;
-}
-
-sub css
-{
-	$_[0]->execute;
-	my $css = $_[0]->{css};
-	return "" unless defined $css;
-	$norm_output->($css);
-	if ($_[0]->query('clean')) {
-		$clean_output->($css);
-	}
-	return $css;
-}
-
-sub err
-{
-	$_[0]->execute;
-	my $err = $_[0]->{err};
-	return "" unless defined $err;
-	$norm_output->($err);
-	$err =~ s/\n.*\Z//s;
-	return $err;
-}
-
-sub msg
-{
-	$_[0]->execute;
-	my $msg = $_[0]->{msg};
-	return "" unless defined $msg;
-	$norm_output->($msg);
-	$msg =~ s/\n.*\Z//s;
-	return $msg;
-}
-
-sub execute
+BEGIN
 {
 
-	my ($spec) = @_;
+	our $todo = 0;
+	$die_first = 0;
+	my $skip_huge = 0;
+	my $skip_todo = 1;
 
-	# only execute each test once
-	return if defined $spec->{css};
-	return if defined $spec->{err};
+	@dirs = ('t/sass-spec/spec');
 
-	# warn $spec->{file};
-
-	# CSS::Sass options
-	my %options = (
-		'precision',
-		$spec->query('prec'),
-		'output_style',
-		$spec->style,
-	);
-
-	my $comp = CSS::Sass->new(%options);
-
-	# save stderr
-	no warnings 'once';
-	open OLDFH, '>&STDERR';
-
-	# redirect stderr to file
-	open(STDERR, "+>:raw:utf8", "specs.stderr.log"); select(STDERR); $| = 1;
-	my $css = eval { $comp->compile_file($spec->{file}) }; my $err = $@;
-	sysseek(STDERR, 0, 0); sysread(STDERR, my $msg, 65536); close(STDERR);
-
-	# reset stderr
-	open STDERR, '>&OLDFH';
-
-	# store the results
-	$spec->{css} = $css;
-	$spec->{err} = $err;
-	$spec->{msg} = $msg;
-
-	# return the results
-	return $css, $err;
-
-}
-
-sub style
-{
-	my $style = $_[0]->query('style');
-	return SASS_STYLE_EXPANDED unless defined $style;
-	if ($style =~ m/compact/i) { return SASS_STYLE_COMPACT; }
-	elsif ($style =~ m/nested/i) { return SASS_STYLE_NESTED; }
-	elsif ($style =~ m/compres/i) { return SASS_STYLE_COMPRESSED; }
-	# elsif ($style =~ m/expanded/i) { return SASS_STYLE_EXPANDED; }
-	return SASS_STYLE_EXPANDED;
-}
-
-sub file { shift->{file}; }
-sub query { shift->{root}->query(@_); }
-
-################################################################################
-package main;
-################################################################################
-
-use Carp qw(croak);
-
-# ********************************************************************
-sub read_file($)
-{
-	local $/ = undef;
-	open my $fh, "<:raw:utf8", $_[0] or
-		croak "Error opening <", $_[0], ">: $!";
-	binmode $fh; return join "", <$fh>;
-}
-
-# ********************************************************************
-sub load_tests()
-{
-
-	# result
-	my @specs; my $ignore = qr/huge|unicode\/report/;
-	my $filter = qr/\Q$ARGV[0]\E/ if defined $ARGV[0];
-	# initial spec test directory entry
-	my $root = new DIR;
-	$root->{start} = 0;
-	$root->{end} = 999;
-	$root->{prec} = 5;
-	my @dirs = (['t/sass-spec/spec', $root]);
-	# walk through all directories
-	# no recursion for performance
-	while (my $entry = shift(@dirs))
+	while (my $dir = shift(@dirs))
 	{
-		my ($dir, $parent) = @{$entry};
-		my $test = new DIR($dir, $parent);
-		if (-f catfile($dir, "options.yml")) {
-			my $file = catfile($dir, "options.yml");
-			my $yaml = YAML::XS::Load(read_file($file));
-			$test->{clean} = $yaml->{':clean'};
-			$test->{prec} = $yaml->{':precision'};
-			$test->{style} = $yaml->{':output_style'};
-			$test->{start} = $yaml->{':start_version'};
-			$test->{end} = $yaml->{':end_version'};
-			$test->{ignore} = grep /^libsass$/i,
-				@{$yaml->{':ignore_for'} || []};
-			$test->{wtodo} = grep /^libsass$/i,
-				@{$yaml->{':warning_todo'} || []};
-			$test->{todo} = grep /^libsass$/i,
-				@{$yaml->{':todo'} || []};
-		}
-
-		$test->{clean} = $parent->{clean} unless $test->{clean};
-		$test->{prec} = $parent->{prec} unless $test->{prec};
-		$test->{style} = $parent->{style} unless $test->{style};
-		$test->{start} = $parent->{start} unless $test->{start};
-		$test->{end} = $parent->{end} unless $test->{end};
-		$test->{ignore} = $parent->{ignore} unless $test->{ignore};
-		$test->{wtodo} = $parent->{wtodo} unless $test->{wtodo};
-		$test->{todo} = $parent->{todo} unless $test->{todo};
-
-		my $sass = catfile($dir, "input.sass");
-		my $scss = catfile($dir, "input.scss");
-		# have spec test
-		if (-e $scss) {
-			if (!$ignore || !($scss =~ m/$ignore/)) {
-				if (!$filter || ($scss =~ m/$filter/)) {
-					push @specs, new SPEC($test, $scss, $test);
-				}
-			}
-		}
-		elsif (-e $sass) {
-			if (!$ignore || !($sass =~ m/$ignore/)) {
-				if (!$filter || ($sass =~ m/$filter/)) {
-					push @specs, new SPEC($test, $sass, $test);
-				}
-			}
-		}
-
-		opendir(my $dh, $dir) or die $!;
+		opendir(my $dh, $dir) or die "error opening specs dir $dir";
 		while (my $ent = readdir($dh))
 		{
+			local $todo = $todo;
 			next if $ent eq ".";
 			next if $ent eq "..";
 			next if $ent =~ m/^\./;
-			# create combined path
-			my $path = catfile($dir, $ent);
-			# go into subfolders
-			if (-d $path) {
-				push @dirs, [$path, $test];
+			next if $ent =~ m/input\.disabled\.scss$/;
+			$todo = $todo || $ent eq "todo" ||
+				$ent eq "libsass-todo-tests" ||
+				$ent eq "libsass-todo-issues";
+			my $path = join("/", $dir, $ent);
+			next if $ent eq "huge" && $skip_huge;
+			next if($todo && $skip_todo);
+			push @dirs, $path if -d $path;
+			if ($ent =~ m/^input\./)
+			{
+				push @tests, [$dir, $ent];
 			}
 		}
-		# close anyway
 		closedir($dh);
 	}
-	# unfiltered
-	return @specs;
+
+	# warn "found ", scalar(@tests), " spec tests\n";
+	# warn join(", ", map { $_->[0] } @tests), "\n";
+
 }
 
-use vars qw(@tests @specs);
-# specs must be loaded first
-# before registering tests
-BEGIN {
-	@tests = load_tests;
-	@specs = grep {
-		! $_->query('todo') &&
-		! $_->query('ignore') &&
-		$_->query('start') <= 3.4
-	} @tests;
-}
+#foreach my $test (@tests) {
+#  my $tst = $test->[0];
+#  $tst =~ s/t\/+sass-spec\/+//;
+#  warn "git mv",
+#       " ", $tst, "/expected_output.css ",
+#       " ", $tst, "/expected.nested.css ",
+#  "\n";
+#}
+#exit(1);
 
-# report todo tests
-# die join("\n", map {
-# 	$_->{root}->{root}
-# } grep {
-# 	$_->query('todo') &&
-# 	! $_->query('ignore') &&
-# 	$_->query('start') <= 3.4
-# } @tests);
+# uncomment to debug a single test case
+# @tests = grep { $_->[0] =~ m/199/ } @tests;
 
-use Test::More tests => 3 * scalar @specs;
+use Test::More tests => $variants * ($redo_sass ? 2 : 1) * scalar(@tests);
 use Test::Differences;
 
-# run tests after filtering
-foreach my $spec (@specs)
+use CSS::Sass;
+
+sub read_file
 {
-	# compare the result with expected data
-	eq_or_diff ($spec->css, $spec->expect, "CSS: " . $spec->file);
-	eq_or_diff ($spec->err, $spec->stderr, "Errors: " . $spec->file);
-	eq_or_diff ($spec->msg, $spec->stdmsg, "Warnings: " . $spec->file);
+  use Carp;
+  local $/ = undef;
+  open my $fh, "<:raw:utf8", $_[0] or croak "Couldn't open file: <", $_[0], ">: $!";
+  binmode $fh; return <$fh>;
 }
+
+my $sass;
+my ($r, $err);
+my ($src, $expect);
+
+# work directly on arg
+# lib/sass_spec/test_case.rb
+sub clean_output ($) {
+	$_[0] =~ s/[\r\n\s	 ]+/ /g;
+	$_[0] =~ s/,[\r\n\s	 ]+/,/g;
+}
+sub norm_output ($) {
+	$_[0] =~ s/\r//g;
+	$_[0] =~ s/\s+([{,])/$1/g;
+	# $_[0] =~ s/#ff0/yellow/g;
+	$_[0] =~ s/(?:\r?\n)+/\n/g;
+	$_[0] =~ s/(?:\r?\n)+$/\n/g;
+}
+
+my @false_negatives;
+
+my %options;
+my @cmds;
+foreach my $test (@tests)
+{
+
+	my $input_file = join("/", $test->[0], $test->[1]);
+	my $output_nested = join("/", $test->[0], 'expected_output.css');
+	my $output_compact = join("/", $test->[0], 'expected.compact.css');
+	my $output_expanded = join("/", $test->[0], 'expected.expanded.css');
+	my $output_compressed = join("/", $test->[0], 'expected.compressed.css');
+
+	eval('use Win32::Process;');
+	eval('use Win32;');
+
+	if ($redo_sass)
+	{
+		unless (-f join("/", $test->[0], 'redo.skip')) {
+			push @cmds, ["C:\\Ruby\\193\\bin\\sass -E utf-8 --unix-newlines --sourcemap=none -t nested -C \"$input_file\" \"$output_nested\"", $input_file] if ($do_nested);
+			push @cmds, ["C:\\Ruby\\193\\bin\\sass -E utf-8 --unix-newlines --sourcemap=none -t compact -C \"$input_file\" \"$output_compact\"", $input_file] if ($do_compact);
+			push @cmds, ["C:\\Ruby\\193\\bin\\sass -E utf-8 --unix-newlines --sourcemap=none -t expanded -C \"$input_file\" \"$output_expanded\"", $input_file] if ($do_expanded);
+			push @cmds, ["C:\\Ruby\\193\\bin\\sass -E utf-8 --unix-newlines --sourcemap=none -t compressed -C \"$input_file\" \"$output_compressed\"", $input_file] if ($do_compressed);
+		} else {
+			SKIP: { skip("dont redo expected_output.css", 1) if ($do_nested); }
+			SKIP: { skip("dont redo expected.compact.css", 1) if ($do_compact); }
+			SKIP: { skip("dont redo expected.expanded.css", 1) if ($do_expanded); }
+			SKIP: { skip("dont redo expected.compressed.css", 1) if ($do_compressed); }
+		}
+	}
+}
+
+
+my @running; my $i = 0;
+foreach my $cmd (@cmds) {
+
+    my $ProcessObj;
+    Win32::Process::Create($ProcessObj,
+                                "C:\\Ruby\\193\\bin\\sass.bat",
+                                $cmd->[0],
+                                0,
+                                Win32::Process::NORMAL_PRIORITY_CLASS(),
+                                ".")|| die "error $!";
+
+    push @running, $ProcessObj;
+
+    while (scalar(@running) >= 12) {
+    	@running = grep {
+    		! $_->Wait(0);
+    	} @running;
+
+  select undef, undef, undef, 0.0125;
+
+    }
+
+  pass("regenerated " . $cmd->[1]);
+
+  select undef, undef, undef, 0.0125;
+
+}
+
+while (scalar(@running)) {
+	@running = grep {
+		! $_->Wait(0);
+	} @running;
+}
+
+# check if the benchmark module is available
+my $benchmark = eval "use Benchmark; 1" ;
+
+# get benchmark stamp before compiling
+my $t0 = $benchmark ? Benchmark->new : 0;
+
+foreach my $test (@tests)
+{
+
+	my $input_file = join("/", $test->[0], $test->[1]);
+	my $output_nested = join("/", $test->[0], 'expected_output.css');
+	my $output_compact = join("/", $test->[0], 'expected.compact.css');
+	my $output_expanded = join("/", $test->[0], 'expected.expanded.css');
+	my $output_compressed = join("/", $test->[0], 'expected.compressed.css');
+
+	# warn $input_file;
+
+	my $last_error; my $on_error;
+	$options{"sass_functions"} = {
+		'reset-error()' => sub { $last_error = undef; },
+		'last-error()' => sub { return ${$last_error || \ undef}; },
+		'mock-errors($on)' => sub { $on_error = $_[0]; return undef; },
+		'@error' => sub { $last_error = $_[0]; return "thrown"; }
+	};
+
+	my $comp_nested = CSS::Sass->new(%options, output_style => SASS_STYLE_NESTED);
+	my $comp_compact = CSS::Sass->new(%options, output_style => SASS_STYLE_COMPACT);
+	my $comp_expanded = CSS::Sass->new(%options, output_style => SASS_STYLE_EXPANDED);
+	my $comp_compressed = CSS::Sass->new(%options, output_style => SASS_STYLE_COMPRESSED);
+
+	my $css_nested = eval { $do_nested && $comp_nested->compile_file($input_file) }; my $error_nested = $@;
+	my $css_compact = eval { $do_compact && $comp_compact->compile_file($input_file) }; my $error_compact = $@;
+	my $css_expanded = eval { $do_expanded && $comp_expanded->compile_file($input_file) }; my $error_expanded = $@;
+	my $css_compressed = eval { $do_compressed && $comp_compressed->compile_file($input_file) }; my $error_compressed = $@;
+
+	# warn $output_nested unless defined $css_nested;
+	$css_nested = "[$error_nested]" unless defined $css_nested;
+	# warn $output_compact unless defined $css_compact;
+	$css_compact = "[$error_compact]" unless defined $css_compact;
+	# warn $output_expanded unless defined $css_expanded;
+	$css_expanded = "[$error_expanded]" unless defined $css_expanded;
+	# warn $output_compressed unless defined $css_compressed;
+	$css_compressed = "[$error_compressed]" unless defined $css_compressed;
+
+	my $sass_nested = $do_nested ? read_file($output_nested) : '';
+	my $sass_compact = $do_compact ? read_file($output_compact) : '';
+	my $sass_expanded = $do_expanded ? read_file($output_expanded) : '';
+	my $sass_compressed = $do_compressed ? read_file($output_compressed) : '';
+
+	die "read $output_nested" unless defined $sass_nested;
+	die "read $output_compact" unless defined $sass_compact;
+	die "read $output_expanded" unless defined $sass_expanded;
+	die "read $output_compressed" unless defined $sass_compressed;
+
+	utf8::decode($css_nested) if ($css_nested) ;
+	utf8::decode($css_compact) if ($css_compact) ;
+	utf8::decode($css_expanded) if ($css_expanded) ;
+	utf8::decode($css_compressed) if ($css_compressed);
+
+	utf8::decode($sass_nested) if ($sass_nested) ;
+	utf8::decode($sass_compact) if ($sass_compact) ;
+	utf8::decode($sass_expanded) if ($sass_expanded) ;
+	utf8::decode($sass_compressed) if ($sass_compressed);
+
+	if (-e substr($output_nested, 0, -4) . ".clean")
+	{ clean_output $css_nested; clean_output $sass_nested; }
+	if (-e substr($output_compact, 0, -4) . ".clean")
+	{ clean_output $css_compact; clean_output $sass_compact; }
+	if (-e substr($output_expanded, 0, -4) . ".clean")
+	{ clean_output $css_expanded; clean_output $sass_expanded; }
+	if (-e substr($output_compressed, 0, -4) . ".clean")
+	{ clean_output $css_compressed; clean_output $sass_compressed; }
+
+	norm_output $css_nested; norm_output $sass_nested;
+	norm_output $css_compact; norm_output $sass_compact;
+	norm_output $css_expanded; norm_output $sass_expanded;
+	norm_output $css_compressed; norm_output $sass_compressed;
+
+	unless ($input_file =~ m/todo/)
+	{
+
+		# oldstyle_diff;
+		unless ($do_nested) { }
+		elsif (-f join("/", $test->[0], 'expected_output.skip')) { SKIP: { skip("nested", 1) } }
+		else { eq_or_diff ($css_nested, $sass_nested, "nested $output_nested") }
+		die if ($do_nested && $die_first && $css_nested ne $sass_nested);
+
+		unless ($do_compact) { }
+		elsif (-f join("/", $test->[0], 'expected.compact.skip')) { SKIP: { skip("compact", 1) } }
+		else { eq_or_diff ($css_compact, $sass_compact, "compact $output_compact") }
+		die if ($do_compact && $die_first && $css_compact ne $sass_compact);
+
+		unless ($do_expanded) { }
+		elsif (-f join("/", $test->[0], 'expected.expanded.skip')) { SKIP: { skip("expanded", 1) } }
+		else { eq_or_diff ($css_expanded, $sass_expanded, "expanded $output_expanded") }
+		die if ($do_expanded && $die_first && $css_expanded ne $sass_expanded);
+
+		unless ($do_compressed) { }
+		elsif (-f join("/", $test->[0], 'expected.compressed.skip')) { SKIP: { skip("compressed", 1) } }
+		else { eq_or_diff ($css_compressed, $sass_compressed, "compressed $output_compressed") }
+		die if ($do_compressed && $die_first && $css_compressed ne $sass_compressed);
+
+	}
+	else
+	{
+
+		# warn "doing test spec " << $test->[0], "\n";
+
+		my $surprise = sub { fail("suprprise in: " . $_[0]); push @surprises, [ @_ ]; };
+
+		if ($css_nested eq $sass_nested)
+		{ $surprise->(join("/", $test->[0], 'expected.nested')); }
+		else { pass(join("/", $test->[0], 'expected.nested') . " is still failing"); }
+
+		if ($css_compact eq $sass_compact)
+		{ $surprise->(join("/", $test->[0], 'expected.compact')); }
+		else { pass(join("/", $test->[0], 'expected.compact') . " is still failing"); }
+
+		if ($css_expanded eq $sass_expanded)
+		{ $surprise->(join("/", $test->[0], 'expected.expanded')); }
+		else { pass(join("/", $test->[0], 'expected.expanded') . " is still failing"); }
+
+		if ($css_compressed eq $sass_compressed)
+		{ $surprise->(join("/", $test->[0], 'expected.compressed')) }
+		else { pass(join("/", $test->[0], 'expected.compressed') . " is still failing"); }
+
+	}
+
+}
+
+# get benchmark stamp after compiling
+my $t1 = $benchmark ? Benchmark->new : 0;
+
+END {
+
+	# only print benchmark result when module is available
+	if ($benchmark) { warn "\nin ", timestr(timediff($t1, $t0)), "\n"; }
+
+	foreach my $surprise (@surprises)
+	{
+		my $file = $surprise->[0];
+		$file =~ s/\//\\/g if $^O eq 'MSWin32';
+		printf STDERR "at %s\n", $file;
+	}
+}
+
+__DATA__
+
+require File::Basename;
+require File::Spec::Functions;
+
+# print git mv commands
+warn join "\n", (map {
+	$_ =~ s/\/+/\\/g;
+	$_ =~ s /\\input\.[a-z]+$//;
+	my $org = $_;
+	my $root = File::Basename::dirname($org);
+	$_ =~ s /\\libsass\-todo\-(?:tests|issues)//;
+	sprintf("pushd \"%s\"\n", $root).
+	sprintf("git mv %s %s\n",
+		File::Spec->rel2abs($org, $root),
+		File::Spec->abs2rel($_, $root)
+	).
+	sprintf("popd\n");
+} @false_negatives), "\n";

@@ -15,16 +15,18 @@ use Padre::Swarm::Identity;
 use Padre::Swarm::Message;
 use Padre::Swarm::Message::Diff;
 use Padre::Util;
-our $VERSION = '0.2';
+our $VERSION = '0.11';
 our @ISA     = 'Wx::Panel';
 
 use Class::XSAccessor
 	accessors => {
-		universe  => 'universe',
+		task      => 'task',
+		service   => 'service',
 		textinput => 'textinput',
 		chatframe => 'chatframe',
 		userlist  => 'userlist',
 		users => 'users',
+		transport => 'transport',
 		label =>'label',
 	},
 	setters => {
@@ -33,6 +35,7 @@ use Class::XSAccessor
 
 sub new {
 	my $class = shift;
+	my $main  = shift;
 	my %args = @_;
 	my $self = $class->SUPER::new(
 		$class->plugin->wx , -1,
@@ -42,8 +45,8 @@ sub new {
 		Wx::wxLC_REPORT
 		| Wx::wxLC_SINGLE_SEL
 	);
-	$self->$_( $args{$_} ) for qw( universe label );
-	Padre->ide->wx->main->bottom->show($self);
+	$self->$_( $args{$_} ) for qw( transport label );
+	$main->bottom->show($self);
 	
 	# build large area for chat output , with a
 	#  single line entry widget for input
@@ -102,7 +105,7 @@ sub new {
 		resource => 'Padre',
 	);
 
-	$self->users( {} );
+        $self->users( {} );
         
 	Wx::Event::EVT_TEXT_ENTER(
                 $self, $text,
@@ -113,10 +116,6 @@ sub new {
 		$text,
 		sub{ $self->on_text_char(@_) },
         );
-        
-    $self->universe->reg_cb( 'enable' , sub { $self->enable(@_) } );
-	$self->universe->reg_cb( 'disable' , sub { $self->disable(@_) } );
-	
 
 	return $self;
 }
@@ -149,9 +148,10 @@ sub view_icon {
 sub enable {
 	my $self     = shift;
 	TRACE( "Enable Chat" ) if DEBUG;
+	TRACE( " main window is " . $self->main ) if DEBUG;
 
 	# Add ourself to the gui;
-	my $main     = Padre->ide->wx->main;
+	my $main     = $self->main;
 	my $bottom   = $self->bottom;
 	my $position = $bottom->GetPageCount;
 	$self->update_userlist;
@@ -166,8 +166,7 @@ sub enable {
 sub disable {
 	my $self = shift;
 	TRACE( 'Disable Chat' ) if DEBUG;
-	$self->universe->send( {type=>'leave', service=>'chat' } );
-	my $main = Padre->ide->wx->main;
+	my $main = $self->main;
 	my $bottom= $main->bottom;
 	my $position = $bottom->GetPageIndex($self);
 	$self->Hide;
@@ -181,7 +180,7 @@ sub disable {
 sub update_userlist {
 	my $self = shift;
 	my $userlist = $self->userlist;
-	my $geo = $self->universe->geometry;
+	my $geo = $self->plugin->geometry;
 	my @users = $geo->get_users();
 	$userlist->DeleteAllItems;
 	foreach my $user ( @users ) {
@@ -218,14 +217,6 @@ sub on_recv {
 
 }
 
-sub on_connect {
-	my $self = shift;
-	$self->universe->send(
-		{type=>'announce',service=>'chat',
-		from=>$self->plugin->identity->nickname 
-	});
-}
-
 sub write_timestamp {
 	my $self = shift;
 	$self->chatframe->AppendText(
@@ -236,9 +227,7 @@ sub write_timestamp {
 sub write_unstyled {
     my ($self,$text) = @_;
     my $style = $self->chatframe->GetDefaultStyle;
-    $style->SetTextColour( 
-		Wx::SystemSettings::GetColour( Wx::wxSYS_COLOUR_WINDOWTEXT ) 
-	);
+    $style->SetTextColour( Wx::Colour->new(0,0,0) );
     $self->chatframe->SetDefaultStyle($style);
     $self->chatframe->AppendText($text);
     
@@ -277,6 +266,7 @@ sub accept_announce {
         $self->users->{$nick} = 1;
     }
      $self->update_userlist;
+    
 }
 
 sub accept_promote {
@@ -294,7 +284,7 @@ sub accept_promote {
 
 sub accept_disco {
 	my ($self,$message) = @_;
-	$self->universe->send( {type=>'promote',service=>'chat'} );
+	$self->transport->send( {type=>'promote',service=>'chat'} );
 }
 
 sub accept_leave {
@@ -328,17 +318,9 @@ sub command_nick {
     
 }
 
-sub command_geo {
-	my $self = shift;
-	my $geo = $self->universe->geometry;
-	foreach my $edge ( $geo->graph->edges ) {
-		$self->write_unstyled( join (' => ' , @$edge) . "\n" );
-	}
-}
-
 sub command_disco {
     my $self = shift;
-    $self->universe->send({type=>'disco'});
+    $self->transport->send({type=>'disco'});
 }
 
 
@@ -352,7 +334,7 @@ sub tell_service {
 			body => $body,
 			type => 'chat',
 		);
-	$self->universe->send($message)
+	$self->transport->send($message)
 }
 
 sub on_text_enter {
@@ -379,7 +361,7 @@ sub on_text_char {
         my ($fragment) = $partial =~ /(\w+)$/;
         return unless $fragment;
         
-        my @users = $self->universe->geometry->get_users;
+        my @users = $self->plugin->geometry->get_users;
         my @possible = grep { $_ =~ /^$fragment/ } @users;
         if ( scalar @possible == 1 ) {
         	my $replace = shift @possible;
@@ -416,8 +398,8 @@ sub accept_diff {
 	my $file = $message->file;
 	my $diff = $message->diff;
 
-	my $current = Padre::Current->document;
-	my $editor = Padre::Current->editor;
+	my $current = $self->main->current->document;
+	my $editor = $self->main->current->editor;
 
 	my $p_dir = $current->project_dir;
 	my $p_name = File::Basename::basename( $p_dir );
@@ -554,7 +536,6 @@ sub derive_rgb {
     my $word   = substr($digest,0,2);
     my $int    = unpack('%S',$word);
     my $hue = 360 * ( $int / 65535 );
-    # TODO - derive differently based on system background colour ?
     my $norm =  hsv2rgb( $hue, 0.8, 0.75 );
     my @rgb =  map { int(255*$_) } @$norm;
     return \@rgb;

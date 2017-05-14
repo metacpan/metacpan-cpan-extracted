@@ -10,7 +10,7 @@ use warnings;
 use base qw( Devel::MAT::Tool );
 use utf8;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Getopt::Long qw( GetOptionsFromArray );
 use List::Util qw( pairs );

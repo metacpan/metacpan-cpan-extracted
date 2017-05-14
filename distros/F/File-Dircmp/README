@@ -1,0 +1,9 @@
+Copyright (c) 2003 Josh Schulte. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+To install File::Dircmp do the following.
+
+perl Makefile.PL
+make
+make test
+make install
+

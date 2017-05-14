@@ -1,0 +1,42 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Conditional Text</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_omgmt.html">Previous Topic</A> | <A HREF="in_event.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.4. Conditional Text</H1>
+<P>Blocks of text can be conditionally included or excluded using the following macros:</P>
+<PRE>
+   !if condition
+   !elsif condition
+   !else
+   !endif
+</PRE>
+<P>These macros allow you to tune the output for different audiences. For example, you may wish to only include email directions if <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A> is being generated:</P>
+<PRE>
+!if OPT_PP_HTML
+Click {{[jump=&quot;mailto:joe&quot;] here}} to send me email.
+!endif
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG></P>
+<OL>
+<LI><EM>elseif</EM> can be used instead of <A HREF="../ref/melsif.html">elsif</A> if you prefer.
+<LI><EM>condition</EM> is an <EM>SDF expression</EM> where unknown variables do not give errors
+<LI>Conditional text blocks must be fully defined within a given file. This prevents an <A HREF="../ref/mif.html">if</A> macro within an included file excluding text in the file doing the including.</OL>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_omgmt.html">Previous Topic</A> | <A HREF="in_event.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

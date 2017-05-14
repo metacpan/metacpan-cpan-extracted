@@ -1,0 +1,8 @@
+# $Id: MANIFEST,v 1.2 2002/06/09 15:42:20 petef Exp $
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/Mail/Verify.pm
+t/use.t

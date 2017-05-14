@@ -1,0 +1,27 @@
+NAME
+    File::Find::Rule::WellFormed - Find well-formed XML documents
+
+SYNOPSIS
+        use File::Find::Rule qw(:WellFormed);
+
+        my @files = find(wellformed => in => $ENV{HOME});
+
+DESCRIPTION
+    "File::Find::Rule::WellFormed" extends "File::Find::Rule" to find
+    well-formed (or not well-formed) XML documents, by providing the
+    "wellformed" test:
+
+      my @broken = File::Find::Rule->new
+                                   ->file
+                                   ->name('*.xml')
+                                   ->not_wellformed
+                                   ->in('/');
+
+    "wellformed" takes no arguments.
+
+SEE ALSO
+    the File::Find::Rule manpage, the XML::Parser manpage
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+

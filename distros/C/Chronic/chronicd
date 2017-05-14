@@ -1,0 +1,90 @@
+#!/usr/bin/perl -sw 
+##
+## chronic - a cron like daemon that schedules tasks when the 
+##            the user is away and the system idle.
+##
+## Author: Vipul Ved Prakash <mail@vipul.net>.
+## $Id: chronicd,v 1.8 2004/07/26 23:11:33 hackworth Exp $
+
+# Most of the Chronic code lives in the libs (under lib/).
+# Schedule::Chronic contains the scheduler, Schedule::Chronic::Tab
+# contains the logic to read/write chrontabs and associated files, and
+# Schedule::Chronic::Constraints::* constain the constraints code. The
+# code in chronicd is mostly about daemonization specific stuff (like
+# handling HUP, running the scheduler in the background, etc.). The
+# documentation for chronicd is installed as a chronicd manpage in 
+# Section 1 of the Unix manual set.
+
+package main;
+use POSIX;
+use lib qw(lib);
+use Schedule::Chronic;
+use Schedule::Chronic::Tab;
+
+# Parse command line variables and flags.
+
+$fg ||= 0;
+
+
+# Set our name to ``chronicd'' so users can send signals to the
+# process by name.
+
+$0 = "chronicd";
+
+
+# Check if the supplied chrontab exists. If no chrontab is
+# supplied, Schedule::Chronic::Tab will discover and read all
+# available tabs.
+
+my $crontab = shift @ARGV;
+
+if ($crontab) { 
+    unless (-e $crontab) { 
+        die "``$crontab'' does not exist.\n";
+    }
+}
+
+
+# $chronic will hold the scheduler object. 
+
+my $chronic;
+
+my $firsttime = 1;
+sub engage { 
+
+    $chronic = new Schedule::Chronic ( debug => $fg ? 1 : 0, logtype => $fg ? 'stderr' : 'syslog' );
+    $chronic->read_tabs($crontab);
+    $chronic->load_cns_for_schedule();
+    if (!$fg and $firsttime) { chdir '/'; fork && exit; POSIX::setsid; }
+    $firsttime++;
+    $chronic->getpid();
+    $chronic->schedule();
+
+}
+
+
+# Install the HUP signal to re-engage. We lose ~44 Kb on each
+# HUP. Debug and FIX!
+
+my $pending_hup = 0;
+
+sub hup_handle { 
+    if ($chronic->{nohup}) { 
+        $chronic->{pending_hup} = 1;
+        return;
+    }
+    $chronic = undef; 
+    engage(); 
+}
+
+
+my $sigset = POSIX::SigSet->new();
+my $action = POSIX::SigAction->new('hup_handle', $sigset, &POSIX::SA_NODEFER);
+POSIX::sigaction(&POSIX::SIGHUP, $action);
+
+
+# Call engage() to put the scheduler live. 
+ 
+engage();
+
+ 

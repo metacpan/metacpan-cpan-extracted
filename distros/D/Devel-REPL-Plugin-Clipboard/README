@@ -1,0 +1,21 @@
+NAME
+    Devel::REPL::Plugin::Clipboard - #clip output to clipboard
+
+VERSION
+    version 0.004
+
+COMMANDS
+    This module provides the following command to your Devel::REPL shell:
+
+  #clip
+    The "#clip" puts the output of the last command on your clipboard.
+
+AUTHOR
+    Steve Nolte <mcsnolte@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steve Nolte.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

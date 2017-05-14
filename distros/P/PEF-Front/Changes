@@ -1,3 +1,15 @@
+0.20 Wed, 10 May 2017 20:20:00 GMT
+         - allow convert_blessed in ajax/json answer  
+          
+0.19 Tue, 09 May 2017 18:20:00 GMT
+         - add answer_data support to RenderTT  
+          
+0.18 Tue, 09 May 2017 11:30:00 GMT
+         - add answer_http_response and answer_data  
+          
+0.17 Tue, 09 May 2017 11:30:00 GMT
+         - add http status set to result and ajax 
+          
 0.16 Mon, 06 Mar 2017 11:30:00 GMT
          - fix chained model call
           

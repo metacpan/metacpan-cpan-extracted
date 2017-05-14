@@ -1,0 +1,52 @@
+CLI.pm	- Simple command line interpreter
+
+CLI.pm is a module to create simple command line programs with simple
+variable and command settings. It supports settig simple variables,
+arrays of values and running commands which use those variables.
+
+The documentation is almost non-existant. This started as a private
+project but has been placed on CPAN in case it is usable by others. If
+it is the author will attempt to improve the doco. Look at test.pl for
+an example of usage. interactive.pl is the same code but runs
+interactively for better feeling for how it works.
+
+Requirements:
+-------------
+
+Perl and the Astro::Time module from CPAN
+
+
+Where can I get it from?
+------------------------
+
+  http://search.cpan.org/~cphil/
+
+Installation:
+------------
+
+ % perl Makefile.PL
+ % make
+ % make test
+ % make install
+
+Changes:
+--------
+
+See the Changes file
+
+Author:
+-------
+
+Chris Phillips, CSIRO, Australia Telescope National Facility
+
+ Chris.Phillips@csiro.au
+
+Acknowledgment:
+---------------
+
+Copyright
+---------
+
+This module is copyright (C) 2009-2015 Chris Phillips.  All rights
+reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,17 @@
+Revision history for Dist-Zilla
+
+0.005  2010-12-23
+          test cleanup
+
+0.004  2010-12-23
+          forgot prereq
+
+0.003  2010-12-22
+          removed aliased prereq
+
+0.002  2010-12-21
+          doc fixes
+
+0.001  2010-12-21
+          original version
+

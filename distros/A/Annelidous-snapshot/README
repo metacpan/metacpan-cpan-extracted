@@ -1,0 +1,22 @@
+-------------------------------------------
+ Annelidous
+ a flexible cloud management framework.
+===========================================
+
+Annelidous provides a perl-based framework
+to develop cloud management systems,
+and to wrap around existing systems,
+to provide proxy services between systems,
+and otherwise provide 'glue' between
+anything and everything IaaS!
+
+
+-------------------------------------------
+ Authors:
+===========================================
+* Eric Windisch <eric@grokthis.net>
+* 
+*
+===========================================
+-------------------------------------------
+                            Copyright 2009.

@@ -1,0 +1,191 @@
+#!/usr/bin/env perl
+package Bio::App::SELEX::AdapterTrim;
+# ABSTRACT: Trim adapters from FASTQ files. Works for 5' or 3' adapters.
+
+#############################################################################
+# Author: Scott Givan with some modifications by Christopher Bottoms.
+#############################################################################
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+my ($infile, $outfile, $overwrite, $adapterseq, $help, $verbose, $debug, $fastq,$idlist,$idlistfile,$printall,$notwoadapters,$id2adapters);
+
+my $adapter3prime;
+
+my $options = GetOptions(
+    "infile=s"        => \$infile,
+    "outfile=s"       => \$outfile,
+    "overwrite"       => \$overwrite,
+    "adapterseq=s"    => \$adapterseq,
+    "help"            => \$help,
+    "verbose"         => \$verbose,
+    "debug"           => \$debug,
+    "fastq"           => \$fastq,
+    "idlist"          => \$idlist,
+    "idlistfile=s"    => \$idlistfile,
+    "printall"        => \$printall,
+    "notwoadapters"   => \$notwoadapters,
+    "id2adapters"     => \$id2adapters,
+    "adapter3prime=s" => \$adapter3prime,
+);
+
+if (!$options) {
+  print "couldn't parse options\n";
+  exit();
+}
+
+if ($help) {
+print <<HELP;
+
+  "infile=s"        =>  \$infile,
+  "outfile=s"       =>  \$outfile,
+  "overwrite"       =>  \$overwrite,
+  "adapterseq=s"    =>  \$adapterseq,
+  "help"            =>  \$help,
+  "verbose"         =>  \$verbose,
+  "debug"           =>  \$debug,
+  "fastq"           =>  \$fastq,
+  "idlist"          =>  \$idlist,
+  "idlistfile=s"    =>  \$idlistfile,
+  "printall"        =>  \$printall, # print all sequences, even if they don't contain adapter sequence
+  "notwoadapters"   =>  \$notwoadapters, # skip sequences that contain > 1 adapter sequence, even if --printall
+  "id2adapters"     =>  \$id2adapters, # output sequences with >1 adapter to STDERR, requires --notwoadapters
+  "adapter3prime=s" =>  \$adapter3prime,
+
+notes:
+
+--notwoadapters filters out sequences with more than one adapter sequence. Typically, these reads are composed
+almost exclusively of adapter sequence, so "two" usually means "at least two". You can see the sequences that
+are filtered using --id2adapters, which directs those sequences to STDERR.
+
+ie:  adapter_trim.pl --infile set1.fq --fastq --outfile trimmed1.fq --adapterseq AAGCAGTGGTATCAACGCAGAGTAC --notwoadapters --id2adapters >& 2adapters.txt
+
+HELP
+exit;
+}
+
+$infile = 'infile' unless ($infile);
+$outfile = 'outfile' unless ($outfile);
+$idlistfile = 'idlist' unless ($idlistfile);
+
+if (-e $outfile && !$overwrite) {
+  print "$outfile already exists and you didn't specify to overwrite\n";
+  exit();
+}
+
+if (!$adapterseq && !$adapter3prime) {
+  print "you must enter a adapter sequence using either the --adapterseq argument or the --adapter3prime argument\n";
+  exit();
+}
+
+open(IN,$infile) or die "can't open '$infile': $!";
+open(OUT,">$outfile") or die "can't open '$outfile': $!";
+
+if ($idlist) {
+  open(ID,">$idlistfile") or die "can't open 'idlist': $!";
+}
+
+my ($seqname, $seq, $parsed);
+
+if (!$fastq) {
+  while (<IN>) {
+    print $_ if ($debug);
+    
+    if ($_ =~ /^>(.+)\n/) {
+      $seqname = $1;
+      next;
+    }
+    
+    chomp($_);
+    $seq = \$_;
+  #  print "seq '$seqname' = '" . $$seq . "'\n" if ($debug);
+    
+    if ($$seq =~ /^$adapterseq/) {
+      print "parsed read:\n" if ($debug);
+      $parsed = $$seq;
+      $parsed =~ s/^$adapterseq//;
+      print "\t>$seqname\n\t$parsed\n" if ($debug);
+      print OUT ">$seqname\n$parsed\n";
+    }
+    
+  }
+} else {
+
+  my ($quality,$sequence,$qualname);
+  #
+  # loop through file, collect sequence ID, sequence and quality string
+  # trim sequence if necessary
+  # if sequence gets trimmed, trim same number of characters from quality string
+  # print trimmed fastq sequence and quality string
+  #
+  
+  while (<IN>) {    
+    if ($_ =~ /^\@(.+)\n/) {
+      $seqname = $1;
+       
+      $sequence = <IN>;
+      chomp($sequence);
+      $qualname = <IN>;
+      $qualname =~ s/[\+\n]//g;
+      $quality = <IN>;
+      chomp($quality);
+    if ($debug) {
+        print "sequence: '$sequence'\n";
+        print "quality:  '$quality'\n";
+    }
+      
+      
+      if ($sequence =~ /^$adapterseq/) {
+     
+        # If debug ... 
+        print "seqname:\t'$seqname'\nsequence:\t'$sequence'\nqualname:\t'$qualname'\nquality:\t'$quality'\n\n" if ($debug);
+        
+        # Remove 5' adapter sequence
+        $sequence =~ s/$adapterseq//;
+
+        # Remove quality scores for the adapter sequence
+        $quality = substr($quality,length($adapterseq));
+
+        # If 3' adapter is defined, then check for it
+        if ($adapter3prime) {
+            if ( $sequence =~ /$adapter3prime$/ ) {
+
+                # Calculate length of sequence sans the adapter
+                my $insert_length = length($sequence) - length($adapter3prime);
+
+                # Remove sequence and quality for the adapter
+                $sequence = substr( $sequence, 0, $insert_length );
+                $quality  = substr( $quality,  0, $insert_length );
+            }else{
+                # Skip sequence since 3' adapter is not found
+                next;
+            }
+        }
+
+        if ($notwoadapters) {
+            if (index($sequence,$adapterseq) >= 0) {
+                print STDERR "\@$seqname\n$sequence\n\+$seqname\n$quality\n" if ($id2adapters);
+                next;
+            }
+        }
+
+        print "seqname:\t'$seqname'\nsequence:\t'$sequence'\nqualname:\t'$qualname'\nquality:\t'$quality'\n\n" if ($debug);
+        
+        print OUT "\@$seqname\n$sequence\n\+$seqname\n$quality\n"; 
+        print ID "$seqname\n" if ($idlist);
+      
+      } elsif ($printall) {
+
+        print OUT "\@$seqname\n$sequence\n\+$seqname\n$quality\n"; 
+          
+      } 
+  
+    }
+  }
+}
+
+close(IN);
+close(OUT);
+close(ID) if ($idlist);

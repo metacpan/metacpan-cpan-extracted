@@ -1,0 +1,19 @@
+# $Revision: 1.1 $ $Date: 2006/02/24 21:27:16 $ $Author: estrabd $
+#
+# State Transition File
+# The detection of of an '&' or 'epsilon' flags this FSA as nondetermininstic 
+# Otherwise, it is treated as deterministic
+#
+
+0:
+epsilon 1 # nfa detected bc of 'epsilon'
+a 2
+b 3
+1:
+a 2 & 4   # nfa could also be flagged when this '&' is detected
+2:
+b 3 & 4
+3:
+epsilon 4
+4: 
+a 0

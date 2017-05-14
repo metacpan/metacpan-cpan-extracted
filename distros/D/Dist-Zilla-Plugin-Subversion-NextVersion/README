@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Dist-Zilla-Plugin-Subversion-NextVersion,
+version 1.003:
+
+  provide a version number by bumping the last SVN release tag
+
+This software is copyright (c) 2013 by Markus Benning <me@w3r3wolf.de>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

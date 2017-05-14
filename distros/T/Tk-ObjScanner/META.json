@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -48,8 +48,8 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-project@rt.cpan.org",
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-ObjScanner"
+         "mailto" : "ddumont at cpan.org",
+         "web" : "https://github.com/dod38fr/perl-tk-objscanner/issues"
       },
       "homepage" : "https://github.com/dod38fr/perl-tk-objscanner",
       "repository" : {
@@ -58,6 +58,7 @@
          "web" : "https://github.com/dod38fr/perl-tk-objscanner"
       }
    },
-   "version" : "2.016"
+   "version" : "2.017",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

@@ -1,0 +1,365 @@
+Revision history for Perl extension Genex.
+
+2.6.0 Tue Feb  6 15:48:00 MST 2001
+      - XMLUtils.pm:
+        Added the beginings of a real XML API, defining db2xml() and
+	   all2xml() for some classes
+	Now defines Bio::Genex::GeneXML and ::GeneXML::USF helper
+	   classes 
+	Fixed pretty_print() to preserve whitespace
+      - DBUtils.pm:
+        now has many more assert_* methods
+        new helper method: fetch_db_ids_for_species() that does a
+	   join accross the USF, and ExternalDatabase tables
+      - Genex.pm:
+        now has timestamp() helper method, so that all DB timestamps
+	   can be formatted identically
+      - GenexAdmin.pm:
+        Class interface to new table. This enables a DB history
+	mechanism to record changes to the DB installation
+      - get_objects() fixed for all classes
+      - db2xml.pl: 
+        fixed a BlastHits bug
+	added pretty_print() again
+	Fixed caching of control bundles, so that the <misc_list> is 
+	   specific to each download
+      - cv-insert.pl:
+        now records info into GenexAdmin
+        now uses --name option to identify *who* made the changes
+	uses --dbname to specify what DB to use
+      - status.pl:
+        New CGI script that shows all version information pertinent to
+	   the server installation. 
+
+2.5.0 Fri Jan 26 02:38:59 MST 2001
+      - db2xml.pl:
+        caching of experiment sets and control-bunldes implemented
+        now has --no_cache option to avoid using or setting cache
+	--user/--password now optional unless --authenticate is specified
+	Removed citationlink()
+	Fixed aweful citation bug that never showed up, because
+	   citationlink table was never populated
+      - Fixed API for get_objects() by creating new method
+	   get_all_objects().
+      - fixed bug in check_password()
+      - XMLUtils.pm.in
+	Added new framework for implementing class-specific XML output. 
+	Implemented output for Chromosome, and partial output for Species
+	   (still needs USF for completeness).
+      - DBUtils.pm.in (Repository): 
+	Added new assert_* methods: 
+	   assert_species
+	   assert_protocol
+	   assert_scanner
+	   assert_software
+	   assert_spotter
+	   assert_array
+	   assert_experiment
+	check_password() no longer dies() with a bad password, instead it
+	   returns undef
+      - UserSequenceFeature, ExperimentSet and ArrayMeasurement now have
+           provider_con_fk() and  provider_con_obj() methods
+	post_process() no longer automatically derefences the con_obj()
+	   from a us_obj, it first tests the definedness
+      - ExternalDatabase: Fixed full name
+      - list_tables.pl.in: Fixed name of HTML title
+
+2.4.0 Tue Jan 16 09:50:56 MST 2001
+      - Changed to Bio::Genex namespace
+      - Now gets INSTALLSITELIB, INSTALLMAN1DIR, and INSTALLMAN3DIR from
+	   Config.PM 
+
+2.2.0 Sun Jan 14 16:37:46 MST 2001
+      - Is now compatible as part of complete GeneX installation or as
+        update of just Genex.pm
+      - db2xml.pl can now use cached control bundle files
+      - example scripts now have more flexibility to choose a
+        different DB if DEBUG is set.
+
+2.1.2 Tue Jan  9 18:00:51 MST 2001
+      - Genex.pm is now included as part of the larger GeneX
+        installation process
+      - Renamed GEML to GeneXML
+      - reorganization of directories (query and curation_tool
+        removed, cgi renamed to samples).
+
+2.1.1 Sat Dec  2 13:29:50 MST 2000
+      - Changed HTMLUtils::post_process(), it now is much more modular
+        and handles errors more intelligently
+
+2.1.0 Sun Nov 12 22:27:02 MST 2000
+      - Major upgrade for Bio::Genex::current_connection(). The $Bio::Genex::*
+        global variables are still available, but current_connection()
+        now takes key/value style arguments when making a
+        connection. If given arguments, it checks their value against
+        those of the current db handle and if any differ, it will
+        invalidate the handle and create a new connection.
+      - DBUtils::check_password() enables checking username/password
+        pairs from the UserSec table. 
+      - UserSec table now stores passwords in crypt() format using the
+        first two letters of the login as salt.
+      - Makefile.PL now sets four DB user variables:
+	$Bio::Genex::RO_USERNAME
+	$Bio::Genex::RO_PASSWORD
+	$Bio::Genex::SU_USERNAME
+	$Bio::Genex::SU_PASSWORD
+	They are accessible by programs	that don't want to hard-code
+	usernames and passwords for the readonly => RO, and super-user
+	=> SU accounts. 
+      - list_tables.pl and fetch_table.pl can now access alternate
+        DB's by specifying the dbname parameter.
+      - HTMLUtils::post_process() now includes the raw fkey as well as
+        the pretty printed name 
+      - new geml.dtd (two minor #REQUIRED ==> #IMPLIED modifications)
+
+2.0.8 Tue Oct 31 13:45:46 MST 2000
+      - Fixed linking table bug in get_objects().
+      - get_objects() API now resolved:
+	   * get_objects('ALL') 
+	   * get_objects({column=>foo,value=>bar})  ==> no 'ALL'
+	   * get_objects(@ids) 	
+      - db2xml now handles treatments correctly
+      - minor geml.dtd modifications
+
+2.0.7 Thu Oct 26 16:44:46 MST 2000
+      - Added new configuration parameters that enable installing the
+        gxquery scripts and the curation-tool scripts properly
+      - Changes to data files
+
+2.0.6 Tue Oct 24 16:50:40 MST 2000
+      - included query/Makefile.PL which slipped through the cracks
+
+2.0.5 Tue Oct 24 16:05:40 MST 2000
+      - Changed URL in HTMLUtils.pm to point to sample scripts
+      - added new configuration options that query for the directories
+        to install the sample cgi scripts and the query cgi scripts
+      - added Makefile.PL to query and install_query target to primary
+        Makefile, and query/Makefile
+
+2.0.4 Tue Oct 24 15:56:40 MST 2000
+      - added new configuration option for locating the analysis tools
+
+2.0.3 Tue Oct 24 15:22:40 MST 2000
+      - added new configuration options for placing the query iterface
+        and the sample CGI scripts in different directories 
+
+2.0.2 Tue Oct 24 14:22:40 MST 2000
+      - updated controlled vocabulary XML
+      - add new data XML files in data/db_tables
+      - added gxquery/ 
+      - minor fixes to db2xml.pl
+
+2.0.1 Wed Oct 18 22:13:38 MST 2000
+      - Added db2xml.pl.in
+      - All dtd's now have versions
+      - eliminated numerous warnings from all modules
+      - xml-write.pl renamed to db2xml.pl
+      - new functionality for create_insert_sql() for creating SQL
+        without placeholders
+      - Made error messages more verbose
+      - use of DBUtils::fetch_fkey_list() is depricated, use
+        get_objects() instead
+
+2.0.0 Tue Sep 26 20:56:00 MST 2000
+      - Fkey interface revamped. Now each foreign key has a raw
+        interface that accesses the values as stored in the DB, and an
+        object oriented interface that retrieves an object of foreign
+        class. This also obsoleted many of the old confusing flags to
+        new(), such as:  'no_fkey_objects', 'recursive_fetch',
+        'fetch_fkey_fkeys', and 'fetch_otm_fkeys'	 
+      - application startup time is much quicker. Classes no longer
+        declare 'use' pragmas for all fkeys.
+      - created data directory where XML versions of some tables are
+        stored: external_database, and controlled vocabularies.
+      - also all MANY_TO_ONE fkeys now leave methods in the calling
+        class, for example 'spc_fk' in Chromosome. This provides both
+        parent and child links to DB objects in MANY_TO_ONE
+        relationships.
+      - xml-write now has friendlier command line option interface
+      - all internal methods now have better DBI error messages
+      - get_objects() no longer returns bogus objects.
+      - new example script: list_tables.pl that is the main entry
+        point from browsing the DB, table-by-table
+      - example cgi scripts are now only installed during 'make
+        install'
+      - more example scripts for using XML to insert data into the
+        DB: cv-insert.pl, contact-insert.pl, security-insert.pl 
+
+1.0.5 Fri Sep 22 19:41:44 MST 2000
+      - Bug fix for xml-write: if USF/CSF entries not present, no
+        external_file reference is created.
+      - Bug fix for make process: cgi scripts are now installed in
+        $CGDIR only during 'make install'
+      - minor bug fixes for entire make process, and general cleanup
+        of Makefile.PL
+
+1.0.4 Wed Sep 20 14:50:41 MST 2000
+      - Fixed linking table bug that caused only a single entry to be
+        retrieved for any fkey access.
+      - Final version of xml-write.pl. Species can now be specified by
+        comma-delimited list (--species=4,5,6), as can
+        experiments. New option for limiting what arrays are output by
+        specifying array type
+        (--am-types=primary_raw,derived_ratio). New tables supported
+        include GroupSec, TL_FactorValues, Treatment_AMs, Sample, and
+        Citation.  
+
+1.0.3 Sat Sep 16 14:18:02 MST 2000
+      - Bug fix in create_genex_class.pl for linking tables
+	 ==> %TABLE2PKEY was improperly generated
+      - moved DTD's into distribution
+      - new scripts directory
+      - Makefile.PL has nicer interface
+      - numerous additions to xml-write: control bundle can now
+	include all contacts in DB, info has been normalized between
+	<array> and <array_measurement>, <citation> support added,
+	controlled vocab terms no longer use white-space, 
+
+1.0.2 Thu Sep  7 17:00:58 MST 2000
+      - created scripts directory
+      - moved assert_element() to XMLUtils.pm
+      - more refinements to xml-write.pl
+
+1.0.1  Tue Sep  5 12:28:31 MST 2000
+     - xml-write.pl now can output complete experiment sets
+     - All subclasses of Bio::Genex::ControlledVocab are now part of the
+       ControlledVocab.pm file
+     - Removed AM_Group class
+
+1.0  Thu Jun 16 18:11:07 MDT 2000
+     - first official release
+
+0.29 Thu Jun 15 18:11:07 MDT 2000
+     - added scripts for creating control bundle
+     - fixed controlled vocab table bugs
+
+0.28 Thu Jun 15 16:41:29 MDT 2000
+     - new controlled vocab tables
+
+0.27 Thu Jun 15 15:20:15 MDT 2000
+     - changed interface to get_objects(), it now accepts an optional
+       hashref as the first parameter,
+       e.g. my @objs = $class->get_objects({no_fkey_objects=>},'ALL') 
+
+0.26 Tue Jun 13 15:24:07 MDT 2000
+     - Fixed CACHE bug in Makefile.PL
+     - added xml-write.pl.in, write-con-vocab.pl.in, and pretty-print.pl.in
+
+0.25 Tue Jun 13 13:37:07 MDT 2000
+     - removed %%GENEX-EXTRALIBS%% this broke make test because the
+       use 'lib' made perl find those libs *before* the new ones in
+       blib. 
+
+0.20 Tue Jun  6 16:57:40 MDT 2000
+     - DBUtils.pm: Moved all functions in @EXPORT to @EXPORT_OK.
+       Added fetch_fkey_list().
+       Added caching to assert_table_defined() ==> much faster for
+	repetitive asserts.
+     - Genex.pm: undefined() handles fetching fkeys as objects.
+     - All classes: new fkey type: LOOKUP_TABLE fkeys.
+	delayed_fetch flag is gone, instead it works by default
+	Added fkey_objects, fetch_all, fetch_fkey_fkeys, fetch_lt_fkeys,
+	fetch_otm_fkeys flags.
+	Cleaned up fetching of fkeys as objects.
+	Documented in comments and pod.
+     - new classes:
+	   UserSequenceFeature.pm
+	   ExternalDatabase.pm
+	   ExperimentFactors.pm
+	   CanonicalSequenceFeature.pm
+	   BlastHits.pm
+     - fetch_es.pl: Added security check to make sure that CGI
+        parameters haven't been modified. 
+        Now use filtering on technology types. Had to add DISTINCT flag
+        to select statement, and prepend table name to columns requested.  
+     - fetch_array.pl: Added security check to make sure that CGI
+	parameters haven't been modified.
+     - fetch_spot.pl.in: Added security check to make sure that CGI
+	parameters haven't been modified.
+     - query-intro.pl.in: Technology types are now fetched from
+       DB. Values are now sorted so defaults come to the top. 
+     - DBUtils.pm.in: Added a DISTINCT option to create_select_sql(). 
+
+0.18 Wed May 31 16:34:48 MDT 2000
+     - DBUtils.pm.in: Added three new helper functions: 
+	   fetch_es_ids -- gets a list of all available experiment set ids
+	      from the DB.
+	   fetch_am_ids -- gets a list of all available array measurement
+	       ids for a given experiment from the DB.
+	   output_spot_data -- writes all spot data for a given experiment
+	       set to a filehandle.
+
+0.17 Fri May 26 16:34:48 MDT 2000
+     - added fetch_spot.pl for retrieval of spot data in downloadable
+       tab delimited files
+     - Added ONLY_ONE_ES parameter to enable a generic interface to
+       the combination of query-intro.pl/fetch_es.pl/fetch_array.pl
+     - query-intro.pl can now filter on species
+     - fetch_es.pl can now filter on array type
+     - HTMLUtils::post_process() now filters out logins and passwords 
+     - All objects can be called in a recursive fetch mode. If fetch
+       is called with a numeric parameter (e.g. $array->fetch(2)),
+       that parameter is used to specify the depth of the recursive
+       fetch -- this is used for following fkeys. 
+     - renamed mksub.pl to create_genex_class.pl
+     - Added classes:
+               Spotter.pm
+               Software.pm
+               Scanner.pm
+               Sample.pm
+               Protocol.pm
+               ExperimentSet.pm
+               ArrayMeasurement.pm
+               ArrayLayout.pm
+
+0.16 Tue May 23 13:51:28 MDT 2000
+     - fixed dangerous problem with caching the current database
+       handle => calling disconnect() didn't undefine the handle,
+       just removed the backend connection. 
+     - fixed dangerous bug in Bio::Genex::undefined()
+     - fixed grammar bug in cgi scripts
+
+0.15 Mon May 22 16:58:30 MDT 2000
+     - added changes for latest ObjectTemplate.pm
+     - added Genex.t regression tests
+     - added HTMLUtils.t regression tests
+     - added DBUtils.t regression tests
+     - now HTMLUTils::post_process() uses autofetch on all
+       attributes. 
+
+0.14 Thu May 18 17:36:08 MDT 2000
+     - Modified HTMLUtils::post_process() to use the object interface
+       instead of using DBI queries ==> WOW!!
+
+0.13 Thu May 18 16:47:29 MDT 2000
+     - Added trial sytle sheet, used it in query-intro.pl
+     - added get_groups() to mksub.pl
+     - fetch_table.pl now used instead of other scripts
+     - modified fetch_table.pl to use object interface instead of
+       rolling it's own DBI queries.
+
+0.12 Wed May 17 17:46:14 MDT 2000
+	- bug fix in fetch_table.pl to print out the header using the
+	  table name. Also added defaults for all parameters
+
+0.11 Wed May 17 16:16:48 MDT 2000
+	- Makefile.PL now puts Genex.pm in the right place
+	- Added DBUtils.pm.in
+	- Added HTMLUtils.pm.in
+	- moved post_process() to HTMLUtils
+	- created fetch_table.pl to handle generic tables
+	- added UserSec.pm and GroupSec.pm
+
+0.10  Tue May 16 13:12:02 MDT 2000
+	- Makefile.PL now queries user if environment variables 
+          are not defined
+	- Makefile.PL now saves cache of user data
+
+0.01  Sat Feb  5 10:11:52 2000
+	- original version; created by h2xs 1.19
+
+### *** emacs file mode definition ***
+### Local Variables: 
+### mode:text
+### mode:filladapt
+### End: 

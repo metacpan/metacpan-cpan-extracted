@@ -1,10 +1,9 @@
 #include <xs/uri/XSURI.h>
 #include <unordered_map>
-#include <xs/lib.h>
 
 namespace xs { namespace uri {
 
-using xs::lib::sv2string;
+using xs::sv2string;
 using panda::uri::Query;
 
 static std::unordered_map<string, SV*> uri_class_map;

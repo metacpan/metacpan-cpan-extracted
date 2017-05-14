@@ -1,0 +1,258 @@
+XML::Template v3.00
+-------------------
+
+1.4.03
+
+- I have finally started a detailed record of changes!
+- Added an error if a document has no content.
+- XPath variables now return a reference to an XPath object.  To get 
+  string values, use the appropriate variable subroutine.
+- Added an AUTOLOAD method to XML::Template::Util which just calls the 
+  subroutine as a method of the XML::Template variable value.
+- XPath objects are now cached for each unique full variable name.
+- XML::Template::Vars::_set now supports setting array variables.
+- Changed XML::Template::Element::Vars::set and element so full variable 
+  names are generated and values set for them (as opposed to generating 
+  actual arrays and hashes on the fly and setting the top level variable).
+- When setting a variable, remove any cached XPath object.  Due to the 
+  previous change, this is now easy.  When creating a new XPath object, 
+  the object is associated with a full variable name in the cache.  The 
+  previous change ensures that all variables (including the elements and 
+  children of array and nested variables) are set using the full variable  
+  name.  So to remove the cached object, just delete the entry in the 
+  cache for the variable name being set (which is always a full name).
+- Fixed a bug in the attribute grammars involving extra /'s when variables 
+  were present in XPath queries.
+
+1.8.03
+
+- Create module XML::Template::Element::DOM and method appendChild.
+
+1.12.03
+
+- Fixed a problem with appendChild.  Instead of using XML::XPath::XMLParse
+  to create the new node to append, I need to create an XPath object for 
+  the new XML and append the node returned by the XPath query 
+  /child::node().  This is because, XMLParse adds an extra level above the 
+  actual child I want to append (the root I suppose).  This extra level is 
+  what ultimately gets appended so queries for the node I really want to 
+  append do not work.  /child::node() returns the actual node.  This may 
+  not technically be a bug in XML::XParse, but it is not the behaviour I 
+  would expect.
+- Now the global and user config files are loaded by XPath.  The children 
+  of the user config file root node are appended to the global root node.
+
+7.17.03
+
+Been awhile...
+
+- Create a general function get_info to retrieve config information via 
+  an xpath query.  Created wrapper functions get_subroutine_info and 
+  get_namespace_info.
+- XPath variable 'Config' added to global context in Vars init.  So the 
+  variable Config is always available to templates.
+
+7.20.03
+
+- get_info takes an arbitrary XPath query now and doesn't append 
+  [\@name='$name'] to it.  This allows functions like get_element_info to 
+  use get_info with more complex XPath queries.  Updated 
+  get_subroutine_info and get_namespace_info.
+- Changed get_host_info, get_source_mapping_info, get_source_info, 
+  get_element_info, and get_attrib_info to use get_info.
+- Removed get_source_mapping from Base.pm.
+- Removed get_hostvar from Process.pm.
+- Started experimenting with xml-template special attributes.  For 
+  instance, in
+    <html xml-template:cgiheader="0">
+      ...
+    </html>
+  no cgi header would be printed.  xml-template:cgiheader is the only 
+  special attribute supported at the moment.  It need to have some end tag
+  code to set the cgiheader flag back to what it was before it is set.
+- Updated Element/User.pm to use new get_*_info and get_source correctly.  
+  Fixed bugs that caused multiple cgi headers to be displayed when setting 
+  cookies and logging in or out.
+- Updated Source/DBI.pm to use new get_source_info correctly.
+
+7.26.03
+
+- Bug fix: Nested in check broke if element config defined but not nested 
+  in defined - just check if nestedin defined.
+- Vars: If performing XPath query on an XPath Node::Element object, create 
+  new $xp object with XML string from Node::Element object.  This allows 
+  things like
+
+  <var:foreach var="el" array="${Config/namespaces/namespace}">
+    title: ${el/namespace/title}<br/>
+  </var:foreach>
+
+  Perhaps there is a better way than to recreate XPath objects from the 
+  child XML tree, but I don't know it.
+- Block/Load: Updated to use new get_source_mapping_info to get block 
+  source.
+
+8.28.03
+
+Template
+- select STDOUT and set cgi_header to 1 before printing an error in case 
+  error comes from code where another filehandle has been selected (i.e., 
+  IO::String).
+
+Base
+- Add related namespace info to get_namespace_info.
+
+Process
+- In print, don't set cgi_header_printed if current file handle is 
+  IO::String.
+- Don't return an error if a loader fails - just go to next one.
+- Remove \01 from variable names passed to process (they came from the
+  attributes of an include tag).
+- Fixed bug is generate_where.
+
+Util
+- Added format_date variable subroutine.
+
+Vars
+- Fixed bug with returning hash elements.
+
+Element/Block
+- If current file handle is IO::String, don't die process fails.
+
+Element/DB
+- Changed related namespace support to use source mapping info.
+
+Element/Email
+- Added support for plain or html mail.  String html from plain.  Send 
+  with correct content type.
+
+Element/Var
+  - Added tag 'unset'.
+  - Return array value properly.
+  - Fixed length variable subroutine.
+
+Parser/cond.grammar, string.grammar
+  - Handle \. (escaping the dot) directly after "{...}".
+  - Bug fix for xpath expressions.
+
+
+9.12.03
+
+Template
+  - minor changes
+
+Config
+  - Load config file(s) using XML::GDOME.
+
+Element
+  - Change attrib format to so-called James Clark notation.
+
+Parser
+  - Parse has been rewritten as a SAX parser handler!
+
+Process
+  - Parse with SAX.
+
+Vars
+  - Relativize xpath statements for vars derived from other xpath vars,
+    e.g. inside a xpath loop.
+  - Check for Element, Text, Attribute GDOME object vars - toString them.
+
+Element/DB
+  - James Clark attribute notation.
+
+Element/File
+  - Added a list (files) tag.
+
+Element/Form
+  - Changed cgi->upload to cgi->param.  Not sure why this needed to be 
+    done, but it works.
+
+Parser/String
+  - Attempt to detect xpath variable, so if a variable function is used 
+    on them, the xpath is not toStrig'ed first.  Then the function will 
+    operate on the actual GDOME object.  It seems to work, but get_xpath 
+    seems to be called on non-xpath vars.  Need to fix.
+
+
+9.25.03
+
+Process
+  - Change attrib format to James Clark notation.
+
+Element/Block
+  - Change attrib format to James Clark notation.
+
+Element/Var
+  - Updated params for sub 'join'.
+
+Parser/String,Cond
+  - Call $vars->get_xpath for all variables.
+
+
+10.1.03
+
+- Changed version to 3.10.
+- Updated INSTALL and README.
+- Updated Makefile.PL to install files from MANIFEST.
+- Updated some POD.
+- Updated copyright years.
+
+
+10.15.03
+
+- Minor fixes.
+- DBI::Wrap -> DBIx::Wrap.
+
+11.30.03
+
+- Updated xml-template.conf and added host specific 
+  xml-template_host.conf.
+- Updated xml-template.pl.
+- Added some features to site admin, added css style.
+
+lib/XML/Template/Element.pm
+lib/XML/Template/Element/Core.pm
+  - Removed xmlinfo code from previous version.
+
+lib/XML/Template/Util.pm
+  - Added encrypt subroutine.
+
+
+12.22.03
+
+- Updated INSTALL instructions.
+- Updated xml-template.sql.
+- Changed XML:Template::Config->admin_dir to admindir.
+- Podified every module!
+
+lib/XML/Template/Base.pm
+  - Fixed so arrays of elements from get_info xpath query are correctly 
+    returned.
+
+lib/XML/Template/Config.pm
+  - Cleaned up a little.
+
+t/string.t
+  - Updated string test.  Need to add tests!!! Ugh...
+
+12.23.03
+
+- Put <> around email address.
+
+lib/XML/Template/Element/DB.pm
+  - Changed some instances of \s to \\s.
+
+lib/XML/Template/Element/Test.pm
+  - Updated.
+
+11.24.03
+
+- Updated TODO.
+- POD: Made some changes, set links, fixed typos.
+- Changed all occurances of 'yes' or 'no' with 'true' or 'false'.
+
+lib/XML/Template/Process.pm
+  - Default load list contains XML::Template::Element::File::Load.
+
+- Moved to version 3.20!  Updated README, INSTALL, Template.pm.

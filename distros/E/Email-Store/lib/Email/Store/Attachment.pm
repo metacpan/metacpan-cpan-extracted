@@ -3,7 +3,7 @@ use base "Email::Store::DBI";
 use strict;
 use MIME::Parser;
 __PACKAGE__->table("attachment");
-__PACKAGE__->columns(All => qw[id mail filename content_type payload ]);
+__PACKAGE__->columns(All => qw[ id mail filename content_type payload ]);
 __PACKAGE__->has_a(mail => "Email::Store::Mail");
 Email::Store::Mail->has_many(attachments => "Email::Store::Attachment");
 
@@ -14,10 +14,10 @@ sub on_store {
     my $id     = $mail->message_id;
     my $rfc822 = $mail->message;
     my $parser = MIME::Parser->new();
-    
+
     $parser->output_to_core('ALL');
     $parser->extract_nested_messages(0);
-    
+
     my $entity = $parser->parse_data($rfc822);
 
     my @keep;
@@ -25,7 +25,7 @@ sub on_store {
         push (@keep, $_) && next if keep_part($_);
         my $type    = $_->effective_type;
         my $file    = $_->head->recommended_filename() || invent_filename($type);
-        my $payload = $_->body_as_string;
+        my $payload = $_->bodyhandle->as_string;
         $class->create({ mail => $id,  payload => $payload, content_type => $type, filename => $file });
     }
     $entity->parts(\@keep);

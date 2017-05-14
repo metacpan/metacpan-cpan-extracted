@@ -11,7 +11,7 @@
   </TMPL_IF>
 
   <TMPL_IF ERROR503>
-    <div class="message warning"><ul><li><lang en="This application is in maintenance, please try to connect later" fr="Cette application est en maintenance, merci de réessayer plus tard" /></li></ul></div>
+    <div class="message warning"><ul><li><lang en="This application is in maintenance, please try to connect later" fr="Cette application est en maintenance, merci de r&eacute;essayer plus tard" /></li></ul></div>
   </TMPL_IF>
 
   <div class="loginlogo"></div>
@@ -20,7 +20,7 @@
 
     <TMPL_IF URL>
       <h3>
-        <lang en="You were redirect from " fr="Vous avez été redirigé depuis " />
+        <lang en="You were redirect from " fr="Vous avez &eacute;t&eacute; redirig&eacute; depuis " />
         <a href="<TMPL_VAR NAME="URL">"><TMPL_VAR NAME="URL"></a>
       </h3>
     </TMPL_IF>

@@ -35,6 +35,8 @@ $Config{startperl}
 
 print OUT <<'!NO!SUBS!';
 
+BEGIN { pop @INC if $INC[-1] eq '.' }
+
 use warnings;
 
 =head1 NAME
@@ -234,7 +236,7 @@ of C<h2xs> may gain the ability to make educated guesses.
 
 When B<--compat-version> (B<-b>) is present the generated tests will use
 C<Test::More> rather than C<Test> which is the default for versions before
-5.7.2 .   C<Test::More> will be added to PREREQ_PM in the generated
+5.6.2.  C<Test::More> will be added to PREREQ_PM in the generated
 C<Makefile.PL>.
 
 =item B<--use-old-tests>
@@ -530,7 +532,7 @@ OPTIONS:
     -X, --omit-XS         Omit the XS portion (implies both -c and -f).
     -a, --gen-accessors   Generate get/set accessors for struct and union members
                           (used with -x).
-    -b, --compat-version  Specify a perl version to be backwards compatibile with.
+    -b, --compat-version  Specify a perl version to be backwards compatible with.
     -c, --omit-constant   Omit the constant() function and specialised AUTOLOAD
                           from the XS file.
     -d, --debugging       Turn on debugging messages.
@@ -649,10 +651,10 @@ usage if $opt_h;
 
 if( $opt_b ){
     usage "You cannot use -b and -m at the same time.\n" if ($opt_b && $opt_m);
-    $opt_b =~ /^\d+\.\d+\.\d+/ ||
+    $opt_b =~ /^v?(\d+)\.(\d+)\.(\d+)/ ||
     usage "You must provide the backwards compatibility version in X.Y.Z form. "
           .  "(i.e. 5.5.0)\n";
-    my ($maj,$min,$sub) = split(/\./,$opt_b,3);
+    my ($maj,$min,$sub) = ($1,$2,$3);
     if ($maj < 5 || ($maj == 5 && $min < 6)) {
         $compat_version =
 	    $sub ? sprintf("%d.%03d%02d",$maj,$min,$sub) :
@@ -789,7 +791,7 @@ if( @path_h ){
     }
     else {
       @paths = (File::Spec->curdir(), $Config{usrinc},
-		(split ' ', $Config{locincpth}), '/usr/include');
+		(split / +/, $Config{locincpth} // ""), '/usr/include');
     }
     foreach my $path_h (@path_h) {
         $name ||= $path_h;
@@ -862,6 +864,10 @@ if( @path_h ){
 	    $rest =~ s!/\*.*?(\*/|\n)|//.*!!g; # Remove comments
 	    $rest =~ s/^\s+//;
 	    $rest =~ s/\s+$//;
+	    if ($rest eq '') {
+	      print("Skip empty $def\n") if $opt_d;
+	      next defines;
+	    }
 	    # Cannot do: (-1) and ((LHANDLE)3) are OK:
 	    #print("Skip non-wordy $def => $rest\n"),
 	    #  next defines if $rest =~ /[^\w\$]/;
@@ -893,7 +899,7 @@ if( @path_h ){
       }
       else {
 	# Work from miniperl too - on "normal" systems
-        my $SEEK_SET = eval 'use Fcntl qw/SEEK_SET/; SEEK_SET' or 0;
+        my $SEEK_SET = eval 'use Fcntl qw/SEEK_SET/; SEEK_SET' || 0;
         seek CH, 0, $SEEK_SET;
         my $src = do { local $/; <CH> };
         close CH;
@@ -901,6 +907,7 @@ if( @path_h ){
 
         # Remove C and C++ comments
         $src =~ s#/\*[^*]*\*+([^/*][^*]*\*+)*/|("(\\.|[^"\\])*"|'(\\.|[^'\\])*'|.[^/"'\\]*)#$2#gs;
+        $src =~ s#//.*$##gm;
 
 	while ($src =~ /\benum\s*([\w_]*)\s*\{\s([^}]+)\}/gsc) {
 	    my ($enum_name, $enum_body) = ($1, $2);
@@ -912,7 +919,7 @@ if( @path_h ){
                 my ($key, $declared_val) = $item =~ /(\w+)\s*(?:=\s*(.*))?/;
                 $val = defined($declared_val) && length($declared_val) ? $declared_val : 1 + $val;
                 $seen_define{$key} = $val;
-                $const_names{$key}++;
+                $const_names{$key} = { name => $key, macro => 1 };
             }
         } # while (...)
       } # if (!defined $opt_e or $opt_e)
@@ -986,8 +993,8 @@ if( ! $opt_X ){  # use XS, unless it was disabled
       }
       warn "Scanning $filename for functions...\n";
       my @styles = $Config{gccversion} ? qw(C++ C9X GNU) : qw(C++ C9X);
-      $c = new C::Scan 'filename' => $filename, 'filename_filter' => $filter,
-	'add_cppflags' => $addflags, 'c_styles' => \@styles;
+      $c = C::Scan->new('filename' => $filename, 'filename_filter' => $filter,
+        'add_cppflags' => $addflags, 'c_styles' => \@styles);
       $c->set('includeDirs' => ["$Config::Config{archlib}/CORE", $cwd]);
 
       $c->get('keywords')->{'__restrict'} = 1;
@@ -1076,7 +1083,14 @@ if( ! $opt_X ){  # use XS, unless it was disabled
     }
   }
 }
-my @const_names = sort keys %const_names;
+my (@const_specs, @const_names);
+
+for (sort(keys(%const_names))) {
+    my $v = $const_names{$_};
+    
+    push(@const_specs, ref($v) ? $v : $_);
+    push(@const_names, $_);
+}
 
 -d $modpmdir || mkpath([$modpmdir], 0, 0775);
 open(PM, ">$modpmname") || die "Can't create $ext$modpname/$modpmname: $!\n";
@@ -1374,6 +1388,7 @@ if( ! $opt_X ){ # print XS, unless it is disabled
 warn "Writing $ext$modpname/$modfname.xs\n";
 
 print XS <<"END";
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -1465,7 +1480,7 @@ if( ! $opt_c ) {
                    XS_FILE =>      $xsfallback,
                    DEFAULT_TYPE => $opt_t,
                    NAME =>         $module,
-                   NAMES =>        \@const_names,
+                   NAMES =>        \@const_specs,
                  );
   print XS "#include \"$constscfname\"\n";
 }
@@ -1716,7 +1731,7 @@ sub accessor_docs {
 #  my \$buffer = $name->new();
 #  my \$obj = \$buffer->_to_ptr();
 #
-#This exersizes the following two methods, and an additional class
+#This exercises the following two methods, and an additional class
 #C<$name>, the internal representation of which is a reference to a
 #packed string with the C structure.  Keep in mind that \$buffer should
 #better survive longer than \$obj.
@@ -1793,7 +1808,7 @@ sub get_typemap {
 sub normalize_type {		# Second arg: do not strip const's before \*
   my $type = shift;
   my $do_keep_deep_const = shift;
-  # If $do_keep_deep_const this is heuristical only
+  # If $do_keep_deep_const this is heuristic only
   my $keep_deep_const = ($do_keep_deep_const ? '\b(?![^(,)]*\*)' : '');
   my $ignore_mods
     = "(?:\\b(?:(?:__const__|const)$keep_deep_const|static|inline|__inline__)\\b\\s*)*";
@@ -1895,14 +1910,18 @@ open(PL, ">Makefile.PL") || die "Can't create $ext$modpname/Makefile.PL: $!\n";
 
 my $prereq_pm = '';
 
-if ( $compat_version < 5.00702 and $new_test )
+if ( $compat_version < 5.006002 and $new_test )
 {
   $prereq_pm .= q%'Test::More'  =>  0, %;
 }
-
-if ( $compat_version < 5.00600 and !$opt_X and $use_xsloader)
+elsif ( $compat_version < 5.006002 )
 {
-  $prereq_pm .= q%'XSLoader'  =>  0, %;
+  $prereq_pm .= q%'Test'        =>  0, %;
+}
+
+if (!$opt_X and $use_xsloader)
+{
+  $prereq_pm .= q%'XSLoader'    =>  0, %;
 }
 
 print PL <<"END";
@@ -1912,11 +1931,13 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => '$module',
-    VERSION_FROM      => '$modpmname', # finds \$VERSION
+    VERSION_FROM      => '$modpmname', # finds \$VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {$prereq_pm}, # e.g., Module::Name => 1.1
-    (\$] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => '$modpmname', # retrieve abstract from module
-       AUTHOR         => '$author <$email>') : ()),
+    ABSTRACT_FROM     => '$modpmname', # retrieve abstract from module
+    AUTHOR            => '$author <$email>',
+    #LICENSE           => 'perl',
+    #Value must be from legacy list of licenses here
+    #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
 END
 if (!$opt_X) { # print C stuff, unless XS is disabled
   $opt_F = '' unless defined $opt_F;
@@ -1950,7 +1971,7 @@ if (!$opt_c) {
                            XS_FILE =>      $constsxsfname,
                            DEFAULT_TYPE => $opt_t,
                            NAME =>         $module,
-                           NAMES =>        \@const_names,
+                           NAMES =>        \@const_specs,
                  );
   print PL <<"END";
 if  (eval {require ExtUtils::Constant; 1}) {
@@ -2009,7 +2030,7 @@ EOM
 close(PL) || die "Can't close $ext$modpname/Makefile.PL: $!\n";
 
 # Create a simple README since this is a CPAN requirement
-# and it doesnt hurt to have one
+# and it doesn't hurt to have one
 warn "Writing $ext$modpname/README\n";
 open(RM, ">README") || die "Can't create $ext$modpname/README:$!\n";
 my $thisyear = (gmtime)[5] + 1900;
@@ -2018,13 +2039,17 @@ my $rmheadeq = "=" x length($rmhead);
 
 my $rm_prereq;
 
-if ( $compat_version < 5.00702 and $new_test )
+if ( $compat_version < 5.006002 and $new_test )
 {
-   $rm_prereq = 'Test::More';
+  $rm_prereq = 'Test::More';
+}
+elsif ( $compat_version < 5.006002 )
+{
+  $rm_prereq = 'Test';
 }
 else
 {
-   $rm_prereq = 'blah blah blah';
+  $rm_prereq = 'blah blah blah';
 }
 
 print RM <<_RMEND_;
@@ -2077,18 +2102,21 @@ my $tests = @const_names ? 2 : 1;
 open EX, ">$testfile" or die "Can't create $ext$modpname/$testfile: $!\n";
 
 print EX <<_END_;
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl $modpname.t'
+# Before 'make install' is performed this script should be runnable with
+# 'make test'. After 'make install' it should work as 'perl $modpname.t'
 
 #########################
 
 # change 'tests => $tests' to 'tests => last_test_to_print';
 
+use strict;
+use warnings;
+
 _END_
 
 my $test_mod = 'Test::More';
 
-if ( $old_test or ($compat_version < 5.007 and not $new_test ))
+if ( $old_test or ($compat_version < 5.006002 and not $new_test ))
 {
   my $test_mod = 'Test';
 

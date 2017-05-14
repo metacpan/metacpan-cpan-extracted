@@ -1,0 +1,89 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: note Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fnofill.html">Previous Topic</A> | <A HREF="fplain.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.22. note Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>note</STRONG>[; parameters]
+  ...
+  !endblock
+</PRE>
+<P>The parameters are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+label
+</TD>
+<TD>
+string
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>note</EM> filter is used to specify a note. The <EM>label</EM> parameter can be used to specify a label. The default label is &quot;Note:&quot;.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<PRE>
+!block note; label='Example:'
+And some text inside
+
+a multi-line note
+!endblock
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Example:</STRONG>And some text inside</P>
+<P>a multi-line note</P>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<P>If you want the label to have a line to itself, leave the first line blank like this:</P>
+<PRE>
+!block note
+
+And some more text inside
+
+another multi-line note
+!endblock
+</PRE>
+<P>The result is:</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG></P>
+<P>And some more text inside</P>
+<P>another multi-line note</P>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fnofill.html">Previous Topic</A> | <A HREF="fplain.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

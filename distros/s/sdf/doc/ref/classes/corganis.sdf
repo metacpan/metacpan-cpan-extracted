@@ -1,0 +1,36 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: organisations Class
+
+H2: Interface
+
+!class_interface "organisations"
+
+H2: Description
+
+The {{organisations}} filter is used to declare and/or format objects in
+the {{organisations}} class. The attributes supported are:
+
+!block table
+Attribute       Description
+Name            the organisation name
+Jump            the organisation URL, if any
+!endblock
+
+H2: Examples
+
+See the {{FILE:objects.sdm}} file within SDF's {{FILE:stdlib}}
+directory.
+
+#H2: Limitations & Future Directions

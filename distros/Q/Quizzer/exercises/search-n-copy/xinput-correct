@@ -1,0 +1,29 @@
+#!/bin/bash
+# (c) 1999, 2000 Red Hat, Inc.
+
+# As a slightly evil hack, if we are running in Japanese,
+# we start the input method here to avoid having to do it for
+# each desktop environment separately. 
+#
+# This unfortunately will require the user to create there
+# own .Xclients if they want to use a different XIM
+# server.  (OWT 10/20/99)
+#
+# The input method server will die with X
+
+# Determine the LC_CTYPE locale category setting
+tmplang="en_US"
+if test x$LC_ALL != x ; then
+    tmplang=$LC_ALL
+elif test x$LC_CTYPE != x ; then
+    tmplang=$LC_CTYPE
+elif test x$LANG != x ; then
+    tmplang=$LANG
+fi
+
+case $tmplang in 
+    ja_JP*)
+        export XMODIFIERS="@im=kinput2"
+	kinput2 &
+    ;;
+esac

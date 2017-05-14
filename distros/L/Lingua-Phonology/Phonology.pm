@@ -2,7 +2,7 @@
 
 package Lingua::Phonology;
 
-$VERSION = 0.35_2;
+$VERSION = 0.35_03;
 
 use strict;
 use warnings;
@@ -19,8 +19,7 @@ use Lingua::Phonology::Syllable;
 
 =head1 NAME
 
-Lingua::Phonology - a module providing a unified way to deal with
-linguistic representations of phonology.
+Lingua::Phonology - an object model for lingistic phonology and sound change
 
 =head1 SYNOPSIS
 

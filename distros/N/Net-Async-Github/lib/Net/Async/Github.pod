@@ -1,0 +1,248 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Github
+at lib/Net/Async/Github.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Github - support for L<https://github.com>'s REST API with L<IO::Async>
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+ use IO::Async::Loop;
+ use Net::Async::Github;
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+  my $gh = Net::Async::Github->new(
+   token => '...',
+  )
+ );
+
+=head1 DESCRIPTION
+
+This is a basic wrapper for Github's API.
+
+=head1 METHODS
+
+=head2 current_user
+
+Returns information about the current user.
+
+ my $user = $gh->current_user->get;
+ printf "User [%s] has %d public repos and was last updated on %s%s\n",
+  $user->login, $user->public_repos, $user->updated_at->to_string
+
+Resolves to a L<Net::Async::Github::User> instance.
+
+=head2 configure
+
+Accepts the following optional named parameters:
+
+=over 4
+
+=item * C<token> - the Github API token
+
+=item * C<endpoints> - hashref of L<RFC6570|https://tools.ietf.org/html/rfc6570>-compliant URL mappings
+
+=item * C<http> - an HTTP client compatible with the L<Net::Async::HTTP> API
+
+=item * C<mime_type> - the MIME type to use as the C<Accept> header for requests
+
+=item * C<page_cache_size> - number of GET responses to cache. Defaults to 1000, set to 0 to disable.
+
+=back
+
+B<<  You probably just want C<token>  >>, defaults should be fine for the
+other settings.
+
+If you're creating a large number of instances, you can avoid
+some disk access overhead by passing C<endpoints> from an existing
+instance to the constructor for a new instance.
+
+=head2 reopen
+
+Reopens the given PR.
+
+Expects the following named parameters:
+
+=over 4
+
+=item * owner - which user or organisation owns this PR
+
+=item * repo - which repo it's for
+
+=item * id - the pull request ID
+
+=back
+
+Resolves to the current status.
+
+=head2 pr
+
+Returns information about the given PR.
+
+Expects the following named parameters:
+
+=over 4
+
+=item * owner - which user or organisation owns this PR
+
+=item * repo - which repo it's for
+
+=item * id - the pull request ID
+
+=back
+
+Resolves to the current status.
+
+=head2 user
+
+Returns information about the given user.
+
+=head2 users
+
+Iterates through all users. This is a good way to exhaust your 5000-query
+ratelimiting quota.
+
+=head2 head
+
+Identifies the head version for this branch.
+
+Requires the following named parameters:
+
+=over 4
+
+=item * owner - which organisation or person owns the repo
+
+=item * repo - the repository name
+
+=item * branch - which branch to check
+
+=back
+
+=head2 update
+
+=head2 core_rate_limit
+
+Returns a L<Net::Async::Github::RateLimit::Core> instance which can track rate limits.
+
+=head2 rate_limit
+
+=head1 METHODS - Internal
+
+The following methods are used internally. They're not expected to be
+useful for external callers.
+
+=head2 api_key
+
+=head2 token
+
+=head2 endpoints
+
+Returns an accessor for the endpoints data. This is a hashref containing URI
+templates, used by L</endpoint>.
+
+=head2 endpoint
+
+Expands the selected URI via L<URI::Template>. Each item is defined in our C< endpoints.json >
+file.
+
+Returns a L<URI> instance.
+
+=head2 http
+
+Accessor for the HTTP client object. Will load and instantiate a L<Net::Async::HTTP> instance
+if necessary.
+
+Actual HTTP implementation is not guaranteed, and the default is likely to change in future.
+
+=head2 auth_info
+
+Returns authentication information used in the HTTP request.
+
+=head2 mime_type
+
+Returns the MIME type used for requests. Currently defined by github in
+L<https://developer.github.com/v3/media/> as C<application/vnd.github.v3+json>.
+
+=head2 base_uri
+
+The L<URI> for requests. Defaults to L<https://api.github.com>.
+
+=head2 http_get
+
+Performs an HTTP GET request.
+
+=head2 pending_requests
+
+A list of all pending requests.
+
+=head2 validate_branch_name
+
+Applies validation rules from L<git-check-ref-format> for a branch name.
+
+Will raise an exception on invalid input.
+
+=head2 validate_owner_name
+
+Applies github rules for user/organisation name.
+
+Will raise an exception on invalid input.
+
+=head2 validate_repo_name
+
+Applies github rules for repository name.
+
+Will raise an exception on invalid input.
+
+=head2 validate_args
+
+Convenience method to apply validation on common parameters.
+
+=head2 page_cache_size
+
+Returns the total number of GET responses we'll cache. Default is probably 1000.
+
+=head2 page_cache
+
+The page cache instance, likely to be provided by L<Cache::LRU>.
+=cut
+
+sub page_cache {
+    $_[0]->{page_cache} //= do {
+        Cache::LRU->new(
+            size => $_[0]->page_cache_size
+        )
+    }
+}
+
+=head2 ryu
+
+Our L<Ryu::Async> instance, used for instantiating L<Ryu::Source> instances.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.

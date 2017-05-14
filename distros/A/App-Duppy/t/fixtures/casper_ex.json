@@ -1,0 +1,13 @@
+{
+    "auto-exit": false,
+    "concise": false,
+    "fail-fast": false,
+    "includes": ["inc1.js", "inc2.js"],
+    "log-level": "debug",
+    "no-colors": false,
+    "paths": ["a.js", "b.js", "c.coffee","sub1", "sub2"],
+    "post": ["post1.js", "post2.js"],
+    "pre": ["pre1.js", "pre2.js"],
+    "verbose": true,
+    "xunit": "results.xml"
+}

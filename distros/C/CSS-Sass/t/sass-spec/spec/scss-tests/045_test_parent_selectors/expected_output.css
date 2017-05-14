@@ -1,6 +1,4 @@
 foo:hover {
-  a: b;
-}
+  a: b; }
 bar foo.baz {
-  c: d;
-}
+  c: d; }

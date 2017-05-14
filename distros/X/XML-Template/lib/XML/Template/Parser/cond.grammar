@@ -1,0 +1,72 @@
+{
+  sub generate_varget {
+    my ($text, $function) = @_;
+
+    my $return;
+    if (defined $function->[0]) {
+      my ($functionname, $params) = @{$function->[0]};
+      $return = "\$process->subroutine ('$functionname', $text";
+      if (defined $params->[0] && scalar @{$params->[0]}) {
+        $return .= ', ';
+        $return .= join (', ', @{$params->[0]});
+      }
+      $return .= ')';
+    } else {
+      $return = "\$vars->get_xpath ($text)"
+    }
+  }
+}
+
+# Text outside a variable name.
+text:           <skip: ''> string(s)
+                { $return = join ('', @{$item[2]}) }
+string:         '${' vartext '}\.'
+                { $return = generate_varget ($item[2]) . " . '.'" }
+      |		'${' vartext '}' function(s?)
+                { $return = generate_varget ($item[2], $item[4]) }
+      |         /([\\]\$|[^\$])+/
+
+# Text inside a variable name.
+vartext:	<skip: ''> varstring(s)
+		{ $return = join (' . ', @{$item[2]}) }
+varstring:	'${' vartext '}\.'
+		{ $return = generate_varget ($item[2]) . " . '.'" }
+         |	'${' vartext '}' function(s?)
+		{ $return = generate_varget ($item[2], $item[4]) }
+         |	/([\\][\${}'\/]|[^\${}'\/])+/
+		{ $item[1] =~ s/\\/\\\\/g; $item[1] =~ s/'/\\'/g; $return = "'$item[1]'" }
+         |	'{' vartext '}'
+                { $return = "\$vars->backslash ('\.\/', $item[2])" }
+         |	'/' xpathtext
+		{ $return = "\$vars->backslash ('\.', $item[2])"; }
+
+xpathtext:	<skip: ''> xpathstring(s)
+		{ $return = "'/' . " . join (' . ', @{$item[2]}) }
+xpathstring:	'${' vartext '}\.'
+		{ $return = generate_varget ($item[2]) . " . '.'" }
+         |	'${' vartext '}' function(s?)
+		{ $return = generate_varget ($item[2], $item[4]) }
+         |	/([\\][\$}]|[^\$}])+/
+		{ $item[1] =~ s/\\/\\\\/g; $item[1] =~ s/'/\\'/g;
+                  $return = "'$item[1]'" }
+
+# Text inside a parameter list.
+paramtext: 	<skip: ''> paramstring(s)
+		{ $return = join (' . ', @{$item[2]}) }
+paramstring:	'${' paramtext '}\.'
+		{ $return = generate_varget ($item[2]) . " . '.'" }
+           |	'${' paramtext '}' function(s?)
+		{ $return = generate_varget ($item[2], $item[4]) }
+           |	/([\\][\$})"]|[^\$})"])+/
+		{ $item[1] =~ s/'/\\'/g; $return = "'$item[1]'" }
+
+# Function and parameter list.
+function:	<skip: '\s*'> '.' /[_a-z0-9]+/i paramlist(s?)
+		{ $return = [$item[3], $item[4]] }
+paramlist:	'(' ')'
+		{ $return = [] }
+         |	'(' <leftop: param ',' param> ')'
+		{ $return = $item[2] }
+param:		'"' paramtext '"'
+		{ $return = $item[2] }
+     |		paramstring

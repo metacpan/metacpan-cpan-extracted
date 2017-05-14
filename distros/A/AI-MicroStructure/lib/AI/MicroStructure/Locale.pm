@@ -7,7 +7,7 @@ use List::Util qw( shuffle );
 use Carp;
 
 our @ISA = qw( AI::MicroStructure::MultiList );
-our $VERSION = '1.000';
+our $VERSION = '0.20';
 
 sub init {
     # alias the older package variable %Locale to %MultiList

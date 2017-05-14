@@ -1,0 +1,25 @@
+=head1 NAME
+
+Win32-ASP-DB - an object-oriented framework for developing database front-ends
+using ASP and PerlScript
+
+=head1 SYNOPSIS
+
+The Win32-ASP-DB framework makes it much easier to deploy robust,
+full-featured database front-ends that include widespread business logic.  The
+framework makes extensive use of Perl's object-oriented support, including the
+flexibility built into that support which allows it to be extended.
+
+=head1 REQUIREMENTS
+
+The system relies upon ASP, PerlScript, and ADO very heavily.
+
+It requires the Perl modules C<Error::Unhandled> and C<Class::SelfMethods>,
+available on CPAN.
+
+=head1 GETTING STARTED
+
+The documentation is currently 60% completed.  There isn't much, however, in
+the way of a tutorial.  I'd recommend looking through the C<DocSample>
+directory. After looking through it, you may wish to install it on your IIS
+server so that you can play with it from a web browser as well.

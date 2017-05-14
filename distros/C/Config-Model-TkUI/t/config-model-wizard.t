@@ -11,8 +11,8 @@ use Config::Model::Value ;
 use Log::Log4perl qw(get_logger :levels) ;
 use Test::Memory::Cycle;
 
-
 use strict;
+use lib 't/lib';
 
 my $arg = shift || '';
 
@@ -41,7 +41,6 @@ my $model = Config::Model -> new () ;
 
 my $inst = $model->instance (
     root_class_name => 'Master',
-    model_file => 't/big_model.pm',
     instance_name => 'test1',
     root_dir   => 'wr_data',
 );

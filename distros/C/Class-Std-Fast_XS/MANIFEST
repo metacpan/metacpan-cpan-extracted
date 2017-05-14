@@ -1,0 +1,16 @@
+AutoXS.h
+benchmark/destroy.t
+benchmark/get_set.t
+Build.PL
+Changes
+lib/Class/Std/Fast_XS.pm
+lib/Class/Std/Fast_XS.xs
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-use.t
+t/01_demolish.t
+t/096_characters.t
+t/098_pod.t
+t/099_pod_coverage.t

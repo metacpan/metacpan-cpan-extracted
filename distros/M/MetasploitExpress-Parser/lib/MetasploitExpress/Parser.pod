@@ -1,0 +1,351 @@
+=pod
+
+=head1 NAME
+
+MetasploitExpress::Parser - Parse metasploit express scan data with Perl
+
+=head1 VERSION
+
+This document describes the latest version of MetasploitExpress::Parser.
+
+=head1 SYNOPSIS
+
+ my $msf = new MetatsploitExpress::Parser;
+
+ my $parser = $msf->parse_file('test1.xml');
+    #a MetasploitExpress::Parser Object
+
+ my @hosts = $parser->get_all_hosts();
+    #an Array of MetasploitExpress::Parser::Host Objects
+
+ my @services = $parser->get_all_services();
+    #an Array of MetasploitExpress::Parser::Service Objects
+
+ my @tasks = $parser->get_all_tasks();
+    #an Array of MetasploitExpress::Parser::Task Objects
+
+ my @events = $parser->get_all_events();
+    #an Array of MetasploitExpress::Parser::Event Objects
+
+ my @reports = $parser->get_all_reports();
+    #an Array of MetasploitExpress::Parser::Report Objects
+
+
+I<For a full listing of methods see the documentation corresponding to each object.>
+
+=head1 DESCRIPTION
+
+
+=head1 OVERVIEW
+
+
+ MetasploitExpress::Parser                              -- Core parser
+ |
+ +--MetasploitExpress::Parser::Session                  -- Metasploit Express scan session information
+ |  
+ +--MetasploitExpress::Parser::Host                     -- General host information
+ |
+ +--MetasploitExpress::Parser::Service                  -- General service information
+ |
+ +--MetasploitExpress::Parser::Report                   -- General report information
+ |
+ +--MetasploitExpress::Parser::Task                     -- General task information
+ |
+ +--MetasploitExpress::Parser::Event                    -- General event information
+
+
+=head1 METHODS
+
+=head2 MetasploitExpress::Parser
+
+The main idea behind the core modules is, you will first parse the
+scan data then extract the information. Therefore, you should run
+parse_file then the you can use any of the get_* methods.
+
+=over 4
+
+=item B<parse_file($xml_file)>
+
+Parse a MetasploitExpress XML file. The XML files are generated from using Metasploit Express
+
+=item B<get_session()>
+
+Obtain the MetasploitExpress::Parser::Session object which contains the session scan information.
+
+=item B<get_all_hosts()>
+
+Obtain an Array of MetasploitExpress::Parser::Host objects which contain host information.
+
+=item B<get_all_services()>
+
+Obtain an Array of MetasploitExpress::Parser::Service objects which contain service information.
+
+=item B<get_all_events()>
+
+Obtain an Array of MetasploitExpress::Parser::Event objects which contain event information.
+
+=item B<get_all_tasks()>
+
+Obtain an Array of MetasploitExpress::Parser::Task objects which contain task information.
+
+
+=item B<get_all_reports()>
+
+Obtain an Array of MetasploitExpress::Parser::Report objects which contain report information.
+
+=back
+
+
+=head2 MetasploitExpress::Parser::Session
+
+This object contains the scan session information of the MetasploitExpress scan.
+
+=over 4
+
+=item B<time()>
+
+Returns the time of the scan.
+
+=item B<user()>
+
+Returns the user that ran the scan.
+
+=item B<project()>
+
+Returns the name of the project.
+
+=back
+
+=head2 MetasploitExpress::Parser::Host
+
+This object contains the information for a host.
+
+=over 4
+
+
+=item B<address()>
+
+Returns a string which contains the ip of this host.
+
+=item B<address6()>
+
+Returns a string which contains the ip v6 of this host.
+
+=item B<arch()>
+
+Returns a string which contains the architecture this host.
+
+=item B<comments()>
+
+Returns a string which contains the comment for this this host.
+
+=item B<created_at()>
+
+Returns a string which contains the date/time this host was created.
+
+=item B<id()>
+
+Returns a string which contains the id for this host.
+
+=item B<mac()>
+
+Returns a string which contains the MAC address for this host.
+
+=item B<name()>
+
+Returns a string which contains the hostname for this host.
+
+=item B<os_flavor()>
+
+Returns a string which contains the OS flavor for this host.
+
+=item B<os_name()>
+
+Returns a string which contains the OS name for this host. Ex: Microsoft Windows XP
+
+=item B<os_sp()>
+
+Returns a string which contains the OS service pack for this host. Ex: SP0/1
+
+=item B<purpose()>
+
+Returns a string which contains the purpose for this host. Ex: client
+
+=item B<state()>
+
+Returns a string which contains the state for this host. Ex: alive
+
+=item B<workspace_id()>
+
+Returns a string which contains the workspace_id for this host. 
+
+=back
+
+=head2 MetasploitExpress::Parser::Service
+
+This object contains the information for a port/service.
+
+=over 4
+
+=item B<port()>
+
+Returns a string which contains the port number.
+
+=item B<proto()>
+
+Returns a string which contains the protocol. Ex: tcp or udp
+
+=item B<state()>
+
+Returns a string which contains the state. Ex: open
+
+=item B<host_id()>
+
+Returns a string which contains the host_id.
+
+=item B<id()>
+
+Returns a string which contains the id.
+
+=item B<created_at()>
+
+Returns a string which contains the date/time this service was created.
+
+=item B<updated_at()>
+
+Returns a string which contains the date/time this service was last updated.
+
+=back
+
+=head2 MetasploitExpress::Parser::Event
+
+This object contains the information for a event.
+
+=over 4
+
+=item B<host_id()>
+
+Returns a string which contains the host_id. This will be a number or 'NULL'.
+
+=item B<critical()>
+
+Returns a string which contains the critical information about the event. This will be a string or 'NULL'
+
+=item B<user()>
+
+Returns a string which contains user that created this event.
+
+=item B<id()>
+
+Returns a string which contains the id.
+
+=item B<created_at()>
+
+Returns a string which contains the date/time this event was created.
+
+=item B<updated_at()>
+
+Returns a string which contains the date/time this event was last updated.
+
+=item B<workspace_id()>
+
+Returns a string which contains the workspace id for this event.
+
+=item B<seen()>
+
+Returns a string which contains a boolean if this event has already been seen before.
+
+=item B<name()>
+
+Returns a string which contains the name of this event. Ex: module_complete
+
+=back 
+
+=head2 MetasploitExpress::Parser::Task
+
+This object contains the information for a task.
+
+=over 4
+
+=item B<description()>
+
+Returns a string which contains the description of this task.
+
+=item B<error()>
+
+Returns a string which contains the error if one occured.
+
+=item B<id()>
+
+Returns a string which contains the id.
+
+=item B<module()>
+
+Returns a string which contains the module that was executed for this task.
+
+=item B<path()>
+
+Returns a string which contains the path which contains the data for this task.
+
+=item B<workspace_id()>
+
+Returns a string which contains the workspace id for this task.
+
+=item B<user()>
+
+Returns a string which contains the username that created this task.
+
+=item B<created_at()>
+
+Returns a string which contains the date/time this task was created.
+
+=item B<updated_at()>
+
+Returns a string which contains the date/time this task was last updated.
+
+=back
+
+=head1 EXAMPLES
+
+
+Here is an example of parsing an XML file using MetasploitExpress::Parser:
+
+my $msf = new MetasploitExpress::Parser;
+
+my $parser = $msf->parse_file('test1.xml');
+
+foreach my $h ( $parser->get_all_hosts() ){
+    print "ip: " . $h->address . "\n";
+    print "---\n";
+
+}   
+
+foreach my $s ( $parser->get_all_services() ){
+    print "port: " . $s->port . "\n";
+    print "proto: " . $s->proto . "\n";
+    print "name: " . $s->name . "\n";
+    print "host_id: " . $s->host_id . "\n";
+    print "---\n";
+
+}
+
+
+=head1 SEE ALSO
+
+ XML::LibXML and Object::InsideOut
+ 
+
+=head1 AUTHOR
+
+Joshua D. Abraham, S<E<lt>jabra AT spl0it DOT orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010 Joshua D. Abraham. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

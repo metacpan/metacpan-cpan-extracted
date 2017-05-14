@@ -1,0 +1,292 @@
+# $Id: globs,v 1.2 2002/05/10 07:46:51 itz Exp $
+
+# teTeX formats and things
+/etc/texmf/fmt.d/*.cnf
+/etc/texmf/fmtutil.cnf
+/etc/texmf/jadetex/fmtutil.cnf
+/etc/texmf/texmf.cnf
+/etc/texmf/varfontdirs.debian
+/var/lib/texmf/web2c/*.fmt
+/var/lib/texmf/web2c/*.efmt
+/var/lib/texmf/web2c/*.log
+/var/lib/texmf/web2c/*.mem
+/var/lib/texmf/ls-R
+/var/lib/texmf/web2c/*.base
+/usr/share/texmf/tex/context/config
+/usr/share/texmf/tex4ht/tex4ht.env
+/usr/share/doc/texmf/tex4ht/index.html
+
+# apt lists and things
+/var/lib/apt/lists/*_Packages
+/var/lib/apt/lists/*_Sources
+/var/lib/apt/lists/*_Release
+/etc/apt/sources.list
+/etc/apt/listchanges.conf
+/var/cache/apt/archives/lock
+/var/cache/apt/pkgcache.bin
+/var/cache/apt/srcpkgcache.bin
+/var/lib/apt/lists/lock
+/var/lib/ucf/hashfile.0
+
+# cvs
+/etc/cvs-*.conf
+
+# X11 font directories
+/usr/X11R6/lib/X11/fonts/*/encodings.dir
+/usr/X11R6/lib/X11/fonts/*/fonts.alias
+/usr/X11R6/lib/X11/fonts/*/fonts.dir
+/usr/X11R6/lib/X11/fonts/*/fonts.scale
+/usr/X11R6/lib/X11/fonts/*/XftCache
+
+# X11 sundry config
+/etc/X11/WindowMaker/menu.hook
+/etc/X11/X
+/etc/X11/XF86Config-4
+/etc/X11/Xwrapper.config
+/etc/X11/default-display-manager
+/etc/X11/fonts/75dpi/mozilla_hack.alias
+/etc/X11/mwm/menudefs.hook
+/etc/X11/mwm/system.mwmrc
+/etc/X11/sawfish/debian-menu.jl
+/etc/X11/xdm/backgrounds
+/etc/X11/xdm/backgrounds/:0
+/etc/X11/xkb/keymap/sgi/cs
+/etc/X11/xkb/symbols/cs
+/etc/X11/xkb/symbols/cs_qwerty
+/etc/X11/xkb/symbols/czsk
+/etc/X11/xkb/symbols/gr
+/usr/X11R6/lib/X11/app-defaults
+
+# dvips maps
+/etc/texmf/dvips/*.map
+
+# sgml catalogs and things
+/etc/sgml/*.cat
+/etc/sgml/*.cat.old
+/etc/sgml/catalog
+/etc/sgml/catalog.old
+/etc/sgml/cdata_wrapper.config
+/etc/sgml/docbook-xml/dbgenent.mod
+/usr/lib/sgml/*.cat
+/usr/lib/sgml/*.cat.old
+
+# pidfiles and run directories
+/var/run/*.pid
+/var/run/crond.reboot
+/var/run/epos
+/var/run/exim
+/var/run/fetchmail
+/var/run/identd
+/var/run/mgetty.pid.ttyS*
+/var/run/ndc
+/var/run/sudo
+/var/run/utmp
+
+#logs
+/var/log/*.log
+/var/log/*.0
+/var/log/*.[1-9].gz
+/var/log/syslog
+/var/log/setuid.changes
+/var/log/mysql.err
+/var/log/messages
+/var/log/mail.err
+/var/log/mail.info
+/var/log/mail.warn
+/var/log/lp-errs
+/var/log/lp-acct
+/var/log/debug
+/var/log/wtmp
+/var/log/wtmp.1
+/var/log/setuid.today
+/var/log/setuid.yesterday
+/var/log/news
+/var/log/dmesg
+/var/log/epos
+/var/log/exim
+/var/log/faillog
+/var/log/lastlog
+
+# emacs startup and site-lib subdirectories
+/etc/emacs*/site-start.d/[0-9][0-9]*.el
+/etc/emacs*/site-start.d/[0-9][0-9]*.elc
+/usr/share/emacs/site-lisp/gnuserv/gnuserv.elc
+/usr/share/emacs/site-lisp/psgml/config.cache
+/usr/share/emacs/site-lisp/psgml/config.log
+/usr/share/emacs/20.7/site-lisp/subdirs.el
+
+# package and local cronjobs
+/etc/cron.d/*
+/etc/cron.daily/*
+/etc/cron.weekly/*
+/etc/cron.monthly/*
+
+# initscripts
+/etc/init.d/*
+/etc/rcS.d/[SK][0-9[0-9]*
+
+# minicom port configurations and things
+/etc/menu/minicom
+/etc/minicom/minirc.*
+
+# modutils things
+/etc/modutils/*
+/etc/modules
+/etc/modules.conf
+/etc/modules.conf.old
+
+# initscript defaults
+/etc/default/*
+
+# snort debian changes
+/etc/snort/local-*
+/etc/snort/snort.debian.conf
+
+# ssh things
+/etc/ssh/sshd_config
+/etc/ssh/ssh_host_[dr]sa_key
+/etc/ssh/ssh_host_[dr]sa_key.pub
+/etc/environment
+
+# amanda excludes and things
+/.amanda_excludes
+/var/.amanda_excludes
+/var/lib/amanda/DailySet1/curinfo
+/var/lib/amanda/amandates
+/etc/amanda/DailySet1/tapelist*
+/var/lib/dumpdates
+
+# defoma things
+/etc/defoma/ghostscript.subst-rule
+/var/lib/defoma/gs.d/id-cache
+/var/lib/defoma/gs.d/psprint.private-subst-cache
+/var/lib/defoma/postscript.font-cache
+/var/lib/defoma/scripts/gs.defoma
+/var/lib/defoma/status-cache
+/var/lib/defoma/type1.font-cache
+/var/lib/defoma/ghostscript.subst-cache
+
+# mgetty and vgetty things
+/etc/mgetty/sendfax.config
+/etc/mgetty/voicemail_head
+/var/spool/voice/.flag
+/var/log/vgetty_voice_shell.ttyS1
+
+# ppp things
+/etc/ppp/*ap-secrets
+/etc/ppp/peers/provider
+/etc/chatscripts/provider
+
+# mozilla things
+/usr/lib/mozilla/chrome/chrome.rdf
+/usr/lib/mozilla/components/xpti.dat
+/etc/mozillarc
+/var/lib/mozilla/chrome
+/var/lib/mozilla/component.reg
+/var/lib/mozilla/components
+/var/lib/mozilla/components/xpti.dat
+
+# lilo
+/etc/driveprm
+/etc/fdprm.obsolete
+/etc/lilo.conf
+/boot/boot.0[0-9]0[0-9]
+/boot/boot.b
+/boot/map
+
+# dynamic loader
+/etc/ld.so.cache
+/etc/ld.so.conf
+/lib/ld.so
+
+# boot and sysvinit things
+/etc/.serial.conf.old
+/etc/aumixrc
+/etc/aumixrc1
+/etc/fstab
+/etc/hostname
+/etc/inittab
+/etc/*.save
+/etc/isapnp.conf
+/etc/motd*
+/etc/mtab
+
+# gsearch things
+/var/lib/gsearch
+/var/lib/gsearch/pathdata*
+/etc/gtags
+/usr/lib/cgi-bin/gsearch.cgi
+
+# password, group files and similar
+/etc/.pwd.lock
+/etc/adduser.conf
+/etc/group
+/etc/group-
+/etc/passwd
+/etc/passwd-
+/etc/sudoers
+
+# network configuration
+/etc/fetchmailrc
+/etc/gfcc/system.rule
+/etc/hostname
+/etc/hosts
+/etc/hosts.*
+/etc/inetd.conf
+/etc/mailname
+/etc/networks
+/etc/news/server
+/etc/resolv.conf
+/etc/ssl/lib
+
+# time and locale things
+/etc/adjtime
+/etc/localtime
+/etc/timezone
+/usr/lib/locale/en_US
+
+# mail things
+/etc/aliases
+/var/mail
+/var/spool/exim
+/var/spool/mail
+
+# just silly symlinks .. :(
+/sbin/fsck.reiserfs
+/sbin/mkfs.reiserfs
+/sbin/rmt
+/usr/bin/man
+/usr/bin/mandb
+/usr/lib/tabset
+/usr/lib/terminfo
+/usr/share/doc/sgb/src
+
+# configuration for local hacks
+/etc/debarnacle
+/etc/permafrost.weekly
+/etc/phalanx
+
+# printing and ghostscript
+/etc/gs.Fontmap
+/etc/papersize
+/etc/printcap
+/usr/share/grace/fonts/type1
+
+# build configuration
+/etc/autoconf/config.site
+/etc/devscripts.conf
+/etc/kernel-img.conf
+/usr/share/guile/1.4/slibcat
+
+# documentation cgi scripts
+/usr/lib/cgi-bin/fom
+/var/cache/info2www
+/var/lib/dwww/html
+/var/lib/pdmenu/.pdmenurc_auto
+
+# hic sunt leones
+/usr/local
+/var/autofs
+
+# games
+/var/games/phalanx.learn

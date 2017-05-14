@@ -1,6 +1,5 @@
-use strict; use warnings;
 package YAML::Old;
-our $VERSION = '1.07';
+our $VERSION = '1.23';
 
 use YAML::Old::Mo;
 
@@ -8,15 +7,21 @@ use Exporter;
 push @YAML::Old::ISA, 'Exporter';
 our @EXPORT = qw{ Dump Load };
 our @EXPORT_OK = qw{ freeze thaw DumpFile LoadFile Bless Blessed };
+our (
+    $UseCode, $DumpCode, $LoadCode,
+    $SpecVersion,
+    $UseHeader, $UseVersion, $UseBlock, $UseFold, $UseAliases,
+    $Indent, $SortKeys, $Preserve,
+    $AnchorPrefix, $CompressSeries, $InlineSeries, $Purity,
+    $Stringify, $Numify
+);
+
 
 use YAML::Old::Node; # XXX This is a temp fix for Module::Build
+use Scalar::Util qw/ openhandle /;
 
 # XXX This VALUE nonsense needs to go.
-{
-    package
-    YAML;
-    use constant VALUE => "\x07YAML\x07VALUE\x07";
-}
+use constant VALUE => "\x07YAML\x07VALUE\x07";
 
 # YAML Object Properties
 has dumper_class => default => sub {'YAML::Old::Dumper'};
@@ -26,15 +31,15 @@ has loader_object => default => sub {$_[0]->init_action_object("loader")};
 
 sub Dump {
     my $yaml = YAML::Old->new;
-    $yaml->dumper_class($YAML::Old::DumperClass)
-        if $YAML::Old::DumperClass;
+    $yaml->dumper_class($YAML::DumperClass)
+        if $YAML::DumperClass;
     return $yaml->dumper_object->dump(@_);
 }
 
 sub Load {
     my $yaml = YAML::Old->new;
-    $yaml->loader_class($YAML::Old::LoaderClass)
-        if $YAML::Old::LoaderClass;
+    $yaml->loader_class($YAML::LoaderClass)
+        if $YAML::LoaderClass;
     return $yaml->loader_object->load(@_);
 }
 
@@ -49,7 +54,7 @@ sub Load {
 sub DumpFile {
     my $OUT;
     my $filename = shift;
-    if (ref $filename eq 'GLOB') {
+    if (openhandle $filename) {
         $OUT = $filename;
     }
     else {
@@ -58,22 +63,29 @@ sub DumpFile {
             ($mode, $filename) = ($1, $2);
         }
         open $OUT, $mode, $filename
-          or YAML::Old::Mo::Object->die('YAML_DUMP_ERR_FILE_OUTPUT', $filename, $!);
+          or YAML::Old::Mo::Object->die('YAML_DUMP_ERR_FILE_OUTPUT', $filename, "$!");
     }
     binmode $OUT, ':utf8';  # if $Config{useperlio} eq 'define';
     local $/ = "\n"; # reset special to "sane"
     print $OUT Dump(@_);
+    unless (ref $filename eq 'GLOB') {
+        close $OUT
+          or do {
+              my $errsav = $!;
+              YAML::Old::Mo::Object->die('YAML_DUMP_ERR_FILE_OUTPUT_CLOSE', $filename, $errsav);
+          }
+    }
 }
 
 sub LoadFile {
     my $IN;
     my $filename = shift;
-    if (ref $filename eq 'GLOB') {
+    if (openhandle $filename) {
         $IN = $filename;
     }
     else {
         open $IN, '<', $filename
-          or YAML::Old::Mo::Object->die('YAML_LOAD_ERR_FILE_INPUT', $filename, $!);
+          or YAML::Old::Mo::Object->die('YAML_LOAD_ERR_FILE_INPUT', $filename, "$!");
     }
     binmode $IN, ':utf8';  # if $Config{useperlio} eq 'define';
     return Load(do { local $/; <$IN> });

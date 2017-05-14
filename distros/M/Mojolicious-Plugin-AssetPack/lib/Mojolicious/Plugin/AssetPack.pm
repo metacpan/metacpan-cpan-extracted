@@ -6,7 +6,7 @@ use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 my %TAG_TEMPLATE;
 $TAG_TEMPLATE{css} = [qw(link rel stylesheet href)];
@@ -168,7 +168,7 @@ sub _process {
   }
 
   my @checksum = map { $_->checksum } @$assets;
-  $self->_app->log->debug(qq(Processed asset "$topic". [@checksum]));
+  $self->_app->log->debug(qq(Processed asset "$topic". [@checksum])) if DEBUG;
   $self->{by_checksum}{$_->checksum} = $_ for @$assets;
   $self->{by_topic}{$topic} = $assets;
   $self;
@@ -277,7 +277,7 @@ Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascrip
 
 =head1 VERSION
 
-1.42
+1.43
 
 =head1 SYNOPSIS
 

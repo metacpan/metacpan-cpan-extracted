@@ -1,5 +1,18 @@
 Revision history for Padre-Plugin-Catalyst
 
+0.13   2010.12.08
+    Fixed another test failure (AZAWAWI)
+
+0.12   2010.12.08
+    Fixed a t/01-perl_interpreter.t failure when DISPLAY is not set (AZAWAWI)
+
+0.11   2010.12.06
+    Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+    Switched to Dist::Zilla (AZAWAWI)
+    Code cleanup (AZAWAWI)
+    Removed unused ExtUtils::Install (AZAWAWI)
+    Fixed 'Update Application Scripts' on win32 (AZAWAWI)
+
 0.09
     compatibility with newer Padre versions (ZENOG)
 

@@ -51,7 +51,7 @@ package Class::MakeMethods::Composite;
 
 $VERSION = 1.000;
 use strict;
-use Class::MakeMethods '-isasubclass';
+use Class::MakeMethods::Standard '-isasubclass';
 use Carp;
 
 ########################################################################
@@ -123,7 +123,7 @@ sub _build_composite {
       push @fragments, @$fragment;
     }
     _bind_composite( $method, @fragments );
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 sub _assemble_fragments {
@@ -209,9 +209,6 @@ sub _bind_composite {
 =head1 SEE ALSO
 
 See L<Class::MakeMethods> for general information about this distribution. 
-
-For distribution, installation, support, copyright and license 
-information, see L<Class::MakeMethods::Docs::ReadMe>.
 
 =cut
 

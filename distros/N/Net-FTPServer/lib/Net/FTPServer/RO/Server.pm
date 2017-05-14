@@ -18,8 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: Server.pm,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 =pod
 
 =head1 NAME
@@ -28,7 +26,7 @@ Net::FTPServer::RO::Server - The anonymous read-only FTP server personality
 
 =head1 SYNOPSIS
 
-  ftpd [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
+  ro-ftpd.pl [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
 
 =head1 DESCRIPTION
 
@@ -39,8 +37,6 @@ except that it is not possible to write and all logins
 must be anonymous.
 
 =head1 METHODS
-
-=over 4
 
 =cut
 
@@ -69,6 +65,8 @@ sub pre_configuration_hook
   }
 
 =pod
+
+=over 4
 
 =item $rv = $self->authentication_hook ($user, $pass, $user_is_anon)
 
@@ -135,18 +133,7 @@ sub root_directory_hook
 
 __END__
 
-=back 4
-
-=head1 FILES
-
-  /etc/ftpd.conf
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/FileHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Handle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/RO/Server.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/RO/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/RO/FileHandle.pm
+=back
 
 =head1 AUTHORS
 
@@ -159,9 +146,9 @@ London, SW6 3EG, UK
 
 =head1 SEE ALSO
 
-L<Net::FTPServer(3)>,
-L<Net::FTP(3)>,
-L<perl(1)>,
+C<Net::FTPServer(3)>,
+C<Net::FTP(3)>,
+C<perl(1)>,
 RFC 765,
 RFC 959,
 RFC 1579,

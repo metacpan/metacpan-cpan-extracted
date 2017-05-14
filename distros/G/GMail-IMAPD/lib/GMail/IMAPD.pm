@@ -2,10 +2,10 @@ package GMail::IMAPD;
 
 use IO::Socket;
 use IO::File;
-use GMail::IMAPD::Gmail;
+use Mail::Webmail::Gmail;
 use strict;
 
-our $VERSION = "0.93";
+our $VERSION = "0.94";
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = ();
@@ -274,10 +274,10 @@ sub cmd_LOGIN { my($self)=@_;
   $self->{CmdArgs}=~s/\"//g;
   my($user,$pass)=split(/\s+/,$self->{CmdArgs}); 
   $self->logit("LOGIN '$user'");
-  $self->{Gmail}=GMail::IMAPD::Gmail->new(username => $user,
-                                          password => $pass,
-                                          timeout  => 10,
-                                          cookies  => {});
+  $self->{Gmail}=Mail::Webmail::Gmail->new(username => $user,
+                                           password => $pass,
+                                           timeout  => 10,
+                                           cookies  => {});
   my $res=$self->{Gmail}->login;
   if($res == -1){
     $self->writesock("$self->{CmdID} NO Authentication failed.");
@@ -614,7 +614,7 @@ GMail::IMAPD - An IMAP4 gateway to Google's webmail service
 
 =head1 DESCRIPTION
 
-This module allows users to access their Gmail account with an IMAP client
+This module allows users to access their Gmail messages with an IMAP client
 by running a server which accepts IMAP connections.
 
 
@@ -712,8 +712,6 @@ Crypt::SSLeay
 
 - Better error handling
 
-- Persistently cached messages, perhaps with DBI
-
 - IMAPS support
 
 - A contacts folder, perhaps containing messages with xml and vcf attachments
@@ -730,7 +728,7 @@ His module greatly accelerated the development of GMail::IMAPD.
 
 =head1 AUTHOR
 
-Kurt Schellpeper  <krs - gmail - com> 
+Kurt Schellpeper  <krs - cpan - org> 
 
 
 =head1 COPYRIGHT

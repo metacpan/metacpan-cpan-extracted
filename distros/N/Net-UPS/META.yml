@@ -1,14 +1,46 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Net-UPS
-version:      0.04
-version_from: UPS.pm
-installdirs:  site
+---
+abstract: 'Implementation of UPS Online Tools API in Perl'
+author:
+  - 'Sherzod B. Ruzmetov <sherzodr@cpan.org>'
+  - 'Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>'
+build_requires:
+  Data::Dump: '0'
+  Data::Printer: '0'
+  File::Temp: '0'
+  HTTP::Response: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Time::HiRes: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-UPS
+no_index:
+  directory:
+    - t/lib
 requires:
-    Class::Struct:                 0.58
-    Crypt::SSLeay:                 
-    LWP::UserAgent:                
-    XML::Simple:                   
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Carp: '0'
+  Class::Struct: '0.58'
+  Encode: '0'
+  File::Spec: '0'
+  IO::File: '0'
+  IO::Socket::SSL: '0'
+  IO::Socket::SSL::Utils: '0'
+  LWP::UserAgent: '0'
+  Mozilla::CA: '0'
+  Scalar::Util: '0'
+  Task::Weaken: '0'
+  XML::Simple: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/NET-A-PORTER/Net-UPS.git
+version: '0.16'

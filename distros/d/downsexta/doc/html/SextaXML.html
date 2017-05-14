@@ -1,0 +1,311 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NOMBRE</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#nombre">NOMBRE</a></li>
+	<li><a href="#sinopsis">SINOPSIS</a></li>
+	<li><a href="#descripci__n">DESCRIPCIÓN</a></li>
+	<li><a href="#m__todos">MÉTODOS</a></li>
+	<ul>
+
+		<li><a href="#constructor">CONSTRUCTOR</a></li>
+		<li><a href="#accesores">ACCESORES</a></li>
+	</ul>
+
+	<li><a href="#ejemplo">EJEMPLO</a></li>
+	<li><a href="#autor">AUTOR</a></li>
+	<li><a href="#licencia">LICENCIA</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="nombre">NOMBRE</a></h1>
+<p><strong>DownVideos::SextaXML</strong> - Un módulo para obtener rutas a los vídeos de los programas de La Sexta</p>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="sinopsis">SINOPSIS</a></h1>
+<pre>
+ use DownVideos::SextaXML</pre>
+<pre>
+ my $xml = SextaXML-&gt;new(URL =&gt; $$capitulos[0]-&gt;{URL});</pre>
+<pre>
+ print &quot;\n\n\nObteniendo datos del primer capítulo de Tiempo:\n\n&quot;;</pre>
+<pre>
+ print &quot;\tNombre:\t\t&quot; . $xml-&gt;nombre . &quot;\n&quot;;
+ print &quot;\tSección:\t&quot; . $xml-&gt;seccion . &quot;\n&quot;;
+ print &quot;\tInfo:\t\t&quot; . $xml-&gt;info . &quot;\n&quot;;
+ print &quot;\tDescripción:\t&quot; . $xml-&gt;descripcion . &quot;\n&quot;;
+ print &quot;\tImagen:\t\t&quot; . $xml-&gt;imagen . &quot;\n&quot;;
+ print &quot;\tVídeo:\t\t&quot; . $xml-&gt;video . &quot;\n&quot;;
+ print &quot;\tRTMP:\t\t&quot; . $xml-&gt;rtmp . &quot;\n&quot;;
+ print &quot;\tTipo:\t\t&quot; . $xml-&gt;mime . &quot;\n&quot;;
+ print &quot;\tTamaño:\t\t&quot; . $xml-&gt;tamanyo . &quot; Megas\n\n\</pre>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="descripci__n">DESCRIPCIÓN</a></h1>
+<p>Un módulo para obtener rutas a los vídeos de capítulos concretos de programas de <strong>La Sexta</strong>. Además proporciona información sobre el nombre, la sección, la descripción, el tipo mime y el tamaño del vídeo.</p>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="m__todos">MÉTODOS</a></h1>
+<p>
+</p>
+<h2><a name="constructor">CONSTRUCTOR</a></h2>
+<dl>
+<dt><strong><a name="new" class="item"><code>new()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$xml = DataSexta-&gt;new( URL =&gt; $url_del_capitulo );</strong></strong></dt>
+
+</dl>
+<p>Crea el objeto. El argumento es un par clave-valor en el que la clave debe ser &quot;URL&quot; y el valor la ruta a la página que contiene el reproductor de vídeo. Este argumento puede obtenerse de un modo sencillo mediante el módulo <strong>DownVideos::DataSexta</strong>.</p>
+<ul>
+<li><strong><a name="sexta" class="item">$sexta (Objeto SextaXML=HASH)</a></strong>
+
+</li>
+</ul>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="accesores">ACCESORES</a></h2>
+<dl>
+<dt><strong><a name="nombre" class="item"><code>nombre()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$nombre = $xml-&gt;nombre();</strong></strong></dt>
+
+</dl>
+<p>Obtiene el nombre o título del programa, serie o noticiero. No requiere argumentos.</p>
+<ul>
+<li><strong>$nombre (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $nombre = &quot;Capítulo 19&quot;</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="seccion" class="item"><code>seccion()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$seccion = $xml-&gt;seccion();</strong></strong></dt>
+
+</dl>
+<p>Obtiene el nombre propio del programa. No requiere argumentos.</p>
+<ul>
+<li><strong>$seccion (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $seccion = &quot;Buena gente&quot;</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="info" class="item"><code>info()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$info = $xml-&gt;info();</strong></strong></dt>
+
+</dl>
+<p>Obtiene información acerca del capítulo concreto. No requiere argumentos.</p>
+<ul>
+<li><strong>$info (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $info = &quot;Capítulo 19 Temporada: 1&quot;</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="descripcion" class="item"><code>descripcion()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$descripcion = $xml-&gt;descripcion();</strong></strong></dt>
+
+</dl>
+<p>Generalmente obtiene una descripcion del contenido del capítulo o información acerca del mismo.</p>
+<ul>
+<li><strong>$descripcion (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $descripcion = &quot;Ana consigue el papel de su vida y decide irse a Miami&quot;</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="imagen" class="item"><code>imagen()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$imagen = $xml-&gt;imagen();</strong></strong></dt>
+
+</dl>
+<p>Obtiene la URL a una imágen del capítulo.</p>
+<ul>
+<li><strong>$imagen (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $imagen = &quot;<a href="http://www.lasexta.com/clipping/2013/07/17/00555/30.jpg&quot">http://www.lasexta.com/clipping/2013/07/17/00555/30.jpg&quot</a>;</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="rtpm" class="item"><code>rtpm()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$rtpm = $xml-&gt;rtpm();</strong></strong></dt>
+
+</dl>
+<p>Obtiene la dirección rtpm para ver el vídeo con un reproductor.</p>
+<ul>
+<li><strong>$rtpm (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $rtpm = &quot;rtmp://a3-lasextafs.fplive.net/a3-lasexta/mp_seriesh3/2013/07/17/00005/000.f4v&quot;</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="tipo" class="item"><code>tipo()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$tipo = $xml-&gt;tipo();</strong></strong></dt>
+
+</dl>
+<p>Obtiene el tipo MIME del fichero de vídeo.</p>
+<ul>
+<li><strong>$tipo (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $tipo = &quot;video/mp4&quot;</pre>
+</dd>
+</dl>
+<dl>
+<dt><strong><a name="tamanyo" class="item"><code>tamanyo()</code></a></strong></dt>
+
+<dl>
+<dt><strong><strong>$tamanyo = $xml-&gt;tamanyo();</strong></strong></dt>
+
+</dl>
+<p>Obtiene el tamaño en megas del fichero de vídeo.</p>
+<ul>
+<li><strong>$tamanyo (Cadena de texto)</strong>
+
+</li>
+</ul>
+<pre>
+    $tamanyo = &quot;629.76&quot;</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="ejemplo">EJEMPLO</a></h1>
+<dl>
+<dt><strong><a name="ejemplo_de_obtenci_n_de_informaci_n_y_urls_de_los_videos_de_un_programa" class="item">Ejemplo de obtención de información y urls de los videos de un programa:</a></strong></dt>
+
+<dd>
+<pre>
+ #!/usr/bin/perl</pre>
+<pre>
+ use warnings;
+ use strict;
+ use utf8;
+ use encoding 'utf8';
+ use open 'locale';
+ use Encode;
+ use DataSexta;
+ use SextaXML;</pre>
+<pre>
+ my $sexta = DataSexta-&gt;new();</pre>
+<pre>
+ my $programas = $sexta-&gt;get_programas;</pre>
+<pre>
+ print &quot;Programas:\n\n&quot;;</pre>
+<pre>
+ my $capitulos = $sexta-&gt;get_capitulos(&quot;Más Vale Tarde&quot;);</pre>
+<pre>
+ foreach my $c (0..@{$capitulos} - 1)
+   {
+   print &quot;$c) TITULO: &quot; . @{$capitulos}[$c]-&gt;{TITULO} . &quot;\n&quot;;
+   print &quot;$c) URL: &quot; . @{$capitulos}[$c]-&gt;{URL} . &quot;\n\n&quot;;
+   }
+ print &quot;\n&quot;;</pre>
+<pre>
+ my $xml = SextaXML-&gt;new(URL =&gt; $$capitulos[26]-&gt;{URL});</pre>
+<pre>
+ print &quot;\n\n\nObteniendo datos del primer capítulo:\n\n&quot;;</pre>
+<pre>
+ print &quot;\tNombre:\t\t&quot; . $xml-&gt;nombre . &quot;\n&quot;;
+ print &quot;\tSección:\t&quot; . $xml-&gt;seccion . &quot;\n&quot;;
+ print &quot;\tInfo:\t\t&quot; . $xml-&gt;info . &quot;\n&quot;;
+ print &quot;\tDescripción:\t&quot; . $xml-&gt;descripcion . &quot;\n&quot;;
+ print &quot;\tRTMP:\t\t&quot; . $xml-&gt;rtmp . &quot;\n\n&quot;;</pre>
+<pre>
+ my @etiquetas = ('Video', 'Tipo', 'Tamaño', 'Imagen'); 
+ my @seccion = ('VIDEO', 'MIMETYPE', 'TAMANYO', 'IMAGEN');</pre>
+<pre>
+ my $multimedia = $xml-&gt;multimedia;</pre>
+<pre>
+ foreach my $n (0..@{$xml-&gt;multimedia} - 1)
+     {
+     foreach my $m (0..@seccion - 1)
+       {
+       print &quot;\t$etiquetas[$m]:\t\t&quot; . @{$xml-&gt;multimedia}[$n]-&gt;{&quot;$seccion[$m]&quot;} . &quot;\n&quot;;
+       }
+     print &quot;\n&quot;;
+     }</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="autor">AUTOR</a></h1>
+<p>Hugo Morago Martín &lt;<a href="mailto:morago@ono.com">morago@ono.com</a>&gt;</p>
+<p>
+<a href="#__index__"><small>Subir</small></a>
+</p>
+<hr />
+<h1><a name="licencia">LICENCIA</a></h1>
+<p>Copyright © 2013 Hugo Morago Martín &lt;<a href="mailto:morago@ono.com">morago@ono.com</a>&gt;</p>
+<p>Este programa se distribuye bajo los términos de la GPL v3 del 29 de enero de 2007. Puede encontrar una copia de la misma en <a href="http://www.gnu.org/licenses/gpl-3.0.html">http://www.gnu.org/licenses/gpl-3.0.html</a></p>
+<p><a href="#__index__"><small>Subir</small></a></p>
+
+</body>
+
+</html>

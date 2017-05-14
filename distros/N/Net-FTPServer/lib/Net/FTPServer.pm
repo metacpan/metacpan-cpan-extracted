@@ -18,7 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: FTPServer.pm,v 1.11 2005/07/15 10:10:22 rwmj Exp $
 
 =pod
 
@@ -28,7 +27,7 @@ Net::FTPServer - A secure, extensible and configurable Perl FTP server
 
 =head1 SYNOPSIS
 
-  ftpd [--help] [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
+  ftpd.sh [--help] [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
        [-P pidfile] [-o option=value]
 
 =head1 DESCRIPTION
@@ -772,7 +771,7 @@ Crypted passwords can be generated using the following command:
 Replace C<123456> with the actual password, and replace C<ab> with two
 random letters from the set C<[a-zA-Z0-9./]>. (The two random letters
 are the so-called I<salt> and are used to make dictionary attacks
-against the password file more difficult - see L<crypt(3)>).
+against the password file more difficult - see C<crypt(3)>).
 
 The userE<39>s home directory comes from the real Unix password file
 (or nsswitch-configured source) for the real Unix user.  You cannot
@@ -1587,7 +1586,7 @@ file:
            $Net::FTPServer::VERSION >= 1.025;
   </Perl>
 
-=back 4
+=back
 
 =head2 LOADING CUSTOMIZED SITE COMMANDS
 
@@ -1769,11 +1768,12 @@ C<SITE SHOW> command:
 
   ftp> site show README
   200-File README:
-  200-$Id: FTPServer.pm,v 1.11 2005/07/15 10:10:22 rwmj Exp $
+  200-README
+  200-======
   200-
-  200-Net::FTPServer - A secure, extensible and configurable Perl FTP server.
+  200-Biblio@Tech Net::FTPServer - A full-featured, secure, extensible
   [...]
-  200-To contact the author, please email: Richard Jones <rich@annexia.org>
+  200-Copyright (C) 2000-2003 Richard Jones <rich@annexia.org> and other contributors.
   200 End of file.
 
 =head2 STANDARD PERSONALITIES
@@ -1889,11 +1889,11 @@ serving files into and out of a database, for example.
 The current manual page contains information about the
 hooks in C<Net::FTPServer> which may be overridden.
 
-See L<Net::FTPServer::DirHandle(3)> for information about
+See C<Net::FTPServer::DirHandle(3)> for information about
 the methods in C<Net::FTPServer::DirHandle> which may be
 overridden.
 
-See L<Net::FTPServer::FileHandle(3)> for information about
+See C<Net::FTPServer::FileHandle(3)> for information about
 the methods in C<Net::FTPServer::FileHandle> which may be
 overridden.
 
@@ -2126,17 +2126,17 @@ consult the author for more information.
 
 =head1 METHODS
 
-=over 4
-
 =cut
 
 package Net::FTPServer;
+
+use 5.005;
 
 use strict;
 
 use vars qw($VERSION $RELEASE);
 
-$VERSION = '1.122';
+$VERSION = '1.125';
 $RELEASE = 1;
 
 # Non-optional modules.
@@ -2237,6 +2237,8 @@ $GOT_SIGHUP  = 0;
 $GOT_SIGTERM = 0;
 
 =pod
+
+=over 4
 
 =item Net::FTPServer->run ([\@ARGV]);
 
@@ -3265,7 +3267,7 @@ sub _set_rlimit
 	setrlimit (&{$ {BSD::Resource::}{$name}}, $value, $value)
 	  or die "setrlimit: $!";
       }
-    else
+    elsif (not $ENV{NET_FTPSERVER_NO_BSD_RESOURCE_WARNING})
       {
 	warn
 	  "Resource limit $name cannot be set. This may be because ",
@@ -4228,7 +4230,7 @@ sub _archive_generator_zip
 
 		 $zip->addMember ($memb);
 		 $memb->desiredCompressionMethod
-		   (&{$ {Archive::Zip::}{COMPRESSION_DEFLATED}});
+		   (&Archive::Zip::COMPRESSION_DEFLATED);
 		 $memb->desiredCompressionLevel (9);
 	       }
 	 },
@@ -4260,7 +4262,7 @@ sub _archive_generator_zip
 	if ($file)
 	  {
 	    unlink $tmpname;
-	    $zip->writeToFileHandle ($file, 1) == &{$ {Archive::Zip::}{AZ_OK}}
+	    $zip->writeToFileHandle ($file, 1) == &Archive::Zip::AZ_OK
 	      or die "failed to write to zip file: $!";
 	    $file->seek (0, 0);
 	  }
@@ -4269,7 +4271,7 @@ sub _archive_generator_zip
     unless ($file)
       {
 	$file = new IO::Scalar;
-	$zip->writeToFileHandle ($file, 1) == &{$ {Archive::Zip::}{AZ_OK}}
+	$zip->writeToFileHandle ($file, 1) == &Archive::Zip::AZ_OK
 	  or die "failed to write to zip file: $!";
 	$file->seek (0, 0);
       }
@@ -6741,8 +6743,8 @@ sub _MLST_command
     # If not file name is given, then we need to return
     # status on the current directory. Else we return
     # status on the file or directory name given.
-    my $fileh = $self->{cwd};
-    my $dirh = $fileh->dir;
+    my $fileh;
+    my $dirh = $self->{cwd};
     my $filename = ".";
 
     if ($rest ne "")
@@ -7475,8 +7477,11 @@ sub _list_file
     my $self = shift;
     my $sock = shift;
     my $fileh = shift;
-    my $filename = shift || $fileh->filename;
+    my $filename = shift;
     my $statusref = shift;
+
+    $filename = $fileh->filename
+      if $filename eq '';
 
     # Get the status information.
     my @status;
@@ -7527,7 +7532,7 @@ sub _list_file
 
     # Display the file.
     my $line = sprintf
-      ("%s%s%4d %-8s %-8s %8d %s %s%s\r\n",
+      ("%s%s%4d %-8s %-8s %8.0f %s %s%s\r\n",
        $fmt_mode,
        $fmt_perms,
        $nlink,
@@ -8064,7 +8069,7 @@ cases such as:
 Unfortunately it is not in general easily possible to catch these
 cases and cleanly call a hook. If your personality needs to do cleanup
 in all cases, then it is probably better to use an C<END> block inside
-your Server object (see L<perlmod(3)>). Even using an C<END> block
+your Server object (see C<perlmod(3)>). Even using an C<END> block
 cannot catch cases where the Perl interpreter crashes.
 
 Status: optional.
@@ -8109,16 +8114,16 @@ sub _newFromFileHandle
     $self->fileName ($filename);
     $self->{externalFileName} = $filename;
 
-    $self->{compressionMethod} = &{$ {Archive::Zip::}{COMPRESSION_STORED}};
+    $self->{compressionMethod} = &Archive::Zip::COMPRESSION_STORED;
 
     my ($mode, $perms, $nlink, $user, $group, $size, $time) = $fileh->status;
     $self->{compressedSize} = $self->{uncompressedSize} = $size;
     $self->desiredCompressionMethod
       ($self->compressedSize > 0
-       ? &{$ {Archive::Zip::}{COMPRESSION_DEFLATED}}
-       : &{$ {Archive::Zip::}{COMPRESSION_STORED}});
+       ? &Archive::Zip::COMPRESSION_DEFLATED
+       : &Archive::Zip::COMPRESSION_STORED);
     $self->unixFileAttributes ($perms);
-    $self->setLastModFileDateTimeFromUnix ($time);
+    $self->setLastModFileDateTimeFromUnix ($time) if $time > 0;
     $self->isTextFile (0);
 
     $self;
@@ -8136,7 +8141,7 @@ sub fh
     return $self->{fh} if $self->{fh};
 
     $self->{fh} = $self->{fileh}->open ("r")
-      or return &{$ {Archive::Zip::}{AZ_IO_ERROR}};
+      or return &Archive::Zip::AZ_IO_ERROR;
 
     $self->{fh};
   }
@@ -8146,17 +8151,17 @@ sub rewindData
     my $self = shift;
 
     my $status = $self->SUPER::rewindData (@_);
-    return $status if $status != &{$ {Archive::Zip::}{AZ_OK}};
+    return $status if $status != &Archive::Zip::AZ_OK;
 
-    return &{$ {Archive::Zip::}{AZ_IO_ERROR}} unless $self->fh;
+    return &Archive::Zip::AZ_IO_ERROR unless $self->fh;
 
     # Not all personalities can seek backwards in the stream. Close
     # the file and reopen it instead.
-    $self->endRead == &{$ {Archive::Zip::}{AZ_OK}}
-      or return &{$ {Archive::Zip::}{AZ_IO_ERROR}};
+    $self->endRead == &Archive::Zip::AZ_OK
+      or return &Archive::Zip::AZ_IO_ERROR;
     $self->fh;
 
-    return &{$ {Archive::Zip::}{AZ_OK}};
+    return &Archive::Zip::AZ_OK;
   }
 
 sub _readRawChunk
@@ -8165,12 +8170,12 @@ sub _readRawChunk
     my $dataref = shift;
     my $chunksize = shift;
 
-    return (0, &{$ {Archive::Zip::}{AZ_OK}}) unless $chunksize;
+    return (0, &Archive::Zip::AZ_OK) unless $chunksize;
 
     my $bytesread = $self->fh->sysread ($$dataref, $chunksize)
-      or return (0, &{$ {Archive::Zip::}{AZ_IO_ERROR}});
+      or return (0, &Archive::Zip::AZ_IO_ERROR);
 
-    return ($bytesread, &{$ {Archive::Zip::}{AZ_OK}});
+    return ($bytesread, &Archive::Zip::AZ_OK);
   }
 
 sub endRead
@@ -8180,18 +8185,17 @@ sub endRead
     if ($self->{fh})
       {
 	$self->{fh}->close
-	  or return &{$ {Archive::Zip::}{AZ_IO_ERROR}};
+	  or return &Archive::Zip::AZ_IO_ERROR;
 	delete $self->{fh};
       }
-    return &{$ {Archive::Zip::}{AZ_OK}};
+    return &Archive::Zip::AZ_OK;
   }
 
 1 # So that the require or use succeeds.
 
 __END__
 
-=back 4
-
+=back
 
 =head1 BUGS
 
@@ -8238,13 +8242,9 @@ Support for IPv6 (see RFC 2428), EPRT, EPSV commands.
 See also "XXX" comments in the code for other problems, missing features
 and bugs.
 
-=head1 FILES
+=head1 DEPENDENCY
 
-  /etc/ftpd.conf
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/FileHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Handle.pm
+IO::Dir, IO::stringy
 
 =head1 AUTHORS
 
@@ -8254,7 +8254,15 @@ Keith Turner (keitht at silvaco.com),
 Azazel (azazel at azazel.net),
 and many others.
 
-=head1 COPYRIGHT
+=head1 MAINTAINER
+
+Ryo Okamoto C<< <ryo at aquahill dot net> >>
+
+=head1 REPOSITORY
+
+https://github.com/ryochin/p5-net-ftpserver
+
+=head1 COPYRIGHT & LICENSE
 
 Copyright (C) 2000 Biblio@Tech Ltd., Unit 2-3, 50 Carnwath Road,
 London, SW6 3EG, UK.
@@ -8278,11 +8286,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =head1 SEE ALSO
 
-L<Net::FTPServer::Handle(3)>,
-L<Net::FTPServer::FileHandle(3)>,
-L<Net::FTPServer::DirHandle(3)>,
-L<Net::FTP(3)>,
-L<perl(1)>,
+C<Net::FTPServer::Handle(3)>,
+C<Net::FTPServer::FileHandle(3)>,
+C<Net::FTPServer::DirHandle(3)>,
+C<Net::FTP(3)>,
+C<perl(1)>,
 RFC 765,
 RFC 959,
 RFC 1579,
@@ -8291,5 +8299,7 @@ RFC 2428,
 RFC 2577,
 RFC 2640,
 Extensions to FTP Internet Draft draft-ietf-ftpext-mlst-NN.txt.
+L<Net::FTPServer::XferLog>
+L<Test::FTP::Server>
 
 =cut

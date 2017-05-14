@@ -1,0 +1,78 @@
+﻿=pod
+
+=head1 NAME
+
+Carrot - higher quality code through systematic expressiveness (v1.1.306)
+
+
+=head1 SYNOPSIS
+
+	# With Carrot you have $expressiveness
+
+	my $expressiveness = Carrot::individuality;
+	$expressiveness->provide(
+		my $distinguished_exceptions =
+			'::Individuality::Controlled::Distinguished_Exceptions');
+
+	$distinguished_exceptions->provide(
+		my $incomplete_projection = 'incomplete_projection');
+
+	$incomplete_projection->raise_exception(
+	...
+
+	# The above leads to a Perl more dynamic and more object
+	# oriented than plain Python or Ruby.
+
+
+=head1 PREFACE
+
+It's a popular habbit to sprinkle syntactic sugar on each and everything, not only in Perl. You'll have noticed the lack of such sugar in the Synopsis. It looks more like healthy food and takes longer to chew: like a Carrot.
+
+Carrot is a good name for this project. Everybody has at least seen one and most readers will now about taste and texture. Compare with the underlying key concept 'systematic expressiveness'. With what? Marketing wins.
+
+CARROTS, CARROTS, FOLKS BUY CARROTS, SPECIAL OFFER ONLY TODAY.
+
+
+=head1 DESCRIPTION
+
+Carrot gives you systematic expressiveness in the form of diversity, modularity, and individuality. Technically the expressiveness relies on controlled monadic growth. Global variables, file descriptors or object oriented methods and attributes are the most common monads in mainstream computer programs. But they're considered wild. Carrot provides a systematic approach to control their growth through providers.
+
+For more information, please visit http://www.carrot-programming.org/perl/. This document is simply a cut down version of that site.
+
+
+=head2 Usage
+
+Simply issue the statement 'use Carrot::Modularity;' on top of your package and all of your code automagically becomes modular. Even the most monolitic parts with 10 levels of indentation transform into cool, powerful, encapsulated, polymorphic, abstract, re-usable, pro-active, agile units with cherry flavor. Just kidding.
+
+Actually there is little you can practically do with this development snapshot of Carrot. There is no installation. The files of the .tgz archive are simply unpacked into /tmp. The following commands illustrate a run.
+
+        cd /tmp/mica_environment/program_modules/perl
+        /tmp/mica_environment/program_modules/perl/Carrot./carrot_program.sh \
+                --carrot-mode=development hello_world
+[...]
+          END loading | ^
+          END loading ^
+        S: 4
+        START loading Carrot::Continuity::Coordination::Episode::Targ...
+        START loading | Carrot::Continuity::Coordination::Episode::So...
+        START loading | | Carrot::Continuity::Coordination::Episode::...
+          END loading | | ^
+          END loading | ^
+          END loading ^
+        Starting Loop
+        Hello World 9466
+        Hello World 9466
+        Hello World 9466
+
+Carrot is a spin-off from a bigger application (which then became smaller). If the preview of Carrot doesn't excite you, then wait for the application which runs on top of Carrot.
+
+
+=head1 ABOUT THIS DOCUMENT
+
+Last modified: 2014-02-11 17:30:50 GMT
+
+Author: Winfried Trumper E<lt>win æt carrot-programming.orgE<gt>
+
+Copyright and license: Mozilla Public License, v. 2.0 (MPL-2.0)
+
+=cut

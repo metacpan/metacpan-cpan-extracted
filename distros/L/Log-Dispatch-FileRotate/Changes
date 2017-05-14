@@ -1,5 +1,9 @@
 Revision history for Perl extension Log::Dispatch::FileRotate.
 
+1.26 Tue May 09 2017
+    - add SEE ALSO reference to Log::Dispath::File::Stamped (Thanks Karen
+      Etheridge)
+
 1.25 Mon Apr 10 2017
     - Fix test failures if the test suite is running as root user.
 

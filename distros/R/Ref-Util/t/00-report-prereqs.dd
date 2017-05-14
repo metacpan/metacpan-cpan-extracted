@@ -1,7 +1,13 @@
 do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Text::ParseWords' => '0'
+                                      }
+                      },
        'develop' => {
                       'requires' => {
-                                      'Devel::PPPort' => '3.23',
+                                      'ExtUtils::HasCompiler' => '0.014',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
@@ -14,7 +20,6 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Exporter' => '5.57',
-                                      'XSLoader' => '0',
                                       'perl' => '5.008'
                                     }
                     },
@@ -23,7 +28,6 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'B::Concise' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::More' => '0'

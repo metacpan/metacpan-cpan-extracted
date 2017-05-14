@@ -1,0 +1,109 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1998, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 15-Jan-98 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Escape Characters
+
+The escape characters available are summarised below.
+Escape characters are entered in paragraphs using either the {{E}}
+or {{CHAR}} phrase styles.
+
+!block table; groups
+Symbol          Description                             Output
+Syntax related:
+lt              less-than                               E<lt>
+gt              greater-than                            E<gt>
+2{              double left brace                       E<2{>
+2}              double right brace                      E<2}>
+2[              double left bracket                     E<2[>
+2]              double right bracket                    E<2]>
+Special symbols:
+amp             ampersand                               E<amp>
+bullet          bullet                                  E<bullet>
+c               copyright                               E<c>
+cent            cent                                    E<cent>
+dagger          dagger                                  E<dagger>
+doubledagger    double dagger                           E<doubledagger>
+emdash          em-dash                                 E<emdash>
+endash          en-dash                                 E<endash>
+emspace         em-space                                E<emspace>
+enspace         en-space                                E<enspace>
+lbrace          left brace                              E<lbrace>
+lbracket        left bracket                            E<lbracket>
+nbdash          non-breaking hyphen                     E<nbdash>
+nbspace         non-breaking space                      E<nbspace>
+nl              newline                                 E<nl>
+pound           pound                                   E<pound>
+quot            double quote                            E<quot>
+r               registered trademark                    E<r>
+rbrace          right brace                             E<rbrace>
+rbracket        right bracket                           E<rbracket>
+tab             tab                                     E<tab>
+tm              trademark                               E<tm>
+yen             yen                                     E<yen>
+
+International:
+Aacute          capital A, acute accent                 E<Aacute>
+aacute          small a, acute accent                   E<aacute>
+Acirc           capital A, circumflex accent            E<Acirc>
+acirc           small a, circumflex accent              E<acirc>
+AElig           capital AE diphthong (ligature)         E<AElig>
+aelig           small ae diphthong (ligature)           E<aelig>
+Agrave          capital A, grave accent                 E<Agrave>
+agrave          small a, grave accent                   E<agrave>
+Aring           capital A, ring                         E<Aring>
+aring           small a, ring                           E<aring>
+Atilde          capital A, tilde                        E<Atilde>
+atilde          small a, tilde                          E<atilde>
+Auml            capital A, dieresis or umlaut mark      E<Auml>
+auml            small a, dieresis or umlaut mark        E<auml>
+Ccedil          capital C, cedilla                      E<Ccedil>
+ccedil          small c, cedilla                        E<ccedil>
+Eacute          capital E, acute accent                 E<Eacute>
+eacute          small e, acute accent                   E<eacute>
+Ecirc           capital E, circumflex accent            E<Ecirc>
+ecirc           small e, circumflex accent              E<ecirc>
+Egrave          capital E, grave accent                 E<Egrave>
+egrave          small e, grave accent                   E<egrave>
+Euml            capital E, dieresis or umlaut mark      E<Euml>
+euml            small e, dieresis or umlaut mark        E<euml>
+Iacute          capital I, acute accent                 E<Iacute>
+iacute          small i, acute accent                   E<iacute>
+Icirc           capital I, circumflex accent            E<Icirc>
+icirc           small i, circumflex accent              E<icirc>
+Igrave          capital I, grave accent                 E<Igrave>
+igrave          small i, grave accent                   E<igrave>
+Iuml            capital I, dieresis or umlaut mark      E<Iuml>
+iuml            small i, dieresis or umlaut mark        E<iuml>
+Ntilde          capital N, tilde                        E<Ntilde>
+ntilde          small n, tilde                          E<ntilde>
+Oacute          capital O, acute accent                 E<Oacute>
+oacute          small o, acute accent                   E<oacute>
+Ocirc           capital O, circumflex accent            E<Ocirc>
+ocirc           small o, circumflex accent              E<ocirc>
+Ograve          capital O, grave accent                 E<Ograve>
+ograve          small o, grave accent                   E<ograve>
+Oslash          capital O, slash                        E<Oslash>
+oslash          small o, slash                          E<oslash>
+Otilde          capital O, tilde                        E<Otilde>
+otilde          small o, tilde                          E<otilde>
+Ouml            capital O, dieresis or umlaut mark      E<Ouml>
+ouml            small o, dieresis or umlaut mark        E<ouml>
+Uacute          capital U, acute accent                 E<Uacute>
+uacute          small u, acute accent                   E<uacute>
+Ucirc           capital U, circumflex accent            E<Ucirc>
+ucirc           small u, circumflex accent              E<ucirc>
+Ugrave          capital U, grave accent                 E<Ugrave>
+ugrave          small u, grave accent                   E<ugrave>
+Uuml            capital U, dieresis or umlaut mark      E<Uuml>
+uuml            small u, dieresis or umlaut mark        E<uuml>
+yuml            small y, dieresis or umlaut mark        E<yuml>
+!endblock

@@ -1,0 +1,54 @@
+H1: 2.000beta4c
+
+!subsections "Enhancements,General Fixes,HTML Fixes,HLP Fixes,Incompatibilities"
+
+H2: Enhancements
+
+None.
+
+H2: General Fixes
+
+If an imported figure is not given an extension, an
+extension is added based on the target format:
+
+* {{hlp}} for Windows help
+* {{gif}} for [[HTML]]
+* {{eps}} otherwise ({{2:not}} epsi).
+
+The {{DOC:SDF User Guide}} had most of the {{Advanced Features}}
+section commented out - this has now been fixed. The architecture
+figure in {{SDF Getting Started}} has been updated to show
+direct [[HTML]] generation.
+
+All hypertext jumps throughout the documentation should now be working
+correctly.
+
+H2: HTML Fixes
+
+Blank cells in tables no longer look ugly.
+
+References and terms are now formatted as a table.
+
+H2: HLP Fixes
+
+URLs no longer come out in blue.
+
+Bitmaps no longer need to be in the directory when {{CMD:hcp.exe}}
+is executed, as the HPJ file now contains a search path.
+The HPJ file can still be generated on a Unix box (even though
+{{CMD:hcp.exe}} runs under [[Windows]]) as the search path is build
+using a new optional variable called SDF_DOSHOME.
+
+Any option in the HLP file (xxx, say) can be set via the matching
+SDF variable called HLP_OPTIONS_xxx.
+
+{{EMAIL:tim.hudson@mincom.com}} has fixed a number of bugs in
+{{CMD:mif2rtf}} including:
+
+* table titles now work
+* formatted phrases at the beginning of a note or bulleted list now work
+* notes now have a closing line.
+
+H2: Incompatibilities
+
+None.

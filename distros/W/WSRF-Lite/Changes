@@ -2,9 +2,12 @@ Revision history for Perl extension WSRF-Lite.
 
 For previous changes prior to version 0.8.2.3, please read README
 
+0.8.3.1
+   - Bug fix: WSRF::Lite seems to drop custom headers when signing.
+
 0.8.3.0
     - NEW: SAML Assertion (added by Alex Peeters - Author from ASNMTAP)
-
+ 
 0.8.2.7
 	- updated the copyright
     - made the ws:id for X509Token, TimeStamp and myBody unique 

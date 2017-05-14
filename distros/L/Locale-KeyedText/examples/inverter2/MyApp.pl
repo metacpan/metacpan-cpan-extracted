@@ -1,3 +1,4 @@
+#!perl
 use 5.008001;
 use utf8;
 use strict;
@@ -70,37 +71,39 @@ sub show_message {
 ###########################################################################
 ###########################################################################
 
-my $TEXT_STRINGS_E = {
+use Readonly;
+Readonly my %TEXT_STRINGS_E => (
     'MYAPP_HELLO' => q[Welcome to MyApp.],
     'MYAPP_GOODBYE' => q[Goodbye!],
     'MYAPP_PROMPT'
         => q[Enter a number to be inverted, or press ENTER to quit.],
     'MYAPP_RESULT' => q[The inverse of "<ORIGINAL>" is "<INVERTED>".],
-};
+);
 
 { package MyApp::L::Eng; # module
     sub get_text_by_key {
         my (undef, $msg_key) = @_;
-        return $TEXT_STRINGS_E->{$msg_key};
+        return $TEXT_STRINGS_E{$msg_key};
     }
 } # module MyApp::L::Eng
 
 ###########################################################################
 ###########################################################################
 
-my $TEXT_STRINGS_F = {
+use Readonly;
+Readonly my %TEXT_STRINGS_F => (
     'MYAPP_HELLO' => q[Bienvenue allé MyApp.],
     'MYAPP_GOODBYE' => q[Salut!],
     'MYAPP_PROMPT'
         => q[Fournir nombre être inverser, ou appuyer sur]
            . q[ ENTER être arrêter.],
     'MYAPP_RESULT' => q[Renversement "<ORIGINAL>" est "<INVERTED>".],
-};
+);
 
 { package MyApp::L::Fre; # module
     sub get_text_by_key {
         my (undef, $msg_key) = @_;
-        return $TEXT_STRINGS_F->{$msg_key};
+        return $TEXT_STRINGS_F{$msg_key};
     }
 } # module MyApp::L::Fre
 

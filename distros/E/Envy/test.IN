@@ -1,0 +1,20 @@
+dimension First
+ETOP=#ETOP#
+
+PATH+=$ETOP/bin
+MANPATH+=$ETOP/man
+LD_LIBRARY_PATH+=$ETOP/lib
+
+echo
+echo ******************************************************************
+echo Envy has been successfully installed under $ETOP!
+echo
+echo I would appreciate it if you sent email to joshua.pritikin@db.com
+echo to let me know you succeeded!
+echo
+echo Take a look at $ETOP/etc/envy/test.env to see where this
+echo message is coming from.
+echo
+echo Also try:
+echo '  env -i $PERL5PREFIX/bin/wrapper -s env | sort'
+echo

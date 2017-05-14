@@ -1,6 +1,6 @@
 use strict;
 use lib -e 't' ? 't' : 'test';
-use TestYAML tests => 41;
+use TestYAML tests => 43;
 
 run_yaml_tests;
 
@@ -62,12 +62,11 @@ MyObj::Class->new();
 
 
 === Ticket #2957 Serializing array-elements with dashes
-+++ skip_this_for_now
+[github #36] The problem is quoted map keys in array elements
 +++ perl: [ { "test - " => 23 } ];
 +++ yaml
 ---
 - 'test - ': 23
-
 
 
 === Ticket #3015 wish: folding length option for YAML
@@ -92,7 +91,7 @@ version: 1.10
 
 
 
-=== Ticket #4784 Can't create YAML::Old::Node from 'REF'
+=== Ticket #4784 Can't create YAML::Node from 'REF'
 +++ skip_this_for_now
 +++ perl: my $bar = 1; my $foo = \\\$bar; bless $foo, "bar"
 +++ yaml
@@ -263,7 +262,7 @@ quoted: "So does this
 
 
 === Ticket #13510 Another roundtrip fails
-+++ skip_this_for_now
+[github #48] The problem is quoted map keys in array elements
 +++ perl
 [{'RR1 (Schloﬂplatz - Wannsee)'=> 1,
 'm‰ﬂiges Kopfsteinpflaster (Teilstrecke)' => 1},
@@ -272,7 +271,7 @@ undef,
 +++ yaml
 ---
 - 'RR1 (Schloﬂplatz - Wannsee)': 1
-  m‰ﬂiges Kopfsteinpflaster (Teilstrecke):  1
+  m‰ﬂiges Kopfsteinpflaster (Teilstrecke): 1
 - ~
 
 

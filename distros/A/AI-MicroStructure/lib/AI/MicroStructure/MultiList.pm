@@ -6,7 +6,7 @@ use List::Util qw( shuffle );
 use Carp;
 
 our @ISA = qw( AI::MicroStructure::RemoteList );
-our $VERSION = '1.000';
+our $VERSION = '0.20';
 
 sub init {
     my ($self, $data) = @_;
@@ -150,15 +150,15 @@ AI::MicroStructure::MultiList - Base class for structures with multiple lists
     1;
 
     =head1 NAME
-    
+
     AI::MicroStructure::digits - The numbers structure
-    
+
     =head1 DESCRIPTION
-    
+
     You can count on this module. Almost.
 
     =cut
-    
+
     __DATA__
     # default
     :all

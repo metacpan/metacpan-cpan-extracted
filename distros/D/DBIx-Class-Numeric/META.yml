@@ -3,17 +3,19 @@ abstract: 'helper methods for numeric columns'
 author:
   - 'Sam Crawley <mutant.nz@gmail.com>'
 build_requires:
-  SQL::Translator: 0.11006
+  SQL::Translator: '0.11006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.31
-generated_by: 'Dist::Zilla version 2.101241'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Class-Numeric
-recommends: {}
 requires:
-  DBIx::Class: 0.08121
-  Sub::Name: 0.04
-version: 0.004
+  DBIx::Class: '0.08121'
+  Sub::Name: '0.04'
+resources:
+  repository: https://github.com/Mutant/DBIx-Class-Numeric.git
+version: '0.005'

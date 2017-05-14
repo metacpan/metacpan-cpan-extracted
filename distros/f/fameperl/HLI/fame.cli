@@ -1,0 +1,1109 @@
+/* FAME 7.7 definitions
+
+Copyright (c) 1995-1997 Fernando Trias.  All rights reserved.
+
+*/
+
+/* define FRB if you are using famedbpath */
+
+/* 
+The notes in this text indicate where/how a function
+is defined. If a note states that a function is not defined
+(or defn'd), then the name exists in the library, but
+is not documented.  These functions are enterd, but
+commented out.  
+
+Some functions are labeled FAME 7.5.  This means that
+the name appeared in the library of the 7.5, but not in
+7.0.  Some of these are not documented.
+
+Unsupported functions are labeled as such.
+
+The "CALL" or "case" command must be the first letter on
+the line.
+
+defines are
+
+   UNSUP  : Undocumented feature
+   HLI75  : New to HLI 7.5
+   HLI76  : New to HLI 7.6
+   FRB    : FRB-specific function libraries
+*/
+
+VAR int f_status status
+VAR string4 version
+
+CALL void cfmalob
+RO int status
+I int dbkey
+IO string objnam
+I int class
+I int freq
+I int type
+I int basis
+I int observ
+I int numobs
+I int numchr
+I float growth
+END
+
+/* new FAME 7.5: not defn'd */
+#ifdef UNSUP
+CALL void cfmawl
+RO int status
+I int dbkey
+I int p2
+IO char** p3
+END 
+#endif
+
+CALL void cfmbwdy
+RO int status
+I int freq
+I int date
+O int biwkdy
+END
+
+CALL void cfmchfr
+RO int status
+I int sfreq
+I int sdate
+I int select
+I int tfreq
+O int tdate
+I int relate
+END
+
+CALL void cfmcldb
+RO int status
+I int dbkey
+END
+
+CALL void cfmcpob
+RO int status
+I int srckey
+I int tarkey
+I string srcnam
+I string tarnam
+END
+
+CALL void cfmdatd
+RO int status
+I int freq
+I int date
+O int year
+O int month
+O int day
+END
+
+CALL void cfmdatf
+RO int status
+I int freq
+I int date
+O int year
+O int period
+I int fmonth
+I int flabel
+END
+
+CALL void cfmdati
+RO int status
+I int freq
+I int date
+O string datstr
+I string image
+I int fmonth
+I int flabel
+END
+
+CALL void cfmdatl
+RO int status
+I int freq
+I int date
+O string datstr
+I int fmonth
+I int flabel
+END
+
+CALL void cfmdatp
+RO int status
+I int freq
+I int date
+O int year
+O int period
+END
+
+CALL void cfmdatt
+RO int status
+I int freq
+I int date
+O int hour
+O int minute
+O int second
+O int ddate
+END
+
+CALL void cfmddat
+RO int status
+I int freq
+O int date
+I int year
+I int month
+I int day
+END
+
+CALL void cfmddes
+RO int status
+I int dbkey
+I string desc
+END
+
+CALL void cfmddoc
+RO int status
+I int dbkey
+I string doc
+END
+
+CALL void cfmdlen
+RO int status
+I int dbkey
+IO string objnam
+O int deslen
+O int doclen
+END
+
+CALL void cfmdlob
+RO int status
+I int objkey
+IO string objnam
+END
+
+/* FAME 7.5 send server cmd */
+#ifdef HLI75
+CALL void cfmfame
+RO int status
+I string cmd
+END
+#endif
+
+CALL void cfmfdat
+RO int status
+I int freq
+O int date
+I int year
+I int period
+I int fmonth
+I int flabel
+END
+
+CALL void cfmfdiv
+RO int status
+I int freq1
+I int freq2
+O int flag
+END
+
+#ifdef HLI75
+CALL void cfmferr
+RO int status
+IO string error
+END
+#endif
+
+CALL void cfmfin
+RO int status
+END
+
+CALL void cfmgali
+RO int status
+I int dbkey
+IO string objnam
+O string aliass
+END
+
+#ifdef HLI76
+CALL void cfmgtali
+RO int status
+I int dbkey
+IO string objnam
+O string alias
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtaso
+RO int status
+I int dbkey
+IO string objnam
+O string assoc
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtatt
+RO int status
+I int dbkey
+IO string objnam
+IO int atttyp
+IO string attnam
+O string value
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtstr
+RO int status
+I int dbkey
+IO string objnam
+I int range 3
+O string strval
+O int ismiss
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtsts
+RO int status
+I int dbkey
+IO string objnam
+I int range 3
+O string strary 2 /* array */
+O int misary
+I int inlen 2 /* array */
+O int outlen 2 /* array */
+END
+
+CALL void cfmgtnl
+RO int status
+I int dbkey
+IO string objnam
+I int index
+O string strval
+I int inlen
+O int outlen
+END
+#endif
+
+#ifdef HLI75
+CALL void cfmgaso
+RO int status
+I int dbkey
+IO string objnam
+O string assoc
+END
+#endif
+
+/* multi-type on value */
+
+CALL void cfmgdat
+RO int status
+I int dbkey
+IO string objnam
+I int freq
+O int cdate
+O int mdate
+END
+
+CALL void cfmgdba
+RO int status
+I int dbkey
+O int cyear
+O int cmonth
+O int cday
+O int myear
+O int mmonth
+O int mday
+O string desc
+O string doc
+END
+
+CALL void cfmgdbd
+RO int status
+I int dbkey
+I int freq
+O int cdate
+O int mdate
+END
+
+CALL void cfmglen
+RO int status
+I int dbkey
+O int deslen
+O int doclen
+END
+
+CALL void cfmgnam
+RO int status
+I int dbkey
+IO string objnam
+O string basnam
+END
+
+#ifdef HLI75
+CALL void cfmgsln
+RO int status
+I int dbkey
+IO string objnam
+O int legnth
+END
+#endif
+
+CALL void cfmidat
+RO int status
+I int freq
+O int date
+I string datstr
+I string image
+I int fmonth
+I int flabel
+I int centry
+END
+
+/* call the expiring version check */
+CALL void d_cfmini cfmini
+RO int status 
+END
+
+CALL void cfminwc
+RO int status
+I int dbkey
+I string wilnam
+END
+
+CALL void cfmisbm
+RO int status
+I int value
+O int ismiss
+END
+
+CALL void cfmisdm
+RO int status
+I int value
+O int ismiss
+END
+
+CALL void cfmislp
+RO int status
+I int year
+O int leap
+END
+
+CALL void cfmisnm
+RO int status
+I float value
+O int ismiss
+END
+
+CALL void cfmispm
+RO int status
+I double value
+O int ismiss
+END
+
+CALL void cfmissm
+RO int status
+I string value
+O int ismiss
+END
+
+CALL void cfmlali
+RO int status
+I int dbkey
+IO string objnam
+O int alilen
+END
+
+#ifdef HLI75
+CALL void cfmlaso
+RO int status
+I int dbkey
+IO string objnam
+O int asolen
+END
+#endif
+
+#ifdef HLI75
+CALL void cfmlatt
+RO int status
+I int dbkey
+IO string objnam
+I int atttyp
+IO string attnam
+O int attlen
+END
+#endif
+
+CALL void cfmldat
+RO int status
+I int freq
+O int date
+I string datstr
+I int fmonth
+I int flabel
+I int centry
+END
+
+#ifdef HLI75
+CALL void cfmlerr
+RO int status
+O int length
+END
+#endif
+
+/* warning cfmlsts is not correct: lenary is an int[] */
+CALL void u_cfmlsts cfmlsts
+RO int status
+I int dbkey
+IO string objnam
+O int range 3
+O int lenary
+END 
+
+CALL void cfmncnt
+RO int status
+I int dbkey
+IO string objnam
+O int length
+END
+
+CALL void cfmnlen
+RO int status
+I int dbkey
+IO string objnam
+I int index
+O int length
+END
+
+CALL void cfmnwob
+RO int status
+I int dbkey
+IO string objnam
+I int class
+I int freq
+I int type
+I int basis
+I int observ
+END
+
+CALL void cfmnxwc
+RO int status
+I  int dbkey
+O  string objnam
+O  int class
+O  int type
+O  int freq
+END
+
+CALL void cfmopdb
+RO int status
+O  int dbkey
+IO string dbnam
+I  int mode
+END
+
+/* FAME 7.5 */
+#ifdef HLI75
+CALL void cfmopre
+RO int status
+O  int dbkey
+IO string objnam
+END
+#endif
+
+/* FAME 7.5 open work database */
+#ifdef HLI75
+CALL void cfmopwk
+RO int status
+O  int dbkey
+END
+#endif
+
+CALL void cfmosiz
+RO int status
+I  int dbkey
+IO string objnam
+O  int class
+O  int type
+O  int freq
+O  int fyear
+O  int fprd
+O  int lyear
+O  int lprd
+END
+
+CALL void cfmpack
+RO int status
+I  int dbkey
+END
+
+CALL void cfmpdat
+RO int status
+I  int freq
+O  int date
+I  int year
+I  int period
+END
+
+CALL void cfmpfrq
+RO int status
+O  int freq
+I  int base
+I  int nunits
+I  int year
+I  int month
+END
+
+CALL void cfmpind
+RO int status
+I  int freq
+O  int count
+END
+
+CALL void cfmpinm
+RO int status
+I  int freq
+I  int year
+I  int month
+O  int count
+END
+
+CALL void cfmpiny
+RO int status
+I  int freq
+I  int year
+O  int count
+END
+
+CALL void cfmpodb
+RO int status
+I  int dbkey
+END
+
+/* warning: valary is an array */
+CALL void u_cfmrdfa cfmrdfa
+RO int status
+I  int dbkey
+IO string objnam
+I  int wntobs
+O  int syear
+O  int sprd
+O  int gotobs
+O  float valary
+I  int tmiss
+O  float mistt
+END 
+
+CALL void cfmrdfm
+RO int status
+I  int dbkey
+IO string objnam
+O string source
+I  int ilen
+O  int olen
+END
+
+/* not in FAME 6.0 defn */
+#ifdef UNSUP
+CALL void cfmrdfr
+RO int status
+I  int dbkey
+IO string p2
+I  int p3
+O  float p4
+I  int p5
+O  float p6
+END
+#endif
+
+CALL void cfmrdnl
+RO int status
+I  int dbkey
+IO string objnam
+I  int index
+O string strval
+O  int length
+END
+
+/* FAME 7.5 */
+#ifdef UNSUP
+CALL void cfmrdsr
+RO int status
+I  int dbkey
+IO string p2
+I  int p3
+I  char** p4
+O  int p5
+O  int p6
+END
+#endif
+
+/* not in FAME 6.0 defn */
+#ifdef UNSUP
+CALL void cfmrdst
+RO int status
+I  int dbkey
+IO string p2
+I  int p3
+IO string p4
+O  int p5
+O  int p6
+END
+#endif
+
+/* FAME 7.5 */
+#ifdef HLI75
+CALL void cfmrmev
+RO int status
+I  int dbkey
+IO string expr
+IO string optns
+I  int wdbkey
+IO string objnam
+END
+#endif
+
+/* not in FAME 6.0 defn */
+#ifdef UNSUP
+CALL void cfmrng
+RO int status
+I  int dbkey
+O  int p2
+O  int p3
+O  int p4
+O  int p5
+O  int p6
+O  int p7
+END
+#endif
+
+CALL void cfmrnob
+RO int status
+I  int dbkey
+IO string srcnam
+IO string tarnam
+END
+
+/* range, valary, mistt are arrays */
+CALL void u_cfmrrng cfmrrng
+RO int status
+I  int dbkey
+IO string objnam
+O  int range 3
+O  float valary
+I  int tmistt
+O  float mistt 2
+END 
+
+CALL void cfmrsdb
+RO int status
+I  int dbkey
+END
+
+/* array */
+CALL void cfmrstr
+RO int status
+I  int dbkey
+IO string objnam
+I  int range 3
+IO string strval
+O  int ismiss
+O  int length
+END
+
+/* array */
+#ifdef UNSUP
+CALL void u_cfmrsts cfmrsts
+RO int status
+I  int dbkey
+IO string objnam
+O  int range 3
+I  char** strary
+O  int misary
+O  int lenary
+END
+#endif
+
+CALL void cfmsali
+RO int status
+I  int dbkey
+IO string objnam
+I  string aliass
+END
+
+/* FAME 7.5 */
+#ifdef HLI75
+CALL void cfmsaso
+RO int status
+I  int dbkey
+IO string objnam
+IO string assoc
+END
+#endif
+
+
+CALL void cfmsbas
+RO int status
+I  int dbkey
+IO string objnam
+I  int basis
+END
+
+/* array */
+CALL void cfmsbm
+RO int status
+I  int nctran
+I  int ndtran
+I  int natran
+O  int bmistt 3
+END
+
+CALL void cfmsdes
+RO int status
+I  int dbkey
+IO string objnam
+IO string desc
+END
+
+/* array */
+CALL void cfmsdm
+RO int status
+I  int ncdtran
+I  int ndtran
+I  int natran
+O  int dmistt 3
+END
+
+CALL void cfmsdoc
+RO int status
+I  int dbkey
+IO string objnam
+I string doc
+END
+
+CALL void cfmsfis
+RO int status
+I  int freq
+IO int sysyear
+IO int sprd
+IO int eyear
+IO int eprd
+O  int range 3
+IO int numobs
+I  int fmonth
+I  int flabel
+END
+
+/* FAME 7.5 read next server cmd*/
+#ifdef HLI75
+CALL void cfmsinp
+RO int status
+O string cmd
+END
+#endif
+
+/* array */
+CALL void cfmsnm
+RO int status
+I  float nctran
+I  float ndtran
+I  float natran
+O  float nmistt 3
+END
+
+CALL void cfmsobs
+RO int status
+I  int dbkey
+IO string objnam
+I  int observ
+END
+
+/* not FAME 6.0 def'n */
+CALL void cfmsopt
+RO int status
+IO string dbkey
+IO string optval
+END
+
+/* array */
+CALL void cfmspm
+RO int status
+I  double nctran
+I  double ndtran
+I  double natran
+O  double pmistt 3
+END
+
+/* array */
+CALL void cfmsrng
+RO int status
+I  int freq
+IO int syear
+IO int sprd
+IO int eyear
+IO int eprd
+O  int range 3
+IO int numobs
+END
+
+/* FAME 7.5 */
+#ifdef HLI75
+CALL void cfmssln
+RO int status
+I  int dbkey
+IO string objnam
+I  int length
+END 
+#endif
+
+CALL void cfmtdat
+RO int status
+I  int freq
+O  int date
+I  int hour
+I  int minute
+I  int second
+I  int ddate
+END
+
+CALL void cfmtody
+RO int status
+I  int freq
+O  int date
+END
+
+CALL void cfmufrq
+RO int status
+I  int freq
+O  int base
+O  int nunits
+O  int year
+O  int month
+END
+
+CALL void cfmver
+RO int status
+O  float ver
+END
+
+CALL void cfmwhat
+RO int status
+I  int dbkey
+IO string objnam
+O  int class
+O  int type
+O  int freq
+O  int basis
+O  int observ
+O  int fyear
+O  int fprd
+O  int lyear
+O  int lprd
+O  int cyear
+O  int cmonth
+O  int cday
+O  int myear
+O  int mmonth
+O  int mday
+IO string desc
+IO string doc
+END
+
+CALL void cfmwkdy
+RO int status
+I  int freq
+I  int date
+O  int wkdy
+END
+
+/* array */
+CALL void u_cfmwrng cfmwrng
+RO int status
+I  int dbkey
+IO string objnam
+O  int range 3
+O  float valary 2
+I  int tmiss
+O  float mistt
+END 
+
+CALL void cfmwstr
+RO int status
+I  int dbkey
+IO string objnam
+I  int range 3
+IO string strval
+I  int ismiss
+I  int length
+END
+
+/* array */
+#ifdef UNSUP
+CALL void cfmwsts
+RO int status
+I  int dbkey
+IO string objnam
+O  int range 3
+IO  char** strary
+O  int misary
+O  int lenary
+END 
+#endif
+
+/* not in FAME 6.0 def'n */
+#ifdef UNSUP
+CALL void cfmwtfr
+RO int status
+I  int dbkey
+IO string objnam
+I  int p3
+O  float p4
+I  int p5
+O  float p6
+END
+#endif
+
+CALL void cfmwtnl
+RO int status
+I  int dbkey
+IO string objnam
+I  int index
+IO string strval
+END
+
+/* not in 6.0 def'n */
+#ifdef UNSUP
+CALL void cfmwtsr
+RO int status
+I  int dbkey
+IO string p2
+I  int p3
+I  char** p4
+O  int p5
+O  int p6
+END 
+#endif
+
+/* not in 6.0 def'n */
+#ifdef UNSUP
+CALL void cfmwtst
+RO int status
+I  int dbkey
+IO string p2
+I  int p3
+IO string p4
+I  int p5
+I  int p6
+END
+#endif
+
+#ifdef FRB
+
+CALL string hli_balloc
+I  int len
+END
+
+CALL string hli_basis
+I  int basis
+END
+
+CALL void hli_blanks
+IO string str
+I  int len
+END
+
+CALL string hli_class
+I  int class
+END
+
+CALL string hli_freq
+I  int freq
+END
+
+CALL int hli_isvalidfreq
+I  int freq
+END
+
+CALL string hli_months
+I  int code
+END
+
+CALL string hli_observed
+I  int class
+END
+
+CALL void hli_perror
+I  int status
+I  string message
+END
+
+CALL string hli_status
+I  int status
+END
+
+CALL string hli_trim
+IO string str
+I  int capsflag
+END
+
+CALL string hli_type
+I  int code
+END
+
+CALL string hli_weekdays
+I  int code
+END
+
+#endif
+
+#ifdef FRB
+
+CALL string famedbpath
+I string dbname
+- string &path
+END
+
+#endif
+
+
+CALL int famegettype
+I int dbkey
+I string objnam
+END
+
+CALL int famegetfreq
+I int dbkey
+I string objnam
+END
+
+#ifdef HLILIB
+
+CALL void hlierr
+I string func
+I int status
+END
+
+CALL string getsta
+I int status 
+END
+
+CALL string getcls
+I int class
+END
+
+CALL string gettyp
+I int type
+END
+
+CALL string getbas
+I int basis
+END
+
+CALL string getobs
+I int obs
+END
+
+CALL string getfrq
+I int freq
+END
+
+#endif

@@ -1,0 +1,457 @@
+<<if: ZXIDBOOK>>
+<<else: >>Apache with mod\_auth\_saml Receipe
+###################################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<class: article!a4paper!!mod\_auth\_saml 01>>
+<<cvsid: $Id: mod_auth_saml.pd,v 1.11 2009-09-16 10:14:57 sampo Exp $>>
+
+While I am not a guru in Apache set-ups and others will do this much
+better, not to speak of the official documentation, I still find that
+to ensure initial success of the new installer, some help may be in order.
+
+Consider this receipe only one of many possible set-ups and not
+necessarily even the best. The receipe worked for me in September 2008. If
+you come much later, things may have changed.
+
+This Apache set-up illustrates ~mod_auth_saml~. If you are interested
+in CGI, ~mod_php~, or ~mod_perl~ use with Apache, or compilation
+of Apache httpd with above bits and pieces, please refer to
+<<link:../html/apache.html: Apache Setup Receipe>>
+
+For more general information about ZXID.org compilation or APIs start
+reading in <<link:../html/README.zxid.html: README.zxid>>.
+
+1 Architectural Overview
+========================
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+<<htmlpreamble: <title>Apache with mod_auth_saml Receipe</title><link type="text/css" rel=stylesheet href="zx.css"><body><h1>Apache with mod_auth_saml Receipe</h1> >>
+<<fi: >>
+
+<<dia: arch-zxid-apache:bg,fg: ZXID, via mod_auth_saml, adds to Apache httpd Single Sign-On (SSO), Attribute Broker, and XACML PEP Capabilities that can be used by existing static and dynamic content without alteration.>>
+<<newpage: >>
+
+<<if: ZXIDBOOK>>
+<<else: >>
+2 Introduction to mod_auth_saml
+===============================
+<<fi: >>
+
+For avoidance of doubt, ~mod_auth_saml~ - based on zxid.org - is
+a separate project from ~mod_authn_casa~, ~mod_scalp~ and ~mod_mellon~,
+which provide somewhat similar functionality, but have
+different code bases. It may be possible to use all of these
+simultaneously, but this is not recommended unless you are an expert
+that can sort out the differences.
+
+~mod_auth_saml~ provides Apache2 native integration at authentication
+layer. The objective of ~mod_auth_saml~ is to cause Apache to trigger
+SAML 2.0 Single Sign-On instead of HTTP Basic or Digest authentication.
+
+~mod_auth_saml~ does not backend in any module in the <<italic:
+mod_authn_*>> sense. All authentication information is obtained from
+the frontend IdP without consulting any backend. (However, the zxid.org
+session mechanism needs backend storage - once zxid.org is generalized
+to support other backends than the default file system, we may factor
+out the local session storage to a backend of its own.)
+
+If you want to perform local authentication after the SSO,
+~mod_auth_saml~ will provide for downstream <<italic: mod_authz_*>> modules a
+(pseudonymous) user identifier that can be used to make the
+authorization decisions. It will also provide the attributes that were
+received in the SSO or that were retrieved by later web services calls
+(like ID-DAP or Personal Profile calls).
+
+Eventually ~mod_auth_saml~ may call on a <<italic: mod_authn_*>>
+backend to obtain additional local attributes (beyond the ones
+received in the SSO). Such call will use the pseudonym as key.
+
+2.1 Compiling from Source
+-------------------------
+
+You may be able to get mod_auth_saml.so in binary form, in which
+case all you need to do is
+
+  make dir   # Create /var/zxid hierarchy
+  cp mod_auth_saml.so /usr/local/httpd/modules
+
+For more in-depth compilation instructions, please refer to
+general ZXID documentation (README.zxid).
+
+Before you try compilation and installation of mod_auth_saml, you
+should investigate what type of Apache install you have. Unfortunately
+different OS distributions do this differently, making it difficult to
+provide one set of instructions that would always work.
+
+Out of box, zxid/Makefile assumes your Apache is installed where
+the Apache project source code distribution would put it, namely
+in APACHE_ROOT=/usr/local/httpd. You can change this by adding
+a new definition in localconf.mk.
+
+On some distributions the Apache related files are scattered
+in many places that are not under any specific "root" directory.
+In these cases you may need to define separate variable
+for each use, e.g:
+
+  localconf.mk:
+  APACHE_INCLUDE=-I/usr/include/apache2
+  APR_INCLUDE=-I/usr/include/apr-1.0
+  APACHE_MODULES=/usr/lib/apache2/modules
+
+To locate the correct directories, you can try
+
+  find / -name ap_config.h
+  find / -name apr.h
+  find / -name mod_auth_basic.so
+
+Once everything is correctly set up, you can compile
+and install by saying
+
+  make apachezxid             # Compiles
+  make apachezxid_install     # Copies
+  make dir                    # Create directory structure
+
+The installation step really just copies mod_auth_saml.so to
+modules/ subdirectory of the Apache installation.
+
+2.1 Configuration and Testing
+-----------------------------
+
+2.1.1 httpd.conf
+~~~~~~~~~~~~~~~~
+
+First you have to make sure mod_auth_saml.so is located in the
+modules/ directory of your Apache httpd installation
+(e.g. /usr/local/httpd/modules/mod_auth_saml.so in Apache httpd
+compiled from source or /usr/lib/apache2/modules/mod_auth_saml.so in
+some distributions). Then you should pull the module into the
+configuration with directive:
+
+  LoadModule auth_saml_module modules/mod_auth_saml.so
+
+Next you should configure the Location protected by SSO:
+
+  <Location /protected>
+    Require valid-user
+    AuthType "saml"
+    ZXIDConf "URL=https://sp1.zxidsp.org:5443/protected/saml"
+  </Location>
+
+The /protected is the directory you choose to protect. AuthType must
+be "saml". The ZXIDConf directive allows you to pass any and
+all ZXID configuration directives, using query string format. Please
+see main ZXID documentation (README.zxid) for full discussion
+of the configuration options.
+
+While most options can be left at their default value, the ~URL~
+always needs to be specified. It must match the domain name
+and the directory that you choose to protect. The final suffix
+/saml is used as communications end point during protocol
+exchanges. You can choose any word you want (i.e. need not be "saml"),
+but it must not conflict with any actual content in the directory
+and must be immediate child of the directory.
+
+As of version 0.28 (Sept 2008) you still need to create actual
+file to correspond to the URL:
+
+  touch /usr/local/httpd/htdocs/protected/saml
+
+We expect to remove this requirement for dummy file in a future
+version.
+
+(*** the saml part should be automatically appeneded, sanity check Location and url match, dig virtual host domain name automatically, example http://idrecconv.orange.fr/auth_user/bin/auth_user.cgi?origine=...)
+
+2.1.2 Trying it out
+~~~~~~~~~~~~~~~~~~~
+
+Try accessing
+
+  https://sp1.zxidsp.org:5443/protected/somefile
+
+You should first land on IdP selection and then after
+authentication to the IdP, see the file, or error
+message if the file does not exist.
+
+<<ignore:
+gdb /apps/apache/std/bin/httpd /apps/apache/std/core
+dir /s/httpd-2.2.3
+bt
+>>
+
+2.1.3 Setting up Circle of Trust
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Auto-CoT method
+* Manual methods
+
+2.2 Real World Example
+----------------------
+
+Assume you want to set up a complex web site with some areas
+protected strongly, others moderately, and some not at all.
+
+  /          -- No protection
+  /pers      -- Optional SAML SSO. If SSO has been performed, the
+                content will be personalized. If no SSO has been
+                performed -- or fails -- nonpersonalized content
+                is served. Default IdP is used.
+  /intra     -- Requires SAML SSO with default IdP
+  /protected -- Requires any SAML SSO with choice of IdP
+  /strong    -- Requires SAML SSO with strong credentials and choice of IdP
+  /other     -- Independent SP colocated with same web server. Login
+                to any of the first 4 directories does not count
+                as login to /other. It is its own entity and needs
+                separate SAML SSO.
+
+1. Here's how you would configure it in httpd.conf (SSL and other
+   configuration items are as usual and are not reproduced here):
+
+     LoadModule auth_saml_module modules/mod_auth_saml.so
+     
+     <Location /pers>
+       Require valid-user
+       AuthType "saml"
+       ZXIDConf "URL=https://sp1.zxidsp.org:5443/protected/saml"
+       ZXIDConf "DEFAULTQS=l0https://s-idp.liberty-iop.org:8881/idp.xml=1%26fp=1"
+     </Location>
+     
+     <Location /intra>
+       Require valid-user
+       AuthType "saml"
+       ZXIDConf "URL=https://sp1.zxidsp.org:5443/protected/saml"
+       ZXIDConf "DEFAULTQS=l0https://s-idp.liberty-iop.org:8881/idp.xml=1%26fc=1"
+       ZXIDConf "REQUIRED_AUTHNCTX=urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport$urn:oasis:names:tc:SAML:2.0:ac:classes:Strong"
+     </Location>
+     
+     <Location /protected>
+       Require valid-user
+       AuthType "saml"
+       ZXIDConf "URL=https://sp1.zxidsp.org:5443/protected/saml"
+       ZXIDConf "ANON_OK=/pers/"
+       ZXIDConf "REDIR_TO_CONTENT=1"
+     </Location>
+     
+     <Location /strong>
+       Require valid-user
+       AuthType "saml"
+       ZXIDConf "URL=https://sp1.zxidsp.org:5443/protected/saml"
+       ZXIDConf "REQUIRED_AUTHNCTX=urn:oasis:names:tc:SAML:2.0:ac:classes:Strong"
+       ZXIDConf "IDP_SEL_PAGE=/idpsel.cgi"
+     </Location>
+   
+     <Location /other>
+       Require valid-user
+       AuthType "saml"
+       ZXIDConf "PATH=/var/other/"
+       ZXIDConf "URL=https://sp1.zxidsp.org:5443/other/saml"
+       ZXIDConf "SES_COOKIE_NAME=OtherSes"
+     </Location>
+
+   Notes
+
+   a. /pers, /intra, and /strong are "slaves" of /protected. This
+      means they can have some settings of their own, but other
+      settings, especially those that apply after SSO, are shared
+      with /protected
+   b. The slaves share Entity ID, session cookie, and session
+      with the master.
+   c. /other is genuinely different SP with its own Entity ID,
+      cookie and session directory.
+   d. The ANON_OK describes prefix under which SSO failure is
+      not considered fatal. Currently there can only be one
+      such prefix per master SP. This is known limitation. (***)
+   e. The REDIR_TO_CONTENT is set in master and shared with
+      slaves. This causes the SSO to end with 302 redirection to
+      the original content so that the URL in browser's address
+      bar will appear clean. Without this option, the last
+      step of the SSO protocol might be visible and since
+      SSO terminates in master SP, the slaves would have
+      their relative URLs wrong.
+   f. The DEFAULTQS specification is used to simulate user
+      submitting the IdP selection form. It is used for the
+      SPs for which the IdP is always the same. The Query String
+      can also have some other form fields that control things
+      like the +ispassive+ flag (fp=1) or the +allowcreate+
+      flag (fc=1). To understand what fields are possible,
+      you can "View Source" the regular IdP selection page.
+      The value of the DEFAULTQS option needs to be URL encoded
+      to prevent premature interpretation as multiple configuration
+      options. In particular the ampersand must be encoded as %26.
+   g. The IDP_SEL_PAGE allows you to build a fully custom
+      IdP selection page. Here we use it for requesting strong
+      authentication context. Other simpler ways to customize
+      the IdP Selection Page exist, see e.g. IDP_SEL_TEMPL_FILE
+      whose default value is "idpsel.html" (you can edit that
+      file or "idpsel.css" for customization). IDP_SEL_TEMPL_FILE
+      must be specified as absolute filesystem path (this may be relaxed in future *** --Sampo).
+
+2. Create directories in the web root according to above plan.
+   You also need to create the /var/other hierarchy since
+   you want to keep /other as separate entity from rest of
+   the directories
+
+     make dir ZXID_PATH=/var/other/
+
+   N.B. The last slash is important.
+
+   Make sure the web server process has file system permissions
+   to write to /var/zxid and /var/other.
+
+2.3 Testing
+-----------
+
+To enable debugging output, you should add
+
+  ZXIDDebug "0x61"
+
+to the above configuration.
+
+1. Make sure you are logged out from your IdP and
+   SP (e.g. delete cookies in browser)
+
+2. https://sp1.zxidsp.org:5443/pers/env.cgi
+
+   * IdP selection should not show up.
+   * IdP should not ask credentials.
+   * You should see dump of environment variables
+   * SAML_authnctxlevel=-
+   * SAML_idpnid=-
+
+3. https://sp1.zxidsp.org:5443/intra/env.cgi
+
+   * IdP selection should not show up. (bug: currently it does ***)
+   * IdP should ask credentials
+   * You should see dump of environment variables
+   * SAML_authnctxlevel=urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport
+   * SAML_idpnid=Peq7sdf-o0brJQcyrFvVh
+
+4. https://sp1.zxidsp.org:5443/pers/env.cgi
+
+   * This time the session is well authenticated so you
+     should see the same dump as in step (3).
+
+5. Logout by https://sp1.zxidsp.org:5443/protected/saml?o=m
+   and clicking "Single Logout (R)"
+
+2.4 mod_auth_saml FAQ
+---------------------
+
+1.  How it actually works, does the module intercept every http
+    request/response?
+
+    It intercepts every HTTP request destined to URL prefixed by what
+    appears in httpd.conf <Location> configuration, i.e. Apache itself
+    prefilters by URL prefix.
+
+    Then it checks if cookie session is present - if so, the request is
+    passed through to rest of Apache processing. If not, it will start
+    the SSO processing by presenting the IdP selection screen. Eventually
+    this will be improved to attempt automatic detection of IdP, e.g. if
+    there is only one IdP in the CoT.
+
+    If the URL is the special one configured in
+
+      ZXIDConf "URL=https://sp1.zxidsp.org:5443/protected/saml"
+
+    it will pass control to the ZXID code.
+
+    If SSO was triggered, the original URL is held in RelayState and
+    once the SSO completes (which will happen at the special URL), a
+    redirect is performed to the original URL found from RelayState.
+    This could be used beneficially in unsolicited SSO as well.
+
+2.  Does it have the reverse proxy functionality or is it located elsewhere?
+
+    mod_auth_saml works at the same layer and much the same way as
+    HTTP Basic authentication is implemented in Apache. It runs
+    in the Apache process itself and does not invoke any external
+    helper.
+
+    It is not a reverse proxy. However, it is possible to configure
+    a frontend Apache server, with mod_auth_saml, to act as a reverse
+    proxy.<<footnote: Integrating zxid to a dedicated reverse proxy
+    like Pound (http://www.apsis.ch/pound/) should not be difficult.>>
+
+3.  Is it OS independant? I mean, works both for Apache-Linux and
+    Apache-Windows and Apache-Solaris? I wonder not directly, but
+    could be compiled, right?
+
+    It should be OS independant. For Unixes I am pretty sure this is a
+    fact. For Windows we need more testing (as of May 2008). It does not
+    yet (May 2008) work in IIS.
+
+4.  How the session creation at application is handled?
+
+    The name of the cookie that ZXID sets is configurable (by default it
+    is called ZXIDSES). This may be enough for some applications.
+
+2.5 Important TODO items for mod_auth_saml
+------------------------------------------
+
+Memory management needs an audit. The problem centers around memory
+management of dependency libraries openssl and libcurl. Both libraries
+as well as ZXID itself have vectorable memory allocators, i.e. you
+can supply your own implementation of malloc(3) and free(3). This allows
+Apache pool allocation functions to be used instead of the traditional
+malloc(3) and free(3).
+
+Unfortunately life is not that simple. Which pool should we use? The
+per request pool is suitable for most purposes, but how can we know for what
+purpose openssl and libcurl allocate memory? There is no easy way of
+knowing and the ephemeral nature of per request allocation may land us
+in trouble. Other option would be to allocate everything from global
+pool to make sure the memory will never be freed under us. Unfortunately
+memory from the global pool can not be freed. Thus we may be better
+sticking to malloc(3) and free(3).
+
+To make matters worse, openssl is used by all of zxid, libcurl, and Apache
+mod_ssl. Which one gets to set the function pointers that point to the
+allocator? There is no easy answer - or at least we have not seen one yet.
+
+The allocator problems may be just about manageable for Apache running
+in traditional pre-fork server mode, but become a real nightmare for
+threaded execution modes.
+
+2.6 mod_authz_xacml
+-------------------
+
+We plan to develop a <<italic: mod_authz_*>> layer module that will perform the
+authorization using XACML. ~mod_authz_xacml~ will act as a PEP and
+pass all available session attributes to a PDP and then act on the
+decision of the PDP to deny or permit access to a web resource. This is
+still WIP.
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+7 Conclusion
+============
+
+If you have any trouble, please do not hesitate to contact the author.
+
+<<EOF: >>
+
+grep ap_internal_redirect * */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*
+
+Apparent order of processing in Apache httpd-2.2.3
+
+tail -f tmp/log.httpd &
+tail -f tmp/err-httpd &
+/apps/apache/std/bin/apachectl restart
+https://sp1.zxidsp.org:5443/protected/content.txt
+https://s-idp.liberty-iop.org:8881/N
+
+ulimit -c unlimited
+/apps/apache/std/bin/httpd -X    # Run Apache in single threaded debug mode
+# In single threaded mode beware of metadata requests blocking
+gdb /apps/apache/std/bin/httpd /d/sampo/zxid/core
+
+Apache and cores:
+* http://www.cyberciti.biz/tips/configure-apache-web-server-for-core-dump.html
+* CoreDumpDirectory /tmp/cores
+* cat /proc/sys/kernel/core_pattern
+
+<<fi: >>

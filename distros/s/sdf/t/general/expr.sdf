@@ -1,0 +1,5 @@
+# This file test expressions
+
+!define xyz
+
+xyz is [[xyz]] and !xyz is [[!xyz]].

@@ -75,13 +75,13 @@ use vars qw( @EXPORT $VERSION
 
 BEGIN
 {
-    $VERSION = '0.62';
+    $VERSION = '0.63';
 
     die "XML::XQL is already used/required" if defined $Included;
     $Included = 1;
     
-    # From XQL spec:
-    $ReXQLName =	  "(?:[a-zA-Z_]+\\w*)";
+    # From XQL spec (The '-' was added to allow XPath style function names.)
+    $ReXQLName =	  "(?:[-a-zA-Z_]+\\w*)";
     
     $Token_q = undef;
     $Token_qq = undef;
@@ -103,7 +103,11 @@ BEGIN
 sub solve
 {
     my ($expr, @args) = @_;
-    new XML::XQL::Query (Expr => $expr)->solve (@args);
+    my $query = new XML::XQL::Query (Expr => $expr);
+    my @result = $query->solve (@args);
+    $query->dispose;
+
+    @result;
 }
 
 #---------- Parser related stuff ----------------------------------------------
@@ -265,7 +269,7 @@ sub listContains
 	    my ($src1, $src2) = ($x->xql_sourceNode, $y->xql_sourceNode);
 	    next if ((defined $src1 or defined $src2) and $src1 != $src2);
 
-	    return ($x == $y) if ($x->isa ('XML::XQL::Node'));
+	    return ($x == $y) if (UNIVERSAL::isa ($x, 'XML::XQL::Node'));
 
 	    return 1 if $x->xql_eq ($y);
 	}
@@ -779,11 +783,11 @@ END_CODE
     }
     $code .= "\$func = \\\&$wrapperName;";
 
-#print "$code\n";
+#print "CODE=$code\n";
 
     eval "$code";
     if ($@) { croak "generateFunction failed for $funcName: $@\n"; }
-    
+
     defineFunction ($name, $func, $argCount, 
 		    $allowedOutsideSubquery, $const);
 }
@@ -1045,6 +1049,16 @@ sub new
     $self;
 }
 
+sub dispose
+{
+    my $self = shift;
+
+    undef $self->{Tree}->{Query};
+
+    $self->{Tree}->dispose;
+    delete $self->{Tree};
+}
+
 sub isNodeQuery
 {
     $_[0]->{NodeQuery};
@@ -1173,6 +1187,7 @@ sub isAllowedOutsideSubquery
 }
 
 package XML::XQL::Operator;
+use fields qw{ Left Right Parent };
 
 sub new
 {
@@ -1183,6 +1198,23 @@ sub new
     $self->{Right}->setParent ($self) if defined $self->{Right};
 
     $self;
+}
+
+sub dispose
+{
+    my $self = shift;
+    if (defined ($self->{Left}))
+    {
+	$self->{Left}->dispose;
+	undef $self->{Left};
+    }
+    if (defined ($self->{Right}))
+    {
+	$self->{Right}->dispose;
+	undef $self->{Right};
+    }
+
+    undef $self->{Parent};
 }
 
 sub xql_check
@@ -1285,8 +1317,7 @@ sub verbose
 }
 
 package XML::XQL::Root;		# "/" at start of XQL expression
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';	# L -> L
 
 sub solve
 {
@@ -1312,8 +1343,8 @@ sub xql_contextString
 }
 
 package XML::XQL::Path;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';	# L -> L
+use fields qw{ PathOp };
 
 sub new
 {
@@ -1413,8 +1444,8 @@ sub xql_toDOM
 }
 
 package XML::XQL::Sequence;		# "elem;elem" or "elem;;elem"
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';	# L -> L
+use fields qw{ Oper };
 
 # See "The Design of XQL" by Jonathan Robie
 # <URL:http://www.texcel.no/whitepapers/xql-design.html>
@@ -1485,8 +1516,7 @@ sub xql_contextString
 }
 
 package XML::XQL::Current;		# "."
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';	# L -> L
 
 sub xql_check
 {
@@ -1508,8 +1538,7 @@ sub xql_contextString
 }
 
 package XML::XQL::Parent;		# ".."
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';
 
 sub xql_check
 {
@@ -1536,15 +1565,26 @@ sub xql_contextString
 }
 
 package XML::XQL::Element;		# "elem"
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';		# L -> L
+use fields qw{ Name NameSpace Expr };
 
 sub new
 {
     my ($class, %args) = @_;
+    if (not defined ($args{NameSpace}))
+    {
+	if ($args{Name} eq "*")
+	{
+	    return bless \%args, 'XML::XQL::AllElements';
+	}
+	else
+	{
+	    return bless \%args, 'XML::XQL::SimpleElement';
+	}
+    }
+
     $args{Expr} = XML::XQL::buildNameSpaceExpr ($args{NameSpace}, 
 						$args{Name});
-    $args{MatchAll} = (not defined ($args{NameSpace}) and $args{Name} eq "*");
     bless \%args, $class;
 }
 
@@ -1561,22 +1601,12 @@ sub solve
     my ($self, $context, $list) = @_;
     my @result = ();
 
-    if ($self->{MatchAll})
+    my $expr = $self->{Expr};
+    for my $node (@$list)
     {
-	for my $node (@$list)
+	for my $kid (@{$node->xql_element})
 	{
-	    push @result, @{$node->xql_element};
-	}
-    }
-    else
-    {
-	my $expr = $self->{Expr};
-	for my $node (@$list)
-	{
-	    for my $kid (@{$node->xql_element})
-	    {
-		push @result, $kid if $kid->xql_nodeName =~ /$expr/;
-	    }
+	    push @result, $kid if $kid->xql_nodeName =~ /$expr/;
 	}
     }
     \@result;
@@ -1606,16 +1636,59 @@ sub xql_toDOM
     $elem;
 }
 
+package XML::XQL::SimpleElement;	# "elem"
+use base 'XML::XQL::Element';		# L -> L
+
+sub solve
+{
+    my ($self, $context, $list) = @_;
+    my @result = ();
+    my $name = $self->{Name};
+
+    for my $node (@$list)
+    {
+	push @result, @{ $node->xql_element ($name) };
+    }
+    \@result;
+}
+
+package XML::XQL::AllElements;		# "*"
+use base 'XML::XQL::Element';		# L -> L
+
+sub solve
+{
+    my ($self, $context, $list) = @_;
+    my @result = ();
+
+    for my $node (@$list)
+    {
+	push @result, @{$node->xql_element};
+    }
+    \@result;
+}
+
 package XML::XQL::Attribute;		# "@attr"
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L of Attributes
+use base 'XML::XQL::Operator';		# L -> L of Attributes
+use fields qw{ Name NameSpace Expr };
 
 sub new
 {
     my ($class, %args) = @_;
+
+    if (not defined ($args{NameSpace}))
+    {
+	if ($args{Name} eq "*")
+	{
+	    return bless \%args, 'XML::XQL::AllAttr';
+	}
+	else
+	{
+	    return bless \%args, 'XML::XQL::SimpleAttr';
+	}
+    }
+
     $args{Expr} = XML::XQL::buildNameSpaceExpr ($args{NameSpace}, 
 						$args{Name});
-    $args{MatchAll} = (not defined ($args{NameSpace}) and $args{Name} eq "*");
     bless \%args, $class;
 }
 
@@ -1632,25 +1705,14 @@ sub solve
     my ($self, $context, $list) = @_;
     my @result = ();
 
-    if ($self->{MatchAll})
+    my $expr = $self->{Expr};
+    for my $node (@$list)
     {
-	for my $node (@$list)
+	for my $kid (@{$node->xql_attribute})
 	{
-	    push @result, @{$node->xql_attribute};
+	    push @result, $kid if $kid->xql_nodeName =~ /$expr/;
 	}
     }
-    else
-    {
-	my $expr = $self->{Expr};
-	for my $node (@$list)
-	{
-	    for my $kid (@{$node->xql_attribute})
-	    {
-		push @result, $kid if $kid->xql_nodeName =~ /$expr/;
-	    }
-	}
-    }
-    $self->verbose ("attr result", \@result);
 }
 
 sub xql_contextString
@@ -1664,9 +1726,40 @@ sub xql_contextString
     XML::XQL::delim ($str, $self, @_);
 }
 
+package XML::XQL::SimpleAttr;		# "@attr"
+use base 'XML::XQL::Attribute';		# L -> L
+
+sub solve
+{
+    my ($self, $context, $list) = @_;
+    my @result = ();
+    my $name = $self->{Name};
+
+    for my $node (@$list)
+    {
+	push @result, @{ $node->xql_attribute ($name) };
+    }
+    \@result;
+}
+
+package XML::XQL::AllAttr;		# "@*"
+use base 'XML::XQL::Attribute';		# L -> L
+
+sub solve
+{
+    my ($self, $context, $list) = @_;
+    my @result = ();
+
+    for my $node (@$list)
+    {
+	push @result, @{$node->xql_attribute};
+    }
+    \@result;
+}
+
 package XML::XQL::Subscript;		# "[3, 5 $to$ 7, -1]"
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';		# L -> L
+use fields qw{ IndexList };
 
 #?? optimize for simple subscripts
 sub solve
@@ -1758,8 +1851,7 @@ sub xql_toDOM
 }
 
 package XML::XQL::Union;		# "book $union$ magazine", also "|"
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L x L -> L
+use base 'XML::XQL::Operator';		# L x L -> L
 
 sub solve
 {
@@ -1802,8 +1894,7 @@ sub xql_contextString
 }
 
 package XML::XQL::Intersect;		# "book $intersect$ magazine"
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L x L -> L
+use base 'XML::XQL::Operator';		# L x L -> L
 
 sub solve
 {
@@ -1833,8 +1924,7 @@ sub xql_contextString
 }
 
 package XML::XQL::Filter;		# "elem[expr]"
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );	# L -> L
+use base 'XML::XQL::Operator';		# L -> L
 
 sub solve
 {
@@ -1878,12 +1968,10 @@ sub xql_contextString
 }
 
 package XML::XQL::BooleanOp;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );
+use base 'XML::XQL::Operator';
 
 package XML::XQL::Or;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::BooleanOp );
+use base 'XML::XQL::BooleanOp';
 
 sub solve
 {
@@ -1902,8 +1990,7 @@ sub xql_contextString
 }
 
 package XML::XQL::And;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::BooleanOp );
+use base 'XML::XQL::BooleanOp';
 
 sub solve
 {
@@ -1922,8 +2009,7 @@ sub xql_contextString
 }
 
 package XML::XQL::Not;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::BooleanOp );
+use base 'XML::XQL::BooleanOp';
 
 sub solve
 {
@@ -1940,8 +2026,8 @@ sub xql_contextString
 }
 
 package XML::XQL::Compare;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );
+use base 'XML::XQL::Operator';
+use fields qw{ Func All };
 
 use Carp;
 
@@ -2130,7 +2216,26 @@ sub _nodesByType
 
 sub pi
 {
-    _nodesByType ($_[1], 7);
+    my ($context, $list, $pi_name) = @_;
+    if (defined $pi_name)
+    {
+	return [] if @$list == 0;
+
+	$pi_name = $pi_name->solve ($context, $list)->xql_toString;
+
+	my @result;
+	for my $node (@$list)
+	{
+	    for my $kid (@{ $node->xql_node })
+	    {
+		push @result, $kid 
+		    if $kid->xql_nodeType == 7 && $kid->getTarget eq $pi_name;
+	    }
+	}
+	return @$list > 1 ? XML::XQL::sortDocOrder (\@result) : \@result;
+    }
+
+    return _nodesByType ($_[1], 7);
 }
 
 sub comment
@@ -2362,8 +2467,7 @@ sub attribute
 }
 
 package XML::XQL::Bang;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );
+use base 'XML::XQL::Operator';
 
 sub solve
 {
@@ -2381,8 +2485,8 @@ sub xql_contextString
 }
 
 package XML::XQL::Invocation;
-use vars qw( @ISA );
-@ISA = qw( XML::XQL::Operator );
+use base 'XML::XQL::Operator';
+use fields qw{ Args Name Type Once ConstVal };
 
 use Carp;
 
@@ -2396,6 +2500,18 @@ sub new
 	$par->setParent ($self);
     }
     $self;
+}
+
+sub dispose
+{
+    my $self = shift;
+    for (@{ $self->{Args} })
+    {
+	$_->dispose;
+    }
+    undef $self->{Args};
+
+    undef $self->{Parent};
 }
 
 sub isConstant
@@ -2509,6 +2625,10 @@ sub xql_contextString
 
 # Base class shared by Node and PrimitiveType
 package XML::XQL::PrimitiveTypeBase;
+
+sub dispose
+{
+}
 
 sub xql_check
 {
@@ -2764,6 +2884,7 @@ sub xql_compare
 #
 
 package XML::XQL::Node;
+
 use vars qw( @ISA );
 @ISA = qw( XML::XQL::PrimitiveTypeBase );
 
@@ -3060,9 +3181,13 @@ XML::XQL - A perl module for querying XML tree structures with XQL
  # Return all elements with tagName='title' under the root element 'book'
  $query = new XML::XQL::Query (Expr => "book/title");
  @result = $query->solve ($doc);
+ $query->dispose; # Avoid memory leaks - Remove circular references
 
  # Or (to save some typing)
  @result = XML::XQL::solve ("book/title", $doc);
+
+ # Or (to save even more typing)
+ @result = $doc->xql ("book/title");
 
 =head1 DESCRIPTION
 
@@ -3118,11 +3243,20 @@ This is provided as a shortcut for:
 
  $query = new XML::XQL::Query (Expr => "doc//book");
  @result = $query->solve ($doc);
+ $query->dispose;
 
 Note that with L<XML::XQL::DOM>, you can also write (see L<XML::DOM::Node>
 for details):
 
  @result = $doc->xql ("doc//book");
+
+=item setDocParser (PARSER)
+
+Sets the XML::DOM::Parser that is used by the new XQL+ document() method.
+By default it uses an XML::DOM::Parser that was created without any arguments,
+i.e.
+
+  $PARSER = new XML::DOM::Parser;
 
 =item defineFunction (NAME, FUNCREF, ARGCOUNT [, ALLOWED_OUTSIDE [, CONST, [QUERY_ARG]]])
 
@@ -3448,6 +3582,38 @@ of the new() function) is considered to be a 'query parameter'.
 See defineFunction for a definition of I<query parameter>.
 It uses expandType to expand XQL primitive type names.
 
+=item Function: document (QUERY) or doc (QUERY)
+
+The document() function creates a new L<XML::XML::Document> for each result 
+of QUERY (QUERY may be a simple string expression, like "/usr/enno/file.xml". 
+See t/xql_document.t or below for an example with a more complex QUERY.)
+
+document() may be abbreviated to doc().
+
+document() uses an XML::DOM::Parser underneath, which can be set with
+XML::XQL::setDocParser(). By default it uses a parser that was created without
+any arguments, i.e.
+
+  $PARSER = new XML::DOM::Parser;
+
+Let's try a more complex example, assuming $doc contains:
+
+ <doc>
+  <file name="file1.xml"/>
+  <file name="file2.xml"/>
+ </doc>
+
+Then the following query will return two L<XML::XML::Document>s, 
+one for file1.xml and one for file2.xml:
+
+ @result = XML::XQL::solve ("document(doc/file/@name)", $doc);
+
+The resulting documents can be used as input for following queries, e.g.
+
+ @result = XML::XQL::solve ("document(doc/file/@name)/root/bla", $doc);
+
+will return all /root/bla elements from the documents returned by document().
+
 =item Method: DOM_nodeType ()
 
 Returns the DOM node type. Note that these are mostly the same as nodeType(),
@@ -3464,11 +3630,152 @@ functions may be regular XQL+ subqueries (that return one or more values) for
 a I<query parameter> (see generateFunction for a definition.)
 Most wrappers of Perl builtin functions have argument 0 for a query parameter,
 except for: chmod (parameter 1 is the query parameter), chown (2) and utime (2).
-The following funcitons have no query parameter, which means that all parameters
+The following functions have no query parameter, which means that all parameters
 should be a single value: atan2, rand, srand, sprintf, rename, unlink, system.
 
 The function result is casted to the appropriate XQL primitive type (Number, 
 Text or Boolean), or to an empty list if the result was undef.
+
+=back
+
+=head2 XPath functions and methods
+
+The following functions were found in the XPath specification:
+
+=over 4
+
+=item Function: concat (STRING, STRING, STRING*) 
+
+The concat function returns the concatenation of its arguments.
+
+=item Function: starts-with (STRING, STRING) 
+
+The starts-with function returns true if the first argument string starts with 
+the second argument string, and otherwise returns false.
+
+=item Function: contains (STRING, STRING) 
+
+The contains function returns true if the first argument string contains the 
+second argument string, and otherwise returns false.
+
+=item Function: substring-before (STRING, STRING) 
+
+The substring-before function returns the substring of the first argument 
+string that precedes the first occurrence of the second argument string
+in the first argument string, or the empty string if the first argument 
+string does not contain the second argument string. For example,
+
+ substring-before("1999/04/01","/") returns 1999.
+
+=item Function: substring-after (STRING, STRING) 
+
+The substring-after function returns the substring of the first argument string 
+that follows the first occurrence of the second argument string in
+the first argument string, or the empty string if the first argument string does
+not contain the second argument string. For example,
+
+ substring-after("1999/04/01","/") returns 04/01, 
+
+and 
+
+ substring-after("1999/04/01","19") returns 99/04/01.
+
+=item Function: substring (STRING, NUMBER [, NUMBER] ) 
+
+The substring function returns the substring of the first argument starting at 
+the position specified in the second argument with length specified in
+the third argument. For example, 
+
+ substring("12345",2,3) returns "234". 
+
+If the third argument is not specified, it returns the substring 
+starting at the position specified in the second argument and continuing to 
+the end of the string. For example, 
+
+ substring("12345",2) returns "2345".
+
+More precisely, each character in the string is considered 
+to have a numeric position: the position of the first character is 1,
+the position of the second character is 2 and so on.
+
+NOTE: This differs from the B<substr> method , in which the
+method treats the position of the first character as 0.
+
+The XPath spec says this about rounding, but that is not true in this 
+implementation: 
+I<The returned substring contains those characters for which the position of the 
+character is greater than or equal to the rounded value of the
+second argument and, if the third argument is specified, less than the 
+sum of the rounded value of the second argument and the rounded value of
+the third argument; the comparisons and addition used for the above 
+follow the standard IEEE 754 rules; rounding is done as if by a call to the
+round function.>
+
+=item Method: string-length ( [ QUERY ] )
+
+The string-length returns the number of characters in the string. 
+If the argument is omitted, it defaults to the context node
+converted to a string, in other words the string-value of the context node.
+
+Note that the generated XQL wrapper for the Perl built-in B<substr> does not
+allow the argument to be omitted.
+
+=item Method: normalize-space ( [ QUERY ] )
+
+The normalize-space function returns the argument string with whitespace 
+normalized by stripping leading and trailing whitespace and replacing
+sequences of whitespace characters by a single space. Whitespace characters are 
+the same as those allowed by the S production in XML. If the
+argument is omitted, it defaults to the context node converted to a string, in 
+other words the string-value of the context node.
+
+=item Function: translate (STRING, STRING, STRING) 
+
+The translate function returns the first argument string with occurrences of 
+characters in the second argument string replaced by the character at
+the corresponding position in the third argument string. For example, 
+
+ translate("bar","abc","ABC") returns the string BAr. 
+
+If there is a
+character in the second argument string with no character at a corresponding
+position in the third argument string (because the second argument
+string is longer than the third argument string), then occurrences of that 
+character in the first argument string are removed. For example,
+
+ translate("--aaa--","abc-","ABC") returns "AAA". 
+
+If a character occurs more than once in the second argument string, then the 
+first occurrence determines the replacement character. If the third argument 
+string is longer than the second argument string, then excess characters
+are ignored.
+
+NOTE: The translate function is not a sufficient solution for case conversion 
+in all languages. A future version may
+provide additional functions for case conversion.
+
+This function was implemented using tr///d.
+
+=item Function: sum ( QUERY ) 
+
+The sum function returns the sum of the QUERY results, by
+converting the string values of each result to a number.
+
+=item Function: floor (NUMBER) 
+
+The floor function returns the largest (closest to positive infinity) number 
+that is not greater than the argument and that is an integer.
+
+=item Function: ceiling (NUMBER) 
+
+The ceiling function returns the smallest (closest to negative infinity) number 
+that is not less than the argument and that is an integer.
+
+=item Function: round (NUMBER) 
+
+The round function returns the number that is closest to the argument 
+and that is an integer. If there are two such numbers, then the one that is
+closest to positive infinity is returned.
 
 =back
 

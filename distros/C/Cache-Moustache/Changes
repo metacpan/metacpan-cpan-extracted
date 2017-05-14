@@ -6,6 +6,18 @@ Home page:    <https://metacpan.org/release/Cache-Moustache>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Cache-Moustache>
 Maintainer:   Toby Inkster <tobyink@cpan.org>
 
+0.006	2017-05-12	The Horseshoe
+
+ [ Bug Fixes ]
+ - `remove` shouldn't ever return empty in a list context.
+
+ [ Documentation ]
+ - Copyright 2017.
+
+ [ Other ]
+ - Allow `remove` to be called with a regular expression parameter.
+ - Minor optimizations.
+
 0.005	2014-09-19	The Imperial
 
  [ Documentation ]
@@ -32,7 +44,7 @@ Maintainer:   Toby Inkster <tobyink@cpan.org>
 
  [ Bug Fixes ]
  - Cache::CacheTester no longer requires Cache::Cache.
- - The 'empty' method erroneously asserted that its return value was 0 or
+ - The `empty` method erroneously asserted that its return value was 0 or
    1.
 
  [ Documentation ]

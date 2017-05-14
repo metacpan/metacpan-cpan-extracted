@@ -54,9 +54,12 @@ for my $impl (IMPL()) {
 
     $q->limit = 6;
     is($q->limit, 6, "limit lvalue in $impl") or do {
+        no warnings 'once';
         local $Forks::Queue::XDEBUG = 1;
         diag "limit lvalue failure: re-running with diagnostics";
+        diag "initial limit is ",$q->limit;
         $q->limit = 6;
+        diag "final limit is ",$q->limit;
     };
     $c = $q->put(1..40);
     is($c, 6, 'limit from lvalue respected') or diag $c;

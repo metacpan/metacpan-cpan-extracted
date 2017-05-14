@@ -3,7 +3,7 @@ package RMI::ProxyReference;
 use strict;
 use warnings;   
 use version;
-our $VERSION = $RMI::VERSION;
+our $VERSION = qv('0.1');
 
 use RMI;
 
@@ -25,6 +25,7 @@ sub TIE {
 
 sub AUTOLOAD {
     no strict 'refs';
+    $DB::single = 1;
     my $method = $RMI::ProxyReference::AUTOLOAD;
     $method =~ s/^.*:://g;
     my $o = $_[0];
@@ -70,10 +71,6 @@ sub DESTROY {
 
 RMI::ProxyReference - used internally by RMI to tie references
     
-=head1 VERSION
-
-This document describes RMI::ProxyReference v0.10.
-
 =head1 DESCRIPTION
 
 When an refrerence is detected in the params or return value for an RMI

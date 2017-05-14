@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - 'Michael Stapelberg, C<< <michael at stapelberg.de> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AllKnowingDNS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mouse: 0
+  MouseX::NativeTraits: 0
+  Net::DNS: 0
+  NetAddr::IP: 0
+  Privileges::Drop: 0
+  perl: 5.010
+version: 1.7

@@ -1,0 +1,69 @@
+=LDR  00000nam\\2200000\a\4500
+=001  tes96000001\
+=003  ViArRB
+=005  199602210153555.7
+=008  960221s1955\\\\dcuabcdjdbkoqu001\0deng\d
+=040  \\$aViArRB$cViArRB
+=050  \4$aPQ1234$b.T39 1955
+=100  2 $aDeer-Doe, J.$q(Jane),$csaint,$d1355-1401,$cspirit.
+=245  10$aNew test record number 1 with ordinary data$h[large print]
+ /$cby Jane Deer-Doe ; edited by Patty O'Furniture.
+=246  1\$aNew test record number one with ordinary data
+=260  \\$aWashington, DC :$bLibrary of Congress,$c1955-<1957>
+=300  \\$av. 1-<5>\:$bill., maps, ports., charts ;$c\cm.
+=440  \0$aTest record series ;$vno. 1
+=500  \\$aThis is a test of ordinary features like replacement of the
+ mnemonics for currency and dollar signs and backslashes (backsolidus {bsol})
+ used for blanks in certain areas.
+=500  \\$aThis is a test for the conversion of curly braces; the opening
+ curly brace ({lcub}) and the closing curly brace ({rcub}).
+=504  \\$aIncludes Bibliographies, discographies, filmographies,
+ and reviews.
+=500  \\$aIncludes index.
+=650  \4$aTest record$xJuvenile.
+=600  14$aDoe, John,$d1955- $xBiography.
+=700  1\$aO'Furniture, Patty,$eed.
+
+=LDR  00000nam\\2200000\a\4500
+=001  tes96000007\
+=003  ViArRB
+=005  19960221165955.9
+=008  960221s1955\\\\dcuabcdjdbkoqu001\0dspa\d
+=020  \\$a8472236579
+=040  \\$aViArRB$cViArRB
+=050  \4$aPQ1234$b.T39 1955
+=100  2 $aDeer-Doe, Jane,$d1957-
+=245  12$aA check of the processing of unrecognized mnemonic strings
+ like {zilch} which might be encountered in the MARCMakr input file.
+=260  \\$aWashington, DC :$bLibrary of Congress,$c1955.
+=300  \\$a300\p.\:$bill., maps, ports., charts ;$c\cm.
+=440  \0$aTest record series ;$vno. 7
+=500  \\$aThis is a test of mnemonic conversion, like a real
+ backslash or back solidus, as it is sometimes called ({bsol}).
+=504  \\$aIncludes Bibliographies, discographies, filmographies,
+ and reviews.
+=500  \\$aIncludes index.
+=650  \4$aTest record$xJuvenile.
+=600  14$aDoe, John,$d1955- $xBiography.
+=856  2\$aftp.loc.gov$d{bsol}pub{bsol}marc
+
+=bad  00000nam\\2200000\a\4500
+=001  tes96000008\
+=003  ViArRB
+=005  19960221195511.9
+=008  960221s1955\\\\dcuabcdjdbkoqu001\0dspa\d
+=020  \\$a8472236579
+=020  \\$a0777000008 :$c{24}35.99
+=020  \\$a0777000008 :$c{curren}35.99
+=020  \\$z3777000008 (German ed.):$c{dollar}46.00
+=040  \\$aViArRB$cViArRB
+=050  \4$aPQ1234$b.T39 1955
+=100  2 $aDeer-Doe, Jane,$d1957-
+=245  12$aA check of the processing of the dollar sign and mnemonic strings
+ used for real dollar signs (associated with prices).
+=260  \\$aWashington, DC :$bLibrary of Congress,$c1955.
+=300  \\$a300\p.\:$bill., maps, ports., charts ;$c\cm.
+=440  \0$aTest record series ;$vno. 8
+=500  \\$aThis is a test of mnemonic conversion, like a real
+ backslash or back solidus, as it is sometimes called ({bsol}).
+

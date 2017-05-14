@@ -75,7 +75,7 @@ sub sync {
 
         my $feed = Plagger::Feed->new;
         $feed->type('livedoorReader');
-        $feed->title( Plagger::Util::strip_html($data->{channel}->{title}) );
+        $feed->title($data->{channel}->{title});
         $feed->link($data->{channel}->{link});
         $feed->url($data->{channel}->{feedlink});
         $feed->image({ url => $data->{channel}->{image} || $sub->{icon} });
@@ -94,7 +94,8 @@ sub sync {
             $entry->link($item->{link});
             # TODO support enclosure
             $entry->tags([ $item->{category} ]) if $item->{category};
-            $entry->date( Plagger::Date->from_epoch($item->{modified_on}) ); # xxx created_on as well
+            $entry->date( Plagger::Date->from_epoch($item->{modified_on}) )
+                if $item->{modified_on};
             $entry->meta->{livedoor_reader_item_id} = $item->{id};
             $entry->feed_link($feed->link);
             $entry->body($item->{body});
@@ -199,7 +200,7 @@ See L<Plagger::Cookies> for details.
 
 C<mark_read> specifies whether this plugin I<marks as read> the items
 you synchronize. With this option set to 0, you will get the
-duplicated updates everytime you run Plagger, until you mark them
+duplicated updates every time you run Plagger, until you mark them
 unread using Livedoor Reader web interface.
 
 =back

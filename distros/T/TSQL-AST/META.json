@@ -1,0 +1,54 @@
+{
+   "abstract" : "'Abstract Syntax Tree' for TSQL.",
+   "author" : [
+      "Ded MedVed <dedmedved@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TSQL-AST",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "IPC::System::Simple" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "MooseX::Declare" : "0",
+            "TSQL::Common::Regexp" : "0.04",
+            "TSQL::SplitStatement" : "0.12",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "autodie" : "0",
+            "indirect" : "0",
+            "perl" : "5.014000",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

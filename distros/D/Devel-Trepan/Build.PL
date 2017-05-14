@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-#  Copyright (C) 2011-2014 Rocky Bernstein <rocky@cpan.org>
+#  Copyright (C) 2011-2015 Rocky Bernstein <rocky@cpan.org>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ my $builder = Module::Build->new(
     },
 
     configure_requires  => {
-        'Module::Build' => '0.32',
+        'Module::Build' => '0.4211',
 
     },
     build_requires => {
@@ -64,7 +64,8 @@ my $builder = Module::Build->new(
         'B::CodeLines'                      => 1.1,
         'Data::Printer'                     => 0,
         'Data::Dumper::Concise'             => 0,
-        'Devel::Trepan::Disassemble'        => '1.9',
+        'Devel::Trepan::Deparse'            => '2.1.0',
+        'Devel::Trepan::Disassemble'        => '2.0.2',
         'Devel::Trepan::Shell'              => '1.4.1',
         'Eval::WithLexicals'                => 0,
         'Pod::Text::Color'                  => '2.06',
@@ -79,6 +80,7 @@ my $builder = Module::Build->new(
         'Array::Columnize'                  => '1.04',
         # 'Capture::Tiny'                     => 0,
         'Data::Dumper'                      => 0,
+        'Devel::Callsite'                   => 0.08,
 	'File::HomeDir'                     => 0.54,
         'Getopt::Long'                      => '2.36',
         'Digest::SHA'                       => 0,

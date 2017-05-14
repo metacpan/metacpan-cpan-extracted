@@ -169,8 +169,11 @@ __END__
 acks
 analyse
 Analysing
+acknowledgement
+acknowledgements
 api
 API
+APIVERSIONS
 ApiKey
 APIs
 ApiVersion
@@ -203,6 +206,7 @@ IPv
 ISR
 Isr
 kafka
+Krotkine
 LeaderNotAvailable
 LLC
 MagicByte
@@ -218,7 +222,9 @@ MessageSize
 metadata
 Metadata
 METADATA
+min
 MinBytes
+ms
 NodeId
 occured
 perlartistic
@@ -231,6 +237,7 @@ RequiredAcks
 ResponseMessage
 SASL
 sec
+secs
 Sergey
 Sergiy
 Simplistically
@@ -241,5 +248,7 @@ timestamp
 TopicName
 TrackingSoft
 unblessed
+untainted
+Vlad
 ZooKeeper
 Zuban

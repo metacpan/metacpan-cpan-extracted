@@ -5,35 +5,12 @@ SYNOPSIS
     Revision history for Class::MakeMethods.
 
 CHANGES
-  Version 1.010
-
-    2004/09/01
-        Moved Template::TextBuilder and Template::DiskCache into Utility::
-        namespace.
-
-        Added support for defaults with -- and -param to Standard
-        get_declarations().
-
-    2004/08/12
-        Began integrating tied-value patches from Dominique Dumont.
-
-    2004/04/27
-        Added method types to Evaled::Hash.
-
-    2004/04/23
-        Added skeleton of a new Evaled::Hash class.
-
   Version 1.009
-
-    2003/09/25
-        Added Emulator::mcoder and compatibility tests.
-
-        Released to CPAN as Class-MakeMethods-1.009.tar.gz.
 
     2003/09/22
         Added support for lvalue methods to Template and Template::Generic.
-        Added a few tests to demonstrate they're working. Added an example
-        to Docs::Examples.
+        Added a few tests to demonstrate it's working. Added an example to
+        Docs::Examples.
 
         Added Emulator::accessors and compatibility tests.
 

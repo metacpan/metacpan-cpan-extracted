@@ -1,0 +1,10 @@
+
+=head1 NAME
+
+LEGO::NXT::Manual::Cookbook - Recipes and tricks for common and not-so-common tasks.
+
+=head1 OVERVIEW
+
+This document is currently just a placeholder until people start
+adding recipes.
+

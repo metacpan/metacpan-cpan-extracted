@@ -6,6 +6,12 @@ use RPi::WiringPi::Constant qw(:all);
 use Test::More;
 use WiringPi::API qw(:all);
 
+if (! $ENV{PI_BOARD}){
+    warn "\n*** PI_BOARD is not set! ***\n";
+    $ENV{NO_BOARD} = 1;
+    plan skip_all => "not on a pi board\n";
+}
+
 my ($adc_cs_pin, $dac_cs_pin) = (26, 12);
 
 my $adc_dac_in = 1;

@@ -1,5 +1,13 @@
 Revision history for Perl extension GraphViz2.
 
+2.46  2017-05-11T09:57:00
+	- Change the default value for the 'graph' attribute within GraphViz2::Parse::ISA from {} to ''.
+		This makes it match the default for each other module in the GraphViz2::Parse::* namespace.
+		The problem was reported by Kevin Ryde (RT#121599) who used GraphViz2::Parse::ISA all by
+		itself, without using it via GraphViz2, and the BUILD sub has a check on the pre-existing
+		value of $self -> graph, which returned {} instead of the empty string, so the code did
+		not initialize $self -> graph properly with a new GraphViz2 object.
+
 2.45  2017-04-16T10:03:00
 	- In stringify_attributes(), check for undefined hash entries before processing them. If
 		detected, they are set to ''. Reported by Raphael Crochet. See RT#121122.

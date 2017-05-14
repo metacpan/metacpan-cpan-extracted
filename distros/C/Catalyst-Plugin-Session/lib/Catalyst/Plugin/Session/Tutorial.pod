@@ -15,7 +15,7 @@ that you know what HTTP is.
 When users use a site, especially one that knows who they are (sites you log in
 to, sites which let you keep a shopping cart, etc.), the server preparing the
 content has to know that request X comes from client A while request Y comes
-from client B, so that each user gets the content meant for it.
+from client B, so that each user gets the content meant for them.
 
 The problem is that HTTP is a stateless protocol. This means that every request
 is distinct, and even if it comes from the same client, it's difficult to know
@@ -72,7 +72,7 @@ State plugins handle session ID persistence. For example
 L<Catalyst::Plugin::Session::State::Cookie> creates a cookie with the session
 ID in it.
 
-These plugins will automatically set C<< $c->sessionid >> at the begining of
+These plugins will automatically set C<< $c->sessionid >> at the beginning of
 the request, and automatically cause C<< $c->sessionid >> to be saved by the
 client at the end of the request.
 
@@ -106,10 +106,10 @@ providing sensible defaults). The session API itself also has configurable
 options listed in L<Catalyst::Plugin::Session/CONFIGURATION>.
 
 For the plugins above we don't need any configuration at all - they should work
-out of the box, but suppose we did want to change some things around, it'll 
+out of the box, but suppose we did want to change some things around, it'll
 look like this:
 
-    MyApp->config( session => {
+    MyApp->config( 'Plugin::Session' => {
         cookie_name => "my_fabulous_cookie",
         storage     => "/path/to/store_data_file",
     });
@@ -320,4 +320,3 @@ browser to a malicious user.
 Yuval Kogman E<lt>nothingmuch@woobling.orgE<gt>
 
 =cut
-

@@ -1,0 +1,55 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Fiserlab Members  <andras@fiserlab.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SmotifTF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "2.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.04",
+            "Config::Simple" : "4.58",
+            "DBI" : "1.6",
+            "File::Find::Rule" : "0.33",
+            "IO::Uncompress::Gunzip" : "2.021",
+            "Math::Trig" : "1.03",
+            "Proc::Simple" : "1.26",
+            "Storable" : "2.15",
+            "Try::Tiny" : "0.19",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "provides" : {
+      "SmotifTF" : {
+         "file" : "lib/SmotifTF.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.09"
+}

@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+package Bio::AssemblyImprovement::Bin::DescaffoldAssembly;
+
+# ABSTRACT: Given an assembly in FASTA format, output a descaffolded assembly.
+# PODNAME: descaffold_assembly
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use Bio::AssemblyImprovement::Scaffold::Descaffold;
+
+my ( $assembly_file, $help );
+
+GetOptions(
+    'a|assembly=s'        => \$assembly_file,
+    'h|help'              => \$help,
+);
+
+( defined($assembly_file) && ( -e $assembly_file ) && !$help ) or die <<USAGE;
+Usage: descaffold_assembly [options]
+Given an assembly in multi FASTA format, output a descaffolded assembly.
+
+# outputs a file called contigs.scaffolded.fa
+descaffold_assembly -a contigs.fa 
+
+# This help message
+descaffold_assembly -h
+
+USAGE
+
+
+my $descaffold_obj = Bio::AssemblyImprovement::Scaffold::Descaffold->new(input_assembly => $assembly_file);
+$descaffold_obj->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+descaffold_assembly - Given an assembly in FASTA format, output a descaffolded assembly.
+
+=head1 VERSION
+
+version 1.160490
+
+=head1 SYNOPSIS
+
+Given an assembly in FASTA format, output a descaffolded assembly.
+
+   descaffold_assembly -a contigs.fa
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

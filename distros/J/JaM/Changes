@@ -1,0 +1,328 @@
+$Id: Changes,v 1.33 2002/03/08 10:55:34 joern Exp $
+
+1.0.10 2002/03/08 joern
+	Bugfixes:
+	- setting Reply-To didn't work
+	
+	Features:
+	- added "Reply Group" button which replies to the address
+	  of the "To:" header field. Useful for replying into
+	  mailing lists.
+	- you can simply specify another From address per mail
+	  by selecting the appropriate entry of the recipient
+	  popup in the compose mail dialog.
+	- if you have many email aliases forwarded to one account
+	  this one is for you: when replying JaM checks the To:
+	  field against the addresses listed in the Non-Reply
+	  user configuration field (it assumes that these are
+	  your aliases). The first address which matches and
+	  is not your normal From: address configured in the
+	  mail account window, will be set as From by default.
+	  This way you don't change your address inside one
+	  thread, if a mail was posted to one of your alias
+	  addresses.
+	- mail filter: regex filter also available as a
+	  case relevant version.
+
+1.0.9 2001/11/15 joern
+	Bugfix:
+	- text was wrapped before quoted when replying to mails
+
+1.0.8 2001/11/06 joern
+	Bugfix:
+	- non multipart HTML Mails, where the HTML message
+	  is contained in the main body of the mail, were displayed
+	  without filtering html tags.
+
+1.0.7 2001/11/02 joern
+	Bugfix:
+	- sent mail were wrapped with wrong length
+	- removed debugging output to STDERR
+
+1.0.6 2001/11/02 joern
+	Bugfix:
+	- wrapping was done after converting URLs to links,
+	  so the added HTML code was counted which leads
+	  to early wrapping.
+
+1.0.5 2001/11/02 joern
+	Features:
+	- Great improvements on wrapping long lines of received
+	  mails and saved drafts / templates, e.g. automatic
+	  paragraph detection and auto insertion. Lines are wrapped
+	  when displaying and sending mail only (not altering received
+	  mails), so line wrapping is preserved for replies and saved
+	  mails.
+	- You can configure wrapping by two new User Configuration
+	  parameters: 'View Mail Wrapping Line Length' (Default: 85) and
+	  'Send Mail Wrapping Line Length' (Default: 72).
+	- Netscape Browser program is configurable (e.g. for using Mozilla
+	  instead) and started in background by JaM.
+	- the new parameters push schema version to 7.
+
+1.0.4 2001/10/27 joern
+	Bugfixes:
+	- Due to a incompatible interface change in DBI 1.20
+	  (selectall_hashref) JaM now needs DBI >= 1.20.
+
+1.0.3 2001/10/14 joern
+	Bugfixes:
+	- There seems to be a strange bug in MIME::Entity or
+	  Mail::Internet. The X-Mailer field of JaM is rather
+	  long, ok ;) That should be no problem, but the X-Mailer
+	  header field was folded strange. A folded line of
+	  whitspace was added. My interpretation of the RFC is
+	  that this is Ok, but some clients seems to be confused
+	  by this. I don't understand where this happens, inside
+	  of MIME::Entity or Mail::Internet resp. Mail::Head.
+	  Mail::Head works Ok in my tests, maybe the handling of
+	  the X- fields in MIME::Entity is broken.
+
+	  Anyway. The X-Mailer field of JaM is now a few
+ 	  characters shorter, which avoids this strange behavior.
+	  Not really a bugfix, not really a bug ;)
+
+	  Credits for reporting this bug go to:
+	  - Hrvoje Husic <husic@zyn.de>
+	  - Michael Kalus <mkalus@expressvu.com>
+
+1.0.2 2001/09/25 joern
+	Features:
+	- Nimda attachments are now executed directly when viewing
+	  a corresponding mail. This is done inside a networked
+	  VMWare session launched on the fly. You must install VMWare
+	  for this feature. JaM won't start without a correctly
+	  configured VMWare in the near future. So hurry up! Maybe
+	  I'll support WINE, too. Stay tuned...
+
+	Bugfixes:
+	- MIME::Types does not support PNG directly. I added the
+	  mime.types of Apache to JaM, which is imported.
+	  Due to this bug PNG files were not attached correctly.
+	- JaM now falls back to application/octet-stream/base64
+	  if the MIME Type cannot be determined by MIME::Types
+
+1.0.1 2001/09/15 joern
+	Bugfixes:
+	- filter reordering didn't work
+
+1.0.0 2001/09/08 joern
+	Features:
+	- when adding new recipients to a mail, keep CC and BCC
+	  header setting for next generated recipient
+
+	Bugfixes:
+	- recursive search in the main folder did not work.
+
+0.9.14 2001/09/02 joern
+	Features:
+	- simple address book (email, name, address, phone and fax).
+	  i'm planning LDAP support for enhanced address lookup, so this
+	  simple version is more than enough.
+	- automatic address book query when pressing enter or tab
+	  in the recipients field of the mail compose window. if this
+	  fails the normal default domain algorithm is used, if the
+	  value doesn't contain an @ sign.
+
+	Bugfixes:
+	- if a Reply-To header was set on outgoing mails, this
+	  address was added to the recipient list of that mail.
+
+0.9.13 2001/09/02 joern
+	Features:
+	- when selecting last selected message in a folder, its
+	  status is not changed
+	- first version of a mail search window, not perfect but
+	  works ok. e.g. it would be nice to see the folder
+	  path of found mails.
+	- mail background color is configurable
+	- added a generic exception handler. internal exceptions
+	  are now catched and presented in a message window. this
+	  way internal errors should not crash JaM to death
+	  (or at least very seldom ;).
+	
+	Bugfixes:
+	- deleting IO filters crashed JaM
+	- initial database creation did not work
+
+0.9.12 2001/09/01 joern
+	Bugfixes:
+	- %$/ sh*t: I broke the Ctrl+Q stuff due a foolish bug,
+	  so I push this release quickly
+
+0.9.11 2001/09/01 joern
+	If no critical bugs appear within the next week the next
+	version will be 1.0.0.
+
+	Features:
+	- added File and Edit menu to the Compose Window
+	- mailto and other URI links are now parsed too in the Mail widget.
+	- pop3 error window
+	- smtp error window
+	- compose: confirm window appears only when content was changed
+
+	Bugfixes:
+	- filters which operates on the mail body crashed JaM
+	  if a mail had no body.
+	  NOTE: select all filters once in the IO Filter window,
+	  	otherwise this bugfix wont take effect
+	- deleting quoted text now works correct via Ctrl+Q
+	  resp. the corresponding menu item
+	- now with basic MIME word encoding on outgoing mail headers,
+	  using MIME::Words, which is supposed not to be fully
+	  RFC 1522 compliant. I'll check that in future.
+	- the "color parents gray" bug is fixed
+	- the update folder statistics bug is fixed
+
+0.9.10 2001/08/29 joern
+	Features:
+	- enhanced update procedure: execute specific program
+	  code for updating the database is now possible too
+	  (needed for more complex data conversions which can't
+	   be done with simple SQL)
+
+	Bugfixes:
+	- filters were not deleted if corresponding folders
+	  were removed
+	- enter key functionality in mail compose textarea was
+	  broken since 0.9.9 (clearing the selected text block)
+	- a folder was renamed if moved around inside the same
+	  parent folder
+ 
+
+0.9.9 2001/08/28 joern
+	Bugfixes:
+	- removed debugging output from JaM::GUI::Window
+	- changed Content-Transfer-Encodiung from binary to 8Bit,
+	  what's better, I think.
+	- fixed date header, it was not strictly rfc822 conform.
+	  the timezone was noted in abbrevation form, which was
+	  not correct at least for my TZ (CEST, only north american
+	  abbrevations are allowed according to rfc822). now the
+	  offest format is used to represent the timezone.
+	- removed hardcoded keyval's, using Gtk::Keysyms instead.
+
+0.9.8 2001/08/20 joern
+	Bugfixes:
+	- suppress recipient domain expansion on emtpy fields
+	- forgot adding the patches/ directory to the distribution
+	- from address was added as cc when replying mails
+	- if config parameter "dont_reply_adresses" was empty,
+	  no recipients were added when replying mail
+
+	Features:
+	- suppress multiple window instances where it make sense:
+	  - database configuration
+	  - account configuration
+	  - parameter configuration
+	  - IO filter configuration
+
+0.9.7 2001/08/19 joern
+	Features:
+	- this version ships with a patch for Gtk::HTML to support
+	  the set_default_content_type() method. JaM uses it, when
+	  available, to set the correct charset when viewing mail.
+	  (see statement beyond regarding support of character sets
+	  for outgoing/replied messages).
+	  If the method is missing, mails will be displayed with
+	  the standard locale charset, which may be wrong.
+	  The patch is located in the patches/ directory, together
+	  with a small README. I hope Ken will add this patch to the
+	  next Gtk-Perl release, so we'll get this feature without
+	  patching.
+	- convert reply messages iso-8859-1, if the orignal message is
+	  utf-8 encoded. unfortunately the i18n stuff in Gtk+ is well
+	  undocumented (at least i can't find good documents, only the
+	  mailing list archive with a horrible slow search frontend), so i
+	  insist on iso-8859-1 for now. i hope i can change this when
+	  i learned more about i18n. iso-8859-1 is ok for me, that's what
+	  counts here ;)
+	  JaM now needs Unicode::String to do the necessary conversions.
+	- user configuation dialog. the layout of this dialog is somewhat
+	  raw (can't get Label widgets aligned *sigh*), but it works.
+
+	Info:
+	- table schema is now version 3
+
+0.9.6 2001/08/18 joern
+	Bugfixes:
+	- filtering was case sensitive
+	- moving a folder to the top level did not work since
+	  i omitted the top "Mail" folder (version 0.9.4)
+	- the new Config value 'default_recipient_domain' was not
+	  created by first database setup, only via updating
+
+	Features:
+	- In-Reply-To header added	
+	- file selection boxes remember last selected directory
+	  inside the same session. if you restart JaM the corresponding
+	  configuried default value will be used again.
+	- empty trash
+	- deletion of the standard folders is now impossible
+	- ask for saving new mail to Drafts if the composse window is
+	  closed
+	- writing mail based on a Draft
+	- create mail templates and write mails based on templates
+
+0.9.5 2001/08/17 joern
+	Bugfixes:
+	- oops, I missed it using a rfc822 compliant date for
+	  outgoing mails
+	- filters were only applied on the first value of
+	  multi value fields
+	- it was not possible to save html filtered mail
+	  attachments
+	- when replying to a mail with "reply all" all recipients
+	  were added to the "To" header field, instead of using
+	  'CC' for other recipients than the original sender.
+
+0.9.4 2001/08/16 joern
+	Bugfixes:
+	- input filter were applied on outgoing mails sometimes
+	- filter adding via folder and subject popup menus did
+	  not work
+	- path values of folders are now computed correctly,
+	  when folder with childs move
+	- name clashing is prevented now when creating, moving
+	  and renaming folders
+	- the folder "Mail" is not displayed anymore. it only
+	  wastes space and can confuse if someone drops a folder
+	  beside it
+	
+	Features:
+	- you can address different .JaMrc files using the environment
+	  variable JAMRC. This way you can easily uses several
+	  independently instances of JaM as the same user.
+	- move mails to folder
+	- a default domain name for recipients can be configured
+	  (if we had a dialog to do this ;). currently you must update
+	  the corresponding value in the Config table.
+	  Config.name='default_recipient_domain'
+
+0.9.3 2001/08/15 joern
+	New Features:
+	- you can configure if pop3 messages should be deleted on
+	  the server (in the account dialog)
+	- "Input Filters" are now "IO Filters". you can defined
+	  output filters which are applied on outgoing mail.
+	- reset schema version to 1 (yet possible, because there
+	  are no production installations, what will change soon ;)
+	- today I throw away my Netscape Mailer
+
+0.9.2 2001/08/14 joern
+	New Features:
+	- parent folders with child folders which have unread
+	  mail can be colored differently. the new configuration
+	  parameter pushes schema version to 2.
+	- quickly adding new filter rules now via right click folder
+	  popup menu. target folder will be set accordingly.
+	- quickly adding new filter rules now via right click subjects
+	  popup menu. target folder will be set accordingly *and*
+	  toccfrom will be set to the "To:" adresse of the clicked mail.
+	  this way you create mailing list filters with one click.
+	- quick search via right click subjects menu for
+	  - sender
+	  - subject
+	  - body
+	  - recipient
+

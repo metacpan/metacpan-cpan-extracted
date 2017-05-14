@@ -4,11 +4,12 @@ package Flower::Rest;
 
 use strict;
 use warnings;
+use feature qw(say switch);
 use Data::Printer;
 use Mojo::Base 'Mojolicious::Controller';
 use JSON::XS;
 use Number::Format qw/format_bytes/;
-
+use Data::FreqConvert;
 my $json    = JSON::XS->new->allow_nonref;
 
 #my $json    = JSON::XS->new->allow_nonref();
@@ -37,6 +38,38 @@ sub files {
 
   my $files_hashref = $config->{nodes}->self->files->as_hashref;
   $self->render( json => { result => 'ok', files => $files_hashref } );
+}
+
+
+
+# list my files
+sub query {
+  my $self   = shift;
+  my $config = $self->config;
+  my $type = $self->param('type') || "class";
+
+
+  $self->ua->get('http://localhost:9200/_search?size=10000000&pretty=1' => sub {
+    my ($ua, $tx) = @_;
+    my $hits = $tx->res->json->{hits}{hits};
+    my $h = {};
+    my @freq = ();
+
+
+    for my $hit (@$hits) {
+
+      #$hit->{_source}{name}=~ s/\W//g;
+      push @freq,$hit->{_source}{$type} unless !$hit->{_source}{$type};
+
+    }
+
+    my $data =  Data::FreqConvert->new;
+    $h = $data->freq(\@freq);
+
+    $self->render("interface/root",set  => $h);
+
+
+    });
 }
 
 # all files we know about

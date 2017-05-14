@@ -4,6 +4,7 @@ Changes.DOM			Changes in XML::DOM from before libenno
 Changes.XQL			Changes in XML::XQL from before libenno
 CheckAncestors.pm		Used by test cases in t/
 CmpDOM.pm			Used by test cases in t/
+FAQ.xml
 MANIFEST			This file.
 Makefile.PL
 README
@@ -12,6 +13,7 @@ XQLParser/Parser.pm		Parser for XML::XQL expressions
 XQLParser/Parser.yp		YAPP input that produces XQLParser/Parser.pm
 bin/README.txt
 bin/filterInsignifWS.pl		Sample perl scripts
+bin/pretty.pl
 bin/testCheckDOM.pl
 bin/testCheckerParser.pl
 bin/testRules.pl
@@ -50,10 +52,17 @@ html/XML/DOM/ValParser.html
 html/XML/DOM/XMLDecl.html
 html/XML/DOM/hierarchy.html
 html/XML/DOM_pkg.html
+html/XML/Filter/DetectWS.html
+html/XML/Filter/Reindent.html
 html/XML/Filter/SAXT.html
+html/XML/Handler/BuildDOM.html
+html/XML/Handler/Composer.html
+html/XML/Handler/DOM.html
+html/XML/Handler/PrintEvents.html
 html/XML/Parser.html
 html/XML/Parser/Expat.html
 html/XML/RegExp.html
+html/XML/UM.html
 html/XML/XQL.html
 html/XML/XQL/DOM.html
 html/XML/XQL/Date.html
@@ -76,6 +85,7 @@ lib/XML/DOM/Attr.pod
 lib/XML/DOM/CDATASection.pod
 lib/XML/DOM/CharacterData.pod
 lib/XML/DOM/Comment.pod
+lib/XML/DOM/DOMException.pm
 lib/XML/DOM/DOMImplementation.pod
 lib/XML/DOM/Document.pod
 lib/XML/DOM/DocumentFragment.pod
@@ -84,8 +94,10 @@ lib/XML/DOM/Element.pod
 lib/XML/DOM/ElementDecl.pod
 lib/XML/DOM/Entity.pod
 lib/XML/DOM/EntityReference.pod
+lib/XML/DOM/NamedNodeMap.pm
 lib/XML/DOM/NamedNodeMap.pod
 lib/XML/DOM/Node.pod
+lib/XML/DOM/NodeList.pm
 lib/XML/DOM/NodeList.pod
 lib/XML/DOM/Notation.pod
 lib/XML/DOM/Parser.pod
@@ -94,31 +106,50 @@ lib/XML/DOM/ProcessingInstruction.pod
 lib/XML/DOM/Text.pod
 lib/XML/DOM/ValParser.pm
 lib/XML/DOM/XMLDecl.pod
+lib/XML/Filter/DetectWS.pm
+lib/XML/Filter/Reindent.pm
 lib/XML/Filter/SAXT.pm
+lib/XML/Handler/BuildDOM.pm
+lib/XML/Handler/Composer.pm
+lib/XML/Handler/PrintEvents.pm
 lib/XML/Parser.pod
 lib/XML/Parser/Expat.pod
 lib/XML/RegExp.pm
+lib/XML/UM.pm
 lib/XML/XQL.pm
 lib/XML/XQL/DOM.pm
 lib/XML/XQL/Date.pm		Adds date() method to XML::XQL
 lib/XML/XQL/Debug.pm
+lib/XML/XQL/DirXQL.pm
 lib/XML/XQL/Plus.pm
 lib/XML/XQL/Query.pod
 lib/XML/XQL/Strict.pm
 lib/XML/XQL/Tutorial.pod	XML::XQL::Tutorial manual page
 samples/REC-xml-19980210.xml	Sample XML files
 samples/bookstore.xml
+samples/minutes.xml
 t/README.txt
 t/attr1.xml
 t/attr2.xml
 t/attr3.xml
 t/bad_root.xml
+t/build_dom.t
 t/chk1.xml
 t/chk_batch.t			Main test case for XML::Checker
 t/dom_astress.t			dom_*.t are test cases for XML::DOM
 t/dom_attr.t
 t/dom_cdata.t
 t/dom_example.t
+t/dom_extent.dtd
+t/dom_extent.ent
+t/dom_extent.t
+t/dom_jp_astress.t
+t/dom_jp_attr.t
+t/dom_jp_cdata.t
+t/dom_jp_example.t
+t/dom_jp_minus.t
+t/dom_jp_modify.t
+t/dom_jp_print.t
 t/dom_minus.t
 t/dom_modify.t
 t/dom_print.t
@@ -194,6 +225,7 @@ t/xql_big.t
 t/xql_comment.t
 t/xql_cos.t
 t/xql_date.t
+t/xql_document.t
 t/xql_eval.t
 t/xql_immed_precedes.t
 t/xql_index.t

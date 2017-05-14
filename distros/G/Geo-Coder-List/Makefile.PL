@@ -16,11 +16,12 @@ WriteMakefile(
 	'Test::Most' => 0,
 	'Geo::Coder::Google::V3' => 0.10,
 	'Geo::Coder::OSM' => 0,
+	'Geo::Coder::CA' => 0,
 	'Test::Number::Delta' => 0,
-	'LWP::Protocol::https' => 0,
 	'Test::NoWarnings' => 0,
     },
     PREREQ_PM => {
+	'LWP::Protocol::https' => 0,
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo::Coder::List-*' },

@@ -1,24 +1,21 @@
 package Tk::ComboEntry;
 
-use Tk;
-
 use Tk::Listbox;
 use Tk::Entry;
+use Tk;
 
-use vars qw ($VERSION @ISA);
-
+use base qw (Tk::Derived Tk::Frame);
+use vars qw ($VERSION);
 use strict;
 
-$VERSION = '1.01';
+$VERSION = '0.03';
 
-@ISA = qw (Tk::Derived Tk::Frame);
-
-*listheight = \&ListHeight;
-*state = \&SelectionState;
-*itemlist = \&SelectionList;
-*list = \&SelectionList;
-*listfont = \&ListFont;
-*invoke = \&Invoke;
+*listheight = \&Tk::ComboEntry::ListHeight;
+*state = \&Tk::ComboEntry::SelectionState;
+*itemlist = \&Tk::ComboEntry::SelectionList;
+*list = \&Tk::ComboEntry::SelectionList;
+*listfont = \&Tk::ComboEntry::ListFont;
+*invoke = \&Tk::ComboEntry::Invoke;
 
 Tk::Widget->Construct ('ComboEntry');
 
@@ -94,15 +91,14 @@ sub Populate
         '-takefocus' => 1,
        );
 
-    my $l_ActualListBox = $this->{m_ListBox} = $l_ListBox->Subwidget
+    my $l_ActualListBox = $this->{'m_ListBox'} = $l_ListBox->Subwidget
        (
         'scrolled',
        );
 
-    $l_ListBox->Subwidget ('yscrollbar')->configure
+    ($this->{'m_ScrollBarY'} = $l_ListBox->Subwidget ('yscrollbar'))->configure
        (
         '-borderwidth' => 1,
-        '-width' => 16,
        );
 
     $l_ActualListBox->selection
@@ -118,7 +114,7 @@ sub Populate
 
     $l_Popup->bind
        (
-        '<Leave>' => sub {$this->AutoHide ($l_Popup);},
+        '<ButtonPress-1>' => sub {$this->AutoHide ($l_Popup);},
        );
 
     $l_Button->bind
@@ -144,6 +140,11 @@ sub Populate
     $l_ActualListBox->bind
        (
         '<Motion>' => sub {$this->Traverse (@_);},
+       );
+
+    $l_ActualListBox->bind
+       (
+        '<KeyRelease>' => [sub {$this->KeySeek (@_);}, Ev ('A')],
        );
 
     $l_ActualListBox->bind
@@ -185,8 +186,10 @@ sub Populate
     $this->ConfigSpecs
        (
         '-background' => [['SELF', 'METHOD', $l_Entry, $l_ListBox], 'background', 'Background', 'white'],
-        '-listfont' => ['METHOD', 'font', 'Font', '-*-Times-Medium-R-Normal--*-180-*-*-*-*-*-*'],
+        '-listfont' => ['METHOD', 'font', 'Font', '-*-Times-Bold-R-Normal--*-120-*-*-*-*-*-*'],
+        '-scrollbarwidth' => ['METHOD', 'scrollbarwidth', 'ScrollbarWidth', undef],
         '-borderwidth' => [['SELF', $l_Button], 'borderwidth', 'BorderWidth', 1],
+        '-popupwidth' => ['METHOD', 'popupwidth', 'PopupWidth', undef],
         '-listheight' => ['METHOD', 'listheight', 'ListHeight', 90],
         '-showmenu' => ['PASSIVE', 'showmenu', 'ShowMenu', 1],
         '-state' => ['METHOD', 'state', 'State', 'normal'],
@@ -229,7 +232,7 @@ sub SelectionList
    {
     $_[0]->{m_ListBox}->delete ('0', 'end');
 
-    foreach my $l_Entry (ref ($_[1]) eq 'ARRAY' ? @{$_[1]} : @_)
+    foreach my $l_Entry (sort (ref ($_[1]) eq 'ARRAY' ? @{$_[1]} : @_))
        {
         chomp $l_Entry;
         $_[0]->{m_ListBox}->insert ('end', $l_Entry);
@@ -266,6 +269,7 @@ sub Hide
     $l_Popup->overrideredirect (1);
     $l_Popup->transient();
     $l_Popup->withdraw();
+    $l_Popup->grabRelease();
     $this->{m_Visible} = 0;
     $this->Subwidget ('Button')->focus();
    }
@@ -282,7 +286,7 @@ sub Show
 
     my $l_Geometry =
        (
-        $this->width().
+        ($this->cget ('-popupwidth') || $this->width()).
         'x'.
         ($this->{m_ListHeight} || 40).
         '+'.
@@ -295,6 +299,7 @@ sub Show
     $l_Popup->deiconify();
     $l_Popup->transient();
     $l_Popup->raise();
+    $l_Popup->grabGlobal();
 
     $this->{m_ListBox}->focus();
     $this->{m_Visible} = 1;
@@ -382,6 +387,8 @@ sub MenuSelect
 
     if (Exists ($l_Menu))
        {
+        $this->Subwidget ('Popup')->grabRelease();
+
         $l_Menu->Popup() if ($Tk::VERSION < 800.005);
 
         $l_Menu->post
@@ -394,7 +401,7 @@ sub MenuSelect
 
 sub DoInvokeCallback
    {
-    if (ref ($_[0]->{'m_Invoke'}) eq 'CODE')
+    if (ref ($_[0]->{'m_Invoke'}) eq 'CODE' || ref ($_[0]->{'m_Invoke'}) eq 'Tk::Callback')
        {
         $_[0]->afterIdle ([$_[0]->{m_Invoke}, $_[0]]);
        }
@@ -454,6 +461,36 @@ sub background
        );
 
     return ($p_Color);
+   }
+
+sub scrollbarwidth
+   {
+    $_[0]->{'m_ScrollBarY'}->configure ('width' => $_[1]) if ($_[1] > 1);
+    return $_[0]->{'m_ScrollBarY'}->cget ('width');
+   }
+
+sub popupwidth
+   {
+    $_[0]->{'Configure'}{'-popupwidth'} = $_[1] if ($_[1] > 1 && $_[1] < 256);
+    return $_[0]->{'Configure'}{'-popupwidth'};
+   }
+
+sub KeySeek
+   {
+    my ($this, $p_ListBox, $p_Key) = @_;
+    my $l_Index = $p_ListBox->size() - 1;
+    my $p_Key = ord ($p_Key);
+
+    return unless ($p_Key > 32);
+
+    while ($l_Index && ord (substr ($p_ListBox->get ($l_Index), 0, 1)) > $p_Key)
+       {
+        --$l_Index;
+       }
+
+    $p_ListBox->selectionClear (0, 'end');
+    $p_ListBox->selectionSet ($l_Index, $l_Index);
+    $p_ListBox->see ($l_Index);
    }
 
 1;

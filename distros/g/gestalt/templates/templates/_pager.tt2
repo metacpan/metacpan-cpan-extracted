@@ -1,0 +1,37 @@
+
+<table width="60%">
+  <tr>
+    <td>
+      [% IF page.previous_page %]
+        <a href="[% REQUEST.uri() %]?[% IF PATTERN %]pattern=[% PATTERN %]&[% END %]pageNum=[% page.previous_page() %]&pageSize=[% BOOK.pageSize %]">Previous Page</a>
+      [% ELSE %]
+        Previous Page
+      [% END %]
+    </td>
+    <td>
+      Displaying Item [% page.first %] - [% page.last %] of [% page.total_entries %]
+    </td>
+    <td>
+      [% IF page.next_page %]
+        <a href="[% REQUEST.uri() %]?[% IF PATTERN %]pattern=[% PATTERN %]&[% END %]pageNum=[% page.next_page %]&pageSize=[% BOOK.pageSize %]">Next Page</a>
+      [% ELSE %]
+        Next Page
+      [% END %]
+    </td>
+    <td align="right">
+      <form action="[% REQUEST.uri() %]" method="get">
+      [%- IF PATTERN -%]
+      <input type="hidden" name="pattern" value="[% PATTERN %]">
+      [%- END -%]
+      <input type="hidden" name="pageNum" value="1"> <!-- Default back to the first page because the number of results per page will change -->
+      <select name="pageSize" onChange="this.form.submit()">
+        <option[% IF page.entries_per_page == 10 %] selected[% END %] value="10">10/page</option>
+        <option[% IF page.entries_per_page == 25 %] selected[% END %] value="25">25/page</option>
+        <option[% IF page.entries_per_page == 50 %] selected[% END %] value="50">50/page</option>
+        <option[% IF page.entries_per_page == 100 %] selected[% END %] value="100">100/page</option>
+        <option[% IF page.entries_per_page == page.total_entries %] selected[% END %] value="0">All on 1 page</option>
+      </select> Results/Page
+      </form>
+    </td>
+  </tr>
+</table>

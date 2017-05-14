@@ -1,0 +1,132 @@
+
+
+
+Tie::Scalar::DecUasye(r3)Contributed Perl DocumentTaitei:o:nScalar::Decay(3)
+
+
+NNNNAAAAMMMMEEEE
+       Tie::Scalar::Decay - Scalar variables that decay
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+         use Tie::Scalar::Decay;
+
+         tie my $scalar, 'Tie::Scalar::Decay', (
+           VALUE => 32,
+           FUNCTION => '$value-=1',
+           PERIOD => 1
+         );
+
+         while($scalar>0) {
+           print "$scalar\n";
+           sleep(2);
+         }
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       This module allows you to tie a scalar variable whose
+       value will change regularly with time.  The default
+       behaviour is for numeric values to halve every time period
+       (a la radioactive decay) and for non-numeric values to be
+       unchanged.
+
+       You can specify a custom decay function if you wish.
+
+       The following named parameters are supported:
+
+       `PERIOD'
+           Use `PERIOD' to specify the time interval for changes.
+           This can be either a numeric value, in which case it
+           is taken to be a number of seconds, or the following
+           forms are also accepted:
+
+               30s                    every thirty seconds
+               10m                    every ten minutes
+               1h                     every hour
+               1d                     every day
+
+           Assigning a value to the variable causes the timer to
+           be reset to zero, so if at t=0 you set a value of 5
+           with a timeout of thirty seconds, then wait twenty
+           seconds and set the value again, then it will not
+           decay until t=50.  The default is a somewhat arbitrary
+           5 seconds.
+
+       `VALUE'
+           Using the `VALUE' hash key, you can specify an initial
+           value for the variable.  Defaults to undef.
+
+       `FUNCTION'
+           This is how you can define your own custom decay
+           functions.  This can either be a string (in which case
+
+
+
+2001-04-11                 perl v5.6.0                          1
+
+
+
+
+
+Tie::Scalar::DecUasye(r3)Contributed Perl DocumentTaitei:o:nScalar::Decay(3)
+
+
+           it is evalled as necessary, and should alter the
+           variable $value as it sees fit) or it can be a
+           coderef, in which case the subroutine is called as
+           necessary, with the current value as a parameter.  The
+           sub is expected to return the new value.  If you don't
+           specify a function, it defaults to one which halves
+           the value if it is numeric, or leaves it as it is
+           otherwise.
+
+           Note that whilst it may appear that your FUNCTION gets
+           called every PERIOD, it isn't really.  In reality, the
+           value stored in the tied scalar remains constant, and
+           every time you try to read its value, a temporary
+           variable is created and FUNCTION gets called the
+           appropriate number of times before that is returned,
+           thus generating the right illusion.  Therefore, your
+           FUNCTION should not depend on such things as the
+           absolute time.
+
+BBBBUUUUGGGGSSSS
+       Plenty, no doubt.  Please tell me if you find any.
+
+       One caveat is that it relies on Time::HiRes.  If your
+       system doesn't support this, then you can comment it out
+       of the module and it'll still mostly work.  You may get
+       hurt by sub-second periods (they still work but the
+       granularity of the timer is only a second) and very
+       occasionally by boundary conditions if the load on your
+       machine is high.  Timing things with 1-second accuracy
+       blows goats.
+
+AAAAUUUUTTTTHHHHOOOORRRR
+       David Cantrell <david@cantrell.org.uk>
+
+       This module was inspired by Marcel Grunauer's
+       Tie::Scalar::Timeout.
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+       Copyright 2001 David Cantrell.
+
+       This module is licensed under the same terms as perl
+       itself.
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+       Tie::Scalar(3pm), _T_i_e_:_:_S_c_a_l_a_r_:_:_T_i_m_e_o_u_t(3)
+
+
+
+
+
+
+
+
+
+
+
+
+2001-04-11                 perl v5.6.0                          2
+
+

@@ -1,0 +1,87 @@
+x Methods in general return self or undef. The problem is, not very
+  many places are checking for undef. I can perhaps cure this by
+  switching from the use of a new method to the alloc/init model
+  instead.
+  (I switched to a NeXT like alloc/init form instead of combining the
+   two in a new class method. This gave me finer control over where
+   errors occur and guarantees that there is always a valid object
+   through which methods may be called.)
+  [DMA 20080723-20080724]
+
+x I'd like to use callbacks to the Entry to update each field directly
+  as it is parsed, but that would make Entry's directly changeable,
+  which opens a whole can of worms on keeping data consistant inside
+  an object which is supposed to have a 'hard shell' around it. This
+  note is here just so I will return to this issue and think about it
+  again from perhaps a different angle sometime in the future.
+  (I did not got to callbacks but I did simplify the code a bit,
+   mostly to make it more obvious what is happening.)
+  [DMA 20080723-20080724] 
+
+x I am not handling errors that could be caused by undef Entry args
+  in report and identical methods.
+  (I switched to getting values strictly via methods that prevent
+   undefs from getting passed through to the FileHash::Report printing.)
+  [DMA 20080723-20080725]
+
+x FormatString: Do I still need the "REST" field name?
+  (no)
+  [DMA 20080723-20080725]
+
+x can I write a _split that handles quoted strings?
+  (Done.)
+  [DMA 20080723-20080727]
+	x I have to worry about the problem of unquoted names
+	  Thus *Simple entries may only contain spaces if they are the
+	  last item on a line and can suck up everything until
+	  newline.
+	  (Done.)
+	  [DMA 20080723-20080727]
+
+x Some ivars are defaulted to something other than undef. Document
+  it.
+  (Appears to only be device, directory and file that get changed 
+   from undef to "" if nothing is present in a FormatString parse)
+  [DMA 20080724-20080727]
+
+x Should I do head and tail whitespace trimming in string2mode?
+  (I have done so using a trick line:
+	$_ = $modestr; ($modestr) = split;
+   that depends on the defaults used by split. This is probably
+   over kill since only a properly delimited lexeme should be 
+   seen at that point in the code, but what the hell...)
+   [DMA 20080723-20080727]  
+
+x I need to check for success on the eval in initFromDump. Also,
+  this is a security issue as just about anything could be in the
+  thing it evals.
+  (I put it in an if statement, if (! eval $line) {... log the error}.
+   As to the security, it returns only the last value, and it
+   catches any errors and returns so that I can print the above.)
+  [DMA 20080724-20080727]
+
+x FILEHASH: remove use lib '.' when done debugging.
+  [DMA 20080805-20080812]
+
+x How do I avoid loops caused by links?
+  This hides multiple problems.
+	* softlinks. We probably want to deal with this
+	  by never following them. We should be including
+	  the part of the tree the file resides in.
+	* hardlinks. Not much used, not easily detected
+	* softlink loops at least let you compare your
+	  path to the hash to see if you have been here
+	  before.
+	* General solutions are not easy.
+  (The problem will probably not occur in most usage. I am
+   now not following softlinks, so that avoids the mostly likely
+   sources of cyclicity; directory hardlinks are often not available
+   or if they are, are only creatable by root and require a possibly
+   insane sysadmin.
+   I think we are covered and safe for 'normal' file systems. Time
+   will tell.)
+  [DMA 20080723-20080812]
+
+
+
+

@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+CalendarMonthDB.pm
+README
+IMPORTANT-README
+setup_calendar.pl
+cgi/addcal.cgi
+cgi/addcal.tmpl
+cgi/caladmin.tmpl
+cgi/calendar.cgi
+cgi/editcal.cgi
+cgi/editcal.tmpl
+

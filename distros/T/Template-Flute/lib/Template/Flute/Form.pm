@@ -2,7 +2,6 @@ package Template::Flute::Form;
 
 use strict;
 use warnings;
-use Scalar::Util qw/blessed/;
 
 =head1 NAME
 
@@ -21,6 +20,7 @@ sub new {
 	my ($class, $sob, $static) = @_;
 	my ($self);
 	
+	$class = shift;
 	$self = {sob => $sob, static => $static, valid_input => undef};
 
     # retrieve values for action and method attributes
@@ -42,7 +42,7 @@ sub new {
         $self->{method} = 'GET';
     }
 
-	bless $self, $class;
+	bless $self;
 }
 
 =head1 METHODS
@@ -279,9 +279,6 @@ sub fill {
 	my ($self, $href) = @_;
 	my ($f, @elts, $value, $zref, $type);
     $self->_set_filled;
-    if (blessed($href) and $href->isa('Hash::MultiValue')) {
-        $href = $href->mixed;
-    }
 	for my $f (@{$self->fields()}) {
 		@elts = @{$f->{elts}};
 
@@ -358,13 +355,72 @@ sub fill {
 	}
 }
 
+=head2 finalize ELT
+
+Finalizes form.
+
+=cut
+
+sub finalize {
+	my ($self, $elt) = @_;
+
+	for (qw/action method/) {
+		if (exists $self->{$_} && $self->{$_}) {
+			$elt->set_att($_, $self->{$_});
+		}
+	}
+
+	return;
+}
+
+=head2 query
+
+Returns Perl structure for database query based on
+the specification.
+
+=cut
+
+sub query {
+	my ($self) = @_;
+	my (%query, $found, %cols);
+
+	%query = (tables => [], columns => {}, query => []);
+	
+	if ($self->{sob}->{table}) {
+		push @{$query{tables}}, $self->{sob}->{table};
+		$found = 1;
+	}
+
+	for (@{$self->{params}}) {
+		push @{$query{columns}->{$self->{sob}->{table}}}, $_->{name};
+		$cols{$_->{name}} = 1;
+		$found = 1;
+	}
+
+	# qualifier based on the input
+	for (values %{$self->{inputs}}) {
+		if ($_->{value}) {
+			push @{$query{query}}, $_->{name} => $_->{value};
+
+			# qualifiers need to be present in column specification
+			unless (exists $cols{$_->{name}}) {
+				push @{$query{columns}->{$self->{sob}->{table}}}, $_->{name};
+			}
+		}
+	}
+	
+	if ($found) {
+		return \%query;
+	}
+}
+
 =head1 AUTHOR
 
 Stefan Hornburg (Racke), <racke@linuxia.de>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2010-2014 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

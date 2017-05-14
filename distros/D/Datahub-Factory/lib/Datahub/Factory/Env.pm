@@ -52,6 +52,13 @@ sub pipeline {
     require_package('PipelineConfig', 'Datahub::Factory')->new({'conf_object' => @_});
 }
 
+sub module {
+    my $self = shift;
+    my $name = shift;
+    my $ns = "Datahub::Factory::Module";
+    return require_package($name, $ns);
+}
+
 1;
 
 __END__

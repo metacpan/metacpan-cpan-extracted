@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rng:grammar xmlns:rng="http://relaxng.org/ns/structure/1.0" rng:datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	<rng:start>
+		<rng:element name="hopkins">
+			<rng:interleave>
+				<rng:zeroOrMore>
+					<rng:element name="plugin">
+						<rng:attribute name="name">
+							<rng:text />
+						</rng:attribute>
+						<rng:ref name="anything" />
+					</rng:element>
+				</rng:zeroOrMore>
+
+				<rng:zeroOrMore>
+					<rng:element name="database">
+						<rng:interleave>
+							<rng:element name="dsn">
+								<rng:text />
+							</rng:element>
+							<rng:element name="user">
+								<rng:text />
+							</rng:element>
+							<rng:element name="pass">
+								<rng:text />
+							</rng:element>
+							<rng:optional>
+								<rng:ref name="options" />
+							</rng:optional>
+						</rng:interleave>
+					</rng:element>
+				</rng:zeroOrMore>
+
+				<rng:zeroOrMore>
+					<rng:element name="queue">
+						<rng:attribute name="name">
+							<rng:text />
+						</rng:attribute>
+						<rng:optional>
+							<rng:element name="concurrency">
+								<rng:data type="int" />
+							</rng:element>
+						</rng:optional>
+						<rng:optional>
+							<rng:attribute name="onerror">
+								<rng:choice>
+									<rng:value type="string">halt</rng:value>
+									<rng:value type="string">freeze</rng:value>
+									<rng:value type="string">shutdown</rng:value>
+								</rng:choice>
+							</rng:attribute>
+						</rng:optional>
+					</rng:element>
+				</rng:zeroOrMore>
+
+				<rng:zeroOrMore>
+					<rng:element name="task">
+						<rng:attribute name="name">
+							<rng:text />
+						</rng:attribute>
+						<rng:optional>
+							<rng:attribute name="onerror">
+								<rng:choice>
+									<rng:value type="string">disable</rng:value>
+								</rng:choice>
+							</rng:attribute>
+						</rng:optional>
+						<rng:optional>
+							<rng:attribute name="enabled">
+								<rng:choice>
+									<rng:value type="string">no</rng:value>
+									<rng:value type="string">yes</rng:value>
+								</rng:choice>
+							</rng:attribute>
+						</rng:optional>
+						<rng:optional>
+							<rng:attribute name="run">
+								<rng:choice>
+									<rng:value type="string">serial</rng:value>
+									<rng:value type="string">parallel</rng:value>
+								</rng:choice>
+							</rng:attribute>
+						</rng:optional>
+						<rng:interleave>
+							<rng:element name="queue">
+								<rng:text />
+							</rng:element>
+							<rng:choice>
+								<rng:element name="cmd">
+									<rng:text />
+								</rng:element>
+								<rng:element name="class">
+									<rng:text />
+								</rng:element>
+							</rng:choice>
+							<rng:zeroOrMore>
+								<rng:element name="schedule">
+									<rng:text />
+								</rng:element>
+							</rng:zeroOrMore>
+							<rng:optional>
+								<rng:ref name="options" />
+							</rng:optional>
+							<rng:optional>
+								<rng:ref name="chain" />
+							</rng:optional>
+						</rng:interleave>
+					</rng:element>
+				</rng:zeroOrMore>
+
+			</rng:interleave>
+		</rng:element>
+	</rng:start>
+
+	<rng:define name="anything">
+		<rng:element>
+			<rng:anyName />
+			<rng:zeroOrMore>
+				<rng:choice>
+					<rng:attribute>
+						<rng:anyName />
+					</rng:attribute>
+					<rng:text/>
+					<rng:ref name="anything" />
+				</rng:choice>
+			</rng:zeroOrMore>
+		</rng:element>
+	</rng:define>
+
+	<rng:define name="options">
+		<rng:element name="options">
+			<rng:oneOrMore>
+				<rng:element name="option">
+					<rng:attribute name="name">
+						<rng:text />
+					</rng:attribute>
+					<rng:attribute name="value">
+						<rng:text />
+					</rng:attribute>
+				</rng:element>
+			</rng:oneOrMore>
+		</rng:element>
+	</rng:define>
+
+	<rng:define name="chain">
+		<rng:element name="chain">
+			<rng:attribute name="task">
+				<rng:text />
+			</rng:attribute>
+			<rng:optional>
+				<rng:ref name="options" />
+			</rng:optional>
+			<rng:optional>
+				<rng:ref name="chain" />
+			</rng:optional>
+		</rng:element>
+	</rng:define>
+</rng:grammar>

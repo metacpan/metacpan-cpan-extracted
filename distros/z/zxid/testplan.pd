@@ -1,0 +1,56 @@
+<<if: ZXIDBOOK>>
+<<else: >>ZXID Testing Plan
+#################
+<<cvsid: $Id: testplan.pd,v 1.4 2009-08-25 16:22:44 sampo Exp $>>
+
+1 Test Plan
+===========
+
+<<fi: >>
+
+1.1 SSO Tests
+-------------
+
+1. SSO to previously unknown IdP by supplying entity ID, using Artifact
+2. SSO to known IdP using POST
+
+1.2 Test targets
+----------------
+
+1.2.1 CGI Based Hello World Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  zxidhlo (the C program)
+  zxidhlo.sh (tests zxidsimple - the C program)
+  zxidhlo.php
+  zxidhlo.pl
+  zxidhlo-java.sh (tests zxidhlo.java)
+
+1.2.2 CGI Based Full API Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  zxid (the C program)
+  zxid.php
+  zxid.pl
+  zxid-java.sh
+
+1.2.3 mod_php tests
+~~~~~~~~~~~~~~~~~~~
+
+1.2.4 mod_perl tests
+~~~~~~~~~~~~~~~~~~~~
+
+1.2.5 Tomcat Integration Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1.2.6 mod_auth_saml tests
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1.3 Signature tests
+-------------------
+
+N.B. The signature validation requires metadata to be present.
+
+  ./zxbench -d -n 1 <t/hp-idp-post-resp.xml
+  ./zxbench -d -n 1 <t/rsa-a7n-sig.xml
+  ./zxbench -d -n 1 <t/slim-inner-a7n-sig.xml

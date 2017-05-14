@@ -1,0 +1,2 @@
+rm -rf /tmp/search-n-copy-test
+mkdir /tmp/search-n-copy-test

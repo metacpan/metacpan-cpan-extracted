@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2016 by Dominique Dumont.
+# This software is Copyright (c) 2008-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.361';
+$Config::Model::TkUI::VERSION = '1.362';
 use 5.10.1;
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ use Tk::Adjuster;
 use Tk::Pod;
 use Tk::Pod::Text;    # for findpod
 
-use Config::Model 2.084;
+use Config::Model 2.095; # Node::get_help_as_text
 
 use Config::Model::Tk::LeafEditor;
 use Config::Model::Tk::CheckListEditor;
@@ -130,6 +130,7 @@ sub Populate {
 
     # initialize internal attributes
     $cw->{location} = '';
+    $cw->{current_mode} = 'view';
 
     $cw->setup_scanner();
 
@@ -166,6 +167,9 @@ sub Populate {
 
     $cw->bind( '<Control-s>', sub { $cw->save } );
     $cw->bind( '<Control-q>', sub { $cw->quit } );
+    $cw->bind( '<Control-c>', sub { $cw->edit_copy } );
+    $cw->bind( '<Control-v>', sub { $cw->edit_paste } );
+    $cw->bind( '<Control-f>', sub { $cw->pack_find_widget } );
 
     my $edit_items = [
 
@@ -247,7 +251,7 @@ sub Populate {
     };
 
     $tree->bind( '<Return>', $b3_sub );
-    $tree->bind( '<Button-3>', $b3_sub );
+    $tree->bind( '<ButtonRelease-3>', $b3_sub );
     bind_clicks($tree,$b1_sub, $b3_sub);
 
     # bind button2 to get cut buffer content and try to store cut buffer content
@@ -255,16 +259,11 @@ sub Populate {
         my $item = $tree->nearest( $tree->pointery - $tree->rooty );
         $cw->on_cut_buffer_dump($item);
     };
-    $tree->bind( '<Button-2>', $b2_sub );
+    $tree->bind( '<ButtonRelease-2>', $b2_sub );
 
     $tree->bind( '<Control-c>', sub { $cw->edit_copy } );
     $tree->bind( '<Control-v>', sub { $cw->edit_paste } );
     $tree->bind( '<Control-f>', sub { $cw->pack_find_widget } );
-
-    # bind button2 to get cut buffer content and try to store cut buffer content
-    #my $key_sub = sub{my $item = $tree->nearest($tree->pointery - $tree->rooty) ;
-    #$cw->on_key_press($item)} ;
-    #$tree->bind('<KeyPress>', $key_sub) ;
 
     my $find_frame = $cw->create_find_widget;
 
@@ -649,6 +648,7 @@ sub on_cut_buffer_dump {
     # display result
     $cw->reload;
     $cw->create_element_widget($cw->{current_mode}, $tree_path);
+    $cw->open_item($tree_path);
 }
 
 # replace dot in str by _|_

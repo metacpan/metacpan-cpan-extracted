@@ -1,15 +1,13 @@
-use strict;
-use warnings;
-use v5.10;
 package WebService::Pixabay;
 
+use Modern::Perl '2010';
 use Moo;
 use Function::Parameters;
 use Data::Printer;
 
 with 'WebService::Client';
 # ABSTRACT: Perl 5 interface to Pixabay API.
-our $VERSION = '0.0.3'; # VERSION
+our $VERSION = '0.0.4'; # VERSION
 
 has api_key =>
 (
@@ -76,7 +74,7 @@ WebService::Pixabay - Perl 5 interface to Pixabay API.
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 

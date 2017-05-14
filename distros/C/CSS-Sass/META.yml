@@ -1,41 +1,62 @@
 ---
 abstract: 'Compile .scss files using libsass'
 author:
+  - 'David Caldwell <david@porkrind.org>'
   - 'Marcel Greter <perl-libsass@ocbnet.ch>'
 build_requires:
-  ExtUtils::CppGuess: 0.09
-  ExtUtils::MakeMaker: 6.52
-  File::chdir: 0.01
-  Getopt::Long: 0.01
-  Test::Differences: 0.01
-  YAML::XS: 0.01
+  ExtUtils::CBuilder: '0'
+  File::chdir: '0'
+  Test::Differences: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::CppGuess: 0.09
-  ExtUtils::MakeMaker: 6.52
-  Getopt::Long: 0.01
+  File::Slurp: '0'
+  File::chdir: '0'
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CSS-Sass
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  CSS::Sass:
+    file: lib/CSS/Sass.pm
+    version: v3.2.1
+  CSS::Sass::Type:
+    file: lib/CSS/Sass/Type.pm
+    version: v3.2.1
+  CSS::Sass::Type::Boolean:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::Color:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::Error:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::List:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::List::Comma:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::List::Space:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::Map:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::Null:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::Number:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Type::String:
+    file: lib/CSS/Sass/Type.pm
+  CSS::Sass::Watchdog:
+    file: lib/CSS/Sass/Watchdog.pm
+    version: v3.2.1
+  CSS::Sass::Watchdog::Queue:
+    file: lib/CSS/Sass/Watchdog.pm
 requires:
-  Carp: 1.01
-  Encode::Locale: 0.01
-  File::Slurp: 0.01
-  Getopt::Long: 0.01
-  List::MoreUtils: 0.01
-  strict: 0
-  version: 0
-  warnings: 0
+  File::Slurp: '0'
+  File::chdir: '0'
+  List::MoreUtils: '0'
+  perl: '5.008'
 resources:
-  bugtracker: https://github.com/sass/perl-libsass/issues
-  homepage: https://metacpan.org/release/CSS-Sass
-  license: http://opensource.org/licenses/MIT
-  repository: https://github.com/sass/perl-libsass
-version: v3.4.5
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/sass/CSS-Sass
+version: v3.2.1

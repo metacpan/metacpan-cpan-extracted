@@ -1,0 +1,31 @@
+/* XPM */
+static char * browseentry_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"19 21 4 1",
+/* colors */
+"  s None c None",
+". c #040204",
+"X c #FCFEFC",
+"o c #848284",
+/* pixels */
+"                   ",
+"                   ",
+"                   ",
+"  ................ ",
+"  .XXXXXXXX..   .. ",
+"  .XXXXXXXX... ... ",
+"  .XXXXXXXX....... ",
+"  ................ ",
+"  .XXXXXXXX.XXXXX. ",
+"  .XXXXXXXX.X . o. ",
+"  .X....XXX.X...o. ",
+"  .XXXXXXXX.ooooo. ",
+"  .X......X....... ",
+"  .XXXXXXXX.XXXXX. ",
+"  .X.....XX.X...o. ",
+"  .XXXXXXXX.X . o. ",
+"  .XXXXXXXX.ooooo. ",
+"  ................ ",
+"                   ",
+"                   ",
+"                   "};

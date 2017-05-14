@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use YAML qw[ DumpFile LoadFile ];
+
+use File::Slurp;
+
+my $protos = read_file( 'protos' );
+
+my %hints = LoadFile( 'proto_hints.yml' );
+
+my %protos;
+
+for my $proto ( grep { $_ ne '' } split( "\n\n", $protos ) )
+{
+
+    my ( $type_func, $args ) = $proto =~ /^(.*)\s*\((.*)\);/;
+
+    my ( $type, $funcname) = $type_func =~ /(\w.*?[^\s])\s*(\w+)\s*$/;
+
+    my ( $pfx, $func ) = $funcname =~ /^(.*)_(.*)$/;
+
+    # check for output arguments
+    my $outputs = $hints{$funcname}{outputs} //= [];
+    my %output = map { $_ => 1 } @{$outputs};
+
+    my @args = 
+      grep { $_->{type} ne 'lua_State *' }
+	map { s/^\s+//; s/\s+$//;
+
+	      my ( $type, $name, $array ) = /(.*?)(\w+)(\[\])?$/;
+	      $type =~ s/\s+$//;
+	      $array //= '';
+
+	      my $hints = $hints{$funcname}{args}{$name} // {};
+
+	      my %attr = ( cdef => $_,
+			   type => $type,
+			   name => $name,
+			   %$hints
+			  );
+	      if ( ! defined $attr{xsdef} )
+	      {
+		  my $xstype = $type;
+		  $xstype =~ s/\*\s*$/\&/
+		    if $output{$name};
+		  $attr{xsdef} = "$xstype $name$array";
+
+		  $attr{xsdef} .= ' = NO_INIT'
+		    if $output{$name};
+	      }
+
+	      \%attr;
+	  } split( ',', $args );
+
+    my @inputs;
+    push @inputs, $_->{name} foreach grep { ! $output{$_->{name}} } @args;
+
+
+    $protos{$funcname} = { type => $type,
+			   lua_funcname => $funcname,
+			   func => $func,
+			   structname => "${func}_S",
+			   args => \@args,
+			   proto => $proto,
+			   fwrap => "wrap_${func}",
+			   outputs => $outputs,
+			   inputs => \@inputs,
+			   attr => $hints{$funcname}{attr} || {},
+			 };
+}
+
+DumpFile( 'protos.yml', %protos )
+
+

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-CMS.t
+lib/WWW/CMS.pm

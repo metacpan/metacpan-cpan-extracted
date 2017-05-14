@@ -1,3 +1,9 @@
+0.37     2017-05-09
+
+- Possible fix for very weird failures seen under threaded Perls with some
+  modules that use Specio.
+
+
 0.36     2017-02-19
 
 - Inlined coercions would attempt to coerce for every type which matched the

@@ -1,0 +1,105 @@
+%%START_PERL%%
+#
+# scanner-insert.pl.in
+#    first version Tue Oct 24 14:13:45 MST 2000
+#    script for inserting scanner entries into genex DB
+#
+my $VERSION = '$Id: scanner-insert.pl.in,v 1.4 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+
+use Bio::Genex qw($SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_insert_sql create_select_sql);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::ExternalDatabase;
+
+my $infile;
+my $rc = GetOptions('file=s' => \$infile);
+
+my $USAGE = <<"EOU";
+usage: $0 --file=file_name
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parsefile($infile);
+
+my @scanner_list = $DOC->getElementsByTagName('scanner');
+
+use constant CON_SCANNER => 'technology_scanner';
+
+# open up a writeable connection
+$Bio::Genex::DBNAME = 'genex';
+$Bio::Genex::USER = $SU_USERNAME;
+$Bio::Genex::PASSWORD = $SU_PASSWORD;
+$Bio::Genex::TRANSACTION = 1;	# do it in a transaction
+
+my $dbh = Bio::Genex::current_connection();
+my $curr_table = 'Scanner';
+my $timeformat = '%r %A %B %d %Y'; 
+
+print STDERR scalar @scanner_list, " Scanners to insert\n";
+
+foreach my $soft_node (@scanner_list) {
+  assert_element($soft_node,'scanner');
+
+  my $model_description = $soft_node->getAttribute('model_description');
+  error("Couldn't find model_description for node: " . $soft_node->toString()) 
+    unless $model_description ne '';
+  my $model_serial_num = $soft_node->getAttribute('model_serial_num');
+  error("Couldn't find model_serial_num for node: " . $soft_node->toString()) 
+    unless $model_serial_num ne '';
+  my $contact = $soft_node->getAttribute('contact');
+  error("Couldn't find contact for node: " . $soft_node->toString()) 
+    unless $contact ne '';
+
+  print STDERR "Inserting scanner $model_description\n";
+
+  my $con_type = CON_SCANNER;
+
+  my $WHERE = "type='$con_type' AND " .
+              "(contact_person LIKE '%$contact%' OR " .
+              " organization LIKE '%$contact%')";
+  my $sql = create_select_sql($dbh,
+			      COLUMNS=>['con_pk'],
+			      FROM=>['Contact'],
+			      WHERE=>$WHERE
+			     );
+  my $con_fk = $dbh->selectall_arrayref($sql);
+  error("couldn't get contact for node: " . $soft_node->toString(), $sql)
+    if $dbh->err;
+  # extract the value from the array of arrays
+  $con_fk = $con_fk->[0][0];
+
+  my %attributes = ('model_description'=>$model_description,
+		    'model_serial_num'=>$model_serial_num,
+		    'con_fk'=>$con_fk,
+		   );
+  my $sql = create_insert_sql($dbh,$curr_table,\%attributes);
+  $dbh->do($sql);
+  error("couldn't insert record for node: " . $soft_node->toString(), $sql)
+    if $dbh->err;
+}
+$dbh->commit();
+# $dbh->rollback();
+$dbh->disconnect();
+exit(0);
+
+sub error {
+  my ($error,$sql) = @_;
+  $error .= ", SQL=<$sql>, DBI=<$DBI::errstr>" if defined $sql;
+  $dbh->rollback();
+  $dbh->disconnect();
+  die "$error\n";
+}

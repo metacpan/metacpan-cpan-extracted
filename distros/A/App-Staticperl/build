@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# this script builds bin/staticperl
+# this is not done at install time normally, to allow people to install the script
+# without a working perl.
+
+if
+   (
+      IFS=
+      while read -r line; do
+         if [ "${line###CAT }" != "$line" ]; then
+            cat "${line###CAT }"
+         else
+            printf -- "%s\n" "$line"
+         fi
+      done
+   ) <staticperl.sh >bin/staticperl~
+then
+   chmod 755 bin/staticperl~
+   if cmp -s bin/staticperl~ bin/staticperl; then
+      rm bin/staticperl~
+      echo unchanged
+   else
+      mv bin/staticperl~ bin/staticperl
+      echo changed
+   fi
+fi

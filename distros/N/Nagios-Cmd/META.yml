@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Nagios-Cmd
+version: 0.05
+license: gpl
+distribution_type: module
+requires:
+  perl: 5.6.0
+recommends: {}
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+conflicts: {}
+provides:
+  Nagios::Cmd:
+    file: lib/Nagios/Cmd.pm
+    version: ~
+  Nagios::Cmd::Read:
+    file: lib/Nagios/Cmd/Read.pm
+    version: ~
+generated_by: Module::Build version 0.18

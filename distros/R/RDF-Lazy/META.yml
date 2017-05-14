@@ -2,34 +2,39 @@
 abstract: 'Lazy typing access to RDF data'
 author:
   - 'Jakob Voß <voss@gbv.de>'
-build_requires: {}
+build_requires:
+  RDF::Trine::NamespaceMap: 0
+  Template: 0
+  Test::More: 0
+  utf8: 0
 configure_requires:
-  Module::Build::Tiny: 0.036
+  ExtUtils::MakeMaker: 6.30
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: RDF-Lazy
-no_index:
-  directory:
-    - t
-    - xt
-    - inc
-    - share
-    - eg
-    - examples
 requires:
-  RDF::NS: 20131002
-  RDF::Trine: 1.000
+  CGI: 0
+  Carp: 0
+  RDF::NS: 0
+  RDF::Trine: 0
+  RDF::Trine::Model: 0
+  RDF::Trine::Parser: 0
+  RDF::Trine::Serializer::RDFJSON: 0
+  RDF::Trine::Serializer::RDFXML: 0
+  RDF::Trine::Serializer::Turtle: 0
+  Scalar::Util: 0
   Try::Tiny: 0
-  perl: v5.10.0
+  base: 0
+  overload: 0
+  perl: v5.10.1
+  strict: 0
+  warnings: 0
 resources:
   bugtracker: https://github.com/nichtich/RDF-Lazy/issues
   homepage: https://github.com/nichtich/RDF-Lazy
   repository: https://github.com/nichtich/RDF-Lazy.git
-version: 0.09
-x_contributors:
-  - 'Jakob Voss <jakob@nichtich.de>'
-  - 'Jakob Voss <voss@gbv.de>'
+version: 0.081

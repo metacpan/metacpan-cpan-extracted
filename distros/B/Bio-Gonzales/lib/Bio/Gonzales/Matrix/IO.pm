@@ -4,49 +4,46 @@ use warnings;
 use strict;
 use Carp;
 use Data::Dumper;
-use List::MoreUtils qw/uniq zip/;
+use File::Slurp qw/slurp/;
+use List::MoreUtils qw/uniq/;
 use Bio::Gonzales::Util qw/flatten/;
-use Text::CSV_XS qw/csv/;
 
 use Bio::Gonzales::Matrix::Util qw/uniq_rows/;
 
 use 5.010;
 
 use List::Util qw/max/;
-use Bio::Gonzales::Util::File qw/open_on_demand slurpc expand_home/;
+use Bio::Gonzales::Util::File qw/open_on_demand slurpc/;
 
 use base 'Exporter';
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
-@EXPORT      = qw(mslurp mspew lslurp miterate lspew dict_slurp dict_spew xcsv_slurp miterate_hash);
+@EXPORT      = qw(mslurp mspew lslurp miterate lspew dict_slurp dict_spew);
 %EXPORT_TAGS = ();
 @EXPORT_OK   = qw(lspew xlsx_slurp xlsx_spew);
-my $COMMENT_RE = qr/^\s*#/;
 
 sub dict_slurp {
   my ( $src, $cc ) = @_;
-  croak "you have not specified key_idx"
-    unless ( $cc && exists( $cc->{key_idx} ) );
+  croak "you have not specified key_idx and val_idx"
+    unless ( $cc && exists( $cc->{key_idx} ) && exists( $cc->{val_idx} ) );
 
   $cc //= {};
   my %c = (
     sep              => qr/\t/,
     header           => undef,
     skip             => -1,
-    comment          => $COMMENT_RE,
+    comment          => qr/^#/,
     key_idx          => 0,
     record_filter    => undef,
     commented_header => undef,
     concat_keys      => 1,
-    sort_keys        => 0,
-    strict           => 0,
+    sort_keys      => 0,
     %$cc
   );
 
   $c{header} //= $c{commented_header};
 
-  my $is_strict     = $c{strict};
   my $record_filter = $c{record_filter};
 
   # concatenate keys to a big string
@@ -75,10 +72,9 @@ sub dict_slurp {
           next;
         }
       }
-      $raw_row =~ s/\r$//;
+      $raw_row =~ s/\r\n/\n/;
       chomp $raw_row;
       @header = split /$c{sep}/, $raw_row;
-      @header = ref $vidx ? @header[@$vidx] : ( $header[$vidx] ) if ( defined $vidx && $vidx ne 'all' );
       last;
     }
   }
@@ -88,7 +84,7 @@ sub dict_slurp {
   while (<$fh>) {
     next if ( $lnum++ <= $c{skip} );
     next if ( $c{comment} && /$c{comment}/ );
-    s/\r$//;
+    s/\r\n/\n/;
     chomp;
     next if (/^\s*$/);
 
@@ -98,8 +94,7 @@ sub dict_slurp {
 
     for my $kidx (@kidcs) {
 
-      my @k = ( ref $kidx ? @r[@$kidx] : $r[$kidx] );
-      @k = map { $_ // '' } @k;
+      my @k = ( ref $kidx ? map { $_ // '' } @r[@$kidx] : $r[$kidx] );
       @k = sort @k if ( $c{sort_keys} );
       my $k = join( $;, @k ) // '';
 
@@ -108,11 +103,10 @@ sub dict_slurp {
       } elsif ( not defined $vidx ) {
         $map{$k}++;
       } elsif ($uniq) {
-        confess "strict mode: two times the same key $k" if ( $is_strict && defined( $map{$k} ) );
-        $map{$k} = ( ref $vidx ? [ @r[@$vidx] ] : ( $vidx eq 'all' ? \@r : $r[$vidx] ) );
+        $map{$k} = ( ref $vidx ? [ @r[@$vidx] ] : $r[$vidx] );
       } else {
         $map{$k} //= [];
-        push @{ $map{$k} }, ( ref $vidx ? [ @r[@$vidx] ] : ( $vidx eq 'all' ? \@r : $r[$vidx] ) );
+        push @{ $map{$k} }, ( ref $vidx ? [ @r[@$vidx] ] : $r[$vidx] );
       }
     }
   }
@@ -151,17 +145,17 @@ sub mslurp {
     header           => 0,
     skip             => -1,
     row_names        => 0,
-    comment          => $COMMENT_RE,
+    comment          => qr/^#/,
     commented_header => undef,
     record_filter    => undef,
-    col_idx          => undef,
+    col_idx => undef,
     %$cc
   );
 
   my $record_filter = $c{record_filter};
 
   my @col_idx;
-  @col_idx = @{ $c{col_idx} } if ( $c{col_idx} && ref $c{col_idx} eq 'ARRAY' );
+  @col_idx = @{$c{col_idx}} if($c{col_idx} && ref $c{col_idx} eq 'ARRAY');
   my @header;
   my @row_names;
 
@@ -196,43 +190,18 @@ sub mslurp {
 
     push @row_names, shift @row if ( $c{row_names} );
 
-    push @m, ( @col_idx ? [ @row[@col_idx] ] : \@row );
+    push @m, (@col_idx ? [ @row[@col_idx] ] : \@row);
   }
   $fh->close unless ($fh_was_open);
 
   #remove first empty element of a header if same number of elements as first matrix element.
-  shift @header if ( $c{row_names} && $c{header} && @m > 0 && @{ $m[0] } == @header && !$header[0] );
+  shift @header if ( $c{header} && @m > 0 && @{ $m[0] } == @header && !$header[0] );
 
   if (wantarray) {
     return ( \@m, ( @header ? \@header : undef ), ( @row_names ? \@row_names : undef ) );
   } else {
     return \@m;
   }
-}
-
-sub xcsv_slurp {
-  my ( $src, $c ) = @_;
-
-  my ( $fh, $fh_was_open ) = open_on_demand( $src, '<' );
-
-  my $data = do { local $/; <$fh> }
-    or confess "No data to analyze\n";
-  $fh->close unless ($fh_was_open);
-
-  $c->{sep} //=
-      $data =~ m/["\d],["\d,]/ ? ","
-    : $data =~ m/["\d];["\d;]/ ? ";"
-    : $data =~ m/["\d]\t["\d]/ ? "\t"
-    :
-    # If neither, then for unquoted strings
-      $data =~ m/\w,[\w,]/ ? ","
-    : $data =~ m/\w;[\w;]/ ? ";"
-    : $data =~ m/\w\t[\w]/ ? "\t"
-    :                        ",";
-  open my $dfh, '<', \$data or die "Can't open filehandle: $!";
-  my $aoa = csv( in => $dfh, sep_char => $c->{sep}, quote_char => '"', escape_char => '"' );
-  close $dfh;
-  return $aoa;
 }
 
 sub miterate {
@@ -243,7 +212,7 @@ sub miterate {
   my %c = (
     sep           => qr/\t/,
     skip          => 0,
-    comment       => $COMMENT_RE,
+    comment       => qr/^#/,
     record_filter => undef,
     %$cc
   );
@@ -270,35 +239,10 @@ sub miterate {
   };
 }
 
-sub miterate_hash {
-  my $mit = miterate(@_);
-
-  my $header = $mit->();
-
-  return sub {
-    my ( $from_idx, $to_idx ) = @_;
-
-    my $row = $mit->();
-    return unless ($row);
-
-    if ( defined($from_idx) && defined($to_idx) ) {
-      my @h = @{$header}[ $from_idx .. $to_idx ];
-      my @r = @{$row}[ $from_idx .. $to_idx ];
-      return { zip @h, @r };
-    } else {
-      return { zip @$header, @$row };
-    }
-
-  }, $header;
-}
-
 sub lspew {
   my ( $dest, $l, $c ) = @_;
   my $delim = $c->{sep} // $c->{delim} // "\t";
-  my $header = $c->{header} // $c->{ids};
   my ( $fh, $fh_was_open ) = open_on_demand( $dest, '>' );
-
-  say $fh join( $delim, @$header ) if ( $header && @$header > 0 );
 
   if ( ref $l eq 'HASH' ) {
     while ( my ( $k, $v ) = each %$l ) {
@@ -374,11 +318,7 @@ sub mspew {
   my ( $fh, $fh_was_open ) = open_on_demand( $dest, '>' );
 
   #print header if we have header
-  if ($header) {
-    my @qhead = @{ _quote( $header, $quote_is_on, $na_value ) };
-    unshift @qhead, '' if ( $rownames && !$c->{r_style_header} );
-    say $fh join $sep, @qhead;
-  }
+  say $fh join $sep, @{ _quote( $header, $quote_is_on, $na_value ) } if ($header);
 
   #iterate through rows
   for ( my $i = 0; $i < $num_rows; $i++ ) {
@@ -388,7 +328,7 @@ sub mspew {
     #add the values
     push @r, @{ $m->[$i] // [] } if ( $i < @$m );
     #fill the square if desired
-    if ( $square || $fill_rows ) {
+    if ($square) {
       my $missing = $num_cols - @r;
       push @r, (undef) x $missing;
     }
@@ -403,7 +343,8 @@ sub _quote {
   my ( $f, $q, $na ) = @_;
   $na = "$na" if ( $q && defined $na );
   my @fields = map {
-    if ( !defined ) {
+    if ( !defined )
+    {
       $na;
     } elsif ( !$q || /^\d+$/ ) {
       $_;
@@ -431,11 +372,7 @@ sub xlsx_spew {
 
   my @table;
   #print header if we have header
-  if ($header) {
-    my @qhead = @$header;
-    unshift @qhead, '' if ($rownames);
-    push @table, \@qhead;
-  }
+  push @table, $header if ($header);
 
   #iterate through rows
   for ( my $i = 0; $i < @$m; $i++ ) {
@@ -454,7 +391,6 @@ sub xlsx_spew {
 
   my $workbook  = Excel::Writer::XLSX->new($fh);
   my $worksheet = $workbook->add_worksheet();
-  $worksheet->keep_leading_zeros() if ( $c->{keep_leading_zeros} );
   $worksheet->write_col( 'A1', \@table );
   $workbook->close;
   $fh->close unless ($fh_was_open);
@@ -466,32 +402,26 @@ sub xlsx_slurp {
   #my @m;
   #my ( $fh, $fh_was_open ) = open_on_demand( $src, '<' );
 
-  eval "use Spreadsheet::ParseXLSX; 1" or confess "could not load Spreadsheet::ParseXLSX";
+  eval "use Spreadsheet::XLSX; 1" or confess "could not load Spreadsheet::XLSX";
 
-  $src = expand_home($src) if ( !ref($src) );
+  my $excel = Spreadsheet::XLSX->new($src);
 
-  my $parser   = Spreadsheet::ParseXLSX->new;
-  my $workbook = $parser->parse($src);
-  if ( !defined $workbook ) {
-    confess $parser->error(), ".\n";
-  }
+  my %ms;
 
-  my @ws;
-  for my $worksheet ( $workbook->worksheets() ) {
-    my @w;
-    my ( $row_min, $row_max ) = $worksheet->row_range();
-    my ( $col_min, $col_max ) = $worksheet->col_range();
-    for ( my $i = $row_min; $i <= $row_max; $i++ ) {
-      my @r;
-      for ( my $j = $col_min; $j <= $col_max; $j++ ) {
-        my $e = $worksheet->get_cell( $i, $j );
-        push @r, ( defined($e) ? $e->unformatted : undef );
-      }
-      push @w, \@r;
+  for my $sheet ( @{ $excel->{Worksheet} } ) {
+
+    my $sname = $sheet->{Name};
+
+    my @m;
+    my $cells = $sheet->{Cells};
+    for my $r (@$cells) {
+      my @e;
+      for my $cell (@$r) { push @e, $cell->{Val}; }
+      push @m, \@e;
     }
-    push @ws, \@w;
+    $ms{$sname} = \@m;
   }
-  return \@ws;
+  return \%ms;
 }
 
 1;
@@ -521,13 +451,12 @@ Provides functions for common matrix/list IO.
     sep     => qr/\t/,
     header  => 0,
     skip    => -1,
-    comment => qr/^\s*#/,
+    comment => qr/^#/,
     key_idx => 0,
     val_idx => undef,
     uniq    => 0,
     record_filter => undef,
     concat_keys => 1,
-    strict => 0
   );
 
 Setups:
@@ -547,13 +476,9 @@ Setups:
 Concatenate the keys by C<< $; >>. If set to 0, key columns are taken in a
 serial fashion and are merged to one big column.
 
-=item uniq = 1 && strict = 1 => confess if two times the same key occurs in the data.
-
 =back
 
 If key_idx is an array, the keys columns are joined by C<$;> to build the hash key.
-
-
 
 =item B<< mspew($filename, \@matrix, \%options) >>
 
@@ -619,7 +544,7 @@ Further options with defaults:
         header => 0, # parse header
         skip => 0, # skip the first N lines (without header)
         row_names => 0, # parse row names
-        comment => qr/^\s*#/ # the comment character
+        comment => qr/^#/ # the comment character
         record_filter => undef # set a function to filter records
     );
     

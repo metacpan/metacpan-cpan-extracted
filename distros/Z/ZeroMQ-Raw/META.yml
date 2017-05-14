@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               ZeroMQ-Raw
+version:            0.01
+abstract:           minimal ZeroMQ that follows the C API as closely as possible
+author:
+    - Jonathan Rockway <jrockway@cpan.org>
+license:            lgpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::Depends:    0.300
+    ExtUtils::MakeMaker:  6.31
+    XS::Object::Magic:    0
+build_requires:
+    Test::Exception:  0
+    Test::More:       0
+requires:
+    XS::Object::Magic:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

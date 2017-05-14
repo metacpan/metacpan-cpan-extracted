@@ -9,7 +9,7 @@ use vars qw($VERSION $DEBUG @ISA $me);
 
 @ISA = qw(Business::OnlinePayment::HTTPS);
 
-$VERSION = '2.05';
+$VERSION = '2.07';
 $VERSION = eval $VERSION; # modperlstyle: convert the string into a number
 
 $DEBUG = 0;
@@ -98,11 +98,37 @@ my %currency_code = (
 );
 
 my %paymentech_countries = map { $_ => 1 } qw( US CA GB UK );
+my %failure_status = (
+  # values of the RespCode element
+  # in theory RespMsg should be set to a descriptive message, but it looks
+  # like that's not reliable
+  # XXX we should have a way to indicate other actions required by the 
+  # processor, such as "honor with identification", "call for instructions",
+  # etc.
+  '00'  => undef,         # Approved
+  '04'  => 'pickup',      # Pickup
+  '33'  => 'expired',     # Card is Expired
+  '41'  => 'stolen',      # Lost/Stolen
+  '42'  => 'inactive',    # Account Not Active
+  '43'  => 'stolen',      # Lost/Stolen Card
+  '44'  => 'inactive',    # Account Not Active
+  #'45' duplicate transaction, should also have its own status
+  'B7'  => 'blacklisted', # Fraud
+  'B9'  => 'blacklisted', # On Negative File
+  'BB'  => 'stolen',      # Possible Compromise
+  'BG'  => 'blacklisted', # Blocked Account
+  'BQ'  => 'blacklisted', # Issuer has Flagged Account as Suspected Fraud
+  'C4'  => 'nsf',         # Over Credit Limit
+  'D5'  => 'blacklisted', # On Negative File
+  'D7'  => 'nsf',         # Insufficient Funds
+  'F3'  => 'inactive',    # Account Closed
+  'K6'  => 'nsf',         # NSF
+);
 
 sub set_defaults {
     my $self = shift;
 
-    $self->server('orbitalvar1.paymentech.net') unless $self->server; # this is the test server.
+    $self->server('orbitalvar1.chasepaymentech.com') unless $self->server; # this is the test server.
     $self->port('443') unless $self->port;
     $self->path('/authorize') unless $self->path;
 
@@ -244,7 +270,7 @@ sub submit {
   my $post_data = XMLout({ Request => $request }, KeepRoot => 1, NoAttr => 1, NoSort => 1);
 
   if (!$self->test_transaction()) {
-    $self->server('orbital1.paymentech.net');
+    $self->server('orbital1.chasepaymentech.com');
   }
 
   warn $post_data if $DEBUG;
@@ -282,21 +308,20 @@ sub submit {
 
   if ($server_response !~ /^200/) {
 
-    $self->is_success(0);
+    #$self->is_success(0);
     my $error = "Server error: '$server_response'";
     $error .= " / Transaction error: '".
               ($r->{'ProcStatusMsg'} || $r->{'StatusMsg'}) . "'"
       if $r->{'ProcStatus'} != 0;
-    $self->error_message($error);
+    #$self->error_message($error);
+    #overzealous?  are there "normal decline" transaction errors being returned?
+    die "$error\n";
 
   } else {
 
-    if ( !exists($r->{'ProcStatus'}) ) {
+    die "Unable to parse response_page\n" if !exists($r->{'ProcStatus'});
 
-      $self->is_success(0);
-      $self->error_message( "Malformed response: '$page'" );
-
-    } elsif ( $r->{'ProcStatus'} != 0 or 
+    if ( $r->{'ProcStatus'} != 0 or 
               # NewOrders get ApprovalStatus, Reversals don't.
               ( exists($r->{'ApprovalStatus'}) ?
                 $r->{'ApprovalStatus'} != 1 :
@@ -304,6 +329,7 @@ sub submit {
             )
     {
 
+      $self->failure_status( $failure_status{ $r->{RespCode} } || 'decline' );
       $self->is_success(0);
       $self->error_message( "Transaction error: '".
                             ($r->{'ProcStatusMsg'} || $r->{'StatusMsg'}) . "'"

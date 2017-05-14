@@ -1,0 +1,56 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000beta6a</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b6b.html">Previous Topic</A> | <A HREF="2000b6.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>16. 2.000beta6a</H1>
+<P ALIGN="Left"><A HREF="#2.000beta6a - Enhancements">Enhancements</A> | <A HREF="#2.000beta6a - Fixes">Fixes</A> | <A HREF="#2.000beta6a - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000beta6a - Enhancements">16.1. Enhancements</A></H2>
+<P>The documentation now includes a draft version of an overview paper called <A HREF="../paper/sdfintro.html">The SDF Document Development System</A>. This is recommended reading for all SDF users.</P>
+<P>For <A HREF="http://www.mincom.com">Mincom</A> users, Mincom-style title pages can now be generated for technical documents. To do this, initialise the <EM>OPT_LOOK</EM> variable using the <A HREF="../ref/minit.html">init</A> macro on the top line of the document like this:</P>
+<PRE>
+   !init OPT_LOOK='mincom'
+</PRE>
+<P><A HREF="../ref/sdf.html">sdf</A>'s -k option can also be used to override the default look. For example:</P>
+<PRE>
+   sdf -2ps -kmincom mydoc.sdf
+</PRE>
+<P>The <A HREF="../ref/re_sdf.html">SDF Reference</A> has been improved - most of the filters and macros now have a description and an example.</P>
+<P>The <A HREF="../ref/mbuild_t.html">build_title</A> macro now outputs the date the document was last modified when the target is HTML.</P>
+<P>Section jumps across documents are now supported via the <EM>doc</EM> phrase attribute. For example:</P>
+<PRE>
+See {{SECT[doc='SDF User Guide'] Event Processing}}
+in the {{DOC:SDF User Guide}} for further details.
+</PRE>
+<P>The default <EM>target</EM> for the <A HREF="../ref/finline.html">inline</A> filter is now <EM>html</EM>.</P>
+<P>The <A HREF="../ref/fnameval.html">namevalues</A> filter can now be used to specify a table of names and values. This is useful at the top of QSD procedures, etc.</P>
+<P>The search order for figure importing into PostScript documents is now eps, pct, gif and finally bmp.</P>
+<HR>
+<H2><A NAME="2.000beta6a - Fixes">16.2. Fixes</A></H2>
+<P>Under certain circumstances, figure importing into <A HREF="http://www.adobe.com">PostScript</A> documents was broken by the previous version. It should now be working again.</P>
+<P>Tables with titles no longer cause blank pages to be appended to the end of the document. This was a [FrameMaker]] 5.0 bug which I now workaround by producing &quot;simple&quot; titles. As a result, table titles are no longer repeated when a table crosses a page boundary.</P>
+<P><EM>Encapsulated PostScript</EM> figures output by <A HREF="http://www.visio.com">Visio</A> are now correctly sized.</P>
+<P>URLs in <A HREF="http://www.adobe.com">PostScript</A> documents are no longer blue.</P>
+<P>A large number of bugs in the QSD templates have been fixed. These had been introduced by the upgrade from <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> to version 5.</P>
+<P>The <A HREF="../ref/mbuild_t.html">build_title</A> macro (as implemented in the <EM>plain</EM> library) no longer outputs a page break after the <EM>Document control</EM> stuff.</P>
+<P>Change bars no longer cause example text (e.g. source code) to be badly formatted in HTML.</P>
+<HR>
+<H2><A NAME="2.000beta6a - Incompatibilities">16.3. Incompatibilities</A></H2>
+<P>None.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2000b6b.html">Previous Topic</A> | <A HREF="2000b6.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

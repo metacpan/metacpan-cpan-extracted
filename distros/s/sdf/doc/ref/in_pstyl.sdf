@@ -1,0 +1,53 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Paragraph Styles
+
+The paragraph styles available are summarised below.
+
+!block table; tags="PSTYLE"; groups
+Name            Purpose
+Headings:
+Hn              normal heading at level {{n}} (1..6)
+An              appendix heading at level {{n}} (1..6)
+Pn              plain heading at level {{n}} (1..6)
+Lists:
+Ln              plain list item or paragraph at level {{n}} (1..6)
+LFn             first entry in an ordered list at level {{n}} (1..6)
+LNn             next entry in an ordered list at level {{n}} (1..6)
+LUn             unordered list item at level {{n}} (1..6)
+Notes:
+Note            a single paragraph note
+NB              start of a multi-paragraph note
+NE              end of a multi-paragraph note
+Miscellaneous:
+E               example text (i.e. fixed width)
+V               verbatim text (i.e. fixed width, ignore escapes)
+E80             wide example text
+Line            horizontal line
+N               normal text
+NV              name-value pair (i.e. hanging indent)
+PB              page break
+Sign            signature for a memo, etc.
+!endblock
+
+The following special styles are also available.
+
+!block table
+Symbol          Purpose
+>               verbatim text
+* .. ******     unordered list item at level 1..6
+- .. -----      unordered list item at level 2..6
+^ .. ^^^^^^     first entry in an ordered list at level 1..6
++ .. ++++++     next entry in an ordered list at level 1..6
+. .. ......     plain list item or paragraph at level 1..6
+!endblock

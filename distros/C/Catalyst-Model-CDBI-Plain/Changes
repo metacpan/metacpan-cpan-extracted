@@ -1,5 +1,10 @@
 Revision history for Perl extension Catalyst::Model::CDBI::Plain.
 
+0.03  Thu Nov 3 16:31:00 EDT 2005
+        - Use -> to refer to Catalyst::Base constructor to make it work on 5.5
+        - Added a helper (Andy Grundman)
+        - Made pod tests succeed.
+
 0.02  Tue May  3 10:14:48 EDT 2005
         - Fixed constructor
 

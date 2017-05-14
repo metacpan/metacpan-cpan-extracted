@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution EyeTracking-EYD,
+version 0.1.2:
+
+  extract EYD binary files in a start,target,stop paradigm
+
+This software is copyright (c) 2013 by Will Foran <willforan+cpan@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

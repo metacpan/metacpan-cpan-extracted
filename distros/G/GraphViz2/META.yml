@@ -64,5 +64,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/GraphViz2.git
-version: '2.45'
+version: '2.46'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

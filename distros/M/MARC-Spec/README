@@ -7,7 +7,7 @@ SYNOPSIS
         use MARC::Spec;
         
         # Parsing MARCspec from a string
-        my $ms = MARC::Spec->parse('246[0-1]_16{007/0=\h}$f{245$h~\[microform\]|245$h~\microfilm}');
+        my $ms = MARC::Spec::parse('246[0-1]_16{007/0=\h}$f{245$h~\[microform\]|245$h~\microfilm}');
     
         # Structure
         say ref $ms;                                             # MARC::Spec
@@ -61,16 +61,18 @@ DESCRIPTION
     MARC::Spec is a MARCspec - A common MARC record path language
     <http://marcspec.github.io/MARCspec/> parser and validator.
 
+FUNCTIONS
+
+ parse(Str)
+
+    Parses a MARCspec as string and returns an instance of MARC::Spec.
+
 METHODS
 
  new(MARC::Spec::Field)
 
     Create a new MARC::Spec instance. Parameter must be an instance of
     MARC::Spec::Field.
-
- parse(Str)
-
-    Parses a MARCspec as string and returns an instance of MARC::Spec.
 
  add_subfield(MARC::Spec::Subfield)
 

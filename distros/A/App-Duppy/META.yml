@@ -1,0 +1,32 @@
+---
+abstract: 'a wrapper around casperjs to pass test configurations as json files'
+author:
+  - "Emmanuel \"BHS_error\" Peroumalnaik"
+  - "Fabrice \"pokki\" Gabolde"
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Duppy
+requires:
+  Carp: 0
+  DDP: 0
+  File::Which: 0
+  FindBin: 0
+  IO::All: 0
+  IPC::Run: 0
+  JSON: 0
+  Moo: 0
+  MooX::Options: 0
+  Try::Tiny: 0
+  lib: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+version: 0.05

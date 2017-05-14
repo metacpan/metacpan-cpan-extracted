@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+# $Revision: $
+
+$type = "First";
+if ($ARGV[0] eq "-Ce") {
+    $type = "GreedyCe";
+    $gen = "TableCe";
+    shift @ARGV;
+}
+elsif ($ARGV[0] eq "-Cf") {
+    $type = "Greedy";
+    $gen = "Table";
+    shift @ARGV;
+}
+die "usage: plex [-Ce|-Cf] tokens.pl scanner-name [namespace]\n" if ! @ARGV;
+eval "use Scanner::$type";
+
+$table = $ARGV[1];
+die "Must know name of scanner" if ! $table;
+$space = $ARGV[2] || "main";
+
+($table_file = $table) =~ s,::,/,g;
+($table_name = $table) =~ s,.*::([^:]+)$,$1,;
+open(TABLE, "> $table_file.pm") || die "Can't output to $table_file.pm";
+
+print TABLE <<"EOF";
+package $table;
+
+require 5.001;
+use Scanner::Stream::File;
+use Scanner::Scanner;
+use Scanner::$type;
+\@ISA = qw(Scanner::$type);
+
+package $space;
+
+EOF
+
+if ($ARGV[0] =~ /\.l$/) {
+    use Scanner::Input::Lex;
+    use Scanner::Stream::Handle;
+
+    open(LEX_INPUT, $ARGV[0]) || die "Can't open lex token file";
+    while (<LEX_INPUT>) {
+        last if /^#\%\%$/;
+        print TABLE;
+    }
+
+    $lex_file = "lex$$.pl";
+    open(TEMP, "> $lex_file") || die "Can't write to temp file!";
+
+    my $input = new Scanner::Stream::Handle \*LEX_INPUT;
+    Scanner::Input::Lex::Convert(\*TEMP, $input, $table_name);
+    close TEMP;
+    $cleanup_scanner_file = 1;
+} else {
+    $lex_file = $ARGV[0];
+}
+
+open(TOKENS, $lex_file) || die "Can't open token file";
+print TABLE <TOKENS>;
+close TOKENS;
+
+print TABLE <<"EOF";
+
+package $table;
+
+sub new {
+    my \$input = \$_[1];
+    if (! ref \$input) {        # not an object, then a file
+        \$input = new Scanner::Stream::File \$input;
+    }
+EOF
+
+if ($type eq "First") {
+    print TABLE <<"EOF";
+    my \$self = new Scanner::$type(\\\@${space}::$table_name, \$input);
+EOF
+}
+elsif ($type eq "GreedyCe") {
+    print TABLE <<"EOF";
+    my \$self = new Scanner::$type(\\\@yy_accept, \\\@yy_ec,
+        \\\@yy_base, \\\@yy_def, \\\@yy_nxt, \\\@yy_chk,
+        \\\@${space}::$table_name, \$yy_jambase, \$input);
+EOF
+}
+elsif ($type eq "Greedy") {
+    print TABLE <<"EOF";
+    my \$self = new Scanner::$type(\\\@yy_nxt, \\\@yy_accept,
+        \\\@${space}::$table_name, \$input);
+EOF
+}
+
+print TABLE <<"EOF";
+    bless \$self;
+    return \$self;
+}
+
+EOF
+
+if ($gen) {
+    require $lex_file;
+    eval "use Scanner::${gen}";
+    eval "Scanner::${gen}::Generate(\\\*TABLE, \\\@$table_name, \"yy_\")";
+} else {
+    print TABLE "1;\n";
+}
+
+unlink $lex_file if $cleanup_scanner_file;
+close TABLE;
+
+exit 0;

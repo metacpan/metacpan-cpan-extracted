@@ -1,0 +1,85 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dbcb0e7f7f662f477fa5c0a8e48d9cce70921897 Changes
+SHA1 a60d885c30d5382f8830e3317ca7213618073950 INSTALL
+SHA1 43dae1e8e65629a90df93c4d1230c0dacaef8ffc LICENSE
+SHA1 6b48ddaf769589d4150b58972dfcd39b7b03a280 MANIFEST
+SHA1 a04b2fb0701a537b2343ceaed9761e2231045f91 META.json
+SHA1 4b3bda22482055e73953627108ca43a7bc97fb0c META.yml
+SHA1 bec69b8811b03c96952e9bf8c6be15b5f8c372df Makefile.PL
+SHA1 6e53987799fd473c0ec505fe15feb1629443e48a README
+SHA1 b509291422bcc6fdbceb18c21e320c4c1092803e cpanfile
+SHA1 f2def4aedbe827ddda48e925ed97e63b4cbc1050 dist.ini
+SHA1 84a3c4c63c4cd5d4e1e2b688add753294ce9c01c examples/board.pl
+SHA1 33f5014248e6d1cfc3d9b2d3615f3f22845d7735 examples/boards.pl
+SHA1 897fba557a849bde25dd9735e2827cbb9b5c2343 examples/me.pl
+SHA1 12eb5abccba23771b0e2f72deb540d51e1cbfb7f lib/Net/Async/Trello.pm
+SHA1 3d87c5afa24a6df385feb7729de3342542e1ac3c lib/Net/Async/Trello.pod
+SHA1 f8d50397c77d702786a405532ae1528dce6fbf4a lib/Net/Async/Trello/Board.pm
+SHA1 8626eaad9dc8689a7dc68461673f439131a6d6d2 lib/Net/Async/Trello/Board.pod
+SHA1 08fdf9cb7446ecdb83a8ae955cd59fe1a965c7ed lib/Net/Async/Trello/Card.pm
+SHA1 44b829ebacb32fbe01a20edb4bf5f219a1351227 lib/Net/Async/Trello/Card.pod
+SHA1 dc7e24b364d7c5f347281b2c3ae058db325e2733 lib/Net/Async/Trello/CardAction.pm
+SHA1 8199bb3db809ea1734a9199a013a80d090312e6b lib/Net/Async/Trello/CardAction.pod
+SHA1 c36fe5e5b85ab94b9eac263e661e77ee1b4a7dfa lib/Net/Async/Trello/Common.pm
+SHA1 b0be12521fd89c8e4e5acd988a5639e9cd85436c lib/Net/Async/Trello/Generated/Board.pm
+SHA1 c6dd8e155e7cc82732b56b3f2f07cc78db07a0b6 lib/Net/Async/Trello/Generated/Board.pod
+SHA1 b418fd4557e689af1f08ffd0b5beb85166e8afa8 lib/Net/Async/Trello/Generated/Card.pm
+SHA1 70ae7620b90d2331550328c23837385075d3d37f lib/Net/Async/Trello/Generated/Card.pod
+SHA1 8004d66a2c3909aa871b221ff04042624b57afff lib/Net/Async/Trello/Generated/CardAction.pm
+SHA1 a9572a982cffcb812b615dc11793c7586a98917c lib/Net/Async/Trello/Generated/CardAction.pod
+SHA1 766b65662f2a1fe2645d766b7281c073234e01ef lib/Net/Async/Trello/Generated/List.pm
+SHA1 56cc56105fc118c768a2c673ed9b46f43811c9c3 lib/Net/Async/Trello/Generated/List.pod
+SHA1 7bd341c88f5f4aff3e236c03492152ec1ade8945 lib/Net/Async/Trello/Generated/Member.pm
+SHA1 39d523809ace133ac2065f3b28b5c5b08201d2bc lib/Net/Async/Trello/Generated/Member.pod
+SHA1 25f2dbe13d15e42f880c78b40ca41213a3156042 lib/Net/Async/Trello/Generated/Organisation.pm
+SHA1 5f4cd2c0666f96e09d0cb733efdbabc7bc7be1fd lib/Net/Async/Trello/Generated/Organisation.pod
+SHA1 508778a4a7710c990404e64eeb70385de32949da lib/Net/Async/Trello/List.pm
+SHA1 c3a655b484baa79ee44acc1dada469b2fec29980 lib/Net/Async/Trello/List.pod
+SHA1 5f9329344f4dc28786b69474e05190e34f79592c lib/Net/Async/Trello/Member.pm
+SHA1 83ef7778a8e8912b11e501cdf8b3f0faa578c63a lib/Net/Async/Trello/Member.pod
+SHA1 e39b81892b3e6cb741c5c1cc1395473ec166bd90 lib/Net/Async/Trello/Organisation.pm
+SHA1 72b74a6fd6a77397cfa0fd88e6cda10f1f6ebc9b lib/Net/Async/Trello/Organisation.pod
+SHA1 86f3429251d241c4d0181ec6246a7d28d9ec39a1 lib/Net/Async/Trello/WS.pm
+SHA1 0404085573cf546b83d42773fb7b47adc317c952 lib/Net/Async/Trello/WS.pod
+SHA1 5021242dc045c94516cd98b1c9ae4dabed115a4a share/endpoints.json
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 af6e0ffd6efe0daab6d2c45ba789eceb3faae0b8 t/00-compile.t
+SHA1 6a2700523a382907bac776f76a0748514c938f1a t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJZFF2AAAoJEG2WkcbynxAl4rkQANNMOMG6w5ZSEjEwDVQDrQZf
+3TlvEDI4Ca2bNFaW579xFUFItrbq+KVTYU22zuwdHdE5OLzeh0Ds873cmrVV51Vp
+rjWljY0hfcJSthgeFdT3SF+pcFjsfTlbZ72gLBvrOWpEYz9QXVXBeK4ONkiloe0p
+NHQkB2cn7mUTQvVXkQmEZt7Yd536XJDrEjF4MhcteVDJegNxR8PlXxQvcERbE3qh
+3ob6Lar0fRNRo83kwkXfm74UZNNUqNJ3oFw8R0enFVELhUyg7sqVkCNmX0M4rHRO
+QyM2LfZvqhXeN7cYP2zt/BOD+wDdE0KLgkK6qRLXKI+vGCe4eBfbzPFUZkmrAU75
+7IV967ux6KaRpBQDhG/AGkDEGvumwpapTyh4sXSP5rgCD7SFL8eTVgwwplImaPrT
+OO70c54BSl0H4EhPJvHGV6yDcP6ORtae2AOTU+/4WN4fqnu9gWOjrU2sjvYyEUBX
+/3c5HgVZe43cFsaHZwwQUafUkzB4hjhGT9f5TVTIJQbe6Lu+TGcmqf4fANm4/XXC
+I08dyc/7j2bOLm+jjW61cMyAZwejix82BXff2SCHvJpvBIfyg1ogRv732fnR0OkL
+1H3W9PQccuCHrKrr9VX3BaeMJQRVBt62wfMDtp7eg6pJNjuva8h4kN9KcKav8i8n
+b9SObezKnnGVmB1+W4cE
+=8b7N
+-----END PGP SIGNATURE-----

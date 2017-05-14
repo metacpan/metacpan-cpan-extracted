@@ -1,0 +1,49 @@
+#! /usr/local/bin/perl -w
+
+use strict;
+use FileHandle;
+use Cwd;
+use vars qw($module $script $user);
+require 'tests/common.pl';
+
+
+$ENV{'PATH_INFO'} = $module.'/file1';
+
+my $fh = new FileHandle 
+	"perl $script edit=lock-and-download user=$user < /dev/null | ";
+
+die if !defined($fh);
+my @ans = <$fh>;
+close $fh;
+
+print "# checking that cvswebedit has locked file and is offering us to edit\n";
+my $download_ready = grep /edit=download-file/, @ans;
+status($download_ready, "CVSWEBEDIT said the file was ready to download");
+
+my $download_fh = new FileHandle
+	"perl $script edit=download-file user=$user < /dev/null | ";	
+die if !defined($download_fh);
+
+my @headers;
+my $line;
+while ($line = <$download_fh>) {
+	last if $line =~ m/^$/; 	# blank line separates headers/footers
+	push @headers, $line;
+}
+
+my @file = <$download_fh>;
+close $download_fh;
+
+my $file_contents = join("",@file);
+print @file;
+
+
+print @headers;
+
+
+
+
+
+
+
+

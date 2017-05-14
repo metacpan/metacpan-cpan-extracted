@@ -7,8 +7,11 @@ package Lemonldap::NG::Portal::AuthTwitter;
 
 use strict;
 use Lemonldap::NG::Portal::Simple;
+use Lemonldap::NG::Portal::_Browser;
+use URI::Escape;
 
-our $VERSION = '1.2.0';
+our @ISA     = (qw(Lemonldap::NG::Portal::_Browser));
+our $VERSION = '1.9.3';
 our $initDone;
 
 BEGIN {
@@ -28,8 +31,11 @@ sub authInit {
         $self->abort( 'Bad configuration',
             'twitterKey and twitterSecret parameters are required' );
     }
-    eval { require Net::Twitter };
-    $self->abort("Unable to load Net::Twitter: $@") if ($@);
+    eval {
+        require Net::OAuth;
+        $Net::OAuth::PROTOCOL_VERSION = &Net::OAuth::PROTOCOL_VERSION_1_0A();
+    };
+    $self->abort("Unable to load Net::OAuth: $@") if ($@);
 
     $initDone = 1;
     PE_OK;
@@ -39,54 +45,95 @@ sub authInit {
 # Authenticate users by Twitter and set user
 # @return Lemonldap::NG::Portal constant
 sub extractFormInfo {
-    my $self = shift;
+    my $self  = shift;
+    my $nonce = time;
 
-    # Build Net::Twitter object
-    $self->{_twitter} = Net::Twitter->new(
-        traits          => [qw/API::REST OAuth/],
-        consumer_key    => $self->{twitterKey},
-        consumer_secret => $self->{twitterSecret},
-        clientname      => $self->{twitterAppName} || 'Lemonldap::NG'
-    );
+    # Default values for Twitter API
+    $self->{twitterRequestTokenURL} ||=
+      "https://api.twitter.com/oauth/request_token";
+    $self->{twitterAuthorizeURL} ||= "https://api.twitter.com/oauth/authorize";
+    $self->{twitterAccessTokenURL} ||=
+      "https://api.twitter.com/oauth/access_token";
 
     # 1. Request to authenticate
     unless ( $self->param('twitterback') ) {
         $self->lmLog( 'Redirection to Twitter', 'debug' );
-        my $url;
 
         # 1.1 Try to get token to dialog with Twitter
-        eval {
-            $url =
-              $self->{_twitter}->get_authorization_url(
-                callback => "$self->{portal}?twitterback=1&url="
-                  . $self->get_url() );
-        };
+        my $callback_url = $self->url();
 
-        #   If 401 is returned => application not declared on Twitter
-        if ($@) {
-            if ( $@ =~ /\b401\b/ ) {
-                $self->abort('Twitter application undeclared');
-            }
-            $self->lmLog( "Net::Twitter error: $@", 'error' );
-            return PE_ERROR;
+        # Twitter callback parameter
+        $callback_url .=
+          ( $callback_url =~ /\?/ ? '&' : '?' ) . "twitterback=1";
+
+        # Add request state parameters
+        if ( $self->{_url} ) {
+            my $url_param = 'url=' . uri_escape( $self->{_url} );
+            $callback_url .= ( $callback_url =~ /\?/ ? '&' : '?' ) . $url_param;
+        }
+        if ( $self->param( $self->{authChoiceParam} ) ) {
+            my $url_param =
+              $self->{authChoiceParam} . '='
+              . uri_escape( $self->param( $self->{authChoiceParam} ) );
+            $callback_url .= ( $callback_url =~ /\?/ ? '&' : '?' ) . $url_param;
         }
 
-        # 1.2 Store token key and secret in cookies
-        push @{ $self->{cookie} },
-          $self->cookie(
-            -name    => '_twitTok',
-            -value   => $self->{_twitter}->request_token,
-            -expires => '+3m'
-          ),
-          $self->cookie(
-            -name    => '_twitSec',
-            -value   => $self->{_twitter}->request_token_secret,
-            -expires => '+3m'
-          );
+        # Forward hidden fields
+        if ( exists $self->{portalHiddenFormValues} ) {
 
-        # 1.3 Redirect user to Twitter
-        $self->redirect( -uri => $url );
-        $self->quit();
+            $self->lmLog( "Add hidden values to Twitter redirect URL", 'debug' );
+
+            foreach ( keys %{ $self->{portalHiddenFormValues} } ) {
+                $callback_url .=
+                    ( $callback_url =~ /\?/ ? '&' : '?' )
+                  . $_ . '='
+                  . uri_escape( $self->{portalHiddenFormValues}->{$_} );
+            }
+        }
+
+        my $request = Net::OAuth->request("request token")->new(
+            consumer_key     => $self->{twitterKey},
+            consumer_secret  => $self->{twitterSecret},
+            request_url      => $self->{twitterRequestTokenURL},
+            request_method   => 'POST',
+            signature_method => 'HMAC-SHA1',
+            timestamp        => time,
+            nonce            => $nonce,
+            callback         => $callback_url,
+        );
+
+        $request->sign;
+
+        my $request_url = $request->to_url;
+
+        $self->lmLog( "POST $request_url to Twitter", 'debug' );
+
+        my $res = $self->ua()->post($request_url);
+        $self->lmLog( "Twitter response: " . $res->as_string, 'debug' );
+
+        if ( $res->is_success ) {
+            my $response = Net::OAuth->response('request token')
+              ->from_post_body( $res->content );
+
+            # 1.2 Store token key and secret in cookies
+            push @{ $self->{cookie} },
+              $self->cookie(
+                -name    => '_twitSec',
+                -value   => $response->token_secret,
+                -expires => '+3m'
+              );
+
+            # 1.3 Redirect user to Twitter
+            my $authorize_url =
+              $self->{twitterAuthorizeURL} . "?oauth_token=" . $response->token;
+            $self->redirect( -uri => $authorize_url );
+            $self->quit();
+        }
+        else {
+            $self->lmLog( 'Twitter OAuth protocol error: ' . $res->content,
+                'error' );
+            return PE_ERROR;
+        }
     }
 
     # 2. User is back from Twitter
@@ -97,33 +144,56 @@ sub extractFormInfo {
         return PE_ERROR;
     }
 
+    $self->lmLog(
+        "Get token $request_token and verifier $verifier from Twitter",
+        'debug' );
+
     # 2.1 Reconnect to Twitter
-    (
-        $self->{sessionInfo}->{_access_token},
-        $self->{sessionInfo}->{_access_token_secret}
-      )
-      = $self->{_twitter}->request_access_token(
-        token        => $self->cookie('_twitTok'),
-        token_secret => $self->cookie('_twitSec'),
-        verifier     => $verifier
-      );
+    my $access = Net::OAuth->request("access token")->new(
+        consumer_key     => $self->{twitterKey},
+        consumer_secret  => $self->{twitterSecret},
+        request_url      => $self->{twitterAccessTokenURL},
+        request_method   => 'POST',
+        signature_method => 'HMAC-SHA1',
+        verifier         => $verifier,
+        token            => $request_token,
+        token_secret     => $self->cookie('_twitSec'),
+        timestamp        => time,
+        nonce            => $nonce,
+    );
+    $access->sign;
 
-    # 2.2 Ask for user_timeline : I've not found an other way to access to user
-    #     datas !
-    my $status = eval { $self->{_twitter}->user_timeline( { count => 1 } ) };
+    my $access_url = $access->to_url;
 
-    # 2.3 Check if user has accepted authentication
-    if ($@) {
-        if ( $@ =~ /\b401\b/ ) {
-            $self->userError('Twitter authentication refused');
-            return PE_BADCREDENTIALS;
-        }
-        $self->lmLog( "Net::Twitter error: $@", 'error' );
+    $self->lmLog( "POST $access_url to Twitter", 'debug' );
+
+    my $res_access = $self->ua()->post($access_url);
+    $self->lmLog( "Twitter response: " . $res_access->as_string, 'debug' );
+
+    if ( $res_access->is_success ) {
+        my $response = Net::OAuth->response('access token')
+          ->from_post_body( $res_access->content );
+
+        # Get user_id and screename
+        $self->{_twitterUserId}     = $response->{extra_params}->{user_id};
+        $self->{_twitterScreenName} = $response->{extra_params}->{screen_name};
+
+        $self->lmLog(
+            "Get user id "
+              . $self->{_twitterUserId}
+              . " and screen name "
+              . $self->{_twitterScreenName},
+            'debug'
+        );
+    }
+    else {
+        $self->lmLog( 'Twitter OAuth protocol error: ' . $res_access->content,
+            'error' );
+        return PE_ERROR;
     }
 
-    # 2.4 Set $self->{user} to twitter.com/<username>
-    $self->{_twitterUser} = $status->[0]->{user};
-    $self->{user} = 'twitter.com/' . $status->{_twitterUser}->{screen_name};
+    # 2.4 Set $self->{user} to screen name
+    $self->{user} = $self->{_twitterScreenName};
     $self->lmLog( "Good Twitter authentication for $self->{user}", 'debug' );
 
     # Force redirection to avoid displaying OAuth datas
@@ -131,7 +201,6 @@ sub extractFormInfo {
 
     # Clean temporaries cookies
     push @{ $self->{cookie} },
-      $self->cookie( -name => '_twitTok', -value => 0, -expires => '-3m' ),
       $self->cookie( -name => '_twitSec', -value => 0, -expires => '-3m' );
     PE_OK;
 }
@@ -142,12 +211,10 @@ sub extractFormInfo {
 sub setAuthSessionInfo {
     my $self = shift;
 
-    # TODO: set a parameter to choose this
-    foreach (qw(screen_name location lang name url)) {
-        $self->{sessionInfo}->{$_} = $self->{_twitterUser}->{$_};
-    }
-
     $self->{sessionInfo}->{authenticationLevel} = $self->{twitterAuthnLevel};
+    $self->{sessionInfo}->{'_user'}             = $self->{user};
+    $self->{sessionInfo}->{_twitterUserId}      = $self->{_twitterUserId};
+    $self->{sessionInfo}->{_twitterScreenName}  = $self->{_twitterScreenName};
 
     PE_OK;
 }
@@ -256,7 +323,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =item Copyright (C) 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

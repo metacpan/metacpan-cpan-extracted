@@ -3,21 +3,21 @@ use Mouse;
 use Module::Depends;
 use Module::Depends::Intrusive;
 use Module::CoreList;
-use List::Compare;
-use FileHandle;
-use Log::Log4perl qw(:easy);
-use Try::Tiny;
-use Parse::CPAN::Meta ();
+use CPAN::Packager::Downloader;
 use CPAN::Packager::ModuleNameResolver;
 use CPAN::Packager::DependencyFilter::Common;
-use CPAN::Packager::FileUtil qw(file dir);
-use CPAN::Packager::ListUtil qw(uniq any);
-use CPAN::Packager::ConflictionChecker;
+use List::Compare;
 use CPAN::Packager::Config::Replacer;
 use CPAN::Packager::Extractor;
-use CPAN::Packager::MetaAnalyzer;
+use List::MoreUtils qw(uniq any);
+with 'CPAN::Packager::Role::Logger';
 
-has 'downloader' => ( is => 'rw', );
+has 'downloader' => (
+    is      => 'rw',
+    default => sub {
+        CPAN::Packager::Downloader->new;
+    }
+);
 
 has 'extractor' => (
     is      => 'rw',
@@ -30,13 +30,6 @@ has 'module_name_resolver' => (
     is      => 'rw',
     default => sub {
         CPAN::Packager::ModuleNameResolver->new;
-    }
-);
-
-has 'meta_analyzer' => (
-    is      => 'rw',
-    default => sub {
-        CPAN::Packager::MetaAnalyzer->new;
     }
 );
 
@@ -62,29 +55,20 @@ has 'dependency_filter' => (
     }
 );
 
-has 'confliction_checker' => (
-    is      => 'rw',
-    default => sub {
-        CPAN::Packager::ConflictionChecker->new;
-    }
-);
-
 sub analyze_dependencies {
     my ( $self, $module, $config ) = @_;
     return $module
         if $config->{modules}->{$module}
             && $config->{modules}->{$module}->{build_status};
 
-    return $module if $self->is_non_dualife_core_module($module);
-
-# try to download unresolved name because resolver sometimes return wrong name.
+   # try to download unresolved name because resolver sometimes return wrong name.
     my $module_info = $self->download_module( $module, $config );
 
     my $resolved_module = $module_info->{dist_name};
     $resolved_module = $self->fix_module_name( $module, $config );
     unless ( $module_info->{dist_name} ) {
 
-# try to download unresolved name because resolver sometimes return wrong name.
+       # try to download unresolved name because resolver sometimes return wrong name.
         $module_info = $self->download_module( $resolved_module, $config );
         $resolved_module = $module_info->{dist_name};
     }
@@ -156,25 +140,13 @@ sub download_module {
         if ($custom_src) {
             if ( $custom_src->{tgz_path} ) {
                 $custom_src->{tgz_path}
-                    = CPAN::Packager::Config::Replacer->replace_variable(
-                    $custom_src->{tgz_path} );
+                    = CPAN::Packager::Config::Replacer->replace_variable($custom_src->{tgz_path} );
             }
             $custom_src->{src_dir}
                 = $custom_src->{src_dir}
-                ? CPAN::Packager::Config::Replacer->replace_variable(
-                $custom_src->{src_dir} )
+                ? CPAN::Packager::Config::Replacer->replace_variable($custom_src->{src_dir})
                 : $self->extractor->extract( $custom_src->{tgz_path} );
             $self->{__downloaded}->{$module} = $custom_src;
-
-            if ( defined $custom_src->{patches} ) {
-                my @expanded_patches = ();
-                foreach my $patch ( @{ $custom_src->{patches} } ) {
-                    push @expanded_patches,
-                        CPAN::Packager::Config::Replacer->replace_variable(
-                        $patch);
-                }
-                $custom_src->{patches} = \@expanded_patches;
-            }
         }
         else {
             if ( my $version = $config->{modules}->{$module}->{version} ) {
@@ -198,7 +170,7 @@ sub download_module {
 sub _is_needed_to_analyze_dependencies {
     my ( $self, $resolved_module, $config ) = @_;
     return 0 if $self->is_added($resolved_module);
-    return 0 if $self->is_non_dualife_core_module($resolved_module);
+    return 0 if $self->is_core($resolved_module);
     return 0 if $resolved_module eq 'perl';
     return 0 if $resolved_module eq 'PerlInterp';
     return 0 if $config->{modules}->{$resolved_module}->{skip_build};
@@ -220,37 +192,16 @@ sub is_added {
     exists $self->modules->{$module};
 }
 
-sub is_non_dualife_core_module {
+sub is_core {
     my ( $self, $module ) = @_;
     return 1 if $module eq 'perl';
-
-    # We should process dual life core modules by default.
-    # The entire point of dual life modules to exist in the first
-    # place is for users to be able to update these modules independent of
-    # upgrading Perl. The vast majority of our users will want dual life
-    # modules to be updated, particularly considering that a lot of recent
-    # CPAN distributions directly depend on updated dual life core modules.
-    return 0 if $self->is_dual_lived_module($module);
-
     my $corelist = $Module::CoreList::version{$]};
     return 1 if exists $corelist->{$module};
-
-    return 0;
-}
-
-sub is_dual_lived_module {
-    my ( $self, $module ) = @_;
-    if ( $self->confliction_checker->is_dual_lived_module($module) ) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
+    return;
 }
 
 sub get_dependencies {
     my ( $self, $module, $src, $config ) = @_;
-    INFO("Analyzing dependencies for $module");
     if (   $config->{modules}
         && $config->{modules}->{$module}
         && $config->{modules}->{$module}->{depends} )
@@ -260,10 +211,20 @@ sub get_dependencies {
             @{ $config->{modules}->{$module}->{depends} };
     }
 
-    my $deps = $self->meta_analyzer->get_dependencies_from_meta($src);
+    my $make_yml_generate_fg = any { $_ eq $module }
+    @{ $config->{global}->{fix_meta_yml_modules} || [] };
+
+    my $depends_mod
+        = $make_yml_generate_fg
+        ? "Module::Depends::Intrusive"
+        : "Module::Depends";
+    my $deps = $depends_mod->new->dist_dir($src)->find_modules;
 
     return grep { !$self->is_added($_) }
-        grep    { !$self->is_non_dualife_core_module($_) } @$deps;
+        grep    { !$self->is_core($_) } uniq(
+        keys %{ $deps->requires || {} },
+        keys %{ $deps->build_requires || {} }
+        );
 }
 
 sub resolve_module_name {

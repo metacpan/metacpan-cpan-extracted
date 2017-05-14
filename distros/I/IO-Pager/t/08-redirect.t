@@ -17,7 +17,7 @@ system qq($^X -Mblib -MIO::Pager::Page -e $q require q[t/08-redirect.pl]; print 
 open(TMP, $tempname) or die "Could not open tmpfile: $!\n";
 my $slurp = do{ undef $/; <TMP> };
 
-our $txt; require 't/08-redirect.pl';
+our $txt; require './t/08-redirect.pl';
 ok($txt eq $slurp, 'Redirection (IO::Pager::Page)');
 
 done_testing;

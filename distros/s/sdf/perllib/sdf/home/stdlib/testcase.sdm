@@ -1,0 +1,134 @@
+# $Id$
+#
+# >>Title::     Testcase Module
+#
+# >>Copyright::
+# Copyright (c) 1996-1997, Tim Hudson (tjh@mincom.com)
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 01-May-97 ianc    Replaced with tjh's latest version
+# 24-Apr-97 ianc    Added revision history
+# 22-Apr-97 prachin Fixed bug caused by SDF now using Perl 5.x
+# 19-Jun-96 tjh     Initial writing
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:testcase}} is the [[SDF]] module for
+# building test documentation.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+#
+# testcase support ... generates a table at the end of the document
+#		       created from the A3: testcasename in each block
+#
+
+!on filter "testcases";; \
+        $name='simple'; \
+        $params.=';pre="!testcaseStart"'; \
+        $params.=';post="!testcaseEnd"'
+
+!block script
+
+# control testcase debug stuff
+$testcase_debug=0;
+
+# set if you want tests inserted inline or leave set to zero 
+# to have them output at the end of the document
+$testcase_inline=0;
+
+# gathers all the data for the output until the end of the document
+@testcases_output;
+
+# a single testcase table data
+@testcases;
+
+$testcase_first=1;
+
+sub testcase_add
+{
+    local($text)=@_;
+
+    print STDERR "TESTCASE:>$text\n" if ($testcase_debug);
+
+    push(@testcases,$text);
+}
+
+sub testcaseStart_Macro
+{
+    local(@text);
+
+    print STDERR "TESTCASE Start $topic\n" if ($testcase_debug);
+    @testcases=();
+
+    if ($testcase_first) {
+        push(@text,"!block end","!testcaseEndOfDocument","!endblock");
+        $testcase_first=0;
+        @testcases_output=("P1[notoc] Test Results");
+    }
+
+    push(@text,'!on paragraph "A3";testcase; &testcase_add($text);');
+
+    return (@text);
+}
+
+sub testcaseEnd_Macro
+{
+    local(@text);
+
+    print STDERR "TESTCASE End $topic\n" if ($testcase_debug);
+
+    @text=();
+
+# Ian is going to freak out when he sees what I am doing here with 
+# tables to implement "keep" --tjh
+    push(@text,
+#"!block table; noheadings; style=\"plain\"",
+#"One",
+#"<<",
+"!keep on",
+"P2[notoc] $topic",
+"",
+"!block table; noheadings; objects=\"B,N,B\"; style=\"plain\"; format='25,45,10,20'",
+"Name            Value                               Name2       Value2",
+"Tester:         ___________________________         Date:       __________",
+"!endblock",
+"",
+"!block table; style=\"grid\"; format=\"50,40,10\"",
+"Test_Case:Comments:Pass"
+    );
+
+    for $test (@testcases) {
+        push(@text,$test);
+    }
+
+    push(@text,
+"!endblock",
+"!keep off",
+#">>",
+#"!endblock"
+);
+
+    if ($testcase_inline) {
+        unshift(@text,"!off paragraph testcase","PB:");
+	return(@text);
+    } else {
+        push(@testcases_output,@text);
+        return("!off paragraph testcase");
+    }
+}
+
+sub testcaseEndOfDocument_Macro
+{
+    print STDERR "TESTCASE EndOfDocument\n" if ($testcase_debug);
+
+    return (@testcases_output);
+}
+
+!endblock

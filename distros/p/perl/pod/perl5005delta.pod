@@ -101,7 +101,7 @@ If you see a compiler error that talks about the variable C<thr> not
 being declared (when building a module that has XS code),  you need
 to add C<dTHR;> at the beginning of the block that elicited the error.
 
-The API function C<perl_get_sv("@",FALSE)> should be used instead of
+The API function C<perl_get_sv("@",GV_ADD)> should be used instead of
 directly accessing perl globals as C<GvSV(errgv)>.  The API call is
 backward compatible with existing perls and provides source compatibility
 with threading is enabled.
@@ -509,7 +509,7 @@ as L<perldos> on some systems).
 
 MiNT is now supported.  See F<README.mint>.
 
-MPE/iX is now supported.  See F<README.mpeix>.
+MPE/iX is now supported.  See README.mpeix.
 
 MVS (aka OS390, aka Open Edition) is now supported.  See F<README.os390> 
 (installed as L<perlos390> on some systems).
@@ -523,7 +523,7 @@ encapsulation of Perl.  GCC and EGCS are now supported on Win32.
 See F<README.win32>, aka L<perlwin32>.
 
 VMS configuration system has been rewritten.  See F<README.vms> (installed 
-as L<README_vms> on some systems).
+as F<README_vms> on some systems).
 
 The hints files for most Unix platforms have seen incremental improvements.
 
@@ -722,7 +722,7 @@ imported with the C<use subs> pragma).
 
 To silently interpret it as the Perl operator, use the C<CORE::> prefix
 on the operator (e.g. C<CORE::log($x)>) or by declaring the subroutine
-to be an object method (see L<attrs>).
+to be an object method (see L</attrs>).
 
 =item Bad index while coercing array into hash
 
@@ -766,7 +766,7 @@ only with arrays that have a hash reference at index 0.
 (F) You said something like C<< local $ar->{'key'} >>, where $ar is
 a reference to a pseudo-hash.  That hasn't been implemented yet, but
 you can get a similar effect by localizing the corresponding array
-element directly -- C<< local $ar->[$ar->[0]{'key'}] >>.
+element directly: C<< local $ar->[$ar->[0]{'key'}] >>.
 
 =item Can't use %%! because Errno.pm is not available
 

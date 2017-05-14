@@ -7,23 +7,14 @@
 #
 #\if EMIT_LICENCE
 #
-#    ========== licence begin  GPL
-#    Copyright (c) 2001-2005 SAP AG
+#    ========== licence begin  SAP
 #
-#    This program is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU General Public License
-#    as published by the Free Software Foundation; either version 2
-#    of the License, or (at your option) any later version.
+#    (c) Copyright 2001-2006 SAP AG
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    All rights reserved.
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #    ========== licence end
+
 
 #\endif
 #*/
@@ -58,7 +49,7 @@ my %opts =
     OBJECT	=> '$(O_FILES)',
  );
 if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
-    $opts{AUTHOR} = 'Marco Paskamp and Thomas Simenec mailto:maxdb@lists.mysql.com';
+    $opts{AUTHOR} = 'Marco Paskamp and Thomas Simenec https://forums.sdn.sap.com/forum.jspa?forumID=90&start=0';
     $opts{ABSTRACT} = 'A MaxDB driver for the Perl5 Database Interface (DBI)';
     $opts{PREREQ_PM} = { DBI => 1.21 };
     $opts{CAPI} = 'TRUE' if $Config{archname} =~ /-object\b/i;
@@ -216,7 +207,7 @@ sub checkSQLDBCSDK {
     print "The DBD::MaxDB module needs to link with MaxDB's common database \n";
     print "interface SQLDBC. The DBD::MaxDB module does _not_ include the\n";
     print "MaxDB SQLDBC sdk! If it isn't already installed you can download\n";
-    print "it from the MySQL homepage.\n\n";
+    print "it from the MaxDB homepage.\n\n";
     print "You need also to set the path to the SQLDBC sdk directory.\n";
     print "You can do this either by setting the SQLDBCSDK environment variable\n";
     print "or by running 'perl Makefile.PL -o <sqldbc-sdk-dir>'.\n";
@@ -235,7 +226,7 @@ sub checkSQLDBCSDKVersion {
     while (<FILE_IN>) {
       chomp $_;
       if (/^#define SQLDBC_CHeaderVersion \"SQLDBC_C.H\s*((\d+).(\d+).(\d+)\s*BUILD\s*(\d+).*)\"$/) {
-			   if ( $2<7 || ($2>=7 && $3<5) || ($2==7 && $3==5 && $4==0 && $5<12)){ 
+			   if ( $2<7 || ($2>=7 && $3<6) || ($2==7 && $3==6 && $4==0 && $5<=19)){ 
 			    $version = $1;
           last;
 			  }
@@ -252,12 +243,12 @@ sub checkSQLDBCSDKVersion {
       }else {
         print "Cannot find the version of SQLDBC sdk.\n"; 
       }
-	    print "The version of SQLDBC-SDK must be at least 7.5.0 Build 012 but\n\n";
+	    print "The version of SQLDBC-SDK must be at least 7.6.0 Build 019 but\n";
 	    print "you should always try the newest version available.\n\n";
 	    print "The DBD::MaxDB module needs to link with MaxDB's common database \n";
 	    print "interface SQLDBC. The DBD::MaxDB module does _not_ include the\n";
 	    print "MaxDB SQLDBC sdk! If it isn't already installed you can download\n";
-	    print "it from the MySQL homepage.\n\n";
+	    print "it from the MaxDB homepage.\n\n";
 	    print "You need also to set the path to the SQLDBC sdk directory.\n";
 	    print "You can do this ether by setting the SQLDBCSDK environment variable\n";
 	    print "or by runing 'perl Makefile.PL -o <sqldbc-sdk-dir>'.\n\n";

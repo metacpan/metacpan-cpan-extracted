@@ -1,6 +1,6 @@
 require 5.005_62; use strict; use warnings;
 
-our $VERSION = '0.01.02';
+our $VERSION = '0.01.04';
 
 use Carp;
 

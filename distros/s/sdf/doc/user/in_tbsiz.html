@@ -1,0 +1,389 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Sizing Columns</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tbtit.html">Previous Topic</A> | <A HREF="in_tbpos.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.4. Sizing Columns</H1>
+<HR>
+<H2><A NAME="Dynamic Sizing">5.4.1. Dynamic Sizing</A></H2>
+<P>SDF supports dynamic column widths for paper documentation, i.e. if a width is not specified for a column, then the column is sized based on the text within it and the space available. As a result, it is rarely necessary to explicitly size columns.</P>
+<HR>
+<H2><A NAME="The format Attribute">5.4.2. The format Attribute</A></H2>
+<P>The <EM>format</EM> attribute of the <A HREF="../ref/ftable.html">table</A> filter is used to specify column widths for paper documentation. Its value is either:</P>
+<UL>
+<LI>a single number, in which case each digit represents 10% of the width available to the table, or
+<LI>a comma-separated list of column width specifications.</UL>
+<P>For example, to specify 3 columns with widths of 20%, 10% and 30% respectively:</P>
+<PRE>
+!block table; format=213
+Name   Age Address
+Bill   42  123 Main Road
+Joe    21  456 Queen Street
+!endblock
+</PRE>
+<P>The result is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Age</STRONG>
+</TD>
+<TD>
+<STRONG>Address</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Bill
+</TD>
+<TD>
+42
+</TD>
+<TD>
+123 Main Road
+</TD>
+</TR>
+<TR>
+<TD>
+Joe
+</TD>
+<TD>
+21
+</TD>
+<TD>
+456 Queen Street
+</TD>
+</TR>
+</TABLE>
+
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The <EM>format</EM> parameter has no impact on HTML generation - all columns in HTML are currently dynamically sized.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Column Width Specifications">5.4.3. Column Width Specifications</A></H2>
+<P>Examples of the column width specifications supported are given below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Value</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+30pt
+</TD>
+<TD>
+an exact size (other supported units are cm, mm, &quot; and in)
+</TD>
+</TR>
+<TR>
+<TD>
+30%
+</TD>
+<TD>
+a percentage of the size available
+</TD>
+</TR>
+<TR>
+<TD>
+30
+</TD>
+<TD>
+a percentage of the size available (% is implicit)
+</TD>
+</TR>
+<TR>
+<TD>
+10-20
+</TD>
+<TD>
+dynamic size between 10% and 20% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+-20
+</TD>
+<TD>
+dynamic size between 0% and 20% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+10-
+</TD>
+<TD>
+dynamic size between 10% and 100% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+-
+</TD>
+<TD>
+dynamic size between 0% and 100% of the total width
+</TD>
+</TR>
+<TR>
+<TD>
+3*
+</TD>
+<TD>
+3 units of the remaining space
+</TD>
+</TR>
+<TR>
+<TD>
+*
+</TD>
+<TD>
+same as 1*
+</TD>
+</TR>
+</TABLE>
+
+<P>For example, in the table below, the second column will be twice the size of the last column.</P>
+<PRE>
+!block  table; format=&quot;20,2*,10,*&quot;
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Default Sizing Rules and Narrow Tables">5.4.4. Default Sizing Rules and Narrow Tables</A></H2>
+<P>If a column is not given a size, the following rules are used:</P>
+<OL>
+<LI>The last unspecified column size is implicitly '*' (i.e. the rest), unless the <EM>narrow</EM> attribute is set, in which case the size is implicitly '-' (i.e. as much as needed).
+<LI>The other unknown sizes are implicitly '-'.</OL>
+<P>For example, the first and third columns in the table below will be dynamically sized. The first column will take as much space as required and the last column will expand so that the table takes the full width of the text area.</P>
+<PRE>
+!block  table; format=&quot;,30,,10&quot;
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<P>However, in the example below, each column will only take as much space is required, making the table narrower than it would be otherwise.</P>
+<PRE>
+!block  table; narrow
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Equalised Column Widths">5.4.5. Equalised Column Widths</A></H2>
+<P>If an = character is used in place of a - character for a column width, then those columns will be equalised in size. For example, the second and forth columns in the table below will be made equal in size.</P>
+<PRE>
+!block  table; format=&quot;20,5=30,10,=&quot;
+Name    Column2             Column3     Column4
+A       B                   C           D
+X       Hello dear world    Y           Z
+!endblock
+</PRE>
+<P>The output is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Column2</STRONG>
+</TD>
+<TD>
+<STRONG>Column3</STRONG>
+</TD>
+<TD>
+<STRONG>Column4</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+B
+</TD>
+<TD>
+C
+</TD>
+<TD>
+D
+</TD>
+</TR>
+<TR>
+<TD>
+X
+</TD>
+<TD>
+Hello dear world
+</TD>
+<TD>
+Y
+</TD>
+<TD>
+Z
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tbtit.html">Previous Topic</A> | <A HREF="in_tbpos.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

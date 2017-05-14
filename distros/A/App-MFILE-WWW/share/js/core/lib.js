@@ -148,7 +148,7 @@ define ([
         // right pad a string with spaces 
         rightPadSpaces: function (toPad, padto) {
             var strToPad = ((toPad === null) ? '' : toPad).toString();
-            console.log("Padding " + strToPad + " to " + padto + " spaces.");
+            // console.log("Padding " + strToPad + " to " + padto + " spaces.");
             var sp = '&nbsp;',
                 padSpaces = sp.repeat(padto - String(strToPad).length);
             return strToPad.concat(padSpaces);
@@ -242,8 +242,35 @@ define ([
             $("#result").html(msg);
             $('input[name="sel"]').val('');
             $('input[name="entry0"]').focus();
-        }
+        },
 
+        // shallow object copy, from
+        // http://blog.soulserv.net/understanding-object-cloning-in-javascript-part-i/
+        shallowCopy: function (original) {
+            // First create an empty object with
+            // same prototype of our original source
+            var clone = Object.create(Object.getPrototypeOf(original)),
+                i, keys = Object.getOwnPropertyNames(original);
+            for (i = 0; i < keys.length; i++) {
+                // copy each property into the clone
+                Object.defineProperty(clone, keys[i],
+                    Object.getOwnPropertyDescriptor(original, keys[i])
+                );
+            }
+            return clone;
+        },
+
+        // boolean function for existing, non-empty string, from 
+        // https://www.safaribooksonline.com/library/view/javascript-cookbook/9781449390211/ch01s07.html
+        // true if variable exists, is a string, and has a length greater than zero
+        isStringNotEmpty: function (unknownVariable) {
+            if (((typeof unknownVariable !== "undefined") &&
+                 (typeof unknownVariable.valueOf() === "string")) &&
+                 (unknownVariable.length > 0)) {
+                return true;
+            }
+            return false;
+        }
     };
 });
 

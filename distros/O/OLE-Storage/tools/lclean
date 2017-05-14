@@ -1,0 +1,902 @@
+#!/usr/bin/perl
+#$Id: lclean,v 1.1.1.1 1998/02/25 21:13:00 schwartz Exp $
+#
+# lclean, Clean Structured Storage documents
+#
+# Copyright (C) 1997 Martin Schwartz 
+#
+# ATTENTION!
+# 
+# This program modifies some data in Structured Storage documents. Though I 
+# think, the program works correctly, there might be errors or there might 
+# be in future unpredictable changes in the document layout. Keep in mind, 
+# that this program will change your document files! 
+#
+# Further more, this program can recognize only this garbage, that is not 
+# specific to any special program. E.g., in Word 6 documents there are data 
+# parts, that lclean can clean, and there are parts, that only Word could 
+# clean. So please:
+#
+#    1. Keep a backup of all treated documents, until you are sure, 
+#       that the cleaned documents are proper. 
+#
+#    2. Don't rely on, that *all* garbage will be cleaned.
+#
+# See also usage() of this file. General information at:
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/index.html
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, you should find it at:
+#
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/COPYING
+#
+# You can contact me via schwartz@cs.tu-berlin.de
+#
+
+useress_global: {
+#
+# Please uncomment (remove '#') / change settings according to your system
+#
+   $global_targetdir = "doctrash"; # This is the output directory
+}
+
+sub error { $Startup->string() }
+
+use Startup;
+use Getopt::Std;
+use OLE::Storage::Std;
+
+global: {
+   $|=1; $[=0;
+   $REV = '$Revision: 1.1.1.1 $' =~ /: ([^ ]*)/ && $1;
+   $DATE = '$Date: 1998/02/25 21:13:00 $' =~ / ..(..)\/(.{5})/ && "$2/$1";
+   getopts ('acdefhi:lnrsz');
+   usage() if !@ARGV || $opt_h;
+   usage() if !@ARGV
+      || $opt_h
+      || !($opt_r||$opt_c||$opt_s||$opt_i||$opt_l||$opt_e)
+   ;
+
+   require OLE::Storage;
+
+   $Startup = new Startup;
+   $Var     = OLE::Storage->NewVar();	# Var Object
+   $Doc     = undef;			# Document Object
+
+   @crc32=();
+   make_crc32_table();
+   $hid_buf="";
+   $hid_headerpart="";
+}
+
+main: {
+   local($errnum); local($dont);
+   local($status);
+   local($fname);
+   local($openmode)= ($opt_c||$opt_i) && 1;
+
+   foreach $infile (@ARGV) {
+
+      $errnum=0; $dont=0;
+
+      print "Processing \"$infile\": ";
+      next if !msg (
+         $Doc = OLE::Storage->open($Startup, $Var, $infile, $openmode)
+      );
+
+      block_a: {
+         if ($opt_r) {
+            $dont++;
+            $errnum++ if !msg (report_trash(-s $infile));
+         }
+         if ($opt_e) {
+            print "Extracting...";
+            ($status, $fname) = extract_hidden();
+            $errnum++ if !msg ($status, "($fname)");
+         }
+         if ($opt_l) {
+            $dont++;
+            $errnum++ if !msg (list_hidden());
+         } 
+         if ($opt_s||$opt_d) {
+            print "Saving... ";
+            $errnum++ if !msg (save_all_trash($infile));
+         }
+      }
+
+      if (!$errnum && !$dont) {
+         if ($opt_c) {
+            print "Cleaning...";
+            ($status, $size) = clean_all_trash();
+            msg ($status, "($size bytes)");
+         }
+         if ($opt_i) {
+            print "Inserting... ";
+            $status = insert_hidden($opt_i);
+            print "Error!\n$status\n" if $status ne "ok";
+         }
+      }      
+      $Doc->close($infile);
+      print "Done.\n\n";
+   }
+   exit 0;
+}
+
+
+sub usage {
+   print "\n";
+   print "lclean  Modify trash sections of OLE documents, like Excel or Word.\n";
+   print "        Version $REV from $DATE\n";
+   print "usage:  lclean -r {document}              Report documents trash\n";
+   print "        lclean -c [-n] {document}         Clean document\n";
+   print "        lclean -s [-a][-d][-z] {document} Save documents trash sections\n";
+   print "        lclean -i <file> [-a] {document}  Insert (hide) a file in OLE documents\n";
+   print "        lclean -l {document}              List the hidden file in OLE documents\n";
+   print "        lclean -e [-f][-z] {document}     Extract hidden file from OLE documents\n";
+   print "-a  All. When saving the trash sections, use one big file.\n";
+   print "    When inserting a hidden file, use all trash space (1+2+4+8).\n";
+   print "-c  Clean trash sections. Will be done (after -s) and (before -i).\n";
+   print "-d  Directory, store trash sections in own directory. ".
+         "Eg \"test\" for \"test.doc\".\n";
+   print "-e  Extract the hidden file out of OLE documents, if there is one.\n";
+   print "-f  Force, always overwrite existing files when extracting.\n";
+   print "-i  Insert a <file> into the document. Use only trash space (1+2).\n";
+   print "-l  List the hidden file in OLE documents, if there is one.\n";
+   print "-n  Null, use null bytes instead of random bytes for cleaning trash type 4.\n";
+   print "-r  Report, gives a little report about the trash sections.\n";
+   print "-s  Save all trash sections into directory \"$global_targetdir\".\n";
+   print "-z  Zero, don't create zero length files.\n";
+   print "\n";
+   print "ATTENTION: when cleaning a document or when inserting a file into, ".
+         "keep a\n".
+         "           backup until you are sure, that the modified file will be ok!\n";
+   print "\n";
+   exit 0;
+}
+
+
+#
+# ------------------- Report about trash sections ---------------------
+#
+
+sub report_trash {
+    local($fsize)=shift;
+    local($i);
+    local(@l)=0;
+    local($lsum)=0;
+    local(@type) = ("Big blocks", "Small blocks", "File space", "System space");
+
+    print "\n";
+    print "Trash (and system) report:\n";
+    for ($i=0; $i<=3; $i++) {
+       $l[$i] = $Doc->size_trash(2**$i);
+       printf ("   Type %d %15s %5d bytes\n", 
+               2**$i, "(".$type[$i]."):", $l[$i]);
+       $lsum+=$l[$i];
+    }
+    printf ("                 1+2:     %5d of %d bytes (%.1f %%)\n",
+            $l[0]+$l[1], $fsize, 100*($l[0]+$l[1])/$fsize);
+    printf ("                 1+2+4+8: %5d of %d bytes (%.1f %%)\n", 
+            $lsum, $fsize, 100*($lsum/$fsize));
+    "ok";
+}
+
+#
+# ------------------ Save document trash into files -------------------
+#
+
+sub save_all_trash {
+#
+# Copies trash types to each a file as: 
+# targetdir/basename.xx, where xx is the hex number the properties handle
+#
+   my $infile = shift;
+   my $outpath = get_outpath($infile);
+   return $Startup->err_str("No savepath given!\n") if !$outpath;
+   my ($buf);
+
+   # save block trash
+   if (!$opt_a) {
+      for (1..4) {
+         $buf = "";
+         return 0 if !$Doc->read_trash(1<<($_-1), \$buf);
+         return 0 if !save_file($outpath.".tr$_", $buf);
+      }
+   } else {
+      $buf = "";
+      return 0 if !$Doc->read_trash(0, \$buf);
+      return 0 if !save_file($outpath.".tra", $buf);
+   }
+
+1}
+
+sub get_outpath {
+#
+# Get the path of the directory, where the trash sections shall be 
+# stored. By default this is directory $global_targetdir. If command 
+# line option "-d" is set, the directory is depending on the filename.
+#
+   my $basename = basename(shift);
+   $global_targetdir = $basename if $opt_d;
+   if (targetdir($global_targetdir)) {
+      return $global_targetdir."/".$basename;
+   } else {
+      return "";
+   }
+}
+
+
+#
+# --------------------- Hidden file management -------------------------
+#
+
+#
+# The "hidden" file is tried to be stored in trash type 1|2, that means in 
+# the unused blocks. With option -a tries additionally type 8 and 4.
+#
+# Hidden file header:
+#    0     1 byte   Used trash types
+#    1     1 byte   magic = 0x38
+#    2     4 bytes  mode of file (access permissions)
+#    6     4 bytes  modification time of file
+#   0a     4 bytes  size of file
+#   0e     4 bytes  crc32 of file
+#   12     2 bytes  = $fl == length of filename
+#   14     $fl      filename
+#   14+$fl filesize file
+#
+
+sub insert_hidden {
+#
+# "ok"||$error = insert_hidden($filepath)
+#
+   local($filepath)=shift;
+   local($status,$fname) = readable_file($filepath);
+   return $status if $status ne "ok";
+
+   local($ttype, $tsize);
+   local ($needed) = 0x14 + length($fname) + (-s $filepath);
+
+   $ttype=1|2; 
+   $tsize=$Doc->size_trash($ttype);
+   if ($opt_a) {
+      if ($tsize < $needed) {
+         $ttype = 1|2|8; $tsize=$Doc->size_trash($ttype);
+      }
+      if ($tsize < $needed) {
+         $ttype = 1|2|4|8; $tsize=$Doc->size_trash($ttype);
+      }
+   }
+   if ($tsize < $needed) {
+      return "Not enough trash space to insert \"$fname\"...";
+   }
+
+   $status = read_hidefile($filepath, $fname, $ttype);
+   return $status if $status ne "ok";
+
+   my $buf = byte($ttype).$hid_headerpart.$hid_buf;
+   return "Error while inserting \"$filepath\" into document!" if
+      !$Doc->modify_trash ($ttype, \$buf, 0, $needed)
+   ;
+
+   "ok";
+}
+
+sub read_hidefile {
+#
+# "ok"||error = read_hidefile ($filepath, $filename, $ttype)
+#
+# This works with global variables... The idea is, that the file to 
+# hide will be read only once, if more than one document shall be 
+# treated. Especially the crc32 has to be calculated then only once.
+#
+   return "ok" if $hid_headerpart;
+
+   local($filepath, $fname, $ttype)=@_;
+   local($crc);
+   local($mode, $mtime) = (stat($filepath))[2,9];
+   local($status)="ok";
+
+   if (open(IO, $filepath)) {
+      binmode(IO);
+      if (read(IO, $hid_buf, -s $filepath) == -s $filepath) {
+         $crc = get_crc32(\$hid_buf);
+         $hid_headerpart = struct("BLLLLW", 
+            [0x38, $mode, $mtime, -s $filepath, $crc, length($fname)]
+         );
+         $hid_headerpart .= $fname;
+      } else {
+         $status="Error while reading \"$filepath\"!";
+      }
+      close(IO);
+   }
+   $status;
+}
+
+sub list_hidden {
+#
+# void = list_hidden()
+#
+   local($ttype, @header)=get_hidden();
+   if (!$ttype) {
+      print "\nHidden file report:\n".
+            "   No hidden file stored.\n";
+      return "ok";
+   }
+   local($fname)="";
+   local($status)="";
+
+   local($ttype, $magic, $mode, $mtime, $fsize, $crc, $fnsize)=@header;
+   return "Input error while retrieving information!" if 
+      !$Doc->read_trash($ttype, \$fname, 0x14, $fnsize)
+   ;
+
+   local(@tim) = localtime($mtime);
+   printf ("\nHidden file report:\n".
+           "   Trash type is %d\n".
+           "   %5d %02d/%02d/%02d %02d:%02d %s\n",
+           $ttype,
+           $fsize, 
+           $tim[4]+1, $tim[3], $tim[5],
+           $tim[2], $tim[1],
+           $fname);
+   "ok";
+}
+
+sub extract_hidden {
+#
+# ("ok"||error, $filename) = extract_hidden()
+#
+# Saves the file from a document to normal file system.
+# - The document will not be modified. 
+#
+   local($ttype, @header)=get_hidden();
+   return ("ok", "nothing to do") if !$ttype;
+
+   local($fname)="";
+   local($file)="";
+   local($status)="";
+
+   local($ttype, $magic, $mode, $mtime, $fsize, $crc, $fnsize)=@header;
+
+   return "Input error while retrieving information!" if 
+      !$Doc->read_trash($ttype, \$fname, 0x14, $fnsize)
+   ;
+
+   return "Error while reading data!" if 
+      !$Doc->read_trash($ttype, \$file, 0x14+$fnsize, $fsize)
+   ;
+
+   return "File is corrupt!" if get_crc32(\$file) != $crc;
+
+   return "Cannot save to file \"$fname\"!" if !replaceable_file($fname);
+   $status = check_replace_file($fname);
+   return ("ok", "") if !$status;
+
+   return 0 if !save_file($fname, $file);
+   chmod ($mode, $fname);
+   utime (time, $mtime, $fname);
+
+   return ("ok", $fname);
+}
+
+
+sub try_hidden {
+#
+# @header||() = try_hidden($ttype);
+#
+   local($ttype)=shift;
+   local($header)="";
+   local(@header);
+   local(@empty)=();
+   check: {
+      my ($pstr, $plen) = packpar("BBLLLLW");
+      last if !$Doc->read_trash($ttype, \$header, 0, $plen);
+      @header = unpack ($pstr, $header);
+      last if $header[0] != $ttype;
+      last if $header[1] != 0x38;
+      last if $header[4] > $Doc->size_trash($ttype);
+      return @header;
+   }
+   return @empty;
+}
+
+sub get_hidden {
+#
+# ($ttype||0, @header) = get_hidden();
+#
+   local($ttype)=0;
+   local(@header)=();
+
+   if (@header = try_hidden(1|2)) {
+      $ttype = 1|2;
+   } elsif (@header = try_hidden(1|2|8)) {
+      $ttype = 1|2|8;
+   } elsif (@header = try_hidden(1|2|4|8)) {
+      $ttype = 1|2|4|8;
+   }
+   return ($ttype, @header);
+}
+
+
+#
+# ------------------------- Clean document -----------------------------
+#
+
+sub clean_all_trash {
+#
+# ($status, $allsize_trash) = clean_all_trash();
+#
+# Cleans trash types with different values
+#
+   local($bufsize, $status);
+   local($allsize_trash)=0;
+
+   clean: {
+      # Free blocks. I prefer the byte "\00"
+      ($status, $bufsize) = clean_trash(1|2, "\00");
+      last if $status ne "ok";
+      $allsize_trash += $bufsize;
+
+      # Clean file trash, I prefer random strings. 
+      # ("random" is a special word for clean_trash)
+      ($status, $bufsize) = clean_trash(4, "random");
+      last if $status ne "ok";
+      $allsize_trash += $bufsize;
+
+      # Unused system bytes, value 0xff looks nice
+      ($status, $bufsize) = clean_trash(8, "\xff");
+      last if $status ne "ok";
+      $allsize_trash += $bufsize;
+   }
+
+   return ($status, $allsize_trash);
+}
+
+sub clean_trash {
+#
+# ("ok"||error, $bufsize) = clean_trash($type, $fill);
+#
+# The trash of type $type will be filled with the pattern of string $fill.
+# If the $fill is "random", the trash will be filled with random bytes.
+#
+   local($type, $fill)=@_;
+   local($buf, $bufsize, $status);
+   $buf="";
+   $bufsize = $Doc->size_trash($type);
+
+   if ($fill =~ /^random$/i) {
+      if (!$opt_n) {
+         new_random_seed();
+         $buf=get_random_shuffle_string(get_random_shuffle_sizes($bufsize));
+      } else {
+         $buf="\00" x $bufsize;
+      }
+   } else {
+      $buf = $fill x ( int($bufsize/length($fill)) );
+   }
+   $buf .= substr($fill, 0, $bufsize % length($fill));
+
+   $status = $Doc->modify_trash($type, \$buf, 0, $bufsize) && "ok"
+      || error()
+   ;
+ 
+   return ($status, $bufsize);
+}
+
+#
+# ------------------- (More or) Less Random Support ---------------------
+#
+
+sub new_random_seed {
+#
+# Random seed. *Not* secure!
+#
+   srand(time^$$);
+}
+
+sub get_random_shuffle_sizes {
+#
+# @size = &get_random_shuffle_sizes($size);
+#
+# Returns a list of randomly yielded sizes, that together have a 
+# length of $size.
+#
+   local($maxsize)=shift;
+   local(@size, $size, $chunk);
+
+   local($chunk_avgnum) = 5 + int(rand(10)) + int(rand($maxsize/0x2000));
+   local($avgsize) = int($maxsize/$chunk_avgnum);
+
+   @size=(); $size=0;
+   while ($size < $maxsize) {
+      $chunk = int( rand($avgsize*2) );
+      $chunk = ($maxsize - $size) if (($size+$chunk) > $maxsize);
+      $size += $chunk;
+      push (@size, $chunk);
+   }
+   return @size;
+}
+
+sub get_random_shuffle_string {
+#
+# $buf = &get_random_shuffle_string(@sizes);
+#
+# Return one string consisting out of $#sizes substrings, each 
+# consisting out of $sizes[$i] random bytes.
+#
+   local($buf)="";
+   foreach $size (@_) {
+      $buf .= get_random_string($size);
+   }
+   random_shuffle_string($buf);
+}
+
+sub get_random_string {
+#
+# $buf = get_random_string($size)
+#
+# Return one string consisting out $size random bytes.
+#
+   local($len)=shift;
+   local($buf)=""; 
+   local($i); 
+   for ($i=0; $i<$len; $i++) {
+      $buf .= byte(rand(256));
+   }
+   $buf;
+}
+
+sub random_shuffle_string {
+#
+# $shuffled_buf = random_shuffle_string($buf);
+# 
+# Permutates the elements of $buf randomly.
+#
+   local($len)=length($_[0]);
+   local($sbuf)=""; local(%sbuf)=();
+
+   # Get a $len elements sized hash 
+   # (hash == perl slang for associative array)
+   # Keys are random integer numbers, values are elements of $buf.
+   # Took integers, because sort is to slow for big lists of real.
+   # 
+   local($key); local($i)=0;
+   while ($i < $len) {
+      $key=int(rand($len*191));
+      if (!$sbuf{$key}) {
+         $sbuf{$key} = substr($_[0], $i++, 1);
+      }
+   }
+   # Sort the hash array according to it's keys, create the buffer.
+   for (sort {$a <=> $b} keys %sbuf) {
+      $sbuf .= $sbuf{$_}; 
+   }
+
+   $sbuf;
+}
+
+#
+# -------------------------- File treatment ----------------------------
+#
+
+sub targetdir {
+#
+# If none exists, create a target directory. This will be readable 
+# only to the person owning the directory.
+#
+   local($dir)=shift;
+   return 1 if -d $dir;
+   if (mkdir $dir, 0700) {
+      print "(created directory \"$global_targetdir\") "; 1;
+   } else {
+      print "Cannot create directory \"$global_targetdir\"!\n"; 0;
+   }
+}
+
+sub save_file {
+#
+# 1||0 = save_file($path, $buf);
+#
+   if ($opt_z) {
+      return 1 if !$_[1];
+   }
+   if (! (open(OUT, '>'.$_[0]) && binmode(OUT)) ) {
+      $Startup->err_str("Cannot save to file \"$_[0]\"!");
+      return 0;
+   }
+   print OUT $_[1];
+   close(OUT); 
+1}
+
+sub replaceable_file {
+#
+# 1||0 = check_replaceable_file($filename)
+#
+   local($file)=shift;
+   if (-e $file) {
+      return 0 if !-f $file;
+      return 0 if !-w $file;
+   }
+   1;
+}
+
+sub check_replace_file {
+#
+# 1||0 = check_replace_file($filename)
+#
+   local($file)=shift;
+   local($key)="";
+
+   return 1 if $opt_f;
+   return 1 if !-e $file;
+   return 0 if !-f $file;
+   return 0 if !-w $file;
+   print "\nFile \"$file\" exists. Replace it? (y/n) ";
+   while (1) {
+      last if ($key=getc) =~ /[yn]/;
+      print "(y/n) " if $key eq "\x0a";
+   }
+   getc; # get \x0a from userEss input
+   $key =~ /y/;
+}
+
+sub readable_file {
+#
+# ("ok"||error, $filename) = readable_file($filepath);
+#
+   local($filepath)=shift;
+   return "No file given!"                if !$filepath;
+   return "\"$filepath\" does not exist!" if !-e $filepath;
+   return "\"$filepath\" is no file!"     if !-f $filepath;
+   return "Cannot read \"$filepath\"!"    if !-r $filepath;
+   local($fname)=substr($filepath, rindex($filepath,'/')+1);
+   return ("ok", $fname);
+}
+
+#
+# ------------------------------- CRC ---------------------------------
+#
+
+sub make_crc32_table {
+#
+# void = make_crc32_table()
+#
+   return if @crc32;
+   local($crc, $i);
+   for ($i=0; $i<=0xff; $i++) {
+      $crc = $i;
+      for (1 .. 8) { 
+         if ($crc & 1) {
+            ($crc /= 2) ^= 0xedb88320; 
+         } else {
+            $crc /= 2;
+         }
+      }
+      push (@crc32, $crc);
+   }
+}
+
+sub get_crc32 {
+#
+# $crc = &crc32 (\$buf)
+#
+# Computes a 32bit CRC for the specified buf. This might take some time!
+#
+   my $bufR = shift;
+   my $crc = 0xffffffff;
+   my @buf = get_nbyte(length($$bufR), $bufR, 0);
+   while (@buf) {
+      $crc = $crc32[$crc&0xff ^ shift(@buf)] ^ ($crc/0x100);
+   }
+   $crc;
+}
+
+#
+# ------------------------------ utils --------------------------------
+#
+
+sub msg {
+   local($status) = shift;
+   if ($status) {
+      if (defined $_[0]) {
+         print "$_[0] ";
+      }
+      return 1;
+   } else {
+      $status = error();
+      if ($status) {
+         print "error!\nError: $status\n";
+      } else {
+         print "error!\n";
+      }
+      print "\n" if ! ($status =~ /\n$/);
+      return 0;
+   }
+}
+
+__END__
+
+=head1 NAME
+
+lclean - Detect and clean trash in Structured Storage documents
+
+=head1 SYNOPSIS
+
+lclean C<-r> || C<-c> || C<-s> || C<-i> || C<-l> || C<-e> document
+
+I<Note!>
+If you use switch C<-c> or C<-i>, lclean changes your document! Please keep
+a backup of the treated documents, until you are sure they did not take any
+harm! 
+
+=head1 DESCRIPTION
+
+lclean deals with documents created typically with MS Windows applications.
+It gives a report about the trash sections in those "OLE / Structured
+Storage" documents, cleans this trash or saves it to files. Further more a
+file can be hidden into and extracted from those trash sections. 
+
+=over 4
+
+=item clean
+
+lclean C<-c> [C<-n>] {document}
+
+The trash sections will be cleaned. Unused blocks are filled with null
+bytes. System data will be cleaned with 0xff bytes. File end trash 
+(type 4) will be cleaned with random bytes. When using switch C<-n>, file 
+end trash also will be filled with zero bytes (faster on files with 
+lots of embedded objects).
+
+=item extract
+
+lclean C<-e> [C<-f>] [C<-z>] {document}
+
+Extracts the hidden file. This makes a copy of the hidden file. If the file
+got corrupted by what reason ever, it will not be extracted. The file will
+get the date of its last modification. If the file already exists, you will
+be prompted to overwrite it with the new extracted file. With switch C<-f>
+you will not be prompted, but the file will be overwritten. With switch C<-z> 
+no zero length files will be created.
+
+=item insert
+
+lclean C<-i> <file> [C<-a>] {document}
+
+Insert a file into the document (hide it).
+The trash in your document will be substituted by some <file>. This file
+cannot be seen by any standard Windows application. The file must be smaller,
+than the size of the trash in your documents (plus 20 bytes plus the size to
+store the filename). Normally, only trash types 1 and 2 will be used for
+this. If they offer not enough space, with switch C<-a> trash type 4 and 8
+will be used additionally.
+
+=item list
+
+lclean C<-l> {document}
+
+List if there is a file hidden in the documents trash.
+
+=item report
+
+lclean C<-r> {document}
+
+Gets a small report about the trash in the documents.
+
+=item save 
+
+lclean C<-s> [C<-a>] [C<-d>] [C<-z>] {document}
+
+The trash sections will be saved to own files. They will be stored to an
+directory in your current directory. Normally it will be the directory
+"C<doctrash>". E.g., if there is the example file "C<legacy.doc>" the
+trashfiles will be stored as: "C<doctrash/legacy.tr1>",
+"C<doctrash/legacy.tr2>", "C<doctrash/legacy.tr3>" and
+"C<doctrash/legacy.tr4>".
+
+=over 4
+
+=item C<-a>
+
+All trash will be stored into one big file "C<doctrash/legacy.tra>".
+
+=item C<-d>
+
+The trash file(s) will not be stored into directory "C<doctrash>",
+but each into an own directory. E.g. into directory "C<legacy/>".
+
+=item C<-z>
+
+When using switch C<-z>, zero length files will not be created.
+
+=back
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item lclean C<-cs> {document}
+
+This would first save all trash chunks into separate files into 
+directory "C<doctrash>", then it would clean the document.
+
+=item lclean C<-aci> <file> {document}
+
+This would first clean the document, then insert the hidden file by using
+all trash types.
+
+=back
+
+=head1 HISTORY
+
+Microsoft's first and still most spread OLE implementations had bugs. One
+caused that some sections of documents that actually should be filled with
+zero bytes contained more or less private data.
+
+Management of OLE documents is a little bit difficult and takes some 
+time. A way to fasten this up is not to care about the old data, but
+simply to add the new data to the document. Cleaning up could be done later.
+When switched on the "fast save" option, Microsoft Word uses this strategy.
+So, thus saved files contain the new and the old version of a document. The
+old data cannot be edited any more and stays invisible in the document.
+
+Some programs seem to use the Microsoft OLE library not properly. 
+For example, the Star Office 3.1. programs create documents, that 
+always contain 1024 bytes of trash.
+
+As far as I know, Microsoft offers a bugfix for 32 bit Windows 
+systems, only.
+
+The program "lclean" can access this kind of garbage in OLE documents. 
+To do this it uses the C<modify_trash> method of OLE::Storage.
+This library decides between four different types of trash. 
+
+Overview:
+
+=over 4
+
+=item Type 1
+
+Unused "big blocks". These blocks are not used by the document. Each of 
+these blocks is 512 bytes long.
+
+=item Type 2
+
+Unused "small blocks". These blocks are not used by the document. Each of 
+these blocks is 64 bytes long.
+
+=item Type 4
+
+File end space. This refers to the "streams" of an OLE document.
+The space is made up of all the space between the end of a stream
+and the end of a block.
+
+=item Type 8
+
+System space. These sections are required by file format, though
+they are not used by OLE system. Actually this data is no garbage. 
+
+=back
+
+=head1 SEE ALSO
+
+L<OLE::Storage>
+
+=head1 AUTHOR
+
+Martin Schwartz E<lt>F<schwartz@cs.tu-berlin.de>E<gt>. 
+
+=cut
+

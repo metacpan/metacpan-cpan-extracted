@@ -1,0 +1,2 @@
+#!/bin/sh
+go2fmt.pl -w xml $@ | go-apply-xslt oboxml_to_simple_owl -

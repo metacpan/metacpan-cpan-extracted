@@ -1,0 +1,20 @@
+{
+   "boards_url" : "https://api.trello.com/1/members/me/boards",
+   "board_lists_url" : "https://api.trello.com/1/boards/{board}/lists",
+   "board_cards_url" : "https://api.trello.com/1/boards/{board}/cards",
+   "cards_url" : "https://api.trello.com/1/cards",
+   "card_url" : "https://api.trello.com/1/cards/{card}{?filter,member}",
+   "card_field_url" : "https://api.trello.com/1/cards/{card}/{field}",
+   "card_attachments_url" : "https://api.trello.com/1/cards/{card}/attachments",
+   "card_board_url" : "https://api.trello.com/1/cards/{card}/board",
+   "card_checklists_url" : "https://api.trello.com/1/cards/{card}/checklists",
+   "card_list_url" : "https://api.trello.com/1/cards/{card}/list",
+   "card_members_url" : "https://api.trello.com/1/cards/{card}/members",
+   "card_members_voted_url" : "https://api.trello.com/1/cards/{card}/membersVoted",
+   "card_stickers_url" : "https://api.trello.com/1/cards/{card}/stickers",
+   "card_actions_url" : "https://api.trello.com/1/cards/{card}/actions{?filter,member}",
+   "search_url" : "https://api.trello.com/1/search{?query,idBoards,idOrganizations,idCards,modelTypes,board_fields,boards_limit,card_fields,cards_limit,cards_page,card_board,card_list,card_members,card_stickers,card_attachments,organization_fields,organizations_limit,member_fields,members_limit,partial}",
+   "socket_io_url" : "https://trello.com/socket.io/1/",
+   "websockets_url" : "wss://trello.com/1/Session/socket{?token}"
+}
+

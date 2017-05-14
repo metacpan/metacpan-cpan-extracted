@@ -1,0 +1,141 @@
+#!/usr/local/bin/perl
+#
+# Test program for query.pl
+#
+use Term::Query qw( query query_table query_table_set_defaults );
+
+sub qa {
+    $ans = query @_;
+    exit if $ans =~ /^\s*(exit|quit|abort)\s*$/;
+    printf "Answer = \"%s\"\n",(length($ans) ? $ans : 
+			defined($ans) ? 'NULL' : 'undef');
+}
+
+sub cr {
+  print "\n";
+}
+
+@keywords = split(' ','SGI HP Sun DEC IBM');
+@fields = split(' ','Index Title Vendor');
+
+
+sub General_Tests {
+
+    &qa('Enter anything:');
+
+    &qa('Enter a required value:','r');
+
+    &qa('Enter a yes or no:','Y');
+
+    &qa('Enter an integer:','ridh',
+	  5,		# default
+	  'This is some help for the 4th query.'); # help string
+
+    &qa('Enter a yes or no:','N');
+
+    &qa('Enter a number:','nrd', 3.1415);		# default
+
+    &qa('Enter a matching keyword:','rmdh',
+	  '^(SGI|HP|Sun|DEC)$',	# match pattern '
+	  'SGI',			# default
+	  'Answer one of SGI, HP, Sun, or DEC.'); # help string
+
+
+    &qa('Enter a keyword:','rdkh',
+	  'SGI',		# default
+	  \@keywords,		# keyword table
+	  'Enter a vendor keyword.'); # helpstring
+
+    $Query::Case_sensitive = 1;
+    &qa('Enter a keyword (case-sensitive):','rdkh',
+	  'SGI',		# default
+	  \@keywords,		# keyword table
+	  'Enter a case-sensitive vendor keyword.'); # helpstring
+    $Query::Case_sensitive = '';
+
+
+    &qa('Enter a new keyword:','rKh',
+	  \@fields,		# anti-keyword list
+	  'Enter a new field name.');
+    cr;
+}
+
+sub Refs_Tests {
+    print "\nTesting input ref methods..\n";
+
+    $foo = $fields[0];		# this should faile
+    &qa('', 'rKIV', \@fields, \$foo, 'bar');
+    printf "\tBar = %s\n", $bar;
+
+
+    $foo = 'Foo';
+    &qa('', 'rKIV', \@fields, \$foo, 'bar');
+    printf "\tBar = %s\n", $bar;
+
+    print "\nTesting referenced variables..\n";
+
+    $ans = 'Bzzzt! Wrong!';
+    &qa("Do you wish to quit?", 'NV', \$ans);
+
+    cr;
+}
+
+sub Defaults_Tests {
+
+    print "\nTesting defaults initializations..\n";
+    $aVar = 'wrong';
+    &qa('Setup aVar','rdIV', 'right', "\n", 'aVar');
+    printf "aVar = %s\n", $aVar;
+
+    cr;
+}
+
+sub Tables_Tests {
+
+    @qtbl = ( 'Integer 1',	'rVidh', 
+		    [ 'int1', 4, 'Asking for integer 1', ] ,
+	      'Integer 2',	'Vid',   
+		    [ 'int2', 5, ],
+	      'Number 3',	'Vndh', 
+		    [ 'num3', 3.1415, 'Asking for a number', ],
+	      'Yes or No 4','VYh',
+		    [ 'yn4',  "Asking yes or no", ],
+	      'No or Yes 5','VNh',
+		    [ 'yn5',  "Asking no or yes", ],
+	      'Keyword 6',	'rVkdh', 
+		    [ 'key6', \@keywords, 'IBM', 'Asking for a keyword', ],
+	      'Nonkey 7',	'VrKh', 
+		    [ 'nonkey7', \@fields, 'Asking for a new keyword', ],
+	      );
+
+    sub show_vars {
+      foreach $var ( qw( int1 int2 num3 yn4 yn5 key6 nonkey7 ) ) {
+	  $val = $$var;
+	  print "  \$$var = \"$val\"\n";
+      }
+    }
+
+    print "Setting qtbl's defaults.\n";
+
+    query_table_set_defaults \@qtbl;
+
+    show_vars;
+    cr;
+
+    $ok = query_table \@qtbl;
+    print "queryTable returned $ok\n";
+
+    show_vars;
+    cr;
+}
+
+@ARGV = ('-all') unless @ARGV;
+
+while ($a = shift) {
+    Tables_Tests 	if grep(/^$a/i, qw(-tables -all));
+    Refs_Tests		if grep(/^$a/i, qw(-refs  -references -all));
+    Defaults_Tests	if grep(/^$a/i, qw(-defaults -all));
+    General_Tests	if grep(/^$a/i, qw(-general -all));
+}
+exit;
+

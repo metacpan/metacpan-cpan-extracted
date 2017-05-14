@@ -1,0 +1,212 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# Two vectors which you can manipulate with the mouse,
+#  and their sum, cross product and difference move.
+
+PROTO AdjArrow [
+	field SFColor color 0.8 0 0
+	field SFRotation init 0 0 1 0
+	eventOut SFRotation rotation
+	eventOut SFVec3f translation # along y axis
+] {
+Group {
+ children [
+  DEF S SphereSensor { rotation_changed IS rotation  offset IS init }
+  DEF T Transform {
+  	rotation IS init
+  	children [
+	  Transform {
+	   translation 0 0.5 0
+	   children [
+		Shape {
+			appearance DEF APP Appearance {
+				material Material {
+					diffuseColor IS color
+				}
+			}
+			geometry Cylinder {
+				radius 0.05 
+				height 1
+			}
+		}
+	   ]
+	  }
+	  Transform {
+	   translation 0 1 0
+	   children [
+	    Transform {
+	     translation 0 0.05 0
+	     children [
+			Shape {
+				appearance USE APP
+				geometry Cone {
+					height 0.1
+					bottomRadius 0.10
+				}
+			}
+	     ]
+	    }
+	   ]
+	  }
+   ]
+  }
+ ]
+}
+ROUTE S.rotation_changed TO T.rotation
+}
+
+PROTO SArrow [
+	field SFColor color 0.8 0 0
+	eventIn SFRotation rotation
+	eventIn SFVec3f scale
+] {
+Group {
+ children [
+  DEF T Transform {
+  	rotation IS rotation
+	scale IS scale
+  	children [
+	  Transform {
+	   translation 0 0.5 0
+	   children [
+		Shape {
+			appearance DEF APP Appearance {
+				material Material {
+					diffuseColor IS color
+				}
+			}
+			geometry Cylinder {
+				radius 0.03 
+				height 1
+			}
+		}
+	   ]
+	  }
+	  Transform {
+	   translation 0 1 0
+	   children [
+	    Transform {
+	     translation 0 0.05 0
+	     children [
+			Shape {
+				appearance USE APP
+				geometry Cone {
+					height 0.1
+					bottomRadius 0.06
+				}
+			}
+	     ]
+	    }
+	   ]
+	  }
+   ]
+  }
+ ]
+}
+}
+
+Transform {
+scale 2.5 2.5 2.5 
+children [
+	DEF A1 AdjArrow { init 1 -0.1 0.1 1.3 color 0.8 0.8 0 } 
+	DEF A2 AdjArrow { color 0.8 0.8 0 init 1 1 -5 0.6} 
+	DEF SUM SArrow { color 0.8 0 0 }
+	DEF DIFF SArrow { color 0 0 0.8 }
+	DEF CP SArrow { color 0 0.8 0 }
+
+	DEF S Script {
+		eventIn SFRotation rot1
+		eventIn SFRotation rot2
+		field SFRotation r1 1 -0.1 0.1 1.3
+		field SFRotation r2 1 1 -5 0.6
+		eventOut SFRotation sum
+		eventOut SFVec3f sumsca
+		eventOut SFVec3f sumvec
+		eventOut SFRotation diff
+		eventOut SFVec3f diffsca
+		eventOut SFVec3f diffvec
+		eventOut SFRotation cp
+		eventOut SFVec3f cpsca
+		eventOut SFVec3f cpvec
+		url "javascript:
+			function dorot() {
+				v1 = new SFVec3f(0,1,0);
+				v2 = r1.multVec(v1);
+				v3 = r2.multVec(v1);
+				sv = v2.add(v3);
+				dv = v2.subtract(v3);
+				cv = v2.cross(v3);
+				sumsca = new SFVec3f(1,sv.length(),1);
+				diffsca = new SFVec3f(1,dv.length(),1);
+				cpsca = new SFVec3f(1,cv.length(),1);
+				sum = new SFRotation(v1,sv.normalize());
+				diff = new SFRotation(v1,dv.normalize());
+				cp = new SFRotation(v1,cv.normalize());
+				sumvec = sum.multVec(v1);
+				diffvec = diff.multVec(v1);
+				cpvec = cp.multVec(v1);
+			}
+			function rot1(val,time) {
+				r1 = val; dorot();
+			}
+			function rot2(val,time) {
+				r2 = val; dorot();
+			}
+		"
+	}
+
+	DEF CARROW Transform {
+	 scale 1.1 1.1 1.1
+	children [
+		Transform { translation 0 0.5 0  children [
+			Shape {
+				appearance DEF APP Appearance {
+					material Material {
+						diffuseColor 0.7 0.7 0.7
+					}
+				}
+				geometry Cylinder {
+					radius 0.02 
+					height 1
+				}
+			}
+		]}
+		Transform {
+		   translation 0 1.05 0
+		   children [
+		   	Shape {
+				appearance USE APP
+				geometry Cone {
+					height 0.1
+					bottomRadius 0.04
+				}
+			}
+		   ]
+		}
+	]
+	}
+	Transform {
+		rotation 1 0 0 1.5708
+		children [USE CARROW]
+	}
+	Transform {
+		rotation 0 0 1 -1.5708
+		children [USE CARROW]
+	}
+]
+}
+	ROUTE A1.rotation TO S.rot1
+	ROUTE A2.rotation TO S.rot2
+	ROUTE S.sum TO SUM.rotation
+	ROUTE S.sumsca TO SUM.scale
+	ROUTE S.diff TO DIFF.rotation
+	ROUTE S.diffsca TO DIFF.scale
+	ROUTE S.cp TO CP.rotation
+	ROUTE S.cpsca TO CP.scale
+
+
+

@@ -49,6 +49,14 @@ unless ($a_rec =~ /^\d+$/) {
     $dbh->disconnect();
     exit 1;
 }
+print "How many AAAA records can he have: ";
+my $aaaa_rec = <>;
+chomp($aaaa_rec);
+unless ($aaaa_rec =~ /^\d+$/) {
+    print "needed to be a number\n";
+    $dbh->disconnect();
+    exit 1;
+}
 print "How many CNAME records can he have: ";
 my $cname_rec = <>;
 chomp($cname_rec);
@@ -93,7 +101,7 @@ $dbh->do("insert into domains (id, domain, owner) values ('', ?, ?)", undef, $do
 my $dom_id = $dbh->selectrow_array("select id from domains where domain = ? and owner = ?", undef, $domain, $uid);
 #printf("insert into domains (id, domain, owner) values ('','%s','%s')\n", $domain, $uid);
 $dbh->do("insert into soa (domain, auth_ns, email, serial, refresh, default_ttl, expire, retry, rec_lock) values (?,?,?,?,?,?,?,?,?)", undef, $dom_id, $rrsoa->mname, $rrsoa->rname, $rrsoa->serial, $rrsoa->refresh, $rrsoa->ttl, $rrsoa->expire, $rrsoa->retry, $lock);
-$dbh->do("insert into rec_count (domain, A_count, CNAME_count, MX_count, NS_count, TXT_count) values (?,?,?,?,?,?)", undef, $dom_id, $a_rec, $cname_rec, $mx_rec, $ns_rec, $txt_rec);
+$dbh->do("insert into rec_count (domain, A_count, AAAA_count, CNAME_count, MX_count, NS_count, TXT_count) values (?,?,?,?,?,?)", undef, $dom_id, $a_rec, $aaaa_rec, $cname_rec, $mx_rec, $ns_rec, $txt_rec);
 
 foreach my $rr (@zone) {
     for ($rr->type) {
@@ -101,6 +109,10 @@ foreach my $rr (@zone) {
 	    print "A: ", $rr->name, " ", $rr->address, " ", $rr->ttl, "\n";
 	    my $rec_lock = rec_lock();
 	    $dbh->do("insert into records_A (id, domain, name, address, ttl, rec_lock) values ('',?,?,?,?,?)", undef, $dom_id, $rr->name, $rr->address, $rr->ttl, $rec_lock);	    
+	} elsif (/^AAAA$/) {
+	    print "AAAA: ", $rr->name, " ", $rr->address, " ", $rr->ttl, "\n";
+	    my $rec_lock = rec_lock();
+	    $dbh->do("insert into records_AAAA (id, domain, name, address, ttl, rec_lock) values ('',?,?,?,?,?)", undef, $dom_id, $rr->name, $rr->address, $rr->ttl, $rec_lock);	    
 	} elsif (/^CNAME$/) {
 	    print "CNAME: ", $rr->name, " ", $rr->cname, " ", $rr->ttl, "\n";
 	    my $rec_lock = rec_lock();

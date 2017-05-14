@@ -1,0 +1,166 @@
+H1: General Questions
+
+H2: Where can I get this document?
+
+The latest version of this FAQ is available from
+{{http://www.mincom.com/mtr/sdf/faq/}}.
+
+H2: What is SDF?
+
+SDF (Simple Document Format) is a freely available
+documentation system designed and developed by
+{{A[jump="mailto:ianc@mincom.com"] Ian Clatworthy}}, with help from
+many others. Based on a simple, readable markup language,
+SDF generates high quality output in multiple formats, all 
+derived from a single document source.
+Supported output formats include HTML, PostScript, PDF, man pages,
+SGML, POD, LaTeX, GNU Info, MIF, RTF, Windows help and plain text.
+If you want to:
+
+* publish documents or reports on the Web or in multiple formats
+* maintain a large documentation suite using rule-based formatting and
+  hypertext generation
+* embed documentation in source code or pretty print source code
+
+then SDF may be for you.
+
+
+H2: What platforms are supported?
+
+SDF documents are plain text files which can be created on any platform.
+
+The SDF software has been completely developed in Perl, so it
+can be executed on all commonly used platforms including most variants
+of Unix, most variants of Windows, OS/2, the Macintosh and VMS.
+Perl 5.003 or later is required.
+
+
+H2: How do I get it?
+
+SDF is available in a number of formats from {{URL:[[SDF_DOWNLOAD]]}}.
+It should also be available from CPAN, the Comprehensive Perl Archive
+Network.
+
+H2: What else is required?
+
+To generate PostScript, SDF requires one of the following:
+
+* the freely available {{pod2ps}} program, available from
+  {{http://www.oasis.leo.org/perl/scripts/textproc/pod2ps.dsc.html}}
+* the freely available {{SGML-Tools}} and {{LaTeX}} packages
+* FrameMaker 5.x or later
+* another word processor which can import RTF.
+
+Earlier versions of FrameMaker will generally work, but I don't
+explicitly support them.
+
+To generate PDF, [[Adobe]] {{PRD:Acrobat}} is required.
+
+To generate Windows help, a help compiler (e.g. hcp.exe) is required.
+
+
+H2: How can I learn SDF?
+
+Generally, the best way to learn SDF is to read the overview paper
+called {{DOC:The SDF Document Development System}} - it should
+contain enough details to get you started. If you need further
+information on the commonly used features,
+read the first few chapters of the {{DOC: SDF User Guide}}.
+
+If you already know Perl's POD format, you might want to read
+the {{DOC: SDF for POD Users}} tutorial before these.
+
+In practice, 99% of SDF documents are created by copying
+an existing one and making the necessary changes. So,
+once you're created templates for the types of documents
+you commonly produce, things are pretty simple ...
+
+
+H2: How is SDF supported?
+
+The following mailing lists are available:
+
+* {{EMAIL:sdf-users@mincom.com}} - for general questions
+* {{EMAIL:sdf-bugs@mincom.com}} - for reporting bugs and fixes.
+
+To subscribe to these lists, send email to
+{{EMAIL:sdf-users-request@mincom.com}} and/or
+{{EMAIL:sdf-bugs-request@mincom.com}} for instructions on
+using {{factotum}}, the majordomo variant that manages these lists.
+In short, send email to {{EMAIL:factotum@mincom.com}} with a
+message body of {{subscribe sdf-users}} or {{subscribe sdf-bugs}}.
+
+An on-line {{A[jump="http://www.mincom.com/mtr/sdf/bugs/"] bug database}}
+is also available providing information on some of the known bugs and requested
+enhancements.
+
+
+H2: Why is SDF free?
+
+I have always wanted to contribute a useful tool {{back}}
+to the worldwide software community which has given me so many
+useful tools (e.g. [[Perl]]). As there appears to be very few
+documentation tools which:
+
+^ generate high quality output in multiple formats, and
++ reduce the time it takes to produce software documentation
+
+[[SDF]] will hopefully be useful to a large number of software developers.
+
+Also, by being freely available, SDF should benefit in several ways.
+These include more testers, more add-on tools and more design ideas.
+
+
+H2: Is SDF still simple?
+
+Arguably not. But SDF has remained simple in spirit, so the name
+hasn't been changed. Maybe {{Software Document Format}} would
+be a better choice, given that SDF is part mark-up language,
+part programming language. Feel free to make SDF stand for
+whatever you like.
+
+
+H2: Why the grapes logo?
+
+After considering a few logos with a paper/writing theme, it was
+decided to follow that great software package tradition - a
+meaningless logo! As an on-line documentation system is essentially
+a cluster of topics linked together, I looked for something which
+reflected that idea. After 10 minutes, the best I could do was
+grapes, a fern or a wattle flower. After 5 seconds of
+agonising decision making, the prize went to the grapes.
+
+Fortunately, there seems to be some useful parallels:
+
+* from a single input (type of grape), several high quality
+  outputs (grape juice/wines/spirits) can be generated (likewise SDF)
+* grapes are quite palatable on their own (as is SDF).
+
+Ok - it's not as sexy as a cup of coffee, but grapes, grape juice
+and red wine (at least) are probably better for you. :-)
+
+
+H2: How can I help?
+
+In lots of ways:
+
+& Tell your friends about SDF.
+. The more users SDF has, the sooner bugs are found and fixed.
+
+& Tell the world about SDF.
+. If SDF has made your job more enjoyable, consider writing an
+  article for a magazine explaining why.
+
+& Report bugs.
+. If you find a bug, report it to {{EMAIL:sdf-bugs@mincom.com}}.
+  Patches are very welcome.
+
+& Make SDF more useful.
+. If SDF doesn't generate an output format you need, consider
+  developing an output driver for that format. Depending on your
+  Perl programming skills, this can take as little as a few days.
+
+& Make it easier for people to migrate to SDF.
+. Consider developing a converter from an existing format to SDF.
+  For example, a high quality RTF to SDF converter would be
+  extremely useful.

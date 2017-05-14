@@ -11,12 +11,12 @@ sub register {
     my($self, $context) = @_;
     $context->register_hook(
         $self,
-        'publish.init'        => \&initialize,
-        'publish.entry.fixup' => \&add_entry,
+        'plugin.init'   => \&initialize,
+        'publish.entry' => \&add_entry,
     );
 }
 
-sub rule_hook { 'publish.entry.fixup' }
+sub rule_hook { 'publish.entry' }
 
 sub initialize {
     my ($self, $context, $args) = @_;
@@ -78,7 +78,7 @@ Plagger::Plugin::Publish::HatenaBookmark - Post to Hatena::Bookmark automaticall
 
 This plugin automatically posts feed updates to Hatena Bookmark
 L<http://b.hatena.ne.jp/>. It supports automatic tagging as well. It
-might be handy for syncronizing delicious feeds into Hatena Bookmark.
+might be handy for synchronizing delicious feeds into Hatena Bookmark.
 
 =head1 AUTHOR
 

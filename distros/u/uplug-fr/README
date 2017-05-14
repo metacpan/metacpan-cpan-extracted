@@ -1,0 +1,14 @@
+
+========================
+French tools for Uplug
+========================
+
+This language pack requires MElt for tagging. Please, install the software first.
+Download sources from http://gforge.inria.fr/projects/lingwb/
+
+INSTALL
+
+perl Makefile.PL
+make all
+make install (run as sudo)
+

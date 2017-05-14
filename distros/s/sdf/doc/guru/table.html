@@ -1,0 +1,162 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: table.pl - Table Processing Library</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="parse.html">Previous Topic</A> | <A HREF="gg_sdf.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1><A NAME="table.pl">2.7. table.pl - Table Processing Library</A></H1>
+<HR>
+<H2><A NAME="Purpose">2.7.1. Purpose</A></H2>
+<P>This library provides routines for reading, processing and writing <A HREF="../ref/fmt_tbl.html">TBL</A> files.</P>
+<HR>
+<H2><A NAME="Interface">2.7.2. Interface</A></H2>
+<PRE>
+require &quot;table.pl&quot;;
+
+@<A HREF="#table_TABLE_MODEL_MODEL">TABLE_MODEL_MODEL</A> = ...
+
+($success, @records) =
+&amp;<A HREF="#table_TableFetch">TableFetch</A>($file, $format);
+
+@records =
+&amp;<A HREF="#table_TableParse">TableParse</A>(@strings);
+
+&amp;<A HREF="#table_TableValidate">TableValidate</A>(*table, *rules);
+
+&amp;<A HREF="#table_TablePrint">TablePrint</A>($strm, *table, %flags);
+
+@strings =
+&amp;<A HREF="#table_TableFormat">TableFormat</A>(*table, %flags);
+
+@fields =
+&amp;<A HREF="#table_TableFields">TableFields</A>($format);
+
+%values =
+&amp;<A HREF="#table_TableRecSplit">TableRecSplit</A>(*fields, $record);
+
+$record =
+&amp;<A HREF="#table_TableRecJoin">TableRecJoin</A>(*fields, %values);
+
+$string =
+&amp;<A HREF="#table_TableRecFormat">TableRecFormat</A>($format, %values);
+
+@result =
+&amp;<A HREF="#table_TableFilter">TableFilter</A>(*table, $where, *var);
+
+@result =
+&amp;<A HREF="#table_TableDeleteFields">TableDeleteFields</A>(*table, @junk);
+
+@result =
+&amp;<A HREF="#table_TableSelectFields">TableSelectFields</A>(*table, @new_fields);
+
+@result =
+&amp;<A HREF="#table_TableSort">TableSort</A>(*table, @by);
+
+%index =
+&amp;<A HREF="#table_TableIndex">TableIndex</A>(*table, *duplicates, @by);
+
+%values =
+&amp;<A HREF="#table_TableLookup">TableLookup</A>(*table, *index, @key_values);
+
+@flds =
+&amp;<A HREF="#table_TableFieldsCheck">TableFieldsCheck</A>($format, $msg_type, %known);
+
+</PRE>
+<HR>
+<H2><A NAME="Description">2.7.3. Description</A></H2>
+<P>Tables are stored in arrays. The first element in the array is the <EM>input format specification</EM>. Remaining elements are data, one record per element.</P>
+<P>The routines are often used together as follows:</P>
+<PRE>
+     # Read in the table (using the default format)
+     ($ok, @table) = &amp;TableFetch($table_name);
+
+     # Process the data records
+     $format = shift @table;
+     @flds = &amp;TableFields($format);
+     for $rec (@table) {
+             %value = &amp;TableRecSplit(*flds, $rec);
+             $value{'Age'}++;        # say ...
+             $rec = &amp;TableRecJoin(*flds, %value);
+     }
+     unshift(@table, $format);
+
+     # Ouptut the new table (using the default flags)
+     &amp;TablePrint(STDOUT, *table);
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Multi-line fields are stored with a newline as the first character so be sure to allow for this when processing them.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P><STRONG><A NAME="table_TABLE_MODEL_MODEL">TABLE_MODEL_MODEL</A></STRONG> is the model for model files.</P>
+<P><STRONG><A NAME="table_TableFetch">TableFetch</A></STRONG> reads <EM>file</EM> as a table defined in <EM>TBL</EM> format. If the first data line of the file is not an input format specification, it can be specified using <EM>format</EM>. <EM>success</EM> is 1 if the file is opened successfully. <EM>records</EM> is an array of records, the first of which is the format specification.</P>
+<P><STRONG><A NAME="table_TableParse">TableParse</A></STRONG> converts a list of strings into a table.</P>
+<P><STRONG><A NAME="table_TableValidate">TableValidate</A></STRONG> validates <EM>@table</EM> against <EM>@rules</EM>.</P>
+<P><STRONG><A NAME="table_TablePrint">TablePrint</A></STRONG> outputs <EM>@table</EM> to <EM>strm</EM>. The <EM>flags</EM> supported are outlined below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Flag</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+TBL format:
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+behead
+</TD>
+<TD>
+column headings are not included at the top of the output
+</TD>
+</TR>
+<TR>
+<TD>
+delimited
+</TD>
+<TD>
+use delimited format - delimiter is the argument (default is tab)
+</TD>
+</TR>
+</TABLE>
+
+<P><STRONG><A NAME="table_TableFormat">TableFormat</A></STRONG> formats <EM>@table</EM> using <EM>flags</EM> and returns a set of strings. See <STRONG><A NAME="table_TablePrint">TablePrint</A></STRONG> for a list of the flags supported.</P>
+<P><STRONG><A NAME="table_TableFields">TableFields</A></STRONG> returns the list of fields in <EM>format</EM>. Behaviour for custom formats is currently undefined.</P>
+<P><STRONG><A NAME="table_TableRecSplit">TableRecSplit</A></STRONG> converts a record into a set of name-value pairs using a set of fields (typically returned from <STRONG><A NAME="table_TableFields">TableFields</A></STRONG>).</P>
+<P><STRONG><A NAME="table_TableRecJoin">TableRecJoin</A></STRONG> converts a set of name-value pairs into a record using a set of fields (typically returned from <STRONG><A NAME="table_TableFields">TableFields</A></STRONG>).</P>
+<P><STRONG><A NAME="table_TableRecFormat">TableRecFormat</A></STRONG> formats a set of name-value pairs into a string using a format string. Behaviour for custom formats is currently undefined.</P>
+<P><STRONG><A NAME="table_TableFilter">TableFilter</A></STRONG> filters a table using an expression.</P>
+<P><STRONG><A NAME="table_TableDeleteFields">TableDeleteFields</A></STRONG> deletes a list of fields from a table.</P>
+<P><STRONG><A NAME="table_TableSelectFields">TableSelectFields</A></STRONG> selects a list of fields from a table.</P>
+<P><STRONG><A NAME="table_TableSort">TableSort</A></STRONG> sorts a table by one of more fields. The fields to use are passed in <EM>by</EM>. If no fields are specified, all fields are used in the order they appear in the table.</P>
+<P><STRONG><A NAME="table_TableIndex">TableIndex</A></STRONG> indexes a table by one of more fields. The fields to use are passed in <EM>by</EM>. If no fields are specified, all fields are used in the order they appear in the table. <EM>index</EM> is an associative array where:</P>
+<UL>
+<LI>the key is the value of the <EM>by</EM> fields
+<LI>the data is the index in <EM>table</EM> of the matching record</UL>
+<P>For multiple-field keys, values are separated by a null character (\000). The index of the first data record is 1 (the field specification record has an index of 0). <EM>@duplicates</EM> is the list of indices which do not appear in <EM>%index</EM>. If duplicate keys are found, the highest index is stored in <EM>%index</EM> for each key.</P>
+<P><STRONG><A NAME="table_TableLookup">TableLookup</A></STRONG> returns the name-value pairs for a given key. <EM>@table</EM> is the data table. <EM>%index</EM> is an index created using <STRONG><A NAME="table_TableIndex">TableIndex</A></STRONG>. An empty associative array is returned if no matching record is found.</P>
+<P><STRONG><A NAME="table_TableFieldsCheck">TableFieldsCheck</A></STRONG> is a wrapper around <STRONG><A NAME="table_TableFields">TableFields</A></STRONG> which checks that the fields contains no duplicates. If <EM>known</EM> is defined, its keys are used to find unknown fields, if any. Any errors encountered are output as such using <STRONG><A NAME="table_AppMsg">AppMsg</A></STRONG>. <EM>msg_type</EM> can be used to control the message type - <EM>error</EM> is the default.</P>
+<HR>
+<H2><A NAME="Limitations and future directions">2.7.4. Limitations and future directions</A></H2>
+<P>When validating field-names, the line number and context should be set to something meaningful. To achieve this, the line number of the format string in the file (if it's in the file, that is!) needs to be saved as part of the table.</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_api.html">Parent Topic</A> | <A HREF="parse.html">Previous Topic</A> | <A HREF="gg_sdf.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

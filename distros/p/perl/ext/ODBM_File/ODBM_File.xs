@@ -1,6 +1,12 @@
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#if defined(PERL_IMPLICIT_SYS)
+#  undef open
+#  define open PerlLIO_open3
+#endif
 
 #ifdef I_DBM
 #  include <dbm.h>
@@ -37,12 +43,14 @@ datum	nextkey(datum key);
 
 #include <fcntl.h>
 
+#define fetch_key 0
+#define store_key 1
+#define fetch_value 2
+#define store_value 3
+
 typedef struct {
 	void * 	dbp ;
-	SV *    filter_fetch_key ;
-	SV *    filter_store_key ;
-	SV *    filter_fetch_value ;
-	SV *    filter_store_value ;
+	SV *    filter[4];
 	int     filtering ;
 	} ODBM_File_type;
 
@@ -95,33 +103,58 @@ odbm_TIEHASH(dbtype, filename, flags, mode)
 	    Newx(tmpbuf, strlen(filename) + 5, char);
 	    SAVEFREEPV(tmpbuf);
 	    sprintf(tmpbuf,"%s.dir",filename);
-	    if (stat(tmpbuf, &PL_statbuf) < 0) {
-		if (flags & O_CREAT) {
-		    if (mode < 0 || close(creat(tmpbuf,mode)) < 0)
-			croak("ODBM_File: Can't create %s", filename);
-		    sprintf(tmpbuf,"%s.pag",filename);
-		    if (close(creat(tmpbuf,mode)) < 0)
-			croak("ODBM_File: Can't create %s", filename);
-		}
-		else
-		    croak("ODBM_FILE: Can't open %s", filename);
+            if ((flags & O_CREAT)) {
+               const int oflags = O_CREAT | O_TRUNC | O_WRONLY | O_EXCL;
+               int created = 0;
+               int fd;
+               if (mode < 0)
+                   goto creat_done;
+               if ((fd = open(tmpbuf,oflags,mode)) < 0 && errno != EEXIST)
+                   goto creat_done;
+               if (close(fd) < 0)
+                   goto creat_done;
+               sprintf(tmpbuf,"%s.pag",filename);
+               if ((fd = open(tmpbuf,oflags,mode)) < 0 && errno != EEXIST)
+                   goto creat_done;
+               if (close(fd) < 0)
+                   goto creat_done;
+               created = 1;
+            creat_done:
+               if (!created)
+                   croak("ODBM_File: Can't create %s", filename);
+            }
+            else {
+               int opened = 0;
+               int fd;
+               if ((fd = open(tmpbuf,O_RDONLY,mode)) < 0)
+                   goto rdonly_done;
+               if (close(fd) < 0)
+                   goto rdonly_done;
+               opened = 1;
+            rdonly_done:
+               if (!opened)
+                   croak("ODBM_FILE: Can't open %s", filename);
 	    }
 	    dbp = (void*)(dbminit(filename) >= 0 ? &dbmrefcnt : 0);
-	    RETVAL = (ODBM_File)safemalloc(sizeof(ODBM_File_type)) ;
-    	    Zero(RETVAL, 1, ODBM_File_type) ;
+	    RETVAL = (ODBM_File)safecalloc(1, sizeof(ODBM_File_type));
 	    RETVAL->dbp = dbp ;
-	    ST(0) = sv_mortalcopy(&PL_sv_undef);
-	    sv_setptrobj(ST(0), RETVAL, dbtype);
 	}
+	OUTPUT:
+	  RETVAL
 
 void
 DESTROY(db)
 	ODBM_File	db
 	PREINIT:
 	dMY_CXT;
+	int i = store_value;
 	CODE:
 	dbmrefcnt--;
 	dbmclose();
+	do {
+	    if (db->filter[i])
+		SvREFCNT_dec(db->filter[i]);
+	} while (i-- > 0);
 	safefree(db);
 
 datum_value
@@ -182,30 +215,10 @@ filter_fetch_key(db, code)
 	ODBM_File	db
 	SV *		code
 	SV *		RETVAL = &PL_sv_undef ;
+	ALIAS:
+	ODBM_File::filter_fetch_key = fetch_key
+	ODBM_File::filter_store_key = store_key
+	ODBM_File::filter_fetch_value = fetch_value
+	ODBM_File::filter_store_value = store_value
 	CODE:
-	    DBM_setFilter(db->filter_fetch_key, code) ;
-
-SV *
-filter_store_key(db, code)
-	ODBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_store_key, code) ;
-
-SV *
-filter_fetch_value(db, code)
-	ODBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_fetch_value, code) ;
-
-SV *
-filter_store_value(db, code)
-	ODBM_File	db
-	SV *		code
-	SV *		RETVAL =  &PL_sv_undef ;
-	CODE:
-	    DBM_setFilter(db->filter_store_value, code) ;
-
+	    DBM_setFilter(db->filter[ix], code);

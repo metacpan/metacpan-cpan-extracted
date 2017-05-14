@@ -1,0 +1,278 @@
+=pod
+
+=encoding utf8
+
+=head1 NOMBRE
+
+B<DownVideos::DataSexta> - Un módulo para obtener rutas a los capítulos de los programas de La Sexta
+
+=head1 SINOPSIS
+
+use DownVideos::DataSexta
+
+my $sexta =  DataSexta->new();
+
+my $series = $sexta->get_series;
+
+for my $p (@$series)
+  {
+  for my $k (keys $p)
+    {
+    print "$k\n";
+    }
+ }
+
+my $capitulos = $sexta->get_capitulos("$nombre_serie");
+
+=head1 DESCRIPCIÓN
+
+Un módulo para obtener rutas a los capítulos de los programas de B<La Sexta>, que junto con B<DownVideos::SextaXML> proporciona la URL de los archivos de video tanto de sus series, como de sus noticieros y programas.
+
+=head1 MÉTODOS
+
+=head2 CONSTRUCTOR
+
+=over
+
+=item new()
+
+=over 
+
+=item B<$sexta = DataSexta-E<gt>new();>
+
+=back
+
+=over
+
+Crea el objeto. No requiere opciones.
+
+=back
+
+=over 4
+
+=item * $sexta (Objeto DataSexta=HASH)
+
+=back
+
+=back
+
+=head2 ACCESORES
+
+=over
+
+=item get_series()
+
+=over 
+
+=item B<$series = $sexta-E<gt>get_series();>
+
+=back
+
+=over
+
+Obtiene un listado de las series y la URL a los capítulos. No requiere argumentos.
+
+=back
+
+=over 4
+
+=item * $series (Array de hashes)
+
+=back
+
+=over
+
+    $series = [
+            {
+              'Serie foo' => '/videos/sfoo.html'
+            },
+            {
+              'Serie bar' => '/videos/sbar.html'
+            }
+          ];
+
+=back
+
+=back
+
+=over
+
+=item get_programas()
+
+=over 
+
+=item B<$programas = $sexta-E<gt>get_series();>
+
+=back
+
+=over
+
+Obtiene un listado de los programas y la URL a los capítulos. No requiere argumentos.
+
+=back
+
+=over 4
+
+=item * $programas (Array de hashes)
+
+=back
+
+=over
+
+    $programas = [
+               {
+                 'Programa foo' => '/videos/pfoo.html'
+               },
+               {
+                 'Programa bar' => '/videos/pbar.html'
+               }
+             ];
+
+=back
+
+=back
+
+=over
+
+=item get_noticias()
+
+=over 
+
+=item B<$noticias = $sexta-E<gt>get_noticias();>
+
+=back
+
+=over
+
+Obtiene un listado de los noticieros y la URL a los capítulos. No requiere argumentos.
+
+=back
+
+=over 4
+
+=item * $noticias (Array de hashes)
+
+=back
+
+=over
+
+=begin perl
+
+    $noticias = [
+              {
+                'Noticiero foo' => '/videos/nfoo.html'
+              },
+              {
+                'Noticiero bar' => '/videos/nbar.html'
+              }
+            ];
+
+=end perl
+
+=back
+
+=back
+
+=over
+
+=item get_capitulos()
+
+=over 
+
+=item B<$capitulos = $sexta-E<gt>get_capitulos($nombre);>
+
+=back
+
+=over
+
+Obtiene un hash con información acerca de todos los capitulos del título (la clave de $series, $programas o $noticias) de la serie, el programa o el noticiero indicado en $nombre.
+
+=back
+
+=over 4
+
+=item * $nombre (Cadena de texto)
+
+=item * $capitulos (Array de hashes)
+
+=back
+
+=over
+
+    $capitulos = [
+               {
+                 'URL' => 'http://www.lasexta.com/videos/seriefoo/temporada-2/capitulo-2.html',
+                 'DESCRIPCION' => "Capítulo 2",
+                 'TITULO' => "Serie foo - Capítulo 2 - Temporada 1",
+                 'IMAGEN' => 'http://www.lasexta.com/clipping/2013/05/02/00047/10.jpg'
+               },
+               {
+                 'URL' => 'http://www.lasexta.com/videos/seriefoo/temporada-2/capitulo-1.html',
+                 'DESCRIPCION' => "Capítulo 1",
+                 'TITULO' => "Serie foo - Capítulo 1 - Temporada 1",
+                 'IMAGEN' => 'http://www.lasexta.com/clipping/2013/04/25/00069/10.jpg'
+               }
+             ];
+
+=back
+
+=back
+
+=head1 EJEMPLO
+
+=over
+
+=item Ejemplo de obtención de información sobre tres capítulos del noticiero Deportes:
+
+ #!/usr/bin/perl
+
+ use warnings;
+ use strict;
+ use utf8;
+ use encoding 'utf8';
+ use open 'locale';
+ use Encode;
+ use DataSexta;
+
+ my $sexta = DataSexta->new();
+ my $noticias = $sexta->get_noticias;
+ 
+ print "Obtenemos los programas de la sección noticias\n";
+
+ for my $p (0..@$noticias - 1)
+    {
+        for my $k (keys @$noticias[$p])
+            {
+            print "Título $p: $k\n";
+            print "URL $p: " . @{$noticias}[$p]->{$k} . "\n\n";
+            }
+    }
+
+ # Obtenemos los capítulos del noticiero "Deportes";
+ my $capitulos = $sexta->get_capitulos("Deportes");
+
+ print "Mostramos información de los 3 últimos capítulos\n";
+
+ for my $c (0..2)
+    {
+        for my $k (keys @$capitulos[$c])
+            {
+            print "($c) $k:";
+            print " " . @{$capitulos}[$c]->{$k} . "\n";
+            }
+    print "\n";
+    }
+
+=back
+
+=head1 AUTOR
+
+Hugo Morago Martín <morago@ono.com>
+
+=head1 LICENCIA
+
+Copyright © 2013 Hugo Morago Martín <morago@ono.com>
+
+Este programa se distribuye bajo los términos de la GPL v3 del 29 de enero de 2007. Puede encontrar una copia de la misma en http://www.gnu.org/licenses/gpl-3.0.html
+
+=cut

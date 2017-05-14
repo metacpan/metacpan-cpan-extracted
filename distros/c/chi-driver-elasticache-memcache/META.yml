@@ -1,0 +1,40 @@
+---
+abstract: "This is a CHI Driver for AWS's Elasticache memcache implementation"
+author:
+  - 'Aaron Moses <zebardy@cpan.org>'
+build_requires:
+  CHI: '0'
+  Sub::Override: '0'
+  Test::MockObject: '0'
+  Test::More: '0.96'
+  Test::Routini: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: chi-driver-elasticache-memcache
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CHI::Driver::Memcached::Base: '0'
+  Cache::Elasticache::Memcache: '0'
+  Moose: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/zebardy/chi-driver-elasticache-memcache/issues
+  homepage: https://github.com/zebardy/chi-driver-elasticache-memcache
+  repository: https://github.com/zebardy/chi-driver-elasticache-memcache.git
+version: '0.01'
+x_contributors:
+  - 'zebardy <zebardy@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

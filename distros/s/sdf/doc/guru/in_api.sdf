@@ -1,0 +1,64 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: SDFAPI
+
+H2: Overview
+
+The libraries provided with [[SDF]] are summarised below.
+
+!block table; groups
+Name            Purpose
+General:
+parse.pl        general parsing and processing of SDF files
+app.pl          application framework for all SDF scripts
+name.pl         filename processing routines
+table.pl        table processing routines (including read/write of {{FMT:TBL}} files)
+dict.pl         dictionary processing routines
+misc.pl         miscellaneous routines
+Support:
+subs.pl         general run-time support
+macros.pl       built-in macros
+filters.pl      built-in filters
+specials.pl     built-in special phrase styles
+Drivers:
+toraw.pl        raw format driver
+tomif.pl        [[MIF]] format driver
+tohtml.pl       [[HTML]] format driver
+totxt.pl        plain text format driver
+topod.pl        {{POD}} format driver
+toman.pl        {{man page}} format driver
+API extraction:
+apiperl.pl      routines for extracting API information from a [[Perl]] library
+!endblock
+
+Further details on the general libraries are given below.
+
+# Add the library directory to the search path
+!path_append "../../perllib/sdf"
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!slide_down
+!getdoc "app.pl"
+!getdoc "dict.pl"
+!getdoc "name.pl"
+!getdoc "misc.pl"
+!getdoc "parse.pl"
+!getdoc "table.pl"
+!slide_up
+!off paragraph h2top

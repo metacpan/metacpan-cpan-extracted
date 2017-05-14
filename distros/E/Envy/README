@@ -1,0 +1,77 @@
+Sick of an endlessly growing PATH?  Me too!
+
+Envy does shell-independent environment variable management.
+
+
+Envy attempts to avoid ambition.  It is designed as a narrow tool to
+solve a specific and practical problem without going wildly overboard.
+Its narrow scope includes:
+
+* A mechanism is provided for setting and prepending environment
+variables in a variety of flexible ways.  All modifications are
+reversible.
+
+* Standardized crontab lauch tool.
+
+* Optional .profile and .login setup.
+
+Available at http://www.perl.com/CPAN/authors/id/JPRIT/ !
+  (Probably requires perl 5.004_05 but older version might work too.)
+
+----------------------------------------------------------------------
+
+Here's what it looks like:
+
+[joshua@grdevl137] ~% envy
+   dailydb-dev                          imag-dbo-testdb
+ x dev                                  imag-dev-2513
+   dev-area-setup                       imag-dev-2519
+   fame                                 imag-prod
+   framemaker                           java
+ x fvwm95-2.0.43a                       objstore
+   gcc                                x openwin
+   gems-1.9.1-dev                       printing
+   gems-2.0-dev                         prod
+   gems-2.0.alpha.14                    prod-new
+   gems-dev                             research
+   gems-intl-rpts                     x reuters
+   gems-prod                            solaris
+   imag-2519                            sunpro
+   ...
+
+'x' indicates that the environement file is loaded in the current
+shell.  Also, you can look at dependencies like this:
+
+ ------------------+-------------------------------------------------------
+  DIMENSION        |  ENVY
+ ------------------+-------------------------------------------------------
+  First            |  qsg
+                   |      openwin
+                   |      printing
+  p4               |      qsg-p4
+  3boink           |  3boink-prod
+                   |      objstore
+  objstore         |          objstore-5.1
+                   |      qsg-build10
+                   |      sunpro
+  sunpro           |          SUNWspro-4.2
+                   |              cc-tools
+ ------------------+-------------------------------------------------------
+
+
+see ./INSTALL for hints on installation
+see ./UPGRADE if you are starting from a prior releases
+
+
+Send any questions or comments to envy@listbox.com.
+
+If you'd like to subscribe to this mailing list, send email to
+majordomo@listbox.com.  Thanks!
+
+-------------------------------------------------------------------
+Copyright © 1997-1999 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)

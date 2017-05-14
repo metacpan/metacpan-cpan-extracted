@@ -1,8 +1,5 @@
 package App::OverWatch;
-
 # ABSTRACT: Watch over your infrastructure
-our $VERSION = '0.1'; # VERSION
-
 use strict;
 use warnings;
 
@@ -116,23 +113,6 @@ sub load_config {
     $self->{Config} = App::OverWatch::Config->new($rh_conf);
 }
 
-sub load_config_string {
-    my $self = shift;
-    my $string = shift;
-
-    my $Config = Config::Tiny->read_string($string);
-    my $rh_conf = $Config->{_}
-        if ($Config && defined($Config->{_}));
-
-    die "Error: Couldn't load configuration from string\n"
-        if (!defined($rh_conf));
-
-    die "Error: Require 'db_type' to be set in config\n"
-        if (!$rh_conf->{db_type});
-
-    $self->{Config} = App::OverWatch::Config->new($rh_conf);
-}
-
 sub _db {
     my $self = shift;
 
@@ -156,7 +136,7 @@ App::OverWatch - Watch over your infrastructure
 
 =head1 VERSION
 
-version 0.1
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -215,26 +195,8 @@ Dies on any missing requirements.  Returns the command.
 
 =head2 load_config
 
-    $OverWatch->load_config();
-
-    $OverWatch->load_config($filename);
-
 Loads OverWatch DB connection configuration from a text file, by
-default it will try ~/.overwatch.conf and then /etc/overwatch.conf.
-
-If a filename is provided, it will only try to load that file.
-
-=head2 load_config_string
-
-        $OverWatch->load_config_string('
-# A comment
-db_type = sqlite
-user =
-password =
-dsn = DBI::SQLite:dbname=:memory:
-');
-
-Loads a configuration from a string.
+default ~/.overwatch.conf.
 
 =head1 AUTHOR
 

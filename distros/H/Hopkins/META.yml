@@ -1,0 +1,51 @@
+---
+author:
+  - 'Mike Eldridge <diz@cpan.org>'
+build_requires:
+  Class::MOP: 0
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  POE::API::Peek: 0
+  Template: 0
+  Test::MockObject: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hopkins
+abstract: complete multiqueue job scheduling and execution system
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Cache::FileCache: 0
+  Class::Accessor::Fast: 0.31
+  DBIx::Class: 0.08103
+  Data::UUID: 0
+  DateTime: 0.37
+  DateTime::Event::MultiCron: 0.01
+  DateTime::Format::ISO8601: 0.06
+  DateTime::Set: 0.25
+  File::Monitor: 0.10
+  JSON: 2.16
+  LWP::UserAgent: 5.833
+  List::Object: 0.01
+  Log::Log4perl: 1.12
+  POE: 1.005
+  POE::API::Peek: 1.34
+  POE::Component::JobQueue: 0.55
+  POE::Wheel::Run: 1.2179
+  Tie::IxHash: 1.21
+  XML::LibXML: 1.69
+  XML::Simple: 2.18
+  YAML::XS: 0.32
+  version: 0.77
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.009002

@@ -1,0 +1,11 @@
+Revision history for Net-Async-Github
+
+0.002     2017-05-12 00:11:11+08:00 Asia/Kuala_Lumpur
+    Bugs fixed:
+
+    * endpoints.json was not being picked up correctly after installation
+    * IO::Async dependency missing in cpanfile (thanks to DBOOK for catching this)
+
+0.001     2017-05-11 22:46:54+08:00 Asia/Kuala_Lumpur
+	* Initial release
+

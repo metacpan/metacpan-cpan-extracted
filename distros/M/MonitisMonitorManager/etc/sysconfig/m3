@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# M3 configuration directory
+M3_CONFIG_DIR=/etc/m3.d
+
+# M3 main configuration xml file
+M3_CONFIG_XML=$M3_CONFIG_DIR/config.xml

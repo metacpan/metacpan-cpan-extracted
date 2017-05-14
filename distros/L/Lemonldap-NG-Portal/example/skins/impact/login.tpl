@@ -45,6 +45,7 @@
       <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <input type="hidden" name="timezone" />
       <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="key">" />
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
       <TMPL_IF NAME="standardform">
 
@@ -66,9 +67,9 @@
 
       <TMPL_IF NAME="logo">
 
-        <TMPL_IF NAME="module">
+        <TMPL_IF NAME="logoFile">
         <div class="authLogo">
-        <img src="<TMPL_VAR NAME="SKIN_PATH">/common/<TMPL_VAR NAME="module">.png" />
+        <img src="<TMPL_VAR NAME="SKIN_PATH">/common/<TMPL_VAR NAME="logoFile">" alt="<TMPL_VAR NAME="module">" />
         </div>
         </TMPL_IF>
 
@@ -76,7 +77,7 @@
         <p>
         <label for="checkLogins">
             <input type="checkbox" id="checkLogins" name="checkLogins" <TMPL_IF NAME="ASK_LOGINS">checked</TMPL_IF>/>
-            <lang en="Check my last logins" fr="Voir mes dernières connexions"/>
+            <lang en="Check my last logins" fr="Voir mes derni&egrave;res connexions"/>
         </label>
         </p>
         </TMPL_IF>
@@ -128,6 +129,7 @@
         <TMPL_VAR NAME="HIDDEN_INPUTS">
         <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
         <input type="hidden" name="timezone" />
+        <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
         <TMPL_INCLUDE NAME="standardform.tpl">
       </form>
     </div>
@@ -158,6 +160,7 @@
         <TMPL_VAR NAME="HIDDEN_INPUTS">
         <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
         <input type="hidden" name="timezone" />
+        <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
         <TMPL_INCLUDE NAME="openidform.tpl">
       </form>
     </div>
@@ -188,6 +191,7 @@
         <TMPL_VAR NAME="HIDDEN_INPUTS">
         <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
         <input type="hidden" name="timezone" />
+        <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
         <TMPL_INCLUDE NAME="yubikeyform.tpl">
       </form>
     </div>
@@ -218,6 +222,7 @@
         <TMPL_VAR NAME="HIDDEN_INPUTS">
         <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
         <input type="hidden" name="timezone" />
+        <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
         <table>
                 <TMPL_IF NAME="module">
@@ -230,7 +235,7 @@
                 <tr><td colspan="2"><div class="buttons">
                 <label for="checkLogins">
                     <input type="checkbox" id="checkLogins" name="checkLogins" <TMPL_IF NAME="ASK_LOGINS">checked</TMPL_IF>/>
-                    <lang en="Check my last logins" fr="Voir mes dernières connexions"/>
+                    <lang en="Check my last logins" fr="Voir mes derni&egrave;res connexions"/>
                 </label>
                 </div></td></tr>
                 </TMPL_IF>

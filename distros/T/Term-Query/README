@@ -1,0 +1,88 @@
+This is the README file ($Revision: 1.2 $) for Term::Query.pm.
+
+Term::Query.pm is a Perl 5 module, which performs generalized queries on
+various kinds of values.  Validation and normalization of input, based
+on the type, is automated, as is error reporting and re-solicitation of
+input.
+
+Input of '?', unless configured otherwise, provides useful, helpful
+information, based on the expected input type, even in the absence of a
+programmer-supplied help string.
+
+There is one primary subroutine, called "query", which is passed a
+prompt and some "flags", optionally followed by addtional arguments,
+depending upon the particular flags.
+
+The flags are single characters which indicate:
+
+    * input type: integer, real, string, yes-no, keyword, or
+      non-keyword;
+
+    * default input, in the absence of user input;
+
+    * help string, to be reported for errors or input of '?';
+
+    * input validation, such as regexp matching, maximum length, and
+      "check" subroutine calls;
+
+    * input handling, such as blank squeezing, and "before" subroutine
+      calls.
+
+    * name of the variable to be set with the validated input.
+
+An accompanying subroutine, query_table, can be passed an array of of
+arguments which will be interatively passed to query, allowing for easy
+generation of table-driven query-response input routines.
+
+The subroutine query_table_set_defaults can be used on a query table
+array to cause any mentioned variables to be initialized with any
+mentioned default values.  This is handy for having a single table
+defining variables, their default values, and the validation criteria
+for setting new values.
+
+The subroutine query_table_process can be used on a query table array to
+process the array in a complete general fashion.
+
+Complete details are provided within the module, in the Perl 5 "pod"
+format.  Traditional man pages are available with the command:
+
+    pod2man Query.pm | nroff -man -
+
+The code was developed and requires Perl5.001m (eg: it uses references),
+Carp.pm (it diagnoses some misuse of itself) and the PrintArray.pm 
+module (by the same author).
+
+There is a Makefile with several useful targets for installing at one or
+more common locations; there is a "test" target which will perform
+regression tests against previous "good" output (see the "t" directory).
+
+WARNING: The "make test" is currently under development, and does not work.
+The Query.pm module does work as advertised (except for unreported bugs :^)
+
+The Query.pm archive is available under the GNU General License,
+Version 2, and is located at:
+
+  http://reality.sgi.com:80/aks/depot/perl/term/Term-Query-2.0.tar.gz
+
+as well as your favorite CPAN site  (see "http://www.perl.com/CPAN").
+
+Suggestions or improvements are welcome.
+
+  Copyright (C) 1995-1997  Alan K. Stebbens <aks@sgi.com>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or (at
+  your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+___________________________________________________________
+Alan Stebbens <aks@sgi.com>      http://reality.sgi.com/aks

@@ -1,0 +1,87 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: datestrings Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fcomment.html">Previous Topic</A> | <A HREF="fdefault.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.10. datestrings Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>datestrings</STRONG>
+  <EM>table</EM>
+  !endblock
+</PRE>
+<P>The table fields are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Field</STRONG>
+</TD>
+<TD>
+<STRONG>Category</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Symbol
+</TD>
+<TD>
+key
+</TD>
+<TD>
+&lt;month|smonth|weekday|sweekday|ampm|AMPM&gt;
+</TD>
+</TR>
+<TR>
+<TD>
+Values
+</TD>
+<TD>
+optional
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>datestrings</EM> filter can be used to change the strings used within a date. The fields within the table are:</P>
+<UL>
+<LI><EM>Symbol</EM> - the matching symbol name (without the $) from the <EM>FormatTime</EM> subroutine
+<LI><EM>Values</EM> - a Perl string containing a whitespace-separated list of values.</UL>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<PRE>
+!block datestrings
+Symbol   Values
+month    &quot;January February March April May June July August September October November December&quot;
+smonth   &quot;Jan     Feb      Mar   Apr   May Jun  Jul  Aug    Sep       Oct     Nov      Dec&quot;
+weekday  &quot;Monday Tuesday Wednesday Thursday Friday Saturday Sunday&quot;
+sweekday &quot;Mon    Tue     Wed       Thu      Fri    Sat      Sun&quot;
+ampm     &quot;am pm&quot;
+AMPM     &quot;AM PM&quot;
+!endblock
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fcomment.html">Previous Topic</A> | <A HREF="fdefault.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

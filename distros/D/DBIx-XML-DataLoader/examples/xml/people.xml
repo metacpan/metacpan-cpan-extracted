@@ -1,0 +1,57 @@
+<PeopleDoc>
+<Person uid="101" first="bob" last="Smith" mothers_maiden="jones" age="28">
+	<Addresses>
+		<Address type="home">
+			<Street>123 Main St</Street>
+			<City>Ourtown</City>
+			<State>IN</State>
+			<Zip>45789</Zip>
+		</Address>
+		<Address type="office">
+			<Street>123 State st</Street>
+			<City>Ourtown</City>
+			<State>IN</State>
+			<Zip>45789</Zip>
+		</Address>
+	</Addresses>	
+</Person>
+<Person uid="102" first="tom" last="crawford" mothers_maiden="cleaver" age="32">
+	<Addresses>
+		<Address type="home">
+			<Street>77 Third St</Street>
+			<City>Ourtown</City>
+			<State>IN</State>
+			<Zip>45766</Zip>
+		</Address>
+		<Address type="office">
+			<Street>642 Broadway</Street>
+			<City>Ourtown</City>
+			<State>IN</State>
+			<Zip>45766</Zip>
+		</Address>
+	</Addresses>	
+</Person>
+<Person uid="103" first="mary" last="brown" mothers_maiden="williams" age="45">
+	<Addresses>
+		<Address type="home">
+			<Street>23 Fourth St</Street>
+			<City>Ourtown</City>
+			<State>IN</State>
+			<Zip>45799</Zip>
+		</Address>
+		<Address type="office">
+			<Street>976 washington</Street>
+			<City>Ourtown</City>
+			<State>IN</State>
+			<Zip>45789</Zip>
+		</Address>
+		<Address type="vacation">
+			<Street>55 Beach bvld</Street>
+			<City>Naples</City>
+			<State>FL</State>
+			<Zip>10899</Zip>
+		</Address>
+	</Addresses>	
+</Person>
+</PeopleDoc>
+

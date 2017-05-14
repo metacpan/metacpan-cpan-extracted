@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+
+DB_NAME=mobius
+
+test:
+	-mysql mobius -e 'drop table test'
+	AUTHOR_TESTING=1 prove -lv --merge t/04limits.t
+
+
+tmp:
+	AUTHOR_TESTING=1 prove -lv --merge t/02run.t
+
+dtest:
+	dzil test
+
+
+push:
+	git push origin master
+
+
+make-test-db:
+	-ssh root@localhost "mysql -e 'drop database $(DB_NAME)'"
+	ssh root@localhost "mysql -e 'create database $(DB_NAME)'"
+	ssh root@localhost "mysql -e \"GRANT ALL ON $(DB_NAME).* TO clb@localhost;\""
+
+
+#Something missing in the current implementation is the detection of when (ax+b) or (cx+d) > Max SQL INT. 
+#max int = 4 294 967 295

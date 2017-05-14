@@ -1,0 +1,126 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Escaping Symbols
+
+H2: Special Characters at the Start of a Line
+
+To escape a special character at the start of a line,
+precede it with a backslash character (\).
+
+H2: Tag Delimiters
+
+Like special characters, any special pattern at the start of a line
+can be escaped by preceding it with a backslash character (\).
+
+Consider the following example:
+
+E:   Important:
+
+This paragraph has a tag called {{Important}} and has no text.
+{{CMD:sdf}} will warn you if it finds an unknown tag so most
+unintentional errors like this are detected. You can escape the
+pattern like this:
+
+E:   \Important:
+
+Other workarounds are:
+
+E:   :Important:
+E:   N:Important:
+
+!if $var{'OPT_TARGET'} ne 'hlp'
+
+H2: Special Symbols
+
+[[SDF]] uses a number of special symbols inside paragraphs:
+
+* A-ZE<lt> and > - delimit {{concise}} phrases
+* E<2{> and E<2}> - delimit {{verbose}} phrases
+* E<2[> and E<2]> - delimit expressions (e.g. variables).
+
+If you need to include one of these symbols in a paragraph,
+use the appropriate escape as shown below.
+
+!block verbatim
+    Symbol      Escape
+    <           E<lt>
+    >           E<gt>
+    {{          E<2{>
+    }}          E<2}>
+    [[          E<2[>
+    ]]          E<2]>
+!endblock
+
+Note the following rules:
+
+^ It isn't necessary to escape any symbols within:
+  - paragraphs tagged with the V style or > tag
+  - paragraphs given the verbatim attribute
+  - paragraphs within a verbatim block
+
++ It is only necessary to escape a < when it appears after
+  a capital letter.
+
++ It is only necessary to escape a > inside a concise phrase.
+  In particular, > is implicitly escaped within a verbose phrase.
+
+!endif
+
+H2: Phrase Parsing Rules
+
+For paragraphs which do not have the {{verbatim}} attribute set,
+the parsing rules for the paragraph text are:
+
+^ Expressions embedded in E<2[> and E<2]> are recursively expanded
++ Verbose phrases embedded in E<2{> and E<2}> are recursively expanded
+  to concise phrases with a V tag.
++ Concise phrases are parsed.
+
+#Note: These rules may be changed before the production release
+#so that only a single left to right parse of the paragraph text is done.
+#However, if this happens, I'll keep the semantics as close to the above as
+#possible.
+
+H2: Multi-line Macros
+
+\!-style macros can be continued onto the next line by ending the
+line with a backslash character (\). To escape this backslash,
+use another one. If N backslash characters are found
+at the end of a line where N is greater than 2, then that
+line is terminated by N-1 backslash characters and the macro
+is continued onto the next line.
+
+H2: Embedded Expressions
+
+As expressions embedded within text are terminated by the ]\] symbol,
+expressions cannot contain this character sequence. If you need this sequence
+within an expression, there is usually a simple workaround you can
+use. For example:
+
+^ use a space character (i.e. $a[$b[1]] becomes $a[$b[1] ])
++ use string concatentation (i.e. "]]" becomes "]"."]").
+
+H2: Semi-Colons Within Attributes
+
+If you need to include a real semi-colon within an attribute or parameter,
+use two semi-colons. In general, if you need to include a sequence of
+N semi-colons in an attribute expression, use N+1 semi-colons.
+For example:
+
+V:To install {{P[index="myApp;;install:myApp"]myApp}}, ...
+
+In this case, the value of {{index}} is {{E:myApp;install:myApp}}.
+
+
+!end_topic

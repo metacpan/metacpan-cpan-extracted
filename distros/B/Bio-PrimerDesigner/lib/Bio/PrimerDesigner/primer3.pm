@@ -1,6 +1,6 @@
-# $Id: primer3.pm,v 1.12 2005/08/23 13:51:14 smckay Exp $
-
 package Bio::PrimerDesigner::primer3;
+
+# $Id: primer3.pm 9 2008-11-06 22:48:20Z kyclark $
 
 =head1 NAME 
 
@@ -19,14 +19,21 @@ raw output.
 =cut
 
 use strict;
+use warnings;
 use File::Spec::Functions 'catfile';
 use File::Temp 'tempfile';
 use Bio::PrimerDesigner::Remote;
 use Bio::PrimerDesigner::Result;
+use Readonly;
+
+Readonly our 
+    $VERSION => sprintf "%s", q$Revision: 24 $ =~ /(\d+)/;
+
+Readonly our
+    $REMOTE_URL => 'mckay.cshl.edu/cgi-bin/primer_designer.cgi';
+
 use base 'Class::Base';
 
-use vars '$VERSION';
-$VERSION = sprintf "%d.%02d", q$Revision: 1.12 $ =~ /(\d+)\.(\d+)/;
 
 # -------------------------------------------------------------------
 sub binary_name {
@@ -483,7 +490,7 @@ Bio::PrimerDesigner::Result object.
     my $length     =  length $dna;
     my $result     =  $self->design(
         'remote',
-        'dev.wormbase.org/db/seq/primer_designer.cgi',
+        $REMOTE_URL,
         { 
             num        => 1,
             seq        => $dna,
@@ -529,14 +536,14 @@ Returns an example DNA sequence.
 
 =head1 AUTHOR
 
-Copyright (C) 2003-2008 Sheldon McKay E<lt>mckays@cshl.eduE<gt>,
-                   Ken Y. Clark E<lt>kclark@cpan.orgE<gt>.
+Copyright (C) 2003-2009 Sheldon McKay E<lt>mckays@cshl.eduE<gt>,
+Ken Youens-Clark E<lt>kclark@cpan.orgE<gt>.
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; version 2.
+the Free Software Foundation; version 3 or any later version.
 
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -545,7 +552,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 
 =head1 SEE ALSO

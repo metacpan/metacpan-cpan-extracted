@@ -1,0 +1,43 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Scanner" db_column="model_description" cv_table="SCN_ModelDescription">
+  <comment type="definition">This table provides the restricted vocabulary for the column model description in the table scanner and is used to describe the technology source for scanning the array. It is only relevant in array technologies	
+</comment>
+<term name="GeneArray_Scanner"
+        description="gene chip scanner used by Affymetrix with the GeneChip, made by Hewlett Packard"/>
+<term name="Arrayer_Scanner"
+        description="microarray scanner used by Affymetrix, was the
+GMS 418 before Affymetrix acquired Genetic Microsystems"/>
+<term name="GMS"
+        description="the GMS 418 microarray scanner from Genetic
+Microsystems, now owned and marketed by Affymetrix"/>
+<term name="arrayWoRx"
+        description="microarray scanner from Applied Precision,
+Issaquah WA"/>
+<term name="GenePix"
+        description="microarray scanner from Axon Instruments"/>
+<term name="Imagene"
+        description="microarray scanner from BioDiscovery Inc., of Los Angeles, CA"/>
+<term name="ScanArray"
+        description="microarray scanner from Cartesian Technologies Inc, Irvine CA"/>
+<term name="Genorama"
+        description="microarray scanner from Asper Ltd., Estonia"/>
+<term name="FluorChem"
+        description="microarray scanner made by AlphaInnotek, San Leandro CA"/>
+<term name="DNA_Microarray_Scanner"
+        description="microarray scanner used by Agilent Technologies"/>
+<term name="Biodetect"
+        description="microarray scanner from GeneScan Europe"/>
+<term name="ChipReader"
+        description="microarray scanner from Virtek"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->
+<!--  LocalWords:  GeneArray arrayWoRx Issaquah GenePix Imagene BioDiscovery
+ -->
+<!--  LocalWords:  ScanArray Genorama FluorChem AlphaInnotek Leandro Agilent
+ -->

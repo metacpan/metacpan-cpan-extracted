@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-HTML\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-26 19:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/HTML.pm:22
+msgid "HTML"
+msgstr "برنامج HTML"
+
+#: lib/Padre/Plugin/HTML.pm:23
+msgid "Tidy HTML"
+msgstr "ترتيب HTML"
+
+#: lib/Padre/Plugin/HTML.pm:24
+msgid "HTML Lint"
+msgstr "تشغيل HTML Lint"
+
+#: lib/Padre/Plugin/HTML.pm:25
+msgid "Validate HTML"
+msgstr "التحقق من HTML"
+
+#: lib/Padre/Plugin/HTML.pm:26
+msgid "Docs"
+msgstr "الوثائق"
+
+#: lib/Padre/Plugin/HTML.pm:27
+msgid "HTML 4.01 Specification"
+msgstr "مواصفات HTML 4.01"
+

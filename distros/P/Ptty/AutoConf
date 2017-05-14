@@ -1,0 +1,127 @@
+package AutoConf;
+require Exporter;
+@ISA = qw(Exporter);
+use Config;
+use Tk::Pretty;
+use strict qw(subs);
+
+BEGIN { open(LOG,">AutoConf.log") || die "Cannot open AutoConf.log:$!" }
+END   { close(LOG) }
+
+@include = ();
+@define  = qw(-Wall -Wno-comment);
+@libs    = ();
+
+sub Define
+{
+ print "Define(",join(' ',@_),")\n";
+ my $sym = shift;
+ if (@_)
+  {
+   my $val = shift;
+   $sym .= "='$val'";
+  }
+ push(@define,"-D$sym");
+}
+
+sub BuildC
+{
+ my ($args) = @_;
+ print STDERR "Checking for ",$args->{'check'},"\n" if (exists $args->{'check'});
+ print LOG "Checking for ",$args->{'check'},"\n" if (exists $args->{'check'});
+ my $file   = $args->{'file'};
+ $file  = "AutoConf" unless (defined $file);
+ $file .= ".c" unless ($file =~ /\.c$/);
+ open(C,">$file") || die "Cannot open $file:$!";
+ if (exists $args->{'header'})
+  {
+   print LOG $args->{'header'},"\n";
+   print C $args->{'header'},"\n";
+  }
+ $args->{'body'} = "0;" unless(exists($args->{'code'}) || exists $args->{'body'});
+ if (exists $args->{'body'})
+  {
+   print LOG "int main() { ",$args->{'body'},"}\n";
+   print C "int main() { ",$args->{'body'},"}\n";
+  }
+ if (exists $args->{'code'})
+  {
+   print LOG $args->{'code'},"\n";
+   print C $args->{'code'},"\n";
+  }
+ close C;
+ return $file;
+}
+
+sub Action
+{
+ my ($ok,$args) = @_;
+ if ($ok)
+  {
+   push(@define,$args->{'then_define'}) if (exists $args->{'then_define'});
+  }
+ else
+  {
+   push(@define,$args->{'else_define'}) if (exists $args->{'else_define'});
+  }
+}
+ 
+sub Compile
+{
+ my %args = @_;
+ my @delete = qw(a.out);
+ my $cc     = $Config{'cc'};
+ my $file   = BuildC(\%args);
+ push(@delete,$file);
+ my @cmd  = ($cc,$Config{'ccflags'},@include,@define);
+ push(@cmd,$args{'define'}) if (exists $args{'define'}); 
+ push(@cmd,$file);
+ push(@cmd,$args{'libs'}) if (exists $args{'libs'}); 
+ push(@cmd,@libs);
+ my $cmd  = join(' ',@cmd);
+ my $msgs = `$cmd 2>&1`;
+ print LOG "$cmd => $?\n$msgs\n"; # unless ($ok);
+ my $ok   = ($? == 0);
+ unlink(@delete);        
+ Action($ok,\%args);
+ return $ok;
+}
+
+sub cpp
+{
+ my %args = @_;
+ my $file = BuildC(\%args);
+ my @cmd  = ($Config{'cppstdin'},$Config{'cppflags'},@include,@define,$Config{'cppminus'});
+ my $cmd  = join(' ',@cmd);
+ open(CODE,"$cmd <$file |") || die "Cannot open pipe to $cmd:$!";
+ my $grep = $args{'grep'};
+ $grep =~ s,/,\\/,;
+ my $match = 0;
+ my $sub = sub { /$grep/o };
+ while (<CODE>)
+  {
+   if (&$sub)
+    {
+     $match = 1;
+     print LOG "Match:$_\n";
+     last;
+    }
+  }
+ close(CODE) || die "Error closing CPP pipe:$!/$?";
+ unlink($file);
+ Action($match,\%args);
+ return $match;
+}
+
+sub define
+{
+ return join(' ',@define);
+}
+
+sub include
+{
+ return join(' ',@include);
+}
+
+
+1;

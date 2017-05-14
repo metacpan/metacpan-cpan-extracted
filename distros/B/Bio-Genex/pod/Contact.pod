@@ -1,0 +1,510 @@
+=head1 NAME
+
+Bio::Genex::Contact - Methods for processing data from the GeneX DB
+ table: Contact
+
+=head1 SYNOPSIS
+
+  use Bio::Genex::Contact;
+
+  # instantiating an instance
+  my $Contact = Bio::Genex::Contact->new(id=>47);
+
+  # retrieve data from the DB for all columns
+  $Contact->fetch();
+
+  # creating an instance, without pre-fetching all columns
+  my $Contact = new Bio::Genex::Contact(id=>47);
+
+  # creating an instance with pre-fetched data
+  my $Contact = new Bio::Genex::Contact(id=>47, 'fetch_all'=>1);
+
+  # retrieving multiple instances via primary keys
+  my @objects = Bio::Genex::Contact->get_objects(23,57,98)
+
+
+  # retrieving all instances from a table
+  my @objects = Bio::Genex::Contact->get_objects('ALL');
+
+  # retrieving the primary key for an object, generically
+  my $primary_key = $Contact->id();
+
+  # or specifically
+  my $con_pk_val = $Contact->con_pk();
+
+  # retreving other DB column attributes
+  my $type_val = $Contact->type();
+  $Contact->type($value);
+
+  my $organization_val = $Contact->organization();
+  $Contact->organization($value);
+
+  my $contact_person_val = $Contact->contact_person();
+  $Contact->contact_person($value);
+
+  my $contact_person_phone_val = $Contact->contact_person_phone();
+  $Contact->contact_person_phone($value);
+
+  my $contact_person_email_val = $Contact->contact_person_email();
+  $Contact->contact_person_email($value);
+
+  my $org_phone_val = $Contact->org_phone();
+  $Contact->org_phone($value);
+
+  my $org_email_val = $Contact->org_email();
+  $Contact->org_email($value);
+
+  my $org_mail_address_val = $Contact->org_mail_address();
+  $Contact->org_mail_address($value);
+
+  my $org_toll_free_phone_val = $Contact->org_toll_free_phone();
+  $Contact->org_toll_free_phone($value);
+
+  my $org_fax_val = $Contact->org_fax();
+  $Contact->org_fax($value);
+
+  my $url_val = $Contact->url();
+  $Contact->url($value);
+
+  my $last_updated_val = $Contact->last_updated();
+  $Contact->last_updated($value);
+
+
+=head1 DESCRIPTION
+
+Each Genex class has a one to one correspondence with a GeneX DB table
+of the same name (I<i.e.> the corresponding table for Bio::Genex::Contact is
+Contact).
+
+
+Most applications will first create an instance of Bio::Genex::Contact
+and then fetch the data for the object from the DB by invoking
+C<fetch()>. However, in cases where you may only be accessing a single
+value from an object the built-in L<delayed fetch|/DELAYED_FETCH>
+mechanism can be used. All objects are created without pre-fetching
+any data from the DB. Whenever an attribute of the object is accessed
+via a getter method, the data for that attribute will be fetched from
+the DB if it has not already been. Delayed fetching happens
+transparently without the user needing to enable or disable any
+features. 
+
+Since data is not be fetched from the DB I<until> it is accessed by
+the calling application, it could presumably save a lot of access time
+for large complicated objects when only a few attribute values are
+needed.
+
+=head1 ATTRIBUTES
+
+There are three different types of attributes which instances of
+Bio::Genex::Contact can access: I<raw> foreign key attributes,
+Obect-Oriented foreign key attributes, and simple column attributes.
+
+=over 4 
+
+=item Raw Foreign Keys Attributes
+
+=item Object Oriented Foreign Key Attributes
+
+This mode presents foreign key attributes in a special way, with all
+non-foreign key attributes presented normally. Foreign keys are first
+retrieved from the DB, and then objects of the appropriate classes are
+created and stored in slots. This mode is useful for applications that
+want to process information from the DB because it automates looking
+up information.
+
+Specifying the 'C<recursive_fetch>' parameter when calling C<new()>,
+modifies the behavior of this mode. The value given specifies the
+number of levels deep that fetch will be invoked on sub-objects
+created.
+
+=item Simple Column Attributes
+
+=back
+
+
+
+=head1 CLASS VARIABLES
+
+Class Bio::Genex::Contact defines the following utility variables for assisting
+programmers to access the Contact table.
+
+=over 4
+
+=item $Bio::Genex::Contact::LIMIT
+
+If defined, $LIMIT will set a limit on any select statements that can
+return multiple instances of this class (for example C<get_objects()>
+or any call to a C<ONE_TO_MANY> or C<LOOKUP_TABLE> foreign key
+accessor method).
+
+
+=item $Bio::Genex::Contact::USE_CACHE
+
+This variable controls whether the class will cache any objects
+created in calls to C<new()>. Objects are cached by primary key. The
+caching is very simple, and no effort is made to track whether
+different invocations of C<new()> are being made for an object with
+the same primary key value, but with different options set. If you
+desire to reinstantiate an object with a different set of parameters,
+you would need to undefine C<$USE_CACHE> first.
+
+
+=back
+
+
+B<WARNING>: variables other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.
+
+=head1 DELAYED FETCH
+
+It is possible to retrieve only the subset of attributes one chooses
+by simply creating an object instance and then calling the appropriate
+getter function. The object will automatically fetch the value from
+the DB when requested. This can potentially save time for large
+complicated objects. This triggers a separate DB query for each
+attribute that is accessed, whereas calling C<fetch()> will retrieve
+all fields of the object with a single query.
+
+For example:
+
+  my $Contact = Bio::Genex::Contact->new(id=>47);
+  my $val = $Contact->con_pk();
+
+The attribute's value is then cached in the object so any further calls
+to that attribute's getter method do not trigger a DB query.
+
+B<NOTE>: Methods may still return C<undef> if their value in
+the DB is C<NULL>.
+
+
+=head1 CLASS METHODS
+
+The following methods can all be called without first having an
+instance of the class via the Bio::Genex::Contact->methodname() syntax.
+
+=over 4
+
+=item new(%args)
+
+new() accepts the following arguments:
+
+=over 4
+
+=item id 
+
+Numeric or string value. The value of the primary key for looking up
+the object in the DB.
+
+=back
+
+=item linking_table()
+
+Used by generic functions to determine if a specified class is a
+linking table class. For Bio::Genex::Contact it returns 0, since it is
+I<not> a linking table class.
+
+=item pkey_name()
+
+This method returns the name of the column which is used as the
+primary key for this DB table. This method only exists for non-linking
+table classes, and for Bio::Genex::Contact it returns the value 'con_pk';
+
+
+=item table_name()
+
+Returns the name of the DB table represented by this class. For
+Bio::Genex::Contact it returns 'Contact';
+
+=item column2name()
+
+This method returns a hashref that translates DB column names into
+human readable format.
+
+=item name2column()
+
+This method returns a hashref that is a reverse lookup table to
+translate the human readable version of a DB column name back into the
+column_name. This is useful for preparing table output in CGI scripts:
+
+
+    %column2name = %{$class->column2name()};
+    if (exists $column2name{$_}) {
+      push(@column_copy,$column2name{$_});
+    }
+    
+    # now that we've translated the names, we sort them
+    @column_copy = sort @column_copy;
+    
+    # make a header element. 
+    push(@rows,th(\@column_copy));
+
+
+=item fkeys()
+
+This method returns a hashref that holds all the foreign key entries
+for the Contact table.
+
+=item column_names()
+
+This method returns an array ref which holds the names of all the
+columns in table Contact.
+
+
+    # first retrieve the data from the DB
+    $object = $full_module_name->new(id=>$id);
+    $object->fetch();
+
+    # now extract the data from the object
+    foreach (@{$class->column_names}) {
+    # we use this to temporarily relax the strict pragma
+    # to use symbolic references
+      no strict 'refs';
+      $tmp_values{$_} = $object->$_;
+
+    # back to our regularily scheduled strictness
+    }
+
+
+=item insert_db($dbh)
+
+This method inserts the data for the object into the database
+specified by the DB handle $dbh. To use this method, create a blank
+object with C<new()>, set the attributes that you want, and then call
+C<insert_db()>.
+
+  my $dbh = Bio::Genex::current_connection(USER=>$SU_USERNAME,
+                                      PASSWORD=>$SU_PASSWORD);
+  my Contact = Bio::Genex::Contact->new();
+  Contact->type('some_value');
+  Contact->insert_db($dbh);
+
+B<NOTE:> You must log into the DB with a user/password that has INSERT
+priveleges in the DB, otherwise you will get a DBI error.
+
+B<WARNING:> C<fetch()> will I<not> be called, so if you are using this
+method to insert a copy of an existing DB object, then it is up to you
+to call C<fetch()>, otherwise, only the attributes that are currently
+set in the object will be inserted.
+
+=item update_db($dbh)
+
+This method update the data for an object already in the database
+specified by the DB handle $dbh. To use this method, fetch an
+object from the DB, change the attributes that you want, and then call
+C<update_db()>.
+
+  my $dbh = Bio::Genex::current_connection(USER=>$SU_USERNAME,
+                                      PASSWORD=>$SU_PASSWORD);
+  my Contact = Bio::Genex::Contact->new(id=>43);
+  Contact->type('some_value');
+  Contact->update_db($dbh);
+
+B<NOTE:> You must log into the DB with a user/password that has INSERT
+priveleges in the DB, otherwise you will get a DBI error.
+
+B<NOTE:> Any modification of the primary key value will be discarded
+('con_pk' for module Bio::Genex::Contact).
+
+=item get_objects(@id_list)
+
+=item get_objects('ALL')
+
+=item get_objects({column=>'col_name',value=>'val'})
+
+This method is used to retrieve multiple instances of class Bio::Genex::Contact
+simultaneously. There are three different ways to invoke this method.
+
+By passing in an C<@id_list>, get_objects() uses each element of the
+list as a primary key for the Contact table and returns a single
+instance for each entry.
+
+B<WARNING>: Passing incorrect id values to C<get_objects()> will cause
+a warning from C<Bio::Genex::Contact::initialize()>. Objects will be
+created for other correct id values in the list.
+
+By passing the 'ALL' parameter, C<get_objects()> returns an instance
+for every entry in the table.
+
+By passing an anonymous hash reference that contains the 'column' and
+'name' keys, the method will return all objects from the DB whose that
+have the specified value in the specified column.
+
+
+=back
+
+
+
+B<NOTE>: All objects must have the 'id' parameter set before attempting
+to use C<fetch()> or any of the objects getter functions.
+
+=head1 INSTANCE METHODS
+
+The following methods can only be called by first having valid
+instance of class Bio::Genex::Contact.
+
+=over 4
+
+
+=item fetch()
+
+This method triggers a DB query to retrieve B<ALL> columns from the DB
+associated with this object.
+
+
+=back
+
+
+
+B<WARNING>: methods other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.
+
+
+=head1 ATTRIBUTE METHODS
+
+These are the setter and getter methods for attributes in class
+Bio::Genex::Contact.
+
+B<NOTE>: To use the getter methods, you may either invoke the
+C<fetch()> method to retrieve all the values for an object, or else
+rely on L<delayed fetching|/DELAYED_FETCH> to retrieve the attributes
+as needed.
+
+=over 4
+
+
+=item id()
+
+C<id()> is a special attribute method that is common to all the Genex
+classes. This method returns the primary key of the given instance
+(and for class Bio::Genex::Contact it is synonomous with the
+C<con_pk()>method). The C<id()> method can be useful in writing
+generic methods because it avoids having to know the name of the
+primary key column. 
+
+=item con_pk()
+
+This is the primary key attribute for Bio::Genex::Contact. It has no setter method. 
+
+
+=item $value = type();
+
+=item type($value);
+
+Methods for the type attribute.
+
+
+=item $value = organization();
+
+=item organization($value);
+
+Methods for the organization attribute.
+
+
+=item $value = contact_person();
+
+=item contact_person($value);
+
+Methods for the contact_person attribute.
+
+
+=item $value = contact_person_phone();
+
+=item contact_person_phone($value);
+
+Methods for the contact_person_phone attribute.
+
+
+=item $value = contact_person_email();
+
+=item contact_person_email($value);
+
+Methods for the contact_person_email attribute.
+
+
+=item $value = org_phone();
+
+=item org_phone($value);
+
+Methods for the org_phone attribute.
+
+
+=item $value = org_email();
+
+=item org_email($value);
+
+Methods for the org_email attribute.
+
+
+=item $value = org_mail_address();
+
+=item org_mail_address($value);
+
+Methods for the org_mail_address attribute.
+
+
+=item $value = org_toll_free_phone();
+
+=item org_toll_free_phone($value);
+
+Methods for the org_toll_free_phone attribute.
+
+
+=item $value = org_fax();
+
+=item org_fax($value);
+
+Methods for the org_fax attribute.
+
+
+=item $value = url();
+
+=item url($value);
+
+Methods for the url attribute.
+
+
+=item $value = last_updated();
+
+=item last_updated($value);
+
+Methods for the last_updated attribute.
+
+
+=back
+
+
+
+B<WARNING>: methods other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.
+
+=head1 IMPLEMENTATION DETAILS
+
+These classes are automatically generated by the
+create_genex_classes.pl script.  Each class is a subclass of the
+Class::ObjectTemplate::DB class (which is in turn a subclass of
+Class::ObjectTemplate written by Sriram Srinivasan, described in
+I<Advanced Perl Programming>, and modified by Jason
+Stewart). ObjectTemplate implements automatic class creation in perl
+(there exist other options such as C<Class::Struct> and
+C<Class::MethodMaker> by Damian Conway) via an C<attributes()> method
+call at class creation time.
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+on Tue Jan 23 22:53:42 2001 by /home/jasons/work/GeneX-WWW-Installer/Genex/scripts/create_genex_class.pl --dir=/home/jasons/work/GeneX-WWW-Installer/Genex --target=Contact
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+

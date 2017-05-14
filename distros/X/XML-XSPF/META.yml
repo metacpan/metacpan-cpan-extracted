@@ -1,15 +1,26 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         XML-XSPF
-version:      0.7
-version_from: lib/XML/XSPF.pm
-installdirs:  site
+--- #YAML:1.0
+name:               XML-XSPF
+version:            0.7.1
+abstract:           API for reading & writing XSPF Playlists
+author:
+    - Dan Sully <dan | at | slimdevices.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
 requires:
-    Class::Accessor:               0.20
-    Date::Parse:                   2.20
-    HTML::Entities:                1.30
-    XML::Parser:                   2.30
-    XML::Writer:                   0.600
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+    Class::Accessor:  0.20
+    Date::Parse:      2.20
+    HTML::Entities:   1.30
+    XML::Parser:      2.30
+    XML::Writer:      0.600
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

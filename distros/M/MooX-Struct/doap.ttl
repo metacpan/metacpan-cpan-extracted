@@ -16,7 +16,11 @@
 	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/80043>;
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
 		doap-deps:on "B::Hooks::EndOfScope"^^doap-deps:CpanId;
-	], [ doap-deps:on "Data::OptList"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Object::ID"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Does"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Install"^^doap-deps:CpanId ];
+	], [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Object::ID"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Tiny 1.000000"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Exporter::Tiny 0.044"^^doap-deps:CpanId;
+	];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct>;
 	doap:created         "2012-10-04"^^xsd:date;
@@ -27,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-Struct";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-014>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-015>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-struct>;
@@ -296,6 +300,26 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Struct-0.014.tar.gz>;
 	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "MooX-Struct-0.015"^^xsd:string;
+	dc:issued            "2017-05-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Eliminate dependency on Scalar::Does. (Use Type::Tiny instead, which Scalar::Does depended on anyway.)";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Eliminate dependency on Sub::Install. (Use Exporter::Tiny instead, which Scalar::Does depended on anyway.)";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Eliminate dependency on Data::OptList.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Struct-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/haarg>
 	a                    foaf:Person;

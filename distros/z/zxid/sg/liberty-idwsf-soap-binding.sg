@@ -1,0 +1,19 @@
+# zxid/sg/liberty-idwsf-soap-binding.sg
+# Slightly edited, 14.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-soap-binding.sg,v 1.4 2009-09-05 02:23:41 sampo Exp $
+
+target(sbf, urn:liberty:sb)
+import(wsu, http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd)
+import(e,   http://schemas.xmlsoap.org/soap/envelope/)
+
+%FrameworkType:
+  any*  processContents(lax)
+  @version  -> %xs:string
+  @wsu:Id?
+  @e:mustUnderstand?
+  @e:actor?
+  @any
+  ;
+Framework   -> %sbf:FrameworkType
+
+#EOF

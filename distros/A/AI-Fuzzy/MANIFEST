@@ -1,7 +1,11 @@
+demo/cpu.pl
+demo/fuzz.pl
 Changes
 Fuzzy.pm
 MANIFEST
+README
 Makefile.PL
 test.pl
 lib/AI/Fuzzy/Set.pm
 lib/AI/Fuzzy/Label.pm
+lib/AI/Fuzzy/Axis.pm

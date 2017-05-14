@@ -6,6 +6,7 @@ META.yml
 Makefile.PL
 README
 README.mkdn
+TODO.txt
 dist.ini
 lib/Catalyst/View/Template/Lace.pm
 lib/Catalyst/View/Template/Lace/Factory.pm

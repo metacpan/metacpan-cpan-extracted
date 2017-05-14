@@ -1,0 +1,7 @@
+t/cmd.t
+lib/Nagios/Cmd/Read.pm
+lib/Nagios/Cmd.pm
+Build.PL
+MANIFEST
+README
+META.yml

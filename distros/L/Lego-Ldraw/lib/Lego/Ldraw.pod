@@ -274,7 +274,20 @@ Returns the full path to the file corresponding to the line's part.
 
   $ldraw_model = $line->explode;
 
-Returns a Lego::Ldraw object of the corresponding to the line's part. 
+Returns a Lego::Ldraw object corresponding to the line's part. 
+
+=head3 traslate
+
+  $line->traslate($x, $y, $z);
+
+Traslates the line by the amounts specified.
+
+=head3 traslate
+
+  $line->rotate($axis, $degrees);
+
+Rotates the line around the axis (first argument) by the amount specified
+in degrees (second argument).
 
 =head3 transform
 

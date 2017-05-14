@@ -3,11 +3,10 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = ('.', '../lib');
+    require './test.pl';
 }
 
-require 'test.pl';
-
-plan (127);
+plan (173);
 
 #
 # @foo, @bar, and @ary are also used from tie-stdarray after tie-ing them
@@ -21,23 +20,6 @@ is($tmp, 5);
 is($#ary, 3);
 is(join('',@ary), '1234');
 
-$[ = 1;
-@ary = (1,2,3,4,5);
-is(join('',@ary), '12345');
-
-$tmp = $ary[$#ary]; --$#ary;
-is($tmp, 5);
-# Must do == here beacuse $[ isn't 0
-ok($#ary == 4);
-is(join('',@ary), '1234');
-
-is($ary[5], undef);
-
-$#ary += 1;	# see if element 5 gone for good
-ok($#ary == 5);
-ok(!defined $ary[5]);
-
-$[ = 0;
 @foo = ();
 $r = join(',', $#foo, @foo);
 is($r, "-1");
@@ -118,29 +100,27 @@ is($foo, 'e');
 $foo = ('a','b','c','d','e','f')[1];
 is($foo, 'b');
 
-@foo = ( 'foo', 'bar', 'burbl');
-push(foo, 'blah');
-is($#foo, 3);
+@foo = ( 'foo', 'bar', 'burbl', 'blah');
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
 
-#curr_test(38);
+#curr_test(37);
 
 @foo = @foo;
-is("@foo", "foo bar burbl blah");				# 38
+is("@foo", "foo bar burbl blah");				# 37
 
 (undef,@foo) = @foo;
-is("@foo", "bar burbl blah");					# 39
+is("@foo", "bar burbl blah");					# 38
 
 @foo = ('XXX',@foo, 'YYY');
-is("@foo", "XXX bar burbl blah YYY");				# 40
+is("@foo", "XXX bar burbl blah YYY");				# 39
 
 @foo = @foo = qw(foo b\a\r bu\\rbl blah);
-is("@foo", 'foo b\a\r bu\\rbl blah');				# 41
+is("@foo", 'foo b\a\r bu\\rbl blah');				# 40
 
-@bar = @foo = qw(foo bar);					# 42
+@bar = @foo = qw(foo bar);					# 41
 is("@foo", "foo bar");
-is("@bar", "foo bar");						# 43
+is("@bar", "foo bar");						# 42
 
 # try the same with local
 # XXX tie-stdarray fails the tests involving local, so we use
@@ -150,55 +130,55 @@ is("@bar", "foo bar");						# 43
 {
 
     local @bee = @bee;
-    is("@bee", "foo bar burbl blah");				# 44
+    is("@bee", "foo bar burbl blah");				# 43
     {
 	local (undef,@bee) = @bee;
-	is("@bee", "bar burbl blah");				# 45
+	is("@bee", "bar burbl blah");				# 44
 	{
 	    local @bee = ('XXX',@bee,'YYY');
-	    is("@bee", "XXX bar burbl blah YYY");		# 46
+	    is("@bee", "XXX bar burbl blah YYY");		# 45
 	    {
 		local @bee = local(@bee) = qw(foo bar burbl blah);
-		is("@bee", "foo bar burbl blah");		# 47
+		is("@bee", "foo bar burbl blah");		# 46
 		{
 		    local (@bim) = local(@bee) = qw(foo bar);
-		    is("@bee", "foo bar");			# 48
-		    is("@bim", "foo bar");			# 49
+		    is("@bee", "foo bar");			# 47
+		    is("@bim", "foo bar");			# 48
 		}
-		is("@bee", "foo bar burbl blah");		# 50
+		is("@bee", "foo bar burbl blah");		# 49
 	    }
-	    is("@bee", "XXX bar burbl blah YYY");		# 51
+	    is("@bee", "XXX bar burbl blah YYY");		# 50
 	}
-	is("@bee", "bar burbl blah");				# 52
+	is("@bee", "bar burbl blah");				# 51
     }
-    is("@bee", "foo bar burbl blah");				# 53
+    is("@bee", "foo bar burbl blah");				# 52
 }
 
 # try the same with my
 {
     my @bee = @bee;
-    is("@bee", "foo bar burbl blah");				# 54
+    is("@bee", "foo bar burbl blah");				# 53
     {
 	my (undef,@bee) = @bee;
-	is("@bee", "bar burbl blah");				# 55
+	is("@bee", "bar burbl blah");				# 54
 	{
 	    my @bee = ('XXX',@bee,'YYY');
-	    is("@bee", "XXX bar burbl blah YYY");		# 56
+	    is("@bee", "XXX bar burbl blah YYY");		# 55
 	    {
 		my @bee = my @bee = qw(foo bar burbl blah);
-		is("@bee", "foo bar burbl blah");		# 57
+		is("@bee", "foo bar burbl blah");		# 56
 		{
 		    my (@bim) = my(@bee) = qw(foo bar);
-		    is("@bee", "foo bar");			# 58
-		    is("@bim", "foo bar");			# 59
+		    is("@bee", "foo bar");			# 57
+		    is("@bim", "foo bar");			# 58
 		}
-		is("@bee", "foo bar burbl blah");		# 60
+		is("@bee", "foo bar burbl blah");		# 59
 	    }
-	    is("@bee", "XXX bar burbl blah YYY");		# 61
+	    is("@bee", "XXX bar burbl blah YYY");		# 60
 	}
-	is("@bee", "bar burbl blah");				# 62
+	is("@bee", "bar burbl blah");				# 61
     }
-    is("@bee", "foo bar burbl blah");				# 63
+    is("@bee", "foo bar burbl blah");				# 62
 }
 
 # try the same with our (except that previous values aren't restored)
@@ -246,28 +226,13 @@ sub foo { "a" }
 @foo=(foo())[0,0];
 is ($foo[1], "a");
 
-# $[ should have the same effect regardless of whether the aelem
-#    op is optimized to aelemfast.
-
-
-
-sub tary {
-  local $[ = 10;
-  my $five = 5;
-  is ($tary[5], $tary[$five]);
-}
-
-@tary = (0..50);
-tary();
-
-
 # bugid #15439 - clearing an array calls destructors which may try
 # to modify the array - caused 'Attempt to free unreferenced scalar'
 
 my $got = runperl (
 	prog => q{
 		    sub X::DESTROY { @a = () }
-		    @a = (bless {}, 'X');
+		    @a = (bless {}, q{X});
 		    @a = ();
 		},
 	stderr => 1
@@ -379,33 +344,31 @@ sub test_arylen {
 }
 
 {
-    # I don't think that it's safe to fix bug #37350 in maint
+    # Bug #37350
     my @array = (1..4);
     $#{@array} = 7;
-    is ($#{4}, -1);
-    is ($#array, 7);
+    is ($#{4}, 7);
 
     my $x;
     $#{$x} = 3;
     is(scalar @$x, 4);
 
     push @{@array}, 23;
-    is ($array[8], 23);
+    is ($4[8], 23);
 }
 {
     # Bug #37350 -- once more with a global
     use vars '@array';
     @array = (1..4);
     $#{@array} = 7;
-    is ($#{4}, -1);
-    is ($#array, 7);
+    is ($#{4}, 7);
 
     my $x;
     $#{$x} = 3;
     is(scalar @$x, 4);
 
     push @{@array}, 23;
-    is ($array[8], 23);
+    is ($4[8], 23);
 }
 
 # more tests for AASSIGN_COMMON
@@ -420,6 +383,176 @@ sub test_arylen {
     (our $y, our $z) = ($x,$y);
     is("$x $y $z", "1 1 2");
 }
+{
+    # AASSIGN_COMMON detection with logical operators
+    my $true = 1;
+    our($x,$y,$z) = (1..3);
+    (our $y, our $z) = $true && ($x,$y);
+    is("$x $y $z", "1 1 2");
+}
 
+# [perl #70171]
+{
+ my $x = get_x(); my %x = %$x; sub get_x { %x=(1..4); return \%x };
+ is(
+   join(" ", map +($_,$x{$_}), sort keys %x), "1 2 3 4",
+  'bug 70171 (self-assignment via my %x = %$x)'
+ );
+ my $y = get_y(); my @y = @$y; sub get_y { @y=(1..4); return \@y };
+ is(
+  "@y", "1 2 3 4",
+  'bug 70171 (self-assignment via my @x = @$x)'
+ );
+}
+
+# [perl #70171], [perl #82110]
+{
+    my ($i, $ra, $rh);
+  again:
+    my @a = @$ra; # common assignment on 2nd attempt
+    my %h = %$rh; # common assignment on 2nd attempt
+    @a = qw(1 2 3 4);
+    %h = qw(a 1 b 2 c 3 d 4);
+    $ra = \@a;
+    $rh = \%h;
+    goto again unless $i++;
+
+    is("@a", "1 2 3 4",
+	'bug 70171 (self-assignment via my @x = @$x) - goto variant'
+    );
+    is(
+	join(" ", map +($_,$h{$_}), sort keys %h), "a 1 b 2 c 3 d 4",
+	'bug 70171 (self-assignment via my %x = %$x) - goto variant'
+    );
+}
+
+
+*trit = *scile;  $trit[0];
+ok(1, 'aelem_fast on a nonexistent array does not crash');
+
+# [perl #107440]
+sub A::DESTROY { $::ra = 0 }
+$::ra = [ bless [], 'A' ];
+undef @$::ra;
+pass 'no crash when freeing array that is being undeffed';
+$::ra = [ bless [], 'A' ];
+@$::ra = ('a'..'z');
+pass 'no crash when freeing array that is being cleared';
+
+# [perl #85670] Copying magic to elements
+SKIP: {
+    skip "no Scalar::Util::weaken on miniperl", 1, if is_miniperl;
+    require Scalar::Util;
+    package glelp {
+	Scalar::Util::weaken ($a = \@ISA);
+	@ISA = qw(Foo);
+	Scalar::Util::weaken ($a = \$ISA[0]);
+	::is @ISA, 1, 'backref magic is not copied to elements';
+    }
+}
+package peen {
+    $#ISA = -1;
+    @ISA = qw(Foo);
+    $ISA[0] = qw(Sphare);
+
+    sub Sphare::pling { 'pling' }
+
+    ::is eval { pling peen }, 'pling',
+	'arylen_p magic does not stop isa magic from being copied';
+}
+
+# Test that &PL_sv_undef is not special in arrays
+sub {
+    ok exists $_[0],
+      'exists returns true for &PL_sv_undef elem [perl #7508]';
+    is \$_[0], \undef, 'undef preserves identity in array [perl #109726]';
+}->(undef);
+# and that padav also knows how to handle the resulting NULLs
+@_ = sub { my @a; $a[1]=1; @a }->();
+is join (" ", map $_//"undef", @_), "undef 1",
+  'returning my @a with nonexistent elements'; 
+
+# [perl #118691]
+@plink=@plunk=();
+$plink[3] = 1;
+sub {
+    $_[0] = 2;
+    is $plink[0], 2, '@_ alias to nonexistent elem within array';
+    $_[1] = 3;
+    is $plink[1], 3, '@_ alias to nonexistent neg index within array';
+    is $_[2], undef, 'reading alias to negative index past beginning';
+    eval { $_[2] = 42 };
+    like $@, qr/Modification of non-creatable array value attempted, (?x:
+               )subscript -5/,
+         'error when setting alias to negative index past beginning';
+    is $_[3], undef, 'reading alias to -1 elem of empty array';
+    eval { $_[3] = 42 };
+    like $@, qr/Modification of non-creatable array value attempted, (?x:
+               )subscript -1/,
+         'error when setting alias to -1 elem of empty array';
+}->($plink[0], $plink[-2], $plink[-5], $plunk[-1]);
+
+$_ = \$#{[]};
+$$_ = \1;
+"$$_";
+pass "no assertion failure after assigning ref to arylen when ary is gone";
+
+
+{
+    # Test aelemfast for both +ve and -ve indices, both lex and package vars.
+    # Make especially careful that we don't have any edge cases around
+    # fitting an I8 into a U8.
+    my @a = (0..299);
+    is($a[-256], 300-256, 'lex -256');
+    is($a[-255], 300-255, 'lex -255');
+    is($a[-254], 300-254, 'lex -254');
+    is($a[-129], 300-129, 'lex -129');
+    is($a[-128], 300-128, 'lex -128');
+    is($a[-127], 300-127, 'lex -127');
+    is($a[-126], 300-126, 'lex -126');
+    is($a[  -1], 300-  1, 'lex   -1');
+    is($a[   0],       0, 'lex    0');
+    is($a[   1],       1, 'lex    1');
+    is($a[ 126],     126, 'lex  126');
+    is($a[ 127],     127, 'lex  127');
+    is($a[ 128],     128, 'lex  128');
+    is($a[ 129],     129, 'lex  129');
+    is($a[ 254],     254, 'lex  254');
+    is($a[ 255],     255, 'lex  255');
+    is($a[ 256],     256, 'lex  256');
+    @aelem =(0..299);
+    is($aelem[-256], 300-256, 'pkg -256');
+    is($aelem[-255], 300-255, 'pkg -255');
+    is($aelem[-254], 300-254, 'pkg -254');
+    is($aelem[-129], 300-129, 'pkg -129');
+    is($aelem[-128], 300-128, 'pkg -128');
+    is($aelem[-127], 300-127, 'pkg -127');
+    is($aelem[-126], 300-126, 'pkg -126');
+    is($aelem[  -1], 300-  1, 'pkg   -1');
+    is($aelem[   0],       0, 'pkg    0');
+    is($aelem[   1],       1, 'pkg    1');
+    is($aelem[ 126],     126, 'pkg  126');
+    is($aelem[ 127],     127, 'pkg  127');
+    is($aelem[ 128],     128, 'pkg  128');
+    is($aelem[ 129],     129, 'pkg  129');
+    is($aelem[ 254],     254, 'pkg  254');
+    is($aelem[ 255],     255, 'pkg  255');
+    is($aelem[ 256],     256, 'pkg  256');
+}
+
+# Test aelemfast in list assignment
+@ary = ('a','b');
+($ary[0],$ary[1]) = ($ary[1],$ary[0]);
+is "@ary", 'b a',
+   'aelemfast with the same array on both sides of list assignment';
+
+for(scalar $#foo) { $_ = 3 }
+is $#foo, 3, 'assigning to arylen aliased in foreach(scalar $#arylen)';
+
+{
+    my @a = qw(a b c);
+    @a = @a;
+    is "@a", 'a b c', 'assigning to itself';
+}
 
 "We're included by lib/Tie/Array/std.t so we need to return something true";

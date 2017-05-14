@@ -203,7 +203,7 @@ sub _overlap_filter {  # assumes left and right are numerically sorted
   
   # complex case, a join(), order() or group()
   # not sure this is handled correctly in all the crazy combos
-  if ($p =~ /^(?:join|order|group)/) {
+  if ($p =~ /^(?:join|order|group|complement)/) {
 
     $p =~ s/\((\d)+\.\d+\)\.\./$1../g;   # (1.10)..  => 1..
     $p =~ s/\.\.\(\d+\.(\d+)\)/..$1/g;   # ..(1.10) => ..10

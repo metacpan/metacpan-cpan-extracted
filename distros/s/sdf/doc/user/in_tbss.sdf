@@ -1,0 +1,107 @@
+H1: Spreadsheet calculations
+
+H2: Overview
+
+Spreadsheet style calculations have been introduced into SDF using the
+standard {{E<2[> E<2]>}} syntax with a prefix of {{+}} (or {{=}}) indicating
+that the expression is to be evaluated by the calculation routines.
+
+This extension has been loosely modelled on [[Microsoft]] {{Excel}}[[r]]
+in terms of the initial functions supported and the syntax used.
+
+The spreadsheet expression evaluator and the documentation below
+was written by Tim Hudson ({{EMAIL:tjh@cryptsoft.com}}).
+
+H2: Cells and Cellids
+
+Each {{cell}} in a table has an {{cellid}} which is made up of a
+single uppercase letter indicating the column index and a number
+indicating the row index (counting from 1 and excluding the
+heading rows). The upper left {{cell}} is hence {{A1}}.
+
+An example grid indicating {{cellid}}s:
+
+!block table; narrow
+Title1:Title2:Title3:Title4:Title5
+A1:B1:C1:D1:E1
+A2:B2:C2:D2:E2
+A3:B3:C3:D3:E3
+...:...:...:...:...
+A100:B100:C100:D100:E100
+!endblock
+
+A range of {{cellid}}s is specified using the syntax {{:cellid1:cellid2}}.
+For example: {{:A1:C1}} is exactly the same as {{A1,B1,C1}}
+
+H2: Spreadsheet Expressions
+
+An expression consists of a combination of standard Perl operators
+and spreadsheet functions and {{cellid}}s or {{cellid}} ranges.
+
+Standard Perl operators include:
+
+* + - * /
+
+H2: Spreadsheet Functions
+
+Spreadsheet functions use the syntax {{FUNCTION(ARG1,ARG2,...ARGN)}}.
+
+The following functions are supported:
+
+* {{AVERAGE}} - the average - SUM(ARGS)/COUNT(ARGS)
+* {{SUM}} - the sum of the args - same as ARG1+ARG2+...+ARGN
+* {{MIN}} - the minumum argument value 
+* {{MAX}} - the maximum argument value
+* {{COUNT}} - the number of arguments
+* {{PRODUCT}} - the product of the args - same as ARG1*ARGN*...*ARGN
+* {{ROWSUM}} - the {{SUM}} of all the cells in the row to the left of 
+               the current cell
+* {{ROWPROD}} - the {{PRODUCT}} of all the cells in the row to the 
+                left of the current cell
+* {{COLSUM}} - the {{SUM}} of all the cells in the column above the 
+               current cell
+* {{COLPROD}} - the {{PRODUCT}} of all the cells in the column above the 
+                current cell
+
+H2: An Example
+
+A simple example is shown below:
+
+!block verbatim
+!block table; style="grid"
+Count         Price        Total
+10            5            [[=A1*B1]]
+15            5.23         [[=ROWPROD]]
+[[=COLSUM]]   [[=B1+B2]]   [[=COLSUM]]
+!endblock
+!endblock
+
+This generates the result below. (Ok, summing two prices is
+meaningless, but it illustrates the syntax.)
+
+!block table; style="grid"
+Count         Price        Total
+10            5            [[=A1*B1]]
+15            5.23         [[=ROWPROD]]
+[[=COLSUM]]   [[=B1+B2]]   [[=COLSUM]]
+!endblock
+
+H2: Accessing Spreadsheet Values in Paragraph Text
+
+Values are available until the next table is processed so
+you can refer to data inside {{normal}} paragraphs after 
+the table like this E<2[>=A1E<2]> (which evaluates to [[=A1]]).
+
+H2: Recursive Expression Evaluation
+
+A spreadsheet expression will recursively evaluate any expressions
+contained in {{cells}} that are used in an expression. In the example
+above, the expression in {{cell}} {{C3}} depends on the results of the
+expression in {{cell}} {{C1}} and {{C2}}.
+
+H2: Disabling Calculations
+
+Calculation support for a table can be disabled by adding in 
+an attribute of {{nocalcs}}. (Without this, the pointers required to table
+data that are needed when doing spreadsheet calculations occur for each
+table cell.)

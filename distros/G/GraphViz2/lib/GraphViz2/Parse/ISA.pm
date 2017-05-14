@@ -18,7 +18,7 @@ use Tree::DAG_Node;
 
 has graph =>
 (
-	default  => sub{return {} },
+	default  => sub{return ''},
 	is       => 'rw',
 	#isa     => 'GraphViz2',
 	required => 0,
@@ -32,7 +32,7 @@ has is_a =>
 	required => 0,
 );
 
-our $VERSION = '2.45';
+our $VERSION = '2.46';
 
 # -----------------------------------------------
 

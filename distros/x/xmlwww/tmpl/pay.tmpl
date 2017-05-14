@@ -1,0 +1,26 @@
+<tmpl_include header.tmpl>
+
+<tmpl_var form_start>
+
+<tmpl_if action_pay2>
+You are about to make the following transfer:<br/>
+<table class="inline">
+	<tr><td>Transfer sum</td><td class="num"><tmpl_var sum></td></tr>
+	<tr><td>Card number</td><td><tmpl_var card></td></tr>
+	<tr><td>Mobile number</td><td><tmpl_var number></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">If the above is correct confirm the transfer by signing</td></tr>
+	<tr><td>Sign</td><td><tmpl_var field_pass>&nbsp;(Your password)</td></tr>
+</table>
+<tmpl_else>
+<table class="inline">
+	<tr><td>Number</td><td><tmpl_var field_number></td></tr>
+	<tr><td>Card</td><td><tmpl_var field_card></td></tr>
+	<tr><td>Sum</td><td><tmpl_var field_sum></td></tr>
+</table>
+</tmpl_if>
+<input class="<tmpl_var styleclass>_button" type="submit" value="GO" />
+
+<tmpl_var form_end>
+
+<tmpl_include footer.tmpl>

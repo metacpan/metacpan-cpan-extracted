@@ -29,7 +29,6 @@ sub init {
     $self->load_plugins();
 
     $self->{ua} = Plagger::UserAgent->new;
-    $self->{ua}->parse_head(0);
 }
 
 sub load_plugins {
@@ -87,6 +86,7 @@ sub handle {
     my $handler = first { $_->custom_feed_handle($args) } @{ $self->{plugins} };
     if ($handler) {
         $args->{match} = $handler->custom_feed_follow_link;
+        $args->{xpath} = $handler->custom_feed_follow_xpath;
         return $self->Plagger::Plugin::CustomFeed::Simple::aggregate($context, $args);
     }
 }
@@ -95,7 +95,7 @@ sub filter {
     my($self, $context, $args) = @_;
 
     my $handler = first { $_->handle_force($args) } @{ $self->{plugins} };
-    if ( !$handler && $args->{entry}->body && $args->{entry}->body =~ /<\w+>/ && !$self->conf->{force_upgrade} ) {
+    if ( !$handler && $args->{entry}->body && $args->{entry}->body->is_html && !$self->conf->{force_upgrade} ) {
         $self->log(debug => $args->{entry}->link . " already contains body. Skipped");
         return;
     }
@@ -124,12 +124,14 @@ sub filter {
     }
 
     # use Last-Modified to populate entry date, even if handler doesn't find one
+    # TODO: make this a separate plugin
     if ($res->last_modified && !$args->{entry}->date) {
         $args->{entry}->date( Plagger::Date->from_epoch($res->last_modified) );
     }
 
     my @plugins = $handler ? ($handler) : @{ $self->{plugins} };
 
+    my $upgraded;
     for my $plugin (@plugins) {
         if ( $handler || $plugin->handle($args) ) {
             $context->log(debug => $args->{entry}->permalink . " handled by " . $plugin->site_name);
@@ -138,20 +140,38 @@ sub filter {
             if ($data) {
                 $context->log(info => "Extract content succeeded on " . $args->{entry}->permalink);
                 my $resolver = HTML::ResolveLink->new( base => $args->{entry}->permalink );
+
+                # if body was already there, set that to summary
+                if ($args->{entry}->body) {
+                    $args->{entry}->summary($args->{entry}->body);
+                }
+
                 $data->{body} = $resolver->resolve( $data->{body} );
                 $args->{entry}->body($data->{body});
                 $args->{entry}->title($data->{title}) if $data->{title};
+                $args->{entry}->author($data->{author}) if $data->{author};
                 $args->{entry}->icon({ url => $data->{icon} }) if $data->{icon};
+                $args->{entry}->summary($data->{summary}) if $data->{summary};
 
                 # extract date using found one
                 if ($data->{date}) {
                     $args->{entry}->date($data->{date});
                 }
 
-                return 1;
+                $upgraded++;
+                last;
             }
         }
     }
+
+    # extract TITLE tag if title is not set yet
+    # TODO: make this a separate plugin
+    if (!$args->{entry}->title
+        and $args->{content} =~ m!<title>\s*(.*?)\s*</title>!is ) {
+        $args->{entry}->title( HTML::Entities::decode($1) );
+    }
+
+    return 1 if $upgraded;
 
     # failed to extract: store whole HTML if the config is on
     if ($self->conf->{store_html_on_failure}) {
@@ -167,6 +187,7 @@ package Plagger::Plugin::Filter::EntryFullText::Site;
 sub new { bless {}, shift }
 sub custom_feed_handle { 0 }
 sub custom_feed_follow_link { }
+sub custom_feed_follow_xpath { }
 sub handle_force { 0 }
 sub handle { 0 }
 
@@ -211,6 +232,10 @@ sub custom_feed_follow_link {
     $_[0]->{custom_feed_follow_link};
 }
 
+sub custom_feed_follow_xpath {
+    $_[0]->{custom_feed_follow_xpath};
+}
+
 sub handle_force {
     my($self, $args) = @_;
     $self->{handle_force}
@@ -232,6 +257,11 @@ sub xml_escape {
 sub extract {
     my($self, $args) = @_;
     my $data;
+
+    unless ($self->{extract} || $self->{extract_xpath}) {
+        Plagger->context->log(error => "YAML doesn't have either 'extract' nor 'extract_xpath'");
+        return;
+    }
 
     if ($self->{extract}) {
 	if (my @match = $args->{content} =~ /$self->{extract}/s) {
@@ -257,7 +287,9 @@ sub extract {
             if (@children) {
                 no warnings 'redefine';
                 local *HTML::Element::_xml_escape = \&xml_escape;
-                $data->{$capture} = $children[0]->as_XML;
+                $data->{$capture} = $children[0]->isElementNode
+                    ? $children[0]->as_XML
+                    : $children[0]->getValue;
             } else {
                 Plagger->context->log(error => "Can't find node matching $self->{extract_xpath}->{$capture}");
             }

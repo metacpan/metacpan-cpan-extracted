@@ -4,5 +4,4 @@
 @import url(fudge.css);
 @import url(bludge.css);
 div[name="hello"] {
-  color: blue;
-}
+  color: blue; }

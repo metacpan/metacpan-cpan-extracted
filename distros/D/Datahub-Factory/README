@@ -60,7 +60,21 @@ COMMANDS
     Fetch data from a local or remote source, convert it to an exchange
     format and export the data.
 
-    Datahub::Factory::Command::transport
+PLUGINS
+
+    Datahub::Factory uses a plugin-based architecture, making it easy to
+    extend with new functionality.
+
+    New commands can be added by creating a Perl module that contains a
+    command_name.pm file in the lib/Datahub/Factory/Command path.
+    Datahub::Factory uses the Datahub::Factory::Command namespace and
+    App::Cmd internally.
+
+    New Datahub::Factory::Importer, Exmporter and Fixer plugins can be
+    added in the same way, in the lib/Datahub/Factory/Importer, Exporter or
+    Fixer path. All plugins use the
+    Datahub::Factory::Importer/Exporter/Fixer namespace and the namespace
+    package as a Moose::Role.
 
 AUTHORS
 

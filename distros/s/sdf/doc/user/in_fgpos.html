@@ -1,0 +1,149 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Positioning a Figure</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_fg.html">Parent Topic</A> | <A HREF="in_fgtit.html">Previous Topic</A> | <A HREF="in_tb.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>4.4. Positioning a Figure</H1>
+<HR>
+<H2><A NAME="Horizontal Alignment">4.4.1. Horizontal Alignment</A></H2>
+<P>The alignment of a figure can be specified using the <EM>align</EM> attribute of the <A HREF="../ref/mimport.html">import</A> macro. The supported values are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Align</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Center
+</TD>
+<TD>
+centered within the region (the default)
+</TD>
+</TR>
+<TR>
+<TD>
+Left
+</TD>
+<TD>
+left side of region
+</TD>
+</TR>
+<TR>
+<TD>
+Right
+</TD>
+<TD>
+right side of region
+</TD>
+</TR>
+<TR>
+<TD>
+Inner
+</TD>
+<TD>
+inner side of region for double sided documents (otherwise Left)
+</TD>
+</TR>
+<TR>
+<TD>
+Outer
+</TD>
+<TD>
+outer side of region for double sided documents (otherwise Right)
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+  !import &quot;my_graph&quot;; align=Left
+</PRE>
+<HR>
+<H2><A NAME="Wide Figures">4.4.2. Wide Figures</A></H2>
+<P>By default, figures are aligned within the main text area. To align a figure within the full text area (i.e. including the side-head), use the <EM>wide</EM> attribute. For example:</P>
+<PRE>
+  !import &quot;my_graph&quot;; align=Left; wide
+</PRE>
+<HR>
+<H2><A NAME="Figures Within a List">4.4.3. Figures Within a List</A></H2>
+<P>To align a figure with a given list indent, use the <EM>listitem</EM> attribute. For example:</P>
+<PRE>
+  * The graphs are impressive:
+    - savings per year
+    !import &quot;my_graph&quot;; listitem=2
+</PRE>
+<HR>
+<H2><A NAME="Vertical Positioning">4.4.4. Vertical Positioning</A></H2>
+<P>The vertical position of a figure can be specified via the <EM>position</EM> attribute. The supported values are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Position</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Below
+</TD>
+<TD>
+below the current paragraph (the default)
+</TD>
+</TR>
+<TR>
+<TD>
+Top
+</TD>
+<TD>
+top of the current column/page
+</TD>
+</TR>
+<TR>
+<TD>
+Bottom
+</TD>
+<TD>
+bottom of the current column/page
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+   !import &quot;my_logo&quot;; position=Bottom; align=Right
+</PRE>
+<HR>
+<H2><A NAME="Wrapping Text Around a Figure">4.4.5. Wrapping Text Around a Figure</A></H2>
+<P>To wrap text around a figure, set the <EM>wrap_text</EM> attribute. For example:</P>
+<PRE>
+    !import &quot;my_graph&quot;; wrap_text
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>When generating HTML, text can be wrapped around a figure but unfortunately, the rules are quite different:</P>
+<OL>
+<LI>The wrap_text attribute has no affect.
+<LI>Text is implicitly wrapped if the <EM>align</EM> attribute is set to Left or Right.
+<LI>The wrapping must be explicitly disabled using the <A HREF="../ref/mclear.html">clear</A> macro.</OL>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_fg.html">Parent Topic</A> | <A HREF="in_fgtit.html">Previous Topic</A> | <A HREF="in_tb.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,21 @@
+---
+name: Colloquy-Bot-Simple
+version: 1.08
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: Simple robot interface for Colloquy
+license: open_source
+requires:
+  Carp: 0
+  Chatbot::TalkerBot: 1.8
+  Parse::Colloquy::Bot: 0.02
+recommends:
+  Test: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Colloquy::Bot::Simple:
+    file: lib/Colloquy/Bot/Simple.pm
+    version: 1.08
+generated_by: Module::Build version 0.2611

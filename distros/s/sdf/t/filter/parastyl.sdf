@@ -1,0 +1,41 @@
+# This file tests the parastyles filter
+
+# Setup a test section
+!macro MYTEXT
+MY1: My level 1 paragraph
+MY2: My level 2 paragraph
+MY3: My level 3 paragraph
+!endmacro
+
+# Test section before styles are declared
+!MYTEXT
+
+# Declare some styles
+!block parastyles
+Name        Category
+MY1
+MY2         example
+!endblock
+
+# Test section after definition but before declaration
+!MYTEXT
+
+# Define some styles
+!block parastyles
+Name        To          Attributes
+MY2         H2
+MY3         P3          notoc
+!endblock
+
+# Test section after definition
+!MYTEXT
+
+# Redefine some styles
+!block parastyles
+Name        To          Attributes
+MY2         P2          nopb
+MY3         MY2
+!endblock
+
+# Test section after redefinition
+!MYTEXT

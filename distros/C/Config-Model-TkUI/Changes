@@ -1,3 +1,21 @@
+1.362 2017-05-10
+
+  Bug fix:
+    * bind mouse button 2 and 3 only on release (avoid
+      double action on button press and then release)
+    * fix undef warnings when pasting a value in tree
+      before opening an editor or a viewer
+    * Depends on Config::Model 2.095 (forgotten in v1.360)
+    * add missing C-f C-c C-v bindings (other binding
+      ideas are welcome, see gh #3)
+
+  Improved functionality:
+    * TkUI: open hash or array after pasting data
+
+  Other:
+    * change layout of test model file
+    * dist.ini: update copyright years
+
 1.361 2017-01-22
 
   Bug fix:

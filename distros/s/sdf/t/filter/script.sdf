@@ -1,0 +1,13 @@
+# This file tests the script filter
+
+!block define
+Name    Value
+xyz     42
+abc     "My favorite station"
+!endblock
+
+!block script
+for $igc ('xyz', 'abc') {
+    print "variable $igc is $var{$igc}.\n";
+}
+!endblock

@@ -1,0 +1,12 @@
+@import url(page.css);
+
+form {
+	border: 1px solid;
+	color: #060;
+	background: #CFC;
+	padding: 0.67em 1em;
+}
+textarea {
+	width: 99.9%;
+}
+

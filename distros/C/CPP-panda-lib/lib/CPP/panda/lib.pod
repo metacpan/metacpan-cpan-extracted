@@ -1,0 +1,337 @@
+=head1 NAME
+
+CPP::panda::lib - Collection of useful functions and classes for C++.
+
+=head1 SYNOPSIS
+
+    #include <panda/lib.h>
+    #include <panda/lib/hash.h>
+    using namespace panda::lib;
+    
+    char* crypted = crypt_xor(source, slen, key, klen);
+    uint32_t val = hash32(str, len);
+    uint64_t val = hash64(str, len);
+    
+    
+    #include <panda/string.h>
+    using panda::string;
+    
+    string abc("lala");
+    ... // everything that std::string supports
+    
+    
+    #include <panda/lib/memory.h>
+    void* mem = StaticMemoryPool<128>::instance()->alloc(); // extremely fast memory allocations
+    void* mem = StaticMemoryPool<128>::tls_instance()->alloc(); // TLS version (still very fast)
+    void* mem = ObjectAllocator::instance()->alloc(256); // dynamic-size fast allocator
+    
+    class MyClass : public AllocatedObject<MyClass> {}
+    MyClass* obj = new MyClass(); // get fast and thread-safe allocations with less code
+
+    class SingleThreadedClass : public AllocatedObject<SingleThreadedClass, false> {} // faster but thread-unsafe
+    
+    // override behaviour from thread-unsafe to thread-safe
+    class MultiThreadedClass : public SingleThreadedClass, public AllocatedObject<MultiThreadedClass> {
+        using AllocatedObject<MultiThreadClass>::operator new;
+        using AllocatedObject<MultiThreadClass>::operator delete;
+    }
+    
+    MemoryPool mypool(32);
+    void* mem = mypool.alloc(); // custom pool with maximum speed, but thread-unsafe
+   
+=head1 C FUNCTIONS
+
+=head4 uint64_t panda::lib::hash64 (const char* str, size_t len)
+
+=head4 uint64_t panda::lib::hash64 (const char* str)
+
+=head4 uint32_t panda::lib::hash32 (const char* str, size_t len)
+
+=head4 uint32_t panda::lib::hash32 (const char* str)
+
+=head4 char* panda::lib::crypt_xor (const char* source, size_t slen, const char* key, size_t klen, char* dest = NULL)
+
+Performs XOR crypt. If 'dest' is null, mallocs and returns new buffer. Buffer must be freed by user manually via 'free'. If 'dest'
+is not null, places result into this buffer. It must have enough space to hold the result.
+
+=head4 panda::lib::h2be16, h2le16, be2h16, le2h16, h2be32, h2le32, be2h32, le2h32, h2be64, h2le64, be2h64, le2h64
+
+Endianess convertation functions. They use C<__builtin_bswap*>, C<_byteswap_*>, etc if possible. Otherwise they use code likely to be
+compiled as a single C<bswap> or C<rol> instruction.
+
+    #include <panda/lib/endian.h>
+    uint64_t network_order = h2be64(host_order);
+
+=head4 panda::dynamic_pointer_cast/const_pointer_cast/static_pointer_cast
+
+The same as std::*_pointer_cast for panda::shared_ptr and std::shared_ptr.
+
+=head4 panda::dyn_cast<>()
+
+Same as C<dynamic_cast>, but has a constant execution time, MUCH faster than C<dynamic_cast>.
+
+=head1 C++ CLASSES
+
+=head2 panda::string, panda::wstring, panda::u16_string, panda::u32_string, panda::basic_string
+
+This string is fully compatible with std::string API, however it supports COW (copy-on-write), even on substr-like functions, also supports
+creating from external buffer with destructor and from literal strings without copying or allocating anything,
+and therefore runs MUCH faster and zero-copy while still memory-managing in contrast to string_view.
+This approach is required like air for implementing TRULLY zero-copy parsers and so on.
+
+panda::string is an std::string drop-in replacement which has the same API but is much more flexible and allows for behaviors that in other case
+would lead to a lot of unnecessary allocations/copying.
+
+Most important features are:
+
+=over
+
+=item Copy-On-Write support (COW).
+
+    Not only when assigning the whole string but also when any form of substr() is applied.
+    If any of the COW copies is trying to change, it detaches from the original string, copying the content it needs.
+    
+=item External static(literal) string support
+ 
+    Can be created from external static(literal) data without allocating memory and copying it.
+    String will be allocated and copied when you first try to change it.
+    For example if a function accepts string, you may pass it just a string literal "hello" and nothing is allocated or copied and even the length
+    is counted in compile time.
+
+=item External dynamic string support
+    
+    Can be created from external dynamic(mortal) data without allocating memory and copying it.
+    External data will be deallocated via custom destructor when the last string that references to the external data is lost.
+    As for any other subtype of panda::string copying/substr/etc of such string does not copy anything
+    
+=item SSO support (small string optimization). Up to 23 bytes for 64bit / 11 bytes for 32bit.
+
+    It does not mean that all strings <= MAX_SSO_CHARS are in SSO mode. SSO mode is used only when otherwise panda::string would have to allocate
+    and copy something. For example if you call "otherstr = mystr.substr(offset, len)", then if mystr is not in SSO, otherstr will not use
+    SSO even if len <= MAX_SSO_CHARS, because it prefers to do nothing (COW-mode) instead of copying content to SSO location.
+    
+=item Support for getting r/w internal data buffer to manually fill it
+
+    The content of other strings which shares the data with current string will not be affected.
+    
+=item Reallocate instead of deallocate/allocate when possible, which in many cases is much faster
+ 
+=item Supports auto convertations between basic_strings with different Allocator template parameter without copying and allocating anything.
+
+    For example any basic_string<...> can be assigned to/from string as if they were of the same class.
+
+=item In either case, panda::basic_string will always do the operation in the way it could not be done faster even in custom C plain code for most common cases.
+
+=back
+
+All these features covers almost all generic use cases, including creating zero-copy cascade parsers which in other case would lead to a lot of pain.
+
+c_str() is not supported, because strings are not null-terminated, and even could not theoretically be
+ 
+=head3 SYNOPSIS
+
+    using panda::string;
+
+    string str("abcd"); // "abcd" is not copied, COW mode.
+    str.append("ef"); // str is copied on modification.
+    cout << str; // prints 'abcdef'
+    
+    void free_buf (char* buf, size_t size) { delete [] buf; }
+    char* mystr = new char[13];
+    memcpy(mystr, "hello, world", 13);
+    str.assign(mystr, 13, 13, free_buf); // external string mode with destructor, no allocations/copies
+    string str2 = str.substr(2, 5); // COW - no copy is done even for external strings
+    cout << str2; // 'llo, '
+    str.offset(10); // no move/copy/allocations
+    cout << str; // 'ld'
+    str.insert(1, ' hello '); // 'l hello d', no allocations! because source buffer (despite of that it is external) has space for that
+    
+    str2.erase(2); // no move/copy/allocations still! still points to external buffer
+    cout << str2; // 'll'
+    
+    str = str2; // COW mode
+    cout << str; // 'll'
+    str.append('!'); // detach on modification. no allocations though, because everything < 23 bytes goes to SSO mode
+    cout << str << str2; // 'll!ll'
+    
+    str.clear(); // nothing deallocated
+    str2.clear(); // last reference lost, free_buf() called
+    
+panda::string can be used in ostream's << operator.
+
+=head3 METHODS
+
+No docs sorry. See <panda/basic_string.h>
+
+=head2 panda::lib::MemoryPool
+
+Base object for fast memory allocations of particular size (commonly used for small objects allocation).
+This class is thread-unsafe, you can only allocate memory using this object from single thread at one time.
+It is about from 10x to 40x times faster than new+delete.
+
+=head3 METHODS
+
+=head4 MemoryPool (size_t blocksize)
+
+Creates object which allocates blocks of size C<blocksize>. There is no memory overheat, because it doesn't store any additional
+data before/after a memory block. However if you pass C<blocksize> less than 8 bytes, it will still allocate blocks large enough
+to hold 8 bytes.
+
+=head4 void* alloc ()
+
+Allocates new block. Can throw std::bad_alloc if no memory.
+
+=head4 void dealloc (void* ptr)
+
+Returns C<ptr> back to pool. If C<ptr> is a pointer that this object never allocated, the behaviour is undefined.
+
+=head4 ~MemoryPool
+
+Frees internal storage and returns memory to system. All pointers ever allocated by this object become invalid.
+
+=head2 template <int BLOCKSIZE> panda::lib::StaticMemoryPool
+
+This class provides access to singleton memory pool objects for particular block size. It is recommended to use memory pools
+via this interface to reduce memory consumption and fragmentation.
+
+=head3 METHODS
+
+=head4 static MemoryPool* instance ()
+
+Returns MemoryPool object for C<BLOCKSIZE> which is global to the whole process. This object is not thread-safe.
+
+=head4 static MemoryPool* tls_instance ()
+
+Returns MemoryPool object for C<BLOCKSIZE> which is global to the current thread. This object is not thread-safe.
+
+=head2 panda::lib::ObjectAllocator
+
+Sometimes you don't know the size of a block at compile time and therefore can't use StaticMemoryPool. From the other hand, creating
+MemoryPool objects for particular size every time is expensive. This class provides interface for allocating memory block of an
+arbitrary size. It holds a colletion of MemoryPool objects of various size which are created on-demand.
+
+=head3 METHODS
+
+=head4 ObjectAllocator ()
+
+Creates allocator object. However i would recommend using singleton interface via instance/tls_instance, see below.
+
+=head4 void* alloc (size_t size)
+
+Allocates block C<size> bytes long. If you pass C<size> less than 8 bytes, it will still allocate 8 bytes.
+
+=head4 void dealloc (void* ptr, size_t size)
+
+Returns C<ptr> back to pool. C<size> is required because MemoryPool doesn't store block sizes before/after blocks to avoid memory
+overheat. If you pass wrong size, or a pointer that was never allocated via this object, the behaviour is undefined.
+
+=head4 ~ObjectAllocator ()
+
+Frees internal storage of all pools and returns memory to system. All pointers ever allocated by this object become invalid.
+
+=head4 static ObjectAllocator* instance ()
+
+Returns ObjectAllocator object which is global to the whole process. This object is not thread-safe.
+
+=head4 static ObjectAllocator* tls_instance ()
+
+Returns ObjectAllocator object which is global to the current thread. This object is not thread-safe.
+
+=head2 template <class TARGET, bool THREAD_SAFE = true> panda::lib::AllocatedObject
+
+This class is a helper base class. If you inherit from it, objects of your class will be allocated via memory pools instead of
+using default new/delete operators.
+
+Normally, you would need to write this code in order to allocate your objects via MemoryPool:
+
+    class MyClass {
+        static void* operator new (size_t size) {
+            if (size == sizeof(MyClass)) return StaticMemoryPool<sizeof(MyClass)>::tls_instance()->alloc();
+            return ObjectAllocator::tls_instance()->alloc(size);
+        }
+        static void operator delete (void* p, size_t size) {
+            if (size == sizeof(MyClass)) StaticMemoryPool<sizeof(MyClass)>::tls_instance()->dealloc(p);
+            else ObjectAllocator::tls_instance()->dealloc(p, size);
+        }
+        ...
+    };
+    
+Size check (if/else) is needed to support inheritance, because in that case, size won't match sizeof(MyClass).
+Mostly, programmers use default operator ::new/::delete in case when sizes don't match, however ObjectAllocator can handle
+dynamic sizes and is much faster than default operators, so even in this case we save time.
+
+To avoid writing this code every time, just inherit from AllocatedObject passing your class name as a template parameter.
+You can pass C<false> as a second param to template if you don't need thread-safe allocations to achieve even more perfomance.
+
+    class MyClass : public AllocatedObject<MyClass> { ... }
+
+=head3 TIP
+
+    class MyChild : public MyClass { ... }
+    
+In this case we will still using memory pool, however via dynamic ObjectAllocator which is slightly slower.
+To restore original perfomance redefine new/delete operators again passing your child class name. We will also need to resolve
+multiple inheritance conflicts via C<using> operator.
+
+    class MyChild : public MyClass, public AllocatedObject<MyChild> {
+        using AllocatedObject<MyChild>::operator new;
+        using AllocatedObject<MyChild>::operator delete;
+        ...
+    }
+
+This code will allocate MyChild objects via static memory pool.
+
+=head2 panda::RefCounted
+
+A base class for refcounting.
+
+=head4 SYNOPSIS
+
+    #include <panda/refcnt.h>
+    
+    class MyClass : virtual public RefCounted { ... }
+    
+    MyClass* obj = new MyClass(...);
+    obj->retain();
+    obj->release();
+    shared_ptr<MyClass> myobj(obj);
+
+=head4 [protected] RefCounted ()
+
+Initializes object with refcnt = 0. You will need to call retain() if you want to hold this object. Call release() if you don't
+need it anymore.
+
+=head4 void retain () const
+
+Increments refcounter.
+
+=head4 void release () const
+
+Decrements refcounter and deletes the object if refcounter <= 0.
+
+=head4 int32_t refcnt () const
+
+Returns refcount.
+
+=head4 virtual void on_retain () const
+
+If you define this method in your class, it will be called on every C<retain()>, after refcnt is increased
+
+=head4 virtual void on_release () const
+
+If you define this method in your class, it will be called on every C<release()>, after C<refcnt> is decreased, but before object
+is deleted (in case if C<refcnt> reached 0). If C<refcnt> reaches 0 and you C<retain> the object in this callback, object will survive.
+
+=head2 template <class T> panda::shared_ptr<T>
+
+API is the same as for std::shared_ptr.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

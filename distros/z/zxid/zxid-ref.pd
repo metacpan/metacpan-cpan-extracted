@@ -1,0 +1,95 @@
+<<references:
+
+[SAML11core] SAML 1.1 Core, OASIS, 2003
+
+[SAML11bind] "Bindings and Profiles for the OASIS Security Assertion Markup Language (SAML) V1.1", Oasis Standard, 2.9.2003, oasis-sstc-saml-bindings-1.1
+
+[IDFF12] http://www.projectliberty.org/resources/specifications.php
+
+[IDFF12meta] Peted Davis, Ed., "Liberty Metadata Description and Discovery Specification", version 1.1, Liberty Alliance Project, 2004. (liberty-metadata-v1.1.pdf)
+
+[IDWSF08] Conor Cahill et al.: "Liberty Alliance Web Services Framework: A Technical Overview", Liberty Alliance, 2008. File: idwsf-intro-v1.0.pdf (from http://projectliberty.org/liberty/resource_center/papers)
+
+[IDWSF2Overview] Jonathan Tourzan and Yuzo Koga, eds.: "Liberty ID-WSF Web Services Framework Overview", Liberty Alliance, 2006. liberty-idwsf-overview-v2.0.pdf from http://projectliberty.org/resource_center/specifications
+
+[SAML2core] "Assertions and Protocols for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-core-2.0-os
+
+[SAML2prof] "Profiles for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-profiles-2.0-os
+
+[SAML2bind] "Bindings for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-bindings-2.0-os
+
+[SAML2context] "Authentication Context for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-authn-context-2.0-os
+
+[SAML2meta] Cantor, Moreh, Phipott, Maler, eds., "Metadata for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-metadata-2.0-os
+
+[SAML2security] "Security and Privacy Considerations for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-sec-consider-2.0-os
+
+[SAML2conf] "Conformance Requirements for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-conformance-2.0-os
+
+[SAML2iop] Eric Tiffany, ed.: "SAML 2.0 Interoperability Testing Procedures, Version 2.0", Liberty Alliance, 7 July 2006. File: Liberty-SAMLv2.0-TestPlan-v2.0-Final.pdf
+
+[SAML2iopDGI] "Test Plan for Liberty Alliance SAML Test Event, Test Criteria SAML 2.0 Version 3.0 Errata F", Drummon Group Inc, 2007. File: Liberty_DGI_4Q07_Interoperability_SAML_Test_Criteria_Test_Plan_vs.3.0.Errata.F.pdf
+
+[SAML2glossary] "Glossary for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-glossary-2.0-os
+
+[XML-C14N] XML Canonicalization (non-exclusive), http://www.w3.org/TR/2001/REC-xml-c14n-20010315; J. Boyer: "Canonical XML Version 1.0", W3C Recommendation, 15.3.2001, http://www.w3.org/TR/xml-c14n, RFC3076
+
+[XML-EXC-C14N] Exclusive XML Canonicalization, http://www.w3.org/TR/xml-exc-c14n/
+
+[Shibboleth] http://shibboleth.internet2.edu/shibboleth-documents.html
+
+[Hardt09] Dick Hardt and Yaron Goland: "Simple Web Token (SWT)", Version 0.9.5.1, Microsoft, Nov. 4, 2009 (SWT-v0.9.5.1.pdf)
+
+[Tom09] Allen Tom, et al.: "OAuth Web Resource Authorization Profiles (OAuth WRAP)", Version 0.9.7.2, Google, Microsoft, and Yahoo, Nov. 5, 2009 (WRAP-v0.9.7.2.pdf)
+
+[XMLENC] "XML Encryption Syntax and Processing", W3C Recommendation, 10.12.2002, http://www.w3.org/TR/xmlenc-core
+
+[XMLDSIG] "XML-Signature Syntax and Processing", W3C Recommendation, 12.2.2002, http://www.w3.org/TR/xmldsig-core, RFC3275
+
+[Disco2] Cahill, ed.: "Liberty ID-WSF Discovery service 2.0", liberty-idwsf-disco-svc-2.0-errata-v1.0.pdf from http://projectliberty.org/resource_center/
+
+[Disco12] Liberty ID-WSF Discovery service 1.2 (liberty-idwsf-disco-svc-v1.2.pdf)
+
+[PeopleSvc] "Liberty ID-WSF People Service Specification", liberty-idwsf-people-service-1.0-errata-v1.0.pdf from http://projectliberty.org/resource_center/specifications/
+
+[SecMech2] "Liberty ID-WSF 2.0 Security Mechanisms", liberty-idwsf-security-mechanisms-core-2.0-errata-v1.0.pdf from http://projectliberty.org/resource_center/specifications
+
+[SOAPAuthn2] "Liberty ID-WSF Authentication, Single Sign-On, and Identity Mapping Services Specification", liberty-idwsf-authn-svc-2.0-errata-v1.0.pdf from http://projectliberty.org/resource_center/specifications/
+
+[SOAPBinding2] "Liberty ID-WSF SOAP Binding Specification", liberty-idwsf-soap-binding-2.0-errata-v1.0.pdf from http://projectliberty.org/resource_center/specifications
+
+[DST21] Sampo Kellomäki and Jukka Kainulainen, eds.: "Liberty Data Services Template 2.1", Liberty Alliance, 2007. liberty-idwsf-dst-v2.1.pdf from http://projectliberty.org/resource_center/specifications/
+
+[DST20] Sampo Kellomäki and Jukka Kainulainen, eds.: "Liberty DST v2.0", Liberty Alliance, 2006.
+
+[DST11] Liberty DST v1.1
+
+[IDDAP] Sampo Kellomäki, ed.: "Liberty Identity based Directory Access Protocol", Liberty Alliance, 2007.
+
+[IDPP] Sampo Kellomäki, ed.: "Liberty Personal Profile specification", Liberty Alliance, 2003.
+
+[Interact11] Liberty ID-WSF Interaction Service protocol 1.1
+
+[FF12] Liberty ID Federation Framework 1.2, Protocols and Schemas
+
+[SUBS2] Liberty Subscriptions and Notifications specification
+
+[Schema1-2] Henry S. Thompson et al. (eds): XML Schema Part 1: Structures, 2nd Ed., WSC Recommendation, 28. Oct. 2004, http://www.w3.org/2002/XMLSchema
+
+[XML] http://www.w3.org/TR/REC-xml
+
+[RFC1950] P. Deutcsh, J-L. Gailly: "ZLIB Compressed Data Format Specification version 3.3", Aladdin Enterprises, Info-ZIP, May 1996
+
+[RFC1951] P. Deutcsh: "DEFLATE Compressed Data Format Specification version 1.3", Aladdin Enterprises, May 1996
+
+[RFC1952] P. Deutcsh: "GZIP file format specification version 4.3", Aladdin Enterprises, May 1996
+
+[RFC2246] TLSv1
+
+[RFC2251] LDAP
+
+[RFC3548] S. Josefsson, ed.: "The Base16, Base32, and Base64 Data Encodings", July 2003. (Section 4 describes Safebase64)
+
+[MS-MWBF] Microsoft Web Browser Federated Sign-On Protocol Specification, 20080207, http://msdn2.microsoft.com/en-us/library/cc236471.aspx
+
+>>

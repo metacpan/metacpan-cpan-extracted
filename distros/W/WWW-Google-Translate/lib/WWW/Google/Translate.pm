@@ -1,40 +1,39 @@
 package WWW::Google::Translate;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use strict;
 use warnings;
 {
-    use Carp;
     use URI;
-    use File::Spec;
-    use JSON qw( from_json );
-    use LWP::UserAgent;
-    use HTTP::Status qw( HTTP_BAD_REQUEST );
+    use Carp;
     use Readonly;
-    use English qw( -no_match_vars $EVAL_ERROR $OS_ERROR );
-    use Data::Dumper;
+    use LWP::UserAgent;
+    use JSON qw( from_json );
+    use Storable qw( store retrieve );
+    use HTTP::Status qw( HTTP_BAD_REQUEST );
+    use English qw( -no_match_vars $EVAL_ERROR );
 }
 
-my ( $REST_HOST, $REST_URL, $CONSOLE_URL, %SIZE_LIMIT_FOR, $TEMP_FILE );
+my ( $REST_HOST, $REST_URL, $CONSOLE_URL, %SIZE_LIMIT_FOR );
 {
-    Readonly $REST_HOST      => 'www.googleapis.com';
+    Readonly $REST_HOST      => 'translation.googleapis.com';
     Readonly $REST_URL       => "https://$REST_HOST/language/translate/v2";
-    Readonly $CONSOLE_URL    => "https://code.google.com/apis/console";
+    Readonly $CONSOLE_URL    => "https://console.developers.google.com/cloud-resource-manager";
     Readonly %SIZE_LIMIT_FOR => (
         translate => 2000,    # google states 2K but observed results vary
         detect    => 2000,
         languages => 9999,    # N/A
     );
-    Readonly $TEMP_FILE => 'www-google-translate.dat';
 }
 
 sub new {
-    my ( $class, $param_rh ) = @_;
+    my ( $class, $param_hr ) = @_;
 
     my %self = (
         key            => 0,
         format         => 0,
+        model          => 0,
         prettyprint    => 0,
         default_source => 0,
         default_target => 0,
@@ -43,60 +42,51 @@ sub new {
         force_post     => 0,
         rest_url       => $REST_URL,
         agent          => ( sprintf '%s/%s', __PACKAGE__, $VERSION ),
-        cache_results  => 0,
+        cache_file     => 0,
         headers        => {},
     );
 
-    for my $property ( keys %self ) {
-
-        if ( exists $param_rh->{$property} ) {
-
-            my $type          = ref $param_rh->{$property} || 'String';
+    for my $property ( keys %self )
+    {
+        if ( exists $param_hr->{$property} )
+        {
+            my $type          = ref $param_hr->{$property} || 'String';
             my $expected_type = ref $self{$property}       || 'String';
 
             croak "$property should be a $expected_type"
                 if $expected_type ne $type;
 
-            $self{$property} = delete $param_rh->{$property};
+            $self{$property} = delete $param_hr->{$property};
         }
     }
 
-    for my $property ( keys %{$param_rh} ) {
-
+    for my $property ( keys %{$param_hr} )
+    {
         carp "$property is not a supported parameter";
     }
 
-    for my $default (qw( cache_results default_source default_target )) {
-
-        if ( !$self{$default} ) {
-
+    for my $default (qw( cache_file default_source default_target ))
+    {
+        if ( !$self{$default} )
+        {
             delete $self{$default};
         }
     }
 
-    if ( exists $self{cache_results} ) {
+    if ( exists $self{cache_file} )
+    {
+        $self{cache_hr} = {};
 
-        my $tmpdir = File::Spec->tmpdir();
+        if ( stat $self{cache_file} )
+        {
+            $self{cache_hr} = retrieve( $self{cache_file} );
 
-        if ($tmpdir) {
+            if ( ref $self{cache_hr} ne 'HASH' )
+            {
+                unlink $self{cache_file};
 
-            $self{cache_rh}   = {};
-            $self{cache_file} = File::Spec->catfile( $tmpdir, $TEMP_FILE );
-
-            if ( stat $self{cache_file} ) {
-
-                croak $self{cache_file}, ' is not writable'
-                    if !-w $self{cache_file};
-
-                croak $self{cache_file}, ' is not readable'
-                    if !-r $self{cache_file};
-
-                $self{cache_rh} = do $self{cache_rh};
+                $self{cache_hr} = {};
             }
-        }
-        else {
-
-            carp 'unable to find a writable temp directory';
         }
     }
 
@@ -118,152 +108,153 @@ sub new {
 }
 
 sub translate {
-    my ( $self, $arg_rh ) = @_;
+    my ( $self, $arg_hr ) = @_;
 
     croak 'q is a required parameter'
-        if !exists $arg_rh->{q};
+        if !exists $arg_hr->{q};
 
-    my $result;
+    return
+        if not $arg_hr->{q};
 
-    if ( $arg_rh->{q} ) {
+    $arg_hr->{source} ||= $self->{default_source};
+    $arg_hr->{target} ||= $self->{default_target};
 
-        $arg_rh->{source} ||= $self->{default_source};
-        $arg_rh->{target} ||= $self->{default_target};
+    $self->{default_source} = $arg_hr->{source};
+    $self->{default_target} = $arg_hr->{target};
 
-        $self->{default_source} = $arg_rh->{source};
-        $self->{default_target} = $arg_rh->{target};
+    my %is_supported = (
+        format      => 1,
+        model       => 1,
+        prettyprint => 1,
+        q           => 1,
+        source      => 1,
+        target      => 1,
+    );
 
-        my %is_supported = (
-            format      => 1,
-            prettyprint => 1,
-            q           => 1,
-            source      => 1,
-            target      => 1,
-        );
+    my @unsupported
+        = grep { !exists $is_supported{$_} } keys %{$arg_hr};
 
-        my @unsupported = grep { !exists $is_supported{$_} }
-            keys %{$arg_rh};
+    croak "unsupported parameters: ", ( join ',', @unsupported )
+        if @unsupported;
 
-        croak "unsupported parameters: ", ( join ',', @unsupported )
-            if @unsupported;
-
-        if ( !exists $arg_rh->{prettyprint} ) {
-
-            if ( $self->{prettyprint} ) {
-
-                $arg_rh->{prettyprint} = $self->{prettyprint};
-            }
+    if ( !exists $arg_hr->{model} )
+    {
+        if ( $self->{model} )
+        {
+            $arg_hr->{model} = $self->{model};
         }
+    }
 
-        if ( !exists $arg_rh->{format} ) {
-
-            if ( $self->{format} ) {
-
-                $arg_rh->{format} = $self->{format};
-            }
-            elsif ( $arg_rh->{q} =~ m{ < [^>]+ > }xms ) {
-
-                $arg_rh->{format} = 'html';
-            }
-            else {
-
-                $arg_rh->{format} = 'text';
-            }
+    if ( !exists $arg_hr->{prettyprint} )
+    {
+        if ( $self->{prettyprint} )
+        {
+            $arg_hr->{prettyprint} = $self->{prettyprint};
         }
+    }
 
-        my $cache_key;
-
-        if ( exists $self->{cache_rh} ) {
-
-            $cache_key
-                = join ',',
-                map { $arg_rh->{$_} }
-                sort grep { exists $arg_rh->{$_} }
-                keys %is_supported;
-
-            return $self->{cache_rh}->{$cache_key}
-                if exists $self->{cache_rh}->{$cache_key};
+    if ( !exists $arg_hr->{format} )
+    {
+        if ( $self->{format} )
+        {
+            $arg_hr->{format} = $self->{format};
         }
-
-        $result = $self->_rest( 'translate', $arg_rh );
-
-        if ($cache_key) {
-
-            $self->{cache_rh}->{$cache_key} = $result;
-
-            my $count = keys %{ $self->{cache_rh} };
-
-            if ( $count % 10 == 0 ) {
-
-                $self->_store_cache();
-            }
+        elsif ( $arg_hr->{q} =~ m{ < [^>]+ > }xms )
+        {
+            $arg_hr->{format} = 'html';
         }
+        else
+        {
+            $arg_hr->{format} = 'text';
+        }
+    }
+
+    my $cache_key;
+
+    if ( exists $self->{cache_hr} )
+    {
+        $cache_key
+            = join '||', map { $arg_hr->{$_} }
+            sort grep { exists $arg_hr->{$_} && defined $arg_hr->{$_} }
+            keys %is_supported;
+
+        return $self->{cache_hr}->{$cache_key}
+            if exists $self->{cache_hr}->{$cache_key};
+    }
+
+    my $result = $self->_rest( 'translate', $arg_hr );
+
+    if ($cache_key)
+    {
+        $self->{cache_hr}->{$cache_key} = $result;
+
+        store( $self->{cache_hr}, $self->{cache_file} );
     }
 
     return $result;
 }
 
 sub languages {
-    my ( $self, $arg_rh ) = @_;
+    my ( $self, $arg_hr ) = @_;
 
     croak 'target is a required parameter'
-        if !exists $arg_rh->{target};
+        if !exists $arg_hr->{target};
 
     my $result;
 
-    if ( $arg_rh->{target} ) {
-
-        my @unsupported = grep { $_ ne 'target' } keys %{$arg_rh};
+    if ( $arg_hr->{target} )
+    {
+        my @unsupported = grep { $_ ne 'target' } keys %{$arg_hr};
 
         croak "unsupported parameters: ", ( join ',', @unsupported )
             if @unsupported;
 
-        $result = $self->_rest( 'languages', $arg_rh );
+        $result = $self->_rest( 'languages', $arg_hr );
     }
 
     return $result;
 }
 
 sub detect {
-    my ( $self, $arg_rh ) = @_;
+    my ( $self, $arg_hr ) = @_;
 
     croak 'q is a required parameter'
-        if !exists $arg_rh->{q};
+        if !exists $arg_hr->{q};
 
     my $result;
 
-    if ( $arg_rh->{q} ) {
-
-        my @unsupported = grep { $_ ne 'q' } keys %{$arg_rh};
+    if ( $arg_hr->{q} )
+    {
+        my @unsupported = grep { $_ ne 'q' } keys %{$arg_hr};
 
         croak "unsupported parameters: ", ( join ',', @unsupported )
             if @unsupported;
 
-        $result = $self->_rest( 'detect', $arg_rh );
+        $result = $self->_rest( 'detect', $arg_hr );
     }
 
     return $result;
 }
 
 sub _rest {
-    my ( $self, $operation, $arg_rh ) = @_;
+    my ( $self, $operation, $arg_hr ) = @_;
 
     my $url
         = $operation eq 'translate'
         ? $self->{rest_url}
-        : $self->{rest_url} . "/$operation";
+        : "$self->{rest_url}/$operation";
 
     my $force_post = $self->{force_post};
 
     my %form = (
         key => $self->{key},
-        %{$arg_rh},
+        %{$arg_hr},
     );
 
-    if ( exists $arg_rh->{source} && !$arg_rh->{source} ) {
-
+    if ( exists $arg_hr->{source} && !$arg_hr->{source} )
+    {
         delete $form{source};
-        delete $arg_rh->{source};
+        delete $arg_hr->{source};
     }
 
     my $byte_size = exists $form{q} ? length $form{q} : 0;
@@ -271,8 +262,8 @@ sub _rest {
 
     my ( $method, $response );
 
-    if ( $force_post || $byte_size > $get_size_limit ) {
-
+    if ( $force_post || $byte_size > $get_size_limit )
+    {
         $method = 'POST';
 
         $response = $self->{ua}->post(
@@ -281,8 +272,8 @@ sub _rest {
             'Content'                => \%form
         );
     }
-    else {
-
+    else
+    {
         $method = 'GET';
 
         my $uri = URI->new($url);
@@ -298,9 +289,9 @@ sub _rest {
 
     $message ||= $response->status_line();
 
-    if ( $response->code() == HTTP_BAD_REQUEST ) {
-
-        my $dump = join ",\n", map {"$_ => $arg_rh->{$_}"} keys %{$arg_rh};
+    if ( $response->code() == HTTP_BAD_REQUEST )
+    {
+        my $dump = join ",\n", map {"$_ => $arg_hr->{$_}"} keys %{$arg_hr};
 
         warn "request failed: $dump\n";
 
@@ -310,14 +301,12 @@ sub _rest {
         $host = uc $host;
 
         die "unsuccessful $operation $method for $byte_size bytes: ",
-            $message,
-            "\n",
-            "check that $host is has API Access for this API key",
-            "\n",
+            $message, "\n",
+            "check that $host has API Access for this API key", "\n",
             "at $CONSOLE_URL\n";
     }
-    elsif ( !$response->is_success() ) {
-
+    elsif ( !$response->is_success() )
+    {
         croak "unsuccessful $operation $method ",
             "for $byte_size bytes, message: $message\n";
     }
@@ -327,48 +316,21 @@ sub _rest {
 
     $json =~ s{ NaN }{-1}xmsg;    # prevent from_json failure
 
-    my $trans_rh;
+    my $trans_hr;
 
-    eval { $trans_rh = from_json( $json, { utf8 => 1 } ); };
+    eval { $trans_hr = from_json( $json, { utf8 => 1 } ); };
 
-    if ($EVAL_ERROR) {
+    if ($EVAL_ERROR)
+    {
         warn "$json\n$EVAL_ERROR";
         return $json;
     }
 
-    return $trans_rh;
-}
-
-sub _store_cache {
-    my ($self) = @_;
-
-    return
-        if !exists $self->{cache_rh} || !exists $self->{cache_file};
-
-    my $fh;
-
-    open $fh, '>', $self->{cache_file}
-        or die 'open ', $self->{cache_file}, ": $OS_ERROR";
-
-    local $Data::Dumper::Terse     = 1;
-    local $Data::Dumper::Indent    = 1;
-    local $Data::Dumper::Quotekeys = 0;
-    local $Data::Dumper::Sortkeys  = 1;
-
-    print {$fh} Dumper( $self->{cache_rh} )
-        or die 'print ', $self->{cache_file}, ": $OS_ERROR";
-
-    close $fh
-        or die 'close ', $self->{cache_file}, ": $OS_ERROR";
-
-    return 1;
+    return $trans_hr;
 }
 
 sub DESTROY {
     my ($self) = @_;
-
-    $self->_store_cache();
-
     return;
 }
 

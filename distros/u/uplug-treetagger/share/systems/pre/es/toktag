@@ -1,0 +1,78 @@
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+	'status' => 'tagTree',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+	'segments' => {
+	  'add IDs' => 1,
+	  'add parent id' => 1,
+	  'tag' => 'w',
+	},
+     'tagger' => {
+      'language' => 'spanish',
+      'startup base' => 'tree_',
+	'encoding' => 'iso-8859-15',
+     },
+     'output' => {
+#        'attribute' => 'pos',
+        'attributes' => 'text:tree:lem',
+        'pattern' => '^(.*)\t+(.*)\t+(.*)$',
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n<s>\n",
+        'tag delimiter' => '\s+',
+	'encoding' => 'iso-8859-15',
+     },
+     'input' => {
+        'token delimiter' => " ",
+        'sentence delimiter' => "\n<s>\n",
+     },
+     'input replacements' => {
+        ## non breaking space --> normal space
+        ' ' => ' '
+     },
+     'output replacements' => {
+        '<unknown>' => '',
+     },
+  },
+  'module' => {
+    'program' => 'uplug-toktag',
+    'location' => '$UplugBin',
+    'name' => 'tree tagger (spanish)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'attr' => 'parameter:output:attribute',
+       'char' => 'output:text:encoding',
+	'lang' => 'parameter:tagger:language',
+       'co' => 'output:text:encoding',
+       'ci' => 'input:text:encoding',
+       'r' => 'input:text:root',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=sent,language=de)'
+	  },
+       },
+  }
+}

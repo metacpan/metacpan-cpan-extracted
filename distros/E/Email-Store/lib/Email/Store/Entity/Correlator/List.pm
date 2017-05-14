@@ -1,4 +1,5 @@
 package Email::Store::Entity::Correlator::List;
+use strict;
 
 # People sometimes reply to lists with the 'name' as the person they're
 # responding to. Hence, if we detect that the address belongs to a

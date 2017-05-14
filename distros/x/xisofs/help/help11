@@ -1,0 +1,1 @@
+Allow files to begin with a period. Usually a leading dot is replaced with an underscore in order to maintain MS-DOS compatability.

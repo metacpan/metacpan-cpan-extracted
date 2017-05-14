@@ -1,0 +1,55 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: Creating New Phrase Styles</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_para.html">Previous Topic</A> | <A HREF="ex_tbl.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.5. Creating New Phrase Styles</H1>
+<HR>
+<H2><A NAME="Using Event Processing">1.5.1. Using Event Processing</A></H2>
+<P>SDF's event processing feature makes it easy to create a new phrase style from an existing one. For example, the following line makes <EM>LIB</EM> an alias of the <EM>S</EM> style:</P>
+<PRE>
+!on phrase 'LIB';; $style='S'
+</PRE>
+<HR>
+<H2><A NAME="Using Mapping Tables">1.5.2. Using Mapping Tables</A></H2>
+<P>SDF uses the <EM>phrasestyles</EM> filter to define the mapping between an SDF phrase style and a target phrase style. For example:</P>
+<PRE>
+!block phrasestyles
+Name    To
+
+# Emphasis
+A       Default
+B       Bold
+I       Italic
+N       Normal
+U       Underline
+E       Filename
+JUMP    Jump
+1       =I
+2       =B
+3       =U
+S       =2
+SUB     Subscript
+SUP     Superscript
+!endblock
+</PRE>
+<HR>
+<H2><A NAME="Creating New Target Phrase Styles">1.5.3. Creating New Target Phrase Styles</A></H2>
+<P>SDF makes it easy to define new target phrase styles by inheriting configuration details from an existing style.</P>
+<P>See the <TT>look/simple/mif.sdn</TT> file in the SDF distribution for examples.</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_para.html">Previous Topic</A> | <A HREF="ex_tbl.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

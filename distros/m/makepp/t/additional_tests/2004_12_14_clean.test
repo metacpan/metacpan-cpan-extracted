@@ -1,0 +1,37 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	19	755	1154549128	1342866883	makepp_test_script.pl
+# Ignore child process INT (matters on AIX)
+$SIG{INT} = 'IGNORE';
+
+eval { makepp } and die 1;
+-f 'x' and -f '.makepp/x.mk' or die 2;
+
+for( qw(a lb) ) {
+  unlink;
+  open my $fh, '>', $_;
+  close $fh;
+}
+
+makepp \'clean';
+-f 'la' || -f 'b' || -f 'x' and die 3;
+-f 'a' && -f 'lb' or die 4;
+
+mkdir '.makepp';		# test harness needs it
+c_echo 'N_FILES\0010\0010\0010\01', '-o.makepp/log';
+1;
+###	15	644	1103069835	1253820874	Makeppfile
+x: la lb
+	&touch $@
+	perl { Mpp::is_windows ? die : kill 'INT', $$ }
+
+a:
+	&echo a -o a
+
+la: a
+    &ln -fs a la
+
+b:
+	&echo b -o b
+
+lb: b
+    &ln -fs b lb

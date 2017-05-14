@@ -3,7 +3,7 @@ package Mastodon::Role::UserAgent;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use v5.10.0;
 use Moo::Role;
@@ -167,7 +167,7 @@ sub _request {
 }
 
 sub _prepare_data {
-  my ($self, $url, $data) = @_;
+  my ($self, $data) = @_;
   $data //= {};
 
   foreach my $key (keys %{$data}) {

@@ -1,0 +1,23 @@
+LICENSE
+Changes
+Makefile.PL
+README
+MANIFEST
+VERSION
+
+lib/Acme/Time/Asparagus.pm
+lib/Acme/Time/Aubergine.pm
+lib/Acme/Time/DimSum.pm
+lib/Acme/Time/Donut.pm
+lib/Acme/Time/FooClock.pm
+
+t/01_ini.t
+t/02_times.t
+t/03_aubergine.t
+t/04_dimsum.t
+t/05_donut.t
+
+bin/veggietime
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

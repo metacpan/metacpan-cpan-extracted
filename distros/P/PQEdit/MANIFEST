@@ -1,0 +1,16 @@
+ChangeLog			History of this package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+README				Get you started with this package
+TODO				The To-Do list for the library
+pqedit.PL                       Writes pqedit.cgi script
+pqedit.pod			PQ Edit documentation
+PQLOGIN.pm                      Optional PQLOGIN module
+test.pl                         Run tests
+t/test1.in                      Input file for test 1
+pqweb/mssql_pqweb.sql		SQL DDL file to create optional pqweb database
+pqweb/sybase_pqweb.sql		SQL DDL file to create optional pqweb database
+pqweb/pqweb.jpg                 JPEG diagram of schema of optional pqweb database
+pqweb/result_types.bcp          Data file containing values for the pqweb result_types table (bcp -c format)
+pqweb/web_elements.bcp          Data file containing values for the pqweb result_types table (bcp -c format)
+pqweb/web_property.bcp          Data file containing values for the pqweb result_types table (bcp -c format)

@@ -1,121 +1,136 @@
 package AI::Fuzzy::Label;
 
 ## Fuzzy Label #### 
+use overload (	'>'  => \&greaterthan,
+		'<'  => \&lessthan,
+		'>=' => \&greaterequal,
+		'<=' => \&lessequal,
+		'<=>'=> \&spaceship,
+		'""'  => \&stringify 
+	    );
 
 sub new {
-
-    my ($class) = @_;
+    my ($class, $name, $low, $mid, $high) = @_;
     my $self = {};
 
-    $self->{labels} = {};
-
     bless $self, $class;
+
+    $self->{name} = $name;
+    $self->{low}  = $low;
+    $self->{mid}  = $mid;
+    $self->{high} = $high;
+
     return $self;
 }
 
-sub addlabel {
+sub name {
+    my ($self, $name) = @_;
 
-    # adds a label for a range of values..
+    $self->{name} = $name if ($name);
+    return $self->{name};
+}
 
-    my ($self, $name, $low, $mid, $high) = @_;
+sub stringify {
+    my $self=shift;
+    return qq([$self->{name}: $self->{low},$self->{mid},$self->{high}]); 
+}
 
-    $self->{labels}->{$name}->{low}  = $low;
-    $self->{labels}->{$name}->{mid}  = $mid;
-    $self->{labels}->{$name}->{high} = $high;
+sub lessthan {
+    my ($self, $that) = @_;
 
-    return 1;
+    if ($self->{low} < $that->{low}) {
+	return 1;
+    } else {
+	return 0;
+    }
+}
+
+sub lessequal {
+    my ($self, $that) = @_;
+
+    if ($self->{low} <= $that->{low}) {
+	return 1;
+    } else {
+	return 0;
+    }
+}
+
+sub greaterthan {
+    my ($self, $that) = @_;
+
+    if ($self->{high} > $that->{high}) {
+	return 1;
+    } else {
+	return 0;
+    }
+}
+
+sub greaterequal {
+    my ($self, $that) = @_;
+
+    if ($self->{high} >= $that->{high}) {
+	return 1;
+    } else {
+	return 0;
+    }
+}
+
+sub between {
+    my ($self, $that1, $that2) = @_;
+
+    if ( ( $that1 <= $self and $self <= $that2) ||
+	 ( $that2 <= $self and $self <= $that1) ) {
+	return 1;
+    } else {
+	return 0;
+    }
+}
+
+sub spaceship {
+    my ($self, $that) = @_;
+
+    return  ( $self->{mid} <=> $that->{mid} );
 }
 
 sub applicability {
-
     # this function should be called something else..
-    # calculates to what degree $label applies to a $value
+    # calculates to what degree this label applies to a $value
 
-    my ($self, $value, $label) = @_;
+    my ($self, $value) = @_;
     my $membership = 0;
 
-    $label = $self->{labels}->{$label};
+    # if the low and mid points are same as value, full membership
+    # same if mid and high are same as value
+    if ($self->{mid} == $self->{low} && $value == $self->{low}) { return 1 };  
+    if ($self->{high} == $self->{mid} && $value == $self->{high}) { return 1 };  
 
     # m = slope of the line.. (change in y/change in x) 
     #     change in y is 1 as membership increases, -1 as it decreases
-
-    my $mIncreasing =  1 / ($label->{mid} - $label->{low});
-    my $mDecreasing = -1 / ($label->{high} - $label->{mid});
+    my $mIncreasing =  1 / ($self->{mid} - $self->{low});
+    my $mDecreasing = -1 / ($self->{high} - $self->{mid});
 
     # reject values that are "out of bounds"
-
     return ($membership = 0)
-	if ($value <= $label->{low} ) or ($value >= $label->{high} );
+	if ($value <= $self->{low} ) or ($value >= $self->{high} );
 
     # now calculate membership:
     # y=mx+b , just like in algebra
-
-    if ($value < $label->{mid}) {
-	$membership = ($value - $label->{low}) * $mIncreasing;
-    } elsif ($value == $label->{mid}) {
+    if ($value < $self->{mid}) {
+	$membership = ($value - $self->{low}) * $mIncreasing;
+    } elsif ($value == $self->{mid}) {
         $membership = 1;
     } else {
-	$membership = (($value - $label->{mid}) * $mDecreasing) + 1;
+	$membership = (($value - $self->{mid}) * $mDecreasing) + 1;
     }
     
     return $membership;
 }
 
-sub label {
-
-    my ($self, $value) = @_;
-
-    my $label;
-    my %weight;
-    my $total_weight = 0;
-    my @range = $self->range();
-
-    # first, find out the applicability of each label
-    # and weight the labels accordingly.
-
-    foreach $label (@range) {
-	my $w = $self->applicability($value, $label);
-	next unless $w > 0;
-
-	$weight{$label} = $w;
-	$total_weight += $weight{$label};
-    }
-
-    # in list context, just return the weights
-    if (wantarray) {
-	return %weight;
-    }
-
-    # give up if no labels apply
-    return 0 unless $total_weight > 0;
-
-    # otherwise, use those weights as probabilities
-    # and randomly pick a label:
-
-    my $v = rand $total_weight;
-    my $x = 0;
-
-    # it doesn't matter how %weight is sorted..
-    foreach $label (keys %weight) {
-	$x += $weight{$label};
-	return $label if $x >= $v;
-    }  
-
-    # and if none of that worked..
-
-    return 0;
-}
-
-
 sub range {
-    # returns a list of labels, sorted by their midpoints
+    # returns the distance from one endpoint to the other
+    
     my ($self) = @_;
-    my $l = $self->{labels};
-    return sort { $l->{$a}->{mid} <=> $l->{$b}->{mid} } keys %{$l};
+    return abs( $self->{high} - $self->{low} );
 }
 
 1;
-
-
-
-

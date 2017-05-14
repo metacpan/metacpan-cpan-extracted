@@ -1,4 +1,0 @@
-Error: Expected identifier.
-  @extend &;
-          ^
-  spec/libsass-issues/issue_1527/extend/input.scss 2:11  root stylesheet

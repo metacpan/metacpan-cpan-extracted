@@ -1,6 +1,6 @@
 
 /*
- * Copyright © 2001 Novell, Inc. All Rights Reserved.
+ * Copyright Â© 2001 Novell, Inc. All Rights Reserved.
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Artistic License, as specified in the README file.
@@ -567,7 +567,7 @@ nw_rmdir(const char *dir)
 }
 
 DIR *
-nw_opendir(char *filename)
+nw_opendir(const char *filename)
 {
 	char	*buff = NULL;
 	int		len = 0;
@@ -843,7 +843,7 @@ sys_intern_clear(pTHX)
 void
 sys_intern_dup(pTHX_ struct interp_intern *src, struct interp_intern *dst)
 {
-
+    PERL_ARGS_ASSERT_SYS_INTERN_DUP;
 }
 #endif	/* HAVE_INTERP_INTERN */
 
@@ -869,12 +869,6 @@ perl_clone_host(PerlInterpreter* proto_perl, UV flags)
 #endif
 
 // Some more functions:
-
-char *
-nw_get_sitelib(const char *pl)
-{
-    return (NULL);
-}
 
 int
 execv(char *cmdname, char **argv)

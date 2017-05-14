@@ -1,0 +1,117 @@
+# $Id$
+#
+# >>Title::     Simple Filter Plug-In
+#
+# >>Copyright::
+# Copyright (c) 1996-1997, Tim Hudson (tjh@mincom.com)
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 04-Jan-97 tjh		exec param of simple now returns modified $line
+# 01-Jan-97 tjh		tidied up a lot of things and added "exec" option
+# 19-Jun-96 tjh		original coding
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+#
+# >>Description::
+# This adds the "simple" filter with parameters:
+#
+# * pre - inserted {{before}} the block
+# * post - inserted {{after}} the block
+# * exec - executed for each line with $line containing the text line.
+#
+# >>Limitations::
+#
+
+$simple_debug=0;
+
+# simple filter ... filter that allows simple prepending and
+#                   appending of text to a block using the
+#                   event processing mechanism
+#
+#!on filter "testsimple";; \
+#    $name='simple'; \
+#    $params.='pre="Hi there#Tim";post="post"';
+#
+#!block testsimple
+#This is normal text
+#!endblock
+#
+#!on filter "product_defines";; \
+#        $name='simple'; \
+#        $params.=';pre="!block products<SEMICOLON> data#Name:Jump"'; \
+#        $params.=';exec="&AddProduct(\$line)"'; \
+#        $params.=';post="!endblock#!DefineProducts"'
+#
+
+@_simple_FilterParams = (
+    'Name       Type        Rule',
+    'pre        string',
+    'post       string',
+    'exec       string',
+);
+
+push(@_simple_FilterParams,@_table_FilterParams);
+
+sub simple_Filter {
+    local(*text, %param) = @_;
+    local($style, $line, $pre, $post, $other_params);
+
+    if ($simple_debug) {
+	for $key (keys %param) {
+	    print STDERR "SIMPLE: param{$key}=\"$param{$key}\"\n";
+	}
+    }
+
+    $pre=$param{"pre"};
+    $post=$param{"post"};
+
+    # allow for being able to process lines of text if the
+    # user has chosen to have an exec routine
+    if (defined $param{"exec"}) {
+	print STDERR "EXEC:$param{'exec'}\n" if ($simple_debug);
+	for $line (@text) {
+	    print STDERR "LINE-IN:$line\n" if ($simple_debug);
+	    $line = eval $param{'exec'};
+	    print STDERR "LINE-OUT:$line\n" if ($simple_debug);
+	}
+    }
+
+    delete $param{"pre"};
+    delete $param{"post"};
+    delete $param{"exec"};
+
+    if ($simple_debug) {
+	for $key (keys %param) {
+	    print STDERR "SIMPLE: param{$key}=\"$param{$key}\"\n";
+	}
+    }
+
+    $other_params='';
+    for $key (keys %param) {
+    	$other_params .= "$key=\"" . $param{$key} . "\"";
+    }
+
+    if ($simple_debug) {
+    	print STDERR "other_params=$other_params\n";
+    }
+
+    $pre =~ s/<SEMICOLON>/;/g;
+    $pre =~ s/<PARAMS>/$other_params/g;
+    $post =~ s/<SEMICOLON>/;/g;
+    $post =~ s/<PARAMS>/$other_params/g;
+
+    # slip some text at the beginning 
+    unshift(@text,split(/#/,$pre));
+
+    # slip some text at the end
+    push(@text,split(/#/,$post));
+
+    print STDERR join("\n",@text) . "\n" if ($simple_debug);
+}
+
+# package return value
+1;

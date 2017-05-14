@@ -1,0 +1,15 @@
+Changelog
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Graph/Simple.pm
+t/Graph/Simple.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-unused-vars.t
+xt/perlcritic.rc
+xt/perltidy.rc

@@ -1,0 +1,45 @@
+.# Title: Subroutine and return
+.#
+Line 1
+.#
+.# Check that a .return ends a sub
+.sub sub1
+Sub1 line 1
+.return
+Sub1 line 2
+.done
+After sub1 def
+.sub1
+After calling sub1
+.#
+.# Check that return inside a .if works
+.sub sub2
+Sub2 line 1
+.if 1
+.return
+.fi
+Sub2 line 2
+.done
+.sub2
+.#
+.# Check that return unwinds local variables
+.sub sub3
+Sub3 line 1
+.eval sub3 va = \v{va}
+.local va
+.let va := 'va 2'
+.eval sub3 va = \v{va}
+.if 1
+.local va
+.let va := 'va 3'
+.eval sub3 va = \v{va}
+.return
+.fi
+Sub3 line 2
+.done
+.#
+.let va := 'va 1'
+.eval va = \v{va}
+.sub3
+.eval va = \v{va}
+EOF

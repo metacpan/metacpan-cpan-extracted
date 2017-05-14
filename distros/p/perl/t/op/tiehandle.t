@@ -2,17 +2,19 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    require './test.pl';
+    set_up_inc(qw '../lib ../dist/base/lib');
 }
 
 my @expect;
 my $data = "";
 my @data = ();
 
-require './test.pl';
-plan(tests => 41);
+plan(tests => 67);
 
 sub compare {
+    local $Level = $Level + 1;
+
     return unless @expect;
     return ::fail() unless(@_ == @expect);
 
@@ -59,6 +61,11 @@ sub READ {
     3;
 }
 
+sub EOF {
+    ::compare(EOF => @_);
+    @data ? '' : 1;
+}
+
 sub WRITE {
     ::compare(WRITE => @_);
     $data = substr($_[1],$_[3] || 0, $_[2]);
@@ -67,7 +74,6 @@ sub WRITE {
 
 sub CLOSE {
     ::compare(CLOSE => @_);
-    
     5;
 }
 
@@ -90,10 +96,17 @@ is($r, 1);
 $r = printf $fh @expect[2,3];
 is($r, 2);
 
-$text = (@data = ("the line\n"))[0];
+@data = ("the line\n");
+@expect = (EOF => $ob, 1);
+is(eof($fh), '');
+
+$text = $data[0];
 @expect = (READLINE => $ob);
 $ln = <$fh>;
 is($ln, $text);
+
+@expect = (EOF => $ob, 0);
+is(eof, 1);
 
 @expect = ();
 @in = @data = qw(a line at a time);
@@ -160,6 +173,37 @@ is($r, 1);
     @expect = (PRINT => $ob,"some","text");
     $r = print STDERR @expect[2,3];
     is($r, 1);
+}
+
+{
+    package Bar::Say;
+    use feature 'say';
+    use base qw(Implement);
+
+    my $ors;
+    sub PRINT     {
+        $ors = $\;
+        my $self = shift;
+        return $self->SUPER::PRINT(@_);
+    }
+
+    my $fh = Symbol::gensym;
+    @expect = (TIEHANDLE => 'Bar::Say');
+    ::ok( my $obj = tie *$fh, 'Bar::Say' );
+
+    local $\ = 'something';
+    @expect = (PRINT => $obj, "stuff", "and", "things");
+    ::ok( print $fh @expect[2..4] );
+    ::is( $ors, 'something' );
+    
+    ::ok( say $fh @expect[2..4] );
+    ::is( $ors, "\n",        'say sets $\ to \n in PRINT' );
+    ::is( $\,   "something", "  and it's localized" );
+
+    local $\;
+    ::ok( say $fh @expect[2..4] );
+    ::is( $ors, "\n",        'say sets $\ to \n in PRINT' );
+    ::is( $\,   undef, "  and it's localized, even for undef \$\\" );
 }
 
 {
@@ -245,4 +289,22 @@ is($r, 1);
     sub READLINE { "foobar\n" }
 }
 
+{
+    # make sure the new eof() features work with @ARGV magic
+    local *ARGV;
+    @ARGV = ('haha');
 
+    @expect = (TIEHANDLE => 'Implement');
+    $ob = tie *ARGV, 'Implement';
+    is(ref($ob),  'Implement');
+    is(tied(*ARGV), $ob);
+
+    @data = ("stuff\n");
+    @expect = (EOF => $ob, 1);
+    is(eof(ARGV), '');
+    @expect = (EOF => $ob, 2);
+    is(eof(), '');
+    shift @data;
+    @expect = (EOF => $ob, 0);
+    is(eof, 1);
+}

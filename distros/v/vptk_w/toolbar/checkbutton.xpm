@@ -1,0 +1,32 @@
+/* XPM */
+static char * checkbutton_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"19 21 5 1",
+/* colors */
+"  s None c None",
+". c #848284",
+"X c #C4C2C4",
+"o c #040204",
+"O c #FCFEFC",
+/* pixels */
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"   ............X   ",
+"   .ooooooooooOX   ",
+"   .oXXXXXXXXXOX   ",
+"   .oXXXXXXXoXOX   ",
+"   .oXXXXXXooXOX   ",
+"   .oXoXXXoooXOX   ",
+"   .oXooXoooXXOX   ",
+"   .oXoooooXXXOX   ",
+"   .oXXoooXXXXOX   ",
+"   .oXXXoXXXXXOX   ",
+"   .oXXXXXXXXXOX   ",
+"   .OOOOOOOOOOOX   ",
+"   XXXXXXXXXXXXX   ",
+"                   ",
+"                   ",
+"                   ",
+"                   "};

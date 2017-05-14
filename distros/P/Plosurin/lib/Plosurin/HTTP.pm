@@ -24,6 +24,7 @@ use warnings;
 use base qw/WebDAO::Engine/;
 use Data::Dumper;
 use Plosurin;
+use open ':utf8';
 
 sub __any_path {
     my $self = shift;
@@ -177,11 +178,11 @@ REC
   <head>
   </head>
   <body>
-  <h1>Test Page</h1>
+  <h1>List path: $root_path</h1>
   <hr>
 $list
   <hr>
-  <p>Plosutin v0012.2</p>
+  <p>Plosurin v$Plosurin::VERSION</p>
   </body>
 </html>
 TXT

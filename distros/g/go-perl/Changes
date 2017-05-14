@@ -1,0 +1,169 @@
+
+2005-01-31      - [cjm] Inititation of Changes file
+
+2005-01-31      - [cjm] changed dependencies in Makefile.PL
+                  Data::Stag 0.07 is the only dependency
+                  (and as of 0.08, no dependencies for Data::Stag)
+
+                - [cjm] XML::LibXML now used in place of xsltproc hack
+
+                - [cjm] Added acc2name_h to base_parser - index
+                  can be used for fast ID checking during parsing
+
+                - [cjm] fixed litemode to report namespace
+                        (map2slim no longer complains)
+
+                - [cjm] fixed prob with go_ont_parser
+                        files with '*' as a type code
+
+2005-02-01      - [cjm] map2slim now uses no_duplicates option 
+
+2005-02-08      - [cjm] new scripts:
+                        go-dag-summary.pl
+                        go-filter-subset.pl
+                        go-show-paths-to-root.pl
+2005-03-14      - [cjm] new parser/handler: obj_storable
+                        added caching to parser
+                        new script option: -use_cache
+
+2005-03-28      - [cjm] added go-apply-xslt to go-perl/scripts
+
+2005-04-02      - [cjm] obo_text output date is now oboedit compatible
+
+2005-04-16      - [cjm] fixed subtle obo_text_parser bug
+                         is_root was not being set if the root term      
+                         was immediately followed by a Typedef stanza
+
+2005-05-20      - [cjm] allowed unsetting of $term->synonym_list
+                - [cjm] new scripts
+                         go-show-assocs-by-node.pl
+                         go-apply-xslt
+2005-05-25      - [cjm] xslt processing: behaviour unchanged for when
+                        GO_ROOT is set; if GO_ROOT is not set, then
+                        the install directory (eg %INC{GO/..}) is checked
+                        for the xsl directory. This makes things easier
+                        for users who wish to use go-perl and the xslts
+                        without downloading and installing all of go-dev
+                        This affects:
+                          go-apply-xslt
+                          GO::Parsers::base_parser
+
+2005-06-29      - [cjm] now accepts obo1.2 format synonyms
+                        accepts obo1.2 xref tag (maps to xref_analog in xml)
+
+VERSION 0.04
+============
+
+2005-08-18      - [cjm] made no_duplicates(1) default in exporting
+                        an ontology to deprecated go_ont format
+                        (this was causing problems with cycles)
+
+2005-09-06      - [cjm] incorporate changes to xsl for chadoxml
+                        when converting to chadoxml, only use
+                        relationship as cv.name if no namespace specified
+
+2005-10-05      - [cjm] obo_text_parser - no longer warns of missing
+                                namespace, if it is a header-only
+                                obo file
+                        owl2obo fixed
+
+VERSION 0.05
+============
+
+2005-12-01      - [cjm] more docs for map2slim. made -b option safe'
+                        new convenience methods in Graph and GeneProduct
+                        added create_handler to Parser
+                        improved POD docs
+                        new test t140
+
+2006-02-12      - [cjm] added methods for new obo Typedef tag
+                        is_transitive, transitive_over etc
+                        
+2006-03-29      - [cjm] added GO::Model::LogicalDefinition
+
+2006-04-19      - [cjm] added new test for chadoxml
+
+
+
+2006-07-14      - [cjm] support for idspace tag
+
+2006-07-24      - [cjm] support for synonymtypedef tag
+                  [cjm] more synonym info from ncbi_taxonomy_parser
+2006-08-25      - [cjm] added checks to dbxref parsing
+
+2006-09-11      - [cjm] exports subsetdefs in obo format
+                        fixed definition dbxref parsing (was only getting 1 dbxref)
+
+2006-10-18      - [cjm] finalised code for GO::Model::LogicalDefinition
+                        added Relationship->complete
+                - [cjm] removed some cruft
+
+VERSION 0.06
+============
+
+No code changes in this release; the 0.05 CPAN release erroneously
+contained out of date copies of the XSL files
+
+VERSION 0.07
+============
+
+2006-11-28      - [cjm] fixed obo export to properly escape {}s
+
+2006-12-06      - [cjm] fixed boolean tags in obo format export
+                        ncbi_taxonomy_parser - has_rank is now metadata property
+
+2006-12-12      - [cjm] handles unquoted trailing modifier correctly in obof1.2
+
+2006-12-12      - [cjm] added GO::Model::DB
+
+2007-03-02      - [cjm] Fixed GO::Parsers::go_xref_parser - now handles >1 xref per line
+
+2007-05-13      - [cjm] object model now handles consider and replaced_by tags
+                - [cjm] disjointness and union_of support in object model
+                - [cjm] fixed definition xref parsing with escape characters
+
+2007-07-05      - [cjm] parses secondary taxon IDs (multi-species terms)
+
+2007-07-10      - [cjm] GO::Parsers::obo_text_parser - handles term expresssions (obof1.3)
+2007-07-10      - [cjm] GO::Parsers::go_assoc_parser - handles new properties column(16)
+
+2007-08-02      - [cjm] object parser now catches species & assocdate
+
+2007-09-09      - [cjm] GO::Parsers::obo_text_parser - synonymtypedef now uses ID and NAME as sub-elements
+
+VERSION 0.08
+============
+
+2007-01-06      - [cjm] includes modified xslt xref handling for OBO_REL xrefs
+2007-01-06      - [cjm] added test for handling of xrefs in OBO_REL 
+2007-01-17      - [cjm] support for instances
+2007-01-22      - [cjm] fixed bug in exporting synonymtypedefs - was not quoting description/name
+
+VERSION 0.09
+============
+
+2007-02-14      - [cjm] add test for disjoint_from
+2007-03-14      - [cjm] imports tag followed
+2007-06-10      - [cjm] chadoxml only: xref handling of OBO_REL : relationship namespace is used
+2007-06-10      - [cjm] shownames option in map2slim
+
+VERSION 0.10
+============
+
+
+VERSION 0.11
+============
+
+2010-05-18	- [cjm] macro expansion in OWL
+
+VERSION 0.12
+============
+
+2010-05-31	- [hsk] fix: 17 cols for GAF2.0. https://rt.cpan.org/Public/Bug/Display.html?id=57994
+2010-05-31	- [hsk] no refs to undefs. https://rt.cpan.org/Ticket/Display.html?id=57997
+2010-06-25	- [cjm] latest owl xslt fixes: URI treatment fixed. allow * idspace option. expansion tags
+
+VERSION 0.13
+============
+
+2010-10-10	- [cjm] latest owl xslt fixes for annotation properties

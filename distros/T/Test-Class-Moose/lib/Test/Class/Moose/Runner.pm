@@ -4,7 +4,7 @@ package Test::Class::Moose::Runner;
 
 use 5.10.0;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use Moose 2.0000;
 use Carp;
@@ -84,7 +84,7 @@ Test::Class::Moose::Runner - Runner for Test::Class::Moose tests
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

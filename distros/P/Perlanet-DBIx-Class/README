@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Perlanet-DBIx-Class,
+version 0.02:
+
+  Aggregate posts in a database using DBIx::Class
+
+This software is copyright (c) 2010 by Oliver Charles.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

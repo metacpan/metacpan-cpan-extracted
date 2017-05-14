@@ -23,7 +23,7 @@ use Specio::TypeChecks qw(
 );
 use Storable qw( dclone );
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use Exporter qw( import );
 
@@ -116,12 +116,12 @@ sub _inline_constructor {
     my $class = shift;
 
     my @build_subs;
-    for my $class ( @{ mro::get_linear_isa($class) } ) {
+    for my $parent ( @{ mro::get_linear_isa($class) } ) {
         {
             ## no critic (TestingAndDebugging::ProhibitNoStrict)
             no strict 'refs';
-            push @build_subs, $class . '::BUILD'
-                if defined &{ $class . '::BUILD' };
+            push @build_subs, $parent . '::BUILD'
+                if defined &{ $parent . '::BUILD' };
         }
     }
 
@@ -337,7 +337,7 @@ Specio::OO - A painfully poor reimplementation of Moo(se)
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 

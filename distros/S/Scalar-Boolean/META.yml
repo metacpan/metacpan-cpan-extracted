@@ -1,0 +1,21 @@
+---
+abstract: 'Makes scalar variables store Boolean values only'
+author:
+  - 'Alan Haggai Alavi <alanhaggai@alanhaggai.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300007, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scalar-Boolean
+resources:
+  repository: git://github.com/alanhaggai/Scalar-Boolean.git
+version: 1.02

@@ -1,15 +1,4 @@
 Changes for Perl extension Padre-Plugin-Swarm
-0.2	- Tue Nov 15 21:36:55 EST 2011
-        - move depends to Padre 0.92
-        - add margin symbol for feedback/comment
-	- add different cursor styling to indicate the original owner's cursor
-        - add ghost cursors in the editor margin showing where other remote editors cursors are
-	- pod updates
-	- first attempt at collaboration with bowtie from irc. (BRAMBLE)
-	- first real 2-way co-operative editing capability
-	- move to new Padre::Task api
-	- add Swarm::Universe container for tools and transports
-	- replace Wx::Socket and IO::Poll task transport with AnyEvent
 0.11  - Fri Jul 29 11:32:24 EST 2011
         - adjustments to loading of Wx::Socket #1264.
 0.1   - Thu Feb  3 13:46:14 EST 2011

@@ -1,0 +1,382 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: Understanding Class Interfaces</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="var_misc.html">Previous Topic</A> | <A HREF="in_filif.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>A. Understanding Class Interfaces</H1>
+<HR>
+<H2><A NAME="Overview">A.1. Overview</A></H2>
+<H3><A NAME="General Syntax">General Syntax</A></H3>
+<P>The general syntax for declaring and/or formatting a table of objects in the class is shown first. By convention, the filter is shown using the <A HREF="../ref/mblock.html">block</A> and <A HREF="../ref/mendbloc.html">endblock</A> macros, although filters can also be used with other macros, including <A HREF="../ref/minclude.html">include</A> and <A HREF="../ref/mexecute.html">execute</A>.</P>
+<H3><A NAME="Object Attributes">Object Attributes</A></H3>
+<P>The attributes supported for each class are listed in a table with the following columns:</P>
+<UL>
+<LI><EM>Field</EM> - the field name
+<LI><EM>Category</EM> - <EM>key</EM>, <EM>mandatory</EM> or <EM>optional</EM>
+<LI><EM>Rule</EM> - the pattern, if any, used to validate the value.</UL>
+<HR>
+<H2><A NAME="Parameters">A.2. Parameters</A></H2>
+<H3><A NAME="Overview">Overview</A></H3>
+<P>All class filters support the set of parameters listed below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+data
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+define objects but do not display them
+</TD>
+</TR>
+<TR>
+<TD>
+cited
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+number these objects as the cited ones (for [1] style references)
+</TD>
+</TR>
+<TR>
+<TD>
+root
+</TD>
+<TD>
+string
+</TD>
+<TD>
+string to prepend to Jump attribute, if any
+</TD>
+</TR>
+<TR>
+<TD>
+columns
+</TD>
+<TD>
+string
+</TD>
+<TD>
+comma-separated list of attributes to display in table
+</TD>
+</TR>
+<TR>
+<TD>
+style
+</TD>
+<TD>
+string
+</TD>
+<TD>
+table style to use (the default is <EM>plain</EM>)
+</TD>
+</TR>
+<TR>
+<TD>
+compact
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+display in a compact table, (make cellpadding and cellspacing both equal to zero)
+</TD>
+</TR>
+<TR>
+<TD>
+wide
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+use sidehead when formatting on paper
+</TD>
+</TR>
+<TR>
+<TD>
+headings
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+display the column headings
+</TD>
+</TR>
+<TR>
+<TD>
+where
+</TD>
+<TD>
+string
+</TD>
+<TD>
+filter the rows using the nominated expression
+</TD>
+</TR>
+<TR>
+<TD>
+sort
+</TD>
+<TD>
+string
+</TD>
+<TD>
+comma-separated list of columns to sort by
+</TD>
+</TR>
+<TR>
+<TD>
+colaligns
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of horizontal alignments  values (Left, Center, Right) for columns; alternatively, a single word containing the letters L, C and R can be used for the value
+</TD>
+</TR>
+<TR>
+<TD>
+colvaligns
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of vertical alignments  values (Top, Middle, Bottom, Baseline) for columns; alternatively, a single word containing the letters T, M, B and L can be used for the value
+</TD>
+</TR>
+<TR>
+<TD>
+select
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of columns to display
+</TD>
+</TR>
+<TR>
+<TD>
+delete
+</TD>
+<TD>
+string
+</TD>
+<TD>
+a comma-separated list of columns to delete
+</TD>
+</TR>
+<TR>
+<TD>
+wrap
+</TD>
+<TD>
+integer
+</TD>
+<TD>
+number of logical rows to place on a physical row
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Building the Columns">A.3. Building the Columns</A></H2>
+<H3><A NAME="Using the columns Parameter">Using the columns Parameter</A></H3>
+<P>The <EM>columns</EM> parameter is a comma-separated list of:</P>
+<PRE>
+   [tag&quot;:&quot;]attribute[&quot;&amp;&quot;view]
+</PRE>
+<P>where:</P>
+<UL>
+<LI><EM>tag</EM> is a phrase style (or expression format)
+<LI><EM>attribute</EM> is the name of an attribute of the class
+<LI><EM>view</EM> is a view to apply to the object when looking up or calculating that attribute (see <A HREF="in_claif.html#Object Views">Object Views</A> below).</UL>
+<P>To remember the syntax for applying an object view, think of C's bit-masking operator, &amp;.</P>
+<P>Examples are given below:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Column</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Code
+</TD>
+<TD>
+output the Code attribute
+</TD>
+</TR>
+<TR>
+<TD>
+2:Code
+</TD>
+<TD>
+output the Code using the 2 (emphasised) phrase style
+</TD>
+</TR>
+<TR>
+<TD>
+BUG:Code
+</TD>
+<TD>
+output the Code using the BUG phrase style
+</TD>
+</TR>
+<TR>
+<TD>
+CONCISE:Date
+</TD>
+<TD>
+output the Date attribute using the CONCISE format
+</TD>
+</TR>
+</TABLE>
+
+<H3><A NAME="Calculated Attributes">Calculated Attributes</A></H3>
+<P>Some class filters support calculated attributes, so the total set of attributes you can place in the <EM>columns</EM> parameter can be quite large. For example, for <A HREF="../ref/creferen.html">references</A>, an unknown attribute which is sequence of uppercase letters is assumed to be a file extension and the generated attribute is an icon providing a jump to that file, if any. For example, if a reference has a <EM>Jump</EM> attribute of <EM>xyz.html</EM>, then the PDF attribute is an image (pdf.gif) which provides a jump to <EM>xyz.pdf</EM>.</P>
+<H3><A NAME="Object Views">Object Views</A></H3>
+<P>On some occasions, it can be very useful if the value placed in a column is a variation of an attribute, rather than the attribute itself. For example, the <A HREF="../ref/creferen.html">references</A> class supports an attribute called PS which is an image (postscript.gif) with a jump to <EM>xyz.ps</EM> (assuming the <EM>Jump</EM> attribute is <EM>xyz.html</EM>). But what if the PostScript file is in a different place to the HTML file? In this case, you need to use an object <EM>view</EM>.</P>
+<P>For example, the <A HREF="http://www.mincom.com/mtr/sdf/catalog.html">SDF Document Catalog</A> provides access to SDF's documents in several formats:</P>
+<UL>
+<LI>PDF and PostScript, stored on SDF's web site
+<LI>HTML, stored locally.</UL>
+<P>This catalog was created by using the following <EM>columns</EM> parameter:</P>
+<PRE>
+  columns='PDF&amp;website,PS&amp;website,DOC:Document,Date,Pages'
+</PRE>
+<P>where <EM>website</EM> is a file containing the following:</P>
+<PRE>
+  prefix_Jump=http://www.mincom.com/mtr/sdf/
+</PRE>
+<P>The name of a view is either a file or a directory:</P>
+<UL>
+<LI>If the name of a view is a file, then the view is loaded from that file. The format is a same as a set of name-value pairs in an <A HREF="../ref/fmt_ini.html">INI</A> file.
+<LI>If the name of a view is a directory, then a view with <EM>prefix_Jump=name/</EM> is returned.</UL>
+<P>Within a view, the parameters supported are:</P>
+<UL>
+<LI><EM>prefix_xxx</EM> - prefix for attribute <EM>xxx</EM>
+<LI><EM>suffix_xxx</EM> - suffix for attribute <EM>xxx</EM>.</UL>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>If it proves helpful, I'm happy to expand this list to include other types of parameters like <EM>default_xxx</EM> and <EM>value_xxx</EM>, say.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Filtering and Sorting">A.4. Filtering and Sorting</A></H2>
+<H3><A NAME="Filter Expressions">Filter Expressions</A></H3>
+<P>The <EM>where</EM> attribute takes an expression which is evaluated for each record. Special symbols available are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Symbol</STRONG>
+</TD>
+<TD>
+<STRONG>Meaning</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+$_
+</TD>
+<TD>
+the current record
+</TD>
+</TR>
+<TR>
+<TD>
+$o{&quot;xyz&quot;}
+</TD>
+<TD>
+the value of column xyz
+</TD>
+</TR>
+<TR>
+<TD>
+$var{&quot;abc&quot;}
+</TD>
+<TD>
+the value of variable abc
+</TD>
+</TR>
+</TABLE>
+
+<P>For example:</P>
+<PRE>
+ !define MODULE_CODE &quot;XYZ&quot;
+ ...
+ !include &quot;../document.reg&quot;; references; compact; \
+   where='$o{&quot;Reference&quot;} =~ /$var{&quot;MODULE_CODE&quot;}/'; \
+   columns=&quot;PS,REF:Reference,DOC:Document,CONCISE:Date&quot;
+</PRE>
+<H3><A NAME="Sorting">Sorting</A></H3>
+<P><EM>sort</EM> takes a comma-separated list of column names to sort on. If no columns are specified, the data is sorted using all columns in the order in which they appear. All sorting is done alphabetically - numeric sorting is not supported.</P>
+<H3><A NAME="Using the delete Parameter">Using the delete Parameter</A></H3>
+<P>The <EM>delete</EM> parameter is particularly useful if you want to sort or filter a table (using the <EM>sort</EM> and <EM>where</EM> parameters, respectively) using columns which you don't want in the output. For example:</P>
+<PRE>
+  # Load the bug tracking module
+  !use &quot;bugtrack&quot;
+
+  # Display the open bugs, sorted by priority
+  H1: Open Defects
+  !include 'bugs.reg'; bugs; headings; \
+           columns='Code,BUGTITLE:Title,Status,Priority'; \
+           where='$o{&quot;Status&quot;} eq &quot;Open&quot;'; \
+           sort='Priority'; \
+           delete='Status'
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>The order of the parameters to a class filter are not important, although the order above best reflects the processing.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>In the case above, the <EM>columns</EM> parameter builds a data table which is then filtered and sorted. Note that the <EM>Status</EM> and <EM>Priority</EM> attributes are required in the columns as those attributes are required to do the filtering and sorting. However, as the heading tell the user that this is the table of open defects, we don't need/want the <EM>Status</EM> attribute in the output, so we delete it.</P>
+<H3><A NAME="Filtering Using the catalog Macro">Filtering Using the catalog Macro</A></H3>
+<P>Another way of building the table above is to use the <A HREF="../ref/mcatalog.html">catalog</A> macro like this:</P>
+<PRE>
+  # Load the bug tracking module
+  !use &quot;bugtrack&quot;
+
+  # Load the bug data
+  !include 'bugs.reg'; bugs; data
+
+  # Display the open bugs, sorted by priority
+  H1: Open Defects
+  !catalog bugs 'Status:Open'; headings; \
+           columns='Code,BUGTITLE:Title,Priority'; \
+           sort='Priority'
+</PRE>
+<P>In this case, the filtering is done before the data reaches the class filter, so things are easier once the data has been loaded.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="var_misc.html">Previous Topic</A> | <A HREF="in_filif.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

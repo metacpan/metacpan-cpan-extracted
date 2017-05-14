@@ -1,0 +1,41 @@
+
+=head1 NAME
+
+LEGO::NXT::Manual - Documentation for the LEGO::NXT module.
+
+=head1 DOCUMENTATION
+
+L<LEGO::NXT::Manual::Introduction> - A beginners walkthrough.
+
+L<LEGO::NXT::Manual::Cookbook> - Recipes and tricks for common and not-so-common tasks.
+
+L<LEGO::NXT::Manual::Plugins> - Using and creating plugins.
+
+L<LEGO::NXT::Manual::FAQ> - Frequenty asked questions.
+
+L<LEGO::NXT::Manual::Troubleshooting> - Resolve troublesome problems.
+
+=head1 MASCOT
+
+              __----
+              |O   O|
+                \ |    ___
+            _____-----__\ \
+        __-- | ----- |-\ \ |
+  ---- / |__-| |___| |  \ \|
+  | X | /    /       |   \ \
+  \---  |   |  < O > |    | |
+   \____|   |    -   |    ---
+           |---------|   |   |
+          :|        |    |   |
+          |          \_  |---|
+         o|  |=--=  o |   \_/
+          \  |  /|    /
+          /   | ||   |
+         |_/  |/ |   |
+           |  | |    |
+         _--  | |  _ \
+       _|  _-/   _/ / |
+       |__| | -  |_/ /
+            -- -____/
+

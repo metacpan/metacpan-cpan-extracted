@@ -1,7 +1,7 @@
 package Myco::Foo;
 
 ###############################################################################
-# $Id: entity.pm,v 1.1.1.1 2004/11/22 19:16:02 owensc Exp $
+# $Id: entity.pm,v 1.6 2006/03/19 19:34:08 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ###############################################################################
@@ -10,29 +10,11 @@ package Myco::Foo;
 
 Myco::Foo - a Myco entity class
 
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
-
 =head1 SYNOPSIS
 
   use Myco;
 
-  # Constructors. See Myco::Base::Entity for more.
+  # Constructors. See Myco::Entity for more.
   my $obj = Myco::Foo->new;
 
   # Accessors.
@@ -69,10 +51,10 @@ use Myco::Exceptions;
 ##############################################################################
 # Inheritance & Introspection
 ##############################################################################
-use base qw(Myco::Base::Entity);
-my $md = Myco::Base::Entity::Meta->new
+use base qw(Myco::Entity);
+my $md = Myco::Entity::Meta->new
   ( name => __PACKAGE__,
-    tangram => { table => '::SetTableName', },
+    #tangram => { table => '::SetTableName', },
 #    ui => { displayname => 'fooattrib' }
   );
 
@@ -80,6 +62,9 @@ my $md = Myco::Base::Entity::Meta->new
 # Function and Closure Prototypes
 ##############################################################################
 
+##############################################################################
+# Query Specifications (See Myco::Entity::Meta::Query)
+##############################################################################
 
 ##############################################################################
 # Constructor, etc.
@@ -88,7 +73,7 @@ my $md = Myco::Base::Entity::Meta->new
 =head1 COMMON ENTITY INTERFACE
 
 Constructor, accessors, and other methods -- as inherited from
-Myco::Base::Entity.
+Myco::Entity.
 
 =cut
 
@@ -196,7 +181,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -205,10 +190,10 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Myco::Foo::Test|Myco::Foo::Test>,
-L<Myco::Base::Entity|Myco::Base::Entity>,
+L<Myco::Entity|Myco::Entity>,
 L<Myco|Myco>,
 L<Tangram|Tangram>,
 L<Class::Tangram|Class::Tangram>,
-L<mkentity|mkentity>
+L<myco-mkentity|mkentity>
 
 =cut

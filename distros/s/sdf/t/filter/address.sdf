@@ -1,0 +1,10 @@
+# This file tests the address filter
+Some text.
+
+!block address
+Bill Bloggs
+43 Smith Lane
+Brisbane Q 4001
+!endblock
+
+Some more text.

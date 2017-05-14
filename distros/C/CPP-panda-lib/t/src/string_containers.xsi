@@ -1,0 +1,445 @@
+MODULE = CPP::panda::lib                PACKAGE = CPP::panda::lib::Test::StringContainers
+PROTOTYPES: DISABLE
+
+void smap_fill (HV* hv) {
+    XS_HV_ITER(hv, {
+        test::smap.emplace(test::String(HeKEY(he), HeKLEN(he)), pandaString(SvPV_nolen(HeVAL(he))));
+    });
+}
+
+void smmap_fill (HV* hv) {
+    XS_HV_ITER(hv, {
+        test::smmap.emplace(test::String(HeKEY(he), HeKLEN(he)), pandaString(SvPV_nolen(HeVAL(he))));
+    });
+}
+
+void usmap_fill (HV* hv) {
+    XS_HV_ITER(hv, {
+        test::usmap.emplace(test::String(HeKEY(he), HeKLEN(he)), pandaString(SvPV_nolen(HeVAL(he))));
+    });
+}
+
+void usmmap_fill (HV* hv) {
+    XS_HV_ITER(hv, {
+        test::usmmap.emplace(test::String(HeKEY(he), HeKLEN(he)), pandaString(SvPV_nolen(HeVAL(he))));
+    });
+}
+
+void sset_fill (AV* hv) {
+    XS_AV_ITER(hv, {
+        test::sset.emplace(test::String(SvPV_nolen(elem)));
+    });
+}
+
+void smset_fill (AV* hv) {
+    XS_AV_ITER(hv, {
+        test::smset.emplace(test::String(SvPV_nolen(elem)));
+    });
+}
+
+void usset_fill (AV* hv) {
+    XS_AV_ITER(hv, {
+        test::usset.emplace(test::String(SvPV_nolen(elem)));
+    });
+}
+
+void usmset_fill (AV* hv) {
+    XS_AV_ITER(hv, {
+        test::usmset.emplace(test::String(SvPV_nolen(elem)));
+    });
+}
+
+pandaString smap_find_sv (string_view key) {
+    auto it = test::smap.find(key);
+    if (it == test::smap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::csmap->find(key);
+    if (cit == test::csmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+pandaString smmap_find_sv (string_view key) {
+    auto it = test::smmap.find(key);
+    if (it == test::smmap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::csmmap->find(key);
+    if (cit == test::csmmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+pandaString usmap_find_sv (string_view key) {
+    auto it = test::usmap.find(key);
+    if (it == test::usmap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::cusmap->find(key);
+    if (cit == test::cusmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+pandaString usmmap_find_sv (string_view key) {
+    auto it = test::usmmap.find(key);
+    if (it == test::usmmap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::cusmmap->find(key);
+    if (cit == test::cusmmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+testString sset_find_sv (string_view key) {
+    auto it = test::sset.find(key);
+    if (it == test::sset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::csset->find(key);
+    if (cit == test::csset->end() || *cit != RETVAL) croak("jopa");
+}
+
+testString smset_find_sv (string_view key) {
+    auto it = test::smset.find(key);
+    if (it == test::smset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::csmset->find(key);
+    if (cit == test::csmset->end() || *cit != RETVAL) croak("jopa");
+}
+
+testString usset_find_sv (string_view key) {
+    auto it = test::usset.find(key);
+    if (it == test::usset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::cusset->find(key);
+    if (cit == test::cusset->end() || *cit != RETVAL) croak("jopa");
+}
+
+testString usmset_find_sv (string_view key) {
+    auto it = test::usmset.find(key);
+    if (it == test::usmset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::cusmset->find(key);
+    if (cit == test::cusmset->end() || *cit != RETVAL) croak("jopa");
+}
+
+pandaString smap_at_sv (string_view key) {
+    RETVAL = test::smap.at(key);
+    if (test::csmap->at(key) != RETVAL) croak("jopa");
+}
+
+pandaString usmap_at_sv (string_view key) {
+    RETVAL = test::usmap.at(key);
+    if (test::cusmap->at(key) != RETVAL) croak("jopa");
+}
+
+size_t smap_count_sv (string_view key) {
+    RETVAL = test::smap.count(key);
+    if (test::csmap->count(key) != RETVAL) croak("jopa");
+}
+
+size_t smmap_count_sv (string_view key) {
+    RETVAL = test::smmap.count(key);
+    if (test::csmmap->count(key) != RETVAL) croak("jopa");
+}
+
+size_t usmap_count_sv (string_view key) {
+    RETVAL = test::usmap.count(key);
+    if (test::cusmap->count(key) != RETVAL) croak("jopa");
+}
+
+size_t usmmap_count_sv (string_view key) {
+    RETVAL = test::usmmap.count(key);
+    if (test::cusmmap->count(key) != RETVAL) croak("jopa");
+}
+
+size_t sset_count_sv (string_view key) {
+    RETVAL = test::sset.count(key);
+    if (test::csset->count(key) != RETVAL) croak("jopa");
+}
+
+size_t smset_count_sv (string_view key) {
+    RETVAL = test::smset.count(key);
+    if (test::csmset->count(key) != RETVAL) croak("jopa");
+}
+
+size_t usset_count_sv (string_view key) {
+    RETVAL = test::usset.count(key);
+    if (test::cusset->count(key) != RETVAL) croak("jopa");
+}
+
+size_t usmset_count_sv (string_view key) {
+    RETVAL = test::usmset.count(key);
+    if (test::cusmset->count(key) != RETVAL) croak("jopa");
+}
+
+AV* smap_equal_range_sv (string_view key) {
+    std::vector<pandaString> v;
+    auto p = test::smap.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(it->second);
+    
+    auto cp = test::csmap->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (it->second != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+AV* smmap_equal_range_sv (string_view key) {
+    std::vector<pandaString> v;
+    auto p = test::smmap.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(it->second);
+    
+    auto cp = test::csmmap->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (it->second != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+AV* usmap_equal_range_sv (string_view key) {
+    std::vector<pandaString> v;
+    auto p = test::usmap.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(it->second);
+    
+    auto cp = test::cusmap->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (it->second != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+AV* usmmap_equal_range_sv (string_view key) {
+    std::vector<pandaString> v;
+    auto p = test::usmmap.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(it->second);
+    
+    auto cp = test::cusmmap->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (it->second != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+AV* sset_equal_range_sv (string_view key) {
+    std::vector<test::String> v;
+    auto p = test::sset.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(*it);
+    
+    auto cp = test::csset->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (*it != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+AV* smset_equal_range_sv (string_view key) {
+    std::vector<test::String> v;
+    auto p = test::smset.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(*it);
+    
+    auto cp = test::csmset->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (*it != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+AV* usset_equal_range_sv (string_view key) {
+    std::vector<test::String> v;
+    auto p = test::usset.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(*it);
+    
+    auto cp = test::cusset->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (*it != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+AV* usmset_equal_range_sv (string_view key) {
+    std::vector<test::String> v;
+    auto p = test::usmset.equal_range(key);
+    for (auto it = p.first; it != p.second; ++it) v.push_back(*it);
+    
+    auto cp = test::cusmset->equal_range(key);
+    int i = 0;
+    for (auto it = cp.first; it != cp.second; ++it) if (*it != v[i++]) croak("jopa");
+    
+    RETVAL = newAV();
+    for (const auto& str : v) av_push(RETVAL, newSVpvn(str.data(), str.length()));
+}
+
+pandaString smap_lower_bound_sv (string_view key) {
+    auto it = test::smap.lower_bound(key);
+    if (it == test::smap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::csmap->lower_bound(key);
+    if (cit == test::csmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+pandaString smmap_lower_bound_sv (string_view key) {
+    auto it = test::smmap.lower_bound(key);
+    if (it == test::smmap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::csmmap->lower_bound(key);
+    if (cit == test::csmmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+testString sset_lower_bound_sv (string_view key) {
+    auto it = test::sset.lower_bound(key);
+    if (it == test::sset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::csset->lower_bound(key);
+    if (cit == test::csset->end() || *cit != RETVAL) croak("jopa");
+}
+
+testString smset_lower_bound_sv (string_view key) {
+    auto it = test::smset.lower_bound(key);
+    if (it == test::smset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::csmset->lower_bound(key);
+    if (cit == test::csmset->end() || *cit != RETVAL) croak("jopa");
+}
+
+pandaString smap_upper_bound_sv (string_view key) {
+    auto it = test::smap.upper_bound(key);
+    if (it == test::smap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::csmap->upper_bound(key);
+    if (cit == test::csmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+pandaString smmap_upper_bound_sv (string_view key) {
+    auto it = test::smmap.upper_bound(key);
+    if (it == test::smmap.end()) XSRETURN_UNDEF;
+    RETVAL = it->second;
+    auto cit = test::csmmap->upper_bound(key);
+    if (cit == test::csmmap->end() || cit->second != RETVAL) croak("jopa");
+}
+
+testString sset_upper_bound_sv (string_view key) {
+    auto it = test::sset.upper_bound(key);
+    if (it == test::sset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::csset->upper_bound(key);
+    if (cit == test::csset->end() || *cit != RETVAL) croak("jopa");
+}
+
+testString smset_upper_bound_sv (string_view key) {
+    auto it = test::smset.upper_bound(key);
+    if (it == test::smset.end()) XSRETURN_UNDEF;
+    RETVAL = *it;
+    auto cit = test::csmset->upper_bound(key);
+    if (cit == test::csmset->end() || *cit != RETVAL) croak("jopa");
+}
+
+size_t smap_erase_sv (string_view key) {
+    RETVAL = test::smap.erase(key);
+}
+
+size_t smmap_erase_sv (string_view key) {
+    RETVAL = test::smmap.erase(key);
+}
+
+size_t usmap_erase_sv (string_view key) {
+    RETVAL = test::usmap.erase(key);
+}
+
+size_t usmmap_erase_sv (string_view key) {
+    RETVAL = test::usmmap.erase(key);
+}
+
+size_t sset_erase_sv (string_view key) {
+    RETVAL = test::sset.erase(key);
+}
+
+size_t smset_erase_sv (string_view key) {
+    RETVAL = test::smset.erase(key);
+}
+
+size_t usset_erase_sv (string_view key) {
+    RETVAL = test::usset.erase(key);
+}
+
+size_t usmset_erase_sv (string_view key) {
+    RETVAL = test::usmset.erase(key);
+}
+
+void _test_compile_ () {
+    test::smap[""];
+    test::smap.at("");
+    test::csmap->at("");
+    test::smap.find("");
+    test::csmap->find("");
+    test::csmap->count("");
+    test::smap.erase("");
+    test::smap.equal_range("");
+    test::csmap->equal_range("");
+    test::smap.lower_bound("");
+    test::csmap->lower_bound("");
+    test::smap.upper_bound("");
+    test::csmap->upper_bound("");
+    
+    test::smmap.find("");
+    test::csmmap->find("");
+    test::csmmap->count("");
+    test::smmap.erase("");
+    test::smmap.equal_range("");
+    test::csmmap->equal_range("");
+    test::smmap.lower_bound("");
+    test::csmmap->lower_bound("");
+    test::smmap.upper_bound("");
+    test::csmmap->upper_bound("");
+    
+    test::usmap[""];
+    test::usmap.at("");
+    test::cusmap->at("");
+    test::usmap.find("");
+    test::cusmap->find("");
+    test::cusmap->count("");
+    test::usmap.erase("");
+    test::usmap.equal_range("");
+    test::cusmap->equal_range("");
+    
+    test::usmmap.find("");
+    test::cusmmap->find("");
+    test::cusmmap->count("");
+    test::usmmap.erase("");
+    test::usmmap.equal_range("");
+    test::cusmmap->equal_range("");
+    
+    test::sset.find("");
+    test::csset->find("");
+    test::csset->count("");
+    test::sset.erase("");
+    test::sset.equal_range("");
+    test::csset->equal_range("");
+    test::sset.lower_bound("");
+    test::csset->lower_bound("");
+    test::sset.upper_bound("");
+    test::csset->upper_bound("");
+    
+    test::smset.find("");
+    test::csmset->find("");
+    test::csmset->count("");
+    test::smset.erase("");
+    test::smset.equal_range("");
+    test::csmset->equal_range("");
+    test::smset.lower_bound("");
+    test::csmset->lower_bound("");
+    test::smset.upper_bound("");
+    test::csmset->upper_bound("");
+    
+    test::usset.find("");
+    test::cusset->find("");
+    test::cusset->count("");
+    test::usset.erase("");
+    test::usset.equal_range("");
+    test::cusset->equal_range("");
+    
+    test::usmset.find("");
+    test::cusmset->find("");
+    test::cusmset->count("");
+    test::usmset.erase("");
+    test::usmset.equal_range("");
+    test::cusmset->equal_range("");
+}
+

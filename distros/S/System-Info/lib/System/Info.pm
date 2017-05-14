@@ -3,7 +3,7 @@ package System::Info;
 use strict;
 use warnings;
 
-our $VERSION = "0.054";
+our $VERSION = "0.055";
 
 use base "Exporter";
 our @EXPORT_OK = qw( &sysinfo &si_uname );
@@ -48,8 +48,11 @@ or
 
 =head1 DESCRIPTION
 
-Sometimes one wants a more elaborate description of the system one is
-working on.
+System::Info tries to present system-related information, like number of CPU's,
+architecture, OS and release related information in a system-independent way.
+This releases the user of this module of the need to know if the information
+comes from Windows, Linux, HP-UX, AIX, Solaris, Irix, or VMS, and if the
+architecture is i386, x64, pa-risc2, or arm.
 
 =head1 METHODS
 

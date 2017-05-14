@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 39;
+plan tests => 59;
 
 $h{'abc'} = 'ABC';
 $h{'def'} = 'DEF';
@@ -106,19 +106,6 @@ isnt ($size, (split('/', scalar %hash))[1]);
 
 is (keys(%hash), 10, "keys (%hash)");
 
-is (keys(hash), 10, "keys (hash)");
-
-$i = 0;
-%h = (a => A, b => B, c=> C, d => D, abc => ABC);
-@keys = keys(h);
-@values = values(h);
-while (($key, $value) = each(h)) {
-	if ($key eq $keys[$i] && $value eq $values[$i] && $key eq lc($value)) {
-		$i++;
-	}
-}
-is ($i, 5);
-
 @tests = (&next_test, &next_test, &next_test);
 {
     package Obj;
@@ -187,3 +174,108 @@ for (keys %u) {
     is($u{$u1}, 3, "U+0100        -> 3 ");
     is($u{$b1}, 4, "U+00C4 U+0080 -> 4");
 }
+
+# test for syntax errors
+for my $k (qw(each keys values)) {
+    eval $k;
+    like($@, qr/^Not enough arguments for $k/, "$k demands argument");
+}
+
+{
+    my %foo=(1..10);
+    my ($k,$v);
+    my $count=keys %foo;
+    my ($k1,$v1)=each(%foo);
+    my $yes = 0;
+    if (%foo) { $yes++ }
+    my ($k2,$v2)=each(%foo);
+    my $rest=0;
+    while (each(%foo)) {$rest++};
+    is($yes,1,"if(%foo) was true");
+    isnt($k1,$k2,"if(%foo) didnt mess with each (key)");
+    isnt($v1,$v2,"if(%foo) didnt mess with each (value)");
+    is($rest,3,"Got the expect number of keys");
+    my $hsv=1 && %foo;
+    like($hsv,qr[/],"Got bucket stats from %foo in scalar assignment context");
+    my @arr=%foo&&%foo;
+    is(@arr,10,"Got expected number of elements in list context");
+}    
+{
+    our %foo=(1..10);
+    my ($k,$v);
+    my $count=keys %foo;
+    my ($k1,$v1)=each(%foo);
+    my $yes = 0;
+    if (%foo) { $yes++ }
+    my ($k2,$v2)=each(%foo);
+    my $rest=0;
+    while (each(%foo)) {$rest++};
+    is($yes,1,"if(%foo) was true");
+    isnt($k1,$k2,"if(%foo) didnt mess with each (key)");
+    isnt($v1,$v2,"if(%foo) didnt mess with each (value)");
+    is($rest,3,"Got the expect number of keys");
+    my $hsv=1 && %foo;
+    like($hsv,qr[/],"Got bucket stats from %foo in scalar assignment context");
+    my @arr=%foo&&%foo;
+    is(@arr,10,"Got expected number of elements in list context");
+}    
+{
+    # make sure a deleted active iterator gets freed timely, even if the
+    # hash is otherwise empty
+
+    package Single;
+
+    my $c = 0;
+    sub DESTROY { $c++ };
+
+    {
+	my %h = ("a" => bless []);
+	my ($k,$v) = each %h;
+	delete $h{$k};
+	::is($c, 0, "single key not yet freed");
+    }
+    ::is($c, 1, "single key now freed");
+}
+
+{
+    # Make sure each() does not leave the iterator in an inconsistent state
+    # (RITER set to >= 0, with EITER null) if the active iterator is
+    # deleted, leaving the hash apparently empty.
+    my %h;
+    $h{1} = 2;
+    each %h;
+    delete $h{1};
+    each %h;
+    $h{1}=2;
+    is join ("-", each %h), '1-2',
+	'each on apparently empty hash does not leave RITER set';
+}
+{
+    my $warned= 0;
+    local $SIG{__WARN__}= sub {
+        /\QUse of each() on hash after insertion without resetting hash iterator results in undefined behavior\E/
+            and $warned++ for @_;
+    };
+    my %h= map { $_ => $_ } "A".."F";
+    while (my ($k, $v)= each %h) {
+        $h{"$k$k"}= $v;
+    }
+    ok($warned,"each() after insert produces warnings");
+    no warnings 'internal';
+    $warned= 0;
+    %h= map { $_ => $_ } "A".."F";
+    while (my ($k, $v)= each %h) {
+        $h{"$k$k"}= $v;
+    }
+    ok(!$warned, "no warnings 'internal' silences each() after insert warnings");
+}
+
+use feature 'refaliasing';
+no warnings 'experimental::refaliasing';
+$a = 7;
+\$h2{f} = \$a;
+($a, $b) = (each %h2);
+is "$a $b", "f 7", 'each in list assignment';
+$a = 7;
+($a, $b) = (3, values %h2);
+is "$a $b", "3 7", 'values in list assignment';

@@ -1,0 +1,5 @@
+.# Title: Preset variables
+.# These are set as input files are read:
+.echo _LineNumber = \v{_LineNumber}
+.echo _FileName = \v{_FileName}
+.echo _IncludeDepth = \v{_IncludeDepth}

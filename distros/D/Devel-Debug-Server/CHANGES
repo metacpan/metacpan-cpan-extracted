@@ -1,0 +1,77 @@
+==================================================
+Changes from 2013-06-25 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.001 at 2013-10-03 20:37:09 +0000
+------------------------------------------
+
+  Change: 83999972b3165fd1ca57e5db5fc3a1bae5bc5b67
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-10-03 22:36:57 +0000
+
+    type in documentatino 
+
+------------------------------------------
+version 1.000 at 2013-10-02 20:37:49 +0000
+------------------------------------------
+
+  Change: 5724a7896fd9ee26fc44e8bf68759d1703fb6302
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-10-02 22:37:49 +0000
+
+    more documentation 
+
+  Change: 006b5a0f7abde5c94612fe2402f1eb499cd90e05
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-10-01 21:29:28 +0000
+
+    fix for travis VI 
+
+  Change: b48e9ee261700e476b0ca996144261cf93be0dc4
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-09-30 23:31:24 +0000
+
+    add travisCI configuration 
+
+  Change: 6a1767dceb3e78362e526d5408af2d6892e5a250
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-09-30 23:05:32 +0000
+
+    Enhance documentation again 
+
+  Change: 9c20b75fc6e49bb9ed18111cfe2ba55a8cbc8bea
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-09-29 22:51:17 +0000
+
+    one more documentation fix 
+
+------------------------------------------
+version 0.007 at 2013-09-29 20:36:18 +0000
+------------------------------------------
+
+  Change: 4c105db2c6aad5b560b6ff34e2a7a74664c14f20
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-09-29 22:36:18 +0000
+
+    fix documentation 
+
+------------------------------------------
+version 0.006 at 2013-09-29 20:24:21 +0000
+------------------------------------------
+
+  Change: a6d95628ad1e33fb447266d886c7888740fab242
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-09-29 22:24:21 +0000
+
+    fix tests. Enhance documentation 
+
+  Change: fc655cc0234974e50ea521d1cfd1a8e98c2024a7
+  Author: jchassler <jhassler@free.fr>
+  Date : 2013-09-27 23:55:41 +0000
+
+    packaging and documentation work 
+
+================================================
+Plus 4 releases after 2013-06-25 00:00:00 +0000.
+================================================

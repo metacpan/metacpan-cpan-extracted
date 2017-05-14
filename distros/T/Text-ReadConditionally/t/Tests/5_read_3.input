@@ -1,0 +1,19 @@
+.# Title: read from pipe
+.# NewOpt: PipeOK 1
+Line 1
+.sub readin
+In readin
+.include -p | echo "Hello World!"
+After .include -p
+.read line
+After .read line
+.eval line='\v{line}' _EOF=\v{_EOF}
+.#
+.# Read again and get EOF
+.read line
+After next .read line
+.eval line='\v{line}' _EOF=\v{_EOF}
+.done
+After readin def
+.readin
+EOF

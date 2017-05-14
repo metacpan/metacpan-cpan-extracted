@@ -1,110 +1,116 @@
-# This file is Copyright (c) 2000-2003 Eric Andreychek.  All rights reserved.
+# This file is Copyright (c) 2000-2007 Eric Andreychek.  All rights reserved.
 # For distribution terms, please see the included LICENSE file.
-#
-# $Id: OpenThought.pm,v 1.99 2003/08/29 00:34:35 andreychek Exp $
-#
 
 package OpenThought;
 
 =head1 NAME
 
-OpenThought - Web Application Environment which doesn't require page reloads
+OpenThought - An AJAX transport and helper library, making AJAX-based page updates trivial
 
 =head1 SYNOPSIS
 
  use OpenThought();
+ use CGI();
 
- my $o = OpenThought->new( $OP );
+ my $OT = OpenThought->new();
+ my $q  = CGI->new;
 
- my $field_data;
- $field_data->{'myTextBox'}    = "Text Box Data";
- $field_data->{'myCheckbox'}   = "true";
- $field_data->{'myRadioBtn'}   = "RadioBtnValue";
- $field_data->{'mySelectList'} = [
-                                    [ "text1", "value1" ],
-                                    [ "text2", "value2" ],
-                                    [ "text3", "value3" ],
-                                 ];
+ # First, put everything you wish to give to the browser into a hash
+ my ($fields, $html, $image);
+ $fields->{'myTextBox'}    = "Text Box Data";
+ $fields->{'myCheckbox'}   = "true";
+ $fields->{'myRadioBtn'}   = "RadioBtn2Value";
+ $fields->{'mySelectList'} = [
+                               [ "text1", "value1" ],
+                               [ "text2", "value2" ],
+                               [ "text3", "value3" ],
+                             ];
 
- my $html_data;
- $html_data->{'id_tagname'} = "New HTML Code";
+ $html->{'id_tagname'} = "<b>New HTML Code</b>";
 
- print $o->serialize({
-            fields     => $field_data,
-            html       => $html_data,
-            focus      => "myTextBox",
-            javascript => $javascript_code
- });
+ $image->{'image_name'} = "http://example.com/my_image.gif";
+
+ # You can also execute JavaScript, just put it into a scalar
+ my $javascript_code = "alert('Howdy!')";
+
+ # Then send it to the browser using:
+
+ $OT->param( $fields );
+ $OT->param( $html );
+ $OT->param( $image );
+ $OT->focus( "myTextBox" );
+ $OT->javascript( $javascript_code );
+
+ print $q->header:
+ print $OT->response();
+
+ # Or use the utility method:
+ print $q->header;
+ print $OT->response( param      => $fields,
+                      param      => $html,
+                      param      => $image,
+                      focus      => "myTextBox",
+                      javascript => $javascript_code,
+                    );
+
+
+ # In a seperate HTML file, you might have this (which is where you'd first
+ # point the browser, the HTML then calls the Perl when you click the button or
+ # select list)
+ <html>
+   <head>
+     <script src="OpenThought.js"></script>
+   </head>
+   <body>
+   <form name="my_form" onSubmit="return false">
+     <input type="text" name="myTextBox">
+     <input type="checkbox" name="myCheckbox">
+     <input type="radio" name="myRadioBtn" value="RadioBtn1value">
+     <input type="radio" name="myRadioBtn" value="RadioBtn2value">
+     <select name="mySelectList" onChange="OpenThought.CallUrl(
+                'http://example.com/my_openthought_app.pl', 'mySelectList')">
+     <span id="id_tag_name">HTML Code will go here</span>
+
+     // Sends the current value of the textbox 'myTextBox', as well as the
+     // param 'this' with the value of 'that', to 'my_openthought_app.pl'.
+     <input type="button" onClick="OpenThought.CallUrl(
+                'http://example.com/my_openthought_app.pl', 'myTextBox', 'this=that')">
+  </form>
+  </body>
+ </html>
 
 =head1 DESCRIPTION
 
-OpenThought is a powerful and flexible web application environment.
-OpenThought applications are different from other web applications in that all
-communication between the browser and the server is performed in the
-background.  This gives a browser the ability to receive data from the server
-without ever reloading the currently loaded document.  Data received can be
-displayed automatically on the existing page, can access JavaScript functions
-and variables, and can load new pages.  Additionally, OpenThought completely
-manages all of your session data for you.  These features give the look and
-feel of a full-blown application instead of just an ordinary Web page.
+OpenThought is a library which implements an API for AJAX communication and
+updates.  You can perform updates to form fields, HTML, call JavaScript
+functions, and more with a trivial amount of code.  OpenThought strives to
+provide a simple yet powerful and flexible means for creating AJAX
+applications.
 
-OpenThought is extended with L<OpenPlugin|OpenPlugin>, also described briefly
-in this documentation.
+The interface is simple -- you just build a hash.  Hash keys are mapped to
+field names or id tags in the HTML.  The value your hash keys contain is
+dynamically inserted into the corresponding field (without reloading the page).
 
-OpenThought works by communicating with the server through the use of a hidden
-frame.  Now some may say "Frames?  You're using frames??"  No need to fret
-though, the frame is completely hidden.  There is no visible way for your users
-to tell that they are using an application which makes use of frames.
+==head1 COMPATABILITY
 
-This hidden frame performs all communication with the server for you, and
-allows your browser to talk to the server without reloading the content
-currently visible in your web browser.  This is how OpenThought can update
-portions of the screen, and how the server can run JavaScript code in the
-browser, all without reloading the page.
+OpenThought is compatible with a wide range of browsers, including Internet
+Explorer 4+, Netscape 4+, Mozilla/Firefox, Safari, Opera, Konqeueror, and
+others.  It detects the browsers capabilities; if the browser doesn't support
+new functions such as XMLHttpRequest or XMLHTTP, it falls back to using
+iframes.
 
-Any time an OpenThought application is loaded, a unique session id is generated
-for that user.  Each time communication takes place between the browser and
-server, OpenThought is careful to make sure that this session id is sent along
-with the request.  There is nothing you need to do to make this work, it is
-done for you.  When you're programming your application, you can always expect
-a session id to be sent to the server, and you can easily retrieve it along
-with the rest of the data sent by the browser.
-
-In addition to being able to update portions of a screen, you can also load new
-pages within the content frame.  If you choose to load new pages, your session
-continues to be maintained.
-
-OpenThought gives you an easy way of tieing together multiple web pages, and
-allows you to build web applications which act like "real" applications.
-When an application is required, some people would decide to build it in Tk,
-Visual Basic, Gtk, or any number of other systems which offer a visual
-interface.  But then, your application is either not available on the web, or
-you have to create a seperate web interface to interact with the backend.
-
-Have you ever tried to create a web interface which minics the interface of a
-non-web based application?  The web based application no longer looks or acts
-like your other interface, it acts like an ordinary webpage.  It probably uses
-several screens to get the same amount of content that your application offered
-in one.
-
-By not ever needing to reload the page, OpenThought offers this application
-look and feel that's been missing from the web.  This allows you to create just
-one interface, for both LAN and web use.
-
-=head1 FUNCTIONS
+=head1 METHODS
 
 =cut
 
 use strict;
+use Carp;
 
-$OpenThought::VERSION="0.71";
+$OpenThought::VERSION="1.99.16";
 
-# Include the OpenThought core components
-use OpenThought::XML2Hash 0.57 ();
-use OpenThought::Serializer();
-use OpenThought::Template();
+$OpenThought::DEBUG ||= 0;
 
-use OpenPlugin 0.11 ();
+use vars qw( $DEBUG );
 
 
 #/-------------------------------------------------------------------------
@@ -115,56 +121,19 @@ use OpenPlugin 0.11 ();
 
 =over 4
 
-=item new
+=item new()
 
- $o = OpenThought->new( $OP, {
-                Prefix          => "/path/which/overrides/config",
-                OpenThoughtRoot => "/path/which/overrides/config",
-             });
+ $OT = OpenThought->new();
 
 Creates a new OpenThought object.
-
-=over 4
-
-=item Parameters
-
-=over 4
-
-=item $OP
-
-An OpenPlugin object.
-
-=item Prefix (optional)
-
-The directory prefix OpenThought Data Files were installed under.
-
-The value for this is typically set in the OpenThought-httpd-modperl.conf file.
-However, if you wish to override it, or you don't have the ability to edit that
-file (ie, you don't have root on the webserver), you can set C<Prefix>
-here.  By default, the installation puts this in C</usr/local/>.
-
-=item OpenThoughtRoot (optional)
-
-The full path to the directory under which all OpenThought Applications will be
-located.  Please include a trailing slash.  By default, the installation puts
-this in C</var/www/OpenThought/>.
-
-The value for this is typically set in the OpenThought-httpd-modperl.conf file.
-However, if you wish to override it, or you don't have the ability to edit that
-file (ie, you don't have root on the webserver), you can set OpenThoughtRoot
-here.
-
-=back
 
 =item Return Value
 
 =over 4
 
-=item $o
+=item $OT
 
 OpenThought object.
-
-=back
 
 =back
 
@@ -174,312 +143,381 @@ OpenThought object.
 
 # The main OpenThought constructor
 sub new {
-    my ( $this, $op, $args ) = @_;
+    my ( $pkg, $args ) = @_;
 
-    if ( $args ) {
-        if ( exists $args->{ Prefix } ) {
-            $OpenThought::Prefix = $args->{ Prefix };
-        }
+    $args ||= {};
 
-        if ( exists $args->{ OpenThoughtRoot } ) {
-            $OpenThought::OpenThoughtRoot = $args->{ OpenThoughtRoot };
-        }
-
-    }
-
-    # If we don't have a Prefix set anywhere, try and figure it out from the
-    # location of the config file passed in
-    unless ( $OpenThought::Prefix ) {
-        require File::Basename;
-        my $dir = File::Basename::dirname( $op->config->{_m}{dir} );
-        $dir =~ s/etc.$//;
-        $OpenThought::Prefix = $dir;
-    }
-    my $class = ref( $this ) || $this;
+    my $class = ref $pkg || $pkg;
 
     my $self = {
-            OP  => $op,
+
+        %{ $args },
+
+        _persist  => $args->{persist} || 0,
+
     };
 
     bless ($self, $class);
 
-    $op->param->set_incoming(
-                $self->deserialize(
-                        $op->param->get_incoming('OpenThought'))) if $op;
+    $self->_init();
 
     return $self;
 }
 
+sub _init {
+    my $self = shift;
 
-#/-------------------------------------------------------------------------
-# function: settings
-#
+    my @settings = qw(
+                        log_enabled
+                        log_level
+                        require
+                        channel_type
+                        channel_visible
+                        channel_url_replace
+                        selectbox_max_width
+                        selectbox_trim_string
+                        selectbox_single_row_mode
+                        selectbox_multi_row_mode
+                        checkbox_true_value
+                        checkbox_false_value
+                        radio_null_selection_value
+                        data_mode
+                );
 
-=pod
+    delete $self->{_settings} if exists $self->{_settings};
 
-=over 4
+    foreach my $setting ( @settings ) {
+        $self->{_settings}{$setting} = [];
+    }
 
-=item settings
+    $self->{_response} = [];
 
- $string = $o->settings({  auto_clear          => boolean,
-                           max_selectbox_width => size,
-                           fetch_start         => string,
-                           fetch_display       => string,
-                           fetch_finish        => string,
-                           runmode_param       => string,
-                           order               => [ "fetchstart", "autoclear" ]
-                        });
-
-Alter settings in the currently running OpenThought application.  These
-settings will persist, until otherwise altered.  To temporarily change
-settings, these same options can be used in the serialize function.
-
-=over 4
-
-=item Parameters
-
-=over 4
-
-=item auto_clear
-
-The default behaviour for select lists is to clear themselves when multiple
-values are being inserted into them.  Setting autoclear to a false value is one
-method of altering that behavior.  If auto_clear is false, the contents of a
-select list are preserved, and any new data is appended to the select list.
-Any number less then 1 and 'false' are considered false values, everything else
-is true.
-
-When autoclear is set to false, you can still clear a select list by passing in
-an empty string as a parameter to the select list.
-
-=item max_selectbox_width
-
-Aside from Netscape 4, all browsers which items into a select box resize
-that select box to the width of the longest entry.  Select box resizing is
-neat, but sometimes it ends up being much to big, and can adversly affect other
-parts of your visual layout.  This option allows you to modify the size of text
-going into a SelectBox, so the browser doesn't make the select box too big.
-Text going into a select box will be truncated if it is longer then the max
-width set here.  The width refers to the maximum amount of characters.  This
-can be any number, or 0 to not constrain the size.
-
-=item runmode_param
-
-The name of the parameter which holds the run mode.  The JavaScript in the
-browser uses this when you send data the the server -- it figures out which run
-mode you are trying to run, and sets the appropriate parameters, so
-L<OpenPlugin::Application> can find it.  This, of course, doesn't matter if you
-aren't using L<OpenPlugin::Application>.
-
-=item fetch_start
-
-Text to display in the status bar when the browser sends data to the server.
-
-=item fetch_display
-
-Text to display in the status bar when the browser has received data from the
-server, and is currently displaying it.
-
-=item fetch_finish
-
-Text to display in the status bar when the browser finished displaying data it
-received from the server.
-
-=item order
-
-As parameters are serialized and executed in a particular order, this parameter
-allows you to override the default and specify exactly what this order will be.
-
-This option is a reference to an array, containing the proper order for all the
-items in the call.  Although this is more useful in the serialize function, it
-still could be beneficial to alter the order of settings.  The current order
-these are executed in are: auto_clear, max_selectbox_width, runmode_param,
-fetch_start, fetch_display, and fetch_finish.
-
-=back
-
-=item Return value
-
-=over 4
-
-=item $string
-
-A string, which contains the settings to be given to the browser.  Often
-this is just sent directly to the browser by your application, although you
-can modify it first if you desire.
-
-=back
-
-=back
-
-=back
-
-=cut
-
-sub settings {
-    my ( $self, $params ) = @_;
-
-    my $serializer = OpenThought::Serializer->new({ OP => $self->{OP} });
-
-    $serializer->params( $params );
-
-    return $serializer->output;
 }
 
 
-#/-------------------------------------------------------------------------
-# function: serialize
-#
+# Generate, in the proper order, the serialized params and settings
+sub output {
+    my $self = shift;
+
+    my ( $save, $serialized_data, $restore );
+    $save = $serialized_data = $restore = "";
+
+    my @settings;
+    foreach my $setting ( keys %{ $self->{_settings} } ) {
+        # There needs to be at least one passed in
+        next unless scalar @{ $self->{_settings}{$setting} } > 0;
+
+        $serialized_data .= join '', @{ $self->{_settings}{$setting} };
+        push @settings, $setting;
+    }
+
+    # Grab all the response data (params, focus, url, javascript, etc)
+    $serialized_data .= join '', @{ $self->{_response} };
+
+    # Save/restore the current settings unless told to make them
+    # persist
+    unless( $self->{settings_persist} ) {
+        if (@settings) {
+            $save    .= $self->_settings_save( @settings );
+            $restore .= $self->_settings_restore( @settings );
+        }
+    }
+
+    # Hands JavaScript code to the browser.  The browser processes the data
+    # automatically as we hand it over -- as far as the browser is concerned,
+    # it is simply loading a new page now (but in the hidden frame).
+    my $code = $self->_add_tags( "${save}${serialized_data}${restore}");
+
+    $DEBUG && carp $code ;
+
+    return $code;
+
+}
+
+*auto_param = \&param;
+*fields     = \&param;
+*html       = \&param;
+*images     = \&param;
+
+# The user has html, input fields, or images they want displayed in the browser
+sub param {
+    my ( $self, $data, $options ) = @_;
+
+    if (ref $data eq "ARRAY") {
+        $options = $data->[1] || {};
+        $data    = $data->[0] || {};
+    }
+
+    $data = $self->_as_javascript( $data );
+
+    my $save = "";
+    my $restore = "";
+    if ($options) {
+        $save =    $self->_settings_save( keys %{ $options } ) .
+                   $self->settings($options, 1);
+        $restore = $self->_settings_restore( keys %{ $options } );
+    }
+
+    $data = "${save}parent.OpenThought.ServerResponse(${data});${restore}";
+
+    push @{ $self->{_response} }, $data;
+
+    return $self->_add_tags($data);
+}
+
+# Calls the Focus function within the browser, which in turn takes the
+# cursor and puts it into a particular field
+sub focus {
+    my ( $self, $field ) = @_;
+
+    my $data = " parent.OpenThought.Focus('$field');";
+
+    push @{ $self->{_response} }, $data;
+
+    return $self->_add_tags($data);
+}
+
+# Send Javascript code to be interpreted by the browser.  This would often be
+# used to call a user defined Javascript function.. an example application of
+# this would be to use the dynapi Dynamic HTML API Library to create and
+# manipulate DHTML objects from the server.
+sub javascript {
+    my ( $self, $javascript_code ) = @_;
+
+    # NOTE: it really doesn't work to escape the JS!  The developer needs to do
+    # it themselves...
+    my $data = " with (parent.document) { $javascript_code }";
+
+    push @{ $self->{_response} }, $data;
+
+    return $self->_add_tags($data);
+}
+
+# Jump to a new page with this url
+sub url {
+    my ( $self, $url ) = @_;
+
+    unless ( $url ) {
+        croak "You're missing the parameter to 'url'.";
+    }
+
+    my $javascript_code;
+
+    if ( ref $url eq "ARRAY" ) {
+        if ( $url->[0] ) {
+            unless ( not ref $url->[0] ) {
+                croak "The first element of the arrayref passed into 'url' should be a scalar containing the url.";
+            }
+
+            $javascript_code = "parent.OpenThought.FetchHtml('$url->[0]'";
+        }
+        if ( $url->[1] ) {
+            unless ( ref $url->[1] eq "HASH" ) {
+                croak "The second element of the arrayref passed into 'url' is optional, but if supplied, must be a hashref.";
+            }
+            foreach my $param ( keys %{ $url->[1] } ) {
+                if ( defined $url->[1]->{ $param } ) {
+                    $javascript_code .= ",'$param=$url->[1]{ $param }'";
+                }
+                else {
+                    $javascript_code .= ",'$param'";
+                }
+            }
+        }
+    }
+    elsif ( not ref $url ) {
+        $javascript_code = "parent.OpenThought.FetchHtml('$url'";
+    }
+    else {
+        croak "The 'url' method takes either a scalar containing the url, or an an arrayref containing both the url and a hashref with url parameters.";
+    }
+
+    $javascript_code .= ");";
+
+    push @{ $self->{_response} }, $javascript_code;
+
+    return $self->_add_tags($javascript_code);
+}
+
+# Alter settings within the existing OpenThought Application
+sub settings {
+    my ( $self, $settings, $return_only ) = @_;
+
+    unless ( ref $settings eq "HASH" ){
+        croak "When you pass in settings, they need to be a hash " .
+             'reference.  Either $OT->settings( \%settings ) or ' .
+             '$OT->response( settings => \%settings ).';
+    }
+
+    my $data;
+    foreach my $name ( keys %{ $settings } ) {
+        # Persist is special as well.  It defines whether the settings
+        # being sent are to remain for the life of this page, or just for this
+        # current request.
+        if( $name eq "settings_persist" ) {
+            $self->{settings_persist} = $settings->{$name};
+        }
+
+        # All other parameters are treated the same here
+        elsif ( $self->{_settings}{$name} ) {
+            my $setting = "parent.OpenThought.config.$name = \"" .
+#                          $self->_escape_javascript( $settings->{$name} ) .  "\");";
+                          $self->_escape_javascript( $settings->{$name} ) .  "\";";
+
+            unless ($return_only) {
+                push @{ $self->{_settings}{$name} }, $setting;
+            }
+
+            $data .= $setting;
+
+        }
+        else {
+            carp "No such setting [$name].";
+        }
+    }
+
+    if ($return_only) {
+        return $data;
+    }
+    else {
+        return $self->_add_tags($data);
+    }
+}
+
 
 =pod
 
 =over 4
 
-=item serialize
+=item param()
 
- $string = $o->serialize({  fields     => $field_data,
-                            html       => $html_data,
-                            focus      => $field_name,
-                            javascript => $javascript_code,
-                            url        => $content_url,
-                            $setting   => $value,
-                            order      => [ "javascript", "fields" ],
-                        });
+ $OT->param( \%data, [ \%settings ] );
 
-Serialize data that you wish to give to the browser.
+Update input-type form field elements (text boxes, radio buttons, checkboxes,
+select lists, text areas, etc), HTML elements, as well as images an image attributes.
 
-=over 4
+This method accepts a hash reference containing keys which map to field
+names, html id's, and image names.
 
-=item Parameters
+The form element, html id, or image will be dynamically updated to contain the value found within the
+hash key.
 
-=over 4
+B<Text, Textarea, Password fields>: These are very straight forward.  The hash
+values are inserted directly into the input fields matching the hash keys.
 
-=item fields
+B<Radio buttons>: The value for the hash key should match the C<value>
+attribute of the radio button element in your HTML code.  When the hash key and
+value matches the radio button name and value, that radio button will become
+checked.
 
-This is how you would update HTML form field elements.
+B<Select Lists>: Sending a single array reference to a select list will cause
+that data to be appended to the select list.  In contrast, sending data as a
+reference to an array of arrays or an array of hashes will cause any values
+within the select list to be overwritten with the new data.
 
-This element accepts a hash reference containing keys which map to HTML form
-element names in the HTML document.  The value of each hash key will be
-displayed in the corresponding field.
+You can modify this select list behaviour by using the
+C<selectbox_single_row_mode> and C<selectbox_multi_row_mode> options.
 
-For radio buttons, the value for the hash key should match the C<value>
-attribute of the radio button element in your HTML code.  The radio button with
-the name and value which matches the hash key and value will be the element
-that gets selected.
+When sending data to a select list (which, as we said, is done as an array),
+the first element of the array is the text to be displayed, the second element
+is the underlying value associated with that text.
 
-Select List elements are a little different.  By default, sending a single
-array reference to a select list will append that item to your existing select
-list items.  Sending in a reference to an array of arrays will cause the list
-to be rewritten with this new data.  You can modify this by using the
-C<autoclear> setting.  Sending a single scalar value to a select list will
-cause that item to become highlighted.
+Sending a single scalar value to a select list highlights the corresponding
+entry in the select list which contains that value.
 
-There are examples of all these below.
+Sending undef, or a reference to an array with an empty string as it's only
+element will cause the select list to be cleared.
 
-=item html
+B<HTML elements>: It accepts a hash reference containing keys which map to HTML id attributes.
+You can add id tags for nearly any HTML attribute.  The hash values are inserted
+within the html containing an id tag matching the hash key (using innerHtml).  The data may contain HTML
+tags, which will be correctly displayed.
 
-This is how you would update literal HTML code.
+ $OT->param({ "html_id_tag" => "<b>foo</b>" }).
 
-It accepts a hash reference containing keys which map to HTML id attributes.
-You can add id tags to nearly any HTML attribute.  The value of each hash key
-will then be displayed within the corresponding id attribute.  This effectively
-allows you to replace any html currently loaded in the browser with whatever
-content you desire, on the fly.
+B<Images>: To change an image or image property, the hash key should be the image name.  If you just want
+to load a new image, the hash value should be a scalar containing the url of the new image.
 
-=item focus
+ $OT->param({ foo => 'http://example.com/new_image.jpg' });
 
-This allows you to focus a given form field.
+ $OT->param({ foo => { width  => 100,
+                       height => 150, });
 
-It accepts a string containing the name of the field within the HTML code which
-you wish to focus.
+B<Optional Parameter: Settings>: The second optional parameter is a hash reference of settings that will
+effect just the data passed into this call of C<param()>.  See the C<settings()> method for a list of
+available options.
 
-=item javascript
+=item javascript()
+
+ $OT->javascript( "alert('Howdy');" );
 
 This allows you to run JavaScript code, along with accessing JavaScript
 functions and variables.
 
-It accepts a string containing the JavaScript code you wish to run.  This will
-be run by the browser, within your application's namespace.  You do not need to
-add script tags.
+It accepts a string containing the JavaScript code you wish to execute.  There
+is no need to add script tags, they will be added for you.
 
-=item url
+=item focus()
 
-The url parameter allows you to load a new html document, in the content frame.
+ $OT->focus( "field_name" );
 
-All your base files which are loaded remain the same -- meaning your session
-and such are preserved -- what changes is the user interface, when using this
-option.  It first expires the cache associated with the form elements in the
-existing page, and then loads the new page you requested.
+This allows you to focus a given input field or anchor tag.
 
-It accepts a string containing the url to load.
+It accepts a string containing the name of the field or anchor tag you wish to
+focus.  If it's a field, it will be given the cursor.  If it's an anchor tag,
+the browser will jump to it's position on the page.
 
-=item setting
+=item url()
 
-This allows you to temporarily change the value of a setting.
+ $OT->url( "http://example.com/my_openthought_app.pl" );
 
-This is the same as calling the C<settings> function, except that when used
-here, the setting is only changed for this one call, and then it is restored to
-it's previous value.  The keyword to use for this option is not the literal
-word 'setting', but any of the setting options listed under the settings
-function.
+ $OT->url([ "http://example.com/my_openthought_app.pl" =>
+               { example_param => some_value,
+                 param2        => another_value } ]);
 
-=item order
+The C<url> method loads new page.
 
-This allows you to alter the order in which items are serialized.
+This method can be used by passing in the url as a scalar, or by passing in the
+url and url parameters within an arrayref.  If you pass in an arrayref, the
+first element of the array should be the url, the second element should be a
+hash reference whose keys and values will be passed on as parameters to the new
+url.
 
-Since parameters are serialized and executed in a particular order, this
-parameter allows you to override the default and specify what this order will
-be.  This is a reference to an array, containing the proper order for all the
-items in the call.  The default order is:  settings (see settings function),
-followed by fields, html, javascript, url, and focus.
+=item settings
 
-=back
+ $OT->settings({
+                        settings_persist           => boolean,
+                        log_start                  => string,
+                        log_level                  => string,
+                        require                    => { ... },
+                        http_request_type          => string,
+                        channel_type               => string,
+                        channel_visible            => boolean,
+                        channel_url_replace        => boolean,
+                        selectbox_max_width        => size,
+                        selectbox_trim_string      => string,
+                        selectbox_single_row_mode  => string,
+                        selectbox_multi_row_mode   => string,
+                        checkbox_true_value        => string,
+                        checkbox_false_value       => string,
+                        radio_null_selection_value => string,
+                        data_mode                  => string,
+                     });
 
-=item Return value
+Alter settings in the OpenThought application running in the browser.  Each
+parameter is optional.  Only pass in the option(s) you wish to change.
 
-=over 4
+For additional information on configuration, and for how/where to set the
+defaults, please see the section labeled C<CONFIGURATION>.
 
-=item $string
+This method accepts a hash reference where the keys are names of OpenThought
+options, and the values are the new option values.
 
-A string, which contains the serialized data to be given to the browser.
-Typically, you would have your application send this directly to the browser,
-although you can modify it first if you desire.
+By default, these options will only be good for one request.  You can change
+that behaviour by either passing in the C<persist> option to this method.
 
-=back
-
-=back
-
-=back
-
-=cut
-
-sub serialize {
-    my ( $self, $params ) = @_;
-
-    my $serializer = OpenThought::Serializer->new({
-                                 save_settings => 1,
-                                 OP            => $self->{OP},
-                                });
-
-    $serializer->params( $params );
-
-    return $serializer->output;
-}
-
-
-#/-------------------------------------------------------------------------
-# function: deserialize
-#
-
-=pod
-
-=over 4
-
-=item deserialize
-
- $hashref = $o->deserialize( OpenThought )
-
-Retrieve the parameters sent to us during a typical OpenThought request.
+You can set the defaults for most of these settings at the top of the
+OpenThought.js file.
 
 =over 4
 
@@ -487,318 +525,697 @@ Retrieve the parameters sent to us during a typical OpenThought request.
 
 =over 4
 
-=item OpenThought
+=item settings_persist()
 
-The parameter, passed to us from the browser, named 'OpenThought'.  This can be
-retrieved using $OP->param->get_incoming('OpenThought').
+ $OT->settings({ settings_persist => "true" });
+
+This specifies whether or not the settings being changed in the browser should
+be just for this request, or whether they should persist as long as the current
+page is loaded.
+
+The default is to not persist.
+
+If you use this parameter, only items you specify will be executed.  That is,
+if you fail to mention where C<fields> should be in the order, then C<fields>
+will be completely ignored for that request.
+
+If C<url> is not last, everything sent after it will be lost when the page
+changes.
+
+=item log_enabled
+
+ $OT->settings({ log_enabled => "true" });
+
+Enable a log window so you can see what's going on behind the scenes.  If
+something in your app isn't working, try enabling this.  This can be very
+useful for debugging, but you probably want it disabled while your app is in
+production.  This, of course, won't work if your popup blocking software
+doesn't allow popups from the site you're running your application from.
+
+=item log_level
+
+ $OT->settings({ log_level => "info" });
+
+What log level to run at.  You have the ability to enable lots of debugging
+output, only serious errors, and various levels in between.
+
+Options are C<debug>, C<info>, C<warn>, C<error>, C<fatal>
+
+=item require
+
+ $OT->settings({ require =>
+                        { "40dom" => "http://example.com/no_40dom",
+                          "xmlhttp" => "http://example.com/no_xmlhttp",
+                        } })
+
+Define a set of browser requirements, and a page to go to if that requirement
+is not met.
+
+Available requirements are C<40dom>, C<xmlhttp>, C<layer>, C<iframe>,
+C<htmlrewrite>.
+
+=item http_request_type (EXPERIMENTAL)
+
+ $OT->settings({ http_request_type => "POST" });
+
+The request type for communications with the server.  This can be
+overridden at any time by passing in either GET or POST as the first
+parameter to CallUrl().  The default (and known to work) option is GET.
+
+Using POST has only been minimally tested.  There have been problems noted when
+using Firefox and POST, if the C<channel_type> option was changed from C<auto>
+to C<iframes>.  This appears to be a Firefox bug.
+
+Options are C<GET> or C<POST> (case sensitive).
+
+=item channel_type
+
+ $OT->settings({ channel_type => "iframe" });
+
+The type of channel to use for communicating with the browser.
+
+By default, OpenThought will attempt to use the XMLHttpRequest or XMLHTTP
+functions available in recent browsers, then fall back to iframes if the
+browser doesn't support those newer options.
+
+However, XMLHttpRequest and XMLHTTP have one limitation -- for any given
+request, the server can only respond once, and the response is all at the same
+time.
+
+Iframes don't have that restriction, and the server can send a variety of
+responses throughout the duration of the request.
+
+XMLHttpRequest/XMLHTTP are fine for most uses, but some applications may
+benefit from being able to have the browser receive data a number of times
+throughtout a single request (ie, irc and other realtime chat applications).
+
+Options are C<auto> or C<iframe>.
+
+=item channel_visible
+
+ $OT->settings({ channel_visible => "true" });
+
+Normally, the channel used to communicate with the server is invisible.  The
+curious may wish to see whats going on inside it (or perhaps need it for
+debugging).  Enabling the following will make the channel visible.  This only
+works if the channel is an iframe (which means it's either an older browser, or
+that you have C<channel_type> set to C<iframe>.
+
+=item url_replace
+
+ $OT->settings({ url_replace => "true" });
+
+When using iframes and layers, the typical way to submit ajax requests to the
+server involves using a 'document.location.replace()'.  This means the requests
+aren't being stored in the browser history.  So, the back button will take you
+to the previous *page*, not the previous AJAX request.  This is often what
+people want.  This sometimes isn't what people want :-) Set to 'true' to not
+add AJAX requests to the browser's history, set to 'false' to have them added
+to the history.
+
+This option has no effect when using XMLHttpRequest/XMLHTTP.
+
+Options are C<true> or C<false>.
+
+=item url_prefix
+
+ $OT->settings({ url_prefix => "include/" });
+
+During any call to the server (via CallUrl and FetchHtml), assume the script is
+located in this directory (ie, the file/dir you pass in is relative to this
+path).  If there's no trailing slash, it will add one.  This config option can
+be overridden by beginning the url with 'http' or '/'.
+
+=item selectbox_single_row_mode
+
+ $OT->settings({ selectbox_single_row_mode => "append" });
+
+This defines whether or not sending a new row (an arrayref) to the select list
+overwrites the existing values, or adds to it.  It can be set to C<append> or
+C<overwrite>.
+
+The default behaviour for adding a row to select lists is to append itself to
+the end of the selectlist.  Setting C<selectbox_single_row_mode> to C<overwrite>
+value is how you can alter that behavior.  If C<selectbox_single_row_mode> is
+C<overwrite>, the contents of a select list are overwritten by the new row.
+
+When C<selectbox_single_row_mode> is set to C<append>, you can still clear a
+select list by passing in an empty string as a parameter to the select list.
+
+=item selectbox_multi_row_mode
+
+ $OT->settings({ selectbox_single_row_mode => "overwrite" });
+
+This defines whether or not sending multiple rows (an array of arrays) to the
+select list overwrites the existing values, or adds to it.  It can be set to
+C<append> or C<overwrite>.
+
+The default behaviour for adding multiple rows to select lists is to overwrite
+the existing list.  Setting C<selectbox_multi_row_mode> to C<append> value
+is how you can alter that behavior.  If C<selectbox_multi_row_mode> is
+C<append>, the contents of a select list are preserved, and all new data is
+appended to the end of the select list.
+
+When C<selectbox_multi_row_mode> is set to C<append>, you can still clear a
+select list by passing in an empty string as a parameter to the select list.
+
+=item selectbox_max_width
+
+ $OT->settings({ selectbox_max_width => "50" });
+
+Limit how many characters an entry in a select box can contain, 0 to not
+constrain the size.  The default is 30.
+
+Upon dynamically receiving select box content, most browsers resize the select
+box to the width of the longest entry.  This seems like a neat feature, but
+resizing the select box will often adversely affect other parts of your visual
+layout.   This option allows you to modify the size of text going into a select
+box, so the browser doesn't make the select box too big.
+
+Netscape 4 is the only browser known not to perform dynamic resizing.  Instead,
+it allows you to scroll side to side to view long text.
+
+See C<selectbox_trim_string> to learn what the trimmed text is replaced with.
+
+=item selectbox_trim_string
+
+ $OT->settings({ selectbox_trim_string => "+" });
+
+Text to add to strings trimmed because of C<selectbox_max_width>.
+
+If the text being inserted into a selectbox needs to be resized to fit (due to
+C<selectbox_max_width>), replace the removed text with the following string to
+make it clear that the string was trimmed.
+
+The default is to use two periods: ..
+
+=item checkbox_true_value
+
+ $OT->settings({ checkbox_true_value => "1" });
+
+The value a checkbox will return if it is checked, and no value is assigned to
+the checkbox (via the value= attribute).  The default is "1".
+
+=item checkbox_false_value
+
+ $OT->settings({ checkbox_false_value => "0" });
+
+The value a checkbox will return if it isn't checked.
+
+=item radio_null_selection_value
+
+ $OT->settings({ radio_null_selection_value => "0" });
+
+The value a group of radio buttons will return if none of them are selected.
+The default is "0".
+
+=item data_mode
+
+ $OT->settings({ data_mode => "append" });
+ $OT->param( $fields => { data_mode => "append" } );
+
+Define whether data should be overwritten or appended, for objects other than
+select lists.  It can be set to C<append> or C<overwrite>.
+
+By default, data sent from the server to the browser overwrites existing
+content.  This allows you to change that behaviour, and have it append.
 
 =back
 
-=item Return value
-
-Deserialize returns a hash reference with the following keys:
-
-=over 4
-
-=item fields
-
-A hash reference containing keys and values which map to the HTML form field
-names and values we were sent from the browser.
-
-=item expr
-
-A hash reference containing keys/value pairs as sent to us by the
-browser.  These are expressions which the application developer wanted sent to
-the server upon a particular event.
-
-=item session_id
-
-A string containing the session id for your application.
-
-=item run_mode
-
-A string containing the current run mode.  The key C<run_mode> is the
-C<run_mode_param>, as set in the config file, or overridden with the
-C<settings()> or C<serialize()> functions.
-
 =back
 
-=back
+=item response
 
-=back
+ print $OT->response();
+
+This returns the data gathered thus far, in a manner in which the browser will
+understand (ie, JavaScript).  Typically, you would just send this directly to
+the browser, though you can modify it first if you desire.
+
+Calling C<response> clears all the data gathered so far on the internal stack.
 
 =cut
 
-sub deserialize {
-    my ( $self, $xml_param ) = @_;
+*parse_and_output = \&response;
 
-    if ( not $xml_param or $xml_param eq "1" or
-         $xml_param eq "ui") {
-
-        $self->{'event_type'} = "init";
-        return;
-    }
-
-    my $serializer = OpenThought::Serializer->new({ OP => $self->{OP} });
-
-    my $params = $serializer->deserialize( $xml_param );
-
-    $self->{'runmode_param'} = $params->{'settings'}{'runmode_param'};
-    $self->{'event_type'}    = $params->{'settings'}{'event'} || "init";
-    $self->{'runmode'}       = $params->{'settings'}{'runmode'};
-
-    my $user_params = {
-        fields      => $params->{'fields'},
-        expr        => $params->{'expr'},
-        session_id  => $params->{'settings'}{'session_id'},
-    };
-
-    $user_params->{ $self->{'runmode_param'} } = $self->{'runmode'} if
-                                    defined $params->{'settings'}{'runmode'};
-
-    return $user_params;
-}
-
-
-#/-------------------------------------------------------------------------
-# function: init
-#
-
-=pod
-
-=over 4
-
-=item init
-
- $string = $o->init( [ $url ] )
-
-Retrieve the base files required for a browser to load an OpenThought
-Application
-
-=over 4
-
-=item Parameters
-
-=over 4
-
-=item $url (optional)
-
-If the url where your HTML user interface can be found is different from the
-one the browser just request, include the url here.  Otherwise, it defaults to
-using the current url to retrieve the HTML.
-
-For example, if your browser used http://mydomain.com/OpenThought/thisapp.pl to
-retrieve the base files, but you want the HTML for the content frame to be
-loaded from "/content/thisapp.html", you can pass in that relative path as a
-parameter.  This isn't frequently used, as most people would use templates
-served from the original url (http://mydomain.com/OpenThought/thisapp.pl).  If
-you do choose to use this, it is recommended that you only pass in relative
-url's.  Most browsers consider it a security risk to use JavaScript in
-combination with frames loaded from different sites.
-
-=back
-
-=item Return value
-
-=over 4
-
-=item $string
-
-Returns as a string the html base code that is required in order for your
-application to run.  Often this is just given directly to the browser by your
-application, although you can modify it first if you desire.
-
-=back
-
-=back
-
-=back
-
-=cut
-
-# Handle the deprecated "get_application_base" method
-*get_application_base = \*init;
-
-sub init {
-    my ( $self, $url ) = @_;
-
-    # Create a blank page for the hidden frame.  And no, simply using
-    # "about:blank" in the browser won't work because of IE6 under SSL, but
-    # thanks for asking.
-    return "<html><body></body></html>" if $self->event_type eq "blank";
-
-    $url ||= $self->{OP}->request->uri;
-
-    my $template = OpenThought::Template->new( $self->{OP}, $url );
-    $template->retrieve_template();
-    $template->insert_parameters();
-
-    return $template->return_template();
-}
-
-#/-------------------------------------------------------------------------
-# function: event
-#
-
-=pod
-
-=over 4
-
-=item event
-
- $string = $o->event( init  => sub { return $o->init; },
-                      ui    => sub { return $self->my_ui_handler },
-                      data  => sub { return $self->my_data_handler },
-                    );
-
-Call a subroutine or code reference based on the applications current event.
-
-Upon executing the C<event> method, OpenThought determines the particular event
-that's been generated, and immediatly calls the associated subroutine that
-you've sent in as a parameter.  It is not necessary to pass in all three
-parameters.
-
-Whenever the browser communicates with your application on the server, it
-generates an event.  An event can be either C<init>, C<ui>, or C<data>.
-
-There is actually one other event type called C<blank>.  It is recommended that
-you do absolutally nothing with this.  However, for those who like to fiddle
-with everything, the C<blank> event is called whenever the hidden frame is
-trying to load it's blank page.  The C<blank> event is usually handled for you
-within C<init>.  If, for some reason, you aren't happy with the blank page it's
-returning, you can pass in C<blank> as a parameter above, and have it return a
-better blank page. :-) (and no, using "about:blank" in the browser won't work
-unless you don't care about IE6+ users)
-
-=over 4
-
-=item Parameters
-
-=over 4
-
-=item init (optional)
-
-A reference to a sub or anonymous sub which will be called during the C<init>
-event.
-
-=item ui (optional)
-
-A reference to a sub or anonymous sub which will be called during the C<ui>
-event.
-
-=item data (optional)
-
-A reference to a sub or anonymous sub which will be called during the C<data>
-event.
-
-=back
-
-=item Return value
-
-=over 4
-
-=item
-
-Returns whatever value your subroutine returned.
-
-=back
-
-=back
-
-=back
-
-=cut
-
-sub event {
-    my $self   = shift;
-    my %events = @_;
-
-    my $event_type = $self->event_type;
-
-    if ($event_type eq "init" and exists $events{'init'}) {
-        return $events{'init'}();
-    }
-    elsif ($event_type eq "blank" and exists $events{'blank'}) {
-        return $events{'blank'}();
-    }
-    # A blank event is handled by "init" if no other handler is offered
-    elsif ($event_type eq "blank" and exists $events{'init'}) {
-        return $events{'init'}();
-    }
-    elsif ($event_type eq "ui" and exists $events{'ui'}) {
-        return $events{'ui'}();
-    }
-    elsif ($event_type eq "data" and exists $events{'data'}) {
-        return $events{'data'}();
-    }
-    else {
-        $self->{OP}->log->info("In event $event_type: no $event_type parameter passed in.");
-    }
-}
-
-#/-------------------------------------------------------------------------
-# function: event_type
-#
-
-=pod
-
-=over 4
-
-=item event_type
-
- $string = $o->event_type()
-
-Retrieve the type of event the browser initiated.
-
-The browser is capable of calling us using C<CallUrl> or C<FetchHtml>.  When
-using C<CallUrl>, the browser is expecting to receive data from the server
-which is can display in place, without reloading the screen.  If we're called
-with C<FetchHtml>, the browser is expecting HTML content so it can load a new
-page.
-
-Sometimes, it's useful to know how we were called, so we can respond
-accordingly.
-
-=over 4
-
-=item Parameters
-
-=over 4
-
-=item none
-
-=back
-
-=item Return value
-
-=over 4
-
-=item [ data | html ]
-
-Returns either the scalar C<data> if we were called by C<CallUrl>, or the
-scalar C<html> if we were called by C<FetchHtml>.
-
-=back
-
-=back
-
-=back
-
-=cut
-
-sub event_type {
+sub response() {
     my $self = shift;
 
-    return $self->{'event_type'};
+    if ( length(@_) and ref $_[0] eq "HASH" ) {
+        my $params = $_[0];
+
+        foreach my $param ( keys %{ $params } ) {
+            $self->$param( $params->{$param} );
+        }
+    }
+    else {
+        my @params = @_;
+
+        #for my $i ( 1 .. (length @params) / 2) {
+        while ( scalar @params > 0 ) {
+
+            my $method        = shift @params;
+            my $method_params = shift @params;
+
+            $self->$method( $method_params ) if $method ne "";
+        }
+    }
+
+    return $self->output();
+}
+
+# Save the current value of a setting
+sub _settings_save {
+    my ( $self, @settings ) = @_;
+
+    my $data;
+
+    foreach my $setting ( @settings ) {
+        $data .= " var __$setting=parent.OpenThought.config.$setting;";
+    }
+
+    return $data;
+}
+
+# Restore the previous value of a setting
+sub _settings_restore {
+    my ( $self, @settings ) = @_;
+
+    my $data;
+
+    foreach my $setting ( @settings ) {
+        $data .= " parent.OpenThought.config.$setting = __$setting;";
+    }
+
+    return $data;
+}
+
+# Convert a Perl hash into a JavaScript data structure.  This has all been
+# recently (7/24/05) modified to use JSON notation:
+#   http://www.crockford.com/JSON/index.html
+sub _as_javascript {
+    my ($self, $data) = @_;
+    my $packet;
+
+    unless ( ref $data eq "HASH" ) {
+        croak "Data sent to the serializer function must be a reference to a hash.";
+    }
+
+    $packet = "{";
+
+    # Loop through each element that needs filled
+    while ( my( $key, $val ) = each %{ $data } ) {
+
+        # In the case of a simple key=value assignment, do the following.  This
+        # is used for text, password, textbox, uniquely named checkboxes, and
+        # radio buttons
+        # Convert: $hash->{key} = "value"
+        # To:      key : value,
+        if( not ref $val) {
+            if ( defined $val ) {
+                $val = $self->_escape_javascript( $val );
+                $packet .= qq("$key": "$val",);
+            }
+            else {
+                $packet .= qq("$key": null,);
+            }
+        }
+
+        # In the case of adding one item to a select box, or clearing a select box
+        # Convert: $hash->{key} = [ $val1, $val2 ]
+        # To:      key: [ val1, val2 ],
+        elsif ( ref $val eq "ARRAY" and not ref $val->[0] ) {
+
+            # If we are sent something like:
+            #   $field->{'selectbox_name'} = [ "" ];
+            # That means we wish to clear the selectbox
+            unless ( defined $val->[0] and $val->[0] ne "" ) {
+
+                $packet .= qq("$key": [ "" ],);
+                next;
+            }
+
+            $packet .= qq("$key": [ );
+            $packet .= join '',
+                map { '"' . ($self->_escape_javascript($_) || "") . '",'}
+                @{ $val };
+
+            chop $packet;
+            $packet .= qq( ],);
+        }
+
+        # For updating select lists using an array of hashes
+        # Convert: $hash->{key} = [ { val1 => val2 }, { val3 => val4 } ]
+        # To:      key: [ { val1: val2 }, { val3: val4 } ],
+        elsif ( ref $val eq "ARRAY" and ref $val->[0] eq "HASH" ) {
+            $packet .= qq("$key": [ );
+
+            foreach my $hash ( @{ $val } ) {
+                while ( my ( $key1, $val1 ) = each %{ $hash } ) {
+                    $val1 = $self->_escape_javascript( $val1 );
+                    $packet .= qq({"$key1": "$val1"},)
+                }
+                chop $packet;
+            }
+            $packet .= qq( ],);
+        }
+
+        # This is done for adding multiple items to select boxes
+        # Convert: $hash->{key} = [ [ val1, val2 ], [ val3, val4 ] ]
+        # To:      key: [ [ val1, val2 ], [ val3, val4 ] ],
+        elsif ( ref $val eq "ARRAY" and ref $val->[0] eq "ARRAY" ) {
+            $packet .= qq("$key": [ );
+            my $i=0;
+            foreach my $array ( @{ $val } ) {
+
+                # If we are only sent text for the selectlist, and no value --
+                # define the value as empty.  When it gets to the browser, the
+                # value will be made the same as the text
+                $array->[1] = "" unless defined($array->[1]);
+
+                $array->[0] = $self->_escape_javascript( $array->[0] );
+                $array->[1] = $self->_escape_javascript( $array->[1] );
+                $packet .= qq(["$array->[0]","$array->[1]"],);
+                $i++;
+            }
+            chop $packet;
+            $packet .= qq( ],);
+        }
+
+        # This updates multiple checkboxes with the same name
+        # Convert: $hash->{key} = { key1 => val1, key2 = val2 }
+        # To:      key : { key1 : val1, key2 : val2 },
+        elsif ( ref $val eq "HASH" ) {
+            $packet .= qq("$key": { );
+            foreach my $key2 ( keys %{ $val } ) {
+                $val->{$key2} = "" unless defined($val->{$key2});
+                $val->{$key2} = $self->_escape_javascript( $val->{$key2} );
+                $packet .= qq("$key2": "$val->{$key2}",);
+            }
+            chop $packet;
+            $packet .= qq(},);
+        }
+        else {
+            carp "I'm not sure what to do with the data structure you sent!";
+        }
+    }
+    chop $packet;
+    $packet .= "}";
+
+    return $packet;
+}
+
+# Adds the appropriate script tags to JavaScript code
+sub _add_tags {
+    my ( $self, $code ) = @_;
+
+    # The <OT> tag is a bit of a unique ID... so that the JS can detect the
+    # difference between OT adding the tags, and tags added by the developer.
+    # The JS will strip all these tags -- everything but $code -- if the call
+    # is done through XmlHttpRequest or similar, but they're required with
+    # iframes.
+    #
+    # We're doing this instead of passing parameters from the browser to the
+    # server and testing on them to see if the tags should be added at all.
+    # Basically, this prevents the developer from having to pass params into OT
+    # that they don't understand, which I think makes things more complicated
+    # than they need to be.  You have my email address, feel free to argue :-)
+    return qq{\r <OT><body onLoad="parent.OpenThought.ResponseComplete(self)"></body><script>${code}</script><OT> \r};
+}
+
+sub _escape_javascript {
+    my ( $self, $code ) = @_;
+
+    return unless defined $code;
+
+    $code =~ s/\\/\\\\/g;
+    $code =~ s/\n/\\n/g;
+    $code =~ s/\r/\\r/g;
+    $code =~ s/\t/\\t/g;
+    $code =~ s/\"/\\"/g;
+    $code =~ s/([\x00-\x1F])/sprintf("\\%03o", ord($1))/ge;
+
+    return $code;
 }
 
 1;
 
 __END__
 
-=head1 INTERACTING WITH THE BROWSER
+=head1 JAVASCRIPT FUNCTIONS
 
-=head2 Sending Data to the Browser
+There are a number of JavaScript functions available after you've added the
+following to your HTML:
+
+  <script src="OpenThought.js"></script>
+
+=item CallUrl
+
+ OpenThought.CallUrl('script.pl', [ 'element1', 'element2', 'name1=value2' ] )
+
+Make an AJAX call (ie, in the background) to the server, and dynamically update the
+current page with the server's response.
+
+=over 4
+
+=item Parameters
+
+=over 4
+
+=item Parameter #1: url
+
+The first parameter is the url to send the request to.  Due to limitations with
+JavaScript, the location being called must be on the same server the HTML page
+which is currently loaded came from.
+
+=item Optional Parameters
+
+After the url, all other parameters are optional.  You can have as many
+additional parameters as you like.  Additional parameters would be one of the
+following:
+
+=over 4
+
+=item elements
+
+Passing in an element name sends the current value of that element to the server.
+
+An element could be the name of a form field (ie, text box, select list,
+checkbox), the name of an image, an id tag of an html element, and so on.
+
+B<wildcards>
+
+If you have a bunch of elements that all start or end with the same string, and
+you don't want to pass in each one individually, you can add an asterisk '*'
+for as a wildcard.  For example, sending in '*name' would send in values for
+the elements named first_name, last_name, and spouse_name.  Sending in just '*'
+with nothing else will pass in every form element on the page as a parameter.
+
+=item expressions
+
+If you have a static value that you'd like to send in, instead of an element,
+you may do so using the syntax:
+
+ 'param_name=param_value'
+
+=back
+
+B<arrays>
+
+You may find it works out easier for you to send in an array, instead of
+several individual parameters.  That's fine, you may send in one or more arrays
+instead of single scalar values.
+
+B<method>
+
+You can optionally specify the HTTP Request method to use.  If you wish to do
+that, you may put C<GET> or <POST> as the first parameter (before the url).  If
+not specified, it uses whatever is in the C<http_request_method>, which
+defaults to "GET".
+
+=back
+
+=back
+
+=item FetchHtml
+
+ OpenThought.FetchHtml('script.pl', [ 'element1', 'element2', 'name1=value2' ] )
+
+This function is called just like C<CallUrl()>, but they do very different
+things.  Unlike C<CallUrl()>, C<FetchHtml>'s job is to load a new page.
+
+Other than that, since it's usage is identical to C<CallUrl()>, see the
+C<CallUrl> parameters above for information on how to use it.
+
+=head1 JAVASCRIPT UTILITY FUNCTIONS
+
+=item GetElement
+
+ [element_type, element_value] = OpenThought.GetElement("someName");
+
+Retrieves the current type and value for an element.
+
+For example, if the element is a text box, this will be the text that currently
+resides within the text box.  If it's a select list, it'll be the active
+selection(s).
+
+=item SetElement
+
+ OpenThought.SetElement("elementName", "new_value");
+
+Sets the element with name "elementName" to the desired value.
+
+=item FindElement
+
+ element_object = OpenThought.FindElement("elementName");
+
+Returns the object for C<elementName>.
+
+This is basically a cross browser implementation of C<getElementById>.  It works
+in all browsers that can run OpenThought.
+
+=item Focus
+
+Focus a form field or jump to an anchor tag.
+
+=item HideElement, ShowElement
+
+Hide and Show elements.
+
+This allows you to hide pieces of HTML until some action occurs.  On any event,
+you may call either of these to show or hide any type of HTML, including form
+elements and even entire div tags.
+
+=item DisableElement, EnableElement
+
+ OpenThought.EnableElement( "element_or_form_name" );
+
+ OpenThought.DisableElement( form_name, { "EXCEPT" : [ "element3", "element4"] } );
+
+Enable or disable an element or form.
+
+There are cases where you'd want to disable an element or entire form.  For
+example, if you want to display an HTML based dialog box, and disable all input
+except for the newly displayed dialog.
+
+Calling C<DisableElement()> causes the elements (generally form elements) in question
+to be greyed out, and to no longer accept input.  Using C<EnableElement>
+re-enables the input. You can pass in '*' as the parameter to enable or disable
+all form elements.
+
+Note that disabled form elements cannot submit data to the server, you must
+first enable them.
+
+If you choose to pass in a form name or '*' (as opposed to an individual
+element name), it will loop over all the elements in the form or forms, and
+disable them individually.  Since you may not wish for each element to become
+disabled, you can pass in an exception list as the last parameter.  To do so,
+you can use JavaScripts ability to create anonymous hashes.  The first
+parameter to the hash must be "EXCEPT", the second parameter is an array,
+containing the names of all the elements to skip over.  In the above example,
+C<element3> and <element4> are going to be skipped.
+
+=item ElementChanged
+
+ bool = OpenThought.ElementChanged("myElement")
+
+Determine if a given element has changed since it's been loaded in the browser.
+
+After passing in a form element name, it will return true or false, depending
+on whether or not the value of that particular form element has been changed
+since the page was initially loaded.
+
+It cannot tell the difference between the user changing a value, and JavaScript
+changing the value.  So, if you were to code something which altered the value
+of an element, it would always return C<true> that it has been modified.
+
+=item ElementReset
+
+ OpenThought.ElementReset('ElementName')
+
+Resets an element to it's original state.
+
+This is quite similar to what a C<reset> button in a form does, but it works
+for individual elements.
+
+=item log
+
+ OpenThought.log.debug("Output some debugging info");
+ OpenThought.log.error("Something terrible has happened");
+
+Log information, based on the current log level.
+
+Available log levels are C<debug>, C<info>, C<warn>, C<error>, and C<fatal>.  If
+the current level is set to C<warn>, only calling the C<warn>, C<error>, and
+C<fatal> methods would generate logging output.  The C<debug> and C<info>
+methods would be ignored.  To get more logging, you'd simply have to set
+C<log_level> to C<info> or C<warn>.
+
+The default log level is set in the configuration section, and may be changed
+programmatically on the fly.  And of course, the log.enabled setting must be
+true for you to actually see any of these messages.
+
+=item browser
+
+ OpenThought.browser.version
+ OpenThought.browser.w3c
+
+=item config
+
+ alert( OpenThought.config.log_level );
+ OpenThought.config.log_enabled = true;
+
+Access any of the configuration settings.
+
+You may change any of these on the fly.
+
+=head1 CONFIGURATION
+
+Most of the configuration defaults are kept at the top of the OpenThought.js
+file.  All of those defaults can be changed at runtime using the C<settings>
+method, discussed above.
+
+While you can modify them directly in that file, that would mean future
+installations of OpenThought could cause them to be overwritten.
+
+After loading those settings, the OpenThought JavaScript looks for the
+existance of a function (class) named C<OpenThoughtConfigLocal>.  If it exists,
+it uses variables setup in it to override what's at the top of the
+OpenThought.js.
+
+To take advantage of that, you could create a (arbitrarily named) file called
+OpenThoughtLocal.js, and insert the following:
+
+ function OpenThoughtConfigLocal() {
+
+     ////////////////////////////////////////////////
+     //
+     // Local Config section - Custom config options
+     //
+
+     this.log_enabled = true;
+     this.log_level = "debug";
+
+     this.channel_visible = true
+     this.selectbox_max_width = "50"
+
+ }
+
+The above would enable logging at the debug level, make the communication
+channel visible (for iframes anyway), and make the max selectbox width 50
+characters instead of 30.
+
+Then, in your HTML code, you'd simply add this line:
+
+ <script src="OpenThoughtLocal.js"></script>
+
+That must be B<above> the line you use to include the OpenThought.js file.
+So, the two lines together would look like:
+
+ <script src="OpenThoughtLocal.js"></script>
+ <script src="OpenThought.js"></script>
+
+=head1 SENDING DATA TO THE BROWSER
 
 The following methods show you how you can send data from the server to the
 browser.
@@ -806,73 +1223,85 @@ browser.
 B<Just a Hashref>
 
 You only need a reference to a hash to send data to the browser.  If the
-hashref containing all of our field data is called $field_data, then all we
-need to do in our code is:
+hashref containing all of our data is called %data, then all we need to
+do in our code is:
 
- # Send the outgoing HTTP Header
- $OP->httpheader->send_outgoing();
+ # Populate the input fields, html, and/or images with the data within our hashref
+ print $OT->param( \%data );
 
- # Populate the form fields with the data within our hashref
- print $o->serialize({ fields => $field_data });
+The keys in the $data hash would map to input field names, HTML id tags, or
+image names in the browser.
 
-B<Populating Text, Password, and Textarea HTML Elements>
+B<Populating Text, Password, and Textarea Form Elements>
 
- $field_data->{'fieldname'} = "data";
+ $data->{'fieldname'} = "data";
 
-B<Populating and Selecting Select List HTML Elements>
+B<Populating and Selecting Select List Form Elements>
 
- $field_data->{'selectbox_name'} = [
-                                        [ "Example 1", "value_one"   ],
-                                        [ "Example 2", "value_two"   ],
-                                        [ "Example 3", "value_three" ],
-                                   ];
+ $data->{'selectbox_name'} = [
+                                 [ "Example 1", "value_one"   ],
+                                 [ "Example 2", "value_two"   ],
+                                 [ "Example 3", "value_three" ],
+                             ];
 
-This will set the text of a select box to the left column above, and the value
-of that text to the right column.
+This will set the text of a select box to the left column above, and the
+underlying value of that text to the right column.
 
+You can also use an array of hashes:
+
+ $data->{'selectbox_name'} = [
+                                 { "Example 1" => "value_one"   },
+                                 { "Example 2" => "value_two"   },
+                                 { "Example 3" => "value_three" },
+                             ];
 In the case that you don't have two columns worth of data you wish to use, you
 can also do:
 
- $field_data->{'selectbox_name'} = [
-                                     [ "Example 1"  ],
-                                     [ "Example 2"  ],
-                                     [ "Example 3"  ],
-                                   ];
+ $data->{'selectbox_name'} = [
+                                 [ "Example 1"  ],
+                                 [ "Example 2"  ],
+                                 [ "Example 3"  ],
+                             ];
 
 This makes both the text and value of the selectbox identical, and requires
-sending less data to the browser (which, of course, saves bandwidth).
+sending less data to the browser (which, of course, saves bandwidth, woohoo!).
 
-The above array of arrays will erase the current contents of the select list
-with the data in the array.  To append a single item to the end of the select
-list, you can use the following:
+By default, the above array of arrays and array of hashes will erase the
+current contents of the select list with the data in the array.  To append a
+single item to the end of the select list, you can use the following:
 
- $field_data->{'selectbox_name'} = [ "Example 1", "value_one" ];
+ $data->{'selectbox_name'} = [ "Example 1", "value_one" ];
 
 You can also use:
 
- $field_data->{'selectbox_name'} = [ "Example 1" ];
+ $data->{'selectbox_name'} = [ "Example 1" ];
 
-This will set both the text and value of the entry to "Example 1".
+The latter will set both the text and value of the entry to "Example 1".
 
-Also, if autoclear is set to false (not the default), you can use the following
-to manually clear the contents of a select list:
+Also, you can use the following methods to manually clear the contents of a
+select list:
 
- $field->{'selectbox_name'} = [ "" ];
+ $data->{'selectbox_name'} = undef;
 
-To select (highlight) an item in an existing list of elements, you can send a
-select list a single string like so:
+   -- or --
 
- $field->{'selectbox_name'} = "optionvalue";
+ $data->{'selectbox_name'} = [ "" ];
+
+That can be particularly useful if c<selectbox_single_row_mode> or
+selectbox_multi_row_mode are set to append, but you need to clear out the list
+for new data.
+
+To select (highlight) an item in an existing select list, you can send a
+single string to your select list like so:
+
+ $data->{'selectbox_name'} = "optionvalue";
 
 Which ever item in the select list has the value C<optionvalue> will become
 highlighted.
 
-For more information on how to add data to a select box without erasing the
-current contents, be sure to check out the C<autoclear> setting.
+B<Selecting Checkbox Elements>
 
-B<Selecting Checkbox HTML Elements>
-
- $field_data->{'checkbox_name'} = "boolean";
+ $data->{'checkbox_name'} = "boolean";
 
 To uncheck a checkbox, set value to C<false>, which can be any of:
 
@@ -886,6 +1315,8 @@ To uncheck a checkbox, set value to C<false>, which can be any of:
 
 =item * any number less then 1
 
+=item * The current value of C<checked_false_value>
+
 =back
 
 =back
@@ -893,9 +1324,12 @@ To uncheck a checkbox, set value to C<false>, which can be any of:
 Setting the value to anything other then the above will be interpreted as
 C<true>, and will cause the checkbox to be checked.
 
-B<Selecting Radio Button HTML Elements>
+Additionally, setting c<checked_true_value> to any of the above "normally false"
+values will override them.
 
- $field_data->{'radiobtn_name'} = "radiobtn_value";
+B<Selecting Radio Button Form Elements>
+
+ $data->{'radiobtn_name'} = "radiobtn_value";
 
 radiobtn_value is the value in the "value=" tag of the radio button.
 
@@ -905,7 +1339,7 @@ that group.
 
 B<Updating Existing HTML Code>
 
- $html_data->{'id_tagname'} = "<h2>New HTML Code</h2>";
+ $data->{'id_tagname'} = "<h2>New HTML Code</h2>";
 
 This inserts the code "<h2>New HTML Code</h2>" inside the tag with the id
 attribute labeled 'id_tagname'.  This replaces any text or code that may have
@@ -917,9 +1351,10 @@ interested :-)
 
 B<Focusing an Element>
 
-You can give the focus to any form element within the browser simply by saying:
+You can give the focus to any form element or anchor tag within the browser
+simply by saying:
 
- $o->serialize({ focus => "fieldname" });
+ $OT->focus("fieldname");
 
 B<Running JavaScript>
 
@@ -929,18 +1364,19 @@ from the server.
 
 The following calls the JavaScript 'alert' function:
 
- $o->serialize({ javascript => "alert('Hello!');" });
+ $OT->javascript("alert('Hello!')");
 
 The next example calls the hypothetical javascript function 'myfunction', using
 C<param1> and C<param2> as arguments to that function:
 
- $o->serialize({ javascript => "myfunction(param1, param2);" });
+ $OT->javascript("myfunction(param1, param2);");
 
 You can send any JavaScript you want, but make sure it's properly formated
 code.  OpenThought does not validate whether or not your JavaScript syntax is
 correct, the browser will be your judge!  If something isn't working, pull up
 your browser's JavaScript console, it may provide you with some insight as to
-what isn't working properly.  You do not need to include script tags.
+what isn't working properly.  Setting C<log_enabled> to C<true> may help as
+well. You do not need to include script tags.
 
 B<Loading a New Page>
 
@@ -949,21 +1385,16 @@ content frame.  Loading a new page is quite simple, and can be initiated from
 the server, or from the browser.
 
 Here is an example of how you might tell the browser, from the server, to load
-a new URL:
+a new page:
 
- $o->serialize({ url => '/OpenThought/newurl.pl' });
+ $OT->url('http://example.com/newurl.pl');
 
 This function will have the browser call the perl script 'newurl.pl'.  It's
 then up to newurl.pl to deliver some sort of content back to the browser.
-Although you are loading a new page, the session is preserved across this call
-since only the content frame is being updated.
-
-You may also load a new page from the browser when a user clicks a button or
-link.  See the 'FetchHtml()' function in L<Sending Data to the Server> below.
 
 B<Using DBI>
 
-You can send the results of a database search directly to the browser, and have
+You can send the results of a database query directly to the browser, and have
 the data from the results put into their respective fields.  You only need one
 thing in order for this to work -- the field names in your database need
 to match your field names in the HTML.  For example:
@@ -974,11 +1405,15 @@ to match your field names in the HTML.  For example:
  my $sth = $dbh->prepare($sql);
  $sth->execute;
 
- $field_data = $sth->fetchrow_hashref;
+ $data = $sth->fetchrow_hashref;
+
+ $OT->param($data);
+ print $q->header();
+ print $OT->response();
 
 In this case, lets say we have 'name', 'address', 'phone', and 'age' as
-text fields in our HTML, and 'married' is a checkbox.  As soon as we send
-$field_data to the browser, these fields (which must exist) will all be filled
+names of text fields in our HTML, and 'married' is a checkbox.  As soon as we
+send $data to the browser, these fields (which must exist) will all be filled
 in with the appropriate data.
 
 This also works for select lists:
@@ -988,30 +1423,40 @@ This also works for select lists:
  my $sth = $dbh->prepare($sql);
  $sth->execute;
 
- $field_data->{'people'} = $sth->fetchall_arrayref;
+ $data->{'people'} = $sth->fetchall_arrayref;
+
+ print $OT->parse_and_output({ auto_param => $data });
 
 This selects the name and social security number from everyone in the table,
-and will allow us to use it to populate a select list named 'people'.
+and will allow us to use it to populate a select list named 'people'.  The
+names are what will be displayed, the ssn will become the corresponding value.
 
 =head2 Sending Data to the Server
 
 You can send data from the browser to the server anytime an event occurs.
 Events are often generated by clicking buttons or links.  JavaScript functions
-like onMouseOver, onClick, onChange, etc.. they can all allow you to cash in on
+like onMouseOver, onClick, onChange, etc.. they all allow you to cash in on
 an event, and you can take advantage of them to send data to the server at that
 time.
 
-The two JavaScript functions available to you for communicating with the server
-are B<CallUrl()> and B<FetchHtml()>.  Their usage and parameters are identical,
-but they perform very different functions.
+There are two JavaScript functions available to you for communicating with the
+server.  Their usage and parameters are identical, but they perform very
+different functions.
 
-B<CallUrl()> is used when you want to interact with the server, optionally
-update the content frame, all without reloading the page.
+=over 4
 
-The function B<FetchHtml>, however, does reload the page.  It's sole purpose is
-to fetch new HTML content for your content screen, replacing your existing
-HTML with the content it is given.  This is a fancy way of saying it just
-loads a new page.
+=item CallUrl
+
+The C<CallUrl> function is used when you want to use "AJAX" or "Remote
+Scripting" -- calling the browser in the background, and dynamically update the
+page with it's response.
+
+=item FetchHtml
+
+The function C<FetchHtml> is what you want to use when you B<do> want to load a
+new page.
+
+=back
 
 The following are some examples of how you might use these two functions.  In
 any of the following situations, the two functions are interchangable.  It all
@@ -1020,13 +1465,13 @@ just depends on what you want to happen.
 B<Button Events>
 
  <input type="button" name="search" value="Click me!"
-        onClick="parent.CallUrl('/OpenThought/servercode.pl',
-                                'field1', 'field2', 'foo=bar');
+        onClick="OpenThought.CallUrl('servercode.pl',
+                                     'field1', 'field2', 'foo=bar');
 
 Upon clicking this button, it will send the current contents of the fields
-named 'field1' and 'field2' to /OpenThought/servercode.pl.  It will also send
-the expression "foo=bar".  When this gets to the server, 'foo' will be a hash
-key, 'bar' will be set to the value of that key.
+named 'field1' and 'field2' to servercode.pl.  It will also send
+the expression "foo=bar".  When this gets to the server, 'foo' will be a
+parameter name, 'bar' will be it's value.
 
 Be careful using submit and image buttons.  You don't want your form to
 actually perform a "submit", which causes the page to refresh.  You are merely
@@ -1034,688 +1479,135 @@ looking to "catch" the submit event, and perform an action when that submit
 even is generated.  If you wish to use a submit or image button, you should
 define your form like this:
 
- <form onSubmit="return false">
+ <form name="myForm" onSubmit="return false">
 
 Now your browser can use submit and image buttons to send data to the server
-without refreshing.
+without actually refreshing.
 
-B<Using Links>
+B<Using 'A' Links>
 
 The following example shows you how you can use a typical HTML link to send
 data to the server without causing the page to refresh:
 
- <a href="javascript:parent.CallUrl('/OpenThought/servercode.pl',
-                                    'run_mode=forgot_password')">Click me!</a>
+ <a href="#" onClick="OpenThought.CallUrl('/OpenThought/servercode.pl',
+                                          'run_mode=forgot_password');
+                                           return false;">
+                                           Click me!</a>
+
+Note: For things to work properly when using links, your JavaScript call has to
+be done within the C<onClick> handler, and you need to finish it off using
+C<return false> (ie, just like the example shows ;-)
 
 B<Select List Events>
 
  <select name="mySelectList" size="10"
-         onChange="parent.CallUrl('/OpenThought/servercode.pl',
-                                  'mySelectList')>
+         onChange="OpenThought.CallUrl('/OpenThought/servercode.pl',
+                                       'mySelectList')>
 
-By using C<onChange> as we are above, we say that whenever an item in the
-select list is clicked, it will send it's value to /OpenThought/servercode.pl.
+By using C<onChange> as we are above, whenever a select list item is clicked,
+it will send it's value to /OpenThought/servercode.pl.
 
-=head1 EXTENDED FUNCTIONALITY: OPENPLUGIN
+=head1 A CLOSER LOOK AT THE DEMO
 
-Instead of building all OpenThought's functionality into the core OpenThought
-modules, non-core functionality was split off into a reusable component called
-L<OpenPlugin>.  OpenPlugin is a plugin manager which may be used in any web
-application, including OpenThought.  The list of plugins if offers is
-currently:
+This is the gist of what happens in the Soul Food Cafe demo.
 
-=over 4
+Filling the menu select lists:
 
-=item * L<Application|OpenPlugin::Application>
+    $data->{menu} = [
+            [ "Fried Chicken",   0 ],
+            [ "Chicken Wings",   1 ],
+            [ "Chicken Nuggets", 2 ],
+            [ "Dry White Toast", 3 ],
+            [ "Dry Wheat Toast", 4 ],
+            [ "Coke",            5 ],
+            [ "Sprite",          6 ],
+        ];
 
-=item * L<Authentication|OpenPlugin::Authentication>
+    print $q->header;
+    print $OT->parse_and_output( auto_param => $data });
 
-=item * L<Cache|OpenPlugin::Cache>
+The above will fill the following select list:
 
-=item * L<Config|OpenPlugin::Config>
+    <select name="menu" size="6"
+            onChange="OpenThought.CallUrl('index.pl', 'menu', 'mode_get_info'>
 
-=item * L<Cookie|OpenPlugin::Cookie>
+If the user clicks a menu item, the onChange event fires.  It sends the
+value of the highlighted menu item to index.pl.  We also send in an arbitrarily
+named parameter of mode=get_info, which the Perl code can test on to know what
+the user just clicked.
 
-=item * L<Datasource|OpenPlugin::Datasource>
+To return info about the "Fried Chicken", and display it in the html:
 
-=item * L<Exception|OpenPlugin::Exception>
+      $data-> {
+          info => 'Best %*$# chicken in the state!',
+          cost => '14.99',
+      };
 
-=item * L<Httpheader|OpenPlugin::Httpheader>
+    print $q->header;
+    $OT->param( $data );
+    print $OT->response();
 
-=item * L<Log|OpenPlugin::Log>
+That updates the following html: (the data inside the span tags is replaced
+with the data in the above hash):
 
-=item * L<Param|OpenPlugin::Param>
+    <span id="info">(no item selected)</span>
+    <span id="cost">0.00</span>
 
-=item * L<Request|OpenPlugin::Request>
+To add an item to the dinner selection, the user clicks this button:
 
-=item * L<Session|OpenPlugin::Session>
+    <input type="button" value="Add Item -->"
+           onClick="OpenThought.CallUrl('index.pl', 'menu', 'mode=add_item'>
 
-=item * L<Upload|OpenPlugin::Upload>
+The onClick even fires, and the currently highlighted menu item is again sent
+to the server (but this time, we send in mode=add_item).  The server runs this:
 
-=back
+    $data->{dinner} = ["Fried Chicken", 0];
 
-=head2 OpenPlugin Usage
+    print $q->header;
+    print $OT->param($data);
 
-Here you will see methods of how to use OpenPlugin within OpenThought.  For
-more information on OpenPlugin, please see the L<OpenPlugin
-documentation|OpenPlugin> included with the OpenPlugin distribution.
+That appends the data to this select list:
 
-=over 4
+    <select name="dinner" size="6">
 
-=item Application
-
-This is a powerful component which is a subclass of L<CGI::Application>.  It,
-in the authors words, will "make it easier to create sophisticated, reusable
-web-based applications".
-
-While using OpenPlugin::Application isn't necessary, it's highly (very highly!) recommended.
-
-=item Authenticate
-
-Authenticate a user:
-
- $auth = $OP->authenticate->authenticate({ username => "some_username",
-                                           password => "some_password",
-                                        });
-
-The variable $auth will be true if the user is successfully authenticated,
-false otherwise.
-
-=item Cache
-
-If you wish to use a cache:
-
- $OP->cache->save( \%cache_data, {
-                         id      => "Unique name for this cache entry",
-                         expires => "+3h",
-                 });
-
-And then later, to retrieve the cache:
-
- my $cache = $OP->cache->fetch( "Unique name for this cache entry" );
-
-$cache will be undef if there is no valid cache data for the id being given.
-
-=item Cookie
-
-A cookie can be sent to the browser with the following:
-
- $OP->cookie->set_outgoing({  name    => 'testcookie',
-                              value   => 'My Cookie',
-                              expires => '+1h',
-                           });
-
-To retrieve the cookies from the client request:
-
- my $cookies = $OP->cookie->get_incoming;
-
-=item Datasource
-
-After defining your datasource in the OpenThought config file, you can access
-it via the OpenPlugin datasource interface.
-
- $dbh = eval { $OP->datasource->connect( "datasource_name" ); };
- if ( $@ ) {
-     $@->throw("Connection Error: $@\n");
- }
-
-At this point, $dbh is a typical DBI database handle, and may be used as such:
-
- my $sth = $dbh->prepare("SELECT * from somewhere");
- $sth->execute;
- my $rows = $sth->fetchrow_hashref;
-
-Now you have the first row of data from your database search stored in $row.
-See the DBI documentation for more information on interacting with databases
-and their results.
-
-=item Exception
-
-You can use this to throw an exception:
-
- $OP->exception->throw( "Some Error Message" );
-
-=item Httpheader
-
-You can send a typical text/html header like so:
-
- $OP->httpheader->send_outgoing();
-
-=item Logging
-
-To log a message to the current logging facility:
-
- $OP->log->warn("My log message");
-
-=item Parameter
-
-To retrieve a parameter sent from the browser to the client:
-
- $OP->param->get_incoming("parameter_name");
-
-=item Session
-
-Retrieve your session:
-
-After properly calling OpenThought's deserialize function, your session_id is
-available as if it were a GET/POST parameter.  You can retrieve it like so:
-
- $session_id = $OP->param->get_incoming( 'session_id' );
-
-And then you can recreate your session:
-
- $session = $OP->session->fetch( $session_id );
-
-You may make any modifications you wish, and once again save this session by
-saying:
-
- $session->{'key'} = "somevalue";
- $OP->session->save( $session );
-
-You may want to perform the save *after* you've sent the headers and data back
-to the browser if you are able to.  Saving the session isn't something that's
-usually necessary before the browser is given it's information. Choosing to
-save afterwards will get the data to the user faster.
-
-=back
-
-=head1 BACKGROUND
-
-OpenThought came to be due to a misconception in what WDDX
-(http://openwddx.org) is supposed to do.  WDDX is actually designed to allow
-you to copy a data structure from one programming language to another.  If you
-have an array in Perl, WDDX will allow you to copy that same data structure
-into, say, JavaScript.  I misunderstood how that was supposed to work at first,
-and thought this would all work in the background, similar to how OpenThought
-does today.  To my dissapointment, WDDX was really much simpler than that.
-WDDX is just an XML specification, it's up to us as developers to figure out
-how to get that XML from one language to another.
-
-That got me thinking though, why can't browsers update content while not
-reloading the page?  Non-browser based applications do it all the time.
-
-When looking at most web applications, the amount of data which changes as you
-traverse from one page to another is pretty minimal.  Or at least, the amount
-of data that I<has> to change is minimal.  So, why can't we just receive the
-data which has changed, instead of reloading the entire page each time we click
-a button in the browser?  The amount of time we'd save for each request is
-incredible.  Not only are we saving bandwidth, but now the browser doesn't have to render it all.
-
-So, these ideas spawned OpenThought.  It was always built using Perl.  However,
-in it's early stages, it didn't use a hidden frame as it does now, it used a
-Java applet called urlPipe to communicate to and from the server.  The Java
-applet required extra resources on the client, added an unnecessary dependency,
-and turned out to be a bit slower.  OpenThought's move to using a hidden frame
-turned out to be an important step in increasing usability, and decreasing
-latency.
-
-=head1 HOW IT WORKS
-
-When you create an OpenThought application, it will be made of two parts.
-There is your Perl code on the server, and the HTML content which gets
-displayed in the browser, and becomes the user interface.
-
-Your HTML Content is made up the HTML screens that you provide for the user to
-interact with.  This is where you begin to notice the differences with
-OpenThought applications.  Any given screen interacts with the server in the
-background.  These screens don't need to submit, don't need to go away, don't
-need to be refreshed.  Whenever you want data to be displayed for the user, it
-can all be displayed dynamically.
-
-OpenThought is able to communicate with the server by using a hidden frame and
-some funky JavaScript.  This hidden frame is used to submit data to the server,
-and the server's responses are also retrieved by these hidden frames.  When
-data is received from the server, OpenThought's internal Javascript routines
-are used to properly handle it -- whether it needs to be displayed, whether it
-should be calling a JavaScript function, and so on.
-
-Lets go step by step through a summary of what happens when using an
-OpenThought Application to dynamically display data.
-
-=over 4
-
-=item 1. The browser requests your OpenThought Application.
-
-=item 2. Your application gives the browser the HTML portion of your application.
-
-=item 3. The user can now interact with the HTML.  As an example, lets say
-that he entered a person's last name, and clicked a submit button.
-
-=item 4. Instead of the HTML content being directly submitted as one would
-typically expect, the data it wants to send to the server is first converted to
-XML, and given to the hidden frame, which in turn sends it to your application
-on the server.  The HTML the user already has in their browser is left
-completely in tact, and never reloaded or refreshed.
-
-=item 5. Your application on the server now receives the data sent by the
-browser.  It doesn't need to know how to parse this data though, and uses the
-OpenThought Engine to deserialize it.
-
-=item 6. The OpenThought Engine deserializes the packet, and returns it to your
-Application in the form of a hash (also sometimes called an associative array).
-
-=item 7. Your application is now free to do whatever it wants with this
-data.  To continue our example, if we were sent a last name, perhaps we
-would do a search for this person's phone number in a database.
-
-=item 8. After we put together a dataset which we would like to send back to
-the browser (a phone number in this case), we send it to the OpenThought
-Engine, in the form of a hash, to be serialized into a packet.  For any data
-you wish to have displayed, the hash key that you use would correspond to a
-form element name or HTML ID tag in the HTML content.
-
-=item 9. The OpenThought Engine gives us back a packet, and we can now send
-this packet to the browser.
-
-=item 10. After receiving this packet, the browser immedietly handles the
-information for you -- and in this case, displays the phone number in the
-appropriatly named field.  There is no programming on your part needed for this
-to work, OpenThought's JavaScript routines figure this out for you based on
-your hash keys as mentioned above.
-
-=back
-
-This entire process actually runs extremely fast, and certainly competes with
-other types of applications.  I've seen round trip times as low as 26
-milliseconds, which certainly beats the pants off loading an entire webpage
-containing the same data :-)
-
-=head1 GETTING STARTED
-
-So far, this documentation has been all theory. But I know you're itching to
-create you own application, so we'll get into the nitty gritty now :-)
-
-=head2 Genesis of an OpenThought Application
-
-From here on out, we are assuming that you have successfully installed
-OpenThought, and that the demo program works correctly.  If this is not the
-case, see the INSTALL file for instructions on getting OpenThought up and
-running.
-
-Now, pick a name for your application, and let's get to work!
-
-=head2 Location Location Location
-
-The first thing you need to do is pick a location for your application.  When
-OpenThought was installed on your system, an "OpenThoughtRoot" was chosen (the
-default is /var/www/OpenThought).  OpenThoughtRoot is a directory under
-which all your OpenThought application executables (.pl files) need to be
-located.  It is recommented that you keep your modules and content files (.pm
-and .html files) in a location not accessible from the web.  On my RedHat
-system, I often use:
-
- # For .pl files
- /var/www/OpenThought/appname
-
- # For .pm files
- /var/www/site/lib/Appname
-
- # For HTML files
- /var/www/site/templates
-
-This is just an example.  Pick a spot for these files that works for you, and
-we're well on our way!
-
-=head2 Create your User Interface
-
-Next, create an HTML Document which will be your user interface.  If you're
-into HTML, you'll like this part.  If not.. well, it doesn't have to be too
-painful :-)  You could even use applications like Macromedia's DreamWeaver and
-Fireworks to handle this visual design for you.
-
-So, imagine all the things you would like to make available to your users, and
-start coding.  You can use any number of form elements in your application.
-Also, you can even use multiple div tags in conjunction with CSS visible / hide
-to give the look and feel of having tabs. With this, you can squeeze much more
-data into a single page.  However, implementing tabs does require a certain
-amount of HTML / CSS / Javascript knowledge.. if you aren't up on that, there's
-plenty of books, and even online tutorials on that subject.  This is also where
-DreamWeaver and Fireworks can help you.
-
-While developing your HTML code, you must give each of your form elements a
-unique name.  For an example interface, feel free to use the demo-template.html
-included with OpenThought.
-
-Now, you may start wondering, "How do I submit data from these forms to the
-server"?  Data is sent after some sort of event is generated... such as
-clicking a button.  When such an event occurs, you'll want to call one of the
-following Javascript functions:
-
- parent.CallUrl('application_url', form_element1, form_element2, ...)
-   -- or --
- parent.FetchHtml('application_url', form_element1, form_element2, ...)
-
-These functions get everything started.
-
-See the section L<Sending Data to the Server> for more information on the above
-two functions.
-
-The parameter "application_url" is url of the application which will be
-receiving this data.  An example of this is could be
-"http://www.foo.com/OpenThought/apps/demo.pl", or even just
-"/OpenThought/apps/demo.pl".
-
-The "form_element" parameters allow you to send the contents of any number of
-form elements to the server.  Simply list their names here.  You defined their
-name when you used the <input name="foo"> attribute in your HTML.  This tag's
-name is foo.  At the time the event is generated, the current values of these
-elements will be taken, and it will all be sent to the server for you to
-process.  Similarly, you can also send HTML to the server by using the id tag
-of the HTML.
-
-In addition to being able to send form elements and html to the server, you can
-also send an expression.  To do so, in place of passing in a fieldname or
-tagname, you can use 'foo=bar' as a parameter.  Don't use spaces, and make sure
-you have it in quotes.
-
-After that, your HTML is complete.
-
-=head2 Create Your Application on the Server
-
-There are three phases of an OpenThought application, that your code needs to
-be able to handle.  They can all be determined, simply by looking at what
-parameters your script was passed.
-
-=over 4
-
-=item Phase 1. No Parameters
-
-In the case that no parameters where sent to us, that means we're in the first
-phase.  The browser is looking for us to give it the OpenThought base files,
-which can be done with:
-
- print $o->get_application_base();
-
-This retrieves the base files from the OpenThought Engine, and sends them to
-the browser.
-
-=item Phase 2. Parameter: OpenThought eq "1"
-
-If you where sent the OpenThought parameter, and it's set to "1", the
-browser is looking for your HTML content.  It's completely up to you on how to
-handle this, but I personally like to use OpenPlugin::Application's load_tmpl
-(which internally uses HTML::Template, and returns an HTML::Template object):
-
- if ( $OP->param->get_incoming('OpenThought') eq "1" ) {
-     my $template = $self->load_tmpl('templates/demo-template.html');
-
-     print $template->output;
- }
-
-=item Phase 3. Parameter: OpenThought eq XML
-
-If you are sent the OpenThought parameter, and it's contents are an XML packet,
-this means that the OpenThought application has finished loading, and that the
-user has sent us some data.  All we need to do is process the data we were
-sent, and respond in an appropriate manner.  For example:
-
- if( $OP->param->get_incoming("OpenThought") and
-      $OP->param->get_incoming("OpenThought") ne "1" ) {
-
-     $OP->param->set_incoming = $o->deserialize(
-            $OP->param->get_incoming("OpenThought") );
-
-     my $field_data;
-
-     # If we were sent the parameter foo
-     if ( $OP->param->get_incoming('fields')->{'foo'}) {
-         $field_data->{comments} = "Thank you for sending foo!";
-     }
-     else {
-         $field_data->{comments} = "Next time, send some foo!";
-     }
-
-     return $self->param('OpenThought')->serialize({ fields => $field_data });
- }
-
-=back
-
-Phase 1 and 2 are usually short, simple, and straightforward.  The third phase
-is typically where most of your coding will be.
-
-Now that you know all this, you can breathe a sigh of relief, because you won't
-have to deal with it much at all.  With the addition of
-L<OpenPlugin::Application>, and the usage of run modes, you won't typically need
-to perform checks to figure out which phase of OpenThought you are in.  You'll
-simply know what to deliver to the browser when it asks to run a given run
-mode.
-
-Now you can go ahead and write the code on the server end for your application.
-
-It is highly recommended (but not necessary) that you use
-OpenPlugin::Application to build your application code.
-OpenPlugin::Application is a subclass of CGI::Application.  It's very easy to
-understand, and the demo app that comes with OpenThought does use
-OpenPlugin::Application.
-
-The following are some examples of things you may want to do in OpenThought.
-
-This is an example of how you would send data to a select list in your user
-interface:
-
-     $field_data->{'selectlist'} = [
-                                     ['AIX'     ,'aix'    ],
-                                     ['BeOS'    ,'beos'   ],
-                                     ['Emacs'   ,'emacs'  ],
-                                     ['HP_UX'   ,'hpux'   ],
-                                     ['Linux'   ,'linux'  ],
-                                     ['Netware' ,'netware'],
-                                     ['OS/2'    ,'os2'    ],
-                                     ['Plan 9'  ,'plan9'  ],
-                                     ['Solaris' ,'solaris'],
-                                     ['Windows' ,'windows'],
-                                   ];
-
-
-The hash key 'selectlist' is the name of the select element in the HTML
-document of the demo application, included with the OpenThought distribution.
-You then see two columns of data.  The data on the left side is what is
-displayed in the select list, and the data on the right is the value assigned
-to that text.  Said another way, the user with their web browser will see the
-data on the left.  But when they click it, it's the data on the right which
-will be sent to your code on the webserver.  For the technically inclined, the
-name of this data structure is a hash of arrays of arrays.  For the not so
-technically inclined, just make sure you use the correct amount of brackets :-)
-
-To send data to HTML elements other then select lists:
-
- $field_data->{'os'}          = "Linux";
- $field_data->{'creator'}     = "Linus Torvalds";
- $field_data->{'notes'}       = "World Domination 2001";
- $field_data->{'free'}        = "true";
- $field_data->{'cool'}        = "true";
- $field_data->{'goodlooking'} = "true";
-
-This is just a simple hash reference.  The key to the hash maps to a form field
-name in the HTML.  Then whenever you send $field_data to the browser, the form
-field with the name 'os' will display the text 'Linux', the form field named
-'creator' will display 'Linus Torvalds', etc.
-
-You'll remember (from the demo app) that the last three elements we're dealing
-with here are each checkboxes.  Checkboxes that are assigned a "true" value,
-including "true", "1", and "checked", become checked when we send this data
-to the browser.
-
-Now, to define data and have it sent to your browser, you could say something
-like:
-
- $field_data->{'os'}          = "Linux";
- $field_data->{'creator'}     = "Linus Torvalds";
- $field_data->{'notes'}       = "World Domination 2001";
- $field_data->{'free'}        = "true";
- $field_data->{'cool'}        = "true";
- $field_data->{'goodlooking'} = "true";
-
- return $self->param('OpenThought')->serialize({ fields => $field_data,
-                                                 focus  => "selectlist" });
-
-This will populate the fields in the HTML with the data you have in the
-$field_data hash reference, and will focus the element "selectlist".
-
-The above code samples are all taken from the demo application which comes with
-OpenThought, named demo.pl.  Feel free to take a look at it for a complete
-example of an OpenThought Application.
+The above code samples are all taken from the soulfoodcafe application which comes with
+OpenThought.  Feel free to take a look at it for a complete example of an
+OpenThought Application.
 
 =head1 EXAMPLES
 
-Continuing our use of OpenPlugin::Application, here are some examples of how
-you might build an OpenThought application.  Some of these examples are
-borrowed from the demo application.  Take a look at the demo app if you'd like
-more information.
+Here are some additional examples of how you might build an OpenThought
+application.  Some of these examples are borrowed from the demo application.
+Take a look at the demo app if you'd like more information.
 
-=head2 The .pl File (mod_perl)
-
-Creating your .pl file is simple.  Just put it in your OpenThoughtRoot
-Directory.  The file could contain something like:
-
- #!/usr/bin/perl -wT
-
- use strict;
- use lib "/path/to/pm/files";
- use Example();
-
- my $r = shift;
-
- my $example = Example->new( request => { apache => $r } );
-
- $example->run();
-
-As for the "/path/to/pm/files" above, I often use /var/www/site for site
-specific pm files.
-
-=head2 The .pm File (mod_perl)
-
-The .pm files will contain the meat of your application.  When using
-OpenPlugin::Application, there are several subroutines you'll need to have,
-which we'll go through.  For more information, please see
-L<OpenPlugin::Application> and the demo application.
-
- package Example;
-
- use strict;
- use base 'OpenPlugin::Application';
- use OpenThought();
-
- # Somewhat of a constructor -- called before setup()
- sub cgiapp_init {
-    my $self = shift;
-    my $OP   = $self->OP;
-
-    $self->param( 'OpenThought' => OpenThought->new( $OP ));
-    $OP->param->set_incoming(
-                 $self->param('OpenThought')->deserialize(
-                         $OP->param->get_incoming('OpenThought')));
-
-    my $session = $OP->session->fetch(
-                    $OP->param->get_incoming( 'session_id' ));
-
-    $self->param( 'session' => $session );
- }
-
- # Set up the run modes
- sub setup {
-     my $self = shift;
-
-     $self->run_modes(
-            'mode1' => 'init_example',
-            'mode2' => 'text_example',
-            'mode3' => 'selectbox_example',
-            'mode4' => 'radiobtn_example',
-            'mode5' => 'html_example',
-     );
-
-     $self->start_mode('mode1');
-     $self->mode_param('run_mode');
- }
-
- # The default run mode
- sub init_example {
-    my $self = shift;
-
-    if( $OP->param->get_incoming('OpenThought')) {
-        my $template = $self->load_tmpl('/path/to/demo-template.html');
-        return $template->output;
-    }
-
-    else {
-        return $self->param('OpenThought')->get_application_base();
-    }
- }
-
-=head2 OpenThought and CGI
-
-Some users may find themselves needing to use CGI instead of mod_perl.  This
-often will be because you don't have root on the machine, but I'm sure there
-are other reasons someone will be able to come up with :-)
-
-Be forewarned that CGI does run slower then mod_perl.  It might even be
-possible to install your own version of Apache / mod_perl in your user space on
-your ISP.  If this still doesn't appeal to you though, the following will
-contain some examples on how to use OpenThought with CGI.
-
-Using OpenThought under CGI is very simple, you just have to be a bit more
-explicit about some things.
-
-Assuming you currently have a .pl with the following line (taken from the above
-examples):
-
- my $example = Example->new( request => { apache => $r } );
-
-You'll want to change it to read:
-
- my $example = Example->new( config => { src => "/path/to/OpenThought.conf" } );
-
-There are two things that we just changed.  We stopped passing $r to the
-Request plugin, and we put the path to the config file in there.  The $r
-variable is only necessary when running under mod_perl.  We definitely want to
-take that out when not using mod_perl.  As for the config file path -- under
-mod_perl, we can state the path to the config file in the
-OpenThought-startup-modperl.pl file.  Under standard CGI, that won't work the
-way we want it to, so we need to explicitely pass the config file location in.
-
-You also have the line in your .pm file:
-
- $self->param( 'OpenThought' => OpenThought->new( $OP ));
-
-Change it to read:
-
- $self->param( 'OpenThought' => OpenThought->new( $OP,
-                        { Prefix => '/path/to/prefix/dir' }));
-
-This modification is again necessary under CGI.  When using mod_perl, the
-Prefix is set in the OpenThought-startup-modperl.pl file.  Under CGI, you won't
-be able to use that file, so you'll need to exlicitely pass in the path when
-initiating your OpenThought object.
-
-=head2 Text, Password, and Textarea HTML Elements
+=head2 Text, Password, and Textarea Form Elements
 
 Client:
 
     <form name="myForm">
 
     <input type="text" name="textbox_example">
-    <input type="button" name="search" value='Click me!'
-       onClick="parent.CallUrl( '/OpenThought/demo_app/text.pl',
-                                'run_mode=mode2', 'textbox_example')">
+    <input type="button"
+       onClick="OpenThought.CallUrl( 'text.pl', 'textbox_example')">
     </form>
 
 
 Server:
 
- sub text_example {
-    my $self = shift;
-    my $OP   = $self->OP;
+    my $q  = CGI->new();
+    my $OT = OpenThought->new();
 
-    my $param = $OP->param->get_incoming('fields')->{'textbox_example'}";
-    warn "We were sent $param";
+    my $param = $q->param('textbox_example');
+    warn("We were sent $param");
 
     my $field_data;
     $field_data->{'textbox_example'} = "Blah blah blah";
 
-    return $self->param('OpenThought')->serialize({ fields => $field_data });
- }
+    print $q->header;
+    $OT->param($field_data);
+    print $OT->response();
 
-=head2  Selectbox HTML Elements
+=head2  Selectbox Form Elements
 
 Client:
 
@@ -1725,19 +1617,17 @@ Client:
         <option value="test">Test!
     </select>
 
-    <input type="button" name=search value='Click me!'
-       onClick="parent.CallUrl( '/OpenThought/demo_app/selectbox.pl',
-                                'selectbox_example')">
+    <input type="button"
+       onClick="OpenThought.CallUrl( 'selectbox.pl', 'selectbox_example')">
     </form>
 
 Server:
 
- sub selectbox_example {
-    my $self = shift;
-    my $OP   = $self->OP;
+    my $q  = CGI->new();
+    my $OT = OpenThought->new();
 
-    my $param = $OP->param->get_incoming('fields')->{'selectbox_example'}";
-    warn "We were sent $param";
+    my $param = $q->param('selectbox_example')";
+    warn("We were sent $param");
 
     my $field_data
     $field_data->{'selectbox_example'} = [
@@ -1746,8 +1636,9 @@ Server:
                                            [ "Example 3", "ex_three" ],
                                          ];
 
-    return $self->param('OpenThought')->serialize({ fields => $field_data });
- }
+    print $q->header;
+    $OT->param($field_data);
+    print $OT->response();
 
 
 =head2  Radio Button HTML Elements
@@ -1761,25 +1652,24 @@ Client:
     <input type="radio" name="radio_example" value="ex_three">
     <input type="radio" name="radio_example" value="ex_four">
 
-    <input type=button name="search" value="Click me!"
-       onClick="parent.CallUrl( '/OpenThought/demo_app/radio.pl',
-                                'radiobox_example')">
+    <input type=button
+            onClick="OpenThought.CallUrl( 'radio.pl', 'radiobox_example')">
     </form>
 
 Server:
 
- sub radiobtn_example {
-    my $self = shift;
-    my $OP   = $self->OP;
+    my $q  = CGI->new();
+    my $OT = OpenThought->new();
 
-    my $param = $OP->param->get_incoming('fields')->{'radiobtn_example'}";
-    warn "We were sent $param";
+    my $param = $q->param('radiobtn_example')";
+    warn("We were sent $param");
 
     my $field_data;
     $field_data->{'radio_example'} = "ex_one";
 
-    return $self->param('OpenThought')->serialize({ fields => $field_data });
- }
+    print $q->header;
+    $OT->param($field_data);
+    print $OT->response();
 
 =head2  Checkbox HTML Elements
 
@@ -1787,90 +1677,198 @@ Client:
 
     <form name="myForm">
 
-    <input type="text" name="checkbox_example">
-    <input type="button" name="search" value="Click me!"
-       onClick="parent.CallUrl( '/OpenThought/demo_app/checkbox.pl',
-                                'checkbox_example')">
+    <input type="checkbox" name="checkbox_example">
+    <input type="button"
+           onClick="OpenThought.CallUrl( 'checkbox.pl', 'checkbox_example')">
     </form>
 
 
 Server:
 
- sub checkbox_example {
-    my $self = shift;
-    my $OP   = $self->OP;
+    my $q  = CGI->new();
+    my $OT = OpenThought->new();
 
-    my $param = $OP->param->get_incoming('fields')->{'checkbox_example'}";
-    warn "We were sent $param";
+    my $param = $q->param('checkbox_example')";
+    warn("We were sent $param");
 
     my $field_data;
     $field_data->{'checkbox_example'} = "true";
 
-    return $self->param('OpenThought')->serialize({ fields => $field_data });
- }
+    print $q->header;
+    $OT->param($field_data);
+    print $OT->response();
 
 =head2  HTML Example
 
 Client:
 
     <h2>
-      <div id="html-example">Old HTML</div>
+      <div id="html-example"><b>Old HTML</b></div>
     </h2>
-     onClick="parent.CallUrl( '/OpenThought/demo_app/html.pl')">
 
+    <input type="button"
+           onClick="OpenThought.CallUrl( 'html.pl', 'html-example')">
 
 Server:
 
- sub html_example {
+    my $q  = CGI->new();
+    my $OT = OpenThought->new();
+
+    my $param = $q->param('html-example')";
+    warn("We were sent $param");
+
+    my $data;
+    $data->{'html_example'} = "<i>New HTML</i>";
+
+    print $q->header();
+    $OT->param($data);
+    print $OT->response();
+ }
+
+=head2  Image Example
+
+Client:
+
+     <img name="img_example" src="/images/image1.png">
+
+     <input type="button"
+            onClick="OpenThought.CallUrl( 'image.pl', 'image-example')">
+
+Server:
+
+    my $q  = CGI->new();
+    my $OT = OpenThought->new();
+
+    my $param = $q->param('img_example')";
+    warn("We were sent image $param");
+
+    my $data;
+    $data->{'img_example'} = "/images/image2.png";
+
+    print $q->header();
+    $OT->param($data);
+    print $OT->response();
+ }
+
+=head2  JavaScript Example
+
+Client:
+
+     onClick="OpenThought.CallUrl( 'javascript.pl' )">
+
+Server:
+
+    my $q  = CGI->new();
+    my $OT = OpenThought->new();
+
+    my $js = qq!var greet="Hello World"; alert(greet); !;
+
+    print $q->header();
+    $OT->javascript($js);
+    $OT->response();
+ }
+
+=head1 EXAMPLE USING CGI::Application
+
+=head2 The .pm File
+
+This is an example package built using L<CGI::Application> together with
+OpenThought.  This is just a package, you'll need an instance script (.pl file)
+to call it.  That's just a handful of lines, and is well documented in
+L<CGI::Application>.
+
+ package Example;
+
+ use strict;
+ use base 'CGI::Application';
+ use OpenThought();
+
+ # Somewhat of a constructor -- called automatically by CGI::Application (and
+ # before setup())
+ sub cgiapp_init {
     my $self = shift;
 
-    my $html_data;
-    $html_data->{'html_example'} = "New HTML";
+    # Store the OpenThought object for later use
+    $self->param('OpenThought' => OpenThought->new());
 
-    return $self->param('OpenThought')->serialize({ html => $html_data });
+ }
+
+ # Set up the run modes -- called automatically by CGI::Application
+ sub setup {
+     my $self = shift;
+
+     $self->run_modes(
+            'mode1' => 'init_example',
+            'mode2' => 'some_screen',
+            'mode3' => 'do_stuff',
+            'mode4' => 'do_something_else',
+            'mode5' => 'another_one',
+     );
+
+     $self->start_mode('mode1');
+ }
+
+ # The default run mode, called if no parameters were sent.  This would
+ # normally return an html page (ie, the first page of the website).
+ sub init_example {
+    my $self = shift;
+
+    my $OT = $self->param('OpenThought');
+
+    return $self->show_html_for_initial_screen();
+
+ }
+
+ # An example run mode
+ sub do_stuff {
+    my $self = shift;
+    my $q    = $self->query;
+    my $OT   = $self->param('OpenThought');
+
+    $data = {...};  # Assume we got some sort of interesting data here
+
+    $OT->param($data);
+    return $OT->response();
  }
 
 =head1 AUTHOR
 
 Eric Andreychek (eric at openthought.net)
 
-=head1 COPYRIGHT
+=head1 THANKS TO
 
-The OpenThought Application Environment is Copyright (c) 2000-2003 by Eric
-Andreychek.
+JJ < jj at jonallen dot info >
+John Jewitt < john at jjspc dot demon dot co dot uk >
+Buddy Burden < buddy at thinkgeek dot com >
+Brent Ashley < brent at ashleyit dot com >
+Greg Pomerantz < gmp216 at nyu dot edu >
 
-The OpenThought Application Environment is licensed under the GNU Public
-License (GPL).
+=head1 COPYRIGHT and LICENSE
+
+OpenThought is Copyright (c) 2000-2007 by Eric Andreychek.
+
+This module is free software; you can redistribute it and/or modify it under the terms of either:
+
+a) the GNU General Public License as published by the Free Software Foundation; either version 1, or (at
+your option) any later version,
+
+or
+
+b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the GNU General
+Public License or the Artistic License for more details.
 
 =head1 BUGS
 
-Certain JavaScript functions don't seem to work properly under Internet
-Explorer 5.0.  They work fine under 4.0, and fine under 5.5, which makes this
-appear to be a JavaScript/DHTML bug in IE 5.0.  I'm working to see if there is
-is a workaround.
-
-Aside from that, bug hunting season has been good.  All known bugs have been
+Bug hunting season has been good.  All known bugs have been
 eradicated.  If you happen to run across one, please let me know and I'd be
 more then happy to take care of it.  But real hackers would send a patch ;-)
 
 =head1 SEE ALSO
 
-L<OpenPlugin|OpenPlugin>
-
-L<OpenPlugin::Application|OpenPlugin::Application>
+L<CGI|CGI>
 
 L<CGI::Application|CGI::Application>
-
-L<Apache::Request|Apache::Request>
-
-L<HTML::Template|HTML::Template>
-
-L<OpenThought::XML2Hash|OpenThought::XML2Hash>
-
-=head1 OPENTHOUGHT CONTRIBUTORS
-
-* Greg Pomerantz (gmp216 at nyu.edu) - Put all sorts of time into that crazy
-bug which made Apache segfault on every request. It ended up being a problem
-with Apache and expat. Thanks to Greg for figuring that out!
-
 

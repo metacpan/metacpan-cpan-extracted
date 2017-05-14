@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/eng2kor
+dist.ini
+lib/Acme/eng2kor.pm
+t/00.load.t
+t/01app.t
+weaver.ini

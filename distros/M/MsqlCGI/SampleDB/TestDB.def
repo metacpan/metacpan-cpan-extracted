@@ -1,0 +1,393 @@
+# table.def
+# This is the table definition file for use with the MsqlCGI package.
+# For more information about MsqlCGI, see
+# http://petrified.cic.net/MsqlCGI/
+#
+# Version 0.8
+DBHost = localhost
+DBName = MsqlCGITest
+TableName = AddressBook
+AllowModify = Yes
+AllowDelete = Yes
+AllowCreate = Yes
+AllowDisplay = Yes
+
+# This is a simple definition file.  No HTML templates will be defined.
+
+# This section is for the table element: ID (id)
+newField
+fieldName = 		id
+description = 		ID
+fieldType = 		int
+notNull = 		Yes
+primaryKey = 		Yes
+fieldSize = 		4
+dispFieldWhenModify = 	No
+modFieldWhenModify = 	No
+dispFieldWhenCreate = 	No
+modFieldWhenCreate = 	No
+dispFieldWhenDisplay =	No
+searchable =		No
+special = 		Serial
+cgiType = 		text
+
+# This section is for the table element: Last Name (lastName)
+newField
+fieldName = 		lastName
+description = 		Last Name
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		30
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+dispFieldWhenDisplay =	Yes
+searchable =		Yes
+cgiType = 		text
+cgiSize = 		30
+cgiMaxLength = 		30
+special = 		
+summary = 		Yes
+
+# This section is for the table element: First Name (firstName)
+newField
+fieldName = 		firstName
+description = 		First Name
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		30
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		Yes
+cgiType = 		text
+cgiSize = 		30
+cgiMaxLength = 		30
+dispFieldWhenDisplay =	Yes
+special = 		
+summary = 		Yes
+
+# This section is for the table element: Primary Email Addreess (email1)
+newField
+fieldName = 		email1
+description = 		Primary Email Addreess
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		50
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		30
+cgiMaxLength = 		50
+special = 		
+summary = 		Yes
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Secondary Email Address (email2)
+newField
+fieldName = 		email2
+description = 		Secondary Email Address
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		50
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		30
+cgiMaxLength = 		50
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Home Page URL (url)
+newField
+fieldName = 		url
+description = 		Home Page URL
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		100
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		40
+cgiMaxLength = 		100
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Home Phone Number (homePhone1)
+newField
+fieldName = 		homePhone1
+description = 		Home Phone Number
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		20
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		20
+cgiMaxLength = 		20
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Secondary Home Phone Number (homePhone2)
+newField
+fieldName = 		homePhone2
+description = 		Secondary Home Phone Number
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		20
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		20
+cgiMaxLength = 		20
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Home Address (homeAddress)
+newField
+fieldName = 		homeAddress
+description = 		Home Address
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		255
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		textarea
+cgiCols = 		40
+cgiRows = 		4
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Primary Work Phone Number (workPhone1)
+newField
+fieldName = 		workPhone1
+description = 		Primary Work Phone Number
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		20
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		20
+cgiMaxLength = 		20
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Secondary Work Phone Number (workPhone2)
+newField
+fieldName = 		workPhone2
+description = 		Secondary Work Phone Number
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		20
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		20
+cgiMaxLength = 		20
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Fax Number (fax)
+newField
+fieldName = 		fax
+description = 		Fax Number
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		20
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		20
+cgiMaxLength = 		20
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Company Name (company)
+newField
+fieldName = 		company
+description = 		Company Name
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		50
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		Yes
+cgiType = 		text
+cgiSize = 		40
+cgiMaxLength = 		50
+special = 		
+dispFieldWhenDisplay =	Yes
+summary = 		Yes
+
+# This section is for the table element: Work Address (workAddress)
+newField
+fieldName = 		workAddress
+description = 		Work Address
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		255
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		textarea
+cgiCols = 		40
+cgiRows = 		3
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Pager Number (pager)
+newField
+fieldName = 		pager
+description = 		Pager Number
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		20
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		20
+cgiMaxLength = 		20
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Birthday (birthday)
+newField
+fieldName = 		birthday
+description = 		Birthday
+fieldType = 		int
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		4
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		text
+cgiSize = 		20
+cgiMaxLength = 		20
+special = 		Date
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Random Comments (comments)
+newField
+fieldName = 		comments
+description = 		Random Comments
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		255
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+cgiType = 		textarea
+cgiCols = 		40
+cgiRows = 		5
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Category (category)
+newField
+fieldName = 		category
+description = 		Category
+fieldType = 		char
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		1
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		Yes
+cgiType = 		radio
+option = 		w:Work
+option = 		p:Personal
+option =		o:Other
+special = 		
+dispFieldWhenDisplay =	Yes
+
+# This section is for the table element: Entry Date (date)
+newField
+fieldName = 		date
+description = 		Entry Date
+fieldType = 		int
+notNull = 		No
+primaryKey = 		No
+fieldSize = 		4
+dispFieldWhenModify = 	Yes
+modFieldWhenModify = 	Yes
+dispFieldWhenCreate = 	Yes
+modFieldWhenCreate = 	Yes
+searchable =		No
+special = 		DateEntered
+dispFieldWhenDisplay =	Yes

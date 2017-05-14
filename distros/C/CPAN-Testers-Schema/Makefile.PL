@@ -6,37 +6,55 @@ use 5.024;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Schema for CPANTesters database processed from test reports",
   "AUTHOR" => "Oriol Soriano <oriolsoriano\@gmail.com>, Doug Bell <preaction\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "CPAN-Testers-Schema",
+  "EXE_FILES" => [
+    "bin/cpantesters-schema"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.024",
   "NAME" => "CPAN::Testers::Schema",
   "PREREQ_PM" => {
     "DBIx::Class" => 0,
     "DBIx::Class::Candy" => 0,
+    "DBIx::Class::InflateColumn::Serializer" => "0.09",
     "DateTime" => 0,
     "DateTime::Format::ISO8601" => 0,
+    "File::Share" => 0,
     "Import::Base" => "0.012",
+    "JSON::MaybeXS" => 0,
     "Log::Any" => "1.045",
+    "Path::Tiny" => "0.072",
+    "SQL::Translator" => "0.11018",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "CPAN::Testers::Fact::LegacyReport" => 0,
+    "CPAN::Testers::Fact::TestSummary" => 0,
+    "CPAN::Testers::Report" => 0,
     "Exporter" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "SQL::Translator" => "0.11018",
     "Test::Lib" => 0,
-    "Test::More" => "1.001005"
+    "Test::More" => "1.001005",
+    "Test::Reporter" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t t/result/*.t t/resultset/*.t"
   }
@@ -44,20 +62,28 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "CPAN::Testers::Fact::LegacyReport" => 0,
+  "CPAN::Testers::Fact::TestSummary" => 0,
+  "CPAN::Testers::Report" => 0,
   "DBIx::Class" => 0,
   "DBIx::Class::Candy" => 0,
+  "DBIx::Class::InflateColumn::Serializer" => "0.09",
   "DateTime" => 0,
   "DateTime::Format::ISO8601" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
+  "File::Share" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Import::Base" => "0.012",
+  "JSON::MaybeXS" => 0,
   "Log::Any" => "1.045",
+  "Path::Tiny" => "0.072",
   "SQL::Translator" => "0.11018",
   "Test::Lib" => 0,
   "Test::More" => "1.001005",
+  "Test::Reporter" => 0,
   "strict" => 0,
   "warnings" => 0
 );
@@ -73,3 +99,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

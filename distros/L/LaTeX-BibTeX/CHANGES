@@ -1,0 +1,85 @@
+Release 0.34 - 1 Apr, 2010
+--------------------------
+* Renamed to LaTeX::BibTeX after fork.
+
+Release 0.33 - 22 March, 2000
+-----------------------------
+* fixed long-standing bug with import/inheritance code; should fix the
+  mysterious "method redefined" and "can't locate object method" errors
+  that various people have seen on various platforms over the years.
+  Thanks to Nikolay Pelov <Nikolay.Pelov@cs.kuleuven.ac.be> for
+  fixing the bug!
+* fixed some small bugs spotted by Horst Tellioglu
+  <telliogl@h2hobel.phl.univie.ac.at> that messed up creating a brand-
+  new entry from scratch
+* fixed even smaller bug spotted by Horst Tellioglu in the BibTeX 0.99
+  emulation code
+
+
+Release 0.32 - 28 November, 1999
+--------------------------------
+* made Makefile.PL able to download and configure btparse, instead
+  of leaving it up to the user
+* fixed entry output method (print_s) so strings are wrapped in braces,
+  not quotes -- that way we don't generate bogus BibTeX files if there
+  are quotes at top-level in a string
+
+
+Release 0.31 - 28 October, 1999
+-------------------------------
+* fixed small bug in LaTeX::BibTeX::BibFormat
+* better documentation for LaTeX::BibTeX::Name example
+* better adherence to POD standard
+
+
+Release 0.30 - 12 March, 1999
+-----------------------------
+* the "structure module" system is in place -- lets you write classes
+  analogous to BibTeX style files, but with all the advantages of
+  object-oriented programming in Perl (see LaTeX::BibTeX::Structure 
+  man page)
+* the Bib structure, meant to emulate the standard style files of
+  BibTeX 0.99, is partially complete: can generate sort keys for
+  any of the 13 standard entry types, and format 'article' and 'book'
+  entries -- no support for crossrefs or alphabetic labels yet though
+* can now (optionally) access the data in more "raw" form, ie. with
+  macros not expanded, strings not concatenated, whitespace not collapsed)
+  (see LaTeX::BibTeX::Value man page)
+* moved support for parsing individual names to the LaTeX::BibTeX::Name class
+* added support for name-formatting via LaTeX::BibTeX::NameFormat class
+  (parallels work in btparse -- see also bt_format_names man page)
+* added BibTeX-style string purificaction
+* added three example programs: btcheck, btsort, and btformat (btformat
+  is *very* preliminary!)
+* lots of documentation added/revised in the existing modules
+
+
+Release 0.21 - 20 October, 1997
+------------------------------
+* companion to btparse 0.21 -- mainly due to bug fixes and one
+  minor interface change (bt_cite_key -> bt_entry_key) in btparse
+* documentation/portability/warning fixes
+* fixed XS code to not make an accidental second "strip quote
+  characters" pass
+* fixed Entry 'print_s' method to handle all entry metatypes
+* changed Entry 'delete' method to handle a list of fields
+* started introducing changes to support the new way of 
+  doing 'structure modules' -- nothing documented yet, though
+* deprecated old Structure module
+
+
+Release 0.2 - 8 September, 1997
+-------------------------------
+* fixed a bunch of little memory leaks in the btparse C library
+* rationalized the LaTeX::BibTeX::Entry method names
+* added (incomplete) LaTeX::BibTeX::Structure module
+* completely overhauled the parser and the interface to it;
+  this necessitated many small changes to BibTeX.xs
+* greatly expanded the test suite and fixed a few little bugs
+  found in the process
+* fixed the XS code to handle comment and preamble entries
+
+
+Release 0.1 - 8 March 1997
+-------------------------
+* initial release

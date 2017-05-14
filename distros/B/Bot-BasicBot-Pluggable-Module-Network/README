@@ -1,0 +1,8 @@
+These have been cribbed from the original Infobot 
+
+	http://www.infobot.org/
+
+and ported to the Bot::BasicBot::Pluggable architecture
+for use in Bot::Infobot
+
+

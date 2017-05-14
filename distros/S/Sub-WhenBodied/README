@@ -1,0 +1,42 @@
+NAME
+
+Sub::WhenBodied - delay action until subroutine acquires body
+
+DESCRIPTION
+
+This module provides a facility to delay an action on a subroutine until
+the subroutine's body (the code that will be run when the subroutine
+is called) has been attached to the subroutine object.  This is mainly
+useful in implementing subroutine attributes, where the implementation
+needs to operate on the subroutine's body.
+
+This facility is required due to an oddity of how Perl constructs
+Perl-language subroutines.  A subroutine object is initially created
+with no body, and then the body is later attached.  Prior to Perl 5.15.4,
+attribute handlers are executed before the body is attached, so see it in
+that intermediate state.  (From Perl 5.15.4 onwards, attribute handlers
+are executed after the body is attached.)  It is otherwise unusual to
+see the subroutine in that intermediate state.  If the implementation
+of an attribute can only be completed after the body is attached, this
+module is the way to schedule the implementation.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2009, 2010, 2011, 2013, 2015
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

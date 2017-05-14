@@ -1,0 +1,358 @@
+#!../../perl
+#
+# usage: cliperl pkg cli.in cli.h cli.i init.i cli.xtra val.i set.i
+#
+#  pkg       string package name
+#  pfx       string prefix name
+#  cli.in    input from preprocessor (no comments)
+#  cli.h     general header lines (fxn decl)
+#  cli.i     the main code
+#  init.i    the "glue" code
+#  cli.xtra  misc. source code from .cli.out
+#  val.i     code to get values of variables
+#  set.i     code to set values of variables
+#
+# Fernando Trias
+#
+
+$pg=shift;
+$pfx=shift;
+
+open(IN,"<$ARGV[0]") || die "Input file $ARGV[0] not found";
+open(HDR,">$ARGV[1]") || die "Can't open header file $ARGV[1]";
+open(BODY,">$ARGV[2]") || die "Can't open $ARGV[2]";
+open(INIT,">$ARGV[3]") || die "Can't open $ARGV[3]";
+open(XTRA,">$ARGV[4]") || die "Can't open $ARGV[4]";
+
+&init;
+while(<IN>) {
+  next if /^#/;
+  /^CALL|^CASE/ && ( &docall, next );
+  /^VAR/ && ( &dovarline, next );
+  print XTRA $_;
+}
+&term;
+
+close(IN);
+close(HDR);
+close(BODY);
+close(INIT);
+close(XTRA);
+
+sub init {
+}
+
+sub term {
+}
+
+sub dovarline {
+  s/^VAR\s+//;
+  ($type,$varn,$als,$dims)=&breakup($_);
+  if ($als =~ /^\d$/) {
+    $dims=$als; $alias="";
+  }
+  $als=$varn if $als eq "-";
+  $als=$varn unless $als;
+
+  if ($dims) {
+    for ($i=0;$i<$dims;$i++) {
+      $alias=$als.$i;
+      $var="$varn[$i]";
+      &dovar;
+    }
+  }
+  else {
+    $alias=$als; $var=$varn;
+    &dovar;
+  }
+}
+
+sub dovar {
+
+    print INIT 
+      "newXS(\"${pg}::var_${alias}::TIESCALAR\",
+      ${pfx}_var_${alias}_TIESCALAR,fn);\n";
+    print INIT 
+      "newXS(\"${pg}::var_${alias}::FETCH\",
+      ${pfx}_var_${alias}_FETCH,fn);\n";
+    print INIT 
+      "newXS(\"${pg}::var_${alias}::STORE\",
+      ${pfx}_var_${alias}_STORE,fn);\n";
+    # print INIT "\tMAGICVAR(\"$alias\",UV_$alias);\n";
+    # print HDR "\tUV_$alias,\n";
+    print HDR "extrn $type $var;\n";
+    print HDR "${pfx}_var_${alias}_TIESCALAR();\n";
+    print HDR "${pfx}_var_${alias}_FETCH();\n";
+    print HDR "${pfx}_var_${alias}_STORE();\n";
+
+print BODY <<EOF;
+XS(${pfx}_var_${alias}_TIESCALAR)
+{
+	dXSARGS;
+        char *name;
+        SV   *ret;
+        HV   *stash;
+        name = SvPV(ST(1),na);
+        ret = newSVpv(name, strlen(name));
+        stash = gv_stashpv("${pg}::var_${alias}", 0);
+        ST(0) = sv_bless(newRV(ret), stash);
+        XSRETURN(1);
+}
+
+EOF
+
+  if ($type !~ /string/) {
+    print BODY <<EOF;
+XS(${pfx}_var_${alias}_FETCH)
+{
+        dXSARGS;
+        ST(0)=newSVnv((double) $var);
+        XSRETURN(1);
+}
+
+XS(${pfx}_var_${alias}_STORE)
+{
+        dXSARGS;
+        $var = ($type) SvNV(ST(1));
+        ST(0)=ST(1);
+        XSRETURN(1);
+}
+
+EOF
+  } 
+  else {
+      $slen=$type;
+      $slen =~ s/string\s*//;
+      $slen=1024 if $slen eq "";
+      $type="char *";
+      $cat=1;
+
+      print BODY <<EOF;
+XS(${pfx}_var_${alias}_FETCH)
+{
+        dXSARGS;
+        ST(0) = newSVpv($var, strlen($var));
+        XSRETURN(1);
+}
+
+XS(${pfx}_var_${alias}_STORE)
+{
+        dXSARGS;
+        char *name;
+        name = SvPV(ST(1),na);
+        strncpy($var, name, $slen);
+        ST(0) = ST(1);
+        XSRETURN(1);
+}
+
+EOF
+  }
+}
+
+sub docall {
+  s/^\S+\s+//;
+  $init="";
+  $retx="";
+  $retfree="";
+  $callarg="";
+  $arglist="";
+  $count=-1;
+  $retvc=0;
+
+  ($rettype,$call,$alias)=&breakup($_);
+
+  if ($call =~ s/^&//) {
+    $retfree.="\tfree(retval);\n" if $rettype ne "void";
+  }
+
+  $alias=$call unless $alias;
+
+  print INIT "newXS(\"${pg}::${alias}\",${pfx}_${alias},fn);\n";
+  print HDR "$pfx_$alias();\n";
+
+  if ($rettype =~ /string/) {
+    $rettype="char *";
+    $decl="\t$rettype retval;\n";
+    $retv="\tST(0)=sv_newmortal();\n\tsv_setpv(ST(0),retval);\n";
+    #$retv="\tXPUSHs(sv_2mortal(newSVpv(retval,strlen(retval))));"; 
+    $retvc++;
+  }
+  elsif ($rettype ne "void") { 
+    $decl="\t$rettype retval;\n"; 
+    $retv="\tST(0)=sv_newmortal();\n\tsv_setnv(ST(0),(double)retval);\n";
+    #$retv="\tXPUSHs(sv_2mortal(newSVnv((double) retval)));"; 
+    $retvc++;
+  }
+  else { $decl=""; $retv=""; }
+  
+  while(<IN>) {
+    last if /^END/;
+    ($io,$type,$argx,$dims)=&breakup($_);
+
+    if ($dims) { $dimsv="[".$dims."]"; }
+    else { $dimsv=""; }
+
+    if ($argx =~ s/^&//) { $alloc=0; }
+    else { $alloc=1; }
+
+    if ($argx =~ /^=/) {
+      $_=$argx;
+      ($argx,$initv)=/([^=]*)(.*)/;
+    } else { $initv=""; }
+
+    # $cat=0 for numeric; 1 for string
+    if ($type =~ /string/) { 
+      $slen=$type;
+      $slen =~ s/string\s*//;
+      $slen=1024 if $slen eq "";
+      $type="char *";
+      $cat=1;
+    }
+    else { $cat=0; }
+
+    $decl.="\t$type $argx$dimsv$initv;\n";
+
+    if ($cat) {
+      if ( ($slen) && ($alloc || $io =~ /I/) ) {
+        $callarg.="$argx,";
+      }
+      else {
+        $callarg.="&$argx,";
+      }
+    }
+    else {
+      if ($dims) {
+        $callarg.="$argx,";
+      }
+      elsif ($io =~ /O/) {
+        $callarg.="&$argx,";
+      }
+      else {
+        $callarg.="$argx,";
+      }
+    }
+
+    if ($dims) {
+      for ($i=0; $i<$dims; $i++) {
+        $arg="${argx}[${i}]";
+        &doarg;
+      }
+    }
+    else {
+      $arg=$argx;
+      &doarg;
+    }
+  }
+
+  chop($arglist);
+  print BODY <<EOF;
+
+XS(${pfx}_$alias)
+{
+	dXSARGS;
+	if (items != $count + 1) 
+	  { croak("Usage: &$alias($arglist)"); }
+        else {
+
+EOF
+  print BODY $decl,"\n";
+  print BODY $init,"\n";
+
+  chop($callarg);  # take out final ","
+  if ($rettype ne "void") {
+    print BODY "\tretval=($rettype)$call($callarg);\n";
+  }
+  else {
+    print BODY "\t(void)$call($callarg);\n";
+  }
+
+  print BODY $retx;
+  if ($retvc>1) { 
+    print BODY <<EOF;
+	EXTEND(sp, $retvc);
+EOF
+  }
+  print BODY $retv;
+  print BODY $retfree;
+#  if ($retvc) { 
+#print BODY "\tXSRETURN(1);\n"; 
+#}
+#  else { print BODY "\tXSRETURN(1);\n"; }
+  print BODY "\t}\n";;
+  print BODY "\tXSRETURN(1);\n";
+  print BODY "}\n";
+  print BODY "\n\n";
+}
+
+sub doarg {
+    $count++ if $io =~ /[IO]/;
+
+    if ($cat) {
+      if ( ($slen) && ($alloc || $io =~ /I/) ) {
+        $init.="\t$arg=($type)malloc($slen);\n";
+        $init.="\tif ($arg==NULL) ";
+        $init.="\t{croak(\"Out of memory in $alias($arg)\"); XSRETURN(0);}\n";
+      }
+      $arglist.="\$$arg," if $io =~ /[IO]/;
+      $retfree.="\tfree($arg);\n";
+      if ( $io =~ /I/ ) {
+        $init.="\tstrncpy($arg,SvPV(ST($count),na),$slen);\n"
+      }
+      if ($io =~ /O/) {
+        $retx.="\tif (!SvREADONLY(ST($count)))\n";
+        $retx.="\t\tsv_setpv(ST($count),$arg);\n";
+      }
+      if ($io =~ /R/) {
+        $retv.="\tST($retvc)=sv_newmortal();\n";
+        $retv.="\tsv_setpv(ST($retvc),$arg);\n"; $retvc++;
+      }
+    }
+    else {
+      if ( $io =~ /O/ ) {
+        $init.="\t$arg = ($type) SvIV(ST($count));\n"
+          if $io =~ /I/;
+        $retx.="\tif (!SvREADONLY(ST($count)))\n";
+        $retx.="\t\tsv_setnv(ST($count), (double) $arg);\n";
+        $arglist.="\$$arg,";
+        if ( $io =~ /R/ ) {
+          $retv.="\tST($retvc)=sv_newmortal();\n";
+          $retv.="\tsv_setnv(ST($retvc),(double) $arg);\n"; $retvc++;
+        }
+      } else { 
+        $arglist.="\$$arg," if /[IO]/; 
+        $init.="\t$arg=SvIV(ST($count));\n"
+          if $io =~ /I/;
+        if ( $io =~ /R/ ) {
+          $retv.="\tST($retvc)=sv_newmortal();\n";
+          $retv.="\tsv_setnv(ST($retvc),(double) $arg);\n"; $retvc++;
+        }
+      }
+    }
+}
+
+sub breakup {
+  local ($_)=@_;
+  local(@r,$x,$xx,$count);
+
+  s/\s+$//;
+
+  while ($_ ne "") {
+    s/^\s+//; 
+    if (/^\(/) {
+      $count=0; $xx="";
+      do {
+        if (/^\(/) { $count++; }
+        ($x,$_)=/^(.[^\)\(]*)(.*)/;
+        $xx.=$x;
+        if (/^\)/) { $count--; }
+      } while ($count>0);
+      s/^.//;
+      push(@r,substr($xx,1));
+    }
+    else { 
+      ($xx,$_)=/^(\S+)(.*)/;
+      push(@r,$xx);
+    }
+  }
+  @r;
+}

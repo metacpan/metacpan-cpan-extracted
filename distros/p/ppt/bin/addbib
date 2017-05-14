@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl -w
-# $Id: addbib,v 1.1.1.1 2001/06/06 08:53:51 sdague Exp $
+# $Id: addbib,v 1.2 2004/08/05 14:17:43 cwest Exp $
 
 use strict;
 use Getopt::Std;

@@ -1,10 +1,5 @@
 Win32API::Registry - Low-level access to Win32 system API calls from WINREG.H
 
-CHANGES
-
-This is version 0.23.  The major change is that it now builds under
-Perl v5.8.
-
 SYNOPSIS
 
   use Win32API::Registry 0.21 qw( :ALL );

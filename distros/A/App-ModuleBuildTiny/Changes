@@ -1,5 +1,9 @@
 Revision history for App-ModuleBuildTiny
 
+0.020
+          - Added an upload command
+
+0.019
           - Added mint command
 
 0.018     2016-10-17

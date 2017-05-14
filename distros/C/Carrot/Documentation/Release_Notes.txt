@@ -1,0 +1,36 @@
+This document applies to version 1.1.309 of Carrot, released 17th August 2014
+
+These are the release notes for the development snapshots of the 1.1 series of Carrot. A development snapshot documents the current state. It's not meant for production use. A development snapshot doesn't fix all bugs, but represents a step towards that goal.
+
+The current implementation of Carrot for Perl is inefficient when it comes to hardware resources like CPU cycles or RAM. As long as the conceptual restrictions are kept, more efficiency would lead to hard coding. Not desirable. Real improvements can only be achieved through a break of restrictions. For example, by integrating Carrot into the language. But that isn't a short-term goal.
+
+Code is pretty readable. However, the documentation was out of sync and has largeley been deleted. What is left are the main pod file Carrot-en.pod and the FAQ Carrot::FAQ-en.pod. A mid-term goal is automatic generation of the API section in the pod file from information given by the block modifiers (capability/effect).
+
+Error messages also couldn't keep up with the fast pace development. The most positive thing to say about them is that they're in English. It will take some time before documentation and error messages reach the usefulness known from the 0.x series. At least the error messages receive priority.
+
+Line numbers of errors refer to the shadow files. It's double work to relate them to the original module file. The formatting of additional code in the shadow files should become more readable one day.
+
+Anything more complex in Carrot did have a unit test. Otherwise it couldn't have come so far. However, most unit tests have been outdated. They were deleted just as the documentation.
+
+Block modifiers in ::(Meta|Diversity):: are pretending for the moment.
+
+Perl 5 has plain scalar values. Not everything is an object. Some classes reserved special methods for them. For example, $instance->add($other_instance) vs. $instance->add_value(5). This approach is simple and robust.
+
+Block parameter checking isn't active. Note that parameters can be assumed or required. Assuming means that during normal program operation you believe they match the given restriction. It's the default. No actual check is performed. Only during debugging +assume turns into a fatal check. +require is always fatal. Restrictions may be given as a single package name or as a single method call. +undefined might be allowed to pull a default value. Names are associated to parameters internally for positional mapping. But for the moment there is no support for calls of the style 'name' => 'value'.  Examples:
+
+	# //parameters
+	#       diameter	::Personality::Valued::Something::Diameter
+	#       offset          ->lesser_value(5) +required
+
+
+Same applies to block return value checking. Return values are purely positional. Example:
+
+	# //returns
+	#       ::Personality::Valued::Something::Diameter +undefined
+	#       ->lesser_value(5) +required
+
+	Invalid: return(1, 6);
+	Valid:   return($diameter_instance, 4);
+
+
+Access parameter checking was lost during syntax upgrades, as the author just noticed. Anyway. Same as above: checks are only performed during debugging. Access control for instances isn't a value by itself which had to be checked at compile time. The main motivation for access control (in dynamic languages) is avoiding destructive re-processing (recursion), an alternative to locking from SQL. That still makes sense during run time, but is an debugging aid then.

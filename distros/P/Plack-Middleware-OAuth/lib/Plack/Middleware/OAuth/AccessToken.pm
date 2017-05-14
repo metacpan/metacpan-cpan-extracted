@@ -11,7 +11,6 @@ use overload
 
 sub new {
     my ($class,%args) = @_;
-    $args{params} ||= { };
     return bless \%args , $class;
 }
 
@@ -22,6 +21,11 @@ sub is_provider {
 sub has_error {
     my $self = shift;
     return $self->{params}->{error};
+}
+
+sub extra_params { 
+    my $self = shift;
+    return $self->{params}->{extra_params};
 }
 
 sub access_token {
@@ -41,30 +45,18 @@ sub hashref {
     return \%$self;
 }
 
-sub extra {
-    my $self = shift;
-    return $self->params->{extra} || { };
-}
-
 sub register_session {
     my ($self,$env) = @_;
     my $session = Plack::Session->new( $env );
     my $provider_id = lc($self->provider);
-
-    $session->set( 'oauth.' . $provider_id  , 1 );
-    $session->set( 'oauth.' . $provider_id  . '.version' , $self->version );
-    $session->set( 'oauth.' . $provider_id  . '.access_token'  , $self->access_token );
-
     if( $self->version == 2 ) {
-        $session->set( 'oauth.' . $provider_id  . '.code'          , $self->{params}->{code} );
-
-        $session->set( 'oauth.' . $provider_id  . '.token_type'    , $self->{params}->{token_type} )
-                    if $self->params->{token_type};
-
-        $session->set( 'oauth.' . $provider_id  . '.refresh_token' , $self->{params}->{refresh_token} ) 
-                    if $self->params->{refresh_token};
+        $session->set( 'oauth2.' . $provider_id  . '.access_token'  , $self->{params}->{access_token} );
+        $session->set( 'oauth2.' . $provider_id  . '.code'          , $self->{params}->{code} );
+        $session->set( 'oauth2.' . $provider_id  . '.token_type'    , $self->{params}->{token_type} );
+        $session->set( 'oauth2.' . $provider_id  . '.refresh_token' , $self->{params}->{refresh_token} );
     } 
     elsif( $self->version == 1 ) {
+        $session->set( 'oauth.' . $provider_id . '.access_token' , $self->{params}->{access_token} );
         $session->set( 'oauth.' . $provider_id . '.access_token_secret' , $self->{params}->{access_token_secret} );
     }
 }

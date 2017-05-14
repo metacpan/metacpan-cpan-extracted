@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hopkins>
+	<state>
+		<root>[% scratch %]/state</root>
+	</state>
+
+	<database>
+		<dsn>dbi:SQLite:dbname=[% scratch %]/hopkins.db</dsn>
+		<user>toor</user>
+		<pass>secret</pass>
+		<options>
+			<option name="AutoCommit" value="1" />
+			<option name="RaiseError" value="1" />
+			<option name="quote_char" value="" />
+			<option name="name_sep" value="." />
+		</options>
+	</database>
+
+	<queue name="parallel">
+		<concurrency>4</concurrency>
+	</queue>
+
+	<queue name="serial">
+		<concurrency>1</concurrency>
+	</queue>
+
+	<task name="Count">
+		<class>Hopkins::Test::Count</class>
+		<schedule><cron>* * * * *</cron></schedule>
+		<queue>serial</queue>
+	</task>
+
+	<task name="Wrench">
+		<class>Hopkins::Test::Die</class>
+		<queue>serial</queue>
+	</task>
+</hopkins>

@@ -1,0 +1,131 @@
+#!/usr/bin/env perl
+package Bio::AssemblyImprovement::Bin::RemovePrimersWithQUASR;
+# ABSTRACT: Given a forward and reverse FASTQ file and a file with primers, it will remove the primers if it appears within a specified distance from the beginning of the read 
+# PODNAME: remove_primers_with_quasr
+
+BEGIN { unshift( @INC, '../lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use Cwd;
+use Cwd 'abs_path';
+use File::Path qw(make_path);
+
+use Bio::AssemblyImprovement::PrimerRemoval::Main;
+
+my ( $forward_file, $reverse_file, $output_directory, $primers_file, $leeway, $minimum_length, $median_quality, $quasr_exec, $debug, $help );
+
+GetOptions(
+		'f|forward_file=s'      => \$forward_file,
+		'r|reverse_file=s'      => \$reverse_file,
+		'o|output_directory=s'	=> \$output_directory,
+		'p|primers_file=s'		=> \$primers_file,
+		'L|leeway=i'			=> \$leeway,
+		'm|minimum_length=i'	=> \$minimum_length,
+		'l|median_quality=i'	=> \$median_quality,
+		'e|quasr_exec=s'		=> \$quasr_exec,
+    	'd|debug'               => \$debug,
+    	'h|help'                => \$help,
+);
+
+# A forward file, a reverse file and a primers file are essential
+( defined($forward_file) && ( -e $forward_file ) && defined($reverse_file) && ( -e $reverse_file ) && defined($primers_file) && ( -e $primers_file ) && !$help )
+  or die <<USAGE;
+Usage: remove_primers_with_quasr [options]
+	
+       	
+		-f|forward_file        <forward fastq file - zipped or unzipped>
+		-r|reverse_file		   <reverse fastq file - zipped or unzipped>
+        -o|output_directory	   <Directory to place output file. Default current working directory>
+        -p|primers_file	 	   <path to a file containing primers and their reverse complements>
+        -L|leeway			   <maximum distance primer can be within a read. Default 5>
+        -m|minimum_length	   <minimum read length cut off. Default 50>
+        -l|median_quality	   <median read quality cut off. Default 30>
+        -e|quasr_exec		   <path to quasr jar file. Default to pathogen installation>
+        -d|debug			   <debug>
+        -h|help      		   <this message>
+        
+Takes in a forward and reverse fastq file and a file with primers, and removes the primers that appear within a specified distance in the reads
+
+# outputs files called primer_removed.forward.fastq.gz and primer_removed.reverse.fastq.gz in current working directory
+remove_primers_with_quasr -f forward.fastq -r reverse.fastq -p /path/to/primers.txt 
+
+# get a list of options
+remove_primers_with_quasr -h
+
+USAGE
+
+# Set defaults
+ 
+$output_directory ||= getcwd();
+$output_directory  = abs_path($output_directory);
+make_path($output_directory);
+
+$leeway ||= 5;
+$minimum_length ||= 50;
+$median_quality ||= 30;
+$quasr_exec ||= '/software/pathogen/external/apps/usr/local/QUASR/readsetProcessor.jar'; 
+$debug           ||= 0;
+
+
+my $primer_remover = Bio::AssemblyImprovement::PrimerRemoval::Main->new(
+    forward_file       	  => $forward_file, 
+    reverse_file	 	  => $reverse_file,
+    output_directory 	  => $output_directory,
+    primers_file	 	  => $primers_file,
+    leeway			 	  => $leeway,
+    minimum_length	 	  => $minimum_length,
+    median_quality_cutoff => $median_quality,
+ 	QUASR_exec		 	  => $quasr_exec,
+    debug            	  => $debug,
+)->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+remove_primers_with_quasr - Given a forward and reverse FASTQ file and a file with primers, it will remove the primers if it appears within a specified distance from the beginning of the read 
+
+=head1 VERSION
+
+version 1.160490
+
+=head1 SYNOPSIS
+
+Given a forward & reverse fastq file and a file with primers, it will remove the primers if they appear within a specified distance from the beginning of the read 
+
+Usage: remove_primers_with_quasr [options]
+
+		-f|forward_file        <forward fastq file - zipped or unzipped>
+		-r|reverse_file		   <reverse fastq file - zipped or unzipped>
+        -o|output_directory	   <Directory to place output file. Default current working directory>
+        -p|primers_file	 	   <path to a file containing primers and their reverse complements>
+        -L|leeway			   <maximum distance primer can be within a read. Default 5>
+        -m|minimum_length	   <minimum read length cut off. Default 50>
+        -l|median_quality	   <median read quality cut off. Default 30>
+        -e|quasr_exec		   <path to quasr jar file. Default to pathogen installation>
+        -d|debug			   <debug>
+        -h|help      		   <this message>
+
+Takes in a forward and reverse fastq file and a file with primers, and removes the primers that appear within a specified distance in the reads
+
+# outputs files called primer_removed.forward.fastq.gz and primer_removed.reverse.fastq.gz in current working directory
+remove_primers_with_quasr -f forward.fastq -r reverse.fastq -p /path/to/primers.txt 
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

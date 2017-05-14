@@ -1,0 +1,40 @@
+0.006  2006-07-06
+
+- we now no longer use Parse::Yapp
+- all expression parsing is done with Perl 6 grrammar
+- regex/token/rule declarations in Perl 6 are parsed
+- uses Moose 0.10 for Perl 6 classes and objects
+- squash warnings
+
+0.005  2006-07-05
+
+- all sanity tests, up and includes Test.pm from Pugs test suite, now passes
+- uses Data::Bind for calling convention
+- 'expr unless/if expr;'
+
+0.003 - 0.004
+
+- "Changed everything to make Test.pm compile"
+- grammar rewrite; now uses Parse::Yapp for expressions only
+
+0.002  2006-06-28
+
+- added REQUIREMENTS section in v6.pm pod
+-- see http://rt.cpan.org/Public/Bug/Display.html?id=20152
+
+- uses Moose.pm as the runtime for classes
+-- implemented 'module' and 'class'
+-- very basic support for 'has', 'method', and parameter list
+-- Makefile.PL recommends 'Moose' 
+
+- properly parses pod
+-- added t/01-pod.t 
+
+- more operators
+-- added a default '.perl' implementation, which calls perl5 Dumper()
+
+- v6.pm no longer searches in development lib directories
+
+0.001  2006-06-26
+
+- initial CPAN release

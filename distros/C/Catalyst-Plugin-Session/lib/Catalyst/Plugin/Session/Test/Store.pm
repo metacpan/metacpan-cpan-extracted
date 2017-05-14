@@ -1,4 +1,4 @@
-﻿#!/usr/bin/perl
+#!/usr/bin/perl
 
 package Catalyst::Plugin::Session::Test::Store;
 
@@ -28,7 +28,8 @@ sub import {
     isa_ok( bless( {}, $m ), "Catalyst::Plugin::Session::Store" );
 
     {
-        package Catalyst::Plugin::SessionStateTest;
+        package # Hide from PAUSE
+            Catalyst::Plugin::SessionStateTest;
         use base qw/Catalyst::Plugin::Session::State/;
 
         no strict 'refs';
@@ -51,9 +52,12 @@ sub import {
 
     {
 
-        package SessionStoreTest;
+        package # Hide from PAUSE
+            SessionStoreTest;
         use Catalyst qw/Session SessionStateTest/;
         push our (@ISA), $m;
+
+        our $VERSION = "123"; # Do not remove
 
         use strict;
         use warnings;
@@ -88,14 +92,16 @@ sub import {
             ok( !$c->session_delete_reason, "no reason for deletion" );
         }
 
-        @{ __PACKAGE__->config->{session} }{ keys %$cfg } = values %$cfg;
+        @{ __PACKAGE__->config->{'Plugin::Session'} }{ keys %$cfg } = values %$cfg;
 
-        __PACKAGE__->setup;
+        { __PACKAGE__->setup; }; # Extra block here is an INSANE HACK to get inlined constructor
+                                 # (i.e. to make B::Hooks::EndOfScope fire)
     }
 
     {
 
-        package SessionStoreTest2;
+        package # Hide from PAUSE
+            SessionStoreTest2;
         use Catalyst qw/Session SessionStateTest/;
         push our (@ISA), $m;
 
@@ -123,11 +129,11 @@ sub import {
             ok( !$c->session->{magic}, "no saved data" );
         }
 
-        __PACKAGE__->config->{session}{expires} = 0;
+        __PACKAGE__->config->{'Plugin::Session'}{expires} = 0;
 
-        @{ __PACKAGE__->config->{session} }{ keys %$cfg } = values %$cfg;
+        @{ __PACKAGE__->config->{'Plugin::Session'} }{ keys %$cfg } = values %$cfg;
 
-        __PACKAGE__->setup;
+        { __PACKAGE__->setup; }; # INSANE HACK (the block - as above)
     }
 
     use Test::More;
@@ -139,7 +145,8 @@ sub import {
 
     {
 
-        package t1;
+        package # Hide from PAUSE
+            t1;
         use Catalyst::Test "SessionStoreTest";
 
         # idiotic void context warning workaround
@@ -151,7 +158,8 @@ sub import {
 
     {
 
-        package t2;
+        package # Hide fram PAUSE
+            t2;
         use Catalyst::Test "SessionStoreTest2";
 
         my $x = get("/create_session");

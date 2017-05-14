@@ -1,0 +1,88 @@
+-------------------------------------------------------------------------- 
+EICNDHCPD v1.11 for NT4
+http://home.worldcom.ch/nreichen/eicndhcpd.html
+
+Made by Nils Reichen <eicndhcpd@worldcom.ch>
+EICN, NEUCHATEL SCHOOL OF ENGINEERING (http://www.eicn.ch)
+Le Locle, Switzerland
+
+Made with Perl 5.004_02 (GSAR) for WinNT4.0
+
+EICNDHCPD Copyright (c)1998,1999 EICN & Nils Reichen <eicndhcpd@worldcom.ch> 
+All rights reserved.
+
+Use under GNU General Public License
+Details can be found at:http://www.gnu.org/copyleft/gpl.html
+--------------------------------------------------------------------------
+
+FOR ALL HELP THAT YOU CANNOT FIND IN THIS FILE, SEND ME A E-MAIL TO
+mailto:eicndhcpd@worldcom.ch
+
+-------------------------------------------------------------------------- 
+
+What is EICNDHCPD:
+
+EICNDHCPD is  static DHCP server for NT4.
+"static" because each computer is identified by his MAC address
+(ethernet addr.) and obtains the same configuration (IP addr., ...) all time.
+All the host configuration is centralized in a text file (netdata.dat).
+---------------------------------------------------------------------------
+
+Specifications:
+
+- compliance with DHCP protocol
+- high flexibility for database: get all parameters from a file (netdata.dat)
+- only on file to configure (dhcpd.conf):
+    - may send E-Mail to administrator(s) if there is a problem
+      like invalid MAC address, invalid IP request, ...
+    - 3 levels for the debug informations:
+        - 0: informations in dhcpd.log only when there is a problem
+	- 1: short informations in debug.log (recieved frames, send frames)
+	- 2: like 1, but with hex. dump of frames
+
+I certainly forget some details, but you will see during use...
+-------------------------------------------------------------------------- 
+
+System Requirements:
+
+You will need the following minimum system configuration to install EICNDHCPD: 
+
+(1) Windows NT 4.0 (TM)
+
+(2) ONLY WORK ON ETHERNET NETWORK !
+
+(3) Perl core for Win32 v5.004_02 (Gurusamy Sarathy's binary version of Perl)
+    (see ftp://theory.uwinnipeg.ca/pub/CPAN/ports/win32/Standard/x86/perl5.00402-bindist04-bc.zip
+     or www.perl.com or a other CPAN site)
+
+(4) Libwin32-0.10 or later
+    (see ftp://theory.uwinnipeg.ca/pub/CPAN/ports/win32/Standard/x86/
+    or a other CPAN site)
+
+(5) SRVANY.EXE and INSRV.EXE from the Windows NT 4.0 Server Resource Kit
+--------------------------------------------------------------------------
+
+History:
+
+ v0.9b Created: 19.May.98 - Created by Nils Reichen <eicndhcpd@worldcom.ch>
+ v0.901b Revised: 26.May.98 - Renew bug solved, and optimized code
+ v0.902b Revised: 04.Jun.98 - EventLog and Service NT
+ v1.0 Revised: 18.Jun.1998 - Fix some little bugs (inet_aton,...)
+ v1.1 Revised: 07.Oct.1998 - Fix \x0a bug
+ v1.11 Revised: 27.June.1999 - Fix a problem with particular MS DHCP client
+
+--------------------------------------------------------------------------
+
+Lisence:
+
+EICNDHCPD v1.11 for NT4 
+EICNDHCPD Copyright (c)1998,1999 EICN & Nils Reichen <eicndhcpd@worldcom.ch> 
+All rights reserved.
+Use under GNU General Public License
+Details can be found at:http://www.gnu.org/copyleft/gpl.html
+
+Made by Nils Reichen <eicndhcpd@worldcom.ch>
+EICN, NEUCHATEL SCHOOL OF ENGINEERING (http://www.eicn.ch)
+Le Locle, Switzerland
+--------------------------------------------------------------------------
+

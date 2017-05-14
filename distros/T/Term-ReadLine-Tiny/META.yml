@@ -26,5 +26,5 @@ resources:
   homepage: https://github.com/orkunkaraduman/p5-Term-ReadLine-Tiny/tree/master
   license: https://www.gnu.org/licenses/gpl-3.0.html
   repository: git://git@github.com:orkunkaraduman/p5-Term-ReadLine-Tiny.git
-version: '1.07'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

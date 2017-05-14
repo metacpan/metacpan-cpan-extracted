@@ -1,0 +1,24 @@
+---
+abstract: 'Non-blocking wrapper to the WWW::Pastebin::*::Create modules'
+author:
+  - 'Jan A. (Treeki) <treeki@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Pastebin
+requires:
+  Carp: 0
+  POE: 0
+  POE::Component::NonBlockingWrapper::Base: 0
+  WWW::Pastebin::Sprunge::Create: 0
+  base: 0
+  strict: 0
+  warnings: 0
+version: 0.001

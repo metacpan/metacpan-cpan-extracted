@@ -1,14 +1,16 @@
 package urpm::download;
 
-# $Id: download.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
 use urpm::msg;
-use urpm::util;
+use urpm::util qw(cat_ basename dirname file_size max member output_safe reduce_pathname);
 use bytes ();
 use Cwd;
 use Exporter;
 # perl_checker: require urpm
+
+# help perl_checker:
+sub getcwd { goto &Cwd::getcwd }
 
 our @ISA = 'Exporter';
 our @EXPORT = qw(get_proxy
@@ -16,8 +18,6 @@ our @EXPORT = qw(get_proxy
 	sync_file sync_rsync sync_ssh
 	set_proxy_config dump_proxy_config
 );
-
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
 
 #- proxy config file.
 our $PROXY_CFG = '/etc/urpmi/proxy.cfg';
@@ -94,13 +94,6 @@ sub preferred_downloader {
 	} elsif ($warned{webfetch_not_available}++ == 0) {
 	    $urpm->{log}(N("%s is not available, falling back on %s", $requested_downloader, $preferred));
 	}
-    }
-    # in some cases, we may want not to use metalink (aria2) since it can 
-    # cause issues, see #53434 for example
-    if ($metalink_disabled && member($preferred, @metalink_downloaders)) {
-	$urpm->{log}("not using $preferred since metalink has been disabled");
-	my @no_metalink = urpm::util::difference2(\@available, \@metalink_downloaders);
-	$preferred = $no_metalink[0];
     }
 
     if ($$use_metalink && !member($preferred, @metalink_downloaders)) {
@@ -287,7 +280,7 @@ sub set_proxy {
 	if (my ($http_proxy) = $p->{http_proxy} && parse_http_proxy($p->{http_proxy})) {
 	    my $allproxy = $p->{user}; 
 	    $allproxy .= ":" . $p->{pwd} if $p->{pwd}; 
-	    $allproxy .= "@";
+	    $allproxy .= "@" if $p->{user};
 	    $allproxy .= $http_proxy;
 	    @res = ("--all-proxy=http://$allproxy");
 	}
@@ -517,14 +510,14 @@ sub sync_curl {
 	    "--stderr", "-", # redirect everything to stdout
 	    @all_files);
 	$options->{debug} and $options->{debug}($cmd);
-	$result = _curl_action($cmd,$options,@l);
+	$result = _curl_action($cmd, $options, @l);
     }
     chdir $cwd;
     $result;
 }
 
 sub _curl_action {
-    my ($cmd, $options, @l, $o_is_upload) = @_;
+    my ($cmd, $options, @l) = @_;
     
 	my ($buf, $file); $buf = '';
 	my $curl_pid = open(my $curl, "$cmd |");
@@ -543,13 +536,11 @@ sub _curl_action {
 			if (propagate_sync_callback($options, 'progress', $file, $percent, $total, $eta, $speed) eq 'canceled') {
 			    kill 15, $curl_pid;
 			    close $curl;
-			    
-			    die N("curl failed: upload canceled\n") if $o_is_upload;
 			    die N("curl failed: download canceled\n");
 			}
 			#- this checks that download has actually started
 			if ($_ eq "\n"
-			    && !($speed eq 0 && $percent == 100 && index($eta, '--') >= 0) #- work around bug 13685
+			    && !($speed == 0 && $percent == 100 && index($eta, '--') >= 0) #- work around bug 13685
 			) {
 			    propagate_sync_callback($options, 'end', $file);
 			    $file = undef;
@@ -597,7 +588,7 @@ sub sync_rsync {
 	    my $buf = '';
 	    my $cmd = join(" ", "/usr/bin/rsync",
 		($limit_rate ? "--bwlimit=$limit_rate" : @{[]}),
-		($options->{quiet} ? qw(-q) : qw(--progress -v)),
+		($options->{quiet} ? qw(-q) : qw(--progress -v --no-human-readable)),
 		($options->{compress} ? qw(-z) : @{[]}),
 		($options->{ssh} ? qq(-e $options->{ssh}) : 
 		   ("--timeout=$CONNECT_TIMEOUT",
@@ -703,19 +694,24 @@ sub sync_aria2 {
 
     my $aria2c_command = join(" ", map { "'$_'" }
 	"/usr/bin/aria2c", $options->{debug} ? ('--log', "$options->{dir}/.aria2.log") : @{[]},
-	"--auto-file-renaming=false",
+	'--auto-file-renaming=false',
 	'--ftp-pasv',
-	"--follow-metalink=mem",
+	'--summary-interval=1',
+	'--follow-metalink=mem',
       $medium->{mirrorlist} ? (
-	'--metalink-enable-unique-protocol=false', # so that it can try both ftp and http access on the same server. aria2 will only do this on first calls
-	'--max-tries=1', # nb: not using $options->{retry}
+	'--metalink-enable-unique-protocol=true', # do not try to connect to the same server using the same protocol
+	 '--metalink-preferred-protocol=http', # try http as first protocol as they're stateless and
+	                                       # will put less strain on ie. the ftp servers which connections
+	                                       # are statefull for, causing unhappy mirror admins complaining
+	                                       # about increase of connections, increasing resource usage.
+	'--max-tries=5', # nb: not using $options->{retry}
 	'--lowest-speed-limit=20K', "--timeout", 3,
-        '--metalink-servers=3', # maximum number of servers to use for one download
+        '--split=3', # maximum number of servers to use for one download
         '--uri-selector=adaptive', "--server-stat-if=$stat_file", "--server-stat-of=$stat_file",
-        $options->{is_versioned} ? @{[]} : '--max-file-not-found=3', # number of not found errors on different servers before aborting file download
+        $options->{is_versioned} ? @{[]} : '--max-file-not-found=9', # number of not found errors on different servers before aborting file download
         '--connect-timeout=6', # $CONNECT_TIMEOUT,
       ) : @{[]},
-	"-Z", "-j1",
+	'-Z', '-j1',
 	($options->{'limit-rate'} ? "--max-download-limit=" . $options->{'limit-rate'} : @{[]}),
 	($options->{resume} ? "--continue" : "--allow-overwrite=true"),
 	($options->{proxy} ? set_proxy({ type => "aria2", proxy => $options->{proxy} }) : @{[]}),
@@ -768,8 +764,29 @@ sub _parse_aria2_output {
 				propagate_sync_callback($options, 'start', $file)
 				  if !$options->{is_retry};
 			}
-			#parses aria2c: [#1 SIZE:176.0KiB/2.5MiB(6%) CN:3 SPD:256.22KiBs ETA:09s]
-    		    if ($buf =~ m!^\[#\d*\s+\S+:([\d\.]+\w*).([\d\.]+\w*)\S([\d]+)\S+\s+\S+\s*([\d\.]+)\s\w*:([\d\.]+\w*)\s\w*:(\d+\w*)\]$!) {
+
+			# aria2c 1.16 and beyond:
+			# parses aria2c: [#2c8dae 496KiB/830KiB(59%) CN:1 DL:84KiB ETA:3s]
+			#
+			# using multiline mode and comments for better readability:
+			#
+			if ($buf =~ m!
+				^\[\#[\dA-Fa-f]+ # match #2c8dae
+				\s+
+				([\d\.]+\w*) # Match 496KiB
+					/
+				([\d\.]+\w*) # Match 830KiB
+				\s* \( (\d+) % \) # Match (59%)
+				\s+
+				CN:(\S+) # Match CN:1
+				\s+
+				DL:(\S+) # Match DL:84KiB
+				\s+
+				ETA:(\w+)
+				\]$
+				!msx
+			)
+			{
 			    my ($total, $percent, $speed, $eta) = ($2, $3, $5, $6);
 			    #- $1 = current downloaded size, $4 = connections
 		    if (propagate_sync_callback($options, 'progress', $file, $percent, $total, $eta, $speed) eq 'canceled') {
@@ -822,11 +839,13 @@ END {
 
 #- get the width of the terminal
 my $wchar = 79;
-eval {
+if (-t *STDOUT) {
+  eval {
     require Term::ReadKey;
     ($wchar) = Term::ReadKey::GetTerminalSize();
     --$wchar;
-};
+  };
+}
 
 sub progress_text {
     my ($mode, $percent, $total, $eta, $speed) = @_;
@@ -932,6 +951,7 @@ sub sync_rel {
 	$urpm->{log}(N("retrieved %s", $files_text));
 	\@result_files;
     } else {
+	$urpm->{log}("error: $err");
 	# don't leave partial download
 	unlink @result_files;
 	undef;
@@ -1093,7 +1113,6 @@ sub _create_metalink_ {
 
 1;
 
-__END__
 
 =back
 

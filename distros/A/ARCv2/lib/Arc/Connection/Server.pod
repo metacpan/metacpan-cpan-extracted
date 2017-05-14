@@ -1,0 +1,678 @@
+=head1 NAME
+
+Arc::Connection::Server - Class to handle one connection on the server side 
+
+=head1 DESCRIPTION
+
+ARC allows non-privileged users to run privileged commands on the server.
+The server decides if the user is allowed to run this command through ACL.
+
+This file is a part of the Perl ARCv2 module suite. ARCv2 is a 
+rewrite of ARC by R.Toebbicke, CERN, Switzerland in Perl. 
+
+=head1 ABSTRACT
+
+From ARC by R. Toebbicke, modified by me:
+User requests are shipped from a client machine to a server using a
+SASL-authenticated socket connection. The purpose is to convey
+requests such as privileged commands (e.g. AFS, Crontab) to be executed on the
+server under appropriate privileges. Given that all privileges are
+confined to the server and the server can be programmed as to filter and
+check the command to be executed, the client machine can be less trusted
+than the server.
+
+Because ARC-v1-Commands are written in perl anyway, implementing the client/server
+in perl makes sense. Platform-independence and "easy-to-read" source code are welcome
+too. This package provides two perl command line scripts (arcx, arcxd). They can
+be used for working with the ARC server from the command line, resp. to start the
+server.
+
+=head1 SYNOPSIS
+
+Arc::Connection::Server - Server handle for ARCv2.
+This class is called by Arc::Server for each incoming connection.
+
+
+=head1 Class VARIABLES
+
+=head3 PUBLIC MEMBERS
+
+=over 2
+
+=item commands 
+
+B<Description>: hash of assignment between B<Command Name> and B<Command Class>. See L<Arc::Command>
+
+B<Default value>: undef
+
+=item logfileprefix I<reimplemented from Arc>
+
+B<Default value>: "server"
+
+=item sasl_cb_checkpass 
+
+B<Description>: Callback for SASL (if PLAIN (or equal) mechanisms are used). See Authen::SASL(::Cyrus).
+
+=item sasl_cb_getsecret 
+
+B<Description>: Callback for SASL (if PLAIN (or equal) mechanisms are used). See Authen::SASL(::Cyrus).
+
+B<Default value>: ""
+
+=item sasl_mechanisms 
+
+B<Description>: array of allowed SASL mechanisms
+
+B<Default value>: undef
+
+=back 
+
+=over 2
+
+=item protocol I<inherited from Arc::Connection>
+
+B<Description>: Which protocol is used (0 = ARC/2.0, 1 = ARC/2.1)
+
+B<Default value>: undef
+
+=item service I<inherited from Arc::Connection>
+
+B<Description>: name of the server (for SASL)
+
+B<Default value>: undef
+
+=item timeout I<inherited from Arc::Connection>
+
+B<Description>: timeout for all connections (ARCv2 and command) in seconds
+
+B<Default value>: undef
+
+=back 
+
+=over 2
+
+=item logdestination I<inherited from Arc>
+
+B<Description>: Where should all the log output go to ('stderr','syslog')
+
+B<Default value>: 'syslog'
+
+=item loglevel I<inherited from Arc>
+
+B<Description>: loglevel is combination of bits (1=AUTH,2=USER,4=ERR,8=CMDDEBUG,16=VERBSIDE,32=DEBUG) see _Log method
+
+B<Default value>: 7
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PROTECTED MEMBERS
+
+=over 2
+
+=item _realm 
+
+B<Description>: Name of the SASL realm, if the user is from the default realm, this is empty
+
+B<Default value>: ""
+
+=back 
+
+=over 2
+
+=item _authenticated I<inherited from Arc::Connection>
+
+B<Description>: Are we authenticated
+
+=item _cmdclientsock I<inherited from Arc::Connection>
+
+B<Description>: IO::Socket for the command connection (encrypted)
+
+B<Default value>: undef
+
+=item _cmdparameter I<inherited from Arc::Connection>
+
+B<Description>: parameter after the command
+
+B<Default value>: undef
+
+=item _connected I<inherited from Arc::Connection>
+
+B<Description>: are we connected
+
+=item _connection I<inherited from Arc::Connection>
+
+B<Description>: IO::Socket for the ARCv2 Connection
+
+B<Default value>: undef
+
+=item _expectedcmds I<inherited from Arc::Connection>
+
+B<Description>: array, which ARCv2 protocol commands are allowed to come next
+
+B<Default value>: undef
+
+=item _select I<inherited from Arc::Connection>
+
+B<Description>: IO::Select for the ARCv2 Connection
+
+B<Default value>: undef
+
+=item _username I<inherited from Arc::Connection>
+
+B<Description>: username extracted from SASL
+
+B<Default value>: "anonymous"
+
+=back 
+
+=over 2
+
+=item _error I<inherited from Arc>
+
+B<Description>: contains the error message
+
+B<Default value>: undef
+
+=item _syslog I<inherited from Arc>
+
+B<Description>: log to syslog or to STDERR
+
+B<Default value>: 1
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PRIVATE MEMBERS
+
+=head1 Class METHODS
+
+=head3 PUBLIC METHODS
+
+=over 2
+
+=item HandleClient ( $clientsock (IO::Socket) ) 
+
+B<Description>: Public function, gets the clientsocket (from Arc::Server) and handles it.
+Handles a connection (main loop).
+
+
+B<Returns:> true on success, otherwise false
+
+
+B<Example:>
+
+$arc->HandleClient(sock);
+
+
+=item Quit (  ) 
+
+B<Description>: Ends the connection.
+Do some cleanup.
+
+
+B<Returns:> always true
+
+
+B<Example:>
+
+$arc->Quit();
+
+
+=item tonne (  ) 
+
+B<Description>: See source code for this method. /dev/null for unwanted output.
+
+
+=back 
+
+=over 2
+
+=item clean (  ) I<inherited from Arc::Connection>
+
+=item IsConnected (  ) I<inherited from Arc::Connection>
+
+B<Description>: are we connected?
+
+
+B<Returns:> true, if the ARCv2 control connection is connected, otherwise false
+
+
+B<Example:>
+
+last unless $arc->IsConnected;
+
+
+=back 
+
+=over 2
+
+=item DESTROY (  ) I<inherited from Arc>
+
+B<Description>: Destructor
+
+
+=item IsError (  ) I<inherited from Arc>
+
+B<Description>: User function to get the error msg.
+
+
+B<Returns:> the error message if any otherwise undef
+
+
+B<Example:>
+
+unless (my $err = $arc->IsError()) { .. } else { print STDERR $err; }
+
+
+=item Log ( $facility, ... (message) ) I<inherited from Arc>
+
+B<Description>: Log function.
+Logs messages to 'logdestination' if 'loglevel' is is set appropriatly.
+loglevel behaviour has changed in the 1.0 release of ARCv2, the "Arc"-class can export
+LOG_AUTH (authentication information), LOG_USER (connection information), LOG_ERR (errors), 
+LOG_CMD (ARCv2 addition internal command information), LOG_SIDE (verbose client/server-specific
+information), LOG_DEBUG (verbose debug information). It possible to combine the 
+levels with or (resp. +) to allow a message to appear when not all loglevels are 
+requested by the user.
+Commonly used for logging errors from application level.
+
+
+B<Returns:> always false
+
+
+B<Example:>
+
+return $arc->Log(LOG_ERR,"Message");
+
+
+=item new ( %hash, key => val, ... ) I<inherited from Arc>
+
+B<Description>: Constructor. 
+Initializes the object and returns it blessed.
+For all sub classes, please override C<_Init> to check the 
+parameter which are passed to the C<new> function. This
+is necessary because you are not able to call the the new method of a
+parent class, when having a class name (new $class::SUPER::new, does not work.).
+
+
+B<Returns:> blessed object of the class
+
+
+B<Example:>
+
+my $this = new Arc::Class ( key => value, key2 => value2 );
+
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PROTECTED METHODS
+
+=over 2
+
+=item _Auth (  ) 
+
+B<Description>: send the available SASL mechanisms.
+Protocol command: AUTH <comma-seperated list of SASL mechansims>\r\n
+
+
+B<Returns:> true when succesful, otherwise false
+
+
+B<Example:>
+
+$this->_Auth();
+
+
+=item _Authtype (  ) 
+
+B<Description>: tell the client, which SASL mechanism is used.
+Protocol command: AUTHTYPE <SASL mechansism>\r\n
+
+
+B<Returns:> true when succesful, otherwise false
+
+
+B<Example:>
+
+$this->_Authtype();
+
+
+=item _CBCanonUser (  ) 
+
+B<Description>: Callback function to canonicalize the username (SASL)
+see Authen::SASL(::Cyrus) for parameter list and how to use.
+
+
+=item _CheckCmd (  ) 
+
+=item _CmdError (  ) 
+
+B<Description>: send a command error msg to client.
+Protocol command: CMDERR <msg>\r\n
+
+
+B<Returns:> true when succesful, otherwise false
+
+
+B<Example:>
+
+$this->_CmdError("failure.");
+
+
+=item _Done (  ) 
+
+B<Description>: command is ready.
+When the ARCv2 command is ready with its work, the server
+sends the DONE command on the control connection.
+Protocol command: DONE\r\n
+
+
+B<Returns:> true when succesful, otherwise false
+
+
+B<Example:>
+
+$this->_Done();
+
+
+=item _Error (  ) 
+
+B<Description>: send an error msg to client (Server error).
+Protocol command: ERR <msg>\r\n
+
+
+B<Returns:> true when succesful, otherwise false
+
+
+B<Example:>
+
+$this->_Error("failure.");
+
+
+=item _Init (  ) I<reimplemented from Arc::Connection>
+
+=item _RAUTHENTICATE (  ) 
+
+B<Description>: parses the AUTHENTICATE[ <SASL mech>]\r\n, sent by the client.
+Checks if the demanded SASL mechanism is allowed and returns the
+selected mechanism.
+
+
+=item _RCMD (  ) 
+
+B<Description>: parses the CMD <cmd>\r\n, sent by the client.
+check if the command exists, prepares the command connection, executes the command and
+does cleanups after execution.
+
+
+=item _RQUIT (  ) 
+
+B<Description>: does nothing, placeholder for QUIT\r\n command, sent by the client.
+
+
+=item _RSASL (  ) 
+
+B<Description>: parses the SASL <base64 encoded SASL string>\r\n, sent by the client.
+Sasl challenge/response from the client
+
+
+=item _RunCmd (  ) 
+
+=item _SplitCmdArgs (  ) 
+
+=item _StartAuthentication (  ) 
+
+B<Description>: Creates the sasl object (server_new)
+and sends the first sasl challenge/response.
+Protocol command: SASL <base64 encoded SASL output>\r\n
+
+
+B<Returns:> true when succesful, otherwise false
+
+
+B<Example:>
+
+$this->_StartAuthentication();
+
+
+=item _StepAuthentication ( bool $first_step ) 
+
+B<Description>: Another SASL step
+Response of a SASL command from the client
+Protocol command: SASL <base64 encoded SASL outout>\r\n
+
+
+B<Returns:> true when succesful, otherwise false
+
+
+B<Example:>
+
+$this->_StepAuthentication(1);
+
+
+=back 
+
+=over 2
+
+=item _CommandConnection (  ) I<inherited from Arc::Connection>
+
+B<Description>: initializes command connection. (protocol)
+Starts listen on the Command socket and sends the B<CMDPASV> command.
+
+
+B<Returns:> true if everything went like expected, otherwise false.
+
+
+B<Example:>
+
+$this->_CommandConnection();
+
+
+=item _PrepareAuthentication (  ) I<inherited from Arc::Connection>
+
+B<Description>: initialize sasl.
+This function initializes the C<__sasl> member with an object
+of C<Authen::SASL>.
+
+
+B<Returns:> true if successful, otherwise false
+
+
+B<Example:>
+
+$this->_PrepareAuthentication() || return;
+
+
+=item _ProcessLine ( $cmd ) I<inherited from Arc::Connection>
+
+B<Description>: process an ARCv2 command. (protocol)
+Process a command by evaling $this->_R$cmd. Also checks if 
+this command was expected now (looks into the $this->{_expectedcmds} array). 
+Used by client and server.
+
+
+B<Returns:> true, if ARCv2 command has been in place, otherwise false
+
+
+B<Example:>
+
+while (my $cmd = $this->_RecvCommand() && $this->_ProcessLine($cmd)) {}
+
+
+=item _ReadWriteBinary ( *locfdin, *locfdout ) I<inherited from Arc::Connection>
+
+B<Description>: function for reading and writing on the command connection.
+This function is always used by the C<Arc::Connection::Server> to handle 
+command data. When calling the C<ProcessCommand> from C<Arc::Connection::Client> 
+this function is also used.
+Data is read from the local socket resp. pipe and is written encrypted 
+to the network socket. The other side reads the data from network socket, 
+decrypts it and writes it to its local socket. This function behaves differently on 
+client and server sides, when the local or network socket is closed.
+
+
+B<Returns:> always true
+
+
+B<Example:>
+
+$this->ReadWriteBinary(*STDIN,*STDOUT);
+
+
+=item _RecvCommand (  ) I<inherited from Arc::Connection>
+
+B<Description>: receives an ARCv2 Command. (protocol)
+This function gets a line from C<_RecvLine> and extracts the ARCv2 command and
+the optional command parameter C<_cmdparameter>.
+
+
+B<Returns:> ARCv2 command and true if everything works fine, otherwise false
+
+
+B<Example:>
+
+while (my $cmd = $this->_RecvCommand()) { ... }
+
+
+=item _RecvLine (  ) I<inherited from Arc::Connection>
+
+B<Description>: receive a line (command). (protocol)
+This function receives data from the ARCv2 connection and
+fills the internal C<__linequeue> and C<__partial>. It returns 
+a line from the internal buffer if there is any. It also handles
+timeouts and "connection closed by foreign host"'s.
+
+
+B<Returns:> true (and the line) if everything worked fine, otherwise false (undef)
+
+
+B<Example:>
+
+if (my $line = $this->_RecvLine()) { ... }
+
+
+=item _Sasl ( $saslstr ) I<inherited from Arc::Connection>
+
+B<Description>: send the ARCv2 SASL command. (protocol)
+This function encodes the output from sasl_*_start and sasl_*_step with Base-64 and sends
+it to the other side
+
+
+B<Returns:> true if successful, otherwise false
+
+
+B<Example:>
+
+$this->_Sasl($sasl->client_start());
+
+
+=item _SendCommand ( $cmd, $parameter ) I<inherited from Arc::Connection>
+
+B<Description>: send a command. (protocol)  
+Send a command to the ARCv2 socket.
+
+
+B<Returns:> true if successful, otherwise false
+
+
+B<Example:>
+
+$this->_SendCommand("CMDPASV",$consock->sockhost.':'.$consock->sockport);
+
+
+=item _SendLine ( ... (line) ) I<inherited from Arc::Connection>
+
+B<Description>: send a line. (protocol)
+This function sends a command line to the ARCv2 socket.
+
+
+B<Returns:> true if writing has succeeded, otherwise false.
+
+
+B<Example:>
+
+$this->_SendLine($cmd,"test"); 
+
+
+=back 
+
+=over 2
+
+=item _Debug ( ... (message) ) I<inherited from Arc>
+
+B<Description>: Debug function.
+Logs messages with "DEBUG" 
+
+
+B<Returns:> always false
+
+
+B<Example:>
+
+$this->_Debug("hello","world"); # message will be "hello world"
+
+
+=item _SetError ( ... (message)  ) I<inherited from Arc>
+
+B<Description>: SetError function.
+This function prepends the error message (@_) to an existing error message (if any) and
+logs the message with LOG_ERR facility.
+Use this function for setting an error from class level. Users should use IsError 
+to get the message if a function failed.
+
+
+B<Returns:> always false
+
+
+B<Example:>
+
+return $this->_SetError("User is not allowed to do this."); # breaks when an error occured
+
+
+=back 
+
+=over 2
+
+=back 
+
+=head3 PRIVATE METHODS
+
+=head1 SEE ALSO
+
+L<Arc>, L<Arc::Command>, L<Arc::Connection>, 
+L<Arc::Connection::Server>, L<Arc::Connection::Client>,
+L<arcx>, L<arcxd>, L<Authen::SASL>, L<Authen::SASL::Cyrus>
+L<Net::Server::PreFork>
+
+=head1 AUTHOR
+
+ Patrick Boettcher <patrick.boettcher@desy.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003-5 Patrick Boettcher <patrick.boettcher@desy.de> and others.
+All rights reserved.
+Zeuthen, Germany, (old) Europe
+
+ This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+ Special thanks go to:
+DESY Zeuthen, in particular:
+
+- Wolfgang Friebel for bleeding edge testing and heavy bug reporting (and the idea of reimplementing ARC).
+
+- Waltraut Niepraschk and Andreas Haupt for their help and support during the development. 
+
+=cut

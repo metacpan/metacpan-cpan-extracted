@@ -1,7 +1,8 @@
 package Class::MakeMethods::Template::Struct;
 
-use Class::MakeMethods::Template::Array '-isasubclass';
+use Class::MakeMethods::Template::Array;
 
+@ISA = "Class::MakeMethods::Template::Array";
 $VERSION = 1.008;
 
 1;

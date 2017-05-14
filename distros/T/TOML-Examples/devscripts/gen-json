@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use TOML::Parser;
+use File::Slurper qw(read_text write_text);
+use JSON;
+
+my $json = JSON->new->allow_nonref->pretty->canonical;
+
+my $reader = TOML::Parser->new();
+for (glob "share/examples/*/*.toml") {
+    next if /TODO-|invalid-/;
+    say "$_ ...";
+    write_text("$_.json", $json->encode($reader->parse(read_text $_)));
+}

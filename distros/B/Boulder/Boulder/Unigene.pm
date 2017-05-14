@@ -6,7 +6,7 @@ require Exporter;
 @EXPORT = ();
 @EXPORT_OK = ();
 use Carp;
-$VERSION=28051999;
+$VERSION=1.0;
 use constant DEFAULT_UNIGENE_PATH => '/data/unigene/Hs.dat';
 
 =head1 NAME

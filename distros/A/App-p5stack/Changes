@@ -1,0 +1,19 @@
+
+0.004     2015-12-22 12:30:30+00:00 Europe/Lisbon
+
+    * Create p5stack directory if missing (Issue#2, reported by AMBS++).
+    * Attempt to warn about cpanm misses (Issue#3, reported by AMBS++).
+    * Fix use of local dzil
+
+0.003     2015-11-19 22:29:12+00:00 Europe/Lisbon
+
+    * Add new 'run' command (AMBS++ for comments).
+
+0.002     2015-09-29 21:18:28+01:00 Europe/Lisbon
+
+    * Fix setup step file paths for dist.ini and cpanfile.
+
+0.001     2015-09-29 18:09:34+01:00 Europe/Lisbon
+
+    * First release.
+

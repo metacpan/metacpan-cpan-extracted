@@ -14,19 +14,19 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA512
 
-SHA1 acadb7ecc5cd87ccf9367a4cf1b7eec33f7008b0 ANSIColor.pm
-SHA1 4fe7bc1c35ef905e28930a7a08f3a6a9e028edec ANSIColor/AllError.pm
-SHA1 c035576c1db0b67e1d413f02488dc17ec98f47df ANSIColor/Die.pm
-SHA1 608e5ebd2766cc695a1a1cf7b94cc890a525a300 ANSIColor/Error.pm
-SHA1 5947f78d6d8742b4c421223dcf405aabfe607954 ANSIColor/ErrorList.pm
-SHA1 f2562594481b916cc6232f6421023587fc9e5e8a ANSIColor/Print.pm
-SHA1 efcbaf8e4ed86714ea36b9d80e52a0fc57a0f618 ANSIColor/PrintVar.pm
-SHA1 d0b4051682706d50d81a21701ccede0b1f6db921 Changes
+SHA1 c367a0998329644b74de7f5143d105df515f453d ANSIColor.pm
+SHA1 409b500ab4727fe84240fd888af4d9535edd1692 ANSIColor/AllError.pm
+SHA1 4a46c6b8a6f22c24ad56950b30f20c717148e8fa ANSIColor/Die.pm
+SHA1 4dec7c5dd18f17a3c525a72c6a152d8289e16dda ANSIColor/Error.pm
+SHA1 cc358fc995433beacfd4fc18774c968441740895 ANSIColor/ErrorList.pm
+SHA1 5dabe2b76a3539dfd16429f14ed9c6da9dffe966 ANSIColor/Print.pm
+SHA1 ba6ccbe7d2030d95ef6984b3be877fbb996109f4 ANSIColor/PrintVar.pm
+SHA1 811434218f81dd503c356b141fdda003683a1fe8 Changes
 SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
 SHA1 d6f39541cf83dde6f7c8b994d131b551ebf4cc92 MANIFEST
-SHA1 846e56fc0838aa10b9d373676de4703b10bfd4a5 META.yml
-SHA1 7ab28b152a6e84d2ae21cdb43f2b48c5bf3bb2e4 Makefile.PL
-SHA1 f1c5505c4c19c660cce02f67dd9d1c412082481e README
+SHA1 4562274fa720666aa636f598a87234bf786b9956 META.yml
+SHA1 d396d97aab34fbd657b065b71f54fee159577f99 Makefile.PL
+SHA1 f782a91f701426ba5296854d2a4b78f459aa03d5 README
 SHA1 1354785bc28565ab078bd1c60d95873e7c0a82e0 examples/ex1.pl
 SHA1 5da94f5efd9e360f96f3c5aec5fa6ac180623031 examples/ex10.pl
 SHA1 ef51d5b7bf38526589d7106b1f6838a7f6727739 examples/ex11.pl
@@ -53,19 +53,19 @@ SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.p
 SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
 SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
 SHA1 bbfc25dddd7e9c1b67ac2ff93aab252b2263cef1 t/Error-Pure-ANSIColor-AllError/01-use.t
-SHA1 d1f555399adf3e6c143e083bc5869e41efb42cbc t/Error-Pure-ANSIColor-AllError/02-version.t
+SHA1 caeea2dfb3c6f943255a9252f518b2c23570f553 t/Error-Pure-ANSIColor-AllError/02-version.t
 SHA1 6ec8b477141c1a454a2005ee0fc008a922f7c8b6 t/Error-Pure-ANSIColor-Die/01-use.t
-SHA1 7f7532579d19eebe0a611a9827b5123df1090254 t/Error-Pure-ANSIColor-Die/02-version.t
+SHA1 6fc59bb852b12b750f70c6d703bfdd570e4c6d12 t/Error-Pure-ANSIColor-Die/02-version.t
 SHA1 db3f3e2b4c12a0471c8025144d012e89a35d5f69 t/Error-Pure-ANSIColor-Error/01-use.t
-SHA1 8bc426983fd1c9e4cbe60d19628b039ecb22dc90 t/Error-Pure-ANSIColor-Error/02-version.t
+SHA1 2ddeebece08e912100255092c15d7565a372b1c7 t/Error-Pure-ANSIColor-Error/02-version.t
 SHA1 2863b94f603c95b2f21a5fbf016603da97678b0b t/Error-Pure-ANSIColor-ErrorList/01-use.t
-SHA1 c33975c9913632b09cb84bf23ba9fe7f717d8c9e t/Error-Pure-ANSIColor-ErrorList/02-version.t
+SHA1 5766c0e0ce54e9a2a92b72fe094ee73ea334da3e t/Error-Pure-ANSIColor-ErrorList/02-version.t
 SHA1 4fb952d278a11b028212a333a3a0fa4f6938434c t/Error-Pure-ANSIColor-Print/01-use.t
-SHA1 8bcf6814eee1f87afcb5f52ac761dbe49845ee32 t/Error-Pure-ANSIColor-Print/02-version.t
+SHA1 6aa16bcb25cc02ffd4e7650776e06ff7eafe74e3 t/Error-Pure-ANSIColor-Print/02-version.t
 SHA1 626b024a5ca9f4030dda1a1a99b57f2341092e53 t/Error-Pure-ANSIColor-PrintVar/01-use.t
-SHA1 f4d35574b3dab42557a255d20529a39e672430d4 t/Error-Pure-ANSIColor-PrintVar/02-version.t
+SHA1 a8985bfcdb197a9b97098f5930ea5b7d49895a28 t/Error-Pure-ANSIColor-PrintVar/02-version.t
 SHA1 2cf90499f17445729bdff4ff67523e16ca58bd40 t/Error-Pure-ANSIColor/01-use.t
-SHA1 1eff25b6dd910de57181f77454375337b9da2fbe t/Error-Pure-ANSIColor/02-version.t
+SHA1 c8736f766b4a36e21ee6947dfbf3aa3896733c84 t/Error-Pure-ANSIColor/02-version.t
 SHA1 3a47baa3bf7068bcc68be6a7e83264fcb7b93d5f xt/Error-Pure-ANSIColor-AllError/01-pod_coverage.t
 SHA1 66744ae4487a535f01f58145df46085ed28b4b34 xt/Error-Pure-ANSIColor-AllError/02-pod.t
 SHA1 43a9c0174e8a42061be42d1cdb6f3334cd550c9e xt/Error-Pure-ANSIColor-Die/01-pod_coverage.t
@@ -82,12 +82,12 @@ SHA1 2654b785bf15e85ec9cd6fc7e43bba82166239c2 xt/Error-Pure-ANSIColor/01-pod_cov
 SHA1 b5befc5443d1cec3310dd29a1674169456c84ea9 xt/Error-Pure-ANSIColor/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAljAF58ACgkQKyiOZjWe
-rHaz0Af/adX1ypQu8WUs9Jkcj7uGqIiqf8WEsHGdR6Qv36h8dRTJyFGlA/wI9XUO
-uYNVqXw4mJJlwm25eZL741E0OTWM0sXlvAoLcV2+imDGa8rX17Lsjj+R3jhnW+9Q
-bGJNDfNRyAnmiIffilx2VdZTGNyAuP3NMxtdaq31tyKbw38UZKF01NC5o9/EFzhS
-GvWDCOc0KZ02sa3wn7RWR3uTlPQvCd0/Qx2eunDLNP2pCtBnjZuOnjr+qrFimAkm
-5ckeaw7J0yh7MOPRZlNifJr/fgrQnL0xb5VwnJVdGf/92Qs06o/UMk6uKYPKRUR5
-t/6dWDgTp5ESyu485627CYEd+uupPg==
-=h4Sz
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAljhMcgACgkQKyiOZjWe
+rHZWXQf/VdS3O+1GTFX0ua0/7LOSzz93QPeK+uKHSE+E91me8TbdPw/+0Rxcixir
+XkFaWN+BhE+b+WTfjR3oCB7vHinY+/vUgmAzCC2Ej6NXrmO2PFWMrDwgzEieSTep
+WMxXtzrH7TK9r5El4des6/8/5My7JxtO1IChOprzpo5O9YzH8jb2V4yJcM4XZib3
+FhppSHOtfUXE2Smet4DV9X60yGGxLdDsD9RS8MaerxApa3dXCO/tCGu90AW1XUwT
+krHSdKA9zzzr5soLcV6lga8IDL3iS0P/7kYOiMSKBcQIr+f0K5kE8GX3z8ROtIw9
+S54fjD+zRuo/AATZ7vFU8IzXquy0zA==
+=+i0w
 -----END PGP SIGNATURE-----

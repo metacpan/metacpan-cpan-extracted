@@ -13,11 +13,11 @@ use Pinto::Util qw(debug throw);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
-with qw( Pinto::Role::UserAgent );
+with qw( Pinto::Role::FileFetcher );
 
 #------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ sub add_archive {
     throw "$origin does not exist" if not -e $origin;
     throw "$origin is not a file"  if not -f $origin;
 
-    $self->mirror( $origin => $destination );
+    $self->fetch( from => $origin, to => $destination );
     $self->update_checksums( directory => $destination->parent );
 
     return $self;
@@ -123,7 +123,7 @@ Pinto::Store - Storage for distribution archives
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 DESCRIPTION
 
@@ -138,7 +138,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

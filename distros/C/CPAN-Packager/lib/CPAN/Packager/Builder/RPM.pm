@@ -1,36 +1,33 @@
 package CPAN::Packager::Builder::RPM;
 use Mouse;
 use Carp ();
-use CPAN::Packager::FileUtil qw(file dir openw);
+use Path::Class qw(file dir);
 use RPM::Specfile;
+use IPC::System::Simple qw(system capture EXIT_ANY);
 use File::Temp qw(tempdir);
 use File::Copy;
-use File::Basename;
-use CPAN::DistnameInfo;
 use CPAN::Packager::Home;
 use CPAN::Packager::Builder::RPM::Spec;
-use CPAN::Packager::Util;
 with 'CPAN::Packager::Builder::Role';
-use Log::Log4perl qw(:easy);
+with 'CPAN::Packager::Role::Logger';
 
-has 'package_output_dir' => (
+has 'release' => (
     is      => 'rw',
-    default => sub {
-        dir( CPAN::Packager::Home->detect, 'rpm' );
-    },
+    default => '1.cpanpackager',
 );
 
-has 'is_debug' => (
-    is      => 'rw',
-    lazy    => 1,
-    default => sub { get_logger('')->level() == $DEBUG }
+has 'package_output_dir' => (
+    +default => sub {
+        my $self = shift;
+        dir( CPAN::Packager::Home->detect, 'rpm' );
+    },
 );
 
 has 'build_dir' => (
     is      => 'rw',
     default => sub {
         my %opt = ( CLEANUP => 1, DIR => '/tmp' );
-        %opt = ( DIR => '/tmp' ) if ( shift->is_debug );
+        %opt = ( DIR => '/tmp' ) if &CPAN::Packager::DEBUG;
         my $tmpdir = tempdir(%opt);
         dir($tmpdir);
     }
@@ -46,15 +43,14 @@ has 'spec_builder' => (
 sub BUILD {
     my $self = shift;
     $self->check_executables_exist_in_path;
-    File::Path::mkpath( $self->package_output_dir );
+    $self->package_output_dir->mkpath;
     $self;
 }
 
 sub check_executables_exist_in_path {
-    die "yum doesn't exist in PATH"
-        if CPAN::Packager::Util::run_command("which yum");
-    die "rpm doesn't exist in PATH"
-        if CPAN::Packager::Util::run_command("which rpm");
+    system("which cpanflute2");
+    system("which yum");
+    system("which rpm");
 }
 
 sub build {
@@ -63,37 +59,24 @@ sub build {
         "$module->{module} does't have tarball. we can't find $module->{module} in CPAN "
         unless $module->{tgz};
 
-    $self->release( $module->{release} )   if $module->{release};
-    $self->pkg_name( $module->{pkg_name} ) if $module->{pkg_name};
-
     my ( $spec_file_name, $spec_content )
         = $self->generate_spec_file($module);
     $self->generate_macro;
     $self->generate_rpmrc;
     $self->copy_module_sources_to_build_dir($module);
-    my $is_failed = $self->build_rpm_package($spec_file_name);
-    $self->install($module) unless $is_failed;
-    INFO(">>> Finished building rpm package ( $module->{module} )");
-    return $self->get_package_name($module);
-}
-
-sub get_spec_name {
-    my ( $self, $module ) = @_;
-    my $package_name = $self->get_package_name($module);
-    my $spec_name    = $package_name . ".spec";
-    return $spec_name;
+    $self->build_rpm_package($spec_file_name);
+    return $self->package_name( $module->{module} );
 }
 
 sub generate_spec_file {
     my ( $self, $module ) = @_;
     my $spec_content   = $self->generate_spec_with_cpanflute($module);
-    my $spec_file_name = $self->get_spec_name($module);
-
+    my $spec_file_name = $self->package_name( $module->{module} ) . ".spec";
     $spec_content
         = $self->filter_spec_file( $spec_content, $module->{module} );
 
+    $self->log( info => ">>> generated specfile : \n $spec_content" );
     $self->create_spec_file( $spec_content, $spec_file_name );
-    DEBUG("Generated specfile:\n-----\n$spec_content");
     ( $spec_file_name, $spec_content );
 }
 
@@ -101,14 +84,11 @@ sub generate_spec_with_cpanflute {
     my ( $self, $module ) = @_;
 
     my $tgz = $module->{tgz};
-    INFO( 'Generating specfile for ' . $tgz );
+    $self->log( info => '>>> generate specfile with cpanflute2 for ' . $tgz );
 
     my $module_name = $module->{module};
     my $version     = $module->{version};
-    my $basename    = fileparse($tgz);
-    my $distro      = CPAN::DistnameInfo->new($basename);
-    my $ext         = $distro->extension;
-    my $copy_to     = file( $self->build_dir, "$module_name-$version.$ext" );
+    my $copy_to = file( $self->build_dir, "$module_name-$version.tar.gz" );
     copy( $module->{tgz}, $copy_to );
 
     $ENV{LANG} = 'C';
@@ -116,42 +96,12 @@ sub generate_spec_with_cpanflute {
         'just-spec'   => 1,
         'noperlreqs'  => 1,
         'installdirs' => 'vendor',
-        'release'     => $self->release,
-        'test'        => 1,
-        'packager'    => 'cpanpackager',
-        'tmpdir'      => $self->build_dir,
-        'pkg_name'    => $self->pkg_name,
-        'epoch'       => $module->{epoch},
-        'patchdir'    => $self->build_dir,
+        'release'     => $self->release
     };
+    my $spec = $self->spec_builder->build( $opts, $copy_to );
 
-    $opts->{test} = 0 if $module->{skip_test};
-
-    if ( defined $module->{custom} and defined $module->{custom}->{patches} )
-    {
-        $opts->{patch} = $module->{custom}->{patches};
-    }
-
-    my $no_depends = $self->_get_no_depends($module_name);
-    my $spec = $self->spec_builder->build( $opts, $copy_to, $no_depends );
-
+    $self->log( info => '>>> generated specfile for ' . $tgz );
     $spec;
-
-}
-
-sub _get_no_depends {
-    my ( $self, $module_name ) = @_;
-    my @module_no_depends = ();
-    if ( $self->config( modules => $module_name ) && $self->config( modules => $module_name )->{no_depends} ) {
-        @module_no_depends
-            = @{ $self->config( modules => $module_name )->{no_depends}
-                || () };
-    }
-    my @global_no_depends
-        = @{ $self->config( global => 'no_depends' ) || () };
-    my @no_depends = ( @module_no_depends, @global_no_depends );
-    @no_depends = map { $_->{module}} @no_depends;
-    return \@no_depends;
 }
 
 sub filter_spec_file {
@@ -169,17 +119,16 @@ sub filter_spec_file {
 sub create_spec_file {
     my ( $self, $spec_content, $spec_file_name ) = @_;
     my $spec_file_path = file( $self->build_dir, $spec_file_name );
-    my $fh = openw( file($spec_file_path) );
+    my $fh = file($spec_file_path)->openw;
     print $fh $spec_content;
     $fh->close;
     copy( $spec_file_path,
         file( $self->package_output_dir, $spec_file_name ) );
-    DEBUG( "Wrote out: " . $self->package_output_dir . "/$spec_file_name" );
+
 }
 
 sub filter_requires_for_rpmbuild {
     my ( $self, $module, $spec_content ) = @_;
-    $spec_content = $self->_prefix_obsoletes( $spec_content, $module );
     $spec_content
         = $self->_filter_module_requires_for_rpmbuild( $spec_content,
         $module );
@@ -221,21 +170,6 @@ sub _filter_module_requires_for_spec {
     }
     $spec_content;
 
-}
-
-sub _prefix_obsoletes {
-    my ( $self, $spec_content, $module ) = @_;
-    if (   $self->config( modules => $module )
-        && $self->config( modules => $module )->{obsoletes} )
-    {
-        for my $obsolete (
-            @{ $self->config( modules => $module )->{obsoletes} || () } )
-        {
-            $spec_content
-                = "Obsoletes: $obsolete->{package}\n" . $spec_content;
-        }
-    }
-    $spec_content;
 }
 
 sub _filter_global_requires_for_rpmbuild {
@@ -281,7 +215,7 @@ sub _generate_module_filter_macro {
     my ( $self, $module_name ) = @_;
 
     my $filter_macro_file = file( $self->build_dir, 'filter_macro' );
-    my $fh = openw($filter_macro_file)
+    my $fh = $filter_macro_file->openw
         or die "Can't create $filter_macro_file: $!";
     print $fh qq{#!/bin/sh
  
@@ -293,7 +227,7 @@ sub _generate_module_filter_macro {
         print $fh "-e '/perl($mod->{module})/d' ";
     }
     print $fh "\n";
-    CPAN::Packager::Util::run_command("chmod 755 $filter_macro_file");
+    system("chmod 755 $filter_macro_file");
 }
 
 sub _generate_global_filter_macro {
@@ -301,7 +235,7 @@ sub _generate_global_filter_macro {
 
     my $filter_macro_file
         = file( $self->build_dir, 'filter_macro_for_special_modules' );
-    my $fh = openw($filter_macro_file)
+    my $fh = $filter_macro_file->openw
         or die "Can't create $filter_macro_file: $!";
     print $fh qq{#!/bin/sh
  
@@ -311,7 +245,7 @@ sub _generate_global_filter_macro {
         print $fh "-e '/perl($mod->{module})/d' ";
     }
     print $fh "\n";
-    CPAN::Packager::Util::run_command("chmod 755 $filter_macro_file");
+    system("chmod 755 $filter_macro_file");
 }
 
 sub get_default_build_arch {
@@ -322,31 +256,19 @@ sub get_default_build_arch {
 
 sub is_installed {
     my ( $self, $module ) = @_;
-    my $package;
+    my $package = $self->package_name($module);
 
-    if (   $self->config( modules => $module )
-        && $self->config( modules => $module )->{pkg_name} )
-    {
-        $package = $self->config( modules => $module )->{pkg_name};
-    }
-    else {
-        $package = $self->package_name($module);
-    }
-
-    my $return_value
-        = CPAN::Packager::Util::capture_command("LANG=C rpm -q $package");
-    if ( $return_value =~ /not installed/ ) {
-        DEBUG("$package is not installed");
-        return 0;
-    }
-    INFO("$package is installed:");
-    return 1;
+    my $return_value = capture( EXIT_ANY, "LANG=C rpm -q $package" );
+    $self->log( info => ">>> $package is "
+            . ( $return_value =~ /not installed/ ? 'not ' : '' )
+            . "installed" );
+    return $return_value =~ /not installed/ ? 0 : 1;
 }
 
 sub generate_macro {
     my $self       = shift;
     my $macro_file = file( $self->build_dir, 'macros' );
-    my $fh         = openw($macro_file) or die "Can't create $macro_file: $!";
+    my $fh         = $macro_file->openw or die "Can't create $macro_file: $!";
     my $package_output_dir = $self->package_output_dir;
     my $build_dir          = $self->build_dir;
 
@@ -367,15 +289,11 @@ sub generate_rpmrc {
     my $self = shift;
 
     my $rpmrc_file = file( $self->build_dir, 'rpmrc' );
-    my $fh = openw($rpmrc_file)
+    my $fh = $rpmrc_file->openw
         or die "Can't create $rpmrc_file: $!";
     my $macrofiles = qx(rpm --showrc | grep ^macrofiles | cut -f2- -d:);
     chomp $macrofiles;
     my $build_dir = $self->build_dir;
-    ( -r '/usr/lib/rpm/rpmrc' )
-        or die(
-        'File "/usr/lib/rpm/rpmrc" does not exist or is not readable. cannot proceed'
-        );
     print $fh qq{
 include: /usr/lib/rpm/rpmrc
 macrofiles: $macrofiles:$build_dir/macros
@@ -385,17 +303,22 @@ macrofiles: $macrofiles:$build_dir/macros
 
 sub build_rpm_package {
     my ( $self, $spec_file_name ) = @_;
-    INFO('>>> build rpm package with rpmbuild');
+    $self->log( info => '>>> build rpm package with rpmbuild' );
     my $rpmrc_file     = file( $self->build_dir, 'rpmrc' );
     my $spec_file_path = file( $self->build_dir, $spec_file_name );
 
+#    my $build_opt
+#        = "--rcfile $rpmrc_file -ba --rmsource --rmspec --clean $spec_file_path";
     my $build_opt
         = "--rcfile $rpmrc_file -ba --rmsource --rmspec --clean $spec_file_path --nodeps";
+
     $build_opt = "--rcfile $rpmrc_file -ba $spec_file_path"
-        if ( $self->is_debug );
-    my $cmd = "env PERL_MM_USE_DEFAULT=1 LANG=C rpmbuild $build_opt";
-    return CPAN::Packager::Util::run_command( $cmd,
-        $self->config( global => "verbose" ) );
+        if &CPAN::Packager::DEBUG;
+    my $result = capture( EXIT_ANY,
+        "env PERL_MM_USE_DEFAULT=1 LANG=C rpmbuild $build_opt" );
+
+    $self->log( debug => $result ) if &CPAN::Packager::DEBUG;
+    $result;
 }
 
 sub copy_module_sources_to_build_dir {
@@ -403,29 +326,31 @@ sub copy_module_sources_to_build_dir {
     my $module_tarball = $module->{tgz};
     my $build_dir      = $self->build_dir;
     my $module_name    = $module->{module};
-    my $basename       = fileparse($module_tarball);
-    my $distro         = CPAN::DistnameInfo->new($basename);
-    my $ext            = $distro->extension;
 
     $module_name =~ s{::}{-}g;
     my $version = $module->{version};
-    copy( $module_tarball, file( $build_dir, "$module_name-$version.$ext" ) );
+    copy( $module_tarball,
+        file( $build_dir, "$module_name-$version.tar.gz" ) );
+    copy( $module_tarball, file( $build_dir, "$module_name-$version.tgz" ) );
+
+    #copy( $module_tarball, $build_dir );
+    #    my $module_file = file($module_tarball)->basename;
+    #    copy( $module_tarball,       file( $build_dir, $module_file ) );
+    #    copy( $module_tarball, file( $build_dir, $module_file ) );
 }
 
 sub package_name {
     my ( $self, $module_name ) = @_;
     $module_name =~ s{::}{-}g;
+    $module_name =~ s{_}{-}g;
     'perl-' . $module_name;
 }
 
 sub installed_packages {
-    my $self = shift;
     my @installed_pkg;
-    my $return_value
-        = CPAN::Packager::Util::run_command(
-        "LANG=C yum list installed|grep '^perl\-*' |awk '{print \$1}'",
-        $self->config( global => "verbose" ) );
-    my @packages = split /[\r\n]+/, $return_value;    #/
+    my $return_value = capture( EXIT_ANY,
+        "LANG=C yum list installed|grep '^perl\-*' |awk '{print \$1}'" );
+    my @packages = split /[\r\n]+/, $return_value;
     for my $package (@packages) {
         push @installed_pkg, $package;
     }
@@ -435,25 +360,9 @@ sub installed_packages {
 sub print_installed_packages {
     my ($self) = @_;
     my $installed_file = file( $self->package_output_dir, 'installed' );
-    my $fh = openw($installed_file);
+    my $fh = $installed_file->openw;
     print $fh "yum -y install $_\n" for $self->installed_packages;
     $fh->close;
-}
-
-sub install {
-    my ( $self, $module ) = @_;
-    my $module_name    = $module->{module};
-    my $module_version = $module->{version};
-    my $package_name   = $self->get_package_name($module);
-
-    INFO(">>> install $package_name-$module_version");
-    my $rpm_path
-        = file( $self->package_output_dir, "$package_name-$module_version" );
-    my $result = CPAN::Packager::Util::run_command(
-        "sudo rpm -Uvh $rpm_path-*.rpm",
-        $self->config( global => "verbose" )
-    );
-    return $result;
 }
 
 no Mouse;

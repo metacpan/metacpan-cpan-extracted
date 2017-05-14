@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                FileHash
+version:             0.01-3
+abstract:            Perl classes for generating and saving hashes of file metadata by name and by md5sum.
+license:             ~
+author:              
+    - Dale Amon
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Cwd:                           0
+    Digest::MD5:                   0
+    Exporter:                      0
+    Fault::Logger:                 0
+    File::Spec:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

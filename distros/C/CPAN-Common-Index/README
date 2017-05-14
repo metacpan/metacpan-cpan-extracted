@@ -3,7 +3,7 @@ NAME
     and distributions
 
 VERSION
-    version 0.006
+    version 0.007
 
 SYNOPSIS
         use CPAN::Common::Index::Mux::Ordered;
@@ -138,24 +138,28 @@ METHODS
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/CPAN-Common-Index/issues>. You will be
-    notified automatically of any progress on your issue.
+    <https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index/issues>. You
+    will be notified automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for
     public review and contribution under the terms of the license.
 
-    <https://github.com/dagolden/CPAN-Common-Index>
+    <https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index>
 
-      git clone https://github.com/dagolden/CPAN-Common-Index.git
+      git clone https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index.git
 
 AUTHOR
     David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
+    *   David Golden <xdg@xdg.me>
+
     *   Helmut Wollmersdorfer <helmut@wollmersdorfer.at>
 
     *   Kenichi Ishigaki <ishigaki@cpan.org>
+
+    *   Shoichi Kaji <skaji@cpan.org>
 
     *   Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 

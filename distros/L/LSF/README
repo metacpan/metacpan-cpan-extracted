@@ -1,0 +1,39 @@
+DESCRIPTION
+       "LSF" provides a simple mechanism to load some of the LSF
+       modules at one time.  Currently this includes:
+
+             LSF::Job
+             LSF::JobInfo
+             LSF::JobGroup
+             LSF::Queue
+             LSF::JobManager
+
+       Turning on or off the printing of LSF command line output
+       can be controlled globally via the 'PRINT' directive to
+       the LSF module. Otherwise it can be set individually in
+       each of the LSF modules by using its 'PRINT' directive or
+       by calling its 'print' class method
+
+       For more information on any of these modules, please see
+       its respective documentation.
+
+       NOTE: FOR THESE MODULES TO WORK IT IS ESSENTIAL THAT YOU
+       INCLUDE THE LSF COMMANDS IN YOUR PATH.
+
+HISTORY
+       The LSF::Batch module on cpan didn't compile easily on all
+       platforms i wanted.  The LSF API didn't seem very perlish
+       either. As a quick fix I knocked these modules together
+       which wrap the LSF command line interface. It was enough
+       for my simple usage. Hopefully they work in a much more
+       perly manner.
+
+AUTHOR
+       Mark Southern (mark_southern@merck.com)
+
+COPYRIGHT
+       Copyright (c) 2002, Merck & Co. Inc. All Rights Reserved.
+       This module is free software. It may be used, redis-
+       tributed and/or modified under the terms of the Perl
+       Artistic License (see http://www.perl.com/perl/misc/Artis-
+       tic.html)

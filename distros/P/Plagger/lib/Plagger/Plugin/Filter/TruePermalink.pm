@@ -55,8 +55,9 @@ sub rewrite {
 
     my $loop;
     while ($self->rewrite_link($getter, $callback, $args)) {
-        if ($loop++ >= 100) {
-            Plagger->error("Possible infinite loop on " . $getter->());
+        if ($loop++ >= 10) {
+            $self->log(error => "Possible infinite loop on " . $getter->());
+            return;
         }
     }
 }
@@ -150,9 +151,7 @@ Plagger::Plugin::Filter::TruePermalink - Normalize permalink using its own plugi
 =head1 DESCRIPTION
 
 This plugin normalizes permalink using YAML based URL pattern
-files. Various permalink fix filters in the past (YahooBlogSearch,
-Namaan, 2chRSSPermalink) can now be writting as a pattern file for
-this plugin.
+files.
 
 This plugin rewrites I<permalink> attribute of C<$entry>, while
 keeping I<link> as is. If C<$entry> has enclosures, this plugin also

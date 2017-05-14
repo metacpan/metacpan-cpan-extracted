@@ -1,0 +1,221 @@
+#!perl -w
+
+use strict;
+use Bot::Infobot::Config qw(parse_config);
+use Bot::BasicBot::Pluggable;
+
+
+=head1 NAME
+
+infobot - an plugin based irc bot based on Kevin Lenzo's original irc bot
+
+=head1 DESCRIPTION
+
+The original Infobot was written by Kevin Lenzo. You can get more 
+information from here.
+
+    http://www.infobot.org/
+
+The code is horrible.
+
+This is a new version of the Infobot based on Tom Insam's 
+C<Bot::BasicBot::Pluggable> infrastructure. It's much nicer.
+Well, I think so anyway.
+
+I've ported over most of the plugins I've found or provided the
+functionality in other ways.
+
+All in all, there should be no loss in functionality, maybe even
+a little increase. And it's much easier to patch and extend.
+
+Infobot - now with 78% less crack.
+
+=head1 CONFIGURATION
+
+We look in the current directory for a file called C<infobot.conf>,
+which is in C<.ini> file. Variables are seperated into the main 
+namespace and then sub namespaces for each plugin.  
+
+For example the config file 
+
+    channels = #somechannel #someotherchannnel
+    server   = irc.example.com
+    nick     = mybot    
+
+    [Foo]
+    somevar = a value
+
+Will join a couple of channels under the given nick. The plugin
+C<Bot::BasicBot::Pluggable::Module::Foo> will have the 
+variable C<somevar> set C<a value>. Individual plugins will
+describe their config values however the config values 
+available for the main bot are - 
+
+=head2 server
+
+The server we're going to connect to.  Defaults to
+"irc.perl.org".
+
+=head2 port
+
+The port we're going to use.  Defaults to "6667"
+
+=head2 nick 
+
+The nick we're going to use.  Defaults to five random letters
+and numbers followed by the word "bot"
+
+=head2 alt_nicks
+
+Alternate nicks that this bot will be known by.  These are not nicks
+that the bot will try if it's main nick is taken, but rather other
+nicks that the bot will recognise if it is addressed in a public
+channel as the nick.  This is useful for bots that are replacements
+for other bots...e.g, your bot can answer to the name "infobot: "
+even though it isn't really.
+
+=head2 username
+
+The username we'll claim to have at our ip/domain.  By default this will be the same
+as our nick.
+
+=head2 name
+
+The name that the bot will identify itself as.  Defaults to
+"$nick bot" where $nick is the nick that the bot uses.
+
+
+=head2 channels 
+
+The channels we're going to connect to.
+
+=head2 quit_message
+
+The channels we're going to connect to.
+
+=head2 ignore_list
+
+The list of irc nicks to ignore B<public> messages from (normally
+other bots).  Useful for stopping bot cascades.
+
+=head2 flood
+
+Set to '1' to disable the built-in flood protection of POE::Compoent::IRC
+
+=head2 store
+
+The name of the backend C<Store> module to use. Defaults to C<Storable>
+and C<Bot::BasicBot::Pluggable> ships with that and a C<DBI> backend.
+
+=head1 STORES
+
+When the infobot starts up it will look in the current directory for various
+C<.storable> files. The are used as variable stores for the various plugins.
+
+Stores are passed anything in the C<Store> namespace. Perhaps the most
+important value is C<name> which describes which backend to use - the default
+is C<Storable> but C<Bot::BasicBot::Pluggable> also ships with a DBI backend.
+
+See the various backend for what variables you need to pass. Here are 
+some examples
+
+=head2 Storable
+
+    [ Store ]
+    type = Storable
+
+=head2 Deep
+
+    [ Store ]
+    type = Deep
+    file = brane.deep
+
+=head2 DBI
+
+    [ Store ]
+    type     = DBI
+    dsn      = dbi:SQLite:brane.db
+    user     = myusername
+    password = mypassword
+    table    = brane
+
+the table should be created automatically
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+based on the original code by Kevin Lenzo et al.
+
+=head1 COPYRIGHT
+
+Copyright 2005, Simon Wistow 
+
+Distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Bot::BasicBot::Pluggable>, L<Config::Tiny>
+
+=cut
+
+# define some config values that have multiple values
+# plugins will have to take care of themselves
+my @multi_keys = qw(alt_nicks ignore_list channels);
+
+
+
+# read the config, if it exists
+my $file   = "infobot.conf";
+
+
+
+# read all the root config values in, splitting where necessary
+my %conf = parse_config($file);
+
+# split up the multi keys
+for (@multi_keys) {
+    next unless exists $conf{$_};
+    my @vals = split ' ', $conf{$_};
+    $conf{$_} = \@vals;
+}
+
+# fire up the bot
+my $bot = Bot::BasicBot::Pluggable->new( %conf );
+$bot->store_from_hashref($conf{store});
+
+$SIG{INT} = sub 
+{ 
+    die "Being told to cark it\n";
+};
+
+# now use Loader to load the rest of the Modules
+print "Loading Loader: ";
+print "".(($bot->load("Loader"))? "OK" : "NOT OK");
+print "\n";
+
+
+# Then set the keys the plugins
+foreach my $key (keys %conf) {
+    next if $key eq 'store';
+    next unless ref $conf{$key} eq 'HASH';
+    my $mod = $bot->load($key);
+
+
+    unless (defined $mod) {
+        print "We haven't loaded a module $key - config values will be ignored\n";
+        next; # should we 'next' now? bah, wait for people to compain 
+    }
+
+    foreach my $sub_key (keys %{$conf{$key}}) {
+        my $val = $conf{$key}->{$sub_key};
+        $mod->set("user_${sub_key}", $val);
+    }
+}
+
+
+# run everything
+$bot->run();
+
+# We should maybe write stuff back out 
+

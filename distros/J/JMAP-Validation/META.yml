@@ -1,0 +1,28 @@
+---
+abstract: 'Validation checking for JMAP'
+author:
+  - 'Alfie John <alfie@fastmail.com>'
+build_requires:
+  FindBin: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JMAP-Validation
+requires:
+  Data::Fake::Dates: '0'
+  Data::Fake::Text: '0'
+  DateTime: '0'
+  Encode: '0'
+  JSON::PP: '0'
+  JSON::Typist: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Compare: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.005'

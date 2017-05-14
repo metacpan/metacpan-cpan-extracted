@@ -1,0 +1,15 @@
+# This file tests macro continuation
+
+!define abc "A B C"
+!define def \
+ "D E F"
+!define xyz \
+ "X " .\
+ "Y " x\
+ 3
+
+abc is [[abc]].
+
+def is [[def]].
+
+xyz is [[xyz]].

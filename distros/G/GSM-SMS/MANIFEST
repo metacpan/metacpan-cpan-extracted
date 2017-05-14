@@ -76,3 +76,4 @@ t/mcube.conf
 t/test_72x14.gif
 t/test_72x28.gif
 t/transporttest.config
+META.yml                                 Module meta-data (added by MakeMaker)

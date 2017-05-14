@@ -1,0 +1,302 @@
+# $Id: go-perl.pod,v 1.21 2009/08/17 00:46:42 cmungall Exp $
+#
+# see also - http://www.geneontology.org
+#          - http://www.godatabase.org/dev
+#
+# You may distribute this module under the same terms as perl itself
+
+=head1 NAME
+
+go-perl           - perl modules for GO and other OBO ontologies
+
+=head1 SYNOPSIS
+
+  # ** FETCHING GRAPH OBJECTS FROM AN ONTOLOGY FILE **
+  use GO::Parser;
+  my $parser = new GO::Parser({handler=>'obj'}); # create parser object
+  $parser->parse("gene_ontology.obo"); # parse file -> objects
+  my $graph = $parser->handler->graph;  # get L<GO::Model::Graph> object
+  my $term = $graph->get_term("GO:0001303");   # fetch a term by ID
+  printf "Got term: %s %s\n", $term->acc, $term->name;
+  my $ancestor_terms =
+    $graph->get_recursive_parent_terms($term->acc);
+  foreach my $anc_term (@$ancestor_terms) {
+    printf "  Ancestor term: %s %s\n", $anc_term->acc, $anc_term->name;
+  }
+
+  # ** FROM THE COMMAND LINE ** (requires go-dev/xml)
+  go2xml gene_ontology.obo | xsltproc $GO_ROOT/xml/xsl/my-transform.xsl -
+
+=head1 DESCRIPTION
+
+go-perl is part of the go-dev code distribution. It is also available
+as a seperate library in its own right.
+
+go-perl is a collection of perl modules for working with ontologies
+and data, in particular the Gene Ontology and other Open
+Bio-Ontologies. For background on these projects, see
+
+http://www.geneontology.org
+
+http://obo.sourceforge.net
+
+go-perl provides the following functionality:
+
+=over
+
+=item parsers
+
+Biological ontologies and associated data come in assorted formats. See:
+
+L<GO::Parser>
+
+=item handlers/writers
+
+All parsers are XML event based - they emit Obo-XML, which can be caught
+by different handlers. Some of these handlers effectively transform
+the parsed file into a different format or summary.
+
+If you are not interested in generating XML, you can use an object
+handler, which will give you objects for traversing an ontology; see
+below
+
+=item a graph-based object model
+
+Biological ontologies typically have graph-based structures
+(DAGs). go-perl provides a perl object model representing ontologies
+and associations to ontologies. Classes include:
+
+L<GO::Model::Term> -- a node/term within an ontology
+
+L<GO::Model::Graph> -- collection of terms and the relationships between them
+
+L<GO::Model::Relationship> -- a typed relationship between two terms
+
+L<GO::Model::Xref> -- a database xref, for a term or any other object
+
+L<GO::Model::Association> -- an association between a term and a gene product
+
+L<GO::Model::GeneProduct> -- a gene or product of a gene or similar annotated entity
+
+L<GO::Model::Evidence> -- supporting evidence for an association
+
+L<GO::Model::Seq> -- a biological sequence of residues for a gene product
+
+=begin html
+
+<img src="http://geneontology.cvs.sourceforge.net/*checkout*/geneontology/go-dev/go-perl/doc/gomodel.png"/>
+
+=end html
+
+=back
+
+=head2 SIMPLE PROGRAMMERS INTERFACE
+
+L<GO::Basic>
+
+simple procedural access to GO files
+
+=head1 SCRIPTS
+
+These scripts come as part of the go-perl distribution
+
+=over
+
+=item map2slim
+
+Given a GO slim file, and a current ontology (in one or more files),
+this script will map a gene association file (containing annotations
+to the full GO) to the terms in the GO slim.  The script can be used
+to either create a new gene association file, containing the most
+pertinent GO slim accessions, or in count-mode, in which case it will
+give distinct gene product counts for each slim term.
+
+for full instructions, see L<map2slim>
+
+=item go-dag-summary.pl
+
+Generates a summary of the DAG structure of an ontology file
+
+A row will be generated for every ontology in the file, with the
+following data columns:
+
+  input filename
+  total no of terms
+  total no of relationships
+  total no of paths
+  avg no of paths per term (p/t)
+  maximum no of paths for any term
+  ID of term with maximum no of paths
+
+for full instructions, see L<go-dag-summary.pl>
+
+=item go-show-paths-to-root.pl
+
+Will show all possible paths from a term to the root/top in the
+ontology
+
+for full instructions, see L<go-show-paths-to-root.pl>
+
+=item go-apply-xslt
+
+Will apply a GO XSL transform (by name) on an OBO-XML file
+
+For a full list of XSLs available, see
+L<http://www.godatabase.org/xml/xsl>
+
+=item go-export-graph.pl
+
+Writes an obo file out as an ascii-tree, a graphviz PNG or other format
+
+for full instructions, see L<go-export-graph.pl>
+
+=item go-show-assocs-by-node.pl
+
+given a GO ontology file and an association file and a term ID, will
+list all products associated to that ID
+
+for full instructions, see L<go-show-assocs-by-node.pl>
+
+=item go-filter-subset.pl
+
+Exports a subset of an ontology from a file. The subset can be based
+on a specified set of IDs, a preset "subset" filter in the ontology
+file (eg a GO "slim" or subset), or a user-defined filter.
+
+The subset can be exported in any format, including a graphical image
+
+for full instructions, see L<go-filter-subset.pl>
+
+=item go2fmt.pl
+
+generic file converter. This will convert any go/obo formatted file
+such as ontology files and association files and write output in some
+other format or report. See the full list of convenience scripts below.
+
+for full instructions, see L<go2fmt.pl>
+
+=item go2chadoxml
+
+converts a file in any valid go/obo format to chadoxml. See also L<go2fmt.pl>
+
+=item go2godb_prestore
+
+converts a file in any valid go/obo format to an xml format that is
+isomorphic to the GO MySQL Db schema, and can be loaded with
+L<DBIx::DBStag>. See also L<go2fmt.pl>
+
+=item go2error_report
+
+converts a file in any valid go/obo format to error_report. See also L<go2fmt.pl>
+
+=item go2obo_test (alias: go2obo)
+
+converts a file in any valid go/obo format to obo. See also L<go2fmt.pl>
+
+=item go2obo_html
+
+converts a file in any valid go/obo format to obo_html. See also L<go2fmt.pl>
+
+=item go2obo_xml  (alias: go2xml)
+
+converts a file in any valid go/obo format to obo_xml. See also L<go2fmt.pl>
+
+=item go2owl
+
+converts a file in any valid go/obo format to owl. See also L<go2fmt.pl>
+
+=item go2pathlist
+
+converts a file in any valid go/obo format to pathlist. See also L<go2fmt.pl>
+
+=item go2prolog
+
+converts a file in any valid go/obo format to prolog. See also L<go2fmt.pl>
+
+=item go2rdfxml
+
+converts a file in any valid go/obo format to rdfxml. See also L<go2fmt.pl>
+
+=item go2summary
+
+converts a file in any valid go/obo format to summary. See also L<go2fmt.pl>
+
+=item go2sxpr
+
+converts a file in any valid go/obo format to sxpr. See also L<go2fmt.pl>
+
+=item go2tbl
+
+converts a file in any valid go/obo format to tbl. See also L<go2fmt.pl>
+
+=item go2text_html
+
+converts a file in any valid go/obo format to text_html. See also L<go2fmt.pl>
+
+=back
+
+=head1 RELATED PACKAGES
+
+Download the full go-dev distribution for access to more
+functionality. go-perl is a subset of go-dev
+
+go-dev includes the following:
+
+=over
+
+=item go-perl
+
+This package
+
+http://www.godatabase.org/dev/go-perl/doc/go-perl-doc.html
+
+=item go-db-perl
+
+Database API for use in conjunction with go-perl
+
+Allows for loading of GO databases and fetching graph objects from the
+database
+
+http://www.godatabase.org/dev/go-db-perl/doc/go-db-perl-doc.html
+
+L<GO::AppHandle>
+
+=item amigo
+
+Ontology browser, written in perl
+
+Requires installation of both go-perl and go-db-perl
+
+=item java
+
+The DAG-Edit curation tool
+
+http://www.godatabase.org/dev
+
+=item xml
+
+DTDs for the Obo-XML format, and XSL stylesheets for converting to and
+from Obo-XML format
+
+http://www.godatabase.org/dev/xml/doc/xml-doc.html
+
+=item sql
+
+Schema and SQL code for the GO database
+
+http://www.godatabase.org/dev/sql/doc/godb-sql-doc.html
+
+=back
+
+=head1 AUTHORS
+
+(C) Chris Mungall 2000-2006
+
+This module is free software. You may distribute under the same terms
+as perl itself.
+
+=cut
+
+package go-perl;
+$VERSION='0.15';
+1;

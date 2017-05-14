@@ -4,7 +4,7 @@ use strict;
 use YAML qw(LoadFile Load);
 use IO::File;
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Data::EDI::X12 - EDI X12 Processing for Perl
 
 =head1 SYNOPSIS
 
- my $x12 = Data::EDI::X12->new({ spec_file => 'edi.yaml', new_lines => 1, truncate_null => 1 });
+ my $x12 = Data::EDI::X12->new({ spec_file => 'edi.yaml', new_lines => 1, truncate_null => 1, hide_empty_sections => 1 });
  my $data = $x12->read_record(...);
  print $x12->write_record($data);
  
@@ -272,14 +272,29 @@ sub new
     $config_separator = $spec->{config}{config_separator}
         if $spec->{config} and $spec->{config}{config_separator};
 
+    my $config_strict_ascii = $args->{strict_ascii};
+    $config_strict_ascii = $spec->{config}{strict_ascii}
+        if $spec->{config} and exists($spec->{config}{strict_ascii});
+
+    my $config_truncate_null = $args->{truncate_null};
+    $config_truncate_null = $spec->{config}{truncate_null}
+        if $spec->{config} and exists($spec->{config}{truncate_null});
+
+    my $config_hide_empty_sections = $args->{hide_empty_sections};
+    $config_hide_empty_sections = $spec->{config}{hide_empty_sections}
+        if $spec->{config} and exists($spec->{config}{hide_empty_sections});
+    
+
     my $self = {
-        spec       => $spec,
-        debug      => $args->{debug},
-        terminator => $config_terminator || $args->{terminator} || '~',
-        separator  => $config_separator  || $args->{separator}  || '*',
-        error      => '',
-        new_lines  => $args->{new_lines},
-        truncate_null => $args->{truncate_null} || 0,
+        spec                => $spec,
+        debug               => $args->{debug},
+        terminator          => $config_terminator || $args->{terminator} || '~',
+        separator           => $config_separator  || $args->{separator}  || '*',
+        error               => '',
+        new_lines           => $args->{new_lines},
+        truncate_null       => $config_truncate_null       || 0,
+        hide_empty_sections => $config_hide_empty_sections || 0,
+        strict_ascii        => $config_strict_ascii        || 0,
     };
     bless($self);
 
@@ -483,7 +498,7 @@ sub _parse_edi
             # parse a record
             my %segment_to_section;
             my %loop_def;
-            for my $section (keys %{ $spec->{structure} || [ ] })
+            for my $section (keys %{ $spec->{structure} || { } })
             {
                 for my $segment (@{ $spec->{structure}{$section} || [ ] })
                 {
@@ -621,6 +636,8 @@ sub _write_spec
 
     for my $def (@{ $type_def->{definition} || [ ] })
     {
+        next unless ref($record) eq 'HASH';
+
         my $value = ($def->{name} and exists($record->{$def->{name}})) ?
             $record->{$def->{name}} : $def->{value};
 
@@ -640,6 +657,13 @@ sub _write_spec
         # deal with maximum limits
         $value = substr($value, 0, $def->{max})
             if $def->{max};
+
+        # stop stupidity
+        $value =~ s/\Q$term_val\E//g if $value;
+        $value =~ s/\Q$sep_val\E//g  if $value;
+
+        # strip all non-ascii
+        $value =~ s/[^[:ascii:]]//g if $self->{strict_ascii};
 
         push @line, sprintf($format, $value);
     }
@@ -675,6 +699,8 @@ sub _write_edi
 
     my $term_val = $self->{terminator};
     my $sep_val  = $self->{separator};
+
+    my $hide_empty_sections = $self->{hide_empty_sections};
 
     $record->{ISA}{control_number} = 1
         unless exists $record->{ISA}{control_number};
@@ -745,7 +771,10 @@ sub _write_edi
                     {
                         for my $structure (@{ $loop_structure || []})
                         {
+                            next if $hide_empty_sections and not exists $record->{$structure};
+
                             $record_count++;
+
                             print $fh $self->_write_spec(
                                 type     => $structure,
                                 type_def => $spec->{segments}{$structure},
@@ -756,6 +785,8 @@ sub _write_edi
                 }
                 else
                 {
+                    next if $hide_empty_sections and not exists $set->{HEADER}{$section};
+
                     $record_count++;
                     print $fh $self->_write_spec(
                         type     => $section,
@@ -779,6 +810,8 @@ sub _write_edi
                         {
                             for my $structure (@{ $loop_structure || []})
                             {
+                                next if $hide_empty_sections and not exists $sub_record->{$structure};
+
                                 $record_count++;
                                 print $fh $self->_write_spec(
                                     type     => $structure,
@@ -790,6 +823,8 @@ sub _write_edi
                     }
                     else
                     {
+                        next if $hide_empty_sections and not exists $detail->{$section};
+
                         $record_count++;
                         print $fh $self->_write_spec(
                             type     => $section,
@@ -813,6 +848,8 @@ sub _write_edi
                     {
                         for my $structure (@{ $loop_structure || []})
                         {
+                            next if $hide_empty_sections and not exists $record->{$structure};
+
                             $record_count++;
                             print $fh $self->_write_spec(
                                 type     => $structure,
@@ -824,6 +861,8 @@ sub _write_edi
                 }
                 else
                 {
+                    next if $hide_empty_sections and not exists $set->{FOOTER}{$section};
+
                     $record_count++;
                     print $fh $self->_write_spec(
                         type     => $section,

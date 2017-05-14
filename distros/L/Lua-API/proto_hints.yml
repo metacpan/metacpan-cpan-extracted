@@ -1,0 +1,18 @@
+--- luaL_checklstring
+---
+outputs:
+  - l
+--- luaL_optlstring
+---
+outputs:
+  - l
+--- luaL_checkstack
+---
+attr:
+  noxs: 1
+--- luaL_checkoption
+---
+args:
+   lst:
+     cdef: const char * const * lst
+     xsdef: const char * const * lst

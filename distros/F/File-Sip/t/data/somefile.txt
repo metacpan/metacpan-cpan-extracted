@@ -1,0 +1,7 @@
+This is a first line
+and
+a 
+fourth.
+some utf8 ★ 
+
+A line after an empty one.

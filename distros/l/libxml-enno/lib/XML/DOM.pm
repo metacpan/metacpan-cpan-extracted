@@ -2,43 +2,26 @@
 #
 # Perl module: XML::DOM
 #
-# By Enno Derksen (official maintainer), enno@att.com
-# and Clark Cooper, coopercl@sch.ge.com
+# By Enno Derksen <enno@att.com>
 #
 ################################################################################
 #
 # To do:
 #
+# * optimize Attr if it only contains 1 Text node to hold the value
+# * fix setDocType!
+#
 # * BUG: setOwnerDocument - does not process default attr values correctly,
 #   they still point to the old doc.
 # * change Exception mechanism
-# * entity expansion
 # * maybe: more checking of sysId etc.
 # * NoExpand mode (don't know what else is useful)
 # * various odds and ends: see comments starting with "??"
-# * normalize(1) should also expand CDataSections and EntityReferences
+# * normalize(1) could also expand CDataSections and EntityReferences
 # * parse a DocumentFragment?
 # * encoding support
-# * someone reported an error that an Entity or something contained a single
-#   quote and it printed ''' or something...
 #
 ######################################################################
-
-package Stat;
-#?? Debugging class - remove later
-
-sub cnt
-{
-    $cnt{$_[0]}++;
-}
-
-sub print
-{
-    for (keys %cnt)
-    {
-	print "$_: " . $cnt{$_} . "\n";
-    }
-}
 
 ######################################################################
 package XML::DOM;
@@ -55,14 +38,15 @@ use XML::RegExp;
 BEGIN
 {
     require XML::Parser;
-    $VERSION = '1.26';
+    $VERSION = '1.27';
 
     my $needVersion = '2.23';
-    die "need at least XML::Parser version $needVersion (current=" .
-		$XML::Parser::VERSION . ")"
+    die "need at least XML::Parser version $needVersion (current=${XML::Parser::VERSION})"
 	unless $XML::Parser::VERSION >= $needVersion;
 
     @ISA = qw( Exporter );
+
+    # Constants for XML::DOM Node types
     @EXPORT = qw(
 	     UNKNOWN_NODE
 	     ELEMENT_NODE
@@ -88,25 +72,25 @@ BEGIN
 
 # Node types
 
-sub UNKNOWN_NODE                () {0;}		# not in the DOM Spec
+sub UNKNOWN_NODE                () { 0 }		# not in the DOM Spec
 
-sub ELEMENT_NODE                () {1;}
-sub ATTRIBUTE_NODE              () {2;}
-sub TEXT_NODE                   () {3;}
-sub CDATA_SECTION_NODE          () {4;}
-sub ENTITY_REFERENCE_NODE       () {5;}
-sub ENTITY_NODE                 () {6;}
-sub PROCESSING_INSTRUCTION_NODE () {7;}
-sub COMMENT_NODE                () {8;}
-sub DOCUMENT_NODE               () {9;}
-sub DOCUMENT_TYPE_NODE          () {10;}
-sub DOCUMENT_FRAGMENT_NODE      () {11;}
-sub NOTATION_NODE               () {12;}
+sub ELEMENT_NODE                () { 1 }
+sub ATTRIBUTE_NODE              () { 2 }
+sub TEXT_NODE                   () { 3 }
+sub CDATA_SECTION_NODE          () { 4 }
+sub ENTITY_REFERENCE_NODE       () { 5 }
+sub ENTITY_NODE                 () { 6 }
+sub PROCESSING_INSTRUCTION_NODE () { 7 }
+sub COMMENT_NODE                () { 8 }
+sub DOCUMENT_NODE               () { 9 }
+sub DOCUMENT_TYPE_NODE          () { 10}
+sub DOCUMENT_FRAGMENT_NODE      () { 11}
+sub NOTATION_NODE               () { 12}
 
-sub ELEMENT_DECL_NODE		() {13;}	# not in the DOM Spec
-sub ATT_DEF_NODE 		() {14;}	# not in the DOM Spec
-sub XML_DECL_NODE 		() {15;}	# not in the DOM Spec
-sub ATTLIST_DECL_NODE		() {16;}	# not in the DOM Spec
+sub ELEMENT_DECL_NODE		() { 13 }	# not in the DOM Spec
+sub ATT_DEF_NODE 		() { 14 }	# not in the DOM Spec
+sub XML_DECL_NODE 		() { 15 }	# not in the DOM Spec
+sub ATTLIST_DECL_NODE		() { 16 }	# not in the DOM Spec
 
 %DefaultEntities = 
 (
@@ -133,11 +117,110 @@ sub ATTLIST_DECL_NODE		() {16;}	# not in the DOM Spec
 #	local *XML::DOM::warning = \&my_warn;
 #	... your code here ...
 # } # end block scope (old XML::DOM::warning takes effect again)
-sub warning
+#
+sub warning	# static
 {
     warn @_;
 }
 
+#
+# This method defines several things in the caller's package, so you can use named constants to
+# access the array that holds the member data, i.e. $self->[_Data]. It assumes the caller's package
+# defines a class that is implemented as a blessed array reference.
+# Note that this is very similar to using 'use fields' and 'use base'.
+#
+# E.g. if $fields eq "Name Model", $parent eq "XML::DOM::Node" and
+# XML::DOM::Node had "A B C" as fields and it was called from package "XML::DOM::ElementDecl",
+# then this code would basically do the following:
+#
+# package XML::DOM::ElementDecl;
+#
+# sub _Name  () { 3 }	# Note that parent class had three fields
+# sub _Model () { 4 }
+#
+# # Maps constant names (without '_') to constant (int) value
+# %HFIELDS = ( %XML::DOM::Node::HFIELDS, Name => _Name, Model => _Model );
+#
+# # Define XML:DOM::ElementDecl as a subclass of XML::DOM::Node
+# @ISA = qw{ XML::DOM::Node };
+#
+# # The following function names can be exported into the user's namespace.
+# @EXPORT_OK = qw{ _Name _Model };
+#
+# # The following function names can be exported into the user's namespace
+# # with: import XML::DOM::ElementDecl qw( :Fields );
+# %EXPORT_TAGS = ( Fields => qw{ _Name _Model } );
+#
+sub def_fields	# static
+{
+    my ($fields, $parent) = @_;
+
+    my ($pkg) = caller;
+
+    no strict 'refs';
+
+    my @f = split (/\s+/, $fields);
+    my $n = 0;
+
+    my %hfields;
+    if (defined $parent)
+    {
+	my %pf = %{"$parent\::HFIELDS"};
+	%hfields = %pf;
+
+	$n = scalar (keys %pf);
+	@{"$pkg\::ISA"} = ( $parent );
+    }
+
+    my $i = $n;
+    for (@f)
+    {
+	eval "sub $pkg\::_$_ () { $i }";
+	$hfields{$_} = $i;
+	$i++;
+    }
+    %{"$pkg\::HFIELDS"} = %hfields;
+    @{"$pkg\::EXPORT_OK"} = map { "_$_" } @f;
+    
+    ${"$pkg\::EXPORT_TAGS"}{Fields} = [ map { "_$_" } @f ];
+}
+
+# sub blesh
+# {
+#     my $hashref = shift;
+#     my $class = shift;
+#     no strict 'refs';
+#     my $self = bless [\%{"$class\::FIELDS"}], $class;
+#     if (defined $hashref)
+#     {
+# 	for (keys %$hashref)
+# 	{
+# 	    $self->{$_} = $hashref->{$_};
+# 	}
+#     }
+#     $self;
+# }
+
+# sub blesh2
+# {
+#     my $hashref = shift;
+#     my $class = shift;
+#     no strict 'refs';
+#     my $self = bless [\%{"$class\::FIELDS"}], $class;
+#     if (defined $hashref)
+#     {
+# 	for (keys %$hashref)
+# 	{
+# 	    eval { $self->{$_} = $hashref->{$_}; };
+# 	    croak "ERROR in field [$_] $@" if $@;
+# 	}
+#     }
+#     $self;
+#}
+
+#
+# CDATA section may not contain "]]>"
+#
 sub encodeCDATA
 {
     my ($str) = shift;
@@ -167,7 +250,9 @@ sub encodeComment
     $str;
 }
 
-# for debugging
+#
+# For debugging
+#
 sub toHex
 {
     my $str = shift;
@@ -185,7 +270,6 @@ sub toHex
 # 2nd parameter $default: list of Default Entity characters that need to be 
 # converted (e.g. "&<" for conversion to "&amp;" and "&lt;" resp.)
 #
-
 sub encodeText
 {
     my ($str, $default) = @_;
@@ -202,8 +286,9 @@ sub encodeText
     $str;
 }
 
+#
 # Used by AttDef - default value
-
+#
 sub encodeAttrValue
 {
     encodeText (shift, '"&<');
@@ -217,7 +302,7 @@ sub encodeAttrValue
 # Algorithm borrowed from expat/xmltok.c/XmlUtf8Encode()
 #
 # not checking for bad characters: < 0, x00-x08, x0B-x0C, x0E-x1F, xFFFE-xFFFF
-
+#
 sub XmlUtf8Encode
 {
     my $n = shift;
@@ -288,6 +373,7 @@ sub getIgnoreReadOnly
     $IgnoreReadOnly;
 }
 
+#
 # The global flag $IgnoreReadOnly is set to the specified value and the old 
 # value of $IgnoreReadOnly is returned.
 #
@@ -305,13 +391,17 @@ sub ignoreReadOnly
     return $i;
 }
 
+#
 # XML spec seems to break its own rules... (see ENTITY xmlpio)
+#
 sub forgiving_isValidName
 {
     $_[0] =~ /^$XML::RegExp::Name$/o;
 }
 
+#
 # Don't allow names starting with xml (either case)
+#
 sub picky_isValidName
 {
     $_[0] =~ /^$XML::RegExp::Name$/o and $_[0] !~ /^xml/i;
@@ -320,18 +410,20 @@ sub picky_isValidName
 # Be forgiving by default, 
 *isValidName = \&forgiving_isValidName;
 
-sub allowReservedNames
+sub allowReservedNames		# static
 {
     *isValidName = ($_[0] ? \&forgiving_isValidName : \&picky_isValidName);
 }
 
-sub getAllowReservedNames
+sub getAllowReservedNames	# static
 {
     *isValidName == \&forgiving_isValidName;
 }
 
+#
 # Always compress empty tags by default
 # This is used by Element::print.
+#
 $TagStyle = sub { 0 };
 
 sub setTagCompression
@@ -363,6 +455,8 @@ sub print
 package XML::DOM::PrintToString;
 ######################################################################
 
+use vars qw{ $Singleton };
+
 #
 # Used by XML::DOM::Node::toString to concatenate strings
 #
@@ -391,410 +485,7 @@ sub reset
     ${$_[0]} = "";
 }
 
-*Singleton = \(new XML::DOM::PrintToString);
-
-######################################################################
-package XML::DOM::DOMException;
-######################################################################
-
-use Exporter;
-use overload '""' => \&stringify;
-use vars qw ( @ISA @EXPORT @ErrorNames );
-
-BEGIN
-{
-  @ISA = qw( Exporter );
-  @EXPORT = qw( INDEX_SIZE_ERR
-		DOMSTRING_SIZE_ERR
-		HIERARCHY_REQUEST_ERR
-		WRONG_DOCUMENT_ERR
-		INVALID_CHARACTER_ERR
-		NO_DATA_ALLOWED_ERR
-		NO_MODIFICATION_ALLOWED_ERR
-		NOT_FOUND_ERR
-		NOT_SUPPORTED_ERR
-		INUSE_ATTRIBUTE_ERR
-	      );
-}
-
-sub UNKNOWN_ERR			() {0;}	# not in the DOM Spec!
-sub INDEX_SIZE_ERR		() {1;}
-sub DOMSTRING_SIZE_ERR		() {2;}
-sub HIERARCHY_REQUEST_ERR	() {3;}
-sub WRONG_DOCUMENT_ERR		() {4;}
-sub INVALID_CHARACTER_ERR	() {5;}
-sub NO_DATA_ALLOWED_ERR		() {6;}
-sub NO_MODIFICATION_ALLOWED_ERR	() {7;}
-sub NOT_FOUND_ERR		() {8;}
-sub NOT_SUPPORTED_ERR		() {9;}
-sub INUSE_ATTRIBUTE_ERR		() {10;}
-
-@ErrorNames = (
-	       "UNKNOWN_ERR",
-	       "INDEX_SIZE_ERR",
-	       "DOMSTRING_SIZE_ERR",
-	       "HIERARCHY_REQUEST_ERR",
-	       "WRONG_DOCUMENT_ERR",
-	       "INVALID_CHARACTER_ERR",
-	       "NO_DATA_ALLOWED_ERR",
-	       "NO_MODIFICATION_ALLOWED_ERR",
-	       "NOT_FOUND_ERR",
-	       "NOT_SUPPORTED_ERR",
-	       "INUSE_ATTRIBUTE_ERR"
-	      );
-
-sub new
-{
-    my ($type, $code, $msg) = @_;
-    my $self = bless {Code => $code}, $type;
-
-    $self->{Message} = $msg if defined $msg;
-
-#    print "=> Exception: " . $self->stringify . "\n"; 
-    $self;
-}
-
-sub getCode
-{
-    $_[0]->{Code};
-}
-
-#------------------------------------------------------------
-# Extra method implementations
-
-sub getName
-{
-    $ErrorNames[$_[0]->{Code}];
-}
-
-sub getMessage
-{
-    $_[0]->{Message};
-}
-
-sub stringify
-{
-    my $self = shift;
-
-    "XML::DOM::DOMException(Code=" . $self->getCode . ", Name=" .
-	$self->getName . ", Message=" . $self->getMessage . ")";
-}
-
-######################################################################
-package XML::DOM::NamedNodeMap;
-######################################################################
-
-BEGIN 
-{
-    import Carp;
-    import XML::DOM::DOMException;
-}
-
-use vars qw( $Special );
-
-# Constant definition:
-# Note: a real Name should have at least 1 char, so nobody else should use this
-$Special = "";
-
-sub new 
-{
-    my ($class, %args) = @_;
-
-    $args{Values} = new XML::DOM::NodeList;
-
-    # Store all NamedNodeMap properties in element $Special
-    bless { $Special => \%args}, $class;
-}
-
-sub getNamedItem 
-{
-    # Don't return the $Special item!
-    ($_[1] eq $Special) ? undef : $_[0]->{$_[1]};
-}
-
-sub setNamedItem 
-{
-    my ($self, $node) = @_;
-    my $prop = $self->{$Special};
-
-    my $name = $node->getNodeName;
-
-    if ($XML::DOM::SafeMode)
-    {
-	croak new XML::DOM::DOMException (NO_MODIFICATION_ALLOWED_ERR)
-	    if $self->isReadOnly;
-
-	croak new XML::DOM::DOMException (WRONG_DOCUMENT_ERR)
-	    if $node->{Doc} != $prop->{Doc};
-
-	croak new XML::DOM::DOMException (INUSE_ATTRIBUTE_ERR)
-	    if defined ($node->{UsedIn});
-
-	croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR,
-		      "can't add name with NodeName [$name] to NamedNodeMap")
-	    if $name eq $Special;
-    }
-
-    my $values = $prop->{Values};
-    my $index = -1;
-
-    my $prev = $self->{$name};
-    if (defined $prev)
-    {
-	# decouple previous node
-	delete $prev->{UsedIn};
-
-	# find index of $prev
-	$index = 0;
-	for my $val (@{$values})
-	{
-	    last if ($val == $prev);
-	    $index++;
-	}
-    }
-
-    $self->{$name} = $node;    
-    $node->{UsedIn} = $self;
-
-    if ($index == -1)
-    {
-	push (@{$values}, $node);
-    }
-    else	# replace previous node with new node
-    {
-	splice (@{$values}, $index, 1, $node);
-    }
-    
-    $prev;
-}
-
-sub removeNamedItem 
-{
-    my ($self, $name) = @_;
-
-    # Be careful that user doesn't delete $Special node!
-    croak new XML::DOM::DOMException (NOT_FOUND_ERR)
-        if $name eq $Special;
-
-    my $node = $self->{$name};
-
-    croak new XML::DOM::DOMException (NOT_FOUND_ERR)
-        unless defined $node;
-
-    # The DOM Spec doesn't mention this Exception - I think it's an oversight
-    croak new XML::DOM::DOMException (NO_MODIFICATION_ALLOWED_ERR)
-	if $self->isReadOnly;
-
-    delete $node->{UsedIn};
-    delete $self->{$name};
-
-    # remove node from Values list
-    my $values = $self->getValues;
-    my $index = 0;
-    for my $val (@{$values})
-    {
-	if ($val == $node)
-	{
-	    splice (@{$values}, $index, 1, ());
-	    last;
-	}
-	$index++;
-    }
-    $node;
-}
-
-# The following 2 are really bogus. DOM should use an iterator instead (Clark)
-
-sub item 
-{
-    my ($self, $item) = @_;
-    $self->{$Special}->{Values}->[$item];
-}
-
-sub getLength 
-{
-    my ($self) = @_;
-    my $vals = $self->{$Special}->{Values};
-    int (@$vals);
-}
-
-#------------------------------------------------------------
-# Extra method implementations
-
-sub isReadOnly
-{
-    return 0 if $XML::DOM::IgnoreReadOnly;
-
-    my $used = $_[0]->{$Special}->{UsedIn};
-    defined $used ? $used->isReadOnly : 0;
-}
-
-sub cloneNode
-{
-    my ($self, $deep) = @_;
-    my $prop = $self->{$Special};
-
-    my $map = new XML::DOM::NamedNodeMap (Doc => $prop->{Doc});
-    # Not copying Parent property on purpose! 
-
-    my $oldIgnore = XML::DOM::ignoreReadOnly (1);	# temporarily...
-
-    for my $val (@{$prop->{Values}})
-    {
-	my $key = $val->getNodeName;
-
-	my $newNode = $val->cloneNode ($deep);
-	$newNode->{UsedIn} = $map;
-	$map->{$key} = $newNode;
-	push (@{$map->{$Special}->{Values}}, $newNode);
-    }
-    XML::DOM::ignoreReadOnly ($oldIgnore);	# restore previous value
-
-    $map;
-}
-
-sub setOwnerDocument
-{
-    my ($self, $doc) = @_;
-    my $special = $self->{$Special};
-
-    $special->{Doc} = $doc;
-    for my $kid (@{$special->{Values}})
-    {
-	$kid->setOwnerDocument ($doc);
-    }
-}
-
-sub getChildIndex
-{
-    my ($self, $attr) = @_;
-    my $i = 0;
-    for my $kid (@{$self->{$Special}->{Values}})
-    {
-	return $i if $kid == $attr;
-	$i++;
-    }
-    -1;	# not found
-}
-
-sub getValues
-{
-    wantarray ? @{ $_[0]->{$Special}->{Values} } : $_[0]->{$Special}->{Values};
-}
-
-# Remove circular dependencies. The NamedNodeMap and its values should
-# not be used afterwards.
-sub dispose
-{
-    my $self = shift;
-
-    for my $kid (@{$self->getValues})
-    {
-	delete $kid->{UsedIn};
-	$kid->dispose;
-    }
-
-    delete $self->{$Special}->{Doc};
-    delete $self->{$Special}->{Parent};
-    delete $self->{$Special}->{Values};
-
-    for my $key (keys %$self)
-    {
-	delete $self->{$key};
-    }
-}
-
-sub setParentNode
-{
-    $_[0]->{$Special}->{Parent} = $_[1];
-}
-
-sub getProperty
-{
-    $_[0]->{$Special}->{$_[1]};
-}
-
-#?? remove after debugging
-sub toString
-{
-    my ($self) = @_;
-    my $str = "NamedNodeMap[";
-    while (my ($key, $val) = each %$self)
-    {
-	if ($key eq $Special)
-	{
-	    $str .= "##Special (";
-	    while (my ($k, $v) = each %$val)
-	    {
-		if ($k eq "Values")
-		{
-		    $str .= $k . " => [";
-		    for my $a (@$v)
-		    {
-#			$str .= $a->getNodeName . "=" . $a . ",";
-			$str .= $a->toString . ",";
-		    }
-		    $str .= "], ";
-		}
-		else
-		{
-		    $str .= $k . " => " . $v . ", ";
-		}
-	    }
-	    $str .= "), ";
-	}
-	else
-	{
-	    $str .= $key . " => " . $val . ", ";
-	}
-    }
-    $str . "]";
-}
-
-######################################################################
-package XML::DOM::NodeList;
-######################################################################
-
-use vars qw ( $EMPTY );
-
-# Empty NodeList
-$EMPTY = new XML::DOM::NodeList;
-
-sub new 
-{
-    bless [], $_[0];
-}
-
-sub item 
-{
-    $_[0]->[$_[1]];
-}
-
-sub getLength 
-{
-    int (@{$_[0]});
-}
-
-#------------------------------------------------------------
-# Extra method implementations
-
-sub dispose
-{
-    my $self = shift;
-    for my $kid (@{$self})
-    {
-	$kid->dispose;
-    }
-}
-
-sub setOwnerDocument
-{
-    my ($self, $doc) = @_;
-    for my $kid (@{$self})
-    { 
-	$kid->setOwnerDocument ($doc);
-    }
-}
+$Singleton = new XML::DOM::PrintToString;
 
 ######################################################################
 package XML::DOM::DOMImplementation;
@@ -819,35 +510,40 @@ package XML::XQL::Node;		# forward declaration
 package XML::DOM::Node;
 ######################################################################
 
-use vars qw( @NodeNames @EXPORT @ISA );
+use vars qw( @NodeNames @EXPORT @ISA %HFIELDS @EXPORT_OK @EXPORT_TAGS );
 
 BEGIN 
 {
-  import XML::DOM::DOMException;
+  use XML::DOM::DOMException;
   import Carp;
 
   require FileHandle;
 
   @ISA = qw( Exporter XML::XQL::Node );
-  @EXPORT = qw(
-	     UNKNOWN_NODE
-	     ELEMENT_NODE
-	     ATTRIBUTE_NODE
-	     TEXT_NODE
-	     CDATA_SECTION_NODE
-	     ENTITY_REFERENCE_NODE
-	     ENTITY_NODE
-	     PROCESSING_INSTRUCTION_NODE
-	     COMMENT_NODE
-	     DOCUMENT_NODE
-	     DOCUMENT_TYPE_NODE
-	     DOCUMENT_FRAGMENT_NODE
-	     NOTATION_NODE
-	     ELEMENT_DECL_NODE
-	     ATT_DEF_NODE
-	     XML_DECL_NODE
-	     ATTLIST_DECL_NODE
-	    );
+
+  # NOTE: SortKey is used in XML::XQL::Node. 
+  #       UserData is reserved for users (Hang your data here!)
+  XML::DOM::def_fields ("C A Doc Parent ReadOnly UsedIn Hidden SortKey UserData");
+
+  push (@EXPORT, qw(
+		    UNKNOWN_NODE
+		    ELEMENT_NODE
+		    ATTRIBUTE_NODE
+		    TEXT_NODE
+		    CDATA_SECTION_NODE
+		    ENTITY_REFERENCE_NODE
+		    ENTITY_NODE
+		    PROCESSING_INSTRUCTION_NODE
+		    COMMENT_NODE
+		    DOCUMENT_NODE
+		    DOCUMENT_TYPE_NODE
+		    DOCUMENT_FRAGMENT_NODE
+		    NOTATION_NODE
+		    ELEMENT_DECL_NODE
+		    ATT_DEF_NODE
+		    XML_DECL_NODE
+		    ATTLIST_DECL_NODE
+		   ));
 }
 
 #---- Constant definitions
@@ -896,9 +592,15 @@ sub ATTLIST_DECL_NODE		() {16;}	# not in the DOM Spec
 	      "ATTLIST_DECL_NODE"
 	     );
 
+sub decoupleUsedIn
+{
+    my $self = shift;
+    undef $self->[_UsedIn]; # was delete
+}
+
 sub getParentNode
 {
-    $_[0]->{Parent};
+    $_[0]->[_Parent];
 }
 
 sub appendChild
@@ -913,18 +615,17 @@ sub appendChild
 	    if $self->isReadOnly;
     }
 
-    my $isFrag = $node->isDocumentFragmentNode;
-    my $doc = $self->{Doc};
+    my $doc = $self->[_Doc];
 
-    if ($isFrag)
+    if ($node->isDocumentFragmentNode)
     {
 	if ($XML::DOM::SafeMode)
 	{
-	    for my $n (@{$node->{C}})
+	    for my $n (@{$node->[_C]})
 	    {
 		croak new XML::DOM::DOMException (WRONG_DOCUMENT_ERR,
 						  "nodes belong to different documents")
-		    if $doc != $n->{Doc};
+		    if $doc != $n->[_Doc];
 		
 		croak new XML::DOM::DOMException (HIERARCHY_REQUEST_ERR,
 						  "node is ancestor of parent node")
@@ -936,12 +637,12 @@ sub appendChild
 	    }
 	}
 
-	my @list = @{$node->{C}};	# don't try to compress this
+	my @list = @{$node->[_C]};	# don't try to compress this
 	for my $n (@list)
 	{
 	    $n->setParentNode ($self);
 	}
-	push @{$self->{C}}, @list;
+	push @{$self->[_C]}, @list;
     }
     else
     {
@@ -949,7 +650,7 @@ sub appendChild
 	{
 	    croak new XML::DOM::DOMException (WRONG_DOCUMENT_ERR,
 						  "nodes belong to different documents")
-		if $doc != $node->{Doc};
+		if $doc != $node->[_Doc];
 		
 	    croak new XML::DOM::DOMException (HIERARCHY_REQUEST_ERR,
 						  "node is ancestor of parent node")
@@ -960,15 +661,15 @@ sub appendChild
 		if $self->rejectChild ($node);
 	}
 	$node->setParentNode ($self);
-	push @{$self->{C}}, $node;
+	push @{$self->[_C]}, $node;
     }
     $node;
 }
 
 sub getChildNodes
 {
-    # NOTE: if node can't have children, $self->{C} is undef.
-    my $kids = $_[0]->{C};
+    # NOTE: if node can't have children, $self->[_C] is undef.
+    my $kids = $_[0]->[_C];
 
     # Return a list if called in list context.
     wantarray ? (defined ($kids) ? @{ $kids } : ()) :
@@ -977,25 +678,25 @@ sub getChildNodes
 
 sub hasChildNodes
 {
-    my $kids = $_[0]->{C};
+    my $kids = $_[0]->[_C];
     defined ($kids) && @$kids > 0;
 }
 
 # This method is overriden in Document
 sub getOwnerDocument
 {
-    $_[0]->{Doc};
+    $_[0]->[_Doc];
 }
 
 sub getFirstChild
 {
-    my $kids = $_[0]->{C};
+    my $kids = $_[0]->[_C];
     defined $kids ? $kids->[0] : undef; 
 }
 
 sub getLastChild
 {
-    my $kids = $_[0]->{C};
+    my $kids = $_[0]->[_C];
     defined $kids ? $kids->[-1] : undef; 
 }
 
@@ -1003,7 +704,7 @@ sub getPreviousSibling
 {
     my $self = shift;
 
-    my $pa = $self->{Parent};
+    my $pa = $self->[_Parent];
     return undef unless $pa;
     my $index = $pa->getChildIndex ($self);
     return undef unless $index;
@@ -1015,7 +716,7 @@ sub getNextSibling
 {
     my $self = shift;
 
-    my $pa = $self->{Parent};
+    my $pa = $self->[_Parent];
     return undef unless $pa;
 
     $pa->getChildAtIndex ($pa->getChildIndex ($self) + 1);
@@ -1032,16 +733,16 @@ sub insertBefore
 	if $self->isReadOnly;
 
     my @nodes = ($node);
-    @nodes = @{$node->{C}}
+    @nodes = @{$node->[_C]}
 	if $node->getNodeType == DOCUMENT_FRAGMENT_NODE;
 
-    my $doc = $self->{Doc};
+    my $doc = $self->[_Doc];
 
     for my $n (@nodes)
     {
 	croak new XML::DOM::DOMException (WRONG_DOCUMENT_ERR,
 					  "nodes belong to different documents")
-	    if $doc != $n->{Doc};
+	    if $doc != $n->[_Doc];
 	
 	croak new XML::DOM::DOMException (HIERARCHY_REQUEST_ERR,
 					  "node is ancestor of parent node")
@@ -1062,7 +763,7 @@ sub insertBefore
 	$n->setParentNode ($self);
     }
 
-    splice (@{$self->{C}}, $index, 0, @nodes);
+    splice (@{$self->[_C]}, $index, 0, @nodes);
     $node;
 }
 
@@ -1075,14 +776,14 @@ sub replaceChild
 	if $self->isReadOnly;
 
     my @nodes = ($node);
-    @nodes = @{$node->{C}}
+    @nodes = @{$node->[_C]}
 	if $node->getNodeType == DOCUMENT_FRAGMENT_NODE;
 
     for my $n (@nodes)
     {
 	croak new XML::DOM::DOMException (WRONG_DOCUMENT_ERR,
 					  "nodes belong to different documents")
-	    if $self->{Doc} != $n->{Doc};
+	    if $self->[_Doc] != $n->[_Doc];
 
 	croak new XML::DOM::DOMException (HIERARCHY_REQUEST_ERR,
 					  "node is ancestor of parent node")
@@ -1102,7 +803,7 @@ sub replaceChild
     {
 	$n->setParentNode ($self);
     }
-    splice (@{$self->{C}}, $index, 1, @nodes);
+    splice (@{$self->[_C]}, $index, 1, @nodes);
 
     $refNode->removeChildHoodMemories;
     $refNode;
@@ -1122,7 +823,7 @@ sub removeChild
 				      "reference node not found")
 	if $index == -1;
 
-    splice (@{$self->{C}}, $index, 1, ());
+    splice (@{$self->[_C]}, $index, 1, ());
 
     $node->removeChildHoodMemories;
     $node;
@@ -1134,9 +835,9 @@ sub normalize
     my ($self) = shift;
     my $prev = undef;	# previous Text node
 
-    return unless defined $self->{C};
+    return unless defined $self->[_C];
 
-    my @nodes = @{$self->{C}};
+    my @nodes = @{$self->[_C]};
     my $i = 0;
     my $n = @nodes;
     while ($i < $n)
@@ -1162,9 +863,12 @@ sub normalize
 		if ($type == ELEMENT_NODE)
 		{
 		    $node->normalize;
-		    for my $attr (@{$node->getAttributes->getValues})
+		    if (defined $node->[_A])
 		    {
-			$attr->normalize;
+			for my $attr (@{$node->[_A]->getValues})
+			{
+			    $attr->normalize;
+			}
 		    }
 		}
 	    }
@@ -1178,9 +882,12 @@ sub normalize
 	    elsif ($type == ELEMENT_NODE)
 	    {
 		$node->normalize;
-		for my $attr (@{$node->getAttributes->getValues})
+		if (defined $node->[_A])
 		{
-		    $attr->normalize;
+		    for my $attr (@{$node->[_A]->getValues})
+		    {
+			$attr->normalize;
+		    }
 		}
 	    }
 	}
@@ -1188,19 +895,21 @@ sub normalize
     }
 }
 
+#
 # Return all Element nodes in the subtree that have the specified tagName.
 # If tagName is "*", all Element nodes are returned.
 # NOTE: the DOM Spec does not specify a 3rd or 4th parameter
+#
 sub getElementsByTagName
 {
     my ($self, $tagName, $recurse, $list) = @_;
     $recurse = 1 unless defined $recurse;
     $list = (wantarray ? [] : new XML::DOM::NodeList) unless defined $list;
 
-    return unless defined $self->{C};
+    return unless defined $self->[_C];
 
     # preorder traversal: check parent node first
-    for my $kid (@{$self->{C}})
+    for my $kid (@{$self->[_C]})
     {
 	if ($kid->isElementNode)
 	{
@@ -1224,7 +933,9 @@ sub setNodeValue
     # no-op
 }
 
+#
 # Redefined by XML::DOM::Element
+#
 sub getAttributes
 {
     undef;
@@ -1236,11 +947,11 @@ sub getAttributes
 sub setOwnerDocument
 {
     my ($self, $doc) = @_;
-    $self->{Doc} = $doc;
+    $self->[_Doc] = $doc;
 
-    return unless defined $self->{C};
+    return unless defined $self->[_C];
 
-    for my $kid (@{$self->{C}})
+    for my $kid (@{$self->[_C]})
     {
 	$kid->setOwnerDocument ($doc);
     }
@@ -1251,63 +962,70 @@ sub cloneChildren
     my ($self, $node, $deep) = @_;
     return unless $deep;
     
-    return unless defined $self->{C};
+    return unless defined $self->[_C];
 
-    my $oldIgnore = XML::DOM::ignoreReadOnly (1);	# temporarily...
+    local $XML::DOM::IgnoreReadOnly = 1;
 
-    for my $kid (@{$node->{C}})
+    for my $kid (@{$node->[_C]})
     {
 	my $newNode = $kid->cloneNode ($deep);
-	push @{$self->{C}}, $newNode;
+	push @{$self->[_C]}, $newNode;
 	$newNode->setParentNode ($self);
     }
-
-    XML::DOM::ignoreReadOnly ($oldIgnore);	# restore previous value
 }
 
+#
 # For internal use only!
+#
 sub removeChildHoodMemories
 {
     my ($self) = @_;
 
-#????? remove?
-    delete $self->{Parent};
+    undef $self->[_Parent]; # was delete
 }
 
+#
 # Remove circular dependencies. The Node and its children should
 # not be used afterwards.
+#
 sub dispose
 {
     my $self = shift;
 
     $self->removeChildHoodMemories;
 
-    if (defined $self->{C})
+    if (defined $self->[_C])
     {
-	$self->{C}->dispose;
-	delete $self->{C};
+	$self->[_C]->dispose;
+	undef $self->[_C]; # was delete
     }
-    delete $self->{Doc};
+    undef $self->[_Doc]; # was delete
 }
 
+#
 # For internal use only!
+#
 sub setParentNode
 {
     my ($self, $parent) = @_;
 
     # REC 7473
-    my $oldParent = $self->{Parent};
+    my $oldParent = $self->[_Parent];
     if (defined $oldParent)
     {
 	# remove from current parent
 	my $index = $oldParent->getChildIndex ($self);
-	splice (@{$oldParent->{C}}, $index, 1, ());
+
+	# NOTE: we don't have to check if [_C] is defined,
+	# because were removing a child here!
+	splice (@{$oldParent->[_C]}, $index, 1, ());
 
 	$self->removeChildHoodMemories;
     }
-    $self->{Parent} = $parent;
+    $self->[_Parent] = $parent;
 }
 
+#
 # This function can return 3 values:
 # 1: always readOnly
 # 0: never readOnly
@@ -1328,6 +1046,7 @@ sub setParentNode
 # with the current XML::Parser.
 # Attr uses a {ReadOnly} property, which is only set if it's part of a AttDef.
 # Always returns 0 if ignoreReadOnly is set.
+#
 sub isReadOnly
 {
     # default implementation for Nodes that are always readOnly
@@ -1349,9 +1068,9 @@ sub getChildIndex
     my ($self, $node) = @_;
     my $i = 0;
 
-    return -1 unless defined $self->{C};
+    return -1 unless defined $self->[_C];
 
-    for my $kid (@{$self->{C}})
+    for my $kid (@{$self->[_C]})
     {
 	return $i if $kid == $node;
 	$i++;
@@ -1361,7 +1080,7 @@ sub getChildIndex
 
 sub getChildAtIndex
 {
-    my $kids = $_[0]->{C};
+    my $kids = $_[0]->[_C];
     defined ($kids) ? $kids->[$_[1]] : undef;
 }
 
@@ -1372,39 +1091,47 @@ sub isAncestor
     do
     {
 	return 1 if $self == $node;
-	$node = $node->{Parent};
+	$node = $node->[_Parent];
     }
     while (defined $node);
 
     0;
 }
 
+#
 # Added for optimization. Overriden in XML::DOM::Text
+#
 sub isTextNode
 {
     0;
 }
 
+#
 # Added for optimization. Overriden in XML::DOM::DocumentFragment
+#
 sub isDocumentFragmentNode
 {
     0;
 }
 
+#
 # Added for optimization. Overriden in XML::DOM::Element
+#
 sub isElementNode
 {
     0;
 }
 
+#
 # Add a Text node with the specified value or append the text to the
 # previous Node if it is a Text node.
+#
 sub addText
 {
     # REC 9456 (if it was called)
     my ($self, $str) = @_;
 
-    my $node = ${$self->{C}}[-1];	# $self->getLastChild
+    my $node = ${$self->[_C]}[-1];	# $self->getLastChild
 
     if (defined ($node) && $node->isTextNode)
     {
@@ -1413,28 +1140,29 @@ sub addText
     }
     else
     {
-	$node = $self->{Doc}->createTextNode ($str);
+	$node = $self->[_Doc]->createTextNode ($str);
 	$self->appendChild ($node);
     }
     $node;
 }
 
+#
 # Add a CDATASection node with the specified value or append the text to the
 # previous Node if it is a CDATASection node.
+#
 sub addCDATA
 {
     my ($self, $str) = @_;
 
-    my $node = ${$self->{C}}[-1];	# $self->getLastChild
+    my $node = ${$self->[_C]}[-1];	# $self->getLastChild
 
     if (defined ($node) && $node->getNodeType == CDATA_SECTION_NODE)
     {
-	# REC 5475
 	$node->appendData ($str);
     }
     else
     {
-	$node = $self->{Doc}->createCDATASection ($str);
+	$node = $self->[_Doc]->createCDATASection ($str);
 	$self->appendChild ($node);
     }
     $node;
@@ -1444,13 +1172,13 @@ sub removeChildNodes
 {
     my $self = shift;
 
-    my $cref = $self->{C};
+    my $cref = $self->[_C];
     return unless defined $cref;
 
     my $kid;
     while ($kid = pop @{$cref})
     {
-	delete $kid->{Parent};
+	undef $kid->[_Parent]; # was delete
     }
 }
 
@@ -1489,7 +1217,9 @@ sub printToFile
     $fh->close;
 }
 
+#
 # Use print to print to a FileHandle object (see printToFile code)
+#
 sub printToFileHandle
 {
     my ($self, $FH) = @_;
@@ -1497,11 +1227,13 @@ sub printToFileHandle
     $self->print ($pr);
 }
 
+#
 # Used by AttDef::setDefault to convert unexpanded default attribute value
+#
 sub expandEntityRefs
 {
     my ($self, $str) = @_;
-    my $doctype = $self->{Doc}->getDoctype;
+    my $doctype = $self->[_Doc]->getDoctype;
 
     $str =~ s/&($XML::RegExp::Name|(#([0-9]+)|#x([0-9a-fA-F]+)));/
 	defined($2) ? XML::DOM::XmlUtf8Encode ($3 || hex ($4)) 
@@ -1524,19 +1256,25 @@ sub expandEntityRef
 #    return "&$entity;";	# entity not found
 }
 
+sub isHidden
+{
+    $_[0]->[_Hidden];
+}
+
 ######################################################################
 package XML::DOM::Attr;
 ######################################################################
 
-BEGIN 
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
+
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Name Specified", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
 sub new
 {
@@ -1545,22 +1283,24 @@ sub new
     if ($XML::DOM::SafeMode)
     {
 	croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR,
-				      "bad Attr name [$name]")
+					  "bad Attr name [$name]")
 	    unless XML::DOM::isValidName ($name);
     }
 
-    my $self = bless {Doc	=> $doc, 
-		      C		=> new XML::DOM::NodeList,
-		      Name	=> $name}, $class;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_C] = new XML::DOM::NodeList;
+    $self->[_Name] = $name;
     
     if (defined $value)
     {
 	$self->setValue ($value);
-	$self->{Specified} = (defined $specified) ? $specified : 1;
+	$self->[_Specified] = (defined $specified) ? $specified : 1;
     }
     else
     {
-	$self->{Specified} = 0;
+	$self->[_Specified] = 0;
     }
     $self;
 }
@@ -1572,12 +1312,12 @@ sub getNodeType
 
 sub isSpecified
 {
-    $_[0]->{Specified};
+    $_[0]->[_Specified];
 }
 
 sub getName
 {
-    $_[0]->{Name};
+    $_[0]->[_Name];
 }
 
 sub getValue
@@ -1585,7 +1325,7 @@ sub getValue
     my $self = shift;
     my $value = "";
 
-    for my $kid (@{$self->{C}})
+    for my $kid (@{$self->[_C]})
     {
 	$value .= $kid->getData;
     }
@@ -1598,8 +1338,8 @@ sub setValue
 
     # REC 1147
     $self->removeChildNodes;
-    $self->appendChild ($self->{Doc}->createTextNode ($value));
-    $self->{Specified} = 1;
+    $self->appendChild ($self->[_Doc]->createTextNode ($value));
+    $self->[_Specified] = 1;
 }
 
 sub getNodeName
@@ -1621,9 +1361,9 @@ sub cloneNode
 {
     my ($self) = @_;	# parameter deep is ignored
 
-    my $node = $self->{Doc}->createAttribute ($self->getName);
-    $node->{Specified} = $self->{Specified};
-    $node->{ReadOnly} = 1 if $self->{ReadOnly};
+    my $node = $self->[_Doc]->createAttribute ($self->getName);
+    $node->[_Specified] = $self->[_Specified];
+    $node->[_ReadOnly] = 1 if $self->[_ReadOnly];
 
     $node->cloneChildren ($self, 1);
     $node;
@@ -1636,17 +1376,17 @@ sub cloneNode
 sub isReadOnly
 {
     # ReadOnly property is set if it's part of a AttDef
-    ! $XML::DOM::IgnoreReadOnly && defined ($_[0]->{ReadOnly});
+    ! $XML::DOM::IgnoreReadOnly && defined ($_[0]->[_ReadOnly]);
 }
 
 sub print
 {
     my ($self, $FILE) = @_;    
 
-    my $name = $self->{Name};
+    my $name = $self->[_Name];
 
     $FILE->print ("$name=\"");
-    for my $kid (@{$self->{C}})
+    for my $kid (@{$self->[_C]})
     {
 	if ($kid->getNodeType == TEXT_NODE)
 	{
@@ -1664,35 +1404,39 @@ sub rejectChild
 {
     my $t = $_[1]->getNodeType;
 
-    $t != TEXT_NODE && $t != ENTITY_REFERENCE_NODE;
+    $t != TEXT_NODE 
+    && $t != ENTITY_REFERENCE_NODE;
 }
 
 ######################################################################
 package XML::DOM::ProcessingInstruction;
 ######################################################################
 
-BEGIN 
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
-
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Target Data", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
 sub new
 {
-    my ($class, $doc, $target, $data) = @_;
+    my ($class, $doc, $target, $data, $hidden) = @_;
 
     croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR,
 			      "bad ProcessingInstruction Target [$target]")
 	unless (XML::DOM::isValidName ($target) && $target !~ /^xml$/io);
 
-    bless {Doc		=> $doc,
-	   Target	=> $target,
-	   Data		=> $data}, $class;
+    my $self = bless [], $class;
+  
+    $self->[_Doc] = $doc;
+    $self->[_Target] = $target;
+    $self->[_Data] = $data;
+    $self->[_Hidden] = $hidden;
+    $self;
 }
 
 sub getNodeType
@@ -1702,12 +1446,12 @@ sub getNodeType
 
 sub getTarget
 {
-    $_[0]->{Target};
+    $_[0]->[_Target];
 }
 
 sub getData
 {
-    $_[0]->{Data};
+    $_[0]->[_Data];
 }
 
 sub setData
@@ -1718,17 +1462,20 @@ sub setData
 				      "node is ReadOnly")
 	if $self->isReadOnly;
 
-    $self->{Data} = $data;
+    $self->[_Data] = $data;
 }
 
 sub getNodeName
 {
-    $_[0]->{Target};
+    $_[0]->[_Target];
 }
 
+#
+# Same as getData
+#
 sub getNodeValue
 {
-    $_[0]->getData;
+    $_[0]->[_Data];
 }
 
 sub setNodeValue
@@ -1739,8 +1486,9 @@ sub setNodeValue
 sub cloneNode
 {
     my $self = shift;
-    $self->{Doc}->createProcessingInstruction ($self->getTarget, 
-					       $self->getData);
+    $self->[_Doc]->createProcessingInstruction ($self->getTarget, 
+						$self->getData,
+						$self->isHidden);
 }
 
 #------------------------------------------------------------
@@ -1750,7 +1498,7 @@ sub isReadOnly
 {
     return 0 if $XML::DOM::IgnoreReadOnly;
 
-    my $pa = $_[0]->{Parent};
+    my $pa = $_[0]->[_Parent];
     defined ($pa) ? $pa->isReadOnly : 0;
 }
 
@@ -1759,39 +1507,43 @@ sub print
     my ($self, $FILE) = @_;    
 
     $FILE->print ("<?");
-    $FILE->print ($self->{Target});
+    $FILE->print ($self->[_Target]);
     $FILE->print (" ");
-    $FILE->print (XML::DOM::encodeProcessingInstruction ($self->{Data}));
+    $FILE->print (XML::DOM::encodeProcessingInstruction ($self->[_Data]));
     $FILE->print ("?>");
 }
 
 ######################################################################
 package XML::DOM::Notation;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
 BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Name Base SysId PubId", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
 sub new
 {
-    my ($class, $doc, $name, $base, $sysId, $pubId) = @_;
+    my ($class, $doc, $name, $base, $sysId, $pubId, $hidden) = @_;
 
     croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR, 
 				      "bad Notation Name [$name]")
 	unless XML::DOM::isValidName ($name);
 
-    bless {Doc		=> $doc,
-	   Name		=> $name,
-	   Base		=> $base,
-	   SysId	=> $sysId,
-	   PubId	=> $pubId}, $class;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_Name] = $name;
+    $self->[_Base] = $base;
+    $self->[_SysId] = $sysId;
+    $self->[_PubId] = $pubId;
+    $self->[_Hidden] = $hidden;
+    $self;
 }
 
 sub getNodeType
@@ -1801,51 +1553,51 @@ sub getNodeType
 
 sub getPubId
 {
-    $_[0]->{PubId};
+    $_[0]->[_PubId];
 }
 
 sub setPubId
 {
-    $_[0]->{PubId} = $_[1];
+    $_[0]->[_PubId] = $_[1];
 }
 
 sub getSysId
 {
-    $_[0]->{SysId};
+    $_[0]->[_SysId];
 }
 
 sub setSysId
 {
-    $_[0]->{SysId} = $_[1];
+    $_[0]->[_SysId] = $_[1];
 }
 
 sub getName
 {
-    $_[0]->{Name};
+    $_[0]->[_Name];
 }
 
 sub setName
 {
-    $_[0]->{Name} = $_[1];
+    $_[0]->[_Name] = $_[1];
 }
 
 sub getBase
 {
-    $_[0]->{Base};
+    $_[0]->[_Base];
 }
 
 sub getNodeName
 {
-    $_[0]->{Name};
+    $_[0]->[_Name];
 }
 
 sub print
 {
     my ($self, $FILE) = @_;    
 
-    my $name = $self->{Name};
-    my $sysId = $self->{SysId};
-    my $pubId = $self->{PubId};
+    my $name = $self->[_Name];
+    my $sysId = $self->[_SysId];
+    my $pubId = $self->[_PubId];
 
     $FILE->print ("<!NOTATION $name ");
 
@@ -1863,8 +1615,9 @@ sub print
 sub cloneNode
 {
     my ($self) = @_;
-    $self->{Doc}->createNotation ($self->{Name}, $self->{Base}, 
-				  $self->{SysId}, $self->{PubId});
+    $self->[_Doc]->createNotation ($self->[_Name], $self->[_Base], 
+				   $self->[_SysId], $self->[_PubId],
+				   $self->[_Hidden]);
 }
 
 sub to_expat
@@ -1886,32 +1639,36 @@ sub _to_sax
 ######################################################################
 package XML::DOM::Entity;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("NotationName Parameter Value Ndata SysId PubId", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
 sub new
 {
-    my ($class, $doc, $par, $notationName, $value, $sysId, $pubId, $ndata) = @_;
+    my ($class, $doc, $par, $notationName, $value, $sysId, $pubId, $ndata, $hidden) = @_;
 
     croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR, 
 				      "bad Entity Name [$notationName]")
 	unless XML::DOM::isValidName ($notationName);
 
-    bless {Doc		=> $doc,
-	   NotationName	=> $notationName,
-	   Parameter	=> $par,
-	   Value	=> $value,
-	   Ndata	=> $ndata,
-	   SysId	=> $sysId,
-	   PubId	=> $pubId}, $class;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_NotationName] = $notationName;
+    $self->[_Parameter] = $par;
+    $self->[_Value] = $value;
+    $self->[_Ndata] = $ndata;
+    $self->[_SysId] = $sysId;
+    $self->[_PubId] = $pubId;
+    $self->[_Hidden] = $hidden;
+    $self;
 #?? maybe Value should be a Text node
 }
 
@@ -1922,12 +1679,12 @@ sub getNodeType
 
 sub getPubId
 {
-    $_[0]->{PubId};
+    $_[0]->[_PubId];
 }
 
 sub getSysId
 {
-    $_[0]->{SysId};
+    $_[0]->[_SysId];
 }
 
 # Dom Spec says: 
@@ -1937,28 +1694,28 @@ sub getSysId
 #?? do we have unparsed entities?
 sub getNotationName
 {
-    $_[0]->{NotationName};
+    $_[0]->[_NotationName];
 }
 
 sub getNodeName
 {
-    $_[0]->{NotationName};
+    $_[0]->[_NotationName];
 }
 
 sub cloneNode
 {
     my $self = shift;
-    $self->{Doc}->createEntity ($self->{Parameter}, 
-				$self->{NotationName}, $self->{Value}, 
-				$self->{SysId}, $self->{PubId}, 
-				$self->{Ndata});
+    $self->[_Doc]->createEntity ($self->[_Parameter], 
+				 $self->[_NotationName], $self->[_Value], 
+				 $self->[_SysId], $self->[_PubId], 
+				 $self->[_Ndata], $self->[_Hidden]);
 }
 
 sub rejectChild
 {
     return 1;
 #?? if value is split over subnodes, recode this section
-# also add:				   c => new XML::DOM::NodeList,
+# also add:				   C => new XML::DOM::NodeList,
 
     my $t = $_[1];
 
@@ -1972,33 +1729,33 @@ sub rejectChild
 
 sub getValue
 {
-    $_[0]->{Value};
+    $_[0]->[_Value];
 }
 
 sub isParameterEntity
 {
-    $_[0]->{Parameter};
+    $_[0]->[_Parameter];
 }
 
 sub getNdata
 {
-    $_[0]->{Ndata};
+    $_[0]->[_Ndata];
 }
 
 sub print
 {
     my ($self, $FILE) = @_;    
 
-    my $name = $self->{NotationName};
+    my $name = $self->[_NotationName];
 
     my $par = $self->isParameterEntity ? "% " : "";
 
     $FILE->print ("<!ENTITY $par$name");
 
-    my $value = $self->{Value};
-    my $sysId = $self->{SysId};
-    my $pubId = $self->{PubId};
-    my $ndata = $self->{Ndata};
+    my $value = $self->[_Value];
+    my $sysId = $self->[_SysId];
+    my $pubId = $self->[_PubId];
+    my $ndata = $self->[_Ndata];
 
     if (defined $value)
     {
@@ -2046,16 +1803,16 @@ sub _to_sax
 ######################################################################
 package XML::DOM::EntityReference;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("EntityName Parameter", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
 sub new
 {
@@ -2065,9 +1822,12 @@ sub new
 		      "bad Entity Name [$name] in EntityReference")
 	unless XML::DOM::isValidName ($name);
 
-    bless {Doc		=> $doc,
-	   EntityName	=> $name,
-	   Parameter	=> ($parameter || 0)}, $class;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_EntityName] = $name;
+    $self->[_Parameter] = ($parameter || 0);
+    $self;
 }
 
 sub getNodeType
@@ -2077,7 +1837,7 @@ sub getNodeType
 
 sub getNodeName
 {
-    $_[0]->{EntityName};
+    $_[0]->[_EntityName];
 }
 
 #------------------------------------------------------------
@@ -2085,21 +1845,21 @@ sub getNodeName
 
 sub getEntityName
 {
-    $_[0]->{EntityName};
+    $_[0]->[_EntityName];
 }
 
 sub isParameterEntity
 {
-    $_[0]->{Parameter};
+    $_[0]->[_Parameter];
 }
 
 sub getData
 {
     my $self = shift;
-    my $name = $self->{EntityName};
-    my $parameter = $self->{Parameter};
+    my $name = $self->[_EntityName];
+    my $parameter = $self->[_Parameter];
 
-    my $data = $self->{Doc}->expandEntity ($name, $parameter);
+    my $data = $self->[_Doc]->expandEntity ($name, $parameter);
 
     unless (defined $data)
     {
@@ -2114,11 +1874,11 @@ sub print
 {
     my ($self, $FILE) = @_;    
 
-    my $name = $self->{EntityName};
+    my $name = $self->[_EntityName];
 
 #?? or do we expand the entities?
 
-    my $pc = $self->{Parameter} ? "%" : "&";
+    my $pc = $self->[_Parameter] ? "%" : "&";
     $FILE->print ("$pc$name;");
 }
 
@@ -2134,15 +1894,15 @@ sub print
 sub getChildNodes
 {
     my $self = shift;
-    my $entity = $self->{Doc}->getEntity ($self->{EntityName});
+    my $entity = $self->[_Doc]->getEntity ($self->[_EntityName]);
     defined ($entity) ? $entity->getChildNodes : new XML::DOM::NodeList;
 }
 
 sub cloneNode
 {
     my $self = shift;
-    $self->{Doc}->createEntityReference ($self->{EntityName}, 
-					 $self->{Parameter});
+    $self->[_Doc]->createEntityReference ($self->[_EntityName], 
+					 $self->[_Parameter]);
 }
 
 sub to_expat
@@ -2154,8 +1914,10 @@ sub to_expat
 sub _to_sax
 {
     my ($self, $doch, $dtdh, $enth) = @_;
-    $doch->entity_reference ( { Name => $self->getEntityName } );
-#?? not supported $self->isParameterEntity);
+    my @par = $self->isParameterEntity ? (Parameter => 1) : ();
+#?? not supported by PerlSAX: $self->isParameterEntity
+
+    $doch->entity_reference ( { Name => $self->getEntityName, @par } );
 }
 
 # NOTE: an EntityReference can't really have children, so rejectChild
@@ -2164,16 +1926,16 @@ sub _to_sax
 ######################################################################
 package XML::DOM::AttDef;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Name Type Fixed Default Required Implied Quote", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
 #------------------------------------------------------------
 # Extra method implementations
@@ -2181,38 +1943,41 @@ use vars qw( @ISA );
 # AttDef is not part of DOM Spec
 sub new
 {
-    my ($class, $doc, $name, $attrType, $default, $fixed) = @_;
+    my ($class, $doc, $name, $attrType, $default, $fixed, $hidden) = @_;
 
     croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR,
 				      "bad Attr name in AttDef [$name]")
 	unless XML::DOM::isValidName ($name);
 
-    my $self = bless {Doc	=> $doc,
-		      Name	=> $name,
-		      Type	=> $attrType}, $class;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_Name] = $name;
+    $self->[_Type] = $attrType;
 
     if (defined $default)
     {
 	if ($default eq "#REQUIRED")
 	{
-	    $self->{Required} = 1;
+	    $self->[_Required] = 1;
 	}
 	elsif ($default eq "#IMPLIED")
 	{
-	    $self->{Implied} = 1;
+	    $self->[_Implied] = 1;
 	}
 	else
 	{
 	    # strip off quotes - see Attlist handler in XML::Parser
 	    $default =~ m#^(["'])(.*)['"]$#;
 	    
-	    $self->{Quote} = $1;	# keep track of the quote character
-	    $self->{Default} = $self->setDefault ($2);
+	    $self->[_Quote] = $1;	# keep track of the quote character
+	    $self->[_Default] = $self->setDefault ($2);
 	    
 #?? should default value be decoded - what if it contains e.g. "&amp;"
 	}
     }
-    $self->{Fixed} = $fixed if defined $fixed;
+    $self->[_Fixed] = $fixed if defined $fixed;
+    $self->[_Hidden] = $hidden if defined $hidden;
 
     $self;
 }
@@ -2224,28 +1989,28 @@ sub getNodeType
 
 sub getName
 {
-    $_[0]->{Name};
+    $_[0]->[_Name];
 }
 
 # So it can be added to a NamedNodeMap
 sub getNodeName
 {
-    $_[0]->{Name};
+    $_[0]->[_Name];
 }
 
 sub getType
 {
-    $_[0]->{Type};
+    $_[0]->[_Type];
 }
 
 sub setType
 {
-    $_[0]->{Type} = $_[1];
+    $_[0]->[_Type] = $_[1];
 }
 
 sub getDefault
 {
-    $_[0]->{Default};
+    $_[0]->[_Default];
 }
 
 sub setDefault
@@ -2253,8 +2018,8 @@ sub setDefault
     my ($self, $value) = @_;
 
     # specified=0, it's the default !
-    my $attr = $self->{Doc}->createAttribute ($self->{Name}, undef, 0);
-    $attr->{ReadOnly} = 1;
+    my $attr = $self->[_Doc]->createAttribute ($self->[_Name], undef, 0);
+    $attr->[_ReadOnly] = 1;
 
 #?? this should be split over Text and EntityReference nodes, just like other
 # Attr nodes - just expand the text for now
@@ -2267,44 +2032,44 @@ sub setDefault
 
 sub isFixed
 {
-    $_[0]->{Fixed} || 0;
+    $_[0]->[_Fixed] || 0;
 }
 
 sub isRequired
 {
-    $_[0]->{Required} || 0;
+    $_[0]->[_Required] || 0;
 }
 
 sub isImplied
 {
-    $_[0]->{Implied} || 0;
+    $_[0]->[_Implied] || 0;
 }
 
 sub print
 {
     my ($self, $FILE) = @_;    
 
-    my $name = $self->{Name};
-    my $type = $self->{Type};
-    my $fixed = $self->{Fixed};
-    my $default = $self->{Default};
+    my $name = $self->[_Name];
+    my $type = $self->[_Type];
+    my $fixed = $self->[_Fixed];
+    my $default = $self->[_Default];
 
     $FILE->print ("$name $type");
     $FILE->print (" #FIXED") if defined $fixed;
 
-    if ($self->{Required})
+    if ($self->[_Required])
     {
 	$FILE->print (" #REQUIRED");
     }
-    elsif ($self->{Implied})
+    elsif ($self->[_Implied])
     {
 	$FILE->print (" #IMPLIED");
     }
     elsif (defined ($default))
     {
-	my $quote = $self->{Quote};
+	my $quote = $self->[_Quote];
 	$FILE->print (" $quote");
-	for my $kid (@{$default->{C}})
+	for my $kid (@{$default->[_C]})
 	{
 	    $kid->print ($FILE);
 	}
@@ -2317,17 +2082,17 @@ sub getDefaultString
     my $self = shift;
     my $default;
 
-    if ($self->{Required})
+    if ($self->[_Required])
     {
 	return "#REQUIRED";
     }
-    elsif ($self->{Implied})
+    elsif ($self->[_Implied])
     {
 	return "#IMPLIED";
     }
-    elsif (defined ($default = $self->{Default}))
+    elsif (defined ($default = $self->[_Default]))
     {
-	my $quote = $self->{Quote};
+	my $quote = $self->[_Quote];
 	$default = $default->toString;
 	return "$quote$default$quote";
     }
@@ -2337,18 +2102,19 @@ sub getDefaultString
 sub cloneNode
 {
     my $self = shift;
-    my $node = new XML::DOM::AttDef ($self->{Doc}, $self->{Name}, $self->{Type},
-				     undef, $self->{Fixed});
+    my $node = new XML::DOM::AttDef ($self->[_Doc], $self->[_Name], $self->[_Type],
+				     undef, $self->[_Fixed]);
 
-    $node->{Required} = 1 if $self->{Required};
-    $node->{Implied} = 1 if $self->{Implied};
-    $node->{Fixed} = $self->{Fixed} if defined $self->{Fixed};
+    $node->[_Required] = 1 if $self->[_Required];
+    $node->[_Implied] = 1 if $self->[_Implied];
+    $node->[_Fixed] = $self->[_Fixed] if defined $self->[_Fixed];
+    $node->[_Hidden] = $self->[_Hidden] if defined $self->[_Hidden];
 
-    if (defined $self->{Default})
+    if (defined $self->[_Default])
     {
-	$node->{Default} = $self->{Default}->cloneNode(1);
+	$node->[_Default] = $self->[_Default]->cloneNode(1);
     }
-    $node->{Quote} = $self->{Quote};
+    $node->[_Quote] = $self->[_Quote];
 
     $node;
 }
@@ -2358,25 +2124,27 @@ sub setOwnerDocument
     my ($self, $doc) = @_;
     $self->SUPER::setOwnerDocument ($doc);
 
-    if (defined $self->{Default})
+    if (defined $self->[_Default])
     {
-	$self->{Default}->setOwnerDocument ($doc);
+	$self->[_Default]->setOwnerDocument ($doc);
     }
 }
 
 ######################################################################
 package XML::DOM::AttlistDecl;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    import XML::DOM::AttDef qw{ :Fields };
+
+    XML::DOM::def_fields ("ElementName", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
 #------------------------------------------------------------
 # Extra method implementations
@@ -2390,14 +2158,16 @@ sub new
 			      "bad Element TagName [$name] in AttlistDecl")
 	unless XML::DOM::isValidName ($name);
 
-    my $self = bless {Doc	=> $doc,
-		      C		=> new XML::DOM::NodeList,
-		      ReadOnly	=> 1,
-		      Name	=> $name}, $class;
+    my $self = bless [], $class;
 
-    $self->{A} = new XML::DOM::NamedNodeMap (Doc	=> $doc,
-					     ReadOnly	=> 1,
-					     Parent	=> $self);
+    $self->[_Doc] = $doc;
+    $self->[_C] = new XML::DOM::NodeList;
+    $self->[_ReadOnly] = 1;
+    $self->[_ElementName] = $name;
+
+    $self->[_A] = new XML::DOM::NamedNodeMap (Doc	=> $doc,
+					      ReadOnly	=> 1,
+					      Parent	=> $self);
 
     $self;
 }
@@ -2409,23 +2179,23 @@ sub getNodeType
 
 sub getName
 {
-    $_[0]->{Name};
+    $_[0]->[_ElementName];
 }
 
 sub getNodeName
 {
-    $_[0]->{Name};
+    $_[0]->[_ElementName];
 }
 
 sub getAttDef
 {
     my ($self, $attrName) = @_;
-    $self->{A}->getNamedItem ($attrName);
+    $self->[_A]->getNamedItem ($attrName);
 }
 
 sub addAttDef
 {
-    my ($self, $attrName, $type, $default, $fixed) = @_;
+    my ($self, $attrName, $type, $default, $fixed, $hidden) = @_;
     my $node = $self->getAttDef ($attrName);
 
     if (defined $node)
@@ -2436,9 +2206,9 @@ sub addAttDef
     }
     else
     {
-	$node = new XML::DOM::AttDef ($self->{Doc}, $attrName, $type, 
-				      $default, $fixed);
-	$self->{A}->setNamedItem ($node);
+	$node = new XML::DOM::AttDef ($self->[_Doc], $attrName, $type, 
+				      $default, $fixed, $hidden);
+	$self->[_A]->setNamedItem ($node);
     }
     $node;
 }
@@ -2453,9 +2223,9 @@ sub getDefaultAttrValue
 sub cloneNode
 {
     my ($self, $deep) = @_;
-    my $node = $self->{Doc}->createAttlistDecl ($self->{Name});
+    my $node = $self->[_Doc]->createAttlistDecl ($self->[_ElementName]);
     
-    $node->{A} = $self->{A}->cloneNode ($deep);
+    $node->[_A] = $self->[_A]->cloneNode ($deep);
     $node;
 }
 
@@ -2464,7 +2234,7 @@ sub setOwnerDocument
     my ($self, $doc) = @_;
     $self->SUPER::setOwnerDocument ($doc);
 
-    $self->{A}->setOwnerDocument ($doc);
+    $self->[_A]->setOwnerDocument ($doc);
 }
 
 sub print
@@ -2472,9 +2242,19 @@ sub print
     my ($self, $FILE) = @_;    
 
     my $name = $self->getName;
-    my @attlist = @{$self->{A}->getValues};
+    my @attlist = @{$self->[_A]->getValues};
 
-    if (@attlist > 0)
+    my $hidden = 1;
+    for my $att (@attlist)
+    {
+	unless ($att->[_Hidden])
+	{
+	    $hidden = 0;
+	    last;
+	}
+    }
+
+    unless ($hidden)
     {
 	$FILE->print ("<!ATTLIST $name");
 
@@ -2487,6 +2267,8 @@ sub print
 	{
 	    for my $attr (@attlist)
 	    {
+		next if $attr->[_Hidden];
+
 		$FILE->print ("\x0A  ");
 		$attr->print ($FILE);
 	    }
@@ -2499,11 +2281,11 @@ sub to_expat
 {
     my ($self, $iter) = @_;
     my $tag = $self->getName;
-    for my $a ($self->{A}->getValues)
+    for my $a ($self->[_A]->getValues)
     {
 	my $default = $a->isImplied ? '#IMPLIED' :
 	    ($a->isRequired ? '#REQUIRED' : 
-	     ($a->{Quote} . $a->getDefault->getValue . $a->{Quote}));
+	     ($a->[_Quote] . $a->getDefault->getValue . $a->[_Quote]));
 
 	$iter->Attlist ($tag, $a->getName, $a->getType, $default, $a->isFixed); 
     }
@@ -2513,34 +2295,34 @@ sub _to_sax
 {
     my ($self, $doch, $dtdh, $enth) = @_;
     my $tag = $self->getName;
-    for my $a ($self->{A}->getValues)
+    for my $a ($self->[_A]->getValues)
     {
 	my $default = $a->isImplied ? '#IMPLIED' :
 	    ($a->isRequired ? '#REQUIRED' : 
-	     ($a->{Quote} . $a->getDefault->getValue . $a->{Quote}));
+	     ($a->[_Quote] . $a->getDefault->getValue . $a->[_Quote]));
 
-	$dtdh->attlist_decl ({ EntityName => $tag, 
+	$dtdh->attlist_decl ({ ElementName => $tag, 
 			       AttributeName => $a->getName, 
-			       Type => $a->{Type}, 
+			       Type => $a->[_Type], 
 			       Default => $default, 
 			       Fixed => $a->isFixed }); 
-#?? add AttDef::getType to DOM!
     }
 }
 
 ######################################################################
 package XML::DOM::ElementDecl;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Name Model", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
+
 
 #------------------------------------------------------------
 # Extra method implementations
@@ -2548,16 +2330,20 @@ use vars qw( @ISA );
 # ElementDecl is not part of the DOM Spec
 sub new
 {
-    my ($class, $doc, $name, $model) = @_;
+    my ($class, $doc, $name, $model, $hidden) = @_;
 
     croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR, 
 			      "bad Element TagName [$name] in ElementDecl")
 	unless XML::DOM::isValidName ($name);
 
-    bless {Doc		=> $doc,
-	   Name		=> $name,
-	   ReadOnly	=> 1,
-	   Model	=> $model}, $class;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_Name] = $name;
+    $self->[_ReadOnly] = 1;
+    $self->[_Model] = $model;
+    $self->[_Hidden] = $hidden;
+    $self;
 }
 
 sub getNodeType
@@ -2567,44 +2353,48 @@ sub getNodeType
 
 sub getName
 {
-    $_[0]->{Name};
+    $_[0]->[_Name];
 }
 
 sub getNodeName
 {
-    $_[0]->{Name};
+    $_[0]->[_Name];
 }
 
 sub getModel
 {
-    $_[0]->{Model};
+    $_[0]->[_Model];
 }
 
 sub setModel
 {
     my ($self, $model) = @_;
 
-    $self->{Model} = $model;
+    $self->[_Model] = $model;
 }
 
 sub print
 {
     my ($self, $FILE) = @_;    
 
-    my $name = $self->{Name};
-    my $model = $self->{Model};
+    my $name = $self->[_Name];
+    my $model = $self->[_Model];
 
-    $FILE->print ("<!ELEMENT $name $model>");
+    $FILE->print ("<!ELEMENT $name $model>")
+	unless $self->[_Hidden];
 }
 
 sub cloneNode
 {
     my $self = shift;
-    $self->{Doc}->createElementDecl ($self->{Name}, $self->{Model});
+    $self->[_Doc]->createElementDecl ($self->[_Name], $self->[_Model], 
+				      $self->[_Hidden]);
 }
 
 sub to_expat
 {
+#?? add support for Hidden?? (allover, also in _to_sax!!)
+
     my ($self, $iter) = @_;
     $iter->Element ($self->getName, $self->getModel);
 }
@@ -2619,16 +2409,17 @@ sub _to_sax
 ######################################################################
 package XML::DOM::Element;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("TagName", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use XML::DOM::NamedNodeMap;
+use Carp;
 
 sub new
 {
@@ -2641,12 +2432,16 @@ sub new
 	    unless XML::DOM::isValidName ($tagName);
     }
 
-    my $self = bless {Doc	=> $doc,
-		      C		=> new XML::DOM::NodeList,
-		      TagName	=> $tagName}, $class;
+    my $self = bless [], $class;
 
-    $self->{A} = new XML::DOM::NamedNodeMap (Doc	=> $doc,
-					     Parent	=> $self);
+    $self->[_Doc] = $doc;
+    $self->[_C] = new XML::DOM::NodeList;
+    $self->[_TagName] = $tagName;
+
+# Now we're creating the NamedNodeMap only when needed (REC 2313 => 1147)    
+#    $self->[_A] = new XML::DOM::NamedNodeMap (Doc	=> $doc,
+#					     Parent	=> $self);
+
     $self;
 }
 
@@ -2657,17 +2452,19 @@ sub getNodeType
 
 sub getTagName
 {
-    $_[0]->{TagName};
+    $_[0]->[_TagName];
 }
 
 sub getNodeName
 {
-    $_[0]->{TagName};
+    $_[0]->[_TagName];
 }
 
 sub getAttributeNode
 {
     my ($self, $name) = @_;
+    return undef unless defined $self->[_A];
+
     $self->getAttributes->{$name};
 }
 
@@ -2683,45 +2480,45 @@ sub setAttribute
     my ($self, $name, $val) = @_;
 
     croak new XML::DOM::DOMException (INVALID_CHARACTER_ERR,
-			      "bad Attr Name [$name]")
+				      "bad Attr Name [$name]")
 	unless XML::DOM::isValidName ($name);
 
     croak new XML::DOM::DOMException (NO_MODIFICATION_ALLOWED_ERR,
 				      "node is ReadOnly")
 	if $self->isReadOnly;
 
-    my $node = $self->{A}->{$name};
+    my $node = $self->getAttributes->{$name};
     if (defined $node)
     {
 	$node->setValue ($val);
     }
     else
     {
-	$node = $self->{Doc}->createAttribute ($name, $val);
-	$self->{A}->setNamedItem ($node);
+	$node = $self->[_Doc]->createAttribute ($name, $val);
+	$self->[_A]->setNamedItem ($node);
     }
 }
 
 sub setAttributeNode
 {
     my ($self, $node) = @_;
-    my $attr = $self->{A};
+    my $attr = $self->getAttributes;
     my $name = $node->getNodeName;
 
     # REC 1147
     if ($XML::DOM::SafeMode)
     {
 	croak new XML::DOM::DOMException (WRONG_DOCUMENT_ERR,
-				      "nodes belong to different documents")
-	    if $self->{Doc} != $node->{Doc};
+					  "nodes belong to different documents")
+	    if $self->[_Doc] != $node->[_Doc];
 
 	croak new XML::DOM::DOMException (NO_MODIFICATION_ALLOWED_ERR,
 					  "node is ReadOnly")
 	    if $self->isReadOnly;
 
-	my $attrParent = $node->{UsedIn};
+	my $attrParent = $node->[_UsedIn];
 	croak new XML::DOM::DOMException (INUSE_ATTRIBUTE_ERR,
-			      "Attr is already used by another Element")
+					  "Attr is already used by another Element")
 	    if (defined ($attrParent) && $attrParent != $attr);
     }
 
@@ -2741,7 +2538,13 @@ sub removeAttributeNode
 				      "node is ReadOnly")
 	if $self->isReadOnly;
 
-    my $attr = $self->{A};
+    my $attr = $self->[_A];
+    unless (defined $attr)
+    {
+	croak new XML::DOM::DOMException (NOT_FOUND_ERR);
+	return undef;
+    }
+
     my $name = $node->getNodeName;
     my $attrNode = $attr->getNamedItem ($name);
 
@@ -2758,12 +2561,10 @@ sub removeAttributeNode
     my $default = $self->getDefaultAttrValue ($name);
     if (defined $default)
     {
-	my $oldIgnore = XML::DOM::ignoreReadOnly (1);	# temporarily
+	local $XML::DOM::IgnoreReadOnly = 1;
 
 	$default = $default->cloneNode (1);
 	$attr->setNamedItem ($default);
-
-	XML::DOM::ignoreReadOnly ($oldIgnore);	# restore previous value
     }
     $node;
 }
@@ -2771,21 +2572,33 @@ sub removeAttributeNode
 sub removeAttribute
 {
     my ($self, $name) = @_;
-    my $node = $self->{A}->getNamedItem ($name);
-
+    my $attr = $self->[_A];
+    unless (defined $attr)
+    {
+	croak new XML::DOM::DOMException (NOT_FOUND_ERR);
+	return;
+    }
+    
+    my $node = $attr->getNamedItem ($name);
+    if (defined $node)
+    {
 #?? could use dispose() to remove circular references for gc, but what if
 #?? somebody is referencing it?
-    $self->removeAttributeNode ($node) if defined $node;
+	$self->removeAttributeNode ($node);
+    }
 }
 
 sub cloneNode
 {
     my ($self, $deep) = @_;
-    my $node = $self->{Doc}->createElement ($self->getTagName);
+    my $node = $self->[_Doc]->createElement ($self->getTagName);
 
     # Always clone the Attr nodes, even if $deep == 0
-    $node->{A} = $self->{A}->cloneNode (1);	# deep=1
-    $node->{A}->setParentNode ($node);
+    if (defined $self->[_A])
+    {
+	$node->[_A] = $self->[_A]->cloneNode (1);	# deep=1
+	$node->[_A]->setParentNode ($node);
+    }
 
     $node->cloneChildren ($self, $deep);
     $node;
@@ -2793,7 +2606,8 @@ sub cloneNode
 
 sub getAttributes
 {
-    $_[0]->{A};
+    $_[0]->[_A] ||= XML::DOM::NamedNodeMap->new (Doc	=> $_[0]->[_Doc],
+						 Parent	=> $_[0]);
 }
 
 #------------------------------------------------------------
@@ -2808,7 +2622,7 @@ sub setTagName
 				      "bad Element TagName [$tagName]")
         unless XML::DOM::isValidName ($tagName);
 
-    $self->{TagName} = $tagName;
+    $self->[_TagName] = $tagName;
 }
 
 sub isReadOnly
@@ -2837,14 +2651,14 @@ sub rejectChild
 sub getDefaultAttrValue
 {
     my ($self, $attr) = @_;
-    $self->{Doc}->getDefaultAttrValue ($self->{TagName}, $attr);
+    $self->[_Doc]->getDefaultAttrValue ($self->[_TagName], $attr);
 }
 
 sub dispose
 {
     my $self = shift;
 
-    $self->{A}->dispose;
+    $self->[_A]->dispose if defined $self->[_A];
     $self->SUPER::dispose;
 }
 
@@ -2853,28 +2667,31 @@ sub setOwnerDocument
     my ($self, $doc) = @_;
     $self->SUPER::setOwnerDocument ($doc);
 
-    $self->{A}->setOwnerDocument ($doc);
+    $self->[_A]->setOwnerDocument ($doc) if defined $self->[_A];
 }
 
 sub print
 {
     my ($self, $FILE) = @_;    
 
-    my $name = $self->{TagName};
+    my $name = $self->[_TagName];
 
     $FILE->print ("<$name");
 
-    for my $att (@{$self->{A}->getValues})
+    if (defined $self->[_A])
     {
-	# skip un-specified (default) Attr nodes
-	if ($att->isSpecified)
+	for my $att (@{$self->[_A]->getValues})
 	{
-	    $FILE->print (" ");
-	    $att->print ($FILE);
+	    # skip un-specified (default) Attr nodes
+	    if ($att->isSpecified)
+	    {
+		$FILE->print (" ");
+		$att->print ($FILE);
+	    }
 	}
     }
 
-    my @kids = @{$self->{C}};
+    my @kids = @{$self->[_C]};
     if (@kids > 0)
     {
 	$FILE->print (">");
@@ -2919,9 +2736,12 @@ sub to_expat
     my $tag = $self->getTagName;
     $iter->Start ($tag);
 
-    for my $attr ($self->getAttributes->getValues)
+    if (defined $self->[_A])
     {
-	$iter->Attr ($tag, $attr->getName, $attr->getValue, $attr->isSpecified);
+	for my $attr ($self->[_A]->getValues)
+	{
+	    $iter->Attr ($tag, $attr->getName, $attr->getValue, $attr->isSpecified);
+	}
     }
 
     $iter->EndAttr;
@@ -2941,13 +2761,40 @@ sub _to_sax
     my $tag = $self->getTagName;
 
     my @attr = ();
-    for my $attr ($self->getAttributes->getValues) 
-   {
-       push @attr, $attr->getName, $attr->getValue;
-#?? losing info: $attr->isSpecified);
+    my $attrOrder;
+    my $attrDefaulted;
 
+    if (defined $self->[_A])
+    {
+	my @spec = ();		# names of specified attributes
+	my @unspec = ();	# names of defaulted attributes
+
+	for my $attr ($self->[_A]->getValues) 
+	{
+	    my $attrName = $attr->getName;
+	    push @attr, $attrName, $attr->getValue;
+	    if ($attr->isSpecified)
+	    {
+		push @spec, $attrName;
+	    }
+	    else
+	    {
+		push @unspec, $attrName;
+	    }
+	}
+	$attrOrder = [ @spec, @unspec ];
+	$attrDefaulted = @spec;
     }
-    $doch->start_element ( { Name => $tag, Attributes => { @attr } } );
+    $doch->start_element (defined $attrOrder ? 
+			  { Name => $tag, 
+			    Attributes => { @attr },
+			    AttributeOrder => $attrOrder,
+			    Defaulted => $attrDefaulted
+			  } :
+			  { Name => $tag, 
+			    Attributes => { @attr } 
+			  }
+			 );
 
     for my $kid ($self->getChildNodes)
     {
@@ -2960,18 +2807,30 @@ sub _to_sax
 ######################################################################
 package XML::DOM::CharacterData;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Data", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+use Carp;
 
+
+#
 # CharacterData nodes should never be created directly, only subclassed!
+#
+sub new
+{
+    my ($class, $doc, $data) = @_;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_Data] = $data;
+    $self;
+}
 
 sub appendData
 {
@@ -2983,7 +2842,7 @@ sub appendData
 					  "node is ReadOnly")
 	    if $self->isReadOnly;
     }
-    $self->{Data} .= $data;
+    $self->[_Data] .= $data;
 }
 
 sub deleteData
@@ -2992,7 +2851,7 @@ sub deleteData
 
     croak new XML::DOM::DOMException (INDEX_SIZE_ERR,
 				      "bad offset [$offset]")
-	if ($offset < 0 || $offset >= length ($self->{Data}));
+	if ($offset < 0 || $offset >= length ($self->[_Data]));
 #?? DOM Spec says >, but >= makes more sense!
 
     croak new XML::DOM::DOMException (INDEX_SIZE_ERR,
@@ -3003,17 +2862,17 @@ sub deleteData
 				      "node is ReadOnly")
 	if $self->isReadOnly;
 
-    substr ($self->{Data}, $offset, $count) = "";
+    substr ($self->[_Data], $offset, $count) = "";
 }
 
 sub getData
 {
-    $_[0]->{Data};
+    $_[0]->[_Data];
 }
 
 sub getLength
 {
-    length $_[0]->{Data};
+    length $_[0]->[_Data];
 }
 
 sub insertData
@@ -3022,14 +2881,14 @@ sub insertData
 
     croak new XML::DOM::DOMException (INDEX_SIZE_ERR,
 				      "bad offset [$offset]")
-	if ($offset < 0 || $offset >= length ($self->{Data}));
+	if ($offset < 0 || $offset >= length ($self->[_Data]));
 #?? DOM Spec says >, but >= makes more sense!
 
     croak new XML::DOM::DOMException (NO_MODIFICATION_ALLOWED_ERR,
 				      "node is ReadOnly")
 	if $self->isReadOnly;
 
-    substr ($self->{Data}, $offset, 0) = $data;
+    substr ($self->[_Data], $offset, 0) = $data;
 }
 
 sub replaceData
@@ -3038,7 +2897,7 @@ sub replaceData
 
     croak new XML::DOM::DOMException (INDEX_SIZE_ERR,
 				      "bad offset [$offset]")
-	if ($offset < 0 || $offset >= length ($self->{Data}));
+	if ($offset < 0 || $offset >= length ($self->[_Data]));
 #?? DOM Spec says >, but >= makes more sense!
 
     croak new XML::DOM::DOMException (INDEX_SIZE_ERR,
@@ -3049,7 +2908,7 @@ sub replaceData
 				      "node is ReadOnly")
 	if $self->isReadOnly;
 
-    substr ($self->{Data}, $offset, $count) = $data;
+    substr ($self->[_Data], $offset, $count) = $data;
 }
 
 sub setData
@@ -3060,13 +2919,13 @@ sub setData
 				      "node is ReadOnly")
 	if $self->isReadOnly;
 
-    $self->{Data} = $data;
+    $self->[_Data] = $data;
 }
 
 sub substringData
 {
     my ($self, $offset, $count) = @_;
-    my $data = $self->{Data};
+    my $data = $self->[_Data];
 
     croak new XML::DOM::DOMException (INDEX_SIZE_ERR,
 				      "bad offset [$offset]")
@@ -3093,22 +2952,16 @@ sub setNodeValue
 ######################################################################
 package XML::DOM::CDATASection;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
+    import XML::DOM::CharacterData qw( :DEFAULT :Fields );
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("", "XML::DOM::CharacterData");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::CharacterData );
-
-sub new
-{
-    my ($class, $doc, $data) = @_;
-    bless {Doc	=> $doc, 
-	   Data	=> $data}, $class;
-}
+use XML::DOM::DOMException;
 
 sub getNodeName
 {
@@ -3123,7 +2976,7 @@ sub getNodeType
 sub cloneNode
 {
     my $self = shift;
-    $self->{Doc}->createCDATASection ($self->getData);
+    $self->[_Doc]->createCDATASection ($self->getData);
 }
 
 #------------------------------------------------------------
@@ -3159,25 +3012,19 @@ sub _to_sax
 ######################################################################
 package XML::DOM::Comment;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::CharacterData qw( :DEFAULT :Fields );
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("", "XML::DOM::CharacterData");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::CharacterData );
+use XML::DOM::DOMException;
+use Carp;
 
 #?? setData - could check comment for double minus
-
-sub new
-{
-    my ($class, $doc, $data) = @_;
-    bless {Doc	=> $doc, 
-	   Data	=> $data}, $class;
-}
 
 sub getNodeType
 {
@@ -3192,7 +3039,7 @@ sub getNodeName
 sub cloneNode
 {
     my $self = shift;
-    $self->{Doc}->createComment ($self->getData);
+    $self->[_Doc]->createComment ($self->getData);
 }
 
 #------------------------------------------------------------
@@ -3202,14 +3049,14 @@ sub isReadOnly
 {
     return 0 if $XML::DOM::IgnoreReadOnly;
 
-    my $pa = $_[0]->{Parent};
+    my $pa = $_[0]->[_Parent];
     defined ($pa) ? $pa->isReadOnly : 0;
 }
 
 sub print
 {
     my ($self, $FILE) = @_;
-    my $comment = XML::DOM::encodeComment ($self->{Data});
+    my $comment = XML::DOM::encodeComment ($self->[_Data]);
 
     $FILE->print ("<!--$comment-->");
 }
@@ -3229,23 +3076,17 @@ sub _to_sax
 ######################################################################
 package XML::DOM::Text;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-    import Carp;
+    import XML::DOM::CharacterData qw( :DEFAULT :Fields );
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("", "XML::DOM::CharacterData");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::CharacterData );
-
-sub new
-{
-    my ($class, $doc, $data) = @_;
-    bless {Doc	=> $doc, 
-	   Data	=> $data}, $class;
-}
+use XML::DOM::DOMException;
+use Carp;
 
 sub getNodeType
 {
@@ -3274,10 +3115,10 @@ sub splitText
     my $rest = substring ($data, $offset);
 
     $self->setData (substring ($data, 0, $offset));
-    my $node = $self->{Doc}->createTextNode ($rest);
+    my $node = $self->[_Doc]->createTextNode ($rest);
 
     # insert new node after this node
-    $self->{Parent}->insertAfter ($node, $self);
+    $self->[_Parent]->insertAfter ($node, $self);
 
     $node;
 }
@@ -3285,7 +3126,7 @@ sub splitText
 sub cloneNode
 {
     my $self = shift;
-    $self->{Doc}->createTextNode ($self->getData);
+    $self->[_Doc]->createTextNode ($self->getData);
 }
 
 #------------------------------------------------------------
@@ -3322,15 +3163,16 @@ sub _to_sax
 ######################################################################
 package XML::DOM::XMLDecl;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Version Encoding Standalone", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
+
 
 #------------------------------------------------------------
 # Extra method implementations
@@ -3339,11 +3181,13 @@ use vars qw( @ISA );
 sub new
 {
     my ($class, $doc, $version, $encoding, $standalone) = @_;
-    my $self = bless {Doc => $doc}, $class;
 
-    $self->{Version} = $version if defined $version;
-    $self->{Encoding} = $encoding if defined $encoding;
-    $self->{Standalone} = $standalone if defined $standalone;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_Version] = $version if defined $version;
+    $self->[_Encoding] = $encoding if defined $encoding;
+    $self->[_Standalone] = $standalone if defined $standalone;
 
     $self;
 }
@@ -3352,51 +3196,51 @@ sub setVersion
 {
     if (defined $_[1])
     {
-	$_[0]->{Version} = $_[1];
+	$_[0]->[_Version] = $_[1];
     }
     else
     {
-	delete $_[0]->{Version};
+	undef $_[0]->[_Version]; # was delete
     }
 }
 
 sub getVersion
 {
-    $_[0]->{Version};
+    $_[0]->[_Version];
 }
 
 sub setEncoding
 {
     if (defined $_[1])
     {
-	$_[0]->{Encoding} = $_[1];
+	$_[0]->[_Encoding] = $_[1];
     }
     else
     {
-	delete $_[0]->{Encoding};
+	undef $_[0]->[_Encoding]; # was delete
     }
 }
 
 sub getEncoding
 {
-    $_[0]->{Encoding};
+    $_[0]->[_Encoding];
 }
 
 sub setStandalone
 {
     if (defined $_[1])
     {
-	$_[0]->{Standalone} = $_[1];
+	$_[0]->[_Standalone] = $_[1];
     }
     else
     {
-	delete $_[0]->{Standalone};
+	undef $_[0]->[_Standalone]; # was delete
     }
 }
 
 sub getStandalone
 {
-    $_[0]->{Standalone};
+    $_[0]->[_Standalone];
 }
 
 sub getNodeType
@@ -3408,17 +3252,17 @@ sub cloneNode
 {
     my $self = shift;
 
-    new XML::DOM::XMLDecl ($self->{Doc}, $self->{Version}, 
-			   $self->{Encoding}, $self->{Standalone});
+    new XML::DOM::XMLDecl ($self->[_Doc], $self->[_Version], 
+			   $self->[_Encoding], $self->[_Standalone]);
 }
 
 sub print
 {
     my ($self, $FILE) = @_;
 
-    my $version = $self->{Version};
-    my $encoding = $self->{Encoding};
-    my $standalone = $self->{Standalone};
+    my $version = $self->[_Version];
+    my $encoding = $self->[_Encoding];
+    my $standalone = $self->[_Standalone];
     $standalone = ($standalone ? "yes" : "no") if defined $standalone;
 
     $FILE->print ("<?xml");
@@ -3443,397 +3287,26 @@ sub _to_sax
 }
 
 ######################################################################
-package XML::DOM::DocumentType;
-######################################################################
-
-BEGIN 
-{
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
-}
-
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
-
-sub new
-{
-    my $class = shift;
-    my $doc = shift;
-
-    my $self = bless {Doc	=> $doc,
-		      ReadOnly	=> 1,
-		      C		=> new XML::DOM::NodeList}, $class;
-
-    $self->{Entities} =  new XML::DOM::NamedNodeMap (Doc	=> $doc,
-						     Parent	=> $self,
-						     ReadOnly	=> 1);
-    $self->{Notations} = new XML::DOM::NamedNodeMap (Doc	=> $doc,
-						     Parent	=> $self,
-						     ReadOnly	=> 1);
-    $self->setParams (@_);
-    $self;
-}
-
-sub getNodeType
-{
-    DOCUMENT_TYPE_NODE;
-}
-
-sub getNodeName
-{
-    $_[0]->{Name};
-}
-
-sub getName
-{
-    $_[0]->{Name};
-}
-
-sub getEntities
-{
-    $_[0]->{Entities};
-}
-
-sub getNotations
-{
-    $_[0]->{Notations};
-}
-
-sub setParentNode
-{
-    my ($self, $parent) = @_;
-    $self->SUPER::setParentNode ($parent);
-
-    $parent->{Doctype} = $self 
-	if $parent->getNodeType == DOCUMENT_NODE;
-}
-
-sub cloneNode
-{
-    my ($self, $deep) = @_;
-
-    my $node = new XML::DOM::DocumentType ($self->{Doc}, $self->{Name}, 
-					   $self->{SysId}, $self->{PubId}, 
-					   $self->{Internal});
-
-#?? does it make sense to make a shallow copy?
-
-    # clone the NamedNodeMaps
-    $node->{Entities} = $self->{Entities}->cloneNode ($deep);
-
-    $node->{Notations} = $self->{Notations}->cloneNode ($deep);
-
-    $node->cloneChildren ($self, $deep);
-
-    $node;
-}
-
-#------------------------------------------------------------
-# Extra method implementations
-
-sub getSysId
-{
-    $_[0]->{SysId};
-}
-
-sub getPubId
-{
-    $_[0]->{PubId};
-}
-
-sub getInternal
-{
-    $_[0]->{Internal};
-}
-
-sub setSysId
-{
-    $_[0]->{SysId} = $_[1];
-}
-
-sub setPubId
-{
-    $_[0]->{PubId} = $_[1];
-}
-
-sub setInternal
-{
-    $_[0]->{Internal} = $_[1];
-}
-
-sub setName
-{
-    $_[0]->{Name} = $_[1];
-}
-
-sub removeChildHoodMemories
-{
-    my ($self, $dontWipeReadOnly) = @_;
-
-    my $parent = $self->{Parent};
-    if (defined $parent && $parent->getNodeType == DOCUMENT_NODE)
-    {
-	delete $parent->{Doctype};
-    }
-    $self->SUPER::removeChildHoodMemories;
-}
-
-sub dispose
-{
-    my $self = shift;
-
-    $self->{Entities}->dispose;
-    $self->{Notations}->dispose;
-    $self->SUPER::dispose;
-}
-
-sub setOwnerDocument
-{
-    my ($self, $doc) = @_;
-    $self->SUPER::setOwnerDocument ($doc);
-
-    $self->{Entities}->setOwnerDocument ($doc);
-    $self->{Notations}->setOwnerDocument ($doc);
-}
-
-sub expandEntity
-{
-    my ($self, $ent, $param) = @_;
-
-    my $kid = $self->{Entities}->getNamedItem ($ent);
-    return $kid->getValue
-	if (defined ($kid) && $param == $kid->isParameterEntity);
-
-    undef;	# entity not found
-}
-
-sub getAttlistDecl
-{
-    my ($self, $elemName) = @_;
-    for my $kid (@{$_[0]->{C}})
-    {
-	return $kid if ($kid->getNodeType == ATTLIST_DECL_NODE &&
-			$kid->getName eq $elemName);
-    }
-    undef;	# not found
-}
-
-sub getElementDecl
-{
-    my ($self, $elemName) = @_;
-    for my $kid (@{$_[0]->{C}})
-    {
-	return $kid if ($kid->getNodeType == ELEMENT_DECL_NODE &&
-			$kid->getName eq $elemName);
-    }
-    undef;	# not found
-}
-
-sub addElementDecl
-{
-    my ($self, $name, $model) = @_;
-    my $node = $self->getElementDecl ($name);
-
-#?? could warn
-    unless (defined $node)
-    {
-	$node = $self->{Doc}->createElementDecl ($name, $model);
-	$self->appendChild ($node);
-    }
-    $node;
-}
-
-sub addAttlistDecl
-{
-    my ($self, $name) = @_;
-    my $node = $self->getAttlistDecl ($name);
-
-    unless (defined $node)
-    {
-	$node = $self->{Doc}->createAttlistDecl ($name);
-	$self->appendChild ($node);
-    }
-    $node;
-}
-
-sub addNotation
-{
-    my $self = shift;
-    my $node = $self->{Doc}->createNotation (@_);
-    $self->{Notations}->setNamedItem ($node);
-    $node;
-}
-
-sub addEntity
-{
-    my $self = shift;
-    my $node = $self->{Doc}->createEntity (@_);
-
-    $self->{Entities}->setNamedItem ($node);
-    $node;
-}
-
-# All AttDefs for a certain Element are merged into a single ATTLIST
-sub addAttDef
-{
-    my $self = shift;
-    my $elemName = shift;
-
-    # create the AttlistDecl if it doesn't exist yet
-    my $elemDecl = $self->addAttlistDecl ($elemName);
-    $elemDecl->addAttDef (@_);
-}
-
-sub getDefaultAttrValue
-{
-    my ($self, $elem, $attr) = @_;
-    my $elemNode = $self->getAttlistDecl ($elem);
-    (defined $elemNode) ? $elemNode->getDefaultAttrValue ($attr) : undef;
-}
-
-sub getEntity
-{
-    my ($self, $entity) = @_;
-    $self->{Entities}->getNamedItem ($entity);
-}
-
-sub setParams
-{
-    my ($self, $name, $sysid, $pubid, $internal) = @_;
-
-    $self->{Name} = $name;
-
-#?? not sure if we need to hold on to these...
-    $self->{SysId} = $sysid if defined $sysid;
-    $self->{PubId} = $pubid if defined $pubid;
-    $self->{Internal} = $internal if defined $internal;
-
-    $self;
-}
-
-sub rejectChild
-{
-    # DOM Spec says: DocumentType -- no children
-    not $XML::DOM::IgnoreReadOnly;
-}
-
-sub print
-{
-    my ($self, $FILE) = @_;
-
-    my $name = $self->{Name};
-
-    my $sysId = $self->{SysId};
-    my $pubId = $self->{PubId};
-
-    $FILE->print ("<!DOCTYPE $name");
-    if (defined $pubId)
-    {
-	$FILE->print (" PUBLIC \"$pubId\" \"$sysId\"");
-    }
-    elsif (defined $sysId)
-    {
-	$FILE->print (" SYSTEM \"$sysId\"");
-    }
-
-    my @entities = @{$self->{Entities}->getValues};
-    my @notations = @{$self->{Notations}->getValues};
-    my @kids = @{$self->{C}};
-
-    if (@entities || @notations || @kids)
-    {
-	$FILE->print (" [\x0A");
-
-	for my $kid (@entities)
-	{
-	    $FILE->print (" ");
-	    $kid->print ($FILE);
-	    $FILE->print ("\x0A");
-	}
-
-	for my $kid (@notations)
-	{
-	    $FILE->print (" ");
-	    $kid->print ($FILE);
-	    $FILE->print ("\x0A");
-	}
-
-	for my $kid (@kids)
-	{
-	    $FILE->print (" ");
-	    $kid->print ($FILE);
-	    $FILE->print ("\x0A");
-	}
-	$FILE->print ("]");
-    }
-    $FILE->print (">");
-}
-
-sub to_expat
-{
-    my ($self, $iter) = @_;
-
-    $iter->Doctype ($self->getName, $self->getSysId, $self->getPubId, $self->getInternal);
-
-    for my $ent ($self->getEntities->getValues)
-    {
-	$ent->to_expat ($iter);
-    }
-
-    for my $nota ($self->getNotations->getValues)
-    {
-	$nota->to_expat ($iter);
-    }
-
-    for my $kid ($self->getChildNodes)
-    {
-	$kid->to_expat ($iter);
-    }
-}
-
-sub _to_sax
-{
-    my ($self, $doch, $dtdh, $enth) = @_;
-
-    $dtdh->doctype_decl ( { Name => $self->getName, 
-			    SystemId => $self->getSysId, 
-			    PublicId => $self->getPubId, 
-			    Internal => $self->getInternal });
-
-    for my $ent ($self->getEntities->getValues)
-    {
-	$ent->_to_sax ($doch, $dtdh, $enth);
-    }
-
-    for my $nota ($self->getNotations->getValues)
-    {
-	$nota->_to_sax ($doch, $dtdh, $enth);
-    }
-
-    for my $kid ($self->getChildNodes)
-    {
-	$kid->_to_sax ($doch, $dtdh, $enth);
-    }
-}
-
-######################################################################
 package XML::DOM::DocumentFragment;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use XML::DOM::DOMException;
 
 sub new
 {
     my ($class, $doc) = @_;
-    bless {Doc	=> $doc,
-	   C	=> new XML::DOM::NodeList}, $class;
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_C] = new XML::DOM::NodeList;
+    $self;
 }
 
 sub getNodeType
@@ -3849,7 +3322,7 @@ sub getNodeName
 sub cloneNode
 {
     my ($self, $deep) = @_;
-    my $node = $self->{Doc}->createDocumentFragment;
+    my $node = $self->[_Doc]->createDocumentFragment;
 
     $node->cloneChildren ($self, $deep);
     $node;
@@ -3867,7 +3340,7 @@ sub print
 {
     my ($self, $FILE) = @_;
 
-    for my $node (@{$self->{C}})
+    for my $node (@{$self->[_C]})
     {
 	$node->print ($FILE);
     }
@@ -3893,25 +3366,26 @@ sub isDocumentFragmentNode
 ######################################################################
 package XML::DOM::Document;
 ######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
 
-BEGIN 
+BEGIN
 {
-    import Carp;
-    import XML::DOM::Node;
-    import XML::DOM::DOMException;
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    XML::DOM::def_fields ("Doctype XmlDecl", "XML::DOM::Node");
 }
 
-use vars qw( @ISA );
-@ISA = qw( XML::DOM::Node );
+use Carp;
+use XML::DOM::NodeList;
+use XML::DOM::DOMException;
 
 sub new
 {
     my ($class) = @_;
-    my $self = bless {C => new XML::DOM::NodeList}, $class;
+    my $self = bless [], $class;
 
     # keep Doc pointer, even though getOwnerDocument returns undef
-    $self->{Doc} = $self;
-
+    $self->[_Doc] = $self;
+    $self->[_C] = new XML::DOM::NodeList;
     $self;
 }
 
@@ -3928,13 +3402,13 @@ sub getNodeName
 #?? not sure about keeping a fixed order of these nodes....
 sub getDoctype
 {
-    $_[0]->{Doctype};
+    $_[0]->[_Doctype];
 }
 
 sub getDocumentElement
 {
     my ($self) = @_;
-    for my $kid (@{$self->{C}})
+    for my $kid (@{$self->[_C]})
     {
 	return $kid if $kid->isElementNode;
     }
@@ -4008,8 +3482,8 @@ sub cloneNode
 
     $node->cloneChildren ($self, $deep);
 
-    my $xmlDecl = $self->{XmlDecl};
-    $node->{XmlDecl} = $xmlDecl->cloneNode ($deep) if defined $xmlDecl;
+    my $xmlDecl = $self->[_XmlDecl];
+    $node->[_XmlDecl] = $xmlDecl->cloneNode ($deep) if defined $xmlDecl;
 
     $node;
 }
@@ -4018,12 +3492,12 @@ sub appendChild
 {
     my ($self, $node) = @_;
 
-    # Extra check: make sure sure we don't end up with more than 1 Elements.
+    # Extra check: make sure we don't end up with more than one Element.
     # Don't worry about multiple DocType nodes, because DocumentFragment
     # can't contain DocType nodes.
 
     my @nodes = ($node);
-    @nodes = @{$node->{C}}
+    @nodes = @{$node->[_C]}
         if $node->getNodeType == DOCUMENT_FRAGMENT_NODE;
     
     my $elem = 0;
@@ -4035,7 +3509,7 @@ sub appendChild
     if ($elem > 0 && defined ($self->getDocumentElement))
     {
 	croak new XML::DOM::DOMException (HIERARCHY_REQUEST_ERR,
-					  "document can have only 1 Element");
+					  "document can have only one Element");
     }
     $self->SUPER::appendChild ($node);
 }
@@ -4049,7 +3523,7 @@ sub insertBefore
     # can't contain DocType nodes.
 
     my @nodes = ($node);
-    @nodes = @{$node->{C}}
+    @nodes = @{$node->[_C]}
 	if $node->getNodeType == DOCUMENT_FRAGMENT_NODE;
     
     my $elem = 0;
@@ -4061,7 +3535,7 @@ sub insertBefore
     if ($elem > 0 && defined ($self->getDocumentElement))
     {
 	croak new XML::DOM::DOMException (HIERARCHY_REQUEST_ERR,
-					  "document can have only 1 Element");
+					  "document can have only one Element");
     }
     $self->SUPER::insertBefore ($node, $refNode);
 }
@@ -4075,7 +3549,7 @@ sub replaceChild
     # can't contain DocType nodes.
 
     my @nodes = ($node);
-    @nodes = @{$node->{C}}
+    @nodes = @{$node->[_C]}
 	if $node->getNodeType == DOCUMENT_FRAGMENT_NODE;
     
     my $elem = 0;
@@ -4089,7 +3563,7 @@ sub replaceChild
     if ($elem > 0 && defined ($self->getDocumentElement))
     {
 	croak new XML::DOM::DOMException (HIERARCHY_REQUEST_ERR,
-					  "document can have only 1 Element");
+					  "document can have only one Element");
     }
     $self->SUPER::appendChild ($node, $refNode);
 }
@@ -4113,7 +3587,7 @@ sub print
 	$FILE->print ("\x0A");
     }
 
-    for my $node (@{$self->{C}})
+    for my $node (@{$self->[_C]})
     {
 	$node->print ($FILE);
 	$FILE->print ("\x0A");
@@ -4123,25 +3597,25 @@ sub print
 sub setDoctype
 {
     my ($self, $doctype) = @_;
-    my $oldDoctype = $self->{Doctype};
+    my $oldDoctype = $self->[_Doctype];
     if (defined $oldDoctype)
     {
 	$self->replaceChild ($doctype, $oldDoctype);
     }
     else
     {
-#?? before root element!
+#?? before root element, but after XmlDecl !
 	$self->appendChild ($doctype);
     }
-    $_[0]->{Doctype} = $_[1];
+    $_[0]->[_Doctype] = $_[1];
 }
 
 sub removeDoctype
 {
     my $self = shift;
-    my $doctype = $self->removeChild ($self->{Doctype});
+    my $doctype = $self->removeChild ($self->[_Doctype]);
 
-    delete $self->{Doctype};
+    undef $self->[_Doctype]; # was delete
     $doctype;
 }
 
@@ -4184,25 +3658,26 @@ sub dispose
 {
     my $self = shift;
 
-    $self->{XmlDecl}->dispose if defined $self->{XmlDecl};
-    delete $self->{XmlDecl};
-    delete $self->{Doctype};
+    $self->[_XmlDecl]->dispose if defined $self->[_XmlDecl];
+    undef $self->[_XmlDecl]; # was delete
+    undef $self->[_Doctype]; # was delete
     $self->SUPER::dispose;
 }
 
 sub setOwnerDocument
 {
     # Do nothing, you can't change the owner document!
+#?? could throw exception...
 }
 
 sub getXMLDecl
 {
-    $_[0]->{XmlDecl};
+    $_[0]->[_XmlDecl];
 }
 
 sub setXMLDecl
 {
-    $_[0]->{XmlDecl} = $_[1];
+    $_[0]->[_XmlDecl] = $_[1];
 }
 
 sub createXMLDecl
@@ -4286,6 +3761,396 @@ sub _to_sax
 }
 
 ######################################################################
+package XML::DOM::DocumentType;
+######################################################################
+use vars qw{ @ISA @EXPORT_OK %EXPORT_TAGS %HFIELDS };
+
+BEGIN
+{
+    import XML::DOM::Node qw( :DEFAULT :Fields );
+    import XML::DOM::Document qw( :Fields );
+    XML::DOM::def_fields ("Entities Notations Name SysId PubId Internal", "XML::DOM::Node");
+}
+
+use XML::DOM::DOMException;
+use XML::DOM::NamedNodeMap;
+
+sub new
+{
+    my $class = shift;
+    my $doc = shift;
+
+    my $self = bless [], $class;
+
+    $self->[_Doc] = $doc;
+    $self->[_ReadOnly] = 1;
+    $self->[_C] = new XML::DOM::NodeList;
+
+    $self->[_Entities] =  new XML::DOM::NamedNodeMap (Doc	=> $doc,
+						      Parent	=> $self,
+						      ReadOnly	=> 1);
+    $self->[_Notations] = new XML::DOM::NamedNodeMap (Doc	=> $doc,
+						      Parent	=> $self,
+						      ReadOnly	=> 1);
+    $self->setParams (@_);
+    $self;
+}
+
+sub getNodeType
+{
+    DOCUMENT_TYPE_NODE;
+}
+
+sub getNodeName
+{
+    $_[0]->[_Name];
+}
+
+sub getName
+{
+    $_[0]->[_Name];
+}
+
+sub getEntities
+{
+    $_[0]->[_Entities];
+}
+
+sub getNotations
+{
+    $_[0]->[_Notations];
+}
+
+sub setParentNode
+{
+    my ($self, $parent) = @_;
+    $self->SUPER::setParentNode ($parent);
+
+    $parent->[_Doctype] = $self 
+	if $parent->getNodeType == DOCUMENT_NODE;
+}
+
+sub cloneNode
+{
+    my ($self, $deep) = @_;
+
+    my $node = new XML::DOM::DocumentType ($self->[_Doc], $self->[_Name], 
+					   $self->[_SysId], $self->[_PubId], 
+					   $self->[_Internal]);
+
+#?? does it make sense to make a shallow copy?
+
+    # clone the NamedNodeMaps
+    $node->[_Entities] = $self->[_Entities]->cloneNode ($deep);
+
+    $node->[_Notations] = $self->[_Notations]->cloneNode ($deep);
+
+    $node->cloneChildren ($self, $deep);
+
+    $node;
+}
+
+#------------------------------------------------------------
+# Extra method implementations
+
+sub getSysId
+{
+    $_[0]->[_SysId];
+}
+
+sub getPubId
+{
+    $_[0]->[_PubId];
+}
+
+sub getInternal
+{
+    $_[0]->[_Internal];
+}
+
+sub setSysId
+{
+    $_[0]->[_SysId] = $_[1];
+}
+
+sub setPubId
+{
+    $_[0]->[_PubId] = $_[1];
+}
+
+sub setInternal
+{
+    $_[0]->[_Internal] = $_[1];
+}
+
+sub setName
+{
+    $_[0]->[_Name] = $_[1];
+}
+
+sub removeChildHoodMemories
+{
+    my ($self, $dontWipeReadOnly) = @_;
+
+    my $parent = $self->[_Parent];
+    if (defined $parent && $parent->getNodeType == DOCUMENT_NODE)
+    {
+	undef $parent->[_Doctype]; # was delete
+    }
+    $self->SUPER::removeChildHoodMemories;
+}
+
+sub dispose
+{
+    my $self = shift;
+
+    $self->[_Entities]->dispose;
+    $self->[_Notations]->dispose;
+    $self->SUPER::dispose;
+}
+
+sub setOwnerDocument
+{
+    my ($self, $doc) = @_;
+    $self->SUPER::setOwnerDocument ($doc);
+
+    $self->[_Entities]->setOwnerDocument ($doc);
+    $self->[_Notations]->setOwnerDocument ($doc);
+}
+
+sub expandEntity
+{
+    my ($self, $ent, $param) = @_;
+
+    my $kid = $self->[_Entities]->getNamedItem ($ent);
+    return $kid->getValue
+	if (defined ($kid) && $param == $kid->isParameterEntity);
+
+    undef;	# entity not found
+}
+
+sub getAttlistDecl
+{
+    my ($self, $elemName) = @_;
+    for my $kid (@{$_[0]->[_C]})
+    {
+	return $kid if ($kid->getNodeType == ATTLIST_DECL_NODE &&
+			$kid->getName eq $elemName);
+    }
+    undef;	# not found
+}
+
+sub getElementDecl
+{
+    my ($self, $elemName) = @_;
+    for my $kid (@{$_[0]->[_C]})
+    {
+	return $kid if ($kid->getNodeType == ELEMENT_DECL_NODE &&
+			$kid->getName eq $elemName);
+    }
+    undef;	# not found
+}
+
+sub addElementDecl
+{
+    my ($self, $name, $model, $hidden) = @_;
+    my $node = $self->getElementDecl ($name);
+
+#?? could warn
+    unless (defined $node)
+    {
+	$node = $self->[_Doc]->createElementDecl ($name, $model, $hidden);
+	$self->appendChild ($node);
+    }
+    $node;
+}
+
+sub addAttlistDecl
+{
+    my ($self, $name) = @_;
+    my $node = $self->getAttlistDecl ($name);
+
+    unless (defined $node)
+    {
+	$node = $self->[_Doc]->createAttlistDecl ($name);
+	$self->appendChild ($node);
+    }
+    $node;
+}
+
+sub addNotation
+{
+    my $self = shift;
+    my $node = $self->[_Doc]->createNotation (@_);
+    $self->[_Notations]->setNamedItem ($node);
+    $node;
+}
+
+sub addEntity
+{
+    my $self = shift;
+    my $node = $self->[_Doc]->createEntity (@_);
+
+    $self->[_Entities]->setNamedItem ($node);
+    $node;
+}
+
+# All AttDefs for a certain Element are merged into a single ATTLIST
+sub addAttDef
+{
+    my $self = shift;
+    my $elemName = shift;
+
+    # create the AttlistDecl if it doesn't exist yet
+    my $attListDecl = $self->addAttlistDecl ($elemName);
+    $attListDecl->addAttDef (@_);
+}
+
+sub getDefaultAttrValue
+{
+    my ($self, $elem, $attr) = @_;
+    my $elemNode = $self->getAttlistDecl ($elem);
+    (defined $elemNode) ? $elemNode->getDefaultAttrValue ($attr) : undef;
+}
+
+sub getEntity
+{
+    my ($self, $entity) = @_;
+    $self->[_Entities]->getNamedItem ($entity);
+}
+
+sub setParams
+{
+    my ($self, $name, $sysid, $pubid, $internal) = @_;
+
+    $self->[_Name] = $name;
+
+#?? not sure if we need to hold on to these...
+    $self->[_SysId] = $sysid if defined $sysid;
+    $self->[_PubId] = $pubid if defined $pubid;
+    $self->[_Internal] = $internal if defined $internal;
+
+    $self;
+}
+
+sub rejectChild
+{
+    # DOM Spec says: DocumentType -- no children
+    not $XML::DOM::IgnoreReadOnly;
+}
+
+sub print
+{
+    my ($self, $FILE) = @_;
+
+    my $name = $self->[_Name];
+
+    my $sysId = $self->[_SysId];
+    my $pubId = $self->[_PubId];
+
+    $FILE->print ("<!DOCTYPE $name");
+    if (defined $pubId)
+    {
+	$FILE->print (" PUBLIC \"$pubId\" \"$sysId\"");
+    }
+    elsif (defined $sysId)
+    {
+	$FILE->print (" SYSTEM \"$sysId\"");
+    }
+
+    my @entities = @{$self->[_Entities]->getValues};
+    my @notations = @{$self->[_Notations]->getValues};
+    my @kids = @{$self->[_C]};
+
+    if (@entities || @notations || @kids)
+    {
+	$FILE->print (" [\x0A");
+
+	for my $kid (@entities)
+	{
+	    next if $kid->[_Hidden];
+
+	    $FILE->print (" ");
+	    $kid->print ($FILE);
+	    $FILE->print ("\x0A");
+	}
+
+	for my $kid (@notations)
+	{
+	    next if $kid->[_Hidden];
+
+	    $FILE->print (" ");
+	    $kid->print ($FILE);
+	    $FILE->print ("\x0A");
+	}
+
+	for my $kid (@kids)
+	{
+	    next if $kid->[_Hidden];
+
+	    $FILE->print (" ");
+	    $kid->print ($FILE);
+	    $FILE->print ("\x0A");
+	}
+	$FILE->print ("]");
+    }
+    $FILE->print (">");
+}
+
+sub to_expat
+{
+    my ($self, $iter) = @_;
+
+    $iter->Doctype ($self->getName, $self->getSysId, $self->getPubId, $self->getInternal);
+
+    for my $ent ($self->getEntities->getValues)
+    {
+	next if $ent->[_Hidden];
+	$ent->to_expat ($iter);
+    }
+
+    for my $nota ($self->getNotations->getValues)
+    {
+	next if $nota->[_Hidden];
+	$nota->to_expat ($iter);
+    }
+
+    for my $kid ($self->getChildNodes)
+    {
+	next if $kid->[_Hidden];
+	$kid->to_expat ($iter);
+    }
+}
+
+sub _to_sax
+{
+    my ($self, $doch, $dtdh, $enth) = @_;
+
+    $dtdh->doctype_decl ( { Name => $self->getName, 
+			    SystemId => $self->getSysId, 
+			    PublicId => $self->getPubId, 
+			    Internal => $self->getInternal });
+
+    for my $ent ($self->getEntities->getValues)
+    {
+	next if $ent->[_Hidden];
+	$ent->_to_sax ($doch, $dtdh, $enth);
+    }
+
+    for my $nota ($self->getNotations->getValues)
+    {
+	next if $nota->[_Hidden];
+	$nota->_to_sax ($doch, $dtdh, $enth);
+    }
+
+    for my $kid ($self->getChildNodes)
+    {
+	next if $kid->[_Hidden];
+	$kid->_to_sax ($doch, $dtdh, $enth);
+    }
+}
+
+######################################################################
 package XML::DOM::Parser;
 ######################################################################
 use vars qw ( @ISA );
@@ -4340,9 +4205,72 @@ sub parse
     $ret;
 }
 
+my $LWP_USER_AGENT;
+sub set_LWP_UserAgent
+{
+    $LWP_USER_AGENT = shift;
+}
+
+sub parsefile
+{
+    my $self = shift;
+    my $url = shift;
+
+    # Any other URL schemes?
+    if ($url =~ /^(https?|ftp|wais|gopher|file):/)
+    {
+	# Read the file from the web with LWP.
+	#
+	# Note that we read in the entire file, which may not be ideal
+	# for large files. LWP::UserAgent also provides a callback style
+	# request, which we could convert to a stream with a fork()...
+
+	my $result;
+	eval
+	{
+	    use LWP::UserAgent;
+
+	    my $ua = $self->{LWP_UserAgent};
+	    unless (defined $ua)
+	    {
+		unless (defined $LWP_USER_AGENT)
+		{
+		    $LWP_USER_AGENT = LWP::UserAgent->new;
+
+		    # Load proxy settings from environment variables, i.e.:
+		    # http_proxy, ftp_proxy, no_proxy etc. (see LWP::UserAgent(3))
+		    # You need these to go thru firewalls.
+		    $LWP_USER_AGENT->env_proxy;
+		}
+		$ua = $LWP_USER_AGENT;
+	    }
+	    my $req = new HTTP::Request 'GET', $url;
+	    my $response = $LWP_USER_AGENT->request ($req);
+
+	    # Parse the result of the HTTP request
+	    $result = $self->parse ($response->content, @_);
+	};
+	if ($@)
+	{
+	    die "Couldn't parsefile [$url] with LWP: $@";
+	}
+	return $result;
+    }
+    else
+    {
+	return $self->SUPER::parsefile ($url, @_);
+    }
+}
+
 ######################################################################
 package XML::Parser::Dom;
 ######################################################################
+
+BEGIN
+{
+    import XML::DOM::Node qw( :Fields );
+    import XML::DOM::CharacterData qw( :Fields );
+}
 
 use vars qw( $_DP_doc
 	     $_DP_elem
@@ -4353,6 +4281,8 @@ use vars qw( $_DP_doc
 	     $_DP_in_CDATA
 	     $_DP_keep_CDATA
 	     $_DP_last_text
+	     $_DP_level
+	     $_DP_expand_pent
 	   );
 
 # This adds a new Style to the XML::Parser class.
@@ -4366,13 +4296,23 @@ sub Init
     $_DP_doctype = new XML::DOM::DocumentType ($_DP_doc);
     $_DP_doc->setDoctype ($_DP_doctype);
     $_DP_keep_CDATA = $_[0]->{KeepCDATA};
-  
+
     # Prepare for document prolog
     $_DP_in_prolog = 1;
-#    $expat->{DOM_inProlog} = 1;
 
     # We haven't passed the root element yet
     $_DP_end_doc = 0;
+
+    # Expand parameter entities in the DTD by default
+
+    $_DP_expand_pent = defined $_[0]->{ExpandParamEnt} ? 
+					$_[0]->{ExpandParamEnt} : 1;
+    if ($_DP_expand_pent)
+    {
+	$_[0]->{DOM_Entity} = {};
+    }
+
+    $_DP_level = 0;
 
     undef $_DP_last_text;
 }
@@ -4403,13 +4343,13 @@ sub Char
 	# Used to be:	$expat->{DOM_Element}->addText ($str);
 	if ($_DP_last_text)
 	{
-	    $_DP_last_text->{Data} .= $str;
+	    $_DP_last_text->[_Data] .= $str;
 	}
 	else
 	{
 	    $_DP_last_text = $_DP_doc->createTextNode ($str);
-	    $_DP_last_text->{Parent} = $_DP_elem;
-	    push @{$_DP_elem->{C}}, $_DP_last_text;
+	    $_DP_last_text->[_Parent] = $_DP_elem;
+	    push @{$_DP_elem->[_C]}, $_DP_last_text;
 	}
     }
 }
@@ -4431,9 +4371,12 @@ sub Start
     $_DP_elem = $node;
     $parent->appendChild ($node);
     
+    my $n = @attr;
+    return unless $n;
+
+    # Add attributes
     my $first_default = $expat->specified_attr;
     my $i = 0;
-    my $n = @attr;
     while ($i < $n)
     {
 	my $specified = $i < $first_default;
@@ -4446,7 +4389,7 @@ sub Start
 
 sub End
 {
-    $_DP_elem = $_DP_elem->{Parent};
+    $_DP_elem = $_DP_elem->[_Parent];
     undef $_DP_last_text;
 
     # Check for end of root element
@@ -4499,16 +4442,35 @@ sub CdataEnd
     $_DP_in_CDATA = 0;
 }
 
+my $START_MARKER = "__DOM__START__ENTITY__";
+my $END_MARKER = "__DOM__END__ENTITY__";
+
 sub Comment
 {
     undef $_DP_last_text;
-    my $comment = $_DP_doc->createComment ($_[1]);
-    $_DP_elem->appendChild ($comment);
+
+    # These comments were inserted by ExternEnt handler
+    if ($_[1] =~ /(?:($START_MARKER)|($END_MARKER))/)
+    {
+	if ($1)	 # START
+	{
+	    $_DP_level++;
+	}
+	else
+	{
+	    $_DP_level--;
+	}
+    }
+    else
+    {
+	my $comment = $_DP_doc->createComment ($_[1]);
+	$_DP_elem->appendChild ($comment);
+    }
 }
 
 sub deb
 {
-    return;
+#    return;
 
     my $name = shift;
     print "$name (" . join(",", map {defined($_)?$_ : "(undef)"} @_) . ")\n";
@@ -4528,6 +4490,7 @@ sub Attlist
     my $expat = shift;
 #    deb ("Attlist", @_);
 
+    $_[5] = "Hidden" unless $_DP_expand_pent || $_DP_level == 0;
     $_DP_doctype->addAttDef (@_);
 }
 
@@ -4551,12 +4514,32 @@ sub Entity
     {
 	$_[0] = $1;
 	$parameter = 1;
+
+	if (defined $_[2])	# was sysid specified?
+	{
+	    # Store the Entity mapping for use in ExternEnt
+	    if (exists $expat->{DOM_Entity}->{$_[2]})
+	    {
+		# If this ever happens, the name of entity may be the wrong one
+		# when writing out the Document.
+		XML::DOM::warning ("Entity $_[2] is known as %$_[0] and %" .
+				   $expat->{DOM_Entity}->{$_[2]});
+	    }
+	    else
+	    {
+		$expat->{DOM_Entity}->{$_[2]} = $_[0];
+	    }
+	    #?? remove this block when XML::Parser has better support
+	}
     }
 
     undef $_DP_last_text;
+
+    $_[5] = "Hidden" unless $_DP_expand_pent || $_DP_level == 0;
     $_DP_doctype->addEntity ($parameter, @_);
 }
 
+#
 # Unparsed is called when it encounters e.g:
 #
 #   <!ENTITY logo SYSTEM "http://server/logo.gif" NDATA gif>
@@ -4572,6 +4555,7 @@ sub Element
 #    deb ("Element", @_);
 
     undef $_DP_last_text;
+    push @_, "Hidden" unless $_DP_expand_pent || $_DP_level == 0;
     $_DP_doctype->addElementDecl (@_);
 }
 
@@ -4581,6 +4565,7 @@ sub Notation
 #    deb ("Notation", @_);
 
     undef $_DP_last_text;
+    $_[4] = "Hidden" unless $_DP_expand_pent || $_DP_level == 0;
     $_DP_doctype->addNotation (@_);
 }
 
@@ -4590,9 +4575,11 @@ sub Proc
 #    deb ("Proc", @_);
 
     undef $_DP_last_text;
-    $_DP_elem->appendChild (new XML::DOM::ProcessingInstruction ($_DP_doc, @_));
+    push @_, "Hidden" unless $_DP_expand_pent || $_DP_level == 0;
+    $_DP_elem->appendChild ($_DP_doc->createProcessingInstruction (@_));
 }
 
+#
 # ExternEnt is called when an external entity, such as:
 #
 #	<!ENTITY externalEntity PUBLIC "-//Enno//TEXT Enno's description//EN" 
@@ -4600,12 +4587,62 @@ sub Proc
 #
 # is referenced in the document, e.g. with: &externalEntity;
 # If ExternEnt is not specified, the entity reference is passed to the Default
-# handler as e.g. "&externalEntity;", where an EntityReference onbject is added.
+# handler as e.g. "&externalEntity;", where an EntityReference object is added.
 #
-#sub ExternEnt
-#{
+# Also for %externalEntity; references in the DTD itself.
+#
+# It can also be called when XML::Parser parses the DOCTYPE header
+# (just before calling the DocType handler), when it contains a
+# reference like "docbook.dtd" below:
+#
+#    <!DOCTYPE book PUBLIC "-//Norman Walsh//DTD DocBk XML V3.1.3//EN" 
+#	"docbook.dtd" [
+#     ... rest of DTD ...
+#
+sub ExternEnt
+{
+    my ($expat, $base, $sysid, $pubid) = @_;
 #    deb ("ExternEnt", @_);
-#}
+
+    # Invoke XML::Parser's default ExternEnt handler
+    my $content;
+    if ($XML::Parser::have_LWP)
+    {
+	$content = XML::Parser::lwp_ext_ent_handler (@_);
+    }
+    else
+    {
+	$content = XML::Parser::file_ext_ent_handler (@_);
+    }
+
+    if ($_DP_expand_pent)
+    {
+	return $content;
+    }
+    else
+    {
+	my $entname = $expat->{DOM_Entity}->{$sysid};
+	if (defined $entname)
+	{
+	    $_DP_doctype->appendChild ($_DP_doc->createEntityReference ($entname, 1));
+            # Wrap the contents in special comments, so we know when we reach the
+	    # end of parsing the entity. This way we can omit the contents from
+	    # the DTD, when ExpandParamEnt is set to 0.
+     
+	    return "<!-- $START_MARKER sysid=[$sysid] -->" .
+		$content . "<!-- $END_MARKER sysid=[$sysid] -->";
+	}
+	else
+	{
+	    # We either read the entity ref'd by the system id in the 
+	    # <!DOCTYPE> header, or the entity was undefined.
+	    # In either case, don't bother with maintaining the entity
+	    # reference, just expand the contents.
+	    return "<!-- $START_MARKER sysid=[DTD] -->" .
+		$content . "<!-- $END_MARKER sysid=[DTD] -->";
+	}
+    }
+}
 
 1; # module return code
 
@@ -4629,13 +4666,18 @@ XML::DOM - A perl module for building DOM Level 1 compliant document structures
  for (my $i = 0; $i < $n; $i++)
  {
      my $node = $nodes->item ($i);
-     my $href = $node->getAttribute ("HREF");
+     my $href = $node->getAttributeNode ("HREF");
      print $href->getValue . "\n";
  }
 
+ # Print doc file
  $doc->printToFile ("out.xml");
 
+ # Print to string
  print $doc->toString;
+
+ # Avoid memory leaks - cleanup circular references for garbage collection
+ $doc->dispose;
 
 =head1 DESCRIPTION
 
@@ -4664,6 +4706,10 @@ XML::DOM::Parser option I<KeepCDATA> to 1 will store CDATASections in
 CDATASection nodes, instead of converting them to Text nodes.
 Subsequent CDATASection nodes will be merged into one. Let me know if this
 is a problem.
+
+When using XML::Parser 2.27 and above, you can suppress expansion of
+parameter entity references (e.g. %pent;) in the DTD, by setting I<ParseParamEnt>
+to 1 and I<ExpandParamEnt> to 0. See L<Hidden Nodes|/_Hidden_Nodes_> for details.
 
 A Document has a tree structure consisting of I<Node> objects. A Node may contain
 other nodes, depending on its type.
@@ -4750,7 +4796,7 @@ Other classes that are not part of the DOM Level 1 Spec:
 
 =item * L<XML::DOM::ValParser> - A validating XML parser that creates XML::DOM::Documents. It uses L<XML::Checker> to check against the DocumentType (DTD)
 
-=item * L<XML::DOM::PerlSAX> - A PerlSAX handler that creates XML::DOM::Documents.
+=item * L<XML::Handler::BuildDOM> - A PerlSAX handler that creates XML::DOM::Documents.
 
 =back
 
@@ -4829,6 +4875,14 @@ previous value. The getIgnoreReadOnly method simply returns its current value.
  };
  XML::DOM::ignoreReadOnly ($oldIgnore);     # restore previous value
 
+Another way to do it, using a local variable:
+
+ { # start new scope
+    local $XML::DOM::IgnoreReadOnly = 1;
+    ... do whatever you want, don't worry about exceptions ...
+ } # end of scope ($IgnoreReadOnly is set back to its previous value)
+    
+
 =item isValidName (name)
 
 Whether the specified name is a valid "Name" as specified in the XML spec.
@@ -4872,7 +4926,7 @@ XML::DOM uses this style by default for all Elements.
 
 This style is sometimes desired when using XHTML. 
 (Note the extra space before the slash "/")
-See http://www.w3.org/TR/WD-html-in-xml Appendix C for more details.
+See L<http://www.w3.org/TR/xhtml1> Appendix C for more details.
 
 =back
 
@@ -4949,6 +5003,31 @@ AttlistDecl object.
 
 Comments in the DOCTYPE section are not kept in the right place. They will become
 child nodes of the Document.
+
+=item * Hidden Nodes
+
+Previous versions of XML::DOM would expand parameter entity references
+(like B<%pent;>), so when printing the DTD, it would print the contents
+of the external entity, instead of the parameter entity reference.
+With this release (1.27), you can prevent this by setting the XML::DOM::Parser
+options ParseParamEnt => 1 and ExpandParamEnt => 0.
+
+When it is parsing the contents of the external entities, it *DOES* still add
+the nodes to the DocumentType, but it marks these nodes by setting
+the 'Hidden' property. In addition, it adds an EntityReference node to the
+DocumentType node.
+
+When printing the DocumentType node (or when using to_expat() or to_sax()), 
+the 'Hidden' nodes are suppressed, so you will see the parameter entity
+reference instead of the contents of the external entities. See test case
+t/dom_extent.t for an example.
+
+The reason for adding the 'Hidden' nodes to the DocumentType node, is that
+the nodes may contain <!ENTITY> definitions that are referenced further
+in the document. (Simply not adding the nodes to the DocumentType could
+cause such entity references to be expanded incorrectly.)
+
+Note that you need XML::Parser 2.27 or higher for this to work correctly.
 
 =back
 

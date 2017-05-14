@@ -1,5 +1,4 @@
 #include <xs/xs.h>
-#include <xs/lib.h>
 #include <xs/uri.h>
 #include <iostream>
 #include <panda/uri/all.h>
@@ -7,12 +6,11 @@
 
 using namespace panda::uri;
 using namespace xs::uri;
-using xs::lib::sv2string;
-using xs::lib::sv2string_view;
+using xs::sv2string;
+using xs::sv2string_view;
 using std::string_view;
 
 static char unsafe_query_component_plus[256];
-
 
 MODULE = Panda::URI                PACKAGE = Panda::URI
 PROTOTYPES: DISABLE

@@ -1,25 +1,25 @@
 {
    "abstract" : "C Language Support for Inline",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Inline-C",
    "no_index" : {
       "directory" : [
-         "inc",
-         "t",
-         "xt",
          "example",
-         "lib/Inline/C/Parser"
+         "inc",
+         "lib/Inline/C/Parser",
+         "t",
+         "xt"
       ],
       "file" : [
          "lib/Inline/C/Parser.pm"
@@ -44,7 +44,7 @@
             "Inline" : "0.79",
             "Parse::RecDescent" : "1.967009",
             "Pegex" : "0.58",
-            "perl" : "v5.8.1"
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -71,6 +71,7 @@
          "web" : "https://github.com/ingydotnet/inline-c-pm"
       }
    },
-   "version" : "0.76"
+   "version" : "0.77",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

@@ -2,6 +2,9 @@ package Boulder::Stream;
 
 # CHANGE HISTORY:
 
+# version 1.07
+# patches from Andy Law to quash warnings under -w switch
+
 # changes from 1.04 to 1.05
 # - new() will now accept filehandle globs, IO::File, and FileHandle objects
 
@@ -26,8 +29,8 @@ Boulder::Stream - Read and write tag/value data from an input stream
    # Age >= 35 and Friends list includes "Fred"
    use Boulder::Stream;
    
+   # filestream way:
    my $stream = Boulder::Stream->newFh;
-   
    while ( my $record = <$stream> ) {
       next unless $record->Age >= 35;
       my @friends = $record->Friends;
@@ -36,6 +39,19 @@ Boulder::Stream - Read and write tag/value data from an input stream
       $record->insert(Eligible => 'yes');
       print $stream $record;
     }
+
+    # object oriented way:
+   my $stream = Boulder::Stream->new;
+   while (my $record = $stream->get ) {
+      next unless $record->Age >= 35;
+      my @friends = $record->Friends;
+      next unless grep {$_ eq 'Fred'} @friends;
+
+      $record->insert(Eligible => 'yes');
+      print $stream $record;
+    }
+
+
 
 =head1 DESCRIPTION
 
@@ -285,10 +301,11 @@ use Carp;
 use Symbol();
 
 use vars '$VERSION';
-$VERSION=1.06;
+$VERSION=1.07;
 
 # Pseudonyms and deprecated methods.
 *get        =  \&read_record;
+*next       =  \&read_record;
 *put        =  \&write_record;
 
 # Call this with IN and OUT filehandles of your choice.
@@ -343,7 +360,7 @@ sub read_one_record {
     my $delim=$self->{'delim'};
     my $subrec_start=$self->{'subrec_start'};
     my $subrec_end=$self->{'subrec_end'};
-    my ($stone,$pebble,$found);
+    my ($pebble,$found);
 
     # This is a small hack to ensure that we respect the
     # record delimiters even when we don't make an 
@@ -357,6 +374,8 @@ sub read_one_record {
 
     undef $self->{WRITE};
     undef $self->{PASSED};
+
+    my $stone = new Stone();
 
     while (1) {
 
@@ -380,15 +399,13 @@ sub read_one_record {
 
 	next unless ($key,$value) = /^\s*(.+?)\s*$delim\s*(.*)/o;
 
-	$stone = new Stone() unless $stone;
-
 	if ((!@keywords) || $interested{$key}) {
 
 	    $found++;
 	    if ($value=~/^\s*$subrec_start/o) {
 		$self->{LEVEL}++;
 		$pebble = read_one_record($self); # call ourselves recursively
-		$pebble = new Stone() unless $pebble; # an empty record is still valid
+		$pebble = new Stone() unless defined($pebble); # an empty record is still valid
 		$stone->insert($self->unescapekey($key)=>$pebble);
 		next;
 	    }
@@ -503,17 +520,18 @@ sub read_next_rec {
     $/="\n".$self->{record_stop};
     my($in) = $self->{IN};
 
-    my($data);
-    chomp($data = <$in>);
+    my $data = <$in>; 
+    chomp($data) if defined $data;
 
     if ($in !~ /ARGV/) {
-	$self->{EOF}++ if eof($in);
+        $self->{EOF}++ if eof($in);
     } else {
-	$self->{EOF}++ if eof();
+        $self->{EOF}++ if eof();
     }
 
     $/=$olddelim;
-    $self->{PAIRS}=[grep($_,split($self->{'line_end'},$data))];
+    $self->{PAIRS}=[grep($_,split($self->{'line_end'},$data))] 
+      if defined $data;
 }
 
 # This returns TRUE when we've reached the end

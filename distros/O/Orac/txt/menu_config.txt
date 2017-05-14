@@ -1,0 +1,224 @@
+Initial Configuration steps
+===========================
+
+The first step is building up the menu.  Assume for now your database is 
+Informix (just replace this with the name of your actual database).
+
+Edit menu/Informix/menu.txt
+===========================
+
+This file is arranged serially, ie. the way it runs downwards, is the way the 
+final menu will be structured.  Here is a full example file below:
+
+Menubutton^struct^
+command^0^0^oi_dbspaces^orac_Informix::onstat_dbspaces^^
+command^0^0^oi_chunks^orac_Informix::onstat_chunks^^
+command^0^0^oi_onconfig_params^orac_Informix::onstat_onconfig_params^^
+separator^
+command^0^0^oi_extents_report^orac_Informix::oncheck_extents^^
+command^0^0^oi_log_rep^orac_Informix::onstat_log_rep^^
+command^0^0^oi_logical_log^orac_Informix::onlog_log^^
+Menubutton^obj^
+cascade^oi_tables^
+casc_command^0^1^oi_tables^orac_Informix::my_func1^$rfm{oi_tabs_form}+0^
+casc_command^0^1^oi_columns^orac_Informix::new_func^'2'+$rfm{oi_cols_form}+0^
+separator^
+command^0^0^oi_synonyms^orac_Informix::dbschema_syns^^
+command^0^0^oi_procedures^orac_Informix::dbschema_procs^^
+command^0^0^oi_proc_list^orac_Informix::dbschema_proc_list^^
+
+Menubutton^tune^
+================
+Each 'Menubutton' defines the top level menu button which appears on the main 
+menu bar.  It has one element, in this case 'tune'.  This refers to a string 
+you'll find in another file txt/language.txt and here's the relevant line from 
+that file:
+
+tune^Tuning^
+
+When Orac starts up, this txt/language.txt file is read, and every line is 
+read into a Perl hash array %lg{}, such that $lg{tune} becomes 'Tuning' when 
+displayed by Orac.  This feature is designed to allow non-English speaking 
+people to configure Orac completely to be in a different language, without 
+changing the program, and only having to edit one file to do it.
+
+We'll get back to txt/language.txt later.
+
+Beneath each 'Menubutton', there are three valid commands:
+
+separator^
+==========
+Straightforward really.  This provides a separator line for the main menu 
+which drops down from the main Menubutton.  Please do not use in cascades.
+
+command^0^0^oi_grants^orac_Informix::dbschema_grants^^
+======================================================
+
+A straightforward command button is produced, directly below the main Menu 
+option.  The next two options are 1:0 switches
+
+command^oi_grants^0
+        =========
+          
+In this example, this tells Orac to set up a flag, to hold a pointer to the 
+command button.  This is required for various reasons, which you may like to 
+work out for yourself by reviewing the code.  The above example would 
+generate:
+
+  $sw_flg[$swc{oi_grants}] = $tm_but[$tm_but_ct]->command(-label=>........
+  
+Wherease command^0^0 would create:
+
+  $tm_but[$tm_but_ct]->command(-label=>.......
+  
+The $swc{oi_grants} flag is a unique counter to distinguish sub-windows.
+Saving the command handle in a variable is useful later for greying out 
+invalid commands, and other such related events.
+
+
+command^0^1
+          =
+            
+This is much simpler.  It just tells the command subfunction, whether to clear 
+the screen or not, before running.  The above example would produce:
+
+  -command => sub { main:f_clr(); main::my_function(); .......
+  
+command^0^0 would produce:
+
+  -command => sub { main::my_function(); ........
+  
+  
+command^0^0^oi_chunks^
+            =========
+              
+This option also refers back to the txt/language.txt file, which supplies the 
+name of the button command as it appears on the menu.  Thus, if we look at the 
+txt/language.txt and search for oi_chunks, we find:
+
+oi_chunks^Chunks^
+
+Therefore, the menubutton sub-command will read 'Chunks'
+
+
+command^0^0^oi_threads^orac_Informix::onstat_threads^^
+                       ==============
+                         
+This tells Orac the name of the function which is to be called.  Thus, the 
+above would produce:
+
+  -command => sub { orac_Informix::onstat_threads() ; ..... }
+  
+  
+command^0^1^oi_tables^main::my_func^$lg{oi_tables}+'Tables'+'1'+0^
+                                    =============================
+                                
+This supplies Orac with the exact 'literal' parameters, which it will supply 
+to the named 'my_func' function.  Note the '+' sign to separate values.  The 
+above would produce:
+
+  -command => sub { main::my_func($lg{oi_tables}, 'Tables', '1', 0) ; .... }
+  
+NB: These parameters, unfortunately for now, are literal strings, to be 
+interpreted as proper variables only later, when the program is actually run.
+
+cascade^oi_tables^
+==================
+
+This produces a 'Cascade' button in the main drop-down menu from the 
+Menubutton.
+
+As before, the 'oi_tables' string is looked up in txt/language.txt, thus:
+
+  oi_tables^Tables^
+  
+This puts up a 'Tables' cascade under the appropriate menu.
+
+
+casc_command^0^1^oi_tables^orac_Informix::f1^$lg{oi_tables}+'Tables'+'1'+0^
+===========================================================================
+
+This is virtually identical to the earlier 'command' option.  Except, it comes 
+under the preceding cascade, rather than under the main Menubutton.
+
+
+The txt/language.txt file
+=========================
+
+Edit this file, to change the language and/or output strings of Orac without 
+changing the file.  It is a simple two column flat-file text file, which 
+supplies the %lg{} Perl hash with all the strings used throughout the program.
+
+The txt/Informix/format.txt file
+================================
+
+This file supplies all of the pre-configure report formats, which are used to 
+format various reports.  You can use these later via the %rfm{} Perl hash 
+variable, throughout the program.  We'll use a few examples:
+
+r8_opt3^l:10,l:20,l:5^
+r8_opt4^r:3,l:8,l:11^
+r8_what^l:5,l:10^
+
+The first format, generates approx. the following report format:
+
+<<<<<<<<<< <<<<<<<<<<<<<<<<<<<< <<<<<
+
+The second one generates:
+
+>>> <<<<<<<< <<<<<<<<<<<
+
+The third one generates:
+
+<<<<< <<<<<<<<<<
+
+It may be fairly clear now what's going on above, with the 'l' generating 
+left justified format fields, and 'r' generating right justified fields.
+
+Example piece of configured code
+================================
+command^0^1^tund^main::prp_lp^$lg{tund}+'mytune'+'1'+$rfm{tund_rep}+0^
+
+The main::prp_lp function is the workhorse function of the Orac program.  We'll 
+work through the line above, using this configuration guide, to find out how 
+Orac reads this menu configuration line, and what it does with it as a result.
+
+First of all, it's a command under a Menubutton.  It reads txt/language.txt to 
+find out the line 'tund^Tuned Parameters' provides the name of the commmand 
+button.  The function does not need a button handle stored in an array, 
+but does clear the the main work screen before it runs with a call to:
+
+  main::f_clr().
+
+When the user picks the button, it calls the main::prp_lp() function, with the 
+following parameters:
+
+  main::prp_lp($lg{tund}, 'mytune', '1', $rfm{tund_rep}, 0);
+  
+This in turn generates the report on the main screen.  It does this partly by 
+reading the report format stored in $rfm{tund_rep}.  This is stored in the 
+txt/Informix/format.txt file as:
+
+tund_rep^r:8,l:5,r:20^
+
+So it produces a report like this:
+
+     Tuned Parameters report (mydatabase):
+
+      COLUMN1 COL2                  COL3
+     ======== ===== ====================
+          XXX XXX         99999999999999
+         XXXX XX                99999999
+      
+And so on.  
+
+Enjoy :-)
+AndyD
+
+(Please let me know if the information in this file is incorrect in any
+way, and I'll change it accordingly.  If there are any other parts of
+Orac you wish to document yourself, please send in the appropriate text
+file, with instructions, and we'll do what we can.)
+
+
+EOF

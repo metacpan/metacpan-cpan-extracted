@@ -35,6 +35,13 @@ WriteMakefile(
     clean => { FILES => 'CPANTS-Kwalitee-Report-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'CPANTS::Kwalitee::Report'               => { file => 'lib/CPANTS/Kwalitee/Report.pm'             , version => '0.09' },
+            'CPANTS::Kwalitee::Report::Score'        => { file => 'lib/CPANTS/Kwalitee/Report/Score.pm'       , version => '0.09' },
+            'CPANTS::Kwalitee::Report::Generator'    => { file => 'lib/CPANTS/Kwalitee/Report/Generator.pm'   , version => '0.09' },
+            'CPANTS::Kwalitee::Report::Indicator'    => { file => 'lib/CPANTS/Kwalitee/Report/Indicator.pm'   , version => '0.09' },
+            'CPANTS::Kwalitee::Report::Distribution' => { file => 'lib/CPANTS/Kwalitee/Report/Distribution.pm', version => '0.09' },
+        },
         resources => {
             repository => {
                 type => 'git',

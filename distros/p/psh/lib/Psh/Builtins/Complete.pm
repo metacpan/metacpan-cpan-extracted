@@ -2,7 +2,7 @@
 #
 #	Complete.pm : 
 #
-#	$Id: Complete.pm,v 1.11 2001/10/09 16:33:10 warp Exp $
+#	$Id: Complete.pm 473 2001-10-09 16:33:10Z warp $
 
 package Psh::Builtins::Complete;
 

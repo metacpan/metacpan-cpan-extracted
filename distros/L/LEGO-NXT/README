@@ -1,0 +1,44 @@
+LEGO::NXT
+==========================
+
+This module provides low-level control of a LEGO NXT brick over bluetooth
+using the Direct Commands API.  This API will not enable you to run programs
+on the NXT, rather, it will connect to the NXT and issue real-time commands
+that turn on/off motors, retrieve sensor values, play sound, and more.
+
+Users will leverage this API to control the NXT directly from an external box.
+
+This is known to work on Linux. Other platforms are currently untested,
+though it should work on any system that has the Net::Bluetooth module.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+  Net::Bluetooth
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+You may also distribute under the terms of Perl Artistic License,
+as specified in the Perl README file.
+

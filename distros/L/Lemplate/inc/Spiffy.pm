@@ -1,3 +1,4 @@
+#line 1
 use strict; use warnings;
 package Spiffy;
 our $VERSION = '0.46';

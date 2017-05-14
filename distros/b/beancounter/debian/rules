@@ -1,0 +1,147 @@
+#! /usr/bin/make -f
+#                                                       -*- makefile -*-
+# debian/rules file for the Debian/GNU Linux beancounter package
+# Copyright (C) 2001 - 2010 by Dirk Eddelbuettel <edd@debian.org>
+
+package	:= $(shell grep Package debian/control | sed 's/^Package: //')
+version	:= $(shell head -1 debian/changelog | \
+			perl -nle 'm/\S+\s+\((\S+)\)/ && print $$1')
+debtmp	:= $(shell pwd)/debian/$(package)
+
+srcdir  := ../../../progs/perl/beancounter
+webdir  := /home/edd/www/code/beancounter
+
+host	:= $(shell hostname)
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+update:
+ifneq ($(host),max)
+		@echo "This needs to run on max"
+		false
+endif
+	cp -vaf	$(srcdir)/BeanCounter.pm 			\
+		$(srcdir)/beancounter 				\
+		$(srcdir)/README 				\
+		$(srcdir)/README.Debian				\
+		$(srcdir)/README.non-gnu			\
+		$(srcdir)/TODO	 				\
+		$(srcdir)/THANKS 				\
+		$(srcdir)/Makefile.PL 				\
+		$(srcdir)/example.beancounterrc			\
+		$(srcdir)/beancounter_example.txt 		\
+		$(srcdir)/beancounter_schema_postgresql.txt 	\
+		$(srcdir)/beancounter_schema_mysql.txt 		\
+		$(srcdir)/beancounter_schema_sqlite.txt 	\
+		$(srcdir)/setup_beancounter			\
+		$(srcdir)/update_beancounter			\
+		$(srcdir)/contrib/				\
+		$(srcdir)/t/					.
+	@echo "********* Now run updatebuild on max"
+
+updatebuild:
+        # update the $$version field in the perl code as well as in
+        # the two support scripts
+	perl -p -i -e \
+		"s/version = \".*\";/version = \""$(version)"\";/" $(package)
+	for i in setup_beancounter update_beancounter; do \
+	   perl -p -i -e "s/VERSION='.*'/VERSION='"$(version)"'/" $$i; \
+	done
+	perl -p -i -e \
+	   "s/'VERSION'	\t=> '\d.\d.\d'/'VERSION'\t\t=> '"$(version)"'/"\
+		Makefile.PL 
+	perl Makefile.PL
+	make dist
+	mv -v Finance-BeanCounter-$(version).tar.gz ..
+
+webdir:
+ifneq ($(host),max)
+		@echo "This needs to run on max"
+		false
+endif
+	cp -vax /var/cache/pbuilder/result/$(package)_$(version)_all.deb ..
+	(cd ..; cp $(package)_$(version)_all.deb /tmp; \
+		cd /tmp; \
+		fakeroot alien -r $(package)_$(version)_all.deb; \
+		fakeroot mv $(package)-$(version)-2.noarch.rpm \
+			$(package)-$(version).noarch.rpm; \
+		cd - ; \
+		mv /tmp/$(package)-$(version).noarch.rpm . )
+	cp -af  ../$(package)_$(version).tar.gz  \
+		../$(package)_$(version)_all.deb \
+		../$(package)-$(version).noarch.rpm \
+		TODO				 \
+	        debian/changelog		 \
+		beancounter.html		 \
+		BeanCounter.html		$(webdir)
+	(cd $(webdir); \
+		mv changelog ChangeLog;			\
+		ln -sfv	$(package)_$(version).tar.gz 	\
+			$(package)-current.tar.gz ;  	\
+		ln -sfv	$(package)_$(version)_all.deb 	\
+			$(package)-current.deb	;	\
+		ln -sfv	$(package)-$(version).noarch.rpm \
+			$(package)-current.rpm	;	\
+		ln -sfv ChangeLog ChangeLog.txt	;	\
+		ln -sfv TODO TODO.txt 			)
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+        #$(PERL) Makefile.PL $(config)
+	perl Makefile.PL INSTALLDIRS=vendor	
+	pod2html --flush $(package) > $(package).html
+	pod2html --flush BeanCounter.pm > BeanCounter.html
+        #pod2man          $(package) > $(package).1
+	$(MAKE)
+	$(MAKE) test
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp .html
+	-test -f Makefile && $(MAKE) realclean
+	-rm -f pod2html-itemcache pod2html-dircache pod2htmi.tmp pod2htmd.tmp
+	dh_clean
+
+binary-indep: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+        #dh_installdirs		usr/bin usr/share/man/man1
+        #dh_installdirs		usr/bin 
+        #$(MAKE) 		prefix=$(debtmp)/usr pure_install
+	$(MAKE) 		install DESTDIR=$(debtmp)
+	dh_perl	
+	dh_installdocs		THANKS TODO README README.Debian \
+				README.non-gnu
+	dh_installexamples	example.beancounterrc flip_symbol.sh 	\
+				beancounter_example.txt 		\
+				beancounter_schema_postgresql.txt 	\
+				beancounter_schema_sqlite.txt	 	\
+				beancounter_schema_mysql.txt 		\
+				contrib/
+        #dh_installmenu
+        #dh_installinit
+        #dh_installcron
+	dh_installman	
+        #dh_undocumented	setup_beancounter.1 update_beancounter.1
+	dh_installchangelogs	
+	dh_compress
+	dh_fixperms
+        #dh_suidregister
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch: build
+
+source diff:                                                                  
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary
+

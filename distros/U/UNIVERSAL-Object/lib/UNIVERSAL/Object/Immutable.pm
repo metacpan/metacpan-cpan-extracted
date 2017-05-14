@@ -6,10 +6,11 @@ use warnings;
 
 use 5.008;
 
-use Carp       ();
+use Carp ();
+
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.10';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -28,7 +29,8 @@ sub BLESS {
         Internals::SvREADONLY( $$self, 1 );
     }
     else {
-        Carp::croak('Unsupported REPR type: '.$self);
+        require Scalar::Util;
+        Carp::croak('Invalid BLESS args for '.Scalar::Util::blessed($self).', unsupported REPR type ('.Scalar::Util::reftype($self).')');
     }
 
     return $self;
@@ -46,7 +48,7 @@ UNIVERSAL::Object::Immutable - Another useful base class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,37 @@
+H1: Creating New Table Styles
+
+H2: Using Event Processing
+
+SDF's event processing feature makes it easy to create
+a new table style from an existing one. For example, the
+following line makes {{schedule}} a variation of the {{shade}} style:
+
+E:!on table 'schedule';; $style='shade'; $param{"wide"} = 1
+
+
+H2: Using Mapping Tables
+
+SDF uses the {{tablestyles}} filter to define the mapping between
+an SDF table style and a target table style.
+For example:
+
+!block example; pure
+!block tablestyles
+Name    To
+columns Columns
+rows    Rows
+grid    Grid
+plain   Plain
+box     Box
+shade   Shade
+!endblock
+!endblock
+
+
+H2: Creating New Target Phrase Styles
+
+SDF makes it easy to define new target table styles
+by inheriting configuration details from an existing style.
+
+See the {{FILE:look/simple/mif.sdn}} file in the SDF distribution
+for examples.

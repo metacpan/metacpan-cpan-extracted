@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    C++ Bitsets    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2010-03-20T16:09:59-0700" />
+<meta name="keywords" content="stl,bitset,start" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/stl/bitset/start?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=stl:bitset" />
+<link rel="edit" title="Edit this page" href="/wiki/stl/bitset/start?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/stl/bitset/start" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/stl/bitset/start" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/stl/bitset/start" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='stl:bitset';var JSINFO = {"id":"stl:bitset:start","namespace":"stl:bitset"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../stl/start.html"  title="stl:start">C++ Standard Template Library</a> &raquo; <a href="../../stl/bitset/start.html"  title="stl:bitset:start">C++ Bitsets</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h1><a name="c_bitsets" id="c_bitsets">C++ Bitsets</a></h1>
+<div class="level1">
+
+<p>
+
+C++ Bitsets give the programmer a set of bits as a data structure. Bitsets can
+be manipulated by various binary operators such as logical AND, OR, and so on.
+</p>
+
+<p>
+The size of a C++ bitset is fixed at compile-time, and the size is the template
+parameter to the bitset. If you wanted to use a bitset whose size you can fix at
+runtime, you can use <a href="http://www.boost.org/doc/libs/1_42_0/libs/dynamic_bitset/dynamic_bitset.html" class="urlextern" title="http://www.boost.org/doc/libs/1_42_0/libs/dynamic_bitset/dynamic_bitset.html"  rel="nofollow">dynamic_bitset</a> from the <a href="http://www.boost.org/" class="urlextern" title="http://www.boost.org/"  rel="nofollow">Boost</a> library.
+
+</p>
+<table class="inline">
+	<tr class="row0">
+		<td class="col0"><a href="../../stl/bitset/bitset.html" class="wikilink1" title="stl:bitset:bitset_constructors">Constructors</a></td><td class="col1">create new bitsets</td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"><a href="../../stl/bitset/operator.html" class="wikilink1" title="stl:bitset:bitset_operators">Operators</a></td><td class="col1">compare and assign bitsets</td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"><a href="../../stl/bitset/any.html" class="wikilink1" title="stl:bitset:any">any</a></td><td class="col1">true if any bits are set</td>
+	</tr>
+	<tr class="row3">
+		<td class="col0"><a href="../../stl/bitset/count.html" class="wikilink1" title="stl:bitset:count">count</a></td><td class="col1">returns the number of set bits</td>
+	</tr>
+	<tr class="row4">
+		<td class="col0"><a href="../../stl/bitset/flip.html" class="wikilink1" title="stl:bitset:flip">flip</a></td><td class="col1">reverses the bitset</td>
+	</tr>
+	<tr class="row5">
+		<td class="col0"><a href="../../stl/bitset/none.html" class="wikilink1" title="stl:bitset:none">none</a></td><td class="col1">true if no bits are set</td>
+	</tr>
+	<tr class="row6">
+		<td class="col0"><a href="../../stl/bitset/reset.html" class="wikilink1" title="stl:bitset:reset">reset</a></td><td class="col1">sets a single bit or all bits to zero</td>
+	</tr>
+	<tr class="row7">
+		<td class="col0"><a href="../../stl/bitset/set.html" class="wikilink1" title="stl:bitset:set">set</a></td><td class="col1">sets a single bit or all bits</td>
+	</tr>
+	<tr class="row8">
+		<td class="col0"><a href="../../stl/bitset/size.html" class="wikilink1" title="stl:bitset:size">size</a></td><td class="col1">number of bits that the bitset can hold</td>
+	</tr>
+	<tr class="row9">
+		<td class="col0"><a href="../../stl/bitset/test.html" class="wikilink1" title="stl:bitset:test">test</a></td><td class="col1">returns the value of a given bit</td>
+	</tr>
+	<tr class="row10">
+		<td class="col0"><a href="../../stl/bitset/to_string.html" class="wikilink1" title="stl:bitset:to_string">to_string</a></td><td class="col1">string representation of the bitset</td>
+	</tr>
+	<tr class="row11">
+		<td class="col0"><a href="../../stl/bitset/to_ulong.html" class="wikilink1" title="stl:bitset:to_ulong">to_ulong</a></td><td class="col1">returns an integer representation of the bitset</td>
+	</tr>
+</table>
+
+</div>
+
+<h3><a name="notes" id="notes">Notes:</a></h3>
+<div class="level3">
+
+<p>
+
+Bit set is missing two boolean queries to compliment <a href="../../stl/bitset/any.html" class="wikilink1" title="stl:bitset:any">any</a> and <a href="../../stl/bitset/none.html" class="wikilink1" title="stl:bitset:none">none</a>: <code>all()</code> and <code>some()</code>.
+
+</p>
+<ul>
+<li class="level1"><div class="li"> all: <code>(~bitset).none()</code></div>
+</li>
+<li class="level1"><div class="li"> some: <code>(~bitset).any()</code></div>
+</li>
+</ul>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        stl/bitset/start.txt &middot; Last modified: 03/20/2010 16:09 by caspin      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

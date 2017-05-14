@@ -1,0 +1,59 @@
+Changelog for a2pdf (see http://perl.jonallen.info/projects/a2pdf)
+
+1.13 - 07 April 2007
+  Fixed minor formatting errors
+
+1.12 - 06 April 2007
+  Fixed inconsistent version numbering
+
+1.09 - 06 April 2007
+  Updated for compatibility with latest version of PDF::API2 (0.60)
+  Changed license to Artistic 2.0
+  Split into script (a2pdf) and module (App::a2pdf)
+
+1.08 - 17 September 2004
+  Now compatible with Windows as well as UNIX
+  Added support for formfeed characters in input stream
+    (thanks to Trevor Richardson)
+  Page title can be specified (--title option)
+  Image icon can be added to page header (--icon option)
+  Added '--timestamp' option
+
+1.07 - 14 April 2004
+  Added '--help' and '--doc' options
+  Documentation update
+  Initial release to CPAN
+
+1.06 - 03 April 2004
+  Added '--version' option
+  Changed header to include the modification timestamp of the 
+  input file
+  Words which are longer than the width of a complete line are
+  now split instead of being printed in a smaller font size
+
+1.05 - 28 March 2004
+  Fixed bug which prevented header/footer display when the
+  font size was >10
+
+1.04 - 28 March 2004
+  Added font cache to reduce the size of created PDF files
+  Renamed script from a2pdf.pl to a2pdf
+  Distribution created with the 'scriptdist' utility
+  Documentation update
+
+1.03 - 21 March 2004
+  Fixed layout bug which occurred when the --noline-numbers
+  option was used
+
+1.02 - 20 March 2004
+  Implemented Perl syntax highlighting (using Perl::Tidy)
+  Both '-' and '_' characters are now allowed in option names
+  (e.g. --perl-syntax is equivalent to --perl_syntax)
+
+1.01 - 07 March 2004
+  Added display of page numbers
+  Increased default margin to 48 points
+
+1.00 - 06 March 2004
+  First public release
+

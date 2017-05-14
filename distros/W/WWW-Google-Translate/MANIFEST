@@ -5,6 +5,6 @@ README
 t/WWW-Google-Translate.t
 lib/WWW/Google/Translate.pm
 lib/WWW/Google/Translate.pod
-example/api.pl
+example/translate.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: PrependText
+
+H2: Purpose
+
+{{S:PrependText}} is used within a paragraph event handler to
+prepend [[SDF]] before a paragraph.
+
+H2: Interface
+
+E:  &PrependText(@sdf)
+
+H3: Description
+
+The argument is the list of [[SDF]] paragraphs to prepend.
+
+H2: Examples
+
+To prepend a line before each level 1 heading:
+
+E:  !on paragraph 'H1';; &AppendText('Line:')

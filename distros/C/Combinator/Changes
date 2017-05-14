@@ -1,5 +1,8 @@
 Revision history for Combinator
 
+0.004003 2017.5.12
+        Optimized for simple {{com ... }}com (without --ser in the top layer)
+
 v0.4.2  2012.7.8
         Change only the version form for PAUSE to index it correctly.
 

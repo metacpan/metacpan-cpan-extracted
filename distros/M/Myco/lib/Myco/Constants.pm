@@ -1,7 +1,7 @@
 package Myco::Constants;
 
 ###############################################################################
-# $Id: Constants.pm,v 1.1.1.1 2004/11/22 19:16:01 owensc Exp $
+# $Id: Constants.pm,v 1.5 2006/03/19 19:34:07 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ###############################################################################
@@ -9,24 +9,6 @@ package Myco::Constants;
 =head1 NAME
 
 Myco::Constants
-
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
 
 =head1 SYNOPSIS
 
@@ -154,7 +136,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -163,10 +145,10 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Myco::Constants::Test|Myco::Constants::Test>,
-L<Myco::Base::Entity|Myco::Base::Entity>,
+L<Myco::Entity|Myco::Entity>,
 L<Myco|Myco>,
 L<Tangram|Tangram>,
 L<Class::Tangram|Class::Tangram>,
-L<mkentity|mkentity>
+L<myco-mkentity|mkentity>
 
 =cut

@@ -1,0 +1,134 @@
+#!/usr/bin/perl -w
+#================================= aandb ====================================
+# Filename:  	       aandb
+# Description:         List all the files in tree a that are also in tree b.
+# Original Author:     Dale M. Amon
+# Revised by:          $Author: $ 
+# Date:                $Date: $ 
+# Version:             $Revision: $
+# License:	       LGPL 2.1, Perl Artistic or BSD
+#
+#=============================================================================
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+
+use Fault::DebugPrinter;
+use Fault::Logger;
+use Fault::Delegate::Stderr;
+use FileHash::Content;
+use FileHash::Report
+
+#=============================================================================
+#                   Logging, debugging and signal handling
+#=============================================================================
+my %opts;
+$::PROCESS_NAME = "aandb";
+$::DEBUG        = 0;
+
+sub done {
+  {local $SIG{'TERM'} = 'IGNORE'; kill 'TERM' => -$$;}
+  Fault::Logger->log ("Shutdown.","NOTE",'notice');
+  exit 1;
+}
+
+                 Fault::DebugPrinter->new(0);
+my $delegate1  = Fault::Delegate::Stderr->new;
+my @delegates = ($delegate1);
+                 Fault::Logger->new (@delegates);
+
+$SIG{'INT'}  = \&done;
+$SIG{'TERM'} = \&done;
+
+#=============================================================================
+#                    Switch and argument handling
+#=============================================================================
+my ($HELP,$MAN,$REPORT,$DIAGNOSTIC_PRINT_LEVEL) = (0,0,"/dev/stdout",0);
+
+my $opts  = Getopt::Long::Parser->new;
+$opts->getoptions (
+        'd|debug'      => sub { $::DEBUG = 1 },
+        'v|verbose=i'  => \$DIAGNOSTIC_PRINT_LEVEL,
+	'report=s' => \$REPORT,
+        'h|help'   => \$HELP,
+        'man'      => \$MAN
+);
+pod2usage(1)                            if $HELP;
+pod2usage(-exitval => 0, -verbose => 2) if $MAN;
+Fault::DebugPrinter->level ($DIAGNOSTIC_PRINT_LEVEL);
+
+#-----------------------------------------------------------------------------
+
+if ($#ARGV != 1 ) {
+  print "ARGV = $#ARGV\n";
+  pod2usage(-exitval => "NOEXIT", -verbose => 1);
+  printf STDERR "$::PROCESS_NAME must have two directory args, eg.\n" .
+    "      $::PROCESS_NAME /my/ArchiveA /my/ArchiveB\n" .
+      "Terminating...\n";
+  exit 1;
+}
+my ($a,$b) = @ARGV;
+my $fha    = FileHash::Content->alloc;
+my $fhb    = FileHash::Content->alloc;
+my $report = FileHash::Report->new;
+
+$fha->initFromTree ($a);
+$fhb->initFromTree ($b);
+
+my $fhc = $fha->and($fhb);
+
+$report->all ($fhc, $REPORT);
+
+exit 0;
+
+#=============================================================================
+#                          POD DOCUMENTATION                                
+#=============================================================================
+# You may extract and format the documention section with the 'perldoc' cmd.
+
+=head1 NAME
+
+ aandb - List all the files in tree a that are not in tree b.
+
+=head1 SYNOPSIS
+
+ aandb {-h|--help|--man} \
+	   {-d|--debug} \
+	   {-v|--verbose=1} \
+	   {--report="~report"} dirname1 dirname2
+
+=head1 Description
+
+List all the files in tree a that are also in tree b stdout or 
+to the specified file if --report defines one.
+
+=head1 Examples
+
+ aandb --report=myreport /home/me/Photos1 /home/me/Photos2
+ aandb /home/me/Photos1 /home/me/Photos2 > report
+
+=head1 Errors and Warnings
+
+ Lots.
+
+=head1 KNOWN BUGS
+
+ None.
+
+=head1 SEE ALSO
+
+ None.
+
+=head1 AUTHOR
+
+Dale Amon <amon@vnl.com>
+
+=cut
+
+#=============================================================================
+#                                CVS HISTORY
+#=============================================================================
+# $Log: $
+# 20080730	Dale Amon <amon@vnl.com>
+#		Created.
+1;

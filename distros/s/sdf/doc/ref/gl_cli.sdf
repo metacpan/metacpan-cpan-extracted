@@ -1,0 +1,273 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Command Line Guidelines
+
+H2: Overview
+
+H3: General Usage
+
+Utilities have the following general usage:
+
+E:   utility [options] arguments
+
+Typically, arguments is a set of filenames. If more than one file is
+specified,  each filename is echoed to standard error as it is processed.
+
+Options can either be:
+
+* {{short style}} - these begin with a '-' character, or
+* {{long-style}} - these begin with the character sequence '--'.
+
+To obtain a concise summary of a utility's usage, execute it without
+any parameters. For example:
+
+E:$ hoopy
+E:usage  : hoopy [-h[help]] [-o[out_ext]] [-l[log_ext]] [-t thing,..] file ...
+E:purpose: do lots of hoopy things to files
+E:version: 1.000
+E:$ _
+
+H3: Exit Codes
+
+The exit code returned to the operating system is dependent on the
+severity of any errors encountered during execution. The  pre-defined
+exit codes are linked to message types as summarised below.
+
+!block table; format=226
+Code    Message     Description
+0       n/a         everything succeeded
+8       warning     a possible problem was identified
+16      error       an error was found
+24      abort       processing could not continue on a file
+32      fatal       the application terminated abnormally
+64      failed      an internal error occurred
+!endblock
+
+H3: Arguments
+
+The set of options is implicitly terminated by the first argument. i.e.
+the first symbol which does not begin with either '-' or '--'. To
+specify an argument which would otherwise be treated as an option, it
+is sometimes necessary to explicitly terminate the options using the '--'
+symbol.
+
+Unless stated otherwise for a particular utility, '+' can be used to specify
+that standard input contains a list of arguments. This feature is
+particularly useful for passing complex arguments to scripts
+on systems with poor support for command line quoting.
+
+If the arguments are files, '-' can be used to indicate standard input.
+
+H3: Providing Default Options
+
+Default options for a utility can be specified in an
+environment variable of the form:
+
+E:   {{name}}OPTS
+
+For example, if {{CMD:hoopy}} supported a -R option for specifying
+a directory to search for report files in, then the user may wish
+to define this directory in an environment variable so that they
+do not need to specify it each time. This could be done by adding
+the following to their {{.profile}}:
+
+E:   HOOPYOPTS=-R/home/me/etc/reports
+E:   export HOOPYOPTS
+
+
+H2: Options
+
+H3: Option Types
+
+Several types of options are supported as outlined in the table below.
+
+!block table
+Option_type         Usage_message_format
+parameter-less      [-x]
+parameter-required  [-x thing]
+parameter-optional  [-x[thing]]
+!endblock
+
+For parameter-optional options, the option parameter typically defaults
+to a particular value if the option is supplied without a parameter.
+For example, the extension of output files can be specified using the -o
+option. The default value of this parameter-optional option is 'out'.
+The series of examples below illustrates this.
+
+^ To send output to standard output:
+
+E:   hoopy *.dat
+
++ To send output to .out files:
+
+E:   hoopy -o *.dat
+
++ To send output to .new files:
+
+E:   hoopy -onew *.dat
+
+As for arguments, '-' can be specified to indicate standard input
+for options expecting a filename.
+
+H3: List Options
+
+Some options have {{list parameters}}. These options can be specified
+several times and/or multiple list elements can be separated with commas.
+For example, the following are all equivalent:
+
+E:   hoopy -ta,b,c *.dat
+E:   hoopy -ta -tb,c *.dat
+E:   hoopy -ta,b -tc *.dat
+E:   hoopy -ta -tb -tc *.dat
+
+In addition to simple lists, lists of name-value pairs are also
+supported. In this case, the name and value are separated by a '='
+or ':' character.
+
+Note: on MS-DOS and OS/2, '=' causes problems so ':' must be used.
+
+If only the name is given, the value is assumed
+to be 1. For example, the following are equivalent:
+
+E:   mycmd -ftbl_dir=../tables -fverbose=1 *.dat
+E:   mycmd -ftbl_dir=../tables -fverbose *.dat
+E:   mycmd -ftbl_dir:../tables -fverbose *.dat
+
+Ordering is not important for name-value lists but may
+be important for normal lists. In either case,
+within a usage message, list options are indicated as follows:
+
+E:   [-t thing,..]
+
+H3: Option Styles
+
+There are two parameter styles: {{short}} and {{long}}.
+Short style is typically used on the command line.
+Long style is useful to improve readability in shell scripts.
+
+In short style:
+
+* options are specified by a single character
+* a set of parameter-less options can be clustered
+* between the option character and the parameter:
+- whitespace is optional for a parameter-required option
+- whitespace is {{not}} permitted for a parameter-optional option
+
+In long style:
+
+* the name can be abbreviated provided it is still unique
+* a '=' or ':' is used to separate the option name from the parameter
+
+Examples are:
+
+E:   hoopy --out *.dat
+
+and
+
+E:   hoopy --out=new *.dat
+
+H3: Option Naming Conventions
+
+Long option names should be selected for maximum readability.
+In general, the short name should be the first letter of the
+long name.
+
+For list options which specify a set of directories to search in:
+
+* the long name should end in '_path'
+* the short name should be a capital letter
+
+If applicable, the capital letter used should be taken from the
+related option. For example, if the -r option is used to specify
+a report file, the -R option should be the list of directories
+to search for the report in.
+
+H2: Commonly Used Options
+
+H3: Overview
+
+There are 3 options available for most utilities:
+
+* -o[out_ext]
+* -l[log_ext]
+* -h[help]
+
+H3: Redirecting Standard Output and Standard Error
+
+By default, generated output goes to standard output. To direct
+output to a file per input file, use the -o option to specify
+an extension for output files. If the -o option is specified
+without a parameter, an extension of {{out}} is assumed.
+Likewise, error messages go to standard error by default. Use
+the -l option to create a log file per input file. If the -l
+option is specified without a parameter, an extension of {{log}}
+is assumed.
+
+For a small number of scripts, there is never a need for
+output or error files per argument. In this case, the -o
+and -l options are not available.
+
+H3: Obtaining Help
+
+The -h option provides help and is always available.
+To obtain a concise description of each option, use the help
+option with no parameter. For example:
+
+!block example
+{{2:$}} sdfget -h
+usage  : sdfget [-h[help]] [-o[out_ext]] [-l[log_ext]] [-g get_rule] [-r[rpt_file]] [-i] file ...
+purpose: extract documentation embedded in source code
+version: 2.000    (SDF 2.000beta9)
+options:
+-h, --help            display help on options
+-o, --out_ext         output file extension
+-l, --log_ext         log file extension
+-g, --get_rule        rule to use to get documentation
+-r, --rpt_file        report file
+-i, --inverse         only output lines not extracted
+!endblock
+
+H3: Obtaining Help on a Given Option
+
+Detailed help on a given option can be obtained by specifying the option
+code as a parameter to the -h option. For example:
+
+!block example
+{{2:$}} sdfget -hg
+usage  : sdfget [-h[help]] [-o[out_ext]] [-l[log_ext]] [-g get_rule] [-r[rpt_file]] [-i] file ...
+purpose: extract documentation embedded in source code
+version: 2.000    (SDF 2.000beta9)
+Detailed help on option: -g,--get_rule
+
+Attribute  Value
+Help       rule to use to get documentation
+Type       STR
+Parameter  yes
+Initial    perl
+Legal      table, perl, cpp, c, eiffel, fortran
+!endblock
+
+H3: Obtaining Special Help
+
+The help option can also be used to
+obtain other useful information by specifying a special keyword
+as the parameter. The keywords supported are:
+
+* {{.parts}} - display name & version of components (and exit)
+* {{.time}} - display execution time (when exiting)
+* {{.calltree}} - display the internal sequence of subroutines leading
+  to utility exit
+
+This type of information is useful when developing scripts but is
+rarely needed by end-users.

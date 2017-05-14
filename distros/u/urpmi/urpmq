@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: urpmq 271299 2010-11-21 15:54:30Z peroyvind $
 
 #- Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
@@ -27,7 +26,7 @@ use urpm;
 use urpm::args;
 use urpm::msg;
 use urpm::sys;
-use urpm::util;
+use urpm::util qw(any cat_ put_in_hash uniq_);
 use urpm::media;
 use urpm::select;
 use urpm::get_pkgs;
@@ -37,7 +36,7 @@ our @names;
 our @src_names;
 
 sub usage() {
-    print urpm::args::copyright('urpmq', $urpm::VERSION, [ '2000-2010', 'Mandriva' ], [ '2012', 'Mageia' ])
+    print urpm::args::copyright('urpmq', [ '2000-2010', 'Mandriva' ], [ '2012-2013', 'Mageia' ])
 	. N("  --help         - print this help message.
 ") . N("  --update       - use only update media.
 ") . N("  --media        - use only the given media, separated by comma.
@@ -49,7 +48,7 @@ sub usage() {
 ") . N("  --auto-orphans - list orphans
 ") . N("  --not-available
                  - list installed packages not available on any media.
-") . N("  --no-suggests  - do not auto select \"suggested\" packages.
+") . N("  --no-recommends - do not auto select \"recommended\" packages.
 ") . N("  --fuzzy        - impose fuzzy search (same as -y).
 ") . N("  --keep         - keep existing packages if possible, reject requested
                    packages that lead to removals.
@@ -81,7 +80,7 @@ sub usage() {
 ") . N("  --obsoletes    - print obsoletes.
 ") . N("  --provides     - print provides.
 ") . N("  --requires     - print requires.
-") . N("  --suggests     - print suggests.
+") . N("  --recommends   - print recommends.
 ") . N("  --sourcerpm    - print sourcerpm.
 ") . N("  --summary, -S  - print summary.
 ") . N("  --verbose, -v  - verbose mode.
@@ -313,8 +312,7 @@ if ($options{list_aliases}) {
 	    #- finally conflicts that will force a new upgrade or a remove.
 	    while (defined ($dep = shift @properties)) {
 		#- take the best package for each choices of same name.
-		my $packages = $urpm->find_candidate_packages($dep);
-		foreach (values %$packages) {
+		foreach ($urpm->find_candidate_packages_($dep)) {
 		    my ($best_requested, $best);
 		    foreach (@$_) {
 			if ($best_requested || exists $requested{$_->id}) {
@@ -350,7 +348,7 @@ if ($options{list_aliases}) {
 			    foreach (map { $urpm->{depslist}[$_] }
 				     grep { ! exists $state->{selected}{$_} && ! exists $properties{$_} }
 				     keys %{$requires{$n} || {}}) {
-				if (grep { URPM::ranges_overlap("$n $s", $_) } $_->requires) {
+				if (any { URPM::ranges_overlap("$n $s", $_) } $_->requires) {
 				    push @properties, $_->id;
 				    $urpm->{debug} and $urpm->{debug}(sprintf "adding package %s (requires %s%s)", $_->name, $pkg->name, $n eq $pkg->name ? '' : " via $n");
 				    $properties{$_->id} = undef;
@@ -366,7 +364,7 @@ if ($options{list_aliases}) {
 				    keep => $options{keep},
 				    rpmdb => $options{env} && "$options{env}/rpmdb.cz",
 				    auto_select => $options{auto_select},
-				    no_suggests => $urpm->{options}{'no-suggests'},
+				    no_recommends => $urpm->{options}{'no-recommends'},
 				    callback_choices => $stop_on_choices);
 	$options{deps} or delete @{$state->{selected}}{grep { exists $state->{selected}{$_} &&
 								  ! defined $state->{selected}{$_} } keys %{$state->{selected}}};
@@ -374,7 +372,7 @@ if ($options{list_aliases}) {
 	#- only deps required.
 	my $empty_db = URPM->new; #- URPM has same methods as URPM::DB and empty URPM will be seen as empty URPM::DB.
 	$urpm->resolve_requested($empty_db, $state, \%requested, 
-				 no_suggests => $urpm->{options}{'no-suggests'},
+				 no_recommends => $urpm->{options}{'no-recommends'},
 				 callback_choices => $stop_on_choices, nodeps => 1);
     } else {
 	$state->{selected} = \%requested;
@@ -503,7 +501,7 @@ if ($options{list_aliases}) {
 	    }
 	}
 	exit $urpm::postponed_code;
-    } elsif (my ($get) = grep { $options{$_} } 'provides', 'requires', 'conflicts', 'obsoletes', 'suggests') {
+    } elsif (my ($get) = grep { $options{$_} } 'provides', 'requires', 'conflicts', 'obsoletes', 'recommends') {
 	my @l = uniq_ { scalar $_->fullname } map { $urpm->{depslist}[$_] } map { split /\|/, $_ } keys %{$state->{selected}};
 	foreach my $pkg (@l) {
 	    if (@l > 1) {

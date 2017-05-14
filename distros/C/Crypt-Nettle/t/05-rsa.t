@@ -58,15 +58,23 @@ my $yarrow_generated_params =
   };
 
 my $digest_algos = [ 'md5', 'sha1', 'sha256', 'sha512' ];
-my $bad_algos = [ 'md2', 'md4', 'sha224', 'sha384' ];
 
 my $test_data = [ '', 'abc123', 'go nettle go!', 'this is test data', 'XMzqir9uXGj4dMyFd+0lLw', 'monkeybusiness' ];
 
-
-plan tests => (8 +
+plan tests => (9 +
+               scalar(@{$digest_algos}) + 
                scalar(keys(%{$yarrow_generated_params})) +
-               (10*scalar(@{$digest_algos})*scalar(@{$test_data})) +
-               scalar(@{$bad_algos}));
+               (8*scalar(@{$digest_algos})*scalar(@{$test_data})*2));
+
+my @reported_digests = sort(Crypt::Nettle::RSA::hashes_available());
+my @digests = sort(@{$digest_algos});
+while (@reported_digests) {
+  my $modea = shift(@digests);
+  my $modeb = shift(@reported_digests);
+  ok($modea eq $modeb);
+}
+ok(0 == scalar(@digests));
+
 
 my $pubkey = Crypt::Nettle::RSA->new_public_key($n, $e);
 my $privkey = Crypt::Nettle::RSA->new_private_key($d, $p, $q);
@@ -99,15 +107,21 @@ use Data::Dumper;
 
 for my $data (@${test_data}) {
   for my $algo (@{$digest_algos}) {
+    my $digest = Crypt::Nettle::Hash::hash_data($algo, $data);
     for my $keypair (['generated', $key], ['stored', $privkey]) {
       my ($keylabel, $curkey) = @{$keypair};
       my $sig = $curkey->rsa_sign($algo, $data);
       ok(defined($sig));
+      my $sig2 = $curkey->rsa_sign_digest($algo, $digest);
+      ok(defined($sig2));
+      ok($sig2 eq $sig);
       my $ret = $curkey->rsa_verify($algo, $data, $sig);
       ok(defined($ret));
       warn Dumper({key => $keylabel, algo => $algo, sig => unpack('H*', $sig), data => $data})
         if($ret != 1);
       ok($ret == 1);
+      $ret = $curkey->rsa_verify_digest($algo, $digest, $sig);
+      ok(defined($ret) && ($ret == 1));
       my $badsig = $sig ^ "\01"; # flip one bit
       $ret = $curkey->rsa_verify($algo, $data, $badsig);
       ok(defined($ret));
@@ -116,7 +130,3 @@ for my $data (@${test_data}) {
   }
 }
 
-for my $algo (@{$bad_algos}) {
-  my $sig = $key->rsa_sign($algo, 'abc123');
-  ok(!defined($sig));
-}

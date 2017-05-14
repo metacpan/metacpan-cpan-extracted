@@ -1,0 +1,44 @@
+NAME
+
+Dancer::Template::MojoTemplate - Mojo::Template wrapper for Dancer
+
+VERSION
+
+version 0.2.0
+
+DESCRIPTION
+
+This is an interface between Dancer's template engine abstraction layer and
+the Mojo::Template module.
+
+In order to use this engine, use the template setting:
+
+    template: mojo_template
+
+This can be done in your config.yml file or directly in your app code with
+the set keyword.
+
+You can configure Mojo::Template :
+
+    template: 'mojo_template'
+    engines:
+        mojo_template:
+            auto_escape: 1
+            trim_mark: '-'
+            prepend: 'my $t = $_[0];'
+
+SEE ALSO
+
+http://perldancer.org/
+http://mojolicio.us/
+
+AUTHOR
+
+James Aitken <jaitken@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by James Aitken.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

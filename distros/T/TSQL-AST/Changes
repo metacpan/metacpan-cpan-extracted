@@ -1,0 +1,10 @@
+Revision history for TSQL::AST
+
+0.01    12/12/12
+        First version, released on an unsuspecting world.  Broken.
+0.02    08/01/13
+        Fixed multiple batch script parsing. Added tests.
+0.03    10/01/13
+        Handle main DDL Create/Alter statements.
+0.04    03/09/2014
+        Kwalitee gaming.

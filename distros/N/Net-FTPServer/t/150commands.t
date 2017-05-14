@@ -1,16 +1,8 @@
-#!/usr/bin/perl -w
-
-# $Id: 150commands.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More tests => 45;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
-
-BEGIN {
-  plan tests => 45;
-}
 
 use Net::FTPServer::InMem::Server;
 
@@ -239,3 +231,5 @@ ok (/^200/);
 print OUTFD0 "QUIT\r\n";
 $_ = <INFD1>;
 ok (/^221/);
+
+__END__

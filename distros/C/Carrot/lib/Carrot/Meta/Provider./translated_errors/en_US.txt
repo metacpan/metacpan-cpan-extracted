@@ -1,0 +1,20 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+package_not_prepared
+	Modularity was requested but diversity hasn't been set up.
+	Package: %s
+
+individuality_without_modularity
+	Individuality was requested but modularity hasn't been set up.
+	Package: %s
+
+already_prepared
+	Diversity for the package has been set up before.
+	Package: %s
+
+diversity_failed
+	Setting up diversity for a package failed.
+	Package: %s

@@ -3,7 +3,7 @@
 
 package Net::Graylog::Client;
 {
-  $Net::Graylog::Client::VERSION = '0.3';
+  $Net::Graylog::Client::VERSION = '0.4';
 }
 
 use strict;
@@ -11,7 +11,7 @@ use warnings;
 use POSIX qw(strftime);
 use Data::Printer;
 use Furl;
-use JSON::Tiny;
+use JSON::Tiny qw(encode_json);
 use Sys::Hostname;
 use Data::UUID;
 use POSIX qw(strftime);
@@ -146,8 +146,7 @@ sub send {
     #     }
     # }
 
-    my $json = JSON::Tiny->new();
-    my $status = $self->_furl->post( $self->url, [ 'Content-Type' => ['application/json'] ], $json->encode( \%data ) );
+    my $status = $self->_furl->post( $self->url, [ 'Content-Type' => 'application/json' ], encode_json( \%data ) );
 
     return ( $status->is_success, $status->code );
 }
@@ -174,6 +173,12 @@ sub AUTOLOAD {
 
     # and perform the actual send
     return $self->send(%params);
+}
+
+# -----------------------------------------------------------------------------
+
+sub DESTROY {
+    return 1;
 }
 
 # -----------------------------------------------------------------------------
@@ -206,7 +211,7 @@ Net::Graylog::Client - Client for Graylog2 analysis server
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 
@@ -229,6 +234,14 @@ adds some defaults.
 * a datetime and timestr field are added, the former is a unix int timestamp, the latter a time string
 * each message gets a uuid
 * a server field will be reinterpreseted as a host field, a default of hostname() will be added if needed
+
+=head1 NAME
+
+Net::Graylog::Client - Client for Graylog2 analysis server
+
+=head1 VERSION
+
+version 0.4
 
 =head1 NAME
 
@@ -329,6 +342,17 @@ Kevin Mulholland <moodfarm@cpan.org>
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2014 by Kevin Mulholland.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+Kevin Mulholland <moodfarm@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by James Lavoy.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

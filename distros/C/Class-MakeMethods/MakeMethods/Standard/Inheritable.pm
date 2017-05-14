@@ -133,7 +133,7 @@ sub scalar {
 	set_vvalue($method->{data}, $self, $value);
       }
     }
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 ########################################################################
@@ -255,7 +255,7 @@ sub array {
 	return array_splicer( $method->{data}{$self}, @_ );
       }
     } 
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 }
 
 ########################################################################
@@ -366,7 +366,7 @@ sub hash {
 	wantarray ? %{ $method->{data}{$self} } : $method->{data}{$self};
       }
     } 
-  } $class->_get_declarations(@_)
+  } $class->get_declarations(@_)
 } 
 
 ########################################################################

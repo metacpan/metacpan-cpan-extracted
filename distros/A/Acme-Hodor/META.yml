@@ -1,0 +1,16 @@
+---
+abstract: 'For programs that I<really> need to hold the door'
+author:
+  - 'Jesse Thompson <zjt@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Hodor
+version: '1.00'
+x_serialization_backend: 'YAML::Tiny version 1.69'

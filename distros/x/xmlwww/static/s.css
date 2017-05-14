@@ -1,0 +1,82 @@
+body {
+	background-color: #444444;
+}
+
+div {
+	padding: 5px;
+	padding-left: 25px;
+	padding-right: 25px;
+	width: 800;
+	background-color: white;
+}
+
+a {
+	color: blue;
+	text-decoration: none;
+}
+
+table {
+	border-spacing: 0px;
+}
+
+th {
+	text-align:center;
+	padding: 4px;
+}
+
+td {
+	text-align:left;
+	padding: 4px;
+}
+
+.www_xml_main {
+	padding: 25px;
+}
+
+.www_xml_header {
+	background-color: #BBBBBB;
+}
+
+.www_xml_userbar {
+	background-color: #EEEEEE;
+}
+
+.www_xml_form_invalid {
+	border: 3px solid red;
+}
+
+.www_xml_error {
+	background-color: red;
+	color: white;
+	border: 1px dotted white;
+	width: 400px;
+}
+
+.www_xml_warning {
+	background-color: yellow ;
+	color: black;
+	border: 1px dotted black;
+	width: 400px;
+}
+
+.www_xml_success {
+	background-color: green ;
+	color: white;
+	border: 1px dotted white;
+	width: 400px;
+}
+
+.xml_www_here {
+	font-size:150%;
+	text-decoration:underline;
+}
+
+.num {
+	text-align: right;
+}
+
+.www_xml_exec_stats {
+	font-size:50%;
+	color:#DDDDDD;
+}
+

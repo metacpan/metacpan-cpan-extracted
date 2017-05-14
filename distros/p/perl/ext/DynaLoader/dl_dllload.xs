@@ -84,7 +84,9 @@
    Other comments within the dl_dlopen.xs file may be helpful as well.
 */
 
+#define PERL_EXT
 #include "EXTERN.h"
+#define PERL_IN_DL_DLLLOAD_XS
 #include "perl.h"
 #include "XSUB.h"
 
@@ -105,24 +107,24 @@ BOOT:
     (void)dl_private_init(aTHX);
 
 
-void *
+void
 dl_load_file(filename, flags=0)
     char *	filename
     int		flags
   PREINIT:
     int mode = 0;
-  CODE:
-{
+    void *retv;
+  PPCODE:
     DLDEBUG(1,PerlIO_printf(Perl_debug_log, "dl_load_file(%s,%x):\n", filename,flags));
     /* add a (void *) dllload(filename) ; cast if needed */
-    RETVAL = dllload(filename) ;
-    DLDEBUG(2,PerlIO_printf(Perl_debug_log, " libref=%lx\n", (unsigned long) RETVAL));
+    retv = dllload(filename) ;
+    DLDEBUG(2,PerlIO_printf(Perl_debug_log, " libref=%lx\n", (unsigned long) retv));
     ST(0) = sv_newmortal() ;
-    if (RETVAL == NULL)
+    if (retv == NULL)
 	SaveError(aTHX_ "%s",strerror(errno)) ;
     else
-	sv_setiv( ST(0), PTR2IV(RETVAL));
-}
+	sv_setiv( ST(0), PTR2IV(retv));
+    XSRETURN(1);
 
 
 int
@@ -139,28 +141,33 @@ dl_unload_file(libref)
     RETVAL
 
 
-void *
-dl_find_symbol(libhandle, symbolname)
+void
+dl_find_symbol(libhandle, symbolname, ign_err=0)
     void *	libhandle
     char *	symbolname
-    CODE:
+    int	        ign_err
+    PREINIT:
+    void *retv;
+    PPCODE:
     DLDEBUG(2, PerlIO_printf(Perl_debug_log,
 			     "dl_find_symbol(handle=%lx, symbol=%s)\n",
 			     (unsigned long) libhandle, symbolname));
-    if((RETVAL = (void*)dllqueryfn(libhandle, symbolname)) == NULL)
-    RETVAL = dllqueryvar(libhandle, symbolname);
+    if((retv = (void*)dllqueryfn(libhandle, symbolname)) == NULL)
+    retv  = dllqueryvar(libhandle, symbolname);
     DLDEBUG(2, PerlIO_printf(Perl_debug_log,
-			     "  symbolref = %lx\n", (unsigned long) RETVAL));
-    ST(0) = sv_newmortal() ;
-    if (RETVAL == NULL)
-	SaveError(aTHX_ "%s",strerror(errno)) ;
+			     "  symbolref = %lx\n", (unsigned long) retv));
+    ST(0) = sv_newmortal();
+    if (retv == NULL) {
+	if (!ign_err) SaveError(aTHX_ "%s", strerror(errno));
+    }
     else
-	sv_setiv( ST(0), PTR2IV(RETVAL));
+	sv_setiv( ST(0), PTR2IV(retv));
+    XSRETURN(1);
 
 
 void
 dl_undef_symbols()
-    PPCODE:
+    CODE:
 
 
 
@@ -170,22 +177,40 @@ void
 dl_install_xsub(perl_name, symref, filename="$Package")
     char *		perl_name
     void *		symref 
-    char *		filename
-    CODE:
+    const char *	filename
+    PPCODE:
     DLDEBUG(2,PerlIO_printf(Perl_debug_log, "dl_install_xsub(name=%s, symref=%lx)\n",
 		perl_name, (unsigned long) symref));
     ST(0) = sv_2mortal(newRV((SV*)newXS_flags(perl_name,
 					      (void(*)(pTHX_ CV *))symref,
 					      filename, NULL,
 					      XS_DYNAMIC_FILENAME)));
+    XSRETURN(1);
 
 
-char *
+SV *
 dl_error()
     CODE:
     dMY_CXT;
-    RETVAL = dl_last_error ;
+    RETVAL = newSVsv(MY_CXT.x_dl_last_error);
     OUTPUT:
     RETVAL
+
+#if defined(USE_ITHREADS)
+
+void
+CLONE(...)
+    CODE:
+    MY_CXT_CLONE;
+
+    PERL_UNUSED_VAR(items);
+
+    /* MY_CXT_CLONE just does a memcpy on the whole structure, so to avoid
+     * using Perl variables that belong to another thread, we create our 
+     * own for this thread.
+     */
+    MY_CXT.x_dl_last_error = newSVpvs("");
+
+#endif
 
 # end.

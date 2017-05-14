@@ -1,0 +1,17 @@
+# $Id: ChangeLog,v 1.7 2002/06/09 15:42:31 petef Exp $
+
+* 7/26/2001 13:56:46 EDT - Pete Fritchman <petef@databits.net>
+  - Initial revision complete (version 0.01)
+
+* 7/26/2001 14:31:51 EDT - Pete Fritchman <petef@databits.net>
+  - CVS Id tags added
+  - Version 0.01 uploaded to CPAN
+
+* 6/9/2001 11:37:44 EDT - Detlef von der Huelst <detlef@tamito.com>
+  - add "use strict", this fixes some bugs in the way i was using scope
+
+* 6/9/2001 11:42:39 EDT - CPAN Tester
+ - add a basic test
+
+* 6/9/2001 11:43:39 EDT - Pete Fritchman <petef@databits.net
+  - release 0.02

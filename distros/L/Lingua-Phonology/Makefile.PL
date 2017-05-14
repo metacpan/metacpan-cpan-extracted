@@ -2,15 +2,12 @@
 
 use ExtUtils::MakeMaker qw(WriteMakefile prompt);
 
-our $prereqs = {
-    XML::Simple => 2.08,
-    Parse::RecDescent => 1.0,
-    B::Deparse => 0.63
-};
+# Note that prereqs are not listed, and have to be managed manually in the meta
+# files
 
 WriteMakefile (
 	NAME			=> 'Lingua::Phonology',
 	ABSTRACT_FROM 	=> 'Phonology.pm',
 	VERSION_FROM 	=> 'Phonology.pm',
-	PREREQ_PM		=> $prereqs
+    NO_META         => 1
 );

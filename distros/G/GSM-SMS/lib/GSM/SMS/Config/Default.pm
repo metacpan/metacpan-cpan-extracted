@@ -1,5 +1,5 @@
 package GSM::SMS::Config::Default;
 
-$Config = {};
-
+$Config = {	
+	};
 1;

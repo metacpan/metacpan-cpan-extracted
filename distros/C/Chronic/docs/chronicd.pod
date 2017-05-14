@@ -1,0 +1,235 @@
+=head1 NAME
+
+Chronic - A constraints-based, opportunistic, application-level scheduler.
+
+
+=head1 DESCRIPTION
+
+Chronic is a constraints-based, opportunistic, application-level
+scheduler. Unlike cron, that schedules according to a time
+specification, Chronic schedules tasks when the specified
+constraints are met. In other words, Chronic schedules during a
+window of opportunity when the circumstances are favorable.
+
+The original motivation for Chronic was for me to be able to
+schedule high-impact, recurring tasks like B<updatedb>, B<emerge
+rsync>, B<webalizer> when I was away from the computer. This
+proved to be useful enough to abstract the notion of a
+I<constraint> and build an opportunistic scheduler that
+schedules according to combinations of arbitrary constraints.
+The current version of Chronic natively contains System
+Inactivity, Disk I/O, Load Average, Frequency and Xscreensaver
+constraints. Network IO activity, cron (that emulates cron), and
+file alterations under a specified directory, are some of the
+constraints planned for a future release.
+
+=head1 USAGE
+
+Chronic is implemented as a Unix daemon, B<chronicd>, that reads
+a B<chrontab> file and executes tasks specified therein. A
+system level B<chrontab> is placed in B</etc/chrontab> and
+user-specific B<chrontab>'s live in B<$HOME/.chrontab>. The only
+option B<chronicd> accepts at the moment is B<-fg> that
+instructs the application to run in foreground and print
+debugging messages.
+
+=head1 CHRONTAB FORMAT
+
+B<chrontab> contains a task per line. A task consists of a
+B<command> to be run, and one or more B<constraint>'s that must
+be met before the command is run. It should be noted that as of
+the current version, when more than one B<constraint> is
+provided for a task, they are B<AND>'ed together. The format of
+task specification is:
+
+    command = COMMAND; constraint = NAME, PARAMETERS; \ 
+        constraint = NAME, PARAMETERS; ...;
+
+    eg: 
+
+    command = "emerge rsync"; constraint = Freq, 86400; \
+        constraint = Inactivity, 60;
+
+A task specification can be split on multiple lines using the
+"\" character. It should be noted that constraint names are
+case-sensitive (and correspond to chucks of code with the
+same name).
+
+=head1 CONSTRAINTS 
+
+Chronic supports the following constraints in the current
+version. This list is likely to grow with future releases, so
+you should check this manpage after upgrading Chronic.
+
+=over 4
+
+=item The B<Inactivity> Constraint
+
+The B<Inactivity> constraint monitors system activity and is met
+when the system is inactive for a specified amount of time.
+Inactivity takes one parameter: the number of seconds for which
+the system must be inactive before the constraint is met. The
+following task will run B<updatedb> when the system has been
+inactive for 120 seconds.
+
+    command = "/usr/bin/updatedb"; constraint = Inactivity, 120;
+
+B<Inactivity> is a wrapper around the DiskIO and Loadavg
+constraints, described later in this section. The constraint's
+notion of inactivity should be appropriate for most systems.
+Otherwise, it is possible to tune the notion of inactivity using
+the DiskIO and Loadavg constraints.
+
+=item The B<Freq> Constraint
+
+The B<Freq> constraint specifies the maximum frequency of
+invocation of a task. B<Freq> requires one parameter, the number
+of seconds, that is the minimum difference between two
+consecutive invocations. So, B<Freq, 86400> implies that the 
+task should not be run more than once a day.  B<Freq> is usually 
+coupled with another constraint (eg: B<Inactivity>) to
+limit the frequency of opportunistic scheduling. For example:
+
+    command = "emerge rsync"; constraint = Inactivity, 120; \ 
+        constraint = Freq, 86400;
+
+says, run "emerge rsync" once a day. However, if the system is
+not inactive for more than one day, "emerge rsync" won't be run
+till the system is inactive.
+
+=item The B<Loadavg> Constraint
+
+The B<Loadavg> constraint monitors the load average of the
+system. It accepts two parameters: a load average threshold and
+the amount of time the system load should linger at or below the
+this threshold before the constraint is considered to be met.
+The syntax is B<Loadavg, TIME, LOADAVG>. eg. B<Loadavg, 60, 0.02> 
+is met when the system has a load average of 0.02 or lower 
+for 60 consecutive seconds. Here's an example of usage:
+
+    command = "cd /home/user/project/; cvs update; make all"; \ 
+        constraint = Loadavg, 60, 0.0; constraint = Freq, 3600;
+
+This task specifies invocation of CVS update under
+B</home/user/project/> and B<make> if the load average is 0.0
+for 60 seconds. The B<Freq> constraint additionally limits the
+task to no more than once in 3600 seconds (one hour).
+
+=item The B<DiskIO> Constraint
+
+The B<DiskIO> constraint monitors the disk read/write activity
+through the B<vmstat> program. It accepts three parameters: a
+threshold for number of blocks read from disk, a threshold for
+number of blocks written to disk and the amount of time for
+which read/write linger at or below these thresholds. B<DiskIO>
+syntax is B<DiskIO, TIME, BLOCKS WRITTEN, BLOCKS
+READ>. eg. B<DiskIO, 60, 10, 15> is met when 10 or less blocks
+READ>  are written to disk and 15 or less blocks are read from 
+disk for 60 consecutive seconds. Here's an example of usage:
+
+    command = "/usr/bin/updatedb"; constraint = DiskIO, 60, 0, 0; \
+        constraint = Freq, 3600;
+
+=item The B<Xscreensaver> Constraint
+
+The B<Xscreensaver> constraints asynchronously monitors
+Xscreensaver through the B<xscreensaver-command> program. It
+accepts one parameter: the number of seconds for which
+B<Xscreensaver> must be enabled before the constraint is met.
+The syntax for the constraint is B<Xscreensaver, TIME>. eg.
+B<Xscreensaver, 120> is met when B<Xscreensaver> is locked for
+120 or more seconds. The constraint is considered to be met
+until the screensaver is unlocked. Here's an example of usage:
+
+    command = "emerge rsync"; Constraint = Xscreensaver, 120; \
+        constraint = Freq, 86400;
+
+=item The B<InXs> Constraint
+
+The B<InXs> constraint (unrelated to the POP band) combines the
+Xscreensaver and Inactivity constraints. It is met when
+B<either> of the constraints is met. B<InXs> is useful for
+scheduling high-load applications on end-user machines because
+it's a good indicator of the user being away from the computer.
+It accepts one parameter: the number of seconds for which either
+of the constraints is enabled before B<InXs> is met. The syntax
+for the constraint is B<InXs, TIME>. eg. B<InXs, 120>. Here's an
+example of usage:
+
+    command = "emerge rsync"; Constraint = InXs, 120; \
+        constraint = Freq, 86400;
+
+=item The B<Ping> Constraint
+
+The B<Ping> constraint sends a ping to a specified address. It
+accepts one parameter: IP address to be pinged. If the address
+is not specified, C<4.2.2.1> is pinged -- an arbitrary address
+on the Internet. B<Ping> syntax is B<Ping, IP>. The constraint
+is considered to be met if the ping is successful. It should be
+noted that the current version of the constraint uses the
+external ping program to send a single ICMP packet to the IP.
+The B<Ping> constraint is useful for tasks that need a
+connection to the Internet but might be run on machines that
+have intermittent connectivity to the Net.
+
+=item The B<Concurrent> Constraint
+
+The B<Concurrent> constraint monitors the number of running
+processes of a specified application and enforces a specified
+level of concurrency. The systax is B<Concurrent, APPLICATION,
+MAX_PROCESSES>. As an example, B<Concurrent, perl, 5> will be
+met if 4 or less B<perl>'s are running at the time of
+evaluation.
+
+=back
+
+=head1 OTHER PARAMETERS
+
+In addition to B<command> and B<constraint> keys, a chrontab
+task entry can also have the following optional keys.
+
+=over 4
+
+=item notify
+
+B<notify> is used to specify a recipient for an email
+notification that is sent with the task is executed. This
+notification contains information on timing and status of the
+executed task. Syntax B<notify = admin@domain>.
+
+=item only_once
+
+B<only_once> is used to indicate that the task should be
+executed only once. Once executed, the scheduler will remove the
+task from the chrontab.
+
+=back
+
+=head1 HUP SIGNAL HANDLING
+
+Send a SIGHUP to chronicd to force it to re-read chrontabs.
+
+=head1 DISCLAIMER
+
+Chronic is alpha software and many a things are likely to
+change, introduced or improve in future releases. If you have
+anything you'd like Chronic to do (or do differently), please
+add a feature request on the sourceforge site,
+B<http://sourceforge.net/projects/chronic> or send mail to
+the author.
+
+=head1 DOWNLOAD 
+
+Chronic is distributed through Sourceforge,
+http://sourceforge.net/projects/chronic/, and CPAN,
+http://search.cpan.org/~vipul/Chronic/
+
+=head1 AUTHOR & LICENSE
+
+Vipul Ved Prakash, E<lt>mail@vipul.netE<gt>
+
+This software is distributed under the ARTISTIC license.
+
+=cut
+
+

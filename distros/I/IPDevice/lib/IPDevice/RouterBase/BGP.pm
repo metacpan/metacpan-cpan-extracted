@@ -3,13 +3,13 @@
 ## This file provides a class for holding informations regarding a BGP instance.
 ####
 
-package RouterBase::BGP;
-use RouterBase::Atom;
-use RouterBase::BGPGroup;
-use RouterBase::BGPVRF;
+package IPDevice::RouterBase::BGP;
+use IPDevice::RouterBase::Atom;
+use IPDevice::RouterBase::BGPGroup;
+use IPDevice::RouterBase::BGPVRF;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom RouterBase::BGPVRF);
+@ISA = qw(IPDevice::RouterBase::Atom IPDevice::RouterBase::BGPVRF);
 
 $VERSION = 0.01;
 
@@ -19,12 +19,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::BGP
+IPDevice::RouterBase::BGP
 
 =head1 SYNOPSIS
 
- use RouterBase::BGP;
- my $bgp = new RouterBase::BGP;
+ use IPDevice::RouterBase::BGP;
+ my $bgp = new IPDevice::RouterBase::BGP;
  $bgp->set_localas(1234);
  my $vrf   = $bgp->vrf('9999');
  my $neigh = $bgp->add_neighbor('192.168.0.2');
@@ -36,7 +36,7 @@ This module provides routines for storing informations regarding a BGP instance.
 =head1 CONSTRUCTOR AND METHODS
 
 This module provides, in addition to all methods from
-L<RouterBase::BGPVRF|RouterBase::BGPVRF>, the following methods.
+L<IPDevice::RouterBase::BGPVRF|IPDevice::RouterBase::BGPVRF>, the following methods.
 
 =cut
 
@@ -96,16 +96,16 @@ sub get_routerid {
 
 =head2 group($name)
 
-Returns the L<RouterBase::BGPGroup|RouterBase::BGPGroup> with the given name.
+Returns the L<IPDevice::RouterBase::BGPGroup|IPDevice::RouterBase::BGPGroup> with the given name.
 If the group does not exist yet, a newly created
-L<RouterBase::BGPGroup|RouterBase::BGPGroup> will be returned.
+L<IPDevice::RouterBase::BGPGroup|IPDevice::RouterBase::BGPGroup> will be returned.
 
 =cut
 sub group {
   my($self, $name) = @_;
-  #print "DEBUG: RouterBase::BGP::group(): Called. ($name)\n";
+  #print "DEBUG: IPDevice::RouterBase::BGP::group(): Called. ($name)\n";
   return $self->{groups}->{$name} if $self->{groups}->{$name};
-  my $group = new RouterBase::BGPGroup;
+  my $group = new IPDevice::RouterBase::BGPGroup;
   $group->set_toplevel($self->toplevel);
   $group->set_parent($self->parent);
   $group->set_name($name);
@@ -115,15 +115,15 @@ sub group {
 
 =head2 vrf($vrfname)
 
-Returns the L<RouterBase::BGPVRF|RouterBase::BGPVRF> with the given name, or,
-if none found, a new L<RouterBase::BGPVRF|RouterBase::BGPVRF>.
+Returns the L<IPDevice::RouterBase::BGPVRF|IPDevice::RouterBase::BGPVRF> with the given name, or,
+if none found, a new L<IPDevice::RouterBase::BGPVRF|IPDevice::RouterBase::BGPVRF>.
 
 =cut
 sub vrf {
   my($self, $vrfname) = @_;
-  #print "DEBUG: RouterBase::BGPVRF::vrf(): Called. ($vrfname)\n";
+  #print "DEBUG: IPDevice::RouterBase::BGPVRF::vrf(): Called. ($vrfname)\n";
   return $self->{vrfs}->{$vrfname} if $self->{vrfs}->{$vrfname};
-  $self->{vrfs}->{$vrfname} = new RouterBase::BGPVRF(name => $vrfname);
+  $self->{vrfs}->{$vrfname} = new IPDevice::RouterBase::BGPVRF(name => $vrfname);
   $self->{vrfs}->{$vrfname}->set_toplevel($self->toplevel);
   $self->{vrfs}->{$vrfname}->set_parent($self->parent);
   return $self->{vrfs}->{$vrfname};
@@ -135,7 +135,7 @@ sub vrf {
 Walks through all VRFs calling the function $func.
 Args passed to $func are:
 
-I<$vrf>: The L<RouterBase::BGPVRF|RouterBase::BGPVRF>.
+I<$vrf>: The L<IPDevice::RouterBase::BGPVRF|IPDevice::RouterBase::BGPVRF>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, the VRF list evaluation will be stopped.
@@ -143,10 +143,10 @@ If $func returns FALSE, the VRF list evaluation will be stopped.
 =cut
 sub foreach_vrf {
   my($self, $func, %data) = @_;
-  #print "DEBUG: RouterBase::BGP::foreach_vrf(): Called.\n";
+  #print "DEBUG: IPDevice::RouterBase::BGP::foreach_vrf(): Called.\n";
   for my $vrfname (sort {$a <=> $b} keys %{$self->{vrfs}}) {
     my $vrf = $self->{vrfs}->{$vrfname};
-    #print "DEBUG: RouterBase::BGP::foreach_vrf(): VRF $vrfname\n";
+    #print "DEBUG: IPDevice::RouterBase::BGP::foreach_vrf(): VRF $vrfname\n";
     return FALSE if !$func->($vrf, %data);
   }
   return TRUE;
@@ -158,7 +158,7 @@ sub foreach_vrf {
 Walks through all VRFs/BGP neighbors calling the function $func.
 Args passed to $func are:
 
-I<$neighbor>: The L<RouterBase::BGPNeighbor|RouterBase::BGPNeighbor>.
+I<$neighbor>: The L<IPDevice::RouterBase::BGPNeighbor|IPDevice::RouterBase::BGPNeighbor>.
 I<%data>: The given data, just piped through.
 
 If $func returns FALSE, the neighbor list evaluation will be stopped.
@@ -166,10 +166,10 @@ If $func returns FALSE, the neighbor list evaluation will be stopped.
 =cut
 sub foreach_neighbor {
   my($self, $func, %data) = @_;
-  #print "DEBUG: RouterBase::BGP::foreach_neighbor(): Called.\n";
+  #print "DEBUG: IPDevice::RouterBase::BGP::foreach_neighbor(): Called.\n";
   for my $vrfname (sort {$a <=> $b} keys %{$self->{vrfs}}) {
     my $vrf = $self->{vrfs}->{$vrfname};
-    #print "DEBUG: RouterBase::BGP::foreach_neighbor(): VRF $vrfname\n";
+    #print "DEBUG: IPDevice::RouterBase::BGP::foreach_neighbor(): VRF $vrfname\n";
     return FALSE if !$vrf->foreach_neighbor($func, %data);
   }
   return TRUE;

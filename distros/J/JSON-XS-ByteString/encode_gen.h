@@ -4,17 +4,25 @@ STRLEN CONCAT(estimate_, NAME)(SV * sv){
     if( sv!=NULL ){
         if( SvROK(sv) && (!UNBLESSED || !sv_isobject(sv)) ){
             SV * rvs = SvRV(sv);
+            for(int i=visited_p-1; i>=0; --i)
+                if( visited[i] == rvs )
+                    return 4;
+            reserve_visited_capacity();
+            visited[visited_p++] = rvs;
             switch( SvTYPE(rvs) ){
                 case SVt_PVAV: {
                     AV * av = (AV*) rvs;
                     SSize_t n = av_len(av);
-                    if( n<0 )
+                    if( n<0 ){
+                        --visited_p;
                         return 2;
+                    }
 
                     STRLEN len = 2 + n;
                     SV ** elems = AvARRAY(av);
                     for(int i=0; i<=n; ++i)
                         len += CONCAT(estimate_, NAME)(elems[i]);
+                    --visited_p;
                     return len;
                 }
                 case SVt_PVHV: {
@@ -34,9 +42,11 @@ STRLEN CONCAT(estimate_, NAME)(SV * sv){
                     }
                     if( len==1 )
                         ++len;
+                    --visited_p;
                     return len;
                 }
                 default:
+                    --visited_p;
                     break;
             }
             if( SvTYPE(rvs) < SVt_PVAV ){
@@ -75,6 +85,11 @@ unsigned char * CONCAT(encode_, NAME)(unsigned char * buffer, SV * sv){
     if( sv!=NULL ){
         if( SvROK(sv) && (!UNBLESSED || !sv_isobject(sv)) ){
             SV * rvs = SvRV(sv);
+            for(int i=visited_p-1; i>=0; --i)
+                if( visited[i] == rvs )
+                    goto DEGENERATE;
+            reserve_visited_capacity();
+            visited[visited_p++] = rvs;
             switch( SvTYPE(rvs) ){
                 case SVt_PVAV: {
                     *buffer++ = '[';
@@ -91,6 +106,7 @@ unsigned char * CONCAT(encode_, NAME)(unsigned char * buffer, SV * sv){
                     }
 
                     *buffer++ = ']';
+                    --visited_p;
                     return buffer;
                 }
                 case SVt_PVHV: {
@@ -116,9 +132,11 @@ unsigned char * CONCAT(encode_, NAME)(unsigned char * buffer, SV * sv){
                         *buffer++ = '}';
                     else
                         *(buffer-1) = '}';
+                    --visited_p;
                     return buffer;
                 }
                 default:
+                    --visited_p;
                     break;
             }
             if( SvTYPE(rvs) < SVt_PVAV ){
@@ -172,6 +190,7 @@ unsigned char * CONCAT(encode_, NAME)(unsigned char * buffer, SV * sv){
             return encode_str(buffer, (unsigned char*)str, len);
         }
     }
+    DEGENERATE:
     *buffer++ = 'n';
     *buffer++ = 'u';
     *buffer++ = 'l';

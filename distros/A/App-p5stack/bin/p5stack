@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+# PODNAME: p5stack
+# ABSTRACT: yet another CPAN/perl release manager tool
+
+use strict;
+use warnings;
+
+use App::p5stack;
+
+my $app = App::p5stack->new(@ARGV);
+$app->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+p5stack - yet another CPAN/perl release manager tool
+
+=head1 VERSION
+
+version 0.004
+
+=head1 AUTHOR
+
+Nuno Carvalho <smash@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Nuno Carvalho.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

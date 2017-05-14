@@ -1,0 +1,31 @@
+/* XPM */
+static char * delete_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"17 17 8 1",
+/* colors */
+"  s None c None",
+". c #9C6264",
+"X c #CC0204",
+"o c #FC9E34",
+"O c #FC0204",
+"+ c #9C0204",
+"@ c #CC3234",
+"# c #FC6204",
+/* pixels */
+"                 ",
+"                 ",
+" .X.         X   ",
+" XoO+      X+    ",
+"  XOO+    X+     ",
+"    XO+  X+      ",
+"     XO+X+       ",
+"      XO+        ",
+"     XO+O+       ",
+"    XO+  O+      ",
+"   XO+    O+     ",
+"  @#X      O     ",
+" @oO+       O    ",
+" @O+             ",
+"  +          O   ",
+"                 ",
+"                 "};

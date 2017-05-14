@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our $DEV_SHM = "/dev/shm";
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
@@ -88,6 +88,12 @@ sub new {
             carp "Forks::Queue::new: 'list' option must be an array ref";
         }
     }
+
+    if ($opts{remote}) {
+        require Net::Objwrap;
+        Net::Objwrap::wrap($opts{remote},$self);
+    }
+
     return $self;
 }
 
@@ -116,7 +122,7 @@ Forks::Queue::Shmem - Forks::Queue implementation using shared memory
 
 =head1 VERSION
 
-0.06
+0.08
 
 =head1 DESCRIPTION
 

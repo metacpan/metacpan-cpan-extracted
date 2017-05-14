@@ -1,0 +1,314 @@
+NAME
+    Net::SFTP::Recursive - Perl class for transfering files recursively and
+    securely
+
+SYNOPSIS
+      use Net::SFTP::Recursive;
+
+      my %cfg = (user=>'usr_id', password=>'secret',
+                 local_dir=>'/ftp/dir', remote_dir=>'/remote/dir',
+                 file_filter=>'ftp*');
+      my $sftp = Net::SFTP::Recursive->new;
+      # or combine the two together
+      my $sftp = Net::SFTP::Recursive->new(%cfg);
+
+      # transfer files from local to remote
+      $sftp->rput('/my/local/dir','/remote/dir'); 
+
+      # transfer files from remote to local
+      $sftp->rget('/pub/remotel/dir','/local/dir'); 
+
+      # pass the output to &my_cb method to process
+      $sftp->rget('/pub/mydir', '/local/dir', \&my_cb);
+
+      # with file and dir filters
+      $sftp->rget('/pub/mydir', '/local/dir', \&my_cb,
+            {file_pat=>'pdf$', dir_pat=>'^f'});
+
+      # you can also use a callback method for get or put method as well
+      $sftp->rget('/remote/dir','/my/dir',\&my_cb,{cb4get=>\&myget_cb});
+      $sftp->rput('/my/dir','/remote/dir',\&my_cb,{cb4put=>\&mysub_cb});
+
+DESCRIPTION
+    This class contains methods to transfer files recursively and securely
+    using Net::SFTP and Net::SSH::Perl.
+
+    *Net::SFTP* is a pure-Perl implementation of the Secure File Transfer
+    Protocol (SFTP)--file transfer built on top of the SSH protocol.
+    *Net::SFTP* uses *Net::SSH::Perl* to build a secure, encrypted tunnel
+    through which files can be transferred and managed. It provides a subset
+    of the commands listed in the SSH File Transfer Protocol IETF draft,
+    which can be found at
+    *http://www.openssh.com/txt/draft-ietf-secsh-filexfer-00.txt*.
+
+    SFTP stands for Secure File Transfer Protocol and is a method of
+    transferring files between machines over a secure, encrypted connection
+    (as opposed to regular FTP, which functions over an insecure
+    connection). The security in SFTP comes through its integration with
+    SSH, which provides an encrypted transport layer over which the SFTP
+    commands are executed, and over which files can be transferred. The SFTP
+    protocol defines a client and a server; only the client, not the server,
+    is implemented in *Net::SFTP*.
+
+    Because it is built upon SSH, SFTP inherits all of the built-in
+    functionality provided by *Net::SSH::Perl*: encrypted communications
+    between client and server, multiple supported authentication methods
+    (eg. password, public key, etc.).
+
+    This class extends from *Net::SFTP* and inherents all the methods from
+    it, plus more methods: *rget*, *rput*, and *local_ls*.
+
+  new ($host, %args)
+
+    Input variables:
+
+      $host - ftp host name or IP address 
+      %args - configuration parameters 
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Net::SFTP::Recursive;      # or
+       my $obj = Net::SFTP::Recursive->new;     # or
+       my $svr = 'ftp.mydomain.com'; 
+       my $obj = Net::SFTP::Recursive->new($svr,
+          user=>'usr',password=>'pwd'); 
+
+    Return: new empty or initialized Net::SFTP::Recursive object.
+
+    Opens a new SFTP connection with a remote host *$host*, and returns a
+    *Net::SFTP* object representing that open connection.
+
+    *%args* can contain:
+
+    * user
+        The username to use to log in to the remote server. This should be
+        your SSH login, and can be empty, in which case the username is
+        drawn from the user executing the process.
+
+        See the *login* method in *Net::SSH::Perl* for more details.
+
+    * password
+        The password to use to log in to the remote server. This should be
+        your SSH password, if you use password authentication in SSH; if you
+        use public key authentication, this argument is unused.
+
+        See the *login* method in *Net::SSH::Perl* for more details.
+
+    * debug
+        If set to a true value, debugging messages will be printed out for
+        both the SSH and SFTP protocols. This automatically turns on the
+        *debug* parameter in *Net::SSH::Perl*.
+
+        The default is false.
+
+    * warn
+        If given a sub ref, the sub is called with $self and any warning
+        message; if set to false, warnings are supressed; otherwise they are
+        output with 'warn' (default).
+
+    * ssh_args
+        Specifies a reference to a list of named arguments that should be
+        given to the constructor of the *Net::SSH::Perl* object underlying
+        the *Net::SFTP* connection.
+
+        For example, you could use this to set up your authentication
+        identity files, to set a specific cipher for encryption, etc.
+
+        See the *new* method in *Net::SSH::Perl* for more details.
+
+METHODS
+    The following are the common methods, routines, and functions defined in
+    this classes.
+
+  Exported Tag: All
+
+    The *:all* tag includes all the methods or sub-rountines defined in this
+    class.
+
+      use Net::SFTP::Recursive qw(:all);
+
+    It includes the following sub-routines:
+
+   rget ($remote, $local, \&callback, $ar)
+
+    Input variables:
+
+      $remote - remote path on ftp server
+      $local  - local path for storing the files and directories
+      \&callback - a sub routine to process the intermediate information
+      $ar     - hash ref for additional parameters 
+          file_pat - pattern for filtering file name such as
+            .txt$ - all the files with .txt extension 
+          dir_pat  - pattern for filtering directory name 
+            ^F   - all the dir starting with F
+          cb4get - sub ref for passing to get method. See callback 
+                   in get method in Net::SFTP
+ 
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $svt = 'ftp.mydomain.com';
+      my %cfg = (user=>'test_user', password => 'secure', debug=>1);
+      my $sftp = Net::SFTP::Recursive->new($svr, %cfg);
+         $sftp->rget('/pub/mydir', '/local/dir', \&my_cb);
+      # with file and dir filters
+         $sftp->rget('/pub/mydir', '/local/dir', \&my_cb,
+            {file_pat=>'pdf$', dir_pat=>'^f', cb4get=>\&myget_cb});
+
+    Return: $msg - number of files transferred
+
+    Downloads files and/or sub-directory from *$remote* to *$local*. If
+    *$local* is specified, it is opened/created, and the contents of the
+    remote file *$remote* are written to *$local*. In addition, its
+    filesystem attributes (atime, mtime, permissions, etc.) will be set to
+    those of the remote file.
+
+    If *rget* is called in a non-void context, returns the contents of
+    *$remote* (as well as writing them to *$local*, if *$local* is provided.
+    Undef is returned on failure.
+
+    *$local* is default to the current directory if it is not specified.
+
+    If *\&callback* is specified, it should be a reference to a subroutine.
+    The subroutine will be executed at each iteration of transfering a file.
+    The callback function will receive as arguments: a *Net::SFTP* object
+    with an open SFTP connection; the remote file path and name; the local
+    file path and name and the hash reference containing atime, mtime,
+    flags, uid, gid, perm, and size in bytes). You can use this mechanism to
+    provide status messages, download progress meters, etc.:
+
+        sub callback {
+            my($sftp, $remote, $local, $ar) = @_;
+            print "Copied from $remote to $local ($ar->{size} Bytes)\n";
+        }
+
+   rput ($local, $remote, \&callback, $ar)
+
+    Input variables:
+
+      $local  - local path for storing the files and directories
+      $remote - remote path on ftp server
+      \&callback - a sub routine to process the intermediate information
+      $ar     - hash ref for additional parameters 
+          file_pat - pattern for filtering file name such as
+            .txt$ - all the files with .txt extension 
+          dir_pat  - pattern for filtering directory name 
+            ^F   - all the dir starting with F
+          cb4put - sub ref for passing to get method. See callback 
+                   in put method in Net::SFTP
+ 
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $svt = 'ftp.mydomain.com';
+      my %cfg = (user=>'test_user', password => 'secure', debug=>1);
+      my $sftp = Net::SFTP::Recursive->new($svr, %cfg);
+         $sftp->rput('/local/mydir', '/remote/dir', \&my_cb);
+      # with file and dir filters
+         $sftp->rput('/local/mydir', '/remote/dir', \&my_cb,
+            {file_pat=>'pdf$', dir_pat=>'^f', cb4put=>\&myput_cb});
+
+    Return: $msg - number of files transferred
+
+    Downloads files and/or sub-directory from *$remote* to *$local*. If
+    *$local* is specified, it is opened/created, and the contents of the
+    remote file *$remote* are written to *$local*. In addition, its
+    filesystem attributes (atime, mtime, permissions, etc.) will be set to
+    those of the remote file.
+
+    If *rget* is called in a non-void context, returns the contents of
+    *$remote* (as well as writing them to *$local*, if *$local* is provided.
+    Undef is returned on failure.
+
+    *$local* is default to the current directory if it is not specified.
+
+    If *\&callback* is specified, it should be a reference to a subroutine.
+    The subroutine will be executed at each iteration of transfering a file.
+    The callback function will receive as arguments: a *Net::SFTP* object
+    with an open SFTP connection; the remote file path and name; the local
+    file path and name and the hash reference containing atime, mtime,
+    flags, uid, gid, perm, and size in bytes). You can use this mechanism to
+    provide status messages, download progress meters, etc.:
+
+        sub callback {
+            my($sftp, $local, $remote, $ar) = @_;
+            print "Copied from $remote to $local ($ar->{size} Bytes)\n";
+        }
+
+   local_ls ($ldr[,$sr[,$hr]])
+
+    Input variables:
+
+      $ldr    - local path for files and sub-directories to be listed
+      $sr     - sub ref for processing each file stat
+      $hr     - hash ref for passing any additional parameters 
+          file_pat - pattern for filtering file name such as
+            .txt$ - all the files with .txt extension 
+          dir_pat  - pattern for filtering directory name 
+            ^F   - all the dir starting with F
+          cb4put - sub ref for passing to get method. See callback 
+                   in put method in Net::SFTP
+ 
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $svt = 'ftp.mydomain.com';
+      my %cfg = (user=>'test_user', password => 'secure', debug=>1);
+      my $sftp = Net::SFTP::Recursive->new($svr, %cfg);
+      # just get the result in list
+      my @dir = $sftp->local_ls('/local/dir');
+      # pass additional parameters and get the result as scalar (array ref) 
+      my $ar2 = $sftp->local_ls('/local/dir',undef,
+            {file_pat=>'pdf$', dir_pat=>'^f'}
+         );
+      # process the file in proc_file sub routine
+      $sftp->local_ls('/local/dir',\&proc_file);
+
+    Return: @r or \@r depends on the caller subroutine.
+
+    This methods fetches a directory listing of *$ldr*.
+
+    If *$sr* is specified, for each entry in the directory, *$sr* will be
+    called and given a reference to a hash with three keys: *filename*, the
+    name of the entry in the directory listing; *longname*, an entry in a
+    "long" listing like "ls -l"; and *a*, a *Net::SFTP::Attributes* object,
+    which contains the file attributes of the entry (atime, mtime,
+    permissions, etc.).
+
+    If *$subref* is not specified, returns a list of directory entries, each
+    of which is a reference to a hash as described in the previous
+    paragraph.
+
+HISTORY
+    * Version 0.10
+        This version includes the *rget*, *rput* and *local_ls* methods. It
+        is released on 07/12/2005.
+
+        07/13/2005 (htu) - changed *rput* so that it is passing a
+        *Net::SFTP::Attributes* object to *do_mkdir*. Changed version to
+        0.11.
+
+SEE ALSO (some of docs that I check often)
+        Data::Describe, Oracle::Loader, CGI::Getopt, File::Xcopy
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

@@ -1,0 +1,24 @@
+Announcing the release of Perl Module Log::Topics Version 0.02
+Uploaded to CPAN under my home directory as Log-Topics-0.02.tar.gz
+
+This module was previously named File::Diagnostic, but has been
+renamed under advice. The function names have also been changed
+accordingly however the basic operation is the same. If you have used
+File::Diagnostic please remove it and replace with this module. I
+apologise for any inconvenience.
+
+Log::Topics -  control flow of logging messages by named topics
+
+This package provides services for controlling the output of logging
+messages from an application. Log messages are identified by named
+topics, and the messages for each topic can be directed or redirected
+to file handles or files.
+
+Suggested Module Entry
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Log::
+::Topics       Rdpf    control flow of logging messages           JARW
+
+  JARW John A.R. Williams <J.A.R.Williams@aston.ac.uk>

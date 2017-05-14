@@ -1,0 +1,2 @@
+"input" fails to match "^(SGI|HP|Sun|DEC)$"
+Answer = "undef"

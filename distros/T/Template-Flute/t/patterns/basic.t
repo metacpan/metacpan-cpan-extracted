@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Template::Flute;
-use Test::More;
+use Test::More tests => 8;
 use Data::Dumper;
 
 my ($spec, $html, $flute, $out, $expected);
@@ -101,32 +101,6 @@ EXPECTED
 
 $expected =~ s/\n//g;
 like $out, qr/\Q$expected\E/, "Interpolation value by pattern with false value";
-
-# pattern string appears twice in HTML string
-my $html_twice =<<'HTML';
-<p class="cartline">There are 0 items in your sh0pping cart.</p>
-<ul>
-  <li class="items">
-    <span class="number">1</span>
-    <span class="category">in category 123</span>
-  </li>
-</ul>
-HTML
-
-$flute = Template::Flute->new(template => $html_twice,
-                              specification => $spec,
-                              values => {
-                                         cartline => "42",
-                                        });
-
-$out = $flute->process;
-
-$expected =<<'EXPECTED';
-<p class="cartline">There are 42 items in your sh42pping cart.</p>
-EXPECTED
-
-$expected =~ s/\n//g;
-like $out, qr/\Q$expected\E/, "Interpolation value by pattern with two occurences in HTML";
 
 # multiple patterns
 
@@ -242,5 +216,3 @@ EXPECTED
 
 $expected =~ s/\n//g;
 like $out, qr/\Q$expected\E/, "Interpolation param by pattern";
-
-done_testing;

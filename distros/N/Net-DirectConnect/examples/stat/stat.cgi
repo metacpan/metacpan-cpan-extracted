@@ -1,16 +1,19 @@
 #!/usr/bin/perl
-#$Id: stat.cgi 792 2011-06-09 21:44:44Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/stat/stat.cgi $
+#$Id: stat.cgi 998 2013-08-14 12:21:20Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/stat/stat.cgi $
 package statcgi;
 use strict;
 use utf8;
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use MIME::Base64;
-eval { use Time::HiRes qw(time sleep); };
+use Time::HiRes qw(time sleep);
 use Data::Dumper;    #dev only
 $Data::Dumper::Sortkeys = $Data::Dumper::Useqq = $Data::Dumper::Indent = 1;
 our ( %config, $param, $db, );
 use lib::abs qw(../../lib ./);
 use statlib;
-binmode( STDOUT, ":utf8" );
+#binmode( STDOUT, ":utf8" );
+use encoding 'utf8';
+#use encoding 'utf8', STDOUT=> 'utf8', STDIN => 'utf8', STDERR=> 'utf8',;
 #our $root_path;
 #BEGIN {
 #  ( $ENV{'SCRIPT_FILENAME'} || $0 ) =~ m|^(.+)[/\\].+?$|;                                                             #v0w
@@ -24,16 +27,24 @@ binmode( STDOUT, ":utf8" );
 use Net::DirectConnect::pslib::psmisc
   #qw(%config)
   ;    # qw(:config :log printlog);
-psmisc->import qw(:log);
-
+psmisc->import(qw(:log));
+use Net::DirectConnect::pslib::psweb;
+#print "Content-type: text/html\n\n";
 sub part ($;@) {
   my $name = shift;
-  psmisc::code_run( $config{'out'}{ $config{'view'} }{$name} || $config{'out'}{''}{$name}, @_ );
+  #print "part[$config{'view'}:$name]\n";
+  local $_ = $config{'out'}{ $config{'view'} }{$name} || $config{'out'}{''}{$name};
+  return psmisc::code_run( $_, @_ ) if ref eq 'CODE';
+  psmisc::printall $_;
 }
 #first is default
 our @colors = qw(black aqua gray navy silver green olive teal blue lime purple magenta maroon red yellow);
 #$param = psmisc::get_params();
-$param = psmisc::get_params_utf8();
+#$param = psmisc::get_params_utf8();
+#warn Dumper __FILE__, __LINE__, $param;
+#psweb::config_init($param);
+#psmisc::configure($ENV{'MOD_PERL'} || $ENV{'FCGI_ROLE'});
+#psmisc::conf();
 delete $param->{'period'} unless exists $config{'periods'}{ $param->{'period'} };
 $config{'view'} = $param->{'view'} || 'html';
 #$config{'view'} = 'rss';
@@ -43,6 +54,36 @@ $config{'out'}{'html'}{'http-header'} = sub {
 };
 $config{'out'}{'rss'}{'http-header'} = sub {
   print "Content-type: application/rss+xml; charset=utf-8\n\n";
+};
+my $json;
+$config{'out'}{'json'}{'http-header'} = "Content-type: application/json\n\n";
+#$config{'out'}{'json'}{'http-header'} = "Content-type: text/plain\n\n";
+$config{'out'}{'json'}{'head'} = sub {
+  $json = {};
+};
+$config{'out'}{'json'}{'table-head'} = sub {
+  my ($q) = @_;
+  $json->{table_current} = $q->{name};
+  $json->{ $json->{table_current} }{'head'} = $q;
+};
+$config{'out'}{'json'}{'footer'} = sub {
+  #$json->{__test} = [qq{-'"-}, qq{-'"`-}];
+  #if ( psmisc::use_try 'JSON::XS' ) { return print JSON::XS->new->encode($json) }
+  #print 'string',Dumper $json;
+  #print 'stringTR',$json;
+  #print ${ psmisc::json_encode($json) };
+  print +($param->{'callback'} ? $param->{'callback'} . '(':'') ,${ psmisc::json_encode($json || {}) }, ($param->{'callback'} ? ');' : '');
+
+  #print ${psmisc::json_encode($json)};
+};
+$config{'out'}{'json'}{'table-row'} ||= sub {
+  my ($row) = @_;
+  #print 'string',Dumper \@_;
+  $row = { %$row, %{ $row->{orig} || {} } };
+  delete $row->{orig};
+  delete $row->{$_} for grep { !length $row->{$_} } keys %$row;
+  push @{ $json->{ $json->{table_current} }{'rows'} ||= [] }, $row;
+  #print 'stringTR',$json;
 };
 part 'http-header' if $ENV{'SERVER_PORT'};
 $config{'out'}{'rss'}{'footer'} = sub { print '</channel></rss>'; };
@@ -70,9 +111,9 @@ $config{'human'}{'magnet-dl'} = sub {
     ( $string            ? 'kt=' . psmisc::encode_url($string)              : '' ),
     ( ( $row->{'hub'} and $row->{'hub'} ne 'localhost' ) ? 'xs=dchub://' . $row->{'hub'} : '' );
   return
-      '&nbsp;<a class="magnet-darr" href="magnet:?' 
+      ' <a class="magnet-darr" href="magnet:?' 
     . $_
-    . '">[&dArr;]</a> <a href="http://dc.proisk.ru/?'
+    . '">[↓]</a> <a href="http://dc.proisk.com/?'
     . ( $row->{'string'} ? "q=" . $row->{'string'} : "tiger=$row->{'tth'}" )
     . '">P</a>'
     if $_;
@@ -82,10 +123,7 @@ $config{'human'}{'dchub-dl'} = sub {
   my ($row) = @_;
   $row = { 'hub' => $row } unless ref $row eq 'HASH';
   #print "[$row->{'hub'}; $row->{'nick'}]";
-  return
-      '&nbsp;<a class="magnet-darr" href="dchub://'
-    . ( join '/', grep { $_ } map { $row->{$_} } qw(hub nick) )
-    . '">[&dArr;]</a>'
+  return ' <a class="magnet-darr" href="dchub://' . ( join '/', grep { $_ } map { $row->{$_} } qw(hub nick) ) . '">[↓]</a>'
     if length $row->{'hub'};
 };
 #print '<a>', psmisc::html_chars( $param->{'tth'} ), '</a>', psmisc::human( 'magnet-dl', $param->{'tth'} ), '<br/>'  if $param->{'tth'};
@@ -93,22 +131,30 @@ my @ask;
 $config{'queries'}{'string'}{'desc'} = psmisc::html_chars( $param->{'string'} ), @ask = ('string') if $param->{'string'};
 @ask = ('tth')      if $param->{'tth'};
 @ask = ('filename') if $param->{'filename'};
-@ask = ( $param->{'query'} ) if $param->{'query'} and $config{'queries'}{ $param->{'query'} };
-$config{'query_default'}{'LIMIT'} = 100 if scalar @ask == 1;
+@ask                              = ( $param->{'query'} ) if $param->{'query'} and $config{'queries'}{ $param->{'query'} };
+@ask                              = ('q')                 if $param->{'q'};
+$config{'query_default'}{'LIMIT'} = 100                   if scalar @ask == 1;
 my %makegraph;
 my %graphcolors;
 my $rss_link = ( @ask ? '?' . $ENV{'QUERY_STRING'} : '?query=queries+top+tth' );
 $config{'out'}{'html'}{'head'} = sub {
   #print "Content-type: text/xml; charset=utf-8\n\n" if $ENV{'SERVER_PORT'};
-  #print qq{<!DOCTYPE html>
-  print qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  print qq{<!DOCTYPE html>};
+  #print qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">};
+  print
+qq{<html xmlns="http://www.w3.org/1999/xhtml" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <head><title>RU DC stat</title>
 <link href="style.css" rel="stylesheet" type="text/css"/>
 <link rel="alternate" type="application/rss+xml" title="RSS version" href="}, psmisc::html_chars( $rss_link . '&view=rss' ),
     qq{"/>
 
-<style></style></head><body><script type="text/javascript" src="pslib/lib.js"></script>};
+<style></style></head><body><script><![CDATA[
+function gid(a) {
+  if (a && typeof a == 'object') return a;
+  return document.getElementById(a) || {};
+}
+]]></script>};
+qq{<script type="text/javascript" src="pslib/lib.js"></script>};
 #print '    <svg:svg version="1.1" baseProfile="full" width="300px" height="200px">      <svg:circle cx="150px" cy="100px" r="50px" fill="#ff0000" stroke="#000000" stroke-width="5px"/>    </svg:svg>';
 };
 part 'head';
@@ -129,15 +175,18 @@ $config{'out'}{'html'}{'header'} = sub {
       $param->{$_}
     } qw(string tth)
     ) or ( $param->{'query'} and !$config{'queries'}{ $param->{'query'} }{'periods'} );
+  part 'header_in_top';
   print '<br/>';
   print
-qq{<div class="main-top-info">Для скачивания файлов по ссылке <a class="magnet-darr">[&dArr;]</a> необходим <a href="http://en.wikipedia.org/wiki/DC%2B%2B#Client_software_comparison">dc клиент</a></div>};
+qq{<div class="main-top-info">Для скачивания файлов по ссылке <a class="magnet-darr">[↓]</a> необходим <a href="http://en.wikipedia.org/wiki/DC%2B%2B#Client_software_comparison">dc клиент</a></div>};
 };
 part 'header';
+#print Dumper \@ask;
 my @queries = @ask ? @ask : sort { $config{'queries'}{$a}{'order'} <=> $config{'queries'}{$b}{'order'} }
   grep { $config{'queries'}{$_}{'main'} } keys %{ $config{'queries'} };
 for my $query (@queries) {
-  my $q = { %{ $config{'queries'}{$query} || next } };
+  my $q = { name => $query, %{ $config{'queries'}{$query} || next } };
+  #print Dumper $q, ;
   next if $q->{'disabled'};
   $q->{'desc'} = $q->{'desc'}{ $config{'lang'} } if ref $q->{'desc'} eq 'HASH';
   $config{'out'}{'rss'}{'table-head'} = sub {
@@ -162,10 +211,16 @@ for my $query (@queries) {
         ? ( !( $param->{$query} ) ? () : "= " . psmisc::html_chars( $param->{$query} ) )
         : ( '= <a>', psmisc::html_chars( $param->{'tth'} ), '</a>', psmisc::human( 'magnet-dl', $param->{'tth'} ), '<br/>' ) )
       : '<a href="?query=' . psmisc::encode_url($query) . '">' . ( $q->{'desc'} || $query ) . '</a>'
-      )
-      . ' <a class="rss" href="'
+      );
+    print '<div class="altview">'
+      . '<a class="rss" href="'
       . psmisc::html_chars( ( @queries > 1 ? '?query=' . psmisc::encode_url($query) : $rss_link ) . '&view=rss' )
-      . '">RSS</a>';
+      . '">RSS</a>'
+      . ' <a class="json" href="'
+      . psmisc::html_chars( ( @queries > 1 ? '?query=' . psmisc::encode_url($query) : $rss_link ) . '&view=json' )
+      . '">JS</a>'
+      . '</div>'
+      unless $config{'client_bot'};
     #print Dumper \%ENV;
     #print Dumper @ask;
     #print " ($q->{'desc'}):" if $q->{'desc'};
@@ -179,8 +234,15 @@ for my $query (@queries) {
       '</th>'
       for @{ $q->{'show'} };
   };
-  part 'table-head';
-  my $res = statlib::make_query( $q, $query, $param->{'period'} );
+  part 'table-head', $q;
+  my $res;
+  psmisc::alarmed(
+    $config{'web_max_query_time'},
+    sub {
+      $res = statlib::make_query( $q, $query, $param->{'period'} );
+    }
+  );
+  print '<p>db ooops</p>' if $@;
   #warn Dumper $res;
   $res =
     [ sort { $b->{ $param->{'sort'} } <=> $a->{ $param->{'sort'} } || $b->{ $param->{'sort'} } cmp $a->{ $param->{'sort'} } }
@@ -210,41 +272,47 @@ for my $query (@queries) {
                                                        #$id =~ tr/ /_/;
     }
     $row->{'tth_show'} = 'tth' if $config{'view'} eq 'rss';
-    $row->{ $_ . '_html' } = (
-      $param->{$_}
-      ? ''
-      : qq{<a class="$_" title="}
-        . psmisc::html_chars( $row->{$_} )
-        . qq{" href="?$_=}
-        . psmisc::encode_url( $row->{$_} ) . qq{">}
-        . ( $row->{ $_ . '_show' } || $row->{$_} )
-        . qq{</a>}
-      )
-      . psmisc::human( 'magnet-dl', $row->{'orig'} )
-      for grep { length $row->{$_} and !$q->{ 'no_' . $_ . '_link' } }
-      grep { $config{'queries'}{$_} } @{ $q->{'show'} };    #qw(string tth);
-    $row->{ $_ . '_html' } = psmisc::human( 'time_period', time - $row->{$_} ) for grep { int $row->{$_} } qw(time online);
-    $row->{ $_ . '_rss' } = psmisc::human( 'date_time', $row->{$_}, ' ', '-' ) for grep { int $row->{$_} } qw(time online);
+    unless ( $config{'view'} eq 'json' ) {
+      $row->{ $_ . '_html' } = (
+        $param->{$_} && $param->{$_} !~ /%/
+        ? ''
+        : qq{<a class="$_" title="}
+          . psmisc::html_chars( $row->{$_} )
+          . qq{" href="?$_=}
+          . psmisc::encode_url( $row->{$_} ) . qq{">}
+          . ( $row->{ $_ . '_show' } || $row->{$_} )
+          . qq{</a>}
+        )
+        . psmisc::human( 'magnet-dl', $row->{'orig'} )
+        for grep { length $row->{$_} and !$q->{ 'no_' . $_ . '_link' } }
+        grep { $config{'queries'}{$_} } @{ $q->{'show'} };    #qw(string tth);
+      $row->{ $_ . '_html' } = psmisc::human( 'time_period', time - $row->{$_} ) for grep { int $row->{$_} } qw(time online);
+      $row->{ $_ . '_rss' } = psmisc::human( 'date_time', $row->{$_}, ' ', '-' ) for grep { int $row->{$_} } qw(time online);
+    }
     $row->{'hub'} .= psmisc::human( 'dchub-dl', { 'hub' => $row->{'orig'}->{'hub'} } ) if $row->{'hub'};
     #$row->{'nick'} .= psmisc::human( 'dchub-dl', $row->{'orig'} ) if $row->{'nick'};
     $row->{$_} = psmisc::human( 'size', $row->{$_} ) for grep { int $row->{$_} } qw(size share);
     $config{'out'}{'html'}{'table-row'} = sub {
       print '<tr>';
       #'<td>', $n, '</td>';
+      #print "<td>D!:";
+      #print utf8::is_utf8 ( $row->{string} );
+      #print "</td>";
+      #printlog('dev', Dumper $row);
+      #printlog('dev', Dumper $q->{'show'});
       print '<td>', $row->{ $_ . '_html' } // $row->{$_}, '</td>' for @{ $q->{'show'} };
       if ( $q->{'graph'} ) {
-        print qq{<td style="background-color:$graphcolor;">&nbsp;</td>} if $config{'use_graph'};
+        print qq{<td style="background-color:$graphcolor;"> </td>} if $config{'use_graph'};
         print qq{<td class='graph' id='$query' rowspan='100' style='min-width:100px;'> </td>} if $n == 1;
 #print qq{<td class='graph' rowspan='100' width='100%'><img id='$query' src='' NOtype='image/svg+xml' width='100%' height='100%'/></td>}    if $n == 1;
 #print qq{<td class='graph' rowspan='100' width='100%'><img id='$query' src='' width='100%' /></td>}    if $n == 1;
-        print qq{<td style="background-color:$graphcolor;">&nbsp;</td>} if $config{'use_graph'};
+        print qq{<td style="background-color:$graphcolor;"> </td>} if $config{'use_graph'};
       }
       print '</tr>';
     };
     $config{'out'}{'rss'}{'table-row'} = sub {
       #my ( $param, $table, $row ) = @_;
       my ($row) = @_;
-      #printlog('dev', Dumper $row);
       print '<item>';
       #"\n<link>", get_param_url_str( $param, ['view'] ), '#n', ( ++$work{'rssn'} ), '</link>';
       #'<description>';
@@ -272,17 +340,17 @@ for my $query (@queries) {
       psmisc::html_chars( \$unique );
       $row->{'guid'} ||= $unique;
       #print "UNIQ[$unique]";#, join',',%$row;
-      $row->{'description'} ||= '<![CDATA['
-        . (
-        join ' ', map { $row->{ $_ . '_rss' } || $row->{ $_ . '_html' } || $row->{$_} } grep { $_ ne $title } @{ $q->{'show'} }
-        ) . ']]>';
+      $row->{'description'} ||= 
+         (
+        join ' ', map { $row->{ $_ . '_rss' } || $row->{ $_ . '_html' } || $row->{$_} } grep { $_ ne $title  and !$param->{'no_'.$_}} @{ $q->{'show'} }
+        ) ;
       #$row->{'description'} ||= 'desc';
       #warn "time[$row->{'time'}]";
       $row->{'pubDate'} ||= psmisc::human( 'rfc822_date_time', $row->{'time'} );
       #$row->{'link'} ||= get_param_url_str( $param, ['view'] ), '#n', ( ++$work{'rssn'} );
-      $row->{'link'} ||= "?$key=" . psmisc::encode_url($unique);
+      $row->{'link'} ||= 'http://'.$ENV{SERVER_NAME}."/?$key=" . psmisc::encode_url($unique);
       $row->{'author'} ||= $row->{'nick'} || 'dcstat';
-      print '<', $_, '>', $row->{$_}, '</', $_, ">\n"
+      print '<', $_, '>', '<![CDATA[' , $row->{$_}, ']]>', '</', $_, ">\n"
         for grep { $row->{$_} } qw(title description author category comments guid pubDate link);
       #'<pubDate>', , '</pubDate>',
       #"<guid></guid>"
@@ -322,8 +390,8 @@ $config{'out'}{'html'}{'graph'} = sub {
       )
     {
       #for my $row ( $db->query("SELECT * FROM $table  " ) ) {
-      psmisc::printlog 'dev', Dumper $row;
-      next if $row->{tth} eq 'LWPNACQDBZRYXW3VHJVCJ64QBZNGHOHHHZWCLNQ';
+      #psmisc::printlog 'dev', Dumper $row;
+      next if $row->{tth} ~~ [qw(LWPNACQDBZRYXW3VHJVCJ64QBZNGHOHHHZWCLNQ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA)];
       my $by = $makegraph{$query}{ $row->{tth} } || $makegraph{$query}{ $row->{string} };
 #print " $row->{date}, $row->{n}, $row->{cnt} <br/>" if $makegraph{$query}{$row->{tth}} eq 'tth' or $makegraph{$query}{$row->{string}} eq 'string';
 #$row->{date} .= '-'. (localtime $row->{time})[2];
@@ -373,7 +441,7 @@ $config{'out'}{'html'}{'graph'} = sub {
 #qq{ <polyline fill="none" stroke="blue" stroke-width="10"              points="50,375                     150,375 150,325 250,325 250,375                     350,375 350,250 450,250 450,375                     550,375 550,175 650,175 650,375                     750,375 750,100 850,100 850,375                     950,375 950,25 1050,25 1050,375                     1150,375" />},
       ;
     #my $color = 0;
-    psmisc::printlog 'dev', $yl, Dumper \%date_max, \%date_min, \%date_step;
+    #psmisc::printlog 'dev', $yl, Dumper \%date_max, \%date_min, \%date_step;
     for my $line ( sort keys %graph ) {
       my $n;
       #$colors[$color] <!-- $line : -->
@@ -383,26 +451,26 @@ $config{'out'}{'html'}{'graph'} = sub {
         . qq{" stroke-width="3" points="};    #. #( #"mc
                                               # join ' ',
       for ( sort keys %dates ) {
-	if (  $graph{$line}{$_}   ) {
-        #      map {
-        #$graph{$line}{$_} = $yl - $graph{$line}{$_};
-        if ( my $v = $graph{$line}{$_} ) {    # ? () : (
-          $v = $yl if $v > $yn;
-          $v = $v - $date_min{$_};
-          $img .= int( $n * $xs ) . ',' . int(
-            $yl -
-              #( $graph{$line}{$_} > $yn ? $yl : ( $graph{$line}{$_} || $yn ) * $ys )
-              #( $graph{$line}{$_} > $yn ? $yl : ( $graph{$line}{$_} || $yn ) * $date_step{$_} )
-              $v * $date_step{$_}
-          ) . ' ';
+        if ( $graph{$line}{$_} ) {
+          #      map {
+          #$graph{$line}{$_} = $yl - $graph{$line}{$_};
+          if ( my $v = $graph{$line}{$_} ) {    # ? () : (
+            $v = $yl if $v > $yn;
+            $v = $v - $date_min{$_};
+            $img .= int( $n * $xs ) . ',' . int(
+              $yl -
+                #( $graph{$line}{$_} > $yn ? $yl : ( $graph{$line}{$_} || $yn ) * $ys )
+                #( $graph{$line}{$_} > $yn ? $yl : ( $graph{$line}{$_} || $yn ) * $date_step{$_} )
+                $v * $date_step{$_}
+            ) . ' ';
+          }
         }
-	}
         ++$n;
         #)
         #       }
         #      ).
       }
-      $img .= qq{" />};
+      $img .= qq{" />}; #"mcedit
       #++$color;
     }
     my $n;
@@ -423,24 +491,31 @@ $config{'out'}{'html'}{'graph'} = sub {
 #print  qq{<script type="text/javascript" language="JavaScript"><![CDATA[},qq{gid('$query').src='data:image/svg+xml;}, psmisc::encode_url($img),
 #print  qq{<script type="text/javascript" language="JavaScript"><![CDATA[},qq{gid('$query').src='data:image/svg;}, psmisc::encode_url($img),
 #print qq{<script type="text/javascript" language="JavaScript"><![CDATA[},qq{gid('$query').innerHTML='}, $img,
-        qq{"/>},
+        qq{"/>}, #"mcedit
       )
       ),
       qq{';}, qq{]]></script>};
     #printlog 'dev', Dumper \%graph, \%dates;
   }
 };
-part 'graph';
+psmisc::alarmed(
+  $config{'web_max_query_time'},
+  sub {
+    part 'graph';
+  }
+);
 $config{'out'}{'html'}{'footer'} = sub {
   print
     #log'dev',
     '<div>graph per ', psmisc::human( 'time_period', time - $graphtime ), '</div>' if $config{'use_graph'} and %makegraph;
   print
 qq{<div class="version"><a href="http://svn.setun.net/dcppp/trac.cgi/browser/trunk/examples/stat">dcstat</a> from <a href="http://search.cpan.org/dist/Net-DirectConnect/">Net::DirectConnect</a> vr}
-    . ( split( ' ', '$Revision: 792 $' ) )[1]
+    . ( split( ' ', '$Revision: 998 $' ) )[1]
     . qq{</div>};
-  print '<script type="text/javascript" src="http://iekill.proisk.ru/iekill.js"></script>';
+  print '<script type="text/javascript" src="http://iekill.proisk.net/iekill.js"></script>';
   part 'footer_aft';
+
+
   print '</body></html>';
 };
 part 'footer_bef';
@@ -448,3 +523,5 @@ part 'footer';
 #print "<pre>";
 #print Dumper $param;
 #print Dumper \%ENV;
+#print Dumper \%config;
+

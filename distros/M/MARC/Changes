@@ -1,181 +1,276 @@
-1.50    Fri. Jan. 15, 2016
+0.3  Mon Aug 23 19:39:00 1999
 
-        [THINGS THAT MAY BREAK YOUR CODE]
-		
-        - Updated Lint::DATA section with Update No. 21 (September 2015)
-        - Updated _check_article with the exceptions: 'Lo que' and 'Lo cual'
-		- Updated check_020 to account for version numbering changes in Business::ISBN (should work for versions greater than '2.009')
-		
-1.49    Wed. July 1, 2015
+0.4  Sun Sep  5 13:49:00 1999
 
-        [THINGS THAT MAY BREAK YOUR CODE]
-		
-        - Updated Lint::DATA section with Update No. 19 (October 2014) through Update No. 20 (April 2015)
+0.5  Sun Sep  5 19:45:00 1999
 
-1.48    Sun. July 20, 2014
+0.6  Mon Sep  6 18:17:00 1999
+	- consolidate into single file
 
-		- Updated Synopsis example to account for repeatable 250 (and added example of non-repeatable field using 040).
+-------------------------------------------------------------
+Revision history for Perl extension MARC.
 
-        [THINGS THAT MAY BREAK YOUR CODE]
-		
-        - Updated Lint::DATA section with Update No. 17 (Sept. 2013) through Update No. 18 (April 2014)
+0.01  Tue Sep  7 10:48:10 1999
+	- original version; created by h2xs 1.18
+	- linux command: h2xs -A -X -n MARC
 
-1.47    Mon Sept. 1, 2013
+0.61  Tue Sep  7 12:56:23 CDT 1999
+	- convert version 0.6 into CPAN format (lots of little changes)
 
-        [THINGS THAT MAY BREAK YOUR CODE]
+0.62  Fri Sep 10 05:18:00 1999
+	- revised datastructure to hash of tags plus non-tag elements
+	  like 'array' which serve as structured views into data
 
-        - Updated Lint::DATA section with Update No. 15 (Sept. 2012) through Update No. 16 (April 2013)
-        - Revised wording in check_245 ending punctuation to account for LC Policy Statement (for RDA records), matching LCRI, for always ending 245 with a period.
+0.63  Sun Sep 12 20:38:00 1999
+	- permit incremental processing to reduce memory footprint
 
-1.46    Mon Sept. 3, 2012
+0.65  Fri Sep 17 08:07:42 1999
+	- add openmarc,nextmarc,closemarc,deletemarc
 
-        [THINGS THAT MAY BREAK YOUR CODE]
+0.7   Sun Sep 21 07:15:00 1999
+	- major upgrade: revise new for incremental reads and tag maps
+	- add selectmarc,searchmarc, createrecord, _joinfield, addfield
+	- add error processing and use Carp
+	- add header/body/footer outputs
+	- revise documentation
 
-        - Updated MARC::Lint::CodeData with most recent version.
+0.71  Wed Sep 22 15:50:31 1999
+	- compute @tags once in _marc2html, fix $outputall detection
+	- add Win32 test and install
+	- t/test1.t uses new output file spec, tests append & $var
 
+0.72  Fri Sep 24 07:42:00 1999
+	- add getvalue
+	- add doc example: xml_header, xml_body, xml_footer
+	- add doc example: createrecord, addfield
 
-1.45    Sat June 30, 2012
+0.80  Sun Oct  3 17:14:00 1999
+	- add isbd and unimarc
 
-        [THINGS THAT MAY BREAK YOUR CODE]
-        
-        - Updated Lint::DATA section with Update No. 10 (Oct. 2009) through Update No. 14 (Apr. 2012)
-        - Updated _check_article with the exceptions: 'A & ', 'L is '
+0.81  Mon Oct  4 22:25:17 CDT 1999
+	- update CPAN doc files: Changes, README, Makefile.PL
+	- add isbd to t/test1.t
 
-1.44    Sat August 29, 2009
+0.82  Wed Oct  6 13:30:22 CDT 1999
+	- Win32 Makefile.PL improvements including automatic html install
+	- Added single quotes to hash keys in MARC.pm and t/test1.t to
+	  eliminate nuisance warnings from Perl 5.004.
 
-        - Updated TODO section with item about verfication of 008 presence and length.
+0.83  Mon Oct 11 22:22:00 EST 1999
+	- Updated MARC.pm line 108 to store scalar references instead of
+	  scalars. This will hopefully cut down on duplication of data in
+	  the MARC object.
+	- Also, updated the getvalue(), searchmarc() and addfield() methods to 
+	  reflect the change in the way subfield data is stored.
+	- Added line 220 to return '0 but true' instead of 0 when no records
+	  were read in. This will allow for statements like
+	  $x->openmarc("test.mrc") || die;
 
-        [THINGS THAT MAY BREAK YOUR CODE]
+0.84  Tue Oct 12 22:07:18 CDT 1999
+	- more Win32 Makefile.PL tweaks after TPJ technical review
+	- add binmode for marc file read/write
+	- unspecified 'increment' defaults to 0
+	- fix repeated subfield in field bug in addfield
 
-        - Updated _check_article with the exceptions: 'A to ', 'A isn\'t '
-        - Updated Lint::DATA section with Update No. 8 (Oct. 2007) 
-        - Updated Lint::DATA section with Update No. 9 (Oct. 2008) 
+0.85  Wed Oct 13 21:19:00 EST 1999
+	- modified addfield to push scalar references instead of scalars when 
+	  adding subfield data to the $x->[record]{field}{subfield} data member
+	  on line 859.
+	- updated closemarc to return 1, to allow constructs like
+	  $x->closemarc() || die;
 
-        - Updated MARC::Lint::CodeData with most recent version.
+0.9   Sun Oct 17 19:48:00 EST 1999
+	- modified deletemarc() to support deleting specified fields and
+	  subfields
+	- modified addfield() to support adding fields in tag order
 
-1.43    Wed October 3 19:36:00 CDT 2007
+0.91  Tue Oct 19 18:01:43 CDT 1999
+	- add demo addlocal.pl, microlif.001, and directory eg
+	- closemarc() returns results of close()
+	- filter '\r' and '\cZ' from binary input stream
+	- fix "delete all records" bug
 
-        [THINGS THAT MAY BREAK YOUR CODE]
+0.911 Wed Oct 20 21:49:02 CDT 1999 <Birthisel>
+	- add "exists" tests to getvalue()
+	- use scalar $callno in addlocal.pl
 
-        - Updated Lint::DATA section with Update No. 7 (Oct. 2006)
-        
-        - MARC::Lint is incompatibile with Business::ISBN versions 2.00-2.02_01.
-        Business::ISBN versions below 2 and 2.02_02 or above should work.
+0.92  Sat Oct 23 00:00:00 CDT 1999 <Lane>
+	- initialize loop counter in getvalue() to avoid warnings
+	- add methods for manipulating "000" and "008" fields:
+		unpack_ldr,	bib_format,	unpack_008
+	- add internal subroutines supporting those methods:
+		_unpack_ldr,	_bib_format,	_unpack_008,
+	- add internal update subroutines:
+		_pack_ldr,	_pack_008
+	
+0.93  Wed Oct 27 21:30:17 CDT 1999 <Birthisel>
+	- deprecate length(), use marc_count() instead
+	- new: bless earlier so _readxxx can use methods
+	- add error checks to file open/close, use binmode
+	- add lineterm for _readmarcmaker and default to DOS
+	- always store header in $record->{'000'} tag position
+	- fix bugs in 'i12' subfield structure
+	- add usmarc_default, ustext_default, MARCMaker charset encode/decode
+	- use createrecord, addfield in _readmarcmaker
+	- fix fieldnotvalue in searchmarc
+	- extensive changes to getvalue to cover '000' tag and indicators
+	- use getvalue in unpack_008
+	- return undef instead of die in _unpack_008
+	- allow lineterm option in output, 'format' defaults to 'marc',
+	  lineterm to '\n' except MARCMaker (CRLF)
+	- add nolinebreak option for MARCBreaker output
+	- 'html_header' outputs "Content-type...", 'html_start' does "<body>"
+	- _writemarc also updates '000' size data in structure
+	- warnings off in addfield
+	- update copyright
+	- add test2.t and test3.t plus supporting files: makrbrkr.mrc,
+	  brkrtest.ref, makrtest.src
+	- add filestring and out_cmp test utilities, MARCopt.pm stub
+	- add MARCMaker/Breaker, getvalue, and searchmarc tests
 
-        - Updated check_record's treatment of 880 fields. Now if the tagno is
-        880, check_record attempts to look at subfield 6 for the linked tagno
-        and uses that as the basis for the tagno to be checked.
+0.94  Thu Oct 28 20:23:57 CDT 1999 <Birthisel>
+	- added numerous "exists" tests for hash queries
+	- add 'title' parameter to html_start
+	- extra error checking: addfield
+	- new getupdate() method
+	- add tests for searchmarc, deletemarc, addfield, getupdate,
+	  html_xxx formats
+	- fix test3.t to use MARCopt everywhere
 
-        - Updated _check_article to account for 880, using subfield 6 linked
-        tagno instead.
-        - Updated _check_article to account for articles followed parentheses,
-        apostrophes and/or quotes. Also related bug fixes for counting
-        punctuation around the article.
+0.95  Tue Nov 02 20:49:09 CST 1999 <Birthisel>
+	- clean up the Win32 "make clean" implementation in Makefile.PL
+	- add tests for selectmarc
+	- add 'title' option for URLs output
+	- terminate addfield if $subfield_id eq "\036" from getupdate()
+	- pod updates: SYNOPSIS, Option Template, various typos
+	- add updaterecord()
+	- template extensions for deletemarc(), searchmarc(), getvalue()
+	- add eg/fixlocal.pl demo and eq/specials.001
 
-        - For subfield 6, it should always be the 1st subfield according to MARC
-        21 specifications, so check_245 has been updated to account for subfield
-        6 being 1st, rather than requiring subfield a to be 1st.
+0.95d  Wed Nov 03 17:00:01 EST 1999 <Lane>
+	- Removed FF_ prefix from @LDR_FIELDS. Left package globals for
+          fixed fields and leaders as globals: this should facilitate
+	  anybody who wants to subclass for MFHL, community, records.
+	- Added pack_008 and pack_ldr. Added get_hash_008 and
+	  get_hash_ldr for future tied interface. Fixed bugs. 
+	  (FF_ prefixes in hash keys.)
+	- Added and updated docs for the new functions.
+	- Added comment on how to renumber tests.
+	- Added tests of pack_008 and pack_ldr. Fixed some test bugs
+	  with FF_ prefixes and non-existent functions.
 
-        - Added new test, test880and6.t for 880 field and for subfield 6.
+0.96   Wed Nov  3 23:04:31 CST 1999 <Birthisel>
+	- fix typos in pod2man and pod2html output
+	- fix test3.t like test1.t
 
-        - Added TODO concerning subfield 9. This subfield is not officially
-        allowed in MARC, since it is locally defined. Some way needs to be made
-        to allow messages/warnings about this subfield to be turned off.
+0.97   Fri Nov  5 17:44:15 CST 1999 <Birthisel>
+	- replace '%$' construct (4 places) which designates pseudo-hash
+	  in 5.005 and fails in 5.004. Detected by CPAN-Testers
+	- Add tests for deletemarc() subfield to t/test2.t
 
-        - Added TODO concerning subfield 8. This subfield could be the 1st or
-        2nd subfield, so the code that checks for the 1st few subfields
-        (check_245, check_250) should take that into account.
+0.98   Fri Nov 12 21:13:39 CST 1999 <Birthisel>
+	- fix addfield reorder bug (new tag > existing)
+	- improved eg/addlocal.pl and added eg/uclocal.pl
+	- moved binmode from _readmarc* to openmarc() and new() to get around
+	  unwanted seek on binmode in Win32 5.00402.
 
-        - Updated MARC::Lint::CodeData with most recent version.
+0.99   Sun Nov 14 21:59:00 EST 1999 <Summers>
+        - created MARC::XML subclass to handle MARC<->XML conversions
+        - moved _marc2xml() from MARC.pm into MARC::XML
 
-1.42    Mon June 19 18:28:00 CDT 2006
+0.991  Sun Nov 21 18:49:00 EST 1999 <Summers>
+        - removed MARC::XML specific pod from MARC.pm and added to MARC::XML
 
-        [THINGS THAT MAY BREAK YOUR CODE]
+1.00   Mon Nov 22 22:22:32 CST 1999 <Birthisel>
+	- add warnings for unsupported output formats
+	- return undef for output failure, test in place of XML
 
-        - Fixed bug that allowed subfield R due to the way tag repeatability is set.
+1.01   Sun Dec 05 23:14:15 CST 1999 <Birthisel>
+	- add invalid size checks to _readmarc()
+	- add header check to _readmarcmaker()
+	- delete length() method and CORE::length() overrides
+	- add $TEST; replace carp with mycarp
 
-        - Removed META.yml from MANIFEST
-        - Updated MARC::Lint::CodeData with most recent version
-        - Updated Lint::DATA section with Update No. 6 (Oct. 2005)
-        - Updated etc/ecbdlist.html to Update No. 6 (Oct. 2005)
+1.02u  Mon Dec 20 06:52:00 EST 1999 <Lane>
+	- added *map* series; supports a data-index view of marc.
+	- added deletefirst and updatefirst to support ties
+	- added getmatch and insertpos to support update or insert
+	   of subfields.
+	- added getfields/updatefields for fine-grained access to
+	   the {array} structures. Allows "in-place" update of fields.
+	- changed add_fields to use add_map. Lets subclasses have a
+	   policy of how they want their indices to look.
+	- changed _readmarc and _readmarcmaker to use add_map. Good
+	   for testing.
+	- Added simple tests for *first and *map* series as test4.t
+	   More complex and complete tests are in MARC::Tie.
+	- Added docs for *map*, getmatch,*fields*,getmatch and insertpos.
 
+1.03   Mon Jan 17 15:21:54 CST 2000 <Birthisel>
+	- Use fill char "|" for "none" in eg/addlocal.pl
+	- integrate "102u" changes into CPAN format
+	- fix bug in addfield where add_map not called if ($tag<10)
 
-1.41    Wed Sept 21 17:49:00 CDT 2005
-        [THINGS THAT MAY BREAK YOUR CODE]
-        - updated DATA to incorporate MARC update 5 (Oct. 2004)
+1.04   Mon Jan 24 22:31:26 CST 2000 <Birthisel>
+	- oops, had to fix the Win32 5.00402 binmode again (c.f 0.98)
+	- added quotes to 'rebuild_map' used as hash key (5.004 warnings)
+	- add docs for "keys" in hash returned by 'unpack_ldr'
+	- add xml format error messages
 
-        - check_245( $field ) updated:
-         - Makes sure $a exists (and is first subfield).
-         - Warns if last character of field is not a period
-         -- Follows LCRI 1.0C, Nov. 2003 rather than MARC21 rule
-         - Verifies that $c is preceded by / (space-/)
-         - Verifies that initials in $c are not spaced
-         - Verifies that $b is preceded by :;= (space-colon, space-semicolon,
-         space-equals)
-         - Verifies that $h is not preceded by space unless it is dash-space
-         - Verifies that data of $h is enclosed in square brackets
-         - Verifies that $n is preceded by . (period)
-         -- As part of that, looks for no-space period, or dash-space-period
-         (for replaced elipses)
-         - Verifies that $p is preceded by , (no-space-comma) when following $n
-         and . (period) when following other subfields.
-         - Performs rudimentary check of 245 2nd indicator vs. 1st word of 245$a
-         (for manual verification). This could use some reworking, and was
-         developed based on a predominantly English collection. Uses the
-         internal _check_article( $field ) method.
+1.05   Sat Jan 29 22:59:03 EST 2000 <Lane>
+	- Removed unnecessary quotes in various potentially tainted variables.
+	- Removed bad references to FF_* in docs.
+	- Updatefields() no longer assumes that fields with the same tag are 
+	  contiguous (e.g. cjk).
+	- Getfields() no longer assumes that fields with the same tag are 
+	  contiguous (again, cjk).
+	- Docs updated to reflect the relaxed assumption.
+	- Extensive quoting of keys for a more warning-free experience.
+	
+	Sun Jan 30 14:34:02 EST 2000 <Lane>
+	- Created add_005s(), _make_005().
+	- Inserted add_005s into output so now we are correctly datestamped.
+	- Docs added for 005 functionality.
+	
+	Mon Jan 31 12:55:52 EST 2000 <Lane>
+	- Fixed $args->{'record'} complaint if $args does not exist.
+	- Now we return "19960221075055.7" when in $TEST mode for 005.
+	- Fixed and updated test2.t and test files makrbrkr.mrc and
+	  makrtest.src. (now have all canonical 005's; makrtest had a
+	  17 digit time, not 16 in the first record).
 
-        - added _check_article( $field ) internal method for comparing
-         nonfiling indicator against first word of title field
-        - added check245.t to test the new check_245 functionality
+1.06   Sun Feb 27 22:00:00 EST 2000 <Lane>
+	- Added getfirstvalue to avoid dependency on index for Ties.
+	- Added from_string and as_string; mainly for Tie
+	  but also has promise for searchmarc. Added option to rebuild map. 
+	- Created MARC::Rec and started moving functions to it.
 
-        - updated lint.t to use File::Spec for path to camel.usmarc
-        - removed updir usage so 'make test' works properly
+	Thu Mar  9 22:00:00 EST 2000 <Lane>
+	- Finished the bulk of ::Rec-ising.
+	- Normalised {records}-{record} handling and %params creation 
+	  (_records and _params).
+	- Updated searchmarc and deletemarc to more idiomatic Perl; fixed bugs.
+	  (Deletemarc was not updating {$tag}{$field}{subfield} information
+	  correctly; it does now since it uses rebuild_map).
+	- Fixed one potential problem in _urls (looked at indicators when it
+	  should have only been looking at subfields).
 
-        [ENHANCEMENTS]
-        - added check for subfield delimiters in fields lower than 010
-         - updated lint.t and camel.usmarc with a test for this new code
+	Sat Mar 11 22:00:00 EST 2000 <Lane>
+	- Checked that a subclass of MARC(:Btrieve) works even in the presence
+	  of MARC::Rec dependencies.
+	- Tested Tie::MARC and Tie::MARC::Btrieve against 1.06
+	- Fixed bugs. All tests pass.
+	- Updated Docs to reflect pervasive MARC::Rec presence and (few)
+	  additional functions.
 
-        - added check_020( $field ):
-         - uses Business::ISBN to validate 020$a and 020$z ISBNs. The current
-         version needs work for ISBN-13 checking. Uses an internal sub,
-         _isbn13_check_digit($ean) to validate 13 digit ISBNs, based on code in
-         Business::ISBN. Checking of subfield z needs work (it is currently
-         written for nonstandard practice).
+	Sun Mar 12 14:39:27 EST 2000 <Lane>
+	- Configured shipping script for MARC.
+	- Fixed numbering in test5.t. All tests pass.
+	- Added option to read from a string for MARC::Rec. (nextmarc())
 
-        - added check020.t to test the new check_020 method
-        
-        - added check_041( $field ):
-         - warns if subfields are not evenly divisible by 3 unless second
-         indicator is 7
-         (future implementation would ensure that each subfield is exactly 3
-         characters unless ind2 is 7--since subfields are now repeatable. This
-         is not implemented here due to the large number of records needing to
-         be corrected.).
-         - validates against the MARC Code List for Languages
-         (L<http://www.loc.gov/marc/>) using the MARC::Lint::CodeData data pack
-         
-        - added check_043( $field )
-         - warns if each subfield a is not exactly 7 characters.
-         - validates each code against the MARC code list for Geographic Areas
-         (L<http://www.loc.gov/marc/>) using the MARC::Lint::CodeData data pack
-
-        - added check041043.t to test the new check_041 and check_043 methods
-
-        - check_record() now accepts any isa( 'MARC::Record' ).
-
-        - _check_article() no longer trips a Perl warning if an indicator
-          has a non-numeric value.
-        
-        - _check_article() updated with exceptions for 'a posteriori' and 'a priori'
-        
-        -Replaced indenting tabs with 4 spaces
-        
-        -marclint utility updated to report errors encountered while translating raw MARC records into MARC::Record objects.
-        
-1.40    Mon Dec 20 14:01:53 CST 2004
-        - added DATA for tags 001-008
-        - updated DATA to incorporate update 4 (Oct. 2003)
-        - corrected errors in the DATA section
-
-1.39    Thu Dec 16 20:25:41 CST 2004
-        - initial baseline release after separation from MARC::Record proper
+1.07   Sun Apr 23 16:41:46 CDT 2000A <Birthisel>
+	- convert all usage to $MARC::TEST, $MARC::DEBUG. Clean up other
+	  "use vars" variables only needed in one package. Sync $VERSION.
+	- Perl 5.6.0 warns on "join (//,", use "join (''," instead.
+	- fixes to $naptime and $testfile in t/test5.t
+	- openmarc did not set 'handle' and 'format' for MARC::Rec

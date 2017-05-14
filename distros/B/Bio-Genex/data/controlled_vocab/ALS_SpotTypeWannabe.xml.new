@@ -1,0 +1,38 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="UserSequenceFeature" db_column="usf_type" cv_table="USF_Type">
+  <comment type="definition">Referred to in the User Sequence Feature Table to describe the type of entity deposited in a spot	
+</comment>
+<term name="cdna"
+        description="the complete cloned  cds of a protein"/>
+<term name="partial_cdna"
+        description="the piece of a cloned EST described by start and stop positions"/>
+<term name="synthetic_oligo"
+        description="a synthetic DNA oligomer, sequence as described"/>
+<term name="pcr_product"
+        description="the amplified section of a an EST, full-length cDNA or other sequence feature"/>
+<term name="gdna_sequence"
+        description="the sequence of a fragment derived from a genomic source"/>
+<term name="control_intensity_range"
+        description="allows the dynamic range of signal detection to be estimated"/>
+<term name="control_nonspecific_binding"
+        description="Allows the noise from non-specific binding to be estimated"/>
+<term name="control_target_concentration"
+        description="Allows the effect of target concentration on signal intensity to be estimated"/>
+<term name="control_kinetic"
+        description="For the purpose of assessing the effect of hybridization conditions and target complexity on the kineticsof reannealing"/>
+<term name="control_dilution_series"
+        description="serial dilution for signal response curve"/>
+<term name="control_background"
+        description="noise from areas with no spots"/>
+<term name="control_binding_capacity"
+        description="Signal from known probe to known target interaction"/>
+<term name="serial_orf"
+        description="Some fraction of a sequenced gDNA piece with unproven tranlsation has been deposited on the array"/>
+</controlled_vocabulary>
+
+<!-- 
+*** emacs file mode definition ***
+Local Variables: 
+ispell-personal-dictionary:"../.ispell-dict"
+End: 
+-->

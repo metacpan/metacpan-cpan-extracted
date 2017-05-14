@@ -1,23 +1,6 @@
-use strict;
-use warnings;
 package Project::Euler;
-BEGIN {
-  $Project::Euler::VERSION = '0.20';
-}
 
 use Modern::Perl;
-use 5.010;  # So Dist::Zilla picks it up
-
-#ABSTRACT: Solutions for L<< http://projecteuler.net >>
-
-
-
-
-
-1; # End of Project::Euler
-
-__END__
-=pod
 
 =head1 NAME
 
@@ -25,15 +8,16 @@ Project::Euler - Solutions for L<< http://projecteuler.net >>
 
 =head1 VERSION
 
-version 0.20
+Version v0.1.5
+
+=cut
+
+use version 0.77; our $VERSION = qv("v0.1.5");
+
 
 =head1 SYNOPSIS
 
-    use Project::Euler::Problem::P001;
-    my $problem1 = Project::Euler::Problem::P001->new;
-
-    $problem1->solve;
-    print $problem1->status;
+    use Project::Euler;
 
 =head1 DESCRIPTION
 
@@ -42,138 +26,112 @@ interface to interact with the solutions implemented so far.
 
 For now, you will have to manually import the problem_solutions and solve them manually.
 
-=head1 LIBRARIES
+    use Project::Euler::Problem::P001;
+    my $problem1 = Project::Euler::Problem::P001->new;
 
-These libraries are used by the problem solutions:
+    $problem1->solve;
+    print $problem1->status;
 
-=over 4
-
-=item 1
-
-L<< Project::Euler::Lib::Utils >>
-
-=item 2
-
-L<< Project::Euler::Lib::Types >>
-
-=back
+While not the most elegant solution, it will have to do for now.
 
 =head1 PROBLEMS
 
-These problems are fully implemented so far (extending the base class L<< Project::Euler::Problem::Base >>)
+These problems are fully implemented so far:
 
 =over 4
 
-=item 1
+=item * L<< Project::Euler::Problem::P001 >>
 
-L<< Project::Euler::Problem::P001 >>
-
-=item 2
-
-L<< Project::Euler::Problem::P002 >>
-
-=item 3
-
-L<< Project::Euler::Problem::P003 >>
-
-=item 4
-
-L<< Project::Euler::Problem::P004 >>
-
-=item 5
-
-L<< Project::Euler::Problem::P005 >>
+=item * L<< Project::Euler::Problem::P002 >>
 
 =back
 
+using the base class:  L<< Project::Euler::Problem::Base >>
+
+
+=head1 LIBRARIES
+
+These libraries are used by the problem_solutions:
+
+=over 4
+
+=item * L<< Project::Euler::Lib::MultipleCheck >>
+
+=item * L<< Project::Euler::Lib::Types >>
+
+=back
+
+=head1 EXPORT
+
+#  Todo:  implement interface functions
+
+=head1 FUNCTIONS
+
+#  Todo:  implement interface functions
+
+
+
 =head1 AUTHOR
 
-Adam Lesperance <lespea@gmail.com>
+Adam Lesperance, C<< <lespea at cpan.org> >>
 
-=for :stopwords CPAN AnnoCPAN RT CPANTS Kwalitee diff
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-project-euler at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-Euler>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc Project::Euler
+    perldoc Project::Euler
 
-=head2 Websites
+Also, you can follow the development of this module on L<< http://www.github.com >>
 
 =over 4
 
-=item *
-
-Search CPAN
-
-L<http://search.cpan.org/dist/Project-Euler>
-
-=item *
-
-AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Project-Euler>
-
-=item *
-
-CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Project-Euler>
-
-=item *
-
-CPAN Forum
-
-L<http://cpanforum.com/dist/Project-Euler>
-
-=item *
-
-RT: CPAN's Bug Tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-Euler>
-
-=item *
-
-CPANTS Kwalitee
-
-L<http://cpants.perl.org/dist/overview/Project-Euler>
-
-=item *
-
-CPAN Testers Results
-
-L<http://cpantesters.org/distro/P/Project-Euler.html>
-
-=item *
-
-CPAN Testers Matrix
-
-L<http://matrix.cpantesters.org/?dist=Project-Euler>
-
-=item *
-
-Source Code Repository
-
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
-
-L<git://github.com/lespea/Project-Euler>
+=item * L<< http://www.github.com/lespea/Project--Euler/ >>
 
 =back
 
-=head2 Bugs
+You can look for further information at:
 
-Please report any bugs or feature requests to C<bug-project-euler at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-Euler>.  I will be
-notified, and then you'll automatically be notified of progress on your bug as I make changes.
+=over 4
 
-=head1 COPYRIGHT AND LICENSE
+=item * RT: CPAN's request tracker
 
-This software is copyright (c) 2010 by Adam Lesperance.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-Euler>
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Project-Euler>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Project-Euler>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Project-Euler/>
+
+=back
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Adam Lesperance.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
 
 =cut
 
+1; # End of Project::Euler

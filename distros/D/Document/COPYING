@@ -1,0 +1,31 @@
+This package was debianized by Dale Amon <amon@vnl.com> on
+Wed,  9 Apr 2008 13:03:50 +0100.
+
+Copyright: 2008 Dale M Amon. All rights reserved.
+
+License:
+
+   This package is free software; you can redistribute it and/or modify
+   it under the terms of the Lesser GNU General Public License as 
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version. Also at your option it
+   may be distributed under Perl Artistic License or the BSD License.
+
+   This package is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the Lesser (Library) GNU General 
+   Public License along with this package; if not, write to the Free 
+   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, 
+   MA  02110-1301 USA
+
+On Debian systems, the complete text of the Lesser (Library) GNU General
+Public License, the Perl Artistic License and the BSD License can be 
+found in `/usr/share/common-licenses/LGPL-2.1',
+`/usr/share/common-licenses/Artistic' and 
+./usr/share/common-licenses/BSD'.
+
+The Debian packaging is (C) 2008, Dale Amon <amon@vnl.com> and
+is licensed under the GPL, see above.

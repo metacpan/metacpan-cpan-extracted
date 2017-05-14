@@ -1,0 +1,42 @@
+This is the RPbufr package.  It contains a perl module for reading
+and writing BUFR files, especially BUFR files containing ground-based GPS data
+or space-based radio occultation (RO) data.
+
+BUFR is a WMO standard for encoding weather observations compactly.  It is
+a non-byte aligned, table-driven standard which weather centers use for
+data to be ingested into weather models.  The BUFR format for radio 
+occultation data has been approved by the WMO, as has the BUFR format
+for ground-based GPS/GNSS data.
+
+This package requires a somewhat recent perl (say >= perl 5.10) and the PDL
+(perl data language) module.
+
+The PDL module has several dependencies, for latest installation instructions, see
+
+http://pdl.perl.org/?page=install
+
+Once PDL is installed, then install this module like so:
+
+tar -xvzf RObufr-V.VV.tar.gz
+cd RObufr-V.VV
+perl Makefile.PL
+make
+make test # should show all OK
+make install
+
+Then you should be able to decode a CDAAC BUFR file (and maybe some other sorts too) like so:
+
+dump_bufr.pl BUFR_file_name
+
+Sample BUFR files are in the ./t directory:
+
+RO BUFR:
+bfrPrf_MTPA.2012.001.00.03.G27_2011.2980_bufr.good
+
+Ground-base GPS:
+ucarPw_2012.249.04.15.0030.01_bufr
+
+Good luck!
+
+Doug Hunt 5/20/2013
+

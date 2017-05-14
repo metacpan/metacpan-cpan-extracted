@@ -1,0 +1,6 @@
+{
+  'host'     => 'some_hostname',
+  'port'     => 1234,
+  'user'     => 'some_user',
+  'password' => 'some_password'
+}

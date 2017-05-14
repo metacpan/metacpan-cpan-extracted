@@ -44,21 +44,21 @@ urpmi can also help installing RPM files directly. Instead of using
 C<rpm -i foobar.rpm>, you can pass the path to the rpm file to urpmi: it
 will then try to resolve the needed dependencies.
 
-Useful options to urpmi include :
+Useful options to urpmi include:
 
 =over 4
 
-=item --auto
+=item B<--auto>
 
 automatic mode: urpmi will not ask questions and always select the default
 choice.
 
-=item --test
+=item B<--test>
 
 tests the installation of packages, but do not actually install anything or
 modify the system.
 
-=item --media I<media1,...,mediaN>
+=item B<--media> I<media1,...,mediaN>
 
 Use only the specified media, instead of defaulting to all available
 media. You can also specify a substring of media names, and urpmi will
@@ -174,7 +174,7 @@ F<second/media_info> subdirectories.
 Per-media metadata consists in an C<hdlist.cz> file, that contains the
 gzipped headers of the RPMs in the media, a C<synthesis.hdlist.cz> file,
 much smaller than the hdlist and that contains only the information
-necessary to urpmi to resolve dependencies, and optionnally a C<pubkey>
+necessary to urpmi to resolve dependencies, and optionally a C<pubkey>
 file if the RPMs are signed (so urpmi can check that the RPMs it downloads
 are signed with the key associated to this media.)
 
@@ -206,7 +206,7 @@ in packages, but a variety of options allows to search through package
 names, provides, requires, RPM descriptions, etc. (or several of those at
 once.)
 
-For example, to find all packages that begin with "apache-" :
+For example, to find all packages that begin with "apache-":
 
     urpmf --name '^apache-'
 
@@ -214,12 +214,12 @@ For example, to find all packages that begin with "apache-" :
 expressions.)
 
 To find all packages that contain files whose pathname includes
-/etc/httpd.conf.d :
+/etc/httpd.conf.d:
 
     urpmf /etc/httpd.conf.d
 
 To find all packages that provide "mail-server", with their version and
-release number (-f) :
+release number (-f):
 
     urpmf --provides -f mail-server
 
@@ -266,7 +266,7 @@ urpmi on the machine to do the actual installation.
 urpmi must be installed on all client machines, but it is not necessary to
 have media defined on these.
 
-To use it, follow those steps :
+To use it, follow those steps:
 
 =over 4
 
@@ -297,89 +297,11 @@ this list.
 
 =item *
 
-Run the urpmi command : for example, to install "package_name" :
+Run the urpmi command: for example, to install "package_name":
 
     urpmi --parallel mynetwork package_name
 
 =back
-
-=head1 urpmi.recover
-
-urpmi.recover is a tool to help management of RPM rollbacks. One rarely
-used feature of RPM is that it can "repackage" the RPMs it deinstalls
-(either because they are upgraded to a newer version, or because they are
-plainly erased), and then reinstall the repackaged RPMs, thereby restoring
-the system to a previous (hopefully more stable) state.
-
-urpmi.recover has three main functions:
-
-=over 4
-
-=item define a checkpoint
-
-C<urpmi.recover --checkpoint> is used to define a point in your system
-that you consider stable, and to start storing info that will enable you
-to rollback to this state (or to any later state).
-
-=item list installations you've done
-
-C<urpmi.recover --list date> is used to list chronologically all
-installations and upgrades on your system up to the specified date. The
-output format gives them grouped by installation transactions. (This
-option has two variants, C<--list-all> and C<--list-safe>.) Here are some
-examples :
-
-List all installations made during the last day :
-
-    urpmi.recover --list '1 day ago'
-
-List all installations since 7th february 2006 :
-
-    urpmi.recover --list 2006-02-07
-
-List all installations since the checkpoint :
-
-    urpmi.recover --list-safe
-
-Lists all installations and upgrades known to the RPM database :
-
-    urpmi.recover --list-all
-
-=item perform rollbacks
-
-C<urpmi.recover --rollback> is used to roll back installations and
-upgrades to a previous point in the past (at most until your checkpoint.)
-It has two variants :
-
-To roll back until a specified date :
-
-    urpmi.recover --rollback <date>
-
-The date can be a duration (for example "2 hours ago") or a date given
-in YYYY-MM-SS hh:mm format.
-
-To roll back a specified number of transactions :
-
-    urpmi.recover --rollback <number of transactions>
-
-In both cases, be careful not to rollback beyond the checkpoint!
-
-=back
-
-Once you've defined a checkpoint, when you use urpmi, urpme or directly
-rpm to install or remove packages, the older packages will be stored in
-/var/spool/repackage. You thus must make sure you have enough space on
-this partition to store all repackaged RPMs.
-
-Technically, defining a checkpoint is equivalent to writing a file
-/etc/rpm/macros.d/urpmi.recover.macros that overrides the rpm macros
-used to set up the repackaging functionalities of rpm. You can change
-C<%_repackage_dir> there if you want to, if you don't want to store
-repackaged RPMs in /var/spool/repackage.
-
-If you want to disable the repackaging functionality and clean up the
-repackage spool, use C<urpmi.recover --disable>. Warning: rollbacks won't
-be possible anymore.
 
 =head1 Restricted urpmi
 

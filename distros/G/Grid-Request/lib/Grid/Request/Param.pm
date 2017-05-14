@@ -28,6 +28,8 @@ use strict;
 use Log::Log4perl qw(get_logger);
 use Grid::Request::Exceptions;
 
+my $MW_PARAM_DELIMITER = ":";
+
 my %VALID_TYPE = ( ARRAY => 1,
                    DIR   => 1,
                    PARAM => 1,
@@ -36,7 +38,7 @@ my %VALID_TYPE = ( ARRAY => 1,
 
 my $logger = get_logger(__PACKAGE__);
 
-our $VERSION = qw$Revision$[1];
+our $VERSION = '0.11';
 if ($^W) {
     $VERSION = $VERSION;
 }
@@ -45,16 +47,29 @@ if ($^W) {
 sub new {
     my ($class, @args) = @_;
     my $self = bless {}, $class || ref($class);
-    $self->_init();
+    $self->_init(@args);
     return $self;
 }
 
 # This _init() method is used to initialize new instances of this class/module.
 sub _init {
     my ($self, @args) = @_;
-    $self->{_type} = "PARAM";
-    $self->{_value} = undef;
-    $self->{_key} = undef;
+    if (scalar @args == 1 && ref(\$args[0]) eq "SCALAR") {
+        my $param_string = $args[0];
+        my @parts = split(/$MW_PARAM_DELIMITER/, $param_string);
+        if (scalar @parts == 3) {
+            $self->{_type} = $parts[0];
+            $self->{_value} = $parts[1];
+            $self->{_key} = $parts[2];
+        } elsif (scalar @parts == 2 && $parts[0] eq "PARAM") {
+            $self->{_type} = $parts[0];
+            $self->{_value} = $parts[1];
+        }
+    } else {
+        $self->{_type} = "PARAM";
+        $self->{_value} = undef;
+        $self->{_key} = undef;
+    }
 }
 
 
@@ -253,6 +268,19 @@ sub _file_count {
         Grid::Request::Exception->throw("Could not close filehandle for: $file.");
     $logger->debug("Returning $count.");
     return $count;
+}
+
+sub to_string {
+    my $self = shift;
+    my $string;
+    if ($self->type() eq "PARAM") {
+        $string = sprintf( '%s' . $MW_PARAM_DELIMITER . '%s',
+                            $self->type(), $self->value());
+    } else {
+        $string = sprintf( '%s' . $MW_PARAM_DELIMITER . '%s' . $MW_PARAM_DELIMITER . '%s',
+                            $self->type(), $self->value(), $self->key() );
+    }
+    return $string;
 }
 
 1;

@@ -5,6 +5,7 @@ use warnings;
 
 use Data::GUID;
 use LWP::ConsoleLogger::Easy qw( debug_ua );
+use LWP::UserAgent ();
 use Test::Fatal qw( exception );
 use Test::More;
 use Test::RequiresInternet( 'pilot-payflowpro.paypal.com' => 443 );
@@ -42,8 +43,8 @@ debug_ua($ua);
     }
 }
 
-my $config;
-try { $config = Util::config() };
+## no critic (ProhibitCallsToUnexportedSubs)
+my $config = try { Util::config() };
 
 SKIP: {
     skip 'config file required for live tests', 2, unless $config;

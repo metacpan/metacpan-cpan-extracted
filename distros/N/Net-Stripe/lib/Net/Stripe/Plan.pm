@@ -1,5 +1,5 @@
 package Net::Stripe::Plan;
-$Net::Stripe::Plan::VERSION = '0.32';
+$Net::Stripe::Plan::VERSION = '0.33';
 use Moose;
 use Moose::Util::TypeConstraints;
 use Kavorka;
@@ -42,7 +42,7 @@ Net::Stripe::Plan - represent a Plan object from Stripe
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 ATTRIBUTES
 

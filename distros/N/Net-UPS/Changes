@@ -1,20 +1,76 @@
-Revision history for Perl extension Net::UPS.
+Revision history for Perl module Net::UPS
 ==============================================
 
-1.00 Thursday, November 10, 2005
+0.16 2015-06-27
+   * thanks to KENTNL for opening RT #105214 and helping me find the
+     culprit of the encoding problems: XML::SAX::PurePerl requires
+     character strings in input
+   * removed encoding test
 
+0.15 2015-02-24
+   * always 'use' IO::Socket::SSL (prevents errors relating to the
+     Net::SSLeay::OP_NO_* constants)
+   * add test to figure out encoding problems
+
+0.14 2015-02-03
+   * allow setting custom SSL options and custom user agent
+   * manually include the root certificate for UPS's servers in the
+     default SSL options
+
+0.13 2014-09-01
+   * incorporate patch from RT #98219, in case AddressKeyFormat is
+     returned multiple times
+   * more tests for address validation
+
+0.12 2014-03-04
+   * replace // with ||, no need to test for definedness
+
+0.11 2014-02-27
+   * FIX RT #92473 add support for street-level address validation,
+     thanks to perl@xev.net for the code
+
+0.10 2013-10-30
+   * do the weaking properly
+   * undo the weakening in 'sub rate', otherwise we get service-less
+     rates out of it
+
+0.09 2013-10-30
+   * weaken service ref in ::Rate in request_rate, this avoids a
+     circular reference and thus a memory leak
+
+0.08 2013-10-29
+   * FIX RT #58402 added new Service Codes
+
+0.07 2013-10-24
+   * honour proxy environment variables
+
+0.06 2013-10-22
+   * added Changes
+   * more testing for RT #87852
+
+0.05-TRIAL 2013-10-15
+    * FIX RT #87852 fix default URLs and allow custom ones
+    * FIX RT #20540 fix & test sizes sorting
+    * FIX RT #24190 ignore warnings from UPS
+    * FIX RT #58369 don't put unknown sizes in hash
+    * FIX RT #21088 better error handling for rates
+    * ported to Dist::Zilla
+
+0.04 2006-02-02
+    * FIX RT #17906 fix oversized rules
+
+0.03 2005-11-10
     * NEW: support for configuration file
     * NEW: Address objects can be validated directly
 
-0.02 Sunday, September 11, 2005
-
+0.02 2005-09-11
     * NEW: results can now be cached with the help of 'cache_life' object attribute
     * NEW: live() class method and 'live' compile-time switch introduced
     * NEW: 'limit_to' and 'exclude' options supported by shop_for_rates()
     * NEW: shop_for_rates() return is sorted by total_charges() in ascending order
 
 
-0.01  Tue May  4 17:51:08 2004
-    - original version; created by h2xs 1.21 with options
+0.01 2004-05-04
+    * original version; created by h2xs 1.21 with options
         -A -X -n Net::UPS
 

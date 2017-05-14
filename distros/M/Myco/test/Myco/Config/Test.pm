@@ -1,7 +1,7 @@
 package Myco::Config::Test;
 
 ################################################################################
-# $Id: Test.pm,v 1.1.1.1 2004/11/22 19:16:05 owensc Exp $
+# $Id: Test.pm,v 1.7 2006/03/31 15:19:41 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ################################################################################
@@ -12,20 +12,11 @@ package Myco::Config::Test;
 
 Myco::Config::Test - Myco::Config unit tester.
 
-=head1 VERSION
-
-$Revision: 1.1.1.1 $
-
-=cut
-
-# Grab the Version Number.
-our $VERSION = (qw$Revision: 1.1.1.1 $ )[-1];
-
 =pod
 
 =head1 DATE
 
-$Date: 2004/11/22 19:16:05 $
+$Date: 2006/03/31 15:19:41 $
 
 =head1 SYNOPSIS
 
@@ -45,34 +36,69 @@ use strict;
 use warnings;
 use Myco::Config;
 use base qw(Test::Unit::TestCase);
+use File::Spec::Functions qw(catfile);
 
-sub test_randy {
+sub test_database {
     my $test = shift;
-    package Myco::Config::randytest;
-    use Myco::Config qw(:randy);
-    $test->assert(RANDY_PORT == 6288, "Check RANDY_PORT" );
-    $test->assert(RANDY_HOST eq 'localhost', "Check RANDY_HOST" );
-    eval "APACHE_USER";
-    $test->assert($@, "APACHE_USER not imported" );
-}
-
-sub test_apache {
-    my $test = shift;
-    package Myco::Config::apachetest;
-    use Myco::Config qw(:apache);
-    $test->assert(APACHE_USER eq 'www', "Got apache User" );
-    $test->assert(APACHE_GROUP eq 'www', "Got apache Group" );
-    eval "RANDY_PORT";
-    $test->assert($@, "RANDY_PORT not imported" );
+    package Myco::Config::database;
+    use Myco::Config qw(:database);
+    $test->assert( defined(DB_DSN), "Check DB_DSN" );
+    $test->assert( defined(DB_USER), "Check DB_USER" );
+    $test->assert( defined(DB_PASSWORD), "Check DB_PASSWORD" );
+    eval "EVLOG";
+    $test->assert($@, "EVLOG not imported" );
 }
 
 sub test_all {
     my $test = shift;
     package Myco::Config::alltest;
     use Myco::Config qw(:all);
-    $test->assert(RANDY_PORT == 6288, "Check RANDY_PORT" );
-    $test->assert(APACHE_USER eq 'www', "Got apache User" );
-    $test->assert(APACHE_GROUP eq 'www', "Got apache Group" );
+    $test->assert( defined(DB_DSN), "Got database group" );
+}
+
+sub test_splitting_string_into_multivalued_item {
+    my $test = shift;
+    package Myco::Config::evlog;
+    use Myco::Config qw(:evlog);
+    $test->assert( defined(EVLOG_CLASSES), "Got an evlog constant" );
+    $test->assert( ref EVLOG_CLASSES eq 'ARRAY', "Got an array of classes" );
+    
+}
+
+sub test_include_file_with_all_key {
+    my $test = shift;
+    # Load the included configuration file
+    my $conf_file = catfile($ENV{MYCO_ROOT}, 'conf', 'include.conf-exaasdasda');
+    eval {
+        open INCLUDE, $conf_file or
+            Myco::Exception::IO->throw(error => "Cannot open $conf_file: $!\n");
+    };
+    $test->assert( $@ and $@ =~ /Cannot open/,
+                  'oops - misspelled include file');
+    
+    $conf_file = catfile($ENV{MYCO_ROOT}, 'conf', 'my_myco_app.conf-example');
+    $test->assert( -f $conf_file, 'got our include file');
+    
+    # Now see if include data gets sucked in through myco.conf with ':all' tag
+    use Myco::Config qw(:all);
+    my $got_doodad = eval { eval 'defined(DOODAD1)' };
+    $test->assert( $got_doodad, "Got DOODAD1 from include file");
+    $test->assert( DOODAD1 eq 'yo!', "DOODAD1 says yo!");
+    $test->assert( DOODAD2 eq 'doo!', "DOODAD2 says doo!");
+    $test->assert( DOODAD3 eq 'dad!', "DOODAD3 says dad!");
+}
+
+sub test_include_file_with_doodads_key {
+    my $test = shift;
+    
+    # Now see if include data gets sucked in with myco.conf with ':doodads' tag
+    use Myco::Config qw(:doodads);
+    my $got_doodad = eval { eval 'defined(DOODAD1)' };
+    $test->assert( $got_doodad, "Got DOODAD1 from include file");
+    $test->assert( DOODAD1 eq 'yo!', "DOODAD1 says yo!");
+    $test->assert( DOODAD2 eq 'doo!', "DOODAD2 says doo!");
+    $test->assert( DOODAD3 eq 'dad!', "DOODAD3 says dad!");
+
 }
 
 1;
@@ -82,7 +108,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

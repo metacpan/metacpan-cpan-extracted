@@ -1,0 +1,94 @@
+** TODO
+
+per user cache of envies
+
+switch perl PERL5PREFIX to PERL_MM_OPT?
+
+explicit dependencies for refcnt>1 ?
+
+include package   # always reload; no dimensions?
+
+support for dimension migration (dimension aliases)?
+
+real lexical analysis -- use XS?
+
+improve catalogue
+
+machine generate shell script variants (see Rc)
+  deprecate csh?
+  keeps sh/csh in sync, less chance of bugs
+  make compatible with rc/es!
+
+regression tests
+  dimension swapping
+  top-level switching
+  Envy::UI
+
+comparison operations -
+  against the same envy symbolic name
+    or against two different
+  diff similarly named env files - shadowed report
+
+pipe long output through $ENV{PAGER}?
+  can't fix envy.pl because shell will eval STDOUT!
+
+umask 0;  # Figure out how to run setuid 'envy'?
+
+documentation for:
+  First - the most important thing is to understand - agree on it!  :-)
+  Envy::DB API
+
+---------------------------------------- GRAPHICAL ENVY PROJECT ---------
+
+Tony.Parent@Symbios.COM wrote:
+This afternoon I started prototyping some stuff for a graphical envy
+module picker/cshrc creator. (Not sure whether I want to use the
+dotfile generator or not.) I'm using perl-TK, so can directly use the
+Envy::DB routines.
+
+What I'm finding I need is the tree stuff we talked about
+before. Basically I need to be able to query the DB to find dimensions
+that are NOT loaded. (Dimensions that are loaded could maybe be
+obtained from the ENVY_STATE and ENVY_DIMENSION environment
+variables. I also need to query for children. Now most of this would
+be more parsing of the .env files correct? I don't see where you
+actually save the dimensions etc of files that aren't loaded. Any
+thing you want me to keep in mind as I work on this? I'm thinking
+it'll be a generic query subroutine in the DB.IN and some stuff in
+envy.pl to add a 'envy.pl tree' command.
+
+On Thu, 3 Sep 1998 Tony.Parent@Symbios.COM wrote:
+> me in the DB code. Correct me if I'm wrong, but so far I'm thinking that
+> I'll essetially have to load each module to make sure the vars are set and
+> I get the correct sub module.
+ 
+Gack!  You're right!  What a mess!  :-)
+ 
+> a.env:
+> 
+> # Set the site variable
+> require SITE 
+> require b_$SITE
+> 
+> In order to show the correct b_<site>.env module I'll have to fully load "a"
+> first. 
+ 
+---------------------------------------------- PIE IN THE SKY! ---
+
+store ENVY_STATE, etc, compressed?!
+
+envy.pl
+  show loaded dimensions in PROMPT?
+&
+  in the 'envy list' the marker is always 'x'
+    make the marker dependent on where the file was loaded?
+
+macro-ize notation?
+  unshift(VAR, ' ', COMPONENTS)
+  push(VAR, ' ', COMPONENTS)
+
+Implement BSD make's "?=" variable assignment operator.  The variable
+is assigned the specified value only if that variable is not already
+defined.  Unload must be eager.  Does anyone want this?
+
+split/join of _any_ very long variable?

@@ -1,0 +1,8 @@
+Changes
+lib/Shishi/Decision.pm
+lib/Shishi/Node.pm
+lib/Shishi/Prototype.pm
+lib/Shishi.pm
+Makefile.PL
+MANIFEST
+test.pl

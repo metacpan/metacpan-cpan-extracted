@@ -18,8 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: DirHandle.pm,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 =pod
 
 =head1 NAME
@@ -30,11 +28,7 @@ Net::FTPServer::DirHandle - A Net::FTPServer directory handle.
 
   use Net::FTPServer::DirHandle;
 
-=head1 DESCRIPTION
-
 =head1 METHODS
-
-=over 4
 
 =cut
 
@@ -54,6 +48,8 @@ use vars qw(@ISA);
 @ISA = qw(Net::FTPServer::Handle);
 
 =pod
+
+=over 4
 
 =item $dirh = new Net::FTPServer::DirHandle ($ftps);
 
@@ -244,7 +240,7 @@ sub open
 
 __END__
 
-=back 4
+=back
 
 =head1 AUTHORS
 
@@ -257,6 +253,6 @@ London, SW6 3EG, UK
 
 =head1 SEE ALSO
 
-L<Net::FTPServer(3)>, L<perl(1)>
+C<Net::FTPServer(3)>, C<perl(1)>
 
 =cut

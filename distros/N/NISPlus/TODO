@@ -1,0 +1,10 @@
+Here are a few things that people have asked for, or I believe need to
+be in the NISPerl package.  If you want to implement any of these, let
+perl-nis@lists.fulcrum.com.au know to avoid dupication of effort, and
+to keep some consistency in the overall design.
+
+- Implement remainder of NIS+ interface
+- Implement group handling
+- Implement directory handling
+- Tie interface for simple access to data
+- Credential manipulation

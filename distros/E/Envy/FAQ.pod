@@ -1,0 +1,145 @@
+=head1 WHERE DOES ENVY FIT IN?
+
+Q: We are looking into how to sync up two separate sits with common
+software and other tools.  Envy struck us as a way to go, but we are
+not sure of all the possable usages of the software.  Our objective is
+to have a way to maintain two separate job sites, and not spend a lot
+of time checking paths, working tool directories, and so forth.  How
+does envy fit in?
+
+A: Envy is designed to centralize specification of environment
+variables.  It also helps manage dependencies between versions.  It
+sounds like envy might fit your requirements.  Read on!
+
+=head1 IS THERE ANY DOCUMENTATION ON THE FORMAT OF AN .ENV FILE?
+
+It's all online: 'envy help'.  Also see the example directory.
+
+=head1 HOW CAN I DO CONDITIONAL REQUIRE?
+
+I want to do something like this:
+
+if($SITE == "FC"){
+  require mgc.site1  
+}elsif($SITE == "CS"){
+  require mgc.site2
+}
+
+Maybe you didn't realize that variable interpolation is also done in
+require?  For example
+
+  require mgc.$SITE
+
+=head1 DIMENSIONS?
+
+Only one version of a particular dimension can be active on one time.
+For example, if you have a set of envy files like this:
+
+  skylark-1.1.env
+  skylark-1.2.env
+  boomhopper-3.1.env
+  boomhopper-3.2.env
+
+Set up 'skylark' as one dimension and 'boomhopper' as another.  Then
+you can mix versions but you will be prevented from having two
+versions of 'boomhopper' active at once.  The name of the dimension is
+usually the name of the packages without the version number.
+
+=head1 WHY IS IT IMPORTANT TO BE ABLE TO UNLOAD?
+
+You can always start a fresh shell but it isn't very clean or
+intuitive.  Rather, I took the requirement to unload as a principle in
+guiding envy's design.  It is this requirement more than anything else
+that restricts the kind of features that I am willing to implement.
+
+=head1 ARE THERE ANY TOOLS SIMILAR TO ENVY?
+
+Envy shares some ideas with www.modules.org.  That is the only similar
+tool that I know of.
+
+=head1 HOW DO I TEST NEW .ENV FILES?
+
+Put them in $HOME/.envy/.  This directory is always in envy's search
+path.
+
+=head1 WHAT IS LAUNCHE?
+
+'lauche' is very similar to 'env' except that instead of setting
+environment variables, it loads envy modules.  There is also a mode
+that exactly simulates the execution environment of crontab.  This
+makes it easy to test cron jobs:
+
+  /path/to/bin/launche -c my-env-1.0 -- cmd p1 p2
+
+=head1 HOW DO I MANAGE PERL INSTALLATIONS WITH ENVY?
+
+This is a bit tricky since envy itself requires perl.  The approach
+that we use is as follows.  We have a very stable, rarely changing
+perl installed under /usr/local.  This version of perl is kept a major
+release or so behind to insure stability.  Upon login, this perl is
+the only perl in $PATH.  Many of our applications require a newer
+version of perl or at least various perl extensions.  To support this,
+we have a bunch of envies like this:
+
+  dimension perl
+  desc perl 5.005_55 gcc 2.8.1 -g + special hacks
+  PATH+=/data/research/p18/bin
+  LD_LIBRARY_PATH+=/data/research/p18/lib
+  MANPATH+=/data/research/p18/man:/data/research/p18/lib/perl5/man
+
+The only difficulty is that many perl scripts make use of
+#!/full/path/to/perl.  Since the path to perl changes with every perl
+release, scripts must be edited.  Makefile.PL makes this fairly easy.
+Alternately, scripts can use #!/symlink/to/dev/perl or
+#!/symlink/to/production/perl.  Both techniques may be used in
+managing the full release cycle.
+
+=head1 HOW TEST THE STATUS OF ENVY IN A SHELL SCRIPT?
+
+  if envy myapp-1.0; then echo yes; else echo no; fi
+
+This doesn't work because 'envy' is really a shell function.  You'll
+need something more like this (untested):
+
+  if envy myapp-1.0 > /tmp/envy$$; then
+    echo oops
+  else
+    . /tmp/envy$$
+  fi
+  /bin/rm -f /tmp/envy$$
+
+=head1 WHAT IF USERS ARE RESISTING?
+
+echo
+echo *** Welcome to Big Company!
+echo
+echo 1. If you are a developer, you might like to be in 'dev' by default:
+echo   echo dev > $HOME/.custom/startup
+echo
+echo 2. If you write crontab scripts, make sure they can run like this:
+echo   env -i $ETOP/bin/launche -c my-env -- cmd p1 p2 ...
+echo
+echo We realize this is a bit confusing.  If you have any questions,
+echo please don't hesitate to voice your concerns or questions to
+echo Sasha or Joshua.
+echo
+echo WE FEEL THAT THE ENVY SYSTEM MEETS THE REQUIREMENTS IN THE
+echo SIMPLEST POSSIBLE MANNER.  THANK YOU VERY MUCH FOR YOUR PATIENCE.
+echo
+
+=head1 SUPPORT
+
+Please send email to envy@listbox.com.
+
+=head1 THANKS!
+
+The following people made significant (and insignificant!)
+contributions to Envy.  May your hair never turn purple!  (Thanks!)
+
+  Vicky Nayer
+  Jerry.Hoffman@symbios.com
+  Tony.Parent@symbios.com
+  Sergei Poliakoff
+  Alexander Shugayev
+  Devina Kerr White
+  and many others...!

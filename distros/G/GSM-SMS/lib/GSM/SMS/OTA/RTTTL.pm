@@ -275,7 +275,7 @@ sub OTARTTTL_check {
              return "Error on duration in note '$note' ($cnt)\n";
          }
 
-         unless ( $n =~ /([a-g]|p)#?/ ) {
+         unless ( $n =~ /(p|a|b|c|d|e|f|g|h)#?/i ) {
              return "Error on note in note '$note' ($cnt)\n";
          }
 

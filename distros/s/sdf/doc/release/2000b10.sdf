@@ -1,0 +1,442 @@
+H1: 2.000beta10
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Introduction
+
+The primary objectives of this release are:
+
+^ To provide a "working prototype" for a POD-friendly SDF.
++ To rationalise SDF's escaping mechanisms and stabilise it's syntax.
++ To provide greatly improved man page generation (via {{pod2man}}).
++ To provide PostScript generation without needing a commercial tool.
+
+I still need to fix up some bugs and loose ends
+with respect to the POD stuff, but there's enough working
+to be useful (in my opinion, at least). In particular,
+the core POD documentation provided with Perl 5.004 can be:
+
+^ Converted to SDF and back to POD with a high degree of success
+  (99.95% if the perltoc.pod file is excluded).
++ Converted to HTML and plain text using the {{CMD:sdf}} program.
+
+If you're an existing POD user, please read the
+{{DOC:SDF for POD Users}} tutorial. If you find
+a bug not listed in the PODNOTES file,
+email the details to {{EMAIL:sdf-bugs@mincom.com}}.
+
+If you're an existing SDF user, please note that
+most of the documentation doesn't yet reflect the
+changes outlined below. You will also need to
+take care with the {{SECT[jump="#2.000beta10 - Incompatibilities"]
+Incompatibilities}} outlined below.
+
+H2: Enhancements
+
+The enhancements are:
+
+!block sections
+. SDF is now POD-friendly
+. Syntax Enhancements
+. Verbatim paragraphs
+. Special symbol escapes
+. Enumerated lists
+. New macros
+. New phrase styles
+. Manpage, LaTeX and fancy text support
+. PostScript generation without a commercial tool
+. POD to SDF conversion
+. Nesting of POD within SDF
+. Automatic translation of POD files
+. Configuration library for Perl documentation.
+. Topic previewing
+. Easier text width control
+!endblock
+
+Further details are provided below.
+
+H3: SDF is now POD-friendly
+
+POD users can now use SDF or migrate to SDF when
+POD isn't powerful enough. In particular:
+
+* POD can now be {{converted}} to SDF and vice versa
+* SDF can now be {{nested}} inside POD and vice versa
+* SDF is now largely upwardly compatible with POD in
+  terms of syntax and functionality.
+
+A {{CMD:poddiff}} program is provided so that users can
+translate POD -> SDF -> POD and compare the generated
+POD with the original.
+
+
+H3: Syntax Enhancements
+
+Any SDF macro can now be called via POD's = syntax, i.e.
+if a macro call starts with an = character, the call is
+terminated by the next blank line.
+
+As a consequence of its new meaning, = is no longer available
+as a shorthand for the E paragraph tag. However, the > character
+can now be used as a shorthand for the V (verbatim) paragraph
+tag. See {{SECT:Verbatim paragraphs}} below.
+
+Any phrase style which is a single capital letter can now
+be specified using POD's [A-Z]<..> syntax. So, the following
+lines are equivalent:
+
+>   Hello {{B:world}}
+>   Hello B<world>
+
+Paragraph and phrase styles must now start with a capital letter,
+digit or underscore. As a result, the following SDF will now come
+out as expected.
+
+V:  The following documents should be
+V:  reviewed:
+
+Previously, SDF would warn about {{reviewed}} being an unknown
+paragraph style. As a special case, phrases which look like URLs
+are still assumed to be so.
+
+Outside of blocks and multi-line macros calls, a \ at the
+start of a line now escapes a special character or pattern,
+including itself. A \ can also be used to escape a ] character
+within a set of attributes.
+
+At the end of a !-style macro call line:
+
+* a single \ continues the macro onto the next line
+* exactly 2 backslashes means a single backslash (with no continuation)
+* N backslashes (N >= 3) means N-1 backslashes with continuation
+
+
+H3: Verbatim paragraphs
+
+For fixed-width verbatim paragraphs, the > special tag or
+V paragraph style can now be used. For example:
+
+>>  {{Hello world}}
+
+or
+
+>V:  {{Hello world}}
+
+The result is:
+
+>  {{Hello world}}
+
+The new {{verbatim}} filter can be used to mark a block
+of text as verbatim.
+
+In fact, the interpolation of embedded characters within
+the text of any paragraph can be disabled by setting the
+{{verbatim}} paragraph attribute. For example:
+
+>  N[verbatim] {{Hello world}}
+
+The result is:
+
+N[verbatim] {{Hello world}}
+
+H3: Special symbol escapes
+
+SDF uses a number of special symbols inside paragraphs:
+
+* A-ZE<lt> and > - delimit {{concise}} phrases
+* E<2{> and E<2}> - delimit {{verbose}} phrases
+* E<2[> and E<2]> - delimit expressions (e.g. variables).
+
+If you need to include one of these symbols in a paragraph,
+use the appropriate escape as shown below.
+
+!block verbatim
+    Symbol      Escape
+    <           E<lt>
+    >           E<gt>
+    {{          E<2{>
+    }}          E<2}>
+    [[          E<2[>
+    ]]          E<2]>
+!endblock
+
+Note the following rules:
+
+^ It isn't necessary to escape any symbols within:
+  - paragraphs tagged with the V style or > tag
+  - paragraphs given the verbatim attribute
+  - paragraphs within a verbatim block
+
++ It is only necessary to escape a < when it appears after
+  a capital letter.
+
++ It is only necessary to escape a > inside a concise phrase.
+  In particular, > is implicitly escaped within a verbose phrase.
+
+H3: Enumerated lists
+
+In addition to bulleted, ordered and plain lists, SDF now
+supports enumerated lists, i.e. lists where each item is a label.
+Each enumerated list item is tagged with either:
+
+* a & special tag (& .. &&&&&& like the other lists), or
+* the LIn style, where n = 1 .. 6.
+
+For example:
+
+!block verbatim
+& BTW
+. by the way
+& FYI
+. for your information
+& RTFM
+. read the flamin' manual
+!endblock
+
+The result is:
+
+& BTW
+. by the way
+& FYI
+. for your information
+& RTFM
+. read the flamin' manual
+
+H3: New macros
+
+All of POD's commands are now available as SDF macros.
+The new macros are:
+
+!block table
+Macro           Meaning
+head{{n}}       level {{n}} heading (n = 1 .. 6)
+over [N]        begins a list (N is the suggested indentation which is ignored)
+item string     label for item in a list
+back            ends a list
+pod             does nothing
+cut             ignore text until an = is found at the start of a line
+for X Y         Y is target-specific output for X
+begin X         begin target-specific output for X
+end X           end target-specific output for X
+!endblock
+
+See the perlpod manpage for further details.
+
+H3: New phrase styles
+
+All of POD's interior sequences are now available as SDF phrase styles.
+The new phrase styles are:
+
+!block table
+Style           Meaning
+B               bold
+C               code
+E               special symbol or HTML escape
+F               file
+I               italics
+L               POD-style link
+S               text contains non-breaking spaces
+X               an index entry
+Z               does nothing
+!endblock
+
+See the perlpod manpage for further details on the meanings
+of these tags.
+
+Note: The S and X tags are not yet working for most output formats. 
+
+H3: Manpage, LaTeX and fancy text support
+
+The {{sdf -2man ...}} command now generates a {{.out}} file in POD format and
+runs {{CMD:pod2man}}. The old man page generation software was
+limited in scope and quite buggy, so this will hopefully improve
+things in the short-to-medium term.
+The F<toman.pl> output driver has been moved to the
+F<contrib/drivers> directory just in case anyone
+really wants to use it instead.
+
+The {{sdf -2latex ...}} command now generates a {{.out}} file
+in POD format and runs {{CMD:pod2latex}}. This creates a {{.out.tex}}
+file which should probably be renamed to delete the {{.out}} bit.
+
+The {{sdf -2text ...}} command now generates a {{.out}} file
+in POD format and runs {{CMD:pod2text}}. For compatibility with
+{{CMD:pod2text}}, this sends the output to standard output.
+
+Note: Plain text output is still available via the -2txt option.
+
+Hopefully, someone will provide fully functional manpage and LaTeX
+drivers (complete with table support) eventually.
+
+H3: PostScript generation without a commercial tool
+
+SDF can now generate PostScript without needing a commercial tool.
+This can be done by:
+
+^ Using {{sdf -2podps ...}} which generates PostScript directly via the
+  freely available {{CMD:pod2ps}} program.
+
++ Using {{sdf -2man ...}} which generates a man page which can be
+  converted to PostScript by using the appropriate (*roff) tools.
+
++ Using {{sdf -2latex ...}} which generates a LaTeX document which can be
+  converted to PostScript by using LaTeX.
+
+In general, the output via these methods isn't as good as the
+PostScript generated via FrameMaker, but it may be good enough.
+In particular, certain looks (e.g. infomap) are not available.
+
+H3: POD to SDF conversion
+
+A {{CMD:pod2sdf}} program is now available which is a wrapper
+around  a Perl module called Pod::Sdf. The SDF generated is more or less
+identical to the input POD, except that verbatim lines
+are tagged with a leading ">". The usage of {{CMD:pod2sdf}} is:
+
+>  pod2sdf [-m] podfile > outfile
+
+If the -m option is provided, the document is converted as
+a main document, rather than a topic, i.e. the NAME section is
+converted to a {{MAC:build_title}} macro rather than a {{head1}}
+macro.
+
+POD authors can escape to SDF if and when they need to by
+using the "=for sdf" and/or "=begin/end sdf" command pair.
+For example:
+
+>  =for sdf
+>  !block table
+>  Name    Meaning
+>  POD     Plain Old Documentation
+>  SDF     Simple Document Format
+>  !endblock
+
+If you want the rest of a POD file to be in SDF, simply put
+in an "=begin sdf" - the closing "=end sdf" isn't necessary.
+
+H3: Nesting of POD within SDF
+
+POD can now be nested inside SDF via the new {{FILT:pod}} filter
+(which is another wrapper around the Pod::Sdf module). e.g.
+
+>   !block pod
+>   =head2 My B<heading>
+>
+>      Some verbatim text
+>   !endblock
+
+Note: Within the pod filter, all lines before the first command
+is ignored and leading whitespace implies a verbatim paragraph.
+
+The pod filter can also be specified to the {{MAC:include}} and
+{{MAC:execute}} macros. For example:
+
+>  !include "perlre.pod"; pod
+>  !execute "getpod 'hello.c'"; pod
+
+where {{getpod}} is a fictitious program which outputs POD to standard output.
+
+H3: Automatic translation of POD files
+
+If a file with a {{.pod}}, {{.pm}} or {{.PL}} extension
+is provided as an argument to the {{CMD:sdf}} command,
+the {{FILT:pod}} filter is implicitly applied. So
+
+. sdf -2html perlre.pod
+
+will generate HTML for F<perlre.pod> using SDF's HTML output driver.
+You can also explicitly request pod prefiltering via the -p option.
+e.g.
+
+. sdf -2html -ppod abc.pd
+
+When pod prefiltering happens, the output is assumed to be a
+main document.
+
+H3: Configuration library for Perl documentation
+
+A configuration library for building Perl's documentation
+is provided. The main thing which this provides is
+semi-intelligent hypertext link generation between Perl's
+standard documentation and its library documentation.
+Within this library, the HTML root directory (equivalent to
+{{CMD:pod2html}}'s --htmlroot flag) can be controlled via the
+PERL_HTML_ROOT variable. The default value is /perl.
+Typical usage is:
+
+>  sdf -2html -cperl -DPERL_HTML_ROOT=/nmanual/perl perl*.pod
+
+At the moment, this library is only required for HTML generation.
+
+H3: Topic previewing
+
+When editing a topic within a large document, it can
+be useful to only compile that topic in order to
+preview its appearance. The new -H option can be used
+to adjust the initial heading level like this:
+
+>  sdf -2ps -H3 -kinfomap mytopic.sdf
+
+Without the -H3 option, the H1s within F<mytopic.sdf>
+would come out as level 1 headings, rather than level 3
+headings.
+
+H3: Easier text width control
+
+The width of text output can now be controlled from the command
+line by using the new -w option to the {{CMD:sdf}} program.
+
+
+H2: Fixes
+
+Special characters in headings (like [) no longer cause problems.
+
+The POD output driver has been fixed. In particular, the generation
+of list items has been fixed.
+
+Some bugs in the pretty printing of source code have been fixed:
+
+* 80 character lines should now fit
+* The >> character sequence is no longer lost
+* form feeds become page breaks.
+
+Handling of multi-line macro calls within a block or macro
+has been fixed.
+
+The {{FILT:box}} filter no longer centers the contents of the box
+unless the {{lines}} parameters is provided.
+
+
+H2: Incompatibilities
+
+This release now requires Perl 5. If you are still using Perl 4.036,
+you will need to upgrade.
+
+As paragraph and phrase styles can no longer start with a
+lowercase character, you will need to rename any user-defined
+styles which violate this rule.
+
+Lines within paragraphs which begin with the > or & character
+will now need to be escaped by a leading \.
+
+Wide example now use a slightly smaller font.
+
+The default values for the DOC_DISTRIBUTION and DOC_STATUS variables
+are now empty strings. Previously, they were "COMMERCIAL IN CONFIDENCE"
+and "Draft" respectively.
+
+Making SDF POD-friendly has introduced a number of incompatibilities.
+These are summarised below:
+
+* The = character is no longer a shorthand for E: - it is now
+  used for multi-line macro calls.
+
+* Existing paragraphs which contain the sequence [A-Z]<..>
+  (i.e. a POD-like phrase) as text will need to be changed.
+
+* The S (strong) and E (example) phrase styles have been renamed to
+  ST and EX respectively. S and E now have the same meaning as
+  their POD counterparts, i.e. "text contains non-breaking spaces"
+  and "escape" respectively. As the S tag was often used for
+  "symbols" (i.e. variables, subroutines) within a library,
+  a Y tag has been introduced for this purpose.

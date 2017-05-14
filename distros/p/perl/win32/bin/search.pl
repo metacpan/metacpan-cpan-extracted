@@ -182,8 +182,6 @@ However, duplicating things (such as -name '*.c' -name '*.txt') implies OR.
 If any letter in -newer/-older is upper case, "or equal" is
 inserted into the test.
 
-You can always find the latest version on the World Wide Web in
-   http://www.wg.omron.co.jp/~jfriedl/perl/
 INLINE_LITERAL_TEXT
 	  exit(0);
       }
@@ -198,7 +196,7 @@ INLINE_LITERAL_TEXT
       $iflag='i',           next if $arg eq '-i';       ## ignore case
       $norc=1,              next if $arg eq '-norc';    ## don't load rc file
       $showrc=1,            next if $arg eq '-showrc';  ## show rc file
-      $underlineOK=1,       next if $arg eq '-u';       ## look throuh underln.
+      $underlineOK=1,       next if $arg eq '-u';       ## look through underln.
       $words=1,             next if $arg eq '-w';       ## match "words" only
       &strip                     if $arg eq '-strip';   ## dump this program
       last                       if $arg eq '-e';
@@ -466,7 +464,7 @@ sub prepare_to_search
 	  ##
 	  if ($underlineOK) {
 	     if ($regex =~ m/[?*+{}()\\.|^\$[]/) {
-		warn "$0: warning, can't underline-safe ``$regex''.\n";
+		warn "$0: warning, can't underline-safe '$regex'.\n";
 	     } else {
 		$regex = join($underline_glue, split(//, $regex));
 	     }
@@ -1143,10 +1141,7 @@ more powerful and efficient (and intuitive, I think).
 
 This manual describes
 .I search
-as of version "941227.4". You can always find the latest version at
-.nf
-   http://www.wg.omron.co.jp/~jfriedl/perl/index.html
-.fi
+as of version "941227.4".
 
 .SH "QUICK EXAMPLE"
 Basic use is simple:

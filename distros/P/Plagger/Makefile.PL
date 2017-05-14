@@ -11,7 +11,9 @@ requires('Template', 2.13);
 requires('Template::Provider::Encoding' => 0.04);
 requires('YAML' => 0.39);
 requires('Text::Tags');
-requires('DateTime' => 0.29);
+requires('DateTime' => 0.35);
+requires('DateTime::TimeZone' => 0.56);
+requires('DateTime::Locale' => 0.32);
 requires('DateTime::Format::Mail');
 requires('DateTime::Format::W3CDTF');
 requires('DateTime::Format::Strptime');
@@ -29,12 +31,13 @@ requires('Net::DNS');
 requires('XML::Feed', 0.12);
 requires('XML::LibXML');
 requires('XML::Atom', 0.23);
-requires('XML::RSS::LibXML', 0.20);
+requires('XML::RSS::LibXML', 0.23);
 requires('Encode', 2.10);
 requires('Term::Encoding');
 requires('File::HomeDir');
 
 build_requires('YAML');
+build_requires('YAML::Loader');
 include_deps('YAML');
 
 build_requires('Test::More', 0.42);
@@ -43,7 +46,7 @@ build_requires('Test::Base', 0.52);
 features(
     'Better Encoding detection' => [
         -default => 0,
-        recommends('Encode::Detect'),
+        recommends('Encode::Detect', 1.0),
     ],
     'POD Testing' => [
         -default => 0,
@@ -62,6 +65,15 @@ features(
     'XPath support in Subscription and Feed Upgrader' => [
         -default => 1,
         recommends('HTML::TreeBuilder::XPath'),
+    ],
+    'Better html to text formatter' => [
+        -default => 1,
+        recommends('HTML::TreeBuilder'),
+        recommends('HTML::FormatText'),
+    ],
+    'Parse Japanese datetime format' => [
+        -default => 0,
+        recommends('DateTime::Format::Japanese'),
     ],
 );
 

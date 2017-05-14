@@ -1,0 +1,42 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Variables
+
+H2: Overview
+
+The categories of predefined variables are:
+
+^ Conversion variables
++ Document variables
++ File variables
++ Miscellaneous variables.
+
+Date-time variables are in units of {{seconds since January 1, 1970}}.
+To format a time, use the {{SUBR:FormatTime}} subroutine.
+
+Further details on each group of variables are provided below.
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!block topics
+Topic
+var_conv
+var_doc
+var_file
+var_misc
+!endblock
+!off paragraph h2top

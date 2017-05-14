@@ -3,37 +3,43 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = qw(. ../lib);
+    require "./test.pl"; require "charset_tools.pl";
+    skip_all_without_perlio();
 }
 
 use Config;
 
-require "test.pl";
 
 my $file = tempfile();
+my $crlf = uni_to_native("\015\012");
+my $crcr = uni_to_native("\x0d\x0d");
 
-if (find PerlIO::Layer 'perlio') {
-    plan(tests => 16);
+my $ungetc_count = 8200;    # Somewhat over the likely buffer size
+
+{
+    plan(tests => 16 + 2 * $ungetc_count);
     ok(open(FOO,">:crlf",$file));
     ok(print FOO 'a'.((('a' x 14).qq{\n}) x 2000) || close(FOO));
     ok(open(FOO,"<:crlf",$file));
 
     my $text;
     { local $/; $text = <FOO> }
-    is(count_chars($text, "\015\012"), 0);
+    is(count_chars($text, $crlf), 0);
     is(count_chars($text, "\n"), 2000);
 
     binmode(FOO);
     seek(FOO,0,0);
     { local $/; $text = <FOO> }
-    is(count_chars($text, "\015\012"), 2000);
+    is(count_chars($text, $crlf), 2000);
 
     SKIP:
     {
-	skip("miniperl can't rely on loading PerlIO::scalar")
-	if $ENV{PERL_CORE_MINITEST};
-	skip("no PerlIO::scalar") unless $Config{extensions} =~ m!\bPerlIO/scalar\b!;
+	skip_if_miniperl("miniperl can't rely on loading PerlIO::scalar",
+			  2 * $ungetc_count + 1);
+	skip("no PerlIO::scalar", 2 * $ungetc_count + 1)
+	    unless $Config{extensions} =~ m!\bPerlIO/scalar\b!;
 	require PerlIO::scalar;
-	my $fcontents = join "", map {"$_\015\012"} "a".."zzz";
+	my $fcontents = join "", map {"$_$crlf"} "a".."zzz";
 	open my $fh, "<:crlf", \$fcontents;
 	local $/ = "xxx";
 	local $_ = <$fh>;
@@ -41,7 +47,17 @@ if (find PerlIO::Layer 'perlio') {
 	seek $fh, $pos, 0;
 	$/ = "\n";
 	$s = <$fh>.<$fh>;
-	ok($s eq "\nxxy\n");
+	is($s, "\nxxy\n");
+
+        for my $i (0 .. $ungetc_count - 1) {
+            my $j = $i % 256;
+            is($fh->ungetc($j), $j, "ungetc of $j returns itself");
+        }
+
+        for (my $i = $ungetc_count - 1; $i >= 0; $i--) {
+            my $j = $i % 256;
+            is(ord($fh->getc()), $j, "getc gets back $j");
+        }
     }
 
     ok(close(FOO));
@@ -66,13 +82,10 @@ if (find PerlIO::Layer 'perlio') {
 	    close FOO;
 	    print join(" ", "#", map { sprintf("%02x", $_) } unpack("C*", $foo)),
 	    "\n";
-	    ok($foo =~ /\x0d\x0a$/);
-	    ok($foo !~ /\x0d\x0d/);
+	    like($foo, qr/$crlf$/);
+	    unlike($foo, qr/$crcr/);
 	}
     }
-}
-else {
-    skip_all("No perlio, so no :crlf");
 }
 
 sub count_chars {

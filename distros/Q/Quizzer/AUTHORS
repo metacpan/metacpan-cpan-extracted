@@ -1,0 +1,10 @@
+Stefano Corsi <ippo@madeinlinux.com> is the author of Quizzer and of the 
+sample test set. He has also modified Debconf to use it as a template
+system for Quizzer.
+
+Joey Hess <joey@kitenet.net> is the author of Debconf, the library/system
+used for Debian configuration.
+
+Alessandro Briosi <abriosi@madeinlinux.com> e Giuliano Pellegrini <gpellegrini@madeinlinux.com> have created the sample quiz-long.txt.
+
+Christopher Gabriel <cgabriel@madeinlinux.com> has contributed to the sample quiz-long.txt

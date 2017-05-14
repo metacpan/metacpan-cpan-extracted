@@ -13,7 +13,7 @@ use base 'App::Pinto::Command';
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ App::Pinto::Command::props - show or set stack properties
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 SYNOPSIS
 
@@ -132,11 +132,7 @@ core and therefore does not need to be added to the stack.
 It must be a version string or number for an existing perl release, 
 and cannot be later than the latest version specified in your
 L<Module::CoreList>.  To target even newer perls, just install the 
-latest version of L<Module::CoreList>.  Remember that Pinto is often
-installed as a stand-alone application, so you will need to update
-Pinto's copy of L<Module::CoreList> - for example:
-
- cpanm -L /opt/local/pinto/ Module::CoreList
+latest version of L<Module::CoreList>.
 
 =back
 
@@ -146,7 +142,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

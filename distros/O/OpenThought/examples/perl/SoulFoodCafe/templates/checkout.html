@@ -1,0 +1,29 @@
+<html>
+<head>
+  <title>Soul Food Cafe (an OpenThought demo)</title>
+  <script src="/OpenThought.js"></script>
+</head>
+
+  <body bgcolor="#999999">
+
+<center><h3>Checkout Complete</h3>
+
+<p>Coming right up! Thanks for your order.</p>
+
+<p>Your total is $<tmpl_var name="total_cost">.</p>
+
+<p>We hope you come back soon to the <b>Soul Food Cafe</b>.</p>
+
+<form>
+<input type="button" value="<-- Modify Order"
+       onClick="OpenThought.FetchHtml('index.pl', 'run_mode=show_storefront',
+                                      '_session_id=<tmpl_var name=session_id>')">
+&nbsp;&nbsp;&nbsp;
+<input type="button" value="OpenThought Homepage -->"
+       onClick="OpenThought.CallUrl('index.pl', 'run_mode=good_bye',
+                                    '_session_id=<tmpl_var name=session_id>')">
+</form>
+</center>
+
+</body>
+</html>

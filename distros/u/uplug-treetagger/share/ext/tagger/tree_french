@@ -1,0 +1,19 @@
+#!/bin/sh
+
+ROOT=${UPLUGSHARE}/ext/tree-tagger
+BIN=$ROOT/bin
+CMD=$ROOT/cmd
+LIB=$ROOT/lib
+
+
+OPTIONS="-token -lemma -sgml"
+
+TAGGER=${BIN}/tree-tagger
+TOKENIZER=${CMD}/tokenize.pl
+ABBR_LIST=${LIB}/french-abbreviations
+PARFILE=${LIB}/french.par
+
+$TOKENIZER -f -a $ABBR_LIST $* |
+$TAGGER $OPTIONS $PARFILE
+
+

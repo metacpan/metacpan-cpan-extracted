@@ -1,0 +1,51 @@
+#!/bin/sh
+# last mod 05.05.04 WN
+#
+# Need the commands ps, awk, kill, sleep
+PATH=${PATH}${PATH:+:}/sbin:/bin:/usr/bin
+ 
+
+killproc() {            # kill the named process(es)
+        for x in `ps -e |grep " $@" |sed -e 's/^  *//' -e 's/ .*//'`
+	do
+                echo "PID: $x"
+                [ ! -z "$pid" ] && echo killing $x && kill $pid &
+        done
+}
+
+ 
+ARCXD_PATH=/opt/products/perl/5.8.2/scripts
+
+case "$1" in
+'start')
+	ps -ef | grep "$ARCXD_PATH/arcxd" | grep -v grep > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		echo "arcxd daemon already running."
+                echo "please check if there are running both"
+                echo " one with default port and one with port 4243"
+		exit 1
+	fi
+
+
+	if [ -x $ARCXD_PATH/arcxd ]
+	then
+                echo "Starting arcx service  ..."
+		$ARCXD_PATH/arcxd 
+#       for batch jobs
+		$ARCXD_PATH/arcxd -p 4243
+	fi
+	;;
+'stop')
+	killproc arcxd
+	;;
+
+'restart')
+
+	$0 stop && sleep 3 && $0 start;;
+
+
+*)
+	echo "Usage: /etc/init.d/init.arcxd { start | restart |  stop }"
+	;;
+esac

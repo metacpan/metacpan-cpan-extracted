@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: primer3.t,v 1.4 2003/08/05 22:43:22 kclark Exp $
+# $Id: primer3.t 16 2008-11-07 02:44:52Z kyclark $
 
 #
 # Tests specific to "primer3" program.

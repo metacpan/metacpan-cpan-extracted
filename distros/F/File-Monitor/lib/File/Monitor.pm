@@ -8,140 +8,60 @@ use base qw(File::Monitor::Base);
 
 use File::Monitor::Object;
 
-use vars qw( $VERSION );
-$VERSION = '1.00';
+use version; our $VERSION = qv('0.0.2');
 
 sub _initialize {
-  my $self = shift;
-  my $args = shift || {};
+    my $self = shift;
+    my $args = shift || { };
 
-  $self->SUPER::_initialize( $args );
-  $self->_install_callbacks( $args );
+    $self->SUPER::_initialize( $args );
+    $self->_install_callbacks( $args );
+    $self->_report_extra( $args );
 
-  if ( my $base = delete $args->{base} ) {
-    $self->base( $base );
-  }
-
-  $self->_report_extra( $args );
-
-  $self->{_monitors} = {};
+    $self->{_monitors} = { };
 }
 
-sub has_monitors {
-  my $self = shift;
-  return 1 if exists $self->{_monitors} && %{ $self->{_monitors} };
-  return;
-}
+sub set_watcher {
+    my $self   = shift;
+    my $object = shift;
 
-sub base {
-  my $self     = shift;
-  my $cur_base = $self->{_base};
-  return $cur_base unless @_;
-  my $new_base = shift or croak "Can't unset base directory";
+    my @need_method = grep { ! $object->can($_) } qw(name scan);
+    if (@need_method) {
+        croak "Watcher $object lacks the required methods: ", join(', ', @need_method);
+    }
 
-  if ( !defined $cur_base && $self->has_monitors ) {
-    croak "Can't make a non-empty absolute "
-     . __PACKAGE__
-     . " relative";
-  }
-
-  $self->{_base}
-   = File::Spec->canonpath( File::Spec->rel2abs( $new_base ) );
-}
-
-sub _set_watcher {
-  my $self   = shift;
-  my $object = shift;
-
-  my $name = $self->_make_relative( $object->name );
-  return $self->{_monitors}->{$name} = $object;
+    my $name = $object->name;
+    
+    return $self->{_monitors}->{$name} = $object;
 }
 
 sub watch {
-  my $self = shift;
+    my $self = shift;
 
-  my $args;
-
-  if ( ref $_[0] eq 'HASH' ) {
-
-    # Hash ref containing all arguments
-    $args = shift;
-
-    croak "When options are supplied as a hash "
-     . "there may be no other arguments"
-     if @_;
-  }
-  else {
-
-    # File/dir name, optional callback
-    my $name = shift or croak "A filename must be specified";
-    my $callback = shift;
-
-    $args = { name => $name };
-
-    # If a callback is defined install it for all changes
-    $args->{callback}->{change} = $callback
-     if defined $callback;
-  }
-
-  $args->{owner} = $self;
-
-  return $self->_set_watcher( File::Monitor::Object->new( $args ) );
+    return $self->set_watcher( File::Monitor::Object->new( @_ ) );
 }
 
 sub unwatch {
-  my $self = shift;
-  my $name = shift || croak "A filename must be specified";
+    my $self = shift;
+    my $name = shift || croak "A filename must be specified";
 
-  $name = $self->_make_relative( $self->_canonical_name( $name ) );
-  delete $self->{_monitors}->{$name};
+    $name = $self->_canonical_name( $name );
+    delete $self->{_monitors}->{$name};
 }
 
 sub scan {
-  my $self    = shift;
-  my @changed = ();
+    my $self    = shift;
+    my @changed = ( );
 
-  for my $obj ( values %{ $self->{_monitors} } ) {
-    push @changed, $obj->scan;
-  }
+    for my $obj (values %{ $self->{_monitors} }) {
+        push @changed, $obj->scan;
+    }
 
-  for my $change ( @changed ) {
-    $self->_make_callbacks( $change );
-  }
+    for my $change (@changed) {
+        $self->_make_callbacks( $change );
+    }
 
-  return @changed;
-}
-
-sub _canonical_name {
-  my $self = shift;
-  my $name = shift;
-  return $self->_make_relative(
-    File::Spec->canonpath( File::Spec->rel2abs( $name ) ) );
-}
-
-# Make a filename (relative or absolute) relative to the base
-# directory if any.
-sub _make_relative {
-  my $self = shift;
-  my $name = shift;
-
-  if ( my $base = $self->base ) {
-    return File::Spec->abs2rel( $name, $base );
-  }
-
-  return $name;
-}
-
-# Make a filename relative to the base directory absolute.
-sub _make_absolute {
-  my $self = shift;
-  my $name = shift;
-
-  if ( my $base = $self->base ) {
-    return File::Spec->rel2abs( $name, $base );
-  }
-
-  return $name;
+    return @changed;
 }
 
 1;
@@ -153,7 +73,7 @@ File::Monitor - Monitor files and directories for changes.
 
 =head1 VERSION
 
-This document describes File::Monitor version 1.00
+This document describes File::Monitor version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -300,7 +220,9 @@ You may register callbacks for a specific file or directory.
     } );
 
 This last example shows the canonical way of specifying the arguments to
-C<watch> as a hash reference. See C<watch> for more details.
+C<watch> as a hash reference. Any arguments passed to C<watch> are
+passed unchanged to C<< File::Monitor::Object->new >>; See
+L<File::Monitor::Object> for more information.
 
 =head2 Directories
 
@@ -320,7 +242,6 @@ Create a new C<File::Monitor> object. Any options should be passed as a
 reference to a hash as follows:
 
     my $monitor = File::Monitor->new( {
-        base     => $some_dir,
         callback => {
             uid => sub {
                 my ($file_name, $event, $change) = @_;
@@ -332,113 +253,27 @@ reference to a hash as follows:
             }
     } );
 
-Both options (C<base> and C<callback>) are optional.
+The only option supported at the moment is C<callback> which, if
+present, must be a reference to a hash that maps event types to handler
+subroutines. See L<File::Monitor::Delta> for a full list of available
+event types.
 
-The C<base> option specifies a base directory. When a base directory has
-been specified all pathnames will internally be stored relative to it.
-This doesn't affect the public interface which still uses absolute paths
-but it does makes it possible to relocate a File::Monitor if the
-directory it's watching is moved.
+=item C<< set_watcher( $object ) >>
 
-The C<callback> option must be a reference to a hash that maps event
-types to handler subroutines. See L<File::Monitor::Delta> for a full
-list of available event types.
+Add a L<File::Monitor::Object> (or compatible object) to the list of
+objects monitored. Replaces any existing watcher object registered for
+the same file or directory.
+
+The object added must expose the methods C<scan> and C<name> with the same
+semantics as L<File::Monitor::Object>.
 
 =item C<< watch( $name, $callback | { args } ) >>
 
-Create a new L<File::Monitor::Object> and add it to this monitor.
+Create a new L<File::Monitor::Object> and add it to this monitor. This
+call is a convenience shortcut for
 
-The passed hash reference contains various options as follows:
-
-    $monitor->watch( {
-        name        => $file_or_directory_name,
-        recurse     => $should_recurse_directory,
-        files       => $should_read_files_in_directory,
-        callback    => {
-            $some_event => sub {
-                # Handler for $some_event
-            },
-            $other_event => sub {
-                # Handler for $other_event
-            }
-        }
-    } );
-
-Here are those options in more detail:
-
-=over
-
-=item C<name>
-
-The name of the file or directory to be monitored. Relative paths will
-be made absolute relative to the current directory at the time of the
-call. This option is mandatory; C<new> will croak if it is missing.
-
-=item C<recurse>
-
-If this is a directory and C<recurse> is true monitor the entire
-directory tree below this directory.
-
-=item C<files>
-
-If this is a directory and C<files> is true monitor the files and
-directories immediately below this directory but don't recurse down the
-directory tree.
-
-Note that if you specify C<recurse> or C<files> only the I<names> of
-contained files will be monitored. Changes to the contents of contained
-files are not detected.
-
-=item C<callback>
-
-Provides a reference to a hash of callback handlers the keys of which
-are the names of events as described in L<File::Monitor::Delta>.
-
-=back
-
-Callback subroutines are called with the following arguments:
-
-=over
-
-=item C<$name>
-
-The name of the file or directory that has changed.
-
-=item C<$event>
-
-The type of change. If the callback was registered for a specific event
-it will be passed here. The actual event may be one of the events below
-the specified event in the event hierarchy. See L<File::Monitor::Delta>
-for more details.
-
-=item C<$delta>
-
-The L<File::Monitor::Delta> object that describes this change.
-
-=back
-
-As a convenience C<watch> may be called with a simpler form of arguments:
-
-    $monitor->watch( $name );
-
-is equivalent to
-
-    $monitor->watch( {
-        name    => $name
-    } );
-
-And
-
-    $monitor->watch( $name, $callback );
-
-is eqivalent to
-
-    $monitor->watch( {
-        name        => $name
-        callback    => {
-            change      => $callback
-        }
-    } );
+    my $watcher = File::Monitor::Object->new( $args );
+    $monitor->set_watcher( $watcher );
 
 =item C<< unwatch( $name ) >>
 
@@ -503,37 +338,20 @@ The L<File::Monitor::Delta> object that describes this change.
 
 =back
 
-=item C<< base >>
-
-Get or set the base directory. This allows the entire monitor tree to be
-relocated.
-
-    # Create a monitor and watch a couple of files
-    my $monitor = File::Monitor->new( { base => $some_dir } );
-    $monitor->watch( "$some_dir/source.c" );
-    $monitor->watch( "$some_dir/notes.text" );
-    
-    # Now move the directory and patch up the monitor
-    rename( $some_dir, $other_dir );
-    $monitor->base( $other_dir );
-
-    # Still works
-    my @changes = $monitor->scan;
-
-If you are going to specify a base directory you must do so before any
-watches are added.
-
-=item C<< has_monitors >>
-
-Returns true if this File::Monitor has any monitors attached to it. Used
-internally to police the restriction that a base directory may not be
-set when monitors have been added.
-
 =back
 
 =head1 DIAGNOSTICS
 
 =over
+
+=item C<< Watcher %s lacks the required methods: %s >>
+
+You may pass any object to set_watcher that exposes methods called
+C<name> and C<scan>. The object you have passed doesn't support one or
+both of those methods.
+
+This is most likely because intended to pass an instance of
+L<File::Monitor::Object> but have actually passed something else.
 
 =item C<< A filename must be specified >>
 

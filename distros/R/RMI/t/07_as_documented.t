@@ -57,7 +57,7 @@ ok($c, "got a connection to a TCP server");
 # do individual remote object construction or other class methods
 my $o = $c->call_class_method("IO::File","new","/etc/passwd");
 isa_ok($o,"IO::File", "remote object seems to be an IO::File");
-ok(UNIVERSAL::isa($o,"RMI::ProxyObject"), "..but ref() reveals it is really a proxy object");
+is(ref($o),"RMI::ProxyObject", "..but ref() reveals it is really a proxy object");
 
 my $expect_fh;
 open($expect_fh,"/etc/passwd") or die;
@@ -105,7 +105,7 @@ isa_ok($o, 'IO::File');
 ok($o->can("getline"), "object can() works");
 
 # ...but not completely (this works if you bring in the whole class with use_remote)
-ok(UNIVERSAL::isa($o, "RMI::ProxyObject"), "ref() reveals the real class");
+is(ref($o), "RMI::ProxyObject", "ref() reveals the real class");
   
 # do the whole class remotely...
 $c->use_remote("IO::File");

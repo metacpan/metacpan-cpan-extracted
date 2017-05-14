@@ -7,7 +7,7 @@ use 5.010;
 
 use Bio::Gonzales::Matrix::IO;
 
-use Bio::Gonzales::Util::File qw/gonzopen/;
+use Bio::Gonzales::Util::File qw/openod/;
 use Pod::Usage;
 use Getopt::Long qw(:config);
 
@@ -37,8 +37,8 @@ if ( $opt{filter} ) {
 my $map = dict_slurp( $map_fn,
   { key_idx => $opt{from}, val_idx => $opt{to}, uniq => 0, record_filter => $filter } );
 
-my $fh   = gonzopen( $data_fn, '<' );
-my $out_fh = gonzopen( $out_fn,  '>' );
+my ( $fh,     undef ) = openod( $data_fn, '<' );
+my ( $out_fh, undef ) = openod( $out_fn,  '>' );
 
 if ( $opt{header} ) {
   print $out_fh scalar <$fh>;

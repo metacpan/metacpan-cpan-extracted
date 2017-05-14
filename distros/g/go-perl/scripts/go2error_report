@@ -1,0 +1,30 @@
+#!/usr/local/bin/perl
+
+use strict;
+use Getopt::Long;
+use Data::Stag;
+use FileHandle;
+
+my $opt = {};
+GetOptions($opt,
+           "format|p=s",
+           "datatype|t=s",
+	   "err|e=s",
+           "handler_args|a=s%",
+           "handler|h=s");
+
+use GO::Parser;
+
+my $errf = $opt->{err};
+my $errhandler = Data::Stag->getformathandler('xml');
+if ($errf) {
+    $errhandler->file($errf);
+}
+else {
+    $errhandler->fh(\*STDOUT);
+}
+foreach my $f (@ARGV) {
+    my $parser = new GO::Parser($opt);
+    $parser->errhandler($errhandler);
+    $parser->parse($f);
+}

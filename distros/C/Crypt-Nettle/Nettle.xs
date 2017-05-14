@@ -26,6 +26,7 @@
 #include <nettle/ctr.h>
 #include <nettle/cbc.h>
 #include <nettle/yarrow.h>
+#include <nettle/base16.h>
 #include <nettle/rsa.h>
 #include <gmp.h>
 #include <string.h>
@@ -96,6 +97,48 @@ struct Crypt_Nettle_RSA_s {
 };
 typedef struct Crypt_Nettle_RSA_s *Crypt_Nettle_RSA;
 
+typedef int(*_cnrsa_sign_func)(const struct rsa_private_key*, void*, mpz_t);
+typedef int(*_cnrsa_verify_func)(const struct rsa_public_key*, void*, const mpz_t);
+
+struct cnrsa_hash {
+   const struct nettle_hash * hash;
+   _cnrsa_sign_func sign;
+   int (*sign_digest)(const struct rsa_private_key*, const uint8_t*, mpz_t);
+   _cnrsa_verify_func verify;
+   int (*verify_digest)(const struct rsa_public_key*, const uint8_t*, const mpz_t);
+};
+
+const struct cnrsa_hash 
+_cnrsa_hashes_available[] = {
+  { &nettle_md5, (_cnrsa_sign_func)rsa_md5_sign, rsa_md5_sign_digest, (_cnrsa_verify_func)rsa_md5_verify, rsa_md5_verify_digest },
+  { &nettle_sha1, (_cnrsa_sign_func)rsa_sha1_sign, rsa_sha1_sign_digest, (_cnrsa_verify_func)rsa_sha1_verify, rsa_sha1_verify_digest },
+  { &nettle_sha256, (_cnrsa_sign_func)rsa_sha256_sign, rsa_sha256_sign_digest, (_cnrsa_verify_func)rsa_sha256_verify, rsa_sha256_verify_digest },
+  { &nettle_sha512, (_cnrsa_sign_func)rsa_sha512_sign, rsa_sha512_sign_digest, (_cnrsa_verify_func)rsa_sha512_verify, rsa_sha512_verify_digest }
+};
+
+STATIC
+const struct cnrsa_hash *
+_cnrsa_hash_lookup(const char* name) {
+  int i;
+  for (i = 0; i < sizeof(_cnrsa_hashes_available)/sizeof(*_cnrsa_hashes_available); i++)
+    if (0 == strcasecmp(name, _cnrsa_hashes_available[i].hash->name))
+      return _cnrsa_hashes_available+i;
+  croak("Crypt::Nettle::RSA: Bad Digest: %s", name);
+  return NULL;
+};
+
+STATIC
+const struct cnrsa_hash *
+_cnrsa_hash_lookup_by_hash(const struct nettle_hash * hash) {
+  int i;
+  if (NULL == hash)
+     croak("Crypt::Nettle::RSA: Bad (NULL) Digest");
+  for (i = 0; i < sizeof(_cnrsa_hashes_available)/sizeof(*_cnrsa_hashes_available); i++)
+    if (hash == _cnrsa_hashes_available[i].hash)
+      return _cnrsa_hashes_available+i;
+  croak("Crypt::Nettle::RSA: Bad Digest: %s", hash->name);
+  return NULL;
+};
 
 struct Crypt_Nettle_Yarrow_s {
   struct yarrow256_ctx  yarrow_ctx;
@@ -326,6 +369,26 @@ _mpz_setSV(mpz_t dst, SV* src) {
 }
 
 STATIC
+int
+_mpz_setSVraw(mpz_t dst, SV* src) {
+  const char* sigdata;
+  int siglen;
+  char* hexdata;
+  int ret;
+
+  if (SVt_PV == SvTYPE(src)) {
+    sigdata = SvPV(src, siglen);
+    Newx(hexdata, BASE16_ENCODE_LENGTH(siglen) + 1, char);
+    hexdata[BASE16_ENCODE_LENGTH(siglen)] = '\0';
+    base16_encode_update(hexdata, siglen, sigdata);
+    ret = (0 == mpz_set_str(dst, hexdata, 16));
+    Safefree(hexdata);
+    return ret;
+  }
+  return _mpz_setSV(dst, src);
+}
+
+STATIC
 SV *
 _newSV_from_mpz(mpz_t src) {
     int sz;
@@ -346,6 +409,44 @@ _newSV_from_mpz(mpz_t src) {
     buf[offset] = '0';
     buf[offset + 1] = 'x';
     SvCUR_set(ret, sz - (2 - offset)); /* get rid of the trailing NULL */
+    return ret;
+}
+
+STATIC
+SV *
+_newSVraw_from_mpz(mpz_t src) {
+    int sz;
+    char* buf;
+    char* retout;
+    SV * ret;
+    int offset = 0;
+    struct base16_decode_ctx armor;
+    unsigned retlen;
+
+    if (mpz_sgn(src) < 0)
+       croak("Expected a non-negative value here!");
+    sz = mpz_sizeinbase(src, 16);
+    if (sz % 2) {
+       sz++;
+       offset = 1;
+    }
+    Newxz(buf, sz, char);
+    if (offset)
+       buf[0] = '0';
+    mpz_get_str(buf + offset, 16, src);
+
+    retlen = sz/2;
+    ret = newSVpv("", retlen);
+    retout = SvPV_nolen(ret);
+    base16_decode_init(&armor);
+    if (0 == base16_decode_update(&armor, &retlen, retout, sz, buf))
+       croak("Failed to decode mpz_t");
+    if (retlen != sz/2)
+       croak("size of decoded mpz_t was unexpected");
+    if (0 == base16_decode_final(&armor))
+       croak("Failed to finalize mpz_t decoding");
+    Safefree(buf);
+
     return ret;
 }
 
@@ -783,6 +884,15 @@ CODE:
 
 MODULE = Crypt::Nettle        PACKAGE = Crypt::Nettle::RSA    PREFIX = cnrsa_
 
+void
+cnrsa_hashes_available()
+    PREINIT:
+        int i;
+    PPCODE:
+        for (i = 0; i < sizeof(_cnrsa_hashes_available)/sizeof(*_cnrsa_hashes_available); i++)
+          XPUSHs(sv_2mortal(newSVpv(_cnrsa_hashes_available[i].hash->name, 0)));
+
+
 Crypt_Nettle_RSA
 cnrsa_new_public_key(classname, n, e)
     const char * classname;
@@ -876,63 +986,116 @@ cnrsa_generate_keypair(classname, y, n_size, e=65537)
         RETVAL
 
 SV *
-cnrsa_rsa_sign_hash(cnrsa, cnh)
+cnrsa_rsa_sign_hash_context(cnrsa, cnh)
     Crypt_Nettle_RSA cnrsa;
     Crypt_Nettle_Hash cnh;
     PREINIT:
         mpz_t sig;
+        const struct cnrsa_hash * hashtype;
         int ret;
     CODE:
         if (NULL == cnrsa->private_key)
            XSRETURN_UNDEF;
         if (cnh->is_hmac)
            XSRETURN_UNDEF;
+        hashtype = _cnrsa_hash_lookup_by_hash(cnh->hashtype);
+        if (NULL == hashtype)
+           XSRETURN_UNDEF;
         mpz_init(sig);
-        ret = 0;
-        if (&nettle_md5 == cnh->hashtype) {
-           ret = rsa_md5_sign(cnrsa->private_key, (struct md5_ctx*)cnh->hash_context, sig);
-        } else if (&nettle_sha1 == cnh->hashtype) {
-           ret = rsa_sha1_sign(cnrsa->private_key, (struct sha1_ctx*)cnh->hash_context, sig);
-        } else if (&nettle_sha256 == cnh->hashtype) {
-           ret = rsa_sha256_sign(cnrsa->private_key, (struct sha256_ctx*)cnh->hash_context, sig);
-        } else if (&nettle_sha512 == cnh->hashtype) {
-           ret = rsa_sha512_sign(cnrsa->private_key, (struct sha512_ctx*)cnh->hash_context, sig);
-        }
+        ret = hashtype->sign(cnrsa->private_key, cnh->hash_context, sig);
         if (0 == ret) {
            mpz_clear(sig);
            XSRETURN_UNDEF;
         }        
-        RETVAL = _newSV_from_mpz(sig);
+        RETVAL = _newSVraw_from_mpz(sig);
+        mpz_clear(sig);
+OUTPUT:
+    RETVAL
+
+SV *
+cnrsa_rsa_sign_digest(cnrsa, algo, digest)
+    Crypt_Nettle_RSA cnrsa;
+    const char * algo;
+    SV * digest;
+    PREINIT:
+        mpz_t sig;
+        int ret;
+        const struct cnrsa_hash * hashtype;
+        int digestlen;
+        const char* digestdata;
+    CODE:
+        if (NULL == cnrsa->private_key)
+           XSRETURN_UNDEF;
+        hashtype = _cnrsa_hash_lookup(algo);
+        if (NULL == hashtype)
+           XSRETURN_UNDEF;
+        digestdata = SvPV(digest, digestlen);
+        if (digestlen != hashtype->hash->digest_size) {
+           croak("Digest should have been %d length; was %d", hashtype->hash->digest_size, digestlen); XSRETURN_UNDEF;
+        }
+        mpz_init(sig);
+        ret = hashtype->sign_digest(cnrsa->private_key, digestdata, sig);
+        if (0 == ret) {
+           mpz_clear(sig);
+           XSRETURN_UNDEF;
+        }        
+        RETVAL = _newSVraw_from_mpz(sig);
         mpz_clear(sig);
 OUTPUT:
     RETVAL
 
 int
-cnrsa_rsa_verify_hash(cnrsa, cnh, signature)
+cnrsa_rsa_verify_hash_context(cnrsa, cnh, signature)
     Crypt_Nettle_RSA cnrsa;
     Crypt_Nettle_Hash cnh;
     SV * signature;
     PREINIT:
         mpz_t sig;
+        const struct cnrsa_hash * hashtype;
     CODE:
         if (NULL == cnrsa->public_key)
            XSRETURN_UNDEF;
         if (cnh->is_hmac)
            XSRETURN_UNDEF;
+        hashtype = _cnrsa_hash_lookup_by_hash(cnh->hashtype);
+        if (NULL == hashtype)
+           XSRETURN_UNDEF;
         mpz_init(sig);
-        if (!_mpz_setSV(sig, signature)) {
+        if (!_mpz_setSVraw(sig, signature)) {
            mpz_clear(sig); XSRETURN_UNDEF;
         }
-        RETVAL = 0;
-        if (&nettle_md5 == cnh->hashtype) {
-           RETVAL = rsa_md5_verify(cnrsa->public_key, (struct md5_ctx*)cnh->hash_context, sig);
-        } else if (&nettle_sha1 == cnh->hashtype) {
-           RETVAL = rsa_sha1_verify(cnrsa->public_key, (struct sha1_ctx*)cnh->hash_context, sig);
-        } else if (&nettle_sha256 == cnh->hashtype) {
-           RETVAL = rsa_sha256_verify(cnrsa->public_key, (struct sha256_ctx*)cnh->hash_context, sig);
-        } else if (&nettle_sha512 == cnh->hashtype) {
-           RETVAL = rsa_sha512_verify(cnrsa->public_key, (struct sha512_ctx*)cnh->hash_context, sig);
+        RETVAL = hashtype->verify(cnrsa->public_key, cnh->hash_context, sig);
+        mpz_clear(sig);
+OUTPUT:
+    RETVAL
+
+int
+cnrsa_rsa_verify_digest(cnrsa, algo, digest, signature)
+    Crypt_Nettle_RSA cnrsa;
+    const char* algo;
+    SV * digest;
+    SV * signature;
+    PREINIT:
+        mpz_t sig;
+        int digestlen;
+        const char* digestdata;
+        const struct cnrsa_hash * hashtype;
+    CODE:
+        if (NULL == cnrsa->public_key)
+           XSRETURN_UNDEF;
+        hashtype = _cnrsa_hash_lookup(algo);
+        if (NULL == hashtype)
+           XSRETURN_UNDEF;
+        digestdata = SvPV(digest, digestlen);
+        if (digestlen != hashtype->hash->digest_size) {
+           croak("Digest should have been %d length; was %d", hashtype->hash->digest_size, digestlen); XSRETURN_UNDEF;
         }
+
+        mpz_init(sig);
+        if (!_mpz_setSVraw(sig, signature)) {
+           mpz_clear(sig); XSRETURN_UNDEF;
+        }
+        RETVAL = hashtype->verify_digest(cnrsa->public_key, digestdata, sig);
         mpz_clear(sig);
 OUTPUT:
     RETVAL
@@ -947,16 +1110,16 @@ cnrsa_key_params(cnrsa)
     CODE:
         targ = (HV *)sv_2mortal((SV *)newHV());
         if (NULL != cnrsa->public_key) {
-           if (mpz_sgn(cnrsa->public_key->n)) hv_stores(targ, "n", _newSV_from_mpz(cnrsa->public_key->n));
-           if (mpz_sgn(cnrsa->public_key->e)) hv_stores(targ, "e", _newSV_from_mpz(cnrsa->public_key->e));
+           if (mpz_sgn(cnrsa->public_key->n)) hv_store(targ, "n", 1, _newSV_from_mpz(cnrsa->public_key->n), 0);
+           if (mpz_sgn(cnrsa->public_key->e)) hv_store(targ, "e", 1, _newSV_from_mpz(cnrsa->public_key->e), 0);
         }
         if (NULL != cnrsa->private_key) {
-           if (mpz_sgn(cnrsa->private_key->d)) hv_stores(targ, "d", _newSV_from_mpz(cnrsa->private_key->d));
-           if (mpz_sgn(cnrsa->private_key->p)) hv_stores(targ, "p", _newSV_from_mpz(cnrsa->private_key->p));
-           if (mpz_sgn(cnrsa->private_key->q)) hv_stores(targ, "q", _newSV_from_mpz(cnrsa->private_key->q));
-           if (mpz_sgn(cnrsa->private_key->a)) hv_stores(targ, "a", _newSV_from_mpz(cnrsa->private_key->a));
-           if (mpz_sgn(cnrsa->private_key->b)) hv_stores(targ, "b", _newSV_from_mpz(cnrsa->private_key->b));
-           if (mpz_sgn(cnrsa->private_key->c)) hv_stores(targ, "c", _newSV_from_mpz(cnrsa->private_key->c));
+           if (mpz_sgn(cnrsa->private_key->d)) hv_store(targ, "d", 1, _newSV_from_mpz(cnrsa->private_key->d), 0);
+           if (mpz_sgn(cnrsa->private_key->p)) hv_store(targ, "p", 1, _newSV_from_mpz(cnrsa->private_key->p), 0);
+           if (mpz_sgn(cnrsa->private_key->q)) hv_store(targ, "q", 1, _newSV_from_mpz(cnrsa->private_key->q), 0);
+           if (mpz_sgn(cnrsa->private_key->a)) hv_store(targ, "a", 1, _newSV_from_mpz(cnrsa->private_key->a), 0);
+           if (mpz_sgn(cnrsa->private_key->b)) hv_store(targ, "b", 1, _newSV_from_mpz(cnrsa->private_key->b), 0);
+           if (mpz_sgn(cnrsa->private_key->c)) hv_store(targ, "c", 1, _newSV_from_mpz(cnrsa->private_key->c), 0);
          }
         RETVAL = newRV((SV*)targ);
     OUTPUT:

@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1d0508b4a321728238f0adb6afdf88ae7e6c14b7 Changes
+SHA1 31e8cc10ca1604d62c48f3cd6b0a86291e49dccc MANIFEST
+SHA1 ca151556c2326bfcda3d9f7da509e52e518ec873 MANIFEST.SKIP
+SHA1 039bd08c91667e53b6cfc39b318f0211c13e8d9b META.yml
+SHA1 5a03a528053faa49a8fa802dde8c0a1c5e4bd51c Makefile
+SHA1 a7f5c7067b2beead4af1834b10aa7f207f53efce Makefile.PL
+SHA1 cabff362d36dbf8868e3081f5efa9431d8af3f78 README
+SHA1 fd5f3c4f0418efee3b9b16cf8c3902e8374909df inc/Module/Install.pm
+SHA1 7cd7c349afdf3f012e475507b1017bdfa796bfbd inc/Module/Install/Base.pm
+SHA1 ba186541bbf6439111f01fc70769cf24d22869bf inc/Module/Install/Can.pm
+SHA1 c55e78fbd586861a1e836068737b325f4baee315 inc/Module/Install/ExtraTests.pm
+SHA1 aaa50eca0d7751db7a4d953fac9bc72c6294e238 inc/Module/Install/Fetch.pm
+SHA1 3e83972921d54198d1246f7278f08664006cd65d inc/Module/Install/Makefile.pm
+SHA1 12bf1867955480d47d5171a9e9c6a96fabe0b58f inc/Module/Install/Metadata.pm
+SHA1 f7ee667e878bd2faf22ee9358a7b5a2cc8e91ba4 inc/Module/Install/Win32.pm
+SHA1 8ed29d6cf217e0977469575d788599cbfb53a5ca inc/Module/Install/WriteAll.pm
+SHA1 06f1f0575531d36033a0c397d4ab37eef009c6f0 lib/Project/Euler.pm
+SHA1 0dda44a6ed7c250d5da0e0196ec86382f0da05cb lib/Project/Euler/Lib/MultipleCheck.pm
+SHA1 8201a9c53590c8887c3d91a54eaf6ee29002311e lib/Project/Euler/Lib/Types.pm
+SHA1 e718d2861a18f02dc8d3d0d3834d6cfca4bc925f lib/Project/Euler/Problem/Base.pm
+SHA1 62f0596e47568413919d69288c3418ef5af6138c lib/Project/Euler/Problem/P001.pm
+SHA1 08d1bc78eb6443e00a23ad073507f2b7657ec499 lib/Project/Euler/Problem/P002.pm
+SHA1 cb836e2b6e1796533ce02a855bc257b9910468fb scripts/create_problem.pl
+SHA1 92483a18ffb27ae28f39e691a0ebf6ee721a18fb t/00-Base/00-load.t
+SHA1 7e74aea412ffed2909eb80691fc59de19a7c63dd t/00-Base/01-base.t
+SHA1 0e7ee660c1570a3388914b070d6a86c6636bb56d t/10-Lib/00-Types.t
+SHA1 ef9d3606d97a6b696846f164766b9666e140a7b7 t/10-Lib/01-Multiple_Check.t
+SHA1 55a14d6e5d2c5e330117b79ddec1f830dde9401e t/20-Problems/000-Correct_Defaults.t
+SHA1 8573689e33403e0b75d1ecf45bcb27ee925687b3 t/20-Problems/001-Sum_Filtered_Lists.t
+SHA1 0a92d98ad145d4a6933c3e6aac6069dc5361b9ea t/20-Problems/002-Sum_Filtered_Fib_Numbers.t
+SHA1 b6c8c28dee823e2c70d1bc1e4f065a9252e19615 xt/release/00-requires.t
+SHA1 85c2654904b966182704cef6d6ee13ff2d5d71ee xt/release/01-consistent_perldoc.t
+SHA1 e20750060a3053981ad13adc705f590b30402924 xt/release/90-boilerplate.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 xt/release/91-pod.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 xt/release/92-pod-coverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkskOm0ACgkQI/ME1FsGbTRWnQCfX/94K+qUSs92CfPppBk9Wwhz
+M1wAoLP56GL0M/Y82w8lqUN0TxjbtBl5
+=ULZn
+-----END PGP SIGNATURE-----

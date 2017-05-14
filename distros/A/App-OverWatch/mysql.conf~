@@ -1,3 +1,0 @@
-user = test
-password = test
-dsn = DBI:mysql:database=testmysql_socket=/home/chris/common/run/mysql-listings-db.sock

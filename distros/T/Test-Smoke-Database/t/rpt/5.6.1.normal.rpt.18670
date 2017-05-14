@@ -1,0 +1,33 @@
+Return-Path: <h.m.brand@hccnet.nl>
+Cc: perl5-porters@perl.org
+Subject: Smoke [5.6.1] 21190 PASS linux 2.4.20-4gb (i686/1 cpu)
+To: smokers-reports@perl.org
+Date: Mon, 15 Sep 2003 15:47 +0200
+From: h.m.brand@hccnet.nl (H M Brand)
+
+Automated smoke report for 5.6.1 patch 18670 on linux - 2.4.20-4gb (i686/1 =
+cpu)
+(lt09) using gcc version 3.3.1
+Report by Test::Smoke v1.18.05 (perl 5.9.0) [32 minutes 25 seconds]
+
+O =3D OK  F =3D Failure(s), extended report at the bottom
+X =3D test(s) failed under TEST but not under harness
+? =3D still running or test results not (yet) available
+Build failures during:       - =3D unknown or N/A
+c =3D Configure, m =3D make, M =3D make (after miniperl), t =3D make test-p=
+rep
+
+   21190     Configuration (common) none
+------------ --------------------------------------------------------------=
+--
+O O
+O O          -Duselargefiles
+O O          -Duse64bitint
+O O          -Duselongdouble
+O O          -Dusemorebits
+| +--------- -DDEBUGGING
++----------- no debugging
+
+Summary: PASS
+
+

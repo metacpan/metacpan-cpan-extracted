@@ -3,25 +3,24 @@ package TestClass;
 use Moose;
 
 use Pinto::Types qw(
-    ANSIColor
-    ANSIColorPalette
-    AuthorID
-    DiffStyle
-    Dir
-    DistributionTarget
-    DistributionTargetList
     File
+    Dir
+    Uri
     Io
-    PackageTarget
-    PackageTargetList
+    AuthorID
+    Version
     PropertyName
-    RevisionID
+    StackName
     StackAll
     StackDefault
-    StackName
-    TargetList
-    Uri
-    Version
+    PkgSpec
+    PkgSpecList
+    DistSpec
+    DistSpecList
+    SpecList
+    RevisionID
+    ANSIColor
+    ANSIColorSet
 );
 
 #-----------------------------------------------------------------------------
@@ -84,31 +83,31 @@ has version => (
 
 has pkg => (
     is     => 'rw',
-    isa    => PackageTarget,
+    isa    => PkgSpec,
     coerce => 1,
 );
 
 has pkgs => (
     is     => 'rw',
-    isa    => PackageTargetList,
+    isa    => PkgSpecList,
     coerce => 1,
 );
 
 has dist => (
     is     => 'rw',
-    isa    => DistributionTarget,
+    isa    => DistSpec,
     coerce => 1,
 );
 
 has dists => (
     is     => 'rw',
-    isa    => DistributionTargetList,
+    isa    => DistSpecList,
     coerce => 1,
 );
 
 has targets => (
     is     => 'rw',
-    isa    => TargetList,
+    isa    => SpecList,
     coerce => 1,
 );
 
@@ -123,14 +122,9 @@ has color => (
     isa => ANSIColor,
 );
 
-has palette => (
+has colorset => (
     is  => 'rw',
-    isa => ANSIColorPalette,
-);
-
-has diffstyle => (
-    is  => 'rw',
-    isa => DiffStyle,
+    isa => ANSIColorSet,
 );
 
 #-----------------------------------------------------------------------------

@@ -60,6 +60,12 @@ use_ok 'Template::Lace::Factory';
     });
   }
 
+  sub add_debug {
+    my ($self, $dom) = @_;
+    $dom->at('body')
+      ->append_content('<footer>INFO</footer>');
+  }
+
   sub template {q[
     <layout-master
         title=\'title:content'
@@ -84,7 +90,7 @@ use_ok 'Template::Lace::Factory';
             <lace-input type='password'
                 name='passwd'
                 label='Password'
-                value='$.form.fields.passwd.value' />
+                value=$.form.fields.passwd.value />
           </lace-form>
           <lace-timestamp tz='America/Chicago'/>
           <tag-anchor href='more.html' target='_top'>See More</tag-anchor>
@@ -197,7 +203,7 @@ ok my $factory = Template::Lace::Factory->new(
   },
 );
 
-ok my $template = $factory->create(
+ok my $renderer = $factory->create(
   title => 'the real story',
   story => 'you are doomed to discover you can never recover...',
   cites => [
@@ -211,7 +217,15 @@ ok my $template = $factory->create(
     },
   });
 
-ok my $html = $template->render;
+$renderer->call(sub {
+  my ($model, $dom) = @_;
+  $model->add_debug($dom);
+});
+
+$renderer->call('add_debug');
+
+ok my $html = $renderer->render;
+
 ok my $dom = Template::Lace::DOM->new($html);
 
 is $dom->find('meta')->[0]->attr('charset'), 'utf-8';

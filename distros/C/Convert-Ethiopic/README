@@ -14,21 +14,21 @@ README file for Convert-Ethiopic distribution:
 	the minimum to support the "LiveGeez" module which is an implementation of
 	the LiveGe'ez Remote Processing Protocol.
 
-	The modules Ethiopic::Cstocs and Ethiopic::Time are intended primarily as
-	services to the LiveGe'ez module and as such expect a LiveGeez::Request
-	object as an argument (though can work with any object containing the
-	expected hash keys and values).
-
-	In future versions of the Ethiopic::Cstocs module should apply the same
-	type of interface as used in the Cz::Cstocs module from the Cstool package
-	which the Ethiopic::Convert package is loosely based on.
+	In version 0.20 of this package an OO interface has become more central,
+	the functional interface is still supported for the functions of primary
+	utility.  The Cstocs.pm module is no longer being maintained as of
+	version 0.20 as well.
+	
+	Future:  Resyncronization with updated libeth.  Most notably this would
+	allow for a wider range of supported languages for the calendar
+	conversions.
 
 
 	Module Ethiopic::System:
 
 		Creates an Ethiopic "system" object that holds conversion settings.
 
-	Module Ethiopic::Cstocs:
+	Module Ethiopic::String:
 
 		Implements an object for various character set code conversions.
 		Character set systems are specified by a canonical name specified
@@ -36,7 +36,29 @@ README file for Convert-Ethiopic distribution:
 		conversion give the number of conversion possibilities at more
 		than 68x9x2.
 
-	Module Ethiopic::Time:
+	Module Ethiopic::Number:
+
+		Implements an object for various character set code conversions.
+		Character set systems are specified by a canonical name specified
+		in the LiveGe'ez Remote Processing Protocol.  Optional secondary
+		conversion give the number of conversion possibilities at more
+		than 68x9x2.
+
+	Module Ethiopic::File:
+
+		Implements an object for various character set code conversions.
+		Character set systems are specified by a canonical name specified
+		in the LiveGe'ez Remote Processing Protocol.  Optional secondary
+		conversion give the number of conversion possibilities at more
+		than 68x9x2.
+
+	Module Ethiopic::Date:
+
+		Implements an object for various calendar services.  The most
+		useful methods are EthiopicToGregorian, GregorianToEthiopic, and
+		isEthiopianHoliday.
+
+	Module Ethiopic::Char:
 
 		Implements an object for various calendar services.  The most
 		useful methods are EthiopicToGregorian, GregorianToEthiopic, and
@@ -49,20 +71,26 @@ README file for Convert-Ethiopic distribution:
 		that can be combined together.  See -? you will need an Ethiopic
 		font and a terminal supporting UTF8.
 
-	Program enumber.pl:
+	Program dates.pl:
 
-		Converts numbers from English to Ethiopic from standard input.
+		Performs a number of date conversions demonstrating usage.
 
-	Program estring.pl:
+	Program number.pl:
 
-		Converts strings between Ethiopic encoding systems.   Will
-		emulate the "cstocs" and "g2" utilities more closely in the future.
+		Converts numbers passed as arguements from English to Ethiopic.
 
-	[ NOTE the .pl demo files require the LiveGeez modules and must be hand
-	  installed for the time being. ]
+	Program string.pl:
+
+		Converts string arguements between Ethiopic encoding systems.
+
+	Program file.pl:
+
+		Opens the "t/Hello.sera" test script and performs the default
+		conversion.
+
 
 Installation:
-    LibEth is required:  http://libeth.netpedia.net
+    LibEth is required:  http://libeth.sourceforge.net
 
 	Download the tar.gz, unpack it, change to the Convert-Ethiopic-*
 	directory. Then do
@@ -73,9 +101,9 @@ Installation:
 		make install
 
 Available:
-	ftp://ftp.abyssiniacybergateway.net/pub/users/abyssini/perl-unicode/ and from your
+	ftp://ftp.geez.org/pub/perl-unicode/ and from your
 	favorite CPAN site in the authors/id/D/DY/DYACOB/ directory.
 	
-Copyright: (c) 1999 Daniel Yacob, yacob@ethiopiaonline.net. All rights
+Copyright: (c) 1998-2001 Daniel Yacob, yacob@ethiopiaonline.net. All rights
 	reserved. This library is free software; you can redistribute
 	it and/or modify it under the same terms as Perl itself.

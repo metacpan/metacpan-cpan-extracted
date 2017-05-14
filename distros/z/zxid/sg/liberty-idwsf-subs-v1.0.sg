@@ -1,0 +1,40 @@
+# zxid/sg/liberty-idwsf-subs-v1.0.sg
+# Slightly edited, 1.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-subs-v1.0.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(subs, urn:liberty:ssos:2006-08)
+import(lu, urn:liberty:util:2006-08,liberty-idwsf-utility-v2.0.xsd)
+
+%SubscriptionType:
+  subs:RefItem*
+  lu:Extension*
+  @subscriptionID    -> %lu:IDType
+  @notifyToRef       -> %xs:anyURI
+  @adminNotifyToRef? -> %xs:anyURI
+  @starts?           -> %xs:dateTime
+  @expires?          -> %xs:dateTime
+  @id?               -> %xs:ID
+  @includeData?:     enum( Yes No YesWithCommonAttributes ) ;
+  ;
+
+RefItem	 -> %subs:RefItemType
+%RefItemType:
+  @subscriptionID?   -> %lu:IDType
+  @lu:itemIDRef
+  ;
+
+&@NotifyAttributeGroup: 
+  @timeStamp?        -> %xs:dateTime
+  ;
+
+%NotificationType:
+  lu:TestResult*
+  @id?               -> %xs:ID
+  @subscriptionID    -> %lu:IDType
+  @expires?          -> %xs:dateTime
+  @endReason?        -> %xs:anyURI
+  ;
+
+%NotifyResponseType:	 base(lu:ResponseType) ;
+
+#EOF

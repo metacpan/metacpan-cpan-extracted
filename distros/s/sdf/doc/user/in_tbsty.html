@@ -1,0 +1,228 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Table Styles</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tbov.html">Previous Topic</A> | <A HREF="in_tbtit.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.2. Table Styles</H1>
+<HR>
+<H2><A NAME="The style Attribute">5.2.1. The style Attribute</A></H2>
+<P>The look of a table is controlled by the <EM>style</EM> attribute. For example:</P>
+<PRE>
+!block table; style=&quot;rows&quot;
+Name   Phone
+Bill   123 4567
+Joe    789 1234
+Mary   584 3333
+!endblock
+</PRE>
+<P>The result is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Phone</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Bill
+</TD>
+<TD>
+123 4567
+</TD>
+</TR>
+<TR>
+<TD>
+Joe
+</TD>
+<TD>
+789 1234
+</TD>
+</TR>
+<TR>
+<TD>
+Mary
+</TD>
+<TD>
+584 3333
+</TD>
+</TR>
+</TABLE>
+
+<P>The other styles available are shown below.</P>
+<HR>
+<H2><A NAME="columns">5.2.2. columns</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Phone</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Bill
+</TD>
+<TD>
+123 4567
+</TD>
+</TR>
+<TR>
+<TD>
+Joe
+</TD>
+<TD>
+789 1234
+</TD>
+</TR>
+<TR>
+<TD>
+Mary
+</TD>
+<TD>
+584 3333
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="plain">5.2.3. plain</A></H2>
+<TABLE>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Phone</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Bill
+</TD>
+<TD>
+123 4567
+</TD>
+</TR>
+<TR>
+<TD>
+Joe
+</TD>
+<TD>
+789 1234
+</TD>
+</TR>
+<TR>
+<TD>
+Mary
+</TD>
+<TD>
+584 3333
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="grid">5.2.4. grid</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Phone</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Bill
+</TD>
+<TD>
+123 4567
+</TD>
+</TR>
+<TR>
+<TD>
+Joe
+</TD>
+<TD>
+789 1234
+</TD>
+</TR>
+<TR>
+<TD>
+Mary
+</TD>
+<TD>
+584 3333
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="shade">5.2.5. shade</A></H2>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Phone</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Bill
+</TD>
+<TD>
+123 4567
+</TD>
+</TR>
+<TR>
+<TD>
+Joe
+</TD>
+<TD>
+789 1234
+</TD>
+</TR>
+<TR>
+<TD>
+Mary
+</TD>
+<TD>
+584 3333
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Changing the Default Table Style">5.2.6. Changing the Default Table Style</A></H2>
+<P>The default style is <EM>columns</EM>. This can be changed via the <EM>DEFAULT_TABLE_STYLE</EM> variable. For example:</P>
+<PRE>
+  !define DEFAULT_TABLE_STYLE &quot;grid&quot;
+  # the default table style is now grid ...
+</PRE>
+<HR>
+<H2><A NAME="Creating New Table Styles">5.2.7. Creating New Table Styles</A></H2>
+<P>New table styles can be defined. See <EM>Extending SDF</EM> in the <A HREF="../guru/gg_sdf.html">SDF Guru Guide</A> for details.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_tb.html">Parent Topic</A> | <A HREF="in_tbov.html">Previous Topic</A> | <A HREF="in_tbtit.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

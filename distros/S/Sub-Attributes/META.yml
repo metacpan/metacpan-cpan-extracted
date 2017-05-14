@@ -1,0 +1,26 @@
+---
+abstract: 'meta programming with subroutine attributes'
+author:
+  - 'David Farrell'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Attributes
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::Fatal: '0'
+  Test::More: '0'
+resources:
+  repository: https://github.com/dnmfarrell/Sub-Attributes.git
+version: 0.04
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

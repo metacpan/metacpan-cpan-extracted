@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-
 use autodie;
 use List::Util qw/sum/;
 use Test::More;
@@ -32,9 +31,7 @@ my @ok_tests = (
         [qw/ 4     3      /],
         [qw/ 5     3      /],
         [qw/ 6     8      /],
-        [qw/ 10    23     /],
-
-        [qw/ 11    33     /],
+        [qw/ 10    23     /],  # Example given
         [qw/ 1000  233168 /],  # Final solution
 
         [15, qc([3, 5], 15)],
@@ -55,10 +52,6 @@ my @ok_tests = (
         [qw/ 3 0 /],
         [qw/ 4 3 /],
         [qw/ 7 9 /],
-    ],
-    [
-        [4],
-        [qw/ 25 84 /],  # Example given #2
     ],
     [
         [2..5],
@@ -98,6 +91,7 @@ for  my $test_array  (grep {scalar @$_ > 0} (\@ok_tests, \@nok_tests)) {
 plan tests => 2 + $sum;
 
 use_ok( MODULE );
+diag( 'Checking specific P001 problems' );
 
 my $problem    = new_ok( MODULE );
 my $def_multis = $problem->multi_nums();

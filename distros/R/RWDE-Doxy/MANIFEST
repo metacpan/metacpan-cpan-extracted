@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+Doxy.pm
+bin/doxy
+Doxy/ClassData.pm
+Doxy/DocGenerator.pm
+Doxy/MethodData.pm
+Doxy/SCF.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

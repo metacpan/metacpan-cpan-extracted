@@ -1,0 +1,22 @@
+H1: 2.000beta6b
+
+!subsections "Enhancements,Fixes,Incompatibilities"
+
+H2: Enhancements
+
+Tables now have a new style called {{box}} that simply puts a thin-line
+around the table.
+
+The cover page generated for the {{mincom}} look has been improved.
+
+H2: Fixes
+
+If a look library and a configuration library had the same name,
+only one was begin loaded. This has now been fixed.
+
+Nested jumps within [[HTML]] files no longer cause problems - the
+inner jump is now ignored.
+
+H2: Incompatibilities
+
+None.

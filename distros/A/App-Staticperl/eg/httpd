@@ -1,0 +1,44 @@
+#! perl
+
+use AnyEvent::HTTPD;
+
+my $httpd = AnyEvent::HTTPD->new (port => 9090);
+
+warn "AnyEvent::HTTPD listening on: http://localhost:9090/\n";
+
+$httpd->reg_cb (
+   '/' => sub {
+      my ($httpd, $req) = @_;
+
+      my $res = "<html><body><h1>files embedded in this staticperl</h1><table><tr><th align=\"left\">by name</th><th align=\"left\">by size</th></tr>";
+
+      my %size;
+
+      $size{$_} = length static::find $_
+         for static::list;
+
+      $res .= "<tr><td>";
+
+      for (sort keys %size) {
+         $res .= "<a href=\"$_\">$_ $size{$_}</a><br />";
+      } 
+
+      $res .= "</td><td>";
+
+      for (sort { $size{$b} <=> $size{$a} or $a cmp $b } keys %size) {
+         $res .= "<a href=\"$_\">$size{$_} $_</a><br />";
+      }
+
+      $res .= "</tr></table></body></html>";
+
+      $req->respond ([200 => "OK", { 'Content-Type' => 'text/html' }, $res]);
+   },
+   '' => sub {
+      my ($httpd, $req) = @_;
+
+      my $file = static::find substr $req->url, 1;
+      $req->respond ([200 => "OK", { 'Content-Type' => 'text/plain; charset=utf-8' }, $file]);
+   },
+);
+
+$httpd->run;

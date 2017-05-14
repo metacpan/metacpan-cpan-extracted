@@ -1,0 +1,99 @@
+<software_list>
+<software
+  name="DesignerDG"
+  version="any"
+  type="spotter"
+  contact="MolecularWare"
+/>
+<software
+  name="AnalyzerDG"
+  version="any"
+  type="image_analysis"
+  contact="MolecularWare"
+/>
+<software
+  name="XDotsReader"
+  version="any"
+  type="image_analysis"
+  contact="COSE"
+/>
+<software
+  name="GenePix_Pro"
+  version="any"
+  type="scanner"
+  contact="Axon Instruments"
+/>
+<software
+  name="ChipReader"
+  version="any"
+  type="scanner"
+  contact="Virtek Vision"
+/>
+<software
+  name="MicroArray_Suite"
+  version="any"
+  type="image_analysis"
+  contact="Scanalytics"
+/>
+<software
+  name="ImaGene"
+  version="any"
+  type="image_analysis"
+  contact="BioDiscovery"
+/>
+<software
+  name="GeneExpressionist"
+  version="any"
+  type="image_analysis"
+  contact="GeneData"
+/>
+<software
+  name="Microarray_Suite"
+  version="any"
+  type="image_analysis"
+  contact="Affymetrix"
+/>
+<software
+  name="GeneChip_Suite"
+  version="any"
+  type="image_analysis"
+  contact="Affymetrix"
+/>
+<software
+  name="softWoRx"
+  version="any"
+  type="image_analysis"
+  contact="Applied Precision, Inc."
+/>
+<software
+  name="TIGR_Spotfinder"
+  version="any"
+  type="image_analysis"
+  contact="The Institute for Genomic Research"
+/>
+<software
+  name="ArrayVision"
+  version="any"
+  type="image_analysis"
+  contact="Imaging Research"
+/>
+<software
+  name="ArrayMaker"
+  version="1.8.8"
+  type="spotter"
+  contact="Joe Derisi"
+/>
+<software
+  name="ScanAlyze"
+  version="any"
+  type="image_analysis"
+  contact="Mike Eisen"
+/>
+<!--
+ name
+ version
+ type   
+ con_fk 
+-->
+</software_list>
+

@@ -1,0 +1,28 @@
+/* XPM */
+static char * labentry_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"40 17 5 1",
+/* colors */
+"  s None c None",
+". c #848284",
+"X c #FCFEFC",
+"o c #040204",
+"O c #C4C2C4",
+/* pixels */
+"                                        ",
+"                                        ",
+"                   ...............X     ",
+"                   .oooooooooooooOX     ",
+"        ..         .oXXXXXXXXXXXXOX     ",
+"        oo         .oXXXXXXXXXXXoOX     ",
+"        ooo        .oXXXXXXoXXXXoOX     ",
+"       . oo        .oXXXXXXoXXXXoOX     ",
+"       o .o        .oXXooXXoooXXoOX     ",
+"      o   .o       .oXoXXoXoXXoXoOX     ",
+"      oooooo.      .oXXoooXoXXoXoOX     ",
+"     o     oo      .oXoXXoXoXXoXoOX     ",
+"     o     .o      .oXXoooXoooXXoOX     ",
+"    oo     .o.     .oXXXXXXXXXXXXOX     ",
+"    oo     ooo     .OOOOOOOOOOOOOOX     ",
+"                   XXXXXXXXXXXXXXXX     ",
+"                                        "};

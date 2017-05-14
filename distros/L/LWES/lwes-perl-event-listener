@@ -1,0 +1,95 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use LWES::EventParser;
+use IO::Socket;
+use IO::Socket::Multicast;
+use Time::HiRes qw( gettimeofday );
+
+# don't buffer stdout
+$| = 1;
+
+my $port    = $ENV{'LWES_PORT'}    || 9191;
+my $addr    = $ENV{'LWES_ADDRESS'} || '224.0.0.69';
+my $debug   = 0;
+my $siteid  = 1;
+
+sub printUsage {
+    ( my $id = $0 ) =~ s/^.*\///;   # basename;
+    STDERR->print(<<"EndOfUsage");
+Usage: $id [options] <listener name> <args>
+		{-m|--addr} <multicast_address>
+		{-p|--port} <multicast_port>
+		{-s|--site_id} <siteid>
+		{-d|--debug}              print extra debugging information
+		{--help}
+  		
+	<args> are passed directly to the listener constructor
+EndOfUsage
+    exit(0);
+}
+
+# Read the command line options
+{
+  local $SIG{__WARN__}=
+    sub {
+      STDERR->print(join("\n",@_),"\n") if (@_);
+      printUsage();
+    };
+
+  GetOptions(
+             'm|addr=s'       => \$addr,
+             'p|port=s'       => \$port,
+             's|site_id=s'    => \$siteid,
+             'd|debug'        => \$debug,
+             'help'           => \&printUsage,
+            );
+}
+
+my $listener = shift @ARGV;
+
+unless ( defined($listener) ) {
+  $listener = "EventPrintingListener";
+}
+my $package_name = undef;
+if ( $listener!~ /::/ ) {
+  $package_name = "LWES::Listeners::".$listener;
+} else {
+  $package_name = $listener;
+}
+
+# Load the module and create an instance
+eval "use $package_name;";
+if ($@) {
+  die "use $package_name failed ($@)";
+}
+
+my $listener_object = $package_name->new(@ARGV);
+
+# set up socket
+my $sock = IO::Socket::Multicast->new(LocalPort=>$port, Reuse=>1)
+  or die "Can't create socket: $!";
+
+$sock->sockopt(SO_RCVBUF,(16*1024*1024));
+
+# add multicast address
+$sock->mcast_add($addr) or die "mcast_add: $!";
+while (1) {
+  my ($message,$peer);
+  die "recv error: $!" unless $peer = recv($sock,$message,65535,0);
+  my ($port,$peeraddr) = sockaddr_in($peer);
+
+  my $event = bytesToEvent($message);
+
+  # set up a header similiar to the lwes header
+  my ($seconds, $microseconds) = gettimeofday;
+  $event->{'SenderPort'} = $port;
+  $event->{'SenderIP'}   = inet_ntoa($peeraddr);
+  $event->{'ReceiptTime'}= $seconds*1000+int($microseconds/1000);
+
+  # let the listener process the event
+  $listener_object->processEvent($event);
+}
+

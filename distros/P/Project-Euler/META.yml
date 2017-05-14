@@ -1,46 +1,46 @@
 ---
 abstract: 'Solutions for L<< http://projecteuler.net >>'
 author:
-  - 'Adam Lesperance <lespea@gmail.com>'
+  - 'Adam Lesperance, C<< <lespea at cpan.org> >>'
 build_requires:
-  English: 0
-  File::Find: 0
-  File::Spec: 0
-  File::Temp: 0
-  Module::Build: 0.3601
-  Test::Exception: 0
-  Test::More: 0
-  Test::Most: 0
-  autodie: 0
-  constant: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0.22
+  Test::More: 0.42
+  Test::Most: 0.20
+  autodie: 1.999
 configure_requires:
-  Module::Build: 0.3601
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102160'
-license: perl
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Project-Euler
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  HTML::TreeBuilder::XPath: 0
+  WWW::Mechanize: 0
 requires:
-  Carp: 0
-  DateTime: 0
-  DateTime::Format::DateParse: 0
-  Exporter::Easy: 0
-  List::MoreUtils: 0
-  List::Util: 0
-  Math::Big::Factors: 0
-  Math::BigInt: 0
-  Modern::Perl: 0
-  Moose: 0
-  Moose::Role: 0
-  MooseX::Types: 0
-  MooseX::Types::Moose: 0
-  Readonly: 0
-  String::Palindrome: 0
-  namespace::autoclean: 0
-  perl: 5.010
+  Carp: 0.00
+  DateTime: 0.38
+  DateTime::Format::DateParse: 0.00
+  List::MoreUtils: 0.13
+  List::Util: 1.20
+  Math::Big: 1.12
+  Modern::Perl: 1.03
+  Moose: 0.65
+  Moose::Role: 0.65
+  MooseX::Method::Signatures: 0.09
+  MooseX::Types: 0.12
+  MooseX::Types::Moose: 0.00
+  Readonly: 0.00
+  perl: 5.10.0
+  version: 0.77
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Project-Euler
-  repository: git://github.com/lespea/Project-Euler
-version: 0.20
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.001005

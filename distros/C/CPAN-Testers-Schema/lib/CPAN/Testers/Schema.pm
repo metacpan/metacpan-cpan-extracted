@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema;
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 # ABSTRACT: Schema for CPANTesters database processed from test reports
 
 #pod =head1 SYNOPSIS
@@ -26,25 +26,19 @@ our $VERSION = '0.005';
 #pod
 #pod =head1 SEE ALSO
 #pod
-#pod =over 4
-#pod
-#pod =item L<CPAN::Testers::Schema::Result::Stats>
-#pod
-#pod =item L<DBIx::Class>
-#pod
-#pod =item L<http://github.com/cpan-testers/cpantesters-project>
-#pod
-#pod For an overview of how the CPANTesters project works, and for information about
-#pod project goals and to get involved.
-#pod
-#pod =back
+#pod L<CPAN::Testers::Schema::Result::Stats>, L<DBIx::Class>
 #pod
 #pod =cut
 
 use CPAN::Testers::Schema::Base;
+use File::Share qw( dist_dir );
+use Path::Tiny qw( path );
+use List::Util qw( uniq );
 use base 'DBIx::Class::Schema';
 
 __PACKAGE__->load_namespaces;
+__PACKAGE__->load_components(qw/Schema::Versioned/);
+__PACKAGE__->upgrade_directory( dist_dir( 'CPAN-Testers-Schema' ) );
 
 #pod =method connect_from_config
 #pod
@@ -81,6 +75,23 @@ sub connect_from_config ( $class ) {
     return $schema;
 }
 
+#pod =method ordered_schema_versions
+#pod
+#pod Get the available schema versions by reading the files in the share
+#pod directory. These versions can then be upgraded to using the
+#pod L<cpantesters-schema> script.
+#pod
+#pod =cut
+
+sub ordered_schema_versions( $self ) {
+    my @versions =
+        uniq sort
+        map { /[\d.]+-([\d.]+)/ }
+        grep { /CPAN-Testers-Schema-[\d.]+-[\d.]+-MySQL[.]sql/ }
+        path( dist_dir( 'CPAN-Testers-Schema' ) )->children;
+    return '0.000', @versions;
+}
+
 1;
 
 __END__
@@ -93,7 +104,7 @@ CPAN::Testers::Schema - Schema for CPANTesters database processed from test repo
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -134,20 +145,15 @@ in C<$HOME/.cpanstats.cnf>. This configuration file should look like:
 
 See L<DBD::mysql/mysql_read_default_file>.
 
+=head2 ordered_schema_versions
+
+Get the available schema versions by reading the files in the share
+directory. These versions can then be upgraded to using the
+L<cpantesters-schema> script.
+
 =head1 SEE ALSO
 
-=over 4
-
-=item L<CPAN::Testers::Schema::Result::Stats>
-
-=item L<DBIx::Class>
-
-=item L<http://github.com/cpan-testers/cpantesters-project>
-
-For an overview of how the CPANTesters project works, and for information about
-project goals and to get involved.
-
-=back
+L<CPAN::Testers::Schema::Result::Stats>, L<DBIx::Class>
 
 =head1 AUTHORS
 
@@ -162,6 +168,12 @@ Oriol Soriano <oriolsoriano@gmail.com>
 Doug Bell <preaction@cpan.org>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords Breno G. de Oliveira
+
+Breno G. de Oliveira <garu@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

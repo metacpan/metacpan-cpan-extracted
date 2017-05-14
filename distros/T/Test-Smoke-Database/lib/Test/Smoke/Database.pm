@@ -2,10 +2,23 @@ package Test::Smoke::Database;
 
 # Test::Smoke::Database - Add / parse /display perl reports smoke database
 # Copyright 2003 A.Barbet alian@alianwebserver.com.  All rights reserved.
-# $Date: 2003/08/19 10:37:24 $
+# $Date: 2004/04/19 17:48:23 $
 # $Log: Database.pm,v $
+# Revision 1.18  2004/04/19 17:48:23  alian
+# update to 1.17
+#
+# Revision 1.17  2004/04/14 22:37:47  alian
+# change url for eg of cgi
+#
+# Revision 1.16  2003/11/07 17:42:22  alian
+# Avoid warnings when create graph
+#
+# Revision 1.15  2003/09/16 15:41:50  alian
+#  - Update parsing to parse 5.6.1 report
+#  - Change display for lynx
+#  - Add top smokers
+#
 # Revision 1.14  2003/08/19 10:37:24  alian
-# Release 1.14:
 #  - FORMAT OF DATABASE UPDATED ! (two cols added, one moved).
 #  - Add a 'version' field to filter/parser (Eg: All perl-5.8.1 report)
 #  - Use the field 'date' into filter/parser (Eg: All report after 07/2003)
@@ -19,54 +32,7 @@ package Test::Smoke::Database;
 #  - Update FAQ.pod for last Test::Smoke version
 #  - Save only wanted headers for each nntp articles (and save From: field).
 #  - Move away last varchar field from builds to data
-#
-# Revision 1.13  2003/08/15 15:55:07  alian
-# Use a correct VERSION
-#
-# Revision 1.12  2003/08/08 14:27:59  alian
-# Update POD documentation
-#
-# Revision 1.11  2003/08/06 19:20:51  alian
-# Add proto to methods
-#
-# Revision 1.10  2003/08/06 18:50:41  alian
-# New interfaces with DB.pm & Display.pm
-#
-# Revision 1.9  2003/08/02 12:39:05  alian
-# Use dbi method like selectrow_array
-#
-# Revision 1.8  2003/07/30 22:07:34  alian
-# - Move away parsing code in Parsing.pm
-# - Update POD documentation
-#
-# Revision 1.7  2003/07/19 18:12:16  alian
-# Use a debug flag and a verbose one. Fix output
-#
-# Revision 1.6  2003/02/16 18:47:04  alian
-# - Update summary table:add number of configure failed, number of make failed.
-# - Add legend after summary table
-# - Add parsing/display of matrice,as Test::Smoke 1.16_15+ can report more than
-# 4 columns
-# - Correct a bug that add a 'Failure:' in HM Brand Report
-#
-# Revision 1.5  2003/02/10 00:58:05  alian
-# - Add feature of graph
-# - Correct Irix report parsing (no os version)
-# - Correct number of failed test
-# - Read archi from 1.16 report
-# - Update parsing of error of HM Brand report
-# - Update display for cgi
-#
-# Revision 1.4  2003/01/05 21:45:55  alian
-# Fix for parsing hm. brand reports with 5.6, fix test with 5.6
-#
-# Revision 1.3  2003/01/05 01:15:55  alian
-# - Add a special parser for HM Brand's reports
-# - Remove --rename option
-# - Rewrite code for better daily use with no --clear option
-# - Add tests for report parsing
-# - Update POD
-#
+
 
 use Carp;
 use strict;
@@ -84,7 +50,7 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-$VERSION = '1.14';
+$VERSION = '1.17';
 
 my $limite = 18600;
 #$limite = 0;
@@ -97,7 +63,7 @@ sub new($$)   {
   my $self = {};
   bless $self, $class;
   $self->{opts} = shift || {};
-  my $driver = "DBI:mysql:database=".$self->{opts}->{database}.
+  my $driver = "DBI:mysql:database=".($self->{opts}->{database} || 'test').
     ";host=localhost;port=3306";
   if (!$self->{opts}->{no_dbconnect}) {
     $self->{DBH} = DBI->connect($driver,
@@ -111,7 +77,9 @@ sub new($$)   {
   } else { $limite = 0; }
   $self->{DB} = new Test::Smoke::Database::DB($self);
   $self->{HTML} = new Test::Smoke::Database::Display($self);
-  print scalar(localtime),": New run\n" if ($self->{opts}->{verbose});
+  print scalar(localtime),
+    ": New run with Test::Smoke::Database version $VERSION\n"
+      if ($self->{opts}->{verbose});
   return $self;
 }
 
@@ -166,8 +134,8 @@ sub build_graph(\%) {
   }
 
   my $graph = new Test::Smoke::Database::Graph($self->{DBH}, $self,undef, "cpan");
-  $graph->stats_cpan();
-  $graph->create_html("cpan", \%limit2, $c);
+  $graph->stats_cpan() &&
+    $graph->create_html("cpan", \%limit2, $c);
 }
 
 
@@ -296,7 +264,8 @@ L<Test::Smoke::Database::Display>.
 =head1 SEE ALSO
 
 L<admin_smokedb>, L<Test::Smoke::Database::FAQ>, L<Test::Smoke>,
-L<http://www.alianwebserver.com/perl/smoke/smoke_db.cgi>
+L<http://cpanplus.keradel.com/cgi-bin/smoke_db.cgi>, 
+L<http://db.test-smoke.org/>
 
 =head1 METHODS
 
@@ -342,7 +311,7 @@ after B<fetch> method.
 
 =head1 VERSION
 
-$Revision: 1.14 $
+$Revision: 1.18 $
 
 =head1 AUTHOR
 

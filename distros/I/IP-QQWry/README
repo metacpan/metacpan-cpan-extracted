@@ -1,4 +1,4 @@
-IP-QQWry version 0.0.16
+IP-QQWry version 0.0.20
 
 'QQWry.Dat' L<http://www.cz88.net/fox/> is an IP file database.  It provides
 some useful infomation such as the geographical position of the host bound
@@ -7,7 +7,7 @@ interface for this file database.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006-2009 sunnavy(<sunnavy@gmail.com>)
+Copyright (C) 2006-2011 sunnavy(<sunnavy@gmail.com>)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

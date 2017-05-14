@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Class::Load qw(try_load_class);
 
 unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation" );
@@ -11,7 +10,7 @@ unless ( $ENV{RELEASE_TESTING} ) {
 
 # Ensure a recent version of Test::Pod
 my $min_tp = 1.22;
-try_load_class('Test::Pod', {-version => $min_tp})
-    or plan skip_all => "Test::Pod $min_tp required for testing POD";
+eval "use Test::Pod $min_tp";
+plan skip_all => "Test::Pod $min_tp required for testing POD" if $@;
 
-Test::Pod::all_pod_files_ok();
+all_pod_files_ok();

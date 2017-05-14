@@ -45,7 +45,7 @@ my @modules = qw(Wizard
 		 Wizard::Elem::CheckBox::Shell);
 
 
-print "1..35\n";
+print "1..", scalar(@modules), "\n";
 
 my $i = 0;
 foreach my $m (@modules) {

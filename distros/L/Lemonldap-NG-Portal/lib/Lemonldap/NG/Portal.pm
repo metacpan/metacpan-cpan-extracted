@@ -5,7 +5,7 @@
 # Alias for Lemonldap::NG::SharedConf
 package Lemonldap::NG::Portal;
 
-our $VERSION = '1.4.11';
+our $VERSION = '1.9.9';
 use Lemonldap::NG::Portal::SharedConf;
 use base 'Lemonldap::NG::Portal::SharedConf';
 
@@ -110,7 +110,7 @@ described below.
 The portal part inherits from L<CGI> so yo can use it both with Apache 1 and 2
 and use all L<CGI> features.
 
-=head2 Authentication, Autorization, Accounting
+=head2 Authentication, Authorization, Accounting
 
 =head3 B<Authentication>
 
@@ -268,7 +268,7 @@ Example:
           'Unit'      => '$ou',
       },
       www2.domain.com => {
-          'Authorization' => '"Basic ".encode_base64($employeeNumber.":dummy")',
+          'Authorization' => '"Basic ".encode_base64($employeeNumber.":dummy", "")',
       },
   }
 
@@ -500,11 +500,11 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2006, 2007, 2008, 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2005-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2006, 2010, 2011, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2006-2015 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

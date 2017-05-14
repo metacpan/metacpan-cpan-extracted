@@ -6,10 +6,8 @@ Source: https://metacpan.org/release/Cache-Moustache
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
- t/lib/Cache/CacheTester.pm
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2017 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01basic.t
@@ -17,12 +15,6 @@ Files: t/01basic.t
  t/lib/Cache/BaseCacheTester.pm
 Copyright: Copyright 2012 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: CONTRIBUTING
- INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -32,22 +24,32 @@ License: public-domain
 
 Files: README
  lib/Cache/Moustache.pm
-Copyright: This software is copyright (c) 2012, 2014 by Toby Inkster.
+Copyright: This software is copyright (c) 2012, 2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+ t/lib/Cache/CacheTester.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  

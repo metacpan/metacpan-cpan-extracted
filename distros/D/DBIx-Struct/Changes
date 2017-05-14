@@ -1,3 +1,18 @@
+0.22 Thu May 11 20:00:00 CEST 2017
+         - more json support fixes 
+         
+0.21 Thu May 11 18:00:00 CEST 2017
+         - fixed ->delete for the whole table 
+         
+0.20 Tue May 09 23:00:00 CEST 2017
+         - fixed ->data on json fields
+         
+0.19 Tue May 09 20:00:00 CEST 2017
+         - added TO_JSON to row objects
+         
+0.18 Tue May 09 20:00:00 CEST 2017
+         - fixed make_object_set
+         
 0.17 Fri May 05 15:30:00 CEST 2017
          - added findBy
          - fixed -distinct

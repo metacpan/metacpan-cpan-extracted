@@ -1,0 +1,9 @@
+lib/Bot/BasicBot/Pluggable/Module/Traceroute.pm
+lib/Bot/BasicBot/Pluggable/Module/Whois.pm
+Build.PL
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01use.t

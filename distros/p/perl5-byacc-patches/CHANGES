@@ -1,0 +1,9 @@
+# $Id: CHANGES,v 1.1 1998/04/29 06:34:45 jake Exp $
+
+Since 0.5
+---------
+
+Added -P {package name} and automatic 'package {package name};' and '1;'
+Added -5 for Perl 5.005 fanciness
+Patch for possible stack overflow conditions
+  (from Rod Whitby <rwhitby@asc.sps.mot.com>)

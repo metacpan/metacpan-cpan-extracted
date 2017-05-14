@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    get    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2010-03-12T14:17:35-0800" />
+<meta name="keywords" content="io,get" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/io/get?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=io" />
+<link rel="edit" title="Edit this page" href="/wiki/io/get?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/io/get" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/io/get" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/io/get" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='io';var JSINFO = {"id":"io:get","namespace":"io"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../start.html"  title="start">C++ Reference</a> &raquo; <a href="../io/start.html"  title="io:start">C++ I/O</a> &raquo; <a href="../io/get.html"  title="io:get">get</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="get" id="get">get</a></h2>
+<div class="level2">
+
+<p>
+Syntax:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    <span class="kw4">int</span> istream<span class="sy0">::</span><span class="me2">get</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    istream<span class="sy0">&amp;</span> istream<span class="sy0">::</span><span class="me2">get</span><span class="br0">&#40;</span> char<span class="sy0">&amp;</span> ch <span class="br0">&#41;</span><span class="sy0">;</span>
+    istream<span class="sy0">&amp;</span> istream<span class="sy0">::</span><span class="me2">get</span><span class="br0">&#40;</span> <span class="kw4">char</span><span class="sy0">*</span> buffer<span class="sy0">,</span> streamsize num <span class="br0">&#41;</span><span class="sy0">;</span>
+    istream<span class="sy0">&amp;</span> istream<span class="sy0">::</span><span class="me2">get</span><span class="br0">&#40;</span> <span class="kw4">char</span><span class="sy0">*</span> buffer<span class="sy0">,</span> streamsize num<span class="sy0">,</span> <span class="kw4">char</span> delim <span class="br0">&#41;</span><span class="sy0">;</span>
+    istream<span class="sy0">&amp;</span> istream<span class="sy0">::</span><span class="me2">get</span><span class="br0">&#40;</span> streambuf<span class="sy0">&amp;</span> buffer <span class="br0">&#41;</span><span class="sy0">;</span>
+    istream<span class="sy0">&amp;</span> istream<span class="sy0">::</span><span class="me2">get</span><span class="br0">&#40;</span> streambuf<span class="sy0">&amp;</span> buffer<span class="sy0">,</span> <span class="kw4">char</span> delim <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+
+The get() function is used with input streams, and either:
+</p>
+<ul>
+<li class="level1"><div class="li"> reads a character and returns that value,</div>
+</li>
+<li class="level1"><div class="li"> reads a character and stores it as ch,</div>
+</li>
+<li class="level1"><div class="li"> reads characters into buffer until num - 1 characters have been read, or <acronym title="End of file">EOF</acronym>, or newline encountered, or the delim character encountered (delim is not read until next time),</div>
+</li>
+<li class="level1"><div class="li"> or reads characters into buffer until a newline, <acronym title="End of file">EOF</acronym>, or delim character is encountered (again, delim isn&#039;t read until the next get() ).</div>
+</li>
+</ul>
+
+<p>
+For example, the following code displays the contents of a file called
+temp.txt, character by character:
+</p>
+<pre class="c code c++" style="font-family:monospace;">     <span class="kw4">char</span> ch<span class="sy0">;</span>
+     ifstream fin<span class="br0">&#40;</span> <span class="st0">&quot;temp.txt&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+     <span class="kw1">while</span><span class="br0">&#40;</span> fin.<span class="me1">get</span><span class="br0">&#40;</span>ch<span class="br0">&#41;</span> <span class="br0">&#41;</span>
+       <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> ch<span class="sy0">;</span>
+     fin.<span class="me1">close</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+Related Topics: <a href="../io/gcount.html" class="wikilink1" title="io:gcount">gcount</a>, <a href="../io/getline.html" class="wikilink1" title="io:getline">getline</a>, <a href="../string/getline.html" class="wikilink1" title="string:getline">(C++ Strings) getline</a>, <a href="../io/ignore.html" class="wikilink1" title="io:ignore">ignore</a>, <a href="../io/peek.html" class="wikilink1" title="io:peek">peek</a>, <a href="../io/put.html" class="wikilink1" title="io:put">put</a>, <a href="../io/read.html" class="wikilink1" title="io:read">read</a>
+</p>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        io/get.txt &middot; Last modified: 03/12/2010 14:17 by 89.214.201.4      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/xml_grep2
+lib/App/Xml_grep2.pm
+t/01-options.t
+t/test.xml
+t/test.html
+t/malformed.xml
+t/catalog.dtd
+t/catalog.templ
+t/with_cat.cxml
+t/with_cat.ent
+t/test_latin1.lxml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

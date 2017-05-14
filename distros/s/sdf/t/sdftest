@@ -1,0 +1,42 @@
+#!/bin/sh
+# $Id$
+#
+# >>Title::     Execute Regression Tests
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+#sdf="sdf"
+sdf="$1 -I../../blib/lib ../../blib/script/sdf"
+echo "Using '$sdf' for the tests"
+cd general
+echo "TESTING GENERAL STUFF ..."
+$sdf -2raw -.test *.sdf
+cd ../macro
+echo "TESTING MACROS ..."
+$sdf -2raw -.test *.sdf
+cd ../filter
+echo "TESTING FILTERS ..."
+$sdf -2raw -.test *.sdf
+cd ../..
+echo "SUMMARY:"
+bad=`/bin/ls t/*/*.out t/*/*.log 2>/dev/null | wc -l`
+if [ $bad -eq 0 ]
+then
+    echo "All tests passed."
+    exit 0
+else
+    echo "$bad test(s) failed."
+    echo ""
+    echo "The unexpected .out or .log file(s), can be found in"
+    echo "test/general, test/macro and/or test/filter."
+    exit 1
+fi

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Module;
 # ABSTRACT: A Module data object
-$MetaCPAN::Client::Module::VERSION = '2.012000';
+$MetaCPAN::Client::Module::VERSION = '2.014000';
 use Moo;
 extends 'MetaCPAN::Client::File';
 
@@ -10,6 +10,11 @@ sub metacpan_url {
     my $self = shift;
     sprintf("https://metacpan.org/pod/release/%s/%s/%s",
             $self->author, $self->release, $self->path );
+}
+
+sub package {
+    my $self = shift;
+    return $self->client->package( $self->documentation );
 }
 
 sub permission {
@@ -31,7 +36,7 @@ MetaCPAN::Client::Module - A Module data object
 
 =head1 VERSION
 
-version 2.012000
+version 2.014000
 
 =head1 SYNOPSIS
 
@@ -52,6 +57,10 @@ Whatever L<MetaCPAN::Client::File> has.
 =head2 metacpan_url
 
 Returns a link to the module page on MetaCPAN.
+
+=head2 package
+
+Returns an L<MetaCPAN::Client::Package> object for the module.
 
 =head2 permission
 

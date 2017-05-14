@@ -1,0 +1,6 @@
+Revision history for Perl extension Saraltest.
+
+0.01  Thu Aug 25 16:05:10 2011
+	- original version; created by h2xs 1.23 with options
+		-AX Saraltest
+

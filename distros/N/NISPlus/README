@@ -1,0 +1,82 @@
+This is a snapshot release of the NIS+ interface to Perl 5.  There are two
+parts to the interface: the raw component (Net::NISPlus), and the
+object-oriented component (Net::NISPlus::Table,
+Net::NISPlus::Directory, Net::NISPlus::Group).
+
+The object-oriented interface is used to simplify access to the NIS+
+databases.  See the example programs in the 't' subdirectory for
+examples on how to use the object-oriented interface.
+
+A 'tie'd interface is planned.
+
+There is only a small amount of pod documentation at this stage.
+
+INSTALLATION:
+------------
+
+To compile the NISPlus package:
+
+1. Unpack the distribution file.  It will create its own directory.
+2. cd NISPlus-0.06-alpha
+3. perl Makefile.PL
+4. make
+5. run some tests
+   Notes:
+     I have tried to write the tests so that they will work anywhere.
+     The t/create.t test will create tables beginning with perltest-
+     which you can safely 'nistbladm -d' after testing.
+     Testing will currently fail the 'indexed passwd test',
+     because I haven't finished implementing that part yet.
+
+when you are happy with the extension, you can type:
+
+6. make install
+
+to install it on your system
+
+IMPORT/EXPORT:
+-------------
+
+Some of the more useful utilities in the t directory are the
+table.export and table.import utilities.  I use them for backing up my
+NIS+ databases in a readable form, making search-and-replace type
+changes to NIS+ tables, and for rebuilding NIS+ systems from scratch.
+
+table.export <tablename> <outputfile>
+table.import <tablename> <inputfile>
+
+For table.import, you need to specify the fuly qualified table name,
+including the '.' at the end.
+
+If you are rebuilding NIS+ from scratch, dump all tables with
+table.export, reinitialise NIS+, edit the exported cred table to make sure the
+root master cred key is _not_ in it (you don't want to write over your
+new root master key, do you?), then import all tables with
+table.import.
+
+NOTE: Use these utilities at your own risk.  There is minimal error
+checking, and if you trash your NIS+ tables, I will not be
+responsible.
+
+BUGS:
+----
+
+The code has been tested on
+
+  perl5.003_22 under Solaris 2.4
+
+This is alpha code.  This means:
+
+a) the interfaces may change
+b) it may not even work for you
+
+Please report any bugs in the code or documentation to
+perl-nis@lists.fulcrum.com.au.  I encourage anyone using the alpha or
+beta versions of the NIS or NIS+ interfaces to subscribe to the mailing
+list.  You can subscribe by sending the message 'subscribe perl-nis'
+in the body of a message to majordomo@lists.fulcrum.com.au.  The list
+is intended to be a discussion/announcement list for all things to do
+with the NIS and NIS+ perl extensions.
+
+have fun,
+rik.	(1997-05-05)

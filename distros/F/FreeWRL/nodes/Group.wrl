@@ -1,0 +1,77 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+#VRML V2.0 utf8
+
+
+DEF GR Group {
+}
+
+
+DEF TS TimeSensor {
+	loop TRUE 
+}
+
+DEF CRS Script {
+	eventOut MFNode nod
+	eventIn SFTime tick
+	field MFNode nod1 [
+		Transform {
+			translation 3 0 0
+			children [
+				Shape { 
+					appearance Appearance {
+						material Material {
+						}
+					}
+					geometry Box { }
+				}
+			]
+		}
+		Shape { 
+			appearance Appearance {
+				material Material {
+				}
+			}
+			geometry Sphere { }
+		}
+	]
+	field MFNode nod2 [
+		Transform {
+			translation 3 0 0
+			children [
+				Shape { 
+					appearance Appearance {
+						material Material {
+						}
+					}
+					geometry Cone { }
+				}
+			]
+		}
+		Shape { 
+			appearance Appearance {
+				material Material {
+				}
+			}
+			geometry Cylinder { }
+		}
+	]
+	field SFInt32 cur 0
+	url [
+	"perl_tjl_xxx1:
+		tick => sub {
+			my $c = $t->{count} ++;
+			my $ind = ($c % 2) + 1;
+			my $n = $t->{nod.$ind};
+			$t->{nod} = $n;
+		}
+	"
+	]
+}
+
+ROUTE TS.cycleTime TO CRS.tick
+ROUTE CRS.nod TO GR.children

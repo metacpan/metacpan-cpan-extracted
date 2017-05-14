@@ -1,0 +1,29 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: hlp_window Filter
+
+H2: Interface
+
+!filter_interface "hlp_window"
+
+H2: Description
+
+The {{hlp_window}} filter is used to
+define the contents of a popup window for [[Windows]] help files.
+
+#H2: Examples
+
+#To be completed.
+
+#H2: Limitations & Future Directions

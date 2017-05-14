@@ -1,0 +1,28 @@
+<!-- partial, used to display different input boxes for field types in different ways. -->
+  [%- IF field.is_array -%]
+      <input type="text" class="text" name="[% field.name %]" size="25" value="[% ROW.$fieldName().join(',') | html_entity %]">
+  [%- ELSE -%]
+    [%- IF field.type == 'character varying' || field.type == 'character' -%]
+      <input type="text" class="text" name="[% field.name %]" size="[% field.length <= 25 ? field.length : 25 %]" maxlength="[% field.length %]" value="[% ROW.$fieldName() | html_entity %]">
+    [%- ELSIF field.type == 'inet' || field.type == 'macaddr' || field.type == 'cidr' -%]
+      <input type="text" name="[% field.name %]" size="[% field.length %]" value="[% ROW.$fieldName() | html_entity %]" onChange="validateInet(this, '[% field.desc %]');">
+    [%- ELSIF field.type == 'text' -%]
+      <textarea name="[% field.name %]">[% ROW.$fieldName() | html_entity %]</textarea>
+    [%- ELSIF field.type == 'bigint' -%]
+      <input type="text" class="text" name="[% field.name %]" size="[% field.length %]" value="[% ROW.$fieldName() | html_entity %]" onChange="validateBigInt(this, '[% field.desc %]');">
+    [%- ELSIF field.type == 'integer' -%]
+      <input type="text" class="text" name="[% field.name %]" size="[% field.length %]" value="[% ROW.$fieldName() | html_entity %]" onChange="validateInteger(this, '[% field.desc %]');">
+    [%- ELSIF field.type == 'smallint' -%]
+      <input type="text" class="text" name="[% field.name %]" size="[% field.length %]" value="[% ROW.$fieldName() | html_entity %]" onChange="validateSmallInt(this, '[% field.desc %]');">
+    [%- ELSIF field.type == 'date' -%]
+      <input type="text" class="text" name="[% field.name %]" size="10" value="[% ROW.$fieldName() | html_entity %]" maxlength="10" onChange="validateDate(this, '[% field.desc %]');"> (YYYY-MM-DD format)
+    [%- ELSIF field.type == 'boolean' -%]
+      <input type="checkbox" class="checkbox" name="[% field.name %]" value="1"[% IF ROW.$fieldName() %] checked[% END %]>
+    [%- ELSIF field.type == 'bytea' -%]
+      <-- TODO: Provide an upload box to upload binary data --> &nbsp;
+    [%- ELSIF field.type == 'bit' || field.type == 'bit varying' -%]
+      <-- TODO: Provide an upload box to upload binary data --> &nbsp;
+    [%- ELSE -%]
+       (Unknown Type: [% field.type %]) <input type="text" class="text" name="[% field.name %]" value="[% ROW.$fieldName() | html_entity %]">
+    [%- END -%]
+  [%- END -%]

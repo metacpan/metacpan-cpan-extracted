@@ -28,7 +28,7 @@ sub method {
     # There is a workaround here to correct for broken ensembl
     # das implementation, which lists all methods as "ensembl"
     # This is actually the source, not the method
-    $self->{id}    =~ s/^[^:]+/$_[0]/ if $_[0] && $_[0] ne 'ensembl';
+    $self->{method}    =~ s/^[^:]+/$_[0]/ if $_[0] && $_[0] ne 'ensembl';
   }
   $d;
 }

@@ -13,9 +13,7 @@
 
 #define PERLIO_NOT_STDIO 0
 
-#if !defined(PERLIO_IS_STDIO) && !defined(USE_SFIO)
 #define PerlIO FILE
-#endif
 
 #define wince_private
 #include "errno.h"
@@ -52,12 +50,6 @@
 #define EXECF_SPAWN_NOWAIT 3
 
 #if defined(PERL_IMPLICIT_SYS)
-#  undef win32_get_privlib
-#  define win32_get_privlib g_win32_get_privlib
-#  undef win32_get_sitelib
-#  define win32_get_sitelib g_win32_get_sitelib
-#  undef win32_get_vendorlib
-#  define win32_get_vendorlib g_win32_get_vendorlib
 #  undef do_spawn
 #  define do_spawn g_do_spawn
 #  undef getlogin
@@ -70,16 +62,17 @@ static int		do_spawn2(pTHX_ char *cmd, int exectype);
 static BOOL		has_shell_metachars(char *ptr);
 static long		filetime_to_clock(PFILETIME ft);
 static BOOL		filetime_from_time(PFILETIME ft, time_t t);
-static char *		get_emd_part(SV **leading, char *trailing, ...);
+static char *		get_emd_part(SV **leading, STRLEN *const len,
+				     char *trailing, ...);
 static void		remove_dead_process(long deceased);
-static long		find_pid(int pid);
+static long		find_pid(pTHX_ int pid);
 static char *		qualified_path(const char *cmd);
 static char *		win32_get_xlib(const char *pl, const char *xlib,
-				       const char *libname);
+				       const char *libname, STRLEN *const len);
 
 #ifdef USE_ITHREADS
 static void		remove_dead_pseudo_process(long child);
-static long		find_pseudo_pid(int pid);
+static long		find_pseudo_pid(pTHX_ int pid);
 #endif
 
 int _fmode = O_TEXT; /* celib do not provide _fmode, so we define it here */
@@ -145,7 +138,7 @@ get_regstr_from(HKEY hkey, const char *valuename, SV **svp)
 	if (retval == ERROR_SUCCESS && type == REG_SZ) {
 	    dTHX;
 	    if (!*svp)
-		*svp = sv_2mortal(newSVpvn("",0));
+		*svp = sv_2mortal(newSVpvs(""));
 	    SvGROW(*svp, datalen);
 	    retval = XCERegQueryValueExA(handle, valuename, 0, NULL,
 				     (PBYTE)SvPVX(*svp), &datalen);
@@ -171,7 +164,7 @@ get_regstr(const char *valuename, SV **svp)
 
 /* *prev_pathp (if non-NULL) is expected to be POK (valid allocated SvPVX(sv)) */
 static char *
-get_emd_part(SV **prev_pathp, char *trailing_path, ...)
+get_emd_part(SV **prev_pathp, STRLEN *const len, char *trailing_path, ...)
 {
     char base[10];
     va_list ap;
@@ -225,9 +218,11 @@ get_emd_part(SV **prev_pathp, char *trailing_path, ...)
 	/* directory exists */
 	dTHX;
 	if (!*prev_pathp)
-	    *prev_pathp = sv_2mortal(newSVpvn("",0));
-	sv_catpvn(*prev_pathp, ";", 1);
+	    *prev_pathp = sv_2mortal(newSVpvs(""));
+	sv_catpvs(*prev_pathp, ";");
 	sv_catpv(*prev_pathp, mod_name);
+	if(len)
+	    *len = SvCUR(*prev_pathp);
 	return SvPVX(*prev_pathp);
     }
 
@@ -235,7 +230,7 @@ get_emd_part(SV **prev_pathp, char *trailing_path, ...)
 }
 
 char *
-win32_get_privlib(const char *pl)
+win32_get_privlib(WIN32_NO_REGISTRY_M_(const char *pl) STRLEN *const len)
 {
     dTHX;
     char *stdlib = "lib";
@@ -248,17 +243,16 @@ win32_get_privlib(const char *pl)
 	(void)get_regstr(stdlib, &sv);
 
     /* $stdlib .= ";$EMD/../../lib" */
-    return get_emd_part(&sv, stdlib, ARCHNAME, "bin", NULL);
+    return get_emd_part(&sv, len, stdlib, ARCHNAME, "bin", NULL);
 }
 
 static char *
-win32_get_xlib(const char *pl, const char *xlib, const char *libname)
+win32_get_xlib(const char *pl, const char *xlib, const char *libname,
+	       STRLEN *const len)
 {
     dTHX;
     char regstr[40];
     char pathstr[MAX_PATH+1];
-    DWORD datalen;
-    int len, newsize;
     SV *sv1 = NULL;
     SV *sv2 = NULL;
 
@@ -269,7 +263,7 @@ win32_get_xlib(const char *pl, const char *xlib, const char *libname)
     /* $xlib .=
      * ";$EMD/" . ((-d $EMD/../../../$]) ? "../../.." : "../.."). "/$libname/$]/lib";  */
     sprintf(pathstr, "%s/%s/lib", libname, pl);
-    (void)get_emd_part(&sv1, pathstr, ARCHNAME, "bin", pl, NULL);
+    (void)get_emd_part(&sv1, NULL, pathstr, ARCHNAME, "bin", pl, NULL);
 
     /* $HKCU{$xlib} || $HKLM{$xlib} . ---; */
     (void)get_regstr(xlib, &sv2);
@@ -277,25 +271,26 @@ win32_get_xlib(const char *pl, const char *xlib, const char *libname)
     /* $xlib .=
      * ";$EMD/" . ((-d $EMD/../../../$]) ? "../../.." : "../.."). "/$libname/lib";  */
     sprintf(pathstr, "%s/lib", libname);
-    (void)get_emd_part(&sv2, pathstr, ARCHNAME, "bin", pl, NULL);
+    (void)get_emd_part(&sv2, NULL, pathstr, ARCHNAME, "bin", pl, NULL);
 
     if (!sv1 && !sv2)
 	return NULL;
-    if (!sv1)
-	return SvPVX(sv2);
-    if (!sv2)
-	return SvPVX(sv1);
+    if (!sv1) {
+	sv1 = sv2;
+    } else if (sv2) {
+	sv_catpvs(sv1, ";");
+	sv_catsv(sv1, sv2);
+    }
 
-    sv_catpvn(sv1, ";", 1);
-    sv_catsv(sv1, sv2);
-
+    if (len)
+	*len = SvCUR(sv1);
     return SvPVX(sv1);
 }
 
 char *
-win32_get_sitelib(const char *pl)
+win32_get_sitelib(const char *pl, STRLEN *const len)
 {
-    return win32_get_xlib(pl, "sitelib", "site");
+    return win32_get_xlib(pl, "sitelib", "site", len);
 }
 
 #ifndef PERL_VENDORLIB_NAME
@@ -303,9 +298,9 @@ win32_get_sitelib(const char *pl)
 #endif
 
 char *
-win32_get_vendorlib(const char *pl)
+win32_get_vendorlib(const char *pl, STRLEN *const len)
 {
-    return win32_get_xlib(pl, "vendorlib", PERL_VENDORLIB_NAME);
+    return win32_get_xlib(pl, "vendorlib", PERL_VENDORLIB_NAME, len);
 }
 
 static BOOL
@@ -354,7 +349,7 @@ has_shell_metachars(char *ptr)
  * the library functions will get the correct environment
  */
 PerlIO *
-Perl_my_popen(pTHX_ char *cmd, char *mode)
+Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 {
   printf("popen(%s)\n", cmd);
 
@@ -412,8 +407,8 @@ tokenize(const char *str, char **dest, char ***destv)
     if (str) {
 	dTHX;
 	int slen = strlen(str);
-	register char *ret;
-	register char **retv;
+	char *ret;
+	char **retv;
 	Newx(ret, slen+2, char);
 	Newx(retv, (slen+3)/2, char*);
 
@@ -496,6 +491,8 @@ get_shell(void)
 int
 Perl_do_aspawn(pTHX_ SV *really, SV **mark, SV **sp)
 {
+  PERL_ARGS_ASSERT_DO_ASPAWN;
+
   Perl_croak(aTHX_ PL_no_func, "aspawn");
   return -1;
 }
@@ -619,18 +616,24 @@ do_spawn2(pTHX_ char *cmd, int exectype)
 int
 Perl_do_spawn(pTHX_ char *cmd)
 {
+    PERL_ARGS_ASSERT_DO_SPAWN;
+
     return do_spawn2(aTHX_ cmd, EXECF_SPAWN);
 }
 
 int
 Perl_do_spawn_nowait(pTHX_ char *cmd)
 {
+    PERL_ARGS_ASSERT_DO_SPAWN_NOWAIT;
+
     return do_spawn2(aTHX_ cmd, EXECF_SPAWN_NOWAIT);
 }
 
 bool
-Perl_do_exec(pTHX_ char *cmd)
+Perl_do_exec(pTHX_ const char *cmd)
 {
+    PERL_ARGS_ASSERT_DO_EXEC;
+
     do_spawn2(aTHX_ cmd, EXECF_EXEC);
     return FALSE;
 }
@@ -640,7 +643,7 @@ Perl_do_exec(pTHX_ char *cmd)
  * return the pointer to the current file name.
  */
 DllExport DIR *
-win32_opendir(char *filename)
+win32_opendir(const char *filename)
 {
     dTHX;
     DIR			*dirp;
@@ -819,7 +822,7 @@ win32_closedir(DIR *dirp)
 /////!!!!!!!!!!! return here and do right stuff!!!!
 
 DllExport DIR *
-win32_opendir(char *filename)
+win32_opendir(const char *filename)
 {
   return opendir(filename);
 }
@@ -880,7 +883,51 @@ win32_longpath(char *path)
   return path;
 }
 
-#ifndef USE_WIN32_RTL_ENV
+static void
+out_of_memory(void)
+{
+    if (PL_curinterp) {
+        dTHX;
+        /* Can't use PerlIO to write as it allocates memory */
+        PerlLIO_write(PerlIO_fileno(Perl_error_log),
+                      PL_no_mem, strlen(PL_no_mem));
+        my_exit(1);
+    }
+    exit(1);
+}
+
+/* The win32_ansipath() function takes a Unicode filename and converts it
+ * into the current Windows codepage. If some characters cannot be mapped,
+ * then it will convert the short name instead.
+ *
+ * The buffer to the ansi pathname must be freed with win32_free() when it
+ * it no longer needed.
+ *
+ * The argument to win32_ansipath() must exist before this function is
+ * called; otherwise there is no way to determine the short path name.
+ *
+ * Ideas for future refinement:
+ * - Only convert those segments of the path that are not in the current
+ *   codepage, but leave the other segments in their long form.
+ * - If the resulting name is longer than MAX_PATH, start converting
+ *   additional path segments into short names until the full name
+ *   is shorter than MAX_PATH.  Shorten the filename part last!
+ */
+DllExport char *
+win32_ansipath(const WCHAR *widename)
+{
+    char *name;
+    size_t widelen = wcslen(widename)+1;
+    int len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, widename, widelen,
+                                  NULL, 0, NULL, NULL);
+    name = win32_malloc(len);
+    if (!name)
+        out_of_memory();
+
+    WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, widename, widelen,
+                        name, len, NULL, NULL);
+    return name;
+}
 
 DllExport char *
 win32_getenv(const char *name)
@@ -893,8 +940,6 @@ win32_putenv(const char *name)
 {
   return xceputenv(name);
 }
-
-#endif
 
 static long
 filetime_to_clock(PFILETIME ft)
@@ -1074,7 +1119,7 @@ do_raise(pTHX_ int sig)
 	    }
 	}
     }
-    /* Tell caller to exit thread/process as approriate */
+    /* Tell caller to exit thread/process as appropriate */
     return 1;
 }
 
@@ -1489,9 +1534,6 @@ win32_tmpfd(void)
 	    if (fh != INVALID_HANDLE_VALUE) {
 		int fd = win32_open_osfhandle((intptr_t)fh, 0);
 		if (fd >= 0) {
-#if defined(__BORLANDC__)
-        	    setmode(fd,O_BINARY);
-#endif
 		    DEBUG_p(PerlIO_printf(Perl_debug_log,
 					  "Created tmpfile=%s\n",filename));
 		    return fd;
@@ -2399,9 +2441,7 @@ XS(w32_GetCwd)
   EXTEND(SP,1);
   SvPOK_on(sv);
   ST(0) = sv;
-#ifndef INCOMPLETE_TAINTS
   SvTAINTED_on(ST(0));
-#endif
   XSRETURN(1);
 }
 
@@ -2661,9 +2701,11 @@ DllExport void
 Perl_win32_term(void)
 {
     dTHX;
+    HINTS_REFCNT_TERM;
     OP_REFCNT_TERM;
     PERLIO_TERM;
     MALLOC_TERM;
+    LOCALE_TERM;
 }
 
 void
@@ -2725,12 +2767,6 @@ char *
 getcwd(char *buf, size_t size)
 {
   return xcegetcwd(buf, size);
-}
-
-int
-isnan(double d)
-{
-  return _isnan(d);
 }
 
 

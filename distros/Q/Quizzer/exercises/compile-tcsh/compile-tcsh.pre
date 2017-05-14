@@ -1,0 +1,3 @@
+rm -rf /tmp/compile-tcsh-test;
+mkdir /tmp/compile-tcsh-test;
+cd /tmp/compile-tcsh-test; tar zxvf /tmp/compile-tcsh/tcsh-6.10.tar.gz

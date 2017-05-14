@@ -1,0 +1,6 @@
+Revision history for Perl extension TweetHook::API.
+
+0.01  Tue Sep 15 09:04:23 2009
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -AX TweetHook::API
+

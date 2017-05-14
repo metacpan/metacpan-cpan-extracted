@@ -1,0 +1,10 @@
+    <configuration>
+      <system>
+        <login>
+          <user>
+            <name>foo</name>
+            <class>bar</class>
+          </user>
+        </login>
+      </system>
+    </configuration>

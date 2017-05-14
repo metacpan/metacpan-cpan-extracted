@@ -1,0 +1,163 @@
+#
+# S.T. first try at a scenario
+#
+
+map 0 0 0 xsize=>16, zsize=>32, start=>[4,36,270];
+in_last;
+
+level 0 0 0 zsize=>24, xsize=>16, y=>0, texture=>'green_tile';
+level 0 0 0 zsize=>24, xsize=>16, y=>8, texture=>'sand';
+
+wall   0  0   0 xsize=>16;
+wall  16  0 270 xsize=>24;
+wall  16 24 180 xsize=>16, gaplist=>[[10,14,0,7]];
+wall   0 24  90 xsize=>24;
+
+wall   8  8 270 xsize=>16;
+
+# a bag of fairy dust
+Treasure 12 22 0 type=>'fairy dust', count=>2, texture=>'coins',
+ wrap_class=>"{translate_fairy=>sub{
+                                  my ($self) = @_;
+                                  if ($self->count) {
+                                    $self->{count}--;
+                                    return 1;
+                                  }
+                                  return 0;
+                                },
+              }";
+
+detector  4 38.1 0 range=>3,
+  near_script=>"sub{
+    $self->state('wait');
+    $self->send_event('do_ticks',1);
+  }",
+  event_script=>
+  {tick=>"sub{
+      if    ($self->state eq 'wait') {
+        $self->state('ready');
+      }
+      elsif ($self->state eq 'ready') {
+        $self->state('done');
+        $self->send_event('do_ticks',0);
+        $self->send_event('auto',12,'step',1,0);
+      }
+    }",
+  };
+
+box 5.5 21 225 xsize=>2.5, zsize=>1.75, ysize=>4,
+ texture=>['space','wood','wood','wood','wood','wood'],
+ wrap_class=>
+  "{handle_touch=>sub{
+      my ($self,$team) = @_;
+      my $target_y = $self->y+$self->ysize;
+      my $step = 1;
+      my $RADIANS = 4*atan2(1,1)/180.0;
+      my $tyaw = -$team->yaw+90;
+      $self->{target}{yaw} = ($tyaw+180) % 360;
+      $self->{target}{z} = $team->z+$step*cos($tyaw*$RADIANS);
+      $self->{target}{x} = $team->x+$step*sin($tyaw*$RADIANS);
+      for my $thing (@{$self->contains}) {
+        $thing->{target}{y} = $target_y;
+        $thing->{target}{x} = 0;
+        $thing->{target}{z} = 0;
+	$target_y += $thing->ysize;
+      }
+    },
+    make_me_nod=>sub{1},
+ }";
+
+in_last;
+
+## make these Boxes into a book
+
+# top (left) half of book SLAVE
+box 0 0 0 ysize=>.1, xsize=>1, zsize=>1.2, stretchi=>1, state=>'closed',
+ texture=>['book','wood','wood','wood','wood','letter'],
+ model=>{miny=>0,     maxy=>0.1,
+	 minx=>0.005, maxx=>0.805,
+	 minz=>-0.5,  maxz=>0.5},
+ event_script=>
+  {open_book=>"sub{
+                 my ($self,$stash,$obj,$ev,@arg) = @_;
+                 $self->state('open');
+                 $self->{target}{roll} = 175;
+               }",
+   close_book=>"sub{
+                 my ($self,$stash,$obj,$ev,@arg) = @_;
+                 $self->state('closed');
+                 $self->{target}{roll} = 0;
+               }",
+  },
+ wrap_class=>
+  "{handle_touch=>sub{
+      my ($self,@arg) = @_;
+      $self->send_event('book_touched',@arg);
+    },
+  }";
+
+# bottom (right) half of book MASTER
+box 0 0 0 ysize=>.1, xsize=>1, zsize=>1.2, stretchi=>1, state=>'closed',
+ texture=>['letter','wood','wood','wood','wood','wood'],
+ model=>{miny=>0,     maxy=>0.1,
+	 minx=>0.005, maxx=>0.805,
+	 minz=>-0.5,  maxz=>0.5},
+ event_script=>
+  {book_touched=>"sub{
+      my ($self,$stash,$obj,$ev,$team) = @_;
+      $self->handle_touch($team);
+    }",
+  },
+ wrap_class=>
+  "{handle_touch=>sub{
+      my ($self,$team) = @_;
+      if (defined($team->using) && $team->using->can('translate_fairy')) {
+        if ($team->using->translate_fairy) {
+          if ($self->state eq 'open') {
+            $self->send_event('msg',qq/success\n/);
+            $self->{texture}[0] = undef;
+            $self->{color}[0] = 'white';
+            $self->{text} = '42';
+            $self->send_event('need_redraw');
+          } else {
+            $self->send_event('msg',qq/failure: book closed\n/);
+          }
+        } else {
+          $self->send_event('msg',qq/failure: no dust left\n/);
+        }
+      } else {
+        if ($self->state eq 'closed') {
+          $self->send_event('open_book');
+          $self->state('open');
+          $self->{target}{roll} = 5;
+        } else {
+          $self->send_event('close_book');
+          $self->state('closed');
+          $self->{target}{roll} = 0;
+        }
+        $self->send_event('need_redraw');
+      }
+    },
+    text_location=>sub{.15,.1,.05,-90},
+  }";
+done;
+
+
+#################################################
+# 
+# pov starts outside, facing doorway, in dark
+# animate move up to doorway view
+# 
+# player sees book on table, closed
+# XXX (not now) if player touches book, zoom in (bend down?) to close up view
+# when close up, book closed, if player touches book,
+#    it opens to show unreadable scribble, except for clue
+# when close up, book open, if player touches book,
+#    it closes
+# when close up, book closed, if player touches book with F.D. bag,
+#    F.D. bag loses some content
+# when close up, book open, if player touches book with (non empty) F.D. bag,
+#    book becomes readable
+# 
+# F.D. bag is elsewhere in scene, to be found
+# 

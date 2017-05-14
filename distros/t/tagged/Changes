@@ -1,0 +1,39 @@
+Revision history for Perl module MP3::Tag, MP3::TAG::ID3v1, MP3::TAG::ID3v2
+
+Release Name: 0.1-beta
+======================
+Changes:
+* Added documentation to the modules
+
+* Writing/removing of ID3v2.3 tags is supported now 
+* Adding, changing, removing frames of ID3v2.3 is supported
+
+* Changed directory structure
+* Added file for proper install of modules
+
+
+Release Name: 0.2-alpha
+=======================
+Changes: 
+* ID3v2.3 compressed frames are supported now 
+* changed directory structure, support librarys for MP3::Tag are now in a
+  subdirectory 
+* tagged.pl calls xview to show pictures, which were found in ID3v2 tags
+  (sorry, not configurable at the moment, but easy to change in tagged.pl)
+
+Release Name: 0.1-alpha
+=======================
+This is the first alpha version. It contains perl modules to
+read ID3v1/ID3v2 tags, but they are still lacking a lot of
+features. 
+
+* Reading / Writing ID3v1 works
+* Reading of most frames of ID3v2.3 works
+
+Included is a demo program tagged.pl, and a program to change ID3v1
+tags and to set automatically the filename of a mp3 file: tagit.pl See
+README.txt for details. More documentation is still lacking. Sorry.
+
+
+
+MP3::Tag can be found at http://sourceforge.net/projects/tagged

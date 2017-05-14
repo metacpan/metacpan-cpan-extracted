@@ -6,7 +6,7 @@ use warnings;
 use Moo;
 use namespace::clean;
 use Config::Simple;
-use Data::Dumper qw(Dumper);
+#use Data::Dumper qw(Dumper);
 
 has conf_object => (is => 'ro', required => 1);
 
@@ -36,38 +36,57 @@ sub parse {
 	if (!defined($importer_plugin)) {
 		die 'Undefined value for plugin at [Importer]';
 	}
-	$options->{$importer_plugin} = $self->plugin_options('importer', $importer_plugin);
+	$options->{sprintf('importer_%s', $importer_plugin)} = $self->plugin_options('importer', $importer_plugin);
 
 	my $fixer_plugin = $self->cfg->param('Fixer.plugin');
 	if (!defined($fixer_plugin)) {
 		die 'Undefined value for plugin at [Fixer]';
 	}
-	$options->{$fixer_plugin} = $self->plugin_options('fixer', $fixer_plugin);
+	$options->{sprintf('fixer_%s', $fixer_plugin)} = $self->plugin_options('fixer', $fixer_plugin);
+
+	foreach my $fixer_conditional_plugin (@{$options->{sprintf('fixer_%s', $fixer_plugin)}->{'fixers'}}) {
+		$options->{sprintf('fixer_%s', $fixer_conditional_plugin)} = $self->block_options(sprintf('plugin_fixer_%s', $fixer_conditional_plugin));
+	}
 
 	my $exporter_plugin = $self->cfg->param('Exporter.plugin');
 	if (!defined($exporter_plugin)) {
 		die 'Undefined value for plugin at [Exporter]';
 	}
-	$options->{$exporter_plugin} = $self->plugin_options('exporter', $exporter_plugin);
+	$options->{sprintf('exporter_%s', $exporter_plugin)} = $self->plugin_options('exporter', $exporter_plugin);
 
-	# Legacy options
 	$options->{'importer'} = $self->cfg->param('Importer.plugin');
 	$options->{'fixer'} = $self->cfg->param('Fixer.plugin');
 	$options->{'exporter'} = $self->cfg->param('Exporter.plugin');
-	$options->{'oimport'} = $options->{$options->{'importer'}};
-	$options->{'ofixer'} = $options->{$options->{'fixer'}};
-	$options->{'oexport'} = $options->{$options->{'exporter'}};
+
+	# TODO: move this to ::Fix module
+	if (!defined($options->{sprintf('fixer_%s', $options->{'fixer'})}->{'id_path'})) {
+		die sprintf('Missing required argument id_path in [plugin_fixer_%s]', $options->{'fixer'});
+	}
+	$options->{'id_path'} = $options->{sprintf('fixer_%s', $options->{'fixer'})}->{'id_path'};
+
+	# Legacy options
+	$options->{'oimport'} = $options->{sprintf('importer_%s', $options->{'importer'})};
+	$options->{'ofixer'} = $options->{sprintf('fixer_%s', $options->{'fixer'})};
+	$options->{'oexport'} = $options->{sprintf('exporter_%s', $options->{'exporter'})};
 	# Even more legacy
-	$options->{'fixes'} = $options->{$options->{'fixer'}}->{'file_name'};
-	$options->{'id_path'} = $options->{$options->{'fixer'}}->{'id_path'};
+	$options->{'fixes'} = $options->{sprintf('fixer_%s', $options->{'fixer'})}->{'file_name'};
 
 	return $options;
 }
 
 sub plugin_options {
 	my ($self, $plugin_type, $plugin_name) = @_;
-	my $block = $self->cfg->get_block(sprintf('plugin_%s_%s', $plugin_type, $plugin_name));
-	return $block;
+	return $self->block_options(sprintf('plugin_%s_%s', $plugin_type, $plugin_name));
+}
+
+sub module_options {
+	my ($self, $module_name) = @_;
+	return $self->block_options(sprintf('module_%s', $module_name));
+}
+
+sub block_options {
+	my ($self, $plugin_block_name) = @_;
+	return $self->cfg->get_block($plugin_block_name);
 }
 
 sub parse_conf_file {

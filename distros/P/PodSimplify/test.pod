@@ -1,0 +1,80 @@
+=begin module test
+
+=begin a
+
+=begin b
+
+=begin c
+
+=begin d
+
+=end d
+
+=end c
+
+=end b
+
+=end a
+
+=begin list
+
+=item *
+
+=begin list
+
+=item 1.
+
+=end list
+
+=end list
+
+=item foo
+
+=heading FOO
+
+=subheading BAR
+
+=subsubhead BLETCH
+
+B<bold>I<italic>B<I<bold-italic>>
+
+X<abc/def>
+
+X<foo;abc/def;xyz/qed>
+
+L<a\bc/def>
+
+L<$;/def>
+
+Y<a\bc/def>
+
+X<B<abc>;abc/def>
+
+=cut
+
+Foo! HAH, you won't read _this!.
+
+=resume
+
+Back in pod.
+
+=set command-style to line
+This is a normal paragraph
+
+ This is a verbatim paragraph
+
+=item foo bar bletch
+This is an item.
+
+=set command-style to paragraph
+
+Back to paragraphs.
+
+=item foobar
+bletch.
+
+=end module test
+
+=begin module test2
+
+=end module test2

@@ -130,8 +130,8 @@ is($results, <<'EOHTML', "listing blocks");
 
 EOHTML
 
-foreach my $target qw(blockquote comment caution epigraph 
-      example important note screen tip warning) {
+foreach my $target (qw(blockquote comment caution epigraph 
+      example important note screen tip warning)) {
   initialize($parser, $results);
   $parser->parse_string_document(<<"EOPOD");
 =begin $target

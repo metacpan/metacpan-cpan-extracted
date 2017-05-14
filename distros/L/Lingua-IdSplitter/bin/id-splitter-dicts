@@ -1,0 +1,79 @@
+#!/usr/bin/perl -s
+# PODNAME: id-splitter-dicts
+# ABSTRACT: command line interface to Lingua::IdSplitter dictionaries
+
+use warnings;
+use strict;
+
+our $l;
+
+use Lingua::IdSplitter;
+use File::ShareDir ':ALL';
+use File::Basename;
+
+my $d = shift;
+unless ($d or $l) {
+  print "Usage: conc-isplitter-dicts [-l] [dictionary]\n\nOptions:\n",
+    "  -l -- list available dictionaries\n",
+      "  <dictionary> -- list dictionary elements\n",
+  exit;
+}
+
+if ($l) {
+  my @found;
+
+  push @found, glob "*.csv";
+  push @found, glob "share/dictionaries/*.csv";
+  eval "require Lingua::IdSplitter;";  # XXX - be nice
+  unless ($@) {
+    my $dir = dist_dir('Lingua-IdSplitter');
+    my @files = glob "$dir/dictionaries/*.csv";
+    push @found, @files;
+  }
+
+  printf("%s: %s\n",_name($_), $_) foreach @found;
+  exit(0);
+}
+
+if ($d) {
+  my $splitter = Lingua::IdSplitter->new;
+  my $d = $splitter->_load_dict($d);
+
+  printf("%s,%s\n", $_, $d->{words}->{$_}) foreach (sort keys %{$d->{words}});
+}
+
+sub _name {
+  my ($file) = @_;
+
+  my $name = basename $file;
+  $name =~ s/\.csv$//;
+
+  return $name;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+id-splitter-dicts - command line interface to Lingua::IdSplitter dictionaries
+
+=head1 VERSION
+
+version 0.03
+
+=head1 AUTHOR
+
+Nuno Carvalho <smash@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014-2015 by Project Natura <natura@natura.di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

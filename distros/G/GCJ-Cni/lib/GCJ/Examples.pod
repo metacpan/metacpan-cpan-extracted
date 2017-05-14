@@ -1,0 +1,271 @@
+=head1 NAME
+
+GCJ::Cni::Examples - Examples of how to use GCJ's CNI interface to write Perl Modules in Java
+
+=head1 EXAMPLES
+
+=head2 Writing Treaded modules in Java
+
+One benefit of using GCJ is that it takes advantage of POSIX threading.  This is nice since Perl's
+threading model is, shall we say, less than ideal.  Now, you could theoretically write a module in C or
+C++ and and use the standard POSIX library to do your threaded work for you, however, why not take advantage
+of the nice Threading interface that Java provides to you by default. This may also come in handy if you have
+a massively threaded Java library that you'd like to call from Perl.
+
+For this example assume that I want to do matrix multiplication, albeit in a very crazy manner.  Therefore,
+I will write a Java class, Matrix, and a method, multiply, which will take another matrix to perform the operation
+between.  Here's the crazy part, for each cell in the resulting matrix I will spawn a new thread, as an internal
+class, and give it a row and a column from which they will derive the result.  I know this is a little wierd but
+the point is that I'll be spawning a lot of new threads.  To multiply two 10x10 matrices we will have to spawn
+100 threads (one thread per cell in the resulting 10x10 matrix).  Imagine doing this in Perl, then imagine doing it
+in Java; natively compiled Java.  Much faster and a lot less headaches.
+
+The Java Interface/pseudocode is as follows:
+
+  public class Matrix {
+    public Matrix ( int numRows, int numCols ) {
+      ...Constructor stuff...
+    }
+  
+    public void set ( int row, int col, int val ) {
+      ...set an element...
+    }
+  
+    public int get ( int row, int col ) {
+      ...get an element...
+    }
+    
+    public Matrix multiply ( Matrix times ) {
+      ...set it up...
+      for ( int i = 0; i < rows; i++ ) {
+        for ( int j = 0; j < times.getCols(); j++ ) {
+          //GO NUTS!!!!
+          ArrayMultiplier multiplier = new ArrayMultiplier(this, times, result, i, j);
+          multiplier.start();
+          ...etc...
+        }
+      }
+      ...wait for the threads to exit and return the new matrix...
+    }
+    
+    public int getRows ( ) {
+      ...get number of rows...
+    }
+    
+    public int getCols ( ) {
+      ...get number of columns...
+    }
+    
+    public void print ( ) {
+      ...print the matrix to stdout...
+    }
+    
+    private class ArrayMultiplier extends Thread {
+      public ArrayMultiplier ( Matrix a, Matrix b, Matrix result, int row, int col ) {
+        ...Construct this bad boy...
+      }
+      
+      public void run ( ) {
+        int sum = 0;
+        for ( int i = 0; i < a.getCols(); i++ ) {
+          sum += (a.get(row, i) * b.get(i, col));
+        }
+        result.set(row, col, sum);
+      }
+      
+    }
+  }
+
+Now, we want to call this class from Perl.  My perferred manner is through SWIG so that's what we're going to use.
+However, you do not need to use SWIG, you can use whatever method you prefer when wrapping C++ classes.  We begin by creating
+a C++ header file from our above class.  This is done by using GCJ's gcjh utility.  First we need to class compile Matrix.java
+
+  gcj -C Matrix.java
+
+Then we go ahead and create the header file:
+
+  gcjh Matrix
+
+Easy enough.  We can then extract the interface we want to have available in Perl from the generated header file and from it
+create a i file to be used as input to SWIG.  I usually start by copying my header file to the same named file but with an i
+extension instead.  I then remove all of the grimy C++ gruff, private methods and variables, slap a module directive on it and
+call it done.  It won't always be this easy though.  When you're done an interface file for the above class should look something
+like this:
+
+  %module Matrix;
+  
+  typedef int jint;
+  
+  class Matrix
+  {
+  public:
+    Matrix (jint, jint);
+    virtual void set (jint, jint, jint);
+    virtual jint get (jint, jint);
+    virtual ::Matrix *multiply (::Matrix *);
+    virtual jint getRows ();
+    virtual jint getCols ();
+    virtual void print ();
+  };
+
+We then put SWIG to work and generate our C++ wrapper for Perl:
+
+  swig -perl -c++ Matrix.i
+
+After the above command we now will see two new files in our current directory, Matrix.pm and Matrix_wrap.cxx; these correspond the
+module directive we gave in Matrix.i.
+
+At this point all we have left to do is compile, and use.
+
+  gcj -c Matrix.java
+  gcc -c -I<perl inc path> -include Matrix.h Matrix_wrap.cxx
+  gcc -shared -lgcj -lstdc++ Matrix.o Matrix_wrap.o -oMatrix.so
+
+A simple Perl file using this module might look something like:
+
+  sub populate_matrix {
+    my $matrix = shift;
+    for ( my $i = 0; $i < $matrix->getRows(); $i++ ) {
+      for ( my $j = 0; $j < $matrix->getCols(); $j++ ) {
+        $matrix->set($i, $j, $i * $j);
+      }
+    }
+  }
+
+  use GCJ::Cni;
+  use Matrix;
+  
+  GCJ::Cni::JvCreateJavaVM(undef);
+  GCJ::Cni::JvAttachCurrentThread(undef, undef);
+  
+  my $matrix = new Matrix::Matrix(10, 10);
+  populate_matrix($matrix);
+  my $matrix2 = new Matrix::Matrix(10, 10);
+  populate_matrix($matrix2);
+  $matrix3 = $matrix->multiply($matrix2);
+  $matrix3->print();
+  
+  GCJ::Cni::JvDetachCurrentThread();
+
+I'll leave it up to the reader to write a Perl module that does the same thing, that is, spawns 100 threads.  In my own personal
+fiddling I found that just spawning that many threads (never mind doing any kind of work) was over 3 time slower in Perl.  In this
+situation we at least get to use our favorite language, Perl, and offload some of the heavy hitting to a language more suited for it.
+
+Where this really comes in handy is when you have an existing multi-threaded Java library that you would like to expose to Perl.  You 
+could theoretically natively compile various components of your library and then generate Perl bindings to access it.  In this way,
+you get a little extra speed and efficiency as well as code reuse and binding.
+
+=head2 Java RMI from Perl
+
+One nice thing about being able to call Java from Perl is that we get to take advantage of all of the things that Java offers us in
+the way of distribited applications.  In particular, we can take advantage of various ways of calling remote Java objects.  As
+an example we'll write a Perl script that makes calls to a Java RMI server and gets back a bean that it can then read, print, 
+basically do whatever it wants with. More realistically, you would probably return a Collection of objects.
+
+Since this is not about how to write an RMI client/server pair I'll spare you the details, instead it'll suffice to just show you the
+client side of this equation:
+
+We begin with a Simple Bean; we'll be asking the server for one of these:
+
+  import java.io.*;
+  public class SomeBean implements Serializable {
+  private String value;
+    public SomeBean() {}
+    public void setValue ( String _value ) { ...typical setter stuff... }
+    public String getValue ( ) { ...typical getter stuff... }
+  }
+
+Then, a client to make the RMI call:
+
+  import java.rmi.*;
+  public class Client {
+    public Client ( ) {}
+    public void connect ( ) {
+      ...lookup the remote object...
+    }
+    public SomeBean getBeanFromServer ( ) {
+      ...make a call into the remote object
+    }
+  }
+
+And just for sanity sake here's the Remote Interface we're calling:
+
+  import java.rmi.*;
+  public interface HelloInterface extends Remote {
+    public SomeBean getMessage() throws RemoteException;
+  }
+
+We will also assume that we have defined a Server (Server.java) and an implementation to our Remote Interface (Hello.java). 
+Once again, I've spared you the details of the inplementation and instead only shown the public interface to these classes.
+
+The next step is to compile our client and ready it for Perl.
+
+  gcj -C SomeBean.java Client.java Hello.java HelloInterface.java
+  gcjh SomeBean
+  gcjh Client
+
+We can then create an i file for SWIG, which might look something like this:
+
+  %module RmiExample
+  
+  %{
+  #include "SomeBean.h"
+  #include "Client.h"
+  %}
+  
+  %typemap(out) jstring {
+    ...convert Java Strings to Perl scalars...
+  }
+  
+  %typemap(in) jstring {
+    ...convert Perl scalar to Java String...
+  }
+  
+  class Client
+  {
+  public:
+    Client ();
+    virtual void connect ();
+    virtual SomeBean *getBeanFromServer ();
+  };
+  
+  class SomeBean
+  {
+  public:
+    SomeBean ();
+    virtual void setValue (jstring);
+    virtual jstring getValue () { return value; }
+  };
+
+Notice the typemap directive, this is used to convert between Java and Perl strings so I don't have to wrap the String class.
+We then get to work compiling and using our Java class:
+
+  gcj -c SimpleBean.java Client.java Hello.java HelloInterface.java
+  swig -perl -c++ RmiExample.i
+  gcc -c -I <perl inc path> -include gcj/cni.h RmiExample_wrap.cxx
+  grmic Hello
+  gcc -shared -lgcj -lstdc++ *.o -oRmiExample.so
+
+And finally we can use our new Module:
+
+  use RmiExample;
+  use GCJ::Cni;
+  
+  GCJ::Cni::JvCreateJavaVM(undef);
+  GCJ::Cni::JvAttachCurrentThread(undef, undef);
+  
+  my $example = new RmiExample::Client();
+  $example->connect();
+  my $bean = $example->getBeanFromServer();
+  print $bean->getValue() . "\n";
+
+  $bean->DISOWN() if $bean;
+  $example->DISOWN() if $example;
+  
+  GCJ::Cni::JvDetachCurrentThread();
+
+This was a rather trivial example, however, imagine you had to talk to a third party system over via RMI calls such as these and 
+interface it with your own Perl system.  Well, you may write a Java library that talks to the RMI server and gets Objects from the server,
+then, does some hardcore processing on them, in Java of course, and packages the results into something your Perl system
+understands how to use.  Maybe you're importing data from one system to another during a nightly load, or you're gathering 
+statistics from a vendor's app, whatever it is, you can easily pull data from a Java system and use it in your Perl system.

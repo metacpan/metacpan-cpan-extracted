@@ -1,0 +1,83 @@
+%%START_PERL%%
+my $VERSION = '$Id: externaldb-insert.pl.in,v 1.5 2001/01/24 06:01:07 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+
+use Bio::Genex qw($SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_insert_sql);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::ExternalDatabase;
+
+my $infile;
+my $rc = GetOptions('file=s' => \$infile);
+
+my $USAGE = <<"EOU";
+usage: $0 --infile=file_name
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parsefile($infile);
+
+my @db_list = $DOC->getElementsByTagName('external_database');
+
+
+# open up a writeable connection
+$Bio::Genex::USER = $SU_USERNAME;
+$Bio::Genex::PASSWORD = $SU_PASSWORD;
+$Bio::Genex::TRANSACTION = 1;	# do it in a transaction
+my $dbh = Bio::Genex::current_connection();
+
+my $curr_table = 'ExternalDatabase';
+print STDERR "  Dropping $curr_table\n";
+$dbh->do("DROP TABLE $curr_table");
+die "Couldn't drop table $curr_table: $DBI::errstr" if $dbh->err;
+
+my $table_def = <<'EOT';
+(name varchar(48) not null,
+ main_url varchar(256) not null,
+ parameterized_url varchar(256))
+EOT
+print STDERR "  Creating $curr_table\n";
+$dbh->do("CREATE TABLE $curr_table $table_def");
+die "Couldn't create table $curr_table: $DBI::errstr" if $dbh->err;
+
+my $user = '%%GENEX_RO_USER%%';
+my $priveleges = 'SELECT';
+print STDERR "  Granting $priveleges to $user\n";
+$dbh->do("GRANT $priveleges on $curr_table TO $user");
+die "Couldn't grant $priveleges to $user $curr_table: $DBI::errstr" if $dbh->err;
+
+my $user = '%%GENEX_SU_USER%%';
+my $priveleges = 'ALL';
+print STDERR "  Granting $priveleges to $user\n";
+$dbh->do("GRANT $priveleges on $curr_table TO $user");
+die "Couldn't grant $priveleges to $user $curr_table: $DBI::errstr" if $dbh->err;
+
+my $sql = create_insert_sql($dbh,$curr_table,['name','parameterized_url','main_url']);
+my $sth = $dbh->prepare($sql);
+
+foreach my $db (@db_list) {
+  assert_element($db,'external_database');
+  my $name = $db->getAttribute('name');
+  my $parameterized_url = $db->getAttribute('parameterized_url');
+  my $main_url = $db->getAttribute('main_url');
+
+  $sth->execute($name,$parameterized_url,$main_url);
+}
+
+$sth->finish();
+$dbh->commit();
+$dbh->disconnect();
+exit(0);

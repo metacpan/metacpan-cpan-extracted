@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 3;
+plan tests => 4;
 
 @ARGV = (
   '--mode', 'uptime',
@@ -22,6 +22,7 @@ if ( ! grep /BEGIN/, keys %Monitoring::GLPlugin::) {
 }
 ok(grep /BEGIN/, keys %Monitoring::GLPlugin::, 'module loaded');
 
+$ENV{NAGIOS__SERVICEMYSQL_USER} = "sepp";
 my $plugin = Monitoring::GLPlugin->new(
     shortname => '',
     usage => 'Usage: %s [ -v|--verbose ] [ -t <timeout> ] '.
@@ -37,6 +38,14 @@ $plugin->add_mode(
     alias => undef,
     help => 'Check the uptime of the device',
 );
+$plugin->add_arg(
+    spec => 'username=s',
+    help => "--username
+   the mysql user",
+    required => 0,
+    env => 'MYSQL_USER',
+);
+
 
 $plugin->add_default_args();
 $plugin->getopts();
@@ -47,7 +56,9 @@ diag($Monitoring::GLPlugin::pluginname);
 diag($plugin->statefilesdir());
 diag($plugin->create_statefile());
 ok($plugin, 'Monitoring::GLPlugin->new');
+ok($plugin->opts->username eq "sepp");
 $plugin = undef;
+
 
 $plugin = Monitoring::GLPlugin::SNMP->new(
     shortname => '',
@@ -74,5 +85,4 @@ diag($Monitoring::GLPlugin::pluginname);
 diag($plugin->statefilesdir());
 diag($plugin->create_statefile());
 ok($plugin, 'Monitoring::GLPlugin::SNMP->new');
-
 

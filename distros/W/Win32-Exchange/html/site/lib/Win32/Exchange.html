@@ -1,0 +1,354 @@
+<HTML>
+<HEAD>
+<TITLE>Win32::Exchange</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Exchange - Exchange 5.5, 2000 and 2003 functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <UL>
+      <LI><A HREF="#functions">Functions</A></LI>
+        <UL>
+          <LI><A HREF="#function_errorcheck">ErrorCheck</A></LI>
+          <LI>Exchange 5.5</LI>
+          <UL>
+            <LI><A HREF="#function_new">new</A></LI>
+            <LI><A HREF="#function_GetDistinguishedName">GetDistinguishedName</A></LI>
+            <LI><A HREF="#function_GetLDAPPath">GetLDAPPath</A></LI>
+            <LI><A HREF="#function_GetVersion">GetVersion</A></LI>
+          </UL>
+          <LI>Exchange 2000/2003</LI>
+          <UL>
+            <LI><A HREF="#function_new">new</A></LI>
+            <LI><A HREF="#function_FindCloseDC">FindCloseDC</A></LI>
+            <LI><A HREF="#function_GetDistinguishedName">GetDistinguishedName</A></LI>
+            <LI><A HREF="#function_GetVersion">GetVersion</A></LI>
+            <LI><A HREF="#function_IsMixedModeExchangeOrg">IsMixedModeExchangeOrg</A></LI>
+            <LI><A HREF="#function_LocateMailboxStore">LocateMailboxStore</A></LI>
+          </UL>
+        </UL>
+
+    </UL>
+
+    <LI><A HREF="#examples">EXAMPLES</A></LI>
+    <LI><A HREF="#notes">NOTES</A></LI>
+    <UL>
+
+        <LI><A HREF="#incompatibilities">Incompatibilities</A></LI>
+        <LI><A HREF="#bugs and limitations">Bugs and Limitations</A></LI>
+    </UL>
+
+    <LI><A HREF="#see also">SEE ALSO</A></LI>
+    <LI><A HREF="#authors">AUTHORS</A></LI>
+    <LI><A HREF="#version">VERSION</A></LI>
+</UL>
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::Exchange - Exchange 5.5, 2000 and 2003 functions</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $provider = Win32::Exchange->new($info_store_server)) ||
+      die " - error creating new object\n';
+
+  #--- Exchange 5.5
+  $mailbox = $provider->CreateMailbox($mailbox_alias_name);
+  if (!$mailbox) {
+    die "Error creating mailbox\n";
+  }
+  print "Create successful\n";
+  $mailbox->SetAttributes(\%Attributes);
+  $mailbox->SetOwner("$domain\\$mailbox_alias_name");
+  $mailbox->SetPerms(\@Perms);
+
+  #--- Exchange 2000
+  $mailbox = $provider->CreateMailbox($mailbox_alias_name,
+                                      "domainname.com") ||
+    print 'Mailbox create failed\n';
+  $mailbox->Win32::Exchange::SetAttributes(\%Attributes) ||
+        print 'Set Attributes failed\n';
+  $mailbox->SetPerms(\@Perms);
+</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+The mailbox functions have moved to <A HREF="./Exchange/Mailbox.html">Win32::Exchange::Mailbox</A>.  This is a base
+class.  By "use"ing Win32::Exchange, the other sub-modules like Mailbox, Const and SMTP::Security are auto included.
+This module deals with low-level functions that most all the other modules might want to use as well.<BR>
+<BR>
+Win32::Exchange uses Win32::OLE exclusively (and technically is just a wrapper for the
+underlying OLE calls) so feel free to look at them, and make a suggestion or two.<BR>
+<BR>
+All methods return 0 (or undef) on failure and 1 for success unless otherwise noted.<BR>
+<P>
+<H2><A NAME="functions">Functions</A></H2>
+<DL>
+<DT><STRONG><A NAME="function_new">$provider = Win32::Exchange-&gt;new($server_name | $version);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_new"><CODE>new()</CODE></A> class method starts a new instance of an Exchange provider object.
+It returns a reference to this object or <B>undef</B> if the creation fails.<BR>
+<BR>
+<UL>
+  <LI>You can send a server name or a version number</LI>
+  <LI>If used, $version must equal 5.5 or 6.0.</LI>
+  <UL>
+    <LI>5.5 would create a Win32::OLE object of type AdsNamespaces for use with Exchange 5.5</LI>
+    <LI>6.0 would create a Win32::OLE object of type CDO.Person for use with Exchange 2000</LI>
+  </UL>
+  <LI>If used, $server_name must NOT be prepended with backslashed</LI>
+</UL>
+<BR>
+$provider = Win32::Exchange-&gt;new($server_name); #new performs a check on your exchange server for versioning<BR>
+$provider = Win32::Exchange-&gt;new($version); #creates an object suitable for a $version server.. ("5.5" or "6.0")<BR>
+<BR>
+This function should probably be deprecated, as it serves no current purpose.  Maybe it will in the next release.  :)<BR>
+<BR>
+<DT><STRONG><A NAME="function_errorcheck">Win32::Exchange::ErrorCheck($hex_error_str,$error_num,$error_name);</A></STRONG><BR>
+<DD>
+The <A HREF="#function_errorcheck"><CODE>ErrorCheck()</CODE></A> method takes an input value something similar to "0x00000000" where
+the string is the error you are expecting.  $error_num and $error_name are output variables if an error other than the value you expected has happenned.
+All values are checked against Win32::OLE->LastError for string comparisons.<BR>
+<BR>
+if (Win32::Exchange::ErrorCheck("0x80073020",$error_num,$error_name)) {<BR>
+  print "Mailbox does not exist.  Good...  Let's create it.\n";<BR>
+} else {<BR>
+  if ($error_num eq "0x00000000")) {<BR>
+    print "OOPS..  The mailbox already exists!!!\n";<BR>
+  } else {<BR>
+    print "Unexpected error getting mailbox! ($error_num,$error_name)\n";<BR>
+  }<BR>
+}<BR>
+<BR>
+<BR>
+
+<DT><STRONG><A NAME="function_FindCloseDC">[$dc_name] = Win32::Exchange::FindCloseDC($exch_server_name,[$dc_name]);</A></STRONG><BR>
+<DD>
+function takes the exchange server name, and finds a close DC to that server, very useful in remote sites because of replication and lag times
+due to differing connection on remote sites.  This function uses WMI, requires Exchange 2000 Service Pack 2, and was contributed to the
+Win32::Exchange project by Andy Webb.<BR>
+<BR>
+This function takes an optional second parameter for the output ($dc_name) of a close domain controller in proximity the Exchange Server specified
+in the first parameter.  If the second parameter is omitted, the function returns the DC name as the return result.<BR>
+<BR>
+if (Win32::Exchange::FindCloseDC("thisexchangeserver",$dc_name)) {<BR>
+  print "dc_name = $dc_name\n";<BR>
+}<BR>
+<BR>
+- or -<BR>
+<BR>
+$dc_name = Win32::Exchange::FindCloseDC("thisexchangeserver");<BR>
+print "dc_name = $dc_name\n";<BR>
+<BR>
+<BR>
+
+<DT><STRONG><A NAME="function_GetDistinguishedName">Win32::Exchange::GetDistinguishedName($server_name,$serach_object,$result);</CODE></A></STRONG><BR>
+<DD>
+The GetDistinguishedName function takes the Server name you want to query, an object type (or properly formatted ADODB filter, see below) and returns
+the distinguished name of the object on that server.  This function is cross-compatible within Exchange versions, but not tested in Exchange 2000 (but
+would probably be useful in querying Active Directory Server attributes.<BR>
+<BR>
+This function opens LDAP on the $server_name, applies the $filter, and then performs an ADODB search on the entire sub-tree.  Once it finds values that
+meet your search criteria, it performs a pattern-match to see if $server_name is found anywhere in the distinguished name of search results.  If it finds the server
+name in the results, it returns the first match.<BR>
+<BR>
+  if (Wi32::Exchange::GetDistinguishedName($info_store_server,'Home-MTA',$result)) {<BR>
+    print 'result = $result\n';<BR>
+  } else {<BR>
+    print 'Error Returning from GetDistinguishedName\n';<BR>
+  }<BR>
+<BR>
+Currently this type of "pre-declaration" of a filter is available for 'Home-MTA' and 'Home-MDB' (case sensitive), but the function also accepts ADODB stype
+filters such as (objectClass=MTA) or (objectClass=MHS-Message-Store), which is the same as declaring 'Home-MTA' or 'Home-MDB'<BR>
+<BR>
+Get familiar with the ADSVW program found in the ADSI 2.5 SDK.  If you can find something helpful in ADSVW, chances are you can come up with an ADODB
+filter to meet your needs.<BR>
+<BR>
+<DT><STRONG><A NAME="function_GetLDAPPath"><CODE>Win32::Exchange::GetLDAPPath($server_name,$org,$ou);#Exchange 5.5</CODE></A></STRONG><BR>
+<DD>
+The GetLDAPPath method takes a server name (Exchange 5.5) and returns the Organization and OU for the Server.<BR>
+<BR>
+The function has no corresponding Exchange 2000 function, but performs the same objective (of determinig where to
+eventually create a mailbox) as provided by <A HREF="#function_LocateMailboxStore">LocateMailboxStore</A>.<BR>
+<BR>
+  if (Win32::Exchange::GetLDAPPath($info_store_server,$org,$ou)) {<BR>
+    print 'returned -> o='.$org.',ou='.$ou.'\n';<BR>
+  } else {<BR>
+    print 'Error Returning from GetLDAPPath\n';<BR>
+  }<BR>
+<BR>
+<BR>
+<DT><STRONG><A NAME="function_GetVersion">Win32::Exchange::<CODE>GetVersion($server_name,\%version);</CODE></A></STRONG><BR>
+<DD>
+This function returns a HASH of version information in the form of:<BR>
+<BR>
+<UL>
+<LI>ver=5.5</LI>
+<LI>build=2653.23</LI>
+<LI>sp=4</LI>
+</UL>
+<BR>
+  if (!Win32::Exchange::GetVersion($info_store_server,\%ver)) {<BR>
+    die "$rtn - Error returning from GetVersion\n";<BR>
+  }<BR>
+<BR>
+  print "version      = $ver{ver}\n";<BR>
+  print "build        = $ver{build}\n";<BR>
+  print "service pack = $ver{sp}\n";<BR>
+<BR>
+<P></P>
+<DT><STRONG><A NAME="function_IsMixedModeExchangeOrg">Win32::Exchange::IsMixedModeExchangeOrg($yes_no);</A></STRONG><BR>
+<DD>
+This function returns 1 (true) on Success and 0 (false) on error.<BR>
+<BR>
+
+if (!Win32::Exchange::IsMixedModeExchangeOrg($yes_no)) {<BR>
+  die "$rtn - Error determining Sstatus of Exchange Organization\n";<BR>
+}<BR>
+<BR>
+if ($yes_no eq "1") {<BR>
+  print "This is a Mixed Mode Exchange Organization\n";<BR>
+} else {<BR>
+  print "This is a Native Mode Exchange organization.  There's no Exchange 5.5 here!\n";<BR>
+}<BR>
+<BR>
+<DT><STRONG><A NAME="function_LocateMailboxStore">Win32::Exchange::<CODE>LocateMailboxStore($info_store_server,$storage_group,$mailbox_store,$store_name,[\@counts]);</CODE></A></STRONG><BR>
+<DD>
+This method allows you to query the Exchange 2000 server to determine:<BR>
+<UL>
+  <li>the default store name (if there is only 1 storage group and 1 mailbox store on the server)</li>
+  <li>the Mailbox Store distinguished name (if passed a valid storage group and mailbox store name)</li>
+  <li>the number of Storage Groups and Mailbox Stores a given server has (optionally)</li>
+</UL>
+<BR>
+  if (Win32::Exchange::LocateMailboxStore($info_store_server,$storage_group,$mailbox_store,$store_name,\@counts)) {<BR>
+    print "storage group = $storage_group\n";<BR>
+    print "mailbox store = $mailbox_store\n";<BR>
+    print "located store distinguished name= $store_name\n";<BR>
+    print "$info_store_server\n";<BR>
+    print "  Total:\n";<BR>
+    print "    storage groups = @counts[0]\n";<BR>
+    print "    mailbox stores = @counts[1]\n";<BR>
+  }<BR>
+<BR>
+In this example, @counts is an optional parameter and should be populated providing the function is able to query the:<BR>
+<UL>
+<li>CDOEXM.ExchangeServer,</li>
+<li>CDOEXM.MailboxStore, and</li>
+<li>CDOEXM.StorageGroup</li>
+</UL>
+classes, and even if the function is unable to locate $storage_group and $mailbox_store, either because these variables are
+null strings and there is more than 1 mailbox store or storage group, or because they were not found as a valid storage group
+and mailbox store (useful for debugging purposes).<BR>
+<H2><A NAME="module options">Module Options</A></H2>
+Currently there are none, but I intend to make DEBUG a passable parameter as it is currently hard-coded to 1 (enabled).<BR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<pre>
+This area under construction.  Sorry.
+</PRE>
+<H1><A NAME="notes">NOTES</A></H1>
+<UL>
+  <LI>NT4 clients talking to Exchange servers will need the following software from Microsoft installed:</LI>
+  <UL>
+    <LI>ADSI 2.5</LI>
+    <LI>ADSI SDK (Software Development Kit)</LI>
+    <LI>The Exchange 5.5 Admin program is optional, but helpful in viewing data related to Exchange 5.5 and 2000.</LI>
+  </UL>
+  <LI>W2K/XP/.NET clients talking to Exchange servers (E55 and E2K) will need the following software from Microsoft installed:</LI>
+  <UL>
+    <LI>ADsSecurity.dll -- this dll must be registered on the system you are running perl from, using the command <B>'regsvr32 adssecurity.dll'</B> (This dll is found in the ADSI SDK), but only if you want to set permissions using this module.</LI>
+    <LI>No additional software required (with the exception of the Exchange 2000 requirements below)</LI>
+  </UL>
+  <LI>All clients manipulating Exchange 2000 mailboxes will need the following software:</LI>
+  <UL>
+    <LI>The Exchange 2000 System Manager (from the Exchange 2000 Server CD)</LI>
+    <LI>The Exchange 5.5 Admin program is optional, but helpful in viewing data related to Exchange 5.5 and 2000.</LI>
+  </UL>
+  <LI>I would think this goes without saying, but:</LI>
+  <UL>
+    <LI>Test this module in a test environment before touching your production environment.</LI>
+    <LI>You need Administrative rights to do most if not all of these tasks, on the Exchange and AD servers</LI>
+    <LI>I am not responsible for mistakes in this module, misuse of this code (though I will take criticism, if you can argue that I have done something bad)</LI>
+    <LI>If you find a mistake, or bug please inform me of the mistake or a possible solution you have found.</LI>
+  </UL>
+</UL>
+<H2><A NAME="incompatabilities">Incompatabilities</A></H2>
+<UL>
+  <LI>NT4 clients installed with the software mentioned in the notes section, will work, but are prone to breaking intermittently.  Microsoft has explained this by saying that there is minimal dependency checking in this toolset (ADSI 2.5), please see the readme.txt provided with this PPM distribution for further rants on this topic.</LI>
+</UL>
+
+<H2><A NAME="bugs and limitations">Bugs and Limitations</A></H2>
+<UL>
+<LI>E2K: Setting permissions on Exchange 2000 mailboxes require the Exchange Client Tools service packed to SP2 or higher, and is reccommended to be the same service pack level as the server</A>.</LI>
+<LI>E2K: Mailbox creation will fail on Exchange 2000 if you do not pass a storage group and mailbox store when there are more than one of either on the server that you have selected in your <A HREF="function_CreateMailbox">CreateMailbox</A>.</LI>
+<LI>E55: Because I use GetObject in the <A HREF="function_GetMailbox">GetMailbox</A> and <A HREF="function_CreateMailbox">CreateMailbox</A> sub, it's possible that a hidden Recipient may exist for the name you have chosen to get/create and the get/create may fail.  This is easily fixed by changing the underlying GetObject call to an OpenDSObject call, but this call, needs an administrative name sent with it so for now, the GetObject works in most cases, and eventually I'll add another function that allows for use of the OpenDSObject, so live with it until I implement a new function for it or by all means, create your own function.  This only pertains to Exchange 5.5.</LI>
+</UL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<UL>
+  <LI><A HREF="./Exchange/Mailbox.html">Win32::Exchange::Mailbox</A></LI>
+  <LI><A HREF="./Exchange/SMTP/Security.html">Win32::Exchange::SMTP::Security</A></LI>
+  <LI><A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wss/wss/_exch2k_welcome_to_exchange.asp">The Exchange 2000 SDK</A></LI>
+  <LI><A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ds2x/hh/ds2x/exds_ds2exchgd_5pgl.asp">Exchange 5.5 and ADSI (ADSI Exchange)</A></LI>
+  <LI><A HREF="http://www.microsoft.com/ntworkstation/downloads/Other/ADSI25.asp">Microsoft ADSI 2.5 and ADSI SDK Download page</A></LI>
+  <LI><A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wss/wss/_cdo_recipient_management_interfaces.asp">Exchange 2000 Interfaces and attributes</A></LI>
+  <LI><A HREF="http://aspn.activestate.com/ASPN/Mail/">Activestate Mailing List Archive (it's a great place to answer your own questions)</A></LI>
+  <LI><A HREF="http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3B810913">Post SP3 Hotfix that allows programmatic access to the SMTP Virtual Server's access list</A></LI>
+</UL>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+With the advent of Exchange 2000, lots of perl scripts started pouring through the listservs, that tried to parse the Storage Group name and Mailbox Store names into
+an incredibly long string to allow for Exchange 2000 mailbox creation (circa 2001?).<BR>
+<BR>
+I knew that the entire string had to be all parsed together somewhere in the Directory, and it was just a matter of finding it.<BR>
+<BR>
+It was; LocateMailboxStore is an implementation of that idea.<BR>
+<BR>
+As it turns out, there are a lot of tricks like LocateMailboxStore that have helped develop this module from
+a string concatenation mess into a lot of fancy searches for the complete ldap paths and distinguished names
+that power mailbox creation and Exchange Server administration.<BR>
+<BR>
+Most of the fancy searches were created by poking around in the objects themselves with ADSVW.EXE (an ADSI
+SDK tool), and then writing an ADODB search to return the right result set.<BR>
+<BR>
+Thanks for taking the time to read all of this..<BR>
+<BR>
+I'd like to extend thanks to the following:<BR>
+<UL>
+  <LI>Dave Roth, in part for advice and comments on my code, and then also for hosting the PPM for this module!</LI>
+  <LI>Andy Webb, for his constructive criticism, for brainstorming new functionality to the module, as well as donating the underlying code for FindCloseDC</LI>
+  <LI><P>Jan Dubois &lt;<A HREF="mailto:jand@activestate.com">jand@activestate.com</A>&gt; and Everyone at Activestate for Win32::OLE, without which this module wouldn't be possible.</LI>
+  <LI>Activestate, for having the mailing list archive chock-full-o' source code and answers to questions asked and answered way too many times!</LI>
+  <LI>Microsoft...  for exposing the Exchange 2000 mailbox interface, &lt;sarcasm&gt;and for NOT updating their documentation on the MSDN Developer network website regarding the ability to programatically change permissions on mailboxes (and suggesting that you can't do it) &lt;/sarcasm&gt;</LI>
+</UL>
+<BR>
+<P>Please send questions, comments or suggestions about this module to Steven Manross &lt;<A HREF="mailto:steven@manross.net">steven@manross.net</A>&gt.</P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>Version 0.042     June 6, 2004</P>
+<H1><A NAME="copyright">Copyright</A></H1>
+Microsoft, Active Directory, ADSI, Windows, Windows NT, MSDN, and Exchange are either registered trademarks or trademarks of Microsoft Corporation in the United States and/or other countries.<BR>
+<BR>
+<BR>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Exchange - Exchange 5.5 and Exchange 2000 functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+</BODY>
+</HTML>

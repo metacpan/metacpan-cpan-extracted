@@ -1,0 +1,6 @@
+1.0.1:
+- Remove the use of 'encodings' pragma.
+
+1.0.0:
+- The method Time::Verbal#distance
+- Full i18n support with Locale::Wolowitz

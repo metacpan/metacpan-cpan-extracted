@@ -1,13 +1,10 @@
-                             Locale::KeyedText
-                                   TODO
+                             Locale-KeyedText
 ---------------------------------------------------------------------------
 
-Following is a summary of things that still need doing.
+TODO
 
-* Consider whether or not we want to add a non-Perl-core external
-dependency like Module::Runtime or Class::Load to load template modules
-more effectively, whether or not they actually bring any value and behave
-correctly for that task, and are worth the dependency weight, or not.
+* Consider raising the version number to 2.x, considering the wide scale
+compatability breaks between the rewrite and previous stable releases.
 
 * Write the DIAGNOSTICS and other pending documentation in KeyedText.pm,
 and write the POD for en.pm, removing sections if not applicable.
@@ -18,6 +15,8 @@ include the same characters as variable markers in Template text strings.
 * Add support for Template files to be a format other than Pure Perl, such
 as plain vanilla tab delimited text files (2 columns: key + string), or
 YAML files, or XML files.
+
+* Add a new test suite.
 
 * No further updates are planned during the short term except in response
 to user requests.

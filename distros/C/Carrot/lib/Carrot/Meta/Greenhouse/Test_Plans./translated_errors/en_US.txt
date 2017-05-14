@@ -1,0 +1,16 @@
+# The text encoding of this file must be UTF-8 with a BOM as file magic.
+# The internal key of a message is never translated, because it's not displayed.
+# The message displayed to the user is indented by a single tab or spaces.
+# It might span several lines. The data value placeholder is %s.
+
+invalid_line_format
+	The format of a line wasn't recognized.
+	Line: '%s'
+
+finding_configuration
+	Processing the configuration lines for a package failed.
+	Package: %s
+
+line_error
+	Processing a line from the configuration failed.
+	Line: '%s'

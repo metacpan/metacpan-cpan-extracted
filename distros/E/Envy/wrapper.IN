@@ -1,0 +1,105 @@
+#!/bin/ksh
+
+wrapper_usage() {
+  echo 'usage: wrapper [-v] [-e envy1 envy2 ...] -s <shell cmd>'
+  echo
+  echo  "  wrapper is superseded by launche:"
+  echo  "    please use launche instead!"
+  exit
+}
+
+if [[ $# = 0 ]]; then wrapper_usage; fi
+
+typeset -i wr_i=0
+typeset -i wr_verbose=0
+wr_preserve=0
+wr_toload=#STARTUP#
+
+while [[ $1 = -* ]]; do
+  case $1 in
+
+  --preserve_environment) wr_preserve=1 ;;
+
+  -s|--) while [[ $2 != -* && $# > 1 ]];
+      do 
+	wr_commands[$wr_i]=${wr_commands[$wr_i]}" "$2
+	shift
+      done
+      if [[ $wr_i -eq 1 ]]; then
+        echo "wrapper: please specify only one shell command"
+      fi
+      wr_i=$(($wr_i + 1))
+      ;;
+
+  -m|-e) while [[ $2 != -* && $# > 1 ]];
+      do 
+	if [ "$2" != #STARTUP# ]; then
+	    wr_toload="$wr_toload $2"
+	fi
+	shift
+      done
+      ;;
+
+  -v) wr_verbose=$(($wr_verbose + 1)) ;;
+
+  *)  echo "wrapper: unknown option '$1' ignored"
+      break
+  esac
+
+  if [[ $# > 0 ]];  then
+    shift
+  fi
+done
+
+if [[ $wr_i -eq 0 ]]; then
+  echo "wrapper: nothing to run!"
+  wrapper_usage
+fi
+
+if test $wr_preserve = 0 -a x$ENVY_VERSION != x; then
+  # Envy is already running.  We need to clear the environment!
+  if [ $wr_verbose -ne 0 ]; then
+    echo "wrapper: cleansing the environment"
+  fi
+  wr_LOGNAME=$LOGNAME
+  wr_HOME=$HOME
+  eval `/bin/env | /bin/sed -e 's/^\([^=]*\)\=.*$/unset \1;/g'`
+  LOGNAME=$wr_LOGNAME;  export LOGNAME
+  HOME=$wr_HOME;        export HOME
+fi
+
+#INITIAL_ENV#
+
+SHELL=/bin/sh; export SHELL
+
+# Is it unlikely that LOGNAME or HOME will not be prepared, however,
+# better safe than sorry.
+if [ x$LOGNAME == x  ]; then
+  LOGNAME='root'; export LOGNAME
+fi
+if [ x$HOME == x ]; then
+  HOME=/home/$LOGNAME; export HOME
+fi
+
+ENVY_CONTEXT=${wr_commands[0]}
+export ENVY_CONTEXT
+
+wr_dirname=`dirname $0`
+wr_envy=$wr_dirname/envy.pl
+test -x $wr_envy || echo "wrapper: 'envy' not found at $wr_envy: PANIC"
+
+if [[ x$wr_toload != x ]]; then
+  if [ $wr_verbose -ne 0 ]; then
+    echo 'wrapper: eval `'"$wr_envy load $wr_toload"'`'
+  fi
+  eval `$wr_envy -v$wr_verbose load $wr_toload`
+fi
+
+typeset -i wr_j=$wr_i
+wr_i=0
+while [[ $wr_i < $wr_j ]];
+do
+    if [ $wr_verbose -ne 0 ]; then echo "wrapper: ${wr_commands[$wr_i]}"; fi
+    ${wr_commands[$wr_i]} 
+    wr_i=$(($wr_i + 1))
+done

@@ -1,0 +1,153 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+# PROTO & ROUTE & Script
+
+PROTO FullRound [
+	field SFTime cycleInterval 6
+	eventOut SFRotation value_changed 
+	field SFVec3f axis 1 0 0
+] {
+	DEF TIMER TimeSensor 
+	  {cycleInterval IS cycleInterval
+	   startTime 0 stopTime -1 enabled TRUE loop TRUE}
+	DEF ORI ScalarInterpolator {
+		key [ 0 0.25 0.5 0.75 1]
+		keyValue [
+			0
+			1.570796
+			3.141593
+			4.71238898
+			6.2831853
+		]
+	}
+	DEF SCRI Script {
+		eventIn SFFloat set_fraction
+		eventOut SFRotation value_changed IS value_changed
+		field SFVec3f axis IS axis
+		url ["javascript:
+		   function set_fraction(val,time) {
+		   	value_changed = new SFRotation(
+			 axis.x,axis.y,axis.z,val
+			);
+		   }
+		" "perl_tjl_xxx1:
+		   set_fraction => sub {
+		   	$t->{value_changed} =
+			 [@{$t->{axis}}, $t->{set_fraction}];
+		   }
+		"]
+	}
+	ROUTE TIMER.fraction_changed TO ORI.set_fraction
+	ROUTE ORI.value_changed TO SCRI.set_fraction
+}
+
+PROTO Wheel [
+	field SFColor color 1 0 0
+	field SFColor color2 0 1 0
+	field SFTime speed1 6
+	field SFTime speed2 10
+	field SFVec3f transl 0 -1 0
+] {
+	DEF WHOLE Transform {
+	 children [
+	 	DEF CONE Transform {
+			translation IS transl
+			children [
+			DEF C1 
+			Transform {
+			translation 0 0.5 0
+			children [
+			Shape {
+				appearance Appearance {
+					material Material {
+						diffuseColor IS color
+					}
+				}
+				geometry Cone {
+					height 1
+					bottomRadius 0.75
+				}
+			}
+			]
+			}
+			Transform {
+				rotation 1 0 0 3.141593
+				children [
+					Transform {
+					translation 0 0.5 0
+					children [
+					Shape {
+						appearance Appearance {
+							material Material {
+								diffuseColor IS color2
+							}
+						}
+						geometry Cone {
+							height 1
+							bottomRadius 0.75
+						}
+					}
+					]
+					}
+				]
+			}
+
+			]
+		}
+		Transform {
+			rotation 0 0 1 1.570796
+			children [USE CONE]
+		}
+		Transform {
+			rotation 0 0 1 3.141593
+			children [USE CONE]
+		}
+		Transform {
+			rotation 0 0 1 4.71238898
+			children [USE CONE]
+		}
+	 ]
+	}
+	DEF FR1 FullRound { cycleInterval IS speed1 }
+	DEF FR2 FullRound { cycleInterval IS speed2 
+				 axis 0 0 1}
+	ROUTE FR1.value_changed TO CONE.rotation
+	ROUTE FR2.value_changed TO WHOLE.rotation
+}
+
+
+Transform {
+	translation 0 0 1
+	children Wheel { 
+		# color 0.8 0 0
+		# color2 1 0.7 1
+		color 0.8 0 0
+		color2 0.8 0 0
+		speed1 4
+		}
+}
+
+Transform {
+	translation 0 0 -1
+	rotation 1 0 0 3.141593
+	children Wheel { 
+		# color 0.5 1 1 
+		# color2 0 0 0.8
+		color 0 0 0.8
+		color2 0 0 0.8
+		speed1 11 speed2 12}
+}
+
+# Transform {
+# 	translation 0 0 0
+# 	rotation 1 0 0 3.141593
+# 	children Wheel { 
+# 		color 0.1 1 0.1
+# 		speed1 20 speed2 40
+# 		transl 0 2.3 0
+# 	}
+# }

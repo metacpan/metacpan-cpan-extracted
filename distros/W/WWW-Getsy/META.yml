@@ -1,0 +1,39 @@
+---
+abstract: 'Command line interface to Etsy V2 OAuth API'
+author:
+  - 'John Goulah, C<< <jgoulah at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Getsy
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  WWW::Getsy:
+    file: lib/WWW/Getsy.pm
+  WWW::Getsy::Client:
+    file: lib/WWW/Getsy/Client.pm
+requires:
+  Data::Dumper: 0
+  File::HomeDir: 0
+  JSON::XS: 0
+  Moose: 1.21
+  MooseX::Declare: 0.34
+  MooseX::Getopt: 0
+  MooseX::NonMoose: 0
+  MooseX::Types: 0
+  Net::OAuth::Simple: 1.5
+  perl: 5.8.8
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.999007

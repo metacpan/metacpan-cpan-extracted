@@ -1,0 +1,39 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: changed Filter
+
+H2: Interface
+
+!filter_interface "changed"
+
+H2: Description
+
+The {{changed}} filter is used to mark a section of text as changed.
+
+H2: Examples
+
+To add change bars to a section of text:
+
+!block example; lang='sdf'
+!block changed
+This text has been changed.
+
+And so has this.
+!endblock
+!endblock
+
+H2: Limitations & Future Directions
+
+At the moment, this filter only works when generating FrameMaker
+documents.

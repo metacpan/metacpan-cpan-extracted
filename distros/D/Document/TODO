@@ -1,0 +1,173 @@
+=================
+General
+
+- Set up Defaults in the debian/control file.
+  [DMA 20080807 - ?]
+
+- Use ($$) arg templates in all functions
+  [DMA 20080827 - ?]
+
+- Use argument fault checks all exported functions
+  [DMA 20080827 - ?]
+
+=================
+Notes.pm
+
+- test the code. I have not ever run it, this is only a skeleton so I 
+  remember the ideas.
+  [DMA 20040927-?]
+
+- there is so much similarility with LogFile, I wonder if
+  we need another abstract superclass?
+  [DMA 20040927-?]
+
+=================
+PageIterator and PageId
+
+- IN GENERAL THE USE OF side and pagealpha is confusing nomenclature
+  and should be simplified. Also, since other entities are page and 
+  subpage, it should perhaps be pagealpha.
+  [DMA 20060705 - ?]
+
+- ARCHIVIST: setting page to 000b.1 does not work, it
+  stays with the sequence already in place. To implement I
+  would have to fit it into the following. The matches are
+  order dependendant so it would have to be done at the
+  right location. Also, the change would affect SWITCH code 
+  in other locations in PageIterator and PageId.
+	sub parse {
+	  my ($class, $lexeme, $flg) = @_;
+	  my (@vals) = ("", $lexeme,);
+	  defined $flg || ($flg = 0);
+	  my $delim        = ($flg) ? "p" : "";
+	  my ($lpar,$rpar) =  ($lexeme =~ /^($delim)(.*)/);
+	  defined $lpar   || ($lpar = "");
+	  $lpar eq $delim || (return @vals);
+	 SWITCH: {$_ = $rpar;
+	    # Example:	001.04b
+	    if (/^(\d+\.\d+[a-z])(.*)/) { @vals = ($1,$2); last SWITCH;}
+		    # Example:	001.04
+	    if (/^(\d+\.\d+)(.*)/)	 { @vals = ($1,$2); last SWITCH;}
+		    # Example:	000.spine
+	    if (/^(0+.spine)(.*)/)	 { @vals = ($1,$2); last SWITCH;}
+		    # Example:	000a
+	    if (/^(\d+[a-z])(.*)/)	 { @vals = ($1,$2); last SWITCH;}
+		    # Example:	001
+	    if (/^(\d+)(.*)/)		 { @vals = ($1,$2); last SWITCH;}
+	  }
+	  return @vals;
+	}
+  [DMA 20070514-?]
+
+	- BUG: ScanBooklet cannot handle page number like '001a.1' but
+	  does not say so. Instead it gives you a name like '001a-001b'
+	  I can't see how it manages to switch to double page mode.
+	  [DMA 20070514-?]
+
+- ARCHIVIST: need support for atop,abot, etc
+  [DMA 20070514-?]
+
+=================
+TocFile
+
+- ARCHIVIST: bug in Document::TocFile->open
+  With this file name
+  20070503-20070506-Debian-bplay-0.991-Sources-annotatedDMA
+  it fails to create the .toc file. Creation of the .log
+  succeeded; it also succeeds with names like
+  20070503-foo.pm-Sources-annotatedDMA
+  [DMA 20070506 - ?]
+
+- Toc and log should include the md5sum of the added page.
+  [DMA 20080828-?]
+
+- I need to confirm the arg to _setdirobj is a good path and is
+  writeable to us.
+  [DMA 20040902 - ?]
+
+- I added a local _err method as it was undefined. It does exist in 
+  File::Spec:BaseParse, but this is not a subclass of it. That call
+  saves the last error message in 'fmt_err' or something like that
+  but does not print. What to do here may become more apparent when
+  I work my way back to the GUI level with the GTK code.
+  [DMA 20040902 - ?]
+
+- SCANBOOKLET: if you use ScanBooklet with a doc name with 
+  "--" the .toc creation fails. Extra dash is removed from
+  the internal file names
+   Failed to open temp file 
+           ARCHIVE///20051012-MysqlSetupExample-annotatedDMA/.toc.tmp! 
+           No such file or directory
+  [DMA 20070514-?]
+
+- BUG: Incorrect date causes file failure
+	  ./ScanBooklet 1990900 AOPAPilot /dma/Publications/AOPAPilot
+	   Failed to open temp file
+	   /dma/Publications/AOPAPilot//20990900-AOPAPilot/.toc.tmp!
+	   No such file or directory
+	   Failed to open temp file
+	   /dma/Publications/AOPAPilot//20990900-AOPAPilot/.toc.tmp!
+	   No such file or directory
+  [DMA 20070514 - ?]
+
+=================
+Toc
+
+- Add and remove could invalidate the current mark. We should
+  check this in _lazy, and be sure to execute it before
+  returning any mark values, page,title,pages,titles...
+  all should require _lazy eval
+  [DMA20040912 - ?]
+
+- initmark in parent does a lazy eval. Think about an override.
+  [DMA20040912 - ?]
+
+
+=================
+LogFile
+
+- new. Do I have to detect if the directory is in an archived state?
+  [DMA 20040829 - ?]
+
+- new. What if there is a .log of the wrong type?
+  [DMA 20040829 - ?]
+
+- Logfile class seems related to the Fault::Notes and Fault::Log types.
+  Can use those clases at all to simplify the Document classes?
+  [DMA 20080828-?]
+
+- Toc and log should include the md5sum of the added page.
+  [DMA 20080828-?]
+
+=================
+Members
+
+- _selmembers. Make it like _selpage. Add the external call here 
+  and override in Toc Class
+  [DMA20040830 - ?]
+
+=================
+PublicationPage
+
+- method fulltitle: This is just an alias name for some legacy code 
+  and can go away when I update it.
+  [DMA 20040830 - ?]
+
+- I could add some toc and log info facts to the info method output.
+  [DMA 20080828-?]
+
+=================
+Directory
+
+- Are PageTitles are really more like PageKeys, search keys for the page?
+  Or did I actually set up tocs for full titles of each article contained by
+  the page? I may have...
+  [DMA 20080828-?]
+
+- Methods to consider adding
+	- display the toc
+	- search the log
+	- add notes
+	- edit the toc, filenames, etc
+  [DMA 20080828-?]
+

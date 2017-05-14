@@ -1,0 +1,21 @@
+---
+abstract: 'Simple interface to the Delicious API'
+author:
+  - 'Adam Taylor <ajct@cpan.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Delicious-Simple
+requires:
+  JSON: 0
+resources:
+  repository: git://github.com/adamtaylor/WWW-Delicious-Simple.git
+version: 0.02

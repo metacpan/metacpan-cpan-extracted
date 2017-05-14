@@ -5,7 +5,7 @@ use TestYAML tests => 2;
 {
     no warnings 'once';
     $Foo::Bar::ClassTag = '!pugs/object:Foo::Bar';
-    $YAML::Old::TagClass->{'!pugs/object:Foo::Bar'} = 'Foo::Bar';
+    $YAML::TagClass->{'!pugs/object:Foo::Bar'} = 'Foo::Bar';
 }
 
 no_diff;

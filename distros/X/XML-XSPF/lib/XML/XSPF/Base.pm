@@ -1,6 +1,6 @@
 package XML::XSPF::Base;
 
-# $Id: Base.pm 13 2006-05-04 18:06:09Z dsully $
+# $Id$
 
 use strict;
 use base qw(Class::Accessor);

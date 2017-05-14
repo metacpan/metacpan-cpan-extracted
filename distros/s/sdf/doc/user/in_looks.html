@@ -1,0 +1,48 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Looks</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_symb.html">Previous Topic</A> | <A HREF="credits.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.9. Looks</H1>
+<HR>
+<H2><A NAME="Changing the look">6.9.1. Changing the look</A></H2>
+<P>The overall appearance of a paper-based output format can be controlled by initialising the OPT_LOOK variable on the top line of a document. For example:</P>
+<PRE>
+   !init OPT_LOOK=&quot;infomap&quot;
+</PRE>
+<P>Alternatively, <A HREF="../ref/sdf.html">sdf</A>'s -k option can be used. For example:</P>
+<PRE>
+   sdf -2ps -kinfomap mydoc
+</PRE>
+<P>The -k option overrides the <A HREF="../ref/minit.html">init</A> macro setting.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>At this time (January 98), multiple looks are currently only supported for paper documentation generated via FrameMaker. Multiple look support will hopefully be added to other SDF output drivers during 1998.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Available looks">6.9.2. Available looks</A></H2>
+<P>The available looks include:</P>
+<UL>
+<LI><EM>simple</EM> - the default look, useful for general documentation
+<LI><EM>fancy</EM> - a look suitable for user documentation
+<LI><EM>infomap</EM> - a look based on Information Mapping&#153; 
+<LI><EM>overhead</EM> - a look suitable for overhead transparencies.</UL>
+<HR>
+<H2><A NAME="Creating new looks">6.9.3. Creating new looks</A></H2>
+<P>It is relatively simple to create new looks by inheriting details from an existing one.</P>
+<P>Refer to the <A HREF="../guru/gg_sdf.html">SDF Guru Guide</A> for details.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_symb.html">Previous Topic</A> | <A HREF="credits.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

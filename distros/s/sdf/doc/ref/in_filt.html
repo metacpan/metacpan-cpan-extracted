@@ -1,0 +1,381 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: verbatim Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="fmt_tbl.html">Previous Topic</A> | <A HREF="fabout.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5. Filters</H1>
+<HR>
+<H2><A NAME="Overview">5.1. Overview</A></H2>
+<P>The filters available are summarised below.</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Purpose</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>General:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftable.html">table</A>
+</TD>
+<TD>
+tabular data
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fnote.html">note</A>
+</TD>
+<TD>
+a note
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fquote.html">quote</A>
+</TD>
+<TD>
+a quotation
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fabstrac.html">abstract</A>
+</TD>
+<TD>
+the abstract for a paper
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftitle.html">title</A>
+</TD>
+<TD>
+title block for a memo, fax or minutes
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Line based:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fexample.html">example</A>
+</TD>
+<TD>
+fixed-width text (e.g. source code)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fverbati.html">verbatim</A>
+</TD>
+<TD>
+fixed-width text, ignoring embedded symbols
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fascii_g.html">ascii_graphic</A>
+</TD>
+<TD>
+fixed-width text, wide enough for ASCII graphics
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fnofill.html">nofill</A>
+</TD>
+<TD>
+a set of lines
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/faddress.html">address</A>
+</TD>
+<TD>
+an address
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Components:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ffront.html">front</A>
+</TD>
+<TD>
+front section of a document
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fabout.html">about</A>
+</TD>
+<TD>
+about section of a document
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fappendi.html">appendix</A>
+</TD>
+<TD>
+change headings to appendix style
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fplain.html">plain</A>
+</TD>
+<TD>
+change headings to plain style
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Formatting:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fbox.html">box</A>
+</TD>
+<TD>
+surround a region of text with a box
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fchanged.html">changed</A>
+</TD>
+<TD>
+mark a block of text as changed
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fsection.html">sections</A>
+</TD>
+<TD>
+paragraphs are sections
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fnameval.html">namevalues</A>
+</TD>
+<TD>
+format a set of name-value pairs (e.g. as used in a title block)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fsdf.html">sdf</A>
+</TD>
+<TD>
+apply arbitrary phrase attributes to text
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fpod.html">pod</A>
+</TD>
+<TD>
+embedded POD
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>File processing:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fcomment.html">comment</A>
+</TD>
+<TD>
+ignore text
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/ftopics.html">topics</A>
+</TD>
+<TD>
+include a set of sub-topics
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/finline.html">inline</A>
+</TD>
+<TD>
+embed text into target format (e.g. <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A>)
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fscript.html">script</A>
+</TD>
+<TD>
+execute text as a <A HREF="http://www.perl.com/perl/index.html">Perl</A> script
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fend.html">end</A>
+</TD>
+<TD>
+process text at the end
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Configuration:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/flangdef.html">langdefs</A>
+</TD>
+<TD>
+define vgrind-like language definitions
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fdefine.html">define</A>
+</TD>
+<TD>
+define a block of variables
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fdefault.html">default</A>
+</TD>
+<TD>
+provide defaults for a block of variables
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fsimple.html">simple</A>
+</TD>
+<TD>
+generic filter for building others
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fdatestr.html">datestrings</A>
+</TD>
+<TD>
+define strings used within dates
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Help:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fhlp_hea.html">hlp_header</A>
+</TD>
+<TD>
+table of jumps at the top of a help topic
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="../ref/fhlp_win.html">hlp_window</A>
+</TD>
+<TD>
+contents of a help popup window
+</TD>
+</TR>
+</TABLE>
+
+<P>Further details on these are provided below.</P>
+<P><A HREF="fabout.html">about Filter</A></P>
+<P><A HREF="fabstrac.html">abstract Filter</A></P>
+<P><A HREF="faddress.html">address Filter</A></P>
+<P><A HREF="fappendi.html">appendix Filter</A></P>
+<P><A HREF="fascii_g.html">ascii_graphic Filter</A></P>
+<P><A HREF="fbox.html">box Filter</A></P>
+<P><A HREF="fchanged.html">changed Filter</A></P>
+<P><A HREF="fcomment.html">comment Filter</A></P>
+<P><A HREF="fdatestr.html">datestrings Filter</A></P>
+<P><A HREF="fdefault.html">default Filter</A></P>
+<P><A HREF="fdefine.html">define Filter</A></P>
+<P><A HREF="fend.html">end Filter</A></P>
+<P><A HREF="fexample.html">example Filter</A></P>
+<P><A HREF="ffront.html">front Filter</A></P>
+<P><A HREF="fhlp_hea.html">hlp_header Filter</A></P>
+<P><A HREF="fhlp_win.html">hlp_window Filter</A></P>
+<P><A HREF="finline.html">inline Filter</A></P>
+<P><A HREF="flangdef.html">langdefs Filter</A></P>
+<P><A HREF="fnameval.html">namevalues Filter</A></P>
+<P><A HREF="fnofill.html">nofill Filter</A></P>
+<P><A HREF="fnote.html">note Filter</A></P>
+<P><A HREF="fplain.html">plain Filter</A></P>
+<P><A HREF="fpod.html">pod Filter</A></P>
+<P><A HREF="fquote.html">quote Filter</A></P>
+<P><A HREF="fscript.html">script Filter</A></P>
+<P><A HREF="fsdf.html">sdf Filter</A></P>
+<P><A HREF="fsection.html">sections Filter</A></P>
+<P><A HREF="fsimple.html">simple Filter</A></P>
+<P><A HREF="ftable.html">table Filter</A></P>
+<P><A HREF="ftitle.html">title Filter</A></P>
+<P><A HREF="ftopics.html">topics Filter</A></P>
+<P><A HREF="fverbati.html">verbatim Filter</A></P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="re_sdf.html">Parent Topic</A> | <A HREF="fmt_tbl.html">Previous Topic</A> | <A HREF="fabout.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

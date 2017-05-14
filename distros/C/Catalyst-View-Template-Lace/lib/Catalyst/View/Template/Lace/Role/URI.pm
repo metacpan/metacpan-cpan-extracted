@@ -25,10 +25,10 @@ sub uri {
 
   if($action_proto =~/\//) {
     my $path = $action_proto=~m/^\// ? $action_proto : $controller->action_for($action_proto)->private_path;
-    die "$action_proto is not an action for controller ${\$controller->component_name}" unless $path;
+    die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}" unless $path;
     die "$path is not a private path" unless $action = $self->ctx->dispatcher->get_action_by_path($path);
   } else {
-    die "$action_proto is not an action for controller ${\$controller->component_name}"
+    die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}"
       unless $action = $controller->action_for($action_proto);
   }
   die "Could not create a URI from '$action_proto' with the given arguments" unless $action;

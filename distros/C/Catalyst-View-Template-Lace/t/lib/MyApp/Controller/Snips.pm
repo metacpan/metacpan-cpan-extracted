@@ -6,7 +6,7 @@ extends 'Catalyst::Controller';
 
 sub display :Path('') {
   my ($self, $c) = @_;
-  $c->body(qq[
+  $c->response->body(qq[
     <html>
       <body>
         <h1>Hello World</h1>

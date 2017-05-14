@@ -1,0 +1,21 @@
+Revision history for WWW-Getsy
+
+0.999006  2012-12-26
+    - updated sandbox urls
+
+0.999005  2011-01-02
+    - removing pod coverage test 
+
+0.999004  2010-12-28
+    - using auto_provides_class in Makefile.PL so it indexes properly 
+    - make error information slightly more informative
+
+0.999003  2010-12-27
+    - added a title 
+
+0.999002  2010-12-27
+    - initial cpan release
+
+0.999001  2010-07-18
+    - initial github release
+

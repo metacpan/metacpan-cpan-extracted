@@ -19,7 +19,7 @@ sub new {
 
     my $type = $DB->type();
 
-    my $subclass = $class . '::' . $type;
+    my $subclass = "$class::$type";
     load($subclass);
 
     my $self = bless( {}, $subclass );
@@ -149,7 +149,7 @@ App::OverWatch::Notify - Notify base class
 
 =head1 VERSION
 
-version 0.1
+version 0.003
 
 =head1 SYNOPSIS
 

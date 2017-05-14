@@ -1,0 +1,157 @@
+﻿=pod
+
+=head1 NAME
+
+Carrot::Productivity::Text::Placeholder - simple placeholder system for text
+
+=head1 SYNOPSIS
+
+	$class_names->provide(
+		my $template_class = '::Productivity::Text::Placeholder::Template');
+
+	my $template = $template_class->constructor(
+		my $counter = '::Counter',
+		my $os_unix_file_name = '::OS::Unix::File::Name');
+	$template->compile('#[=counter=]. [=file_name_base=]');
+
+	my $file_names = [qw(/etc/hosts nonexisting.txt /etc/passwd)];
+	foreach my $file_name (@$file_names)
+	{
+		$os_unix_file_name->set_subject($file_name);
+		print ${$template->execute()}, TXT_LINE_BREAK;
+	}
+
+=head1 DESCRIPTION
+
+Carrot::Productivity::Text::Placeholder substitutes symbolic placeholders in a text with actual values. The core package is less than 120 lines of Perl code. There is hardly intelligence or convenience in the core. The work of producing actual values is mostly delegated to special objects called placeholder miniplates. Thus the approach stays small and extensible. Several such miniplates can be combined and placeholder resolution is done in the given order of the miniplates. In the synopsis a counter and a file name miniplate are combined to create a listing.
+
+The objective of Carrot::Productivity::Text::Placeholder is to preserve the natural division of labor among specialists for various computer technologies. That is achieved by connecting instead of mixing existing languages. It's a subtle difference, which isn't catched by any of the usual punchy claims, like easy, fast, or secure. For details see the example appliances.
+
+The default format for placeholders is [=...=] and anything inside the bracket-equal delimiter is taken as the name of the placeholder. The format can be changed with build_parser, parser and default_parser (see API and examples/synopsis_parser.pl).
+
+=head2 Template Systems
+
+The term template commonly refers to mixtures of languages. The most advanced and widely used template system is probably PHP, which mixes HTML with a straightforward programming language. The development effort behind PHP is huge, so that there is no point in trying to re-invent or imitate PHP. You can't in an afternoon. Going beyond PHP requires a totally different approach.
+
+Thus Carrot::Productivity::Text::Placeholder doesn't try to be a template system. No mix of languages. It aims for simple placeholders. However, the syntax for placeholders is free. Up to the extend of wildcard placeholders, which match anything inside the delimiters. ::Perl_Inlined is a such placeholder miniplate. It's sole purpose is the theoretic discussion in this section. It interprets the placeholder as Perl code. Therefore it provides language mixing in theory. Carrot::Productivity::Text::Placeholder has the potential for mixing due to its flexibility. The point is, that you don't want to explore this potential once you studied the ::Appliances::* modules.
+
+=head1 APPLIANCE MODULES
+
+Carrot::Productivity::Text::Placeholder suggests three layers of conceptual API wrapping. The first layer is the implementation of placeholders, then aggregations, then appliances. The latter are the interface definition for a specific use of Carrot::Productivity::Text::Placeholder.
+
+The appliance ::Directory_Listing uses all three layers. On the lowest level it uses placeholder implementations for the name parts and for the properties of a file. The implementations are organized in two different miniplates, because a name doesn't need to exist, while a file property makes only sense for an existing file. In the case of a directory listing, both miniplates are related via the full file name. The relation is handled by Carrot::Productivity::Text::Placeholder::Aggregator. Still the interface isn't punchy. In the last layer, the appliance, two method calls hide all the details. It looks like this. Compare this code (found in examples/directory_listing.pl) to the full code in Directory_Listing.pm
+
+	use Carrot::Productivity::Text::Placeholder::Appliance::Directory_Listing;
+
+	my $listing = Carrot::Productivity::Text::Placeholder::Appliance::Directory_Listing->constructor(
+		'[=counter=]. [=file_name_full=] [=file_mode_rwx=]');
+	my $rows = $listing->generate('/');
+	print join(TXT_LINE_BREAK, @$rows), TXT_LINE_BREAK;
+
+There is another example appliance called ::SQL::Retrieval_n_Display and it's example use is found in examples/retrieval_n_display.pl.
+
+=head1 METHOD REFERENCE (API)
+
+The design goal was a simple and robust API with a straightforward implementation, respecting all limitations of Perl 5.
+
+=over 8
+
+=item new([$specification], [$miniplate, ...])
+
+The constructor. For convenience it takes two types of optional arguments: a placeholder parser and/or placeholder miniplates. If a placeholder parser (see below) is passed, then it's used instead of the default parser. Placeholder miniplates are passed to add_miniplates (see below).
+
+=item compile($text)
+
+Parses a given string and stores a representation suitable for fast execution. Work is delegated to placeholder miniplates.
+
+=item execute
+
+Executes the compiled text. Returns a string ref with all placeholders substituted by actual values. Work is delegated to placeholder miniplates. Calling it multiple times makes sense if the data of a placeholder miniplate is modified in between two calls.
+
+=item parser($specification) or parser
+
+Sets or gets the parser used to recognize and substitute the placeholders in the text. The specification can be given as a code reference or as a regular expression, which is automatically turned into a suitable code reference.
+
+If the specification is given as a regular expression, then it must have two capture miniplates. The first one should capture everything up to the next placeholder and the second should capture the name of the placeholder.
+
+=item default_parser($specification) or default_parser
+
+Like parser above, but sets the default parser, which is used from here onwards.
+
+=item Carrot::Productivity::Text::Placeholder::build_parser($re_specification)
+
+Not a method, but a plain subroutine. Returns a code reference created from the regular expression $re_specification. The code reference can then be re-used for the constructor. For cases where you don't want to touch the default parser.
+
+=item add_miniplates($miniplate, ...)
+
+Add placeholder miniplates. In order to do something useful, you need to have placeholder miniplates. The miniplate can be referred to as a package/class name relative to Carrot::Productivity::Text::Placeholder or as a fully qualified package/class name or as a ready-made instance.
+
+The order in which miniplates are given is preserved. This is important for miniplates matching any placeholder.
+
+=back
+
+=head1 PLACEHOLDER MINIPLATES
+
+The following is an overview of the miniplates shipped with Carrot::Productivity::Text::Placeholder.
+
+=over 8
+
+=item L<::Aggregator|Carrot::Productivity::Text::Placeholder::Aggregator>
+
+Miniplates placeholder miniplates, which share the same subject. For example, the subject is the file name for OS::Unix::File::Name/Properties.
+
+=item L<::Counter|Carrot::Productivity::Text::Placeholder::Generic>
+
+Provides no placeholders by default. Any sense has to be added via add_placeholder.
+
+=item L<::Counter|Carrot::Productivity::Text::Placeholder::Counter>
+
+Provides the placeholder 'counter'. Increments the counter each time 'execute' is called.
+
+=item L<::URI|Carrot::Productivity::Text::Placeholder::URI>
+
+Provides the placeholders uri_(scheme|opaque|host|path|full). A proof-of-concept module.
+
+=item L<::Perl_Inlined|Carrot::Productivity::Text::Placeholder::Perl_Inlined>
+
+Provides no specific placeholders. Instead any placeholder is treated as perl code. A proof-of-concept module, which over-stretches Carrot::Productivity::Text::Placeholder. There are no plans to maintain it or develop it further.
+
+=item L<::OS::Unix::File::Name|Carrot::Productivity::Text::Placeholder::OS::Unix::File::Name>
+
+Provides the placeholders file_(name_full|name_path|name_only|name_extension). The file doesn't need to exists.
+
+=item L<::OS::Unix::File::Properties|Carrot::Productivity::Text::Placeholder::OS::Unix::File::Properties>
+
+Provides the placeholders file_(owner_id|owner_name|miniplate_id|miniplate_name|size|timestamp_creation|timestamp_modification|timestamp_status). The file must exist. Can be used together with ::OS::Unix::File::Name via ::Aggregator for the name.
+
+=item L<::SQL::Result|Carrot::Productivity::Text::Placeholder::SQL::Result>
+
+Provides placeholders based on a configurable RE, which requires one capture miniplate. Placeholders substituted by the captured pattern. A list of captures can be obtained. In between two calls to execute the row data is changed.
+
+=item L<::SQL::Statement|Carrot::Productivity::Text::Placeholder::SQL::Statement>
+
+Provides placeholders based on a configurable RE. All placeholders matching the RE are substituted by question marks. A list of matches can be obtained.
+
+=back
+
+You might want to search CPAN for placeholder miniplates, which are distributed separately.
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+This is the first public release.
+
+Carrot::Productivity::Text::Placeholder was part of a bigger software project and has recently been separated. However, the quality of the code should be good enough for an initial release.
+
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,55 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: terms Class
+
+H2: Interface
+
+!class_interface "terms"
+
+H2: Description
+
+The {{terms}} filter is used to declare and/or format objects in
+the {{terms}} class. The attributes supported are:
+
+!block table
+Attribute       Description
+Term            the term name
+Definition      the explanation for the term
+!endblock
+
+H2: Examples
+
+A configuration file may have
+the following declaration of terms:
+
+E:  !block terms; data
+E:  Term     Definition
+E:  SDF      Simple Document Format
+E:  SQL      Structured Query Language
+E:  !endblock
+
+These can then be inserted into a document as follows:
+
+E:  !block terms
+E:  Term     Definition
+E:  SDF
+E:  SQL
+E:  WWW      World Wide Web
+E:  !endblock
+
+Note that the definition for a term already declared will be inserted
+if none is provided. Furthermore, new terms (like WWW above) can be
+inserted and added to the configured ones.
+
+#H2: Limitations & Future Directions

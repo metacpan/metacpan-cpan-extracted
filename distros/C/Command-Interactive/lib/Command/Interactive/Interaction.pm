@@ -3,7 +3,7 @@ package Command::Interactive::Interaction;
 use strict;
 use warnings;
 
-our $VERSION = 1.1;
+our $VERSION = '1.21';    ## VERSION
 
 use Moose;
 
@@ -26,7 +26,7 @@ Command::Interactive. Optionally this class can model the string to be sent in r
 
     my $result = Command::Interactive->new({
         interactions => [ $password_prompt ],
-    })-run("ssh user@somehost");
+    })-run('ssh user@somehost');
 
 =head1 FIELDS
 
@@ -55,7 +55,7 @@ has response => (
 
 =head2 expected_string_is_regex (DEFAULT: FALSE)
 
-Whether the C<expected_string> should be treated as a Perl regular expression. 
+Whether the C<expected_string> should be treated as a Perl regular expression.
 
 =cut
 
@@ -126,13 +126,13 @@ has max_allowed_occurrences => (
 
 Returns the actual string to send in response to discovering C<expected_string>, including any newlines that might be added to the end of the string.
 
-=cut 
+=cut
 
 sub actual_response_to_send {
     my $self = shift;
     return $self->response
-      ? $self->response . ($self->send_newline_with_response ? "\n" : '')
-      : undef;
+        ? $self->response . ($self->send_newline_with_response ? "\n" : '')
+        : undef;
 }
 
 =head2 type

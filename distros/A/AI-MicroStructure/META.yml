@@ -36,6 +36,7 @@ requires:
   Fcntl: '0'
   File::Basename: '0'
   File::Glob: '0'
+  File::HomeDir: '0'
   File::Spec: '0'
   Getopt::Long: '0'
   HTML::SimpleLinkExtor: '0'
@@ -64,5 +65,5 @@ requires:
   Sysadm::Install: '0'
   perl: v5.14.1
 resources:
-  homepage: http://space-man.de/
-version: '0.19'
+  homepage: http://active-memory.de:2323
+version: '0.20'

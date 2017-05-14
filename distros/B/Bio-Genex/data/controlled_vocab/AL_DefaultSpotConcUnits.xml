@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ArrayLayout" db_column="default_spot_conc_units" cv_table="AL_DefaultSpotConcUnits">
+  <comment type="definition">This control table is used by the AL
+table to describe the default value assumed for concentration of the
+spots on the array.
+</comment>
+<term name="pmol_per_mm"
+        description="The DNA on the spot is present in pmol per mm"/>
+<term name="blank"
+        description="no DNA is at this position"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

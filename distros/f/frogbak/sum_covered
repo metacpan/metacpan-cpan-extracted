@@ -1,0 +1,113 @@
+#!/usr/local/bin/perl
+
+#
+# display and sum the df output of all the filesystems that
+# are backed up by the named control files.
+#
+# David Muir Sharnoff, 8/25/91
+#
+
+$fmt = "%-12s %8s %8s %8s   %3.0f%%    %s\n";
+print "Host	      kbytes	 used	 avail capacity	 Mounted on\n";
+
+for $control (@ARGV) {
+	open(CONTROL,$control) || die "open $control: $!";
+	while ($_ = <CONTROL>) {
+		#filesystem	host		os	ifreq	ivalue	ffreq	fvalue
+		#
+		#/usr		vibes		mach	12h	801	5d	801/fdp*5*2
+		next unless /^\//;
+		split;
+		if ($host eq $_[1]) {
+			push(@fs,$_[0]);
+		} else {
+			&doit($host, $os, @fs);
+			$host = $_[1];
+			$os = $_[2];
+			@fs = ($_[0]);
+		}
+	}
+	&doit($host, $os, @fs);
+	print "\n";
+	printf $fmt, "total", $total_size, $total_used, $total_avail, ($total_used/($total_used+$total_avail)*100), $control;
+	close(CONTROL);
+	@fs = ();
+	$total_total_size += $total_size;
+	$total_total_used += $total_used;
+	$total_total_avail += $total_avail;
+	$total_size = 0;
+	$total_used = 0;
+	$total_avail = 0;
+	print "\n" if $#ARGV;
+}
+
+if ($#ARGV) {
+	printf $fmt, "total", $total_total_size, $total_total_used, $total_total_avail, ($total_total_used/($total_total_used+$total_total_avail)*100), "";
+}
+
+sub doit
+{
+	local($host, $os, @fs) = @_;
+	return unless $host;
+	local($device,$size,$used,$avail,$percent,$filesys);
+
+	local(%fs);
+	@fs{@fs} = @fs;
+
+	if ($os eq "hp-ux" || $os eq "hpux") {
+		$df = "bdf";
+	} elsif ($os eq "hpuxlv" ) {
+		$df = "bdf";
+	} elsif ($os eq "irix5") {
+		$df = "df -k";		# strange format though!
+	} elsif ($os eq "solaris" || $os eq "alpha" || $os eq "nec") {
+		$df = "df -k";
+	} elsif ($os eq "svr4") {
+		$df = "df -k";
+	} elsif ($os eq "aix" || $os eq "mach" || $os eq "sunos" || $os eq "ultrix") {
+		$df = "df";
+	} elsif ($os eq "linux" || $os eq "freebsd" || $os eq "dostar") {
+		$df = "df -k";
+	} else {
+		die "do not grock os";
+	}	 
+
+	open(RSH,"rsh $host -n $df|") || die "open rsh '$host': $!";
+	while(<RSH>) {
+		next unless /^\/dev/;
+		chop;
+		if (/^\S+$/) {	
+			# join split df lines
+			$_ .= <RSH>;
+			chop;
+		}
+		# Filesystem	kbytes	  used	 avail capacity	 Mounted on
+		# /dev/sd0a	 14455	  8299	  4710	  64%	 /
+		#
+		if (/^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)%\s+(\S+)/) {
+			($device,$size,$used,$avail,$percent,$filesys) = ($1, $2, $3, $4, $5, $6);
+			next unless defined($fs{$filesys});
+			$total_size += $size;
+			$total_used += $used;
+			$total_avail += $avail;
+
+			printf $fmt, $host, $size, $used, $avail, $percent, $fil
+esys;
+		}
+		# [Irix 5.x is non-standard]
+		#
+		# Filesystem		     Type  kbytes     use   avail %use Mounted on
+		# /dev/root		      efs  226926   16640  210286   7% /
+		#
+		if (/^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)%\s+(\S+)/) {
+			($device,$fstype,$size,$used,$avail,$percent,$filesys) = ($1, $2, $3, $4, $5, $6, $7);
+			next unless defined($fs{$filesys});
+			$total_size += $size;
+			$total_used += $used;
+			$total_avail += $avail;
+
+			printf $fmt, $host, $size, $used, $avail, $percent, $filesys;
+		}
+	}
+}
+

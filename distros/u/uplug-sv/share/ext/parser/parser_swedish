@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+
+use FindBin qw($Bin);
+
+
+my $DIR=$ENV{PWD};                                  # save current dir
+
+my $PARSERDIR="$Bin/sv";
+my $PARSER="$PARSERDIR/run_parse.py";
+chdir $PARSERDIR;
+
+# LINES=`wc -l $1 |sed "s/^ *//g" | cut -f1 -d " "`;
+# ${PARSER} -p 0 ${LINES} $1 $2
+
+system "$PARSER -p 0 0 $ARGV[0] $ARGV[1]";
+
+chdir $DIR;
+exit;
+

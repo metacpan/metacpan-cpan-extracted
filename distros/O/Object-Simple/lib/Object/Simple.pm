@@ -1,6 +1,6 @@
 package Object::Simple;
 
-our $VERSION = '3.19';
+our $VERSION = '3.1801';
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ sub import {
   
   # No export syntax
   my $no_export_syntax;
-  unless (grep { $_[0] eq $_ } qw/new attr/) {
+  unless (grep { $_[0] eq $_ } qw/new attr class_attr dual_attr/) {
     $no_export_syntax = 1;
   }
   
@@ -72,7 +72,7 @@ sub import {
     my @methods = @_;
   
     # Exports
-    my %exports = map { $_ => 1 } qw/new attr/;
+    my %exports = map { $_ => 1 } qw/new attr class_attr dual_attr/;
     
     # Export methods
     for my $method (@methods) {
@@ -154,6 +154,18 @@ sub attr {
   }
 }
 
+# DEPRECATED!
+sub class_attr {
+  require Object::Simple::Accessor;
+  Object::Simple::Accessor::create_accessors('class_attr', @_)
+}
+
+# DEPRECATED!
+sub dual_attr {
+  require Object::Simple::Accessor;
+  Object::Simple::Accessor::create_accessors('dual_attr', @_)
+}
+
 =head1 NAME
 
 Object::Simple - Simplest class builder, Mojo::Base porting, fast and less memory
@@ -214,6 +226,13 @@ Inheritance
   # Bar inherit Foo
   package Bar;
   use Object::Simple 'Foo';
+  
+  # Another way to inherit(This is Object::Simple original)
+  package Bar;
+  use Object::Simple -base => 'Foo';
+
+  # Another way to inherit (This is Object::Simple original)
+  use Foo -base;
 
 =head1 DESCRIPTION
 
@@ -689,16 +708,14 @@ EXPERIMENTAL functionality will be changed without warnings.
     has x => 1, y => 2;      
     __PACAKGE__->attr(x => 1, y => 2);
   # Will be removed 2021/6/1
+  
+  class_attr method # will be removed 2017/1/1
+  dual_attr method # will be removed 2017/1/1
 
 =head1 BUGS
 
 Tell me the bugs
 by mail(C<< <kimoto.yuki at gmail.com> >>) or github L<http://github.com/yuki-kimoto/Object-Simple>
-
-=head1 SUPPORT
-
-If you have any questions the documentation might not yet answer, don't hesitate to ask on the mailing list or the official IRC channel
-#object-simple on irc.perl.org.
 
 =head1 AUTHOR
 
@@ -734,7 +751,7 @@ L<Mojo::Base>, L<Class::Accessor>, L<Class::Accessor::Fast>, L<Moose>, L<Moo>, L
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2017 Yuki Kimoto, all rights reserved.
+Copyright 2008-2016 Yuki Kimoto, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Artistic v2.

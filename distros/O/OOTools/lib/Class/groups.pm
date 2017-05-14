@@ -1,5 +1,5 @@
 package Class::groups ;
-$VERSION = 2.40 ;
+$VERSION = 2.21 ;
 use 5.006_001 ;
 use strict ;
 
@@ -141,7 +141,7 @@ __END__
 
 Class::groups - Pragma to implement group of properties
 
-=head1 VERSION 2.40
+=head1 VERSION 2.21
 
 Included in OOTools 2.21 distribution.
 

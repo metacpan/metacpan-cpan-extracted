@@ -37,13 +37,5 @@ Revision history for Perl module Net::ACME
 0.093 Mon Dec 19 2016
 - Remove Types::Serialiser dependency.
 
-0.094 Thu Dec 22 2016
-- Fixed MANIFEST (missing files broke tests)
-
-0.1 Tue Jan 03 2017
-- No more OpenSSL--we now go anywhere Perl goes!
-- ECDSA support!
-- Stronger warning about tls-sni-01 challenges. (Yowza, how’d that slip by??)
-
-0.11 Wed Feb 08 2017
-- Require bug-fixed Crypt::Perl version
+0.093 Thu Dec 22 2016
+- Fix MANIFEST

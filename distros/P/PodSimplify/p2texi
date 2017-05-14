@@ -1,0 +1,268 @@
+#!/usr/bin/perl -I.
+
+use Pod::Simplify;
+
+$x = new Pod::Simplify;
+
+sub findindex {
+	my(@a) = @_;
+	shift @a;
+	my(@look) = map(join("/",@$_),@a);
+	my($match)=0;
+	foreach(@look) {
+		if($match = $idx{$_}) {
+			last;
+		}
+	}
+	$match;
+}
+
+sub flowed {
+	my($out);
+	foreach $i (@_) {
+		if(ref $i eq "ARRAY") {
+			my(@i) = (@$i);
+			my($c) = shift @i;
+			if($c eq "B" ) {
+				$out .= '@strong{' . flowed(@i) . '}';
+			}
+			elsif($c eq "I") {
+				$out .= '@emph{' . flowed(@i) . '}';
+			}
+			elsif($c eq "V") { # Variable 
+				$out .= '@code{'. flowed(@i) . '}'; # _Not_ @var
+			}
+			elsif($c eq "P") { # Procedure
+				$out .= '@code{'. flowed(@i) . '}';
+			}
+			elsif($c eq "F") { # Filename
+				$out .= '@file{'. flowed(@i) . '}';
+			}
+			elsif($c eq "S") { # Switch
+				$out .= '@samp{'. flowed(@i) . '}';
+			}
+			elsif($c eq "C") { # Code
+				$incode++;
+				$out .= '@code{'. flowed(@i) . '}';
+				$incode--;
+			}
+			elsif($c eq "N") { # Nonbreak
+				$out .= '@w{' . flowed(@i). '}';
+			}
+			elsif($c eq "R") { # Reference
+				my($id) = findindex(@i);
+				#$out .= '<A HREF="' if $id;
+				#$out .= $id->[2] if $id and $id->[2] ne "foo";
+				#$out .= '#'.$id->[0].'">' if $id;
+				#$out .= "{r}". flowed(@{$i[0]});
+				$out .= flowed(@{$i[0]});
+				#$out .= "</A>" if $id;
+#				#$out .= "{R:".Pod::Simplify::dumpout([@i])."} ";
+			}
+			elsif($c eq "X") { # Index
+				my($id) = findindex(@i);
+				$out .= flowed(@{$i[0]});
+				#$out .= '<A NAME="'.$id->[0].'">'.flowed(@{$i[0]})."</A>";
+#				#@$out .= "{X:".Pod::Simplify::dumpout([@i])."} ";
+			} 
+			elsif($c eq "E") { # Escape
+				$out .= '&'.$i[0].';';
+			}
+			else {
+				$out .= "{$c".":". flowed(@i) ."}"; 
+			}
+		} else {
+			$i =~ s/([\@\{\}])/\@$1/g;
+			$i =~ s/([^\.])(\.\.\.)([^\.]|$)/$1\@dots\{\}$3/g;
+			#$i =~ s/TeX/\@TeX\{\}/g; # Whatever for?
+			$i =~ s/\(C\)/\@copyright\{\}/g;
+			
+			$i =~ s/\-/\@minus\{\}/g unless $incode;
+			
+			$out .= $i;
+		}
+	}
+	$out;
+}
+
+@listtype=();
+
+$idx=0;
+
+sub doindex {
+	foreach (@_) {
+		if(ref $_ eq "ARRAY") {
+			my(@i) = @$_;
+			my($i) = shift @i;
+			if( $i eq "X") {
+				shift @i; # discard printable block
+				$idx++;
+				$name = join("/",@{$i[0]});
+				$name =~ s/([^A-Za-z0-9_])/ "%".sprintf("%.2X",ord($1)) /ge;
+				foreach (@i) {
+					$idx{join("/",@$_)} = [$name,$idx,"perlvar.pod"];
+				}
+				#print "Index: ",Pod::Simplify::dumpout([@i]),"\n";
+			} else {
+				doindex(@i);
+			}
+		}
+	}
+}
+
+sub dump1 {
+	my($par,$line,$pos,$cmd,$var1,$var2) = @_;
+	
+	# Save the parsed data for later processing
+	push(@results,@_);
+	
+	if( $cmd =~ /^(item|head|flow|index)$/) {
+		doindex(@$var2);
+	}
+}
+
+sub dump2 {
+	my($par,$line,$pos,$cmd,$var1,$var2) = @_;
+	
+	#print "cmd = $cmd\n";
+	
+	if( $cmd eq "begin" ) {
+		if($var1 eq "list") {
+			if($var2 eq "bullet") {
+				print "\@itemize \@bullet\n";
+			}
+			elsif($var2 eq "number") {
+				print "\@enumerate 1\n";
+			} else {
+				if(!$define) {					
+					print "\n\@table \@asis\n";
+				} else {
+					$begun = 0;
+				}
+			}
+			unshift(@listtype,$var2);
+		}
+		elsif($var1 eq "pod") {
+			print "\\input texinfo      \@c -*-texinfo-*-\n";
+			print "\@c %**start of header\n";
+			print "\@setfilename foo.texi\n";
+			print "\@settitle Foo\n";
+			print "\@c %**end of header\n";
+			
+			
+			print "\@node Top, Foo, (dir), (dir)\n";
+			print "\@comment node-name,next,prev,up\n";
+			print "\n";
+			print "\@menu\n";
+			print "* more:: more about foo.\n";
+			print "\@end menu\n";
+		}
+	}
+	elsif( $cmd eq "end" ) {
+		if($var1 eq "list") {
+			if($var2 eq "bullet") {
+				print "\@end itemize\n";
+			}
+			elsif($var2 eq "number") {
+				print "\@end enumerate\n";
+			} else {
+				if(!$define) {
+					print "\@end table\n";
+				} else {
+					if($begun) {
+						print "\@end $define\n";
+					}
+				}
+			}
+			shift(@listtype);
+		}
+		elsif($var1 eq "pod") {
+			print "\@bye\n";
+		}
+	}
+	elsif( $cmd eq "item") {
+		if($var1->[0] eq "bullet") {
+			print "\n\@item\n";
+			print flowed(@$var2);
+		}
+		elsif($var1->[0] eq "number") {
+			print "\@item\n";
+			print flowed(@$var2);
+		}
+		else {
+			if($define) {
+				if($lastcmd eq "item") {
+					print "\@${define}x ";
+				} else {
+					if($begun) {
+						print "\@end $define\n";
+					}
+					print "\@$define ";
+				}
+				$begun=1;
+				
+			} else {
+				if($lastcmd eq "item") {
+					print "\@itemx ";
+				} else {
+					print "\@item ";
+				}
+			}
+			print flowed(@$var2),"\n";
+		}
+	}
+	elsif( $cmd eq "head") {
+		if($var1 == 1) {
+			print "\@unnumberedsec ";
+		} else {
+			print "\@unnumberedsubsec ";
+		}
+		print flowed(@$var2), "\n";
+	}
+	elsif( $cmd eq "verb") {
+		print "\n\@example\n";
+		$var1 =~ s/([\@\{\}])/\@$1/g;
+		print $var1;
+		print "\n\@end example\n\@noindent\n";
+	}
+	elsif( $cmd eq "flow") {
+		$f = Pod::Simplify::wrap(flowed(@$var2),75);
+		print $f,"\n\n";
+	}
+	elsif( $cmd eq "comment" ) {
+		$var1 =~ s/^\n+//s;
+		$var1 =~ s/\n+$//s;
+		$var1 =~ s/([\@\{\}])/\@$1/g;
+		$var1 =~ s/^/\@comment /mg;
+		print $var1,"\n";
+	}
+	elsif( $cmd eq "index") {
+		push(@waitingindex,map(join("/",@$_),@{$var2->[0]}));
+	}
+	elsif( $cmd eq "set") {
+		if($var1 eq "definitions") {
+			if($var2 eq "function") {
+				$define = "defun";
+			}
+			elsif($var2 eq "variable") {
+				$define = "defvar";
+			}
+			else {
+				$define = undef;
+			}
+		}
+	}
+	$lastcmd = $cmd;
+}
+
+$x->parse_from_file_by_name("newvar.pod",\&dump2);
+#$x->parse_from_file_by_name("newfunc.pod",\&dump2);
+#$x->parse_from_file_by_name("foo.pod",\&dump2);
+#$x->parse_from_file_by_name("newfunc.pod",\&dump2);
+
+#write index
+#foreach (sort keys %idx) {
+#	print join(" ",$_,@{$idx{$_}}),"\n";
+#}
+
+#dump2(@_) while(@_=splice(@results,0,6));

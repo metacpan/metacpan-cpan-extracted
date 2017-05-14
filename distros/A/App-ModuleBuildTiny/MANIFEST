@@ -8,6 +8,7 @@ META.yml
 README
 cpanfile
 lib/App/ModuleBuildTiny.pm
+lib/App/ModuleBuildTiny/Dist.pm
 script/mbtiny
 t/00-compile.t
 t/release-kwalitee.t

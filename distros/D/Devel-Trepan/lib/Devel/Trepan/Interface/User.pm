@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2012, 2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2012, 2014-2015 Rocky Bernstein <rocky@cpan.org>
 # Interface when communicating with the user.
 
 use warnings; no warnings 'redefine';
@@ -58,10 +58,20 @@ sub new
 sub add_history($$)
 {
     my ($self, $command) = @_;
-    return unless ($self->{input}{readline});
+    return unless ($self->{input}{readline}) and $self->{input}->can('add_history');
     $self->{input}{readline}->add_history($command) ;
-    my $now = localtime;
-    $self->{input}{readline}->add_history_time($now);
+
+    if ($self->can('add_history_time')) {
+	my $now = localtime;
+	$self->{input}{readline}->add_history_time($now);
+    }
+
+    # Having problems with setting destroy to write history.
+    # So write it after each add. Ugh.
+    # Use Term::ReadLine::Gnu name WriteHistory, since Gnu doesn't have
+    # write_history().
+    $self->{input}{readline}->WriteHistory($self->{histfile}, $command)
+	if $self->can('WriteHistory');
 }
 
 sub remove_history($;$)
@@ -129,30 +139,6 @@ sub read_history($)
             $self->{input}{readline}->can("ReadHistory");
     }
 }
-
-sub save_history($)
-{
-    my $self = shift;
-    if ($self->{histfile} && $self->{opts}{history_save} &&
-        $self->want_term_readline &&
-        $self->{input}{readline}) {
-
-        $self->{input}{readline}->StifleHistory($self->{histsize}) if
-            $self->{input}{readline}->can("StifleHistory");
-	if ($self->{input}{readline}->can("WriteHistory")) {
-	    $self->{input}{readline}->WriteHistory($self->{histfile})
-	}
-    }
-}
-
-# sub DESTROY($)
-# {
-#     my $self = shift;
-#     if ($self->want_term_readline) {
-#       $self->save_history;
-#     }
-#     Devel::Trepan::Interface::DESTROY($self);
-# }
 
 sub is_interactive($)
 {

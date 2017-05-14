@@ -1,5 +1,9 @@
 Revision history for Web::Request::Role::Response
 
+1.003   2017-05-09T14:07:15
+    - load Web::Response instead of Plack::Response
+
+
 1.002   2017-02-06T12:56:41
     - only call uri_for on HASHREF so we can redirect to URI objects etc
       (Thomas Klausner)

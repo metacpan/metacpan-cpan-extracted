@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: urpmi 271299 2010-11-21 15:54:30Z peroyvind $
 
 #- Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
@@ -63,7 +62,7 @@ $ENV{HOME} ||= "/root";
 $ENV{USER} ||= "root";
 
 sub usage () {
-    print urpm::args::copyright('urpmi', [ '1999-2010', 'Mandriva' ], [ '2011-2012', 'Mageia' ])
+    print urpm::args::copyright('urpmi', [ '1999-2010', 'Mandriva' ], [ '2011-2013', 'Mageia' ])
    . N("  --help         - print this help message.
 ") . N("  --media        - use only the given media, separated by comma.
 ") . N("  --excludemedia - do not use the given media, separated by comma.
@@ -77,7 +76,7 @@ sub usage () {
 ") . N("    --no-md5sum    - disable MD5SUM file checking.
 ") . N("    --force-key    - force update of gpg key.
 ") . N("  --auto-orphans - remove orphans without asking
-") . N("  --no-suggests  - do not auto select \"suggested\" packages.
+") . N("  --no-recommends - do not auto select \"recommended\" packages.
 ") . N("  --no-uninstall - never ask to uninstall a package, abort the installation.
 ") . N("  --no-install   - don't install packages (only download)
 ") . N("  --keep         - keep existing packages if possible, reject requested
@@ -94,13 +93,15 @@ sub usage () {
 ") . N("  --clean        - remove rpm from cache before anything else.
 ") . N("  --noclean      - don't clean rpms from cache.
 ") . N("  --justdb       - update only the rpm db, not the filesystem.
+") . N("  --downgrade    - downgrade a package from the version currently installed
+                   to the previously highest version
 ") . N("  --replacepkgs  - force installing packages which are already installed.
 ") . N("  --force        - force invocation even if some packages do not exist.
 ") . N("  --allow-nodeps - allow asking user to install packages without
                    dependencies checking.
 ") . N("  --allow-force  - allow asking user to install packages without
                    dependencies checking and integrity.
-") . N("  --allow-suggests - auto select \"suggested\" packages.
+") . N("  --allow-recommends - auto select \"recommended\" packages.
 ") . N("  --parallel     - distributed urpmi across machines of alias.
 ") . N("  --root         - use another root for rpm installation.
 ") . N("  --urpmi-root   - use another root for urpmi db & rpm installation.
@@ -135,7 +136,6 @@ sub usage () {
 ") . N("  --ignorearch   - allow to install rpms for unmatched architectures.
 ") . N("  --noscripts    - do not execute package scriptlet(s)
 ") . N("  --replacefiles - ignore file conflicts
-") . N("  --repackage    - Re-package the files before erasing
 ") . N("  --skip         - packages which installation should be skipped
 ") . N("  --prefer       - packages which should be preferred
 ") . N("  --more-choices - when several packages are found, propose more choices
@@ -381,7 +381,7 @@ my $rpm_lock = !$env && !$options{nolock} && urpm::lock::rpm_db($urpm, 'exclusiv
 my $search_result = '';
 if (@names) {
     $search_result = urpm::select::search_packages($urpm,
-	\%requested, [ @names ],
+	\%requested, \@names,
 	all => $all,
 	use_provides => $use_provides,
 	fuzzy => $urpm->{options}{fuzzy},
@@ -394,7 +394,7 @@ if (@names) {
     }
 }
 if (@src_names) {
-    $search_result = urpm::select::search_packages($urpm, \%requested, [ @src_names ],
+    $search_result = urpm::select::search_packages($urpm, \%requested, \@src_names,
 	all => $all,
 	use_provides => $use_provides,
 	fuzzy => $urpm->{options}{fuzzy},
@@ -439,7 +439,7 @@ sub ask_choice {
 	print N("In order to satisfy the '%s' dependency, one of the following packages is needed:", $virtual_pkg_name), "\n";
 	my $i = 0;
 	foreach (@l) { print " " . ++$i . "- $_\n" }
-	$n = message_input_(N("What is your choice? (1-%d) ", $i), default => $prefer, range_min => 0, range => $i);
+	$n = message_input(N("What is your choice? (1-%d) ", $i), default => $prefer, range_min => 0, range => $i);
 	defined($n) && $n ne "0" or exit 1; # abort.
 	if ($n =~ /\D/) {
 	    my @nn = map { $choices[$_ - 1] } grep { !/\D/ } split /[, \t]+/, $n;
@@ -467,7 +467,7 @@ if ($options{replacepkgs}) {
     install_src => $install_src,
     keep => $urpm->{options}{keep},
     nodeps => $urpm->{options}{'allow-nodeps'} || $urpm->{options}{'allow-force'},
-    no_suggests => $urpm->{options}{'no-suggests'},
+    no_recommends => $urpm->{options}{'no-recommends'},
     priority_upgrade => $test || $env ? '' : $urpm->{options}{'priority-upgrade'},
     );
 }
@@ -482,7 +482,7 @@ if (@unselected_uninstalled) {
     my $list = join "\n", map { $_->name . '-' . $_->version . '-' . $_->release  } @unselected_uninstalled;
     my $msg = @unselected_uninstalled == 1 ?
     	N("The following package cannot be installed because it depends on packages
-that are older than the installed ones:\n%s",$list)
+that are older than the installed ones:\n%s", $list)
 	: N("The following packages can't be installed because they depend on packages
 that are older than the installed ones:\n%s", $list);
     if ($urpm->{options}{auto}) {
@@ -490,7 +490,7 @@ that are older than the installed ones:\n%s", $list);
     } else {
 	my $noexpr = N("Nn");
 	$msg .= N("\nContinue installation anyway?");
-	$force || message_input_($msg . N(" (Y/n) "), boolean => 1) !~ /[$noexpr]/ or exit 17;
+	$force || message_input($msg . N(" (Y/n) "), boolean => 1) !~ /[$noexpr]/ or exit 17;
     }
     # Whatever option we selected, the overall installation should fail if some packages are unselected
     $urpm::postponed_msg .= $msg . "\n";
@@ -501,14 +501,14 @@ my @ask_unselect = urpm::select::unselected_packages($state);
 if (@ask_unselect) {
     my $list = urpm::select::translate_why_unselected($urpm, $state, @ask_unselect);
     my $msg = @ask_unselect == 1 ?
-    	N("A requested package cannot be installed:\n%s",$list)
+    	N("A requested package cannot be installed:\n%s", $list)
 	: N("Some requested packages cannot be installed:\n%s", $list);
     if ($urpm->{options}{auto}) {
 	print "$msg\n";
     } else {
 	my $noexpr = N("Nn");
 	$msg .= N("\nContinue installation anyway?");
-	$force || message_input_($msg . N(" (Y/n) "), boolean => 1) !~ /[$noexpr]/ or exit 17;
+	$force || message_input($msg . N(" (Y/n) "), boolean => 1) !~ /[$noexpr]/ or exit 17;
     }
     # Whatever option we selected, the overall installation should fail if some packages are unselected
     $urpm::postponed_msg .= $msg . "\n";
@@ -582,7 +582,9 @@ if (@to_install && $options{auto_orphans}) {
 #-     - this also takes care of removing packages from 
 #-       installed-through-deps if the package was first installed as a 
 #-       dep of another package, then removed and then explicitly installed
-urpm::orphans::mark_as_requested($urpm, $state, $test);
+if (!$urpm->{options}{downgrade}) {
+    urpm::orphans::mark_as_requested($urpm, $state, $test);
+}
 
 foreach my $pkg (@to_install) {
     #- reflect change in flag usage, now requested is set whatever a package is selected or not,
@@ -623,7 +625,7 @@ if (!$urpm->{options}{auto} && $ask_user && $urpm->{nb_install} || $env && !$opt
 	exit 0; #- exit now for specific environment.
     }
     my $noexpr = N("Nn");
-    $force || message_input_($p . N(" (Y/n) "), boolean => 1) !~ /[$noexpr]/ or exit 17;
+    $force || message_input($p . N(" (Y/n) "), boolean => 1) !~ /[$noexpr]/ or exit 17;
 }
 
 my $exit_code = urpm::main_loop::run($urpm, $state, 
@@ -637,10 +639,10 @@ my $exit_code = urpm::main_loop::run($urpm, $state,
 	    1;
 	} else {
 	    my $msg2 = N("Press Enter when mounted...");
-	    defined message_input_("$msg\n$msg2 ");
+	    defined message_input("$msg\n$msg2 ");
 	}
     }) : ()),
-    trans_log => &urpm::download::sync_logger,
+    trans_log => \&urpm::download::sync_logger,
     bad_signature => sub {
 	    my ($msg, $msg2) = @_;
 	    #- rurpmi always abort here

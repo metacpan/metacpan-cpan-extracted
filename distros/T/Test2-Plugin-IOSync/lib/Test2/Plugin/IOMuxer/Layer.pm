@@ -2,9 +2,27 @@ package Test2::Plugin::IOMuxer::Layer;
 use strict;
 use warnings;
 
+BEGIN {
+    local $@ = undef;
+    my $ok = eval {
+        require JSON::MaybeXS;
+        JSON::MaybeXS->import('JSON');
+        1;
+    };
+
+    unless($ok) {
+        require JSON::PP;
+        *JSON = sub() { 'JSON::PP' };
+    }
+
+    my $json = JSON()->new->utf8(1);
+
+    sub encode_json { $json->encode(@_) }
+}
+
 use Time::HiRes qw/time/;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000007';
 
 use Test2::Plugin::OpenFixPerlIO;
 use IO::Handle;
@@ -29,12 +47,10 @@ sub WRITE {
     my $ok = eval {
         my $time = time;
         my $fileno = fileno($handle);
-        my $sync = "TEST2-SYNC-$fileno: $time\n";
 
+        my $json = encode_json({stamp => $time, fileno => $fileno, buffer => $buffer});
         my $mh = $MUX_FILES{$MUXED{$fileno}};
-        print $mh "START-$sync";
-        print $mh $buffer;
-        print $mh substr($buffer, -1, 1) eq "\n" ? "+STOP-$sync" : "\n-STOP-$sync";
+        print $mh $json, "\n";
 
         1;
     };

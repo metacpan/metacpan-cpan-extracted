@@ -1,0 +1,52 @@
+
+I've started running the NIST conformance tests.
+
+Here are the results (I haven't tried nearly all yet):
+Should FreeWRL fail one of the tests at some point, please inform me.
+
+DISCLAIMER: THIS INFORMATION IS NOT NECESSARILY ACCURATE FOR ANY
+GIVEN VERSION OF FREEWRL. THERE IS ABSOLUTELY NO GUARANTEE/WARRANTY
+THAT FREEWRL WILL PASS OR HAS PASSED ANY OF THESE TESTS.
+
+(parentheses = not tested due to VP but should work - 
+XXX = doesn't work, ?? = not sure):
+
+ProximitySensor 
+	1
+	2
+	3
+	(4)
+	5
+	6
+	7
+	8
+	9
+	10 (??)
+
+PlaneSensor
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
+	11
+	XXX 12
+	XXX 13
+	14 XXX ??? It's not PlaneSensor but CylinderSensor
+
+Shape
+	1
+	2
+	3 (extrusion weird -- according to spec it should reverse!!)
+	4 (white)  
+	5
+
+Extrusion
+	XXX 1
+	2
+	...

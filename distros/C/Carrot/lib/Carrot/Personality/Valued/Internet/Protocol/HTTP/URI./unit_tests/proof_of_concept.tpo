@@ -1,0 +1,13 @@
+Creating a test plan at Fri Aug 15 00:27:30 2014.
+Scheduling a total of 1 plan sections.
+Plan section for method transparency.
+  Reported result #1.1 [X] slash.
+  Reported result #1.2 [X] index.
+  Reported result #1.3 [X] directory.
+Summary of test results at Fri Aug 15 00:27:30 2014
+*-------+---------+---------+---------*
+| Total | Success | Failure | Missing |
++-------+---------+---------+---------+
+|    3  |      3  |     0   |     0   |
+*-------+---------+---------+---------*
+Error code: 0

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011-2012, 2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2011-2012, 2014-2015 Rocky Bernstein <rocky@cpan.org>
 use warnings; no warnings 'redefine';
 use rlib '../../../..';
 
@@ -49,8 +49,9 @@ listing begins at the specificed location.
 
 The number of lines to show is controlled by the debugger "listsize"
 setting. Use L<C<set max
-list>|Devel::Trepan::CmdProcessor::Set::Max::List> or C<show max list>
-to see or set the value.
+list>|Devel::Trepan::CmdProcessor::Set::Max::List> or L<C<show max
+list>|Devel::Trepan::CmdProcessor::Show::Max::List> to see or set the
+value.
 
 If the location form is used with a subsequent parameter, the
 parameter is the starting line number.  When there two numbers are
@@ -91,8 +92,9 @@ disabled.
 L<C<set
 autolist>|Devel::Trepan::CmdProcessor::Command::Set::Auto::List>,
 L<C<help syntax
-location>|Devel::Trepan::CmdProcessor::Command::Help::location>, and
-C<deparse>|Devel::Trepan::CmdProcessor::Command::Deparse>.
+location>|Devel::Trepan::CmdProcessor::Command::Help::location>,
+L<C<disassemble>|Devel::Trepan::CmdProcessor::Command::Disassemble>,
+and L<C<deparse>|Devel::Trepan::CmdProcessor::Command::Deparse>.
 
 =cut
 HELP
@@ -261,7 +263,8 @@ sub run($$)
     my $bp;
     local(*DB::dbline) = "::_<$filename";
     my $lineno;
-    my $msg = sprintf("%s [%d-%d]", $proc->canonic_file($filename), $start, $end);
+    my $msg = sprintf("%s [%d-%d]",
+		      $proc->canonic_file($filename), $start, $end);
 
     # FIXME: put in frame?
     my $frame_filename = $proc->filename();
@@ -301,11 +304,17 @@ sub run($$)
             $s .= ' ';
         }
 	## FIXME move above code
-
-        $s .= ($proc->{frame} && $lineno == $proc->line &&
-               $frame_filename eq $filename) ? '->' : $a_pad;
         my $opts = {unlimited => 1};
-        $proc->msg("$s\t$line", $opts);
+	my $mess;
+	if ($proc->{frame} && $lineno == $proc->line &&
+	    $frame_filename eq $filename) {
+	    $s .=  '->';
+	    $s = $proc->bolden($s);
+	} else {
+	    $s .=  $a_pad;
+	}
+	$mess = "$s\t$line";
+	$proc->msg($mess, $opts);
     }
     $proc->{list_line} = $lineno + $center_correction;
     $proc->{list_filename} = $filename;
@@ -323,7 +332,7 @@ unless (caller) {
     cache_file(__FILE__);
     my $frame_ary = Devel::Trepan::CmdProcessor::Mock::create_frame();
     $proc->frame_setup($frame_ary);
-    $proc->{settings}{highlight} = 0;
+    $proc->{settings}{highlight} = undef;
     $cmd->run([$NAME]);
     print '-' x 20, "\n";
     $cmd->run([$NAME]);

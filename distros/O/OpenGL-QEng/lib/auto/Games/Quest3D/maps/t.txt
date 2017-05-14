@@ -1,0 +1,31 @@
+map 0 0 0 xsize=>40, zsize=>40, start=>[15,13,0];
+in_last;
+
+level 0 0 0 zsize=>40, xsize=>40, y=>0;
+level 0 0 0 zsize=>40, xsize=>40, y=>8, texture=>'sand';
+
+#Top wall
+wall  2.6795 2.6795   0 xsize=>34.641;
+
+#right wall
+wall 37.32   2.6795 240 xsize=>34.641;
+partof_last;
+opening  5 0 0;
+opening 10 0 0;
+opening 16 0 0;
+done;
+
+#left wall
+wall  2.6795 2.6795 300 xsize=>34.641;
+partof_last;
+door  5 0  0 state=>'closed';
+door 10 0  0 state=>'closed';
+door 16 0  0 state=>'closed';
+done;
+
+#v wall
+wall 20     15.2    270 xsize=>17.32;
+
+inventory;
+MappingKit 4 6 0;
+done;

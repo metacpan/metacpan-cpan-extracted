@@ -1,0 +1,65 @@
+NAME
+    Unicode::Subscript - Generate subscripted and superscripted UTF-8 text
+    without markup
+
+SYNOPSIS
+     use Unicode::Subscript qw(subscript superscript);
+
+     say 'H' . subscript(2) . 'O';  # H₂O
+     say 'This algorithm is O(n' . superscript(3) . ')';  # O(n³)
+
+     say superscript('this text is really high!');  # ᵗʰⁱˢ ᵗᵉˣᵗ ⁱˢ ʳᵉᵃˡˡʸ ʰⁱᵍʰ!
+
+     use Unicode::Subscript qw(SM TM);
+     say 'Eat at Subway' . TM();   # Eat at Subway™
+
+     use Unicode::Subscript ':all';   # import everything
+
+DESCRIPTION
+    This module provides methods to convert characters to the equivalent
+    UTF-8 characters for their subscripted or superscripted forms. This may
+    come in handy when generating fractions, chemical formulas, footnotes,
+    etc.
+
+FUNCTIONS
+  subscript ($text)
+    Return the subscripted version of $text, in UTF-8 encoding. The
+    following characters has subscripted forms in Unicode:
+
+    *   Digits 0-9, +, -, = and ()
+
+    *   A small number of lowercase letters: a e h i k l m n o p r s t u v x
+
+    Any other input characters will be left un-suscripted.
+
+  superscript ($text)
+    Return the superscripted version of $text, in UTF-8 encoding. The
+    following characters have superscripted forms in Unicode:
+
+    *   Digits 0-9, +, -, = and ()
+
+    *   All of the lowercase letters except q
+
+    *   A small number of uppercase letters: A B D E G H I J K L M N O P R T
+        U V W
+
+    Any other input characters will be left un-superscripted.
+
+  TM
+    Returns the Unicode (TM) superscript character.
+
+  SM
+    Returns the Unicode (SM) superscript character.
+
+SEE ALSO
+    Unicode::Fraction
+
+AUTHOR
+    Richard Harris <RJH@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Richard Harris.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

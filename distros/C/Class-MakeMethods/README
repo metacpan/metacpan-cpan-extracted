@@ -3,22 +3,22 @@ NAME
 
 DESCRIPTION
     This is an updated release of Class::MakeMethods, for distribution
-    through CPAN.
-
-    This distribution includes the Class::MakeMethods::Template and
-    Class::MakeMethods::Emulator modules which were packaged sepearately in
-    some previous releases.
+    through CPAN. This release includes the Class::MakeMethods::Template and
+    Class::MakeMethods::Emulator modules which were previously distributed
+    separately.
 
 MOTIVATION
-    By passing arguments to "use Class::MakeMethods ..." statements, you can
-    select from a library of hundreds of common types of methods, which are
-    dynamically installed as subroutines in your module, simplifying the
-    code for your class.
+    Here's the "elevator pitch" for the module:
+
+      By passing arguments to "use Class::MakeMethods ..." statements,
+      you can select from a library of hundreds of common types of
+      methods, which are dynamically generated and installed as
+      subroutines in your module, simplifying the code for your class.
 
 DISTRIBUTION AND INSTALLATION
   Version
 
-    This is Class::MakeMethods v1.010, intended for general use.
+    This is Class::MakeMethods v1.009, intended for general use.
 
     This module's CPAN registration should read:
 
@@ -41,10 +41,6 @@ DISTRIBUTION AND INSTALLATION
     *   Class::MakeMethods::Template "--lvalue": The lvalue modifier
         provided by the Template generator subclasses will only work on Perl
         version 5.6 or later.
-
-    *   Some third-party tests used to check the compliance of Emulator
-        modules require Test::More and will be automatically skipped on
-        machines which do not have this installed.
 
   Installation
 
@@ -111,7 +107,7 @@ DISTRIBUTION AND INSTALLATION
 
     * http://testers.cpan.org/show/Class-MakeMethods.html
 
-SUPPORT
+BUGS AND SUPPORT
   Release Status
 
     This module has been used in a variety of production systems and has
@@ -119,14 +115,21 @@ SUPPORT
     distributions dependant on it, so it would be fair to say that it is
     fully released.
 
-    However, while the commonly-used portions are well tested, some of the
-    more obscure combinations of options are less so, and new bug reports do
-    trickle in occasionally. If you do encounter any problems, please inform
-    the author and I'll endeavor to patch them promptly.
+    However, while some portions are well tested, others are less so, and
+    new bug reports do trickle in occasionally. If you do encounter any
+    problems, please inform the author and I'll endeavor to patch them
+    promptly.
 
     Additional features have been outlined for future development, but the
     intent is support these by adding more options to the declaration
     interface, while maintaining backward compatibility.
+
+  Known Problems
+
+    It does not appear to be possible to assign subroutine names to closures
+    within Perl. As a result, debugging output from Carp and similar sources
+    will show all generated methods as "ANON()" rather than
+    "YourClass::methodname()".
 
     See the Class::MakeMethods::Docs::ToDo manpage for other outstanding
     issues and development plans.
@@ -138,8 +141,8 @@ SUPPORT
     support program, I do attempt to answer email promptly.
 
     I would be particularly interested in any suggestions towards improving
-    the documentation and correcting any Perl-version or platform
-    dependencies, as well as general feedback and suggested additions.
+    the documentation, correcting any Perl-version or platform dependencies,
+    as well as general feedback and suggested additions.
 
     Bug reports that contain a failing test case are greatly appreciated,
     and suggested patches will be promptly considered for inclusion in
@@ -222,9 +225,6 @@ CREDITS AND COPYRIGHT
     Class::MakeMethods::Emulator::Inheritable is based on
     Class::Data::Inheritable. Portions Copyright 2000 Damian Conway and
     Michael G Schwern.
-
-    Class::MakeMethods::Emulator::mcoder is based on mcoder. Portions
-    Copyright 2003 by Salvador Fandiño.
 
     Class::MakeMethods::Emulator::Singleton is based on Class::Singleton, by
     Andy Wardley. Portions Copyright 1998 Canon Research Centre Europe Ltd.

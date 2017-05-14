@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Set these paths appropriately
+ROOT=${UPLUGSHARE}/ext/tree-tagger
+BIN=$ROOT/bin
+CMD=$ROOT/cmd
+LIB=$ROOT/lib
+OPTIONS="-token -lemma -sgml"
+
+TOKENIZER=${CMD}/tokenize.pl
+MWL=${CMD}/mwl-lookup.perl
+TAGGER=${BIN}/tree-tagger
+ABBR_LIST=${LIB}/spanish-abbreviations
+PARFILE=${LIB}/spanish.par
+MWLFILE=${LIB}/spanish-mwls
+
+$TOKENIZER -a $ABBR_LIST $* |
+# recognition of MWLs
+$MWL -f $MWLFILE |
+# tagging
+$TAGGER $OPTIONS $PARFILE

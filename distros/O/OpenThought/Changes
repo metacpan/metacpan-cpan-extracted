@@ -1,0 +1,24 @@
+2.0
+    - Removed all dependencies, outside of what comes with Perl
+    - Dropped the frameset, OpenThought is now a seperate JavaScript library
+      that gets included from a script tag.
+    - For communication, it attempts to use XMLHTTP.  If that's not available,
+      it falls back to dynamically creating iframes.
+    - No longer a limit of how many simultaneous connections you can have
+    - Serious JavaScript code cleanup, it's now OO
+    - Perl code cleaned up as well, now just a single module
+    - Optional browser based log window
+    - Ability to use GET or POST requests
+    - Ability to use wildcards when selecting fields to send to the server
+    - Ability to pass in arrays instead of multiple parameters
+    - More control over browser requirements, and what to do with browsers
+      which don't meet the requirements for your site.
+    - Select lists can accept data as an array of hashes, in addition to an
+      array of arrays
+    - Added ability to append data to any text based field, in addition to
+      select lists
+    - Many changes to the documentation
+    - Simplified and more powerful configuration
+    - Added a number of JavaScript utility functions that should help in the
+      usability and functionality of web apps
+    - Now dual licensed under the GPL/Artistic licenses

@@ -1,0 +1,31 @@
+Revision history for Perl extension YAML::Accessor.
+
+0.10  Tue Jul  5 20:19:53 2011
+	- original version; created by h2xs 1.23 with options
+		--use-new-tests -n YAML::Accessor -v 0.10 -X -A -MClass::Accessor -MYAML::XS
+
+0.3  Fri Sep 16 08:43:06 EDT 2011
+	added additional data structures to yaml test data
+	added sub-accessors
+
+0.4  Wed Sep 21 19:18:09 EDT 2011
+	added support for mutators (but no sub-mutators)
+	added support for autocommit
+	added support for manually committing
+
+0.42 Wed Sep 28 10:26:39 EDT 2011
+	added refresh() method
+
+0.43
+	added explicit call to 'use feature qw/state/'. apparently common::sense doesn't quite frob this well enough for some perls.
+		I'm looking at you, 5.15.
+		And mlehmann.
+	Also, mst gave me strictures.pm. It doesn't suck as much.
+
+0.44
+	Updated Makefile.PL to require strictures instead of c::s. Oops.
+
+0.45
+	Fixed bug #75500
+		https://rt.cpan.org/Public/Bug/Display.html?id=75500
+	Updated author name

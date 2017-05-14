@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w 
 
 # created by thomas@stderr.net (2001/03/23) 
-# $Id: it.lang,v 1.5 2001/04/25 12:20:23 thomas Exp $ 
+# $Id: it.lang,v 1.6 2001/06/22 17:57:59 thomas Exp $ 
 
 use strict; 
 
@@ -29,7 +29,9 @@ sub lang () {
 		'EXPIRE'            => 'Expire', 
 		'TTL'               => 'TTL', 
 		'HOST'              => 'Host',
-		'IP_ADDRESS'        => 'Indirizzo IP', 
+		'REVERSE_HOST'      => 'Reverse Host',
+		'IP_ADDRESS'        => 'Indirizzo IP',
+		'IPV6_ADDRESS'      => 'Indirizzo IPv6',
 		'CNAME'             => 'Nome Canonico (CNAME)', 
 		'MX'                => 'Gestore Mail (MX)',
 		'PREFERENCE'        => 'Priorit&agrave; MX', 
@@ -48,7 +50,9 @@ sub lang () {
 		'ERROR_CORRECT'     => 'Per favore correggi il/i seguente/i errore/i:',
 		'ERROR_DUPLICATE'   => 'Record duplicato',
 		'ERROR_IP'          => 'Valore non corretto per l\'indirizzo IP',
+		'ERROR_IPV6'        => 'Valore non corretto per l\'indirizzo IPv6',
 		'ERROR_HOST'        => 'Valore non corretto per l\'Host',
+		'ERROR_REVERSE'     => 'Valore non corretto per il Reverse Host',
 		'ERROR_TTL'         => 'Valore non corretto per il campo TTL',
 		'ERROR_CNAME'       => 'Valore non corretto per il campo CNAME',
 		'ERROR_MX'          => 'Valore non corretto per il campo MX',

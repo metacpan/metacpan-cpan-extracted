@@ -1,0 +1,9 @@
+__tuning[]
+__endtuning[]
+N[orig_style='N']Some text before.
+N[orig_style='N']Some sdf
+LU2[orig_style='LU2']text.
+N[orig_style='N']Some middle text.
+N[orig_style='N']Some more sdf text.
+E[orig_style='E'] An example paragraph
+N[orig_style='N']Some text after.

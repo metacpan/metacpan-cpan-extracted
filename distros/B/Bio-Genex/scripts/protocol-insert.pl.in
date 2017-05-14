@@ -1,0 +1,116 @@
+%%START_PERL%%
+#
+# protocol-insert.pl.in
+#    first version Tue Oct 24 14:13:45 MST 2000
+#    script for inserting protocol entries into genex DB
+#
+my $VERSION = '$Id: protocol-insert.pl.in,v 1.4 2001/02/05 16:33:24 jes Exp $ ';
+
+use strict;
+use blib;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+
+use XML::DOM;
+
+use Bio::Genex qw($SU_USERNAME $SU_PASSWORD);
+use Bio::Genex::DBUtils qw(create_insert_sql create_select_sql);
+use Bio::Genex::XMLUtils qw(assert_element);
+use Bio::Genex::ExternalDatabase;
+
+my $infile;
+my $UPDATE = 0;
+my $rc = GetOptions('file=s' => \$infile, 'update' => \$UPDATE);
+
+my $USAGE = <<"EOU";
+usage: $0 --file=file_name --update
+EOU
+
+die "Bad option: $rc\n$USAGE" unless $rc;
+die "Must specify --file\n$USAGE" unless defined $infile;
+
+
+my $PARSER = XML::DOM::Parser->new();
+
+my $DOC = $PARSER->parsefile($infile);
+
+my @protocol_list = $DOC->getElementsByTagName('protocol');
+
+# open up a writeable connection
+$Bio::Genex::DBNAME = 'genex';
+$Bio::Genex::USER = $SU_USERNAME;
+$Bio::Genex::PASSWORD = $SU_PASSWORD;
+$Bio::Genex::TRANSACTION = 1;	# do it in a transaction
+
+my $dbh = Bio::Genex::current_connection();
+my $curr_table = 'Protocol';
+my $timeformat = '%r %A %B %d %Y'; 
+
+print STDERR scalar @protocol_list, " Protocols to insert\n";
+
+my $sql = create_insert_sql($dbh,$curr_table, ['title','type','text']);
+my $sth = $dbh->prepare($sql);
+error("couldn't create prepare sql ", $sql, $sth)
+  if $dbh->err;
+
+foreach my $prot_node (@protocol_list) {
+  assert_element($prot_node,'protocol');
+
+  my $title = $prot_node->getAttribute('title');
+  error("Couldn't find title for node: " . $prot_node->toString()) 
+    unless $title ne '';
+  my $type = $prot_node->getAttribute('type');
+  error("Couldn't find type for node: " . $prot_node->toString()) 
+    unless $type ne '';
+  my $text = $prot_node->getFirstChild->getNodeValue();
+  error("Couldn't find contact for node: " . $prot_node->toString()) 
+    unless $text ne '';
+
+  if ($UPDATE) {
+    print STDERR "Updating protocol $title\n";
+
+    my $sql = create_select_sql($dbh,
+		FROM=>[$curr_table],
+		COLUMNS=>['prt_pk'],
+		WHERE=>"title='$title' AND type='$type'"
+			       );
+    my $prt_pk = $dbh->selectall_arrayref($sql);
+    error("couldn't SELECT protocol for node: " . $prot_node->toString(), $sql)
+      if $dbh->err;
+    # extract the value from the array of arrays
+    $prt_pk = $prt_pk->[0][0];
+    error("couldn't get protocol for node: " . $prot_node->toString(), $sql)
+      unless $prt_pk;
+    my %attributes = (title=>$title,text=>$text,type=>$type);
+
+    foreach my $key (keys %attributes) {
+      $sql = "UPDATE $curr_table set $key=? WHERE prt_pk=$prt_pk";
+      my $sth = $dbh->prepare($sql);
+      error("couldn't prepare update SQL", $sql)
+	if $dbh->err;
+      $sth->execute($attributes{$key});
+    error("couldn't execute update SQL for <$key>=<$attributes{$key}>", $sql, $sth)
+      if $dbh->err;      
+    }
+  } else {
+    print STDERR "Inserting protocol $title\n";
+
+    $sth->execute($title,$type,$text);
+  }
+}
+
+$dbh->commit();
+# $dbh->rollback();
+$dbh->disconnect();
+exit(0);
+
+sub error {
+  my ($error,$sql,$sth) = @_;
+  $error .= ", SQL=<$sql>, DBI=<$DBI::errstr>" if defined $sql;
+  $sth->finish() if defined $sth;
+  $dbh->rollback();
+  $dbh->disconnect();
+  die "$error\n";
+}

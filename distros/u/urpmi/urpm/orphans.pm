@@ -1,11 +1,10 @@
 package urpm::orphans;
 
 use strict;
-use urpm::util;
+use urpm::util qw(add2hash_ append_to_file cat_ output_safe partition put_in_hash uniq wc_l);
 use urpm::msg;
 use urpm;
 
-# $Id: select.pm 243120 2008-07-01 12:24:34Z pixel $
 
 my $fullname2name_re = qr/^(.*)-[^\-]*-[^\-]*\.[^\.\-]*$/;
 
@@ -49,6 +48,12 @@ sub unrequested_list__file {
     ($urpm->{env_dir} || "$urpm->{root}/var/lib/rpm") . '/installed-through-deps.list';
 }
 
+=item unrequested_list($urpm)
+
+Returns the list of potentiel files (ake files installed as requires for others)
+
+=cut
+
 #- side-effects: none
 sub unrequested_list {
     my ($urpm) = @_;
@@ -61,7 +66,7 @@ sub unrequested_list {
 
 =item mark_as_requested($urpm, $state, $test)
 
-Mark some packages as explicitely requested (usually because
+Mark some packages as explicitly requested (usually because
 they were manually installed).
 
 =cut
@@ -89,6 +94,20 @@ sub mark_as_requested {
     }
 }
 
+=item _installed_req_and_unreq($urpm)
+
+Returns :
+
+=over
+
+=item * req: list of installed packages that were installed as requires of others 
+
+=item * unreq: list of installed packages that were not installed as requres of others (ie the ones that were explicitely selected for install)
+
+=back
+
+=cut
+
 #- side-effects:
 #-   + those of _installed_req_and_unreq_and_update_unrequested_list (<root>/var/lib/rpm/installed-through-deps.list)
 sub _installed_req_and_unreq {
@@ -96,6 +115,20 @@ sub _installed_req_and_unreq {
     my ($req, $unreq, $_unrequested) = _installed_req_and_unreq_and_update_unrequested_list($urpm);
     ($req, $unreq);
 }
+
+=item _installed_and_unrequested_lists($urpm)
+
+Returns :
+
+=over
+
+=item * pkgs: list of installed packages
+
+=item * unrequested: list of packages that were installed as requires of others (the sum of the previous lists)
+
+=back
+
+=cut
 
 #- side-effects:
 #-   + those of _installed_req_and_unreq_and_update_unrequested_list (<root>/var/lib/rpm/installed-through-deps.list)
@@ -118,6 +151,22 @@ sub _write_unrequested_list__file {
 		".old") if !$urpm->{env_dir};
 }
 
+=item _installed_req_and_unreq_and_update_unrequested_list ($urpm)
+
+Returns :
+
+=over
+
+=item * req: list of installed packages that were installed as requires of others 
+
+=item * unreq: list of installed packages that were not installed as requres of others (ie the ones that were explicitely selected for install)
+
+=item * unrequested: list of packages that were installed as requires of others (the sum of the previous lists)
+
+=back
+
+=cut
+
 #- side-effects: those of _write_unrequested_list__file
 sub _installed_req_and_unreq_and_update_unrequested_list {
     my ($urpm) = @_;
@@ -138,9 +187,13 @@ sub _installed_req_and_unreq_and_update_unrequested_list {
     ($req, $unreq, $unrequested);
 }
 
-#- returns the new "unrequested" packages
-#- the reason can be "required by xxx" or "suggested"
-#-
+=item _selected_unrequested($urpm, $selected, $rejected)
+
+Returns the new "unrequested" packages.
+The reason can be "required by xxx" or "recommended"
+
+=cut
+
 #- side-effects: none
 sub _selected_unrequested {
     my ($urpm, $selected, $rejected) = @_;
@@ -152,16 +205,20 @@ sub _selected_unrequested {
 	    my $name = $pkg->name;
 	    $pkg->flag_requested || urpm::select::was_pkg_name_installed($rejected, $name) ? () : 
 		($name => "(required by " . $from->fullname . ")");
-	} elsif ($selected->{$_}{suggested}) {
-	    ($urpm->{depslist}[$_]->name => "(suggested)");
+	} elsif ($selected->{$_}{recommended}) {
+	    ($urpm->{depslist}[$_]->name => "(recommended)");
 	} else {
 	    ();
 	}
     } keys %$selected;
 }
 
-#- returns the packages obsoleting packages marked "unrequested"
-#- 
+=item _renamed_unrequested($urpm, $selected, $rejected)
+
+Returns the packages obsoleting packages marked "unrequested"
+
+=cut
+
 #- side-effects: none
 sub _renamed_unrequested {
     my ($urpm, $selected, $rejected) = @_;
@@ -223,10 +280,10 @@ sub check_unrequested_orphans_after_auto_select {
 
 =item unrequested_orphans_after_remove($urpm, $toremove)
 
-This function computes wether removing $toremove packages will create
+This function computes whether removing $toremove packages will create
 unrequested orphans.
 
-It does not return the new orphans since "whatsuggests" is not
+It does not return the new orphans since "whatrecommends" is not
 available,
 
 If it detects there are new orphans, _all_unrequested_orphans() must
@@ -247,7 +304,7 @@ sub unrequested_orphans_after_remove {
 sub _unrequested_orphans_after_remove_once {
     my ($urpm, $db, $unrequested, $toremove) = @_;
 
-    # first we get the list of requires/suggests that may be unneeded after removing $toremove
+    # first we get the list of requires/recommends that may be unneeded after removing $toremove
     my @requires;
     foreach my $fn (keys %$toremove) {
 	my ($n) = $fn =~ $fullname2name_re;
@@ -255,7 +312,7 @@ sub _unrequested_orphans_after_remove_once {
 	$db->traverse_tag('name', [ $n ], sub {
 	    my ($p) = @_;
 	    $p->fullname eq $fn or return;
-	    push @requires, $p->requires, $p->suggests;
+	    push @requires, $p->requires, $p->recommends_nosense;
 	});
     }
 
@@ -279,11 +336,15 @@ sub _unrequested_orphans_after_remove_once {
     0;
 }
 
-#- return true if $pkg will no more be required after removing $toremove
-#-
-#- nb: it may wrongly return false for complex loops,
-#-     but will never wrongly return true
-#-
+=item _will_package_be_unneeded($urpm, $db, $toremove, $pkg)
+
+Return true if $pkg will no more be required after removing $toremove
+
+nb: it may wrongly return false for complex loops,
+but will never wrongly return true
+
+=cut
+
 #- side-effects: none
 sub _will_package_be_unneeded {
     my ($urpm, $db, $toremove, $pkg) = @_;
@@ -314,8 +375,12 @@ sub _will_package_be_unneeded {
     1;
 }
 
-#- return true if $prop will still be required after removing $toremove
-#-
+=item _will_prop_still_be_needed($urpm, $db, $toremove, $fullname, $prop, $required_maybe_loop)
+
+Return true if $prop will still be required after removing $toremove
+
+=cut
+
 #- side-effects: none
 sub _will_prop_still_be_needed {
     my ($urpm, $db, $toremove, $fullname, $prop, $required_maybe_loop) = @_;
@@ -343,27 +408,37 @@ sub _will_prop_still_be_needed {
     });
 }
 
-# so that we can filter out current running kernel:
+=item _get_current_kernel_package()
+
+Return the current kernel's package so that we can filter out current running
+kernel:
+
+=cut
+
 sub _get_current_kernel_package() {
     my $release = (POSIX::uname())[2];
     # --qf '%{name}' is used in order to provide the right format:
-    -e "/boot/vmlinuz-$release" && `rpm -qf --qf '%{name}' /boot/vmlinuz-$release`;
+    -e "/boot/vmlinuz-$release" && ($release, `rpm -qf --qf '%{name}' /boot/vmlinuz-$release`);
 }
 
 
-# - returns list of kernels
-#
-# _fast_ version w/o looking at all non kernel packages requires on
-# kernels (like "urpmi_find_leaves '^kernel'" would)
-#
-# _all_unrequested_orphans blacklists nearly all kernels b/c of packages
-# like 'ndiswrapper' or 'basesystem' that requires 'kernel'
-#
-# rationale: other packages only require 'kernel' or a sub package we
-# do not care about (eg: kernel-devel, kernel-firmware, kernel-latest)
-# so it's useless to look at them
-#
-my (@latest_kernels, %requested_kernels, %kernels);
+=item _kernel_callback ($pkg, $unreq_list)
+
+Returns list of kernels
+
+_fast_ version w/o looking at all non kernel packages requires on
+kernels (like "urpmi_find_leaves '^kernel'" would)
+
+_all_unrequested_orphans blacklists nearly all kernels b/c of packages
+like 'ndiswrapper' or 'basesystem' that requires 'kernel'
+
+rationale: other packages only require 'kernel' or a sub package we
+do not care about (eg: kernel-devel, kernel-firmware, kernel-latest)
+so it's useless to look at them
+
+=cut
+
+my (@req_by_latest_kernels, %requested_kernels, %kernels);
 sub _kernel_callback { 
     my ($pkg, $unreq_list) = @_;
     my $shortname = $pkg->name;
@@ -372,55 +447,66 @@ sub _kernel_callback {
     # only consider kernels (and not main 'kernel' package):
     # but perform a pass on their requires for dkms like packages that require a specific kernel:
     if ($shortname !~ /^kernel-/) {
-	foreach (grep { /^kernel/ } $pkg->requires) {
+	foreach (grep { /^kernel/ } $pkg->requires_nosense) {
 	    $requested_kernels{$_}{$shortname} = $pkg;
 	}
 	return;
     }
 
     # only consider real kernels (and not kernel-doc and the like):
-    return if $shortname =~ /-(?:source|doc|headers|firmware(?:|-extra))$/;
+    return if $shortname =~ /-(?:source|doc|headers|firmware(?:|-extra|-nonfree))$/;
 
     # ignore requested kernels (aka that are not in /var/lib/rpm/installed-through-deps.list)
     return if !$unreq_list->{$shortname} && $shortname !~ /latest/;
 
-    # keep track of latest kernels in order not to try removing requested kernels:
+    # keep track of packages required by latest kernels in order not to try removing requested kernels:
     if ($n =~ /latest/) {
-        push @latest_kernels, $pkg->requires;
+        push @req_by_latest_kernels, $pkg->requires;
     } else {
         $kernels{$shortname} = $pkg;
     }
 }
 
 
-# - returns list of orphan kernels
+=item _get_orphan_kernels()
+
+Returns list of orphan kernels
+
+=cut
+
 sub _get_orphan_kernels() {
     # keep kernels required by kernel-*-latest:
-    delete $kernels{$_} foreach @latest_kernels;
+    delete $kernels{$_} foreach @req_by_latest_kernels;
     # return list of unused/orphan kernels:
-    %kernels;
+    \%kernels;
 }
 
 
-#- returns the list of "unrequested" orphans.
-#-
+=item _all_unrequested_orphans($urpm, $req, $unreq)
+
+Returns the list of "unrequested" orphans.
+
+=cut
+
 #- side-effects: none
 sub _all_unrequested_orphans {
     my ($urpm, $req, $unreq) = @_;
 
     my (%l, %provides);
+    # 1- list explicit provides (not files) from installed packages:
     foreach my $pkg (@$unreq) {
 	$l{$pkg->name} = $pkg;
 	push @{$provides{$_}}, $pkg foreach $pkg->provides_nosense;
     }
     my $unreq_list = unrequested_list($urpm);
 
-    my $current_kernel = _get_current_kernel_package();
+    my ($current_kernel_version, $current_kernel) = _get_current_kernel_package();
 
+    # 2- check if "unrequested" packages are still needed:
     while (my $pkg = shift @$req) {
         # do not do anything regarding kernels if we failed to detect the running one (ie: chroot)
  	_kernel_callback($pkg, $unreq_list) if $current_kernel;
-	foreach my $prop ($pkg->requires, $pkg->suggests) {
+	foreach my $prop ($pkg->requires, $pkg->recommends_nosense) {
 	    my $n = URPM::property2name($prop);
 	    foreach my $p (@{$provides{$n} || []}) {
 		if ($p != $pkg && $l{$p->name} && $p->provides_overlap($prop)) {
@@ -432,7 +518,7 @@ sub _all_unrequested_orphans {
     }
 
     # add orphan kernels to the list:
-    my $a = { _get_orphan_kernels() };
+    my $a = _get_orphan_kernels();
     add2hash_(\%l, $a);
 
     # add packages that require orphan kernels to the list:
@@ -440,8 +526,13 @@ sub _all_unrequested_orphans {
 	add2hash_(\%l, $requested_kernels{$_});
     }
 
-    # do not offer to remove current kernel:
+    # do not offer to remove current kernel or DKMS modules for current kernel:
     delete $l{$current_kernel};
+    # prevent removing orphan kernels if we failed to detect running kernel version:
+    if ($current_kernel_version) {
+        do { delete $l{$_} } foreach grep { /$current_kernel_version/ } keys %l;
+    }
+
     [ values %l ];
 }
 
@@ -572,7 +663,7 @@ sub installed_leaves {
     }
 
     foreach my $pkg (@$packages) {
-	foreach my $prop ($pkg->requires, $pkg->suggests) {
+	foreach my $prop ($pkg->requires, $pkg->recommends_nosense) {
 	    my $n = URPM::property2name($prop);
 	    foreach my $p (@{$provides{$n} || []}) {
 		$p != $pkg && $p->provides_overlap($prop) and 
@@ -594,6 +685,6 @@ sub installed_leaves {
 
 Copyright (C) 2008-2010 Mandriva SA
 
-Copyright (C) 2011-2012 Mageia
+Copyright (C) 2011-2015 Mageia
 
 =cut

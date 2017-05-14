@@ -2,7 +2,7 @@ package GSM::SMS::NBS::Message;
 use	GSM::SMS::PDU;
 use GSM::SMS::NBS::Frame;
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 use constant DATAGRAM_LENGTH => 128;
 

@@ -11,7 +11,7 @@ use base 'App::Pinto::Command';
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -42,7 +42,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -50,7 +53,7 @@ App::Pinto::Command::delete - permanently remove an archive
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 SYNOPSIS
 
@@ -75,8 +78,8 @@ use the L<unregister|App::Pinto::Command::unregister> command.
 
 =head1 COMMAND ARGUMENTS
 
-Arguments are the targets that you want to delete.  Targets are
-specified as C<AUTHOR/FILENAME>.  For example:
+Arguments are the archives that you want to delete.  Archives are
+specified as C<AUTHOR/ARCHIVE-NAME>.  For example:
 
   SHAKESPEARE/King-Lear-1.2.tar.gz
 
@@ -102,7 +105,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

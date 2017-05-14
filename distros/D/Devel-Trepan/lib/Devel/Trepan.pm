@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
-# Copyright (C) 2013-2014 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2013-2015 Rocky Bernstein <rocky@cpan.org>
 # Documentation is at the __END__
+eval "use feature ':5.10';";
 use strict; use warnings;
 
 use rlib '..';
@@ -18,13 +19,19 @@ use Exporter;
 
 use constant PROGRAM => 'trepan.pl';
 use version;
-$VERSION='0.58'; # To fool CPAN indexer. Is <= real version
+$VERSION='0.73'; # To fool CPAN indexer. Is <= real version
 $VERSION = $Devel::Trepan::Version::VERSION;
 $PROGRAM = PROGRAM;
 
 sub show_version() {
     PROGRAM . ", version $Devel::Trepan::VERSION";
 }
+
+# Access to stopping point as an integer.
+sub addr() { $DB::OP_addr };
+
+# Access to stopping point as a hex string.
+sub haddr() { sprintf "0x%x", $DB::OP_addr }
 
 # =head2 debugger
 # Allows program to make an explicit call to the debugger.
@@ -89,7 +96,7 @@ The version Trepan.pm however is what is seen at https://metacpan.org/module/Dev
 
 =head1 NAME
 
-Devel::Trepan -- A new modular Perl debugger
+Devel::Trepan -- A modular gdb-like Perl debugger
 
 =head1 SUMMARY
 
@@ -102,7 +109,7 @@ L<trepanning debuggers|http://github.com/rocky/rb-trepanning/wiki>.
 
 =item *
 
-extensive online-help
+extensive pod-formatted online-help
 
 =item *
 
@@ -118,14 +125,6 @@ out-of-process and remote debugging
 
 =item *
 
-interactive shell support
-
-=item *
-
-code disassembly
-
-=item *
-
 gdb syntax
 
 =item *
@@ -135,6 +134,14 @@ easy extensibility at several levels: aliases, commands, and plugins
 =item *
 
 comes with extensive tests
+
+=item *
+
+interactive shell support (via an optional plugin)
+
+=item *
+
+code deparsing and disassembly (via an optional plugins)
 
 =item *
 
@@ -297,7 +304,11 @@ L<Debug into a Perl expression or statement (debug)|Devel::Trepan::CmdProcessor:
 
 =item *
 
-L<Disassemble subroutine(s) (disassemble)|Devel::Trepan::CmdProcessor::Command::Disassemble>
+L<Disassemble (de-parse) Perl code|Devel::Trepan::CmdProcessor::Command::Deparse>
+
+=item *
+
+L<Disassemble Perl OP codes (disassemble)|Devel::Trepan::CmdProcessor::Command::Disassemble>
 
 =item *
 
@@ -309,7 +320,7 @@ L<Evaluate Perl code (eval)|Devel::Trepan::CmdProcessor::Command::Eval>
 
 =item *
 
-L<Recursively Debug into Perl code (debug)|Devel::Trepan::CmdProcessor::Command::Debug>
+L<Evaluate Perl code (deval) via Deparse|Devel::Trepan::CmdProcessor::Command::Deval>
 
 =item *
 
@@ -321,10 +332,6 @@ L<Cancel some expressions to be displayed when program stops
 =head3 Specifying and examining files
 
 =over
-
-=item *
-
-L<Deparse source code vis B::Deparse (deparse)|Devel::Trepan::CmdProcessor::Command::Deparse>
 
 =item *
 
@@ -504,7 +511,7 @@ L<Debugger Command Examples|Devel::Trepan::CmdProcessor::Command::Help::examples
 =head1 BUGS/CAVEATS
 
 Because this should be useful in all sorts of environments such as
-back to perl 5.008, we often can make use of newer Perlisms nor can we
+back to perl 5.008, we often can not make use of newer Perlisms nor can we
 I<require> by default all of the modules, say for data printing, stack
 inspection, or interactive terminal handling. That said, if you have a
 newer Perl or the recommended modules or install plugins, you'll get
@@ -543,6 +550,9 @@ L<Devel::Trepan Debugger evaluation of Perl statements|http://blogs.perl.org/use
 L<Location, Location, Location|http://blogs.perl.org/users/rockyb/2012/08/location-location-location.html>
 
 =item *
+L<Exact Perl location with B::DeparseTree (and Devel::Callsite)|http://blogs.perl.org/users/rockyb/2015/11/exact-perl-location-with-bdeparse-and-develcallsite.html>
+
+=item *
 
 L<Devel::Trepan github wiki|https://github.com/rocky/Perl-Devel-Trepan/wiki>
 
@@ -558,8 +568,17 @@ L<Devel::Trepan::Shell> adds a debugger C<shell> command support via L<Devel::RE
 
 =item *
 
-L<Devel::Trepan::Disassemble> adds a debugger C<disassemble> command
-support via L<B::Concise>
+L<Devel::Trepan::Deparse> adds Perl code disassembly
+(de-parsing). With this, you can find out I<exactly> where you are
+stopped. It also allows for a more reliably C<eval> command, called
+C<deval>. See L<Exact Perl location with B::Deparse (and
+Devel::Callsite)|http://blogs.perl.org/users/rockyb/2015/11/exact-perl-location-with-bdeparse-and-develcallsite.html>
+
+=item *
+
+L<Devel::Trepan::Disassemble> adds a command C<disassemble> for
+disassembly of Perl OP codes. Post-processing is done to colorize the
+listings.
 
 =back
 
@@ -569,12 +588,6 @@ I<Devel::Trepan> will detect automatically whether any of these
 modules are present. If so, additional capabilies are available.
 
 =over 4
-
-=item *
-
-L<Devel::Callsite> allows you to see the exact location of where you
-are stopped. Location reporting changes by default to show the current
-OP address, when this module is present.
 
 =item *
 L<Enbugger> allows you to enter the debugger without previously having your program compiled for debugging.
@@ -629,13 +642,14 @@ use some parts of this along with C<perl5db>.
 L<Devel::Hdb>
 
 A Perl debugger that uses HTML and javascript to implement the
-GUI. The front end talks via a REST service.
+GUI. The front end talks via a REST service. (via Websocket would be
+cooler though.) It too uses ideas from L<DB>.
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011, 2012, 2014 Rocky Bernstein <rocky@cpan.org>
+Copyright (C) 2011, 2012, 2014-2015 Rocky Bernstein <rocky@cpan.org>
 
 This program is distributed WITHOUT ANY WARRANTY, including but not
 limited to the implied warranties of merchantability or fitness for a

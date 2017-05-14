@@ -14,7 +14,7 @@ sub import {
     my $tag = shift;
     if ( $tag ) {
         no warnings 'once';
-        $YAML::Old::TagClass->{$tag} = $package;
+        $YAML::TagClass->{$tag} = $package;
         ${$package . "::YamlTag"} = $tag;
     }
 }

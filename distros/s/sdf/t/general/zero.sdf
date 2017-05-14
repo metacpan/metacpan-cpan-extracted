@@ -1,0 +1,12 @@
+# This file tests "zero" paragraphs
+0
+
+1
+
+2
+
+!block table
+F1  F2
+0   a
+1   0
+!endblock

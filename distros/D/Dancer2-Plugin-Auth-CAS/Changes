@@ -1,0 +1,38 @@
+2.000       Mon Mar 06 15:56:11 2017 +0100
+    [ Major ]
+    * Ported to Dancer2
+
+1.128       Tue Jan 20 15:44:21 2015 +0100
+    [ Minor ]
+    * Added config setting 'ssl_verify_hostname' to override ssl_verify_hostname in LWP::UserAgent which is beeing used in Authen::CAS::Client. Defaults to true.
+
+
+1.127       Wed Jul 02 18:14:22 2014 +0200
+
+    [ Patch ]
+    * Made the /validate fully CAS 1.0 aware and fixed the redirect with url parameters on validation sucess
+
+1.126       Thu Jun 26 22:12:32 2014 +0200
+
+    [ Patch ]
+    * URL parameters are no longer dropped/ignored when redirecting to the CAS service.
+
+1.124       Thu Jun 26 19:02:54 2014 +0200
+
+    [ Major ]
+    * On failure to authenticate, redirect to 'cas_denied_url' instead of the 'cas_logout_url'
+    * Raise hard error when the backend is unable to auth instead of redirecting.
+
+    [ Minor ]
+    * Calling auth_cas() with 'cas_user_map', 'cas_logout_path' and 'cas_denied_path' overrides their global value
+
+    [ Patch ]
+    * Fixed missing documentation for auth_cas() call options.
+    * Sensitive content after calling auth_cas() was reachable on error/auth_failure - fixed with harsh halt()
+      All users SHOULD upgrade to this version.
+
+
+1.002       Mon May 19 14:18:10 2014 +0200
+
+    * Released as stable
+

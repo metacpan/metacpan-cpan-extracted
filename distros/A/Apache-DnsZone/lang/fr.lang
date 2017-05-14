@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # edited by khali@linux-fr.org (2001/03/24)
-# $Id: fr.lang,v 1.5 2001/04/25 19:29:21 thomas Exp $
+# $Id: fr.lang,v 1.6 2001/06/22 18:53:53 thomas Exp $
 
 use strict;
 
@@ -29,7 +29,9 @@ sub lang () {
 		'EXPIRE'            => 'D&eacute;lai d\'expiration',
 		'TTL'               => 'Dur&eacute;e de vie',
 		'HOST'              => 'H&ocirc;te',
+		'REVERSE_HOST'      => 'Nom canonique',
 		'IP_ADDRESS'        => 'Adresse IP',
+		'IPV6_ADDRESS'      => 'Adresse IPv6',
 		'CNAME'             => 'Nom canonique',
 		'MX'                => '&Eacute;changeur mail',
 		'PREFERENCE'        => 'Pr&eacute;f&eacute;rence',
@@ -48,7 +50,9 @@ sub lang () {
 		'ERROR_CORRECT'     => 'Veuillez corriger la ou les erreur(s) suivantes&nbsp;:',
 		'ERROR_DUPLICATE'   => 'Un doublon existe',
 		'ERROR_IP'          => 'Valeur incorrecte pour "Adresse IP"',
+		'ERROR_IPV6'        => 'Valeur incorrecte pour "Adresse IPv6"',
 		'ERROR_HOST'        => 'Valeur incorrecte pour "H&ocirc;te"',
+		'ERROR_REVERSE'     => 'Valeur incorrecte pour "Nom canonique"',
 		'ERROR_TTL'         => 'Valeur incorrecte pour "Dur&eacute;e de vie"',
 		'ERROR_CNAME'       => 'Valeur incorrecte pour "Nom canonique"',
 		'ERROR_MX'          => 'Valeur incorrecte pour "&Eacute;changeur mail',

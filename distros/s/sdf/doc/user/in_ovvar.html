@@ -1,0 +1,169 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Variables</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovmac.html">Previous Topic</A> | <A HREF="in_ovflt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>2.5. Variables</H1>
+<HR>
+<H2><A NAME="Introduction">2.5.1. Introduction</A></H2>
+<P>A <EM>variable</EM> is a named value. Document-wide settings are controlled in SDF using variables. Likewise, authors can define and access their own variables. In either case, the value of a variable can be referenced in a paragraph by delimiting it with the special symbols [[ and ]].</P>
+<P>For example:</P>
+<PRE>
+  !define MY_EMAIL 'abc@xyz.com'
+  My electronic mail address is [[MY_EMAIL]].
+</PRE>
+<P>The result is:</P>
+<P>My electronic mail address is abc@xyz.com.</P>
+<HR>
+<H2><A NAME="Commonly used system variables">2.5.2. Commonly used system variables</A></H2>
+<P>Some commonly used system variables are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Variable</STRONG>
+</TD>
+<TD>
+<STRONG>Description</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Options:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>OPT_LOOK</EM>
+</TD>
+<TD>
+the overall look (e.g. simple, fancy)
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>OPT_STYLE</EM>
+</TD>
+<TD>
+the general type (e.g. memo, manual)
+</TD>
+</TR>
+<TR>
+<TD>
+<STRONG>Titles:</STRONG>
+</TD>
+<TD>
+<STRONG>&nbsp;</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>DOC_NAME</EM>
+</TD>
+<TD>
+the title, excluding the type (e.g. SDF)
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>DOC_TYPE</EM>
+</TD>
+<TD>
+the title type (e.g. User Guide)
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>DOC_AUTHOR</EM>
+</TD>
+<TD>
+the author
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>DOC_TOC</EM>
+</TD>
+<TD>
+the number of heading levels in the table of contents
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<H2><A NAME="Setting variables">2.5.3. Setting variables</A></H2>
+<P>Variables can be set via:</P>
+<UL>
+<LI>the <A HREF="../ref/mdefine.html">define</A> macro
+<LI>the <A HREF="../ref/mdefault.html">default</A> macro
+<LI>the <A HREF="../ref/minit.html">init</A> macro
+<LI><A HREF="../ref/sdf.html">sdf</A>'s command line.</UL>
+<P>To undefine a variable, use the <A HREF="../ref/mundef.html">undef</A> macro.</P>
+<HR>
+<H2><A NAME="The Define macro">2.5.4. The Define macro</A></H2>
+<P>Variables are usually set in <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> by using the <A HREF="../ref/mdefine.html">define</A> macro. The format is:</P>
+<PRE>
+   !define symbol [expression]
+</PRE>
+<P>Examples are:</P>
+<PRE>
+   !define LONG
+   !define VERSION &quot;1.002&quot;
+</PRE>
+<P><EM>symbol</EM> is a sequence of letters, digits and underscore. If <EM>expression</EM> is omitted, the default value is 1.</P>
+<HR>
+<H2><A NAME="The Default macro">2.5.5. The Default macro</A></H2>
+<P>It is often a good idea to only define a variable if it does not already have a value. To do this, use the <A HREF="../ref/mdefault.html">default</A> macro. The format is:</P>
+<PRE>
+   !default symbol [expression]
+</PRE>
+<P>For example:</P>
+<PRE>
+   !default VERSION &quot;1.002&quot;
+</PRE>
+<P><EM>symbol</EM> is a sequence of letters, digits and underscore. If <EM>expression</EM> is omitted, the default value is 1.</P>
+<HR>
+<H2><A NAME="The Init macro">2.5.6. The Init macro</A></H2>
+<P>Generally speaking, the first thing <A HREF="../ref/sdf.html">sdf</A> does is to load the standard library (<EM>stdlib.sdm</EM>). However, if the first line of an SDF document is the <A HREF="../ref/minit.html">init</A> macro, the nominated variables are initialised <EM>before</EM> the standard library is loaded. This allows an SDF document to initialise variables used within the standard library. The format of the init macro is:</P>
+<PRE>
+   !init name1[&quot;=&quot;expression1]&quot;;&quot; name2[&quot;=&quot;expression2] ...
+</PRE>
+<P>For example:</P>
+<PRE>
+   !init OPT_STYLE=&quot;memo&quot;
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Certain variables cannot be set after the standard library is loaded. These variables can <EM>only</EM> be set via <A HREF="../ref/sdf.html">sdf</A>'s command line or via the <A HREF="../ref/minit.html">init</A> macro.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<H2><A NAME="Using the command line">2.5.7. Using the command line</A></H2>
+<P>It is occasionally useful to set variables via <A HREF="../ref/sdf.html">sdf</A>'s -D option. Multiple definitions can be separated by commas. For example:</P>
+<PRE>
+   sdf -DLONG,VERSION=&quot;1.002&quot; ...
+</PRE>
+<P>Alternatively, the option can be repeated. For example:</P>
+<PRE>
+   sdf -DLONG -DVERSION=&quot;1.002&quot; ...
+</PRE>
+<P>In either case, if a value is not specified for a variable, 1 is assumed.</P>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>Variables set on the command line override the values set by the <A HREF="../ref/minit.html">init</A> macro.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_overv.html">Parent Topic</A> | <A HREF="in_ovmac.html">Previous Topic</A> | <A HREF="in_ovflt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,29 @@
+Padre::Plugin::Catalyst - TODO list!
+
+bug: no files open, selecting "new model"
+
+    * jump from current action to corresponding template and back (zamolxes)
+      --> look for the functions method or "find method declaration", maybe they have a good way to detect the method we're at.
+
+
+    * option to add a new action + corresponding template + mechanize test (zamolxes)
+
+    * some sort of integration with Catalyst::Dispatcher::AsGraph
+    * an outline-like panel that showed all actions and where they resolve to (code-wise)
+
+	* Add some catalyst.pl project options, such as -makefile, -scripts 
+	  and -short. Also add the option to change a project's config file format, running something like: 
+	  perl -Ilib -e 'use MyApp; use Config::General;
+	  Config::General->new->save_file("myapp.conf", MyApp->config);
+	
+	* Before creating a new project, test if directory to-be-created 
+	  already exists. If so, ask the user if we should force it anyway
+	  
+	* Wait for server to actually start before issuing the pop-up window 
+	  asking if the user wants to open the web browser.
+	
+	* Add a plugin preferences window, including (but not limited to):
+	  - user provided list of plugins to include automagically
+	  - default view/model/controller helper to display
+	  - test server options, such as "port" and "restart when files get 
+		modified"

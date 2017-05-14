@@ -12,7 +12,10 @@ such as Sun Grid Engine (SGE) or Condor.
 =head1 SYNOPSIS
 
  use Grid::Request;
- my $request = Grid::Request->new( project => "SomeProject" );
+ my $request = Grid::Request->new();
+
+ # Optionally set the job's project, if the configured scheduler requires it.
+ $request->project("MyProject");
 
  $request->times(2);
  $request->command("/path/to/executable");
@@ -41,8 +44,8 @@ such as Sun Grid Engine (SGE) or Condor.
  my $times_wrong_way = $request->get_times(3);
 
  # Finally, submit the request...
- my @id = $request->submit();
- print "The first ID for this request is $id[0].\n";
+ my @job_ids = $request->submit();
+ print "The first ID for this request is $job_ids[0].\n";
 
  # ...and wait for the results. This step is not necessary, only
  # if you wish to block, or wait for the request to complete before
@@ -61,6 +64,10 @@ Grid::Request->new(%args);
 B<Description:> This is the object constructor. Parameters are passed to
 the constructor in the form of a hash. Examples:
 
+  my $req = Grid::Request->new();
+
+  or
+
   my $req = Grid::Request->new( project => "SomeProject" );
 
   or
@@ -74,11 +81,9 @@ the constructor in the form of a hash. Examples:
 Users may also add a "debug" flag to the constructor call for increased
 reporting:
 
-  my $req = Grid::Request->new( project => "SomeProject",
-                                debug   => 1 );
+  my $req = Grid::Request->new( debug => 1 );
 
-B<Parameters:> Only the 'project' parameter is mandatory when calling the
-constructor.
+B<Parameters:> A hash of request configuration options.
 
 B<Returns:> $obj, a Grid::Request object.
 
@@ -98,12 +103,7 @@ the file may also specify the path to a Log::Log4perl configuration file with th
 
 The 'tempdir' directory must point to a directory that is accessible
 to the grid execution machines, for instance, over NFS...
-Users may provide an alternate path to a different configuration file
-by specifying the 'config' parameter to the constructor:
 
-  my $req = Grid::Request->new( project => "SomeProject",
-                                config => "/some/other/dir/request.conf",
-                              );
 Another way of specifying an alternate configuration is to define
 the GRID_CONFIG environment variable.
 
@@ -137,9 +137,8 @@ my $section = $Grid::Request::HTC::config_section;
 
 my $WORKER = $Grid::Request::HTC::WORKER;
 
-my $command_element = 0;
 my $DRMAA_INITIALIZED = 0;
-our $VERSION = qw$Revision: 8365 $[1];
+our $VERSION = '0.11';
 my $SESSION_NAME = lc(__PACKAGE__);
 $SESSION_NAME =~ s/:+/_/g;
 
@@ -211,7 +210,7 @@ sub _init {
 
     $logger->info("Creating the first Command object.");
     # holds an array of command elements.
-    $self->{_cmd_ele}->[$command_element] =
+    $self->{_cmd_ele}->[0] =
         Grid::Request::Command->new(%$command_args_ref);
 
     $self->{_drm} = _load_drm($cfg);
@@ -257,8 +256,8 @@ sub _init_config_logger {
 
 # Accessors (private) used to return internal objects.
 sub _drm { return $_[0]->{_drm}; }
-sub _com_obj_list { return $_[0]->{_cmd_ele}; }
-sub _com_obj { return $_[0]->{_cmd_ele}->[$command_element]; }
+sub _com_obj_list { return wantarray ? @{ $_[0]->{_cmd_ele} } : $_[0]->{_cmd_ele}; }
+sub _com_obj { return $_[0]->{_cmd_ele}->[-1]; }
 sub _config { return $_[0]->{_config}; }
 
 sub _load_drm {
@@ -317,18 +316,17 @@ sub _validate {
     my $self = shift;
     $logger->debug("In _validate.");
     my $rv = 1;
-    if ($self->project() =~ m/\s/) {
-        Grid::Request::Exception->throw("White space is not allowed for the project attribute.");
+    if ($self->project() && ($self->project() =~ m/\s/)) {
+        Grid::Request::Exception->throw("White space is not allowed for the 'project' attribute.");
     }
 
-    if ($self->account() =~ m/\s/) {
-        Grid::Request::Exception->throw("White space is not allowed for the account attribute.");
+    if (defined($self->account()) && length($self->account()) && $self->account() =~ m/\s/) {
+        Grid::Request::Exception->throw("White space is not allowed for the 'account' attribute.");
     }
 
     $logger->debug("Returning $rv.");
     return $rv;
 }
-
 
 
 # This method knows how to dispatch method invocations to the proper module
@@ -365,14 +363,16 @@ sub AUTOLOAD {
 # method. Don't modify or remove unless you know what you are doing.
 # This is a private method that is not to be invoked directly.
 sub DESTROY { 
-    # Close the DRMAA Session
-    $logger->debug("Closing the DRMAA session.");
-    my ($error, $diagnosis) = drmaa_exit();
-    if ($error) {
-        $logger->error("Error closing the DRMAA session: ",
-                 drmaa_strerror($error), $diagnosis);
-    } else {
-        $DRMAA_INITIALIZED = 0;
+    # Close the DRMAA Session (if necessary).
+    if ( $DRMAA_INITIALIZED != 0 ) {
+        $logger->debug("Closing the DRMAA session.");
+        my ($error, $diagnosis) = drmaa_exit();
+        if ($error) {
+            $logger->error("Error closing the DRMAA session: ",
+                     drmaa_strerror($error), $diagnosis);
+        } else {
+            $DRMAA_INITIALIZED = 0;
+        }
     }
 }
 
@@ -403,7 +403,8 @@ argument, no logic is attempted to interpret the string provided. The module
 simply adds the specified string verbatim to the list of parameters when
 building the command line to invoke on the grid.  If 3 parameters are passed,
 then they are read as "key", "value", "type". The parameter 'type' can be
-either "ARRAY", "DIR", "PARAM", or "FILE" (the default is "PARAM").
+either "ARRAY", "DIR", "PARAM", or "FILE" (the default is "PARAM"). Any other
+number of parameters passed will yield an error.
 
 The 'type' is used in the following way to aid in the parallelization of
 processes: If ARRAY is used, the job will be iterated over the elements of the
@@ -698,12 +699,11 @@ sub is_submitted {
 }
 =item $obj->project([$project]);
 
-B<Description:> The project attribute is used to affiliate usage of the DRM with
-a particular administrative project. This will allow for more effective
+B<Description:> The project attribute is used to affiliate usage of the DRM
+with a particular administrative project. This will allow for more effective
 control and allocation of resources, especially when high priority projects
-must be fulfilled. Therefore, the "project" is mandatory when the request object
-is built. However, the user may still change the project attribute as long as
-the job has not yet been submitted (after submission most attributes are
+must be fulfilled. The caller may change the project setting as long as the job
+has not yet been submitted (after submission most request attributes are
 locked).
 
 B<Parameters:> The first parameter will be used to set (or reset)
@@ -740,18 +740,6 @@ B<Returns:> When called with no arguments, returns the currently set
 initialdir, or undef if not yet set.
 
 
-=item $obj->length([length]);
-
-B<Description:> This method is used to characterize how long the request
-is expected to take to complete. For long running requests, an attempt to
-match appropriate resources is made. If unsure, leave this setting unset.
-
-B<Parameters:> "short", "medium", "long". No attempt is made to validate
-the length passed in when used as a setter.
-
-B<Returns:> The currently set length attribute (when called with no
-arguments).
-
 =item $obj->name([name]);
 
 B<Description:> The name attribute for request objects is optional and is
@@ -762,20 +750,6 @@ B<Parameters:> A scalar name for the request.
 B<Returns:> When called with no arguments, returns the current name, or
 undef if not yet set. The name cannot be changed once a request is submitted.
 
-
-=item $obj->new_command();
-
-B<Description:> The module allows for requests to encapsulate multiple
-commands. This method will start work on a a new one by moving a cursor.
-Commands are processed in the order in which they are created if they are
-submitted synchronously, or in parallel if submitted asynchronously (the
-default). In addition, the only attribute that the new command inherits from
-the command that preceded it, is the project. However, users are free to change
-the project by calling the project() method...
-
-B<Parameters:> None.
-
-B<Returns:> None.
 
 =item $obj->opsys([$os]);
 
@@ -818,6 +792,48 @@ B<Parameters:> memory in megabytes. Examples: 1000MB, 5000MB
 
 B<Returns:> When called with no arguments, returns the memory if set.
 
+=item $obj->new_command();
+
+B<Description:> The module allows for requests to encapsulate multiple
+commands. This method will start work on a a new one by moving a cursor.
+Commands are processed in the order in which they are created if they are
+submitted synchronously, or in parallel if submitted asynchronously (the
+default). In addition, the only attribute that the new command inherits from
+the command that preceded it, is the project (if set). However, users are free
+to change the project by calling the project() method...
+
+B<Parameters:> None.
+
+B<Returns:> None.
+
+=cut
+
+sub new_command {
+    $logger->debug("In new_command.");
+    
+    my ($self, @args) = @_;
+    if (scalar @args) {
+        Grid::Request::InvalidArgumentException->throw("No arguments are valid for new_command().");
+    }
+
+    # The only piece of information replicated from command to command is the
+    # project. So we first get the project and then use it to build the new
+    # Command object.
+    my $project = $self->project();
+
+    # Increment element pointer.
+    my @objs = $self->_com_obj_list;
+    my $cmd_len = scalar(@objs);
+
+    $logger->debug("Creating new Command object in element $cmd_len.");
+    if (defined $project && length($project)) {
+        $self->_com_obj_list->[$cmd_len] =
+            Grid::Request::Command->new( project => $project );
+    } else {
+        $self->_com_obj_list->[$cmd_len] = Grid::Request::Command->new();
+    }
+}
+
 
 =item $obj->pass_through([pass_value]);
 
@@ -831,23 +847,6 @@ B<Parameters:> $string, a scalar.
 
 B<Returns:> None.
 
-=cut
-
-sub new_command {
-    $logger->debug("In new_command.");
-    my $self = shift;
-
-    # The only piece of information replicated from command to command is the
-    # project. So we first get the project and then use it to build the new
-    # Command object.
-    my $project = $self->project();
-
-    # Increment element pointer.
-    $command_element++;
-    $logger->debug("Creating Command object in element $command_element.");
-    $self->_com_obj_list->[$command_element] =
-        Grid::Request::Command->new( project => $project );
-}
 
 =item $obj->output([path]);
 
@@ -891,11 +890,20 @@ B<Parameters:> Scalar priority value.
 
 B<Returns:> The current priority, or undef if unset.
 
-=cut
+=item $obj->runtime([minutes]);
+
+B<Description:> Cap the runtime of the job on the DRM. Most DRM systems
+have a mechanism to limit the maximum amount of time a job can run. This
+method accepts a value in minutes.
+
+B<Parameters:> Scalar containing a positive integer nubmer of minutes.
+
+B<Returns:> The current runtime limit if called as a getter, or undef if unset.
+
 
 =item $obj->set_env_list(@vars);
 
-B<Description:> This method is used to establish the environment that a a
+B<Description:> This method is used to establish the environment that a
 request to the grid should run under. Users may pass this method a list of
 strings that are in "key=value" format. The keys will be converted into
 environment variables set to "value" before execution of the command is begun.
@@ -923,12 +931,69 @@ sub set_env_list {
         push(@valid, $arg);
     }
 
-    $self->[5] = \@valid;
+    $self->{_env} = \@valid;
 
     # If the user has set their own environment with set_envlist, then we
     # assume that they want getenv to be true. We do it for them here to save
     # them an extra step.
     $self->getenv(1);
+}
+
+
+=item $obj->show_invocations();
+
+B<Description:> Show what will be executed on the DRM. An attempt is made
+to excape shell sensitive characters so that the commands can be copied
+and pasted for test execution.
+
+B<Parameters:> None.
+
+B<Returns:> None. The method print to STDOUT.
+
+=cut
+
+sub show_invocations {
+    my $self = shift;
+
+    # Remember, we may have multiple command objects...
+    my @command_objs = $self->_com_obj_list();
+
+    # Iterate over them...
+    my $command_count = 1;
+
+    eval { require Grid::Request::JobFormulator };
+    my $formulator = Grid::Request::JobFormulator->new();
+
+    foreach my $com_obj (@command_objs) {
+        print "Command #" . $command_count . "\n"; 
+        my $exe = $com_obj->command();
+        my $block_size = $com_obj->block_size();
+        my @params = $com_obj->params();
+        my @param_strings = ();
+
+        foreach my $param_obj (@params) {
+            my $param_str = $param_obj->to_string();
+            push (@param_strings, $param_str);
+        }
+
+        my @invocations = $formulator->formulate($block_size, $exe, @param_strings);
+        foreach my $invocations (@invocations) {
+            my @cli = @$invocations;
+            my @esc_cli = _esc_chars(@cli);
+            print join(" ", @esc_cli) . "\n";
+        }
+        
+        $command_count++;
+    }
+}
+
+sub _esc_chars {
+    # will change, for example, a!!a to a\!\!a
+    my @cli = @_;
+    my $e;
+    @cli = map { $e =$_; $e =~ s/([;<>\*\|`&\$!#\(\)\[\]\{\}:'"])/\\$1/g; $e } @cli;
+    @cli = map { if ($_ =~ m/\s/) { '"' . $_ . '"' } else { $_ } } @cli;
+    return @cli;
 }
 
 
@@ -1141,23 +1206,41 @@ sub _drmaa_submit {
     my @ids;
     my $total = $self->command_count();
     my $count = 1;
-    for (my $cmd = 0; $cmd < $total; $cmd++) {
-        my $cmd_obj = $self->_com_obj_list->[$cmd];
-        $logger->debug("Submitting command $count/$total.");
-        my $jt = $self->_cmd_base_drmaa($cmd_obj);
-        $logger->debug("Got a good job template.") if defined $jt;
-        my @sub_ids;
-        if ($cmd_obj->cmd_type() eq "mw") {
-            @sub_ids = $self->_submit_mw($jt, $cmd_obj);
-        } else {
-            @sub_ids = $self->_submit_htc($jt, $cmd_obj);
+
+    eval {
+        for (my $cmd = 0; $cmd < $total; $cmd++) {
+            my $cmd_obj = $self->_com_obj_list->[$cmd];
+            $logger->debug("Submitting command $count/$total.");
+            my $jt = $self->_cmd_base_drmaa($cmd_obj);
+            $logger->debug("Got a good job template.") if defined $jt;
+            my @sub_ids;
+            if ($cmd_obj->cmd_type() eq "mw") {
+                @sub_ids = $self->_submit_mw($jt, $cmd_obj);
+            } else {
+                @sub_ids = $self->_submit_htc($jt, $cmd_obj);
+            }
+            if ($serially) {
+                _sync_ids($cmd_obj);
+            }
+            push @ids, @sub_ids;
+            $count++;
         }
-        if ($serially) {
-            _sync_ids($cmd_obj);
+    };
+
+    my $e;
+    if ($e = Exception::Class->caught("Grid::Request::DRMAAException")) {
+        $logger->fatal("Unable to submit: " . $e->diagnosis() . ": " . $e->drmaa() );
+        $e->rethrow();
+    } elsif ( $e = Exception::Class->caught("Grid::Request::Exception") ) {
+        $logger->fatal("Unable to submit: " . $e->error());
+        $e->rethrow();
+    } else {
+        $e = Exception::Class->caught();
+        if ($e) {
+            ref $e ? $e->rethrow : $logger->logcroak("Unable to submit: $e");
         }
-        push @ids, @sub_ids;
-        $count++;
     }
+
     $logger->debug("Finished submitting.");
     return wantarray ? @ids : \@ids;
 }
@@ -1184,8 +1267,8 @@ sub _cmd_base_drmaa {
     my $output = $cmd->output();
     my $error_path = $cmd->error();
     if (defined($output) || defined($error_path)) {
-        $output =~ s/\$\(Index\)/\$drmaa_incr_ph\$/g;
-        $error_path =~ s/\$\(Index\)/\$drmaa_incr_ph\$/g;
+        $output =~ s/\$\(Index\)/\$drmaa_incr_ph\$/g if defined($output);
+        $error_path =~ s/\$\(Index\)/\$drmaa_incr_ph\$/g if defined($error_path);
 
         $output ||= '/dev/null';
         $logger->debug("STDOUT will go to $output.");
@@ -1228,7 +1311,7 @@ sub _cmd_base_drmaa {
     my $email = $cmd->email();
     if ($email) {
         $logger->info("Setting DRM to not block emails.");
-        ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_BLOCK_EMAIL, 0);
+        ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_BLOCK_EMAIL, "0");
         _throw_drmaa("Unable to unblock emails.", $error, $diagnosis) if $error;
         $logger->info("Setting the job email.");
         ($error, $diagnosis) = drmaa_set_vector_attribute($jt, $DRMAA_V_EMAIL, [$email]);
@@ -1236,7 +1319,7 @@ sub _cmd_base_drmaa {
     }
  
     my @drm_methods = qw(account hosts opsys evictable priority memory
-                         length project class runtime);
+                         project class runtime);
     my @native_attrs;
     foreach my $method (@drm_methods) {
         my $val = $cmd->$method;
@@ -1275,7 +1358,7 @@ sub _submit_mw {
     $logger->debug("In _submit_mw.");
     my ($self, $jt, $cmd) = @_;
     unless (defined $jt && defined $cmd) {
-        Grid::Request::InvalidArgumentException->("Job template and/or command object are not defined.");
+        Grid::Request::InvalidArgumentException->throw("Job template and/or command object are not defined.");
     }
 
     $logger->debug("Setting the command executable.");
@@ -1337,8 +1420,7 @@ sub _submit_mw {
         $logger->debug("Invoking the code to determine the block size.");
         $block_size = $block_size_calculator->($cmd, $min_count); 
 
-
-        if ($block_size =~ /^-?\d+$/) {                                                                          
+        if (defined($block_size) && length($block_size) && $block_size =~ /^-?\d+$/) {                                                                          
             if ($block_size > 0) {                                                                              
                 $logger->debug("Invocation yielded a block size of $block_size.");
             } else {
@@ -1424,13 +1506,13 @@ sub _submit_htc {
     $logger->debug("In _submit_htc.");
     my ($self, $jt, $cmd) = @_;
     unless (defined $jt && defined $cmd) {
-        Grid::Request::InvalidArgumentException->(
+        Grid::Request::InvalidArgumentException->throw(
             "Job template and/or command object are not defined.");
     }
 
     my $exe = $cmd->command();
     unless (defined $exe) {
-        Grid::Request::InvalidArgumentException->("Command executable is not defined.");
+        Grid::Request::InvalidArgumentException->throw("Command executable is not defined.");
     }
     $logger->debug("Setting the command executable.");
     my ($error, $diagnosis) = drmaa_set_attribute($jt, $DRMAA_REMOTE_COMMAND, $exe);

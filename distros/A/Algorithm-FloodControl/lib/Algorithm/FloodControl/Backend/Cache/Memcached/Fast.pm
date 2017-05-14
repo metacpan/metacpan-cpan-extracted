@@ -6,8 +6,6 @@ use warnings;
 use Algorithm::FloodControl::Backend::Cache::Memcached;
 use base 'Algorithm::FloodControl::Backend::Cache::Memcached';
 
-our ($VERSION) = '$Revision: 2609 $' =~ m{ \$Revision: \s+ (\S+) }mx;
-
 1;
 
 __END__

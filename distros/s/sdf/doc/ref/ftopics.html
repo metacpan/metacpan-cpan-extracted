@@ -1,0 +1,179 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: topics Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="ftitle.html">Previous Topic</A> | <A HREF="fverbati.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.32. topics Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>topics</STRONG>[; parameters]
+  <EM>table</EM>
+  !endblock
+</PRE>
+<P>The parameters are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+intro
+</TD>
+<TD>
+string
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+noslide
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+data
+</TD>
+<TD>
+boolean
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>The table fields are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Field</STRONG>
+</TD>
+<TD>
+<STRONG>Category</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+Topic
+</TD>
+<TD>
+mandatory
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+Label
+</TD>
+<TD>
+optional
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+Level
+</TD>
+<TD>
+optional
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+Next
+</TD>
+<TD>
+optional
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+Prev
+</TD>
+<TD>
+optional
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+Up
+</TD>
+<TD>
+optional
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+</TABLE>
+
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>topics</EM> filter is used to include a set of sub-topics into a document. For <A HREF="http://www.adobe.com">PostScript</A>, this implies that the heading levels on topics included as sub-topics are adjusted accordingly. For <A HREF="http://www.w3.org/hypertext/WWW/MarkUp/">HTML</A> and Windows help files, this implies that hypertext jumps are inserted to the topics.</P>
+<P>This filter expects a table of data in <A HREF="../ref/fmt_tbl.html">TBL</A> format. The only field typically provided is <EM>Topic</EM> - the name of the file containing the topic, excluding the <EM>.sdf</EM> extension. The other fields are used by SDF internally during the generation of HTML topics.</P>
+<P>The <EM>intro</EM> parameter can be used to specify SDF text to be output before the hypertext jumps. This text is not output for formats where the topics are simply included, e.g. PostScript.</P>
+<P>The <EM>noslide</EM> parameter stops the heading levels of the topics being slid down.</P>
+<P>The <EM>data</EM> parameter is used to specify that the table is topics data and no output should be generated. This parameter is used by SDF internally during the generation of HTML topics.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<PRE>
+
+The subroutines are documented below.
+
+<B>!block</B> topics; intro=<TT>'H2: Subroutines'</TT>
+Topic
+mysub1
+mysub2
+<B>!endblock</B>
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="ftitle.html">Previous Topic</A> | <A HREF="fverbati.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

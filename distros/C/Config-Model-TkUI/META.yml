@@ -19,7 +19,7 @@ meta-spec:
 name: Config-Model-TkUI
 requires:
   Carp: '0'
-  Config::Model: '2.084'
+  Config::Model: '2.095'
   Config::Model::ObjTreeScanner: '0'
   Log::Log4perl: '1.11'
   Path::Tiny: '0'
@@ -53,5 +53,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-tk-ui/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-tk-ui.git
-version: '1.361'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.362'
+x_serialization_backend: 'YAML::Tiny version 1.70'

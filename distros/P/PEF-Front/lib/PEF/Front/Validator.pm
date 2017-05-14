@@ -618,6 +618,8 @@ sub _make_rules_parser {
 MRP
 		} elsif ($cmd eq 'answer') {
 			$sub_int .= "\t\$response->{answer} = " . make_value_parser($start->{$cmd}) . ";\n";
+		} elsif ($cmd eq 'status') {
+			$sub_int .= "\t\$http_response->status(" . make_value_parser($start->{$cmd}) . ");\n";
 		}
 	}
 	$sub_int .= "\t}";

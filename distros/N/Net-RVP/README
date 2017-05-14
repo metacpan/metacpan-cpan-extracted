@@ -1,0 +1,32 @@
+Net::RVP
+========
+
+The Net::RVP modules comprise an RVP (Rendez-Vous Protocol) client, usable with
+Microsoft Exchange instant messenger servers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+perl 5.6.0
+
+Event and the Event::IO bundle (Event::IO::Record, Event::IO::Server)
+libwww-perl (LWP::UserAgent, HTTP::Request, HTTP::Response, etc.) and URI
+Authen::NTLM (Mark Bush's version, not Yee Man Chan's; both are on CPAN) 
+XML::Simple, which will require a backend such as XML::Parser
+Digest::MD5
+Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+This module may be used under the same terms as Perl itself.
+
+Copyright (C) 2004 David B. Robins.
+

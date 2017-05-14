@@ -1,0 +1,107 @@
+=head1 NAME
+
+Perl::Tutorial::HelloWorld - Hello World for Perl
+
+=head1 SYNOPSIS
+
+  #!/usr/bin/perl
+  #
+  # The traditional first program.
+
+  # Strict and warnings are recommended.
+  use strict;
+  use warnings;
+
+  # Print a message.
+  print "Hello, World!\n";
+
+=head1 DESCRIPTION
+
+=head2 Running the program
+
+Open a text editor, and type in the above program.  Save it in a file
+named "hello".  Then open a terminal window.
+
+First ensure the file is given executable permissions:
+
+  chmod u+x hello
+
+Then you can run the program using either of the following:
+
+  ./hello
+  perl hello
+
+You should see it print "Hello, World!" to the console.
+
+=head2 The first line
+
+Every Perl program should start with a line similar to one of these:
+
+  #!/usr/bin/perl
+  #!/usr/bin/env perl
+
+or on Windows:
+
+  #!C:\Perl\bin\perl.exe
+  #!C:\strawberry\perl\bin\perl.exe
+
+The first line is known as the "shebang line", and is used by
+UNIX-like systems to look up the path to the Perl interpreter.
+
+=head2 Comments
+
+Comments in Perl always start with a '#' character:
+
+  # This is a single-line comment.
+
+  # This comment extends over two lines
+  # to illustrate multi-line comments.
+
+  print 'hello'; # And here is an inline comment.
+
+Anything to the right of a '#' will be ignored.
+
+=head2 Statements
+
+Statements always end with a semicolon in Perl:
+
+  print 'hello';
+
+  print 'This statement extends over two lines
+  because there is no semicolon on the first line.';
+
+It is possible to have more than one statement on a single line, but generally
+this would not be very readable.
+
+=head2 Strict and Warnings
+
+These two statements turn on the 'strict' and 'warnings' pragmas:
+
+  use strict;
+  use warnings;
+
+These are strongly encouraged for all Perl programs - they tell the Perl
+interpreter to check for programming errors like undeclared variables.
+
+=head2 Printing to standard output
+
+To print some output to the terminal, you can use the 'print' function:
+
+  print "Hello, World!\n";
+
+In this case, the double-quoted string "Hello, World!\n" is being printed.  You
+should see that the "\n" sequence does not appear on the console - it is used
+to mark the end of a line.  Double-quoted strings can contain various other
+escape sequences.
+
+=head1 SEE ALSO
+
+L<Perl::Tutorial>
+
+=head1 COPYRIGHT AND LICENSING
+
+Copyright (C) 2011 Copperly Ltd.
+
+This documentation is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

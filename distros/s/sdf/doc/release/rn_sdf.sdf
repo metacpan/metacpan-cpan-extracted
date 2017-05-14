@@ -1,0 +1,62 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 06-Mar-98 ianc    2.001beta1 release
+# 07-Oct-97 ianc    2.000 release
+# 18-Jul-97 ianc    2.000beta12 release
+# 08-Jul-97 ianc    2.000beta11 release
+# 19-Jun-97 ianc    2.000beta10 release
+# 03-Jun-97 ianc    2.000beta9a release
+# 01-May-97 ianc    2.000beta9 release
+# 08-Apr-97 ianc    2.000beta8a release
+# 02-Apr-97 ianc    2.000beta8 release
+# 19-Aug-96 ianc    2.000beta7c release
+# 29-Aug-96 ianc    2.000beta7b release
+# 13-Jun-96 ianc    2.000beta6c release
+# 03-Jun-96 ianc    2.000beta6a release
+# 23-May-96 ianc    2.000beta6 release
+# 26-Apr-96 ianc    2.000beta5 release
+# 23-Apr-96 ianc    2.000beta4c release
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+# Load the configuration
+!define SDF_ROOT "../"
+!inherit "sdf"
+
+# Define variables
+!define DOC_NAME    "SDF"
+!define DOC_TYPE    "Release Notes"
+!define DOC_AUTHOR  "Ian Clatworthy"
+!define DOC_TOC     1
+
+# Build the title page
+!build_title
+
+!include "2001b1.sdf"
+!include "2000.sdf"
+!include "2000b12.sdf"
+!include "2000b11.sdf"
+!include "2000b10.sdf"
+!include "2000b9a.sdf"
+!include "2000b9.sdf"
+!include "2000b8a.sdf"
+!include "2000b8.sdf"
+!include "2000b7c.sdf"
+!include "2000b7b.sdf"
+!include "2000b7a.sdf"
+!include "2000b7.sdf"
+!include "2000b6c.sdf"
+!include "2000b6b.sdf"
+!include "2000b6a.sdf"
+!include "2000b6.sdf"
+!include "2000b5.sdf"
+!include "2000b4c.sdf"
+!include "2000b4b.sdf"

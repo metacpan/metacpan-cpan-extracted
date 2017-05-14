@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    max    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="index,follow" />
+<meta name="date" content="2008-10-14T15:42:05-0700" />
+<meta name="keywords" content="stl,algorithm,max" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/stl/algorithm/max?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=stl:algorithm" />
+<link rel="edit" title="Edit this page" href="/wiki/stl/algorithm/max?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/stl/algorithm/max" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/stl/algorithm/max" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/stl/algorithm/max" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='stl:algorithm';var JSINFO = {"id":"stl:algorithm:max","namespace":"stl:algorithm"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../../start.html"  title="start">C++ Reference</a> &raquo; <a href="../../stl/start.html"  title="stl:start">C++ Standard Template Library</a> &raquo; <a href="../../stl/algorithm/start.html"  title="stl:algorithm:start">C++ Algorithms</a> &raquo; <a href="../../stl/algorithm/max.html"  title="stl:algorithm:max">max</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    
+
+
+<h2><a name="max" id="max">max</a></h2>
+<div class="level2">
+
+<p>
+Syntax:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    <span class="co2">#include &lt;algorithm&gt;</span>
+    <span class="kw4">const</span> TYPE<span class="sy0">&amp;</span> max<span class="br0">&#40;</span> <span class="kw4">const</span> TYPE<span class="sy0">&amp;</span> x<span class="sy0">,</span> <span class="kw4">const</span> TYPE<span class="sy0">&amp;</span> y <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw4">const</span> TYPE<span class="sy0">&amp;</span> max<span class="br0">&#40;</span> <span class="kw4">const</span> TYPE<span class="sy0">&amp;</span> x<span class="sy0">,</span> <span class="kw4">const</span> TYPE<span class="sy0">&amp;</span> y<span class="sy0">,</span> BinPred p <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+The max() function returns the greater of x and y.
+</p>
+
+<p>
+If the binary predicate p is given, then it will be used instead of the &lt;
+operator to compare the two elements.
+</p>
+
+<p>
+For example, the following code snippet displays various uses of the max()
+function:
+</p>
+<pre class="c code c++" style="font-family:monospace;">   <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Max of 1 and 9999 is &quot;</span> <span class="sy0">&lt;&lt;</span> max<span class="br0">&#40;</span> 1<span class="sy0">,</span> 9999<span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span>
+   <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Max of 'a' and 'b' is &quot;</span> <span class="sy0">&lt;&lt;</span> max<span class="br0">&#40;</span> <span class="st0">'a'</span><span class="sy0">,</span> <span class="st0">'b'</span><span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span>
+   <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Max of 3.14159 and 2.71828 is &quot;</span> <span class="sy0">&lt;&lt;</span> max<span class="br0">&#40;</span> 3.14159<span class="sy0">,</span> 2.71828<span class="br0">&#41;</span> <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span></pre>
+<p>
+When run, this code displays:
+</p>
+<pre class="code">
+   Max of 1 and 9999 is 9999
+   Max of 'a' and 'b' is b
+   Max of 3.14159 and 2.71828 is 3.14159</pre>
+<p>
+Related Topics: <a href="../../stl/algorithm/max_element.html" class="wikilink1" title="stl:algorithm:max_element">max_element</a>, <a href="../../stl/algorithm/min.html" class="wikilink1" title="stl:algorithm:min">min</a>, <a href="../../stl/algorithm/min_element.html" class="wikilink1" title="stl:algorithm:min_element">min_element</a>
+</p>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        stl/algorithm/max.txt &middot; Last modified: 10/14/2008 15:42 (external edit)      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

@@ -1,0 +1,12 @@
+%$
+\.(bak|old|o)$
+\bMakefile$
+\bother\b
+\blog$
+\bscreen
+\bConfig\b
+\bblib\b
+\bpty-4.0\b
+\bPtty\.c$
+AutoConf\.log
+\.bso?$

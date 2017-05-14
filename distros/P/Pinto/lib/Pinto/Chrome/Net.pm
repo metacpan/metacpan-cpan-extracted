@@ -8,11 +8,11 @@ use MooseX::MarkAsMethods ( autoclean => 1 );
 
 use Pinto::Types qw(Io);
 use Pinto::Util qw(itis);
-use Pinto::Constants qw(:protocol);
+use Pinto::Constants qw(:server);
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ sub diag {
     # Prepend prefix to each line (not just at the start of the message)
     # The prefix is used by Pinto::Remote to distinguish between
     # messages that go to stderr and those that should go to stdout
-    $msg =~ s/^/$PINTO_PROTOCOL_DIAG_PREFIX/gmx;
+    $msg =~ s/^/$PINTO_SERVER_DIAG_PREFIX/gmx;
 
     print { $self->stderr } $msg or croak $!;
 }
@@ -70,7 +70,7 @@ sub show_progress {
 
     $self->stderr->autoflush;    # Make sure pipes are hot
 
-    print { $self->stderr } $PINTO_PROTOCOL_PROGRESS_MESSAGE . "\n" or croak $!;
+    print { $self->stderr } $PINTO_SERVER_PROGRESS_MESSAGE . "\n" or croak $!;
 }
 
 #-----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ Pinto::Chrome::Net - Interface for network-based interaction
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -120,7 +120,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

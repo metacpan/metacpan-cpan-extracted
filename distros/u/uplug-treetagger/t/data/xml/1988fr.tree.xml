@@ -1,0 +1,3793 @@
+<?xml version="1.0" encoding="utf-8"?>
+<text>
+<p id="1">
+<s id="s1.1">
+ <w id="w1.1.1" pos="NOM">Declaration</w> 
+ <w lem="de" id="w1.1.2" pos="PRP">de</w> 
+ <w lem="politique" id="w1.1.3" pos="NOM">Politique</w> 
+ <w lem="général" id="w1.1.4" pos="ADJ">Générale</w> 
+ <w lem="du" id="w1.1.5" pos="PRP:det">du</w> 
+ <w lem="gouvernement" id="w1.1.6" pos="NOM">Gouvernement</w> 
+ <w lem="présenter" id="w1.1.7" pos="VER:pper">présentée</w> 
+ <w lem="mardi" id="w1.1.8" pos="NOM">mardi</w> 
+ <w lem="@card@" id="w1.1.9" pos="NUM">4</w> 
+ <w lem="octobre" id="w1.1.10" pos="NOM">octobre</w> 
+ <w lem="@card@" id="w1.1.11" pos="NUM">1988</w> 
+ <w lem="devant" id="w1.1.12" pos="PRP">devant</w> 
+ <w lem="le" id="w1.1.13" pos="DET:ART">le</w> 
+ <w id="w1.1.14" pos="NOM">Riksdag</w> 
+ <w lem="par" id="w1.1.15" pos="PRP">par</w> 
+ <w lem="Monsieur" id="w1.1.16" pos="NAM">Monsieur</w> 
+ <w id="w1.1.17" pos="NAM">Ingvar</w> 
+ <w id="w1.1.18" pos="NAM">Carlsson</w>
+ <w lem="," id="w1.1.19" pos="PUN">,</w> 
+ <w lem="Premier" id="w1.1.20" pos="NAM">Premier</w> 
+ <w id="w1.1.21" pos="NAM">Ministre</w>
+ <w lem="." id="w1.1.22" pos="SENT">.</w>
+</s></p>
+
+<p id="2">
+<s id="s2.1">
+ <w lem="majesté" id="w2.1.1" pos="NOM">Majestés</w>
+ <w lem="," id="w2.1.2" pos="PUN">,</w> 
+ <w id="w2.1.3" pos="NAM">Altesses</w> 
+ <w id="w2.1.4" pos="NAM">Royales</w>
+ <w lem="," id="w2.1.5" pos="PUN">,</w> 
+ <w lem="Monsieur" id="w2.1.6" pos="NAM">Monsieur</w> 
+ <w lem="le" id="w2.1.7" pos="DET:ART">le</w> 
+ <w lem="Président" id="w2.1.8" pos="NOM">Président</w>
+ <w lem="," id="w2.1.9" pos="PUN">,</w> 
+ <w lem="Mesdames" id="w2.1.10" pos="NAM">Mesdames</w> 
+ <w lem="et" id="w2.1.11" pos="KON">et</w> 
+ <w id="w2.1.12" pos="NAM">Messieurs</w> 
+ <w lem="le" id="w2.1.13" pos="DET:ART">les</w> 
+ <w lem="député" id="w2.1.14" pos="NOM">députés</w>
+ <w lem="!" id="w2.1.15" pos="SENT">!</w>
+</s></p>
+
+<p id="3">
+<s id="s3.1">
+ <w lem="le" id="w3.1.1" pos="DET:ART">La</w> 
+ <w lem="politique" id="w3.1.2" pos="ADJ">politique</w> 
+ <w lem="suédois" id="w3.1.3" pos="NOM">suédoise</w> 
+ <w lem="de" id="w3.1.4" pos="PRP">de</w> 
+ <w lem="neutralité" id="w3.1.5" pos="NOM">neutralité</w> 
+ <w lem="revêtir" id="w3.1.6" pos="VER:pres">revêt</w> 
+ <w lem="un" id="w3.1.7" pos="DET:ART">une</w> 
+ <w lem="importance" id="w3.1.8" pos="NOM">importance</w> 
+ <w lem="capital" id="w3.1.9" pos="ADJ">capitale</w> 
+ <w lem="pour" id="w3.1.10" pos="PRP">pour</w> 
+ <w lem="le" id="w3.1.11" pos="DET:ART">la</w> 
+ <w lem="paix" id="w3.1.12" pos="NOM">paix</w> 
+ <w lem="et" id="w3.1.13" pos="KON">et</w> 
+ <w id="w3.1.14" pos="NOM">l</w>
+ <w lem="'" id="w3.1.15" pos="PUN">'</w> 
+ <w lem="indépendance" id="w3.1.16" pos="NOM">indépendance</w> 
+ <w lem="de" id="w3.1.17" pos="PRP">de</w> 
+ <w lem="notre" id="w3.1.18" pos="DET:POS">notre</w> 
+ <w lem="pays" id="w3.1.19" pos="NOM">pays</w>
+ <w lem="." id="w3.1.20" pos="SENT">.</w>
+</s> 
+ 
+<s id="s3.2">
+ <w lem="elle" id="w3.2.1" pos="PRO:PER">Elle</w> 
+ <w lem="contribuer" id="w3.2.2" pos="VER:pres">contribue</w> 
+ <w lem="également" id="w3.2.3" pos="ADV">également</w> 
+ <w lem="à" id="w3.2.4" pos="PRP">à</w> 
+ <w lem="le" id="w3.2.5" pos="DET:ART">la</w> 
+ <w lem="stabilité" id="w3.2.6" pos="NOM">stabilité</w> 
+ <w lem="et" id="w3.2.7" pos="KON">et</w> 
+ <w lem="à" id="w3.2.8" pos="PRP">à</w> 
+ <w lem="le" id="w3.2.9" pos="DET:ART">la</w> 
+ <w lem="détente" id="w3.2.10" pos="NOM">détente</w> 
+ <w lem="dans" id="w3.2.11" pos="PRP">dans</w> 
+ <w lem="notre" id="w3.2.12" pos="DET:POS">notre</w> 
+ <w lem="secteur" id="w3.2.13" pos="NOM">secteur</w> 
+ <w lem="du" id="w3.2.14" pos="PRP:det">du</w> 
+ <w lem="monde" id="w3.2.15" pos="NOM">monde</w>
+ <w lem="." id="w3.2.16" pos="SENT">.</w>
+</s> 
+ 
+<s id="s3.3">
+ <w lem="ce" id="w3.3.1" pos="PRO:DEM">Cette</w> 
+ <w lem="politique" id="w3.3.2" pos="NOM">politique</w> 
+ <w lem="recueillir" id="w3.3.3" pos="VER:pres">recueille</w> 
+ <w lem="un" id="w3.3.4" pos="DET:ART">une</w> 
+ <w lem="large" id="w3.3.5" pos="ADJ">large</w> 
+ <w lem="adhésion" id="w3.3.6" pos="NOM">adhésion</w> 
+ <w lem="populaire" id="w3.3.7" pos="ADJ">populaire</w>
+ <w lem="." id="w3.3.8" pos="SENT">.</w>
+</s> 
+ 
+<s id="s3.4">
+ <w lem="elle" id="w3.4.1" pos="PRO:PER">Elle</w> 
+ <w lem="être" id="w3.4.2" pos="VER:futu">sera</w> 
+ <w lem="poursuivre" id="w3.4.3" pos="VER:pper">poursuivie</w> 
+ <w lem="avec" id="w3.4.4" pos="PRP">avec</w> 
+ <w lem="énergie" id="w3.4.5" pos="NOM">énergie</w> 
+ <w lem="et" id="w3.4.6" pos="KON">et</w> 
+ <w lem="cohérence" id="w3.4.7" pos="NOM">cohérence</w>
+ <w lem="." id="w3.4.8" pos="SENT">.</w>
+</s></p>
+
+<p id="4">
+<s id="s4.1">
+ <w lem="le" id="w4.1.1" pos="DET:ART">La</w> 
+ <w lem="politique" id="w4.1.2" pos="NOM">politique</w> 
+ <w lem="de" id="w4.1.3" pos="PRP">de</w> 
+ <w lem="neutralité" id="w4.1.4" pos="NOM">neutralité</w> 
+ <w id="w4.1.5" pos="ADJ">s</w>
+ <w lem="'" id="w4.1.6" pos="PUN">'</w> 
+ <w lem="appuyer" id="w4.1.7" pos="VER:pres">appuie</w> 
+ <w lem="sur" id="w4.1.8" pos="PRP">sur</w> 
+ <w lem="un" id="w4.1.9" pos="DET:ART">une</w> 
+ <w lem="défense" id="w4.1.10" pos="NOM">défense</w> 
+ <w lem="fort" id="w4.1.11" pos="ADJ">forte</w> 
+ <w lem="pour" id="w4.1.12" pos="PRP">pour</w> 
+ <w lem="le" id="w4.1.13" pos="DET:ART">la</w> 
+ <w lem="sauvegarde" id="w4.1.14" pos="NOM">sauvegarde</w> 
+ <w lem="de" id="w4.1.15" pos="PRP">de</w> 
+ <w lem="notre" id="w4.1.16" pos="DET:POS">notre</w> 
+ <w lem="indépendance" id="w4.1.17" pos="NOM">indépendance</w>
+ <w lem="." id="w4.1.18" pos="SENT">.</w>
+</s> 
+ 
+<s id="s4.2">
+ <w lem="il" id="w4.2.1" pos="PRO:PER">Il</w> 
+ <w lem="ne" id="w4.2.2" pos="ADV">ne</w> 
+ <w lem="être" id="w4.2.3" pos="VER:futu">sera</w> 
+ <w lem="jamais" id="w4.2.4" pos="ADV">jamais</w> 
+ <w lem="tolérer" id="w4.2.5" pos="VER:pper">toléré</w> 
+ <w lem="de" id="w4.2.6" pos="PRP">de</w> 
+ <w lem="violation" id="w4.2.7" pos="NOM">violations</w> 
+ <w lem="du" id="w4.2.8" pos="PRP:det">du</w> 
+ <w lem="territoire" id="w4.2.9" pos="NOM">territoire</w> 
+ <w lem="suédois" id="w4.2.10" pos="ADJ">suédois</w>
+ <w lem="." id="w4.2.11" pos="SENT">.</w>
+</s> 
+ 
+<s id="s4.3">
+ <w lem="L" id="w4.3.1" pos="NUM">L</w>
+ <w lem="'" id="w4.3.2" pos="PUN">'</w> 
+ <w lem="armer" id="w4.3.3" pos="VER:pper">armée</w> 
+ <w lem="aller" id="w4.3.4" pos="VER:pres">va</w> 
+ <w lem="être" id="w4.3.5" pos="VER:infi">être</w> 
+ <w lem="réformer" id="w4.3.6" pos="VER:pper">réformée</w> 
+ <w lem="et" id="w4.3.7" pos="KON">et</w> 
+ <w lem="rendre" id="w4.3.8" pos="VER:pper">rendue</w> 
+ <w lem="plus" id="w4.3.9" pos="ADV">plus</w> 
+ <w lem="efficace" id="w4.3.10" pos="ADJ">efficace</w>
+ <w lem="." id="w4.3.11" pos="SENT">.</w>
+</s> 
+ 
+<s id="s4.4">
+ <w lem="le" id="w4.4.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w4.4.2" pos="NOM">Gouvernement</w> 
+ <w lem="avoir" id="w4.4.3" pos="VER:pres">a</w> 
+ <w lem="le" id="w4.4.4" pos="DET:ART">la</w> 
+ <w lem="ferme" id="w4.4.5" pos="ADJ">ferme</w> 
+ <w lem="résolution" id="w4.4.6" pos="NOM">résolution</w> 
+ <w lem="de" id="w4.4.7" pos="PRP">de</w> 
+ <w lem="rechercher" id="w4.4.8" pos="VER:infi">rechercher</w> 
+ <w lem="du" id="w4.4.9" pos="PRP:det">des</w> 
+ <w lem="solution" id="w4.4.10" pos="NOM">solutions</w> 
+ <w lem="de" id="w4.4.11" pos="PRP">de</w> 
+ <w lem="large" id="w4.4.12" pos="ADJ">large</w> 
+ <w lem="consensus" id="w4.4.13" pos="NOM">consensus</w> 
+ <w lem="sur" id="w4.4.14" pos="PRP">sur</w> 
+ <w lem="le" id="w4.4.15" pos="DET:ART">les</w> 
+ <w lem="question" id="w4.4.16" pos="NOM">questions</w> 
+ <w lem="important" id="w4.4.17" pos="ADJ">importantes</w> 
+ <w lem="pour" id="w4.4.18" pos="PRP">pour</w> 
+ <w lem="notre" id="w4.4.19" pos="DET:POS">notre</w> 
+ <w lem="sécurité" id="w4.4.20" pos="NOM">sécurité</w> 
+ <w lem="national" id="w4.4.21" pos="ADJ">nationale</w>
+ <w lem="." id="w4.4.22" pos="SENT">.</w>
+</s></p>
+
+<p id="5">
+<s id="s5.1">
+ <w lem="le" id="w5.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w5.1.2" pos="NOM">Gouvernement</w> 
+ <w id="w5.1.3" pos="ADJ">s</w>
+ <w lem="'" id="w5.1.4" pos="PUN">'</w> 
+ <w lem="être" id="w5.1.5" pos="VER:pres">est</w> 
+ <w lem="féliciter" id="w5.1.6" pos="VER:pper">félicité</w> 
+ <w lem="de" id="w5.1.7" pos="PRP">de</w> 
+ <w id="w5.1.8" pos="NOM">l</w>
+ <w lem="'" id="w5.1.9" pos="PUN">'</w> 
+ <w lem="accord" id="w5.1.10" pos="NOM">accord</w> 
+ <w lem="conclure" id="w5.1.11" pos="VER:pper">conclu</w> 
+ <w lem="entre" id="w5.1.12" pos="PRP">entre</w> 
+ <w lem="le" id="w5.1.13" pos="DET:ART">les</w> 
+ <w lem="Etats-Unis" id="w5.1.14" pos="NAM">Etats-Unis</w> 
+ <w lem="et" id="w5.1.15" pos="KON">et</w> 
+ <w id="w5.1.16" pos="VER:simp">l</w>
+ <w lem="'" id="w5.1.17" pos="PUN">'</w> 
+ <w lem="union" id="w5.1.18" pos="NOM">Union</w> 
+ <w lem="soviétique" id="w5.1.19" pos="ADJ">Soviétique</w> 
+ <w lem="sur" id="w5.1.20" pos="PRP">sur</w> 
+ <w id="w5.1.21" pos="NOM">l</w>
+ <w lem="'" id="w5.1.22" pos="PUN">'</w> 
+ <w lem="élimination" id="w5.1.23" pos="NOM">élimination</w> 
+ <w lem="du" id="w5.1.24" pos="PRP:det">des</w> 
+ <w lem="missile" id="w5.1.25" pos="NOM">missiles</w> 
+ <w lem="nucléaire" id="w5.1.26" pos="ADJ">nucléaires</w> 
+ <w lem="à" id="w5.1.27" pos="PRP">à</w> 
+ <w lem="portée" id="w5.1.28" pos="NOM">portée</w> 
+ <w lem="intermédiaire" id="w5.1.29" pos="ADJ">intermédiaire</w> 
+ <w lem="baser" id="w5.1.30" pos="VER:pper">basés</w> 
+ <w lem="au" id="w5.1.31" pos="PRP:det">au</w> 
+ <w lem="sol" id="w5.1.32" pos="NOM">sol</w>
+ <w lem="." id="w5.1.33" pos="SENT">.</w>
+</s> 
+ 
+<s id="s5.2">
+ <w lem="le" id="w5.2.1" pos="DET:ART">Les</w> 
+ <w lem="effort" id="w5.2.2" pos="NOM">efforts</w> 
+ <w lem="devoir" id="w5.2.3" pos="VER:pres">doivent</w> 
+ <w lem="maintenant" id="w5.2.4" pos="ADV">maintenant</w> 
+ <w lem="viser" id="w5.2.5" pos="VER:infi">viser</w> 
+ <w lem="notamment" id="w5.2.6" pos="ADV">notamment</w> 
+ <w lem="à" id="w5.2.7" pos="PRP">à</w> 
+ <w lem="réduire" id="w5.2.8" pos="VER:infi">réduire</w> 
+ <w lem="le" id="w5.2.9" pos="DET:ART">les</w> 
+ <w lem="armement" id="w5.2.10" pos="NOM">armements</w> 
+ <w lem="stratégique" id="w5.2.11" pos="ADJ">stratégiques</w> 
+ <w lem="et" id="w5.2.12" pos="KON">et</w> 
+ <w lem="à" id="w5.2.13" pos="PRP">à</w> 
+ <w lem="mettre" id="w5.2.14" pos="VER:infi">mettre</w> 
+ <w lem="au" id="w5.2.15" pos="PRP:det">au</w> 
+ <w lem="point" id="w5.2.16" pos="NOM">point</w> 
+ <w lem="un" id="w5.2.17" pos="DET:ART">un</w> 
+ <w lem="accord" id="w5.2.18" pos="NOM">accord</w> 
+ <w lem="sur" id="w5.2.19" pos="PRP">sur</w> 
+ <w id="w5.2.20" pos="NOM">l</w>
+ <w lem="'" id="w5.2.21" pos="PUN">'</w> 
+ <w lem="arrêt" id="w5.2.22" pos="NOM">arrêt</w> 
+ <w lem="complet" id="w5.2.23" pos="ADJ">complet</w> 
+ <w lem="du" id="w5.2.24" pos="PRP:det">des</w> 
+ <w lem="essai" id="w5.2.25" pos="NOM">essais</w> 
+ <w lem="nucléaire" id="w5.2.26" pos="ADJ">nucléaires</w>
+ <w lem="." id="w5.2.27" pos="SENT">.</w>
+</s> 
+ 
+<s id="s5.3">
+ <w lem="le" id="w5.3.1" pos="DET:ART">La</w> 
+ <w lem="Suède" id="w5.3.2" pos="NAM">Suède</w> 
+ <w lem="y" id="w5.3.3" pos="PRO:PER">y</w> 
+ <w lem="travailler" id="w5.3.4" pos="VER:pres">travaille</w>
+ <w lem="," id="w5.3.5" pos="PUN">,</w> 
+ <w lem="en" id="w5.3.6" pos="PRP">en</w> 
+ <w lem="particulier" id="w5.3.7" pos="NOM">particulier</w> 
+ <w lem="dans" id="w5.3.8" pos="PRP">dans</w> 
+ <w lem="le" id="w5.3.9" pos="DET:ART">le</w> 
+ <w lem="cadre" id="w5.3.10" pos="NOM">cadre</w> 
+ <w lem="de" id="w5.3.11" pos="PRP">de</w> 
+ <w id="w5.3.12" pos="NOM">l</w>
+ <w lem="'" id="w5.3.13" pos="PUN">'</w> 
+ <w lem="initiative" id="w5.3.14" pos="NOM">Initiative</w> 
+ <w lem="du" id="w5.3.15" pos="PRP:det">des</w> 
+ <w id="w5.3.16" pos="NAM">Six</w> 
+ <w id="w5.3.17" pos="NAM">Nations</w>
+ <w lem="." id="w5.3.18" pos="SENT">.</w>
+</s></p>
+
+<p id="6">
+<s id="s6.1">
+ <w lem="le" id="w6.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w6.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="continuer" id="w6.1.3" pos="VER:futu">continuera</w> 
+ <w lem="à" id="w6.1.4" pos="PRP">à</w> 
+ <w lem="uvrer" id="w6.1.5" pos="VER:infi">oeuvrer</w> 
+ <w lem="activement" id="w6.1.6" pos="ADV">activement</w> 
+ <w lem="pour" id="w6.1.7" pos="PRP">pour</w> 
+ <w lem="un" id="w6.1.8" pos="DET:ART">une</w> 
+ <w lem="zone" id="w6.1.9" pos="NOM">zone</w> 
+ <w lem="nordique" id="w6.1.10" pos="ADJ">nordique</w> 
+ <w lem="dénucléariser" id="w6.1.11" pos="VER:pper">dénucléarisée</w> 
+ <w lem="ainsi" id="w6.1.12" pos="ADV">ainsi</w> 
+ <w lem="que" id="w6.1.13" pos="KON">que</w> 
+ <w lem="pour" id="w6.1.14" pos="PRP">pour</w> 
+ <w lem="un" id="w6.1.15" pos="DET:ART">un</w> 
+ <w lem="couloir" id="w6.1.16" pos="NOM">couloir</w> 
+ <w lem="libre" id="w6.1.17" pos="ADJ">libre</w> 
+ <w id="w6.1.18" pos="VER:simp">d</w>
+ <w lem="'" id="w6.1.19" pos="PUN">'</w> 
+ <w lem="arme" id="w6.1.20" pos="NOM">armes</w> 
+ <w lem="nucléaire" id="w6.1.21" pos="ADJ">nucléaires</w> 
+ <w lem="tactique" id="w6.1.22" pos="ADJ">tactiques</w> 
+ <w lem="en" id="w6.1.23" pos="PRP">en</w> 
+ <w lem="Europe" id="w6.1.24" pos="NAM">Europe</w> 
+ <w lem="central" id="w6.1.25" pos="ADJ">centrale</w>
+ <w lem="." id="w6.1.26" pos="SENT">.</w>
+</s></p>
+
+<p id="7">
+<s id="s7.1">
+ <w lem="par" id="w7.1.1" pos="PRP">Par</w> 
+ <w lem="son" id="w7.1.2" pos="DET:POS">son</w> 
+ <w lem="soutien" id="w7.1.3" pos="NOM">soutien</w> 
+ <w lem="au" id="w7.1.4" pos="PRP:det">au</w> 
+ <w lem="développement" id="w7.1.5" pos="NOM">développement</w> 
+ <w lem="économique" id="w7.1.6" pos="ADJ">économique</w> 
+ <w lem="et" id="w7.1.7" pos="KON">et</w> 
+ <w lem="social" id="w7.1.8" pos="ADJ">social</w> 
+ <w lem="du" id="w7.1.9" pos="PRP:det">des</w> 
+ <w id="w7.1.10" pos="NAM">PVD</w>
+ <w lem="," id="w7.1.11" pos="PUN">,</w> 
+ <w lem="le" id="w7.1.12" pos="DET:ART">le</w> 
+ <w lem="gouvernement" id="w7.1.13" pos="NOM">Gouvernement</w> 
+ <w lem="entendre" id="w7.1.14" pos="VER:pres">entend</w> 
+ <w lem="contribuer" id="w7.1.15" pos="VER:infi">contribuer</w> 
+ <w lem="à" id="w7.1.16" pos="PRP">à</w> 
+ <w lem="enrayer|enrayer" id="w7.1.17" pos="VER:infi">enrayer</w> 
+ <w lem="le" id="w7.1.18" pos="DET:ART">la</w> 
+ <w lem="régression" id="w7.1.19" pos="NOM">régression</w> 
+ <w lem="dans" id="w7.1.20" pos="PRP">dans</w> 
+ <w lem="le" id="w7.1.21" pos="DET:ART">les</w> 
+ <w lem="pays" id="w7.1.22" pos="NOM">pays</w> 
+ <w lem="pauvre" id="w7.1.23" pos="ADJ">pauvres</w> 
+ <w lem="et" id="w7.1.24" pos="KON">et</w> 
+ <w lem="à" id="w7.1.25" pos="PRP">à</w> 
+ <w lem="atténuer" id="w7.1.26" pos="VER:infi">atténuer</w> 
+ <w lem="le" id="w7.1.27" pos="DET:ART">la</w> 
+ <w lem="crise" id="w7.1.28" pos="NOM">crise</w> 
+ <w lem="de" id="w7.1.29" pos="PRP">de</w> 
+ <w lem="le" id="w7.1.30" pos="DET:ART">la</w> 
+ <w lem="dette" id="w7.1.31" pos="NOM">dette</w>
+ <w lem="." id="w7.1.32" pos="SENT">.</w>
+</s> 
+ 
+<s id="s7.2">
+ <w lem="le" id="w7.2.1" pos="DET:ART">La</w> 
+ <w lem="coopération" id="w7.2.2" pos="NOM">coopération</w> 
+ <w lem="devoir" id="w7.2.3" pos="VER:pres">doit</w> 
+ <w lem="par" id="w7.2.4" pos="PRP">par</w> 
+ <w lem="ailleurs" id="w7.2.5" pos="ADV">ailleurs</w> 
+ <w lem="favoriser" id="w7.2.6" pos="VER:infi">favoriser</w> 
+ <w lem="un" id="w7.2.7" pos="DET:ART">une</w> 
+ <w lem="gestion" id="w7.2.8" pos="NOM">gestion</w> 
+ <w lem="prévoyant" id="w7.2.9" pos="ADJ">prévoyante</w> 
+ <w lem="du" id="w7.2.10" pos="PRP:det">des</w> 
+ <w lem="ressource" id="w7.2.11" pos="NOM">ressources</w> 
+ <w lem="naturel" id="w7.2.12" pos="ADJ">naturelles</w> 
+ <w lem="et" id="w7.2.13" pos="KON">et</w> 
+ <w lem="le" id="w7.2.14" pos="DET:ART">le</w> 
+ <w lem="souci" id="w7.2.15" pos="NOM">souci</w> 
+ <w lem="de" id="w7.2.16" pos="PRP">de</w> 
+ <w id="w7.2.17" pos="NOM">l</w>
+ <w lem="'" id="w7.2.18" pos="PUN">'</w> 
+ <w lem="environnement" id="w7.2.19" pos="NOM">environnement</w>
+ <w lem="." id="w7.2.20" pos="SENT">.</w>
+</s></p>
+
+<p id="8">
+<s id="s8.1">
+ <w lem="le" id="w8.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w8.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="uvrer" id="w8.1.3" pos="VER:futu">oeuvrera</w> 
+ <w lem="pour" id="w8.1.4" pos="PRP">pour</w> 
+ <w id="w8.1.5" pos="NOM">qu</w>
+ <w lem="'" id="w8.1.6" pos="PUN">'</w> 
+ <w lem="un" id="w8.1.7" pos="DET:ART">une</w> 
+ <w lem="conférence" id="w8.1.8" pos="NOM">conférence</w> 
+ <w lem="mondial" id="w8.1.9" pos="ADJ">mondiale</w> 
+ <w lem="du" id="w8.1.10" pos="PRP:det">des</w> 
+ <w lem="nation" id="w8.1.11" pos="NOM">Nations</w> 
+ <w lem="unir" id="w8.1.12" pos="VER:pper">Unies</w> 
+ <w lem="sur" id="w8.1.13" pos="PRP">sur</w> 
+ <w id="w8.1.14" pos="NOM">l</w>
+ <w lem="'" id="w8.1.15" pos="PUN">'</w> 
+ <w lem="environnement" id="w8.1.16" pos="NOM">environnement</w> 
+ <w lem="et" id="w8.1.17" pos="KON">et</w> 
+ <w lem="le" id="w8.1.18" pos="DET:ART">le</w> 
+ <w lem="développement" id="w8.1.19" pos="NOM">développement</w> 
+ <w lem="être" id="w8.1.20" pos="VER:subp">soit</w> 
+ <w lem="convoquer" id="w8.1.21" pos="VER:pper">convoquée</w> 
+ <w lem="en" id="w8.1.22" pos="PRP">en</w> 
+ <w lem="@ord@" id="w8.1.23" pos="NAM">1992.</w>
+</s></p>
+
+<p id="9">
+<s id="s9.1">
+ <w lem="en" id="w9.1.1" pos="PRP">En</w> 
+ <w lem="Amérique" id="w9.1.2" pos="NAM">Amérique</w> 
+ <w lem="central" id="w9.1.3" pos="ADJ">centrale</w>
+ <w lem="," id="w9.1.4" pos="PUN">,</w> 
+ <w lem="le" id="w9.1.5" pos="DET:ART">les</w> 
+ <w lem="cinq" id="w9.1.6" pos="NUM">cinq</w> 
+ <w lem="président" id="w9.1.7" pos="NOM">présidents</w> 
+ <w lem="avoir" id="w9.1.8" pos="VER:pres">ont</w> 
+ <w lem="signer" id="w9.1.9" pos="VER:pper">signé</w> 
+ <w lem="un" id="w9.1.10" pos="DET:ART">un</w> 
+ <w lem="plan" id="w9.1.11" pos="NOM">plan</w> 
+ <w lem="de" id="w9.1.12" pos="PRP">de</w> 
+ <w lem="paix" id="w9.1.13" pos="NOM">paix</w> 
+ <w lem="auquel" id="w9.1.14" pos="PRO:REL">auquel</w> 
+ <w lem="le" id="w9.1.15" pos="DET:ART">la</w> 
+ <w lem="Suède" id="w9.1.16" pos="NAM">Suède</w> 
+ <w lem="avoir" id="w9.1.17" pos="VER:pres">a</w> 
+ <w lem="accorder" id="w9.1.18" pos="VER:pper">accordé</w> 
+ <w lem="son" id="w9.1.19" pos="DET:POS">son</w> 
+ <w lem="soutien" id="w9.1.20" pos="NOM">soutien</w> 
+ <w lem="sans" id="w9.1.21" pos="PRP">sans</w> 
+ <w lem="réserve" id="w9.1.22" pos="NOM">réserve</w>
+ <w lem="." id="w9.1.23" pos="SENT">.</w>
+</s> 
+ 
+<s id="s9.2">
+ <w lem="du" id="w9.2.1" pos="PRP:det">Des</w> 
+ <w lem="pourparler" id="w9.2.2" pos="NOM">pourparlers</w> 
+ <w lem="se" id="w9.2.3" pos="PRO:PER">se</w> 
+ <w lem="tenir" id="w9.2.4" pos="VER:pres">tiennent</w> 
+ <w lem="sur" id="w9.2.5" pos="PRP">sur</w> 
+ <w lem="le" id="w9.2.6" pos="DET:ART">la</w> 
+ <w lem="paix" id="w9.2.7" pos="NOM">paix</w> 
+ <w lem="entre" id="w9.2.8" pos="PRP">entre</w> 
+ <w id="w9.2.9" pos="NOM">l</w>
+ <w lem="'" id="w9.2.10" pos="PUN">'</w> 
+ <w lem="Iran" id="w9.2.11" pos="NAM">Iran</w> 
+ <w lem="et" id="w9.2.12" pos="KON">et</w> 
+ <w id="w9.2.13" pos="VER:simp">l</w>
+ <w lem="'" id="w9.2.14" pos="PUN">'</w> 
+ <w id="w9.2.15" pos="NOM">Irak</w>
+ <w lem="." id="w9.2.16" pos="SENT">.</w>
+</s> 
+ 
+<s id="s9.3">
+ <w lem="le" id="w9.3.1" pos="DET:ART">Les</w> 
+ <w lem="troupe" id="w9.3.2" pos="NOM">troupes</w> 
+ <w lem="soviétique" id="w9.3.3" pos="ADJ">soviétiques</w> 
+ <w lem="être" id="w9.3.4" pos="VER:pres">sont</w> 
+ <w lem="en" id="w9.3.5" pos="PRP">en</w> 
+ <w lem="train" id="w9.3.6" pos="NOM">train</w> 
+ <w lem="de" id="w9.3.7" pos="PRP">de</w> 
+ <w lem="se" id="w9.3.8" pos="PRO:PER">se</w> 
+ <w lem="retirer" id="w9.3.9" pos="VER:infi">retirer</w> 
+ <w id="w9.3.10" pos="VER:pper">d</w>
+ <w lem="'" id="w9.3.11" pos="PUN">'</w> 
+ <w lem="Afghanistan" id="w9.3.12" pos="NAM">Afghanistan</w>
+ <w lem="." id="w9.3.13" pos="SENT">.</w>
+</s></p>
+
+<p id="10">
+<s id="s10.1">
+ <w lem="dans" id="w10.1.1" pos="PRP">Dans</w> 
+ <w lem="le" id="w10.1.2" pos="DET:ART">la</w> 
+ <w lem="plupart" id="w10.1.3" pos="NOM">plupart</w> 
+ <w lem="du" id="w10.1.4" pos="PRP:det">des</w> 
+ <w lem="conflit" id="w10.1.5" pos="NOM">conflits</w> 
+ <w lem="régional" id="w10.1.6" pos="ADJ">régionaux</w>
+ <w lem="," id="w10.1.7" pos="PUN">,</w> 
+ <w id="w10.1.8" pos="VER:pper">l</w>
+ <w lem="'" id="w10.1.9" pos="PUN">'</w> 
+ <w lem="organisation" id="w10.1.10" pos="NOM">Organisation</w> 
+ <w lem="du" id="w10.1.11" pos="PRP:det">des</w> 
+ <w id="w10.1.12" pos="NAM">Nations</w> 
+ <w id="w10.1.13" pos="NAM">Unies</w> 
+ <w lem="avoir" id="w10.1.14" pos="VER:pres">a</w> 
+ <w lem="pouvoir" id="w10.1.15" pos="VER:pper">pu</w> 
+ <w lem="apporter" id="w10.1.16" pos="VER:infi">apporter</w> 
+ <w lem="du" id="w10.1.17" pos="PRP:det">des</w> 
+ <w lem="contribution" id="w10.1.18" pos="NOM">contributions</w> 
+ <w lem="important" id="w10.1.19" pos="ADJ">importantes</w>
+ <w lem="." id="w10.1.20" pos="SENT">.</w>
+</s> 
+ 
+<s id="s10.2">
+ <w lem="le" id="w10.2.1" pos="DET:ART">La</w> 
+ <w lem="Suède" id="w10.2.2" pos="NAM">Suède</w> 
+ <w lem="participer" id="w10.2.3" pos="VER:pres">participe</w>
+ <w lem="," id="w10.2.4" pos="PUN">,</w> 
+ <w lem="entre" id="w10.2.5" pos="PRP">entre</w> 
+ <w lem="autre" id="w10.2.6" pos="ADJ">autres</w>
+ <w lem="," id="w10.2.7" pos="PUN">,</w> 
+ <w lem="au" id="w10.2.8" pos="PRP:det">aux</w> 
+ <w lem="groupe" id="w10.2.9" pos="NOM">groupes</w> 
+ <w id="w10.2.10" pos="ADJ">d</w>
+ <w lem="'" id="w10.2.11" pos="PUN">'</w> 
+ <w lem="observateur" id="w10.2.12" pos="NOM">observateurs</w> 
+ <w lem="de" id="w10.2.13" pos="PRP">de</w> 
+ <w id="w10.2.14" pos="NOM">l</w>
+ <w lem="'" id="w10.2.15" pos="PUN">'</w> 
+ <w lem="ONU" id="w10.2.16" pos="ABR">ONU</w> 
+ <w lem="en" id="w10.2.17" pos="PRP">en</w> 
+ <w lem="Afghanistan" id="w10.2.18" pos="NAM">Afghanistan</w> 
+ <w lem="et" id="w10.2.19" pos="KON">et</w> 
+ <w lem="en" id="w10.2.20" pos="PRP">en</w> 
+ <w id="w10.2.21" pos="NOM">Iran/</w>
+ <w id="w10.2.22" pos="NOM">Irak</w>
+ <w lem="." id="w10.2.23" pos="SENT">.</w>
+</s></p>
+
+<p id="11">
+<s id="s11.1">
+ <w lem="C" id="w11.1.1" pos="NUM">C</w>
+ <w lem="'" id="w11.1.2" pos="PUN">'</w> 
+ <w lem="être" id="w11.1.3" pos="VER:pres">est</w> 
+ <w lem="avec" id="w11.1.4" pos="PRP">avec</w> 
+ <w lem="joie" id="w11.1.5" pos="NOM">joie</w> 
+ <w lem="que" id="w11.1.6" pos="PRO:REL">que</w> 
+ <w lem="nous" id="w11.1.7" pos="PRO:PER">nous</w> 
+ <w lem="avoir" id="w11.1.8" pos="VER:pres">avons</w> 
+ <w lem="accueillir" id="w11.1.9" pos="VER:pper">accueilli</w> 
+ <w id="w11.1.10" pos="VER:pper">l</w>
+ <w lem="'" id="w11.1.11" pos="PUN">'</w> 
+ <w lem="annonce" id="w11.1.12" pos="NOM">annonce</w> 
+ <w lem="que" id="w11.1.13" pos="KON">que</w> 
+ <w lem="le" id="w11.1.14" pos="DET:ART">le</w> 
+ <w id="w11.1.15" pos="NAM">Prix</w> 
+ <w id="w11.1.16" pos="NAM">Nobel</w> 
+ <w lem="de" id="w11.1.17" pos="PRP">de</w> 
+ <w lem="le" id="w11.1.18" pos="DET:ART">la</w> 
+ <w lem="paix" id="w11.1.19" pos="NOM">Paix</w> 
+ <w lem="aller" id="w11.1.20" pos="VER:pres">va</w> 
+ <w lem="ce" id="w11.1.21" pos="PRO:DEM">cette</w> 
+ <w lem="année" id="w11.1.22" pos="NOM">année</w> 
+ <w lem="au" id="w11.1.23" pos="PRP:det">aux</w> 
+ <w lem="force|forces" id="w11.1.24" pos="NOM">forces</w> 
+ <w lem="de" id="w11.1.25" pos="PRP">de</w> 
+ <w lem="maintien" id="w11.1.26" pos="NOM">maintien</w> 
+ <w lem="de" id="w11.1.27" pos="PRP">de</w> 
+ <w lem="le" id="w11.1.28" pos="DET:ART">la</w> 
+ <w lem="paix" id="w11.1.29" pos="NOM">paix</w> 
+ <w lem="du" id="w11.1.30" pos="PRP:det">des</w> 
+ <w id="w11.1.31" pos="NAM">Nations</w> 
+ <w id="w11.1.32" pos="NAM">Unies</w>
+ <w lem="." id="w11.1.33" pos="SENT">.</w>
+</s> 
+ 
+<s id="s11.2">
+ <w lem="le" id="w11.2.1" pos="DET:ART">La</w> 
+ <w lem="Suède" id="w11.2.2" pos="NAM">Suède</w> 
+ <w lem="avoir" id="w11.2.3" pos="VER:pres">a</w> 
+ <w lem="participer" id="w11.2.4" pos="VER:pper">participé</w> 
+ <w lem="à" id="w11.2.5" pos="PRP">à</w> 
+ <w lem="pratiquement" id="w11.2.6" pos="ADV">pratiquement</w> 
+ <w lem="tout" id="w11.2.7" pos="PRO:IND">toutes</w> 
+ <w lem="le" id="w11.2.8" pos="DET:ART">les</w> 
+ <w lem="action" id="w11.2.9" pos="NOM">actions</w> 
+ <w lem="de" id="w11.2.10" pos="PRP">de</w> 
+ <w lem="ce" id="w11.2.11" pos="PRO:DEM">ce</w> 
+ <w lem="genre" id="w11.2.12" pos="NOM">genre</w> 
+ <w lem="de" id="w11.2.13" pos="PRP">de</w> 
+ <w id="w11.2.14" pos="NOM">l</w>
+ <w lem="'" id="w11.2.15" pos="PUN">'</w> 
+ <w lem="ONU" id="w11.2.16" pos="ABR">ONU</w>
+ <w lem="." id="w11.2.17" pos="SENT">.</w>
+</s> 
+ 
+<s id="s11.3">
+ <w lem="C" id="w11.3.1" pos="NUM">C</w>
+ <w lem="'" id="w11.3.2" pos="PUN">'</w> 
+ <w lem="être" id="w11.3.3" pos="VER:pres">est</w> 
+ <w lem="également" id="w11.3.4" pos="ADV">également</w> 
+ <w lem="un" id="w11.3.5" pos="DET:ART">un</w> 
+ <w lem="honneur" id="w11.3.6" pos="NOM">honneur</w> 
+ <w lem="pour" id="w11.3.7" pos="PRP">pour</w> 
+ <w lem="le" id="w11.3.8" pos="DET:ART">la</w> 
+ <w lem="Suède" id="w11.3.9" pos="NAM">Suède</w> 
+ <w lem="que" id="w11.3.10" pos="KON">que</w> 
+ <w lem="le" id="w11.3.11" pos="DET:ART">le</w> 
+ <w lem="secrétaire" id="w11.3.12" pos="NOM">Secrétaire</w> 
+ <w lem="général" id="w11.3.13" pos="ADJ">général</w>
+ <w lem="," id="w11.3.14" pos="PUN">,</w> 
+ <w lem="en" id="w11.3.15" pos="PRP">en</w> 
+ <w lem="concertation" id="w11.3.16" pos="NOM">concertation</w> 
+ <w lem="avec" id="w11.3.17" pos="PRP">avec</w> 
+ <w lem="le" id="w11.3.18" pos="DET:ART">les</w> 
+ <w lem="partie" id="w11.3.19" pos="NOM">parties</w>
+ <w lem="," id="w11.3.20" pos="PUN">,</w> 
+ <w lem="avoir" id="w11.3.21" pos="VER:subp">ait</w> 
+ <w lem="désigner" id="w11.3.22" pos="VER:pper">désigné</w> 
+ <w lem="notre" id="w11.3.23" pos="DET:POS">notre</w> 
+ <w lem="ambassadeur" id="w11.3.24" pos="NOM">ambassadeur</w> 
+ <w lem="auprès" id="w11.3.25" pos="ADV">auprès</w> 
+ <w lem="du" id="w11.3.26" pos="PRP:det">des</w> 
+ <w id="w11.3.27" pos="NAM">Nations</w> 
+ <w id="w11.3.28" pos="NAM">Unies</w> 
+ <w lem="comme" id="w11.3.29" pos="KON">comme</w> 
+ <w lem="son" id="w11.3.30" pos="DET:POS">son</w> 
+ <w lem="représentant" id="w11.3.31" pos="NOM">représentant</w> 
+ <w lem="personnel" id="w11.3.32" pos="ADJ">personnel</w> 
+ <w lem="dans" id="w11.3.33" pos="PRP">dans</w> 
+ <w lem="le" id="w11.3.34" pos="DET:ART">les</w> 
+ <w lem="pourparler" id="w11.3.35" pos="NOM">pourparlers</w> 
+ <w lem="de" id="w11.3.36" pos="PRP">de</w> 
+ <w lem="paix" id="w11.3.37" pos="NOM">paix</w> 
+ <w lem="entre" id="w11.3.38" pos="PRP">entre</w> 
+ <w id="w11.3.39" pos="NOM">l</w>
+ <w lem="'" id="w11.3.40" pos="PUN">'</w> 
+ <w lem="Iran" id="w11.3.41" pos="NAM">Iran</w> 
+ <w lem="et" id="w11.3.42" pos="KON">et</w> 
+ <w id="w11.3.43" pos="VER:simp">l</w>
+ <w lem="'" id="w11.3.44" pos="PUN">'</w> 
+ <w id="w11.3.45" pos="NOM">Irak</w>
+ <w lem="." id="w11.3.46" pos="SENT">.</w>
+</s></p>
+
+<p id="12">
+<s id="s12.1">
+ <w lem="le" id="w12.1.1" pos="DET:ART">Le</w> 
+ <w lem="système" id="w12.1.2" pos="NOM">système</w> 
+ <w lem="dégrader" id="w12.1.3" pos="VER:ppre">dégradant</w> 
+ <w lem="de" id="w12.1.4" pos="PRP">de</w> 
+ <w id="w12.1.5" pos="NOM">l</w>
+ <w lem="'" id="w12.1.6" pos="PUN">'</w> 
+ <w lem="apartheid" id="w12.1.7" pos="NOM">apartheid</w> 
+ <w lem="en" id="w12.1.8" pos="PRP">en</w> 
+ <w lem="Afrique" id="w12.1.9" pos="NAM">Afrique</w> 
+ <w lem="du" id="w12.1.10" pos="PRP:det">du</w> 
+ <w lem="Sud" id="w12.1.11" pos="NOM">Sud</w> 
+ <w lem="devoir" id="w12.1.12" pos="VER:pres">doit</w> 
+ <w lem="être" id="w12.1.13" pos="VER:infi">être</w> 
+ <w lem="abolir" id="w12.1.14" pos="VER:pper">aboli</w>
+ <w lem="." id="w12.1.15" pos="SENT">.</w>
+</s> 
+ 
+<s id="s12.2">
+ <w lem="un" id="w12.2.1" pos="DET:ART">Une</w> 
+ <w lem="décision" id="w12.2.2" pos="NOM">décision</w> 
+ <w lem="du" id="w12.2.3" pos="PRP:det">du</w> 
+ <w id="w12.2.4" pos="NAM">Conseil</w> 
+ <w lem="de" id="w12.2.5" pos="PRP">de</w> 
+ <w lem="sécurité" id="w12.2.6" pos="NOM">sécurité</w> 
+ <w lem="de" id="w12.2.7" pos="PRP">de</w> 
+ <w id="w12.2.8" pos="NOM">l</w>
+ <w lem="'" id="w12.2.9" pos="PUN">'</w> 
+ <w lem="ONU" id="w12.2.10" pos="ABR">ONU</w> 
+ <w lem="sur" id="w12.2.11" pos="PRP">sur</w> 
+ <w lem="du" id="w12.2.12" pos="PRP:det">des</w> 
+ <w lem="sanction" id="w12.2.13" pos="NOM">sanctions</w> 
+ <w lem="obligatoire" id="w12.2.14" pos="ADJ">obligatoires</w> 
+ <w lem="contre" id="w12.2.15" pos="PRP">contre</w> 
+ <w id="w12.2.16" pos="NOM">l</w>
+ <w lem="'" id="w12.2.17" pos="PUN">'</w> 
+ <w lem="Afrique" id="w12.2.18" pos="NAM">Afrique</w> 
+ <w lem="du" id="w12.2.19" pos="PRP:det">du</w> 
+ <w lem="Sud" id="w12.2.20" pos="NOM">Sud</w> 
+ <w lem="être" id="w12.2.21" pos="VER:cond">serait</w> 
+ <w lem="le" id="w12.2.22" pos="DET:ART">la</w> 
+ <w lem="mesure" id="w12.2.23" pos="NOM">mesure</w> 
+ <w lem="le" id="w12.2.24" pos="DET:ART">la</w> 
+ <w lem="plus" id="w12.2.25" pos="ADV">plus</w> 
+ <w lem="efficace" id="w12.2.26" pos="ADJ">efficace</w> 
+ <w lem="à" id="w12.2.27" pos="PRP">à</w> 
+ <w lem="ce" id="w12.2.28" pos="PRO:DEM">cette</w> 
+ <w lem="fin" id="w12.2.29" pos="NOM">fin</w>
+ <w lem="." id="w12.2.30" pos="SENT">.</w>
+</s></p>
+
+<p id="13">
+<s id="s13.1">
+ <w lem="le" id="w13.1.1" pos="DET:ART">Le</w> 
+ <w lem="conflit" id="w13.1.2" pos="NOM">conflit</w> 
+ <w lem="du" id="w13.1.3" pos="PRP:det">du</w> 
+ <w id="w13.1.4" pos="NAM">Proche-Orient</w> 
+ <w lem="être" id="w13.1.5" pos="VER:pres">est</w> 
+ <w lem="parmi" id="w13.1.6" pos="PRP">parmi</w> 
+ <w lem="le" id="w13.1.7" pos="DET:ART">les</w> 
+ <w lem="plus" id="w13.1.8" pos="ADV">plus</w> 
+ <w lem="difficile" id="w13.1.9" pos="ADJ">difficiles</w> 
+ <w lem="à" id="w13.1.10" pos="PRP">à</w> 
+ <w lem="résoudre" id="w13.1.11" pos="VER:infi">résoudre</w> 
+ <w lem="de" id="w13.1.12" pos="PRP">de</w> 
+ <w lem="notre" id="w13.1.13" pos="DET:POS">notre</w> 
+ <w lem="époque" id="w13.1.14" pos="NOM">époque</w>
+ <w lem="." id="w13.1.15" pos="SENT">.</w>
+</s> 
+ 
+<s id="s13.2">
+ <w lem="le" id="w13.2.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w13.2.2" pos="NOM">Gouvernement</w> 
+ <w lem="soutenir" id="w13.2.3" pos="VER:pres">soutient</w> 
+ <w lem="activement" id="w13.2.4" pos="ADV">activement</w> 
+ <w lem="le" id="w13.2.5" pos="DET:ART">les</w> 
+ <w lem="effort" id="w13.2.6" pos="NOM">efforts</w> 
+ <w lem="afin" id="w13.2.7" pos="KON">afin</w> 
+ <w lem="de" id="w13.2.8" pos="PRP">de</w> 
+ <w lem="convoquer" id="w13.2.9" pos="VER:infi">convoquer</w> 
+ <w lem="un" id="w13.2.10" pos="DET:ART">une</w> 
+ <w lem="conférence" id="w13.2.11" pos="NOM">conférence</w> 
+ <w lem="international" id="w13.2.12" pos="ADJ">internationale</w> 
+ <w lem="de" id="w13.2.13" pos="PRP">de</w> 
+ <w lem="paix" id="w13.2.14" pos="NOM">paix</w> 
+ <w lem="sous" id="w13.2.15" pos="PRP">sous</w> 
+ <w id="w13.2.16" pos="NOM">l</w>
+ <w lem="'" id="w13.2.17" pos="PUN">'</w> 
+ <w lem="égide" id="w13.2.18" pos="NOM">égide</w> 
+ <w lem="de" id="w13.2.19" pos="PRP">de</w> 
+ <w id="w13.2.20" pos="NOM">l</w>
+ <w lem="'" id="w13.2.21" pos="PUN">'</w> 
+ <w lem="ONU" id="w13.2.22" pos="ABR">ONU</w>
+ <w lem="." id="w13.2.23" pos="SENT">.</w>
+</s></p>
+
+<p id="14">
+<s id="s14.1">
+ <w lem="notre" id="w14.1.1" pos="DET:POS">Notre</w> 
+ <w lem="pays" id="w14.1.2" pos="NOM">pays</w> 
+ <w lem="être" id="w14.1.3" pos="VER:pres">est</w> 
+ <w lem="tributaire" id="w14.1.4" pos="ADJ">tributaire</w> 
+ <w lem="de" id="w14.1.5" pos="PRP">de</w> 
+ <w lem="le" id="w14.1.6" pos="DET:ART">la</w> 
+ <w lem="liberté" id="w14.1.7" pos="NOM">liberté</w> 
+ <w lem="du" id="w14.1.8" pos="PRP:det">des</w> 
+ <w lem="échange" id="w14.1.9" pos="NOM">échanges</w> 
+ <w lem="commercial" id="w14.1.10" pos="ADJ">commerciaux</w> 
+ <w lem="entre" id="w14.1.11" pos="PRP">entre</w> 
+ <w lem="le" id="w14.1.12" pos="DET:ART">les</w> 
+ <w lem="nation" id="w14.1.13" pos="NOM">nations</w>
+ <w lem="." id="w14.1.14" pos="SENT">.</w>
+</s> 
+ 
+<s id="s14.2">
+ <w lem="nous" id="w14.2.1" pos="PRO:PER">Nous</w> 
+ <w lem="jouer" id="w14.2.2" pos="VER:pres">jouons</w> 
+ <w lem="un" id="w14.2.3" pos="DET:ART">un</w> 
+ <w lem="rôle" id="w14.2.4" pos="NOM">rôle</w> 
+ <w lem="moteur" id="w14.2.5" pos="ADJ">moteur</w> 
+ <w lem="dans" id="w14.2.6" pos="PRP">dans</w> 
+ <w lem="le" id="w14.2.7" pos="DET:ART">les</w> 
+ <w lem="pourparler" id="w14.2.8" pos="NOM">pourparlers</w> 
+ <w lem="en" id="w14.2.9" pos="PRP">en</w> 
+ <w lem="vue" id="w14.2.10" pos="NOM">vue</w> 
+ <w lem="de" id="w14.2.11" pos="PRP">de</w> 
+ <w lem="renforcer" id="w14.2.12" pos="VER:infi">renforcer</w> 
+ <w lem="le" id="w14.2.13" pos="DET:ART">le</w> 
+ <w lem="libre-échange" id="w14.2.14" pos="NOM">libre-échange</w> 
+ <w lem="qui" id="w14.2.15" pos="PRO:REL">qui</w> 
+ <w lem="se" id="w14.2.16" pos="PRO:PER">se</w> 
+ <w lem="dérouler" id="w14.2.17" pos="VER:pres">déroulent</w> 
+ <w lem="actuellement" id="w14.2.18" pos="ADV">actuellement</w>
+ <w lem="." id="w14.2.19" pos="SENT">.</w>
+</s></p>
+
+<p id="15">
+<s id="s15.1">
+ <w lem="le" id="w15.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w15.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="approfondir" id="w15.1.3" pos="VER:futu">approfondira</w>
+ <w lem="," id="w15.1.4" pos="PUN">,</w> 
+ <w lem="dans" id="w15.1.5" pos="PRP">dans</w> 
+ <w lem="le" id="w15.1.6" pos="DET:ART">le</w> 
+ <w lem="cadre" id="w15.1.7" pos="NOM">cadre</w> 
+ <w lem="de" id="w15.1.8" pos="PRP">de</w> 
+ <w id="w15.1.9" pos="NOM">l</w>
+ <w lem="'" id="w15.1.10" pos="PUN">'</w> 
+ <w lem="AELE" id="w15.1.11" pos="ABR">AELE</w> 
+ <w lem="et" id="w15.1.12" pos="KON">et</w> 
+ <w lem="en" id="w15.1.13" pos="PRP">en</w> 
+ <w lem="liaison" id="w15.1.14" pos="NOM">liaison</w> 
+ <w lem="avec" id="w15.1.15" pos="PRP">avec</w> 
+ <w lem="le" id="w15.1.16" pos="DET:ART">les</w> 
+ <w lem="autre" id="w15.1.17" pos="ADJ">autres</w> 
+ <w lem="pays" id="w15.1.18" pos="NOM">pays</w> 
+ <w lem="membre" id="w15.1.19" pos="NOM">membres</w>
+ <w lem="," id="w15.1.20" pos="PUN">,</w> 
+ <w lem="le" id="w15.1.21" pos="DET:ART">la</w> 
+ <w lem="coopération" id="w15.1.22" pos="NOM">coopération</w> 
+ <w lem="avec" id="w15.1.23" pos="PRP">avec</w> 
+ <w lem="le" id="w15.1.24" pos="DET:ART">la</w> 
+ <w lem="CE_" id="w15.1.25" pos="ABR">CE</w> 
+ <w lem="dans" id="w15.1.26" pos="PRP">dans</w> 
+ <w lem="tout" id="w15.1.27" pos="PRO:IND">tous</w> 
+ <w lem="le" id="w15.1.28" pos="DET:ART">le</w> 
+ <w lem="domaine" id="w15.1.29" pos="NOM">domaines</w>
+ <w lem="," id="w15.1.30" pos="PUN">,</w> 
+ <w lem="en" id="w15.1.31" pos="PRO:PER">en</w> 
+ <w lem="aller" id="w15.1.32" pos="VER:ppre">allant</w> 
+ <w lem="aussi" id="w15.1.33" pos="ADV">aussi</w> 
+ <w lem="loin" id="w15.1.34" pos="ADV">loin</w> 
+ <w lem="que" id="w15.1.35" pos="KON">que</w> 
+ <w lem="le" id="w15.1.36" pos="PRO:PER">le</w> 
+ <w lem="permettre" id="w15.1.37" pos="VER:pres">permet</w> 
+ <w lem="le" id="w15.1.38" pos="DET:ART">la</w> 
+ <w lem="politique" id="w15.1.39" pos="NOM">politique</w> 
+ <w lem="de" id="w15.1.40" pos="PRP">de</w> 
+ <w lem="neutralité" id="w15.1.41" pos="NOM">neutralité</w>
+ <w lem="." id="w15.1.42" pos="SENT">.</w>
+</s> 
+ 
+<s id="s15.2">
+ <w lem="le" id="w15.2.1" pos="DET:ART">La</w> 
+ <w lem="coopération" id="w15.2.2" pos="NOM">coopération</w> 
+ <w lem="nordique" id="w15.2.3" pos="ADJ">nordique</w> 
+ <w lem="être" id="w15.2.4" pos="VER:futu">sera</w> 
+ <w lem="également" id="w15.2.5" pos="ADV">également</w> 
+ <w lem="développer" id="w15.2.6" pos="VER:pper">développée</w>
+ <w lem="." id="w15.2.7" pos="SENT">.</w>
+</s> 
+ 
+<s id="s15.3">
+ <w lem="à" id="w15.3.1" pos="PRP">A</w> 
+ <w lem="ce" id="w15.3.2" pos="PRO:DEM">cet</w> 
+ <w lem="égard" id="w15.3.3" pos="NOM">égard</w>
+ <w lem="," id="w15.3.4" pos="PUN">,</w> 
+ <w lem="un" id="w15.3.5" pos="DET:ART">une</w> 
+ <w lem="place" id="w15.3.6" pos="NOM">place</w> 
+ <w lem="central" id="w15.3.7" pos="ADJ">centrale</w> 
+ <w lem="être" id="w15.3.8" pos="VER:futu">sera</w> 
+ <w lem="accorder" id="w15.3.9" pos="VER:pper">accordée</w> 
+ <w lem="au" id="w15.3.10" pos="PRP:det">aux</w> 
+ <w lem="exigence" id="w15.3.11" pos="NOM">exigences</w> 
+ <w lem="du" id="w15.3.12" pos="PRP:det">du</w> 
+ <w lem="plein" id="w15.3.13" pos="ADJ">plein</w> 
+ <w lem="emploi" id="w15.3.14" pos="NOM">emploi</w>
+ <w lem="," id="w15.3.15" pos="PUN">,</w> 
+ <w lem="du" id="w15.3.16" pos="PRP:det">du</w> 
+ <w lem="bien-être" id="w15.3.17" pos="NOM">bien-être</w>
+ <w lem="," id="w15.3.18" pos="PUN">,</w> 
+ <w id="w15.3.19" pos="VER:pper">d</w>
+ <w lem="'" id="w15.3.20" pos="PUN">'</w> 
+ <w lem="un" id="w15.3.21" pos="DET:ART">un</w> 
+ <w lem="environnement" id="w15.3.22" pos="NOM">environnement</w> 
+ <w lem="sain" id="w15.3.23" pos="ADJ">sain</w> 
+ <w lem="et" id="w15.3.24" pos="KON">et</w> 
+ <w lem="de" id="w15.3.25" pos="PRP">de</w> 
+ <w lem="le" id="w15.3.26" pos="DET:ART">la</w> 
+ <w lem="participation" id="w15.3.27" pos="NOM">participation</w> 
+ <w lem="syndical" id="w15.3.28" pos="ADJ">syndicale</w> 
+ <w lem="au" id="w15.3.29" pos="PRP:det">aux</w> 
+ <w lem="décision" id="w15.3.30" pos="NOM">décisions</w>
+ <w lem="." id="w15.3.31" pos="SENT">.</w>
+</s> 
+ 
+<s id="s15.4">
+ <w lem="le" id="w15.4.1" pos="DET:ART">Les</w> 
+ <w lem="possibilité" id="w15.4.2" pos="NOM">possibilités</w> 
+ <w id="w15.4.3" pos="ADJ">d</w>
+ <w lem="'" id="w15.4.4" pos="PUN">'</w> 
+ <w lem="étude" id="w15.4.5" pos="NOM">études</w>
+ <w lem="," id="w15.4.6" pos="PUN">,</w> 
+ <w lem="de" id="w15.4.7" pos="PRP">de</w> 
+ <w lem="travail" id="w15.4.8" pos="NOM">travail</w> 
+ <w lem="et" id="w15.4.9" pos="KON">et</w> 
+ <w id="w15.4.10" pos="NOM">d</w>
+ <w lem="'" id="w15.4.11" pos="PUN">'</w> 
+ <w lem="échange" id="w15.4.12" pos="NOM">échanges</w> 
+ <w lem="culturel" id="w15.4.13" pos="ADJ">culturels</w> 
+ <w lem="au" id="w15.4.14" pos="PRP:det">au</w> 
+ <w lem="delà" id="w15.4.15" pos="ADV">delà</w> 
+ <w lem="du" id="w15.4.16" pos="PRP:det">des</w> 
+ <w lem="frontière" id="w15.4.17" pos="NOM">frontières</w> 
+ <w lem="être" id="w15.4.18" pos="VER:futu">seront</w> 
+ <w lem="étendre" id="w15.4.19" pos="VER:pper">étendues</w>
+ <w lem="." id="w15.4.20" pos="SENT">.</w>
+</s></p>
+
+<p id="16">
+<s id="s16.1">
+ <w lem="le" id="w16.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w16.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="avoir" id="w16.1.3" pos="VER:pres">a</w> 
+ <w id="w16.1.4" pos="VER:pper">l</w>
+ <w lem="'" id="w16.1.5" pos="PUN">'</w> 
+ <w lem="intention" id="w16.1.6" pos="NOM">intention</w> 
+ <w lem="de" id="w16.1.7" pos="PRP">de</w> 
+ <w lem="consolider" id="w16.1.8" pos="VER:infi">consolider</w> 
+ <w lem="et" id="w16.1.9" pos="KON">et</w> 
+ <w lem="de" id="w16.1.10" pos="PRP">de</w> 
+ <w lem="renforcer" id="w16.1.11" pos="VER:infi">renforcer</w> 
+ <w lem="de" id="w16.1.12" pos="PRP">de</w> 
+ <w lem="plusieurs" id="w16.1.13" pos="PRO:IND">plusieurs</w> 
+ <w lem="manière" id="w16.1.14" pos="NOM">manières</w> 
+ <w id="w16.1.15" pos="ADJ">l</w>
+ <w lem="'" id="w16.1.16" pos="PUN">'</w> 
+ <w lem="Etat" id="w16.1.17" pos="NAM">Etat</w> 
+ <w lem="de" id="w16.1.18" pos="PRP">de</w> 
+ <w lem="droit" id="w16.1.19" pos="NOM">droit</w>
+ <w lem="." id="w16.1.20" pos="SENT">.</w>
+</s></p>
+
+<p id="17">
+<s id="s17.1">
+ <w lem="le" id="w17.1.1" pos="DET:ART">Les</w> 
+ <w lem="possibilité" id="w17.1.2" pos="NOM">possibilités</w> 
+ <w lem="pour" id="w17.1.3" pos="PRP">pour</w> 
+ <w lem="le" id="w17.1.4" pos="DET:ART">les</w> 
+ <w lem="tribunal" id="w17.1.5" pos="NOM">tribunaux</w> 
+ <w lem="et" id="w17.1.6" pos="KON">et</w> 
+ <w lem="le" id="w17.1.7" pos="DET:ART">les</w> 
+ <w lem="service" id="w17.1.8" pos="NOM">services</w> 
+ <w lem="du" id="w17.1.9" pos="PRP:det">du</w> 
+ <w lem="parquet" id="w17.1.10" pos="NOM">Parquet</w> 
+ <w lem="de" id="w17.1.11" pos="PRP">de</w> 
+ <w id="w17.1.12" pos="NOM">s</w>
+ <w lem="'" id="w17.1.13" pos="PUN">'</w> 
+ <w lem="acquitter" id="w17.1.14" pos="VER:infi">acquitter</w> 
+ <w lem="de" id="w17.1.15" pos="PRP">de</w> 
+ <w lem="leur" id="w17.1.16" pos="DET:POS">leurs</w> 
+ <w lem="important" id="w17.1.17" pos="ADJ">importantes</w> 
+ <w lem="tâche" id="w17.1.18" pos="NOM">tâches</w> 
+ <w lem="être" id="w17.1.19" pos="VER:futu">seront</w> 
+ <w lem="améliorer" id="w17.1.20" pos="VER:pper">améliorées</w>
+ <w lem="." id="w17.1.21" pos="SENT">.</w>
+</s></p>
+
+<p id="18">
+<s id="s18.1">
+ <w lem="le" id="w18.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w18.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="présenter" id="w18.1.3" pos="VER:futu">présentera</w> 
+ <w lem="du" id="w18.1.4" pos="PRP:det">des</w> 
+ <w lem="proposition" id="w18.1.5" pos="NOM">propositions</w> 
+ <w lem="de" id="w18.1.6" pos="PRP">de</w> 
+ <w lem="mesure" id="w18.1.7" pos="NOM">mesures</w> 
+ <w lem="pour" id="w18.1.8" pos="PRP">pour</w> 
+ <w lem="développer" id="w18.1.9" pos="VER:infi">développer</w> 
+ <w lem="et" id="w18.1.10" pos="KON">et</w> 
+ <w lem="rendre" id="w18.1.11" pos="VER:infi">rendre</w> 
+ <w lem="plus" id="w18.1.12" pos="ADV">plus</w> 
+ <w lem="efficace" id="w18.1.13" pos="ADJ">efficace</w> 
+ <w id="w18.1.14" pos="NOM">l</w>
+ <w lem="'" id="w18.1.15" pos="PUN">'</w> 
+ <w lem="activité" id="w18.1.16" pos="NOM">activité</w> 
+ <w lem="du" id="w18.1.17" pos="PRP:det">des</w> 
+ <w lem="service" id="w18.1.18" pos="NOM">services</w> 
+ <w lem="de" id="w18.1.19" pos="PRP">de</w> 
+ <w lem="police" id="w18.1.20" pos="NOM">police</w>
+ <w lem="." id="w18.1.21" pos="SENT">.</w>
+</s></p>
+
+<p id="19">
+<s id="s19.1">
+ <w lem="un" id="w19.1.1" pos="DET:ART">Un</w> 
+ <w lem="projet" id="w19.1.2" pos="NOM">projet</w> 
+ <w id="w19.1.3" pos="ADJ">d</w>
+ <w lem="'" id="w19.1.4" pos="PUN">'</w> 
+ <w lem="abaissement" id="w19.1.5" pos="NOM">abaissement</w> 
+ <w lem="du" id="w19.1.6" pos="PRP:det">du</w> 
+ <w lem="tau|taux" id="w19.1.7" pos="NOM">taux</w> 
+ <w lem="limite" id="w19.1.8" pos="NOM">limite</w> 
+ <w lem="pour" id="w19.1.9" pos="PRP">pour</w> 
+ <w lem="le" id="w19.1.10" pos="DET:ART">la</w> 
+ <w lem="conduite" id="w19.1.11" pos="NOM">conduite</w> 
+ <w lem="sous" id="w19.1.12" pos="PRP">sous</w> 
+ <w id="w19.1.13" pos="NOM">l</w>
+ <w lem="'" id="w19.1.14" pos="PUN">'</w> 
+ <w lem="empire" id="w19.1.15" pos="NOM">empire</w> 
+ <w id="w19.1.16" pos="ADJ">d</w>
+ <w lem="'" id="w19.1.17" pos="PUN">'</w> 
+ <w lem="un" id="w19.1.18" pos="DET:ART">un</w> 
+ <w lem="état" id="w19.1.19" pos="NOM">état</w> 
+ <w lem="alcoolique" id="w19.1.20" pos="ADJ">alcoolique</w> 
+ <w lem="être" id="w19.1.21" pos="VER:futu">sera</w> 
+ <w lem="présenter" id="w19.1.22" pos="VER:pper">présenté</w> 
+ <w lem="au" id="w19.1.23" pos="PRP:det">au</w> 
+ <w id="w19.1.24" pos="NOM">Riksdag</w>
+ <w lem="." id="w19.1.25" pos="SENT">.</w>
+</s></p>
+
+<p id="20">
+<s id="s20.1">
+ <w lem="L" id="w20.1.1" pos="NUM">L</w>
+ <w lem="'" id="w20.1.2" pos="PUN">'</w> 
+ <w lem="action" id="w20.1.3" pos="NOM">action</w> 
+ <w lem="local" id="w20.1.4" pos="ADJ">locale</w> 
+ <w lem="de" id="w20.1.5" pos="PRP">de</w> 
+ <w lem="prévention" id="w20.1.6" pos="NOM">prévention</w> 
+ <w lem="de" id="w20.1.7" pos="PRP">de</w> 
+ <w lem="le" id="w20.1.8" pos="DET:ART">la</w> 
+ <w lem="délinquance" id="w20.1.9" pos="NOM">délinquance</w> 
+ <w lem="être" id="w20.1.10" pos="VER:futu">sera</w> 
+ <w lem="encourager" id="w20.1.11" pos="VER:pper">encouragée</w>
+ <w lem="." id="w20.1.12" pos="SENT">.</w>
+</s> 
+ 
+<s id="s20.2">
+ <w lem="le" id="w20.2.1" pos="DET:ART">La</w> 
+ <w lem="lutte" id="w20.2.2" pos="NOM">lutte</w> 
+ <w lem="contre" id="w20.2.3" pos="PRP">contre</w> 
+ <w lem="le" id="w20.2.4" pos="DET:ART">la</w> 
+ <w lem="violence" id="w20.2.5" pos="NOM">violence</w> 
+ <w lem="et" id="w20.2.6" pos="KON">et</w> 
+ <w lem="celui" id="w20.2.7" pos="PRO:DEM">celle</w> 
+ <w lem="contre" id="w20.2.8" pos="PRP">contre</w> 
+ <w lem="le" id="w20.2.9" pos="DET:ART">la</w> 
+ <w lem="délinquance" id="w20.2.10" pos="NOM">délinquance</w> 
+ <w lem="économique" id="w20.2.11" pos="ADJ">économique</w> 
+ <w lem="recevoir" id="w20.2.12" pos="VER:futu">recevront</w> 
+ <w lem="le" id="w20.2.13" pos="DET:ART">la</w> 
+ <w lem="priorité" id="w20.2.14" pos="NOM">priorité</w>
+ <w lem="." id="w20.2.15" pos="SENT">.</w>
+</s></p>
+
+<p id="21">
+<s id="s21.1">
+ <w lem="le" id="w21.1.1" pos="DET:ART">Le</w> 
+ <w lem="traitement" id="w21.1.2" pos="NOM">traitement</w> 
+ <w lem="pénitentiaire" id="w21.1.3" pos="ADJ">pénitentiaire</w> 
+ <w lem="devoir" id="w21.1.4" pos="VER:pres">doit</w> 
+ <w lem="être" id="w21.1.5" pos="VER:infi">être</w> 
+ <w lem="conduire" id="w21.1.6" pos="VER:pper">conduit</w> 
+ <w lem="de" id="w21.1.7" pos="PRP">de</w> 
+ <w lem="manière" id="w21.1.8" pos="NOM">manière</w> 
+ <w lem="à" id="w21.1.9" pos="PRP">à</w> 
+ <w lem="empêcher" id="w21.1.10" pos="VER:infi">empêcher</w> 
+ <w lem="le" id="w21.1.11" pos="DET:ART">les</w> 
+ <w lem="évasion" id="w21.1.12" pos="NOM">évasions</w>
+ <w lem="." id="w21.1.13" pos="SENT">.</w>
+</s> 
+ 
+<s id="s21.2">
+ <w lem="dans" id="w21.2.1" pos="PRP">Dans</w> 
+ <w lem="le" id="w21.2.2" pos="DET:ART">le</w> 
+ <w lem="même" id="w21.2.3" pos="ADJ">même</w> 
+ <w lem="temps" id="w21.2.4" pos="NOM">temps</w>
+ <w lem="," id="w21.2.5" pos="PUN">,</w> 
+ <w lem="le" id="w21.2.6" pos="DET:ART">la</w> 
+ <w lem="période" id="w21.2.7" pos="NOM">période</w> 
+ <w lem="de" id="w21.2.8" pos="PRP">de</w> 
+ <w lem="détention" id="w21.2.9" pos="NOM">détention</w> 
+ <w lem="et" id="w21.2.10" pos="KON">et</w> 
+ <w lem="le" id="w21.2.11" pos="DET:ART">le</w> 
+ <w lem="traitement" id="w21.2.12" pos="NOM">traitement</w> 
+ <w lem="en" id="w21.2.13" pos="PRP">en</w> 
+ <w lem="milieu" id="w21.2.14" pos="NOM">milieu</w> 
+ <w lem="ouvrir" id="w21.2.15" pos="VER:pper">ouvert</w> 
+ <w lem="devoir" id="w21.2.16" pos="VER:pres">doivent</w> 
+ <w lem="faciliter" id="w21.2.17" pos="VER:infi">faciliter</w> 
+ <w lem="un" id="w21.2.18" pos="DET:ART">une</w> 
+ <w lem="réinsertion" id="w21.2.19" pos="NOM">réinsertion</w> 
+ <w lem="après" id="w21.2.20" pos="PRP">après</w> 
+ <w lem="le" id="w21.2.21" pos="DET:ART">la</w> 
+ <w lem="libération" id="w21.2.22" pos="NOM">libération</w>
+ <w lem="." id="w21.2.23" pos="SENT">.</w>
+</s></p>
+
+<p id="22">
+<s id="s22.1">
+ <w lem="L" id="w22.1.1" pos="NUM">L</w>
+ <w lem="'" id="w22.1.2" pos="PUN">'</w> 
+ <w lem="objectif" id="w22.1.3" pos="ADJ">objectif</w> 
+ <w lem="de" id="w22.1.4" pos="PRP">de</w> 
+ <w lem="le" id="w22.1.5" pos="DET:ART">la</w> 
+ <w lem="politique" id="w22.1.6" pos="NOM">politique</w> 
+ <w lem="économique" id="w22.1.7" pos="ADJ">économique</w> 
+ <w lem="être" id="w22.1.8" pos="VER:pres">est</w> 
+ <w lem="le" id="w22.1.9" pos="DET:ART">le</w> 
+ <w lem="plein" id="w22.1.10" pos="ADJ">plein</w> 
+ <w lem="emploi" id="w22.1.11" pos="NOM">emploi</w> 
+ <w lem="et" id="w22.1.12" pos="KON">et</w> 
+ <w lem="un" id="w22.1.13" pos="DET:ART">un</w> 
+ <w lem="bien-être" id="w22.1.14" pos="NOM">bien-être</w> 
+ <w lem="accroire" id="w22.1.15" pos="VER:pper">accru</w> 
+ <w lem="pour" id="w22.1.16" pos="PRP">pour</w> 
+ <w id="w22.1.17" pos="NOM">l</w>
+ <w lem="'" id="w22.1.18" pos="PUN">'</w> 
+ <w lem="ensemble" id="w22.1.19" pos="ADV">ensemble</w> 
+ <w lem="de" id="w22.1.20" pos="PRP">de</w> 
+ <w lem="le" id="w22.1.21" pos="DET:ART">la</w> 
+ <w lem="population" id="w22.1.22" pos="NOM">population</w>
+ <w lem="." id="w22.1.23" pos="SENT">.</w>
+</s></p>
+
+<p id="23">
+<s id="s23.1">
+ <w lem="le" id="w23.1.1" pos="DET:ART">Le</w> 
+ <w lem="tau|taux" id="w23.1.2" pos="NOM">taux</w> 
+ <w id="w23.1.3" pos="ADJ">d</w>
+ <w lem="'" id="w23.1.4" pos="PUN">'</w> 
+ <w lem="inflation" id="w23.1.5" pos="NOM">inflation</w> 
+ <w lem="trop" id="w23.1.6" pos="ADV">trop</w> 
+ <w lem="élever" id="w23.1.7" pos="VER:pper">élevé</w> 
+ <w lem="devoir" id="w23.1.8" pos="VER:pres">doit</w> 
+ <w lem="être" id="w23.1.9" pos="VER:infi">être</w> 
+ <w lem="réduire" id="w23.1.10" pos="VER:pper">réduit</w>
+ <w lem="." id="w23.1.11" pos="SENT">.</w>
+</s> 
+ 
+<s id="s23.2">
+ <w lem="C" id="w23.2.1" pos="NUM">C</w>
+ <w lem="'" id="w23.2.2" pos="PUN">'</w> 
+ <w lem="être" id="w23.2.3" pos="VER:pres">est</w> 
+ <w lem="pourquoi" id="w23.2.4" pos="ADV">pourquoi</w> 
+ <w lem="le" id="w23.2.5" pos="DET:ART">la</w> 
+ <w lem="politique" id="w23.2.6" pos="NOM">politique</w> 
+ <w lem="budgétaire" id="w23.2.7" pos="ADJ">budgétaire</w> 
+ <w lem="devoir" id="w23.2.8" pos="VER:pres">doit</w> 
+ <w lem="rester" id="w23.2.9" pos="VER:infi">rester</w> 
+ <w lem="rigoureux" id="w23.2.10" pos="ADJ">rigoureuse</w> 
+ <w lem="et" id="w23.2.11" pos="KON">et</w> 
+ <w lem="le" id="w23.2.12" pos="DET:ART">la</w> 
+ <w lem="solidité" id="w23.2.13" pos="NOM">solidité</w> 
+ <w lem="du" id="w23.2.14" pos="PRP:det">des</w> 
+ <w lem="finance" id="w23.2.15" pos="NOM">finances</w> 
+ <w lem="de" id="w23.2.16" pos="PRP">de</w> 
+ <w id="w23.2.17" pos="NOM">l</w>
+ <w lem="'" id="w23.2.18" pos="PUN">'</w> 
+ <w lem="Etat" id="w23.2.19" pos="NAM">Etat</w> 
+ <w lem="être" id="w23.2.20" pos="VER:infi">être</w> 
+ <w lem="préserver" id="w23.2.21" pos="VER:pper">préservée</w>
+ <w lem="." id="w23.2.22" pos="SENT">.</w>
+</s> 
+ 
+<s id="s23.3">
+ <w lem="du" id="w23.3.1" pos="PRP:det">Des</w> 
+ <w lem="réforme" id="w23.3.2" pos="NOM">réformes</w> 
+ <w lem="coûteux" id="w23.3.3" pos="ADJ">coûteuses</w> 
+ <w lem="ne" id="w23.3.4" pos="ADV">ne</w> 
+ <w lem="être" id="w23.3.5" pos="VER:futu">seront</w> 
+ <w lem="réaliser" id="w23.3.6" pos="VER:pper">réalisées</w> 
+ <w id="w23.3.7" pos="VER:pper">qu</w>
+ <w lem="'" id="w23.3.8" pos="PUN">'</w> 
+ <w lem="au" id="w23.3.9" pos="PRP:det">au</w> 
+ <w lem="fur" id="w23.3.10" pos="NOM">fur</w> 
+ <w lem="et" id="w23.3.11" pos="KON">et</w> 
+ <w lem="à" id="w23.3.12" pos="PRP">à</w> 
+ <w lem="mesure" id="w23.3.13" pos="NOM">mesure</w> 
+ <w id="w23.3.14" pos="ADJ">qu</w>
+ <w lem="'" id="w23.3.15" pos="PUN">'</w> 
+ <w lem="un" id="w23.3.16" pos="DET:ART">une</w> 
+ <w lem="marge" id="w23.3.17" pos="NOM">marge</w> 
+ <w lem="être" id="w23.3.18" pos="VER:futu">sera</w> 
+ <w lem="dégager" id="w23.3.19" pos="VER:pper">dégagée</w> 
+ <w lem="par" id="w23.3.20" pos="PRP">par</w> 
+ <w lem="le" id="w23.3.21" pos="DET:ART">la</w> 
+ <w lem="croissance" id="w23.3.22" pos="NOM">croissance</w> 
+ <w lem="économique" id="w23.3.23" pos="ADJ">économique</w>
+ <w lem="," id="w23.3.24" pos="PUN">,</w> 
+ <w lem="le" id="w23.3.25" pos="DET:ART">la</w> 
+ <w lem="révision" id="w23.3.26" pos="NOM">révision</w> 
+ <w lem="du" id="w23.3.27" pos="PRP:det">des</w> 
+ <w lem="programme" id="w23.3.28" pos="NOM">programmes</w> 
+ <w lem="de" id="w23.3.29" pos="PRP">de</w> 
+ <w lem="dépense" id="w23.3.30" pos="NOM">dépenses</w> 
+ <w lem="et" id="w23.3.31" pos="KON">et</w> 
+ <w lem="du" id="w23.3.32" pos="PRP:det">des</w> 
+ <w lem="rationalisation" id="w23.3.33" pos="NOM">rationalisations</w> 
+ <w lem="dans" id="w23.3.34" pos="PRP">dans</w> 
+ <w lem="le" id="w23.3.35" pos="DET:ART">le</w> 
+ <w lem="secteur" id="w23.3.36" pos="NOM">secteur</w> 
+ <w lem="public" id="w23.3.37" pos="ADJ">public</w>
+ <w lem="." id="w23.3.38" pos="SENT">.</w>
+</s></p>
+
+<p id="24">
+<s id="s24.1">
+ <w lem="le" id="w24.1.1" pos="DET:ART">La</w> 
+ <w lem="manque" id="w24.1.2" pos="NOM">manque</w> 
+ <w lem="de" id="w24.1.3" pos="PRP">de</w> 
+ <w lem="main" id="w24.1.4" pos="NOM">main</w> 
+ <w id="w24.1.5" pos="ADJ">d</w>
+ <w lem="'" id="w24.1.6" pos="PUN">'</w> 
+ <w lem="uvre" id="w24.1.7" pos="NOM">oeuvre</w> 
+ <w lem="et" id="w24.1.8" pos="KON">et</w> 
+ <w lem="le" id="w24.1.9" pos="DET:ART">la</w> 
+ <w lem="faiblesse" id="w24.1.10" pos="NOM">faiblesse</w> 
+ <w lem="de" id="w24.1.11" pos="PRP">de</w> 
+ <w id="w24.1.12" pos="NOM">l</w>
+ <w lem="'" id="w24.1.13" pos="PUN">'</w> 
+ <w lem="épargne" id="w24.1.14" pos="NOM">épargne</w> 
+ <w lem="freiner" id="w24.1.15" pos="VER:pres">freinent</w> 
+ <w lem="le" id="w24.1.16" pos="DET:ART">la</w> 
+ <w lem="croissance" id="w24.1.17" pos="NOM">croissance</w> 
+ <w lem="et" id="w24.1.18" pos="KON">et</w> 
+ <w lem="faire" id="w24.1.19" pos="VER:pres">font</w> 
+ <w lem="grimper" id="w24.1.20" pos="VER:infi">grimper</w> 
+ <w lem="le" id="w24.1.21" pos="DET:ART">les</w> 
+ <w lem="prix" id="w24.1.22" pos="NOM">prix</w> 
+ <w lem="et" id="w24.1.23" pos="KON">et</w> 
+ <w lem="le" id="w24.1.24" pos="DET:ART">les</w> 
+ <w lem="coût" id="w24.1.25" pos="NOM">coûts</w>
+ <w lem="." id="w24.1.26" pos="SENT">.</w>
+</s> 
+ 
+<s id="s24.2">
+ <w lem="aussi" id="w24.2.1" pos="ADV">Aussi</w> 
+ <w lem="du" id="w24.2.2" pos="PRP:det">des</w> 
+ <w lem="mesure" id="w24.2.3" pos="NOM">mesures</w> 
+ <w lem="particulier" id="w24.2.4" pos="ADJ">particulières</w> 
+ <w lem="être" id="w24.2.5" pos="VER:futu">seront</w>
+ <w lem="elle" id="w24.2.6" pos="PRO:PER">-elles</w> 
+ <w lem="appliquer" id="w24.2.7" pos="VER:pper">appliquées</w> 
+ <w lem="dans" id="w24.2.8" pos="PRP">dans</w> 
+ <w lem="le" id="w24.2.9" pos="DET:ART">le</w> 
+ <w lem="but" id="w24.2.10" pos="NOM">but</w> 
+ <w lem="de" id="w24.2.11" pos="PRP">de</w> 
+ <w lem="stimuler" id="w24.2.12" pos="VER:infi">stimuler</w> 
+ <w id="w24.2.13" pos="VER:pper">l</w>
+ <w lem="'" id="w24.2.14" pos="PUN">'</w> 
+ <w lem="épargne" id="w24.2.15" pos="NOM">épargne</w> 
+ <w lem="et" id="w24.2.16" pos="KON">et</w> 
+ <w lem="de" id="w24.2.17" pos="PRP">de</w> 
+ <w lem="mieux" id="w24.2.18" pos="ADV">mieux</w> 
+ <w lem="tirer" id="w24.2.19" pos="VER:infi">tirer</w> 
+ <w lem="partir" id="w24.2.20" pos="VER:pper">parti</w> 
+ <w lem="du" id="w24.2.21" pos="PRP:det">du</w> 
+ <w lem="désir" id="w24.2.22" pos="NOM">désir</w> 
+ <w lem="de" id="w24.2.23" pos="PRP">de</w> 
+ <w lem="travailler" id="w24.2.24" pos="VER:infi">travailler</w> 
+ <w lem="du" id="w24.2.25" pos="PRP:det">des</w> 
+ <w lem="gens" id="w24.2.26" pos="NOM">gens</w>
+ <w lem="." id="w24.2.27" pos="SENT">.</w>
+</s> 
+ 
+<s id="s24.3">
+ <w lem="du" id="w24.3.1" pos="PRP:det">Des</w> 
+ <w lem="proposition" id="w24.3.2" pos="NOM">propositions</w> 
+ <w lem="aller" id="w24.3.3" pos="VER:pres">vont</w> 
+ <w lem="être" id="w24.3.4" pos="VER:infi">être</w> 
+ <w lem="présenter" id="w24.3.5" pos="VER:pper">présentées</w> 
+ <w lem="viser" id="w24.3.6" pos="VER:ppre">visant</w> 
+ <w lem="à" id="w24.3.7" pos="PRP">à</w> 
+ <w lem="accroître" id="w24.3.8" pos="VER:infi">accroître</w> 
+ <w lem="le" id="w24.3.9" pos="DET:ART">la</w> 
+ <w lem="concurrence" id="w24.3.10" pos="NOM">concurrence</w> 
+ <w lem="et" id="w24.3.11" pos="KON">et</w> 
+ <w lem="à" id="w24.3.12" pos="PRP">à</w> 
+ <w lem="contenir" id="w24.3.13" pos="VER:infi">contenir</w> 
+ <w lem="le" id="w24.3.14" pos="DET:ART">les</w> 
+ <w lem="coût" id="w24.3.15" pos="NOM">coûts</w> 
+ <w lem="dans" id="w24.3.16" pos="PRP">dans</w> 
+ <w lem="le" id="w24.3.17" pos="DET:ART">les</w> 
+ <w lem="secteur" id="w24.3.18" pos="NOM">secteurs</w> 
+ <w lem="où" id="w24.3.19" pos="PRO:REL">où</w> 
+ <w id="w24.3.20" pos="VER:subi">l</w>
+ <w lem="'" id="w24.3.21" pos="PUN">'</w> 
+ <w lem="évolution" id="w24.3.22" pos="NOM">évolution</w> 
+ <w lem="du" id="w24.3.23" pos="PRP:det">des</w> 
+ <w lem="prix" id="w24.3.24" pos="NOM">prix</w> 
+ <w lem="alimenter" id="w24.3.25" pos="VER:pres">alimente</w> 
+ <w id="w24.3.26" pos="VER:pper">l</w>
+ <w lem="'" id="w24.3.27" pos="PUN">'</w> 
+ <w lem="inflation" id="w24.3.28" pos="NOM">inflation</w>
+ <w lem="." id="w24.3.29" pos="SENT">.</w>
+</s></p>
+
+<p id="25">
+<s id="s25.1">
+ <w lem="un" id="w25.1.1" pos="DET:ART">Un</w> 
+ <w lem="abaissement" id="w25.1.2" pos="NOM">abaissement</w> 
+ <w lem="du" id="w25.1.3" pos="PRP:det">du</w> 
+ <w lem="tau|taux" id="w25.1.4" pos="NOM">taux</w> 
+ <w lem="marginal" id="w25.1.5" pos="ADJ">marginal</w> 
+ <w lem="de" id="w25.1.6" pos="PRP">de</w> 
+ <w id="w25.1.7" pos="NOM">l</w>
+ <w lem="'" id="w25.1.8" pos="PUN">'</w> 
+ <w lem="impôt" id="w25.1.9" pos="NOM">impôt</w> 
+ <w lem="de" id="w25.1.10" pos="PRP">de</w> 
+ <w lem="@card@" id="w25.1.11" pos="NUM">3</w> 
+ <w lem="%" id="w25.1.12" pos="SYM">%</w> 
+ <w lem="en" id="w25.1.13" pos="PRP">en</w> 
+ <w lem="@card@" id="w25.1.14" pos="NUM">1989</w> 
+ <w lem="bénéficiant" id="w25.1.15" pos="ADJ">bénéficiant</w> 
+ <w lem="en" id="w25.1.16" pos="PRP">en</w> 
+ <w lem="premier" id="w25.1.17" pos="NUM">premier</w> 
+ <w lem="lieu" id="w25.1.18" pos="NOM">lieu</w> 
+ <w lem="à" id="w25.1.19" pos="PRP">à</w> 
+ <w lem="celui" id="w25.1.20" pos="PRO:DEM">ceux</w> 
+ <w lem="qui" id="w25.1.21" pos="PRO:REL">qui</w> 
+ <w lem="travailler" id="w25.1.22" pos="VER:pres">travaillent</w> 
+ <w lem="à" id="w25.1.23" pos="PRP">à</w> 
+ <w lem="plein" id="w25.1.24" pos="ADJ">plein</w> 
+ <w lem="temps" id="w25.1.25" pos="NOM">temps</w> 
+ <w lem="être" id="w25.1.26" pos="VER:futu">sera</w> 
+ <w lem="proposer" id="w25.1.27" pos="VER:pper">proposé</w>
+ <w lem="." id="w25.1.28" pos="SENT">.</w>
+</s></p>
+
+<p id="26">
+<s id="s26.1">
+ <w lem="dans" id="w26.1.1" pos="PRP">Dans</w> 
+ <w lem="le" id="w26.1.2" pos="DET:ART">le</w> 
+ <w lem="cour|cours" id="w26.1.3" pos="NOM">cours</w> 
+ <w lem="ultérieur" id="w26.1.4" pos="ADJ">ultérieur</w> 
+ <w lem="de" id="w26.1.5" pos="PRP">de</w> 
+ <w lem="le" id="w26.1.6" pos="DET:ART">la</w> 
+ <w lem="législature" id="w26.1.7" pos="NOM">législature</w>
+ <w lem="," id="w26.1.8" pos="PUN">,</w> 
+ <w lem="un" id="w26.1.9" pos="DET:ART">un</w> 
+ <w lem="projet" id="w26.1.10" pos="NOM">projet</w> 
+ <w lem="de" id="w26.1.11" pos="PRP">de</w> 
+ <w lem="vaste" id="w26.1.12" pos="ADJ">vaste</w> 
+ <w lem="refonte" id="w26.1.13" pos="NOM">refonte</w> 
+ <w lem="du" id="w26.1.14" pos="PRP:det">du</w> 
+ <w lem="système" id="w26.1.15" pos="NOM">système</w> 
+ <w lem="fiscal" id="w26.1.16" pos="ADJ">fiscal</w> 
+ <w lem="être" id="w26.1.17" pos="VER:futu">sera</w> 
+ <w lem="déposer" id="w26.1.18" pos="VER:pper">déposé</w>
+ <w lem="." id="w26.1.19" pos="SENT">.</w>
+</s> 
+ 
+<s id="s26.2">
+ <w lem="L" id="w26.2.1" pos="NUM">L</w>
+ <w lem="'" id="w26.2.2" pos="PUN">'</w> 
+ <w lem="objectif" id="w26.2.3" pos="ADJ">objectif</w> 
+ <w lem="être" id="w26.2.4" pos="VER:pres">est</w> 
+ <w lem="de" id="w26.2.5" pos="PRP">de</w> 
+ <w lem="stimuler" id="w26.2.6" pos="VER:infi">stimuler</w> 
+ <w lem="le" id="w26.2.7" pos="DET:ART">le</w> 
+ <w lem="travail" id="w26.2.8" pos="NOM">travail</w> 
+ <w lem="et" id="w26.2.9" pos="KON">et</w> 
+ <w id="w26.2.10" pos="NOM">l</w>
+ <w lem="'" id="w26.2.11" pos="PUN">'</w> 
+ <w lem="épargne" id="w26.2.12" pos="NOM">épargne</w>
+ <w lem="." id="w26.2.13" pos="SENT">.</w>
+</s> 
+ 
+<s id="s26.3">
+ <w lem="L" id="w26.3.1" pos="NUM">L</w>
+ <w lem="'" id="w26.3.2" pos="PUN">'</w> 
+ <w lem="impôt" id="w26.3.3" pos="NOM">impôt</w> 
+ <w id="w26.3.4" pos="ADJ">d</w>
+ <w lem="'" id="w26.3.5" pos="PUN">'</w> 
+ <w lem="Etat" id="w26.3.6" pos="NAM">Etat</w> 
+ <w lem="sur" id="w26.3.7" pos="PRP">sur</w> 
+ <w lem="le" id="w26.3.8" pos="DET:ART">le</w> 
+ <w lem="revenu" id="w26.3.9" pos="NOM">revenu</w> 
+ <w lem="être" id="w26.3.10" pos="VER:futu">sera</w> 
+ <w lem="diminuer" id="w26.3.11" pos="VER:pper">diminué</w> 
+ <w lem="et" id="w26.3.12" pos="KON">et</w> 
+ <w id="w26.3.13" pos="VER:subi">l</w>
+ <w lem="'" id="w26.3.14" pos="PUN">'</w> 
+ <w lem="imposition" id="w26.3.15" pos="NOM">imposition</w> 
+ <w lem="du" id="w26.3.16" pos="PRP:det">du</w> 
+ <w lem="capital" id="w26.3.17" pos="NOM">capital</w> 
+ <w lem="renforcer" id="w26.3.18" pos="VER:pper">renforcée</w>
+ <w lem="." id="w26.3.19" pos="SENT">.</w>
+</s> 
+ 
+<s id="s26.4">
+ <w lem="le" id="w26.4.1" pos="DET:ART">Le</w> 
+ <w lem="système" id="w26.4.2" pos="NOM">système</w> 
+ <w lem="fiscal" id="w26.4.3" pos="ADJ">fiscal</w> 
+ <w lem="être" id="w26.4.4" pos="VER:futu">sera</w> 
+ <w lem="simplifier" id="w26.4.5" pos="VER:pper">simplifié</w> 
+ <w lem="et" id="w26.4.6" pos="KON">et</w> 
+ <w id="w26.4.7" pos="VER:subi">l</w>
+ <w lem="'" id="w26.4.8" pos="PUN">'</w> 
+ <w lem="évasion" id="w26.4.9" pos="NOM">évasion</w> 
+ <w lem="fiscal" id="w26.4.10" pos="ADJ">fiscale</w> 
+ <w lem="combattre" id="w26.4.11" pos="VER:pper">combattue</w>
+ <w lem="." id="w26.4.12" pos="SENT">.</w>
+</s> 
+ 
+<s id="s26.5">
+ <w lem="le" id="w26.5.1" pos="DET:ART">La</w> 
+ <w lem="fiscalité" id="w26.5.2" pos="NOM">fiscalité</w> 
+ <w lem="du" id="w26.5.3" pos="PRP:det">des</w> 
+ <w lem="entreprise" id="w26.5.4" pos="NOM">entreprises</w> 
+ <w lem="être" id="w26.5.5" pos="VER:futu">sera</w> 
+ <w lem="réformer" id="w26.5.6" pos="VER:pper">réformée</w> 
+ <w lem="dans" id="w26.5.7" pos="PRP">dans</w> 
+ <w lem="le" id="w26.5.8" pos="DET:ART">le</w> 
+ <w lem="sen|sens" id="w26.5.9" pos="NOM">sens</w> 
+ <w lem="de" id="w26.5.10" pos="PRP">de</w> 
+ <w lem="tau|taux" id="w26.5.11" pos="NOM">taux</w> 
+ <w id="w26.5.12" pos="ADJ">d</w>
+ <w lem="'" id="w26.5.13" pos="PUN">'</w> 
+ <w lem="imposition" id="w26.5.14" pos="NOM">imposition</w> 
+ <w lem="plus" id="w26.5.15" pos="ADV">plus</w> 
+ <w lem="bas" id="w26.5.16" pos="ADJ">bas</w> 
+ <w lem="et" id="w26.5.17" pos="KON">et</w> 
+ <w lem="de" id="w26.5.18" pos="PRP">de</w> 
+ <w lem="base" id="w26.5.19" pos="NOM">bases</w> 
+ <w id="w26.5.20" pos="ADJ">d</w>
+ <w lem="'" id="w26.5.21" pos="PUN">'</w> 
+ <w lem="imposition" id="w26.5.22" pos="NOM">imposition</w> 
+ <w lem="plus" id="w26.5.23" pos="ADV">plus</w> 
+ <w lem="large" id="w26.5.24" pos="ADJ">larges</w>
+ <w lem="." id="w26.5.25" pos="SENT">.</w>
+</s> 
+ 
+<s id="s26.6">
+ <w lem="le" id="w26.6.1" pos="DET:ART">La</w> 
+ <w lem="fiscalité" id="w26.6.2" pos="NOM">fiscalité</w> 
+ <w lem="indirect" id="w26.6.3" pos="ADJ">indirecte</w> 
+ <w lem="être" id="w26.6.4" pos="VER:futu">sera</w> 
+ <w lem="elle" id="w26.6.5" pos="PRO:PER">elle</w> 
+ <w lem="aussi" id="w26.6.6" pos="ADV">aussi</w> 
+ <w lem="réformer" id="w26.6.7" pos="VER:pper">réformée</w>
+ <w lem="." id="w26.6.8" pos="SENT">.</w>
+</s></p>
+
+<p id="27">
+<s id="s27.1">
+ <w lem="afin" id="w27.1.1" pos="KON">Afin</w> 
+ <w id="w27.1.2" pos="VER:subi">d</w>
+ <w lem="'" id="w27.1.3" pos="PUN">'</w> 
+ <w lem="accroître" id="w27.1.4" pos="VER:infi">accroître</w> 
+ <w lem="encore" id="w27.1.5" pos="ADV">encore</w> 
+ <w id="w27.1.6" pos="VER:pper">l</w>
+ <w lem="'" id="w27.1.7" pos="PUN">'</w> 
+ <w lem="emploi" id="w27.1.8" pos="NOM">emploi</w> 
+ <w lem="et" id="w27.1.9" pos="KON">et</w> 
+ <w lem="de" id="w27.1.10" pos="PRP">de</w> 
+ <w lem="remédier" id="w27.1.11" pos="VER:infi">remédier</w> 
+ <w lem="au" id="w27.1.12" pos="PRP:det">au</w> 
+ <w lem="manque" id="w27.1.13" pos="NOM">manque</w> 
+ <w lem="de" id="w27.1.14" pos="PRP">de</w> 
+ <w lem="main" id="w27.1.15" pos="NOM">main</w> 
+ <w id="w27.1.16" pos="ADJ">d</w>
+ <w lem="'" id="w27.1.17" pos="PUN">'</w> 
+ <w lem="uvre" id="w27.1.18" pos="NOM">oeuvre</w>
+ <w lem="," id="w27.1.19" pos="PUN">,</w> 
+ <w lem="le" id="w27.1.20" pos="DET:ART">le</w> 
+ <w lem="gouvernement" id="w27.1.21" pos="NOM">Gouvernement</w> 
+ <w lem="développer" id="w27.1.22" pos="VER:futu">développera</w> 
+ <w lem="le" id="w27.1.23" pos="DET:ART">la</w> 
+ <w lem="politique" id="w27.1.24" pos="ADJ">politique</w> 
+ <w lem="active" id="w27.1.25" pos="NOM">active</w> 
+ <w lem="du" id="w27.1.26" pos="PRP:det">du</w> 
+ <w lem="marché" id="w27.1.27" pos="NOM">marché</w> 
+ <w lem="du" id="w27.1.28" pos="PRP:det">du</w> 
+ <w lem="travail" id="w27.1.29" pos="NOM">travail</w>
+ <w lem="." id="w27.1.30" pos="SENT">.</w>
+</s> 
+ 
+<s id="s27.2">
+ <w lem="le" id="w27.2.1" pos="DET:ART">La</w> 
+ <w lem="formation" id="w27.2.2" pos="NOM">formation</w> 
+ <w lem="continuer" id="w27.2.3" pos="VER:pres">continue</w> 
+ <w lem="dans" id="w27.2.4" pos="PRP">dans</w> 
+ <w lem="le" id="w27.2.5" pos="DET:ART">la</w> 
+ <w lem="vie" id="w27.2.6" pos="NOM">vie</w> 
+ <w lem="professionnel" id="w27.2.7" pos="ADJ">professionnelle</w> 
+ <w lem="et" id="w27.2.8" pos="KON">et</w> 
+ <w lem="le" id="w27.2.9" pos="DET:ART">le</w> 
+ <w lem="recyclage" id="w27.2.10" pos="NOM">recyclage</w> 
+ <w lem="élargir" id="w27.2.11" pos="VER:ppre">élargissant</w> 
+ <w lem="le" id="w27.2.12" pos="DET:ART">les</w> 
+ <w lem="compétence" id="w27.2.13" pos="NOM">compétences</w> 
+ <w lem="jouer" id="w27.2.14" pos="VER:pres">jouent</w> 
+ <w lem="sur" id="w27.2.15" pos="PRP">sur</w> 
+ <w lem="ce" id="w27.2.16" pos="PRO:DEM">ce</w> 
+ <w lem="plan" id="w27.2.17" pos="NOM">plan</w> 
+ <w lem="un" id="w27.2.18" pos="DET:ART">un</w> 
+ <w lem="rôle" id="w27.2.19" pos="NOM">rôle</w> 
+ <w lem="important" id="w27.2.20" pos="ADJ">important</w>
+ <w lem="." id="w27.2.21" pos="SENT">.</w>
+</s> 
+ 
+<s id="s27.3">
+ <w lem="le" id="w27.3.1" pos="DET:ART">Les</w> 
+ <w lem="possibilité" id="w27.3.2" pos="NOM">possibilités</w> 
+ <w lem="pour" id="w27.3.3" pos="PRP">pour</w> 
+ <w lem="le" id="w27.3.4" pos="DET:ART">les</w> 
+ <w lem="handicapé" id="w27.3.5" pos="NOM">handicapés</w> 
+ <w lem="de" id="w27.3.6" pos="PRP">de</w> 
+ <w lem="participer" id="w27.3.7" pos="VER:infi">participer</w> 
+ <w lem="à" id="w27.3.8" pos="PRP">à</w> 
+ <w lem="le" id="w27.3.9" pos="DET:ART">la</w> 
+ <w lem="vie" id="w27.3.10" pos="NOM">vie</w> 
+ <w lem="actif" id="w27.3.11" pos="ADJ">active</w> 
+ <w lem="devoir" id="w27.3.12" pos="VER:pres">doivent</w> 
+ <w lem="être" id="w27.3.13" pos="VER:infi">être</w> 
+ <w lem="encore" id="w27.3.14" pos="ADV">encore</w> 
+ <w lem="améliorer" id="w27.3.15" pos="VER:pper">améliorées</w>
+ <w lem="." id="w27.3.16" pos="SENT">.</w>
+</s> 
+ 
+<s id="s27.4">
+ <w lem="il" id="w27.4.1" pos="PRO:PER">Il</w> 
+ <w lem="falloir" id="w27.4.2" pos="VER:pres">faut</w> 
+ <w lem="faciliter" id="w27.4.3" pos="VER:infi">faciliter</w> 
+ <w id="w27.4.4" pos="VER:pper">l</w>
+ <w lem="'" id="w27.4.5" pos="PUN">'</w> 
+ <w lem="insertion" id="w27.4.6" pos="NOM">insertion</w> 
+ <w lem="du" id="w27.4.7" pos="PRP:det">des</w> 
+ <w lem="immigrer" id="w27.4.8" pos="VER:pper">immigrés</w> 
+ <w lem="sur" id="w27.4.9" pos="PRP">sur</w> 
+ <w lem="le" id="w27.4.10" pos="DET:ART">le</w> 
+ <w lem="marché" id="w27.4.11" pos="NOM">marché</w> 
+ <w lem="du" id="w27.4.12" pos="PRP:det">du</w> 
+ <w lem="travail" id="w27.4.13" pos="NOM">travail</w>
+ <w lem="." id="w27.4.14" pos="SENT">.</w>
+</s></p>
+
+<p id="28">
+<s id="s28.1">
+ <w lem="le" id="w28.1.1" pos="DET:ART">La</w> 
+ <w lem="vie" id="w28.1.2" pos="NOM">vie</w> 
+ <w lem="professionnel" id="w28.1.3" pos="ADJ">professionnelle</w> 
+ <w lem="devoir" id="w28.1.4" pos="VER:pres">doit</w> 
+ <w lem="être" id="w28.1.5" pos="VER:infi">être</w> 
+ <w lem="rendre" id="w28.1.6" pos="VER:pper">rendue</w> 
+ <w lem="plus" id="w28.1.7" pos="ADV">plus</w> 
+ <w lem="sûr" id="w28.1.8" pos="ADJ">sûre</w> 
+ <w lem="et" id="w28.1.9" pos="KON">et</w> 
+ <w lem="plus" id="w28.1.10" pos="ADV">plus</w> 
+ <w lem="juste" id="w28.1.11" pos="ADJ">juste</w>
+ <w lem="." id="w28.1.12" pos="SENT">.</w>
+</s></p>
+
+<p id="29">
+<s id="s29.1">
+ <w lem="le" id="w29.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w29.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="inviter" id="w29.1.3" pos="VER:futu">invitera</w> 
+ <w lem="le" id="w29.1.4" pos="DET:ART">les</w> 
+ <w lem="organisation" id="w29.1.5" pos="NOM">organisations</w> 
+ <w lem="du" id="w29.1.6" pos="PRP:det">du</w> 
+ <w lem="marché" id="w29.1.7" pos="NOM">marché</w> 
+ <w lem="du" id="w29.1.8" pos="PRP:det">du</w> 
+ <w lem="travail" id="w29.1.9" pos="NOM">travail</w> 
+ <w lem="et" id="w29.1.10" pos="KON">et</w> 
+ <w lem="le" id="w29.1.11" pos="DET:ART">les</w> 
+ <w lem="autorité" id="w29.1.12" pos="NOM">autorités</w> 
+ <w lem="concerner" id="w29.1.13" pos="VER:pper">concernées</w> 
+ <w lem="à" id="w29.1.14" pos="PRP">à</w> 
+ <w lem="participer" id="w29.1.15" pos="VER:infi">participer</w> 
+ <w lem="à" id="w29.1.16" pos="PRP">à</w> 
+ <w lem="un" id="w29.1.17" pos="DET:ART">une</w> 
+ <w lem="commission" id="w29.1.18" pos="NOM">commission</w> 
+ <w lem="sur" id="w29.1.19" pos="PRP">sur</w> 
+ <w id="w29.1.20" pos="NOM">l</w>
+ <w lem="'" id="w29.1.21" pos="PUN">'</w> 
+ <w lem="environnement" id="w29.1.22" pos="NOM">environnement</w> 
+ <w lem="du" id="w29.1.23" pos="PRP:det">du</w> 
+ <w lem="travail" id="w29.1.24" pos="NOM">travail</w> 
+ <w lem="afin" id="w29.1.25" pos="KON">afin</w> 
+ <w lem="de" id="w29.1.26" pos="PRP">de</w> 
+ <w lem="réaliser" id="w29.1.27" pos="VER:infi">réaliser</w> 
+ <w lem="du" id="w29.1.28" pos="PRP:det">des</w> 
+ <w lem="action" id="w29.1.29" pos="NOM">actions</w> 
+ <w lem="spécial" id="w29.1.30" pos="ADJ">spéciales</w> 
+ <w lem="pour" id="w29.1.31" pos="PRP">pour</w> 
+ <w lem="le" id="w29.1.32" pos="DET:ART">les</w> 
+ <w lem="@card@" id="w29.1.33" pos="NUM">400000</w> 
+ <w lem="poste|postes" id="w29.1.34" pos="NOM">postes</w> 
+ <w lem="de" id="w29.1.35" pos="PRP">de</w> 
+ <w lem="travail" id="w29.1.36" pos="NOM">travail</w> 
+ <w lem="le" id="w29.1.37" pos="DET:ART">les</w> 
+ <w lem="plus" id="w29.1.38" pos="ADV">plus</w> 
+ <w lem="exposer" id="w29.1.39" pos="VER:pper">exposés</w>
+ <w lem="." id="w29.1.40" pos="SENT">.</w>
+</s> 
+ 
+<s id="s29.2">
+ <w lem="le" id="w29.2.1" pos="DET:ART">La</w> 
+ <w lem="commission" id="w29.2.2" pos="NOM">commission</w> 
+ <w lem="présenter" id="w29.2.3" pos="VER:futu">présentera</w> 
+ <w lem="du" id="w29.2.4" pos="PRP:det">des</w> 
+ <w lem="proposition" id="w29.2.5" pos="NOM">propositions</w> 
+ <w lem="de" id="w29.2.6" pos="PRP">de</w> 
+ <w lem="mesure" id="w29.2.7" pos="NOM">mesures</w> 
+ <w lem="susceptible" id="w29.2.8" pos="ADJ">susceptibles</w> 
+ <w id="w29.2.9" pos="VER:simp">d</w>
+ <w lem="'" id="w29.2.10" pos="PUN">'</w> 
+ <w lem="assurer" id="w29.2.11" pos="VER:infi">assurer</w> 
+ <w lem="du" id="w29.2.12" pos="PRP:det">des</w> 
+ <w lem="environnement" id="w29.2.13" pos="NOM">environnements</w> 
+ <w lem="de" id="w29.2.14" pos="PRP">de</w> 
+ <w lem="travail" id="w29.2.15" pos="NOM">travail</w> 
+ <w lem="plus" id="w29.2.16" pos="ADV">plus</w> 
+ <w lem="sain" id="w29.2.17" pos="ADJ">sains</w> 
+ <w lem="et" id="w29.2.18" pos="KON">et</w> 
+ <w lem="de" id="w29.2.19" pos="PRP">de</w> 
+ <w lem="réduire" id="w29.2.20" pos="VER:infi">réduire</w> 
+ <w lem="le" id="w29.2.21" pos="DET:ART">le</w> 
+ <w lem="nombre" id="w29.2.22" pos="NOM">nombre</w> 
+ <w lem="du" id="w29.2.23" pos="PRP:det">des</w> 
+ <w lem="accident" id="w29.2.24" pos="NOM">accidents</w> 
+ <w lem="et" id="w29.2.25" pos="KON">et</w> 
+ <w lem="maladie" id="w29.2.26" pos="NOM">maladies</w> 
+ <w lem="professionnel" id="w29.2.27" pos="ADJ">professionnelles</w>
+ <w lem="." id="w29.2.28" pos="SENT">.</w>
+</s></p>
+
+<p id="30">
+<s id="s30.1">
+ <w lem="dans" id="w30.1.1" pos="PRP">Dans</w> 
+ <w lem="le" id="w30.1.2" pos="DET:ART">le</w> 
+ <w lem="courant" id="w30.1.3" pos="NOM">courant</w> 
+ <w lem="de" id="w30.1.4" pos="PRP">de</w> 
+ <w lem="le" id="w30.1.5" pos="DET:ART">la</w> 
+ <w lem="législature" id="w30.1.6" pos="NOM">législature</w>
+ <w lem="," id="w30.1.7" pos="PUN">,</w> 
+ <w lem="un" id="w30.1.8" pos="DET:ART">une</w> 
+ <w lem="loi" id="w30.1.9" pos="NOM">loi</w> 
+ <w lem="instaurer" id="w30.1.10" pos="VER:ppre">instaurant</w> 
+ <w lem="un" id="w30.1.11" pos="DET:ART">une</w> 
+ <w lem="sixième" id="w30.1.12" pos="NUM">sixième</w> 
+ <w lem="semaine" id="w30.1.13" pos="NOM">semaine</w> 
+ <w lem="de" id="w30.1.14" pos="PRP">de</w> 
+ <w lem="congé" id="w30.1.15" pos="NOM">congés</w> 
+ <w lem="payer|payer" id="w30.1.16" pos="VER:pper">payés</w> 
+ <w lem="être" id="w30.1.17" pos="VER:futu">sera</w> 
+ <w lem="voter" id="w30.1.18" pos="VER:pper">votée</w>
+ <w lem="." id="w30.1.19" pos="SENT">.</w>
+</s> 
+ 
+<s id="s30.2">
+ <w lem="ce" id="w30.2.1" pos="PRO:DEM">Cette</w> 
+ <w lem="réforme" id="w30.2.2" pos="NOM">réforme</w> 
+ <w lem="être" id="w30.2.3" pos="VER:futu">sera</w> 
+ <w lem="réaliser" id="w30.2.4" pos="VER:pper">réalisée</w> 
+ <w lem="par" id="w30.2.5" pos="PRP">par</w> 
+ <w lem="étape" id="w30.2.6" pos="NOM">étapes</w>
+ <w lem="." id="w30.2.7" pos="SENT">.</w>
+</s></p>
+
+<p id="31">
+<s id="s31.1">
+ <w lem="il" id="w31.1.1" pos="PRO:PER">Il</w> 
+ <w lem="convenir|convier" id="w31.1.2" pos="VER:pres">convient</w> 
+ <w lem="de" id="w31.1.3" pos="PRP">de</w> 
+ <w lem="poursuivre" id="w31.1.4" pos="VER:infi">poursuivre</w> 
+ <w id="w31.1.5" pos="VER:pper">l</w>
+ <w lem="'" id="w31.1.6" pos="PUN">'</w> 
+ <w lem="action" id="w31.1.7" pos="NOM">action</w> 
+ <w lem="viser" id="w31.1.8" pos="VER:ppre">visant</w> 
+ <w lem="à" id="w31.1.9" pos="PRP">à</w> 
+ <w lem="mettre" id="w31.1.10" pos="VER:infi">mettre</w> 
+ <w lem="fin" id="w31.1.11" pos="NOM">fin</w> 
+ <w lem="à" id="w31.1.12" pos="PRP">à</w> 
+ <w lem="le" id="w31.1.13" pos="DET:ART">la</w> 
+ <w lem="ségrégation" id="w31.1.14" pos="NOM">ségrégation</w> 
+ <w lem="en" id="w31.1.15" pos="PRP">en</w> 
+ <w lem="fonction" id="w31.1.16" pos="NOM">fonction</w> 
+ <w lem="du" id="w31.1.17" pos="PRP:det">du</w> 
+ <w lem="sexe" id="w31.1.18" pos="NOM">sexe</w> 
+ <w lem="sur" id="w31.1.19" pos="PRP">sur</w> 
+ <w lem="le" id="w31.1.20" pos="DET:ART">le</w> 
+ <w lem="marché" id="w31.1.21" pos="NOM">marché</w> 
+ <w lem="du" id="w31.1.22" pos="PRP:det">du</w> 
+ <w lem="travail" id="w31.1.23" pos="NOM">travail</w>
+ <w lem="." id="w31.1.24" pos="SENT">.</w>
+</s> 
+ 
+<s id="s31.2">
+ <w lem="le" id="w31.2.1" pos="DET:ART">Les</w> 
+ <w lem="femme" id="w31.2.2" pos="NOM">femmes</w> 
+ <w lem="comme" id="w31.2.3" pos="KON">comme</w> 
+ <w lem="le" id="w31.2.4" pos="DET:ART">les</w> 
+ <w lem="homme" id="w31.2.5" pos="NOM">hommes</w> 
+ <w lem="devoir" id="w31.2.6" pos="VER:pres">doivent</w> 
+ <w lem="pouvoir" id="w31.2.7" pos="VER:infi">pouvoir</w> 
+ <w lem="plus" id="w31.2.8" pos="ADV">plus</w> 
+ <w lem="facilement" id="w31.2.9" pos="ADV">facilement</w> 
+ <w lem="concilier" id="w31.2.10" pos="VER:infi">concilier</w> 
+ <w lem="activité" id="w31.2.11" pos="NOM">activité</w> 
+ <w lem="rémunérer" id="w31.2.12" pos="VER:pper">rémunérée</w> 
+ <w lem="et" id="w31.2.13" pos="KON">et</w> 
+ <w lem="responsabilité" id="w31.2.14" pos="NOM">responsabilités</w> 
+ <w lem="parental" id="w31.2.15" pos="ADJ">parentales</w>
+ <w lem="." id="w31.2.16" pos="SENT">.</w>
+</s> 
+ 
+<s id="s31.3">
+ <w lem="de" id="w31.3.1" pos="PRP">De</w> 
+ <w lem="nouveau" id="w31.3.2" pos="ADJ">nouvelles</w> 
+ <w lem="mesure" id="w31.3.3" pos="NOM">mesures</w> 
+ <w lem="être" id="w31.3.4" pos="VER:futu">seront</w> 
+ <w lem="prendre" id="w31.3.5" pos="VER:pper">prises</w> 
+ <w lem="afin" id="w31.3.6" pos="KON">afin</w> 
+ <w id="w31.3.7" pos="VER:subi">d</w>
+ <w lem="'" id="w31.3.8" pos="PUN">'</w> 
+ <w lem="accroître" id="w31.3.9" pos="VER:infi">accroître</w> 
+ <w lem="le" id="w31.3.10" pos="DET:ART">la</w> 
+ <w lem="représentation" id="w31.3.11" pos="NOM">représentation</w> 
+ <w lem="du" id="w31.3.12" pos="PRP:det">des</w> 
+ <w lem="femme" id="w31.3.13" pos="NOM">femmes</w> 
+ <w lem="dans" id="w31.3.14" pos="PRP">dans</w> 
+ <w lem="différent" id="w31.3.15" pos="ADJ">différentes</w> 
+ <w lem="instance" id="w31.3.16" pos="NOM">instances</w> 
+ <w lem="de" id="w31.3.17" pos="PRP">de</w> 
+ <w lem="décision" id="w31.3.18" pos="NOM">décision</w>
+ <w lem="." id="w31.3.19" pos="SENT">.</w>
+</s></p>
+
+<p id="32">
+<s id="s32.1">
+ <w lem="L" id="w32.1.1" pos="NUM">L</w>
+ <w lem="'" id="w32.1.2" pos="PUN">'</w> 
+ <w lem="élargissement" id="w32.1.3" pos="NOM">élargissement</w> 
+ <w lem="de" id="w32.1.4" pos="PRP">de</w> 
+ <w lem="le" id="w32.1.5" pos="DET:ART">la</w> 
+ <w lem="politique" id="w32.1.6" pos="NOM">politique</w> 
+ <w lem="régional" id="w32.1.7" pos="ADJ">régionale</w> 
+ <w lem="qui" id="w32.1.8" pos="PRO:REL">qui</w> 
+ <w lem="avoir" id="w32.1.9" pos="VER:pres">a</w> 
+ <w lem="avoir" id="w32.1.10" pos="VER:pper">eu</w> 
+ <w lem="lieu" id="w32.1.11" pos="NOM">lieu</w> 
+ <w lem="au" id="w32.1.12" pos="PRP:det">au</w> 
+ <w lem="cour|cours" id="w32.1.13" pos="NOM">cours</w> 
+ <w lem="du" id="w32.1.14" pos="PRP:det">des</w> 
+ <w lem="dernier" id="w32.1.15" pos="ADJ">dernières</w> 
+ <w lem="année" id="w32.1.16" pos="NOM">années</w>
+ <w lem="," id="w32.1.17" pos="PUN">,</w> 
+ <w lem="orienter" id="w32.1.18" pos="VER:pper">orienté</w> 
+ <w lem="vers" id="w32.1.19" pos="PRP">vers</w> 
+ <w id="w32.1.20" pos="NOM">l</w>
+ <w lem="'" id="w32.1.21" pos="PUN">'</w> 
+ <w lem="accroissement" id="w32.1.22" pos="NOM">accroissement</w> 
+ <w lem="du" id="w32.1.23" pos="PRP:det">des</w> 
+ <w lem="compétence" id="w32.1.24" pos="NOM">compétences</w>
+ <w lem="," id="w32.1.25" pos="PUN">,</w> 
+ <w lem="le" id="w32.1.26" pos="DET:ART">la</w> 
+ <w lem="formation" id="w32.1.27" pos="NOM">formation</w> 
+ <w lem="et" id="w32.1.28" pos="KON">et</w> 
+ <w id="w32.1.29" pos="NOM">l</w>
+ <w lem="'" id="w32.1.30" pos="PUN">'</w> 
+ <w lem="amélioration" id="w32.1.31" pos="NOM">amélioration</w> 
+ <w lem="du" id="w32.1.32" pos="PRP:det">des</w> 
+ <w lem="infrastructure" id="w32.1.33" pos="NOM">infrastructures</w>
+ <w lem="," id="w32.1.34" pos="PUN">,</w> 
+ <w lem="continuer" id="w32.1.35" pos="VER:futu">continuera</w>
+ <w lem="." id="w32.1.36" pos="SENT">.</w>
+</s></p>
+
+<p id="33">
+<s id="s33.1">
+ <w lem="le" id="w33.1.1" pos="DET:ART">Les</w> 
+ <w lem="petit" id="w33.1.2" pos="ADJ">petites</w> 
+ <w lem="entreprise" id="w33.1.3" pos="NOM">entreprises</w> 
+ <w lem="assurer" id="w33.1.4" pos="VER:pres">assurent</w> 
+ <w lem="beaucoup" id="w33.1.5" pos="ADV">beaucoup</w> 
+ <w lem="du" id="w33.1.6" pos="PRP:det">du</w> 
+ <w lem="dynamisme" id="w33.1.7" pos="NOM">dynamisme</w> 
+ <w lem="et" id="w33.1.8" pos="KON">et</w> 
+ <w lem="de" id="w33.1.9" pos="PRP">de</w> 
+ <w lem="le" id="w33.1.10" pos="DET:ART">la</w> 
+ <w lem="rénovation" id="w33.1.11" pos="NOM">rénovation</w> 
+ <w lem="dans" id="w33.1.12" pos="PRP">dans</w> 
+ <w lem="le" id="w33.1.13" pos="DET:ART">la</w> 
+ <w lem="vie" id="w33.1.14" pos="NOM">vie</w> 
+ <w lem="économique" id="w33.1.15" pos="ADJ">économique</w> 
+ <w lem="suédois" id="w33.1.16" pos="ADJ">suédoise</w>
+ <w lem="." id="w33.1.17" pos="SENT">.</w>
+</s> 
+ 
+<s id="s33.2">
+ <w lem="aussi" id="w33.2.1" pos="ADV">Aussi</w> 
+ <w lem="le" id="w33.2.2" pos="DET:ART">les</w> 
+ <w lem="effort" id="w33.2.3" pos="NOM">efforts</w> 
+ <w lem="afin" id="w33.2.4" pos="KON">afin</w> 
+ <w lem="de" id="w33.2.5" pos="PRP">de</w> 
+ <w lem="créer" id="w33.2.6" pos="VER:infi">créer</w> 
+ <w lem="du" id="w33.2.7" pos="PRP:det">des</w> 
+ <w lem="condition" id="w33.2.8" pos="NOM">conditions</w> 
+ <w lem="propice" id="w33.2.9" pos="ADJ">propices</w> 
+ <w lem="au" id="w33.2.10" pos="PRP:det">au</w> 
+ <w lem="développement" id="w33.2.11" pos="NOM">développement</w> 
+ <w lem="de" id="w33.2.12" pos="PRP">de</w> 
+ <w lem="ce" id="w33.2.13" pos="PRO:DEM">ces</w> 
+ <w lem="entreprise" id="w33.2.14" pos="NOM">entreprises</w> 
+ <w lem="aller" id="w33.2.15" pos="VER:pres">vont</w>
+ <w lem="il" id="w33.2.16" pos="PRO:PER">-ils</w> 
+ <w lem="être" id="w33.2.17" pos="VER:infi">être</w> 
+ <w lem="poursuivre" id="w33.2.18" pos="VER:pper">poursuivis</w>
+ <w lem="." id="w33.2.19" pos="SENT">.</w>
+</s></p>
+
+<p id="34">
+<s id="s34.1">
+ <w lem="le" id="w34.1.1" pos="DET:ART">La</w> 
+ <w lem="politique" id="w34.1.2" pos="NOM">politique</w> 
+ <w lem="du" id="w34.1.3" pos="PRP:det">des</w> 
+ <w lem="réfugier" id="w34.1.4" pos="VER:pper">réfugiés</w> 
+ <w lem="généreux" id="w34.1.5" pos="ADJ">généreuse</w> 
+ <w lem="et" id="w34.1.6" pos="KON">et</w> 
+ <w lem="solidaire" id="w34.1.7" pos="ADJ">solidaire</w> 
+ <w lem="demeure" id="w34.1.8" pos="NOM">demeure</w>
+ <w lem="." id="w34.1.9" pos="SENT">.</w>
+</s> 
+ 
+<s id="s34.2">
+ <w lem="L" id="w34.2.1" pos="NUM">L</w>
+ <w lem="'" id="w34.2.2" pos="PUN">'</w> 
+ <w lem="action" id="w34.2.3" pos="NOM">action</w> 
+ <w lem="de" id="w34.2.4" pos="PRP">de</w> 
+ <w id="w34.2.5" pos="NOM">l</w>
+ <w lem="'" id="w34.2.6" pos="PUN">'</w> 
+ <w lem="ONU" id="w34.2.7" pos="ABR">ONU</w> 
+ <w lem="en" id="w34.2.8" pos="PRP">en</w> 
+ <w lem="faveur" id="w34.2.9" pos="NOM">faveur</w> 
+ <w lem="du" id="w34.2.10" pos="PRP:det">des</w> 
+ <w lem="réfugier" id="w34.2.11" pos="VER:pper">réfugiés</w> 
+ <w lem="dans" id="w34.2.12" pos="PRP">dans</w> 
+ <w lem="le" id="w34.2.13" pos="DET:ART">le</w> 
+ <w lem="monde" id="w34.2.14" pos="NOM">monde</w> 
+ <w lem="continuer" id="w34.2.15" pos="VER:futu">continuera</w> 
+ <w lem="à" id="w34.2.16" pos="PRP">à</w> 
+ <w lem="recevoir" id="w34.2.17" pos="VER:infi">recevoir</w> 
+ <w lem="un" id="w34.2.18" pos="DET:ART">un</w> 
+ <w lem="soutien" id="w34.2.19" pos="NOM">soutien</w> 
+ <w lem="vigoureux" id="w34.2.20" pos="ADJ">vigoureux</w>
+ <w lem="." id="w34.2.21" pos="SENT">.</w>
+</s> 
+ 
+<s id="s34.3">
+ <w lem="racisme" id="w34.3.1" pos="NOM">Racisme</w> 
+ <w lem="et" id="w34.3.2" pos="KON">et</w> 
+ <w lem="xénophobie" id="w34.3.3" pos="NOM">xénophobie</w> 
+ <w lem="être" id="w34.3.4" pos="VER:futu">seront</w> 
+ <w lem="combattre" id="w34.3.5" pos="VER:pper">combattus</w>
+ <w lem="." id="w34.3.6" pos="SENT">.</w>
+</s></p>
+
+<p id="35">
+<s id="s35.1">
+ <w lem="un" id="w35.1.1" pos="DET:ART">Un</w> 
+ <w lem="projet" id="w35.1.2" pos="NOM">projet</w> 
+ <w lem="de" id="w35.1.3" pos="PRP">de</w> 
+ <w lem="nouveau" id="w35.1.4" pos="ADJ">nouvelle</w> 
+ <w lem="loi" id="w35.1.5" pos="NOM">loi</w> 
+ <w lem="sur" id="w35.1.6" pos="PRP">sur</w> 
+ <w lem="le" id="w35.1.7" pos="DET:ART">les</w> 
+ <w lem="étranger" id="w35.1.8" pos="NOM">étrangers</w> 
+ <w lem="être" id="w35.1.9" pos="VER:futu">sera</w> 
+ <w lem="soumettre" id="w35.1.10" pos="VER:pper">soumis</w> 
+ <w lem="au" id="w35.1.11" pos="PRP:det">au</w> 
+ <w id="w35.1.12" pos="NOM">Riksdag</w>
+ <w lem="." id="w35.1.13" pos="SENT">.</w>
+</s> 
+ 
+<s id="s35.2">
+ <w lem="le" id="w35.2.1" pos="DET:ART">Les</w> 
+ <w lem="délai" id="w35.2.2" pos="NOM">délais</w> 
+ <w id="w35.2.3" pos="ADJ">d</w>
+ <w lem="'" id="w35.2.4" pos="PUN">'</w> 
+ <w lem="attente" id="w35.2.5" pos="NOM">attente</w> 
+ <w lem="pour" id="w35.2.6" pos="PRP">pour</w> 
+ <w lem="le" id="w35.2.7" pos="DET:ART">la</w> 
+ <w lem="régularisation" id="w35.2.8" pos="NOM">régularisation</w> 
+ <w lem="de" id="w35.2.9" pos="PRP">de</w> 
+ <w lem="le" id="w35.2.10" pos="DET:ART">la</w> 
+ <w lem="situation" id="w35.2.11" pos="NOM">situation</w> 
+ <w lem="du" id="w35.2.12" pos="PRP:det">des</w> 
+ <w lem="étranger" id="w35.2.13" pos="NOM">étrangers</w> 
+ <w lem="être" id="w35.2.14" pos="VER:futu">seront</w> 
+ <w lem="sensiblement" id="w35.2.15" pos="ADV">sensiblement</w> 
+ <w lem="raccourcir" id="w35.2.16" pos="VER:pper">raccourcis</w>
+ <w lem="." id="w35.2.17" pos="SENT">.</w>
+</s></p>
+
+<p id="36">
+<s id="s36.1">
+ <w lem="le" id="w36.1.1" pos="DET:ART">Le</w> 
+ <w lem="souci" id="w36.1.2" pos="NOM">souci</w> 
+ <w lem="de" id="w36.1.3" pos="PRP">de</w> 
+ <w id="w36.1.4" pos="NOM">l</w>
+ <w lem="'" id="w36.1.5" pos="PUN">'</w> 
+ <w lem="environnement" id="w36.1.6" pos="NOM">environnement</w> 
+ <w lem="et" id="w36.1.7" pos="KON">et</w> 
+ <w lem="de" id="w36.1.8" pos="PRP">de</w> 
+ <w lem="le" id="w36.1.9" pos="DET:ART">la</w> 
+ <w lem="nature" id="w36.1.10" pos="NOM">nature</w> 
+ <w lem="devoir" id="w36.1.11" pos="VER:pres">doit</w> 
+ <w lem="imprimer" id="w36.1.12" pos="VER:infi">imprimer</w> 
+ <w lem="son" id="w36.1.13" pos="DET:POS">sa</w> 
+ <w lem="marque" id="w36.1.14" pos="NOM">marque</w> 
+ <w lem="à" id="w36.1.15" pos="PRP">à</w> 
+ <w id="w36.1.16" pos="NOM">l</w>
+ <w lem="'" id="w36.1.17" pos="PUN">'</w> 
+ <w lem="évolution" id="w36.1.18" pos="NOM">évolution</w> 
+ <w lem="dans" id="w36.1.19" pos="PRP">dans</w> 
+ <w lem="tout" id="w36.1.20" pos="PRO:IND">tous</w> 
+ <w lem="le" id="w36.1.21" pos="DET:ART">les</w> 
+ <w lem="domaine" id="w36.1.22" pos="NOM">domaines</w> 
+ <w lem="de" id="w36.1.23" pos="PRP">de</w> 
+ <w lem="le" id="w36.1.24" pos="DET:ART">la</w> 
+ <w lem="vie" id="w36.1.25" pos="NOM">vie</w> 
+ <w lem="collectif" id="w36.1.26" pos="ADJ">collective</w>
+ <w lem="." id="w36.1.27" pos="SENT">.</w>
+</s> 
+ 
+<s id="s36.2">
+ <w lem="le" id="w36.2.1" pos="DET:ART">La</w> 
+ <w lem="décision" id="w36.2.2" pos="NOM">décision</w> 
+ <w lem="du" id="w36.2.3" pos="PRP:det">du</w> 
+ <w id="w36.2.4" pos="NOM">Riksdag</w> 
+ <w lem="sur" id="w36.2.5" pos="PRP">sur</w> 
+ <w lem="le" id="w36.2.6" pos="DET:ART">la</w> 
+ <w lem="politique" id="w36.2.7" pos="NOM">politique</w> 
+ <w lem="du" id="w36.2.8" pos="PRP:det">des</w> 
+ <w lem="transport" id="w36.2.9" pos="NOM">transports</w> 
+ <w lem="revêtir" id="w36.2.10" pos="VER:pres">revêt</w> 
+ <w lem="à" id="w36.2.11" pos="PRP">à</w> 
+ <w lem="ce" id="w36.2.12" pos="PRO:DEM">cet</w> 
+ <w lem="égard" id="w36.2.13" pos="NOM">égard</w> 
+ <w lem="un" id="w36.2.14" pos="DET:ART">une</w> 
+ <w lem="importance" id="w36.2.15" pos="NOM">importance</w> 
+ <w lem="majeur" id="w36.2.16" pos="ADJ">majeure</w>
+ <w lem="." id="w36.2.17" pos="SENT">.</w>
+</s></p>
+
+<p id="37">
+<s id="s37.1">
+ <w lem="un" id="w37.1.1" pos="DET:ART">Une</w> 
+ <w lem="politique" id="w37.1.2" pos="ADJ">politique</w> 
+ <w lem="radical" id="w37.1.3" pos="NOM">radicale</w> 
+ <w lem="de" id="w37.1.4" pos="PRP">de</w> 
+ <w id="w37.1.5" pos="NOM">l</w>
+ <w lem="'" id="w37.1.6" pos="PUN">'</w> 
+ <w lem="environnement" id="w37.1.7" pos="NOM">environnement</w> 
+ <w lem="supposer" id="w37.1.8" pos="VER:pres">suppose</w> 
+ <w lem="un" id="w37.1.9" pos="DET:ART">une</w> 
+ <w lem="économie" id="w37.1.10" pos="NOM">économie</w> 
+ <w lem="fort" id="w37.1.11" pos="ADJ">forte</w>
+ <w lem="." id="w37.1.12" pos="SENT">.</w>
+</s> 
+ 
+<s id="s37.2">
+ <w lem="L" id="w37.2.1" pos="NUM">L</w>
+ <w lem="'" id="w37.2.2" pos="PUN">'</w> 
+ <w lem="action" id="w37.2.3" pos="NOM">action</w> 
+ <w lem="être" id="w37.2.4" pos="VER:futu">sera</w> 
+ <w lem="poursuivre" id="w37.2.5" pos="VER:pper">poursuivie</w> 
+ <w lem="en" id="w37.2.6" pos="PRP">en</w> 
+ <w lem="vue" id="w37.2.7" pos="NOM">vue</w> 
+ <w lem="de" id="w37.2.8" pos="PRP">de</w> 
+ <w lem="parvenir" id="w37.2.9" pos="VER:infi">parvenir</w> 
+ <w lem="à" id="w37.2.10" pos="PRP">à</w> 
+ <w lem="du" id="w37.2.11" pos="PRP:det">des</w> 
+ <w lem="accord" id="w37.2.12" pos="NOM">accords</w> 
+ <w id="w37.2.13" pos="ADJ">transfrontaliers</w> 
+ <w lem="sur" id="w37.2.14" pos="PRP">sur</w> 
+ <w lem="le" id="w37.2.15" pos="DET:ART">la</w> 
+ <w lem="réduction" id="w37.2.16" pos="NOM">réduction</w> 
+ <w lem="du" id="w37.2.17" pos="PRP:det">des</w> 
+ <w lem="pollution" id="w37.2.18" pos="NOM">pollutions</w> 
+ <w lem="atmosphérique" id="w37.2.19" pos="ADJ">atmosphériques</w> 
+ <w lem="et" id="w37.2.20" pos="KON">et</w> 
+ <w lem="hydrique" id="w37.2.21" pos="ADJ">hydriques</w> 
+ <w lem="ainsi" id="w37.2.22" pos="ADV">ainsi</w> 
+ <w lem="que" id="w37.2.23" pos="KON">que</w> 
+ <w lem="sur" id="w37.2.24" pos="PRP">sur</w> 
+ <w lem="le" id="w37.2.25" pos="DET:ART">la</w> 
+ <w lem="protection" id="w37.2.26" pos="NOM">protection</w> 
+ <w lem="du" id="w37.2.27" pos="PRP:det">du</w> 
+ <w lem="climat" id="w37.2.28" pos="NOM">climat</w> 
+ <w lem="de" id="w37.2.29" pos="PRP">de</w> 
+ <w lem="le" id="w37.2.30" pos="DET:ART">la</w> 
+ <w lem="terre" id="w37.2.31" pos="NOM">terre</w>
+ <w lem="." id="w37.2.32" pos="SENT">.</w>
+</s> 
+ 
+<s id="s37.3">
+ <w lem="le" id="w37.3.1" pos="DET:ART">Le</w> 
+ <w lem="plan" id="w37.3.2" pos="NOM">plan</w> 
+ <w id="w37.3.3" pos="ADJ">d</w>
+ <w lem="'" id="w37.3.4" pos="PUN">'</w> 
+ <w lem="abandon" id="w37.3.5" pos="NOM">abandon</w> 
+ <w lem="de" id="w37.3.6" pos="PRP">de</w> 
+ <w id="w37.3.7" pos="NOM">l</w>
+ <w lem="'" id="w37.3.8" pos="PUN">'</w> 
+ <w lem="emploi" id="w37.3.9" pos="NOM">emploi</w> 
+ <w lem="du" id="w37.3.10" pos="PRP:det">du</w> 
+ <w lem="fréon" id="w37.3.11" pos="NOM">fréon</w> 
+ <w lem="être" id="w37.3.12" pos="VER:futu">sera</w> 
+ <w lem="poursuivre" id="w37.3.13" pos="VER:pper">poursuivi</w>
+ <w lem="." id="w37.3.14" pos="SENT">.</w>
+</s></p>
+
+<p id="38">
+<s id="s38.1">
+ <w lem="le" id="w38.1.1" pos="DET:ART">Les</w> 
+ <w lem="produit" id="w38.1.2" pos="NOM">produits</w> 
+ <w lem="et" id="w38.1.3" pos="KON">et</w> 
+ <w lem="le" id="w38.1.4" pos="DET:ART">les</w> 
+ <w lem="processus" id="w38.1.5" pos="NOM">processus</w> 
+ <w lem="industriel" id="w38.1.6" pos="ADJ">industriels</w> 
+ <w lem="être" id="w38.1.7" pos="VER:futu">seront</w> 
+ <w lem="assainir" id="w38.1.8" pos="VER:pper">assainis</w> 
+ <w lem="au" id="w38.1.9" pos="PRP:det">au</w> 
+ <w lem="moyen" id="w38.1.10" pos="NOM">moyen</w> 
+ <w id="w38.1.11" pos="ADJ">d</w>
+ <w lem="'" id="w38.1.12" pos="PUN">'</w> 
+ <w lem="exigence" id="w38.1.13" pos="NOM">exigences</w> 
+ <w lem="sévère" id="w38.1.14" pos="ADJ">sévères</w> 
+ <w lem="et" id="w38.1.15" pos="KON">et</w> 
+ <w id="w38.1.16" pos="ADJ">d</w>
+ <w lem="'" id="w38.1.17" pos="PUN">'</w> 
+ <w lem="un" id="w38.1.18" pos="DET:ART">une</w> 
+ <w lem="adaptation" id="w38.1.19" pos="NOM">adaptation</w> 
+ <w lem="rapide" id="w38.1.20" pos="ADJ">rapide</w> 
+ <w lem="au" id="w38.1.21" pos="PRP:det">aux</w> 
+ <w lem="nouveau" id="w38.1.22" pos="ADJ">nouvelles</w> 
+ <w lem="technologie" id="w38.1.23" pos="NOM">technologies</w>
+ <w lem="." id="w38.1.24" pos="SENT">.</w>
+</s> 
+ 
+<s id="s38.2">
+ <w lem="le" id="w38.2.1" pos="DET:ART">Les</w> 
+ <w lem="autorisation" id="w38.2.2" pos="NOM">autorisations</w> 
+ <w lem="accordé" id="w38.2.3" pos="NOM">accordées</w> 
+ <w lem="être" id="w38.2.4" pos="VER:futu">seront</w> 
+ <w lem="réexaminer" id="w38.2.5" pos="VER:pper">réexaminées</w>
+ <w lem="." id="w38.2.6" pos="SENT">.</w>
+</s> 
+ 
+<s id="s38.3">
+ <w lem="le" id="w38.3.1" pos="DET:ART">Les</w> 
+ <w lem="exigence" id="w38.3.2" pos="NOM">exigences</w> 
+ <w lem="en" id="w38.3.3" pos="PRP">en</w> 
+ <w lem="ce" id="w38.3.4" pos="PRO:DEM">ce</w> 
+ <w lem="qui" id="w38.3.5" pos="PRO:REL">qui</w> 
+ <w lem="concerner" id="w38.3.6" pos="VER:pres">concerne</w> 
+ <w lem="le" id="w38.3.7" pos="DET:ART">les</w> 
+ <w lem="produit" id="w38.3.8" pos="NOM">produits</w> 
+ <w lem="nocif" id="w38.3.9" pos="ADJ">nocifs</w> 
+ <w lem="pour" id="w38.3.10" pos="PRP">pour</w> 
+ <w id="w38.3.11" pos="NOM">l</w>
+ <w lem="'" id="w38.3.12" pos="PUN">'</w> 
+ <w lem="environnement" id="w38.3.13" pos="NOM">environnement</w>
+ <w lem="," id="w38.3.14" pos="PUN">,</w> 
+ <w lem="le" id="w38.3.15" pos="DET:ART">les</w> 
+ <w lem="matière" id="w38.3.16" pos="NOM">matières</w> 
+ <w lem="chimique" id="w38.3.17" pos="ADJ">chimiques</w> 
+ <w lem="et" id="w38.3.18" pos="KON">et</w> 
+ <w lem="le" id="w38.3.19" pos="DET:ART">la</w> 
+ <w lem="gestion" id="w38.3.20" pos="NOM">gestion</w> 
+ <w lem="du" id="w38.3.21" pos="PRP:det">des</w> 
+ <w lem="déchet" id="w38.3.22" pos="NOM">déchets</w> 
+ <w lem="être" id="w38.3.23" pos="VER:futu">seront</w> 
+ <w lem="renforcer" id="w38.3.24" pos="VER:pper">renforcées</w>
+ <w lem="." id="w38.3.25" pos="SENT">.</w>
+</s> 
+ 
+<s id="s38.4">
+ <w lem="le" id="w38.4.1" pos="DET:ART">Les</w> 
+ <w lem="substance" id="w38.4.2" pos="NOM">substances</w> 
+ <w lem="chimique" id="w38.4.3" pos="ADJ">chimiques</w> 
+ <w lem="nouveau" id="w38.4.4" pos="ADJ">nouvelles</w> 
+ <w lem="être" id="w38.4.5" pos="VER:futu">seront</w> 
+ <w lem="soumettre" id="w38.4.6" pos="VER:pper">soumises</w> 
+ <w lem="à" id="w38.4.7" pos="PRP">à</w> 
+ <w lem="un" id="w38.4.8" pos="DET:ART">un</w> 
+ <w lem="contrôle" id="w38.4.9" pos="NOM">contrôle</w> 
+ <w lem="préalable" id="w38.4.10" pos="ADJ">préalable</w>
+ <w lem="." id="w38.4.11" pos="SENT">.</w>
+</s></p>
+
+<p id="39">
+<s id="s39.1">
+ <w lem="du" id="w39.1.1" pos="PRP:det">Des</w> 
+ <w lem="redevance" id="w39.1.2" pos="NOM">redevances</w> 
+ <w lem="de" id="w39.1.3" pos="PRP">de</w> 
+ <w lem="pollution" id="w39.1.4" pos="NOM">pollution</w> 
+ <w lem="être" id="w39.1.5" pos="VER:futu">seront</w> 
+ <w lem="instaurer" id="w39.1.6" pos="VER:pper">instaurées</w> 
+ <w lem="dès" id="w39.1.7" pos="PRP">dès</w> 
+ <w lem="@card@" id="w39.1.8" pos="NUM">1989</w> 
+ <w lem="pour" id="w39.1.9" pos="PRP">pour</w> 
+ <w lem="le" id="w39.1.10" pos="DET:ART">les</w> 
+ <w lem="dérivé" id="w39.1.11" pos="NOM">dérivés</w> 
+ <w lem="organique" id="w39.1.12" pos="ADJ">organiques</w> 
+ <w lem="chloré" id="w39.1.13" pos="ADJ">chlorés</w> 
+ <w lem="et" id="w39.1.14" pos="KON">et</w> 
+ <w lem="le" id="w39.1.15" pos="DET:ART">le</w> 
+ <w lem="soufre" id="w39.1.16" pos="NOM">soufre</w>
+ <w lem="." id="w39.1.17" pos="SENT">.</w>
+</s> 
+ 
+<s id="s39.2">
+ <w lem="du" id="w39.2.1" pos="PRP:det">Des</w> 
+ <w lem="proposition" id="w39.2.2" pos="NOM">propositions</w> 
+ <w lem="de" id="w39.2.3" pos="PRP">de</w> 
+ <w lem="redevance" id="w39.2.4" pos="NOM">redevances</w> 
+ <w lem="de" id="w39.2.5" pos="PRP">de</w> 
+ <w lem="pollution" id="w39.2.6" pos="NOM">pollution</w> 
+ <w lem="sur" id="w39.2.7" pos="PRP">sur</w> 
+ <w id="w39.2.8" pos="NOM">d</w>
+ <w lem="'" id="w39.2.9" pos="PUN">'</w> 
+ <w lem="autre" id="w39.2.10" pos="ADJ">autres</w> 
+ <w lem="substance" id="w39.2.11" pos="NOM">substances</w>
+ <w lem="," id="w39.2.12" pos="PUN">,</w> 
+ <w lem="entre" id="w39.2.13" pos="PRP">entre</w> 
+ <w lem="autre" id="w39.2.14" pos="ADJ">autres</w> 
+ <w lem="le" id="w39.2.15" pos="DET:ART">le</w> 
+ <w lem="dioxyde" id="w39.2.16" pos="NOM">dioxyde</w> 
+ <w lem="de" id="w39.2.17" pos="PRP">de</w> 
+ <w lem="carbone" id="w39.2.18" pos="NOM">carbone</w>
+ <w lem="," id="w39.2.19" pos="PUN">,</w> 
+ <w lem="être" id="w39.2.20" pos="VER:futu">seront</w> 
+ <w lem="présenter" id="w39.2.21" pos="VER:pper">présentées</w> 
+ <w lem="au" id="w39.2.22" pos="PRP:det">au</w> 
+ <w lem="cour|cours" id="w39.2.23" pos="NOM">cours</w> 
+ <w lem="de" id="w39.2.24" pos="PRP">de</w> 
+ <w lem="le" id="w39.2.25" pos="DET:ART">la</w> 
+ <w lem="législature" id="w39.2.26" pos="NOM">législature</w>
+ <w lem="." id="w39.2.27" pos="SENT">.</w>
+</s></p>
+
+<p id="40">
+<s id="s40.1">
+ <w lem="L" id="w40.1.1" pos="NUM">L</w>
+ <w lem="'" id="w40.1.2" pos="PUN">'</w> 
+ <w lem="ensemble" id="w40.1.3" pos="ADV">ensemble</w> 
+ <w lem="de" id="w40.1.4" pos="PRP">de</w> 
+ <w lem="le" id="w40.1.5" pos="DET:ART">la</w> 
+ <w lem="législation" id="w40.1.6" pos="NOM">législation</w> 
+ <w lem="sur" id="w40.1.7" pos="PRP">sur</w> 
+ <w id="w40.1.8" pos="NOM">l</w>
+ <w lem="'" id="w40.1.9" pos="PUN">'</w> 
+ <w lem="environnement" id="w40.1.10" pos="NOM">environnement</w> 
+ <w lem="être" id="w40.1.11" pos="VER:futu">sera</w> 
+ <w lem="revoir" id="w40.1.12" pos="VER:pper">revu</w> 
+ <w lem="et" id="w40.1.13" pos="KON">et</w> 
+ <w lem="coordonner" id="w40.1.14" pos="VER:pper">coordonné</w>
+ <w lem="." id="w40.1.15" pos="SENT">.</w>
+</s> 
+ 
+<s id="s40.2">
+ <w lem="du" id="w40.2.1" pos="PRP:det">Des</w> 
+ <w lem="projet" id="w40.2.2" pos="NOM">projets</w> 
+ <w lem="de" id="w40.2.3" pos="PRP">de</w> 
+ <w lem="nouveau" id="w40.2.4" pos="ADJ">nouvelle</w> 
+ <w lem="loi" id="w40.2.5" pos="NOM">loi</w> 
+ <w lem="sur" id="w40.2.6" pos="PRP">sur</w> 
+ <w lem="le" id="w40.2.7" pos="DET:ART">la</w> 
+ <w lem="protection" id="w40.2.8" pos="NOM">protection</w> 
+ <w lem="de" id="w40.2.9" pos="PRP">de</w> 
+ <w lem="le" id="w40.2.10" pos="DET:ART">la</w> 
+ <w lem="nature" id="w40.2.11" pos="NOM">nature</w> 
+ <w lem="ainsi" id="w40.2.12" pos="KON">ainsi</w> 
+ <w lem="que" id="w40.2.13" pos="KON">que</w> 
+ <w lem="de" id="w40.2.14" pos="PRP">de</w> 
+ <w lem="renforcement" id="w40.2.15" pos="NOM">renforcement</w> 
+ <w lem="du" id="w40.2.16" pos="PRP:det">des</w> 
+ <w lem="disposition" id="w40.2.17" pos="NOM">dispositions</w> 
+ <w lem="de" id="w40.2.18" pos="PRP">de</w> 
+ <w lem="le" id="w40.2.19" pos="DET:ART">la</w> 
+ <w lem="loi" id="w40.2.20" pos="NOM">loi</w> 
+ <w lem="sur" id="w40.2.21" pos="PRP">sur</w> 
+ <w lem="le" id="w40.2.22" pos="DET:ART">la</w> 
+ <w lem="protection" id="w40.2.23" pos="NOM">protection</w> 
+ <w lem="de" id="w40.2.24" pos="PRP">de</w> 
+ <w id="w40.2.25" pos="NOM">l</w>
+ <w lem="'" id="w40.2.26" pos="PUN">'</w> 
+ <w lem="environnement" id="w40.2.27" pos="NOM">environnement</w> 
+ <w lem="être" id="w40.2.28" pos="VER:futu">seront</w> 
+ <w lem="présenter" id="w40.2.29" pos="VER:pper">présentés</w> 
+ <w lem="dans" id="w40.2.30" pos="PRP">dans</w> 
+ <w lem="le" id="w40.2.31" pos="DET:ART">le</w> 
+ <w lem="courant" id="w40.2.32" pos="NOM">courant</w> 
+ <w lem="de" id="w40.2.33" pos="PRP">de</w> 
+ <w lem="le" id="w40.2.34" pos="DET:ART">la</w> 
+ <w lem="législature" id="w40.2.35" pos="NOM">législature</w>
+ <w lem="." id="w40.2.36" pos="SENT">.</w>
+</s></p>
+
+<p id="41">
+<s id="s41.1">
+ <w lem="le" id="w41.1.1" pos="DET:ART">Les</w> 
+ <w lem="service" id="w41.1.2" pos="NOM">services</w> 
+ <w lem="de" id="w41.1.3" pos="PRP">de</w> 
+ <w lem="défense" id="w41.1.4" pos="NOM">défense</w> 
+ <w lem="de" id="w41.1.5" pos="PRP">de</w> 
+ <w id="w41.1.6" pos="NOM">l</w>
+ <w lem="'" id="w41.1.7" pos="PUN">'</w> 
+ <w lem="environnement" id="w41.1.8" pos="NOM">environnement</w> 
+ <w lem="recevoir" id="w41.1.9" pos="VER:futu">recevront</w> 
+ <w lem="du" id="w41.1.10" pos="PRP:det">des</w> 
+ <w lem="ressource" id="w41.1.11" pos="NOM">ressources</w> 
+ <w lem="accroire|accroître" id="w41.1.12" pos="VER:pper">accrues</w>
+ <w lem="." id="w41.1.13" pos="SENT">.</w>
+</s> 
+ 
+<s id="s41.2">
+ <w lem="du" id="w41.2.1" pos="PRP:det">Des</w> 
+ <w lem="mesure" id="w41.2.2" pos="NOM">mesures</w> 
+ <w lem="spécial" id="w41.2.3" pos="ADJ">spéciales</w> 
+ <w lem="être" id="w41.2.4" pos="VER:futu">seront</w> 
+ <w lem="mettre" id="w41.2.5" pos="VER:pper">mises</w> 
+ <w lem="en" id="w41.2.6" pos="PRP">en</w> 
+ <w lem="uvre" id="w41.2.7" pos="NOM">oeuvre</w> 
+ <w lem="dans" id="w41.2.8" pos="PRP">dans</w> 
+ <w lem="du" id="w41.2.9" pos="PRP:det">des</w> 
+ <w lem="région" id="w41.2.10" pos="NOM">régions</w> 
+ <w lem="particulièrement" id="w41.2.11" pos="ADV">particulièrement</w> 
+ <w lem="exposer" id="w41.2.12" pos="VER:pper">exposées</w> 
+ <w lem="tel" id="w41.2.13" pos="PRO:DEM">telles</w> 
+ <w lem="que" id="w41.2.14" pos="PRO:REL">que</w> 
+ <w id="w41.2.15" pos="VER:subi">l</w>
+ <w lem="'" id="w41.2.16" pos="PUN">'</w> 
+ <w lem="ouest" id="w41.2.17" pos="ADJ">ouest</w> 
+ <w lem="de" id="w41.2.18" pos="PRP">de</w> 
+ <w lem="le" id="w41.2.19" pos="DET:ART">la</w> 
+ <w id="w41.2.20" pos="NAM">Scanie</w> 
+ <w lem="et" id="w41.2.21" pos="KON">et</w> 
+ <w lem="le" id="w41.2.22" pos="DET:ART">le</w> 
+ <w lem="secteur" id="w41.2.23" pos="NOM">secteur</w> 
+ <w id="w41.2.24" pos="NAM">Sundsvall/</w>
+ <w id="w41.2.25" pos="ABR">Timrå</w>
+ <w lem="." id="w41.2.26" pos="SENT">.</w>
+</s></p>
+
+<p id="42">
+<s id="s42.1">
+ <w lem="le" id="w42.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w42.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="convier" id="w42.1.3" pos="VER:futu">conviera</w> 
+ <w lem="prochainement" id="w42.1.4" pos="ADV">prochainement</w> 
+ <w lem="du" id="w42.1.5" pos="PRP:det">des</w> 
+ <w lem="représentant" id="w42.1.6" pos="NOM">représentants</w> 
+ <w lem="du" id="w42.1.7" pos="PRP:det">des</w> 
+ <w lem="trois" id="w42.1.8" pos="NUM">trois</w> 
+ <w lem="grand" id="w42.1.9" pos="ADJ">grandes</w> 
+ <w lem="zone" id="w42.1.10" pos="NOM">zones</w> 
+ <w lem="urbain" id="w42.1.11" pos="ADJ">urbaines</w> 
+ <w lem="à" id="w42.1.12" pos="PRP">à</w> 
+ <w lem="du" id="w42.1.13" pos="PRP:det">des</w> 
+ <w lem="discussion" id="w42.1.14" pos="NOM">discussions</w> 
+ <w lem="sur" id="w42.1.15" pos="PRP">sur</w> 
+ <w lem="le" id="w42.1.16" pos="DET:ART">les</w> 
+ <w lem="moyen" id="w42.1.17" pos="NOM">moyens</w> 
+ <w id="w42.1.18" pos="ADJ">d</w>
+ <w lem="'" id="w42.1.19" pos="PUN">'</w> 
+ <w lem="améliorer" id="w42.1.20" pos="VER:infi">améliorer</w> 
+ <w id="w42.1.21" pos="VER:pper">l</w>
+ <w lem="'" id="w42.1.22" pos="PUN">'</w> 
+ <w lem="environnement" id="w42.1.23" pos="NOM">environnement</w> 
+ <w lem="dans" id="w42.1.24" pos="PRP">dans</w> 
+ <w lem="celui" id="w42.1.25" pos="PRO:DEM">celles</w>
+ <w lem="-ci" id="w42.1.26" pos="ADV">-ci</w>
+ <w lem="." id="w42.1.27" pos="SENT">.</w>
+</s></p>
+
+<p id="43">
+<s id="s43.1">
+ <w lem="en" id="w43.1.1" pos="PRP">En</w> 
+ <w lem="@card@" id="w43.1.2" pos="NUM">1990</w> 
+ <w lem="être" id="w43.1.3" pos="VER:futu">sera</w> 
+ <w lem="soumettre" id="w43.1.4" pos="VER:pper">soumis</w> 
+ <w lem="au" id="w43.1.5" pos="PRP:det">au</w> 
+ <w id="w43.1.6" pos="NOM">Riksdag</w> 
+ <w lem="un" id="w43.1.7" pos="DET:ART">un</w> 
+ <w lem="projet" id="w43.1.8" pos="NOM">projet</w> 
+ <w lem="relatif" id="w43.1.9" pos="ADJ">relatif</w> 
+ <w lem="au" id="w43.1.10" pos="PRP:det">aux</w> 
+ <w lem="deux" id="w43.1.11" pos="NUM">deux</w> 
+ <w lem="réacteur" id="w43.1.12" pos="NOM">réacteurs</w> 
+ <w lem="du" id="w43.1.13" pos="PRP:det">des</w> 
+ <w lem="centrale" id="w43.1.14" pos="NOM">centrales</w> 
+ <w lem="nucléaire" id="w43.1.15" pos="ADJ">nucléaires</w> 
+ <w lem="de" id="w43.1.16" pos="PRP">de</w> 
+ <w id="w43.1.17" pos="NAM">Barsebäck</w> 
+ <w lem="et" id="w43.1.18" pos="KON">et</w> 
+ <w lem="de" id="w43.1.19" pos="PRP">de</w> 
+ <w id="w43.1.20" pos="NOM">Ringhals</w> 
+ <w lem="qui" id="w43.1.21" pos="PRO:REL">qui</w> 
+ <w lem="devoir" id="w43.1.22" pos="VER:futu">devront</w> 
+ <w lem="être" id="w43.1.23" pos="VER:infi">être</w> 
+ <w lem="mettre" id="w43.1.24" pos="VER:pper">mis</w> 
+ <w lem="hors" id="w43.1.25" pos="PRP">hors</w> 
+ <w lem="service" id="w43.1.26" pos="NOM">service</w> 
+ <w lem="en" id="w43.1.27" pos="PRP">en</w> 
+ <w lem="@card@" id="w43.1.28" pos="NUM">1995</w> 
+ <w lem="et" id="w43.1.29" pos="KON">et</w> 
+ <w lem="@ord@" id="w43.1.30" pos="NUM">1996.</w>
+</s> 
+ 
+<s id="s43.2">
+ <w lem="L" id="w43.2.1" pos="NUM">L</w>
+ <w lem="'" id="w43.2.2" pos="PUN">'</w> 
+ <w lem="infrastructure" id="w43.2.3" pos="NOM">infrastructure</w> 
+ <w lem="énergétique" id="w43.2.4" pos="ADJ">énergétique</w> 
+ <w lem="être" id="w43.2.5" pos="VER:futu">sera</w> 
+ <w lem="modifier" id="w43.2.6" pos="VER:pper">modifiée</w> 
+ <w lem="de" id="w43.2.7" pos="PRP">de</w> 
+ <w lem="façon" id="w43.2.8" pos="NOM">façon</w> 
+ <w lem="à" id="w43.2.9" pos="PRP">à</w> 
+ <w lem="réduire" id="w43.2.10" pos="VER:infi">réduire</w> 
+ <w id="w43.2.11" pos="VER:pper">l</w>
+ <w lem="'" id="w43.2.12" pos="PUN">'</w> 
+ <w lem="acidification" id="w43.2.13" pos="NOM">acidification</w> 
+ <w lem="et" id="w43.2.14" pos="KON">et</w> 
+ <w lem="à" id="w43.2.15" pos="PRP">à</w> 
+ <w lem="combattre" id="w43.2.16" pos="VER:infi">combattre</w> 
+ <w lem="le" id="w43.2.17" pos="DET:ART">les</w> 
+ <w lem="répercussion" id="w43.2.18" pos="NOM">répercussions</w> 
+ <w lem="sur" id="w43.2.19" pos="PRP">sur</w> 
+ <w lem="le" id="w43.2.20" pos="DET:ART">le</w> 
+ <w lem="climat" id="w43.2.21" pos="NOM">climat</w>
+ <w lem="." id="w43.2.22" pos="SENT">.</w>
+</s></p>
+
+<p id="44">
+<s id="s44.1">
+ <w lem="le" id="w44.1.1" pos="DET:ART">La</w> 
+ <w lem="politique" id="w44.1.2" pos="NOM">politique</w> 
+ <w lem="agricole" id="w44.1.3" pos="ADJ">agricole</w> 
+ <w lem="du" id="w44.1.4" pos="PRP:det">du</w> 
+ <w id="w44.1.5" pos="NAM">Gouvernement</w> 
+ <w lem="viser" id="w44.1.6" pos="VER:pres">vise</w> 
+ <w lem="à" id="w44.1.7" pos="PRP">à</w> 
+ <w lem="un" id="w44.1.8" pos="DET:ART">une</w> 
+ <w lem="agriculture" id="w44.1.9" pos="NOM">agriculture</w> 
+ <w lem="dynamique" id="w44.1.10" pos="ADJ">dynamique</w>
+ <w lem="," id="w44.1.11" pos="PUN">,</w> 
+ <w lem="sans" id="w44.1.12" pos="PRP">sans</w> 
+ <w lem="effet" id="w44.1.13" pos="NOM">effets</w> 
+ <w lem="dommageable" id="w44.1.14" pos="ADJ">dommageables</w> 
+ <w lem="sur" id="w44.1.15" pos="PRP">sur</w> 
+ <w id="w44.1.16" pos="NOM">l</w>
+ <w lem="'" id="w44.1.17" pos="PUN">'</w> 
+ <w lem="environnement" id="w44.1.18" pos="NOM">environnement</w>
+ <w lem="." id="w44.1.19" pos="SENT">.</w>
+</s> 
+ 
+<s id="s44.2">
+ <w lem="un" id="w44.2.1" pos="DET:ART">Un</w> 
+ <w lem="passage" id="w44.2.2" pos="NOM">passage</w> 
+ <w lem="progressif" id="w44.2.3" pos="ADJ">progressif</w> 
+ <w lem="devoir" id="w44.2.4" pos="VER:pres">doit</w> 
+ <w id="w44.2.5" pos="VER:pper">s</w>
+ <w lem="'" id="w44.2.6" pos="PUN">'</w> 
+ <w lem="effectuer" id="w44.2.7" pos="VER:infi">effectuer</w> 
+ <w lem="de" id="w44.2.8" pos="PRP">de</w> 
+ <w lem="le" id="w44.2.9" pos="DET:ART">la</w> 
+ <w lem="production" id="w44.2.10" pos="NOM">production</w> 
+ <w lem="intensif" id="w44.2.11" pos="ADJ">intensive</w> 
+ <w lem="actuel" id="w44.2.12" pos="ADJ">actuelle</w> 
+ <w lem="vers" id="w44.2.13" pos="PRP">vers</w> 
+ <w lem="un" id="w44.2.14" pos="DET:ART">une</w> 
+ <w lem="agriculture" id="w44.2.15" pos="NOM">agriculture</w> 
+ <w lem="qui" id="w44.2.16" pos="PRO:REL">qui</w> 
+ <w lem="répondre" id="w44.2.17" pos="VER:subp">réponde</w> 
+ <w lem="mieux" id="w44.2.18" pos="ADV">mieux</w> 
+ <w lem="au" id="w44.2.19" pos="PRP:det">aux</w> 
+ <w lem="exigence" id="w44.2.20" pos="NOM">exigences</w> 
+ <w lem="poser" id="w44.2.21" pos="VER:pper">posées</w> 
+ <w lem="en" id="w44.2.22" pos="PRP">en</w> 
+ <w lem="ce" id="w44.2.23" pos="PRO:DEM">ce</w> 
+ <w lem="qui" id="w44.2.24" pos="PRO:REL">qui</w> 
+ <w lem="concerner" id="w44.2.25" pos="VER:pres">concerne</w> 
+ <w id="w44.2.26" pos="VER:pper">l</w>
+ <w lem="'" id="w44.2.27" pos="PUN">'</w> 
+ <w lem="environnement" id="w44.2.28" pos="NOM">environnement</w> 
+ <w lem="et" id="w44.2.29" pos="KON">et</w> 
+ <w id="w44.2.30" pos="NOM">l</w>
+ <w lem="'" id="w44.2.31" pos="PUN">'</w> 
+ <w lem="équilibre" id="w44.2.32" pos="NOM">équilibre</w> 
+ <w lem="régional" id="w44.2.33" pos="ADJ">régional</w>
+ <w lem="." id="w44.2.34" pos="SENT">.</w>
+</s> 
+ 
+<s id="s44.3">
+ <w lem="le" id="w44.3.1" pos="DET:ART">La</w> 
+ <w lem="culture" id="w44.3.2" pos="NOM">culture</w> 
+ <w lem="biologique" id="w44.3.3" pos="ADJ">biologique</w> 
+ <w lem="être" id="w44.3.4" pos="VER:futu">sera</w> 
+ <w lem="encourager" id="w44.3.5" pos="VER:pper">encouragée</w>
+ <w lem="." id="w44.3.6" pos="SENT">.</w>
+</s> 
+ 
+<s id="s44.4">
+ <w lem="le" id="w44.4.1" pos="DET:ART">Le</w> 
+ <w lem="paysage" id="w44.4.2" pos="NOM">paysage</w> 
+ <w lem="rural" id="w44.4.3" pos="ADJ">rural</w> 
+ <w lem="humaniser" id="w44.4.4" pos="VER:pper">humanisé</w> 
+ <w lem="être" id="w44.4.5" pos="VER:futu">sera</w> 
+ <w lem="préserver" id="w44.4.6" pos="VER:pper">préservé</w>
+ <w lem="." id="w44.4.7" pos="SENT">.</w>
+</s></p>
+
+<p id="45">
+<s id="s45.1">
+ <w lem="L" id="w45.1.1" pos="NUM">L</w>
+ <w lem="'" id="w45.1.2" pos="PUN">'</w> 
+ <w lem="évolution" id="w45.1.3" pos="NOM">évolution</w> 
+ <w lem="international" id="w45.1.4" pos="ADJ">internationale</w> 
+ <w lem="imposer" id="w45.1.5" pos="VER:futu">imposera</w> 
+ <w lem="également" id="w45.1.6" pos="ADV">également</w> 
+ <w lem="un" id="w45.1.7" pos="DET:ART">une</w> 
+ <w lem="conversion" id="w45.1.8" pos="NOM">conversion</w> 
+ <w lem="de" id="w45.1.9" pos="PRP">de</w> 
+ <w id="w45.1.10" pos="NOM">l</w>
+ <w lem="'" id="w45.1.11" pos="PUN">'</w> 
+ <w lem="aide" id="w45.1.12" pos="NOM">aide</w> 
+ <w lem="à" id="w45.1.13" pos="PRP">à</w> 
+ <w id="w45.1.14" pos="NOM">l</w>
+ <w lem="'" id="w45.1.15" pos="PUN">'</w> 
+ <w lem="agriculture" id="w45.1.16" pos="NOM">agriculture</w> 
+ <w lem="vers" id="w45.1.17" pos="PRP">vers</w> 
+ <w lem="du" id="w45.1.18" pos="PRP:det">des</w> 
+ <w lem="forme" id="w45.1.19" pos="NOM">formes</w> 
+ <w lem="impliquer" id="w45.1.20" pos="VER:ppre">impliquant</w> 
+ <w lem="un" id="w45.1.21" pos="DET:ART">un</w> 
+ <w lem="degré" id="w45.1.22" pos="NOM">degré</w> 
+ <w lem="moindre" id="w45.1.23" pos="ADJ">moindre</w> 
+ <w lem="de" id="w45.1.24" pos="PRP">de</w> 
+ <w lem="protectionnisme" id="w45.1.25" pos="NOM">protectionnisme</w>
+ <w lem="." id="w45.1.26" pos="SENT">.</w>
+</s> 
+ 
+<s id="s45.2">
+ <w lem="le" id="w45.2.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w45.2.2" pos="NOM">Gouvernement</w> 
+ <w lem="se" id="w45.2.3" pos="PRO:PER">se</w> 
+ <w lem="proposer" id="w45.2.4" pos="VER:pres">propose</w> 
+ <w lem="de" id="w45.2.5" pos="PRP">de</w> 
+ <w lem="développer" id="w45.2.6" pos="VER:infi">développer</w> 
+ <w lem="le" id="w45.2.7" pos="DET:ART">la</w> 
+ <w lem="politique" id="w45.2.8" pos="NOM">politique</w> 
+ <w lem="de" id="w45.2.9" pos="PRP">de</w> 
+ <w id="w45.2.10" pos="NOM">l</w>
+ <w lem="'" id="w45.2.11" pos="PUN">'</w> 
+ <w lem="alimentation" id="w45.2.12" pos="NOM">alimentation</w> 
+ <w lem="en" id="w45.2.13" pos="PRP">en</w> 
+ <w lem="sorte" id="w45.2.14" pos="NOM">sorte</w> 
+ <w lem="que" id="w45.2.15" pos="KON">que</w> 
+ <w id="w45.2.16" pos="NOM">l</w>
+ <w lem="'" id="w45.2.17" pos="PUN">'</w> 
+ <w lem="évolution" id="w45.2.18" pos="NOM">évolution</w> 
+ <w lem="du" id="w45.2.19" pos="PRP:det">des</w> 
+ <w lem="prix" id="w45.2.20" pos="NOM">prix</w> 
+ <w lem="être" id="w45.2.21" pos="VER:subp">soit</w> 
+ <w lem="freiner" id="w45.2.22" pos="VER:pper">freinée</w> 
+ <w lem="et" id="w45.2.23" pos="KON">et</w> 
+ <w lem="que" id="w45.2.24" pos="KON">que</w> 
+ <w lem="le" id="w45.2.25" pos="DET:ART">les</w> 
+ <w lem="consommateur" id="w45.2.26" pos="NOM">consommateurs</w> 
+ <w lem="se" id="w45.2.27" pos="PRO:PER">se</w> 
+ <w lem="voir" id="w45.2.28" pos="VER:pres">voient</w> 
+ <w lem="offrir" id="w45.2.29" pos="VER:infi">offrir</w> 
+ <w lem="du" id="w45.2.30" pos="PRP:det">des</w> 
+ <w lem="denrée" id="w45.2.31" pos="NOM">denrées</w> 
+ <w lem="alimentaire" id="w45.2.32" pos="ADJ">alimentaires</w> 
+ <w lem="à" id="w45.2.33" pos="PRP">à</w> 
+ <w lem="du" id="w45.2.34" pos="PRP:det">des</w> 
+ <w lem="prix" id="w45.2.35" pos="NOM">prix</w> 
+ <w lem="raisonnable" id="w45.2.36" pos="ADJ">raisonnables</w>
+ <w lem="." id="w45.2.37" pos="SENT">.</w>
+</s> 
+ 
+<s id="s45.3">
+ <w lem="le" id="w45.3.1" pos="DET:ART">Le</w> 
+ <w lem="contrôle" id="w45.3.2" pos="NOM">contrôle</w> 
+ <w lem="du" id="w45.3.3" pos="PRP:det">des</w> 
+ <w lem="denrée" id="w45.3.4" pos="NOM">denrées</w> 
+ <w lem="alimentaire" id="w45.3.5" pos="ADJ">alimentaires</w> 
+ <w lem="être" id="w45.3.6" pos="VER:futu">sera</w> 
+ <w lem="renforcer" id="w45.3.7" pos="VER:pper">renforcé</w>
+ <w lem="." id="w45.3.8" pos="SENT">.</w>
+</s></p>
+
+<p id="46">
+<s id="s46.1">
+ <w lem="le" id="w46.1.1" pos="DET:ART">Le</w> 
+ <w lem="secteur" id="w46.1.2" pos="NOM">secteur</w> 
+ <w lem="public" id="w46.1.3" pos="ADJ">public</w> 
+ <w lem="être" id="w46.1.4" pos="VER:futu">sera</w> 
+ <w lem="rénover" id="w46.1.5" pos="VER:pper">rénové</w> 
+ <w lem="afin" id="w46.1.6" pos="KON">afin</w> 
+ <w lem="de" id="w46.1.7" pos="PRP">de</w> 
+ <w lem="mieux" id="w46.1.8" pos="ADV">mieux</w> 
+ <w lem="venir" id="w46.1.9" pos="VER:infi">venir</w> 
+ <w lem="en" id="w46.1.10" pos="PRP">en</w> 
+ <w lem="aide" id="w46.1.11" pos="NOM">aide</w> 
+ <w lem="au" id="w46.1.12" pos="PRP:det">aux</w> 
+ <w lem="gens" id="w46.1.13" pos="NOM">gens</w> 
+ <w lem="en" id="w46.1.14" pos="PRP">en</w> 
+ <w lem="fonction" id="w46.1.15" pos="NOM">fonction</w> 
+ <w lem="de" id="w46.1.16" pos="PRP">de</w> 
+ <w lem="leur" id="w46.1.17" pos="DET:POS">leurs</w> 
+ <w lem="besoin" id="w46.1.18" pos="NOM">besoins</w> 
+ <w lem="et" id="w46.1.19" pos="KON">et</w> 
+ <w lem="de" id="w46.1.20" pos="PRP">de</w> 
+ <w lem="leur" id="w46.1.21" pos="DET:POS">leur</w> 
+ <w lem="désir" id="w46.1.22" pos="NOM">désirs</w>
+ <w lem="." id="w46.1.23" pos="SENT">.</w>
+</s> 
+ 
+<s id="s46.2">
+ <w lem="le" id="w46.2.1" pos="DET:ART">Le</w> 
+ <w lem="service" id="w46.2.2" pos="NOM">service</w> 
+ <w lem="et" id="w46.2.3" pos="KON">et</w> 
+ <w lem="le" id="w46.2.4" pos="DET:ART">la</w> 
+ <w lem="liberté" id="w46.2.5" pos="NOM">liberté</w> 
+ <w lem="de" id="w46.2.6" pos="PRP">de</w> 
+ <w lem="choix" id="w46.2.7" pos="NOM">choix</w> 
+ <w lem="être" id="w46.2.8" pos="VER:futu">seront</w> 
+ <w lem="accroire|accroître" id="w46.2.9" pos="VER:pper">accrus</w>
+ <w lem="." id="w46.2.10" pos="SENT">.</w>
+</s> 
+ 
+<s id="s46.3">
+ <w lem="L" id="w46.3.1" pos="NUM">L</w>
+ <w lem="'" id="w46.3.2" pos="PUN">'</w> 
+ <w lem="efficacité" id="w46.3.3" pos="NOM">efficacité</w> 
+ <w lem="être" id="w46.3.4" pos="VER:futu">sera</w> 
+ <w lem="encourager" id="w46.3.5" pos="VER:pper">encouragée</w>
+ <w lem="," id="w46.3.6" pos="PUN">,</w> 
+ <w lem="notamment" id="w46.3.7" pos="ADV">notamment</w> 
+ <w lem="en" id="w46.3.8" pos="PRP">en</w> 
+ <w lem="laisser" id="w46.3.9" pos="VER:ppre">laissant</w> 
+ <w lem="un" id="w46.3.10" pos="DET:ART">une</w> 
+ <w lem="plus" id="w46.3.11" pos="ADV">plus</w> 
+ <w lem="large" id="w46.3.12" pos="ADJ">large</w> 
+ <w lem="place" id="w46.3.13" pos="NOM">place</w> 
+ <w lem="à" id="w46.3.14" pos="PRP">à</w> 
+ <w id="w46.3.15" pos="NOM">l</w>
+ <w lem="'" id="w46.3.16" pos="PUN">'</w> 
+ <w id="w46.3.17" pos="NOM">ésprit</w> 
+ <w id="w46.3.18" pos="ADJ">d</w>
+ <w lem="'" id="w46.3.19" pos="PUN">'</w> 
+ <w lem="initiative" id="w46.3.20" pos="NOM">initiative</w> 
+ <w lem="du" id="w46.3.21" pos="PRP:det">du</w> 
+ <w lem="personnel" id="w46.3.22" pos="NOM">personnel</w>
+ <w lem="." id="w46.3.23" pos="SENT">.</w>
+</s></p>
+
+<p id="47">
+<s id="s47.1">
+ <w lem="L" id="w47.1.1" pos="NUM">L</w>
+ <w lem="'" id="w47.1.2" pos="PUN">'</w> 
+ <w lem="assurance" id="w47.1.3" pos="NOM">assurance</w> 
+ <w lem="parental" id="w47.1.4" pos="ADJ">parentale</w> 
+ <w lem="être" id="w47.1.5" pos="VER:futu">sera</w> 
+ <w lem="porter" id="w47.1.6" pos="VER:pper">portée</w> 
+ <w lem="de" id="w47.1.7" pos="PRP">de</w> 
+ <w lem="neuf" id="w47.1.8" pos="ADJ">neuf</w> 
+ <w lem="à" id="w47.1.9" pos="PRP">à</w> 
+ <w lem="dix-huit" id="w47.1.10" pos="NUM">dix-huit</w> 
+ <w lem="moi|mois" id="w47.1.11" pos="NOM">mois</w>
+ <w lem="," id="w47.1.12" pos="PUN">,</w> 
+ <w lem="avec" id="w47.1.13" pos="PRP">avec</w> 
+ <w lem="un" id="w47.1.14" pos="DET:ART">une</w> 
+ <w lem="indemnisation" id="w47.1.15" pos="NOM">indemnisation</w> 
+ <w lem="selon" id="w47.1.16" pos="PRP">selon</w> 
+ <w lem="le" id="w47.1.17" pos="DET:ART">le</w> 
+ <w lem="principe" id="w47.1.18" pos="NOM">principe</w> 
+ <w lem="de" id="w47.1.19" pos="PRP">de</w> 
+ <w lem="le" id="w47.1.20" pos="DET:ART">la</w> 
+ <w lem="compensation" id="w47.1.21" pos="NOM">compensation</w> 
+ <w lem="de" id="w47.1.22" pos="PRP">de</w> 
+ <w lem="le" id="w47.1.23" pos="DET:ART">la</w> 
+ <w lem="perte" id="w47.1.24" pos="NOM">perte</w> 
+ <w lem="de" id="w47.1.25" pos="PRP">de</w> 
+ <w lem="revenu" id="w47.1.26" pos="NOM">revenu</w>
+ <w lem="." id="w47.1.27" pos="SENT">.</w>
+</s> 
+ 
+<s id="s47.2">
+ <w lem="ce" id="w47.2.1" pos="PRO:DEM">Cette</w> 
+ <w lem="extension" id="w47.2.2" pos="NOM">extension</w> 
+ <w lem="être" id="w47.2.3" pos="VER:futu">sera</w> 
+ <w lem="achever" id="w47.2.4" pos="VER:pper">achevée</w> 
+ <w lem="en" id="w47.2.5" pos="PRP">en</w> 
+ <w lem="@ord@" id="w47.2.6" pos="NAM">1991.</w>
+</s> 
+ 
+<s id="s47.3">
+ <w lem="le" id="w47.3.1" pos="DET:ART">La</w> 
+ <w lem="premier" id="w47.3.2" pos="NUM">première</w> 
+ <w lem="étape" id="w47.3.3" pos="NOM">étape</w>
+ <w lem="," id="w47.3.4" pos="PUN">,</w> 
+ <w lem="qui" id="w47.3.5" pos="PRO:REL">qui</w> 
+ <w lem="prendre" id="w47.3.6" pos="VER:futu">prendra</w> 
+ <w lem="effet" id="w47.3.7" pos="NOM">effet</w> 
+ <w lem="au" id="w47.3.8" pos="PRP:det">au</w> 
+ <w lem="1er" id="w47.3.9" pos="NUM">1er</w> 
+ <w lem="juillet" id="w47.3.10" pos="NOM">juillet</w> 
+ <w lem="@card@" id="w47.3.11" pos="NUM">1989</w>
+ <w lem="," id="w47.3.12" pos="PUN">,</w> 
+ <w lem="impliquer" id="w47.3.13" pos="VER:pres">implique</w> 
+ <w id="w47.3.14" pos="VER:pper">l</w>
+ <w lem="'" id="w47.3.15" pos="PUN">'</w> 
+ <w lem="indemnisation" id="w47.3.16" pos="NOM">indemnisation</w> 
+ <w lem="de" id="w47.3.17" pos="PRP">de</w> 
+ <w lem="trois" id="w47.3.18" pos="NUM">trois</w> 
+ <w lem="moi|mois" id="w47.3.19" pos="NOM">mois</w> 
+ <w lem="supplémentaire" id="w47.3.20" pos="ADJ">supplémentaires</w>
+ <w lem="." id="w47.3.21" pos="SENT">.</w>
+</s></p>
+
+<p id="48">
+<s id="s48.1">
+ <w lem="le" id="w48.1.1" pos="DET:ART">Le</w> 
+ <w lem="développement" id="w48.1.2" pos="NOM">développement</w> 
+ <w lem="du" id="w48.1.3" pos="PRP:det">des</w> 
+ <w lem="structure" id="w48.1.4" pos="NOM">structures</w> 
+ <w id="w48.1.5" pos="ADJ">d</w>
+ <w lem="'" id="w48.1.6" pos="PUN">'</w> 
+ <w lem="accueil" id="w48.1.7" pos="NOM">accueil</w> 
+ <w lem="de" id="w48.1.8" pos="PRP">de</w> 
+ <w id="w48.1.9" pos="NOM">l</w>
+ <w lem="'" id="w48.1.10" pos="PUN">'</w> 
+ <w lem="enfance" id="w48.1.11" pos="NOM">enfance</w> 
+ <w lem="être" id="w48.1.12" pos="VER:futu">sera</w> 
+ <w lem="poursuivre" id="w48.1.13" pos="VER:pper">poursuivi</w> 
+ <w lem="conformément" id="w48.1.14" pos="ADV">conformément</w> 
+ <w lem="au" id="w48.1.15" pos="PRP:det">aux</w> 
+ <w lem="décision" id="w48.1.16" pos="NOM">décisions</w> 
+ <w lem="du" id="w48.1.17" pos="PRP:det">du</w> 
+ <w id="w48.1.18" pos="NOM">Riksdag</w>
+ <w lem="." id="w48.1.19" pos="SENT">.</w>
+</s></p>
+
+<p id="49">
+<s id="s49.1">
+ <w lem="avec" id="w49.1.1" pos="PRP">Avec</w> 
+ <w id="w49.1.2" pos="NOM">l</w>
+ <w lem="'" id="w49.1.3" pos="PUN">'</w> 
+ <w lem="augmentation" id="w49.1.4" pos="NOM">augmentation</w> 
+ <w lem="exceptionnel" id="w49.1.5" pos="ADJ">exceptionnelle</w> 
+ <w lem="du" id="w49.1.6" pos="PRP:det">du</w> 
+ <w lem="montant" id="w49.1.7" pos="NOM">montant</w> 
+ <w lem="de" id="w49.1.8" pos="PRP">de</w> 
+ <w lem="base" id="w49.1.9" pos="NOM">base</w> 
+ <w lem="au" id="w49.1.10" pos="PRP:det">au</w> 
+ <w lem="1er" id="w49.1.11" pos="NUM">1er</w> 
+ <w lem="janvier" id="w49.1.12" pos="NOM">janvier</w> 
+ <w lem="@card@" id="w49.1.13" pos="NUM">1989</w>
+ <w lem="," id="w49.1.14" pos="PUN">,</w> 
+ <w lem="le" id="w49.1.15" pos="DET:ART">les</w> 
+ <w lem="retraité" id="w49.1.16" pos="NOM">retraités</w> 
+ <w lem="obtenir" id="w49.1.17" pos="VER:futu">obtiendront</w> 
+ <w lem="un" id="w49.1.18" pos="DET:ART">une</w> 
+ <w lem="plein" id="w49.1.19" pos="ADJ">pleine</w> 
+ <w lem="compensation" id="w49.1.20" pos="NOM">compensation</w> 
+ <w lem="pour" id="w49.1.21" pos="PRP">pour</w> 
+ <w lem="le" id="w49.1.22" pos="DET:ART">les</w> 
+ <w lem="effet" id="w49.1.23" pos="NOM">effets</w> 
+ <w lem="de" id="w49.1.24" pos="PRP">de</w> 
+ <w lem="le" id="w49.1.25" pos="DET:ART">la</w> 
+ <w lem="dévaluation" id="w49.1.26" pos="NOM">dévaluation</w> 
+ <w lem="de" id="w49.1.27" pos="PRP">de</w> 
+ <w lem="@ord@" id="w49.1.28" pos="NAM">1982.</w>
+</s></p>
+
+<p id="50">
+<s id="s50.1">
+ <w lem="le" id="w50.1.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w50.1.2" pos="NOM">Gouvernement</w> 
+ <w lem="se" id="w50.1.3" pos="PRO:PER">se</w> 
+ <w lem="proposer" id="w50.1.4" pos="VER:pres">propose</w>
+ <w lem="," id="w50.1.5" pos="PUN">,</w> 
+ <w lem="notamment" id="w50.1.6" pos="ADV">notamment</w> 
+ <w lem="par" id="w50.1.7" pos="PRP">par</w> 
+ <w lem="le" id="w50.1.8" pos="DET:ART">les</w> 
+ <w lem="travail" id="w50.1.9" pos="NOM">travaux</w> 
+ <w lem="de" id="w50.1.10" pos="PRP">de</w> 
+ <w lem="le" id="w50.1.11" pos="DET:ART">la</w> 
+ <w lem="commission" id="w50.1.12" pos="NOM">Commission</w> 
+ <w id="w50.1.13" pos="ADJ">d</w>
+ <w lem="'" id="w50.1.14" pos="PUN">'</w> 
+ <w lem="étude" id="w50.1.15" pos="NOM">étude</w> 
+ <w lem="sur" id="w50.1.16" pos="PRP">sur</w> 
+ <w lem="le" id="w50.1.17" pos="DET:ART">les</w> 
+ <w lem="service" id="w50.1.18" pos="NOM">services</w> 
+ <w lem="de" id="w50.1.19" pos="PRP">de</w> 
+ <w lem="santé" id="w50.1.20" pos="NOM">santé</w> 
+ <w lem="et" id="w50.1.21" pos="KON">et</w> 
+ <w lem="de" id="w50.1.22" pos="PRP">de</w> 
+ <w lem="soin" id="w50.1.23" pos="NOM">soins</w> 
+ <w lem="médical" id="w50.1.24" pos="ADJ">médicaux</w>
+ <w lem="," id="w50.1.25" pos="PUN">,</w> 
+ <w id="w50.1.26" pos="VER:pper">d</w>
+ <w lem="'" id="w50.1.27" pos="PUN">'</w> 
+ <w lem="accorder" id="w50.1.28" pos="VER:infi">accorder</w> 
+ <w lem="un" id="w50.1.29" pos="DET:ART">une</w> 
+ <w lem="grand" id="w50.1.30" pos="ADJ">grande</w> 
+ <w lem="attention" id="w50.1.31" pos="NOM">attention</w> 
+ <w lem="à" id="w50.1.32" pos="PRP">à</w> 
+ <w lem="ce" id="w50.1.33" pos="PRO:DEM">ce</w> 
+ <w lem="que" id="w50.1.34" pos="PRO:REL">que</w> 
+ <w lem="tout" id="w50.1.35" pos="PRO:IND">tout</w> 
+ <w lem="le" id="w50.1.36" pos="DET:ART">le</w> 
+ <w lem="monde" id="w50.1.37" pos="NOM">monde</w> 
+ <w lem="avoir" id="w50.1.38" pos="VER:subp">ait</w> 
+ <w lem="droit" id="w50.1.39" pos="ADJ">droit</w> 
+ <w lem="à" id="w50.1.40" pos="PRP">à</w> 
+ <w lem="du" id="w50.1.41" pos="PRP:det">des</w> 
+ <w lem="soin" id="w50.1.42" pos="NOM">soins</w> 
+ <w lem="médical" id="w50.1.43" pos="ADJ">médicaux</w> 
+ <w lem="de" id="w50.1.44" pos="PRP">de</w> 
+ <w lem="haut" id="w50.1.45" pos="ADJ">haute</w> 
+ <w lem="qualité" id="w50.1.46" pos="NOM">qualité</w>
+ <w lem="." id="w50.1.47" pos="SENT">.</w>
+</s> 
+ 
+<s id="s50.2">
+ <w lem="le" id="w50.2.1" pos="DET:ART">Le</w> 
+ <w lem="recrutement" id="w50.2.2" pos="NOM">recrutement</w> 
+ <w lem="du" id="w50.2.3" pos="PRP:det">du</w> 
+ <w lem="personnel" id="w50.2.4" pos="NOM">personnel</w> 
+ <w lem="dans" id="w50.2.5" pos="PRP">dans</w> 
+ <w lem="le" id="w50.2.6" pos="DET:ART">les</w> 
+ <w lem="service" id="w50.2.7" pos="NOM">services</w> 
+ <w lem="de" id="w50.2.8" pos="PRP">de</w> 
+ <w lem="soin" id="w50.2.9" pos="NOM">soins</w> 
+ <w lem="médical" id="w50.2.10" pos="ADJ">médicaux</w> 
+ <w lem="et" id="w50.2.11" pos="KON">et</w> 
+ <w id="w50.2.12" pos="ADJ">d</w>
+ <w lem="'" id="w50.2.13" pos="PUN">'</w> 
+ <w lem="action" id="w50.2.14" pos="NOM">action</w> 
+ <w lem="social" id="w50.2.15" pos="ADJ">sociale</w> 
+ <w lem="devoir" id="w50.2.16" pos="VER:pres">doit</w> 
+ <w lem="être" id="w50.2.17" pos="VER:infi">être</w> 
+ <w lem="améliorer" id="w50.2.18" pos="VER:pper">amélioré</w>
+ <w lem="." id="w50.2.19" pos="SENT">.</w>
+</s></p>
+
+<p id="51">
+<s id="s51.1">
+ <w lem="un" id="w51.1.1" pos="DET:ART">Une</w> 
+ <w lem="attention" id="w51.1.2" pos="NOM">attention</w> 
+ <w lem="particulier" id="w51.1.3" pos="ADJ">particulière</w> 
+ <w lem="être" id="w51.1.4" pos="VER:futu">sera</w> 
+ <w lem="porter" id="w51.1.5" pos="VER:pper">portée</w> 
+ <w lem="à" id="w51.1.6" pos="PRP">à</w> 
+ <w lem="le" id="w51.1.7" pos="DET:ART">la</w> 
+ <w lem="situation" id="w51.1.8" pos="NOM">situation</w> 
+ <w lem="du" id="w51.1.9" pos="PRP:det">des</w> 
+ <w lem="personne" id="w51.1.10" pos="NOM">personnes</w> 
+ <w lem="gravement" id="w51.1.11" pos="ADV">gravement</w> 
+ <w lem="handicaper" id="w51.1.12" pos="VER:pper">handicapées</w> 
+ <w lem="ainsi" id="w51.1.13" pos="ADV">ainsi</w> 
+ <w id="w51.1.14" pos="VER:pper">qu</w>
+ <w lem="'" id="w51.1.15" pos="PUN">'</w> 
+ <w lem="à" id="w51.1.16" pos="PRP">à</w> 
+ <w lem="celui" id="w51.1.17" pos="PRO:DEM">celle</w> 
+ <w lem="du" id="w51.1.18" pos="PRP:det">des</w> 
+ <w lem="enfant" id="w51.1.19" pos="NOM">enfants</w> 
+ <w lem="handicaper" id="w51.1.20" pos="VER:pper">handicapés</w> 
+ <w lem="et" id="w51.1.21" pos="KON">et</w> 
+ <w lem="de" id="w51.1.22" pos="PRP">de</w> 
+ <w lem="leur" id="w51.1.23" pos="DET:POS">leur</w> 
+ <w lem="famille" id="w51.1.24" pos="NOM">famille</w>
+ <w lem="." id="w51.1.25" pos="SENT">.</w>
+</s></p>
+
+<p id="52">
+<s id="s52.1">
+ <w lem="L" id="w52.1.1" pos="NUM">L</w>
+ <w lem="'" id="w52.1.2" pos="PUN">'</w> 
+ <w lem="action" id="w52.1.3" pos="NOM">action</w> 
+ <w lem="social" id="w52.1.4" pos="ADJ">sociale</w> 
+ <w lem="en" id="w52.1.5" pos="PRP">en</w> 
+ <w lem="faveur" id="w52.1.6" pos="NOM">faveur</w> 
+ <w lem="du" id="w52.1.7" pos="PRP:det">des</w> 
+ <w lem="personne" id="w52.1.8" pos="NOM">personnes</w> 
+ <w lem="âgé" id="w52.1.9" pos="ADJ">âgées</w> 
+ <w lem="être" id="w52.1.10" pos="VER:futu">sera</w> 
+ <w lem="développer" id="w52.1.11" pos="VER:pper">développée</w> 
+ <w lem="afin" id="w52.1.12" pos="KON">afin</w> 
+ <w lem="de" id="w52.1.13" pos="PRP">de</w> 
+ <w lem="lui" id="w52.1.14" pos="PRO:PER">leur</w> 
+ <w lem="assurer" id="w52.1.15" pos="VER:infi">assurer</w> 
+ <w lem="sécurité" id="w52.1.16" pos="NOM">sécurité</w>
+ <w lem="," id="w52.1.17" pos="PUN">,</w> 
+ <w lem="autonomie" id="w52.1.18" pos="NOM">autonomie</w> 
+ <w lem="de" id="w52.1.19" pos="PRP">de</w> 
+ <w lem="décision" id="w52.1.20" pos="NOM">décision</w> 
+ <w lem="et" id="w52.1.21" pos="KON">et</w> 
+ <w lem="liberté" id="w52.1.22" pos="NOM">liberté</w> 
+ <w lem="de" id="w52.1.23" pos="PRP">de</w> 
+ <w lem="choix" id="w52.1.24" pos="NOM">choix</w>
+ <w lem="." id="w52.1.25" pos="SENT">.</w>
+</s></p>
+
+<p id="53">
+<s id="s53.1">
+ <w lem="le" id="w53.1.1" pos="DET:ART">La</w> 
+ <w lem="lutte" id="w53.1.2" pos="NOM">lutte</w> 
+ <w lem="contre" id="w53.1.3" pos="PRP">contre</w> 
+ <w lem="le" id="w53.1.4" pos="DET:ART">le</w> 
+ <w lem="virus" id="w53.1.5" pos="NOM">virus</w> 
+ <w lem="HIV" id="w53.1.6" pos="NAM">HIV</w> 
+ <w lem="et" id="w53.1.7" pos="KON">et</w> 
+ <w lem="le" id="w53.1.8" pos="DET:ART">le</w> 
+ <w id="w53.1.9" pos="NAM">SIDA</w> 
+ <w lem="être" id="w53.1.10" pos="VER:futu">sera</w> 
+ <w lem="poursuivre" id="w53.1.11" pos="VER:pper">poursuivie</w>
+ <w lem="," id="w53.1.12" pos="PUN">,</w> 
+ <w lem="de" id="w53.1.13" pos="PRP">de</w> 
+ <w lem="même" id="w53.1.14" pos="ADV">même</w> 
+ <w lem="que" id="w53.1.15" pos="KON">que</w> 
+ <w lem="celui" id="w53.1.16" pos="PRO:DEM">celle</w> 
+ <w lem="contre" id="w53.1.17" pos="PRP">contre</w> 
+ <w lem="le" id="w53.1.18" pos="DET:ART">les</w> 
+ <w lem="stupéfiant" id="w53.1.19" pos="NOM">stupéfiants</w>
+ <w lem="." id="w53.1.20" pos="SENT">.</w>
+</s></p>
+
+<p id="54">
+<s id="s54.1">
+ <w lem="le" id="w54.1.1" pos="DET:ART">Le</w> 
+ <w lem="projet" id="w54.1.2" pos="NOM">projet</w> 
+ <w lem="du" id="w54.1.3" pos="PRP:det">du</w> 
+ <w lem="gouvernement" id="w54.1.4" pos="NOM">Gouvernement</w> 
+ <w lem="concernant" id="w54.1.5" pos="PRP">concernant</w> 
+ <w id="w54.1.6" pos="NOM">l</w>
+ <w lem="'" id="w54.1.7" pos="PUN">'</w> 
+ <w lem="école" id="w54.1.8" pos="NOM">école</w> 
+ <w lem="de" id="w54.1.9" pos="PRP">de</w> 
+ <w lem="base" id="w54.1.10" pos="NOM">base</w> 
+ <w lem="être" id="w54.1.11" pos="VER:pres">est</w> 
+ <w lem="maintenant" id="w54.1.12" pos="ADV">maintenant</w> 
+ <w lem="prêt" id="w54.1.13" pos="ADJ">prêt</w> 
+ <w lem="à" id="w54.1.14" pos="PRP">à</w> 
+ <w lem="être" id="w54.1.15" pos="VER:infi">être</w> 
+ <w lem="examiner" id="w54.1.16" pos="VER:pper">examiné</w>
+ <w lem="." id="w54.1.17" pos="SENT">.</w>
+</s> 
+ 
+<s id="s54.2">
+ <w lem="L" id="w54.2.1" pos="NUM">L</w>
+ <w lem="'" id="w54.2.2" pos="PUN">'</w> 
+ <w lem="école" id="w54.2.3" pos="NOM">école</w> 
+ <w lem="du" id="w54.2.4" pos="PRP:det">du</w> 
+ <w lem="second" id="w54.2.5" pos="NUM">second</w> 
+ <w lem="cycle" id="w54.2.6" pos="NOM">cycle</w> 
+ <w lem="de" id="w54.2.7" pos="PRP">de</w> 
+ <w id="w54.2.8" pos="NOM">l</w>
+ <w lem="'" id="w54.2.9" pos="PUN">'</w> 
+ <w lem="enseignement" id="w54.2.10" pos="NOM">enseignement</w> 
+ <w lem="secondaire" id="w54.2.11" pos="ADJ">secondaire</w> 
+ <w lem="aller" id="w54.2.12" pos="VER:pres">va</w> 
+ <w lem="être" id="w54.2.13" pos="VER:infi">être</w> 
+ <w lem="réformer" id="w54.2.14" pos="VER:pper">réformée</w>
+ <w lem="." id="w54.2.15" pos="SENT">.</w>
+</s> 
+ 
+<s id="s54.3">
+ <w lem="ceci" id="w54.3.1" pos="PRO:DEM">Ceci</w> 
+ <w lem="impliquer" id="w54.3.2" pos="VER:pres">implique</w> 
+ <w lem="du" id="w54.3.3" pos="PRP:det">des</w> 
+ <w lem="changement" id="w54.3.4" pos="NOM">changements</w> 
+ <w lem="en" id="w54.3.5" pos="PRP">en</w> 
+ <w lem="ce" id="w54.3.6" pos="PRO:DEM">ce</w> 
+ <w lem="qui" id="w54.3.7" pos="PRO:REL">qui</w> 
+ <w lem="concerner" id="w54.3.8" pos="VER:pres">concerne</w> 
+ <w lem="aussi" id="w54.3.9" pos="ADV">aussi</w> 
+ <w lem="bien" id="w54.3.10" pos="ADV">bien</w> 
+ <w lem="le" id="w54.3.11" pos="DET:ART">les</w> 
+ <w lem="filière" id="w54.3.12" pos="NOM">filières</w> 
+ <w lem="à" id="w54.3.13" pos="PRP">à</w> 
+ <w lem="orientation" id="w54.3.14" pos="NOM">orientation</w> 
+ <w lem="professionnel" id="w54.3.15" pos="ADJ">professionnelle</w> 
+ <w lem="que" id="w54.3.16" pos="KON">que</w> 
+ <w lem="le" id="w54.3.17" pos="DET:ART">les</w> 
+ <w lem="filière" id="w54.3.18" pos="NOM">filières</w> 
+ <w lem="théorique" id="w54.3.19" pos="ADJ">théoriques</w>
+ <w lem="." id="w54.3.20" pos="SENT">.</w>
+</s> 
+ 
+<s id="s54.4">
+ <w lem="un" id="w54.4.1" pos="DET:ART">Une</w> 
+ <w lem="place" id="w54.4.2" pos="NOM">place</w> 
+ <w lem="être" id="w54.4.3" pos="VER:futu">sera</w> 
+ <w lem="assurer" id="w54.4.4" pos="VER:pper">assurée</w> 
+ <w lem="à" id="w54.4.5" pos="PRP">à</w> 
+ <w lem="tout" id="w54.4.6" pos="PRO:IND">tous</w> 
+ <w lem="le" id="w54.4.7" pos="DET:ART">les</w> 
+ <w lem="jeune" id="w54.4.8" pos="NOM">jeunes</w> 
+ <w lem="de" id="w54.4.9" pos="PRP">de</w> 
+ <w lem="moins" id="w54.4.10" pos="ADV">moins</w> 
+ <w lem="de" id="w54.4.11" pos="PRP">de</w> 
+ <w lem="vingt" id="w54.4.12" pos="NUM">vingt</w> 
+ <w lem="an" id="w54.4.13" pos="NOM">ans</w> 
+ <w lem="à" id="w54.4.14" pos="PRP">à</w> 
+ <w id="w54.4.15" pos="NOM">l</w>
+ <w lem="'" id="w54.4.16" pos="PUN">'</w> 
+ <w lem="école" id="w54.4.17" pos="NOM">école</w> 
+ <w lem="du" id="w54.4.18" pos="PRP:det">du</w> 
+ <w lem="second" id="w54.4.19" pos="NUM">second</w> 
+ <w lem="cycle" id="w54.4.20" pos="NOM">cycle</w> 
+ <w lem="de" id="w54.4.21" pos="PRP">de</w> 
+ <w id="w54.4.22" pos="NOM">l</w>
+ <w lem="'" id="w54.4.23" pos="PUN">'</w> 
+ <w lem="enseignement" id="w54.4.24" pos="NOM">enseignement</w> 
+ <w lem="secondaire" id="w54.4.25" pos="ADJ">secondaire</w>
+ <w lem="." id="w54.4.26" pos="SENT">.</w>
+</s></p>
+
+<p id="55">
+<s id="s55.1">
+ <w lem="L" id="w55.1.1" pos="NUM">L</w>
+ <w lem="'" id="w55.1.2" pos="PUN">'</w> 
+ <w lem="enseignement" id="w55.1.3" pos="NOM">enseignement</w> 
+ <w lem="du" id="w55.1.4" pos="PRP:det">des</w> 
+ <w lem="adulte" id="w55.1.5" pos="NOM">adultes</w>
+ <w lem="," id="w55.1.6" pos="PUN">,</w> 
+ <w lem="le" id="w55.1.7" pos="DET:ART">la</w> 
+ <w lem="formation" id="w55.1.8" pos="NOM">formation</w> 
+ <w lem="pour" id="w55.1.9" pos="PRP">pour</w> 
+ <w lem="le" id="w55.1.10" pos="DET:ART">le</w> 
+ <w lem="marché" id="w55.1.11" pos="NOM">marché</w> 
+ <w lem="du" id="w55.1.12" pos="PRP:det">du</w> 
+ <w lem="travail" id="w55.1.13" pos="NOM">travail</w> 
+ <w lem="et" id="w55.1.14" pos="KON">et</w> 
+ <w lem="le" id="w55.1.15" pos="DET:ART">la</w> 
+ <w lem="formation" id="w55.1.16" pos="NOM">formation</w> 
+ <w lem="du" id="w55.1.17" pos="PRP:det">du</w> 
+ <w lem="personnel" id="w55.1.18" pos="NOM">personnel</w> 
+ <w lem="être" id="w55.1.19" pos="VER:futu">seront</w> 
+ <w lem="mieux" id="w55.1.20" pos="ADV">mieux</w> 
+ <w lem="coordonner" id="w55.1.21" pos="VER:pper">coordonnés</w>
+ <w lem="." id="w55.1.22" pos="SENT">.</w>
+</s></p>
+
+<p id="56">
+<s id="s56.1">
+ <w lem="le" id="w56.1.1" pos="DET:ART">Les</w> 
+ <w lem="effort" id="w56.1.2" pos="NOM">efforts</w> 
+ <w lem="afin" id="w56.1.3" pos="KON">afin</w> 
+ <w id="w56.1.4" pos="NOM">d</w>
+ <w lem="'" id="w56.1.5" pos="PUN">'</w> 
+ <w lem="arriver" id="w56.1.6" pos="VER:infi">arriver</w> 
+ <w lem="à" id="w56.1.7" pos="PRP">à</w> 
+ <w lem="un" id="w56.1.8" pos="DET:ART">une</w> 
+ <w lem="plus" id="w56.1.9" pos="ADV">plus</w> 
+ <w lem="grand" id="w56.1.10" pos="ADJ">grande</w> 
+ <w lem="égalité" id="w56.1.11" pos="NOM">égalité</w> 
+ <w lem="entre" id="w56.1.12" pos="PRP">entre</w> 
+ <w lem="le" id="w56.1.13" pos="DET:ART">les</w> 
+ <w lem="sexe" id="w56.1.14" pos="NOM">sexes</w> 
+ <w lem="et" id="w56.1.15" pos="KON">et</w> 
+ <w lem="à" id="w56.1.16" pos="PRP">à</w> 
+ <w lem="un" id="w56.1.17" pos="DET:ART">une</w> 
+ <w lem="composition" id="w56.1.18" pos="NOM">composition</w> 
+ <w lem="social" id="w56.1.19" pos="ADJ">sociale</w> 
+ <w lem="plus" id="w56.1.20" pos="ADV">plus</w> 
+ <w lem="équilibrer" id="w56.1.21" pos="VER:pper">équilibrée</w> 
+ <w lem="dans" id="w56.1.22" pos="PRP">dans</w> 
+ <w lem="tout" id="w56.1.23" pos="PRO:IND">toutes</w> 
+ <w lem="le" id="w56.1.24" pos="DET:ART">les</w> 
+ <w lem="voie" id="w56.1.25" pos="NOM">voies</w> 
+ <w lem="de" id="w56.1.26" pos="PRP">de</w> 
+ <w lem="formation" id="w56.1.27" pos="NOM">formation</w> 
+ <w lem="être" id="w56.1.28" pos="VER:futu">seront</w> 
+ <w lem="intensifier" id="w56.1.29" pos="VER:pper">intensifiés</w>
+ <w lem="." id="w56.1.30" pos="SENT">.</w>
+</s> 
+ 
+<s id="s56.2">
+ <w lem="un" id="w56.2.1" pos="DET:ART">Une</w> 
+ <w lem="attention" id="w56.2.2" pos="NOM">attention</w> 
+ <w lem="particulier" id="w56.2.3" pos="ADJ">particulière</w> 
+ <w lem="être" id="w56.2.4" pos="VER:futu">sera</w> 
+ <w lem="porter" id="w56.2.5" pos="VER:pper">portée</w> 
+ <w lem="à" id="w56.2.6" pos="PRP">à</w> 
+ <w lem="le" id="w56.2.7" pos="DET:ART">la</w> 
+ <w lem="situation" id="w56.2.8" pos="NOM">situation</w> 
+ <w lem="du" id="w56.2.9" pos="PRP:det">des</w> 
+ <w lem="jeune" id="w56.2.10" pos="NOM">jeunes</w> 
+ <w lem="immigrer" id="w56.2.11" pos="VER:pper">immigrés</w>
+ <w lem="." id="w56.2.12" pos="SENT">.</w>
+</s></p>
+
+<p id="57">
+<s id="s57.1">
+ <w lem="le" id="w57.1.1" pos="DET:ART">La</w> 
+ <w lem="coopération" id="w57.1.2" pos="NOM">coopération</w> 
+ <w lem="international" id="w57.1.3" pos="ADJ">internationale</w> 
+ <w lem="dans" id="w57.1.4" pos="PRP">dans</w> 
+ <w lem="le" id="w57.1.5" pos="DET:ART">la</w> 
+ <w lem="recherche" id="w57.1.6" pos="NOM">recherche</w> 
+ <w lem="et" id="w57.1.7" pos="KON">et</w> 
+ <w lem="le" id="w57.1.8" pos="DET:ART">le</w> 
+ <w lem="développement" id="w57.1.9" pos="NOM">développement</w> 
+ <w lem="prendre" id="w57.1.10" pos="VER:pres">prend</w> 
+ <w lem="de" id="w57.1.11" pos="PRP">de</w> 
+ <w lem="plus" id="w57.1.12" pos="ADV">plus</w> 
+ <w lem="en" id="w57.1.13" pos="PRP">en</w> 
+ <w lem="plus" id="w57.1.14" pos="ADV">plus</w> 
+ <w id="w57.1.15" pos="VER:pper">d</w>
+ <w lem="'" id="w57.1.16" pos="PUN">'</w> 
+ <w lem="importance" id="w57.1.17" pos="NOM">importance</w>
+ <w lem="." id="w57.1.18" pos="SENT">.</w>
+</s> 
+ 
+<s id="s57.2">
+ <w lem="le" id="w57.2.1" pos="DET:ART">Le</w> 
+ <w lem="gouvernement" id="w57.2.2" pos="NOM">Gouvernement</w> 
+ <w lem="poursuivre" id="w57.2.3" pos="VER:futu">poursuivra</w> 
+ <w lem="son" id="w57.2.4" pos="DET:POS">ses</w> 
+ <w lem="effort" id="w57.2.5" pos="NOM">efforts</w> 
+ <w lem="pour" id="w57.2.6" pos="PRP">pour</w> 
+ <w lem="créer" id="w57.2.7" pos="VER:infi">créer</w> 
+ <w lem="du" id="w57.2.8" pos="PRP:det">des</w> 
+ <w lem="condition" id="w57.2.9" pos="NOM">conditions</w> 
+ <w lem="favorable" id="w57.2.10" pos="ADJ">favorables</w> 
+ <w lem="à" id="w57.2.11" pos="PRP">à</w> 
+ <w lem="le" id="w57.2.12" pos="DET:ART">la</w> 
+ <w lem="participation" id="w57.2.13" pos="NOM">participation</w> 
+ <w lem="du" id="w57.2.14" pos="PRP:det">des</w> 
+ <w lem="opérateur" id="w57.2.15" pos="NOM">opérateurs</w> 
+ <w lem="économique" id="w57.2.16" pos="ADJ">économiques</w> 
+ <w lem="et" id="w57.2.17" pos="KON">et</w> 
+ <w lem="du" id="w57.2.18" pos="PRP:det">des</w> 
+ <w lem="chercheur" id="w57.2.19" pos="NOM">chercheurs</w> 
+ <w lem="suédois" id="w57.2.20" pos="ADJ">suédois</w> 
+ <w lem="à" id="w57.2.21" pos="PRP">à</w> 
+ <w lem="le" id="w57.2.22" pos="DET:ART">la</w> 
+ <w lem="coopération" id="w57.2.23" pos="NOM">coopération</w> 
+ <w lem="international" id="w57.2.24" pos="ADJ">internationale</w> 
+ <w lem="dans" id="w57.2.25" pos="PRP">dans</w> 
+ <w lem="le" id="w57.2.26" pos="DET:ART">le</w> 
+ <w lem="domaine" id="w57.2.27" pos="NOM">domaine</w> 
+ <w lem="de" id="w57.2.28" pos="PRP">de</w> 
+ <w lem="le" id="w57.2.29" pos="DET:ART">la</w> 
+ <w lem="recherche" id="w57.2.30" pos="NOM">recherche</w>
+ <w lem="." id="w57.2.31" pos="SENT">.</w>
+</s></p>
+
+<p id="58">
+<s id="s58.1">
+ <w lem="au" id="w58.1.1" pos="PRP:det">Au</w> 
+ <w lem="cour|cours" id="w58.1.2" pos="NOM">cours</w> 
+ <w lem="de" id="w58.1.3" pos="PRP">de</w> 
+ <w lem="le" id="w58.1.4" pos="DET:ART">la</w> 
+ <w lem="présent" id="w58.1.5" pos="ADJ">présente</w> 
+ <w lem="législature" id="w58.1.6" pos="NOM">législature</w>
+ <w lem="," id="w58.1.7" pos="PUN">,</w> 
+ <w lem="@card@" id="w58.1.8" pos="NUM">300</w> 
+ <w lem="million" id="w58.1.9" pos="NOM">millions</w> 
+ <w lem="de" id="w58.1.10" pos="PRP">de</w> 
+ <w lem="couronne" id="w58.1.11" pos="NOM">couronnes</w> 
+ <w lem="être" id="w58.1.12" pos="VER:futu">seront</w> 
+ <w lem="consacrer" id="w58.1.13" pos="VER:pper">consacrés</w> 
+ <w lem="au" id="w58.1.14" pos="PRP:det">au</w> 
+ <w lem="renouvellement" id="w58.1.15" pos="NOM">renouvellement</w> 
+ <w lem="et" id="w58.1.16" pos="KON">et</w> 
+ <w lem="au" id="w58.1.17" pos="PRP:det">au</w> 
+ <w lem="développement" id="w58.1.18" pos="NOM">développement</w> 
+ <w lem="de" id="w58.1.19" pos="PRP">de</w> 
+ <w lem="le" id="w58.1.20" pos="DET:ART">la</w> 
+ <w lem="vie" id="w58.1.21" pos="NOM">vie</w> 
+ <w lem="culturel" id="w58.1.22" pos="ADJ">culturelle</w>
+ <w lem="." id="w58.1.23" pos="SENT">.</w>
+</s> 
+ 
+<s id="s58.2">
+ <w lem="enfant" id="w58.2.1" pos="NOM">Enfants</w> 
+ <w lem="et" id="w58.2.2" pos="KON">et</w> 
+ <w lem="adolescent" id="w58.2.3" pos="NOM">adolescents</w> 
+ <w lem="se" id="w58.2.4" pos="PRO:PER">se</w> 
+ <w lem="voir" id="w58.2.5" pos="VER:futu">verront</w> 
+ <w lem="offrir" id="w58.2.6" pos="VER:infi">offrir</w> 
+ <w lem="du" id="w58.2.7" pos="PRP:det">des</w> 
+ <w lem="possibilité" id="w58.2.8" pos="NOM">possibilités</w> 
+ <w lem="accroire|accroître" id="w58.2.9" pos="VER:pper">accrues</w> 
+ <w lem="de" id="w58.2.10" pos="PRP">de</w> 
+ <w lem="découvrir" id="w58.2.11" pos="VER:infi">découvrir</w> 
+ <w lem="et" id="w58.2.12" pos="KON">et</w> 
+ <w lem="pratiquer" id="w58.2.13" pos="VER:infi">pratiquer</w> 
+ <w lem="lui-même" id="w58.2.14" pos="PRO:PER">eux-mêmes</w> 
+ <w lem="musiquer" id="w58.2.15" pos="VER:pres">musique</w>
+ <w lem="," id="w58.2.16" pos="PUN">,</w> 
+ <w lem="danse" id="w58.2.17" pos="NOM">danse</w>
+ <w lem="," id="w58.2.18" pos="PUN">,</w> 
+ <w lem="chant" id="w58.2.19" pos="NOM">chant</w>
+ <w lem="," id="w58.2.20" pos="PUN">,</w> 
+ <w lem="littérature" id="w58.2.21" pos="NOM">littérature</w>
+ <w lem="," id="w58.2.22" pos="PUN">,</w> 
+ <w lem="théâtre" id="w58.2.23" pos="NOM">théâtre</w> 
+ <w lem="et" id="w58.2.24" pos="KON">et</w> 
+ <w lem="autre" id="w58.2.25" pos="ADJ">autres</w> 
+ <w lem="forme" id="w58.2.26" pos="NOM">formes</w> 
+ <w id="w58.2.27" pos="ADJ">d</w>
+ <w lem="'" id="w58.2.28" pos="PUN">'</w> 
+ <w lem="activité" id="w58.2.29" pos="NOM">activité</w> 
+ <w lem="artistique" id="w58.2.30" pos="ADJ">artistique</w>
+ <w lem="." id="w58.2.31" pos="SENT">.</w>
+</s> 
+ 
+<s id="s58.3">
+ <w lem="le" id="w58.3.1" pos="DET:ART">Les</w> 
+ <w lem="condition" id="w58.3.2" pos="NOM">conditions</w> 
+ <w lem="faire" id="w58.3.3" pos="VER:pres">faites</w> 
+ <w lem="au" id="w58.3.4" pos="PRP:det">aux</w> 
+ <w lem="artiste" id="w58.3.5" pos="NOM">artistes</w> 
+ <w lem="de" id="w58.3.6" pos="PRP">de</w> 
+ <w lem="profession" id="w58.3.7" pos="NOM">profession</w> 
+ <w lem="être" id="w58.3.8" pos="VER:futu">seront</w> 
+ <w lem="améliorer" id="w58.3.9" pos="VER:pper">améliorées</w>
+ <w lem="." id="w58.3.10" pos="SENT">.</w>
+</s> 
+ 
+<s id="s58.4">
+ <w lem="le" id="w58.4.1" pos="DET:ART">La</w> 
+ <w lem="vie" id="w58.4.2" pos="NOM">vie</w> 
+ <w lem="culturel" id="w58.4.3" pos="ADJ">culturelle</w> 
+ <w lem="être" id="w58.4.4" pos="VER:futu">sera</w> 
+ <w lem="renforcer" id="w58.4.5" pos="VER:pper">renforcée</w> 
+ <w lem="dans" id="w58.4.6" pos="PRP">dans</w> 
+ <w lem="tout" id="w58.4.7" pos="PRO:IND">tout</w> 
+ <w lem="le" id="w58.4.8" pos="DET:ART">le</w> 
+ <w lem="pays" id="w58.4.9" pos="NOM">pays</w>
+ <w lem="." id="w58.4.10" pos="SENT">.</w>
+</s></p>
+
+<p id="59">
+<s id="s59.1">
+ <w lem="le" id="w59.1.1" pos="DET:ART">Les</w> 
+ <w lem="mouvement" id="w59.1.2" pos="NOM">mouvements</w> 
+ <w lem="populaire" id="w59.1.3" pos="ADJ">populaires</w>
+ <w lem="," id="w59.1.4" pos="PUN">,</w> 
+ <w lem="et" id="w59.1.5" pos="KON">et</w> 
+ <w lem="tout" id="w59.1.6" pos="ADV">tout</w> 
+ <w lem="particulièrement" id="w59.1.7" pos="ADV">particulièrement</w> 
+ <w lem="le" id="w59.1.8" pos="DET:ART">les</w> 
+ <w lem="organisation" id="w59.1.9" pos="NOM">organisations</w> 
+ <w lem="de" id="w59.1.10" pos="PRP">de</w> 
+ <w lem="jeunesse" id="w59.1.11" pos="NOM">jeunesse</w> 
+ <w lem="et" id="w59.1.12" pos="KON">et</w> 
+ <w lem="le" id="w59.1.13" pos="DET:ART">le</w> 
+ <w lem="mouvement" id="w59.1.14" pos="NOM">mouvement</w> 
+ <w lem="sportif" id="w59.1.15" pos="ADJ">sportif</w>
+ <w lem="," id="w59.1.16" pos="PUN">,</w> 
+ <w lem="réaliser" id="w59.1.17" pos="VER:pres">réalisent</w> 
+ <w lem="un" id="w59.1.18" pos="DET:ART">un</w> 
+ <w lem="travail" id="w59.1.19" pos="NOM">travail</w> 
+ <w lem="précieux" id="w59.1.20" pos="ADJ">précieux</w> 
+ <w lem="qui" id="w59.1.21" pos="PRO:REL">qui</w> 
+ <w lem="être" id="w59.1.22" pos="VER:futu">sera</w> 
+ <w lem="soutenir" id="w59.1.23" pos="VER:pper">soutenu</w> 
+ <w lem="et" id="w59.1.24" pos="KON">et</w> 
+ <w lem="faciliter" id="w59.1.25" pos="VER:pper">facilité</w>
+ <w lem="." id="w59.1.26" pos="SENT">.</w>
+</s></p>
+
+<p id="60">
+<s id="s60.1">
+ <w lem="le" id="w60.1.1" pos="DET:ART">La</w> 
+ <w lem="construction" id="w60.1.2" pos="NOM">construction</w> 
+ <w lem="de" id="w60.1.3" pos="PRP">de</w> 
+ <w lem="logement" id="w60.1.4" pos="NOM">logements</w> 
+ <w lem="devoir" id="w60.1.5" pos="VER:pres">doit</w> 
+ <w lem="avoir" id="w60.1.6" pos="VER:infi">avoir</w> 
+ <w lem="un" id="w60.1.7" pos="DET:ART">un</w> 
+ <w lem="volume" id="w60.1.8" pos="NOM">volume</w> 
+ <w lem="tel" id="w60.1.9" pos="PRO:DEM">tel</w> 
+ <w lem="que" id="w60.1.10" pos="PRO:REL">que</w> 
+ <w lem="le" id="w60.1.11" pos="DET:ART">les</w> 
+ <w lem="besoin" id="w60.1.12" pos="NOM">besoins</w> 
+ <w lem="dans" id="w60.1.13" pos="PRP">dans</w> 
+ <w lem="ce" id="w60.1.14" pos="PRO:DEM">ce</w> 
+ <w lem="domaine" id="w60.1.15" pos="NOM">domaine</w> 
+ <w lem="pouvoir" id="w60.1.16" pos="VER:subp">puissent</w> 
+ <w lem="être" id="w60.1.17" pos="VER:infi">être</w> 
+ <w lem="satisfaire" id="w60.1.18" pos="VER:pper">satisfaits</w>
+ <w lem="." id="w60.1.19" pos="SENT">.</w>
+</s> 
+ 
+<s id="s60.2">
+ <w lem="le" id="w60.2.1" pos="DET:ART">Les</w> 
+ <w lem="effort" id="w60.2.2" pos="NOM">efforts</w> 
+ <w lem="afin" id="w60.2.3" pos="KON">afin</w> 
+ <w id="w60.2.4" pos="NOM">d</w>
+ <w lem="'" id="w60.2.5" pos="PUN">'</w> 
+ <w lem="obtenir" id="w60.2.6" pos="VER:infi">obtenir</w> 
+ <w lem="davantage" id="w60.2.7" pos="ADV">davantage</w> 
+ <w lem="de" id="w60.2.8" pos="PRP">de</w> 
+ <w lem="logement" id="w60.2.9" pos="NOM">logements</w> 
+ <w lem="pour" id="w60.2.10" pos="PRP">pour</w> 
+ <w lem="le" id="w60.2.11" pos="DET:ART">les</w> 
+ <w lem="jeune" id="w60.2.12" pos="NOM">jeunes</w> 
+ <w lem="être" id="w60.2.13" pos="VER:futu">seront</w> 
+ <w lem="intensifier" id="w60.2.14" pos="VER:pper">intensifiés</w>
+ <w lem="." id="w60.2.15" pos="SENT">.</w>
+</s> 
+ 
+<s id="s60.3">
+ <w lem="du" id="w60.3.1" pos="PRP:det">Des</w> 
+ <w lem="ressource" id="w60.3.2" pos="NOM">ressources</w> 
+ <w lem="être" id="w60.3.3" pos="VER:futu">seront</w> 
+ <w lem="dégager" id="w60.3.4" pos="VER:pper">dégagées</w> 
+ <w lem="pour" id="w60.3.5" pos="PRP">pour</w> 
+ <w lem="le" id="w60.3.6" pos="DET:ART">la</w> 
+ <w lem="construction" id="w60.3.7" pos="NOM">construction</w> 
+ <w lem="de" id="w60.3.8" pos="PRP">de</w> 
+ <w lem="logement" id="w60.3.9" pos="NOM">logements</w> 
+ <w lem="au" id="w60.3.10" pos="PRP:det">au</w> 
+ <w lem="moyen" id="w60.3.11" pos="NOM">moyen</w> 
+ <w lem="de" id="w60.3.12" pos="PRP">de</w> 
+ <w lem="restriction" id="w60.3.13" pos="NOM">restrictions</w> 
+ <w lem="au" id="w60.3.14" pos="PRP:det">aux</w> 
+ <w lem="autre" id="w60.3.15" pos="ADJ">autres</w> 
+ <w lem="travail" id="w60.3.16" pos="NOM">travaux</w> 
+ <w lem="de" id="w60.3.17" pos="PRP">de</w> 
+ <w lem="construction" id="w60.3.18" pos="NOM">construction</w> 
+ <w lem="dans" id="w60.3.19" pos="PRP">dans</w> 
+ <w lem="le" id="w60.3.20" pos="DET:ART">les</w> 
+ <w lem="région" id="w60.3.21" pos="NOM">régions</w> 
+ <w lem="où" id="w60.3.22" pos="PRO:REL">où</w> 
+ <w lem="il" id="w60.3.23" pos="PRO:PER">il</w> 
+ <w lem="y" id="w60.3.24" pos="PRO:PER">y</w> 
+ <w lem="avoir" id="w60.3.25" pos="VER:pres">a</w> 
+ <w lem="surchauffe" id="w60.3.26" pos="NOM">surchauffe</w>
+ <w lem="." id="w60.3.27" pos="SENT">.</w>
+</s> 
+ 
+<s id="s60.4">
+ <w lem="de" id="w60.4.1" pos="PRP">De</w> 
+ <w lem="nouveau" id="w60.4.2" pos="ADJ">nouvelles</w> 
+ <w lem="mesure" id="w60.4.3" pos="NOM">mesures</w> 
+ <w lem="viser" id="w60.4.4" pos="VER:ppre">visant</w> 
+ <w lem="à" id="w60.4.5" pos="PRP">à</w> 
+ <w lem="freiner" id="w60.4.6" pos="VER:infi">freiner</w> 
+ <w id="w60.4.7" pos="VER:pper">l</w>
+ <w lem="'" id="w60.4.8" pos="PUN">'</w> 
+ <w lem="évolution" id="w60.4.9" pos="NOM">évolution</w> 
+ <w lem="du" id="w60.4.10" pos="PRP:det">des</w> 
+ <w lem="coût" id="w60.4.11" pos="NOM">coûts</w> 
+ <w lem="être" id="w60.4.12" pos="VER:futu">seront</w> 
+ <w lem="prendre" id="w60.4.13" pos="VER:pper">prises</w>
+ <w lem="." id="w60.4.14" pos="SENT">.</w>
+</s></p>
+
+<p id="61">
+<s id="s61.1">
+ <w lem="le" id="w61.1.1" pos="DET:ART">La</w> 
+ <w lem="politique" id="w61.1.2" pos="NOM">politique</w> 
+ <w lem="qui" id="w61.1.3" pos="PRO:REL">qui</w> 
+ <w lem="être" id="w61.1.4" pos="VER:futu">sera</w> 
+ <w lem="mener" id="w61.1.5" pos="VER:pper">menée</w> 
+ <w lem="durant" id="w61.1.6" pos="PRP">durant</w> 
+ <w lem="ce" id="w61.1.7" pos="PRO:DEM">ces</w> 
+ <w lem="trois" id="w61.1.8" pos="NUM">trois</w> 
+ <w lem="année" id="w61.1.9" pos="NOM">années</w> 
+ <w lem="imprimer" id="w61.1.10" pos="VER:futu">imprimera</w> 
+ <w lem="son" id="w61.1.11" pos="DET:POS">sa</w> 
+ <w lem="marque" id="w61.1.12" pos="NOM">marque</w> 
+ <w lem="à" id="w61.1.13" pos="PRP">à</w> 
+ <w id="w61.1.14" pos="NOM">l</w>
+ <w lem="'" id="w61.1.15" pos="PUN">'</w> 
+ <w lem="évolution" id="w61.1.16" pos="NOM">évolution</w> 
+ <w lem="de" id="w61.1.17" pos="PRP">de</w> 
+ <w lem="notre" id="w61.1.18" pos="DET:POS">notre</w> 
+ <w lem="pays" id="w61.1.19" pos="NOM">pays</w> 
+ <w lem="au" id="w61.1.20" pos="PRP:det">au</w> 
+ <w lem="cour|cours" id="w61.1.21" pos="NOM">cours</w> 
+ <w lem="de" id="w61.1.22" pos="PRP">de</w> 
+ <w lem="le" id="w61.1.23" pos="DET:ART">la</w> 
+ <w lem="prochain" id="w61.1.24" pos="ADJ">prochaine</w> 
+ <w lem="décennie" id="w61.1.25" pos="NOM">décennie</w>
+ <w lem="." id="w61.1.26" pos="SENT">.</w>
+</s> 
+ 
+<s id="s61.2">
+ <w lem="dans" id="w61.2.1" pos="PRP">Dans</w> 
+ <w lem="le" id="w61.2.2" pos="DET:ART">les</w> 
+ <w lem="année" id="w61.2.3" pos="NOM">années</w> 
+ <w lem="qui" id="w61.2.4" pos="PRO:REL">qui</w> 
+ <w lem="venir" id="w61.2.5" pos="VER:pres">viennent</w>
+ <w lem="," id="w61.2.6" pos="PUN">,</w> 
+ <w lem="nous" id="w61.2.7" pos="PRO:PER">nous</w> 
+ <w lem="nous" id="w61.2.8" pos="PRO:PER">nous</w> 
+ <w lem="trouver" id="w61.2.9" pos="VER:futu">trouverons</w> 
+ <w lem="devant" id="w61.2.10" pos="ADV">devant</w> 
+ <w lem="du" id="w61.2.11" pos="PRP:det">des</w> 
+ <w lem="défi" id="w61.2.12" pos="NOM">défis</w> 
+ <w lem="avoir" id="w61.2.13" pos="VER:ppre">ayant</w> 
+ <w lem="du" id="w61.2.14" pos="PRP:det">des</w> 
+ <w lem="répercussion" id="w61.2.15" pos="NOM">répercussions</w> 
+ <w id="w61.2.16" pos="NOM">jusqu</w>
+ <w lem="'" id="w61.2.17" pos="PUN">'</w> 
+ <w lem="au" id="w61.2.18" pos="PRP:det">au</w> 
+ <w lem="siècle" id="w61.2.19" pos="NOM">siècle</w> 
+ <w lem="suivant" id="w61.2.20" pos="ADJ">suivant</w>
+ <w lem="." id="w61.2.21" pos="SENT">.</w>
+</s></p>
+
+<p id="62">
+<s id="s62.1">
+ <w lem="aussi" id="w62.1.1" pos="ADV">Aussi</w> 
+ <w lem="convenir|convier" id="w62.1.2" pos="VER:pres">convient</w>
+ <w lem="il" id="w62.1.3" pos="PRO:PER">-il</w> 
+ <w id="w62.1.4" pos="VER:infi">d</w>
+ <w lem="'" id="w62.1.5" pos="PUN">'</w> 
+ <w lem="utiliser" id="w62.1.6" pos="VER:infi">utiliser</w> 
+ <w lem="le" id="w62.1.7" pos="DET:ART">la</w> 
+ <w lem="transition" id="w62.1.8" pos="NOM">transition</w> 
+ <w lem="du" id="w62.1.9" pos="PRP:det">des</w> 
+ <w lem="année" id="w62.1.10" pos="NOM">années</w> 
+ <w lem="@card@" id="w62.1.11" pos="NUM">80</w> 
+ <w lem="au" id="w62.1.12" pos="PRP:det">aux</w> 
+ <w lem="année" id="w62.1.13" pos="NOM">années</w> 
+ <w lem="@card@" id="w62.1.14" pos="NUM">90</w> 
+ <w lem="pour" id="w62.1.15" pos="PRP">pour</w> 
+ <w lem="consolider" id="w62.1.16" pos="VER:infi">consolider</w> 
+ <w lem="et" id="w62.1.17" pos="KON">et</w> 
+ <w lem="renforcer" id="w62.1.18" pos="VER:infi">renforcer</w> 
+ <w lem="à" id="w62.1.19" pos="PRP">à</w> 
+ <w lem="long" id="w62.1.20" pos="ADJ">long</w> 
+ <w lem="terme" id="w62.1.21" pos="NOM">terme</w> 
+ <w lem="ce" id="w62.1.22" pos="PRO:DEM">ce</w> 
+ <w lem="qui" id="w62.1.23" pos="PRO:REL">qui</w> 
+ <w lem="devoir" id="w62.1.24" pos="VER:pres">doit</w> 
+ <w lem="encore" id="w62.1.25" pos="ADV">encore</w> 
+ <w lem="constituer" id="w62.1.26" pos="VER:infi">constituer</w> 
+ <w lem="le" id="w62.1.27" pos="DET:ART">la</w> 
+ <w lem="base" id="w62.1.28" pos="NOM">base</w> 
+ <w lem="de" id="w62.1.29" pos="PRP">de</w> 
+ <w id="w62.1.30" pos="NOM">l</w>
+ <w lem="'" id="w62.1.31" pos="PUN">'</w> 
+ <w lem="évolution" id="w62.1.32" pos="NOM">évolution</w> 
+ <w lem="futur" id="w62.1.33" pos="ADJ">future</w>
+ <w lem=":" id="w62.1.34" pos="PUN">:</w> 
+ <w id="w62.1.35" pos="VER:pper">l</w>
+ <w lem="'" id="w62.1.36" pos="PUN">'</w> 
+ <w lem="économie" id="w62.1.37" pos="NOM">économie</w>
+ <w lem="," id="w62.1.38" pos="PUN">,</w> 
+ <w id="w62.1.39" pos="VER:pper">l</w>
+ <w lem="'" id="w62.1.40" pos="PUN">'</w> 
+ <w lem="emploi" id="w62.1.41" pos="NOM">emploi</w> 
+ <w lem="et" id="w62.1.42" pos="KON">et</w> 
+ <w lem="le" id="w62.1.43" pos="DET:ART">le</w> 
+ <w lem="bien-être" id="w62.1.44" pos="NOM">bien-être</w>
+ <w lem="." id="w62.1.45" pos="SENT">.</w>
+</s></p>
+
+<p id="63">
+<s id="s63.1">
+ <w lem="de" id="w63.1.1" pos="PRP">De</w> 
+ <w lem="ce" id="w63.1.2" pos="PRO:DEM">cette</w> 
+ <w lem="manière" id="w63.1.3" pos="NOM">manière</w>
+ <w lem="," id="w63.1.4" pos="PUN">,</w> 
+ <w lem="nous" id="w63.1.5" pos="PRO:PER">nous</w> 
+ <w lem="créer" id="w63.1.6" pos="VER:futu">créerons</w> 
+ <w lem="aussi" id="w63.1.7" pos="ADV">aussi</w> 
+ <w lem="un" id="w63.1.8" pos="DET:ART">une</w> 
+ <w lem="marge" id="w63.1.9" pos="NOM">marge</w> 
+ <w lem="de" id="w63.1.10" pos="PRP">de</w> 
+ <w lem="manuvre" id="w63.1.11" pos="NOM">manoeuvre</w> 
+ <w lem="pour" id="w63.1.12" pos="PRP">pour</w> 
+ <w lem="le" id="w63.1.13" pos="DET:ART">la</w> 
+ <w lem="rénovation" id="w63.1.14" pos="NOM">rénovation</w> 
+ <w lem="et" id="w63.1.15" pos="KON">et</w> 
+ <w lem="le" id="w63.1.16" pos="DET:ART">les</w> 
+ <w lem="nouveau" id="w63.1.17" pos="ADJ">nouvelles</w> 
+ <w lem="intervention" id="w63.1.18" pos="NOM">interventions</w> 
+ <w lem="qui" id="w63.1.19" pos="PRO:REL">qui</w> 
+ <w id="w63.1.20" pos="VER:subi">s</w>
+ <w lem="'" id="w63.1.21" pos="PUN">'</w> 
+ <w lem="imposer" id="w63.1.22" pos="VER:pres">imposent</w> 
+ <w lem="dans" id="w63.1.23" pos="PRP">dans</w> 
+ <w lem="un" id="w63.1.24" pos="DET:ART">une</w> 
+ <w lem="série" id="w63.1.25" pos="NOM">série</w> 
+ <w lem="de" id="w63.1.26" pos="PRP">de</w> 
+ <w lem="domaine" id="w63.1.27" pos="NOM">domaines</w> 
+ <w lem="important" id="w63.1.28" pos="ADJ">importants</w>
+ <w lem=":" id="w63.1.29" pos="PUN">:</w> 
+ <w lem="dans" id="w63.1.30" pos="PRP">dans</w> 
+ <w lem="le" id="w63.1.31" pos="DET:ART">la</w> 
+ <w lem="politique" id="w63.1.32" pos="NOM">politique</w> 
+ <w lem="de" id="w63.1.33" pos="PRP">de</w> 
+ <w id="w63.1.34" pos="NOM">l</w>
+ <w lem="'" id="w63.1.35" pos="PUN">'</w> 
+ <w lem="environnement" id="w63.1.36" pos="NOM">environnement</w> 
+ <w lem="et" id="w63.1.37" pos="KON">et</w> 
+ <w lem="de" id="w63.1.38" pos="PRP">de</w> 
+ <w id="w63.1.39" pos="NOM">l</w>
+ <w lem="'" id="w63.1.40" pos="PUN">'</w> 
+ <w lem="énergie" id="w63.1.41" pos="NOM">énergie</w>
+ <w lem="," id="w63.1.42" pos="PUN">,</w> 
+ <w lem="dans" id="w63.1.43" pos="PRP">dans</w> 
+ <w lem="le" id="w63.1.44" pos="DET:ART">le</w> 
+ <w lem="secteur" id="w63.1.45" pos="NOM">secteur</w> 
+ <w lem="collectif" id="w63.1.46" pos="ADJ">collectif</w>
+ <w lem="," id="w63.1.47" pos="PUN">,</w> 
+ <w lem="dans" id="w63.1.48" pos="PRP">dans</w> 
+ <w lem="le" id="w63.1.49" pos="DET:ART">la</w> 
+ <w lem="vie" id="w63.1.50" pos="NOM">vie</w> 
+ <w lem="actif" id="w63.1.51" pos="ADJ">active</w>
+ <w lem="," id="w63.1.52" pos="PUN">,</w> 
+ <w lem="dans" id="w63.1.53" pos="PRP">dans</w> 
+ <w lem="le" id="w63.1.54" pos="DET:ART">le</w> 
+ <w lem="domaine" id="w63.1.55" pos="NOM">domaine</w> 
+ <w lem="fiscal" id="w63.1.56" pos="ADJ">fiscal</w>
+ <w lem="," id="w63.1.57" pos="PUN">,</w> 
+ <w lem="ainsi" id="w63.1.58" pos="KON">ainsi</w> 
+ <w lem="que" id="w63.1.59" pos="KON">que</w> 
+ <w lem="pour" id="w63.1.60" pos="PRP">pour</w> 
+ <w lem="le" id="w63.1.61" pos="DET:ART">le</w> 
+ <w lem="renforcement" id="w63.1.62" pos="NOM">renforcement</w> 
+ <w lem="de" id="w63.1.63" pos="PRP">de</w> 
+ <w lem="notre" id="w63.1.64" pos="DET:POS">notre</w> 
+ <w lem="coopération" id="w63.1.65" pos="NOM">coopération</w> 
+ <w lem="-" id="w63.1.66" pos="PUN">-</w> 
+ <w lem="économique" id="w63.1.67" pos="ADJ">économique</w>
+ <w lem="," id="w63.1.68" pos="PUN">,</w> 
+ <w lem="social" id="w63.1.69" pos="ADJ">sociale</w> 
+ <w lem="et" id="w63.1.70" pos="KON">et</w> 
+ <w lem="culturel" id="w63.1.71" pos="ADJ">culturelle</w> 
+ <w lem="-" id="w63.1.72" pos="PUN">-</w> 
+ <w lem="avec" id="w63.1.73" pos="PRP">avec</w> 
+ <w id="w63.1.74" pos="NOM">d</w>
+ <w lem="'" id="w63.1.75" pos="PUN">'</w> 
+ <w lem="autre" id="w63.1.76" pos="ADJ">autres</w> 
+ <w lem="pays" id="w63.1.77" pos="NOM">pays</w>
+ <w lem="." id="w63.1.78" pos="SENT">.</w>
+</s></p>
+
+<p id="64">
+<s id="s64.1">
+ <w lem="le" id="w64.1.1" pos="DET:ART">Les</w> 
+ <w lem="condition" id="w64.1.2" pos="NOM">conditions</w> 
+ <w lem="pour" id="w64.1.3" pos="PRP">pour</w> 
+ <w lem="un" id="w64.1.4" pos="DET:ART">une</w> 
+ <w lem="tel" id="w64.1.5" pos="PRO:DEM">telle</w> 
+ <w lem="orientation" id="w64.1.6" pos="NOM">orientation</w> 
+ <w lem="de" id="w64.1.7" pos="PRP">de</w> 
+ <w lem="le" id="w64.1.8" pos="DET:ART">la</w> 
+ <w lem="politique" id="w64.1.9" pos="NOM">politique</w> 
+ <w lem="être" id="w64.1.10" pos="VER:pres">sont</w> 
+ <w lem="favorable" id="w64.1.11" pos="ADJ">favorables</w>
+ <w lem=":" id="w64.1.12" pos="PUN">:</w>
+</s></p>
+
+<p id="65">
+<s id="s65.1">
+ <w lem="L" id="w65.1.1" pos="NUM">L</w>
+ <w lem="'" id="w65.1.2" pos="PUN">'</w> 
+ <w lem="évolution" id="w65.1.3" pos="NOM">évolution</w> 
+ <w lem="sur" id="w65.1.4" pos="PRP">sur</w> 
+ <w lem="le" id="w65.1.5" pos="DET:ART">le</w> 
+ <w lem="plan" id="w65.1.6" pos="NOM">plan</w> 
+ <w lem="international" id="w65.1.7" pos="ADJ">international</w> 
+ <w lem="donner" id="w65.1.8" pos="VER:pres">donne</w> 
+ <w lem="à" id="w65.1.9" pos="PRP">à</w> 
+ <w lem="espérer" id="w65.1.10" pos="VER:infi">espérer</w> 
+ <w lem="de" id="w65.1.11" pos="PRP">de</w> 
+ <w lem="nouveau" id="w65.1.12" pos="ADJ">nouveaux</w> 
+ <w lem="pas" id="w65.1.13" pos="NOM">pas</w> 
+ <w lem="vers" id="w65.1.14" pos="PRP">vers</w> 
+ <w lem="le" id="w65.1.15" pos="DET:ART">la</w> 
+ <w lem="paix" id="w65.1.16" pos="NOM">paix</w>
+ <w lem="," id="w65.1.17" pos="PUN">,</w> 
+ <w lem="le" id="w65.1.18" pos="DET:ART">la</w> 
+ <w lem="liberté" id="w65.1.19" pos="NOM">liberté</w> 
+ <w lem="et" id="w65.1.20" pos="KON">et</w> 
+ <w lem="un" id="w65.1.21" pos="DET:ART">une</w> 
+ <w lem="plus" id="w65.1.22" pos="ADV">plus</w> 
+ <w lem="grand" id="w65.1.23" pos="ADJ">grande</w> 
+ <w lem="compréhension" id="w65.1.24" pos="NOM">compréhension</w> 
+ <w lem="entre" id="w65.1.25" pos="PRP">entre</w> 
+ <w lem="nation" id="w65.1.26" pos="NOM">nations</w> 
+ <w lem="et" id="w65.1.27" pos="KON">et</w> 
+ <w lem="entre" id="w65.1.28" pos="PRP">entre</w> 
+ <w lem="peuple" id="w65.1.29" pos="NOM">peuples</w>
+ <w lem="." id="w65.1.30" pos="SENT">.</w>
+</s></p>
+
+<p id="66">
+<s id="s66.1">
+ <w lem="le" id="w66.1.1" pos="DET:ART">La</w> 
+ <w lem="situation" id="w66.1.2" pos="NOM">situation</w> 
+ <w lem="de" id="w66.1.3" pos="PRP">de</w> 
+ <w id="w66.1.4" pos="NOM">l</w>
+ <w lem="'" id="w66.1.5" pos="PUN">'</w> 
+ <w lem="économie" id="w66.1.6" pos="NOM">économie</w> 
+ <w lem="suédois" id="w66.1.7" pos="ADJ">suédoise</w> 
+ <w id="w66.1.8" pos="VER:simp">s</w>
+ <w lem="'" id="w66.1.9" pos="PUN">'</w> 
+ <w lem="être" id="w66.1.10" pos="VER:pres">est</w> 
+ <w lem="considérablement" id="w66.1.11" pos="ADV">considérablement</w> 
+ <w lem="améliorer" id="w66.1.12" pos="VER:pper">améliorée</w> 
+ <w lem="au" id="w66.1.13" pos="PRP:det">au</w> 
+ <w lem="cour|cours" id="w66.1.14" pos="NOM">cours</w> 
+ <w lem="du" id="w66.1.15" pos="PRP:det">des</w> 
+ <w lem="dernier" id="w66.1.16" pos="ADJ">dernières</w> 
+ <w lem="année" id="w66.1.17" pos="NOM">années</w>
+ <w lem="." id="w66.1.18" pos="SENT">.</w>
+</s> 
+ 
+<s id="s66.2">
+ <w lem="L" id="w66.2.1" pos="NUM">L</w>
+ <w lem="'" id="w66.2.2" pos="PUN">'</w> 
+ <w lem="emploi" id="w66.2.3" pos="NOM">emploi</w> 
+ <w lem="dans" id="w66.2.4" pos="PRP">dans</w> 
+ <w lem="notre" id="w66.2.5" pos="DET:POS">notre</w> 
+ <w lem="pays" id="w66.2.6" pos="NOM">pays</w> 
+ <w lem="se" id="w66.2.7" pos="PRO:PER">se</w> 
+ <w lem="situer" id="w66.2.8" pos="VER:pres">situe</w> 
+ <w lem="à" id="w66.2.9" pos="PRP">à</w> 
+ <w lem="un" id="w66.2.10" pos="DET:ART">un</w> 
+ <w lem="niveau" id="w66.2.11" pos="NOM">niveau</w> 
+ <w lem="élever" id="w66.2.12" pos="VER:pper">élevé</w>
+ <w lem="." id="w66.2.13" pos="SENT">.</w>
+</s> 
+ 
+<s id="s66.3">
+ <w lem="le" id="w66.3.1" pos="DET:ART">La</w> 
+ <w lem="société" id="w66.3.2" pos="NOM">société</w> 
+ <w lem="du" id="w66.3.3" pos="PRP:det">du</w> 
+ <w lem="bien-être" id="w66.3.4" pos="NOM">bien-être</w> 
+ <w lem="reposer" id="w66.3.5" pos="VER:pres">repose</w> 
+ <w lem="sur" id="w66.3.6" pos="PRP">sur</w> 
+ <w lem="un" id="w66.3.7" pos="DET:ART">un</w> 
+ <w lem="vaste" id="w66.3.8" pos="ADJ">vaste</w> 
+ <w lem="assentiment" id="w66.3.9" pos="NOM">assentiment</w> 
+ <w lem="populaire" id="w66.3.10" pos="ADJ">populaire</w>
+ <w lem="." id="w66.3.11" pos="SENT">.</w>
+</s></p>
+
+<p id="67">
+<s id="s67.1">
+ <w lem="il" id="w67.1.1" pos="PRO:PER">Il</w> 
+ <w lem="exister" id="w67.1.2" pos="VER:pres">existe</w> 
+ <w lem="un" id="w67.1.3" pos="DET:ART">une</w> 
+ <w lem="volonté" id="w67.1.4" pos="NOM">volonté</w> 
+ <w lem="politique" id="w67.1.5" pos="ADJ">politique</w> 
+ <w lem="et" id="w67.1.6" pos="KON">et</w> 
+ <w lem="un" id="w67.1.7" pos="DET:ART">un</w> 
+ <w lem="large" id="w67.1.8" pos="ADJ">large</w> 
+ <w lem="consensus" id="w67.1.9" pos="NOM">consensus</w> 
+ <w lem="pour" id="w67.1.10" pos="PRP">pour</w> 
+ <w id="w67.1.11" pos="NOM">s</w>
+ <w lem="'" id="w67.1.12" pos="PUN">'</w> 
+ <w lem="attaquer" id="w67.1.13" pos="VER:infi">attaquer</w> 
+ <w lem="énergiquement" id="w67.1.14" pos="ADV">énergiquement</w> 
+ <w lem="au" id="w67.1.15" pos="PRP:det">aux</w> 
+ <w lem="problème" id="w67.1.16" pos="NOM">problèmes</w> 
+ <w id="w67.1.17" pos="ADJ">d</w>
+ <w lem="'" id="w67.1.18" pos="PUN">'</w> 
+ <w lem="environnement" id="w67.1.19" pos="NOM">environnement</w>
+ <w lem="." id="w67.1.20" pos="SENT">.</w>
+</s></p>
+
+<p id="68">
+<s id="s68.1">
+ <w lem="nous" id="w68.1.1" pos="PRO:PER">Nous</w> 
+ <w lem="avoir" id="w68.1.2" pos="VER:pres">avons</w> 
+ <w lem="de" id="w68.1.3" pos="PRP">de</w> 
+ <w lem="bon" id="w68.1.4" pos="ADJ">bonnes</w> 
+ <w lem="raison" id="w68.1.5" pos="NOM">raisons</w> 
+ <w id="w68.1.6" pos="ADJ">d</w>
+ <w lem="'" id="w68.1.7" pos="PUN">'</w> 
+ <w lem="envisager" id="w68.1.8" pos="VER:infi">envisager</w> 
+ <w id="w68.1.9" pos="VER:pper">l</w>
+ <w lem="'" id="w68.1.10" pos="PUN">'</w> 
+ <w lem="avenir" id="w68.1.11" pos="NOM">avenir</w> 
+ <w lem="avec" id="w68.1.12" pos="PRP">avec</w> 
+ <w lem="optimisme" id="w68.1.13" pos="NOM">optimisme</w>
+ <w lem="." id="w68.1.14" pos="SENT">.</w>
+</s></p>
+
+<p id="69">
+<s id="s69.1">
+ <w lem="il" id="w69.1.1" pos="PRO:PER">Il</w> 
+ <w lem="convenir|convier" id="w69.1.2" pos="VER:pres">convient</w> 
+ <w lem="cependant" id="w69.1.3" pos="ADV">cependant</w> 
+ <w lem="aussi" id="w69.1.4" pos="ADV">aussi</w> 
+ <w lem="de" id="w69.1.5" pos="PRP">de</w> 
+ <w lem="rappeler" id="w69.1.6" pos="VER:infi">rappeler</w> 
+ <w lem="avec" id="w69.1.7" pos="PRP">avec</w> 
+ <w lem="quel" id="w69.1.8" pos="PRO:REL">quelle</w> 
+ <w lem="rapidité" id="w69.1.9" pos="NOM">rapidité</w> 
+ <w lem="un" id="w69.1.10" pos="DET:ART">une</w> 
+ <w lem="évolution" id="w69.1.11" pos="NOM">évolution</w> 
+ <w lem="favorable" id="w69.1.12" pos="ADJ">favorable</w> 
+ <w lem="pouvoir" id="w69.1.13" pos="VER:pres">peut</w> 
+ <w lem="se" id="w69.1.14" pos="PRO:PER">se</w> 
+ <w lem="muer" id="w69.1.15" pos="VER:infi">muer</w> 
+ <w lem="en" id="w69.1.16" pos="PRP">en</w> 
+ <w lem="son" id="w69.1.17" pos="DET:POS">son</w> 
+ <w lem="contraire" id="w69.1.18" pos="NOM">contraire</w>
+ <w lem="." id="w69.1.19" pos="SENT">.</w>
+</s> 
+ 
+<s id="s69.2">
+ <w lem="C" id="w69.2.1" pos="NUM">C</w>
+ <w lem="'" id="w69.2.2" pos="PUN">'</w> 
+ <w lem="être" id="w69.2.3" pos="VER:pres">est</w> 
+ <w lem="ce" id="w69.2.4" pos="PRO:DEM">ce</w> 
+ <w lem="qui" id="w69.2.5" pos="PRO:REL">qui</w> 
+ <w id="w69.2.6" pos="VER:subi">s</w>
+ <w lem="'" id="w69.2.7" pos="PUN">'</w> 
+ <w lem="être" id="w69.2.8" pos="VER:pres">est</w> 
+ <w lem="produire" id="w69.2.9" pos="VER:pper">produit</w> 
+ <w lem="dans" id="w69.2.10" pos="PRP">dans</w> 
+ <w lem="le" id="w69.2.11" pos="DET:ART">les</w> 
+ <w lem="année" id="w69.2.12" pos="NOM">années</w> 
+ <w lem="@card@" id="w69.2.13" pos="NUM">70</w>
+ <w lem="," id="w69.2.14" pos="PUN">,</w> 
+ <w lem="lorsque" id="w69.2.15" pos="KON">lorsque</w> 
+ <w id="w69.2.16" pos="VER:subi">l</w>
+ <w lem="'" id="w69.2.17" pos="PUN">'</w> 
+ <w lem="économie" id="w69.2.18" pos="NOM">économie</w> 
+ <w lem="suédois" id="w69.2.19" pos="ADJ">suédoise</w> 
+ <w lem="avoir" id="w69.2.20" pos="VER:pres">a</w> 
+ <w lem="être" id="w69.2.21" pos="VER:pper">été</w> 
+ <w lem="affecter" id="w69.2.22" pos="VER:pper">affectée</w> 
+ <w lem="par" id="w69.2.23" pos="PRP">par</w> 
+ <w lem="le" id="w69.2.24" pos="DET:ART">la</w> 
+ <w lem="crise" id="w69.2.25" pos="NOM">crise</w> 
+ <w lem="le" id="w69.2.26" pos="DET:ART">la</w> 
+ <w lem="plus" id="w69.2.27" pos="ADV">plus</w> 
+ <w lem="grave" id="w69.2.28" pos="ADJ">grave</w> 
+ <w lem="depuis" id="w69.2.29" pos="PRP">depuis</w> 
+ <w lem="le" id="w69.2.30" pos="DET:ART">les</w> 
+ <w lem="année" id="w69.2.31" pos="NOM">années</w> 
+ <w lem="@ord@" id="w69.2.32" pos="INT">30.</w>
+</s> 
+ 
+<s id="s69.3">
+ <w lem="le" id="w69.3.1" pos="DET:ART">Les</w> 
+ <w lem="tâche" id="w69.3.2" pos="NOM">tâches</w> 
+ <w lem="devant" id="w69.3.3" pos="PRP">devant</w> 
+ <w lem="lequel" id="w69.3.4" pos="PRO:REL">lesquelles</w> 
+ <w lem="nous" id="w69.3.5" pos="PRO:PER">nous</w> 
+ <w lem="nous" id="w69.3.6" pos="PRO:PER">nous</w> 
+ <w lem="trouver" id="w69.3.7" pos="VER:pres">trouvons</w> 
+ <w lem="ainsi" id="w69.3.8" pos="ADV">ainsi</w> 
+ <w lem="que" id="w69.3.9" pos="KON">que</w> 
+ <w lem="le" id="w69.3.10" pos="DET:ART">les</w> 
+ <w lem="risque" id="w69.3.11" pos="NOM">risques</w> 
+ <w lem="de" id="w69.3.12" pos="PRP">de</w> 
+ <w lem="changement" id="w69.3.13" pos="NOM">changements</w> 
+ <w lem="dramatique" id="w69.3.14" pos="ADJ">dramatiques</w> 
+ <w lem="rapide" id="w69.3.15" pos="ADJ">rapides</w> 
+ <w lem="impliquer" id="w69.3.16" pos="VER:pres">impliquent</w> 
+ <w lem="que" id="w69.3.17" pos="KON">que</w> 
+ <w lem="sen|sens" id="w69.3.18" pos="NOM">sens</w> 
+ <w lem="de" id="w69.3.19" pos="PRP">de</w> 
+ <w lem="le" id="w69.3.20" pos="DET:ART">la</w> 
+ <w lem="responsabilité" id="w69.3.21" pos="NOM">responsabilité</w>
+ <w lem="," id="w69.3.22" pos="PUN">,</w> 
+ <w lem="énergie" id="w69.3.23" pos="NOM">énergie</w> 
+ <w lem="politique" id="w69.3.24" pos="ADJ">politique</w> 
+ <w lem="et" id="w69.3.25" pos="KON">et</w> 
+ <w lem="capacité" id="w69.3.26" pos="NOM">capacité</w> 
+ <w lem="de" id="w69.3.27" pos="PRP">de</w> 
+ <w lem="coopérer" id="w69.3.28" pos="VER:infi">coopérer</w> 
+ <w lem="être" id="w69.3.29" pos="VER:futu">seront</w> 
+ <w lem="nécessaire" id="w69.3.30" pos="ADJ">nécessaires</w> 
+ <w lem="dans" id="w69.3.31" pos="PRP">dans</w> 
+ <w id="w69.3.32" pos="NOM">l</w>
+ <w lem="'" id="w69.3.33" pos="PUN">'</w> 
+ <w lem="avenir" id="w69.3.34" pos="NOM">avenir</w> 
+ <w lem="encore" id="w69.3.35" pos="ADV">encore</w>
+ <w lem="." id="w69.3.36" pos="SENT">.</w>
+</s></p>
+
+<p id="70">
+<s id="s70.1">
+ <w lem="pour" id="w70.1.1" pos="PRP">Pour</w> 
+ <w lem="le" id="w70.1.2" pos="DET:ART">la</w> 
+ <w lem="premier" id="w70.1.3" pos="NUM">première</w> 
+ <w lem="foi|fois" id="w70.1.4" pos="NOM">fois</w> 
+ <w lem="depuis" id="w70.1.5" pos="PRP">depuis</w> 
+ <w lem="@card@" id="w70.1.6" pos="NUM">70</w> 
+ <w lem="an" id="w70.1.7" pos="NOM">ans</w>
+ <w lem="," id="w70.1.8" pos="PUN">,</w> 
+ <w lem="un" id="w70.1.9" pos="DET:ART">un</w> 
+ <w lem="nouveau" id="w70.1.10" pos="ADJ">nouveau</w> 
+ <w lem="parti" id="w70.1.11" pos="NOM">parti</w> 
+ <w lem="prendre" id="w70.1.12" pos="VER:pres">prend</w> 
+ <w lem="aujourd'hui" id="w70.1.13" pos="ADV">aujourd'hui</w> 
+ <w lem="place" id="w70.1.14" pos="NOM">place</w> 
+ <w lem="au" id="w70.1.15" pos="PRP:det">au</w> 
+ <w id="w70.1.16" pos="NOM">Riksdag</w>
+ <w lem="." id="w70.1.17" pos="SENT">.</w>
+</s> 
+ 
+<s id="s70.2">
+ <w lem="je" id="w70.2.1" pos="PRO:PER">Je</w> 
+ <w lem="vouloir" id="w70.2.2" pos="VER:cond">voudrais</w> 
+ <w lem="souhaiter" id="w70.2.3" pos="VER:infi">souhaiter</w> 
+ <w lem="au" id="w70.2.4" pos="PRP:det">aux</w> 
+ <w lem="député" id="w70.2.5" pos="NOM">députés</w> 
+ <w lem="du" id="w70.2.6" pos="PRP:det">du</w> 
+ <w lem="parti" id="w70.2.7" pos="NOM">Parti</w> 
+ <w lem="écologique" id="w70.2.8" pos="ADJ">écologique</w> 
+ <w lem="-" id="w70.2.9" pos="PUN">-</w> 
+ <w lem="le" id="w70.2.10" pos="DET:ART">les</w> 
+ <w lem="vert" id="w70.2.11" pos="NOM">Verts</w> 
+ <w lem="le" id="w70.2.12" pos="DET:ART">la</w> 
+ <w lem="bienvenu|bienvenue" id="w70.2.13" pos="NOM">bienvenue</w> 
+ <w lem="dans" id="w70.2.14" pos="PRP">dans</w> 
+ <w lem="ce" id="w70.2.15" pos="PRO:DEM">ce</w> 
+ <w lem="qui" id="w70.2.16" pos="PRO:REL">qui</w> 
+ <w lem="être" id="w70.2.17" pos="VER:futu">sera</w>
+ <w lem="," id="w70.2.18" pos="PUN">,</w> 
+ <w lem="je" id="w70.2.19" pos="PRO:PER">je</w> 
+ <w id="w70.2.20" pos="VER:futu">l</w>
+ <w lem="'" id="w70.2.21" pos="PUN">'</w> 
+ <w lem="espère" id="w70.2.22" pos="NOM">espère</w>
+ <w lem="," id="w70.2.23" pos="PUN">,</w> 
+ <w lem="un" id="w70.2.24" pos="DET:ART">un</w> 
+ <w lem="travail" id="w70.2.25" pos="NOM">travail</w> 
+ <w lem="parlementaire" id="w70.2.26" pos="ADJ">parlementaire</w> 
+ <w lem="inspirant" id="w70.2.27" pos="ADJ">inspirant</w>
+ <w lem="." id="w70.2.28" pos="SENT">.</w>
+</s></p>
+
+<p id="71">
+<s id="s71.1">
+ <w lem="nous" id="w71.1.1" pos="PRO:PER">Nous</w> 
+ <w lem="avoir" id="w71.1.2" pos="VER:pres">avons</w> 
+ <w lem="tout" id="w71.1.3" pos="PRO:IND">tous</w> 
+ <w lem="un" id="w71.1.4" pos="DET:ART">une</w> 
+ <w lem="responsabilité" id="w71.1.5" pos="NOM">responsabilité</w> 
+ <w lem="conjoint" id="w71.1.6" pos="ADJ">conjointe</w> 
+ <w lem="pour" id="w71.1.7" pos="KON">pour</w> 
+ <w lem="que" id="w71.1.8" pos="KON">que</w> 
+ <w lem="le" id="w71.1.9" pos="DET:ART">les</w> 
+ <w lem="trois" id="w71.1.10" pos="NUM">trois</w> 
+ <w lem="année" id="w71.1.11" pos="NOM">années</w> 
+ <w lem="qui" id="w71.1.12" pos="PRO:REL">qui</w> 
+ <w lem="venir" id="w71.1.13" pos="VER:pres">viennent</w> 
+ <w lem="être" id="w71.1.14" pos="VER:subp">soient</w> 
+ <w lem="bon" id="w71.1.15" pos="ADJ">bonnes</w> 
+ <w lem="pour" id="w71.1.16" pos="PRP">pour</w> 
+ <w lem="notre" id="w71.1.17" pos="DET:POS">notre</w> 
+ <w lem="pays" id="w71.1.18" pos="NOM">pays</w> 
+ <w lem="et" id="w71.1.19" pos="KON">et</w> 
+ <w lem="tout" id="w71.1.20" pos="PRO:IND">tous</w> 
+ <w lem="son" id="w71.1.21" pos="DET:POS">ses</w> 
+ <w lem="habitant" id="w71.1.22" pos="NOM">habitants</w>
+ <w lem="," id="w71.1.23" pos="PUN">,</w> 
+ <w lem="pour" id="w71.1.24" pos="PRP">pour</w> 
+ <w id="w71.1.25" pos="NOM">l</w>
+ <w lem="'" id="w71.1.26" pos="PUN">'</w> 
+ <w lem="environnement" id="w71.1.27" pos="NOM">environnement</w>
+ <w lem="," id="w71.1.28" pos="PUN">,</w> 
+ <w lem="pour" id="w71.1.29" pos="PRP">pour</w> 
+ <w lem="notre" id="w71.1.30" pos="DET:POS">nos</w> 
+ <w lem="relation" id="w71.1.31" pos="NOM">relations</w> 
+ <w lem="avec" id="w71.1.32" pos="PRP">avec</w> 
+ <w id="w71.1.33" pos="NOM">l</w>
+ <w lem="'" id="w71.1.34" pos="PUN">'</w> 
+ <w lem="extérieur" id="w71.1.35" pos="NOM">extérieur</w> 
+ <w lem="et" id="w71.1.36" pos="KON">et</w> 
+ <w lem="pour" id="w71.1.37" pos="PRP">pour</w> 
+ <w lem="le" id="w71.1.38" pos="DET:ART">les</w> 
+ <w lem="contact" id="w71.1.39" pos="NOM">contacts</w> 
+ <w lem="et" id="w71.1.40" pos="KON">et</w> 
+ <w lem="relation" id="w71.1.41" pos="NOM">relations</w> 
+ <w lem="entre" id="w71.1.42" pos="PRP">entre</w> 
+ <w lem="nous" id="w71.1.43" pos="PRO:PER">nous</w> 
+ <w lem="tout" id="w71.1.44" pos="PRO:IND">tous</w> 
+ <w lem="dans" id="w71.1.45" pos="PRP">dans</w> 
+ <w lem="le" id="w71.1.46" pos="DET:ART">la</w> 
+ <w lem="vie" id="w71.1.47" pos="NOM">vie</w> 
+ <w lem="quotidien" id="w71.1.48" pos="ADJ">quotidienne</w>
+ <w lem="," id="w71.1.49" pos="PUN">,</w> 
+ <w lem="où" id="w71.1.50" pos="PRO:REL">où</w> 
+ <w lem="que" id="w71.1.51" pos="KON">que</w> 
+ <w lem="nous" id="w71.1.52" pos="PRO:PER">nous</w> 
+ <w lem="avoir" id="w71.1.53" pos="VER:subp">ayons</w> 
+ <w lem="notre" id="w71.1.54" pos="DET:POS">nos</w> 
+ <w lem="racine" id="w71.1.55" pos="NOM">racines</w>
+ <w lem="." id="w71.1.56" pos="SENT">.</w>
+</s></p>
+
+<p id="72">
+<s id="s72.1">
+ <w lem="C" id="w72.1.1" pos="NUM">C</w>
+ <w lem="'" id="w72.1.2" pos="PUN">'</w> 
+ <w lem="être" id="w72.1.3" pos="VER:pres">est</w> 
+ <w lem="le" id="w72.1.4" pos="DET:ART">le</w> 
+ <w lem="devoir" id="w72.1.5" pos="NOM">devoir</w> 
+ <w lem="et" id="w72.1.6" pos="KON">et</w> 
+ <w id="w72.1.7" pos="NOM">l</w>
+ <w lem="'" id="w72.1.8" pos="PUN">'</w> 
+ <w lem="ambition" id="w72.1.9" pos="NOM">ambition</w> 
+ <w lem="du" id="w72.1.10" pos="PRP:det">du</w> 
+ <w lem="gouvernement" id="w72.1.11" pos="NOM">Gouvernement</w> 
+ <w lem="de" id="w72.1.12" pos="PRP">de</w> 
+ <w lem="mettre" id="w72.1.13" pos="VER:infi">mettre</w> 
+ <w lem="à" id="w72.1.14" pos="PRP">à</w> 
+ <w lem="profit" id="w72.1.15" pos="NOM">profit</w> 
+ <w lem="tout" id="w72.1.16" pos="PRO:IND">toutes</w> 
+ <w lem="le" id="w72.1.17" pos="DET:ART">les</w> 
+ <w lem="heureux" id="w72.1.18" pos="ADJ">heureuses</w> 
+ <w lem="initiative" id="w72.1.19" pos="NOM">initiatives</w>
+ <w lem="," id="w72.1.20" pos="PUN">,</w> 
+ <w id="w72.1.21" pos="VER:pper">d</w>
+ <w lem="'" id="w72.1.22" pos="PUN">'</w> 
+ <w lem="uvrer" id="w72.1.23" pos="VER:infi">oeuvrer</w> 
+ <w lem="pour" id="w72.1.24" pos="PRP">pour</w> 
+ <w lem="du" id="w72.1.25" pos="PRP:det">des</w> 
+ <w lem="solution" id="w72.1.26" pos="NOM">solutions</w> 
+ <w lem="de" id="w72.1.27" pos="PRP">de</w> 
+ <w lem="large" id="w72.1.28" pos="ADJ">large</w> 
+ <w lem="consensus" id="w72.1.29" pos="NOM">consensus</w> 
+ <w lem="et" id="w72.1.30" pos="KON">et</w> 
+ <w lem="de" id="w72.1.31" pos="PRP">de</w> 
+ <w lem="mener" id="w72.1.32" pos="VER:infi">mener</w> 
+ <w lem="un" id="w72.1.33" pos="DET:ART">une</w> 
+ <w lem="politique" id="w72.1.34" pos="NOM">politique</w> 
+ <w lem="servir" id="w72.1.35" pos="VER:ppre">servant</w> 
+ <w id="w72.1.36" pos="VER:pper">l</w>
+ <w lem="'" id="w72.1.37" pos="PUN">'</w> 
+ <w lem="intérêt" id="w72.1.38" pos="NOM">intérêt</w> 
+ <w lem="du" id="w72.1.39" pos="PRP:det">du</w> 
+ <w lem="peuple" id="w72.1.40" pos="NOM">peuple</w> 
+ <w lem="tout" id="w72.1.41" pos="ADV">tout</w> 
+ <w lem="entier" id="w72.1.42" pos="ADJ">entier</w>
+ <w lem="." id="w72.1.43" pos="SENT">.</w>
+</s></p></text>

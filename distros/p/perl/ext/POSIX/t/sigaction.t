@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-	chdir 't' if -d 't';
-	unshift @INC, '../lib';
-}
-
 BEGIN{
 	# Don't do anything if POSIX is missing, or sigaction missing.
 	use Config;
@@ -16,7 +11,7 @@ BEGIN{
 	}
 }
 
-use Test::More tests => 30;
+use Test::More tests => 36;
 
 use strict;
 use vars qw/$bad $bad7 $ok10 $bad18 $ok/;
@@ -24,15 +19,15 @@ use vars qw/$bad $bad7 $ok10 $bad18 $ok/;
 $^W=1;
 
 sub IGNORE {
-	$bad7=1;
+    ++$bad7;
 }
 
 sub DEFAULT {
-	$bad18=1;
+    ++$bad18;
 }
 
 sub foo {
-	$ok=1;
+    ++$ok;
 }
 
 my $newaction=POSIX::SigAction->new('::foo', new POSIX::SigSet(SIGUSR1), 0);
@@ -42,11 +37,10 @@ my $oldaction=POSIX::SigAction->new('::bar', new POSIX::SigSet(), 0);
 	my $bad;
 	local($SIG{__WARN__})=sub { $bad=1; };
 	sigaction(SIGHUP, $newaction, $oldaction);
-	ok(!$bad, "no warnings");
+	is($bad, undef, "no warnings");
 }
 
-ok($oldaction->{HANDLER} eq 'DEFAULT' ||
-   $oldaction->{HANDLER} eq 'IGNORE', $oldaction->{HANDLER});
+like($oldaction->{HANDLER}, qr/\A(?:DEFAULT|IGNORE)\z/, '$oldaction->{HANDLER}');
 
 is($SIG{HUP}, '::foo');
 
@@ -64,19 +58,19 @@ SKIP: {
 $newaction=POSIX::SigAction->new('IGNORE');
 sigaction(SIGHUP, $newaction);
 kill 'HUP', $$;
-ok(!$bad, "SIGHUP ignored");
+is($bad, undef, "SIGHUP ignored");
 
 is($SIG{HUP}, 'IGNORE');
 sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
 is($SIG{HUP}, 'DEFAULT');
 
-$newaction=POSIX::SigAction->new(sub { $ok10=1; });
+$newaction=POSIX::SigAction->new(sub { ++$ok10; });
 sigaction(SIGHUP, $newaction);
 {
 	local($^W)=0;
 	kill 'HUP', $$;
 }
-ok($ok10, "SIGHUP handler called");
+is($ok10, 1, "SIGHUP handler called");
 
 is(ref($SIG{HUP}), 'CODE');
 
@@ -88,13 +82,14 @@ eval {
 	sigaction(SIGINT, $act);
 };
 kill 'HUP', $$;
-ok($ok, "signal mask gets restored after croak");
+is($ok, 1, "signal mask gets restored after croak");
 
 undef $ok;
 # Make sure the signal mask gets restored after sigaction returns early.
 my $x=defined sigaction(SIGKILL, $newaction, $oldaction);
 kill 'HUP', $$;
-ok(!$x && $ok, "signal mask gets restored after early return");
+is($x, '', "signal mask gets restored after early return");
+is($ok, 1, "signal mask gets restored after early return");
 
 $SIG{HUP}=sub {};
 sigaction(SIGHUP, $newaction, $oldaction);
@@ -103,22 +98,23 @@ is(ref($oldaction->{HANDLER}), 'CODE');
 eval {
 	sigaction(SIGHUP, undef, $oldaction);
 };
-ok(!$@, "undef for new action");
+is($@, '', "undef for new action");
 
 eval {
 	sigaction(SIGHUP, 0, $oldaction);
 };
-ok(!$@, "zero for new action");
+is($@, '', "zero for new action");
 
 eval {
 	sigaction(SIGHUP, bless({},'Class'), $oldaction);
 };
-ok($@, "any object not good as new action");
+like($@, qr/\Aaction is not of type POSIX::SigAction/,
+     'any object not good as new action');
 
 SKIP: {
     skip("SIGCONT not trappable in $^O", 1)
 	if ($^O eq 'VMS');
-    $newaction=POSIX::SigAction->new(sub { $ok10=1; });
+    $newaction=POSIX::SigAction->new(sub { ++$ok10; });
     if (eval { SIGCONT; 1 }) {
 	sigaction(SIGCONT, POSIX::SigAction->new('DEFAULT'));
 	{
@@ -126,7 +122,7 @@ SKIP: {
 	    kill 'CONT', $$;
 	}
     }
-    ok(!$bad18, "SIGCONT trappable");
+    is($bad18, undef, "SIGCONT trappable");
 }
 
 {
@@ -139,7 +135,7 @@ SKIP: {
     sub hup21 { $hup21++ }
 
     sigaction("FOOBAR", $newaction);
-    ok(1, "no coredump, still alive");
+    pass("no coredump, still alive");
 
     $newaction = POSIX::SigAction->new("hup20");
     sigaction("SIGHUP", $newaction);
@@ -176,7 +172,7 @@ ok($oldaction->safe, "SigAction can be safe");
 # And safe signal delivery must work
 $ok = 0;
 kill 'HUP', $$;
-ok($ok, "safe signal delivery must work");
+is($ok, 1, "safe signal delivery must work");
 
 SKIP: {
     eval 'use POSIX qw(%SIGRT SIGRTMIN SIGRTMAX); scalar %SIGRT + SIGRTMIN() + SIGRTMAX()';
@@ -184,7 +180,7 @@ SKIP: {
     || SIGRTMIN() < 0 || SIGRTMAX() < 0	# HP-UX 10.20 exports both as -1
     || SIGRTMIN() > $Config{sig_count}	# AIX 4.3.3 exports bogus 888 and 999
 	and skip("no SIGRT signals", 4);
-    ok(SIGRTMAX() > SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
+    cmp_ok(SIGRTMAX(), '>', SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
     is(scalar %SIGRT, SIGRTMAX() - SIGRTMIN() + 1, "scalar SIGRT");
     my $sigrtmin;
     my $h = sub { $sigrtmin = 1 };
@@ -194,6 +190,51 @@ SKIP: {
     is($sigrtmin, 1, "SIGRTMIN handler works");
 }
 
+SKIP: {
+    my %siginfo = (
+        signo => SIGHUP,
+        pid => $$,
+        uid => $<,
+    );
+    my %opt_val = ( code => 'SI_USER' );
+    my %always = map +($_ => 1), qw(signo code);
+    my %skip = ( code => { darwin => "not set to SI_USER for kill()" } );
+    $skip{pid}{$^O} = $skip{uid}{$^O} = "not set for kill()"
+        if (($^O.$Config{osvers}) =~ /^darwin[0-8]\./
+            ||
+            ($^O.$Config{osvers}) =~ /^openbsd[0-5]\./);
+    my $tests = keys %{{ %siginfo, %opt_val }};
+    eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';
+    skip("no SA_SIGINFO", $tests) if $@;
+    skip("SA_SIGINFO is broken on AIX 4.2", $tests) if ($^O.$Config{osvers}) =~ m/^aix4\.2/;
+    skip("SA_SIGINFO is broken on os390", $tests) if ($^O.$Config{osvers}) =~ m/os390/;
+    eval "use POSIX qw($opt_val{$_}); \$siginfo{$_} = $opt_val{$_}"
+        for keys %opt_val;
+    sub hiphup {
+        for my $field (sort keys %{{ %siginfo, %opt_val }}) {
+            SKIP: {
+                skip("siginfo_t has no $field field", 1)
+                    unless %always{$field} or ($Config{"d_siginfo_si_$field"} || '') eq 'define';
+                skip("no constant defined for SA_SIGINFO $field value $opt_val{$field}", 1)
+                    unless defined $siginfo{$field};
+                skip("SA_SIGINFO $field value is wrong on $^O: $skip{$field}{$^O}", 1)
+                    if $skip{$field}{$^O};
+                is($_[1]->{$field}, $siginfo{$field}, "SA_SIGINFO got right $field")
+            }
+        }
+    }
+    my $act = POSIX::SigAction->new('hiphup', 0, SA_SIGINFO);
+    sigaction(SIGHUP, $act);
+    kill 'HUP', $$;
+}
+
 eval { sigaction(-999, "foo"); };
 like($@, qr/Negative signals/,
     "Prevent negative signals instead of core dumping");
+
+# RT 77432 - assertion failure with POSIX::SigAction
+{
+  local *SIG = {};
+  ok(sigaction(SIGHUP, POSIX::SigAction->new),
+     "sigaction would crash/assert with a replaced %SIG");
+}

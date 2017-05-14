@@ -1,8 +1,7 @@
 use Test::More;
 use MARC::Spec;
 
-my $parser = MARC::Spec->parse('999$a[#]{245_01}{$a=\Foo|$a=\Y}');
-#my $parser = MARC::Spec->parse('999$a[#]');
+my $parser = MARC::Spec::parse('999$a[#]{245_01}{$a=\Foo|$a=\Y}');
 
 #checking subspecs
 ok scalar @{$parser->subfields->[0]->subspecs} == 2, 'subbfield a subspec count';
@@ -11,8 +10,8 @@ ok scalar @{$parser->subfields->[0]->subspecs->[1]} == 2, 'subfield a subspec co
 my $field = $parser->field;
 #creating more subspecs
 my $subspecs = [
-    MARC::Spec::Subspec->new( {right=> MARC::Spec->parse('245$e')} ),
-    MARC::Spec::Subspec->new( {right => MARC::Spec->parse('245$f')} )
+    MARC::Spec::Subspec->new( {right=> MARC::Spec::parse('245$e')} ),
+    MARC::Spec::Subspec->new( {right => MARC::Spec::parse('245$f')} )
 ];
 
 #and adding more subspecs
@@ -21,8 +20,8 @@ $field->add_subspecs($subspecs);
 #creating lot more subspecs
 my $or_subspecs = [
     [
-        MARC::Spec::Subspec->new( {right=> MARC::Spec->parse('245$g')} ),
-        MARC::Spec::Subspec->new( {right => MARC::Spec->parse('245$h')} )
+        MARC::Spec::Subspec->new( {right=> MARC::Spec::parse('245$g')} ),
+        MARC::Spec::Subspec->new( {right => MARC::Spec::parse('245$h')} )
     ]
 ];
 

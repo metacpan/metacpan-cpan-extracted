@@ -9,13 +9,14 @@ require 'conf.pl';
 
 my ($db_src, $db_user, $db_pass) = conf();
 
-my $dbh = DBI->connect($db_src, $db_user, $db_pass, { RaiseError => 1, PrintError => 1});
+my $dbh = DBI->connect($db_src, $db_user, $db_pass, { RaiseError => 1, PrintError => 1, AutoCommit => 0});
 
 print "Username to add: ";
 my $user = <>;
 chomp($user);
 if ($dbh->selectrow_array("select id from users where username = ?", undef, $user)) {
     print "$user name already in use\n";
+    $dbh->rollback();
     $dbh->disconnect();
     exit 1;
 }
@@ -29,6 +30,7 @@ chomp($password_confirm);
 ReadMode(0);
 unless ($password eq $password_confirm) {
     print "\nTwo wrongs doesn't make a right!\n";
+    $dbh->rollback();
     $dbh->disconnect();
     exit 1;
 }
@@ -39,6 +41,7 @@ my $email = <>;
 chomp($email);
 unless ($email = Email::Valid->address($email)) {
     print "Need a valid email\n";
+    $dbh->rollback();
     $dbh->disconnect();
     exit 1;
 }
@@ -55,6 +58,7 @@ my $lang_id = $dbh->selectrow_array("select id from languages where lang = ?", u
 
 $dbh->do("insert into users (id, username, password, email, lang) values ('',?,?,?,?)", undef, $user, $password, $email, $lang_id);
 
+$dbh->commit();
 print "$user($email:$lang) added...\n";
 
 $dbh->disconnect();

@@ -1,6 +1,6 @@
 package Apache::DnsZone;
 
-# $Id: DnsZone.pm,v 1.37 2001/06/12 23:28:26 thomas Exp $
+# $Id: DnsZone.pm,v 1.41 2001/06/26 19:58:04 thomas Exp $
 
 use strict;
 use Exporter;
@@ -10,7 +10,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA);
 @EXPORT = qw();
 @EXPORT_OK = qw(Debug);
 %EXPORT_TAGS = ();
-$VERSION = '0.1';
+$VERSION = '0.2';
 
 use Apache ();
 use Apache::Constants qw(:common REDIRECT);
@@ -21,6 +21,7 @@ use Apache::DnsZone::DB;
 use Apache::DnsZone::Language;
 use Apache::DnsZone::AuthCookie;
 use Net::DNS;
+use Net::IP qw(:PROC);
 use HTML::Entities;
 use Email::Valid;
 use CGI::FastTemplate;
@@ -77,14 +78,18 @@ sub cfg {
 # returns 0 on anything else than valid ip    #
 ###############################################
 
+# might be swithced out with some of Net::IP's functions
 sub check_ip ($) {
     my $ip = shift;
     Debug(5, qq{check_ip($ip)});
-    $ip =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-    return 0 unless ($1 >= 1 && $1 <= 254 && $2 >= 0 && $2 <= 255 && $3 >= 0 && $3 <= 255 && $4 >= 1 && $4 <= 254);
-    # By using int on the values we make sure that the user can't enter data that will corrupt the database. 
-    # IP addresses like 001.001.001.001 are avoided and will only show 1.1.1.1
-    return join ".", int(${1}), int(${2}), int(${3}), int(${4});
+    if ($ip =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/) {
+        return 0 unless ($1 >= 1 && $1 <= 254 && $2 >= 0 && $2 <= 255 && $3 >= 0 && $3 <= 255 && $4 >= 1 && $4 <= 254);
+        # By using int on the values we make sure that the user can't enter data that will corrupt the database. 
+        # IP addresses like 001.001.001.001 are avoided and will only show 1.1.1.1
+        return join ".", int($1), int($2), int($3), int($4);
+    } else {
+        return 0;
+    }
 }
 
 ############################################
@@ -175,6 +180,37 @@ sub check_fqdn ($$) {
     return "$host$domain" if ($host =~ /\.$/);
     return 0 unless (length($host . "." . $domain) <= 255);
     return "$host.$domain";
+}
+
+sub check_in_addr ($) {
+    my $in_addr = shift;
+    Debug(5, qq{check_in_addr($in_addr)});
+    if ($in_addr =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.in-addr\.arpa\.?$/i) {
+        return 0 unless ($1 >= 1 && $1 <= 254 && $2 >= 0 && $2 <= 255 && $3 >= 0 && $3 <= 255 && $4 >= 1 && $4 <= 254);
+        return join ".", int($1), int($2), int($3), int($4), "in-addr", "arpa";
+    } else {
+        return 0;
+    }
+}
+
+sub check_reverse ($$) {
+    my $reverse = shift;
+    my $domain = shift;
+    Debug(5, qq{check_reverse($reverse, $domain) called\n});
+    return 0 unless (check_chars($reverse) && check_chars_domain($domain));
+    return 0 unless (check_host($reverse));
+    return 0 unless (length($reverse) <= 255);
+    if ($reverse =~ /\.$domain$/i) {
+        # the reverse pointer has the in-addr.arpa domain appended already
+        return check_in_addr($reverse);
+    } else {
+        if ($reverse =~ /\.$/) {
+            $reverse .= $domain;
+        } else {
+            $reverse .= "." . $domain;
+        }
+        return check_in_addr($reverse);
+    }
 }
 
 #sub check_fqdn_cname ($$) {
@@ -490,6 +526,49 @@ sub is_updated_A {
     return 1;
 }
 
+sub check_before_add_AAAA {
+    my $dom_id = shift;
+    my $host = shift;
+    my $address = shift;
+    Debug(5, qq{check_before_add_AAA($dom_id, $host, $address) called});
+    if ($dbh->is_duplicate_AAAA($dom_id, $host, $address)) {
+	return 0;
+    }
+    if ($dbh->does_CNAME_exist($dom_id, $host)) {
+	return 0;
+    }
+    # no A record exists that has the same address, no CNAME record exists with the same name
+    return 1;
+}
+
+sub check_before_edit_AAAA {
+    my $dom_id = shift;
+    my $a_id = shift;
+    my $new_host = shift;
+    my $new_address = shift;
+    Debug(5, qq{check_before_edit_AAAA($dom_id, $a_id, $new_host, $new_address) called});
+    my ($old_name, $old_address, $old_ttl) = $dbh->aaaa_lookup($dom_id, $a_id);
+    return 1 if $old_name eq $new_host && $old_address eq $new_address;
+    if ($dbh->is_duplicate_AAAA($dom_id, $new_host, $new_address)) {
+	return 0;
+    }
+    if ($dbh->does_CNAME_exist($dom_id, $new_host)) {
+	return 0;
+    }
+    return 1;
+}
+
+sub is_updated_AAAA {
+    my $dom_id = shift;
+    my $a_id = shift;
+    my $new_host = shift;
+    my $new_address = shift;
+    my $new_ttl = shift;
+    my ($old_name, $old_address, $old_ttl) = $dbh->aaaa_lookup($dom_id, $a_id);
+    return 0 if $old_name eq $new_host && $old_address eq $new_address && $old_ttl == $new_ttl;
+    return 1;
+}
+
 sub check_before_add_CNAME {
     my $dom_id = shift;
     my $host = shift;
@@ -634,6 +713,43 @@ sub is_updated_NS {
     my $new_ttl = shift;
     my ($old_name, $old_nameserver, $old_ttl) = $dbh->ns_lookup($dom_id, $ns_id);
     return 0 if $old_name eq $new_host && $old_nameserver eq $new_ns && $old_ttl == $new_ttl;
+    return 1;
+}
+
+sub check_before_add_PTR {
+    my $dom_id = shift;
+    my $host = shift;
+    my $reverse = shift;
+    Debug(5, qq{check_before_add_PTR($dom_id, $host, $reverse) called});
+    if ($dbh->is_duplicate_PTR($dom_id, $host, $reverse)) {
+	return 0;
+    }
+    # no PTR record exists that has the same address
+    return 1;
+}
+
+sub check_before_edit_PTR {
+    my $dom_id = shift;
+    my $ptr_id = shift;
+    my $new_host = shift;
+    my $new_reverse = shift;
+    Debug(5, qq{check_before_edit_PTR($dom_id, $ptr_id, $new_host, $new_reverse) called});
+    my ($old_name, $old_reverse, $old_ttl) = $dbh->ptr_lookup($dom_id, $ptr_id);
+    return 1 if $old_name eq $new_host && $old_reverse eq $new_reverse;
+    if ($dbh->is_duplicate_PTR($dom_id, $new_host, $new_reverse)) {
+	return 0;
+    }
+    return 1;
+}
+
+sub is_updated_PTR {
+    my $dom_id = shift;
+    my $ptr_id = shift;
+    my $new_host = shift;
+    my $new_reverse = shift;
+    my $new_ttl = shift;
+    my ($old_name, $old_reverse, $old_ttl) = $dbh->ptr_lookup($dom_id, $ptr_id);
+    return 0 if $old_name eq $new_host && $old_reverse eq $new_reverse && $old_ttl == $new_ttl;
     return 1;
 }
 
@@ -1062,9 +1178,11 @@ sub delete_record {
     my $rec_lock = 0;
     for ($type) {
 	if (/^A$/) { ($rec_lock) = $dbh->get_lock_A($dom_id, $record_id); }
+	elsif (/^AAAA$/) { ($rec_lock) = $dbh->get_lock_AAAA($dom_id, $record_id); }
 	elsif (/^CNAME$/) { ($rec_lock) = $dbh->get_lock_CNAME($dom_id, $record_id); }
 	elsif (/^MX$/) { ($rec_lock) = $dbh->get_lock_MX($dom_id, $record_id); }
 	elsif (/^NS$/) { ($rec_lock) = $dbh->get_lock_NS($dom_id, $record_id); }
+	elsif (/^PTR$/) { ($rec_lock) = $dbh->get_lock_PTR($dom_id, $record_id); }
 	elsif (/^TXT$/) { ($rec_lock) = $dbh->get_lock_TXT($dom_id, $record_id); }
 	else { $rec_lock = 1; }
     }
@@ -1083,6 +1201,13 @@ sub delete_record {
 		    Debug(5, qq{dns_delete_A succeded\n});
 		} else {
 		    Debug(5, qq{dns_delete_A failed\n});
+		}
+	    }
+	    elsif (/^AAAA$/) {
+		if (dns_del_AAAA($dom_id, $record_id)) {
+		    Debug(5, qq{dns_delete_AAAA succeded\n});
+		} else {
+		    Debug(5, qq{dns_delete_AAAA failed\n});
 		}
 	    }
 	    elsif (/^CNAME$/) {
@@ -1104,6 +1229,13 @@ sub delete_record {
 		    Debug(5, qq{dns_delete_NS succeded\n});
 		} else {
 		    Debug(5, qq{dns_delete_NS failed\n});
+		}
+	    }
+	    if (/^PTR$/) {
+		if (dns_del_PTR($dom_id, $record_id)) {
+		    Debug(5, qq{dns_delete_PTR succeded\n});
+		} else {
+		    Debug(5, qq{dns_delete_PTR failed\n});
 		}
 	    }
 	    elsif (/^TXT$/) {
@@ -1147,6 +1279,13 @@ sub delete_record {
 		$tpl->assign(IP_ADDRESS_VALUE => $address);
 		$tpl->assign(TTL_VALUE => $ttl);
 	    }
+	    elsif (/^AAAA$/) {
+		my ($name, $address, $ttl) = $dbh->aaaa_lookup($dom_id, $record_id);
+		$tpl->define(record => 'aaaa/remove.tpl');
+		$tpl->assign(HOST_VALUE => $name);
+		$tpl->assign(IPV6_ADDRESS_VALUE => $address);
+		$tpl->assign(TTL_VALUE => $ttl);
+	    }
 	    elsif (/^CNAME$/) {
 		my ($name, $cname, $ttl) = $dbh->cname_lookup($dom_id, $record_id);
 		$tpl->define(record => 'cname/remove.tpl');
@@ -1167,6 +1306,13 @@ sub delete_record {
 		$tpl->define(record => 'ns/remove.tpl');
 		$tpl->assign(ZONE_VALUE => $name);
 		$tpl->assign(NS_VALUE => $nsdname);
+		$tpl->assign(TTL_VALUE => $ttl);
+	    }
+	    if (/^PTR$/) {
+		my ($name, $ptrdname, $ttl) = $dbh->ptr_lookup($dom_id, $record_id);
+		$tpl->define(record => 'ptr/remove.tpl');
+		$tpl->assign(HOST_VALUE => $name);
+		$tpl->assign(REVERSE_HOST_VALUE => $ptrdname);
 		$tpl->assign(TTL_VALUE => $ttl);
 	    }
 	    elsif (/^TXT$/) {
@@ -1243,11 +1389,17 @@ sub add_record {
     }
 
     my $no_records_left = 0;
-    my ($A_max, $CNAME_max, $MX_max, $NS_max, $TXT_max) = $dbh->get_max_record_count($dom_id);
+    my ($A_max, $AAAA_max, $CNAME_max, $MX_max, $NS_max, $PTR_max, $TXT_max) = $dbh->get_max_record_count($dom_id);
     for ($type) {
 	if (/^A$/) {
 	    my ($a_count) = $dbh->get_a_count($dom_id);
 	    if ($A_max <= $a_count) {
+		$no_records_left = 1;
+	    }
+	}
+	elsif (/^AAAA$/) {
+	    my ($aaaa_count) = $dbh->get_aaaa_count($dom_id);
+	    if ($AAAA_max <= $aaaa_count) {
 		$no_records_left = 1;
 	    }
 	}
@@ -1266,6 +1418,12 @@ sub add_record {
 	elsif (/^NS$/) {
 	    my ($ns_count) = $dbh->get_ns_count($dom_id);
 	    if ($NS_max <= $ns_count) {
+		$no_records_left = 1;
+	    }
+	}
+	elsif (/^PTR$/) {
+	    my ($ptr_count) = $dbh->get_ptr_count($dom_id);
+	    if ($PTR_max <= $ptr_count) {
 		$no_records_left = 1;
 	    }
 	}
@@ -1291,7 +1449,7 @@ sub add_record {
 	    if (/^A$/) { 
 		# actually there needs to be another check to see if they really exists the parameters maybe up in the checking of the rec_lock
 		my $all_set = 1;
-		my $ip = apr()->param('ip');;
+		my $ip = apr()->param('ip');
 		if (!($ip = check_ip($ip))) {
 		    $all_set = 0;
 		}
@@ -1310,9 +1468,9 @@ sub add_record {
 		    # check wheter an excact copy exists in dns to avoid errors
 		    
 		    if (dns_set_A($dom_id, $host, $ip, $ttl)) {
-		      Debug(5, qq{dns_update_A succeded\n});
+		      Debug(5, qq{dns_set_A succeded\n});
 		    } else {
-		      Debug(5, qq{dns_update_A failed\n});
+		      Debug(5, qq{dns_set_A failed\n});
 		    }
 		} else {
 		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
@@ -1378,6 +1536,99 @@ sub add_record {
 		    return OK;
 	        }
 	    }
+	    elsif (/^AAAA$/) { 
+		# actually there needs to be another check to see if they really exists the parameters maybe up in the checking of the rec_lock
+		my $all_set = 1;
+		my $ipv6 = apr()->param('ipv6');
+
+		if (ip_is_ipv6($ipv6)) {
+		    $ipv6 = ip_expand_address($ipv6, 6); # to always have the correct full address to match against
+		} else {
+		    $all_set = 0;
+		}
+		my $host = "";
+		if (!($host = check_fqdn(apr()->param('host'), $domain))) {
+		    $all_set = 0;
+		}
+		my $ttl = apr()->param('ttl');
+		if (!check_ttl($ttl)) {
+		    $all_set = 0;
+		}
+		if ($all_set && check_before_add_AAAA($dom_id, $host, $ipv6)) {
+		    # update dns! and sql
+		    # check wheter name is the same? so no need for update?
+		    # rule checking like not the same a and cname record
+		    # check wheter an excact copy exists in dns to avoid errors
+		    
+		    if (dns_set_AAAA($dom_id, $host, $ipv6, $ttl)) {
+		      Debug(5, qq{dns_set_AAAA succeded\n});
+		    } else {
+		      Debug(5, qq{dns_set_AAAA failed\n});
+		    }
+		} else {
+		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
+		    $tpl->define(layout => 'layout.tpl', menu => 'menu.tpl');
+		    $tpl->assign(%lang);
+		    $tpl->assign(DEBUG => '');
+		    
+		    if ($dbh->get_domain_count($uid) == 1) {
+			$tpl->assign(ADDITIONAL_MENU => '');
+		    } else {
+			$tpl->assign(ADDITIONAL_MENU => qq{<a href="/admin?action=default">$lang{LIST_DOMAIN}</a> | });
+		    }
+
+		    my $page_title = $lang{PAGE_ADD};
+		    $page_title =~ s/\$record/$type/;
+		    $page_title =~ s/\$domain/$domain/;
+		    
+		    $tpl->assign(TITLE => $page_title);
+
+		    $tpl->define(record => 'aaaa/add.tpl');
+		    $tpl->assign(HOST_VALUE => encode_entities(apr()->param('host'))); # maybe it needs to fully qualify it if it was okay?
+		    $tpl->assign(IPV6_ADDRESS_VALUE => encode_entities(apr()->param('ipv6')));
+		    $tpl->assign(TTL_VALUE => encode_entities(apr()->param('ttl')));
+
+		    # do the red-marker assignment
+		    # and the error text getting
+		    my $error_text = $lang{ERROR_CORRECT};
+
+		    if (!ip_is_ipv6($ipv6)) {
+			$tpl->assign(IPV6_ADDRESS => qq{<font color="red">} . $lang{IPV6_ADDRESS} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_IPV6}};
+		    }
+		    if (!($host = check_fqdn(apr()->param('host'), $domain))) {
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_HOST}};
+		    }
+		    if (!check_ttl($ttl)) {
+			$tpl->assign(TTL => qq{<font color="red">} . $lang{TTL} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_TTL}};
+		    }
+		    # check_before_add_AAAA
+		    if ($all_set) {
+			# this means check_before_add_AAAA failed!
+			# text for error?
+			$tpl->assign(IPV6_ADDRESS => qq{<font color="red">} . $lang{IPV6_ADDRESS} . qq{</font>});
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_DUPLICATE}};
+		    }
+		    $tpl->assign(EXPLANATION => $error_text);
+		    
+		    $tpl->assign(DOM_ID => $dom_id);
+
+		    $tpl->parse(MENU => "menu");
+		    $tpl->parse(MAIN => ["record", "layout"]);
+
+		    my $content_ref = $tpl->fetch("MAIN");
+
+		    output_headers($r, 1, length(${$content_ref}));
+		    
+		    $r->print(${$content_ref});	
+
+ 	            $dbh->close();
+		    return OK;
+	        }
+	    }
 	    elsif (/^CNAME$/) { 
 		my $all_set = 1;
 		my $host = "";
@@ -1400,9 +1651,9 @@ sub add_record {
 		    # check wheter an excact copy exists in dns to avoid errors
 		    
 		    if (dns_set_CNAME($dom_id, $host, $cname, $ttl)) {
-		        Debug(5, qq{dns_update_CNAME succeded\n});
+		        Debug(5, qq{dns_set_CNAME succeded\n});
 		    } else {
-		        Debug(5, qq{dns_update_CNAME failed\n});
+		        Debug(5, qq{dns_set_CNAME failed\n});
 		    }
 		} else {
 		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
@@ -1484,9 +1735,9 @@ sub add_record {
 		}
 		if ($all_set && check_before_add_MX($dom_id, $host, $exchanger, $preference)) {
 		    if (dns_set_MX($dom_id, $host, $exchanger, $preference, $ttl)) {
-		        Debug(5, qq{dns_update_MX succeded\n});
+		        Debug(5, qq{dns_set_MX succeded\n});
 		    } else {
-		        Debug(5, qq{dns_update_MX failed\n});
+		        Debug(5, qq{dns_set_MX failed\n});
 		    }
 		} else {
 		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
@@ -1570,9 +1821,9 @@ sub add_record {
 		}
 		if ($all_set && check_before_add_NS($dom_id, $zone, $nameserver)) {
 		    if (dns_set_NS($dom_id, $zone, $nameserver, $ttl)) {
-		        Debug(5, qq{dns_update_NS succeded\n});
+		        Debug(5, qq{dns_set_NS succeded\n});
 		    } else {
-		        Debug(5, qq{dns_update_NS failed\n});
+		        Debug(5, qq{dns_set_NS failed\n});
 		    }
 		} else {
 		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
@@ -1634,6 +1885,96 @@ sub add_record {
 		    return OK;
 		}
 	    }
+	    if (/^PTR$/) { 
+		# actually there needs to be another check to see if they really exists the parameters maybe up in the checking of the rec_lock
+		my $all_set = 1;
+		my $reverse = apr()->param('host');
+		if (!(check_host($reverse))) {
+		    $all_set = 0;
+		}
+		my $host = "";
+		if (!($host = check_reverse(apr()->param('reverse'), $domain))) {
+		    $all_set = 0;
+		}
+		my $ttl = apr()->param('ttl');
+		if (!check_ttl($ttl)) {
+		    $all_set = 0;
+		}
+		if ($all_set && check_before_add_PTR($dom_id, $host, $reverse)) {
+		    # update dns! and sql
+		    # check wheter name is the same? so no need for update?
+		    # rule checking like not the same a and cname record
+		    # check wheter an excact copy exists in dns to avoid errors
+		    
+		    if (dns_set_PTR($dom_id, $host, $reverse, $ttl)) {
+		      Debug(5, qq{dns_set_PTR succeded\n});
+		    } else {
+		      Debug(5, qq{dns_set_PTR failed\n});
+		    }
+		} else {
+		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
+		    $tpl->define(layout => 'layout.tpl', menu => 'menu.tpl');
+		    $tpl->assign(%lang);
+		    $tpl->assign(DEBUG => '');
+		    
+		    if ($dbh->get_domain_count($uid) == 1) {
+			$tpl->assign(ADDITIONAL_MENU => '');
+		    } else {
+			$tpl->assign(ADDITIONAL_MENU => qq{<a href="/admin?action=default">$lang{LIST_DOMAIN}</a> | });
+		    }
+
+		    my $page_title = $lang{PAGE_ADD};
+		    $page_title =~ s/\$record/$type/;
+		    $page_title =~ s/\$domain/$domain/;
+		    
+		    $tpl->assign(TITLE => $page_title);
+
+		    $tpl->define(record => 'ptr/add.tpl');
+		    $tpl->assign(HOST_VALUE => encode_entities(apr()->param('host'))); # maybe it needs to fully qualify it if it was okay?
+		    $tpl->assign(REVERSE_HOST_VALUE => encode_entities(apr()->param('reverse')));
+		    $tpl->assign(TTL_VALUE => encode_entities(apr()->param('ttl')));
+
+		    # do the red-marker assignment
+		    # and the error text getting
+		    my $error_text = $lang{ERROR_CORRECT};
+
+		    if (!(check_host(apr()->param('host')))) {
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_HOST}};
+		    }
+		    if (!($host = check_reverse(apr()->param('reverse'), $domain))) {
+			$tpl->assign(REVERSE => qq{<font color="red">} . $lang{REVERSE} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_REVERSE}};
+		    }
+		    if (!check_ttl($ttl)) {
+			$tpl->assign(TTL => qq{<font color="red">} . $lang{TTL} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_TTL}};
+		    }
+		    # check_before_add_PTR
+		    if ($all_set) {
+			# this means check_before_add_PTR failed!
+			# text for error?
+			$tpl->assign(REVERSE => qq{<font color="red">} . $lang{REVERSE} . qq{</font>});
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_DUPLICATE}};
+		    }
+		    $tpl->assign(EXPLANATION => $error_text);
+		    
+		    $tpl->assign(DOM_ID => $dom_id);
+
+		    $tpl->parse(MENU => "menu");
+		    $tpl->parse(MAIN => ["record", "layout"]);
+
+		    my $content_ref = $tpl->fetch("MAIN");
+
+		    output_headers($r, 1, length(${$content_ref}));
+		    
+		    $r->print(${$content_ref});	
+
+ 	            $dbh->close();
+		    return OK;
+	        }
+	    }
 	    elsif (/^TXT$/) { 
 		my $all_set = 1;
 		my $host = "";
@@ -1650,9 +1991,9 @@ sub add_record {
 		}
 		if ($all_set && check_before_add_TXT($dom_id, $host, $txtdata)) {
 		    if (dns_set_TXT($dom_id, $host, $txtdata, $ttl)) {
-		        Debug(5, qq{dns_update_TXT succeded\n});
+		        Debug(5, qq{dns_set_TXT succeded\n});
 		    } else {
-		        Debug(5, qq{dns_update_TXT failed\n});
+		        Debug(5, qq{dns_set_TXT failed\n});
 		    }
 		} else {
 		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
@@ -1749,6 +2090,12 @@ sub add_record {
 		$tpl->assign(IP_ADDRESS_VALUE => '');
 		$tpl->assign(TTL_VALUE => '');
 	    }
+	    elsif (/^AAAA$/) {
+		$tpl->define(record => 'aaaa/add.tpl');
+		$tpl->assign(HOST_VALUE => '');
+		$tpl->assign(IPV6_ADDRESS_VALUE => '');
+		$tpl->assign(TTL_VALUE => '');
+	    }
 	    elsif (/^CNAME$/) {
 		$tpl->define(record => 'cname/add.tpl');
 		$tpl->assign(HOST_VALUE => '');
@@ -1766,6 +2113,12 @@ sub add_record {
 		$tpl->define(record => 'ns/add.tpl');
 		$tpl->assign(ZONE_VALUE => '');
 		$tpl->assign(NS_VALUE => '');
+		$tpl->assign(TTL_VALUE => '');
+	    }
+	    if (/^PTR$/) {
+		$tpl->define(record => 'ptr/add.tpl');
+		$tpl->assign(HOST_VALUE => '');
+		$tpl->assign(REVERSE_HOST_VALUE => '');
 		$tpl->assign(TTL_VALUE => '');
 	    }
 	    elsif (/^TXT$/) {
@@ -1856,9 +2209,11 @@ sub edit_record {
     for ($type) {
 	if (/^SOA$/) { ($rec_lock) = $dbh->get_lock_SOA($dom_id); }
 	elsif (/^A$/) { ($rec_lock) = $dbh->get_lock_A($dom_id, $record_id); }
+	elsif (/^AAAA$/) { ($rec_lock) = $dbh->get_lock_AAAA($dom_id, $record_id); }
 	elsif (/^CNAME$/) { ($rec_lock) = $dbh->get_lock_CNAME($dom_id, $record_id); }
 	elsif (/^MX$/) { ($rec_lock) = $dbh->get_lock_MX($dom_id, $record_id); }
 	elsif (/^NS$/) { ($rec_lock) = $dbh->get_lock_NS($dom_id, $record_id); }
+	elsif (/^PTR$/) { ($rec_lock) = $dbh->get_lock_PTR($dom_id, $record_id); }
 	elsif (/^TXT$/) { ($rec_lock) = $dbh->get_lock_TXT($dom_id, $record_id); }
 	else { $rec_lock = 1; }
     }
@@ -2035,7 +2390,7 @@ sub edit_record {
 
 		    my $error_text = $lang{ERROR_CORRECT};
 
-		    if (!($ip = check_ip($ip))) {
+		    if (!($ip = check_ip(apr()->param('ip')))) {
 			$tpl->assign(IP_ADDRESS => qq{<font color="red">} . $lang{IP_ADDRESS} . qq{</font>});
 			$error_text .= qq{<br>$lang{ERROR_IP}};
 		    }
@@ -2049,6 +2404,100 @@ sub edit_record {
 		    }
 		    if ($all_set) {
 			$tpl->assign(IP_ADDRESS => qq{<font color="red">} . $lang{IP_ADDRESS} . qq{</font>});
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_DUPLICATE}};
+		    }
+
+		    $tpl->assign(EXPLANATION => $error_text);
+
+		    $tpl->assign(DOM_ID => $dom_id);
+		    $tpl->assign(RECORD_ID => $record_id);
+
+		    $tpl->parse(MENU => "menu");
+		    $tpl->parse(MAIN => ["record", "layout"]);
+
+		    my $content_ref = $tpl->fetch("MAIN");
+
+		    output_headers($r, 1, length(${$content_ref}));
+		    
+		    $r->print(${$content_ref});	
+
+ 	            $dbh->close();
+		    return OK;
+	        }
+	    }
+	    elsif (/^AAAA$/) { 
+		# actually there needs to be another check to see if they really exists the parameters maybe up in the checking of the rec_lock
+		my $all_set = 1;
+		my $ipv6 = apr()->param('ipv6');
+                if (ip_is_ipv6($ipv6)) {
+		    $ipv6 = ip_expand_address($ipv6, 6); # to always have the correct full address to match against
+		} else {
+		    $all_set = 0;
+		}
+		my $host = "";
+		if (!($host = check_fqdn(apr()->param('host'), $domain))) {
+		    $all_set = 0;
+		}
+		my $ttl = apr()->param('ttl');
+		if (!check_ttl($ttl)) {
+		    $all_set = 0;
+		}
+		if ($all_set && check_before_edit_AAAA($dom_id, $record_id, $host, $ipv6)) {
+		    # update dns! and sql
+		    # check wheter name is the same? so no need for update?
+		    
+		    # check wheter an excact copy exists in dns to avoid errors
+		    if (is_updated_AAAA($dom_id, $record_id, $host, $ipv6, $ttl)) {
+			if (dns_update_AAAA($dom_id, $record_id, $host, $ipv6, $ttl)) {
+			    Debug(2, qq{dns_update_AAAA succeded\n});
+			} else {
+			    Debug(2, qq{dns_update_AAAA failed\n});
+			}
+		    } else {
+		        Debug(2, qq{Dns record not changed so not updated\n});
+		    }
+		} else {
+		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
+		    $tpl->define(layout => 'layout.tpl', menu => 'menu.tpl');
+		    $tpl->assign(%lang);
+		    $tpl->assign(DEBUG => '');
+		    
+		    if ($dbh->get_domain_count($uid) == 1) {
+			$tpl->assign(ADDITIONAL_MENU => '');
+		    } else {
+			$tpl->assign(ADDITIONAL_MENU => qq{<a href="/admin?action=default">$lang{LIST_DOMAIN}</a> | });
+		    }
+
+		    my $page_title = $lang{PAGE_EDIT};
+		    $page_title =~ s/\$record/$type/;
+		    $page_title =~ s/\$domain/$domain/;
+		    
+		    $tpl->assign(TITLE => $page_title);
+
+		    $tpl->define(record => 'aaaa/edit.tpl');
+		    $tpl->assign(HOST_VALUE => encode_entities(apr()->param('host'))); # maybe it needs to fully qualify it if it was okay?
+		    $tpl->assign(IPV6_ADDRESS_VALUE => encode_entities(apr()->param('ipv6')));
+		    $tpl->assign(TTL_VALUE => encode_entities(apr()->param('ttl')));
+
+		    # do the red-marker assignment
+
+		    my $error_text = $lang{ERROR_CORRECT};
+
+		    if (!ip_is_ipv6($ipv6)) {
+			$tpl->assign(IPV6_ADDRESS => qq{<font color="red">} . $lang{IPV6_ADDRESS} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_IPV6}};
+		    }
+		    if (!($host = check_fqdn(apr()->param('host'), $domain))) {
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_HOST}};
+		    }
+		    if (!check_ttl($ttl)) {
+			$tpl->assign(TTL => qq{<font color="red">} . $lang{TTL} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_TTL}};
+		    }
+		    if ($all_set) {
+			$tpl->assign(IPV6_ADDRESS => qq{<font color="red">} . $lang{IPV6_ADDRESS} . qq{</font>});
 			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
 			$error_text .= qq{<br>$lang{ERROR_DUPLICATE}};
 		    }
@@ -2340,6 +2789,98 @@ sub edit_record {
                     return OK;
 		}
 	    }
+	    elsif (/^PTR$/) { 
+		# actually there needs to be another check to see if they really exists the parameters maybe up in the checking of the rec_lock
+		my $all_set = 1;
+		my $reverse = apr()->param('host');
+		if (!(check_host($reverse))) {
+		    $all_set = 0;
+		}
+		my $host = "";
+		if (!($host = check_reverse(apr()->param('reverse'), $domain))) {
+		    $all_set = 0;
+		}
+		my $ttl = apr()->param('ttl');
+		if (!check_ttl($ttl)) {
+		    $all_set = 0;
+		}
+		if ($all_set && check_before_edit_PTR($dom_id, $record_id, $host, $reverse)) {
+		    # update dns! and sql
+		    # check wheter name is the same? so no need for update?
+		    
+		    # check wheter an excact copy exists in dns to avoid errors
+		    if (is_updated_PTR($dom_id, $record_id, $host, $reverse, $ttl)) {
+			if (dns_update_PTR($dom_id, $record_id, $host, $reverse, $ttl)) {
+			    Debug(2, qq{dns_update_PTR succeded\n});
+			} else {
+			    Debug(2, qq{dns_update_PTR failed\n});
+			}
+		    } else {
+		        Debug(2, qq{Dns record not changed so not updated\n});
+		    }
+		} else {
+		    my $tpl = new CGI::FastTemplate($cfg->{'cfg'}->{DnsZoneTemplateDir});
+		    $tpl->define(layout => 'layout.tpl', menu => 'menu.tpl');
+		    $tpl->assign(%lang);
+		    $tpl->assign(DEBUG => '');
+		    
+		    if ($dbh->get_domain_count($uid) == 1) {
+			$tpl->assign(ADDITIONAL_MENU => '');
+		    } else {
+			$tpl->assign(ADDITIONAL_MENU => qq{<a href="/admin?action=default">$lang{LIST_DOMAIN}</a> | });
+		    }
+
+		    my $page_title = $lang{PAGE_EDIT};
+		    $page_title =~ s/\$record/$type/;
+		    $page_title =~ s/\$domain/$domain/;
+		    
+		    $tpl->assign(TITLE => $page_title);
+
+		    $tpl->define(record => 'ptr/edit.tpl');
+		    $tpl->assign(HOST_VALUE => encode_entities(apr()->param('host'))); # maybe it needs to fully qualify it if it was okay?
+		    $tpl->assign(REVERSE_HOST_VALUE => encode_entities(apr()->param('reverse')));
+		    $tpl->assign(TTL_VALUE => encode_entities(apr()->param('ttl')));
+
+		    # do the red-marker assignment
+
+		    my $error_text = $lang{ERROR_CORRECT};
+
+		    if (!(check_host(apr()->param('host')))) {
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_IP}};
+		    }
+		    if (!($host = check_reverse(apr()->param('reverse'), $domain))) {
+			$tpl->assign(REVERSE_HOST => qq{<font color="red">} . $lang{REVERSE_HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_REVERSE}};
+		    }
+		    if (!check_ttl($ttl)) {
+			$tpl->assign(TTL => qq{<font color="red">} . $lang{TTL} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_TTL}};
+		    }
+		    if ($all_set) {
+			$tpl->assign(REVERSE_HOST => qq{<font color="red">} . $lang{REVERSE_HOST} . qq{</font>});
+			$tpl->assign(HOST => qq{<font color="red">} . $lang{HOST} . qq{</font>});
+			$error_text .= qq{<br>$lang{ERROR_DUPLICATE}};
+		    }
+
+		    $tpl->assign(EXPLANATION => $error_text);
+
+		    $tpl->assign(DOM_ID => $dom_id);
+		    $tpl->assign(RECORD_ID => $record_id);
+
+		    $tpl->parse(MENU => "menu");
+		    $tpl->parse(MAIN => ["record", "layout"]);
+
+		    my $content_ref = $tpl->fetch("MAIN");
+
+		    output_headers($r, 1, length(${$content_ref}));
+		    
+		    $r->print(${$content_ref});	
+
+ 	            $dbh->close();
+		    return OK;
+	        }
+	    }
 	    elsif (/^TXT$/) { 
 		my $all_set = 1;
 		my $host = "";
@@ -2472,6 +3013,13 @@ sub edit_record {
 		$tpl->assign(IP_ADDRESS_VALUE => $address);
 		$tpl->assign(TTL_VALUE => $ttl);
 	    }
+	    elsif (/^AAAA$/) {
+		my ($name, $address, $ttl) = $dbh->aaaa_lookup($dom_id, $record_id);
+		$tpl->define(record => 'aaaa/edit.tpl');
+		$tpl->assign(HOST_VALUE => $name);
+		$tpl->assign(IPV6_ADDRESS_VALUE => $address);
+		$tpl->assign(TTL_VALUE => $ttl);
+	    }
 	    elsif (/^CNAME$/) {
 		my ($name, $cname, $ttl) = $dbh->cname_lookup($dom_id, $record_id);
 		$tpl->define(record => 'cname/edit.tpl');
@@ -2492,6 +3040,13 @@ sub edit_record {
 		$tpl->define(record => 'ns/edit.tpl');
 		$tpl->assign(ZONE_VALUE => $name);
 		$tpl->assign(NS_VALUE => $nsdname);
+		$tpl->assign(TTL_VALUE => $ttl);
+	    }
+	    elsif (/^PTR$/) {
+		my ($name, $ptrdname, $ttl) = $dbh->ptr_lookup($dom_id, $record_id);
+		$tpl->define(record => 'ptr/edit.tpl');
+		$tpl->assign(HOST_VALUE => $ptrdname);
+		$tpl->assign(REVERSE_HOST_VALUE => $name);
 		$tpl->assign(TTL_VALUE => $ttl);
 	    }
 	    elsif (/^TXT$/) {
@@ -2562,12 +3117,16 @@ sub view_domain {
 	     view_domain_soa => "view_domain/soa.tpl",
 	     view_domain_a => "view_domain/a.tpl",
 	     view_domain_a_record => "view_domain/a_record.tpl",
+	     view_domain_aaaa => "view_domain/aaaa.tpl",
+	     view_domain_aaaa_record => "view_domain/aaaa_record.tpl",
 	     view_domain_cname => "view_domain/cname.tpl",
 	     view_domain_cname_record => "view_domain/cname_record.tpl",
 	     view_domain_mx => "view_domain/mx.tpl",
 	     view_domain_mx_record => "view_domain/mx_record.tpl",
 	     view_domain_ns => "view_domain/ns.tpl",
 	     view_domain_ns_record => "view_domain/ns_record.tpl",
+	     view_domain_ptr => "view_domain/ptr.tpl",
+	     view_domain_ptr_record => "view_domain/ptr_record.tpl",
 	     view_domain_txt => "view_domain/txt.tpl",
 	     view_domain_txt_record => "view_domain/txt_record.tpl"
 	     );
@@ -2585,7 +3144,7 @@ sub view_domain {
 	$tpl->assign(ADDITIONAL_MENU => qq{<a href="/admin?action=default">$lang{LIST_DOMAIN}</a> | });
     }
 
-    my ($A_max, $CNAME_max, $MX_max, $NS_max, $TXT_max) = $dbh->get_max_record_count($dom_id);
+    my ($A_max, $AAAA_max, $CNAME_max, $MX_max, $NS_max, $PTR_max, $TXT_max) = $dbh->get_max_record_count($dom_id);
 
     my ($auth_ns, $email, $serial, $refresh, $retry, $expire, $default_ttl, $rec_lock) = $dbh->soa_lookup($dom_id);
     $email =~ s/\./\@/;
@@ -2644,6 +3203,45 @@ sub view_domain {
 	$tpl->assign(A_ADD => '');
 	$tpl->assign(A_RECORD => '');
 	$tpl->assign(A_RR => '');
+    }
+    if ($AAAA_max != 0) { 
+	my ($aaaa_count) = $dbh->get_aaaa_count($dom_id);
+	if ($AAAA_max > $aaaa_count) {
+	    $tpl->assign(AAAA_ADD => qq{[ <a href="/admin?action=add&dom_id=$dom_id&type=AAAA">$lang{ADD}</a> ]});
+	} else {
+	    $tpl->assign(AAAA_ADD => qq{\&nbsp;});
+	}
+	if ($aaaa_count != 0) {
+	    my $sth_AAAA = $dbh->view_domain_AAAA_prepare($dom_id);
+	    my $count = 0;
+	    while (my ($AAAA_id, $AAAA_name, $AAAA_address, $AAAA_ttl, $AAAA_rec_lock) = $sth_AAAA->fetchrow_array()) {
+		$count++;
+		my $bgcolor = "";
+		if ($count % 2 != 1) {
+		    $tpl->assign(AAAA_RR_BGCOLOR => $cfg->{'cfg'}->{DnsZoneTableEvenColor});
+		} else {
+		    $tpl->assign(AAAA_RR_BGCOLOR => $cfg->{'cfg'}->{DnsZoneTableOddColor});
+		}
+		$tpl->assign(AAAA_HOST_VALUE => $AAAA_name);
+		$tpl->assign(AAAA_IPV6_VALUE => $AAAA_address);
+		$tpl->assign(AAAA_TTL_VALUE => $AAAA_ttl);
+		if ($AAAA_rec_lock == 0) {
+		    $tpl->assign(AAAA_CHANGE => qq{[ <a href="/admin?action=edit&dom_id=$dom_id&type=AAAA&record_id=$AAAA_id">$lang{EDIT}</a> | <a href="/admin?action=delete&dom_id=$dom_id&type=AAAA&record_id=$AAAA_id">$lang{REMOVE}</a> ]});
+		} else {
+		    $tpl->assign(AAAA_CHANGE => qq{<i>$lang{LOCKED}</i>});
+		}
+		$tpl->parse(AAAA_RECORD => ".view_domain_aaaa_record");
+	    }
+	    $sth_AAAA->finish();
+	    $tpl->parse(AAAA_RR => "view_domain_aaaa");
+	} else {
+	    $tpl->assign(AAAA_RECORD => '');
+	    $tpl->parse(AAAA_RR => "view_domain_aaaa");
+	}
+    } else {
+	$tpl->assign(AAAA_ADD => '');
+	$tpl->assign(AAAA_RECORD => '');
+	$tpl->assign(AAAA_RR => '');
     }
     if ($CNAME_max != 0) { 
 	my ($cname_count) = $dbh->get_cname_count($dom_id);
@@ -2723,7 +3321,7 @@ sub view_domain {
 	$tpl->assign(MX_RR => '');
     }
     if ($NS_max != 0) { 
-	my ($ns_count) = $dbh->get_mx_count($dom_id);
+	my ($ns_count) = $dbh->get_ns_count($dom_id);
 	if ($NS_max > $ns_count) {
 	    $tpl->assign(NS_ADD => qq{[ <a href="/admin?action=add&dom_id=$dom_id&type=NS">$lang{ADD}</a> ]});
 	} else {
@@ -2759,6 +3357,44 @@ sub view_domain {
 	$tpl->assign(NS_ADD => '');
 	$tpl->assign(NS_RECORD => '');
 	$tpl->assign(NS_RR => '');
+    }
+    if ($PTR_max != 0) { 
+	my ($ptr_count) = $dbh->get_ptr_count($dom_id);
+	if ($PTR_max > $ptr_count) {
+	    $tpl->assign(PTR_ADD => qq{[ <a href="/admin?action=add&dom_id=$dom_id&type=PTR">$lang{ADD}</a> ]});
+	} else {
+	    $tpl->assign(PTR_ADD => '');
+	}
+	if ($ptr_count != 0) {
+	    my $sth_PTR = $dbh->view_domain_PTR_prepare($dom_id);
+	    my $count = 0;
+	    while (my ($PTR_id, $PTR_name, $PTR_ptrdname, $PTR_ttl, $PTR_rec_lock) = $sth_PTR->fetchrow_array()) {
+		$count++;
+		if ($count % 2 != 1) {
+		    $tpl->assign(PTR_RR_BGCOLOR => $cfg->{'cfg'}->{DnsZoneTableEvenColor});
+		} else {
+		    $tpl->assign(PTR_RR_BGCOLOR => $cfg->{'cfg'}->{DnsZoneTableOddColor});
+		}
+		$tpl->assign(PTR_REVERSE_HOST_VALUE => $PTR_name);
+		$tpl->assign(PTR_HOST_VALUE => $PTR_ptrdname);
+		$tpl->assign(PTR_TTL_VALUE => $PTR_ttl);
+		if ($PTR_rec_lock == 0) {
+		    $tpl->assign(PTR_CHANGE => qq{[ <a href="/admin?action=edit&dom_id=$dom_id&type=PTR&record_id=$PTR_id">$lang{EDIT}</a> | <a href="/admin?action=delete&dom_id=$dom_id&type=PTR&record_id=$PTR_id">$lang{REMOVE}</a> ]}); 
+		} else {
+		    $tpl->assign(PTR_CHANGE => qq{<i>$lang{LOCKED}</i>});
+		}
+		$tpl->parse(PTR_RECORD => ".view_domain_ptr_record");
+	    }
+	    $tpl->parse(PTR_RR => "view_domain_ptr");
+	    $sth_PTR->finish();
+	} else {
+	    $tpl->assign(PTR_RECORD => '');
+	    $tpl->parse(PTR_RR => "view_domain_ptr");
+	}
+    } else {
+	$tpl->assign(PTR_ADD => '');
+	$tpl->assign(PTR_RECORD => '');
+	$tpl->assign(PTR_RR => '');
     }
     if ($TXT_max != 0) { 
 	my ($txt_count) = $dbh->get_txt_count($dom_id);
@@ -2883,6 +3519,57 @@ sub dns_del_A {
     Debug(5, qq{Apache::DnsZone::dns_del_A (result): } . $ans->header->rcode);
     unless ($ans->header->rcode eq "NOERROR") { return 0; }
     return $dbh->delete_A($domain_id, $a_id);
+}
+
+sub dns_set_AAAA {
+    my $domain_id = shift;
+    my $name = shift;
+    my $ipv6 = shift;
+    my $ttl = shift || 86400; 
+    my $domain = $dbh->id2domain($domain_id);
+    my $update = new Net::DNS::Update($domain);
+    Debug(5, qq{dns_set_AAAA: $name $ttl AAAA $ipv6});
+    $update->push("update", rr_add(qq{$name $ttl AAAA $ipv6}));
+    resolver_setup($domain_id);
+    my $ans = $res->res->send($update);
+    Debug(5, qq{Apache::DnsZone::dns_set_AAAA (result): } . $ans->header->rcode);
+    unless ($ans->header->rcode eq "NOERROR") { return 0; }
+    return $dbh->set_AAAA($domain_id, $name, $ipv6, $ttl);
+}
+
+sub dns_update_AAAA {
+    my $domain_id = shift;
+    my $aaaa_id = shift;
+    my $new_name = shift;
+    my $new_ipv6 = shift;
+    my $new_ttl = shift || 86400;
+    my $domain = $dbh->id2domain($domain_id);
+    my ($old_name, $old_ipv6, $old_ttl) = $dbh->aaaa_lookup($domain_id, $aaaa_id);
+    my $update = new Net::DNS::Update($domain);
+    Debug(5, qq{Apache::DnsZone::dns_update_AAAA (del): ($domain) $old_name AAAA $old_ipv6});
+    $update->push("update", rr_del(qq{$old_name AAAA $old_ipv6}));
+    Debug(5, qq{Apache::DnsZone::dns_update_AAAA (set): ($domain) $new_name $new_ttl AAAA $new_ipv6});
+    $update->push("update", rr_add(qq{$new_name $new_ttl AAAA $new_ipv6}));
+    resolver_setup($domain_id);
+    my $ans = $res->res->send($update);
+    Debug(5, qq{Apache::DnsZone::dns_update_AAAA (result): } . $ans->header->rcode);
+    unless ($ans->header->rcode eq "NOERROR") { return 0; }
+    return $dbh->update_AAAA($domain_id, $aaaa_id, $new_name, $new_ipv6, $new_ttl);
+}
+
+sub dns_del_AAAA {
+    my $domain_id = shift;
+    my $aaaa_id = shift;
+    my $domain = $dbh->id2domain($domain_id);
+    my ($name, $ipv6, $ttl) = $dbh->aaaa_lookup($domain_id, $aaaa_id);
+    my $update = new Net::DNS::Update($domain);
+    Debug(5, qq{dns_del_AAAA: ($domain) $name AAAA $ipv6});
+    $update->push("update", rr_del(qq{$name AAAA $ipv6}));
+    resolver_setup($domain_id);
+    my $ans = $res->res->send($update);
+    Debug(5, qq{Apache::DnsZone::dns_del_AAAA (result): } . $ans->header->rcode);
+    unless ($ans->header->rcode eq "NOERROR") { return 0; }
+    return $dbh->delete_AAAA($domain_id, $aaaa_id);
 }
 
 sub dns_set_CNAME {
@@ -3038,6 +3725,57 @@ sub dns_del_NS {
     Debug(5, qq{Apache::DnsZone::dns_del_NS (result): } . $ans->header->rcode);
     unless ($ans->header->rcode eq "NOERROR") { return 0; }
     return $dbh->delete_NS($domain_id, $ns_id);
+}
+
+sub dns_set_PTR {
+    my $domain_id = shift;
+    my $name = shift; 
+    my $ptrdname = shift;
+    my $ttl = shift || 86400; 
+    my $domain = $dbh->id2domain($domain_id);
+    my $update = new Net::DNS::Update($domain);
+    Debug(5, qq{dns_set_PTR: $name PTR $ptrdname});
+    $update->push("update", rr_add(qq{$name $ttl PTR $ptrdname}));
+    resolver_setup($domain_id);
+    my $ans = $res->res->send($update);
+    Debug(5, qq{Apache::DnsZone::dns_set_PTR (result): } . $ans->header->rcode);
+    unless ($ans->header->rcode eq "NOERROR") { return 0; }
+    return $dbh->set_PTR($domain_id, $name, $ptrdname, $ttl);
+}
+
+sub dns_update_PTR {
+    my $domain_id = shift;
+    my $ptr_id = shift;
+    my $new_name = shift;
+    my $new_ptrdname = shift;
+    my $new_ttl = shift || 86400;
+    my $domain = $dbh->id2domain($domain_id);
+    my ($old_name, $old_ptrdname, $old_ttl) = $dbh->ptr_lookup($domain_id, $ptr_id);
+    my $update = new Net::DNS::Update($domain);
+    Debug(5, qq{Apache::DnsZone::dns_update_PTR (del): ($domain) $old_name PTR $old_ptrdname});
+    $update->push("update", rr_del(qq{$old_name PTR $old_ptrdname}));
+    Debug(5, qq{Apache::DnsZone::dns_update_PTR (set): ($domain) $new_name $new_ttl PTR $new_ptrdname});
+    $update->push("update", rr_add(qq{$new_name $new_ttl PTR $new_ptrdname}));
+    resolver_setup($domain_id);
+    my $ans = $res->res->send($update);
+    Debug(5, qq{Apache::DnsZone::dns_update_PTR (result): } . $ans->header->rcode);
+    unless ($ans->header->rcode eq "NOERROR") { return 0; }
+    return $dbh->update_PTR($domain_id, $ptr_id, $new_name, $new_ptrdname, $new_ttl);
+}
+
+sub dns_del_PTR {
+    my $domain_id = shift;
+    my $ptr_id = shift;
+    my $domain = $dbh->id2domain($domain_id);
+    my ($name, $ptrdname, $ttl) = $dbh->ptr_lookup($domain_id, $ptr_id);
+    my $update = new Net::DNS::Update($domain);
+    Debug(5, qq{dns_del_PTR: $name PTR $ptrdname});
+    $update->push("update", rr_del(qq{$name PTR $ptrdname}));
+    resolver_setup($domain_id);
+    my $ans = $res->res->send($update);
+    Debug(5, qq{Apache::DnsZone::dns_del_PTR (result): } . $ans->header->rcode);
+    unless ($ans->header->rcode eq "NOERROR") { return 0; }
+    return $dbh->delete_PTR($domain_id, $ptr_id);
 }
 
 sub dns_set_TXT {

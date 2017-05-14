@@ -113,7 +113,7 @@ use warnings;
 no warnings 'utf8';
 use bytes;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 REQUIREMENTS
 
@@ -127,6 +127,7 @@ as is the L<XML::ASCX12::Segments|XML::ASCX12::Segments>.
 =cut
 use Carp qw(croak);
 
+## use Data::Dumper;
 use XML::ASCX12::Catalogs qw($LOOPNEST load_catalog);
 use XML::ASCX12::Segments qw($SEGMENTS $ELEMENTS);
 
@@ -339,13 +340,16 @@ sub XMLENC
 =item string = _proc_segment($segment_data);
 
 
-This is an internal private method that processes a segment. It is called by
-C<_proc_transaction()> while looping per-segment.
+This is an internal private method that processes a segment using $LOOPNEST.
+It is called by C<convertfile()> or C<convertdata()> while looping per-segment.
 
 =cut
 sub _proc_segment
 {
     my ($self, $segment) = @_;
+    if (defined	 $XML::ASCX12::Catalogs::IS_CHILD) {
+	    return $self->_proc_segment_in_child($segment);
+    }
     $segment =~ s/\n//g;
     if ($segment =~ m/[0-9A-Za-z]*/)
     {   
@@ -354,6 +358,11 @@ sub _proc_segment
         {
             $self->_unload_catalog();
             $self->load_catalog($elements[0]);
+	    ## IS_CHILD not defined until after Catalog loaded
+	    ## Use alternate parsing starting with "ST" segment
+    	    if (defined	 $XML::ASCX12::Catalogs::IS_CHILD) {
+	    	return $self->_proc_segment_in_child($segment);
+    	    }
         }
 
         # check to see if we need to close a loop
@@ -364,6 +373,75 @@ sub _proc_segment
         {
             # check to see if we need to open a loop
             if (my $tmp = $self->_openloop($curloop, $self->{lastloop})) { $xml .= $tmp; }
+
+            # now the standard segment (and elements)
+            $xml .= '<segm code="'.XML::ASCX12::XMLENC($segcode).'"';
+            $xml .= ' desc="'.XML::ASCX12::XMLENC($XML::ASCX12::Segments::SEGMENTS->{$segcode}[0]).'"' if $XML::ASCX12::Segments::SEGMENTS->{$segcode};
+            $xml .= '>';
+            
+            # make our elements
+            $xml .= $self->_proc_element($segcode, @elements);
+            
+            # close the segment
+            $xml .= '</segm>';
+
+            # keep track
+            $self->{lastloop} = $curloop;
+        }
+        return $xml;
+    }
+}
+
+=item string = _proc_segment_in_child($segment_data);
+
+
+This is an internal private method that processes a segment using $IN_CHILD.
+It is called by C<_proc_segment()> when $IN_CHILD is defined.
+
+=cut
+sub _proc_segment_in_child
+{
+    my ($self, $segment) = @_;
+    $segment =~ s/\n//g;
+	$self->{lastloop} ||= '';
+    if ($segment =~ m/[0-9A-Za-z]*/)
+    {   
+        my ($segcode, @elements) = split(/$self->{DES}/, $segment);
+        if ($segcode and $segcode eq "ST")
+        {
+
+		## warn "segcode = $segcode\n";
+		## warn Dumper $self, $XML::ASCX12::Catalogs::LOOPNEST,
+		## 	\@_LOOPS, $XML::ASCX12::Catalogs::IS_CHILD;
+	}
+	elsif ($segcode) {
+		## warn "segcode = $segcode\n";
+	}
+	else {
+		## warn "no segcode\n";
+		## final loop close
+        	return $self->_closeloop('', $self->{lastloop}, '');
+	}
+        my $xml = '';
+	my $is_child;
+        my $curloop = $_LOOPS[-1];
+	until ( defined ($is_child =
+		$XML::ASCX12::Catalogs::IS_CHILD->{$curloop}->{$segcode}) ) {
+	    $xml .= $self->_execclose($curloop);
+	    ## warn "WCB close tag: $xml\n";
+	    ## warn Dumper \@_LOOPS;
+            $curloop = $_LOOPS[-1];
+	}
+	## warn "WCB IS_CHILD = $is_child, $curloop, $segcode, $_LOOPS[-1]\n";
+		
+        if (@elements)
+        {
+            # check to see if we need to open a loop
+	    if ($is_child eq '0') {
+		push (@_LOOPS, $segcode);
+		## warn 'WCB open tag: <loop:'.XML::ASCX12::XMLENC($segcode).">\n";
+	        $xml .= '<loop:'.XML::ASCX12::XMLENC($segcode).'>';
+	    }
 
             # now the standard segment (and elements)
             $xml .= '<segm code="'.XML::ASCX12::XMLENC($segcode).'"';
@@ -439,6 +517,7 @@ This routine is a private method.  It will recurse to close any open loops.
 sub _closeloop
 {
     my ($self, $newloop, $lastloop, $currentseg, $once) = @_;
+    $lastloop ||= '';
     $once = 0 unless $once;
     my $xml;
     # Case when there are two consecutive loops
@@ -515,12 +594,14 @@ sub _execclose
 
 
 Private method that clears out catalog data and loads standard ASCX12 structure.
+Also initializes ISA and GS data common to all Catalogs.
 
 =cut
 sub _unload_catalog
 {
     my $self = shift;
     $XML::ASCX12::Catalogs::LOOPNEST = ();
+    $XML::ASCX12::Catalogs::IS_CHILD = undef;
     $self->load_catalog(0);
 }
 
@@ -566,8 +647,12 @@ Make a live repository of transaction set data (catalogs).  I'd really like use 
 each catalog and import them to local dbm files or tied hashes during install and via an update
 script.  This project will be driven if there is adaquate demand.
 
-According to the ASC X12 website (L<http://www.x12.org>), there are 315 transaction sets.  This module has 3, so
-there are 312 that could be added.
+According to the ASC X12 website (L<http://www.x12.org>), there are 315 transaction sets.  This module has 4, so
+there are 311 that could be added.
+
+Documentation for Catalog 175 (Court Notice Transaction Set) is available from
+the US Bankruptcy Courts (L<http://www.ebnuscourts.com/documents/edi.adp>). 
+
 
 =item * XML Documentation
 

@@ -9,7 +9,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.121'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.123'
                                       },
                       'requires' => {
                                       'Dist::Zilla' => '5',
@@ -20,6 +20,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Breaks' => '0',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.004',
                                       'Dist::Zilla::Plugin::CheckIssues' => '0',
+                                      'Dist::Zilla::Plugin::CheckMetaResources' => '0',
                                       'Dist::Zilla::Plugin::CheckPrereqsIndexed' => '0.019',
                                       'Dist::Zilla::Plugin::CheckSelfDependency' => '0',
                                       'Dist::Zilla::Plugin::CheckStrictVersion' => '0',
@@ -78,7 +79,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::EOL' => '0.17',
                                       'Dist::Zilla::Plugin::Test::Kwalitee' => '2.10',
                                       'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000003',
-                                      'Dist::Zilla::Plugin::Test::Pod::No404s' => '1.003',
                                       'Dist::Zilla::Plugin::Test::Portability' => '2.000007',
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.022',
                                       'Dist::Zilla::Plugin::TestRelease' => '0',
@@ -99,7 +99,6 @@ do { my $x = {
                                       'Test::More' => '0.96',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
-                                      'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'blib' => '1.01'
                                     }

@@ -11,7 +11,7 @@ use MIME::Base64;
 use Lemonldap::NG::Portal::SharedConf;    # inherits
 use Lemonldap::NG::Portal::_SAML;         # inherits
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.9.1';
 our @ISA = qw(Lemonldap::NG::Portal::_SAML Lemonldap::NG::Portal::SharedConf);
 
 ## @method int process()

@@ -72,7 +72,7 @@ The size of the seed file for Yarrow256.
 =head2 slow_reseed()
 
 Cause a fast or slow reseed to take place immediately, regardless of
-the current entropy estimates of the two pools. Use with care.
+the current entropy estimates of the two pools.  Use with care.
 
 =head1 BUGS AND FEEDBACK
 

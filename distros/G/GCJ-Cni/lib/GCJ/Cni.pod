@@ -1,0 +1,122 @@
+=head1 NAME
+
+GCJ::Cni - CNI Bindings to GNU Compiler for Java
+
+=head1 SYNOPSIS
+
+Using this module in Perl is similar to using it in C++:
+
+   use GCJ::Cni;
+   
+   if ( GCJ::Cni::JvCreateJavaVM(undef) ) {
+     die "Failed to initialize JavaVM, cannot continue...";
+   }
+   
+   unless ( my $thread_obj = GCJ::Cni::JvAttachCurrentThread(undef, undef) ) {
+     die "Failed to attach thread, cannot continue...";
+   }
+   
+   ...
+   
+   if ( GCJ::Cni::JvDetachCurrentThread() ) {
+     die "Failed to detach current thread, cannot continue...";
+   }
+
+=head1 DESCRIPTION
+
+This module wraps the GCJ CNI interface for use in Perl.  This library is needed to call natively compiled (by way of GCJ) Java classes from Perl.  This can be used to write Perl modules in Java instead of the customary C or C++.
+
+=head1 METHODS
+
+Descriptions taken and modified from http://gcc.gnu.org/onlinedocs/gcj/Invocation.html#Invocation.
+
+=over 4
+
+=item JvCreateJavaVM(undef)
+
+Initializes the Java runtime. This function performs essential initialization of the threads interface, garbage collector, exception handling and other key aspects of the runtime. It must be called once by a Perl application, before any other Java or CNI calls are made. It is safe, but not recommended, to call JvCreateJavaVM() more than once provided it is only called from a single thread.
+
+=item JvAttachCurrentThread(undef, undef)
+
+Registers an existing thread with the Java runtime. This must be called once from each thread, before that thread makes any other Java or CNI calls. It must be called after JvCreateJavaVM. The thread will be a member of the main thread group. The return value is the Java Thread object that represents the thread and undef otherwise. It is safe to call JvAttachCurrentThread() more than once from the same thread. If the thread is already attached, the call is ignored and the current thread object is returned.
+
+=item JvDetachCurrentThread()
+
+Unregisters a thread from the Java runtime. This should be called by threads that were attached using JvAttachCurrentThread(), after they have finished making calls to Java code. This ensures that any resources associated with the thread become eligible for garbage collection. This function returns 0 upon success, or -1 if the current thread is not attached.
+
+=back
+
+=head1 PRACTICAL USE
+
+The main purpose of wrapping the CNI interface is to allow us to write Perl modules in Java.  The CNI interface allows us to represent and use a natively compiled Java class (compiled with gcj -c) as a C++ class.  In short, we can then XS wrap that C++ class representation, compile it with the GNU compiler suite, write our Perl module and be on our way.  For instance, say we wanted to wrap the following Java class:
+
+   public class APerlModule {
+      
+      public APerlModule() {
+         System.out.println("Constructing APerlModule in Java");
+         //Do Some Work in Java
+      }
+
+      public void doAJavaMethod() {
+         System.out.println("doAJavaMethod was called on APerlModule");
+         //Do Some More Work in Java
+      }
+   
+   }
+
+We would first compile this class using the GNU compiler suite:
+
+   gcj -C APerlModule.java
+   gcjh APerlModule
+   gcj -c APerlModule.java
+   #or gcc -c APerlModule.java
+   #or gcc -c APerlModule.class
+   #or gcj -c APerlModule.class
+
+As a result we would see three new files in our current directory, APerlModule.class, APerlModule.o and APerlModule.h.  We can now wrap the C++ interface described in APerlModule.h in XS, write a Perl DynaLoaded module to use it and be on our way.  My favorite way to do this is by using SWIG:
+
+   swig -c++ -perl -module APerlModule APerlModule.h
+   #results in APerlModule.pm and APerlModule.cxx being created
+   g++ -c -include APerlModule.h APerlModule_wrap.cxx -I<your Perl inc directory>
+   g++ -shared -lgcj APerlModule.o APerlModule_wrap.o -o APerlModule.so
+
+As a result you will now have APerlModule.pm and APerlModule.so which you can now call from Perl code:
+
+   use APerlModule;
+
+   my $perl_module = new APerlModule::APerlModule();
+   $perl_module->doAJavaMethod();
+
+Of course this is an oversimplified example which does not address things such as Passing arguments to methods, recieving return values from methods, catching exceptions or inheritance.  In order to pass arguments ,get return values and use Java-style inheritance, you will have to make sure that you wrap every Java Object that you plan on using from Perl and natively compile that class.  In addition, SWIG will wrap all exceptions into a Perl die statement and your program will exit on exception unless you catch it with an eval statement.  If writing custom XS code or using another tool to wrap your C++ interface you should be aware of how you will be handling exceptions.
+
+One benefit of this approach to calling Java classes from Perl is that although the classes directly called from Perl must be natively compiled, any classes that they call behind the scenes may be class compiled.  In fact, as a nice side-effect of GCJ, you may freely mix native and class compiled Java code.
+
+A practical use of this approach might be to write a Java class that calls EJBs and returns DTOs.  To do this you would only have to natively compile and XS wrap your DTO class and your EJB client class.
+
+=head1 REQUIREMENTS
+
+This module requires gcc-java >= 4.0 to build and run.
+   
+=head1 TODO
+
+This module does not currently support the following features:
+
+- Passing of Initialization Arguments to JvCreateJavaVM
+
+- Setting of Thread Name in JvAttachCurrentThread
+
+- Setting of ThreadGroup in JvAttachCurrentThread
+
+- Use of Thread object returned from JvAttachCurrentThread
+
+=head1 ACKNOWLEDGEMENTS
+
+A Special thanks to Google and the Perl Foundation for sponsoring this project through the first ever "Summer of Code"
+
+=head1 AUTHOR
+
+David Rusek, rusekd@cpan.org
+
+=head1 SEE ALSO
+
+perl(1), Java::Import(3), Inline::Java(3), GCJ (http://gcc.gnu.org/java)

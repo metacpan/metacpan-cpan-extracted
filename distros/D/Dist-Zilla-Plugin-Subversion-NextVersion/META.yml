@@ -1,0 +1,33 @@
+---
+abstract: 'provide a version number by bumping the last SVN release tag'
+author:
+  - 'Markus Benning <me@w3r3wolf.de>'
+build_requires:
+  SVN::Client: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Subversion-NextVersion
+requires:
+  Dist::Zilla: 4
+  Dist::Zilla::Role::BeforeRelease: 0
+  Dist::Zilla::Role::VersionProvider: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  SVN::Client: 0
+  Try::Tiny: 0
+  Version::Next: 0
+  constant: 0
+  strict: 0
+  version: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Subversion-NextVersion
+  repository: https://github.com/benningm/Dist-Zilla-Plugin-Subversion-NextVersion
+version: 1.003

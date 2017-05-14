@@ -1,0 +1,41 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: sections Filter
+
+H2: Interface
+
+!filter_interface "sections"
+
+H2: Description
+
+The {{sections}} filter is used to create section jumps for html
+and hlp outputs: for these formats, the text of each paragraph
+(excluding punctuation) is assumed to be the title of a section
+within this document. For other outputs, the text is unchanged.
+
+H2: Examples
+
+!block example; lang='sdf'
+
+There are lots of new things in this version including:
+
+!block sections
+. Topics mode
+. HTML headers and footers
+!endblock
+
+Further details are given below.
+!endblock
+
+#H2: Limitations & Future Directions

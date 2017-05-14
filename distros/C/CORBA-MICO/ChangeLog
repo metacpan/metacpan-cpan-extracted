@@ -1,53 +1,658 @@
-2001-02-26 15:47  Nikolai Logvinov <logvinon@mail.ru>
+2009-04-13 11:13  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: AIX: multithread library
+
+2007-08-09 07:39  Nikolay Logvinov <logvinon@mail.ru>
+
+	* client: to debug new MICO::Fixed
+
+2007-08-09 07:36  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO/Fixed.pm: Rewrite to use new Math::BigInt. Strange but it
+	  helps to eliminate very bad error.
+
+2007-08-08 12:58  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: debug
+
+2007-08-08 12:57  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, dispatcher.cc, errors.cc, server.cc, types.cc: code
+	  cleanup
+
+2007-08-08 09:12  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MANIFEST: add examples/mt1*
+
+2007-08-08 09:11  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, errors.cc, interfaces.cc, server.cc: the perl_ form of
+	  this function is deprecated
+
+2007-08-08 08:42  Nikolay Logvinov <logvinon@mail.ru>
+
+	* server.cc: debug
+
+2006-12-19 15:58  Nikolay Logvinov <logvinon@mail.ru>
+
+	* ccc/Makefile.PL: do not check for gtk+-devel, use Gtk2
+	  prerequisite instead
+
+2006-11-24 15:52  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/Hypertext.pm: Search: heighlight all occurencies, use split()
+	  instead of regexp
+
+2006-11-24 10:53  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/Hypertext.pm: Regular search result doesn't include newlines
+
+2006-11-24 09:36  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/Hypertext.pm: Restriction on EntryCompletion size
+
+2006-11-24 09:29  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/Makefile.PL: Gtk -> Gtk2
+
+2006-11-24 09:09  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/Hypertext.pm: Hypertext: search implemented
+
+2006-11-23 15:11  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: BGQueue.pm, CMenu.pm, Hypertext.pm, IR.pm, IR2Dia.pm,
+	  Misc.pm, NC.pm, NCEntry.pm, Pixtree.pm, ccc: Porting to Gtk2
+
+2006-11-17 09:03  Nikolay Logvinov <logvinon@mail.ru>
+
+	* types.cc: Fixed marshaling of octet sequence, converts sv to byte
+	  representation first if necessary before lengthing it. Thanks to
+	  Michael Sanders <mike.sanders@greenbay.usa.com>
+
+2006-11-16 10:39  Nikolay Logvinov <logvinon@mail.ru>
+
+	* types.cc, Account.idl: empty sequence of chars or octets should
+	  be converted to empty Perl string, not to undef
+
+2006-11-09 16:15  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: remove PERL_UNUSED_ARG() due to some Perl builds
+
+2006-11-09 16:06  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Account.idl, client, interfaces.cc: the upper level constants
+	  should be preloaded to use it
+
+2006-09-12 10:33  Nikolay Logvinov <logvinon@mail.ru>
+
+	* types.cc: fixed memory leak reported by rolf.banting@tecnomen.com
+
+2006-05-04 11:49  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: Exception raised from method invocation leads to
+	  the memory leak (reported by Rolf Banting
+	  <rolf.banting@tecnomen.com>).  Because in case of CORBA object
+	  exception the Perl method 'Error::raise' has been called and
+	  control flow never returns to method invocation stub. That
+	  prevents from the local vars clearing.  So, now every object
+	  method consists of two parts: 1) XS(_pmico_callStub) - which
+	  really calls CORBA object method, but doesnt' raise exception.
+	  Instead returns the exception object as last result value.  2)
+	  Perl stub sub - which calls _pmico_callStub, analyze result and
+	  in case of exception calls Error::throw directly from Perl.
+
+2006-05-04 08:18  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: code cleanup
+
+2006-05-04 07:36  Nikolay Logvinov <logvinon@mail.ru>
+
+	* errors.cc: code cleanup
+
+2006-05-04 07:00  Nikolay Logvinov <logvinon@mail.ru>
+
+	* errors.cc: code cleanup
+
+2006-03-24 16:06  Nikolay Logvinov <logvinon@mail.ru>
+
+	* types.cc: memory leak reported by John McNamara
+	  <jmcnamara@cpan.org>
+
+2006-03-24 16:01  Nikolay Logvinov <logvinon@mail.ru>
+
+	* server.cc, MICO.xs, errors.cc: the perl_ form of this function is
+	  deprecated
+
+2006-03-24 15:58  Nikolay Logvinov <logvinon@mail.ru>
+
+	* dispatcher.cc: the perl_ form of this function is deprecated
+
+2006-03-15 13:04  Nikolay Logvinov <logvinon@mail.ru>
+
+	* server.h: Change syntax, reported by Michael Sanders
+	  <mike.sanders@greenbay.usa.com>
+
+2005-12-14 12:03  Nikolay Logvinov <logvinon@mail.ru>
+
+	* types.cc: More type casting to eliminate compiler problems
+	  reported by mike.sanders@greenbay.usa.com
+
+2005-04-27 07:01  Nikolay Logvinov <logvinon@mail.ru>
+
+	* server.cc: fixed compilation bug with no-threaded Perl
+
+2005-02-15 16:24  Nikolay Logvinov <logvinon@mail.ru>
+
+	* pmico.h, server.cc, util.cc: Serialize access from MICO servants
+	  to Perl code.  Because I don't know how to merge Perl ithreads
+	  and MICO threads, I set guard to protect simulteneuos call more
+	  then one servant from MT MICO.
+
+2005-02-15 13:41  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MANIFEST, Makefile.PL, pmico.h, server.cc, util.cc: Use
+	  MICO::Logger (level Info) for own debugging purposes. It's
+	  possible now to view debug info from CORBA::MICO module by option
+	  '-ORBDebug Info'.  Function cv_log uses vsnprintf(), so for some
+	  platforms it may require adoption.
+
+2004-10-11 09:52  Nikolay Logvinov <logvinon@mail.ru>
+
+	* examples/: mt1.idl, mt1client, mt1server: Add trivial callback
+	  hello world like example (see examples/mt1*). It looks like MICO
+	  demo/mt/callback.
+
+2004-10-05 12:42  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm: Up version to 0.6.7
+
+2004-10-05 09:24  Nikolay Logvinov <logvinon@mail.ru>
+
+	* server.cc: clean off compiler complains
+
+2004-10-05 09:17  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: clean up
+
+2004-10-05 09:16  Nikolay Logvinov <logvinon@mail.ru>
+
+	* server.cc, server.h: use Perl context, at least it allows to work
+	  in single threaded model in multithreaded environment
+
+2004-09-30 08:55  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: add guard against CORBA::nil object after
+	  converting it from SV
+
+2003-12-03 15:46  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, errors.cc, interfaces.cc, pmico.h, server.cc: use
+	  namespace std:: as MICO does
+
+2003-11-10 12:05  Nikolay Logvinov <logvinon@mail.ru>
+
+	* types.cc: Fixed demarshalling of chars/octets sequence reported
+	  by flitzie <flitzie@gmx.de>
+
+2003-11-10 08:41  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: add prerequisite modules
+
+2003-08-20 10:37  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO/Fixed.pm: adopt to new Math::BigInt module
+
+2003-04-03 13:12  Nikolay Logvinov <logvinon@mail.ru>
+
+	* gtkmico.h, pmico.h: fixed gcc 3.2 compilation problems, posted by
+	  "Alexey V. Grigorovich" <grig@hop-go.com>
+
+2003-03-25 14:47  Nikolay Logvinov <logvinon@mail.ru>
+
+	* exttypes.cc: fixed conversion bug with CORBA::ULongLong reported
+	  by Alexey V. Grigorovich <grig@hop-go.com>
+
+2003-03-14 13:43  Nikolay Logvinov <logvinon@mail.ru>
+
+	* pmico.h: using namespace std for VisualAge
+
+2003-02-21 13:39  Nikolay Logvinov <logvinon@mail.ru>
+
+	* exttypes.cc: fixed conversion bug with CORBA::LongLong
+
+2003-01-28 16:08  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: Add option '--with-ssl' to add OpenSSL libraries for
+	  linking with MICO.
+
+2002-12-15 15:14  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm: Up version to 0.6.6
+
+2002-12-15 14:16  Nikolay Logvinov <logvinon@mail.ru>
+
+	* developers: new developer - Nico Mack
+
+2002-12-15 14:08  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MANIFEST, MICO.def, Makefile.PL, Makefile.win32, README.win32:
+	  Extend search path for MICO library
+
+2002-12-15 13:24  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MANIFEST, mico-2.2.7-checker.patch, start-servers.sh: Remove old
+	  files. Use standard MICO IDL-files in test environment.
+
+2002-11-21 12:33  Nico Mack <neckelatius@users.sourceforge.net>
+
+	* CONFIG.win32, Makefile.PL, README.win32: Unified Makefile.PL
+	  installation procedure for both unix and win32 systems
+
+2002-11-18 09:31  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.def: port to Win32
+
+2002-11-15 16:49  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.win32: port to Win32
+
+2002-11-15 16:45  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.win32: port to Win32
+
+2002-11-15 15:24  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: port to Win32
+
+2002-11-15 14:40  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, Makefile.win32, errors.cc, exttypes.cc, exttypes.h,
+	  interfaces.cc, server.cc, server.h, typemap: port to Win32
+
+2002-10-18 15:16  Nikolay Logvinov <logvinon@mail.ru>
+
+	* client: add example for type any
+
+2002-10-09 10:01  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/ccc: Invoke $orb->preload() with 'eval'
+
+2002-09-10 14:25  Nikolay Logvinov <logvinon@mail.ru>
+
+	* errors.cc, interfaces.cc, server.cc, types.cc: fixed problem with
+	  decoding UserException. Initialize request with ExceptionList
+	  before invoking.
+
+2001-11-22 08:24  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm: fix description of method 'preload'
+
+2001-11-22 08:20  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm: up version to 0.6.5
+
+2001-11-22 08:20  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm: fix usage of 'preload' method
+
+2001-11-22 07:55  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: add debug output
+
+2001-11-01 09:37  Arun Kumar U <bksys@vsnl.com>
+
+	* Makefile.PL: Fixed $Config{'cc'} typo & Makefile options for
+	  linux
+
+2001-10-24 11:49  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm, MICO.xs: some fixes suggested by Philippe Causse
+	  <philippe.causse@ericsson.dk>
+
+2001-10-24 10:27  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL, pmico.h, types.cc: add debug output facility and use
+	  it
+
+2001-10-24 09:44  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, Makefile.PL, client, errors.cc, interfaces.cc, types.cc:
+	  compile with IBM VisualAge C++ for AIX
+
+2001-10-23 14:09  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs: fix reference dereference operator
+
+2001-10-23 13:59  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, pmico.h: clean off a lot of compiler complains
+
+2001-10-23 13:25  Nikolay Logvinov <logvinon@mail.ru>
+
+	* ccc/Makefile.PL: avoid to generate Makefile if Gtk is absent
+
+2001-10-23 07:17  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MANIFEST: remove redudant file
+
+2001-10-22 14:33  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm: Up version to 0.6.4
+
+2001-10-22 14:30  Nikolay Logvinov <logvinon@mail.ru>
+
+	* README: more actual README
+
+2001-10-17 12:37  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: IR.pm, NC.pm, NCEntry.pm, ccc: Name Service: show IORs
+
+2001-10-12 12:17  Arun Kumar U <bksys@vsnl.com>
+
+	* examples/states: Example to test various POA States
+
+2001-10-12 12:11  Arun Kumar U <bksys@vsnl.com>
+
+	* MICO.xs: Added get_state() method for the POAManager interface
+
+2001-10-11 13:24  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/IR.pm: Support abstract interfaces for MICO version 2.3.6 and
+	  higher
+
+2001-10-11 13:01  Arun Kumar U <bksys@vsnl.com>
+
+	* examples/objecttest: Example to exercise the methods in
+	  CORBA::Object
+
+2001-10-11 13:00  Arun Kumar U <bksys@vsnl.com>
+
+	* examples/pingo: Object Pinger Example
+
+2001-10-11 12:52  Arun Kumar U <bksys@vsnl.com>
+
+	* MICO.xs: Added the following methods supported by CORBA::Object
+	  pseudo interface: _non_existent(), _is_a(), _hash() and
+	  _is_equivalent()
+
+2001-10-10 13:59  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/ccc: Catch CORBA exception when connect to Name Service
+
+2001-10-10 13:31  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: IR.pm, NC.pm: Name Service browser: interface inheritance
+	  tree, export to DIA
+
+2001-10-10 13:12  Nikolay Logvinov <logvinon@mail.ru>
+
+	* dispatcher.cc, errors.cc, gtkmico.h, server.cc: compiler
+	  complainigs
+
+2001-10-10 13:10  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: IR.pm, NC.pm, ccc: Name Service browser: IDL representation
+	  of object's interfaces
+
+2001-10-10 08:48  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: CMenu.pm, IR.pm, IRRoot.pm, Misc.pm, NC.pm, README, ccc:
+	  Global menu object Global queue for background processing
+
+2001-10-09 14:13  Nikolay Logvinov <logvinon@mail.ru>
+
+	* developers: new developer - Arun Kumar U
+
+2001-10-09 14:10  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MANIFEST, client-activate: try to forget about BOA
+
+2001-10-09 13:22  Arun Kumar U <bksys@vsnl.com>
+
+	* client, server: Necessary updations for the revised IDL (module
+	  name changed to Bank)
+
+2001-10-09 13:20  Arun Kumar U <bksys@vsnl.com>
+
+	* MICO.xs: Undefined Symbols fixed (MICO 2.3.6 compatibility fix)
+
+2001-10-09 13:18  Arun Kumar U <bksys@vsnl.com>
+
+	* Account.idl: module name changed from 'Account' to 'Bank'.
+	  Required by the new IDL Compiler (MICO ver 2.3.6)
+
+2001-10-08 15:24  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs: fixed command line arguments corruption, reported by
+	  Arun Kumar U <bksys@vsnl.com>
+
+2001-10-08 09:47  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: BGQueue.pm, IR.pm, IRRoot.pm, Misc.pm, NC.pm, NCEntry.pm,
+	  NCRoot.pm, ccc: Name service browser
+
+2001-10-08 08:22  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/plans.txt: plans.txt added
+
+2001-10-05 12:07  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/ccc: Compatibility with versions of perl under 5.6.0
+
+2001-10-05 10:12  Nikolay Logvinov <logvinon@mail.ru>
+
+	* server.cc: fixed call of server method with void return and out
+	  arguments, reported by Arun Kumar U <bksys@vsnl.com>
+
+2001-09-27 07:36  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, errors.cc: use and catch MICO UserExceptions, see
+	  orb_except.idl
+
+2001-09-20 07:43  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: Misc.pm, ccc: Status line added
+
+2001-09-07 12:57  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm, README: Up version to 0.6.3
+
+2001-09-07 12:51  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: add option for Solaris to put path to MICO libraries
+	  into binary
+
+2001-09-07 12:40  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MANIFEST, MANIFEST.SKIP: remove ir-browser obsoleted by CCC
+
+2001-09-04 07:31  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/Makefile.PL: 'PREREQ_PM' - required modules/versions added
+
+2001-09-03 09:06  Pavel Rousnak <rousnak@users.sourceforge.net>
+
+	* ccc/: Hypertext.pm, IR2Dia.pm, IREntry.pm, IRRoot.pm,
+	  Makefile.PL, Misc.pm, Pixtree.pm, README, ccc: CORBA Control
+	  Center project started
+
+2001-09-03 07:55  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs: catch CORBA::Exception during
+	  resolve_initial_references()
+
+2001-08-17 08:48  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: Take into account that MICO may be installed into
+	  unusual place, thanks to John Stoffel <stoffel@casc.com>
+
+2001-06-26 11:31  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, client: add list_initial_services()
+
+2001-06-25 14:50  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Account.idl, client, interfaces.cc, server: fixed bug with inout
+	  args, reported by Arun Kumar U <bksys@vsnl.com>
+
+2001-05-04 08:26  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs: add INT2PTR macros for perl5.005_03 compatibility
+
+2001-04-20 08:39  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs: fixed strange mistake with Exception indirection,
+	  submitted by Alexei Liagouzine <a.liagouzine@telesens.de>
+
+2001-04-12 07:46  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: change get_cv() to perl_get_cv() for perl5.005
+	  compatibility
+
+2001-04-12 07:37  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm, README: Up version to 0.6.2
+
+2001-04-11 09:22  Nikolay Logvinov <logvinon@mail.ru>
+
+	* README, developers: new developer - Pavel Rousnak
+
+2001-04-11 09:09  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, typemap: introduce DynamicAny::DynValue
+
+2001-04-11 09:01  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, typemap: introduce DynamicAny::DynArray
+
+2001-04-11 08:58  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, typemap: introduce DynamicAny::DynSequence
+
+2001-04-11 08:37  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, typemap: introduce DynamicAny::DynUnion
+
+2001-04-11 08:06  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Account.idl, MICO.xs, client, pmico.h, types.cc: finish
+	  DynamicAny::DynStruct
+
+2001-04-04 08:56  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, client: Fixed DynamicAny::DynFixed::DESTROY,
+	  DynamicAny::DynEnum::DESTROY. Add tests for DynamicAny::.
+
+2001-04-04 08:30  Nikolay Logvinov <logvinon@mail.ru>
+
+	* Account.idl, MICO.xs, client, pmico.h, server, typemap, types.cc:
+	  Start DynamicAny::DynStruct. Change DESTROY policy for
+	  DynamicAny.  Fixed a bug concerned converting CORBA::Any to SV.
+
+2001-04-03 11:28  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm: fixed @packet::ISA
+
+2001-03-26 10:48  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, typemap: introduce DynamicAny::DynEnum
+
+2001-03-26 09:29  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, typemap: introduce DynamiAny::DynFixed
+
+2001-03-23 10:13  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm, MICO.xs, errors.cc: Introduce DynamicAny::DynAny
+
+2001-03-22 08:52  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, client, errors.cc, typemap: Introduce
+	  DynamicAny::DynAnyFactory
+
+2001-03-14 08:54  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs: added CORBA::is_nil()
+
+2001-03-13 09:49  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: catch CORBA::Exception during req->invoke()
+
+2001-03-07 09:25  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm, README: Up version to 0.6.1
+
+2001-03-07 08:19  Nikolay Logvinov <logvinon@mail.ru>
+
+	* README: actualize
+
+2001-03-05 14:42  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: Check for already defined methods. When base
+	  interfaces are based on the same interface then it's methods are
+	  duplicated.
+
+2001-03-01 12:33  Nikolay Logvinov <logvinon@mail.ru>
+
+	* interfaces.cc: UserExceptions can be preloaded
+
+2001-03-01 12:31  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.xs: surround call with a trap for CORBA::Exception
+
+2001-02-26 13:16  Nikolay Logvinov <logvinon@mail.ru>
+
+	* MICO.pm, README: Up version to 0.6.0
+
+2001-02-26 12:47  Nikolay Logvinov <logvinon@mail.ru>
 
 	* Makefile.PL: clean account.ref
 
-2001-02-26 15:37  Nikolai Logvinov <logvinon@mail.ru>
+2001-02-26 12:37  Nikolay Logvinov <logvinon@mail.ru>
 
 	* tictactoe: rand() returns fractional number, truncate it
 
-2001-02-26 15:34  Nikolai Logvinov <logvinon@mail.ru>
+2001-02-26 12:34  Nikolay Logvinov <logvinon@mail.ru>
 
 	* MICO.xs, server.cc: duplicate reference to PortableServer::POA
-	adapter before convert it to SV due to PortableServer::POA::DESTROY
-	()
+	  adapter before convert it to SV due to
+	  PortableServer::POA::DESTROY ()
 
-2001-02-26 15:23  Nikolai Logvinov <logvinon@mail.ru>
+2001-02-26 12:23  Nikolay Logvinov <logvinon@mail.ru>
 
 	* MICO.xs, errors.cc, exttypes.h, interfaces.cc, server.cc,
-	types.cc: Due to perl5005delta:"All Perl global variables that are
-	visible for use by extensions now have a `PL_' prefix." necessary
-	changes have been made. Adopt for MICO v2.3.5
+	  types.cc: Due to perl5005delta:"All Perl global variables that
+	  are visible for use by extensions now have a `PL_' prefix."
+	  necessary changes have been made. Adopt for MICO v2.3.5
 
-1999-06-13 18:35  Owen Taylor  <otaylor@redhat.com>
-
-	* Account.idl, ChangeLog, LICENSE-LGPL, MANIFEST, MICO.pm, MICO.xs,
-	Makefile.PL, Performance, README, TODO, Tictactoe.idl, account.ref,
-	client, client-activate, constsub.c, dispatcher.cc, dispatcher.h,
-	empty.xpm, errors.cc, exttypes.cc, exttypes.h, fixedtest,
-	gtkmico.cc, gtkmico.h, interfaces.cc, mico-2.2.7-checker.patch,
-	opponent.xpm, perl-idl, pmico.h, self.xpm, server, server.cc,
-	server.h, start-servers.sh, tictactoe, typemap, types.cc,
-	MICO/Fixed.pm, MICO/LongDouble.pm, MICO/LongLong.pm,
-	MICO/ULongLong.pm, MICO/internals.fig, MICO/internals.pod,
-	MICO/internals.ps, MICO/mapping.pod, ir-browser/README,
-	ir-browser/TCUtils.pm, ir-browser/browser, shlib/hello,
-	shlib/hello.idl, shlib/perl-client, shlib/server.cc, mico/ir.idl,
-	mico/ir_base.idl: Initial revision
-
-1999-06-13 18:35  Owen Taylor  <otaylor@redhat.com>
+1999-06-13 14:35  Owen Taylor  <otaylor@redhat.com>
 
 	* Account.idl, ChangeLog, LICENSE-LGPL, MANIFEST, MICO.pm, MICO.xs,
-	Makefile.PL, Performance, README, TODO, Tictactoe.idl, account.ref,
-	client, client-activate, constsub.c, dispatcher.cc, dispatcher.h,
-	empty.xpm, errors.cc, exttypes.cc, exttypes.h, fixedtest,
-	gtkmico.cc, gtkmico.h, interfaces.cc, mico-2.2.7-checker.patch,
-	opponent.xpm, perl-idl, pmico.h, self.xpm, server, server.cc,
-	server.h, start-servers.sh, tictactoe, typemap, types.cc,
-	MICO/Fixed.pm, MICO/LongDouble.pm, MICO/LongLong.pm,
-	MICO/ULongLong.pm, MICO/internals.fig, MICO/internals.pod,
-	MICO/internals.ps, MICO/mapping.pod, ir-browser/README,
-	ir-browser/TCUtils.pm, ir-browser/browser, shlib/hello,
-	shlib/hello.idl, shlib/perl-client, shlib/server.cc, mico/ir.idl,
-	mico/ir_base.idl: Initial import of Perl bindings for MICO
+	  Makefile.PL, Performance, README, TODO, Tictactoe.idl,
+	  account.ref, client, client-activate, constsub.c, dispatcher.cc,
+	  dispatcher.h, empty.xpm, errors.cc, exttypes.cc, exttypes.h,
+	  fixedtest, gtkmico.cc, gtkmico.h, interfaces.cc,
+	  mico-2.2.7-checker.patch, opponent.xpm, perl-idl, pmico.h,
+	  self.xpm, server, server.cc, server.h, start-servers.sh,
+	  tictactoe, typemap, types.cc, MICO/Fixed.pm, MICO/LongDouble.pm,
+	  MICO/LongLong.pm, MICO/ULongLong.pm, MICO/internals.fig,
+	  MICO/internals.pod, MICO/internals.ps, MICO/mapping.pod,
+	  shlib/hello, shlib/hello.idl, shlib/perl-client, shlib/server.cc:
+	  Initial import of Perl bindings for MICO
+
+1999-06-13 14:35  Owen Taylor  <otaylor@redhat.com>
+
+	* Account.idl, ChangeLog, LICENSE-LGPL, MANIFEST, MICO.pm, MICO.xs,
+	  Makefile.PL, Performance, README, TODO, Tictactoe.idl,
+	  account.ref, client, client-activate, constsub.c, dispatcher.cc,
+	  dispatcher.h, empty.xpm, errors.cc, exttypes.cc, exttypes.h,
+	  fixedtest, gtkmico.cc, gtkmico.h, interfaces.cc,
+	  mico-2.2.7-checker.patch, opponent.xpm, perl-idl, pmico.h,
+	  self.xpm, server, server.cc, server.h, start-servers.sh,
+	  tictactoe, typemap, types.cc, MICO/Fixed.pm, MICO/LongDouble.pm,
+	  MICO/LongLong.pm, MICO/ULongLong.pm, MICO/internals.fig,
+	  MICO/internals.pod, MICO/internals.ps, MICO/mapping.pod,
+	  shlib/hello, shlib/hello.idl, shlib/perl-client, shlib/server.cc:
+	  Initial revision
 

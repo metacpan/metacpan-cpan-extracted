@@ -6,21 +6,26 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CPAN/Testers/Schema.pm',
     'CPAN/Testers/Schema/Base.pm',
     'CPAN/Testers/Schema/Result/LatestIndex.pm',
+    'CPAN/Testers/Schema/Result/MetabaseUser.pm',
     'CPAN/Testers/Schema/Result/Release.pm',
     'CPAN/Testers/Schema/Result/ReleaseStat.pm',
     'CPAN/Testers/Schema/Result/Stats.pm',
+    'CPAN/Testers/Schema/Result/TestReport.pm',
     'CPAN/Testers/Schema/Result/Upload.pm',
     'CPAN/Testers/Schema/ResultSet/Release.pm',
+    'CPAN/Testers/Schema/ResultSet/TestReport.pm',
     'CPAN/Testers/Schema/ResultSet/Upload.pm'
 );
 
-
+my @scripts = (
+    'bin/cpantesters-schema'
+);
 
 # no fake home requested
 
@@ -59,6 +64,38 @@ for my $lib (@module_files)
         push @warnings, @_warnings;
     }
 }
+
+foreach my $file (@scripts)
+{ SKIP: {
+    open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
+    my $line = <$fh>;
+
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
+    @switches = (@switches, split(' ', $1)) if $1;
+
+    my $stderr = IO::Handle->new;
+
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
+    binmode $stderr, ':crlf' if $^O eq 'MSWin32';
+    my @_warnings = <$stderr>;
+    waitpid($pid, 0);
+    is($?, 0, "$file compiled ok");
+
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { require blib; blib->VERSION('1.01') };
+
+    # in older perls, -c output is simply the file portion of the path being tested
+    if (@_warnings = grep { !/\bsyntax OK$/ }
+        grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
+    {
+        warn @_warnings;
+        push @warnings, @_warnings;
+    }
+} }
 
 
 

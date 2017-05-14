@@ -1,0 +1,41 @@
+<tmpl_include header.tmpl>
+
+<tmpl_var form_start>
+
+<table>
+	<thead>
+		<th></th>
+		<th>Num</th>
+		<th>Balance</th>
+		<th>Vendor</th>
+	</thead>
+	<tbody>
+		<tmpl_loop u_number><tr>
+			<td><input type="checkbox" id="s_<tmpl_var num>" name="n_<tmpl_var num>" /></td>
+			<td><a href="#set" onclick="setform(document.forms[0],'<tmpl_var num>','<tmpl_var sum>','<tmpl_var vendor>/<tmpl_var sub>')"><tmpl_var num></a></td>
+			<td class="num"><tmpl_var sum></td>
+			<td><tmpl_var vendor_text></td>
+		</tr></tmpl_loop>
+	</tbody>
+</table>
+
+<input class="<tmpl_var styleclass>_button" type="submit" value="Delete" onclick="this.form.submit_action.value='delete'" />
+<p/>
+<table class="inline">
+	<tr><td>Num</td><td><tmpl_var field_num></td></tr>
+	<tr><td>Balance</td><td><tmpl_var field_sum></td></tr>
+	<tr><td>Vendor</td><td><tmpl_var field_vendor></td></tr>
+</table>
+<input class="<tmpl_var styleclass>_button" type="submit" value="Add/Modify" />
+
+<tmpl_var form_end>
+
+<script><!--
+function setform (f,num,sum,vendor) {
+	f.num.value = num;
+	f.sum.value = sum;
+	f.vendor.value = vendor;
+}
+--></script>
+
+<tmpl_include footer.tmpl>

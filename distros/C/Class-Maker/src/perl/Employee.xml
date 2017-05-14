@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="perlClass.xsl"?>
+<class name="Employee">
+	<info>Stores an employee's data</info>
+		<uses>
+			<use>class qw(:all)</use>
+			<use>Data::Dumper</use>
+			<use>IO::Extended qw(:all)</use>
+		</uses>	
+	<dependencies>
+		<dependency>Object</dependency>
+		<dependency>Object::Serializable::XML</dependency>
+		<dependency>Object::Serializable::HTML</dependency>
+	</dependencies>
+	<parents>
+		<parent name="Object" visibility="public" href="Object.xml"/>
+		<parent name="Object::Serializable" visibility="public" href="Object_serializer.xml"/>
+	</parents>
+	<properties>
+		<property name="Name" type="string" has_data="true"/>
+		<property name="Firstname" type="string" has_data="true" is_unique="true"/>
+		<property name="SSN" type="int"/>
+		<property name="Salary" type="double"/>
+	</properties>
+	<methods>
+		<method name="increaseSalary" type="void">
+			<params>
+			     <param name="percent" type="$"/>
+			     <param name="names" type="@"/>
+			</params>				
+		</method>
+		<method name="decreaseSalary" type="void"/>
+		<method name="calculateSalaray" type="void" proto="$">
+			<params>
+				<param name="percent" type="$"/>
+				<param name="names" type="@"/>
+			</params>
+		</method>
+	</methods>
+	<functions>
+		<function name="to_xml" type="func">
+			<params>
+				<param name="percent" type="$"/>
+				<param name="names" type="@"/>
+			</params>
+		</function>
+		<function name="to_html">
+			<params>
+				<param name="format" type="$"/>
+				<param name="names" type="@"/>
+			</params>
+		</function>
+	</functions>
+</class>

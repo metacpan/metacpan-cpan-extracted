@@ -1,0 +1,14 @@
+Revision history for Perl extension PerlQt4.
+
+0.60  Mon Dec 14 22:50:33 2009
+    - First release.  60% of the Qt examples are now verified to be working.
+      Includes support for:
+      * Making Perl subclasses of C++ classes and overriding their virtual
+        methods
+      * Defining signals and slots in Perl
+      * Creating QVariants that contain arbitrary Perl hashes or arrays
+
+0.01  Thu Jul 31 23:15:44 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n PerlQt
+

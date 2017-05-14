@@ -1,0 +1,16 @@
+lib/Bot/BasicBot/Pluggable/Module/Convert.pm
+lib/Bot/BasicBot/Pluggable/Module/Funcs.pm
+lib/Bot/BasicBot/Pluggable/Module/LongURLs.pm
+lib/Bot/BasicBot/Pluggable/Module/Maths.pm
+lib/Bot/BasicBot/Pluggable/Module/Spell.pm
+lib/Bot/BasicBot/Pluggable/Module/Status.pm
+lib/Bot/BasicBot/Pluggable/Module/Stockquote.pm
+lib/Bot/BasicBot/Pluggable/Module/Translate.pm
+lib/Bot/BasicBot/Pluggable/Module/Tools.pod
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01use.t
+Build.PL
+Makefile.PL

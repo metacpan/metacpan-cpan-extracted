@@ -1,38 +1,20 @@
-#
-# $Id$
+#!perl -w
 #
 # This script is written intentionally in UTF-8
 # Requires Encode 1.83 or better
 # -- dankogai
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
-        chdir 't';
-        @INC = '../lib';
-    }
-    require Config; import Config;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
-      print "1..0 # Skip: Encode was not built\n";
-      exit 0;
-    }
-    if (ord("A") == 193) {
-        print "1..0 # Skip: EBCDIC\n";
-        exit 0;
-    }
-    unless (PerlIO::Layer->find('perlio')){
-        print "1..0 # Skip: PerlIO required\n";
-        exit 0;
-    }
-    if ($ENV{PERL_CORE_MINITEST}) {
-        print "1..0 # Skip: no dynamic loading on miniperl, no Encode\n";
-        exit 0;
-    }
-    $| = 1;
+    chdir 't' if -d 't';
+    require './test.pl';
+    skip_all_without_dynamic_extension('Encode');
+    skip_all("no encoding pragma in EBCDIC") if $::IS_EBCDIC;
+    skip_all_without_perlio();
 }
 
 use strict;
-use Test::More tests => 8;
-
+plan(tests => 8);
+no warnings 'deprecated';
 use encoding 'utf8';
 
 my @hiragana =  map {chr} ord("ぁ")..ord("ん");
@@ -64,7 +46,7 @@ is($str, $hiragana, "s/// # hiragana -> katakana");
 {
   # [perl 16843]
   my $line = 'abcdefghijklmnopqrstuvwxyz$0123456789';
-  $line =~ tr/bcdeghijklmnprstvwxyz$02578/בצדעגהיײקלמנפּרסטװשכיזשױתײחא/;
+  $line =~ tr/bcdeghijklmnprstvwxyz$02578/בצדעגהיײקלמנפּרסטװשכיזשױתײח/;
   is($line, "aבצדעfגהיײקלמנoפqּרסuטװשכיזש1ױ34ת6ײח9", "[perl #16843]");
 }
 

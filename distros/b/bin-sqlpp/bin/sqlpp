@@ -1,0 +1,995 @@
+#!/usr/bin/perl -w
+
+# $Id: sqlpp,v 1.15 2007/03/24 12:22:30 dk Exp $
+
+use strict;
+use vars qw($input $output @inc @context $context $sigdie %defines %macros $debug $VERSION);
+use vars qw(%global); # for perldef
+
+$VERSION = '0.06';
+
+# special predefined macros
+%defines = (
+	__LINE__ => {
+		code => sub { $context->{line} },
+	},
+	__FILE__ => {
+		code => sub { $context->{file} },
+	},
+	__VERSION__ => {
+		code => sub { $VERSION },
+	},
+	'#' => {
+		num	=> 1,
+		name	=> '#',
+		code	=> sub {
+			my $x = $_[0];
+			$x =~ s/([\\'])/\\$1/gs;
+			"'$x'";
+		},
+	},
+);
+
+use constant MACRO_OFF     => 0; # none
+use constant MACRO_SIMPLE  => 1; # #defines with no-parameters only
+use constant MACRO_COMPLEX => 2; # #defines with parameters only
+use constant MACRO_ALL     => 3; # all #defines
+
+# run
+$debug = 0;
+
+$context = new_context( file => 'command line', macro => MACRO_OFF );
+parse_argv();
+
+$context = new_context();
+parse_input();
+
+
+# used for serving 'defined' call from #if, which is basically perl code
+sub is_defined { exists ($defines{$_[0]}) ? 1 : 0 }
+
+$SIG{__DIE__} = sub {
+	# avoid multiple wrappings by perl's "use" - careful when recovering from an eval!
+	die @_ if $sigdie++; 
+
+	die "error in `$context->{file}', line #$context->{line}: ", @_, "\n";
+};
+parse_file(1);
+exit;
+
+# a context defines state of parser in a file
+sub new_context 
+{
+	{
+		line       => 0,
+		buf        => '',
+		in_comment => 0,
+		ifdef      => [{state => 1,passive=>[]}],
+		in_sql     => 0,
+		macro      => MACRO_ALL,
+		strip      => 1,
+		@_
+	}
+}
+
+# does buffered input
+sub getline
+{
+	my $undef_if_eof = $_[0];
+	if ( length $context->{buf}) {
+		my $ret = $context->{buf};
+		$context->{buf} = '';
+		return $ret;
+	}
+	my $ret;
+	unless ( defined ($ret = <$input>)) {
+		die "Unexpected end of input\n" unless $undef_if_eof;
+	} else {
+		$context->{line}++;
+	}
+	$ret;
+}
+
+# skips input until the EOL
+sub eatline { $context->{buf} = '' }
+
+# returns next token from input stream
+sub gettok
+{
+	while ( 1) {
+		unless ( length $context->{buf}) {
+			unless ( defined ($context->{buf} = <$input>)) {
+				die "Unexpected end of input\n";
+			}
+			chomp $context->{buf};
+			$context->{line}++;
+		}
+
+		$context->{buf} =~ s/^\s+//;
+
+		return $1 
+			if $context-> {buf} =~ s/^(\w+|\S)//;
+	}
+}
+
+# returns ID from input stream
+sub getid
+{
+	my $tok = gettok;
+	die "Identificator expected\n" unless $tok =~ /^\w+$/;
+	$tok;
+}
+
+# Line handle is a state of the parser as it progresses through input .
+# The idea is to avoid accumultaion of input until the end of input, and
+# spew processed data as soon as possible. The calling routing thus is
+# begin_line / while( not parse_line) / print end_line, with different
+# variations.
+#
+# Currently, parse_line returns 0 ( a signal to call end_line ) when 
+# bracket balance is achieved - but there's a bug with macro
+# call MACRO\n() where MACRO and () are on different lines.
+
+sub new_line_handle { {} }
+
+sub begin_line
+{
+	my $k = $_[0] || new_line_handle;
+	$k-> {var}	= '';		 # text to parse
+	$k-> {ids}	= [];		 # stack of IDs met, f.ex. if var="A(b,C(d,", then ids=(A,C)
+	$k-> {last_id}	= '';		 # a candidate to ids
+	$k-> {last_pos}	= 0;		 # stores pos(var) between calls
+	$k-> {storage}	= [ 'copy', 0 ]; # accululates parsed info, to be run throung substitute_parameters later
+	$k-> {run_stack}= [];		 # stack of macro calls
+	$k-> {run}	= $k-> {storage};# current macro call context
+	$k;
+}
+
+sub parse_line
+{
+	my $k = $_[0];
+	$k-> {last_pos} = pos( $k-> {var}) || 0;
+	$k-> {var} .= $_[1];
+	my $full   = $context-> {macro} & MACRO_COMPLEX;
+	my $simple = $context-> {macro} & MACRO_SIMPLE;
+	pos( $k-> {var}) = $k-> {last_pos};
+	{
+		# do comments
+		$context->{multiline_comment} and $k-> {var} =~ m/\G.*?(\*\/)?/gcs and do {
+			$context-> {multiline_comment} = 0 if $1;
+			redo;
+		};
+		( $k-> {var} =~ m/\G--/ or (
+			not $k-> {macro} and $k-> {var} =~ m/\G#/
+		)) and do {
+			if ( $context->{strip}) {
+				my $savepos = pos( $k-> {var});
+				$k-> {var} =~ s/\G.*$//g;
+				pos( $k-> {var}) = $savepos;
+			} elsif ( $k-> {macro}) {
+				$k-> {var} =~ m/\G--/gc;
+			} else {
+				$k-> {var} =~ m/\G(--|#)/gc;
+			}
+			redo;
+		};
+		$k-> {var} =~ m/\G\/\*/gcs and do {
+			$context-> {multiline_comment} = 1;
+			redo;
+		};
+		$k-> {var} =~ m/\G-+/gc and redo;
+
+		# do identifiers
+		$k-> {var} =~ m/\G(\w+)/gcs and do {
+			if ( $k->{parameters} and exists $k->{parameters}->{$1}) {
+				$k-> {last_id} = '';
+				push @{$k->{run}}, 
+					pos( $k->{var}) - length($1),
+					'parameter', $k->{parameters}->{$1},
+					'copy', pos( $k->{var});
+			} elsif ( $simple and exists $defines{$1}) {
+				my ( $l1, $d, $p) = ( length( $1), $defines{$1}, pos($k->{var}));
+				$k-> {last_id} = '';
+				push @{$k->{run}}, 
+					$p - $l1,
+					'define', $defines{$1},
+					'copy', $p;
+			} else {
+				$k-> {last_id} = $1;
+				$k-> {last_id_pos_start} = pos($k-> {var}) - length($1);
+			}
+			print "- id $k->{last_id}\n" if $debug;
+			redo;
+		};
+
+		# do opening bracket
+		$full and $k-> {var} =~ m/\G\(\s*/gcs and do {
+			push @{$k-> {ids}}, [ $k-> {last_id}, $context->{line}];
+			if ( length $k->{last_id} and $macros{$k->{last_id}}) {
+				push @{$k->{run_stack}}, $k->{run};
+				push @{$k->{run}}, 
+					$k-> {last_id_pos_start},
+					'macro', $macros{$k->{last_id}}, 
+					[
+						'copy', pos($k->{var}),
+					];
+				$k->{run} = $k->{run}->[-1];
+			}
+			$k-> {last_id} = '';
+			print "- open\n" if $debug;
+			redo;
+		};
+	
+		# nulling ID after right after comments and IDs are processed is basically
+		# a grammar rule that states that in a macro call nothing except a comment 
+		# and whitespace can be present between a macro ID and an opening bracket
+		$k-> {var} =~ m/\G\s+/gcs and redo;
+		$k-> {last_id} = '';
+
+		# do closing bracket
+		$full and $k-> {var} =~ m/\G(\s*\))/gcs and do {
+			die "Brackets mismatch at character ", pos($k-> {var})-$k-> {last_pos}, "\n" 
+				unless @{$k-> {ids}};
+			my $id = (pop @{$k->{ids}})->[0];
+			print "- close [$id]\n" if $debug;
+			
+			if ( length $id and $macros{$id}) {
+				push @{$k->{run}}, pos($k->{var}) - length($1);
+				$k->{run} = pop @{$k->{run_stack}};
+				push @{$k->{run}}, 'copy', pos($k->{var});
+			}
+			redo;
+		};
+
+		# do next param
+		$full and $k-> {var} =~ m/\G(\s*,\s*)/gcs and do {
+			redo unless @{$k->{ids}};
+
+			if ( length($k->{ids}->[-1]->[0]) and 
+				$macros{$k->{ids}->[-1]->[0]} and @{$k->{run_stack}}) {
+				push @{$k->{run}},
+					pos($k-> {var}) - length($1),
+					'next', 
+					'copy', pos($k-> {var})
+			}
+			redo;
+		};
+
+		# special # and ## operators
+		$k->{macro} and $k->{var} =~ /\G\#(?:(\#\s*)|(\s*)(\w+)|(.*))/gcs and do {
+			if ( defined $1) {
+				# concatenation
+				my $minus = 1 + length($1);
+				$minus++ while 
+					$minus < pos($k->{var}) and 
+					substr( $k->{var}, pos($k->{var}) - $minus - 1, 1) eq ' ';
+				push @{$k->{run}}, 
+					pos($k->{var}) - $minus,
+					'copy', pos($k->{var});
+			} elsif ( defined $3 and exists $k->{parameters}->{$3}) {
+				# stringification
+				push @{$k->{run}},
+					pos($k->{var}) - 1 - length($2) - length($3),
+					'macro', $defines{'#'}, 
+						[ 'parameter', $k->{parameters}->{$3} ],
+					'copy', pos($k->{var});
+			} else {
+				die "'#' is not followed by a macro parameter (",
+					(( defined $3) ? $3 : $4),
+					")\n";
+			}
+			redo;
+		};
+
+		# we do ''-only strings
+		$full and $k-> {var} =~ m/\G'[^']*'/gcs and redo;
+
+		# everything else
+		if ( $full) {
+			$k-> {var} =~ m/\G[^\w\(\)\'\-\,\#]+/gcs and redo;
+		} else {
+			$k-> {var} =~ m/\G[^\w\-\#]+/gcs and redo;
+		}
+		!$full and $k-> {var} =~ m/\G[\(\)\']+/gcs and redo;
+
+		print "? stop at ", pos($k-> {var}), "\n" if $debug;
+		print +('.' x (pos($k-> {var})-1)), "v\n$k->{var}\n" if $debug;
+	}
+
+	return scalar(@{$k-> {ids}}) ? 0 : 1;
+}
+
+sub end_parse_line
+{
+	my $k = $_[0];
+	die "Brackets don't match at character ", pos($k->{var}) - $k-> {last_pos}, ", line $k->{ids}->[-1]->[1]\n"
+		if @{$k-> {ids}};
+	push @{$k->{run}}, length($k->{var});
+	delete @$k{qw(run run_stack last_id last_pos last_id_pos_start ids)};
+}
+
+# input:
+#     k - text reference object
+#     v - set of commands, where 'copy' referes to text chunks in k
+#     p - set of actual parameters to be substututed
+# output:
+#     text with parameters substituted
+sub substitute_parameters
+{
+	my ( $k, $v, $parameters) = @_;
+
+	my @output = ('');
+
+	for ( my $i = 0; $i < @$v; ) {
+		my $cmd = $v->[$i++];
+		if ( $cmd eq 'copy') {
+			$output[-1] .= substr( $k->{var}, $v->[$i], $v->[$i+1] - $v->[$i]);
+			$i += 2;
+		} elsif ( $cmd eq 'parameter') {
+			$output[-1] .= $parameters->[ $v->[$i++] ];
+		} elsif ( $cmd eq 'next') {
+			push @output, '';
+		} elsif ( $cmd eq 'macro') {
+			$output[-1] .= execute_macro( 
+				$v->[$i],
+				substitute_parameters( $k, $v->[$i+1], $parameters)
+			);
+			$i += 2;
+		} elsif ( $cmd eq 'define') {
+			$output[-1] .= execute_macro( $v->[$i++]);
+		} else {
+			die "Internal error: unknown directive `$cmd' (i=$i, stack=@$v)\n";
+		}
+	}
+
+	# XXX special case - zero parameters
+	return if 1 == @output and $output[0] eq '';
+
+	return @output;
+}
+
+sub execute_macro
+{
+	my ( $handle, @params) = @_;
+	
+	die sprintf "Macro `%s' requires %d argument%s, %d %s passed\n",
+		$handle->{name}, 
+		$handle->{num},  ( $handle->{num} == 1) ? '' : 's',
+		scalar(@params), (scalar(@params) == 1) ? 'was' : 'were'
+			unless $handle->{ellipsis} or 
+				!defined($handle->{num}) or 
+				$handle->{num} == scalar(@params);
+
+	return join($", $handle->{code}->(@params)) if $handle-> {code};
+
+	return join('', substitute_parameters( 
+		$handle,
+		$handle->{storage},
+		\@params 
+	));
+}
+
+sub end_line
+{
+	my $k = $_[0];
+	end_parse_line($k);
+	return join('', substitute_parameters( $k, $k->{storage}, [] ));
+}
+
+# begin_macro/end_macro pairs are same as begin_line/end_line, but for macro declaration purposes 
+sub begin_macro
+{
+	my ( $name, $parametric, @params ) = @_;
+
+	my %p;
+	my $pno = 0;
+	for my $p ( @params) {
+		die "Error in macros `$name' definition: argument `$p' is used twice\n"
+			if $p{$p};
+		die "Error in macros `$name' definition: argument name `$p' is not a valid identifier\n"
+			if $p =~ /\'\(\)\#/;
+		$p{$p} = $pno++;
+	}
+
+	return begin_line {
+		parametric => $parametric,
+		parameters => \%p,
+		name       => $name,
+		macro      => 1,
+		line       => $context->{line},
+		file       => $context->{file},
+	};
+}
+
+sub end_macro
+{
+	my $handle = $_[0];
+	end_parse_line( $handle);
+	
+	if ( $handle->{parametric}) {
+		$macros{ $handle->{name} } = $handle;
+		$handle->{num} = scalar keys %{$handle->{parameters}};
+	} else {
+		$defines{ $handle->{name} } = $handle;
+		$handle->{num} = 0;
+	}
+	delete @$handle{qw(parametric macro)};
+}
+
+sub parse_pragma
+{
+	my ( $pragma, $param) = @_;
+	if ( $pragma eq 'macro') {
+		if ( $param eq 'simple') {
+			$context->{macro} = MACRO_SIMPLE;
+		} elsif ( $param eq 'all') {
+			$context->{macro} = MACRO_ALL;
+		} elsif ( $param eq 'off') {
+			$context->{macro} = MACRO_OFF;
+		} else {
+			die "Invalid '#pragma macro($param)': should be 'all', 'simple', or 'off'\n";
+		}
+	} elsif ( $pragma eq 'comment') {
+		if ( $param eq 'strip') {
+			$context->{strip} = 1;
+		} elsif ( $param eq 'leave') {
+			$context->{strip} = 0;
+		} else {
+			die "Invalid '#pragma comments($param)': should be 'strip' or 'leave'\n";
+		}
+	} elsif ( $pragma eq 'lang') {
+		if ( $param eq 'sql') {
+			parse_pragma(qw(macro all));
+			parse_pragma(qw(comment strip));
+		} elsif ( $param eq 'perl') {
+			parse_pragma(qw(macro simple));
+			parse_pragma(qw(comment leave));
+		} else {
+			die "Invalid '#pragma lang($param)': should be 'sql' or 'perl'\n";
+		}
+	} else {
+		die "Unknown #pragma $pragma\n";
+	}
+}
+
+# if a line begins with #, then parse_comment checks it first
+sub parse_comment
+{
+	my $eatline = 1;
+	my $what;
+
+	if ( $context->{buf} !~ s/^(\w+)\s+//) {
+		# a comment
+		eatline;
+		return;
+	} else {
+		$what = $1;
+	}
+
+	# parse if/else/elif/endif in the passive code less heavily
+	unless ( $context->{ifdef}->[-1]->{state}) {
+		if ( $what =~ /^if(n?def)?$/) {
+			push @{$context->{ifdef}->[-1]->{passive}}, 1; # flipsleft
+		} elsif ( $what eq 'else') {
+			goto NORMAL unless @{$context->{ifdef}->[-1]->{passive}};
+			die "Too many #else\n" unless $context->{ifdef}->[-1]->{passive}->[-1]--;
+		} elsif ( $what eq 'elif') {
+			goto NORMAL unless @{$context->{ifdef}->[-1]->{passive}};
+		} elsif ( $what eq 'endif') {
+			goto NORMAL unless @{$context->{ifdef}->[-1]->{passive}};
+			pop @{$context->{ifdef}->[-1]->{passive}};
+		}
+		eatline;
+		return;
+	}
+	
+	# normal '#' pragmas
+NORMAL:
+	if ( $what eq 'define') {
+		my $heredoc = $context->{buf} =~ s/^<<//;
+		my $def = getid();
+
+		my @params;
+		my $parametric = 0;
+ 		if ( $context->{buf} =~ s/^\(([^\)]*)\)//) {
+			@params = map { 
+				s/^\s*//;
+				s/\s*$//;
+				die "`$1' may not appear in macro parameter list\n"
+					if m/(\W)/;
+				$_
+			} split ',', $1;
+			$parametric = 1;
+		}
+		$context->{buf} =~ s/^\s*//;
+
+		$eatline = 0;
+		if ( $heredoc or length $context->{buf}) {
+			my $v = begin_macro( $def, $parametric, @params);
+
+			my $do_ml = 1;
+			while ( $do_ml) {
+				my $l = getline;
+				chomp $l;
+				if ( $heredoc) {
+					last if $l eq $def;
+				} else {
+					$do_ml = $l =~ s/\\\s*$//;
+				}
+				parse_line( $v, $l . ( $do_ml ? "\n" : ''));
+			}
+
+			# check if macro already exists by comparing with the macro body
+			my $ref = $parametric ? $macros{$def} : $defines{$def};
+			if ( defined $ref) {
+				my $fail;
+				if ( !defined $ref->{var}) {
+					$fail = 1;
+				} else {
+					$fail = ( 
+						join(':', keys %{$ref->{parameters}})
+						ne
+						join(':', @params)
+					) || (
+						$ref->{var}
+						ne
+						$v->{var}
+					);
+				}
+				warn "`$def' redefined, previous declaration in $ref->{file}:$ref->{line}\n"
+					if $fail;
+			}
+
+			# register the macro
+			end_macro( $v);
+		} elsif ( $parametric) { # special macro 
+			warn "`$def' redefined, previous declaration in $macros{$def}->{file}:$macros{$def}->{line}\n"
+				if exists $macros{$def} and defined $macros{$def}->{var};
+			$macros{$def} = {
+				name    => $def,
+				num     => scalar(@params),
+				storage => [],
+				line    => $context->{line},
+				file    => $context->{file},
+			}
+		} else { # special define
+			warn "`$def' redefined, previous declaration in $defines{$def}->{file}:$defines{$def}->{line}\n"
+				if exists $defines{$def} and defined $defines{$def}->{var};
+			$defines{$def} = {
+				name    => $def,
+				num     => 0,
+				storage => [],
+				line    => $context->{line},
+				file    => $context->{file},
+			}
+		}
+	} elsif ( $what eq 'undef') {
+		my $def = getid();
+		delete $defines{$def};
+		delete $macros{$def};
+	} elsif ( $what =~ /if(n?)def/) {
+		my $def = getid();
+		my $notdef = length($1) ? 1 : 0;
+		push @{$context->{ifdef}}, {
+			state => exists($defines{$def}) ? !$notdef : $notdef,
+			flipsleft => 1,
+			passive => [],
+			do_else => exists($defines{$def}) ? $notdef : !$notdef,
+		};
+	} elsif ( $what eq 'if') {
+		my $do_ml = 1;
+		my $v = begin_line;
+		while ( $do_ml) {
+			my $l = getline;
+			chomp $l;
+			$do_ml = $l =~ s/\\\s*$//;
+			$l =~ s/defined\s*\(([^\)\s]+)\s*\)\s*/is_defined($1)/ge; # XXX a hack
+			parse_line( $v, $l . ( $do_ml ? "\n" : ''));
+		}
+		my $if = end_line($v);
+		my $ret = eval $if;
+		die $@ if $@;
+		push @{$context->{ifdef}}, {
+			state => $ret ? 1 : 0,
+			flipsleft => 1,
+			passive => [],
+			do_else => ( $ret ? 0 : 1),
+		};
+		$eatline = 0;
+	} elsif ( $what eq 'elif') {
+		die "Runaway #elif\n" if 
+			0 == $#{$context->{ifdef}} or 
+			@{$context->{ifdef}->[-1]->{passive}};
+		my $do_ml = 1;
+		my $v = begin_line;
+		while ( $do_ml) {
+			my $l = getline;
+			chomp $l;
+			$do_ml = $l =~ s/\\\s*$//;
+			$l =~ s/defined\s*\(([^\)\s]+)\s*\)\s*/is_defined($1)/ge; # XXX a hack
+			parse_line( $v, $l . ( $do_ml ? "\n" : ''));
+		}
+		my $if = end_line($v);
+		if ( $context->{ifdef}->[-1]->{do_else}) {
+			my $ret = eval $if;
+			die $@ if $@;
+			$context->{ifdef}->[-1]->{state} = ($ret ? 1 : 0);
+			$context->{ifdef}->[-1]->{do_else} = 0 if $ret;
+		} else {
+			$context->{ifdef}->[-1]->{state} = 0;
+		}
+		$eatline = 0;
+	} elsif ( $what eq 'else') {
+		die "Runaway #else\n" if 
+			0 == $#{$context->{ifdef}} or 
+			@{$context->{ifdef}->[-1]->{passive}};
+		die "Too many #else\n" unless $context->{ifdef}->[-1]->{flipsleft}--;
+		$context->{ifdef}->[-1]->{state} = $context->{ifdef}->[-1]->{state} ? 
+			0 : 
+			$context->{ifdef}->[-1]->{do_else};
+	} elsif ( $what eq 'endif') {
+		die "Runaway #endif\n" if
+			0 == $#{$context->{ifdef}} or
+			@{$context->{ifdef}->[-1]->{passive}};
+		pop @{$context->{ifdef}};
+	} elsif ( $what eq 'error') {
+		die getline;
+	} elsif ( $what eq 'include') {
+		my $bracket = gettok();
+		die "format #include <file> or #include \"file\"\n" 
+			unless $bracket =~ /^["<]$/;
+		my $file;
+		my @local_inc;
+		if ( $bracket eq '<') {
+			@local_inc = ( @inc, '.');
+			die "format #include <file>\n" unless $context->{buf} =~ s/([^>]*)>//;
+			$file = $1;
+		} else {
+			@local_inc = ( '.');
+			die "format #include \"file\"\n" unless $context->{buf} =~ s/([^"]*)"//;
+			$file = $1;
+		}
+		my $found;
+		for my $inc ( @local_inc) {
+			next unless -f "$inc/$file";
+			$found = "$inc/$file";
+			last;
+		}
+		die "Cannot find file `$file' in path [@local_inc]\n" unless $found;
+		$file = $found;
+
+		local $input;
+		open $input, "< $file" or die "Cannot open $file\n";
+		push @context, $context;
+		$context = new_context( file => $file);
+		parse_file(1);
+		$context = pop @context;
+		close $input;
+	} elsif ( $what eq 'pragma') {
+		my $pragma = gettok();
+		my $param = length($context->{buf}) ? getline() : '';
+		$param =~ s/^[\s\(]*(\w+)[\s\)\#]*$/$1/m;
+
+		parse_pragma( $pragma, $param);
+	} elsif ( $what eq 'perldef') {
+		$eatline = 0;
+		my $heredoc = $context->{buf} =~ s/^<<//;
+		my $def = getid();
+
+		my ( $ellipsis, @params);
+		my $parametric = 0;
+ 		if ( $context->{buf} =~ s/^\(([^\)]*)\)//) {
+			if ( $1 eq '...') {
+				$ellipsis = 1;
+			} else {
+				@params = map { 
+					s/^\s*//;
+					s/\s*$//;
+					die "`$_' is not a valid Perl scalar declaration (must begin with \$)\n"
+						unless m/^\$\w+$/;
+					$_
+				} split ',', $1;
+			}
+			$parametric = 1;
+		}
+		$context->{buf} =~ s/^\s*//;
+		die "Empty #perldef declaration `$def'\n" 
+			unless $heredoc or length $context->{buf};
+
+		my $perlcode = "sub {\n";
+		$perlcode .= "my (" . join( ', ', @params) . ") = \@_;\n" 
+			if !$ellipsis and @params;
+
+		my $do_ml = 1;
+		while ( $do_ml) {
+			my $l = getline;
+			chomp $l;
+			if ( $heredoc) {
+				last if $l eq $def;
+			} else {
+				$do_ml = $l =~ s/\\\s*$//;
+			}
+			$perlcode .= $l . ( $do_ml ? "\n" : '');
+		}
+		$perlcode .= "\n}";
+		my $p = eval $perlcode;
+		unless ( defined $p) {
+			$@ =~ s/at \(eval \d+\) line (\d+), //gs;
+			$@ =~ s/<\$ih>\s+//gs;
+			die "$@\n";
+		}
+		( $parametric ? $macros{$def} : $defines{$def} ) = {
+			name		=> $def,
+			num		=> scalar(@params),
+			storage		=> [],
+			ellipsis	=> $ellipsis,
+			code		=> $p,
+		};
+	} elsif ( $what =~ /^([\w\d_]+)/) {
+		die "Invalid preprocessor directive '$1'\n";
+	} else {
+		# a true comment
+	}
+
+	eatline if $eatline;
+}
+
+sub parse_file
+{
+	my $do_output = $_[0];
+	my $l;
+	my $h = begin_line;
+	while ( defined ( $l = getline(1))) {
+		if ( !$context->{multiline_comment} and $l =~ s/^#//) {
+			$context->{buf} = $l;
+			parse_comment( $l);
+		} elsif ( $context->{ifdef}->[-1]->{state} and parse_line( $h, $l)) {
+			$l = end_line($h);
+			print $l if $do_output;
+			begin_line($h);
+		}
+	}
+	end_line($h);
+	die "Runaway #ifdef\n" if $#{$context->{ifdef}};
+}
+
+sub parse_input
+{
+	my $ih;
+
+	if ( $input eq '-') {
+		$input = \*STDIN;
+		$context->{file} = 'stdin';
+	} elsif ( ! open $ih, "< $input") {
+		die "Cannot open $input:$!\n";
+	} else {
+		$context->{file} = $input;
+		$input = $ih;
+	}
+
+	if ( defined $output) {
+		open OUT, "> $output" or die "Cannot open $output:$!\n";
+		select OUT;
+	}
+}
+
+sub parse_argv
+{
+	my $dominus = 1;
+	for ( my $i = 0; $i < @ARGV; $i++) {
+
+		die "Too many arguments\n" if $input;
+	
+		my $d = $ARGV[$i];
+		if ( $dominus and $d =~ s/^-//) {
+			if ( $d =~ /^I(.+)/ or 
+				( $d eq 'I' and 
+					( defined $ARGV[$i+1] or die "Argument required\n") and 
+					$ARGV[++$i] =~ /(.*)/
+				)) {
+				push @inc, $1;
+			} elsif ( $d =~ /^D(.+)/ or 
+				( $d eq 'D' and 
+					( defined $ARGV[$i+1] or die "Argument required\n") and 
+					$ARGV[++$i] =~ /(.*)/
+				)) {
+				$d = $1;
+				die "Invalid define $d\n" unless $d =~ m/^([^\=]+)(?:\=(.*))?$/;
+				my ( $def, $body) = ( $1, $2);
+				my $v = begin_macro( $def );
+				parse_line( $v, defined($2) ? $2 : '');
+				end_macro( $v);
+			} elsif ( $d =~ /^o(.+)/ or 
+				( $d eq 'o' and 
+					( defined $ARGV[$i+1] or die "Argument required\n") and 
+					$ARGV[++$i] =~ /(.*)/
+				)) {
+				die "Output is already defined\n" if defined $output;
+				$output = $1;
+			} elsif ( $d eq '?' or $d eq 'h' or $d eq '-help') {
+				print <<USAGE;
+sqlpp - simple SQL preprocessor v$VERSION
+
+sqlpp [options] filename
+
+options:
+
+  -I path   - include path
+  -D var[=value] - define variable
+  -o output - output to file ( default to stdout )
+  -h,--help - display this text
+  -hh       - display man page
+
+USAGE
+				exit;
+			} elsif ( $d eq 'hh') {
+				system 'perldoc', $0;
+				exit;
+			} elsif ( $d eq '-') {
+				$dominus = 0;
+			} elsif ( $d eq '') {
+				$input = '-';
+			} else {
+				die "Unknown or invalid argument -$d\n";
+			}
+		} else {
+			$input = $d;
+		}
+	}
+
+	die "No input file\n" unless defined $input;
+}
+
+__DATA__
+
+=pod
+
+=head1 NAME
+
+sqlpp - SQL preprocessor
+
+=head1 DESCRIPTION
+
+C<sqlpp> is a conventional cpp-alike preprocessor taught to understand SQL ( PgSQL, in particular)
+syntax specificities. In addition to the standard #define/#ifdef/#else/#endif cohort, provides
+also #perldef for calling arbitrary perl code.
+
+=head1 SYNOPSIS
+
+sqlpp [options] filename
+
+options:
+
+  -I path   - include path
+  -D var[=value] - define variable
+  -o output - output to file ( default to stdout )
+  -h,--help - display this text
+  -hh       - display man page
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 catpipe Systems ApS. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SYNTAX
+
+=over
+
+=item #define TAG
+
+Identical to cpp
+
+=item #define TAG([PARAMETERS]) MACRO
+
+Not fully identical to cpp, the behavior is slightly different. Concatenation
+( a ## b ) and stringification ( # a ) behave similar to as in cpp.
+
+The multiline macro can be declared either tranditionally via CPP backslash
+line continuation, or a perl's heredoc style. In the latter case, TAG must be prepended
+with C<< << >>.
+
+=item #if EXPRESSION
+
+Analogous to cpp. 
+
+Note: EXPRESSION is evaluated via perl runtime engine, and although can execute
+arbitrary perl code, it is recommended to use simple arithmetic operators. To 
+operate with defines as strings, use double quotes.
+
+The C<defined()> function works like in cpp, not like in perl.
+
+=item #ifdef, #ifndef, #else, #elif, #endif, #undef, #include, #error
+
+Identical to cpp
+
+=item #pragma macro(simple|all|off)
+
+Pragma C<macro> defines how defines and macros should be tracked and
+substituted.  The reason is that SQL code may contain non-SQL code that is so
+complicated that would confuse the macro parser. Such sections can be guarded
+with C<#pragma macro(simple)>/C<#pragma macro(all)> brackets, for example.
+
+There are three C<macro> modes:
+
+=over
+
+=item off
+
+Neither defines nor macros are substituted.
+
+=item simple
+
+Defines are substituted, macros are not substituted.
+
+=item all
+
+Both defines are macros are substituted.
+
+=back
+
+=item #pragma comments(strip|leave)
+
+Pragma C<comments> tells what to do with C<#> and C<--> comments. The default
+is C<strip> these from the output, however, the parts of input that are not
+SQL, can be guarded from incorrect parsing by C<#pragma comments(leave)>/
+C<#pragma comments(strip)> macros. Note that C<#> comments are
+ineffectual in macro definitions, because C<#> is a macro concatenation symbol.
+
+=item #pragma lang(sql|perl)
+
+A combination of existing pragmas. 
+
+=over
+
+=item sql
+
+Same as C<#pragma macro(all)> and C<#pragma comments(strip)>. These are defaults settings.
+
+=item perl
+
+Same as C<#pragma macro(simple)> and C<#pragma comments(leave)>. 
+Useful if perl code is embedded.
+
+=back
+
+
+=item #perldef TAG [(PARAMETERS)] CODE
+
+Creates a special define or a macro, where CODE is perl code. PARAMETERS is either a list
+of perl scalar names ( dollar sign included ), then the code may access the
+parameters directly. Or, PARAMETERS is the ellipsis (...) string, in which case
+the code must parse C<@_> by itself.
+
+The multiline perl code can be declared either tranditionally via CPP backslash
+line continuation, or a perl's heredoc style. In the latter case, TAG must be prepended
+with C<< << >>.
+
+The perl code is executed in the anonymous subroutine context, and the return
+values are passed to further processing. Perl C<print> and C<printf>
+statements may be used to produce direct output into the program output,
+bypassign the preprocessing.
+
+For the shared storage the code can use C<%global>; for accessing contents of
+defines and macros, C<%defines> and C<%macros> internal hashes may be used.
+
+=item Predefined macros
+
+=over
+
+=item __LINE__
+
+=item __FILE__
+
+=item VERSION
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Dmitry Karasik <dk@catpipe.net>
+
+=cut

@@ -28,6 +28,7 @@ example/nexting.pl
 example/our.pl
 example/selfloadtest.pl
 example/signal.pl
+example/square.pl
 example/test-module.pm
 example/test-require.pl
 gpl-2.0.txt
@@ -47,7 +48,6 @@ lib/Devel/Trepan/CmdProcessor/Command/Condition.pm
 lib/Devel/Trepan/CmdProcessor/Command/Continue.pm
 lib/Devel/Trepan/CmdProcessor/Command/Debug.pm
 lib/Devel/Trepan/CmdProcessor/Command/Delete.pm
-lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm
 lib/Devel/Trepan/CmdProcessor/Command/Disable.pm
 lib/Devel/Trepan/CmdProcessor/Command/Display.pm
 lib/Devel/Trepan/CmdProcessor/Command/Down.pm
@@ -66,6 +66,7 @@ lib/Devel/Trepan/CmdProcessor/Command/Help/location.pod
 lib/Devel/Trepan/CmdProcessor/Command/Help/suffixes.pod
 lib/Devel/Trepan/CmdProcessor/Command/Info.pm
 lib/Devel/Trepan/CmdProcessor/Command/Info_Subcmd/Breakpoints.pm
+lib/Devel/Trepan/CmdProcessor/Command/Info_Subcmd/Display.pm
 lib/Devel/Trepan/CmdProcessor/Command/Info_Subcmd/Files.pm
 lib/Devel/Trepan/CmdProcessor/Command/Info_Subcmd/Frame.pm
 lib/Devel/Trepan/CmdProcessor/Command/Info_Subcmd/Functions.pm
@@ -109,6 +110,7 @@ lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Display_Subcmd/Eval.pm
 lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Display_Subcmd/OP.pm
 lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Highlight.pm
 lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Max.pm
+lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Max_Subcmd/Lines.pm
 lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Max_Subcmd/List.pm
 lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Max_Subcmd/Stack.pm
 lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Max_Subcmd/String.pm
@@ -141,6 +143,7 @@ lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Display_Subcmd/OP.pm
 lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Highlight.pm
 lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Interactive.pm
 lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Max.pm
+lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Max_Subcmd/Lines.pm
 lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Max_Subcmd/List.pm
 lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Max_Subcmd/Stack.pm
 lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Max_Subcmd/String.pm

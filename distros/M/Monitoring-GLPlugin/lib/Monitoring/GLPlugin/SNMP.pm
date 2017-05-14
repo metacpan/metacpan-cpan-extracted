@@ -86,6 +86,13 @@ sub add_snmp_modes {
       help => 'Show snmpwalk command with the oids necessary for a simulation',
   );
   $self->add_mode(
+      internal => 'device::walkbulk',
+      spec => 'bulkwalk',
+      alias => undef,
+      help => 'Show snmpbulkwalk command with the oids necessary for a simulation',
+      hidden => 1,
+  );
+  $self->add_mode(
       internal => 'device::supportedmibs',
       spec => 'supportedmibs',
       alias => undef,
@@ -213,7 +220,7 @@ sub add_snmp_args {
 sub validate_args {
   my ($self) = @_;
   $self->SUPER::validate_args();
-  if ($self->opts->mode eq 'walk') {
+  if ($self->opts->mode =~ /^walk/) {
     if ($self->opts->snmpwalk && $self->opts->hostname) {
       if ($self->check_messages == CRITICAL) {
         # gemecker vom super-validierer, der sicherstellt, dass die datei
@@ -291,7 +298,8 @@ sub init {
       while (! $timedout && @trees) {
         my $tree = shift @trees;
         $SIG{CHLD} = 'IGNORE';
-        my $cmd = sprintf "snmpwalk -ObentU -v%s -c %s %s %s >> %s", 
+        my $cmd = sprintf "%s -ObentU -v%s -c %s %s %s >> %s",
+            ($self->mode =~ /bulk/) ? "snmpbulkwalk" : "snmpwalk",
             $self->opts->protocol,
             $self->opts->community,
             $self->opts->hostname,
@@ -315,7 +323,8 @@ sub init {
     } else {
       printf "rm -f %s\n", $name;
       foreach (@trees) {
-        printf "snmpwalk -ObentU -v%s -c %s %s %s >> %s\n", 
+        printf "%s -ObentU -v%s -c %s %s %s >> %s\n",
+            ($self->mode =~ /bulk/) ? "snmpbulkwalk -t 15 -r 20" : "snmpwalk",
             $self->opts->protocol,
             $self->opts->community,
             $self->opts->hostname,
@@ -463,7 +472,7 @@ sub init {
     push(@{$mibdepot}, ['1.3.6.1.2.1.107', 'ietf', 'v2', 'HC-PerfHist-TC-MIB']);
     push(@{$mibdepot}, ['1.3.6.1.2.1.16.20.5', 'ietf', 'v2', 'HC-RMON-MIB']);
     push(@{$mibdepot}, ['1.3.6.1.2.1.25.1', 'ietf', 'v1', 'HOST-RESOURCES-MIB']);
-    push(@{$mibdepot}, ['1.3.6.1.2.1.25.7.1', 'ietf', 'v2', 'HOST-RESOURCES-MIB']);
+    push(@{$mibdepot}, ['1.3.6.1.2.1.25.1', 'ietf', 'v2', 'HOST-RESOURCES-MIB']);
     push(@{$mibdepot}, ['1.3.6.1.2.1.34.6.1.5', 'ietf', 'v2', 'HPR-IP-MIB']);
     push(@{$mibdepot}, ['1.3.6.1.2.1.34.6', 'ietf', 'v2', 'HPR-MIB']);
     push(@{$mibdepot}, ['1.3.6.1.2.1.106', 'ietf', 'v2', 'IANA-CHARSET-MIB']);
@@ -731,6 +740,7 @@ sub init {
     push(@{$mibdepot}, ['1.3.6.1.2.1.129', 'ietf', 'v2', 'VPN-TC-STD-MIB']);
     push(@{$mibdepot}, ['1.3.6.1.2.1.68', 'ietf', 'v2', 'VRRP-MIB']);
     push(@{$mibdepot}, ['1.3.6.1.2.1.65', 'ietf', 'v2', 'WWW-MIB']);
+    push(@{$mibdepot}, ['1.3.6.1.4.1.8072', 'net-snmp', 'v2', 'NET-SNMP-MIB']);
     my $oids = $self->get_entries_by_walk(-varbindlist => [
         '1.3.6.1.2.1', '1.3.6.1.4.1',
     ]);
@@ -1697,7 +1707,15 @@ sub get_request {
     # und beim abschliessenden map wirds natuerlich nicht mehr gefunden 
     # also leeres return. <<kraftausdruck>>
     foreach my $key (%{$result}) {
-      $self->add_rawdata($key, $result->{$key});
+      # so, und zwei jahre spaeter kommt man drauf, dass es viele sorten 
+      # von stinkstiefeln gibt. die fragt man nach 1.3.6.1.4.1.13885.120.1.3.1
+      # und kriegt als antwort 1.3.6.1.4.1.13885.120.1.3.1.0=[noSuchInstance]
+      # bis zum 11.10.16 wurde das in den cache geschrieben. eine etage hoeher
+      # wird aber dann nach 1.3.6.1.4.1.13885.120.1.3.1.0 gefallbacked, was
+      # dann prompt aus dem cache gefischt wird, anstatt den agenten zu fragen,
+      # der in diesem fall eine saubere antwort liefern wuerde.
+      # ergo: keine fehlermeldungen in den chache
+      $self->add_rawdata($key, $result->{$key}) if defined $result->{$key} && $result->{$key} ne 'noSuchInstance';
     }
   }
   my $result = {};

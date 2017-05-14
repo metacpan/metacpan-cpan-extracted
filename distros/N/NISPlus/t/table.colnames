@@ -1,0 +1,8 @@
+#!/usr/local/bin/perl -w
+
+BEGIN { unshift(@INC, "../blib", "./blib"); }
+require Net::NISPlus::Directory;
+require Net::NISPlus::Table;
+
+$table = Net::NISPlus::Table->new("group");
+print join("\n", $table->colnames()), "\n";

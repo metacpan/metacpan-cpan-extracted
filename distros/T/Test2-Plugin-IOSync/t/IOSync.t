@@ -3,10 +3,7 @@ use File::Temp qw/tempfile/;
 use IPC::Open3 qw/open3/;
 use List::Util qw/first/;
 
-{
-    no warnings 'redefine';
-    *Test2::Plugin::IOMuxer::Layer::time = sub() { 12345 };
-}
+BEGIN { *JSON = Test2::Plugin::IOMuxer::Layer->can('JSON') }
 
 ok($INC{'Test2/Plugin/OpenFixPerlIO.pm'}, "Loaded OpenFixPerlIO");
 
@@ -66,58 +63,21 @@ is(
 );
 
 like(
-    [<$mux_fh>],
-    array {
-        item qr/^START-TEST2-SYNC-(\d+): [0-9\.]+/;
-        item qr/^STDOUT BEFORE TESTING/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^STDERR BEFORE TESTING/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^# Seeded srand with seed/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^ok 1 - pass 1/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^# STDOUT IN TESTING/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^ok 2 - pass 2/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^# a diag message 1/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^# STDERR IN TESTING/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^# a diag message 2/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^1\.\.2/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^# STDOUT AFTER TESTING/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        item qr/^START-TEST2-SYNC-\d+: [0-9\.]+/;
-        item qr/^# STDERR AFTER TESTING/;
-        item qr/^\+STOP-TEST2-SYNC-\d+: [0-9\.]+/;
-
-        end;
-    },
+    [map { JSON->new->decode($_) } <$mux_fh>],
+    [
+        {buffer => "STDOUT BEFORE TESTING\n"},
+        {buffer => "STDERR BEFORE TESTING\n"},
+        {buffer => qr/# Seeded srand with seed/},
+        {buffer => "ok 1 - pass 1\n"},
+        {buffer => "# STDOUT IN TESTING\n"},
+        {buffer => "ok 2 - pass 2\n"},
+        {buffer => "# a diag message 1\n"},
+        {buffer => "# STDERR IN TESTING\n"},
+        {buffer => "# a diag message 2\n"},
+        {buffer => "1..2\n"},
+        {buffer => "# STDOUT AFTER TESTING\n"},
+        {buffer => "# STDERR AFTER TESTING\n"}
+    ],
     "Got muxed output"
 );
 

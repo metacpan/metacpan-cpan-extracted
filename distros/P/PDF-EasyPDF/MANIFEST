@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/PDF-EasyPDF.t
+lib/PDF/EasyPDF.pm

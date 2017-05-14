@@ -1,15 +1,16 @@
 #!/usr/bin/perl
 package TestScheduler;
-use Mesos::Messages;
-use Mesos::Types qw(ExecutorInfo);
 use Moo;
+use strict;
+use warnings;
 extends 'Mesos::Scheduler';
+use Mesos::Messages;
 
 has TOTAL_TASKS => (is => 'ro', default => 5);
 has TOTAL_CPUS => (is => 'ro', default => 1);
 has TASK_MEM => (is => 'ro', default => 32);
 
-has executor => (is => 'ro', isa => ExecutorInfo, coerce => 1);
+has executor => (is => 'ro');
 has taskData => (is => 'rw', default => sub { {} });
 has tasksLaunched => (is => 'rw', default => 0);
 has tasksFinished => (is => 'rw', default => 0);

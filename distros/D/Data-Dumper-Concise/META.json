@@ -1,0 +1,60 @@
+{
+   "abstract" : "Less indentation and newlines plus sub deparsing",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2501, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Dumper-Concise",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-Dumper-Concise@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dumper-Concise"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/p5sagit/Data-Dumper-Concise.git",
+         "web" : "https://github.com/p5sagit/Data-Dumper-Concise"
+      }
+   },
+   "version" : "2.023",
+   "x_contributors" : [
+      "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>",
+      "Matt S Trout <matthewt@hercule.scsys.co.uk>",
+      "Karen Etheridge <ether@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::MaybeXS version 1.003009"
+}

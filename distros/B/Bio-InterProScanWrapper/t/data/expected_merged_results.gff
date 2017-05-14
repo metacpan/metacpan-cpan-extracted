@@ -1,0 +1,73 @@
+##gff-version 3
+##sequence-region Q97R95 1 369
+Q97R95	.	polypeptide	1	369	.	+	.	md5=bb3bde1de955af5b7f49a84ba2c4d4ae;ID=Q97R95
+Q97R95	PRINTS	protein_match	41	55	.	+	.	Name=PR00474;signature_desc=Glutamate 5-kinase family signature;Target=Q97R95 41 55;status=T;ID=match$1_41_55;Ontology_term="GO:0004349","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR001057"
+Q97R95	PRINTS	protein_match	147	174	.	+	.	Name=PR00474;signature_desc=Glutamate 5-kinase family signature;Target=Q97R95 147 174;status=T;ID=match$1_147_174;Ontology_term="GO:0004349","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR001057"
+Q97R95	PRINTS	protein_match	75	103	.	+	.	Name=PR00474;signature_desc=Glutamate 5-kinase family signature;Target=Q97R95 75 103;status=T;ID=match$1_75_103;Ontology_term="GO:0004349","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR001057"
+Q97R95	PRINTS	protein_match	115	136	.	+	.	Name=PR00474;signature_desc=Glutamate 5-kinase family signature;Target=Q97R95 115 136;status=T;ID=match$1_115_136;Ontology_term="GO:0004349","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR001057"
+Q97R95	PRINTS	protein_match	208	228	.	+	.	Name=PR00474;signature_desc=Glutamate 5-kinase family signature;Target=Q97R95 208 228;status=T;ID=match$1_208_228;Ontology_term="GO:0004349","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR001057"
+Q97R95	SMART	protein_match	276	347	1.1E-6	+	.	Name=SM00359;signature_desc=Putative RNA-binding Domain in PseudoUridine synthase and Archaeosine transglycosylase;Target=Q97R95 276 347;status=T;ID=match$2_276_347;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR002478"
+Q97R95	PANTHER	protein_match	2	337	.	+	.	Name=PTHR11063:SF6;Target=Q97R95 2 337;status=T;ID=match$3_2_337;date=31-07-2013
+Q97R95	Pfam	protein_match	4	234	7.2E-46	+	.	Name=PF00696;signature_desc=Amino acid kinase family;Target=Q97R95 4 234;status=T;ID=match$4_4_234;Ontology_term="GO:0008652";date=31-07-2013;Dbxref="InterPro:IPR001048","Reactome:REACT_13"
+Q97R95	ProSitePatterns	protein_match	206	223	.	+	.	Name=PS00902;signature_desc=Glutamate 5-kinase signature.;Target=Q97R95 206 223;status=T;ID=match$5_206_223;Ontology_term="GO:0004349","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR019797","KEGG:00330+2.7.2.11","UniPathway:UPA00098"
+Q97R95	Gene3D	protein_match	273	356	5.6E-21	+	.	Name=G3DSA:2.30.130.10;Target=Q97R95 273 356;status=T;ID=match$6_273_356;date=31-07-2013;Dbxref="InterPro:IPR015947"
+Q97R95	ProSiteProfiles	protein_match	275	355	.	+	.	Name=PS50890;signature_desc=PUA domain profile.;Target=Q97R95 275 355;status=T;ID=match$7_275_355;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR002478"
+Q97R95	SUPERFAMILY	protein_match	276	356	.	+	.	Name=SSF88697;Target=Q97R95 276 356;status=T;ID=match$8_276_356;date=31-07-2013;Dbxref="InterPro:IPR015947"
+Q97R95	TIGRFAM	protein_match	4	361	2.2E-134	+	.	Name=TIGR01027;signature_desc=proB: glutamate 5-kinase;Target=Q97R95 4 361;status=T;ID=match$9_4_361;Ontology_term="GO:0004349","GO:0005737","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR005715","KEGG:00330+2.7.2.11","UniPathway:UPA00098"
+Q97R95	Hamap	protein_match	3	259	.	+	.	Name=MF_00456;signature_desc=Glutamate 5-kinase [proB].;Target=Q97R95 3 259;status=T;ID=match$10_3_259;Ontology_term="GO:0004349","GO:0005737","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR005715","KEGG:00330+2.7.2.11","UniPathway:UPA00098"
+Q97R95	SUPERFAMILY	protein_match	4	255	.	+	.	Name=SSF53633;Target=Q97R95 4 255;status=T;ID=match$11_4_255;Ontology_term="GO:0008652";date=31-07-2013;Dbxref="InterPro:IPR001048","Reactome:REACT_13"
+Q97R95	PANTHER	protein_match	2	337	.	+	.	Name=PTHR11063;Target=Q97R95 2 337;status=T;ID=match$12_2_337;date=31-07-2013
+Q97R95	Gene3D	protein_match	3	255	7.1E-62	+	.	Name=G3DSA:3.40.1160.10;Target=Q97R95 3 255;status=T;ID=match$13_3_255;Ontology_term="GO:0008652";date=31-07-2013;Dbxref="InterPro:IPR001048","Reactome:REACT_13"
+Q97R95	PIRSF	protein_match	1	368	4.2E-182	+	.	Name=PIRSF000729;Target=Q97R95 1 368;status=T;ID=match$14_1_368;Ontology_term="GO:0004349","GO:0005737","GO:0006561";date=31-07-2013;Dbxref="InterPro:IPR011529","KEGG:00330+2.7.2.11","UniPathway:UPA00098"
+Q97R95	Pfam	protein_match	276	341	6.5E-16	+	.	Name=PF01472;signature_desc=PUA domain;Target=Q97R95 276 341;status=T;ID=match$15_276_341;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR002478"
+##sequence-region A2VDN9 1 647
+A2VDN9	.	polypeptide	1	647	.	+	.	md5=1fb3569701c50e369fa112ac96b5e459;ID=A2VDN9
+A2VDN9	ProSiteProfiles	protein_match	236	271	.	+	.	Name=PS50302;signature_desc=Pumilio RNA-binding repeat profile.;Target=A2VDN9 236 271;status=T;ID=match$1_236_271;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	ProSiteProfiles	protein_match	385	422	.	+	.	Name=PS50302;signature_desc=Pumilio RNA-binding repeat profile.;Target=A2VDN9 385 422;status=T;ID=match$2_385_422;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	ProSiteProfiles	protein_match	200	235	.	+	.	Name=PS50302;signature_desc=Pumilio RNA-binding repeat profile.;Target=A2VDN9 200 235;status=T;ID=match$3_200_235;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	SUPERFAMILY	protein_match	145	478	.	+	.	Name=SSF48371;Target=A2VDN9 145 478;status=T;ID=match$4_145_478;Ontology_term="GO:0005488";date=31-07-2013;Dbxref="InterPro:IPR016024"
+A2VDN9	ProSiteProfiles	protein_match	163	199	.	+	.	Name=PS50302;signature_desc=Pumilio RNA-binding repeat profile.;Target=A2VDN9 163 199;status=T;ID=match$5_163_199;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	SMART	protein_match	385	421	10.0	+	.	Name=SM00025;signature_desc=Pumilio-like repeats;Target=A2VDN9 385 421;status=T;ID=match$6_385_421;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	SMART	protein_match	236	272	3.9	+	.	Name=SM00025;signature_desc=Pumilio-like repeats;Target=A2VDN9 236 272;status=T;ID=match$6_236_272;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	SMART	protein_match	423	459	0.079	+	.	Name=SM00025;signature_desc=Pumilio-like repeats;Target=A2VDN9 423 459;status=T;ID=match$6_423_459;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	SMART	protein_match	200	235	0.0011	+	.	Name=SM00025;signature_desc=Pumilio-like repeats;Target=A2VDN9 200 235;status=T;ID=match$6_200_235;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	SMART	protein_match	164	199	0.0082	+	.	Name=SM00025;signature_desc=Pumilio-like repeats;Target=A2VDN9 164 199;status=T;ID=match$6_164_199;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	SMART	protein_match	349	384	0.0045	+	.	Name=SM00025;signature_desc=Pumilio-like repeats;Target=A2VDN9 349 384;status=T;ID=match$6_349_384;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	PANTHER	protein_match	1	647	.	+	.	Name=PTHR13389;Target=A2VDN9 1 647;status=T;ID=match$7_1_647;date=31-07-2013
+A2VDN9	SUPERFAMILY	protein_match	488	645	.	+	.	Name=SSF48371;Target=A2VDN9 488 645;status=T;ID=match$8_488_645;Ontology_term="GO:0005488";date=31-07-2013;Dbxref="InterPro:IPR016024"
+A2VDN9	ProSiteProfiles	protein_match	423	459	.	+	.	Name=PS50302;signature_desc=Pumilio RNA-binding repeat profile.;Target=A2VDN9 423 459;status=T;ID=match$9_423_459;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	ProSiteProfiles	protein_match	349	384	.	+	.	Name=PS50302;signature_desc=Pumilio RNA-binding repeat profile.;Target=A2VDN9 349 384;status=T;ID=match$10_349_384;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	Pfam	protein_match	432	579	1.9E-68	+	.	Name=PF08144;signature_desc=CPL (NUC119) domain;Target=A2VDN9 432 579;status=T;ID=match$11_432_579;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR012959"
+A2VDN9	ProSiteProfiles	protein_match	136	489	.	+	.	Name=PS50303;signature_desc=Pumilio homology domain (PUM-HD) profile.;Target=A2VDN9 136 489;status=T;ID=match$12_136_489;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	ProSiteProfiles	protein_match	492	530	.	+	.	Name=PS50302;signature_desc=Pumilio RNA-binding repeat profile.;Target=A2VDN9 492 530;status=T;ID=match$13_492_530;Ontology_term="GO:0003723";date=31-07-2013;Dbxref="InterPro:IPR001313"
+A2VDN9	Gene3D	protein_match	136	487	2.5E-65	+	.	Name=G3DSA:1.25.10.10;Target=A2VDN9 136 487;status=T;ID=match$14_136_487;date=31-07-2013;Dbxref="InterPro:IPR011989"
+##sequence-region A2YIW7 1 122
+A2YIW7	.	polypeptide	1	122	.	+	.	md5=f927b0d241297dcc9a1c5990b58bf3c4;ID=A2YIW7
+A2YIW7	Pfam	protein_match	9	112	1.9E-31	+	.	Name=PF00085;signature_desc=Thioredoxin;Target=A2YIW7 9 112;status=T;ID=match$1_9_112;Ontology_term="GO:0045454";date=31-07-2013;Dbxref="InterPro:IPR013766"
+A2YIW7	ProSitePatterns	protein_match	32	50	.	+	.	Name=PS00194;signature_desc=Thioredoxin family active site.;Target=A2YIW7 32 50;status=T;ID=match$2_32_50;Ontology_term="GO:0045454";date=31-07-2013;Dbxref="InterPro:IPR017937"
+A2YIW7	Gene3D	protein_match	9	112	2.8E-35	+	.	Name=G3DSA:3.40.30.10;Target=A2YIW7 9 112;status=T;ID=match$3_9_112;date=31-07-2013;Dbxref="InterPro:IPR012336"
+A2YIW7	ProSiteProfiles	protein_match	1	118	.	+	.	Name=PS51352;signature_desc=Thioredoxin domain profile.;Target=A2YIW7 1 118;status=T;ID=match$4_1_118;date=31-07-2013;Dbxref="InterPro:IPR012336"
+A2YIW7	PIRSF	protein_match	4	113	1.8E-27	+	.	Name=PIRSF000077;Target=A2YIW7 4 113;status=T;ID=match$5_4_113;Ontology_term="GO:0006662","GO:0009055","GO:0015035","GO:0045454";date=31-07-2013;Dbxref="InterPro:IPR005746"
+A2YIW7	SUPERFAMILY	protein_match	6	114	.	+	.	Name=SSF52833;Target=A2YIW7 6 114;status=T;ID=match$6_6_114;date=31-07-2013;Dbxref="InterPro:IPR012336"
+A2YIW7	PRINTS	protein_match	31	39	.	+	.	Name=PR00421;signature_desc=Thioredoxin family signature;Target=A2YIW7 31 39;status=T;ID=match$7_31_39;Ontology_term="GO:0006662","GO:0009055","GO:0015035","GO:0045454";date=31-07-2013;Dbxref="InterPro:IPR005746"
+A2YIW7	PRINTS	protein_match	78	89	.	+	.	Name=PR00421;signature_desc=Thioredoxin family signature;Target=A2YIW7 78 89;status=T;ID=match$7_78_89;Ontology_term="GO:0006662","GO:0009055","GO:0015035","GO:0045454";date=31-07-2013;Dbxref="InterPro:IPR005746"
+A2YIW7	PRINTS	protein_match	39	48	.	+	.	Name=PR00421;signature_desc=Thioredoxin family signature;Target=A2YIW7 39 48;status=T;ID=match$7_39_48;Ontology_term="GO:0006662","GO:0009055","GO:0015035","GO:0045454";date=31-07-2013;Dbxref="InterPro:IPR005746"
+A2YIW7	PANTHER	protein_match	1	113	.	+	.	Name=PTHR10438;Target=A2YIW7 1 113;status=T;ID=match$8_1_113;Ontology_term="GO:0006662","GO:0009055","GO:0015035","GO:0045454";date=31-07-2013;Dbxref="InterPro:IPR005746"
+##sequence-region P22298 1 129
+P22298	.	polypeptide	1	129	.	+	.	md5=493932c1f43289805b4c4e651ceb9249;ID=P22298
+P22298	ProSiteProfiles	protein_match	79	127	.	+	.	Name=PS51390;signature_desc=WAP-type 'four-disulfide core' domain profile.;Target=P22298 79 127;status=T;ID=match$1_79_127;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SUPERFAMILY	protein_match	26	73	.	+	.	Name=SSF57256;Target=P22298 26 73;status=T;ID=match$2_26_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Gene3D	protein_match	81	128	8.8E-16	+	.	Name=G3DSA:4.10.75.10;Target=P22298 81 128;status=T;ID=match$3_81_128;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Gene3D	protein_match	28	73	6.0E-12	+	.	Name=G3DSA:4.10.75.10;Target=P22298 28 73;status=T;ID=match$3_28_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SUPERFAMILY	protein_match	75	127	.	+	.	Name=SSF57256;Target=P22298 75 127;status=T;ID=match$4_75_127;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Pfam	protein_match	82	126	1.1E-8	+	.	Name=PF00095;signature_desc=WAP-type (Whey Acidic Protein) 'four-disulfide core';Target=P22298 82 126;status=T;ID=match$5_82_126;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Pfam	protein_match	28	72	5.4E-8	+	.	Name=PF00095;signature_desc=WAP-type (Whey Acidic Protein) 'four-disulfide core';Target=P22298 28 72;status=T;ID=match$5_28_72;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	118	126	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 118 126;status=T;ID=match$6_118_126;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	79	88	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 79 88;status=T;ID=match$6_79_88;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	101	108	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 101 108;status=T;ID=match$6_101_108;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	108	117	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 108 117;status=T;ID=match$6_108_117;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SMART	protein_match	28	73	1.9E-5	+	.	Name=SM00217;signature_desc=Four-disulfide core domains;Target=P22298 28 73;status=T;ID=match$7_28_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SMART	protein_match	82	127	8.6E-22	+	.	Name=SM00217;signature_desc=Four-disulfide core domains;Target=P22298 82 127;status=T;ID=match$7_82_127;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PANTHER	protein_match	3	129	.	+	.	Name=PTHR19441;Target=P22298 3 129;status=T;ID=match$8_3_129;date=31-07-2013
+P22298	SignalP_EUK	protein_match	1	22	.	+	.	Name=SignalP-noTM;Target=P22298 1 22;status=T;ID=match$9_1_22;date=31-07-2013
+P22298	ProSiteProfiles	protein_match	25	73	.	+	.	Name=PS51390;signature_desc=WAP-type 'four-disulfide core' domain profile.;Target=P22298 25 73;status=T;ID=match$10_25_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"

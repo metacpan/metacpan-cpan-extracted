@@ -1,0 +1,44 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 03-Jun-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: namevalues Filter
+
+H2: Interface
+
+!filter_interface "namevalues"
+
+H2: Description
+
+The {{namevalues}} filter is used to format a table of name-value pairs.
+Each name is output in bold. For PostScript output, the names are
+placed in the sidehead.
+
+H2: Examples
+
+!block example; lang='sdf'
+!block namevalues
+Name            Value
+Description:    Find the maximum of two numbers
+Module:         general
+Author:         Joe Bloggs
+!endblock
+!endblock
+
+The result is:
+
+!block namevalues
+Name            Value
+Description:    Find the maximum of two numbers
+Module:         general
+Author:         Joe Bloggs
+!endblock

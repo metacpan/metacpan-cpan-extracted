@@ -1,0 +1,15 @@
+#!/bin/sh
+
+ROOT=${UPLUGSHARE}/ext/tree-tagger
+BIN=$ROOT/bin
+CMD=$ROOT/cmd
+LIB=$ROOT/lib
+
+OPTIONS="-token -lemma -sgml"
+
+TAGGER=${BIN}/tree-tagger
+TOKENIZER=${CMD}/utf8-tokenize.pl
+PARFILE=${LIB}/bulgarian.par
+
+$TOKENIZER $* |
+$TAGGER $OPTIONS $PARFILE

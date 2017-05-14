@@ -1,4 +1,4 @@
-require 5.002;			# For (defined ref)
+require 5.014;			# For more reliable $@ after eval
 package dumpvar;
 
 # Needed for PrettyPrinter only:
@@ -14,6 +14,8 @@ package dumpvar;
 
 $winsize = 80 unless defined $winsize;
 
+sub ASCII { return ord('A') == 65; }
+
 
 # Defaults
 
@@ -24,6 +26,9 @@ $unctrl = 'quote' unless defined $unctrl;
 $subdump = 1;
 $dumpReused = 0 unless defined $dumpReused;
 $bareStringify = 1 unless defined $bareStringify;
+
+my $APC = chr utf8::unicode_to_native(0x9F);
+my $backslash_c_question = (ASCII) ? '\177' : $APC;
 
 sub main::dumpValue {
   local %address;
@@ -37,27 +42,34 @@ sub main::dumpValue {
 # This one is good for variable names:
 
 sub unctrl {
-	local($_) = @_;
+    for (my($dummy) = shift) {
 	local($v) ; 
 
 	return \$_ if ref \$_ eq "GLOB";
-        if (ord('A') == 193) { # EBCDIC.
-	    # EBCDIC has no concept of "\cA" or "A" being related
-	    # to each other by a linear/boolean mapping.
-	} else {
-	    s/([\001-\037\177])/'^'.pack('c',ord($1)^64)/eg;
-	}
-	$_;
+        s/([\000-\037])/ '^' . chr(utf8::unicode_to_native(ord($1)^64))/eg;
+        s/ $backslash_c_question /^?/xg;
+	return $_;
+    }
 }
 
 sub uniescape {
     join("",
 	 map { $_ > 255 ? sprintf("\\x{%04X}", $_) : chr($_) }
-	     unpack("U*", $_[0]));
+	     unpack("W*", $_[0]));
 }
 
 sub stringify {
-	local($_,$noticks) = @_;
+  my $string;
+  if (eval { $string = _stringify(@_); 1 }) {
+    return $string;
+  }
+
+  return "<< value could not be dumped: $@ >>";
+}
+
+sub _stringify {
+    (my $__, local $noticks) = @_;
+    for ($__) {
 	local($v) ; 
 	my $tick = $tick;
 
@@ -68,49 +80,43 @@ sub stringify {
 	    and %overload:: and defined &{'overload::StrVal'};
 	
 	if ($tick eq 'auto') {
-	    if (ord('A') == 193) {
-		if (/[\000-\011]/ or /[\013-\024\31-\037\177]/) {
-		    $tick = '"';
-		} else {
-		    $tick = "'";
-		}
-            }  else {
-		if (/[\000-\011\013-\037\177]/) {
-		    $tick = '"';
-		} else {
-		    $tick = "'";
-		}
-	    }
+            if (/[^[:^cntrl:]\n]/u) {   # All controls but \n get '"'
+                $tick = '"';
+            } else {
+                $tick = "'";
+            }
 	}
 	if ($tick eq "'") {
 	  s/([\'\\])/\\$1/g;
 	} elsif ($unctrl eq 'unctrl') {
 	  s/([\"\\])/\\$1/g ;
-	  s/([\000-\037\177])/'^'.pack('c',ord($1)^64)/eg;
+          $_ = &unctrl($_);
 	  # uniescape?
-	  s/([\200-\377])/'\\0x'.sprintf('%2X',ord($1))/eg 
+	  s/([[:^ascii:]])/'\\0x'.sprintf('%2X',ord($1))/eg
 	    if $quoteHighBit;
 	} elsif ($unctrl eq 'quote') {
 	  s/([\"\\\$\@])/\\$1/g if $tick eq '"';
-	  s/\033/\\e/g;
-	  if (ord('A') == 193) { # EBCDIC.
-	      s/([\000-\037\177])/'\\c'.chr(193)/eg; # Unfinished.
-	  } else {
-	      s/([\000-\037\177])/'\\c'._escaped_ord($1)/eg;
-	  }
+	  s/\e/\\e/g;
+          s/([\000-\037$backslash_c_question])/'\\c'._escaped_ord($1)/eg;
 	}
 	$_ = uniescape($_);
-	s/([\200-\377])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
-	($noticks || /^\d+(\.\d*)?\Z/) 
+	s/([[:^ascii:]])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
+	return ($noticks || /^\d+(\.\d*)?\Z/) 
 	  ? $_ 
 	  : $tick . $_ . $tick;
+    }
 }
 
 # Ensure a resulting \ is escaped to be \\
 sub _escaped_ord {
     my $chr = shift;
-    $chr = chr(ord($chr)^64);
-    $chr =~ s{\\}{\\\\}g;
+    if ($chr eq $backslash_c_question) {
+        $chr = '?';
+    }
+    else {
+        $chr = chr(utf8::unicode_to_native(ord($chr)^64));
+        $chr =~ s{\\}{\\\\}g;
+    }
     return $chr;
 }
 
@@ -157,6 +163,7 @@ sub unwrap {
     $sp = " " x $s ;
     $s += 3 ; 
 
+    eval {
     # Check for reused addresses
     if (ref $v) { 
       my $val = $v;
@@ -165,8 +172,7 @@ sub unwrap {
       # Match type and address.                      
       # Unblessed references will look like TYPE(0x...)
       # Blessed references will look like Class=TYPE(0x...)
-      ($start_part, $val) = split /=/,$val;
-      $val = $start_part unless defined $val;
+      $val =~ s/^.*=//; # suppress the Class part, just keep TYPE(0x...)
       ($item_type, $address) = 
         $val =~ /([^\(]+)        # Keep stuff that's     
                                  # not an open paren
@@ -251,7 +257,7 @@ sub unwrap {
 	  if ($#$v >= 0) {
 	    $short = $sp . "0..$#{$v}  " . 
 	      join(" ", 
-		   map {exists $v->[$_] ? stringify $v->[$_] : "empty"} ($[..$tArrayDepth)
+		   map {exists $v->[$_] ? stringify $v->[$_] : "empty"} (0..$tArrayDepth)
 		  ) . "$shortmore";
 	  } else {
 	    $short = $sp . "empty array";
@@ -262,7 +268,7 @@ sub unwrap {
 	#  print "$short\n";
 	#  return;
 	#}
-	for $num ($[ .. $tArrayDepth) {
+	for $num (0 .. $tArrayDepth) {
 	    return if $DB::signal;
 	    print "$sp$num  ";
 	    if (exists $v->[$num]) {
@@ -310,6 +316,12 @@ sub unwrap {
 	print( (' ' x $s) .  "FileHandle({$v}) => fileno($fileno)\n" );
       }
     }
+    };
+    if ($@) {
+      print( (' ' x $s) .  "<< value could not be dumped: $@ >>\n");
+    }
+
+    return;
 }
 
 sub matchlex {
@@ -343,7 +355,7 @@ sub unctrlSet {
     if ($in eq 'unctrl' or $in eq 'quote') {
       $unctrl = $in;
     } else {
-      print "Unknown value for `unctrl'.\n";
+      print "Unknown value for 'unctrl'.\n";
     }
   }
   $unctrl;

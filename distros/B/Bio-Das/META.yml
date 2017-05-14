@@ -1,15 +1,18 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Bio-Das
-version:      1.02
-version_from: Das.pm
-installdirs:  site
-requires:
+--- #YAML:1.0
+name:                Bio-Das
+version:             1.17
+abstract:            Client-side library for Distributed Genome Annotation System
+license:             ~
+author:              
+    - Lincoln Stein (lstein@cshl.edu)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
     Bio::Root::Root:               0
     Compress::Zlib:                1
     HTML::Parser:                  3
     LWP:                           5
     MIME::Base64:                  2.12
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

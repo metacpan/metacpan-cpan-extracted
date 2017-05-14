@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl 16-evaluate.t'
 use 5.010001;
-use Test::Simple tests => 4;
+use Test::Simple tests => 8;
 
 use Math::Utils qw(:polynomial :compare);
 use Math::Complex;
@@ -33,5 +33,24 @@ foreach (@case)
 		"   [ " . join(", ", @y) . " ]"
 	);
 }
+
+#
+# The above tests used an array ref for the X values. Test the other ways.
+#
+my $x = 3;
+my $cref = [8, -18, 5];
+my @y;
+
+@y = pl_evaluate($cref, \$x);
+ok($y[0] == -1, "SCALAR ref of X variable failed.");
+
+@y = pl_evaluate($cref, $x);
+ok($y[0] == -1, "Simple use of X variable failed.");
+
+@y = pl_evaluate($cref, ($x, $x, $x, $x));
+ok(join("", @y) eq "-1-1-1-1", "List of X variables failed.");
+
+@y = pl_evaluate($cref, [$x, $x], [$x, $x]);
+ok(join("", @y) eq "-1-1-1-1", "List of ARRAY refs failed.");
 
 1;

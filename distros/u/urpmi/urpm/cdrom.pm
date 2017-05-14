@@ -1,11 +1,10 @@
 package urpm::cdrom;
 
-# $Id: cdrom.pm 257782 2009-06-05 14:51:02Z cfergeau $
 
 use strict;
 use urpm::msg;
 use urpm::sys;
-use urpm::util;
+use urpm::util qw(basename copy_and_own difference2 remove_internal_name);
 use urpm::get_pkgs;
 use urpm::removable;
 use urpm 'file_from_local_medium';
@@ -14,7 +13,7 @@ use urpm 'file_from_local_medium';
 
 =head1 NAME
 
-urpm::install - Package installation transactin routines for urpmi
+urpm::cdrom - Retrieving packages from removable media
 
 =head1 SYNOPSIS
 
@@ -53,42 +52,42 @@ sub _look_for_mounted_cdrom_in_mtab() {
 }
 
 #- side-effects:
-#-   + those of _try_mounting_cdrom_using_hal ($urpm->{cdrom_mounted}, "hal_mount")
+#-   + those of _try_mounting_cdrom_using_udisks ($urpm->{cdrom_mounted}, "hal_mount")
 #-   + those of _find_blist_matching ($blists->[_]{medium}{mntpoint})
 sub try_mounting_cdrom {
     my ($urpm, $blists) = @_;
 
     my @blists;
 
-    # first try without hal, it allows users where hal fails to work (with one CD only)
+    # first try without UDisks, it allows users where UDisks fails to work (with one CD only)
     my @mntpoints = _look_for_mounted_cdrom_in_mtab();
     @blists = map { _find_blist_matching($urpm, $blists, $_) } @mntpoints;
 
     if (!@blists) {
-	@mntpoints = _try_mounting_cdrom_using_hal($urpm);
+	@mntpoints = _try_mounting_cdrom_using_udisks($urpm);
 	@blists = map { _find_blist_matching($urpm, $blists, $_) } @mntpoints;
     }
     @blists;
 }
 
 #- side-effects: $urpm->{cdrom_mounted}, "hal_mount"
-sub _try_mounting_cdrom_using_hal {
+sub _try_mounting_cdrom_using_udisks {
     my ($urpm) = @_;
 
     $urpm->{cdrom_mounted} = {}; # reset
 
     eval { require Hal::Cdroms; 1 } or $urpm->{error}(10, N("You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done automatically)")), return();
 
-    my $hal_cdroms = eval { Hal::Cdroms->new } or $urpm->{fatal}(10, N("Udisks daemon (udisks-daemon) is not running or not ready"));
+    my $cdroms = eval { Hal::Cdroms->new } or $urpm->{fatal}(10, N("Udisks daemon (udisks-daemon) is not running or not ready"));
 
-    foreach my $hal_path ($hal_cdroms->list) {
-	my $mntpoint = $hal_cdroms->get_mount_point($hal_path);
+    foreach my $udisks_path ($cdroms->list) {
+	my $mntpoint = $cdroms->get_mount_point($udisks_path);
 	if (!$mntpoint) {
-	    $urpm->{log}("trying to mount $hal_path");
-	    $mntpoint = $hal_cdroms->ensure_mounted($hal_path)
-	      or $urpm->{error}("failed to mount $hal_path: $hal_cdroms->{error}"), next;
+	    $urpm->{log}("trying to mount $udisks_path");
+	    $mntpoint = $cdroms->ensure_mounted($udisks_path)
+	      or $urpm->{error}("failed to mount $udisks_path: $cdroms->{error}"), next;
 	}
-	$urpm->{cdrom_mounted}{$hal_path} = $mntpoint;
+	$urpm->{cdrom_mounted}{$udisks_path} = $mntpoint;
     }
     values %{$urpm->{cdrom_mounted}};
 }
@@ -130,21 +129,21 @@ sub _may_eject_cdrom {
 
 #- side-effects: $urpm->{cdrom_mounted}, "hal_umount", "hal_eject"
 sub _eject_cdrom {
-    my ($urpm, $hal_path) = @_;
+    my ($urpm, $udisks_path) = @_;
 
-    my $mntpoint = delete $urpm->{cdrom_mounted}{$hal_path};
-    $urpm->{debug} and $urpm->{debug}("umounting and ejecting $mntpoint (cdrom $hal_path)");
+    my $mntpoint = delete $urpm->{cdrom_mounted}{$udisks_path};
+    $urpm->{debug} and $urpm->{debug}("umounting and ejecting $mntpoint (cdrom $udisks_path)");
 
     eval { require Hal::Cdroms; 1 } or return;
 
-    my $hal_cdroms = Hal::Cdroms->new;
-    $hal_cdroms->unmount($hal_path) or do {
-	my $mntpoint = $hal_cdroms->get_mount_point($hal_path);
-	#- trying harder. needed when the cdrom was not mounted by hal
+    my $cdroms = Hal::Cdroms->new;
+    $cdroms->unmount($udisks_path) or do {
+	my $mntpoint = $cdroms->get_mount_point($udisks_path);
+	#- trying harder. needed when the cdrom was not mounted by UDisks
 	$mntpoint && system("umount '$mntpoint' 2>/dev/null") == 0
-	  or $urpm->{error}("failed to umount $hal_path: $hal_cdroms->{error}");
+	  or $urpm->{error}("failed to umount $udisks_path: $cdroms->{error}");
     };
-    $hal_cdroms->eject($hal_path);
+    $cdroms->eject($udisks_path);
     1;
 }
 
@@ -264,6 +263,6 @@ Copyright (C) 1999-2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2012 Mageia
+Copyright (C) 2011-2015 Mageia
 
 =cut

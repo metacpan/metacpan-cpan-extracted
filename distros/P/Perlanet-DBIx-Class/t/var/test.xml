@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:media="http://search.yahoo.com/mrss/"
+	>
+
+<channel>
+	<title>Cycles</title>
+	<atom:link href="http://acidcycles.wordpress.com/feed/" rel="self" type="application/rss+xml" />
+	<link>http://acidcycles.wordpress.com</link>
+	<description></description>
+	<lastBuildDate>Mon, 10 May 2010 22:33:10 +0000</lastBuildDate>
+
+	<language>en</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>http://wordpress.com/</generator>
+<cloud domain='acidcycles.wordpress.com' port='80' path='/?rsscloud=notify' registerProcedure='' protocol='http-post' />
+<image>
+		<url>http://www.gravatar.com/blavatar/e41e251308aaf8c831d6d9c466e1161f?s=96&#038;d=http://s2.wp.com/i/buttonw-com.png</url>
+
+		<title>Cycles</title>
+		<link>http://acidcycles.wordpress.com</link>
+	</image>
+	<atom:link rel="search" type="application/opensearchdescription+xml" href="http://acidcycles.wordpress.com/osd.xml" title="Cycles" />
+	<atom:link rel='hub' href='http://acidcycles.wordpress.com/?pushpress=hub'/>
+		<item>
+		<title>Time to end an information addiction</title>
+
+		<link>http://acidcycles.wordpress.com/2010/05/10/time-to-end-an-information-addiction/</link>
+		<comments>http://acidcycles.wordpress.com/2010/05/10/time-to-end-an-information-addiction/#comments</comments>
+		<pubDate>Mon, 10 May 2010 22:33:10 +0000</pubDate>
+		<dc:creator>acidcycles</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+
+		<guid isPermaLink="false">http://acidcycles.wordpress.com/?p=108</guid>
+
+		<description><![CDATA[I&#8217;ve become increasingly frustrated with how I spend my free time. Bouncing back and forth and back and forth between Reddit and Hacker News, and having a constant drip of information straight to me. It&#8217;s come to the point now, where my attention span is terrible &#8211; I can go barely half an hour without [...]<img alt="" border="0" src="http://stats.wordpress.com/b.gif?host=acidcycles.wordpress.com&blog=2388432&post=108&subd=acidcycles&ref=&feed=1" />]]></description>
+			<content:encoded><![CDATA[<p>I&#8217;ve become increasingly frustrated with how I spend my free time. Bouncing back and forth and back and forth between <a href="http://reddit.com">Reddit</a> and <a href="http://news.ycombinator.com">Hacker News</a>, and having a constant drip of information straight to me.  It&#8217;s come to the point now, where my attention span is terrible &#8211; I can go barely half an hour without needing to find something funny to look at, or a new video to watch, or catch up on some technology that I&#8217;m going to forget 10 seconds later that has <em>zero</em> impact on my life.</p>
+<p>I often spend time thinking back to myself as a child. There were things I do differently in life now, but there are still a lot of traits that I&#8217;ve lost as a kid. The fascination with everything, a need to understand &#8211; really understand &#8211; how everything worked. I could spend hours hacking away at little things and feel that joy and buzz when I got it working. I don&#8217;t get this so much anymore.</p>
+<p>Part of it is growing up, no doubt. I&#8217;m 7 years older than these first memories &#8211; it&#8217;s hard to constantly understand new things, because there is a limit to the speed at which you can discover stuff. But the larger problem is just that I&#8217;m not trying! I still have the ideas, but there is no development. An idea might make it to a repository, but die out shortly afterwards.</p>
+<p>Now I&#8217;m not suggesting I finish all these projects &#8211; there are countless past projects that never made it anywhere. However, there were projects that did have longevity &#8211; now there aren&#8217;t.</p>
+<p>So, Reddit, Hacker News, it&#8217;s time to say good bye for now &#8211; it&#8217;s been fun, but you&#8217;re just starting to drain me of creativity. I&#8217;m sure the transitional period is going to be rocky, but I fell this has got to be done!</p>
+<p>Now, maybe I can finish reading these books on my self, finish really learning Haskell and Lisp, practice guitar more and continue my piano studies&#8230;</p>
+<hr />
+Interesting footnote: During the writing of this short post, I was distracted probably 5 times with YouTube and other stuff &#8211; at one point entirely forgetting what I was writing about.</p>
+<br />  <a rel="nofollow" href="http://feeds.wordpress.com/1.0/gocomments/acidcycles.wordpress.com/108/"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/comments/acidcycles.wordpress.com/108/" /></a> <a rel="nofollow" href="http://feeds.wordpress.com/1.0/godelicious/acidcycles.wordpress.com/108/"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/delicious/acidcycles.wordpress.com/108/" /></a> <a rel="nofollow" href="http://feeds.wordpress.com/1.0/gostumble/acidcycles.wordpress.com/108/"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/stumble/acidcycles.wordpress.com/108/" /></a> <a rel="nofollow" href="http://feeds.wordpress.com/1.0/godigg/acidcycles.wordpress.com/108/"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/digg/acidcycles.wordpress.com/108/" /></a> <a rel="nofollow" href="http://feeds.wordpress.com/1.0/goreddit/acidcycles.wordpress.com/108/"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/reddit/acidcycles.wordpress.com/108/" /></a> <img alt="" border="0" src="http://stats.wordpress.com/b.gif?host=acidcycles.wordpress.com&blog=2388432&post=108&subd=acidcycles&ref=&feed=1" />]]></content:encoded>
+			<wfw:commentRss>http://acidcycles.wordpress.com/2010/05/10/time-to-end-an-information-addiction/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+
+		<media:content url="http://0.gravatar.com/avatar/2ff9430c0ae3a75bc06d156361429e54?s=96&#38;d=identicon&#38;r=G" medium="image">
+			<media:title type="html">acidcycles</media:title>
+		</media:content>
+
+	</item>
+</channel>
+</rss>

@@ -1,0 +1,151 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Example Paragraphs
+
+H2: Simple Examples
+
+Example paragraphs are displayed in a fixed-width font (e.g. Courier).
+Unlike most other paragraphs, spaces and tabs immediately
+after the paragraph tag are not ignored in example paragraphs.
+The tags used are:
+
+* E - fixed-width text
+* V - verbatim, fixed-width text (embedded symbols are ignored).
+
+For example:
+
+>E:# {{Greeting}} outputs a friendly greeting.
+>E:sub Greeting {
+>E:    print "Hello world\n";
+>E:}
+
+The result is:
+
+E:# {{Greeting}} outputs a friendly greeting.
+E:sub Greeting {
+E:    print "Hello world\n";
+E:}
+
+H2: Shorthand Notation
+
+As verbatim, fixed-width text is very common in software documentation,
+">" is provided as a shorthand for "V:". For example:
+
+>># {{Greeting}} outputs a friendly greeting.
+>>sub Greeting {
+>>    print "Hello world\n";
+>>}
+
+The result is:
+
+># {{Greeting}} outputs a friendly greeting.
+>sub Greeting {
+>    print "Hello world\n";
+>}
+
+H2: Large Examples
+
+Large examples are usually defined using the {{example}} or {{verbatim}}
+filters like this:
+
+!block verbatim
+!block example
+# {{Greeting}} outputs a friendly greeting.
+sub Greeting {
+    print "Hello world\n";
+}
+!endblock
+!endblock
+
+H2: Wide Examples
+
+If an example block has unwanted line breaks, the {{wide}}
+parameter should be specified. Wide examples use a wider text area
+(and a smaller font, if necessary) so that 80 characters can
+fit onto each line. For example:
+
+!block verbatim; wide
+!block example; wide
+sub SaveTheWorld {                  # This routine provides world peace
+    local($param1, param2) = @_;    # Input parameters
+
+    # Do the work
+    # ...
+}
+!endblock
+!endblock
+
+The result is:
+
+!block example; wide
+sub SaveTheWorld {                  # This routine provides world peace
+    local($param1, param2) = @_;    # Input parameters
+
+    # Do the work
+    # ...
+}
+!endblock
+
+H2: Formatting Source Code
+
+Blocks of source code can be nicely formatted via the {{lang}}
+parameter to the {{FILT:example}} filter. For example:
+
+!block verbatim
+!block example; lang='Perl'
+sub hello {
+    local($planet) = @_;
+
+    # Output a nice message
+    print "hello $planet!\n";
+}
+!endblock
+!endblock
+
+The result is:
+
+!block example; lang='Perl'
+sub hello {
+    local($planet) = @_;
+
+    # Output a nice message
+    print "hello $planet!\n";
+}
+!endblock
+
+For convenience, if a programming language is used as a filter
+(and a filter of that name doesn't exist), SDF implicitly calls
+the example filter for you with the relevant lang parameter.
+
+There is built-in support for numerous languages including
+[[Perl]], C, C++, [[Java]], [[Delphi]], CORBA IDL and shell.
+New language definitions can be easily added
+({{CMD:vgrind}} definitions are used).
+
+H2: File Pretty Printing
+
+Pretty printing of source code files is directly supported by
+{{CMD:sdf}}'s -P option.
+For example:
+
+E:  sdf -2ps -Psh myscript
+E:  sdf -2ps -P myapp.c
+E:  sdf -2ps -P -n5 mylib.pl
+
+The language to use can be specified as a parameter.
+The default language is derived from the extension of the file.
+The -n option adds line numbers at the frequency given.
+The default frequency is 1. i.e. every line.
+
+!end_topic

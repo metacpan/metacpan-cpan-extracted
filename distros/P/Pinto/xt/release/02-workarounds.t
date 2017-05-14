@@ -10,13 +10,14 @@ use Pinto::Tester;
 
 #------------------------------------------------------------------------------
 note("This test requires a live internet connection to pull stuff from CPAN");
+
 #------------------------------------------------------------------------------
 
 # FCGI and common::sense both generate the .pm files at build time.  So it
 # appears that they don't have any packages.  The PackageExctractor class
 # has workaround for these
 
-for my $pkg (qw(common::sense FCGI Net::LibIDN)) {
+for my $pkg (qw(common::sense FCGI)) {
     my $t = Pinto::Tester->new;
     $t->run_ok( Pull => { targets => $pkg } );
     $t->run_ok( List => {} );
@@ -36,17 +37,6 @@ for my $pkg (qw(DateTime::TimeZone)) {
 }
 
 #------------------------------------------------------------------------------
-# Module::Metadata mistakenly thinks that EU::MM has a "version" package.
-# See https://github.com/thaljef/Pinto/issues/204 for all the gory details
-#------------------------------------------------------------------------------
-{
-  my $t = Pinto::Tester->new;
-  $t->run_ok( Pull => { targets => 'version@0.9912' } );
-  $t->registration_ok('JPEACOCK/version-0.9912/version~0.9912');
-
-  $t->run_ok( Pull => { targets => 'ExtUtils::MakeMaker@7.04' } );
-  $t->registration_ok('JPEACOCK/version-0.9912/version~0.9912');
-}
 
 done_testing;
 

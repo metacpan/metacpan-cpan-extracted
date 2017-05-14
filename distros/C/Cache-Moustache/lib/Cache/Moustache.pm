@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Cache::Moustache::AUTHORITY = 'cpan:TOBYINK';
-	$Cache::Moustache::VERSION   = '0.005';
+	$Cache::Moustache::VERSION   = '0.006';
 }
 
 sub isa
@@ -32,7 +32,7 @@ sub new
 	return $class if ref $class && $class->isa(__PACKAGE__);
 	my %self = map { ;"~~~~$_" => $args{$_} } keys %args;
 	$self{'~~~~default_expires_in'} ||= 3600;
-	bless {%self}, $class;
+	bless \%self, $class;
 }
 
 my %multipliers = (
@@ -107,14 +107,21 @@ sub get
 sub remove
 {
 	my ($cache, $key) = @_;
-	return if $key =~ /^~~~~/;
+	
+	if (ref $key eq 'Regexp') {
+		my @keys = grep { $_ =~ $key and not !/^~~~~/ } keys %$cache;
+		delete @{$cache}{@keys};
+		return scalar(@keys);
+	}
+	
+	return 0 if $key =~ /^~~~~/;
 	return( (delete $cache->{$key}) ? 1 : 0 );
 }
 
 sub clear
 {
 	my $cache = shift;
-	my @keys = grep { !/^~~~~/ } keys %$cache;
+	my @keys = grep !/^~~~~/, keys %$cache;
 	delete $cache->{$_} for @keys;
 	return scalar(@keys);
 }
@@ -125,15 +132,15 @@ sub purge
 	my $now   = time;
 	my @keys  =
 		grep { my $e = $cache->{$_}[1]; $e >= 0 && $e < $now }
-		grep { !/^~~~~/ } keys %$cache;
-	delete $cache->{$_} for @keys;
+		grep !/^~~~~/, keys %$cache;
+	delete @{$cache}{@keys};
 	return scalar(@keys);
 }
 
 sub get_keys
 {
 	my $cache = shift;
-	my @keys = grep { !/^~~~~/ } keys %$cache;
+	my @keys = grep !/^~~~~/, keys %$cache;
 	return @keys;
 }
 
@@ -245,6 +252,9 @@ Retrieve the value associated with a key (unless it's expired).
 Removes a key/value pair from the cache. Returns the number of
 pairs removed (one or none).
 
+C<< $key >> may be a regular expression, in which case multiple
+keys may be removed.
+
 =item C<< clear >>
 
 Empty everything from the cache. Returns the number of key/value
@@ -300,7 +310,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012, 2014 by Toby Inkster.
+This software is copyright (c) 2012, 2014, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

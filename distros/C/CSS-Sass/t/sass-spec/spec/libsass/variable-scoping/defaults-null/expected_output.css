@@ -1,11 +1,8 @@
 div inner {
-  foo: lexical;
-}
+  foo: lexical; }
 
 outer {
-  foo: outer;
-}
+  foo: outer; }
 
 div inner {
-  foo: lexical;
-}
+  foo: lexical; }

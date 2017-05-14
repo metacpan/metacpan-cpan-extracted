@@ -1,0 +1,6 @@
+lib/CGI/Application/Tutorial/Namegame.pm
+MANIFEST
+Makefile.PL
+cgi-bin/namegame.cgi
+t/00.t
+META.yml                                 Module meta-data (added by MakeMaker)

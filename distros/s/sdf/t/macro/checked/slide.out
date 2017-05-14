@@ -1,0 +1,16 @@
+__tuning[]
+__endtuning[]
+H2[orig_style='H2']Heading 2
+H3[orig_style='H3']Heading 3
+H1[orig_style='H1']Before
+H3[orig_style='H2']Heading 2
+H4[orig_style='H3']Heading 3
+H1[orig_style='H1']After
+H2[orig_style='H2']Heading 2
+H3[orig_style='H3']Heading 3
+H1[orig_style='H1']Before
+H4[orig_style='H2']Heading 2
+H5[orig_style='H3']Heading 3
+H1[orig_style='H1']After
+H2[orig_style='H2']Heading 2
+H3[orig_style='H3']Heading 3

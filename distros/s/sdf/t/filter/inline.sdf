@@ -1,0 +1,17 @@
+# This file tests the inline filter
+
+Some text before.
+
+!block inline; target='raw'
+Some inline
+text.
+!endblock
+
+Some middle text.
+
+!block inline; target='raw'
+Some more
+inline text.
+!endblock
+
+Some text after.

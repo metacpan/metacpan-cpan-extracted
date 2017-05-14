@@ -1,0 +1,24 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Sane.xs
+examples/scanadf-perl
+examples/scanimage-perl
+lib/Image/Sane.pm
+lib/Image/Sane/Device.pm
+saneperl.h
+t/1_init.t
+t/81_scanimage-perl.t
+t/90_MANIFEST.t
+t/91_critic.t
+t/data.t
+t/enums.t
+t/err.t
+t/non-blocking.t
+t/options.t
+t/perlcriticrc
+t/pod.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

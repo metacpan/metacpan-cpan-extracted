@@ -110,7 +110,8 @@ document is used by
 [Mojolicious::Plugin::OpenAPI](http://metacpan.org/pod/Mojolicious::Plugin::OpenAPI)
 to generate the Mojolicious routes and validate the input and output
 automatically. Each route should have an `x-mojo-to` key to link it to
-a `controller` (class) and `action` (method).
+a `controller` (class) and `action` (method). It should also have an
+`operationId` that is globally unique for all API files.
 
 ##### `share/templates`
 

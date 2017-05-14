@@ -1,6 +1,6 @@
 package App::redisp::Commands;
-BEGIN {
-  $App::redisp::Commands::VERSION = '0.11';
+{
+  $App::redisp::Commands::VERSION = '0.13';
 }
 use strict;
 use base "Exporter";
@@ -140,7 +140,7 @@ App::redisp::Commands
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 AUTHOR
 
@@ -150,8 +150,9 @@ David Leadbeater <dgl@dgl.cx>
 
 This software is copyright (c) 2011 by David Leadbeater.
 
-This is free software; you can redistribute it and/or modify it under
-the terms of the Beerware license.
+This program is free software. It comes without any warranty, to the extent
+permitted by applicable law. You can redistribute it and/or modify it under the
+terms of the Beer-ware license revision 42.
 
 =cut
 

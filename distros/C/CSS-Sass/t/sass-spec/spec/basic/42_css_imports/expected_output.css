@@ -2,9 +2,7 @@
 @import url(foo.css);
 @import url(bar.css);
 div {
-  color: red;
-}
+  color: red; }
 
 span {
-  color: blue;
-}
+  color: blue; }

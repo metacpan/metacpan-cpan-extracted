@@ -1,0 +1,45 @@
+#
+# mSQL Dump  (requires mSQL-1.0.6 or better)
+#
+# Host: localhost    Database: MsqlCGITest
+#--------------------------------------------------------
+
+
+#
+# Table structure for table 'AddressBook'
+#
+drop table AddressBook\g
+CREATE TABLE AddressBook (
+  id INT NOT NULL PRIMARY KEY,
+  lastName CHAR(30),
+  firstName CHAR(30),
+  email1 CHAR(50),
+  email2 CHAR(50),
+  url CHAR(100),
+  homePhone1 CHAR(20),
+  homePhone2 CHAR(20),
+  homeAddress CHAR(255),
+  workPhone1 CHAR(20),
+  workPhone2 CHAR(20),
+  fax CHAR(20),
+  company CHAR(50),
+  workAddress CHAR(255),
+  pager CHAR(20),
+  birthday INT,
+  comments CHAR(1024),
+  category CHAR(1),
+  date INT
+) \g
+
+
+#
+# Dumping data for table 'AddressBook'
+#
+
+INSERT INTO AddressBook VALUES (2134,'Tang','Alex','altitude@petrified.cic.net','altitude@cic.net','http://petrified.cic.net/~altitude/','313-483-4580','516-671-8545','860 Helen Ct
+Ypsilanti, MI  48198
+
+92 McCoun\'s Lane
+Old Brookville, NY  11545','313-998-8083','313-998-6103','313-998-6105','CICNet, Inc.','2901 Hubbard Drive
+Ann Arbor, MI
+48105','313-990-7118',64566000,'','p',0)\g

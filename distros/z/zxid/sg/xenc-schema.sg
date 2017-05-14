@@ -1,0 +1,87 @@
+# xenc-schema.sg  --  Slightly edited after generation
+# $Id: xenc-schema.sg,v 1.2 2007-09-24 02:34:34 sampo Exp $
+
+target(xenc,http://www.w3.org/2001/04/xmlenc#)
+ns(xs,http://www.w3.org/2001/XMLSchema)
+import(ds,http://www.w3.org/2000/09/xmldsig#,http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd)
+
+%EncryptedType:
+  xenc:EncryptionMethod?	 -> %xenc:EncryptionMethodType
+  ds:KeyInfo?
+  xenc:CipherData
+  xenc:EncryptionProperties?
+  @Id?	 -> %xs:ID
+  @Type?	 -> %xs:anyURI
+  @MimeType?	 -> %xs:string
+  @Encoding?	 -> %xs:anyURI
+  ;
+
+%EncryptionMethodType:
+  xenc:KeySize?	 -> %xenc:KeySizeType
+  xenc:OAEPparams?	 -> %xs:base64Binary
+  any*
+  @Algorithm	 -> %xs:anyURI
+  ;
+
+%KeySizeType:	 base(xs:integer) ;
+
+CipherData	 -> %xenc:CipherDataType
+%CipherDataType:
+     xenc:CipherValue?	 -> %xs:base64Binary
+     xenc:CipherReference?
+     ;
+
+CipherReference	 -> %xenc:CipherReferenceType
+%CipherReferenceType:
+  xenc:Transforms?	 -> %xenc:TransformsType
+  @URI	 -> %xs:anyURI
+  ;
+
+%TransformsType:
+  ds:Transform+
+  ;
+
+EncryptedData	 -> %xenc:EncryptedDataType
+%EncryptedDataType:	 base(xenc:EncryptedType) ;
+
+EncryptedKey	 -> %xenc:EncryptedKeyType
+%EncryptedKeyType:	 base(xenc:EncryptedType)
+    xenc:ReferenceList?
+    xenc:CarriedKeyName?	 -> %xs:string
+  @Recipient?	 -> %xs:string
+  ;
+
+AgreementMethod	 -> %xenc:AgreementMethodType
+%AgreementMethodType:
+  xenc:KA-Nonce?	 -> %xs:base64Binary
+  any*
+  xenc:OriginatorKeyInfo?	 -> %ds:KeyInfoType
+  xenc:RecipientKeyInfo?	 -> %ds:KeyInfoType
+  @Algorithm	 -> %xs:anyURI
+  ;
+
+ReferenceList:
+  xenc:DataReference?	 -> %xenc:ReferenceType
+  xenc:KeyReference?	 -> %xenc:ReferenceType
+  ;
+
+%ReferenceType:
+  any*
+  @URI	 -> %xs:anyURI
+  ;
+
+EncryptionProperties	 -> %xenc:EncryptionPropertiesType
+%EncryptionPropertiesType:
+  xenc:EncryptionProperty+
+  @Id?	 -> %xs:ID
+  ;
+
+EncryptionProperty	 -> %xenc:EncryptionPropertyType
+%EncryptionPropertyType:
+  any*
+  @Target?	 -> %xs:anyURI
+  @Id?	 -> %xs:ID
+  @any?
+  ;
+
+#EOF

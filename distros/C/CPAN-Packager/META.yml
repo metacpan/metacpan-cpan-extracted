@@ -5,9 +5,10 @@ author:
 build_requires:
   ExtUtils::MakeMaker: 6.42
   Test::Base: 0
+  Test::Class: 0
   Test::LoadAllModules: 0.02
-  Test::More: 0.94
-  Test::Requires: 0.03
+  Test::More: 0.92
+  Test::Requires: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
@@ -23,39 +24,35 @@ no_index:
     - t
     - xt
 recommends:
-  App::CPAN::Fresh: 0
   Archive::Tar: 0
-  Archive::Zip: 0
-  CPANPLUS::Backend: 0
   Cwd: 0
   File::Basename: 0
+  File::Copy: 0
   File::Temp: 0
   RPM::Specfile: 0
-  URI: 0
   URI::Escape: 0
 requires:
   Archive::Extract: 0
-  CPAN::DistnameInfo: 0
+  CPANPLUS::Backend: 0
+  Class::Inspector: 0
   File::Copy: 0
-  Filter::Util::Call: 0
   FindBin::libs: 0
-  Getopt::Long::Descriptive: 0.083
   Hash::Merge: 0
-  IO::File: 0
-  IPC::Cmd: 0
+  IPC::System::Simple: 0
   Kwalify: 1.20
   LWP::UserAgent: 0
   List::Compare: 0
-  Log::Log4perl: 1.26
+  List::MoreUtils: 0
   Module::CoreList: 2.17
   Module::Depends: 0
-  Mouse: 0.47
-  MouseX::Getopt: 0.2601
-  Parse::CPAN::Meta: 0
-  Try::Tiny: 0.04
+  Mouse: 0.17
+  MouseX::Getopt: 0.04
+  Path::Class: 0
+  Pod::POM: 0
+  UNIVERSAL::require: 0
+  URI: 0
   YAML: 0
   perl: 5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/dann/p5-cpan-packager.git
-version: 0.33
+version: 0.074

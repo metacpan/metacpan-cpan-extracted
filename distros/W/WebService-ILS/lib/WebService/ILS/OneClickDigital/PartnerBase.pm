@@ -20,17 +20,6 @@ use URI::Escape;
 
 use parent qw(WebService::ILS::OneClickDigital);
 
-sub library_action_base_url {
-    my $self = shift;
-
-    return $self->api_url("/libraries/".$self->library_id);
-}
-
-sub products_url {
-    my $self = shift;
-    return $self->library_action_base_url."/search";
-}
-
 sub title_url {
     my $self = shift;
     my $isbn = shift or croak "No isbn";

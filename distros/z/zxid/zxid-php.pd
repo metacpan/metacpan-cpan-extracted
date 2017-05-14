@@ -1,0 +1,310 @@
+<<if: ZXIDBOOK>>
+<<else: >>PHP Interface to ZXID
+#####################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-php.pd,v 1.7 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-PHP 01>>
+<<define: ZXDOC=ZXID PHP Interface>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. This document describes the PHP glue.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+The PHP glue for ZXID was generated using swig(1), however, the swig
+interface is not a retrofit: the whole ZXID API was designed to
+be easily swiggifiable.
+
+The main aim of the glue is supporting the easy and simple API, see
+<<link:zxid-simple.html: zxid_simple()>> for general
+reference. Only differences and language specifics are covered in this
+document.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+
+7 PHP extension php_zxid.so
+===========================
+
+<<fi: >>
+
+The PHP integration is incomplete due to incomplete support in SWIG
+for php5. However, enough interface exists to get most high level API
+working and thus successfully run an SP.
+
+7.1 Installing Binaries or from Package
+---------------------------------------
+
+TBD (*** WIP)
+
+7.2 Building and Installing ZXID PHP extension
+----------------------------------------------
+
+After building main zxid distribution, say
+
+  make phpzxid
+
+You MUST have php-config(1) in path. If not, try
+
+  make phpzxid PHP_CONFIG=/path/to/php-config
+
+If the extension built successfully, you can use it by copying
+it to a suitable place, e.g.
+
+  make phpzxid_install
+
+The install again uses the php-config(1) to figure out where
+php(1) can find the module.
+
+Next you need to decide whether to run under Apache mod_php
+setup (apache), or as CGI (any web server).
+
+We have tested ZXID with php-5.1.6 and php-5.3.6 (current development
+target as of 20110707). For mod_php operation, the Apache httpd 2.2.3
+and 2.2.19 (current development target as of 20110707) have been
+tested.
+
+7.2.1 Running PHP as Apache mod_php
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See <<link:apache.html: Apache recipe>> for how
+to compile Apache to support mod_php.
+
+7.2.2 Running PHP as CGI (any web server)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the CGI case you generally make sure your CGI script starts like
+
+  #!/usr/bin/php
+  <?
+  dl("php_zxid.so");  # These three lines can go to initialization: they only need to run once
+  $conf = "PATH=/var/zxid/&URL=https://sp1.zxidsp.org:8443/zxidhlo.php";
+  $cf = zxid_new_conf_to_cf($conf);
+  ?>
+
+The first line makes sure the file is executed with php interpreter. You should
+change it to match the path where your php is installed. You also need to
+make your CGI script executable, e.g:
+
+  chmod a+x mycgi.php
+
+Then you place the CGI script in a directory in the document tree
+of the web site and make sure your http server is configured (permitted)
+to execute CGI scripts in that directory.
+
+One tricky thing that can go wrong is dynamic linking. When you compiled
+the php_zxid.so module, some linking dependencies are usually created.
+Problem arises if some of the dependencies are not in the paths
+allowed for dynamic linking by your web server. The paths allowed
+by web server can easily be different than in your shell and some
+web servers even ignore ~LD_LIBRARY_PATH~ environment variable. Sometimes
+you just have to copy the dependency libraries to one of the allowed
+directories. This is "dirty", but works. See ldconfig(8) and
+section <<see: ZXID-Installing-CannedTutorialRunningZXIDasCGIundermini_httpd-AccessingZXID>> for further information.
+
+You can easily see the dependencies using ldd(1)
+
+  ldd /apps/php/5.1.6/lib/php/extensions/no-debug-non-zts-20050922/php_zxid.so
+        linux-gate.so.1 =>  (0xffffe000)
+        libpthread.so.0 => /lib/libpthread.so.0 (0xb7796000)
+        libdl.so.2 => /lib/libdl.so.2 (0xb7792000)
+        libcurl.so.3 => /apps/lib/libcurl.so.3 (0xb7611000)
+        libz.so.1 => /apps/lib/libz.so.1 (0xb75fe000)
+        libc.so.6 => /lib/libc.so.6 (0xb74dd000)
+        /lib/ld-linux.so.2 (0x80000000)
+
+In this example the suspect library dependencies are
+/apps/lib/libcurl.so.3 and /apps/lib/libz.so.1 because they are
+outside normal places, i.e. /lib and /usr/lib.
+
+Another thing to remember is that CGI specification requires that the
+~Content-Type~ header and an empty line (to separate headers from
+content) is emitted before the actual page. If this fails to happen, the
+page will mysteriously not appear although your script ran successfully.
+
+Sometimes the debug output can end up in stdout (e.g. somewhere stderr
+was redirected to stdout) and this will garble the returned web page.
+Easy fix is to disable debug output by not supplying ~ZXID_AUTO_DEBUG~.
+See section <<see: ZXID-ZXID_simpleAPI-HelloWorld-AUTOoptions>>.
+
+7.3 Programming with ZXID PHP Extension
+---------------------------------------
+
+To use the ZXID PHP extension you must add near beginning of your script
+
+  dl("php_zxid.so");   // Load the module
+
+You may need to tweak the paths, or ~LD_LIBRARY_PATH~, to get this to work.
+
+After this, you can use the PHP interface much the same way as you
+would use the C interface. See the distributed zxid.php and
+zxidhlo.php for further usage examples.
+
+7.4 Simple API Using PHP
+------------------------
+
+(*** also in zxid-php.pd)
+
+The simplest APIs are easy to use and suitable for CGIs where the
+program is restarted anew every time. However in situations where the
+script engine stays alive persistently, it is wasteful to reparse (and
+reallocate) the configuration every time. Consider following PHP
+snippet designed to be used with mod_php:
+
+  01 # Put this in the PHP initialization (it only needs to run once)
+  02 dl("php_zxid.so");
+  03 $conf = "PATH=/var/zxid/&URL=https://sp1.zxidsp.org:8443/zxiddemo.php";
+  04 $cf = zxid_new_conf_to_cf($conf);
+  05 <?   # For every page that is accessed
+  06 $qs = $_SERVER['REQUEST_METHOD'] == 'GET'
+  07       ? $_SERVER['QUERY_STRING']
+  08       : file_get_contents('php://input');
+  09 $res = zxid_simple_cf($cf, -1, $qs, null, 0x1800);
+  10 switch (substr($res, 0, 1)) {
+  11 case 'L': header($res); exit;  # Redirect
+  12 case 'n': exit;   # already handled
+  13 case 'b': my_send_metadata();
+  14 case 'e': my_render_login_screen();
+  15 case 'd': break;  # Logged in case -- fall through
+  16 default:  error_log("Unknown zxid_simple() res(%s)", res); exit;
+  17 }
+  18 # *** Parse the LDIF in $res into a hash of attributes (see zxidhlo.php)
+  19 
+  20 ?>
+  21 <html><title>Protected content, logged in as <$=$attr['cn']$></title>
+  22 ...
+  23 </html>
+  24 <?
+  25 function my_render_login_screen()
+  26 {
+  27 ?>
+  28 <html><title>Please Login Using IdP</title>
+  29 ...
+  30 <?=zxid_idp_select_cf($cf, 0, 0x1800)?>
+  31 ...</html>
+  32 <? exit; }?>
+
+Notes
+
+1. Line 4 creates a system-wide configuration object that is later
+   used by the other API calls
+2. On line 9 we call zxid_simple_cf() with the created object. The
+   second and third argument specify a buffer or string that contains
+   the CGI form data to parse. This may come from ~QUERY_STRING~ of a
+   GET request or from HTTP body of a POST request, as determined
+   on line 8. The -1 means the length of the data should be
+   determined using strlen(3), i.e. C string nul termination.
+   The ~auto_flags == 0x1800~ enables form tag wrapping and debug
+   prints, but otherwise automation is disabled.
+3. Since automation was disabled, we need to handle several
+   cases of possible outcomes from zxid_simple_cf(), on lines 10-17.
+4. From line 18 onwards we handle the login successful or already
+   logged in case. First we split the LDIF entry into a hash
+   so that we can access the attributes easily (e.g. ~cn~ on line 20).
+5. On line 30 we call zxid_idp_list_cf() to create the form
+   for choosing which IdP to use for login (remember that
+   ~auto_flags == 0xc0~ enabled the form wrapper). As can be
+   seen the same configuration object, ~$cf~, is used through out.
+
+14 Integration of Other Libraries with ZXID PHP
+===============================================
+
+14.2 Pat Patterson's php module
+-------------------------------
+
+(*** this section appears in README.zxid)
+
+Pat Patterson of Sun distributes a pure PHP module (not to be confused
+with Sun's OpenSSO open source effort, with which Pat has some
+contact) that implements some aspects of SAML 2.0. As of May 2007, his
+library provides functionality that, by and large, parallels that of the
+php_zxid module. A major advatage of his module is that it does not have
+C shared library dependency, but beware that he still depends on XML
+parsing and popular crypto libraries (openssl) to be available. These
+assumptions are not onerous, but you should be aware of them in case
+your system differs from main stream deployments.
+
+Overall, Pat's PHP implementation, as of May 2007, is still lacking
+in metadata generation and loading (it does not implement Auto-CoT
+or Well Known Location) and has some rough edges around less frequently
+used parts of the SAML specification. No doubt matters will improve
+over the time.
+
+Pat's library handles only SSO and not ID Web Services. It would be
+possible to extract the discovery bootstrap from SSO using his library
+after which you can use ZXID WSC API to actually call the services.
+
+14.3 Sun OpenSSO
+----------------
+
+Sun Microsystems distributes an open source implementation of SAML 2.0.
+Their implementation is of primary interest as it provides a freely available
+IdP implementation (as of May 2007 IMNSHO the ZXID SP interface is
+superior to the OpenSSO SP - and since both implement an open standard,
+you can mix ZXID SP with OpenSSO IdP).
+
+Thus, the ZXID to OpenSSO integration reduces to each one acting in its
+role using standard wire protocol - SAML 2.0.
+
+95 FAQ
+======
+
+95.1 Build and Linking Problems
+-------------------------------
+
+95.1.1 Dry run test
+~~~~~~~~~~~~~~~~~~~
+
+A good way to test whether php is able to run at all is to simulate
+running of a CGI script by setting few environment variables and
+then invoking the script from command line:
+
+ QUERY_STRING=o=E REQUEST_METHOD=GET php ./zxidhlo.php 
+
+The result should be the IdP selection page as HTML. Another test is
+to run o=B to obtain the metadata.
+
+95.1.1 Duplicate symbols
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Following types of error messages
+
+ Warning: Function registration failed - duplicate name - hexdec in /a/d/sampo/zxid/zxidhlo.php on line 16
+ 
+ Warning: zxid:  Unable to register functions, unable to load in Unknown on line 0
+ 
+ Fatal error: Call to undefined function zxid_new_conf_to_cf() in /a/d/sampo/zxid/zxidhlo.php on line 22
+
+Theory: the zxid library has already been loaded in some other way, such as part
+of mod_auth_saml or Net::SAML loading.
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+96 License
+==========
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+See file COPYING for complete information.
+
+<<references:
+
+[SAML2core] "Assertions and Protocols for the OASIS Security Assertion Markup Language (SAML) V2.0", Oasis Standard, 15.3.2005, saml-core-2.0-os
+
+>>
+
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

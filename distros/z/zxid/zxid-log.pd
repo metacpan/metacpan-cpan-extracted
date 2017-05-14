@@ -1,0 +1,835 @@
+<<if: ZXIDBOOK>>
+<<else: >>ZXID Signed and Encrypted Logging Facility
+##########################################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-log.pd,v 1.11 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-LOG 01>>
+<<define: ZXDOC=ZXID Signed and Encrypted Logging Facility>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. The logging module described in this
+document allows various degrees of digital signing and encryption
+to be configured to ensure tamperproofness and confidentiality
+of the logs. Of course such operations come at a cost.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+All ZXID logging is filesystem based and consists mainly of text files
+to which lines are appended. This document describes the filesystem
+layout for other purposes as well (to keep it all in one place, but
+see also zxid-idp.pd). The logging system has also some tactical uses,
+such as detecting duplicate messages and assertions - within validity
+period, they are detected by checking if corresponding blob log
+already exists.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+
+1.2 Logging API
+---------------
+
+The logging API is further described in the
+full <<link:ref/html/index.html: ZXID API Reference>>, which see.
+In summary, the logging functions are
+
+  int zxlog_dup_check(struct zxid_conf* cf, struct zx_str* path, char* logkey);
+
+  int zxlog_blob(struct zxid_conf* cf, int logflag, struct zx_str* path, struct zx_str* blob, char* lk);
+
+  int zxlog(struct zxid_conf* cf, struct timeval* ourts, struct timeval* srcts, char* ipport, struct zx_str* entid, struct zx_str* msgid, struct zx_str* a7nid, struct zx_str* nid, char* sigval, char* res, char* op, char* arg, char* fmt, ...);
+
+of which zxlog() is by far the most used. A typical invocantion could be
+
+  //    1   2  3  4  5  6  7  8  9    10   11     12        13         14
+  zxlog(cf, 0, 0, 0, 0, 0, 0, 0, "N", "B", "ERR", cgi->eid, "Desc %s", foo);
+
+Where
+
+cf     (1)::  ZXID configuration object, used for configuration options
+    and memory allocation
+ourts  (2)::  Timestamp as observed by localhost. Typically the wall clock
+    time. See gettimeofday(3)
+srcts  (3)::  Timestamp claimed by the message to which the log entry pertains
+ipport (4)::  IP address and port number from which the message appears
+    to have originated
+entid  (5)::  Entity ID to which the message pertains, usually the issuer.
+    Null ok.
+msgid  (6)::  Message ID, can be used for correlation to establish audit
+    trail continuity from request to response. Null ok.
+a7nid  (7)::  Assertion ID, if message contained assertion (outermost and first
+    assertion if there are multiple relevant assertions). Null ok.
+nid    (8)::  Name ID pertaining to the message
+sigval (9)::  Signature validation letters
+res   (10)::  Result letters
+op    (11)::  Operation code for the message
+arg   (12)::  Operation specific argument
+fmt, ...  ::  Free format message conveying additional information
+
+
+4 Logging and Audit
+===================
+<<fi: >>
+
+N.B. zxidconf.h contains a wealth of logging related config options, see
+<<link:html/zxid-conf.html: ZXID Configuration Reference>>
+
+> Tip: Your web server also has logging options. You may want
+> to correlate the web server logs with zxid audit logs.
+
+In serious use of SSO and web services it is fundamental that the
+relying party, the SP, WSC, or WSP, archives the digitally signed
+evidence that justifies its actions. Generally this means that, at
+least, the SSO or credential assertions have to be archived. Quite
+often, especially in the WSC world, the entire SOAP response (which
+may be partially signed) needs to be preserved as a proof of an
+authorized action or attested attributes.
+
+To lesser extent, it is also important that the issuing party, the IdP
+(or sometimes the DS, PS, WSC, or WSP), keeps records so that it can
+confirm or refute the claims of the relying party -- in the minimum it
+should be able to refute any obviously false claim and it should be
+able to detect breaches of its own security arrangements,
+e.g. situations where somebody is signing messages in its name
+although internal audit trail demonstrates this to be impossible (it
+is important to be able to compare independent audit trails). The IdP
+audit trail consists of preserving any (signed) request made by anyone
+as well as preserving every (signed) response it makes.
+
+Generally every assertion, request, and response will have its unique
+ID that can be used as the primary key, or filename, for storing it in
+a database. Unfortunately these namespaces<<footnote: Namespace, as
+used here, has nothing to do with XML namespaces.>> are not disjoint
+(it is not very well specified in any of the standards how they
+interact or how wide their uniqueness properties are).<<footnote: Many
+rational implementations use 128 bit random identifiers, which
+statistically guarantees that there will not be collisions, but
+unfortunately we can not rely on other parties to adopt this
+reasonable behaviour.>> The only safe assumption is the pessimistic one: each
+type of object observes a unique namespace only towards its issuer and
+type and hence we need to map such namespaces to subdirectories.
+
+4.1 Filesystem Layout for Logs
+------------------------------
+
+Please consider following layout of the log directory at SP (or IdP,
+but see zxid-idp.pd for more detail):
+
+  /var/zxid/
+   |
+   +-- zxid.conf  Main configuration file
+   +-- pem/       Our certificates
+   +-- cot/       Metadata of CoT partners (metadata cache)
+   +-- ses/       Sessions (see refinement in Sesstion Storage section)
+   `-- log/       Log files, pid files, and the like
+        |
+        +-- issue/
+        |    |
+        |    +-- SHA1NAME/   Evidence issued to entity is kept in directory named after entity ID
+        |    |    |
+        |    |    +-- a7n/   Assertions issued to the given 3rd party, named by AssertionID
+        |    |    +-- msg/   Messages of any type issued to the given 3rd party, named by MessageID
+        |    |    `-- wir/   Wire messages, such as redirects, and posts (e.g. POST SimpleSign)
+        |   ...   
+        |    `-- SHA1NAME2/  Evidence issued to another entity ID
+        |
+        +-- rely/
+        |    |
+        |    +-- SHA1NAME/   Evidence from entity is kept in directory named after entity ID
+        |    |    |
+        |    |    +-- a7n/   Assertions from 3rd parties, named by AssertionID
+        |    |    +-- msg/   Messages of any type from 3rd parties, named by MessageID or sha1
+        |    |    `-- wir/   Wire messages, such as redirects, and posts (e.g. POST SimpleSign)
+        |   ...   
+        |    `-- SHA1NAME2/  Evidence from another entity ID
+        |
+        +-- tmp/             Subdirectory used for atomic operations à la Maildir
+        +-- act              Global activity log
+        +-- err              Global error log
+        `-- debug            Global debugging log
+
+The Audit Bus will log its messages and acknowledgements in its own hierarchy,
+typically under /var/zxid/bus. See Audit Bus documentation (and source) for
+further documentation.
+
+4.2 ZXID Log Format
+-------------------
+
+The log file is line oriented, one record per line irrespective of
+line length, and plain text: binary data is generally omitted (perhaps
+the blob file name will be referenced) or represented as (safe)
+base64. Fields are separated by exactly one space character (0x20),
+except for the last free format field. Records are separated by
+exactly one new line (0x0a) character (never by CRLF sequence, but
+analysis tools should tolerate the CRLF as well due to braindamaged
+OSs that perform conversions unknown to the user).
+
+The log file format supports
+
+1. Plain text logging
+2. Signed plain text logging using either RSA-SHA1 or DSA-SHA1 (more algos?)
+3. Symmetrically encrypted logging using either 3DES or AES (more algos?)
+4. Asymmetrically encrypted logging using RSA (or DSA?)
+5. Signed and symmetrically encrypted logging
+6. Signed and Asymmetrically encrypted logging
+
+All activity and error log file lines have the following format (any one of the 4):
+
+  # comment
+  SE HH CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+  SE HH SIG OURTS SRCTS IP:PORT SUCCEID MID A7NID NID MM VVV RES OP PPP FMT
+  SE HH SSS OURTS SRCTS IP:PORT SUCCEID MID A7NID NID MM VVV RES OP PPP FMT
+
+<<ignore:
+
+PP - 20070929-041314.599 20070929-121312.501 0.0.0.0:0 zIDxx57qGA-qwnsymUf4JD0Er2A - A7NHKJdRVk8P_WNEV-RFqB4 PT7cP8WWiZy3g3jCTDciT G K FEDSSO - -
+
+PP - 20070929-041314.599 - 0.0.0.0:0 - - - - N K GETMD https://s-xtra.liberty-iop.org:8443/zxidgsa?o=B time 237ms
+
+  SE SSS OURTS SRCTS IP:PORT VVV RES OP SUCCENTID MSGID A7NID NID PPP FMT
+
+PP - 20070929-041314.599 20070929-121312.501 0.0.0.0:0 G K FEDSSO zIDxx57qGA-qwnsymUf4JD0Er2A - A7NHKJdRVk8P_WNEV-RFqB4 PT7cP8WWiZy3g3jCTDciT - -
+
+PP - 20070929-041314.599 - 0.0.0.0:0 N K GETMD https://s-xtra.liberty-iop.org:8443/zxidgsa?o=B time 237ms
+
+>>
+
+where
+
+SE:: Log signing and encryption designator. In all cases
+    the actual signing or encryption key is not identified on the log line.
+    This will need to be determined out-of-band, typically using SAML2 metadata.
+
+    PP:: PlainPlain: not signed and not encrypted
+    Rx:: RSA-SHA1 signed (x = any encryption)
+    Dx:: DSA-SHA1 signed
+    Sx:: SHA1 check-summed, but not signed (SSS is the checksum)
+    xA:: Asymmetrically AES encrypted (x = any signing method, same meth for assymmetrical-enc)
+    xT:: Asymmetrically 3DES encrypted
+    xB:: Symmetrically AES encrypted (theoretical: how to safeguard the key?)
+    xU:: Symmetrically 3DES encrypted (theoretical: how to safeguard the key?)
+    xZ:: [RFC1951] zipped (not really encryption)
+    Xxx:: Experimental arrangements.
+
+HH:: HMAC chaining code to previous message, to protect against log line
+    deletion. If not used, this will be "-".
+
+CCCC:: Safe base64 encoded log encryption blob. In case of encryption blob,
+    the rest of the log fields will not appear. Decrypted logline will contain
+    fields starting from SSS.
+
+SIG:: Safe base64 encoded log line signature blob. If no signature, this is
+    a dash ("-").
+
+OURTS:: Our time stamp, format YYYYMMDD-HHMMSS.TTT where TTT are the
+    milliseconds. The time is always in GMT (UTC, Zulutime).
+
+SRCTS:: Source time stamp, format YYYYMMDD-HHMMSS.TTT. If TTT was not
+    originally specified it is represented as "501". The time is always
+    in GMT (UTC, Zulu-time).
+
+IP:PORT:: The IP address and the port number of the other end point (usually
+    client, but could be spoofed, caveat emptor).
+
+SUCCEID:: The SHA1 name of the entity (succinct entity ID without the
+    equals sign).
+
+MID:: Message ID relating to the log line. Allows message to be fetched from
+    the database or the file system. Any relates-to or similar ID is only
+    available by fetching the original message. Dash ("-") if none.
+
+A7NID:: Assertion ID relating to the log line. Allows assertion to be fetched
+    from the database or the file system. If message benefits from multiple
+    assertions, this is the one relating to the outermost one. Other A7NIDs
+    are only available by fetching the original assertion. Dash ("-") if none.
+    If the assertion is encrypted and can not be decrypted, then
+    placehoder "-enca7n-" is used.
+
+NID:: IdP assigned NameID relating to the message, if any. If the NameID is
+    encrypted and can not be decrypted, then placeholder "-encnid-" is used.
+
+MM:: Module or subsystem indicator (e.g. discriminate between SP and IdP
+    that log to same file)
+
+VVV:: Signature validation codes (*** among VVV and RES still avail HJLQYZ)
+    U:: Signature issued ("Underwritten" - getit?).
+    O:: Capital Oh (not zero). All relevant signatures validate (generally assertion)
+    A:: Unsupported or bad signature or message digest algorithm
+    G:: Checksum of XML DSIG does not validate
+    R:: The RSA layer of the signature does not validate
+    N:: No signature detected (or issued) or expected or not applicable.
+    M:: Malformed signature, e.g. SignedInfo or Reference missing
+    I:: Issuer metadata not found (or not in CoT, or corrupt metadata).
+    V:: Assertion validity error (e.g. not in time range or wrong audience)
+    F:: Operation failed or faulted by error code (low level protocol ok)
+    Exx:: Extended signature validation code (generally error or failure)
+    Xxx:: Experimental signature validation code (generally failure)
+
+RES:: Result of the operation.
+    K:: Operation was success
+    C:: Operation failed because client did not provide valid input
+    S:: Operation failed due to server side error
+    P:: Operation failed due to policy or permissions issue
+    T:: Temporary error, client was encouraged to retry
+    B:: Metadata related error (no metadata or parse error in metadata)
+    D:: Redirect or recredential. Client was encouraged to retry.
+    W:: Way point message. Neither success nor failure.
+    Exx:: Extended result (generally error or failure)
+    Xxx:: Experimental result (generally failure)
+
+OP:: The documented operation
+
+    FEDNEW:: New federation was created (usually due to SSO or discovery).
+    FEDSSO:: SP SSO using federated ID was performed
+    TMPSSO:: SP SSO using transient NameID was performed
+    IFSSO::  IdP SSO using federated ID was issued
+    ITSSO::  IdP SSO using transient NameID was issued
+    NEWSES:: SP new session
+    INEWSES:: IdP new session
+    PNEWSES:: WSP new session
+    SLO::    Single Logout was completed (SP)
+    ISLO::   Single Logout completed (IdP)
+    DEFED::  Defederation was performed
+    BADCF::  Server configuration (/var/zxid/zxid.conf) is bad
+    NOMD::   No metadata found after options exhausted (cache, fetch from net)
+    BADMD::  Metadata parsing error
+    BADXML:: XML parsing error in protocol
+    SAMLFAIL:: SAML call failed (often SOAP call)
+    EMISS::  Missing element (in otherwise correct XML)
+    EFILE::  File missing, wrong permissions, corrupt content. Install errors.
+    ECRYPT:: Crypto or signature error, usually due to corrupt or wrong key.
+    EDUP::   Duplicate message. Suspect replay attack.
+    ERR::    Other error
+
+    For WSP the OP is the command verb that was exercised.
+
+    FEDDI::  Discovery: Issue of EPR with assertion using federated NameID
+    TMPDI::  Discovery: Issue of EPR with assertion using transient NameID
+    DIOK::   Summary status of successful discovery on server side
+    VALID::  Message was validated OK and accepted for processing. See zxid_wsp_validate()
+    DECOR::  Message was decorated and issued, see zxid_wsp_decorate()
+    CGIRESP:: Notification of issued message written in local audit trail
+
+    For WSC the OP is the command verb preceded by capital C, e.g. "CQuery".
+
+    Additional OP verbs may need to be specified for protocol substeps like
+    artifact resolution (ART) and direct authentication (AUTH).
+
+    ART:: Artifact resolution request sent with SOAP (1)
+    ANREDIR:: Redirection with Authentication Request
+    LOCLO:: Local Logout (1)
+
+    SLOREDIR::  Redirection with Single Logout Request
+    SLORESREDIR::  Redirection with Single Logout Response
+    MNIREDIR::  Redirection with Manage NameID Request for changing NameID
+    DEFEDREDIR:: Redirection with Manage NameID Request for defederation
+
+    SLOSOAP::   Single Logout Request SOAP call made
+    MNISOAP::   Manage NameID Request for changing NameID SOAP call
+    DEFEDSOAP:: Manage NameID Request for defederation SOAP call
+    SAMLOK::    SAML call OK (often SOAP call)
+
+    Additional OP verbs may need to be specified for other logging operations
+    like regular web access logs (HEAD, GET, POST).
+
+    IDPSEL::   IdP Selection screen is shown (2)
+    MGMT::     Management screen is shown (2)
+    SHOWPC::   Logged in (by SSO or session). Show protected content. arg is sid. (1)
+    SPDISP::   SP Command Dispatch (received POST or redir) (2)
+    IDPDISP::  IdP Command Dispatch (received POST or redir) (2)
+    MYMD::     My metadata was served to requester on the net (1)
+    GETMD::    Getting metadata from net (2)
+    GOTMD::    Got metadata from net (1)
+    BADCGI::   Unknown CGI options (0, but not implemented yet)
+    REDIRDEC:: Redirect or POST Bindong decoding
+    ANREDIR::  Authentication redirect
+    AUTHN::    Authentication
+    SSOA7N::   Issuance of SSO Assertion
+    SSORESP::  Issuance of SSO response
+    DIA7N::    Issuance of Discovery Assertion
+    DIRESP::   Issuance of Discovery response
+
+    KEYGEN::   Auto-Cert generation of a self-signed certificate
+    NEWUSR::   New user creation
+
+    OAUTH2 and UMA related
+
+    DCR:: Dynamic Client Registration
+
+PPP:: Operation dependent one most relevant parameter. Dash ("-") if none.
+
+FMT:: Operation dependent free-form data. May contain spaces. Dash ("-") if
+    none.
+
+4.3 Log Signing and Encryption
+------------------------------
+
+Logs are enabled in the config file zxidconf.h (compile time) by ZXLOG
+macros which provide default values for the log flags in ~struct
+zxid_conf~. Each log flag is a bitmask of signing and encryption
+options. Zero value means no logging. "1" can be used to enable
+plain text logging.
+
+Log signing may help you to argue that log evidence was (not) tampered
+with. You can configure the signing level in the config file
+zxidconf.h (compile time):
+
+0:: no signing (Px)
+2:: sha1 MD only (Sx)
+4:: RSA-SHA1 (Rx)
+6:: DSA-SHA1 (Dx)
+
+For actual signing (options 4 and 6), the private key for signing must
+be available in /var/zxid/pem/logsign-nopw-cert.pem. Note that this
+file need not contain the actual certificate (but it may, it just will
+be ignored).
+
+The weak point of log signing is that if the private key is stolen,
+then someone can create falsified logs and the private key needs
+to be available on the point where the logs are generated - thus
+it is actually quite vulnerable as these might be very forward
+positioned servers.
+
+Log encryption may help to keep the logs confidential.  You can
+configure the configuration level in the config file zxidconf.h
+(compile time):
+
+0x00:: no encryption (xP)
+0x10:: [RFC1951] zip - safe-base64 [RFC3548] (xZ)
+0x20:: RSA-AES (xA)
+0x30:: RSA-3DES (xT)
+0x40:: Symmetric AES (xB)
+0x50:: Symmetric 3DES (xU)
+
+For RSA modes the public key for encryption must be available
+in /var/zxid/pem/logenc-nopw-cert.pem. Note that the +private
+key+ should *NOT* be kept in this file: the whole point of
+public key encryption is that even if your server machine
+is stolen, the bad guys can't access the logs - if the
+private key was anywhere in the stolen machine, they will
+find it.
+
+For symmetric encryption the key is the SHA1 hash of file
+/var/zxid/pem/logenc.key. Obviously this key must be kept secret,
+but see the caveat about stolen machine in the previous paragraph.
+
+All encryption modes, except for 0, [RFC1951] zip compress the log line
+before encryption and safe-base64 encode the result of the
+encryption. All encryption modes, except 0 and 1, prefix the zipped log
+line with 128 bit nonce before encrypting.
+
+The algorithm is roughly (see source for detail):
+
+1. If encrypt, zip the raw log line
+2. If sign, compute the signature (over zipped version if applicable)
+3. Prepend signature blob to log line. If encrypting, the signature
+   is embedded in binary form, otherwise it is embedded in safe-base64 form.
+4. If encrypt, perform the encryption.
+5. If encrypt, apply safe-base64.
+
+The supplied tool zxlogview(1) allows the logs to be decrypted and the
+signatures verified.
+
+  ./zxlogview logsign-nopw-cert.pem logenc-nopw-cert.pem <some-log-lines
+
+Note that for zxlogview(1) to work the logsign-nopw-cert.pem needs to
+contain the public key (and need not contain the privatekey) which is
+the opposite of the situation what zxid(1) needs to see in order to
+sign. Similarly logenc-nopw-cert.pem needs to contain the private key
+(and may contain the certificate, though this will not be used).
+
+> N.B. While encrypted logs are cool, you should evaluate the
+> gain against the incovenience: if you encrypt them, the lesser
+> mortal sysadmins may not be able to debug your installation
+> because they do not know how to decrypt logs or you are not
+> willing to trust them with the keys. For this reason, you
+> can configure the encryption of error log separately.
+
+4.4 Internal Crypto Formats
+---------------------------
+
+For [RFC1951] zipped safe-base64 [RFC3548] output the input to base64 encoding is
+
+  LLSSSSZZZZZZZZZZZZZZ    -- RFC1951 zipped safe-base64
+
+For encrypted modes the input to AES (or other symmetric cipher) is
+
+  NNNNLLSSSSZZZZZZZZZZ    -- Note how nonce is prepended
+
+The NNNN is used as initialization vector and actual encryption
+encompasses LL, SSSS, and ZZZZ.
+
+In RSA-AES the session key is encrypted using RSA and prepended
+to the input for base64 encoding.
+
+  KKEEEECCCCCCCCCCCCCC    -- RSA-AES: note prepended session key
+
+NNNN:: 16 bytes of nonce. This is used as initialization vector
+       for AES or 3DES cipher operated in CBC mode.
+LL::   Bigendian integer representing signature length in bytes.
+       0 means none. Negative values reserved for future use.
+SSSS:: The signature in binary
+ZZZZ:: [RFC1951] zipped safe-base64 [RFC3548] of the payload
+KK::   Bigendian integer representing encrypted session key
+       length in bytes. Negative values are reserved for future use.
+EEEE:: RSA encrypted session key in binary
+CCCC:: Ciphertext from the symmetric cipher, including nonce.
+
+In RSA operations RSA_PKCS1_OAEP_PADDING padding is used (PKCS #1 v2.0).
+
+4.5 Logging Assertions
+----------------------
+
+Logging of assertions is controlled by configuration options
+ZXLOG_ISSUE_A7N and ZXLOG_RELY_A7N. At least ZXLOG_RELY_A7N should be
+turned on for ID-WSF web services to work correctly. Logging relied
+assertions also allows detection of duplicate assertion IDs. Logging,
+or not, of issued assertions does not have any operational effect and
+is only for audit trail purposes.
+
+Assertions are logged in directories depending on issuer's sha1 name.
+
+  /var/zxid/log/rely/ISSUER-SHA1-NAME/a7n/A7N-ID-AS-SHA1
+
+Sha1 names are used to avoid any attack through issuer entity ID or
+the assertion ID being evilly crafted to contain shell metacharacters
+or filesystem significant characters.
+
+Assertions issued by ourselves follow the pattern
+
+  /var/zxid/log/issue/DEST-SHA1-NAME/a7n/A7N-ID-AS-SHA1
+
+If the logfile starts by less-than character ("<" - from XML opening
+tag) then it is in plain text. Encrypted or signed formats will start
+in another way, but are not specified at this time.
+
+N.B. The relied-on assertions may be referenced from session objects
+and used in construction of credentials for ID-WSF based web services
+calls. Therefore the rely directory should not be cleaned too
+aggressively: the assertions must remain there until the referencing
+session expires.
+
+4.6 Logging Requests and Responses
+----------------------------------
+
+Logging of requests and responses is controlled by ZXLOG_ISSUE_MSG and
+ZXLOG_RELY_MSG. Logging, or not, messages has no operational effect
+and is only for audit trail purposes. If logging of relied messages is
+turned on, then it is possible to detect duplicate message IDs.
+
+Request messages are logged in directories depending on issuer's sha1 name.
+
+  /var/zxid/log/rely/ISSUER-SHA1-NAME/msg/REQ-ID-AS-SHA1
+
+Sha1 names are used to avoid any attack through issuer entity ID or
+the assertion ID being evilly crafted to contain shell metacharacters
+or filesystem significant characters.
+
+Responses issued by ourselves follow similar pattern
+
+  /var/zxid/log/issue/DEST-SHA1-NAME/msg/RESP-ID-AS-SHA1
+
+If the logfile starts by less-than character ("<") then it is in
+plain text. Encrypted or signed formats will start in another way,
+but are not specified at this time.
+
+4.7 Session Storage and Bootstraps
+----------------------------------
+
+The ZXID session system serves three purposes:
+
+1. Remember whether user has logged in. The session ID is carried
+   either in a cookie or as part of the URL.
+
+2. Make it possible to perform Single Logout (SLO) and
+   certain federation management tasks.
+
+3. Remember the service end points (EPRs) that were either
+
+   a. supplied as bootstrap attributes in the SSO assertion, or
+
+   b. later discovered
+
+The biggest complication is the requirement to remember the EPRs and
+the solution currently used is to keep them as files in a per session
+directory under the /var/zxid/ses tree.
+
+  /var/zxid/
+   |
+   +-- zxid.conf  Main configuration file
+   +-- pem/       Our certificates
+   +-- cot/       Metadata of CoT partners (metadata cache)
+   +-- ses/       Sessions
+   |    |
+   |    +-- SESID/         Each session has its own directory
+   |         |
+   |         +-- .ses      The session file
+   |         `-- SVC,SHA1  Each bootstrap is kept in its own file
+   |
+   +-- user/      Local user accounts (if enabled)
+   |    |
+   |    +-- SHA1/ Each local user has a directory whose name is SHA1
+   |    |    |    of the user's NameID (idpnid) and IdP Entity ID
+   |    |    +-- .mni     Information needed by Name ID management
+   |    |    +-- PS,SHA1  Long term People Service EPR, kept in its own file
+   |    |    +-- .deleg/  Delegations (invitations) user has issued
+   |    |    |    |
+   |    |    |    +-- DELEG
+   |    |    |    `-- DELEG
+   |    |    |    
+   |    |    +-- .access/ Invitations user has received (delegations to access other's resources)
+   |    |    |    |
+   |    |    |    +-- ACCESS
+   |    |    |    `-- ACCESS
+   |    |    |
+   |    |    +-- .bs/     Local user attribute directory
+   |    |    |    |
+   |    |    |    `-- .at Local user attributes as LDIF (see zxid_ses_to_pool())
+   |    |    |    
+   |    |    `-- .pw      User's local password if any (usually none)
+   |    |
+   |    `-- SHA1b -> ../uid/Sue   SHA1 can also be symlink to local account
+   |
+   +-- uid/       Local user ID (local login name) to SHA1 mapping
+   |    |
+   |    +-- joe -> ../user/SHA1   Symlink points to the real user directory
+   |    +-- Sue/   Local user can have directory whose name is the uid
+   |         |
+   |         +-- .mni     Information needed by Name ID management
+   |         `-- .pw      User's local password if any (usually none)
+   |    
+   |
+   `-- log/       Log files, pid files, and the like
+
+4.7.1 Session directory
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The session ID is an unguessable (but see ID_BITS configuration
+options) safe base64 encoded pseudorandom number. Unguessability
+ensures that the session can only be crated via SSO.
+
+The service EPRs are XML documents whose name is composed from
+two components
+
+  SVC,SHA1
+
+SVC:: The service type URI, with file system unsafe characters
+    (e.g. "/" and ",") folded to underscore ("_"). Purpose of
+    the SVC is to allow quick identification, without opening,
+    of the files that contain EPRs for a given service type.
+    Only first 200 bytes of the service type are used.
+SHA1:: safe base64 encoded SHA1 hash of the content of the EPR. The
+    purpose of the SHA1 hash is to produce a unique identifier
+    so that two distinct EPRs for same service will have
+    different file names.
+
+The session directory also contains .ses file. The first line
+is as follows (still subject to change, Oct 2007):
+
+  NameID|a7n-ref
+
+The pipey symbol (|) is a field separator. Future versions
+may define further fields beyound these original two. All other
+lines are reserved for future expansion. Fields:
+
+NameID:: NameID, extracted during SSO
+a7n-ref:: Filesystem path to the SSO assertion.
+
+4.7.2 User directory (user/)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+User directories are used for storage of +local account+ information.
+Since many web applications, to which ZXID may be integrated, already
+have their own local user storage, the ZXID user directory is optional,
+see USER_LOCAL configuration option.
+
+IdP initiated ManageNameID requests depend on local user accounts, so
+if you want this to work you need to enable them. Local user account
+management may be useful on its own right if your application does not
+yet have such system. If it has, you probably want to continue to use the
+application's own system.
+
+Another functionality that needs the local user accounts is delegation
+using people service. In this case the invitations / delegations and
+PS-EPR of the user are remembered.
+
+Each user is represented by a directory whose filename is safe base64
+of the SHA1 hash of the user's NameID and the IdP's Entity ID. The directory can actually
+be a symlink to some other place, such as uid/ directory, see below.
+
+Inside the directory, a file called .mni captures the information
+needed for NameID Management. It is expected that other files
+about the user may be populated to capture other aspects. Your own
+applications could even create files here.
+
+The first line of the .mni file is as follows
+
+  FMT|IDPEnt|SPqual|NameID|MNIptr
+
+The pipey symbol (|) is a field separator. Future versions
+may define further fields beyound these original two. All other
+lines are reserved for future expansion. Fields:
+
+FMT:: NameID Format
+IDPent:: IdP entity ID that qualifies the NameID (namespace if you like).
+    This usually corresponds to the NameQualifier of <NameID>
+SPqual:: SP entity or affilitation ID (optionally) sent by IdP. This
+    further qualifies the namespace of the Name ID.
+NameID:: NameID of the account
+MNIptr:: If NameID Management has been used to change the
+    IdP assigned NameID, then the new NameID. There will be
+    a local user account directory for the new NameID. Consider
+    this as a sort of symlink functionality.
+
+4.7.3 Local UID Directory (uid/)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The main purpose of the local uid/ directory is to support local
+logins. Since the main objective of ZXID is to support Single Sign On,
+there should be little need to support local logins. Hence uid/
+directory is optional.
+
+Often uid/ directory is implemented by providing symlinks to the
+user/ directory. In this case uid/ only acts as an index or
+mapping from local UID to the safe base64 encoded SHA1 of the IdP
+assigned Name ID, see above.
+
+4.7.4 IdP Use of Local UID Directory (uid/)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+zxididp uses local uid/ directory to implement the IdP logins and
+to store users federations, bootstraps, and attributes.
+
+  /var/zxid/
+   |
+   +-- idpzxid.conf  Main configuration file
+   +-- idppem/       Our certificates
+   +-- idpcot/       Metadata of CoT partners (metadata cache)
+   +-- idpses/       Sessions
+   |    |
+   |    +-- SESID/         Each session has its own directory
+   |         |
+   |         +-- .ses      The session file
+   |         `-- SVC,SHA1  Each bootstrap is kept in its own file
+   |
+   +-- idpuid/       Local user ID (local login name) to SHA1 mapping
+   |    |
+   |    +-- JOE/  Local user has directory whose name is the login uid
+   |    |    |
+   |    |    +-- .log      Log of operations regarding the user
+   |    |    +-- .pw       User's local password
+   |    |    +-- .yk       User's yubikey shared aes128 secret in hex
+   |    |    +-- .ykspent/ Cache of already used One TIme Passwords
+   |    |    |    |
+   |    |    |    `-- OTP  File name is the spent Yubikey ticket (w/o uid)
+   |    |    |    
+   |    |    +-- .bs/      Directory of bootstraps to be included
+   |    |    |    |
+   |    |    |    +-- .at         Attributes to be included in each SSO
+   |    |    |    `-- SVC,SHA1    Bootstrap for a service
+   |    |    |
+   |    |    `-- SP,SHA1/  One directory for each SP user is federated with
+   |    |         |
+   |    |         +-- .mni        Federated name id to be used with this SP
+   |    |         +-- .at         Attributes to be included for this SP
+   |    |         `-- SVC,SHA1    Bootstrap to be included for this SP
+   |    |
+   |    `-- .all/ Template used for all users
+   |         |
+   |         +-- .bs/      Directory of default bootstraps to be included
+   |         |    |
+   |         |    +-- .at         Attributes to be included in each SSO
+   |         |    `-- SVC,SHA1    Bootstrap for a service
+   |         |
+   |         `-- SP,SHA1/  One directory for each SP
+   |              |
+   |              +-- .at         Attributes to be included for this SP
+   |              `-- SVC,SHA1    Bootstrap to be included for this SP
+   |
+   +-- idpnid/       Index of federated NameIDs, to map to uid
+   |    |
+   |    `-- SVC,SHA1    Bootstrap to be included for this SP
+   |         |
+   |         `-- NID    Content of the file is uid
+   |
+   +-- idpdimd/
+   |    |
+   |    `-- SVC,SHA1    Discovery MD registration for a service
+   |
+   `-- idplog/       Log files, pid files, and the like
+
+When generating SSO assertion, the attributes are collected as follows:
+
+1.  LDIF at /var/zxid/uid/JOE/.bs/.at
+2.  LDIF at /var/zxid/uid/JOE/SP,SHA/.at
+3.  LDIF at /var/zxid/uid/.all/.bs/.at
+4.  LDIF at /var/zxid/uid/.all/SP,SHA/.at
+
+As of version 0.33 (20090904) the attributes are rendered
+singlevalued. If multiple occurrances of an attribute happen,
+the first instance is used and others ignored. However, in
+a future version, we expect to support multivalued attributes.
+
+The order for attaching bootstrap attributes is similar.
+
+Yubikey support works by using the initial part of the ticket (passed
+in as user field) as uid and the latter as the ticket proper. The uid
+part is used to locate correct directory. Mapping from yubikey modhex
+to real UID is done by creating a symlink. The AES128 shared (between
+yubikey token and IdP) key is kept in the .yk file. As this is not a
+password has, but rather directly the shared secret, it requires
+rigorous approach to the filesystem security. The fact that .pw and
+.yk are separate files caters for the possibility of user
+authenticating either by yubikey or by password. By default yubikey
+is one factor authentication (in fairly secure and very convenient
+form). If two factor authentication is desired, the password component
+should be prefixed to the UID component, i.e. first user types PIN
+and then presses yubikey to add UID and ticket.
+
+TLS Client Certificate authentication of users has not been
+implemented yet, but in any case would be mainly implemented by
+configuration of web server to request such certificate and verify
+it. By the time zxid gets called, the client cert authentication will
+already have happened. HTTP Basic authentication works in similar way
+and we make no attempt to cater for it, although it can be used of
+configured separately (in the traditional way).
+
+zxpasswd(8) is a user provisioning tool that allows creation of
+new accounts as well as manipulation of .pw and .yk files.
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+96 License
+==========
+
+Copyright (c) 2010-2011 Sampo Kellomäki (sampo@iki.fi), All Rights Reserved.
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+<<zxid-ref.pd>>
+
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+test13 toimii OK
+<<fi: >>

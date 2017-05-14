@@ -1,0 +1,32 @@
+Revision history for ZHOUYI-ZhanPu
+
+0.09    2016-12-07/18
+
+* doc dity 
+
+0.07    2016-12-05/17
+* Code dity .
+
+0.06    2016-11-04/21
+
+* Code dity .
+* Add example and plugin module for webqq. 
+
+0.05    2016-11-04/21
+
+* change given when in order to support high perl version.
+
+0.04    2016-11-04/20
+
+* add tuan and xanig part.
+d character encoding.
+* fix example outing garbled.
+
+0.03    2016-10-10/11
+
+* some fixes of function  and output changes
+
+0.01    2016-10-09/17
+        
+* A util of ZHOUYI modules，divination to judge for the future.
+

@@ -1,0 +1,15 @@
+%IDType:	 base(xs:string) ;
+%IDReferenceType:	 base(xs:string) ;
+%StatusType:
+  Status*
+  @code	 -> %xs:string
+  @ref?	 -> %IDReferenceType
+  @comment?	 -> %xs:string
+  ;
+Status	 -> %StatusType
+%EmptyType:	 base(xs:anyType) ;
+Extension	 -> %extensionType
+%extensionType:
+  any+  ns(##other)  processContents(lax)
+  ;
+@consent	 -> %xs:string

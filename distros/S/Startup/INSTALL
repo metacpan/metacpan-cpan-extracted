@@ -1,0 +1,22 @@
+
+To install the package, assure to have write permissions for you Perl 
+Library directories. Then do the lines:
+
+   perl Makefile.PL
+
+   make install
+
+This will install the Startup module to your system and also the utility
+and demonstration program:
+
+   replace - use perls regular expressions on a list of files
+
+If you need assure where to install executables, library files and manpages, 
+install the distribution with the PREFIX option, like:
+
+   perl Makefile.PL PREFIX=/usr/local/
+
+   make install
+
+Martin
+

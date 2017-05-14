@@ -1,0 +1,48 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: script Filter</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fquote.html">Previous Topic</A> | <A HREF="fsdf.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>5.26. script Filter</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !block <STRONG>script</STRONG>
+  ...
+  !endblock
+</PRE>
+<P>See <A HREF="in_filif.html">Understanding Filter Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>script</EM> filter can be used to embed arbitrary Perl source code within an SDF document. This is useful for many things including:</P>
+<UL>
+<LI>declaring Perl subroutines implementing SDF filters and macros
+<LI>accessing databases
+<LI>updating log files.</UL>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<PRE>
+<B>!block</B> script
+printf STDERR <TT>&quot;Hello world!\n&quot;</TT>;
+<B>!endblock</B>
+</PRE>
+<HR>
+<H2><A NAME="Limitations &amp; Future Directions">Limitations &amp; Future Directions</A></H2>
+<P>As arbitrary sections of <A HREF="http://www.perl.com/perl/index.html">Perl</A> can be included and executed, the code can potentially cause harm. At the moment, the ability to update external files from within an SDF document is seen as a <EM>feature</EM>. However, a version of SDF which restricts the embedded Perl to &quot;safe&quot; operations would be nice.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_filt.html">Parent Topic</A> | <A HREF="fquote.html">Previous Topic</A> | <A HREF="fsdf.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

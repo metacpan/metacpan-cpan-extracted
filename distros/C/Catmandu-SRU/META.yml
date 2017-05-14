@@ -1,49 +1,33 @@
 ---
 abstract: 'Catmandu module for working with SRU data'
 author:
-  - 'Wouter Willaert, C<< <wouterw@inuits.eu> >>'
+  - 'Wouter Willaert <wouterw@inuits.eu>'
 build_requires:
-  Module::Build: '0.28'
-  Test::Exception: '0'
-  Test::More: '1.001003'
-  Test::Simple: '1.001003'
-  XML::XPath: '1.13'
+  Software::License: 0
+  Test::Exception: 0
+  Test::More: 0
 configure_requires:
-  Module::Build: '0.28'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Catmandu-SRU
-no_index:
-  directory:
-    - t
-    - xt
-    - inc
-    - share
-    - eg
-    - examples
+provides:
+  Catmandu::Importer::SRU:
+    file: lib/Catmandu/Importer/SRU.pm
+    version: 0
+  Catmandu::SRU:
+    file: lib/Catmandu/SRU.pm
+    version: 0.0101
 requires:
-  Catmandu: '0.9204'
-  Furl: '0.41'
-  Moo: '1.005000'
-  URI::Escape: '1.60'
-  XML::LibXML::Simple: '0.91'
-  XML::Struct: '0.16'
-  YAML::XS: '0.34'
+  Catmandu: 0.0302
+  Furl: 0.41
+  Moo: 1.000003
+  XML::LibXML::Simple: 0.91
   perl: v5.10.1
 resources:
-  bugtracker: https://github.com/LibreCat/Catmandu-SRU/issues
-  homepage: https://github.com/LibreCat/Catmandu-SRU
-  repository: https://github.com/LibreCat/Catmandu-SRU.git
-version: '0.039'
-x_contributors:
-  - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
-  - 'Jakob Voss <jakob@nichtich.de>'
-  - 'Jakob Voss <voss@gbv.de>'
-  - 'Johann Rolschewski <rolschewski@gmail.com>'
-  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
-  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
-  - 'wouterw <wouter.willaert@gmail.com>'
+  license: http://dev.perl.org/licenses/
+version: 0.0101

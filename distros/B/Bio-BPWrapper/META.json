@@ -8,7 +8,7 @@
       "R. Bernstein"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4218",
    "license" : [
       "perl_5"
    ],
@@ -25,12 +25,12 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4211"
+            "Module::Build" : "0.4214"
          }
       },
       "runtime" : {
          "requires" : {
-            "Bio::Root::Version" : "v1.6.924",
+            "Bio::Root::Version" : "1.006924",
             "perl" : "v5.10.0",
             "rlib" : "0.02"
          }
@@ -45,26 +45,20 @@
    "provides" : {
       "Bio::BPWrapper" : {
          "file" : "lib/Bio/BPWrapper.pm",
-         "version" : "1.04"
+         "version" : "1.11"
       },
       "Bio::BPWrapper::AlnManipulations" : {
          "file" : "lib/Bio/BPWrapper/AlnManipulations.pm"
-      },
-      "Bio::BPWrapper::GetoptLong" : {
-         "file" : "lib/Bio/BPWrapper/GetoptLong.pm",
-         "version" : "2.39"
-      },
-      "Bio::BPWrapper::GetoptLong::CallBack" : {
-         "file" : "lib/Bio/BPWrapper/GetoptLong.pm"
-      },
-      "Bio::BPWrapper::GetoptLong::Parser" : {
-         "file" : "lib/Bio/BPWrapper/GetoptLong.pm"
       },
       "Bio::BPWrapper::PopManipulations" : {
          "file" : "lib/Bio/BPWrapper/PopManipulations.pm"
       },
       "Bio::BPWrapper::SeqManipulations" : {
-         "file" : "lib/Bio/BPWrapper/SeqManipulations.pm"
+         "file" : "lib/Bio/BPWrapper/SeqManipulations.pm",
+         "version" : "1.0"
+      },
+      "Bio::BPWrapper::TreeManipulations" : {
+         "file" : "lib/Bio/BPWrapper/TreeManipulations.pm"
       }
    },
    "release_status" : "stable",
@@ -76,5 +70,6 @@
          "url" : "https://github.com/bioperl/bp-utils"
       }
    },
-   "version" : "1.04"
+   "version" : "1.11",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

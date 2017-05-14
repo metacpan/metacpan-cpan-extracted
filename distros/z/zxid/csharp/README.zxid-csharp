@@ -1,0 +1,19 @@
+README.zxid-csharp
+$Id: README.zxid-csharp,v 1.1 2008-05-13 15:09:42 sampo Exp $
+
+This is the C# module for using libzxid. This module is
+tightly integrated into the main ZXID project and distribution.
+
+Please see for further information
+
+  zxid.org
+  zxid/README.zxid
+
+Install
+
+  cd zxid-X.Y
+  make dep
+  make              # creates libzxid
+  make csharpzxid
+
+--Sampo

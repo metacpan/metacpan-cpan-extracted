@@ -1,6 +1,5 @@
 package urpm::util;
 
-# $Id: util.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
 use Exporter;
@@ -18,6 +17,7 @@ our @EXPORT = qw(add2hash_
     file2absolute_file
     file_size
     find
+    formatList
     intersection
     max
     member 
@@ -36,8 +36,6 @@ our @EXPORT = qw(add2hash_
     untaint
     wc_l
 );
-
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
 
 sub min  { my $n = shift; $_ < $n and $n = $_ foreach @_; $n }
 sub max  { my $n = shift; $_ > $n and $n = $_ foreach @_; $n }
@@ -219,11 +217,12 @@ sub append_to_file {
 
 1;
 
-__END__
 
 =head1 NAME
 
 urpm::util - Misc. utilities subs for urpmi
+
+Mostly a subset of L<MDK::Common>
 
 =head1 SYNOPSIS
 

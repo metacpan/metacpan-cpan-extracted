@@ -1,0 +1,41 @@
+{
+  'module' => {
+    'program' => 'uplug-malt',
+    'location' => '$UplugBin',
+    'name' => 'MaltParser (Swedish)',
+    'stdout' => 'text'
+  },
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#     'encoding' => 'iso-8859-1',
+      'status' => 'malt',
+    }
+  },
+  'parameter' => {
+    'parser' => {
+      'model' => 'swemalt',
+    },
+  },
+  'required' => {
+    'text' => {
+      'words' => undef
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+      'in' => 'input:text:file',
+      'out' => 'output:text:file',
+      'm' => 'parameter:parser:model',
+      'j' => 'parameter:java',
+    }
+  },
+}

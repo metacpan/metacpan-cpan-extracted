@@ -1,0 +1,8 @@
+0.004     2014-05-25 15:01:48-07:00 America/Los_Angeles
+	Fixed issue where raw called method in Catalyst::Model::DBIx::Raw, and fixed argument passing in AUTOLOAD.
+
+0.003     2014-05-17 19:55:47-07:00 America/Los_Angeles
+	Fixed documentation again
+
+0.002     2014-05-17 19:51:37-07:00 America/Los_Angeles
+	Fixed documentation

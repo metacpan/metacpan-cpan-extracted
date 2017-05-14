@@ -1,0 +1,381 @@
+Questions and answers about the browser architecture
+(with help from Thomas Dudziak and Bernhard Reiter):
+
+---
+Q. I want to help develop FreeWRL. Where do I start?
+
+A. 
+Ask me (lukka@fas.harvard.edu). I am the most up-to-date 
+resource on open problems (development is quick so it's better
+to coordinate than duplicate effort).
+
+If you need background material,
+
+VRML:
+ http://www.vrml.org, also get some good book if you need an introduction.
+
+Perl:
+ http://www.perl.com  is the only place you'll ever need
+ to look: it contains links, book reviews and everything else.
+
+OpenGL: (the API used for rendering)
+ http://www.opengl.org  -- links, book reviews, everything.
+
+Computer graphics in general:
+ e.g. comp.graphics FAQ
+ ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/comp/graphics/ 
+ 
+If you have additional recommendations for this section, please email me.
+
+---
+Q.  I was just curious about one thing : What is the benefit of using Perl
+ instead of a more let's say "usual" choice like C/C++ ? Why do you use
+ it ? To my experience, the code is even more complicated than C-source
+ ($,@,% don't contribute to a good readability).
+
+A. Coding time. Do you really think one person could have finished
+coding it all in this time, while trying to cope with random segfault,
+long recompiles and whatever. My secret plan is trying to first achieve
+spec compatibility and then maybe translating some of the modules
+to other languages.
+
+Perl is truly ideal for prototyping software. You get your things done
+*quickly*. E.g. make a program that prints out its command-line arguments
+separated by commas:
+
+	print join ',',@ARGV;
+
+whereas with c, you have to do loops, test when you need to print the comma
+and whatever.
+
+Some people say Perl is like sex: before you've tried it, you don't know
+what the fuss is all about, after you know it, you don't want to be without ;)
+
+Just a simple example is the event structure: in VRMLNodes.pm, I just
+do 
+
+	$f->{blahblah} = [3,1,2];
+
+to send out a "blahblah" event from the node automatically to all
+nodes ROUTEd or ISed from it.
+
+The '$%@/' are explained in the perl documentation -- after a couple
+of days/weeks, they become a second nature, like 'a,the,...' in English.
+
+
+---
+Q. What's the overall structure of FreeWRL?
+
+A.
+
+Parser
+  |
+  V
+Scene Manager  .... Event model, node actions
+  |                              |
+  V                              V
+Renderer                   Script interfaces
+
+
+---
+
+Q. How do you parse the file, ie when and how do you create "objects" (in
+terms of VRML)
+
+A. The file Parser.pm contains the top-level parse loop,
+the function VRML::Parser::parse is the key. The way parsing works
+is that the parser reads the file and calls the VRML::Scene object
+which was passed to it to create nodes and such while parsing.
+E.g. if you give the parser a file like
+Transform {
+	translation 1 0 0
+	children [
+		Shape { geometry Box { } }
+	]
+}
+
+Then the parser calls the functions in the scene object like
+(in exact perl syntax, i.e. [1,0,0] is an anonymous array etc.)
+All types are translated into native Perl types for easy access.
+
+$a = $scene->new_node("Box", {});
+$b = $scene->new_node("Shape", {geometry => $a});
+$c = $scene->new_node("Transform", {translation => [1,0,0], 
+	children  => [$b]}); # Notice children is an array reference (MFNode)
+$scene->topnodes([$c]); # Set which nodes were top-level in the scene.
+
+---
+
+Q. How do you handle PROTOs ?
+
+A. This is currently a bit complicated and messy, I hope to rewrite it
+a little later. The important file is Scene.pm
+
+Once the scene has been created (this needs to be changed later
+due to bindable nodes.. this is the way it is currently implemented),
+I call the $scene->make_executable method. This method iterates through
+all the nodes of the scene and expands prototypes by placing the prototype
+in the {ProtoExp} member of the node structure. VRML::Node::make_executable 
+is where this happens. 
+
+Prototypes (and their instances) are actually represented internally
+by the same structure that scenes are represented by (VRML::Scene).
+This structure takes care of the name space of the instance.
+
+---
+
+Q. What is the internal handling of events ?
+
+A. This happens in Events.pm (duh ;) as well as Scene.pm.
+
+Basically, the function VRML::EventMachine::propagate_events (Events.pm)
+is called at each event timestamp.  This function first gets the
+initial events from nodes and from mouse events, propagates the
+event cascade, calls eventsProcessed and continues this until
+no events remain.
+
+Take note of the {RFields} member of a node -- this is a *tied*
+hash (which looks like a normal perl hash (associative array) on top
+but assignments to members and getting values of members translate
+to function calls) tied with the class VRML::FieldHash (Scene.pm).
+This takes care of IS and USE/DEF when getting/setting field values
+as well as generating events when setting field values. The line
+
+	$node->{EventModel}->put_event($node, $k, $value);
+
+in the function VRML::FieldHash::STORE causes the new event to be queued
+to be executed at the next step of the current event cascade.
+
+Nodes receive events by the function VRML::Node::receive_event (Scene.pm)
+which calls the function for that particular node (defined in VRMLNodes.pm)
+to receive that event.
+
+
+---
+
+Q. Where and how is JavaScript/VrmlScript/Java connected ?
+
+A.  Continuing from the previous question, VRMLNodes.pm is the place where
+the different node types receive events. In there, the Script node 
+definition is the place to check. For Perl scripts, evaluation is 
+done directly, compiling the subs into the {ScriptScript} member of 
+the node, and for both JavaScript and Java, an object (the {J} member)
+is used to deliver events. 
+
+The JavaScript interface is in the JS/ subdirectory and uses code 
+from Mozilla(R/TM/whatever). The file JS.xs in that file is generated
+by genJS.pl (see later about code generation)
+
+FreeWRL currently interprets 'vrmlscript:' to be exactly equivalent
+to 'javascript:'.
+
+The Java interface resides in VRMLJava.pm (Perl side) 
+and the java/ subdirectory (Java side). The interface is currently
+through named pipes, with an ascii protocol for communication to make
+it as easy as possible to use java. The file VRMLJava.pm spawns the
+java interpreter and manages the protocol to use for communication.
+
+---
+
+Q. What is VRMLC.pm, genJS.pl etc?
+
+A. FreeWRL uses extensive code generation to make programming convenient.
+Instead of having to declare and use functions in many places and remember
+everywhere what is happening at every other place, I only need to 
+declare/define the way a node is rendered / renders its children in one
+place. Also, the actual C types used to represent fields may change later
+if I interface with other C modules so it is good to be able to change
+them later. 
+
+The way it works is simply that VRMLC.pm is a perl script (most
+of the action happens at the end of the file) that prints the files
+VRMLFunc.xs and VRMLFunc.pm as a result of running it. Some of the C code
+is also in VRMLRend.pm. If the structure of these files is unclear, please
+ask me.
+
+---
+
+Q. How do you handle Nodes for JavaScript and other languages?
+
+A. There is a package VRML::Handles in Browser.pm which provides 
+simple string handles for nodes and ways to release them so that 
+the garbage collection mechanisms of the different languages can be
+unified without requiring scripting languages to be in the same process
+and handle pointers.
+
+Because that package stores a reference to the object in question,
+that object will not be freed before the handle is released.
+
+---
+
+Q. Where is the implementation of the routines for the Browser object?
+
+A. In the file "Browser.pm", naturally ;) -- each scripting interface
+calls these routines for the browser object.
+
+---
+
+Q. How do you handle bindable nodes?
+
+A. In Scene.pm. When a node receives a set_bind event, if checks
+for the special case in VRML::Node::receive_event and calls
+VRML::Scene::set_bind in the same file, which manages the stack.
+
+
+
+---
+Q. On www-vrml: Steve Sycamore asking (>)
+
+> Here are some thoughts about how you might be able to leverage the work you've
+> done into a group which wants to have a generic, high performance, OS independ
+ent,
+> spec compliant and GPL'ed VRML plug-in:
+
+Thank you for the thoughts!
+
+> If you really believe Freewrl has acceptable performance, then publish some
+> performance specs comparing it to CP 2.1 and WV 2.1.
+
+Tell me how to make the comparation?
+It's mighty fast on our department's SGI, somewhat slower on my laptop
+(but that's due to no OpenGL acceleration).
+
+Is there a benchmark somewhere I could try?
+
+There are several optimizations still that I haven't done yet -
+primary goal is compliance, performance is only second.
+
+> Publish, in at least brief form, the general architecture of Freewrl, especial
+ly noted
+> the high level component design.  Show how a plan to replace Perl code in
+> componentized modules with C++ or Java or both could be feasible!
+
+It's at the FreeWRL home page, under "ARCHITECTURE".
+http://www.fas.harvard.edu/~lukka/freewrl
+
+The plan: the APIs between the different parts of the browser are simple
+and don't transfer pointers, just names and VRML field values. 
+Interfaceing Perl with other languages (C, ...) is trivial 
+(just make a slightly modified function declaration and you can call it
+from Perl).
+
+> Show other frameworks which Mike Fletcher has identified could leverage parts
+> of Freewrl or vice versa.
+
+someone could take the parser and event model of freewrl (I still need
+to clean up the interface between event model/backend a little, there
+are two little warts there but nothing serious) and write a new backend
+(e.g. in Direct3D), throw them together and have a browser.
+
+The backend needs to be able to render either VRML97 nodes, without motion
+or polygonal versions of them (e.g. Extrusion having been converted to
+polygons).
+
+> Maybe it makes sense to have Freewrl be the scaffolding which allows parts of
+> a browser to be immediately available while other parts are being developed an
+d
+> tested.
+
+I think it does. But I'm biased ;)
+
+
+
+================================================...
+
+Basic explanations of the architecture of the browser.
+
+Node types are in VRMLNodes.pm
+Parser.pm parses the code
+Scene.pm takes care of the scene graph, PROTOs, DEF/USE, IS etc.
+Events.pm takes care of all moving parts
+GLBackEnd.pm renders and takes mouse events.
+Viewer.pm takes care of navigation and viewpoint.
+
+Each node has two different field hashes:
+The member Fields is a normal hash with values that can refer
+to IS'ed values, DEF/USE structs etc.
+The member RFields is a tied hash which automatically dereferences
+these and sends the proper events whenever a member is stored.
+
+Assignment to individual members of fields is currently not allowed.
+
+============================
+
+There are three parts to this browser: the parser, the scene/event processor
+and the backend (renderer).
+
+It should be possible to easily replace any of these parts and/or
+create character stream (e.g. socket) interfaces between the parts
+and then use parts in other languages that communicate with parts
+of this browser.
+
+=============================
+Rendering backends are defined in a simple fashion:
+
+1. there shall be implementations of all the VRML97 nodes
+that render something or have children (group, transform,
+geometry,...)
+
+2. the backend is used via the functions
+
+  # Initialization
+  $a = VRML::BackEnd()...
+
+  # Creating a new node
+  $n = $a->new_node("Cone", {a => b...}); 
+
+  # Setting fields in a node
+  $a->set_fields($n, {a => b, c => d}); 
+
+  # Setting bindable nodes
+  $a->set_root($n);
+  $a->set_bindable(Which, $node);
+
+  # HMM??
+  $a->set_sensitive($n,click,over,sub); # Are mouse hits / overs at $n 
+  				    # to be recorded?
+  $a->delete_node($n); # It can be assumed that nothing will refer to $n
+		       #	at this point.
+
+For field types, the usual perl representations are used, except
+for SFNode, (also inside MFNode) where the id received from the backend ($n)
+is used.
+
+By defining the backend in this way, we will be able to call it over
+a network or process limit or whatever.
+
+The ids can then be C pointers or whatever.
+
+
+=============================
+Parser interface: the parser shall use the following routines:
+Here, $sc is either a file or a prototype.
+
+  # Only explicitly specified fields provided
+  $n = $sc->new_node("Cone", {a => b, ...}) 
+
+  # Finally, set the top-level nodes of the file.
+  $sc->topnodes([$node1,$node2,...]); # Set the top-level nodes
+
+  # DEF/USE
+  $n = $sc->new_def("FOO", $node);
+  $n = $sc->new_use("FOO");
+
+  # ROUTE
+  $sc->new_route("FOO","bar","BAZ","quux");
+
+  # Prototypes:
+  $pr = $sc->new_proto("MyProto",{par => [ftype,type,value]});
+  $pr->new_node(...); # Construct the prototype interface
+  $pr->new_route(...); # Construct the prototype interface
+  $pr->topnodes(...); # Set the top-level nodes
+
+  + SOME
+
+This interface will make it easy to define new VRML formats
+(e.g. compressed binary) and plug them in.
+
+===============================
+Currently inside the scenegraph: PROTO -> copy of implementation
+as well as event model.
+

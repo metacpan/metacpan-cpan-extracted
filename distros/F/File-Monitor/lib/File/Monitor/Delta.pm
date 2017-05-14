@@ -6,243 +6,231 @@ use Carp;
 
 use base qw(File::Monitor::Base);
 
-our $VERSION = '1.00';
+use version; our $VERSION = qv('0.0.2');
 
 my %TAXONOMY;
 
 BEGIN {
-  my $created = sub {
-    my ( $this, $old, $new, $key ) = @_;
-    return ( !defined $old->{mode} && defined $new->{mode} ) || 0;
-  };
+    my $created = sub {
+        my ($this, $old, $new, $key) = @_;
+        return (!defined $old->{mode} && defined $new->{mode}) || 0;
+    };
 
-  my $deleted = sub {
-    my ( $this, $old, $new, $key ) = @_;
-    return $created->( $this, $new, $old, $key );
-  };
+    my $deleted = sub {
+        my ($this, $old, $new, $key) = @_;
+        return $created->($this, $new, $old, $key);
+    };
 
-  my $num_diff = sub {
-    my ( $this, $old, $new, $key ) = @_;
-    return ( $new->{$key} || 0 ) - ( $old->{$key} || 0 );
-  };
+    my $num_diff = sub {
+        my ($this, $old, $new, $key) = @_;
+        return ($new->{$key} || 0) - ($old->{$key} || 0);
+    };
 
-  my $bit_diff = sub {    # XOR
-    my ( $this, $old, $new, $key ) = @_;
-    return ( $new->{$key} || 0 ) ^ ( $old->{$key} || 0 );
-  };
+    my $bit_diff = sub { # XOR
+        my ($this, $old, $new, $key) = @_;
+        return ($new->{$key} || 0) ^ ($old->{$key} || 0);
+    };
 
-  my $nop = sub {         # Just return value
-    my ( $this, $old, $new, $key ) = @_;
-    return $this->{delta}->{$key};
-  };
+    my $nop = sub { # Just return value
+        my ($this, $old, $new, $key) = @_;
+        return $this->{delta}->{$key};
+    };
 
-  %TAXONOMY = (
-    change => {
-      created  => $created,
-      deleted  => $deleted,
-      metadata => {
-        time => {
-          mtime => $num_diff,
-          ctime => $num_diff,
-        },
-        perms => {
-          uid => $num_diff,
-          gid => $num_diff,
-
-          # Bit delta
-          mode => $bit_diff,
-        },
-
-        # Value delta
-        size => $num_diff,
-      },
-      directory => {
-
-        # List delta
-        files_created => $nop,
-        files_deleted => $nop
-      }
-    }
-  );
-
-  my @OBJ_ATTR = qw(
-   dev inode mode num_links uid gid rdev size mtime ctime
-   blk_size blocks error files
-  );
-
-  my $IS_ARRAY = qr/^files_/;
-
-  no strict 'refs';
-
-  # Accessors for old/new attributes
-  for my $pfx ( qw(old new) ) {
-    for my $attr ( @OBJ_ATTR ) {
-      my $func_name = "${pfx}_${attr}";
-      *$func_name = sub {
-        my $self = shift;
-        croak "$func_name is read-only" if @_;
-        return $self->{ $pfx . '_info' }->{$attr};
-      };
-    }
-  }
-
-  # Accessors for deltas are named after the leaf keys in the taxonomy
-  my @work = \%TAXONOMY;
-  while ( my $obj = shift @work ) {
-    while ( my ( $n, $v ) = each %$obj ) {
-      my $is_name = "is_$n";
-      *$is_name = sub {
-        my $self = shift;
-        return $self->is_event( $n );
-      };
-
-      if ( ref $v eq 'CODE' ) {
-
-        # Got a leaf item -> make an accessor
-        my $func_name = $n;
-        if ( $n =~ $IS_ARRAY ) {
-          *$func_name = sub {
-            my $self = shift;
-            croak "$func_name is read-only" if @_;
-            return @{ $self->{delta}->{$func_name} || [] };
-          };
+    %TAXONOMY = (
+        change  => {
+            created     => $created,
+            deleted     => $deleted,
+            metadata    => {
+                    time        => {
+                        mtime       => $num_diff,
+                        ctime       => $num_diff,
+                    },
+                    perms       => {
+                        uid         => $num_diff,
+                        gid         => $num_diff,
+                        # Bit delta
+                        mode        => $bit_diff,
+                    },
+                    # Value delta
+                    size        => $num_diff,
+            },
+            directory   => {
+                # List delta
+                files_created   => $nop,
+                files_deleted   => $nop
+            }
         }
-        else {
-          *$func_name = sub {
-            my $self = shift;
-            croak "$func_name is read-only" if @_;
-            return $self->{delta}->{$func_name};
-          };
+    );
+
+    my @OBJ_ATTR = qw(
+        dev inode mode num_links uid gid rdev size mtime ctime
+        blk_size blocks error files
+    );
+
+    my $IS_ARRAY = qr/^files_/;
+
+    no strict 'refs';
+
+    # Accessors for old/new attributes
+    for my $pfx (qw(old new)) {
+        for my $attr (@OBJ_ATTR) {
+            my $func_name = "${pfx}_${attr}";
+            *$func_name = sub {
+                my $self = shift;
+                croak "$func_name is read-only" if @_;
+                return $self->{$pfx . '_info'}->{$attr};
+            };
         }
-      }
-      elsif ( ref $v eq 'HASH' ) {
-        push @work, $v;
-      }
-      else {
-        die "\%TAXONOMY contains a ", ref $v;
-      }
     }
-  }
+
+    # Accessors for deltas are named after the leaf keys in the taxonomy
+    my @work = \%TAXONOMY;
+    while ( my $obj = shift @work ) {
+        while ( my ($n, $v) = each %$obj ) {
+            my $is_name = "is_$n";
+            *$is_name = sub {
+                my $self = shift;
+                return $self->is_event($n);
+            };
+
+            if ( ref $v eq 'CODE' ) {
+                # Got a leaf item -> make an accessor
+                my $func_name = $n;
+                if ($n =~ $IS_ARRAY) {
+                    *$func_name = sub {
+                        my $self = shift;
+                        croak "$func_name is read-only" if @_;
+                        return @{ $self->{delta}->{$func_name} || [ ] };
+                    };
+                } else {
+                    *$func_name = sub {
+                        my $self = shift;
+                        croak "$func_name is read-only" if @_;
+                        return $self->{delta}->{$func_name};
+                    };
+                }
+            } elsif ( ref $v eq 'HASH' ) {
+                push @work, $v;
+            } else {
+                die "\%TAXONOMY contains a ", ref $v;
+            }
+        }
+    }
 }
 
 sub _initialize {
-  my $self = shift;
-  my $args = shift;
+    my $self = shift;
+    my $args = shift;
 
-  $self->SUPER::_initialize( $args );
+    $self->SUPER::_initialize( $args );
 
-  for my $attr ( qw(object old_info new_info) ) {
-    croak "You must supply a value for $attr"
-     unless exists $args->{$attr};
-    $self->{$attr} = delete $args->{$attr};
-  }
+    for my $attr (qw(object old_info new_info)) {
+        croak "You must supply a value for $attr"
+            unless exists $args->{$attr};
+        $self->{$attr} = delete $args->{$attr};
+    }
 
-  $self->_report_extra( $args );
+    $self->_report_extra( $args );
 
-  if ( !$self->_deep_compare( $self->{old_info}, $self->{new_info} ) ) {
-    $self->_compute_delta;
-  }
+    if (!$self->_deep_compare($self->{old_info}, $self->{new_info})) {
+        $self->_compute_delta;
+    }
 }
 
 sub object {
-  my $self = shift;
-  croak "object is read-only" if @_;
-  return $self->{object};
+    my $self = shift;
+    croak "object is read-only" if @_;
+    return $self->{object};
 }
 
 sub name {
-  my $self = shift;
-  return $self->object->name( @_ );
+    my $self = shift;
+    return $self->object->name(@_);
 }
 
 sub _deep_compare {
-  my ( $self, $this, $that ) = @_;
-  use Storable qw/freeze/;
-  local $Storable::canonical = 1;
-  return freeze( $this ) eq freeze( $that );
+    my ($self, $this, $that) = @_;
+    use Storable qw/freeze/;
+    local $Storable::canonical = 1;
+    return freeze($this) eq freeze($that);
 }
 
 sub _diff_list {
-  my ( $this, $that ) = @_;
+    my ($this, $that) = @_;
 
-  my %which = map { $_ => 1 } @$this;
-  $which{$_} |= 2 for @$that;
+    my %which = map { $_ => 1 } @$this;
+    $which{$_} |= 2 for @$that;
 
-  my @diff = ( [], [] );
-  while ( my ( $v, $w ) = each %which ) {
-    push @{ $diff[ $w - 1 ] }, $v if $w < 3;
-  }
+    my @diff = ( [ ], [ ] );
+    while (my ($v, $w) = each %which) {
+        push @{ $diff[$w-1] }, $v if $w < 3;
+    }
 
-  return @diff;
+    return @diff;
 }
 
 sub _walk_taxo {
-  my $self = shift;
-  my $taxo = shift;
+    my $self = shift;
+    my $taxo = shift;
 
-  my $change_found = 0;
+    my $change_found = 0;
 
-  while ( my ( $n, $v ) = each %$taxo ) {
-    if ( ref $v eq 'CODE' ) {
-      my $diff
-       = $v->( $self, $self->{old_info}, $self->{new_info}, $n );
-      if ( $diff ) {
-        $self->{delta}->{$n} = $diff;
-        $self->{"_is_event"}->{$n}++;
-        $change_found++;
-      }
+    while ( my ($n, $v) = each %$taxo ) {
+        if ( ref $v eq 'CODE' ) {
+            my $diff = $v->($self, $self->{old_info}, $self->{new_info}, $n);
+            if ($diff) {
+                $self->{delta}->{$n} = $diff;
+                $self->{"_is_event"}->{$n}++;
+                $change_found++;
+            }
+        } else {
+            if ($self->_walk_taxo($v)) {
+                $self->{"_is_event"}->{$n}++;
+                $change_found++;
+            }
+        }
     }
-    else {
-      if ( $self->_walk_taxo( $v ) ) {
-        $self->{"_is_event"}->{$n}++;
-        $change_found++;
-      }
-    }
-  }
 
-  return $change_found;
+    return $change_found;
 }
 
 sub _compute_delta {
-  my $self = shift;
+    my $self = shift;
 
-  # Compute the file list deltas as a special case first
-  my @df = _diff_list(
-    $self->{old_info}->{files} || [],
-    $self->{new_info}->{files} || []
-  );
+    # Compute the file list deltas as a special case first
+    my @df = _diff_list( $self->{old_info}->{files} || [ ],
+                         $self->{new_info}->{files} || [ ] );
 
-  my $monitor = $self->object->owner;
-  for my $attr ( qw(files_deleted files_created) ) {
-    my @ar = map { $monitor->_make_absolute( $_ ) } sort @{ shift @df };
-    $self->{delta}->{$attr} = \@ar if @ar;
-  }
+    for my $attr (qw(files_deleted files_created)) {
+        my @ar = sort @{ shift @df };
+        $self->{delta}->{$attr} = \@ar if @ar;
+    }
 
-  $self->{_is_event} = {};
+    $self->{_is_event} = { };
 
-  # Now do everything else
-  $self->_walk_taxo( \%TAXONOMY );
+    # Now do everything else
+    $self->_walk_taxo( \%TAXONOMY );
 }
 
 sub is_event {
-  my $self  = shift;
-  my $event = shift;
+    my $self  = shift;
+    my $event = shift;
 
-  return $self->{_is_event}->{$event};
+    return $self->{_is_event}->{$event};
 }
 
 sub _trigger_callbacks {
-  my $self      = shift;
-  my $callbacks = shift || {};
-  my $name      = $self->name;
+    my $self      = shift;
+    my $callbacks = shift || { };
+    my $name      = $self->name;
 
-  if ( $self->is_change ) {
-    while ( my ( $event, $cb ) = each %$callbacks ) {
-      if ( $self->is_event( $event ) ) {
-        $cb->( $name, $event, $self );
-      }
+    if ( $self->is_change ) {
+        while (my ($event, $cb) = each %$callbacks) {
+            if ($self->is_event($event)) {
+                $cb->($name, $event, $self);
+            }
+        }
     }
-  }
 }
 
 1;
@@ -253,7 +241,7 @@ File::Monitor::Delta - Encapsulate a change to a file or directory
 
 =head1 VERSION
 
-This document describes File::Monitor::Delta version 1.00
+This document describes File::Monitor::Delta version 0.0.2
 
 =head1 SYNOPSIS
 

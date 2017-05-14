@@ -1,0 +1,29 @@
+---
+abstract: 'web spider searching for keywords'
+author:
+  - 'Katarina Durechova <durechova@ynet.sk>'
+build_requires:
+  Test::MockObject: 0
+  Test::Spec: 0
+  Test::Spec::Mocks: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: KeywordsSpider
+requires:
+  Data::Dumper: 0
+  HTML::TreeBuilder: 0
+  HTTP::Cookies: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  Modern::Perl: 0
+  Moose: 0
+  MooseX::UndefTolerant: 0
+  Parallel::ForkManager: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/katkad/KeywordsSpider
+version: 0.02

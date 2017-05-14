@@ -17,7 +17,7 @@ The following options are supported:
    --path /example/path     Path to LedgerSMB installation (required)
    --chart us/chart/General Chart of Accounts path (relative to sql)
    --gifi  ca/gifi/General  Path to GIFI
-   --port 5432              Database Poart
+   --port 5432              Database Port
    --dbname database        Create db with the following name (required)
    --username postgres      Database Superuser to Log In As
    --prompt-password        Prompt for Password (can use PGPASSWORD instead)

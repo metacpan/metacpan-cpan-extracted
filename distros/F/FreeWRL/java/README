@@ -1,0 +1,7 @@
+This is the development ground for the java scripting interface.
+
+If the code is weird and non-idiomatic java, please tell me -- it's
+my first java program. No, really, it is. 
+
+genfields.pl generates the files in fields/ subdirectory from 
+VRMLFields.pm, making it possible to specify both Const* and * quickly.

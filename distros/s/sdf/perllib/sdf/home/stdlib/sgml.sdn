@@ -1,0 +1,143 @@
+# $Id$
+#
+# >>Title::     SGML Tuning
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 14-Aug-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# The {{stdlib/sgml.sdn}} module defines [[SDF]] configuration details for
+# generating [[SGML]] files.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Make SGML a restricted family of variables
+!restrict 'SGML'
+
+# Declare SGML document variables
+!block variables; family="SGML"; export
+Name                        Type            Rule
+DTD                         string          <qwertz|linuxdoc>
+!endblock
+
+# Declare SGML paragraph attributes
+!block paraattrs; family="sgml"
+Name                Type            Rule
+!endblock
+
+# Declare SGML phrase attributes
+!block phraseattrs; family="sgml"
+Name            Type            Rule
+!endblock
+
+# Declare SGML table parameters
+!block tableparams; family="sgml"
+Name            Type            Rule
+!endblock
+
+# Declare SGML row parameters
+!block rowparams; family="sgml"
+Name            Type            Rule
+!endblock
+
+# Declare SGML cell parameters
+!block cellparams; family="sgml"
+Name                Type            Rule
+!endblock
+
+# Define paragraph styles (default is P if not known and not below)
+!block parastyles
+Name        To                      Attributes
+Line        HR
+PB          HR
+Addr        ADDRESS
+Sign        ADDRESS
+TITLE       title
+AUTHOR      author
+DATE        date
+!endblock
+
+# Mapping of phrase styles (default is Name if not below)
+# The SDF_* one will be ignored - this seems better than "UNKNOWN"
+!block phrasestyles
+Name    To
+A       SDF_ASIS
+B       bf
+I       em
+N       SDF_NORMAL
+U       u
+EX      tt
+1       =I
+2       =B
+3       =U
+SUB     sub
+SUP     sup
+ST      bf
+Y       =ST
+!endblock
+
+
+# Mapping tables for attribute/parameter values
+!block script
+!endblock
+
+# Mapping of paragraph attributes
+!block paraattrs
+Name        To          Map         Attributes
+align       align
+!endblock
+
+# Mapping of phrase attributes
+!block phraseattrs
+Name        To          Map         Attributes
+family
+size
+bold
+italics
+underline
+changed
+color
+!endblock
+
+# Mapping of cell parameters
+!block cellparams
+Name        To          Map         Parameters
+!endblock
+
+# ignore Page-breaks in sgml
+!on paragraph 'PB';; $style = 'N'
+
+# Default build_title output
+!macro build_sgml_cover
+    !default DOC_TOC 2
+    TITLE: [[DOC_TITLE]]
+    !if DOC_AUTHOR
+        AUTHOR: [[join(", ", grep(/\w/, &Var('DOC_AUTHOR'), &Var('DOC_AUTHOR2'), &Var('DOC_AUTHOR3')))]]
+    !endif
+    DATE: [[DATE:DOC_MODIFIED]]
+
+    # Add the table of contents
+    !block inline; target='sgml'; expand
+
+    !if DOC_TOC
+<toc>
+    !endif
+    !if DOC_LOF
+<lof>
+    !endif
+    !if DOC_LOT
+<lot>
+    !endif
+
+    !endblock
+!endmacro

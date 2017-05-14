@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+Makefile.custom
+README
+SIGNATURE
+example/perlre_test.c
+lib/perlec.pm
+perlec.c
+perlec.h
+t/97_podspell.t
+t/pod-coverage.t
+t/pod.t

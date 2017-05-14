@@ -1,5 +1,8 @@
 Revision history for Perl extension IO::Pager.
 
+0.38	Tue May 11 2017
+	More test fixes for Perl 5.26 removal of . from @INC
+
 0.37	Tue Apr 25 2017
 	Fix tests for Perl 5.26 removal of . from @INC
 

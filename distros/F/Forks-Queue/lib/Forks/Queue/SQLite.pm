@@ -9,7 +9,7 @@ use Time::HiRes 'time';
 use base 'Forks::Queue';
 use 5.010;    #  using  // //=  operators
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our ($DEBUG,$XDEBUG);
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -63,6 +63,12 @@ sub new {
             carp "Forks::Queue::new: 'list' option must be an array ref";
         }
     }
+
+    if ($opts{remote}) {
+        require Net::Objwrap;
+        Net::Objwrap::wrap($opts{remote},$self);
+    }
+
     return $self;
 }
 
@@ -120,8 +126,8 @@ sub _dbh {
     $self->{_dbh}{AutoCommit} = 1;
 
     $self->{_dbh}->begin_work;
-    $self->{_dbh}->do("DELETE FROM pids WHERE pid=$$ AND tid=$tid");
-    $self->{_dbh}->do("INSERT INTO pids VALUES ($$,$tid)");
+    eval { $self->{_dbh}->do("DELETE FROM pids WHERE pid=$$ AND tid=$tid");
+           $self->{_dbh}->do("INSERT INTO pids VALUES ($$,$tid)"); };
     $self->{_dbh}->commit;
     $self->{style} = $self->_status("style");
     $self->{limit} = $self->_status("limit");
@@ -147,7 +153,10 @@ sub DESTROY {
     $dbh && eval { $dbh->disconnect };
     if ($t->[0][0] == 0) {
         $DEBUG and print STDERR "$$ Unlinking files from here\n";
-        unlink $self->{db_file} unless $self->{persist};
+        if (!$self->{persist}) {
+            sleep 1;
+            unlink $self->{db_file};
+        }
     }
 }
 
@@ -785,31 +794,31 @@ sub _impute_file {
 }
 
 sub _DUMP {
-    my ($self,$dfh) = @_;
+    my ($self,$fh_dump) = @_;
     my $dbh = $self->_dbh;
-    $dfh ||= *STDERR;
+    $fh_dump ||= *STDERR;
 
     my $sth = $dbh->prepare("SELECT * FROM pids");
     my $z = $sth->execute;
-    print $dfh "\n\n=== pids ===\n------------\n";
+    print {$fh_dump} "\n\n=== pids ===\n------------\n";
     foreach my $r (@{$sth->fetchall_arrayref}) {
-        print $dfh join("\t",@$r),"\n";
+        print {$fh_dump} join("\t",@$r),"\n";
     }
 
     $sth = $dbh->prepare("SELECT * FROM status");
     $z = $sth->execute;
-    print $dfh "\n\n=== status ===\n--------------\n";
+    print {$fh_dump} "\n\n=== status ===\n--------------\n";
     foreach my $r (@{$sth->fetchall_arrayref}) {
-        print $dfh join("\t",@$r),"\n";
+        print {$fh_dump} join("\t",@$r),"\n";
     }
 
     $sth = $dbh->prepare("SELECT * FROM the_queue");
     $z = $sth->execute;
-    print $dfh "\n\n=== queue ===\n-------------\n";
+    print {$fh_dump} "\n\n=== queue ===\n-------------\n";
     foreach my $r (@{$sth->fetchall_arrayref}) {
-        print $dfh join("\t",@$r),"\n";
+        print {$fh_dump} join("\t",@$r),"\n";
     }
-    print $dfh "\n\n";
+    print {$fh_dump} "\n\n";
 }
 
 1;
@@ -820,7 +829,7 @@ Forks::Queue::SQLite - SQLite-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.06
+0.08
 
 =head1 SYNOPSIS
 

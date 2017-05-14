@@ -1,3 +1,8 @@
+0.4 2017-05-10
+  * Removed regex \C check to support newer perls
+  * Removed perl 5.16 requirement
+  * Corrected JSON::Tiny call to be compatible with > 0.53
+  * Random housekeeping after maintainership switch
 0.3 2014-04-04
   * Tidy up some pod
   * use App::Basis::Config to hold targets

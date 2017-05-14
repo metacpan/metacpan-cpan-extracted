@@ -1,0 +1,333 @@
+#! /bin/bash -e
+#
+#   update_beancounter --- Modify beancounter database
+#  
+#   Copyright (C) 2000 - 2006  Dirk Eddelbuettel <edd@debian.org>
+#  
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#  
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#  
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+#   $Id: update_beancounter,v 1.16 2006/03/22 04:15:45 edd Exp $
+
+# If we really want to be independent of the underlying database, this 
+# probably needs to written in Perl using DBI/DBD
+#
+# This once started as being PostgreSQL specific, and now also supports MySQL
+
+progname=$(basename $0)
+
+if [ "$USER" = "" ]
+then
+    USER=$(whoami)
+fi
+
+VERSION='0.8.10'
+DB_SCHEMA='0.6.0'
+#DATABASE='testbean'
+DATABASE='beancounter'
+#PASSWORD=
+#DBSYSTEM='MySQL'
+DBSYSTEM='PostgreSQL'
+
+# -------------------------- Functions ----------------------------------
+function usage_and_exit
+{
+    cat<<EOF
+Update beancounter tables
+Usage: $progname [-m] [-n databasename] [-h] 
+Options:
+    -m		Use MySQL instead of PostgreSQL
+    -n SOMENAME Create database as SOMENAME instead of beancounter
+    -h		Show this help
+EOF
+    exit 0
+}
+
+function set_version_to_current
+{
+    query="update beancounter set version = '$DB_SCHEMA'"
+    echo $query | $DBCOMMAND 
+}
+
+# test if symbols are numeric (finance-yahooquote cannot retrieve
+# symbols like 555750.DE but deals fine with the more mnemonic symbols_
+function check_for_numeric_symbols
+{
+    rc=0
+    query="select distinct symbol from stockinfo where active"
+    echo $query | $DBCOMMAND -t | grep -q "\b[[:digit:]]"
+    rc=$?
+
+    if [ "$rc" -eq 0 ]; then
+	cat <<EOF
+
+Numeric symbols in database:
+  Your database appears to have numeric symbols. Beancounter has switched
+  to using Finance::YahooQuote as its backend for quote retrieval, and
+  Finance::YahooQuote may experience problems with stock symbols such as
+  '555750.F' (for Deutsche Telekom in Frankfurt, Germany) whereas the
+  equivalent 'DTEGN.F' is fully supported.
+
+  In order to use beancounter, you may need to convert the numeric symbols.
+  A helper script 'symbol_alias.sh' is included with Finance::YahooQuote;
+  it will find the mnemonic alias for a given numeric symbol. The script
+  'flip_symbol.sh' included with Beancounter can then be used to convert
+  the beancounter database from a given (numeric) symbol to a given textual
+  symbol.
+
+EOF
+    fi
+    return 0
+}
+
+# add 'active' column to stockinfo
+function add_beancounter_table_if_needed
+{
+    rc=0
+    table=beancounter
+
+    set +e
+    if [ "$DBSYSTEM" = "MySQL" ]; then
+	query="show tables"
+    else
+	query="\d"
+    fi
+
+    echo $query | $DBCOMMAND | grep -q $table
+    rc=$?
+
+    if [ "$rc" -ne 0 ]; then
+        if [ "$DBSYSTEM" = "MySQL" ]; then
+	    cmd="create table $table (version varchar(12) not null, data_last_updated datetime)"
+	else
+	    cmd="create table $table (version varchar(12) not null, data_last_updated timestamp with time zone)"
+	fi
+	echo "Running $cmd"
+	echo $cmd | $DBCOMMAND
+
+	cmd="insert into beancounter values('$VERSION','now')"
+	echo "Running $cmd"
+	echo $cmd | $DBCOMMAND
+    fi
+    set -e
+
+    return 0
+}
+
+# add 'active' column to stockinfo
+function add_active_if_needed
+{
+    rc=0
+    table=stockinfo
+    column=active
+
+    set +e
+    if [ "$DBSYSTEM" = "MySQL" ]; then
+	query="show columns from $table"
+    else
+	query="\d $table"
+    fi
+
+    echo $query | $DBCOMMAND | grep -q $column
+    rc=$?
+
+    if [ "$rc" -ne 0 ]; then
+	if [ "$DBSYSTEM" = "MySQL" ]; then
+	    cmd="alter table $table add column active bool default '1'"
+	    echo $cmd | $DBCOMMAND
+	    echo "Running $cmd"
+	else
+	    cmd="alter table $table add column active boolean"
+	    echo $cmd | $DBCOMMAND
+	    echo "Running $cmd"
+	    cmd="alter table $table alter column active set default true"
+	    echo $cmd | $DBCOMMAND
+	    echo "Running $cmd"
+	    cmd="update table $table set active = true where active is null"
+	    echo $cmd | $DBCOMMAND
+	    echo "Running $cmd"
+	fi
+    fi
+    set -e
+
+    return 0
+}
+
+# test if given column (argument 1) exists in a given table (argument 2)
+# and add it with given specs (argument 3) if it does not already exist
+function add_unless_exists_column
+{
+    column=$1
+    table=$2
+    spec=$3
+    rc=0
+
+    set +e
+    if [ "$DBSYSTEM" = "MySQL" ]; then
+	query="show columns from $table"
+    else
+	query="\d $table"
+    fi
+    ##echo "Query $query -> $DBCOMMAND"
+    echo $query | $DBCOMMAND | grep -q $column
+    rc=$?
+
+    if [ "$rc" -ne 0 ]; then
+	cmd="alter table $table add $column $spec;"
+	echo $cmd | $DBCOMMAND
+	## echo "Running $cmd"
+    fi
+    set -e
+
+    return 0
+}
+
+function reindex_portfolio_table
+{
+   if [ "$DBSYSTEM" = "MySQL" ]; then
+	cmd="drop index portfolio_pkey on portfolio; create unique index portfolio_pkey on portfolio (symbol, owner, date);"
+    else
+	cmd="drop index portfolio_pkey; create unique index portfolio_pkey on portfolio (symbol, owner, date);"
+    fi
+    echo $cmd | $DBCOMMAND
+
+    return 0
+}
+
+# test if given column (argument 1) exists in a given table (argument 2)
+# and if so rename it to new name (argument 3) and spec (arg 4; mysql only)
+function rename_if_not_exists_column
+{
+    oldname=$1
+    table=$2
+    column=$3
+    spec=$4
+    rc=0
+
+    set +e
+    if [ "$DBSYSTEM" = "MySQL" ]; then
+	query="show columns from $table"
+    else
+	query="\d $table"
+    fi
+
+    echo $query | $DBCOMMAND | grep -q "$column"
+    rc=$?
+
+    if [ "$rc" -ne 0 ]; then
+	if [ "$DBSYSTEM" = "MySQL" ]; then
+	    # nothing to do as we only added this for 0.4.0
+	    true
+	else    
+	    cmd="alter table $table rename $oldname to $column;"
+	    echo $cmd | $DBCOMMAND
+	    echo "Running $cmd"
+	fi    
+    fi
+    set -e
+
+    return 0
+}
+
+# -------------------------- Main ---------------------------------------
+
+while getopts ":mn:h" opt
+do
+    case $opt in
+	m)
+	    DBSYSTEM='MySQL'
+	    #echo "Now using $DBSYSTEM"
+	    ;;
+	n)
+	    DATABASE=$OPTARG
+	    #echo "Now using database name $DATABASE"
+	    ;;
+	h)
+	    usage_and_exit
+	    ;;
+	?)
+	    echo "Ignoring unknown argument, try '$progname -h' for help."
+	    ;;
+    esac
+done	    
+echo "Examining database $DATABASE on $DBSYSTEM"
+
+if [ "$DBSYSTEM" = "MySQL" ]
+then
+    # mysql(1) arguments -- you could add host, port, ... here
+    if [ -z "$PASSWORD" ]
+    then
+	DBCOMMAND="mysql $DATABASE"
+    else
+	DBCOMMAND="mysql -p$PASSWORD $DATABASE"
+    fi
+else
+    if [ -z "$PASSWORD" ]
+    then
+	DBCOMMAND="psql -q $DATABASE"
+    else
+	DBCOMMAND="psql -q -W $PASSWORD $DATABASE"
+    fi
+fi
+
+add_unless_exists_column type  portfolio "varchar(16) default null"
+add_unless_exists_column owner portfolio "varchar(16) default null"
+add_unless_exists_column cost  portfolio "float default null"
+add_unless_exists_column date  portfolio "date  default null"
+
+reindex_portfolio_table
+
+rename_if_not_exists_column change stockprices day_change "float default null"
+rename_if_not_exists_column change fxprices day_change "float default null"
+rename_if_not_exists_column index indices stockindex 'varchar(12) not null default ""'
+
+add_active_if_needed
+
+add_beancounter_table_if_needed
+
+set_version_to_current
+
+check_for_numeric_symbols
+
+echo "Done."
+exit 0
+
+=head1 NAME
+
+update_beancounter - Convert older BeanCounter databases
+
+=head1 SYNOPSIS
+
+update_beancounter [-m] [-n NAME] [-h] 
+
+=head1 DESCRIPTION
+
+B<update_beancounter> converts the databases used by 
+B<beancounter> from an older release to the current one.
+
+=head1 OPTIONS
+
+ -m       Use MySQL as the backend over the default PostgreSQL
+ -s name  Use name as the database instead of B<beancounter
+ -h       Show a simple help message
+
+=head1 SEE ALSO
+
+B<beancounter>(1), B<BeanCounter>(1), B<setup_beancounter>(1)
+
+=head1 AUTHOR
+
+Dirk Eddelbuettel edd@debian.org
+
+=cut

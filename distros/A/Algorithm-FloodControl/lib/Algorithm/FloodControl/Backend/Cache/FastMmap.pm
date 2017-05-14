@@ -8,8 +8,6 @@ use Params::Validate qw/:all/;
 use base 'Algorithm::FloodControl::Backend';
 __PACKAGE__->mk_accessors( qw/storage prefix expires/ );
 
-our ($VERSION) = '$Revision: 2609 $' =~ m{ \$Revision: \s+ (\S+) }mx;
-
 =head2 increment
 
 =cut

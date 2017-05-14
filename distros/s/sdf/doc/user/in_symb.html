@@ -1,0 +1,89 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Escaping Symbols</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_hyper.html">Previous Topic</A> | <A HREF="in_looks.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.8. Escaping Symbols</H1>
+<HR>
+<H2><A NAME="Special Characters at the Start of a Line">6.8.1. Special Characters at the Start of a Line</A></H2>
+<P>To escape a special character at the start of a line, precede it with a backslash character (\).</P>
+<HR>
+<H2><A NAME="Tag Delimiters">6.8.2. Tag Delimiters</A></H2>
+<P>Like special characters, any special pattern at the start of a line can be escaped by preceding it with a backslash character (\).</P>
+<P>Consider the following example:</P>
+<PRE>
+   Important:
+</PRE>
+<P>This paragraph has a tag called <EM>Important</EM> and has no text. <A HREF="../ref/sdf.html">sdf</A> will warn you if it finds an unknown tag so most unintentional errors like this are detected. You can escape the pattern like this:</P>
+<PRE>
+   \Important:
+</PRE>
+<P>Other workarounds are:</P>
+<PRE>
+   :Important:
+   N:Important:
+</PRE>
+<HR>
+<H2><A NAME="Special Symbols">6.8.3. Special Symbols</A></H2>
+<P><A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> uses a number of special symbols inside paragraphs:</P>
+<UL>
+<LI>A-Z&lt; and &gt; - delimit <EM>concise</EM> phrases
+<LI>{{ and }} - delimit <EM>verbose</EM> phrases
+<LI>[[ and ]] - delimit expressions (e.g. variables).</UL>
+<P>If you need to include one of these symbols in a paragraph, use the appropriate escape as shown below.</P>
+<PRE>
+    Symbol      Escape
+    &lt;           E&lt;lt&gt;
+    &gt;           E&lt;gt&gt;
+    {{          E&lt;2{&gt;
+    }}          E&lt;2}&gt;
+    [[          E&lt;2[&gt;
+    ]]          E&lt;2]&gt;
+</PRE>
+<P>Note the following rules:</P>
+<OL>
+<LI>It isn't necessary to escape any symbols within:<UL>
+<LI>paragraphs tagged with the V style or &gt; tag</UL><UL>
+<LI>paragraphs given the verbatim attribute</UL><UL>
+<LI>paragraphs within a verbatim block</UL>
+<LI>It is only necessary to escape a &lt; when it appears after a capital letter.
+<LI>It is only necessary to escape a &gt; inside a concise phrase. In particular, &gt; is implicitly escaped within a verbose phrase.</OL>
+<HR>
+<H2><A NAME="Phrase Parsing Rules">6.8.4. Phrase Parsing Rules</A></H2>
+<P>For paragraphs which do not have the <EM>verbatim</EM> attribute set, the parsing rules for the paragraph text are:</P>
+<OL>
+<LI>Expressions embedded in [[ and ]] are recursively expanded
+<LI>Verbose phrases embedded in {{ and }} are recursively expanded to concise phrases with a V tag.
+<LI>Concise phrases are parsed.</OL>
+<HR>
+<H2><A NAME="Multi-line Macros">6.8.5. Multi-line Macros</A></H2>
+<P>!-style macros can be continued onto the next line by ending the line with a backslash character (\). To escape this backslash, use another one. If N backslash characters are found at the end of a line where N is greater than 2, then that line is terminated by N-1 backslash characters and the macro is continued onto the next line.</P>
+<HR>
+<H2><A NAME="Embedded Expressions">6.8.6. Embedded Expressions</A></H2>
+<P>As expressions embedded within text are terminated by the ]\] symbol, expressions cannot contain this character sequence. If you need this sequence within an expression, there is usually a simple workaround you can use. For example:</P>
+<OL>
+<LI>use a space character (i.e. $a[$b[1]] becomes $a[$b[1] ])
+<LI>use string concatentation (i.e. &quot;]]&quot; becomes &quot;]&quot;.&quot;]&quot;).</OL>
+<HR>
+<H2><A NAME="Semi-Colons Within Attributes">6.8.7. Semi-Colons Within Attributes</A></H2>
+<P>If you need to include a real semi-colon within an attribute or parameter, use two semi-colons. In general, if you need to include a sequence of N semi-colons in an attribute expression, use N+1 semi-colons. For example:</P>
+<PRE>
+To install {{P[index=&quot;myApp;;install:myApp&quot;]myApp}}, ...
+</PRE>
+<P>In this case, the value of <EM>index</EM> is <E>myApp;install:myApp</E>.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_hyper.html">Previous Topic</A> | <A HREF="in_looks.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

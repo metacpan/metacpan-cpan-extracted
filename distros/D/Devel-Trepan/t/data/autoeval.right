@@ -1,8 +1,7 @@
 -- main::(gcd.pl:18)
 die sprintf "Need two integer arguments, got %d", scalar(@ARGV) unless 
-    @ARGV == 2;
 basename is on.
-highlight is off.
+output set to not use terminal escape sequences
 set auto eval is off.
 Evaluation of unrecognized debugger commands is off.
 *** Undefined command: "fdafdsa". Try "help".

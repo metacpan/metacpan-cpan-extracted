@@ -1,0 +1,13 @@
+#
+# first cut of default game file
+#
+GameState 0 0 0;
+partof_last;
+  Team 4 4 90;
+  MapHash 0 0 0;
+  partof_last;
+    Map 0 0 0 file=>'maps/girlmap.txt';
+    Map 0 0 0 file=>'maps/tunnel1.txt';
+    Map 0 0 0 file=>'maps/startMap.txt';
+  done;
+done;

@@ -1,0 +1,24 @@
+Win32-Filenames
+
+This module has no dependencies outside of the base perl modules.
+
+With this module, you can easily validate if a filename is a valid 
+windows filename. It can also be used to convert an invalid filename into a 
+valid filename.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Brent Hostetler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,317 @@
+#!/usr/bin/perl
+#$Id: lls,v 1.2 1998/03/11 08:19:20 schwartz Exp $
+#
+# lls, Laola List
+#
+# This program lists the structure of ole/com documents.
+#
+# See also usage() of this file. General information at:
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/index.html
+#
+# Copyright (C) 1996, 1997 Martin Schwartz 
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, you should find it at:
+#
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/COPYING
+#
+# You can contact me via schwartz@cs.tu-berlin.de
+#
+
+my $PROGNAME = "lls";
+my $VERSION=do{my@R=('$Revision: 1.2 $'=~/\d+/g);sprintf"%d."."%d"x$#R,@R};
+my $DATE = ('$Date: 1998/03/11 08:19:20 $' =~ / ([^ ]*) /) && $1;
+
+use Getopt::Long;
+use Startup;
+use OLE::Storage::Std;
+
+my ($Doc, $Startup, $Var, $text);
+my %opt = (
+   "dest_base" => "analyze",
+   "dirmode"   => "0700",
+   "filemode"  => "0600",
+);
+
+{
+   $|=1;
+   GetOptions (\%opt,
+      "log",
+      "src_base|source_base|source_dir=s",
+      "dest_base|destbase|destdir=s",
+      "from_stdin|from_0|from0",
+      "filemode=s",
+      "dirmode=s",
+      "help",
+      "recurse|recursive",
+      "relative",
+      "extradir=s",
+      "save",
+   );
+   usage() if $opt{"help"} || (!@ARGV && !$opt{"from_stdin"});
+   fail(1) if !($Startup = new Startup);
+
+   $Startup -> init ({
+      SUB_FILES  => \&handle_files,
+      SUB_STREAM => \&handle_stream,
+      PROG_NAME  => $PROGNAME,
+      PROG_VER   => $VERSION,
+      FROM_STDIN => $opt{"from_stdin"},
+      SRCPATH    => $opt{"src_base"},
+      DESTPATH   => $opt{"dest_base"},
+      RECURSE    => $opt{"recurse"},
+      RELATIVE   => $opt{"relative"},
+      FILEMODE   => $opt{"filemode"},
+      DIRMODE    => $opt{"dirmode"},
+   });
+
+   $Startup->allow_logging if $opt{"log"};
+   $Startup->open_log();
+
+   require OLE::Storage;
+   if (!($Var = OLE::Storage->NewVar())) {
+      _error("No Var handle!"); exit 1;
+   }
+   $Doc = undef;
+   # Please ignore the following three lines...
+   $Var -> handler() -> par ("date", "string", 
+      ["%02d.%02d.%04d %02d:%02d:%02d", "%02d:%02d:%02d", "<undef>"]
+   );
+
+   $Startup->go(@ARGV);
+
+   $Startup->close_log();
+   exit 1;
+}
+
+sub handle_stream {
+   my ($dp) = @_;
+   $Startup->log('processing <STDIN>');
+   $Startup->msg_silent(0);
+   $Startup->msg_nl('processing <STDIN>');
+   {
+      return $Startup->error("Nothing to do!") if -t STDIN;
+      undef $/;
+      return 0 if !($Doc = 
+         OLE::Storage->open($Startup, $Var, "<stdin>", 2**4, \<>)
+      );
+      ppss_info();
+   }
+   return 0 if !main_work(0, 0, "$dp/stdin");
+   $Startup->msg_finish("done");
+1}
+
+sub handle_files {
+   my ($sp, $sf, $dp, $status) = @_;
+   $Startup->msg_reset();
+
+   $Startup->log("processing $sp/$sf");
+   $Startup->msg("Processing \"$sf\"");
+
+   return error ("File \"$sf\" doesn't exist!") if !$status;
+   return 1 if $status < 0;
+   {
+      return 0 if !($Doc = OLE::Storage->open($Startup, $Var, "$sp/$sf"));
+      $Startup->msg_nl();
+      ppss_info();
+      if ($opt{"extradir"}) {
+         $dp .= "/" . basename($sf);
+         return 0 if !targetdir($dp);
+      }
+      $status = main_work(0, 0, "$dp/".basename($sf));
+      $Doc->close($infile);
+   }
+
+   return 0 if !$status;
+   $Startup->msg_finish("done");
+1}
+
+sub error { $Startup -> error (@_); }
+sub _error { my ($msg) = @_; $Startup -> msg_error($msg); }
+
+sub fail {
+   my ($num) = @_;
+   print "Strange error #$num! Exiting!\n"; exit 0;
+}
+
+sub basename {
+#
+# $basename = basename($filepath)
+#
+   (substr($_[0], rindex($_[0],'/')+1) =~ /(^[^.]*)/) && $1;
+}
+
+sub usage {
+   _print_usage (
+      "$PROGNAME V$VERSION ($DATE)\n"
+      ."usage: $PROGNAME {--option [arg]} file(s)",
+      [
+        "log           write a logfile",
+        "src_base   s  Regard this as start directory in relative mode",
+        "dest_base  s  Store output files based at this directory ('".
+                       $opt{"dest_base"}."')",
+        "from_stdin    Take input from stdin",
+        "extradir   s  Save files in own directories (e.g. 'test' for 'test.doc')",
+        "filemode   s  New files get access mode s (".$opt{"filemode"}.")",
+        "dirmode    s  New directories get access mode s (".$opt{"dirmode"}.")",
+        "recurse       Operate recursively on directories",
+        "relative      Store files relatively to destdir when in recurse mode",
+        "save          Save property storages to files",
+      ]
+   );
+   exit 0;
+}
+
+sub _print_usage {
+   my ($header, $bodylistR, $footer) = @_;
+   print "$header\n" if $header;
+   print map "   --$_\n", sort { lc($a) cmp lc($b) } @$bodylistR;
+   print "$footer\n" if $footer;
+}
+
+##
+##
+##
+
+sub main_work {
+   # !recursive!
+   my ($directory_pps, $level, $path)=@_;
+   my @dir = $Doc->dirhandles($directory_pps);
+
+   for (0 .. $#dir) {
+      pps_info($_, $dir[$_], $level);
+      if ($Doc->is_file($dir[$_])) {
+         _error() if !pps_save($path, $dir[$_]);
+      } elsif ($Doc->is_directory($dir[$_])) {
+         main_work ($dir[$_], $level+1, $path);
+      }
+   }
+1}
+
+sub ppss_info {
+   #
+   # generate some information about the root entry of the property 
+   # set storage
+   #
+   $global_pps_count=0;
+   pps_info(0,0,0);
+}
+
+sub pps_info {
+   #
+   # generate a line of information about the current property storage
+   #
+   my ($i, $pps, $level) = @_;
+   my ($name, $out) = ("", "");
+   ($name=$Doc->name($pps)->string()) =~ s/[^_a-zA-Z0-9]/ /g;
+
+   $out = sprintf ("%02x: " . ("   " x $level) . "%2x '%s' (pps %x) ",
+                   $global_pps_count++,         $i+1, $name,   $pps);
+   $out .= " " x (54 - length($out));
+
+   # info about the properties type
+   if ($Doc->is_directory($pps)) {
+      $out .= $Doc->is_root($pps) ? "ROOT " : "DIR  ";
+      $out .= $Doc->date($pps)->string();
+   } elsif ($Doc->is_file($pps)) {
+      $out .= sprintf("FILE        %6x bytes ", $Doc->size($pps));
+   } else {
+      $out.="unknown type!";
+   }
+
+   $Startup->msg($out);
+}
+
+sub targetdir {
+#
+# If none exists, create a $targetdirectory. 
+#
+   my $dir = shift;
+   return 1 if -d $dir;
+   if (mkdir ($dir, oct($opt{"dirmode"}))) {
+      $Startup -> msg ("Created directory \"$targetdir\"");
+      return 1;
+   } else {
+      _error ("Cannot create directory \"$targetdir\"");
+      return 0;
+   }
+}
+
+sub pps_save {
+#
+# 1 = pps_save(path, pps)
+# 
+# Copies the current property stream to an own file as: 
+# targetdir/basename.xx, where xx is the hex number of the property 
+# storage
+#
+   my ($outfilebasename, $pps) = @_;
+   my $status = 1;
+   my $tmp = "";
+
+   return 1 if !($opt{"save"}||$opt{"extradir"});
+   return 1 if !$outfilebasename; # warning already done
+   my $outname = sprintf "$outfilebasename.%02x", $pps;
+
+   return _error ("Cannot open \"$outname\"!")
+      if ! ( open(OUT, ">".$outname)  &&  binmode(OUT) )
+   ;
+
+   if (!$Doc->read($pps, \$tmp)) {
+      $status = _error (sprintf "Error while reading pps #%x", $pps);
+   } elsif (!print OUT $tmp) {
+      $status = _error (sprintf "Error while writing pps #%x!", $pps)
+   }
+   close(OUT); 
+
+   $status;
+}
+
+__END__
+
+=head1 NAME
+
+lls - Laola List
+
+=head1 SYNOPSIS
+
+ lls V0.389 (1998/02/12)
+ usage: lls {--option [arg]} file(s)
+   --dest_base  s  Store output files based at this directory ('analyze')
+   --dirmode    s  New directories get access mode s (0700)
+   --extradir   s  Save files in own directories (e.g. 'test' for 'test.doc')
+   --filemode   s  New files get access mode s (0600)
+   --from_stdin    Take input from stdin
+   --log           write a logfile
+   --recurse       Operate recursively on directories
+   --relative      Store files relatively to destdir when in recurse mode
+   --save          Save property storages to files
+   --src_base   s  Regard this as start directory in relative mode
+
+=head1 DESCRIPTION
+
+Lists the raw document structure of MS Windows Structured Storage files,
+like Word and Excel documents.
+
+Demonstration program for OLE::Storage.
+
+=head1 SEE ALSO
+
+L<OLE::Storage>
+
+=head1 AUTHOR
+
+Martin Schwartz E<lt>F<schwartz@cs.tu-berlin.de>E<gt>. 
+
+=cut
+

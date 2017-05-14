@@ -1,0 +1,142 @@
+package DateEntered;
+
+##########################################################################
+# sub MsqlCGIDateEntered
+#
+# This file is an example "special" subroutine that goes with the
+# MsqlCGI Package.  an element with the "date" flag will display an
+# integer value (as returned by the perl "time()" function) and displays
+# it as a nicely formatted string.  When modifying, it creates a set of
+# drop down boxes.
+#
+# DateEntered always creates the date when the field is created but never
+# touches it after that.  
+#
+# This file is part of the MsqlCGI Package, Copyright 1996 Alex Tang and
+# CICNet, Inc.
+##########################################################################
+
+use POSIX;
+
+@months = ( "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", 
+	    "Aug", "Sep", "Oct", "Nov", "Dec" );
+@days = ( "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" );
+
+
+	# this function can only LEGALLY read the %in variables:
+	# %main::in{'_MsqlCGI_Special_<whatever>'}
+
+
+sub CreateQueryPart_Create {
+  local ( $tableInfo, $pData, $value ) = @_;
+  $fieldName = $pData->{'fieldName'};
+
+  &main::DPrint ( "<i>$fieldName, $value</i>" );
+
+  	# Oh boy, this is a hack, but if we get a value here, we're
+	# assuming it's a valid time, so bypass all extra parsing.  
+
+  if ( ! $value ) { 
+    $year = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Year'} - 1900;
+    $month = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Month'} - 1;
+    $mday = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Day'};
+    $hour = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Hour'} - 1;
+    $min = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Minute'};
+    $sec = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Second'};
+    &main::DPrint ( "<b>$sec, $min, $hour, $mday, $month, $year</b>" );
+    $value = mktime ( $sec, $min, $hour, $mday, $month, $year ); 
+    &main::DPrint ( "Year: $year, Month: $month, Day: $mday, $value" );
+  }
+   
+  return $value;
+
+}
+
+#########################################################################
+# CreateQueryPart_Modify
+#
+# in this function, we're going to convert the data passed back from the
+# CGI form to a usable date integer.  We're going to do this by creating
+# using the POSIX mktime command.
+#
+# We are going to get our special data from the hash elements:
+#	
+#	_MsqlCGI_Special_<fieldName>-whatever
+#########################################################################
+sub CreateQueryPart_Modify {
+  local ( $tableInfo, $pData, $value ) = @_;
+
+  &main::DPrint ( "<b>In DateEntered: ModQuery, $value</b>" );
+  if ( ! $value ) {
+  $fieldName = $pData->{'fieldName'};
+  
+    $year = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Year'} - 1900;
+    $month = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Month'} - 1;
+    $mday = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Day'};
+    $hour = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Hour'} - 1;
+    $min = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Minute'};
+    $sec = $main::in{'_MsqlCGI_Special_' . $fieldName . '-Second'};
+    &main::DPrint ( "<b>$sec, $min, $hour, $mday, $month, $year</b>" );
+    $value = mktime ( $sec, $min, $hour, $mday, $month, $year );
+    &main::DPrint ( "Year: $year, Month: $month, Day: $mday, $value" );
+  }
+
+  &main::DPrint ( "<b>In DateEntered: ModQuery, $value</b>" );
+  return $value;
+
+}
+
+
+
+########################################################################
+# ConvertValue
+#
+# This Converts the date from an integer returned by time to a human
+# readable date string.
+########################################################################
+sub ConvertValue {
+  local ( $value, $pData ) = @_;
+  if ( ! $value ) {
+    $strRet = "";
+
+  } else {
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = 
+    	localtime ( $value );
+    $hour++ if ( ! $isdst );
+    $strRet = sprintf ( "%s %s %02d, %04d.  %02d:%02d:%02d", 
+			$days[$wday], $months[$mon], $mday, $year + 1900, 
+		      $hour, $min, $sec );
+
+    #$strRet = sprintf ( "%02d-%02d-%02d", $mon + 1, $mday, $year );
+  }
+
+  return ( $strRet, 0 );
+}
+
+########################################################################
+# CreateCGIString
+########################################################################
+sub CreateCGIString {
+  local ( $tableInfo, $pData, $type, $value ) = @_;
+
+  $modStr = "_MsqlCGI_modify-" .  $pData->{'fieldName'};
+
+  if ( $type eq "CREATE" ) {
+    $value = time;
+  }
+
+  ( $strCGI ) = &ConvertValue ( $value, $pData );
+
+  if ( $type eq "CREATE" ) {
+    $strCGI .= <<EOF;
+      <input type=hidden name="$pData->{'fieldName'}" value="$value">
+EOF
+  } else {
+      $strMod = "<input type=hidden name=\"$modStr\" value=\"No\">";
+  }
+  return ( $strMod, $strCGI );
+}
+
+1;
+
+

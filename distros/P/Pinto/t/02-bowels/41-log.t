@@ -26,7 +26,7 @@ $t->run_ok(
 
 $t->run_ok(
     Copy => {
-        stack => 'master',
+        from_stack => 'master',
         to_stack   => 'branch'
     }
 );
@@ -39,7 +39,8 @@ $t->run_ok(
 );
 
 #------------------------------------------------------------------------------
-subtest 'log master' => sub {
+
+{
 
     my $stack = 'master';
     $t->run_ok( Log => { stack => $stack } );
@@ -55,10 +56,11 @@ subtest 'log master' => sub {
     # This test might not be portable, based on locale settings:
     $t->stdout_like( qr/Date: Jan 1, 1970/, 'Log message has correct date' );
 
-};
+}
 
 #------------------------------------------------------------------------------
-subtest 'log branch' => sub {
+
+{
 
     my $stack = 'branch';
     $t->run_ok( Log => { stack => $stack } );
@@ -69,7 +71,7 @@ subtest 'log branch' => sub {
     $t->stdout_like( qr/Foo-0.01.tar.gz/, 'Log messages have Foo archive' );
     $t->stdout_like( qr/Bar-0.02.tar.gz/, 'Log messages have Bar archive' );
 
-};
+}
 
 #-----------------------------------------------------------------------------
 

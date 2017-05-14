@@ -1,0 +1,47 @@
+# zxid/sg/liberty-idwsf-security-mechanisms-v2.0.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# 10.2.2007, added sa:Assertion as potential security token type --Sampo
+# $Id: liberty-idwsf-security-mechanisms-v2.0.sg,v 1.7 2009-08-25 16:22:45 sampo Exp $
+
+target(sec, urn:liberty:security:2006-08)
+ns(sa,     urn:oasis:names:tc:SAML:2.0:assertion)
+ns(sp,     urn:oasis:names:tc:SAML:2.0:protocol)
+ns(sa11,   urn:oasis:names:tc:SAML:1.0:assertion)
+ns(ff12,   urn:liberty:iff:2003-08)
+
+TokenPolicy	 -> %sec:TokenPolicyType
+%TokenPolicyType:
+  sp:NameIDPolicy?
+  any*  processContents(lax)
+  @validUntil?	 -> %xs:dateTime
+  @issueTo?	 -> %xs:anyURI
+  @type?	 -> %xs:anyURI
+  @wantDSEPR?    -> %xs:boolean
+  ;
+
+#   @any*
+
+TransitedProvider	 -> %sec:TransitedProviderType
+%TransitedProviderType:	 base(xs:anyURI)
+  @timeStamp?	 -> %xs:dateTime
+  @confirmationURI?	 -> %xs:anyURI
+  ;
+
+TransitedProviderPath	 -> %sec:TransitedProviderPathType
+%TransitedProviderPathType:
+  sec:TransitedProvider+
+  ;
+
+Token     -> %sec:TokenType
+%TokenType:
+  sa:Assertion?
+  sa:EncryptedAssertion?
+  sa11:Assertion?
+  ff12:Assertion?
+  any*  processContents(lax)
+  @id?    -> %xs:ID
+  @ref?   -> %xs:anyURI
+  @usage? -> %xs:anyURI
+  ;
+
+#EOF

@@ -1,83 +1,89 @@
-# $Id: Musician.pm,v 1.2 2002/09/17 21:14:01 ology Exp $
+# $Id: Musician.pm,v 1.1.1.1 2004/11/22 17:52:11 root Exp $
 
-# non-POE musician functionality
 package POE::Framework::MIDI::Musician;
 use strict;
-use vars qw/@ISA @EXPORT/;
-use Exporter;  # i'm not sure if i should be exporting here, but it works for now.
-@ISA = qw(Exporter);
-@EXPORT = qw(new package name channel);
-my $VERSION = '0.1a';
+no strict 'refs';
+use vars '$VERSION'; $VERSION = '0.02';
 
-sub new
-{
-	my($self,$class) = ({},shift);
-	bless($self,$class);
+sub new {
+    my( $self, $class ) = ( {},  shift );
+    bless( $self, $class );
+    
+    #my %params = @_;
+    #$self->{cfg} = \%params;
+    use Data::Dumper;
+    
     $self->{cfg} = shift;
-	die "no package provided to POE::Framework::MIDI::Musician....
-	it needs a package to know what to play."
-	unless $self->{cfg}->{package};
+   unless($self->{cfg}->{package}) {
+    die "no package provided to POE::Framework::MIDI::Musician.. it needs a package to know what to play.  Dump: " . Dumper($self->{cfg}) . "\n\n" . caller;
+   }
+    #die "no channel passed to $self->{cfg}->{package}::new" unless $self->{cfg}->{package};
+    #die "no name passed to $self->{cfg}->{package}:new" unless $self->{cfg}->{name};
     return $self;
 }
 
-sub package
-{
-	my $self = shift;
-	return $self->{cfg}->{package};
+sub package {
+    my $self = shift;
+    return $self->{cfg}->{package};
 }
 
-sub name
-{
-	my $self = shift;
-	return $self->{cfg}->{name};	
+sub name {
+    my $self = shift;
+    return $self->{cfg}->{name};    
 }
 
-sub channel
-{
+sub instrument_name {
 	my $self = shift;
-	return $self->{cfg}->{channel};
+	return $self->name;
+}
+
+sub channel {
+    my $self = shift;
+    return $self->{cfg}->{channel};
+}
+
+sub data {
+	my $self = shift;
+	return $self->{cfg}->{data};
 }
 
 1;
 
+__END__
+
 =head1 NAME
 
-POE::Framework::MIDI::Musician
+POE::Framework::MIDI::Musician - Non-POE Musician functionality
+
+=head1 ABSTRACT
 
 =head1 DESCRIPTION
 
-Non-POE Musician functionality. This package takes a package name as a configuration
-parameter, and uses that package to create musical events, and run them through rules
-and transformations.
+Non-POE Musician functionality. This package takes a package name as a 
+configuration parameter, and uses that package to create musical 
+events, and run them through rules and transformations.
 
-=head1 USAGE
-
-This module is configured as per the 'musicians' array reference defined in 
-the spawn method of POEConductor and coordinated by the POEConductor to procduce
-a MIDI event stream.
-
-=head1 BUGS
-
-=head1 SUPPORT
+This module is configured as per the 'musicians' array reference 
+defined in the spawn method of POEConductor and coordinated by the 
+POEConductor to procduce a MIDI event stream.
 
 =head1 AUTHOR
 
-	Steve McNabb
-	CPAN ID: JUSTSOMEGUY
-	steve@justsomeguy.com
-	http://justsomeguy.com/code/POE/POE-Framework-MIDI 
+Primary: Steve McNabb E<lt>steve@justsomeguy.comE<gt>
 
-=head1 COPYRIGHT
+CPAN ID: SMCNABB
 
-Copyright (c) 2002 Steve McNabb. All rights reserved.
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+Secondary: Gene Boggs E<lt>cpan@ology.netE<gt>
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+CPAN ID: GENE
 
-=head1 SEE ALSO
+=head1 COPYRIGHT AND LICENCE
 
-perl(1). POE.  Perl-MIDI
+Copyright (c) 2004 Steve McNabb. All rights reserved.
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file 
+included with this module.
 
 =cut

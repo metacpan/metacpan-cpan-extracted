@@ -4,10 +4,19 @@
 # Recursively walks the node tree and checks parent/child and document links.
 #
 
+use strict;
+
 package CheckAncestors;
 
 use XML::DOM;
 use Carp;
+
+BEGIN
+{
+    # import the constants for accessing member fields, e.g. _Doc
+    import XML::DOM::Node qw{ :Fields };
+    import XML::DOM::DocumentType qw{ :Fields };
+}
 
 sub new
 {
@@ -27,7 +36,7 @@ sub check
     my $doc = $self->{Doc};
     if (defined $doc)
     {
-	my $doc2 = $node->{Doc};
+	my $doc2 = $node->[_Doc];
 	croak "wrong Doc [$doc] [$doc2]" if $doc != $doc2;
     }
     else
@@ -54,18 +63,20 @@ sub check
     if ($type == XML::DOM::Node::ELEMENT_NODE || 
 	$type == XML::DOM::Node::ATTLIST_DECL_NODE)
     {
-	$self->checkAttr ($node, $node->{A});
+	$self->checkAttr ($node, $node->[_A]);
     }
     elsif ($type == XML::DOM::Node::DOCUMENT_TYPE_NODE)
     {
-	$self->checkAttr ($node, $node->{Entities});
-	$self->checkAttr ($node, $node->{Notations});	
+	$self->checkAttr ($node, $node->[_Entities]);
+	$self->checkAttr ($node, $node->[_Notations]);	
     }
 }
 
+# (This should have been called checkNamedNodeMap)
 sub checkAttr
 {
     my ($self, $node, $attr) = @_;
+    return unless defined $attr;
 
     # check if NamedNodeMap was already seen
     croak "found NamedNodeMap twice [$attr]" if ($self->{Mark}->{$attr});

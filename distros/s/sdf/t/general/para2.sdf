@@ -1,0 +1,5 @@
+# This file tests a paragraph immediately after a pragma
+
+__variable[]xx 64
+Hello world.
+

@@ -15,7 +15,6 @@ use Bio::Gonzales::Feat;
 use Data::Dumper;
 use Carp;
 use Scalar::Util qw/blessed/;
-use Bio::Gonzales::Seq::Util qw/crc64/;
 use Bio::Gonzales::MiniFeat;
 
 extends 'Bio::Gonzales::Feat::IO::Base';
@@ -24,8 +23,7 @@ extends 'Bio::Gonzales::Feat::IO::Base';
 #'OSs', 'OGs', 'OCs', 'OXs', 'OHs',
 #'Refs', 'CCs', 'DRs', 'PE', 'KWs', 'FTs', 'Stars', 'SQs');
 
-our $VERSION = '0.062'; # VERSION
-has check_crc64 => ( is => 'rw' );
+our $VERSION = '0.0546'; # VERSION
 
 sub next_feat {
   my ($self) = @_;
@@ -81,9 +79,6 @@ sub Parse_entry {
     source     => $src,
     attributes => { 'Name' => [$name] }
   );
-  my $sequence;
-  my %description = (main => []);
-  my $description_level = 'main';
 
   my @seq;
   for my $e (@$lines) {
@@ -91,8 +86,8 @@ sub Parse_entry {
     my $key = substr $e, 0, 2;
 
     #  FIXME also parse these parts of the data entry
-    #last if ( $key eq 'FT' );
-    #last if ( $key eq 'SQ' );
+    last if ( $key eq 'FT' );
+    last if ( $key eq 'SQ' );
 
     last if ( $key eq '//' );
 
@@ -113,22 +108,11 @@ sub Parse_entry {
       $mfeat->add_attr( 'accession_number' => [ split /;\s+/, $val ] );
     } elsif ( $key eq 'DT' ) {
     } elsif ( $key eq 'DE' ) {
-      if($val =~ /^(\w+):\s*$/) {
-        $description_level = lc($1);
-        next;
-      }
-      if($val =~ s/^Flags:\s*//) {
-        push @{$description{main}}, [ 'flags', undef,  split( /;\s*/, $val )];
-        next;
-      }
-      die $val unless($val =~ /^(?:(\w+):)?\s*(\w+)=\s*(.*)$/);
-      my $cat = $1 // $description{$description_level}[-1][0];
-      push @{$description{$description_level}}, [ lc($cat), lc($2), $3 ];
     } elsif ( $key eq 'GN' ) {
       next if ( $val eq 'and' );
       for my $a ( split /;\s+/, $val ) {
         my ( $ak, $av ) = split /=/, $a, 2;
-        $mfeat->add_attr( "gene_" . lc($ak) => [ $av ? split( /\s*,\s*/, $av ) : '' ] );
+        $mfeat->add_attr( "gene_" . lc($ak) => [ $av ? split( /\s*,\s*/, $av) : '' ] );
       }
     } elsif ( $key eq 'OS' ) {
     } elsif ( $key eq 'OG' ) {
@@ -181,17 +165,12 @@ sub Parse_entry {
     } elsif ( $key eq 'FT' ) {
       #_read_ft($feat, line)
     } elsif ( $key eq 'SQ' ) {
-      #SQ   SEQUENCE XXXX AA; XXXXX MW; XXXXXXXXXXXXXXXX CRC64;
-      $val =~ s/^SEQUENCE\s+//;
-      my ( $length, $weight, $crc64 ) = split /;\s+/, $val;
-      $length =~ s/\s+AA$//;
-      $weight =~ s/\s+MW$//;
-      $crc64 =~ s/\s+CRC64$//;
-      $mfeat->add_attr(
-        'seq' => { length => int($length), molecular_weight => $weight + 0.0, crc64 => $crc64 } );
+      #cols = value.split()
+      #assert len(cols) == 7, "I don't understand SQ line %s" % line
+      # Do more checking here?
+      #record.seqinfo = int(cols[1]), int(cols[3]), cols[5]
     } elsif ( $key eq '  ' ) {
-      $val =~ y/A-Za-z//cd;
-      $sequence .= $val;
+      #_sequence_lines.append(value.replace(" ", "").rstrip())
     } elsif ( $key eq '//' ) {
       # Join multiline data into one string
       #record.description = " ".join(record.description)
@@ -205,42 +184,12 @@ sub Parse_entry {
       #reference.location = " ".join(reference.location)
       #record.sequence = "".join(_sequence_lines)
       #return record
-      last;
     } else {
       die sprintf( "Unknown keyword '%s' found", $key );
     }
   }
 
-  $mfeat->add_attr(description => _merge_descriptions(\%description));
   $mfeat->add_attr( ID => $mfeat->attr_first('accession_number') );
-
-  die "no sequence object found in " . $mfeat->id . Dumper($mfeat)
-    unless ( $mfeat->attr->{seq} );
-  die "CRC64 does not match for " . $mfeat->id
-    unless ( crc64($sequence) eq $mfeat->attr->{seq}[0]{crc64} );
-  $mfeat->attr->{seq}[0]{data} = $sequence;
 
   return $mfeat;
 }
-
-sub _merge_descriptions {
-  my $desc = shift;
-  my %desc_new;
-  while(my ($lvl, $data) = each %$desc) {
-  for my $d (@$data) {
-    my $cat = shift @$d;
-    my $scat = shift @$d;
-
-    $cat .= "_" . $scat if($scat);
-
-    $desc_new{$lvl}{$cat} //= [];
-
-    push @{$desc_new{$lvl}{$cat}}, @$d;
-  }
-
-  }
-  return { %{delete $desc_new{main}}, %desc_new };
-
-}
-
-__PACKAGE__->meta->make_immutable();

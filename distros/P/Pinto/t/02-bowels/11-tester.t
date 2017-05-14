@@ -1,8 +1,5 @@
 #!perl
 
-use strict;
-use warnings;
-
 use Test::More;
 
 use lib 't/lib';
@@ -10,9 +7,9 @@ use Pinto::Tester;
 use Pinto::Tester::Util qw(make_dist_struct parse_reg_spec);
 
 #-------------------------------------------------------------------------------
-subtest 'make_dist_struct' => sub {
 
-    my $spec   = 'AUTHOR/FooAndBar-1.2 = Foo~1.2; Bar~0.0 & Baz~3.1; Nuts~2.4';
+{
+    my $spec   = 'AUTHOR/FooAndBar-1.2=Foo~1.2,Bar~0.0&Baz~3.1,Nuts~2.4';
     my $struct = make_dist_struct($spec);
     is $struct->{cpan_author}, 'AUTHOR',    'Got author';
     is $struct->{name},        'FooAndBar', 'Got name';
@@ -20,12 +17,11 @@ subtest 'make_dist_struct' => sub {
     is_deeply $struct->{provides}->{Bar}, { file => 'lib/Bar.pm', version => '0.0' };
     is_deeply $struct->{requires},        { Baz  => '3.1',        Nuts    => '2.4' };
     is $struct->{version}, '1.2';
-
-};
+}
 
 #-------------------------------------------------------------------------------
-subtest 'parse_reg_spec' => sub {
 
+{
     my ( $author, $dist_archive, $pkg_name, $pkg_ver, $stack_name, $is_pinned ) =
         parse_reg_spec('AUTHOR/Foo-1.2/Foo~2.0/my_stack/*');
 
@@ -35,15 +31,14 @@ subtest 'parse_reg_spec' => sub {
     is $pkg_ver,      '2.0';
     is $stack_name,   'my_stack';
     is $is_pinned,    1;
-
-};
+}
 
 #-------------------------------------------------------------------------------
-subtest 'populate' => sub {
 
+{
     my $t = Pinto::Tester->new;
 
-    $t->populate('AUTHOR/FooAndBar-1.2=Foo~1.2;Bar~0.0');
+    $t->populate('AUTHOR/FooAndBar-1.2=Foo~1.2,Bar~0.0');
 
     # Without .tar.gz extension
     $t->registration_ok('AUTHOR/FooAndBar-1.2/Foo~1.2/master');
@@ -56,8 +51,7 @@ subtest 'populate' => sub {
 
     # Without explicit stack
     $t->registration_ok('AUTHOR/FooAndBar-1.2/Bar~0.0');
-
-};
+}
 
 #-------------------------------------------------------------------------------
 done_testing;

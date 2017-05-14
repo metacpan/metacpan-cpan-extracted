@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::_WebForm;
 use Lemonldap::NG::Portal::Simple;
 use base qw(Lemonldap::NG::Portal::_WebForm Lemonldap::NG::Portal::_Proxy);
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.9.1';
 
 ## @apmethod int authInit()
 # Call Lemonldap::NG::Portal::_Proxy::proxyInit();
@@ -68,7 +68,7 @@ Lemonldap::NG::Portal::AuthProxy - Authentication module for Lemonldap::NG
 that delegates authentication to a remote Lemonldap::NG portal.
 
 The difference with Remote authentication module is that the client will never
-be redirect to the main Lemonldap::NG portal. This configuration is usable if
+be redirected to the main Lemonldap::NG portal. This configuration is usable if
 you want to expose your internal SSO to another network (DMZ).
 
 =head1 SYNOPSIS
@@ -123,9 +123,9 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2009, 2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2009-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
-=item Copyright (C) 2010, 2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =back
 

@@ -1,0 +1,3 @@
+Use of uninitialized value at blib/lib/Term/Query.pm line 242.
+Use of uninitialized value at blib/lib/Term/Query.pm line 674, <STDIN> chunk 1.
+Answer = "no"

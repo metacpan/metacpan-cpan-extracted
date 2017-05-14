@@ -1,0 +1,37 @@
+---
+abstract: 'Perl API For Official Xunlei Remote API.'
+author:
+  - 'Zhu Sheng Li <zshengli@cpan.org>'
+build_requires:
+  Test::LWP::UserAgent: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Xunlei
+requires:
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  POSIX: '0'
+  Term::ANSIColor: '0'
+  Time::HiRes: '0'
+  URI::Escape: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/digglife/www-xunlei/issues
+  repository: git://github.com/digglife/www-xunlei.git
+version: '0.03'

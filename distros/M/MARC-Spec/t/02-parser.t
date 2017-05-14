@@ -1,7 +1,7 @@
 use Test::More;
 use MARC::Spec;
 
-my $parser = MARC::Spec->parse('...$a-z{LDR/0=\A|LDR/0=\X}{LDR/1!=\X}$$/1-#');
+my $parser = MARC::Spec::parse('...$a-z{LDR/0=\A|LDR/0=\X}{LDR/1!=\X}$$/1-#');
 
 # checking field
 ok $parser->field->tag eq '...', 'field tag';

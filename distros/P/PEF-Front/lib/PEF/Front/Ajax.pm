@@ -14,6 +14,12 @@ use PEF::Front::Validator;
 use PEF::Front::NLS;
 use PEF::Front::Response;
 
+my $json_utf8_object;
+
+BEGIN {
+	$json_utf8_object = JSON->new->utf8->convert_blessed;
+}
+
 sub ajax {
 	my ($request, $context) = @_;
 	my $form          = $request->params;
@@ -152,26 +158,37 @@ sub ajax {
 		}
 	}
 out:
+	if (exists $response->{answer_status} and $response->{answer_status} > 100) {
+		$http_response->status($response->{answer_status});
+		delete $response->{answer_status};
+	}
 	if ($context->{is_subrequest}) {
 		return $response;
 	} elsif ($json) {
-		if (exists $response->{answer} and not exists $response->{answer_no_nls}) {
-			my $args = exists($response->{answer_args}) ? $response->{answer_args} : [];
-			$args = [$args] if 'ARRAY' ne ref $args;
-			$response->{answer} = msg_get($lang, $response->{answer}, @$args)->{message};
+		if (    exists $response->{answer_http_response}
+			and blessed $response->{answer_http_response}
+			and $response->{answer_http_response}->isa('PEF::Front::Response'))
+		{
+			$http_response = $response->{answer_http_response};
+		} else {
+			if (exists $response->{answer} and not exists $response->{answer_no_nls}) {
+				my $args = exists($response->{answer_args}) ? $response->{answer_args} : [];
+				$args = [$args] if 'ARRAY' ne ref $args;
+				$response->{answer} = msg_get($lang, $response->{answer}, @$args)->{message};
+			}
+			if (exists $response->{answer_data} and ref $response->{answer_data}) {
+				$response = $response->{answer_data};
+			}
+			$http_response->content_type('application/json; charset=utf-8');
+			$http_response->set_body($json_utf8_object->encode($response));
 		}
-		$http_response->content_type('application/json; charset=utf-8');
-		$http_response->set_body(encode_json($response));
 		return $http_response->response();
 	} else {
-		if (exists $response->{answer_status} and $response->{answer_status} > 100) {
-			$http_response->status($response->{answer_status});
-			if (   $response->{answer_status} > 300
-				&& $response->{answer_status} < 400
-				&& (my $loc = $http_response->get_header('Location')))
-			{
-				$new_loc = $loc;
-			}
+		if (   $http_response->status > 300
+			&& $http_response->status < 400
+			&& (my $loc = $http_response->get_header('Location')))
+		{
+			$new_loc = $loc;
 		}
 		if (!defined($new_loc) || $new_loc eq '') {
 			cfg_log_level_debug

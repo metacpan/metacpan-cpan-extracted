@@ -1,0 +1,25 @@
+name: QtGui
+version: 4.004
+author:
+    - Vadim Likhota <vadim-lvv@yandex.ru>
+abstract: Perl interface to the Qt4 Gui library
+license: GPL
+distribution_type: module
+requires:     
+    perl: 5.008
+    Exporter: 0
+    QtCore: 4.004
+dynamic_config: 1
+provides:
+    QtGui:
+        file: lib/QtGui.pm
+no_index:
+    directory:
+        - examples
+        - t
+meta-spec:
+    url: http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+resources:
+    homepage: http://www.qt-apps.org/content/show.php/Perl+Qt4?content=69748
+generated_by: Hands version 1.0

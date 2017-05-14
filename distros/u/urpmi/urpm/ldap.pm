@@ -1,15 +1,12 @@
 package urpm::ldap;
 
-# $Id: ldap.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
 use warnings;
 use urpm;
-use urpm::util;
+use urpm::util qw(cat_ output_safe);
 use urpm::msg 'N';
 use urpm::media;
-
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
 
 our $LDAP_CONFIG_FILE = '/etc/ldap.conf';
 my @per_media_opt = (@urpm::media::PER_MEDIA_OPT, qw(md5sum ftp-proxy http-proxy));
@@ -42,14 +39,12 @@ sub write_ldap_cache($$) {
     # FIXME what perm for cache ?
     -d $ldap_cache or mkdir $ldap_cache
 	or die N("Cannot create ldap cache directory");
-    open my $cache, ">", "$ldap_cache/$medium->{name}"
-	or die N("Cannot write cache file for ldap\n");
-    print $cache "# internal cache file for disconnect ldap operation, do not edit\n";
-    foreach (keys %$medium) {
-        defined $medium->{$_} or next;
-        print $cache "$_ = $medium->{$_}\n";
-    }
-    close $cache;
+    output_safe("$ldap_cache/$medium->{name}",
+		join("\n",
+		     "# internal cache file for disconnect ldap operation, do not edit",
+		     map { "$_ = $medium->{$_}" } grep { $medium->{$_} } keys %$medium
+		)
+	) or die N("Cannot write cache file for ldap\n");
     return 1;
 }
 
@@ -237,7 +232,6 @@ sub load_ldap_media {
 
 1;
 
-__END__
 
 =back
 

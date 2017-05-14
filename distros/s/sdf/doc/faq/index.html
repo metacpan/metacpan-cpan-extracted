@@ -1,0 +1,308 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Frequently Asked Questions</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<H1>SDF Frequently Asked Questions</H1>
+<ADDRESS>SDF-FAQ.001 (Final)</ADDRESS>
+<ADDRESS>Ian Clatworthy</ADDRESS>
+<ADDRESS>27 October 1998</ADDRESS>
+<BR CLEAR="All">
+<!-- TOC -->
+<HR>
+<H2>Table of Contents</H2>
+<UL>
+<A HREF="#General Questions">1. General Questions</A><UL>
+<A HREF="#Where can I get this document">1.1. Where can I get this document?</A>
+<BR>
+<A HREF="#What is SDF">1.2. What is SDF?</A>
+<BR>
+<A HREF="#What platforms are supported">1.3. What platforms are supported?</A>
+<BR>
+<A HREF="#How do I get it">1.4. How do I get it?</A>
+<BR>
+<A HREF="#What else is required">1.5. What else is required?</A>
+<BR>
+<A HREF="#How can I learn SDF">1.6. How can I learn SDF?</A>
+<BR>
+<A HREF="#How is SDF supported">1.7. How is SDF supported?</A>
+<BR>
+<A HREF="#Why is SDF free">1.8. Why is SDF free?</A>
+<BR>
+<A HREF="#Is SDF still simple">1.9. Is SDF still simple?</A>
+<BR>
+<A HREF="#Why the grapes logo">1.10. Why the grapes logo?</A>
+<BR>
+<A HREF="#How can I help">1.11. How can I help?</A></UL>
+<BR>
+<A HREF="#SDF in the real world">2. SDF in the real world</A><UL>
+<A HREF="#How stable is SDF">2.1. How stable is SDF?</A>
+<BR>
+<A HREF="#How many people are using SDF">2.2. How many people are using SDF?</A>
+<BR>
+<A HREF="#What is SDF being used for">2.3. What is SDF being used for?</A>
+<BR>
+<A HREF="#What new developments are expected for SDF in the future">2.4. What new developments are expected for SDF in the future?</A></UL>
+<BR>
+<A HREF="#Output Formats">3. Output Formats</A><UL>
+<A HREF="#What output formats does SDF directly support">3.1. What output formats does SDF directly support?</A>
+<BR>
+<A HREF="#What output formats does SDF indirectly support">3.2. What output formats does SDF indirectly support?</A>
+<BR>
+<A HREF="#Why should I use SDF when my word processor can generate HTML">3.3. Why should I use SDF when my word processor can generate HTML?</A>
+<BR>
+<A HREF="#Can SDF generate Word documents">3.4. Can SDF generate Word documents?</A>
+<BR>
+<A HREF="#Can SDF generate Windows help">3.5. Can SDF generate Windows help?</A>
+<BR>
+<A HREF="#Is FrameMaker needed for generating PostScript">3.6. Is FrameMaker needed for generating PostScript?</A></UL>
+<BR>
+<A HREF="#Language Issues">4. Language Issues</A><UL>
+<A HREF="#How do I enter an empty row in a table">4.1. How do I enter an empty row in a table?</A>
+<BR>
+<A HREF="#How do I enter a multi-line cell in a table">4.2. How do I enter a multi-line cell in a table?</A></UL></UL>
+<!-- ENDTOC -->
+<HR>
+<H1><A NAME="General Questions">1. General Questions</A></H1>
+<H2><A NAME="Where can I get this document">1.1. Where can I get this document?</A></H2>
+<P>The latest version of this FAQ is available from <A HREF="http://www.mincom.com/mtr/sdf/faq/">http://www.mincom.com/mtr/sdf/faq/</A>.</P>
+<H2><A NAME="What is SDF">1.2. What is SDF?</A></H2>
+<P>SDF (Simple Document Format) is a freely available documentation system designed and developed by <A HREF="mailto:ianc@mincom.com">Ian Clatworthy</A>, with help from many others. Based on a simple, readable markup language, SDF generates high quality output in multiple formats, all derived from a single document source. Supported output formats include HTML, PostScript, PDF, man pages, SGML, POD, LaTeX, GNU Info, MIF, RTF, Windows help and plain text. If you want to:</P>
+<UL>
+<LI>publish documents or reports on the Web or in multiple formats
+<LI>maintain a large documentation suite using rule-based formatting and hypertext generation
+<LI>embed documentation in source code or pretty print source code</UL>
+<P>then SDF may be for you.</P>
+<H2><A NAME="What platforms are supported">1.3. What platforms are supported?</A></H2>
+<P>SDF documents are plain text files which can be created on any platform.</P>
+<P>The SDF software has been completely developed in Perl, so it can be executed on all commonly used platforms including most variants of Unix, most variants of Windows, OS/2, the Macintosh and VMS. Perl 5.003 or later is required.</P>
+<H2><A NAME="How do I get it">1.4. How do I get it?</A></H2>
+<P>SDF is available in a number of formats from <A HREF="http://www.mincom.com/mtr/sdf/download.html">http://www.mincom.com/mtr/sdf/download.html</A>. It should also be available from CPAN, the Comprehensive Perl Archive Network.</P>
+<H2><A NAME="What else is required">1.5. What else is required?</A></H2>
+<P>To generate PostScript, SDF requires one of the following:</P>
+<UL>
+<LI>the freely available <EM>pod2ps</EM> program, available from <A HREF="http://www.oasis.leo.org/perl/scripts/textproc/pod2ps.dsc.html">http://www.oasis.leo.org/perl/scripts/textproc/pod2ps.dsc.html</A>
+<LI>the freely available <EM>SGML-Tools</EM> and <EM>LaTeX</EM> packages
+<LI>FrameMaker 5.x or later
+<LI>another word processor which can import RTF.</UL>
+<P>Earlier versions of FrameMaker will generally work, but I don't explicitly support them.</P>
+<P>To generate PDF, <A HREF="http://www.adobe.com">Adobe</A> <A HREF="http://www.adobe.com/prodindex/acrobat/">Acrobat</A> is required.</P>
+<P>To generate Windows help, a help compiler (e.g. hcp.exe) is required.</P>
+<H2><A NAME="How can I learn SDF">1.6. How can I learn SDF?</A></H2>
+<P>Generally, the best way to learn SDF is to read the overview paper called <A HREF="../paper/sdfintro.html">The SDF Document Development System</A> - it should contain enough details to get you started. If you need further information on the commonly used features, read the first few chapters of the <A HREF="../user/ug_sdf.html">SDF User Guide</A>.</P>
+<P>If you already know Perl's POD format, you might want to read the <A HREF="../podusers/index.html">SDF for POD Users</A> tutorial before these.</P>
+<P>In practice, 99% of SDF documents are created by copying an existing one and making the necessary changes. So, once you're created templates for the types of documents you commonly produce, things are pretty simple ...</P>
+<H2><A NAME="How is SDF supported">1.7. How is SDF supported?</A></H2>
+<P>The following mailing lists are available:</P>
+<UL>
+<LI><A HREF="mailto:sdf-users@mincom.com">sdf-users@mincom.com</A> - for general questions
+<LI><A HREF="mailto:sdf-bugs@mincom.com">sdf-bugs@mincom.com</A> - for reporting bugs and fixes.</UL>
+<P>To subscribe to these lists, send email to <A HREF="mailto:sdf-users-request@mincom.com">sdf-users-request@mincom.com</A> and/or <A HREF="mailto:sdf-bugs-request@mincom.com">sdf-bugs-request@mincom.com</A> for instructions on using <EM>factotum</EM>, the majordomo variant that manages these lists. In short, send email to <A HREF="mailto:factotum@mincom.com">factotum@mincom.com</A> with a message body of <EM>subscribe sdf-users</EM> or <EM>subscribe sdf-bugs</EM>.</P>
+<P>An on-line <A HREF="http://www.mincom.com/mtr/sdf/bugs/">bug database</A> is also available providing information on some of the known bugs and requested enhancements.</P>
+<H2><A NAME="Why is SDF free">1.8. Why is SDF free?</A></H2>
+<P>I have always wanted to contribute a useful tool <EM>back</EM> to the worldwide software community which has given me so many useful tools (e.g. <A HREF="http://www.perl.com/perl/index.html">Perl</A>). As there appears to be very few documentation tools which:</P>
+<OL>
+<LI>generate high quality output in multiple formats, and
+<LI>reduce the time it takes to produce software documentation</OL>
+<P><A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> will hopefully be useful to a large number of software developers.</P>
+<P>Also, by being freely available, SDF should benefit in several ways. These include more testers, more add-on tools and more design ideas.</P>
+<H2><A NAME="Is SDF still simple">1.9. Is SDF still simple?</A></H2>
+<P>Arguably not. But SDF has remained simple in spirit, so the name hasn't been changed. Maybe <EM>Software Document Format</EM> would be a better choice, given that SDF is part mark-up language, part programming language. Feel free to make SDF stand for whatever you like.</P>
+<H2><A NAME="Why the grapes logo">1.10. Why the grapes logo?</A></H2>
+<P>After considering a few logos with a paper/writing theme, it was decided to follow that great software package tradition - a meaningless logo! As an on-line documentation system is essentially a cluster of topics linked together, I looked for something which reflected that idea. After 10 minutes, the best I could do was grapes, a fern or a wattle flower. After 5 seconds of agonising decision making, the prize went to the grapes.</P>
+<P>Fortunately, there seems to be some useful parallels:</P>
+<UL>
+<LI>from a single input (type of grape), several high quality outputs (grape juice/wines/spirits) can be generated (likewise SDF)
+<LI>grapes are quite palatable on their own (as is SDF).</UL>
+<P>Ok - it's not as sexy as a cup of coffee, but grapes, grape juice and red wine (at least) are probably better for you. :-)</P>
+<H2><A NAME="How can I help">1.11. How can I help?</A></H2>
+<P>In lots of ways:</P>
+<P><B>Tell your friends about SDF.</B></P>
+<UL>
+The more users SDF has, the sooner bugs are found and fixed.</UL>
+<P><B>Tell the world about SDF.</B></P>
+<UL>
+If SDF has made your job more enjoyable, consider writing an article for a magazine explaining why.</UL>
+<P><B>Report bugs.</B></P>
+<UL>
+If you find a bug, report it to <A HREF="mailto:sdf-bugs@mincom.com">sdf-bugs@mincom.com</A>. Patches are very welcome.</UL>
+<P><B>Make SDF more useful.</B></P>
+<UL>
+If SDF doesn't generate an output format you need, consider developing an output driver for that format. Depending on your Perl programming skills, this can take as little as a few days.</UL>
+<P><B>Make it easier for people to migrate to SDF.</B></P>
+<UL>
+Consider developing a converter from an existing format to SDF. For example, a high quality RTF to SDF converter would be extremely useful.</UL>
+<HR>
+<H1><A NAME="SDF in the real world">2. SDF in the real world</A></H1>
+<H2><A NAME="How stable is SDF">2.1. How stable is SDF?</A></H2>
+<P>Other than some syntax changes introduced in 2.000beta10 to make SDF more palatable for users of Perl's POD format, the core SDF code hasn't changed much since early 1996. Within Mincom, people have been using SDF on a daily basis for at least 4 or 5 years now.</P>
+<H2><A NAME="How many people are using SDF">2.2. How many people are using SDF?</A></H2>
+<P>At the moment (February 98), my guess is that SDF has 50-100 users within <A HREF="http://www.mincom.com">Mincom</A> and a few hundred within other organisations. Excluding Mincom, SDF has active users within a large number of countries including Australia, Belgium, Canada, Denmark, England, Germany, France, Italy, New Zealand, Norway, Russia and the USA.</P>
+<H2><A NAME="What is SDF being used for">2.3. What is SDF being used for?</A></H2>
+<P>Within <A HREF="http://www.mincom.com">Mincom</A>, SDF is used for a large number of purposes including:</P>
+<UL>
+<LI>The user documentation for Mincom's flagship product, MIMS Open Enterprise. This is a large documentation suite containing over 11,000 A4 pages and over 10,000 HTML topics with over 144,000 hypertext jumps. All of the hypertext is automatically generated, greatly reducing the maintenance cost of the online documentation.
+<LI>All of the documents produced by the MIMS Technology Research (MTR) group within the last 3 years, i.e. a few hundred documents, and a Web-based project information system for all MTR projects. (The MTR group is the home of SDF.)
+<LI>Embedded documentation within C and C++ code.
+<LI>Documentation for Delphi components developed in-house.
+<LI>Documentation for Perl modules developed in-house.
+<LI>The documentation for SDF itself.</UL>
+<P>Outside of Mincom, SDF is also used for many things including:</P>
+<UL>
+<LI>The SSLeay FAQ (<A HREF="http://www.psy.uq.edu.au/~ftp/Crypto/">http://www.psy.uq.edu.au/~ftp/Crypto/</A>)
+<LI>All of the documentation produced by Cryptsoft Pty Ltd (<A HREF="http://www.cryptsoft.com">http://www.cryptsoft.com</A>)
+<LI>Documentation for the Ultimate editor (<A HREF="http://http://www.ufs.com.au/">http://http://www.ufs.com.au/</A>)
+<LI>The Fulcrum Consulting Group (<A HREF="http://www.fulcrum.com.au">http://www.fulcrum.com.au</A>) are using SDF for automatically generating periodic customer reports for publishing in a variety of formats, and also for internal procedures.
+<LI>Lots of other interesting things I'm unable to mention until I get permission to do so.</UL>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>If you are using SDF and would like to be mentioned above, send me some email.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>SDF can also be used to convert documentation in Perl's POD format to any output format supported by SDF. For example, the HTML produced by SDF for Perl's documentation is available at <A HREF="http://www.mincom.com/mtr/perl/catalog.html">http://www.mincom.com/mtr/perl/catalog.html</A>.</P>
+<H2><A NAME="What new developments are expected for SDF in the future">2.4. What new developments are expected for SDF in the future?</A></H2>
+<P>My current priorites are:</P>
+<OL>
+<LI>Supporting existing SDF users (by email and bug fixes).
+<LI>Developing the next generation of SDF called <A HREF="http://www.mincom.com/mtr/simpledoc/">SimpleDoc</A>.</OL>
+<P>The key objectives of SimpleDoc are:</P>
+<UL>
+<LI>upwards compatibility with SDF
+<LI>a new architecture which supports:<UL>
+<LI>multiple input parsers (SDF, XML and POD)
+<LI>output formatters which are decoupled from the input format</UL>
+<LI>Perl 5 modules
+<LI>better performance
+<LI>support for XML output (in addition to XML input)
+<LI>support for HTML-Help output
+<LI>support for Java-Help output
+<LI>better LaTeX output.</UL>
+<P>As always, my time is limited, so if one or more of the above features interests you, let me know so I can prioritise things accordingly.</P>
+<P>Further information on SimpleDoc is available on the web. The URL is <A HREF="http://www.mincom.com/mtr/simpledoc/">http://www.mincom.com/mtr/simpledoc/</A>.</P>
+<HR>
+<H1><A NAME="Output Formats">3. Output Formats</A></H1>
+<H2><A NAME="What output formats does SDF directly support">3.1. What output formats does SDF directly support?</A></H2>
+<P>HTML, plain text, POD, MIF (Maker Interchange Format), SGML, MIMS F6 help and MIMS HTX.</P>
+<P>When generating HTML, either a single document or a set of topics can be created.</P>
+<P>When generating MIF, either a single document or a FrameMaker book and set of chapters can be created.</P>
+<H2><A NAME="What output formats does SDF indirectly support">3.2. What output formats does SDF indirectly support?</A></H2>
+<P>By using the pod2* programs provided with Perl 5, SDF can generate man pages, LaTeX files, PostScript and a few other formats.</P>
+<P>By using FrameMaker, SDF can indirectly generate PostScript, FrameViewer, RTF and other formats which FrameMaker can export. On Unix, most of these can be generated using FrameMaker's batch utility (fmbatch). On other platforms, it is necessary to generate a MIF file, open it in FrameMaker and print, save or export to the required format.</P>
+<P>By using <EM>SGML-Tools</EM> 1.02 or later, SDF can indirectly generate LaTeX, RTF, GNU Info and LyX formats. If LaTeX is also installed, SDF can indirectly generate PostScript and DVI.</P>
+<H2><A NAME="Why should I use SDF when my word processor can generate HTML">3.3. Why should I use SDF when my word processor can generate HTML?</A></H2>
+<P>Unlike WYSIWYG tools, SDF encourages authors to specify documents in a <EM>logical</EM> manner. As a result, SDF has the <EM>semantics</EM> it needs to generate high quality paper-based and online documents.</P>
+<P>SDF also includes a number of features which greatly simplify the effort required to produce online documents. These include:</P>
+<UL>
+<LI>centralised hypertext management
+<LI>rule-based hypertext generation.</UL>
+<P>It could be a long time before word processors provide these features. As a result, it takes a lot less effort (and cost) to create and maintain a large online documentation system in SDF when compared to existing WYSIWYG tools (that I know about, at least).</P>
+<H2><A NAME="Can SDF generate Word documents">3.4. Can SDF generate Word documents?</A></H2>
+<P>Not directly. However, SDF can generate RTF (Rich Text Format) files which can be opened in Word and many other word processors. The commands to convert a file called <TT>mydoc.sdf</TT> to RTF are:</P>
+<PRE>
+   sdf -2rtf_mif  mydoc.sdf
+   sdf -2rtf_fm   mydoc.sdf
+   sdf -2rtf_sgml mydoc.sdf
+   sdf -2rtf      mydoc.sdf
+</PRE>
+<P>The first of these works by generating a MIF (Maker Interchange Format) file and then converting it to RTF via a Perl script supplied with SDF called <EM>mif2rtf</EM>. The main problems with mif2rtf are:</P>
+<OL>
+<LI>it is slow
+<LI>the output is not as great as one would hope for
+<LI>it occasionally crashes. :-(</OL>
+<P>The second command works by generating a MIF file and then converting it to RTF via FrameMaker's RTF export filter. This approach is more reliable than using mif2rtf, although it has it own set of problems and limitations.</P>
+<P>The third command works by generating a SGML file and then uses <EM>SGML-Tools</EM> to generate RTF. I haven't tested <EM>SGML-Tools</EM>'s RTF generation, so I have no idea how well this will work.</P>
+<P>The forth command is an alias for one of the commands above. See the <EM>FormatMapping</EM> section of the <TT>sdf.ini</TT> file to view and/or edit the mapping.</P>
+<P>Oneday, SDF will support RTF directly.</P>
+<H2><A NAME="Can SDF generate Windows help">3.5. Can SDF generate Windows help?</A></H2>
+<P>SDF can generate RTF files and HPJ files which are the inputs to a Windows 3.x help compiler (e.g. hcp.exe).</P>
+<P>I haven't tried building help for Windows 95 or NT, so I'm not sure how well that works or otherwise. In any case, Microsoft is moving to HTML for online help, so I'm not overly motivated to improve the existing support for Windows help.</P>
+<H2><A NAME="Is FrameMaker needed for generating PostScript">3.6. Is FrameMaker needed for generating PostScript?</A></H2>
+<P>No. <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> can generate PostScript via the freely available <EM>pod2ps</EM> program or the freely available <EM>SGML-Tools</EM>/<EM>LaTeX</EM> packages.</P>
+<P>However, if you have <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A>, using it currently has the following advantages:</P>
+<UL>
+<LI>the <A HREF="http://www.adobe.com">PostScript</A> it generates looks better than that generated by most other packages (at the moment)
+<LI>SDF currently supports <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> better than other packages in some areas (e.g. indexes)
+<LI>SDF has been tested with <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A> much more than other packages.</UL>
+<P>Alternatively, SDF can be used to generate RTF which can then be imported into most word processors.</P>
+<HR>
+<H1><A NAME="Language Issues">4. Language Issues</A></H1>
+<H2><A NAME="How do I enter an empty row in a table">4.1. How do I enter an empty row in a table?</A></H2>
+<P>TBL format ignores blanks lines, so to enter an empty line, you need to enter an empty cell like this:</P>
+<PRE>
+!block table
+Big     Small
+A       a
+{{}}
+B       b
+!endblock
+</PRE>
+<P>The result is:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Big</STRONG>
+</TD>
+<TD>
+<STRONG>Small</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+A
+</TD>
+<TD>
+a
+</TD>
+</TR>
+<TR>
+<TD>
+<EM>&nbsp;</EM>
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+B
+</TD>
+<TD>
+b
+</TD>
+</TR>
+</TABLE>
+
+<H2><A NAME="How do I enter a multi-line cell in a table">4.2. How do I enter a multi-line cell in a table?</A></H2>
+<P>By beginning a cell with a &lt;&lt; symbol like this:</P>
+<PRE>
+!block table
+Option  Description
+-g      &lt;&lt;
+        This option produces the following:
+
+        !import &quot;g_code&quot;
+&gt;&gt;
+-v      verbose mode
+!endblock
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG></P>
+<OL>
+<LI>The cell is terminated by a &gt;&gt; symbol at the beginning of a line.
+<LI>You can place any SDF you like within the cell.
+<LI>Whitespace is generally ignored at the beginning of lines, so you can put the cell contents under its column heading if you want to.
+<LI>If the multi-line cell is not the last one within the row, you currently need to format the table using delimited format rather than fixed width format.</OL>
+<P><HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,4 @@
+This file is called lib to make sure
+that the dir_find command only finds
+directories when I do a search for
+lib in the find_dir.t test.

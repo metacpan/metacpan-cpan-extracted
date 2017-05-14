@@ -1,0 +1,118 @@
+=================
+General issues
+
+- Different fields have different importance in searches. If present,
+  md5sum gets very high weight. File name is next, followed by longest
+  pathname match, followed by approximate matches of either. ctime
+  would be the last factor, although its importance should be raised
+  if md5sum is not present. 
+  [DMA 20080723-?]
+
+- FILEHASH: report class now will only need different
+  output formats, or a means of passing it an output format.
+  [DMA 20080805-?]
+
+- FILEHASH: FileHash::Base: watch out for a null full name before calling _branch!
+  [DMA 20080805-?]
+
+- FILEHASH: perhaps need an A + AB operator?
+  [DMA 20080805-?]
+
+=================
+FileHash::Base
+
+- I need to check the version number that is read from a dump file
+  to make sure it is one we can handle.
+
+- Depth counter is included just in case I ever want to put in a
+  trace of the recursive descent.
+  [DMA 20080723-?]
+
+- Add date ranges, sets. This will make the Entry more useful as I
+  place to collect information in cases where it is in use for file
+  system restoration from bits and pieces. You might only know
+  that all files must have dates xxxx<, or that they are between
+  xxxx>,yyyy<= (ie xxxx>now,yyyy<=now). If useful allow multiple 
+  date ranges.
+  [DMA 20080723-?]
+
+- Could I treat tar an ar files of various types as a sort of 
+  directory? I could open them, test them, do the md5hash of each
+  file and record it so that I could detect corruption.
+  [DMA 20080723-?]
+
+- Could I import the partial name matches I used a couple years ago
+  in my ArchiveManager.pl be useful here as well?
+  [DMA 20080723-?]
+	- partial path match comparisons
+	  [DMA 20080723-?]
+	- Could I detect a nearly complete copy of a directory?
+	  [DMA 20080723-?]
+		- I may need FileHash entries for directories too
+		  [DMA 20080723-?]
+
+=================
+FileHash::Entry
+
+- We are using invalid lengths to skip lines that do not match our 
+  format. It's a silly cheat for working with files with headers and 
+  we'll need something better. initFromLine.
+  [DMA 20080723-?]
+
+- I need a fault_check_isglob for initFromDump method.
+  [DMA 20080724-?]
+
+=================
+FileHash::Report
+
+- An improved Report format would be one that uses a FormatString to
+  do the output field selection, although that would not much help
+  with pretty printing for readability, which is one of the key
+  requirements of a report vs a dump.
+  [DMA 20080723-?]
+
+- What about the format statement with a picture?
+  [DMA 20080723-?]
+
+=================
+FileHash::FormatString
+
+- Add code to validate simple data values, ie in _getUid, etc
+  [DMA 20080723-?]
+
+- I'd like to use callbacks to the Entry to update each field directly
+  as it is parsed, but that would make Entry's directly changeable,
+  which opens a whole can of worms on keeping data consistant inside
+  an object which is supposed to have a 'hard shell' around it. This
+  note is here just so I will return to this issue and think about it
+  again from perhaps a different angle sometime in the future.
+  [DMA 20080723-?] 
+
+=================
+MYSQL support
+
+- MYSQL dump may be necessary due to size. There could be millions of
+  entries.
+  [DMA 20080723-?]
+	- The kind of actions I need in the end are like (A-C)*B,
+	  or alternatively expressed, not(A*B)*C, where A is the 
+	  set we want; C is what we already have, and B is a possible
+	  source of files we could use.
+	  [DMA 20080723-?]
+	- This makes it easier to have many different B's from many
+	  sources. For instance, multiple backup CD's and disks.
+	  [DMA 20080723-?]
+
+- If I wanted to write immediately to MYSQL, _store is the only method 
+  that needs to be modified. I could probably manage it with a simple
+  switch in the new method. There would of course be the need for db
+  open, creation, and retrieval methods.
+  [DMA 20080723-?]
+
+- How do you then deal with non-unique keys? Both fname and md5sum,size
+  are non-unique, which is the point. Perhaps I have no real key other
+  than recnum and everything else is just done by selects?
+  Would I then replace the Content and Name subclasses with a mysql
+  subclass and the old searches just become selects as noted?
+  [DMA 20080723-?]
+

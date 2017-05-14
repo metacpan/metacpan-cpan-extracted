@@ -11,13 +11,12 @@ use MooseX::Aliases;
 
 use URI;
 
-use Pinto::Constants qw(@PINTO_DEFAULT_SOURCE_URIS);
 use Pinto::Types qw(Dir File Username PerlVersion);
 use Pinto::Util qw(current_username current_time_offset);
 
 #------------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #------------------------------------------------------------------------------
 # Moose attributes
@@ -154,8 +153,8 @@ has sources => (
     is            => 'ro',
     isa           => Str,
     key           => 'sources',
-    default       => "@PINTO_DEFAULT_SOURCE_URIS",
-    documentation => 'URIs of upstream repositories (space delimited)',
+    default       => 'http://cpan.perl.org http://backpan.perl.org',
+    documentation => 'URLs of upstream repositories (space delimited)',
 );
 
 has target_perl_version => (
@@ -173,14 +172,6 @@ has recurse => (
     key           => 'recurse',
     documentation => 'Default recursive behavior',
     default       => 1,          
-);
-
-has intermingle => (
-    is            => 'ro',
-    isa           => Bool,
-    key           => 'intermingle',
-    documentation => 'Allow stacks to intermingle distributions',
-    default       => 0,          
 );
 
 #------------------------------------------------------------------------------
@@ -211,8 +202,7 @@ sub sources_list {
 sub directories {
     my ($self) = @_;
 
-    return ( $self->root_dir, $self->config_dir, $self->cache_dir, 
-             $self->authors_dir, $self->log_dir, $self->db_dir );
+    return ( $self->root_dir, $self->config_dir, $self->cache_dir, $self->authors_dir, $self->log_dir, $self->db_dir );
 }
 
 #------------------------------------------------------------------------------
@@ -229,7 +219,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -237,7 +230,7 @@ Pinto::Config - Internal configuration for a Pinto repository
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 DESCRIPTION
 
@@ -250,7 +243,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2001-2016, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2017, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -18,8 +18,8 @@ use File::Copy;
 
 $| = 1;
 
-my $Version  = "1.24";
-my $Latest_t = "5.025011";
+my $Version  = "1.25";
+my $Latest_t = "5.025012";
 my $Author   = 'paul@pjcj.net';
 my @perlbug  = ("perlbug", "-a", $Author,
                            "-s", "Installation of Devel::Cover $Version");
@@ -32,7 +32,7 @@ my @inc      = sort keys %inc;
 open I, ">lib/Devel/Cover/Inc.pm"
     or die "Cannot open lib/Devel/Cover/Inc.pm: $!";
 print I <<"EOI";
-# Copyright 2001-2016, Paul Johnson (paul\@pjcj.net)
+# Copyright 2001-2017, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -103,7 +103,7 @@ for my $t (readdir D) {
     print T <<EOT;
 #!$^X
 
-# Copyright 2002-2016, Paul Johnson (paul\@pjcj.net)
+# Copyright 2002-2017, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -172,20 +172,18 @@ my $d = <<EOM;
 The coverage database can be stored in any of the Storable, JSON or Sereal
 formats.  To use the Storable format, the Storable module is required.  This has
 been a core module since perl-5.8.0.  To store the database in JSON format
-JSON::PP can be used.  This has been a core module since perl-5.14.0.  If you
-wish, you may install the JSON module which will be used in preference.  To use
-the Sereal format, the Sereal module should be installed.  This is available on
-CPAN.
+JSON::MaybeXS can be used.  It will use the best JSON backend available, trying
+first Cpanel::JSON::XS.  To use the Sereal format, the Sereal module should be
+installed.  This is available on CPAN.
 
 Sereal is used if it is available.  Otherwise JSON is used, if available.
 Otherwise Storable will be used.  The Sereal and JSON formats should be portable
 between all systems, whereas Storable format may not be.
 EOM
 
-check "Storable", $d;
-check "JSON",     $d;
-check "JSON::PP", $d;
-check "Sereal",   $d;
+check "Storable",      $d;
+check "JSON::MaybeXS", $d;
+check "Sereal",        $d;
 
 check "Digest::MD5", <<EOM;
 Digest::MD5 is required to check whether covered files have changed.  You can

@@ -1,0 +1,34 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="dev_stage_units" cv_table="SMP_DevelopmentStageUnits">
+  <comment type="definition">This table provides the controlled vocabulary for the column developmental stage units in the table sample and is used to delimit the units that are employed to describe such stages 	
+</comment>
+<term name="seconds"
+        description="none available"/>
+<term name="minutes"
+        description="none available"/>
+<term name="hours"
+        description="none available"/>
+<term name="days"
+        description="none available"/>
+<term name="weeks"
+        description="none available"/>
+<term name="years"
+        description="none available"/>
+<term name="decades"
+        description="none available"/>
+<term name="undifferentiated"
+        description="none available"/>
+<term name="immature"
+        description="none available"/>
+<term name="mature"
+        description="none available"/>
+<term name="senescent"
+        description="none available"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

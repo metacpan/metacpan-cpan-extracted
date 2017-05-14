@@ -1,0 +1,17 @@
+# This file tests the define macro
+
+# test numbers
+!define num1
+!define num2 42
+Variable num1 is [[num1]].
+Variable num2 is [[num2]].
+
+# test strings
+!define str1 "My favorite station"
+Variable str1 is [[str1]].
+
+# test expressions (and re-definition)
+!define num2 42 * 2 / 3
+!define str2 'AA-' . &Var("str1") . '-ZZ'
+Variable num2 is [[num2]].
+Variable str2 is [[str2]].

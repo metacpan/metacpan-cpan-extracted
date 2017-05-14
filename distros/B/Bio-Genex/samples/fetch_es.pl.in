@@ -1,0 +1,472 @@
+%%START_PERL%%
+
+use Carp;
+use strict;
+%%GENEX_EXTRALIBS%%
+use DBI;              # and the DBI module
+use CGI qw/:standard :html3 :Carp/; # LS's CGI thingie
+use CGI::Carp qw(fatalsToBrowser);
+use Bio::Genex qw(timestamp);
+use Bio::Genex::ExperimentSet;
+use Bio::Genex::DBUtils qw(create_select_sql fetch_es_species);
+use Bio::Genex::HTMLUtils;
+
+# ============  Executive / Important Decisions  ==========================
+my $current_time = timestamp();
+
+# vars for generating URLs, local temp storage
+my $www_server = '%%WWWHOST%%';
+my $cgi_bin = '%%GENEX_URL_EXAMPLE%%';
+
+# start a connection using the default parameters
+my $dbh = Bio::Genex::current_connection();
+
+# ======= Start composing HTML page =====
+my $q = new CGI;
+
+print $q->header, 
+  $q->start_html('ExperimentSet Viewer Page'), 
+  $q->h2('ExperimentSets Retrieved from GeneX');
+
+# ===============  Get the params from the Web Page via CGI  ==============
+my ($query,@es_names,@species,@tech_types,@data_providers,$do_fetch,%columns,%column2name,%name2column,@column_names);
+
+# setup some useful aliases
+%column2name = %{Bio::Genex::ExperimentSet->column2name()};
+%name2column = %{Bio::Genex::ExperimentSet->name2column()};
+@column_names = @{Bio::Genex::ExperimentSet->column_names()};
+
+my $DEBUG = 0;
+my $DB = 0;
+if ($DB) {
+  open(IN, "/tmp/params.txt") or die "Couldn't open param file";
+  restore_parameters(\*IN);
+  close(IN);
+} 
+
+my $ONLY_ONE_ES = 0;
+if (param) {
+  $DEBUG = param('DEBUG') if defined param('DEBUG');
+
+  @es_names = param('Experiments');
+  @species = param('Species');	
+  @tech_types = param('Tech');	
+  @data_providers = param('DataProviders');	
+
+
+  # And following can be as many different buttons and widgets and dohickies
+  # as we want to set all the params we want/need to compose the SQL
+
+  # get check box values
+  my @check_boxes = param('experiment_checkboxes');
+  foreach (@check_boxes) {
+    $columns{$_} = 1;
+  }
+
+  # and button type gets set here
+  $do_fetch = param('FETCH');
+  $ONLY_ONE_ES = param('ONLY_ONE_ES') if defined param('ONLY_ONE_ES');
+}
+
+# ==========  Got all params, now do something useful with them ============
+# So that sets all the parameters for the search.  Now, depending on which 
+# button was pushed, we will either do the search and find out how many rows 
+# get returned or do the search and do the rest of the analysis, or simply 
+# download the data.  
+
+if ($DEBUG) {
+  unless ($DB) {
+    open(OUT, ">/tmp/params.txt") or die "Couldn't open param file";
+    save_parameters(\*OUT);
+  }
+
+  my $table = $q->table({-border => ''},
+			caption('Values of CGI parameters'),
+			Tr([th(['parameter name','parameter value']),
+			    td(['FETCH', $do_fetch]),
+			    td(['Tech', join ', ',@tech_types]),
+			    td(['Species', join ', ',@species]),
+			    td(['DataProvider', join ', ',@data_providers]),
+			    td(['Experiment', join ', ',@es_names]),
+			   ])
+		       );
+  
+  print $table;
+
+  my @rows;
+  foreach (@column_names) {
+    push(@rows,td([$_, exists $columns{$_}]));
+  }
+  
+  print table({-border =>'',-cols=>2},
+		    caption('Values of checkbox parameters'),
+		    Tr(th(['parameter name','parameter value'])),
+		    Tr(\@rows));
+  
+}
+
+########################################
+#
+# form the sql query based on the input parameters
+#
+
+########################################
+# 
+# @COLUMNS handles the list of column we want to retrieve 
+#    from the ExperimentSet table
+#
+
+my $TABLE = 'ExperimentSet';
+# we start with two columns
+my @COLUMNS = ("$TABLE.name", 'es_pk');
+
+# now we add more columns based on the CGI parameters
+foreach (keys %columns) {
+    push(@COLUMNS,"$TABLE.$_");
+}
+
+########################################
+# 
+# @FROM handles the list of tables from whic we want 
+#    to retrieve information 
+#
+
+# we start with one table
+my @FROM  = ($TABLE);
+
+########################################
+# 
+# $WHERE handles the filter with which we restrict which
+#   experiment sets are returned
+#
+
+my $WHERE;
+my @join;
+
+# 'All_Experiments' is the default value of the CGI parameter
+# it has no filtering value, so we ignore it, and look for other
+# values that may have been chosen
+if (scalar(@es_names) > 1 || 
+    (scalar(@es_names) == 1 && $es_names[0] ne 'All_Experiments')) 
+{
+  #
+  # SECURITY CHECK: the values in @es_names are retrieved from a WWW 
+  #   form and should not be trusted. We check them to make sure that
+  #   they are untampered, ie. they are only digits
+  #
+  foreach (@es_names) {
+    next if /All_Experiments/;
+    croak "Bad Experiment ID: $_" unless /^\d+$/;
+    push(@join,$_);
+  }
+
+  # NOTE: I use q"foo" to make cperl-mode in emacs happy 
+  #   even with the "" the 'q' operator makes it a single quoted string
+  my $experiment_where = q"(ExperimentSet.es_pk='"; 
+  $experiment_where .= join(q"' OR ExperimentSet.es_pk='", @join);
+  $experiment_where .= q"')";
+
+  # add an 'AND' if there was a previous where clause
+  $WHERE .= ' AND ' if defined $WHERE;
+
+  # add the current value wrapped in parens for nice grouping
+  $WHERE .= "( $experiment_where )";
+} 
+
+# 'All_Providers' is the default value of the CGI parameter
+# it has no filtering value, so we ignore it, and look for other
+# values that may have been chosen
+if (scalar(@data_providers) > 1 || 
+    (scalar(@data_providers) == 1 && $data_providers[0] ne 'All_Providers')) 
+{
+  #
+  # SECURITY CHECK: the values in @data_providers are retrieved from a WWW 
+  #   form and should not be trusted. We check them to make sure that
+  #   they are untampered, ie. they are only digits
+  #
+  foreach (@data_providers) {
+    next if /All_Providers/;
+    croak "Bad Provider ID: $_" unless /^\d+$/;
+    push(@join,$_);
+  }
+
+  # NOTE: I use q"foo" to make cperl-mode in emacs happy 
+  #   even with the "" the 'q' operator makes it a single quoted string
+  my $provider_where = q"(us_fk='" . join(q"' OR us_fk='", @join);
+  $provider_where .= q"')";
+
+  # add an 'AND' if there was a previous where clause
+  $WHERE .= ' AND ' if defined $WHERE;
+
+  # add the current value wrapped in parens for nice grouping
+  $WHERE .= "( $provider_where )";
+} 
+
+# 'All_Technologies' is the default value of the CGI parameter
+# it has no filtering value, so we ignore it, and look for other
+# values that may have been chosen
+if (scalar(@tech_types) > 1 || 
+    (scalar(@tech_types) == 1 && $tech_types[0] ne 'All_Technologies')) 
+{
+  #
+  # SECURITY CHECK: the values in @tech_types are retrieved from a WWW 
+  #   form and should not be trusted. We check them to make sure that
+  #   they are untampered, ie. they are only digits
+  #
+  foreach (@tech_types) {
+    next if /All_Technologies/;
+    croak "Bad Tech ID: $_" unless /^[\w_]+$/;
+    push(@join,$_);
+  }
+  # we add new tables to the FROM clause
+  push(@FROM,'ArrayLayout','ArrayMeasurement');
+
+  # NOTE: I use q"foo" to make cperl-mode in emacs happy 
+  #   even with the "" the 'q' operator makes it a single quoted string
+  my $tech_where = q"(primary_es_fk=es_pk AND al_pk=al_fk AND technology_type='";
+  $tech_where .= join(q[') OR (primary_es_fk=es_pk AND al_pk=al_fk AND technology_type='],@join);
+  $tech_where .= q"')";
+
+  # add an 'AND' if there was a previous where clause
+  $WHERE .= ' AND ' if defined $WHERE;
+
+  # add the current value wrapped in parens for nice grouping
+  $WHERE .= "( $tech_where )";
+} 
+
+# 'All_Species' is the default value of the CGI parameter
+# it has no filtering value, so we ignore it, and look for other
+# values that may have been chosen
+my %SPECIES;
+if (scalar(@species) > 1 || $species[0] ne 'All_Species') {
+
+  # 
+  # *** HACK ALERT ***
+  #
+  # we are waiting for a linking table between ArrayMeasurement
+  # and Species, until then we have to use a workaround 
+  # in order to filter by species
+  #
+  foreach (@species) {
+    next if $_ eq 'All_Species'; # the default value filters nothing
+    #
+    # SECURITY CHECK: the values in @species are retrieved from a WWW 
+    #   form and should not be trusted. We check them to make sure that
+    #   they are untampered, ie. they are only digits
+    #
+    croak "Bad Species ID: $_" unless /^\d+$/;
+
+    $SPECIES{$_} = 1;
+  }
+} 
+
+# create the select command
+my @args = (DISTINCT=>1,FROM=>\@FROM,COLUMNS=>\@COLUMNS);
+push(@args,WHERE=>$WHERE) if defined $WHERE;
+my $sql = create_select_sql($dbh,@args);
+
+print h2("Your query is: " . $sql) if $DEBUG;
+
+########################################
+#
+# execute the sql query and fetch the results
+#
+my $sth = $dbh->prepare($sql) || die $DBI::errstr;
+$sth->execute() || die $DBI::errstr;
+my $rows = $sth->rows;
+
+my @experiments;
+if (defined $rows) {
+  while (my $hashref = $sth->fetchrow_hashref()) {
+    die $DBI::errstr if $sth->err;
+    if (scalar keys %SPECIES) {
+      my @species = fetch_es_species($dbh,$hashref->{es_pk});
+
+      # now that we've got the species, check if it's in the list
+      next unless grep {exists $SPECIES{$_}} @species;
+    }
+    # it was in the list, so include it
+    push(@experiments,$hashref);
+  }
+
+  # now reset $rows
+  $rows = scalar @experiments;
+
+  if (! $rows) {
+    print h2("Sorry, no experiments matched your query");
+    print p(b("Hit the back button on your browser or this return button and try your query again"));
+    print start_form(-action=>"$cgi_bin/query-intro.pl");
+    print table({-cols=>3,
+		 -align=>'CENTER',
+		},
+		Tr([td([submit(-name=>"Return",
+			       -value=>'Try Again')]),
+		   ])
+	       );
+
+    print $q->end_html;
+    exit(0);
+  } else {
+    ########################################
+    #
+    # Start of CGI form
+    #
+    print start_form(-action=>"$cgi_bin/fetch_array.pl");
+
+    if ($DEBUG) {
+      # add an element to pass on the DEBUG flag
+      print hidden(-name=>'DEBUG',-value=>1);
+    }
+
+    if ($ONLY_ONE_ES) {
+      # add an element to pass on the ONLY_ONE_ES flag
+      print hidden(-name=>'ONLY_ONE_ES',-value=>1);
+    }
+
+    my $response = "Your query returned $rows experiment";
+
+    # check for good grammar
+    if ($rows > 1) {
+      $response .= 's';
+    } 
+    print h3($response);
+
+    my @rows;
+
+    ########################################
+    #
+    # make a header element with the column names
+    #
+    
+    # we take out the two columns we want first and
+    # translate the header to be readable
+    my @column_copy;
+    foreach (@COLUMNS) {
+      # we strip off any leading tablename identifier from the columns
+      s/$TABLE\.//o;
+      next if /^es_pk$/ || /^name$/;
+
+      if (exists $column2name{$_}) {
+	$_ = $column2name{$_};
+      }
+      push(@column_copy,$_)
+    }
+    
+    # now that we've translated the names, we sort them
+    @column_copy = sort @column_copy;
+    
+    # now make add 'Accession Number' and 'Experiment Name' 
+    # to the front of the list
+    unshift(@column_copy,'Accession Number', 'Experiment Name');
+    
+    # make a header element. 
+    push(@rows,th(\@column_copy));
+    
+    # Finally, go through the data rows one by one and 
+    # make a table of the results. We get a hash ref so that we can
+    # get the column names and automatically make a header
+    foreach my $hash_ref (@experiments) {
+      # we take out the rows that we know exist, and order them
+      my $es_pk = $hash_ref->{'es_pk'};
+      delete $hash_ref->{'es_pk'};
+      my $es_name = $hash_ref->{'name'};
+      delete $hash_ref->{'name'};
+
+      my @values = (checkbox(-name=>'ExperimentsToFetch',
+			     -label=>'',
+			     -value=>$es_pk,
+			     -checked=>1),
+		    $es_name);
+
+      # post process the query results
+      my %tmp_values = post_process($q,%{$hash_ref});
+
+      # the names in @column_copy are sorted, we loop through them
+      # and add the values from $hash_ref to @values in sorted order
+      # we use %name2column to faciliate the reverse name lookup
+      foreach (@column_copy){
+	next if /^Accession Number$|^Experiment Name$/;
+
+	push(@values, $tmp_values{$name2column{$_}});
+      }
+      
+      push(@rows,td({-align=>'CENTER'},\@values));
+    }
+
+    # now contstruct the table, 
+    print table({-border=>''},
+		Tr(\@rows)	# Tr() distributes over an array reference
+	       );
+  }
+} else {
+  print h1("Error: " . $dbh->err);
+}
+
+########################################
+#
+# Start of CGI form
+#
+print start_form(-action=>"$cgi_bin/fetch_array.pl");
+
+print br(), hr({-noshade=>1, 
+	     -size=>5});
+print p('You can restrict the number of columns returned by an array fetch query by un/checking the boxes below'), br();
+
+require Bio::Genex::ArrayMeasurement;
+my %labels = %{Bio::Genex::ArrayMeasurement->column2name()};
+delete $labels{'am_pk'};
+
+print checkbox_group(-name=>'array_checkboxes',
+		     -columns=>5,
+		     -values=> \%labels,
+		     -default=>['name','type']);
+
+my $am_types_sql = create_select_sql($dbh,
+			COLUMNS=>['term_string'], 
+			FROM=>['am_type']);
+my @am_types;
+my $array_ref = $dbh->selectall_arrayref($am_types_sql);
+if (defined $array_ref) {
+  foreach (@{$array_ref}) {
+    push(@am_types,$_);
+  }
+} else {
+  die "Couldn't get Contact names";
+}
+
+my %labels;
+$labels{'All_Types'} = 'All ArrayMeasurement Types';
+foreach (@am_types) {
+  $labels{"$_->[0]"} = $_->[1];
+}
+
+print hr({-noshade=>1, 
+	     -size=>5}), 
+  p('You can restrict the types of arrays fetched by the query by un/selecting the choices below'), 
+  br();
+
+my @values = keys %labels;
+print scrolling_list(-name =>'AM_types',
+		     -multiple=>1, 
+		     -size=>7,
+		     -default=>['All_Types'],
+		     -labels=>\%labels,
+		     -value=>\@values,
+		    );
+
+print p(b("When you are finished making the selection, press the button below to Retrieve the data."));
+
+if ($ONLY_ONE_ES) {
+  print h1("Remember, the analysis you have chosen requires that you can only select a single ExperimentSet");
+}
+
+print table({-cols=>3,
+		 -align=>'CENTER',
+		},
+		Tr([td([submit(-name=>"FETCH",
+				   -value=>'Fetch Arrays')]),
+		   ])
+	       );
+
+print $q->end_form;
+print $q->end_html;

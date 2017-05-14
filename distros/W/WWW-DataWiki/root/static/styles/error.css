@@ -1,0 +1,8 @@
+@import url(page.css);
+
+pre {
+	color: #600;
+	background: #f99;
+	padding: 0.5em; 
+	border: 1px solid;
+}

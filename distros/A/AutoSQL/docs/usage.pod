@@ -1,0 +1,21 @@
+=pod
+
+=head1 Usage of AutoSQL system
+
+I suggest you to read another doc, if you did not, The Overview.
+
+There are two levels you can use this system. But with whichever level, 
+the fundamental understanding on the system described on the Overview is needed.
+The high-level usage absolutely doesn't mean you need to understand how this
+system works less than with low-level usage.
+
+=head2 The low-level usage
+
+
+
+=head2 The high-level usage
+
+
+=cut
+
+

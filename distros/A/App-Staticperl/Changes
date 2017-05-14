@@ -1,0 +1,215 @@
+Revision history for Perl extension App::Staticperl
+
+SHLIB_PATH hpux, .sl
+LD_LIBRARY_PATH solaris, .so
+LIBPATH aix .a(?)
+LD_LIBRARY_PATH_32 and LD_LIBRARY_PATH_64 .so solaris
+LD_LIBRARYN32_PATH irix
+LD_LIBRARY64_PATH irix
+DYLD_LIBRARY_PATH darwin
+TODO: nonstatic builds, make.aperl failure does not link in everything?
+TODO-IMPORTANT: CPAN::MyConfig!
+TODO: tell people that staticperl perl *PL;make/make install is not enough normally.
+TODO: document hooks
+
+1.44 Tue Jul  7 01:32:49 CEST 2015
+	- added Net::SSLeay hint, tested and improved by gleeco.
+        - fix quoting bug, avoid failure when EXTRA_MODULES contains spaces.
+        - enable build_requires_install_policy to work around one of the myriad
+          bugs in Module::Build.
+        - support concurrent access to the DLCACHE.
+        - install ExtUtils::CBuilder early, to improve chances of succeeding
+          slightly by having a newer version.
+        - patch ExtUtils::CBuilder::Base::have_compiler to always return
+          false, as ExtUtils::CBuilder blindly builds shared libs on systems
+          that cannot build shared libs and modules relying on it usually
+          fail for similar reasons.
+        - set LD/CC/LDFLAGS/CFLAGS to work around the endlessly buggy ExtUtils::CBuilder,
+          which incidentally is a byproduct (read: garbage) of Module::Build.
+        - be more aggressive about post-install patching, to avoid stuff falling
+          through the cracks.
+        - override MAP_TARGET for ExtUtils::MakeMaker, as some modules
+          provide their own name for the perl binary (which is not what we want).
+        - update DynaLoader patch for current ExtUtils::MakeMaker.
+
+1.43 Wed Apr 18 14:38:43 CEST 2012
+	- remove the temporary MakeMaker patch, as either Pod::Parser or
+          MakeMaker have been fixed. Also make sure we pull MakeMaker
+          from CPAN. This might fix the CPAN dependency problems with
+          newer perl versions (at least 5.14.2).
+	- staticperl mkperl or mkapp didn't clean up temporary files.
+        - PPI::XS seems to be broken, directly depend on PPI.
+
+1.42 Mon Mar  5 08:16:02 CET 2012
+	- actually, really do it.
+
+1.41 Mon Mar  5 08:14:11 CET 2012
+	- temporarily patch ExtUtils::MakeMaker because newer versions
+          break Pod::Parser.
+
+1.4  Mon Jul 18 09:33:48 CEST 2011
+	- new configuration variable DLCACHE to avoid repeated downloads.
+        - the static:: namespace was wrongly documented as sttaicperl::.
+        - provide no compiler flags apart from -Os anymore by default.
+        - staticperl clean now removes all build files (src/).
+        - staticperl no longer sets EV_EXTRA_DEFS or CORO_INTERFACE.
+        - patch ExtUtils::Miniperl to always include DynaLoader, otherwise
+          static linking disables later dynamic linking and vice versa.
+        - (experimental) do not build a new perl unless a static archive
+          was created, to make -Dusedl faster.
+        - actually fail when not being able to install some modules from CPAN.
+        - speed up installing modules from CPAN if multiple modules have
+          been specified.
+	- weed out duplicated libraries form the beginning, not the end.
+        - set shell variable $PERL to full path to perl binary
+          when running staticperl cpan, which is handy for subshells.
+        - properly define "boot_DynaLoader" when DynaLoader is available.
+        - fix a memleak in static::list.
+        - mkbundle can now bundle dynamic objects for perl extensions
+          (--allow-dynamic).
+        - lots of windows workarounds/bugfixes.
+
+1.31 Tue Jun 14 09:03:59 CEST 2011
+	- pause is more tricky than expected - rename fake.pm to Staticperl.pm.
+        - improved documentation a bit.
+
+1.3  Tue May 10 19:39:39 CEST 2011
+	- the nothing-to-see-except-a-version-bump release.
+	- package a fake.pm file to (maybe!) get CPAN to allocate namespace
+          for us, as people have real trouble to install the distribution.
+
+1.22  Sun May  1 11:28:54 CEST 2011
+	- prepend staticperl binary install path to PATH when running any
+          commands - will help many broken modules and scripts (e.g. those
+          using the broken #!env perl hack), but will also make life easier
+          for "staticperl cpan / look" users.
+	- use empty PERL_OPTIMIZE flags in testsuite for higher portability.
+        - unset PERL_CORE and PERL_MB_OPT variables because
+          these modules are part of perl - set them in your staticperlrc
+          instead.
+        - disable MAN1PODS and MAN3PODS in PERL_MM_OPT, to make Glib, Cairo,
+          Pango and Gtk2 build.
+        - patch ExtUtils::MM_Unix to search for static archives in blib more
+          often, as it doesn't detect Pango as being an XS module (which
+          is a bug in Pango).
+	- create a patch helper (SP-patch-postinstall) that is executed
+          after perl and eahc module install to do some important patches.
+	- rename the cpan-make-inmstall helper to SP-make-install-make.
+        - write mkbundle to bin/SP-mkbundle.
+        - new "staticperl perl" command.
+        - updated small/bigperl to 5.12.3.
+
+1.21  Fri Mar 18 19:21:15 CET 2011
+	- ok, irix tar has no working -f and freebsd tar goes to a device
+          by default, so screw irix and go with freebsd.
+	- some bloke thought it's cool to force dynamic linking on darwin.
+          force as in "either you enable it, or the resulting build will be
+          forcefully broken". proves that whoever uses darwin deserves it.
+          anyway, we now patch away the idiocy in the hints file.
+        - for better portability, do not supply -Wl,--no-gc-sections
+          -Wl,--allow-multiple-definition, but sitll patch -Wl,--no-gc...
+        - new hook: patchconfig.
+
+1.2   Mon Mar 14 00:11:15 CET 2011
+        - patch CPAN::HandleConfig as there seems to be no other way to
+          keep it from clobbering the users MyConfig.pm accidentally.
+        - call cpan internally in a way so it picks up only our MyConfig.pm,
+          for extra safety and the initial calls before patching.
+        - set default cpan "installer" to EUMM, and MB is too broken
+          (it fails to build extensions statically).
+	- use "tar x" only to accomodate irix (and possibly other systems).
+
+1.11  Tue Mar  8 18:37:00 CET 2011
+	- no longer create bundle variable names from md5(data),
+          as it is no longer useful.
+        - fix output shortening in testsuite.
+
+1.1   Thu Feb 24 07:20:22 CET 2011
+	- use a better -M syntax.
+	- the one-arg form of add/binadd was broken.
+	- --add and --binadd now use the file as alias if the alias is missing.
+	- embeddable bundle files were broken because "args"
+          was used before defined.
+	- mkapp now actually passes arguments to the boot script.
+	- more cpan-testers workarounds :/.
+        - implement an ignore-env option for mkbundle.
+        - use, not just require, modules when tracing their dependencies.
+        - support an optional xs_init argument to staticperl_init, which
+          can be 0 (and is then ignored).
+        - reduce PERL_ARENA_SIZE to something more reasonable for perl 5.12.
+        - use perl 5.12.3 by default.
+        - enable debug symbols by default (but not the dreaded -DDEBUGGING).
+
+1.0   Mon Jan 10 15:13:19 CET 2011
+        - specify -Uinstallusrbinperl in configure to avoid creating
+          /usr/bin/perl.
+        - try to work around the totally broken /bin/sh on solaris
+          (only in the testsuite).
+	- use curl -f instead of just curl.
+        - prefer curl over wget again, as cpan seems to do so.
+        - clarify license.
+
+0.92  Wed Dec 22 02:09:19 CET 2010
+	- major rework of the PHASE 2 documentation section, hopefully
+          it's now more clear, more useful, more sexy.
+        - renamed --usepacklist to --usepacklists (--usepacklist still
+          supported as abbreviation).
+	- "properly" get rid of SITELIB paths, avoid using -U compiler flags
+          (which didn't even do anything...).
+        - avoid export var=value syntax for non-unix shells (solaris...).
+        - better output in the error case from the testsuite.
+
+0.912 Wed Dec 15 01:14:26 CET 2010
+	- print a longer and hopefully useful message when Configure fails.
+	- remove PERL_CPPFLAGS, replace with PERL_CCFLAGS, which get appended
+          tot he ccflags, instead of overriding them.
+        - introduce PERL_CC.
+	- work around *bsd stupidity again, where even root can't replace
+          files with mv :/.
+        - stop command processing when a command fails (e.g. staticperl mkperl
+          will stop if the install step fails).
+        - let perl do most configuration when running make test, to increase
+          chances of success.
+
+0.911 Sat Dec 11 16:50:41 CET 2010
+	- argl, testsuite had a duplicated test.
+	- use -Wl,--allow-multiple-definition for better portability.
+
+0.91  Fri Dec 10 22:13:43 CET 2010
+	- add testsuite (yeah, should be optional - send patches).
+	- started to maintain two demo builds: bigperl and smallperl,
+          on http://staticperl.schmorp.de.
+	- implemented --staticlib option.
+        - special unicore/ compression (but much more could be done,
+          especially for the uncompressed case).
+        - implemented a strip cache, speeding up ppi stripping enourmously.
+        - implemented --include/--exclude options.
+        - try to port the tar call to freebsd (reported and analyzed
+          by Thomas Linden).
+        - (hopefully) better meaning of verbose levels.
+        - avoid deadlocking in --eval (unlikely, but possible).
+        - implement $STATICPERLRC.
+        - do all option AND bundle file processing with Getopt::Long,
+          to make maintenance easier.
+
+0.9   Wed Dec  8 23:26:48 CET 2010
+	- support AutoLoader'ed functions with prototypes.
+        - new mkapp / --app option for mkbundle, to create
+          standalone applications.
+
+0.2   Tue Dec  7 21:50:07 CET 2010
+        - make it work as non-root user.
+        - make module install/linking much more robust against
+          build and link failures, i.e. try to only install
+          the module when it was actualyl built successfully.
+        - split "install" phase into perl install and module
+          install, so fixing your postinstall hook takes less time.
+        - change make clean to delete the sources dir.
+        - add preconfigure hook.
+
+0.1   Tue Dec  7 10:23:43 CET 2010
+	- initial release.
+
+0.0   Mon Dec  6 10:44:38 CET 2010
+	- cloned from Convert::Scalar.
+

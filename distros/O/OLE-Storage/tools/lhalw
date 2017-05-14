@@ -1,0 +1,484 @@
+#!/usr/bin/perl
+#$Id: lhalw,v 1.6 1998/04/28 01:13:55 schwartz Exp $
+#
+# lhalw, Have A Look at Word 6+ Files
+#
+# This program saves the text part of a Word 6/7 style or the first text
+# chunk of a word 8 file. The result for Word 8 files saved with "fastsave" 
+# will *not* always be the real contents of the document.
+#
+# -  The purpose of lhalw is mainly to demonstrate OLE::Storage, not so
+#    much to convert a word file. Anyway at least it handles the text portions
+#    of Word 6 / 7 files quite correctly. If you need a real convertress, 
+#    you will have to wait... I'm working on it, but it lasts longer than
+#    I excpected. 
+#
+# -  lhalw informs you a little bit about the trouble while converting.
+#
+# See also usage() of this file. General information at:
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/index.html
+#
+# Copyright (C) 1996, 1997 Martin Schwartz 
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, you should find it at:
+#
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/COPYING
+#
+# You can contact me via schwartz@cs.tu-berlin.de
+#
+
+my ($Doc, $Msg, $Startup, $Text, $Unicode, $Var);
+my ($stat_fast, $stat_crypted, $stat_unicode, $stat_verok);
+
+my $PROGNAME = "lhalw";
+my $VERSION=do{my@R=('$Revision: 1.6 $'=~/\d+/g);sprintf"%d."."%d"x$#R,@R};
+my $DATE = ('$Date: 1998/04/28 01:13:55 $' =~ / ([^ ]*) /) && $1;
+
+use Getopt::Long;
+use OLE::Storage::Std;
+
+my ($Doc, $Startup, $Var, $text);
+my %opt = (
+   "dirmode"   => "0700",
+   "filemode"  => "0600",
+   "suffix"    => ".txt",
+   "warnlevel" => "1",
+);
+
+{
+   $|=1;
+   GetOptions (\%opt,
+      "log",
+      "src_base|source_base|source_dir=s",
+      "dest_base|destbase|destdir=s",
+      "from_stdin|from_0|from0",
+      "to_stdout|to_1|to1",
+      "filemode=s",
+      "dirmode=s",
+      "override|overwrite",
+      "help",
+      "recurse|recursive",
+      "column=s",
+      "control",
+      "warnlevel=i",
+      "stupid",
+      "recode=s",
+      "suffix=s",
+      "no_warn", 	# old and no longer supported
+   );
+   usage() if $opt{"help"} || (!@ARGV && !$opt{"from_stdin"});
+
+   require OLE::Storage;
+   require OLE::Storage::Textutil;
+   require Unicode::Map;
+   require Startup;
+   fail(1) unless $Startup = new Startup;
+
+   $Startup -> init ({
+      SUB_FILES  => \&handle_files,
+      SUB_STREAM => \&handle_stream,
+      PROG_DATE  => $DATE,
+      PROG_NAME  => $PROGNAME,
+      PROG_VER   => $VERSION,
+      FROM_STDIN => $opt{"from_stdin"},
+      SRCPATH    => $opt{"src_base"},
+      DESTPATH   => $opt{"dest_base"},
+      RECURSE    => $opt{"recurse"},
+      RELATIVE   => $opt{"relative"},
+      FILEMODE   => $opt{"filemode"},
+      DIRMODE    => $opt{"dirmode"},
+   });
+
+   fail(2) unless $Map  = new Unicode::Map({"STARTUP"=>$Startup});
+   fail(3) unless $Text = new OLE::Storage::Textutil({"STARTUP"=>$Startup});
+   fail(4) unless $Var  = OLE::Storage->NewVar();
+
+   $Doc     = undef;
+
+   $Startup->allow_logging if $opt{"log"};
+   $Startup->open_log();
+
+   if (!($Var = OLE::Storage->NewVar())) {
+      error("No Var handle!"); exit 1;
+   }
+   $Doc = undef;
+
+   $Startup->msg_silent(1) if $opt{"to_stdout"};
+
+   $Startup->go(@ARGV);
+
+   $Startup->close_log();
+   exit 1;
+}
+
+sub handle_stream {
+   my ($dp) = @_;
+   $Startup->log('processing <STDIN>');
+   $Startup->msg('processing <STDIN>');
+   {
+      return _error("Nothing to do!") if -t STDIN;
+      undef $/;
+      return 0 if !($Doc = 
+         OLE::Storage->open($Startup, $Var, "<stdin>", 2**4, \<>)
+      );
+   }
+   return 0 if !main_work(0, 0, "$dp/stdin");
+   $Startup->msg_finish("done");
+1}
+
+sub handle_files {
+   my ($sp, $sf, $dp, $status) = @_;
+   $Startup->msg_reset;
+
+   $Startup->log("processing " . ($sp ne "." ? "$sp/":"") . $sf);
+   $Startup->msg("Processing \"$sf\"");
+
+   return _error ("File \"$sf\" doesn't exist!") if !$status;
+   return 1 if $status < 0;
+   {
+      return 0 if !($Doc = OLE::Storage->open($Startup, $Var, "$sp/$sf"));
+      $status = main_work($sp, $sf, $dp);
+      $Doc->close($infile);
+   }
+
+   return 0 if !$status;
+   $Startup->msg_finish("done");
+1}
+
+sub _error { $Startup -> error (@_) if $Startup; }
+
+sub error { my ($msg) = @_; $Startup -> msg_error($msg) if $Startup; 0}
+
+sub fail {
+   my ($num) = @_;
+   print "Strange error #$num! Exiting!\n"; exit 0;
+}
+
+sub basename {
+#
+# $basename = basename($filepath)
+#
+   (substr($_[0], rindex($_[0],'/')+1) =~ /(^[^.]*)/) && $1;
+}
+
+sub usage {
+   _print_usage (
+      "$PROGNAME V$VERSION ($DATE) - Convert a Word 6+ doc to text.\n"
+      ."usage: $PROGNAME {-option [arg]} file(s)",
+      [
+        "log           write a logfile",
+        "src_base   s  Regard this as start directory in relative mode",
+        "dest_base  s  Store output files based at this directory ('".
+                       $opt{"dest_base"}."')",
+        "from_stdin    Take input from stdin",
+        "to_stdout     Write output to stdout",
+        "filemode   s  New files get access mode s (".$opt{"filemode"}.")",
+        "dirmode    s  New directories get access mode s (".$opt{"dirmode"}.")",
+        "recurse       Operate recursively on directories",
+        "relative      Store files relatively to destdir when in recurse mode",
+
+        "column     s  Output will have a width of maximal n characters.",
+        "control       Keep Word's control characters.",
+        "warnlevel  i  0=no | 1=standard | 2=paranoid warnings (default 1)",
+        "stupid        Do not evaluate fastsave information.",
+        "override      Overwrite existing files.",
+        "suffix     s  Output files shall get suffix 's' (default: '".
+                       $opt{"suffix"}."')",
+        #"recode     s  (Recode text to character set s (in development))",
+      ]
+   );
+   exit 0;
+}
+
+sub _print_usage {
+   my ($header, $bodylistR, $footer) = @_;
+   print "$header\n" if $header;
+   print map "   --$_\n", sort { lc($a) cmp lc($b) } @$bodylistR;
+   print "$footer\n" if $footer;
+}
+
+sub main_work {
+   my ($sp, $sf, $dp) = @_;
+   $header="";
+   $text_warn=undef; $warn=0;
+   $text_body=undef; $text_foot=undef; 
+   $word_textl=0; $word_footl=0; $word_destl=0;
+
+   my $wpps;
+
+   is_opened: {
+      last if !get_worddocument_pps(\$wpps);
+      last if !$Doc->read($wpps, \$header, 0, 0x300);
+      last if !get_status();
+      last if !get_document_text($wpps);
+
+      if (!$stat_unicode) {
+         last if !convert_text();
+      } else {
+         last if !map_unicode();
+      }
+      last if !save_document($sp, $sf, $dp);
+      return $Doc->close();
+   }
+
+   $Doc->close();
+0}
+
+sub get_status {
+   # Document status
+   my $status1 = get_byte(\$header, 0x05);
+   my $status2 = get_word(\$header, 0x0a);
+
+   $stat_verok   = 1 if ($status1==0xc0) || ($status1==0xe0);
+   $stat_fast    = $status2 & 2**2;
+   $stat_crypted = $status2 & 2**8;
+   $stat_unicode = $status2 & 2**9;
+
+   return _error("Document is password protected!") if $stat_crypted;
+1}
+
+sub get_worddocument_pps {
+#
+# Assume Word Document, if there is a stream "WordDocument".
+#
+   my $ppsR = shift;
+   my %dir = ();
+   $Doc->directory(0, \%dir, "string");
+   $$ppsR = $dir{"WordDocument"};
+   return _error ("Not a Word document!") if !$$ppsR;
+1}
+
+sub get_document_text {
+#
+# Read text section out of $inbuf and store this in global $text_body
+#
+   my $pps = shift;
+
+   if ($stat_verok ) {
+      ($word_textl, $word_footl, $word_destl) = get_nlong(3, \$header, 0x34);
+      $word_textl *= 2 if $stat_unicode;
+      $word_footl *= 2 if $stat_unicode;
+      $word_destl *= 2 if $stat_unicode;
+      if ($stat_fast && !$opt{"stupid"}) {
+         return 0 if !get_fastsaved_text($pps, \$text_body);
+      } else {
+         return 0 if !get_text($pps, \$text_body);
+      }
+   } else {
+      $word_textl = get_long(\$header, 0x4c); 
+      $word_textl *= 2 if $stat_unicode;
+      return 0 if !get_text($pps, \$text_body);
+   }
+
+   # Give a little warning, even if it's not very sensible.
+   my ($l, $lstr, $qstr);
+   $l = $word_textl+$word_footl+$word_destl-length($text_body);
+   if ($word_textl+$word_footl < length($text_body)) {
+      substr($text_body, $word_textl+$word_footl)="";
+   }
+   if ($l) {
+      if (($l<0) && ($l>-4)) {
+         $warn = 1;
+      } else {
+         $warn = 2;
+      }
+   }
+   if ($warn) {
+      $lstr = abs($l)." byte" . (abs($l)>1 && "s" || "");
+      $qstr = ($l>0) ? "missing" : "to much";
+      $pri = " ";
+      if ($warn > 1) {
+         $pri = "!";
+         if ($opt{"warnlevel"}>1) {
+            $text_warn = "!! Attention: $lstr of text $qstr !!\n";
+            $Startup->msg_warn("$lstr $qstr");
+         }
+      }
+      $Startup -> log ("$lstr of text $qstr", $pri);
+   }
+1}
+
+sub get_text {
+   my ($pps, $bufR) = @_;
+   my ($begin, $end) = get_nlong(2, \$header, 0x18);
+   $Doc->read($pps, $bufR, $begin, $end-$begin);
+}
+
+sub get_fastsaved_text {
+#
+# This code handles as little as possible Word's fastsave format. 
+#
+   my ($pps, $bufR) = @_;
+
+   my ($buf, $tmp, $status);
+   my @fchar_to = ();
+   my @fchar_o = ();
+   my ($t, $o, $l, $max);
+
+   return 0 if !$Doc->read($pps, \$tmp);
+   $buf=substr($tmp, get_nlong(2, \$header, 0x160));
+
+   $o=0; 
+   while ($o<=length($buf)) {
+      $t=get_byte(\$buf, \$o);
+      $l=get_word(\$buf, \$o); next if !$l;
+      if (!$t) {
+         $o++; next;
+      } elsif ($t==1) {
+      } elsif ($t==2) {
+         $max = ($l-4)/12+1; $o+=2;
+         @fchar_to = get_nlong($max, \$buf, $o);
+         @fchar_o  = map (get_long(\$buf, $o+$max*4 +$_*8 +2), (0..$max-1));
+         last;
+      } else {
+         return _error ("I don't understand this fastsave format!");
+      }
+      $o+=$l;
+   }
+   for (0..$#fchar_o) {
+      $$bufR .= substr($tmp, $fchar_o[$_], $fchar_to[$_+1]-$fchar_to[$_]);
+   }
+1}
+
+##
+## --- Unicode ------------------------------------------------------------
+##
+
+sub map_unicode {
+   $Map->reverse_unicode($text_body);
+   return 1 if !$opt{"recode"};
+   return 0 if !$Map->from_unicode( $opt{"recode"}, \$text_body, \$tmp );
+   $text_body=$tmp;
+1}
+
+sub convert_text {
+   $text_foot = substr($text_body, $word_textl, $word_footl);
+   if ($word_textl < length($text_body)) {
+      substr($text_body, $word_textl)="";
+   }
+   local($num);
+
+   if (!$opt{"control"}) {
+      silly_convert();
+      strip_control(\$text_body);
+      strip_control(\$text_foot);
+   } 
+
+   if ($opt{"column"}) {
+      $Text->width($opt{"column"});
+      $Text->mode(1); 
+      $Text->hyphen("-");
+      $Text->pardel($opt{"control"}? "\x0d" : "\n");
+      $Text->tabdel("\t");
+
+      # Line breaking
+      return 0 if ! (
+         $Text->wrap(\$text_body) 
+         && $Text->wrap(\$text_foot)
+      );
+   }
+1}
+
+sub silly_convert {
+   # footnotes
+   $num=1; while ($text_body =~ s/\x02/[$num]/) { $num++ }
+   $num=1; while ($text_foot =~ s/\x02/[$num]/) { $num++ }
+   # fields
+   $text_body =~ s/\x13[^\x14]*\x14([^\x15]*)\x15/$1/g;
+   $text_body =~ s/\x13[^\x15]*\x15//g;
+   $text_foot =~ s/\x13[^\x14]*\x14([^\x15]*)\x15/$1/g;
+   $text_foot =~ s/\x13[^\x15]*\x15//g;
+}
+
+sub strip_control {
+   # Here some characters could be converted like:
+   my $bufR = shift;
+   $$bufR =~ s/[\x08\x09]/\t/g;		
+   $$bufR =~ s/(\x07\x07)/$1\x0d/g;		
+   $$bufR =~ s/\x07/ /g;
+   $$bufR =~ s/[\xa0]/ /g;		
+   $$bufR =~ s/[\x0b\x0c\x0e]/\x0d/g;		
+   $$bufR =~ tr/\x1e\x84\x91\x92\x93\x94/-"`'""/;
+
+   # Away with Words control characters 
+   $$bufR =~ s/[\x00-\x06\x0f-\x1f\x80-\x9f]//g;
+
+   $$bufR =~ s/\x0d/\n/g;
+}
+
+sub save_document {
+   my ($sp, $sf, $dp) = @_;
+   if ($opt{"from_stdin"} || $opt{"to_stdout"}) {
+      print $text_warn if $text_warn && ($warn > $opt{"warnlevel"});
+      print $text_body.$text_foot;
+   } else {
+      my $outname = basename($sf) . $opt{"suffix"};
+      if (!$opt{"override"}) {
+         return _error("File already exists! Try --override.") 
+            if -e "$dp/$outname"
+         ;
+      }
+      return _error("Cannot open $outname!") if !(
+         open(OUT, ">$dp/$outname") && binmode(OUT)
+      );
+      print OUT $text_warn if $text_warn && ($warn > $opt{"warnlevel"});
+      print OUT $text_body.$text_foot;
+      close OUT;
+   }
+1}
+
+__END__
+
+=head1 NAME
+
+lhalw - Have A Look at Word 6+ Files
+
+=head1 SYNOPSIS
+
+lhalw V0.3817 (1998/02/12) - Convert a Word 6+ doc to text.
+usage: lhalw {-option [arg]} file(s)
+   --column     s  Output will have a width of maximal n characters.
+   --control       Keep Word's control characters.
+   --dest_base  s  Store output files based at this directory ('')
+   --dirmode    s  New directories get access mode s (0700)
+   --filemode   s  New files get access mode s (0600)
+   --from_stdin    Take input from stdin
+   --log           write a logfile
+   --no_warn       No warnings.
+   --override      Overwrite existing files.
+   --recurse       Operate recursively on directories
+   --relative      Store files relatively to destdir when in recurse mode
+   --src_base   s  Regard this as start directory in relative mode
+   --stupid        Do not evaluate fastsave information.
+   --suffix     s  Output files shall get suffix 's' (default: '.txt')
+   --to_stdout     Write output to stdout
+
+=head1 DESCRIPTION
+
+Converts a Word 6+ Document simply to text. 
+
+Understands and converts Word 6 and Word 7, gets some text out of Word 8 
+documents. By some purpose lhalw often sends warn messages ("... bytes too
+much"). You can switch them off with option "--warnlevel=0".
+
+=head1 SEE ALSO
+
+L<OLE::Storage>
+
+=head1 AUTHOR
+
+Martin Schwartz E<lt>F<schwartz@cs.tu-berlin.de>E<gt>. 
+
+=cut
+

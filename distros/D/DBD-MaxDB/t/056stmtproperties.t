@@ -165,10 +165,14 @@ print " Test 24: setting MAXDB_RESULTSETCONCURRENCY option\n";
 $sth->{'MAXDB_RESULTSETCONCURRENCY'}='CONCUR_UPDATABLE';
 MaxDBTest::Test(1);
 
+
+
+my $scrollableProp = (MaxDBTest::checkMinimalKernelVersion($dbh,"7.6"))?"FORWARD_ONLY":"SCROLL_SENSITIVE";
+
 print " Test 25: check MAXDB_RESULTSETTYPE option\n";
 $sth = $dbh->prepare("select * from dual\n");
 print "$sth->{'MAXDB_RESULTSETTYPE'}\n";
-if ($sth->{"MAXDB_RESULTSETTYPE"}eq 'SCROLL_SENSITIVE'){
+if ($sth->{"MAXDB_RESULTSETTYPE"}eq $scrollableProp){
   MaxDBTest::Test(1);
 } else {
   MaxDBTest::Test(0, "MAXDB_RESULTSETTYPE should be SCROLL_SENSITIVE\n");

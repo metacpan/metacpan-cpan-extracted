@@ -9,7 +9,8 @@ use Test::Mockify;
 use Test::Mockify::Verify qw (GetParametersFromMockifyCall WasCalled GetCallCount);
 use Test::More;
 use Test::Exception;
-
+use warnings;
+no warnings 'deprecated';
 sub testPlan {
     my $self = shift;
     $self->test_MockModule();
@@ -318,7 +319,7 @@ sub test_MockModule_CallCounter_addMethodSpyWithParameterCheck_negativ {
     $MockObject->addMethodSpyWithParameterCheck('dummmyMethodWithParameterReturn',[{'hashref'=>{'key'=>'value'}}]);
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok( sub { $MockedFakeModule->dummmyMethodWithParameterReturn('NotAHashRef') },
-               qr/Parameter\[0\] is not a HashRef:/,
+               qr/No matching found for string/,
                "$SubTestName - test the Error if method is called with wrong type"
      );
 
@@ -392,7 +393,7 @@ sub test_MockModule_AddMockWithReturnValue_UnexpectedParameterInCall {
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('anUnexpectedParameter') },
-        qr/UnexpectedParameter:/,
+        qr/No matching found for string/,
         "$SubTestName - test if the mocked method was called with the wrong amount of parameters"
     );
 
@@ -405,7 +406,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck {
 
     my $aParameterList = [];
     my $MockObject = $self->_createMockObject($aParameterList);
-    my $aParameterCheckList = ['string','int','undef','hashref', 'arrayref', 'object',];
+    my $aParameterCheckList = ['string','int','undef','hashref', 'arrayref', 'object'];
     $MockObject->addMockWithReturnValueAndParameterCheck('DummmyMethodForTestOverriding', 'This is a return value', $aParameterCheckList);
     my $MockedFakeModule = $MockObject->getMockObject();
     my $TestObject = bless({}, 'Test::Object');
@@ -462,7 +463,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_ExpectedString {
     );
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding( 'wrong String' ) },
-        qr/ActualValue='wrong String'/,
+        qr/'wrong String'/,
         "$SubTestName - test if a wrong value will be found."
     );
 
@@ -484,7 +485,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_ExpectedInteger {
     );
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding( 123456 ) },
-        qr/Parameter\[0\] unexpected value:/,
+        qr/No matching found for number/,
         "$SubTestName - test if a wrong value will be found."
     );
 
@@ -506,7 +507,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_ExpectedFloat {
     );
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding( 6.66 ) },
-        qr/ActualValue='6.66'/sm,
+        qr/No matching found for number/sm,
         "$SubTestName - test if a wrong float value will be found."
     );
 
@@ -530,7 +531,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_ExpectedHash {
     my $hWrongParameter = {'zwei'=>'value'};
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding( $hWrongParameter ) },
-        qr/Parameter\[0\] unexpected value:/,
+        qr/No matching found for hashref/,
         "$SubTestName - test if a wrong value will be found."
     );
     return;
@@ -552,7 +553,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_ExpectedArray {
     my $aWrongParameter = ['eins'];
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding( $aWrongParameter ) },
-        qr/Parameter\[0\] unexpected value:/,
+        qr/No matching found for arrayref/,
         "$SubTestName - test if a wrong value will be found."
     );
 
@@ -576,7 +577,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_ExpectedObject {
     my $WrongTestObject = bless({},'Wrong::Test::Object');
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding( $WrongTestObject ) },
-        qr/ActualObjectType='Wrong::Test::Object'/,
+        qr/No matching found for object/,
         "$SubTestName - test if a wrong value will be found."
     );
 
@@ -613,7 +614,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongAmountOfParamet
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('Hello') },
-        qr/WrongAmountOfParameters:/,
+        qr/No matching found for string/,
         "$SubTestName - test the Error if the Dummy Method don't get enough parameters"
     );
 
@@ -631,7 +632,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongDataTypeFor_Int
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('123NotANumber321') },
-        qr/Parameter\[0\] is not an Integer:/,
+        qr/No matching found for string/,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -649,7 +650,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongDataTypeFor_Flo
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('1.23NotAFloat3.21') },
-        qr/Parameter\[0\] is not an Float:/,
+        qr/No matching found for string/,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -667,7 +668,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongDataTypeFor_Str
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding(['Not','aString']) },
-        qr/Parameter\[0\] is not a String:/,
+        qr/No matching found for arrayref/,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -685,7 +686,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongDataTypeFor_Has
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('NotAHashRef') },
-        qr/Parameter\[0\] is not a HashRef:/,
+        qr/No matching found for string/,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -703,7 +704,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongDataTypeFor_Arr
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('NotAnArrayRef') },
-        qr/Parameter\[0\] is not an ArrayRef:/,
+        qr/No matching found for string/,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -721,7 +722,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongDataTypeFor_Obj
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('NotAObject') },
-        qr/Parameter\[0\] is not a Object:/,
+        qr/No matching found for string/,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -739,7 +740,7 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongDataTypeFor_Und
     my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
         sub { $MockedFakeModule->DummmyMethodForTestOverriding('NotUndef') },
-        qr/Parameter\[0\] is not undefined:/,
+        qr/No matching found for string/,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -768,11 +769,11 @@ sub test_MockModule_AddMockWithReturnValueAndParameterCheck_WrongParameterName {
     my $aParameterList = [];
     my $MockObject = $self->_createMockObject($aParameterList);
     my $ParameterCheckList = ['string','WrongType'];
-    $MockObject->addMockWithReturnValueAndParameterCheck('DummmyMethodForTestOverriding', 'This is a return value', $ParameterCheckList);
-    my $MockedFakeModule = $MockObject->getMockObject();
     throws_ok(
-        sub { $MockedFakeModule->DummmyMethodForTestOverriding('some','value') },
-        qr/UnknownParametertype/,
+        sub {
+            $MockObject->addMockWithReturnValueAndParameterCheck('DummmyMethodForTestOverriding', 'This is a return value', $ParameterCheckList) 
+        },
+        qr/Found unsupported type, 'WrongType'./,
         "$SubTestName - test the Error if method is called with wrong type"
     );
 
@@ -985,4 +986,5 @@ sub _createMockObject {
 
     return $MockObject;
 }
+
 __PACKAGE__->RunTest();

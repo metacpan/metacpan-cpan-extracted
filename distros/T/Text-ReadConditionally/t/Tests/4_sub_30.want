@@ -1,0 +1,10 @@
+Line 1
+In rec:  a0: fred; a1: 0
+in Sub 1
+Recurse: .rec bill 9
+In rec:  a0: bill; a1: 9
+End of rec: a0: bill; a1: 9
+DONE Recurse: .rec bill 9
+End of rec: a0: fred; a1: 0
+Last .rec returned. Last a0=fred This num args=0
+EOF

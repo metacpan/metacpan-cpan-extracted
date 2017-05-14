@@ -1,0 +1,165 @@
+# zxid/sg/oasis-sstc-saml-schema-assertion-1.1.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# 15.10.2006, extended AttributeValue schema to cater for bootstraps --Sampo
+# 10.2.2007, added other types of assertions as potential Advice content --Sampo
+# 3.3.2007, added XACML support --Sampo
+# $Id: oasis-sstc-saml-schema-assertion-1.1.sg,v 1.6 2009-11-14 22:44:43 sampo Exp $
+
+target(sa11, urn:oasis:names:tc:SAML:1.0:assertion)
+ns(xs,http://www.w3.org/2001/XMLSchema)
+import(ds, http://www.w3.org/2000/09/xmldsig#, http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd)
+ns(di12, urn:liberty:disco:2003-08)
+ns(a,    http://www.w3.org/2005/08/addressing)
+ns(sa,   urn:oasis:names:tc:SAML:2.0:assertion)
+ns(ff12, urn:liberty:iff:2003-08)
+ns(xasa, urn:oasis:xacml:2.0:saml:assertion:schema:os)
+ns(xasacd1, urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:assertion:cd-01)
+
+%DecisionType:   enum( Permit Deny Indeterminate ) ;
+AssertionIDReference -> %xs:NCName
+
+Assertion        -> %sa11:AssertionType
+%AssertionType:
+  sa11:Conditions?
+  sa11:Advice?
+  sa11:Statement*
+  sa11:SubjectStatement*
+  sa11:AuthenticationStatement*
+  sa11:AuthorizationDecisionStatement*
+  sa11:AttributeStatement*
+  xasa:XACMLAuthzDecisionStatement*
+  xasa:XACMLPolicyStatement*
+  xasacd1:XACMLAuthzDecisionStatement*
+  xasacd1:XACMLPolicyStatement*
+  ds:Signature?
+  @MajorVersion  -> %xs:integer
+  @MinorVersion  -> %xs:integer
+  @AssertionID   -> %xs:ID
+  @Issuer        -> %xs:string
+  @IssueInstant  -> %xs:dateTime
+  ;
+
+Conditions       -> %sa11:ConditionsType
+%ConditionsType:
+  sa11:AudienceRestrictionCondition*
+  sa11:DoNotCacheCondition*
+  sa11:Condition*
+  @NotBefore?    -> %xs:dateTime
+  @NotOnOrAfter? -> %xs:dateTime
+  ;
+Condition        -> %sa11:ConditionAbstractType
+
+AudienceRestrictionCondition       -> %sa11:AudienceRestrictionConditionType
+%AudienceRestrictionConditionType: base(sa11:ConditionAbstractType)
+  sa11:Audience+
+  ;
+
+Audience -> %xs:anyURI
+
+DoNotCacheCondition       -> %sa11:DoNotCacheConditionType
+%DoNotCacheConditionType: base(sa11:ConditionAbstractType) ;
+
+Advice -> %sa11:AdviceType
+%AdviceType:
+  sa11:AssertionIDReference*
+  sa11:Assertion*
+  ff12:Assertion*
+  sa:Assertion*
+  any*  ns(##other)  processContents(lax)
+  ;
+
+Statement -> %sa11:StatementAbstractType
+
+SubjectStatement -> %sa11:SubjectStatementAbstractType
+%SubjectStatementAbstractType: base(sa11:StatementAbstractType)
+  sa11:Subject
+  ;
+
+Subject -> %sa11:SubjectType
+%SubjectType:
+  sa11:NameIdentifier?
+  sa11:SubjectConfirmation?
+  ;
+
+NameIdentifier -> %sa11:NameIdentifierType
+%NameIdentifierType: base(xs:string)
+  @NameQualifier? -> %xs:string
+  @Format? -> %xs:anyURI
+  ;
+
+SubjectConfirmation -> %sa11:SubjectConfirmationType
+%SubjectConfirmationType:
+  sa11:ConfirmationMethod+
+  sa11:SubjectConfirmationData?
+  ds:KeyInfo?
+  ;
+
+SubjectConfirmationData -> %xs:anyType
+ConfirmationMethod -> %xs:anyURI
+
+AuthenticationStatement -> %sa11:AuthenticationStatementType
+%AuthenticationStatementType: base(sa11:SubjectStatementAbstractType)
+  sa11:SubjectLocality?
+  sa11:AuthorityBinding*
+  @AuthenticationMethod -> %xs:anyURI
+  @AuthenticationInstant -> %xs:dateTime
+  ;
+
+SubjectLocality  -> %sa11:SubjectLocalityType
+%SubjectLocalityType:
+  @IPAddress?    -> %xs:string
+  @DNSAddress?   -> %xs:string
+  ;
+
+AuthorityBinding -> %sa11:AuthorityBindingType
+%AuthorityBindingType:
+  @AuthorityKind -> %xs:QName
+  @Location      -> %xs:anyURI
+  @Binding       -> %xs:anyURI
+  ;
+
+AuthorizationDecisionStatement       -> %sa11:AuthorizationDecisionStatementType
+%AuthorizationDecisionStatementType: base(sa11:SubjectStatementAbstractType)
+  sa11:Action+
+  sa11:Evidence?
+  @Resource      -> %xs:anyURI
+  @Decision      -> %sa11:DecisionType
+  ;
+
+Action           -> %sa11:ActionType
+%ActionType:     base(string)
+  @Namespace?    -> %xs:anyURI
+  ;
+
+Evidence         -> %sa11:EvidenceType
+%EvidenceType:
+  sa11:AssertionIDReference*
+  sa11:Assertion*
+  ;
+
+AttributeStatement -> %sa11:AttributeStatementType
+%AttributeStatementType: base(sa11:SubjectStatementAbstractType)
+  sa11:Attribute+
+  ;
+
+AttributeDesignator   -> %sa11:AttributeDesignatorType
+%AttributeDesignatorType:
+  @AttributeName      -> %xs:string
+  @AttributeNamespace -> %xs:anyURI
+  ;
+
+Attribute -> %sa11:AttributeType
+%AttributeType: base(sa11:AttributeDesignatorType)
+  sa11:AttributeValue+
+  ;
+
+# To cater for discovery bootstraps we add them to schema here --Sampo
+#AttributeValue	   -> %xs:anyType
+
+AttributeValue -> %sa11:AttributeValueType
+%AttributeValueType:
+  di12:ResourceOffering*
+  a:EndpointReference*
+  ;
+
+#EOF

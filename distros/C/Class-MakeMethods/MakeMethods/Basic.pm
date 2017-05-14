@@ -92,7 +92,4 @@ letters, numbers, or underscores.
 
 See L<Class::MakeMethods> for general information about this distribution. 
 
-For distribution, installation, support, copyright and license 
-information, see L<Class::MakeMethods::Docs::ReadMe>.
-
 =cut

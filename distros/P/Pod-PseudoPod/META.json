@@ -1,0 +1,68 @@
+{
+   "abstract" : "A framework for parsing PseudoPod",
+   "author" : [
+      "Allison Randal (allison@perl.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-PseudoPod",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : 0,
+            "Pod::Simple" : "3.02",
+            "Text::Wrap" : "98.112902"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::PseudoPod" : {
+         "file" : "lib/Pod/PseudoPod.pm",
+         "version" : "0.18"
+      },
+      "Pod::PseudoPod::Checker" : {
+         "file" : "lib/Pod/PseudoPod/Checker.pm",
+         "version" : "0.18"
+      },
+      "Pod::PseudoPod::DocBook" : {
+         "file" : "lib/Pod/PseudoPod/DocBook.pm",
+         "version" : "0.18"
+      },
+      "Pod::PseudoPod::HTML" : {
+         "file" : "lib/Pod/PseudoPod/HTML.pm",
+         "version" : "0.18"
+      },
+      "Pod::PseudoPod::Index" : {
+         "file" : "lib/Pod/PseudoPod/Index.pm",
+         "version" : "0.18"
+      },
+      "Pod::PseudoPod::Text" : {
+         "file" : "lib/Pod/PseudoPod/Text.pm",
+         "version" : "0.18"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.18"
+}

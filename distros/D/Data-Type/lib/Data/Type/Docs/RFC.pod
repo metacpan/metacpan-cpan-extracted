@@ -1,0 +1,442 @@
+# $Header: /cygdrive/y/cvs/perl/modules/Data/Type/Type/Docs/RFC.pod,v 1.1 2003/04/12 12:48:40 Murat Exp $
+# $Revision: 1.1 $
+
+=head1 NAME
+
+Data::Type::RFC - request for comments on the design of Data::Type
+
+=head1 REVISION
+
+ $Revision: 1.1 $
+
+=head1 SYNOPSIS
+
+ package Data::Type::Object::std_myfirst;
+
+  our @ISA = qw(Data::Type::Collection::Std::Interface::Numeric);  # interface of the Collection (one or many of many)
+
+  our $VERSION = '0.01.25';                                        # last modified in version of Data::Type
+
+  sub desc : method { 'boolean value' }
+    
+  sub info : method
+  {
+    $this = shift;                                            # @$this are the arguments
+	
+    return sprintf '%s value', $this->[0] || 'true or false';
+  }
+
+  sub _test : method
+  {
+    $this = shift;                                            # @$this are the arguments
+
+    throw Data::Type::Exception->new( text => 'demo exception' ) if $Data::Type::value =~ /throwme/;
+
+    if( $this->[0] eq 'true' )
+    {
+      Data::Type::ok( 1, Data::Type::Facet::bool( $this->[0] ) );
+    }
+    else
+    {
+      Data::Type::ok( 0, Data::Type::Facet::bool( $this->[0] ) );
+    }
+  }
+
+ package Data::Type::Collection::Std::Interface;
+
+   our @ISA = qw(Data::Type::Object::Interface);
+
+   our $VERSION = '0.01.25';
+
+   sub prefix : method {'Std::'} 
+
+   sub pkg_prefix : method {'std_'} 
+
+   sub desc : method { 'Standard' }
+
+   sub doc : method { 'The standard numeric interface' }
+
+=head1 DESCRIPTION
+
+This is the API documentation. Every candidate datatype must be sustain the following conventions before it should be released. Comments are requested.
+
+=head1 CONVENTIONS
+
+=over 3
+
+=item
+HANDLING REGEXPS
+
+All regexps are handles by L<Regexp::Box>. Data::Type has C<$Data::Type::rebox> where all must be registered if they should be available to the B<match> facet (see L<Data::Type::Facet>). One is really encourages to use the box for all regexps so they are available to L<Data::Type::Query> and to the facets. Just the really trivial/private one which just make sense in its very singular context should be used as plain regexps.
+
+=item 
+PACKAGE NAMING
+
+All datatypes live in the B<Data::Type::Object::<name>> namespace. To prevent namespace conflicts between collections, the B<<name>> part should be formated like C<$collection_id.'_'.$datatype_name>. Example: I<bio_dna>.
+
+[Note] Per convention <name> must be lowercased and the collection id uppercased. For example C<Data::Type::Object::any> in the B<MY> collection would later called as:
+
+   verify 123123, MY::ANY;
+
+=item 
+COLLECTION ID
+
+The B<collection id> should be arround 3 characters.
+
+[Note] Carefull with reserved or used ids! Public discussion (at the mailing-list/sourceforge site below) is recommended.
+
+=item
+THROWING EXCEPTIONS
+
+It is from primary importance that at documented exceptions are thrown. Mostly this is in the B<$dt->test()> method. Otherwise nothing will work as expected.
+
+=back
+
+=head1 INTERFACE Data::Type::Object::Interface
+
+The abstract interface for all C<Data::Type::Object>s. Is inherited by the collection interface B<Data::Type::Collection::*::Interface>.
+
+=head2 SYNOPSIS
+
+ package Data::Type::Object::std_myfirst;
+
+  our @ISA = qw(Data::Type::Collection::Std::Interface::Numeric);  # interface of the Collection (one or many of many)
+
+  our $VERSION = '0.01.25';                                        # last modified in version of Data::Type
+
+  sub desc : method { 'boolean value' }
+    
+  sub info : method
+  {
+    $this = shift;                                            # @$this are the arguments
+	
+    return sprintf '%s value', $this->[0] || 'true or false';
+  }
+
+  sub _test : method
+  {
+    $this = shift;                                            # @$this are the arguments
+
+    throw Data::Type::Exception->new( text => 'demo exception' ) if $Data::Type::value =~ /throwme/;
+
+    if( $this->[0] eq 'true' )
+    {
+      Data::Type::ok( 1, Data::Type::Facet::bool( $this->[0] ) );
+    }
+    else
+    {
+      Data::Type::ok( 0, Data::Type::Facet::bool( $this->[0] ) );
+    }
+  }
+
+=head2 VARIABLES
+
+=head3 our @ISA
+
+Normal inheritance mechanism. So a collection can inherit from another collection. The isa tree is also used to build a comprehensive hierarchy chart for the documentation.
+
+=head3 our $VERSION
+
+L<Data::Type> version at the last modification of that type.
+
+=head2 METHODS
+
+=head3 $dt->desc
+
+  $str = $dt->desc
+
+C<$str> is a text describing the purpose of the type.
+
+=head3 $dt->doc
+
+  $str = $dt->doc
+
+C<$str> with some sort of B<"manpage"> for this type.
+
+=head3 $dt->pod
+
+  $str = $dt->pod
+
+This method is inherited from L<Data::Type::Object::Interface>.
+
+C<$str> is a text pod of C<$dt-E<gt>doc. Constructs a string assembled by the information from other methods like usage etc.
+
+=head3 $dt->summary( [ ARGS ] )
+
+  $str = $dt->summary( [ ARGS ] )
+  @entries = $dt->summary( [ ARGS ] )
+
+This method is inherited from L<Data::Type::Object::Interface>.
+
+Dispatches the L<summary()|Data::Type/"$scalar = summary( $value, @types )"> function as a method. In scalar context it returns a complete paragraph of plain text.
+
+In list context C<@entries> are returned. Is is an array of L<Data::Type::Entry> objects (as the L<summary()|Data::Type/"$scalar = summary( $value, @types )"> does in general).
+
+=head3 $dt->info
+
+  $str = $dt->info
+
+C<$str> is a text containg add-on information to that from C<$dt-E<gt>doc> or C<$dt-E<gt>desc>.
+
+=head3 $dt->usage
+
+  $str = $dt->usage
+
+Similar to a shell command usage with options and instructions how to invoke it. Use following annotation for arguments:
+
+ [...]             - arguments inside the brackets are optional 
+
+ (...|...|...)     - choose one of the arguments separated by the bars 
+
+ {...}             - you can specify the braced argument ZERO or more times 
+
+ {...}+            - you can specify the braced argument ONE or more times 
+
+[Note] Arguments may be given an ID which just identifies it within the scope of the usage documentation. If the argument shall be give a datatype constrain it is followed by an C<as MY::TYPE> idiom.
+
+In the line below the usage states that B<STD::VARCHAR> has the optional argument SIZE (which requires to be B<STD::NUM>:
+
+ STD::VARCHAR( [SIZE as STD::NUM] )
+
+That means that following valid perl lines will not raise an usage exception:
+
+ die unless is STD::VARCHAR;         # default is 8
+
+ die unless is STD::VARCHAR( 90 )    # 90 is valid, because it is a STD::NUM
+
+Return a string containing the usage documenation I<en block>. This is a complete usage:
+
+ sub usage : method
+ {
+ return <<END_HERE;
+  STD::VARCHAR( [SIZE as STD::NUM] )
+    SIZE sets the upper limit for the string.
+ END_HERE
+ } 
+
+=head3 $dt->_test 
+
+This method I<throws> a L<Data::Type::Exception>.
+
+Genereally implements the main logic of a datatype. Must use B<Data::Type::ok()> to dispatch public and private facets. See also C<Data::Type::ok()>.
+
+[Important] B<$Data::Type::value> is a global containing the first argument given to L<valid()|Data::Type/"valid( $value, @types ) I<throws> L<Data::Type::Exception>"> (i.e. the test value). It is not delived as an argument.
+
+=head3 $dt->_filters
+
+  $aref = $dt->_filters
+
+C<$aref> is the list of filters applied to the value in question before subjected to the testing (C<$dt-E<gt>_test> method). For example:
+
+  sub _filters { ( [ 'chomp' ], [ 'strip', '\s' ] ) }
+
+The names are valid filter ids as elaborated in L<Data::Type::Filter>.
+
+=head3 $dt->choice
+
+  $aref = $dt->choice
+
+C<$aref> is data of alternativ choices when an inputfield is generated for this type. An inputfield is still ill defined, but L<Data::Type::Field> is planned to generate on-the-fly shell- or webform input fields.
+
+ printf 'Please select [choice: %s ]', join( ', ', $aref );
+
+=head3 $dt->choice_as_text
+
+  $str = $dt->choice_as_text
+
+C<$str> is a text formatted for direct output:
+
+ printf 'Please select [choice: %s ]', $dt->choice_as_text;
+ 
+=head3 $dt->param
+
+  $aref = $dt->param
+
+Must be called within any other of this methods to access default arguments. Any static parts of a test (like locale information) should be return by this method. This helps porting and extending a type.
+
+Returns a data structure used for the configuration/parameterization of the datatype.
+
+=head3 $dt->default
+
+If some default value for C<$dt-E<gt>param> exists, they should be returned by this function.
+
+=head3 $dt->basic_depends
+
+  @modules = $dt->basic_depends
+
+This method should be implemented only by the B<Data::Type::Collection::*::Interface> interface. The C<@modules> returned by this function are loaded at runtime during access of any collection member.
+
+Array of B<required> modules for a collection of types (for instance CPAN modules). 
+
+[Note] Used to build a dependency tree.
+
+=head3 $dt->depends 
+
+  @modules = $dt->depends 
+
+C<@modules> are loaded at runtime during first access to its type.
+
+[Note] This information is used to bundle C<Data::Type> with the right C<Makefile.PL> information.
+In future this could be also exploited for runtime loading of modules only for actually used types.
+
+Array of B<required> modules for a single type (for instance CPAN modules).
+
+=head3 $dt->to_text
+
+  $str = $dt->to_text
+
+Should generate a string  C<$str> which could be evalled and would revive the state of the type. This would be usefull for some sort of simple and readable persistance (ie. in config files or web forms).
+
+  $scalar = STD::VARCHAR(80)->to_string;   # should return "STD::VARCHAR( 80 )"
+  
+  eval $scalar;
+
+[Note] The state is a mix of C<$dt-E<gt>param and C<$dt-E<gt>default>. Currently no datatype supports it.
+
+=head3 $dt->cast( $dt )
+
+  $now_b_was_a = $dt_a->cast( $dt_b );
+
+API for casting of types. 
+
+[Note] L<Class::Multimethods> may be used for dispatching multiple cast methods.
+
+Returns the casted destination type C<$now_b_was_a> or B<undef> if cast wasnt possible.
+
+=head3 $dt->prefix
+
+  $str = $dt->prefix
+
+This should be implemented by an Data::Type::Collection::*::Interface class which is then used when generating the final exportname with C<exported>.
+
+This method can be used to overload the automatic export name scheme with some individual.
+
+[Note] Only used if absolutely needed.
+
+=head3 $dt->export
+
+  @aliases = $dt->export
+
+If not implemented it generates an automatic name via uppercasing the packagenames last part (C<Data::Type::_package_to_name>).
+
+  package Data::Type::Object::bio_atom;
+
+    sub export { qw(ATOM ELEMENT) }  # part of the BIO collection, would make this type available as BIO::ATOM and BIO::ELEMENT
+
+Returns an array of alias's for that type.
+
+=head3 $dt->exported
+
+  @aliases = $dt->exported
+
+Array of alias's for that type, including a prefix if this type is part of a collection.
+
+=head1 INTERFACE Data::Type::Collection::<ID>::Interface
+
+=head2 SYNOPSIS
+
+ package Data::Type::Collection::Std::Interface;
+
+   our @ISA = qw(Data::Type::Object::Interface);
+
+   our $VERSION = '0.01.25';
+
+   sub prefix : method {'Std::'} 
+
+   sub pkg_prefix : method {'std_'} 
+
+   sub desc : method { 'Standard' }
+
+   sub doc : method { 'The standard numeric interface' }
+
+=head2 VARIABLES
+
+=head3 our @ISA
+
+Normal inheritance mechanism. So a collection can inherit from another collection. The isa tree is also used to build a comprehensive hierarchy chart for the documentation.
+
+=head3 our $VERSION
+
+Should hold the value of the L<Data::Type> version at the last modification.
+
+=head2 METHODS
+
+=head3 $dtc->prefix
+
+  $str = $dtc->prefix
+
+The heading part of the package name. Prefixed to all types of that collection.
+
+ STD::NUM
+
+where 'STD::' was the prefix added to the 'NUM' type.
+
+=head3 $dtc->pkg_prefix
+
+  $str = $dtc->pkg_prefix
+
+Because all types, no matter which collection, are living the in the same namespace the require a unique name. So it is required practice to put a prefix to the package name.
+
+ package Data::Type::Object::db_set;
+
+ package Data::Type::Object::std_set;
+
+So here the 'set' datatype is protected from ambiguity via prefixing it with the collection B<pkg_prefix>.
+
+=head3 $dtc->desc
+
+  $str = $dtc->desc
+
+A representative short headline for the collection.
+
+=head3 $dtc->doc
+
+  $str = $dtc->doc
+
+A complete documentation for the collection. 
+
+[Note] Used by the authors automatic documentation system.
+
+=head1 INTERFACE Data::Type::Facet::Interface
+
+=head2 VARIABLES
+
+=head3 our $VERSION
+
+Should hold the value of the L<Data::Type> version at the last modification.
+
+=head2 METHODS
+
+=head3 $dtf->test
+
+This method I<throws> a L<Data::Type::Exception>.
+
+Holds the logic of type validation. Must use Data::Type::ok() to dispatch public and private facets.
+
+=head3 $dtf->desc
+
+  $str = $dtf->desc
+
+A scalar describing the purpose of the facet.
+
+=head3 $dtf->info
+
+  $str = $dtf->info
+
+C<$str> should be a static string with supportive information.
+
+=head3 $dtf->usage
+
+  $str = $dtf->usage
+
+Shell commando like usage. Must precisly describe every argument in the text C<$str>. See $dt->usage for explicit instructions.
+
+
+=head1 CONTACT
+
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+
+=head1 AUTHOR
+
+Murat Uenalan, <muenalan@cpan.org>
+

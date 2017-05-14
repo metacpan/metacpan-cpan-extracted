@@ -1,7 +1,9 @@
+#include <xs/xs.h>
 #include <map>
 #include <string>
+#include <typeinfo>
+#include <cxxabi.h>
 #include <stdexcept>
-#include <xs/xs.h>
 
 namespace xs {
 
@@ -186,6 +188,21 @@ void inherit_package (pTHX_ const char* module, const char* parent) {
     module_isa[mlen+4] = 'A';
     module_isa[mlen+5] = 0;
     av_push(get_av(module_isa, GV_ADD), newSVpv_share(parent, 0));
+}
+
+SV* error_sv (const std::exception& err) {
+    dTHX;
+
+    int status;
+    char* class_name = abi::__cxa_demangle(typeid(err).name(), NULL, NULL, &status);
+    if (status != 0) croak("[error_sv] !critical! abi::__cxa_demangle error");
+    SV* errsv = newSVpvs("[");
+    sv_catpv(errsv, class_name);
+    sv_catpv(errsv, "] ");
+    sv_catpv(errsv, err.what());
+    free(class_name);
+
+    return errsv;
 }
 
 namespace _tm {

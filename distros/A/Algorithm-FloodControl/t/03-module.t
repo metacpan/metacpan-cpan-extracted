@@ -21,7 +21,7 @@ use warnings;
 use Cache::FastMmap;
 use File::Temp;
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 
 use Algorithm::FloodControl;
@@ -50,4 +50,6 @@ foreach ( 1 .. 4 ) {
 }
 $attempts = $control->get_attempt_count( check_auth_data => "test_$$" );
 ok( $control->is_user_overrated( check_auth_data => "test_$$") );
+$control->forget_attempts( check_auth_data => "test_$$" );
+ok( !$control->is_user_overrated( check_auth_data => "test_$$") );
 

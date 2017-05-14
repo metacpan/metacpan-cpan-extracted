@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
-#$Id: demo.pl 754 2011-03-07 01:07:15Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/demo.pl $
+#$Id: demo.pl 998 2013-08-14 12:21:20Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/demo.pl $
 use strict;
 no warnings qw(uninitialized);
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use Data::Dumper;    #dev only
 $Data::Dumper::Sortkeys = 1;
 use lib::abs '../lib';

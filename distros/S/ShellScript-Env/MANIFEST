@@ -1,0 +1,11 @@
+MANIFEST
+README
+Makefile.PL
+lib/ShellScript/Env.pm
+t/generate.t
+t/dir_find.t
+t/lib
+t/bin/ignore
+t/root/bin/ignore
+t/root/lib/ignore
+META.yml                                 Module meta-data (added by MakeMaker)

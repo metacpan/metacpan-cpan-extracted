@@ -1,5 +1,5 @@
 package Template::Magic::Zone ;
-$VERSION = 1.40 ;
+$VERSION = 1.39 ;
 use strict ;
 use 5.006_001 ;
 
@@ -14,7 +14,11 @@ use 5.006_001 ;
    }
 
 ; BEGIN
-   { foreach my $n (qw| zone output text post |)
+   { foreach my $n qw| zone
+                       output
+                       text
+                       post
+                     |
       { no strict 'refs'
       ; *{$n.'_process'} = sub
                             { my ($z) = @_
@@ -167,12 +171,12 @@ use 5.006_001 ;
       { $code
       }
      else
-      { no strict 'refs','vars'
+      { no strict
       ; local *S = $l.'::'.$id
       ; defined $S ?  $S
-            : @S ? \@S
-            : %S ? \%S
-            : undef
+      : defined @S ? \@S
+      : defined %S ? \%S
+      : undef
       }
    }
    

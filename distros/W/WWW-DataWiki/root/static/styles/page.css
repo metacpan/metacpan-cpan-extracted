@@ -1,0 +1,57 @@
+@import url(http://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic,700italic);
+
+body {
+	font-family: "Ubuntu", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+	color: black;
+	background: white;
+	margin: 0;
+	padding: 0.67em 4em 0.67em;
+}
+h1 {
+	color: #003;
+	background: #99f;
+	font-size: 150%;
+	text-align: left;
+	font-weight: normal;
+	font-style: italic;
+	padding: 0.33em; 
+	border-bottom: 2px solid;
+	margin-top: 0;
+	margin-bottom: 1em;
+	margin-left: -2em;
+	margin-right: -2em;
+}
+h2 {
+	color: #5d5d5d;
+	font-weight: bold;
+	font-style: normal;
+	font-size: 100%;
+	padding: 0;
+}
+ul {
+	margin: 0;
+	padding: 0;
+}
+li {
+	margin: 0 0 0.67em 0;
+	padding: 0;
+}
+div.footer {
+	color: #003;
+	background: #99f;
+	padding: 0.5em; 
+	border-top: 2px solid;
+	margin-top: 1em;
+	margin-left: -3em;
+	margin-right: -3em;
+}
+div.footer hr {
+	display: none;
+}
+a:link, a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+	color: red;
+}

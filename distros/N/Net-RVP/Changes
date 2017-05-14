@@ -1,0 +1,10 @@
+Change log for the Net::RVP modules
+===================================
+
+David Robins <dbrobins@davidrobins.net>
+
+0.01 - initial external release
+
+0.02 - remove extraneous debug logging
+     - add this Changes file
+

@@ -1,0 +1,78 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Headings</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_parag.html">Parent Topic</A> | <A HREF="in_parag.html">Previous Topic</A> | <A HREF="in_examp.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>3.1. Headings</H1>
+<HR>
+<H2><A NAME="Chapter Headings">3.1.1. Chapter Headings</A></H2>
+<P>Headings are specified using the tags H1 .. H6:</P>
+<UL>
+<LI>H1 is a chapter heading
+<LI>H2 .. H6 are sub headings</UL>
+<P>The actual presentation of H-style headings (e.g. numbered or unnumbered) is decided by the target format and document style.</P>
+<HR>
+<H2><A NAME="Other Headings">3.1.2. Other Headings</A></H2>
+<P>The following heading tags are also supported:</P>
+<UL>
+<LI>A1 .. A6 - headings in <EM>Appendices</EM>
+<LI>P1 .. P6 - headings in <EM>plain</EM> sections (e.g. Glossary)</UL>
+<P>P-style headings are always unnumbered so are commonly used in memos.</P>
+<P>In normal documents, it is often unnecessary to use A-style or P-style tags. The preferred approach is to:</P>
+<UL>
+<LI>store each section in a file using H-style headings
+<LI>convert the heading style using the <A HREF="../ref/fappendi.html">appendix</A> or <A HREF="../ref/fplain.html">plain</A> filter as the file is being imported.</UL>
+<P>For example:</P>
+<PRE>
+  !include &quot;budget.sdf&quot;; appendix
+</PRE>
+<P>Using this approach, sections can easily be reused in different ways in different documents.</P>
+<HR>
+<H2><A NAME="Generating a Table of Contents">3.1.3. Generating a Table of Contents</A></H2>
+<P>A table of contents can be generated from the heading paragraphs. All types of heading tags (i.e. H, A and P) are included. The depth of the table of contents is specified by the <EM>DOC_TOC</EM> variable. For example, to generate a table of contents including headings up to and including level 4:</P>
+<PRE>
+   doccvt -o -DDOC_TOC=4 mydoc.sdf
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG>For normal documents, the <A HREF="../ref/mbuild_t.html">build_title</A> macro defaults this variable to 3.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<P>Individual headings can be excluded from the table of contents by specifying the <EM>notoc</EM> attribute. For example:</P>
+<PRE>
+   H3[notoc] Yet Another Heading
+</PRE>
+<P>See <A HREF="in_ovatt.html">Attributes</A> for further details on attribute syntax.</P>
+<HR>
+<H2><A NAME="Controlling Page Breaks">3.1.4. Controlling Page Breaks</A></H2>
+<P>Generally speaking, page breaks are controlled by rules associated with heading tags. For example:</P>
+<UL>
+<LI>for documents, memos and faxes, each level 1 heading starts a new page
+<LI>for manuals, each level 1 heading starts a new chapter and each level 2 heading typically starts a new page.</UL>
+<P>The <EM>top</EM> paragraph attribute can be used to position a paragraph at the top of the next page. For example:</P>
+<PRE>
+  H3[top] Abc Module
+</PRE>
+<P>Page breaks can also be explicitly specified using the PB tag. For example:</P>
+<PRE>
+  text on one page.
+  PB:
+  H3: Another Section
+</PRE>
+<P><HR WIDTH="80%" ALIGN="Left">
+<STRONG>Note: </STRONG><A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> is designed to be a <EM>logical markup language</EM>. While it is sometimes necessary to explicitly specify page breaks in order to get the layout you want, doing so can reduce the portability of your document to different styles, page sizes and target formats.
+<HR WIDTH="80%" ALIGN="Left"></P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_parag.html">Parent Topic</A> | <A HREF="in_parag.html">Previous Topic</A> | <A HREF="in_examp.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

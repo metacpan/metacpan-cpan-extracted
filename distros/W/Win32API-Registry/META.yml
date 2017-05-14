@@ -1,21 +1,24 @@
---- #YAML:1.0
-name:               Win32API-Registry
-version:            0.32
-abstract:           Low-level access to Win32 system API calls from WINREG.H
+---
+abstract: Low-level access to Win32 system API calls from WINREG.H
 author:
-    - Tye McQueen <tye@metronet.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Tye McQueen <tye@metronet.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32API-Registry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.005
+resources:
+  repository: git://github.com/chorny/Win32API-Registry.git
+version: 0.33

@@ -1,0 +1,135 @@
+format-version: 1.0
+date: $Date: 2005/05/20 16:11:02 $
+saved-by: cjm
+auto-generated-by: cjm
+default-namespace: relationship
+remark: <p>This ontology contains logical relations to be shared across the different OBO ontologies. Each OBO ontology is free to extend this set with relations specific to the biology within that ontology. This ontology should remain largely invisible to the casual user</p><p>This ontology is designed to be used by the following groups of people: <dl><dt>OBO curators</dt><dd>each OBO ontology should use relations that are consistent with the relations defined here</dd><dt>Database administrators and developers, and other software developers</dt><dd>This ontology file is a partial computable specification of the core relationships in OBO. (The full semantics can not be specified using the OBO format, please refer to the paper for a full specification). This obo format file can be loaded into a database such as GO-DB or Chado in order to make relations between classes and instance data interoperable </dd><dt>Advanced users</dt><dd>The formal relations specified here allow for formal reasoning over the ontologies in OBO</dd></dl><h3>Notes:</h3><p>In the above, variables c, d, ..., p, q, ... range over instances of continuants and processes respectively. C, D, ..., P, Q, ... range over the corresponding classes</p>
+
+[Typedef]
+id: OBO_REL:relationship
+name: relationship
+def: "A relationship between two classes (terms). Relationships between classes are expressed in terms of relations on underlying instances. For more details see Smith B et al 'Relations in Bio Ontologies' [in press]." [obo:smith_et_al]
+
+[Typedef]
+id: OBO_REL:is_a
+name: is_a
+builtin: true
+def: "For continuants: C is_a C' if and only if: given any c that instantiates C at a time t, c instantiates C' at t. For processes: P is_a P' if and only if: that given any p that instantiates P, then p instantiates P'." [obo:smith_et_al]
+comment: The is_a relationship is considered axiomatic by the obo file format specification; ie it is taken for granted. The is_a relation is still included in this ontology for uniqueness
+exact_synonym: is_subtype_of
+xref_analog: owl:subClassOf
+inverse_of: has_subclass
+is_reflexive: true
+is_anti_symmetric: true
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:part_of
+name: part_of
+is_a: OBO_REL:relationship
+def: "For continuants: C part_of C' if and only if: given any c that instantiates C at a time t, there is some c' such that c' instantiates C' at time t, and c *part_of* c' at t. For processes: P part_of P' if and only if: given any p that instantiates P at a time t, there is some p' such that p' instantiates P' at time t, and p *part_of* p' at t. (Here *part_of* is the instance-level part-relation.)" [obo:smith_et_al]
+inverse_of: has_part
+is_reflexive: true
+is_anti_symmetric: true
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:integral_part_of
+name: integral_part_of
+is_a: OBO_REL:part_of
+def: "C integral_part_of C' if and only if: C part_of C' AND C' has_part C" [obo:smith_et_al]
+inverse_of: has_integral_part
+is_reflexive: true
+is_anti_symmetric: true
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:proper_part_of
+name: proper_part_of
+is_a: OBO_REL:part_of
+def: "As for part_of, with the additional constraint that subject and object are distinct" [obo:smith_et_al]
+inverse_of: has_proper_part
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:improper_part_of
+name: improper_part_of
+is_a: OBO_REL:part_of
+def: "As for part_of, with the additional constraint that subject and object are identical" [obo:smith_et_al]
+inverse_of: has_improper_part
+is_reflexive: true
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:located_in
+name: located_in
+is_a: OBO_REL:relationship
+def: "C located_in C' if and only if: given any c that instantiates C at a time t, there is some c' such that: c' instantiates C' at time t and c *located_in* c'. (Here *located_in* is the instance-level location relation.)" [obo:smith_et_al]
+inverse_of: location_of
+is_transitive: true
+is_reflexive: true
+
+[Typedef]
+id: OBO_REL:contained_in
+name: contained_in
+is_a: OBO_REL:relationship
+inverse_of: contains
+def: "C contained_in C' if and only if: given any instance c that instantiates C at a time t, there is some c' such that: c' instantiates C' at time t and c located_in c' at t, and it is not the case that c *part_of* c' at t. (c' is a conduit or cavity.)" [obo:smith_et_al]
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:adjacent_to
+name: adjacent_to
+is_a: OBO_REL:relationship
+def: "C adjacent to C' if and only if: given any instance c that instantiates C at a time t, there is some c' such that: c' instantiates C' at time t and c and c' occupy neighboring spatial regions." [obo:smith_et_al]
+inverse_of: adjacent_to
+is_symmetric: true
+is_reflexive: true
+
+[Typedef]
+id: OBO_REL:transformation_of
+name: transformation_of
+is_a: OBO_REL:relationship
+def: "Relation between two classes, in which instances retain their identity yet change their classification by virtue of some kind of transformation. Examples: larval oenocyte transformation_of embryonic oenocyte, mature_mRNA transformation of pre_mRNA. Formally: C transformation_of C' if and only if given any c and any t, if c instantiates C at time t, then for some t', c instantiates C' at t' and t' earlier t." [obo:smith_et_al]
+inverse_of: transformed_into
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:derives_from
+name: derives_from
+is_a: OBO_REL:relationship
+def: "Derivation on the instance level (*derives_from*) holds between distinct material continuants when one succeeds the other across a temporal divide in such a way that at least a biologically significant portion of the matter of the earlier continuant is inherited by the later. We say that one class C derives_from class C' if instances of C are connected to instances of C' via some chain of instance-level derivation relations. Example: osteocyte derives_from osteoblast. Formally: C derives_immediately_from C' if and only if: given any c and any t, if c instantiates C at time t, then there is some c' and some t', such that c' instantiates C' at t' and t' earlier-than t and c *derives_from* c'. C derives_from C' if and only if: there is an chain of immediate derivation relations connecting C to C'." [obo:smith_et_al]
+inverse_of: derived_into
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:preceded_by
+name: preceded_by
+is_a: OBO_REL:relationship
+def: "P preceded_by P' if and only if: given any process p that instantiates P at a time t, there is some process p' such that p' instantiates P' at time t', and t' is earlier than t. " [obo:smith_et_al]
+inverse_of: precedes
+is_transitive: true
+
+[Typedef]
+id: OBO_REL:has_participant
+name: has_participant
+is_a: OBO_REL:relationship
+def: "P has_participant C if and only if: given any process p that instantiates P there is some continuant c, and some time t, such that: c instantiates p at t and c participates in p at t" [obo:smith_et_al]
+inverse_of: participates_in
+
+[Typedef]
+id: OBO_REL:has_agent
+name: has_agent
+is_a: OBO_REL:relationship
+def: "As for has_participant, but with the additional condition that the component instance is causally active in the relevant process" [obo:smith_et_al]
+inverse_of: agent_in
+
+[Typedef]
+id: OBO_REL:instance_of
+name: instance_of
+is_a: OBO_REL:relationship
+def: "A relation between an instance and a class. For components: a primitive relation between a component instance and a class which it instantiates at a specific time. For processes: a primitive relation, between a process instance and a class which it instantiates, holding independently of time" [obo:smith_et_al]
+comment: The is_a relationship is considered axiomatic by the obo file format specification; ie it is taken for granted. The is_a relation is still included in this ontology for uniqueness
+inverse_of: has_instance
+
+

@@ -1,0 +1,66 @@
+# $Id$
+#
+# >>Title::	Pages Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 08-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{pages}} is an [[SDF]] module containing configuration data
+# common to styles in the {{simple}} look.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Load the standard header/footer stuff
+!use "stdlib/pages"
+
+############### PAGE LAYOUTS ##################
+
+# Define the margins. For pages >= 8 inches, a wider outer margin is used.
+!define OPT_MARGIN_TOP      '0.5in'
+!define OPT_MARGIN_BOTTOM   '0.5in'
+!define OPT_MARGIN_INNER    '1.0in'
+!define OPT_MARGIN_OUTER    $var{'DOC_PAGE_WIDTH'} >= 576 ? '1.0in' : '0.5in'
+
+# Define the first page layout
+# (no header and no borders on the footer)
+!define PAGE_FIRST_HEADER_BORDER ''
+!define PAGE_FIRST_HEADER_HEIGHT '0.00in'
+!define PAGE_FIRST_HEADER_GAP    '0.00in'
+!define PAGE_FIRST_FOOTER_BORDER ''
+!define PAGE_FIRST_FOOTER_HEIGHT '0.50in'
+!define PAGE_FIRST_FOOTER_GAP    '0.25in'
+
+# Define the right page layout
+!define PAGE_RIGHT_HEADER_HEIGHT  '0.40in'
+!define PAGE_RIGHT_HEADER_GAP     '0.30in'
+!define PAGE_RIGHT_FOOTER_HEIGHT  '0.50in'
+!define PAGE_RIGHT_FOOTER_GAP     '0.25in'
+
+# Define the header/footer borders
+!macro build_borders
+!if $var{'OPT_BORDERS'} == 0
+!define PAGE_RIGHT_HEADER_BORDER  ''
+!define PAGE_RIGHT_FOOTER_BORDER  ''
+!elsif $var{'OPT_BORDERS'} == 1
+!define PAGE_RIGHT_HEADER_BORDER  "bottom=0.25"
+!define PAGE_RIGHT_FOOTER_BORDER  "top=0.25"
+!else
+!define PAGE_RIGHT_HEADER_BORDER  "top=0.25,bottom=0.25"
+!define PAGE_RIGHT_FOOTER_BORDER  "top=0.25"
+!endif
+!endmacro
+
+# Define the sidehead details
+!define OPT_SIDEHEAD_WIDTH "30pt"
+!define OPT_SIDEHEAD_GAP   "6pt"

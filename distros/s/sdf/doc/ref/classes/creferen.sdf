@@ -1,0 +1,42 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: references Class
+
+H2: Interface
+
+!class_interface "references"
+
+H2: Description
+
+The {{references}} filter is used to declare a set of
+references and matching documents. It can also be used to
+build a table of references within a document.
+
+The attributes supported are:
+
+!block table
+Attribute       Description
+Reference       the document code
+Document        the document name
+Version         the document version
+Status          the document status
+Jump            the URL, if any
+!endblock
+
+H2: Examples
+
+See the {{FILE:sdf.sdm}} and {{FILE:document.reg}} files within SDF's
+{{FILE:sdf}} directory.
+
+#H2: Limitations & Future Directions

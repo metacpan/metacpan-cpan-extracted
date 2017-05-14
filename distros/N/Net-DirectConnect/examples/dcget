@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#$Id: dcget 794 2011-06-17 17:48:15Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/dcget $
+#$Id: dcget 998 2013-08-14 12:21:20Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/dcget $
 
 =head1 NAME
 
@@ -17,8 +17,13 @@
  $config{dc}{host} = 'myhub.net';
 
 =cut
+
 use 5.10.0;
 use strict;
+no strict qw(refs);
+use warnings "NONFATAL" => "all";
+no warnings qw(uninitialized);
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use Data::Dumper;
 $Data::Dumper::Sortkeys = $Data::Dumper::Useqq = $Data::Dumper::Indent = 1;
 use Time::HiRes qw(time sleep);
@@ -40,14 +45,14 @@ use Net::DirectConnect::filelist;
 #$config{disconnect_after_inf} //= 0;
 psmisc::configure();    #psmisc::lib_init();
 psmisc::lib_init();     #for die handler
-$config{'auto_get_best'}      //= 1;
+#$config{'auto_get_best'}      //= 1;
 $config{'hit_to_ask'}         //= 5;
 $config{'queue_recalc_every'} //= 100;
 $config{'get_every'}          //= 60;
 #$config{'get_dir'}            //= './downloads/';
-$config{ 'log_' . $_ } //= 0 for qw (dmp dcdmp dcdbg);
+$config{ 'log_' . $_ } //= 0 for qw (dmp dcdmp dcdbg dcdev adcdev);
 psmisc::printlog("usage: $1 [adc|dchub://]host[:port] [hub..]\n"), exit
-  if !$ARGV[0] and !$config{dc}{host};    # and !$config{dc}{hosts};
+  if !$ARGV[0] and !( $config{dc}{host} || $config{dcget}{host} );    # and !$config{dc}{hosts};
 psmisc::printlog( 'info', 'started:', $^X, $0, join ' ', @ARGV );
 #$SIG{INT} = $SIG{KILL} = sub { printlog 'exiting', exit; };
 #printlog 'dev', 'mkdir', $config{'get_dir'},
@@ -61,6 +66,7 @@ my $log = sub (@) {
 };
 my @todl = grep { /^[A-Z0-9]{39}$/ or /^-/ } @ARGV;
 s/^-// for @todl;
+$log->('info', 'todl:', @todl)if @todl;
 @ARGV = grep { !( /^[A-Z0-9]{39}$/ or /^-/ ) } @ARGV;
 $SIG{PIPE} = sub { printlog( 'sig', 'PIPE' ) };
 my @dirs = grep { -d } @ARGV;
@@ -70,11 +76,11 @@ my $filelist = shift @ARGV if $ARGV[0] ~~ 'filelist';
 my @hosts = grep { m{^\w+://} } @ARGV;
 Net::DirectConnect::filelist->new( log => $log, %{ $config{dc} || {} } )->filelist_make(@dirs), exit
   if ( $filelist and !caller )
-  or ( !@hosts and !$config{dc}{host} );
+  or ( !@hosts and !( $config{dc}{host} || $config{dcget}{host} ) );
 my @dc;
 @dc = map {
   Net::DirectConnect->new(
-    modules            => ['filelist'],
+    #modules            => ['filelist'],
     share              => \@dirs,
     'filelist_builder' => ( join ' ', $^X, $0, 'filelist' ),
     #'filelist_builder' => ( join ' ', $^X, 'dcshare', 'filelist' ),
@@ -119,7 +125,7 @@ my @dc;
         #$work{'tthfrom'}{ $s{tth} }{ $s{nick} } = \%s;
         #++$work{'stat'}{'SR'};
       },
-      'RES' => sub {     #_parse_aft
+      'RES' => sub {    #_parse_aft
         my $dc = shift;
         #psmisc::printlog 'RESparsed:', Dumper( \@_ );
         my ( $dst, $peercid ) = @{ $_[0] };
@@ -135,47 +141,54 @@ my @dc;
     #auto_work
     worker => sub {
       my $dc = shift;
+      #printlog('worker',  keys %{$dc->{parent}||{}}    );
       $dc->{'handler'}{'SCH'} ||= $dc->{'handler'}{'Search'};    #_parse_aft _parse_aft
       psmisc::schedule(
         $config{'queue_recalc_every'},
         our $queuerecalc_ ||= sub {
+          my $dc   = shift;
           my $time = int time;
           $work{'toask'} = [ (
               sort { $work{'ask'}{$a} <=> $work{'ask'}{$b} } grep {
                       $work{'ask'}{$_} >= $config{'hit_to_ask'}
                   and !exists $work{'asked'}{$_}
                   and !exists $dc->{share_full}{$_}
-                } keys %{ $work{'ask'} }
+              } keys %{ $work{'ask'} }
             )
           ];
           psmisc::printlog(
             'info', "queue len=", scalar @{ $work{'toask'} },
             " first hits=", $work{'ask'}{ $work{'toask'}[0] },
+            "asks=", scalar keys %{ $work{'ask'} },
             $work{'toask'}[0]
           );
-        }
+        },
+        $dc
       );
       psmisc::schedule(
         [ 3600, 3600 ],
         our $hashes_cleaner_ ||= sub {
-          my $min = scalar keys %{ $work{'hubs'} || {} };
+          my $dc = shift;
+          #my $min = scalar keys %{ $work{'hubs'} || {} };
+          my $min = scalar @dc;
           psmisc::printlog( 'info', "queue clear min[$min] now", scalar %{ $work{'ask'} || {} } );
-          delete $work{'ask'}{$_} for grep { $work{'ask'}{$_} < $min } keys %{ $work{'ask'} || {} };
+          delete $work{'ask'}{$_} for grep { $work{'ask'}{$_} <= $min } keys %{ $work{'ask'} || {} };
           psmisc::printlog( 'info', "queue clear ok now", scalar %{ $work{'ask'} || {} } );
-        }
+        },
+        $dc
       );
       if ( $config{'auto_get_best'} ) {
         psmisc::schedule(
           $dc->{'search_every'},
-          our $queueask_ ||= sub {
-            my ($dc) = @_;
+          $dc->{'___queueask_'} ||= sub {
+            my $dc = shift;
+            return unless $dc->active();
             my $q;
             #psmisc::printlog( 'dev', "getbest run");
             while ( $q = shift @{ $work{'toask'} } or return ) {
               #psmisc::printlog( 'dev', "getbest:", $q);
-              psmisc::printlog('dev', 'already in share', $q),
-              next if $dc->{share_full}{$q};
-              last if  !exists $work{'asked'}{$q};
+              psmisc::printlog( 'dev', 'already in share', $q ), next if $dc->{share_full}{$q};
+              last if !exists $work{'asked'}{$q};
 #$work{'ask_db'}{$q} = $work{'asked'}{$q} = $r->{'time'}, next                  if $r and $r->{'time'};    # + $config{'ask_retry'} > time;
 #$work{'ask_db'}{$q} = 0;
 #last;
@@ -198,9 +211,50 @@ my @dc;
       psmisc::schedule(
         [ 10, 99999999 ],
         our $se_sub__ ||= sub {
+          my $dc = shift;
           #$dc->search('lost');
           #$dc->search($_) for @ARGV;
-        }
+        },
+        $dc
+      );
+      psmisc::schedule(
+        [ 10, 0, 1 ],
+        our $update_queue_sub__ ||= sub {
+          #my $self = $dc;
+          my $self = shift;
+          #$self->log('dev', 'dlsub once!!');
+          my %partial;
+          unless ( $self->{no_auto_load_partial} ) {
+            my $dir = $self->{'partial_prefix'};
+            #$self->log('dev', 'look', $self->{'partial_prefix'});
+            for my $file (<$dir*>) {
+              #$self->log('dev', $_);
+              local $_ = $file;
+              $_ = Encode::decode $self->{charset_fs}, $_, Encode::FB_WARN if $self->{charset_fs};
+              #$self->log('dev', 'U', $_);
+              next unless s/$self->{'partial_ext'}$//i;
+              next unless s/^$self->{'partial_prefix'}//i;
+              #$self->log('dev', $_);
+              next unless s/\.([A-Z0-9]{39})$//;
+              my ($tth) = $1;
+              $self->log( 'warn', 'removing already downloaded partial', $_, $tth ), unlink($file), next
+                if $self->{'share_full'}{$tth};
+              $self->log( 'warn', 'removing already downloading partial', $_, $tth ), unlink($file), next
+                if $partial{$tth}{size} > -s $file;
+              $self->log( 'warn', 'removing already downloading partial2', $_, $tth, $partial{$tth}{size} ),
+                unlink( $partial{$tth}{file} )
+                if $partial{$tth}{size} and $partial{$tth}{size} < -s $file;
+              $self->log( 'dev', 'adding to queue', $_, $tth, -s $file, $partial{$tth} );
+              #$self->{'want_download'}{$tth} //= {};
+              push @todl, $tth unless $partial{$tth};
+              $partial{$tth}{size} = -s $file;
+              $partial{$tth}{file} = $file;
+              $self->{'want_download_filename'}{$tth} = { $_ => 100 };
+            }
+            #$self->dumper();
+          }
+        },
+        $dc
       );
       psmisc::schedule(
         [ 10, 11 ],
@@ -208,11 +262,13 @@ my @dc;
           return unless @todl;
           #$dc->search('lost');
           #$dc->search($_) for @ARGV;
-          $dc->download( shift @todl );
-        }
+          $dc->download( shift @todl ) if $dc->{status} ~~ 'connected';
+        },
+        $dc
       );
     },
-    %{ $config{dc} || {} },
+    %{ $config{dc}    || {} },
+    %{ $config{dcget} || {} },
     #( $_ ? ( 'host' => $_ ) : () ),
     #( $ARGV[0] ? ( 'host' => $ARGV[0] ) : () ),
     'host' => $_,
@@ -222,10 +278,12 @@ my @dc;
     $_
     }    #psmisc::array($config{dc}{host}), #ref $config{dc}{host} eq 'ARRAY' ? @{ $config{dc}{host} } : $config{dc}{host},
          #@ARGV
-    @hosts ? @hosts : psmisc::array( $config{dc}{host} )
+    @hosts ? @hosts : psmisc::array( $config{dc}{host} || $config{dcget}{host} )
   );
 $_->{__work} ||= \%work for    #for dumper
   grep { $_->{dev_auto_dump} } @dc;
-while ( @dc = grep { $_ and $_->active() } @dc ) {
-  $_->work() for @dc;
+while ( @_ = grep { $_ and $_->active() } @dc ) {
+  $_->work() for @_;
+  #Time::HiRes::sleep 0.1;
 }
+#psmisc::printlog 'dev', 'endst', join ', ', map {$_->status }@dc

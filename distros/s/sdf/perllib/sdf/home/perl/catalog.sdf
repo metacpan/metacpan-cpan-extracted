@@ -1,0 +1,250 @@
+!init OPT_CONFIG='perl'; PERL_HTML_ROOT="./"
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 08-Sep-97 ianc    2.000beta12 release
+# -----------------------------------------------------------------------
+#
+
+# Setup the header/footer: as this is the catalog page, remove the
+# jump to it.
+!define HTML_URL_CATALOG ''
+
+# Build the title
+!define DOC_NAME "Perl Document Catalog"
+!define DOC_TOC  0
+!build_title
+
+!subsections "Core Documentation,Pragmas,Libraries,Extensions,Utilities,," . \
+             "VMS Stuff"; "noprefix"; "center"
+
+This page provides a catalog of the supporting documentation supplied with
+{{B:[[DOC_PROJECT]]}}.
+
+The latest version of the documentation can be downloaded from
+{{ftp://ftp.mincom.com/pub/mtr/sdf/perl/}}.
+# Alternatively, you can generate it yourself using SDF.
+
+
+P1: Core Documentation
+
+!block references; root="pod/"; columns='REF:Reference'; wrap=6
+Reference               Jump
+perl                    perl.html
+perlapio                perlapio.html
+perlbook                perlbook.html
+perlbot                 perlbot.html
+perlcall                perlcall.html
+perldata                perldata.html
+perldebug               perldebug.html
+perldelta               perldelta.html
+perldiag                perldiag.html
+perldsc                 perldsc.html
+perlop                  perlop.html
+perlembed               perlembed.html
+perlfaq                 perlfaq.html
+perlfaq1                perlfaq1.html
+perlfaq2                perlfaq2.html
+perlfaq3                perlfaq3.html
+perlfaq4                perlfaq4.html
+perlfaq5                perlfaq5.html
+perlfaq6                perlfaq6.html
+perlfaq7                perlfaq7.html
+perlfaq8                perlfaq8.html
+perlfaq9                perlfaq9.html
+perlform                perlform.html
+perlfunc                perlfunc.html
+perlguts                perlguts.html
+perlipc                 perlipc.html
+perllocale              perllocale.html
+perllol                 perllol.html
+perlmod                 perlmod.html
+perlmodlib              perlmodlib.html
+perlobj                 perlobj.html
+perlpod                 perlpod.html
+perlre                  perlre.html
+perlref                 perlref.html
+perlrun                 perlrun.html
+perlsec                 perlsec.html
+perlstyle               perlstyle.html
+perlsub                 perlsub.html
+perlsyn                 perlsyn.html
+perltie                 perltie.html
+perltoc                 perltoc.html
+perltoot                perltoot.html
+perltrap                perltrap.html
+perlvar                 perlvar.html
+perlxs                  perlxs.html
+perlxstut               perlxstut.html
+!endblock
+
+P1: Pragmas
+
+!block references; root="lib/"; columns='REF:Reference'; wrap=6
+Reference               Jump
+autouse                 autouse.html
+blib                    blib.html
+constant                constant.html
+diagnostics             diagnostics.html
+integer                 integer.html
+less                    less.html
+lib                     lib.html
+locale                  locale.html
+overload                overload.html
+sigtrap                 sigtrap.html
+strict                  strict.html
+subs                    subs.html
+vars                    vars.html
+!endblock
+
+P1: Libraries
+
+!block references; root="lib/"; columns='REF:Reference'; wrap=4; sort=Reference
+Reference               Jump
+Bundle::CPAN            Bundle/CPAN.html
+CGI::Apache             CGI/Apache.html
+CGI::Carp               CGI/Carp.html
+CGI::Fast               CGI/Fast.html
+CGI::Push               CGI/Push.html
+CGI::Switch             CGI/Switch.html
+CPAN::FirstTime         CPAN/FirstTime.html
+CPAN::Nox               CPAN/Nox.html
+Class::Struct           Class/Struct.html
+Devel::SelfStubber      Devel/SelfStubber.html
+ExtUtils::Command       ExtUtils/Command.html
+ExtUtils::Embed         ExtUtils/Embed.html
+ExtUtils::Install       ExtUtils/Install.html
+ExtUtils::Liblist       ExtUtils/Liblist.html
+ExtUtils::MM_OS2        ExtUtils/MM_OS2.html
+ExtUtils::MM_Unix       ExtUtils/MM_Unix.html
+ExtUtils::MM_VMS        ExtUtils/MM_VMS.html
+ExtUtils::MM_Win32      ExtUtils/MM_Win32.html
+ExtUtils::MakeMaker     ExtUtils/MakeMaker.html
+ExtUtils::Manifest      ExtUtils/Manifest.html
+ExtUtils::Mkbootstrap   ExtUtils/Mkbootstrap.html
+ExtUtils::Mksymlists    ExtUtils/Mksymlists.html
+ExtUtils::testlib       ExtUtils/testlib.html
+File::Basename          File/Basename.html
+File::CheckTree         File/CheckTree.html
+File::Compare           File/Compare.html
+File::Copy              File/Copy.html
+File::DosGlob           File/DosGlob.html
+File::Find              File/Find.html
+File::Path              File/Path.html
+File::stat              File/stat.html
+Getopt::Long            Getopt/Long.html
+Getopt::Std             Getopt/Std.html
+I18N::Collate           I18N/Collate.html
+IPC::Open2              IPC/Open2.html
+IPC::Open3              IPC/Open3.html
+Math::BigFloat          Math/BigFloat.html
+Math::BigInt            Math/BigInt.html
+Math::Complex           Math/Complex.html
+Math::Trig              Math/Trig.html
+Net::Ping               Net/Ping.html
+Net::hostent            Net/hostent.html
+Net::netent             Net/netent.html
+Net::protoent           Net/protoent.html
+Net::servent            Net/servent.html
+Pod::Functions          Pod/Functions.html
+Pod::Html               Pod/Html.html
+Pod::Text               Pod/Text.html
+Search::Dict            Search/Dict.html
+Sys::Hostname           Sys/Hostname.html
+Sys::Syslog             Sys/Syslog.html
+Term::Cap               Term/Cap.html
+Term::Complete          Term/Complete.html
+Term::ReadLine          Term/ReadLine.html
+Test::Harness           Test/Harness.html
+Text::Abbrev            Text/Abbrev.html
+Text::ParseWords        Text/ParseWords.html
+Text::Soundex           Text/Soundex.html
+Text::Tabs              Text/Tabs.html
+Text::Wrap              Text/Wrap.html
+Tie::Hash               Tie/Hash.html
+Tie::RefHash            Tie/RefHash.html
+Tie::Scalar             Tie/Scalar.html
+Tie::SubstrHash         Tie/SubstrHash.html
+Time::Local             Time/Local.html
+Time::gmtime            Time/gmtime.html
+Time::localtime         Time/localtime.html
+Time::tm                Time/tm.html
+User::grent             User/grent.html
+User::pwent             User/pwent.html
+AnyDBM_File             AnyDBM_File.html
+AutoLoader              AutoLoader.html
+AutoSplit               AutoSplit.html
+Benchmark               Benchmark.html
+CGI                     CGI.html
+CPAN                    CPAN.html
+Carp                    Carp.html
+Cwd                     Cwd.html
+DirHandle               DirHandle.html
+English                 English.html
+Env                     Env.html
+Exporter                Exporter.html
+FileCache               FileCache.html
+FileHandle              FileHandle.html
+FindBin                 FindBin.html
+SelectSaver             SelectSaver.html
+SelfLoader              SelfLoader.html
+Shell                   Shell.html
+Symbol                  Symbol.html
+UNIVERSAL               UNIVERSAL.html
+!endblock
+
+P1: Extensions
+
+!block references; root="ext/"; columns='REF:Reference'; wrap=4; sort=Reference
+Reference              Jump
+DB_File                DB_File/DB_File.html
+DynaLoader             DynaLoader/DynaLoader.html
+Fcntl                  Fcntl/Fcntl.html
+GDBM_File              GDBM_File/GDBM_File.html
+IO::File               IO/lib/IO/File.html
+IO::Handle             IO/lib/IO/Handle.html
+IO::Pipe               IO/lib/IO/Pipe.html
+IO::Seekable           IO/lib/IO/Seekable.html
+IO::Select             IO/lib/IO/Select.html
+IO::Socket             IO/lib/IO/Socket.html
+IO                     IO/IO.html
+NDBM_File              NDBM_File/NDBM_File.html
+ODBM_File              ODBM_File/ODBM_File.html
+Opcode                 Opcode/Opcode.html
+Opcode::Safe           Opcode/Safe.html
+Opcode::ops            Opcode/ops.html
+POSIX                  POSIX/POSIX.html
+SDBM_File              SDBM_File/SDBM_File.html
+Socket                 Socket/Socket.html
+!endblock
+
+P1: Utilities
+
+!block references; root="utils/"; columns='REF:Reference'; wrap=4
+Reference               Jump
+c2ph                    c2ph.html
+h2ph                    h2ph.html
+h2xs                    h2xs.html
+perlbug                 perlbug.html
+perldoc                 perldoc.html
+pl2pm                   pl2pm.html
+splain                  splain.html
+!endblock
+
+P1: VMS Stuff
+
+!block references; root="vms/"; columns='REF:Reference'; wrap=4
+Reference               Jump
+perlvms                 perlvms.html
+ext/vmsish              ext/vmsish.html
+ext/DCLsym              ext/DCLsym/DCLsym.html
+ext/Filespec            ext/Filespec.html
+ext/Stdio               ext/Stdio/Stdio.html
+ext/XSSymSet            ext/XSSymSet.html
+!endblock

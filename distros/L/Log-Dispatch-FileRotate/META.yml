@@ -33,5 +33,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-FileRotate
   homepage: http://search.cpan.org/dist/Log-Dispatch-FileRotate/
   repository: git://github.com/mschout/perl-log-dispatch-filerotate.git
-version: '1.25'
+version: '1.26'
 x_serialization_backend: 'YAML::Tiny version 1.69'

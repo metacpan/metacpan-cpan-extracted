@@ -1,21 +1,5 @@
 Revision history for Plack-Middleware-OAuth
 
-
-0.10    日 12/ 4 15:45:10 2011
-        - Added Live.com OAuth from @fayland++
-
-0.091   六 10/15 14:03:02 2011
-        - Fix inc/ bug.
-
-0.09    一  9/26 19:36:56 2011
-        - User info query interface bug fixes.
-        - Add Facebook info query interface
-        - Disable Net::GitHub, use LWP::UserAgent class.
-        - Fix extra param hash position.
-
-0.08    日  9/25 18:04:12 2011
-        - Add Google/GitHub/Twitter UserInfo query interface for fetching user interface.
-
 0.070, 0.071   日  9/25 16:34:28 2011
         - Add UserInfo query interface.
 

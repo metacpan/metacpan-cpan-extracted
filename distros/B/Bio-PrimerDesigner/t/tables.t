@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: tables.t,v 1.5 2004/02/19 22:54:58 sheldon Exp $
+# $Id: tables.t 16 2008-11-07 02:44:52Z kyclark $
 
 #
 # Tests specific to "Bio::PrimerDesigner::Tables."

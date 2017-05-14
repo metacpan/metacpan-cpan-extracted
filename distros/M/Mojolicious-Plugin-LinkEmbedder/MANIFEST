@@ -9,9 +9,7 @@ lib/Mojolicious/Plugin/LinkEmbedder/Link/Game.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Game/_2play.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Image.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Image/Imgur.pm
-lib/Mojolicious/Plugin/LinkEmbedder/Link/Image/Instagram.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Image/Xkcd.pm
-lib/Mojolicious/Plugin/LinkEmbedder/Link/Map/Google.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Music.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Music/Spotify.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Text.pm
@@ -27,6 +25,7 @@ lib/Mojolicious/Plugin/LinkEmbedder/Link/Text/Travis.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Text/Twitter.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Video.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Video/AppearIn.pm
+lib/Mojolicious/Plugin/LinkEmbedder/Link/Video/Blip.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Video/Collegehumor.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Video/Dbtv.pm
 lib/Mojolicious/Plugin/LinkEmbedder/Link/Video/Ted.pm
@@ -41,7 +40,6 @@ t/App.pm
 t/fallback.t
 t/image-base.t
 t/image-imgur.t
-t/image-instagram.t
 t/image-xkcd.t
 t/is.t
 t/music-spotify.t
@@ -57,6 +55,7 @@ t/text-travis.t
 t/text-twitter.t
 t/video-appearin.t
 t/video-base.t
+t/video-blip.t
 t/video-collegehumor.t
 t/video-dbtv.t
 t/video-ted.t

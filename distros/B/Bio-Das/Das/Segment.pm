@@ -1,14 +1,18 @@
 package Bio::Das::Segment;
 
-# $Id: Segment.pm,v 1.16 2005/08/24 16:10:11 lstein Exp $
+# $Id: Segment.pm,v 1.26 2010/06/29 19:42:48 lstein Exp $
 use strict;
 use Bio::Root::Root;
 use Bio::Das::SegmentI;
 use Bio::Das::Util 'rearrange';
+use File::Basename 'basename';
+use Data::Dumper 'Dumper';
+use File::Spec;
+use File::Path 'mkpath';
 use vars qw(@ISA $VERSION);
 @ISA = qw(Bio::Root::Root Bio::Das::SegmentI);
 
-$VERSION = 0.90;
+$VERSION = 0.91;
 
 use overload '""' => 'asString';
 *abs_ref   = *refseq = \&ref;
@@ -16,6 +20,8 @@ use overload '""' => 'asString';
 *abs_end   = *stop   = \&end;
 *abs_strand= \&strand;
 *toString = \&asString;
+
+use constant DEBUG=>0;
 
 sub new {
   my $pack = shift;
@@ -58,8 +64,17 @@ sub features {
   }
   return $das->features(@args,
 			-dsn => $dsn,
-#			-segment=> [$self->asString]);
 			-segment=> [$self]);
+}
+
+sub get_seq_stream {
+    my $self = shift;
+    my @args = @_;
+    return $self->features(@args,-iterator=>1);
+}
+
+sub source_tag {
+  return shift()->dsn;
 }
 
 sub autotypes {
@@ -219,62 +234,137 @@ sub render {
   my $self = shift;
   my ($panel,$position_to_insert,$options,$max_bump,$max_label) = @_;
 
+  $max_bump  = 50 unless defined $max_bump;
+  $max_label = 50 unless defined $max_label;
+  $options   = 0  unless defined $options;
+  $panel->key_style('between') if $panel->key_style eq 'bottom'; # bottom key doesn't work with stylesheets
+
   my @COLORS = qw(cyan blue red yellow green wheat turquoise orange);
 
-  my $stylesheet = $self->das->stylesheet;
+  # cache stylesheet
+  my $stylesheet = $self->get_cached_stylesheet;
+
   my @override = $options && CORE::ref($options) eq 'HASH' ? %$options : ();
   my @new_tracks;
 
-  my (%type_count,%tracks,$color);
-  for my $feature ($self->features) {
-    my $type = $feature->type;
+  my (%type_count,%tracks,%track_configs,$color);
+  my @f = $self->features;
+  for my $feature (@f) {
 
+      warn "rendering $feature type = ",$feature->type," category = ",$feature->category if DEBUG;
+      warn "subtypes = ",join ' ',map {$_->type} $feature->get_SeqFeatures if DEBUG;
+
+    my $type      = $feature->type;
+    my $track_key = $type;
+    my $label     = $type->label || $type->method_label;
+    $track_key   .= ": ".$label if $label;
 
     $type_count{$type}++;
     if (my $track = $tracks{$type}) {
       $track->add_feature($feature);
       next;
     }
-    my ($glyph,@style) = $stylesheet->style($feature) if $stylesheet;
-    $glyph           ||= 'segments';
 
-    my @config = ( -glyph   => $glyph,         # really generic
-		   -bgcolor => $COLORS[$color++ % @COLORS],
-		   -label   => 1,
-		   -key     => $type,
-		   @style,                        # from stylesheet
-		   @override,                     # overridden
-		 );
+    my @config = (
+	-bgcolor    => $COLORS[$color++ % @COLORS],
+	-label      => 1,
+	-key        => $track_key,
+	-stylesheet => $stylesheet,
+	-glyph      => 'line',
+	);
 
-    if (defined($position_to_insert)) {
-      push @new_tracks,($tracks{$type} = $panel->insert_track($position_to_insert++,$feature,@config));
-    } else {
-      push @new_tracks,($tracks{$type} = $panel->add_track($feature,@config));
-    }
+
+      eval {
+	  if (defined($position_to_insert)) {
+	      push @new_tracks,($tracks{$type} = 
+				$panel->insert_track($position_to_insert++,$feature,@config));
+	  } else {
+	      push @new_tracks,($tracks{$type} = 
+				$panel->add_track($feature,@config));
+	  }
+      };
+      warn $@ if $@;
   }
 
   # reconfigure bumping, etc
   for my $type (keys %type_count) {
     my $type_count = $type_count{$type};
-    my $do_bump    =   $options == 0 ? $type_count <= $max_bump
-                     : $options == 1 ? 0
-		     : $options == 2 ? 1
-		     : $options == 3 ? 1
-		     : $options == 4 ? 2
-		     : $options == 5 ? 2
-		     : 0;
-    my $do_label   =   $options == 0 ? $type_count <= $max_label
+    my $do_bump    = defined $track_configs{$type}{-bump} ? $track_configs{$type}{-bump}
+                                                          : $options == 0 ? $type_count <= $max_bump
+							  : $options == 1 ? 0
+							  : $options == 2 ? 1
+							  : $options == 3 ? 1
+							  : $options == 4 ? 2
+							  : $options == 5 ? 2
+							  : 0;
+
+    my $maxed_out  = $type_count > $max_label;
+    my $conf_label = defined $track_configs{$type}{-label} 
+                             ? $track_configs{$type}{-label}
+                             : 1;
+
+    my $do_label   =   $options == 0 ? !$maxed_out && $conf_label
                      : $options == 3 ? 1
 		     : $options == 5 ? 1
 		     : 0;
+    # warn "type = $type, label = $do_label, do_bump = $do_bump";
+
     my $track = $tracks{$type};
 
-    $track->configure(-connector  => 'none') if !$do_bump;
-    $track->configure(-bump  => $do_bump,
-		      -label => $do_label);
+    my $factory = $track->factory;
+    $factory->set_option(connector  => 'none') if !$do_bump;
+    $factory->set_option(bump       => $do_bump);
+    $factory->set_option(label      => $do_label);
   }
   my $track_count = keys %tracks;
   return wantarray ? ($track_count,$panel,\@new_tracks) : $track_count;
+}
+
+sub get_cached_stylesheet {
+    my $self    = shift;
+    my $tmpdir  = File::Spec->tmpdir;
+    my $program = basename($0);
+    my $user    = (getpwuid($>))[0];
+    my $url     = $self->das->name.'/stylesheet';
+    foreach ($program,$user,$url) {
+	tr/a-zA-Z0-9_-/_/c;
+    }
+
+    my $dir  = File::Spec->catfile($tmpdir,"$program-$user");
+    mkpath($dir) or die "$dir: $!" unless -d $dir;
+    my $path = File::Spec->catfile($dir,$url);
+
+    my $stylesheet;
+
+    eval {
+
+	# cache for 5 minutes
+	my $mtime = (stat($path))[9];
+	if ($mtime && ((time() - $mtime)/60) < 5.0) {
+	    open my $f,'<',$path or die "$path: $!";
+	    my $s;
+	    $s .= $_ while <$f>;
+	    close $f;
+	    my $VAR1;
+	    $stylesheet = eval "$s; \$VAR1";
+	    warn $@ if $@;
+	    utime undef,undef,$path;
+	}
+	
+	else {
+	    $stylesheet = $self->das->stylesheet;
+	    my $d = Data::Dumper->new([$stylesheet]);
+	    $d->Purity(1);
+	    open my $f,">",$path or die "$path: $!";
+	    print $f $d->Dump;
+	    close $f;
+	}
+    
+	return $stylesheet;
+    };
+
+    # something went wrong, so revert to non-cached behavior
+    return $self->das->stylesheet;
 }
 
 1;

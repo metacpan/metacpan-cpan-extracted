@@ -8,7 +8,7 @@ Data::Chronicle - Chronicle storage system
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 DESCRIPTION
 

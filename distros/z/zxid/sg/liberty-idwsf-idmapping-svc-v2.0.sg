@@ -1,0 +1,35 @@
+# zxid/sg/liberty-idwsf-idmapping-svc-v2.0.sg
+# Slightly edited, 1.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: liberty-idwsf-idmapping-svc-v2.0.sg,v 1.2 2009-03-27 18:40:46 sampo Exp $
+
+target(im, urn:liberty:ims:2006-08)
+import(sec, urn:liberty:security:2006-08, liberty-idwsf-security-mechanisms-v2.0.xsd)
+import(lu, urn:liberty:util:2006-08, liberty-idwsf-utility-v2.0.xsd)
+
+MappingInput -> %im:MappingInputType
+%MappingInputType:
+  sec:TokenPolicy?
+  sec:Token?
+  @reqID? -> %lu:IDType
+  ;
+
+MappingOutput -> %im:MappingOutputType
+%MappingOutputType:
+  sec:Token
+  @reqRef? -> %lu:IDReferenceType
+  ;
+
+IdentityMappingRequest -> %im:IdentityMappingRequestType
+%IdentityMappingRequestType:
+  im:MappingInput+
+  @any
+  ;
+
+IdentityMappingResponse -> %im:IdentityMappingResponseType
+%IdentityMappingResponseType:
+  lu:Status
+  im:MappingOutput*
+  @any
+  ;
+
+#EOF

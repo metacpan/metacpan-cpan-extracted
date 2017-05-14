@@ -1,0 +1,472 @@
+<HTML>
+<HEAD>
+<TITLE>Bio::Genex::Protocol - Methods for processing data from the GeneX DB
+ table: Protocol</TITLE>
+<LINK REV="made" HREF="mailto:jasons@amadeus.avesthagen.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#attributes">ATTRIBUTES</A></LI>
+	<LI><A HREF="#class variables">CLASS VARIABLES</A></LI>
+	<LI><A HREF="#delayed fetch">DELAYED FETCH</A></LI>
+	<LI><A HREF="#class methods">CLASS METHODS</A></LI>
+	<LI><A HREF="#instance methods">INSTANCE METHODS</A></LI>
+	<LI><A HREF="#foreign key accessor methods">FOREIGN KEY ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#attribute methods">ATTRIBUTE METHODS</A></LI>
+	<LI><A HREF="#implementation details">IMPLEMENTATION DETAILS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#last updated">LAST UPDATED</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Bio::Genex::Protocol - Methods for processing data from the GeneX DB
+ table: Protocol</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Bio::Genex::Protocol;</PRE>
+<PRE>
+  # instantiating an instance
+  my $Protocol = Bio::Genex::Protocol-&gt;new(id=&gt;47);</PRE>
+<PRE>
+  # retrieve data from the DB for all columns
+  $Protocol-&gt;fetch();</PRE>
+<PRE>
+  # creating an instance, without pre-fetching all columns
+  my $Protocol = new Bio::Genex::Protocol(id=&gt;47);</PRE>
+<PRE>
+  # creating an instance with pre-fetched data
+  my $Protocol = new Bio::Genex::Protocol(id=&gt;47, 'fetch_all'=&gt;1);</PRE>
+<PRE>
+  # retrieving multiple instances via primary keys
+  my @objects = Bio::Genex::Protocol-&gt;get_objects(23,57,98)</PRE>
+<PRE>
+  # retrieving all instances from a table
+  my @objects = Bio::Genex::Protocol-&gt;get_objects('ALL');</PRE>
+<PRE>
+  # retrieving the primary key for an object, generically
+  my $primary_key = $Protocol-&gt;id();</PRE>
+<PRE>
+  # or specifically
+  my $prt_pk_val = $Protocol-&gt;prt_pk();</PRE>
+<PRE>
+  # retreving other DB column attributes
+  my $title_val = $Protocol-&gt;title();
+  $Protocol-&gt;title($value);</PRE>
+<PRE>
+  my $type_val = $Protocol-&gt;type();
+  $Protocol-&gt;type($value);</PRE>
+<PRE>
+  my $text_val = $Protocol-&gt;text();
+  $Protocol-&gt;text($value);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Each Genex class has a one to one correspondence with a GeneX DB table
+of the same name (<EM>i.e.</EM> the corresponding table for Bio::Genex::Protocol is
+Protocol).</P>
+<P>Most applications will first create an instance of Bio::Genex::Protocol
+and then fetch the data for the object from the DB by invoking
+<A HREF="#item_fetch"><CODE>fetch()</CODE></A>. However, in cases where you may only be accessing a single
+value from an object the built-in <A HREF="#delayed_fetch">delayed fetch</A>
+mechanism can be used. All objects are created without pre-fetching
+any data from the DB. Whenever an attribute of the object is accessed
+via a getter method, the data for that attribute will be fetched from
+the DB if it has not already been. Delayed fetching happens
+transparently without the user needing to enable or disable any
+features.</P>
+<P>Since data is not be fetched from the DB <EM>until</EM> it is accessed by
+the calling application, it could presumably save a lot of access time
+for large complicated objects when only a few attribute values are
+needed.</P>
+<P>
+<HR>
+<H1><A NAME="attributes">ATTRIBUTES</A></H1>
+<P>There are three different types of attributes which instances of
+Bio::Genex::Protocol can access: <EM>raw</EM> foreign key attributes,
+Obect-Oriented foreign key attributes, and simple column attributes.</P>
+<DL>
+<DT><STRONG><A NAME="item_Raw_Foreign_Keys_Attributes">Raw Foreign Keys Attributes</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Object_Oriented_Foreign_Key_Attributes">Object Oriented Foreign Key Attributes</A></STRONG><BR>
+<DD>
+This mode presents foreign key attributes in a special way, with all
+non-foreign key attributes presented normally. Foreign keys are first
+retrieved from the DB, and then objects of the appropriate classes are
+created and stored in slots. This mode is useful for applications that
+want to process information from the DB because it automates looking
+up information.
+<P>Specifying the '<CODE>recursive_fetch</CODE>' parameter when calling <A HREF="#item_new"><CODE>new()</CODE></A>,
+modifies the behavior of this mode. The value given specifies the
+number of levels deep that fetch will be invoked on sub-objects
+created.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Simple_Column_Attributes">Simple Column Attributes</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="class variables">CLASS VARIABLES</A></H1>
+<P>Class Bio::Genex::Protocol defines the following utility variables for assisting
+programmers to access the Protocol table.</P>
+<DL>
+<DT><STRONG><A NAME="item_%24Bio%3A%3AGenex%3A%3AProtocol%3A%3ALIMIT">$Bio::Genex::Protocol::LIMIT</A></STRONG><BR>
+<DD>
+If defined, $LIMIT will set a limit on any select statements that can
+return multiple instances of this class (for example <A HREF="#item_get_objects"><CODE>get_objects()</CODE></A>
+or any call to a <CODE>ONE_TO_MANY</CODE> or <CODE>LOOKUP_TABLE</CODE> foreign key
+accessor method).
+<P></P>
+<DT><STRONG><A NAME="item_%24Bio%3A%3AGenex%3A%3AProtocol%3A%3AUSE_CACHE">$Bio::Genex::Protocol::USE_CACHE</A></STRONG><BR>
+<DD>
+This variable controls whether the class will cache any objects
+created in calls to <A HREF="#item_new"><CODE>new()</CODE></A>. Objects are cached by primary key. The
+caching is very simple, and no effort is made to track whether
+different invocations of <A HREF="#item_new"><CODE>new()</CODE></A> are being made for an object with
+the same primary key value, but with different options set. If you
+desire to reinstantiate an object with a different set of parameters,
+you would need to undefine <CODE>$USE_CACHE</CODE> first.
+<P></P></DL>
+<P><STRONG>WARNING</STRONG>: variables other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.</P>
+<P>
+<HR>
+<H1><A NAME="delayed fetch">DELAYED FETCH</A></H1>
+<P>It is possible to retrieve only the subset of attributes one chooses
+by simply creating an object instance and then calling the appropriate
+getter function. The object will automatically fetch the value from
+the DB when requested. This can potentially save time for large
+complicated objects. This triggers a separate DB query for each
+attribute that is accessed, whereas calling <A HREF="#item_fetch"><CODE>fetch()</CODE></A> will retrieve
+all fields of the object with a single query.</P>
+<P>For example:</P>
+<PRE>
+  my $Protocol = Bio::Genex::Protocol-&gt;new(id=&gt;47);
+  my $val = $Protocol-&gt;prt_pk();</PRE>
+<P>The attribute's value is then cached in the object so any further calls
+to that attribute's getter method do not trigger a DB query.</P>
+<P><STRONG>NOTE</STRONG>: Methods may still return <CODE>undef</CODE> if their value in
+the DB is <CODE>NULL</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="class methods">CLASS METHODS</A></H1>
+<P>The following methods can all be called without first having an
+instance of the class via the Bio::Genex::Protocol-&gt;<CODE>methodname()</CODE> syntax.</P>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new(%args)</CODE></A></STRONG><BR>
+<DD>
+<A HREF="#item_new"><CODE>new()</CODE></A> accepts the following arguments:
+<DL>
+<DT><STRONG><A NAME="item_id">id</A></STRONG><BR>
+<DD>
+Numeric or string value. The value of the primary key for looking up
+the object in the DB.
+<P></P></DL>
+<DT><STRONG><A NAME="item_linking_table"><CODE>linking_table()</CODE></A></STRONG><BR>
+<DD>
+Used by generic functions to determine if a specified class is a
+linking table class. For Bio::Genex::Protocol it returns 0, since it is
+<EM>not</EM> a linking table class.
+<P></P>
+<DT><STRONG><A NAME="item_pkey_name"><CODE>pkey_name()</CODE></A></STRONG><BR>
+<DD>
+This method returns the name of the column which is used as the
+primary key for this DB table. This method only exists for non-linking
+table classes, and for Bio::Genex::Protocol it returns the value 'prt_pk';
+<P></P>
+<DT><STRONG><A NAME="item_table_name"><CODE>table_name()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of the DB table represented by this class. For
+Bio::Genex::Protocol it returns 'Protocol';
+<P></P>
+<DT><STRONG><A NAME="item_column2name"><CODE>column2name()</CODE></A></STRONG><BR>
+<DD>
+This method returns a hashref that translates DB column names into
+human readable format.
+<P></P>
+<DT><STRONG><A NAME="item_name2column"><CODE>name2column()</CODE></A></STRONG><BR>
+<DD>
+This method returns a hashref that is a reverse lookup table to
+translate the human readable version of a DB column name back into the
+column_name. This is useful for preparing table output in CGI scripts:
+<PRE>
+    %column2name = %{$class-&gt;column2name()};
+    if (exists $column2name{$_}) {
+      push(@column_copy,$column2name{$_});
+    }
+</PRE>
+<PRE>
+
+    # now that we've translated the names, we sort them
+    @column_copy = sort @column_copy;</PRE>
+<PRE>
+
+    # make a header element. 
+    push(@rows,th(\@column_copy));</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_fkeys"><CODE>fkeys()</CODE></A></STRONG><BR>
+<DD>
+This method returns a hashref that holds all the foreign key entries
+for the Protocol table.
+<P></P>
+<DT><STRONG><A NAME="item_column_names"><CODE>column_names()</CODE></A></STRONG><BR>
+<DD>
+This method returns an array ref which holds the names of all the
+columns in table Protocol.
+<PRE>
+    # first retrieve the data from the DB
+    $object = $full_module_name-&gt;new(id=&gt;$id);
+    $object-&gt;fetch();</PRE>
+<PRE>
+    # now extract the data from the object
+    foreach (@{$class-&gt;column_names}) {
+    # we use this to temporarily relax the strict pragma
+    # to use symbolic references
+      no strict 'refs';
+      $tmp_values{$_} = $object-&gt;$_;</PRE>
+<PRE>
+    # back to our regularily scheduled strictness
+    }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_insert_db"><CODE>insert_db($dbh)</CODE></A></STRONG><BR>
+<DD>
+This method inserts the data for the object into the database
+specified by the DB handle $dbh. To use this method, create a blank
+object with <A HREF="#item_new"><CODE>new()</CODE></A>, set the attributes that you want, and then call
+<A HREF="#item_insert_db"><CODE>insert_db()</CODE></A>.
+<PRE>
+  my $dbh = Bio::Genex::current_connection(USER=&gt;$SU_USERNAME,
+                                      PASSWORD=&gt;$SU_PASSWORD);
+  my Protocol = Bio::Genex::Protocol-&gt;new();
+  Protocol-&gt;title('some_value');
+  Protocol-&gt;insert_db($dbh);</PRE>
+<P><STRONG>NOTE:</STRONG> You must log into the DB with a user/password that has INSERT
+priveleges in the DB, otherwise you will get a DBI error.</P>
+<P><STRONG>WARNING:</STRONG> <A HREF="#item_fetch"><CODE>fetch()</CODE></A> will <EM>not</EM> be called, so if you are using this
+method to insert a copy of an existing DB object, then it is up to you
+to call <A HREF="#item_fetch"><CODE>fetch()</CODE></A>, otherwise, only the attributes that are currently
+set in the object will be inserted.</P>
+<P></P>
+<DT><STRONG><A NAME="item_update_db"><CODE>update_db($dbh)</CODE></A></STRONG><BR>
+<DD>
+This method update the data for an object already in the database
+specified by the DB handle $dbh. To use this method, fetch an
+object from the DB, change the attributes that you want, and then call
+<A HREF="#item_update_db"><CODE>update_db()</CODE></A>.
+<PRE>
+  my $dbh = Bio::Genex::current_connection(USER=&gt;$SU_USERNAME,
+                                      PASSWORD=&gt;$SU_PASSWORD);
+  my Protocol = Bio::Genex::Protocol-&gt;new(id=&gt;43);
+  Protocol-&gt;title('some_value');
+  Protocol-&gt;update_db($dbh);</PRE>
+<P><STRONG>NOTE:</STRONG> You must log into the DB with a user/password that has INSERT
+priveleges in the DB, otherwise you will get a DBI error.</P>
+<P><STRONG>NOTE:</STRONG> Any modification of the primary key value will be discarded
+('prt_pk' for module Bio::Genex::Protocol).</P>
+<P></P>
+<DT><STRONG><A NAME="item_get_objects"><CODE>get_objects(@id_list)</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>get_objects('ALL')</CODE></STRONG><BR>
+<DD>
+<DT><STRONG>get_objects({column=&gt;'col_name',value=&gt;'val'})</STRONG><BR>
+<DD>
+This method is used to retrieve multiple instances of class Bio::Genex::Protocol
+simultaneously. There are three different ways to invoke this method.
+<P>By passing in an <CODE>@id_list</CODE>, <A HREF="#item_get_objects"><CODE>get_objects()</CODE></A> uses each element of the
+list as a primary key for the Protocol table and returns a single
+instance for each entry.</P>
+<P><STRONG>WARNING</STRONG>: Passing incorrect id values to <A HREF="#item_get_objects"><CODE>get_objects()</CODE></A> will cause
+a warning from <CODE>Bio::Genex::Protocol::initialize()</CODE>. Objects will be
+created for other correct id values in the list.</P>
+<P>By passing the 'ALL' parameter, <A HREF="#item_get_objects"><CODE>get_objects()</CODE></A> returns an instance
+for every entry in the table.</P>
+<P>By passing an anonymous hash reference that contains the 'column' and
+'name' keys, the method will return all objects from the DB whose that
+have the specified value in the specified column.</P>
+<P></P></DL>
+<P><STRONG>NOTE</STRONG>: All objects must have the 'id' parameter set before attempting
+to use <A HREF="#item_fetch"><CODE>fetch()</CODE></A> or any of the objects getter functions.</P>
+<P>
+<HR>
+<H1><A NAME="instance methods">INSTANCE METHODS</A></H1>
+<P>The following methods can only be called by first having valid
+instance of class Bio::Genex::Protocol.</P>
+<DL>
+<DT><STRONG><A NAME="item_fetch"><CODE>fetch()</CODE></A></STRONG><BR>
+<DD>
+This method triggers a DB query to retrieve <STRONG>ALL</STRONG> columns from the DB
+associated with this object.
+<P></P></DL>
+<P><STRONG>WARNING</STRONG>: methods other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.</P>
+<P>
+<HR>
+<H1><A NAME="foreign key accessor methods">FOREIGN KEY ACCESSOR METHODS</A></H1>
+<P>There are two major categories of foreign key accessor methods:
+<EM>Object Oriented</EM> foreign key methods, and <EM>raw</EM> foreign key
+methods.</P>
+<P>Each foreign key column in the table is represented by <STRONG>two</STRONG> methods,
+one OO method and one raw method. The raw method enables fethcing the
+exact numeric or string values stored in the DB. The OO method creates
+objects of the class the fkey column refers to. The idea is that if
+only the numeric fkey value is desired, the raw fkey method can be
+used. If it is necessary to get attributes from the table referred to
+by the fkey column, then the OO method should be invoked, and the
+necessary methods on that object can be queried.</P>
+<P>The names of the raw fkey methods is the same as the fkey columns in
+the DB table they represent (all fkey columns end in the suffix
+'_fk'). The OO methods have the same names as the column they
+represent, with the difference that they have the suffix '_obj'
+instead of '_fk'.</P>
+<P>So for example, in class Bio::Genex::ArrayMeasurement the
+'<CODE>primary_es_fk</CODE>' column is represented by two methods, the raw
+method <CODE>primary_es_fk()</CODE>, and the OO method <CODE>primary_es_obj</CODE>.</P>
+<P>The following foreign key accessors are defined for class
+Bio::Genex::Protocol:</P>
+<DL>
+<DT><STRONG><A NAME="item_sampleprotocols_fk">@id_list = <CODE>sampleprotocols_fk()</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_sampleprotocols_obj">@obj_list = <CODE>sampleprotocols_obj()</CODE></A></STRONG><BR>
+<DD>
+This is an attribute of type ONE_TO_MANY_LINK and refers to class
+<A HREF="/home/jasons/work/GeneX-WWW-Installer/Genex/html/Bio/Genex/SampleProtocols.html">the Bio::Genex::SampleProtocols manpage</A>. The raw accessor method, <A HREF="#item_sampleprotocols_fk"><CODE>sampleprotocols_fk()</CODE></A> returns a list of
+foreign key ids. The OO accessor method, <A HREF="#item_sampleprotocols_obj"><CODE>sampleprotocols_obj()</CODE></A> returns a
+list of objects of class Bio::Genex::SampleProtocols.
+<P></P></DL>
+<P>Every foreign key in a DB table belongs to a certain class of foreign
+keys. Each type of foreign key confers a different behavior on the
+class that contains it. The classifications used in Genex.pm are:</P>
+<UL>
+<LI>
+MANY_TO_ONE
+<P>If a class contains a foreign key of this type it will not be visible
+to the API of that class, but instead it confers a special method to
+the class that it references.</P>
+<P>For example, the Chromosome table has a MANY_TO_ONE foreign key,
+spc_fk, that refers to the species table. Class <A HREF="/home/jasons/work/GeneX-WWW-Installer/Genex/html/Bio/Genex/Chromosome.html">the Bio::Genex::Chromosome manpage</A>, has
+it\'s normal <CODE>spc_fk()</CODE> attribute method, but no special foreign key
+accessor method. However, class <A HREF="/home/jasons/work/GeneX-WWW-Installer/Genex/html/Bio/Genex/Species.html">the Bio::Genex::Species manpage</A> is given a special
+foreign key accessor method, <CODE>chromosome_fk()</CODE> of type
+ONE_TO_MANY. When invoked, this method returns a list of objects of
+class <A HREF="/home/jasons/work/GeneX-WWW-Installer/Genex/html/Bio/Genex/Species.html">the Bio::Genex::Species manpage</A>.</P>
+<P></P>
+<LI>
+ONE_TO_MANY
+<P>The inverse of type MANY_TO_ONE. It is not an attribute inherent to a
+given foreign key in any DB table, but instead is created by the
+existence of a MANY_TO_ONE foreign key in another table. See the above
+discussion about MANY_TO_ONE foreign keys.</P>
+<P></P>
+<LI>
+LOOKUP_TABLE
+<P>This type of key is similar to type ONE_TO_MANY. However, However the
+API will <EM>never</EM> retrieve an object of this type. Instead it
+retrieves a matrix of values, that represent the list of objects. It
+is used in only two places in the API: <A HREF="/home/jasons/work/GeneX-WWW-Installer/Genex/html/Bio/Genex/ArrayMeasurement.html">the Bio::Genex::ArrayMeasurement manpage</A> and
+<A HREF="/home/jasons/work/GeneX-WWW-Installer/Genex/html/Bio/Genex/ArrayLayout.html">the Bio::Genex::ArrayLayout manpage</A> classes with the <CODE>am_spots()</CODE> and <CODE>al_spots()</CODE>
+accessor functions.</P>
+<P></P>
+<LI>
+LINKING_TABLE
+<P>Foreign keys of this type appear in tables without primary keys. The
+foreign keys are each of type LINKING_TABLE, and when invoked return
+an object of the class referred to by the foreign key.</P>
+<P></P>
+<LI>
+FKEY
+<P>A generic foreign key with no special properties. When invoked it returns
+an object of the class referred to by the foreign key.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="attribute methods">ATTRIBUTE METHODS</A></H1>
+<P>These are the setter and getter methods for attributes in class
+Bio::Genex::Protocol.</P>
+<P><STRONG>NOTE</STRONG>: To use the getter methods, you may either invoke the
+<A HREF="#item_fetch"><CODE>fetch()</CODE></A> method to retrieve all the values for an object, or else
+rely on <A HREF="#delayed_fetch">delayed fetching</A> to retrieve the attributes
+as needed.</P>
+<DL>
+<DT><STRONG><CODE>id()</CODE></STRONG><BR>
+<DD>
+<A HREF="#item_id"><CODE>id()</CODE></A> is a special attribute method that is common to all the Genex
+classes. This method returns the primary key of the given instance
+(and for class Bio::Genex::Protocol it is synonomous with the
+<A HREF="#item_prt_pk"><CODE>prt_pk()</CODE></A>method). The <A HREF="#item_id"><CODE>id()</CODE></A> method can be useful in writing
+generic methods because it avoids having to know the name of the
+primary key column.
+<P></P>
+<DT><STRONG><A NAME="item_prt_pk"><CODE>prt_pk()</CODE></A></STRONG><BR>
+<DD>
+This is the primary key attribute for Bio::Genex::Protocol. It has no setter method.
+<P></P>
+<DT><STRONG><A NAME="item_title">$value = title();</A></STRONG><BR>
+<DD>
+<DT><STRONG>title($value);</STRONG><BR>
+<DD>
+Methods for the title attribute.
+<P></P>
+<DT><STRONG><A NAME="item_type">$value = type();</A></STRONG><BR>
+<DD>
+<DT><STRONG>type($value);</STRONG><BR>
+<DD>
+Methods for the type attribute.
+<P></P>
+<DT><STRONG><A NAME="item_text">$value = text();</A></STRONG><BR>
+<DD>
+<DT><STRONG>text($value);</STRONG><BR>
+<DD>
+Methods for the text attribute.
+<P></P></DL>
+<P><STRONG>WARNING</STRONG>: methods other than those listed here are for internal use
+only and are subject to change without notice. Use them at your own
+risk.</P>
+<P>
+<HR>
+<H1><A NAME="implementation details">IMPLEMENTATION DETAILS</A></H1>
+<P>These classes are automatically generated by the
+create_genex_classes.pl script.  Each class is a subclass of the
+Class::ObjectTemplate::DB class (which is in turn a subclass of
+Class::ObjectTemplate written by Sriram Srinivasan, described in
+<EM>Advanced Perl Programming</EM>, and modified by Jason
+Stewart). ObjectTemplate implements automatic class creation in perl
+(there exist other options such as <CODE>Class::Struct</CODE> and
+<CODE>Class::MethodMaker</CODE> by Damian Conway) via an <CODE>attributes()</CODE> method
+call at class creation time.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Please send bug reports to <A HREF="mailto:genex@ncgr.org">genex@ncgr.org</A></P>
+<P>
+<HR>
+<H1><A NAME="last updated">LAST UPDATED</A></H1>
+<P>on Tue Jan 23 22:53:40 2001 by /home/jasons/work/GeneX-WWW-Installer/Genex/scripts/create_genex_class.pl --dir=/home/jasons/work/GeneX-WWW-Installer/Genex --target=Protocol --support=SampleProtocols</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jason E. Stewart (<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

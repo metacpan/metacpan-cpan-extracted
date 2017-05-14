@@ -1,4 +1,4 @@
-package WWW::SourceForge::API;
+packageWWW::SourceForge::API;
 our $VERSION = '0.99';
 1;
 

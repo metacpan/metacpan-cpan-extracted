@@ -1,0 +1,14 @@
+<!-- partial, used to display a row of a foreign key field. -->
+    [% pKeyField = fTable.primaryKeys %]
+    <option[% IF ROW.$fieldName() && ROW.$fieldName() == FROW.$pKeyField() %] selected[% END %] value="[% FROW.$pKeyField() %]">
+      [% FOREACH fieldName = fTable.summaryFields() %]
+        [% f = fTable.field( fieldName ) %]
+        [% IF f.fkey %]
+          [% INCLUDE _fkeyDisplay.tt2 ROW = FROW %]
+        [% ELSE %]
+          [% INCLUDE _fieldDisplay.tt2 field = f ROW = FROW %]
+        [% END %]
+        [% UNLESS loop.last %] / [% END %]
+      [% END %]
+</option>
+

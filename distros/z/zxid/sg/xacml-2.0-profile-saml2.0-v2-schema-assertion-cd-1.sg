@@ -1,0 +1,30 @@
+# zxid/sg/xacml-2.0-profile-saml2.0-v2-schema-assertion-cd-1.xsd
+# Slightly edited, 5.11.2009, Sampo Kellomaki (sampo@iki.fi)
+# $Id$
+
+target(xasacd1, urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:assertion:cd-01)
+
+import(sa, urn:oasis:names:tc:SAML:2.0:assertion, http://docs.oasis-open.org/security/saml/v2.0/saml-schema-assertion-2.0.xsd)
+
+import(xac, urn:oasis:names:tc:xacml:2.0:context:schema:os, http://docs.oasis-open.org/xacml/access_control-xacml-2.0-context-schema-os.xsd)
+
+import(xa, urn:oasis:names:tc:xacml:2.0:policy:schema:os, http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd)
+
+XACMLAuthzDecisionStatement -> %xasacd1:XACMLAuthzDecisionStatementType
+%XACMLAuthzDecisionStatementType:	 base(sa:StatementAbstractType)
+  xac:Response
+  xac:Request?
+  ;
+
+XACMLPolicyStatement -> %xasacd1:XACMLPolicyStatementType
+%XACMLPolicyStatementType:	 base(sa:StatementAbstractType)
+  xa:Policy?
+  xa:PolicySet?
+  xasacd1:ReferencedPolicies?
+  ;
+
+ReferencedPolicies	 -> %xasacd1:ReferencedPoliciesType
+%ReferencedPoliciesType:
+  xa:Policy?
+  xa:PolicySet?
+  ;

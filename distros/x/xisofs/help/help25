@@ -1,0 +1,1 @@
+Generate special SUSP records for transparently compressed files. This is only of use and interest for hosts that support transparent decompression. This is an experimental feature, and no hosts yet support this, but there are ALPHA patches for Linux that can make use of this feature.

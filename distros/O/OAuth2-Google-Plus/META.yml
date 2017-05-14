@@ -1,0 +1,31 @@
+---
+abstract: 'simple wrapper for google+ OAuth2 API'
+author:
+  - 'Matthijs van Henten <matthijs@ischen.nl>'
+build_requires:
+  Cwd: 0
+  FindBin: 0
+  Sub::Override: 0
+  Test::Class: 0
+  Test::More: 0
+  base: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OAuth2-Google-Plus
+requires:
+  Carp::Assert: 0
+  JSON: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Moo: 0
+  MooX::late: 0
+  URI: 0
+  strict: 0
+  warnings: 0
+version: 0.03

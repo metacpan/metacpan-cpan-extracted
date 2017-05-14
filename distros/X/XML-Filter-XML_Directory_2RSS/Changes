@@ -1,21 +1,5 @@
 Revision history for Perl extension XML::Filter::XML_Directory_Pruner.
 
-0.9.1	 Tue May 24 2002
-
-	 - Added &make_item function and include item elements in thr:children nodes
-	   (props to Aaron Swartz for answering questions)
-
-	 - Added hooks to pass 'orderby' prefs from XML::Directory when generating
-	   rdf/channel/items list
-
-	 - Fixed error checking in test.pl
-
-	 - Upped Makefile requirements for XML::SAX::Base to 1.04
-
-	 - Upped Makefile requirement for XML::Directory to 0.96
-
-	 - Updated POD
-
 0.9.02	 Wed May 15 2002
 
 	 - Added &uri method to _2RSS.pm and fixed &add_meta_data actually

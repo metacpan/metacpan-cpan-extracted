@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-
+use 5.014001;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "pasive agent",
+  "ABSTRACT" => "passive agent",
   "AUTHOR" => "santex <santex\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,16 +17,69 @@ my %WriteMakefileArgs = (
     "bin/flower"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.014001",
   "NAME" => "Flower",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.02",
+  "PREREQ_PM" => {
+    "AnyEvent" => 0,
+    "Carp" => 0,
+    "Data::FreqConvert" => 0,
+    "Data::Printer" => 0,
+    "Data::UUID" => 0,
+    "Digest::MD5" => 0,
+    "EV" => 0,
+    "Encode" => 0,
+    "File::Find" => 0,
+    "File::Temp" => 0,
+    "JSON" => 0,
+    "JSON::XS" => 0,
+    "Mojo" => 0,
+    "Mojolicious" => 0,
+    "Mojolicious::Plugin::SimpleSession" => 0,
+    "Number::Format" => 0,
+    "Scalar::Util" => 0,
+    "Test::Fatal" => 0,
+    "Test::MockTime" => 0,
+    "Test::Mojo" => 0,
+    "Test::MonkeyMock" => 0,
+    "Test::More" => 0,
+    "Time::Duration" => 0,
+    "Time::Piece" => 0,
+    "URI" => 0
+  },
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "AnyEvent" => 0,
+  "Carp" => 0,
+  "Data::FreqConvert" => 0,
+  "Data::Printer" => 0,
+  "Data::UUID" => 0,
+  "Digest::MD5" => 0,
+  "EV" => 0,
+  "Encode" => 0,
+  "File::Find" => 0,
+  "File::Temp" => 0,
+  "JSON" => 0,
+  "JSON::XS" => 0,
+  "Mojo" => 0,
+  "Mojolicious" => 0,
+  "Mojolicious::Plugin::SimpleSession" => 0,
+  "Number::Format" => 0,
+  "Scalar::Util" => 0,
+  "Test::Fatal" => 0,
+  "Test::MockTime" => 0,
+  "Test::Mojo" => 0,
+  "Test::MonkeyMock" => 0,
+  "Test::More" => 0,
+  "Time::Duration" => 0,
+  "Time::Piece" => 0,
+  "URI" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

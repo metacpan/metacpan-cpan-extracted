@@ -1,0 +1,55 @@
+
+[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Plugin-Selector.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Plugin-Selector)
+
+# SYNOPSIS
+
+# NAME
+
+WWW::Mechanize::Plugin::Selector - CSS selector method for WWW::Mechanize
+
+# DESCRIPTION
+
+This is a plugin (or "Role", for some) which supplies the `->selector`
+method to your WWW::Mechanize object. It requires that the WWW::Mechanize
+object implements a corresponding `->xpath` method, as [WWW::Mechanize::Firefox](https://metacpan.org/pod/WWW::Mechanize::Firefox)
+and [WWW::Mechanize::PhantomJS](https://metacpan.org/pod/WWW::Mechanize::PhantomJS) do.
+
+# ADDED METHODS
+
+## `$mech->selector( $css_selector, %options )`
+
+    my @text = $mech->selector('p.content');
+
+Returns all nodes matching the given CSS selector. If
+`$css_selector` is an array reference, it returns
+all nodes matched by any of the CSS selectors in the array.
+
+This takes the same options that `->xpath` does.
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/www-mechanize-plugin-selector](https://github.com/Corion/www-mechanize-plugin-selector).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Plugin-Selector](https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Plugin-Selector)
+or via mail to [www-mechanize-plugin-selector-Bugs@rt.cpan.org](https://metacpan.org/pod/www-mechanize-plugin-selector-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2010-2017 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

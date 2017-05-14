@@ -1,46 +1,27 @@
 package Ref::Util;
 # ABSTRACT: Utility functions for checking references
-$Ref::Util::VERSION = '0.113';
+$Ref::Util::VERSION = '0.201';
 use strict;
 use warnings;
-use XSLoader;
 
 use Exporter 5.57 'import';
 
-our %EXPORT_TAGS = ( 'all' => [qw<
-    is_ref
-    is_scalarref
-    is_arrayref
-    is_hashref
-    is_coderef
-    is_regexpref
-    is_globref
-    is_formatref
-    is_ioref
-    is_refref
+if (eval { require Ref::Util::XS; 1 }) {
+    _install_aliases('Ref::Util::XS');
+}
+else {
+    require Ref::Util::PP;
+    _install_aliases('Ref::Util::PP');
+}
 
-    is_plain_ref
-    is_plain_scalarref
-    is_plain_arrayref
-    is_plain_hashref
-    is_plain_coderef
-    is_plain_globref
-    is_plain_formatref
-    is_plain_refref
-
-    is_blessed_ref
-    is_blessed_scalarref
-    is_blessed_arrayref
-    is_blessed_hashref
-    is_blessed_coderef
-    is_blessed_globref
-    is_blessed_formatref
-    is_blessed_refref
->] );
-
-our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
-
-XSLoader::load('Ref::Util', $Ref::Util::VERSION);
+sub _install_aliases {
+    my ($package) = @_;
+    no warnings 'once';
+    no strict 'refs';
+    our %EXPORT_TAGS = %{"${package}::EXPORT_TAGS"};
+    our @EXPORT_OK   = @{"${package}::EXPORT_OK"};
+    *$_ = \&{"${package}::$_"} for '_using_custom_ops', @EXPORT_OK;
+}
 
 1;
 
@@ -56,7 +37,7 @@ Ref::Util - Utility functions for checking references
 
 =head1 VERSION
 
-version 0.113
+version 0.201
 
 =head1 DESCRIPTION
 
@@ -513,6 +494,10 @@ Vikenty Fesunov <vyf@cpan.org>
 =item *
 
 Gonzalo Diethelm <gonzus@cpan.org>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
 
 =back
 

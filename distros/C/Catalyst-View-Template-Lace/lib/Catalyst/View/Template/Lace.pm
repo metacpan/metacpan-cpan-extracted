@@ -1,11 +1,11 @@
 package Catalyst::View::Template::Lace;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 use Module::Runtime;
 use Catalyst::View::Template::Lace::Renderer;
-use Template::Lace::ComponentCallback;
+use Template::Lace::Utils;
 
 extends 'Catalyst::View';
 
@@ -37,6 +37,26 @@ has ctx => (is=>'ro', required=>0);
 sub view_components {
   my ($class, $app, $merged_args) = @_;
   return +{
+    catalyst => {
+      response => Template::Lace::Utils::mk_component {
+        require HTTP::Request;
+        require HTTP::Message::PSGI;
+
+        my @args = (delete $_{action});
+        push @args, delete($_{parts}) if $_{parts};
+        push @args, delete($_{query}) if $_{query};
+        my $href = $_{model}->uri_for(@args);
+        my $http_request = HTTP::Request->new('GET', $href);
+        my $psgi_env = HTTP::Message::PSGI::req_to_psgi($http_request);
+        my $psgi_response = $_{model}->ctx->psgi_app->($psgi_env);
+        my $http_response = HTTP::Message::PSGI::res_from_psgi($psgi_response);
+        my $content = $http_response->content;
+        if($_{at}) {
+          return $_->make_dom($content)->at($_{at});
+        }
+        return $content;
+      }
+    },
     view => sub {
       my ($name, $args, %attrs) = @_;
       $name = ucfirst $name; #Maybe too simple...

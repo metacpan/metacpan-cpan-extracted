@@ -1,18 +1,22 @@
 #!./perl -w
 
 BEGIN {
+    # We really want to know if chdir is working, as the build process will
+    # all go wrong if it is not.  So avoid clearing @INC under miniperl.
+    @INC = () if defined &DynaLoader::boot_DynaLoader;
+
     # We're not going to chdir() into 't' because we don't know if
     # chdir() works!  Instead, we'll hedge our bets and put both
     # possibilities into @INC.
-    @INC = qw(t . lib ../lib);
+    unshift @INC, qw(t . lib ../lib);
+    require "test.pl";
+    plan(tests => 47);
 }
 
 use Config;
-require "test.pl";
-plan(tests => 38);
+use Errno qw(ENOENT EBADF EINVAL);
 
 my $IsVMS   = $^O eq 'VMS';
-my $IsMacOS = $^O eq 'MacOS';
 
 # For an op regression test, I don't want to rely on "use constant" working.
 my $has_fchdir = ($Config{d_fchdir} || "") eq "define";
@@ -25,8 +29,6 @@ use File::Spec::Functions qw(:DEFAULT splitdir rel2abs splitpath);
 # path separators than File::Spec.
 sub abs_path {
     my $d = rel2abs(curdir);
-
-    $d = uc($d) if $IsVMS;
     $d = lc($d) if $^O =~ /^uwin/;
     $d;
 }
@@ -36,8 +38,14 @@ my $Cwd = abs_path;
 # Let's get to a known position
 SKIP: {
     my ($vol,$dir) = splitpath(abs_path,1);
-    my $test_dir = $IsVMS ? 'T' : 't';
-    skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir;
+    my $test_dir = 't';
+    my $compare_dir = (splitdir($dir))[-1];
+
+    # VMS is case insensitive but will preserve case in EFS mode.
+    # So we must normalize the case for the compare.
+ 
+    $compare_dir = lc($compare_dir) if $IsVMS;
+    skip("Already in t/", 2) if $compare_dir eq $test_dir;
 
     ok( chdir($test_dir),     'chdir($test_dir)');
     is( abs_path, catdir($Cwd, $test_dir),    '  abs_path() agrees' );
@@ -46,7 +54,7 @@ SKIP: {
 $Cwd = abs_path;
 
 SKIP: {
-    skip("no fchdir", 6) unless $has_fchdir;
+    skip("no fchdir", 23) unless $has_fchdir;
     my $has_dirfd = ($Config{d_dirfd} || $Config{d_dir_dd_fd} || "") eq "define";
     ok(opendir(my $dh, "."), "opendir .");
     ok(open(my $fh, "<", "op"), "open op");
@@ -58,9 +66,65 @@ SKIP: {
     else {
        eval { chdir($dh); };
        like($@, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
-       chdir "..";
+       chdir ".." or die $!;
+    }
+
+    # same with bareword file handles
+    no warnings 'once';
+    *DH = $dh;
+    *FH = $fh;
+    ok(chdir FH, "fchdir op bareword");
+    ok(-f "chdir.t", "verify that we are in op");
+    if ($has_dirfd) {
+       ok(chdir DH, "fchdir back bareword");
+    }
+    else {
+       eval { chdir(DH); };
+       like($@, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+       chdir ".." or die $!;
     }
     ok(-d "op", "verify that we are back");
+
+    # And now the ambiguous case
+    {
+	no warnings qw<io deprecated>;
+	ok(opendir(H, "op"), "opendir op") or diag $!;
+	ok(open(H, "<", "base"), "open base") or diag $!;
+    }
+    if ($has_dirfd) {
+	ok(chdir(H), "fchdir to op");
+	ok(-f "chdir.t", "verify that we are in 'op'");
+	chdir ".." or die $!;
+    }
+    else {
+	eval { chdir(H); };
+	like($@, qr/^The dirfd function is unimplemented at/,
+	     "dirfd is unimplemented");
+	SKIP: {
+	    skip("dirfd is unimplemented");
+	}
+    }
+    ok(closedir(H), "closedir");
+    ok(chdir(H), "fchdir to base");
+    ok(-f "cond.t", "verify that we are in 'base'");
+    ok(close(H), "close");
+    $! = 0;
+    {
+        my $warn;
+        local $SIG{__WARN__} = sub { $warn = shift };
+        ok(!chdir(H), "check we can't chdir to closed handle");
+        is(0+$!, EBADF, 'check $! set appropriately');
+        like($warn, qr/on closed filehandle H/, 'like closed');
+        $! = 0;
+    }
+    {
+        my $warn;
+        local $SIG{__WARN__} = sub { $warn = shift };
+        ok(!chdir(NEVEROPENED), "check we can't chdir to never opened handle");
+        is(0+$!, EBADF, 'check $! set appropriately');
+        like($warn, qr/on unopened filehandle NEVEROPENED/, 'like never opened');
+        chdir ".." or die $!;
+    }
 }
 
 SKIP: {
@@ -77,10 +141,10 @@ sub check_env {
     my($key) = @_;
 
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
-    if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS ) {
+    if( $key eq 'SYS$LOGIN' && !$IsVMS ) {
         ok( !chdir(),         "chdir() on $^O ignores only \$ENV{$key} set" );
         is( abs_path, $Cwd,   '  abs_path() did not change' );
-        pass( "  no need to test SYS\$LOGIN on $^O" ) for 1..7;
+        pass( "  no need to test SYS\$LOGIN on $^O" ) for 1..4;
     }
     else {
         ok( chdir(),              "chdir() w/ only \$ENV{$key} set" );
@@ -90,29 +154,10 @@ sub check_env {
 
         my $warning = '';
         local $SIG{__WARN__} = sub { $warning .= join '', @_ };
-
-
-        # Check the deprecated chdir(undef) feature.
-#line 64
-        ok( chdir(undef),           "chdir(undef) w/ only \$ENV{$key} set" );
-        is( abs_path, $ENV{$key},   '  abs_path() agrees' );
-        is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
-Use of uninitialized value in chdir at $0 line 64.
-Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 64.
-WARNING
-
-        chdir($Cwd);
-
-        # Ditto chdir('').
-        $warning = '';
-#line 76
-        ok( chdir(''),              "chdir('') w/ only \$ENV{$key} set" );
-        is( abs_path, $ENV{$key},   '  abs_path() agrees' );
-        is( $warning,  <<WARNING,   '  got deprecation warning' );
-Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 76.
-WARNING
-
-        chdir($Cwd);
+        $! = 0;
+        ok(!chdir(''), "chdir('') no longer implied chdir()");
+        is($!+0, ENOENT, 'check $! set appropriately');
+        is($warning, '', 'should no longer warn about deprecation');
     }
 }
 
@@ -123,12 +168,9 @@ sub clean_env {
 
         # Can't actually delete SYS$ stuff on VMS.
         next if $IsVMS && $env eq 'SYS$LOGIN';
-        next if $IsVMS && $env eq 'HOME' && !$Config{'d_setenv'};
 
-        unless ($IsMacOS) { # ENV on MacOS is "special" :-)
-            # On VMS, %ENV is many layered.
-            delete $ENV{$env} while exists $ENV{$env};
-        }
+	# On VMS, %ENV is many layered.
+	delete $ENV{$env} while exists $ENV{$env};
     }
 
     # The following means we won't really be testing for non-existence,
@@ -154,17 +196,20 @@ foreach my $key (@magic_envs) {
     no warnings 'uninitialized';
 
     clean_env;
-    $ENV{$key} = catdir $Cwd, ($IsVMS ? 'OP' : 'op');
+    $ENV{$key} = catdir $Cwd, 'op';
 
     check_env($key);
 }
 
 {
     clean_env;
-    if (($IsVMS || $IsMacOS) && !$Config{'d_setenv'}) {
-        pass("Can't reset HOME, so chdir() test meaningless");
-    } else {
+  SKIP:
+    {
+        $IsVMS
+          and skip "Can't delete SYS\$LOGIN, so chdir() test meaningless", 2;
+        $! = 0;
         ok( !chdir(),                   'chdir() w/o any ENV set' );
+        is( $!+0, EINVAL,               'check $! set to EINVAL');
     }
     is( abs_path, $Cwd,             '  abs_path() agrees' );
 }

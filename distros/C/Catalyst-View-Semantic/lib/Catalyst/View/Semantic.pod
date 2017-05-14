@@ -1,0 +1,199 @@
+=encoding utf8
+
+=head1 NAME
+
+Catalyst::View::Semantic - L<Template::Semantic> view for L<Catalyst>
+
+=head1 SYNOPSIS
+
+    package MyApp::View::Semantic;
+    use Moose;
+    extends 'Catalyst::View::Semantic';
+    __PACKAGE__->meta->make_immutable;
+    1;
+
+setup end action in Root
+
+    sub auto : Private {
+        my ($self, $c) = @_;
+        $c->stash( js => [], css => [], jscode => '' );
+    }
+
+    sub end : ActionClass('RenderView') {
+        my ($self, $c) = @_;
+        return if $c->response->status > 200 || $c->response->body;
+        $c->stash->{title} //= 'Default page title';
+        unshift $c->stash->{css}, 'bootstrap.min'; # add default css
+        unshift $c->stash->{js}, 'vendor/prototype'; # add default js
+        $c->forward('View::Semantic', []);
+    }
+
+create layout as root/template/layout.html
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Page Title</title>
+        <link href="" rel="stylesheet" />
+        <script src=""> </script>
+        <script type="application/x-javascript">
+            //<![CDATA[
+            Event.observe(document, 'dom:loaded', function() {
+                /*code*/
+            });
+            //]]>
+        </script>
+    </head>
+    <body> </body>
+    </html>
+
+in MyApp::Controller::Foo
+
+    sub bar :Local {
+        my ($self, $c) = @_;
+        $c->stash( view => { a => [ map {
+            '.' => $_->name,
+            '@href' => $_->url
+        } $c->model('MyDB::Item')->all ] });
+    }
+
+create template for action as root/template/foo/bar.html
+
+    <div>list: <a href="#">item</a></div>
+
+that's it.
+
+=head1 DESCRIPTION
+
+This is L<Catalyst> view class for L<Template::Semantic> with sane (hopefully) defaults and some useful methods like html layout and pager. Feel free to extend your view. Check the L<Template::Semantic::Cookbook> and source of this module.
+
+=head1 ATTRIBUTES
+
+The following is a list of configuration attributes you can set in your global
+L<Catalyst> configuration or locally as in:
+ 
+    package MyApp::View::Semantic;
+    use Moose;
+    extends 'Catalyst::View::Semantic';
+ 
+    __PACKAGE__->config(
+        template_extension => 'xml', # override default extension
+        wrapper => sub { html => { 'body > div#main' => shift } } # override default wrapper
+    );
+ 
+=head2 path
+ 
+Used at the prefix path for where yout templates are stored.  Defaults to C<< $c->path_to('root','template') >>.
+
+=head2 template_extension
+ 
+Optionally set the filename extension of your templates. Default: 'html'
+
+=head2 process_key
+ 
+Name of key in stash which contains processing instructions for default template(from action path) 
+or template specified in C<< $c->stash->{template} >>. Default: 'view'
+
+=head2 template_key
+ 
+Name of key in stash which contains name of template on which apply processing instructions. Default: 'template'
+
+=head2 content_type
+
+Set $c->response->content_type to this value unless specified. Default: 'text/html'
+
+=head2 wrapper
+
+Default wrapper callback - sets layout template name and L<Template::Semamtic> instruction to insert wrapped content.
+Default C<< sub { layout => { body => shift } } >>
+
+=head2 css_key
+
+A key in stash which contains title to include in default layout. Default: 'title'
+
+=head2 css_key
+
+A key in stash which contains array of css file names (without extension) to include in default layout. Default: 'css'
+
+=head2 js_key
+
+A key in stash which contains array of js file names (without extension) to include in default layout. Default: 'js'
+
+=head2 jscode_key
+
+A key in stash which contains string of js code to include in default layout. Default: 'jscode'
+
+=head2 css_uri
+
+Prefix location of css files. Default: '/static/css'
+
+=head2 js_uri
+
+Prefix location of js files. Default: '/static/js'
+
+=head2 pager_template
+
+Name of default pager template
+
+=head1 METHODS
+
+=head2 process($c, $code, $template)
+
+Renders the template specified in C<<$template>> or in C<< $c->stash->{$self->template_key} >> or 
+C<< $c->namespace/$c->action >> (the private name of the matched action). $code or stash
+contents under C<< $c->stash{$self->process_key}  >> are passed to the underlying view object.
+If C<wrapper> is defined, than result is wrapped using default layout.
+
+Output is stored in C<< $c->response->body >> and value of 
+C<< $c->response->content_type >> to C<text/html> or whatever you
+configured as the L</content_type> attribute unless this header has previously
+been set.
+
+=head2 render($template, $code)
+
+Returns L<Templace::Semantic::Document> as result of processing C<< $template >> with C<< $code >> instructions.
+
+=head2 layout($template, $code, $meta)
+
+Renders html document. Check L</SYNOPSIS> for default layout which should be in C<< $template >> file.
+C<< $meta >> should be a hash with corresponding keys (L</title_key>, L</css_key>, L</js_key>, L</jscode_key>)
+
+=head2 pager($c, $pager, $template)
+
+Renders pager snippet from C<< $template >> or C<< $self->pager_template >> using C<< $pager >> ( L<Data::Page> object )
+You should have root/template/pager.html (or other path which corresponds to your configuration)
+
+    <div> <a class="prev" href="#">prev</a> <span> <a href="#" class="">middle</a> </span> <a class="next" href="#">next</a> </div>
+
+=head2 engine
+
+Access underlying Template::Semantic object
+
+=head1 SUPPORT
+
+=over
+
+=item * GitHub
+ 
+L<http://github.com/vividsnow/Catalyst-View-Semantic>
+ 
+=item * Search MetaCPAN
+ 
+L<https://metacpan.org/module/Catalyst::View::Semantic>
+ 
+=back
+ 
+=head1 AUTHOR
+ 
+Yegor Korablev <egor@cpan.org>
+ 
+=head1 LICENSE
+ 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+ 
+=head1 SEE ALSO
+ 
+L<Template::Semantic>, L<HTML::Zoom>, L<Text::Xslate>, L<Template>, L<Catalyst::View>, L<Catalyst::View::HTML::Zoom>
+
+=cut

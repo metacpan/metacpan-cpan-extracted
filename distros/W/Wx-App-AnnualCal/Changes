@@ -1,0 +1,9 @@
+0.92      2014-05-05 14:43:20EDT-0400 America/New_York
+  - removed modules Test::Perl::Critic and Pod::Coverage as distribution
+    requirements because they are only used by the author during development
+
+0.91      2014-04-28 22:56:06EDT-0400 America/New_York
+  - corrected package names
+
+0.9       2014-04-21 12:01:59EDT-0400 America/New_York
+  - initial release

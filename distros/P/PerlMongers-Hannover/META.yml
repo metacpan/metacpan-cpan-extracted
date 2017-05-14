@@ -1,0 +1,22 @@
+---
+abstract: 'prints information about Hannover.pm to the screen'
+author:
+  - 'Paul Cochrane <ptc@hannover.pm>'
+build_requires:
+  perl: v5.10.1
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.10.1
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlMongers-Hannover
+requires:
+  Capture::Tiny: '0'
+  Pod::Text: '0'
+  Test::More: '0'
+  perl: v5.10.1
+version: 0.8.5

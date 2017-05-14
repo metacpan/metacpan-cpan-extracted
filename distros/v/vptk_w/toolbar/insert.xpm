@@ -1,0 +1,26 @@
+/* XPM */
+static char *insert[] = {
+/* width height ncolors chars_per_pixel */
+"19 16 3 1",
+/* colors */
+"  s None c None",
+"x c #C4C2C4",
+". c #040204",
+/* pixels */
+"                   ",
+"                   ",
+"                   ",
+"    ............   ",
+"   .xxxxxxxxxxxx.  ",
+"   .xx.x......xx.  ",
+"   .xxxxxxxxxxxx.  ",
+"   .xxxxxxxxxxxx.  ",
+"   .xx.xxxxxxxxx.  ",
+"    xx..xxxxxxxx.  ",
+"  .......xxxxxxx.  ",
+"    xx..xxxxxxxx.  ",
+"   .xx.xxxxxxxxx.  ",
+"    ............   ",
+"                   ",
+"                   "
+};

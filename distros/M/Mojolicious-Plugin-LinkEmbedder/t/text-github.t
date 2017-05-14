@@ -8,26 +8,26 @@ my @tests = (
   {
     url   => 'https://github.com/kraih/mojo/issues/729',
     image => '/u/737152',
-    h3    => qr{Validate &lt;input type=&quot;checkbox&quot;&gt;},
-    p     => qr{rshadow\s+opened\s+this\s+Issue\s+Jan\s+12,\s+2015\s+·\s+4\s+comments}s
+    h3    => 'Validate &lt;input type=&quot;checkbox&quot;&gt;',
+    p     => qr{rshadow opened this Issue Jan 12, 2015 · 4 comments}
   },
   {
     url   => 'http://git.io/aKhMuA',
     image => '/u/45729',
-    h3    => qr{Add\s+back\s+compat\s+redirect\s+from\s+/convos}s,
-    p     => qr{jhthorsen\s+committed\s+Oct\s+19,\s+2014}s
+    h3    => 'Add back compat redirect from /convos to /',
+    p     => qr{jhthorsen authored Oct 19, 2014}
   },
   {
     url   => 'https://github.com/Nordaaker/convos',
     image => '/u/811887',
-    h3    => qr{convos - Better group chat},
-    p     => qr{Convos is}
+    h3    => 'convos - Better group chat',
+    p     => qr{Convos is the simplest way to use IRC}
   },
   {
     url   => 'https://github.com/Nordaaker/convos/issues/50',
     image => '/u/45729',
-    h3    => qr{Feature/start backend},
-    p     => qr{marcusramberg\s+merged\s+2\s+commits}s
+    h3    => 'Feature/start backend',
+    p     => qr{marcusramberg merged 2 commits into master from feature/start-backend}
   },
 );
 
@@ -43,7 +43,7 @@ for my $test (@tests) {
     ->element_exists(qq(.link-embedder-media img[src*="$test->{image}"]))
     ->text_like('.link-embedder.text-html > p', $test->{p});
 
-  like $t->tx->res->dom->at("h3"), $test->{h3}, "escaped h3";
+  is $t->tx->res->dom->at("h3"), "<h3>$test->{h3}</h3>", "escaped h3";
 }
 
 done_testing;

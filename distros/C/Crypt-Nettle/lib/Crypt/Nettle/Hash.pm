@@ -79,6 +79,8 @@ contexts.
  my $hmac = Crypt::Nettle::Hash::hmac_data('sha1', $buffer, $key);
 
 
+=head1 DIGEST CONTEXT CREATION
+
 =head2 new($algo)
 
 Create a new digest context:
@@ -105,12 +107,6 @@ It is recommended that you use a key of the same size as the
 digest_length() of the chosen digest algorithm.
 
 
-=head2 is_hmac()
-
-Returns non-zero if this digest context is an HMAC digest context:
-
-  printf("Is HMAC: %s\n", ($digest->is_hmac() ? 'yes' : 'no'));
-
 =head2 copy()
 
 Copy an existing Crypt::Nettle::Hash object, including its internal
@@ -120,6 +116,8 @@ state:
 
 On error, will return undefined.
 
+=head1 HASH CONTEXT OPERATION
+
 =head2 update($data)
 
 Pass data into the digest context:
@@ -127,7 +125,8 @@ Pass data into the digest context:
   $digest->update($data);
 
 $data is expected to be a string.  You can call this function as many
-times as needed on a $digest object.
+times as needed on a $digest object, it will produce a digest over
+everything fed to it since its creation.
 
 =head2 digest()
 
@@ -136,7 +135,19 @@ to update():
 
   $output = $digest->digest();
 
-This will also resets the state to be the same as when it was new().
+This will also resets the state to be the same as when it was created.
+If you want to see the current hash value without resetting the
+context state, you should do:
+
+  $output = $digest->copy()->digest();
+
+=head1 DIGEST DETAILS
+
+=head2 is_hmac()
+
+Returns non-zero if this digest context is an HMAC digest context:
+
+  printf("Is HMAC: %s\n", ($digest->is_hmac() ? 'yes' : 'no'));
 
 =head2 name()
 
@@ -146,7 +157,9 @@ Return the name of the digest algorithm:
 
 =head2 digest_size()
 
-Return the size (in bytes) of the digest algorithm in use:
+Return the size (in bytes) of the digest produced by a digest
+algorithm.  This can be called either on digest context, or just by
+passing the name of an algorithm to the module directly:
 
   printf("Digest size: %d\n", $digest->digest_size());
 
@@ -156,7 +169,9 @@ or
 
 =head2 block_size()
 
-Return the internal block size (in bytes) of this digest algorithm:
+Return the internal block size (in bytes) of a digest algorithm.  This
+can be called either on digest context, or just by passing the name of
+an algorithm to the module directly:
 
   printf("Block size: %d\n", $digest->block_size());
 

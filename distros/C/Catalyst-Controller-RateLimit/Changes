@@ -1,0 +1,6 @@
+0.26    Tue 22 Dec 2009 15:36:51 MSK
+        Fixed dependencies. Added repository.
+0.23    Чтв Ноя  6 10:50:25 MSK 2008
+        Added support for Algorithm::FloodControl's backend_name
+0.22    Срд Ноя  5 17:02:56 MSK 2008
+        Added support for Algorithm::FloodControl

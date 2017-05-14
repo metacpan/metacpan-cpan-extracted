@@ -25,12 +25,12 @@ no_index:
 requires:
   Carp: '0'
   Mojolicious: '5.37'
-  Net::OAuth2::AuthorizationServer: '0.14'
+  Net::OAuth2::AuthorizationServer: '0.15'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/Humanstate/mojolicious-plugin-oauth2-server/issues
   homepage: https://metacpan.org/module/Mojolicious::Plugin::OAuth2::Server
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/mojolicious-plugin-oauth2-server
-version: '0.36'
+version: '0.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

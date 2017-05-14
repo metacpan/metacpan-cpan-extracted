@@ -1,0 +1,74 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Notes
+
+H2: Short Notes
+
+The paragraph tag for adding a single paragraph note is {{Note}}.
+For example:
+
+E:  Note: Life is too short to waste time being unhappy.
+
+The result is:
+
+Note: Life is too short to waste time being unhappy.
+
+H2: Changing the Label
+
+You can change the label for a note by using the {{PATTR:label}}
+paragraph attribute. For example:
+
+E:  Note[label='Important: '] Life is too short to drink bad wine.
+
+The result is:
+
+Note[label='Important: '] Life is too short to drink bad wine.
+
+H2: Long Notes
+
+If the note requires more than one paragraph, use the {{FILT:note}}
+filter. For example:
+
+E:  !block note
+E:  Life is too short to:
+E:
+E:  * waste time being unhappy
+E:  * worry about yesterday.
+E:  !endblock
+
+The result is:
+
+!block note
+Life is too short to:
+
+* waste time being unhappy
+* worry about yesterday.
+!endblock
+
+H2: The NB/NE Tags
+
+Before the {{FILT:note}} filter existed, long notes were created
+by using the NB (Note Begin) and NE (Note End) tags. For example:
+
+E:  NB: Life is too short to:
+E:
+E:  * waste time being unhappy
+E:  * worry about yesterday.
+E:
+E:  NE:
+
+These paragraph styles are still supported, although the {{FILT:note}}
+filter is now the recommended way of specifying long notes.
+
+!end_topic

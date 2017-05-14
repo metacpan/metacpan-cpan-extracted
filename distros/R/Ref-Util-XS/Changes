@@ -1,0 +1,110 @@
+0.115     2017-05-12 09:48:02+02:00 Europe/Amsterdam
+
+        * This (and 0.114) is effectively Ref-Util 0.113. It is being
+          released as Ref-Util-XS to make room for Ref-Util's new
+          pure-Perl interface.
+
+0.114
+
+0.113     2017-01-16 19:36:58+01:00 Europe/Amsterdam
+
+        * Fix bugtracker link.
+          (Shoichi Kaji)
+
+0.112     2017-01-15 17:15:26+01:00 Europe/Amsterdam
+
+        * GH #35: Fix compilation on Sun (Oracle) and some MSVC compilers.
+          (stphnlyd)
+
+0.111     2016-12-30 12:18:04+01:00 Europe/Amsterdam
+
+        * Fix test failure on 5.8.5 and under.
+        * Moved to Dist::Zilla.
+
+0.110   2016-12-29
+
+        * GH #29, #34: Fix support of 5.8.
+          (Sergey Aleynikov)
+        * Additional optimizations.
+          (Sergey Aleynikov)
+        * More extensive test suite.
+
+0.101   2016-08-29
+        * A test accidentally added a dependency on Readonly.pm. Fixed!
+          (GH #30)
+        * Update README.
+
+0.100   2016-08-27
+        * Support situations in op-code implementation where the parameters
+          do not come as a list. (Zefram)
+        * Fix memory leak in dangling op. (Zefram)
+        * Support magic (tied variables). (Tony Cook)
+        * Rework op implementation. (Zefram)
+          Thanks to Christian Walde for porting and merging Zefram's work
+          from Hash::SharedMem.
+        * Speed up by changing the top of the stack instead of POPing and
+          PUSHing. (Sergey Aleynikov)
+        * Update ppport.h file from Devel::PPPort and remove the copy of
+          SVRXOK since it's now available.
+          (Christian Walde)
+        * Add license in Pod. (Pete Houston)
+        * Specify minimum version of perl (5.6.2). (Pete Houston)
+
+0.020   2016-05-02
+        * Work on Perl 5.22 and above with -DPERL_OP_PARENT.
+          (Aaron Crane)
+        * Verify number of arguments. (Aaron Crane)
+
+0.011   2016-04-29
+        * Update README.
+
+0.010   2016-04-29
+        * Add is_plain_* functions to support explicitly non-blessed
+          variations of the functions. (Aaron Crane)
+        * Add is_blessed* functions to support explicitly blessed
+          variations of the functions. (Aaron Crane)
+        * Support blessed and magical regexes in 5.10+. From the
+          implementation perspective, we're now using SvRXOK() on
+          Perl 5.10+ (both opcode and XS) because it's more correct.
+          (Sawyer X, Aaron Crane)
+
+0.008   2016-01-23
+        * Document is_ref() in the POD (GH #8).
+
+0.007   2016-01-09
+        * Add is_ref(), asked by Ilmari (GH #6).
+          (Tested on 5.18.2, 5.10.1, 5.8.9, 5.6.2)
+        * Clarify tied variables support (or lack thereof).
+
+0.006   2016-01-01
+        * Update changelog for 0.005 (5.10.1 tested successfully).
+        * Add license metadata. Thanks, Manwar!
+        * Rephrase croak message for is_formatref on 5.6.
+
+0.005   2015-12-28
+        * Support for 5.10. (Tested on 5.10.1)
+        * Support for 5.8. (Tested on 5.8.9)
+        * Support for 5.6, except for is_formatref. (Tested on 5.6.2)
+        * Support older Test::More versions.
+        * Provide metadata to direct people to Github instead of RT.
+          (Thanks, Graham Ollis!)
+        * Clarify Readonly, tied variables, and magic.
+        * Cleaned up docs a bit.
+
+0.004   2015-12-18
+        * Add is_refref() function!
+        * Mention and compare to Scalar::Util::reftype.
+        * Add benchmark results, including against reftype.
+        * Add a note about the nature of playing with op trees, sort of.
+        * Add a note on what functions from reftype() are not available.
+        * Clarify how bad overloading is. No, it's not duck-typing either.
+
+0.003   2015-12-17
+        * Clarify overloading approach. Sorry, everyone!
+        * Document :all option.
+
+0.002   2015-12-05
+        * Ugh PAUSE. Thanks, Graham Barr.
+
+0.001   2015-12-04
+        * First version

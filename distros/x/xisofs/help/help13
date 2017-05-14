@@ -1,0 +1,1 @@
+The Rock Ridge protocol is a transparent method of creating a unix compatable file system on an ISO9660 disc. Filesystems created with this option may be difficult to read on systems which do not support this protocol.

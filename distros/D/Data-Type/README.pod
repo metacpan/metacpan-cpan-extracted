@@ -1,0 +1,112 @@
+=head1 NAME
+
+Data::Type - robust and extensible data- and valuetype system
+
+=head1 VERSION
+
+0.02.01 (Wed Dec  1 21:33:51 2004)
+
+=head1 DESCRIPTION
+
+This module delivers an easy, generic and unified interface to type related CPAN modules. They all have one common purpose: reporting if data has some "characteristics". And this module wraps that with a clean api.
+
+=head1 SYNOPSIS
+
+  use Data::Type qw(:is +ALL);
+
+  is STD::EMAIL or warn;
+
+  warn if isnt STD::CREDITCARD( 'MASTERCARD', 'VISA' );
+
+  try
+  {
+    valid( '9999-12-31 23:59:59', DB::DATETIME );
+  }
+  catch Data::Type::Exception with
+  {
+    print $e->to_string foreach @_;
+  };
+
+=head1 EXAMPLES
+
+Visit the L<Data::Type::Docs::Howto> to explore how to use this module
+for DBI, CGI, Getopt and more scenarios.
+
+=head1 INSTALLATION
+
+I highly recommend to use CPAN for one-stop-shop installation:
+
+perl -MCPAN -e "install Data::Type"
+
+
+=head1 SUPPORTED TYPES
+
+
+All types are grouped and though belong to a B<collection>. The collection is identified by a short id. All members are living in a namespace that is prefixed with it (uppercased).
+
+=over 3
+
+=item L<Standard Collection ('STD')|Data::Type::Collection::Std>
+
+This is a heterogenous collection of datatypes which is loaded by default. It contains various issues from CPAN modules (i.e. business, creditcard, email, markup, regexps and etc.) and some everyday things. See L<Data::Type::Collection::Std>.
+
+=item L<W3C/XML-Schema Collection ('W3C')|Data::Type::Collection::W3C>
+
+A nearly 1-to-1 use of L<XML::Schema> datatypes. It is nearly complete and works off the shelf. Please visit the XMLSchema L<http://www.w3.org/TR/xmlschema-2/> homepage for sophisticated documentation. See L<Data::Type::Collection::W3C>.
+
+=item L<Database Collection ('DB')|Data::Type::Collection::DB>
+
+Common database table types (VARCHAR, TINYTEXT, TIMESTAMP, etc.). See L<Data::Type::Collection::DB>.
+
+=item L<Biological Collection ('BIO')|Data::Type::Collection::Bio>
+
+Everything that is related to biological matters (DNA, RNA, etc.). See L<Data::Type::Collection::Bio>.
+
+=item L<Chemistry Collection ('CHEM')|Data::Type::Collection::Chem>
+
+Everything that is related to chemical matters (Atoms, etc.). See L<Data::Type::Collection::Chem>.
+
+=item L<Perl5 Collection ('PERL')|Data::Type::Collection::Perl>
+
+Reserved and undecided. See L<Data::Type::Collection::Perl>.
+
+=item L<Perl6 Apocalypse Collection ('PERL6')|Data::Type::Collection::Perl6>
+
+Placeholder for the Apocalypse and Synopsis 6 suggested datatypes for perl6. See L<Data::Type::Collection::Perl6>.
+
+=back
+
+B<[Note]> L<C<ALL>|Data::Type/EXPORT> is a an alias for all available collections at once.
+
+
+
+=head1 PREREQUISITES
+
+Following modules get automatically installed via the CPAN module. See INSTALLATION above. Data::Type has a mechanism
+for delayed loading of modules. This means modules are loaded only when the used types require
+them, not all at once.
+
+
+Class::Maker (0.05.17), Regexp::Box (0.01), Error (0.15), IO::Extended (0.06), Tie::ListKeyedHash (0.41), Data::Iter (0), Class::Multimethods (1.70), Attribute::Util (0.01), DBI (1.30), Text::TabularDisplay (1.18), String::ExpandEscapes (0.01), XML::LibXSLT (1.53), Locale::Language (2.21), Business::CreditCard (0.27), Email::Valid (0.15), Business::UPC (0.04), HTML::Lint (1.26), Business::CINS (1.13), Date::Parse (2.27), Net::IPv6Addr (0.2), Business::ISSN (0.90), Regexp::Common (2.113), X500::DN (0.28), Locale::SubCountry (0), XML::Schema (0.07), XML::Parser (2.34), Pod::Find (0.24)
+
+
+=head1 READON
+
+Visit the L<Data::Type> main documentation or advance directly to the L<Data::Type::Docs> manpage.
+
+
+=head1 CONTACT
+
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+
+=head1 AUTHOR
+
+Murat Uenalan, <muenalan@cpan.org>
+
+
+=head1 COPYRIGHT/LICENSE
+
+(c) 2004 by Murat Uenalan. All rights reserved. Note: This program is
+free software; you can redistribute it and/or modify it under the same
+terms as perl itself
+

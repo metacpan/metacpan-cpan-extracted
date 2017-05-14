@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+c_plus_plus.pm
+c_plus_plus.xs
+test.pl
+README
+patch

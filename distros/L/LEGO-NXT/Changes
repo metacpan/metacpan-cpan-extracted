@@ -1,0 +1,42 @@
+
+1.42 : BLEADING EDGE
+- New Manual::Plugins documentation.
+- Added plugin support.
+- Moved constants out of LEGO::NXT and in to LEGO::NXT::Constants.
+- Added a Changes file and backlogged it with our subversion logs.
+- Licensed under the Perl license as well as GNU.
+- New Manual docs: FAQ, Troubleshooting, Cookbook, and Introduction
+- We are now really export the constants like we thought me were.
+
+1.41 : 2006-09-26
+- Updated MANIFEST with tests and removed directories.
+- Modified README to be more than just a text version of the POD.
+- Add t directory for automated tests and added 2 basic tests.
+- Addede META.yml, MANIFEST, and README docs.
+- POD formatting of method parameters and return values.
+- Renamed package to LEGO::NXT instead of NXT.
+- Added and AUTHOR, CONTRIBUTORS, and LICENSE section.
+- Assumed all undocumented methods are private, and thus moved them.
+  in to a new PRIVATE METHODS SECTION and pre-pended their names with.
+  an underscore.
+- Double-space indented all code samples.
+- Renamed $conn to $nxt in all code sample.
+- Added missing direct commands start_program, stop_program.
+- Added/modified documentation.
+- Changed parse methods to follow lower_case names.
+- Added ultrasound documentation.
+- Cleanup synopsis.
+- Cleanup constants documentation.
+- Change the names of constants variables to NXT_ instead of NXT::.
+- Export all constants by default.
+- Changed test script namespace.
+- Changed Lego namespace to LEGO.
+- Migrated directory structure to reflect planned Lego namespace.
+- Modified sub names to reflect underscore_spaced perl best practice.
+- Modified ls_write to require pre-packed $txdata.
+- Added initial implementation of ultrasound range sensor using I2C digital
+  interface.
+
+1.40 : 2006-09-21
+- Initial release on CPAN.
+

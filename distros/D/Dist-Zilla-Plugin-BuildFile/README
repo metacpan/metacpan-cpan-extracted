@@ -1,0 +1,87 @@
+NAME
+    Dist::Zilla::Plugin::BuildFile - build files by running an external
+    command
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+    In your dist.ini:
+
+      [BuildFile / Readme ]
+
+      [BuildFile / MyModule.pod ]
+      command = podextract MyModule.pm >{{$target}}
+
+      [BuildFile]
+      target = first long name.txt
+      target = second long name.txt
+
+DESCRIPTION
+    During the 'BeforeBuild' phase of execution, this plugin creates or
+    updates one or more files and tests that they now exist. Later, during
+    the 'AfterBuild' phase of execution the created or updated files are
+    deleted, unless the 'precious' configuration option was used.
+
+    Note that this plugin only generates the files on demand. In order to
+    put them into the distribution, a FileGatherer such as GatherDir must
+    also be run.
+
+    The file(s) are built by running an external command specified with the
+    'command =' configuration parameter. By default that command runs 'make'
+    with the list of targets specified with the 'target = ' configuration
+    parameter. If not specified, the list of targets contains a single item
+    which is the name of the plugin.
+
+    Provided the command runs successfully, the list of files specified with
+    the 'filename =' configuration parameter is now tested to see if they
+    exist, and an error is generated if any of the files are missing. If not
+    specfied, the list of files to check for is the same as the list of
+    targets.
+
+    Thus, by itself, the section specifier of:
+
+        [BuildFile / Readme ]
+
+    has a BuildFile section name of 'Readme' which becomes the target file
+    to build, so that the command 'make Readme' gets executed. Then a test
+    is run to ensure that a file named 'Readme' now exists.
+
+ATTRIBUTES
+  target
+    This attribute can appear multiple times and each time it names a target
+    that needs to be built in order to generate the desired list of files to
+    install in the distribution. If not specified, the list of targets is
+    assumed to be just a single item with the same name as the plugin.
+
+  filename
+    This attribute can appear multiple times and each time it names a file
+    that should exist as a result of this Plugin. After running the
+    generating command, these files are checked for, and if they are not all
+    present then an error is generated. If not specified, then the list of
+    files is assumed to be the same as the list of targets.
+
+  command
+    This attribute gives the command that will be run to generate the
+    desired filenames. The command is expanded by Text::Template, and the
+    results are executed by IPC::Run3.
+
+    The command substitution uses the substitution delimeters of '{{' and
+    '}}', and has the following variables that can be expanded:
+
+    @filenames - The list of filenames
+    @targets - The list of targets
+    $target - The first target in the list of targets
+    $filename - The first filename in the list of filenames
+
+    If not specified, the default command is "make {{@targets}}".
+
+AUTHOR
+    Stirling Westrup <swestrup@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Stirling Westrup.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

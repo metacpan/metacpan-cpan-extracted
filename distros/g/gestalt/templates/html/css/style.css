@@ -1,0 +1,35 @@
+<style type="text/css">
+<!--
+body {
+	background-color: #FFFFFF;
+}
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	text-align: left
+	valign: top
+	list-style-position: outside;
+	list-style-type: disc;
+}
+a {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #000066;
+}
+a:link {
+	text-decoration: underline;
+}
+a:visited {
+	text-decoration: underline;
+	color: #990000;
+}
+a:hover {
+	text-decoration: none;
+	color: #000066;
+}
+a:active {
+	text-decoration: underline;
+	color: #990000;
+}
+-->
+</style>

@@ -1,0 +1,19 @@
+xisofs v1.3 (c) Copyright 1997 Steve Sherwood
+---------------------------------------------
+
+xisofs is a Perl/Tk interface to mkisofs and cdwrite/cdrecord. It will 
+allow you to build an ISO9660 filesystem (via mkisofs) and write this to 
+a blank CD-ROM (via cdwrite/cdrecord).
+
+Requirements
+------------
+
+Perl v5.004
+ptk v400.202
+mkisofs v1.11
+cdwrite v2.0 / cdrecord v1.5
+
+All of the above software needs to be compiled and installed for xisofs
+to work correctly (Although if cdwrite or cdrecord are not installed, 
+xisofs will still allow you to create ISO9660 filesystems).
+

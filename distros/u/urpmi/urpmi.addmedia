@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: urpmi.addmedia 271299 2010-11-21 15:54:30Z peroyvind $
 
 #- Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
@@ -96,7 +95,7 @@ if ($options{'xml-info'}) {
     member($options{'xml-info'}, urpm::xml_info_policies()) or die N("known xml-info policies are %s", join(', ', urpm::xml_info_policies())) . "\n";
 }
 
-our ($name, $url, $with, $relative_synthesis) = our @cmdline;
+our ($name, $url, $with, $relative_synthesis) = our @cmdline;  #- set by urpm::args
 my $with_dir;
 
 $options{quiet} = 1 if $options{verbose} < 0;
@@ -132,7 +131,7 @@ if ($options{distrib}) {
 	    my ($medianame, $add_by_default) = @_;
 	    my $yesexpr = N("Yy");
 	    $add_by_default = 1 if $options{allmedia};
-	    my $answer = message_input_(
+	    my $answer = message_input(
 		N("\nDo you want to add media '%s'?", $medianame) . ($add_by_default ? N(" (Y/n) ") : N(" (y/N) ")),
 		boolean => 1,
 	    );

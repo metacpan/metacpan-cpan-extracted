@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includepath>
+  <includepathentry path="/home/derek/Workspaces/current-projects/catalyst-plugin-sitemap/lib" />
+  <includepathentry path="/home/derek/Workspaces/current-projects/catalyst-plugin-sitemap/t/lib" />
+</includepath>
+

@@ -1,3 +1,6 @@
+2.1.7  11.05.2017
+           - move cast.h, refcnt.h to CPP::panda::lib, require CPP::panda::lib
+           - add PXS_TRY, sv2string, sv2string_view from Panda::Lib
 2.1.6  13.03.2017
            - compile with all warnings enabled, fix all warnings
            - fix threaded perl build

@@ -2,7 +2,9 @@ package WebService::PayPal::PaymentsAdvanced::Error::HTTP;
 
 use Moo;
 
-our $VERSION = '0.000021';
+use namespace::autoclean;
+
+our $VERSION = '0.000022';
 
 extends 'Throwable::Error';
 
@@ -56,13 +58,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::PayPal::PaymentsAdvanced::Error::HTTP - An HTTP transport error
 
 =head1 VERSION
 
-version 0.000021
+version 0.000022
 
 =head1 SYNOPSIS
 
@@ -120,13 +124,17 @@ Returns the HTTP status code for the response.
 
 The URI of the request that caused the HTTP error.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues>.
+
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc.
+This software is copyright (c) 2017 by MaxMind, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

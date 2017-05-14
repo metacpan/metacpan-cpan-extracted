@@ -1,0 +1,65 @@
+#!/usr/local/bin/perl5 -I./blib -I../blib -w
+
+require Net::NIS::Table;
+
+$hosts=Net::NIS::Table->new("hosts.byname");
+
+print "-"x75, "\n";
+
+$data = $hosts->list();
+
+if (defined($data))
+{
+  foreach $key (keys %{$data}) { print "$key --> $data->{$key}\n"; };
+}
+else
+{
+  print "no data returned\n";
+  print "status: ", $hosts->status(), "\n";
+}
+
+print "-"x75, "\n";
+
+$data = $hosts->match('phoenix');
+
+if (defined($data))
+{
+  print "match phoenix returned: $data\n";
+}
+else
+{
+  print "no data returned\n";
+  print "status: ", $hosts->status(), "\n";
+}
+
+print "-"x75, "\n";
+
+$data = $hosts->search('p');
+
+if (defined($data))
+{
+  foreach $key (keys %{$data}) { print "$key --> $data->{$key}\n"; };
+}
+else
+{
+  print "no data returned\n";
+  print "status: ", $hosts->status(), "\n";
+}
+
+print "-"x75, "\n";
+
+$none=Net::NIS::Table->new("unknown_map");
+
+$data = $none->list();
+
+if (defined($data))
+{
+  foreach $key (keys %{$data}) { print "$key --> $data->{$key}\n"; };
+}
+else
+{
+  print "no data returned\n";
+  print "status: ", $none->status(), "\n";
+}
+
+print "-"x75, "\n";

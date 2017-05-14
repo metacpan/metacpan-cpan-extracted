@@ -1,0 +1,40 @@
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://idp.ssocircle.com"><md:IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:KeyDescriptor use="encryption"><ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>
+                        MIICCDCCAXECBEX0DVswDQYJKoZIhvcNAQEEBQAwSzELMAkGA1UEBhMCREUxEjAQBgNVBAoTCVNT
+                        T0NpcmNsZTEMMAoGA1UECxMDaWRwMRowGAYDVQQDExFpZHAuc3NvY2lyY2xlLmNvbTAeFw0wNzAz
+                        MTExNDA4MjdaFw0wOTAyMjgxNDA4MjdaMEsxCzAJBgNVBAYTAkRFMRIwEAYDVQQKEwlTU09DaXJj
+                        bGUxDDAKBgNVBAsTA2lkcDEaMBgGA1UEAxMRaWRwLnNzb2NpcmNsZS5jb20wgZ8wDQYJKoZIhvcN
+                        AQEBBQADgY0AMIGJAoGBAJvMNGS50L9oLaAypFVVot08kkTCkUHijvV9Hluc13ahyec3Mn9b0KgJ
+                        quDMrH4Qng2be9aZf8hlEIW+u/L0Lvx8/Vya3pJrT3Ur2W5owDJafugLyH9gFcfusHja129Ytjgq
+                        X1UnLpQJyW9qzKt8rH5JHgpTrMKwzrbYq+nnBbrtAgMBAAEwDQYJKoZIhvcNAQEEBQADgYEAZ4QM
+                        MSekojkrcSQgXl+nyU7uniop7KQYyy2t3O7gzW10mpcEAVEnrsVBQ5n0PsaeSZv6D7E0hP8S5iqT
+                        9HFCLOTThL/r0/jCPhMRxqJI/OfYj+vcMAjYySXCC0AUa/L17iGxHw5yyq0hG+zNeXiXaM6aqpmj
+                        toqRzFhtTZpZ3ro=
+        </ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:KeyDescriptor use="signing"><ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>
+                        MIICCDCCAXECBEX0DVswDQYJKoZIhvcNAQEEBQAwSzELMAkGA1UEBhMCREUxEjAQBgNVBAoTCVNT
+                        T0NpcmNsZTEMMAoGA1UECxMDaWRwMRowGAYDVQQDExFpZHAuc3NvY2lyY2xlLmNvbTAeFw0wNzAz
+                        MTExNDA4MjdaFw0wOTAyMjgxNDA4MjdaMEsxCzAJBgNVBAYTAkRFMRIwEAYDVQQKEwlTU09DaXJj
+                        bGUxDDAKBgNVBAsTA2lkcDEaMBgGA1UEAxMRaWRwLnNzb2NpcmNsZS5jb20wgZ8wDQYJKoZIhvcN
+                        AQEBBQADgY0AMIGJAoGBAJvMNGS50L9oLaAypFVVot08kkTCkUHijvV9Hluc13ahyec3Mn9b0KgJ
+                        quDMrH4Qng2be9aZf8hlEIW+u/L0Lvx8/Vya3pJrT3Ur2W5owDJafugLyH9gFcfusHja129Ytjgq
+                        X1UnLpQJyW9qzKt8rH5JHgpTrMKwzrbYq+nnBbrtAgMBAAEwDQYJKoZIhvcNAQEEBQADgYEAZ4QM
+                        MSekojkrcSQgXl+nyU7uniop7KQYyy2t3O7gzW10mpcEAVEnrsVBQ5n0PsaeSZv6D7E0hP8S5iqT
+                        9HFCLOTThL/r0/jCPhMRxqJI/OfYj+vcMAjYySXCC0AUa/L17iGxHw5yyq0hG+zNeXiXaM6aqpmj
+                        toqRzFhtTZpZ3ro=
+        </ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://idp.ssocircle.com:80/sso/ArtifactResolver/metaAlias/ssocircle" index="0" isDefault="1"></md:ArtifactResolutionService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://idp.ssocircle.com:80/sso/IDPSloSoap/metaAlias/ssocircle"></md:SingleLogoutService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://idp.ssocircle.com:80/sso/IDPSloRedirect/metaAlias/ssocircle" ResponseLocation="http://idp.ssocircle.com:80/sso/IDPSloRedirect/metaAlias/ssocircle"></md:SingleLogoutService><md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://idp.ssocircle.com:80/sso/IDPMniSoap/metaAlias/ssocircle"></md:ManageNameIDService><md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://idp.ssocircle.com:80/sso/IDPMniRedirect/metaAlias/ssocircle" ResponseLocation="http://idp.ssocircle.com:80/sso/IDPMniRedirect/metaAlias/ssocircle"></md:ManageNameIDService><md:NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+        </md:NameIDFormat><md:NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+        </md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://idp.ssocircle.com:80/sso/SSORedirect/metaAlias/ssocircle"></md:SingleSignOnService>
+    
+        
+        
+        
+        
+        
+        
+        
+        
+       
+       </md:IDPSSODescriptor>
+
+    </md:EntityDescriptor>

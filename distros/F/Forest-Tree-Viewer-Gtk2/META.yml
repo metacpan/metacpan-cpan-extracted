@@ -1,0 +1,19 @@
+---
+abstract: 'display a Forest::Tree as a gtk tree view'
+author:
+  - 'Pawel Murias'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Forest-Tree-Viewer-Gtk2
+requires:
+  Gtk2: 1.222
+  Moose: 1.08
+  Test::use::ok: 0.02
+version: 0.03

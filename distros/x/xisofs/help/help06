@@ -1,0 +1,1 @@
+Include all files on the iso9660 filesystem. Normally files that contain the characters ~ or # will not be included (these are typically backup files for editors under UNIX).

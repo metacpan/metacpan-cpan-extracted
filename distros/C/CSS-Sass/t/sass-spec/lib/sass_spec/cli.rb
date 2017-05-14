@@ -5,19 +5,26 @@ module SassSpec::CLI
 
   def self.parse
     options = {
-      engine_adapter: SassEngineAdapter.new,
-      spec_directory: nil,
-      generate: false,
+      engine_adapter: SassEngineAdapter.new("sass"),
+      spec_directory: "spec",
       tap: false,
       skip: false,
       verbose: false,
       filter: "",
       limit: -1,
-      only_output_styles: []
+      unexpected_pass: false,
+      nuke: false,
+
+      # Constants
+      input_file: 'input.scss',
+      expected_file: 'expected_output.css',
+      compressed_file: 'expected.compressed.css',
+      expanded_file: 'expected.expanded.css',
+      compact_file: 'expected.compact.css'
     }
 
     OptionParser.new do |opts|
-      opts.banner = "Usage: ./sass-spec.rb [options] [spec_directory...]
+      opts.banner = "Usage: ./sass-spec.rb [options]
 
 Examples:
   Run `sassc --style compressed input.scss`:
@@ -32,9 +39,6 @@ the output matches the expected output. If you want set up your own test suite,
 follow a similar hierarchy as described in the initial comment of this script
 for your test hierarchy.
 
-This command can also be used to annotate tests to control which tests are ran
-and when. For details: ./sass-spec.rb annotate -h
-
 Make sure the command you provide prints to stdout.
 
 "
@@ -43,40 +47,16 @@ Make sure the command you provide prints to stdout.
         options[:verbose] = true
       end
 
-      opts.on("-V", "--version LANGUAGE_VERSION", "Select the Sass Language Version to test.") do |v|
-        unless SassSpec::LANGUAGE_VERSIONS.include?(v)
-          raise ArgumentError.new("Version #{v} is not valid. " +
-                                  "Did you mean one of: #{SassSpec::LANGUAGE_VERSIONS.join(', ')}")
-        end
-        options[:language_version] = v
-      end
-
       opts.on("-t", "--tap", "Output TAP compatible report") do
         options[:tap] = true
       end
 
       opts.on("-c", "--command COMMAND", "Sets a specific binary to run (defaults to '#{options[:engine_adapter]}')") do |v|
-        options[:engine_adapter] = ExecutableEngineAdapter.new(v)
+        options[:engine_adapter] = ExecutableEngineAdapater.new(v)
       end
 
-      opts.on("--dart PATH", "Run Dart Sass, whose repo should be at the given path.") do |path|
-        options[:engine_adapter] = DartEngineAdapter.new(path)
-      end
-
-      opts.on("-g", "--generate", "Run test(s) and generate expected output file(s).") do
-        options[:generate] = true
-      end
-
-      opts.on("--run-todo", "Run any tests marked as todo. Defaults to false.") do
-        options[:run_todo] = true
-      end
-
-      opts.on("--probe-todo", "Run and report tests marked as todo that unexpectedly pass. Defaults to false.") do
-        options[:probe_todo] = options[:run_todo] = true
-      end
-
-      opts.on("--impl NAME", "Sets the name of the implementation being tested. Defaults to 'sass'") do |name|
-        options[:implementation] = name
+      opts.on("--ignore-todo", "Skip any folder named 'todo'") do
+        options[:skip_todo] = true
       end
 
       opts.on("--filter PATTERN", "Run tests that match the pattern you provide") do |pattern|
@@ -87,56 +67,24 @@ Make sure the command you provide prints to stdout.
         options[:limit] = limit.to_i
       end
 
-      opts.on("--output-style STYLE", [:expanded, :compact, :nested, :compressed, :unspecified],
-              "Only run tests that have the specified output style.",
-              "Legal values: expanded, compact, nested, compressed, unspecified.") do |style|
-        style = nil if style == :unspecified
-        options[:only_output_styles] << style
+      opts.on("-s", "--skip", "Skip tests that fail to exit successfully") do
+        options[:skip] = true
       end
 
-      opts.on("-r SPEC_DIR", "--root SPEC_DIR", "Root directory for the specs. ",
-                "Defaults to the first directory specified if not provided or ",
-                "the default spec directory if no directory is specified or if the first directory",
-                "specified is a subdirectory of the default spec directory.") do |spec_dir|
-        options[:spec_directory] = File.expand_path(spec_dir)
+      opts.on("--nuke", "Write a new expected_output for every test from whichever engine we are using") do
+        options[:nuke] = true
       end
 
-      opts.on("--migrate-version", "Copy tests that fail and make them pass for the current version.") do
-        options[:migrate_version] = true
-      end
-
-      opts.on("--migrate-impl", "Copy tests that fail and make them pass for the current implementatino.") do
-        options[:migrate_impl] = true
+      opts.on("--unexpected-pass", "When running the todo tests, flag as an error when a test passes which is marked as todo.") do
+        options[:unexpected_pass] = true
       end
 
       opts.on("--silent", "Don't show any logs") do
         options[:silent] = true
       end
-
-      opts.on("--check-annotations", "Check if any test annotations are unecessary.") do
-        options[:check_annotations] = true
-      end
-
-      opts.on("--interactive", "When a test fails, enter into a dialog for how to handle it.") do
-        options[:interactive] = true
-      end
     end.parse!
 
-    if ARGV.any? && !options[:spec_directory]
-      if File.expand_path(ARGV[0]).start_with?(SassSpec::SPEC_DIR)
-        options[:spec_directory] = SassSpec::SPEC_DIR
-      else
-        options[:spec_directory] = File.expand_path(ARGV[0])
-      end
-    end
-
-    options[:spec_directory] ||= SassSpec::SPEC_DIR
-
-    options[:spec_dirs_to_run] = ARGV.dup.map{|d| File.expand_path(d)} if ARGV.any?
-
-    if options[:implementation] && options[:engine_adapter].respond_to?(:set_description)
-      options[:engine_adapter].set_description(options[:implementation])
-    end
+    options[:spec_directory] = ARGV[0] if !ARGV.empty?
 
     options
   end

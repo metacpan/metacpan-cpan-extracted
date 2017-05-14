@@ -1,18 +1,13 @@
+#include <xs/xs.h>
 #include <stdint.h>
-#include <xs/lib.h>
 #include <panda/lib.h>
 #include <xs/lib/cmp.h>
 #include <xs/lib/clone.h>
 #include <xs/lib/merge.h>
 #include <panda/string.h>
 
-#ifdef TEST_FULL
-#  include "t/src/test.h"
-#endif
-
 using namespace panda::lib;
 using namespace xs::lib;
-
 
 MODULE = Panda::Lib                PACKAGE = Panda::Lib
 PROTOTYPES: DISABLE
@@ -82,9 +77,3 @@ SV* clone (SV* source, bool cross = false) {
 bool compare (SV* first, SV* second) {
     RETVAL = sv_compare(aTHX_ first, second);
 }
-
-#ifdef TEST_FULL
-
-INCLUDE: t/src/test.xsi
-
-#endif

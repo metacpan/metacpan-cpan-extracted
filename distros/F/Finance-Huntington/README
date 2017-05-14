@@ -1,0 +1,22 @@
+Finance::Huntington
+
+DESCRIPTION
+
+This is a collection of modules for interfacing with the
+Huntington Online bank.
+
+Finance::Huntington::Statement will parse an html banking statement
+from the bank into a hash.  perldoc Statement.pm for more information.
+
+COPYRIGHT
+
+Copyright (c) 2000 Chad Lavy. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make install
+

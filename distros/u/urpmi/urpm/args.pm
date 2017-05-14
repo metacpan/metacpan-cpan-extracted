@@ -1,6 +1,5 @@
 package urpm::args;
 
-# $Id: args.pm 271299 2010-11-21 15:54:30Z peroyvind $
 
 use strict;
 use warnings;
@@ -14,14 +13,12 @@ use Exporter;
 our @ISA = 'Exporter';
 our @EXPORT = '%options';
 
-(our $VERSION) = q($Revision: 271299 $) =~ /(\d+)/;
-
 # The program that invokes us
 (my $tool = $0) =~ s!.*/!!;
 
 # Configuration of Getopt. urpmf is a special case, because we need to
 # parse non-alphanumerical options (-! -( -))
-my @configuration = qw(bundling gnu_compat permute);
+my @configuration = qw(bundling no_ignore_case permute);
 push @configuration, 'pass_through'
     if $tool eq 'urpmf' || $tool eq 'urpmi.addmedia';
 Getopt::Long::Configure(@configuration);
@@ -120,12 +117,20 @@ my %options_spec = (
 	justdb => \$options{justdb},
 	replacepkgs => \$options{replacepkgs},
 	suggests => sub { 
-	    $urpm->{fatal}(1, "Use --allow-suggests instead of --suggests");
+	    $urpm->{fatal}(1, "Use --allow-recommends instead of --suggests");
 	},
-	'allow-suggests' => sub { $urpm->{options}{'no-suggests'} = 0 },
-	'no-suggests' => sub { $urpm->{options}{'no-suggests'} = 1 },
+	'allow-suggests' => sub {
+	    warn "WARNING: --allow-suggests is deprecated. Use --allow-recommends instead\n";
+	    $urpm->{options}{'no-recommends'} = 0 },
+	'allow-recommends' => sub { $urpm->{options}{'no-recommends'} = 0 },
+	'no-recommends' => sub { $urpm->{options}{'no-recommends'} = 1 },
+	'no-suggests' => sub { # COMPAT
+	    warn "WARNING: --no-suggests is deprecated. Use --no-recommends instead\n";
+	    $urpm->{options}{'no-recommends'} = 1;
+	},
 	'allow-nodeps' => sub { $urpm->{options}{'allow-nodeps'} = 1 },
 	'allow-force' => sub { $urpm->{options}{'allow-force'} = 1 },
+	'downgrade' => sub { $urpm->{options}{downgrade} = 1 },
 	'parallel=s' => \$::parallel,
 
 	'metalink!' => sub { $urpm->{options}{metalink} = $_[1] },
@@ -168,10 +173,16 @@ my %options_spec = (
 	'norebuild!' => sub { $urpm->{options}{'build-hdlist-on-error'} = !$_[1] },
 	'test!' => \$::test,
 	'debug__do_not_install' => \$options{debug__do_not_install},
+	deploops => \$options{deploops},
 	'skip=s' => \$options{skip},
 	'prefer=s' => \$options{prefer},
  	'root=s' => sub { set_root($urpm, $_[1]) },
-	'use-distrib=s' => \$options{usedistrib},
+	'use-distrib=s' => sub {
+	    $options{usedistrib} = $_[1];
+	    return if !$>;
+	    $urpm->{cachedir} = $urpm->valid_cachedir;
+	    $urpm->{statedir} = $urpm->valid_statedir;
+	},
 	'probe-synthesis' => sub { $options{probe_with} = 'synthesis' },
 	'probe-hdlist' => sub { $options{probe_with} = 'synthesis' }, #- ignored, kept for compatibility
 	'excludepath|exclude-path=s' => sub { $urpm->{options}{excludepath} = $_[1] },
@@ -180,7 +191,6 @@ my %options_spec = (
 	'ignorearch' => sub { $urpm->{options}{ignorearch} = 1 },
 	noscripts => sub { $urpm->{options}{noscripts} = 1 },
 	replacefiles => sub { $urpm->{options}{replacefiles} = 1 },
-	repackage => sub { $urpm->{options}{repackage} = 1 },
 	'more-choices' => sub { $urpm->{options}{morechoices} = 1 },
 	'expect-install!' => \$::urpm::main_loop::expect_install,
 	'nolock' => \$options{nolock},
@@ -255,9 +265,13 @@ my %options_spec = (
 	provides => \$options{provides},
 	sourcerpm => \$options{sourcerpm},
 	'summary|S' => \$options{summary},
+	recommends => sub {
+	    $options{recommends} = 1;
+	},
 	suggests => sub { 
 	    $urpm->{error}("--suggests now displays the suggested packages, see --allow-suggests for previous behaviour");
-	    $options{suggests} = 1;
+	    $urpm->{error}("You should now use --recommends.");
+	    $options{recommends} = 1;
 	},
 	'list-media:s' => sub { $options{list_media} = $_[1] || 'all' },
 	'list-url' => \$options{list_url},
@@ -354,16 +368,6 @@ my %options_spec = (
 	'verify-rpm!' => sub { ${options}{'verify-rpm'} = $_[1] },
     },
 
-    'urpmi.recover' => {
-	'list=s' => \$::listdate,
-	'list-all' => sub { $::listdate = -1 },
-	'list-safe' => sub { $::listdate = 'checkpoint' },
-	checkpoint => \$::do_checkpoint,
-	'rollback=s' => \$::rollback,
-	noclean => \$::noclean,
-	disable => \$::disable,
-    },
-
 );
 
 # generate urpmf options callbacks
@@ -419,12 +423,12 @@ foreach my $k ('allow-medium-change', 'auto', 'auto-select', 'clean', 'download-
 $options_spec{gurpmi2} = $options_spec{gurpmi};
 
 foreach my $k ("test!", "force", "root=s", "use-distrib=s", 'env=s',
-    'repackage', 'noscripts', 'auto', 'auto-orphans', 'justdb',
+    'noscripts', 'auto', 'auto-orphans', 'justdb',
     "parallel=s")
 {
     $options_spec{urpme}{$k} = $options_spec{urpmi}{$k};
 }
-foreach my $k ("root=s", "nolock", "use-distrib=s", "skip=s", "prefer=s", "synthesis=s", 'no-suggests', 'allow-suggests', 'auto-orphans')
+foreach my $k ("root=s", "nolock", "use-distrib=s", "skip=s", "prefer=s", "synthesis=s", 'no-recommends', 'no-suggests', 'allow-recommends', 'allow-suggests', 'auto-orphans')
 {
     $options_spec{urpmq}{$k} = $options_spec{urpmi}{$k};
 }
@@ -532,7 +536,6 @@ usage:
 
 1;
 
-__END__
 
 =head1 NAME
 
@@ -550,6 +553,6 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-=cut
-
 =for vim:ts=8:sts=4:sw=4
+
+=cut

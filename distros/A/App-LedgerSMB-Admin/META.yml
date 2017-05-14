@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,16 +19,11 @@ no_index:
     - t
     - inc
 requires:
-  DBD::Pg: '0'
-  DBI: '0'
-  Dancer: '0'
   PGObject::Simple::Role: '0'
   PGObject::Util::DBAdmin: '0'
   PGObject::Util::DBChange: '0.04'
   PGObject::Util::DBMethod: '0'
-  Template: '0'
-  Try::Tiny: '0'
   perl: '5.01'
 resources:
   repository: https://github.com/ledgersmb/App-LedgerSMB-Admin.git
-version: '0.05'
+version: '0.07'

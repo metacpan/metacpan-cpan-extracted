@@ -1,0 +1,16 @@
+
+schema:
+    $class: CPAN::Testers::Schema
+    $method: connect_from_config
+
+metabase_dbh:
+    $class: DBI
+    $method: connect
+    $args:
+        - 'dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application;mysql_enable_utf8=1;database=metabase'
+        - ~
+        - ~
+        - AutoCommit: 1
+          RaiseError: 1
+          mysql_enable_utf8: 1
+

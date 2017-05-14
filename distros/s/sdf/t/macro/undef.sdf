@@ -1,0 +1,16 @@
+# This file tests the undef macro
+
+# define some values
+!define num1 42
+!define str1 "Hello world"
+Variable num1 is [[num1]].
+Variable str1 is [[str1]].
+
+# now undefine them
+!undef num1
+!undef str1
+Variable num1 is [[num1]].
+Variable str1 is [[str1]].
+
+# try undefining a non-existent variable
+!undef num2

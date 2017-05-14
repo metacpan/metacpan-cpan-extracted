@@ -1,0 +1,31 @@
+---
+abstract: 'Do a brute-force batched C<map()> though a list with a callback'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: List-MapBruteBatch
+no_index:
+  directory:
+    - t
+requires:
+  Exporter: 5.566
+  perl: 5.008
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=List-MapBruteBatch
+  homepage: http://metacpan.org/release/List-MapBruteBatch
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/list-mapbrutebatch.git
+version: 0.02
+x_serialization_backend: 'YAML::Tiny version 1.50'

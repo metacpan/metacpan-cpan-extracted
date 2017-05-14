@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Tree-Interval
+version:            0.3.2
+abstract:           ~
+author:
+    - Greg Banks <gnb@fastmail.fm>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::Unit:  0.25
+requires:
+    Test::Unit:  0.25
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

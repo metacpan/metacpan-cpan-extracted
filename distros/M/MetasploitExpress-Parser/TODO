@@ -1,0 +1,7 @@
+TODO
+
+* Parse Loots/Loot
+* Fix base64 encoded ruby blob
+* Add more tests
+* Complete the parsing of Hosts/Host
+* Add more documentation

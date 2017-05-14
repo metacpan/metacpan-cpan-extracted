@@ -1,0 +1,82 @@
+VRML syntax relaxation for preprocessor:
+(currently only the route thing is implemented)
+
+The idea is to define a VRML syntax that would be nicer to write
+than standard vrml (how many times have you had to write
+appearance Appearance { material Material {diffuseColor XXXX} }
+?) yet easy to convert into standard VRML mechanically.
+
+
+The intent is to understand many things but warn of non-standard
+things. 
+
+ROUTE aaa.bbb to ccc.ddd     [allow lowercase as well as omission of TO]
+Transform {
+	translate 0 0 0      [allow 'translate, rotate' for translation..]
+	Shape {		     [automatically infer 'children' for uppercase]
+		Cone { }     [automatically infer 'geometry' for suitable]
+		Material { ... } [...]
+	}
+}
+
+One neat idea: how about allowing
+
+	Sphere {
+		translation 1 0 0
+		diffuseColor 0.5 0 0
+		radius 2
+	}
+
+i.e. allowing Translation and Appearance/Material fields being implicitly
+interpreted in the parser. This would be translated into
+
+	Transform {
+		translation 1 0 0
+		children [
+			Shape {
+				apperarance Appearance {
+				 material Material {
+				  diffuseColor 0.8 0 0
+				 }
+				}
+				geometry Sphere {
+					radius 2
+				}
+			}
+		]
+	}
+		
+quite some savings on a very commonly done thing. Naturally, all fields
+of Transform would be supported and the transform node would
+be created only if any of the fields exist. Similarly, the Shape
+node would be created only if the Sphere node were not inside a Shape.
+
+This would save quite a lot of keystrokes from authors and would not be
+difficult to implement.
+
+Combining all the above, we can get quite concise syntax:
+
+Transform {
+	translate 5 0 0
+	rotate 2 3 0 0.15
+	Sphere {
+		translate 1 0 0
+		diffuseColor 0.5 0 0.5
+		radius 1
+	}
+	Cylinder {
+		diffuseColor 0.8 0 0
+	}
+}
+
+Also, Appearance node would implicitly take Material fields.
+
+It should be possible to specify rotations via pointing vectors
+from point 1 to point 2, and setting the Y axis to the plane of 
+point 1 to point 3.
+
+It should be possible to do TDEF (textual field value definition)
+and TUSE for fields.
+
+To make the converter, the parser should give the node arguments
+in an array instead of hash.

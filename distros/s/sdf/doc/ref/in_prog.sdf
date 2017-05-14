@@ -1,0 +1,73 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+H1: Programs
+
+H2: Overview
+
+The programs available are summarised below.
+
+!block table; tags="CMD"
+Name      Purpose
+sdf       convert [[SDF]] files to other formats
+sdfapi    extract the {{Application Programming Interface}} from source code
+sdfbatch  generate [[FrameMaker]] batch files
+sdfcli    extract the {{Command Line Interface}} from a utility
+sdfget    extract documentation embedded in source code
+sdftest   execute SDF regression tests
+sdngen    build an SDF tuning module from a FrameMaker template
+#fm2ps     convert FrameMaker files to PostScript (a wrapper for {{CMD:sdfbatch}})
+#pod2sdf   convert POD to SDF
+#poddiff   compare POD files and report differences
+prn2ps    convert Windows PostScript to Unix PostScript
+!endblock
+
+{{CMD:sdf}} is typically invoked as follows:
+
+E:   sdf -2{{format}} [options] files
+
+Supported {{format}} values include the following:
+
+!block table
+Format  Description
+ps      a [[PostScript]] document
+html    a [[HTML]] document
+hlp     [[Microsoft]] Windows help input files
+fvo     a {{PRD:FrameViewer}} file
+txt     a plain text document
+rtf     an [[RTF]] document
+book    a book ([[PostScript]])
+!endblock
+
+Further details on the programs are provided below.
+
+# Add the script directory to the search path
+!path_append "../../bin"
+
+# Include the subsections, placing each at the top of a page (or after a line)
+!if $var{'OPT_TARGET'} eq 'txt'
+    !on paragraph 'H2'; h2top; &PrependText("Line:")
+!else
+    !on paragraph 'H2'; h2top; $attr{'top'} = 1
+!endif
+!block topics
+Topic
+sdf
+sdfapi
+sdfbatch
+sdfcli
+sdfget
+sdftest
+sdngen
+prn2ps
+!endblock
+!off paragraph h2top

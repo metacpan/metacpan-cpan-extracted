@@ -1,0 +1,156 @@
+MODULE = CPP::panda::lib                PACKAGE = CPP::panda::lib::Test
+PROTOTYPES: DISABLE
+
+void test_new_obj (int type) {
+    static const int cnt = 1000;
+    if (type == 0) {
+        MyObject* arr[cnt];
+        for (int i = 0; i < cnt; ++i) arr[i] = new MyObject();
+        for (int i = 0; i < cnt; ++i) delete arr[i];
+    } else if (type == 1) {
+        MyObjectDyn* arr[cnt];
+        for (int i = 0; i < cnt; ++i) arr[i] = new MyObjectDyn();
+        for (int i = 0; i < cnt; ++i) delete arr[i];
+    } else if (type == 2) {
+        MyObjectThr* arr[cnt];
+        for (int i = 0; i < cnt; ++i) arr[i] = new MyObjectThr();
+        for (int i = 0; i < cnt; ++i) delete arr[i];
+    } else {
+        MyObjectDynThr* arr[cnt];
+        for (int i = 0; i < cnt; ++i) arr[i] = new MyObjectDynThr();
+        for (int i = 0; i < cnt; ++i) delete arr[i];
+    }
+}
+
+void test_malloc_serial (int size) {
+    static const int cnt = 1000;
+    void* arr[cnt];
+    for (int i = 0; i < cnt; ++i) {
+        arr[i] = malloc(size);
+    }
+    for (int i = 0; i < cnt; ++i) {
+        free(arr[i]);
+    }
+}
+
+int test_malloc_rotate (int size) {
+    RETVAL = 0;
+    static const int cnt = 1000000;
+    void* arr[cnt];
+    for (int i = 0; i < cnt; ++i) {
+        arr[i] = malloc(size);
+        RETVAL += (uint64_t)arr[i];
+        free(arr[i]);
+    }
+}
+
+void test_oalloc_serial (int size) {
+    static const int cnt = 1000;
+    void* arr[cnt];
+    for (int i = 0; i < cnt; ++i) {
+        arr[i] = ObjectAllocator::instance()->allocate(size);
+    }
+    for (int i = 0; i < cnt; ++i) {
+        ObjectAllocator::instance()->deallocate(arr[i], size);
+    }
+}
+
+int test_oalloc_rotate (int size) {
+    RETVAL = 0;
+    static const int cnt = 1000;
+    void* arr[cnt];
+    for (int i = 0; i < cnt; ++i) {
+        arr[i] = ObjectAllocator::instance()->allocate(size);
+        RETVAL += (uint64_t)arr[i];
+        ObjectAllocator::instance()->deallocate(arr[i], size);
+    }
+}
+
+int test_oalloc_rotate_tls (int size) {
+    RETVAL = 0;
+    static const int cnt = 1000000;
+    void* arr[cnt];
+    for (int i = 0; i < cnt; ++i) {
+        arr[i] = ObjectAllocator::tls_instance()->allocate(size);
+        RETVAL += (uint64_t)arr[i];
+        ObjectAllocator::tls_instance()->deallocate(arr[i], size);
+    }
+}
+
+uint64_t test_mempool16r () {
+    RETVAL = 0;
+    static const int cnt = 1000000;
+    void* arr[cnt];
+    for (int i = 0; i < cnt; ++i) {
+        arr[i] = StaticMemoryPool<16>::instance()->allocate();
+        RETVAL += (uint64_t) arr[i];
+        StaticMemoryPool<16>::instance()->deallocate(arr[i]);
+    }
+}
+
+uint64_t test_mempool16r_threaded () {
+    RETVAL = 0;
+    static const int cnt = 1000000;
+    void* arr[cnt];
+    for (int i = 0; i < cnt; ++i) {
+        arr[i] = StaticMemoryPool<16>::tls_instance()->allocate();
+        RETVAL += (uint64_t) arr[i];
+        StaticMemoryPool<16>::tls_instance()->deallocate(arr[i]);
+    }
+}
+
+void test_mempool_tls () {
+    static const int smp = 20;
+    for (int i = 0; i < 100; ++i) {
+#ifdef _WIN32
+        HANDLE thread[smp];
+        for (int j = 0; j < smp; ++j) {
+            DWORD tid;
+            thread[j] = CreateThread(NULL, 0, test_on_thread_start, NULL, 0, &tid);
+            if (!thread[j]) croak("FUCK, thread creation error");
+        }
+        for (int j = 0; j < smp; ++j) {
+            if (!thread[j]) continue;
+            DWORD ret = WaitForSingleObject(thread[j], INFINITE);
+            //if (err) croak("FUCK, thread join error: %d", err);
+        }
+#else
+        pthread_t thread[smp];
+        for (int j = 0; j < smp; ++j) {
+            int err = pthread_create(&thread[j], NULL, test_on_thread_start, NULL);
+            if (err) croak("FUCK, thread creation error: %d", err);
+        }
+        for (int j = 0; j < smp; ++j) {
+            void* retval;
+            int err = pthread_join(thread[j], &retval);
+            if (err) croak("FUCK, thread join error: %d", err);
+        }
+#endif
+    }
+}
+
+#ifndef _WIN32
+
+void test_mutex () {
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    for (int i = 0; i < 1000000; ++i) {
+        pthread_mutex_lock(&mutex);
+        pthread_mutex_unlock(&mutex);
+    }
+}
+
+void test_rwlock () {
+    pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
+    for (int i = 0; i < 1000000; ++i) {
+        pthread_rwlock_wrlock(&lock);
+        pthread_rwlock_unlock(&lock);
+    }
+}
+
+#endif
+
+INCLUDE: t/src/string.xsi
+
+INCLUDE: t/src/string_containers.xsi
+
+INCLUDE: t/src/from_chars.xsi

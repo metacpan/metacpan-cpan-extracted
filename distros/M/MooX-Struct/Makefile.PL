@@ -4,53 +4,53 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "make simple lightweight record-like structures that make sounds like cows",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "MooX-Struct",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => {
-                            "B::Hooks::EndOfScope" => 0,
-                            "Data::OptList" => 0,
-                            "Moo" => "1.000000",
-                            "namespace::clean" => 0,
-                            "Object::ID" => 0,
-                            "perl" => 5.008,
-                            "Scalar::Does" => 0,
-                            "Sub::Install" => 0,
-                          },
+  "abstract"         => "make simple lightweight record-like structures that make sounds like cows",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => { requires => { "Test::More" => 0.61 } },
-                      },
-  "provides"       => {
-                        "MooX::Struct"            => { file => "lib/MooX/Struct.pm", version => 0.014 },
-                        "MooX::Struct::Processor" => { file => "lib/MooX/Struct.pm", version => 0.014 },
-                        "MooX::Struct::Util"      => { file => "lib/MooX/Struct/Util.pm", version => 0.014 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct" },
-                        homepage     => "https://metacpan.org/release/MooX-Struct",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-moox-struct.git",
-                                          web  => "https://github.com/tobyink/p5-moox-struct",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Struct/project",
-                      },
-  "version"        => 0.014,
-  "x_contributors" => ["NOBODY"],
+  "name"             => "MooX-Struct",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => {
+                              "B::Hooks::EndOfScope" => 0,
+                              "Exporter::Tiny" => 0.044,
+                              "Moo" => "1.000000",
+                              "namespace::clean" => 0,
+                              "Object::ID" => 0,
+                              "perl" => 5.008,
+                              "Type::Tiny" => "1.000000",
+                            },
+                          },
+                          test => { requires => { "Test::More" => 0.61 } },
+                        },
+  "provides"         => {
+                          "MooX::Struct"            => { file => "lib/MooX/Struct.pm", version => 0.015 },
+                          "MooX::Struct::Processor" => { file => "lib/MooX/Struct.pm", version => 0.015 },
+                          "MooX::Struct::Util"      => { file => "lib/MooX/Struct/Util.pm", version => 0.015 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct" },
+                          homepage     => "https://metacpan.org/release/MooX-Struct",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-moox-struct.git",
+                                            web  => "https://github.com/tobyink/p5-moox-struct",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Struct/project",
+                        },
+  "version"          => 0.015,
+  "x_contributors"   => ["NOBODY"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

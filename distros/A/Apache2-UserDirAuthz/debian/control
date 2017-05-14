@@ -1,0 +1,19 @@
+Source: libapache2-userdirauthz-perl
+Section: perl
+Priority: optional
+Maintainer: Tom Jones <tom.jones@bccx.com>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: perl,
+ perl-modules
+Standards-Version: 3.9.2
+Homepage: http://search.cpan.org/dist/Apache2-UserDirAuthz/
+
+Package: libapache2-userdirauthz-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: simple one directory per username access control
+ When used as a PerlAuthzHandler with Apache+mod_perl, Apache2::UserdirAuthz
+ will perform simple access control, where each user has access to the part of
+ the hierarchy named after their username. For example, a user "tom" will have
+ access to all locations under /tom/, such as /tom/index.html, /tom/logo.png,
+ and so on.

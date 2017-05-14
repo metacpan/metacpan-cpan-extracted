@@ -1,0 +1,52 @@
+==================================================
+Changes from 2011-01-29 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.4 at 2012-01-29 23:19:01 +0000
+----------------------------------------
+
+  Change: 48f278c73a02dd86859bda13ba2455b93551a205
+  Author: Richard Harris <richardjharris@gmail.com>
+  Date : 2012-01-29 23:19:01 +0000
+
+    Commit release files for v0.4 
+
+----------------------------------------
+version 0.3 at 2012-01-29 23:01:12 +0000
+----------------------------------------
+
+  Change: cebd92673fe891ecf01285f31c9509698f6bdc77
+  Author: Richard Harris <richardjharris@gmail.com>
+  Date : 2012-01-29 23:01:12 +0000
+
+    dzil release generates build dirs, which Git::Check will complain
+    about. Add to gitignore. 
+
+  Change: a4c6bf112a1c6bdb8d1f1aa901857f3f26515699
+  Author: Richard Harris <richardjharris@gmail.com>
+  Date : 2012-01-29 22:58:05 +0000
+
+    Fix POD method names 
+
+  Change: 3841df6ce7407c87aefc19f1b1187aaa747aeab0
+  Author: Richard Harris <richardjharris@gmail.com>
+  Date : 2012-01-29 22:58:00 +0000
+
+    Don't upload to CPAN twice 
+
+  Change: b4503cbee7a5cc481bf41f67959950d63fd4f453
+  Author: Richard Harris <richardjharris@gmail.com>
+  Date : 2012-01-29 22:53:09 +0000
+
+    Add UTF-8 to POD and use FUNCTIONS rather than METHODS. 
+
+  Change: ba3f4462618bd313d14b501815f8abe8455f275e
+  Author: Richard Harris <richardjharris@gmail.com>
+  Date : 2012-01-29 22:29:31 +0000
+
+    Initial commit prior to release. 
+
+================
+End of releases.
+================

@@ -1,0 +1,36 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="genetic_status" cv_table="SMP_GeneticStatus">
+  <comment type="definition">This table provides the restricted vocabulary for the column genetic status in the table sample and is used to give general categories 	
+</comment>
+<term name="haploid"
+        description="The organism is in the haploid from"/>
+<term name="diploid"
+        description="The organism is in its diploid form"/>
+<term name="polyploid"
+        description="The organism is a polyploid"/>
+<term name="has_plasmid"
+        description="a characterized plasmid is present"/>
+<term name="partial_diploid"
+        description="The organism exists as a partial diploid"/>
+<term name="mutant"
+        description="This is a specific mutant of a given organism"/>
+<term name="wildtype"
+        description="This is an organism unmodified by the experimentalist"/>
+<term name="ecotype"
+        description="This is an organism characterized as coming from a  region"/>
+<term name="strain"
+        description="This is an organism that has been characterized for many of its loci"/>
+<term name="model"
+        description="This is an organism being used in a sequencing project for which a lot of genomic information is known"/>
+<term name="transformant"
+        description="This organism has undergone expression manipulation by a transformation procedure"/>
+<term name="model"
+        description="This organism has been the focus of a genomic sequencing effort and may be close to fully characterized at the genomic level"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

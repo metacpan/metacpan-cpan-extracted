@@ -49,7 +49,7 @@ EXPECT
 use strict ;
 $fred ;
 EXPECT
-Global symbol "$fred" requires explicit package name at - line 4.
+Global symbol "$fred" requires explicit package name (did you forget to declare "my $fred"?) at - line 4.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -57,7 +57,7 @@ Execution of - aborted due to compilation errors.
 use strict 'vars' ;
 <$fred> ;
 EXPECT
-Global symbol "$fred" requires explicit package name at - line 4.
+Global symbol "$fred" requires explicit package name (did you forget to declare "my $fred"?) at - line 4.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -65,7 +65,7 @@ Execution of - aborted due to compilation errors.
 use strict 'vars' ;
 local $fred ;
 EXPECT
-Global symbol "$fred" requires explicit package name at - line 4.
+Global symbol "$fred" requires explicit package name (did you forget to declare "my $fred"?) at - line 4.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -78,7 +78,22 @@ use strict 'vars' ;
 $joe = 1 ;
 EXPECT
 Variable "$joe" is not imported at - line 8.
-Global symbol "$joe" requires explicit package name at - line 8.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at - line 8.
+Execution of - aborted due to compilation errors.
+########
+
+# Check compile time scope of strict vars pragma
+use strict 'vars' ;
+use utf8;
+use open qw( :utf8 :std );
+{
+    no strict ;
+    $jòè = 1 ;
+}
+$jòè = 1 ;
+EXPECT
+Variable "$jòè" is not imported at - line 10.
+Global symbol "$jòè" requires explicit package name (did you forget to declare "my $jòè"?) at - line 10.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -90,7 +105,7 @@ no strict;
 }
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 6.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at - line 6.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -123,8 +138,25 @@ $joe = 1 ;
 require "./abc";
 EXPECT
 Variable "$joe" is not imported at ./abc line 2.
-Global symbol "$joe" requires explicit package name at ./abc line 2.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at ./abc line 2.
 Compilation failed in require at - line 2.
+########
+
+--FILE-- abc
+use strict 'vars' ;
+use utf8;
+use open qw( :utf8 :std );
+$jòè = 1 ;
+1;
+--FILE-- 
+use utf8;
+use open qw( :utf8 :std );
+$jòè = 1 ;
+require "./abc";
+EXPECT
+Variable "$jòè" is not imported at ./abc line 4.
+Global symbol "$jòè" requires explicit package name (did you forget to declare "my $jòè"?) at ./abc line 4.
+Compilation failed in require at - line 4.
 ########
 
 --FILE-- abc.pm
@@ -136,9 +168,27 @@ $joe = 1 ;
 use abc;
 EXPECT
 Variable "$joe" is not imported at abc.pm line 2.
-Global symbol "$joe" requires explicit package name at abc.pm line 2.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at abc.pm line 2.
 Compilation failed in require at - line 2.
 BEGIN failed--compilation aborted at - line 2.
+########
+
+--FILE-- abc.pm
+use strict 'vars' ;
+use utf8;
+use open qw( :utf8 :std );
+$jòè = 1 ;
+1;
+--FILE-- 
+use utf8;
+use open qw( :utf8 :std );
+$jòè = 1 ;
+use abc;
+EXPECT
+Variable "$jòè" is not imported at abc.pm line 4.
+Global symbol "$jòè" requires explicit package name (did you forget to declare "my $jòè"?) at abc.pm line 4.
+Compilation failed in require at - line 4.
+BEGIN failed--compilation aborted at - line 4.
 ########
 
 --FILE-- abc.pm
@@ -153,20 +203,20 @@ $p = 0b12;
 --FILE-- 
 use abc;
 EXPECT
-Global symbol "$f" requires explicit package name at abc.pm line 3.
-Global symbol "$k" requires explicit package name at abc.pm line 3.
-Global symbol "$g" requires explicit package name at abc.pm line 4.
-Global symbol "$l" requires explicit package name at abc.pm line 4.
-Global symbol "$c" requires explicit package name at abc.pm line 5.
-Global symbol "$h" requires explicit package name at abc.pm line 5.
-Global symbol "$m" requires explicit package name at abc.pm line 5.
-Global symbol "$d" requires explicit package name at abc.pm line 6.
-Global symbol "$i" requires explicit package name at abc.pm line 6.
-Global symbol "$n" requires explicit package name at abc.pm line 6.
-Global symbol "$e" requires explicit package name at abc.pm line 7.
-Global symbol "$j" requires explicit package name at abc.pm line 7.
-Global symbol "$o" requires explicit package name at abc.pm line 7.
-Global symbol "$p" requires explicit package name at abc.pm line 8.
+Global symbol "$f" requires explicit package name (did you forget to declare "my $f"?) at abc.pm line 3.
+Global symbol "$k" requires explicit package name (did you forget to declare "my $k"?) at abc.pm line 3.
+Global symbol "$g" requires explicit package name (did you forget to declare "my $g"?) at abc.pm line 4.
+Global symbol "$l" requires explicit package name (did you forget to declare "my $l"?) at abc.pm line 4.
+Global symbol "$c" requires explicit package name (did you forget to declare "my $c"?) at abc.pm line 5.
+Global symbol "$h" requires explicit package name (did you forget to declare "my $h"?) at abc.pm line 5.
+Global symbol "$m" requires explicit package name (did you forget to declare "my $m"?) at abc.pm line 5.
+Global symbol "$d" requires explicit package name (did you forget to declare "my $d"?) at abc.pm line 6.
+Global symbol "$i" requires explicit package name (did you forget to declare "my $i"?) at abc.pm line 6.
+Global symbol "$n" requires explicit package name (did you forget to declare "my $n"?) at abc.pm line 6.
+Global symbol "$e" requires explicit package name (did you forget to declare "my $e"?) at abc.pm line 7.
+Global symbol "$j" requires explicit package name (did you forget to declare "my $j"?) at abc.pm line 7.
+Global symbol "$o" requires explicit package name (did you forget to declare "my $o"?) at abc.pm line 7.
+Global symbol "$p" requires explicit package name (did you forget to declare "my $p"?) at abc.pm line 8.
 Illegal binary digit '2' at abc.pm line 8, at end of line
 abc.pm has too many errors.
 Compilation failed in require at - line 1.
@@ -193,7 +243,7 @@ eval {
 print STDERR $@;
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 6.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at - line 6.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -205,8 +255,8 @@ eval {
 print STDERR $@;
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 5.
-Global symbol "$joe" requires explicit package name at - line 8.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at - line 5.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at - line 8.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -220,7 +270,23 @@ print STDERR $@;
 $joe = 1 ;
 EXPECT
 Variable "$joe" is not imported at - line 9.
-Global symbol "$joe" requires explicit package name at - line 9.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at - line 9.
+Execution of - aborted due to compilation errors.
+########
+
+# Check scope of pragma with eval
+use strict 'vars' ;
+use utf8;
+use open qw( :utf8 :std );
+eval {
+    no strict ;
+    $jòè = 1 ;
+};
+print STDERR $@;
+$jòè = 1 ;
+EXPECT
+Variable "$jòè" is not imported at - line 11.
+Global symbol "$jòè" requires explicit package name (did you forget to declare "my $jòè"?) at - line 11.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -241,7 +307,7 @@ eval q[
     $joe = 1 ;
 ]; print STDERR $@;
 EXPECT
-Global symbol "$joe" requires explicit package name at (eval 1) line 3.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at (eval 1) line 3.
 ########
 
 # Check scope of pragma with eval
@@ -250,7 +316,7 @@ eval '
     $joe = 1 ;
 '; print STDERR $@ ;
 EXPECT
-Global symbol "$joe" requires explicit package name at (eval 1) line 2.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at (eval 1) line 2.
 ########
 
 # Check scope of pragma with eval
@@ -261,7 +327,7 @@ eval '
 '; print STDERR $@;
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 8.
+Global symbol "$joe" requires explicit package name (did you forget to declare "my $joe"?) at - line 8.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -274,9 +340,9 @@ $ret = eval q{ print $x; };
 print $@;
 print "ok 2\n" unless defined $ret;
 EXPECT
-Global symbol "$x" requires explicit package name at (eval 1) line 1.
+Global symbol "$x" requires explicit package name (did you forget to declare "my $x"?) at (eval 1) line 1.
 ok 1
-Global symbol "$x" requires explicit package name at (eval 2) line 1.
+Global symbol "$x" requires explicit package name (did you forget to declare "my $x"?) at (eval 2) line 1.
 ok 2
 ########
 
@@ -333,7 +399,22 @@ sub foo {
 $fred ;
 EXPECT
 Variable "$fred" is not imported at - line 8.
-Global symbol "$fred" requires explicit package name at - line 8.
+Global symbol "$fred" requires explicit package name (did you forget to declare "my $fred"?) at - line 8.
+Execution of - aborted due to compilation errors.
+########
+
+# strict vars with elapsed our - error
+use strict 'vars' ;
+use utf8;
+use open qw( :utf8 :std );
+sub fòò {
+    our $frèd;
+    $frèd;
+}
+$frèd ;
+EXPECT
+Variable "$frèd" is not imported at - line 10.
+Global symbol "$frèd" requires explicit package name (did you forget to declare "my $frèd"?) at - line 10.
 Execution of - aborted due to compilation errors.
 ########
 
@@ -379,7 +460,7 @@ our $foo;
 ${foo} = 10;
 our $foo;
 EXPECT
-"our" variable $foo masks earlier declaration in same scope at - line 7.
+"our" variable $foo redeclared at - line 7.
 ########
 
 # multiple our declarations in same scope, same package, warning
@@ -390,12 +471,14 @@ use warnings;
 our $foo;
 {
     our $foo;
+    our $foo;
     package Foo;
     our $foo;
 }
 EXPECT
 "our" variable $foo redeclared at - line 9.
 	(Did you mean "local" instead of "our"?)
+"our" variable $foo redeclared at - line 10.
 ########
 
 --FILE-- abc
@@ -413,18 +496,80 @@ ok
 ########
 
 # Make sure the strict vars failure still occurs
-# now that the `@i should be written as \@i' failure does not occur
+# now that the '@i should be written as \@i' failure does not occur
 # 20000522 mjd@plover.com (MJD)
 use strict 'vars';
 no warnings;
 "@i_like_crackers";
 EXPECT
-Global symbol "@i_like_crackers" requires explicit package name at - line 7.
+Global symbol "@i_like_crackers" requires explicit package name (did you forget to declare "my @i_like_crackers"?) at - line 7.
+Execution of - aborted due to compilation errors.
+########
+
+# [perl #21914] New bug > 5.8.0. Used to dump core.
+use strict 'vars';
+@k = <$k>;
+EXPECT
+Global symbol "@k" requires explicit package name (did you forget to declare "my @k"?) at - line 4.
+Global symbol "$k" requires explicit package name (did you forget to declare "my $k"?) at - line 4.
 Execution of - aborted due to compilation errors.
 ########
 # [perl #26910] hints not propagated into (?{...})
 use strict 'vars';
 qr/(?{$foo++})/;
 EXPECT
-Global symbol "$foo" requires explicit package name at (re_eval 1) line 1.
-Compilation failed in regexp at - line 3.
+Global symbol "$foo" requires explicit package name (did you forget to declare "my $foo"?) at - line 3.
+Execution of - aborted due to compilation errors.
+########
+# Regex compilation errors weren't UTF-8 clean.
+use strict 'vars';
+use utf8;
+use open qw( :utf8 :std );
+qr/(?{$fòò++})/;
+EXPECT
+Global symbol "$fòò" requires explicit package name (did you forget to declare "my $fòò"?) at - line 5.
+Execution of - aborted due to compilation errors.
+########
+# [perl #73712] 'Variable is not imported' should be suppressible
+$dweck;
+use strict 'vars';
+no warnings;
+eval q/$dweck/;
+EXPECT
+########
+# [perl #112316] strict vars getting confused by nulls
+# Assigning to a package whose name contains a null
+BEGIN { *Foo:: = *{"foo\0bar::"} }
+package foo;
+*Foo::bar = [];
+use strict;
+eval 'package Foo; @bar = 1' or die;
+EXPECT
+########
+# [perl #112316] strict vars getting confused by nulls
+# Assigning from within a package whose name contains a null
+BEGIN { *Foo:: = *{"foo\0bar::"} }
+package Foo;
+*foo::bar = [];
+use strict;
+eval 'package foo; @bar = 1' or die;
+EXPECT
+########
+# [perl #112316] strict vars getting confused by nulls
+# Assigning from one null package to another, with a common prefix
+BEGIN { *Foo:: = *{"foo\0foo::"};
+        *Bar:: = *{"foo\0bar::"} }
+package Foo;
+*Bar::bar = [];
+use strict;
+eval 'package Bar; @bar = 1' or die;
+EXPECT
+########
+# UTF8 and Latin1 package names equivalent at the byte level
+use utf8;
+# ĵ in UTF-8 is the same as Äµ in Latin-1
+package ĵ;
+*Äµ::bar = [];
+use strict;
+eval 'package Äµ; @bar = 1' or die;
+EXPECT

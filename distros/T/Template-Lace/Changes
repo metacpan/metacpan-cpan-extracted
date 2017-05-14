@@ -1,5 +1,13 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.003   12 May 2017
+        - More HTML attribute helpers
+        - new Template::Lace::DOM method to run transforms under a context
+        - new Template::Lace::DOM method to run a list of actions to take
+          on the DOM.
+        - new Renderer shortcut methods 'call' and 'call_at' to make it easier
+          to call methods on the Model to tranform the current DOM
+
 0.002   25 April 2017
         - Fixed POD errors in previous version
 

@@ -1,0 +1,203 @@
+<perldata>
+  <hashref>
+    <item key="database" >
+      <hashref>
+        <item key="dbtype" >Pg</item>
+        <item key="dbname" >test</item>
+        <item key="host" >localhost</item>
+        <item key="password" />
+        <item key="username" />
+      </hashref>
+    </item>
+    <item key="search" >
+      <hashref>
+        <item key="!Fields" >number, gl_acctname.name, dim2, entrydate,
+        entereddr as debit, enteredcr as credit, 
+        entereddr - enteredcr AS total, text,
+        gl_batch.batchnr || '/' || journalnr AS id</item>
+        <item key="!Table" >gl_journal, gl_acctgrid, gl_chartofaccount, gl_acctname</item>
+        <item key="!TabJoin" >gl_acctname JOIN gl_chartofaccount USING (ac_id)
+        JOIN gl_acctgrid ON (coa_id = dim1)
+        JOIN gl_journal USING (ag_id)
+        JOIN gl_batch USING (batch_id)</item>
+        <item key="$where" >number BETWEEN ? AND ?
+        AND entrydate BETWEEN ? AND ?</item>
+        <item key="$order" >number, dim2, entrydate</item>
+        <item key="$values" >
+          <arrayref>
+            <item key="0" >10000</item>
+            <item key="1" >19999</item>
+            <item key="2" >2003-1-1</item>
+            <item key="3" >2003-3-1</item>
+          </arrayref>
+        </item>
+      </hashref>
+    </item>
+    <item key="report" >
+      <hashref>
+        <item key="locale" >da_DK</item>
+        <item key="papersize" >A4</item>
+      </hashref>
+    </item>
+    <item key="breaks" >
+      <hashref>
+        <item key="_total" >
+          <hashref>
+            <item key="format" >%.2f</item>
+            <item key="order" >2</item>
+            <item key="text" />
+            <item key="total" >
+              <arrayref>
+                <item key="0" >debit</item>
+                <item key="1" >credit</item>
+                <item key="2" >total</item>
+              </arrayref>
+            </item>
+            <item key="xpos" >5</item>
+          </hashref>
+        </item>
+        <item key="number" >
+          <hashref>
+            <item key="font" >
+              <hashref>
+                <item key="face" >Helvetica-Bold</item>
+                <item key="size" >10</item>
+              </hashref>
+            </item>
+            <item key="format" >%.2f</item>
+            <item key="order" >1</item>
+            <item key="text" >Konto $number: $name </item>
+            <item key="total" >
+              <arrayref>
+                <item key="0" >debit</item>
+                <item key="1" >credit</item>
+                <item key="2" >total</item>
+              </arrayref>
+            </item>
+            <item key="xpos" >5</item>
+          </hashref>
+        </item>
+        <item key="produktgruppe" >
+          <hashref>
+            <item key="font" >
+              <hashref>
+                <item key="face" >Helvetica-Bold</item>
+                <item key="size" >10</item>
+              </hashref>
+            </item>
+            <item key="format" >%.2f</item>
+            <item key="order" >0</item>
+            <item key="text" >Produktgruppe $dim2</item>
+            <item key="total" >
+              <arrayref>
+                <item key="0" >debit</item>
+                <item key="1" >credit</item>
+                <item key="2" >total</item>
+              </arrayref>
+            </item>
+            <item key="xpos" >5</item>
+          </hashref>
+        </item>
+      </hashref>
+    </item>
+    <item key="fields" >
+      <arrayref>
+        <item key="0" >
+          <hashref>
+            <item key="font" >
+              <hashref>
+                <item key="face" >Helvetica</item>
+                <item key="size" >10</item>
+              </hashref>
+            </item>
+            <item key="align" >right</item>
+            <item key="name" >id</item>
+            <item key="text" >ID</item>
+            <item key="xpos" >28</item>
+          </hashref>
+        </item>
+        <item key="1" >
+          <hashref>
+            <item key="name" >text</item>
+            <item key="text" >Name</item>
+            <item key="xpos" >30</item>
+          </hashref>
+        </item>
+        <item key="2" >
+          <hashref>
+            <item key="align" >right</item>
+            <item key="depends" >$debit > 0.00</item>
+            <item key="function" >sprintf(&quot;%.2f&quot;, $debit)</item>
+            <item key="name" >debit</item>
+            <item key="text" >Debit</item>
+            <item key="xpos" >140</item>
+          </hashref>
+        </item>
+        <item key="3" >
+          <hashref>
+            <item key="align" >right</item>
+            <item key="depends" >$credit > 0.00</item>
+            <item key="function" >sprintf(&quot;%.2f&quot;, $credit)</item>
+            <item key="name" >credit</item>
+            <item key="text" >Credit</item>
+            <item key="xpos" >170</item>
+          </hashref>
+        </item>
+        <item key="4" >
+          <hashref>
+            <item key="align" >right</item>
+            <item key="depends" >$total != 0.00</item>
+            <item key="function" >sprintf(&quot;%.2f&quot;, $total)</item>
+            <item key="name" >total</item>
+            <item key="text" >Total</item>
+            <item key="xpos" >200</item>
+          </hashref>
+        </item>
+      </arrayref>
+    </item>
+    <item key="page" >
+      <hashref>
+        <item key="header" >
+          <hashref>
+            <item key="font" >
+              <hashref>
+                <item key="face" >Helvetica-Bold</item>
+                <item key="size" >14</item>
+              </hashref>
+            </item>
+            <item key="number" >
+              <hashref>
+                <item key="align" >right</item>
+                <item key="text" >Side: </item>
+                <item key="xpos" >200</item>
+              </hashref>
+            </item>
+            <item key="text" >
+              <arrayref>
+                <item key="0" >
+                  <hashref>
+                    <item key="text" >Journalliste</item>
+                    <item key="xpos" >5</item>
+                    <item key="ypos" >6</item>
+                  </hashref>
+                </item>
+              </arrayref>
+            </item>
+          </hashref>
+        </item>
+      </hashref>
+    </item>
+    <item key="body" >
+      <hashref>
+        <item key="font" >
+          <hashref>
+            <item key="face" >helvetica-bold</item>
+            <item key="size" >10</item>
+          </hashref>
+        </item>
+        <item key="ypos" >10</item>
+        <item key="heigth" >265</item>
+      </hashref>
+    </item>
+  </hashref>
+</perldata>

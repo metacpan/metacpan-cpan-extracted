@@ -1,0 +1,109 @@
+$Id: CHANGES,v 1.8 2005/04/26 07:27:51 hackworth Exp $
+
+0.30 (April 25, 2005)
+
+    - ``Ping'' constraint was introduced. The constraint sends
+      a single ICMP ping to a given address and is considered
+      met if an ICMP packet is successfully received. ``Ping''
+      can be used to ascertain that network connection is
+      available and functional for tasks that depend on one.
+
+    - ``Concurrent'' constraint was introduced. The constraint
+      keeps a tab on the number of concurrent processes of a
+      specified application. The constraint is considered met
+      iff the number of processes running is less than the
+      concurrency level. [Feature Request #1011911]
+
+    - Reintroduced a ``safe_sleep'' time at the end of the
+      scheduler's while() loop. This stops the scheduler to go
+      into a tight loop, every time there is a few microseconds
+      of latency between task_wait and Freq constraint.
+
+
+0.25 (August 18, 2004)
+
+    - emerge-later, an application that adds packages to be
+      emerged (using Gentoo's package manager - emerge) to
+      system chrontab as only_once tasks, was added to the
+      distribution.
+
+    - Syslog support was introduced. When invoked in the
+      background mode (which is the default), chronicd will log
+      to Syslog's daemon facility with 'debug' and 'info'
+      priorities. The logging format was also changed to improve
+      clarity. [Feature Request #947137]
+
+    - SIGHUP handling was augmented to defer signals during task
+      execution since tasks can't be safely interrupted. HUP is
+      turned off before execution and replayed once the task is
+      finished running.
+
+    - The scheduling algorithm was modified such that scheduler
+      sleeps are completely controlled by ``wait'' times
+      returned by constraints; the scheduler does not sleep for
+      a ``timestep'' like it used to. The scheduler can also
+      function when there are no tasks in the chrontab; it will
+      simply sleep till a task arrives.
+
+
+0.20 (June 30, 2004)
+
+    - SIGHUP handling was introduced in chronicd. On receipt of
+      a HUP signal, chronicd will drop the existing schedule,
+      re-read config files and start over again.
+
+    - Capability to run certain tasks "only once" was added
+      to the Scheduler. When ``only_once'' is set to 1 in
+      the config file, chronicd will run the task once.
+      chronicd will purge these tasks from the chrontab once
+      they've been run.
+
+    - Notification functionality augmented to inform the user of
+      failures. If return value of the program is not 0, a
+      failure is assumed.
+
+
+0.15 (June 04, 2004) 
+
+    - Introduced the "InXs" constraint that combines the
+      Inactivity constraint and the Xscreensaver constraint
+      using an OR relationship.
+
+    - Scheduler wait doesn't exceed 10 minutes. This is because
+      a machine can hibernate (or chronicd backgrounded) in
+      middle of a long sleep, causing scheduler_wait to exceed
+      the intended sleep time. An upper limit ensure that
+      chronicd will "self-correct" its timers every 10 minutes.
+
+    - Added support for email notifications. notify =
+      email@address as a task field will send notifications to
+      email@address. Time values in the email notification are
+      in human readable format. eg. 35 seconds, 4.52 days, etc. 
+      [Feature Request #946816]
+
+    - Fixed a bug in chrontab re-writing logic. We were missing
+      the final ";" which could've caused a corrupted chrontab
+      in certain cases.
+
+    - Added a template constraint module under the docs
+      directory. The template will act as a starting point for
+      writing new constraints.
+
+
+0.10 (May 15, 2004)
+
+    - Introduced a Xscreensaver constraint that is met when
+      Xscreensaver is locked for a specified amount of time.
+      chronicd manpage updated with Xscreensaver documentation.
+      [Feature Request #952966]
+
+    - Added a basic use test to satisfy CPAN's automated
+      testing. A more comprehensive test suite will be
+      provided someday.
+
+
+0.02 (May 11, 2004)
+
+    - First public release.
+
+

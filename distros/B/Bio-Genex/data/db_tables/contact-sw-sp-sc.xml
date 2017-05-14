@@ -1,0 +1,416 @@
+<contact_list>
+<contact
+  type="software_image_analysis"
+  organization="Applied Precision, Inc."
+  org_mail_address="Applied Precision, Inc. 
+                1040 12th Avenue Northwest
+                Issaquah, Washington 98027
+                USA"
+  org_phone="+1 (425) 557-1000"
+  org_fax="+1 (425) 557-1000"
+  org_email="saleshotline@api.com"
+  url=""
+/>
+<contact
+  type="software_image_analysis"
+  contact_person="Mike Eisen"
+  organization="Stanford University"
+  contact_person_email="eisen@genome.stanford.edu"
+  url="http://rana.Stanford.EDU/software/"
+/>
+<contact
+  type="software_image_analysis"
+  organization="The Institute for Genomic Research"
+  org_mail_address="The Institute for Genomic Research
+              9712 Medical Center Drive
+              Rockville, MD 20850"
+  org_phone="+1 (301) 838-0200"
+  org_fax="+1 (301) 838-0208"
+  org_email="tools@tigr.org"
+  url="http://www.tigr.org/softlab/"
+/>
+<contact
+  type="software_image_analysis"
+  organization="BioDiscovery, Inc."
+  org_mail_address="BioDiscovery, Inc
+                   11150 West Olympic Blvd, Suite 1170
+                   Los Angeles, CA 90064 USA"
+  org_phone="+1 (310) 966-9366"
+  org_fax="+1 (310) 966-9346"
+  org_email="info@biodiscovery.com"
+  url="http://www.biodiscovery.com/"
+/>
+<contact
+  type="technology_scanner"
+  organization="Axon Instruments, Inc."
+  org_mail_address="Axon Instruments, Inc.
+                 1101 Chess Drive
+                 Foster City, CA 94404-1102
+                 USA"
+  org_email="sales@axon.com"
+  org_phone="+1 (650) 571-9400"
+  org_fax="+1 (650) 571-9500"
+  url="http://www.axon.com/"
+/>
+<contact
+  type="technology_scanner"
+  organization="Alpha Innotech Corporation"
+  org_mail_address="Alpha Innotech Corporation
+4743 Catalina St.
+        San Leandro, CA 94577
+        U.S.A"
+  org_email="info@aicemail.com"
+  org_phone="+1 (510) 483-9620"
+  org_fax="+1 (510) 483-3227"
+  org_toll_free_phone="+1 (800) 795-5556"
+  url="http://www.alphainnotech.com/"
+/>
+<contact
+  type="technology_scanner"
+  organization="Asper Biotech"
+  org_email="info@asperbio.com"
+  url="http://www.asper.ee/"
+/>
+<contact
+  type="technology_scanner"
+  organization="GSI Lumonics, Inc."
+  org_mail_address="GSI Lumonics
+4E Crosby Drive
+Bedford , MA, U.S.A. 01730"
+  org_email="info@gsilumonics.com"
+  org_phone="+1 (781) 275-1300"
+  org_fax="+1 (781) 275-3844"
+  url="http://www.gsilumonics.com/"
+/>
+<contact
+  type="software_scanner"
+  organization="Axon Instruments, Inc."
+  org_mail_address="Axon Instruments, Inc.
+                 1101 Chess Drive
+                 Foster City, CA 94404-1102
+                 USA"
+  org_email="sales@axon.com"
+  org_phone="+1 (650) 571-9400"
+  org_fax="+1 (650) 571-9500"
+  url="http://www.axon.com/"
+/>
+<contact
+  type="software_image_analysis"
+  organization="Scanalytics"
+  org_mail_address="Scanalytics, Inc.
+                    8550 Lee Highway
+                    Suite 400
+                    Fairfax, VA 22031
+                    USA"
+  org_email="sales@scanalytics.com"
+  org_phone="+1 (703) 208-2230"
+  org_fax="+1 (703) 208-1960"
+  url="http://www.scanalytics.com/"
+/>
+<contact
+  type="software_image_analysis"
+  organization="Imaging Research, Inc."
+  org_mail_address="Brock University, 500 Glenridge Ave., 
+              St. Catharines, Ontario, Canada L2S 3A1"
+  org_email="imaging@brocku.ca"
+  org_phone="+1 (905) 688-2040"
+  org_fax="+1 (905) 688-5861"
+  url="http://imaging.broku.ca/products/ArrayVision.htm/"
+/>
+<contact
+  type="software_spotter"
+  contact_person="Joe Derisi"
+  organization="Stanford University"
+  contact_person_email="joe@derisilab.ucsf.edu"
+  url="http://cmgm.stanford.edu/pbrown/mguide/software.html/"
+/>
+
+<contact
+  type="technology_spotter"
+  contact_person="Patrick O. Brown"
+  organization="Stanford University"
+  org_mail_address="Department of Biochemistry, Stanford University School of Medicine, Stanford CA 94305-5428 USA"
+  contact_person_email="pbrown@cmgm.stanford.edu"
+  url="http://cmgm.stanford.edu/pbrown/mguide/"
+/>
+<contact
+  type="experiment_set_provider"
+  contact_person="Patrick O. Brown"
+  organization="Stanford University"
+  org_mail_address="Department of Biochemistry, Stanford University School of Medicine, Stanford CA 94305-5428 USA"
+  contact_person_email="pbrown@cmgm.stanford.edu"
+  url="http://cmgm.stanford.edu/pbrown/"
+/>
+
+<contact
+  type="experiment_set_provider"
+  contact_person="G. Wesley Hatfield"
+  contact_person_phone="949-824-5344, 5858"
+  organization="University of California Irvine, Microbiology and Molecular Genetics"
+  org_mail_address="B237, C280 Med Sci I 
+University of California, Irvine 
+Microbiology and Molecular Genetetics
+Irvine, CA 92697-4025 
+USA"
+  contact_person_email="gwhatfield@uci.edu"
+  url=""
+/>
+
+<contact
+  type="technology_spotter"
+  organization="TeleChem International, Inc."
+  org_mail_address="TeleChem International, Inc. // ArrayIt.com
+                   524 E. Weddell Drive, Suite #3
+                   Sunnyvale, CA 94089"
+  org_email="arrayit@arrayit.com"
+  org_phone="+1 (408) 744-1331"
+  org_fax="+1 (408) 744-1711"
+  url="http://arrayit.com/"
+/>
+
+<contact
+  type="technology_spotter"
+  organization="Cartesian Technologies"
+  org_mail_address="TeleChem International, Inc. // ArrayIt.com
+                   524 E. Weddell Drive, Suite #3
+                   Sunnyvale, CA 94089"
+  org_email="sales@cartesiantech.com"
+  org_phone="+1 (949) 440-3680"
+  org_fax="+1 (949) 622-0255"
+  org_toll_free_phone="+1 (800) 935-8007"
+  url="http://www.cartesiantech.com/"
+/>
+
+<contact
+  type="technology_spotter"
+  organization="GeneMachines"
+  org_mail_address="GeneMachines
+935 Washington Street
+San Carlos, California 94070"
+  org_phone="+1 (650) 508-1634"
+  org_fax="+1 (650) 508-1644"
+  org_email="info@genemachines.com"
+  url="http://www.genemachines.com/"
+/>
+
+<contact
+  type="software_image_analysis"
+  organization="GeneData AG"
+  org_mail_address="GeneData AG 
+                                      Postfach 254
+                                      CH-4016 Basel
+                                      Switzerland"
+  org_phone="+41 61 697 60 99"
+  org_fax="+41 61 697 72 44"
+  org_email="products@genedata.com"
+  url="http://www.genedata.com/"
+/>
+
+<contact
+  type="technology_scanner"
+  organization="Applied Precision, Inc."
+  org_mail_address="Applied Precision, Inc. 
+                1040 12th Avenue Northwest
+                Issaquah, Washington 98027
+                USA"
+  org_phone="+1 (425) 557-1000"
+  org_fax="+1 (425) 557-1000"
+  org_email="saleshotline@api.com"
+  url=""
+/>
+
+<contact
+  type="software_image_analysis"
+  organization="Applied Precision, Inc."
+  org_mail_address="Applied Precision, Inc. 
+                1040 12th Avenue Northwest
+                Issaquah, Washington 98027
+                USA"
+  org_phone="+1 (425) 557-1000"
+  org_fax="+1 (425) 557-1000"
+  org_email="saleshotline@api.com"
+  url=""
+/>
+
+<contact
+  type="software_image_analysis"
+  organization="Affymetrix, Inc."
+  org_mail_address="Affymetrix, Inc.
+   3380 Central Exwy
+   Santa Clara, CA 95051"
+  org_phone="+1 (408) 731-5503"
+  org_fax="+1 (408) 481-9442"
+  org_email="sales@affymetrix.com"
+  url="http://www.affymetrix.com/"
+/>
+<contact
+  type="software_image_analysis"
+  organization="MolecularWare, Inc."
+  org_mail_address="MolecularWare, Inc.
+1 Broadway, Suite 600
+Cambridge, MA 02139"
+  org_phone="+1 (617) 354-9797"
+  org_toll_free_phone="+1 (877) 665-3285"
+  org_email="info@molecularware.com"
+  url="http://www.molecularware.com/"
+/>
+<contact
+  type="software_image_analysis"
+  organization="COSE"
+  org_mail_address="COSE
+              32 rue Amelin , 93440 Dugny ,
+              FRANCE"
+  org_phone="+33 01 48 37 42 53"
+  org_fax="+33 01 48 37 63 84"
+  org_email="cose@cose.fr"
+  url="http://www.cose.fr/"
+/>
+<contact
+  type="software_spotter"
+  organization="MolecularWare, Inc."
+  org_mail_address="MolecularWare, Inc.
+1 Broadway, Suite 600
+Cambridge, MA 02139"
+  org_phone="+1 (617) 354-9797"
+  org_toll_free_phone="+1 (877) 665-3285"
+  org_email="info@molecularware.com"
+  url="http://www.molecularware.com/"
+/>
+
+
+<contact
+  type="technology_scanner"
+  organization="Virtek Vision International Inc."
+  org_mail_address="Virtek Vision International Inc.
+785 Bridge Street
+Waterloo Ontario
+Canada N2V 2K1"
+  org_phone="+1 (519) 746-7190"
+  org_fax="+1 (519) 746-3383"
+  org_email="chipreader@virtek.ca"
+  url="http://www.virtek.ca/"
+/>
+<contact
+  type="software_scanner"
+  organization="Virtek Vision International Inc."
+  org_mail_address="Virtek Vision International Inc.
+785 Bridge Street
+Waterloo Ontario
+Canada N2V 2K1"
+  org_phone="+1 (519) 746-7190"
+  org_fax="+1 (519) 746-3383"
+  org_email="chipreader@virtek.ca"
+  url="http://www.virtek.ca/"
+/>
+<contact
+  type="technology_scanner"
+  organization="Affymetrix, Inc."
+  org_mail_address="Affymetrix, Inc.
+   3380 Central Exwy
+   Santa Clara, CA 95051"
+  org_phone="+1 (408) 731-5503"
+  org_fax="+1 (408) 481-9442"
+  org_email="sales@affymetrix.com"
+  url="http://www.affymetrix.com/"
+/>
+<contact
+  type="technology_spotter"
+  organization="Affymetrix, Inc."
+  org_mail_address="Affymetrix, Inc.
+   3380 Central Exwy
+   Santa Clara, CA 95051"
+  org_phone="+1 (408) 731-5503"
+  org_fax="+1 (408) 481-9442"
+  org_email="sales@affymetrix.com"
+  url="http://www.affymetrix.com/"
+/>
+
+<contact
+  type="technology_spotter"
+  organization="Rosetta Inpharmatics"
+  org_mail_address="Rosetta Inpharmatics
+12040-115th Ave, NE
+Kirkland,WA 98034"
+  org_phone="+1 (425) 820-8900"
+  org_fax="+1 (425) 821-5354"
+  org_email="info@rii.com"
+  url="http://www.rii.com/"
+/>
+
+<contact
+  type="technology_spotter"
+  organization="Agilent Technologies"
+  org_mail_address="Agilent Technologies
+    P.O. Box #10395
+    Palo Alto, CA 94303"
+  org_toll_free_phone="+1 (800) 227-9770"
+  org_email="dna_microarray@agilent.com"
+  url="http://www.agilent.com/"
+/>
+
+<contact
+  type="technology_scanner"
+  organization="Agilent Technologies"
+  org_mail_address="Agilent Technologies
+    P.O. Box #10395
+    Palo Alto, CA 94303"
+  org_toll_free_phone="+1 (800) 227-9770"
+  org_email="dna_microarray@agilent.com"
+  url="http://www.agilent.com/"
+/>
+
+<contact
+  type="technology_scanner"
+  organization="GeneScan Europe"
+  org_mail_address="GeneScan Europe AG 
+Engesserstr. 4 b 
+79108 Freiburg
+Germany"
+  org_phone="+49 761-5038-200"
+  org_fax="+49 761-5038-111"
+  org_email="info@biochip.com"
+  url="http://www.biochip.com/"
+/>
+<contact
+  type="technology_spotter"
+  organization="GeneScan Europe"
+  org_mail_address="GeneScan Europe AG 
+Engesserstr. 4 b 
+79108 Freiburg
+Germany"
+  org_phone="+49 761-5038-200"
+  org_fax="+49 761-5038-111"
+  org_email="info@biochip.com"
+  url="http://www.biochip.com/"
+/>
+<contact
+  type="technology_spotter"
+  organization="BioRobotics Inc."
+  org_mail_address="BioRobotics Inc.
+                  12 Walnut Hill Park
+                  Woburn
+                  Massachusetts 01801
+                  USA"
+  org_phone="+1 (781) 376-9791"
+  org_fax="+1 (781) 376-9792"
+  org_email="info@biorobotics.com"
+  url="http://www.biorobotics.com/"
+/>
+
+<!--
+<contact
+  type=""
+  contact_person=""
+  contact_person_phone=""
+  contact_person_email=""
+  organization=""
+  org_mail_address=""
+  org_phone=""
+  org_fax=""
+  org_email=""
+  org_toll_free_phone=""
+  url=""
+/>
+-->
+</contact_list>
+

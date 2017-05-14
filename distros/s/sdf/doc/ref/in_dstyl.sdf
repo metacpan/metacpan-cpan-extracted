@@ -1,0 +1,44 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Document Styles
+
+The document styles available are summarised below.
+
+!block table; groups
+Style           Purpose
+General:
+document        a normal document
+manual          a manual
+paper           a technical paper
+Administration:
+admin           generic administration document
+fax             a fascimile
+memo            a memorandum
+newslttr        a newsletter
+minutes         minutes of a meeting
+Miscellaneous:
+listing         a source code listing
+!endblock
+
+For HTML output, the general styles are all the same.
+For PostScript output, they typically differ as follows:
+
+* {{document}} - single-sided, busy cover page,
+  busy headers/footers, table of contents
+
+* {{manual}} - double-sided, simple cover page,
+  simple header/footers, table of contents
+
+* {{paper}} - single-sided, no cover page (just a centered title),
+  simple header/footers, no table of contents.

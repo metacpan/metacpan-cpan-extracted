@@ -1,7 +1,7 @@
 package Myco::Exceptions;
 
 ################################################################################
-# $Id: Exceptions.pm,v 1.1.1.1 2004/11/22 19:16:01 owensc Exp $
+# $Id: Exceptions.pm,v 1.6 2006/03/17 22:41:31 sommerb Exp $
 #
 # See license and copyright near the end of this file.
 ################################################################################
@@ -12,24 +12,6 @@ package Myco::Exceptions;
 
 Myco::Exceptions - Myco Exception classes defined
 
-=head1 VERSION
-
-=over 4
-
-=item Release
-
-0.01
-
-=cut
-
-our $VERSION = 0.01;
-
-=item Repository
-
-$Revision$ $Date$
-
-=back
-
 =head1 SYNOPSIS
 
   use Myco::Exceptions;
@@ -37,7 +19,8 @@ $Revision$ $Date$
 
 =head1 DESCRIPTION
 
-
+Myco::Exceptions provides a straight-forward way to define different classes of
+exceptions for various pieces of myco.
 
 =cut
 
@@ -90,10 +73,6 @@ use Exception::Class ( 'Myco::Exception' => { description =>
                                    { description => 'Authorization exception.',
                                      isa => 'Myco::Exception' },
 
-                       'Myco::Exception::MalformedPassword' =>
-                                   { description => 'Malformed Password.',
-                                     isa => 'Myco::Exception' },
-
                        'Myco::Exception::Stat' =>
                                      { description => 'File status exception.',
                                        isa => 'Myco::Exception' },
@@ -109,15 +88,6 @@ use Exception::Class ( 'Myco::Exception' => { description =>
                        'Myco::Exception::Meta' =>
                                       { description => 'Meta data exception.',
                                         isa => 'Myco::Exception' },
-
-                       'Myco::Exception::MVC' =>
-                           { description => 'Model-View-Controller exception.',
-                             isa => 'Myco::Exception' },
-
-                       'Myco::Exception::MVC::PostAction' =>
-                           { description =>
-			       'Model-View-Controller PostAction exception.',
-                             isa => 'Myco::Exception::MVC' },
 
                        'Myco::Exception::Query' =>
                            { description => 'Query exception.',
@@ -139,7 +109,6 @@ use Exception::Class ( 'Myco::Exception' => { description =>
                        'Myco::Exception::Query::Filter' =>
                            { description => 'Missing Query Filter exception.',
                              isa => 'Myco::Exception::Query' },
-
                      );
 
 package Myco::Exception;
@@ -180,7 +149,7 @@ __END__
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2004 the myco project. All rights reserved.
+Copyright (c) 2006 the myco project. All rights reserved.
 This software is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+ lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    C++ Iterators    [C++ Reference]
+  </title>
+
+  <meta name="generator" content="DokuWiki Release 2009-12-25c &quot;Lemming&quot;" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="date" content="2010-05-02T14:55:31-0700" />
+<meta name="keywords" content="stl,iterators" />
+<link rel="search" type="application/opensearchdescription+xml" href="/wiki/lib/exe/opensearch.php" title="C++ Reference" />
+<link rel="start" href="/wiki/" />
+<link rel="contents" href="/wiki/stl/iterators?do=index" title="Index" />
+<link rel="alternate" type="application/rss+xml" title="Recent Changes" href="/wiki/feed.php" />
+<link rel="alternate" type="application/rss+xml" title="Current Namespace" href="/wiki/feed.php?mode=list&amp;ns=stl" />
+<link rel="edit" title="Edit this page" href="/wiki/stl/iterators?do=edit" />
+<link rel="alternate" type="text/html" title="Plain HTML" href="/wiki/_export/xhtml/stl/iterators" />
+<link rel="alternate" type="text/plain" title="Wiki Markup" href="/wiki/_export/raw/stl/iterators" />
+<link rel="canonical" href="http://www.cppreference.com/wiki/stl/iterators" />
+<link rel="stylesheet" media="all" type="text/css" href="/wiki/lib/exe/css.php?s=all&amp;t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="screen" type="text/css" href="/wiki/lib/exe/css.php?t=custom1&amp;tseed=1272971091" />
+<link rel="stylesheet" media="print" type="text/css" href="/wiki/lib/exe/css.php?s=print&amp;t=custom1&amp;tseed=1272971091" />
+<script type="text/javascript" charset="utf-8" ><!--//--><![CDATA[//><!--
+var NS='stl';var JSINFO = {"id":"stl:iterators","namespace":"stl"};
+//--><!]]></script>
+<script type="text/javascript" charset="utf-8" src="/wiki/lib/exe/js.php?tseed=1272971091" ></script>
+
+  <link rel="shortcut icon" href="/wiki/lib/tpl/custom1/images/favicon.png" />
+
+  </head>
+
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="breadcrumbs">
+      <span class="bchead">You are here: </span><a href="../start.html"  title="start">C++ Reference</a> &raquo; <a href="../stl/start.html"  title="stl:start">C++ Standard Template Library</a> &raquo; <a href="../stl/iterators.html"  title="stl:iterators">C++ Iterators</a>    </div>
+    
+  </div>
+
+
+  
+  
+  <div class="page">
+
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2828341-1";
+urchinTracker();
+</script>
+    <!-- wikipage start -->
+    <!-- TOC START -->
+<div class="toc">
+<div class="tocheader toctoggle" id="toc__header">Table of Contents</div>
+<div id="toc__inside">
+
+<ul class="toc">
+<li class="clear">
+
+<ul class="toc">
+<li class="level2"><div class="li"><span class="li"><a href="#c_iterators" class="toc">C++ Iterators</a></span></div>
+<ul class="toc">
+<li class="level3"><div class="li"><span class="li"><a href="#iterator_categories" class="toc">Iterator Categories</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#auxiliary_iterator_functions" class="toc">Auxiliary Iterator Functions</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#invalidating_iterators" class="toc">Invalidating Iterators</a></span></div></li></ul>
+</li></ul>
+</li></ul>
+</div>
+</div>
+<!-- TOC END -->
+
+
+
+<h2><a name="c_iterators" id="c_iterators">C++ Iterators</a></h2>
+<div class="level2">
+
+<p>
+
+Iterators are used to access elements of a sequence, and can be used
+in a similar manner to pointers. For example, one might use an iterator to step
+through the elements of a vector.
+</p>
+
+<p>
+The following code creates and uses an iterator with a vector:
+</p>
+<pre class="c code c++" style="font-family:monospace;">    vector<span class="sy0">&lt;</span>int<span class="sy0">&gt;</span> the_vector<span class="sy0">;</span>
+    vector<span class="sy0">&lt;</span>int<span class="sy0">&gt;::</span><span class="me2">iterator</span> the_iterator<span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="kw1">for</span><span class="br0">&#40;</span> <span class="kw4">int</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> <span class="nu0">10</span><span class="sy0">;</span> i<span class="sy0">++</span> <span class="br0">&#41;</span> the_vector.<span class="me1">push_back</span><span class="br0">&#40;</span>i<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw4">int</span> total <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    the_iterator <span class="sy0">=</span> the_vector.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">while</span><span class="br0">&#40;</span> the_iterator <span class="sy0">!=</span> the_vector.<span class="me1">end</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#41;</span> <span class="br0">&#123;</span>
+      total <span class="sy0">+=</span> <span class="sy0">*</span>the_iterator<span class="sy0">;</span>
+      <span class="sy0">++</span>the_iterator<span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a> <span class="sy0">&lt;&lt;</span> <span class="st0">&quot;Total=&quot;</span> <span class="sy0">&lt;&lt;</span> total <span class="sy0">&lt;&lt;</span> endl<span class="sy0">;</span></pre>
+<p>
+Notice that you can access the elements of the container by dereferencing the
+iterator.
+</p>
+
+<p>
+NOTES: You should prefer pre-increment operator (<code>++iter</code>) to post-increment operator (<code>iter++</code>)<br/>
+
+if you are not going to use the old value. <br/>
+
+Post-increment is generally implemented as follows:
+
+</p>
+<pre class="c code c++" style="font-family:monospace;">  Iter operator<span class="sy0">++</span><span class="br0">&#40;</span><span class="kw4">int</span><span class="br0">&#41;</span>
+  <span class="br0">&#123;</span>
+    Iter tmp<span class="br0">&#40;</span><span class="sy0">*</span>this<span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// store the old value in a temporary object</span>
+    <span class="sy0">++*</span>this<span class="sy0">;</span>         <span class="co1">// call pre-increment</span>
+    <span class="kw1">return</span> tmp<span class="sy0">;</span>      <span class="co1">// return the old value</span>
+  <span class="br0">&#125;</span></pre>
+<p>
+Obviously, it&#039;s less efficient than pre-increment. 
+</p>
+
+<p>
+<br/>
+
+</p>
+
+</div>
+
+<h3><a name="iterator_categories" id="iterator_categories">Iterator Categories</a></h3>
+<div class="level3">
+
+<p>
+Not every kind of iterator has exactly the same abilities. Reading and writing require different abilities.<br/>
+
+Random access is efficient and convenient for a <code>vector</code>, whereas it would be expensive for a <code>list</code>.<br/>
+
+For this reason, iterators are classified into five categories according to their abilities:
+
+</p>
+<table class="inline">
+	<tr class="row0">
+		<th class="col0">Iterator Category</th><th class="col1">Description</th><th class="col2">Providers</th><th class="col3">Tag</th>
+	</tr>
+	<tr class="row1">
+		<td class="col0">Input</td><td class="col1">Read values with forward movement. These can be incremented, compared, and dereferenced.</td><td class="col2">istream</td><td class="col3">input_iterator_tag</td>
+	</tr>
+	<tr class="row2">
+		<td class="col0">Output</td><td class="col1">Write values with forward movement. These can be incremented and dereferenced.</td><td class="col2">ostream, inserter</td><td class="col3">output_iterator_tag</td>
+	</tr>
+	<tr class="row3">
+		<td class="col0">Forward</td><td class="col1">Read or write values with forward movement. These combine the functionality of input and output iterators with the ability to store the iterators value.</td><td class="col2"> slist</td><td class="col3">forward_iterator_tag</td>
+	</tr>
+	<tr class="row4">
+		<td class="col0">Bidirectional</td><td class="col1">Read and write values with forward and backward movement. These are like the forward iterators, but you can increment and decrement them.</td><td class="col2">list, map, multimap, set, multiset</td><td class="col3">bidirectional_iterator_tag</td>
+	</tr>
+	<tr class="row5">
+		<td class="col0">Random-access</td><td class="col1">Read and write values with random access. These are the most powerful iterators, combining the functionality of bidirectional iterators with the ability to do pointer arithmetic and pointer comparisons.</td><td class="col2">array, deque, string, vector</td><td class="col3">random_access_iterator</td>
+	</tr>
+</table>
+
+<p>
+
+Each of the STL containers is associated with a category of iterator,
+and each of the <a href="../stl/algorithm/start.html" class="wikilink1" title="stl:algorithm:start">STL algorithms</a> uses a certain category of iterator. 
+</p>
+
+<p>
+For example, <a href="../stl/vector/start.html" class="wikilink1" title="stl:vector:start">vectors</a> are associated with random-access
+iterators, which means that they can use algorithms that require
+random access. Since random-access iterators encompass all of the
+characteristics of the other iterators, vectors can use algorithms
+designed for other iterators as well.
+</p>
+<pre class="c code c++" style="font-family:monospace;">    vector<span class="sy0">&lt;</span>int<span class="sy0">&gt;</span> the_vector<span class="br0">&#40;</span>10<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// generate_n requires output_iterator</span>
+    generate_n<span class="br0">&#40;</span>the_vector.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> 5<span class="sy0">,</span> rand<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// fill requires forward_iterator</span>
+    fill<span class="br0">&#40;</span>the_vector.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">+</span>5<span class="sy0">,</span> the_vector.<span class="me1">end</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> 100<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// random_shuffle requires random_access_iterator</span>
+    random_shuffle<span class="br0">&#40;</span>the_vector.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> the_vector.<span class="me1">end</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// copy requires input_iterator</span>
+    copy<span class="br0">&#40;</span>the_vector.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> the_vector.<span class="me1">end</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> ostream_iterator<span class="sy0">&lt;</span>int<span class="sy0">&gt;</span><span class="br0">&#40;</span><a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a><span class="sy0">,</span> <span class="st0">&quot; &quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// reverse_copy requires bidirectional_iterator</span>
+    reverse_copy<span class="br0">&#40;</span>the_vector.<span class="me1">begin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> the_vector.<span class="me1">end</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> ostream_iterator<span class="sy0">&lt;</span>int<span class="sy0">&gt;</span><span class="br0">&#40;</span><a href="http://www.opengroup.org/onlinepubs/009695399/functions/cout.html"><span class="kw3">cout</span></a><span class="sy0">,</span> <span class="st0">&quot; &quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+
+<br/>
+
+</p>
+
+</div>
+
+<h3><a name="auxiliary_iterator_functions" id="auxiliary_iterator_functions">Auxiliary Iterator Functions</a></h3>
+<div class="level3">
+
+<p>
+The <code>&lt;iterator&gt;</code> header file defines two auxiliary functions.
+
+</p>
+<pre class="c code c++" style="font-family:monospace;">  <span class="kw4">void</span> advance<span class="br0">&#40;</span> input_iterator<span class="sy0">&amp;</span> pos<span class="sy0">,</span> Dist n <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+
+<code>advance()</code> lets <code>pos</code> step <code>n</code> elements forward (or backward).<br/>
+
+For bidirectional and random_access_iterators, <code>n</code> can be negative to step backward.<br/>
+
+For random_access_iterators, <code>advance()</code> runs in constant time (simply calls <code>pos</code>+=<code>n</code>).<br/>
+
+For all other iterators, <code>advance()</code> has linear complexity (calls <code>++pos</code> <code>n</code> times).
+</p>
+<pre class="c code c++" style="font-family:monospace;">  typename iterator_traits<span class="sy0">&lt;</span>input_iterator<span class="sy0">&gt;::</span><span class="me2">difference_type</span>
+  distance<span class="br0">&#40;</span> input_iterator pos1<span class="sy0">,</span> input_iterator pos2 <span class="br0">&#41;</span><span class="sy0">;</span></pre>
+<p>
+
+<code>distance()</code> returns the distance between two iterators.<br/>
+
+For random_access_iterators, <code>distance()</code> runs in constant time (simply returns <code>pos2</code> - <code>pos1</code>).<br/>
+
+For all other iterators, <code>distance()</code> runs in linear time ( <code>pos1</code> is incremented until it reaches <code>pos2</code>, and returns the number of incrementation).
+</p>
+
+</div>
+
+<h3><a name="invalidating_iterators" id="invalidating_iterators">Invalidating Iterators</a></h3>
+<div class="level3">
+
+<p>
+Iterators to exisiting elements in a container can become invalidated when the container is changed. This makes changing the container while iterating it problematic. The containers offer different guarantees in this regard:<br/>
+
+</p>
+<ul>
+<li class="level1"><div class="li"> vectors: any insert that causes a reallocation invalidates all iterators, otherwise it invalidates all iterators to the insert position of after; erase invalidates all iterators to the erased elements and those after.<br/>
+</div>
+</li>
+<li class="level1"><div class="li"> list/map: insert invalidates no iterators; erase only invalidates iterators to the erased element(s) &amp; no others.<br/>
+</div>
+</li>
+</ul>
+
+<p>
+
+<br/>
+
+<br/>
+
+Related topics: <a href="http://www.oreillynet.com/pub/a/network/2005/10/18/what-is-iterator-in-c-plus-plus.html" class="urlextern" title="http://www.oreillynet.com/pub/a/network/2005/10/18/what-is-iterator-in-c-plus-plus.html"  rel="nofollow">http://www.oreillynet.com/pub/a/network/2005/10/18/what-is-iterator-in-c-plus-plus.html</a>
+
+</p>
+
+</div>
+
+    <!-- wikipage stop -->
+  </div>
+
+  <div class="clearer">&nbsp;</div>
+
+  
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <!--
+      <div class="doc">
+        stl/iterators.txt &middot; Last modified: 05/02/2010 14:55 by 70.81.52.33      </div>
+      -->
+    </div>
+
+   
+    </div></div></body>
+</html>

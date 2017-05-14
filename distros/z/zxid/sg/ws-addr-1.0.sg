@@ -1,0 +1,120 @@
+# zxid/sg/ws-addr-1.0.sg
+# Slightly edited, 5.9.2006, Sampo Kellomaki (sampo@iki.fi)
+# 6.2.2007, Added Discovery specifics to the Metadata --Sampo
+# 7.12.2013, added rankKey extension to EPR MD to facilitate sorting di results --Sampo
+# 11.2.2016, added <tas3:AltAddress> element --Sampo
+# $Id: ws-addr-1.0.sg,v 1.11 2016-02-11 05:10:03 sampo Exp $
+
+target(a, http://www.w3.org/2005/08/addressing)
+#t arget(a, http://schemas.xmlsoap.org/ws/2004/08/addressing)  # used by WS Federation?
+import(di,  urn:liberty:disco:2006-08, liberty-idwsf-disco-svc-v2.0.xsd)
+import(e,   http://schemas.xmlsoap.org/soap/envelope/)
+import(wsu, http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd,wss-util-1.0.xsd)
+import(tas3, http://tas3.eu/tas3/200911/)
+ns(sbf,     urn:liberty:sb)
+ns(b,       urn:liberty:sb:2006-08)
+
+&@hdrs:
+  @wsu:Id?
+  @e:mustUnderstand?
+  @e:actor?
+  @id?	 -> %xs:anyURI
+  @ID?	 -> %xs:anyURI
+  ;
+
+EndpointReference	 -> %a:EndpointReferenceType
+%EndpointReferenceType:
+  a:Address	 -> %a:AttributedURIType
+  a:ReferenceParameters?
+  a:Metadata?
+  tas3:AltAddress*  # Added by Sampo
+  @notOnOrAfter?  -> %xs:dateTime # Added by Sampo
+  &@a:hdrs          # Added by Sampo
+  any*  ns(##other)  processContents(lax)
+  @any
+  ;
+
+ReferenceParameters	 -> %a:ReferenceParametersType
+%ReferenceParametersType:
+  b:TargetIdentity*
+  any*  processContents(lax)
+  &@a:hdrs          # Added by Sampo
+  @any
+  ;
+
+Metadata	 -> %a:MetadataType
+%MetadataType:
+  sbf:Framework?
+  di:Abstract?
+  di:ProviderID?
+  di:ServiceType?
+  di:SecurityContext?
+  tas3:Trust?
+  any*  processContents(lax)
+  @rankKey -> %xs:anyURI  # Added by Sampo
+  @any
+  ;
+
+MessageID	 -> %a:AttributedURIType
+
+RelatesTo	 -> %a:RelatesToType
+%RelatesToType:	 base(xs:anyURI)
+  @RelationshipType?	 -> %a:RelationshipTypeOpenEnum  # default (http://www.w3.org/2005/08/addressing/reply)
+  &@a:hdrs          # Added by Sampo
+  @any
+  ;
+
+%RelationshipTypeOpenEnum:  union(a:RelationshipType xs:anyURI)  ;
+%RelationshipType:	 enum( http://www.w3.org/2005/08/addressing/reply ) ;
+
+ReplyTo	 -> %a:EndpointReferenceType
+From	 -> %a:EndpointReferenceType
+FaultTo	 -> %a:EndpointReferenceType
+To	 -> %a:AttributedURIType
+Action	 -> %a:AttributedURIType
+
+%AttributedURIType:	 base(xs:anyURI)
+  &@a:hdrs          # Added by Sampo
+  @any
+  ;
+
+@IsReferenceParameter	 -> %xs:boolean
+
+%FaultCodesOpenEnumType:  union(a:FaultCodesType xs:QName)
+  ;
+
+%FaultCodesType:	 enum( a:InvalidAddressingHeader a:InvalidAddress a:InvalidEPR a:InvalidCardinality a:MissingAddressInEPR a:DuplicateMessageID a:ActionMismatch a:MessageAddressingHeaderRequired a:DestinationUnreachable a:ActionNotSupported a:EndpointUnavailable ) ;
+
+RetryAfter	 -> %a:AttributedUnsignedLongType
+
+%AttributedUnsignedLongType:	 base(xs:unsignedLong)
+  &@a:hdrs          # Added by Sampo
+  @any
+  ;
+
+ProblemHeaderQName -> %a:AttributedQNameType
+
+%AttributedQNameType:	 base(xs:QName)
+  &@a:hdrs          # Added by Sampo
+  @any
+  ;
+
+ProblemHeader	 -> %a:AttributedAnyType
+
+%AttributedAnyType:
+  any*  processContents(lax)
+  &@a:hdrs          # Added by Sampo
+  @any
+  ;
+
+ProblemURI	 -> %a:AttributedURIType
+
+ProblemAction	 -> %a:ProblemActionType
+%ProblemActionType:
+  a:Action?
+  a:SoapAction? -> %xs:anyURI
+  &@a:hdrs          # Added by Sampo
+  @any
+  ;
+
+#EOF

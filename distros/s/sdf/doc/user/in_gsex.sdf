@@ -1,0 +1,71 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: A simple example
+
+H2: A sample SDF document
+
+A sample SDF document is shown below:
+
+!include "../paper/mydoc.sdf"; verbatim
+
+Note: This document (called {{FILE:mydoc.sdf}}) is provided in
+the {{FILE: doc/paper}} directory of the SDF distribution.
+
+H2: A brief explanation
+
+Comments begin with a # character as the first non-whitespace
+character on a line.
+
+Macros are embedded commands which begin with a ! as the
+first non-whitespace character on a line.
+The {{MAC:define}} macro is used to set variables.
+The value of a variable can be embedded in paragraph
+text  by using the E<2[>...E<2]> syntax.
+
+The DOC_NAME and DOC_TYPE variables are used by
+the {{MAC:build_title}} macro which creates:
+
+* a cover page (or two) for paper-based outputs
+* a title header for online outputs.
+
+Paragraphs can be tagged in different ways. For the vast majority of
+SDF documents, the only tags used are:
+
+!block table
+Tag     Meaning
+H1:     level 1 heading
+H2:     level 2 heading
+*       item in level 1 bulleted list
+-       item in level 2 bulleted list
+^       first item in level 1 ordered list
++       next item in level 1 ordered list
+>       fixed-width, verbatim text
+Note:   note
+!endblock
+
+Phrases can also be tagged in several ways. Any phrase can be tagged
+using the syntax:
+
+>  {{XYZ:...}}
+
+where XYZ is the tag. For single, uppercase character tags like
+I (Italics) and B (Bold), POD-style syntax is also supported:
+
+>  X<...>
+
+where X is the tag.
+
+Tables can be specified using the {{FILT:table}} filter, typically
+in combination with the {{MAC:block}} and {{MAC:endblock}} macros.
+The first row is the headings. Remaining rows are data.

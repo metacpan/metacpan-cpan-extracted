@@ -1,17 +1,23 @@
-use Test::More tests => 1;
+use Test::More tests => 18;
 
-my $ok;
-END { BAIL_OUT "Could not load all modules" unless $ok }
-use Riak::Light;
-use Riak::Light::PBC;
-use Riak::Light::Connector;
-use Riak::Light::Driver;
-use Riak::Light::Timeout;
-use Riak::Light::Timeout::Alarm;
-use Riak::Light::Timeout::Select;
-use Riak::Light::Timeout::SelectOnRead;
-use Riak::Light::Timeout::TimeOut;
-use Riak::Light::Util;
+BEGIN {
+    use_ok('Riak::Light');
+    use_ok('Riak::Light::PBC');
+    use_ok('Riak::Light::Connector');
+    use_ok('Riak::Light::Driver');
+    use_ok('Riak::Light::Timeout');
+    use_ok('Riak::Light::Timeout::Alarm');
+    use_ok('Riak::Light::Timeout::Select');
+    use_ok('Riak::Light::Timeout::SelectOnRead');
+    use_ok('Riak::Light::Timeout::TimeOut');
+}
 
-ok 1, 'All modules loaded successfully';
-$ok = 1;
+require_ok('Riak::Light');
+require_ok('Riak::Light::PBC');
+require_ok('Riak::Light::Connector');
+require_ok('Riak::Light::Driver');
+require_ok('Riak::Light::Timeout');
+require_ok('Riak::Light::Timeout::Alarm');
+require_ok('Riak::Light::Timeout::Select');
+require_ok('Riak::Light::Timeout::SelectOnRead');
+require_ok('Riak::Light::Timeout::TimeOut');

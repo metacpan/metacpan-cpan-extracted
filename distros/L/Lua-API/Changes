@@ -1,0 +1,28 @@
+Revision history for Perl extension Lua::State.
+
+0.04  Mon Apr 18 18:04:27 EDT 2011
+
+  * fix META.yml for CPAN
+
+0.03  Fri Mar  4 12:08:11 2011
+
+  [BUG FIXES]
+
+  * interfaces to Lua API routines which throw errors now properly
+    handle them
+
+  [TODO]
+
+  * luaL_checkoption is not correctly implemented
+
+
+0.02  Thu Feb 24 2011
+
+  [BUG FIXES]
+
+   * lua_error is now properly implemented.  Hopefully.
+
+0.01  Mon Jun 21 14:04:35 2010
+	- original version
+
+

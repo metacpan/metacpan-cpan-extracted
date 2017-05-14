@@ -1,0 +1,15 @@
+__tuning[]
+__endtuning[]
+A1[orig_style='H1']Heading 1 inside an appendix block
+A2[orig_style='H2']Purpose
+N[orig_style='N']This manual provides an overview of ...
+N[orig_style='N']Directions for ... are also provided.
+A2[orig_style='H2']Scope
+N[orig_style='N']This manual contains:
+LF1[orig_style='LF1']a summary of ...
+LN1[orig_style='LN1']an overview of ...
+N[orig_style='N']The following documents may also be of interest:
+LU1[orig_style='LU1']abc
+LU1[orig_style='LU1']xyz
+H2[orig_style='H2']See Also
+N[orig_style='N']The person next to you.

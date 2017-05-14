@@ -1,0 +1,4629 @@
+  $Revision: 1.17a $ $Date: 2004/05/11 $ by D.OFFILER for RO/V2-v1.4 $
+
+ 001003 WMO REGION OR GEOGRAPHICAL AREA
+0  ANTARCTICA
+1  AFRICA
+2  ASIA
+3  S AMERICA
+4  N AMERICA
+5  SW PACIFIC
+6  EUROPE
+
+   001007 SATELLITE IDENTIFIER
+  1   ERS 1
+  2   ERS 2
+  3   METOP-1
+  4   METOP-2
+  5   METOP-3
+  20  SPOT 1
+  21  SPOT 2
+  22  SPOT 3
+  23  SPOT 4
+  40  OERSTED                                                      !1.17a
+  41  CHAMP                                                        !1.17a
+  50  METEOSAT 3
+  51  METEOSAT 4
+  52  METEOSAT 5
+  53  METEOSAT 6
+  54  METEOSAT 7
+  55  METEOSAT 8                                                   !1.17a
+  56  METEOSAT 9                                                   !1.17a
+  57  METEOSAT 10                                                  !1.17a
+  58  METEOSAT 1                                                   !1.17a
+  59  METEOSAT 2                                                   !1.9
+  60  ENVISAT                                                      !1.17a
+  70  METEOSAT 11                                                  !1.17a
+  120 ADEOS-2                                                      !1.13
+  150 GMS 3
+  151 GMS 4
+  152 GMS 5
+  171 MTSAT-1R                                                     !1.11
+  200 NOAA 8
+  201 NOAA 9
+  202 NOAA 10
+  203 NOAA 11
+  204 NOAA 12
+  205 NOAA 14
+  206 NOAA 15
+  207 NOAA 16
+  208 NOAA 17
+  209 NOAA 18
+  220 LANDSAT 5                                                    !1.9
+  221 LANDSAT 4                                                    !1.9
+  222 LANDSAT 7
+  240 DMSP 7
+  241 DMSP 8
+  242 DMSP 9
+  243 DMSP 10
+  244 DMSP 11
+  245 DMSP 12
+  246 DMSP 13                                                      !1.9
+  247 DMSP 14                                                      !1.9
+  248 DMSP 15                                                      !1.9
+  249 DMSP 16                                                      !1.9
+  250 GOES 6
+  251 GOES 7
+  252 GOES 8
+  253 GOES 9
+  254 GOES 10
+  255 GOES 11
+  256 GOES 12
+  260 JASON-1                                                      !1.14
+  261 JASON-2                                                      !1.14
+  281 QUIKSCAT                                                     !1.9
+  310 GOMS 1
+  311 GOMS 2
+  320 METEOR 2-21
+  321 METEOR 3-5
+  322 METEOR 3M-1
+  323 METEOR 3M-2
+  341 RESURS 01-4
+  430 INSAT 1B
+  431 INSAT 1C
+  432 INSAT 1D
+  450 INSAT 2A
+  451 INSAT 2B
+  452 INSAT 2E
+  470 INSAT 3A
+  471 INSAT 3D
+  472 INSAT 3E
+  500 FY-1C
+  501 FY-1D
+  510 FY-2
+  700 TIROS M (ITOS 1)
+  701 NOAA 1
+  702 NOAA 2
+  703 NOAA 3
+  704 NOAA 4
+  705 NOAA 5
+  706 NOAA 6
+  707 NOAA 7
+  708 TIROS-N
+  710 GOES (SMS 1)
+  711 GOES (SMS 2)
+  720 TOPEX                                                        !1.14
+  721 GFO           (GEOSAT follow-on)                             !1.14
+  722 GRACE A                                                      !1.17a
+  723 GRACE B                                                      !1.17a
+  731 GOES 1
+  732 GOES 2
+  733 GOES 3
+  734 GOES 4
+  735 GOES 5
+  740 COSMIC-1                                                     !1.17a
+  741 COSMIC-2                                                     !1.17a
+  742 COSMIC-3                                                     !1.17a
+  743 COSMIC-4                                                     !1.17a
+  744 COSMIC-5                                                     !1.17a
+  745 COSMIC-6                                                     !1.17a
+  763 NIMBUS 3                                                     !1.17a
+  764 NIMBUS 4                                                     !1.17a
+  765 NIMBUS 5                                                     !1.17a
+  766 NIMBUS 6                                                     !1.17a
+  767 NIMBUS 7                                                     !1.17a
+  780 ERBS                                                         !1.17a
+  781 UARS                                                         !1.17a
+  782 EARTH PROBE                                                  !1.17a
+  783 TERRA                                                        !1.17a
+  784 AQUA                                                         !1.17a
+  800 SUNSAT                                                       !1.13
+  820 SAC-C                                                        !1.13
+
+  001031 ORIGINATING/GENERATING CENTRE                             !1.17
+1   AMMC MELBOURNE
+2        MELBOURNE
+4   RUMS MOSCOW
+5        MOSCOW
+7   KWBC WASHINGTON (NCEP)
+8   KWXX US W/SERVICE (NWSTG)
+10  HECA CAIRO  RMC
+11       CAIRO  RMC
+12  GOOY DAKAR  RMC
+13       DAKAR  RMC
+14  HKNA NAIROBI RMC
+15       NAIROBI RMC
+16  FMMD ANTANANARIVO       (not in Manual)
+17       ANTANANARIVO       (not in Manual)
+18  DTTV TUNIS-CASABLANCA
+19       TUNIS-CASABLANCA
+20  SPLP LAS PALMAS
+21  DAMM ALGIERS
+22  LPLG LAGOS  RMS         (not in Manual)
+23       LAGOS  RMS         (not in Manual)
+24  FAPR PRETORIA                                                  !1.17
+25  FME  LA REUNION                                                !1.17
+26  RUKH KHABAROVSK
+27       KHABAROVSK
+28  DEMS NEW DELHI
+29       NEW DELHI
+30  UNNN NOVOSIBIRSK
+31       NOVOSIBIRSK
+32  RUTK TASHKENT
+33       JEDDAH
+34  RJTD TOKYO
+35       TOKYO RMC
+36  VTBB BANGKOK
+37  MNUB ULAN BATOR
+38  BABJ BEIJING
+39       BEIJING
+40  RKSL SEOUL
+41  SABM BUENOS AIRES
+42       BUENOS AIRES
+43  SBBR BRASILIA
+44       BRASILIA
+45  SCSC SANTIAGO
+46       BRAZILIAN SA - INPE
+51  KMIA MIAMI
+52       MIAMI  HURRICANE CENTRE
+53  CWAO MONTREAL RMC
+54       MONTREAL RMC
+55  KSFO SANFRANCISCO
+57  KARS US AIR FORCE (ARGOS COMMUNICATIONS CENTRE, LANDOVER, MD)
+58  KMRY US NAVY, MONTEREY
+59  KBOU BOULDER (NOAA FORECAST LAB)
+60  KNCR NCAR                                                      !1.17a
+61       Service ARGOS (Landover)                                  !1.11
+62       US Naval Oceanographic Office                             !1.17
+64  PHNL HONOLULU
+65  ADRM DARWIN
+66       DARWIN
+67  AMMC MELBOURNE
+69  NZKL WELLINGTON
+70       WELLINGTON
+71  NFFN NADI (FIJI)                                               !1.17
+74  EGRR UK MET OFFICE
+75       UK MET OFFICE
+76       MOSCOW
+78  EDZW OFFENBACH
+79       OFFENBACH
+80  LIIB ROME   RMC
+81       ROME   RMC
+82  BGSF SONDRE/STROMFJORD GREENLAND ??? (Manual says Norrkoping)  !1.17
+83  ESWI NORRKOPING RMC
+84       Toulouse                                                  !1.11
+85  LFPW TOULOUSE
+86  EFKL HELSINKI
+87  LYMB BELGRADE
+88  ENMI OSLO
+89  LKPR PRAGUE
+90  LCRO EPISKOPI
+91  LTAA ANKARA
+92  EDDZ FRANKFURT/MAIN
+93  EGRB LONDON WAFC
+94  EKCH COPENHAGEN
+95  LERT ROTA
+96  LGAT ATHENS
+97  EESA ESA
+98  ECMF ECMWF
+99  EHDB DE BILT
+110 VHHH HONG KONG                                                 !1.17
+160      NOAA/NESDIS                                               !1.17
+210      FRASCATI (ESA/ESRIN)                                      !1.17
+211 LFRO LANNION                                                   !1.17
+212 LPPT LISBOA                                                    !1.17
+213 BIRK REYKJAVIK                                                 !1.17
+214      MADRID                                                    !1.17
+215 LSZH ZURICH                                                    !1.17
+216      ARGOS (Toulouse)                                          !1.17
+217 LZIB BRATISLAVA                                                !1.17
+218 LHBP BUDAPEST                                                  !1.17
+219 LJLJ LJUBLJANA                                                 !1.17
+220 EPWA WARSAW                                                    !1.17
+221 LDZA ZAGREB                                                    !1.17
+254      EUMETSAT                                                  !1.17
+
+ 001033 ORIGINATING/GENERATING CENTRE (SEE 001031)
+
+ 001090 Technique for making up initial perturbations             !1.14
+0  Lagged-average forecasting
+1  Breeding
+2  Singular vectors
+3  Multiple analysis cycles
+
+ 001092 Type of ensemble forecast                                 !1.14
+0  High-resolution unperturbed control forecast
+1  Low-resolution unperturbed control forecast
+2  Negatively perturbed forecast
+3  Positively perturbed forecast
+
+ 001193 SFERICS SELECTOR STATION
+0
+1  TARGET SYSTEM (BEAUFORT PARK)
+2  HEMSBY
+3  CAMBORNE
+4  STORNOWAY
+5  LERWICK
+6  CYPRUS
+7
+8  B-MODEL     (BEAUFORT PARK)
+9  GIBRALTAR
+
+ 001212 TAF/METAR PARALLEL RUNWAY INDICATORS
+0  FAR LEFT
+1  LEFT
+2  CENTRE
+3  RIGHT
+4  FAR RIGHT
+5  ALL
+
+ 001213 TAKE-OFF/LANDING RUNWAY INDICATOR
+0
+1  TAKE-OFF
+2  LANDING
+
+ 001224 SOURCE OF DATA USED IN CHECK
+0  NOT UKMO
+1  UKMO NWP
+2  UKMO NOT NWP
+
+ 002001 TYPE OF STATION
+0  AUTOMATIC
+1  MANNED
+2  HYBRID
+
+ 002002 TYPE OF INSTRUMENTATION FOR WIND MEASUREMENT  (4-BIT FLAG TABLE)
+1  CERTIFIED
+2  WAS IN KNOTS
+3  WAS IN KM/H
+
+ 002003 TYPE OF MEASURING EQUIPMENT USED (PILOTS ONLY)
+0  PRESSURE
+1  OPTIC THEOD
+2  RADAR THEOD
+3  RADAR
+4  VLF-OMEGA
+5  LORAN-C
+6  WIND PROFILE
+7  SATELLITE NAVIGATION
+8  RASS         Radio-Acoustic Sounding System                     !1.9
+9  SODAR                                                           !1.9
+10
+11
+12
+13
+14 PRESS FAILED DURING ASCENT
+
+ 002004 INSTRUMENT FOR EVAPORATION OR CROP FOR EVAPOTRANSPIRATION REPORT
+0  Open pan, no cover (USA)
+1  Open pan, mesh-covered (USA)
+2  GGI-3000EVAP
+3  20 MXX2 TANK
+4  OTHERS
+5  RICE
+6  WHEAT
+7  MAIZE
+8  SORGHUM
+9  OTHER CROPS
+
+ 002011 RADIOSONDE TYPE
+0
+1
+2  REFLECTOR   OR OTHER PASSIVE TARGET
+3  TRANSPONDER OR OTHER ACTIVE TARGET
+4  PASSIVE T-RH  TEMP-HUMIDITY PROFILER
+5  ACTIVE T-RH   TEMP-HUMIDITY PROFILER
+6  RADIO-ACOUSTIC SOUNDER
+7
+8
+9  NO SONDE    SYSTEM UNKNOWN
+10 VIZ TYPE A  (USA)
+11 VIZ TYPE B  (USA)
+12 SDC         (SPACE DATA CORPORATION USA)
+13 ASTOR       (NO LONGER MADE, AUSTRALIA)
+14 VIZ MICROSONDE (USA)
+15 EEC TYPE 23 (USA)
+16 ELIN        (AUSTRIA)
+17 GRAW G      (GERMANY)
+18
+19 GRAW M60    (GERMANY)
+20 INDIAL MK3  (INDIA)
+21 JINYANG     (SOUTH KOREA)
+22 MEISEI SR2-80 (JAPAN)
+23 FMO 1950A   MENSURAL (FRANCE)
+24 FMO 1945A   MENSURAL (FRANCE)
+25 MH73A       MENSURAL (FRANCE)
+26 BASORA      (SWITZERLAND)
+27 AVK-MRZ     (USSR)
+28 MARZ2-1     METEORIT (USSR)
+29 MARZ2-2     METEORIT (USSR)
+30 OKI RS2-80  (JAPAN)
+31 VIZ/VALCOM A TYPE (CANADA)
+32 SHANGHAI RADIO (CHINA)
+33 UK MK3      (UK)
+34 VINOHRADY   (CZECHOSLOVAKIA)
+35 VAISALA 18  (FINLAND)
+36 VAISALA 21  (FINLAND)
+37 VAISALA 80  (FINLAND)
+38 VIZ LOCATE  (LORAN-C) (USA)
+39 SPRENGER 76 (GERMANY)
+40 SPRENGER 84 (GERMANY)
+41 SPRENGER 85 (GERMANY)
+42 SPRENGER 86 (GERMANY)
+43 IS-4A-1680  (UK)
+44 IS-4A-1680 X (UK)
+45 RS MSS
+46 IS-4A-403   (USA)
+47 MEISEI RS2-91 (JAPAN)
+48 VALCOM      (CANADA)
+49 VIZ MARK II (USA)
+50 GRAW DFM-90 (GERMANY)
+51 VIZ-B2      (USA)
+52 RS80-57H    (Vaisala)
+53 AVK-RF95    (RUSSIA)                                            !1.9
+54 GRAW DFM-97 (Germany)                                           !1.11
+55
+56
+57
+58
+59
+60 RS80/MICROCORA VAISALA (FINLAND)
+61 RS80/Loran/Digicora I,II or Marwin (Vaisala, Finland)           !1.11
+62 RS80/PCCORA    VAISALA (FINLAND)
+63 RS80/STAR      VAISALA (FINLAND)
+64 909-11-XX
+65 VIZ 1499-520
+66 RS80/Autosonde (Finland)                                        !1.11
+67 RS80/DIGICORA III (Finland)                                     !1.11
+68
+69
+70
+71 RS90/Loran/Digicora I,II or Marwin (Vaisala, Finland)           !1.11
+72 RS90/PC-CORA (Vaisala, Finland)                                 !1.11
+73 RS90/Autosonde (Vaisala, Finland)                               !1.11
+74 RS90/Star    (Vaisala, Finland)                                 !1.11
+75 AVK-MRZ-ARMA  (RUSSIA)                                          !1.9
+76 AVK-RF95-ARMA (RUSSIA)                                          !1.9
+77 GL98 GEOLINK GPSonde (FRANCE)                                   !1.9
+78 RS90/DIGICORA III (Finland)                                     !1.11
+79
+80
+81
+82 MK2 GPS/STAR (SIPPICAN, USA)                                    !1.11
+83 MK2 GPS/W9000 (SIPPICAN, USA)                                   !1.11
+84
+85
+86
+87
+88
+89
+90 Unknown
+91 P-only
+92 P-only + transponder
+93 P-only + radar reflector
+94 No P + transponder
+95 No P + radar reflector
+96 Descending
+
+ 002013 SOLAR AND INFRARED RADIATION CORRECTION
+0  NONE
+1  CIMO SOL I/R CIMO SOLAR CORRECTED AND CIMO INFRARED CORRECTED
+2  I/R CIMO SOL CIMO SOLAR CORRECTED AND INFRARED CORRECTED
+3  CIMO SOL     CIMO SOLAR CORRECTED ONLY
+4  AUTO SOL I/R SOLAR AND I/R CORRECTED AUTOMATICALLY BY SONDE SYSTEM
+5  AUTO SOL     SOLAR CORRECTED AUTOMATICALLY BY SONDE SYSTEM
+6  SPEC SOL I/R SOLAR AND INFRARED CORRECTED AS SPECIFIED BY COUNTRY
+7  SPEC SOL     SOLAR CORRECTED AS SPECIFIED BY COUNTRY
+
+ 002014 TRACKING TECHNIQUE/SYSTEM STATUS
+0  NO WIND FINDING
+1  AUTO OPTICAL  AUTOMATIC WITH AUXILIARY OPTICAL DIRECTION FINDING
+2  AUTO RADIO    AUTOMATIC WITH AUXILIARY RADIO DIRECTION FINDING
+3  AUTO RANGING  AUTOMATIC WITH AUXILIARY RANGING
+4
+5  AUTO VLF-OMEGA SIGNALS
+6  AUTO LORAN-C  AUTOMATIC CROSS CHAIN LORAN-C
+7  AUTO PROFILER AUTOMATIC WITH AUXILIARY WIND PROFILER
+8  AUTO SAT NAV  AUTOMATIC SATELLITE NAVIGATION
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20 SHIP STOPPED
+21 SHIP DIVERTED
+22 SHIP DELAYED
+23 BOX DAMAGED
+24 POWER FAILED
+25
+26
+27
+28
+29 OTHER
+30 POWER FAILED
+31 UPS FAILED
+32 REC HARDWARE
+33 REC SOFTWARE
+34 PROC HARDWARE
+35 PROC SOFTWARE
+36 NAVAID FAIL
+37 GAS SHORTAGE
+38
+39 OTHER
+40 MECH DEFECT
+41 HAND LAUNCHER
+42 POWER
+43 CONTROL
+44 PNEUMATIC
+45 OTHER
+46 COMPRESSOR
+47 BALLOON
+48 BALLOON RLSE
+49 LAUNCHER
+50 R/S ANTENNA
+51 NAVAID ANTENNA
+52 R/S CABLE
+53 NAVAID CABLE
+54
+55
+56
+57
+58
+59 OTHER
+60 ASAP DEFECT
+61 DATA REJECTED
+62 NO POWER
+63 CABLE BROKEN
+64 CABLE DEFECT
+65 POWER LOW
+66
+67
+68
+69 OTHER
+70 ALL NORMAL
+
+ 002015 RADIOSONDE COMPLETENESS
+0
+1  P-ONLY       PRESSURE-ONLY RADIOSONDE
+2  P-ONLY,TRANS PRESSURE-ONLY RADIOSONDE PLUS TRANSPONDER
+3  P-ONLY,RADAR PRESSURE-ONLY RADIOSONDE PLUS RADAR REFLECTOR
+4  NO-P,TRANS   NO-PRESSURE RADIOSONDE PLUS TRANSPONDER
+5  NO-P,RADAR   NO-PRESSURE RADIOSONDE PLUS RADAR REFLECTOR
+
+ 002016 Radiosonde configuration (5-BIT FLAG TABLE)                !1.14
+1  Train regulator
+2  Light unit
+3  Parachute
+4  Rooftop release
+
+   002019 SATELLITE INSTRUMENTS                                    !1.12
+  10  AATSR                                                        !1.12
+  11  ATSR                                                         !1.12
+  12  ATSR-2                                                       !1.12
+  13  MWR                                                          !1.12
+  30  ARGOS                                                        !1.12
+  40  Laser reflectors                                             !1.12
+  41  DORIS                                                        !1.12
+  45  POSEIDON                                                     !1.12
+  47  SSALT                                                        !1.12
+  52  HRV                                                          !1.12
+  53  HRVIR                                                        !1.12
+  54  ScaRaB/MV2                                                   !1.12
+  55  POLDER                                                       !1.12
+  60  VEGETATION                                                   !1.12
+  61  WINDII                                                       !1.12
+  80  RADARSAT DTT                                                 !1.12
+  81  RADARSAT TTC                                                 !1.12
+  85  SAR (CSA)                                                    !1.12
+  90  MOPITT                                                       !1.12
+  97  Panchromatic imager                                          !1.12
+  101 Imaging spectrometer                                         !1.12
+  102 CHAMP GPS sounder                                            !1.12
+  116 CHAMP gravity package (Accelerometer + GPS)                  !1.12
+  117 CHAMP magnetometry package (1 scalar + 2 vector magnetometer)!1.13
+  120 ENVISAT Comms                                                !1.12
+  121 ERS Comms                                                    !1.12
+  140 AMI/SAR/image                                                !1.12
+  141 AMI/SAR/wave                                                 !1.12
+  142 AMI/scatterometer                                            !1.12
+  143 ASAR                                                         !1.12
+  147 RA-2/MWR                                                     !1.12
+  148 RA/MWR                                                       !1.12
+  161 MIPAS                                                        !1.12
+  172 GOMOS                                                        !1.12
+  174 MERIS                                                        !1.12
+  175 SCIAMACHY                                                    !1.12
+  181 METEOSAT Comms                                               !1.12
+  200 GERB                                                         !1.12
+  202 GRAS                                                         !1.12
+  203 MHS                                                          !1.12
+  205 MVIRI                                                        !1.12
+  207 SEVIRI                                                       !1.12
+  220 GOME-2                                                       !1.12
+  221 IASI                                                         !1.12
+  240 DCP                                                          !1.12
+  245 CCD                                                          !1.12
+  250 WFI                                                          !1.12
+  255 IRMSS                                                        !1.12
+  260 BSS & FSS transponders                                       !1.12
+  261 DRT-S&R                                                      !1.12
+  262 INSAT Comms                                                  !1.12
+  268 HR-PAN                                                       !1.12
+  269 MSMR                                                         !1.12
+  270 VHRR                                                         !1.12
+  271 WiFS                                                         !1.12
+  276 LISS-I                                                       !1.12
+  277 LISS-II                                                      !1.12
+  278 LISS-III                                                     !1.12
+  279 LISS-IV                                                      !1.12
+  284 PAN                                                          !1.12
+  285 MOS                                                          !1.12
+  290 MTSAT Comms                                                  !1.12
+  295 IMAGER/MTSAT                                                 !1.12
+  296 VISSR                                                        !1.12
+  301 LRA                                                          !1.12
+  302 MBLA                                                         !1.12
+  312 NSCAT                                                        !1.12
+  313 SeaWinds                                                     !1.12
+  330 ACRIM                                                        !1.12
+  334 BUV                                                          !1.12
+  336 ALI                                                          !1.12
+  347 ASTER                                                        !1.12
+  348 CERES-2                                                      !1.12
+  350 ETM+                                                         !1.12
+  351 GPSDR                                                        !1.12
+  353 HiRDLS                                                       !1.12
+  354 HRDI                                                         !1.12
+  356 LIS                                                          !1.12
+  358 PEM                                                          !1.12
+  359 SeaWiFS                                                      !1.12
+  360 SUSIM (UARS)                                                 !1.12
+  363 SBUV/1                                                       !1.12
+  365 TMI                                                          !1.12
+  366 JMR                                                          !1.12
+  369 LIMS                                                         !1.12
+  370 LRIR                                                         !1.12
+  375 VIRS                                                         !1.12
+  382 CLAES                                                        !1.12
+  383 HALOE                                                        !1.12
+  384 ISAMS                                                        !1.12
+  385 MISR                                                         !1.12
+  386 MLS                                                          !1.12
+  387 MLS (EOS-CHEM)                                               !1.12
+  389 MODIS                                                        !1.12
+  395 Atmospheric corrector                                        !1.12
+  396 Hyperion                                                     !1.12
+  399 SAGE I                                                       !1.12
+  400 SAGE II                                                      !1.12
+  401 SAGE III                                                     !1.12
+  402 SAMS                                                         !1.12
+  403 SAM-II                                                       !1.12
+  404 IRIS                                                         !1.12
+  420 AIRS                                                         !1.12
+  426 SOLSTICE                                                     !1.12
+  430 TES                                                          !1.12
+  431 TOMS                                                         !1.12
+  450 ADEOS Comms                                                  !1.12
+  451 DCS (NASDA)                                                  !1.12
+  453 GMS Comms                                                    !1.12
+  454 JERS-1 Comms                                                 !1.12
+  460 RIS                                                          !1.12
+  461 PR                                                           !1.12
+  462 SAR                                                          !1.12
+  482 AVNIR                                                        !1.12
+  485 MESSR                                                        !1.12
+  486 MSR                                                          !1.12
+  487 OCTS                                                         !1.12
+  488 OPS                                                          !1.12
+  489 VISSR (GMS-5)                                                !1.12
+  490 VTIR                                                         !1.12
+  510 ILAS-I                                                       !1.12
+  511 ILAS-II                                                      !1.12
+  512 IMG                                                          !1.12
+  540 DCS (NOAA)                                                   !1.12
+  541 GOES Comms                                                   !1.12
+  542 LANDSAT Comms                                                !1.12
+  543 NOAA Comms                                                   !1.12
+  544 S&R (GOES)                                                   !1.12
+  545 S&R (NOAA)                                                   !1.12
+  546 WEFAX                                                        !1.12
+  547 WEM (GOES)                                                   !1.12
+  560 HIRS/2 + SBUV/2                                              !1.12
+  570 AMSU-A                                                       !1.12
+  571 AMSU-A1-1                                                    !1.12
+  574 AMSU-B                                                       !1.12
+  580 ATOVS (HIRS/3 + AMSU + AVHRR/3)                              !1.12
+  590 AVHRR/2                                                      !1.12
+  591 AVHRR/3                                                      !1.12
+  592 AVHRR/4                                                      !1.12
+  600 ERBE                                                         !1.12
+  601 ETM+                                                         !1.12
+  605 HIRS/2                                                       !1.12
+  606 HIRS/3                                                       !1.12
+  607 HIRS/4                                                       !1.12
+  615 IMAGER                                                       !1.12
+  620 CrIRS/NP                                                     !1.12
+  622 MSS                                                          !1.12
+  623 MSU                                                          !1.12
+  624 SBUV/2                                                       !1.12
+  625 SBUV/3                                                       !1.12
+  626 SOUNDER                                                      !1.12
+  627 SSU                                                          !1.12
+  628 TM                                                           !1.12
+  629 TOVS (HIRS/2 + MSU + SSU)                                    !1.12
+  630 VAS                                                          !1.12
+  631 SSZ                                                          !1.12
+  645 SEM                                                          !1.12
+  650 MVIRSR (10 channel)                                          !1.12
+  651 MVIRSR (3 channel)                                           !1.12
+  652 MVIRSR (5 channel)                                           !1.12
+  670 RLSBO                                                        !1.12
+  682 RM-08                                                        !1.12
+  685 TRASSER                                                      !1.12
+  700 KONDOR-2                                                     !1.12
+  701 BRK                                                          !1.12
+  710 ALISSA                                                       !1.12
+  712 Balkan-2 lidar                                               !1.12
+  715 MK-4                                                         !1.12
+  716 MK-4M                                                        !1.12
+  730 Greben                                                       !1.12
+  731 SAR-10                                                       !1.12
+  732 SAR-3                                                        !1.12
+  733 SAR-70                                                       !1.12
+  740 SLR-3                                                        !1.12
+  745 Travers SAR                                                  !1.12
+  750 174-K                                                        !1.12
+  751 BTVK                                                         !1.12
+  752 Chaika                                                       !1.12
+  753 DELTA-2                                                      !1.12
+  755 IKAR-D                                                       !1.12
+  756 IKAR-N                                                       !1.12
+  757 IKAR-P                                                       !1.12
+  760 ISP                                                          !1.12
+  761 KFA-1000                                                     !1.12
+  762 KFA-200                                                      !1.12
+  763 KFA-3000                                                     !1.12
+  770 Klimat                                                       !1.12
+  771 Klimat-2                                                     !1.12
+  775 MIRAS                                                        !1.12
+  776 MIVZA                                                        !1.13
+  777 MIVZA-M                                                      !1.12
+  780 MR-2000                                                      !1.12
+  781 MR-2000M                                                     !1.12
+  785 MR-900                                                       !1.12
+  786 MR-900B                                                      !1.12
+  790 MSU-E                                                        !1.12
+  791 MSU-E1                                                       !1.12
+  792 MSU-E2                                                       !1.12
+  793 MSU-M                                                        !1.12
+  794 MSU-S                                                        !1.12
+  795 MSU-SK                                                       !1.12
+  796 MSU-V                                                        !1.12
+  810 MTZA                                                         !1.12
+  815 MZOAS                                                        !1.12
+  820 R-225                                                        !1.12
+  821 R-400                                                        !1.12
+  822 R-600                                                        !1.12
+  830 RMS                                                          !1.12
+  835 TV camera                                                    !1.12
+  836 SILVA                                                        !1.12
+  840 SROSMO                                                       !1.12
+  850 BUFS-2                                                       !1.12
+  851 BUFS-4                                                       !1.12
+  855 ISTOK-1                                                      !1.12
+  856 SFM-2                                                        !1.12
+  857 DOPI                                                         !1.12
+  858 KGI-4                                                        !1.12
+  859 Ozon-M                                                       !1.12
+  860 RMK-2                                                        !1.12
+  900 MAXIE                                                        !1.12
+  901 OLS                                                          !1.12
+  905 SSM/I                                                        !1.12
+  906 SSM/T-1                                                      !1.12
+  907 SSM/T-2                                                      !1.12
+  910 SXI                                                          !1.12
+  930 EHIC                                                         !1.12
+  931 X-ray astronomy payload                                      !1.12
+
+   002020 SATELLITE CLASSIFICATION
+  0   NIMBUS
+  1   VTPR
+  2   TIROS 1 (TIROS, NOAA-6 TO NOAA-13)
+  3   TIROS 2 (NOAA-14 ONWARDS)
+  31  DMSP
+  61  EUMETSAT POLAR SYSTEM (EPS)
+  91  ERS
+  121 ADEOS
+  241 GOES
+  261 JASON                                                        !1.14
+  271 GMS
+  301 INSAT
+  331 METEOSAT OPERATIONAL PROGRAMME (MOP)
+  332 METEOSAT TRANSITIONAL PROGRAMME (MTP)
+  333 METEOSAT SECOND GENERATION PROGRAMME (MSG)
+  351 GOMS
+  381 FY-2
+  401 GPS                                                          !1.14
+  402 GLONASS                                                      !1.14
+  403 GALILEO                                                      !1.14
+
+ 002021 SATELLITE INSTRUMENT USED  (9-BIT FLAG TABLE)
+1  HIRS
+2  MSU
+3  SSU
+4  AMI WIND
+5  AMI WAVE
+6  AMI IMAGE
+7  RADAR ALTIM
+8  ATSR
+
+ 002022 SATELLITE DATA-PROCESSING TECHNIQUE USED  (8-BIT FLAG TABLE)
+1  NOT DEFINED
+2  REGRESSION
+3  CLEAR PATH
+4  PARTLY CLOUD
+5  CLOUDY PATH
+
+ 002023 SATELLITE DERIVED WIND COMPUTATION METHOD                  !1.9
+0
+1  INFRARED     MOTION OBSERVED IN THE INFRARED CHANNEL
+2  VISIBLE      MOTION OBSERVED IN THE VISIBLE CHANNEL
+3  VAPOUR CLOUD MOTION OBSERVED IN THE WATER VAPOUR CHANNEL
+4  COMBINATION  MOTION OBSERVED IN A COMBINATION OF SPECTRAL CHANNELS
+5  VAPOUR CLEAR MOTION OBSERVED IN THE WATER VAPOUR CHANNEL IN CLEAR AIR
+6  OZONE        MOTION OBSERVED IN THE OZONE CHANNEL
+7  VAPOUR       MOTION OBSERVED IN WATER VAPOUR CHANNEL (CLOUD OR CLEAR)
+
+ 002024 INTEGRATED MEAN HUMIDITY COMPUTATIONAL METHOD
+0
+1  TABLE WITH FULL RANGE OF HUMIDITY VARIATION IN LAYER
+2  REGRESSION TECHNIQUE ON 2 HUMIDITY VALUES IN LAYER
+
+ 002025 SATELLITE CHANNEL   (25-BIT FLAG TABLE)
+1
+2  WATER: HIRS
+3  WATER: MSU
+4
+5
+6  TROP: HIRS
+7  TROP: MSU
+8
+9
+10 OZONE: 7HIRS
+11 OZONE: 5HIRS
+12 OZONE: MSU
+13
+14
+15 TEMP A: HIRS
+16 TEMP A:HIRS*
+17 TEMP A: MSU
+18 TEMP A: SKIN
+19
+20
+21 TEMP C:HIRS*
+22 TEMP C: SSU
+23 TEMP C: MSU
+
+ 002030 METHOD OF CURRENT MEASUREMENT
+0
+1  ADCP          Acoustic Doppler Current Profiler                 !1.9
+2  GEK           GEOMAGNETIC ELECTROKINETOGRAPH
+3  3-6HR FIXES   SHIPS'S SET & DRIFT DETERMINED BY FIXES 3-6 HRS APART
+4  7-11HR FIXES  SHIPS'S SET & DRIFT DETERMINED BY FIXES 7-11 HRS APART
+5  Buoy's drift                                                   !1.13
+
+ 002031 DURATION AND TIME OF CURRENT MEASUREMENT
+0
+1  INSTANT, H-1
+2  <3 MIN, H-1
+3  3-6 MIN, H-1
+4  6-12 MIN,H-1
+5  INSTANT, H-2
+6  <3 MIN, H-2
+7  3-6 MIN, H-2
+8  6-12 MIN,H-2
+9
+10
+11 <1 HOUR
+12 1-2 HOURS
+13 2-4 HOURS
+14 4-8 HOURS
+15 8-12 HOURS
+16 12-18 HOURS
+17 18-24 HOURS
+18
+19 NOT BY DRIFT
+
+ 002032 INDICATOR FOR DIGITISATION
+0  SELECT DEPTH
+1  SIGNIF DEPTH
+
+ 002033 METHOD OF SALINITY/DEPTH MEASUREMENT
+0  NOT MEASURED
+1  SENSOR, <.02
+2  SENSOR, >.02
+3  SAMPLE
+
+ 002034 DROGUE TYPE                                               !1.13
+0  Unspecified                                                    !1.13
+1  Holey sock                                                     !1.13
+2  TRISTAR                                                        !1.13
+3  Window shade                                                   !1.13
+4  Parachute                                                      !1.13
+5  Sea anchor  (non-Lagrangian)                                   !1.13
+
+ 002036 BUOY TYPE
+0  DRIFTING
+1  FIXED
+2  Sub-surface float (moving)                                     !1.13
+
+ 002037 METHOD OF TIDAL OBSERVATION
+0
+1  TIDE STAFF
+2  MANUAL SINGLE
+3  MANUAL MULTI
+4  AUTO SINGLE
+5  AUTO MULTI
+
+ 002038 METHOD OF SEA SURFACE TEMPERATURE MEASUREMENT
+0  SHIP INTAKE
+1  BUCKET
+2  HULL CONTACT
+3  REVERSING
+4  STD/CTD
+5  MECHANICAL
+6  EXPENDABLE
+7  DIGITAL
+8  THERMISTOR
+9  INFRARED
+10 MICROWAVE
+
+ 002039 METHOD OF WET BULB TEMPERATURE MEASUREMENT
+0  MEASURED
+1  ICED MEASURED
+2  COMPUTED
+3  ICED COMPUTED
+
+ 002040 METHOD OF REMOVING VELOCITY AND MOTION OF PLATFORM FROM CURRENT
+0  TRACK & AVGE  VELOCITY REMOVED BY BOTTOM TRACKING,MOTION BY AVERAGING
+1  TRACK & COMP  VELOCITY REMOVED BY BOTTOM TRACKING, MOTION COMPENSATED
+2  BOTTOM TRACK  VELOCITY REMOVED BY BOTTOM TRACKING, MOTION NOT REMOVED
+3  NAVIG & AVGE  VELOCITY REMOVED BY NAVIGATION, MOTION BY AVERAGING
+4  NAVIG & COMP  VELOCITY REMOVED BY NAVIGATION, MOTION COMPENSATED
+5  NAVIGATION    VELOCITY REMOVED BY NAVIGATION, MOTION NOT REMOVED
+6  NO PROFILING  DOPPLER CURRENT PROFILING METHOD NOT USED
+
+ 002041 METHOD OF ESTIMATING REPORTS RELATED TO SYNOPTIC FEATURES
+0  MANUAL ANAL
+1  COMPUT ANAL
+2  DATA ASSIMIL
+3  ANAL & ASSIM
+4
+5
+6
+7
+8
+9
+10 Based on NWP                                                   !1.13
+
+ 002044 METHOD OF CALCULATION OF SPECTRAL WAVE DATA
+0
+1  1964 Longuet-Higgins                                           !1.13
+2  F3 Longuet-Higgins                                             !1.13
+3  MAX LIKELIHOOD
+4  MAX ENTROPY
+
+ 002045 TYPE OF PLATFORM
+0  SEA STATION
+1  DATA BUOY
+2  AIRCRAFT
+3  SATELLITE
+
+ 002046 WAVE MEASUREMENT INSTRUMENTATION
+0
+1  HEAVE SENSOR
+2  SLOPE SENSOR
+
+ 002048 SATELLITE SENSOR
+0  HIRS
+1  MSU
+2  SSU
+3  AMSU-A
+4  AMSU-B
+5  AVHRR
+6  SSMI
+7  NSCAT                                                           !1.9
+8  SEA WINDS                                                       !1.9
+9  POSEIDON altimeter                                              !1.14
+10 JASON microwave radiometer                                      !1.14
+
+ 002049 GEOSTATIONARY SATELLITE DATA-PROCESSING TECHNIQUE (8-BIT FLAG TABLE)
+1  NOT DEFINED
+2  SIMULTANEOUS
+3  CLEAR
+4  CLOUDY
+
+ 002050 GEOSTATIONARY SOUNDER SATELLITE CHANNELS USED (20-BIT FLAG TABLE)
+1  14.71
+2  14.37
+3  14.06
+4  13.64
+5  13.37
+6  12.66
+7  12.02
+8  11.03
+9  9.71
+10 7.43
+11 7.02
+12 6.51
+13 4.57
+14 4.52
+15 4.45
+16 4.13
+17 3.98
+18 3.74
+19 0.969
+
+ 002051 INDICATOR TO SPECIFY OBSERVING METHOD FOR EXTREME TEMPERATURES
+0
+1  MAX/MIN
+2  AUTOMATED
+3  THERMOGRAPH
+
+ 002052 GEOSTATIONARY IMAGER SATELLITE CHANNELS USED (6-BIT FLAG TABLE)
+1  0.55-0.75
+2  3.9
+3  6.7
+4  10.7
+5  12.0
+
+ 002053 GOES-I/M BRIGHTNESS TEMPERATURE CHARACTERISTICS
+0  OBSERVED
+1  BIAS CORRECTED
+2  FIRST GUESS
+3  SOUNDING
+
+ 002054 GOES-I/M SOUNDINGS PARAMETER CHARACTERISTICS
+0  SOUNDER BT'S
+1  IMAGER BT'S
+2  FIRST GUESS
+3  NMC ANALYSIS
+4  SONDE INFO
+
+ 002055 GEOSTATIONARY SOUNDINGS STATISTICAL PARAMETERS
+0  RETRVL/SONDE
+1  RETRVL/GUESS
+2  SONDE/GUESS
+3  OBS/RETRVL
+4  OBS/GUESS
+5  SONDE/IMAGER
+6  SONDE/SOUNDR
+7  SONDE
+8  FIRST GUESS
+
+ 002056 GEOSTATIONARY SOUNDINGS ACCURACY STATISTICS
+0  SUM OF DIFFS
+1  DIFF**2 SUM
+2  SAMPLE SIZE
+3  MIN DIFF
+4  MAX DIFF
+
+ 002057 ORIGIN OF FIRST GUESS INFORMATION FOR GOES-I/M SOUNDINGS
+0  NGM         Nested Grid Model                                  !1.13
+1  AVN         Aviation Model                                     !1.13
+2  MRF         Medium-Range Forecast                              !1.13
+3  GDAS        Global Data Assimilation System                    !1.13
+4  OBS <3HRS
+5  CLIMATOLOGY
+
+ 002058 VALIDITY TIMES OF FIRST GUESS INFORMATION FOR GOES-I/M SOUNDINGS
+0  12-HR & 18-HR
+1  18-HR & 24-HR
+2  6-HR & 12-HR
+3  >24 HOURS
+
+ 002059 ORIGIN OF ANALYSIS INFORMATION FOR GOES-I/M SOUNDINGS
+0  NGM         Nested Grid Model                                  !1.13
+1  AVN         Aviation Model                                     !1.13
+2  MRF         Medium-Range Forecast                              !1.13
+3  GDAS        Global Data Assimilation System                    !1.13
+
+ 002060 ORIGIN OF SURFACE INFORMATION FOR GOES-I/M SOUNDINGS
+0  CURRENT SURFACE
+1  CURRENT SHIP
+2  CURRENT BUOY
+3  1HR OLD SURFACE
+4  1HR OLD SHIP
+5  1HR OLD BUOY
+
+ 002061 AIRCRAFT NAVIGATIONAL SYSTEM
+0  INERTIAL
+1  OMEGA
+
+ 002062 TYPE OF AIRCRAFT DATA RELAY SYSTEM
+0  ASDAR
+1  ASDAR-ACARS (ACARS ALSO AVAILABLE BUT NOT OPERATIVE)
+2  ASDAR+ACARS (ACARS ALSO AVAILABLE AND OPERATIVE)
+3  ACARS
+4  ACARS-ASDAR (ASDAR ALSO AVAILABLE BUT NOT OPERATIVE)
+5  ACARS+ASDAR (ASDAR ALSO AVAILABLE AND OPERATIVE)
+
+ 002064 AIRCRAFT ROLL ANGLE
+0  GOOD (<5 DEG)
+1  BAD (>5 DEG)
+
+ 002066 Radiosonde ground receiving system
+0  TRS 2000
+1  IMS 1500C
+
+ 002070 ORIGINAL SPECIFICATION OF LATITUDE/LONGITUDE
+0  IN SECONDS
+1  IN MINUTES
+2  IN DEGREES
+3  IN DECIDEGREES
+4  IN CENTIDEGREES
+5  ref seconds   REFERENCED TO CHECKPOINT IN SECONDS              !1.13
+6  ref minutes   REFERENCED TO CHECKPOINT IN MINUTES              !1.13
+7  ref degrees   REFERENCED TO CHECKPOINT IN DEGREES              !1.13
+8  ref decidegs  REFERENCED TO CHECKPOINT IN DECIDEGREES          !1.13
+9  ref centideg  REFERENCED TO CHECKPOINT IN CENTIDEGREES         !1.13
+10 IN DECIMINS
+11 ref decimins  REFERENCED TO CHECKPOINT IN DECIMINS             !1.13
+
+ 002080 Balloon manufacturer                                      !1.14
+0  Kaysam
+1  Totex
+2  KKS
+
+ 002081 Type of balloon                                           !1.14
+0  GP26
+1  GP28
+2  GP30
+3  HM26
+4  HM28
+5  HM30
+6  SV16
+
+ 002083 Type of balloon shelter                                   !1.14
+0  High bay
+1  Low bay
+2  BILS
+3  Rooftop BILS
+
+ 002084 Type of gas used in balloon                               !1.14
+0  Hydrogen
+1  Helium
+2  Natural gas
+
+ 002095 Type of pressure sensor                                   !1.14
+0  Capacitance aneroid
+1  GPS-derived
+2  Resistive strain gauge
+
+ 002096 Type of temperature sensor                                !1.14
+0  Rod thermistor
+1  Bead thermistor
+2  Capacitance bead
+
+ 002097 Type of humidity sensor                                   !1.14
+0  VIZ Mark II carbon hygristor
+1  VIZ B2 hygristor
+2  Vaisala A-Humicap
+3  Vaisala H-Humicap
+4  Capacitance sensor
+5  Vaisala RS90
+6  Sippican Mark IIA carbon hygristor
+
+ 002101 TYPE OF ANTENNA
+0  CENTRE FRONT-FED PARABOLOID
+1  OFFSET FRONT-FED PARABOLOID
+2  CENTRE CASSEGRAIN PARABOLOID
+3  OFFSET CASSEGRAIN PARABOLOID
+4  PLANAR ARRAY
+5  COAXIAL-COLLINEAR ARRAY
+6  YAGI ELEMENTS ARRAY
+7  MICROSTRIP
+
+ 002103 RADOME  (2-BIT FLAG TABLE)
+1  RADOME
+
+ 002104 ANTENNA POLARISATION
+0  HORIZONTAL
+1  VERTICAL
+2  RIGHT CIRCULAR
+3  LEFT CIRCULR
+4  HORIZ & VERT
+5  RIGHT & LEFT
+
+ 002115 Type of surface observing equipment                       !1.14
+0  PDB
+1  RSOIS
+2  ASOS
+3  Psychrometer
+4  F420
+
+ 002119 RA-2 instrument operations                                !1.14
+0  IF CAL      Intermediate frequency calibration mode
+1  BITE DGT    Built-in test equipment digital
+2  BITE RF     Built-in test equipment radio-frequency
+3  PSET TRK    Preset tracking
+4  LOOP OUT    Preset
+5  Acquisition
+6  Tracking
+
+ 002131 SENSITIVITY TIME CONTROL (STC)  (2-BIT FLAG TABLE)
+1  STC OPERATIONAL
+
+ 002143 OZONE INSTRUMENT TYPE
+0
+1  BREWER
+2  CAVER TEICHERT
+3  DOBSON
+4  DOBSON JAPAN
+5  EHMET
+6  FECKER
+7  HOELPER
+8  JODMETER
+9  FILTER M-83
+10 MAST
+11 OXFORD
+12 PAETZOLD
+13 REGENER
+14
+15 VASSY FILTER
+16 CARBON IODIDE
+17 BUBBLER
+18 FILTER M-124
+19 ECC SONDE
+
+ 002144 MEASUREMENT TYPE FOR BREWER INSTRUMENTS
+0  DIRECT SUN#0
+1  DIRECT SUN#1
+2  DIRECT SUN#2
+3  FOCUST MOON
+4  FOCUST SUN
+5  SUN & SKY
+6  ZENITH SKY
+
+ 002145 WAVELENGTH SETTING FOR DOBSON INSTRUMENTS
+0  AD ORDINARY
+1  BD ORDINARY
+2  CD ORDINARY
+3  CC' ORDINARY
+4  AD FOCUSSED
+5  BD FOCUSSED
+6  CD FOCUSSED
+7  CC' FOCUSSED
+
+ 002146 SOURCE CONDITION FOR DOBSON INSTRUMENTS
+0  DIRECT SUN
+1  DIRECT MOON
+2  BLUE ZENITH
+3  LOW OPACITY
+4  MED OPACITY
+5  VERY OPAQUE
+6  VARBL OPAC
+7  ZENITH FOG
+8  ZENITH HAZE                                                     !1.9
+9  SUN THRU FOG  (on direct sun through thin cloud, fog or haze)   !1.9
+
+ 002148 DATA COLLECTION AND/OR LOCATION SYSTEM                     !1.9
+0
+1  ARGOS
+2  GPS
+3  GOES DCP
+4  METEOSAT DCP
+
+ 002149 TYPE OF DATA BUOY                                          !1.9
+0  drifting     unspecified
+1  Lagrangian   standard drifter (Global Drifter Programme)
+2  FGGE         standard FGGE-type drifting buoy (non-Lagrangian met...)
+3  Wind FGGE    wind-measuring FGGE-type drifting buoy (non-Lagrangian
+4  Ice float
+5
+6
+7
+8  sub-surface  unspecified
+9  SOFAR
+10 ALACE
+11 MARVOR
+12 RAFOS
+13
+14
+15
+16 moored       unspecified
+17 Nomad
+18 3m discus
+19 10m discus   10-12 metre
+20 ODAS 30      series
+21 ATLAS        (e.g. TAO area)
+22 TRITON
+23
+24 Omnidirectional waverider
+25 Directional waverider
+26 ARGO float   (sub-surface)                                     !1.13
+
+ 002150 TOVS/ATOVS/AVHRR INSTRUMENTATION CHANNEL NUMBER
+0
+1  HIRS 1
+2  HIRS 2
+3  HIRS 3
+4  HIRS 4
+5  HIRS 5
+6  HIRS 6
+7  HIRS 7
+8  HIRS 8
+9  HIRS 9
+10 HIRS 10
+11 HIRS 11
+12 HIRS 12
+13 HIRS 13
+14 HIRS 14
+15 HIRS 15
+16 HIRS 16
+17 HIRS 17
+18 HIRS 18
+19 HIRS 19
+20 HIRS 20
+21 MSU 1
+22 MSU 2
+23 MSU 3
+24 MSU 4
+25 SSU 1
+26 SSU 2
+27 SSU 3
+28 AMSU-A 1
+29 AMSU-A 2
+30 AMSU-A 3
+31 AMSU-A 4
+32 AMSU-A 5
+33 AMSU-A 6
+34 AMSU-A 7
+35 AMSU-A 8
+36 AMSU-A 9
+37 AMSU-A 10
+38 AMSU-A 11
+39 AMSU-A 12
+40 AMSU-A 13
+41 AMSU-A 14
+42 AMSU-A 15
+43 AMSU-B 1
+44 AMSU-B 2
+45 AMSU-B 3
+46 AMSU-B 4
+47 AMSU-B 5
+48 AVHRR 1
+49 AVHRR 2
+50 AVHRR 3A
+51 AVHRR 3B
+52 AVHRR 4
+53 AVHRR 5
+
+ 002151 RADIOMETER IDENTIFIER
+0  HIRS
+1  MSU
+2  SSU
+3  AMSU-A1-1
+4  AMSU-A1-2
+5  AMSU-A2
+6  AMSU-B
+7  AVHRR
+
+ 002152 SATELLITE INSTRUMENT DATA USED IN PROCESSING (31-BIT FLAG TABLE)
+1  HIRS        High Resolution Infrared Sounder                    !1.9
+2  MSU         Microwave Sounding Unit                             !1.9
+3  SSU         Stratospheric Sounding Unit                         !1.9
+4  AMI wind    mode                                                !1.9
+5  AMI wave    mode                                                !1.9
+6  AMI image   mode                                                !1.9
+7  Radar Altimeter                                                 !1.9
+8  ATSR
+9  Geo imager                                                      !1.9
+10 Geo sounder                                                     !1.9
+11 GERB        Geostationary Earth Radiation                       !1.9
+
+ 002158 RA-2 instrument (9-BIT FLAG TABLE)                        !1.14
+1  Red Vec HPA mismatch
+2  Red Vec RFSS mismatch
+3  320 MHz (Ku) PTR calibration band
+4  80 MHz (Ku) PTR calibration band
+5  20 MHz (Ku) PTR calibration band
+6  160 MHz (S) PTR calibration band
+7  Ku flight calibration parameters available
+8  S flight calibration parameters available
+
+ 002159 MWR instrument (8-BIT FLAG TABLE)                         !1.14
+1  Temperature inconsistency
+2  Data missing
+3  Redundancy channel
+4  Power bus protection
+5  Overvoltage/overload protection
+
+ 002163 HEIGHT ASSIGNMENT METHOD
+0  Auto Editor                                                     !1.14
+1  IRW                                                             !1.9
+2  WV                                                              !1.9
+3  H2O intercept                                                   !1.9
+4  CO2 slicing                                                     !1.9
+5  Low pixel max gradient                                          !1.9
+6  Higher pixel max gradient                                       !1.9
+7  Primary                                                         !1.9
+8  Layer thickness                                                 !1.9
+9  10% height  (cumulative contribution function)                  !1.11
+10 50% height  (cumulative contribution function)                  !1.11
+11 90% height  (cumulative contribution function)                  !1.11
+12 Ht of max gradient  (cumulative contribution function)          !1.11
+
+ 002164 TRACER CORRELATION METHOD
+0  LP          Norms least square minimum                          !1.9
+1  EN          Euclidean norm with radiance correlation            !1.9
+2  CC          Cross Correlation                                   !1.9
+
+ 002166 RADIANCE TYPE
+0  NOT DEFINED                                                    !1.13
+1  AUTOMATED STATISTICAL REGRESSION
+2  CLEAR PATH
+3  PARTLY CLOUDY PATH
+4  CLOUDY PATH
+
+ 002167 RADIANCE COMPUTATIONAL METHOD
+0  NOT DEFINED                                                    !1.13
+1  1B RAW RADIANCE
+2  PROCESSED RADIANCE
+
+ 002169 ANEMOMETER TYPE                                            !1.9
+0  Cup rotor
+1  Propeller rotor
+2  WOTAN         Wind Observation Through Ambient Noise
+
+ 002172 PRODUCT TYPE FOR RETRIEVED ATMOSPHERIC GASES               !1.9
+0
+1  Nadir        Retrieval from a nadir sounding
+2  Limb         Retrieval from a limb sounding
+
+ 002175 Method of precipitation measurement                        !1.11
+0  Manual
+1  Tipping bucket
+2  Weighing
+3  Optical
+4  Pressure
+5  Float
+6  Drop counter
+
+ 002176 Method of state of ground measurement                      !1.11
+0  Manual
+1  Video camera
+2  Infra-red
+3  Laser
+
+ 002177 Method of snow depth measurement                           !1.11
+0  Manual
+1  Ultrasonic
+2  Video camera
+
+ 002178 Method of liguid content measurement of precipitation      !1.11
+0  Manual
+1  Optical
+2  Capacitive
+
+ 002179 Type of sky condition algorithm                            !1.11
+0  Manual
+1  Vaisala
+2  ASOS (FAA)
+3  AWOS (Canada)
+
+ 002180 Main present weather detection system                      !1.11
+0  Manual
+1  Optical & precipitation sensing system
+2  Visible scatter
+3  IR scatter
+4  IRED system
+5  Doppler radar
+
+ 002181 Supplementary present weather sensor (21-BIT FLAG TABLE)   !1.11
+1  Rain
+2  Freezing rain
+3  Ice
+4  Hail/ice pellets
+
+ 002182 Visibility measurement system                              !1.11
+0  Manual
+1  >25m base transmissometer
+2  <25m base transmissometer
+3  Forward scatter
+4  Back scatter
+
+ 002183 Cloud detection system                                     !1.11
+0  Manual
+1  Ceilometer
+2  IR camera
+3  Microwave visual camera
+4  Sky imager
+5  Video time-lapsed camera
+6  Micropulse lidar
+
+ 002184 Type of lightning detection sensor                         !1.11
+0  Manual
+1  Lightning imaging sensor
+2  Electrical storm identification sensor
+3  Magnetic finder sensor
+4  Lightning strike sensor
+5  Flash counter
+
+ 002185 Method of evaporation measurement                          !1.11
+0  Manual
+1  Balanced floating
+2  Pressure
+3  Ultrasonic
+4  Hydraulic
+
+ 002186 Capability to detect precipitation phenomena (SEE 020021)  !1.11
+
+ 002187 Capability to detect other weather phenomena (SEE 020023)  !1.11
+
+ 002188 Capability to detect obscuration (SEE 020025)              !1.11
+
+ 002189 Capability to discriminate strikes (12-BIT FLAG TABLE)     !1.11
+1  Manual
+2  All, without discrimination
+3  Only cloud-to-ground
+4  All, with discrimination between cloud-to-ground & cloud-to-cloud
+
+ 002193 POSITION ACCURACY FLAG
+0  COARSE
+1  FINE
+
+ 002195 WAVE MEASUREMENT METHOD
+0  MEASURED WAVE GROUP
+1  ESTIMATED WAVE GROUP
+
+ 002196 REMOVAL OF SHIP VELOCITY & MOTION FROM CURRENT (SEE 002040)
+
+ 002197 CLOUD CLEARING METHOD (JUL 1999)
+0  DAYTIME METHOD
+1  NIGHTTIME METHOD
+2  TWILIGHT METHOD
+
+ 002217 CHANNEL NUMBER
+0
+1  1 HIRS
+2  2 HIRS
+3  3 HIRS
+4  4 HIRS
+5  5 HIRS
+6  6 HIRS
+7  7 HIRS
+8  8 HIRS
+9  9 HIRS
+10 10 HIRS
+11 11 HIRS
+12 12 HIRS
+13 13 HIRS
+14 14 HIRS
+15 15 HIRS
+16 16 HIRS
+17 17 HIRS
+18 18 HIRS
+19 19 HIRS
+20 20 HIRS
+21 1 MSU
+22 2 MSU
+23 3 MSU
+24 4 MSU
+25 1 SSU
+26 2 SSU
+27 3 SSU
+
+ 002223 SATELLITE INSTRUMENT USED (12-BIT FLAG TABLE)
+1  HIRS
+2  MSU
+3  SSU
+4  AMI WIND
+5  AMI WAVE
+6  AMI IMAGE
+7  RADAR ALTIM
+8  ATSR
+9  AMSU-A
+10 AMSU-B
+11 AVHRR
+
+ 004059 Times of obs used to compute means (6-BIT FLAG TABLE)     !1.14
+1  00 UTC
+2  06 UTC
+3  12 UTC
+4  18 UTC
+5  others
+
+ 004192 FREQUENCY OF OCCURRENCE
+0  NONE
+1  OCCASIONAL
+2  FREQUENT
+
+ 004225 DURATION AND TIME OF CURRENT MEASUREMENT (DOPPLER/VECTOR)
+0
+1  INSTANT, H-1
+2  <3 MIN, H-1
+3  3-6 MIN, H-1
+4  6-12 MIN,H-1
+5  INSTANT, H-2
+6  <3 MIN, H-2
+7  3-6 MIN, H-2
+8  6-12 MIN,H-2
+9  NOT USED    VECTOR OR DOPPLER CURRENT PROFILING METHOD NOT USED
+
+ 008001 VERTICAL SOUNDING SIGNIFICANCE (7-BIT FLAG TABLE)
+1  SURFACE
+2  STANDARD
+3  TROPOPAUSE
+4  MAX WIND
+5  SIG TEMP
+6  SIG WIND
+
+ 008002 VERTICAL SIGNIFICANCE (SURFACE OBSERVATION)
+0  LOWEST CLOUD FM 12SYNOP/13SHIP OBSERVING RULES, BASE OF LOWEST CLOUD
+1  first non-Cb significant layer                                 !1.14
+2  second non-Cb significant layer                                !1.14
+3  third non-Cb significant layer                                 !1.14
+4  CUNIM
+5  CEILING
+6  NO CLOUD <  NO CLOUD BELOW THE FOLLOWING HEIGHT(S)
+7  LOW CLOUD
+8  MEDIUM CLOUD
+9  HIGH CLOUD
+10 base below & top above station                                 !1.14
+11 base & top below station                                       !1.14
+
+ 008003 VERTICAL SIGNIFICANCE (SATELLITE OBSERVATION)
+0  SURFACE
+1  SOUNDING BASE
+2  CLOUD TOP
+3  TROPOPAUSE
+4  PRECIP WATER
+5  RADIANCES
+6  MEAN TEMPS
+7  OZONE
+
+ 008004 PHASE OF AIRCRAFT FLIGHT
+0
+1
+2  UNS          Unsteady                                          !1.13
+3  LVR          Level flight, routine observation                 !1.13
+4  LVW          Level flight, highest wind encountered            !1.13
+5  ASC          Ascending                                         !1.13
+6  DES          Descending                                        !1.13
+
+ 008005 METEOROLOGICAL ATTRIBUTE SIGNIFICANCE
+0  Automatic                                                      !1.13
+1  STORM CENTRE
+2  STORM EDGE  OR OUTER LIMIT
+3  MAXIMUM WIND
+
+ 008006 OZONE VERTICAL SOUNDING SIGNIFICANCE (9-BIT FLAG TABLE)    !1.9
+1  Surface
+2  Standard
+3  Tropopause
+4  Clear max
+5  Clear min
+6  Min pressure
+7
+8  Undetermined significance
+
+ 008007 DIMENSIONAL SIGNIFICANCE
+0  POINT
+1  LINE
+2  AREA
+3  VOLUME
+
+ 008008 RADIATION VERTICAL SOUNDING SIGNIFICANCE (9-BIT FLAG TABLE) !1.9
+1  Surface
+2  Standard
+3  Tropopause
+4  Max beta radiation
+5  Max gamma radiation
+6  Min pressure level
+7
+8  Undetermined significance
+
+ 008009 Detailed phase of aircraft flight                          !1.14
+0  LVR UNS
+1  LVW UNS
+2  UNS          unsteady
+3  LVR          level flight, routine observation
+4  LVW          level flight, highest wind encountered
+5  ASC          ascending
+6  DES          descending
+7  ASC time     observation intervals selected by time increments
+8  ASC UNS time
+9  ASC press    observation intervals selected by pressure increments
+10 ASC UNS press
+11 DES time     observation intervals selected by time increments
+12 DES UNS time
+13 DES press    observation intervals selected by pressure increments
+14 DES UNS press
+
+ 008010 Surface qualifier (temperature data)                       !1.11
+0
+1  Bare soil
+2  Bare rock
+3  Land grass cover
+4  Water (lake, sea)
+5  Flood water underneath
+6  Snow
+7  Ice
+8  Runway or road
+
+ 008011 METEOROLOGICAL FEATURE
+0  QSTAT FRONT
+1  QFRONT ALOFT
+2  WARM FRONT
+3  WFRONTALOFT
+4  COLD FRONT
+5  CFRONT ALOFT
+6  OCCLUSION
+7  INSTAB LINE
+8  TROPIC FRONT
+9  CONVERG LINE
+10 JET STREAM
+11 CLOUD CLEAR
+12 CLOUD
+13 TURBULENCE
+14 STORM
+15 AIRFRANE ICING
+16 PHENOMENON
+17 VOLCANO
+18 ATMOSPHERICS                                                    !1.9
+19
+20 SPECIAL CLOUDS
+21 Thunderstorm                                                    !1.14
+22 Tropical cyclone                                                !1.14
+23 Mountain Wave                                                   !1.14
+24 Duststorm                                                       !1.14
+25 Sandstorm                                                       !1.14
+
+ 008012 LAND/SEA
+0  LAND
+1  SEA
+2  COAST
+
+ 008013 NIGHT/DAY
+0  NIGHT
+1  DAY
+
+ 008014 QUALIFIER FOR RUNWAY VISUAL RANGE
+0  10-MIN MEAN
+1  10-MIN P MEAN
+2  10-MIN M MEAN
+3  1-MIN MIN
+4  1-MIN P MIN
+5  1-MIN M MIN
+6  1-MIN MAX
+7  1-MIN P MAX
+8  1-MIN M MAX
+
+ 008016 CHANGE QUALIFIERS OF A TEND-TYPE OR AERODROME FORECAST
+0  NOSIG
+1  BECMG
+2  TEMPO
+3  FM
+
+ 008017 QUALIFIERS OF THE TIME WHEN THE FORECAST CHANGE IS EXPECTED
+0  FM
+1  TL
+2  AT
+
+ 008018 SEAWINDS LAND/ICE SURFACE TYPE (17-BIT FLAG TABLE)         !1.9
+1  Land present
+2  Ice present on surface ice map
+3
+4
+5
+6
+7
+8
+9
+10
+11 No ice map data available
+12 No attenuation map data available
+
+ 008019 Qualifier for following centre identifier                 !1.14
+0
+1  ATS          Air Traffic Service
+2  FIR          Flight Information Region
+3  UIR          Upper Information Region
+4  CTA          Control Area
+5  VAAC         Volcanic Ash Advisory Centre
+6  MWO          Meteorological Watch Office
+
+ 008021 TIME SIGNIFICANCE
+0
+1  TIME SERIES
+2  TIME AVERAGE
+3  ACCUMULATED
+4  FORECAST
+5  F/C TIME SER
+6  F/C TIME AVE
+7  F/C ACCUM
+8  ENSEMBL MEAN
+9                 9-15 ARE AS 1-7 FOR ENSEMBLE MEAN
+10
+11
+12
+13
+14
+15
+16 ANALYSED
+17 START OF PHENOMENON
+18 SONDE LAUNCH
+19 ORBIT START
+20 ORBIT END
+21 ASC NODE
+22 WIND SHIFT
+23 Monitoring  period                                              !1.9
+24 Agreed limit for report reception                               !1.9
+25 Nominal reporting time                                          !1.9
+26 Last known position time                                        !1.11
+27 FIRST GUESS
+28 START OF SCAN
+29 END OF SCAN
+
+ 008023 SIGNIFICANCE OF FOLLOWING VALUE (FIRST ORDER STATISTICS)
+0
+1
+2  MAXIMUM
+3  MINIMUM
+4  MEAN
+5  MEDIAN
+6  MODAL
+7  MEAN ABS ERROR
+8
+9  STD DEV (N-1) BEST ESTIMATE
+10 STD DEV (N)
+11 HARMONIC MEAN
+12 RMS VECTOR ERROR
+13 Root mean square                                               !1.14
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32 VECTOR MEAN
+
+ 008024 FIRST ORDER DIFFERENCES - OBSERVED MINUS ..
+0
+1
+2  OBS-MAXIMUM
+3  OBS-MINIMUM
+4  OBS-MEAN
+5  OBS-MEDIAN
+6  OBS-MODE
+7
+8
+9
+10 TOLERANCE        ***** NOT AN INTERNATIONAL ENTRY! *****
+11 OBS-CLIMAT  MINUS CLIMATOLOGY
+12 OBS-ANALYSIS
+13 OBS-INIT    MINUS INITIALISED ANALYSED VALUE
+14 OBS-FORECAST
+15
+16
+17
+18
+19
+20
+21 OBS-INTERP  MINUS INTERPOLATED VALUE
+22 OBS-HYDRO   MINUS HYDROSTATICALLY CALCULATED VALUE
+
+ 008025 TIME DIFFERENCE QUALIFIER
+0  UTC-LST
+1  LST         LOCAL STANDARD TIME
+2  UTC-SATCLOCK
+3
+4
+5  FROM EDGE OF PROCESSING SEGMENT                                 !1.9
+
+ 008029 Remotely sensed surface type                               !1.14
+0  Open ocean or semi-enclosed sea
+1  Enclosed sea or lake
+2  Continental ice
+3  Land
+
+ 008033 Method of percentage confidence derivation for radiances   !1.11
+0
+1  Cloud fraction
+2  Standard deviation of temperature
+
+ 008035 TYPE OF MONITORING EXERCISE                                !1.9
+0  GLOBAL
+1  REGIONAL
+2  NATIONAL
+3  SPECIAL
+4  BILATERAL
+
+ 008036 TYPE OF CENTRE OR STATION PERFORMING MONITORING            !1.9
+0  WMO secretariat
+1  WMO
+2  RSMC
+3  NMC
+4  RTH
+5  Observing site
+
+  008040 Flight level significance                                 !1.17
+0  High resolution data sample
+1  Within 20hPa of surface
+2  <10hPa
+3  Base pressure level for stability index
+4  Begin T,ht doubtful
+5  Begin missing data (all elements)
+6  Begin RH missing
+7  Begin T missing
+8  Highest level reached before balloon descent
+9  End T,ht doubtful
+10 End missing data (all elements)
+11 End RH missing
+12 End T missing
+13 0C crossing for RADAT
+14 Std pressure
+15 Operator added level
+16 Operator deleted level
+17 Balloon reascended beyond previous highest level
+18 Sig RH
+19 No more RH
+20 Surface
+21 Sig T
+22 Mandatory T
+23 Flight termination
+24 Tropopause
+25 Aircraft report
+26 Interpolated level
+27 Mandatory wind
+28 Sig wind
+29 Max wind
+30 Increm wind
+31 Increm height
+32 Wind termination
+33 100-110hPa
+40 Inversion
+41 Sig RH (NCDC criteria)
+42 Sig T (NCDC)
+60 80kt FL above jet (flight level of 80-knot isotach)            !1.17
+61 80kt FL below jet                                              !1.17
+
+ 008041 Data significance                                         !1.14
+0  Parent site
+1  Observation site
+2  Balloon manufacture date
+3  Balloon launch point
+4  Surface observation
+5  Displacement of surface observation from launch point
+6  Flight observation
+7  Flight termination point
+
+ 008050 QUALIFIER FOR NUMBER OF MISSING VALUES IN STATISTIC CALC. !1.14
+0
+1  pressure
+2  temperature
+3  extreme temp
+4  vapour pressure
+5  precipitation
+6  sunshine
+7  max temp
+8  min temp
+9  wind
+
+ 008051 QUALIFIER FOR NUMBER OF MISSING VALUES IN STATISTIC CALCULATION
+0
+1  PRESSURE
+2  TEMPERATURE
+3  EXTREME TEMP
+4  VAPOUR PRESSURE
+5  PRECIPITATION
+6  SUNSHINE
+
+ 008052 CONDITION FOR WHICH NUMBER OF DAYS OF OCCURRENCE FOLLOWS
+0  WIND >10M/S
+1  WIND >20M/S
+2  WIND >30M/S
+3  MAX TEMP <0C
+4  MAX TEMP >25C
+5  MAX TEMP >30C
+6  MAX TEMP >35C
+7  MAX TEMP >40C
+8  MIN TEMP <0C
+9  MAX TEMP >0C
+10 RRR >1MM
+11 RRR >5MM
+12 RRR >10MM
+13 RRR >50MM
+14 RRR >100MM
+15 RRR >150MM
+16 SNOW >0CM
+17 SNOW >1CM
+18 SNOW >10CM
+19 SNOW >50CM
+20 VIS <50M
+21 VIS <100M
+22 VIS <1000M
+23 HAIL
+24 THUNDERSTORM
+
+ 008053 DAY OF OCCURRENCE QUALIFIER
+0  ONLY ONE DAY IN MONTH
+1  >1 DAY/MONTH
+
+ 008060 SAMPLE SCANNING MODE SIGNIFICANCE
+0
+1  RANGE
+2  AZIMUTH
+3  HORIZONTAL
+4  VERTICAL
+
+ 008070 TOVS/ATOVS PRODUCT QUALIFIER
+0
+1
+2  LEVEL 1B
+3  LEVEL 1C
+4  LEVEL 1D
+
+ 008072 PIXEL(S) TYPE
+0  MIXED
+1  CLEAR
+2  CLOUDY
+
+ 008074 Altimeter echo type                                       !1.14
+0  open ocean or semi-enclosed sea
+1  non-ocean-like
+
+ 008075 Ascending/descending orbit qualifier                       !1.11
+0  Ascending
+1  Descending
+
+ 008076 Type of band                                              !1.14
+0  Ku
+1  C
+
+ 008079 Change in status of following product                     !1.14
+0  Cancelled
+
+ 008080 Qualifier for GTSSP quality flag                          !1.14
+0  pressure
+1  temperature
+2  salinity
+3  conductivity
+
+ 008192 LOGICAL OPERATORS
+0  EQ           EQUAL TO
+1  GT           GREATER THAN
+2  GE           GREATER THAN OR EQUAL TO
+3  LT           LESS THAN
+4  LE           LESS THAN OR EQUAL TO
+
+ 008193 SATELLITE TIME QUALIFIER  (ECMWF - USE 008021 NOW)
+0  ORBIT START
+1  ORBIT END
+2  ASC NODE
+
+ 008194 ATOVS main land type                                       !1.9
+0
+1  Green Needle  Evergreen needleleaf forests
+2  Green Broad   Evergreen broadeleaf forests
+3  Decid Needle  Deciduous needleleaf forests
+4  Decid Broad   Deciduous broadeleaf forests
+5  Mixed Forest  Mixed forests
+6  Closed Shrub  Closed shrublands
+7  Open Shrub    Open shrublands
+8  Woody         Woody savannas
+9  Savannas      Savannas
+10 Grasslands    Grasslands
+11 Wetlands      Permanent wetlands
+12 Croplands     Croplands
+13 Urban         Urban & built-up
+14 Mosaics       Cropland / natural vegetation mosaics
+15 Snow/Ice      Snow & ice
+16 Barren        Barren
+17 Water Bodies  Water bodies
+
+ 008204 SURFACE TYPE INDICATOR
+0  SEA          (PRECISE MEANING NOT DEFINED OR KNOWN)
+1  SEA NOT ICE  (EXCLUDING SEA ICE)
+2  SEA AND ICE  (INCLUDING SEA ICE)
+3  LAND         (PRECISE MEANING NOT DEFINED)
+4  LAND NOT ICE (EXCLUDING SEA ICE)
+5  LAND AND ICE (INCLUDING SEA ICE)
+6  SEA ICE
+
+ 008205 ESTIMATED NEAREST AMSU SURFACE TYPE
+0  Young ice   (i.e. new ice, no snow)                             !1.9
+1  Dry land    (i.e. dry, with or without vegetation)              !1.9
+2  Dry snow    (i.e. snow with water less than 2%, over land)      !1.9
+3  Old ice     (i.e. old ice with dry snow cover)                  !1.9
+4  Sea         (i.e. open water, no islands, ice-free, ws < 14m/s) !1.9
+5  Wet forest  (i.e. established forest with wet canopy)           !1.9
+6  Wet land    (i.e. non-forested land with a wet surface)         !1.9
+7  Wet snow    (i.e. water content > 2%, over land or ice)         !1.9
+8  Desert                                                          !1.9
+
+ 008213 TIME SIGNIFICANCE
+0
+1  TIME SERIES
+2  TIME AVERAGE
+3  ACCUMULATED
+4  FORECAST
+5  F/C TIME SER
+6  F/C TIME AVE
+7  F/C ACCUM
+8  ENSEMBL MEAN
+9
+10
+11
+12
+13
+14
+15
+16 ANALYSIS
+17 BUDDY
+
+ 008215 SIGNIFICANCE OF FOLLOWING VALUE
+0
+1  OBSERVED
+2  MAXIMUM
+3  MINIMUM
+4  MEAN
+5  MEDIAN
+6  MODAL
+7  MEAN ABS ERROR
+8  range                                                          !1.13
+9
+10 STANDARD DEVIATION
+11 CLIMATOLOGY
+12 ANALYSED
+13 INIT ANAL
+14 FORECAST
+15 INPUT       (GLOSS BRIGHTNESS TEMPERATURES)
+16 CORRECTED   (GLOSS BRIGHTNESS TEMPERATURES)
+17 RETRIEVED   (GLOSS BRIGHTNESS TEMPERATURES)
+18
+19
+20
+21 INTERPOLATED MID-POINT POSITION
+
+ 008220 TAF/METAR TREND INDICATOR  (11-BIT FLAG TABLE)
+1
+2  FM
+3  RE          (RECENT WEATHER)
+4  TEND
+5  INTER
+6  BECMG
+7  TEMPO
+8  RAPID
+9  GRADU
+10 NOSIG
+11 PROB
+
+ 010063 CHARACTERISTIC OF PRESSURE TENDENCY
+0  INCR, PEAK
+1  INCR GENTLER
+2  INCREASING
+3  INCR STEEPER
+4  STEADY
+5  DECR, TROUGH
+6  DECR GENTLER
+7  DECREASING
+8  DECR STEEPER
+
+ 010064 SIGMET cruising level                                     !1.14
+0  Subsonic
+1  Transonic
+2  Supersonic
+
+ 011031 DEGREE OF TURBULENCE
+0  NIL  (CLOUD)
+1  LIGHT (CLOUD
+2  MOD  (CLOUD)
+3  SEV  (CLOUD)
+4  NIL    (CAT)
+5  LIGHT  (CAT)
+6  MOD    (CAT)
+7  SEVERE (CAT)
+8  NIL         - CLOUD/CLEAR
+9  SLIGHT      - CLOUD/CLEAR
+10 MODERATE    - CLOUD/CLEAR
+11 SEVERE      - CLOUD/CLEAR
+12 EXTREME (CAT)
+13 EXTREME (CLOUD)
+14 EXTREME     - CLOUD/CLEAR NOT SPECIFIED
+
+ 011037 TURBULENCE INDEX (AVERAGE & PEAK VALUE OF EDDY DISSIPATION RATE)
+0  <0.1, <0.1        ave<0.1             peak<0.1                  !1.9
+1  <0.1, <0.2        ave<0.1        0.1<=peak<0.2
+2  <0.2, <0.2   0.1<=ave<0.2        0.1<=peak<0.2
+3  <0.1, <0.3        ave<0.1        0.2<=peak<0.3
+4  <0.2, <0.3   0.1<=ave<0.2        0.2<=peak<0.3
+5  <0.3, <0.3   0.2<=ave<0.3        0.2<=peak<0.3
+6  <0.1, <0.4        ave<0.1        0.3<=peak<0.4
+7  <0.2, <0.4   0.1<=ave<0.2        0.3<=peak<0.4
+8  <0.3, <0.4   0.2<=ave<0.3        0.3<=peak<0.4
+9  <0.4, <0.4   0.3<=ave<0.4        0.3<=peak<0.4
+10 <0.1, <0.5        ave<0.1        0.4<=peak<0.5
+11 <0.2, <0.5   0.1<=ave<0.2        0.4<=peak<0.5
+12 <0.3, <0.5   0.2<=ave<0.3        0.4<=peak<0.5
+13 <0.4, <0.5   0.3<=ave<0.4        0.4<=peak<0.5
+14 <0.5, <0.5   0.4<=ave<0.5        0.4<=peak<0.5
+15 <0.1, <0.8        ave<0.1        0.5<=peak<0.8
+16 <0.2, <0.8   0.1<=ave<0.2        0.5<=peak<0.8
+17 <0.3, <0.8   0.2<=ave<0.3        0.5<=peak<0.8
+18 <0.4, <0.8   0.3<=ave<0.4        0.5<=peak<0.8
+19 <0.5, <0.8   0.4<=ave<0.5        0.5<=peak<0.8
+20 <0.8, <0.8   0.5<=ave<0.8        0.5<=peak<0.8
+21 <0.1, >0.8        ave<0.1        0.8<=peak
+22 <0.2, >0.8   0.1<=ave<0.2        0.8<=peak
+23 <0.3, >0.8   0.2<=ave<0.3        0.8<=peak
+24 <0.4, >0.8   0.3<=ave<0.4        0.8<=peak
+25 <0.5, >0.8   0.4<=ave<0.5        0.8<=peak
+26 <0.8, >0.8   0.5<=ave<0.8        0.8<=peak
+27 >0.8, >0.8   0.8<=ave            0.8<=peak
+28 NIL, NIL
+
+ 011038 TIME OF PEAK EDDY DISSIPATION RATE (MINUTES BEFORE OBSERVATION)
+0  MIN<1                                                           !1.10
+1  1<=MIN<2
+2  2<=MIN<3
+3  3<=MIN<4
+4  4<=MIN<5
+5  5<=MIN<6
+6  6<=MIN<7
+7  7<=MIN<8
+8  8<=MIN<9
+9  9<=MIN<10
+10 10<=MIN<11
+11 11<=MIN<12
+12 12<=MIN<13
+13 13<=MIN<14
+14 14<=MIN<15
+15 No timing
+
+ 011206 WIND SHEAR INDICATOR
+0  NO SHEAR
+1  WIND SHEAR
+
+ 013038 SUPERADIABATIC INDICATOR
+0  NOT SUPERADIABATIC
+1  SUPERADIABATIC
+
+ 013039 TERRAIN TYPE (ICE/SNOW)
+0  SEA ICE
+1  SNOW ON LAND
+
+ 013040 Surface flag                                              !1.13
+0  Land                                                           !1.13
+1                                                                 !1.13
+2  Near Coast                                                     !1.13
+3  Ice                                                            !1.13
+4  Possible ice                                                   !1.13
+5  Ocean                                                          !1.13
+6  Coast                                                          !1.13
+
+ 013041 PASQUILL-GIFFORD STABILITY CATEGORY
+0
+1  A
+2  A-B
+3  B
+4  B-C
+5  C
+6  D
+7  E
+8  F
+9  G
+
+ 013051 FREQUENCY GROUP, PRECIPITATION
+0  30-YEAR MIN
+1  1ST QUINTILE
+2  2ND QUINTILE
+3  3RD QUINTILE
+4  4TH QUINTILE
+5  5TH QUINTILE
+6  30-YEAR MAX
+
+ 013202 TYPE OF SURFACE  (ECMWF)
+0  LAND
+1  VEGETATION
+2
+3  MULTI-YR ICE
+4  FIRST-YR ICE
+5  OCEAN
+6  COASTLINE
+
+ 019001 TYPE OF SYNOPTIC FEATURE
+0  DEPRESSION
+1  TROP DEPRESS
+2  TROPIC STORM
+3  SEVERE STORM
+4  TYPHOON
+5
+6
+7
+8
+9
+10 DUST/SANDSTORM
+
+ 019008 Vertical extent of circulation                            !1.13
+0                                                                 !1.13
+1  Shallow     (top below 700hPa)                                 !1.13
+2  Medium      (top between 700hPa & 400hPa)                      !1.13
+3  Deep        (top above 400hPa)                                 !1.13
+
+ 019010 METHOD FOR TRACKING THE CENTRE OF SYNOPTIC FEATURE         !1.9
+0
+1  Min MSL pressure
+2  Max 850hPa relative vorticity
+
+   020003 PRESENT WEATHER                          !1.16                1.16
+  0   No cloud development observed
+  1   Clouds dissolving
+  2   Sky unchanged
+  3   Clouds forming
+  4   Visibility reduced by smoke
+  5   Haze
+  6   Dust in suspension
+  7   Dust or sand raised by wind
+  8   Dust or sand whirl(s)
+  9   Duststorm or sandstorm
+  10  Mist
+  11  Shallow fog patches
+  12  Continuous shallow fog
+  13  Lightning, no thunder
+  14  Precipitation in sight, not reaching surface
+  15  Precipitation reaching surface >5km away
+  16  Precipitation reaching surface near station
+  17  Thunderstorm, but no precipitation now
+  18  Squalls
+  19  Funnel cloud(s)
+  20  Drizzle (not freezing) or snow grains, not showery
+  21  Rain (not freezing), not showery
+  22  Snow, not showery
+  23  Rain & snow or ice pellets, not showery
+  24  Drizzle or rain, freezing, not showery
+  25  Rain shower
+  26  Snow (or snow & rain) shower
+  27  Hail (or hail & rain) shower
+  28  Fog or ice fog
+  29  Thunderstorm
+  30  Dust/sand storm, slight, decreasing in past hour
+  31  Dust/sand storm, slight, no change in past hour
+  32  Dust/sand storm, slight, increasing in past hour
+  33  Dust/sand storm, severe, decreasing in past hour
+  34  Dust/sand storm, severe, no change in past hour
+  35  Dust/sand storm, severe, increasing in past hour
+  36  Drifting snow, low, slight or moderate
+  37  Drifting snow, low, heavy
+  38  Blowing snow, high, slight or moderate
+  39  Blowing snow, high, heavy
+  40  Fog or ice fog at a distance
+  41  Fog or ice fog patches
+  42  Fog or ice fog, sky visible, thinner in past hour
+  43  Fog or ice fog, sky invisible, thinner in past hour
+  44  Fog or ice fog, sky visible, no change in past hour
+  45  Fog or ice fog, sky invisible, no change in past hour
+  46  Fog or ice fog, sky visible, thicker in past hour
+  47  Fog or ice fog, sky invisible, thicker in past hour
+  48  Fog depositing rime, sky visible
+  49  Fog depositing rime, sky invisible
+  50  Drizzle, not freezing, intermittent, slight now
+  51  Drizzle, not freezing, continuous, slight now
+  52  Drizzle, not freezing, intermittent, moderate now
+  53  Drizzle, not freezing, continuous, moderate now
+  54  Drizzle, not freezing, intermittent, heavy now
+  55  Drizzle, not freezing, continuous, heavy now
+  56  Drizzle, freezing, slight
+  57  Drizzle, freezing, moderate or heavy
+  58  Drizzle & rain, slight
+  59  Drizzle & rain, moderate or heavy
+  60  Rain, not freezing, intermittent, slight now
+  61  Rain, not freezing, continuous, slight now
+  62  Rain, not freezing, intermittent, moderate now
+  63  Rain, not freezing, continuous, moderate now
+  64  Rain, not freezing, intermittent, heavy now
+  65  Rain, not freezing, continuous, heavy now
+  66  Rain, freezing, slight
+  67  Rain, freezing, moderate or heavy
+  68  Rain or drizzle & snow, light
+  69  Rain or drizzle & snow, moderate or heavy
+  70  Snowflake fall, intermittent, slight now
+  71  Snowflake fall, continuous, slight now
+  72  Snowflake fall, intermittent, moderate now
+  73  Snowflake fall, continuous, moderate now
+  74  Snowflake fall, intermittent, heavy now
+  75  Snowflake fall, continuous, heavy now
+  76  Diamond dust
+  77  Snow grains
+  78  Isolated starlike snow crystals
+  79  Ice pellets
+  80  Rain shower(s), slight
+  81  Rain shower(s), moderate or heavy
+  82  Rain shower(s), violent
+  83  Shower(s) of rain & snow mixed, slight
+  84  Shower(s) of rain & snow mixed, moderate or heavy
+  85  Snow shower(s), slight
+  86  Snow shower(s), moderate or heavy
+  87  Snow pellet or small hail shower(s), slight
+  88  Snow pellet or small hail shower(s), moderate or heavy
+  89  Hail shower(s) without thunder, slight
+  90  Hail shower(s) without thunder, moderate or heavy
+  91  Thunderstorm in past hour, slight rain now
+  92  Thunderstorm in past hour, moderate or heavy rain now
+  93  Thunderstorm in past hour, slight snow (or rain & snow, or hail) now
+  94  Thunderstorm in past hour, Moderate or heavy snow now
+  95  Thunderstorm, slight or moderate, no hail but rain and/or snow
+  96  Thunderstorm, slight or moderate, hail
+  97  Thunderstorm, heavy, no hail but rain and/or snow
+  98  Thunderstorm with duststorm or sandstorm
+  99  Thunderstorm, heavy, hail
+  100 No significant weather
+  101 Clouds dissolving
+  102 Sky unchanged
+  103 Clouds forming
+  104 Haze or smoke, vis >1 km
+  105 Haze or smoke, vis <1 km
+  110 Mist
+  111 Diamond dust
+  112 Distant lightning
+  118 Squalls
+  120 Fog
+  121 PRECIPITATION
+  122 Drizzle (not freezing) or snow grains
+  123 Rain (not freezing)
+  124 Snow
+  125 Drizzle or rain, freezing
+  126 Thunderstorm
+  127 BLOWING OR DRIFTING SNOW OR SAND
+  128 Blowing or drifting snow or sand, vis >1 km
+  129 Blowing or drifting snow or sand, vis <1 km
+  130 FOG
+  131 Fog or ice fog, patches
+  132 Fog or ice fog, thinner in past hour
+  133 Fog or ice fog, no change in past hour
+  134 Fog or ice fog, thicker in past hour
+  135 Fog depositing rime
+  140 PRECIPITATION
+  141 Precipitation, slight or moderate
+  142 Precipitation, heavy
+  143 Liquid precipitation, slight or moderate
+  144 Liquid precipitation, heavy
+  145 Solid precipitation, slight or moderate
+  146 Solid precipitation, heavy
+  147 Freezing precipitation, slight or moderate
+  148 Freezing precipitation, heavy
+  150 DRIZZLE
+  151 Drizzle, not freezing, slight
+  152 Drizzle, not freezing, moderate
+  153 Drizzle, not freezing, heavy
+  154 Drizzle, freezing, slight
+  155 Drizzle, freezing, moderate
+  156 Drizzle, freezing, heavy
+  157 Drizzle & rain, slight
+  158 Drizzle & rain, moderate or heavy
+  160 RAIN
+  161 Rain, not freezing, slight
+  162 Rain, not freezing, moderate
+  163 Rain, not freezing, heavy
+  164 Rain, freezing, slight
+  165 Rain, freezing, moderate
+  166 Rain, freezing, heavy
+  167 Rain (or drizzle) & snow, slight
+  168 Rain (or drizzle) & snow, moderate or heavy
+  170 SNOW
+  171 Snow, slight
+  172 Snow, moderate
+  173 Snow, heavy
+  174 Ice pellets, slight
+  175 Ice pellets, moderate
+  176 Ice pellets, heavy
+  180 SHOWERS OR INTERMITTENT PRECIPITATION
+  181 Rain shower(s) or intermittent rain, slight
+  182 Rain shower(s) or intermittent rain, moderate
+  183 Rain shower(s) or intermittent rain, heavy
+  184 Rain shower(s) or intermittent rain, violent
+  185 Snow shower(s) or intermittent snow, slight
+  186 Snow shower(s) or intermittent snow, moderate
+  187 Snow shower(s) or intermittent snow, heavy
+  190 THUNDERSTORM
+  191 Thunderstorm, slight or moderate, no precipitation
+  192 Thunderstorm, slight or moderate, showers of rain or snow
+  193 Thunderstorm, slight or moderate, hail
+  194 Thunderstorm, heavy, no precipitation
+  195 Thunderstorm, heavy, showers of rain or snow
+  196 Thunderstorm, heavy, hail
+  199 Tornado
+  204 Volcanic ash supended in the air aloft
+  206 Thick dust haze, vis < 1km
+  207 Blowing spray
+  208 Drifting dust or sand
+  209 Wall of dust or sand in distance (like haboob)
+  210 Snow haze
+  211 Whiteout
+  213 Lightning, cloud to surface
+  217 Dry thunderstorm
+  219 Tornado cloud (destructive) at or in sight of station
+  220 Volcanic ash deposition
+  221 Dust or sand deposition
+  222 Dew deposition
+  223 Wet snow deposition
+  224 Soft rime deposition
+  225 Hard rime deposition
+  226 Hoar frost deposition
+  227 Glaze deposition
+  228 Ice crust (ice slick) deposition
+  230 Duststorm or sandstorm, temperature below 0C
+  239 Blowing snow, can't tell if snow is falling
+  241 Fog on sea
+  242 Fog in valleys
+  243 (Ant)arctic sea smoke
+  244 Steam fog (sea, lake or river)
+  245 Steam fog (land)
+  246 Fog over ice or snow cover
+  247 Dense fog, vis 60-90m
+  248 Dense fog, vis 30-60m
+  249 Dense fog, vis <30m
+  250 Drizzle, <0.10mm/h
+  251 Drizzle, 0.10-0.19mm/h
+  252 Drizzle, 0.20-0.39mm/h
+  253 Drizzle, 0.40-0.79mm/h
+  254 Drizzle, 0.80-1.59mm/h
+  255 Drizzle, 1.60-3.19mm/h
+  256 Drizzle, 3.20-6.39mm/h
+  257 Drizzle, >6.4mm/h
+  259 Drizzle & snow
+  260 Rain, <1.0mm/h
+  261 Rain, 1.0-1.9mm/h
+  262 Rain, 2.0-3.9mm/h
+  263 Rain, 4.0-7.9mm/h
+  264 Rain, 8.0-15.9mm/h
+  265 Rain, 16.0-31.9mm/h
+  266 Rain, 32.0-63.9mm/h
+  267 Rain, >64.0mm/h
+  270 Snow, <1.0mm/h
+  271 Snow, 1.0-1.9mm/h
+  272 Snow, 2.0-3.9mm/h
+  273 Snow, 4.0-7.9mm/h
+  274 Snow, 8.0-15.9mm/h
+  275 Snow, 16.0-31.9mm/h
+  276 Snow, 32.0-63.9mm/h
+  277 Snow, >64.0mm/h
+  278 Snow or ice crystals from a clear sky
+  279 Wet snow freezing on contact
+  280 Rain (ww=87-99)
+  281 Freezing rain (ww=80-82)
+  282 Rain & snow mixed
+  283 Snow
+  284 Snow pellets or small hail
+  285 Snow pellets or small hail with rain
+  286 Snow pellets or small hail with rain & snow mixed
+  287 Snow pellets or small hail with snow
+  288 Hail
+  289 Hail with rain
+  290 Hail with rain & snow mixed
+  291 Hail with snow
+  292 Shower(s) or thunderstorm over sea
+  293 Shower(s) or thunderstorm over mountains
+  508 No significant weather
+  509 Not observed
+  510 Not reported
+
+ 020004 PAST WEATHER
+0  CLOUD < HALF
+1  CLOUD HALF
+2  CLOUD > HALF
+3  BLOWING
+4  FOG/ICE/HAZE
+5  DRIZZLE
+6  RAIN
+7  SNOW/RAIN
+8  SHOWER(S)
+9  THUNDERSTORM
+10 NO SIG WX
+11 VIS REDUCED
+12 BLOWING
+13 FOG
+14 PRECIPTATION
+15 DRIZZLE
+16 RAIN
+17 PELLETS
+18 SHOWER(S)
+19 THUNDERSTORM
+
+ 020005 (SEE 020004)
+
+ 020008 CLOUD DISTRIBUTION FOR AVIATION
+0  SKY CLEAR
+1  FEW
+2  SCATTERED
+3  BROKEN
+4  OVERCAST
+5
+6  SCT/BKN     scattered/broken                                    !1.9
+7  BKN/OVC     broken/overcast                                     !1.9
+8  ISOLATED
+9  ISOL/EMBED  isolated/embedded                                   !1.9
+10 OCCASIONAL
+11 OCNL/EMBED  occasional/embedded                                 !1.9
+12 FREQUENT
+13 DENSE
+14 LAYERS
+15 Obscured                                                        !1.14
+16 Embedded                                                        !1.14
+
+ 020009 GENERAL WEATHER INDICATOR (TAF/METAR)
+0
+1  NSC          NO SIGNIFICANT CLOUD
+2  CAVOK
+3  SKC          SKY CLEAR
+4  NSW          NO SIGNIFICANT WEATHER
+
+ 020011 CLOUD AMOUNT
+0  0
+1  1 OKTA OR <1
+2  2 OKTAS
+3  3 OKTAS
+4  4 OKTAS
+5  5 OKTAS
+6  6 OKTAS
+7  7 OKTAS (<8)
+8  8 OKTAS
+9  SKY OBSCURED METEOROLOGICAL
+10 SKY PARTLY  OBSCURED BY FOG AND/OR OTHER METEOROLOGICAL PHENOMENA
+11 SCATTERED
+12 BROKEN
+13 FEW
+
+ 020012 CLOUD TYPE
+0  CI
+1  CC
+2  CS
+3  AC
+4  AS
+5  NS
+6  SC
+7  ST
+8  CU
+9  CB
+10 NO CH CLOUDS
+11 CI FIB (UNC)
+12 CI SPI SHEAF
+13 CI SPI CUGEN
+14 CI UNC/FIB
+15 CI VEIL <45'
+16 CI VEIL >45'
+17 CS WHOLE SKY
+18 CS NOT COVER
+19 CH MOSTLY CC
+20 NO CM CLOUDS
+21 AS TR
+22 AS OP / NS
+23 AC TR LEVEL
+24 AC TR PATCHY
+25 AC TR BANDS
+26 AC CU(CB)GEN
+27 AC TR LAYERS
+28 AC CAS/FLO
+29 AC CHAOTIC
+30 NO CL CLOUDS
+31 CU HUM/FRA
+32 CU MED/CON
+33 CU CAL
+34 SC CUGEN
+35 SC NOT CUGEN
+36 SC NEB/FRA
+37 ST/CU FRA
+38 CU/SC LEVELS
+39 CB CAP
+40 CH                                                             !1.13
+41 CM                                                             !1.13
+42 CL                                                             !1.13
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59 CLOUD INVIS
+60 CH INVISIBLE
+61 CM INVISIBLE
+62 CL INVISIBLE
+
+ 020017 CLOUD TOP DESCRIPTION
+0  ISOLATED
+1  CONTIN, FLAT
+2  BROKEN, FLAT  Broken cloud, small breaks, flat tops            !1.13
+3          FLAT  Broken cloud, large breaks, flat tops            !1.13
+4  CONTIN, WAVY
+5  BROKEN, WAVY  Broekn cloud, small breaks, undulating tops      !1.13
+6          WAVY  Broekn cloud, large breaks, undulating tops      !1.13
+7  WAVES/TOWERS
+8  Groups of waves with toweing clouds above the top of the layer !1.13
+9  TWO LAYERS
+
+ 020018 TENDENCY OF RUNWAY VISUAL RANGE
+0  INCREASING
+1  DECREASING
+2  NO CHANGE
+
+ 020021 TYPE OF PRECIPITATION (30-BIT FLAG TABLE)                  !1.11
+1  Unknown
+2  Liquid not freezing
+3  Liquid freezing
+4  Drizzle
+5  Rain
+6  Solid
+7  Snow
+8  Snow grains
+9  Snow pellets                                                    !1.11
+10 Ice pellets                                                     !1.11
+11 Ice crystals                                                    !1.11
+12 Diamond dust                                                    !1.11
+13 Small hail                                                      !1.11
+14 Hail                                                            !1.11
+15 Glaze                                                           !1.11
+16 Rime                                                            !1.11
+17 Soft rime                                                       !1.11
+18 Hard rime                                                       !1.11
+19 Clear ice                                                       !1.11
+20 Wet snow                                                        !1.11
+21 Hoar frost                                                      !1.11
+22 Dew                                                             !1.11
+
+ 020022 CHARACTER OF PRECIPITATION                                !1.13
+0  None
+1  Continuous
+2  Intermittent
+3  Shower
+4  Not reaching ground
+5  Deposition
+
+ 020023 OTHER WEATHER PHENOMENA (18-BIT FLAG TABLE)               !1.13
+1  Dust/sand whirl
+2  Squalls
+3  Sandstorm
+4  Duststorm
+5  Cloud-to-surface lightning
+6  Cloud-to-cloud lightning
+7  Distant lightning
+8  Thunderstorm
+9  Funnel cloud not touching surface
+10 FC touching surface  (Funnel cloud)
+11 Spray
+
+ 020024 INTENSITY OF PHENOMENA                                    !1.13
+0  None
+1  Light
+2  Moderate
+3  Heavy
+4  Violent
+5  Severe                                                         !1.14
+
+ 020025 OBSCURATION (21-BIT FLAG TABLE)                           !1.13
+1  Fog
+2  Ice fog
+3  Steam fog
+4
+5
+6
+7  Mist
+8  Haze
+9  Smoke
+10 Volcanic ash
+11 Dust
+12 Sand
+13 Snow
+
+ 020026 CHARACTER OF OBSCURATION                                  !1.13
+0  No change
+1  Shallow
+2  Patches
+3  Partial
+4  Freezing
+5  Low drifting
+6  Blowing
+7  Increasing
+8  Decreasing
+9  In suspension in the air
+10 Wall
+11 Dense
+12 Whiteout
+
+ 020027 PHENOMENA OCCURRENCE (9-BIT FLAG TABLE)                   !1.13
+1  At time of observation
+2  In past hour
+3  In W1W2 period
+4  In specified period
+5
+6
+7  At the station
+8  In the vicinity
+
+ 020028 Expected change in intensity                              !1.14
+0  No change
+1  Weaken
+2  Intensify
+
+ 020029 RAIN FLAG                                                 !1.13
+0  No rain                                                        !1.13
+1  Rain                                                           !1.13
+
+ 020032 RATE OF ICE ACCRETION
+0  NO BUILDUP
+1  SLOW BUILDUP
+2  FAST BUILDUP
+3  SLOW MELT
+4  FAST MELT
+
+ 020033 CAUSE OF ICE ACCRETION  (4-BIT FLAG TABLE)
+1  OCEAN SPRAY
+2  FOG
+3  RAIN
+
+ 020034 SEA ICE CONCENTRATION
+0  NONE VISIBLE
+1  IN LEAD/FAST
+2  <3/10 PACK
+3  4-6/10 PACK
+4  7-8/10 PACK
+5  >9/10 PACK
+6  OPEN, PATCHY
+7  CLOSE,PATCHY
+8  FAST & OPEN
+9  FAST & CLOSE
+10
+11
+12
+13
+14 CAN'T REPORT
+
+ 020035 AMOUNT AND TYPE OF ICE
+0  NO LAND ICE
+1  1-5 BERGS
+2  6-10 BERGS
+3  11-20 BERGS
+4  <10 BITS
+5  >10 BITS
+6  1-5 & BITS
+7  6-10 & BITS
+8  11-20 & BITS
+9  >20 & BITS
+10
+11
+12
+13
+14 UNABLE TO REPORT, DARKNESS, LACK OF VISIBILITY, ONLY SEA ICE VISIBLE
+
+ 020036 ICE SITUATION                                             !1.13
+0  In sight
+1  Easy, improving
+2  Easy, no change
+3  Easy, worsening
+4  Hard, improving
+5  Hard, no change
+6  Hard, worsening. Ice forming & floes freezing together
+7  Slight pressure
+8  Severe pressure
+9  Ship beset
+
+ 020037 ICE DEVELOPMENT
+0  NEW ICE ONLY
+1  NILAS/RIND
+2  10-30CM
+3  MOSTLY NEW
+4  MOSTLY THIN
+5  THIN,30-70CM
+6
+7  MEDIUM/THICK
+8  >2M THICK
+9  MOSTLY OLD
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30 UNABLE TO REPORT, DARKNESS, LACK OF VISIBLITY
+
+ 020041 AIRFRAME ICING
+0  NONE
+1  LIGHT
+2  LIGHT (CLOUD
+3  LIGHT (PRECP
+4  MOD
+5  MOD (CLOUD)
+6  MOD (PRECIP)
+7  SEV
+8  SEV (CLOUD)
+9  SEV (PRECIP)
+10 TRACE
+11 TRACE (CLOUD)
+12 TRACE (PRECIPITATION)
+
+ 020042 AIRFRAME ICING                                            !1.14
+0  No icing
+1  Icing
+
+ 020045 Supercooled large droplet (SLD) conditions                !1.14
+0  No SLD
+1  SLD
+
+ 020062 STATE OF GROUND
+0  DRY
+1  MOIST
+2  WET
+3  FLOODED
+4  FROZEN
+5  GLAZE ON GROUND
+6  LOOSE COVER OF DUST OR SAND
+7  THIN COVER OF DUST OR SAND
+8  THICK COVER OF DUST OR SAND
+9  DRY, CRACKED
+10 ICE-COVERED
+11 WET SNOW, LESS THAN HALF GROUND COVER
+12 WET SNOW, MORE THAN HALF GROUND COVER
+13 EVEN WET SNOW, ALL GROUND COVERED
+14 UNEVEN WET SNOW, ALL GROUND COVERED
+15 DRY SNOW, LESS THAN HALF GROUND COVER
+16 DRY SNOW, MORE THAN HALF GROUND COVER
+17 EVEN DRY SNOW, ALL GROUND COVERED
+18 UNEVEN DRY SNOW, ALL GROUND COVERED
+19 DEEP SNOW DRIFTS
+
+ 020063 SPECIAL PHENOMENA (TO BE DEVELOPED)
+
+ 020071 ACCURACY OF FIX AND RATE OF ATMOSPHERICS                   !1.9
+0  NO ASSESSMENT
+1  <50km <1/s      < 50KM             < 1 PER SECOND
+2  50-200km <1/s   > 50KM & < 200KM   < 1 PER SECOND
+3  >200km <1/s     > 200KM            < 1 PER SECOND
+4  <50km >1/s      < 50KM             1 OR MORE PER SECOND
+5  50-200km >1/s   > 50KM & < 200KM   1 OR MORE PER SECOND
+6  >200km >1/s     > 200KM            1 OR MORE PER SECOND
+7  <50km fast      < 50KM             SO RAPID NUMBER CANNOT BE COUNTED
+8  50-200km fast   > 50KM & < 200KM   SO RAPID NUMBER CANNOT BE COUNTED
+9  >200km fast     > 200KM            SO RAPID NUMBER CANNOT BE COUNTED
+
+ 020090 SPECIAL CLOUDS
+0
+1  NACREOUS
+2  NOCTILUCENT
+3  WATERFALL
+4  FIRE CLOUDS
+5  VOLCANIC
+
+ 020192 SIGNIFICANT PRESENT OR FORECAST WEATHER: INTENSITY OR PROXIMITY
+0
+1  LIGHT
+2  MODERATE
+3  HEAVY
+4
+5  IN VICINITY
+
+ 020193 SIGNIFICANT PRESENT OR FORECAST WEATHER: QUALIFIERS  (8-BIT FLAG TABLE)
+1  PARTIAL       PR
+2  SUPERCOOLED   FZ
+3  THUNDERSTORM  TS
+4  SHOWER(S)     SH
+5  BLOWING       BL
+6  LOW DRIFTING  DR
+7  PATCHES       BC
+8  SHALLOW       MI
+
+ 020194 SIGNIFICANT PRESENT OR FORECAST WEATHER  (21-BIT FLAG TABLE)
+1
+2  DUSTSTORM     DS
+3  SANDSTORM     SS
+4  FUNNEL CLOUD  FC
+5  SQUALLS       SQ
+6  WHIRLS        PO
+7  HAZE          HZ
+8  SAND          SA
+9  DUST LYING    DU
+10 VOLCANIC ASH  VA
+11 SMOKE         FU
+12 FOG           FG
+13 MIST          BR
+14 HAIL/SNOW     GS
+15 HAIL          GR
+16 ICE PELLETS   PE
+17 DIAMOND DUST  IC
+18 SNOW GRAINS   SG
+19 SNOW          SN
+20 RAIN          RA
+21 DRIZZLE       DZ
+
+ 020195 TAF/METAR GENERAL WEATHER INDICATORS  (6-BIT FLAG TABLE)
+1
+2  WX NIL
+3  NSW
+4  SKC
+5  CAVOK
+6  NSC
+
+ 020197 VISIBILITY TENDENCY
+0  NONE
+1  INCREASING
+2  DECREASING
+
+ 020198 DAY OF HAIL,ICE (0000Z-2400Z PREVIOUS DAY)
+0  None                                                            !1.9
+1  DIAMOND DUST
+2  SNOW GRAINS
+3  SNOW PELLETS
+4  ICE PELLETS OR SMALL HAIL (LESS THAN 5MM DIAMETER)
+5  HAIL (5-9MM DIAMETER)
+6  HAIL (10-19MM DIAMETER)
+7  HAIL (20MM OR GREATER DIAMETER)
+8                                                                  !1.9
+9  None (restricted period)                                        !1.9
+
+ 020199 DAY OF THUNDER (0000Z-2400Z PREVIOUS DAY)
+0  None                                                            !1.9
+1  Thunderstorm, with or without precipitation                     !1.9
+2                                                                  !1.9
+3                                                                  !1.9
+4                                                                  !1.9
+5                                                                  !1.9
+6                                                                  !1.9
+7                                                                  !1.9
+8                                                                  !1.9
+9  None (restricted period)                                        !1.9
+
+ 020200 DAY OF FOG (0000Z-2400Z PREVIOUS DAY)
+0  >1000m      Visibility 1000m or more at 0900z previous day      !1.9
+1  <1000m      Visibility less than 1000m at 0900z                 !1.9
+
+ 020201 DAY OF GALE (0000Z-2400Z PREVIOUS DAY)
+0  None                                                            !1.9
+1  34-knot winds for a period of at least 10 minutes               !1.9
+2                                                                  !1.9
+3                                                                  !1.9
+4                                                                  !1.9
+5                                                                  !1.9
+6                                                                  !1.9
+7                                                                  !1.9
+8                                                                  !1.9
+9  None (restricted period)                                        !1.9
+
+ 020202 DAY OF SNOW OR SLEET (0000Z-2400Z PREVIOUS DAY)
+0  None                                                            !1.9
+1  Sleet                                                           !1.9
+2                                                                  !1.9
+3                                                                  !1.9
+4                                                                  !1.9
+5  Snow                                                            !1.9
+6                                                                  !1.9
+7                                                                  !1.9
+8                                                                  !1.9
+9  None (restricted period)                                        !1.9
+
+ 020203 STATE OF CONCRETE
+0  SLAB DRY
+1  SLAB MOIST
+2  SLAB WET
+3  SLAB ICY
+
+ 021066 UWA PRODUCT CONFIDENCE DATA (12-BIT FLAG TABLE)
+1  NOT WORKING
+2  EQUIP FAILED
+3  PRF CHANGED
+4  WINDOW CHANGE
+5  GAIN CHANGE
+6  BAD CHIRP
+7  BAD I & Q
+8  CENTR>MMCC
+9  CENTR>PRF/2
+10 AMBIG<MMCC
+11 OUTPUT<MMCC
+
+ 021067 UWI PRODUCT CONFIDENCE DATA (13-BIT FLAG TABLE)
+1  NO FOREBEAM
+2  NO MIDBEAM
+3  NO AFTBEAM
+4  FORE ARCING
+5  MID ARCING
+6  AFT ARCING
+7  ANY BEAM KP ABOVE THRESHOLD
+8  LAND IN CELL FOOTPRINT
+9  NO AMBIG REMOVAL
+10 NO MET BACKGROUND
+11 MIN RESIDUAL ABOVE THRESHOLD
+12 CHECKSUM ERROR
+
+ 021068 URA PRODUCT CONFIDENCE DATA (8-BIT FLAG TABLE)
+1  BAD WIND
+2  BAD SWH
+3  BAD ALTITUDE
+4  BAD PEAKINESS
+5  BAD CHECKSUM
+6  NO HTL CORR
+7  <10 VALUES
+
+ 021069 UAT QUALITY ANALYSIS (10-BIT FLAG TABLE) (0 NOT DONE, 1 DONE)
+1  12.0 PRESENT
+2  11.0 PRESENT
+3  3.7 PRESENT
+4  1.6 PRESENT
+5  1.6 HISTOGRAM REFLECTANCE CLOUD TEST USED IN CLOUD IDENTIFICATION
+6  DYN THRESHOLD USED IN 1.6 HISTOGRAM REFLECTANCE CLOUD TEST
+7  SUNGLINT    DETECTED IN 1.6 REFLECTANCE TEST
+8  SST USED 3.7 CHANNEL
+9  SST USED DAYTIME DATA IN DERIVATION (NIGHTTIME IF ZERO)
+
+ 021070 SST product confidence data (SADIST-2) (23-BIT FLAG TABLE)  !1.8
+1  Cell 1:nadir-only view SST used 3.7 micron channel
+2  Cell 2:nadir-only view SST used 3.7 micron channel
+3  Cell 3:nadir-only view SST used 3.7 micron channel
+4  Cell 4:nadir-only view SST used 3.7 micron channel
+5  Cell 5:nadir-only view SST used 3.7 micron channel
+6  Cell 6:nadir-only view SST used 3.7 micron channel
+7  Cell 7:nadir-only view SST used 3.7 micron channel
+8  Cell 8:nadir-only view SST used 3.7 micron channel
+9  Cell 9:nadir-only view SST used 3.7 micron channel
+10 Cell 1: dual view SST used 3.7 micron channel
+11 Cell 2: dual view SST used 3.7 micron channel   Cell numbering:
+12 Cell 3: dual view SST used 3.7 micron channel     NW       NE
+13 Cell 4: dual view SST used 3.7 micron channel        7 8 9
+14 Cell 5: dual view SST used 3.7 micron channel        4 5 6
+15 Cell 6: dual view SST used 3.7 micron channel        1 2 3
+16 Cell 7: dual view SST used 3.7 micron channel     SW       SE
+17 Cell 8: dual view SST used 3.7 micron channel
+18 Cell 9: dual view SST used 3.7 micron channel
+19 Nadir:day   Nadir view contains day-time data (night if not set)
+20 Forward:day Forward view contains day-time data (night if not set)
+21 Some not yaw Contributions from scans when platform not in yaw-steering mode
+22 Poor scans  Contributions from scans whose quality is poor or unknown
+
+ 021072 ALTIMETER CALIBRATION STATUS  (4-BIT FLAG TABLE)
+1  HEIGHT ERROR   CORRECTION
+2  STL DISCRIM    CORRECTION
+3  AGC OUTPUT     CORRECTION
+
+ 021073 ALTIMETER INSTRUMENT MODE  (9-BIT FLAG TABLE)
+1  BLANK RECORD
+2  TEST
+3  CALIBRATION
+4  BITE
+5  AQUIS ON ICE
+6  AQUIS ON SEA
+7  TRACK ON ICE
+8  TRACK ON SEA
+
+ 021076 REPRESENTATION OF INTENSITIES
+0  Linear                                                         !1.13
+1  Log (base e)                                                   !1.13
+2  Log (base 10)                                                  !1.13
+
+ 021109 SEAWINDS WIND VECTOR CELL QUALITY (17-BIT FLAG TABLE)      !1.9
+1  Not enough good sigma-0 available for wind retrieval
+2  Poor azimuth diversity among sigma-0 for wind retrieval
+3
+4
+5
+6
+7
+8  Over land    Some portion of wind vector cell is over land
+9  Over ice     Some portion of wind vector cell is over ice
+10 No retrieval Wind retrieval not performed for wind vector cell
+11 >30m/s       Reported wind speed greater than 30m/s
+12 <3m/s        Reported wind speed less than or equal to 3m/s     !1.10
+
+ 021115 SEAWINDS SIGMA-0 QUALITY (17-BIT FLAG TABLE)               !1.9
+1  Not usable
+2  Low s/n ratio
+3  Negative
+4  Out of range
+5  Unacceptable scatterometer pulse quality
+6  Cell location algorithm does not converge
+7  Frequency shift beyond range of x factor table
+8  Spacecraft temperature beyond calibration coefficient range
+9  No applicable attitude records found
+10 Interpolated ephemeris data not acceptable
+
+ 021116 SEAWINDS SIGMA-0 MODE (17-BIT FLAG TABLE)                  !1.9
+1              calibration measurement pulse
+2              calibration measurement pulse
+3  Outer antenna beam
+4  Sigma-0 cell aft of spacecraft
+5              current mode
+6              current mode
+7              effective gate width - slice resolution
+8              effective gate width - slice resolution
+9              effective gate width - slice resolution
+10 Low resolution mode - whole pulse data
+11 Scatterometer electronic subsystem b
+12 Alternate spin rate - 19.8 rpm
+13 Receiver protection on
+14             slices per composite
+15             slices per composite
+16             slices per composite
+
+ 021119 WIND SCATTEROMETER GEOPHYSICAL MODEL FUNCTION              !1.9
+0
+1  SASS
+2  SASS2
+3  NSCAT0
+4  NSCAT1
+5  NSCAT2
+6  QSCAT0
+7  QSCAT1
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31 CMOD1
+32 CMOD2
+33 CMOD3
+34 CMOD4
+35 CMOD5
+
+ 021144 Altimeter rain flag (2-BIT FLAG TABLE)                    !1.14
+1  rain
+
+ 021196 UWA PRODUCT CONFIDENCE DATA (SEE 021066)
+
+ 021197 UWI PRODUCT CONFIDENCE DATA (12-BIT FLAG TABLE)
+1  NO FOREBEAM
+2  NO MIDBEAM
+3  NO AFTBEAM
+4  FORE ARCING
+5  MID ARCING
+6  AFT ARCING
+7  KP>THRESHOLD
+8  LAND
+9  NO AMBIG REM
+10 NO MET BACKG
+11 CHECKSUM ERR
+
+ 021198 URA PRODUCT CONFIDENCE DATA (SEE 021068)
+
+ 021199 UAT QUALITY ANALYSIS (7-BIT FLAG TABLE) (0 NOT DONE, 1 DONE)
+1  3.7 CHANNEL USED IN ASST DERIVATION
+2  DAYTIME DATA USED IN ASST DERIVATION
+3  PREVIOUS PASS COMPARISON PERFORMED
+4  WEEKLY MEAN COMPARISON PERFORMED
+5
+6  RATE OF CHANGE OF ASST CHECKED AGAINST STATIC THRESHOLD
+
+ 021200 MWI PRODUCT CONFIDENCE DATA (16-BIT FLAG TABLE)
+1  NO FOREBEAM
+2  NO MIDBEAM
+3  NO AFTBEAM
+4  FORE ARCING
+5  MID ARCING
+6  AFT ARCING
+7  KP>THRESHOLD
+8  LAND
+9  NO AMBIG REM
+10 NO MET BACKG
+11 CHECKSUM ERR
+12 NO RETRIEVAL
+13 <4 OR >24M/S   RETRIEVED WIND <4 OR >24M/S
+14 RET-BGD>4M/S   RETRIEVED - BACKGROUND WIND SPEED >4M/S
+15 RET-BGD>40D    RETRIEVED - BACKGROUND WIND DIRECTION > 40 DEGREES
+
+ 021202 ALTIMETER CALIBRATION STATUS  (4-BIT FLAG TABLE) (SEE 021072)
+
+ 021203 ALTIMETER INSTRUMENT MODE  (9-BIT FLAG TABLE) (SEE 021073)
+
+ 021214 UAT QUALITY SUMMARY
+0  NO DATA       NO DATA IN PRODUCT
+1  NOT RECOMMNDD NOT RECOMMENDED FOR USE
+2  CONF FAILURE  CONFIDENCE ANALYSIS FAILED; USE WITH DISCRETION
+3  QUALANAL FAIL QUALITY ANALYSIS FAILED; USE WITH DISCRETION
+4  OK FOR USE    OK; RECOMMENDED FOR USE
+
+ 021231 RADIO OCCULTATION PRODUCT CONFIDENCE (16-BIT FLAG TABLE)   !1.12
+1  ASCENDING OCCULTATION                                           !1.12
+
+ 022056 DIRECTION OF PROFILE                                      !1.13
+0  Upwards
+1  Downwards
+2  Horizontal
+
+ 022061 STATE OF SEA
+0  GLASSY
+1  RIPPLED
+2  WAVELETS
+3  SLIGHT
+4  MODERATE
+5  ROUGH
+6  VERY ROUGH
+7  HIGH
+8  VERY HIGH
+9  PHENOMENAL
+
+   022067 INSTRUMENT TYPE FOR WATER TEMPERATURE PROFILE MEASUREMENT
+  1   T-4 (A=6.472)
+  2   T-4
+  11  T-5
+  21  FAST DEEP
+  31  T-6 (A=6.472)
+  32  T-6
+  41  T-7 (A=6.472)
+  42  T-7
+  51  DEEP BLUE (A=6.472)
+  52  DEEP BLUE
+  61  T-10
+  71  T-11
+  201 TSK T-4 (A=6.472)
+  202 TSK T-4
+  211 TSK T-6 (A=6.472)
+  212 TSK T-6
+  221 TSK T-7 (A=6.472)
+  222 TSK T-7
+  231 TSK T-5
+  241 TSK T-10
+  251 TSK Deep Blue                                               !1.13
+  252 TSK Deep Blue                                               !1.13
+  261 TSK AXBT                                                    !1.13
+  401 XBT-1
+  411 XBT-3
+  421 XBT-4
+  431 XBT-5
+  441 XBT-5DB
+  451 XBT-6
+  461 XBT-7
+  462 XBT-7                                                       !1.13
+  471 XBT-7DB
+  481 XBT-10
+  491 XBT-20
+  501 XBT-20DB
+  510 SPARTON 536 AXBT (A=1.524, B=0)                              !1.9
+  700 XCTD STANDARD
+  710 XCTD DEEP
+  720 AXCTD
+  730 SXCTD
+  741 TSK XCTD                                                    !1.13
+  751 TSK AXCTD                                                   !1.13
+  800 MECHANICAL BT
+  810 HYDROCAST
+  820 THERMISTOR CHAIN
+  830 CTD
+  831 CTD_P_ALACE float                                           !1.13
+  840 PROVOR,NO   conductivity sensor                              !1.9
+  841 PROVOR,SEABIRD conductivity sensor                           !1.9
+  842 PROVOR,FSI  conductivity sensor                              !1.9
+  845 WEB,NO      conductivity sensor                              !1.9
+  846 WEB,SEABIRD conductivity sensor                              !1.9
+  847 WEB,FSI     conductivity sensor                              !1.9
+  850 SOLO,NO     conductivity sensor                              !1.9
+  851 SOLO,SEABIRD conductivity sensor                             !1.9
+  852 SOLO,FSI    conductivity sensor                              !1.9
+  855 NINJA,no    conductivity sensor                             !1.14
+  856 NINJA,SBE   conductivity sensor                             !1.14
+  857 NINJA,FSI   conductivity sensor                             !1.14
+  858 NINJA,TSK   conductivity sensor                             !1.14
+  900 T-12 XBT    Sippican  (a=9.727, b=-0.0000473)               !1.14
+
+ 022068 RECORDER TYPE (BATHY)
+0
+1  STRIP CHART
+2  MK2A/SSQ-61
+3  MK-9
+4  AN/BHQ-7/MK8
+5  MK-12
+6  MK-21                                                          !1.13
+7
+8
+9
+10 SOC BT/SV
+11 OL5005       Lockheed-Sanders                                   !1.9
+12
+13
+14
+15
+16
+17
+18
+19
+20 XBT-ST
+21 XBT-ST 1
+22 XBT-ST 2
+23
+24
+25
+26
+27
+28
+29
+30 SA-810
+31 METROBYTE
+32 Z-60-16 III
+33 Z-60-16 II
+34 ETSM2
+35 NMS-XBT
+36
+37
+38
+39
+40 TSK MK-2A
+41 TSK MK-2S
+42 TSK MK-30
+43 TSK MK-30N
+44
+45 TSK MK-100                                                     !1.13
+46 TSK MK-130   Compatible recorder for both XBT and XCTD          !1.9
+47
+48 TSK AXBT RECEIVER MK-300                                       !1.13
+49
+50 JMA ASTOS                                                      !1.13
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60 ARGOS UP     ARGOS communications, sampling on up transit       !1.9
+61 ARGOS DOWN   ARGOS communications, sampling on down transit     !1.9
+62 ORBCOMM UP   ORBCOMM communications, sampling on up transit     !1.9
+63 ORBCOMM DOWN ORBCOMM communications, sampling on down transit   !1.9
+64
+65
+66
+67
+68
+69
+70 Devil-1 XBT CSIRO acquisition system                            !1.14
+71 Devil-2 XBT CSIRO acquisition system                            !1.14
+
+ 022120 TIDE STATION AUTOMATED WATER LEVEL CHECK
+0  GOOD DATA
+1  TOO HIGH
+2  TOO LOW
+3  > RATE LIMIT
+4  > FLAT LIMIT
+5  > O-P LIMIT
+6  PRIM-BACKUP
+7  > TOLERANCE
+8  > QA LIMIT
+9  BAD SEA TEMP
+10 >1 FAILURE
+11 NO CHECKS
+
+ 022121 TIDE STATION MANUAL WATER LEVEL CHECK
+0  OPERATIONAL
+1  CLOGGING?
+2  DATUM SHIFT?
+3  WATER LEVEL?
+4  TEMP SENSOR?
+5  >1 PROBLEM?
+6  BAD DATA!
+7  NO CHECKS
+
+ 022122 TIDE STATION AUTOMATED METEOROLOGICAL DATA CHECK
+0  GOOD DATA
+1  BAD DD
+2  BIG FF
+3  BAD P
+4  BAD T
+5  >1 FAIL
+6  NO CHECKS
+
+ 022123 TIDE STATION MANUAL METEOROLOGICAL DATA CHECK
+0  OPERATIONAL
+1  WIND SENSOR?
+2  PRES SENSOR?
+3  TEMP SENSOR?
+4  SENSORS?
+5  >1 PROBLEM?
+6  BAD DATA!
+7  NO CHECKS
+
+ 023001 ACCIDENT EARLY NOTIFICATION - ARTICLE APPLICABLE
+0
+1  ARTICLES 1-2
+2  ARTICLE 3
+3  ARTICLE 5.2
+
+ 023002 ACTIVITY OR FACILITY INVOLVED IN INCIDENT
+0
+1  GROUND REACTOR
+2  SEA REACTOR
+3  SPACE REACTOR
+4  NUC.FUEL FAC
+5  RAD.WASTE
+6  WASTE TRANSP
+7  WASTE STORAG
+8  MANUF.ISOTOP
+9  ISOTOPE USE
+10 ISO STORAGE
+11 ISO DISPOSAL
+12 ISO TRANSPRT
+13 ISO POWERGEN
+
+ 023003 TYPE OF RELEASE
+0  NO RELEASE
+1  TO ATMOSPHERE
+2  TO WATER
+3  ATMOS/WATER
+4  EXPECT ATMOS
+5  EXPECT WATER
+6  EXPECT BOTH
+
+ 023004 COUNTERMEASURES TAKEN NEAR BORDER
+0  NONE
+1  EVACUATION
+2  SHELTERING
+3  PROPHYLAXIS
+4  WATER
+
+ 023005 CAUSE OF INCIDENT
+0  NOT KNOWN
+1  KNOWN
+
+ 023006 INCIDENT SITUATION
+0  NO BETTER
+1  UNSTABLE
+2  NO WORSE
+3  IMPROVING
+4  STABLE
+5  WORSENING
+
+ 023007 CHARACTERISTICS OF RELEASE
+0  NO RELEASE
+1  STOPPED
+2  RELEASE
+3  CONTINUING
+
+ 023008 STATE OF CURRENT RELEASE
+0  GASEOUS
+1  PARTICULATE
+2  GAS/PARTICLE
+
+ 023009 STATE OF EXPECTED RELEASE (AS 023008)
+
+ 023016 POSSIBILITY OF SIGNIFICANT CHEMICAL TOXIC HEALTH EFFECT
+0  NOT SIGNIF
+1  SIGNIFICANT
+
+ 023018 RELEASE BEHAVIOUR OVER TIME
+0  ENDED
+1  CONTINUING
+2  RATE: MORE
+3  RATE: SAME
+4  RATE: LESS
+
+ 023031 POSSIBILITY THAT PLUME WILL MEET RAIN IN INCIDENT STATE
+0  NO RAIN
+1  RAIN
+
+ 023032 POSSIBILITY OF CHANGE IN WIND SPEED/DIRECTION IN NEXT 6 HOURS
+0  NOT EXPECTED
+1  EXPECTED
+
+ 024003 COMPOSITION OF RELEASE
+0  NOBLE GASES
+1  IODINES
+2  CAESIUMS
+3  TRANSURANICS
+
+ 025004 ECHO PROCESSING
+0  INCOHERENT
+1  COHERENT (DOPPLER)
+
+ 025005 ECHO INTEGRATION
+0  LOG - 2.5 DB
+1  LINEAR
+2  SPECIAL
+
+ 025006 Z TO R CONVERSION
+0  ZH TO R
+1  (ZH,ZDR) TO (NO,DO) TO R
+2  (Z(F1),Z(F2)) TO ATTENUATION TO R
+
+ 025009 CALIBRATION METHOD  (4-BIT FLAG TABLE)
+1  NONE
+2  TARGET/SIGNAL
+3  RAINGAUGES
+4  DISTROMETER
+
+ 025010 CLUTTER TREATMENT
+0  NONE
+1  MAP
+2  INSERTION OF HIGHER ELEVATION DATA AND MAP
+3  ANALYSIS OF THE FLUCTUATION LOGARITHM SIGNAL (CLUTTER DETECTION)
+4  EXTRACTION OF THE FLUCTUATING PART OF LINEAR SIGNAL(CLUTTER SUPPRESSION)
+5  CLUTTER SUPRESSION (DOPPLER)
+6  MULTI-PARAMETER ANALYSIS
+
+ 025011 GROUND OCCULTATION CORRECTION (SCREENING)
+0  NONE
+1  MAP OF CORRECTION FACTORS
+2  INTERPOLATION (AZIMUTH OR ELEVATION)
+
+ 025012 RANGE ATTENUATION CORRECTION
+0  HARDWARE
+1  SOFTWARE
+2  HARD & SOFTWARE
+
+ 025013 BRIGHT-BAND CORRECTION  (2-BIT FLAG TABLE)
+1  BRIGHT-BAND
+
+ 025015 RADOME ATTENUATION CORRECTION  (2-BIT FLAG TABLE)
+1  RADOME ATTEN
+
+ 025017 PRECIPITATION ATTENUATION CORRECTION  (2-BIT FLAG TABLE)
+1  PRECIP ATTEN
+
+ 025020 MEAN SPEED ESTIMATION
+0  FFT
+1  PPP
+2  VPC
+
+ 025021 WIND COMPUTATION ENHANCEMENT (8-BIT FLAG TABLE)
+1  SIMPLE MEAN
+2  CONSENS MEAN
+3  MEDIAN CHECK
+4  VERT CONSIST
+5  OTHER
+
+ 025030 USE OF RUNNING MEAN SEA SURFACE TEMPERATURE AS PREDICTOR
+0  CRIT NOT MET
+1  NO DATA
+2  USED
+
+ 025032 WIND PROFILER MODE INFORMATION
+0
+1  LOW MODE
+2  HIGH MODE
+
+ 025033 NOAA WIND PROFILER SUBMODE INFORMATION
+0  SUBMODE A
+1  SUBMODE B
+
+ 025034 NOAA WIND PROFILER QUALITY CONTROL TEST RESULTS (4-BIT FLAG TABLE)
+1  TEST A FAIL
+2  TEST B FAIL
+3  INCONCLUSIVE
+
+ 025036 ATMOSPHERICS LOCATION METHOD
+0  direction-finder network operating on the same atmospherics     !1.9
+1  ATD network operating on the same atmospherics                  !1.9
+2
+3
+4
+5
+6  SINGLE STATION RANGE BEARING TECHNIQUE
+
+ 025040 CO2 WIND PRODUCT DERIVATION
+0  NON-SPECIFIC
+1  FIRST GUESS
+2  CLOUD DATA
+3  AVGE VECTOR
+4  PRIMARY DATA
+5  GUESS DATA
+6  VECTOR DATA
+7  TRACER DATA
+8  TRACER: NEXT
+
+ 025041 MOVING PLATFORM DIRECTION REPORTING METHOD
+0  TRUE DEGREES
+1  TABLE 0700
+
+ 025042 MOVING PLATFORM SPEED REPORTING METHOD
+0  M/S
+1  TABLE 4451
+
+ 025045 HIRS CHANNEL COMBINATION (21-BIT FLAG TABLE)
+1  CHANNEL 1
+2  CHANNEL 2
+3  CHANNEL 3
+4  CHANNEL 4
+5  CHANNEL 5
+6  CHANNEL 6
+7  CHANNEL 7
+8  CHANNEL 8
+9  CHANNEL 9
+10 CHANNEL 10
+11 CHANNEL 11
+12 CHANNEL 12
+13 CHANNEL 13
+14 CHANNEL 14
+15 CHANNEL 15
+16 CHANNEL 16
+17 CHANNEL 17
+18 CHANNEL 18
+19 CHANNEL 19
+20 CHANNEL 20
+
+ 025046 MSU CHANNEL COMBINATION (5-BIT FLAG TABLE)                 !1.10
+1  CHANNEL 1
+2  CHANNEL 2
+3  CHANNEL 3
+4  CHANNEL 4
+
+ 025047 SSU CHANNEL COMBINATION (4-BIT FLAG TABLE)                 !1.10
+1  CHANNEL 1
+2  CHANNEL 2
+3  CHANNEL 3
+
+ 025048 AMSU-A CHANNEL COMBINATION (16-BIT FLAG TABLE)
+1  CHANNEL 1
+2  CHANNEL 2
+3  CHANNEL 3
+4  CHANNEL 4
+5  CHANNEL 5
+6  CHANNEL 6
+7  CHANNEL 7
+8  CHANNEL 8
+9  CHANNEL 9
+10 CHANNEL 10
+11 CHANNEL 11
+12 CHANNEL 12
+13 CHANNEL 13
+14 CHANNEL 14
+15 CHANNEL 15
+
+ 025049 AMSU-B CHANNEL COMBINATION (6-BIT FLAG TABLE)
+1  CHANNEL 1
+2  CHANNEL 2
+3  CHANNEL 3
+4  CHANNEL 4
+5  CHANNEL 5
+
+ 025051 AVHRR CHANNEL COMBINATION (7-BIT FLAG TABLE)              !1.13
+1  CHANNEL 1
+2  CHANNEL 2
+3  CHANNEL 3
+4  CHANNEL 4
+5  CHANNEL 5
+6  CHANNEL 6
+
+ 025069 Flight level pressure corrections (8-BIT FLAG TABLE)      !1.14
+1  Smoothed
+2  Baseline adjusted
+3  Normalised time interval
+4  Outlier checked
+5  Plausibility checked
+6  Consistency checked
+7  Interpolated
+
+ 025053 OBSERVATION QUALITY (12-BIT FLAG TABLE)
+1  GOOD
+2  REDUNDANT
+3  QUESTIONABLE
+4  BAD
+5  EXPERIMENTAL
+6  PRECIPITATING
+
+ 025086 DEPTH CORRECTION INDICATOR
+0  NOT CORRECTED
+1  CORRECTED
+
+ 025093 RASS COMPUTATION CORRECTION (8-BIT FLAG TABLE)             !1.9
+1  None
+2  Vertical velocity
+3
+4
+5
+6
+7  All
+
+ 025095 Altimeter state (2-BIT FLAG TABLE)                        !1.14
+1  Backup
+
+ 025096 Radiometer state (5-BIT FLAG TABLE)                       !1.14
+1  Mode 1
+2  Mode 1 calibration sequence
+3  Channel 2 off
+4  Channel 3 off
+
+ 025097 Three-dimensional estimate of navigator orbit error       !1.14
+0  0-30 cm
+1  30-60 cm
+2  60-90 cm
+3  90-120 cm
+4  120-150 cm
+5  150-180 cm
+6  180-210 cm
+7  210-240 cm
+8  240-270 cm
+9  >270 cm
+
+ 025110 Image processing summary (10-BIT FLAG TABLE)              !1.14
+1  Default parameters used in correction
+2  Raw data analysis used in correction
+3  Antenna elevation pattern correction applied
+4  Nominal chirp replica used
+5  Reconstructed chirp used
+6  Slant range to ground range conversion applied
+
+ 025120 RA2 L2 processing flag                                    !1.14
+0  Not enough data set records free of Level-2 processing errors
+1  More than enough data set records free of Level-2 processing errors
+
+ 025122 Hardware configuration for radio frequency                !1.14
+0  A
+1  B
+
+ 025123 Hardware configuration for HPA                            !1.14
+0  A
+1  B
+
+ 025124 MWR L2 processing flag    (Microwave Radiometer)          !1.14
+0  Not enough data set records free of Level-2 processing errors
+1  More than enough data set records free of Level-2 processing errors
+
+ 025214 PRE-PROCESSING QUALITY FLAGS FOR ATOVS (24-BIT FLAG TABLE)
+1  AMSU BT's considered contaminated for the mapping               !1.9
+2  NN AMSU-A used secondary calibration                            !1.9
+3  AMSU-B used secondary calibration                               !1.9
+4  AMSU-B missing due to insufficient good data                    !1.9
+5  Maximum probability scheme cloud flag (NN)                      !1.9
+6  Scattering test (only set over the sea) (NN)                    !1.9
+7  Logistic precipitation probability test (NN)                    !1.9
+8  Grody light rainfall test (NN)                                  !1.9
+9  AMSU-A/B 89gHz values (NN) don't match                          !1.9
+10 NN surface types from topography & preprocessing don't match    !1.9
+11 AVHRR channel 3 value is albedo, not brightness temperature     !1.9
+12 Secondary calibration used in the mapping                       !1.9
+13 Nearest AMSU-A fov used was not the closest                     !1.9
+14 AMSU-A data missing                                             !1.9
+
+ 025215 FIELD OF VIEW QUALITY FLAGS FOR ATOVS 1D DATA (24-BIT FLAG TABLE)
+1  SET IF SECONDARY CALIBRATION USED
+2  HIRS CLOUD TEST
+3  CHANNEL 1   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+4  CHANNEL 2   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+5  CHANNEL 3   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+6  CHANNEL 4   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+7  CHANNEL 5   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+8  CHANNEL 6   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+9  CHANNEL 7   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+10 CHANNEL 8   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+11 CHANNEL 9   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+12 CHANNEL 10  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+13 CHANNEL 11  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+14 CHANNEL 12  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+15 CHANNEL 13  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+16 CHANNEL 14  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+17 CHANNEL 15  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+18 CHANNEL 16  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+19 CHANNEL 17  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+20 CHANNEL 18  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+21 CHANNEL 19  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+22 CHANNEL 20  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+23 BAD OR MISSING DATA (IN ANY OR ALL CHANNELS)
+
+ 026010 HOURS INCLUDED (26-BIT FLAG TABLE)
+1  0100
+2  0200
+3  0300
+4  0400
+5  0500
+6  0600
+7  0700
+8  0800
+9  0900
+10 1000
+11 1100
+12 1200
+13 1300
+14 1400
+15 1500
+16 1600
+17 1700
+18 1800
+19 1900
+20 2000
+21 2100
+22 2200
+23 2300
+24 2400
+25 UNKNOWN MIXTURE OF HOURS
+
+ 029001 PROJECTION TYPE
+0  NON-POL STER
+1  POLAR STEREO
+2  LAMBERTCONIC
+3  MERCATOR
+4  SCAN CONE   (RADAR)
+
+ 029002 CO-ORDINATE GRID TYPE
+0  CARTESIAN
+1  POLAR
+2  OTHER
+
+ 030031 PICTURE TYPE
+0  PPI
+1  COMPOSITE
+2  CAPPI
+3  VERT SECTION
+4  ALPHANUMERIC
+5  SUBJECT CLUTTER MAP
+6  MAP
+7  TEST PICTURE
+8  COMMENTS
+9  OCCULTATION OF GROUND
+10 RADARBEAM HT
+
+ 030032 COMBINATION WITH OTHER DATA  (16-BIT FLAG TABLE)
+1  MAP
+2  SATELLITE IR
+3  SATELITE VIS
+4  SATELLITE WV
+5  MULTISPECTRAL
+6  SYNOPTIC OBS
+7  F/C PARAMS
+8  LIGHTNING
+
+ 031021 ASSOCIATED FIELD SIGNIFICANCE
+0  PPI                                                            !1.13
+1  GOOD/BAD
+2  GOOD/SUS/BAD
+3
+4
+5
+6  GTSPP flag  (1:good,2:good?,3:bad?,4:bad,5:changed,8:interpol) !1.13
+7  % CONFIDENCE
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21 ORIGINAL/COR     0: ORIGINAL, 1: SUBSTITUTED/CORRECTED VALUE
+
+ 031031 DATA PRESENT INDICATOR (1-BIT FLAG TABLE)
+1  NOT PRESENT
+
+ 033001 DATA QUALITY INDICATOR (1-BIT FLAG TABLE)
+1  SUSPECT
+
+ 033002 QUALITY INFORMATION
+0  NOT SUSPECT
+1  SUSPECT
+
+ 033003 QUALITY INFORMATION
+0  NOT SUSPECT
+1  SUSPECT
+2  VERY SUSPECT
+3  UNUSABLE
+
+ 033005 Suspect element (AWS data) (30-BIT FLAG TABLE)             !1.11
+1  No automated checks done
+2  Pressure
+3  Wind
+4  Dry-bulb temperature
+5  Wet-bulb temperature
+6  Humidity
+7  Ground temperature
+8  1st soil temperature
+9  2nd soil temperature
+10 3rd soil temperature
+11 4th soil temperature
+12 5th soil temperature
+13 Cloud
+14 Visibility
+15 Present weather
+16 Lightning
+17 Ice deposit
+18 Precipitation
+19 State of ground
+20 Snow
+21 Water content
+22 Evaporation/evapotranspiration
+23 Sunshine
+
+ 033006 Internal measurement status information (AWS)              !1.11
+0  Selfcheck OK
+1  One Warning
+2  One Alarm
+3  Sensor failure
+
+ 033015 Data quality check indicator                              !1.14
+0  passed
+1  missing
+2  des/reascending balloon check
+3  above limit
+4  below limit
+5  superadiabatic
+6  limiting angles
+7  ascension rate
+8  too diff from previous flight
+9  balloon overhead
+10 wind speed
+11 wind direction
+12 dependency
+13 valid but modified
+14 outlier
+
+ 033020 QUALITY CONTROL INDICATION FOR FOLLOWING VALUE
+0  GOOD
+1  INCONSISTENT
+2  DUBIOUS
+3  WRONG
+4  NOT CHECKED
+5  CHANGED
+
+ 033021 QUALITY OF FOLLOWING VALUE
+0  IN RANGE
+1  NOT IN RANGE
+
+ 033022 QUALITY OF BUOY SATELLITE TRANSMISSION
+0  GOOD
+1  DUBIOUS
+
+ 033023 QUALITY OF BUOY LOCATION
+0  RELIABLE
+1  LATEST KNOWN
+2  DUBIOUS
+
+ 033024 STATION ELEVATION QUALITY MARK (FOR MOBILE STATIONS)
+0
+1  <3M
+2  <10M
+3  <20M
+4  >20M
+5  <10FT
+6  <30FT
+7  <60FT
+8  >60FT
+
+ 033025 ACARS INTERPOLATED VALUES
+0  TIME
+1  LAT & LONG
+2  TIME,LAT,LONG
+3  NONE
+
+ 033026 MOISTURE QUALITY                                           !1.9
+0  MEASURING
+1  NOT MEASURING
+2  SMALL RH
+3  ELEMENT WET
+4  ELEMENT DIRTY
+5  HEATER FAIL
+6  BOTH FAILED
+7  VALIDITY BAD
+8  NUMERIC ERROR
+9  NO SENSOR                                                       !1.9
+
+ 033027 LOCATION QUALITY CLASS (RANGE OF RADIUS OF 66% CONFIDENCE)
+0  >1500M
+1  500-1500M
+2  250-500M
+3  <250M
+
+ 033030 SCAN LINE STATUS FLAGS FOR ATOVS (24-BIT FLAG TABLE)
+1  DO NOT USE SCAN FOR PRODUCT GENERATION
+2  TIME SEQUENCE ERROR DETECTED WITH THIS SCAN
+3  DATA GAP PRECEDES THIS SCAN
+4  NO CALIBRATION
+5  NO EARTH LOCATION
+6  FIRST GOOD TIME FOLLOWING A CLOCK UPDATE
+7  INSTRUMENT STATUS CHANGED WITH THIS SCAN
+
+ 033031 SCAN LINE QUALITY FLAGS FOR ATOVS (24-BIT FLAG TABLE)
+1  Time bad but can probably be inferred from previous good time   !1.9
+2  Time bad and can't be inferred from the previous good time      !1.9
+3  Sequence inconsistent with previous times (time discontinuity)  !1.9
+4  Sequence repeats scan times previously accepted                 !1.9
+5  Bad time: scan line not calibrated                              !1.9
+6  Scan line calibrated with fewer than preferred scan lines       !1.9
+7  Scan line not calibrated - bad or insufficient PRT data         !1.9
+8  Scan line was calibrated but with marginal PRT data             !1.9
+9  Some uncalibrated channels on this scan                         !1.9
+10 Uncalibrated due to instrument mode                             !1.9
+11 Space view antenna position error, so questionable calibration  !1.9
+12 Black body antenna position error, so questionable calibration  !1.9
+13 Not earth located because of bad time                           !1.9
+14 Time code questionable, so earth location questionable          !1.9
+15 Marginal reasonableness check, earth location questionable      !1.9
+16 Reasonableness check failed, earth location questionable        !1.9
+17 Antenna position check failed, earth location questionable      !1.9
+18 Cold black body scan line calibration                          !1.13
+19 Warm black body scan line calibration                          !1.13
+20 Space view scan line calibration                               !1.13
+21 Earth view                                                     !1.13
+
+ 033032 CHANNEL QUALITY FLAGS FOR ATOVS (24-BIT FLAG TABLE)
+1  NO GOOD BLACKBODY COUNTS FOR SCAN LINE
+2  NO GOOD SPACE VIEW COUNTS FOR THIS LINE
+3  NO GOOD PRTS FOR THIS LINE
+4  SOME BAD BLACKBODY VIEW COUNTS FOR THIS LINE
+5  SOME BAD SPACE VIEW COUNTS FOR THIS LINE
+6  SOME BAD PRT TEMPS ON THIS LINE
+
+ 033033 FIELD OF VIEW QUALITY FLAGS FOR ATOVS (24-BIT FLAG TABLE)
+1  SECONDARY CALIBRATION USED
+2  CHANNEL 1   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+3  CHANNEL 2   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+4  CHANNEL 3   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+5  CHANNEL 4   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+6  CHANNEL 5   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+7  CHANNEL 6   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+8  CHANNEL 7   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+9  CHANNEL 8   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+10 CHANNEL 9   BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+11 CHANNEL 10  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+12 CHANNEL 11  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+13 CHANNEL 12  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+14 CHANNEL 13  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+15 CHANNEL 14  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+16 CHANNEL 15  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+17 CHANNEL 16  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+18 CHANNEL 17  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+19 CHANNEL 18  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+20 CHANNEL 19  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+21 CHANNEL 20  BRIGHTNESS TEMPERATURE UNREASONABLE OR NOT CALCULATED
+22 ALL THE CHANNELS ARE MISSING
+
+ 033035 MANUAL/AUTOMATIC QUALITY CONTROL
+0  Pass,Nocheck  AUTOMATIC Q/C PASSED & NOT CHECKED MANUALLY       !1.9
+1  Pass,Passed   AUTOMATIC Q/C PASSED & MANUALLY CHECKED & PASSED  !1.9
+2  Pass,Deleted  AUTOMATIC Q/C PASSED & MANUALLY CHECKED & DELETED !1.9
+3  Fail,Nocheck  AUTOMATIC Q/C FAILED & NOT CHECKED MANUALLY       !1.9
+4  Fail,Failed   AUTOMATIC Q/C FAILED & MANUALLY CHECKED & FAILED  !1.9
+5  Fail,Redone   AUTOMATIC Q/C FAILED & MANUALLY CHECKED & RE-INSERTED
+6  Suspect, no manual check                                        !1.14
+7  Suspect, failed manual check                                    !1.14
+8  Failed manual check                                             !1.14
+
+ 033037 WIND CORRELATION FACTOR (20-BIT FLAG TABLE)
+1  bad u guess                                                     !1.9
+2  bad v guess                                                     !1.9
+3  bad u,v guess                                                   !1.9
+4  u accel                                                         !1.9
+5  v accel                                                         !1.9
+6  u & v accel                                                     !1.9
+7  possible land feature                                           !1.9
+8  u accel & possible land feature                                 !1.9
+9  v accel & possible land feature                                 !1.9
+10 u,v accel & possible land feature                               !1.9
+11 bad wind guess                                                  !1.9
+12 correlation failure                                             !1.9
+13 search box off edge of area                                     !1.9
+14 target box off edge of area                                     !1.9
+15 pixel brightness out of bounds (noisy line)                     !1.9
+16 target not in lat/long box                                      !1.9
+17 target outside pressure min/max                                 !1.9
+18 slow vector flagged by autoeditor                               !1.9
+19 vectors flagged by autoeditor                                   !1.9
+
+ 033038 Quality flags for GB-GNSS data (10-BIT FLAG TABLE)         !1.14
+1  Zenith Total Delay poor
+2  Galileo     satellites used
+3  GLONASS     satellites used
+4  GPS         satellites used
+5  Met data used
+6  Atmospheric loading correction applied
+7  Ocean tide  loading applied
+8  Climate quality data processing
+9  Near-real time data processing
+
+ 033039 Quality flags for Radio Occ. data (16-BIT FLAG TABLE)      !1.17a
+1  Non-nominal quality
+2  Offline product
+3  Ascending occultation
+4  Excess Phase processing non-nominal
+5  Bending Angle processing non-nominal
+6  Refractivity processing non-nominal
+7  Meteorological processing non-nominal
+8  Reserved
+9  Reserved
+10 Reserved
+11 Reserved
+12 Reserved
+13 Reserved
+14 Background profile non-nominal
+15 Background profile present
+
+ 033041 ATTRIBUTE OF FOLLOWING VALUE                               !1.10
+0  True value
+1  > true value (measurement hit lower limit of instrument)
+2  < true value (measurement hit upper limit of instrument)
+
+ 033042 Type of limit represented by following value               !1.14
+0  >
+1  >=
+2  <
+3  =<
+
+ 033043 AST CONFIDENCE (8-BIT FLAG TABLE)                          !1.14
+1  Nadir-only SST retrieval used 3.7 micron channel
+2  Dual-view SST retrieval used 3.7 micron channel
+3  Nadir daytime data
+4  Forward daytime data
+
+ 033044 ASAR quality information (15-BIT FLAG TABLE)               !1.14
+1  Input mean out of range
+2  Input standard deviation out of range
+3  Input gaps >threshold
+4  Missing lines >threshold
+5  Doppler centroid uncertain
+6  Doppler ambiguity estimate uncertain
+7  Output mean out of range
+8  Output standard deviation out of range
+9  Chirp reconstruction failed
+10 Data set missing
+11 Invalid downlink parameters
+12 Azimuth cut-off fit did not converge in minmum number of iterations
+13 Azimuth cut-off fit did not converge in minmum number of iterations
+14 Phase information confidence
+
+ 033047 Measurement confidence (31-BIT FLAG TABLE)                 !1.14
+1  Error detected and attempts to recover made
+2  OBDH anomaly (On-Board Data Handling)
+3  USOP anomaly (Ultra-Stable Oscillator Processing)
+4  Errors detected by on-board computer
+5  AGC out of range (Automatic Gain Control)
+6  Rx delay fault: distance out of range
+7  Wave form samples fault
+8
+9
+10
+11
+12 Channel 1 brightness temperature out of range
+13 Channel 2 brightness temperature out of range
+14
+15 Ku ocean retracking error
+16 S ocean retracking error
+17 Ku ice 1 retracking error
+18 S ice 1 retracking error
+19 Ku ice 2 retracking error
+20 S ice 2 retracking error
+21 Ku sea ice retracking error
+22 Arithmetic fault
+23 No map
+24 1 map
+25 2 maps degraded
+26 2 maps nominal
+27 Errors: propagation mode
+28 Warning: propagation mode
+29 Errors: initialisation mode
+30 Warning: initialisation mode
+
+ 033048 Confidence measure of SAR inversion                        !1.14
+0  succesful
+1  not succesful
+
+ 033049 Confidence measure of wind retreival                       !1.14
+0  dd used     (external wind direction used during inversion)
+1  dd not used (external wind direction not used during inversion)
+
+ 033050 Global GTSSP quality flag                                  !1.14
+0
+1  correct
+2  probably good
+3  probably bad
+4  impossible
+5  modifies
+6
+7
+8  interpolated
+
+ 033052 S band ocean retracking quality (21-BIT FLAG TABLE)        !1.14
+1  20-th data block contains invalid measurement
+
+ 033053 Ku band ocean retracking quality (21-BIT FLAG TABLE)       !1.14
+1  20-th data block contains invalid measurement
+
+ 033192 AVERAGED SURFACE TEMPERATURE CONFIDENCE (8-BIT FLAG TABLE) !1.12
+1  SEA MDS. NADIR ONLY SST RETRIEVAL USED 3.7 MICRON CHANNEL       !1.12
+2  SEA MDS. DUAL VIEW SST RETRIEVAL USED 3.7 MICRON CHANNEL        !1.12
+3  NADIR VIEW CONTAINS DAY TIME DATA                               !1.12
+4  FORWARD VIEW CONTAINS DAY TIME DATA                             !1.12
+
+ 033194 QUALITY FLAGS FOR GB-GNSS DATA (10-BIT FLAG TABLE)         !1.12
+1  TOTAL ZENITH DELAY QUALITY IS CONSIDERED POOR                   !1.12
+2  GALILEO SATELLITES USED                                         !1.12
+3  GLONASS SATELLITES USED                                         !1.12
+4  GPS SATELLITES USED                                             !1.12
+5  METEOROLOGICAL DATA APPLIED                                     !1.12
+6  ATMOSPHERIC LOADING CORRECTION APPLIED                          !1.12
+7  OCEAN TIDE LOADING APPLIED                                      !1.12
+8  CLIMATE QUALITY DATA PROCESSING                                 !1.12
+9  NEAR REAL TIME DATA PROCESSING                                  !1.12
+
+ 033220 KIND OF CHECK - OBSERVED MINUS (3-BIT FLAG TABLE)
+1  BUDDY
+2  BACKGROUND
+3  CLIMATOLOGY
+
+ 033250 DRIFTER QUALITY INDICATORS (6-BIT FLAG TABLE)
+1  BAD PRESSURE      QP
+2  BAD SENSOR        Q2
+3  BAD SST           QTW
+4  BAD AIR TEMP      Q4
+5  BAD TRANSMISSION  QN
+
+ 033251 QUALITY OF LOCATION
+0  2 PASSES, OK
+1  LATEST KNOWN
+2  ONLY 1 PASS    2ND SOLUTION POSSIBLE
+
+ 033255 SEQUENCE CHECK
+0  3-HOUR
+1  6-HOUR
+2  24-HOUR
+
+ 035000 FM AND REGIONAL CODE NUMBER                                !1.9
+
+ 035001 TIME FRAME FOR MONITORING                                  !1.9
+0  REAL TIME
+1  NEAR-REAL   TIME
+2  NON-REAL    TIME
+
+ 035030 DISCREPANCIES IN THE AVAILABILITY OF EXPECTED DATA         !1.9
+0  none
+1  non-compliance                                                 !1.13
+2  out of date catalogues of meteorological bulletins
+3  wrong route - incorrect routeing directories
+4  inflexible  routing arrangements
+5  deficiencies
+6  data loss   or delays in relaying data on the GTS
+7  diff route  from routeing provided in plan
+8  malpractices                                                   !1.13
+
+ 035031 QUALIFIER ON MONITORING RESULTS                            !1.9
+0
+1  Enough & OK
+2  Enough, not OK
+3  Short but OK
+4  Short & bad
+5  Incomplete  messages
+6  Miscoded    groups could not be interpreted confidently
+7  Gross coding errors
+8  Out of order transmissions
+9  Garbled     & thus discarded
+10 Faults fixed
+11 Faults not fixed
+12 Fault unclear
+13 Measuring errors
+14 Mutual inconsistency
+15 Time inconsistency
+16 F/c error
+17 Bias
+18 Improve Q/C
+19 More training
+
+ 035032 Cause of missing data                                      !1.9
+0
+1  Radio fading
+2  Centre out
+3  Circuit out
+4  RBSN density not implemented or not maintained
+5  Staff lack
+6  Supply lack
+7  Instrument  failure
+8  Procedures  not adhered to
+9  End of observing programme
+
+ 035033 Observation and collection deficiency                      !1.9
+0
+1  None
+2  Not regular
+3  Wrong time
+4  Not disseminated
+5  Wrong users
+6  Not received
+7  Sent late
+8  Not sent
+9  HF propagation difficulties, difficult to select suitable frequency
+10 Maintenance difficulties with remote communication equipment
+11 No alternative arrangement for routeing meteorological observation
+
+ 035034 Statistical trends for data availability (in survey period) !1.9
+0
+1  Bit better
+2  Better
+3  Lots better
+4  Steady
+5  Worse
+6  Bad at night
+
+ 035035 Reason for termination                                    !1.14
+0
+1  Balloon burst
+2  Balloon forced down by icing
+3  Balloon leaking or floating
+4  Weak or fading signal
+5  Battery failure
+6  Ground equipment failure
+7  Signal interference
+8  Radiosonde failure
+9  Too many data frames missing
+10
+11 Too many temperatures missing
+12 Too many pressures missing
+13 User terminated
+
+ 055001 MODEL TYPE
+0
+1  UNI.GLBL1991   UNIFIED MODEL GLOBAL
+2  UNI.RGNL1991   UNIFIED MODEL REGIONAL
+3  WAVEGLBL1991   WAVE MODEL GLOBAL
+4  SST ANALYSIS   SST ANALYSIS SYSTEM
+
+ 055003 DATA USE/EXTRACTION INDICATORS  (8-BIT FLAG TABLE)
+1
+2
+3  EXTRACTED V    FOR/FROM REGIONAL MODEL UPDATE RUN
+4  EXTRACTED L    FOR/FROM REGIONAL MODEL MAIN RUN
+5
+6  EXTRACTED U    FOR/FROM GLOBAL MODEL UPDATE RUN
+7  EXTRACTED G    FOR/FROM GLOBAL MODEL MAIN RUN
+8  COLLWITHLASS   FOR COLLOCATION WITH LASS SOUNDINGS
+
+ 055004 AVHRR PROCESSING AND Q.C. FLAGS (7-BIT FLAG TABLE) (JUL 1999)
+1  3 CH RETRVL    3 CHANNEL RETRIEVAL,     ELSE 2 CHANNEL RETRIEVAL
+2  1.6MIC CH3A    CHANNEL 3A IS 1.6 MIC,   ELSE CHANNEL 3B IS 3.7 MIC
+3  CLOUD CONTAM   CLOUD CONTAMINATION,     ELSE CLOUD FREE
+4  NO B/G TEST    NO BACKGROUND TEST DONE, ELSE BACKGROUND TEST DONE
+5  OVER LAND      OB OVER LAND,            ELSE OB OVER SEA
+6  SURFACE ICE    SURFACE HAS ICE,         ELSE SURFACE HAS NO ICE
+
+ 055005 MODEL RUN INDICATOR
+0
+1  COP.FFFNGM     ANAL.HR 00, F/C 36HRS, CUTOFF 0155HRS
+2  COP.FFFLLF0    ANAL.HR 00, F/C 06HRS, CUTOFF 0800HRS
+3  COP.FFFLLF1    ANAL.HR 03, F/C 06HRS, CUTOFF 0800HRS
+4  COP.FFFNGI     ANAL.HR 06, F/C 36HRS, CUTOFF 0800HRS
+5  COP.FFFLLF2    ANAL.HR 06, F/C 06HRS, CUTOFF 1220HRS
+6  COP.FFFLLF3    ANAL.HR 09, F/C 06HRS, CUTOFF 1220HRS
+7  COP.FFFNMG     ANAL.HR 12, F/C 36HRS, CUTOFF 1355HRS
+8  COP.FFFLLF0    ANAL.HR 12, F/C 06HRS, CUTOFF 2000HRS
+9  COP.FFFLLF1    ANAL.HR 15, F/C 06HRS, CUTOFF 2000HRS
+10 COP.FFFNGI     ANAL.HR 18, F/C 36HRS, CUTOFF 2000HRS
+11 COP.FFFLLF2    ANAL.HR 18, F/C 06HRS, CUTOFF 0020HRS
+12 COP.FFFLLF3    ANAL.HR 21, F/C 06HRS, CUTOFF 0020HRS
+
+ 055010 GLOSS FLAGS FOR WHOLE ASCENT  (17-BIT FLAG TABLE)
+1
+2  NO ABEND
+3  100-10MB BAD
+4  1000-100 BAD
+5  STABIL FAILD
+6  STABIL CHECK
+7  FINAL Q/C
+8  B/G FAILED
+9  DATA MISSING
+10 COLLOCATED
+11 CF REJECTED
+12 UNUSABLE
+13 CONFLICTING
+14 DUPLICATE
+15 NO CONVERGE
+16 GLOSS QCP
+17 LAND > 500M
+
+ 055011 QUALITY INDICATORS FOR SOUNDING DATA  (12-BIT FLAG TABLE)
+1
+2
+3
+4
+5  B.TEMP CHECK   BRIGHTNESS TEMPERATURE REL. PROBABILITY CHECK DONE
+6  B.TEMP FAIL    BRIGHTNESS TEMPERATURE REL. PROBABILITY CHECK FAIL
+7  STABCH DONE    STABILITY CHECK PERFORMED
+8  STABCH FAIL    STABILITY CHECK FAILED
+9  >100HPA DONE   MULTI-LEVEL CHECK ABOVE 100 HPA PERFORMED
+10 >100HPA FAIL   MULTI-LEVEL CHECK ABOVE 100 HPA FAIL
+11 100-1000DONE   MULTI-LEVEL CHECK 100-1000 HPA PERFORMED
+12 100-1000FAIL   MULTI-LEVEL CHECK 100-1000 HPA FAIL
+
+ 055012 GLOSS FLAGS FOR STANDARD LEVEL  (7-BIT FLAG TABLE)
+1
+2  DON'T USE
+3  FINAL FLAG
+4  B/G FAILED
+5  B/G CHECKED
+6  CF REJECTED
+7  CFO REJECTED
+
+ 055013 OBSERVATION CHECKS PERFORMED (10-BIT FLAG TABLE)
+1
+2  A PRIORI REJ   A PRIORI REJECTION (PRIOR KNOWLEDGE OF OB. QUAL.)
+3  CF REJECTION   CFO REJECTION
+4  CLIMCH DONE    CLIMATOLOGICAL CHECK PERFORMED
+5  CLIMCH FAIL    CLIMATOLOGICAL CHECK FAILED
+6  BCKGRD DONE    BACKGROUND CHECK PERFORMED
+7  BCKGRD FAIL    BACKGROUND CHECK FAILED
+8  BUDDYCH DONE   BUDDY CHECK PERFORMED
+9  BUDDYCH FAIL   BUDDY CHECK FAILED
+10 NOT IN ANAL    NOT USED BY ANALYSIS  (FINAL FLAG)
+
+ 055014 ESA/UKMO CONSISTENCY CHECK  (3-BIT FLAG TABLE)
+1
+2  ESA CONSFAIL   CONSISTENCY CHECK FAILED
+3  ESA CONCHECK   CONSISTENCY CHECK PERFORMED
+
+ 055015 TYPE OF CHECK AGAINST OBSERVATION
+0
+1  BUDDY
+2  BACKGROUND
+3  CLIMATOLOGY
+
+ 055016 Q/C FLAGS FOR WHOLE REPORT (14-BIT FLAG TABLE)
+1  NO PRESSURE SENSOR FOR PILOT
+2  STRAT REJECT (LEVELS ABOVE 100MB REJECTED)
+3  TROP REJECT  (LEVELS BELOW 100MB REJECTED)
+4  STAB REJECT  (FAILED STABILITY CHECK)
+5  STAB CHECK   (STABILITY CHECK DONE)
+6  SUPEROB
+7  TRACK SUSPECT
+8  TRACK REJECT (FAILED TRACK CHECK
+9  IN SUPEROB   (COMBINED WITH OTHER OBS)
+10 LAND REJECT  (MARINE OB OVER LAND)
+11 OUT OF AREA
+12 SURPLUS      (DUPLICATE)
+13 PERM REJECT  (BLACKLISTED)
+14 FINAL REJECT (ONE OF FLAGS 2-7 SET)
+
+ 055018 Q/C FLAGS ON ELEMENTS FOR SURFACE DATA (24-BIT FLAG TABLE)
+1
+2
+3
+4
+5
+6
+7  PSTN USED
+8  PSTD USED
+9  PMSL USED
+10 PSTN PREF
+11 PSTD REP
+12 TENDENCY     (PRESSURE TENDENCY CHECK FAILED)
+13 EXTREME VALUE
+14 INCONSISTENT
+15 DATA CORRECT (E.G. SIGN CORRECTION)
+16 PERM CORRECT (FIXED CORRECTION)
+17 CLIM PERF
+18 BACK PERF    (BACKGROUND CHECK DONE)
+19 BUDDY PERF
+20 CLIM REJECT
+21 PERM REJECT  (BLACKLISTED)
+22 BACK REJECT  (BACKGROUND CHECK FAILED)
+23 BUDDY REJECT
+24 FINAL REJECT (DO NOT USE IN ANALYSIS)
+
+ 055019 Q/C FLAGS ON ELEMENTS FOR SONDE DATA (24-BIT FLAG TABLE)
+1
+2
+3  PARTIAL LAYER
+4  TROPOPAUSE
+5  MAX WIND
+6  SIG WIND
+7  SIG TEMP
+8  STANDARD
+9  SURFACE
+10 SUPERADIABATIC
+11 INTERPOLATION
+12 HYDROSTATIC
+13 EXTREME VALUE
+14 INCONSISTENT
+15 DATA CORRECT (E.G. SIGN CORRECTION)
+16 PERM CORRECT (FIXED CORRECTION)
+17 CLIM PERF
+18 BACK PERF    (BACKGROUND CHECK DONE)
+19 BUDDY PERF
+20 CLIM REJECT
+21 PERM REJECT  (BLACKLISTED)
+22 BACK REJECT  (BACKGROUND CHECK FAILED)
+23 BUDDY REJECT
+24 FINAL REJECT (DO NOT USE IN ANALYSIS)
+
+ 055020 Q/C FLAGS ON ELEMENTS FOR ERSMWI DATA (24-BIT FLAG TABLE)
+1
+2
+3
+4
+5
+6
+7
+8  INC ANGLE 2
+9  INC ANGLE 1  (ANGLE OF INCIDENCE)
+10 AMBIG REMOV2
+11 AMBIG REMOV1 (AMBIGUITY REMOVAL)
+12 CONFIDENCE
+13 EXTREME VALUE
+14 INCONSISTENT
+15 DATA CORRECT (E.G. SIGN CORRECTION)
+16 PERM CORRECT (FIXED CORRECTION)
+17 CLIM PERF
+18 BACK PERF    (BACKGROUND CHECK DONE)
+19 BUDDY PERF
+20 CLIM REJECT
+21 PERM REJECT  (BLACKLISTED)
+22 BACK REJECT  (BACKGROUND CHECK FAILED)
+23 BUDDY REJECT
+24 FINAL REJECT (DO NOT USE IN ANALYSIS)
+
+ 055021 1DVAR profile Q/C flags (16-BIT FLAG TABLE)                !1.8
+1
+2  RAIN CONTAMINATION OF FOOTPRINT
+3  SEA ICE CONTAMINATION OF FOOTPRINT
+4  1DVAR FAILED TO CONVERGE
+5  INCONSISTENT CONVERSION TO RT PARAMETERS
+6  WIND SPEED BACKGROUND BAD (<0.1 or > 100 m/s)
+7  WIND DIRECTION BACKGROUND BAD (<0 or > 360 degrees)
+8  SURFACE PRESSURE BACKGROUND BAD
+9  MISSING SSMI RADIANCES IN ONE OR MORE CHANNELS
+10 BAD SSM/I GEOLOCATION
+11 UNKNOWN SATELLITE IDENTIFIER
+12 LAND CONTAMINATION OF FOOTPRINT
+13 UNABLE TO INITIALISE RT MODEL
+14 BACKGROUND OUT OF BOUNDS
+15 1DVAR RETRIEVAL OUT OF BOUNDS
+16

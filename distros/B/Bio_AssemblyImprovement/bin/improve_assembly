@@ -1,0 +1,223 @@
+#!/usr/bin/env perl
+package Bio::AssemblyImprovement::Bin::ImproveAssembly;
+# ABSTRACT: Given an assembly, some reads and optionally a reference, reduce the number of contigs and fill gaps.
+# PODNAME: improve_assembly
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use File::Copy;
+use Cwd;
+use Cwd 'abs_path';
+use File::Path qw(make_path);
+use Bio::AssemblyImprovement::Scaffold::SSpace::PreprocessInputFiles;
+use Bio::AssemblyImprovement::Scaffold::SSpace::Iterative;
+use Bio::AssemblyImprovement::FillGaps::GapFiller::Iterative;
+use Bio::AssemblyImprovement::Abacas::Iterative;
+use Bio::AssemblyImprovement::Validate::Executable;
+use Bio::AssemblyImprovement::Util::FastaTools;
+use Bio::AssemblyImprovement::Util::FastqTools;
+use Bio::AssemblyImprovement::Util::OrderContigsByLength;
+
+my ( $assembly_file, $forward_reads_file, $reverse_reads_file, $insert_size, $scaffolder_exec, $abacas_exec,$gapfiller_exec, $debug,$reference,$output_directory, $min_final_contig_length, $min_perc_to_not_filter_final_contigs, $help );
+
+GetOptions(
+    'a|assembly=s'        => \$assembly_file,
+    'f|forward_fastq=s'   => \$forward_reads_file,
+    'r|reverse_fastq=s'   => \$reverse_reads_file,
+    'c|reference=s'       => \$reference,
+    'i|insert_size=i'     => \$insert_size,
+    's|scaffolder_exec=s' => \$scaffolder_exec,
+    'b|abacas_exec=s'     => \$abacas_exec,
+    'g|gapfiller_exec=s'  => \$gapfiller_exec,
+    'd|debug'             => \$debug,
+    'o|output_directory=s' => \$output_directory,
+    'l|min_final_contig_length' => \$min_final_contig_length,
+    'p|min_perc_to_not_filter_final_contigs' => \$min_perc_to_not_filter_final_contigs,
+    'h|help'              => \$help,
+);
+
+( defined($assembly_file) && defined($forward_reads_file) && defined($reverse_reads_file) && ( -e $assembly_file ) && ( -e $forward_reads_file ) && ( -e $reverse_reads_file ) && !$help ) or die <<USAGE;
+Usage: improve_assembly [options]
+Take in an assembly in FASTA format,reads in FASTQ format, and optionally a reference and produce a a better reference using Abacas/SSpace and GapFiller.
+	
+        -a|assembly            <assembly file in fasta format - zipped or unzipped>
+        -f|forward_fastq       <forward reads file - zipped or unzipped>       
+        -r|reverse_fastq       <reverse reads files - zipped or unzipped>
+        -c|reference       	   <reference file in fasta format - zipped or unzipped>
+    	-i|insert_size         <insert size, default 250>
+    	-s|scaffolder_exec     <path to scaffolder, defaults to version of SSPACE on /software>
+    	-b|abacas_exec         <path to ABACAS, defaults to version of ABACAS on /software>
+    	-g|gapfiller_exec      <path to GapFiller, defaults to version of GapFiller on /software>
+    	-d|debug               <debug use this to be told if something goes wrong when running SSPACE, ABACAS and GapFiller, default false>
+    	-o|output_directory    <output directory, default current working directory>
+    	-h|help                <print this help message>
+
+
+# Improve the assembly without a reference
+improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq
+
+# Provide a reference
+improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq  -c my_reference.fa
+
+# Gzipped input files are accepted
+improve_assembly -a contigs.fa.gz -f 123_1.fastq.gz -r 123_2.fastq.gz
+
+# Insert size defaults to 250 if not specified
+improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq -i 3000
+
+# Minimum length of final sequences defaults to 300 if not specified
+improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq -l 300
+
+# Filtering only used if at least 95% of bases remain after filtering. Change with -p.
+# improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq -p 95
+
+# Output to a specific directory
+improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq -o my_directory
+
+# This help message
+improve_assembly -h
+
+USAGE
+
+# abs_path to inputs
+$assembly_file = abs_path($assembly_file) if(defined $assembly_file);
+$forward_reads_file = abs_path($forward_reads_file) if(defined $forward_reads_file);
+$reverse_reads_file = abs_path($reverse_reads_file) if(defined $reverse_reads_file);
+
+$debug           ||= 0;
+$insert_size     ||= 250;
+$min_final_contig_length ||= 300;
+$min_perc_to_not_filter_final_contigs ||= 95;
+
+#Default executables
+my $scaffolder_default = '/software/pathogen/external/apps/usr/local/SSPACE-BASIC-2.0_linux-x86_64/SSPACE_Basic_v2.0.pl';
+my $gapfiller_default  = '/software/pathogen/external/apps/usr/local/GapFiller_v1-10_linux-x86_64/GapFiller.pl';
+my $abacas_default     = '/software/pathogen/internal/prod/bin/abacas.pl';
+
+# If executables not specified or do not exist, use the default
+$scaffolder_exec = Bio::AssemblyImprovement::Validate::Executable->new()->check_executable_and_set_default($scaffolder_exec, $scaffolder_default);
+$gapfiller_exec = Bio::AssemblyImprovement::Validate::Executable->new()->check_executable_and_set_default($gapfiller_exec, $gapfiller_default);
+$abacas_exec = Bio::AssemblyImprovement::Validate::Executable->new()->check_executable_and_set_default($abacas_exec, $abacas_default);
+
+$output_directory ||= getcwd();
+$output_directory  = abs_path($output_directory);
+make_path($output_directory);
+
+my @input_files = ( $forward_reads_file, $reverse_reads_file );
+
+my $preprocess_input_files = Bio::AssemblyImprovement::Scaffold::SSpace::PreprocessInputFiles->new(
+    input_files    => \@input_files,
+    input_assembly => $assembly_file,
+    reference      => $reference,
+);
+my $process_input_files_tmp_dir_obj = $preprocess_input_files->_temp_directory_obj();
+
+# scaffold and extend contigs
+my $scaffolding_obj = Bio::AssemblyImprovement::Scaffold::SSpace::Iterative->new(
+    input_files     => $preprocess_input_files->processed_input_files,
+    input_assembly  => $preprocess_input_files->processed_input_assembly,
+    insert_size     => $insert_size,
+    scaffolder_exec => $scaffolder_exec,
+    debug           => $debug,
+    output_base_directory => $output_directory
+);
+$scaffolding_obj->run();
+
+my $scaffolding_output = $scaffolding_obj->final_output_filename;
+my $fill_gaps_input = $scaffolding_output;
+
+# order contigs on an assembly
+if(defined($reference))
+{
+  $scaffolding_obj = Bio::AssemblyImprovement::Abacas::Iterative->new(
+    reference      => $preprocess_input_files->processed_reference,
+    input_assembly => $scaffolding_output,
+    abacas_exec    => $abacas_exec,
+    debug          => $debug,
+    output_base_directory => $output_directory
+  );
+  $fill_gaps_input = $scaffolding_obj->run();
+}
+
+
+# fill gaps
+my $fill_gaps_obj = Bio::AssemblyImprovement::FillGaps::GapFiller::Iterative->new(
+    input_files     => $preprocess_input_files->processed_input_files,
+    input_assembly  => $fill_gaps_input,
+    insert_size     => $insert_size,
+    gap_filler_exec => $gapfiller_exec,
+    debug           => $debug,
+    _output_prefix  => 'gapfilled',
+    output_base_directory => $output_directory
+)->run();
+
+# remove tiny contigs
+my $fastq_processor = Bio::AssemblyImprovement::Util::FastqTools->new(input_filename => $forward_reads_file);
+my $read_length = $fastq_processor->first_read_length();
+my $fill_gaps_output = $fill_gaps_obj->final_output_filename;
+my $fasta_processor = Bio::AssemblyImprovement::Util::FastaTools->new(input_filename => $fill_gaps_output);
+$fasta_processor->remove_small_contigs($read_length, 0);
+my $remove_tiny_contigs_output = $fasta_processor->output_filename;
+
+# remove small contigs
+my $fasta_processor2 = Bio::AssemblyImprovement::Util::FastaTools->new(input_filename => $remove_tiny_contigs_output);
+$fasta_processor2->remove_small_contigs($min_final_contig_length, $min_perc_to_not_filter_final_contigs);
+move($fasta_processor2->output_filename, "$output_directory/scaffolds.scaffolded.gapfilled.length_filtered.fa");
+
+# sort contigs by length
+my $order_contigs = Bio::AssemblyImprovement::Util::OrderContigsByLength->new( input_filename  => "$output_directory/scaffolds.scaffolded.gapfilled.length_filtered.fa" );
+$order_contigs->output_filename("$output_directory/scaffolds.scaffolded.gapfilled.length_filtered.sorted.fa");
+$order_contigs->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+improve_assembly - Given an assembly, some reads and optionally a reference, reduce the number of contigs and fill gaps.
+
+=head1 VERSION
+
+version 1.160490
+
+=head1 SYNOPSIS
+
+Given an assembly, some reads and optionally a reference, reduce the number of contigs and fill gaps.
+
+   # Improve the assembly without a reference
+   improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq
+
+   # Provide a reference
+   improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq  -c my_reference.fa
+
+   # Gzipped input files are accepted
+   improve_assembly -a contigs.fa.gz -f 123_1.fastq.gz -r 123_2.fastq.gz
+
+   # Insert size defaults to 250 if not specified
+   improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq -i 3000
+
+   # Output to a specific directory
+   improve_assembly -a contigs.fa -f 123_1.fastq -r 123_2.fastq -o my_directory
+
+   # This help message
+   improve_assembly -h
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

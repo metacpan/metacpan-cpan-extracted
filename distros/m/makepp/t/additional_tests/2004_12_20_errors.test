@@ -1,0 +1,81 @@
+###	SPAR <http://www.cpan.org/scripts/>
+###	48	644	1103567918	1103567911	makefile
+perl_begin
+ warn 0;
+ sub f_foo {
+  warn 1;
+  "foo"
+ }
+perl_end
+
+sub f_bar {
+  warn 2;
+  "bar"
+}
+
+perl {
+ sub f_fubar {
+  warn 3;
+  "fubar"
+ }
+}
+
+X := $(perl sub f_foobar { warn 4; "foobar" })
+
+$(phony default): input_check foo
+	&echo $(foo 2)
+	&echo $(bar)
+	&echo $(fubar 2)
+	&echo $(foobar)
+	&echo a $(warning 5) b
+	perl {{
+		warn 6;
+	}}
+
+include dir/foo.mk
+
+input_check: nothing
+	perl {{
+		my ($input, $output) =
+		 (f_input(undef, @Cxt), f_output(undef, @Cxt));
+		open(OUT, ">$output") or die;
+		print OUT "$input\n";
+		close(OUT);
+	}}
+
+$(phony nothing):
+
+ifeq $(warning 8)
+  Y := $(warning 9)
+endif
+###	D	755	1103567444	1103567383	answers
+###	10	644	1119250783	1103567928	answers/warnings
+*** warning: 0 at makefile line 2.
+*** warning: 8 at `makefile:46'
+*** warning: 9 at `makefile:47'
+*** warning: 1 at makefile line 4.
+*** warning: 2 at makefile line 10.
+*** warning: 3 at makefile line 16.
+*** warning: 4 at makefile line 21.
+*** warning: 5 at `makefile:23'
+*** warning: 7 at foo.mk line 2.
+*** warning: 6 at makefile line 24.
+###	1	644	1103567804	1103567928	answers/input_check
+nothing
+###	D	755	1103567444	1103567383	dir
+###	4	644	1103567804	1103567928	dir/foo.mk
+$(phony foo):
+	perl {{
+		warn 7;
+	}}
+###	10	755	1164209909	1342898729	makepp_test_script.pl
+makepp;
+
+sub dewarn {
+  /warning:/ or return 1;
+  tr/\02//d;
+  s!(at `?).*/!$1!;		# Remove path, which varies
+  0;
+}
+
+c_grep '-wwarnings', '&dewarn', '-o+<.makepp/log';

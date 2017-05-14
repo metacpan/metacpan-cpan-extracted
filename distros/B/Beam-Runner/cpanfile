@@ -1,3 +1,4 @@
+requires "Beam::Service" => "0";
 requires "Beam::Wire" => "1.019";
 requires "List::Util" => "1.33";
 requires "Module::Runtime" => "0";

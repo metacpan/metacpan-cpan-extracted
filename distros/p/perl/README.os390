@@ -5,12 +5,15 @@ about pod in pod/perlpod.pod or the short summary in the INSTALL file.
 
 =head1 NAME
 
-README.os390 - building and installing Perl for OS/390 and z/OS
+perlos390 - building and installing Perl for OS/390 and z/OS
 
 =head1 SYNOPSIS
 
 This document will help you Configure, build, test and install Perl
 on OS/390 (aka z/OS) Unix System Services.
+
+B<This document needs to be updated, but we don't know what it should say.
+Please email comments to L<perlbug@perl.org|mailto:perlbug@perl.org>.>
 
 =head1 DESCRIPTION
 
@@ -26,7 +29,7 @@ running the Configure script for Perl.
 
 The z/OS Unix Tools and Toys list may prove helpful and contains links
 to ports of much of the software helpful for building Perl.
-http://www-1.ibm.com/servers/eserver/zseries/zos/unix/bpxa1toy.html
+http://www.ibm.com/servers/eserver/zseries/zos/unix/bpxa1toy.html
 
 
 =head2 Unpacking Perl distribution on OS/390
@@ -35,7 +38,7 @@ If using ftp remember to transfer the distribution in binary format.
 
 Gunzip/gzip for OS/390 is discussed at:
 
-  http://www-1.ibm.com/servers/eserver/zseries/zos/unix/faq/bpxqp1.html
+  http://www.ibm.com/servers/eserver/zseries/zos/unix/bpxa1ty1.html
 
 to extract an ASCII tar archive on OS/390, try this:
 
@@ -47,7 +50,7 @@ or
 
 If you get lots of errors of the form
 
-  tar: FSUM7171 ...: cannot set uid/gid: EDC5139I Operation not permitted.
+ tar: FSUM7171 ...: cannot set uid/gid: EDC5139I Operation not permitted
 
 you didn't read the above and tried to use tar instead of pax, you'll
 first have to remove the (now corrupt) perl directory
@@ -122,8 +125,9 @@ to watch out for include:
 
 A message of the form:
 
- (I see you are using the Korn shell.  Some ksh's blow up on Configure,
- mainly on older exotic systems.  If yours does, try the Bourne shell instead.)
+ (I see you are using the Korn shell.  Some ksh's blow up on
+ Configure, mainly on older exotic systems.  If yours does, try the
+ Bourne shell instead.)
 
 is nothing to worry about at all.
 
@@ -132,7 +136,7 @@ is nothing to worry about at all.
 Some of the parser default template files in /samples are needed in /etc.
 In particular be sure that you at least copy /samples/yyparse.c to /etc
 before running Perl's Configure.  This step ensures successful extraction
-of EBCDIC versions of parser files such as perly.c, perly.h, and x2p/a2p.c.
+of EBCDIC versions of parser files such as perly.c and perly.h.
 This has to be done before running Configure the first time.  If you failed
 to do so then the easiest way to re-Configure Perl is to delete your
 misconfigured build root and re-extract the source from the tar ball.
@@ -151,7 +155,8 @@ for perl to work.  See the config.sh file for the value of $archlibexp.
 If in trying to use Perl you see an error message similar to:
 
  CEE3501S The module libperl.dll was not found.
-         From entry point __dllstaticinit at compile unit offset +00000194 at
+   From entry point __dllstaticinit at compile unit offset +00000194
+   at
 
 then your LIBPATH does not have the location of libperl.x and either
 libperl.dll or libperl.so in it.  Add that directory to your LIBPATH and
@@ -231,20 +236,6 @@ anomalies:
 
 A message of the form:
 
- comp/cpp.............ERROR CBC3191 ./.301989890.c:1     The character $ is not a
-  valid C source character.
- FSUM3065 The COMPILE step ended with return code 12.
- FSUM3017 Could not compile .301989890.c. Correct the errors and try again.
- ok
-
-indicates that the t/comp/cpp.t test of Perl's -P command line switch has
-passed but that the particular invocation of c89 -E in the cpp script does
-not suppress the C compiler check of source code validity.
-
-=item *
-
-A message of the form:
-
  io/openpid...........CEE5210S The signal SIGHUP was received.
  CEE5210S The signal SIGHUP was received.
  CEE5210S The signal SIGHUP was received.
@@ -257,10 +248,11 @@ with extraneous messages on stderr from CEE.
 
 A message of the form:
 
- lib/ftmp-security....File::Temp::_gettemp: Parent directory (/tmp/) is not safe
- (sticky bit not set when world writable?) at lib/ftmp-security.t line 100
- File::Temp::_gettemp: Parent directory (/tmp/) is not safe (sticky bit not
- set when world writable?) at lib/ftmp-security.t line 100
+ lib/ftmp-security....File::Temp::_gettemp: Parent directory (/tmp/)
+ is not safe (sticky bit not set when world writable?) at
+ lib/ftmp-security.t line 100
+ File::Temp::_gettemp: Parent directory (/tmp/) is not safe (sticky
+ bit not set when world writable?) at lib/ftmp-security.t line 100
  ok
 
 indicates a problem with the permissions on your /tmp directory within the HFS.
@@ -274,7 +266,7 @@ from an account with write access to the directory entry for /tmp.
 
 Out of Memory!
 
-Recent perl test suite is quite memory hunrgy. In addition to the comments
+Recent perl test suite is quite memory hungry. In addition to the comments
 above on memory limitations it is also worth checking for _CEE_RUNOPTS
 in your environment. Perl now has (in miniperlmain.c) a C #pragma
 to set CEE run options, but the environment variable wins.
@@ -410,27 +402,27 @@ Thanks to John Goodyear for dynamic loading help.
 
 L<INSTALL>, L<perlport>, L<perlebcdic>, L<ExtUtils::MakeMaker>.
 
-    http://www-1.ibm.com/servers/eserver/zseries/zos/unix/bpxa1toy.html
+ http://www.ibm.com/servers/eserver/zseries/zos/unix/bpxa1toy.html
 
-    http://www.redbooks.ibm.com/abstracts/sg245944.html
+ http://www.redbooks.ibm.com/redbooks/SG245944.html
 
-    http://www-1.ibm.com/servers/eserver/zseries/zos/unix/bpxa1ty1.html#opensrc
+ http://www.ibm.com/servers/eserver/zseries/zos/unix/bpxa1ty1.html#opensrc
 
-    http://www.xray.mpe.mpg.de/mailing-lists/perl-mvs/
+ http://www.xray.mpe.mpg.de/mailing-lists/perl-mvs/
 
-    http://publibz.boulder.ibm.com:80/cgi-bin/bookmgr_OS390/BOOKS/ceea3030/
+ http://publibz.boulder.ibm.com:80/cgi-bin/bookmgr_OS390/BOOKS/ceea3030/
 
-    http://publibz.boulder.ibm.com:80/cgi-bin/bookmgr_OS390/BOOKS/CBCUG030/
+ http://publibz.boulder.ibm.com:80/cgi-bin/bookmgr_OS390/BOOKS/CBCUG030/
 
 =head2 Mailing list for Perl on OS/390
 
-If you are interested in the VM/ESA, z/OS (formerly known as OS/390)
+If you are interested in the z/OS (formerly known as OS/390)
 and POSIX-BC (BS2000) ports of Perl then see the perl-mvs mailing list.
 To subscribe, send an empty message to perl-mvs-subscribe@perl.org.
 
 See also:
 
-    http://lists.perl.org/showlist.cgi?name=perl-mvs
+    http://lists.perl.org/list/perl-mvs.html
 
 There are web archives of the mailing list at:
 

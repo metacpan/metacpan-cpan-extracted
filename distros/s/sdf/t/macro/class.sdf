@@ -1,0 +1,36 @@
+# This file tests the class macro
+
+!class widgets 'WID,WIDGET'
+
+# Define some objects
+!block widgets; data; root="http://www."
+Name        Long        Jump
+A           Alpha       alpha.com
+B           Beta        beta.com
+C           Gamma       gamma.com
+!endblock
+
+# Now insert a table of them
+!block widgets
+Name,Jump,Long
+A
+C
+D
+E,http://www.epsilon.com,Epsilon
+!endblock
+
+# Hypertext should be generated for the object below
+This paragraph contains a short form ({{WID:A}}) and a
+long form ({{WIDGET:Alpha}}) of a widget.
+
+# Try short <-> long form conversion
+This paragraph contains {{WID[expand]A}} and {{WIDGET[shrink]Beta}}
+widgets.
+
+# Try unknown objects - should produce warnings
+This paragraph contains {{WID:F}} and {{WIDGET:Omega}}
+widgets.
+
+# Try short <-> long form conversion on unknown objects
+This paragraph contains {{WID[expand]F}} and {{WIDGET[shrink]Omega}}
+widgets.

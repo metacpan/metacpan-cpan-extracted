@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/Net-HTTP/issues
   homepage: https://github.com/libwww-perl/Net-HTTP
   repository: https://github.com/libwww-perl/Net-HTTP.git
-version: '6.14'
+version: '6.15'
 x_contributors:
   - 'Adam Kennedy <adamk@cpan.org>'
   - 'Adam Sjogren <asjo@koldfront.dk>'

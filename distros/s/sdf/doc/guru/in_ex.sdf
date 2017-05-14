@@ -1,0 +1,45 @@
+H1: Extending SDF
+
+H2: Overview
+
+H3: Logical Documents
+
+A central part of SDF's philosophy is that documents should be
+specified in a logical manner. In order to make this possible,
+SDF has been designed to be easy to extend.
+
+H3: Documenting Extensions
+
+If you do extend SDF and other people need to use your extensions,
+please try to document things. Within the SDF distribution, the
+SDF document catalog (doc/catalog.html) provides a link for
+local documentation (doc/local/) which you may wish to use.
+
+H3: Packaging Extensions
+
+If your extensions would be useful to a wider audience, please
+consider packaging them into an SDF library or module, documenting
+the features and notifying people on the SDF mailing lists.
+
+H3: What Can I Create?
+
+Almost every part of SDF is extensible. As a rule, the most commonly
+created extensions are new macros and new filters. However, creating
+new paragraph, phrase and table styles is also quite simple.
+
+Details on how to create these things and other SDF entities are
+given below.
+
+!block topics
+Topic
+ex_mac
+ex_filt
+ex_para
+ex_phras
+ex_tbl
+ex_look
+ex_dvrs
+#ex_attr
+#ex_lang
+#ex_rpt
+!endblock

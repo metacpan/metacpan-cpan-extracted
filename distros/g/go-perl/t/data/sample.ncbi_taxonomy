@@ -1,0 +1,996 @@
+ID                        : 1
+PARENT ID                 : 0
+RANK                      : no rank
+GC ID                     : 1
+SCIENTIFIC NAME           : root
+SYNONYM                   : all
+//
+ID                        : 2
+PARENT ID                 : 131567
+RANK                      : superkingdom
+GC ID                     : 11
+SCIENTIFIC NAME           : Bacteria
+GENBANK COMMON NAME       : eubacteria
+SYNONYM                   : not Bacteria Haeckel 1894
+IN-PART                   : Prokaryota
+IN-PART                   : Monera
+IN-PART                   : Procaryotae
+IN-PART                   : Prokaryotae
+BLAST NAME                : eubacteria
+//
+ID                        : 6
+PARENT ID                 : 335928
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Azorhizobium
+SYNONYM                   : Azorhizobium Dreyfus et al. 1988
+EQUIVALENT NAME           : Azotirhizobium
+//
+ID                        : 7
+PARENT ID                 : 6
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Azorhizobium caulinodans
+SYNONYM                   : Azorhizobium caulinodans Dreyfus et al. 1988
+INCLUDES                  : Rhizobium sp. ORS571
+INCLUDES                  : Rhizobium sp. ORS 571
+INCLUDES                  : Rhizobium sp. (strain ORS571)
+INCLUDES                  : Rhizobium ORS571
+EQUIVALENT NAME           : Azotirhizobium caulinodans
+//
+ID                        : 9
+PARENT ID                 : 32199
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Buchnera aphidicola
+SYNONYM                   : Buchnera aphidicola Munson et al. 1991
+INCLUDES                  : Acyrthosiphon pisum symbiont P
+//
+ID                        : 10
+PARENT ID                 : 135621
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Cellvibrio
+SYNONYM                   : "Cellvibrio" Winogradsky 1929
+SYNONYM                   : Cellvibrio (ex Winogradsky 1929) Blackall et al. 1986 emend. Humphry et al. 2003
+//
+ID                        : 11
+PARENT ID                 : 10
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Cellvibrio gilvus
+SYNONYM                   : 'Cellvibrio gilvus'
+//
+ID                        : 13
+PARENT ID                 : 203488
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Dictyoglomus
+SYNONYM                   : Dictyoglomus Saiki et al. 1985
+//
+ID                        : 14
+PARENT ID                 : 13
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Dictyoglomus thermophilum
+SYNONYM                   : Dictyoglomus thermophilum Saiki et al. 1985
+//
+ID                        : 16
+PARENT ID                 : 32011
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Methylophilus
+SYNONYM                   : Methylophilus Jenkins et al. 1987
+MISSPELLING               : Methylotrophus
+EQUIVALENT NAME           : Methyliphilus
+//
+ID                        : 17
+PARENT ID                 : 16
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Methylophilus methylotrophus
+SYNONYM                   : Methylotrophus methylophilus
+SYNONYM                   : Methylophilus methylotrophus Jenkins et al. 1987
+EQUIVALENT NAME           : Methyliphilus methylitrophus
+EQUIVALENT NAME           : Methyliphilus methylotrophus
+EQUIVALENT NAME           : Methylophilus methylitrophus
+//
+ID                        : 18
+PARENT ID                 : 213423
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Pelobacter
+SYNONYM                   : Pelobacter Schink and Pfennig 1983
+//
+ID                        : 19
+PARENT ID                 : 18
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Pelobacter carbinolicus
+SYNONYM                   : Pelobacter carbinolicus Schink 1984
+//
+ID                        : 20
+PARENT ID                 : 76892
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Phenylobacterium
+SYNONYM                   : Phenylobacterium Lingens et al. 1985 emend. Kanso and Patel 2004
+//
+ID                        : 21
+PARENT ID                 : 20
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Phenylobacterium immobile {test}
+SYNONYM                   : Phenylobacterium immobile Lingens et al. 1985
+//
+ID                        : 22
+PARENT ID                 : 267890
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Shewanella
+SYNONYM                   : Shewanella MacDonell and Colwell 1986
+//
+ID                        : 23
+PARENT ID                 : 22
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Shewanella colwelliana
+SYNONYM                   : Alteromonas colwelliana
+SYNONYM                   : Shewanella colwelliana (Weiner et al. 1988) Coyne et al. 1990
+//
+ID                        : 24
+PARENT ID                 : 22
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Shewanella putrefaciens
+SYNONYM                   : Alteromonas putrefaciens
+SYNONYM                   : Pseudomonas putrefaciens
+SYNONYM                   : Shewanella putrefaciens (Lee et al. 1981) MacDonell and Colwell 1986
+SYNONYM                   : Alteromonas putrefaciens (ex Derby and Hammer) Lee et al. 1981
+SYNONYM                   : "Pseudomonas putrefaciens" (Derby and Hammer) Long and Hammer 1941
+MISSPELLING               : Alteromonas putrifaciens
+MISSPELLING               : Shewanella putrifaciens
+//
+ID                        : 25
+PARENT ID                 : 22
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Shewanella hanedai
+SYNONYM                   : Alteromonas hanedai Jensen et al. 1981
+SYNONYM                   : Shewanella hanedai (Jensen et al. 1981) MacDonell and Colwell 1986
+SYNONYM                   : Alteromonas hanedai
+//
+ID                        : 27
+PARENT ID                 : 49928
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : halophilic eubacterium NRCC 41227
+SYNONYM                   : halophilic eubacterium NRCC41227
+SYNONYM                   : halophilic eubacterium (NRCC 41227)
+//
+ID                        : 28
+PARENT ID                 : 49928
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : halophilic eubacterium
+//
+ID                        : 29
+PARENT ID                 : 28221
+RANK                      : order
+GC ID                     : 11
+SCIENTIFIC NAME           : Myxococcales
+GENBANK COMMON NAME       : fruiting gliding bacteria
+SYNONYM                   : Myxobacteria
+SYNONYM                   : Myxococcales Tchan et al. 1948
+SYNONYM                   : The Myxobacteria
+//
+ID                        : 31
+PARENT ID                 : 80811
+RANK                      : family
+GC ID                     : 11
+SCIENTIFIC NAME           : Myxococcaceae
+SYNONYM                   : Myxococcaceae Jahn 1924
+//
+ID                        : 32
+PARENT ID                 : 31
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Myxococcus
+SYNONYM                   : Myxococcus Thaxter 1892
+//
+ID                        : 33
+PARENT ID                 : 32
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Myxococcus fulvus
+SYNONYM                   : Micrococcus fulvus
+SYNONYM                   : Myxococcus fulvus (Cohn 1875) Jahn 1911
+SYNONYM                   : "Micrococcus fulvus" Cohn 1875
+//
+ID                        : 34
+PARENT ID                 : 32
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Myxococcus xanthus
+SYNONYM                   : Myxococcus xanthus Beebe 1941
+INCLUDES                  : Myxococcus xanthus retron Mx65
+INCLUDES                  : Myxococcus xanthus retron Mx162
+//
+ID                        : 35
+PARENT ID                 : 32
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Myxococcus macrosporus
+SYNONYM                   : Myxococcus macrosporus (Krzemieniewska and Krzemieniewski 1926) Zahler and McCurdy 1974
+SYNONYM                   : "Chondrococcus macrosporus" Krzemieniewska and Krzemieniewski 1926
+SYNONYM                   : not "Myxococcus macrosporus" Zukal 1897
+SYNONYM                   : Chondrococcus macrosporus
+//
+ID                        : 36
+PARENT ID                 : 32
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Myxococcus coralloides
+SYNONYM                   : Chondrococcus coralloides
+SYNONYM                   : "Chondrococcus coralloides" (Thaxter 1892) Jahn 1924
+SYNONYM                   : "Chondrococcus polycystus" (Kofler 1913) Krzemieniewska and Krzemieniewski 1926
+SYNONYM                   : "Myxococcus clavatus" Quehl 1906
+SYNONYM                   : "Myxococcus digitatus" Quehl 1906
+SYNONYM                   : "Myxococcus exiguus" Kofler 1913
+SYNONYM                   : "Myxococcus polycystus" Kofler 1913
+SYNONYM                   : Myxococcus coralloides Thaxter 1892
+SYNONYM                   : Myxococcus polycystus
+SYNONYM                   : Chondrococcus polycystus
+SYNONYM                   : Myxococcus exiguus
+SYNONYM                   : Myxococcus digitatus
+SYNONYM                   : Myxococcus clavatus
+//
+ID                        : 38
+PARENT ID                 : 42
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Angiococcus disciformis
+SYNONYM                   : "Angiococcus disciformis" (Thaxter 1904) Jahn 1924
+SYNONYM                   : Angiococcus disciformis (Thaxter 1904) Hook et al. 1980
+SYNONYM                   : Myxococcus disciformis Thaxter 1904 (Approved Lists 1980)
+SYNONYM                   : Cystobacter disciformis
+SYNONYM                   : Myxococcus disciformis
+SYNONYM                   : 'Cystobacter disciformis'
+//
+ID                        : 39
+PARENT ID                 : 80811
+RANK                      : family
+GC ID                     : 11
+SCIENTIFIC NAME           : Cystobacteraceae
+SYNONYM                   : Cystobacteraceae McCurdy 1970
+INCLUDES                  : Archangiaceae Jahn 1924
+INCLUDES                  : Archangiaceae
+//
+ID                        : 40
+PARENT ID                 : 39
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Stigmatella
+SYNONYM                   : Stigmatella Berkeley and Curtis 1875
+//
+ID                        : 41
+PARENT ID                 : 40
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Stigmatella aurantiaca
+SYNONYM                   : Chondromyces aurantiacus
+SYNONYM                   : "Chondromyces aurantiacus" (Berkeley and Curtis) Thaxter 1892
+SYNONYM                   : Stigmatella aurantiaca Berkeley and Curtis 1875
+//
+ID                        : 42
+PARENT ID                 : 39
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Cystobacter
+SYNONYM                   : Cystobacter Schroeter 1886
+INCLUDES                  : Angiococcus
+INCLUDES                  : Angiococcus (ex Jahn 1924) Hook et al. 1980
+INCLUDES                  : "Angiococcus" Jahn 1924
+//
+ID                        : 43
+PARENT ID                 : 42
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Cystobacter fuscus
+SYNONYM                   : Polyangium fuscum
+SYNONYM                   : Cystobacter fuscus Schroeter 1886
+SYNONYM                   : "Polyangium fuscum" (Schroeter 1886) Thaxter 1904
+//
+ID                        : 44
+PARENT ID                 : 39
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Melittangium
+SYNONYM                   : Melittangium Jahn 1924
+//
+ID                        : 45
+PARENT ID                 : 44
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Melittangium lichenicola
+SYNONYM                   : Podangium gracilipes
+SYNONYM                   : Podangium lichenicolum
+SYNONYM                   : Chondromyces minor
+SYNONYM                   : Chondromyces lichenicolus
+SYNONYM                   : Chondromyces gracilipes
+SYNONYM                   : "Chondromyces minor" Krzemieniewska and Krzemieniewski 1930
+SYNONYM                   : "Chondromyces lichenicolus" Thaxter 1892
+SYNONYM                   : "Chondromyces gracilipes" Thaxter 1897
+SYNONYM                   : "Podangium gracilipes" (Thaxter 1897) Jahn 1924
+SYNONYM                   : "Podangium lichenicolum" (Thaxter 1892) Jahn 1924
+SYNONYM                   : Melittangium lichenicola (Thaxter 1892) McCurdy 1971
+//
+ID                        : 47
+PARENT ID                 : 39
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Archangium
+SYNONYM                   : Archangium Jahn 1924
+//
+ID                        : 48
+PARENT ID                 : 47
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Archangium gephyra
+SYNONYM                   : "Chondrococcus cerebriformis" (Kofler) Jahn 1924
+SYNONYM                   : "Chondromyces serpens" Quehl 1906
+SYNONYM                   : "Myxococcus cerebriformis" Kofler 1913
+SYNONYM                   : Archangium gephyra Jahn 1924
+SYNONYM                   : Chondrococcus cerebriformis
+SYNONYM                   : Chondromyces serpens
+SYNONYM                   : Myxococcus cerebriformis
+//
+ID                        : 49
+PARENT ID                 : 80812
+RANK                      : family
+GC ID                     : 11
+SCIENTIFIC NAME           : Polyangiaceae
+SYNONYM                   : Polyangiaceae Jahn 1924
+INCLUDES                  : "Sorangiaceae" Jahn 1924
+INCLUDES                  : Sorangiaceae
+//
+ID                        : 50
+PARENT ID                 : 49
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Chondromyces
+SYNONYM                   : "Myxobotrys" Zukal 1896
+SYNONYM                   : "Polycephalum" Kalchbrenner and Cooke 1880
+SYNONYM                   : Chondromyces Berkeley and Curtis 1874
+SYNONYM                   : Polycephalum
+SYNONYM                   : Myxobotrys
+MISSPELLING               : Chrondromyces
+//
+ID                        : 51
+PARENT ID                 : 50
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Chondromyces apiculatus
+SYNONYM                   : Chondromyces apiculatus Thaxter 1897
+MISSPELLING               : Chrondromyces apiculatus
+//
+ID                        : 52
+PARENT ID                 : 50
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Chondromyces crocatus
+SYNONYM                   : Chondromyces crocatus Berkeley and Curtis 1874
+SYNONYM                   : "Myxobotrys variabilis" Zukal 1896 (putative synonym)
+SYNONYM                   : Myxobotrys variabilis
+MISSPELLING               : Chrondromyces crocatus
+//
+ID                        : 53
+PARENT ID                 : 224463
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Nannocystis
+SYNONYM                   : Nannocystis Reichenbach 1970
+//
+ID                        : 54
+PARENT ID                 : 53
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Nannocystis exedens
+SYNONYM                   : Nannocystis exedens Reichenbach 1970
+//
+ID                        : 55
+PARENT ID                 : 49
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Polyangium
+SYNONYM                   : Polyangium Link 1809
+//
+ID                        : 56
+PARENT ID                 : 55
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Polyangium cellulosum
+SYNONYM                   : Sorangium cellulosum
+SYNONYM                   : "Polyangium cellulosum" Imshenetski and Solntseva 1936
+SYNONYM                   : "Sorangium cellulosum" (Imshenetski and Solntseva 1936) Imshenetski and Solntseva 1937
+SYNONYM                   : "Sorangium nigrescens" Krzemieniewska and Krzemieniewski 1938
+SYNONYM                   : "Sorangium nigrum" Krzemieniewska and Krzemieniewski 1938
+SYNONYM                   : Polyangium cellulosum (ex Imshenetski and Solntseva 1936) Brockman 1989
+SYNONYM                   : Sorangium nigrescens
+SYNONYM                   : Sorangium nigrum
+//
+ID                        : 57
+PARENT ID                 : 55
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Polyangium sp.
+//
+ID                        : 59
+PARENT ID                 : 90153
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Vitreoscilla
+SYNONYM                   : Vitreoscilla Pringsheim 1949
+//
+ID                        : 60
+PARENT ID                 : 59
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Vitreoscilla sp.
+//
+ID                        : 61
+PARENT ID                 : 59
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Vitreoscilla stercoraria
+SYNONYM                   : Vitreoscilla stercoraria Pringsheim 1951 (Approved Lists 1980) emend. Strohl et al. 1986
+//
+ID                        : 62
+PARENT ID                 : 59
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Vitreoscilla beggiatoides
+SYNONYM                   : Vitreoscilla beggiatoides Pringsheim 1949 (Approved Lists 1980) emend. Strohl et al. 1986
+//
+ID                        : 63
+PARENT ID                 : 59
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Vitreoscilla filiformis
+SYNONYM                   : "Vitreoscilla filiformis" Pringsheim 1951
+SYNONYM                   : Vitreoscilla filiformis (ex Pringsheim 1951) Strohl et al. 1986
+//
+ID                        : 64
+PARENT ID                 : 189773
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Herpetosiphon
+SYNONYM                   : Herpetosiphon Holt and Lewin 1968
+//
+ID                        : 65
+PARENT ID                 : 64
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Herpetosiphon aurantiacus
+SYNONYM                   : Herpetosiphon giganteus
+SYNONYM                   : Herpetosiphon aurantiacus Holt and Lewin 1968
+//
+ID                        : 68
+PARENT ID                 : 32033
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Lysobacter
+SYNONYM                   : Lysobacter Christensen and Cook 1978
+//
+ID                        : 69
+PARENT ID                 : 68
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Lysobacter enzymogenes
+SYNONYM                   : Lysobacter enzymogenes Christensen and Cook 1978
+//
+ID                        : 71
+PARENT ID                 : 481
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Simonsiella
+SYNONYM                   : Simonsiella Schmid 1922
+//
+ID                        : 72
+PARENT ID                 : 71
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Simonsiella muelleri
+SYNONYM                   : Simonsiella muelleri Schmid 1922
+SYNONYM                   : Caryophanon muelleri
+SYNONYM                   : "Caryophanon muelleri" (Schmid 1922) Peshkoff 1948
+COMMON NAME               : Scheibenbakterien
+COMMON NAME               : Scheibenbakterien Muller 1911
+//
+ID                        : 75
+PARENT ID                 : 76892
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Caulobacter
+SYNONYM                   : Caulobacter Henrici and Johnson 1935 (Approved Lists 1980) emend. Abraham et al. 1999
+//
+ID                        : 78
+PARENT ID                 : 75
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Caulobacter sp.
+//
+ID                        : 80
+PARENT ID                 : 75
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Caulobacter spinosum
+SYNONYM                   : 'Caulobacter spinosum'
+//
+ID                        : 81
+PARENT ID                 : 45401
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Hyphomicrobium
+SYNONYM                   : Hyphomicrobium Stutzer and Hartleb 1898
+SYNONYM                   : Hyphomicrobium Stutzer and Hartleb 1899 (sic)
+//
+ID                        : 82
+PARENT ID                 : 81
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Hyphomicrobium sp.
+//
+ID                        : 83
+PARENT ID                 : 81
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Hyphomicrobium vulgare
+SYNONYM                   : Hyphomicrobium vulgare Stutzer and Hartleb 1898
+SYNONYM                   : Hyphomicrobium vulgare Stutzer and Hartleb 1899 (sic)
+//
+ID                        : 84
+PARENT ID                 : 81
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Hyphomicrobium methylovorum
+SYNONYM                   : Hyphomicrobium methylovorum Izumi et al. 1983
+//
+ID                        : 85
+PARENT ID                 : 69657
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Hyphomonas
+SYNONYM                   : Hyphomonas (ex Pongratz 1957) Moore et al. 1984 emend. Weiner et al. 2000
+//
+ID                        : 86
+PARENT ID                 : 85
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Hyphomonas jannaschiana
+SYNONYM                   : Hyphomonas jannaschiana Weiner et al. 1985
+//
+ID                        : 87
+PARENT ID                 : 85
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Hyphomonas sp.
+//
+ID                        : 88
+PARENT ID                 : 224471
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Leptothrix
+SYNONYM                   : Detoniella
+SYNONYM                   : "Chlamydothrix" Migula 1900
+SYNONYM                   : "Detoniella" Trevisan in de Toni and Trevisan 1889
+SYNONYM                   : Leptothrix Kutzing 1843
+SYNONYM                   : Chlamydothrix
+//
+ID                        : 89
+PARENT ID                 : 88
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Leptothrix discophora
+SYNONYM                   : "Leptothrix discophora" (Schwers 1912) Dorff 1934
+SYNONYM                   : "Leptothrix crassa" Cholodny 1924
+SYNONYM                   : "Megalothrix discophora" Schwers 1912
+SYNONYM                   : Leptothrix discophora (ex Schwers 1912) Spring et al. 1997
+SYNONYM                   : Leptothrix crassa
+SYNONYM                   : Megalothrix discophora
+//
+ID                        : 93
+PARENT ID                 : 433
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Stella
+SYNONYM                   : Stella Vasilyeva 1985
+//
+ID                        : 94
+PARENT ID                 : 93
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Stella humosa
+SYNONYM                   : Stella humosa Vasilyeva 1985
+//
+ID                        : 96
+PARENT ID                 : 90627
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Gallionella
+SYNONYM                   : Gallionella Ehrenberg 1838
+//
+ID                        : 97
+PARENT ID                 : 96
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Gallionella ferruginea
+SYNONYM                   : Spirophyllum ferrugineum
+SYNONYM                   : Spirillum ferrugineum
+SYNONYM                   : "Spirophyllum ferrugineum" (Ehrenberg 1838) Ellis 1907
+SYNONYM                   : Chlamydothrix ferruginea
+SYNONYM                   : Gallionella ferruginea Ehrenberg 1838
+SYNONYM                   : "Spirillum ferrugineum" (Ehrenberg 1838) de Toni and Trevisan 1889
+SYNONYM                   : "Chlamydothrix ferruginea" (Ehrenberg 1838) Migula 1900
+//
+ID                        : 99
+PARENT ID                 : 335928
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Ancylobacter
+SYNONYM                   : Ancylobacter Raj 1983
+SYNONYM                   : Microcyclus
+SYNONYM                   : Microcyclus Orskov 1928 (Approved Lists 1980)
+//
+ID                        : 100
+PARENT ID                 : 99
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Ancylobacter aquaticus
+SYNONYM                   : Microcyclus aquaticus
+SYNONYM                   : Ancylobacter aquaticus (Orskov 1928) Raj 1983
+SYNONYM                   : Microcyclus aquaticus Orskov 1928 (Approved Lists 1980)
+//
+ID                        : 101
+PARENT ID                 : 89373
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Flectobacillus
+SYNONYM                   : Flectobacillus Larkin et al. 1977 (Approved Lists 1980) emend. Raj and Maloy 1990
+//
+ID                        : 102
+PARENT ID                 : 52959
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Polaribacter glomeratus
+SYNONYM                   : Flectobacillus glomeratus McGuire et al. 1988
+SYNONYM                   : Polaribacter glomeratus (McGuire et al. 1988) Gosink et al. 1998
+SYNONYM                   : Flectobacillus glomeratus
+//
+ID                        : 103
+PARENT ID                 : 101
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Flectobacillus major
+SYNONYM                   : "Microcyclus major" Gromov 1963
+SYNONYM                   : Flectobacillus major (Gromov 1963) Larkin et al. 1977
+SYNONYM                   : Microcyclus major
+//
+ID                        : 104
+PARENT ID                 : 68288
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Cyclobacterium marinum
+SYNONYM                   : Microcyclus marinus
+SYNONYM                   : Cyclobacterium marinus
+SYNONYM                   : "Microcyclus marinus" Raj 1976
+SYNONYM                   : Cyclobacterium marinum corrig. (Raj 1976) Raj and Maloy 1990
+SYNONYM                   : Flectobacillus marinus
+SYNONYM                   : Flectobacillus marinus (Raj 1976) Borrall and Larkin 1978 (Approved Lists 1980)
+EQUIVALENT NAME           : Cyclibacterium marinum
+//
+ID                        : 105
+PARENT ID                 : 89373
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Runella
+SYNONYM                   : Runella Larkin and Williams 1978
+//
+ID                        : 106
+PARENT ID                 : 105
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Runella slithyformis
+SYNONYM                   : Runella slithyformis Larkin and Williams 1978
+//
+ID                        : 107
+PARENT ID                 : 89373
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Spirosoma
+SYNONYM                   : Spirosoma Migula 1894
+//
+ID                        : 108
+PARENT ID                 : 107
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Spirosoma linguale
+SYNONYM                   : Spirosoma linguale Migula 1894
+//
+ID                        : 109
+PARENT ID                 : 41294
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Blastobacter
+SYNONYM                   : Blastobacter Zavarzin 1961 (Approved Lists 1980) emend. Sly 1985
+//
+ID                        : 110
+PARENT ID                 : 279
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Xanthobacter viscosus
+SYNONYM                   : "Blastobacter viscosus" Loginova and Trotsenok 1979
+SYNONYM                   : Xanthobacter viscosus Doronina and Trotsenko 2003
+SYNONYM                   : Blastobacter viscosus
+SYNONYM                   : "Blastobacter viscosus" Loginova and Trotensko 1979
+INCLUDES                  : Blastobacter viscosus 7d
+//
+ID                        : 111
+PARENT ID                 : 109
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Blastobacter denitrificans
+SYNONYM                   : Blastobacter denitrificans Hirsch and Muller 1986
+//
+ID                        : 112
+PARENT ID                 : 203683
+RANK                      : order
+GC ID                     : 11
+SCIENTIFIC NAME           : Planctomycetales
+SYNONYM                   : Planctomycetales Schlesner and Stackebrandt 1987
+BLAST NAME                : planctomycetes
+//
+ID                        : 113
+PARENT ID                 : 126
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Gemmata
+SYNONYM                   : Gemmata Franzmann and Skerman 1985
+//
+ID                        : 114
+PARENT ID                 : 113
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Gemmata obscuriglobus
+SYNONYM                   : Gemmata obscuriglobus Franzmann and Skerman 1985
+//
+ID                        : 117
+PARENT ID                 : 123
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Pirellula sp.
+MISSPELLING               : Pirella sp.
+//
+ID                        : 118
+PARENT ID                 : 126
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Planctomyces
+SYNONYM                   : "Acinothrix" Novacek 1938
+SYNONYM                   : Blastocaulis
+SYNONYM                   : Acinothrix
+SYNONYM                   : "Blastocaulis" Henrici and Johnson 1935
+SYNONYM                   : Planctomyces Gimesi 1924
+//
+ID                        : 119
+PARENT ID                 : 118
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Planctomyces brasiliensis
+SYNONYM                   : Planctomyces brasiliensis Schlesner 1990
+//
+ID                        : 120
+PARENT ID                 : 118
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Planctomyces limnophilus
+SYNONYM                   : Planctomyces limnophilus Hirsch and Muller 1986
+//
+ID                        : 122
+PARENT ID                 : 118
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Planctomyces maris
+SYNONYM                   : Planctomyces maris (ex Bauld and Staley 1976) Bauld and Staley 1980
+SYNONYM                   : "Planctomyces maris" Bauld and Staley 1976
+//
+ID                        : 123
+PARENT ID                 : 126
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Pirellula
+SYNONYM                   : Pirellula Schlesner and Hirsch 1987 emend. Schlesner et al. 2004
+MISNOMER                  : Pirella Schlesner and Hirsch 1984
+MISNOMER                  : Pirella
+MISSPELLING               : Pivellula
+//
+ID                        : 124
+PARENT ID                 : 265487
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Blastopirellula marina
+SYNONYM                   : Blastopirellula marina (Schlesner 1987) Schlesner et al. 2004
+SYNONYM                   : Pirellula marina
+SYNONYM                   : Pirellula marina (Schlesner 1987) Schlesner and Hirsch 1987
+MISNOMER                  : Pirella marina Schlesner 1987
+MISNOMER                  : Pirella marina
+MISSPELLING               : Pivellula marina
+//
+ID                        : 125
+PARENT ID                 : 123
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Pirellula staleyi
+SYNONYM                   : Pirellula staleyi (Schlesner and Hirsch 1984) Schlesner and Hirsch 1987
+INCLUDES                  : Pasteuria ramosa ATCC 27377
+MISNOMER                  : Planctomyces staleyi
+MISNOMER                  : Pirella staleyi Schlesner and Hirsch 1984
+MISNOMER                  : Pirella staleyi
+//
+ID                        : 126
+PARENT ID                 : 112
+RANK                      : family
+GC ID                     : 11
+SCIENTIFIC NAME           : Planctomycetaceae
+SYNONYM                   : Planctomycetaceae Schlesner and Stackebrandt 1987
+//
+ID                        : 127
+PARENT ID                 : 126
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Isosphaera
+SYNONYM                   : Isosphaera Giovannoni et al. 1995
+//
+ID                        : 128
+PARENT ID                 : 127
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Isosphaera pallida
+SYNONYM                   : "Isocystis pallida" Woronichin 1927 (as cyanobacterium)
+SYNONYM                   : "Torulopsidosira pallida" (Woronichin 1927) Geitler 1963 (as a yeast)
+SYNONYM                   : Isocystis pallida
+SYNONYM                   : Isosphaera pallida (ex Woronichin 1927) Giovannoni et al. 1995
+SYNONYM                   : Torulopsidosira pallida
+//
+ID                        : 129
+PARENT ID                 : 82117
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Renobacter
+SYNONYM                   : 'Renobacter'
+SYNONYM                   : "Renobacter" Nikitin 1971
+//
+ID                        : 130
+PARENT ID                 : 129
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Renobacter vaculatum
+SYNONYM                   : "Renobacter vaculatum" Nikitin 1971
+SYNONYM                   : 'Renobacter vaculatum'
+EQUIVALENT NAME           : Renobacter vacuolatum
+//
+ID                        : 131
+PARENT ID                 : 82117
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Tuberoidobacter
+//
+ID                        : 132
+PARENT ID                 : 131
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Tuberoidobacter mutans
+SYNONYM                   : 'Tuberoidobacter mutans'
+//
+ID                        : 133
+PARENT ID                 : 31993
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Methylocystis
+SYNONYM                   : Methylocystis Bowman et al. 1993
+//
+ID                        : 134
+PARENT ID                 : 133
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Methylocystis parvus
+SYNONYM                   : Methylocystis parvus Bowman et al. 1993
+//
+ID                        : 136
+PARENT ID                 : 203692
+RANK                      : order
+GC ID                     : 11
+SCIENTIFIC NAME           : Spirochaetales
+SYNONYM                   : Spirochaetales Buchanan 1917
+BLAST NAME                : spirochetes
+//
+ID                        : 137
+PARENT ID                 : 136
+RANK                      : family
+GC ID                     : 11
+SCIENTIFIC NAME           : Spirochaetaceae
+SYNONYM                   : Spirochaetaceae Swellengrebel 1907
+IN-PART                   : Treponemataceae
+IN-PART                   : Treponemataceae Robinson 1948 (Approved Lists 1980)
+//
+ID                        : 138
+PARENT ID                 : 137
+RANK                      : genus
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia
+SYNONYM                   : Borrelia Swellengrebel 1907
+//
+ID                        : 139
+PARENT ID                 : 64895
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia burgdorferi
+GENBANK COMMON NAME       : Lyme disease spirochete
+SYNONYM                   : Borrelia burgdorferi Johnson et al. 1984 emend. Baranton et al. 1992
+MISSPELLING               : Borrelia burdorferi
+MISSPELLING               : Borrelia burgdorffragment
+EQUIVALENT NAME           : Borrelia burgdorferi sensu stricto
+//
+ID                        : 140
+PARENT ID                 : 138
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia hermsii
+SYNONYM                   : Spirochaeta hermsi
+SYNONYM                   : "Spirochaeta hermsi" (sic) Davis 1942
+SYNONYM                   : Borrelia hermsii (Davis 1942) Steinhaus 1946
+//
+ID                        : 141
+PARENT ID                 : 138
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia parkeri
+SYNONYM                   : "Spirochaeta parkeri" Davis 1942
+SYNONYM                   : Borrelia parkeri (Davis 1942) Steinhaus 1946
+SYNONYM                   : Spirochaeta parkeri
+//
+ID                        : 142
+PARENT ID                 : 138
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia turicatae
+SYNONYM                   : Borrelia turicatae (Brumpt 1933) Steinhaus 1946
+SYNONYM                   : "Spirochaeta turicatae" Brumpt 1933
+SYNONYM                   : Spirochaeta turicatae
+//
+ID                        : 143
+PARENT ID                 : 138
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia anserina
+SYNONYM                   : Spirochaeta anserina
+SYNONYM                   : Spirochaete gallinarum
+SYNONYM                   : Spiroschaudinnia anserina
+SYNONYM                   : Borrelia anserina (Sakharoff 1891) Bergey et al. 1925
+SYNONYM                   : "Spiroschaudinnia anserina" (Sakharoff 1891) Sambon 1907
+SYNONYM                   : "Spirochaete gallinarum" (sic) Stephens and Christopher 1904
+SYNONYM                   : "Spirochaeta anserina" Sakharoff 1891
+//
+ID                        : 144
+PARENT ID                 : 138
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia coriaceae
+SYNONYM                   : Borrelia coriaceae Johnson et al. 1987
+//
+ID                        : 145
+PARENT ID                 : 138
+RANK                      : species
+GC ID                     : 11
+SCIENTIFIC NAME           : Borrelia sp.
+//

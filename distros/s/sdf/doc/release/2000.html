@@ -1,0 +1,101 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Release Notes: 2.000</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2001b1.html">Previous Topic</A> | <A HREF="2000b12.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>2. 2.000</H1>
+<P ALIGN="Left"><A HREF="#2.000 - Enhancements">Enhancements</A> | <A HREF="#2.000 - Fixes">Fixes</A> | <A HREF="#2.000 - Incompatibilities">Incompatibilities</A></P>
+<HR>
+<H2><A NAME="2.000 - Enhancements">2.1. Enhancements</A></H2>
+<P>As this is the first public production release of SDF, the focus has been to fix bugs and improve the documentation. The enhancements are:</P>
+<OL>
+<LI><A HREF="2001b1.html#Better documentation">Better documentation</A>
+<LI><A HREF="2000.html#Better packaging">Better packaging</A>
+<LI><A HREF="2000.html#Better support for non-English languages">Better support for non-English languages</A>
+<LI><A HREF="2000.html#Table enhancements">Table enhancements</A>
+<LI><A HREF="2000.html#Object management enhancements">Object management enhancements</A>
+<LI><A HREF="2000.html#Example/verbatim enhancements">Example/verbatim enhancements</A>
+<LI><A HREF="2000.html#Miscellaneous things">Miscellaneous things.</A></OL>
+<H3><A NAME="Better documentation">2.1.1. Better documentation</A></H3>
+<P>The following documents have been improved:</P>
+<UL>
+<LI><A HREF="../paper/sdfintro.html">The SDF Document Development System</A>
+<LI><A HREF="../ref/re_sdf.html">SDF Reference</A>.</UL>
+<P>The <A HREF="http://www.mincom.com/mtr/sdf/index.html">SDF Web Site</A> has also been improved by the addition of the following sections:</P>
+<UL>
+<LI><A HREF="http://www.mincom.com/mtr/sdf/news/index.html">SDF Latest News</A>
+<LI><A HREF="http://www.mincom.com/mtr/sdf/templates/index.html">SDF Template Catalog</A>
+<LI><A HREF="http://www.mincom.com/mtr/sdf/resources/index.html">SDF Resource Center</A>
+<LI><A HREF="http://www.mincom.com/mtr/sdf/samples/index.html">SDF Sample Showcase</A>.</UL>
+<H3><A NAME="Better packaging">2.1.2. Better packaging</A></H3>
+<P>The PostScript and PDF versions of the documentation have been removed from the core distribution making it substantially smaller. The PostScript and PDF documents can still be accessed as needed from <A HREF="http://www.mincom.com/mtr/sdf/catalog.html">http://www.mincom.com/mtr/sdf/catalog.html</A>.</P>
+<P>The SDF distribution is now CPAN-compliant, thanks to the efforts of Achim Bonnet (<A HREF="mailto:ach@mpe.mpg.de">ach@mpe.mpg.de</A>). As a result, several things have changed:</P>
+<UL>
+<LI>installation is much easier
+<LI>the SDFHOME environment variable is no longer used to find files:<UL>
+<LI>Perl libraries are now assumed to be available on Perl's library path
+<LI>configuration files, including <TT>sdf.ini</TT>, are now located within the <TT>sdf/home</TT> directory somewhere on Perl's library path.</UL>
+<LI>the <EM>test</EM> directory has been renamed to <EM>t</EM>
+<LI>the <A HREF="../ref/sdftest.html">sdftest</A> script is now located within the <EM>t</EM> directory.</UL>
+<H3><A NAME="Better support for non-English languages">2.1.3. Better support for non-English languages</A></H3>
+<P>Russian characters (and characters from other non-English languages) are now hopefully better handled for users running on Perl 5.004 or later. (Thanks to Nikolaj Logvinov for this fix.)</P>
+<P>A German locale (de_de.sdl) has also been added. (Thanks to Andreas Lohrum for this.)</P>
+<H3><A NAME="Table enhancements">2.1.4. Table enhancements</A></H3>
+<P>The <A HREF="../ref/ftable.html">table</A> filter now supports some new parameters:</P>
+<UL>
+<LI><EM>colvaligns</EM> - a comma-separated list of vertical alignments values (Top, Middle, Bottom, Baseline) for columns. For the lazy people, a single word containing the letters T, M, B and L can be used for the value as well.
+<LI><EM>select</EM> - a comma-separated list of columns to display.
+<LI><EM>delete</EM> - a comma-separated list of columns to delete.</UL>
+<P>The <EM>delete</EM> parameter is particularly useful if you want to sort or filter a table (using the <EM>sort</EM> and <EM>where</EM> parameters, respectively) using a column which you don't want in the output.</P>
+<H3><A NAME="Object management enhancements">2.1.5. Object management enhancements</A></H3>
+<P>Class filters also support the <EM>colaligns</EM>, <EM>colvaligns</EM>, <EM>select</EM> and <EM>delete</EM> parameters provided by the <A HREF="../ref/ftable.html">table</A> filter.</P>
+<P>A new feature called <EM>object views</EM> has been introduced. See <A HREF="../ref/in_claif.html">Understanding Class Interfaces</A> within the <A HREF="../ref/re_sdf.html">SDF Reference</A> for details.</P>
+<P>The <A HREF="../ref/mcatalog.html">catalog</A> macro can now apply the filtering mask to an attribute other than the name. To specify the attribute, use a mask of the format:</P>
+<PRE>
+       attribute&quot;:&quot;mask_pattern
+</PRE>
+<H3><A NAME="Example/verbatim enhancements">2.1.6. Example/verbatim enhancements</A></H3>
+<P>The <A HREF="../ref/fverbati.html">verbatim</A> and <A HREF="../ref/fexample.html">example</A> filters now support a <EM>listitem</EM> attribute (ala the <A HREF="../ref/ftable.html">table</A> filter), although this attribute currently only indents the text for these filters.</P>
+<P>The <EM>skipheader</EM> attribute of the <A HREF="../ref/fexample.html">example</A> and <A HREF="../ref/fverbati.html">verbatim</A> filters now uses the <EM>lang</EM> attribute, if any, to determine the commenting conventions. Previously, it assumed comments began with # and were terminated by the end of line.</P>
+<H3><A NAME="Miscellaneous things">2.1.7. Miscellaneous things</A></H3>
+<P>A module with support for Use Cases has been added (stdlib/usecases.sdm).</P>
+<P>The <A HREF="../ref/minsert.html">insert</A> macro can now be used to insert/execute a macro which may not be defined.</P>
+<HR>
+<H2><A NAME="2.000 - Fixes">2.2. Fixes</A></H2>
+<P><A HREF="../ref/sdftest.html">sdftest</A> on Windows/DOS systems now works.</P>
+<P>For plain text output, unwanted lines between consecutive example paragraphs have been removed.</P>
+<P>File handling on the Macintosh should now be fixed. (Thanks to David Schooley.)</P>
+<P>Within <A HREF="../ref/sdfget.html">sdfget</A> reports, * processing now works again.</P>
+<P>When generating an <EM>rtf</EM> file via <A HREF="http://www.frame.com/PRODUCTS/Products.doc.html">FrameMaker</A>, the intermediate <EM>mif</EM> file is now deleted.</P>
+<P><EM>Inner</EM> and <EM>Outer</EM> no longer produce warnings as unknown values for the <EM>align</EM> parameter for the <A HREF="../ref/ftable.html">table</A> or <A HREF="../ref/fbox.html">box</A> filter.</P>
+<P>Consecutive normal paragraphs within a <A HREF="../ref/fbox.html">box</A> filter or a multi-paragraph table cell no longer run together when HTML is generated.</P>
+<P>The <A HREF="../ref/fabout.html">about</A> filter works correctly again for HTML output.</P>
+<P>The <EM>FILE</EM> phrase style is now mapped to TT for HTML output.</P>
+<P>The <EM>OPT_PAGE_SIZE</EM> and <EM>OPT_WIDTH</EM> variables are no longer ignored if they are set via the <A HREF="../ref/minit.html">init</A> macro.</P>
+<P>Generating PostScript and DVI via SGML-Tools 1.02 or later should now work.</P>
+<P>Column alignments within tables are no longer ignored when SGML is generated.</P>
+<P><EM>None</EM> is now a legal value for cell rulings within tables. (Thanks to Cliff Krumvieda for this fix.)</P>
+<HR>
+<H2><A NAME="2.000 - Incompatibilities">2.3. Incompatibilities</A></H2>
+<P>Configuration files are now located differently. See <A HREF="2000.html#Better packaging">Better packaging</A>, above, for details.</P>
+<P>The scripts in the <TT>bin</TT> directory now use <TT>/usr/local/bin/perl</TT>, rather than <TT>/usr/local/bin/perl5</TT>, i.e. the default version of Perl installed at a site is now assumed to be 5.003 or later.</P>
+<P>The PDF and PostScript versions of the documentation are no longer shipped with the SDF package. Instead, the document catalog points to PDF and PostScript files on SDF's web site. (This change was made to reduce the size of the SDF distribution.)</P>
+<P>If you are generating outputs via SGML-Tools, you now need SGML-Tools 1.02 or later (rather than 0.99 or later).</P>
+<P>The <EM>paper</EM> document style now leaves headings as they are defined. Previously, it implicitly changed H-style headings to P-style headings and slid them down one level.</P>
+<P>The <EM>sdtgen</EM> script has been renamed <A HREF="../ref/sdngen.html">sdngen</A> to reflect the fact that <EM>sdn</EM> is the extension now used for tuning modules.</P>
+<HR>
+<P ALIGN="Center"><A HREF="rn_sdf.html">Contents</A> | <A HREF="rn_sdf.html">Parent Topic</A> | <A HREF="2001b1.html">Previous Topic</A> | <A HREF="2000b12.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

@@ -114,11 +114,12 @@ sub factory {
 	my ($class, $value_ref, $update_hash, $hash_key) = @_;
 	my $self;
 	if (not ref $$value_ref) {
-		return if not $$value_ref;
-		my $jv = from_json $$value_ref;
+		my $jv = from_json($$value_ref) if $$value_ref;
 		$$value_ref = $jv if $jv;
 	}
-	if ('HASH' eq ref $$value_ref) {
+	if (not defined $$value_ref) {
+		$self = [undef, undef];
+	} elsif ('HASH' eq ref $$value_ref) {
 		my %h;
 		tie %h, 'DBIx::Struct::JSON::Hash', $$value_ref, $update_hash, $hash_key;
 		$self = [\%h, $$value_ref];
@@ -131,7 +132,11 @@ sub factory {
 }
 
 sub revert {
-	$_[0] = to_json $_[0][1];
+	$_[0] = defined($_[0][1]) ? to_json $_[0][1] : undef;
+}
+
+sub data {
+	$_[0][1];
 }
 
 sub accessor {
@@ -185,7 +190,7 @@ use Data::Dumper;
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.17';
+our $VERSION = '0.22';
 
 our @EXPORT = qw{
 	one_row
@@ -569,8 +574,8 @@ sub _parse_find_by {
 		} split /Or(?![[:lower:]])/, $where
 	);
 #>>>
-	my $obj = $type eq 'One' ? 'DBIx::Struct::one_row' : 'DBIx::Struct::all_rows';
-	my $flags = $column ? ", -column => '$column'" : '';
+	my $obj   = $type eq 'One' ? 'DBIx::Struct::one_row'  : 'DBIx::Struct::all_rows';
+	my $flags = $column        ? ", -column => '$column'" : '';
 	$flags = $distinct ? $flags ? ", -distinct => '$column'" : ", '-distinct'" : $flags;
 	$order
 		= $order
@@ -585,7 +590,6 @@ sub _parse_find_by {
 	$tspec .= $where . $order . $limit;
 	return "sub { $obj($tspec) }";
 }
-
 
 sub _row_data ()    {0}
 sub _row_updates () {1}
@@ -710,9 +714,11 @@ FTS
 }
 
 sub make_object_set {
-	my $set = <<SET;
+	my $table = $_[0];
+	my $set   = <<SET;
 		sub set {
 			my \$self = \$_[0];
+			my \@unknown_columns;
 			if(CORE::defined(\$_[1])) {
 				if(CORE::ref(\$_[1]) eq 'ARRAY') {
 					\$self->[@{[_row_data]}] = \$_[1];
@@ -721,17 +727,25 @@ sub make_object_set {
 					for my \$f (CORE::keys \%{\$_[1]}) {
 						if (CORE::exists \$fields{\$f}) {
 							\$self->\$f(\$_[1]->{\$f});
+						} else {
+							CORE::push \@unknown_columns, \$f;
 						}
 					}
 				} elsif(not CORE::ref(\$_[1])) {
 					for(my \$i = 1; \$i < \@_; \$i += 2) {
 						if (CORE::exists \$fields{\$_[\$i]}) {
-							my \$f = \$fields{\$_[\$i]};
+							my \$f = \$_[\$i];
 							\$self->\$f(\$_[\$i + 1]);
+						} else {
+							CORE::push \@unknown_columns, \$_[\$i];
 						}
 					}
 				}
 			}
+			DBIx::Struct::error_message {
+					result  => 'SQLERR',
+					message => 'unknown columns '.CORE::join(", ", \@unknown_columns).' for $table->data'
+			} if \@unknown_columns;
 			\$self;
 		}
 SET
@@ -739,7 +753,8 @@ SET
 }
 
 sub make_object_data {
-	my $data = <<DATA;
+	my $table = $_[0];
+	my $data  = <<DATA;
 		sub data {
 			my \$self = \$_[0];
 			my \@ret_keys;
@@ -749,7 +764,7 @@ sub make_object_data {
 					if(!\@{\$_[1]}) {
 						\$ret = \$self->[@{[_row_data]}];
 					} else {
-						\$ret = [CORE::map {\$self->[@{[_row_data]}]->[\$fields{\$_}] } CORE::grep {CORE::exists \$fields{\$_}} \@{\$_[1]}];
+						\$ret = [CORE::map {\$self->[@{[_row_data]}]->[\$fields{\$_}] } \@{\$_[1]}];
 					}
 				} else {
 					for my \$k (\@_[1..\$#_]) {
@@ -759,12 +774,13 @@ sub make_object_data {
 			} else {
 				\@ret_keys = keys \%fields;
 			}
+			my \@unknown_columns = CORE::grep {not CORE::exists \$fields{\$_}} \@ret_keys;
+			DBIx::Struct::error_message {
+					result  => 'SQLERR',
+					message => 'unknown columns '.CORE::join(", ", \@unknown_columns).' for $table->data'
+			} if \@unknown_columns;
 			\$ret = { 
-				CORE::map { 
-					CORE::exists(\$json_fields{\$_})
-					? (\$_ => \$self->\$_->accessor)
-					: (\$_ => \$self->\$_) 
-				} \@ret_keys
+				CORE::map {\$_ => \$self->\$_} \@ret_keys
 			} if not CORE::defined \$ret;
 			\$ret;
 		}
@@ -892,21 +908,7 @@ sub make_object_delete {
 		$delete = <<DEL;
 		sub delete {
 			my \$self = \$_[0];
-			if(\@_ > 1) {
-				my (\$where, \@bind);
-				my \$cond = \$_[1];
-				if(not CORE::ref(\$cond)) {
-					\$cond = {(selectKeys)[0] => \$_[1]};
-				}
-				(\$where, \@bind) = SQL::Abstract->new->where(\$cond);
-				return DBIx::Struct::connect->run(sub {
-					\$_->do(qq{delete from $table \$where}, undef, \@bind)
-					or DBIx::Struct::error_message {
-						result  => 'SQLERR',
-						message => 'error '.\$_->errstr.' updating table $table'
-					}
-				});
-			} else {
+			if(Scalar::Util::blessed \$self) {
 				DBIx::Struct::connect->run(
 					sub {
 						\$_->do(qq{delete from $table where $pk_where}, undef, $pk_row_data)
@@ -915,8 +917,34 @@ sub make_object_delete {
 							message => 'error '.\$_->errstr.' updating table $table'
 						}
 					});
+				return \$self;
 			}
-			\$self;
+			my \$where = '';
+			my \@bind;
+			my \$cond = \$_[1] if \@_ > 1;
+			if(not CORE::ref(\$cond)) {
+				\$cond = {};
+				my \@keys = selectKeys();
+				for(my \$i = 1; \$i < \@_; ++\$i) {
+					DBIx::Struct::error_message {
+						result  => 'SQLERR',
+						message => "Too many keys to delete for $table"
+					} if not CORE::defined \$keys[\$i-1];
+					\$cond->{\$keys[\$i-1]} = \$_[\$i];
+				}
+			}
+			my \@rpar = ();
+			if(\$cond) {
+				(\$where, \@bind) = SQL::Abstract->new->where(\$cond);
+				\@rpar = (undef, \@bind);
+			}
+			return DBIx::Struct::connect->run(sub {
+				\$_->do(qq{delete from $table \$where}, \@rpar)
+				or DBIx::Struct::error_message {
+					result  => 'SQLERR',
+					message => 'error '.\$_->errstr.' updating table $table'
+				}
+			});
 		}
 DEL
 	} else {
@@ -1066,6 +1094,47 @@ sub _parse_interface ($) {
 	\%ret;
 }
 
+sub make_object_to_json {
+	my ($table, $field_types, $fields) = @_;
+	my $field_to_types = join ",\n\t\t\t\t ", map {
+		qq|"$_" => !defined(\$self->[@{[_row_data]}][$fields->{$_}])? undef: |
+			. (
+			  $field_types->{$_} eq 'number'  ? "0+\$self->[@{[_row_data]}][$fields->{$_}]"
+			: $field_types->{$_} eq 'boolean' ? "\$self->[@{[_row_data]}][$fields->{$_}]? \\1: \\0"
+			: $field_types->{$_} eq 'json'
+			? "CORE::ref(\$self->[@{[_row_data]}]->[$fields->{$_}])? \$self->[@{[_row_data]}][$fields->{$_}]->data"
+				. ": JSON::from_json(\$self->[@{[_row_data]}][$fields->{$_}])"
+			: "\"\$self->[@{[_row_data]}][$fields->{$_}]\""
+			)
+	} keys %$field_types;
+	my $set = <<TOJSON;
+		sub TO_JSON {
+			my \$self = \$_[0];
+			return +{
+				$field_to_types
+			};
+		}
+TOJSON
+}
+
+sub _field_type_from_name {
+	my $type_name = $_[0];
+	return 'string' if not defined $type_name;
+	if (   $type_name =~ /int(\d+)?$/i
+		|| $type_name =~ /integer/i
+		|| $type_name =~ /bit$/
+		|| $type_name =~ /float|double|real|decimal|numeric/i)
+	{
+		return 'number';
+	} elsif ($type_name =~ /json/i) {
+		return 'json';
+	} elsif ($type_name =~ /bool/i) {
+		return 'boolean';
+	} else {
+		return 'string';
+	}
+}
+
 sub setup_row {
 	my ($table, $ncn, $interface) = @_;
 	error_message {
@@ -1084,6 +1153,7 @@ sub setup_row {
 	my @refkeys;
 	my %json_fields;
 	my $connector = DBIx::Struct::connect;
+	my %field_types;
 
 	if (not ref $table) {
 		# means this is just one simple table
@@ -1108,7 +1178,8 @@ sub setup_row {
 					if ($chr->{NULLABLE} == 0 && !defined($chr->{COLUMN_DEF})) {
 						push @required, $chr->{COLUMN_NAME};
 					}
-					$fields{$chr->{COLUMN_NAME}} = $i++;
+					$fields{$chr->{COLUMN_NAME}}      = $i++;
+					$field_types{$chr->{COLUMN_NAME}} = _field_type_from_name($chr->{TYPE_NAME});
 				}
 				@pkeys = $_->primary_key(undef, undef, $table);
 				if (!@pkeys && @required) {
@@ -1148,14 +1219,16 @@ sub setup_row {
 			sub {
 				for (my $cn = 0; $cn < @{$table->{NAME}}; ++$cn) {
 					my $ti = $_->type_info($table->{TYPE}->[$cn]);
+					$field_types{$table->{NAME}->[$cn]} = _field_type_from_name($ti->{TYPE_NAME});
 					push @timestamp_fields, $table->{NAME}->[$cn]
-						if $ti && $ti->{TYPE_NAME} =~ /^time/;
+						if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^time/;
 					$json_fields{$table->{NAME}->[$cn]} = undef
-						if $ti && $ti->{TYPE_NAME} =~ /^json/;
+						if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^json/;
 				}
 			}
 		);
 	}
+	my $field_types = join ", ", map {qq|"$_" => '$field_types{$_}'|} keys %field_types;
 	my $fields      = join ", ", map {qq|"$_" => $fields{$_}|} keys %fields;
 	my $json_fields = join ", ", map {qq|"$_" => undef|} keys %json_fields;
 	my $required    = '';
@@ -1355,6 +1428,7 @@ ACC
 		use JSON;
 		use Scalar::Util 'blessed';
 		use vars qw(\$AUTOLOAD);
+		our \%field_types = ($field_types);
 		our \%fields = ($fields);
 		our \%json_fields = ($json_fields);
 PHD
@@ -1379,12 +1453,13 @@ PHD
 	}
 	my $new              = make_object_new($table, $required, $pk_row_data, $pk_returninig);
 	my $filter_timestamp = make_object_filter_timestamp($timestamps);
-	my $set              = make_object_set();
-	my $data             = make_object_data();
+	my $set              = make_object_set($table);
+	my $data             = make_object_data($table);
 	my $update           = make_object_update($table, $pk_where, $pk_row_data);
 	my $delete           = make_object_delete($table, $pk_where, $pk_row_data);
 	my $fetch            = make_object_fetch($table, $pk_where, $pk_row_data);
 	my $autoload         = make_object_autoload_find($table, $pk_where, $pk_row_data);
+	my $to_json          = make_object_to_json($table, \%field_types, \%fields);
 	my $destroy;
 
 	if (not ref $table) {
@@ -1398,9 +1473,8 @@ DESTROY
 		$destroy = '';
 	}
 	my $eval_code = join "", $package_header, $select_keys, $new,
-		$filter_timestamp, $set, $data, $fetch, $autoload,
-		$update, $delete, $destroy, $accessors, $foreign_tables,
-		$references_tables;
+		$set,    $data,   $fetch,   $autoload,  $to_json,        $filter_timestamp,
+		$update, $delete, $destroy, $accessors, $foreign_tables, $references_tables;
 
 	# print $eval_code;
 	eval $eval_code;
@@ -1814,8 +1888,18 @@ sub one_row {
 			my $data = $sth->fetchrow_arrayref;
 			$sth->finish;
 			return if not $data;
-			return $ncn->new([@$data]) if !$one_column;
-			return $data->[0];
+			if ($one_column) {
+#<<<
+# json type is not working yet here					
+#				no strict 'refs';
+#				my @f = %{$ncn . "::field_types"};
+#				if ($f[1] eq 'json') {
+#					return (defined($data->[0]) ? from_json($data->[0]) : undef);
+#				} else {
+					return $data->[0];
+#>>>				}
+			}
+			return $ncn->new([@$data]);
 		},
 		@_
 	);
@@ -1841,7 +1925,16 @@ sub all_rows {
 				}
 			} else {
 				if ($one_column) {
-					push @rows, $row->[0] while ($row = $sth->fetch);
+#<<<
+# json type is not working yet here					
+#					no strict 'refs';
+#					my @f = %{$ncn . "::field_types"};
+#					if ($f[1] eq 'json') {
+#						push @rows, (defined($row->[0]) ? from_json($row->[0]) : undef) while ($row = $sth->fetch);
+#					} else {
+						push @rows, $row->[0] while ($row = $sth->fetch);
+#					}
+#>>>
 				} else {
 					push @rows, $ncn->new([@$row]) while ($row = $sth->fetch);
 				}

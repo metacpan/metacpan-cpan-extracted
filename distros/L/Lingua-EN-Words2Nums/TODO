@@ -1,0 +1,7 @@
+* spelled out numbers, ie, "nine one one" => 911,
+	(currently, it returns 9 + 1 + 1)
+	(getting this right is a pre-req for decimals..)
+* fractions and decimals
+* support strings that start with a number and end with non-numbers,
+  returning the remaining part. HARD -- numbers are currently parsed
+  backwards!

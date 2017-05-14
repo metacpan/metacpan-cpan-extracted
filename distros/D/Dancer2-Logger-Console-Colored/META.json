@@ -1,0 +1,60 @@
+{
+   "abstract" : "Dancer2 colored console logger.",
+   "author" : [
+      "BURNERSK <burnersk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Logger-Console-Colored",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2::Core::Types" : "0",
+            "Dancer2::Logger::Console" : "0",
+            "Moo" : "0",
+            "Term::ANSIColor" : "0",
+            "perl" : "5.013002"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Logger::Console::Colored" : {
+         "file" : "lib/Dancer2/Logger/Console/Colored.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/burnersk/Dancer2-Logger-Console-Colored/issues"
+      },
+      "homepage" : "https://github.com/burnersk/Dancer2-Logger-Console-Colored",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/burnersk/Dancer2-Logger-Console-Colored.git",
+         "web" : "https://github.com/burnersk/Dancer2-Logger-Console-Colored"
+      }
+   },
+   "version" : "0.001",
+   "x_contributors" : [
+      "BURNERSK <burnersk@cpan.org>"
+   ]
+}
+

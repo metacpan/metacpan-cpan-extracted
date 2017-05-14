@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/get-shit-done
+dist.ini
+lib/App/GSD.pm
+share/sample.yaml
+t/author-basic.t
+t/author-critic.t
+t/basic.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

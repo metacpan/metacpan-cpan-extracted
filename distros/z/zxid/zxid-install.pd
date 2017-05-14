@@ -1,0 +1,2177 @@
+<<if: ZXIDBOOK>>
+<<else: >>Installing ZXID (from package or source)
+###########################################
+<<author: Sampo Kellomäki (sampo@iki.fi)>>
+<<cvsid: $Id: zxid-install.pd,v 1.4 2010-01-08 02:10:09 sampo Exp $>>
+<<class: article!a4paper!!ZXID-COMP 01>>
+<<define: ZXDOC=Compiling and Installing ZXID>>
+
+<<abstract:
+
+ZXID.org Identity Management toolkit implements standalone SAML 2.0 and
+Liberty ID-WSF 2.0 stacks. This document explains how to compile
+ZXID from source code.
+
+>>
+
+<<maketoc: 1>>
+
+1 Introduction
+==============
+
+ZXID is distributed in source code form, ready to be compiled
+with C development environment.
+
+Depending on your skill level, you may want to see if a binary package
+is available for your distribution - installing them is similar to
+installing the versions compiled from source, except that you step the
+early steps of compilation.
+
+Once you have compiled ZXID or found a package, you should
+proceed to install ZXID. This will depend heavily on your
+environment and some of the cases are explained in their
+own documents.
+
+* <<link:../mod_auth_saml/mod_auth_saml.html: mod_auth_saml>> Apache
+  module documentation: SSO without programming.
+* <<link:zxid-java.html: javazxid>>: Using ZXID from Java
+* <<link:zxid-perl.html: Net::SAML>>: Using ZXID from Perl
+* <<link:zxid-php.html: php_zxid>>: Using ZXID from PHP
+
+After installation, you should try to run a canned tutorial,
+in section <<see:>>, below, to learn the basics of the technology and to ascertain
+everything works.
+
+When you are ready to deploy your own services, you should check
+configuration instructions in <<link:zxid-conf.html: ZXID Configuration
+Reference>>.
+
+1.1 Other documents
+-------------------
+
+<<doc-inc.pd>>
+
+2 Installing
+============
+
+<<fi: >>
+
+If you want to try ZXID out immediately, we recommend compiling the
+library and examples and installing one of the examples as a CGI
+script in an existing web server. See later chapters for more details.
+
+Download from zxid.org or get it with anon git:  ~git clone git://zxid.org/zxid~
+
+  tar xvzf zxid-0.76.tgz
+  cd zxid-0.76
+  # N.B.  There is no configure script. The Makefile works for all
+  #       supported platforms by provision of correct TARGET option.
+  # N.B2: We distribute some generated files. If they are missing, you need
+  #       to regenerate them: make cleaner; make dep ENA_GEN=1
+  # Standard place is /var/zxid. You can change this with, e.g.
+  #   make ZXID_PATH=/usr/local/var/zxid
+  make                    # default Linux. Do `make TARGET=sol8' for Solaris
+  make all                # Also builds the optional language bindings, see below
+  make dir                # Creates /var/zxid hierarchy (may need to be root)
+  
+  make apachezxid         # optional
+  make apachezxid_install # optional: install the mod_auth_saml Apache module
+  make samlmod            # optional
+  make samlmod_install    # optional: install Net::SAML perl module
+  make phpzxid            # optional
+  make phpzxid_install    # optional: install php_zxid.so PHP extension
+  make javazxid           # optional
+
+  cp zxidhlo <webroot>/
+  # configure your web server to recognize zxid a CGI, e.g.
+  mini_httpd -p 8443 -c 'zxid*' -S -E zxid.pem
+
+  # Edit your /etc/hosts to contain
+  127.0.0.1       localhost sp1.zxidcommon.org sp1.zxidsp.org
+
+  # Point your browser to (zxid_simple() API version)
+  https://sp1.zxidsp.org:8443/zxidhlo?o=E
+  https://sp1.zxidsp.org:8443/zxidhlo.pl?o=E       # Perl version
+  https://sp1.zxidsp.org:8443/zxidhlo.php?o=E      # PHP version
+  http://sp1.zxidsp.org:8080/zxidservlet/zxidHLO?o=E  # Java version
+
+  # Find an IdP to test with and configure it...
+  # see zxididp and zxid-idp.pd for documentation, or use the
+  # free IdP on the net: https://zxidp.org/index-idp.html
+  
+
+2.1 Prerequisites
+-----------------
+
+This software depends on the following packages:
+
+1. zlib from zlib.net. Generally whatever comes with your distro is sufficient.
+2. openssl-0.9.8l or openssl-1.0.0c (earlier versions contain a
+   man-in-the-middle security vulnearability)
+   or later. See www.openssl.org. Generally openssl libraries
+   distributed with most Linux distros are sufficient.<<footnote: It is
+   possible to compile without OpenSSL, e.g. for space constrained embedded
+   system, but this has serious security implications.>>
+3. libcurl from http://curl.haxx.se/. I used version 7.15.5, but probably
+   whatever ships with your distribution is fine. libcurl is needed
+   for SOAP bindings and for fetching metadata. It needs to be compiled
+   to support HTTPS.<<footnote: Compilation without libcurl is possible
+   with some loss of functionality.>>
+4. HTTPS capable web server. For most trivial testing CGI support is needed. We
+   recommend mini_httpd(8) available from
+   http://www.acme.com/software/mini_httpd/
+
+   We also provide Apache HTTP receipe: <<link:apache.html: apache.html>>
+
+5. Perl, PHP, and Java interfaces depend on the respective development
+   tools but should not need any additional modules or tools.
+
+2.1.1 Building from Source: Install Required Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While you may compile the dependency libraries from their respective sources,
+generally you can use the libraries that come with your operating system
+distribution. In this case you need to ensure that "development" versions
+of the packages are installed (the non-development versions do not include
+header files or .a files, which are needed for compiling zxid).
+
+Unfortunately the manner how development packages are installed is
+highly distribution dependent. Here are some commands that have
+been empirically found to work (tested 2011):
+
+  sudo apt-get install libssl-dev     # Debian
+  sudo apt-get install libcurl4-openssl-dev
+  sudo apt-get install libapr1-dev
+  sudo apt-get install apache2-dev
+  sudo apt-get install php5-dev
+  sudo apt-get install openjdk-6-jdk
+  sudo apt-get install mini-httpd     # But our patched version is better
+
+  sudo yum -y install openssl-devel   # Redhat
+  sudo yum -y install libcurl-devel
+
+
+2.1.2 Additional Prerequisites for Complete Rebuild from Scratch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Following additional packages are needed by developers who wish
+to build from scratch, including the code generation (the standard
+distribution includes the output of the code generation, so most
+people do not need these).
+
+A. gperf from gnu.org (only for build process when generating code)
+B. swig from swig.org (only for build process and only if you
+   want scripting interfaces)
+C. perl from cpan.org (only for build process and only if you
+   want to generate code from .sg)
+D. plaindoc from http://zxid.org/plaindoc/pd.html (only for
+   build process, for code generation from .sg, and for documentation)
+   You can also do git clone git://zxid.org/pd
+
+Although technically not needed to build zxid, you will need an IdP
+to test against. You can use the free IdP at https://zxidp.org/index-idp.html
+- it allows anyone to register a user and any SP to join the Circle
+of Trust. Or you can compile and configure the zxididp, see zxid-idp.pd.
+
+<<ignore:
+* http://symlabs.com/Products/SFIAM.html
+* Lasso: http://lasso.entrouvert.org/
+* The IDP:  http://authentic.labs.libre-entreprise.org/ 
+>>
+
+2.1.3 Operating System and Platform Support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As of January 2011, following platforms are "officially" supported:
+
+* Linux/Unix (default platform, also should work for other Unixes, e.g. FreeBSD, with gnu tools)
+  - Ubuntu / Debian
+  - Amazon Linux (CentOS / Redhat derivative)
+* Solaris 8 (and later) (~make TARGET=sol8~)
+* MacOS X (~make TARGET=macosx~)
+* Windows 2000 using mingw (~make TARGET=mingw~)
+
+Many other platforms have been occasionally tested and found to work, such as
+
+* Windows using Microsoft compilers (MSVC) (~make TARGET=win32cl~)
+* Windows using cygwin (~make TARGET=cygwin~)
+* Linux hosted cross compilation targets: ~xsol8~, ~xmingw~
+
+As of April 2013 most testing has been on x86_32 and x86_64
+architectures. The code is believed to be 64bit clean. Most testing
+has been in little endian (ix86) architectures, with only occasional
+testing in big endian architectures like PowerPC and
+Sparc. Never-the-less, we are committed to support every modern
+architecture and OS out there.
+
+> N.B. We prefer to support every supported architecture via an
+> explicit ~make TARGET=yourarch~ section in the Makefile. We believe
+> debugging gnu autohell generated ~configure~ scripts is more pain
+> and distraction than it's worth. If you add new platform support,
+> please do so directly in the ~Makefile~.
+
+2.2 Canned Tutorial: Running ZXID as CGI under mini_httpd
+---------------------------------------------------------
+
+While zxid will run easily under Apache httpd (see <<link:apache.html:
+recipe>>), for sake of simplicity we first illustrate running it with
+mini_httpd(8), a very simple SSL capable web server by Jef Poskanzer.
+
+2.2.1 Getting and installing mini_httpd
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can download the source for mini_httpd from
+http://www.acme.com/software/mini_httpd/
+
+You should already have installed OpenSSL, or quite probably OpenSSL
+shipped with your distribution. If it is not located at
+/usr/local/ssl, the you need to edit the mini_httpd ~Makefile~ to
+indicate where it is. At any rate you need to uncomment all lines that
+start by SSL_ in the ~Makefile~. Then say
+
+  make
+
+Now copy the mini_httpd binary somewhere in your path.
+
+2.2.2 Running mini_httpd
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+After building zxid, cd to zxid directory and run
+
+  mini_httpd -p 8443 -c 'zxid*' -S -E zxid.pem
+
+where
+
+  -p 8443      specifies the port to listen to
+  -c 'zxid*'   specifies that URL paths with "zxid" are CGI scripts
+  -S           specifies that https is to be used
+  -E zxid.pem  specifies the SSL certificate to use
+
+See <<link:apache.html: Apache recipe>> for alternative that
+avoids mini_httpd, but is more complicated otherwise.
+
+> N.B. The zxid.pem certificate and private key combo is shipped with zxid
+> for demonstration purposes. Obviously everybody who downloads zxid
+> has that private key, so there is no real security what-so-ever.  For
+> production use, you must generate, or acquire, your own private
+> key-certificate pair (and keep the private key secret). See Certificates
+> chapter for further info.
+
+2.2.3 Accessing ZXID
+~~~~~~~~~~~~~~~~~~~~
+
+Edit your /etc/hosts file so that the definition of localhost also
+includes sp1.zxidcommon.org and sp1.zxidsp.org domain names, e.g:
+
+  127.0.0.1       localhost sp1.zxidcommon.org sp1.zxidsp.org
+
+Point your browser to
+
+> https://sp1.zxidsp.org:8443/zxidhlo
+
+or if you do not want the common domain cookie check
+
+> https://sp1.zxidsp.org:8443/zxidhlo?o=E
+
+*Dynamic linking problems*
+
+If accessing the URL (while running mini_httpd) you get
+no error message and no content - everything just
+mysteriously fails - you may be hitting a dynamic
+linking problem. If mini_httpd(8) fails to launch CGI
+script it will silently fail. This is unfortunate, but
+I guess that is what the "mini" in the name implies.
+
+To make matters even worse, mini_httpd(8), probably in the
+interest of security, will ignore ~LD_LIBRARY_PATH~
+variable. Apparently it has its fixed notion of the
+library paths that is set at compile time.
+
+If you suspect this problem, try following:
+
+1. Create shell script called test.sh:
+
+     #!/bin/sh
+     echo Content-Type: text/plain
+     echo
+     echo Test $$
+     echo lib_path is --$LD_LIBRARY_PATH--
+     ldd zxidhlo
+     ./zxidhlo -h 2>&1
+     echo Exit value --$?--
+
+2. Restart mini_httpd(8) like this
+
+     chmod a+x test.sh
+     mini_httpd -p 8443 -c test.sh -S -E zxid.pem -l mini.out
+
+3. Access https://sp1.zxidsp.org:8443/test.sh - you
+   may see something like
+
+     Test 1655
+     lib_path is --/usr/local/lib:/usr/lib--
+     ./zxidhlo: error while loading shared libraries: libcurl.so.3: cannot
+         open shared object file: No such file or directory
+
+   Now you at least see why it's failing (in this case the
+   directory where ~libcurl~ was installed is not in mini_httpd's
+   notion of LD_LIBRARY_PATH). If the ~zxidhlo~ binary runs
+   fine from comman line, try `ldd zxidhlo' to see where it
+   is finding its libraries.
+
+Easiest dirty fix is to copy the missing libraries to one of the
+hardwired directories of mini_httpd(8) (e.g. /usr/lib).  More
+sophisticated fixes include using ldconfig(8), recompiling your
+mini_httpd(8), or statically linking the offending library into zxidhlo
+binary.
+
+2.2.4 Setting up an IdP
+~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID now ships with an IdP: ~zxididp~. You may set this up, see
+documentation in zxid-idp.pd, or you may want to use a free
+IdP on the net, such as https://zxidp.org/index-idp.html
+
+For you to test zxidhlo, you will need to acquire an IdP from
+somewhere - any vendor whose product is SAML 2.0 certified
+will do. Possible sources are
+
+* https://zxidp.org/index-idp.html
+* http://symlabs.com/Products/SFIAM.html who have a free download of commercial product
+* Lasso: http://lasso.entrouvert.org/
+* Their IDP:  http://authentic.labs.libre-entreprise.org/ 
+
+If you do not want to install an IdP yourself (even for testing), find
+someone who already runs one (e.g. https://zxidp.org/index-idp.html)
+and ask if they would be willing to load the metadata of your zxid
+SP. If you do this, you will need to get externally visible domain
+names. This canned tutorial uses /etc/hosts (see previous step) which
+is only visible on your own machine.
+
+Once you get your IdP up and running, you need to make sure it accepts
+the zxid SP in its Circle of Trust (CoT). This is done by placing
+the metadata of the SP in right place in the IdP product configuration.
+If your IdP supports automatic CoT management, just turn it on
+and chances are you are done.<<footnote: On production IdP you should
+understand the trust implications (i.e. no trust) of flipping automatic
+CoT management on.>>
+
+If not, you can obtain the zxid SP metadata (which is slightly different
+for each install so you can't just copy it from existing install) from
+
+> https://sp1.zxidsp.org:8443/zxidhlo?o=B
+
+This URL is the +well known location+ method metadata URL. It is also
+the SP +Entity ID+ or Provider ID, should the IdP product ask for
+this in its configuration. If the IdP product needs you to
+supply the metadata manually as an xml file, just point your
+web browser to the above URL and save to file, or use curl(1) or wget(1).
+
+zxid SP, by default, has automatic fetching of IdP metadata enabled so
+there is no manual configuration step needed, provided that the IdP
+supports the well known location method. All SAML 2.0 certified IdP
+implementations must support it (but you may still need to enable it
+in configuration). See [SAML2meta] section 4.1 "Publication and
+Resolution via Well-Known Location", p.29, for normative description of this
+method.
+
+However, you will need the Entity ID (Provider ID) of the IdP. This is
+the URL that the IdP uses for well known location method of metadata
+sharing. You may need to dig the IdP documentation or GUI for a while
+to find it. If you already have the IdP metadata as an xml file, open it
+and look for EntityDescriptor/entityID. If you already have the
+file, you can also import it manually by running the following command
+
+  ./zxcot -a </path/to/idp-meta.xml
+
+But the preferred method still is: just let the automatic method
+do its job. See also zxcot(8) documentation, or run ~zxcot -h~
+
+2.2.5 Your first SSO
+~~~~~~~~~~~~~~~~~~~~
+
+1. Start at
+
+   > https://sp1.zxidsp.org:8443/zxidhlo
+
+   or
+
+   > https://sp1.zxidsp.org:8443/zxidhlo?o=E
+
+   If you had common domain cookie already in place, and you
+   are already logged in the IdP, the SSO may happen
+   automatically (go to step 3). The automatic experience
+   will be typical when you use SSO regularly for more
+   than one web site (i.e. several SPs).
+
+   However, if you get a screen titled "ZXID SP SSO",
+   you need to paste the IdP's Entity ID to the supplied field
+   and click "Login". If zxid SP already obtained the metadata for the
+   IdP, you may also see a button specific for your IdP (and in this
+   case there is no need to know the Entity ID anymore or paste anything). 
+
+2. Next step depends on the IdP product you are using. Usually
+   a login screen will appear asking for user name and password.
+   Supply these and login. You will need an account at the IdP.
+
+3. For more slick IdPs, that's all you need to do and you will
+   land right back at the zxid SP page titled "ZXID SP Management".
+
+   > Congratulations, you have made your first SSO!
+
+   However, some IdPs will pester you with additional questions
+   and you will have to jump through their hoops. A typical
+   question is whether you want to accept a federation. You do.
+
+   Sometimes the federation question does not appear automatically
+   and you need to figure out a way to create a federation
+   in their user interface and how to get them to send you
+   back to the SP. Sometimes the word used is "account linking"
+   instead of federation.<<footnote: Vendor products are constantly
+   improving in this area. From protocol perspective
+   all the additional gyrations are unnecessary. Be sure
+   to provide feedback to the vendor so that simpler, easier
+   to use, products will emerge in future.>>
+
+5 Compilation for Experts
+=========================
+
+  make cleaner
+  make dep ENA_GEN=1
+  make
+  make all ENA_GEN=1
+
+5.1 Build Process
+-----------------
+
+The build process of ZXID relies heavily on code generation techniques
+that are not for the faint of heart. Some of these techniques, like
+xsd2sg.pl were innovated for this project, while others like SWIG and
+gperf(1) are existing software.  Here and there some additional
+perl(1) <<footnote: There used to be a sed(1) dependency as well, but
+nowdays sed-zxid.pl perl script handles all seddish stuff.>> scripts
+are run to fix a thing or two.
+
+<<dot: zxid-build: ZXID Build Process
+
+margin=0
+
+sg [label=".sg"];
+i  [label=".i"];
+phpi  [label="phpzxid.i"];
+hc [label=".h and .c"];
+pm [label=".pm and glue"];
+php [label="php glue"];
+gperf [label=".gperf"];
+netsaml [label="Net::SAML"];
+
+sg -> hc [label="xsd2sg.pl"];
+sg -> gperf [label="xsd2sg.pl"];
+gperf -> hc [label="gperf"];
+hc -> hc [label="gen-consts-from-gperf-output.pl"];
+hc -> libzxid [label="gcc"];
+hc -> pm [label="swig"];
+i  -> pm [label="swig"];
+hc -> php [label="swig"];
+phpi -> php [label="swig"];
+
+libzxid -> zxid [label="ld"];
+
+libzxid -> netsaml [label="ld"];
+pm -> netsaml [label="perl, gcc, ld"];
+
+libzxid -> php_zxid [label="ld"];
+php -> php_zxid [label="gcc, ld"];
+
+>>
+
+Carefully study the ~Makefile~, and this should all start to make
+sense (no pun intended). Please note that there is *no* ~configure~
+script and GNU Auto-tools ("GNU Autohell") are not used. This is because
+they have been evaluated to be unsuitable for this project (or to
+author's tastes). If the ~Makefile~ does not do what you want, you
+should first study if you can change necessary variables using
+localconf.mk, or if that does not work, then just edit the ~Makefile~
+itself.
+
+To make your life easier, the build process is +not recursive+
+and only uses single Makefile, so if you edit it, you can just say
+~make -f MyMakefile~
+
+You can temporarily customize the ~Makefile~ variables
+by providing a new value on command line, e.g.
+
+  make CC=cc   # override the default of CC=gcc
+
+Another philosophical tidbit is that, although some source code is in
+subdirectories, all the build logic is kept in +one+ top level ~Makefile~,
+eliminating all the complexity of hierarchical make. The ~Makefile~ supports
+building outside source tree using +vpath+ feature of gnu make(1).
+
+5.2 Special or embedded compile (reduced functionality)
+-------------------------------------------------------
+
+~libzxid~ contains thousands of functions and any given application is
+unlikely to use them all. Thus the easiest, safest, no loss of
+functionality, way to reduce the footprint is to simply enable
+compiler and linker flags that support dead function
+elimination.<<footnote: Unfortunately the gnu ld does not support dead
+function elimination. You should file this as a bug to them. If they
+tell you to put every one of the 7000-some functions in a separate .c file,
+consider the scalability implications of this. Read the comments in
+pulverize.pl for a full scoop and an approach.>>
+
+> On gcc you should investigate compilation with
+> "-ffunction-sections -fdata-sections" and linking
+> with "-Wl,--gc-sections".
+
+If you need to squeeze zxid into as minimal space as possible,
+some functionality trade-offs are supported. I stress that you
+should only attempt these trade-offs once you are familiar with
+zxid and know what you are doing. The canned install instructions
+and tutorial walk thrus stop working if you omit
+significant functionality.
+
+5.2.1 Compilation without OpenSSL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Comment out the -DUSE_OPENSSL flag from CFLAGS in ~Makefile~ and
+recompile.
+
+This will cripple zxid from security perspective because it
+will no longer be able to verify or generate digital signatures.
+Unless your environment does not need trust and security,
+or you understand thoroughly how to provide trust and security
+by other means, it is a very bad idea to compile without OpenSSL.
+
+> N.B. Compiling, or not, zxid with OpenSSL does not affect whether your
+> web server will use SSL or TLS. Unless you know what you are doing,
+> you should be using SSL at web server layer. Given that SSL is used at
+> web server layer, the memory footprint savings you would gain from
+> compiling zxid without OpenSSL may be negligible if you use dynamic
+> linking.
+
+5.2.2 Compilation without libcurl
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Comment out the -DUSE_CURL flag from CFLAGS in ~Makefile~ and
+recompile.
+
+Disabling ~libcurl~ does not have adverse security implications: you
+only loose some functionality and depending on your situation you may
+well be able to live without it.
+
+1. Without ~libcurl~, zxid can not act as a SOAP client. This has a few
+   consequences
+
+   a. Artifact profile for SSO is not supported because it needs SOAP
+      to resolve the artifact. In most cases a perfectly
+      viable alternative is to use POST profile for SSO.
+
+   b. SOAP profiles for Single Logout and NameID management (aka
+      defederation) are not supported. You can use the redirect
+      profiles and get mostly the same functionality.
+
+   c. ID-WSF Web Services Client (WSC) and Discovery Client (DIC),
+      as well as XACML client (PEP) functionality is not available.
+
+2. Automatic CoT metadata fetching using well known
+   location method is not supported without ~libcurl~.
+   You can fetch the metadata manually, e.g. using web browser,
+   and place it in /var/zxid/cot directory.
+
+   If you want to manually control your Circle of Trust
+   relationships, you probably want to do this anyway so
+   loss of automatic functionality may be a non-issue.<<footnote:
+   If you compile with libcurl, but still want to disable
+   automatic metadata fetching, investigate the MD_FETCH
+   and related configuration options.>>
+
+3. Web Services Client (WSC) functionality is not supported
+   without ~libcurl~. Effectively this is just another case of
+   "SOAP needed". If you have your own SOAP implementation,
+   you may, at lesser automation, achieve much of the
+   same functionality by calling the encoder and decoder
+   functions manually.
+
+5.2.3 Compiling without zlib (not supported)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+zlib is used mainly in redirect profiles. Since zlib is widely
+available and its foot print is small, we have made no supported
+provision to compile without it. If you hack something together, let
+us know.
+
+5.3 Static Linking and Building Against Dietlibc
+------------------------------------------------
+
+Static linking has its advantages: (i) you eliminate all library
+dependencies from install process - as well as from error reporting
+and debugging processes; (ii) you avoid the dynamic linking overhead -
+this is significant in CGI use where same executable gets launched
+over and over again. The buffer cache ensures the blocks of dll's
+(.so's) are already in memory, but that does not prevent the system
+calls to do the redundant dynamic linking step (just look at output of
+strace for first about 100 lines on a dynamically linked executable to
+get an idea). With static link, the buffer cache has the blocks and
+there is no dynamic link syscall overhead.
+
+Static linking also has its cons: (i) if any library has a
+bug, such as a critical security vulnearability, then you need to
+rebuild (and reinstall in all places where it was distributed) the
+statically linked binary - it is not enough to upgrade the offending
+library package. But this sword cuts the other way too: you will
+always know what combination of libraries is being used (because you
+built it and you kept records), thus any bugs that are due to
+interactions between versions of libraries are none of your concern.
+
+(ii) Static linking prevents some techniques adopted by modern
+libraries, such as gnu libc. For example, name resolution can not
+dynamically load resolver modules so you probably have to forget about
+YP (Sun Yellow Pages) or NIS (Sun Network Information Service - a
+newer version of YP) support. Your /etc/nsswitch.conf will no longer
+be consulted. Instead you will have a fixed static name resolution
+policy: first check /etc/hosts, then DNS. Heck, some of us wanted that
+to start with - sounds like an improvement.
+
+In bug reduction, minimality is a good thing. glibc has gotten about
+as far as possible from minimality. Luckily, competing libc projects
+have appeared. Felix Leitner's dietlibc (http://www.fefe.de/dietlibc/)
+is perhaps the most promising candidate.
+
+Dietlibc is useful for compiling statically linked binaries
+without glibc dependency. The dependency is to be avoided
+for two reasons: (i) statically linked glibc still needs dynamic
+linking for name resolution, (ii) dietlibc is a different
+code base than glibc. glibc is a fat target while dietlibc is
+used by security conscious minority - thus it is not likely
+to be an attractive target.
+
+5.3.1 dietlibc-0.33 Build
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+wget http://www.fefe.de/dietlibc/dietlibc-0.33.tar.bz2
+tar xvf dietlibc-0.33.tar.bz2
+
+N.B. Enabling WANT_DYNAMIC may trigger "no .eh_frame_hdr table will be
+created" linking error.
+
+<<diffout:
+diff -u dietfeatures.h~ dietfeatures.h
+--- dietfeatures.h~     2012-11-02 11:17:28.000000000 +0000
++++ dietfeatures.h      2013-04-13 17:47:37.000000000 +0000
+@@ -4,8 +4,8 @@
+ /* feel free to comment some of these out to reduce code size */
+
+ #define WANT_FLOATING_POINT_IN_PRINTF
+-#define WANT_FLOATING_POINT_IN_SCANF
+-#define WANT_CHARACTER_CLASSES_IN_SCANF
++/*#define WANT_FLOATING_POINT_IN_SCANF*/
++/*#define WANT_CHARACTER_CLASSES_IN_SCANF*/
+ #define WANT_NULL_PRINTF
+ /* #define WANT_ERROR_PRINTF */
+ #define WANT_LONGLONG_PRINTF
+@@ -29,7 +29,7 @@
+ #define WANT_TLS
+
+ /* make the startcode, etc. dynamic aware ({con,de}structors) */
+ /* #define WANT_DYNAMIC */
+
+ /* GDB support in the dynamic linker */
+ #define WANT_LD_SO_GDB_SUPPORT
+@@ -46,23 +46,23 @@
+ /* 20040118: enabling this breaks User Mode Linux!  It's their fault. */
+ #define WANT_SYSENTER
+
+-#define WANT_LINKER_WARNINGS
++/*#define WANT_LINKER_WARNINGS*/
+
+ /* you need to define this if you want to run your programs with large
+  * file support on kernel 2.2 or 2.0 */
+-#define WANT_LARGEFILE_BACKCOMPAT
++/*#define WANT_LARGEFILE_BACKCOMPAT*/
+
+ /* do you want localtime(3) to read /etc/localtime?
+  * Needed for daylight saving time etc. */
+-#define WANT_TZFILE_PARSER
++/*#define WANT_TZFILE_PARSER*/
+
+ /* do you want the DNS routines to parse and use "domain" and "search"
+  * lines from /etc/resolv.conf?  Normally not used on boot floppies and
+  * embedded environments. */
+-#define WANT_FULL_RESOLV_CONF
++/*#define WANT_FULL_RESOLV_CONF*/
+
+ /* do you want IPv6 transport support in the DNS resolver? */
+-#define WANT_IPV6_DNS
++/*#define WANT_IPV6_DNS*/
+
+ /* do you want gethostbyname and friends to consult /etc/hosts? */
+ #define WANT_ETC_HOSTS
+@@ -72,10 +72,10 @@
+ #define WANT_INET_ADDR_DNS
+
+ /* do you want math functions high precision rather than fast/small? */
+-#define WANT_HIGH_PRECISION_MATH
++/*#define WANT_HIGH_PRECISION_MATH*/
+
+ /* do you want support for matherr? */
+-#define WANT_MATHERR
++/*#define WANT_MATHERR*/
+
+ /* do you want crypt(3) to use MD5 if the salt starts with "$1$"? */
+ #define WANT_CRYPT_MD5
+@@ -87,11 +87,11 @@
+ /* This enables zeroconf DNS aka Rendezvous aka Bonjour. */
+ /* This code will try zeroconf DNS if you ask for host.local or if you
+  * ask for an unqualified hostname */
+-#define WANT_PLUGPLAY_DNS
++/*#define WANT_PLUGPLAY_DNS*/
+
+ /* This enables LLMNR, the MS variant of zeroconf DNS.  This only works
+  * if you also enabled WANT_PLUGPLAY_DNS */
+-#define WANT_LLMNR
++/*#define WANT_LLMNR*/
+
+ /* Uncomment this if you want DNS lookups to fail if /etc/hosts contains
+  * an entry but it's for a different record type */
+@@ -101,7 +101,7 @@
+  * check for valgrind, and if detected, turn off optimized SIMD string
+  * routines that cause false positives in valgrind.  This enlarges and
+  * slightly slows down your code! */
+-#define WANT_VALGRIND_SUPPORT
++/*#define WANT_VALGRIND_SUPPORT*/
+
+ /* do you want that malloc(0) return a pointer to a "zero-length" object
+  * that is realloc-able; means realloc(..,size) gives a NEW object (like a
+@@ -129,7 +129,7 @@
+  * and program_invocation_name to be there.  This functionality is not
+  * portable and adds useless bloat to libc.  Help stomp out code
+  * depending on this!  util-linux, I'm looking at you here! */
+-#define WANT_GNU_STARTUP_BLOAT
++/*#define WANT_GNU_STARTUP_BLOAT*/
+
+ /* Include support for ProPolice/SSP, calls guard_setup */
+ /* ProPolice is part of gcc 4.1 and up, there were patches for earlier
+
+diff -u Makefile~ Makefile
+--- Makefile~   2006-06-18 14:32:28.000000000 -0400
++++ Makefile    2006-12-16 22:34:24.000000000 -0500
+@@ -141,6 +141,7 @@
+ COMMENT = :
+ endif
+ CFLAGS += -Wall -W -Wchar-subscripts -Wmissing-prototypes -Wmissing-declarations -Wno-switch -Wno-unused -Wredundant-decls
++CFLAGS += -march=i586
+ 
+ PWD=$(shell pwd)
+
+diff -u libcruft/res_query.c~ libcruft/res_query.c
+--- libcruft/res_query.c~       2006-12-08 16:24:56.000000000 +0000
++++ libcruft/res_query.c        2008-06-15 18:39:21.000000000 +0000
+@@ -106,8 +106,10 @@
+ #ifdef WANT_PLUGPLAY_DNS
+       if (duh[1].fd!=-1) {
+        sendto(pnpfd,packet,size,0,(struct sockaddr*)(&pnpsa4),sizeof(pnpsa4));
++#ifdef WANT_IPV6_DNS
+        if (!v4pnp)
+          sendto(pnpfd,packet,size,0,(struct sockaddr*)(&pnpsa6),sizeof(pnpsa6));
++#endif
+       }
+       /* if it doesn't work, we don't care */
+ #endif
+
+diff -u /opt/diet/include/sys/param.h~ /opt/diet/include/sys/param.h
+--- /opt/diet/include/sys/param.h~      2008-06-15 18:55:43.000000000 +0000
++++ /opt/diet/include/sys/param.h       2008-06-15 20:12:49.000000000 +0000
+@@ -26,4 +26,6 @@
+ #define roundup(x, y)   ((((x)+((y)-1))/(y))*(y))
+ #define powerof2(x)     ((((x)-1)&(x))==0)
+ 
++#define        MAXSYMLINKS     20
++
+ #endif
+
+diff -u dietlibc-0.32/libugly/gethostent.c~ dietlibc-0.32/libugly/gethostent.c
+--- libugly/gethostent.c~       2003-06-23 10:48:13.000000000 +0000
++++ libugly/gethostent.c        2010-08-25 00:12:09.000000000 +0000
+@@ -26,6 +26,8 @@
+   if (!hostmap) {
+     int hostfd=open(_PATH_HOSTS,O_RDONLY);
+     if (hostfd<0) return 0;
++    /* *** all this global variable manipulation seems rather at odds with reentrant
++     * *** nature of gethostent_r(), surely there is race here. 24.8.2010, sampo@iki.fi */
+     hostlen=lseek(hostfd,0,SEEK_END);
+     hostmap=mmap(0,hostlen,PROT_READ|PROT_WRITE,MAP_PRIVATE,hostfd,0);
+     if ((long)hostmap==(-1)) { close(hostfd); hostmap=0; goto error; }
+@@ -81,8 +83,7 @@
+       dest+=len;
+       *dest=0; ++dest;
+     }
+-    if (*cur=='\n') { ++cur; ++aliasidx; break; }
+-    if (cur>=last || !isblank(*cur)) break;
++    if (cur>=last || *cur=='\n') { ++cur; ++aliasidx; break; }
+     cur++;
+   }
+   pe->h_aliases[aliasidx]=0;
+
+diff -u __v_printf.c.orig __v_printf.c
+--- __v_printf.c.orig   2013-04-16 15:13:12.000000000 +0000
++++ __v_printf.c        2013-04-16 16:53:49.000000000 +0000
+@@ -7,15 +7,35 @@
+ #include "dietstdio.h"
+ #include "dietwarning.h"
+
+-#define MAX_WIDTH 10*1024
+-
+ static inline unsigned long skip_to(const char *format) {
+   unsigned long nr;
+   for (nr=0; format[nr] && (format[nr]!='%'); ++nr);
+   return nr;
+ }
+
+-#define A_WRITE(fn,buf,sz)     ((fn)->put((void*)(buf),(sz),(fn)->data))
++/*#define A_WRITE(fn,buf,sz)   ((fn)->put((void*)(buf),(sz),(fn)->data))*/
++/* 20130416, sampo@zxidp.org
++ * Problem: Old A_WRITE() ignores the return value from write(2), thus leaving
++ *     open the possibility that the data was not actually written.
++ * Proposed fix: deal with error return from write style function
++ *     and keep on trying in blocking fashion until everything is written. */
++int __a_write_all(struct arg_printf* fn, const char* buf, unsigned int len) {
++  int ret, todo=len;
++  while (todo) {
++    ret = fn->put((void*)buf, todo, fn->data);
++    if (ret == -1) {
++      switch (errno) {
++      case EAGAIN: /*case EWOULDBLOCK:*/ ret=0; break;
++      default:
++       return ret;
++      }
++    }
++    todo -= ret;
++    buf += ret;
++  }
++  return len;
++}
++#define A_WRITE(fn,buf,sz)     __a_write_all((fn),(buf),(sz))
+ #define B_WRITE(fn,buf,sz)     { if ((unsigned long)(sz) > (((unsigned long)(int)(-1))>>1) || len+(int)(sz)<len) return -1; A_WRITE(fn,buf,sz); } while (0)
+
+ static const char pad_line[2][16]= { "                ", "0000000000000000", };
+@@ -123,7 +143,6 @@
+       case '9':
+        if(flag_dot) return -1;
+        width=strtoul(format-1,(char**)&s,10);
+-       if (width>MAX_WIDTH) return -1;
+        if (ch=='0' && !flag_left) padwith='0';
+        format=s;
+        goto inn_printf;
+@@ -138,7 +157,6 @@
+            flag_left=1;
+            tmp=-tmp;
+          }
+-         if ((width=(unsigned long)tmp)>MAX_WIDTH) return -1;
+          goto inn_printf;
+        }
+       case '.':
+@@ -152,7 +170,6 @@
+          preci=tmp<0?0:tmp;
+          format=s;
+        }
+-       if (preci>MAX_WIDTH) return -1;
+        goto inn_printf;
+
+       /* print a char or % */
+
+>>
+
+On gcc-3.4.6 you need
+
+<<diffout:
+diff -u  Makefile~ Makefile
+--- Makefile~   2012-11-02 11:17:28.000000000 +0000
++++ Makefile    2013-04-13 19:38:26.000000000 +0000
+@@ -141,6 +141,7 @@
+ COMMENT = :
+ endif
+ CFLAGS += -W -Wall -Wextra -Wchar-subscripts -Wmissing-prototypes -Wmissing-declarations -Wno-switch -Wno-unused -Wredundant-decls
++CFLAGS += -march=i586
+
+ PWD=$(shell pwd)
+
+@@ -534,7 +535,7 @@
+ # WANT_SSP
+ # This facepalm brought to you by: Ubuntu!
+ $(OBJDIR)/stackgap.o: lib/stackgap.c dietfeatures.h
+-       $(CROSS)$(CC) $(INC) $(CFLAGS) -c lib/stackgap.c -o $@ -D__dietlibc__ -fno-stack-protector
++       $(CROSS)$(CC) $(INC) $(CFLAGS) -c lib/stackgap.c -o $@ -D__dietlibc__
+        $(COMMENT) -$(CROSS)strip -x -R .comment -R .note $@
+
+ # WANT_MALLOC_ZERO
+>>
+
+  patch --dry-run -p0 <the-patch-above-as-needed
+
+After applying patches
+
+  make prefix=/usr/local DEBUG=1
+  make prefix=/usr/local DEBUG=1 dyn
+  sudo make prefix=/usr/local install  # works
+
+<<ignore: email:
+Subject dietlibc-0.33: fprintf() does not print long data
+To: dietlibc@fefe.de
+
+I have been trying to use fprintf() to print
+rather long data to a socket, e.g.
+
+  fprintf(stdout, "Content-Type: %s" CRLF "Content-Length: %d" CRLF2 "%.*s",
+	  cont_type, ss->len, ss->len, ss->s);
+
+This fails to print the data that should appear in "%.*s" format
+specifier. The fprintf() backends to __v_printf() and write(2).
+
+Examining lib/__v_printf.c I have identified two dubious points that
+are, each alone, liable to break my code:
+
+1. What is the purpose of MAX_WIDTH specification? I propose to
+   not impose any MAX_WIDTH at all. Due to the way __v_printf() is
+   implemented, there does not seem to be any buffer that could be
+   overrun. I did not find in any man page documentation a mention
+   of this MAX_WIDTH, and it does not appear in any header either.
+   Thus I suspect it to be unnecessary implementation dependent
+   restriction.
+
+2. Why does not _A_WRITE() check its return value and why does it
+   not retry write(2) until all data is written? My usual C wisdom
+   is that fprintf(3) blocks until the data is written (at least
+   into kernel). It would appear that __v_printf() as implemented
+   in 0.33 is broken in this regard. Please see my patch for a
+   fix. Basically I add a loop that retries write as many times
+   as it takes. Is there already such write all function somewhere
+   in the library? write_all() would come handy in many other
+   programming tasks.
+
+Cheers,
+--Sampo
+
+
+diff -u __v_printf.c.orig __v_printf.c
+--- __v_printf.c.orig   2013-04-16 15:13:12.000000000 +0000
++++ __v_printf.c        2013-04-16 16:53:49.000000000 +0000
+@@ -7,15 +7,35 @@
+ #include "dietstdio.h"
+ #include "dietwarning.h"
+
+-#define MAX_WIDTH 10*1024
+-
+ static inline unsigned long skip_to(const char *format) {
+   unsigned long nr;
+   for (nr=0; format[nr] && (format[nr]!='%'); ++nr);
+   return nr;
+ }
+
+-#define A_WRITE(fn,buf,sz)     ((fn)->put((void*)(buf),(sz),(fn)->data))
++/*#define A_WRITE(fn,buf,sz)   ((fn)->put((void*)(buf),(sz),(fn)->data))*/
++/* 20130416, sampo@zxidp.org
++ * Problem: Old A_WRITE() ignores the return value from write(2), thus leaving
++ *     open the possibility that the data was not actually written.
++ * Proposed fix: deal with error return from write style function
++ *     and keep on trying in blocking fashion until everything is written. */
++int __a_write_all(struct arg_printf* fn, const char* buf, unsigned int len) {
++  int ret, todo=len;
++  while (todo) {
++    ret = fn->put((void*)buf, todo, fn->data);
++    if (ret == -1) {
++      switch (errno) {
++      case EAGAIN: /*case EWOULDBLOCK:*/ ret=0; break;
++      default:
++       return ret;
++      }
++    }
++    todo -= ret;
++    buf += ret;
++  }
++  return len;
++}
++#define A_WRITE(fn,buf,sz)     __a_write_all((fn),(buf),(sz))
+ #define B_WRITE(fn,buf,sz)     { if ((unsigned long)(sz) > (((unsigned long)(int)(-1))>>1) || len+(int)(sz)<len) return -1; A_WRITE(fn,buf,sz); } while (0)
+
+ static const char pad_line[2][16]= { "                ", "0000000000000000", };
+@@ -123,7 +143,6 @@
+       case '9':
+        if(flag_dot) return -1;
+        width=strtoul(format-1,(char**)&s,10);
+-       if (width>MAX_WIDTH) return -1;
+        if (ch=='0' && !flag_left) padwith='0';
+        format=s;
+        goto inn_printf;
+@@ -138,7 +157,6 @@
+            flag_left=1;
+            tmp=-tmp;
+          }
+-         if ((width=(unsigned long)tmp)>MAX_WIDTH) return -1;
+          goto inn_printf;
+        }
+       case '.':
+@@ -152,7 +170,6 @@
+          preci=tmp<0?0:tmp;
+          format=s;
+        }
+-       if (preci>MAX_WIDTH) return -1;
+        goto inn_printf;
+
+       /* print a char or % */
+
+
+>>
+
+5.3.2 zlib-1.2.7 linked against dietlibc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<console:
+wget http://zlib.net/zlib-1.2.7.tar.bz2
+tar xvf zlib-1.2.7.tar.bz2
+cd zlib-1.2.7
+# diet compile on x86_64 (amd64 as in GQ)
+cp contrib/amd64/amd64-match.S ./match.S
+CC='diet gcc' LD='diet ld' CFLAGS="-g -O3 -DASMV -D_BSD_SOURCE -DGNU_SOURCE" ./configure --static --prefix=/usr/local
+make LOC=-DASMV OBJA=match.o
+make test
+sudo make install
+>>
+
+5.3.3 OpenSSL-1.0.1e linked against dietlibc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  tar xvf openssl-1.0.1e.tar.gz
+
+Add to Configure
+
+  "diet-debug-linux-x86_64","diet gcc:-DREF_CHECK -DCONF_DEBUG -DCRYPTO_MDEBUG -m64 -DL_ENDIAN -DTERMIO -O2 -g -Wall::-D_REENTRANT::-ldl:SIXTY_FOUR_BIT_LONG RC4_CHUNK DES_INT DES_UNROLL:${x86_64_asm}:elf:dlfcn:linux-shared:-fPIC:-m64:.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR):::64",
+
+  "diet-debug-linux-pentium", "diet gcc:-DREF_CHECK -DCONF_DEBUG -DL_ENDIAN -DTERMIO -O2 -g -march=pentium  -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+
+N.B. -DREF_PRINT causes compilation error.
+
+<<console:
+export PATH=/usr/bin:/bin:/usr/local/bin   # /usr/local/bin is needed for diet(1) to be found
+./Configure --prefix=/usr/local enable-rc5 enable-mdc2 no-dso no-hw no-engine zlib diet-debug-linux-pentium
+./Configure --prefix=/usr/local enable-rc5 enable-mdc2 no-dso no-hw no-engine zlib diet-debug-linux-x86_64
+make depend  # fails
+make         # ?
+
+time make test  # segfaults?!?
+sudo make install
+>>
+
+5.3.4 curl-7.30.0 linked against dietlibc and openssl-1.0.1e
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<<console:
+wget http://curl.haxx.se/download/curl-7.30.0.tar.bz2
+tar xvf curl-7.30.0.tar.bz2
+cd curl-7.30.0
+
+CC='diet gcc' LD='diet ld' CPPFLAGS='-I/usr/local/include' LDFLAGS='-L/usr/local/lib' LIBS='-lssl -lcrypto -lz' ./configure --prefix=/usr/local --with-ssl=/usr/local --without-gnutls --enable-thread --enable-nonblocking --disable-shared
+
+make
+make test
+sudo make install
+>>
+
+5.3.5 zxididp against dietlibc based libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  make clean
+  CC='diet cc' LD='diet cc' make zxididp-static
+
+  diet gcc -o zxididp zxididp.o -static -L. -lzxid -pthread -lpthread -L/usr/local/lib -L/usr/local/ssl/lib-x86_64 -lcurl -lssl -lcrypto -lz
+
+
+5.4 Choosing Which Standards to Include (default: all)
+------------------------------------------------------
+
+WARNING: Only regularly tested configuration is to compile all
+standards in.
+
+On space constrained systems you may shed additional weight by only
+compiling in the IdM standards you actually use.  Of course, if you do
+not use them, the dead function elimination should take care of them,
+but sometimes you can gain additional savings in space and especially
+compile time.
+
+Another reason could be, in the land of the free, if some modules
+are covered by a software patent, you may want to compile a binary
+without the contested functionality.<<footnote: Please do not
+ask me to add additional baggage to avoid patents. Software
+patents are a plague and your efforts are best spent in getting
+them overturned or changing laws so they go away.>>
+
+You can tweak the flags, shown in accompanying table, in the ~Makefile~
+or by supplying new values in localconf.mk or on commend line. For example
+
+  make TARGET=sol8 ENA_SAML2=0
+
+would disable SAML 2.0 (and trigger build for Sparc Solaris 8).
+
+<<table: Conditional inclusion of standards
+Makefile flag    Standard      Comments
+================ ============= ======================================
+ENA_SSO=1        All SSO       Must be enabled for any of SSO to work
+ENA_SAML2=1      SAML 2.0
+ENA_FF12=1       ID-FF 1.2     Requires ENA_SAML11=1
+ENA_SAML11=1     SAML 1.1
+ENA_WSF=1        All WSF       Must be enabled for any of WSF to work
+ENA_WSF2=1       ID-WSF 2.0
+ENA_WSF11=1      ID-WSF 1.1
+>>
+
+5.5 localconf.mk
+----------------
+
+You can use localconf.mk to remember your own make(1) options,
+such as ~TARGET~ and different ~ENA~ flags, without editing
+the distributed ~Makefile~.
+
+One useful option to put in localconf.mk is ~ENA_GEN~ which
+will turn on the dependencies that will trigger generation
+of the files in zxid/c directory. For example
+
+  echo 'ENA_GEN=1' >>localconf.mk
+  make
+
+> WARNING: If you are confused about compilation flags
+> appearing "out of nowhere", despite not being mentioned
+> in the Makefile, be sure you have not inadvertently created
+> a localconf.mk (perhaps you rsynced the sources from another
+> machine and forgot to remove localconf.mk). A similar
+> problem can occur if you accidentally copied deps.dep
+> from another machine. It will reference the dependencies
+> with the paths of that other machine. Just remove the deps.dep
+> to solve that issue.
+
+5.6 Known Compilation Warnings
+------------------------------
+
+This list was reated around August 2010. Things are likely to have changed since then.
+
+1.  __FUNCTION__ definition incompatible with char*. Ignore.
+
+2.  const char **file incompatible with &((const char*)file
+
+      zxsig.c:314: warning: passing arg 1 of `ERR_get_error_line_data' from incompatible pointer type
+      zxsig.c:314: warning: passing arg 3 of `ERR_get_error_line_data' from incompatible pointer type
+
+    This probably is due to const being, or not, defined differently.
+
+    Ignore.
+
+3.  Warning about sentinel: Ignore.
+
+<<ignore:
+zxcot.c: In function `zxid_reg_svc':
+zxcot.c:315: warning: passing arg 1 of `write_all_fd' makes pointer from integer without a cast
+zxcot.c:322: warning: assignment makes integer from pointer without a cast
+zxcot.c:323: warning: comparison between pointer and integer
+zxcot.c:330: warning: passing arg 1 of `write_all_fd' makes pointer from integer without a cast
+zxcot.c:332: warning: passing arg 1 of `close_file' makes pointer from integer without a cast
+zxcot.c:340: warning: assignment makes integer from pointer without a cast
+zxcot.c:341: warning: comparison between pointer and integer
+zxcot.c:347: warning: passing arg 1 of `write_all_fd' makes pointer from integer without a cast
+zxcot.c:348: warning: passing arg 1 of `close_file' makes pointer from integer without a cast
+zxcot.c: In function `zxid_addmd':
+zxcot.c:390: warning: passing arg 1 of `write_all_fd' makes pointer from integer without a cast
+zxcot.c:395: warning: assignment makes integer from pointer without a cast
+zxcot.c:396: warning: comparison between pointer and integer
+zxcot.c:403: warning: passing arg 1 of `write_all_fd' makes pointer from integer without a cast
+zxcot.c:405: warning: passing arg 1 of `close_file' makes pointer from integer without a cast
+>>
+
+5.7 Tough Compilation Errors
+----------------------------
+
+ZXID was mostly developed on gcc 3.4.6 and explicitly has not been
+tested on 4.x series of gcc (due to deprecation of commonly useful
+features in that gcc series). If you hit compile time problems with
+4.x gcc, try with 3.4.x series gcc first, before reporting bugs.
+
+*** elaborate more - until then, mail the author
+
+5.8 Tough Linking Errors
+------------------------
+
+* There are some, yet unspecified, compilation or linking
+  errors that manifest on 64 bit or mixed 32 and 64 bit Linux platforms.
+  Current suggested workaround is to compile 32 bit only.
+
+* Linking error that has been reported a lot on the Google for
+  other software packages:
+
+    /usr/lib/libc_nonshared.a(elf-init.oS): In function `__libc_csu_init':
+    (.text+0x2a): undefined reference to `__init_array_start'
+    /usr/bin/ld: zxidjava/libzxidjni.so: hidden symbol `__fini_array_end' isn't defined
+    /usr/bin/ld: final link failed: Nonrepresentable section on output
+
+  This seems to be either glibc version related or linker configuration
+  related (or compiler version?). See
+
+    http://www-gatago.com/gnu/gcc/help/43379636.html
+    http://lists.debian.org/debian-68k/2006/07/msg00017.html
+
+  The verdict seems to be that somewhere in glibc-2.3 development
+  it was broken by design and nobody cared to provide any viable
+  fix short of upgrading your binutils. Seems to be Ulrich Drepper
+  at it again, turning symbols hidden in teeny version number upgrade.
+
+  A symptom of this is if this command gives the follwing output
+
+     ld --verbose | egrep '__init_array_(start|end)'
+     PROVIDE_HIDDEN (__init_array_start = .);
+     PROVIDE_HIDDEN (__init_array_end = .);  
+
+  You can manually attempt to link with
+
+    gcc -nostdlib -o zxidjava/libzxidjni.so -shared --export-all-symbols -Wl,-whole-archive -Wl,--allow-multiple-definition zxidjava/zxid_wrap.o -L. -lzxid -lpthread -L/usr/local/lib -L/usr/local/ssl/lib -lcrypto -lcurl -lz
+
+  The trick is to supply the -nostdlib flag.
+
+  ZXID project considers this to be glibc or binutils bug and will not
+  investigate further. Either use the workaround link line or upgrade
+  binutils, glibc, or both and complain to glibc authors or binutils authors.
+
+5.9 Overview of the xsd2sg.pl Tool (guru level)
+-----------------------------------------------
+
+The xsd2sg.pl tool, distributed as part of Plaindoc
+(http://zxid.org/plaindoc/pd.html) system, is at the heart of the
+ZXID code generation. Unfortunately the tool is still in flux. What
+follows is general outline valid as of March 2007.
+
+xsd2sg.pl can be invoked in three ways (see xsd2sg.pl --help), but the
+invocation of interest to us is the -S (SG to XSD with Code generation
+mode). This mode takes as inputs all .sg files and names of
+decoding root elelment. It will generate one mega parser that is capable
+of decoding any root element (and since root elements contain other
+elements, then really all elements). The decoder works by recursive
+descent parser principle so there will be smaller decoder functions to
+call. Similarily the encoder is generated by creating many unit
+encoders for different elements. Then the parent elements will
+call the child element encoders.
+
+5.9.1 Process .sg to create %dt hash (throw away XSD output)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+xsd2sg.pl first processes the .sg files to XSD. As a side effect it
+populates %dt multidimentsional hash
+
+  $dt{'element'}{elemname}[array-of-sublemens-and-attrs]
+  $dt{'attribute'}{attrname} = "";
+  $dt{'complexType'}{typename}[array-of-sublemens-and-attrs]
+  $dt{'group'}{groupname}[array-of-sublemens-and-attrs]
+  $dt{'attributeGroup'}{agname}[array-of-attrs]
+
+Where the array-of-subelems-and-attrs can contain tag or reference to fundamental
+or derived type, e.g.
+
+  "tag$sa:Assertion$min$max"
+  "ref$xs:anyURI$"
+  "ref$sa:Assertion$"
+  "base$$0$1$base-type"
+  "enum$n1$n2$n3$n4$n5"
+  "any$$min$max$pc$ns"
+  "anyAttribute$$min$1"
+  "_d$$0$1$simplecontent"
+
+5.9.2 The expanding element definitions in %dt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since the concrete goal is to generate data structures for elements
+irrespective of how types were used to describe the data, we need to
+expand any type reference into element definition where it appears.
+This is done by expand_element() which will in its turn call
+expand_complex_type(), expand_group() and expand_attribute_group()
+to do the job.
+
+5.9.3 Generation Phase
+~~~~~~~~~~~~~~~~~~~~~~
+
+Once %dt is in expanded form, the get_element() is called for each
+XML namespace. It will generate the code for encoders and decoders
+for the elements in the XML namespace. Finally the root decoder
+is gnerated using gen_element(). Furing generation following
+template files are used
+
+  aux-templ.c      - Code generation template for auxiliary functions
+  dec-templ.c      - Code generation template for decoders
+  enc-templ.c      - Code generation template for encoders
+  getput-templ.c   - Code generation template for accessor functions
+
+A lot of the generated headers are simply hard coded in the xsd2sg.pl (i.e. no
+templates).
+
+
+11 Integration with Existing Web Sites
+======================================
+
+Single Sign-On is used to protect some useful resources. ZXID does not
+have any means of serving these resources, rather a normal web server
+or application server should do it (e.g. Apache httpd(8) or Tomcat, or
+our favorite mini_httpd(8) ). ZXID just concentrates on verifying that
+a user has a valid session, and if not, establishing the session by way
+of SSO.
+
+11.1 Brief Overview of Control Flow
+-----------------------------------
+
+The SAML 2.0 specifications mandate a wire protocol, and in order
+to speak the wire protocol, the SP application typically
+has to follow certain standard sequence of control flow.
+
+<<dia: sp-flow,,:bg: Typical control flow of ZXID SP>>
+
+First a user<<footnote: The user is often referred to as "Principal" in
+more technical jargon. Although the human user and web browser are
+distinct entities, we do not stress that separation here. Whatever
+user "does" really will, in protocol, appear as web browser sending
+requests.>> tries to access a web site that acts in SP role. This
+triggers following sequence of events
+
+1.  User is redirected to URL in a common domain. This is so that
+    we can read the Common Domain Cookie that indicates which
+    IdP the user uses. Alternatively, if you started at
+    https://sp1.zxidsp.org:8443/zxid?o=E, the CDC check is
+    by-passed and flow 2b. happens.
+
+2.  After the CDC check, a Authentication Request (AuthnReq) is
+    generated. The IdP may have been chosen automatically
+    using CDC (2a), or there may have been some user interface
+    interaction (not show in the diagram) to choose the IdP.
+
+3.  User is redirected to the IdP. The redirection carries
+    as a query string a compressed and encoded form of
+    the SAML 2.0 AuthnReq.
+
+4.  Once the IdP has authenticated the user, or observed
+    that there already is a valid IdP session (perhaps from
+    a cookie), the IdP redirects the user back to the SP.
+
+    The AuthnResponse may be carried in this redirection
+    in a number of alternate ways
+
+    a. The redirect contains a special token called
+       +artifact+. The artifact is a reference to the
+       AuthnResponse and the SP needs to get the
+       actual AuthnResponse by using a SOAP call (the
+       4bis step).
+
+    b. The "redirect" is actually a HTML page with
+       a form and little JavaScript that causes the
+       form to be automatically posted to the SP.
+       The AuthnResponse is carried as a form field.
+
+5.  After verifying that AuthnResponse indicated a
+    success, the SP establishes a local session for the
+    user (perhaps setting a cookie to indicate this).
+    
+    Depending on how the SP to web site integration
+    is done the user is taken to the web site in
+    one of the two ways
+
+    a. Redirect to the content. This time the session
+       is there, therefore the flow passes directly
+       from check session to the web content.
+
+    b. It is also possible to show the content directly
+       without any intervening redirection.
+
+11.2 Redirect Approach to Integration
+-------------------------------------
+
+*** TBW
+
+11.3 Pass-thru Approach to Integration
+--------------------------------------
+
+11.3.1 mod_auth_saml pass-thru
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*** TBW, but see mod_auth_saml.pd for some documentation.
+
+11.3.2 mod_perl pass-thru
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*** TBW, but see zxid-perl.pd for some documentation.
+
+11.3.3 PHP pass-thru
+~~~~~~~~~~~~~~~~~~~~
+
+*** TBW, but see zxid-php.pd for some documentation.
+
+11.4 Proxy Approach to Integration
+----------------------------------
+
+*** TBD
+
+20 Testing
+==========
+
+You can skip this section if you are not a developer. However, you may
+be interested, from quality assurance perspective, in the extent of
+the testing that we perform.
+
+ZXID test suite is driven by zxtest.pl and the test input in t/ subdirectory.
+The test suite is not distributed in the tar ball, but is available from
+the git repository. Some tests still rely on detailed manual setup, YMMV.
+
+Test coverage of the project is monitored using ~gcov~ and ~lcov~ tools. This
+requires ZXID to be compiled in a special way:
+
+  make clean
+  make all ENA_PG=1       # Enables -pg flag to gcc, among others
+
+Then you need to start the web servers that are used by the tests, for example:
+
+  mini_httpd -p 8081 -c 'zx*' &
+
+  cd /home/sampo/apache-tomcat-5.5.20/
+  killall java; bin/startup.sh
+
+Now you are ready to run, in the zxid distribution directory, the test suite
+
+  ./zxtest.pl -a -a -dx
+
+The test suite can also be run using web interface: http://localhost:8081/zxtest.pl
+
+After running the test suite and possibly performing manual tests, you can
+generate the test coverage report by running.
+
+  make lcov
+
+You can then view the coverage report by pointing your web
+browser to lcovhtml/index.html
+
+20.1 Test Suite
+---------------
+
+The test suite as of release 0.76, January 2011, covers following items:
+
+<<logoutput: Test suite 0.76
+STATUS   SECS  GOAL  TEST NAME                              MESSAGES
+OK       0.052 0.1   HELP1 zxcall -h
+OK       0.038 0.1   HELP2 zxpasswd -h
+OK       0.049 0.1   HELP3 zxcot -h
+OK       0.044 0.1   HELP4 zxdecode -h
+OK       0.056 0.1   HELP5 zxlogview -h
+OK       0.058 0.1   SOENC1 EncDec Status
+OK       0.020 0.1   ATORD1 Attribute sorting
+OK       0.058 0.1   ATCERT1 Attribute certificate
+OK       0.034 0.1   CONF1 zxcall -dc dump config
+OK       0.056 0.1   CONF2 zxidhlo o=d dump config
+OK       0.021 0.1   CONF3 zxidhlo o=c dump carml
+OK       0.027 0.1   CONF4 zxidhlo o=B dump metadata
+OK       0.070 0.1   CONF5 zxididp o=B dump metadata
+OK       0.100 0.1   META1 Java LEAF Meta
+OK       0.023 0.1   HLO1 zxidhlo o=M LECP check
+OK       0.020 0.1   HLO2 zxidhlo o=C CDC
+OK       0.062 0.1   HLO3 zxidhlo o=E idp select page
+OK       0.039 0.1   HLO4 zxidhlo o=L start sso failure
+OK       0.043 0.1   HLO5 zxidhlo o=A artifact failure
+OK       0.042 0.1   HLO6 zxidhlo o=P POST failure
+OK       0.021 0.1   HLO7 zxidhlo o=D deleg invite fail
+OK       0.024 0.1   HLO8 zxidhlo o=F not an idp fail
+OK       0.021 0.1   IDP1 zxididp o=R fail
+OK       0.020 0.1   IDP2 zxididp o=F fail
+OK       0.020 0.1   IDP3 zxididp o=N new user fail
+OK       0.023 0.1   IDP4 zxididp o=W pwreset fail
+OK       0.620 0.1   IDP5 zxididp o=S SASL Req
+OK       0.027 0.1   PW1 zxpasswd list user
+OK       0.024 0.1   PW2 zxpasswd pw an ok
+OK       0.023 0.1   PW3 zxpasswd pw an fail
+OK       0.045 0.1   PW4 zxpasswd create user
+OK       0.043 0.1   PW5 zxpasswd change pw
+OK       0.057 0.1   PW6 zxpasswd list user
+OK       0.054 0.1   COT1 zxcot list
+OK       0.037 0.1   COT2 zxcot list swap
+OK       0.042 0.1   COT3 zxcot list s2
+OK       0.083 0.1   COT4 zxcot get idp meta dry
+OK       0.046 0.1   COT5 zxcot get sp meta dry
+OK       0.023 0.1   COT6 zxcot my meta
+OK       0.039 0.1   COT7 zxcot my meta add
+OK       0.024 0.1   COT8 zxcot gen epr
+OK       0.050 0.1   COT9 zxcot gen epr add
+OK       0.022 0.1   COT10 zxcot my meta
+OK       0.045 0.1   COT11 zxcot list s2
+OK       0.019 0.1   LOG1 zxlogview list
+OK       0.063 0.1   LOG2 zxlogview list
+OK slow  0.349 0.1   SMIME1 smime key gen ca
+OK slow  0.239 0.1   SMIME2 smime key gen joe
+Diff ERR 0.025 0.1   SMIME3 smime ca
+Diff ERR 0.028 0.1   SMIME4 smime code sig
+App Err  0.034 0.1   SMIME5 smime code vfy                  exit=256
+Diff ERR 0.034 0.1   SMIME6 smime sig
+Diff ERR 0.031 0.1   SMIME7 smime clear sig
+OK       0.026 0.1   SMIME8 smime pubenc
+App Err  0.044 0.1   SMIME8b smime pubencdec                exit=256
+App Err  0.050 0.1   SMIME9 smime sigenc                    exit=256
+App Err  0.042 0.1   SMIME10 smime encsig                   exit=256
+App Err  0.048 0.1   SMIME11 smime multi sigenc             exit=256
+App Err  0.020 0.1   SMIME12 smime query sig                exit=256
+App Err  0.020 0.1   SMIME13 smime verify                   exit=256
+App Err  0.020 0.1   SMIME14 smime query cert               exit=256
+App Err  0.021 0.1   SMIME15 smime verify cert              exit=256
+OK       0.016 0.1   SMIME16 smime mime ent
+OK       0.015 0.1   SMIME17 smime mime ent b64
+Diff ERR 0.029 0.1   SMIME18 smime pkcs12 exp
+Diff ERR 0.021 0.1   SMIME19 smime pkcs12 imp
+App Err  0.020 0.1   SMIME20 smime query req                exit=256
+OK       0.030 0.1   SMIME21 smime covimp
+OK       0.071 0.1   SIG1 sig vry shib resp
+OK       0.037 0.1   SIG2 sig vry shib post
+OK       0.061 0.1   SIG3 sig vry zxid resp
+OK       0.056 0.1   SIG4 sig vry zxid post
+OK       0.030 0.1   SIG5 sig vry sm resp
+OK       0.031 0.1   SIG6 sig vry sm post
+App Err  0.030 0.1   SIG7 * sig vry shib resp undecl prefix exit=2816
+OK       0.024 0.1   SIG8 * sig vry ping resp
+OK       0.026 0.1   SIG9 sig vry ping post
+OK       0.040 0.1   SIG10 sig vry hp a7n
+OK       0.029 0.1   SIG11 sig vry hp post
+OK       0.028 0.1   SIG12 sig vry hp resp
+OK       0.028 0.1   SIG13 sig vry hp resp2
+OK       0.027 0.1   SIG15 sig vry saml artifact response
+OK       0.026 0.1   SIG16 sig vry saml artifact response
+OK       0.025 0.1   SIG17 sig vry saml artifact response
+App Err  0.041 0.1   SIG18b sig vry prstnt-a7n              exit=2816
+OK       0.026 0.1   SIG20b sig vry rsa-a7n
+OK       0.024 0.1   SIG21b sig vry rsa-a7n2
+OK       0.026 0.1   SIG22b sig vry rsa-idp-post
+OK       0.046 0.1   SIG32b sig vry enc-nid-enc-attr
+OK       0.031 0.1   SIG37 sig vry
+OK       0.022 0.1   SIG38 sig vry
+OK       0.023 0.1   SIG39 sig vry
+OK       0.034 0.1   SIG40 sig vry
+OK       0.025 0.1   SIG41 sig vry
+OK       0.187 10    XML1 Decode-Encode SO and WO: ns-bug
+OK       0.139 10    XML2 Decode-Encode SO and WO: azrq1
+OK       0.164 10    XML3 Decode-Encode SO and WO: azrs1
+OK slow  0.014 0.01  XML4 * Decode-Encode RIS malformed 1
+OK       0.413 10    XML5 Decode-Encode SO and WO: ana7n1
+OK       0.056 10    XML6 Decode-Encode SO and WO: anrq1
+OK       0.166 10    XML7 Decode-Encode SO and WO: anrs1
+OK       0.327 10    XML8 Decode-Encode SO and WO: dirq1
+OK       0.257 10    XML9 Decode-Encode SO and WO: dirs1
+OK       0.572 10    XML10 Decode-Encode SO and WO: dirq2
+OK       0.223 10    XML11 Decode-Encode SO and WO: dia7n1
+OK       0.261 10    XML12 Decode-Encode SO and WO: epr1
+OK       0.333 10    XML13 Decode-Encode SO and WO: wsrq1
+OK       0.281 10    XML14 Decode-Encode SO and WO: wsrs1
+OK       0.577 10    XML15 Decode-Encode SO and WO: wsrq2
+OK       0.435 10    XML16 Decode-Encode SO and WO: wsrs2
+OK       0.046 10    XML17 Decode-Encode SO and WO: as-req
+OK       0.220 10    XML18 Decode-Encode SO and WO: as-resp
+OK       0.055 10    XML19 Decode-Encode SO and WO: authnreq
+OK       0.017 0.1   XML20 Decode-Encode SO and WO: sun-md
+OK       0.019 0.1   XML21 Decode-Encode SO and WO: provisio
+OK       0.045 0.1   XML22 Decode-Encode SO and WO: provisio
+OK       0.041 0.1   XML23 Decode-Encode SO and WO: pds-crea
+OK       0.021 0.1   XML24 Decode-Encode SO and WO: pds-quer
+OK       0.032 0.1   XML25 Decode-Encode SO and WO: AdvCliennt
+OK       0.029 0.1   XML26 Decode-Encode SO and WO: AdvClient
+OK       0.021 0.1   XML27 Decode-Encode SO and WO: AdvClient
+OK       0.033 0.1   XML28 Decode-Encode SO and WO: AdvClien
+OK       0.018 0.1   XML29 Decode-Encode SO and WO: AdvClien
+OK       0.019 0.1   XML30 Decode-Encode SO and WO: zx a7n
+OK       0.014 0.1   XML31 Decode-Encode SO and WO: covimp
+OK       2.736 30    ZXC-AS1 Authentication Service call: SS
+OK slow  1.069 0.1   ZXC-AS2 Authentication Service call: An
+OK       5.019 30    ZXC-IM1 Identity Mapping Service call
+OK       5.059 30    ZXC-IM2 * SAML NID Map call
+OK       7.840 30    ZXC-IM3 SSOS call
+OK       1.667 30    ZXC-DI1 Discovery Service call
+OK slow  2.024 0.03  ZXC-DI2 List EPR cache
+OK       9.880 30    ZXC-WS1 AS + WSF call: idhrxml
+OK       16.51 30    ZXC-WS2 AS + WSF call: x-foobar
+OK slow  9.338 0.1   ZXC-WS3 AS + WSF call leaf (x-recurs)
+OK slow  2.879 0.1   ZXC-WS4 AS + WSF call EPR not found
+OK slow  1.086 0.1   ZXC-WS5 AS + WSF call bad pw
+OK slow  9.408 0.1   ZXC-WS6 AS + WSF call hr-xml bad
+OK slow  9.677 0.1   ZXC-WS7 AS + WSF call hr-xml create
+OK slow  9.855 0.1   ZXC-WS8 AS + WSF call hr-xml query
+OK slow  9.787 0.1   ZXC-WS9 AS + WSF call hr-xml mod
+OK slow  9.697 0.1   ZXC-WS10 AS + WSF call hr-xml mod
+OK       0.116 0.5   LOGIN-IDP1 IdP Login screen            len=1933
+OK       0.219 0.5   LOGIN-IDP2 IdP Give password           len=685
+OK       0.121 0.5   LOGIN-IDP3 IdP Local Logout            len=2309
+OK       0.120 0.5   SSOHLO1 IdP selection screen           len=3280
+OK       0.441 0.5   SSOHLO2 Selected IdP                   len=2649
+App Err  0.115 0.5   SSOHLO3 Login to IdP
+OK       0.120 0.5   SSOHLO4 POST to SP                     len=3280
+OK slow  0.674 0.5   SSOHLO5 SP SOAP Az                     len=52742
+OK       0.113 0.5   SSOHLO6 SP SOAP defed                  len=3280
+OK       0.109 0.5   SSOHLO7 SP SOAP defed                  len=3280
+OK       0.110 0.5   SSOHLO8 SP SOAP logout                 len=3280
+OK       0.110 0.5   SSOHLO9 SP local logout                len=3280
+OK       3.010 10    COVIMP1 Silly tests, to improve cov    len=3280
+=== Test success 135/155 (87.1%) ===
+>>
+
+As can be seen from the output, the smime tool has still many unresolved problems.
+Other test failures are explained in the comments in the zxtest.pl application.
+Major part of that application is a large table of tests where the test setup
+is described and any anomalies are commented on.
+
+<<img: zxtest-web1: Test output using web interface.>>
+
+<<ignore:
+Some things that should be tested (all are tested as of Jan 2011)
+
+1. Will generated HTTP redirect sig validate at IdP?
+2. Does IdP issued A7N validate?
+3. Validation of EncryptedAssertion?
+4. Will generated SOAP binding sig validate at IdP?
+5. Does IdP issued SOAP sig validate?
+
+Metadata related
+
+1. IBM metadata (can we parse)
+2. Sun metadata (can we parse)
+
+XML related
+
+1. Fully qualified XML parses?
+2. Unknown ns prefix that refers to known namespace URI
+3. Known ns prefix, referring to wrong URI
+4. Known prefix refers to aliased URI
+5. Use of default namespaces working?
+6. Unknown prefix and URI as long as it is never used
+7. Unknown prefix and URI, used
+8. Known NS (prefix or URI), unknown element
+>>
+
+20.2 Test Coverage
+------------------
+
+The test coverage report looks as follows
+
+<<img: zxtest-lcov1: Test coverage report.>>
+
+As of R0.73, December 2010, the test coverage was about 63% of the
+handwritten lines of code that could execute. While this figure is
+still mediocre, it should be noted that 100% test coverage is
+inachievable and useless stretch goal. We feel about 80% would
+be good.
+
+There are several reasons why 100% is not achievable:
+
+1.  Defensive coding requires us to insert error checks at
+    many layers. This means that some of the error checks
+    will never trigger because the checks in other layers
+    already checked the situation. It is therefore virutally
+    impossible to construct a test case that would cause
+    the code path to be taken.
+
+2.  Similar to above, some checks require extreme inputs, e.g.
+    to overflow buffers. Such inputs may be very expensive
+    to generate and extremely unlikely in real practise.
+    While these situations should be tested for security
+    vulnearabilities, there is not much harm done if
+    null pointer exception causes a cgi process to crash
+    rather than return meaningful error message. The cost
+    of testing these corner cases can be hard to justify.
+
+3.  We have peppered the code with extensive debug prints. While
+    crash due to debug print is nasty, it is also avoidable
+    by turning off the debug flag. Not worth burning too much
+    midnight oil to concot test cases to test every
+    corner case in this area.
+
+4.  The test coverage considerations do not include subdirectory c/
+    as that contains machine generated code. This is highly
+    repetitive and there is no point to include it in coverage
+    score.
+
+With the above caveats, it still needs to be admitted that more
+testing could be done. In particular the biggest gaps appear in
+areas where new functionality is already supported at encoder-decoder
+level, but not yet realized in hand written logic.
+
+<<if: ZXIDBOOK>>
+<<else: >>
+
+96 License
+==========
+
+Copyright (c) 2006-2009 Symlabs (symlabs@symlabs.com), All Rights Reserved.
+Author: Sampo Kellomäki (sampo@iki.fi)
+
+Copyright (c) 2011 Sampo Kellomäki (sampo@iki.fi), All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+While the source distribution of ZXID does not contain
+SSLeay or OpenSSL code, if you use this code you will use OpenSSL
+library. Please give Eric Young and OpenSSL team credit (as required by
+their licenses).
+
+Binary distribution of this product includes software developed by the
+OpenSSL Project for use in the OpenSSL Toolkit
+(http://www.openssl.org/). See LICENSE.openssl for further information.
+
+Binary distribution of this product includes cryptographic software
+written by Eric Young (eay@cryptsoft.com).  Binary distribution of
+this product includes software written by Tim Hudson
+(tjh@cryptsoft.com). See LICENSE.ssleay for further information.
+
+And remember, you, and nobody else but you, are responsible for
+auditing ZXID and OpenSSL library for security problems,
+back-doors, and general suitability for your application.
+
+96.1 Dependency Library Licenses
+--------------------------------
+
+ZXID strives to maintain IPR hygiene and avoid both
+non-free and GPL license contamination. All the
+dependency libraries have BSD style licenses
+
+* OpenSSL under BSDish (with "advertising" clause)
+* libcurl under BSDish
+* zlib under BSDish
+* libc available as part of the operating system
+
+Please see each library package for the exact details of their
+licenses.
+
+96.2 Specification IPR
+----------------------
+
+ZXID is based on open SAML and Liberty specifications. The parties
+that have developed these specifications, including Symlabs, have made
+Royalty Free (RF) licensing commitment. Please ask OASIS and Liberty
+Alliance for the specifics of their IPR policies and IPR disclosures.
+
+Some protocols, such as WS-Trust and WS-Federation enjoy Microsoft's
+pledge<<footnote: If you have a reference to where this pledge can be
+found, please let me know so it can be included here.>> that they will
+not sue you even if you implement these specifications. You should
+evaluate yourself whether this is good enough for your situation.
+
+96.3 Further Warranties
+-----------------------
+
+If you need the author or Symlabs to further disclaim IPR interest or
+make warranties of non-infringement, such declarations are
+available for a fee. Please contact sales@symlabs.com
+
+Legal queries and clarifications will be answered at then-current
+Symlabs Professional Services rate, please contact sales@symlabs.com.
+
+97 FAQ
+======
+
+97.1 Compilation Problems
+-------------------------
+
+97.1.1 OpenSSL not found: you need to create localconf.mk
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ZXID does NOT have a configure script. It ships with a notion
+of "standard" locations for the three dependency libraries,
+but if these libraries are not where it expects to find them,
+then typically you see (n.b. lines were folded for presentation):
+
+  make
+  If you get compilation errors, try: make help
+  gcc -g -fpic -fmessage-length=0 -Wno-unused-label -Wno-unknown-pragmas
+     -fno-strict-aliasing -D_REENTRANT -DDEBUG -DUSE_CURL -DUSE_OPENSSL
+     -DLINUX -I/tmp/zxid-0.20 -I/usr/local/ssl/include -I/usr/local/include
+     -c -o zxid.o zxid.c
+  zxid.c:34:23: curl/curl.h: No such file or directory
+  In file included from zxid.c:38:
+  zx.h:26:25: openssl/rsa.h: No such file or directory
+  ...
+
+What happened is that OpenSSL for some reason is not in the location
+where standard OpenSSL distribution would install it (as indicated by
+-I/usr/local/ssl/include flag that ships with ZXID Makefile). You need
+to determine where OpenSSL is installed in your case. You can use
+
+  find / -name rsa.h -ls
+
+to locate candidates.
+
+For example, if it turns out that OpenSSL is installed in /opt/ssl, then
+you need to create a localconf.mk file that indicates this location:
+
+  echo OPENSSL_ROOT=/opt/ssl >localconf.mk
+
+There are several other make variables you may need to tweak. In the
+above example, we also notice that libcurl was not found where
+expected. This would be fixed like this
+
+  echo CURL_ROOT=/opt/curl >>localconf.mk
+
+Net result? ZXID does not try to guess where the libraries are. It
+makes you do the foot work of locating the correct libraries (some
+people have more than one instance installed) and prepare the
+localconf.mk. This may seem like a lot of work, but in my experience,
+fixing GNU autohell configure scripts that guess wrong is thousand
+times more frustrating. The system is dumb by design so you, as a human,
+do not have to try to second guess it - you are in control.
+
+97.1.2 Missing gperf
+~~~~~~~~~~~~~~~~~~~~
+
+  gcc -g -fpic -fmessage-length=0 -Wno-unused-label -Wno-unknown-pragmas -fno-strict-aliasing -D_REENTRANT -DDEBUG -DUSE_CURL -DUSE_OPENSSL -DLINUX -I/c/cvs/zxid_cvs -I/usr/local/ssl/include -I/usr//include   -c -o c/zx-a-aux.o c/zx-a-aux.c
+  c/zx-a-aux.c: In function "zx_NEW_a_Action":
+  c/zx-a-aux.c:80: error: "zx_a_Action_ELEM" undeclared (first use in this function)
+
+This happens because c/zx-const.h was misgenerated (it should not happen at
+all if you do not supply ENA_GEN=1) and does not include the necessary defines.
+c/zx-const.h should have more than 1900 lines and look something like
+
+  /* generated file, do not edit! zx_ _ATTR */
+  #ifndef _zx__ATTR
+  #define _zx__ATTR
+  #define zx_use_ATTR     0
+  #define zx_used_ATTR    1
+  #define zx_sequence_ATTR        2
+  ...
+  #define zx_wantDSEPR_ATTR       347
+  #define zx_ZX_TOK_NOT_FOUND_ATTR        348
+  #define zx__ATTR_MAX    349
+  #endif
+  /* generated file, do not edit! zx_ _ELEM */
+  #ifndef _zx__ELEM
+  #define _zx__ELEM
+  #define zx_ds_Y_ELEM    0
+  #define zx_gl_Y_ELEM    1
+  #define zx_gl_esrd_ELEM 2
+  ...
+  #define zx_wst_OnBehalfOf_ELEM  1629
+  #define zx_ZX_TOK_NOT_FOUND_ELEM        1630
+  #define zx__ELEM_MAX    1631
+  #endif
+
+97.1.3 make samlmod gives "incompatible types in assignment"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Should not happen with version 0.21 or later. See zxidnoswig.h
+for explanation of the problem.
+
+97.1.4 Perl compiled with different compiler than zxid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Perl modules generally want to be compiled with the same C compiler
+and options as were used to compile perl itself (see perl -V). If this
+happens to be different than the compiler you have defined in CC
+variable (gcc by default, near top of Makefile or in localconf.mk), you may
+get an error like:
+
+  cd Net; perl Makefile.PL && make
+  Warning: -L.. changed to -L/home/sampo/zxid/Net/..
+  Writing Makefile for Net::SAML
+  make[1]: Entering directory `/home/sampo/zxid/Net'
+  cc -c  -I.. -I/apps/openssl/std/include -I/apps/include -D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBUGGING -fno-strict-aliasing -pipe -Wdeclaration-after-statement -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O2 -march=i586 -mtune=i686 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -g -Wall -pipe   -DVERSION=\"\" -DXS_VERSION=\"\" -fPIC "-I/usr/lib/perl5/5.8.8/i586-linux-thread-multi/CORE"   SAML_wrap.c
+  /bin/sh: cc: command not found
+  make[1]: *** [SAML_wrap.o] Error 127
+  make[1]: Leaving directory `/zxid/Net'
+  make: *** [samlmod] Error 2
+
+*Solutions*
+
+1. Compile zxid with compiler that was used for perl, e.g.
+
+     make CC=the-compiler-that-perl-wants
+
+2. Recompile perl using the compiler that you want to use for zxid
+
+3. Tinker with PATH environment variable so that both C compilers
+   are found. However, using two different compilers is not really supported.
+
+In general these types of problems happen when you use perl installed
+by your distribution, but have later compiled a gcc of your own. It may
+even be that you never installed the distribution cc - in that case
+consider installing it and then trying approaches 1 or 3.
+
+A similar situation can arise with incompatibility of the compiler and
+options used for dependency libraries, such as OpenSSL or libcurl, and
+those used for compiling zxid itself.
+
+97.1.5 All files under zx missing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You need to symlink zx to zxid source directory, thus
+
+  ln -s . zx
+
+If you do not have it, then you will get a lot of file inclusion errors for
+headers that are supposed to be in path starting by zx/
+
+The symlink is there to keep all hand written source files on top
+level of directory for ease of development, yet allow inclusions to go
+through ~zx~ subdirectory. When zxid is installed, it goes to
+/usr/include/zx. Hence the symlink keeps the includes the same whether
+developing or using installed version.
+
+97.1.6 Compiler Warnings
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you compile zxid with compiler warnings turned on (CFLAGS += -Wall),
+you will see quite a number of warnings, most of which are
+unwarranted. Since the warnings are unwarranted, I ship zxid Makefile
+with warnings turned off. If this bothers you, feel free to investigate
+the warnings and report to me any issues you uncover.
+
+Following warnings in partuclar are unwarranted:
+
+1. Any unusued variable warnings, especially in generated code. Most
+   common of these is ~se~ variable (see enc-templ.c).
+2. "Suggest parenthesis around assignment when used as truth value." I
+   rely on C language operator precedence. Also, in most cases the
+   assignment is the only expression in the truth test - there simply
+   is no opportunity for ambiguity -- and no justified case for gcc to
+   warn about this.
+3. "Suggest parenthesis around && when used in ||". I rely on C
+   language operator precedence, hence the suggestion is redundant.
+
+Some warnings you may want to worry about
+
+A. "int format, long int arg". On 32 bit platforms int and long
+   are both 32 bits so this warning is not an issue. On 64 bit platforms,
+   however, there may be cause for worry.
+
+97.1.7 SWIG and Java Problems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+javac -J-Xmx128m -g zxid.java zxidjava/*.java
+zxidjava/zxidjni.java:159: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_pub_enc(zx_ctx c, zx_str plain, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                              ^
+zxidjava/zxidjni.java:164: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_pub_dec(zx_ctx c, zx_str ciphered, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                                 ^
+zxidjava/zxidjni.java:169: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_priv_dec(zx_ctx c, zx_str ciphered, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                                  ^
+zxidjava/zxidjni.java:174: cannot find symbol
+symbol  : class SWIGTYPE_p_p_void
+location: class zxidjava.zxidjni
+  public static zx_str zx_rsa_priv_enc(zx_ctx c, zx_str plain, SWIGTYPE_p_p_void rsa_pkey, int pad) {
+                                                               ^
+This was due to missing SWIG generated classes. Probably interrupted file transfer.
+
+javac -J-Xmx128m -g zxid.java zxidjava/*.java
+zxid.java:24: cannot find symbol
+symbol  : method new_conf(java.lang.String)
+location: class zxidjava.zxidjni
+      cf = zxidjni.new_conf("/var/zxid/");
+                  ^
+zxid.java:27: cannot find symbol
+symbol  : method url_set(zxidjava.zxid_conf,java.lang.String)
+location: class zxidjava.zxidjni
+      zxidjni.url_set(cf, url);
+             ^
+zxid.java:28: cannot find symbol
+
+jar cf zxidjava.jar *.class
+jar cf /tmp/zxidjava.jar zxidjava/*.class
+
+javac -J-Xmx128m -g zxid.java                
+zxid.java:187: cannot access zxid_conf
+bad class file: /Library/Java/Extensions/zxidjava.jar(zxid_conf.class)
+class file contains wrong class: zxidjava.zxid_conf
+Please remove or make sure it appears in the correct subdirectory of the classpath.
+  public static int mgmt_screen(zxid_conf cf, zxid_cgi cgi, zxid_ses ses, char op)
+                                ^
+1 error
+
+Underscore in linking error
+
+./zxid-java.sh 
+Start...
+Exception in thread "main" java.lang.NoSuchMethodError: zxidjava.zxidjni.new_conf(Ljava/lang/String;)Lzxidjava/zxid_conf;
+        at zxid.main(zxid.java:24)
+
+This was due to finding some old copies from system paths.
+
+java -classpath .:zxidjava -Djava.library.path=zxidjava zxid 
+Start...
+Exception in thread "main" java.lang.UnsatisfiedLinkError: _zxid_new_conf
+        at zxidjava.zxidjniJNI._zxid_new_conf(Native Method)
+        at zxidjava.zxidjni.new_conf(zxidjni.java:586)
+        at zxid.main(zxid.java:24)
+
+
+97.2 Platform Specifics
+-----------------------
+
+If your Unix platform is not mentioned, you should try saying just
+
+  make
+
+which will compile with Linux options. These options actually
+are pretty close to pure POSIX compile so you should get very close
+to working configuration.
+
+97.2.1 Linux
+~~~~~~~~~~~~
+
+Native development platform. Just say
+
+  make
+
+Seems there are some "improvements" that distributions have made. ZXID
+adopts the policy of expecting dependency modules where the module
+author meant it to be installed by default - for example OpenSSL by
+default installs in /usr/local/ssl (naming is historic, but has stuck).
+Many distros tinker with these paths. This means you need to create
+a localconf.mk.
+
+Redhat used to have an issue with Net::SAML (make samlmod). This has
+since been fixed, please see zxidnoswig.h for explanation.
+
+No doubt, distros will eventually pick up ZXID and provide it as a package.
+Once that happens they will solve any path issues accoring to their
+disto policy and that is fine, just do not ask me to comply with any
+such policy.
+
+97.2.2 FreeBSD
+~~~~~~~~~~~~~~
+
+No target available on Makefile, but a port is available from
+http://www.freshports.org/security/zxid/
+
+97.2.3 Solaris (Sparc)
+~~~~~~~~~~~~~~~~~~~~~~
+
+  make TARGET=sol8
+  make TARGET=xsol8    # Cross compile for Solaris (e.g. on Linux host)
+
+97.2.4 MacOS X (PowerPC?)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  make TARGET=macosx
+
+97.2.5 Windows Using MinGW
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  make zxid.dll TARGET=xmingw    # Cross compile on Linux host (best supported)
+  make zxid.dll TARGET=mingw     # Native compile for mingw target in Cygwin environment
+
+Eitherway, the net result is native Windows DLL that does not have
+Cygwin library dependencies or GPL encumberation.
+
+See Makefile for further mingw notes.
+
+97.2.6 Windows Using Cygwin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  make TARGET=cygwin
+
+Very experimental (as of Oct 2007) native build for Cygwin.
+
+Cygwin appears to not have neither flock(2) nor lockf(2). This is
+strange because at least one of these is implemented on MinGW.
+Current workaround is to define flock() to be empty macro. This
+of course means there is no file locking. There are 3 known races
+where things can go wrong
+
+1. Audit logs can get garbled. This does not stop ZXID from working,
+   but may make log analysis more complicated.
+2. Auto-CoT metadata writes can get garbled. This is very unprobable,
+   but if it happens, the ZXID deployment will not work towards
+   affected IdP. Nothing to worry about really.
+3. Locking is used to protect against updates of zxid.conf while
+   zxid is running. Again any corruption is very unlikely. Nothing
+   to worry about.
+
+The results of Cygwin compile may be GPL encumbered due to libraries.
+
+97.2.7 Windows Using MSVC
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Never been done (as of Oct 2007), but probably this is not very
+difficult given that MinGW port already has addressed many Windows
+platform issues. Please send any success reports, and receipes, my way.
+
+97.5 Deployment Planning
+------------------------
+
+Here is a rudimentary decision tree for deployment planning
+
+1. List your applications
+   a. Any provided by external partner?
+   b. Non web apps
+2. Document your existing identity stores and approaches to
+   a. User provisioning (when someone is employed)
+   b. Application provisioning (when someone starts using app)
+   c. Authorization: how do you know who is supposed to be
+      doing what?
+   d. Deprovisioning: what happens when someone is fired?
+   e. Login? Per app? Harmonized user names? Enterprise SSO?
+3. Document your goal: federated SAML SSO über alles :-)
+   a. Do you want to run IdP?
+   b. Could you out-source IdP?
+   c. Will your partners / customers be running their own IdPs?
+   d. Will you participate (or run) single CoT or do you
+      need to consider cross CoT inter-operation (e.g. IdP proxying)
+
+To be continued...
+
+
+98 Support
+==========
+
+98.1 Mailing list and forums
+----------------------------
+
+Mail the author until we get the list set up. Or volunteer a list :-)
+
+98.2 Bugs
+---------
+
+Mail the author until we get bug tracking set up. Or volunteer.
+
+98.3 Developer access
+---------------------
+
+We use CVS, but access needs to be manually configured and is not
+anonymous. If you contribute significantly, I will bother. Others
+can send patches (good way to show you are worthy of CVS access)
+to me. I've heard some mixed experiences about open source
+sites like sourceforge. If you run such site and want to
+host ZXID Project, please contact me.
+
+If you just always want the latest source: get the tar ball from
+the downloads section. Trust me, this is still so much in flux
+that only the tar ball snapshots are in any usable state. CVS
+access just to get latest source would be pointless.
+
+98.9 Commercial Support
+-----------------------
+
+Following companies provide consultancy and support contracts for
+ZXID:
+
+* symlabs.com
+* Levelview, Lda.
+
+<<zxid-ref.pd>>
+<<doc-end.pd>>
+<<notapath: TCP/IP a.k.a xBSD/Unix n/a Perl/mod_perl PHP/mod_php Java/Tomcat>>
+<<EOF: >>
+<<fi: >>

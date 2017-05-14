@@ -1,0 +1,15 @@
+Perl Module Log::Topics - 0.02
+
+     Copyright (c) 1995 John A.R. Williams. All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+To install, unzip and untar the archive. In the directory created type
+
+perl Makefile.pl
+make install
+
+Documentation is in the module file and will be added onto
+perllocal.pod as usual.
+
+I can be contacted at <Email: J.A.R.Williams@aston.ac.uk>

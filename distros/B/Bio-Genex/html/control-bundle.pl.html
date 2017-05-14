@@ -1,0 +1,86 @@
+<HTML>
+<HEAD>
+<TITLE>NAME</TITLE>
+<LINK REV="made" HREF="mailto:jasons@amadeus.avesthagen.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#parameters">PARAMETERS</A></LI>
+	<LI><A HREF="#implementation">IMPLEMENTATION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#last updated">LAST UPDATED</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P><STRONG>control-bundle.pl</STRONG>: a CGI script for creating a Gene Expression
+Markup Language (GeneXML) control bundle file.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  control-bundle.pl?species=4&amp;user=jes&amp;password=foo</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This CGI script takes returns a page of content type 'text/xml' which
+should cause the browser to prompt for file save.</P>
+<P>
+<HR>
+<H1><A NAME="parameters">PARAMETERS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_species%3D%24spc_id">species=$spc_id</A></STRONG><BR>
+<DD>
+Passed directly to <EM>xml-write.pl</EM> as a --species option.
+<P></P>
+<DT><STRONG><A NAME="item_user%3D%24login_name">user=$login_name</A></STRONG><BR>
+<DD>
+Passed directly to <EM>xml-write.pl</EM> as --user option.
+<P></P>
+<DT><STRONG><A NAME="item_password%3D%24password">password=$password</A></STRONG><BR>
+<DD>
+Passed directly to <EM>xml-write.pl</EM> as --password option.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="implementation">IMPLEMENTATION</A></H1>
+<P>The script calls <EM>xml-write.pl</EM> internally to generate the GeneXML
+file. It <EM>does not</EM> currently specifies either the --include_usf or
+the --include_al options which means that neither user sequence
+feature information nor array layout information will be included in
+the control bundle file.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>It will not provide a graceful error if the user and password field do
+not match.</P>
+<P>Please send bug reports to <A HREF="mailto:genex@ncgr.org">genex@ncgr.org</A></P>
+<P>
+<HR>
+<H1><A NAME="last updated">LAST UPDATED</A></H1>
+<P>Mon Jun 19 00:43:39 MDT 2000 by <A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jason E. Stewart (<A HREF="mailto:jes@ncgr.org">jes@ncgr.org</A>)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

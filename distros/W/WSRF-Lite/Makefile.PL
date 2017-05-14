@@ -7,13 +7,13 @@
       author   'Mark Mc Keown <Mark.McKeown@manchester.ac.uk>';
       abstract 'Implementation of WSRF';
       license  'perl';
-      version  '0.8.3.0';
+      version  '0.8.3.1';
 	
 	# add some requires for modules that dont properly specify dependencies
 	requires 'Params::Validate' 		=> '0.91';
 	requires 'DateTime::Locale'			=> '0.41';
 	requires 'DateTime::TimeZone'		=> '0.78';
-#	requires 'IO::Socket::SSL'			=> '1.39';
+	requires 'IO::Socket::SSL'			=> '1.08';
 	requires 'List::MoreUtils'			=> '0.22';
 	
 	# wsrf requires	
@@ -31,7 +31,7 @@
 	requires 'XML::LibXML'		        => '1.64';
 	# not windows compatible ...
 	if ( not( $^O =~ /MSWin32|Windows_NT/i ) ) {
-		requires 'Crypt::OpenSSL::X509' 	=> '1.7';
+		requires 'Crypt::OpenSSL::X509' 	=> '0.7';
 	} else {
 		print STDOUT "\n\nSorry, but MS Windows is not a suitable platform for asynchronous services.\n" 
 		           . "While, you can still create services, you will not be able to use HTTPS\n"

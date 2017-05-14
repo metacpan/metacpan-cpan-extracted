@@ -9,7 +9,7 @@ require 'conf.pl';
 
 my ($db_src, $db_user, $db_pass) = conf();
 
-my $dbh = DBI->connect($db_src, $db_user, $db_pass, { RaiseError => 1, PrintError => 1});
+my $dbh = DBI->connect($db_src, $db_user, $db_pass, { RaiseError => 1, PrintError => 1, AutoCommit => 0});
 
 print "Username to delete: ";
 my $user = <>;
@@ -19,6 +19,7 @@ my $uid = $dbh->selectrow_array("select id from users where username = ?", undef
 
 unless ($uid) {
     print "Need a real user\n";
+    $dbh->rollback();
     $dbh->disconnect();
     exit 1;
 }
@@ -30,6 +31,7 @@ if ($dbh->selectrow_array("select id from domains where owner = ?", undef, $uid)
     my $lock = 1 if $answer =~ /^y$/i;
     if (!$lock) {
 	print "Will not delete $user...\n";
+	$dbh->rollback();
 	$dbh->disconnect();
 	exit 1;
     }
@@ -43,6 +45,7 @@ if ($dbh->selectrow_array("select id from domains where owner = ?", undef, $uid)
 }
 
 $dbh->do("delete from users where username = ?", undef, $user);
+$dbh->commit();
 print "$user deleted...\n";
 
 $dbh->disconnect();

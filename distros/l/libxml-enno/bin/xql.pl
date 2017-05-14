@@ -1,4 +1,4 @@
-#!/home1/enno/bin/perl
+#!/home1/enno/bin/perl -Ilib
 
 ############################################################################
 # Copyright (c) 1998 Enno Derksen
@@ -55,6 +55,7 @@ END_USAGE
 
 use XML::XQL;
 use XML::XQL::DOM;
+use XML::XQL::DirXQL;
 
 if (@ARGV < 1)
 {

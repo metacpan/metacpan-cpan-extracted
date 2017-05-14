@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::_i18n;
 # Developpers warning : this file must stay UTF-8 encoded
 
 use AutoLoader qw(AUTOLOAD);
-our $VERSION = '1.4.9';
+our $VERSION = '1.9.3';
 use utf8;
 
 ## @fn string msg(int msg, array ref lang)
@@ -35,7 +35,6 @@ sub error {
     foreach ( @{$lang} ) {
         if ( __PACKAGE__->can("error_$_") ) {
             my $tmp = &{"error_$_"}->[$error];
-            utf8::encode($tmp) if ( $ENV{FCGI_ROLE} );
             return $tmp;
         }
     }
@@ -45,7 +44,6 @@ sub error {
 1;
 
 __END__
-
 # Order of the constants:
 # * PE_OK                                 0
 # * PE_SESSIONEXPIRED                     1
@@ -521,7 +519,8 @@ sub error_pt {
         'Impossível registar o identificante de conexão Liberty Alliance',
         'Um processo terminal SOAP Liberty Alliance fracassou',
         'A sua conta está bloqueada',
-        'A sua senha expirou' 'Certificado exigido',
+        'A sua senha expirou',
+        'Certificado exigido',
         'Erro',
         'A senha foi reinicializada e deve ser mudada',
         'Modificação da senha não autorizada',
@@ -877,6 +876,14 @@ sub error_ro {
 # * PM_ERROR_MSG               21
 # * PM_LAST_LOGINS             22
 # * PM_LAST_FAILED_LOGINS      23
+# * PM_OIDC_CONSENT            24
+# * PM_OIDC_SCOPE_OPENID       25
+# * PM_OIDC_SCOPE_PROFILE      26
+# * PM_OIDC_SCOPE_EMAIL        27
+# * PM_OIDC_SCOPE_ADDRESS      28
+# * PM_OIDC_SCOPE_PHONE        29
+# * PM_OIDC_SCOPE_OTHER        30
+# * PM_OIDC_CONFIRM_LOGOUT     31
 
 sub msg_en {
     use utf8;
@@ -905,6 +912,14 @@ sub msg_en {
         'Error Message',
         'Your last logins',
         'Your last failed logins',
+        'The application %s would like to know:',
+        'Your identity',
+        'Your profile',
+        'Your email',
+        'Your address',
+        'Your phone number',
+        'Another information:',
+        'Do you want to logout?',
     ];
 }
 
@@ -935,5 +950,14 @@ sub msg_fr {
         'Message d\'erreur',
         'Vos dernières connexions',
         'Vos dernières connexions refusées',
+        'L\'application %s voudrait connaître :',
+        'Votre identité',
+        'Vos informations personnelles',
+        'Votre adresse électronique',
+        'Votre adresse',
+        'Votre numéro de téléphone',
+        'Une autre information :',
+        'Souhaitez-vous vous déconnecter&nbsp;?',
     ];
 }
+

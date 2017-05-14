@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Base;
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 # ABSTRACT: Base module for importing standard modules, features, and subs
 
 #pod =head1 SYNOPSIS
@@ -24,11 +24,7 @@ our $VERSION = '0.005';
 #pod
 #pod =head1 SEE ALSO
 #pod
-#pod =over
-#pod
-#pod =item L<Import::Base>
-#pod
-#pod =back
+#pod L<Import::Base>
 #pod
 #pod =cut
 
@@ -67,7 +63,7 @@ CPAN::Testers::Schema::Base - Base module for importing standard modules, featur
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -90,11 +86,7 @@ feature|perlsub/Signatures>.
 
 =head1 SEE ALSO
 
-=over
-
-=item L<Import::Base>
-
-=back
+L<Import::Base>
 
 =head1 AUTHORS
 

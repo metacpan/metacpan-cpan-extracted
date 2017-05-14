@@ -1,10 +1,8 @@
 package Flower::Node;
 
-use 5.12.0;
-
 use strict;
 use warnings;
-
+use feature qw(say);
 use Mojo::UserAgent;
 use Mojo::ByteStream qw/b/;
 use JSON::XS;

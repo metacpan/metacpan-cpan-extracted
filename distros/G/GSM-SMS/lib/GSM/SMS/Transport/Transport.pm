@@ -5,7 +5,7 @@ use vars qw( $VERSION $AUTOLOAD );
 
 use Carp;
 
-$VERSION = '0.2';
+$VERSION = "0.161";
 
 =head1 NAME
 

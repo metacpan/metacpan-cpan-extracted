@@ -3,11 +3,11 @@
 ## This file provides a class for holding informations regarding ISIS.
 ####
 
-package RouterBase::ISIS;
-use RouterBase::Atom;
+package IPDevice::RouterBase::ISIS;
+use IPDevice::RouterBase::Atom;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase::Atom);
+@ISA = qw(IPDevice::RouterBase::Atom);
 
 $VERSION = 0.01;
 
@@ -17,12 +17,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-RouterBase::ISIS
+IPDevice::RouterBase::ISIS
 
 =head1 SYNOPSIS
 
- use RouterBase::ISIS;
- my $isis = new RouterBase::ISIS;
+ use IPDevice::RouterBase::ISIS;
+ my $isis = new IPDevice::RouterBase::ISIS;
  $isis->set_level(1);
 
 =head1 DESCRIPTION

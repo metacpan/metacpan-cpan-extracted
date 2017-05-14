@@ -1,30 +1,32 @@
 package DTL::Fast::Filter::Reverse;
-use strict; use utf8; use warnings FATAL => 'all';
+use strict;
+use utf8;
+use warnings FATAL => 'all';
 use parent 'DTL::Fast::Filter';
 
-$DTL::Fast::FILTER_HANDLERS{'reverse'} = __PACKAGE__;
+$DTL::Fast::FILTER_HANDLERS{reverse} = __PACKAGE__;
 
 #@Overrde
 sub filter
 {
-    my( $self, $filter_manager, $value, $context ) = @_;
+    my ( $self, $filter_manager, $value, $context ) = @_;
     my $result;
 
     my $value_type = ref $value;
 
-    if( $value_type eq 'ARRAY' )
+    if ($value_type eq 'ARRAY')
     {
-        $result = [reverse @$value];
+        $result = [ reverse @$value ];
     }
-    elsif( $value_type eq 'HASH' )
+    elsif ($value_type eq 'HASH')
     {
-        $result = {reverse %$value};
+        $result = { reverse % $value };
     }
-    elsif( UNIVERSAL::can($value_type, 'reverse') )
+    elsif (UNIVERSAL::can($value_type, 'reverse'))
     {
         $result = $value->reverse($context);
     }
-    elsif( not $value_type )
+    elsif (not $value_type)
     {
         $result = join '', reverse ($value =~ /(.)/gs);
     }

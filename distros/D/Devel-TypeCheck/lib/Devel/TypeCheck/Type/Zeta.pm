@@ -37,13 +37,13 @@ sub new {
     my ($name, $param, $return) = @_;
 
     my $this = {};
-   
-    if (defined($param) &&
-	($param->type != Devel::TypeCheck::Type::M() ||
-	 ($param->type == Devel::TypeCheck::Type::M() &&
-	  $param->subtype->type != Devel::TypeCheck::Type::O()))) {
-	carp("Impossible type ", $param->type, " for parameter part of Zeta");
-    }
+
+#     if (defined($param) &&
+# 	($param->type != Devel::TypeCheck::Type::M() ||
+# 	 ($param->type == Devel::TypeCheck::Type::M() &&
+# 	  $param->subtype->type != Devel::TypeCheck::Type::O()))) {
+# 	confess("Impossible type ", $param->type, " for parameter part of Zeta");
+#     }
 
     $this->{'param'} = $param;
     $this->{'return'} = $return;

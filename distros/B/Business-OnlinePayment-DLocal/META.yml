@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/Jayceh/Business-OnlinePayment-DLocal/issues
   homepage: http://search.cpan.org/dist/Business-OnlinePayment-DLocal/
   repository: git://github.com/Jayceh/Business-OnlinePayment-DLocal.git
-version: '0.003'
+version: '0.004'
 x_contributors:
   - 'Jason Terry <jterry@bluehost.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

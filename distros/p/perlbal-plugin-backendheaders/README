@@ -1,0 +1,42 @@
+This is Perl module Perlbal::Plugin::BackendHeaders.
+
+INSTALLATION
+
+Perlbal::Plugin::BackendHeaders installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Perlbal::Plugin::BackendHeaders
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+    
+Finally apply the modify_headers.patch to perlbal:
+  
+    % cat modify_headers.patch | patch -p0
+    
+Check to make sure it works:
+  
+    % curl -I http://mydomain.com/
+    
+    HTTP/1.0 200 OK
+    Content-Type: text/html; charset=utf-8
+    Content-Language: en
+    Pragma: public
+    X-Backend: mydomain:8880
+    Connection: close
+    
+DOCUMENTATION
+
+Perlbal::Plugin::BackendHeaders documentation is available as in POD. So you can do:
+
+    % perldoc Perlbal::Plugin::BackendHeaders
+
+to read the documentation online with your favorite pager.
+
+Victor Igumnov

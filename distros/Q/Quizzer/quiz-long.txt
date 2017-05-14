@@ -1,0 +1,1457 @@
+Template: quiz/domanda1
+Title: Prima domanda
+Type: select
+Choices: ls -l, ls -w, ls, Nessuna
+Level: low
+Description: Quale di queste linee di comando permette di visualizzare anche i file nascosti?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: Nessuna
+
+Template: quiz/domanda2
+Type: select
+Level: medium
+Description: Quale di queste linee di comando non serve a nulla nella compilazione del kernel?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: make config, make menuconfig, make newconfig, make oldconfig
+Answer: make newconfig
+
+Template: quiz/domanda3
+Type: multiselect
+Level: critical
+Description: Quali di queste estensioni di file caratterizzano (di solito...) archivi compressi?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: .tar.gz, .bak, .Z, .exe, .bz2
+Answer: .tar.gz, .Z, .bz2
+
+Template: quiz/domanda4
+Type: multiselect
+Level: high
+Choices: cp --rec /tmp/* /var, cp -dpR /tmp/* /var, cp /tmp/*/* /var, cp -a /tmp/* /var
+Description: Selezionare tutti i modi per copiare ricorsivamente tutti i file e le sottodirectory che si trovano in /tmp nella directory /var.
+Answer: cp -dpR /tmp/* /var, cp -a /tmp/* /var
+
+Template: quiz/domanda5
+Type: String
+Level: high
+Description: Qual'e' il comando piu' veloce per scompattare l'archivio file001.tar.gz (usate meno caratteri possibile!)?
+extended_description: *** Suggerimento: per ogni opzione che scrivete pensate se e' veramente necessaria! ***
+Answer: tar zxf file001.tar.gz
+Answer2: tar xzf file001.tar.gz
+
+Template: quiz/domanda6
+Argument: Documentation
+Type: select
+Level: low
+Description: Linux a quale di queste licenza è soggetto ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: User-friendly, Commercial-license, Free, GPL
+Answer: GPL
+
+Template: quiz/domanda7
+Argument: Filesystems
+Type: select
+Level: high
+Description: In Linux il kernel-space e lo user-space sono:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: filesystems, zone virtuali, directory, utility
+Answer: zone virtuali
+
+Template: quiz/domanda8
+Argument: Installation
+Type: select
+Level: medium
+Description: In fase di installazione di Linux, quante sono il numero di partizioni minime consigliate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: 1, 2, 3, 4
+Answer: 3
+
+Template: quiz/domanda9
+Argument: Kernel
+Type: select
+Level: medium
+Description: Quante immagini del kernel posso avere su un client linux ? 
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices:  2, 4, infinite ma legate alla dimensione della /boot, 0 su un client
+Answer: infinite ma legate alla dimensione della /boot
+
+Template: quiz/domanda10
+Argument: Kernel
+Type: multiselect
+Level: low
+Description: Quali tra questi kernel usereste per un server di produzione.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: 2.3.17, 2.4.12, 2.4.9, 2.0.39
+Answer: 2.4.12, 2.4.9, 2.0.39
+
+Template: quiz/domanda11
+Argument: Documentation
+Type: select
+Level: low
+Description: Linux è:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices:  una tipologia d'approccio unix, un filesystems, il kernel, uno ambiente X 
+Answer: il kernel
+
+Template: quiz/domanda12
+Argument: Boot
+Type: select
+Level: medium
+Description: Col LILO quante immagine del kernel possiamo avere come opzione dal menù di base in fase di boot del pc se /etc è una partizione da 500 Mbyte ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: 22, 100, infinite ma legate allo spazio disponibile in /etc, una ogni Mbyte.
+Answer: infinite ma legate allo spazio disponibile in /etc
+
+Template: quiz/domanda13
+Argument: Boot
+Type: select
+Level: medium
+Description: Se LILO risiede nel mbr, come faccio a cancellarlo da microsoft windows ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: erase mbr, delete all, fdisk /mbr, fdisk mbr-all
+Answer: fdisk /mbr
+
+Template: quiz/domanda14
+Argument: Boot
+Type: select
+Level: medium
+Description: Se LILO risiede nel mbr, come faccio a cancellarlo da linux ?
+Choices: fdformat /mbr, superformat /mbr, lilo -u, fixing /dev/mbr
+Answer: lilo -u
+
+Template: quiz/domanda15
+Argument: Device
+Type: select
+Level: low
+Description: Il device /dev/md0 rappresenta:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: uno iomega-zip, un cluster, un raid software, una webcam
+Answer: un raid software
+
+Template: quiz/domanda16
+Argument: Installation
+Type: multiselect
+Level: low
+Description: Su quali di queste piattaforme non è possibile installare linux ? 
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: mips, arm,  zx spectrum, vic 20
+Answer: zx spectrum, vic 20
+
+Template: quiz/domanda17
+Argument: Kernel
+Type: string
+Level: high
+Description: Scrivere la sequenza corretta dei comandi per compilare un kernel linux e i suoi moduli separando ogni comando da un carattere di ";" ( es: comando1;comando2;comando3)
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: make dep;make clean;make bzImage;make modules;make modules_install
+
+Template: quiz/domanda18
+Argument: Kernel
+Type: multiselect
+Level: low
+Description: Quale tra queste tipologie può essere usata dal kernel di linux ? 
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: gerarchica, modulare, reticolare, monolitica
+Answer: modulare, monolitica
+
+Template: quiz/domanda19
+Argument: Device
+Type: select
+Level: low
+Description: I device in linux sono rappresentati da : 
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: files, cartelle condivise, librerie condivise, cursori
+Answer: files
+
+Template: quiz/domanda20
+Argument: Boot
+Type: select
+Level: medium
+Description: In linux quale tra questi demoni è chiamato anche superdaemon ? 
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices:  snmpd, inetd, flushd, ttyd
+Answer: inetd
+
+Template: quiz/domanda21
+Argument: Filesystems
+Type: select
+Level: low
+Description: Quale è il tipo di filesystems standard di linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: ext1, ext2, ext3, raiser fs
+Answer: ext2
+
+Template: quiz/domanda22
+Argument: Device
+Type: select
+Level: low
+Description: 2 dischi ide sul 1° canale, uno master e l'altro slave corrispondono a ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: hda e hdc, hdb e hdd, hda e hdb,  hda1 e hdb1
+Answer: hda e hdb
+
+Template: quiz/domanda23
+Argument: Device
+Type: select
+Level: low
+Description: la partizione /dev/hdd4 corrisponde alla 4° partizione del disco ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: slave secondario, slave primario, interslave concatenato, non è definibile
+Answer: slave secondario
+
+Template: quiz/domanda24
+Argument: Device
+Type: select
+Level: low
+Description: la partizione  /dev/sdd2 corrisponde alla 2° partizione ....
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: del 4° disco scsi, del 2° disco scsi, del 6° disco scsi, non è definibile
+Answer: del 4° disco scsi
+
+Template: quiz/domanda25
+Argument: Shell
+Type: select
+Level: low
+Description: Siete nella directory /pippo/pluto/. Lanciate lo script eseguibile minni con:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: minni, ./minni, .minni, /minni
+Answer: ./minni
+
+Template: quiz/domanda26
+Argument: Shell
+Type: multiselect
+Level: low
+Description: Quale tra queste non è una variabile d'ambiente globale.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: DISPLAY , HOSTNAME, userlogger, allusers
+Answer: userlogger, allusers
+
+Template: quiz/domanda27
+Argument: Shell
+Type: multiselect
+Level: medium
+Description: Quale di questi comandi restituisce il path di linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: echo $PATH, echo PATH, printenv, env
+Answer: echo $PATH, printenv, env
+
+Template: quiz/domanda28
+Argument: Boot
+Type: select
+Level: critical
+Description: Che stringa passate al Lilo per effettuare un troubleshotting a livello 1.Considerate che l'immagine del kernel sia linux.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: linux go 1, linux init=/bin/sh rw, linux start 1, linux runlevel 1
+Answer: linux init=/bin/sh rw
+
+Template: quiz/domanda29
+Argument: Shell
+Type: select
+Level: critical
+Description: Rendere setuid root la shell /bin/bash comporta a livello di sicurezza un:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: aumento, un degrado, un pericolo grave, non cambia nulla
+Answer: un pericolo grave
+
+Template: quiz/domanda30
+Argument: Kernel
+Type: string
+Level: low
+Description: Quale è il comando che mi permette di configurare il kernel di linux con una interfaccia grafica?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: make xconfig
+
+Template: quiz/domanda31
+Argument: Boot
+Type: select
+Level: medium
+Description: Quale file in madeinlinux carica all'avvio in automatico i moduli del kernel?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: modules.start, modules.conf, conf.modules, start.modules
+Answer: modules.conf
+
+Template: quiz/domanda32
+Argument: Shell
+Type: select
+Level: low
+Description: Per scrivere nel file pippo.text con l'editor vim, devo prima premere i tasti:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: Esc+h, Esc+i, Esc+m, Esc+Esc+k
+Answer: Esc+i
+
+Template: quiz/domanda33
+Argument: Shell
+Type: select
+Level: low
+Description: Per salvare il contenuto di un file con vim ed uscire uso tasti:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: Esc+:+wq, Esc+save, Alt+Esc, Esc+j
+Answer: Esc+:+wq
+
+Template: quiz/domanda34
+Argument: Device
+Type: select
+Level: low
+Description: Quale tra questi comandi permette di montare un device generico ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices:  show, mount, rex, deviceon
+Answer: mount
+
+Template: quiz/domanda35
+Argument: Boot
+Type: select
+Level: low
+Description: Una partizione che è bootable (avviabile) è di tipo:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: secondaria, estesa, logica, primaria
+Answer: primaria
+
+Template: quiz/domanda36
+Argument: Boot
+Type: select
+Level: medium
+Description: Il demone che gestisce i log di sistema è:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: logd, syslogd, linuxlogd, systemlogd
+Answer: syslogd
+
+Template: quiz/domanda37
+Argument: Boot
+Type: string
+Level: medium
+Description: Quale è il file di configurazione del superdaemon ? Scrivere il path completo del file (es: /opt/superdaemon.txt)
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: /etc/inetd.conf
+
+Template: quiz/domanda38
+Argument: Boot
+Type: select
+Level: medium
+Description: Quale tra questi demoni viene caricato come 1° all'avvio di linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: kerneld, inetd, modulesd, networkingd
+Answer: inetd
+
+Template: quiz/domanda39
+Argument: Permission
+Type: string
+Level: high
+Description: Quale è il file di configurazione che gestisce gli utenti ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: /etc/passwd
+
+Template: quiz/domanda40
+Argument: Permission
+Type: string
+Level: high
+Description: Quale file di configurazione è stato creato con l'introduzione della shadow? Scrivere il path completo del file (es: /opt/shadow.txt)
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: /etc/shadow
+
+Template: quiz/domanda41
+Argument: Permission
+Type: select
+Level: medium
+Description: Per inserire un nuovo utente in linux, si utlizza il seguente modo:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: edito il file di configurazione degli utenti, useradd, uso Kuserad, altro
+Answer: useradd
+
+Template: quiz/domanda42
+Argument: Permission
+Type: select
+Level: medium
+Description: Per inserire un nuovo gruppo in linux uso il seguente comando:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: addgroup, groupadd, Kgroupadd, Xconfigurator
+Answer: groupadd
+
+Template: quiz/domanda43
+Argument: Permission
+Type: select
+Level: medium
+Description: Per inserire da riga di comando l'utente pippo con uid uguale a 1000 uso:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: useradd -u 1000 pippo, insuser -u 1000 pippo, iuser -uid 1000 pippo, altro 
+Answer: useradd -u 1000 pippo
+
+Template: quiz/domanda44
+Argument: Permission
+Type: string
+Level: high
+Description: drwxr-xr-x 3 root root 4096 Feb 18 08:58 pippo. Sistemare l'ownership in maniera ricorsiva sapendo che pippo appartiene al gruppo wd.Scrivere per esteso il path della cartella pippo, ossia /hom/pippo e non inserire eventuali flag alla fine del comando.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: chown -R pippo.wd /home/pippo
+
+Template: quiz/domanda45
+Argument: Permission
+Type: select
+Level: high
+Description: Quale comando usereste per modificare i permessi di un file in linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: modify, change, tobe, chmod
+Answer: chmod
+
+Template: quiz/domanda46
+Argument: Shell
+Type: select
+Level: medium
+Description: Quali tra questi è una shell dei comandi valida ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tcsh, bash, sh, tutte le precedenti
+Answer: tutte le precedenti
+
+Template: quiz/domanda47
+Argument: Permission
+Type: select
+Level: critical
+Description: Il flag dei permessi +s applicato al demone pppd rende questo 
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: eseguibile da parte di tutti gli utenti, più sicuro, condiviso, opzione inesistente
+Answer: eseguibile da parte di tutti gli utenti
+
+Template: quiz/domanda48
+Argument: Filesystems
+Type: select
+Level: low
+Description: Quale comando mi restituisce la dimensione im Mb della directory /etc ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: free /etc, df  -h /etc, du -h /etc, /etc -free
+Answer: du -h /etc
+
+Template: quiz/domanda49
+Argument: Filesystems
+Type: select
+Level: low
+Description: Quale comando mi restituisce lo spazio libero in Mb presente sul server ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: du -h /, du -all, df -h, fdisk --free
+Answer: df -h
+
+Template: quiz/domanda50
+Argument: Kernel
+Type: select
+Level: low
+Description: Quando si ricompila il kernel è necessario .....
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: raddoppiare la quantità di ram, rimappare la ram, settare il buffer, altro
+Answer: altro
+
+Template: quiz/domanda51
+Argument: Process
+Type: select
+Level: medium
+Description: Quali tra questi demoni si occupa della schedulazione automatica ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: timerd, crontabd, cronometrod, crond
+Answer: crond
+
+Template: quiz/domanda52
+Argument: Process
+Type: select
+Level: low
+Description: Quale comando l'utente root usa per impostare una schedulazione ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: timersetting -e, crontab -e, crontab -k, systime -i
+Answer: crontab -e
+
+Template: quiz/domanda53
+Argument: Process
+Type: select
+Level: low
+Description: Quale comando l'utente root usa per visualizzare una schedulazione ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: timersetting -l, crontab -l, crontab -v, systime -l
+Answer: crontab -l
+
+Template: quiz/domanda54
+Argument: Precess
+Type: string
+Level: low
+Description: */1 * * * * /bin/ls lancia il comando ls ogni ....
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: minuto
+
+Template: quiz/domanda55
+Argument: Process
+Type: string
+Level: medium
+Description: * 12 * * 1-5 /bin/ls , quando viene lanciato il comando ls ? (es1: alle 22 dal giugno al settembre;  es2: alle 9 dal martedi al giovedi)
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: alle 12 dal lunedi al venerdi
+
+Template: quiz/domanda56
+Argument: Kernel
+Type: string
+Level: medium
+Description: Quale è il comando che mi permette di compilare il kernel senza la presenza di un interfaccia grafica ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: make menuconfig
+
+Template: quiz/domanda57
+Argument: Process
+Type: string
+Level: high
+Description: Scrivere la stringa per schedulare il file /bk/backup alle ore 3.00am dal lunedi al venerdi. Come nel file ogni campo deve essere separato con uno spazio.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: * 3 * * 1-5 /bk/backup
+
+Template: quiz/domanda58
+Argument: Package
+Type: string
+Level: high
+Description: Usando il comando tar creare  il file all.tar.gz che effettui il backup di tutto il filesystems in modalità compressa. Non specificare nessun path per all.tar.gz.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: tar cvfz all.tar.gz /
+
+Template: quiz/domanda59
+Argument: Package
+Type: string
+Level: critical
+Description: Usando il comando tar effettuare il backup di tutto il filesystems in modalità compressa  su dat considerando che il device dat sia /dev/dat.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: tar cvvfz /dev/dat /
+
+Template: quiz/domanda60
+Argument: Package
+Type: string
+Level: high
+Description: Effettuare il restore dei dati usando il file miodati.tar.gz da dove mi trovo.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: tar xvfz miodati.tar.gz
+
+Template: quiz/domanda61
+Argument: Package
+Type: string
+Level: medium
+Description: Creare un archivio tar della directory /home chiamato archivio.tar nella posizione in cui mi trovo.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: tar cvf archivio.tar /home
+
+Template: quiz/domanda62
+Argument: Shell
+Type: select
+Level: medium
+Description: L'utente pippo è stato creato con la shell /bin/false. L'utente pippo al logon:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: accede a /bin/bash, il logon non ha effetto, non prende il profile, altro
+Answer: il logon non ha effetto
+
+Template: quiz/domanda63
+Argument: Shell
+Type: select
+Level: low
+Description: Quale comando usereste per sapere il numero di righe del file pippo.txt ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: row -l, rows -l, wc -l, wc -r
+Answer: wc -l
+
+Template: quiz/domanda64
+Argument: Networking
+Type: string
+Level: high
+Description: Scrivere il comando per settare la nic eth0 con ip=10.10.10.10 in classe c usando gli appositi flag eth0 e netmask
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: ifconfig eth0 10.10.10.10 netmask 255.255.255.0
+
+Template: quiz/domanda65
+Argument: Networking 
+Type: string
+Level: high
+Description: Scrivere il comando che aggiunge il default gateway con  ip 10.10.10.1 con il numero minore di flag.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: route add default gw 10.10.10.1
+
+Template: quiz/domanda66
+Argument: Networking
+Type: select
+Level: medium
+Description: Il comando route -n mi permette di:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: monitorare il router, stampare a video la route table, sniffare i bytes, altro
+Answer: stampare a video la route table
+
+Template: quiz/domanda67
+Argument: Networking
+Type: select
+Level: medium
+Description: Il comando netstat mi permette di effettuare molte operazione sul:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: stampante, networking, kernel, moduli del kernel
+Answer: networking
+
+Template: quiz/domanda68
+Argument: Boot
+Type: select
+Level: medium
+Description: Quali tra questi comandi riavviano linux immediatamente ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: halt, init 0, shutdown -h now, shutdown -r now
+Answer: shutdown -r now
+
+Template: quiz/domanda69
+Argument: Documentation
+Type: select
+Level: low
+Description: Quale strumento permette all'utente di interagire con linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: la shell, il mouse, floppy, la cpu
+Answer: la shell
+
+Template: quiz/domanda70
+Argument: Boot
+Type: select
+Level: low
+Description: Per modificare il runlevel di default si deve aprire il file:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: inetd.conf, boot.conf, inittab, mrtg.conf
+Answer: inittab
+
+Template: quiz/domanda71
+Argument: Boot
+Type: select
+Level: low
+Description: id:3:initdefault permette di far partire il livello 3 all'avvio se siamo:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: root, admin, sys, nessuna delle precedenti
+Answer: nessuna delle precedenti
+
+Template: quiz/domanda72
+Argument: Kernel
+Type: select
+Level: high
+Description: per passare dai sorgenti del  kernel 2.4.5 al kernel 2.4.17 posso usare:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: vmlinuz, il lilo, le patch, i binary precompilati di trovalds
+Answer: le patch
+
+Template: quiz/domanda73
+Argument: Package
+Type: select
+Level: medium
+Description: Per installare il pacchetto pippo.rpm utilizzo il comando:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: rpm -insert, rpm -i, rpm -vh, rpm --i
+Answer: rpm -i
+
+Template: quiz/domanda74
+Argument: Package
+Type: multiselect
+Level: medium
+Description: Per verificare la presenza sul disco del pacchetto rpm  pippo usate:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: rpm -p, rpm -d, rpm -q, rpm --query
+Answer: rpm -q, rpm --query
+
+Template: quiz/domanda75
+Argument: Package
+Type: select
+Level: medium
+Description: Avete il pacchetto pippo.rpm installato. Visionate il contenuto del pacchetto con il comando:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: rpm -?, rpm -ql, rpm --list, devo prima disinstallarlo
+Answer: rpm -ql
+
+Template: quiz/domanda76
+Argument: Filesystems
+Type: select
+Level: low
+Description: in linux esiste il master profile. Quale file in /etc lo rappresenta ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: master, promaster, profile, profile_master
+Answer: profile
+
+Template: quiz/domanda77
+Argument: Filesystems
+Type: select
+Level: low
+Description: La directory /etc/init.d contiene:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: il kernel, gli script dei demoni, i log, sendmail
+Answer: gli script dei demoni
+
+Template: quiz/domanda78
+Argument: Filesystems
+Type: select
+Level: low
+Description: Quale directory viene utilizzata per ospitare i log di sistema ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices:  /log, /logs, /syslog, /var/log
+Answer: /var/log
+
+Template: quiz/domanda79
+Argument: Filesystems
+Type: select
+Level: low
+Description: Quale directory usate per memorizzare i dati dei vostri utenti ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: /samba, /users, /home, /fileserver
+Answer: /home
+
+Template: quiz/domanda80
+Argument: Filesystems
+Type: select
+Level: low
+Description: Il kernel space è rappresentato sul filesystems da quale  directory ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: /usr/src, /tmp, /boot, /proc
+Answer: /proc
+
+Template: quiz/domanda81
+Argument: Kernel
+Type: select
+Level: low
+Description: Ho compilato il supporto raid1 come modulo. Ora volgio caricarlo come prova prima di renderlo operativo sul server di produzione. Quale comando si usa ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: insmod, insertmodule, addmodule, moduleinsert
+Answer: insmod
+
+Template: quiz/domanda82
+Argument: Kernel
+Type: select
+Level: low
+Description: Quale comando mi permette di vedere i moduli caricati in linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: loadmodule, showmodule, lsmod, listmod
+Answer: lsmod
+
+Template: quiz/domanda83
+Argument: Kernel
+Type: select
+Level: low
+Description: Voglio rimuovere il modulo raid1 dalla mia macchina. Uso il comando:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: delmod, deletemod, rmmod, erase mod
+Answer: rmmod
+
+Template: quiz/domanda84
+Argument: Package
+Type: string
+Level: medium
+Description: Eliminare il pacchetto rpm pippo, come fare?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: rpm -e --nodeps pippo
+
+Template: quiz/domanda85
+Argument: Filesystems
+Type: string
+Level: medium
+Description: Il file affari.sdw è un documento staroffice. Il vostro capo reparto vi chiede urgentemente il file ma voi non riuscite a trovarlo. Quali metodi usereste per trovare questo file ? Scriverli in ordine alfabetico separando ogni metodo con il carattere "," (es: metodo1,metodo2,metodo3
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: find,locate
+
+Template: quiz/domanda86
+Argument: Filesystems
+Type: string
+Level: medium
+Description: Quale è il metodo di ricerca più veloce per un generico file ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: locate
+
+Template: quiz/domanda87
+Argument: Filesystems
+Type: string
+Level: medium
+Description: Quale metodo di ricerca si appoggia ad un database ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: locate
+
+Template: quiz/domanda88
+Argument: Filesystems
+Type: select
+Level: medium
+Description: Quale comando aggiorna il database di un particolare metodo di ricerca ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: refresh, update, updatedb, dbupdate
+Answer: updatedb
+
+Template: quiz/domanda89
+Argument: Filesystems
+Type: string
+Level: medium
+Description: Quale metodo di ricerca mi permette di trovare una serie di file che possiedono una determinata maschera di permessi ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: find
+
+Template: quiz/domanda90
+Argument: Package
+Type: multiselect
+Level: low
+Description: Volete installare il pacchetto pippo.tar.gz. Avete già esploso il pacchetto.Quale passo fareste per primo per poter installare il pacchetto ? 
+Choices: leggo file INSTALL se presente, leggo il file README se presente, leggo il file Makefile se presente, mi iscrivo alla mailing list del progetto
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: leggo il file INSTALL se presente, leggo il file README se presente
+
+Template: quiz/domanda91
+Argument: Package
+Type: select
+Level: low
+Description: Il file Makefile per un generico pacchetto cosa contiene ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: il sorgente, il kernel, le librerie, le istruzioni di compilazione
+Answer: le istruzioni di compilazione
+
+Template: quiz/domanda92
+Argument: Package
+Type: select
+Level: medium
+Description: Avete esploso il pacchetto pippo.tar.gz. Prima di procedere alla compilazione qualche script lanciate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: make, make all, configure, install 
+Answer: configure
+
+Template: quiz/domanda93
+Argument: Package
+Type: select
+Level: medium
+Description: Il comando make appartiene al pacchetto:
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: glibc-2.24, gcc-2.95.3, gnu-make, librerie condivise
+Answer: gnu-make
+
+Template: quiz/domanda94
+Argument: Package
+Type: select
+Level: medium
+Description: Il comando make a cosa serve ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: installazione sorgenti, compilazione dei sorgenti, settaggio dei sorgenti, debugger
+Answer: compilazione dei sorgenti
+
+Template: quiz/domanda95
+Argument: Package
+Type: select
+Level: low
+Description: Il comando make install a cosa serve ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: installazione file, compilazione dei sorgenti, settaggio dei sorgenti, debugger
+Answer: installazione file
+
+Template: quiz/domanda96
+Argument: Kernel
+Type: select
+Level: medium
+Description: Prima di compilare un nuovo kernel, cosa fate come prima cosa ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: leggo il file Changes, upgrade delle glibc, init 1, rpm -e glibc
+Answer: leggo il file Changes
+
+Template: quiz/domanda97
+Argument: Filesystems
+Type: select
+Level: critical
+Description: E' saltata la corrente elettrica. Il server linux si è spento. Al reebot della macchina appare il messaggio INCONSENSTY DATA il quale vi indica che vi è un problema di consistenza dei dati. Quale comando utilizzate per cercare di riparare il filesystems della partzione /dev/sda1 ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: fsck.ext2 /dev/sda1, mkfs.ext2 /dev/sda1, mke2fs /dev/sda1, check /dev/sda1
+Answer: fsck.ext2 /dev/sda1
+
+Template: quiz/domanda98
+Argument: Filesystems
+Type: select
+Level: medium
+Description: Sul server è stato aggiunto un nuovo disco scsi. Quale comando usate per creare le partizioni sul nuovo disco ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: mdform, addpartition, fdisk, addisk
+Answer: fdisk
+
+Template: quiz/domanda99
+Argument: Filesystems
+Type: select
+Level: medium
+Description: Abbiamo formattato il floppy /dev/fd0 ed ora vogliamo creare sul floppy un filesystems di tipo ext2. Quale comando utilizzate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: mkfs.ext2 /dev/fd0, addfs.ext2 /dev/fd0, mkext2 /dev/fd0, fsadd.ext2 /dev/fd0
+Answer: mkfs.ext2 /dev/fd0
+
+Template: quiz/domanda100
+Argument: Device
+Type: select
+Level: medium
+Description: Ho compilato il kernel 2.4.17 con il supprto USB come modulo. Al momento stò lavorando con il kernel di default 2.4.5 il quale però non ha abilitato in nessun modo il supporto USB. Decido quindi di utilizzare il modulo USB del kernel 2.4.17, cosa ottengo da questa operazione ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: il corretto funzionamento, instabilità del modulo, instabilità del kernel, non è possibile utilizzare moduli di altre versione del kernel
+Answer: non è possibile utilizzare moduli di altre versione del kernel
+
+Template: quiz/domanda101
+Argument: Kernel
+Type: select
+Level: low
+Description: Il vostro collega vi ha riavviato il server ed ha lanciato un kernel che non è quello di default. Quale comando usate per sapere solo la versione di kernel impiegata ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: kernel -v, name -k, uname -a, uname -r
+Answer: uname -r
+
+Template: quiz/domanda102
+Argument: Boot
+Type: select
+Level: low
+Description: Quale tra questi è il log di sistema più importante ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: logs, kernel, messages, system.log
+Answer: messages
+
+Template: quiz/domanda103
+Argument: Boot
+Type: select
+Level: low
+Description: Volete visionare la schermata di boot di linux per vedere se vi sono problemi di conflitti. Quale comando usate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: boot, dmesg, list, show boot
+Answer: dmesg
+
+Template: quiz/domanda104
+Argument: Filesystems
+Type: select
+Level: low
+Description: State navigando all'interno del filesystems di linux. Siete entrati in una serie di directory e non vi ricordate più il percorso. Cosa fate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: lancio pwd, lancio whereami, lancio whereiam, lancio position
+Answer: lancio pwd
+
+Template: quiz/domanda105
+Argument: Process
+Type: select
+Level: low
+Description: Quale comando vi stampa a video la quantità d'uso della memoria di swap ? 
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: swap memory, memory,  free, show swap
+Answer: free
+
+Template: quiz/domanda106
+Argument: Process
+Type: select
+Level: low
+Description: Quale comando vi stampa un istantanea dei demoni che girano in memoria  in quell'istante ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: dlist,  ps, show demand, snapshot now
+Answer: ps
+
+Template: quiz/domanda107
+Argument: Device
+Type: select
+Level: low
+Description: Quale è il file di configurazione delle stampanti locali e di rete ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: spooler, printer, printcap, print.conf
+Answer: printcap
+
+Template: quiz/domanda108
+Argument: Device
+Type: select
+Level: low
+Description: Quale comando mi visualizza la coda di stampa ?
+Choices: lpspooler, lpq, lplist, lpcode
+Answer: lpq
+
+Template: quiz/domanda109
+Argument: Device
+Type: select
+Level: low
+Description: Il comando lprm a cosa serve ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: pulisce la coda di stampa, pulisce lo schermo, restituisce la lista dei file rimossi, visualizza i processi rimossi
+Answer: pulisce la coda di stampa
+
+Template: quiz/domanda110
+Argument: Device
+Type: select
+Level: low
+Description: Il comando cat pippo.txt server per ....
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: stampare il file pippo.txt, visualizzare il contenuto del file pippo.txt, rimuove tutte le righe del file pippo.txt, nessuna delle precedenti
+Answer: visualizzare il contenuto del file pippo.txt
+
+Template: quiz/domanda111
+Argument: Shell
+Type: select
+Level: low
+Description: Stò lavorando a riga di comando. Per sbalgio premo Alt+F4 e ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: appare il 4° terminale virtuale tty4, parte X, parte kde, parte gnome
+Answer: appare il 4° terminale virtuale tty4
+
+Template: quiz/domanda112
+Argument: Filesystems
+Type: select
+Level: critical
+Description: Quale file contiene la lista delle partizioni da montare al boot ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: part, mtab, fstab, listpart
+Answer: fstab
+
+Template: quiz/domanda113
+Argument: Filesystems
+Type: select
+Level: low
+Description: Quale file contiene la lista dei device montati in quell'istante ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: fstab, mtab, listpart, part 
+Answer: mtab
+
+Template: quiz/domanda114
+Argument: Filesystems
+Type: select
+Level: low
+Description: se da shell digito il comando mount, cosa appare a video ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: un errore, il cdrom, il floppy, i device montati
+Answer: i device montati
+
+Template: quiz/domanda115
+Argument: Text Processing
+Type: select
+Level: medium
+Description: Volete ricercare la parola pippo dentro il file minni.txt senza aprirlo o stamparlo a video. Quale comando utilizzate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: search, grep, find, analays
+Answer: grep
+
+Template: quiz/domanda116
+Argument: Shell
+Type: multiselect
+Level: low
+Description: Avete saputo dal vostro collega l'esistenza del comando less, ma non sapete come utilizzarlo correttamente. Quale comando vi può aiutare per darvi delle informazioni sul corretto utilizzo di less ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: howto, man, info, apropos
+Answer: man, info, apropos
+
+Template: quiz/domanda117
+Argument: Boot
+Type: select
+Level: medium
+Description: Avete installato il pacchetto pippo che è un utility per il ced. Tale pacchetto però generna un file di log di ampie dimensioni che nell' arco della giornata cresce vertiginosamente. Quale tecnica usate per evitare che questo file di log vi saturi tutto lo spazio su disco disponibile ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: rotazione automatica del log, verifica modulare del log, uso un redo log, uso una tecnica dei log chiamata log garbage
+Answer: rotazione automatica del log
+
+Template: quiz/domanda118
+Argument: X Environment
+Type: select
+Level: low
+Description: Volete settare la vostra stampante parallela utilizzando un tool grafico. Quale strumento pensate di impiegare?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: printset, xprint, xspool, printtool
+Answer: printtool
+
+Template: quiz/domanda119
+Argument: Process
+Type: select
+Level: low
+Description: Il vostro capo ufficio vi chiede di visualizzargli a video il numero dei processi zombie e un istantanea dello stato dei demoni che stanno girando in quel momento sul suo client linux. Quale comando utilizzereste ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: zomd, pszombie, top, zd
+Answer: top
+
+Template: quiz/domanda120
+Argument: Documentation
+Type: select
+Level: low
+Description: Il termine multiprocessing indica che ....
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: si hanno uno o pù processori, si hanno almeno due processori, non esiste, è un sinonimo di cpu
+Answer: si hanno almeno due processori
+
+Template: quiz/domanda121
+Argument: Process
+Type: select
+Level: medium
+Description: Il demone pippod non risponde più al vostro controllo. Il pid del demone è  16422. Quale comando è possibile impiegare per far terminare il demone pippod ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: kill -9 16422, term -9 16422, killer -9 16422, operazione impossibile
+Answer: kill -9 16422
+
+Template: quiz/domanda122
+Argument: Shell 
+Type: select
+Level: medium
+Description: Avete il file pippo.txt che ha una dimensione di 20Mbyte. Il vostro capo ufficio vi chiede il contenuto dell'ultima riga senza però aprire il file con il vim o altro editor di testo. Quale comando potete utilizzare per risolvere il problema ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: pico, more, tail, vi
+Answer: tail
+
+Template: quiz/domanda123
+Argument: Text Processing 
+Type: string
+Level: high
+Description: Avete il file pippo.txt che è stato salvato per sbaglio dalla segretaria come paperino.txt, ed in questo file ha modificato del testo. Scrivere il comando completo per creare un file chiamato variazioni.txt che contenga le differenze di  testo presenti.Non specificare nessun path per i files.(Sugg.  Il file primo file da analizzare è pippo.txt il secondo è paperino.txt)
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: diff pippo.txt paperino.txt > variazioni.txt
+
+Template: quiz/domanda124
+Argument: Shell
+Type: select
+Level: low
+Description: Siete l'utente root. Se scrivete da shell il comand cd ~ ottengo che ..
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: vado nella /root, un errore, vado nel kernelspace, vado nello userspace
+Answer: vado nella /root
+
+Template: quiz/domanda125
+Argument: Process
+Type: select
+Level: medium
+Description: Il vostro capo vi chiede di visualizzargli l'albero dei processi, in modo da avere una chiara visione di cosa gira sul suo client linux. Quale comando usate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tree, treeps, pstree, listtree
+Answer: pstree
+
+Template: quiz/domanda126
+Argument: Utility
+Type: select
+Level: high
+Description: Avete un problema di sincronizzazione dell'ora sul server. Volete schedulare che ad ogni ora il server si sincronizzi col sito clock.isc.org.Quale pacchetto dovete utilizzare per il sincronismo ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: sync, timesync, uptime, rdate
+Answer: rdate
+
+Template: quiz/domanda127
+Argument: Filesystems
+Type: string
+Level: medium
+Description: Voglio cancellare la directory /gestione con tutte le sottocartelle ed i documenti in essa contenuta. Scrivere il comando completo da shell che non mi chieda nessun tipo di conferma.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: rm -rf /gestione
+
+Template: quiz/domanda128
+Argument: Security
+Type: select
+Level: high
+Description: Siete sul vostro fileserver e volete vedere chi è loggato al server. Quale comando potete utilizzare ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: user, w, connect, list
+Answer: w
+
+Template: quiz/domanda129
+Argument: Security
+Type: select
+Level: high
+Description: Siete sul fileserver e volete vedere la quantità di tempo che la cpu dedica al processo gestione dell'utente pippo1. Quale comando utilizzate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: who, w, timeslice, connectslice
+Answer: w
+
+Template: quiz/domanda130
+Argument: Installation
+Type: select
+Level: high
+Description: Al termine dell'installazione di linux su un server che ospiterà il server di database oracle8i, quale operazione fareste per ottimizzare le prestazione di linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tolgo apache, tolgo squid, ricompilo il kernel, uso iptables
+Answer: ricompilo il kernel
+
+Template: quiz/domanda131
+Argument: Boot
+Type: string
+Level: high
+Description: Quale file vi potrebbe dare delle indicazioni su eventuali scansioni di porte fatte dal pacchetto nmap? Scrivere il file senza path.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: messages
+
+Template: quiz/domanda132
+Argument: Filesystems
+Type: select
+Level: high
+Description: Il vostro capo vi chiede di montargli sul suo client linux un secondo disco ide contenente window98. Al termine dell'operazione cercate di montare la partizione windows98 nella directory /win98 ma il filesystems risulta sconosciuto. Dove possiamo intervenire per risolvere il problema ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX
+Choices: kernel, filesystems, kernelspace, e2fsprogs
+Answer: kernel
+
+Template: quiz/domand133
+Argument: Shell
+Type: select
+Level: low
+Description: Volete creare il file pippo.txt senza usare nessun editor di testo. Quale comando utilizzate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: newfile, touch, create, edit
+Answer: touch
+
+Template: quiz/domanda134
+Argument: Shell
+Type: select
+Level: low
+Description: Quale comando vi sposta un file da una directory all'altra ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: cp, copy, move, mv
+Answer: mv
+
+Template: quiz/domanda135
+Argument: Shell
+Type: select
+Level: low
+Description: Quale comando vi stampa a video la data corrente comprensiva di ora ?
+Choices: timer, now, time, date
+Answer: date
+
+Template: quiz/domanda136
+Argument: Security
+Type: select
+Level: high
+Description: Quale tra questi file memorizza in modalità criptata tutti i login avvenuti ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: access, wtmp, intruder, linux.access
+Answer: wtmp
+
+Template: quiz/domanda137
+Argument: Security
+Type: select
+Level: high
+Description: Quale comando stampa a video tutti i login avvenuti in linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: access, logon, showlogon, last
+Answer: last
+
+Template: quiz/domanda138
+Argument: Installation
+Type: select
+Level: critical
+Description: Prima di installare madeinlinux su un server, cosa fate ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: telefono alla MLX, aumento la quantità di ram sul server, inserisco il controller raid, verifico la compatibilità hardware con linux delle componenti
+Answer: verifico la compatibilità hardware con linux delle componenti
+
+Template: quiz/domanda139
+Argument: Installation
+Type: select
+Level: high
+Description: Volete fare un acquisto di 10 server professionali ed installare poi linux.Cosa chiedete al vostro fornitore ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: server certificati linux, server con Madeinlinux4.0 installata, licenza GPL, sistema di ridondanza cluster opensource di linux
+Answer: server certificati linux
+
+Template: quiz/domanda140
+Argument: Shell
+Type: select
+Level: low
+Description: Il vostro capo vi chiede di visualizzargli a video solo le prime 10 righe del file di testo pippo.txt senza utilizzare nessun tipo di editor di testo. Quale comando usate?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: showtest, vimtest, head, first
+Answer: head
+
+Template: quiz/domanda141
+Argument: Shell
+Type: select
+Level: low
+Description: Quale comando vi dice da quante ora il server è acceso ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: time, up, uptime, lifeon
+Answer: uptime
+
+Template: quiz/domanda142
+Argument: Installation
+Type: select
+Level: high
+Description: In fase di installazione vi accorgete che il bios del pc non supporta il boot da cdrom. Come potete fare quindi per installare madeinlinux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: chiamo MLX, compro un nuovo pc, faccio l'upgrade del bios,  creo un floppy per il boot di madeinlinux
+Answer: creo un floppy per il boot di madeinlinux
+
+Template: quiz/domanda143
+Argument: Device
+Type: select
+Level: medium
+Description: Avete installato un masterizzatore ide su un client linux. Nel momento in cui lanciate il pacchetto X-cd-roast per duplicare un cd vi accorgete che linux non vede il masterizzatore. Che supporto non è stato abilitato ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: scsi emulation, cdrw emulation, joliet support, iso9660 support
+Answer: scsi emulation
+
+Template: quiz/domanda144
+Argument: Security
+Type: select
+Level: critical
+Description: Quali strumenti utilizzereste di teleassistenza in sostituzione al telnet ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: Tng-Unicenter, rlogin, openssh, Citrix MetaFrame
+Answer: openssh
+
+Template: quiz/domanda145
+Argument: Boot
+Type: select
+Level: low
+Description: Quale comando vi informa in quale runlevel siete in questo momento ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: now, runlevel, level, state on
+Answer: runlevel
+
+Template: quiz/domanda146
+Argument: Documentation
+Type: select
+Level: low
+Description: Il vostro capo ufficio ha deciso di acquistare una serie di scanner per il reparto marketing. Prima di effettuare l'ordine lo consigliate di visitare un sito che elenca  le compatibilità di tutti gli scanner con linux. Quale è questo sito ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: www.mostang.com/sane, www.google.com, www.linux.org, www.acl.net
+Answer: www.mostang.com/sane
+
+Template: quiz/domanda147
+Argument: Boot
+Type: select
+Level: low
+Description: Il comando init viene utilizzato per ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: spostarsi tra i vari run level, inizializzare un processo, modificare un interrupt per un device, è una combinaizone di flag
+Answer: spostarsi tra i vari run level
+
+Template: quiz/domanda148
+Argument: Device
+Type: select
+Level: low
+Description: Il device /dev/ttyS0 è l'equivalente in ambiente microsoft di ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: LPT1, COM0, COM1, LPT0
+Answer: COM1
+
+Template: quiz/domanda149
+Argument: Device
+Type: select
+Level: low
+Description: Il device /dev/lp0 è l'equivalente in ambiente microsoft di ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: LPT0, LPT1, LPT2, COM0
+Answer: LPT1
+
+Template: quiz/domanda150
+Argument: Shell
+Type: select
+Level: medium
+Description: Quale comando viene utilizzato per creare un link hard?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: ln -s, ln, ln -h, ln -hard
+Answer: ln
+
+Template: quiz/domanda151
+Argument: Filesystems
+Type: string
+Level: high
+Description: Quale tipo di partizione o file viene impiegato per creare la memoria virtuale in linux ? Scrivere solo il nome senza articoli.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: swap
+
+Template: quiz/domanda152
+Argument: Documentation
+Type: select
+Level: low
+Description: Linux è un O.S. Plug & Play come Windows98 ma non supporta l' USB.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tutto vero, tutto falso, in parte vero, in parte falso
+Answer: tutto falso
+
+Template: quiz/domanda153
+Argument: Documentation
+Type: select
+Level: low
+Description: Linux è un O.S. che non può girare sui processori a 64 bit.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tutto vero, tutto falso, i 64 bit sono una tecnologia sperimantale, altro
+Answer: tutto falso
+
+Template: quiz/domanda154
+Argument: Documentation
+Type: select
+Level: low
+Description: Linux è un O.S. completamente intoccabile dai virus informatici.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tutto vero, tutto falso, in parte vero, dipende dalla versione di kernel di linux
+Answer: in parte vero
+
+Template: quiz/domanda155
+Argument: Installation
+Type: select
+Level: high
+Description: Dopo aver installato madeinlinux sul pc abbiamo a disposizione 30 giorni per registrare la licenza, dopo di che linux non parte più all'avvio del pc.
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tutto vero, tutto falso, in parte vero, in parte falso
+Answer: tutto falso
+
+Template: quiz/domanda156
+Argument: Documentation
+Type: select
+Level: low
+Description: Nell'inserire un server samba linux in una lan con 10 client W98, dobbiamo acquistare 10 licenze CAL dalla Microsoft
+Description-de: XXXXXXX XXXXXXX XXXXXXX
+Choices: tutto vero, tutto falso, in parte vero, a discrezione della Microsoft
+Answer: tutto falso
+
+Template: quiz/domanda157
+Argument: Security
+Type: select
+Level: high
+Description: Il vostro capo vi chiede l'elenco delle password dei dipendenti. Per il dipendente pippo non ricordate più la password e senza consultarlo utilizzate uno sniffer per venire a conoscenza della password. Il vostro approccio è ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: completamente errato, perfetto, ammirevole, professionale
+Answer: completamente errato
+
+Template: quiz/domanda158
+Argument: Filesystems
+Type: select
+Level: high
+Description: Il vostro capo ufficio stanco delle lamentale dell'ufficio marketing vi chiede di impostare il quota per tutti i dipendenti. Cosa fate come prima cosa per abilitare il quoting users ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: creo quota.conf, compilo il kernel, modifico la /home, cambio i permessi di tutti i dipendenti
+Answer: compilo il kernel
+
+Template: quiz/domanda159
+Argument: Shell
+Type: select
+Level: low
+Description: Il comando cat pippo.txt serve per ...
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: stampare a video il contenuto del file pippo.txt, effettuare un pending, creare un device, effettuare il tunneling
+Answer: stampare a video il contenuto del file pippo.txt
+
+Template: quiz/domanda160
+Argument: Networking
+Type: select
+Level: high
+Description: Volete disabilitare la nic per un minuto. Quale script possiamo usare ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: net stop, network stop, nic stop, ifconfig stop
+Answer: network stop
+
+Template: quiz/domanda161
+Argument: X Environment
+Type: select
+Level: low
+Description: Il vostro capo vuole lanciare IceWM con il comando init x, cosa accade ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: tutto ok, si formatta il disco, messaggio d'errore, appare una stringa per l'uso
+Answer: appare una stringa per l'uso
+
+Template: quiz/domanda162
+Argument: Networking
+Type: select
+Level: low
+Description: Quale comando visualizza a video il nome del host linux ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: host, hostname, namehost, show name
+Answer: hostname
+
+Template: quiz/domanda163
+Argument: Kernel
+Type: select
+Level: medium
+Description: Quale comando carica un modulo controllando le sue dipendenze ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Choices: findmod, modprobe, checkmod, infomod
+Answer: modprobe
+
+Template: quiz/domanda164
+Argument: Kernel
+Type: string
+Level: low
+Description: Quale è il comando che mi permette di compilare il kernel tramite un interfaccia grafica ma da shell ?
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: make menuconfig
+
+Template: quiz/domanda165
+Argument: Permission
+Type: string
+Level: low
+Description: Quale è il file di configurazione che gestisce i gruppi ? Specificare il path completo (es: /opt/pippo.txt)
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: /etc/group
+
+Template: quiz/domanda166
+Argument: Permission
+Type: string
+Level: low
+Description: Quale è il file di configurazione che gestisce il comportamento del daemon sshd? Specificare il path completo (es: /opt/pippo.txt)
+Description-de: XXXXXXX XXXXXXX XXXXXXX?
+Answer: /etc/ssh/sshd_config

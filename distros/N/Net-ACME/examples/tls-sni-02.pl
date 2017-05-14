@@ -14,7 +14,7 @@ use Net_ACME_Example ();
 
 Net_ACME_Example::do_example(
     sub {
-        my ( $domain, $cmb_ar, $key_jwk ) = @_;
+        my ( $domain, $cmb_ar, $reg ) = @_;
 
         return if @$cmb_ar > 1;
 
@@ -23,7 +23,7 @@ Net_ACME_Example::do_example(
         return if $c->type() ne 'tls-sni-02';
 
         my $token  = $c->token();
-        my $kauthz = $c->make_key_authz( $key_jwk );
+        my $kauthz = $c->make_key_authz( $reg->key() );
 
         my @sans = map {
             my $sha = Digest::SHA::sha256_hex($_);

@@ -1,6 +1,31 @@
 package warnings::register;
 
-our $VERSION = '1.01';
+our $VERSION = '1.04';
+require warnings;
+
+# left here as cruft in case other users were using this undocumented routine
+# -- rjbs, 2010-09-08
+sub mkMask
+{
+    my ($bit) = @_;
+    my $mask = "";
+
+    vec($mask, $bit, 1) = 1;
+    return $mask;
+}
+
+sub import
+{
+    shift;
+    my @categories = @_;
+
+    my $package = (caller(0))[0];
+    warnings::register_categories($package);
+
+    warnings::register_categories($package . "::$_") for @categories;
+}
+1;
+__END__
 
 =pod
 
@@ -16,36 +41,6 @@ warnings::register - warnings import function
 
 Creates a warnings category with the same name as the current package.
 
-See L<warnings> and L<perllexwarn> for more information on this module's
-usage.
+See L<warnings> for more information on this module's usage.
 
 =cut
-
-require warnings;
-
-sub mkMask
-{
-    my ($bit) = @_;
-    my $mask = "";
-
-    vec($mask, $bit, 1) = 1;
-    return $mask;
-}
-
-sub import
-{
-    shift;
-    my $package = (caller(0))[0];
-    if (! defined $warnings::Bits{$package}) {
-        $warnings::Bits{$package}     = mkMask($warnings::LAST_BIT);
-        vec($warnings::Bits{'all'}, $warnings::LAST_BIT, 1) = 1;
-        $warnings::Offsets{$package}  = $warnings::LAST_BIT ++;
-	foreach my $k (keys %warnings::Bits) {
-	    vec($warnings::Bits{$k}, $warnings::LAST_BIT, 1) = 0;
-	}
-        $warnings::DeadBits{$package} = mkMask($warnings::LAST_BIT);
-        vec($warnings::DeadBits{'all'}, $warnings::LAST_BIT++, 1) = 1;
-    }
-}
-
-1;

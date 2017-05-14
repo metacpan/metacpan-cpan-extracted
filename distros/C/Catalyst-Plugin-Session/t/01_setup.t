@@ -4,17 +4,19 @@ use strict;
 use warnings;
 
 use Test::More tests => 10;
-use Test::MockObject;
+use Class::MOP;
 use Test::Deep;
 
 my $m;
 BEGIN { use_ok( $m = "Catalyst::Plugin::Session" ) }
 
 my %config;
-my $log      = Test::MockObject->new;
+my $log_meta = Class::MOP::Class->create_anon_class(superclasses => ['Moose::Object']);
+my $log      = $log_meta->name->new;
 my @mock_isa = ();
 
-$log->set_true("fatal");
+my $calls = 0;
+$log_meta->add_method("fatal" => sub { $calls++; 1; });
 
 {
 
@@ -41,7 +43,7 @@ like(
     "can't setup an object that doesn't use state/store plugins"
 );
 
-$log->called_ok( "fatal", "fatal error logged" );
+is $calls, 1, 'Fatal error logged';
 
 @mock_isa = qw/Catalyst::Plugin::Session::State/;
 eval { MockCxt->new->setup };
@@ -53,17 +55,17 @@ eval { MockCxt->new->setup };
 like( $@, qr/requires.*(?:State)/i,
     "can't setup an object that doesn't use state/store plugins" );
 
-$log->clear;
+$calls = 0;
 
 @mock_isa =
   qw/Catalyst::Plugin::Session::State Catalyst::Plugin::Session::Store/;
 eval { MockCxt->new->setup };
 ok( !$@, "setup() lives with state/store plugins in use" );
-ok( !$log->called("fatal"), "no fatal error logged either" );
+is( $calls, 0, "no fatal error logged either" );
 
 cmp_deeply(
-    [ keys %{ $config{session} } ],
-    bag(qw/expires verify_address/),
+    [ keys %{ $config{'Plugin::Session'} } ],
+    bag(qw/expires verify_address verify_user_agent expiry_threshold/),
     "default values for config were populated in successful setup",
 );
 

@@ -1,0 +1,31 @@
+---
+abstract: 'Plack middleware to identify bots and spiders'
+author:
+  - 'chromatic <chromatic@wgz.org>'
+build_requires:
+  HTTP::Message::PSGI: '0'
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-BotDetector
+requires:
+  Plack::Middleware: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/chromatic/Plack-Middleware-BotDetector/issues
+  repository: git://github.com/chromatic/Plack-Middleware-BotDetector.git
+version: 1.20170315.1614
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

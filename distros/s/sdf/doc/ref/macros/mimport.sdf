@@ -1,0 +1,39 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: import Macro
+
+H2: Interface
+
+!macro_interface "import"
+
+H2: Description
+
+The {{import}} macro imports a figure. If the filename is not given
+an extension, the extension is found using the search rules below.
+
+!block table
+When_generating     The_search_order_is
+PostScript          epsi, eps, wmf, mif, gif
+HTML                jpeg, jpg, png, gif
+Windows Help        bmp
+!endblock
+
+The {{title}} argument can be used to add a figure title.
+
+See {{Figures}}
+within the {{DOC:SDF User Guide}} for further details.
+
+H2: Examples
+
+#H2: Limitations & Future Directions

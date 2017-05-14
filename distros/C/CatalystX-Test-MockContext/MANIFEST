@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CatalystX/Test/MockContext.pm
+t/00-compile.t
+t/100-basic.t
+t/author-critic.t
+t/lib/MyApp.pm
+t/lib/MyApp/Controller/Root.pm
+t/lib/OtherApp.pm
+t/lib/OtherApp/Controller/Root.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-synopsis.t

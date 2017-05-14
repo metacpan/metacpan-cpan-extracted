@@ -1,0 +1,12 @@
+CONTRIBUTING.md
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+dist.ini
+lib/Math/Tau.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/test.t
+weaver.ini

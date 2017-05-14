@@ -1,0 +1,213 @@
+#!/usr/bin/perl
+#
+# tuidemo
+# (c) 1999 R.F. Lens
+#
+
+use Tui;
+use Curses;
+
+Tui::init;
+Tui::background(3);
+Tui::xyprint(1,0,"Tui demo",3,1);
+Tui::xyprint(1,1,"(c) 1999 R.F. Lens",3);
+
+refresh;
+&menu;
+endwin;
+
+print "Thank you for using Tui\nByt bye...\n";
+
+# EOP
+
+sub menu {
+  my ($menu) = new Tui::Menubar;
+  my ($result,$menuno,$menuentry);
+
+  $menu->add("File","Quit");
+  $menu->add("Demos","msgbox","yesnobox","okcancelbox","entrybox","form","editarea");
+  $menu->add("Help","About","Help");
+  
+  while (1) {
+    ($menuno,$menuentry) = $menu->run;
+    ($menuno == 0 && $menuentry == 0) && (last);
+    if ($menuno == 1) {
+      ($menuentry == 0) && (&msgbox);
+      ($menuentry == 1) && (&yesnobox);
+      ($menuentry == 2) && (&okcancelbox);
+      ($menuentry == 3) && (&entrybox);
+      ($menuentry == 4) && (&form);
+      ($menuentry == 5) && (&editarea);
+    }
+    ($menuno == 2 && $menuentry == 0) && (&about);
+  }
+}
+
+sub msgbox {
+  Tui::msgbox("Message box",
+    "This is a simple message box,\nYou can display some text");
+}
+
+sub yesnobox {
+  if (Tui::yesnobox("Question","Do you really like Tui?")) {
+    Tui::msgbox("Result","So you really like Tui.");
+  } else {
+    Tui::msgbox("Result","Email me why you don't like it.");
+  }
+}
+
+sub okcancelbox {
+  if (Tui::okcancelbox("Are you sure","Do you want to format the drave?")) {
+    Tui::msgbox("Result","Now your harddisk is spic and span;)");
+  } else {
+    Tui::msgbox("Result","Smart decision");
+  }
+}
+
+sub entrybox {
+  my ($result,$entry);
+  $entry = Tui::entrybox("Entrybox","Just enter something here","Go:");
+  Tui::msgbox("Result","You entered '$entry'.");
+  ($entry,$result) = Tui::entrybox("Entrybox",
+    "This one is with the password flag set\nand with a cancel button",
+    "Password:",20,20,1,1);
+  if (!$result) {
+    Tui::msgbox("Result","You pressed cancel!");
+  } else {
+    Tui::msgbox("Result","You pressed OK\nand entered '$entry'.");
+  }
+}
+
+sub form {
+
+  # checkboxes
+  my ($l2) = new Tui::Label("Check boxes:",2,1);
+  my ($cb1) = new Tui::Checkbox("checkbox 1",2,2);
+  my ($cb2) = new Tui::Checkbox("checkbox 2",2,3);
+
+  # radio buttons
+  my ($l3) = new Tui::Label("Radio boxes:",2,5);
+  my ($rb1) = new Tui::Radiobutton("radio 1",2,7);
+  my ($rb2) = new Tui::Radiobutton("radio 2",2,8);
+  my ($rb3) = new Tui::Radiobutton("radio 3",2,9);
+  my ($rg) = new Tui::Radiogroup($rb1,$rb2,$rb3);
+  $rg->set(1);
+  my ($rbox) = new Tui::Box(1,6,13,5,0,0);
+
+  my ($l4) = new Tui::Label("Listbox:",2,12);
+  my ($listbox) = new Tui::Listbox("",1,13,15,6);
+  $listbox->add(qw( dove bear monkey cat dog bee snake walrus whale dog));
+
+  my ($l5) = new Tui::Label("Multiple listbox:",19,1);
+  my ($mlistbox) = new Tui::Mlistbox("",18,2,15,6);
+  $mlistbox->add(qw( dove bear monkey cat dog bee snake walrus whale dog));
+  $mlistbox->set(1,4,5);
+
+  my ($l6) = new Tui::Label("Dropbox:",19,9);
+  my ($dropbox) = new Tui::Dropbox(19,10,15,6);
+  $dropbox->add(qw( dove bear monkey cat dog bee snake walrus whale dog));
+
+  my ($l7) = new Tui::Label("Spinner",19,12);
+  my ($spinner) = new Tui::Spinner("Value",19,13,10,1);
+
+  my ($l8) = new Tui::Label("Entryfields:",19,15);
+  my ($entry) = new Tui::Entryfield("Normal  :",19,16,20,40);
+  my ($password) = new Tui::Passwordfield("Password:",19,17,20,40);
+
+  my ($l9) = new Tui::Label("View area:",38,1);
+  my ($viewarea) = new Tui::Viewarea(38,2,20,13,1);
+  $viewarea->set(&sometext);
+
+  my ($ok) = new Tui::Button("OK",53,16);
+
+  my ($form) = new Tui::Form("A form",1,1,60,19,1);
+  $form->exitonaltenter;
+  $form->add($cb1,$cb2,$rb1,$rb2,$rb3,$rbox,$listbox,$mlistbox);
+  $form->add($dropbox,$spinner,$entry,$password,$viewarea,$ok);
+  $form->add($l2,$l3,$l4,$l5,$l6,$l7,$l8,$l9);
+
+
+
+  my ($result,$widgetno) = $form->run;
+}
+
+
+sub editarea {
+  my ($label) = new Tui::Label(
+    "This is an editarea. Use the cursorkeys to move around\n" .
+    "and enter text. The backspace works as expected and alt-d\n" .
+    "works as the del key. Alt-a is home and alt-e end.",1,1);
+
+  my ($editarea) = new Tui::Editarea(1,4,61,11,1);
+  $editarea->set("");
+  my ($ok) = new Tui::Button("OK",58,16);
+
+  my ($form) = new Tui::Form("Editarea",1,1,64,19,1);
+  $form->add($label,$editarea,$ok)->exitonaltenter->run;
+}
+
+sub sometext {
+  return
+  "Tui\n" .
+  "A text user interface toolkit" .
+  "\n" .
+  "Tui is an object oriented toolkit\n"   .
+  "That provides various widgets which\n" .
+  "which will make your program look quite\n" .
+  "nice (if I may be so humble;).\n" .
+  "\n" .
+  "It was inspired by the PV module by Ashish Gulhati.\n" .
+  "I tried extending his version but wasn't very keen\n" .
+  "using an array to store object attributes in.\n" .
+  "I prefer an anonymous hash for that. It has the\n" .
+  "advantage that you can name the variables.\n" .
+  "Nevertheless a lot of credit goes to him." .
+  "\n" .
+  "It relies heavily on the Curses module.\n" .
+  "\n" .
+  "It has quite a lot of widgets:\n" .
+  "Labels\n" .
+  "Buttons\n" .
+  "Checkboxes\n" .
+  "Radiobuttons\n" .
+  "Listboxes\n" .
+  "Multiple listboxes\n" .
+  "Dropdown boxes\n" .
+  "Spinners\n" .
+  "Entryfields\n" .
+  "Passwordfields\n" .
+  "Viewareas\n" .
+  "Editareas\n" .
+  "\n" .
+  "It also provides some basic dialogs:\n" .
+  "Messageboxes\n" .
+  "Yes/No boxes\n" .
+  "OK/Cancel boxes\n" .
+  "Entry boxes\n" .
+  "\n" .
+  "If you want to email me, my address is\n" .
+  "ronald\@ronaldlens.com\n" .
+  "My homepage is http://www.ronaldlens.com";
+}
+
+sub about {
+  my ($label) = new Tui::Label("About tuidemo",2,1);
+  my ($ok) = new Tui::Button("OK",18,7);
+  my ($form) = new Tui::Form("About",1,1,40,12,1);
+  $form->add($label,$ok)->draw;
+  
+  foreach (2..37) {
+    $form->xyprintchar(ACS_HLINE,$_,5,1);
+  }
+  refresh($form->getwin);
+  my ($x);
+  foreach (2..37) {
+    $form->xyprintchar(ACS_HLINE,$_,5,1);
+    $form->xyprintchar('*',$_ + 1,5,1);
+    refresh($form->getwin);
+    select(undef,undef,undef,0.01);
+  }
+  $form->run;
+
+
+}

@@ -3,7 +3,7 @@ package GSM::SMS::OTA::Config;
 require Exporter;
 @ISA = qw(Exporter);
 
-$VERSION = '0.1';
+$VERSION = "0.161";
 
 @EXPORT = qw(	OTA_BEARER_CSD 
 				OTA_BEARER_SMS

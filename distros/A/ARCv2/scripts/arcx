@@ -1,0 +1,310 @@
+#!perl
+use strict;
+use Getopt::Std;
+use Config::IniFiles;
+use Arc::Connection::Client;
+use Term::ReadKey;
+use Term::ReadLine;
+
+my %args;
+
+$SIG{KILL} = \&interrupt;
+$SIG{INT}  = \&interrupt;
+$SIG{TERM} = \&interrupt;
+$SIG{HUP} = \&interrupt;
+
+getopts("01S:l:nh:s:p:L:r:t:vaA:uU:wW:f:FC:V",\%args) || usage("Wrong parameter construction.");
+
+usage() if $args{V};
+
+usage("Timeout value must be numeric.") if (defined $args{t} && $args{t} !~ /^\d+$/);
+usage("If using -r, a string must be appended.") if (defined $args{r} && length($args{r}) == 0);
+usage("Port must be a number correct number.") if (defined $args{p} && $args{p} != 1 && $args{p} !~ /^\d+$/);
+usage("Logging destination not chosen correctly.") if (defined $args{L} && ($args{L} ne "syslog" && $args{L} ne "stderr"));
+
+$args{t} = defined $args{t} ? $args{t} : undef;
+$args{l} = defined $args{l} ? $args{l} : 0;
+$args{L} = defined $args{L} ? $args{L} : 'stderr';
+$args{S} = defined $args{S} ? $args{S} : 'arc';
+$args{f} = defined $args{f} && $args{f} ne "" ? $args{f} : $ENV{HOME}.'/.archistory';
+$args{C} = defined $args{C} && $args{C} ne "" ? $args{C} : $Arc::ConfigPath.'/arcx.conf';
+
+my $intact = !@ARGV;
+my $stop = 0;
+
+my @server_list;
+
+if ($args{h}) {
+	push @server_list, $args{h}.($args{p} ? ":".$args{p} : "");
+# only use the cmd2server maplist, when we have a command given
+} elsif (!$intact && $args{C}) {
+	unless (-e $args{C}) {
+		err("Configfile $args{C} not found.");
+	} else {
+		my $cf = new Config::IniFiles( -file => $args{C});
+		my $err = @Config::IniFiles::errors;
+		usage($err) if $err;
+
+		foreach ($cf->Parameters('server_command_map')) {
+			my ($host,$cmdlist) = ($_,$cf->val('server_command_map',$_));
+			push @server_list, $host
+				if $cmdlist eq '*' || grep( { $_ eq $ARGV[0] } split(/[,:;]/, $cmdlist));
+		}
+	}
+}
+
+push @server_list, "$Arc::DefaultHost:$Arc::DefaultPort" unless @server_list;
+
+my $retval = 0;
+
+verbout("Will try the following server: ",join(", ",@server_list));
+
+foreach (@server_list) {
+	($args{h},$args{p}) = split(/:/,$_);
+
+
+	verbout("connecting to '$args{h}:$args{p}'");
+	verbout("timeout is set to '$args{t}'");
+	verbout("loglevel is set to '$args{l}'");
+	verbout("log output will go to '$args{L}'");
+	verbout("using service name '$args{S}'");
+
+	if (defined $args{s}) {
+		verbout("authentication mechanism forced by client: '$args{s}'");
+	} else {
+		verbout("we let the server choose the authentication mechanism.");
+	}
+	my $arc = new Arc::Connection::Client(
+		server => $args{h},
+		port => $args{p},
+		timeout => $args{t},
+		loglevel=> $args{l},
+		logdestination => $args{L},
+		service => $args{S},
+		sasl_mechanism => $args{s},
+		sasl_cb_user => \&username,
+		sasl_cb_auth => \&authname,
+		sasl_cb_pass => \&password,
+		protocol => $args{0} ? 0 : 1,
+	);
+
+	if (my $msg = $arc->IsError()) {
+		err($msg);
+		$retval = 1;
+		next;
+	}
+	if ($arc->StartSession) {
+		err("You are authenticated to $arc->{server}:$arc->{port} using $arc->{sasl_mechanism}.") if $args{n} || $intact || $args{v};
+
+		if ($intact) {
+			my $term = new Term::ReadLine 'ARCv2 Terminal';
+
+# Read from history
+			unless ($args{F}) {
+				unless (open(FH,"<$args{f}")) {
+					err("Cannot read from history file: $args{f}. (",$!,")");
+				} else {
+					while (<FH>) {
+						s/[\n\r]//g;
+						$term->AddHistory($_);
+					}
+					close (FH);
+				}
+			}
+
+			while (!$stop && $arc->IsConnected()) {
+				$_ = $term->readline("ARC> ");
+				last unless defined $_;
+				next unless $_;
+
+				last if ($_ eq "\\q");
+
+				if ($_ eq "?") {
+					showhelp();
+					next;
+				}
+				addhistoryfile($_);
+				while (!$arc->ProcessCommand($_)) {
+					err($arc->IsError());
+					unless ($arc->IsConnected) {
+						err("Try to reconnect.");
+						my $end = $arc->StartSession();
+						err($arc->IsError()) unless $end;
+						last unless $end;
+					} else {
+						last;
+					}
+				}
+			}
+
+		} elsif (!defined $args{r}) {
+			addhistoryfile(@ARGV);
+			unless ($arc->ProcessCommand(@ARGV)) {
+				err($arc->IsError());
+				$retval = 1;
+				next;
+			}
+		} else {
+			addhistoryfile(@ARGV);
+			if ($arc->CommandStart(@ARGV)) {
+				if ($arc->CommandWrite($args{r})) {
+					$arc->CommandEOF();
+					while ($_ = $arc->CommandRead()) {
+						print $_;
+					}
+					unless ($arc->CommandEnd()) {
+						err($arc->IsError());
+						$retval = 1;
+						next;
+					}
+				} else {
+					err($arc->IsError());
+					$retval = 1;
+					next;
+				}
+			} else {
+				err($arc->IsError());
+				$retval = 1;
+				next;
+			}
+		}
+		$arc->Quit();
+	} else {
+		err("Could not connect to '$args{h}:$args{p}': ",$arc->IsError());
+		$retval = 1;
+		next;
+	}
+	verbout("Available SASL mechanisms return by the server: ",join(", ",@{$arc->{server_sasl_mechanisms}}));
+	last;
+}
+
+exit $retval;
+
+sub showhelp
+{
+	print <<EOT;
+internal command for this client:
+  ?      for this help
+  \\q,^D  quit
+EOT
+}
+
+sub usage
+{
+	my $msg = shift;
+	print STDERR <<EOT;
+$msg
+$0 [-h <hostname>] [-p <port>] [-l <loglevel]
+   [-L <logdestination] [-n] [-v] [-S <service>]
+   [-F -f <history>] [-u|-U <username>] [-a|-A <authname>]
+   [-w|-W <password>] [-s <mech>] [-t <timeout in sec>]
+   [-r <string>] [-V] [-C <conffile>] [command [command-arguments]]
+
+  (Remark: Some parameters behave different in comparison to the old arc)
+
+  -h <hostname>    specify the ARCv2 server
+  -p <port>        port to connect (default: $Arc::DefaultPort)
+  -t <timeout>     specify the timeout in seconds (default: 30 secs)
+  -0               use old protocol type (unencrypted protocol conn.)
+  -C <conffile>    use <conffile> as source for server-command-mapping.
+                   (default: $Arc::ConfigPath/arcx.conf)
+
+  -r <string>      use this string as stdin value for the command
+
+  -S <service>     name of the service used for arc auth (default: arc)
+  -s <mech>        use <mech> as authentication mechanism for SASL
+  -n               do nothing, just try to authenticate
+  -v               be verbose
+
+  -U <username>    username for authentication (dep. on SASL mechanism)
+  -u               ask for username
+  -A <authz name>  username for authorization (dep. SASL mechanism)
+  -a               ask for authname
+  -W <password>    password (dep. on SASL mechanism)
+  -w               ask for password
+
+  -f <history>     filename for command history (def: $ENV{HOME}/.archistory)
+  -F               don't add commands to the history file
+
+  -l <loglevel>    loglevel (see man Arc) (default: 0, error msgs will be on stderr)
+  -L <logdest>     log destination (possible values: 'syslog' (def) or 'stderr')
+  -V               display version information
+
+$Arc::Copyright
+$Arc::Contact
+EOT
+
+	exit 1;
+}
+
+
+sub username
+{
+	if (defined $args{U} && $args{U} ne "") {
+		return $args{U};
+	} elsif (defined $args{u}) {
+		print STDERR "Enter your username: "; return <STDIN>;
+	} else {
+		return $ENV{'USER'};
+	}
+}
+
+sub authname
+{
+	if (defined $args{A} && $args{A} ne "") {
+		return $args{A};
+	} elsif (defined $args{a}) {
+		print STDERR "Enter your name for authorization: "; return <STDIN>;
+	} else {
+		return $ENV{'USER'};
+	}
+}
+
+sub password
+{
+	if (defined $args{P} && $args{P} ne "") {
+		return $args{P};
+	} elsif (defined $args{p}) {
+		print STDERR "Enter your password: ";
+		ReadMode 2;
+		my $pw = <STDIN>;
+		ReadMode 0;
+		return $pw;
+	} else {
+		return $ENV{'USER'};
+	}
+}
+
+sub verbout
+{
+	err("verbose:",@_) if $args{v};
+}
+
+sub err
+{
+	print STDERR join(" ",@_),"\n";
+	1;
+}
+
+sub interrupt
+{
+	my $sig = shift;
+
+	verbout("Received signal: $sig.");
+	$stop = 1;
+
+	undef;
+}
+
+sub addhistoryfile
+{
+	unless ($args{F}) {
+		unless (open(FH,">>$args{f}")) {
+			$args{F} = 1;
+			err("Cannot write to history file: $args{f}. (",$!,")");
+			return;
+		}
+		print FH join(" ",@_),"\n";
+		close (FH);
+	}
+}

@@ -25,6 +25,10 @@ t/060tableinfo2.t
 t/061columninfo.t
 t/063trailingzerobytes.t
 t/064defaultvalues.t
+t/065nestedselect.t
+t/066wholeblobread.t
+t/067primary_keyinfo.t
+t/068foreign_keyinfo.t
 t/100connectproperties.t
 t/101connect_cached.t
 t/102driverdatasource.t
@@ -59,6 +63,8 @@ t/138severalstmts.t
 t/139fetchAllTypes.t
 t/142UndefParameter.t
 t/143BooleanTypeHandling.t
+t/144simpleunicode.t
+t/145simple8bitascii.t
 t/lib.pl
 t/MaxDB.dbtest
 t/MaxDB.mtest
@@ -75,3 +81,4 @@ t/mysql_50chopblanks.t
 t/mysql_50commit.t
 t/mysql_akdbd.t
 t/mysql_dbdadmin.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,130 +1,110 @@
-package Language::Indonesia;
-
-
-
-use Exporter;
+package Indonesia;
 use Filter::Simple;
 use strict;
-our @ISA = 'Exporter';
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Language::Indonesia ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-
-# our %EXPORT_TAGS = ( 'all' => [ qw() ] );
-
-# our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 
+our $VERSION = '0.0.2';
 
+FILTER{
 
-our @EXPORT = qw(
-cetak
-potong
-karakter
-ordinal
-enkripsi
-heksadesimal
-kecil_pertama
-balikan
+my %scalar_string = (
+'panjang' => 'length',
+'potong' => 'chop',
+'potongkan' => 'chomp',
+'karakter' => 'chr',
+'sandi' => 'crypt',
+'huruf kecil' => 'lc',
+'huruf besar' => 'uc',
+'ordinal' => 'ord',
+'pak' => 'pack',
+'balikan' => 'reverse',
+'sub string' => 'substr',
+'cetak' => 'print',
+'format_cetakan' => 'printf'
 );
 
-our $VERSION = '0.01';    # pre-alpha
+my %function = (
+'absolut' => 'abs',
+'tangen' => 'atan2',
+'kosinus' => 'cos',
+'pangkat' => 'exp',
+'heksadesimal' => 'hex',
+'integer' => 'int',
+'logaritma' => 'log',
+'oktal' => 'oct',
+'acak' => 'rand',
+'sinus' => 'sin',
+'akar' => 'sqrt',
+'acak_seed' => 'srand'
+);
 
+my %func_array = (
+'ambil' => 'pop',
+'tambah' => 'push',
+'pindah' => 'shift',
+'sambung' => 'splice'
+# '' => 'unshift'
+);
 
-sub cetak{
-	return print @_;
+my %list_data = (
+# '' => 'grep',
+'gabung' => 'join',
+# '' => 'map',
+# '' => 'qw/STRING/',
+'urut' => 'sort',
+# '' => 'unpack'
+);
+
+my %func_hash = (
+'hapus' => 'delete',
+'setiap' => 'each',
+'ada' => 'exists',
+'kunci' => 'keys',
+'nilai' => 'values'
+);
+
+my %scope = (
+'panggil' => 'caller',
+# '' => 'import',
+# 'lokal' => 'local',
+'lokal' => 'my',
+# '' => 'our',
+'paket' => 'package',
+'gunakan' => 'use'
+);
+
+my %module = (
+'tidak' => 'no', # 'tidak' means 'no', but it will confuse others, especially Indonesian
+'perlu' => 'require',
+);
+
+my $i;
+
+foreach $i(keys %scalar_string){
+	s/\b$i\s*(.*?);/$scalar_string{$i} $1;/g;
 }
 
-sub format_cetakan{
-	return printf @_;
+foreach $i(keys %function){
+	s/\b$i\s*(.*?);/$function{$i} $1;/g;
+}
+
+foreach $i(keys %func_array){
+	s/\b$i\s*(.*?);/$func_array{$i} $1;/g;
 }
 
 
 
-# Functions for SCALARs or strings
 
-sub potong{
-	chop @_;
-}
+s/\bjika\s*?\(((.|\n)*?)\)\s*?\{((.|\n)*?)\}/if($1){$3}/g;
+s/\bketika\s*?\((.*?)\)\s*?\{((.|\n)*?)\}/while($1){$2}/g;
+s/\blakukan((.|\n)*?)\}/do $1}/g;
+s/\blakukan\s*(.*?);/do $1;/g;
+s/\buntuk\s*?\(.*?\)\s*?\{(.*?)\}//g;
 
-sub potongan{
-	chomp @_;
-}
-
-sub karakter{
-	chr $_[0];
-}
-
-sub ordinal{
-	ord $_[0];
-}
-
-sub enkripsi{
-	crypt $_[0], $_[1];
-}
-
-sub heksadesimal{
-	hex $_[0];
-}
-
-sub oktal{
-	oct $_[0];
-}
-sub kapital{
-	uc @_;
-}
-
-sub kapital_pertama{
-	ucfirst @_;
-}
-
-sub kecil{
-	lc @_;
-}
-
-sub kecil_pertama{
-	lcfirst $_[0];
-}
-
-sub panjang{
-	length $_[0];
-}
-
-sub indeks{
-	index $_[0], $_[1], $_[2];
-}
-
-sub pak{
-	pack $_[0], $_[1];
-}
-
-sub balikan{
-	reverse $_[0];
-}
-
-# "chop", ,  "pack",
-#           "q/STRING/", "qq/STRING/", "reverse", "rindex", "sprintf", "substr", "tr///", "y///"
-
-BEGIN{
-
-# start filtering
-FILTER{
-	s/jika( *|\n*)*?\((.*?)\)/if ($2)/g;
-	s/untuk( *|\n*)*?\(/for (/g;
-	s/selagi( *|\n*)*?\(/while (/g;
-	s/lakukan( *|\n*)*?\{/do {/g;
-
-	}
-}
+};
 
 1;
 
-__END__
 
 
 =head1 NAME
@@ -133,38 +113,52 @@ Language::Indonesia - Write Perl program in Bahasa Indonesia.
 
 =head1 SYNOPSIS
 
-  use Language::Indonesia;
+    use Language::Indonesia;
 
 =head1 DESCRIPTION
 
 This module will help a lot of Indonesian programmers (most of them
 aren't good enough in english) to write Perl program in Bahasa Indonesia.
-This module also help introductory programmers to learn pseudo code
 
-Convertion table:
-    Indonesia          English
-    =========          =======
-    cetak              print
-    format_cetakan     printf
-    potongan           chomp
-    potong             chop
-    untuk              for
-    selagi             while
-    lakukan            do
+The linguistic principles behind Language::Indonesia are described in:
 
-etc..
+    http://www.anti-php.net/~daniels/index.pl?_work=indonesia
 
+=begin html
 
-=head1 MISC
+<pre>
+Conversion table:
+<br />
+    Bahasa Indonesia      perlfunc
+    =========             =======
+    cetak                 print
+    format_cetakan        printf
+    potongkan             chomp
+    potong                chop
+    untuk                 for
+    selagi                while
+    lakukan               do
+etc.
 
-Language::Indonesia is not completed yet, but I still keep improving this
-module.
+</pre>
 
-Bug reports, bugfix, addition, and correction are welcome.
+There's a lot of ambiguity in this module, for example:
+
+<pre>
+tidak strict;    # no strict;  ?
+</pre>
+
+Will confuse Indonesian programmers, I think. :-)
+
+=end html
+
+=head1 BUGS
+
+Not all Perl built-in function implemented.
 
 =head1 AUTHOR
 
-Daniel Sirait, E<lt>dns@cpan.orgE<gt>
+Daniel Sirait E<lt>dns@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

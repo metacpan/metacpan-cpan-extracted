@@ -1,0 +1,63 @@
+# The protocol between the script processor and the rest of the browser:
+
+# Format of a request 1 thing per line:
+
+
+# Browser can send
+
+NEWSCRIPT
+__id__
+type
+(nfields)
+eventIn/eventOut/field
+fieldType1
+fieldName1
+fieldValue1  # field only
+...
+
+
+SETFIELD
+__id__
+fieldName
+value (all on one line)
+
+INITIALIZE
+__id__
+__reqid
+
+EVENTSPROCESSED
+__id__
+__reqid
+
+SENDEVENT
+__id__
+__reqid
+fieldName
+value 
+timestamp
+
+
+
+# Script can send
+
+SENDEVENT
+__id__
+fieldName
+value
+
+FINISHED
+__reqid
+
+# In the future, for Nodes (direct access):
+GETNODEID
+__id__
+fieldName
+GETNODEIDS
+__id__
+fieldName
+RELEASENODE
+__id__
+
+-- expects a return of NODEID __id__ fieldName __id2__ or
+ NODEIDS __id__ fieldName (number) __id2__ __id3__ ...
+- 

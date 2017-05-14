@@ -1,13 +1,16 @@
-#$Id: hubcli.pm 593 2010-01-30 11:11:27Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/lib/Net/DirectConnect/hubcli.pm $
+#$Id: hubcli.pm 998 2013-08-14 12:21:20Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/lib/Net/DirectConnect/hubcli.pm $
 #reserved for future 8), but something works
 package    #hide from cpan
   Net::DirectConnect::hubcli;
 use strict;
+no strict qw(refs);
+use warnings "NONFATAL" => "all";
+no warnings qw(uninitialized);
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use Net::DirectConnect;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
-no warnings qw(uninitialized);
-our $VERSION = ( split( ' ', '$Revision: 593 $' ) )[1];
+our $VERSION = ( split( ' ', '$Revision: 998 $' ) )[1];
 use base 'Net::DirectConnect';
 
 sub init {

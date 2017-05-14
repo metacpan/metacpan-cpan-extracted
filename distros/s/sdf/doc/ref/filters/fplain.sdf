@@ -1,0 +1,42 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: plain Filter
+
+H2: Interface
+
+!filter_interface "plain"
+
+H2: Description
+
+The {{plain}} filter is used when including a topic as
+an "plain" section within a document, i.e.
+normal headings are converted to plain headings.
+
+H2: Examples
+
+A typical book might look like this:
+
+!block example; lang='sdf'
+!init OPT_STYLE="manual"
+
+!define DOC_NAME "A Sample Book"
+!build_title
+
+!include "chapter1.sdf"
+!include "chapter2.sdf"
+!include "chapter3.sdf"
+!include "glossary.sdf"; plain
+!endblock
+
+#H2: Limitations & Future Directions

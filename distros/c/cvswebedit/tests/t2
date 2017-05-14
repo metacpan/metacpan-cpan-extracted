@@ -1,0 +1,32 @@
+#! /usr/local/bin/perl
+
+use strict;
+use FileHandle;
+require 'tests/common.pl';
+
+print "# This test makes sure you get sent a Set-Cookie: directive with the user name\n\n";
+
+my $script='cvswebedit.pl';
+my $user='mrjc';
+my $debug =1;
+my $fh = new FileHandle "perl $script edit=start user=$user < /dev/null | ";
+
+die if !defined($fh);
+
+my @ans = <$fh>;
+my $cookie_ok = grep /Set-Cookie: cvswebedit=$user/, @ans;
+my @ops = grep /^edit=/, @ans;
+
+status($cookie_ok, "!cookie not sent");
+
+print "# This will send a USAGE PAGE as we have not specified a file name\n";
+print "Counting number of operations, should be 8: $#ops\n";
+my $op;
+
+foreach $op (@ops) {
+    print "# $op";
+}
+
+status ($#ops == 8, "number of operations not 8");
+
+

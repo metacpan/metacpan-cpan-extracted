@@ -4,7 +4,7 @@
       "John M. Gamble <jgamble@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4218",
    "keywords" : [
       "math",
       "math-utils",
@@ -53,6 +53,6 @@
          "url" : "git://github.com/jgamble/Math-Utils.git"
       }
    },
-   "version" : "1.09",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

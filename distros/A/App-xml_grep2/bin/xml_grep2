@@ -1,0 +1,437 @@
+#!/usr/bin/perl 
+
+use strict;
+use warnings;
+
+#use Pod::Usage;
+use Pod::Text;
+use Getopt::Long;
+
+use App::Xml_grep2;
+
+
+our $VERSION="0.14";
+
+my $option={};
+
+my $defaults= { 
+                format            => 0,
+                original_encoding => 0,
+                ns           => "xg2", # can be overwritten through the ns option
+                ns_uri       => "http://xmltwig.org/tools/xml_grep2/",
+                result_tag   => "result_set",
+                file_tag     => "file",
+                att_filename => "filename",
+                indent       => ' ' x2,
+              };
+
+
+Getopt::Long::Configure( qw(gnu_getopt));
+
+my $USAGE= "xml_grep2 [options] <xpath> <files>\n";
+
+# options go into $option->{<first_given_option>}
+# so put the hash field first (better if it's a valid Perl name) 
+GetOptions( $option,
+            'count|c',
+            'catalog|C=s',
+            'help',
+            'format|f=i',
+            'generate_empty_set|generate-empty-set|g',
+            'wrap|with_filename|with-filename|H',
+            'nowrap|no_filename|no-filename|h',
+            'html',
+            'files_without_matches|files-without-matches|L',
+            'files_with_matches|files-with-matches|l',
+            'label=s',
+            'man|M',
+            'max_count|max-count|m=i',
+            'ns|namespace|n=s',
+            'define_ns|define-ns|N=s%',
+            'original_encoding|original-encoding|o',
+            'quiet|silent|q',
+            'recursive|R|r',
+            'include=s',
+            'exclude=s',
+            'no_messages|no-messages|s',
+            'text_only|text-only|t',
+            'invert_match|invert-match|v',
+            'version|V',
+            'no_xml_wrap|no-xml-wrap|x',
+            'xml_wrap|xml-wrap|X',
+            'xl|XL|liberal',
+          ) or exit( 2);
+
+output_pod(-exitstatus => 0, -verbose => 1) if $option->{help};
+output_pod(-exitstatus => 0, -verbose => 2) if $option->{man};
+if( $option->{version}) { warn "$0 version $VERSION\n"; exit; }
+
+my $grepper= App::Xml_grep2->new( $defaults, $option);
+
+my $xpath= shift @ARGV or die $USAGE; 
+my $status= $grepper->grep( $xpath, @ARGV);
+ 
+exit $status;
+
+
+sub output_pod
+  { my %option= @_;
+    
+    my $pod= do { local undef $/; <DATA> };
+    if( $option{-verbose} == 1)
+      { $pod= join "\n", map { $pod=~ m{(=head1 $_.*?)=head1}s } qw( NAME SYNOPSYS OPTIONS); }
+    
+    my $parser= Pod::Text->new();
+    $parser->output_fh( *STDOUT);
+    $parser->parse_string_document( $pod);
+
+    my $status= $option{-exitstatus} || 0;
+    exit $status;
+  }
+ 
+__END__
+=head1 NAME
+
+  xml_grep2 - grep XML files using XPath
+
+=head1 SYNOPSYS
+
+B<xml_grep2> [I<options>] I<xpath_expression> [I<FILE>...] 
+
+=head1 DESCRIPTION
+
+C<xml_grep2> is a grep-like utility for XML files.
+
+It mimicks B<grep> as much as possible with the major difference that
+the patterns are XPath expressions instead of regular expressions.
+
+When the results of the grep is a list of XML nodes (ie no option that
+causes the output to be plain text is used) then the output is normally
+a single XML document: results are wrapped in a single root element 
+(C<xg2:result_set>). When several files are grepped, the results are grouped
+by file, wrapped in a single element (C<xg2:file>) with an attribute
+(C<xg2:filename>) giving the name of the file.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c>, B<--count> 
+
+Suppress normal output; instead print a count of matching  lines for each  input  file.
+
+=item B<--help> 
+
+Display help message
+
+=item B<-f> I<NUM>, B<--format> I<NUM>
+
+Format, of the output XML
+
+The format parameter sets the indenting of the output.
+This parameter is expected to be an integer value, that specifies
+that indentation should be used. The format parameter can have
+three different values if it is used:
+
+If I<NUM> is 0, than the document is dumped as it was originally
+parsed
+
+If I<NUM> is 1, xml_grep2 will add ignorable whitespaces, so the
+nodes content is easier to read. Existing text nodes will not be
+altered
+
+If I<NUM> is 2 (or higher), xml_grep2 will act as $format == 1 but
+it add a leading and a trailing linebreak to each text node.
+
+xml_grep2 uses a hardcoded indentation of 2 space characters per
+indentation level. This value can not be altered on runtime.
+
+=item B<-g>, B<--generate-empty-set>
+
+Generate an XML result (consisting of only the wrapper) even if no result
+has been found
+
+=item B<-H>, B<--wrap>, B<--with-filename> 
+
+Force results for each file to be wrapped, even if only 1 file is grepped.
+
+Results are normally wrapped by file only when 2 or more files are grepped
+
+When the C<-t>, C<--text> option is used, prints the filename for each match.
+
+=item B<-h>, B<--nowrap>, B<--no-filename> 
+
+Suppress the wrapping of results by file, even if more than one file is grepped.
+
+When the C<-t>, C<--text> option is used, suppress the prefixing of  filenames  
+on  output  when  multiple files are searched.
+
+=item B<--html> 
+
+Parses the input as HTML instead of XML
+
+=item B<-L>, B<--files-without-matches> 
+
+Suppress  normal  output;  instead  print the name of each input
+file from which no output would normally have been printed. Note
+that the file still needs to be parsed and loaded.
+
+=item B<-l>, B<--files-with-matches> 
+
+Suppress  normal  output;  instead  print the name of each input
+file from which output would normally have  been  printed. Note
+that the file still needs to be parsed and loaded.
+
+=item B<--label> I<LABEL>
+
+Displays input actually coming from standard input as input com-
+ing from file LABEL.  This is especially useful for  tools  like
+zgrep, e.g.  gzip -cd foo.xml.gz | xml_grep --label=foo.xml something
+
+=item B<-M>, B<--man> 
+
+Display long help message
+
+=item B<-m> I<NUM>, B<--max-count> I<NUM>
+
+Output only I<NUM> matches per input file. Note that the file still needs
+to be parsed and loaded.
+
+=item B<-N> I<PREFIX>=I<URI>, B<--define-ns> I<PREFIX>=I<URI>
+
+Defines a namespace mapping, that can then be used in the XPath query.
+
+This is the only way to query elements (or attributes) in the default namespace.
+
+C<XML::LibXML::XPathContext> needs to be installed for this option to be available.
+
+Several B<-N>, B<--define-ns> options can be used
+
+=item B<-n> I<STRING>, B<--namespace> I<STRING>
+
+Change the default namespace prefix used for wrapping results. The default is C<xg2>.
+Use an empty string C<-n ''> to remove the namespace altogether.
+
+If a namespace (default or otherwise) is used, it is associated to the URI 
+C<http://xmltwig.org/tools/xml_grep2/>
+
+=item B<-o>, B<--original-encoding> 
+
+Output results in the original encoding of the file. Otherwise output is in UTF-8.
+
+The exception to this is when the B<-v>, B<--invert-match> option is used, in
+which case the original encoding is used.
+
+If the result is an XML document then the encoding will be the encoding of the first
+document with hits.
+
+Note that if grepping files in various encodings the result could very well be 
+not well-formed XML. 
+
+Without this argument all outputs are in UTF-8.
+
+=item B<-q>, B<--quiet>, B<--silent> 
+
+Quiet; do not write anything to standard output. Exit immediately with zero 
+status if any match is found, even if an  error was detected. Also see the 
+B<-s> or B<--no-messages> option.
+
+When also using the C<-v> or C<--invert-match> option, the return status will
+be an error if all the document root (or all the entire document) have been
+matched. 
+
+=item B<-R>, B<-r>, B<--recursive> 
+
+Read all files under each directory, recursively
+
+=item B<--include> I<PATTERN>
+
+Recurse in directories only searching file matching I<PATTERN>.
+
+=item B<--exclude> I<PATTERN>
+
+Recurse in directories skip file matching I<PATTERN>.
+
+=item B<-s>, B<--no-messages> 
+
+Suppress error messages about nonexistent or  unreadable  files.
+
+=item B<-t>, B<--text-only> 
+
+Return the result as text (using the XPath I<value> of nodes). Results
+are stripped of newlines and output 1 per line.
+
+Results are in the original encoding for the document.
+
+=item B<-V>, B<--version> 
+
+Print the version number of xml_grep2 to standard error.
+This version number should be included in all bug reports (see below).
+
+=item B<-v>, B<--invert-match> 
+
+Return the original document without nodes matching the pattern argument
+Note that in this mode documents are output on their original encoding.
+
+=item B<-x>, B<no-xml-wrap>
+
+Suppress the output of the XML wrapper around the XML result. 
+
+Useful for exemple when returning collection of attribute nodes. 
+
+This option is activated by default when the C<-v> option is used (use 
+C<-X> or X<--xml-wrap> to force the XML wrapping in this case)
+
+=item B<-X>, B<xml-wrap>
+
+Forces the use of the XML wrapper around the output, when C<-v> is used. 
+
+=item B<xl>, B<liberal>
+
+Use XML::Liberal to parse broken XML. XML::Liberal needs to be installed
+for this option to be available
+
+=back
+
+All options names that use '-' can also use '_' instead, eg you can use
+C<no-xml-wrap> or C<no_xml_wrap>.
+
+=head1 Differences with grep
+
+There are some differences in behaviour with grep that are worth being mentioned:
+
+=over 4
+
+=item files are always parsed and loaded in memory
+
+This is inevitable due to the random-access nature of XPath
+
+=item the file list is built before the grepping start
+
+This means that warnings about permission problems are reported all at once before the
+results are output.
+
+=back
+
+=head1 BUGS, TODO
+
+=over 4
+
+=item namespace problems
+
+When a namespace mapping is defined using the B<-N>, B<define-ns> option, if this prefix
+is found in a document, even bound to a different namespace, it will match.
+
+When a prefix is defined using the B<-N>, B<define-ns> option, if the prefix
+is found in a file, then the one defined on the command line will not match for this
+file
+
+=item Encoding
+
+Avoid outputing characters outside of the basic ASCII range as numerical entities
+
+Allow encoding conversions
+
+=item XML parsing errors
+
+Deal better with malformed XML, probably through an option to skip malformed 
+XML files without dying
+
+=item Be more compatible with C<grep>
+
+Do not build the list of files up front. Report bad links.
+
+=item package properly, more tests, more docs...
+
+=back
+
+=head1 XPath
+
+see http://www.w3.org/TR/xpath/ for the spec
+
+see http://zvon.org/xxl/XPathTutorial/General/examples.html for a tutorial
+
+=head1 EXAMPLES
+
+=over 4
+
+=item xml_grep2 //h1 index.xhtml
+
+Extract C<h1> elements from C<index.xhtml>. Do not forget the C<//> or
+you will not get any result.
+
+=item xml_grep2 '//h1|//h2' index.xhtml
+
+Extract C<h1> and C<h2> elements from C<index.xhtml>. The expression needs 
+to be quoted because the C<|> is special for the shell.
+
+=item xml_grep2 -t -h -r --include '*.xml' '//RowAmount' /invoices/
+
+Get the content (B<-t>) of all C<RowAmount> elements in C<.xml> files in the 
+C<invoices> directory (and sub-directories)
+
+The result will be a text stream with 1 result per line. The B<-h> option
+suppresses the display of the file name at the beginning of each line.
+
+=item xml_grep2 -t -r -h --include '*.xml' '//@AmountCurrencyIdentifier' /invoices/
+
+Get the value of all C<AmountCurrencyIdentifier> attribute in C<.xml> files 
+in the C<invoices> directory (and sub-directories). Piping this to C<sort -u>
+will give you all the currencies used in the invoices.
+
+=item xml_grep2 -v '//p[@class="classified"]' secret.xml > pr.xml
+
+Remove all C<p> elements in the C<classified> class from the file C<secret.xml>
+
+=item xml_grep2 -t -N d='http://perl.org/rss/1.0/' '//d:title' use.perl.org.rss.xml
+
+Extract the text of the titles from the RSS feed for use.perl.org
+
+As the title elements are in the default namespace, the only way to get them is to
+define a mapping between a prefix and the namespace URI, then to use it. 
+
+=item GET http://xmltwig.org/index.html | ./xml_grep2 --html -t '//@href' | sort -u
+
+Get the list of links in a web page
+
+
+=back
+
+=head1 REQUIREMENTS
+
+Perl 5, 
+
+libxml2
+
+XML::LibXML
+
+XML::LibXML::XPathContext for B<-N>, B<--define-ns> option
+
+Pod::Usage;
+
+Getopt::Long;
+
+File::Find::Rule
+
+=head1 SEE ALSO
+
+C<xml_grep>, distributed with the XML::Twig Perl module offers a less powerful
+but often more memory efficient implementation of an XML grepper.
+
+C<xsh> (http://xsh.sourceforge.net) is an XML shell also based on C<libxml2>
+and C<XML::LibXML>.
+
+C<XMLStarlet> (http://xmlstar.sourceforge.net/) is a set of tools to process XML
+written in C and also based on C<libxml2>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+mirod <mirod@cpan.org>
+
+
+

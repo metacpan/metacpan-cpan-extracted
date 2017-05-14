@@ -1,0 +1,628 @@
+# $Id$
+#
+# >>Title::     Delphi Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+#                   (With lots of initial work from Tim Hudson)
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:delphi}} is the [[SDF]] module for
+# the building {{PRD:Delphi}} documentation.
+#
+# >>Description::
+# A {{very}} nice way of doing [[Delphi]] help without having to
+# jump through major hoops and still be able to get {{great}}
+# hardcopy documentation. Beat that!
+#
+# >>Limitations::
+# TJH notes:
+#    * still lots of work to do in controlling table formatting stuff
+#      where we don't yet have things such that we can squish things
+#      as nicely as we need ... too much whitespace 
+#    * I'd like to be able to say ... take all SpBefore and SpAfter 
+#      down by 50% or something like that.
+#
+# Some outstanding issues:
+# * How do we jump to topics inside the standard Delphi help files?
+# * Should H2s be H3s so that H2 can be reserved for the optional level
+#   shown in the Delphi library reference?
+# * What's the best way of extracting properties, etc., from the code:
+#   - How are 'key' entities marked?
+#   - How are parent classes found?
+#   - How often do we 'go to file' vs 'access the cache'?
+#
+
+# grab things not yet "installed" in the kernel modules
+!use "misc.sdm"
+
+# Load the images library
+!inherit "images"
+
+# Make 'delphi' a filter for formatting source code
+!on filter 'delphi';; $name='example'; $params .= ';lang="Delphi"'
+
+# Define the new paragraph attributes
+!block paraattrs
+Name
+delphi_unit
+delphi_image
+!endblock
+
+#
+# On a level heading, delphi_unit triggers some nice things:
+# * for help, the unit is prepended before the next heading
+# * otherwise, the unit name is added to the heading.
+#
+#
+!if $var{'OPT_TARGET'} eq 'hlp'
+    !on paragraph '[HAP]\d';; $delphi_unit = $attr{'delphi_unit'}
+    !on paragraph '[HAP]\d';; \
+        if ($delphi_unit) {\
+            &PrependText("$style: Unit", "N:{{UNIT:$delphi_unit}}");\
+            $delphi_unit = '';\
+        }
+!else
+    #!on paragraph '[HAP]\d';; $attr{'label'} = $attr{'delphi_unit'};\
+    #    $attr{'mif.NumAtEnd'} = 1
+    !on paragraph '[HAP]\d';; \
+        if ($attr{'delphi_unit'} ne '') {\
+            $text .= " (" . $attr{'delphi_unit'} . ")";\
+        }
+!endif
+
+# these should be moved into the images library?
+# At the moment, we use IMPORT for paper-based stuff to force 'inline'
+# importing, rather than 'below' importing.
+!define IMG_ARROW "{{IMPORT:arrow}}"
+!define IMG_KEY   "{{IMPORT:key}}"
+
+# Control the font mapping so that things are by default in
+# "normal" Delphi mode ... which the user can override where
+# they see fit!
+
+!if $var{'OPT_TARGET'} eq 'hlp'
+
+    # Just the entities in the contents
+    !on paragraph '[HAP][2-9]';; $attr{'notoc'} = 1
+
+    # all top level headings are blue for Delphi-style help!
+    !on paragraph '[HAP]1';; $attr{'color'} = 'Blue';
+
+    # Delphi help is always in a nice "Arial" font ... 
+    !on paragraph ;; $attr{'family'} = 'Arial';
+    !on phrase ;; $attr{'family'} = 'Arial';
+
+    # 12 point for headers ...
+    !on paragraph '[HAP]1';; $attr{'size'} = '12 pt'; $attr{'bold'} = '1';
+
+    # 19 point for second level headers ...
+    !on paragraph '[HAP]2';; $attr{'size'} = '10 pt'; $attr{'bold'} = '1';
+
+    # 10 point by default for everything else
+    !on paragraph '';; $attr{'size'} = '10 pt';
+
+    # Make Tasks and Example separate topics
+    !on paragraph '[HAP]2';; \
+        if ($text eq 'Tasks' || $text eq 'Example') {\
+            $attr{'top'} = 1;\
+            $attr{'id'} = "jump_${topic}_$text";\
+        }
+
+!else
+
+    # Start level 1 headings on a new page (and make plain)
+    !on paragraph '[HAP]1';; $style =~ tr/HA/PP/; $attr{'top'} = 1
+
+    # Remove level 2+ headings from the contents (and make plain)
+    !on paragraph '[HA][2-9]';; $style =~ tr/HA/PP/; $attr{'notoc'} = 1
+
+    # For PostScript output, the 'Description' heading gets junked.
+    !if $var{'OPT_TARGET'} eq 'ps'
+        !on paragraph '[HAP]2';; if ($text eq 'Description') \
+            {$text = ""; %attr = ('sp_before', '0 pt')}
+    !endif
+!endif
+
+
+
+# Commonly used phrase styles
+!block phrasestyles
+Name            To
+CLASS           =1
+COMP            =1
+EVENT           =1
+EXCEPT          =1
+FUNC            =1
+METH            =1
+OBJ             =1
+PROC            =1
+PROP            =1
+TYPE            =1
+UNIT            =1
+VAR             =1
+!endblock
+
+################# Hypertext Generation Stuff #####################
+
+
+# Declare short <-> long mapping tables
+!block script
+%delphi_s2l = (
+    'class',        'class',
+    'comp',         'component',
+    'event',        'event',
+    'except',       'exception',
+    'func',         'function',
+    'meth',         'method',
+    'obj',          'object',
+    'proc',         'procedure',
+    'prop',         'property',
+    'type',         'type',
+    'unit',         'unit',
+    'var',          'variable',
+);
+%delphi_l2s = (
+    'class',        'class',    
+    'component',    'comp',     
+    'event',        'event',    
+    'exception',    'except',
+    'function',     'func',     
+    'method',       'meth',     
+    'object',       'obj',      
+    'procedure',    'proc',     
+    'property',     'prop',     
+    'type',         'type',     
+    'unit',         'unit',     
+    'variable',     'var',
+);
+
+sub _DelphiGenerateHyperText {
+    local($tmp, $group, $prefix);
+
+    $tmp = $style;
+    $tmp =~ tr/A-Z/a-z/;
+    $prefix = '';
+    if ($text =~ /\./) {
+        ($group, $text) = split(/\./, $text, 2);
+        unless (defined($_delphi_groups{$group})) {
+            &'AppMsg("warning", "unknown delphi group '$group'");
+        }
+        $prefix = $_delphi_groups{$group};
+    }
+    $attr{'jump'} = $prefix . "#${tmp}_$text";
+}
+!endblock
+
+# Generate hypertext jumps
+!on phrase 'CLASS|COMP|EVENT|EXCEPT|FUNC|METH|OBJ|PROC|PROP|TYPE|UNIT|VAR';; \
+    &_DelphiGenerateHyperText()
+
+# Generate hypertext targets
+!on paragraph '[HAP][12]';; \
+    ($tmp1, $tmp2) = split(/\s+/, $text, 2); \
+    $tmp2 =~ tr/A-Z/a-z/; \
+    $tmp2 = $delphi_l2s{$tmp2}; \
+    $attr{'id'} = "${tmp2}_$tmp1" if $tmp2
+
+
+################# Filters #####################
+
+!block script
+
+# Table of "groups" - a logical name for a jump prefix
+%_delphi_groups = ();
+
+# delphi_groups - table of logical group names and matching jump prefixes
+@_delphi_groups_FilterParams = ();
+@_delphi_groups_FilterModel = &'TableParse(
+    'Field      Category    Rule',
+    'Name       key',
+    'Prefix     optional',
+);
+sub delphi_groups_Filter {
+    local(*text, %param) = @_;
+    local(@tbl, @flds, $rec, %values);
+
+    # Parse and validate the data
+    @tbl = &'TableParse(@text);
+    @text = ();
+    &'TableValidate(*tbl, *_delphi_groups_FilterModel);
+
+    # Process the data
+    (@flds) = &'TableFields(shift @tbl);
+    for $rec (@tbl) {
+        %values = &'TableRecSplit(*flds, $rec);
+        $_delphi_groups{$values{'Name'}} = $values{'Prefix'};
+    }
+}
+
+# delphi_properties - table of properties for a Delphi class
+@_delphi_properties_FilterParams = ();
+@_delphi_properties_FilterModel = &'TableParse(
+    'Field      Category    Rule',
+    'Name       key',
+    'Key        optional    <yes>',
+    'RO         optional    <yes>'
+);
+sub delphi_properties_Filter {
+    local(*text, %param) = @_;
+    local(@tbl, @flds, $rec, %values);
+    local($line_count,$row_count,@items);
+    local($row,$line,$pos);
+
+    # Parse and validate the data
+    @tbl = &'TableParse(@text);
+    @text = ();
+    &'TableValidate(*tbl, *_delphi_properties_FilterModel);
+
+    # Sort the data
+    @tbl = &'TableSort(*tbl, 'Name');
+
+    # Get the line and row counts
+    (@flds) = &'TableFields(shift @tbl);
+    $line_count=scalar(@tbl);
+    $row_count=int(($line_count+2)/3);
+    #print STDERR "LINE_COUNT $line_count ROW_COUNT $row_count\n";
+
+    # Build the section "header"
+    if ($var{'OPT_TARGET'} eq 'hlp') {
+        push(@text,
+            "!block hlp_window",
+            "!squish on ; ",
+            "H2[notoc;hlp.topic='jump_${topic}_Properties'] Properties",
+            "!block table; noheadings;style=\"plain\";format=\"3,30,6,27\"",
+            "1a|1b|2a|2b",
+            "[[IMG_ARROW]]|{{B:Run-time only}}|[[IMG_KEY]]|{{B:Key properties}}",
+            "!endblock",
+            "!block table; noheadings;style='plain';" .
+              "tags=',,PROP,,,PROP,,,PROP';format=\"2,6,25,2,6,25,2,6,25\"",
+            "1a|1b|1c|2a|2b|2c|3a|3b|3c"
+            );
+    } else {
+        push(@text,
+            "P2[notoc] Properties",
+            "!block table; noheadings;style='plain';" .
+              "tags=',,PROP,,,PROP,,,PROP';format=\"2,6,25,2,6,25,2,6,25\"",
+            "1a|1b|1c|2a|2b|2c|3a|3b|3c"
+        );
+    }
+
+    # Process the data
+    @items = ();
+    for($line=0;$line<$row_count;$line++) {
+      $item='';
+      for($row=0;$row<3;$row++) {
+        # access in the right location
+        # alphabetically down with three cols
+        $pos=$line+($row*$row_count);
+        if ($pos>$line_count) {
+          $rec='';
+          #print STDERR "TBL[$line,$row,$pos]=<BLANK>\n";
+        } else {
+          $rec=$tbl[$pos];
+          #print STDERR "TBL[$line,$row,$pos]=$rec\n";
+        }
+        %values = &'TableRecSplit(*flds, $rec);
+
+        # divide into a three column table ...
+        if ($values{'RO'}) {
+            $item .= "[[IMG_ARROW]]|";
+        } else {
+            $item .= "|";
+        }
+        if ($values{'Key'}) {
+            $item .= "[[IMG_KEY]]|";
+        } else {
+            $item .= "|";
+        }
+        if ($values{'Name'}) {
+            $item .= "$values{'Name'}";
+        } else {
+            $item .= "";
+        }
+        $item .= "|" if ($row<2);
+      }
+      push(@items, $item);
+    }
+
+    # Let the reader know if there are none
+    @items = ('||None.') if $line_count == 0;
+
+    # add in the table body
+    push(@text,@items);
+
+    push(@text,"!endblock");
+    if ($var{'OPT_TARGET'} eq 'hlp') {
+        push(@text, "!endblock", "!squish off");
+    }
+
+    #print STDERR "Properties:\n" . join("\n",@text);
+
+}
+
+
+# delphi_methods - table of methods for a Delphi class
+@_delphi_methods_FilterParams = ();
+sub delphi_methods_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_keytable(*text, 'Methods');
+}
+
+# delphi_events - table of events for a Delphi class
+@_delphi_events_FilterParams = ();
+sub delphi_events_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_keytable(*text, 'Events');
+}
+
+# generic processing for methods & events
+@_delphi_keytable_FilterModel = &'TableParse(
+    'Field      Category    Rule',
+    'Name       key',
+    'Key        optional    <yes>'
+);
+sub _delphi_keytable {
+    local(*text, $label) = @_;
+#   local();
+    local($lc_label);
+    local($tags_value);
+    local(@tbl, @flds, $rec, %values);
+    local($line_count,$row_count,@items);
+    local($row,$line,$pos);
+
+    # Get a lower-case version of the label
+    $lc_label = $label;
+    $lc_label =~ tr/A-Z/a-z/;
+
+    # Gets the value of the tags parameter
+    if ($label eq 'Methods') {
+        $tags_value = ',,METH,,,METH,,,METH';
+    }
+    else {
+        $tags_value = ',,EVENT,,,EVENT,,,EVENT';
+    }
+
+    # Parse and validate the data
+    @tbl = &'TableParse(@text);
+    @text = ();
+    &'TableValidate(*tbl, *_delphi_keytable_FilterModel);
+
+    # Sort the data
+    @tbl = &'TableSort(*tbl, 'Name');
+
+    # Get the line and row counts
+    (@flds) = &'TableFields(shift @tbl);
+    $line_count=scalar(@tbl);
+    $row_count=int(($line_count+2)/3);
+    #print STDERR "LINE_COUNT $line_count ROW_COUNT $row_count\n";
+
+    # Build the section "header"
+    if ($var{'OPT_TARGET'} eq 'hlp') {
+        unshift(@text,
+            "!block hlp_window",
+            "!squish on ; ",
+            "H2[notoc;hlp.topic='jump_${topic}_$label'] $label",
+            "!block table; noheadings;style=\"plain\";format=\"6,27\"",
+            "1a|1b",
+            "[[IMG_KEY]]|{{B:Key $lc_label}}",
+            "!endblock",
+            "!block table; noheadings;style='plain';" .
+              "tags='$tags_value';format=\"2,6,25,2,6,25,2,6,25\"",
+            "1a|1b|1c|2a|2b|2c|3a|3b|3c"
+            );
+    } else {
+        push(@text,
+            "P2[notoc] $label",
+            "!block table; noheadings;style='plain';" .
+              "tags='$tags_value';format=\"2,6,25,2,6,25,2,6,25\"",
+            "1a|1b|1c|2a|2b|2c|3a|3b|3c"
+        );
+    }
+
+    # Process the data
+    @items = ();
+    for($line=0;$line<$row_count;$line++) {
+      $item='';
+      for($row=0;$row<3;$row++) {
+        # access in the right location
+        # alphabetically down with three cols
+        $pos=$line+($row*$row_count);
+        if ($pos>$line_count) {
+          $rec='';
+          #print STDERR "TBL[$line,$row,$pos]=<BLANK>\n";
+        } else {
+          $rec=$tbl[$pos];
+          #print STDERR "TBL[$line,$row,$pos]=$rec\n";
+        }
+        %values = &'TableRecSplit(*flds, $rec);
+
+        # method/event doesn't have the RO field but does still
+        # use the same table formatting ... cute huh!
+        $item .= "|";
+
+        if ($values{'Key'}) {
+            $item .= "[[IMG_KEY]]|";
+        } else {
+            $item .= "|";
+        }
+        if ($values{'Name'}) {
+            $item .= "$values{'Name'}";
+        } else {
+            $item .= "";
+        }
+
+        $item .= "|" if ($row<2);
+
+      }
+      push(@items, $item);
+    }
+
+    # Let the reader know if there are none
+    @items = ('||None.') if $line_count == 0;
+
+    # add in the table body
+    push(@text,@items);
+
+    push(@text,"!endblock");
+    if ($var{'OPT_TARGET'} eq 'hlp') {
+        push(@text, "!endblock", "!squish off");
+    }
+
+    #print STDERR "Methods:\n" . join("\n",@text);
+
+}
+
+# delphi_see_also - a table of related entities
+@_delphi_see_also_FilterParams = ();
+@_delphi_see_also_FilterModel = &'TableParse(
+    'Field      Category    Rule',
+    'Name       key',
+    'Category   optional    <component|object|exception|type|property|method|event|function|procedure>'
+);
+sub delphi_see_also_Filter {
+    local(*text, %param) = @_;
+#   local();
+    local(@tbl, @flds, $rec, %values);
+    local($item, @items, $style);
+
+    # Parse and validate the data
+    @tbl = &'TableParse(@text);
+    @text = ();
+    &'TableValidate(*tbl, *_delphi_see_also_FilterModel);
+
+    # Process the data
+    (@flds) = &'TableFields(shift @tbl);
+    for $rec (@tbl) {
+        %values = &'TableRecSplit(*flds, $rec);
+        if ($values{'Category'}) {
+            $style = $delphi_l2s{$values{'Category'}};
+            $style =~ tr/a-z/A-Z/;
+            $item = "{{$style: $values{'Name'}}} $values{'Category'}";
+        } else {
+            $item = "{{JUMP: $values{'Name'}}}";
+        }
+        push(@items, $item);
+    }
+
+    # Format the output
+    if ($var{'OPT_TARGET'} eq 'hlp') {
+        @text = (
+            "!squish on ; ",
+            "!block hlp_window",
+            "H2[id='jump_${topic}_See also']See also",
+            grep(s/^/N:/, @items),
+            "!endblock",
+            "!squish off"
+        );
+    }
+    else {
+        @text = ("H2:See also", "N:" . join(", ", @items));
+    }
+
+    #print STDERR "See Also:\n" . join("\n",@text);
+}
+
+# delphi_components - table of components for a Delphi unit
+@_delphi_components_FilterParams = ();
+sub delphi_components_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_list(*text, 'Components', 'COMP');
+}
+
+# delphi_objects - table of objects for a Delphi unit
+@_delphi_objects_FilterParams = ();
+sub delphi_objects_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_list(*text, 'Objects', 'OBJ');
+}
+
+# delphi_types - table of types for a Delphi unit
+@_delphi_types_FilterParams = ();
+sub delphi_types_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_list(*text, 'Types', 'TYPE');
+}
+
+# delphi_routines - table of routines for a Delphi unit
+@_delphi_routines_FilterParams = ();
+sub delphi_routines_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_list(*text, 'Routines', 'FUNC');
+}
+
+# delphi_exceptions - table of exceptions for a Delphi unit
+@_delphi_exceptions_FilterParams = ();
+sub delphi_exceptions_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_list(*text, 'Exceptions', 'EXCEPT');
+}
+
+# delphi_variables - table of variables for a Delphi unit
+@_delphi_variables_FilterParams = ();
+sub delphi_variables_Filter {
+    local(*text, %param) = @_;
+
+    &_delphi_list(*text, 'Variables', 'VAR');
+}
+
+# generic processing for components, objects, types and routines
+@_delphi_list_FilterModel = &'TableParse(
+    'Field      Category    Rule',
+    'Name       key',
+    'Style      optional',
+);
+sub _delphi_list {
+    local(*text, $label, $style) = @_;
+#   local();
+    local(@tbl, @flds, $rec, %values);
+    local($item_style, $item, @items);
+
+    # Parse and validate the data
+    @tbl = &'TableParse(@text);
+    @text = ();
+    &'TableValidate(*tbl, *_delphi_list_FilterModel);
+
+    # Sort the data
+    @tbl = &'TableSort(*tbl, 'Name');
+
+    # Process the data
+    (@flds) = &'TableFields(shift @tbl);
+    for $rec (@tbl) {
+        %values = &'TableRecSplit(*flds, $rec);
+        $item_style = $values{'Style'} ne '' ? $values{'Style'} : $style;
+        $item = "{{$item_style: $values{'Name'}}}";
+        push(@items, $item);
+    }
+
+    # Format the output
+    if ($var{'OPT_TARGET'} eq 'hlp') {
+        @text = (
+            "!squish on ; ",
+            "H2:$label",
+            grep(s/^/N:/, @items),
+            "N:",
+            "!squish off"
+        );
+    }
+    else {
+        @text = ("H2:$label", "N:" . join(", ", @items));
+    }
+}
+
+!endblock
+

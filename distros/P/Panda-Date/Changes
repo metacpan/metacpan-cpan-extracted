@@ -1,3 +1,5 @@
+3.0.6    11.05.2017
+           - use CPP::panda::lib
 3.0.5    13.03.2017
            - compile with all warnings enabled, fix warnings
            - fix threaded perl build

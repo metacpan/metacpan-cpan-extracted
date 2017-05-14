@@ -1,0 +1,2467 @@
+%%START_PERL%% 
+my $VERSION = q[$Id: db2xml.pl.in,v 1.36 2001/02/05 16:33:24 jes Exp $];
+# BEGIN{use Env qw(DISPLAY); $DISPLAY='ludwig:0';}
+use strict;
+use Benchmark;
+use Carp;
+use Getopt::Long;
+use Env qw(USER);
+
+
+# this has to be a file scope (global variable) and not a lexical (my)
+# variable, otherwise it will not be visible in both BEGIN and rest of file
+use vars qw(%OPTIONS);
+
+my $GENEXML_DIR = '%%GENEXML_DIR%%';
+my $CB_CACHE_DIR   = '%%GENEX_CB_CACHE_DIR%%';
+my $EXP_CACHE_DIR   = '%%GENEX_EXP_CACHE_DIR%%';
+###
+### No modifications after this point
+###
+
+
+###
+### Fetch any command line parameters
+###    we put this in a BEGIN {} so that USAGE happens quickly
+###
+
+BEGIN {
+  $OPTIONS{experiments} = [];
+  $OPTIONS{species} = [];
+  $OPTIONS{user} = '';
+  $OPTIONS{password} = '';
+  $OPTIONS{cb} = 0;
+  $OPTIONS{authenticate} = 0;
+  $OPTIONS{no_cache} = 0;
+  $OPTIONS{directory} = '';
+  $OPTIONS{am_types} = [];
+#  $OPTIONS{help};
+#  $OPTIONS{debug_help};
+
+  # debug options must be globally visible
+  $OPTIONS{debug}           = 0;
+  $OPTIONS{debug_no_usf}    = 0;
+  $OPTIONS{debug_one_hyb}   = 0;
+  $OPTIONS{debug_one_ams}   = 0;
+  $OPTIONS{debug_no_ams}    = 0;
+  $OPTIONS{debug_no_als}    = 0;
+  $OPTIONS{debug_no_ext}    = 0;
+  $OPTIONS{profile}         = 0;
+  my $rc = GetOptions(\%OPTIONS,
+		      'cb',
+		      'exp=s@',
+		      'directory=s',
+		      'user=s',
+		      'password=s',
+		      'species=s@',
+		      'am_types=s@',
+		      'debug',
+		      'authenticate',
+		      'no_cache',
+		      'profile',
+		      'debug_no_usf',
+		      'debug_no_ams',
+		      'debug_no_als',
+		      'debug_no_ext',
+		      'debug_one_ams',
+		      'debug_one_hyb',
+		      'help',
+		      'help_debug',
+		     );
+
+
+  my $USAGE = <<"EOU";
+usage: 
+  to output a curation tool control bundle:
+    $0 --cb REQUIRED_ARGS [OPTIONAL_ARGS]
+
+  to output experiment sets:
+    $0 --exp=exp1[,exp2[,...]] REQUIRED_ARGS [OPTIONAL_ARGS]
+
+Required arguments: 
+      --directory=dir_name  <all files are written to dir_name>
+
+Optional arguments: 
+  for --cb:
+        --species=spc1[,spc2[,...]]  <only species spc1 in control bundle,
+                                      default is all species in DB>
+      --authenticate     <require --user and --password>
+        --user=name 
+        --password=passw [options]
+
+  for --exp:
+        --am_types=type1[,type2[,...]] <only print arrays of given type>
+
+Help options:
+      --help        <this message>
+      --help_debug  <help on debug options>
+EOU
+
+  my $DEBUG_USAGE = <<"EOU";
+
+Debug options:
+      --debug           <only 10 entries written to any external file>
+      --profile         <outputs performance benchmarks>
+      --debug_one_ams   <only the first array from each hybridization included>
+      --debug_one_hyb   <only the first hybridization included>
+      --debug_no_usf    <no external USF files included>
+      --debug_no_ams    <no external AMS files included>
+      --debug_no_als    <no external ALS files included>
+      --debug_no_ext    <no external files of any type written>
+
+EOU
+
+  if (defined $OPTIONS{help}) {
+    print STDERR $USAGE;
+    exit(1);
+  }
+
+  if (defined $OPTIONS{help_debug}) {
+    print STDERR $DEBUG_USAGE;
+    exit(1);
+  }
+  die "Bad option: $rc\n$USAGE" unless $rc;
+  die "Must specify either --cb or --exp\n$USAGE" 
+    unless $OPTIONS{cb} || 
+      (exists $OPTIONS{exp} && scalar @{$OPTIONS{exp}});
+  die "Must specify --directory\n$USAGE" unless $OPTIONS{directory};
+
+  die "Directory $OPTIONS{directory} does not exist" 
+    unless -d $OPTIONS{directory};
+  die "Directory $OPTIONS{directory} is not writeable by $USER" 
+    unless -w $OPTIONS{directory};
+}
+
+###
+### Now do the rest of the modules
+###
+use File::Basename;
+%%GENEX_EXTRALIBS%%
+# use blib;
+
+use XML::DOM;
+
+use Bio::Genex qw(timestamp);
+use Bio::Genex::DBUtils qw(fetch_spot_data 
+		      fetch_es_species 
+		      fetch_am_ids 
+		      fetch_user_al_ids
+		      check_password
+		      create_select_sql);
+use Bio::Genex::XMLUtils qw(pretty_print);
+use Bio::Genex::ExperimentSet;
+use Bio::Genex::Protocol;
+use Bio::Genex::ExperimentFactors;
+use Bio::Genex::UserSequenceFeature;
+use Bio::Genex::Contact;
+use Bio::Genex::Scanner;
+use Bio::Genex::Spotter;
+use Bio::Genex::Software;
+use Bio::Genex::ArrayLayout;
+use Bio::Genex::AL_Spots;
+use Bio::Genex::ControlledVocab;
+use Bio::Genex::UserSec;
+use Bio::Genex::Species;
+use Bio::Genex::ExternalDatabase;
+use Bio::Genex::GroupSec;
+use Bio::Genex::ExperimentFactors;
+use Bio::Genex::Citation;
+use Bio::Genex::Sample;
+use Bio::Genex::SpotLink;
+
+###
+### Handle the rest of the command line options
+###
+
+if ($OPTIONS{debug_no_ext}) {
+  # no external files get written
+  $OPTIONS{debug_no_ams} = 1;
+  $OPTIONS{debug_no_als} = 1;
+  $OPTIONS{debug_no_usf} = 1;
+}
+
+# species can be specified in two ways:
+# --species=id_one --species=id_two ...
+# or
+# --species=id_one,id_two
+# 
+# so we use the following construct to handle both cases
+my @SPECIES = split(/,/,join(',',@{$OPTIONS{species}}));
+
+# likewise experiments
+my @EXPERIMENTS;
+if (exists $OPTIONS{exp}) {
+  @EXPERIMENTS = split(/,/,join(',',@{$OPTIONS{exp}}));
+}
+# likewise am_types
+my @AM_ALL_TYPES = Bio::Genex::AM_Type->get_terms();
+my @AM_TYPES;
+if (scalar @{$OPTIONS{am_types}}) {
+  @AM_TYPES = split(/,/,join(',',@{$OPTIONS{am_types}}));
+  # make sure the types are properly defined
+  my %am_types = map {$_,1} @AM_ALL_TYPES;
+  my @bad_types = grep {not exists $am_types{$_}} @AM_TYPES;
+  die "$0: Bad ArrayMeasurement type: \'", join('\', \'', @bad_types), "'"
+    if scalar @bad_types;
+} else {
+  @AM_TYPES = @AM_ALL_TYPES;
+}
+
+$Bio::Genex::DBUtils::DEBUG = 1 if $OPTIONS{debug};
+
+# set up the Genex.pm connection variables
+%%GENEX_CONNECT%%
+
+$Bio::Genex::PASSWORD = '%%GENEX_RO_PASSWORD%%';
+$Bio::Genex::USER = '%%GENEX_RO_USER%%';
+
+my %EXPERIMENT2GENEXML = (
+   'name' => 'name',
+   'is_public' => 'is_public',
+   'local_accession' => 'local_accession',
+   'group_can_update' => 'group_can_update',
+   'treatment_type' => 'treatment_type',
+   'quantity_series_type' => 'quantity_series_type',
+   'archive_bundle_ref' => 'archive_bundle_ref',
+   'release_date' => 'release_date',
+   'submission_date' => 'submission_date',
+   'experiment_date' => 'experiment_date',
+		  );
+
+my @ARRAY_COLUMNS = (        
+             'name',
+             'instance_code',
+             'group_can_update',
+             'is_public',
+             'spot_measurement_units',
+             'hyb_stringency',
+             'hybridization_name',
+             'release_date', 
+             'submission_date', 
+             'experiment_date', 
+);
+
+my @AM_COLUMNS = (
+             'type',
+             'file_name',
+             'column_name',
+);
+
+my %ARRAY2GENEXML = (
+		  'description' => 'description',
+		  'image_anal_sw_params' => 'image_analysis_sw_params',
+		  'spotter_sw_params' => 'spotter_sw_params',
+		  'spotter_hw_params' => 'spotter_hw_params',
+		  'scan_sw_params' => 'scanner_sw_params',
+		  'scan_hw_params' => 'scanner_hw_params',
+		  instance_code => 'identifier_code',
+		  hyb_stringency => 'hybridization_stringency',
+		 );
+
+my @VOCABS =  Bio::Genex::ControlledVocab->get_vocabs();
+my @VOCABS_LC = map {lc($_)} @VOCABS;
+
+# turn on autoflush for STDERR
+select(STDERR);
+$| = 1;
+
+###
+### File Global variables
+###
+my $GENEXML_DTD = $GENEXML_DIR . '/genexml.dtd';
+open(GENEXML,$GENEXML_DTD) or die "$0: Couldn't open $GENEXML_DTD for reading";
+
+# slurp the file into a single scalar
+undef $/;
+my $DTD = <GENEXML>;
+close(GENEXML);
+
+my $DOCTYPE = '<!DOCTYPE GENEXML [' . "\n";
+$DOCTYPE .= $DTD;
+$DOCTYPE .= "\n" . ']>';
+
+my $GENEXML = <<"END";
+<?xml version="1.0"  encoding="UTF-8" standalone="no"?>
+$DOCTYPE
+
+<GENEXML cvs_id="&VERSION;">
+  <header>
+    <misc_list>
+    </misc_list>
+    <genex_info>
+      <controlled_vocabulary_list>
+      </controlled_vocabulary_list>
+    </genex_info>
+  </header>
+</GENEXML>
+END
+
+# used for bookeeping the external files
+my $FILE_ID=1;
+my $USF=1;
+my $AMS=1;
+my $ALS=1;
+my %ID;
+
+my $PARSER = XML::DOM::Parser->new();
+
+# $DOC is really the only global variable the system relies on,
+#    when the code is migrated into a module, the get_*_tag() subroutines
+#    will need to pass in $DOC as a parameter instead of relying on it's 
+#    global prescence
+#
+my $DOC = $PARSER->parse($GENEXML);
+
+# I'm wimping out and using a global for this value, so that add_external_file()
+# knows whether to append 'control-bundle' or the experiment set name to the 
+# beginning of external file names.
+my $FILE_NAME = '';
+
+my @FILE_LIST = ();
+
+########################################
+###
+### the main action
+###
+########################################
+my $cb_file_name;
+
+# parse the cvs_id string and set the other attributes
+#   $Id: db2xml.pl.in,v 1.36 2001/02/05 16:33:24 jes Exp $ 
+my $genexml_node = get_genexml_tag();
+my $cvs_id = $genexml_node->getAttribute('cvs_id');
+my ($id_tag,$filename,$revision,$date,$time,$author,$state) = split(' ',$cvs_id);
+$genexml_node->setAttribute('date',$date);
+$genexml_node->setAttribute('version',$revision);
+
+if (scalar @EXPERIMENTS) {
+  my @experiments = Bio::Genex::ExperimentSet->get_objects(@EXPERIMENTS);
+  my $genexml = get_genexml_tag();
+  my $file_name;
+  my %CACHED;
+
+  # first see if we have cached files
+  if (!$OPTIONS{no_cache} && -d "$EXP_CACHE_DIR/" . $experiments[0]->es_pk) {
+    foreach my $es_db (@experiments) {
+      my $pk = $es_db->es_pk();
+      foreach (glob "$EXP_CACHE_DIR/$pk/*.{ext,xml}") {
+	my ($file) = fileparse($_);
+	print STDERR "writing $OPTIONS{directory}/$file ...\n";
+	system("cp $EXP_CACHE_DIR/$pk/$file $OPTIONS{directory}");
+	die "$0: Error moving cached file: $file: $!"
+	  if $?;
+	push(@FILE_LIST,"$OPTIONS{directory}/$file");
+      }
+    }
+  } else {
+    # no cached files present
+
+    # if we have multiple experiments, we call the main XML file
+    # somethings simple: experiments.xml
+    if (scalar @experiments > 1) {
+      $file_name = "$OPTIONS{directory}/experiments.xml";
+      open(OUT,">$file_name") or die "do_experiments: Couldn't open $file_name for writing";
+      push(@FILE_LIST,$file_name);    
+    }
+
+    foreach my $es_db (@experiments) {
+      # for each new experiment, we zero out the file counters
+      reset_external_counters();
+
+      # we let add_external_file know which experiment we're processing
+      $FILE_NAME = $es_db->name();
+
+      # if we're only writing a single experiment, call it by the 
+      # experiment set name
+      unless (defined $file_name) {
+	$file_name = "$OPTIONS{directory}/$FILE_NAME.xml";
+	open(OUT,">$file_name") 
+	  or die "do_experiments: Couldn't open $file_name for writing";
+	push(@FILE_LIST,$file_name);
+      }
+      my $es_node;
+      my $code = sub {
+	$es_node = do_experiment($es_db);
+	$genexml->appendChild($es_node);
+      };
+      my $PK = $es_db->es_pk();
+      if ($OPTIONS{debug_profile}) {
+	my $t = timeit(1, $code);
+	print STDERR "Time for experiment: $PK = ", timestr($t), "\n";
+      } else {
+	$code->();
+      }
+      # print the data to the file, and close the handle
+      print OUT pretty_print($DOC->toString());
+      #   print OUT $DOC->toString();
+      close(OUT);
+
+      if (!$OPTIONS{no_cache}) {
+	# since there were no cached files, we add them
+	foreach (@FILE_LIST) {
+	  unless (exists $CACHED{$_}) {
+	    mkdir("$EXP_CACHE_DIR/$PK", 0777);
+	    system("cp $_ $EXP_CACHE_DIR/$PK");
+	    $CACHED{$_}++;
+	  }
+	}
+      }
+    }
+  }
+} elsif ($OPTIONS{cb}) {
+  # we let add_external_file know what we're doing
+  $FILE_NAME = 'control-bundle';
+  $cb_file_name = $OPTIONS{directory} . '/' . $FILE_NAME . '.xml';
+  if (!$OPTIONS{no_cache} && -e "$CB_CACHE_DIR/$FILE_NAME.xml") {
+    foreach (glob "$CB_CACHE_DIR/*.{ext,xml}") {
+      my ($file) = fileparse($_);
+      next if $file eq 'control-bundle.xml';
+
+      print STDERR "writing $OPTIONS{directory}/$file ...\n";
+      system("cp $CB_CACHE_DIR/$file $OPTIONS{directory}");
+      die "$0: Error moving cached file: $file: $!"
+	if $?;
+      push(@FILE_LIST,"$OPTIONS{directory}/$file");
+    }
+    # now we fix the <misc_list>,
+    # the old list was cached for the user, we need a new one
+    # first we clear the old one
+    $DOC = $PARSER->parsefile("$CB_CACHE_DIR/control-bundle.xml");
+    my $misc_node = get_misc_list_tag();
+    for my $child ($misc_node->getChildNodes()) {
+      $misc_node->removeChild($child);
+    }
+    # then we create a new one
+    do_misc();
+
+    # and write it out
+    open(OUT,">$cb_file_name") or
+      die "$0: Couldn't open $cb_file_name for writing\n";
+    print OUT pretty_print($DOC->toString());
+    close(OUT);
+    push(@FILE_LIST,$cb_file_name);
+  } else {
+    open(OUT,">$cb_file_name") 
+      or die "$0: Couldn't open $cb_file_name for writing";
+    push(@FILE_LIST,$cb_file_name);
+    my $code = sub {do_control_bundle()};
+    if ($OPTIONS{profile}) {
+      my $t = timeit(1, $code);
+      print STDERR "Time for control bundle = ", timestr($t), "\n";
+    } else {
+      $code->();
+    }
+    print OUT pretty_print($DOC->toString());
+    # print OUT $DOC->toString();
+    close(OUT);
+
+    if (!$OPTIONS{no_cache}) {
+      # since there were no cached files, we add them
+      foreach (@FILE_LIST) {
+	system("cp $_ $CB_CACHE_DIR");
+      }
+    }
+  }
+}
+# return the file list
+print STDOUT join("\n",@FILE_LIST);
+exit(0);
+
+########################################
+###
+### END of main section
+###
+########################################
+
+#
+# subroutines for fetching tags from the DOM hierarchy
+#   these really want to be part of XMLUtils.pm and not here
+#
+
+sub get_genexml_tag {
+  my @nodes = $DOC->getElementsByTagName ('GENEXML');
+  my $genexml = $nodes[0];
+  assert_element($genexml,'GENEXML');
+  return $genexml;
+}
+
+sub get_header_tag {
+  my @nodes = $DOC->getElementsByTagName ('header');
+  my $header = $nodes[0];
+  assert_element($header,'header');
+  return $header;
+}
+
+sub get_genex_info_tag {
+  my @nodes = $DOC->getElementsByTagName ('genex_info');
+  my $genex_info = $nodes[0];
+  assert_element($genex_info,'genex_info');
+  return $genex_info;
+}
+
+sub get_vocabulary_list_tag {
+  my @nodes = $DOC->getElementsByTagName ('controlled_vocabulary_list');
+  my $vocab_list = $nodes[0];
+  assert_element($vocab_list,'controlled_vocabulary_list');
+  return $vocab_list;
+}
+
+sub get_misc_list_tag {
+  my @nodes = $DOC->getElementsByTagName ('misc_list');
+  my $misc_list = $nodes[0];
+  assert_element($misc_list,'misc_list');
+  return $misc_list;
+}
+
+sub get_header_list_node {
+  my $node_list_name = shift;
+
+  # get the node_list
+  my @nodes = $DOC->getElementsByTagName($node_list_name);
+  die "get_header_list_node: Too many $node_list_name lists" if scalar @nodes > 1;
+  my $node_list;
+  if (scalar @nodes < 1) {
+    $node_list = create_element($node_list_name);
+    my $header = get_header_tag();
+    $header->appendChild($node_list);
+  } else {
+    $node_list = $nodes[0];
+  }
+}
+
+sub get_genex_info_list_node {
+  my $node_list_name = shift;
+
+  # get the node_list
+  my @nodes = $DOC->getElementsByTagName($node_list_name);
+  die "get_genex_info_list_node: Too many $node_list_name lists" if scalar @nodes > 1;
+  my $node_list;
+  if (scalar @nodes < 1) {
+    $node_list = create_element($node_list_name);
+    my $genex_info = get_genex_info_tag();
+    $genex_info->appendChild($node_list);
+  } else {
+    $node_list = $nodes[0];
+  }
+}
+
+#
+# Helper subroutines for validate Genex objects
+#   these really want to be part of Genex.pm and not here
+#
+
+sub assert_species {
+  my $species = shift;
+  croak "Not a valid Species" unless 
+    ref($species) eq 'Bio::Genex::Species';
+}
+
+sub assert_protocol {
+  my $protocol = shift;
+  croak "Not a valid Protocol" unless 
+    ref($protocol) eq 'Bio::Genex::Protocol';
+}
+
+sub assert_scanner {
+  my $scanner = shift;
+  croak "Not a valid Scanner" unless 
+    ref($scanner) eq 'Bio::Genex::Scanner';
+}
+
+sub assert_software {
+  my $software = shift;
+  croak "Not a valid Software" unless 
+    ref($software) eq 'Bio::Genex::Software';
+}
+
+sub assert_spotter {
+  my $spotter = shift;
+  croak "Not a valid Spotter" unless 
+    ref($spotter) eq 'Bio::Genex::Spotter';
+}
+
+sub assert_array {
+  my $array = shift;
+  croak "Not a valid Array" unless 
+    ref($array) eq 'Bio::Genex::ArrayMeasurement';
+}
+
+sub assert_experiment {
+  my $experiment = shift;
+  croak "Not a valid Experiment" unless 
+    ref($experiment) eq 'Bio::Genex::ExperimentSet';
+}
+
+#
+# Helper Subroutines for creating XML
+#
+
+sub assert_element {
+  my ($node,$name) = @_;
+  croak "Not a valid DOM Element node" unless 
+    ref($node) eq 'XML::DOM::Element' &&
+      $node->getTagName() eq $name;
+}
+
+sub reset_external_counters {
+  $USF=1;
+  $AMS=1;
+  $ALS=1;
+}
+
+sub add_external_file {
+  my ($type,$name_info) = @_;
+  $name_info = '' unless defined $name_info;
+  my $external_file_list_node = get_header_list_node('external_file_list');
+  my $external_file_node = create_element('external_file');
+  my $id = "ExternalFile:$FILE_ID:LOCAL";
+  $FILE_ID++;
+  $external_file_node->setAttribute(id=>$id);
+
+  # create the name of the external file. Each file consists of 4 pieces:
+  # 
+  #   $name _ $type _ $num . $ext
+  #
+  # where $name is either the experiment set name or 'control-bundle'.
+  #       $type is USF/ALS/AMS
+  #       $num  is a two digit number
+  #       $ext  is 'ext' for external files
+  #
+  # example 'control-bundle_AMS_03.ext'
+  #
+  my $file_name = $OPTIONS{directory} . '/';
+  $file_name .= $FILE_NAME;	# print the $name
+  $file_name .= "_${type}_";	# print the $type
+  if ($type eq 'USF') {		# print the $num
+    $file_name .= sprintf("%.2d", $USF++);
+  } elsif ($type eq 'ALS') {
+    $file_name .= sprintf("%.2d", $ALS++);
+  } elsif ($type eq 'AMS') {
+    $file_name .= sprintf("%.2d", $AMS++);
+  }
+  $file_name .= '.ext';		# print the $ext
+  push(@FILE_LIST,$file_name);
+
+  # we use relative pathnames in the tag
+  $external_file_node->setAttribute(file_name=> basename($file_name));
+  $external_file_list_node->appendChild($external_file_node);
+  return ($file_name,$id);
+}
+
+#
+# lookup_id($table_name,$pkey,$create)
+#    if the $pkey primary key entry does not exist in the %ID lookup table for 
+#    the table $table_name, it will add the data to the XML file by calling
+#    that classes add_genexml_entry() method.
+#
+#    $create indicates whether lookup_id() should add the data for the entry
+#    if it does not yet exist in the XML file.
+#
+# return value: the ID value to be entered into the XML tag
+#
+sub lookup_id {
+  my ($table_name,$pkey,$create) = @_;
+  $create = 0 unless defined $create;
+
+  my $id = $ID{"$table_name:$pkey"};
+  if ((! defined $id) && $create) {
+    print STDERR "lookup_id: Creating new key for $table_name:  $pkey\n" 
+      if $OPTIONS{debug};
+
+    # call the class method for adding the data
+    my $class = 'Bio::Genex::' . $table_name;
+    $class->add_genexml_entry($pkey);
+
+    # enter the information in the lookup table
+    $id = create_id($table_name,$pkey);
+  }
+  return $id;
+}
+
+sub create_id {
+  my ($table_name,$pkey) = @_;
+  my $key = "$table_name:$pkey";
+  my $ID = $ID{$key};
+  unless (defined $ID) {
+    $ID = $key . ':NCGR';
+    $ID{$key} = $ID;
+  }
+  return $ID;
+}
+
+sub create_element {
+  my $name = shift;
+  my $node = $DOC->createElement($name) or 
+    die "create_element: couldn't create $name";
+}
+
+#
+# subroutines for writing XML
+#
+
+
+#
+# do_control_bundle()
+#   main entry point for writing control bundle
+#
+sub do_control_bundle {
+#  my $us_fk = do_misc();
+  do_misc();
+  do_controlled_vocab();
+
+  # By default we list all species in control bundle
+  # unless user has specified a desired subset
+  if (scalar @SPECIES) {
+    foreach my $spc_id (@SPECIES) {
+      do_species(Bio::Genex::Species->new(id=>$spc_id));
+    }
+  } else {
+    foreach my $spc_db (Bio::Genex::Species->get_all_objects()) {
+      do_species($spc_db);
+    }
+  }
+
+  # for now all contact and group info is written
+  do_all_contact();
+#  do_all_group();
+
+  do_all_db();
+  do_all_scanner();
+  do_all_spotter();
+  do_all_software();
+  do_all_protocol();
+  unless ($OPTIONS{debug_no_als}) {
+    if ($OPTIONS{profile}) {
+      my $t = timeit(1, sub {do_all_al()});
+      print STDERR "Time for ALS = ", timestr($t), "\n";
+    } else {
+      do_all_al();
+    }
+  }
+}
+sub do_experiment {
+  my $es_db = shift;
+
+  # make the node for the experiment set
+  my $es_node = create_element('experiment_set');
+  my $id = create_id('ExperimentSet', $es_db->es_pk);
+  $es_node->setAttribute('id',$id);
+  
+  # create the header and add it to the experiment set
+  my $es_header_node = create_element('experiment_set_header');
+  $es_node->appendChild($es_header_node);
+
+  # this is not strictly necessary, but since we're going
+  # to be writing out all the information, might as well
+  $es_db->fetch();
+  
+  #
+  # Handle the foreign keys
+  #
+  
+  # do the species
+  my $dbh = Bio::Genex::current_connection();
+  my $spc_db = fetch_es_species($dbh,$es_db->es_pk);
+  do_species($spc_db);
+
+  # do the citations
+  if (defined $es_db->cit_obj) {
+    $es_node->setAttribute('citation_ids',do_citation($es_db->cit_obj));
+  } else {
+    # not all experiments have citations, so this is not a warning
+  }
+
+  # get the owner's contact information
+  my $owner_id = do_contact($es_db->provider_con_obj);
+  $es_node->setAttribute('owner_contact_id', $owner_id);
+
+  # do the group
+  my $gid = do_group($es_db->gs_obj);
+  $es_node->setAttribute('group_id', $gid);
+
+  # add an experiment_factors_list to the header
+  do_factor_list($es_header_node,$es_db);
+  my %column2name = %{Bio::Genex::ExperimentSet->column2name()};
+  foreach my $column (keys %column2name) {
+    # because we are under the restrictions of 'use strict'
+    # we need this to get away with the dynamic cuteness of 
+    # $obj->$func_name()
+    no strict 'subs';
+    
+    # we need a way to deal with exporting the accession number
+    # so we don't bother printing out the experiment set primary key
+    # but if the local accession number isn't defined we declare it
+    # as local to NCGR
+    next if $column eq 'es_pk';
+    if ($column eq 'local_accession') {
+      if (defined $es_db->local_accession && 
+	  $es_db->local_accession !~ /^\s*$/) {
+	$es_node->setAttribute($EXPERIMENT2GENEXML{$column},$es_db->$column());
+      } else {
+	# this experiment set is local to NCGR, so we use the 
+	# primary key as the local accession
+	$es_node->setAttribute($EXPERIMENT2GENEXML{$column},
+			       'NCGR.ORG:' . $es_db->es_pk);
+      }
+    } elsif ($column =~ /type/) {
+      my $type = $es_db->$column();
+      next unless defined $type;
+      $type  =~ s/ /_/g;
+      $es_node->setAttribute($column, $type);      
+    } elsif ($column =~ /^(?:analysis_description|
+			   biology_description)$/x) {
+      # some data maps to the header
+      my $node = create_element($column);
+      $node->addText($es_db->$column());
+      $es_header_node->appendChild($node);
+    } else {
+      # we only print things if we should
+      next unless exists $EXPERIMENT2GENEXML{$column};
+      
+      # the default case is just to add it as an attribute
+      # we may need to remap the column names to fit the DTD 
+      $es_node->setAttribute($EXPERIMENT2GENEXML{$column},
+			     $es_db->$column());      
+    }
+  }
+  $es_node->setAttribute("name",$es_db->name);
+
+  # now handle the arrays
+  unless ($OPTIONS{debug_no_ams}) {
+    my $code = sub {
+      my @array_list = fetch_am_ids($es_db->es_pk,@AM_TYPES);
+      unless (scalar @array_list) {
+	warn "No arrays found for experiment: " . $es_db->name();
+	return $es_node;
+      }
+      @array_list = Bio::Genex::ArrayMeasurement->get_objects(@array_list);
+      do_arrays($es_node,$es_db,@array_list);
+    };
+    if ($OPTIONS{profile}) {
+      my $t = timeit(1,$code);
+      print STDERR "Time for Arrays = ", timestr($t), "\n";
+    } else {
+      $code->();
+    }
+  }
+  # now that the array ID's are stored, we handle the treatments
+  do_treatments($es_db,$es_header_node);
+
+  return $es_node;
+}
+
+#
+# Subroutines for writing groups of DB objects
+#
+
+sub do_misc {
+  my $dbh = Bio::Genex::current_connection();
+
+  if ($OPTIONS{authenticate}) {
+    # only validate the user if we've been asked to
+    croak "Must specify a user" unless $OPTIONS{user};
+    croak "Must specify a password" unless $OPTIONS{password};
+
+    # validate the password
+    my $us_pk = check_password($dbh,$OPTIONS{user},$OPTIONS{password});
+    die  "do_misc: Bad Password for user: $OPTIONS{user}" 
+      unless defined $us_pk;
+
+    my $us_db = Bio::Genex::UserSec->new(id=>$us_pk);
+    my $contact = $us_db->con_obj();
+    unless (defined lookup_id('Contact',$contact->con_pk)) {
+      do_contact($contact);
+    }
+  }
+
+  # announce our progress
+  print STDERR "Writing control bundle file to $cb_file_name\n";
+
+  my $misc_list = get_misc_list_tag();
+  # add a user node
+  my $user_node = create_element('misc_qualifier');
+  # add it to the tree
+  $user_node->setAttribute(name=>'user_name');
+  $user_node->setAttribute(value=>$OPTIONS{user});
+  $misc_list->appendChild($user_node);
+
+  # add a type node
+  my $type_node = create_element('misc_qualifier');
+  # add it to the tree
+  $type_node->setAttribute(name=>'transmission_type');
+  $type_node->setAttribute(value=>'control_bundle');
+  $misc_list->appendChild($type_node);
+
+  # add a tool node
+  my $tool_node = create_element('misc_qualifier');
+  # add it to the tree
+  $tool_node->setAttribute(name=>'file_creator');
+  $tool_node->setAttribute(value=>basename($0));
+  $misc_list->appendChild($tool_node);
+
+  # add a tool version node
+  my $version_node = create_element('misc_qualifier');
+  # add it to the tree
+  $version_node->setAttribute(name=>'file_creator_version');
+  $version_node->setAttribute(value=>$VERSION);
+  $misc_list->appendChild($version_node);
+
+  # add a site node
+  my $site_node = create_element('misc_qualifier');
+  # add it to the tree
+  $site_node->setAttribute(name=>'transmission_site');
+  $site_node->setAttribute(value=>'NCGR');
+  $misc_list->appendChild($site_node);
+
+  #
+  # add a time node
+  my $time_node = create_element('misc_qualifier');
+  # add it to the tree
+  $time_node->setAttribute(name=>'creation_time');
+  my $current_time = timestamp();
+  $time_node->setAttribute(value=>$current_time);
+  $misc_list->appendChild($time_node);
+
+  # add experiment set names
+  my @experiments = Bio::Genex::ExperimentSet->get_all_objects();
+  foreach my $es_db (@experiments) {
+    my $experiment_name_node = create_element('misc_qualifier');
+    # add it to the tree
+    $experiment_name_node->setAttribute(name=>'experiment_set_name');
+    $experiment_name_node->setAttribute(value=>$es_db->name);
+    $misc_list->appendChild($experiment_name_node);
+  }
+
+  # we're done
+#  return $us_db->us_pk();    
+}
+
+sub by_cv_term {
+  # $a and $b are Bio::Genex::ControlledVocab objects
+  return 
+}
+
+sub do_controlled_vocab {
+  # get the main list node
+  my $vocab_list = get_vocabulary_list_tag ();
+ VOCAB: for (my $i=0;$i<scalar @VOCABS_LC;$i++) {
+    # create the node, and add it to the tree
+    my $vocab_node = create_element('controlled_vocabulary');
+    $vocab_node->setAttribute(qualifier=>$VOCABS[$i]);
+    $vocab_list->appendChild($vocab_node);
+    
+    # get the data from the DB
+    my $class = "Bio::Genex::$VOCABS[$i]";
+    eval "require $class";
+    
+    # we sort the terms 
+    my @objs = sort {$::a->term_string cmp $::b->term_string} 
+      $class->get_all_objects();
+  TERM: foreach my $term (@objs) {
+      my $term_string = $term->term_string();
+      # don't add empty terms
+      next TERM if $term_string =~ /^\s*$/;
+      
+      # we need to get rid of bad mojo
+      $term_string =~ s/\s+/_/g;   # strings of whitespace => '_'
+      $term_string =~ s|/|_per_|g; # 'moles/liter'  => 'moles_per_liter'      
+      
+      # create the node, and add it to the tree
+      my $node = create_element('term');
+      $vocab_node->appendChild($node);
+      $node->setAttribute(name=>$term_string);
+
+      # don't add empty descriptions
+      next TERM if $term->description =~ /^\s*$/;
+      $node->setAttribute(description=>$term->description);
+    }
+  }
+}
+
+sub do_all_protocol {
+  foreach my $sw_db (Bio::Genex::Protocol->get_all_objects()) {
+    do_protocol($sw_db);
+  }
+}
+
+sub do_all_software {
+  foreach my $sw_db (Bio::Genex::Software->get_all_objects()) {
+    do_software($sw_db);
+  }
+}
+
+sub do_all_scanner {
+  foreach my $scn_db (Bio::Genex::Scanner->get_all_objects()) {
+    do_scanner($scn_db);
+  }
+}
+
+sub do_all_spotter {
+  foreach my $spt_db (Bio::Genex::Spotter->get_all_objects()) {
+    do_spotter($spt_db);
+  }
+}
+
+sub do_all_db {
+  my @dbs = Bio::Genex::ExternalDatabase->get_all_objects();
+  my $external_database_list_node = get_header_list_node('external_database_list');
+  foreach my $db (@dbs) {
+    # don't make a new one if we have it already
+    next if defined lookup_id('ExternalDatabase',$db->name);
+
+    my $db_node = create_element('external_database');
+    $external_database_list_node->appendChild($db_node);
+
+    my $id = create_id('ExternalDatabase',$db->name);
+    $db_node->setAttribute('id',$id);
+
+    foreach my $col (qw(name main_url parameterized_url)) {
+      $db_node->setAttribute($col,$db->$col());
+    }
+  }
+}
+
+sub do_all_contact {
+  foreach my $con_db (Bio::Genex::Contact->get_all_objects()) {
+    do_contact($con_db);
+  }
+}
+
+sub do_all_group {
+  foreach my $grp_db (Bio::Genex::GroupSec->get_all_objects()) {
+    do_group($grp_db);
+  }
+}
+
+sub do_all_al {
+#  my $us_fk = shift;
+
+#  my @al_ids = fetch_user_al_ids($us_fk);
+#   foreach my $al_db (Bio::Genex::ArrayLayout->get_objects(@al_ids)) {
+  foreach my $al_db (Bio::Genex::ArrayLayout->get_all_objects()) {
+    do_al($al_db);
+  }
+}
+
+#
+# Subroutines for writing individual DB objects
+#
+
+sub do_al {
+  my $al_db = shift;
+
+  # don't enter the layout if it already exists
+  my $id = lookup_id('ArrayLayout',$al_db->al_pk);
+  return $id if defined $id;
+
+  my $al_node_list = get_header_list_node('array_layout_list');
+  my $al_node = create_element('array_layout');
+  $al_node_list->appendChild($al_node);
+
+  $id = create_id('ArrayLayout',$al_db->al_pk);
+  $al_node->setAttribute('id',$id);
+  foreach my $col (qw(name   
+		      technology_type
+		      coating
+		      default_spot_conc
+		      default_spot_conc_units
+		      default_spot_conc_error)) {
+    next unless defined $al_db->$col();
+    $al_node->setAttribute($col,$al_db->$col());
+  }
+  my $con_fk = $al_db->con_fk();
+  if (defined $con_fk) {
+    my $con_id = lookup_id('Contact',$con_fk,1);
+    $al_node->setAttribute('contact_id',$con_id);
+  }
+
+  $Bio::Genex::AL_Spots::LIMIT = 10 if $OPTIONS{debug};
+
+  # we know that al_spots_obj() is defined to return an array reference
+  # (which may reference an empty array), so it is safe to directly
+  # interpolate and call 'scalar' to check for the existence of data
+  my @data;
+  if ($OPTIONS{profile}) {
+    my $t = timeit(1, sub {
+		     @data = @{$al_db->al_spots_obj()};
+		   });
+    print STDERR "Time for retrieving ALS data = ", timestr($t), "\n";
+  } else {
+    @data = @{$al_db->al_spots_obj()};
+  }
+
+  unless (scalar @data) {
+    warn "No ALS spot data for ", $al_db->name(), "\n";
+    return $id;
+  }
+  
+  #
+  # If we've gotten here, then there are ALS values to write out
+  #
+
+  # set up the internal DTD
+  my $GENEXML_DTD = $GENEXML_DIR . '/als.dtd';
+  open(GENEXML,$GENEXML_DTD) or die "do_als: Couldn't open $GENEXML_DTD for reading";
+  
+  # slurp the file into a single scalar
+  undef $/;
+  my $DTD = <GENEXML>;
+  close(GENEXML);
+  
+  my $DOCTYPE = '<!DOCTYPE ALS [' . "\n";
+  $DOCTYPE .= $DTD;
+  $DOCTYPE .= "\n" . ']>';
+  
+  my $ALS_GENEXML = <<"END";
+<?xml version="1.0"  encoding="UTF-8" standalone="no"?>
+$DOCTYPE
+
+<ALS cvs_id="&VERSION;"/>
+END
+
+  # we create a new parser, so that memory will be disposed when we
+  # leave the subroutine
+  my $parser = XML::DOM::Parser->new();
+  my $als_doc = $parser->parse($ALS_GENEXML);
+  my ($ALS_node) = $als_doc->getElementsByTagName('ALS');
+
+  # parse the cvs_id string and set the other attributes
+  #   $Id: db2xml.pl.in,v 1.36 2001/02/05 16:33:24 jes Exp $ 
+  my $cvs_id = $ALS_node->getAttribute('cvs_id');
+  my ($id_tag,$filename,$revision,$date,$time,$author,$state) = split(' ',$cvs_id);
+  $ALS_node->setAttribute('date',$date);
+  $ALS_node->setAttribute('version',$revision);
+
+  my $data_node = create_element('data');
+  $al_node->appendChild($data_node);
+
+  # make the external file
+  my ($als_file_name,$file_id) = add_external_file('ALS');
+  print STDERR "writing ALS data to $als_file_name\n";
+  $data_node->setAttribute('external_file_id',$file_id);
+
+  my @header = @{shift @data};
+
+  # set up the index of column names -- by running map, 
+  # we create a hash where the names return the array index
+  my $i = 0;
+  my %index = map {$_,$i++} @header;
+
+  # remove usf_fk, als_pk, and al_fk from the list of column names
+  my @column_names = 
+    grep {! /^als_pk$/ && 
+          ! /^usf_fk$/ && 
+          ! /^al_fk$/} @{Bio::Genex::AL_Spots->column_names()};
+
+  die "do_al: Couldn't find columns for " . $al_db->name() 
+    unless exists $index{als_pk} && exists $index{usf_fk};
+  foreach my $data (@data) {
+    my $spot_node = $als_doc->createElement('array_layout_spot');
+    $ALS_node->appendChild($spot_node);
+
+    # add the rest of the attributes
+    foreach my $col (@column_names) {
+      my $val = $data->[$index{$col}];
+      next unless defined $val;
+      $spot_node->setAttribute($col,$val);
+    }
+    # add the id
+    my $id = create_id('AL_Spots',$data->[$index{als_pk}]);
+    $spot_node->setAttribute('id',$id);
+
+    # lookup the usf_id
+    my $usf_id = lookup_id('UserSequenceFeature',$data->[$index{usf_fk}]);
+    next unless defined $usf_id;
+    $spot_node->setAttribute('sequence_feature_id',$usf_id);
+  }				# end of spot data
+
+  # write the data out
+  open(ALS,">$als_file_name") 
+    or die "do_al: Couldn't open $als_file_name for writing";
+
+  print ALS pretty_print($als_doc->toString());
+  close(ALS);
+
+  # now let the caller know where the data was stored
+  return $id;
+}
+
+sub do_protocol {
+  my $proto_db = shift;
+  assert_protocol($proto_db);
+
+  my $id = lookup_id('Protocol', $proto_db->prt_pk);
+  unless (defined $id) {
+    # don't enter the protocol if it already exists
+    my $id = lookup_id('Protocol',$proto_db->prt_pk);
+    return $id if defined $id;
+
+    my $proto_node_list = get_header_list_node('protocol_list');
+
+    my $proto_node = create_element('protocol');
+    $proto_node_list->appendChild($proto_node);
+  
+    $proto_node->setAttribute('title',$proto_db->title);
+    $proto_node->setAttribute('type',$proto_db->type);
+
+    if (defined $proto_db->text) {
+      my $text_node = create_element('text');
+      $text_node->addText($proto_db->text);
+      # we have preformatted text, and we want it preserved
+      $text_node->setAttribute('xml:space','preserve');
+      $proto_node->appendChild($text_node);
+    }
+    $id = create_id('Protocol',$proto_db->prt_pk);
+    $proto_node->setAttribute('id',$id);
+  }
+  return $id;
+}
+
+sub do_scanner {
+  my $scn_db = shift;
+  assert_scanner($scn_db);
+
+  # don't enter the scanner if it already exists
+  my $id = lookup_id('Scanner',$scn_db->scn_pk);
+  return $id if defined $id;
+
+  my $scn_node_list = get_header_list_node('scanner_list');
+
+  my $scn_node = create_element('scanner');
+  $scn_node_list->appendChild($scn_node);
+    
+  $id = create_id('Scanner',$scn_db->scn_pk);
+  $scn_node->setAttribute('id',$id);
+  
+  $scn_node->setAttribute('model_serial_num',$scn_db->model_serial_num);
+  $scn_node->setAttribute('model_description',$scn_db->model_description);
+
+  my $con_fk = $scn_db->con_fk;
+  if (defined $con_fk) {
+    my $con_id = lookup_id('Contact',$con_fk,1);
+    $scn_node->setAttribute('contact_id',$con_id);
+  }
+  return $id;
+}
+
+sub do_software {
+  my $sw_db = shift;
+  assert_software($sw_db);
+
+  # don't enter the software if it already exists
+  my $id = lookup_id('Software',$sw_db->sw_pk);
+  return $id if defined $id;
+
+  my $sw_node_list = get_header_list_node('software_list');
+
+  my $sw_node = create_element('software');
+  $sw_node_list->appendChild($sw_node);
+    
+  $id = create_id('Software',$sw_db->sw_pk);
+  $sw_node->setAttribute('id',$id);
+
+  foreach my $col (qw(name
+		      type
+		      version)) {
+    $sw_node->setAttribute($col,$sw_db->$col());
+  }
+  my $con_fk = $sw_db->con_fk;
+  if (defined $con_fk) {
+    my $con_id = lookup_id('Contact',$con_fk,1);
+    $sw_node->setAttribute('contact_id',$con_id);
+  }
+  return $id;
+}
+
+sub do_spotter {
+  my $spt_db = shift;
+  assert_spotter($spt_db);
+
+  # don't enter the layout if it already exists
+  my $id = lookup_id('Spotter',$spt_db->sptr_pk);
+  return $id if defined $id;
+
+  my $spt_node_list = get_header_list_node('spotter_list');
+
+  my $spt_node = create_element('spotter');
+  $spt_node_list->appendChild($spt_node);
+    
+  $id = create_id('Spotter',$spt_db->sptr_pk);
+  $spt_node->setAttribute('id',$id);
+  
+  $spt_node->setAttribute('model_serial_num',$spt_db->model_serial_num);
+  $spt_node->setAttribute('model_description',$spt_db->model_description);
+
+  my $con_fk = $spt_db->con_fk;
+  if (defined $con_fk) {
+    # add the contact entry if not yet defined
+    my $con_id = lookup_id('Contact',$con_fk,1);
+    $spt_node->setAttribute('contact_id',$con_id);
+  }
+  return $id;
+}
+
+sub do_factor_list {
+  my ($es_header_node,$es_db) = @_;
+  assert_element($es_header_node,'experiment_set_header');
+  assert_experiment($es_db);
+
+  my $factor_list_node = get_experiment_header_list_node($es_header_node,
+							 'experiment_factors_list');
+
+  # we know that experimentfactor_obj() is defined to return an array
+  # reference (which may reference an empty array), so it is safe to
+  # directly interpolate and call 'scalar' to check for the existence
+  # of data
+  my @factor_list = @{$es_db->experimentfactors_obj()};
+  unless (scalar @factor_list) {
+    warn "No ExperimentFactors for experiment ", $es_db->name(), "\n";
+  }
+  my @column_names = @{Bio::Genex::ExperimentFactors->column_names()};
+  foreach my $factor (@factor_list) {
+    my $factor_node = create_element('experiment_factor');
+    foreach my $col (@column_names) {
+      next if $col =~ /_[pf]k$/;
+      $factor_node->setAttribute($col,$factor->$col());
+    }
+    $factor_node->setAttribute('id',create_id('ExperimentFactor',$factor->ef_pk));
+    $factor_list_node->appendChild($factor_node);
+  }
+  $es_header_node->appendChild($factor_list_node);
+}
+
+sub do_species {
+  my $spc_db = shift;
+  assert_species($spc_db);
+
+  my $id = lookup_id('Species',$spc_db->spc_pk);
+  unless (defined $id) {
+    my $species_list_node = get_header_list_node('species_list');
+
+    # make the tag
+    my $species_node = create_element('species');
+    $species_list_node->appendChild($species_node);
+    
+    $id = create_id('Species', $spc_db->spc_pk);
+    $species_node->setAttribute('id',$id);
+
+    # handle the attributes
+    foreach my $col (qw(primary_scientific_name
+			is_sequenced_genome
+			is_circular_genome
+			num_chromosomes
+			general_classification
+			cell_structure)) {
+      my $text = $spc_db->$col();
+      next unless defined $text && $text !~ /^\s*$/;
+      $species_node->setAttribute($col,$text);
+    }
+    
+    # handle the elements
+    foreach my $col (qw(scientific_aliases
+			common_names
+			genome_size
+			ncbi_taxonomy_acc
+			relevant_urls
+			comments)) {
+      # we only write out these columns if they have information
+      my $text = $spc_db->$col();
+      next unless defined $text && $text !~ /^\s*$/;
+
+      my $node = create_element($col);
+      $species_node->appendChild($node);
+      $node->addText($text);
+    }
+    
+    # handle the chromosomes
+    my $chrom_list_node = create_element('chromosome_list');
+    $species_node->appendChild($chrom_list_node);
+
+    # we know that chromosome_obj() is defined to return an array
+    # reference (which may reference an empty array), so it is safe to
+    # directly interpolate and call 'scalar' to check for the
+    # existence of data
+    unless (scalar @{$spc_db->chromosome_obj}) {
+      warn "no Chromosomes for species ", 
+	$spc_db->primary_scientific_name(), "\n";
+    } else {
+      foreach my $chrom_db (@{$spc_db->chromosome_obj}) {
+	my $chrom = create_element('chromosome');
+	$chrom_list_node->appendChild($chrom);
+	foreach my $col (qw(name length)) {
+	  $chrom->setAttribute($col,$chrom_db->$col());
+	}
+      }
+    }
+
+    # do the user sequence features
+    unless ($OPTIONS{debug_no_usf}) {
+      my $code = sub {do_usf($spc_db)};
+      if ($OPTIONS{profile}) {
+	my $t = timeit(1, $code);
+	print STDERR "Time for USF = ", timestr($t), "\n";
+      } else {
+	$code->();
+      }
+    }
+    $id = create_id('Species', $spc_db->spc_pk);
+    $species_node->setAttribute('id',$id);
+  }
+  return $id;
+}
+
+sub do_usf {
+  my $spc_db = shift;
+  my $usf_list_node = get_header_list_node('usf_list');
+
+  #
+  # We first check whether there are any USF to write
+  #   if there aren't, we return without creating any elements
+  #
+
+  # for debugging
+  my $USF_LIMIT = 10;
+  $Bio::Genex::UserSequenceFeature::LIMIT = $USF_LIMIT if $OPTIONS{debug};
+  $Bio::Genex::DBUtils::DEBUG = 1 if $OPTIONS{debug};
+
+  # we know that usersequencefeature_obj() is defined to return an
+  # array reference (which may reference an empty array), so it is
+  # safe to directly interpolate and call 'scalar' to check for the
+  # existence of data
+  my @usf_list;
+  {
+    # <testing>
+    # if NO_FETCH_ALL is set to '1', $obj->fetch() will *not*
+    # be invoked on each of the members of @usf_list, which 
+    # will cause Bio::Genex::undefined() to be invoked for each
+    # attribute access. This seems like it should take more time.
+    # </testing>
+    my $code = sub {
+      local $Bio::Genex::DBUtils::NO_FETCH_ALL = 0;
+      @usf_list = @{$spc_db->usersequencefeature_obj};
+    };
+    if ($OPTIONS{profile}) {
+      my $t = timeit(1, $code);
+      print STDERR "Time for retrieving USF data = ", timestr($t), "\n";
+    } else {
+      $code->();
+    }
+  }
+
+  unless (scalar @usf_list) {
+    warn "No UserSequenceFeatures for species ", 
+      $spc_db->primary_scientific_name(), "\n";
+    return;
+  }
+
+  #
+  # If we've gotten here, then there are USF values to write out
+  #
+
+  # set up the internal DTD
+  my $GENEXML_DTD = $GENEXML_DIR . '/usf.dtd';
+  open(GENEXML,$GENEXML_DTD) or die "do_usf: Couldn't open $GENEXML_DTD for reading";
+  
+  # slurp the file into a single scalar
+  undef $/;
+  my $DTD = <GENEXML>;
+  close(GENEXML);
+  
+  my $DOCTYPE = '<!DOCTYPE USF [' . "\n";
+  $DOCTYPE .= $DTD;
+  $DOCTYPE .= "\n" . ']>';
+  
+  my $USF_GENEXML = <<"END";
+<?xml version="1.0"  encoding="UTF-8" standalone="no"?>
+$DOCTYPE
+
+<USF cvs_id="&VERSION;"/>
+END
+
+  # we create a new parser, so that memory will be disposed when we
+  # leave the subroutine
+  my $parser = XML::DOM::Parser->new();
+  my $usf_doc = $parser->parse($USF_GENEXML);
+  my ($USF_node) = $usf_doc->getElementsByTagName('USF');
+
+  # parse the cvs_id string and set the other attributes
+  #   $Id: db2xml.pl.in,v 1.36 2001/02/05 16:33:24 jes Exp $ 
+  my $cvs_id = $USF_node->getAttribute('cvs_id');
+  my ($id,$filename,$revision,$date,$time,$author,$state) = split(' ',$cvs_id);
+  $USF_node->setAttribute('date',$date);
+  $USF_node->setAttribute('version',$revision);
+
+  # first add the DBs, so that we can look them up later
+  do_all_db();
+
+  # create the link to the data file
+  my ($usf_file_name,$file_id) = add_external_file('USF');
+  print STDERR "Printing USF data to $usf_file_name\n";
+  my $data_node = create_element('data');
+  $data_node->setAttribute('external_file_id',$file_id);
+  $usf_list_node->appendChild($data_node);
+
+  # species_id
+  my $species_id = lookup_id('Species',$spc_db->spc_pk,1);
+
+  #
+  # We keep track of some useful info for timing feedback
+  my $i;
+  my $initial_time = new Benchmark;
+  my $total = scalar @usf_list;
+  $total = $USF_LIMIT if $OPTIONS{DEBUG};
+  foreach my $usf_db (@usf_list) {
+    # handle the timing feedback
+    $i++;
+    if ($i % 250 == 0) {
+      my $time_str = timestr(timediff(new Benchmark,$initial_time));
+      my ($cur_time) = $time_str =~ /(\d+)\s+wallclock secs/;
+      print STDERR "Processing USF number $i, ";
+      my $time_left = $cur_time * ($total/$i) - $cur_time;
+      if ($time_left <= 0) {
+	print STDERR "finished\n";
+      } else {
+	printf STDERR "%5.2f secs remaining for processing\n", $time_left;
+      }
+    }
+
+    # do the real work
+    my $usf_node = $usf_doc->createElement('sequence_feature');
+    foreach my $col (qw(chromosome
+			start_position
+			end_position
+			usf_name
+			usf_type
+			other_name
+			other_type
+			short_description)) {
+      $usf_node->setAttribute($col,$usf_db->$col());
+    }
+    if (defined $usf_db->sequence()) {
+      my $seq_node = $usf_doc->createElement('sequence');
+      $seq_node->addText($usf_db->sequence());
+      $usf_node->appendChild($seq_node);
+    }
+    if (defined $usf_db->clone_name()) {
+      my $clone_node = $usf_doc->createElement('clone');
+      $clone_node->addText($usf_db->clone_name());
+      $usf_node->appendChild($clone_node);
+    }
+
+    # blast scores
+
+    # we know that blasthits_obj() is defined to return an array
+    # reference (which may reference an empty array), so it is safe to
+    # directly interpolate and call 'scalar' to check for the
+    # existence of data
+    if (scalar @{$usf_db->blasthits_obj}) {
+      my $blast_node = $usf_doc->createElement('blast_scores');
+      $usf_node->appendChild($blast_node);
+
+      # make a list of blast scores
+      foreach my $hit_db (@{$usf_db->blasthits_obj}) {
+	my $hit_node = $usf_doc->createElement('hit');
+	$blast_node->appendChild($hit_node);
+	$hit_node->setAttribute('match_name',$hit_db->match_accession);
+	$hit_node->setAttribute('e_score',$hit_db->expect_value);
+      }
+    }
+
+    # DB accession numbers
+
+    # we know that usf_externaldblink_obj() is defined to return an
+    # array reference (which may reference an empty array), so it is
+    # safe to directly interpolate and call 'scalar' to check for
+    # the existence of data
+    if (scalar @{$usf_db->usf_externaldblink_obj}) {
+      my $database_list_node = $usf_doc->createElement('database_accession_nums');
+      $usf_node->appendChild($database_list_node);
+      
+      # make a list of DB nums
+      foreach my $db_link (@{$usf_db->usf_externaldblink_obj}) {
+	my $database_node = $usf_doc->createElement('database');
+	$database_list_node->appendChild($database_node);
+	
+	my $db_id = lookup_id('ExternalDatabase',$db_link->db_name) ||
+	  die "do_usf: Couldn't get DB ID for ", $db_link->db_name();
+	$database_node->setAttribute('accession_num',$db_link->external_identifier);
+	$database_node->setAttribute('database_id',$db_id);
+      }
+    }
+
+    # contact_id
+    my $con_fk = $usf_db->con_fk; 
+    if (defined $con_fk && $con_fk !~ /^\s*$/) {
+      $usf_node->setAttribute('contact_id',
+			      lookup_id('Contact',$con_fk,1));
+    }
+    # sample_id
+    my $smp_fk = $usf_db->smp_fk; 
+    if (defined $smp_fk && $smp_fk !~ /^\s*$/) {
+      $usf_node->setAttribute('sample_id',
+			      lookup_id('Sample',$smp_fk,1));
+    }
+
+    $usf_node->setAttribute('species_id',$species_id);
+    $usf_node->setAttribute('id',create_id('UserSequenceFeature',
+					   $usf_db->usf_pk));
+    $USF_node->appendChild($usf_node);
+  }
+
+  # write out the data to file
+  open(USF,">$usf_file_name") or die "do_usf: Couldn't open $usf_file_name for writing";
+  print USF pretty_print($usf_doc->toString());
+  close(USF);
+}
+
+sub do_citation {
+  my $cit_db = shift;
+
+  # to avoid entering them multiple times
+  my $id = lookup_id('Citation',$cit_db->cit_pk);
+  unless (defined $id) {
+    my @columns = @{Bio::Genex::Citation->column_names()};
+
+    my $cit_node_list = get_header_list_node('citation_list');
+    my $cit_node = create_element('citation');
+    $cit_node_list->appendChild($cit_node);
+    foreach my $col (@columns) {
+      next if $col =~ /^cit_pk$/;
+      my $text = $cit_db->$col();
+      next unless defined $text && $text !~ /^\s*$/;
+      
+      my $node = create_element($col);
+      $cit_node->appendChild($node);
+      $node->addText($text);
+    }
+    $id = create_id('Citation',$cit_db->cit_pk);
+    $cit_node->setAttribute('id',$id);
+  }
+  return $id;
+}
+
+sub do_contact {
+  my $con_db = shift;
+
+  # to avoid entering them multiple times
+  my $id = lookup_id('Contact',$con_db->con_pk);
+  unless (defined $id) {
+    my $con_node_list = get_header_list_node('contact_list');
+    my @columns = @{Bio::Genex::Contact->column_names()};
+    
+    my $con_node = create_element('contact');
+    $con_node_list->appendChild($con_node);
+    foreach my $col (@columns) {
+      next if $col =~ /^type$/;
+      next if $col =~ /^last_updated$/;
+      next if $col =~ /^con_pk$/;
+      my $text = $con_db->$col();
+      next if not defined $text or $text =~ /^\s*$/;
+
+      my $node = create_element($col);
+      $con_node->appendChild($node);
+      $node->addText($text);
+    }
+    $con_node->setAttribute('last_updated',$con_db->last_updated);
+    $con_node->setAttribute('type',$con_db->type);
+    $id = create_id('Contact',$con_db->con_pk);
+    $con_node->setAttribute('id',$id);
+  }
+  return $id;
+}
+
+#
+# We'll let this stay on hold until after the next release
+#
+
+# sub do_contact {
+#   my $con_db = shift;
+# 
+#   # to avoid entering them multiple times
+#   my $id = lookup_id('Contact',$con_db->con_pk);
+#   unless (defined $id) {
+#     my $con_node_list = get_header_list_node('contact_list');
+#     my @columns = @{Bio::Genex::Contact->column_names()};
+#     
+#     my $con_node = create_element('contact');
+#     $con_node_list->appendChild($con_node);
+#     foreach my $col (@columns) {
+# 	next if $col =~ /^con_pk$/;
+# 	my $text = $con_db->$col();
+# 	next unless defined $text && $text !~ /^\s*$/;
+# 	
+# 	$con_node->setAttribute($col,$con_db->$col());
+#     }
+#     $id = create_id('Contact',$con_db->con_pk);
+#     $con_node->setAttribute('id',$id);
+#   }
+#   return $id;
+# }  
+
+sub do_group {
+  my $group_db = shift;
+  my $id = lookup_id('Group',$group_db->gs_pk);
+  unless (defined $id) {
+    my $group_node_list = get_header_list_node('group_list');
+    my $group_node = create_element('group');
+    $group_node_list->appendChild($group_node);
+    $group_node->setAttribute('name',$group_db->group_name);
+    $id = create_id('Group',$group_db->gs_pk);
+    $group_node->setAttribute('id',$id);
+
+    # now add the group members
+    # we know that grouplink_obj() is defined to return an
+    # array reference (which may reference an empty array), so it is
+    # safe to directly interpolate and call 'scalar' to check for
+    # the existence of data
+    if (scalar @{$group_db->grouplink_obj}) {
+      foreach my $gl_db (@{$group_db->grouplink_obj}) {
+	my $member_node = create_element('member');
+	$member_node->setAttribute('contact_id',
+				   lookup_id('Contact',
+					     $gl_db->us_obj->con_fk(),
+					     1));
+	$group_node->appendChild($member_node);
+      }
+    }
+  }
+  return $id;
+}
+
+#
+# We need to know *which* experiment set header to utilize
+#    so it is simplest just to pass it in.
+#
+sub do_treatments {
+  my ($es_db,$es_header_node) = @_;
+  assert_experiment($es_db);
+
+  # we know that treatmentlevel_obj() is defined to return an
+  # array reference (which may reference an empty array), so it is
+  # safe to directly interpolate and call 'scalar' to check for
+  # the existence of data
+  my @treatment_list = @{$es_db->treatmentlevel_obj};
+  unless (scalar @treatment_list) {
+    warn "No TreatmentLevels for experiment: ", $es_db->name(), "\n";
+    return;
+  }
+
+  assert_element($es_header_node,'experiment_set_header');
+  my $treatment_list_node = create_element('treatment_list');
+  
+  $es_header_node->appendChild($treatment_list_node);
+  foreach my $treatment_db (@treatment_list) {
+    my $treatment_node = create_element('treatment');
+    $treatment_node->setAttribute('treatment_name',$treatment_db->name);
+
+    # we only add the entry if the array is in the XML file already
+    my $ratio_id = lookup_id('ArrayMeasurement',$treatment_db->ratio_am_obj->am_pk);
+    $treatment_node->setAttribute('ratio_array_measurement_id',$ratio_id)
+      if defined $ratio_id;
+
+    $treatment_node->setAttribute('id', create_id('TreatmentLevel',
+						  $treatment_db->tl_pk));
+    $treatment_list_node->appendChild($treatment_node);
+
+    # add the treatment_ams
+    # we know that treatment_ams_obj() is defined to return an
+    # array reference (which may reference an empty array), so it is
+    # safe to directly interpolate and call 'scalar' to check for
+    # the existence of data
+    my @treatment_am_list = @{$treatment_db->treatment_ams_obj};
+    unless (scalar @treatment_am_list) {
+      warn "No Treatment_AMs for TreatmentLevel: ", 
+	$treatment_db->name(), "\n";
+    } else {
+      my $treatment_am_list_node = create_element('treatment_array_list');
+      $treatment_node->appendChild($treatment_am_list_node);
+      foreach my $treatment_am_db (@treatment_am_list) {
+	my $treatment_am_node = create_element('treatment_array');
+
+	my $am_id = lookup_id('ArrayMeasurement', $treatment_am_db->am_fk);
+	die "Couldn't find ID for array: ", $treatment_am_db->am_fk()
+	  unless defined $am_id;
+	$treatment_am_node->setAttribute('measurement_id', $am_id);
+			
+	$treatment_am_list_node->appendChild($treatment_am_node);
+      }
+    }
+
+    # add the tl_factorvalues
+    # we know that tl_factorvalues_obj() is defined to return an
+    # array reference (which may reference an empty array), so it is
+    # safe to directly interpolate and call 'scalar' to check for
+    # the existence of data
+    my @tl_factorvalues_list = @{$treatment_db->tl_factorvalues_obj};
+    unless (scalar @tl_factorvalues_list) {
+      warn "No TL_factorvalues for TreatmentLevel: ", 
+	$treatment_db->name(), "\n";
+    } else {
+      my $treatment_factor_list_node = create_element('treatment_factor_list');
+      $treatment_node->appendChild($treatment_factor_list_node);
+      foreach my $tl_factorvalues_db (@tl_factorvalues_list) {
+	my $tl_factorvalues_node = create_element('treatment_factor');
+
+	$tl_factorvalues_node->setAttribute('value',
+					    $tl_factorvalues_db->value);
+	$tl_factorvalues_node->setAttribute('reference_value',
+					    $tl_factorvalues_db->reference_value);
+	$tl_factorvalues_node->setAttribute('factor_id',
+					    lookup_id('ExperimentFactor',
+						      $tl_factorvalues_db->ef_fk));
+	$treatment_factor_list_node->appendChild($tl_factorvalues_node);
+      }
+    }
+  }
+}
+
+sub get_array_list_node {
+  my ($array_node,$node_name) = @_;
+  assert_element($array_node,'array');
+
+  # get the node_list
+  my @nodes = $array_node->getElementsByTagName($node_name);
+  die "get_array_list_node: Too many $node_name nodes" if scalar @nodes > 1;
+  my $node_list;
+  if (scalar @nodes < 1) {
+    $node_list = create_element($node_name);
+    $array_node->appendChild($node_list);
+  } else {
+    $node_list = $nodes[0];
+  }
+  return $node_list;
+}
+
+sub get_channel_list_node {
+  my ($channel_node,$node_name) = @_;
+  assert_element($channel_node,'channel_info');
+
+  # get the node_list
+  my @nodes = $channel_node->getElementsByTagName($node_name);
+  die "get_channel_list_node: Too many $node_name nodes" if scalar @nodes > 1;
+  my $node_list;
+  if (scalar @nodes < 1) {
+    $node_list = create_element($node_name);
+    $channel_node->appendChild($node_list);
+  } else {
+    $node_list = $nodes[0];
+  }
+  return $node_list;
+}
+
+sub get_experiment_header_list_node {
+  my ($es_header_node,$node_name) = @_;
+  assert_element($es_header_node,'experiment_set_header');
+
+  # get the node_list
+  my @nodes = $es_header_node->getElementsByTagName($node_name);
+  die "get_experiment_header_list_node: Too many $node_name nodes" 
+    if scalar @nodes > 1;
+  my $node_list;
+  if (scalar @nodes < 1) {
+    $node_list = create_element($node_name);
+    $es_header_node->appendChild($node_list);
+  } else {
+    $node_list = $nodes[0];
+  }
+  return $node_list;
+}
+
+sub do_sample {
+  my $smp_db = shift;
+  my $id = lookup_id('Sample',$smp_db->smp_pk);
+  unless (defined $id) {
+    my $sample_list_node = get_header_list_node('sample_list');
+    my $sample_node = create_element('sample');
+    $sample_list_node->appendChild($sample_node);
+
+    # handle fkeys
+    my $species_id = do_species($smp_db->spc_obj);
+    $sample_node->setAttribute('species_id',$species_id);
+
+    if (defined $smp_db->con_obj) {
+      my $clone_supplier_id = do_contact($smp_db->con_obj);
+      ## what do we do here??
+    }
+
+    # handle attributes
+    my $sample_qualifier_list_node;
+    foreach my $col (@{Bio::Genex::Sample->column_names}) {
+      next if $col =~ /_[pf]k$/;
+      next unless defined $smp_db->$col() && $smp_db->$col() !~ /^\s*$/;
+    
+      unless (defined $sample_qualifier_list_node) {
+	$sample_qualifier_list_node = create_element('sample_qualifier_list');
+	$sample_node->appendChild($sample_qualifier_list_node);
+
+      }
+      my $qualifier_node = create_element('sample_qualifier');
+      $sample_qualifier_list_node->appendChild($qualifier_node);
+      $qualifier_node->setAttribute('name',$col);
+      $qualifier_node->setAttribute('value',$smp_db->$col());
+    }
+
+    # handle protocols
+    if (scalar @{$smp_db->sampleprotocols_obj}) {
+      my $smp_prt_list_node = create_element('sample_protocol_list');
+      $sample_node->appendChild($smp_prt_list_node);
+      foreach my $smp_prt_db (@{$smp_db->sampleprotocols}) {
+	my $smp_prt_node = create_element('protocol');
+	$smp_prt_list_node->appendChild($smp_prt_node);
+	if (defined $smp_prt_db->comment && 
+	    $smp_prt_db->comment !~ /^\s*$/) {
+	  my $comment_node = create_element('comment');
+	  $smp_prt_node->appendChild($comment_node);
+	  $comment_node->addText($smp_prt_db->comment);
+
+	  $smp_prt_node->setAttribute('protocol_id',
+				      do_protocol($smp_prt_db->prt_fk));
+	}
+      }
+    }
+    $id = create_id('Sample',$smp_db->smp_pk);
+    $sample_node->setAttribute('id',$id);
+  }
+  return $id;
+}
+
+sub do_array_measurement {
+  my ($am_node,$am_db) = @_;
+  assert_element($am_node,'array');
+  assert_array($am_db);
+
+  # add the channel info
+  my $channel_list_node = get_array_list_node($am_node,'channel_info_list');
+  my @channels = $channel_list_node->getChildNodes();
+  my $channel_node;
+  if (defined $am_db->channel_name && $am_db->channel_name !~ /^\s*$/) {
+    ($channel_node) = grep {$_->getAttribute('description') eq $am_db->channel_name} @channels;
+
+    unless (defined $channel_node) {
+      $channel_node = create_element('channel_info');
+      $channel_list_node->appendChild($channel_node);
+      $channel_node->setAttribute('description',$am_db->channel_name);
+      $channel_node->setAttribute('id',
+				  create_id('Channel',$am_db->channel_name
+					    . '-' 
+					    . $am_db->am_pk));
+    }
+  }
+  
+  # create the data node and add it to the <array>
+  my $array_measurement_list_node = get_array_list_node($am_node, 'array_measurement_list');
+  $am_node->appendChild($array_measurement_list_node);
+  my $array_measurement_node = create_element('array_measurement');
+  $array_measurement_list_node->appendChild($array_measurement_node);
+  $array_measurement_node->setAttribute('id',create_id('ArrayMeasurement',
+						       $am_db->am_pk));
+  # AM's of type derived_* have NO channel_names
+  if (defined $channel_node) {
+    $array_measurement_node->setAttribute('channel_id',
+					  $channel_node->getAttribute('id'));
+  }
+
+  # now add the am_factorvalues
+  # we know that am_factorvalues_obj() is defined to return an
+  # array reference (which may reference an empty array), so it is
+  # safe to directly interpolate and call 'scalar' to check for
+  # the existence of data
+  my @factor_list = @{$am_db->am_factorvalues_obj};
+  if (scalar @factor_list) {
+    my $measurement_factor_value_list_node = get_channel_list_node($channel_node,'measurement_factor_value_list');
+    foreach my $amf_db (@factor_list) {
+      next if defined lookup_id('AM_FactorValues',
+				$amf_db->am_fk() . '-' . $amf_db->ef_fk);
+
+      my $factor_node = create_element('measurement_factor_value');
+      $measurement_factor_value_list_node->appendChild($factor_node);
+      $factor_node->setAttribute('value',$amf_db->value);
+      $factor_node->setAttribute('factor_id',lookup_id('ExperimentFactor',
+						       $amf_db->ef_fk));
+      # NOTE: we don't store this in the XML
+      # it is created to serve as a flag for this creation loop
+      # so that we don't get multiple entries
+      create_id('AM_FactorValues',$amf_db->am_fk() . '-' . $amf_db->ef_fk);
+    }
+  } else {
+    warn "No AM_FactorValues for ArrayMeasurement ", $am_db->name(), "\n";
+  }
+
+  #
+  # Handle the fkeys
+  #
+
+  # handle the sample: smp_fk
+  my $sample_id = do_sample($am_db->smp_obj) if defined $am_db->smp_obj;
+  $array_measurement_node->setAttribute('sample_id',$sample_id);
+
+  if (defined $am_db->equation) {
+    my $eq_node = create_element('equation');
+    my $type = $am_db->equation_type;
+
+    #### BOGUSITY ####
+    # this is a DB mis-spelling, and I'm fixing it in the code
+    #### HACK ALERT ####
+    $type =~ s/finded/fined/g;
+    $eq_node->setAttribute('type',$type);
+    $eq_node->setAttribute('value',$am_db->equation);
+    # NOTE: we put this info in the main node ($array_measurement_node)
+    #   not the external node ($AMS_node)
+    $array_measurement_node->appendChild($eq_node);
+  }
+
+  # handle the ArrayMeasurement columns specific to each
+  # this measurement that are attributes
+  #
+  # NOTE: we put this info in the main node ($array_measurement_node)
+  #   not the external node ($AMS_node)
+  foreach my $column (@AM_COLUMNS) {
+    $array_measurement_node->setAttribute($column,$am_db->$column());
+  }
+  # handle the ArrayMeasurement columns specific to each
+  # this measurement that are represented as tags
+  #
+  # NOTE: we put this info in the main node ($array_measurement_node)
+  #   not the external node ($AMS_node)
+  foreach my $column (qw /description/) {
+      next unless defined $am_db->$column();
+
+      die "do_array_measurement: Invalid column name: $column" 
+	unless defined $ARRAY2GENEXML{$column};
+      my $node = create_element($ARRAY2GENEXML{$column});
+      $node->addText($am_db->$column());
+      $array_measurement_node->appendChild($node);
+  }
+
+  $Bio::Genex::AM_Spots::LIMIT = 10 if $OPTIONS{debug};
+
+  $Bio::Genex::AM_Spots::LIMIT = 10 if 0;	# to get -w to be silent
+
+  # now add the data
+  # we know that am_spots_obj() is defined to return an
+  # array reference (which may reference an empty array), so it is
+  # safe to directly interpolate and call 'scalar' to check for
+  # the existence of data
+  my @data;
+  if ($OPTIONS{profile}) {
+    my $t = timeit(1, sub {
+		     @data  = @{$am_db->am_spots_obj};
+		   });
+    print STDERR "Time for retrieving array data = ", timestr($t), "\n";
+  } else {
+    @data  = @{$am_db->am_spots_obj};
+  }
+
+  #
+  # If we've gotten here, then there are AMS values to write out
+  #
+
+  # set up the internal DTD
+  my $GENEXML_DTD = $GENEXML_DIR . '/ams.dtd';
+  open(GENEXML,$GENEXML_DTD) or 
+    die "do_array_measurement: Couldn't open $GENEXML_DTD for reading";
+  
+  # slurp the file into a single scalar
+  undef $/;
+  my $DTD = <GENEXML>;
+  close(GENEXML);
+  
+  my $DOCTYPE = '<!DOCTYPE AMS [' . "\n";
+  $DOCTYPE .= $DTD;
+  $DOCTYPE .= "\n" . ']>';
+
+  my $AMS_GENEXML = <<"END";
+<?xml version="1.0"  encoding="UTF-8" standalone="no"?>
+$DOCTYPE
+
+<AMS cvs_id="&VERSION;"/>
+END
+
+  # we create a new parser, so that memory will be disposed when we
+  # leave the subroutine
+  my $parser = XML::DOM::Parser->new();
+  my $ams_doc = $parser->parse($AMS_GENEXML);
+  my ($AMS_node) = $ams_doc->getElementsByTagName('AMS');
+
+  # parse the cvs_id string and set the other attributes
+  #   $Id: db2xml.pl.in,v 1.36 2001/02/05 16:33:24 jes Exp $ 
+  my $cvs_id = $AMS_node->getAttribute('cvs_id');
+  my ($id,$filename,$revision,$date,$time,$author,$state) = split(' ',$cvs_id);
+  $AMS_node->setAttribute('date',$date);
+  $AMS_node->setAttribute('version',$revision);
+
+  my ($am_file,$file_id) = add_external_file('AMS');
+  print STDERR "Printing data for '", $am_db->name, "' to file: $am_file\n" 
+    if $OPTIONS{debug};
+
+  my $data_node = create_element('data');
+  $array_measurement_node->appendChild($data_node);
+  $data_node->setAttribute('external_file_id',$file_id);
+
+  # parse the header
+  my @header;
+  if (scalar @data) {
+    @header = @{shift @data};
+  } else {
+    warn "No Spot data for ArrayMeasurement ", $am_db->name(), "\n";
+    return;
+  }
+
+  my $val_col;
+  my $usf_col;
+  my $pk_col;
+  for (my $i=0;$i<scalar @header;$i++) {
+    $val_col = $i if $header[$i] =~ /spot_value/;
+    $usf_col = $i if $header[$i] =~ /usf_fk/;
+    $pk_col  = $i if $header[$i] =~ /ams_pk/;
+  }
+  die "do_array_measurement: Couldn't find columns for " . $am_db->name() 
+    unless defined $val_col && defined $usf_col;
+  my $LIMIT = scalar @data;
+
+  #
+  # OPTIMIZE: we do this once per array, instead of once/spot
+  #
+  my $TYPE = $am_db->type();
+  my $TYPE_NAME;
+  if ($TYPE =~ /raw/) {
+    $TYPE_NAME = 'raw_intensity';
+  } elsif ($TYPE =~ /corrected$/) {
+    $TYPE_NAME = 'corrected_value';
+  } elsif ($TYPE =~ /background$/) {
+    $TYPE_NAME = 'background';
+  } elsif ($TYPE =~ /^derived/) {
+    # this covers derived_ratio, derived_average, and derived_other
+    # do nothing
+  } else {
+    print STDERR "Unsupported array type: $TYPE\n";
+  }
+
+  for (my $i=0;$i<$LIMIT;$i++) {
+    my $seq_feat = $data[$i]->[$usf_col];
+    my $value    = $data[$i]->[$val_col];
+    my $pkey     = $data[$i]->[$pk_col];
+    
+    unless (defined $seq_feat && defined $value) {
+      warn "Incomplete spot data for array: ", 
+	$am_db->am_pk, " and spot: $i\n";
+      next;
+    }
+    # OPTIMIZE: Instead of doing the lookups as lookup_id() calls
+    #   we want to pre-fetch the data and store it in a lookup table
+    #   one for USF and one for ALS
+    #
+    my $seq_feat_id = lookup_id('UserSequenceFeature',$seq_feat);
+    if ($OPTIONS{debug}) {
+      unless (defined $seq_feat_id) {
+	$seq_feat_id = create_id('UserSequenceFeature',$seq_feat);
+      }
+    } 
+    my $feature_node = $ams_doc->createElement('feature');
+    $AMS_node->appendChild($feature_node);
+    $feature_node->setAttribute(sequence_feature_id=>$seq_feat_id);
+
+    my $spot_node = $ams_doc->createElement('spot');
+    unless ($OPTIONS{debug_no_als}) {
+      local $SIG{__WARN__} = sub{shift;}; # we don't want to hear warnings 
+      my $spot_link = Bio::Genex::SpotLink->new(id=>$pkey,pkey_link=>'ams_fk');
+      if (defined $spot_link) {
+	my $spot_id = lookup_id('AL_Spots',$spot_link->als_fk);
+	$spot_node->setAttribute(array_layout_spot_id=>$spot_id);
+      } else {
+	# some arrays don't have ALS info
+      }
+    }
+    $feature_node->appendChild($spot_node);
+
+    # if the array is any derived type, we make a ratio tag
+    if ($TYPE =~ /^derived/) {
+      my $ratio_node = $ams_doc->createElement('ratio');
+      $spot_node->appendChild($ratio_node);
+      $ratio_node->setAttribute(value=>$value);
+    } else {
+      # otherwise we make a measurement tag
+      my $measurement_node = $ams_doc->createElement('measurement');
+      $spot_node->appendChild($measurement_node);
+      $measurement_node->setAttribute($TYPE_NAME=>$value);
+    }
+  }				# end of spot data
+
+  # write out the data to file
+  open(AM,">$am_file") or 
+    die "do_array_measurement: Couldn't open $am_file for writing";
+  print AM pretty_print($ams_doc->toString());
+  close(AM);
+}
+
+sub do_arrays {
+  my ($es_node,$es_db,@array_list)= @_;
+  assert_element($es_node,'experiment_set');
+  assert_experiment($es_db);
+  
+  # we need to group the arrays, based on hybridization_name
+  my %hybs;
+  foreach my $array (@array_list) {
+    # we're creating the values of %hybs to be array refs, so 
+    # we don't need to do a type check
+    my $hyb_name = $array->hybridization_name();
+    unless (defined $hyb_name && $hyb_name !~ /^\s*$/) {
+      # this array doesn't have a hybridization_name, must be of
+      # type derived_*, give it unique name so that it gets put into
+      # it's own <array> 
+      warn "No hybridization_name for array: ", $array->am_pk
+	unless $array->type =~ /^derived/;
+      $hyb_name = $array->am_pk . $$
+    }
+    push(@{$hybs{$hyb_name}},$array);
+  }
+  foreach my $key (keys %hybs) {
+    # set up the node for the GENEXML file
+    my $am_node = create_element('array'); 
+    $es_node->appendChild($am_node);
+
+    #
+    # handle the fkeys
+    # 
+
+    # 
+    # We really should check that these are identical among the arrays
+    #    for now we just use the first one
+    #
+    my @hyb_list = @{$hybs{$key}};
+    my $am_db = $hyb_list[0];
+
+    # handle the array layout
+    my $array_layout_db = $am_db->al_obj();
+    if (defined $array_layout_db) {
+      my $id;
+      if ($OPTIONS{profile}) {
+	my $t = timeit(1, sub {
+			 $id = do_al($array_layout_db);
+		       });
+	print STDERR "Time for ALS = ", timestr($t), "\n";
+      } else {
+	$id = do_al($array_layout_db);
+      }
+      $am_node->setAttribute('array_layout_id',$id);
+    }
+
+    # handle the spotter software
+    my $software_db = $am_db->spotter_sw_obj();
+    if (defined $software_db) {
+      # don't enter it if it already exists
+      my $id = do_software($software_db);
+      $am_node->setAttribute('spotter_sw_id',$id);
+    }
+
+    # handle the scanner software
+    $software_db = $am_db->scan_sw_obj();
+    if (defined $software_db) {
+      # don't enter it if it already exists
+      my $id = do_software($software_db);
+      $am_node->setAttribute('scanner_sw_id',$id);
+    }
+
+    # handle the image analysis software
+    $software_db = $am_db->image_anal_sw_obj();
+    if (defined $software_db) {
+      # don't enter it if it already exists
+      my $id = do_software($software_db);
+      $am_node->setAttribute('image_analysis_sw_id',$id);
+    }
+
+    # handle the spotter hardware
+    my $hardware_db = $am_db->sptr_obj();
+    if (defined $hardware_db) {
+      # don't enter it if it already exists
+      my $id = do_spotter($hardware_db);
+      $am_node->setAttribute('spotter_hw_id',$id);
+    }
+
+    # handle the scanner hardware
+    $hardware_db = $am_db->scn_obj();
+    if (defined $hardware_db) {
+      # don't enter it if it already exists
+      my $id = do_scanner($hardware_db);
+      $am_node->setAttribute('scanner_hw_id',$id);
+    }
+
+    # get the owner's contact information
+    my $owner_id = do_contact($am_db->us_obj->con_obj);
+    $am_node->setAttribute('owner_contact_id', $owner_id);
+
+    # do the group
+    my $gid = do_group($am_db->gs_obj);
+    $am_node->setAttribute('group_id', $gid);
+
+    # handle the ArrayMeasurement columns general to all
+    # measurements in the hybridization group
+    foreach my $column (@ARRAY_COLUMNS) {
+      if ($column =~ /^(?:hybridization_stringency|
+			instance_code|
+		       )
+	              $/x) {
+	$am_node->setAttribute($ARRAY2GENEXML{$column},$am_db->$column());
+      } else {
+	$am_node->setAttribute($column,$am_db->$column());
+      }
+    }
+
+    # add the sub elements of <array>
+    foreach my $column (qw /spotter_hw_params
+			spotter_sw_params
+			scan_hw_params
+			scan_sw_params
+			image_anal_sw_params /) {
+      next unless defined $am_db->$column();
+
+      die "do_arrays: Invalid column name: $column" 
+	unless defined $ARRAY2GENEXML{$column};
+      my $node = create_element($ARRAY2GENEXML{$column});
+      $node->addText($am_db->$column());
+      $am_node->appendChild($node);
+    }
+
+    # now we enter the specific information for each array measurement
+    foreach my $am (@hyb_list) {
+      if ($OPTIONS{profile}) {
+	my $t = timeit(1, sub {
+			 do_array_measurement($am_node,$am);
+		       });
+	print STDERR "Time for Array = ", timestr($t), "\n";
+      } else {
+	do_array_measurement($am_node,$am);
+      }
+      last if $OPTIONS{debug_one_ams};
+    }
+    last if $OPTIONS{debug_one_hyb};
+  }
+}
+
+sub do_user {
+  my $us_db = shift;
+}
+
+#
+# Subroutines for on-demand writing of DB objects as XML
+#   these are called when it is discovered that the object
+#   does not yet exist in the GeneXML header.
+#
+#   These really belong in XMLUtils.pm
+
+package Bio::Genex::ArrayLayout;
+
+sub add_genexml_entry {
+  my ($class,$pkey) = @_;
+  ::do_al($class->new(id=>$pkey));
+}
+
+package Bio::Genex::Species;
+
+sub add_genexml_entry {
+  my ($class,$pkey) = @_;
+  ::do_species($class->new(id=>$pkey));
+}
+
+package Bio::Genex::ArrayMeasurement;
+
+sub add_genexml_entry {
+  my ($class,$pkey) = @_;
+  print STDERR "$class called for value: $pkey\n";
+}
+
+package Bio::Genex::Contact;
+
+sub add_genexml_entry {
+  my ($class,$pkey) = @_;
+  ::do_contact($class->new(id=>$pkey));
+}
+
+__END__
+
+=head1 NAME
+
+B<db2xml.pl>: a script for export data from a Genex DB as a Gene
+Expression Markup Language (GeneXML) file
+
+=head1 SYNOPSIS
+
+  db2xml.pl --cb=outfile_name --user=name --password=passw [options]
+
+  db2xml.pl --exp=exp_id --user=name --password=passw [options]
+
+=head1 DESCRIPTION
+
+db2xml.pl has two primary uses: exporting control bundles for the
+curation tool using the --cb option, and exporting experiment sets
+for download using the --exp option.
+
+=head1 OPTIONS
+
+=head2 Required Options
+
+=over 4
+
+=item --cb=filename.xml
+
+Specifies that the curationtool control bundle should be written to
+the file 'filename.xml'. The output will first be run through
+XMLUtils::pretty_print() to format the output to be more
+human-readable. This option is mutually exclusive with the --exp
+option. Depending on which other options are used, other supporting
+XML files may be written as well (array layout, user sequence feature).
+
+=item --exp=$exp_id
+
+Specifies that the experiment set whose primary key is $exp_id should
+be exported as GeneXML. The spot data for each E<lt>arrayE<gt> will be
+written to a separate external file. May be used multiple times on the
+command line to specify that multiple experiment sets should be
+exported. For example:
+
+  db2xml.pl --exp=23 --exp=25 --user=jes --password=foo
+
+B<NOTE>: This option is not fully functional and should be approached
+with caution.
+
+=item --user=$login_name
+
+=item --password=$password
+
+Retrieves the entry for $login_name from the UserSec table and matches
+the supplied $password against it. It will cause a not-so-graceful
+error if the password doesn\'t match.
+
+=back
+
+
+=head2 Optional Options
+
+=over 4
+
+=item --species=$spc_id 
+
+Used for control bundle export. Specifies that species whose primary key is $spc_id should be included in the export file. This option may be included multiple times on the command line to specify multiple species. For example:
+
+  db2xml.pl --cb=output.xml --user=jes --password=foo --species=4 --species=8
+
+=back
+
+
+=head1 BUGS
+
+Please send bug reports to genex@ncgr.org
+
+=head1 LAST UPDATED
+
+Mon Jun 19 00:43:39 MDT 2000 by jes@ncgr.org
+
+=head1 AUTHOR
+
+Jason E. Stewart (jes@ncgr.org)
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

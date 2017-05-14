@@ -1,0 +1,5 @@
+* Move common DB handling code to a superclass used by all db objects
+* Add typechecking to all methods
+* Work on the docs
+
+

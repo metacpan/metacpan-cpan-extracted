@@ -1,0 +1,1283 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1998, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-Oct-98 ianc    Improve feature coverage
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# To do:
+# * indexing rules
+# * expressions & spreadsheet functions
+# * parameters for command-line options?
+# * syntax information?
+# * macro parameters?
+#
+
+
+# Load the configuration
+!define SDF_ROOT "../"
+!inherit "sdf"
+
+# Define variables
+!define DOC_NAME    "SDF"
+!define DOC_TYPE    "Quick Reference"
+!define DOC_TOC     2
+!define DOC_AUTHOR  "Ian Clatworthy"
+
+# Build the title page
+!build_title
+
+# Make everything wide
+!on paragraph '';; $attr{'wide'} = 1
+!on table '';; $param{'wide'} = 1
+
+# Change the default look of tables for paper
+!if $var{'OPT_TARGET'} eq 'ps'
+!define DEFAULT_TABLE_STYLE 'plain'
+!endif
+
+H1: SDF - The Package
+
+H2: Programs
+
+!block table
+Name      Purpose
+sdf       convert [[SDF]] files to other formats
+sdfapi    extract the {{Application Programming Interface}} from source code
+sdfbatch  generate [[FrameMaker]] batch files
+sdfcli    extract the {{Command Line Interface}} from a utility
+sdfget    extract documentation embedded in source code
+sdftest   execute SDF regression tests
+sdngen    build an SDF tuning module from a FrameMaker template
+fm2ps     convert FrameMaker files to PostScript (a wrapper for {{CMD:sdfbatch}})
+pod2sdf   convert POD to SDF
+poddiff   compare POD files and report differences
+prn2ps    convert Windows PostScript to Unix PostScript
+!endblock
+
+Environment variables used are:
+
+!block table
+Name            Description
+SDFBIN          on MS-DOS/Windows systems, the directory containing SDF's scripts, \
+                (e.g. c:\sdf\bin\)
+SDFOPTS         options always used by {{CMD:sdf}} (e.g. -Yc:\mysdflib)
+!endblock
+
+H2: File Extension Conventions
+
+!block table; headings; wrap=2; format='10,12,28,10,12,28'
+A       B       C
+Ext.    Format  Usage
+ini     INI     configuration file
+sde     SDF     SDF end module
+sdf     SDF     normal SDF file
+sdg     SDG     {{CMD:sdfget}} report
+sdl     SDF     SDF locale
+sdm     SDF     SDF module
+sdn     SDF     SDF tuning module
+sdo     TBL     SDF object register
+sdp     Perl    SDF plug-in
+sdr     Perl    SDF report
+sds     SDF     SDF style module
+sdt     HTML    SDF template
+!endblock
+
+H1[nopb] sdf - The Program
+
+H2: Command-line Options
+
+!block table
+Option          Long_name       Description
+-2              --format        the output format you want
+-a              --parameters    parameters for the pre-filter
+-c              --config        configuration library
+-d              --driver        format driver - default is expand
+-f              --flag          define flags (flag xxx maps to variable DOC_XXX)
+-h              --help          display help on options or a single option
+-k              --look          look library
+-l              --log_ext       log file extension (default is log)
+-n              --split_level   heading level to autosplit into topics
+-o              --out_ext       output file extension (default is out)
+-p              --prefilter     pre-filter input file from each argument
+-r              --report        report to pre-filter the input with
+-s              --style         style of document
+-t              --target        logical target format
+-u              --uses          modules to use
+-v              --verbose       verbose mode
+-w              --width         width for text-based outputs
+-y              --post_filter   filter to post-filter the output with
+-z              --post_process  list of post processing actions to do
+-D              --variable      define variables
+-H              --head_level    initial heading level
+-I              --include_path  search path for include files, templates, etc.
+-L              --locale        locale
+-N              --line_numbers  number lines in pretty-printed source code
+-P              --plang         pre-filter as a programming language
+-S              --page_size     page size for paper documents
+-T              --trace_levels  debugging trace levels
+-Y              --library_path  path to search for libraries and modules
+!endblock
+
+H2: Useful Command Lines
+
+[keep_next]Generate format xxx for mydoc.sdf:
+
+>       sdf -2xxx mydoc
+
+[keep_next]Generate PDF via a FrameMaker book (on Unix):
+
+>       sdf -2book -zpdf mydoc
+
+[keep_next]Generate a man page:
+
+>       sdf -2man mydoc | nroff -man > mydoc.1
+
+[keep_next]Spell check a document:
+
+>       sdf mydoc | spell
+
+[keep_next]Pretty-print lang source code in format xxx:
+
+>       sdf -2xxx -Plang mysource
+>       sdf -2xxx -P mysource.lang
+>       sdf -2xxx -P -N5 mysource.lang   (with line numbering)
+
+[keep_next]Generate reference documentation in format xxx for mymod.sdm:
+
+>       sdf -2xxx mymod.sdm
+
+[keep_next]Generate format xxx for a table:
+
+>       sdf -2xxx mydata.tbl
+>       sdf -2xxx -aformat='15,75,10' mydata.tbl
+
+[keep_next]Generate format xxx for a MIMS topic, chapter or specification:
+
+>       sdf -2xxx +mt mydoc
+>       sdf -2xxx +mc mydoc
+>       sdf -2xxx +ms mydoc
+
+H2: Target Formats
+
+The format naming conventions are:
+
+* {{xxx}} - generate (logical) format xxx
+* {{xxx_yyy}} - generate format xxx via yyy
+* {{xxx_}} - generate format xxx directly.
+
+{{CMD:sdf}}'s -2 option is used to specify the target format.
+
+H3: Logical Formats
+
+!block table; wrap=3; format='13,20,13,20,13,20'
+Format          Maps_to
+_dir            html_dir
+book            ps_fmbook
+doc             doc_fm
+dvi             dvi_sgml
+expand          sdf_expand
+fvo             fvo_fm
+hlp             hlp_mif
+html            html_
+htx             htx_
+info            info_sgml
+latex           latex_sgml
+lyx             lyx_sgml
+man             man_pod
+mf6             mf6_
+mif             mif_
+pdf             pdf_mif
+pod             pod_
+ps              ps_fm
+raw             sdf_raw
+rtf             rtf_fm
+sgml            sgml_
+topics          html_topics
+txt             txt_
+!endblock
+
+H3: Explicit Formats
+
+!block table
+Format          Generates
+doc_fm          Frame binary format via FrameMaker
+dvi_sgml        DVI format via SGML
+fvo_fm          FrameViewer format via FrameMaker
+hlp_mif         Windows Help input files via MIF
+html_           a HTML document
+html_dir        an SDF directory in HTML
+html_fm         a HTML document via FrameMaker
+html_topics     HTML topics
+htx_            MIMS HTX format
+info_sgml       GNU info format via SGML
+latex_pod       LaTeX format via POD
+latex_sgml      LaTeX format via SGML
+lyx_sgml        a LyX file via SGML
+man_pod         Man page format via POD
+mf6_            MIMS F6 help format
+mif_            Frame MIF format
+pdf_mif         PostScript and PDF via FrameMaker
+pod_            POD format
+ps_fm           PostScript via FrameMaker
+ps_fmbook       PostScript via a FrameMaker book
+ps_pod          PostScript via POD
+ps_sgml         PostScript via SGML
+rtf_fm          RTF format via FrameMaker
+rtf_mif         RTF format via MIF
+rtf_sgml        RTF format via SGML format
+sdf_expand      expanded SDF
+sdf_raw         raw SDF
+sgml_           SGML format
+txt_            plain text format
+txt_fm          plain text format via FrameMaker
+txt_pod         plain text format via POD
+!endblock
+
+H2: Document Styles
+
+!block table; wrap=2; format='15,35,15,35'
+Style       Description
+document    normal document (default)
+fax         fascimile
+listing     program listing
+manual      user manual
+memo        memorandum
+minutes     minutes of a meeting
+newslettr   newsletter
+paper       technical paper
+!endblock
+
+H2: Looks
+
+!block table
+Style           Description
+fancy           look useful for manuals
+infomap         Information Mapping[[tm]]
+overhead        look useful for overhead transparencies
+plain           alias for {{simple}}
+simple          look useful for normal documents
+!endblock
+
+H2: Page Sizes
+
+!block table; wrap=2; format='15,15,20,15,15,20'
+Name    Width   Height
+global  21.0cm  11.0in
+A3      29.7cm  42.0cm 
+A4      21.0cm  29.7cm
+A5      14.8cm  21.0cm
+B4      25.7cm  36.4cm
+B5      17.6cm  25.0cm
+letter  8.5in   11.0in
+legal   8.5in   14.0in
+tabloid 11.0in  17.0in
+!endblock
+
+Rotated sizes are named with an appended R (e.g. A4R).
+
+H2: Reports
+
+!block table
+Name            Description
+sdf_dir         generate a directory tree of nested SDF documents
+!endblock
+
+H2: Pre-filters
+
+Files with extensions matching a pre-filter name or alias have the name filter applied.
+
+!block table; wrap=2; format='15,35,15,35'
+Name            Aliases
+table           tbl
+template        sdt
+module          sdm
+pod             pm,PL
+!endblock
+
+H1[nopb] SDF - The Language
+
+H2: Concepts and Conventions
+
+!block table
+Term        Description
+paragraph   the basic building block of documents
+phrase      a section of text delimited by E<2{> and E<2}> within a paragraph
+style       the type of a document, paragraph, phrase or table (e.g. H1)
+attribute   a property of a paragraph or phrase (e.g. jump)
+macro       a command embedded in a document (e.g. !define)
+variable    a named value (e.g. DOC_NAME)
+block       a section of text enclosed by {{MAC:block}} and {{MAC:endblock}} macros
+filter      a rule to use when processing blocks or files (e.g. table)
+module      a file containing reusable information
+library     a directory containing modules
+!endblock
+
+For variables, the general conventions are:
+
+* lower-case for special symbols (e.g. tm)
+* edit-case for commonly used objects (e.g. Mincom)
+* upper-case for other variables (e.g. DOC_NAME).
+
+The general conventions for other symbols are:
+
+* upper-case for paragraph and phrase styles
+* lower-case for other names.
+
+H2: Paragraph Styles
+
+!block table; groups
+Tag             Description
+A1 .. A6        appendix heading at level 1..6
+Addr            line in an address
+E               example
+E80             example at least 80 characters per line
+FA              figure anchor
+FOOTER          page footer (in header/footer only)
+FT              figure title
+GL              glossary entry (term and definition are tab separated)
+GLD             definition in a glossary
+GLT             term in a glossary
+H1 .. H6        normal heading at level 1..6
+HEADER          page header (in header/footer only)
+KN              normal paragraph - keep with next
+KP              normal paragraph - keep with previous
+L1 .. L6        paragraph (or plain list item) at level 1..6
+Line            horizontal line
+LF1 .. LF6      first entry in an ordered list at level 1..6
+LI1 .. LI6      enumerated list item at level 1..6
+LN1 .. LN6      next entry in an ordered list at level 1..6
+LU1 .. LU6      unordered list at level 1..6
+N               normal paragraph
+NB              note begin
+NE              note end
+NV              name value
+Note            a single paragraph note
+P1 .. P6        plain heading at level 1..6
+PB              page break
+Sign            signature
+V               verbatim (example with no embedded symbols)
+!endblock
+
+Special styles (implicitly terminated) are:
+
+!block table
+Tag             Description
+>               verbatim paragraph
+. .. ......     paragraph (or plain list item) at level 1..6
+* .. ******     unordered list at level 1..6
+- .. -----      unordered list at level 2..6
+^ .. ^^^^^^     first entry in an ordered list at level 1..6
++ .. ++++++     next entry in an ordered list at level 1..6
+& .. &&&&&&     labelled list item at level 1..6
+!endblock
+
+H2: Paragraph Attributes
+
+!block table
+Name        Type        Description
+align       string      alignment of paragraph within text column \
+                        (1, Full, Left, Right, Center)
+#continued   boolean     ???
+component   string      start a component within a book \
+                        (see {{SECT:Book Components}})
+first       string      indent of first line (in points)
+in          integer     list indent level (for examples only)
+keep_next   boolean     keep this paragraph with the next one
+keep_prev   boolean     keep this paragraph with the previous one
+label       string      label for this paragraph (e.g. "Tip:")
+left        string      left indent (in points)
+noevents    boolean     do not do event processing on this paragraph
+nopb        boolean     do not force this paragraph onto a new page
+notoc       boolean     do not put this in the table of contents
+noid        boolean     do not auto-generate an id for this paragraph
+obj         string      format as the nominated phrase
+orig_style  string      original style (useful in event processing)
+out_style   string      output style to use
+right       string      right indent (in points)
+sp_after    string      space after this paragraph (in points)
+sp_before   string      space before this paragraph (in points)
+tabs        string      comma-separated list of tabstops
+text        string      display the value instead of the existing text
+top         string      place paragraph on a new page (1, 0, Page, Column, Left, Right)
+wide        boolean     span the side-head
+!endblock
+
+H2: Phrase Styles
+
+Leading whitespace is not removed for styles marked with (*).
+
+!block table
+Tag             Description
+1               1st level emphasis
+2               2nd level emphasis
+3               3rd level emphasis
+A               as-is
+B               bold
+C               source code (*)
+CHAR            escape/special character
+CMD             command
+E               escape/special character
+EMAIL           email address
+EX              example text (*)
+F               filename
+FILE            filename
+I               italic
+IMPORT          figure
+INLINE          embedded target format
+JUMP            same as URL
+L               POD link
+N               normal
+#P               ???
+S               text with non-breaking spaces (*)
+SECT            (jump to) document section
+ST              strong emphasis
+SUB             subscript
+SUP             superscript
+#T               ???
+U               underline
+URL             Uniform Resource Locator
+X               POD index entry
+Y               symbol (e.g. subroutine)
+Z               zero width character (ala POD)
+!endblock
+
+The following styles are only supported in headers/footers:
+
+!block table
+Tag             Description
+PAGECOUNT       highest page number
+PAGENUM         current page number
+PARALAST        text of last paragraph on page with the nominated style
+PARANUM         paragraph number (e.g. Appendix A)
+PARANUMONLY     paragraph number only (e.g. A)
+PARASHORT       value of {{short}} attribute of paragraph
+PARATEXT        paragraph text (e.g. Hardware requirements)
+!endblock
+
+The {{PARA*}} tags require a comma separated list of paragraph styles
+to be nominated as the text of the phrase, e.g. E<2{>PARATEXT:H1,A1,P1E<2}>.
+
+H2: Phrase Attributes
+
+!block table
+Name        Type        Description
+bold        boolean     enable bold
+changed     boolean     enable change bars
+color       string      text colour (Black, White, Red, Green, Blue, Yellow, Cyan, \
+                        Magenta)
+doc         string      for SECT, the name of the document containing the section
+expand      boolean     expand object from short to long name
+family      string      font family
+id          string      identifier for this phrase (used by jumps)
+index       string      indexing specification string (MIF only)
+index_type  string      index type (MIF only)
+italics     boolean     enable italics
+jump        string      URL to jump to
+short       string      text to display in header/footer when PARASHORT used
+shrink      boolean     shrink object from long to short name
+size        string      font size
+text        string      display the value instead of the existing text
+underline   boolean     enable underline
+verbatim    boolean     ignore embedded symbols within this paragraph
+xref        string      cross-referencing information (future)
+!endblock
+
+H2: Escapes
+
+!block table; wrap=3; format='16,17,16,17,16,17'
+Name            Output
+2[              E<2[>
+2]              E<2]>
+2{              E<2{>
+2}              E<2}>
+Aacute          E<Aacute>
+aacute          E<aacute>
+Acirc           E<Acirc>
+acirc           E<acirc>
+AElig           E<AElig>
+aelig           E<aelig>
+Agrave          E<Agrave>
+agrave          E<agrave>
+amp             E<amp>
+Aring           E<Aring>
+aring           E<aring>
+Atilde          E<Atilde>
+atilde          E<atilde>
+Auml            E<Auml>
+auml            E<auml>
+bullet          E<bullet>
+c               E<c>
+Ccedil          E<Ccedil>
+ccedil          E<ccedil>
+cent            E<cent>
+dagger          E<dagger>
+doubledagger    E<doubledagger>
+Eacute          E<Eacute>
+eacute          E<eacute>
+Ecirc           E<Ecirc>
+ecirc           E<ecirc>
+Egrave          E<Egrave>
+egrave          E<egrave>
+emdash          E<emdash>
+emspace         E<emspace>
+endash          E<endash>
+enspace         E<enspace>
+Euml            E<Euml>
+euml            E<euml>
+gt              E<gt>
+Iacute          E<Iacute>
+iacute          E<iacute>
+Icirc           E<Icirc>
+icirc           E<icirc>
+Igrave          E<Igrave>
+igrave          E<igrave>
+Iuml            E<Iuml>
+iuml            E<iuml>
+lbrace          E<lbrace>
+lbracket        E<lbracket>
+lt              E<lt>
+nbdash          E<nbdash>
+nbspace         {{non-breaking space}}
+nl              {{newline}}
+Ntilde          E<Ntilde>
+ntilde          E<ntilde>
+Oacute          E<Oacute>
+oacute          E<oacute>
+Ocirc           E<Ocirc>
+ocirc           E<ocirc>
+Ograve          E<Ograve>
+ograve          E<ograve>
+Oslash          E<Oslash>
+oslash          E<oslash>
+Otilde          E<Otilde>
+otilde          E<otilde>
+Ouml            E<Ouml>
+ouml            E<ouml>
+pound           E<pound>
+quot            E<quot>
+r               E<r>
+rbrace          E<rbrace>
+rbracket        E<rbracket>
+tab             {{tab}}
+tm              E<tm>
+Uacute          E<Uacute>
+uacute          E<uacute>
+Ucirc           E<Ucirc>
+ucirc           E<ucirc>
+Ugrave          E<Ugrave>
+ugrave          E<ugrave>
+Uuml            E<Uuml>
+uuml            E<uuml>
+yen             E<yen>
+yuml            E<yuml>
+!endblock
+
+For convenience, variables are provided for:
+amp, bullet, c, cent, dagger, doubledagger, emdash, endash, emspace, enspace,
+nbdash, nbspace, nbsp, nl, pound, r, reg, tab, tm, yen.
+
+H2: Macros
+
+!block table
+Name                Description
+back                ends a list (from POD)
+begin               begin target-specific output (from POD)
+block               begin a block of text
+build_title         build a title page
+catalog             build a catalog from objects already loaded
+class               define a class of objects
+clear               reset text wrapping around a figure
+continued           continue a heading from a previous page
+cut                 ignore text until an = is found at the start of a line (from POD)
+default             set a variable (if not already set)
+define              set a variable
+else                begin alternative section
+elseif              same as elsif
+elsif               begin a conditional section
+end                 end target-specific output (from POD)
+end_topic           mark the end of a topic
+endblock            end a block of text
+endif               end conditional text
+endmacro            end a macro definition
+execute             include output from a command
+export              export a variable to the format driver (and/or mark it for later exporting)
+for                 insert target-specific output (from POD)
+getcli              extract command-line interface information
+getcode             extract source code (i.e. non-documentation) from a file
+getdoc              extract documentation embedded in source code
+head{{n}}           level {{n}} heading (n = 1 .. 6) (from POD)
+if                  begin conditional text
+import              import an external object (e.g. figure)
+include             include another file
+inherit             inherit entities from a library
+init                initialise variables (before loading configuration files)
+insert              call a macro
+item                label an item in a list (from POD)
+jumps               generate lines of jumps to headings
+line                change message parameters
+macro               begin a macro definition
+message             output a message during execution
+off                 disable processing previously specified
+on                  specify processing for an event
+output              dynamically change the output file used
+over                begins a list (from POD)
+perlapi             extract API information from a [[Perl]] library
+pod                 does nothing (from POD)
+restrict            declare a restricted family of variables
+script              execute a line of [[Perl]]
+slide_down          decrease heading levels (e.g. H2 -> H3)
+slide_up            increase heading levels (e.g. H2 -> H1)
+subsections         specify the subsections for a topic
+undef               clear a variable
+use                 load a library module
+!endblock
+
+H2: Filters
+
+!block table
+Filter          Description
+about           about section of a document
+abstract        the abstract for a paper
+address         an address
+appendix        change headings to appendix style
+ascii_graphic   fixed-width text, wide enough for ASCII graphics
+box             surround a region of text with a box
+center          centre a region
+changed         mark a block of text as changed
+chapter         chapter of a document (does nothing)
+comment         ignore text
+datestrings     define strings used in dates
+default         provide defaults for a block of variables
+define          define a block of variables
+end             process text at the end
+example         fixed-width text (e.g. source code)
+front           front section of a document
+glossary        glossary section of document (alias for plain)
+hlp_header      table of jumps at the top of a help topic
+hlp_window      contents of a help popup window
+inline          embed text into target format (e.g. [[HTML]])
+langdefs        define vgrind-like language definitions
+namevalues      format a set of name-value pairs (e.g. as used in a title block)
+nofill          a set of lines
+note            a note
+plain           change headings to plain style
+pod             embedded POD
+quote           a quotation
+script          execute text as a [[Perl]] script
+sdf             apply arbitrary phrase attributes to text
+sections        paragraphs are sections
+simple          generic filter for building others
+table           tabular data
+template        alias for inline with {{expand}} set to true
+title           title block for a memo, fax or minutes
+topics          include a set of sub-topics
+verbatim        fixed-width text, ignoring embedded symbols
+!endblock
+
+{{SECT:Classes}} and {{SECT:Programming Languages}} can also be used as filters.
+
+H2: Figures
+
+Extension search rules:
+
+!block table
+When_generating     The_search_order_is
+PostScript          epsi, eps, wmf, mif, gif
+HTML                jpeg, jpg, png, gif
+Windows Help        bmp
+!endblock
+
+{{MAC:import}} macro parameters:
+
+!block table
+Name            Description
+alt             alternate text to display (ala HTML)
+align           alignment (Left, Center, Right, Inner, Outer)
+base            the prefix to prepend to the figure pathname \
+                to get the location needed for the HTML output
+border          the border width in pixels
+height          explicit height measurement (MIF only)
+jump            the URL to jump to
+listitem        the list indent level (e.g. 1)
+mif_figure      the tag before the figure in the MIF source \
+                (only needed if more than one figure in the MIF file)
+position        vertical position (Below, Top, Bottom)
+title           figure caption
+wide            figure straddles the side head area of the page
+width           explicit width measurement (MIF only)
+wrap_text       wrap text around a figure (ignored for HTML)
+!endblock
+
+Default conversion rules (from F<sdf.ini>):
+
+# Limit the first column
+!block table; format='15%'
+When_generating Create  From    Using_the_command
+html            gif     eps     ps2gif -crop $source
+html            gif     ps      ps2gif -crop $source
+html            gif     prn     prn2ps -ops $source; ps2gif -crop $base.ps; rm $base.ps
+ps              eps     ps      ps2epsi $source $dest
+ps              eps     prn     prn2ps -ops $source; ps2epsi $base.ps $dest; rm $base.ps
+!endblock
+
+H2: Tables
+
+{{FILT:table}} filter parameters:
+
+!block table
+Name          Description
+align         alignment of table: one of Left, Center, Right, Inner, Outer
+bgcolor       background colour for a table (HTML only)
+bmargin       default bottom margin for table cells (MIF only)
+cellpadding   padding size for table cells (HTML only)
+cellspacing   spacing size between table cells (HTML only)
+colaligns     a comma-separated list of horizontal alignments \
+              values (Left, Center, Right) for columns; \
+              alternatively, a single word containing the letters L, C and R
+coltags       a comma-separated list of phrase styles to apply to columns
+colvaligns    a comma-separated list of vertical alignments \
+              values (Top, Middle, Bottom, Baseline) for columns; \
+              alternatively, a single word containing the letters T, M, B and L
+delete        a comma-separated list of columns to delete
+footings      the number of footing rows at the end of the table
+format        a comma-separated list of column width specifications; \
+              alternatively, a single number where each digit represents \
+              10% of the space available to the table
+groups        pattern of group-style rows (default is /:$/)
+headings      the number of heading rows at the top of the table
+landscape     display the table in landscape mode (MIF only)
+listitem      the list indent level (e.g. 1) of this table
+lmargin       default left margin for table cells (MIF only)
+narrow        if set, the table will only be as wide as required; \
+              otherwise the table will span the available space
+niceheadings  set to 0 to disable _ to space conversion in headings
+nocalcs       set to 0 to disable calculation processing within a table
+noheadings    suppress headings in output
+objects       alias for coltags (coltags is preferred)
+oncell        Perl code to execute for each cell (internal use only!)
+parseline     column headings parsing line (if not the first row in the text)
+placement     vertical placement of table: one of Float, Pagetop, Columntop, \
+              Lefttop, Righttop (MIF only)
+rmargin       default right margin for table cells (MIF only)
+select        a comma-separated list of columns to display
+sort          a comma-separated list of columns to sort the data rows by
+style         overall look of the table (columns, rows, grid, plain, shade)
+tags          alias for coltags (coltags is preferred)
+title         table caption
+tmargin       default top margin for table cells (MIF only)
+type          alias for style (style is preferred)
+where         an expression to filter the data rows with
+wide          table straddles the side head area of the page
+wrap          the number of data rows to display in a physical row
+!endblock
+
+Column width specifications:
+
+!block table
+Value       Meaning
+30pt        an exact size (other supported units are cm, mm, " and in)
+30%         a percentage of the size available
+30          a percentage of the size available (% is implicit)
+10-20       dynamic size between 10% and 20% of the total width
+-20         dynamic size between 0% and 20% of the total width
+10-         dynamic size between 10% and 100% of the total width
+-           dynamic size between 0% and 100% of the total width
+3*          3 units of the remaining space
+*           same as 1*
+!endblock
+
+N: = can be used in place of - to get equalised column widths.
+
+Cell attributes:
+
+!block table; groups
+Name        Value
+align       horizontal alignment (Left, Center, Right)
+angle       angle of text (0, 90, 180, 270)
+bgcolor     background colour of cell
+bruling     ruling setting for bottom of cell
+cols        the number of columns this cell spans (default is 1)
+fill        background colour fill % \
+            (100, 90, 70, 50, 30, 10, 3)
+lruling     ruling setting for left of cell
+nowrap      disable word wrap for this cell
+paratag     paragraph style to apply to cell text (future)
+rows        the number of rows this cell spans (default is 1)
+rruling     ruling setting for right of cell
+sdf         treat the cell text as SDF (rather than as phrase text)
+tag         phrase tag to apply to cell text
+truling     ruling setting for top of cell
+valign      vertical alignment (Top, Middle, Bottom, Baseline)
+!endblock
+
+Permitted ruling values: {{Vthin}}, {{Thin}}, {{Medium}}, {{Thick}}, {{Double}}.
+
+H2: Classes
+
+Data fields for the predefined classes are:
+
+!block table; groups
+Field           Tag     Description
+organisations:
+Name            ORG     organisation name
+Long            ORGN    long form of organisation name
+Jump                    URL for organisation
+products:
+Name            PRD     product name
+Jump                    URL for product
+references:
+Reference       REF     document code
+Document        DOC     document title
+Jump                    URL for document
+Version                 version number
+Status                  status (e.g. Draft, Review or Final)
+terms:
+Term            TERM    term, acronym or abbreviation
+Description             explanation
+Jump                    URL for term
+!endblock
+
+The REFNUMONLY tag can be used to mark a REF phrase where only the
+trailing number is output.
+
+Calculated fields for the {{CLASS:references}} class:
+
+!block table
+Name       Description
+XXX        if a matching xxx file is found, an image which jumps to that file
+Cite       a string of the form [n]
+Date       the date of the html file
+Pages      the number of pages in the PostScript document
+Printdoc   an image which launches the F</cgi-bin/printdoc/> CGI script
+Printer    alias for Printdoc
+!endblock
+
+Parameters of class filters:
+
+!block table
+Name       Type         Description
+cited      boolean      number these objects as the cited ones \
+                        (for [1] style references)
+colaligns  string       a comma-separated list of horizontal alignments  \
+                        values (Left, Center, Right) for columns; \
+                        alternatively, a single word containing the \
+                        letters L, C and R can be used for the value
+columns    string       comma-separated list of attributes to display in table
+colvaligns string       a comma-separated list of vertical alignments  \
+                        values (Top, Middle, Bottom, Baseline) for columns; \
+                        alternatively, a single word containing the \
+                        letters T, M, B and L can be used for the value
+compact    boolean      display in a compact table, (make cellpadding \
+data       boolean      define objects but do not display them
+delete     string       a comma-separated list of columns to delete
+headings   boolean      display the column headings
+root       string       string to prepend to Jump attribute, if any
+select     string       a comma-separated list of columns to display
+sort       string       comma-separated list of columns to sort by
+style      string       table style to use (the default is {{plain}})
+                        and cellspacing both equal to zero)
+variables  boolean      define a variable for each object; the variable name \
+                        is derived from the object name with underscores \
+                        replacing non-alphanumeric characters
+where      string       filter the rows using the nominated expression
+wide       boolean      use sidehead when formatting on paper
+wrap       integer      number of logical rows to place on a physical row
+!endblock
+
+H2: Document Variables/Macros
+
+P3: Controls
+
+!block table; groups
+Name                        Type        Description
+DOC_ADMIN_LOGO              string      logo to use in administration document styles
+DOC_ADMIN_LOGO_BASE         string      base directory for DOC_ADMIN_LOGO
+DOC_APPROVE                 string      person approving the document
+DOC_APPROVE2                string      2nd person approving the document
+DOC_APPROVE3                string      3rd person approving the document
+DOC_AUTHOR                  string      author of document
+DOC_AUTHOR2                 string      2nd author of document
+DOC_AUTHOR3                 string      3rd author of document
+DOC_CODE                    string      document code (*)
+DOC_COMPONENT               string      current component type within a book
+DOC_COMPONENT_LOGO          string      logo to use for components within a book
+DOC_COVER                   string      logical name of the cover page to use \
+                                        (e.g. original, project, manual, paper)
+DOC_DISTRIBUTION            string      document distribution
+DOC_HTML_LOGO               string      logo to use in HTML output
+DOC_HTML_LOGO_BASE          string      base directory for HTML_LOGO
+DOC_IX                      boolean     build an index
+DOC_LOF                     boolean     build a list of figures
+DOC_LOF_TITLE               string      list of figures title
+DOC_LOGO                    string      logo to use for document
+DOC_LOGO_BASE               string      base directory for DOC_LOGO
+DOC_LOT                     boolean     build a list of tables
+DOC_LOT_TITLE               string      list of tables title
+DOC_MANUAL_LOGO             string      logo to use when generating paper manuals
+DOC_NAME                    string      document name, e.g. "SDF 2.000"
+DOC_OWNER                   string      person or company owning the copyright
+DOC_PRODUCT                 string      for man pages, the center string in the header
+DOC_PROJECT                 string      orginating project of document
+DOC_SECTION                 integer     for man pages, the section number
+DOC_STATUS                  string      status of document (*)
+DOC_TITLE_LOGO              string      logo used in the title of a PostScript document
+#DOC_TITLE_LOGO_BASE         string      base directory for DOC_TITLE_LOGO - why is this needed?
+DOC_TOC                     integer     table of contents level
+DOC_TOC_GRAPHIC             string      graphic to include in TOC title
+DOC_TOC_TITLE               string      table of contents title
+DOC_TOPIC_LOGO              string      logo to use in HTML topics mode output
+DOC_TOPIC_LOGO_BASE         string      base directory for DOC_TOPIC_LOGO
+DOC_TWO_SIDES               boolean     build a two-sided document
+DOC_TYPE                    string      document type, e.g. "User Guide"
+DOC_URL                     string      URL of document
+DOC_VERSION                 string      version number of document (*)
+
+Macros:
+DOC_COMPONENT_BEGIN         macro       hook to initialise things before book \
+                                        component processing begins
+DOC_COMPONENT_END           macro       hook to finalise things after book \
+                                        component processing ends
+DOC_OFFICES                 macro       for manuals, the text to put after the \
+                                        inside front cover
+DOC_RECIPIENTS              macro       table of controlled copy recipients
+DOC_TRADEMARKS              macro       text specifying trademarks used in document
+!endblock
+
+If the variables marked with (*) are not defined,
+{{MAC:build_title}} sets them using the references data, if possible.
+
+P3: Information
+
+!block table; groups
+Name                        Type        Description
+DOC_BASE                    string      the base (filename) of the current document
+DOC_COLUMN_WIDTH            integer     width of a text column (in points)
+DOC_DIR                     string      the directory of the current document
+DOC_EXT                     string      the extension of the current document
+DOC_FULL_WIDTH              integer     width of text area including the side-head (in points)
+DOC_ID                      string      combination of DOC_CODE and DOC_VERSION
+DOC_ID_SEP                  string      separator used within DOC_ID
+DOC_MODIFIED                datetime    the most recent modification time of files visited so far
+DOC_PAGE_HEIGHT             integer     height of page (in points)
+DOC_PAGE_WIDTH              integer     width of page (in points)
+DOC_PATH                    string      the full pathname of the current document
+DOC_SHORT                   string      the base and extension of the current document
+DOC_START                   datetime    the time document conversion started
+DOC_TEXT_HEIGHT             integer     height of text area (in points)
+DOC_TEXT_WIDTH              integer     width of text area available for text columns (in points)
+DOC_TITLE                   string      combination of DOC_NAME and DOC_TYPE
+MODIFIED_DATE               string      alias for DATE:DOC_MODIFIED
+
+File:
+FILE_BASE                   string      base part of current filename (e.g. {{mydoc}})
+FILE_DIR                    string      directory of current filename (e.g. {{/doc/sdf}})
+FILE_EXT                    string      extension of current filename (e.g. {{sdf}})
+FILE_MODIFIED               datetime    time when this file was last modified
+FILE_PATH                   string      current pathname (e.g. {{/doc/sdf/mydoc.sdf}})
+!endblock
+
+H2: Option Variables
+
+These variables (except OPT_NOBARS) give the values of command-line options.
+Variables marked with a (*) can be set via the {{MAC:init}} macro on the
+top line of a document:
+
+!block table
+Name                        Type        Description
+OPT_CONFIG                  string      configuration library (*)
+OPT_DRIVER                  string      name of driver used to convert documents
+OPT_EXT                     string      output extension
+OPT_HEAD_LEVEL              integer     level to start headings at
+OPT_LOCALE                  string      locale
+OPT_LOOK                    string      look (*)
+OPT_NOBARS                  boolean     disable change bars (*)
+OPT_NUMBER                  integer     line numbering fequency
+OPT_PAGE_SIZE               string      page size setting (default is {{global}}) (*)
+OPT_PP_xxx                  boolean     set if xxx post-processing requested
+OPT_REPORT                  string      report to run
+OPT_SPLIT_LEVEL             integer     level to split headings at for topics mode
+OPT_STYLE                   string      document style (*)
+OPT_TARGET                  string      target format
+OPT_WIDTH                   integer     width for txt output (default is 70) (*)
+!endblock
+
+These variables can only be set within look libraries:
+
+# Limit the first column size
+!block table; format='40%'
+Name                        Type        Description
+OPT_BORDERS                 integer     high-level header/footer border control \
+                                        (0=none; 1=above footer,below header; \
+                                        2=above footer,above & below header)
+OPT_COLUMNS                 integer     number of columns in text area (default is 1)
+OPT_COLUMN_GAP              dimension   gap between columns in text area
+OPT_COMPONENT_COVER         boolean     give book components a cover page
+OPT_HEADINGS                integer     size in lines (0..4) of headers/footers \
+                                        (Note: for values 2..4, header size is 2)
+OPT_IX_COLUMNS              integer     number of columns in text area in the index (default is 1)
+OPT_IX_COLUMN_GAP           dimension   gap between columns in text area in the index
+OPT_IX_SIDEHEAD_GAP         dimension   width between side-head and text area in the index
+OPT_IX_SIDEHEAD_WIDTH       dimension   width of side-head in the index
+OPT_LIST_INDENT             dimension   size of each list indent in points
+OPT_MARGIN_BOTTOM           string      size of margin below the footer, if any
+OPT_MARGIN_INNER            string      size of inner margin
+OPT_MARGIN_OUTER            string      size of outer margin
+OPT_MARGIN_TOP              string      size of margin above the header, if any
+OPT_NUMBER_PER_COMPONENT    boolean     number figures, etc. per component
+OPT_SIDEHEAD_GAP            dimension   width between side-head and first text column
+OPT_SIDEHEAD_WIDTH          dimension   width of side-head
+#OPT_TEMPLATE                string      ???
+!endblock
+
+H2: Page Layout Variables
+
+Page variables can only be set within look libraries.
+
+Page tags:
+
+!block table
+Page    Usage
+FIRST   the first page in the document
+RIGHT   the page used for single-sided documents and the right hand side of double-sided documents
+LEFT    the left hand side of double-sided documents; ignored for single-sided documents
+!endblock
+
+In the table below, {{frl}} is either:
+
+* FIRST, RIGHT or LEFT, or
+* {{COMPONENT}}_{{FRL}} where:
+  - {{COMPONENT}} is the name of the component in upper-case
+    (refer to {{SECT:Book Components}})
+  - {{FRL}} is FIRST, RIGHT or LEFT.
+
+If a component does not have a component-specific macro/variable
+defined, then the generic macro/variable is used.
+
+!block table
+Name                        Type        Description
+PAGE_{{frl}}_BACKGROUND     string      background image name
+PAGE_{{frl}}_FOOTER_BORDER  string      border specification
+PAGE_{{frl}}_FOOTER_GAP     dimension   gap between text area and footer area
+PAGE_{{frl}}_FOOTER_HEIGHT  dimension   height of footer area
+PAGE_{{frl}}_FOOTER_INNERn  string      inner text of line n (0..3) of footer
+PAGE_{{frl}}_FOOTER_CENTERn string      centre text of line n (0..3) of footer
+PAGE_{{frl}}_FOOTER_OUTERn  string      outer text of line n (0..3) of footer
+PAGE_{{frl}}_HEADER_BORDER  string      border specification
+PAGE_{{frl}}_HEADER_GAP     dimension   gap between header area and text area
+PAGE_{{frl}}_HEADER_HEIGHT  dimension   height of header area
+PAGE_{{frl}}_HEADER_INNERn  string      inner text of line n (1..2) of header
+PAGE_{{frl}}_HEADER_CENTERn string      centre text of line n (1..2) of header
+PAGE_{{frl}}_HEADER_OUTERn  string      outer text of line n (1..2) of header
+!endblock
+
+When [[FrameMaker]] is being used to generate [[PostScript]],
+the background image name is mapped to a master page called
+{{backgrnd}} within a file called {{backgrnd}}.mif.
+At the moment, objects from the master page
+(excluding TextRects) are directly transferred to the
+generated MIF file. This means that objects in the
+lower right hand corner of an A4 master page will not
+will be positioned nicely if the paper size is changed
+to A5, say.
+
+A {{border specification}} string is a comma-separated list
+of attributes which collectively describe the border.
+The format of each attribute is name[=value].
+The supported attributes are:
+
+* {{top}} - a line above the area
+* {{bottom}} - a line below the area
+* {{box}} - a box around the area
+* {{radius}} - for a box, the radius of the corner.
+
+For {{top}}, {{bottom}} and {{box}}, the value of the
+attribute is the line width in points.
+
+H2: Miscellaneous Variables/Macros
+
+P3: Controls
+
+!block table; groups
+Name                        Type        Description
+Processing:
+DEFAULT_LOCALE              string      default OPT_LOCALE (set in F<sdf.ini>)
+DEFAULT_LOOK                string      default OPT_LOOK (set in F<sdf.ini>)
+DEFAULT_TAB_SIZE            integer     default tab size (initially 8)
+DEFAULT_TABLE_STYLE         string      default style for tables (initially {{columns}})
+DEFAULT_XREF_STYLE          string      default style for cross-references (initially {{sections}})
+
+Link expansion formats:
+FORMAT_LINK_PAGE            string      default is: the $page manpage
+FORMAT_LINK_PAGE_ENTRY      string      default is: the $entry entry in the $page manpage
+FORMAT_LINK_PAGE_SECTION    string      default is: the section on "$sect" in the $page manpage
+FORMAT_LINK_SECTION         string      default is: the section on "$sect"
+!endblock
+
+P3: Information
+
+!block table; groups
+Name                        Type        Description
+Package:
+SDF                         phrase      PRD:SDF
+SDF_BUGS                    phrase      EMAIL:sdf-bugs@mincom.com
+SDF_FTP                     string      URL for SDF's FTP site
+SDF_HOME                    string      library/configuration directory
+SDF_USERS                   phrase      EMAIL:sdf-users@mincom.com
+SDF_VERSION                 string      product version string (e.g. 2.000 beta1)
+SDF_WWW                     string      URL for SDF's home page
+
+Macros for default.sdg:
+SDF_DESCRIPTION_POST        macro       finalisation after {{Description}}
+SDF_DESCRIPTION_PRE         macro       initialisation before {{Description}}
+SDF_OPT_HELP                macro       text explaining help option
+SDF_OPT_STD                 macro       text explaining standard options
+
+Old macro names:
+BUILD_TITLE                 string      provided for backwards-compatibility
+END_TOPIC                   string      provided for backwards-compatibility
+SLIDE_DOWN                  string      provided for backwards-compatibility
+SLIDE_UP                    string      provided for backwards-compatibility
+!endblock
+
+H2: Programming Languages
+
+!block table
+Language                        Names
+C                               c
+C++                             c++, cpp, hpp, cc, h
+COBOL                           cobol
+CORBA IDL                       idl
+FORTRAN                         fortran, f77, fc, f, for
+Java                            java
+MIMS COBOL                      mimscobol, pcom, precom
+Object Pascal                   delphi, pascal, pas, int
+Perl                            perl, pl, pm, sdp, sdr
+Python                          python, jpython, py
+Simple Document Format          sdf, sdm, sds, sdn, sdl, sde
+Unix shell                      sh
+Unix c-shell                    csh
+!endblock
+
+Language names are case insensitive.
+
+H2: Colours
+
+For PS (i.e. MIF) generation, the supported colour values are
+{{Black}}, {{White}}, {{Red}}, {{Green}},
+{{Blue}}, {{Yellow}}, {{Cyan}} and {{Magenta}}.
+If a different colour is specified, it is ignored.
+
+For HTML generation, any of the HTML colours names
+(including those supported for PS generation) or the "#rrggbb" form
+can be used. Useful variables are:
+
+!block table; wrap=2; format='30,20,30,20'
+Name            Value
+COLOR_WHITE     'ffffff'
+COLOR_BLACK     '000000'
+COLOR_RED       'ff0000'
+COLOR_GREEN     '00ff00'
+COLOR_BLUE      '0000ff'
+COLOR_YELLOW    'ffff00'
+COLOR_MAGENTA   'ff00ff'
+COLOR_CYAN      '00ffff'
+COLOR_GREY      'c0c0c0'
+!endblock
+
+H2: Expression Formats
+
+!block table; groups
+Name            Description
+Strings:
+LOWER           convert a string to lowercase
+LOWER1          convert the first character to lowercase
+UPPER           convert a string to uppercase
+UPPER1          convert the first character to uppercase
+
+Dates:
+CONCISE         alias for FORMAT_SDATE
+DATE            format to a date only
+DATETIME        format to a complete date-time format
+FULL            alias for FORMAT_DATETIME
+SDATE           format to a concise date only
+TIME            format to a time only
+YEAR            format to a 4-digit year
+!endblock
+
+Expression format XXX can be changed/defined via the FORMAT_XXX variable.
+
+H2: Modules
+
+!block table
+Name            Description
+bugtrack        extensions for bug tracking
+defines         simplified product declaration/definition
+delphi          extensions for delphi 1.x documentation
+misc            miscellaneous goodies
+objects         IT-related objects
+testcase        extensions for test case documentation
+usecases        extensions for Use Case documentation
+!endblock
+
+H2: Book Components
+
+!block table
+Name                Meaning
+front               the cover component
+pretoc              components before the contents
+toc                 the table of contents
+lof                 the list of figures
+lot                 the list of tables
+prechapter          components before the chapters
+chapter             a normal chapter
+appendix            an appendix
+preix               components before the index
+ix                  the index
+!endblock
+
+H2: Event Processing
+
+KN: Supported symbols within actions:
+
+!block table
+Type        Symbols
+paragraph   $style, $text, %attr, &PrependText, &AppendText, \
+            $level, $prev_style, $prev_text, %prev_attr
+phrase      $style, $text, %attr, $append
+macro       $name, $args
+filter      $name, $params
+table       $style, %param
+!endblock
+
+KN: Special symbol meanings:
+
+!block table; groups
+Symbol          Meaning
+paragraph:
+&PrependText    a subroutine to add paragraphs before this one
+&AppendText     a subroutine to add paragraphs after this one
+$level          the current heading level ({{before}} this paragraph)
+$prev_style     the style of the previous paragraph
+$prev_text      the text of the previous paragraph
+%prev_attr      the attributes of the previous paragraph
+phrase:
+$append         text to append onto the end of the phrase
+!endblock
+
+
+#H1: Format Specific Extensions
+#
+#H2: HTML
+#
+#H2: MIF
+#
+#H2: Plain Text
+#
+#H2: POD

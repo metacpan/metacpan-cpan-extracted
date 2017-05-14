@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl5 -w
+
+#
+# btcheck
+#
+# Check the syntax and structure of a single BibTeX database file.
+# Currently hardcoded to use the "Bib" structure, which implements
+# exactly the structure of BibTeX 0.99.
+#
+# $Id: btcheck,v 1.4 1997/12/20 14:40:58 greg Rel $
+#
+
+use strict;
+use LaTeX::BibTeX (':metatypes');
+
+my ($filename, $structure, $bibfile, $entry, %seen_key);
+die "usage: btcheck file [structure]\n" unless @ARGV == 1 || @ARGV == 2;
+($filename, $structure) = @ARGV;
+$structure ||= 'Bib';
+
+$bibfile = new LaTeX::BibTeX::File $filename or die "$filename: $!\n";
+$bibfile->set_structure ($structure);
+
+while ($entry = new LaTeX::BibTeX::Entry $bibfile) 
+{
+   next unless $entry->parse_ok and $entry->metatype == BTE_REGULAR;
+   my $key = $entry->key;
+   $entry->warn ("repeated entry key \"$key\"") if $seen_key{$key};
+   $seen_key{$key} = 1;
+   $entry->check;
+}

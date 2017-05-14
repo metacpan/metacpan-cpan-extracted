@@ -1,0 +1,3 @@
+sqlpp is a conventional cpp-alike preprocessor taught to understand SQL syntax
+specificities. In addition to the standard #define/#ifdef/#else/#endif cohort,
+provides also #perldef for calling arbitrary perl code.

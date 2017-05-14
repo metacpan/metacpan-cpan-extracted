@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150002",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -15,10 +15,10 @@
    "name" : "CPAN-Common-Index",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
@@ -41,12 +41,18 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1"
+            "Test::Version" : "1",
+            "blib" : "1.01"
          }
       },
       "runtime" : {
@@ -56,12 +62,14 @@
             "Carp" : "0",
             "Class::Tiny" : "0",
             "File::Basename" : "0",
+            "File::Copy" : "0",
             "File::Fetch" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0.19",
+            "File::stat" : "0",
             "HTTP::Tiny" : "0",
             "IO::Uncompress::Gunzip" : "0",
             "Module::Load" : "0",
-            "Path::Tiny" : "0",
             "Search::Dict" : "1.07",
             "Tie::Handle::SkipHeader" : "0",
             "URI" : "0",
@@ -93,43 +101,46 @@
    "provides" : {
       "CPAN::Common::Index" : {
          "file" : "lib/CPAN/Common/Index.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "CPAN::Common::Index::LocalPackage" : {
          "file" : "lib/CPAN/Common/Index/LocalPackage.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "CPAN::Common::Index::MetaDB" : {
          "file" : "lib/CPAN/Common/Index/MetaDB.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "CPAN::Common::Index::Mirror" : {
          "file" : "lib/CPAN/Common/Index/Mirror.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "CPAN::Common::Index::Mux::Ordered" : {
          "file" : "lib/CPAN/Common/Index/Mux/Ordered.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/dagolden/CPAN-Common-Index/issues"
+         "web" : "https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index/issues"
       },
-      "homepage" : "https://github.com/dagolden/CPAN-Common-Index",
+      "homepage" : "https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/dagolden/CPAN-Common-Index.git",
-         "web" : "https://github.com/dagolden/CPAN-Common-Index"
+         "url" : "https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index.git",
+         "web" : "https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
+      "David Golden <xdg@xdg.me>",
       "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>",
       "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Shoichi Kaji <skaji@cpan.org>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

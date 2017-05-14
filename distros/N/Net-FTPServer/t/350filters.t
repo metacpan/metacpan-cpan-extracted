@@ -1,35 +1,20 @@
-#!/usr/bin/perl -w
-
-# $Id: 350filters.t,v 1.1 2003/09/28 11:50:45 rwmj Exp $
-
 use strict;
-use Test;
+use Test::More;
 use POSIX qw(dup2);
 use IO::Handle;
 use FileHandle;
-
-BEGIN {
-  `which uudecode` &&
-    `which compress` &&
-    `which gzip` or
-    do {
-      print "1..0 # external filter missing for test.\n";
-      exit;
-    };
-  plan tests => 13;
-}
 
 # Skip all tests if required executable compress doesn't exist (true
 # for patent-free Debian systems, for example).
 unless (on_path ("compress"))
   {
-    for (my $i = 0; $i < 13; ++$i) {
-      skip ("missing 'compress' command", 1);
-    }
+    plan skip_all => "missing 'compress' command";
     exit 0;
   }
 
 use Net::FTPServer::InMem::Server;
+
+plan tests => 13;
 
 pipe INFD0, OUTFD0 or die "pipe: $!";
 pipe INFD1, OUTFD1 or die "pipe: $!";
@@ -98,20 +83,29 @@ ok (upload_file ($tmpfile));
 ok (download_file ($tmpfile, "$tmpfile.a"));
 ok (compare_files ($tmpfile, "$tmpfile.a"));
 
-ok (download_file ("$tmpfile.Z", "$tmpfile.a"));
-system ("compress -cd < $tmpfile.a > $tmpfile.b") == 0 or die "compress: $!";
-ok (compare_files ($tmpfile, "$tmpfile.b"));
+SKIP: {
+  skip "external command compress missing", 2 if not qx(which compress);
+  ok (download_file ("$tmpfile.Z", "$tmpfile.a"));
+  system ("compress -cd < $tmpfile.a > $tmpfile.b") == 0 or die "compress: $!";
+  ok (compare_files ($tmpfile, "$tmpfile.b"));
+};
 
-ok (download_file ("$tmpfile.gz", "$tmpfile.a"));
-system ("gzip -cd < $tmpfile.a > $tmpfile.b") == 0 or die "gzip: $!";
-ok (compare_files ($tmpfile, "$tmpfile.b"));
+SKIP: {
+  skip "external command gzip missing", 2 if not qx(which gzip);
+  ok (download_file ("$tmpfile.gz", "$tmpfile.a"));
+  system ("gzip -cd < $tmpfile.a > $tmpfile.b") == 0 or die "gzip: $!";
+  ok (compare_files ($tmpfile, "$tmpfile.b"));
+};
 
-ok (download_file ("$tmpfile.gz.uue", "$tmpfile.a"));
-# uudecode -o $tmpfile.b < $tmpfile.a
-system ("uudecode < $tmpfile.a") == 0 or die "uudecode: $!";
-rename ("file", "$tmpfile.b") or die "uudecode: $!";
-system ("gzip -cd < $tmpfile.b > $tmpfile.a") == 0 or die "gzip: $!";
-ok (compare_files ($tmpfile, "$tmpfile.a"));
+SKIP: {
+  skip "external command uudecode or gzip missing", 2 if not qx(which uudecode) || not qx(which gzip);
+  ok (download_file ("$tmpfile.gz.uue", "$tmpfile.a"));
+  # uudecode -o $tmpfile.b < $tmpfile.a
+  system ("uudecode < $tmpfile.a") == 0 or die "uudecode: $!";
+  rename ("file", "$tmpfile.b") or die "uudecode: $!";
+  system ("gzip -cd < $tmpfile.b > $tmpfile.a") == 0 or die "gzip: $!";
+  ok (compare_files ($tmpfile, "$tmpfile.a"));
+};
 
 unlink $tmpfile;
 unlink "$tmpfile.a";
@@ -218,3 +212,5 @@ sub on_path
       }
     0;
   }
+
+__END__

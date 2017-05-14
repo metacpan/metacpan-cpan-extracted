@@ -1,0 +1,26 @@
+---
+abstract: 'Client for sending email using BlueHornet (http://www.bluehornet.com/)'
+author:
+  - 'Brian Hartsock <brian.h@tilt.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tilt-Email-BlueHornet
+requires:
+  Encode: '0'
+  Function::Parameters: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  URI: '0'
+  XML::Simple: '0'
+  strict: '0'
+version: '0.001'

@@ -1,0 +1,41 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: end Filter
+
+H2: Interface
+
+!filter_interface "end"
+
+H2: Description
+
+The {{end}} filter is used to add a section of SDF onto the end of
+the document. This is particularly useful in configuration files
+when you want to:
+
+* load a "exit" configuration module
+* provide defaults for variables not provided by authors within a document.
+
+When several sections are added to the end using this macro,
+the sections are processed in a first-in-last-out order.
+
+H2: Examples
+
+!block example; lang='sdf'
+!block end
+Line:
+N[align=Center] END OF DOCUMENT
+!endblock
+!endblock
+
+#H2: Limitations & Future Directions

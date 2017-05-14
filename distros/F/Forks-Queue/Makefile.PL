@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 use 5.010001;
 
 our %RECOMMENDED = ( DBI => 0, 'DBD::SQLite' => 0);
-our %REQUIRED = ( JSON => '2.0', 'Time::HiRes' => 0 );
+our %REQUIRED = ( JSON => '2.0', 'Time::HiRes' => 0, 'File::Temp' => 0 );
 our @NO_INDEX = ();
 
 our %META_MERGE
@@ -14,9 +14,12 @@ if (@NO_INDEX) {
 }
 
 our $FILES_TO_CLEAN
-    = join " ", qw(Forks-Queue-*);
+    = join " ", qw(Forks-Queue-* t/cfg* t/rq* t/*cfg);
 
-our @TEST_FILES = ('t/*.t');
+our @TEST_FILES = ('t/[0-9]*.t');
+if ($] >= 5.012) {
+    unshift @TEST_FILES, 't/_*.t';
+}
 
 ######################################################################
 

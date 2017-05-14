@@ -1,0 +1,37 @@
+---
+# This is a sample configuration file, see man pages for 'get-shit-done' for documentation.
+# List of hostnames to block
+block:
+ - amazon.co.uk
+ - bbc.co.uk
+ - delicious.com
+ - desura.com
+ - digg.com
+ - engadget.com
+ - facebook.com
+ - flickr.com
+ - forums.somethingawful.com
+ - friendster.com
+ - hi5.com
+ - hotukdeals.com
+ - i.reddit.com
+ - linkedin.com
+ - livejournal.com
+ - mail.google.com
+ - meetup.com
+ - myspace.com
+ - news.bbc.co.uk
+ - news.ycombinator.com
+ - plus.google.com
+ - quora.com
+ - reddit.com
+ - slashdot.org
+ - steam.com
+ - steampowered.com
+ - stickam.com
+ - stumbleupon.com
+ - twitter.com
+ - vimeo.com
+ - youtube.com
+#network_command: '/etc/rc.d networking restart'
+#hosts: /etc/hosts

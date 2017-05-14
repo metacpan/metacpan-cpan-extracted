@@ -1,0 +1,90 @@
+=pod
+
+=head1 NAME
+
+Object::By::Array - minimalistic constructors for array based objects
+
+=head1 SYNOPSIS
+
+	package some_package;
+	use parent qw(Object::By::Array);
+
+	sub ATR_SOMETHING() { 0 }
+	sub _constructor {
+		my ($this, ...) = @_;
+		$this->[ATR_SOMETHING] = data of first attribute;
+		...
+		return;
+	}
+
+	package main;
+	use some_package;
+	some_package->constructor(...);
+
+=head1 DESCRIPTION
+
+Object::By::Array provides generic constructors for OO programming, which are tailored to an actual class via a method called _constructor. A generic constructor creates the reference from various sources, blesses, tailors, locks, and finally returns it. A small advantage at a small price of 60 lines of Perl code.
+
+=head1 METHOD REFERENCE (API)
+
+The design goal was a simple and robust API with a straightforward implementation, respecting all limitations of Perl 5.
+
+=over 8
+
+=item $class->constructor or class->constructor
+
+A generic constructor for objects of the class. If the method _constructor is defined, calls _constructor and forwards any arguments to it. The data structure is locked afterwards.
+
+=item $class->prototype_constructor or class->prototype_constructor
+
+Prototype means, the object only carries a class and no data. Otherwise like class->constructor.
+
+=item $old_object->sibling_constructor
+
+Takes the class of $old_object to create an object of the same class. Otherwise works like class->constructor.
+
+=item $old_object->clone_constructor
+
+Takes the class of $old_object to create an object of the same class and the same data. Does not call _constructor, but copies the first level of the object's data structure. To leave no doubt: no deep copy is performed.
+
+=back
+
+For a way to use partial class names for object construction, see wild_construct from Package::Aspect::Wild_Class.
+
+
+=head1 SUPPORTING CLASSES
+
+These have no documentation of their own. These should come before Object::By::Array in order to override any default methods.
+
+=over 8
+
+=item Object::By::Array_Accessor
+
+Provides the generic methods _get, _set and _get_or_set.
+
+=item Object::By::Array_Clone_Recursive
+
+Provides a version of clone_constructor, which recursively calls the method on any contained objects.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+There are no tests.
+
+This module has been developed for the specific needs of FReDI and the Mica Environment. It is used by Mica, HTTP::Fools_Gold, Package::Aspect, Text::Placeholder and Object::Episode.
+
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011,2012 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

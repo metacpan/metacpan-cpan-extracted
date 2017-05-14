@@ -1,0 +1,58 @@
+##gff-version 3
+##feature-ontology http://song.cvs.sourceforge.net/viewvc/song/ontology/sofa.obo?revision=1.269
+##sequence-region P22298 1 129
+P22298	.	polypeptide	1	129	.	+	.	md5=493932c1f43289805b4c4e651ceb9249;ID=P22298
+P22298	ProSiteProfiles	protein_match	79	127	.	+	.	Name=PS51390;signature_desc=WAP-type 'four-disulfide core' domain profile.;Target=P22298 79 127;status=T;ID=match$1_79_127;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SUPERFAMILY	protein_match	26	73	.	+	.	Name=SSF57256;Target=P22298 26 73;status=T;ID=match$2_26_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Gene3D	protein_match	81	128	8.8E-16	+	.	Name=G3DSA:4.10.75.10;Target=P22298 81 128;status=T;ID=match$3_81_128;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Gene3D	protein_match	28	73	6.0E-12	+	.	Name=G3DSA:4.10.75.10;Target=P22298 28 73;status=T;ID=match$3_28_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SUPERFAMILY	protein_match	75	127	.	+	.	Name=SSF57256;Target=P22298 75 127;status=T;ID=match$4_75_127;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Pfam	protein_match	82	126	1.1E-8	+	.	Name=PF00095;signature_desc=WAP-type (Whey Acidic Protein) 'four-disulfide core';Target=P22298 82 126;status=T;ID=match$5_82_126;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	Pfam	protein_match	28	72	5.4E-8	+	.	Name=PF00095;signature_desc=WAP-type (Whey Acidic Protein) 'four-disulfide core';Target=P22298 28 72;status=T;ID=match$5_28_72;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	118	126	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 118 126;status=T;ID=match$6_118_126;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	79	88	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 79 88;status=T;ID=match$6_79_88;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	101	108	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 101 108;status=T;ID=match$6_101_108;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PRINTS	protein_match	108	117	.	+	.	Name=PR00003;signature_desc=4-disulphide core signature;Target=P22298 108 117;status=T;ID=match$6_108_117;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SMART	protein_match	28	73	1.9E-5	+	.	Name=SM00217;signature_desc=Four-disulfide core domains;Target=P22298 28 73;status=T;ID=match$7_28_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	SMART	protein_match	82	127	8.6E-22	+	.	Name=SM00217;signature_desc=Four-disulfide core domains;Target=P22298 82 127;status=T;ID=match$7_82_127;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+P22298	PANTHER	protein_match	3	129	.	+	.	Name=PTHR19441;Target=P22298 3 129;status=T;ID=match$8_3_129;date=31-07-2013
+P22298	SignalP_EUK	protein_match	1	22	.	+	.	Name=SignalP-noTM;Target=P22298 1 22;status=T;ID=match$9_1_22;date=31-07-2013
+P22298	ProSiteProfiles	protein_match	25	73	.	+	.	Name=PS51390;signature_desc=WAP-type 'four-disulfide core' domain profile.;Target=P22298 25 73;status=T;ID=match$10_25_73;Ontology_term="GO:0005576","GO:0030414";date=31-07-2013;Dbxref="InterPro:IPR008197"
+>P22298
+GRGLLPFVLLALGIXAPWAVEGAENALKGGACPPRKIVQCLRYEKPKCTSDWQCPDKKKC
+CRDTCAIKCLNPVAITNPVKVKPGKCPVVYGQCMMLNPPNHCKTDSQCLGDLKCCKSMCG
+KVCLTPVKA
+>match$1_79_127
+VKVKPGKCPVVYGQCMMLNPPNHCKTDSQCLGDLKCCKSMCGKVCLTPV
+>match$2_26_73
+ALKGGACPPRKIVQCLRYEKPKCTSDWQCPDKKKCCRDTCAIKCLNPV
+>match$3_28_73
+KGGACPPRKIVQCLRYEKPKCTSDWQCPDKKKCCRDTCAIKCLNPV
+>match$3_81_128
+VKPGKCPVVYGQCMMLNPPNHCKTDSQCLGDLKCCKSMCGKVCLTPVK
+>match$4_75_127
+ITNPVKVKPGKCPVVYGQCMMLNPPNHCKTDSQCLGDLKCCKSMCGKVCLTPV
+>match$5_28_72
+KGGACPPRKIVQCLRYEKPKCTSDWQCPDKKKCCRDTCAIKCLNP
+>match$5_82_126
+KPGKCPVVYGQCMMLNPPNHCKTDSQCLGDLKCCKSMCGKVCLTP
+>match$6_79_88
+VKVKPGKCPV
+>match$6_101_108
+HCKTDSQC
+>match$6_108_117
+CLGDLKCCKS
+>match$6_118_126
+MCGKVCLTP
+>match$7_28_73
+KGGACPPRKIVQCLRYEKPKCTSDWQCPDKKKCCRDTCAIKCLNPV
+>match$7_82_127
+KPGKCPVVYGQCMMLNPPNHCKTDSQCLGDLKCCKSMCGKVCLTPV
+>match$8_3_129
+GLLPFVLLALGIXAPWAVEGAENALKGGACPPRKIVQCLRYEKPKCTSDWQCPDKKKCCR
+DTCAIKCLNPVAITNPVKVKPGKCPVVYGQCMMLNPPNHCKTDSQCLGDLKCCKSMCGKV
+CLTPVKA
+>match$9_1_22
+GRGLLPFVLLALGIXAPWAVEG
+>match$10_25_73
+NALKGGACPPRKIVQCLRYEKPKCTSDWQCPDKKKCCRDTCAIKCLNPV

@@ -35,7 +35,7 @@ William Carr (Mr. Maloof), <bill@bottlenose-wine.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2011 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

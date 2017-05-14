@@ -1,0 +1,201 @@
+#!/usr/local/bin/perl -w
+#
+# eumm -  a simple `h2xs -AX -n` replacement.
+#
+# Author: Joshua Keroes
+# $Id: eumm,v 1.1 2002/05/29 16:37:44 jkeroes Exp $
+#
+#------------------------------------------------------------
+# Libs, pragmata, globals
+#------------------------------------------------------------
+
+use strict;
+use ExtUtils::ModuleMaker;
+use Getopt::Long;
+use File::Basename;
+
+use vars qw ($TESTING $DEBUG $VERBOSE $VERSION @LICENSES %CHECKS %ARGS);
+
+$VERSION = "0.02";
+
+# Defaults:
+%ARGS = ( verbose   => 0, # not handled
+	      debug     => 0, # not handled
+	      compact   => 1, # best handled by ExtUtils::ModuleMaker or a subclass.
+);
+
+# Should ask ExtUtils::ModuleMaker::Licenses for a list of known licenses.
+@LICENSES = qw/custom apache apache_1_1 artistic bsd gpl gpl_2 ibm ibm_1_0
+    intel jabber jabber_1_0 lgpl lgpl_2_1 mit mitre mozilla mozilla_1_1 
+    mozilla_1_0 mpl mpl_1_1 mpl_1_0 nethack nokia nokos nokia_1_0a nokos_1_0a 
+    python perl q q_1_0 ricoh ricoh_1_0 sun sissl sleepycat vovida vovida_1_0 
+    zlib libpng/;
+
+# XXX Many of the regexen should be improved. This is just a rough-up.
+#
+# email:   should use Email::Valid, if present
+# website: should use URI (or similar), if present
+my $license_re	 = qr/(?{ join "|", @LICENSES })/; # (?{..}) is experimental
+my $module_re	 = qr/[\'\"\w\.:-]+/;
+my $abstract_re	 = qr/.{0,44}/;
+
+%CHECKS = (
+	       help	      => qr/1|0/,
+	       compact	      => qr/1|0/,
+
+	       abstract	      => $abstract_re,
+	       name	      => qr/.*/,
+	       email	      => qr/.*\@.*/,
+	       cpanid	      => qr/\w{3,9}/,	
+	       website	      => qr/http:\/\/.*/,
+	       version	      => qr/[\w\.-]*/,	
+	       license	      => $license_re,	
+
+	       extra_modules  => qr/(?: $module_re \s* => \s* $abstract_re ,?)+ /x,
+
+	       module	      => qr/[\w'-]+ (?:: [\w'-] )* /x,
+);
+
+#------------------------------------------------------------
+# Main
+#------------------------------------------------------------
+
+GetOptions( \%ARGS, "help|?", "debug", "verbose!", "testing",
+
+	    "abstract=s",
+	    "name=s", "email=s", "cpanid=s", "website=s",
+	    "version=s", "license=s",
+
+	    "compact",
+	  );
+
+die "Need a module name.\n" . usage() unless @ARGV;
+die usage() if delete $ARGS{help};
+
+($TESTING, $DEBUG, $VERBOSE) = delete @ARGS{ qw/testing debug verbose/ };
+
+%ARGS = check_args(%ARGS, module => shift @ARGV);
+
+if ($TESTING) {
+    require Data::Dumper;
+    print Data::Dumper->Dump([\%ARGS, {args2args(\%ARGS)}], [qw/ARGS for_gen_mod_files/]);
+} else {
+    Generate_Module_Files( args2args(\%ARGS) );
+}
+
+exit;
+
+#------------------------------------------------------------
+# Subs
+#------------------------------------------------------------
+
+# Validates all of the command-line options, complains if they don't pass,
+# and uppercases the keys.
+#
+# Dies on validation failure.
+sub check_args {
+    my %args = @_;
+    my $err  = 0;
+
+    die usage() unless $args{module};
+
+    my %clean;
+    while (my ($arg, $value) = each %args) {
+	unless (defined $CHECKS{$arg}) {
+	    warn "Unknown argument '$arg' is being ignored.\n";
+	    next;
+	}
+
+	my $regex = $CHECKS{$arg};
+	die "Didn't find validation check for command-line argument '$arg'. Aborting."
+	    unless ref $regex eq 'Regexp';
+
+	if ($value =~ /$regex/) {
+	    $clean{$arg} = $value;
+	} else {
+	    ++$err;
+
+	    if ($arg =~ /module/i) {
+		warn "Your module name, '$value', didn't pass the validation check.\n"
+	    } else {
+		warn $value
+		    ? "'--$arg=$value' didn't pass the validation check.\n"
+		    : "'--$arg' didn't pass the validation check\n";
+	    }
+	}
+    }
+
+    die "Aborting.\n" if $err;
+    return %clean;
+}
+
+# Special handling:
+#   AUTHOR-related args are put into the AUTHOR hash.
+#   MODULE becomes NAME.
+#   compact is a processing directive. It shouldn't be CAPITALIZED.
+#
+# Input:  hashref of command-line options
+# Output: array of args, suitable for  Generate_Module_Files().
+sub args2args {
+    my $args = shift;
+
+    my %args;
+    while (my ($k, $v) = each %$args) {
+
+	$k = uc($k);
+
+	if ($k =~ /NAME|EMAIL|CPANID|WEBSITE/ ) {
+	    $args{AUTHOR}{$k} = $v;
+	} else {
+	    $args{$k} = $v;
+	}
+    }
+
+    # Special handling
+    $args{NAME}    = delete $args{MODULE};
+    $args{compact} = delete $args{COMPACT};
+
+    return %args;
+}
+
+sub usage {
+    my $progname = basename($0);
+
+    return <<EOB;
+
+Usage: $progname [options] <Module::Name>
+
+Creates a Perl module directory with template files.
+
+ # General options
+ -h, -?, --help		  display this help
+ --verbose		  show additional information
+
+ # ExtUtils::ModuleMaker options
+ -a,  --abstract=string	  e.g. 'Module::Foo does good stuff'
+ -cp, --cpanid=string	  e.g. 'JOSHUA' [1]
+ -e,  --email=string	  e.g. 'joshua\@cpan.org'
+ -l,  --license=string	  e.g. 'artistic' [2]
+ -n,  --name=string	  e.g. 'Joshua Keroes'
+ -w,  --website=string	  e.g. 'http://NetTelnetCisco.sf.net'
+ --version=string	  e.g. '1.10'
+
+ # Processing directives
+ -co, --compact=string	  Create compact base directory. [Default: 1]
+
+ # Developer options
+ -d, --debug		  Turn on debugging options
+ -t, --testing		  Turn on testing options
+
+Footnotes:
+
+  [1] About PAUSE: http://www.cpan.org/modules/04pause.html
+  [2] perldoc ExtUtils::ModuleMaker::Licenses
+
+EOB
+
+}
+
+__END__
+
+# XXX POD should follow

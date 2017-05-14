@@ -4,7 +4,7 @@ use warnings;
 BEGIN {
 
 $|=1;
-require YAML::Syck;
+require YAML::XS;
 my @data = qw(
 id/A/AA/AAU/MRIM/CHECKSUMS
 id/A/AA/AAU/MRIM/Net-MRIM-1.10.meta
@@ -25,7 +25,7 @@ id/A/AD/ADAMK/YAML-Tiny-1.36.tar.gz
 id/J/JO/JONATHAN/Perl6/NativeCall-v1.tar.gz
 );
 
-my $yaml = YAML::Syck::Dump( { recent => [ map { { path => $_, type => 'new', epoch => (time() - (60*20)) } } @data ] } );
+my $yaml = YAML::XS::Dump( { recent => [ map { { path => $_, type => 'new', epoch => (time() - (60*20)) } } @data ] } );
 
 my $D = shift || '';
 if ($D eq 'daemon') {

@@ -1,0 +1,1 @@
+aclocal && autoconf && automake --add-missing && echo "" && echo "Now run ./configure && make && make install" && echo ""

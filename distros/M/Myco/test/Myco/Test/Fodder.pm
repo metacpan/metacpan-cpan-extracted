@@ -1,4 +1,4 @@
-# $Id: Fodder.pm,v 1.1.1.1 2004/11/22 19:16:05 owensc Exp $
+# $Id: Fodder.pm,v 1.1.1.1 2005/12/09 18:08:47 sommerb Exp $
 #
 #     global test Fodder... and test framework support
 
@@ -18,52 +18,6 @@ my $_dbi;   # DBI connection object
 
 # Generate stack backtrace on exception if asked
 $SIG{__DIE__} = \&Carp::confess if ($ENV{MYCO_TESTCONFESS});
-
-### Reusable Test Scenerios
-
-sub scenerio_PersonInCohort {
-    my $test = shift;
-    my $p = Myco::Person->new(first => "Joe", last => "Cool");
-    my $c = Myco::Cohort->new(cohortid => "FOO53");
-    $p->save;
-    $c->save;
-    $test->destroy_upon_cleanup($p, $c);
-    return ($p, $c, $c->add_member($p, $c));
-}
-
-sub scenerio_PersonInProgram {
-    my $test = shift;
-    my $p = Myco::Person->new(first => "Joe", last => "Cool");
-    $p->save;
-    my $ap = Myco::Admissions::Process->create(person => $p,
-					       stage=> 1);
-    my $pgm = Myco::Program->new(name => "BSBA");
-    $pgm->save;
-#    $test->destroy_upon_cleanup($p, $pgm);
-    return ($p, $pgm, $pgm->enroll($p));
-}
-
-sub scenerio_AdmissionsReqTest {
-    my $test = shift;
-
-    my $p = Myco::Person->new(first => "Joe", last => "Cool",
-				 citizenship => 'USA');
-    $p->save;
-    my $prog = Myco::Program->new(name => 'BS of BasketWeaving',
-			     admission_reqs_classname => 'Sample');
-    $prog->save;
-
-    my $ap = Myco::Admissions::Process->new(person => $p,
-					    program => $prog, stage => 1);
-    $p->save;
-    my $reqeval = Myco::Admissions::ReqEvaluation->
-                                      new(name => 'mid',
-		  		          requirements_classname => 'Sample');
-    $reqeval->save;
-    $test->destroy_upon_cleanup($p, $prog, $reqeval);
-    return ($p, $ap, $prog, $reqeval);
-
-}
 
 
 ###
@@ -212,13 +166,14 @@ sub _config_fixture {
     } else {
 	eval "require Myco"
 	  or die "could not load class Myco: $@";
-
+	
 	# Set up connection to persistence storage
 	unless ($tparams->{skip_persistence}) {
-	    my $db = $ENV{PGDATABASE} || getpwuid $>;
-	    my $user = $ENV{PGUSER} || getpwuid $>;
-	    my $pw = $ENV{PGPASSWORD} || '';
-            my $dsn = "dbi:Pg:dbname=$db";
+
+	       use Myco::Config qw(:database);
+           my $user = DB_USER;
+           my $pw = DB_PASSWORD;
+           my $dsn = DB_DSN;
 
             $test->{myco}{data_source} = $dsn;
             $test->{myco}{username} = $user;

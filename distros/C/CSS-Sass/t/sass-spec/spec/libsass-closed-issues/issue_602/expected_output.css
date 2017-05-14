@@ -1,19 +1,14 @@
 #foo.\bar {
-  color: red;
-}
+  color: red; }
 
 #foo.b\ar {
-  color: red;
-}
+  color: red; }
 
 #foo\.bar {
-  color: red;
-}
+  color: red; }
 
 #foo\bar {
-  color: red;
-}
+  color: red; }
 
 #fo\o.bar {
-  color: red;
-}
+  color: red; }

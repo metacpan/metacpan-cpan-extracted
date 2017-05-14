@@ -58,5 +58,5 @@ requires:
 resources:
   bugtracker: https://github.com/jef-sure/pef-front-psgi-dist/issues
   repository: https://github.com/jef-sure/pef-front-psgi-dist.git
-version: '0.16'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

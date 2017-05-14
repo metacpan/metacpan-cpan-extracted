@@ -1,0 +1,72 @@
+#
+#  example resource file ~/.beancounterrc for BeanCounter
+#
+ 
+#
+#  beancounter --- A stock portfolio performance monitoring tool
+# 
+#  Copyright (C) 1998 - 2004  Dirk Eddelbuettel <edd@debian.org>
+# 
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+ 
+#
+#  The format of this file is simple:  pairs of  key=value where
+#  the key must be a symbol used and recognised by the global hash
+#  %Config; some command-line arguments are also recognized.  See 
+#  the GetConfig() function in BeanCounter.pm for the gory details.
+#
+ 
+#  Set the host on which the beancounter db is stored 
+host=localhost
+
+#  Set the database user -- Note that you if don't specify
+#  a user, your (system) uid is used via the USER variable
+#user=joe
+
+#  Set the database password -- not needed if e.g. the database 
+#  grants eg access locally. Hence defaults to 'undef'.
+#passwd=joesecret
+
+#  Declare that we want to connect using ODBC rather than via the
+#  Perl DBD driver for PostgreSQL or MySQL. See beancounter(1) for an
+#  example ODBC configuration file, and the libiodbc documentation.
+#  Default is 0, i.e. DBD-Pg or DBD-mysql.
+#odbc=1
+
+#  ODBC datasource name, defaults to beancounter
+#dsn=beancounter
+
+#  Set the default domestic currency. Default is USD  (yes, I moved :)
+#currency=CAD
+
+#  Example of setting a firewall proxy host, and user:password
+#proxy=http://1.2.3.4:80
+#firewall=joeuser:joepasswd
+
+#  Debugging
+#debug=0
+
+#  Verbose operation
+#verbose=0
+
+#  Database system, eg to select MySQL over the default PostgreSQL
+#dbsystem=PostgreSQL
+
+#  Database name, eg to select something other than the default beancounter
+#dbname=beancounter
+
+#  Shall FX rates be updated?  Default is yes
+#fxupdate=1

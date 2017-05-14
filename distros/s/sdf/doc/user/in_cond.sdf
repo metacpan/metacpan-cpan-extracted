@@ -1,0 +1,45 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: Conditional Text
+
+Blocks of text can be conditionally included or excluded using
+the following macros:
+
+E:   !if condition
+E:   !elsif condition
+E:   !else
+E:   !endif
+
+These macros allow you to tune the output for different audiences.
+For example, you may wish to only include email directions
+if [[HTML]] is being generated:
+
+!block example; pure
+!if OPT_PP_HTML
+Click {{[jump="mailto:joe"] here}} to send me email.
+!endif
+!endblock
+
+NB:
+^ {{elseif}} can be used instead of {{MAC:elsif}} if you prefer.
+
++ {{condition}} is an {{SDF expression}} where
+  unknown variables do not give errors
+
++ Conditional text blocks must be fully defined within a given file.
+  This prevents an {{MAC:if}} macro within an included file excluding
+  text in the file doing the including.
+NE:
+
+!end_topic

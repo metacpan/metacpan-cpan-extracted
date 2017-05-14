@@ -1,0 +1,142 @@
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+To install, you need Perl 5.004_04 or later as well as an OpenGL-
+compatible library (e.g. IRIX native opengl or the freely available
+Mesa library). You also need an ANSI C compiler and the X development
+libraries as well as an X server to run this program with.
+If you plan to use jpeg textures, you will also neet libjpeg.
+
+Downloads:
+	perl 5.004_04: 	http://www.perl.com/CPAN/src/5.0
+	libwww-perl:    http://www.perl.com/CPAN/modules/by-module/LWP/
+	Mesa:		http://www.ssec.wisc.edu/~brianp/Mesa.html
+	FreeType:	http://www.freetype.org
+	libJPEG		ftp://ftp.uu.net:/graphics/jpeg/
+ 	 (note you need a fairly recent version)
+
+	libpng1.0.0	http://www.cdrom.com/pub/png/
+ 	 (or later and the libraries it requires, e.g. libz (aka zlib))
+
+	gnu make, if you don't have it yet
+			any GNU archive
+
+	Additionally, if you want to embed FreeWRL into Netscape,
+	get XSwallow
+			http://skynet.csn.ul.ie/~caolan/docs/XSwallow.html
+
+NOTE: when compiling these libraries on systems where there are
+several different binary formats (notably IRIX), make sure you compile
+these libraries into the same format your Perl was compiled with
+(usually -n32 on IRIX). 
+
+NOTE2: libwww-perl shouldn't be strictly necessary if you are using
+only local documents -- however I haven't tested the code in ./URL.pm
+so there might be trouble. Get it anyway, it's very simple to install
+and mighty useful -- you can get documents from the WWW just by 
+"get 'http://foo.org'" in your script.
+
+NOTE3: Mesa has been known to compile badly sometimes, e.g. with
+linux-i386-elf on a 486. PLEASE MAKE SURE THE MESA DEMOS WORK FIRST 
+BEFORE COMPLAINING TO ME!
+
+---------
+All these steps are quite a job -- anyone fancy making a really big
+binary distribution which contains *everything* and just falls neatly
+in place in the system.
+---------
+
+First, edit vrml.conf to explain where your OpenGL and other libraries
+are - the current settings are for finding the Mesa library in my
+home directory so you will probably want to change that. Change -lMesaGL
+to -lGL if you have native OpenGL. You can also copy vrml.conf to ~/.vrml.conf
+to retain settings between use - remember to check back to the distribution
+file if you use a newer version to see if something has changed.
+
+TO GET JAVASCRIPT WORKING, YOU MUST CURRENTLY DO THE FOLLOWING::
+Go to JS/js/ subdirectory and compile the Mozilla javascript code.
+I don't know how to do it on your platform, on linux simply
+       cd JS/js; make
+worked. NOTE: you *must* use GNU make to make the JS/js directory.
+ALSO, YOU MUST EDIT THE LIBRARY PATH IN vrml.conf!!!!
+Otherwise, the support for javascript WILL NOT WORK. 
+
+
+Next, try 
+
+	perl Makefile.PL
+
+in the main FreeWRL directory. If there are any errors, correct
+them first. If there is no -ljs, see the above step: this is the javascript
+library. Email me if the problem persists.
+ 
+Email me if the problem persists.
+
+Then, just say 
+
+	make
+
+which should compile and install (in the blib/ directory) the files.
+Because this release is strictly alpha, installing them anywhere else
+is not advisable. !!! NOTE! DO NOT SAY "make install"!!! THIS IS NOT
+YET EXPECTED TO WORK! I have not yet had time to streamline the building/
+installing because of so many other things to do with this that the browser
+only works if you run it from the distribution directory. IF YOU WANT
+THIS TO WORK PROPERLY *NOW*, SEND A PATCH. For my priorities, spec and EAI
+compliance comes first.
+
+For the java interface, you have to first create the named pipes via
+the commands
+       mknod .javapipej p
+       mknod .javapipep p
+or whatever on your system and set your classpath and the correct 
+executable java interpreter in VRMLJava.pm (these will change later 
+as I clean up interfaces). These are all just very quick hacks to
+get the system up and running. Of course, if you want to patch them
+to work in a nicer way, I would be very grateful ;)
+!!!NOTE!!! On some operating systems, the java process seems to be left
+behind -- if that happens, kill it, otherwise it'll mess up the next
+browser invocation.
+
+The 'make' command in the main directory does not recompile the java
+files yet, but you can go to the java/ directory and type 'make' (fix
+the makefile for your system first).
+
+Likewise, it does not run genJS.pl in the JS/ subdirectory, you
+have to do that by hand.
+
+-------------------------------
+ANSWERS TO COMMON QUESTIONS:
+
+Q.  I am running XYZ_OS on an ZFB machine and
+    there are no configuration files for XYZ_OS and the
+    make step crashes on install.  Seems to be related to the config/*.mk
+    lookup in the JS area.  The Mesa libs make seems to work. Any Ideas?
+
+Yes, it appears that the mozilla JS library (of which the JS/js subdirectory
+is a verbatim copy (except as discussed in MODIFICATIONS).
+
+What you can try is to first see which filename the makefile looks for
+in the config/ directory, then copy one of the SunOS files to that
+filename and then edit the settings in that file (e.g. which C compiler,
+etc). This is something I can't do, not having access to that type
+of machine and not knowing how exactly one must compile files etc. 
+on it. When you make the file, I'd be very grateful for a copy.
+
+I'm probably going to try to do something about making the build process
+more flexible but so far there is much more to do before that, such as
+complete spec compliance as well as EAI.
+
+Also, note that "make install" doe not work yet, as mentioned above.
+This is strictly a development version and as such, you need to run
+it in the distribution directory ;)
+
+
+Q. How do I use FreeWRL with XSwallow?
+
+A. See The freewrl manpage (which is in freewrl.PL in POD format)
+
+
+

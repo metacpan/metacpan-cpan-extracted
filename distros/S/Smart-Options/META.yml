@@ -33,7 +33,7 @@ no_index:
 provides:
   Smart::Options:
     file: lib/Smart/Options.pm
-    version: '0.06'
+    version: '0.061'
   Smart::Options::Declare:
     file: lib/Smart/Options/Declare.pm
 requires:
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/kan/p5-smart-options/issues
   homepage: https://github.com/kan/p5-smart-options
   repository: git://github.com/kan/p5-smart-options.git
-version: '0.06'
+version: '0.061'
 x_contributors:
   - 'hayajo <hayajo@cpan.org>'
   - 'Takuji Nishibayashi <takuji31@gmail.com>'

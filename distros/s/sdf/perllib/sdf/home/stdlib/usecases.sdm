@@ -1,0 +1,97 @@
+# $Id$
+#
+# >>Title::     Use Case Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1997, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 17-Dec-97 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:usecases}} is an [[SDF]] module for
+# managing Use Cases.
+#
+# >>Description::
+# You can customise this module's behavior
+# by defining the following variables before using this module:
+#
+# * {{UC_ATTRIBUTES}} - the comma-separated list of attributes
+#   at the top of each details file
+# * {{UC_SUBSECTIONS}} - the comma-separated list of subsections
+#   at the top of each details file.
+#
+# >>Limitations::
+#
+
+!default UC_ATTRIBUTES    'Version,Status'
+!default UC_SUBSECTIONS   'Purpose,Actors,Scenario,Special Requirements,Related Use Cases'
+
+# Define the classes
+!class usecases 'UC,UCTITLE'; 'Code,Title'; "Jump,$var{'UC_ATTRIBUTES'}"
+!class actors   'ACT';        'Name,Description'
+
+# Define the hypertext generation rules
+!on phrase 'UC';; $attr{'jump'}="$text.html"
+!on phrase 'UCTITLE';; $attr{'jump'}=$obj_long{'usecases',$text,'Code'} . ".html"
+
+!block script
+
+sub usecases_Jump_Value {
+    local($name) = @_;
+#   local($result);
+
+    return "$name.html";
+}
+
+sub usecases_Value {
+    local($attr, $name) = @_;
+#   local($result);
+
+    return AttrToFile($attr, $name, 'usecases');
+}
+
+# Macro to construct the title for a details file.
+# If a title is supplied, a warning is output if it does not
+# match the title in the database.
+@_uc_title_MacroArgs = (
+    'Name       Type        Default     Rule',
+    'title      string      _NULL_',
+);
+sub uc_title_Macro {
+    local(%arg) = @_;
+    local(@text);
+    local($title, $db_title);
+    local($code);
+
+    # Check the title matches the database
+    $title = $arg{'title'};
+    $code = $var{'FILE_BASE'};
+    $db_title = &Value('usecases', $code, 'Title');
+    if ($title eq '') {
+        $title = $db_title;
+    }
+    elsif ($title ne $db_title) {
+        &'AppMsg("warning", "usecase title does not match database value");
+    }
+
+    # Build result
+    @text = (
+        "!define DOC_NAME '$code. $title'",
+        "!define DOC_TOC 0",
+        "!build_title",
+        "!if UC_SUBSECTIONS",
+        "!subsections UC_SUBSECTIONS; 'noprefix'",
+        "!endif",
+        "!if UC_ATTRIBUTES",
+        "!namevalues 'usecases'; '$code'; UC_ATTRIBUTES",
+        "!endif");
+
+    # Return result
+    return @text;
+}
+!endblock

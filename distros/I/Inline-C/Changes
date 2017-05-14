@@ -1,3 +1,6 @@
+0.77 Fri 12 May 17:57:36 CEST 2017
+ - Apply PR#63 (@mohawk2)
+
 0.76 Wed Jul  1 08:09:50 PDT 2015
  - Support for cppflags
 
@@ -274,4 +277,3 @@
 
 0.30 Fri Dec  8 01:55:43 PST 2000
  - Created Inline::C. Separated C code from Inline 0.26
-

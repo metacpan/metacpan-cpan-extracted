@@ -1,0 +1,8 @@
+<form:select xmlns:form="http://syrme.net/xml-template/form/v1"
+             name="type" default="${${Field}}">
+  <type:foreach xmlns:type="http://syrme.net/xml-template/type/v1"
+                fields="*">
+    <form:option value="${type}">${description}</form:option>
+  </type:foreach>
+</form:select>
+<i>(To add a new type, add an entry to the <kbd>types</kbd> database table.)</i>

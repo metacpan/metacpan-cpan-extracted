@@ -1,0 +1,13 @@
+2013-09-20  向晨  <ailin at devio dot us>
+
+	* v0.2
+	* WithEmacs.pm:
+	  - add workaround for broken controlling terminal handler in
+	    IPC::Run
+	  - clean up arguments for older gnuclients
+
+2013-09-19  向晨  <ailin at devio dot us>
+
+	* v0.1
+	* WithEmacs.pm: initial release
+

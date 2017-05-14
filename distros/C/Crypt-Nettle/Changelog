@@ -1,3 +1,14 @@
+Crypt::Nettle (0.3) upstream;
+
+  * Used hv_store instead of hv_stores (so it works with perl 5.8,
+    thanks, Peter Mack <peter@emergence.com> for finding and fixing it!)
+  * Documentation cleanup
+  * Expose/document rsa_sign_hash_context and rsa_verify_hash_context
+    and rsa_sign_digest and rsa_verify_digest
+  * implement Crypt::Nettle::RSA::hashes_available()
+
+ -- Daniel Kahn Gillmor <dkg@fifthhorseman.net>  Fri, 18 Mar 2011 16:59:13 -0400
+
 Crypt::Nettle (0.2) upstream;
 
   * Brown Paper Bag release -- META.yaml was cargo-culted over from

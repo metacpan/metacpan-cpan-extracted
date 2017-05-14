@@ -26,14 +26,14 @@ Usage:  $0 [-h]
                             a /^#!.*perl/ line was already present).
         -s stripsuffix  strip this suffix from file before appending ".bat"
                             Not case-sensitive
-                            Can be a regex if it begins with `/'
+                            Can be a regex if it begins with '/'
                             Defaults to "/\.plx?/"
         -h              show this help
 EOT
 
 my %OPT = ();
 warn($usage), exit(0) if !getopts('whun:o:a:s:',\%OPT) or $OPT{'h'};
-# NOTE: %0 is already enclosed in doublequotes by cmd.exe, as appropriate
+# NOTE: %0 is already enclosed in double quotes by cmd.exe, as appropriate
 $OPT{'n'} = '-x -S %0 %*' unless exists $OPT{'n'};
 $OPT{'o'} = '-x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9' unless exists $OPT{'o'};
 $OPT{'s'} = '/\\.plx?/' unless exists $OPT{'s'};
@@ -335,7 +335,7 @@ variable to determine which operating system it is being run from.
 
 Strip a suffix string from file name before appending a ".bat"
 suffix.  The suffix is not case-sensitive.  It can be a regex if
-it begins with `/' (the trailing '/' is optional and a trailing
+it begins with '/' (the trailing '/' is optional and a trailing
 C<$> is always assumed).  Defaults to C</.plx?/>.
 
 =item B<-w>
@@ -363,21 +363,21 @@ Show command line usage.
 
 	C:\> pl2bat foo.pl bar.PM 
 	[..creates foo.bat, bar.PM.bat..]
-	
+
 	C:\> pl2bat -s "/\.pl|\.pm/" foo.pl bar.PM
 	[..creates foo.bat, bar.bat..]
-	
+
 	C:\> pl2bat < somefile > another.bat
-	
+
 	C:\> pl2bat > another.bat
 	print scalar reverse "rekcah lrep rehtona tsuj\n";
 	^Z
 	[..another.bat is now a certified japh application..]
-	
+
 	C:\> ren *.bat *.pl
 	C:\> pl2bat -u *.pl
 	[..updates the wrapping of some previously wrapped scripts..]
-	
+
 	C:\> pl2bat -u -s .bat *.bat
 	[..same as previous example except more dangerous..]
 
@@ -403,7 +403,7 @@ and must use
 A loop should be used to build up the argument list when not on
 Windows NT so more than 9 arguments can be processed.
 
-See also L</Disadvantages>.
+See also L</DISADVANTAGES>.
 
 =head1 SEE ALSO
 

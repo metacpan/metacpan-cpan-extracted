@@ -4,6 +4,10 @@ todo
 
 	isa, can etc. when needed ("deep reflection").
 }
+done
+{
+	via $Class::Maker::Reflection::DEEP;
+}
 
 todo
 {
@@ -15,6 +19,10 @@ todo
 	{
 		explicit => 0,
 	}
+}
+done
+{
+	see pod docu.
 }
 
 todo
@@ -346,6 +354,16 @@ done
 			return $this->SUPER::new( name => $_[0] );
 		}
 }
+comment
+{
+	I am bad. Param transformation should happen in _preinit() via forming the (1,2,3) to ( p1 => 1, p2 => 2, px => 2 ) or
+	something appropriate
+}
+reallydone
+{
+	use ->_arginit() callback to transform @_ to appropiate hash or something to handle such cases.
+}
+
 
 todo
 {
@@ -401,6 +419,23 @@ done
 {
 	!! deprecated !! Because was to confusing <privat> fields in the public section.
 }
+comment
+{
+	May we should reuptake that idea. Then we could say:
+	
+		* if we have a section "attributes" , then we would allow the <private> syntax
+		
+			attributes =>
+			{
+				string => [qw( <name> name tele addr )],
+				
+				int => [qw( <oid> something etc)],
+			},
+			
+		[Note] We have a public and private "name", so _name and name.
+			
+		* if someone uses "public" and "private" it is prohibited.
+}
 
 todo
 {
@@ -435,6 +470,10 @@ todo
 
 	$test->getopts( @ARGV );
 }
+note
+{
+   it is stupid to put it into the default field. This type of problems belongs to _preinit or _postinit or separate method !
+}
 
 todo Reflection
 {
@@ -450,6 +489,62 @@ done
 
 todo 
 {
-	int the "default" section, check whether the "defaulted" memeber exists.
+	in the "default" section, check whether the "defaulted" memeber exists.
 }
 
+
+todo
+{
+	Add modes like $Class::Maker::mode where you can setup 'strictness'.
+
+	Example: with $mode == 'very strict' you must set a default for every
+	value in the 
+
+	defaults =>
+	{
+	}
+
+	section or it must be set at the end of _post_init.
+}
+
+todo
+{
+	add a 'types' section where you set the Data::Type for attributes.
+
+	example
+
+	public => 
+	{
+		string => [qw(zip homepage birth telefon)],
+	},
+	
+	types =>
+	{
+		birth => DATE,
+		zip => ZIP( german ),
+		telefon => PHONE( german ),
+		homepage => URI( 'HTTP' ),
+	},
+}
+partial
+{
+	Already possible. Use Data::Type::Guard for explicit validation.
+}
+
+todo( USABILITY )
+{
+	add config for creating compound accessor names:
+	
+  	  public => 
+	  {
+		string => [qw(zip homepage birth telefon)],
+	  },
+
+	would then in the code be created as <type>_<name>
+
+	   print $this->string_zip;
+
+	   print $this->string_homepage;
+
+        for example. 
+}

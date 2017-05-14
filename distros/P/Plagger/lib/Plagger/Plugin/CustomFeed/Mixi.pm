@@ -30,11 +30,24 @@ our $MAP = {
         get_list   => 'parse_list_comment',
     },
     Log => {
-        start_url => 'http://mixi.jp/show_log.pl',
-        title     => 'ミクシィ足跡',
-        get_list => 'parse_show_log',
-        icon_re => qr/[^_]id=(\d+)/,
+        start_url  => 'http://mixi.jp/show_log.pl',
+        title      => 'ミクシィ足跡',
+        get_list   => 'parse_show_log',
+        icon_re    => qr/[^_]id=(\d+)/,
     }, 
+    MyDiary => {
+        start_url  => 'http://mixi.jp/list_diary.pl',
+        title      => 'ミクシィ日記',
+        get_list   => 'parse_list_diary',
+        get_detail => 'get_view_diary',
+        icon_re    => qr/owner_id=(\d+)/,
+    },
+    Calendar => {
+        start_url  => 'http://mixi.jp/show_calendar.pl',
+        title      => 'ミクシィカレンダー',
+        get_list   => 'parse_show_calendar',
+        get_detail => 'get_view_event',
+    },
 };
 
 sub plugin_id {
@@ -83,7 +96,7 @@ sub aggregate_feed {
 
     my $next_url = URI->new($start_url)->path;
 
-    if ($response->content =~ /action=login\.pl/) {
+    if ($response->content =~ /action="login\.pl"/) {
         $context->log(debug => "Cookie not found. Logging in");
 
         if ($self->conf->{email} eq 'plagger@localhost') {
@@ -165,6 +178,10 @@ sub aggregate_feed {
                     Time::HiRes::sleep( $self->conf->{fetch_body_interval} || 1.5 );
                     my $meth = $MAP->{$type}->{get_detail};
                     my($item) = $self->{mixi}->$meth($msg->{link});
+
+                    if ($meth eq 'get_view_diary') {
+                        $item->{images} = $self->get_images($self->{mixi}->response->content);
+                    }
                     $item;
                 },
                 '12 hours',
@@ -173,8 +190,12 @@ sub aggregate_feed {
                 my $body = decode('euc-jp', $item->{description});
                    $body =~ s!(\r\n?|\n)!<br />!g;
                 for my $image (@{ $item->{images} }) {
-                    # xxx this should be $entry->enclosures
                     $body .= qq(<div><a href="$image->{link}"><img src="$image->{thumb_link}" style="border:0" /></a></div>);
+                    my $enclosure = Plagger::Enclosure->new;
+                    $enclosure->url( URI->new($image->{thumb_link}) );
+                    $enclosure->auto_set_type;
+                    $enclosure->is_inline(1);
+                    $entry->add_enclosure($enclosure);
                 }
                 $entry->body($body);
 
@@ -189,6 +210,17 @@ sub aggregate_feed {
     }
 
     $context->update->add($feed);
+}
+
+sub get_images {
+    my($self, $content) = @_;
+
+    my @images;
+    while ($content =~ m!MM_openBrWindow\('(show_diary_picture\.pl\?.*?)',.*?><img src="(http://ic\d+\.mixi\.jp/p/.*?)"!g) {
+        push @images, { link => "http://mixi.jp/$1", thumb_link => $2 };
+    }
+
+    return \@images;
 }
 
 1;
@@ -254,7 +286,7 @@ mixi.jp site, which makes the output HTML very user-friendly.
 
 With this option set, you can set the feed types.
 
-Now supports: RecentComment, FriendDiary, and Message.
+Now supports: RecentComment, FriendDiary, Message, Log, MyDiary, and Calendar.
 
 Default: FriendDiary.
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use WebService::SSLLabs::SimClient();
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 sub new {
     my ( $class, $json ) = @_;
@@ -53,7 +53,7 @@ WebService::SSLLabs::Simulation - Simulation object
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =head1 SUBROUTINES/METHODS
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
-use warnings; 
+use warnings;
 
 use Net::Easypost;
 use Net::Easypost::Address;
@@ -40,16 +40,18 @@ my $verified = $easypost->verify_address(
      name    => 'Zaphod',
    }
 );
-is $verified->country, 'US';
-ok($verified);
+
+is($verified->country, 'US', 'Verified country is US');
+ok($verified, 'US address verified ok');
+
 $verified->country('IT');
-ok($easypost->verify_address($verified));
-is( $verified->country, 'IT' );
+is($verified->country, 'IT', 'Verified country is IT');
+ok($easypost->verify_address($verified), 'IT address verified ok');
 
 
 sub get_rates {
     my ($country, $zip, $ounces) = @_;
-    
+
     my $from = $easypost->verify_address(
         { street1 => '388 Townsend St',
           street2 => 'Apt 20',
@@ -58,23 +60,26 @@ sub get_rates {
           name    => 'Zaphod',
         }
     );
-    
+
     # default to US
-    is( $from->country, 'US');
+    is($from->country, 'US');
     my $to = Net::Easypost::Address->new(
         zip     => $zip,
         country => $country,
     );
-    is( $to->country, $country, "Country is $country" );
+    is($to->country, $country, "Country is $country");
+
     my $parcel = Net::Easypost::Parcel->new(
         weight => $ounces,
     );
+
     my $rates = $easypost->get_rates(
         { to     => $to,
           from   => $from,
-          parcel => $parcel 
+          parcel => $parcel
         }
     );
+
     return sort { $a->rate <=> $b->rate } @$rates;
 }
 

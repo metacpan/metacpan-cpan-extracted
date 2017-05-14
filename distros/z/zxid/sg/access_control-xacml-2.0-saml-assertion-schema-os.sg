@@ -1,0 +1,23 @@
+# zxid/sg/access_control-xacml-2.0-saml-assertion-schema-os.sg
+# Slightly edited, 3.3.2007, Sampo Kellomaki (sampo@iki.fi)
+# $Id: access_control-xacml-2.0-saml-assertion-schema-os.sg,v 1.2 2009-09-05 02:23:41 sampo Exp $
+
+target(xasa, urn:oasis:xacml:2.0:saml:assertion:schema:os)
+import(sa, urn:oasis:names:tc:SAML:2.0:assertion, http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=security)
+import(sp, urn:oasis:names:tc:SAML:2.0:protocol, http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=security)
+import(xac, urn:oasis:names:tc:xacml:2.0:context:schema:os, http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-context-schema-os.xsd)
+import(xa, urn:oasis:names:tc:xacml:2.0:policy:schema:os, http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd)
+
+XACMLAuthzDecisionStatement -> %xasa:XACMLAuthzDecisionStatementType
+%XACMLAuthzDecisionStatementType: base(sp:StatementAbstractType)
+  xac:Response?
+  xac:Request?
+  ;
+
+XACMLPolicyStatement -> %xasa:XACMLPolicyStatementType
+%XACMLPolicyStatementType: base(sp:StatementAbstractType)
+  xa:Policy?
+  xa:PolicySet?
+  ;
+
+#EOF

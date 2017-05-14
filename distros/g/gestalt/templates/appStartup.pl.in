@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use lib qw(@prefix@/modules);
+
+use CGI();
+CGI->compile(qw(:all));
+
+use Apache::DBI();
+use DBI();
+
+use APR::Table();
+use Apache::RequestRec();
+use Apache::RequestIO();
+
+use Apache::Request::Dispatcher();
+
+use DB::Table::Row();
+use DB::Table();
+use Apache::Request::Controller();
+[% FOREACH tableName = TABLES -%]
+use Apache::Request::Controller::[% tableName %]();
+use DB::Table::[% tableName %]();
+use DB::Table::Row::[% tableName %]();
+[% END -%]
+
+1;

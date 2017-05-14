@@ -24,24 +24,9 @@ Force update of GPG key.
 Don't update media, but mark them as ignored (that is, disables them).
 B<--no-ignore> has the reverse behaviour: it marks the media as enabled.
 
-=item B<--limit-rate I<rate>>
-
-Try to limit the download speed, I<rate> is given in bytes/sec. This
-option is not active by default.
-
 =item B<--no-md5sum>
 
 Disable MD5SUM file checking.
-
-=item B<--proxy> I<proxyhost[:port|1080]>
-
-Use specified HTTP proxy.
-
-=item B<--proxy-user> I<user:password>
-
-Use specified user and password to use for proxy authentication.
-Specifying B<--proxy-user=ask> will cause urpmi.update to prompt for a
-username and a password.
 
 =item B<--urpmi-root> I<directory>
 
@@ -55,28 +40,6 @@ If the urpmi or rpm db is busy, wait until it is available
 =item B<--update>
 
 Use only update media.
-
-=item B<--curl>
-
-Use curl for downloading distant
-files. By default curl is used if available, or wget instead.
-
-=item B<--wget>
-
-Use wget for downloading distant files. By default curl
-is used if available, or wget instead.
-
-=item B<--curl-options> I<'options'>
-
-=item B<--rsync-options> I<'options'>
-
-=item B<--wget-options> I<'options'>
-
-Specify additional command-line options to be passed to curl, rsync or
-wget when retrieving files. If several options are to be passed, separate
-them with spaces and enclose them in quotes.
-
-Note that the rsync options will also be used for ssh media.
 
 =item B<-a>
 
@@ -101,6 +64,51 @@ Quiet mode.
 =item B<-v>
 
 Verbose mode.
+
+
+=back
+
+=head2 Download Options
+
+=over
+
+=item B<--curl>
+
+Use curl for downloading distant
+files. By default curl is used if available, or wget instead.
+
+=item B<--wget>
+
+Use wget for downloading distant files. By default curl
+is used if available, or wget instead.
+
+=item B<--curl-options> I<'options'>
+
+=item B<--rsync-options> I<'options'>
+
+=item B<--wget-options> I<'options'>
+
+Specify additional command-line options to be passed to curl, rsync or
+wget when retrieving files. If several options are to be passed, separate
+them with spaces and enclose them in quotes.
+
+Note that the rsync options will also be used for ssh media.
+
+=item B<--proxy> I<proxyhost[:port|1080]>
+
+Use specified HTTP proxy.
+
+=item B<--proxy-user> I<user:password>
+
+Use specified user and password to use for proxy authentication.
+Specifying B<--proxy-user=ask> will cause urpmi.update to prompt for a
+username and a password.
+
+=item B<--limit-rate I<rate>>
+
+Try to limit the download speed, I<rate> is given in bytes/sec. This
+option is not active by default.
+
 
 =back
 

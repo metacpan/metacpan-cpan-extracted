@@ -1,0 +1,15 @@
+bin/marclint
+Changes
+etc/ecbdlist.html
+etc/specs
+lib/MARC/Lint/CodeData.pm
+lib/MARC/Lint.pm
+Makefile.PL
+MANIFEST
+README
+t/camel.usmarc
+t/check020.t
+t/check041043.t
+t/check245.t
+t/lint.t
+t/test880and6.t

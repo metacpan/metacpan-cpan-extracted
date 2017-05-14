@@ -1,14 +1,12 @@
-Build.PL
 Changes
-MANIFEST
-META.yml
-Makefile.PL
-README
 lib/Bundle/Template/Magic.pm
 lib/Template/Magic.pm
 lib/Template/Magic/HTML.pm
 lib/Template/Magic/QuickStart.pm
 lib/Template/Magic/Zone.pm
+Makefile.PL
+MANIFEST			This list of files
+README
 t/01_template_inclusion.t
 t/02_placeholders_from_files.t
 t/03_placeholders_from_ref.t
@@ -48,4 +46,4 @@ t/template_test_02
 t/test_pod.t
 t/test_pod_coverage.t
 t/text_file
-META.json
+META.yml                                 Module meta-data (added by MakeMaker)

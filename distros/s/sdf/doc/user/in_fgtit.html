@@ -1,0 +1,51 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Adding Figure Titles</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_fg.html">Parent Topic</A> | <A HREF="in_fggen.html">Previous Topic</A> | <A HREF="in_fgpos.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>4.3. Adding Figure Titles</H1>
+<HR>
+<H2><A NAME="Adding a Title to a Figure">4.3.1. Adding a Title to a Figure</A></H2>
+<P>To add a title, use the <EM>title</EM> attribute of the <A HREF="../ref/mimport.html">import</A> macro. For example:</P>
+<PRE>
+  !import &quot;growth&quot;; title=&quot;Predicted Growth&quot;
+</PRE>
+<HR>
+<H2><A NAME="Adding a Title to a Psuedo Figure">4.3.2. Adding a Title to a Psuedo Figure</A></H2>
+<P>Occasionally, it is useful to label a source code example or ASCII graphic with a title. To do this, use the FT (Figure Title) paragraph style. For example:</P>
+<PRE>
+   FT: Source code for main.c
+   !include &quot;main.c&quot;; example; lang='C'
+</PRE>
+<HR>
+<H2><A NAME="Generating a List of Figures">4.3.3. Generating a List of Figures</A></H2>
+<P>A list of figures can be generated from the figure titles. To do this, set the <EM>DOC_LOF</EM> variable. For example:</P>
+<PRE>
+# Build the title
+!define DOC_NAME &quot;World Peace in 60 Days&quot;
+!define DOC_LOF
+!build_title
+</PRE>
+<P>This will generate a list of figures after the table of contents.</P>
+<HR>
+<H2><A NAME="Changing the List of Figures Title">4.3.4. Changing the List of Figures Title</A></H2>
+<P>The default title for the list of figures is &quot;List of Figures&quot;. To change this, set the DOC_LOF_TITLE. For example:</P>
+<PRE>
+!define DOC_LOF_TITLE &quot;Figures&quot;
+</PRE>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_fg.html">Parent Topic</A> | <A HREF="in_fggen.html">Previous Topic</A> | <A HREF="in_fgpos.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

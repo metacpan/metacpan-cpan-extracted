@@ -23,7 +23,7 @@ Pinto::Manual::Thanks - Thanking the Pinto supporters
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 THANK YOU
 
@@ -56,29 +56,29 @@ generous support, I can continue doing the work I love most.
   Gustavo Chaves          Wolfgang Kinkeldei      Li Sen                  
   Peter Chines            Yaroslav Korshak        Michael South           
   Adam Clarke             Damien Krotkine         Tadeusz Sosnierz        
-  Olav Cleemann           Michael Kröll           Marc St Raymond         
+  Olav Cleemann           Michael Kr\xF6ll           Marc St Raymond         
   Jody Clements           Tom Legrady             Seth Surchin            
   Greg Cole               Felipe Leprevost        Gabor Szabo             
   Montgomery Conner       Hermen Lesscher         Christopher Taranto     
   Tudor Constantin        Vladimir Lettiev        Jan Thorsen             
   Anon Contrib            Carlos Lima             Viacheslav Tykhanovskyi 
   Anonymous Contributor   Nick Logan              A Sinan Unur            
-  Justin Cook             Søren Lund              Bruce Van Allen         
+  Justin Cook             S\xF8ren Lund              Bruce Van Allen         
   Dave Cross              Jim Martinez            Todd Wade               
   Tomasz Czepiel          Naveed Massjouni        Brian Wisti             
   Seth Daniel             Vyacheslav Matyukhin    John Wittkoski          
   Robert Debowski         Gabriel Munoz           William Wolf            
   Gautam Dey              Kamen Naydenov          Chisel Wright           
-  José Diaz Seng          Al Newkirk              Sawyer X                
-  Boris Däppen            T Nishimura             Andy Yates              
+  Jos\xE9 Diaz Seng          Al Newkirk              Sawyer X                
+  Boris D\xE4ppen            T Nishimura             Andy Yates              
   Magnus Enger            Ryan Olson              Doyle Young             
   Hugh Esco               Marco Palma             Marek Zareba            
   Roman F                 Karen Pauley            Kev Zettler             
   David Farrell           Bryan Paxton            j0e axford              
-  Eric Folley             Emil Perhinschi         dagur                   
+  Eric Folley             Emil Perhinschi         dagur                  
   Mike Friedman           Matt Perry              brian d foy             
   Wolf Gang               Dimitar Petrov          del skorch              
-  Greg Gerke              Jamie Pitts             Allen van der Ross      
+  Greg Gerke              Jamie Pitts             Allen van der Ross    
 
 I also thank L<Crowdtilt|http://crowdtilt.com> for graciously allowing us to
 use their fundraising platform free of charge, and for providing such
@@ -90,7 +90,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

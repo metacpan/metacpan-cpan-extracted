@@ -1,0 +1,209 @@
+# $Id$
+#
+# >>Title::     SDF Module
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 29-Feb-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{MOD:sdf}} is the [[SDF]] library module for building
+# the [[SDF]] documentation suite.
+#
+# >>Description::
+# The SDF_ROOT variable is prepended to relative paths, so that
+# documents in different directories can access files in a relative
+# manner.
+#
+# >>Limitations::
+#
+
+# The default SDF_ROOT is the current directory
+#!default SDF_ROOT           './'
+!default SDF_ROOT           ''
+
+# Set up the default location for images
+#!define IMAGES_BASE "/images/"
+
+# Logos
+!define DOC_LOGO            "sdflogo"
+!define DOC_LOGO_BASE       SDF_ROOT
+!define DOC_TITLE_LOGO      "sdfbig"
+
+# Title page details
+!define DOC_DISTRIBUTION    "UNLIMITED CIRCULATION"
+!define DOC_PRODUCT         "Simple Document Format"
+!define DOC_PROJECT         "SDF $var{'SDF_VERSION'}"
+!define DOC_OWNER           "Ian Clatworthy"
+
+# HTML configuration variables
+!define HTML_BG_COLOR       COLOR_WHITE
+#!define HTML_LINK_COLOR     COLOR_BLUE
+#!define HTML_VLINK_COLOR    COLOR_RED
+!define HTML_URL_HOME       $var{'SDF_ROOT'} . "index.html"
+!define HTML_URL_CATALOG    $var{'SDF_ROOT'} . "catalog.html"
+#!define HTML_URL_SEARCH     $var{'SDF_ROOT'} . "search.html"
+
+# Define the documents within this documentation suite.
+!include "document.reg"; references; data; root=SDF_ROOT
+
+# Add technical papers as references
+!block references; data; root=SDF_ROOT
+Reference,Jump,Document
+Clatworthy 96,qauug96/qauug96.html,SDF - A Documentation System for Software Developers
+!endblock
+
+# Add the bugs database, etc. as references
+!block references; data; root="http://www.mincom.com/mtr/sdf/"
+Reference       Jump                    Document
+SDF-HOME        index.html              SDF Web Site
+SDF-DOCS        catalog.html            SDF Document Catalog
+#SDF-DOWNLOAD    download.html           SDF Download Page
+SDF-BUGS        bugs/index.html         SDF Bug Database
+SDF-SAMPLES     samples/index.html      SDF Sample Showcase
+SDF-RESOURCES   resources/index.html    SDF Resource Center
+SDF-TEMPLATES   templates/index.html    SDF Template Catalog
+SDF-NEWS        news/index.html         SDF Latest News
+!endblock
+
+# Make some things easier to reference
+!define SDF_DOWNLOAD "http://www.mincom.com/mtr/sdf/download.html"
+
+# Include commonly referenced objects
+!use "objects"
+
+# Commonly used phrase styles
+!block phrasestyles
+Name            To
+CLASS           =1
+DSTYLE          =1
+VAR             =1
+FMT             =1
+FILT            =1
+MAC             =1
+MOD             =1
+SUBR            =1
+OATTR           =1
+OSTYLE          =N
+PATTR           =1
+PSTYLE          =N
+TSTYLE          =N
+TPARAM          =1
+RPARAM          =1
+CPARAM          =1
+!endblock
+
+# Commonly referenced organisations
+!block organisations; data
+Name            Long                                    Jump
+!endblock
+
+# Commonly referenced products
+!block products; data
+Name            Jump
+Acrobat         http://www.adobe.com/prodindex/acrobat/
+Emacs
+MIF             http://www.frame.com
+PDF             http://www.adobe.com
+PDF Distiller   http://www.adobe.com
+RTF             http://www.microsoft.com
+pod2ps          http://www.oasis.leo.org/perl/scripts/textproc/pod2ps.dsc.html
+SGML-Tools      http://www.xs4all.nl/~cg/sgmltools/
+Ultimate        http://www.ufs.com.au/
+Visio           http://www.visio.com
+!endblock
+
+# Make the most commonly referenced objects variables
+!define MIF             "{{PRD:MIF}}"
+!define PDF             "{{PRD:PDF}}"
+!define RTF             "{{PRD:RTF}}"
+!define SDF             "{{PRD:SDF}}"
+!define SDFAPI          "{{SECT:SDFAPI}}"
+!define SDF_DRIVER      "{{SDF driver}}"
+!define Visio           "{{PRD:Visio}}"
+
+# Document summary variables
+!define SDF_DOC_WP  "{{DOC:The SDF Document Development System}} - an overview of the architecture and features"
+!define SDF_DOC_QR  "{{DOC:SDF Quick Reference}} - a concise summary of the most frequently used {{PRD:SDF}} features"
+!define SDF_DOC_UG  "{{DOC:SDF User Guide}} - a tutorial style introduction to the key features"
+!define SDF_DOC_GG  "{{DOC:SDF Guru Guide}} - information on extending {{PRD:SDF}}"
+!define SDF_DOC_REF "{{DOC:SDF Reference}} - detailed reference material on all {{PRD:SDF}} features"
+!define SDF_DOC_MIG "{{DOC:SDF 2.000 Migration Guide}} - information on the features added in version 2.000"
+!define SDF_DOC_REL "{{DOC:SDF Release Notes}} - information on the latest enhancements and bug fixes"
+
+# Copyright stuff
+!macro DOC_COPYRIGHT
+    Copyright [[c]] [[_DOC_YEAR]], [[DOC_OWNER]]
+
+    All rights reserved.
+
+    You are free to copy and distribute this manual as often as you like.
+    If parts of this manual are included in commercial products such as
+    books and magazine articles, credit {{must}} be given to the author.
+!endmacro
+
+# Trademark stuff
+!macro  DOC_TRADEMARKS
+[[FrameMaker]], [[FrameViewer]], {{PRD:Acrobat}},
+[[PDF]] and [[PostScript]] are registered trademarks of {{ORG[expand]Adobe}}.
+
+[[Windows]] is a registered trademark of
+{{ORG[expand] Microsoft}}.
+
+[[Unix]] is a registered trademark of
+{{ORG[expand] X/Open}}.
+
+Infomation Mapping is a registered trademark of
+Information Mapping, Incorporated.
+
+Other trademarks are the property of their respective owners.
+!endmacro
+
+# Admendments advice
+!macro SDF_AMENDMENTS
+Suggested enhancements and corrections to [[SDF]] and its documentation
+can be forwarded to [[SDF_BUGS]].
+
+Note: This manual documents version [[SDF_VERSION]] of [[SDF]].
+!endmacro
+
+################# Hypertext Generation Stuff #####################
+
+!if $var{'OPT_TARGET'} eq 'html'
+    # the Reference Guide is broken into topics for HTML
+    !on phrase 'CMD' ;; \
+        if ($text =~ /^sd[fn]/) {\
+            $attr{'jump'} = sprintf("%sref/%s.html", $var{'SDF_ROOT'}, \
+              $text =~ /^sdfcvt$|^sdf2/ ? 'sdf' : $text); \
+        }
+    !on phrase 'FMT' ;; \
+        $attr{'jump'} = $text; \
+        $attr{'jump'} =~ tr/A-Z/a-z/; \
+        $attr{'jump'} = $var{'SDF_ROOT'} . "ref/fmt_" . $attr{'jump'} . ".html"
+    !on phrase 'CLASS';; $attr{'jump'} = $var{'SDF_ROOT'} . "ref/c".substr($text,0,7).".html"
+    !on phrase 'FILT' ;; $attr{'jump'} = $var{'SDF_ROOT'} . "ref/f".substr($text,0,7).".html"
+    !on phrase 'MAC'  ;; $attr{'jump'} = $var{'SDF_ROOT'} . "ref/m".substr($text,0,7).".html"
+!else
+    # normal mode
+    !on phrase 'CMD' ;; \
+        if ($text =~ /^sd[ft]/) { \
+            $attr{'jump'} = "../ref/re_sdf.html#" . \
+              ($text =~ /^sdfcvt$|^sdf2/ ? 'sdf' : $text); \
+        }
+    !on phrase 'CLASS';; $attr{'jump'} = $var{'SDF_ROOT'} . "ref/re_sdf.html#$text Class"
+    !on phrase 'FMT'  ;; $attr{'jump'} = $var{'SDF_ROOT'} . "ref/re_sdf.html#$text Format"
+    !on phrase 'FILT' ;; $attr{'jump'} = $var{'SDF_ROOT'} . "ref/re_sdf.html#$text Filter"
+    !on phrase 'MAC'  ;; $attr{'jump'} = $var{'SDF_ROOT'} . "ref/re_sdf.html#$text Macro"
+!endif
+
+################# Index Generation Stuff #####################
+
+# A poor man's index :-)
+!on phrase ''       ;; if (length($text) < 50) {$attr{'index'} = $text}
+!on phrase '[HAP]\d';; $attr{'index'} = $text

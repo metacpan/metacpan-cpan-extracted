@@ -1,0 +1,110 @@
+  JPERL Beta                                             
+
+  PERL Access routines in Java
+
+  ---------------------------------------------------------------------
+  Copyright (c) 1998, S Balamurugan, Texas Instruments India. 
+  All Rights Reserved.
+  ---------------------------------------------------------------------
+
+  Permission to  use, copy, modify, and  distribute this  software and
+  its documentation for  NON-COMMERCIAL  purposes and without fee   is
+  hereby granted provided that  this  copyright notice appears  in all
+  copies.  Please  refer below  for  further  important  copyright and
+  licensing information.
+
+  BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+  FOR  THE PROGRAM.  THE   PROGRAM IS  PROVIDED ON   AN "AS  IS" BASIS
+  WITHOUT  WARRANTY OF  ANY     KIND, EITHER EXPRESSED   OR   IMPLIED,
+  INCLUDING,  BUT   NOT   LIMITED  TO,   THE  IMPLIED   WARRANTIES  OF
+  MERCHANTABILITY AND FITNESS FOR  A PARTICULAR PURPOSE. THE AUTHOR OR
+  TEXAS INSTRUMENTS  SHALL NOT BE LIABLE FOR  ANY  DAMAGES SUFFERED BY
+  LICENSEE AS  A RESULT   OF  USING, MODIFYING OR   DISTRIBUTING  THIS
+  SOFTWARE OR ITS DERIVATIVES.
+
+  ---------------------------------------------------------------------
+
+  Definitions
+
+  `Copyright Holder' refers to the Author of this package (S Balamurugan)
+  and the company where it was developed (Texas Instruments)
+
+  `Package'  refers  to the   collection of  files distributed  by the
+  Copyright   Holder, and  derivatives  of  that  collection of  files
+  created through textual modification.
+
+  `Standard  Version' refers to  such  a Package  if  it has  not been
+  modified, or has been modified in  accordance with the wishes of the
+  Copyright Holder as specified below.
+
+  Each licensee is addressed as "you".
+
+  
+  LICENCE AGREEMENT 
+
+  1. You may  copy  and distribute  verbatim copies  of  the Program's
+  source  code  as you  receive it,  in any medium,  provided that you
+  conspicuously and appropriately publish  on each copy an appropriate
+  copyright  notice and  disclaimer of  warranty;  keep intact all the
+  notices   that  refer to  this License  and  to the   absence of any
+  warranty;  and give any other  recipients of the  Program  a copy of
+  this License along with the Program.
+
+  You MAY NOT charge  a fee for this  package or any distributions  of
+  this package. However, any software built using this package, can at
+  your discretion be  charged, as long  as a notice displaying the use
+  of this software along with credits to the Author is maintained.
+
+  2.You may apply bug fixes, portability fixes and other modifications
+  derived from the   Public Domain or from the   Copyright Holder.   A
+  Package  modified in  such   a way shall   still  be considered  the
+  Standard Version.
+
+  3.You may otherwise  modify your copy  of  this Package in  any way,
+  provided that  you  insert a  prominent notice in  each changed file
+  stating how and when you changed that file, and provided that you do
+  at least ONE of the following:
+
+       a. place  your modifications in the  Public Domain or otherwise
+       make   them   Freely Available,    such as   by   posting  said
+       modifications to Usenet or an equivalent medium, or placing the
+       modifications on a major  archive site such as uunet.uu.net, or
+       by allowing the Copyright Holder  to include your modifications
+       in the Standard Version of  the Package.   
+
+       b. use   the modified Package only   within your corporation or
+       organization.    
+
+       c. make other  distribution  arrangements  with  the   Copyright
+       Holder.
+
+  4.You may distribute the programs freely in any medium provided that
+  you  conspicuously  and   appropriately publish on   each  copy this
+  copyright notice and licence agreement.
+
+  5. You may  not charge a fee for  this Package itself. However,  you
+  may distribute  this   Package  in aggregate with    other (possibly
+  commercial) programs  as part  of  a larger   (possibly  commercial)
+  software  distribution provided  that  you   do not  advertise  this
+  Package as  a product    of   your  own and   include    appropriate
+  acknowledgement of credit to the author.
+
+  6. The  name of the  Copyright Holder may not  be used  to endorse or
+  promote products derived  from this software without  specific prior
+  written permission.
+
+  7. All use of this package and its derivatives should contain a copy
+  of this copyright notice and aggregation of  this package as part of
+  a larger  (possibly  commericial)  program should  carry  approriate
+  acknowledgement of credit to the author.
+
+  8. You  may not copy, modify,  sublicense, or distribute the Program
+  except as expressly   provided  under  this License.   Any   attempt
+  otherwise to  copy, modify, sublicense or  distribute the Program is
+  void, and    will automatically terminate  your  rights   under this
+  License.  
+
+  By using, modifying or distributing  the Program (or any  work based 
+  on the Program), you indicate your acceptance of this License to do so, 
+  and all its terms and conditions for copying, distributing or modifying
+  the Program or works based on it.

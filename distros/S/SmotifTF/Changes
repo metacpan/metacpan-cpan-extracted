@@ -1,0 +1,45 @@
+Revision history for SmotifTF
+
+0.01    2015-06-08
+        First version, released on an unsuspecting world.
+
+0.02    2015-06-08
+        Documentation updates
+
+0.03    2015-06-08
+        Documentation updates
+
+0.04    2015-06-08
+        Documentation updates
+
+0.05	2015-06-10
+		* Documentation updates
+        * Removed Text::Template, Schedule::DRMAAc, lib/SmotifTF/ClusterShellScripts.pm 
+        and smotiftf_cluster.pl for cluster support.
+        * $chain variable was removed  from the entire library. Originally $chain was there 
+          for benchmarking purposes and it is not necessary for production version.  
+         
+0.06	2015-06-10
+        * Adding filesystem independency to Psiblast.pm
+		* Removed MYSQL dependency from Protein.pm and configuration file. 
+        * Removed  MYSQLSmotifs.pm from the library.
+        * smotiftf_prereq.pl was fixed, step==all options did not work.          
+
+0.07    2015-06-25
+		* Bug fix in Psiblast.pm (deltablast path and exec)
+		* Fixed smotiftf_config.ini to remove hard-coded paths in smotiftf_prereq.pl,
+		  GetSMotifsfromPDB.pm and PDBfileParser.pm
+		* Fixed the PDB path in PDBfileParser.pm and GeometricalCalculations.pm so that
+          it can handle both regular and remodeled_pdb (remodeled PDB has chain id in the 
+          file name). 
+
+0.08   2015-08-6
+       * In version 0.07, 01.Psipred_run.t is failing in all platform except linux.
+         01.Psipred_run.t was modified to find smotiftf_config.ini in /t/Data 
+         while running testing routines.
+ 
+         smotiftf_config.ini file has to be found at /t/Data for testing purpose
+         $ENV{'SMOTIFTF_CONFIG_FILE'} = File::Spec->catfile("t", "Data", "smotiftf_config.ini"); 
+
+0.09  2015-11-12
+       * A bug was fixed in t/01.Psipred_run.t. Prispred test was failing on Linux platforms.

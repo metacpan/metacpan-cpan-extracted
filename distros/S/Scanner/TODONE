@@ -1,0 +1,42 @@
+x Pod documentation section needs a clean up pass to bring it in line with
+  my current standards.
+  (I satisfied this requirement when I did a formatting a week or two ago.)
+  [DMA 20080120-20080818]
+
+x Someone is working on a paper type class Paper::Spec. It may have all the
+  properties I need. Keep an eye on it to see when it matures enough to be
+  useable.
+  (It is definitely useable at this point. I will have to create my
+   own debian package though.)
+  [DMA 20060615-20080818]
+
+x I should not 'die' inside an object, but should fail and let the caller
+  decide.
+  (All have been replaced by Fault::ErrorHandler->warn and undef returns)
+  [DMA 20070511-20080828]
+
+x Need a better place/way of creating the tmp.pnm file.
+  (If I understand what I intended by this note, I have done it since
+   I am using full pathnames instead of chdir now.)
+  [DMA 20080120-20080828]
+
+x In pagetitle method, how do I handle the 'p' that goes before a pageid?
+  (I think the full meaning of this note is lost in the sands of time. 
+   Currently the code in that method does this:
+	($pageid = "p" . $pageid) if ($pageid);
+   to handle it. Hope that is what I meant.)
+  [DMA 20040818 - 20080828]
+
+x I need to consolidate libdocument and possibly libfile-spec before
+  I set up Defaults in the debian/control file.
+  (This is definitely the case now, so I can go ahead and do it any time.)
+  [DMA 20080807 - 20080828]
+
+x Modify Job->new to take format as P:8.5x13.
+  (Pretty much all done with this.)
+  [DMA 20080818 - 20080822]
+
+	x I need to do validity checking on this.
+	  (Pretty much all done with this.)
+	  [DMA 20080818 - 20080822]
+

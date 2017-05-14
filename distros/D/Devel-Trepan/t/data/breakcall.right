@@ -1,8 +1,9 @@
 -- main::(callbug.pl:8)
 if (scalar @ARGV) {
-        iamnotok(@ARGV);
 -> main::(callbug.pl:4)
 sub iamnotok {
-   no warnings qw(uninitialized);
+--> #0 ? = main::iamnotok in file `callbug.pl' at line 4
+    #1 file `callbug.pl' at line 9
 $DB::D[0] = foo
+Breakpoint 2 set in callbug.pl at line 6
 trepan.pl: That's all, folks...

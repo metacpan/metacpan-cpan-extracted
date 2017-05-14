@@ -1,0 +1,166 @@
+  JPERL Beta
+
+  PERL Access routines in Java
+
+  ---------------------------------------------------------------------
+  Copyright (c) 1998, S Balamurugan, Texas Instruments India.
+  All Rights Reserved.
+  ---------------------------------------------------------------------
+
+  Permission to  use, copy, modify, and  distribute this  software and
+  its documentation for  NON-COMMERCIAL  purposes and without fee   is
+  hereby granted provided that  this  copyright notice appears  in all
+  copies.  Please  refer LICENCE  for  further  important  copyright
+  and licensing information.
+
+  BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+  FOR  THE PROGRAM.  THE   PROGRAM IS  PROVIDED ON   AN "AS  IS" BASIS
+  WITHOUT  WARRANTY OF  ANY     KIND, EITHER EXPRESSED   OR   IMPLIED,
+  INCLUDING,  BUT   NOT   LIMITED  TO,   THE  IMPLIED   WARRANTIES  OF
+  MERCHANTABILITY AND FITNESS FOR  A PARTICULAR PURPOSE. THE AUTHOR OR
+  TEXAS INSTRUMENTS  SHALL NOT BE LIABLE FOR  ANY  DAMAGES SUFFERED BY
+  LICENSEE AS  A RESULT   OF  USING, MODIFYING OR   DISTRIBUTING  THIS
+  SOFTWARE OR ITS DERIVATIVES.
+
+  ---------------------------------------------------------------------
+
+  Accessing PERL from cpp
+
+  * Initialisation and Close routines
+  -----------------------------------
+  int PLInit(char *perlfile);
+  // Need to call init with the PERL file before using any other routine
+  // Refer example.c for more details
+
+  int PLClose();
+  // Closes interpretter and frees memory
+
+
+  * Making PERL calls
+  -------------------
+  // All functions return number of elements returned from PERL,
+  // return value is passed through retval reference. Any number and
+  // type of argument can be passed. Need to provide the format of the
+  // arguments. In case of passing Arrays need to pass length and then
+  // the array. See example below
+
+  Valid formats
+  -------------
+  %d - int
+  %f - double
+  %s - char *   (String)
+  %I - int *    (Array of integer. Need to pass length before int *)
+  %F - double * (Array of double . Need to pass length before double *)
+  %S - char **  (Array of string.  Need to pass length before char **)
+  e.g. PLCall(retval,"MyFunc","%I",len,Int_Array);
+
+  // Returns scalar string
+  int PLCall(char *&retval, char *fname, char *format, ...);
+
+  // Returns scalar integer
+  int PLCall(int &retval, char *fname, char *format, ...);
+
+  // Returns scalar double
+  int PLCall(double &retval, char *fname, char *format, ...);
+
+  // Returns array of int
+  int PLCall(int *&retval, char *fname, char *format, ...);
+
+  // Returns array of double
+  int PLCall(double *&retval, char *fname, char *format, ...);
+
+  // Returns array of string and PERL Hash
+  // Hash is returned as array of char *, with alternate elements being
+  // key and values
+  int PLCall(char **&retval, char *fname, char *format, ...);
+
+  Examples
+  --------
+  //Passing scalar, returning string array
+  PLInit("t.pl");
+  char **AS;
+  int number_of_elements =  PLCall(AS,"TestFunc","%s%f","Hai",(float)100);
+  PLClose();
+
+  //Passing array of int and double, returning Hash
+  PLInit("t.pl");
+  char **AS;
+  int IA[]    = { 10,20,30 };
+  double DA[] = { 0.10, 0.20 } ;
+  PLCall(AS,"TestFuncAI","%I%F",3,IA,2,DA); // Note: Passing length before arr.
+  PLClose();
+
+  // Refer example.c for more information
+  
+  * Evalaluating PERL expressions
+  -------------------------------
+  // Evaluates PERL expression in command. Returns string array in retval
+  int PLEval(char **&retval, char *command);
+
+  Example
+  -------
+  char **EvalRet;
+  int ct = PLEval(EvalRet,"$a = 'MyString'; $b = reverse($a); return ($a,$b);");
+  for(int i=0;i<ct;i++)
+    {
+     printf("%s\n",EvalRet[i]);
+    }
+
+
+  * Generic Call
+  --------------
+  // Same as other PLCalls, except returns one single string (retval) with 
+  // all return values from PERL concatenated using a delimiter (delim)
+  int PLGeneric(char *&retstr, char *delim, char *fname, char *format, ...);
+
+  * Loading additional modules
+  ----------------------------
+  // Should you need to load additional modules, not part of 'use' or 'require'
+  // in the program that you loaded in PLInit(), use this function.
+  int PLLoadModule(char *modulename);
+
+
+  Points to Note
+  --------------
+
+  1. Check return status of PLCalls. -1 is returned on error
+
+  2. PLCalls() allocate memory to retval (except in case int, double).  
+     You need to free it after use
+
+  3. PERL Hash are mapped to array of strings in c. Passing odd number of 
+     elements, when PERL expects a Hash, cause an error to be reported by
+     PERL. Alternate elements are to be key, value
+     e.g. { "key1","Value1","Key2","Value2"}
+
+  4. Unless you are sure of return type from PERL, DO NOT use PLCalls that
+     return int/double. Safest is to obtain all returns as char ** and 
+     convert to other types later
+
+  5. When passing arrays as arguments to PLCall, ensure that you are passing
+     the length before passing the actual array
+
+  6. Ensure format passed to PLCall is proper. Improper formats may cause
+     SEGV
+
+  7. In case of PERL modules using dynamic libraries, an error will be 
+    reported.  Support for this will be added in next release.
+
+  8. Flush STDIN/OUT in PERL, so that output of print in PERL is
+     not buffered. This can be done by 
+     select((select(STDOUT),$| = 1)[0]);
+
+  9. Data transfer mechanism from PERL to cpp is restricted to those
+     described above. In case of PERL taking complex data structures
+     like Hash of Hash, Array of Hash etc., a wrapper PERL function needs to
+     be written
+
+ 10. In Perl returning non existant values causes "(null)" to be returned.
+     for example
+              sub foo { return ("Iam there",$nonexistent); }
+     when accessed as char ** in c, contains a value "(null)"
+
+ 11. If the PERL program exits or dies, control will not return
+
+ 12. Using Scalar return, when PERL returns a list will cause PLCall to
+     return -1

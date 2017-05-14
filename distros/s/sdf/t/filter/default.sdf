@@ -1,0 +1,35 @@
+# This file tests the default filter
+
+!define xyz 77
+
+!block default
+Name    Value
+xyz     42
+abc     "My favorite station"
+!endblock
+
+Variable xyz is [[xyz]]. Variable abc is [[abc]].
+
+Variable my_xyz is [[my_xyz]]. Variable my_abc is [[my_abc]].
+
+# Test the family parameter
+!block default; family="my"
+Name    Value
+xyz     23
+abc     "Alpha Beta Gamma"
+!endblock
+
+Variable xyz is [[xyz]]. Variable abc is [[abc]].
+
+Variable my_xyz is [[my_xyz]]. Variable my_abc is [[my_abc]].
+
+# Test exporting
+!block default; export
+Name    Value
+xyz     17
+abc     "My favorite 3 letters"
+!endblock
+
+Variable xyz is [[xyz]]. Variable abc is [[abc]].
+
+Variable my_xyz is [[my_xyz]]. Variable my_abc is [[my_abc]].

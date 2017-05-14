@@ -17,7 +17,7 @@ sub new {
 
     my $type = $Config->db_type();
 
-    my $subclass = $class . '::' . $type;
+    my $subclass = "$class::$type";
     load($subclass);
 
     my $self = bless( {}, $subclass );
@@ -102,7 +102,7 @@ App::OverWatch::DB - Database connector base class
 
 =head1 VERSION
 
-version 0.1
+version 0.003
 
 =head1 NAME
 

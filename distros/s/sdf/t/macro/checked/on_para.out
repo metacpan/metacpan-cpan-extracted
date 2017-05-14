@@ -1,0 +1,16 @@
+__tuning[]
+__endtuning[]
+H1[orig_style='H1']Heading 1 before on
+P1[orig_style='H1']Heading 1 after on
+P2[orig_style='H2']Heading 2 before on
+P2[orig_style='H2']HEADING 2 AFTER ON
+P3[orig_style='H3']Heading 3 before on
+P3[nopb=1;notoc=1;orig_style='H3']Heading 3 after on
+P4[orig_style='H4']Heading 4 after on
+P1[orig_style='H1']Another H1
+P2[nopb=1;notoc=1;orig_style='H2']ANOTHER H2
+P3[nopb=1;notoc=1;orig_style='H3']Another H3
+E[orig_style='E']Some prepended example text.
+Note[id=2;orig_style='Note']This note should have an example paragraph prepended and a normal paragraph appended!
+N[orig_style='N']Some appended normal text.
+N[orig_style='N']Some ending text.

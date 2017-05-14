@@ -1,0 +1,7 @@
+.# Title: Simple arithmetic
+.# Test arithmetic, string & numeric:
+.let num := 1; bill := 'Billy'; ben := 'Benjamin'
+.let num++
+.let FP_men := bill . ' and ' . ben
+.echo Flower Pot Men: \v{FP_men}
+.echo num = \v{num}

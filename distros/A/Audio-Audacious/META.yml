@@ -1,0 +1,18 @@
+---
+abstract: 'An Object-orientated interface to Audacious'
+author:
+  - 'Alexandria Marie Wolcott <alyx@woomoo.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Audio-Audacious
+requires:
+  Carp: 0
+  Method::Signatures: 0
+version: 0.932

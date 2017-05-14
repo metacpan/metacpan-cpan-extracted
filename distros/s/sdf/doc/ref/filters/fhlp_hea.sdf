@@ -1,0 +1,30 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: hlp_header Filter
+
+H2: Interface
+
+!filter_interface "hlp_header"
+
+H2: Description
+
+The {{hlp_header}} filter is used to
+define a table of jumps within the non-scrolling region of a Windows
+help topic.
+
+#H2: Examples
+
+#To be completed.
+
+#H2: Limitations & Future Directions

@@ -1,0 +1,15 @@
+<doc>
+  <s1 id="s1-1" att1="val1">
+    <e1 id="e1-1" att1="val2">text e1-1</e1>
+    <e1 id="e1-2" att1="val2">text e1-2</e1>
+    <e1 id="e1-3" att1="val3">text e1-3</e1>
+  </s1>
+  <s1 id="s1-2" att1="val4">
+    <e1 id="e1-4" att1="val2">text e1-4</e1>
+    <e1 id="e1-5" att1="val4">text e1-5</e1>
+    <e1 id="e1-6" att1="val5">text e1-6</e1>
+  </s1>
+  <s1 id="s1-2" att1="val4" xmlns:xg="http://xmltwig.org/xg">
+    <xg:e1 id="e1-7" att1="val2">text e1-7</xg:e1>
+  </s1>
+</doc>

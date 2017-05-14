@@ -1,8 +1,37 @@
 package Mojolicious::Plugin::LinkEmbedder::Link::Video::Youtube;
+
+=head1 NAME
+
+Mojolicious::Plugin::LinkEmbedder::Link::Video::Youtube - youtube.com link
+
+=head1 DESCRIPTION
+
+L<https://developers.google.com/youtube/player_parameters#Embedding_a_Player>
+
+This class inherit from L<Mojolicious::Plugin::LinkEmbedder::Link::Text::HTML>.
+
+=cut
+
 use Mojo::Base 'Mojolicious::Plugin::LinkEmbedder::Link::Text::HTML';
+
+=head1 ATTRIBUTES
+
+=head2 media_id
+
+Returns the "v" query param value from L</url>.
+
+=head2 provider_name
+
+=cut
 
 has media_id => sub { shift->url->query->param('v') || '' };
 sub provider_name {'YouTube'}
+
+=head1 METHODS
+
+=head2 learn
+
+=cut
 
 sub learn {
   my ($self, $c, $cb) = @_;
@@ -11,6 +40,12 @@ sub learn {
   $self->$cb;
   $self;
 }
+
+=head2 pretty_url
+
+Returns L</url> without "eurl", "mode" and "search" query params.
+
+=cut
 
 sub pretty_url {
   my $self  = shift;
@@ -22,6 +57,12 @@ sub pretty_url {
   $query->remove('search');
   $url;
 }
+
+=head2 to_embed
+
+Returns the HTML code for an iframe embedding this movie.
+
+=cut
 
 sub to_embed {
   my $self     = shift;
@@ -42,42 +83,10 @@ sub to_embed {
   );
 }
 
-1;
-
-=encoding utf8
-
-=head1 NAME
-
-Mojolicious::Plugin::LinkEmbedder::Link::Video::Youtube - youtube.com link
-
-=head1 DESCRIPTION
-
-L<https://developers.google.com/youtube/player_parameters#Embedding_a_Player>
-
-This class inherit from L<Mojolicious::Plugin::LinkEmbedder::Link::Text::HTML>.
-
-=head1 ATTRIBUTES
-
-=head2 media_id
-
-Returns the "v" query param value from L</url>.
-
-=head2 provider_name
-
-=head1 METHODS
-
-=head2 learn
-
-=head2 pretty_url
-
-Returns L</url> without "eurl", "mode" and "search" query params.
-
-=head2 to_embed
-
-Returns the HTML code for an iframe embedding this movie.
-
 =head1 AUTHOR
 
 Marcus Ramberg
 
 =cut
+
+1;

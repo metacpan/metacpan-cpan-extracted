@@ -1,0 +1,30 @@
+Index: reviews/email.py
+===================================================================
+--- reviews/email.py    (revision 1196)
++++ reviews/email.py    (working copy)
+@@ -10,7 +10,7 @@
+     if not u.get_full_name():
+         return u.email
+     else:
+-        return u'"%s" <%s>' % (u.get_full_name(), u.email)
++        return u'"%s" <%s>' % ( u.get_full_name(), u.email )
+ 
+ 
+ def get_email_addresses_for_group(g):
+@@ -18,14 +18,14 @@
+         if g.mailing_list.find(",") == -1:
+             # The mailing list field has only one e-mail address in it,
+             # so we can just use that and the group's display name.
+-            return [u'"%s" <%s>' % (g.display_name, g.mailing_list)]
++            return [ u'"%s" <%s>' % ( g.display_name, g.mailing_list ) ]
+         else:
+             # The mailing list field has multiple e-mail addresses in it.
+             # We don't know which one should have the group's display name
+             # attached to it, so just return their custom list as-is.
+             return g.mailing_list
+     else:
+-        return [get_email_address_for_user(u) for u in g.users.all()]
++        return [ get_email_address_for_user(u) for u in g.users.all() ]
+ 
+ 
+ class SpiffyEmailMessage(EmailMessage):

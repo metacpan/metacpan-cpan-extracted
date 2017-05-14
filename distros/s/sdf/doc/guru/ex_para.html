@@ -1,0 +1,48 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Guru Guide: Creating New Paragraph Styles</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_filt.html">Previous Topic</A> | <A HREF="ex_phras.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>1.4. Creating New Paragraph Styles</H1>
+<HR>
+<H2><A NAME="Using Event Processing">1.4.1. Using Event Processing</A></H2>
+<P>SDF's event processing feature makes it easy to create a new paragraph style from an existing one. For example, the following line makes <EM>FEATURE</EM> an alias of the <EM>P2</EM> style:</P>
+<PRE>
+!on paragraph 'FEATURE';; $style='P2'
+</PRE>
+<HR>
+<H2><A NAME="Using Mapping Tables">1.4.2. Using Mapping Tables</A></H2>
+<P>SDF uses the <EM>parastyles</EM> filter to define the mapping between an SDF paragraph style and a target paragraph style. For example:</P>
+<PRE>
+!block parastyles
+Name        To                      Attributes
+
+# normal paragraphs
+N           b0_Body
+
+# headings
+H1          h1_Heading
+H2          h2_Heading
+H3          h3_Heading
+!endblock
+</PRE>
+<HR>
+<H2><A NAME="Creating New Target Paragraph Styles">1.4.3. Creating New Target Paragraph Styles</A></H2>
+<P>SDF makes it easy to define new target paragraph styles by inheriting configuration details from an existing style.</P>
+<P>See the <TT>look/simple/mif.sdn</TT> file in the SDF distribution for examples.</P>
+<HR>
+<P ALIGN="Center"><A HREF="gg_sdf.html">Contents</A> | <A HREF="in_ex.html">Parent Topic</A> | <A HREF="ex_filt.html">Previous Topic</A> | <A HREF="ex_phras.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

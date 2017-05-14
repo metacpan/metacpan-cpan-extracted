@@ -46,10 +46,10 @@ Datahub::Factory::Importer::TMS - Import data from a L<TMS|http://www.gallerysys
 
 =head1 SYNOPSIS
 
-    use Datahub::Factory::Importer::TMS;
+    use Datahub::Factory;
     use Data::Dumper qw(Dumper);
 
-    my $tms = Datahub::Factory::Importer::TMS->new(
+    my $tms = Datahub::Factory->importer('TMS')->new(
         db_host     => 'localhost',
         db_name     => 'tms',
         db_user     => 'tms',

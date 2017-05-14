@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Retry,
+version 0.004:
+
+  DBIx::Connector with the ability to retry the run method for a specified amount of time.
+
+This software is copyright (c) 2012 by Hartmut Behrens.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

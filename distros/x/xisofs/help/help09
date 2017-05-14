@@ -1,0 +1,1 @@
+Follow symbolic links when generating the filesystem. When this option is not in use, symbolic links will be entered using Rock Ridge if enabled, otherwise the file will be ignored.

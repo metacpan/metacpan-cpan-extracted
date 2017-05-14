@@ -1,28 +1,164 @@
-MARC::Lint
-===========
+MARC (manipulate MAchine Readable Cataloging)
+VERSION=1.07, 23 April 2000
 
-MARC::Lint provides a mechanism for validating MARC records. MARC::Lint
-was once a part of the MARC::Record distribution, but was split out to 
-ease maintenance and development.
+This is a cross-platform module. All of the files except README.txt
+are LF-only terminations. You will need a better editor than Notepad
+to read them on Win32. README.txt is README with CRLF.
 
-INSTALLATION
+DESCRIPTION:
 
-To install this module type the following:
+MARC.pm is a Perl 5 module for reading in, manipulating, and outputting
+bibliographic records in the USMARC format. You will need to have Perl
+5.004 or greater for MARC.pm to work properly. Since it is a Perl module
+you use MARC.pm from one of your own Perl scripts. It handles conversions
+from MARC into ASCII (text),  Library of Congress MARCMaker, HTML,
+and ISBD. Input from MARCMaker format is also supported. Individual
+records, fields, indicators, and subfields can be created, modified, and
+deleted. It can extract URLs from the 856 field into HTML.
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+The MARC::XML module adds conversions to and from XML.
 
-DEPENDENCIES
+The MARC::Tie module adds another way to access this data.
 
-- MARC::Record
-- Business::ISBN
+MARC.pm can handle both single and batches of MARC records. The limit on
+the number of records in a batch is determined by the memory capacity of
+the machine you are running. If memory is an issue for you MARC.pm will
+allow you to read in records from a batch gradually. MARC.pm also includes
+a variety of tools for searching, removing, and even creating records from
+scratch.
 
-COPYRIGHT AND LICENCE
+FILES:
 
-This software is free software and may be distributed under the same
-terms as Perl itself.
+    Changes		- for history lovers
+    Makefile.PL		- the "starting point" for traditional reasons
+    MANIFEST		- file list
+    README		- this file for CPAN
+    README.txt		- this file for DOS
+    MARC.pm		- the reason you're reading this
 
-Copyright (C) 2001-2011  Baldus, Lester, Summers
+    t			- test directory
+    t/marc.dat		- two record data file for testing
+    t/marc4.dat		- slightly different version of t/marc.dat
+    t/badmarc.dat	- corrupt data file for testing
+    t/test1.t		- basic tests, search, update
+    t/test2.t		- MARCMaker format tests
+    t/test3.t		- Inheritance version of test1.t
+    t/test4.t		- tests for the *map* methods
+    t/test5.t		- updatefirst/deletefirst tests
+    t/MARCopt.pm	- Inheritance stub module
+    t/makrbrkr.mrc	- LoC. MARCMaker reference records
+    t/makrtest.src	- MARCMaker source for makrbrkr.mrc
+    t/brkrtest.ref	- MARCBreaker output from makrbrkr.mrc
+    t/makrtest.bad	- corrupt MARCMaker source file for testing
 
+    eg			- test directory
+    eg/microlif.001	- eighteen record data file for demo
+    eg/addlocal.pl	- simple modify/write demo with comments
+    eg/specials.001	- complex data file for fixlocal demo
+    eg/fixlocal.pl	- multi-field search and replace demo with comments
+			  and option templates
+    eg/uclocal.pl	- complex modify/write demo with extensive use of
+			  templates and tutorial comments
+
+INSTALL and TEST:
+
+On linux and Unix, this distribution uses Makefile.PL and the "standard"
+install sequence for CPAN modules:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+On Win32, Makefile.PL creates equivalent scripts for the "make-deprived"
+and follows a similar sequence.
+	perl Makefile.PL
+	perl test.pl
+	perl install.pl
+
+Both sequences create install files and directories. The test uses a
+small sample input file and creates outputs in various formats. You can
+specify an optional PAUSE (0..5 seconds) between pages of output. The
+'perl t/test1.pl PAUSE' form works on all OS types. The test will
+indicate if any unexpected errors occur (not ok).
+
+Once you have installed, you can check if Perl can find it. Change to
+some other directory and execute from the command line:
+
+            perl -e "use MARC"
+
+No response that means everything is OK! If you get an error like
+* Can't locate method "use" via package MARC *, then Perl is not
+able to find MARC.pm--double check that the file copied it into the
+right place during the install.
+
+EXPERIMENTAL ELEMENTS:
+
+A number of functions were added in Version 0.92 by Derek Lane to
+support updating "000" and "008" fields. All of these are experimental
+and may be subject to changes or syntax refinements. Here are his
+comments:
+
+	(unpack_ldr): gets an updateable version of the LDR
+	
+	(_unpack_ldr): This and other _ - series functions work fine on a
+	record-by-record basis. In general all official methods in the
+	(un)?pack.* series call corresponding _(un)?pack.* methods. The
+	official interfaces have to specify the records.
+	
+	(_pack_ldr): Added in 0.95d
+	
+	(bib_format): returns, e.g. BOOK or SERIAL. Don't confuse this
+	with usmarc vs XML.
+	
+	(_bib_format): Suitable for record-by-record access.
+
+	(unpack_008): Returns updateable fixed field information.
+
+	(_unpack_008): Internal record-by-record equivalent.
+
+	(_pack_008): Added in 0.95d
+
+COMPATIBILITY:
+
+The length() method has been removed because it overrides a Perl builtin.
+Use the new marc_count() method instead.
+
+Version 0.93 adds character_set conversions to MarcMaker format reads and
+writes. The usmarc/ustext character maps are used by default, so existing
+files in that format will produce different results than earlier versions.
+
+Starting with version 1.00, the XML conversions are moved to MARC::XML.
+
+Version 1.05 no longer assumes fields with same tag are contiguous. This
+is required for CJK characters and may introduce other changes from earlier
+conversions. The addition of proper date stamp generation in the "005" field
+may now create different output from the same source data.
+
+NOTES:
+
+Please let us know if you run into any difficulties using MARC.pm--
+e'd be happy to try to help. Also, please contact us if you notice any
+bugs, or if you would like to suggest an improvement/enhancement. Email
+addresses are listed at the bottom of this page.
+
+The module is provided in standard CPAN distribution format. Additional
+documentation is created during the installation (html and man formats).
+
+Download the latest version from CPAN or:
+
+    http://marcpm.sourceforge.net
+
+AUTHORS:
+
+    Chuck Bearden cbearden@rice.edu
+    Bill Birthisel wcbirthisel@alum.mit.edu
+    Charles McFadden chuck@vims.edu
+    Ed Summers esummers@odu.edu
+    Derek Lane dereklane@pobox.com
+
+COPYRIGHT
+
+Copyright (C) 1999, 2000 Bearden, Birthisel, Lane, McFadden, and Summers.
+All rights reserved. This module is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+Portions Copyright (C) 1999, 2000 Duke University, Lane.

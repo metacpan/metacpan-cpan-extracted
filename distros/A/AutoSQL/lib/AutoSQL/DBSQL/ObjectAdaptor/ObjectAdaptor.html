@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OVERVIEW</title>
+<link rev="made" href="mailto:juguang@commandos.local." />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#overview">OVERVIEW</a></li>
+	<li><a href="#development_note">DEVELOPMENT NOTE</a></li>
+	<ul>
+
+		<li><a href="#objectadaptor::store">ObjectAdaptor::Store</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="overview">OVERVIEW</a></h1>
+<p>
+</p>
+<hr />
+<h1><a name="development_note">DEVELOPMENT NOTE</a></h1>
+<p>
+</p>
+<h2><a name="objectadaptor::store">ObjectAdaptor::Store</a></h2>
+<p>'_insert' method is to store the corresponding object. However, in many cases,
+only knowing the object itself is not enough, while the some referent objects,
+in SQL term, foreign keys, are required.</p>
+<p>the interface of this method is shown below,</p>
+<pre>
+  sub _insert {
+      my ($self, $obj, $fks)=@_;</pre>
+<p>lkjasd</p>
+<dl>
+<dt><strong><a name="item_%27%24obj%27_is_the_object_you_want_to_store%2e">'$obj' is the object you want to store.</a></strong><br />
+</dt>
+<dt><strong><a name="item_%27%24fks%27_is_the_hash_reference%2c_with_keys_of">'$fks' is the hash reference, with keys of foreign key name and values as the
+foreign key ids or referent objects.</a></strong><br />
+</dt>
+</dl>
+<p>The order of store</p>
+<ol>
+<li><strong><a name="item_shared_children%2c_like_location_to_person">Shared children, like Location to Person</a></strong><br />
+</li>
+<li><strong><a name="item_the_object_itself%2e">the object itself.</a></strong><br />
+</li>
+<li><strong><a name="item_others_after_getting_the_dbid">Others after getting the dbID</a></strong><br />
+</li>
+<ul>
+<li><strong><a name="item_asdlkjasfl">asdlkjasfl</a></strong><br />
+</li>
+<li><strong><a name="item_lkajsldkfj">lkajsldkfj</a></strong><br />
+</li>
+</ul>
+</ol>
+
+</body>
+
+</html>

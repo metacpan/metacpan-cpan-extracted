@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: result.t,v 1.4 2003/08/05 22:43:22 kclark Exp $
+# $Id: result.t 16 2008-11-07 02:44:52Z kyclark $
 
 #
 # Tests specific to "Bio::PrimerDesigner::Result."
@@ -15,7 +15,7 @@ my $pd     = Bio::PrimerDesigner->new;
 my $result = $pd->primer3_example;
 
 SKIP: {
-    skip $pd->error, 2 unless defined $result;
+    skip $pd->error, 2 if !defined $result;
 
     isa_ok( $result, 'Bio::PrimerDesigner::Result' );
 

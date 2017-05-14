@@ -1,0 +1,63 @@
+=pod
+
+=head1 NAME
+
+Object::By::Existing_Reference - a minimalistic constructor for objects based on existing references
+
+=head1 SYNOPSIS
+
+	package some_package;
+	use parent qw(
+		Object::By::Existing_Reference
+		Object::By::Array);
+
+	sub _constructor {
+		my ($this, ...) = @_;
+		...
+		return;
+	}
+
+	package main;
+	use some_package;
+
+	my $reference = ...;
+	some_package->constructor($reference, ...);
+
+=head1 DESCRIPTION
+
+Object::By::Existing_Reference provides a generic constructor for OO programming, which is tailored to an actual class via a method called _constructor. The first argument to the constructor must be an existing reference.
+
+This class can also be used to override constructor() from classes with
+
+=head1 METHOD REFERENCE (API)
+
+The design goal was a simple and robust API with a straightforward implementation, respecting all limitations of Perl 5.
+
+=over 8
+
+=item $class->constructor($reference) or class->constructor($reference)
+
+A generic constructor for objects of the class. If the method _constructor is defined, calls _constructor and forwards any arguments to it. The data structure is locked afterwards.
+
+=back
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+There are no tests.
+
+This module has been developed for the specific needs of FReDI and the Mica Environment. It is used by Mica, HTTP::Fools_Gold, Package::Aspect, Text::Placeholder and Object::Episode.
+
+
+=head1 AUTHOR
+
+Winfried Trumper E<lt>pub+perl(a)wt.tuxomania.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011, 2012 Winfried Trumper
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

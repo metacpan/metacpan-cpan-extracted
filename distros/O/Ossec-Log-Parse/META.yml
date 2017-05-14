@@ -1,0 +1,18 @@
+---
+abstract: 'Perl interface for parsing Ossec alert files'
+author:
+  - 'Stefan Amyotte <samyotte@phirelight.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ossec-Log-Parse
+resources:
+  homepage: https://github.com/unusedPhD/perl-ossec-log-parse
+  repository: https://github.com/unusedPhD/perl-ossec-log-parse.git
+version: 0.1.1

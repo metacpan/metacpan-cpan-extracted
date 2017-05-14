@@ -1,0 +1,201 @@
+package Echo360;
+
+use strict;
+use warnings;
+use Carp;
+use Net::OAuth;
+use LWP::UserAgent;
+use HTTP::Headers;
+use HTML::Parser;
+use XML::Simple;
+use Data::Dumper;
+
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+
+my %attr_map = (
+	'organizations' => 'organization',
+	'terms' => 'term',
+	'courses' => 'course',
+	'people' => 'person',
+	'rooms' => 'room',
+	'campuses' => 'campus',
+	'buildings' => 'building',
+	'product-groups' => 'product-group',	
+);
+
+sub new {
+	my ($self, %args) = @_;
+	my @required = qw(USERNAME KEY URL SECRET);
+	
+	my %cfg = map {uc $_ => $args{$_}} keys %args;
+	
+	for my $req (qw(USERNAME KEY URL SECRET)) {
+		croak "Required argument $req not found"
+			unless exists $cfg{$req};
+	}
+	
+	return bless \%cfg, $self;
+}
+
+sub get {
+	my ($self, %options) = @_;	
+	my %opt = map {uc $_ => $options{$_}} keys %options; 
+	$opt{URI} = "/$opt{URI}" unless $opt{URI} =~/^\//;
+
+	print "GET URI: $opt{URI}\n" if $self->{DEBUG};
+
+	for my $req (qw(URI)) {
+		croak "Required argument $req not found"
+			unless exists $opt{$req};
+	}
+	
+	my $resp = $self->_send('get', "$opt{URI}". (exists $opt{PARAMS} ? "?$opt{PARAMS}" : ''));
+
+	if ($resp and $resp->code >= 400) {
+		$self->{_ERROR} = [$self->_parse_error($resp)]; 
+		croak $self->errstr;
+	}
+
+	my $ref = XML::Simple->new()->XMLin($resp->content);
+	
+	$opt{URI} =~ s/^\///;
+
+	if (exists $opt{MATCH}) {
+		my $ret;
+		if ($opt{URI} eq 'people') {
+			for my $id (keys $ref->{$attr_map{$opt{URI}}}) {
+				for (keys $ref->{$attr_map{$opt{URI}}}->{$id}) {
+					if ($ref->{$attr_map{$opt{URI}}}->{$id}{$_} =~ /$opt{MATCH}/) {
+						$ret = {
+							id => $id,
+							map {$_ => $ref->{$attr_map{$opt{URI}}}->{$id}{$_}} keys $ref->{$attr_map{$opt{URI}}}->{$id}
+						};
+					}				
+				} 
+			}
+		
+		} else {
+			for my $match (grep /$opt{MATCH}/, keys $ref->{$attr_map{$opt{URI}}}) {
+				$ret->{$match} = $ref->{$attr_map{$opt{URI}}}->{$match};
+			}
+		}
+		
+		return $ret;
+	}
+		
+	if ($opt{URI} =~ /.*\/.*/) {
+		return $ref;
+	} else {
+		return $ref->{$attr_map{$opt{URI}}};	
+	}
+	
+}
+
+sub add {
+	my ($self, $uri, $xml) = @_;
+	$uri = "/$uri" unless $uri =~/^\//;
+
+	print "POST URI: $uri\n" if $self->{DEBUG};
+
+	my $resp = $self->_send('POST', "$uri", $xml);
+
+	if ($resp and $resp->code >= 400) {
+		$self->{_ERROR} = [$self->_parse_error($resp)]; 
+		croak $self->errstr;
+	}
+
+	return XML::Simple->new()->XMLin($resp->content)
+}
+
+sub update {
+	my ($self, $uri, $xml) = @_;
+	$uri = "/$uri" unless $uri =~/^\//;
+
+	print "PUT URI: $uri\n" if $self->{DEBUG};
+	
+	my $resp = $self->_send('PUT', "$uri", $xml);
+
+	if ($resp and $resp->code >= 400) {
+		$self->{_ERROR} = [$self->_parse_error($resp)]; 
+		croak $self->errstr;
+	}
+
+	my $ret = XML::Simple->new()->XMLin($resp->content) if $resp->content;
+	return $ret; 
+}
+
+sub delete {
+	my ($self, $uri, $xml) = @_;
+	$uri = "/$uri" unless $uri =~/^\//;
+
+	print "DELETE URI: $uri\n" if $self->{DEBUG};
+	
+	my $resp = $self->_send('DELETE', $uri);
+
+	if ($resp and $resp->code >= 400) {
+		$self->{_ERROR} = [$self->_parse_error($resp)]; 
+		croak $self->errstr;
+	}
+
+	my $ret = XML::Simple->new()->XMLin($resp->content) if $resp->content;
+	return $ret; 
+}
+
+sub _send {
+	my ($self, $method, $uri, $xml) = @_;
+	my $timestamp = time();
+	my $nonce = int rand 99999999;
+	
+	my $oauth_request = Net::OAuth->request('consumer')->new(
+		consumer_key => $self->{'KEY'},
+		consumer_secret => $self->{'SECRET'},
+		request_url => $self->{'URL'}. $uri,
+		request_method => uc $method,
+		signature_method => "HMAC-SHA1",
+		timestamp => $timestamp,
+		nonce => $nonce,
+		extra_params => {
+			'xoauth_requestor_id' => $self->{'USERNAME'} . '@' . $self->{'KEY'},
+		},
+	);
+
+	$oauth_request->sign;
+
+	my $req = HTTP::Request->new(uc $method => $self->{'URL'}.$uri.($uri =~ /\?/ ? '&': '?').'xoauth_requestor_id='.$self->{'USERNAME'}.'@'.$self->{'KEY'});
+	$req->header('Content-type' => 'application/xml');
+	$req->header('Authorization' => $oauth_request->to_authorization_header);
+	$req->content($xml) if $xml;
+	
+	my $ua = LWP::UserAgent->new;
+	my $oauth_response = $ua->request($req);
+	
+	return ($oauth_response) ? $oauth_response : 0;
+}
+
+sub _parse_error {
+	my ($self, $resp) = @_;
+	my @errors;
+	my $pre_found = 0;
+	my $html_parser = HTML::Parser->new(
+		start_h => [sub {
+			for (@_) {$pre_found++ if $_ eq 'pre'}
+		}, 'tag'],
+		text_h => [sub {
+			for (@_) { s/\n//; s/\s\s//g; push @errors, $_ if $pre_found;}
+		}, 'text'],
+		end_h => [sub {
+			for (@_) {$pre_found = 0 if $_ eq '/pre'}
+		}, 'tag']
+	);
+	my $content = $resp->content;
+	$html_parser->parse($content);
+	return @errors;
+}	
+
+sub errstr {
+	my $self = shift;
+	return (ref $self->{_ERROR}) ? join ':', @{$self->{_ERROR}} : $self->_ERROR;
+}
+
+1;
+# ABSTRACT: Echo 360 API

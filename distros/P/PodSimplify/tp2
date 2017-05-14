@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+
+use Pod::Simplify;
+
+$x = new Pod::Simplify;
+
+#@r = $x->parse_from_file_by_name("tp2");
+@r = $x->parse_from_file_by_name("newfunc.pod",sub {print Pod::Simplify::dumpout(\@_),"\n"});
+#@r = $x->parse_from_file_by_name("pod/perlrun.pod");
+
+#while(@i=splice(@r,0,6)) {
+#	print Pod::Simplify::dumpout(\@i),"\n";
+#}
+
+#print Pod::Simplify::dumpout(\@r),"\n";
+
+=without auto-indexing
+
+=with foobar
+
+=with auto-indexing of 3
+
+=head1 TEST
+ 
+This is a test.
+
+=subheading
+
+=index test1
+test2
+test3
+       test4
+       test/5
+ 
+This is another test
+
+This paragraph mentions the foo() function, the bar(2) manpage, and the $bletch variable.
+
+=begin list
+
+=item bla
+
+=item B<1>I<2>
+
+=item X<B<1>I<2>>
+
+=item X<B<1>/I<2>>
+
+=item X<B<1>I<2>;12>
+
+=item X<B<1>I<2>;number/12>
+
+=item X<B<1;2>;12>
+
+foo
+
+=end list
+ 
+=cut
+
+=begin comment
+
+=begin pod test2
+
+=end pod test2
+
+=end comment

@@ -1,0 +1,28 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Protocol" db_column="type" cv_table="PRT_Type">
+  <comment type="definition">This table provides the restricted vocabulary for the column type in the table Protocol and is used to give a high-level cut as to which of the manipulations in the array and sample prep processes is being described	
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. They regulate
+the sub-setting of which protocol entries are displayed in the protocol
+screen.</comment>  
+<term name="growth"
+        description="protocol relates to growth conditions for the organism, such as temperature, pH, light and nutrients"/>
+<term name="rna_prep"
+        description="protocol relates to how the target RNA sample was prepared, such as phenol or guanidinium extraction"/>
+<term name="tissue_or_sample"
+        description="protocol describes the particular tissue or cell type isolated for the RNA extraction"/>
+<term name="cdna_and_labeling"
+        description="protocol relates to how the cDNA was made from RNA, and labeled"/>
+<term name="hybridization"
+        description="protocol relates to how the target and probe interaction was manipulated for stringency and kinetics"/>
+<term name="other_protocol"
+        description="protocols that describe less general procedures such as oligo manufacture and QC, slide or filter preparation etc"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

@@ -18,7 +18,7 @@ The following options are supported:
    --path13 /example/path   Path to LedgerSMB 1.3 installation
    --path14 /example/path2  Path to LedgerSMB 1.4 installation
    --path15 /example/path2  Path to LedgerSMB 1.5 installation
-   --port 5432              Database Poart
+   --port 5432              Database Port
    --dbname database        Reload the specified db, overridden by --all
    --username postgres      Database Superuser to Log In As
    --prompt-password        Prompt for Password (can use PGPASSWORD instead)

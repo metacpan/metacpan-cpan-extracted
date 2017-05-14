@@ -21,11 +21,11 @@
 ## router.
 ####
 
-package JuniperRouter;
-use RouterBase;
+package IPDevice::JuniperRouter;
+use IPDevice::RouterBase;
 use strict;
 use vars qw($VERSION @ISA);
-@ISA = qw(RouterBase);
+@ISA = qw(IPDevice::RouterBase);
 
 $VERSION = 0.01;
 
@@ -35,12 +35,12 @@ use constant FALSE => 0;
 
 =head1 NAME
 
-JuniperRouter
+IPDevice::JuniperRouter
 
 =head1 SYNOPSIS
 
- use JuniperRouter;
- my $router = new JuniperRouter;
+ use IPDevice::JuniperRouter;
+ my $router = new IPDevice::JuniperRouter;
  $router->set_hostname('hostname');
  my $card = $router->add_card('0');
  $card->add_module('0/1');
@@ -52,7 +52,7 @@ router.
 
 =head1 CONSTRUCTOR AND METHODS
 
-This module provides, in addition to all methods from L<RouterBase|RouterBase>,
+This module provides, in addition to all methods from L<IPDevice::RouterBase|IPDevice::RouterBase>,
 the following methods.
 
 =head2 new([%args])
@@ -74,7 +74,7 @@ sub new {
 
 =head2 interfacename($interfacename)
 
-Returns the L<RouterBase::Interface|RouterBase::Interface> with the given name.
+Returns the L<IPDevice::RouterBase::Interface|IPDevice::RouterBase::Interface> with the given name.
 Valid names have the format 'so-1/2/3', 'lo0', 'lo0.0', 'fe-0/1/2.1', or
 just '1/2/3'.
 If the interface does not yet exist, it will be created.
@@ -82,7 +82,7 @@ If the interface does not yet exist, it will be created.
 =cut
 sub interfacename {
   my($self, $logintname) = @_;
-  #print "JuniperRouter::interfacename(): $logintname\n";
+  #print "IPDevice::JuniperRouter::interfacename(): $logintname\n";
   my $logintno =  $logintname;   # Logical interface name without the type.
   my $intname  =  $logintname;   # Interface name without the unit number.
   my $intno    =  $logintname;   # Interface name without type.
@@ -96,7 +96,7 @@ sub interfacename {
   my($card, $mod);
   $card  = $1, $mod = $2 if $intno =~ /^(\d+)\/(\d+)\/\d+$/;
   #FIXME: Damn Juniper - there can be two fxp0 interfaces - what should we do?
-  #print "JuniperRouter::interfacename(): $logintname, $card/$mod/x.$unit\n";
+  #print "IPDevice::JuniperRouter::interfacename(): $logintname, $card/$mod/x.$unit\n";
   #FIXME: If new, set unitname. I have to go home now ;).
   return $self->card($card)->module($mod)->interface($intname) if !defined $unit;
   return $self->card($card)->module($mod)->interface($intname)->unit($unit);

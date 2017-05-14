@@ -1,4 +1,5 @@
 Changes
+CMakeLists.txt
 Lib.xs
 lib/Panda/Lib.pm
 lib/Panda/Lib.pod
@@ -7,26 +8,7 @@ MANIFEST			This list of files
 misc/mytest.plx
 misc/mytest.plx.orig
 Panda-Lib.pro
-src/panda/basic_string.h
-src/panda/basic_string_view.h
-src/panda/iterator.h
-src/panda/lib.cc
-src/panda/lib.h
-src/panda/lib/endian.h
-src/panda/lib/from_chars.cc
-src/panda/lib/from_chars.h
-src/panda/lib/hash.cc
-src/panda/lib/hash.h
-src/panda/lib/memory.cc
-src/panda/lib/memory.h
-src/panda/string.h
-src/panda/string_map.h
-src/panda/string_set.h
-src/panda/string_view.h
-src/panda/unordered_string_map.h
-src/panda/unordered_string_set.h
-src/xs/lib.cc
-src/xs/lib.h
+src/xs/lib.o
 src/xs/lib/clone.cc
 src/xs/lib/clone.h
 src/xs/lib/cmp.cc
@@ -43,17 +25,5 @@ t/06-clone.t
 t/07-hash_cmp.t
 t/08-merge.t
 t/99-leaks.t
-t/from_chars.t
-t/lib/PLTest.pm
-t/src/from_chars.xsi
-t/src/string.xsi
-t/src/string_containers.xsi
-t/src/test.h
-t/src/test.xsi
-t/src/testmap
-t/string.t
-t/string_containers.t
-t/to_chars.t
-typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

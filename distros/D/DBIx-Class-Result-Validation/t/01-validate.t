@@ -107,6 +107,18 @@ subtest "Defined / Empty Validation" => sub {
 
     $error="";
     try{
+        $obj_ok = $schema->resultset('Object')->create({name => "hé", my_enum => "val1", my_enum_def => "val1", attribute => "xxx", ref_id => 1});
+    }
+    catch{
+        $error = $_;
+    };
+    isa_ok( $error, "DBIx::Class::Result::Validation::VException", "error returned is a DBIx::Class::Result::Validation::VException");
+    ok( $error->object->result_errors, "error returned object with result_error");
+    ok (defined $error->object->result_errors->{name}, "only ascii characters are authorized");
+    is $error->object->result_errors->{name}->[0], "only ascii characters are authorized", "correct message is set";
+
+    $error="";
+    try{
         $obj_ok = $schema->resultset('Object')->create({ my_enum => "val1", my_enum_def => "val1", attribute => "xxx", ref_id => 1});
     }
     catch{

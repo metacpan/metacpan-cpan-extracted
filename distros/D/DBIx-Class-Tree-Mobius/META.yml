@@ -1,0 +1,23 @@
+---
+abstract: 'Manage trees of data using the Möbius encoding (nested intervals with continued fraction)'
+author:
+  - 'Valentin D Guillois <vdg@polygonism.net>'
+build_requires:
+  SQL::Translator: 0.11006
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Tree-Mobius
+requires:
+  Carp: 0
+  DBIx::Class: 0
+  Digest: 0
+  ExtUtils::MakeMaker: 0
+  Math::BigFloat: 0
+version: 0.212

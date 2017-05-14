@@ -6,33 +6,13 @@ use strict;
 use warnings;
 use version;
 
-use MooseX::Types -declare => [ qw(
-    ANSIColor
-    ANSIColorPalette
-    AuthorID
-    DiffStyle
-    Dir
-    DistributionTarget
-    DistributionTargetList
-    File
-    FileList
-    Io
-    PackageTarget
-    PackageTargetList
-    PerlVersion
-    PropertyName
-    RevisionHead
-    RevisionID
-    StackAll
-    StackDefault
-    StackName
-    StackObject
-    Target
-    TargetList
-    Uri
-    Username
-    Version
-)];
+use MooseX::Types -declare => [
+    qw( AuthorID Username Uri Dir File FileList Io Version
+        StackName StackAll StackDefault PropertyName PkgSpec
+        PkgSpecList StackObject DistSpec DistSpecList
+        Spec SpecList RevisionID RevisionHead
+        ANSIColor ANSIColorSet PerlVersion)
+];
 
 use MooseX::Types::Moose qw( Str Num ScalarRef ArrayRef Undef
     HashRef FileHandle Object Int );
@@ -46,12 +26,12 @@ use IO::String;
 use IO::Handle;
 use IO::File;
 
-use Pinto::Target;
+use Pinto::SpecFactory;
 use Pinto::Constants qw(:all);
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -85,8 +65,7 @@ subtype StackDefault, as Undef;
 
 #-----------------------------------------------------------------------------
 
-class_type StackObject,
-    { class => 'Pinto::Schema::Result::Stack' };
+class_type StackObject, { class => 'Pinto::Schema::Result::Stack' };
 
 #-----------------------------------------------------------------------------
 
@@ -96,26 +75,21 @@ subtype PropertyName, as Str,
 
 #-----------------------------------------------------------------------------
 
-class_type Version,
-    { class => 'version' };
+class_type Version, { class => 'version' };
 
-coerce Version,
-    from Str, via { version->parse($_) };
+coerce Version, from Str, via { version->parse($_) };
 
-coerce Version,
-    from Num, via { version->parse($_) };
+coerce Version, from Num, via { version->parse($_) };
 
 #-----------------------------------------------------------------------------
 
 subtype PerlVersion, as Object,
     where { $_->isa('version') && exists $Module::CoreList::version{ $_->numify + 0 } },
-    message {"perl version ($_) is unknown to me; try updating Pinto's copy of Module::CoreList"};
+    message {"perl version ($_) is unknown to me"};
 
-coerce PerlVersion,
-    from Str, via { version->parse($_) };
+coerce PerlVersion, from Str, via { version->parse($_) };
 
-coerce PerlVersion,
-    from Num, via { version->parse($_) };
+coerce PerlVersion, from Num, via { version->parse($_) };
 
 #-----------------------------------------------------------------------------
 
@@ -125,98 +99,85 @@ subtype ANSIColor, as Str,
 
 #-----------------------------------------------------------------------------
 
-subtype ANSIColorPalette, as ArrayRef[ANSIColor],
-    where { @{$_} == 3 },
-    message {'Must be exactly three colors'};
+subtype ANSIColorSet, as ArrayRef [ANSIColor], where { @{$_} == 3 }, message {'Must be exactly three colors'};
 
 #-----------------------------------------------------------------------------
 
-class_type Uri,
-    { class => 'URI' };
+class_type Uri, { class => 'URI' };
 
-coerce Uri,
-    from Str, via { URI->new($_) };
+coerce Uri, from Str, via { URI->new($_) };
 
 #-----------------------------------------------------------------------------
 
-class_type Dir,
-    { class => 'Path::Class::Dir' };
+class_type Dir, { class => 'Path::Class::Dir' };
 
-# file:/// URIs will be converted to plain paths
-
-coerce Dir,
-    from Str, via { $_ =~ s{^file://}{}; Path::Class::Dir->new($_) };
+coerce Dir, from Str, via { Path::Class::Dir->new($_) }, from ArrayRef, via { Path::Class::Dir->new( @{$_} ) };
 
 #-----------------------------------------------------------------------------
 
-class_type File,
-    { class => 'Path::Class::File' };
+class_type File, { class => 'Path::Class::File' };
 
-# file:/// URIs will be converted to plain paths
-
-coerce File,
-    from Str, via { $_ =~ s{^file://}{}; Path::Class::File->new($_) };
+coerce File, from Str, via { Path::Class::File->new($_) }, from ArrayRef, via { Path::Class::File->new( @{$_} ) };
 
 #-----------------------------------------------------------------------------
 
 subtype FileList, as ArrayRef [File];
 
-coerce FileList,
-    from File,          via { [ $_ ] },
-    from Str,           via { s{^file://}{}; [ Path::Class::File->new($_) ] },
-    from ArrayRef[Str], via { [ map { s{^file://}{}; Path::Class::File->new($_) } @$_ ] };
+coerce FileList, from File, via { [$_] }, from Str, via { [ Path::Class::File->new($_) ] }, from ArrayRef [Str], via {
+    [ map { Path::Class::File->new($_) } @$_ ];
+};
 
 #-----------------------------------------------------------------------------
 
-class_type PackageTarget, { class => 'Pinto::Target::Package' };
+class_type PkgSpec, { class => 'Pinto::PackageSpec' };
 
-coerce PackageTarget,
-    from Str,     via { Pinto::Target->new($_) },
-    from HashRef, via { Pinto::Target->new($_) };
-
-#-----------------------------------------------------------------------------
-
-class_type DistributionTarget, { class => 'Pinto::Target::Distribution' };
-
-coerce DistributionTarget,
-    from Str,     via { Pinto::Target->new($_) },
-    from HashRef, via { Pinto::Target->new($_) };
+coerce PkgSpec,
+    from Str,     via { Pinto::SpecFactory->make_spec($_) },
+    from HashRef, via { Pinto::SpecFactory->make_spec($_) };
 
 #-----------------------------------------------------------------------------
 
-subtype TargetList, as ArrayRef [ PackageTarget | DistributionTarget ];    ## no critic qw(ProhibitBitwiseOperators);
+class_type DistSpec, { class => 'Pinto::DistributionSpec' };
 
-coerce TargetList,
-    from PackageTarget,      via { [ $_ ] },
-    from DistributionTarget, via { [ $_ ] },
-    from Str,                via { [ Pinto::Target->new($_) ] },
-    from ArrayRef[Str],      via { [ map { Pinto::Target->new($_) } @$_ ] };
+coerce DistSpec,
+    from Str,     via { Pinto::SpecFactory->make_spec($_) },
+    from HashRef, via { Pinto::SpecFactory->make_spec($_) };
 
 #-----------------------------------------------------------------------------
 
-subtype DistributionTargetList, as ArrayRef [DistributionTarget];            ## no critic qw(ProhibitBitwiseOperators);
+subtype SpecList, as ArrayRef [ PkgSpec | DistSpec ];    ## no critic qw(ProhibitBitwiseOperators);
 
-coerce DistributionTargetList,
-    from DistributionTarget,  via { [$_] },
-    from Str,                 via { [ Pinto::Target::Distribution->new($_) ] },
-    from ArrayRef[Str],       via { [ map { Pinto::Target::Distribution->new($_) } @$_ ] };
+coerce SpecList,
+    from PkgSpec, via { [$_] },
+    from DistSpec, via { [$_] }, from Str, via { [ Pinto::SpecFactory->make_spec($_) ] }, from ArrayRef [Str], via {
+    [ map { Pinto::SpecFactory->make_spec($_) } @$_ ];
+    };
 
 #-----------------------------------------------------------------------------
 
-subtype PackageTargetList, as ArrayRef [PackageTarget];              ## no critic qw(ProhibitBitwiseOperators);
+subtype DistSpecList, as ArrayRef [DistSpec];            ## no critic qw(ProhibitBitwiseOperators);
 
-coerce PackageTargetList,
-    from DistributionTarget,  via { [ $_ ] },
-    from Str,                 via { [ Pinto::Target::Package->new($_) ] },
-    from ArrayRef[Str],       via { [ map { Pinto::Target::Package->new($_) } @$_ ] };
+coerce DistSpecList,
+    from DistSpec, via { [$_] }, from Str, via { [ Pinto::DistributionSpec->new($_) ] }, from ArrayRef [Str], via {
+    [ map { Pinto::DistributionSpec->new($_) } @$_ ];
+    };
+
+#-----------------------------------------------------------------------------
+
+subtype PkgSpecList, as ArrayRef [PkgSpec];              ## no critic qw(ProhibitBitwiseOperators);
+
+coerce PkgSpecList,
+    from DistSpec, via { [$_] }, from Str, via { [ Pinto::PackageSpec->new($_) ] }, from ArrayRef [Str], via {
+    [ map { Pinto::PackageSpec->new($_) } @$_ ];
+    };
 
 #-----------------------------------------------------------------------------
 
 subtype Io, as Object;
 
 coerce Io,
-    from Str,       via { my $fh = IO::File->new(); $fh->open($_);   return $fh },
-    from File,      via { my $fh = IO::File->new(); $fh->open("$_"); return $fh },
+    from Str,  via { my $fh = IO::File->new(); $fh->open($_);   return $fh },
+    from File, via { my $fh = IO::File->new(); $fh->open("$_"); return $fh },
     from ArrayRef,  via { IO::Handle->new_from_fd(@$_) },
     from ScalarRef, via { IO::String->new( ${$_} ) };
 
@@ -234,10 +195,6 @@ subtype RevisionHead, as Undef;
 
 #-----------------------------------------------------------------------------
 
-enum DiffStyle, [$PINTO_DIFF_STYLE_CONCISE, $PINTO_DIFF_STYLE_DETAILED];
-
-#-----------------------------------------------------------------------------
-
 1;
 
 __END__
@@ -246,7 +203,10 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Jeffrey Ryan Thalhammer
+=for :stopwords Jeffrey Ryan Thalhammer BenRifkah Fowler Jakob Voss Karen Etheridge Michael
+G. Bergsten-Buret Schwern Oleg Gashev Steffen Schwigon Tommy Stanton
+Wolfgang Kinkeldei Yanick Boris Champoux hesco popl Däppen Cory G Watson
+David Steinbrunner Glenn
 
 =head1 NAME
 
@@ -254,7 +214,7 @@ Pinto::Types - Moose types used within Pinto
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -262,7 +222,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

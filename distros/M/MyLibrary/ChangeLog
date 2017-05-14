@@ -1,0 +1,1102 @@
+2007-09-06 15:58  emorgan
+
+	* lib/MyLibrary/Core.pm: Just incremented the version number.
+
+2007-09-06 15:55  emorgan
+
+	* INSTALL, etc/mylibrary-postgresql-schema.sql: The modification of
+	  Patron.pm is not really a modification.  The addition of
+	  mylibrary-postgresql-schema.sql should allow postgresql users to
+	  use MyLibrary. The INSTALL file was update to reflect some
+	  Postgresql instructions. --ELM
+
+2007-06-25 09:32  emorgan
+
+	* INSTALL, MANIFEST, Makefile.PL, README, lib/MyLibrary/Config.pm,
+	  ChangeLog: [no log message]
+
+2007-06-19 16:18  emorgan
+
+	* t/Auth_Kerb.t: [no log message]
+
+2007-06-19 16:17  emorgan
+
+	* lib/MyLibrary/Auth/Kerberos.pm: Moving Kerberos.pm to a separate
+	  distribution. --ELM
+
+2007-06-19 16:13  emorgan
+
+	* MANIFEST: [no log message]
+
+2007-06-19 16:11  emorgan
+
+	* etc/mylibrary-mysql-schema.sql: Renamed some files --ELM
+
+2007-06-19 16:09  emorgan
+
+	* MANIFEST: [no log message]
+
+2007-06-19 15:35  emorgan
+
+	* ChangeLog, MANIFEST, MANIFEST.SKIP: [no log message]
+
+2007-06-19 15:03  emorgan
+
+	* .project, MANIFEST, MANIFEST.SKIP, lib/MyLibrary/Core.pm,
+	  etc/index-all.cfg, etc/mylibrary-rdf-ns, etc/mylibrary2swish.cfg:
+	  [no log message]
+
+2007-06-12 16:51  emorgan
+
+	* INSTALL, Makefile.PL, lib/MyLibrary/Auth.pm,
+	  lib/MyLibrary/Config.pm, lib/MyLibrary/Facet.pm,
+	  lib/MyLibrary/Librarian.pm, lib/MyLibrary/Message.pm,
+	  lib/MyLibrary/Patron.pm, lib/MyLibrary/Resource.pm,
+	  lib/MyLibrary/Review.pm, lib/MyLibrary/Stylesheet.pm,
+	  lib/MyLibrary/Term.pm, lib/MyLibrary/Patron/Links.pm,
+	  lib/MyLibrary/Resource/Location.pm, t/Auth_Kerb.t, t/Config.t,
+	  t/Facet.t, t/Location.t, t/Message.t, t/Patron.t, t/Resource.t,
+	  t/Term.t: ed to make tests work with warnings turned on. Added a
+	  hack regarding AUTOLOAD to Resources.pm. Added the id parameter
+	  to a call in Term.pm (overlap) in order to call
+	  MyLibrary::Term->new correctly. Who knows what else I broke.
+	  --ELM
+
+2007-06-11 16:00  rfox
+
+	* lib/MyLibrary/Term.pm: Correcting minor error in overlap()
+	  method. - RJF
+
+2007-02-19 13:43  rfox
+
+	* lib/MyLibrary/Resource.pm: A minor tweak to the synopsis. - RJF
+
+2007-02-19 13:40  rfox
+
+	* lib/MyLibrary/Resource.pm: Adding quicksearch_redirect() changes
+	  per Eric's instructions. - RJF
+
+2006-12-11 12:35  rfox
+
+	* ChangeLog: fixed minor bug in get_resources Resource.pm method. -
+	  RJF
+
+2006-12-11 12:32  rfox
+
+	* lib/MyLibrary/Resource.pm: Found a minor bug in the
+	  get_resources() method. - RJF
+
+2006-09-01 13:43  rfox
+
+	* lib/MyLibrary/Auth/Kerberos.pm: Changed Kerberos session
+	  parameters. - RJF
+
+2006-09-01 13:35  rfox
+
+	* lib/MyLibrary/Auth/Kerberos.pm: Changed some Kerberos session
+	  params. - RJF
+
+2006-08-29 15:21  rfox
+
+	* lib/MyLibrary/Auth/Kerberos.pm: Minor tweak to Kerberos
+	  messaging. - RJF
+
+2006-03-29 14:25  emorgan
+
+	* ChangeLog, MANIFEST: [no log message]
+
+2006-03-29 09:55  emorgan
+
+	* MANIFEST.SKIP: Trying to make dist
+
+2006-03-29 09:42  emorgan
+
+	* ChangeLog: [no log message]
+
+2006-03-29 09:42  emorgan
+
+	* lib/MyLibrary/: Core.pm, Resource.pm: Updated version number.
+	  Tweaked get_resources in Resource.pm
+
+2006-01-27 16:54  emorgan
+
+	* MANIFEST, lib/MyLibrary/Config.pm, lib/MyLibrary/Core.pm: Trying
+	  to make a distro --ELM
+
+2006-01-23 13:50  emorgan
+
+	* lib/MyLibrary/Tutorial.pm: Added this to help people get started.
+	  --ELM
+
+2005-12-06 09:41  rfox
+
+	* .project, lib/MyLibrary/Resource.pm: Corrected a bug in the
+	  get_resources() method. - RJF
+
+2005-10-07 16:11  rfox
+
+	* t/: Patron.t, Patron_Links.t: Adding appropriate tests for new
+	  Patron::Links module. - RJF
+
+2005-10-07 16:06  rfox
+
+	* lib/MyLibrary/Config.pm: Putting blank Config back in place. -
+	  RJF
+
+2005-10-07 16:04  rfox
+
+	* lib/MyLibrary/: Config.pm, Patron.pm, Patron/Links.pm: Adding a
+	  Links.pm module for the personal patron links. - RJF
+
+2005-09-23 16:37  rfox
+
+	* lib/MyLibrary/: Auth.pm, Auth/Basic.pm, Auth/Kerberos.pm: Fixed
+	  some minor bugs. - RJF
+
+2005-09-22 15:10  rfox
+
+	* lib/MyLibrary/Auth.pm, lib/MyLibrary/Patron.pm,
+	  lib/MyLibrary/Auth/Basic.pm, lib/MyLibrary/Auth/Kerberos.pm,
+	  t/Auth_Basic.t, t/Auth_Kerb.t, t/Patron.t: Adding new modules for
+	  authentication subsystem (Basic, Kerberos). - RJF
+
+2005-09-13 14:00  rfox
+
+	* lib/MyLibrary/Config.pm: Whoops. Putting blank Config.pm back in
+	  place. - RJF
+
+2005-09-13 13:59  rfox
+
+	* lib/MyLibrary/Config.pm, lib/MyLibrary/Stylesheet.pm, t/Patron.t,
+	  t/Stylesheet.t: Adding a new module for storing stylesheet info
+	  in MyLibrary. - RJF
+
+2005-09-09 11:43  rfox
+
+	* lib/MyLibrary/: Patron.pm, Resource.pm, Term.pm: Added several
+	  methods between Patrons, Resources and Terms. - RJF
+
+2005-09-06 11:38  rfox
+
+	* lib/MyLibrary/Config.pm: Returned blank Config.pm to repository.
+	  - RJF
+
+2005-09-06 11:36  rfox
+
+	* MANIFEST, lib/MyLibrary/Config.pm, lib/MyLibrary/Patron.pm,
+	  lib/MyLibrary/Resource.pm, t/Patron.t, t/Resource.t: Recreated
+	  the Patron.pm module. Added several methods to Resource.pm. - RJF
+
+2005-05-05 14:10  emorgan
+
+	* INSTALL, README, lib/MyLibrary/Core.pm: Tweaking for
+	  distribution.
+
+2005-04-28 13:44  rfox
+
+	* lib/MyLibrary/Config.pm: Put blank Config.pm back into place. -
+	  RJF
+
+2005-04-28 13:43  rfox
+
+	* lib/MyLibrary/: Config.pm, Term.pm: Updated overlap() method to
+	  document possible database engine limitation. - RJF
+
+2005-04-14 16:27  rfox
+
+	* MANIFEST, Makefile.PL, lib/MyLibrary/Config.pm, t/Resource.t:
+	  Updated Makefile.PL. - RJF
+
+2005-04-13 13:25  emorgan
+
+	* Makefile.PL: Simple formatting tweakes.
+
+2005-04-11 16:13  rfox
+
+	* lib/MyLibrary/Config.pm: Removed NDs config info again. Ugh. -
+	  RJF
+
+2005-04-11 16:10  rfox
+
+	* lib/MyLibrary/: Config.pm, Resource.pm: Added a
+	  qsearch_redirect() class method to Resource.pm. - RJF
+
+2005-03-31 15:36  rfox
+
+	* INSTALL, MANIFEST, Makefile.PL: New Makefile.PL written.
+	  convert_data.pl updated. New MANIFEST and INSTALL.
+
+2005-03-23 14:31  rfox
+
+	* lib/MyLibrary/Config.pm: Putting blank Config.pm back in place. -
+	  RJF
+
+2005-03-23 14:30  rfox
+
+	* etc/mylibrary-rdf-ns, lib/MyLibrary/Config.pm: Moving more files
+	  around. - RJF
+
+2005-03-23 12:03  rfox
+
+	* Makefile.PL, lib/MyLibrary/Config.pm: Moved many files and
+	  directories in order to consolidate documentation. RJF
+
+2005-03-22 16:55  rfox
+
+	* lib/MyLibrary/Config.pm: Created a blank configuration module. -
+	  RJF
+
+2005-03-22 16:33  rfox
+
+	* MANIFEST, Makefile.PL: Update Manifest and added Perl PM reqs to
+	  Makefile.PL. - RJF
+
+2005-03-22 13:27  rfox
+
+	* MANIFEST: Updated manifest with Core.pm information. - RJF
+
+2005-03-22 13:24  rfox
+
+	* Makefile.PL: Changed version retrieval parameter. - RJF
+
+2005-03-22 13:16  rfox
+
+	* lib/MyLibrary.pm: Removing parent module and replacing with
+	  Core.pm. - RJF
+
+2005-03-22 13:15  rfox
+
+	* lib/MyLibrary/Core.pm: Adding a new file to load all modules
+	  simultaneously. - RJF
+
+2005-03-22 13:13  rfox
+
+	* lib/MyLibrary/Config.pm: Updating Config.pm file. - RJF
+
+2005-03-17 16:00  rfox
+
+	* lib/MyLibrary/Term.pm, t/Term.t: Added a distinct_terms() method
+	  to Term.pm. - RJF
+
+2005-03-17 15:09  rfox
+
+	* lib/MyLibrary/Config.pm, lib/MyLibrary/Term.pm, t/Term.t: Added
+	  an overlap() method to Term.pm. - RJF
+
+2005-03-15 08:40  emorgan
+
+	* ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL: Trying to make a
+	  distro.
+
+2005-03-14 11:58  emorgan
+
+	* etc/: index-all.cfg, mylibrary2swish.cfg: Example swish
+	  configuration files.
+
+2005-03-08 15:42  rfox
+
+	* lib/MyLibrary/Term.pm: Removed some debugging messages. - RJF
+
+2005-03-08 15:39  rfox
+
+	* lib/MyLibrary/: Config.pm, Term.pm: Miscelaneous updates. - RJF
+
+2005-02-23 16:08  rfox
+
+	* lib/MyLibrary/Resource.pm: Correcting some formatting issues for
+	  new module. - RJF
+
+2005-02-23 16:07  rfox
+
+	* lib/MyLibrary/Resource.pm: Uploading appropriate version of
+	  module. - RJF
+
+2005-02-23 15:47  emorgan
+
+	* lib/MyLibrary/Resource.pm: Weirdness.
+
+2005-02-23 15:25  emorgan
+
+	* lib/MyLibrary.pm: Added version subroutine and 'used' all the
+	  other modules.
+
+2005-02-23 11:48  emorgan
+
+	* INSTALL, LICENSE, README: Added this for a distro.
+
+2005-02-23 10:18  emorgan
+
+	* lib/MyLibrary.pm: Added this file for better version control and
+	  to provide an overview of what MyLibrary does. Right now, the
+	  file is pretty much empty. --ELM
+
+2005-02-22 13:49  rfox
+
+	* lib/MyLibrary/Config.pm: Tweaked some settings in Config.pm. -
+	  RJF
+
+2005-02-21 15:49  rfox
+
+	* t/User.t: Removing User.t test. - RJF
+
+2005-02-21 15:47  rfox
+
+	* t/Location_Type.t: Adding MyLibrary::Resource::Location::Type
+	  test. - RJF
+
+2005-02-21 15:45  rfox
+
+	* ChangeLog: Updated ChangeLog. - RJF
+
+2005-02-21 15:04  rfox
+
+	* t/: Alert.t, Harvester.t: Removing obsolete test files. - RJF
+
+2005-02-21 14:57  rfox
+
+	* lib/MyLibrary/: Librarian.pm, Resource.pm, Term.pm: Updated core
+	  modules to reflect new database schema elements. - RJF
+
+2005-02-16 15:55  rfox
+
+	* lib/MyLibrary/Resource/: Location.pm, Location/Type.pm: Adding a
+	  method to Location/Type.pm and cleaning up Location.pm. - RJF
+
+2005-02-16 12:17  rfox
+
+	* lib/MyLibrary/Resource/Location/Type.pm: Adding location type
+	  methods in separate module. - RJF
+
+2005-02-16 12:12  rfox
+
+	* lib/MyLibrary/Resource.pm: Added some exception handling code and
+	  cleaned up some areas. - RJF
+
+2004-11-08 16:23  rfox
+
+	* lib/MyLibrary/: Config.pm, DB.pm, Librarian.pm: Added method to
+	  Config.pm and tweaked pod for Librarian.pm. - RJF
+
+2004-10-29 15:26  emorgan
+
+	* lib/MyLibrary/Librarian.pm: Made the output of get_librarians
+	  sorted by name.
+
+2004-09-09 10:23  rfox
+
+	* lib/MyLibrary/Term.pm: Removed some unecessary debugging code. -
+	  RJF
+
+2004-09-09 10:19  rfox
+
+	* lib/MyLibrary/: Config.pm, Resource.pm, Term.pm: Added some error
+	  checking to resource_locations() method. Also tweaked Config.pm -
+	  RJF
+
+2004-06-30 18:14  rfox
+
+	* lib/MyLibrary/Term.pm: Added sort() method. - RJF
+
+2004-06-28 16:58  rfox
+
+	* lib/MyLibrary/Term.pm: Added documentation for sort parameter in
+	  suggested_resources() method. - RJF
+
+2004-06-28 16:55  rfox
+
+	* lib/MyLibrary/Term.pm: Added sort parameter to
+	  suggested_resources() method. - RJF
+
+2004-06-23 08:50  rfox
+
+	* lib/MyLibrary/Librarian.pm: Fixed problem in the commit() method
+	  relating to term ids. - RJF
+
+2004-06-22 16:05  rfox
+
+	* lib/MyLibrary/: Facet.pm, Resource.pm, Term.pm,
+	  Resource/Location.pm: Added several required delete_[attribute
+	  name]() methods. Updated tests and docs. - RJF
+
+2004-06-22 10:25  rfox
+
+	* lib/MyLibrary/Term.pm: Fixed delete related resources bug in
+	  commit(). - RJF
+
+2004-06-17 16:05  rfox
+
+	* lib/MyLibrary/Config.pm: Added many config parameters. - RJF
+
+2004-06-16 10:29  rfox
+
+	* lib/MyLibrary/Librarian.pm: Fixed bug in term_ids() method. - RJF
+
+2004-06-15 13:56  rfox
+
+	* lib/MyLibrary/Librarian.pm: Added sort parameter to term_ids()
+	  method in Librarian.pm. - RJF
+
+2004-06-15 11:10  rfox
+
+	* lib/MyLibrary/Harvester.pm: Removing file due to alternate
+	  development path chosen. - RJF
+
+2004-06-15 10:59  rfox
+
+	* lib/MyLibrary/Alert.pm: Placing into archive because another
+	  development path was chosen. - RJF
+
+2004-06-15 10:48  rfox
+
+	* lib/MyLibrary/: Facet.pm, Librarian.pm: Updated some
+	  documentation. - RJF
+
+2004-06-14 16:23  rfox
+
+	* lib/MyLibrary/Librarian.pm: Fixed bug in term_ids() method
+	  relating back to the term id reference bug. - RJF
+
+2004-06-14 16:17  rfox
+
+	* lib/MyLibrary/Librarian.pm: Fixed bug in commit() method
+	  regarding a reference assignment for term ids. - RJF
+
+2004-06-11 10:20  rfox
+
+	* lib/MyLibrary/Librarian.pm: Fixed an error in the Librarian.pm
+	  new() method. - RJF
+
+2004-06-10 11:46  rfox
+
+	* lib/MyLibrary/Facet.pm: Corrected delete() method so that related
+	  terms are also deleted. - RJF
+
+2004-06-10 10:11  rfox
+
+	* lib/MyLibrary/Term.pm: Corrected bug in librarians() method. -
+	  RJF
+
+2004-06-09 16:52  rfox
+
+	* lib/MyLibrary/Librarian.pm, lib/MyLibrary/Resource.pm,
+	  lib/MyLibrary/Term.pm, t/Term.t: Corrected commit() Librarian.pm.
+	  Added parameters to librarians() method Term.pm. Corrected
+	  documentation. - RJF
+
+2004-06-07 10:21  rfox
+
+	* lib/MyLibrary/Term.pm: Corrected exception handling routine for
+	  commit() method regarding suggested resources. - RJF
+
+2004-06-04 16:02  rfox
+
+	* lib/MyLibrary/Term.pm, t/Term.t: Added field, value parameters to
+	  get_terms() method. Updated tests. - RJF
+
+2004-06-04 15:42  rfox
+
+	* lib/MyLibrary/Facet.pm, t/Facet.t: Added field and value
+	  parameters to get_facets() method. Updated tests. - RJF
+
+2004-06-04 12:47  rfox
+
+	* lib/MyLibrary/Facet.pm, t/Facet.t: Added a sort parameter to the
+	  get_facets() method. - RJF
+
+2004-06-04 12:01  rfox
+
+	* lib/MyLibrary/Facet.pm: Cleaned up some code. Also: fixed
+	  database so that null is allowed for note field. - RJF
+
+2004-05-27 10:39  rfox
+
+	* lib/MyLibrary/Resource.pm: Deleted some unecessary code. - RJF
+
+2004-05-27 10:37  rfox
+
+	* lib/MyLibrary/Resource.pm: Minor tweaks. - RJF
+
+2004-05-27 10:01  rfox
+
+	* lib/MyLibrary/Resource/Location.pm: Added ORDER BY for retrieval
+	  of resource location ids in get_locations() method. - RJF
+
+2004-05-25 15:31  rfox
+
+	* lib/MyLibrary/Resource.pm: Added output parameter for
+	  get_resources() method plus documentation. - RJF
+
+2004-05-25 15:17  rfox
+
+	* lib/MyLibrary/Resource.pm: Removed some debugging code. - RJF
+
+2004-05-25 15:16  rfox
+
+	* lib/MyLibrary/Resource.pm: Changed method of determining list
+	  construnction for get_resources(). - RJF
+
+2004-05-25 14:57  rfox
+
+	* t/Resource.t: Added a couple of tests for field searching in
+	  get_resources() method. - RJF
+
+2004-05-25 14:57  rfox
+
+	* lib/MyLibrary/Resource.pm: Added functionality to get_resources()
+	  method allowing limited field searching. - RJF
+
+2004-05-24 14:51  rfox
+
+	* lib/MyLibrary/Term.pm: Fixed bug when all suggested resources
+	  deleted in suggested_resources() method. - RJF
+
+2004-05-24 10:25  rfox
+
+	* lib/MyLibrary/Resource.pm: Corrected bug in related_terms()
+	  method. - RJF
+
+2004-05-21 15:14  rfox
+
+	* lib/MyLibrary/Resource.pm: Added deletion of suggested flags for
+	  resource deletion and resource -> term deletions. RJF
+
+2004-05-17 14:24  rfox
+
+	* lib/MyLibrary/Resource.pm: Added a small amount of documentation.
+	  - RJF
+
+2004-05-14 16:51  rfox
+
+	* lib/MyLibrary/Resource/Location.pm: Updated some documentation. -
+	  RJF
+
+2004-04-19 08:50  rfox
+
+	* lib/MyLibrary/Term.pm, t/Term.t: Added librarians() class method
+	  to retrieve related librarian objects. - RJF
+
+2004-04-16 16:52  rfox
+
+	* lib/MyLibrary/Librarian.pm, t/Librarian.t: Corrected several bugs
+	  in term_ids() and commit() methods. - RJF
+
+2004-04-16 12:30  rfox
+
+	* lib/MyLibrary/Librarian.pm, t/Librarian.t, t/Term.t: Updated and
+	  enhanced many subroutines. Added error checking. Updated tests.
+	  RJF
+
+2004-04-15 08:20  rfox
+
+	* lib/MyLibrary/Librarian.pm: Updated methods and documentation. -
+	  RJF
+
+2004-04-13 08:52  rfox
+
+	* lib/MyLibrary/Librarian.pm, t/Librarian.t: Updated some methods
+	  and corresponding tests. - RJF
+
+2004-04-13 08:41  rfox
+
+	* t/Librarian.t: Updated tests. - RJF
+
+2004-04-12 16:08  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm:
+	  Worked on File.pm and Record.pm will fix all tests tomorrow. JDH
+
+2004-04-12 09:03  dhuckleby
+
+	* t/Harvester.t:
+	  Update to record.pm jdh
+
+2004-04-08 12:43  dhuckleby
+
+	* t/Harvester.t:
+	  Added DC Methods to Record.pm and Tests to Harvester.t to
+	  correspond to the new methods. JDH
+
+2004-04-06 16:53  emorgan
+
+	* ChangeLog, MANIFEST: Simply updated these files.
+
+2004-04-06 16:48  emorgan
+
+	* lib/MyLibrary/Alert.pm, t/Alert.t: Added many methods to
+	  Alert.pm. Worked hardest on the execute method. Need a way to
+	  nullify the value of an alerter attribute value. Many of the
+	  methods seem too database dependent. Hmmm...
+
+2004-04-06 15:44  rfox
+
+	* lib/MyLibrary/Harvester.pm: Some cleanup. - RJF
+
+2004-04-06 14:41  rfox
+
+	* lib/MyLibrary/Harvester.pm, t/Harvester.t: Created Record.pm
+	  module. Modified Harvester.pm, OAI.pm and tests. - RJF
+
+2004-04-05 16:49  emorgan
+
+	* t/Alert.t: Added bunches o' tests as well as sample data.
+
+2004-04-05 16:48  emorgan
+
+	* lib/MyLibrary/Alert.pm: Added many methods such as
+	  get_all_locations, get_all_media, get_all_languages. Started
+	  enabling execute.
+
+2004-04-05 15:42  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm, t/Harvester.t:
+	  Added Record.pm
+
+2004-04-05 11:48  rfox
+
+	* t/Harvester.t: Changed collection() method so that it returns
+	  array, modified test, etc. - RJF
+
+2004-04-05 10:34  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm, t/Harvester.t:
+	  Update as of 04/05/04 11:25
+
+2004-04-05 09:01  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm, t/Harvester.t:
+	  Added POD to OAI.pm and will complete more tests soon
+
+2004-04-01 17:13  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm:
+	  Added methods(connection and collect) to OAI.pm
+
+2004-04-01 16:37  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm, t/Harvester.t:
+	  Added the collect method with test.
+
+2004-04-01 15:56  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm, t/Harvester.t:
+	  Added Connection Method to Harvester.pm.
+
+2004-04-01 11:06  emorgan
+
+	* MANIFEST: Updated the manifest.
+
+2004-04-01 09:32  rfox
+
+	* ChangeLog, lib/MyLibrary/Harvester.pm: Modified module include
+	  procedure for child classes. - RJF
+
+2004-04-01 09:15  rfox
+
+	* lib/MyLibrary/Harvester.pm, t/Harvester.t: Fixed some issues with
+	  inheretance. Updated tests. - RJF
+
+2004-04-01 09:08  rfox
+
+	* t/Harvester.t: Initial creation of harvester test routines. - RJF
+
+2004-03-31 20:09  dhuckleby
+
+	* lib/MyLibrary/Harvester.pm:
+	  Initial add of work done By David and Rob on MyLibrary::Harvester
+
+2004-03-30 20:33  dhuckleby
+
+	* t/User.t: Update.
+
+2004-03-30 20:29  rfox
+
+	* t/User.t: Update.
+
+2004-03-30 16:29  emorgan
+
+	* lib/MyLibrary/Alert.pm, t/Alert.t: Added output and sort_by
+	  methods.
+
+2004-03-30 15:25  emorgan
+
+	* lib/MyLibrary/Alert.pm, t/Alert.t: Begun adding the Alert
+	  service.
+
+2004-03-30 10:53  emorgan
+
+	* lib/MyLibrary/: Alert.pm, Harvester.pm: Started added framework
+	  for What's New Service a la OCKHAM.
+
+2004-03-04 16:29  rfox
+
+	* t/Resource.t: Changed on of the tests. - RJF
+
+2004-03-04 16:22  rfox
+
+	* lib/MyLibrary/Resource.pm, t/Resource.t: Added test_relation()
+	  method to Resource.pm along with tests. - RJF
+
+2004-03-03 12:09  rfox
+
+	* lib/MyLibrary/Resource.pm, t/Resource.t: Added get_ids() method
+	  to Resource.pm; updated tests. - RJF
+
+2004-03-02 15:15  rfox
+
+	* ChangeLog, lib/MyLibrary/Resource.pm: Updated ChangeLog and
+	  tweaked Resource.pm module. - RJF
+
+2004-03-02 11:34  rfox
+
+	* lib/MyLibrary/Resource.pm, lib/MyLibrary/Resource/Location.pm,
+	  t/Resource.t: Several modifications were made to methods for
+	  resource locations. - RJF
+
+2004-02-24 13:42  rfox
+
+	* lib/MyLibrary/: Resource.pm, Resource/Location.pm: Killed another
+	  bug in get_locations() and resource_locations() respectively. -
+	  RJF
+
+2004-02-20 17:22  rfox
+
+	* t/Term.t: Updated tests. - RJF
+
+2004-02-20 17:19  rfox
+
+	* lib/MyLibrary/Term.pm: Fixed serious bug in constructor method. -
+	  RJF
+
+2004-02-20 15:03  rfox
+
+	* lib/MyLibrary/Resource.pm, lib/MyLibrary/Resource/Location.pm,
+	  t/Resource.t: Added get_location() method to Resource.pm and
+	  updated Location.pm. - RJF
+
+2004-02-19 16:48  rfox
+
+	* lib/MyLibrary/Resource.pm, lib/MyLibrary/Resource/Location.pm,
+	  t/Location.t: Modified some database related functions and
+	  associated module tests. - RJF
+
+2004-02-19 12:03  rfox
+
+	* lib/MyLibrary/Resource.pm, t/Resource.t: Added more return codes
+	  to add_location() and tweaked test. - RJF
+
+2004-02-19 10:08  rfox
+
+	* lib/MyLibrary/: Resource.pm, Resource/Location.pm: Added strict
+	  => 'off' option for resource_id() method in Location.pm. - RJF
+
+2004-02-18 17:03  rfox
+
+	* lib/MyLibrary/Resource.pm: Added some documentation for the new
+	  location methods. - RJF
+
+2004-02-18 16:44  rfox
+
+	* lib/MyLibrary/Resource.pm: More tweaking of the commit() method.
+	  - RJF
+
+2004-02-18 16:26  rfox
+
+	* lib/MyLibrary/Resource.pm: Modified commit() and add_resource()
+	  methods to check for $self->id(). - RJF
+
+2004-02-18 14:44  rfox
+
+	* lib/MyLibrary/Resource/Location.pm, t/Location.t, t/Resource.t:
+	  Cleaned up several tests and created more robust tests. - RJF
+
+2004-02-18 12:23  rfox
+
+	* lib/MyLibrary/Resource/Location.pm, t/Location.t: Changed the key
+	  id increment for location types and added private method. - RJF
+
+2004-02-18 10:53  rfox
+
+	* ChangeLog, lib/MyLibrary/Resource.pm, t/Resource.t: Tweaked
+	  modify_location() and delete_location() methods, updated docs. -
+	  RJF
+
+2004-02-18 08:57  rfox
+
+	* t/Location.t: Tests for the new Resource/Location module. - RJF
+
+2004-02-18 08:56  rfox
+
+	* t/Resource.t: Added several tests to accomodate the new location
+	  methods. - RJF
+
+2004-02-18 08:55  rfox
+
+	* lib/MyLibrary/Resource.pm: Added several methodes dealing with
+	  location manipulation. - RJF
+
+2004-02-18 08:54  rfox
+
+	* lib/MyLibrary/Resource/Location.pm: Added sub-class
+	  'Resource/Location' to handle multiple locations per resource. -
+	  RJF
+
+2004-02-06 16:52  rfox
+
+	* lib/MyLibrary/: Patron.pm, Term.pm: Added a lot of documentation
+	  in Patron.pm. Tweaked docs in Term.pm. - RJF
+
+2004-02-06 14:53  rfox
+
+	* lib/MyLibrary/Patron.pm, t/Patron.t: Altered tests; Added
+	  functionality to several existing methods; Clean up; - RJF
+
+2004-01-27 11:06  rfox
+
+	* ChangeLog, lib/MyLibrary/Resource.pm, t/Resource.t: Added list =>
+	  [@resource_ids] to get_resource() class method. - RJF
+
+2004-01-27 09:13  rfox
+
+	* lib/MyLibrary/Facet.pm, t/Facet.t: Added sort parameter to
+	  Facet.pm. Updated tests and docs. - RJF
+
+2004-01-27 08:34  rfox
+
+	* lib/MyLibrary/Facet.pm, lib/MyLibrary/Resource.pm,
+	  lib/MyLibrary/Term.pm, t/Resource.t, t/Term.t: Standardized sort
+	  parameters and updated tests. - RJF
+
+2004-01-26 21:50  rfox
+
+	* ChangeLog, lib/MyLibrary/Term.pm, t/Term.t: Added sort =>
+	  alpha_name to Term.pm; modified tests. - RJF
+
+2004-01-26 16:52  rfox
+
+	* lib/MyLibrary/Resource.pm, t/Resource.t: Added sort => 'alpha'
+	  parameter to get_resources() class method. - RJF
+
+2004-01-23 12:35  rfox
+
+	* ChangeLog, lib/MyLibrary/Facet.pm, lib/MyLibrary/Resource.pm,
+	  lib/MyLibrary/Term.pm, t/Resource.t, t/Term.t: Fixed issues with
+	  get_* class methods and updated tests. - RJF
+
+2004-01-22 11:52  rfox
+
+	* ChangeLog, t/Resource.t: Enhanced get_fkey() test in Resource.t
+	  and updated docs. - RJF
+
+2004-01-22 11:34  rfox
+
+	* lib/MyLibrary/: Facet.pm, Resource.pm: Tweaked some documentation
+	  and tests. - RJF
+
+2004-01-20 14:27  rfox
+
+	* lib/MyLibrary/Resource.pm, t/Resource.t: get_lcd() method renamed
+	  lcd_resources() and heavily modified. Tests updated. - RJF
+
+2004-01-16 12:44  rfox
+
+	* ChangeLog, lib/MyLibrary/Resource.pm, lib/MyLibrary/Term.pm:
+	  Fixed some bugs in related_resources() and related_terms()
+	  methods. - RJF
+
+2004-01-16 09:52  rfox
+
+	* ChangeLog: Updated ChangeLog. - RJF
+
+2004-01-16 09:50  rfox
+
+	* lib/MyLibrary/Resource.pm: Tweaked reference_linking() method. -
+	  RJF
+
+2004-01-16 09:34  rfox
+
+	* lib/MyLibrary/Resource.pm, t/Resource.t: Added get_fkey() class
+	  method and updated docs and test file. - RJF
+
+2004-01-13 12:32  rfox
+
+	* ChangeLog, lib/MyLibrary/Resource.pm: Updated documentation for
+	  get_lcd() class method. - RJF
+
+2004-01-13 12:24  rfox
+
+	* lib/MyLibrary/Resource.pm, lib/MyLibrary/Term.pm, t/Resource.t:
+	  Added get_lcd() class method to Resource.pm as well as additional
+	  tests. - RJF
+
+2004-01-13 12:06  rfox
+
+	* ChangeLog, lib/MyLibrary/Term.pm, t/Term.t: Added
+	  suggested_resources() method to Term.pm, plus additional tests
+	  and docs. - RJF
+
+2004-01-12 12:06  rfox
+
+	* ChangeLog: Updated Changelog. - RJF
+
+2004-01-12 12:04  rfox
+
+	* t/Resource.t: Added new tests for related_terms method. - RJF
+
+2004-01-12 12:04  rfox
+
+	* lib/MyLibrary/: DB.pm, Facet.pm, Term.pm: Updated some
+	  documentaion. - RJF
+
+2004-01-12 12:00  rfox
+
+	* lib/MyLibrary/: Resource.pm, Term.pm: Added related_terms()
+	  method to Resource.pm. Tweaked Term.pm. - RJF
+
+2004-01-12 09:05  rfox
+
+	* lib/MyLibrary/: Facet.pm, Resource.pm, Term.pm: Updated synopsis
+	  documentation sections. - RJF
+
+2004-01-12 08:42  rfox
+
+	* lib/MyLibrary/Term.pm: Modified delete() method of Term.pm. - RJF
+
+2004-01-12 08:22  rfox
+
+	* ChangeLog, lib/MyLibrary/Facet.pm: Updated ChangeLog and
+	  documentation. - RJF
+
+2004-01-09 15:40  rfox
+
+	* t/Term.t: Updated Term tests to accomodate new related_resources
+	  method. - RJF
+
+2004-01-09 15:35  rfox
+
+	* lib/MyLibrary/: Facet.pm, Resource.pm, Term.pm: Modified error
+	  checking and added related_resources method to Term.pm - RJF
+
+2004-01-08 13:29  rfox
+
+	* lib/MyLibrary/: Facet.pm, Librarian.pm, Message.pm, Patron.pm,
+	  Resource.pm, Review.pm, Term.pm: Revised error checking routine
+	  in commit() methods. - RJF
+
+2004-01-08 13:10  rfox
+
+	* lib/MyLibrary/Facet.pm: Updated error checking in the commit()
+	  method. - RJF
+
+2004-01-07 17:46  rfox
+
+	* ChangeLog: Updated change log. - RJF
+
+2004-01-07 17:44  rfox
+
+	* t/Facet.t: Added specialized tests for related_terms() method. -
+	  RJF
+
+2004-01-07 17:43  rfox
+
+	* lib/MyLibrary/Facet.pm: Added related_terms() method. - RJF
+
+2004-01-07 14:33  rfox
+
+	* lib/MyLibrary/Facet.pm: Added some module documentation. - RJF
+
+2004-01-07 14:14  rfox
+
+	* t/Resource.t: Added several tests and tweaked other ones. - RJF
+
+2004-01-07 14:11  rfox
+
+	* lib/MyLibrary/DB.pm: Added some error checking routines. - RJF
+
+2004-01-07 12:53  rfox
+
+	* ChangeLog: Added notes about Resource.pm module changes, convert
+	  script changes, etc. - RJF
+
+2004-01-07 12:48  rfox
+
+	* t/Resource.t: Added several tests to accomodate new methods in
+	  module. - RJF
+
+2004-01-07 12:47  rfox
+
+	* lib/MyLibrary/Resource.pm: Added several attribute methods to the
+	  module. - RJF
+
+2004-01-07 10:10  rfox
+
+	* ChangeLog: Updated the changelog. - RJF
+
+2004-01-05 17:17  rfox
+
+	* t/: Facet.t, Resource.t: Updated tests. - RJF
+
+2004-01-05 17:15  rfox
+
+	* lib/MyLibrary/Resource.pm: Added functionality to Resource
+	  constructor. Updated tests. - RJF
+
+2004-01-05 16:28  rfox
+
+	* lib/MyLibrary/Facet.pm: Modified constructor to create object
+	  based on name parameter, and tweaked the test. - RJF
+
+2003-12-02 16:34  rfox
+
+	* lib/MyLibrary/Config.pm, lib/MyLibrary/Term.pm, t/Term.t: Added
+	  functionality to Term constructor. Updated tests. - RJF
+
+2003-11-24 15:08  rfox
+
+	* ChangeLog: Updated ChangeLog.
+
+2003-11-21 11:55  rfox
+
+	* lib/MyLibrary/: Interface.pm, Patron.pm, Interface/Admin.pm:
+	  Updated Patron object syntax and Admin class methods. - RJF
+
+2003-11-20 17:06  rfox
+
+	* lib/MyLibrary/: Config.pm, Interface/Admin.pm: Added some
+	  functionality to the edit function. - RJF
+
+2003-10-31 16:32  emorgan
+
+	* MANIFEST: Added a sample script that creates, finds, edits, and
+	  deletes facets.
+
+2003-10-31 11:03  emorgan
+
+	* MANIFEST, lib/MyLibrary/Review.pm, t/Review.t: Simply add a
+	  review package.
+
+2003-10-30 15:30  emorgan
+
+	* ChangeLog, MANIFEST, Makefile.PL, lib/MyLibrary/Auth.pm,
+	  lib/MyLibrary/Config.pm, lib/MyLibrary/DB.pm,
+	  lib/MyLibrary/Facet.pm, lib/MyLibrary/Interface.pm,
+	  lib/MyLibrary/Librarian.pm, lib/MyLibrary/Message.pm,
+	  lib/MyLibrary/Patron.pm, lib/MyLibrary/Resource.pm,
+	  lib/MyLibrary/Term.pm, lib/MyLibrary/Auth/Basic.pm,
+	  lib/MyLibrary/Auth/LDAPS.pm, lib/MyLibrary/Interface/Admin.pm,
+	  lib/MyLibrary/Interface/User.pm, t/Config.t, t/DB.t, t/Facet.t,
+	  t/Librarian.t, t/Message.t, t/Patron.t, t/Resource.t, t/Term.t,
+	  t/User.t: Initial revision
+
+2003-10-30 15:30  emorgan
+
+	* ChangeLog, MANIFEST, Makefile.PL, lib/MyLibrary/Auth.pm,
+	  lib/MyLibrary/Config.pm, lib/MyLibrary/DB.pm,
+	  lib/MyLibrary/Facet.pm, lib/MyLibrary/Interface.pm,
+	  lib/MyLibrary/Librarian.pm, lib/MyLibrary/Message.pm,
+	  lib/MyLibrary/Patron.pm, lib/MyLibrary/Resource.pm,
+	  lib/MyLibrary/Term.pm, lib/MyLibrary/Auth/Basic.pm,
+	  lib/MyLibrary/Auth/LDAPS.pm, lib/MyLibrary/Interface/Admin.pm,
+	  lib/MyLibrary/Interface/User.pm, t/Config.t, t/DB.t, t/Facet.t,
+	  t/Librarian.t, t/Message.t, t/Patron.t, t/Resource.t, t/Term.t,
+	  t/User.t: first import, sort of
+

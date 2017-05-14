@@ -1,0 +1,46 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF User Guide: Modules and Libraries</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_sdadv.html">Previous Topic</A> | <A HREF="in_omgmt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.2. Modules and Libraries</H1>
+<HR>
+<H2><A NAME="Modules">6.2.1. Modules</A></H2>
+<P><A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> can be extended by using <EM>modules</EM>. A module is a normal <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> file which typically contains reusable entities like <EM>macros</EM>, <EM>filters</EM> and <EM>styles</EM>. Modules are loaded by the <A HREF="../ref/muse.html">use</A> macro. For example:</P>
+<PRE>
+   !use &quot;delphi&quot;
+</PRE>
+<P>By convention, modules are given the <EM>sdm</EM> extension. The <A HREF="../ref/muse.html">use</A> macro adds this extension if none is provided. Modules can also be loaded by using <A HREF="../ref/sdf.html">sdf</A>'s -u option.</P>
+<HR>
+<H2><A NAME="Libraries">6.2.2. Libraries</A></H2>
+<P>A collection of related modules can be placed into a <EM>library</EM> which is simply a subdirectory under the <EM>sdf/home</EM> directory on Perl's library path. Libraries can be loaded by the <A HREF="../ref/minherit.html">inherit</A> macro which essentially does the following:</P>
+<OL>
+<LI>appends the matching directory onto the <EM>include path</EM>
+<LI>loads the matching <EM>main module</EM>.</OL>
+<P>For example:</P>
+<PRE>
+   !inherit &quot;images&quot;
+</PRE>
+<OL>
+<LI>appends sdf/home/images onto the include path
+<LI>loads the sdf/home/images/images.sdm module.</OL>
+<HR>
+<H2><A NAME="The Configuration Library">6.2.3. The Configuration Library</A></H2>
+<P>After loading the standard library (<EM>stdlib</EM>), <A HREF="http://www.mincom.com/mtr/sdf/">SDF</A> loads the configuration library, if any. This is typically specified via the <EM>OPT_CONFIG</EM> variable being initialised on the top line of the file via the <A HREF="../ref/minit.html">init</A> macro. It can also be set via <A HREF="../ref/sdf.html">sdf</A>'s -c option.</P>
+<P>While <A HREF="../ref/sdf.html">sdf</A> only supports a single configuration library, additonal libraries can be loaded via the <A HREF="../ref/minherit.html">inherit</A> macro. Furthermore, a library can inherit things from other libraries, making it easy to create new ones.</P>
+<HR>
+<P ALIGN="Center"><A HREF="ug_sdf.html">Contents</A> | <A HREF="in_sdadv.html">Parent Topic</A> | <A HREF="in_sdadv.html">Previous Topic</A> | <A HREF="in_omgmt.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

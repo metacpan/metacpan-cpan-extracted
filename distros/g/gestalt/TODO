@@ -1,0 +1,12 @@
+
+In no particular order:
+
+Make gestalt (the generator) also produce a top-level Makefile.PL
+so that the user may use autoconf and/or perl's build system.
+
+Change the Dispatcher so that it can be sub-classed more
+easily.
+
+Need more user documentation.
+
+Need better info on the trac website.

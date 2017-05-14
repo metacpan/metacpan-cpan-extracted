@@ -8,7 +8,7 @@
 <span><img src="cid:key:skins/common/key.png" /></span>
 <b>$password</b>
 <TMPL_ELSE>
-<lang en="Your password was changed." fr="Votre mot de passe a été changé." /> 
+<lang en="Your password was changed." fr="Votre mot de passe a &eacute;t&eacute; chang&eacute;." /> 
 </TMPL_IF>
 </p>
 

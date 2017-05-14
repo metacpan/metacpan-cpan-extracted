@@ -11,7 +11,6 @@
 #include <unicode/ustring.h>
 
 #include "tconv/convert/ICU.h"
-/* Because this is a built-in, it can take advantage of TCONV_TRACE macro */
 #include "tconv_config.h"
 
 #define TCONV_ICU_IGNORE   "//IGNORE"
@@ -464,7 +463,7 @@ size_t tconv_convert_ICU_run(tconv_t tconvp, void *voidp, char **inbufpp, size_t
   static const char            funcs[]  = "tconv_convert_ICU_run";
   tconv_convert_ICU_context_t *contextp = (tconv_convert_ICU_context_t *) voidp;
   char                        *dummys   = "";
-  size_t                       rcl      = 0;
+  size_t                       rcl;
   char                        *inbufp;
   size_t                       inbytesleftl;
   char                        *outbufp;
@@ -535,6 +534,8 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
   static const char funcs[]      = "_tconv_convert_ICU_run";
   const char       *inbufLimitp  = (const char *) (*inbufpp + *inbytesleftlp);
   const char       *outbufLimitp = (const char *) (*outbufpp + *outbytesleftlp);
+  /* We consider that with ICU the number of non-reversible characters is 0 */
+  size_t            rcl = 0;
 
   /* Variables */
   const char       *inbufOrigp;
@@ -547,7 +548,6 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
   UBool             fromSawEndOfBytesb;
   int32_t           textCapacityl;
   int32_t           limitl;
-  size_t            rcl;
 
   TCONV_TRACE(tconvp, "%s - *inbytesleftlp=%lld *outbytesleftlp=%lld flushb=%s",
 	      funcs,
@@ -560,7 +560,6 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
   /* Credits to the uconv.cpp team.                                        */
   /* --------------------------------------------------------------------- */
 
-  rcl    = 0;
   do {
     uCharBufp      = (UChar *) (contextp->uCharBufOrigp + contextp->uCharBufLengthl);
     uCharBufLimitp = contextp->uCharBufLimitp;
@@ -702,6 +701,7 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
                                &limitl,
                                &uErrorCode);
             if (U_FAILURE(uErrorCode)) {
+              errno = EINVAL;
               goto err;
             }
           }
@@ -795,17 +795,27 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
       int32_t consumedl        = uCharBufp - *upp;
       int32_t remainingLengthl = *uLengthlp - consumedl;
 
+      /*
       rcl += u_countChar32(*upp, consumedl);
+      */
       if (remainingLengthl > 0) {
         memmove(*upp, uCharBufp, remainingLengthl * sizeof(UChar));
       }
       *uLengthlp -= consumedl;
     }
+
+    /*
     TCONV_TRACE(tconvp, "%s - %10lld UChars => %10lld bytes (%lld characters), remains %lld UChars",
                 funcs,
                 (unsigned long long) (uCharBufp - *upp),
                 (unsigned long long) (*outbufpp - outbufOrigp),
                 (unsigned long long) rcl,
+                (unsigned long long) (uCharBufLimitp - uCharBufp));
+    */
+    TCONV_TRACE(tconvp, "%s - %10lld UChars => %10lld bytes, remains %lld UChars",
+                funcs,
+                (unsigned long long) (uCharBufp - *upp),
+                (unsigned long long) (*outbufpp - outbufOrigp),
                 (unsigned long long) (uCharBufLimitp - uCharBufp));
 
     if (uErrorCode == U_BUFFER_OVERFLOW_ERROR) {
@@ -813,6 +823,7 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
       rcl     = (size_t)-1;
       goto overflow;
     } else if (U_FAILURE(uErrorCode)) {
+      errno = EINVAL;
       goto err;
     }
 

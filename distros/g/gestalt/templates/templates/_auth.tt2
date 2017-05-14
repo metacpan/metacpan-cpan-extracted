@@ -1,0 +1,9 @@
+[% IF CFG.authLevel() == 'mixed' || CFG.authLevel() == 'login' %]
+  [% IF SESSION.auth.username %]
+    Logged in as [% SESSION.auth.username %]. Click <a href="[% REQUEST.location() %]/[% CFG.authController() %]">Here</a> to change
+  [% ELSE %]
+    Not logged in. Click <a href="[% REQUEST.location() %]/[% CFG.authController() %]">Here</a> to login.
+  [% END %]
+[% ELSE %]
+&nbsp;
+[% END %]

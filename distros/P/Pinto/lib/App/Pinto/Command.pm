@@ -14,7 +14,7 @@ use App::Cmd::Setup -command;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.097'; # VERSION
 
 #-----------------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ sub validate_args {
 sub execute {
     my ( $self, $opts, $args ) = @_;
 
-    my %args = $self->process_args($opts, $args);
+    my %args = $self->process_args($args);
     my $result = $self->pinto->run( $self->action_name, %{$opts}, %args );
 
     return $result->exit_status;
@@ -64,11 +64,11 @@ sub execute {
 #-----------------------------------------------------------------------------
 
 sub process_args {
-    my ( $self, $opts, $args ) = @_;
+    my ( $self, $args ) = @_;
 
     my $attr_name = $self->args_attribute or return;
 
-    if ( !@{$args} && $self->args_from_stdin($opts) ) {
+    if ( !@{$args} && $self->args_from_stdin ) {
         return ( $attr_name => [ _args_from_fh( \*STDIN ) ] );
     }
 
@@ -139,7 +139,7 @@ App::Pinto::Command - Base class for pinto commands
 
 =head1 VERSION
 
-version 0.12
+version 0.097
 
 =head1 AUTHOR
 
@@ -147,7 +147,7 @@ Jeffrey Ryan Thalhammer <jeff@stratopan.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+This software is copyright (c) 2013 by Jeffrey Ryan Thalhammer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

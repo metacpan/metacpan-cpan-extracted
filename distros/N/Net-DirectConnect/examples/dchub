@@ -1,40 +1,44 @@
 #!/usr/bin/perl -w
-#$Id: dchub 794 2011-06-17 17:48:15Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/dchub $
+#$Id: dchub 998 2013-08-14 12:21:20Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/dchub $
 
 =r
 
 dev hub test
 
 =cut
+
 use strict;
+no strict qw(refs);
+use warnings "NONFATAL" => "all";
+no warnings qw(uninitialized);
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+use Time::HiRes;
 use Data::Dumper;    #dev only
 $Data::Dumper::Sortkeys = $Data::Dumper::Useqq = $Data::Dumper::Indent = 1;
 use lib::abs '../lib';
 use Net::DirectConnect::hub;
-#use lib::abs '../lib';
-#use lib::abs '../TigerHash/lib';
-#use lib './stat/pslib';
-#use psmisc;
 our %config;
 use Net::DirectConnect::pslib::psmisc;
 psmisc->import(qw(:log));
 psmisc::configure();
 #my $dc = Net::DirectConnect::hub->new( no_print => undef, );
 my $dc = Net::DirectConnect->new(
-  'protocol' => 'adc',
-  hub        => 1,
-  no_print   => undef,
-  myport     => 413,
-  #Proto     => 'sctp',
-  'log'      => sub {
+  protocol => 'adc',
+  hub      => 1,
+  no_print => undef,
+  myport   => 413,
+  log      => sub {
     my $dc = ref $_[0] ? shift : {};
     #psmisc::printlog shift(), $dc->{'number'}, join ' ', psmisc::human('time'), @_, "\n";
     psmisc::printlog shift(), "[$dc->{'number'}]", @_,;
   },
-  'auto_work' => sub {
+  auto_work => sub {
     my $dc = shift;
+    #warn('hubwork');
+    #Time::HiRes::sleep 0.1;
   },
-  %{ $config{dc} || {} },
+  %{ $config{dc} },
+  %{ $config{dchub} },
 );
 #$dc->work(100);      #seconds
 
@@ -52,4 +56,5 @@ while ( $dc->active() ) {
 #$dc->wait_finish();
 $dc->disconnect();
 =cut
+
 #$dc = undef;

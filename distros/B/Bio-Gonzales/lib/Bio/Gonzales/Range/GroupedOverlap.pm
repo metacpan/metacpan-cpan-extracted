@@ -10,7 +10,7 @@ use 5.010;
 
 use Bio::Gonzales::Range::Overlap;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 has _trees => ( is => 'rw', default => sub { {} } );
 has keep_coords => ( is => 'rw', default => 1 );

@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+README
+TODO
+debian/changelog
+debian/control
+debian/copyright
+debian/rules
+samples
+t/samples.t
+testnum
+Words2Nums.pm
+META.yml                                 Module meta-data (added by MakeMaker)

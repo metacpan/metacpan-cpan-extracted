@@ -1,4 +1,4 @@
-This is Boulder version 1.15.
+This is the Boulder IO package.
 
 Boulder provides a simple stream-oriented format for transmitting data
 objects between one or more processes.  It does not provide for the
@@ -31,4 +31,4 @@ for more information.  See the eg/ directory for some practical
 examples.
 
 Lincoln Stein
-12/02/98
+lstein@cshl.org

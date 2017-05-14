@@ -1,0 +1,55 @@
+# NAME
+
+Crypt::HC128 - Perl extension module for the HC-128 stream cipher based on wolfssl  
+
+# SYNOPSIS
+
+    use Crypt::HC128;
+
+# DESCRIPTION
+
+Perl extension module for the HC-128 stream cipher based on wolfssl. 
+
+## EXPORT
+
+None by default.
+
+## Exportable constants
+
+    HC128_ENC_TYPE
+
+## Exportable functions
+
+    int Hc128_Process(HC128*, byte*, const byte*, word32)
+    int Hc128_SetKey(HC128*, const byte* key, const byte* iv)
+
+# NAME
+
+Crypt::HC128 - Perl extension for HC-128 stream cipher
+
+# SEE ALSO
+
+    L<Chapter 18: wolfCrypt API Reference|https://wolfssl.com/wolfSSL/Docs-wolfssl-manual-18-17-wolfcrypt-api-hc128.html>
+
+# AUTHOR
+
+Li ZHOU, <lzh@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Li ZHOU
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+# AUTHOR
+
+Li ZHOU <lzh@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Li ZHOU.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,41 @@
+use Test::More qw(no_plan);
+use strict;
+use warnings;
+use lib 't';
+use_ok('Authen::Bitcard');
+use Test::AuthClient;
+use Test::WWW::Mechanize;
+
+my $agent = Test::WWW::Mechanize->new();
+
+ok(Authen::Bitcard->set_config(Test::AuthClient->config_args), 'set config');
+
+ok(my $auth = Authen::Bitcard->new(), "new");
+
+$agent->get($auth->login_url);
+ok($agent->success, "got login page");
+$agent->set_visible('test', 'foo');
+$agent->click;
+
+my %q = URI::URL->new($agent->uri)->query_form;
+ok($q{t}, "got ticket");
+
+# simulate new request to the site server ...
+
+ok($auth = Authen::Bitcard->new(ticket => $q{t}), "new authclient, with ticket");
+ok($auth->is_authenticated, "is_authenticated");
+
+ok(my $session_id = $auth->session_id, "get session_id");
+
+## new request with the session_id
+#ok($auth = Authen::Bitcard->new(session_id => $session_id), "new authclient, with session_id");
+
+my $attribute = "foobar";
+ok($auth->set_attribute("test" => $attribute), "set_attribute");
+is($auth->get_attribute("test", "get_attribute"), $attribute, "get_attribute");
+
+ok($auth->delete_session, "delete session");
+
+# cleanup the session on the auth server
+my $return_url = "http://authtest.askask.com/?test=logout";
+$agent->get($auth->logout_url("return_url" => $return_url));

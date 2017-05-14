@@ -1,0 +1,14 @@
+.cvsignore
+COPYING
+INSTALL
+lib/VUser/SOAP.pm
+lib/VUser/SOAP/Dispatcher.pm
+lib/VUser/SOAP/Transport/HTTP.pm
+Makefile.PL
+MANIFEST			This list of files
+rc_scripts/gentoo-vsoapd
+rc_scripts/freebsd-vsoapd.sh
+sbin/gen-wsdl.pl
+sbin/vsoapc
+sbin/vsoapd
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,5 @@
+.# Title: variable set & substitute
+.let foo := 'bar'
+Line 1
+.echo Line 2 foo = \v{foo}
+Line 3

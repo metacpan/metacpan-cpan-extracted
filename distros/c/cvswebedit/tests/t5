@@ -1,0 +1,231 @@
+#! /usr/local/bin/perl -w
+
+use strict;
+use FileHandle;
+use Cwd;
+use vars qw($module $script $user $cvsroot);
+require 'tests/common.pl';
+
+
+my $scriptdir = cwd();
+chdir("tests/t5.tests");
+
+my @upload_download_tests = glob('*.orig');
+my $testfile;
+
+map( s/\.orig//, @upload_download_tests);
+
+foreach $testfile (@upload_download_tests) {
+
+    delete_cvs_file_if_exists($module, $testfile);
+    add_cvs_file($module, $testfile);
+    test_download_file($module, $testfile);
+    my $uploadfile = create_modified_file($module, $testfile);
+    test_upload_file($module, $testfile, $uploadfile);
+    delete_cvs_file_if_exists($module, $testfile);
+    
+}
+
+exit 0;
+
+sub delete_cvs_file_if_exists ($$) {
+    my ($module, $file) = @_;
+#    unlink $cvsroot.'/'.$module.'/'.$file; # FIXME, do it properly!
+}
+
+sub add_cvs_file($$) {
+    my ($module, $file) = @_;
+    # FIXME: we need a cvs radd command ...
+    my $filecontents = cwd()."/$file.orig";
+    VCS::CVS::radd(-module=>$module, -files=>[$file], -filecontents=>[$filecontents]);
+    print "Done\n";
+}
+
+sub create_modified_file($$) {
+    my ($module, $file) = @_;
+    
+    my $uploadfile = $file.".for.upload";
+    system "cp $file.orig $uploadfile";
+    system "echo This has been appended >> $uploadfile"; # FIXME yuk
+
+    return $uploadfile;
+}
+	
+sub test_download_file($$) {
+    my ($module, $file) = @_;
+    my $localfile = $file.".downloaded";
+    #RemoteCVSedit::
+    lock_and_download($module, $file, $localfile);
+    my $tmp ="diff -s $file.orig $localfile";
+    system $tmp;
+    print "$tmp\n";
+}
+
+sub test_upload_file($$) {
+    my ($module, $file, $uploadfile) = @_;
+    #RemoteCVSedit::
+    upload_and_unlock($module, $file, $uploadfile);
+
+}
+
+
+# FIXME: put the package back
+#package RemoteCVSedit;
+
+#use vars qw($module $script $user $cvsroot);
+#require 'tests/common.pl'; # FIXME duplicate require
+
+# returns a reference to the headers.
+# saves file in localfile.
+
+sub lock_and_download {
+    my ($module, $file, $localfile) = @_;
+    $ENV{'PATH_INFO'} = $module."/".$file;
+
+    my $fh = new FileHandle script()." edit=lock-and-download user=$user < /dev/null | ";
+    
+    die if !defined($fh);
+    my @ans = <$fh>;
+    close $fh;
+
+    # FIXME: doesn't check to see whether the script crashed.
+
+    print "# checking that cvswebedit has locked file and is offering us to edit\n";
+    my $download_ready = grep /edit=download-file/, @ans;
+    status($download_ready, "CVSWEBEDIT said the file was ready to download - @ans");
+
+    my $download_fh = new FileHandle
+	script()." edit=download-file user=$user < /dev/null | ";	
+    die if !defined($download_fh);
+
+    my @headers;
+    my $line;
+
+    while ($line = <$download_fh>) {
+	last if $line =~ m/^$/; 	# blank line separates headers/footers
+	push @headers, $line;
+    }
+
+    my $local_fh = new FileHandle $localfile, "w";
+    while ($line = <$download_fh>) {
+	print "LINE: ".$line."\n";
+	print $local_fh $line;
+    }
+    close $download_fh;
+    close $local_fh;
+    
+    return \@headers;
+
+}
+
+sub upload_and_unlock {
+    my ($module, $file, $localfile) = @_;
+    $ENV{'PATH_INFO'} = $module."/".$file;
+
+    my $fh = new FileHandle script()." edit=upload-and-unlock user=$user < /dev/null | ";
+    
+    die if !defined($fh);
+    my @ans = <$fh>;
+    close $fh;
+
+    # FIXME: doesn't check to see whether the script crashed.
+
+    print @ans;
+    return;
+#------------------
+
+    print "# checking that cvswebedit has locked file and is offering us to edit\n";
+    my $download_ready = grep /edit=download-file/, @ans;
+    status($download_ready, "CVSWEBEDIT said the file was ready to download - @ans");
+
+    my $download_fh = new FileHandle
+	script()." edit=download-file user=$user < /dev/null | ";	
+    die if !defined($download_fh);
+
+    my @headers;
+    my $line;
+
+    while ($line = <$download_fh>) {
+	last if $line =~ m/^$/; 	# blank line separates headers/footers
+	push @headers, $line;
+    }
+
+    my $local_fh = new FileHandle $localfile, "w";
+    while ($line = <$download_fh>) {
+	print "LINE: ".$line."\n";
+	print $local_fh $line;
+    }
+    close $download_fh;
+    close $local_fh;
+    
+    return \@headers;
+
+}
+
+
+sub script {
+    return "cd $scriptdir; perl $script ";
+
+}
+
+
+package VCS::CVS;
+
+use Carp;
+use Cwd;
+use File::Path;
+use File::Basename;
+
+# makes empty files and checks them in.
+sub radd {
+#    my $type = shift;
+    my %params = @_;
+    my $ocwd = cwd();
+
+    my $module = $params{'-module'} || carp "No module specified";
+    my @files = @{$params{'-files'}};
+# || carp "No files specified";
+    my $message = $params{'-message'} || "";
+    my @contents = @{$params{'-filecontents'}};
+
+    print "MODULE=$module\nFILES=".join(',',@files)." CONTENTS=@contents\n";
+
+    my $tmpdir = '/tmp/vcs/cvs';
+    mkpath $tmpdir;
+    chdir $tmpdir;
+
+    system "cvs co $module";
+    chdir dirname("$module/junk") || die $!;
+
+    print cwd()."\n";
+    my $cmd;
+    my $idx;
+    for ($idx=0; $idx <= $#files; $idx++) {
+	if (defined($contents[$idx])) {
+	    $cmd = "cp ".$contents[$idx]." ".$files[$idx]; # FIXME File::Copy
+	    print $cmd."\n";
+	    system $cmd;
+	} else {
+	    system("touch ".$files[$idx]);
+	}
+    }
+
+    # FIXME: consider the case where module contains directories
+    $cmd = "cvs add ". join(" ", @files);
+    print $cmd."\n";
+    system $cmd; #FIXME : status
+
+    $cmd = "cvs commit -m'".$message."' ".join(" ", @files);
+    print $cmd."\n";
+    system $cmd;  #FIXME : status
+
+    chdir $ocwd;
+    
+}
+
+
+
+
+
+
+

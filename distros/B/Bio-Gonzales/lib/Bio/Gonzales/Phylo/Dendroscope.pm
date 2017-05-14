@@ -15,7 +15,7 @@ use List::MoreUtils qw/any/;
 use List::Util qw/sum/;
 use Bio::Gonzales::Util::Graphics::Color::Generator;
 
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.0546'; # VERSION
 
 has file => ( is => 'rw', required => 1 );
 

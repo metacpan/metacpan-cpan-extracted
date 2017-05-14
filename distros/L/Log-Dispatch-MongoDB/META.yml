@@ -1,0 +1,19 @@
+---
+abstract: 'A MongoDB backend for Log::Dispatch'
+author:
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-MongoDB
+requires:
+  Log::Dispatch: 0
+  MongoDB: 0
+version: 0.001

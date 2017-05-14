@@ -1,4 +1,0 @@
-Error: Invalid function name.
-@function and() {
-^^^^^^^^^^^^^^^
-  /sass/spec/libsass-issues/issue_713/and/input.scss 1:1

@@ -1,0 +1,7 @@
+Revision history for Perl extension MongoDBx::Bread::Board::Container
+
+0.002 Wed. Mar. 2, 2011
+    - fixing this to work with Bread::Board 0.17
+
+0.001 Tues. Feb. 8, 2011
+    - first release

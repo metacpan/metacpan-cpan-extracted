@@ -1,0 +1,80 @@
+StockCar:
+  class:
+    name: "RA::UnitTest::Car"
+  dependencies:
+    make:
+      value: "Chevrolet"
+    model:
+      value: "Z06"
+    year:
+      value: 2007
+    engine:
+      service: "LS7Engine"
+    transmission:
+      service: "TremecT56Transmission"
+FastNFuriousCar:
+  class:
+    name: "RA::UnitTest::Car"
+  dependencies:
+    make:
+      value: "VIN BENZINE"
+    model:
+      value: "Z006"
+    year:
+      value: 2012
+    engine:
+      service: "RidiculouslyModdedLS7Engine"
+    transmission:
+      service: "TremecT56Transmission"
+LS7Engine:
+  class:
+    name: "RA::UnitTest::Engine"
+  dependencies:
+    make:
+      value: "GM"
+    year:
+      value: "2007"
+    model:
+      value: "LS7"
+    displacement:
+      value: 7000
+    cylinders: 
+      value: 8
+    horsepower:
+      value: 505
+TremecT56Transmission:
+  class: 
+    name: "RA::UnitTest::Transmission"
+  dependencies:
+    make:
+      value: "Tremec"
+    model:
+      value: "T56"
+    interface:
+      service: "Standard6SpeedHPattern"
+    forward_gears:
+      value: 6 
+    reverse_gears:
+      value: 1
+Standard6SpeedHPattern:
+  class:
+    name: "RA::UnitTest::6SpeedShifter"
+  dependencies:
+    pattern:
+      value: "H"
+RidiculouslyModdedLS7Engine:
+  class:
+    name: "RA::UnitTest::Engine"
+  dependencies:
+    make:
+      value: "Ridiculous Engines R' Us" 
+    year:
+      value: 2012
+    model: 
+      value: "LS200"
+    displacement:
+      value: 14000
+    cylinders: 
+      value: 16 
+    horsepower:
+      value: 2000 

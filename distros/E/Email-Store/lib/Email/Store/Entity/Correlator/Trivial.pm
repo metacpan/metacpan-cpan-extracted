@@ -1,4 +1,5 @@
 package Email::Store::Entity::Correlator::Trivial;
+use strict;
 
 sub get_person_order { 99 }
 sub get_person {

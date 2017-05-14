@@ -1,0 +1,47 @@
+NAME
+    File::Find::Rule::TTMETA - Find files based on Template Toolkit META
+    directives
+
+SYNOPSIS
+        use File::Find::Rule qw(:TTMETA);
+
+        my @files = find(ttmeta => { author => "darren chamberlain" },
+                         in => "/var/www/html");
+
+DESCRIPTION
+    "File::Find::Rule::TTMETA" extends "File::Find::Rule" to work with
+    Template Toolkit templates by providing access to template-specific
+    metadata.
+
+    "File::Find::Rule::TTMETA" adds a "ttmeta" method / keyword to
+    "File::Find::Rule". "ttmeta" takes a series of name, value tuples, each
+    of which is compared to the metadata for the file in question (a
+    "Template::Provider" instance attempts to treat each file as a template;
+    compile errors are silently skipped). A file matches if *each* element
+    of metadata defined in "ttmeta" is present. If there are multiple keys
+    defined, all must match for the file to be considered a match.
+
+    Values can be strings or regexes:
+
+        find(ttmeta => { VERSION => qr/^2\.\d+/ } => in => $dir);
+
+        File::Find::Rule->file
+                        ->ttmeta(color => "green", sheep => 3)
+                        ->in($dir);
+
+    More complex variables are not (currently) supported by this module,
+    even though "Template::Document" supports them. Patches welcome.
+
+Template Toolkit DETAILS
+    "File::Find::Rule::TTMETA" uses "Template::Config" to instantiate its
+    "Template::Provider" instance, so it is possible to use custom provider
+    subclasses.
+
+    The "Template::Provider" instance that is created has only "ABSOLUTE =>
+    1" set, mainly because most of the other options don't really apply
+    here, but also because I can't think of an elegant way to pass
+    configuration parameters to the constructor.
+
+SEE ALSO
+    the File::Find::Rule manpage, the Template manpage
+

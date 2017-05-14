@@ -1,0 +1,23 @@
+---
+abstract: 'Sugar for class-based exception handlers'
+author:
+  - 'Paul Driver <frodwith@cpan.org>'
+build_requires:
+  Exception::Class: 0
+  Test::More: 0
+  Try::Tiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.101600'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exception-Caught
+requires:
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  Sub::Exporter::Lexical: 0
+  namespace::clean: 0
+version: 0.01

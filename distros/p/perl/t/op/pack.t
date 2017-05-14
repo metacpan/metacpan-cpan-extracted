@@ -1,10 +1,9 @@
-#!./perl
-# FIXME - why isn't this -w clean in maint?
+#!./perl -w
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl';
+    require './test.pl'; require './charset_tools.pl';
+    set_up_inc(qw '../lib ../dist/Math-BigInt/lib');
 }
 
 # This is truth in an if statement, and could be a skip message
@@ -13,14 +12,12 @@ my $no_endianness = $] > 5.009 ? '' :
 my $no_signedness = $] > 5.009 ? '' :
   "Signed/unsigned pack modifiers not available on this perl";
 
-my $only510 = 414;
-plan tests => 14284 + ($] > 5.009 ? $only510 : 0);
+plan tests => 14712;
 
 use strict;
-# use warnings qw(FATAL all);
+use warnings qw(FATAL all);
 use Config;
 
-my $Is_EBCDIC = (defined $Config{ebcdic} && $Config{ebcdic} eq 'define');
 my $Perl = which_perl();
 my @valid_errors = (qr/^Invalid type '\w'/);
 
@@ -124,7 +121,7 @@ sub list_eq ($$) {
 
 {
     my $sum = 129; # ASCII
-    $sum = 103 if $Is_EBCDIC;
+    $sum = 103 if $::IS_EBCDIC;
 
     my $x;
     is( ($x = unpack("%32B*", "Now is the time for all good blurfl")), $sum );
@@ -302,8 +299,6 @@ sub list_eq ($$) {
 
     skip("-- $^O has serious fp indigestion on w-packed infinities", 1)
        if (
-	   ($^O eq 'mpeix')
-	   ||
 	   ($^O eq 'ultrix')
 	   ||
 	   ($^O =~ /^svr4/ && -f "/etc/issue" && -f "/etc/.relid") # NCR MP-RAS
@@ -319,7 +314,7 @@ sub list_eq ($$) {
       if ($^O eq 'vos');
 
     eval { $x = pack 'w', $inf };
-    like ($@, qr/^Cannot compress integer/, "Cannot compress integer");
+    like ($@, qr/^Cannot compress Inf/, "Cannot compress infinity");
   }
 
  SKIP: {
@@ -673,7 +668,7 @@ numbers ('d', -(2**34), -1, 0, 1, 2**34);
 numbers_with_total ('q', -1,
                     -9223372036854775808, -1, 0, 1,9223372036854775807);
 # This total is icky, but the true total is 2**65-1, and need a way to generate
-# the epxected checksum on any system including those where NVs can preserve
+# the expected checksum on any system including those where NVs can preserve
 # 65 bits. (long double is 128 bits on sparc, so they certainly can)
 # or where rounding is down not up on binary conversion (crays)
 numbers_with_total ('Q', sub {
@@ -818,12 +813,20 @@ SKIP: {
 {
   # /
 
-  my ($x, $y, $z);
+  my ($x, $y, $z, @a);
   eval { ($x) = unpack '/a*','hello' };
   like($@, qr!'/' must follow a numeric type!);
   undef $x;
   eval { $x = unpack '/a*','hello' };
   like($@, qr!'/' must follow a numeric type!);
+
+  # [perl #60204] Unhelpful error message from unpack
+  eval { @a = unpack 'v/a*','h' };
+  is($@, '');
+  is(scalar @a, 0);
+  eval { $x = unpack 'v/a*','h' };
+  is($@, '');
+  is($x, undef);
 
   undef $x;
   eval { ($z,$x,$y) = unpack 'a3/A C/a* C/Z', "003ok \003yes\004z\000abc" };
@@ -863,7 +866,7 @@ SKIP: {
   foreach (
            ['a/a*/a*', '212ab345678901234567','ab3456789012'],
            ['a/a*/a*', '3012ab345678901234567', 'ab3456789012'],
-           ['a/a*/b*', '212ab', $Is_EBCDIC ? '100000010100' : '100001100100'],
+           ['a/a*/b*', '212ab', $::IS_EBCDIC ? '100000010100' : '100001100100'],
   )
   {
     my ($pat, $in, $expect) = @$_;
@@ -911,16 +914,15 @@ EOP
 }
 
 
-SKIP: {
-    skip("(EBCDIC and) version strings are bad idea", 2) if $Is_EBCDIC;
-
-    is("1.20.300.4000", sprintf "%vd", pack("U*",1,20,300,4000));
-    is("1.20.300.4000", sprintf "%vd", pack("  U*",1,20,300,4000));
+{
+    is("1.20.300.4000", sprintf "%vd", pack("U*",utf8::native_to_unicode(1),utf8::native_to_unicode(20),300,4000));
+    is("1.20.300.4000", sprintf "%vd", pack("  U*",utf8::native_to_unicode(1),utf8::native_to_unicode(20),300,4000));
 }
-isnt(v1.20.300.4000, sprintf "%vd", pack("C0U*",1,20,300,4000));
+isnt(v1.20.300.4000, sprintf "%vd", pack("C0U*",utf8::native_to_unicode(1),utf8::native_to_unicode(20),300,4000));
 
-my $rslt = $Is_EBCDIC ? "156 67" : "199 162";
-is(join(" ", unpack("C*", chr(0x1e2))), $rslt);
+my $rslt = join " ", map { ord } split "", byte_utf8a_to_utf8n("\xc7\xa2");
+# The ASCII UTF-8 of U+1E2 is "\xc7\xa2"
+is(join(" ", unpack("U0 C*", chr(0x1e2))), $rslt);
 
 # does pack U create Unicode?
 is(ord(pack('U', 300)), 300);
@@ -934,24 +936,30 @@ is("@{[unpack('U*', pack('U*', 100, 200, 300))]}", "100 200 300");
 # is unpack U the reverse of pack U for byte string?
 is("@{[unpack('U*', pack('U*', 100, 200))]}", "100 200");
 
-
-SKIP: {
-    skip "Not for EBCDIC", 4 if $Is_EBCDIC;
-
-    # does unpack C unravel pack U?
-    is("@{[unpack('C*', pack('U*', 100, 200))]}", "100 195 136");
-
+{
     # does pack U0C create Unicode?
-    is("@{[pack('U0C*', 100, 195, 136)]}", v100.v200);
+    my $cp202 = chr(202);
+    utf8::upgrade $cp202;
+    my @bytes202;
+    {   # This is portable across character sets
+        use bytes;
+        @bytes202 = map { ord } split "", $cp202;
+    }
+
+    # This test requires the first number to be invariant; 64 is invariant on
+    # ASCII and EBCDIC.
+    is("@{[pack('U0C*', 64, @bytes202)]}", v64.v202);
 
     # does pack C0U create characters?
-    is("@{[pack('C0U*', 100, 200)]}", pack("C*", 100, 195, 136));
+    # The U* is expecting Unicode, so convert to that.
+    is("@{[pack('C0U*', map { utf8::native_to_unicode($_) } 64, 202)]}",
+       pack("C*", 64, @bytes202));
 
     # does unpack U0U on byte data warn?
     {
 	use warnings qw(NONFATAL all);;
 
-        my $bad = pack("U0C", 255);
+        my $bad = pack("U0C", 202);
         local $SIG{__WARN__} = sub { $@ = "@_" };
         my @null = unpack('U0U', $bad);
         like($@, qr/^Malformed UTF-8 character /);
@@ -1274,7 +1282,7 @@ SKIP: {
   # comma warning only once
   @warning = ();
   $x = pack( 'C(C,C)C,C', 65..71  );
-  like( scalar @warning, 1 );
+  cmp_ok( scalar(@warning), '==', 1 );
 
   # forbidden code in []
   eval { my $x = pack( 'A[@4]', 'XXXX' ); };
@@ -1490,9 +1498,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
 ok(pack('u2', 'AA'), "[perl #8026]"); # used to hang and eat RAM in perl 5.7.2
 
 $_ = pack('c', 65); # 'A' would not be EBCDIC-friendly
-eval "unpack('c')";
-like ($@, qr/Not enough arguments for unpack/,
-      "one-arg unpack (change #18751) is not in maint");
+is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 
 {
     my $a = "X\x0901234567\n" x 100; # \t would not be EBCDIC TAB
@@ -1508,7 +1514,10 @@ like ($@, qr/Not enough arguments for unpack/,
     local $SIG{__WARN__} = sub {
         $warning = $_[0];
     };
-    my $out = pack("u99", "foo" x 99);
+
+    # This test is looking for the encoding of the bit pattern "\x66\x6f\x6f",
+    # which is ASCII "foo"
+    my $out = pack("u99", native_to_uni("foo") x 99);
     like($warning, qr/Field too wide in 'u' format in pack at /,
          "Warn about too wide uuencode");
     is($out, ("_" . "9F]O" x 21 . "\n") x 4 . "M" . "9F]O" x 15 . "\n",
@@ -1523,58 +1532,31 @@ like ($@, qr/Not enough arguments for unpack/,
     is($x[1], $y[1], "checksum advance ok");
 
     # verify that the checksum is not overflowed with C0
-    if (ord('A') == 193) {
-	is(unpack("C0%128U", "/bcd"), unpack("U0%128U", "abcd"), "checksum not overflowed");
-    } else {
-	is(unpack("C0%128U", "abcd"), unpack("U0%128U", "abcd"), "checksum not overflowed");
-    }
+    is(unpack("C0%128U", "abcd"), unpack("U0%128U", "abcd"), "checksum not overflowed");
 }
 
+my $U_1FFC_bytes = byte_utf8a_to_utf8n("\341\277\274");
 {
     # U0 and C0 must be scoped
-    my $pattern;
-    if ($] > 5.009) {
-	$pattern = "a(U0)U";
-    } else {
-	# 5.8.x needs to keep the old meanings of U0 and C0 for unpack.
-	# Also it appears to need U0 to turn on the utf8 mode. So this template
-	# is semantically equivalent.
-	$pattern = "aU0(C0)U";
-    }
-    my (@x) = unpack($pattern, "b\341\277\274");
+    my (@x) = unpack("a(U0)U", "b$U_1FFC_bytes");
     is($x[0], 'b', 'before scope');
     is($x[1], 8188, 'after scope');
 
-    is(pack("a(U0)U", "b", 8188), "b\341\277\274");
+    is(pack("a(U0)U", "b", 8188), "b$U_1FFC_bytes");
 }
 
 {
     # counted length prefixes shouldn't change C0/U0 mode
-    # (note the length is actually 0 in this test)
-    if ($] > 5.009) {
-	if (ord('A') == 193) {
-	    is(join(',', unpack("aU0C/UU", "b\0\341\277\274")), 'b,0');
-	    is(join(',', unpack("aU0C/CU", "b\0\341\277\274")), 'b,0');
-	} else {
-	    is(join(',', unpack("aC/UU",   "b\0\341\277\274")), 'b,8188');
-	    is(join(',', unpack("aC/CU",   "b\0\341\277\274")), 'b,8188');
-	    is(join(',', unpack("aU0C/UU", "b\0\341\277\274")), 'b,225');
-	    is(join(',', unpack("aU0C/CU", "b\0\341\277\274")), 'b,225');
-	}
-    } else {
-	if (ord('A') == 193) {
-	    # IBM's EBCDIC counting mistake copied as is - maybe they should
-	    # pay someone to actually test this?
-	    # Someone competant, otherwise it's a false economy.
-	    is(join(',', unpack("aC0C/UU", "b\0\341\277\274")), 'b,0');
-	    is(join(',', unpack("aC0C/CU", "b\0\341\277\274")), 'b,0');
-	} else {
-	    is(join(',', unpack("aU0C/UU", "b\0\341\277\274")), 'b,8188');
-	    is(join(',', unpack("aU0C/CU", "b\0\341\277\274")), 'b,8188');
-	    is(join(',', unpack("aC0C/UU", "b\0\341\277\274")), 'b,225');
-	    is(join(',', unpack("aC0C/CU", "b\0\341\277\274")), 'b,225');
-	}
-    }
+    # (note the length is actually 0 in this test, as the C/ is replaced by C0
+    # due to the \0 in the string)
+    is(join(',', unpack("aC/UU",   "b\0$U_1FFC_bytes")), 'b,8188');
+    is(join(',', unpack("aC/CU",   "b\0$U_1FFC_bytes")), 'b,8188');
+
+    # The U expects Unicode, so convert from native
+    my $first_byte = utf8::native_to_unicode(ord substr($U_1FFC_bytes, 0, 1));
+
+    is(join(',', unpack("aU0C/UU", "b\0$U_1FFC_bytes")), "b,$first_byte");
+    is(join(',', unpack("aU0C/CU", "b\0$U_1FFC_bytes")), "b,$first_byte");
 }
 
 {
@@ -1583,8 +1565,7 @@ like ($@, qr/Not enough arguments for unpack/,
     is(join(',', @x), '1', 'pack Z0 doesn\'t destroy the character before');
 }
 
-# None of these will work on 5.8.x due to the W template.
-if ($] > 5.009) {
+{
     # Encoding neutrality
     # String we will pull apart and rebuild in several ways:
     my $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
@@ -1655,8 +1636,6 @@ if ($] > 5.009) {
     for my $format (qw(s S i I l L j J f d F D q Q
                        s! S! i! I! l! L! n! N! v! V!)) {
       SKIP: {
-	  skip "a0 will not upgrade on 5.8.x for backwards compatibility", 9
-	      if $] < 5.009;
           my $down = eval { pack($format, $val) };
           skip "cannot pack/unpack $format on this perl", 9 if
               $@ && is_valid_error($@);
@@ -1679,7 +1658,7 @@ if ($] > 5.009) {
 }
 
 {
-    # C is *not* neutral
+    # C *is* neutral
     my $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
     my $up   = $down;
     utf8::upgrade($up);
@@ -1689,12 +1668,12 @@ if ($] > 5.009) {
     is(pack("C*", @down), $down, "byte join");
 
     my @up   = unpack("C*", $up);
-    my @expect_up = (0xc3, 0xb8, 0xc3, 0xb9, 0xc3, 0xba, 0xc3, 0xbb, 0xc3, 0xbc, 0xc3, 0xbd, 0xc3, 0xbe, 0xc3, 0xbf, 0x05, 0x06);
+    my @expect_up = (0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff, 0x05, 0x06);
     is("@up", "@expect_up", "UTF-8 expand");
     is(pack("U0C0C*", @up), $up, "UTF-8 join");
 }
 
-if ($] > 5.009) {
+{
     # Harder cases for the neutrality test
 
     # u format
@@ -1812,19 +1791,19 @@ if ($] > 5.009) {
     is(pack("A*", $high), "\xfeb");
     is(pack("Z*", $high), "\xfeb\x00");
 
-    utf8::upgrade($high = "\xc3\xbeb");
-    is(pack("U0a2", $high), "\xfe");
-    is(pack("U0A2", $high), "\xfe");
-    is(pack("U0Z1", $high), "\x00");
-    is(pack("U0a3", $high), "\xfeb");
-    is(pack("U0A3", $high), "\xfeb");
-    is(pack("U0Z3", $high), "\xfe\x00");
-    is(pack("U0a6", $high), "\xfeb\x00\x00\x00");
-    is(pack("U0A6", $high), "\xfeb   ");
-    is(pack("U0Z6", $high), "\xfeb\x00\x00\x00");
-    is(pack("U0a*", $high), "\xfeb");
-    is(pack("U0A*", $high), "\xfeb");
-    is(pack("U0Z*", $high), "\xfeb\x00");
+    utf8::upgrade($high = byte_utf8a_to_utf8n("\xc3\xbe") . "b");
+    is(pack("U0a2", $high), uni_to_native("\xfe"));
+    is(pack("U0A2", $high), uni_to_native("\xfe"));
+    is(pack("U0Z1", $high), uni_to_native("\x00"));
+    is(pack("U0a3", $high), uni_to_native("\xfe") . "b");
+    is(pack("U0A3", $high), uni_to_native("\xfe") . "b");
+    is(pack("U0Z3", $high), uni_to_native("\xfe\x00"));
+    is(pack("U0a6", $high), uni_to_native("\xfe") . "b" . uni_to_native("\x00\x00\x00"));
+    is(pack("U0A6", $high), uni_to_native("\xfe") . "b   ");
+    is(pack("U0Z6", $high), uni_to_native("\xfe") . "b" . uni_to_native("\x00\x00\x00"));
+    is(pack("U0a*", $high), uni_to_native("\xfe") . "b");
+    is(pack("U0A*", $high), uni_to_native("\xfe") . "b");
+    is(pack("U0Z*", $high), uni_to_native("\xfe") . "b" . uni_to_native("\x00"));
 }
 {
     # pack /
@@ -1853,37 +1832,20 @@ if ($] > 5.009) {
 }
 {
     # unpack("A*", $unicode) strips general unicode spaces
-    is(unpack("A*", "ab \n\xa0 \0"), "ab \n\xa0",
+    is(unpack("A*", "ab \n" . uni_to_native("\xa0") . " \0"), "ab \n" . uni_to_native("\xa0"),
        'normal A* strip leaves \xa0');
-    is(unpack("U0C0A*", "ab \n\xa0 \0"), "ab \n\xa0",
+    is(unpack("U0C0A*", "ab \n" . uni_to_native("\xa0") . " \0"), "ab \n" . uni_to_native("\xa0"),
        'normal A* strip leaves \xa0 even if it got upgraded for technical reasons');
-    if ($] > 5.009) {
-	is(unpack("A*", pack("a*(U0U)a*", "ab \n", 0xa0, " \0")), "ab",
-	   'upgraded strings A* removes \xa0');
-	is(unpack("A*", pack("a*(U0UU)a*", "ab \n", 0xa0, 0x1680, " \0")), "ab",
-	   'upgraded strings A* removes all unicode whitespace');
-	is(unpack("A5", pack("a*(U0U)a*", "ab \n", 0x1680, "def", "ab")), "ab",
-	   'upgraded strings A5 removes all unicode whitespace');
-	is(unpack("A*", pack("U", 0x1680)), "",
-	   'upgraded strings A* with nothing left');
-    } else {
-	my $NBSP = chr 0xa0;
-	my $OSM = chr 0x1680; # Ogham Space Mark
-	utf8::encode($NBSP);
-	utf8::encode($OSM);
-	is(unpack("A*", pack("U0a*Ua*", "ab \n", 0xa0, " \0")), "ab \n$NBSP",
-	   'upgraded strings A* leaves \xa0, which in turn leaks UTF-8');
-	is(unpack("A*", pack("U0a*UUa*", "ab \n", 0xa0, 0x1680, " \0")),
-	   "ab \n$NBSP$OSM",
-	   'upgraded strings A* leaves all unicode whitespace');
-	is(unpack("A6", pack("U0a*Ua*", "ab \n", 0x1680, " def", "ab")),
-	   "ab \n" . substr($OSM, 0, 2),
-	   'upgraded strings A6 leaves all unicode whitespace but leaks UTF-8 and then mangles it');
-	is(unpack("A*", pack("U0U", ord " ")), "",
-	   'upgraded strings A* with nothing left');
-    }
+    is(unpack("A*", pack("a*(U0U)a*", "ab \n", 0xa0, " \0")), "ab",
+       'upgraded strings A* removes \xa0');
+    is(unpack("A*", pack("a*(U0UU)a*", "ab \n", 0xa0, 0x1680, " \0")), "ab",
+       'upgraded strings A* removes all unicode whitespace');
+    is(unpack("A5", pack("a*(U0U)a*", "ab \n", 0x1680, "def", "ab")), "ab",
+       'upgraded strings A5 removes all unicode whitespace');
+    is(unpack("A*", pack("U", 0x1680)), "",
+       'upgraded strings A* with nothing left');
 }
-if ($] > 5.009) {
+{
     # Testing unpack . and .!
     is(unpack(".", "ABCD"), 0, "offset at start of string is 0");
     is(unpack(".", ""), 0, "offset at start of empty string is 0");
@@ -1946,7 +1908,7 @@ if ($] > 5.009) {
     is(unpack("U0x3(x2.!*)", $high), 5,
        "U0 mode utf8 star offset is relative to start");
 }
-if ($] > 5.009) {
+{
     # Testing pack . and .!
     is(pack("(a)5 .", 1..5, 3), "123", ". relative to string start, shorten");
     eval { () = pack("(a)5 .", 1..5, -3) };
@@ -2015,7 +1977,7 @@ if ($] > 5.009) {
        "\x{301}\x{302}\x00\x00a",
        "utf8 . based shrink properly updates group starts");
 }
-if ($] > 5.009) {
+{
     # Testing @!
     is(pack('a* @3',  "abcde"), "abc", 'Test basic @');
     is(pack('a* @!3', "abcde"), "abc", 'Test basic @!');
@@ -2033,6 +1995,52 @@ if ($] > 5.009) {
 }
 {
     #50256
-    my ($v) = split //, unpack ('(B)*', 'ab');
+    # This test is for the bit pattern "\x61\x62", which is ASCII "ab"
+    my ($v) = split //, unpack ('(B)*', native_to_uni('ab'));
     is($v, 0); # Doesn't SEGV :-)
+}
+{
+    #73814
+    my $x = runperl( prog => 'print split( /,/, unpack(q(%2H*), q(hello world))), qq(\n)' );
+    is($x, "0\n", "split /a/, unpack('%2H*'...) didn't crash");
+
+    my $y = runperl( prog => 'print split( /,/, unpack(q(%32u*), q(#,3,Q)), qq(\n)), qq(\n)' );
+    is($y, "0\n", "split /a/, unpack('%32u*'...) didn't crash");
+}
+
+#90160
+is(eval { () = unpack "C0 U*", ""; "ok" }, "ok",
+  'medial U* on empty string');
+
+package o {
+    use overload
+        '""' => sub { ++$o::str; "42" },
+        '0+' => sub { ++$o::num; 42 };
+}
+is pack("c", bless [], "o"), chr(42), 'overloading called';
+is $o::str, undef, 'pack "c" does not call string overloading';
+is $o::num, 1,     'pack "c" does call num overloading';
+
+#[perl #123874]: argument underflow leads to corrupt length
+eval q{ pack "pi/x" };
+ok(1, "argument underflow did not crash");
+
+{
+    # [perl #126325] pack [hH] with a unicode string
+    # the hex encoders would read past the end of the string, using
+    # invalid source bytes
+    my $twenty_nuls = "\0" x 20;
+    # This is the case that failed
+    is(pack("WH40", 0x100, ""), "\x{100}$twenty_nuls",
+       "check pack H zero fills (utf8 target)");
+    my $up_nul = "\0";
+
+    utf8::upgrade($up_nul);
+    # check the other combinations too
+    is(pack("WH40", 0x100, $up_nul), "\x{100}$twenty_nuls",
+       "check pack H zero fills (utf8 target/source)");
+    is(pack("H40", ""), $twenty_nuls,
+       "check pack H zero fills (utf8 none)");
+    is(pack("H40", $up_nul), $twenty_nuls,
+       "check pack H zero fills (utf8 source)");
 }

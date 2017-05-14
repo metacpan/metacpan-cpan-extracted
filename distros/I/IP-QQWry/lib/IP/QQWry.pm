@@ -4,7 +4,7 @@ use 5.008;
 use warnings;
 use strict;
 use Carp;
-use version; our $VERSION = qv('0.0.16');
+use version; our $VERSION = qv('0.0.20');
 
 my %cache;
 my $tmp;            # used for hold temporary data
@@ -55,6 +55,7 @@ sub query {
         $cache{$ip} = [ $self->_result($ip) ] unless $self->cached($ip);
         return wantarray ? @{ $cache{$ip} } : join '', @{ $cache{$ip} };
     }
+    return;
 }
 
 sub _convert_input {
@@ -253,8 +254,8 @@ For more about the format of the database, take a look at this:
 L<http://lumaqq.linuxsir.org/article/qqwry_format_detail.html>
 
 Caveat: The 'QQWry.Dat' database uses gbk or big5 encoding, C<IP::QQWry> doesn't
-provide any encoding conversion utility, so if you want some other encoding,
-you have to do it yourself. (BTW, L<Encode> is a great module for this.)
+do any decoding stuff, use C<IP::QQWry::Decoded> if you want the returned info
+decoded.
 
 =head1 INTERFACE
 
@@ -318,7 +319,7 @@ sunnavy  C<< <sunnavy@gmail.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2009, sunnavy C<< <sunnavy@gmail.com> >>.
+Copyright (c) 2006-2011, sunnavy C<< <sunnavy@gmail.com> >>.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

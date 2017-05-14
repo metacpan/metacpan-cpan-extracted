@@ -1,6 +1,7 @@
 Changes
 Fast.xs
 lib/DTL/Fast.pm
+lib/DTL/Fast.pod
 lib/DTL/Fast/Cache.pm
 lib/DTL/Fast/Cache/Compressed.pm
 lib/DTL/Fast/Cache/File.pm

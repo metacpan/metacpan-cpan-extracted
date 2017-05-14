@@ -13,7 +13,7 @@ use Digest::MD5 qw(md5_hex);
 use Errno;
 use Data::Dumper;
 our $AUTOLOAD;
-*VERSION = \'2.3';
+*VERSION = \'2.3.7';
 
 use constant { OK => 0, WARNING => 1, CRITICAL => 2, UNKNOWN => 3 };
 
@@ -1198,12 +1198,13 @@ sub valdiff {
           if ($date >= ($now - $self->opts->lookback)) {
             $last_values->{$_} = $last_values->{lookback_history}->{$_}->{$date};
             $last_values->{timestamp} = $date;
+            $self->{'delta_timestamp'} = $now - $last_values->{timestamp};
             if (ref($last_values->{$_}) eq "ARRAY") {
               $self->debug(sprintf "oldest value of %s within lookback is size %s (age %d)",
-                  $_, scalar(@{$last_values->{$_}}), time - $date);
+                  $_, scalar(@{$last_values->{$_}}), $now - $date);
             } else {
               $self->debug(sprintf "oldest value of %s within lookback is %s (age %d)",
-                  $_, $last_values->{$_}, time - $date);
+                  $_, $last_values->{$_}, $now - $date);
             }
             last;
           } else {

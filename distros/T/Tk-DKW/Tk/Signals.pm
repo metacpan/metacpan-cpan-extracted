@@ -1,13 +1,13 @@
 package Tk::Signals;
 
-use vars qw ($VERSION %SLOTS);
-
 use Tk::Widget;
 use Tk;
 
+use vars qw ($VERSION %SLOTS);
 use strict;
-
 use Carp;
+
+$VERSION = '0.03';
 
 sub GLOBALSLOT
    {

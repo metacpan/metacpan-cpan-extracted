@@ -1,3 +1,10 @@
+2.017 2017-05-11
+
+    * Fix failures in pre-5.10 Perls (tx E. Choroba)
+    * Tk::ObjScanner doc: Correct example code. (tx heytitle)
+    * README: Use proper Markdown syntax.(tx heytitle)
+    * change bug tracker from RT to github
+
 2.016 2014-07-30
 
     * Added forgotten $VERSION string

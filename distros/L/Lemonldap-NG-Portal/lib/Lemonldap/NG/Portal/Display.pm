@@ -9,7 +9,7 @@ use strict;
 use Lemonldap::NG::Portal::Simple;
 use utf8;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.9.3';
 
 ## @method array display()
 # Call portal process and set template parameters
@@ -98,7 +98,6 @@ sub display {
 
             %templateParams = (
                 AUTH_USER           => $auth_user,
-                AUTOCOMPLETE        => $self->{portalAutocomplete},
                 NEWWINDOW           => $self->{portalOpenLinkInNewWindow},
                 AUTH_ERROR          => $self->error( $self->{menuError} ),
                 AUTH_ERROR_TYPE     => $self->error_type( $self->{menuError} ),
@@ -152,6 +151,7 @@ sub display {
             ASK_LOGINS      => $self->{checkLogins},
             CONFIRMKEY      => $self->stamp(),
             LIST            => $self->{list} || [],
+            REMEMBER        => $self->{confirmRemember},
         );
     }
 
@@ -198,7 +198,6 @@ sub display {
             AUTH_ERROR_TYPE       => $self->error_type,
             AUTH_URL              => $self->get_url,
             LOGIN                 => $self->get_user,
-            AUTOCOMPLETE          => $self->{portalAutocomplete},
             CHECK_LOGINS          => $self->{portalCheckLogins},
             ASK_LOGINS            => $self->{checkLogins},
             DISPLAY_RESETPASSWORD => $self->{portalDisplayResetPassword},
@@ -231,6 +230,8 @@ sub display {
             or $self->{error} == PE_PASSWORD_MISMATCH
             or $self->{error} == PE_BADOLDPASSWORD
             or $self->{error} == PE_PASSWORDFORMEMPTY
+            or (    $self->{error} == PE_PP_PASSWORD_EXPIRED
+                and $self->{ldapAllowResetExpiredPassword} )
           )
         {
             %templateParams = (
@@ -325,6 +326,7 @@ sub display {
         SKIN_PATH => $portalPath . "skins",
         SKIN      => $skin,
         ANTIFRAME => $self->{portalAntiFrame},
+        SKIN_BG   => $self->{portalSkinBackground},
     );
 
     ## Custom template params
@@ -406,13 +408,13 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =over
 
-=item Copyright (C) 2010, 2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Copyright (C) 2010-2012 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =item Copyright (C) 2012 by Sandro Cazzaniga, E<lt>cazzaniga.sandro@gmail.comE<gt>
 
 =item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
 
-=item Copyright (C) 2010, 2011, 2012, 2013 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Copyright (C) 2010-2016 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
 
 =item Copyright (C) 2011 by Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
 

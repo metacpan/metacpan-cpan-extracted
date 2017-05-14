@@ -1,0 +1,56 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Sample" db_column="tissue_type" cv_table="SMP_TissueType">
+  <comment type="definition">This table provides the restricted vocabulary for the column tissue type in the sample table and is used to describe the tissue from a differentiated organism from which the sample was derived.
+</comment>
+  <comment type="curation_tool_programatic">The elements of this
+controlled vocabulary are encoded in the curation tool. Although not
+currently implemented, it will regulate the visibility of other
+details of the sample screen.</comment>   
+<term name="epithelial"
+        description="plant or animal"/>
+<term name="renal"
+        description="animal"/>
+<term name="cardiovascular"
+        description="animal"/>
+<term name="pith"
+        description="plant"/>
+<term name="xylem"
+        description="plant"/>
+<term name="phloem"
+        description="plant"/>
+<term name="parenchyma"
+        description="plant"/>
+<term name="collenchyma"
+        description="plant"/>
+<term name="sclerenchyma"
+        description="plant"/>
+<term name="mesophyll"
+        description="plant"/>
+<term name="parenchyma"
+        description="plant"/>
+<term name="epidermis"
+        description="plant or animal"/>
+<term name="endodermis"
+        description="plant"/>
+<term name="pericycle"
+        description="plant"/>
+<term name="cotex"
+        description="plant"/>
+<term name="cork_cambium"
+        description="plant"/>
+<term name="endosperm"
+        description="plant"/>
+<term name="aleurone"
+        description="plant"/>
+<term name="cuticle"
+        description="plant or animal"/>
+<term name="nectary"
+        description="plant"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

@@ -46,8 +46,267 @@ my $content = $user_template->render;
       $dom->ul('#friends, $data)
   );
 
+# This idea will work better with binds
+
+== How to let a compent control the init args of subcomponents
+
 # The idea is that the sub component gets it args from
 # the contaiing componet
  <lace-form errors='$.form.errors' ...>
   <input errors='$.errors.age' value='$.values.age' title='$self.title' />
  </lace-form>
+
+Starting to lean toward something like
+
+$dom->at('#content')
+  ->content( $self->process_components( $self->content))
+
+or mayb $self->content->process_components( ctx=>$self->formdata, ...)
+
+might have to move the concept of compoents into Template::Lace::DOM 
+to get this right. 
+
+Ok now if we move components to the DOM we can support 
+->attach
+
+==== END
+ ----
+
+-- <web-component attr_hash={a=>1,f=>4} attr_array=['$.foo','rr']
+
+=== Form ideas
+-- fill and smart_content for matching input[name= same as class and id.
+  ?this maybe is overloading fill to much perhaps a ->fill_form would be
+  better.
+  
+$dom->form('#login',
+  \%attrs, sub {
+    $_->ctx($self->fif, sub {
+      
+    },
+  },
+)
+
+maybe instead some sort of MOP on forms like WWW::Mech
+== END
+
+'ul li' => Repeat {
+  Fill('~', $_),
+  '~@id+' => $_->id,
+  '~@class' => do { $_->completed ? 'completed' : undef },
+  '.update' => $self->uri('/task/update', [$_->todo_id]),
+  'label' => [
+    '~@data_task' => $_->todo_id,
+    '~' => $_->title,
+  'input[name="title"]' => $_->title,
+
+} $self->list,
+
+  $dom->at('label')
+    ->attr('data-task', $_->todo_id)
+    ->content($_->label);
+
+  $dom->'#id'->class("completed")
+
+====
+letting a template 'reach into' a component
+
+<Lace-Status.show>
+<p>
+  This is a test <info:status/>.  For More information
+  click <a info:href >here</a>
+</p>
+</Lace-Status.show>
+
+package MyApp::Lace::Status;
+
+sub show {
+  my ($self, $dom) = @_;
+  $dom->bind('info', 
+    status => $self->status,
+    href => $self->uri('info'), # canonically +{ href => $self->uri('info') },
+  );
+}
+
+<section id="todos">
+  <lace-todos.count>
+    <p>
+      Hi there <person:name />! Here's you're work list!
+    </p>
+    <ol>
+      <li data-person='todos'><todo:name/></li>
+    </ol>
+  </lace-todos.count>
+</section>
+
+package MyApp::Lace::Todos;
+
+sub dispatch { 
+  my ($self, $name, @args) = @_;
+  return $self->display(@args) if $name eq 'count';
+}
+
+sub display {
+  my ($self, $dom) = @_;
+  $dom->bind('person', 
+    name => $self->person->name,
+    todos => sub { $self->list_todos($_) },
+  );
+}
+
+sub list_todos {
+  my ($self, $dom) = @_;
+  $dom->repeat(sub {
+    my ($dom, $todo) = @_;
+    $dom->bind('todo', name => $todo->name)
+  }, $self->person->todos);
+}
+
+# =================
+
+sub process_dom {
+  my ($self, $dom) = @_;
+  $dom->bind('links',
+    add_task => { action=>$self->uri('add') },
+    clear_completed => { action=>$self->uri('clear_completed') },
+    show_all => $self->build_summary_url('all'),
+    show_active => $self->build_summary_url('active'),
+    show_completed => $self->build_summary_url('completed'),
+  )->bind('todos',
+    active_count => $self->active_task_count,
+    set => sub { $self->list_todos($_) },
+  );
+}
+
+sub build_summary_url {
+  my ($self, $set) = @_;
+  return +{
+    action => $self->uri('summary',{q=>$set}),
+    class => $self->set eq $set ? 'selected':undef,
+  };
+}
+
+sub list_todos {
+  my ($self, $dom) = @_;
+  $dom->repeat(sub {
+    my ($dom, $todo) = @_;
+    $dom->bind('todo',
+      update_action => +{ action => $self->uri('/task/update', [$todo->todo_id]) },
+      destroy_action => +{ action => $self->uri('/task/delete', [$todo->todo_id]) },
+      display_label => $todo->title,
+      title_input => sub { $_->value($todo->title) }
+      task_id => +{ 'id+' => $todo->id },
+      form_id => +{ 'id+' => $todo->id },
+      data_id => +{ 'data-task' => $todo->id },
+      completed => sub { $self->mark_completed($_) },
+    );
+  }, $self->todos);
+}
+
+sub mark_completed {
+  my ($self, $dom) = @_;
+  $dom->data('is_complete',
+    'checkbox@checked' => $self->completed,
+    'display_class@class' => ($todo->completed ? "completed": undef),
+  );
+}
+
+
+=======
+
+
+<section id="todos">
+  <lace-todos.count>
+    <p>
+      Hi there <span data-person='name'>PERSON</span>! Here's you're work list!
+    </p>
+      <ol>    
+        <li data-person='todos'>
+          <span data-todo='title'>THING TODO</span>
+        </li>
+      </ol>
+  </view-todos>
+</section>
+
+package MyApp::Lace::Todos;
+
+sub dispatch { 
+  my ($self, $name, @args) = @_;
+  return $self->display(@args) if $name eq 'count';
+}
+
+sub display {
+  my ($self, $dom) = @_;
+  $dom->data('person', 
+    name => $self->person->name,
+    todos => sub { $self->list_todos($_) },
+  );
+}
+
+sub list_todos {
+  my ($self, $dom) = @_;
+  $dom->repeat(sub {
+    my ($dom, $todo) = @_;
+    $dom->data('todo', name => $todo->name)
+  }, $self->person->todos);
+}
+
+
+===
+
+# We need some way to set the value to a component
+sub process_dom {
+  my ($self, $dom) = @_;
+  $dom->form('#login', sub {
+    $_->input = $self
+      ->ctx
+      ->view('Input', value=>$self->fif->{user}, err=>$self->err->{user})
+  });
+
+} 
+
+  $_->input = Helpers->input( value=>$self->fif->{user}, err=>$self->err->{user})
+
++++++
+=======
+
+
+<section id="todos">
+    <p>
+      Hi there <span data-person='name'>PERSON</span>! Here's you're work list!
+    </p>
+      <ol>
+        <li data-lace='$.list-todos'>
+          <span data-todo='title'>THING TODO</span>
+        </li>
+      </ol>
+</section>
+
+package MyApp::Lace::Todos;
+
+sub dispatch { 
+  my ($self, $name, @args) = @_;
+  return $self->display(@args) if $name eq 'count';
+}
+
+sub display {
+  my ($self, $dom) = @_;
+  $dom->data('person', 
+    name => $self->person->name,
+    todos => sub { $self->list_todos($_) },
+  );
+}
+
+sub list_todos {
+  my ($self, $dom) = @_;
+  $dom->repeat(sub {
+    my ($dom, $todo) = @_;
+    $dom->data('todo', name => $todo->name)
+  }, $self->person->todos);
+}
+
+##===
+
+Placeholders
+<lace:person>Example</lace:person>
+

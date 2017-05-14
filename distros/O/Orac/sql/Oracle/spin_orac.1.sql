@@ -1,0 +1,6 @@
+select ADDR,PID,
+SPID,USERNAME,
+SERIAL# ser#,TERMINAL term,
+PROGRAM,BACKGROUND bgnd,
+LATCHWAIT lwt,LATCHSPIN lsp
+from v$process

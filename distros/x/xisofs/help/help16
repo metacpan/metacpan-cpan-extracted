@@ -1,0 +1,1 @@
+Generate a file TRANS.TBL in each directory on the CDROM, which can be used on non-Rock Ridge capable systems to help extablish the correct file names. There is also information present in the file that indicates the major and minor numbers for block and character devices, and each symlink has the name of the link file given.

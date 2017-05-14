@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ArrayLayout" db_column="identifier_code" cv_table="AL_IdentifierCode">
+  <comment type="definition">Referred to in the array layout table and used to restrict the model number and or catalog number for a particular technology type.	
+</comment>
+<term name="HU6800"
+        description="Affymetrix human chip 6800"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

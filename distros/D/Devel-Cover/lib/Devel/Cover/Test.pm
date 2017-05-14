@@ -1,4 +1,4 @@
-# Copyright 2002-2016, Paul Johnson (paul@pjcj.net)
+# Copyright 2002-2017, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Test;
 use strict;
 use warnings;
 
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 use Carp;
 
@@ -392,7 +392,7 @@ Devel::Cover::Test - Internal module for testing
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 METHODS
 
@@ -491,7 +491,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2016, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2017, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

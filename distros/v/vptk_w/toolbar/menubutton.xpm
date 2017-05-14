@@ -1,0 +1,32 @@
+/* XPM */
+static char * menubutton_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"19 21 5 1",
+/* colors */
+"  s None c None",
+". c #FFFFFF",
+"X c #C4C2C4",
+"o c #040204",
+"O c #000000",
+/* pixels */
+"                   ",
+"                   ",
+"                   ",
+"  ..........       ",
+"  .XXXXXXXXo       ",
+"  .XXXXXXXXo       ",
+"  .XXXXXXXXo       ",
+"  .ooooooooo       ",
+"  ................ ",
+"  .XXXXXXXXXXXXXXo ",
+"  .XOOOOOXOOXXXXXo ",
+"  .XOOOOOOOOXXXXXo ",
+"  .XXXXXXXXXXXXXXo ",
+"  .XOOOOOOXOOXXXXo ",
+"  .XOOOOOOOOOXXXXo ",
+"  .XXXXXXXXXXXXXXo ",
+"  .ooooooooooooooo ",
+"                   ",
+"                   ",
+"                   ",
+"                   "};

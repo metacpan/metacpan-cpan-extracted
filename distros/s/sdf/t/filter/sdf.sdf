@@ -1,0 +1,50 @@
+# This file tests the sdf filter
+
+Some text before.
+
+!block sdf
+Some sdf
+- text.
+!endblock
+
+Some middle text.
+
+!block sdf
+Some more
+sdf text.
+
+E: An example paragraph
+!endblock
+
+# Test arbitary parameters
+!block sdf; size='12pt'; bold; sp_before=4
+Life is too short to:
+
+* drink bad wine
+* argue over silly things
+* not use SDF.
+
+Don't you agree?
+!endblock
+
+Middle.
+
+# Test an unknown attribute
+!block sdf; bad_apple; changed
+Life is also too short to:
+
+* argue over good wine.
+!endblock
+
+# Test nesting and overriding
+!block sdf; sp_before=6
+Hello
+[sp_before=5]world
+!block sdf; sp_before=9
+goodbye
+[sp_before=20]world
+!endblock
+Goodbye!
+!endblock
+
+Some text after.

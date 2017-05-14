@@ -1,0 +1,7 @@
+.
+./INSTALL.txt
+./lib
+./lib/Acme
+./lib/Acme/1337.pm
+./Makefile.PL
+./README

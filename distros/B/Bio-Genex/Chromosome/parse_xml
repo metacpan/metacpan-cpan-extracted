@@ -1,0 +1,15 @@
+sub parse_xml {
+  my ($self,$file_name) = @_;
+  my $sub = sub {$self->handle_char(shift,shift)};
+  my $p = new XML::Parser(Handlers => {Char  => $sub});
+  $p->parsefile($file_name);
+}
+
+sub handle_char {
+  my ($self,$expat,$string) = @_;
+  return if $string =~ /\s+/;	# don't parse only whitespace
+  my @context = @{$expat->{Context}};
+  my $tag = pop(@context);
+  chomp($string);
+  $self->$tag($string);
+}

@@ -1,5 +1,8 @@
 Revision history for Perl extension Captcha::AreYouAHuman
 
+0.00004  Mon Mar 26 2012
+    - Change the JavaScript tag generated to comply with standards.
+
 0.00003  Mon Dec 5 2011
     - original version
 

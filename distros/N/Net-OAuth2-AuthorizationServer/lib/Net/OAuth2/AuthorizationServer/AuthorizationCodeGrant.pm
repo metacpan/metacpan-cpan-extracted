@@ -42,6 +42,7 @@ Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant - OAuth2 Authorization 
     type            => 'auth', # one of: auth, access, refresh
     redirect_uri    => $redirect_uri,
     user_id         => $user_id,      # optional
+	jwt_claims_cb   => sub { ... },   # optional, see jwt_claims_cb in Manual
   );
 
   # store the auth code

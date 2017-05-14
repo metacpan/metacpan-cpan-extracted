@@ -1,0 +1,26 @@
+
+	Desired results of memory management (these don't match current
+	results.)
+
+Given:
+
+  {
+     my $label = new Gtk::Label "foo";
+  }
+
+
+Result:
+
+  no leakage, $label released from Perl and Gtk upon exit of loop.
+
+
+
+Given:
+
+  {
+     my $label = ForeignCObject; # This function returns a pre-allocated Gtk object
+  }
+
+Result:
+
+  leakage. $label released from Perl, but Gtk object unreleased.

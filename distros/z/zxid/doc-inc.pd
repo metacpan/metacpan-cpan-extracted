@@ -1,0 +1,25 @@
+<<ignore: A list for referencing all of documentation. Include in each file.
+$Id: doc-inc.pd,v 1.5 2009-11-20 20:27:13 sampo Exp $
+>>
+
+* <<link:mod_auth_saml.html: mod_auth_saml>> Apache
+  module documentation: SSO without programming.
+* <<link:zxid-simple.html: zxid_simple()>> Easy API for SAML
+* <<link:zxid-raw.html: ZXID Raw API>>: Program like
+  the pros (and fix your own problems). See also <<link:../ref/html/index.html: Function Reference>>
+* <<link:zxid-wsf.html: ZXID ID-WSF API>>: Make Identity Web Services Calls using ID-WSF
+* <<link:zxid-install.html: ZXID Compilation and Installation>>: Compile
+  and install from source or package. See also <<link:html/INSTALL.zxid.html: INSTALL.zxid>>
+  for quick overview.
+* <<link:zxid-conf.html: ZXID Configuration Reference>>: Nitty gritty
+  on all options.
+* <<link:zxid-cot.html: ZXID Circle of Trust Reference>>: How to
+  set up the Circle of Trust, i.e. the partners your web site works with.
+* <<link:zxid-log.html: ZXID Logging Reference>>: ZXID digitally signed logging facility
+* <<link:zxid-java.html: javazxid>>: Using ZXID from Java
+* <<link:zxid-perl.html: Net::SAML>>: Using ZXID from Perl
+* <<link:zxid-php.html: php_zxid>>: Using ZXID from PHP
+* <<link:zxid-idp.html: zxididp>>: Using ZXID IdP and Discovery
+* <<link:../README.smime: README.smime>>: Crypto and Cert Tutorial
+* <<link:zxid-faq.html: FAQ>>: Frequently Asked Questions
+* <<link:README.zxid.html: README.zxid>>: ZXID project overview

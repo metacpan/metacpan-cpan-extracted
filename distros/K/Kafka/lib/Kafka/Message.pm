@@ -6,7 +6,7 @@ Kafka::Message - Interface to the Kafka message properties.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Message> version 1.001013 .
+This documentation refers to C<Kafka::Message> version 1.02 .
 
 =cut
 
@@ -18,7 +18,7 @@ use warnings;
 
 # ENVIRONMENT ------------------------------------------------------------------
 
-our $VERSION = '1.001013';
+our $VERSION = '1.02';
 
 #-- load the modules -----------------------------------------------------------
 
@@ -26,6 +26,7 @@ our $VERSION = '1.001013';
 
 our @_standard_fields = qw(
     Attributes
+    Timestamp
     error
     HighwaterMarkOffset
     key
@@ -157,6 +158,12 @@ A simple message received from the Apache Kafka server.
 The key is an optional message key that was used for partition assignment.
 The key can be an empty string.
 
+=head3 Timestamp
+
+Integer of BigInt on 32 bits platforms: the message timestamp ( might be -1 if
+the message has no timestamp). Requires Kafka version > 0.10.0 and timestamp
+enabled in the topic messages format.
+
 =head3 C<valid>
 
 Boolean value: indicates whether received message is valid or not.
@@ -250,7 +257,7 @@ Vlad Marchenko
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016 by TrackingSoft LLC.
+Copyright (C) 2012-2017 by TrackingSoft LLC.
 
 This package is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. See I<perlartistic> at

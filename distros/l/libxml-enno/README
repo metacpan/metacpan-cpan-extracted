@@ -1,6 +1,6 @@
 			Perl module: libxml-enno
 
-Copyright (c) 1999 Enno Derksen
+Copyright (c) 1999,2000 Enno Derksen
 All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. 
@@ -27,6 +27,10 @@ You need the following modules (all available at CPAN):
 - Parse::Yapp (Used by XML::XQL. I'm using 0.16)
 - Date::Manip (Used by XML::XQL::Date. 
 	       I'm using 5.33. I know 5.20 or less doesn't work)
+- LWP::UserAgent (It's part of libwww-perl. If you don't have it, some test
+		  cases may fail and you can't read files from URLs.)
+- XML::Parser::PerlSAX (It's part of libxml-perl. You need at least version 0.06.
+			If you don't have it some test cases may fail.)
 
 I used PodToHTML-0.04 to generate the html documentation. You only need this
 if you want to re-generate it.
@@ -50,6 +54,8 @@ Then to build you run make.
 You can then test the module by typing:
 
 	make test
+
+See FAQ.xml for known problems.
 
 If you have write access to the perl library directories, you may then
 install by typing:
@@ -100,10 +106,22 @@ XML::DOM::ValParser  - an XML::DOM::Parser that validates at parse time
 
 ============= Other packages ===================================================
 
-XML::Filter::SAXT    - Replicates SAX events to several SAX event handlers 
-		       (like the Unix 'tee' command)
-XML::RegExp          - Contains regular expressions for XML tokens
+XML::RegExp           - Contains regular expressions for XML tokens
+XML::UM		      - Convert UTF-8 strings to any encoding supported 
+			by XML::Encoding
 
+XML::Filter::SAXT     - Replicates SAX events to several SAX event handlers 
+		        (like the Unix 'tee' command)
+XML::Filter::DetectWS - PerlSAX filter that detects ignorable whitespace and, 
+			optionally, filters it. (Untested!) 
+XML::Filter::Reindent - PerlSAX filter that can re-indent XML files.
+
+XML::Handler::BuildDOM - Previously called XML::DOM::PerlSAX. Builds a DOM
+			document from PerlSAX events.
+XML::Handler::Composer - Yet another XML printer. This one supports printing 
+			to other encodings.
+XML::Handler::PrintEvents - Prints all PerlSAX events it receives to stdout. 
+			Useful when debugging PerlSAX event filters/producers. 
 --------------------------------------------------------------------------------
 
 Have fun!

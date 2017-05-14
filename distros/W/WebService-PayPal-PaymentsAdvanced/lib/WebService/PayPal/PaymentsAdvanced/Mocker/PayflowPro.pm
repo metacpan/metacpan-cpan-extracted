@@ -2,7 +2,9 @@ package WebService::PayPal::PaymentsAdvanced::Mocker::PayflowPro;
 
 use Mojolicious::Lite;
 
-our $VERSION = '0.000021';
+use namespace::autoclean;
+
+our $VERSION = '0.000022';
 
 use feature qw( state );
 
@@ -13,6 +15,7 @@ use WebService::PayPal::PaymentsAdvanced::Mocker::Helper;
 
 my $helper = WebService::PayPal::PaymentsAdvanced::Mocker::Helper->new;
 
+## no critic (RequireExplicitInclusion)
 app->types->type( nvp => 'text/namevalue' );
 
 post '/' => sub {
@@ -245,13 +248,15 @@ sub to_app {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::PayPal::PaymentsAdvanced::Mocker::PayflowPro - A simple app to enable easy PPA mocking
 
 =head1 VERSION
 
-version 0.000021
+version 0.000022
 
 =head1 DESCRIPTION
 
@@ -270,13 +275,17 @@ hint:
     local $ENV{PLACK_ENV} = 'development'; #
     my $app = WebService::PayPal::PaymentsAdvanced::Mocker::PayflowPro->to_app;
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues>.
+
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc.
+This software is copyright (c) 2017 by MaxMind, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

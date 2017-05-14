@@ -1,0 +1,35 @@
+===============================
+Language pack for Uplug
+===============================
+
+
+This package adds language-specific annotation tools to Uplug.
+It includes pre-trained models and Uplug configuration files.
+
+
+Installation
+------------
+
+Requirements: Uplug main components (uplug-main)
+
+If you maintain a local copy of Uplug:
+- copy all files into your Uplug home directory, i.e. somthing like
+  cp -R * /path/to/uplug/home/dir/
+
+Otherwise: Run the usual perlish installation steps
+
+  perl Makefile.PL
+  make all
+  sudo make install
+
+
+Usage
+-----
+
+Look at share/systems/ what kind of new tools are available. They can
+be called in the same way as other Uplug tools. You should also be
+able to run all language-specific pre-processing steps from plain text
+to annotated XML using
+  uplug pre/xx-all -in input.txt -out output.xml
+where <xx> is the language ID of this language pack.
+

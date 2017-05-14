@@ -1,0 +1,25 @@
+# $Id$
+#
+# >>Title::	Memo Style
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 08-Oct-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+# >>Purpose::
+# {{memo}} is an [[SDF]] style for memos.
+#
+# >>Description::
+#
+# >>Limitations::
+#
+
+# Use the admin style with an appropriate default title
+!default DOC_TYPE "MEMORANDUM"
+!use "admin.sds"

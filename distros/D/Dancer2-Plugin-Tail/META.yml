@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/jck000/Dancer2-Plugin-Tail/issues
   homepage: https://github.com/jck000/Dancer2-Plugin-Tail/
   repository: https://github.com/jck000/Dancer2-Plugin-Tail
-version: '0.010'
+version: '0.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

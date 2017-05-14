@@ -1,0 +1,53 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="Software" db_column="name"  cv_table="SW_Name">
+  <comment type="definition">This table provides the restricted vocabulary for the column name in the table software to allow definition and searching of the software packages used in image and data analysis	
+</comment>
+<term name="custom"
+        description="custom-written software"/>
+<term name="ImaGene"
+        description="BioDiscovery Inc(MatLab Gene Site, Auto Gene,
+Clone Tracker)"/>
+<term name="softWoRx"
+        description="image analysis package from Applied Precision"/>
+<term name="GenePix_Pro"
+        description="image analysis package from Axon Instruments"/>
+<term name="GeneExpressionist"
+        description="Gene Data AG"/>
+<term name="ArrayVision"
+        description="Imaging Research, Inc."/>
+<term name="ScanAlyze"
+        description="Image analysis software by Mike Eisen, Stanford U."/>
+<term name="ArrayMaker"
+        description="Spotter software by Joe Derisi, Stanford U."/>
+<term name="MicroArray_Suite"
+        description="Image analysis software by Scanalytics"/>
+<term name="Microarray_Suite"
+        description="Image analysis software by Affymetrix"/>
+<term name="GeneChip_Suite"
+        description="Image analysis software by Affymetrix"/>
+<term name="DesignerDG"
+        description="Chip design package from MolecularWare"/>
+<term name="AnalyzerDG"
+        description="Image analysis package from MolecularWare"/>
+<term name="ChipReader"
+        description="Scanner software from Virtek Vision"/>
+<term name="XDotsReader"
+        description="Image analysis software from Cose"/>
+<term name="TIGR_Spotfinder"
+        description="Image analysis software from TIGR"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->
+<!--  LocalWords:  ImaGene BioDiscovery MatLab softWoRx ArrayVision Scanalyze
+ -->
+<!--  LocalWords:  Eisen ArrayMaker Derisi MicroArray Scanalytics DesignerDG
+ -->
+<!--  LocalWords:  MolecularWare AnalyzerDG ChipReader Virtek XDotsReader Cose
+ -->
+<!--  LocalWords:  Partek arraySCOUT GeneSpring Spotfire
+ -->

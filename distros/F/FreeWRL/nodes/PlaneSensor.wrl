@@ -1,0 +1,59 @@
+#VRML V2.0 utf8
+# Copyright (C) 1998 Tuomas J. Lukka
+# DISTRIBUTED WITH NO WARRANTY, EXPRESS OR IMPLIED.
+# See the GNU Library General Public License (file COPYING in the distribution)
+# for conditions of use and redistribution.
+
+
+ Shape {
+ 	geometry Box { size 10 10 0.1 }
+ 	appearance Appearance { material Material {diffuseColor 0 0 0.6}}
+ }
+
+Group {
+children [
+	DEF S PlaneSensor { }
+	DEF T Transform {
+	 children [
+	 Shape {
+		geometry Box { size 1 1 1 }
+		appearance Appearance { material Material {diffuseColor 0.8 0 0.2}}
+	 }
+	]
+	}
+]
+}
+
+ROUTE S.translation_changed TO T.translation
+
+Group {
+children [
+	DEF S2 PlaneSensor { }
+	DEF T2 Transform {
+	 children [
+	 Shape {
+		geometry Box { size 1 1 1 }
+		appearance Appearance { material Material {diffuseColor 0.8 0.8 0.2}}
+	 }
+	]
+	}
+]
+}
+
+ROUTE S2.translation_changed TO T2.translation
+
+Group {
+children [
+	DEF S3 PlaneSensor { }
+	DEF T3 Transform {
+	 children [
+	 Shape {
+		geometry Box { size 1 1 1 }
+		appearance Appearance { material Material {diffuseColor 0.8 0.8 0.8}}
+	 }
+	]
+	}
+]
+}
+
+ROUTE S3.translation_changed TO T3.translation

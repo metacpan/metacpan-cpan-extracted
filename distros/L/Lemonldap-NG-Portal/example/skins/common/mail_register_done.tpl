@@ -3,7 +3,7 @@
 <p>
 <lang en="Hello" fr="Bonjour" /> $firstname $lastname,<br />
 <br />
-<lang en="Your account was successfully created." fr="Votre compte a bien été créé." />
+<lang en="Your account was successfully created." fr="Votre compte a bien &eacute;t&eacute; cr&eacute;&eacute;." />
 <br /> 
 <br /> 
 <lang en="Your login is" fr="Votre identifiant est" /> 

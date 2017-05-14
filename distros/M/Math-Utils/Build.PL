@@ -7,7 +7,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Useful mathematical functions not in Perl',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '1.09',
+	dist_version => '1.10',
 	dist_name => 'Math-Utils',
 
 	requires => {

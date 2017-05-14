@@ -17,8 +17,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# $Id: Server.pm,v 1.1 2003/10/17 14:40:37 rwmj Exp $
-
 =pod
 
 =head1 NAME
@@ -27,7 +25,7 @@ Net::FTPServer::Proxy::Server - Proxy FTP server
 
 =head1 SYNOPSIS
 
-  proxy-ftpd [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
+  proxy-ftpd.pl [-d] [-v] [-p port] [-s] [-S] [-V] [-C conf_file]
 
 =head1 DESCRIPTION
 
@@ -65,8 +63,6 @@ To proxy multiple servers using IP-based virtual hosts, use:
  </Host>
 
 =head1 METHODS
-
-=over 4
 
 =cut
 
@@ -155,19 +151,6 @@ sub root_directory_hook
 
 __END__
 
-=back 4
-
-=head1 FILES
-
-  /etc/ftpd.conf
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/FileHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Handle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Proxy/Server.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Proxy/DirHandle.pm
-  /usr/lib/perl5/site_perl/5.005/Net/FTPServer/Proxy/FileHandle.pm
-
 =head1 AUTHORS
 
 Richard Jones (rich@annexia.org).
@@ -178,6 +161,6 @@ Copyright (C) 2003 Richard Jones E<lt>rich@annexia.orgE<gt>
 
 =head1 SEE ALSO
 
-L<Net::FTPServer(3)>.
+C<Net::FTPServer(3)>.
 
 =cut

@@ -1,0 +1,36 @@
+# $Id$
+#
+# >>Copyright::
+# Copyright (c) 1992-1996, Ian Clatworthy (ianc@mincom.com).
+# You may distribute under the terms specified in the LICENSE file.
+#
+# >>History::
+# -----------------------------------------------------------------------
+# Date      Who     Change
+# 16-May-96 ianc    SDF 2.000
+# -----------------------------------------------------------------------
+#
+
+H1: box Filter
+
+H2: Interface
+
+!filter_interface "box"
+
+H2: Description
+
+The {{box}} filter is used to box a region of text.
+The {{lines}} parameter can be used to treat each line
+as a line within a paragraph - without this, the contents is
+treated as normal SDF.
+
+The other parameters have the same meanings as they do for the
+{{FILT:table}} filter.
+
+#H2: Examples
+
+
+H2: Limitations & Future Directions
+
+Some of the output drivers (e.g. the MIF driver) do not support
+nested tables, so tables within the box may be ignored.

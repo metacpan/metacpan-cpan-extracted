@@ -1,4 +1,4 @@
-use 5.008;
+use 5.014;
 use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -13,15 +13,16 @@ WriteMakefile(
             'DBI'                    => 0,
             'Glib'                   => 0,
             'HTTP::Message'          => 0,
+            'JSON'                   => 0,
             'Lasso'                  => '2.3.0',
-            'Lemonldap::NG::Handler' => '1.4.11',
+            'Lemonldap::NG::Handler' => '1.9.9',
             'LWP'                    => 0,
             'LWP::Protocol::https'   => 0,
             'MIME::Lite'             => 0,
+            'Net::OAuth'             => 0,
             'Net::Facebook::Oauth2'  => 0,
             'Net::OpenID::Consumer'  => 0,
             'Net::OpenID::Server'    => 0,
-            'Net::Twitter'           => 0,
             'SOAP::Lite'             => 0,
             'String::Random'         => 0,
             'URI'                    => 0,
@@ -51,7 +52,7 @@ WriteMakefile(
         'CGI'                   => 3.08,
         'Clone'                 => 0,
         'HTML::Template'        => 0,
-        'Lemonldap::NG::Common' => '1.4.11',
+        'Lemonldap::NG::Common' => '1.9.9',
         'Net::LDAP'             => 0.38,
         'Regexp::Assemble'      => 0,
         'Unicode::String'       => 0,

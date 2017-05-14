@@ -1,0 +1,1 @@
+Do not use deep directory relocation, and instead just pack them in the way we see them. This violates the ISO9660 standard, but it works on many systems. Use with caution.

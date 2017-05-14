@@ -1,0 +1,59 @@
+NAME
+    WWW::DataWiki - RESTful read-write RDF repository
+
+SYNOPSIS
+      script/www_datawiki_server.pl
+
+DESCRIPTION
+    WWW::DataWiki is a RESTful read-write RDF repository. Powered by
+    Catalyst, RDF::Trine and RDF::Query, it provides you with a wiki-like
+    site where each page, rather than being a textual document is an RDF
+    graph (actually, technically it's an N3 graph, so supports a slight
+    superset of RDF).
+
+    Graphs are versioned, and each graph (each version in fact) acts as its
+    own SPARQL endpoint. HTTP content negotiation serves up graph data as
+    HTML, Turtle, RDF/XML, JSON; and query results as HTML, XML, JSON, CSV
+    or tab-delimited data.
+
+    WWW::DataWiki is fully RESTful, using HTTP GET to retrieve the graph,
+    HTTP PUT to replace the graph with a new version, HTTP DELETE to replace
+    the graph with an empty graph (and there may be an option in the future
+    to delete the graph and its entire history), HTTP POST to append RDF
+    data to the graph, and HTTP PATCH to alter the graph using the SPARQL
+    Update language. (SPARQL Query and Update can also be tunnelled over
+    POST; and SPARQL Query can be tunnelled over GET.)
+
+    WWW::DataWiki exposes graph history using the HTTP headers described at
+    <http://www.mementoweb.org/>.
+
+    WWW::DataWiki offers some rudimentary support for RFC 2324.
+
+    In the current release there is very little user interface, and to
+    manage graphs you probably need to use a command-line tool like "curl"
+    or "lwp-request".
+
+    There is currently no support for authentication or access control. You
+    may be able to use external forms of access control.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=WWW-DataWiki>.
+
+SEE ALSO
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

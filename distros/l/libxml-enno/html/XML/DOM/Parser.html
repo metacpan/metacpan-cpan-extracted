@@ -38,4 +38,30 @@ XML::DOM::Parser option <B>KeepCDATA</B> to 1 will store CDATASections in
 CDATASection nodes, instead of converting them to Text nodes.
 Subsequent CDATASection nodes will be merged into one. Let me know if this
 is a problem.
-<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:31 1999</FONT></I></BODY></HTML>
+
+<P><HR><H1><A NAME="Using_LWP_to_parse_URLs">Using LWP to parse URLs
+
+</A></H1><P>The parsefile() method now also supports URLs, e.g. <I>http://www.erols.com/enno/xsa.xml</I>.
+It uses LWP to download the file and then calls parse() on the resulting string.
+By default it will use a <A>LWP::UserAgent</A> that is created as follows:
+
+<PRE> use LWP::UserAgent;
+ $LWP_USER_AGENT = LWP::UserAgent-&gt;new;
+ $LWP_USER_AGENT-&gt;env_proxy;
+
+</PRE><P>Note that env_proxy reads proxy settings from environment variables, which is what I need to
+do to get thru our firewall. If you want to use a different LWP::UserAgent, you can either set
+it globally with:
+
+<PRE> XML::DOM::Parser::set_LWP_UserAgent ($my_agent);
+
+</PRE><P>or, you can specify it for a specific XML::DOM::Parser by passing it to the constructor:
+
+<PRE> my $parser = new XML::DOM::Parser (LWP_UserAgent =&gt; $my_agent);
+
+</PRE><P>Currently, LWP is used when the filename (passed to parsefile) starts with one of
+the following URL schemes: http, https, ftp, wais, gopher, or file (followed by a colon.)
+If I missed one, please let me know. 
+
+<P>The LWP modules are part of libwww-perl which is available at CPAN.
+<P><HR><I><FONT SIZE="-1">Last updated: Wed Feb 23 13:37:27 2000</FONT></I></BODY></HTML>

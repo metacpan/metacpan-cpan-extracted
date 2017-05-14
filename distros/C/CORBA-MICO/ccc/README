@@ -1,0 +1,100 @@
+CORBA Control Center
+=================
+
+CORBA Control Center (CCC) is a tool providing user interface for
+standard CORBA subsystems and services.
+
+Status
+======
+Only one part of CCC implemented: Interface repository browser.
+Supports the following features:
+  1. Representing Interface Repository as a tree, navigating through it.
+  2. Reconstruction of source IDL code for IR entities.
+  3. Simple graphical representation of ancestor-successor relationships for 
+     IDL interfaces.
+  4. Inheritance trees may be exported to files in format understandable
+     by DIA (http://www.lysator.liu.se/~alla/dia/dia.html). 
+  5. Representing Name Service as a tree, navigating through it.
+   
+Requirements
+============
+CORBA::MICO (version 0.6.2 or later)
+Gtk module for Perl (version 0.7006 or later)
+
+Installation
+============
+To install and run this program, you'll need to have CORBA::MICO v0.6.2
+or better and Gtk/Perl v0.7006 or better installed.
+
+To build this package type:
+
+  perl Makefile.PL
+  make
+
+The package then can be installed by executing the command:
+
+  make install
+
+Running
+=======
+To run CCC you have to have:
+  - MICO Interface Repository running and accessible from your system.
+  - Interface Repository IDL files fed to Interface Repository.
+  - Name service server running and accessible from your system (optional).
+  - Name Service IDL file (CosNaming.idl) fed to Interface Repository (optional)
+Then type:
+   $ ccc -ORBIfaceRepoAddr <IR-address> [-ORBNamingAddr <NSD-address>] &
+       where <IR-address>  is Interface Repository address
+             <NSD-address> is Name Service server address
+or simply
+   $ ccc
+if you have .micorc file in your home directory containing Interface Repository
+and Name Service server (if you want Name Service to be managed from within CCC)addresses.
+
+File start-servers.sh in CORBA::MICO package may be used for starting 
+and preparing Interface Repository and .micorc file.
+
+To run Name Service server you should type
+  $ nsd -ORBIIOPAddr <NSD-address> &
+    where <NSD-address> is base server address in format inet:<hostname>:<port>
+Than you may use MICO naming service administration tool (nsadmin) 
+to add/edir/remove Name Service entries.
+The following command may be used to feed Name Service IDL file to IR.  
+  $ idl --no-codegen-c++ --feed-ir CosNaming.idl 
+   
+Troubleshooting
+===============
+The most popular diagnostic messages and probable problems may cause them:
+
+1.
+warning: cannot bind to Interface Repository at ...
+warning: will use a local Interface Repository
+Cannot find 'IDL:omg.org/CORBA:1.0' in interface repository at ...
+...
+
+Most probable reasons: 
+  - IR is not running or accessible
+  - bad IR address (option -ORBIfaceRepoAddr) or $HOME/.micorc file.
+
+2.
+Cannot find 'IDL:omg.org/CORBA:1.0' in interface repository at ...
+...
+
+Most probable reasons: 
+  - There is no IR address (option -ORBIfaceRepoAddr) or $HOME/.micorc file
+  - Interface Repository IDL files were not fed to Interface Repository.
+  
+3.
+Name Service will not be supported so as module CosNaming was not found in IR
+Reason:
+  - There is Name Service server running and acceptable but its IDL 
+    file (CosNaming.idl) was not fed to Interface Repository.
+
+=================
+CCC is a part of CORBA::MICO project initiated by Owen Taylor
+and currently maintained by Nikolay Logvinov (logvinon@users.sourceforge.net).
+
+URLs   : http://corba-mico.sourceforge.net
+Author : Pavel Rousnak
+Contact: Pavel Rousnak <rousnak@users.sourceforge.net>
+=================

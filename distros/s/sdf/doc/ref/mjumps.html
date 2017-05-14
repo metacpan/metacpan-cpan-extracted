@@ -1,0 +1,85 @@
+<!doctype html public "-//W30//DTD W3 HTML 2.0//EN">
+
+<HTML>
+
+<!-- This file was generated using SDF 2.001beta1 by
+     Ian Clatworthy (ianc@mincom.com). SDF is freely
+     available from http://www.mincom.com/mtr/sdf. -->
+
+<HEAD>
+<TITLE>SDF 2.001beta1: SDF Reference: jumps Macro</TITLE>
+</HEAD>
+<BODY BGCOLOR="ffffff">
+
+<P><IMG SRC="../sdflogo.gif" ALIGN="Right"></P>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_mac.html">Parent Topic</A> | <A HREF="minsert.html">Previous Topic</A> | <A HREF="mline.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+<BR CLEAR="Right">
+<H1>6.28. jumps Macro</H1>
+<HR>
+<H2><A NAME="Interface">Interface</A></H2>
+<P>The general syntax is:</P>
+<PRE>
+  !<STRONG>jumps</STRONG> labels [; layout]
+</PRE>
+<P>The arguments are:</P>
+<TABLE BORDER>
+<TR>
+<TD>
+<STRONG>Name</STRONG>
+</TD>
+<TD>
+<STRONG>Type</STRONG>
+</TD>
+<TD>
+<STRONG>Default</STRONG>
+</TD>
+<TD>
+<STRONG>Rule</STRONG>
+</TD>
+</TR>
+<TR>
+<TD>
+labels
+</TD>
+<TD>
+string
+</TD>
+<TD>
+&nbsp;
+</TD>
+<TD>
+&nbsp;
+</TD>
+</TR>
+<TR>
+<TD>
+layout
+</TD>
+<TD>
+string
+</TD>
+<TD>
+Center
+</TD>
+<TD>
+&lt;Left|Center|Right|left|center|right&gt;
+</TD>
+</TR>
+</TABLE>
+
+<P>See <A HREF="in_macif.html">Understanding Macro Interfaces</A>, if necessary.</P>
+<HR>
+<H2><A NAME="Description">Description</A></H2>
+<P>The <EM>jumps</EM> macro generates lines of jumps to headings.</P>
+<HR>
+<H2><A NAME="Examples">Examples</A></H2>
+<P>Typical usage is:</P>
+<PRE>
+   !jumps &quot;Purpose,Usage,,Description,Examples&quot;
+</PRE>
+<P>This will create two jump lines: the first has <EM>Purpose</EM> and <EM>Usage</EM>; the second has <EM>Description</EM> and <EM>Examples</EM>.</P>
+<HR>
+<P ALIGN="Center"><A HREF="re_sdf.html">Contents</A> | <A HREF="in_mac.html">Parent Topic</A> | <A HREF="minsert.html">Previous Topic</A> | <A HREF="mline.html">Next Topic</A> <BR><A HREF="../index.html">Home</A> | <A HREF="../catalog.html">Catalog</A></P>
+
+</BODY>
+</HTML>

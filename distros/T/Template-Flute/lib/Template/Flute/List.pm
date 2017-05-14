@@ -20,6 +20,7 @@ sub new {
 	my ($class, $sob, $static, $spec, $name) = @_;
 	my ($self, $lf);
 	
+	$class = shift;
 	$static ||= [];
 	
 	$self = {sob => $sob, static => $static, valid_input => undef};
@@ -29,7 +30,7 @@ sub new {
 	}
     $self->{limit} = $sob->{limit} if defined $sob->{limit};
 	
-	bless $self, $class;
+	bless $self;
 	
 	if ($spec && $name) {
 		$self->inputs_add($spec->list_inputs($name));
@@ -281,6 +282,107 @@ sub input {
 	return 1;
 }
 
+=head2 query
+
+Returns Perl structure for database query based on
+the specification.
+
+=cut
+
+sub query {
+	my ($self) = @_;
+	my (%query, $found_table, $found_param, $name, %cols);
+
+	%query = (tables => [], columns => {}, query => []);
+	
+	if ($self->{sob}->{table}) {
+		push @{$query{tables}}, $self->{sob}->{table};
+		$found_table = 1;
+	}
+
+	for (@{$self->{params}}) {
+		if (exists $_->{field}) {
+			$name = $_->{field};
+		}
+		else {
+			$name = $_->{name};
+		}
+		
+		push @{$query{columns}->{$self->{sob}->{table}}}, $name;
+		$cols{$name} = 1;
+		$found_param = 1;
+	}
+
+	# qualifier based on the input
+	for (values %{$self->{inputs}}) {
+		if (exists $_->{field}) {
+			$name = $_->{field};
+		}
+		else {
+			$name = $_->{name};
+		}
+
+		if ($_->{optional} && ! exists $_->{value}) {
+			next;
+		}
+		
+		if (exists $_->{op}) {
+			# specific operator
+			push @{$query{query}}, $name => {$_->{op} => $_->{value}};
+		}
+		else {
+			push @{$query{query}}, $name => $_->{value};
+		}
+		
+		# qualifiers need to be present in column specification
+		unless (exists $cols{$name}) {
+			push @{$query{columns}->{$self->{sob}->{table}}}, $name;
+		}
+	}
+
+	# filter
+	if (exists $self->{filters}) {
+		for my $fname (keys %{$self->{filters}}) {
+			if (exists $self->{filters}->{$fname}->{field}) {
+				push @{$query{columns}->{$self->{sob}->{table}}},
+					$self->{filters}->{$fname}->{field};
+			}
+		}
+	}
+	
+	# sorting
+	if (exists $self->{sorts}->{default}) {
+		my @sort;
+
+		for my $op (@{$self->{sorts}->{default}->{ops}}) {
+			if ($op->{direction}) {
+				push (@sort, "$op->{name} $op->{direction}");
+			}
+			else {
+				push (@sort, $op->{name});
+			}
+		}
+
+		$query{sort_by} = join(',', @sort);
+	}
+
+	# limits
+	if (exists $self->{limits}) {
+		my $limit;
+
+		if (exists $self->{limits}->{all}) {
+			$query{limit} = $self->{limits}->{all};
+		}
+		elsif (exists $self->{limits}->{plus}) {
+			$query{limit} = $self->{limits}->{plus} + 1;
+		}
+	}
+	
+	if ($found_table && $found_param) {
+		return \%query;
+	}
+}
+
 =head2 set_limit TYPE LIMIT
 
 Set list limit for type TYPE to LIMIT.
@@ -354,7 +456,7 @@ Stefan Hornburg (Racke), <racke@linuxia.de>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Stefan Hornburg (Racke) <racke@linuxia.de>.
+Copyright 2010-2014 Stefan Hornburg (Racke) <racke@linuxia.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

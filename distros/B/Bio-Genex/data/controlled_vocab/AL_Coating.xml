@@ -1,0 +1,32 @@
+<?xml version="1.0" standalone="yes"?>
+<controlled_vocabulary db_table="ArrayLayout" db_column="coating" cv_table="AL_Coating">
+<comment type="definition">This Control Table is used by the Array Layout table to describe what chemistry is used to promote sequence feature attachment
+</comment>
+<term name="photolithography"
+        description="the sequence feature is attached to a glass surface via photolithographic processes"/>
+<term name="polyeneimine"
+        description="The sequence feature is attached on a slide coated with polyeneimine"/>
+<term name="superamine"
+        description="Proprietary amine coated glass slides by ArrayIt"/>
+<term name="superclean"
+        description="Proprietary glass slides by ArrayIt"/>
+<term name="superaldehyde"
+        description="Proprietary aldehyde coated glass slides by ArrayIt"/>
+<term name="polylysine"
+        description="The sequence feature is attached  on a slide coated with polylysine"/>
+<term name="microwave"
+        description="The sequence feature attachment is based upon cross linking of DNA to a filter with microwave energy"/>
+<term name="nonspecific"
+        description="The sequence feature attachment is based upon uncharacterized interactions of DNA to a filter"/>
+<term name="carbon_linker"
+        description="The sequence feature is attached via a covalent bond to a surface or bead with a carbon chain between"/>
+<term name="concatenated"
+        description="The sequence features have been ligated together with an intervening signature tag to allow discrimination"/>
+</controlled_vocabulary>
+
+<!--
+*** emacs file mode definition ***
+Local Variables:
+ispell-personal-dictionary:"../.ispell-dict"
+End:
+-->

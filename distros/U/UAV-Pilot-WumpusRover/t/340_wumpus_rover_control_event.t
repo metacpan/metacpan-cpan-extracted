@@ -1,4 +1,4 @@
-# Copyright (c) 2014  Timm Murray
+# Copyright (c) 2015  Timm Murray
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 
@@ -21,17 +21,26 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 6;
+use Test::More;
 use strict;
 use warnings;
 use AnyEvent;
 use UAV::Pilot::Control;
 use UAV::Pilot::ControlRover;
 use UAV::Pilot::EasyEvent;
-use UAV::Pilot::WumpusRover::Control::Event;
 use UAV::Pilot::WumpusRover::Driver::Mock;
 use UAV::Pilot::WumpusRover::PacketFactory;
 use Test::Moose;
+
+eval "
+    use UAV::Pilot::WumpusRover::Control::Event;
+";
+if( $@ ) {
+    plan skip_all => "UAV::Pilot::SDL not installed";
+}
+else {
+    plan tests => 6;
+}
 
 
 my $driver = UAV::Pilot::WumpusRover::Driver::Mock->new({

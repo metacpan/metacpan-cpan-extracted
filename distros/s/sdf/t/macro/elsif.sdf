@@ -1,0 +1,19 @@
+# This file tests the elsif macro
+
+Some starting text.
+
+# Test an unexpected elsif (should generate an error)
+!elsif
+
+Some middle text.
+!if abc
+Inside abc.
+!else
+Inside else.
+
+# Test another unexpected elsif (should generate an error)
+!elsif xyz
+Inside elsif.
+
+!endif
+Some ending text.

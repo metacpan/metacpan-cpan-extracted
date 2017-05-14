@@ -1,38 +1,91 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR Free Software Foundation, Inc.
-# Naim Daka <naim70@freesurf.ch>, 2002.
 #
-#
+# Translators:
+# Ardit Dani <ardit.dani@gmail.com>, 2014-2016
+# Naim Daka <naim70@freesurf.ch>, 2002
 msgid ""
 msgstr ""
-"Project-Id-Version: urpmi 3.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-01 19:38+0200\n"
-"PO-Revision-Date: 2002-12-04 23:55+0200\n"
-"Last-Translator: Naim Daka <naim70@freesurf.ch>\n"
-"Language-Team: Albanian <LL@li.org>\n"
+"Project-Id-Version: Mageia\n"
+"POT-Creation-Date: 2014-09-13 21:15+0200\n"
+"PO-Revision-Date: 2016-04-08 10:33+0000\n"
+"Last-Translator: Ardit Dani <ardit.dani@gmail.com>\n"
+"Language-Team: Albanian (http://www.transifex.com/MageiaLinux/mageia/"
+"language/sq/)\n"
 "Language: sq\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../gurpmi:32
-#, fuzzy, c-format
-msgid "RPM installation"
-msgstr "Instalimi i sistemit"
+#: ../gurpm/RPMProgressDialog.pm:47
+#, c-format
+msgid "Distribution Upgrade"
+msgstr "Përmirësimi Shpërndarjes"
 
-#: ../gurpmi:46
+#: ../gurpm/RPMProgressDialog.pm:47
+#, c-format
+msgid "Packages installation"
+msgstr "Instalimi paketave"
+
+#: ../gurpm/RPMProgressDialog.pm:128
+#, c-format
+msgid "Please wait..."
+msgstr "Ju lutemi prisni..."
+
+#: ../gurpm/RPMProgressDialog.pm:290
+#, c-format
+msgid "Verifying package signatures..."
+msgstr "Verifikimi i nënshkrimeve paketës..."
+
+#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:107
+#, c-format
+msgid "Preparing..."
+msgstr "Përgatitje..."
+
+#: ../gurpm/RPMProgressDialog.pm:313
+#, c-format
+msgid "Removing package `%s' ..."
+msgstr "Heqja paketave `%s'..."
+
+#: ../gurpm/RPMProgressDialog.pm:316
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Instalimi i pakove `%s' (%s/%s)..."
+
+#: ../gurpm/RPMProgressDialog.pm:345
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Shkarkimi i pakos `%s'..."
+
+#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
+#, c-format
+msgid "Cancel"
+msgstr "Anulo"
+
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:453 ../urpm/download.pm:857
+#: ../urpm/get_pkgs.pm:278 ../urpm/media.pm:1126 ../urpm/media.pm:1647
+#: ../urpm/media.pm:1798
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "...rikuperimi dështoi: %s"
+
+#: ../gurpmi:49
+#, c-format
+msgid "RPM installation"
+msgstr "Instalimi RPM"
+
+#: ../gurpmi:63
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
 msgstr ""
 
-#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
 #, c-format
 msgid "_Ok"
 msgstr "_Ok"
 
-#: ../gurpmi:67
+#: ../gurpmi:84
 #, c-format
 msgid ""
 "You have selected a source package:\n"
@@ -45,8 +98,8 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: ../gurpmi:75 ../gurpmi:86
-#, fuzzy, c-format
+#: ../gurpmi:92 ../gurpmi:103
+#, c-format
 msgid ""
 "You are about to install the following software packages on your computer:\n"
 "\n"
@@ -54,10 +107,8 @@ msgid ""
 "\n"
 "Proceed?"
 msgstr ""
-"Ju duhet të jeni administrator  për t'instaluar mvarësit e radhitura:\n"
-"%s\n"
 
-#: ../gurpmi:81
+#: ../gurpmi:98
 #, c-format
 msgid ""
 "You are about to install the following software package on your computer:\n"
@@ -66,137 +117,128 @@ msgid ""
 "\n"
 "You may prefer to just save it. What is your choice?"
 msgstr ""
+"Ju jeni gati për të instaluar paketën e mëposhtme software në kompjuterin "
+"tuaj:\n"
+"\n"
+"%s\n"
+"\n"
+"Ju mund të preferoni vetëm ta ruani atë. Cila është zgjedhja juaj?"
 
-#: ../gurpmi:99
+#: ../gurpmi:116
 #, c-format
 msgid "_Install"
 msgstr "_Instalo"
 
-#: ../gurpmi:100
+#: ../gurpmi:117
 #, c-format
 msgid "_Save"
 msgstr "_Ruaj"
 
-#: ../gurpmi:101 ../gurpmi2:197
+#: ../gurpmi:118 ../gurpmi2:173
 #, c-format
 msgid "_Cancel"
 msgstr "_Anulo"
 
-#: ../gurpmi:109
-#, fuzzy, c-format
-msgid "Choose location to save file"
-msgstr "Zgjedhe një skedare"
-
-#: ../gurpmi.pm:41
+#: ../gurpmi:126
 #, c-format
-msgid "Options:"
+msgid "Choose location to save file"
 msgstr ""
 
-#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
-#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#: ../gurpmi:126 ../gurpmi2:119
+#, c-format
+msgid "Ok"
+msgstr "Ok"
+
+#: ../gurpmi.pm:56
+#, c-format
+msgid "Options:"
+msgstr "Opsione:"
+
+#: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
 #, c-format
 msgid "  --help         - print this help message.\n"
 msgstr "  --help         - shtype këtë lajmë ndihmues.\n"
 
-#: ../gurpmi.pm:43 ../urpmi:74
+#: ../gurpmi.pm:58 ../urpmi:74
 #, c-format
 msgid ""
 "  --auto         - non-interactive mode, assume default answers to "
 "questions.\n"
 msgstr ""
 
-#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#: ../gurpmi.pm:59 ../urpmi:75 ../urpmq:48
 #, c-format
 msgid ""
 "  --auto-select  - automatically select packages to upgrade the system.\n"
 msgstr ""
 "  --auto-select  - zgjedhni automatikisht pakot azhurnuese në sistem.\n"
 
-#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#: ../gurpmi.pm:60 ../urpme:46 ../urpmi:100 ../urpmq:64
 #, c-format
 msgid ""
 "  --force        - force invocation even if some packages do not exist.\n"
 msgstr ""
 "  --force        - kërkim i forcuar edhe pse disa pako nuk ekzistojnë.\n"
 
-#: ../gurpmi.pm:46 ../urpmi:129
-#, fuzzy, c-format
+#: ../gurpmi.pm:61 ../urpmi:131
+#, c-format
 msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
 "                   (--no-verify-rpm disables it, default is enabled).\n"
 msgstr ""
-"  --verify-rpm   - verifikoje nënshkrimin e rpm para instalimit\n"
-"                   (--no-verify-rpm dezaktivizoje verifikim e tyre).\n"
 
-#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
 msgid "  --media        - use only the given media, separated by comma.\n"
 msgstr ""
 "  --media        - përdori vetëm burimet e dhëna, të ndara me presje.\n"
 
-#: ../gurpmi.pm:49 ../urpmi:146
+#: ../gurpmi.pm:64 ../urpmi:147
 #, c-format
 msgid "  -p             - allow search in provides to find package.\n"
 msgstr ""
 "  -p             - lejon hulumtimet në pajisjetë për ta gjetur pakon.\n"
 
-#: ../gurpmi.pm:50 ../urpmi:147
+#: ../gurpmi.pm:65 ../urpmi:148
 #, c-format
 msgid "  -P             - do not search in provides to find package.\n"
 msgstr "  -P             - mos hulumto në këto pajisje për ta gjetur pakon.\n"
 
-#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
-#, fuzzy, c-format
+#: ../gurpmi.pm:66 ../urpmi:107 ../urpmq:67
+#, c-format
 msgid "  --root         - use another root for rpm installation.\n"
 msgstr ""
-"  --wget         - përdore wget për rikuperimin e skedareve në distancë.\n"
 
-#: ../gurpmi.pm:52 ../urpmi:131
-#, fuzzy, c-format
+#: ../gurpmi.pm:67 ../urpmi:133
+#, c-format
 msgid ""
 "  --test         - only verify if the installation can be achieved "
 "correctly.\n"
 msgstr ""
-"  --test        - verifikoje nëse instalimi përfundon në mënyrë korrekte.\n"
 
-#: ../gurpmi.pm:53 ../urpmi:71
-#, fuzzy, c-format
+#: ../gurpmi.pm:68 ../urpmi:71
+#, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested packages.\n"
 msgstr ""
-"  --media        - përdori vetëm burimet e dhëna, të ndara me presje.\n"
 
-#: ../gurpmi.pm:96
-#, fuzzy, c-format
+#: ../gurpmi.pm:115
+#, c-format
 msgid "No packages specified"
-msgstr "Asnjë urdhër i specifikuar"
+msgstr "Asnjë paketë e specifikuar"
 
-#: ../gurpmi2:55
-#, fuzzy, c-format
-msgid "Please wait..."
-msgstr "Një moment ju lutemi."
-
-#: ../gurpmi2:64
-#, fuzzy, c-format
+#: ../gurpmi2:46
+#, c-format
 msgid "Must be root"
-msgstr "Porta e Minit"
+msgstr "Duhet të jetë root"
 
-#: ../gurpmi2:71
-#, fuzzy, c-format
-msgid "Distribution Upgrade"
-msgstr "shpërndarje e %s"
-
-#: ../gurpmi2:71
-#, fuzzy, c-format
-msgid "Packages installation"
-msgstr "Instalimi i pakos..."
-
-#: ../gurpmi2:98
+#: ../gurpmi2:76
 #, c-format
 msgid "Preparing packages installation..."
 msgstr "Pregatitje për instalimin e pakove..."
 
-#: ../gurpmi2:113 ../urpmi:505
+#: ../gurpmi2:91 ../urpmi:506
 #, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
@@ -205,159 +247,145 @@ msgstr ""
 "Disa nga pakot e kërkuara nuk mund të instalohen:\n"
 "%s"
 
-#: ../gurpmi2:121
-#, fuzzy, c-format
+#: ../gurpmi2:99
+#, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Disa nga pakot e kërkuara nuk mund të instalohen:\n"
-"%s"
+"Disa nga paketat e kërkuara nuk mund të instalohen:\n"
+"%s\n"
+"Vazhdo instalimin gjithsesi?"
 
-#: ../gurpmi2:156
+#: ../gurpmi2:119
 #, c-format
 msgid "Warning"
 msgstr "Kujdes"
 
-#: ../gurpmi2:156
+#: ../gurpmi2:169
 #, c-format
-msgid "Ok"
-msgstr "Ok"
-
-#: ../gurpmi2:193
-#, fuzzy, c-format
 msgid " (to upgrade)"
-msgstr "Azhurno"
+msgstr "(për të përmirësuar)"
 
-#: ../gurpmi2:194
-#, fuzzy, c-format
+#: ../gurpmi2:170
+#, c-format
 msgid " (to install)"
-msgstr "Fundi i instalimit"
+msgstr "(për të instaluar)"
 
-#: ../gurpmi2:197
+#: ../gurpmi2:173
 #, c-format
 msgid "Package choice"
-msgstr ""
+msgstr "Zgjedhje pakete"
 
-#: ../gurpmi2:198
+#: ../gurpmi2:174
 #, c-format
 msgid "One of the following packages is needed:"
 msgstr "Një nga pakot e radhitura nevojitet:"
 
-#: ../gurpmi2:223
-#, fuzzy, c-format
+#: ../gurpmi2:204
+#, c-format
 msgid "_Abort"
-msgstr "Ndërpreje"
+msgstr "_Ndërpre"
 
-#: ../gurpmi2:258
-#, fuzzy, c-format
+#: ../gurpmi2:239
+#, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Pakot a radhitura duhet të zhduken që të tjerat të azhurnohen:\n"
-"%s"
+"Paketat në vazhdim duhen të hiqen që të tjerat të përmirësohen:\n"
+"%s\n"
+"Vazhdo instalimin gjithsesi?"
 
-#: ../gurpmi2:277 ../urpmi:605
-#, fuzzy, c-format
+#: ../gurpmi2:250 ../urpmi:615
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr "%s hapësirë ​​shtesë në disk do të përdoret."
+
+#: ../gurpmi2:251 ../urpmi:616
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr "%s e hapësirë ​​në disk do të lirohen."
+
+#: ../gurpmi2:252 ../urpmi:617
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr "%s e paketave do të rifitohet."
+
+#: ../gurpmi2:253 ../urpmi:618
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] "Të vazhdohet me instalimin e një paketë?"
+msgstr[1] "Të vazhdohet me instalimin e %d paketave?"
+
+#: ../gurpmi2:259 ../urpmi:606
+#, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
-msgstr "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
+msgstr "Për të kënaqur varësitë, paketa e mëposhtme do të instalohet:"
 
-#: ../gurpmi2:278 ../urpmi:606
-#, fuzzy, c-format
+#: ../gurpmi2:260 ../urpmi:607
+#, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
-msgstr ""
-"Me rastin e mbushjes së mvarësisë, pako(t) e radhitura duhet të\n"
-"instalohen:\n"
-"\n"
+msgstr "Për të kënaqur varësitë, paketat e mëposhtme do të instalohen:"
 
-#: ../gurpmi2:280
-#, c-format
-msgid "(%d package, %d MB)"
-msgid_plural "(%d packages, %d MB)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#: ../gurpmi2:270 ../urpm/main_loop.pm:467
 #, c-format
 msgid "unable to get source packages, aborting"
 msgstr "e pa mundur marrja e burimit të pakos, ndërpritje"
 
-#: ../gurpmi2:320 ../urpm/install.pm:104
+#: ../gurpmi2:287 ../urpmi:634
 #, c-format
-msgid "Preparing..."
-msgstr "Përgatitje..."
-
-#: ../gurpmi2:326
-#, c-format
-msgid "Installing package `%s' (%s/%s)..."
-msgstr "Instalimi i pakove `%s' (%s/%s)..."
-
-#: ../gurpmi2:344 ../urpmi:633
-#, fuzzy, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "Ju lutemi futni burimin e emruar \"%s\" në mjetin [%s]"
+msgstr ""
 
-#: ../gurpmi2:358
+#: ../gurpmi2:307
 #, c-format
-msgid "Downloading package `%s'..."
-msgstr "Shkarkimi i pakos `%s'..."
+msgid "An error occurred:"
+msgstr "Një gabim ndodhi:"
 
-#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
-#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
-#: ../urpm/media.pm:1657
+#: ../gurpmi2:319
 #, c-format
-msgid "...retrieving failed: %s"
-msgstr "...rikuperimi dështoi: %s"
-
-#: ../gurpmi2:387
-#, fuzzy, c-format
 msgid "_Done"
-msgstr "Përfundoi"
+msgstr "_Bërë"
 
-#: ../gurpmi2:404 ../urpm/main_loop.pm:82
-#, fuzzy, c-format
+#: ../gurpmi2:336 ../urpm/main_loop.pm:82
+#, c-format
 msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
-msgstr "Instalimi dështio"
+msgstr ""
+"Instalimi dështoi, mungojnë disa kartela:\n"
+"%s"
 
-#: ../gurpmi2:407
-#, fuzzy, c-format
+#: ../gurpmi2:339
+#, c-format
 msgid "You may want to update your urpmi database."
 msgstr ""
-"Instalimi dështoi, disa skedare mungojnë:\n"
-"%s\n"
-"A dëshironi t'azhurnoni bazën e të dhënave urpmi"
 
-#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
-#, fuzzy, c-format
+#: ../gurpmi2:343 ../urpm/main_loop.pm:288 ../urpm/main_loop.pm:580
+#, c-format
 msgid "Installation failed:"
-msgstr "Instalimi dështio"
+msgstr "Instalimi dështoi:"
 
-#: ../gurpmi2:416
+#: ../gurpmi2:348
 #, c-format
 msgid "The package(s) are already installed"
 msgstr "Gjdo gjë është veçse e instaluar"
 
-#: ../gurpmi2:418
+#: ../gurpmi2:350
 #, c-format
 msgid "Installation finished"
 msgstr "Instalimi përfundoi"
 
-#: ../gurpmi2:419 ../urpme:165
-#, c-format
-msgid "removing %s"
-msgstr "zhdukja e %s"
-
-#: ../gurpmi2:430 ../urpmi:691
+#: ../gurpmi2:363 ../urpmi:692
 #, c-format
 msgid "restarting urpmi"
-msgstr ""
+msgstr "rifillimi urpmi"
 
 #: ../rpm-find-leaves:15
 #, c-format
@@ -374,28 +402,26 @@ msgid "   -h|--help      - print this help message.\n"
 msgstr "   -h|--help      - shtype këtë lajmë ndihmues.\n"
 
 #: ../rpm-find-leaves:18
-#, fuzzy, c-format
+#, c-format
 msgid "   --root <path>  - use the given root instead of /\n"
-msgstr "  --synthesis    - përdori skedaret e dhëna sintezë në vend të db.\n"
+msgstr ""
 
 #: ../rpm-find-leaves:19
-#, fuzzy, c-format
+#, c-format
 msgid "   -g [group]     - restrict results to specified group.\n"
-msgstr "  --group         - çfaqe etiketën group: grupi.\n"
+msgstr ""
 
 #: ../rpm-find-leaves:20
-#, fuzzy, c-format
+#, c-format
 msgid "                    defaults to %s.\n"
 msgstr ""
-"\n"
-"                      Raporti DrakBackup \n"
 
 #: ../rpm-find-leaves:21
-#, fuzzy, c-format
+#, c-format
 msgid "   -f             - output rpm full name (NVRA)\n"
-msgstr "  -g             - çfaqi grupet njashtu dhe emrat.\n"
+msgstr ""
 
-#: ../rurpmi:11 ../urpmi:265
+#: ../rurpmi:11 ../urpmi:266
 #, c-format
 msgid "Only superuser is allowed to install packages"
 msgstr "Vetëm administratori i sistemin ka mundësi të instalojë pakot"
@@ -410,137 +436,137 @@ msgstr ""
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:110
-#, fuzzy, c-format
+#: ../urpm.pm:194
+#, c-format
 msgid "fail to create directory %s"
-msgstr "I pa mundur krijimi i repertorit [%s] për raport të bug(it)"
+msgstr "dështojnë për të krijuar kartelën %s"
 
-#: ../urpm.pm:111
+#: ../urpm.pm:195
 #, c-format
 msgid "invalid owner for directory %s"
-msgstr ""
+msgstr "pronari i pavlefshëm për kartelën %s"
 
-#: ../urpm.pm:135
-#, fuzzy, c-format
+#: ../urpm.pm:238
+#, c-format
 msgid "Can not download packages into %s"
-msgstr "Shkarkimi i pakos `%s'..."
+msgstr "Nuk mund të shkarkoni paketa në %s"
 
-#: ../urpm.pm:150
+#: ../urpm.pm:254
 #, c-format
 msgid "Environment directory %s does not exist"
-msgstr ""
+msgstr "Mjedisi kartelës %s nuk ekziston"
 
-#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#: ../urpm.pm:255 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "përdorim specifik i mjedisit në %s\n"
 
-#: ../urpm.pm:313
+#: ../urpm.pm:423
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "e pa mundur hapja e rpmdb"
 
-#: ../urpm.pm:327
+#: ../urpm.pm:442
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "emri i skedares rpm është invalid [%s]"
 
-#: ../urpm.pm:333
+#: ../urpm.pm:448
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "rikuperimi i skedareve rpm [%s]..."
 
-#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#: ../urpm.pm:450 ../urpm/get_pkgs.pm:276
 #, c-format
 msgid "...retrieving done"
 msgstr "...rikuperim i bërë"
 
-#: ../urpm.pm:343
+#: ../urpm.pm:458
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "e pa mundur hyrja në skedaren rpm [%s]"
 
-#: ../urpm.pm:348
-#, fuzzy, c-format
+#: ../urpm.pm:463
+#, c-format
 msgid "unable to parse spec file %s [%s]"
-msgstr "analizimi i pa mundur i \"%s\" në skedaren [%s]"
+msgstr ""
 
-#: ../urpm.pm:356
+#: ../urpm.pm:471
 #, c-format
 msgid "unable to register rpm file"
 msgstr "i pa mundur regjistrimi i skedares rpm"
 
-#: ../urpm.pm:358
+#: ../urpm.pm:473
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr ""
 
-#: ../urpm.pm:362
+#: ../urpm.pm:477
 #, c-format
 msgid "error registering local packages"
 msgstr "gabim gjatë regjistrimit të pakove lokale"
 
-#: ../urpm.pm:450
+#: ../urpm.pm:589
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr ""
 
-#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "proxy që është deklaruar në linjën komanduese nuk është i saktë\n"
 
-#: ../urpm/args.pm:306
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: nuk mund ta lexojë skedaren rpm \"%s\"\n"
 
-#: ../urpm/args.pm:384
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
+msgstr "shprehja e papritur %s"
+
+#: ../urpm/args.pm:390
+#, c-format
+msgid "missing expression before %s"
 msgstr ""
 
-#: ../urpm/args.pm:385
-#, fuzzy, c-format
-msgid "missing expression before %s"
-msgstr "Mungon nënshkrimi (%s)"
-
-#: ../urpm/args.pm:391
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr ""
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr ""
 
-#: ../urpm/args.pm:404
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 
-#: ../urpm/args.pm:478
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr ""
 
-#: ../urpm/args.pm:501
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
-msgstr ""
+msgstr "Nuk mund të përdorni %s pa %s"
 
-#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
-msgstr ""
+msgstr "Nuk mund të përdorni %s me %s"
 
-#: ../urpm/args.pm:515
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
-msgstr ""
+msgstr "Shumë argumente\n"
 
-#: ../urpm/args.pm:523
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -556,12 +582,12 @@ msgstr ""
 "\n"
 "përdorim:\n"
 
-#: ../urpm/args.pm:529
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "E drejtë autori (C) %s %s"
 
-#: ../urpm/bug_report.pm:67 ../urpmi:255
+#: ../urpm/bug_report.pm:67 ../urpmi:256
 #, c-format
 msgid "Copying failed"
 msgstr "Kopjimi dështoi"
@@ -579,202 +605,184 @@ msgid "Udisks daemon (udisks-daemon) is not running or not ready"
 msgstr ""
 
 #: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\" is not available"
-msgstr "burimi \"%s\" nuk është i zgjedhur"
+msgstr ""
 
 #: ../urpm/cdrom.pm:218
 #, c-format
 msgid "unable to read rpm file [%s] from medium \"%s\""
 msgstr "i pa mundur leximi i skedares [%s] nga burimi \"%s\""
 
-#: ../urpm/cfg.pm:82
-#, fuzzy, c-format
+#: ../urpm/cfg.pm:74
+#, c-format
 msgid "syntax error in config file at line %s"
-msgstr "i pa mundur shkrimi i skedares konfiguruese [%s]"
+msgstr ""
 
-#: ../urpm/cfg.pm:115
-#, fuzzy, c-format
+#: ../urpm/cfg.pm:107
+#, c-format
 msgid "unable to read config file [%s]"
-msgstr "i pa mundur shkrimi i skedares konfiguruese [%s]"
+msgstr ""
 
-#: ../urpm/cfg.pm:141
+#: ../urpm/cfg.pm:133
 #, c-format
 msgid "medium `%s' is defined twice, aborting"
 msgstr ""
 
-#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#: ../urpm/cfg.pm:249 ../urpm/media.pm:556
 #, c-format
 msgid "unable to write config file [%s]"
 msgstr "i pa mundur shkrimi i skedares konfiguruese [%s]"
 
-#: ../urpm/download.pm:95
+#: ../urpm/download.pm:93
 #, c-format
 msgid "%s is not available, falling back on %s"
 msgstr ""
 
-#: ../urpm/download.pm:178
+#: ../urpm/download.pm:169
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
 msgstr ""
 
-#: ../urpm/download.pm:208
+#: ../urpm/download.pm:199
 #, c-format
 msgid "Please enter your credentials for accessing proxy\n"
 msgstr ""
 
-#: ../urpm/download.pm:209
+#: ../urpm/download.pm:200
 #, c-format
 msgid "User name:"
 msgstr "Emri i përdoruesit:"
 
-#: ../urpm/download.pm:209
+#: ../urpm/download.pm:200
 #, c-format
 msgid "Password:"
-msgstr "Shifra:"
+msgstr "Fjalëkalim:"
 
-#: ../urpm/download.pm:295
+#: ../urpm/download.pm:286
 #, c-format
 msgid "Unknown webfetch `%s' !!!\n"
 msgstr ""
 
-#: ../urpm/download.pm:303
+#: ../urpm/download.pm:294
 #, c-format
 msgid "%s failed: exited with signal %d"
 msgstr ""
 
-#: ../urpm/download.pm:304
+#: ../urpm/download.pm:295
 #, c-format
 msgid "%s failed: exited with %d"
 msgstr ""
 
-#: ../urpm/download.pm:338
-#, fuzzy, c-format
-msgid "copy failed"
-msgstr "Kopjimi dështoi"
-
-#: ../urpm/download.pm:344
-#, fuzzy, c-format
-msgid "wget is missing\n"
-msgstr "ka arritur nga mungesa %s"
-
-#: ../urpm/download.pm:411
-#, fuzzy, c-format
-msgid "curl is missing\n"
-msgstr "ka arritur nga mungesa %s"
-
-#: ../urpm/download.pm:547
+#: ../urpm/download.pm:329
 #, c-format
-msgid "curl failed: upload canceled\n"
-msgstr ""
+msgid "copy failed"
+msgstr "kopje dështuar"
 
-#: ../urpm/download.pm:548
+#: ../urpm/download.pm:335
+#, c-format
+msgid "wget is missing\n"
+msgstr "wget mungon\n"
+
+#: ../urpm/download.pm:402
+#, c-format
+msgid "curl is missing\n"
+msgstr "curl mungon\n"
+
+#: ../urpm/download.pm:537
 #, c-format
 msgid "curl failed: download canceled\n"
 msgstr ""
 
-#: ../urpm/download.pm:583
+#: ../urpm/download.pm:572
 #, c-format
 msgid "rsync is missing\n"
-msgstr ""
+msgstr "rsync mungon\n"
 
-#: ../urpm/download.pm:651
+#: ../urpm/download.pm:640
 #, c-format
 msgid "ssh is missing\n"
-msgstr ""
+msgstr "ssh mungon\n"
 
-#: ../urpm/download.pm:670
+#: ../urpm/download.pm:659
 #, c-format
 msgid "prozilla is missing\n"
-msgstr ""
+msgstr "prozilla mungon\n"
 
-#: ../urpm/download.pm:686
+#: ../urpm/download.pm:675
 #, c-format
 msgid "Couldn't execute prozilla\n"
 msgstr ""
 
-#: ../urpm/download.pm:696
-#, fuzzy, c-format
+#: ../urpm/download.pm:685
+#, c-format
 msgid "aria2 is missing\n"
-msgstr "ka arritur nga mungesa %s"
+msgstr "aria2 mungon\n"
 
-#: ../urpm/download.pm:740
+#: ../urpm/download.pm:734
 #, c-format
 msgid "Failed to download %s"
 msgstr ""
 
-#: ../urpm/download.pm:835
+#: ../urpm/download.pm:829
 #, c-format
 msgid "        %s%% of %s completed, ETA = %s, speed = %s"
 msgstr ""
 
-#: ../urpm/download.pm:836
+#: ../urpm/download.pm:830
 #, c-format
 msgid "        %s%% completed, speed = %s"
 msgstr ""
 
-#: ../urpm/download.pm:921
-#, fuzzy, c-format
+#: ../urpm/download.pm:915
+#, c-format
 msgid "retrieving %s"
-msgstr "zhdukja e %s"
+msgstr ""
 
-#: ../urpm/download.pm:932
-#, fuzzy, c-format
+#: ../urpm/download.pm:926
+#, c-format
 msgid "retrieved %s"
-msgstr "...rikuperimi dështoi: %s"
+msgstr ""
 
-#: ../urpm/download.pm:994
+#: ../urpm/download.pm:989
 #, c-format
 msgid "unknown protocol defined for %s"
 msgstr "protokol i pa njoftur për përcaktimit e %s"
 
-#: ../urpm/download.pm:1008
+#: ../urpm/download.pm:1003
 #, c-format
 msgid "no webfetch found, supported webfetch are: %s\n"
 msgstr ""
 
-#: ../urpm/download.pm:1023
+#: ../urpm/download.pm:1018
 #, c-format
 msgid "unable to handle protocol: %s"
 msgstr "i pa mundur përdorimi i protokolit: %s"
 
 #: ../urpm/get_pkgs.pm:29
-#, fuzzy, c-format
+#, c-format
 msgid "cleaning %s and %s"
-msgstr "instalimi i %s"
+msgstr ""
 
 #: ../urpm/get_pkgs.pm:141
 #, c-format
 msgid "package %s is not found."
 msgstr "pakoja %s nuk është prezente"
 
-#: ../urpm/get_pkgs.pm:277
+#: ../urpm/get_pkgs.pm:269
 #, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
 msgstr "rikuperimi i skedareve rpm nga burimi\"%s\"..."
 
-#: ../urpm/install.pm:110
+#: ../urpm/install.pm:115 ../urpme:164
 #, c-format
-msgid "[repackaging]"
-msgstr ""
+msgid "removing %s"
+msgstr "zhdukja e %s"
 
-#: ../urpm/install.pm:201
+#: ../urpm/install.pm:215
 #, c-format
-msgid ""
-"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
-msgstr ""
-"krijimi i një akcioni transmetues për një instalim në %s (remove=%d, install="
-"%d, upgrade=%d)"
-
-#: ../urpm/install.pm:204
-#, c-format
-msgid "unable to create transaction"
-msgstr "i pa mundur krijimi i një akcioni transmetues"
-
-#: ../urpm/install.pm:229
-#, fuzzy, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
-msgstr "e pa mundur zhdukja e pakos %s"
+msgstr ""
 
 #: ../urpm/install.pm:242
 #, c-format
@@ -782,64 +790,72 @@ msgid "unable to install package %s"
 msgstr "i pa mundur instalimi i pakos %s"
 
 #: ../urpm/install.pm:245
-#, fuzzy, c-format
+#, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "instalimi i %s"
+msgstr ""
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:311
-#, fuzzy, c-format
+#: ../urpm/install.pm:246 ../urpm/install.pm:374
+#, c-format
 msgid "removing %s failed: %s"
-msgstr "...rikuperimi dështoi: %s"
+msgstr ""
 
-#: ../urpm/install.pm:292
-#, fuzzy, c-format
-msgid "Removing package %s"
-msgstr "zhdukja e pakos %s"
-
-#: ../urpm/install.pm:293
+#: ../urpm/install.pm:295
 #, c-format
 msgid "removing package %s"
 msgstr "zhdukja e pakos %s"
 
-#: ../urpm/install.pm:309
-#, fuzzy, c-format
+#: ../urpm/install.pm:341
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+"krijimi i një akcioni transmetues për një instalim në %s (remove=%d, install="
+"%d, upgrade=%d)"
+
+#: ../urpm/install.pm:344
+#, c-format
+msgid "unable to create transaction"
+msgstr "i pa mundur krijimi i një akcioni transmetues"
+
+#: ../urpm/install.pm:372
+#, c-format
 msgid "removing installed rpms (%s) from %s"
-msgstr "instalimi i %s"
+msgstr ""
 
-#: ../urpm/install.pm:318
-#, fuzzy, c-format
+#: ../urpm/install.pm:381
+#, c-format
 msgid "More information on package %s"
-msgstr "Më shumë informacione mbi pakon..."
+msgstr ""
 
-#: ../urpm/ldap.pm:44
+#: ../urpm/ldap.pm:42
 #, c-format
 msgid "Cannot create ldap cache directory"
 msgstr ""
 
-#: ../urpm/ldap.pm:46
+#: ../urpm/ldap.pm:48
 #, c-format
 msgid "Cannot write cache file for ldap\n"
 msgstr ""
 
-#: ../urpm/ldap.pm:181
+#: ../urpm/ldap.pm:177
 #, c-format
 msgid "No server defined, missing uri or host"
 msgstr ""
 
-#: ../urpm/ldap.pm:182
-#, fuzzy, c-format
+#: ../urpm/ldap.pm:178
+#, c-format
 msgid "No base defined"
-msgstr "Asnjë urdhër i specifikuar"
+msgstr ""
 
-#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#: ../urpm/ldap.pm:188 ../urpm/ldap.pm:191
 #, c-format
 msgid "Cannot connect to ldap uri:"
 msgstr ""
 
 #: ../urpm/lock.pm:99
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked, process %d is already using it"
-msgstr "baza e të dhënave urpmi është e mbyllur"
+msgstr ""
 
 #: ../urpm/lock.pm:101
 #, c-format
@@ -847,34 +863,31 @@ msgid "%s database is locked (another program is already using it)"
 msgstr ""
 
 #: ../urpm/lock.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "baza e të dhënave urpmi është e mbyllur"
+msgstr ""
 
 #: ../urpm/lock.pm:116
-#, fuzzy, c-format
+#, c-format
 msgid "aborting"
-msgstr "Kujdes"
+msgstr "ndërprerje"
 
 #: ../urpm/main_loop.pm:58
 #, c-format
 msgid "Retry?"
-msgstr ""
+msgstr "Riprovo?"
 
 #: ../urpm/main_loop.pm:85
-#, fuzzy, c-format
+#, c-format
 msgid "You may need to update your urpmi database."
 msgstr ""
-"Instalimi dështoi, disa skedare mungojnë:\n"
-"%s\n"
-"A dëshironi t'azhurnoni bazën e të dhënave urpmi"
 
 #: ../urpm/main_loop.pm:89
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
-msgstr "Instalimi dështio"
+msgstr ""
 
 #: ../urpm/main_loop.pm:108
 #, c-format
@@ -885,9 +898,9 @@ msgid ""
 msgstr ""
 
 #: ../urpm/main_loop.pm:138
-#, fuzzy, c-format
+#, c-format
 msgid "The following package has bad signature"
-msgstr "Pakot a radhitura kanë nënshkrime të pa pranueshëm"
+msgstr ""
 
 #: ../urpm/main_loop.pm:139
 #, c-format
@@ -899,53 +912,53 @@ msgstr "Pakot a radhitura kanë nënshkrime të pa pranueshëm"
 msgid "Do you want to continue installation ?"
 msgstr "A dëshironi të vazhdoni me instalimin e tyre ?"
 
-#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
-#: ../urpm/main_loop.pm:296
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:290
+#: ../urpm/main_loop.pm:298
 #, c-format
 msgid "Installation failed"
 msgstr "Instalimi dështio"
 
 #: ../urpm/main_loop.pm:159
-#, fuzzy, c-format
+#, c-format
 msgid "removing installed rpms (%s)"
-msgstr "instalimi i %s"
+msgstr ""
 
 #: ../urpm/main_loop.pm:185
 #, c-format
 msgid "Try to continue anyway?"
 msgstr ""
 
-#: ../urpm/main_loop.pm:234
-#, fuzzy, c-format
-msgid "installing %s from %s"
-msgstr "instalimi i %s"
-
 #: ../urpm/main_loop.pm:236
+#, c-format
+msgid "installing %s from %s"
+msgstr ""
+
+#: ../urpm/main_loop.pm:238
 #, c-format
 msgid "installing %s"
 msgstr "instalimi i %s"
 
-#: ../urpm/main_loop.pm:243
+#: ../urpm/main_loop.pm:245
 #, c-format
 msgid "distributing %s"
 msgstr "shpërndarje e %s"
 
-#: ../urpm/main_loop.pm:289
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:291
+#, c-format
 msgid "Try installation without checking dependencies?"
-msgstr "Tento një instalim pa verifikimin e mvarësive? (p/J) "
+msgstr ""
 
-#: ../urpm/main_loop.pm:297
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:299
+#, c-format
 msgid "Try harder to install (--force)?"
-msgstr "Tento një instalim më të forcuar (--force)? (p/J) "
+msgstr ""
 
-#: ../urpm/main_loop.pm:490
+#: ../urpm/main_loop.pm:590
 #, c-format
 msgid "Packages are up to date"
 msgstr ""
 
-#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#: ../urpm/main_loop.pm:601 ../urpm/parallel.pm:299
 #, c-format
 msgid "Installation is possible"
 msgstr "Instalimi është i mundur"
@@ -955,279 +968,285 @@ msgstr "Instalimi është i mundur"
 msgid "warning: md5sum for %s unavailable in MD5SUM file"
 msgstr ""
 
-#: ../urpm/media.pm:270
+#: ../urpm/media.pm:268
 #, c-format
 msgid "virtual medium \"%s\" should have a clear url, medium ignored"
 msgstr ""
 "burimi virtuel \"%s\" duhet të posedoj një url të qartë, burim i injoruar"
 
-#: ../urpm/media.pm:272
+#: ../urpm/media.pm:270
 #, c-format
 msgid "unable to access list file of \"%s\", medium ignored"
 msgstr "e pa mundur hyrja në skedaren e listës të \"%s\", burim i injoruar"
 
-#: ../urpm/media.pm:275
-#, fuzzy, c-format
+#: ../urpm/media.pm:273
+#, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
-msgstr "e pa mundur hyrja në skedaren hdlist të \"%s\", burim i injoruar"
+msgstr ""
 
-#: ../urpm/media.pm:301
-#, fuzzy, c-format
+#: ../urpm/media.pm:299
+#, c-format
 msgid "trying to override existing medium \"%s\", skipping"
-msgstr "tentim në kalimin e një burimit ekzistues \"%s\", ndërprerje"
+msgstr ""
 
-#: ../urpm/media.pm:517
+#: ../urpm/media.pm:515
 #, c-format
 msgid "failed to migrate removable device, ignoring media"
 msgstr ""
 
-#: ../urpm/media.pm:555
+#: ../urpm/media.pm:558
 #, c-format
 msgid "wrote config file [%s]"
 msgstr "shkruaja e skedares konfiguruese [%s]"
 
-#: ../urpm/media.pm:598
+#: ../urpm/media.pm:649
 #, c-format
 msgid "Can't use parallel mode with use-distrib mode"
 msgstr ""
 
-#: ../urpm/media.pm:606
+#: ../urpm/media.pm:657
 #, c-format
 msgid "using associated media for parallel mode: %s"
 msgstr "përdorimi i burimit të lidhur për modë paralel: %s"
 
-#: ../urpm/media.pm:622
-#, fuzzy, c-format
+#: ../urpm/media.pm:673
+#, c-format
 msgid ""
 "--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
 "update, --use-distrib or --parallel"
 msgstr ""
-"--synthesis nuk mund të përdoret me --media, --excludemedia, --sortmedia, --"
-"update or --parallel"
 
-#: ../urpm/media.pm:731
-#, fuzzy, c-format
+#: ../urpm/media.pm:786
+#, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr ""
+
+#: ../urpm/media.pm:795
+#, c-format
+msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
+msgstr ""
+
+#: ../urpm/media.pm:799
+#, c-format
+msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
+msgstr ""
+
+#: ../urpm/media.pm:827
+#, c-format
 msgid "Search start: %s end: %s"
-msgstr "Hulumtoi polisat e instaluara"
+msgstr "Fillo kërkimin: %s mbaro: %s"
 
-#: ../urpm/media.pm:748
+#: ../urpm/media.pm:844
 #, c-format
 msgid "skipping package %s"
 msgstr "kalimi i pakos %s"
 
-#: ../urpm/media.pm:764
+#: ../urpm/media.pm:860
 #, c-format
 msgid "would install instead of upgrade package %s"
 msgstr "dëshiron ta instaloj në vend që t'azhurnoj pakon %s"
 
-#: ../urpm/media.pm:840
+#: ../urpm/media.pm:943
 #, c-format
 msgid "medium \"%s\" already exists"
 msgstr "burimi \"%s\" ekziston me heret"
 
-#: ../urpm/media.pm:882
+#: ../urpm/media.pm:985
 #, c-format
 msgid "(ignored by default)"
 msgstr ""
 
-#: ../urpm/media.pm:888
-#, fuzzy, c-format
+#: ../urpm/media.pm:991
+#, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
-msgstr "leximi i majës nga burimi \"%s\""
+msgstr ""
 
-#: ../urpm/media.pm:894
-#, fuzzy, c-format
+#: ../urpm/media.pm:997
+#, c-format
 msgid "adding medium \"%s\""
-msgstr "zhdukja e burimit \"%s\""
+msgstr ""
 
-#: ../urpm/media.pm:918
-#, fuzzy, c-format
+#: ../urpm/media.pm:1021
+#, c-format
 msgid "failed to copy media.cfg to %s (%d)"
-msgstr "e pa mundur hapja e rpmdb"
+msgstr ""
 
-#: ../urpm/media.pm:960
+#: ../urpm/media.pm:1092
 #, c-format
 msgid "directory %s does not exist"
 msgstr ""
 
-#: ../urpm/media.pm:968
+#: ../urpm/media.pm:1100
 #, c-format
 msgid "this location doesn't seem to contain any distribution"
 msgstr ""
 
-#: ../urpm/media.pm:992
-#, fuzzy, c-format
+#: ../urpm/media.pm:1124
+#, c-format
 msgid "unable to parse media.cfg"
-msgstr "e pa mundur hapja e rpmdb"
+msgstr ""
 
-#: ../urpm/media.pm:995
-#, fuzzy, c-format
+#: ../urpm/media.pm:1127
+#, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
-"hyrja e pa mundur në burimin e parë instalues (asnjë skedare e gjetur në "
-"hdlists)"
 
-#: ../urpm/media.pm:1016
+#: ../urpm/media.pm:1149
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1031
-#, fuzzy, c-format
-msgid "ignoring non-free medium `%s'"
-msgstr "Botimi i burimit \"%s\":"
-
-#: ../urpm/media.pm:1074
-#, fuzzy, c-format
+#: ../urpm/media.pm:1207
+#, c-format
 msgid "retrieving media.cfg file..."
-msgstr "rikuperimi i skedares hdlist..."
+msgstr ""
 
-#: ../urpm/media.pm:1117
+#: ../urpm/media.pm:1250
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "tento zgjedhjen e një burimi jo ekzistues \"%s\""
 
-#: ../urpm/media.pm:1120
+#: ../urpm/media.pm:1253
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "zgjedhje të shumta burimesh: %s"
 
-#: ../urpm/media.pm:1179
+#: ../urpm/media.pm:1312
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "zhdukja e burimit \"%s\""
 
-#: ../urpm/media.pm:1262
-#, fuzzy, c-format
+#: ../urpm/media.pm:1403
+#, c-format
 msgid "reconfiguring urpmi for media \"%s\""
-msgstr "rikuperimi i skedareve rpm nga burimi\"%s\"..."
+msgstr ""
 
-#: ../urpm/media.pm:1296
-#, fuzzy, c-format
+#: ../urpm/media.pm:1437
+#, c-format
 msgid "...reconfiguration failed"
-msgstr "Menyja e konfigurimit është regjistruar"
+msgstr ""
 
-#: ../urpm/media.pm:1302
-#, fuzzy, c-format
+#: ../urpm/media.pm:1443
+#, c-format
 msgid "reconfiguration done"
-msgstr "Konfigurimi i Serverit"
+msgstr ""
 
-#: ../urpm/media.pm:1318
+#: ../urpm/media.pm:1459
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1339
-#, fuzzy, c-format
+#: ../urpm/media.pm:1480
+#, c-format
 msgid "medium \"%s\" is up-to-date"
-msgstr "burimi \"%s\" nuk është i zgjedhur"
+msgstr ""
 
-#: ../urpm/media.pm:1350
+#: ../urpm/media.pm:1491
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "kontrollimi i skedares sintezë [%s]"
 
-#: ../urpm/media.pm:1370
+#: ../urpm/media.pm:1511
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "problem gjatë leximit të skedares sitezë të burimit \"%s\""
 
-#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
-#, fuzzy, c-format
+#: ../urpm/media.pm:1524 ../urpm/media.pm:1619
+#, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "shkruarja e skedares për listën e burimit \"%s\""
+msgstr ""
 
-#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#: ../urpm/media.pm:1526 ../urpm/media.pm:1596 ../urpm/media.pm:1849
 #, c-format
 msgid "...copying failed"
 msgstr "...kopjimi dështoi"
 
-#: ../urpm/media.pm:1451
+#: ../urpm/media.pm:1592
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "kopjimi i skedares përshkruese të \"%s\"..."
 
-#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#: ../urpm/media.pm:1594 ../urpm/media.pm:1623
 #, c-format
 msgid "...copying done"
 msgstr "...kopjimi i bërë"
 
-#: ../urpm/media.pm:1484
-#, fuzzy, c-format
+#: ../urpm/media.pm:1625
+#, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
-msgstr "kopjimi i [%s] dështoi"
+msgstr ""
 
-#: ../urpm/media.pm:1532
-#, fuzzy, c-format
+#: ../urpm/media.pm:1673
+#, c-format
 msgid "computing md5sum of retrieved source synthesis"
-msgstr "llogaritja md5sum e rikuperimit të burimit hdlist (ose sintezës)"
+msgstr ""
 
-#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
-#, fuzzy, c-format
+#: ../urpm/media.pm:1675 ../urpm/media.pm:2158
+#, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
-msgstr "kopjimi i [%s] dështoi"
-
-#: ../urpm/media.pm:1549
-#, fuzzy, c-format
-msgid "genhdlist2 failed on %s"
-msgstr "kontrollimi i skedares hdlist [%s]"
-
-#: ../urpm/media.pm:1559
-#, fuzzy, c-format
-msgid "comparing %s and %s"
-msgstr "instalimi i %s"
-
-#: ../urpm/media.pm:1589
-#, fuzzy, c-format
-msgid "invalid hdlist file %s for medium \"%s\""
-msgstr "asnjë skedare e gjetur hdlist për burimin \"%s\""
-
-#: ../urpm/media.pm:1615
-#, fuzzy, c-format
-msgid "copying MD5SUM file of \"%s\"..."
-msgstr "kopjimi i skedares përshkruese të \"%s\"..."
-
-#: ../urpm/media.pm:1655
-#, fuzzy, c-format
-msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "emri i skedares rpm është invalid [%s]"
-
-#: ../urpm/media.pm:1658
-#, fuzzy, c-format
-msgid "no metadata found for medium \"%s\""
-msgstr "asnjë skedare e gjetur hdlist për burimin \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1690
-#, fuzzy, c-format
-msgid "retrieving source synthesis of \"%s\"..."
-msgstr "rikuperim i burimit hdlist (ose sintezës) të \"%s\"..."
+#, c-format
+msgid "genhdlist2 failed on %s"
+msgstr ""
+
+#: ../urpm/media.pm:1700
+#, c-format
+msgid "comparing %s and %s"
+msgstr "krahasuar %s dhe %s"
+
+#: ../urpm/media.pm:1730
+#, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1756
+#, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr ""
+
+#: ../urpm/media.pm:1796
+#, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr ""
+
+#: ../urpm/media.pm:1799
+#, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr ""
+
+#: ../urpm/media.pm:1831
+#, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr ""
+
+#: ../urpm/media.pm:1897
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "verifimi i skedares pubkey të \"%s\"..."
 
-#: ../urpm/media.pm:1768
+#: ../urpm/media.pm:1909
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...importimi i çelësit %s nga skedarja pubkey e \"%s\""
 
-#: ../urpm/media.pm:1772
+#: ../urpm/media.pm:1913
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "është e pa mundur importimi i skedares pubkey të \"%s\""
 
-#: ../urpm/media.pm:1813
-#, fuzzy, c-format
+#: ../urpm/media.pm:1954
+#, c-format
 msgid "no synthesis file found for medium \"%s\""
-msgstr "asnjë skedare e gjetur hdlist për burimin \"%s\""
+msgstr ""
 
-#: ../urpm/media.pm:1846
-#, fuzzy, c-format
+#: ../urpm/media.pm:1987
+#, c-format
 msgid "updated medium \"%s\""
-msgstr "shtuarja e burimit %s"
+msgstr ""
 
-#: ../urpm/media.pm:1968
+#: ../urpm/media.pm:2152
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr ""
@@ -1248,87 +1267,87 @@ msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr ""
 
 #: ../urpm/mirrors.pm:305
-#, fuzzy, c-format
+#, c-format
 msgid "getting mirror list from %s"
-msgstr "lexim i skedareve rpm nga [%s]"
+msgstr ""
 
-#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#: ../urpm/msg.pm:75 ../urpmi:492 ../urpmi:510 ../urpmi:626
 #, c-format
 msgid "Nn"
 msgstr "Nn"
 
 #. -PO: Add here the keys which might be pressed in the "Yes"-case.
-#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#: ../urpm/msg.pm:76 ../urpme:38 ../urpmi.addmedia:133
 #, c-format
 msgid "Yy"
 msgstr "Yy"
 
-#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#: ../urpm/msg.pm:101 ../urpme:158 ../urpmi.addmedia:136
 #, c-format
 msgid " (y/N) "
 msgstr " (p/J)"
 
-#: ../urpm/msg.pm:139
+#: ../urpm/msg.pm:130
 #, c-format
 msgid "Sorry, bad choice, try again\n"
 msgstr "Kemi ndjesë, zgjedhje e gabuar, provoni edhe një herë\n"
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Package"
-msgstr ""
+msgstr "Paketë"
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Version"
-msgstr ""
+msgstr "Versioni"
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:161
 #, c-format
 msgid "Release"
-msgstr ""
+msgstr "Lëshim"
+
+#: ../urpm/msg.pm:161
+#, c-format
+msgid "Arch"
+msgstr "Arch"
 
 #: ../urpm/msg.pm:170
-#, fuzzy, c-format
-msgid "Arch"
-msgstr "Hulumto"
-
-#: ../urpm/msg.pm:179
 #, c-format
-msgid "(suggested)"
+msgid "(recommended)"
+msgstr "(rekomanduar)"
+
+#: ../urpm/msg.pm:185
+#, c-format
+msgid "medium \"%s\""
 msgstr ""
 
-#: ../urpm/msg.pm:194
-#, fuzzy, c-format
-msgid "medium \"%s\""
-msgstr "zhdukja e burimit \"%s\""
-
-#: ../urpm/msg.pm:194
+#: ../urpm/msg.pm:185
 #, c-format
 msgid "command line"
 msgstr ""
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "B"
-msgstr ""
+msgstr "B"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "KB"
 msgstr "KB"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "MB"
 msgstr "MB"
 
-#: ../urpm/msg.pm:208
+#: ../urpm/msg.pm:199
 #, c-format
 msgid "GB"
 msgstr "GB"
 
-#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#: ../urpm/msg.pm:199 ../urpm/msg.pm:208
 #, c-format
 msgid "TB"
 msgstr "TB"
@@ -1338,8 +1357,8 @@ msgstr "TB"
 msgid "Marking %s as manually installed, it won't be auto-orphaned"
 msgstr ""
 
-#: ../urpm/orphans.pm:522
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:527
+#, c-format
 msgid ""
 "The following package:\n"
 "%s\n"
@@ -1348,17 +1367,17 @@ msgid_plural ""
 "The following packages:\n"
 "%s\n"
 "are now orphaned."
-msgstr[0] "Një nga pakot e radhitura nevojitet:"
-msgstr[1] "Një nga pakot e radhitura nevojitet:"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpm/orphans.pm:525
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:530
+#, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] "Mos zhduk asgjë"
-msgstr[1] "Mos zhduk asgjë"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpm/orphans.pm:542
+#: ../urpm/orphans.pm:547
 #, c-format
 msgid ""
 "The following package:\n"
@@ -1399,31 +1418,31 @@ msgid "on node %s"
 msgstr ""
 
 #: ../urpm/parallel.pm:294
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed on node %s"
-msgstr "Instalimi dështio"
+msgstr ""
 
-#: ../urpm/parallel_ka_run.pm:58
+#: ../urpm/parallel_ka_run.pm:57
 #, c-format
 msgid "rshp failed, maybe a node is unreacheable"
 msgstr ""
 
-#: ../urpm/parallel_ka_run.pm:80
+#: ../urpm/parallel_ka_run.pm:79
 #, c-format
 msgid "mput failed, maybe a node is unreacheable"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:27
+#: ../urpm/parallel_ssh.pm:25
 #, c-format
 msgid "scp failed on host %s (%d)"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:39
+#: ../urpm/parallel_ssh.pm:37
 #, c-format
 msgid "cp failed on host %s (%d)"
 msgstr ""
 
-#: ../urpm/parallel_ssh.pm:86
+#: ../urpm/parallel_ssh.pm:84
 #, c-format
 msgid ""
 "%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
@@ -1431,16 +1450,16 @@ msgid ""
 msgstr ""
 
 #: ../urpm/removable.pm:46
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access medium \"%s\"."
-msgstr "hyrje e pa mundur në burimin \"%s\""
+msgstr ""
 
-#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:101
 #, c-format
 msgid "mounting %s"
 msgstr "montimi i %s"
 
-#: ../urpm/removable.pm:117
+#: ../urpm/removable.pm:113
 #, c-format
 msgid "unmounting %s"
 msgstr "demontimi i %s"
@@ -1456,66 +1475,64 @@ msgid ""
 "urpmi was restarted, and the list of priority packages did change: %s vs %s"
 msgstr ""
 
-#: ../urpm/select.pm:217
+#: ../urpm/select.pm:220
 #, c-format
 msgid "No package named %s"
 msgstr "Asnjë pako e emruar %s"
 
-#: ../urpm/select.pm:219 ../urpme:113
+#: ../urpm/select.pm:222 ../urpme:112
 #, c-format
 msgid "The following packages contain %s: %s"
 msgstr "Pakot e radhitura përmbajnë %s: %s"
 
-#: ../urpm/select.pm:221
+#: ../urpm/select.pm:224
 #, c-format
 msgid "You should use \"-a\" to use all of them"
 msgstr ""
 
-#: ../urpm/select.pm:368
-#, fuzzy, c-format
+#: ../urpm/select.pm:372
+#, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
-msgstr "Gjdo gjë është veçse e instaluar"
+msgstr ""
 
-#: ../urpm/select.pm:600
-#, fuzzy, c-format
+#: ../urpm/select.pm:607
+#, c-format
 msgid "Package %s is already installed"
-msgstr "Gjdo gjë është veçse e instaluar"
+msgstr ""
 
-#: ../urpm/select.pm:601
-#, fuzzy, c-format
+#: ../urpm/select.pm:608
+#, c-format
 msgid "Packages %s are already installed"
-msgstr "Gjdo gjë është veçse e instaluar"
+msgstr ""
 
-#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#: ../urpm/select.pm:625 ../urpm/select.pm:712
 #, c-format
 msgid "due to conflicts with %s"
 msgstr "ka arritur gjatë konflikteve me %s"
 
-#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#: ../urpm/select.pm:626 ../urpm/select.pm:706
 #, c-format
 msgid "due to unsatisfied %s"
 msgstr "ka arritur gjatë mosmarrëveshjes %s"
 
-#: ../urpm/select.pm:625
+#: ../urpm/select.pm:632
 #, c-format
 msgid "trying to promote %s"
 msgstr "tentim në gradimin e %s"
 
-#: ../urpm/select.pm:626
+#: ../urpm/select.pm:633
 #, c-format
 msgid "in order to keep %s"
 msgstr "në urdhër për ta mbajturë %s"
 
-#: ../urpm/select.pm:667
-#, fuzzy, c-format
+#: ../urpm/select.pm:674
+#, c-format
 msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"Pakot a radhitura duhet të zhduken që të tjerat të azhurnohen:\n"
-"%s"
 
-#: ../urpm/select.pm:668
+#: ../urpm/select.pm:675
 #, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
@@ -1524,12 +1541,12 @@ msgstr ""
 "Pakot a radhitura duhet të zhduken që të tjerat të azhurnohen:\n"
 "%s"
 
-#: ../urpm/select.pm:695
+#: ../urpm/select.pm:702
 #, c-format
 msgid "in order to install %s"
 msgstr "në urdhër për instalim %s"
 
-#: ../urpm/select.pm:701
+#: ../urpm/select.pm:708
 #, c-format
 msgid "due to missing %s"
 msgstr "ka arritur nga mungesa %s"
@@ -1540,9 +1557,9 @@ msgid "Invalid signature (%s)"
 msgstr "Nënshkrim i pa pranueshëm (%s)"
 
 #: ../urpm/signature.pm:77
-#, fuzzy, c-format
+#, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
-msgstr "Pakot e radhitura përmbajnë %s: %s"
+msgstr ""
 
 #: ../urpm/signature.pm:83
 #, c-format
@@ -1569,40 +1586,40 @@ msgstr ""
 msgid "Medium without key (%s)"
 msgstr ""
 
-#: ../urpm/sys.pm:225
+#: ../urpm/sys.pm:199
 #, c-format
 msgid "system"
 msgstr ""
 
-#: ../urpm/sys.pm:262
+#: ../urpm/sys.pm:236
 #, c-format
 msgid "You should restart your computer for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:264
+#: ../urpm/sys.pm:238
 #, c-format
 msgid "You should restart your session for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:266
+#: ../urpm/sys.pm:240
 #, c-format
 msgid "You should restart %s for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:404
-#, fuzzy, c-format
+#: ../urpm/sys.pm:378
+#, c-format
 msgid "Can't write file"
-msgstr "i pa mundur shkrimi i skedares konfiguruese [%s]"
+msgstr ""
 
-#: ../urpm/sys.pm:404
-#, fuzzy, c-format
+#: ../urpm/sys.pm:378
+#, c-format
 msgid "Can't open file"
-msgstr "Kopjimi dështoi"
+msgstr ""
 
-#: ../urpm/sys.pm:417
-#, fuzzy, c-format
+#: ../urpm/sys.pm:391
+#, c-format
 msgid "Can't move file %s to %s"
-msgstr "Kopjimi dështoi"
+msgstr ""
 
 #: ../urpme:43
 #, c-format
@@ -1616,137 +1633,129 @@ msgid "  --auto-orphans - remove orphans\n"
 msgstr ""
 
 #: ../urpme:45
-#, fuzzy, c-format
+#, c-format
 msgid "  --test         - verify if the removal can be achieved correctly.\n"
 msgstr ""
-"  --test        - verifikoje nëse instalimi përfundon në mënyrë korrekte.\n"
 
-#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format
 msgid "  --parallel     - distributed urpmi across machines of alias.\n"
 msgstr ""
 "  --parallel     - urmpi është i shpërndarë në pseudo makina të shumëta.\n"
 
-#: ../urpme:48 ../urpmi:138
-#, fuzzy, c-format
-msgid "  --repackage    - Re-package the files before erasing\n"
-msgstr "  --packager      - çfaqe etiketën packager: paketues.\n"
-
-#: ../urpme:49
-#, fuzzy, c-format
+#: ../urpme:48
+#, c-format
 msgid "  --root         - use another root for rpm removal.\n"
 msgstr ""
-"  --wget         - përdore wget për rikuperimin e skedareve në distancë.\n"
 
-#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
-#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
-#, fuzzy, c-format
+#: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
+#: ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
 msgstr ""
-"  --wget         - përdore wget për rikuperimin e skedareve në distancë.\n"
 
-#: ../urpme:51 ../urpmi:96
-#, fuzzy, c-format
+#: ../urpme:50 ../urpmi:96
+#, c-format
 msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
-msgstr "  --update       - azhurno vetëm burimet azhurnuese.\n"
+msgstr ""
+
+#: ../urpme:51
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr ""
 
 #: ../urpme:52
-#, fuzzy, c-format
-msgid "  --noscripts    - do not execute package scriptlet(s).\n"
-msgstr "  --description   - çfaqe etiketën description: përshkrimi.\n"
-
-#: ../urpme:53
 #, c-format
 msgid ""
 "  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
 "                   to (un)install a chroot with --root option.\n"
 msgstr ""
 
-#: ../urpme:55 ../urpmi:149 ../urpmq:87
-#, fuzzy, c-format
+#: ../urpme:54 ../urpmi:150 ../urpmq:87
+#, c-format
 msgid "  --verbose, -v  - verbose mode.\n"
-msgstr "  --verbose      - model oratori.\n"
+msgstr ""
 
-#: ../urpme:56
+#: ../urpme:55
 #, c-format
 msgid "  -a             - select all packages matching expression.\n"
 msgstr "  -a             - zgjedhni të gjitha pakot me përshkrim të njëjtë.\n"
 
-#: ../urpme:71
-#, fuzzy, c-format
+#: ../urpme:70
+#, c-format
 msgid "Only superuser is allowed to remove packages"
-msgstr "Vetëm administratori i sistemin ka mundësi të instalojë pakot"
+msgstr ""
 
-#: ../urpme:104
+#: ../urpme:103
 #, c-format
 msgid "unknown packages"
 msgstr "pako të pa njoftura"
 
-#: ../urpme:104
+#: ../urpme:103
 #, c-format
 msgid "unknown package"
 msgstr "pako e pa njoftur"
 
-#: ../urpme:119
-#, fuzzy, c-format
+#: ../urpme:118
+#, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] "zhdukja a pakove %s do të dëmtoj sistemin tuaj"
-msgstr[1] "zhdukja a pakove %s do të dëmtoj sistemin tuaj"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpme:124
+#: ../urpme:123
 #, c-format
 msgid "Nothing to remove"
 msgstr "Mos zhduk asgjë"
 
-#: ../urpme:141
-#, fuzzy, c-format
+#: ../urpme:140
+#, c-format
 msgid "No orphans to remove"
-msgstr "Mos zhduk asgjë"
+msgstr ""
 
-#: ../urpme:147
-#, fuzzy, c-format
+#: ../urpme:146
+#, c-format
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
-msgstr[1] "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpme:152
-#, fuzzy, c-format
+#: ../urpme:151
+#, c-format
 msgid "(orphan package)"
 msgid_plural "(orphan packages)"
-msgstr[0] "pako e pa njoftur"
-msgstr[1] "pako e pa njoftur"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpme:159
-#, fuzzy, c-format
+#: ../urpme:158
+#, c-format
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
-msgstr[0] "zhdukja e pakos %s"
-msgstr[1] "zhdukja e pakos %s"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpme:164
-#, fuzzy, c-format
+#: ../urpme:163
+#, c-format
 msgid "testing removal of %s"
-msgstr "marrje e mjetit tërheqës si \"%s\""
+msgstr ""
 
-#: ../urpme:181
+#: ../urpme:180
 #, c-format
 msgid "Removal failed"
 msgstr "Zhdukja dështoi"
 
-#: ../urpme:183
-#, fuzzy, c-format
+#: ../urpme:182
+#, c-format
 msgid "Removal is possible"
-msgstr "Zhdukja dështoi"
+msgstr ""
 
 #: ../urpmf:31
-#, fuzzy, c-format
+#, c-format
 msgid "  --version      - print this tool's version number.\n"
-msgstr "  --help         - shtype këtë lajmë ndihmues.\n"
+msgstr ""
 
-#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#: ../urpmf:32 ../urpmi:130 ../urpmq:78
 #, c-format
 msgid "  --env          - use specific environment (typically a bug report).\n"
 msgstr ""
@@ -1775,9 +1784,9 @@ msgstr ""
 "me presje.\n"
 
 #: ../urpmf:38
-#, fuzzy, c-format
+#, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
-msgstr "  --synthesis    - përdori skedaret e dhëna sintezë në vend të db.\n"
+msgstr ""
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
 #, c-format
@@ -1805,9 +1814,9 @@ msgid "  -i             - ignore case distinctions in patterns.\n"
 msgstr "  -i             - injoroje rastin e ndryshëm në gjdo model.\n"
 
 #: ../urpmf:44
-#, fuzzy, c-format
+#, c-format
 msgid "  -I             - honor case distinctions in patterns (default).\n"
-msgstr "  -i             - injoroje rastin e ndryshëm në gjdo model.\n"
+msgstr ""
 
 #: ../urpmf:45
 #, c-format
@@ -1845,39 +1854,34 @@ msgid "  !              - unary NOT.\n"
 msgstr "  -!             - njëjsi NOT.\n"
 
 #: ../urpmf:52
-#, fuzzy, c-format
+#, c-format
 msgid "  ( )            - left and right parentheses.\n"
 msgstr ""
-"  )             - kllapë e djathtë për ta mbyllur shprehjen e grupit.\n"
 
 #: ../urpmf:53
-#, fuzzy, c-format
+#, c-format
 msgid "List of tags:\n"
 msgstr ""
-"Listoi të dhënat për ti riparuar:\n"
-"\n"
 
 #: ../urpmf:54
-#, fuzzy, c-format
+#, c-format
 msgid "  --qf           - specify a printf-like output format\n"
-msgstr "  --X            - përdore sipërfaqën ndarëse X.\n"
+msgstr ""
 
 #: ../urpmf:55
-#, fuzzy, c-format
+#, c-format
 msgid "                   example: '%%name:%%files'\n"
 msgstr ""
-"\n"
-"                      Raporti DrakBackup \n"
 
 #: ../urpmf:56
-#, fuzzy, c-format
+#, c-format
 msgid "  --arch         - architecture\n"
-msgstr "  --url        - çfaqe etiketën serial: url.\n"
+msgstr ""
 
 #: ../urpmf:57
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildhost    - build host\n"
-msgstr "  --buildhost    - çfaqe etiketën buildhost: ndërtoje ftuesin.\n"
+msgstr ""
 
 #: ../urpmf:58
 #, c-format
@@ -1885,19 +1889,19 @@ msgid "  --buildtime    - build time\n"
 msgstr ""
 
 #: ../urpmf:59
-#, fuzzy, c-format
+#, c-format
 msgid "  --conffiles    - configuration files\n"
-msgstr "Konfigurimi i modulit të Konsolës"
+msgstr ""
 
 #: ../urpmf:60
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - conflict tags\n"
-msgstr "  --conflicts     - çfaqe etiketën conflicts: gjitha konfliktet.\n"
+msgstr ""
 
 #: ../urpmf:61
-#, fuzzy, c-format
+#, c-format
 msgid "  --description  - package description\n"
-msgstr "  --description   - çfaqe etiketën description: përshkrimi.\n"
+msgstr ""
 
 #: ../urpmf:62
 #, c-format
@@ -1905,89 +1909,89 @@ msgid "  --distribution - distribution\n"
 msgstr ""
 
 #: ../urpmf:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --epoch        - epoch\n"
-msgstr "  --epoch          - çfaqe etiketën epoch: epokë.\n"
+msgstr ""
 
 #: ../urpmf:64
-#, fuzzy, c-format
+#, c-format
 msgid "  --filename     - filename of the package\n"
-msgstr "  --all           - çfaqi të gjitha etiketat.\n"
+msgstr ""
 
 #: ../urpmf:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --files        - list of files contained in the package\n"
-msgstr "  --list         - shpalosi pakotë lira.\n"
+msgstr ""
 
 #: ../urpmf:66
-#, fuzzy, c-format
+#, c-format
 msgid "  --group        - group\n"
-msgstr "  --group         - çfaqe etiketën group: grupi.\n"
+msgstr ""
 
 #: ../urpmf:67
-#, fuzzy, c-format
+#, c-format
 msgid "  --license      - license\n"
-msgstr "  --all           - çfaqi të gjitha etiketat.\n"
+msgstr ""
 
 #: ../urpmf:68
-#, fuzzy, c-format
+#, c-format
 msgid "  --name         - package name\n"
-msgstr "  --all           - çfaqi të gjitha etiketat.\n"
+msgstr ""
 
 #: ../urpmf:69
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - obsoletes tags\n"
-msgstr "  --obsoletes     - çfaqe etiketën obsoletes: gjitha absolutisht.\n"
+msgstr ""
 
 #: ../urpmf:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --packager     - packager\n"
-msgstr "  --packager      - çfaqe etiketën packager: paketues.\n"
+msgstr ""
 
 #: ../urpmf:71
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - provides tags\n"
-msgstr "  --provides      - çfaqe etiketën provides: gjitha pajisjet.\n"
+msgstr ""
 
 #: ../urpmf:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - requires tags\n"
-msgstr "  --requires      - çfaqe etiketën requires: gjitha dëshiratë.\n"
+msgstr ""
 
 #: ../urpmf:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --size         - installed size\n"
-msgstr "  --size          - çfaqe etiketën size: madhësia.\n"
+msgstr ""
 
 #: ../urpmf:74
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - source rpm name\n"
-msgstr "  --sourcerpm     - çfaqe etiketën sourcerpm: burimi rpm.\n"
+msgstr ""
 
 #: ../urpmf:75
-#, fuzzy, c-format
-msgid "  --suggests     - suggests tags\n"
-msgstr "  --obsoletes     - çfaqe etiketën obsoletes: gjitha absolutisht.\n"
+#, c-format
+msgid "  --recommends   - recommends tags\n"
+msgstr ""
 
 #: ../urpmf:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary      - summary\n"
-msgstr "  --summary        - çfaqe etiketën summary: përmbledhje.\n"
+msgstr ""
 
 #: ../urpmf:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --url          - url\n"
-msgstr "  --url        - çfaqe etiketën serial: url.\n"
+msgstr ""
 
 #: ../urpmf:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --vendor       - vendor\n"
-msgstr "  --verbose      - model oratori.\n"
+msgstr ""
 
 #: ../urpmf:79
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - the media in which the package was found\n"
-msgstr "  --list         - shpalosi pakotë lira.\n"
+msgstr ""
 
 #: ../urpmf:80 ../urpmq:97
 #, c-format
@@ -1995,36 +1999,35 @@ msgid "  -f             - print version, release and arch with name.\n"
 msgstr ""
 "  -f             - çfaqe versionin, hollësitë dhe arkitekturen me emër.\n"
 
-#: ../urpmf:148
+#: ../urpmf:149
 #, c-format
 msgid "unterminated expression (%s)"
 msgstr ""
 
-#: ../urpmf:193
+#: ../urpmf:194
 #, c-format
 msgid "Incorrect format: you may use only one multi-valued tag"
 msgstr ""
 
-#: ../urpmf:286
-#, fuzzy, c-format
+#: ../urpmf:287
+#, c-format
 msgid "no hdlist available for medium \"%s\""
-msgstr "asnjë skedare e gjetur hdlist për burimin \"%s\""
+msgstr ""
 
-#: ../urpmf:293
-#, fuzzy, c-format
+#: ../urpmf:294
+#, c-format
 msgid "no synthesis available for medium \"%s\""
-msgstr "krijimi i skedares sintezë për burimin \"%s\""
+msgstr ""
 
-#: ../urpmf:302
-#, fuzzy, c-format
+#: ../urpmf:303
+#, c-format
 msgid "no xml-info available for medium \"%s\""
-msgstr "shkruarja e skedares për listën e burimit \"%s\""
+msgstr ""
 
 #: ../urpmi:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --auto-update  - update media then upgrade the system.\n"
 msgstr ""
-"  --auto-select  - zgjedhni automatikisht pakot azhurnuese në sistem.\n"
 
 #: ../urpmi:77
 #, c-format
@@ -2042,9 +2045,9 @@ msgid "  --auto-orphans - remove orphans without asking\n"
 msgstr ""
 
 #: ../urpmi:80 ../urpmq:52
-#, fuzzy, c-format
-msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
-msgstr "  --obsoletes     - çfaqe etiketën obsoletes: gjitha absolutisht.\n"
+#, c-format
+msgid "  --no-recommends - do not auto select \"recommended\" packages.\n"
+msgstr ""
 
 #: ../urpmi:81
 #, c-format
@@ -2056,9 +2059,9 @@ msgstr ""
 "instalimin.\n"
 
 #: ../urpmi:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
-msgstr "  --install-src  - instalo vetëm burimet e pakove (jo binare).\n"
+msgstr ""
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2089,14 +2092,14 @@ msgstr ""
 "%d.\n"
 
 #: ../urpmi:91
-#, fuzzy, c-format
+#, c-format
 msgid "  --fuzzy, -y    - impose fuzzy search.\n"
-msgstr "  --fuzzy        - shfrytëzoje hulumtimin e paqartë (njëjtë si -y).\n"
+msgstr ""
 
 #: ../urpmi:92
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildrequires - install the buildrequires of the packages\n"
-msgstr "  --requires      - çfaqe etiketën requires: gjitha dëshiratë.\n"
+msgstr ""
 
 #: ../urpmi:93
 #, c-format
@@ -2110,17 +2113,24 @@ msgstr ""
 "  --clean        - zhduki të gjithë rpm e fshehta para gjdo operacioni.\n"
 
 #: ../urpmi:95
-#, fuzzy, c-format
+#, c-format
 msgid "  --noclean      - don't clean rpms from cache.\n"
-msgstr "  --noclean      - mbane rpm dhe mos e përdor në fshehje.\n"
+msgstr ""
 
 #: ../urpmi:97
+#, c-format
+msgid ""
+"  --downgrade    - downgrade a package from the version currently installed\n"
+"                   to the previously highest version\n"
+msgstr ""
+
+#: ../urpmi:99
 #, c-format
 msgid ""
 "  --replacepkgs  - force installing packages which are already installed.\n"
 msgstr ""
 
-#: ../urpmi:99
+#: ../urpmi:101
 #, c-format
 msgid ""
 "  --allow-nodeps - allow asking user to install packages without\n"
@@ -2129,7 +2139,7 @@ msgstr ""
 "  --allow-nodeps - mundëson që përdoruesi në pytje të instaloj\n"
 "                   pakot pas i verifikuar mvarësit e tyre.\n"
 
-#: ../urpmi:101
+#: ../urpmi:103
 #, c-format
 msgid ""
 "  --allow-force  - allow asking user to install packages without\n"
@@ -2138,87 +2148,85 @@ msgstr ""
 "  --allow-force  - mundëson që përdoruesi në pytje të instaloj\n"
 "                   pakot pas i verifikuar mvarësit dhe integritetin e tyre.\n"
 
-#: ../urpmi:103
-#, fuzzy, c-format
-msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
-msgstr "  --obsoletes     - çfaqe etiketën obsoletes: gjitha absolutisht.\n"
+#: ../urpmi:105
+#, c-format
+msgid "  --allow-recommends - auto select \"recommended\" packages.\n"
+msgstr ""
 
-#: ../urpmi:107
+#: ../urpmi:109
 #, c-format
 msgid ""
 "  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
 "                   to install a chroot with --root option.\n"
 msgstr ""
 
-#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:37
 #, c-format
 msgid "  --metalink     - generate and use a local metalink.\n"
 msgstr ""
 
-#: ../urpmi:110
+#: ../urpmi:112
 #, c-format
 msgid ""
 "  --download-all - download all needed packages before trying to install "
 "them\n"
 msgstr ""
 
-#: ../urpmi:111
+#: ../urpmi:113
 #, c-format
 msgid ""
 "  --downloader   - program to use to retrieve distant files. \n"
 "                   known programs: %s\n"
 msgstr ""
 
-#: ../urpmi:114
+#: ../urpmi:116
 #, c-format
 msgid "  --curl-options - additional options to pass to curl\n"
 msgstr ""
 
-#: ../urpmi:115
+#: ../urpmi:117
 #, c-format
 msgid "  --rsync-options- additional options to pass to rsync\n"
 msgstr ""
 
-#: ../urpmi:116
+#: ../urpmi:118
 #, c-format
 msgid "  --wget-options - additional options to pass to wget\n"
 msgstr ""
 
-#: ../urpmi:117
+#: ../urpmi:119
 #, c-format
 msgid "  --prozilla-options - additional options to pass to prozilla\n"
 msgstr ""
 
-#: ../urpmi:118
+#: ../urpmi:120
 #, c-format
 msgid "  --aria2-options - additional options to pass to aria2\n"
 msgstr ""
 
-#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:38
 #, c-format
 msgid "  --limit-rate   - limit the download speed.\n"
 msgstr "  --limit-rate   - kyfizimi i shpëjtësisë së shkarkimit.\n"
 
-#: ../urpmi:120
-#, fuzzy, c-format
+#: ../urpmi:122
+#, c-format
 msgid ""
 "  --resume       - resume transfer of partially-downloaded files\n"
 "                   (--no-resume disables it, default is disabled).\n"
 msgstr ""
-"  --verify-rpm   - verifikoje nënshkrimin e rpm para instalimit\n"
-"                   (--no-verify-rpm dezaktivizoje verifikim e tyre).\n"
 
-#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
 #, c-format
 msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
 "                   to be 1080 by default (format is <proxyhost[:port]>).\n"
 msgstr ""
 "  --proxy        - përdore proxy HTTP, numri i portës është i supozuar të\n"
-"                   jetë 1080 në marrëveshje (forma është <proxyhost[:port]"
-">).\n"
+"                   jetë 1080 në marrëveshje (forma është <proxyhost[:"
+"port]>).\n"
 
-#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
 #, c-format
 msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
@@ -2228,7 +2236,7 @@ msgstr ""
 "proxy\n"
 "                   me vërtetim (forma është <user:password>).\n"
 
-#: ../urpmi:126
+#: ../urpmi:128
 #, c-format
 msgid ""
 "  --bug          - output a bug report in directory indicated by\n"
@@ -2237,135 +2245,130 @@ msgstr ""
 "  --bug          - dorëzoje një raport të bug(it) në repertorin e\n"
 "                   sugjeruar nga argumenti i dytë.\n"
 
-#: ../urpmi:132
+#: ../urpmi:134
 #, c-format
 msgid "  --excludepath  - exclude path separated by comma.\n"
 msgstr "  --excludepath  - përdori vetëm burimet e ndara me presje.\n"
 
-#: ../urpmi:133
+#: ../urpmi:135
 #, c-format
 msgid "  --excludedocs  - exclude doc files.\n"
 msgstr "  --excludedocs  - mos i prano skedaret doc.\n"
 
-#: ../urpmi:134
-#, fuzzy, c-format
+#: ../urpmi:136
+#, c-format
 msgid "  --ignoresize   - don't verify disk space before installation.\n"
 msgstr ""
-"  --no-uninstall - mos pyet kurr për dez-instalimin e pakos, abortoje "
-"instalimin.\n"
-
-#: ../urpmi:135
-#, fuzzy, c-format
-msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
-msgstr "  --url        - çfaqe etiketën serial: url.\n"
-
-#: ../urpmi:136
-#, fuzzy, c-format
-msgid "  --noscripts    - do not execute package scriptlet(s)\n"
-msgstr "  --description   - çfaqe etiketën description: përshkrimi.\n"
 
 #: ../urpmi:137
-#, fuzzy, c-format
-msgid "  --replacefiles - ignore file conflicts\n"
-msgstr "  --conflicts     - çfaqe etiketën conflicts: gjitha konfliktet.\n"
+#, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr ""
+
+#: ../urpmi:138
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr ""
 
 #: ../urpmi:139
-#, fuzzy, c-format
-msgid "  --skip         - packages which installation should be skipped\n"
+#, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
 msgstr ""
-"  --test        - verifikoje nëse instalimi përfundon në mënyrë korrekte.\n"
 
 #: ../urpmi:140
-#, fuzzy, c-format
-msgid "  --prefer       - packages which should be preferred\n"
+#, c-format
+msgid "  --skip         - packages which installation should be skipped\n"
 msgstr ""
-"  --test        - verifikoje nëse instalimi përfundon në mënyrë korrekte.\n"
 
 #: ../urpmi:141
+#, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr ""
+
+#: ../urpmi:142
 #, c-format
 msgid ""
 "  --more-choices - when several packages are found, propose more choices\n"
 "                   than the default.\n"
 msgstr ""
 
-#: ../urpmi:143
-#, fuzzy, c-format
-msgid "  --nolock       - don't lock rpm db.\n"
-msgstr "  --noclean      - mbane rpm dhe mos e përdor në fshehje.\n"
-
 #: ../urpmi:144
+#, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr ""
+
+#: ../urpmi:145
 #, c-format
 msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
 msgstr ""
 
-#: ../urpmi:145 ../urpmq:95
+#: ../urpmi:146 ../urpmq:95
 #, c-format
 msgid "  -a             - select all matches on command line.\n"
 msgstr ""
 "  -a             - zgjedhni të gjitha korrespondencat në linjën komanduese.\n"
 
-#: ../urpmi:148
-#, fuzzy, c-format
+#: ../urpmi:149
+#, c-format
 msgid "  --quiet, -q    - quiet mode.\n"
-msgstr "  -q             - model i qetë.\n"
-
-#: ../urpmi:150
-#, fuzzy, c-format
-msgid "  --debug        - very verbose mode.\n"
-msgstr "  --verbose      - model oratori.\n"
+msgstr ""
 
 #: ../urpmi:151
+#, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr ""
+
+#: ../urpmi:152
 #, c-format
 msgid "  names or rpm files given on command line will be installed.\n"
 msgstr "  emrat apo skedaret rpm në linjën komanduese do të instalohen.\n"
 
-#: ../urpmi:179
+#: ../urpmi:180
 #, c-format
 msgid "Error: can't use --auto-select along with package list.\n"
 msgstr ""
 
-#: ../urpmi:186
+#: ../urpmi:187
 #, c-format
 msgid ""
 "Error: To generate a bug report, specify the usual command-line arguments\n"
 "along with --bug.\n"
 msgstr ""
 
-#: ../urpmi:216
-#, fuzzy, c-format
+#: ../urpmi:217
+#, c-format
 msgid "You can't install binary rpm files when using --install-src"
 msgstr ""
-"Çfarë mund të bëhet me skedaret rpm binare nëse e përdorni --install-src"
 
-#: ../urpmi:217
+#: ../urpmi:218
 #, c-format
 msgid "You can't install spec files"
 msgstr ""
 
-#: ../urpmi:224
+#: ../urpmi:225
 #, c-format
 msgid "defaulting to --buildrequires"
 msgstr ""
 
-#: ../urpmi:229
+#: ../urpmi:230
 #, c-format
 msgid ""
 "please use --buildrequires or --install-src, defaulting to --buildrequires"
 msgstr ""
 
-#: ../urpmi:249
-#, fuzzy, c-format
+#: ../urpmi:250
+#, c-format
 msgid ""
 "Directory [%s] already exists, please use another directory for bug report "
 "or delete it"
-msgstr "Grupi veçse ekziston, ju lutemi zgjedheni një Emër tjetër të Grupit"
+msgstr ""
 
-#: ../urpmi:250
+#: ../urpmi:251
 #, c-format
 msgid "Unable to create directory [%s] for bug report"
 msgstr "I pa mundur krijimi i repertorit [%s] për raport të bug(it)"
 
-#: ../urpmi:271
+#: ../urpmi:272
 #, c-format
 msgid ""
 "Error: %s appears to be mounted read-only.\n"
@@ -2373,42 +2376,42 @@ msgid ""
 msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to upgrade)"
-#: ../urpmi:425
-#, fuzzy, c-format
+#: ../urpmi:426
+#, c-format
 msgid "%s: %s (to upgrade)"
-msgstr "Azhurno"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to upgrade)"
-#: ../urpmi:427
-#, fuzzy, c-format
+#: ../urpmi:428
+#, c-format
 msgid "%s (to upgrade)"
-msgstr "Azhurno"
+msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to install)"
-#: ../urpmi:431
-#, fuzzy, c-format
+#: ../urpmi:432
+#, c-format
 msgid "%s: %s (to install)"
-msgstr "Fundi i instalimit"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to install)"
-#: ../urpmi:433
-#, fuzzy, c-format
+#: ../urpmi:434
+#, c-format
 msgid "%s (to install)"
-msgstr "Fundi i instalimit"
+msgstr ""
 
-#: ../urpmi:439
-#, fuzzy, c-format
+#: ../urpmi:440
+#, c-format
 msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
-msgstr "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
+msgstr ""
 
-#: ../urpmi:442
+#: ../urpmi:443
 #, c-format
 msgid "What is your choice? (1-%d) "
 msgstr "Cila është zgedhja e juaj? (1-%d) "
 
-#: ../urpmi:484
+#: ../urpmi:485
 #, c-format
 msgid ""
 "The following package cannot be installed because it depends on packages\n"
@@ -2416,7 +2419,7 @@ msgid ""
 "%s"
 msgstr ""
 
-#: ../urpmi:486
+#: ../urpmi:487
 #, c-format
 msgid ""
 "The following packages can't be installed because they depend on packages\n"
@@ -2424,44 +2427,39 @@ msgid ""
 "%s"
 msgstr ""
 
-#: ../urpmi:492 ../urpmi:510
-#, fuzzy, c-format
+#: ../urpmi:493 ../urpmi:511
+#, c-format
 msgid ""
 "\n"
 "Continue installation anyway?"
-msgstr "Vazhdo pa marrë parasyshë?"
+msgstr ""
 
-#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#: ../urpmi:494 ../urpmi:512 ../urpmi:627 ../urpmi.addmedia:136
 #, c-format
 msgid " (Y/n) "
 msgstr " (P/j) "
 
-#: ../urpmi:504
-#, fuzzy, c-format
+#: ../urpmi:505
+#, c-format
 msgid ""
 "A requested package cannot be installed:\n"
 "%s"
 msgstr ""
-"Disa nga pakot e kërkuara nuk mund të instalohen:\n"
-"%s"
 
-#: ../urpmi:525
+#: ../urpmi:526
 #, c-format
 msgid "removing package %s will break your system"
 msgstr "zhdukja a pakove %s do të dëmtoj sistemin tuaj"
 
-#: ../urpmi:533
-#, fuzzy, c-format
+#: ../urpmi:534
+#, c-format
 msgid ""
 "The installation cannot continue because the following package\n"
 "has to be removed for others to be upgraded:\n"
 "%s\n"
 msgstr ""
-"Instalimin nuk mund të vazhdoj më tutje, sepse pakot a radhitura duhet\n"
-"të zhduken që të tjerat të azhurnohen:\n"
-"%s\n"
 
-#: ../urpmi:535
+#: ../urpmi:536
 #, c-format
 msgid ""
 "The installation cannot continue because the following packages\n"
@@ -2472,69 +2470,45 @@ msgstr ""
 "të zhduken që të tjerat të azhurnohen:\n"
 "%s\n"
 
-#: ../urpmi:543
+#: ../urpmi:544
 #, c-format
 msgid "(test only, removal will not be actually done)"
 msgstr ""
 
-#: ../urpmi:562
-#, fuzzy, c-format
+#: ../urpmi:563
+#, c-format
 msgid ""
 "You must first call urpmi with --buildrequires to install the following "
 "dependencies:\n"
 "%s\n"
 msgstr ""
-"Ju duhet të jeni administrator  për t'instaluar mvarësit e radhitura:\n"
-"%s\n"
 
-#: ../urpmi:572
-#, fuzzy, c-format
+#: ../urpmi:573
+#, c-format
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
-msgstr[0] "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
-msgstr[1] "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpmi:596
+#: ../urpmi:597
 #, c-format
 msgid "WARNING: %s option is in use. Some strange problems may happen"
 msgstr ""
 
-#: ../urpmi:608
+#: ../urpmi:609
 #, c-format
 msgid "(test only, installation will not be actually done)"
 msgstr ""
 
-#: ../urpmi:614
+#: ../urpmi:640
 #, c-format
-msgid "%s of additional disk space will be used."
-msgstr ""
-
-#: ../urpmi:615
-#, c-format
-msgid "%s of disk space will be freed."
-msgstr ""
-
-#: ../urpmi:616
-#, c-format
-msgid "%s of packages will be retrieved."
-msgstr ""
-
-#: ../urpmi:617
-#, c-format
-msgid "Proceed with the installation of one package?"
-msgid_plural "Proceed with the installation of the %d packages?"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../urpmi:639
-#, fuzzy, c-format
 msgid "Press Enter when mounted..."
-msgstr "Shtypni mbi Enter kur jeni i gatshëm..."
+msgstr ""
 
 #. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
 #: ../urpmi.addmedia:36
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: urpmi.addmedia [options] <name> <url>\n"
 "where <url> is one of\n"
@@ -2556,16 +2530,6 @@ msgid ""
 "\n"
 "and [options] are from\n"
 msgstr ""
-"përdorim: urmpi.addmedia [opcionet] <emri> <url> [with <shteg_relativë>]\n"
-"ku <url> është njëri nga\n"
-"       [file:/]/<shtegu> with <emër relativë të skedares hdlist>\n"
-"       ftp://<përdorues>:<parulla>@<ftuesi>/<shtegu> with <emër relativë të "
-"skedareshdlist>\n"
-"       ftp://<ftuesi>/<shtegu> with <emër relativë të skedares hdlist>\n"
-"       http://<ftuesi>/<shtegu> with <emër relativë të skedares hdlist>\n"
-"       removable://<shtegu> with <emër relativë të skedares hdlist>\n"
-"\n"
-"dhe [opcionet] janë nga\n"
 
 #: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
 #, c-format
@@ -2580,16 +2544,14 @@ msgstr ""
 "  --curl         - pëdore curl për rikuperimin e skedareve në distancë.\n"
 
 #: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
 msgstr ""
-"  --curl         - pëdore curl për rikuperimin e skedareve në distancë.\n"
 
 #: ../urpmi.addmedia:59 ../urpmi.update:36
-#, fuzzy, c-format
+#, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
 msgstr ""
-"  --curl         - pëdore curl për rikuperimin e skedareve në distancë.\n"
 
 #: ../urpmi.addmedia:66
 #, c-format
@@ -2607,10 +2569,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-synthesis - use synthesis file.\n"
 msgstr ""
-"  --probe-synthesis - tento në gjetjen dhe përdorimin e skedares sintezë.\n"
 
 #: ../urpmi.addmedia:71
 #, c-format
@@ -2618,11 +2579,9 @@ msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
 msgstr ""
 
 #: ../urpmi.addmedia:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-probe     - do not try to find any synthesis file.\n"
 msgstr ""
-"  --no-probe     - mos tento gjetjen e ndonjë sintezë apo\n"
-"                   skedare hdlist.\n"
 
 #: ../urpmi.addmedia:74
 #, c-format
@@ -2639,17 +2598,14 @@ msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
 msgstr ""
 
 #: ../urpmi.addmedia:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --all-media    - with --distrib, add every listed media\n"
-msgstr "  --list-media   - shpalosi burimet e lira.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
 msgstr ""
-"  --virtual      - krijo një burim vituel i cili përdoret gjithnji për "
-"azhurnim,\n"
-"                   vetëm file:// protokoli është i lejuar.\n"
 
 #: ../urpmi.addmedia:79 ../urpmi.update:44
 #, c-format
@@ -2692,24 +2648,24 @@ msgid "bad <url> (for local directory, the path must be absolute)"
 msgstr ""
 
 #: ../urpmi.addmedia:116
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to add media"
-msgstr "Vetëm administratori i sistemin ka mundësi të instalojë pakot"
+msgstr ""
 
 #: ../urpmi.addmedia:119
-#, fuzzy, c-format
+#, c-format
 msgid "creating config file [%s]"
-msgstr "shkruaja e skedares konfiguruese [%s]"
+msgstr ""
 
 #: ../urpmi.addmedia:120
-#, fuzzy, c-format
+#, c-format
 msgid "Can't create config file [%s]"
-msgstr "shkruaja e skedares konfiguruese [%s]"
+msgstr ""
 
 #: ../urpmi.addmedia:128
-#, fuzzy, c-format
+#, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
-msgstr "specifikim i pa nevojshëm <shteg relativë i hdlist> me --distrib"
+msgstr ""
 
 #: ../urpmi.addmedia:136
 #, c-format
@@ -2719,139 +2675,19 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
-#, fuzzy, c-format
+#, c-format
 msgid "unable to add medium"
-msgstr "hyrje e pa mundur në burimin \"%s\""
+msgstr "e pamundur shtimi medies"
 
 #: ../urpmi.addmedia:164
-#, fuzzy, c-format
+#, c-format
 msgid "<relative path of synthesis> missing\n"
-msgstr "<shteg relativë i hdlist> mungon\n"
+msgstr ""
 
 #: ../urpmi.addmedia:167
 #, c-format
 msgid "Can't use %s with remote medium"
 msgstr ""
-
-#: ../urpmi.recover:30
-#, c-format
-msgid "  --checkpoint   - set repackaging start now\n"
-msgstr ""
-
-#: ../urpmi.recover:31
-#, fuzzy, c-format
-msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
-msgstr "  --noclean      - mbane rpm dhe mos e përdor në fshehje.\n"
-
-#: ../urpmi.recover:33
-#, fuzzy, c-format
-msgid ""
-"  --list         - list transactions since provided date/duration argument\n"
-msgstr "  --list-media   - shpalosi burimet e lira.\n"
-
-#: ../urpmi.recover:34
-#, fuzzy, c-format
-msgid "  --list-all     - list all transactions in rpmdb (long)\n"
-msgstr "  --list-media   - shpalosi burimet e lira.\n"
-
-#: ../urpmi.recover:35
-#, fuzzy, c-format
-msgid "  --list-safe    - list transactions since checkpoint\n"
-msgstr "  --list-media   - shpalosi burimet e lira.\n"
-
-#: ../urpmi.recover:36
-#, c-format
-msgid ""
-"  --rollback     - rollback until specified date,\n"
-"                   or rollback the specified number of transactions\n"
-msgstr ""
-
-#: ../urpmi.recover:38
-#, fuzzy, c-format
-msgid "  --disable      - turn off repackaging\n"
-msgstr "  --all           - çfaqi të gjitha etiketat.\n"
-
-#: ../urpmi.recover:53
-#, c-format
-msgid "Invalid date or duration [%s]\n"
-msgstr ""
-
-#: ../urpmi.recover:61
-#, fuzzy, c-format
-msgid "Repackage directory not defined\n"
-msgstr "pakoja %s nuk është prezente"
-
-#: ../urpmi.recover:64
-#, fuzzy, c-format
-msgid "Can't write to repackage directory [%s]\n"
-msgstr "I pa mundur krijimi i repertorit [%s] për raport të bug(it)"
-
-#: ../urpmi.recover:66
-#, fuzzy, c-format
-msgid "Cleaning up repackage directory [%s]...\n"
-msgstr "I pa mundur krijimi i repertorit [%s] për raport të bug(it)"
-
-#: ../urpmi.recover:68
-#, c-format
-msgid "%d file removed\n"
-msgid_plural "%d files removed\n"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../urpmi.recover:78
-#, c-format
-msgid "Spurious command-line arguments [%s]\n"
-msgstr ""
-
-#: ../urpmi.recover:80
-#, c-format
-msgid "You can't specify --checkpoint and --rollback at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:82
-#, c-format
-msgid "You can't specify --checkpoint and --list at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:84
-#, c-format
-msgid "You can't specify --rollback and --list at the same time\n"
-msgstr ""
-
-#: ../urpmi.recover:86
-#, c-format
-msgid "You can't specify --disable along with another option"
-msgstr ""
-
-#: ../urpmi.recover:111
-#, c-format
-msgid "No transaction found since %s\n"
-msgstr ""
-
-#: ../urpmi.recover:126
-#, c-format
-msgid "You must be superuser to do this"
-msgstr ""
-
-#: ../urpmi.recover:139 ../urpmi.recover:205
-#, fuzzy, c-format
-msgid "Writing rpm macros file [%s]...\n"
-msgstr "rikuperimi i skedareve rpm [%s]..."
-
-#: ../urpmi.recover:181
-#, fuzzy, c-format
-msgid "No rollback date found\n"
-msgstr "Asnjë mjet i gjetur"
-
-#: ../urpmi.recover:184
-#, c-format
-msgid "Rollback until %s...\n"
-msgstr ""
-
-#: ../urpmi.recover:191
-#, fuzzy, c-format
-msgid "Disabling repackaging\n"
-msgstr "  --all           - çfaqi të gjitha etiketat.\n"
 
 #: ../urpmi.removemedia:38
 #, c-format
@@ -2868,15 +2704,14 @@ msgid "  -a             - select all media.\n"
 msgstr "  -a             - zgjidhi të gjitha burimet.\n"
 
 #: ../urpmi.removemedia:42
-#, fuzzy, c-format
+#, c-format
 msgid "  -y             - fuzzy match on media names.\n"
 msgstr ""
-"  -a             - zgjedhni të gjitha korrespondencat në linjën komanduese.\n"
 
 #: ../urpmi.removemedia:59
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to remove media"
-msgstr "Vetëm administratori i sistemin ka mundësi të instalojë pakot"
+msgstr ""
 
 #: ../urpmi.removemedia:71
 #, c-format
@@ -2912,9 +2747,9 @@ msgid "  --force-key    - force update of gpg key.\n"
 msgstr ""
 
 #: ../urpmi.update:46
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignore       - don't update, mark the media as ignored.\n"
-msgstr "  --update       - azhurno vetëm burimet azhurnuese.\n"
+msgstr ""
 
 #: ../urpmi.update:47
 #, c-format
@@ -2922,31 +2757,29 @@ msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
 msgstr ""
 
 #: ../urpmi.update:49
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
 msgstr ""
-"  --no-probe     - mos tento gjetjen e ndonjë sintezë apo\n"
-"                   skedare hdlist.\n"
 
 #: ../urpmi.update:50
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all enabled non-removable media.\n"
-msgstr "  -a             - zgjidhi të gjitha burimet jo levizëse.\n"
+msgstr ""
 
 #: ../urpmi.update:51
-#, fuzzy, c-format
+#, c-format
 msgid "  -f             - force updating synthesis\n"
-msgstr "  -f             - përfitim i forcuar në skedaret hdlist.\n"
+msgstr ""
 
 #: ../urpmi.update:52
-#, fuzzy, c-format
+#, c-format
 msgid "  -ff            - really force updating synthesis\n"
-msgstr "  -f             - përfitim i forcuar në skedaret hdlist.\n"
+msgstr ""
 
 #: ../urpmi.update:69
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to update media"
-msgstr "Vetëm administratori i sistemin ka mundësi të instalojë pakot"
+msgstr ""
 
 #: ../urpmi.update:86
 #, c-format
@@ -2969,22 +2802,21 @@ msgid "\"%s\""
 msgstr "\"%s\""
 
 #: ../urpmi.update:99
-#, fuzzy, c-format
+#, c-format
 msgid "ignoring media %s"
-msgstr "Botimi i burimit \"%s\":"
+msgstr ""
 
 #: ../urpmi.update:99
-#, fuzzy, c-format
+#, c-format
 msgid "enabling media %s"
-msgstr "zhdukja e burimit \"%s\""
+msgstr ""
 
 #: ../urpmq:44
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested (or updated) "
 "packages.\n"
 msgstr ""
-"  --media        - përdori vetëm burimet e dhëna, të ndara me presje.\n"
 
 #: ../urpmq:49
 #, c-format
@@ -3014,9 +2846,9 @@ msgid "  --list-media   - list available media.\n"
 msgstr "  --list-media   - shpalosi burimet e lira.\n"
 
 #: ../urpmq:58
-#, fuzzy, c-format
+#, c-format
 msgid "  --list-url     - list available media and their url.\n"
-msgstr "  --list-media   - shpalosi burimet e lira.\n"
+msgstr ""
 
 #: ../urpmq:59
 #, c-format
@@ -3043,15 +2875,14 @@ msgstr ""
 "  --src          - pakoja me radhë është pako e burimit (njëjtë si -s).\n"
 
 #: ../urpmq:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
 msgstr ""
-"  --src          - pakoja me radhë është pako e burimit (njëjtë si -s).\n"
 
 #: ../urpmq:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
-msgstr "  --url        - çfaqe etiketën serial: url.\n"
+msgstr ""
 
 #: ../urpmq:69
 #, c-format
@@ -3061,51 +2892,51 @@ msgid ""
 msgstr ""
 
 #: ../urpmq:79
-#, fuzzy, c-format
+#, c-format
 msgid "  --changelog    - print changelog.\n"
-msgstr "  --all           - çfaqi të gjitha etiketat.\n"
+msgstr ""
 
 #: ../urpmq:80
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - print conflicts.\n"
-msgstr "  --conflicts     - çfaqe etiketën conflicts: gjitha konfliktet.\n"
+msgstr ""
 
 #: ../urpmq:81
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - print obsoletes.\n"
-msgstr "  --obsoletes     - çfaqe etiketën obsoletes: gjitha absolutisht.\n"
+msgstr ""
 
 #: ../urpmq:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - print provides.\n"
-msgstr "  --provides      - çfaqe etiketën provides: gjitha pajisjet.\n"
+msgstr ""
 
 #: ../urpmq:83
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - print requires.\n"
-msgstr "  --requires      - çfaqe etiketën requires: gjitha dëshiratë.\n"
+msgstr ""
 
 #: ../urpmq:84
-#, fuzzy, c-format
-msgid "  --suggests     - print suggests.\n"
-msgstr "  --obsoletes     - çfaqe etiketën obsoletes: gjitha absolutisht.\n"
+#, c-format
+msgid "  --recommends   - print recommends.\n"
+msgstr ""
 
 #: ../urpmq:85
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - print sourcerpm.\n"
-msgstr "  --sourcerpm     - çfaqe etiketën sourcerpm: burimi rpm.\n"
+msgstr ""
 
 #: ../urpmq:86
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary, -S  - print summary.\n"
-msgstr "  --summary        - çfaqe etiketën summary: përmbledhje.\n"
+msgstr ""
 
 #: ../urpmq:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --requires-recursive, -d\n"
 "                   - query package dependencies.\n"
-msgstr "  -d             - shtrirja e hetimeve në pakot e mvarura.\n"
+msgstr ""
 
 #: ../urpmq:90
 #, c-format
@@ -3113,19 +2944,18 @@ msgid "  --whatrequires - reverse search to what requires package.\n"
 msgstr "  --whatrequires - lejon hulumtimet në pajisje për ta gjetur pakon.\n"
 
 #: ../urpmq:91
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatrequires-recursive\n"
 "                   - extended reverse search (includes virtual packages).\n"
-msgstr "  -R             - lejon hulumtimet në pajisje për ta gjetur pakon.\n"
+msgstr ""
 
 #: ../urpmq:93
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatprovides, -p\n"
 "                   - search in provides to find package.\n"
 msgstr ""
-"  -p             - lejon hulumtimet në pajisjetë për ta gjetur pakon.\n"
 
 #: ../urpmq:96
 #, c-format
@@ -3138,19 +2968,19 @@ msgid "  -g             - print groups with name also.\n"
 msgstr "  -g             - çfaqi grupet njashtu dhe emrat.\n"
 
 #: ../urpmq:99
-#, fuzzy, c-format
+#, c-format
 msgid "  -i             - print useful information in human readable form.\n"
-msgstr "  -g             - çfaqi grupet njashtu dhe emrat.\n"
+msgstr ""
 
 #: ../urpmq:100
-#, fuzzy, c-format
+#, c-format
 msgid "  -l             - list files in package.\n"
-msgstr "  --list         - shpalosi pakotë lira.\n"
+msgstr ""
 
 #: ../urpmq:101
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - equivalent to -du\n"
-msgstr "  -q             - model i qetë.\n"
+msgstr ""
 
 #: ../urpmq:102
 #, c-format
@@ -3179,10 +3009,9 @@ msgstr ""
 "  -y             - imponoje një hulumtim të paqartë (njëjtë si --fuzzy).\n"
 
 #: ../urpmq:106
-#, fuzzy, c-format
+#, c-format
 msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
 msgstr ""
-"  -a             - zgjedhni të gjitha korrespondencat në linjën komanduese.\n"
 
 #: ../urpmq:107
 #, c-format
@@ -3201,676 +3030,49 @@ msgid "--list-nodes can only be used with --parallel"
 msgstr "--liste-nodes mund të përdoret vetëm me --parallel"
 
 #: ../urpmq:231
-#, fuzzy, c-format
+#, c-format
 msgid "use -l to list files"
-msgstr "shkruarja në skedaren list është e pa mundur për \"%s\""
+msgstr ""
 
-#: ../urpmq:416
+#: ../urpmq:415
 #, c-format
 msgid "no xml info for medium \"%s\", only partial result for package %s"
 msgstr ""
 
-#: ../urpmq:417
+#: ../urpmq:416
 #, c-format
 msgid "no xml info for medium \"%s\", only partial result for packages %s"
 msgstr ""
 
-#: ../urpmq:420
+#: ../urpmq:419
 #, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for package %s"
 msgstr ""
 
-#: ../urpmq:421
+#: ../urpmq:420
 #, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr ""
 
-#: ../urpmq:488
-#, fuzzy, c-format
+#: ../urpmq:487
+#, c-format
 msgid "No changelog found\n"
-msgstr "Asnjë imazh i gjetur"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:1
-#, fuzzy
 msgid "Software Installer"
-msgstr "Instalues për Softver"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:2
 msgid "Graphical front end to install RPM files"
 msgstr "Interfac grafike dhe për instalimin e skedareve RPM"
 
-#~ msgid ""
-#~ "urpme version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme versioni %s\n"
-#~ "%s\n"
-#~ "Ky është software gratis dhe mund të shpërndahet ndër termet e GNU GPL.\n"
-#~ "\n"
-#~ "përdorim:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage: urpmf [options] pattern-expression\n"
-#~ msgstr ""
-#~ "azhurnimi-mdk versioni %s\n"
-#~ "E drejtë autori (C) %s Mandriva.\n"
-#~ "Ky është software gratis dhe mund të shpërndahet ndër termet e GNU GPL.\n"
-#~ "\n"
-#~ "përdorim:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmi.recover version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmi.recover versioni %s\n"
-#~ "E drejtë autori (C) 2006 Mandriva.\n"
-#~ "Ky është software gratis dhe mund të shpërndahet ndër termet e GNU GPL.\n"
-#~ "\n"
-#~ "përdorim:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmq version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmq versioni %s\n"
-#~ "E drejtë autori (C) 2000-2006 Mandriva.\n"
-#~ "Ky është software gratis dhe mund të shpërndahet ndër termet e GNU GPL.\n"
-#~ "\n"
-#~ "përdorim:\n"
-
-#~ msgid ""
-#~ "Installation failed, some files are missing:\n"
-#~ "%s\n"
-#~ "You may want to update your urpmi database"
-#~ msgstr ""
-#~ "Instalimi dështoi, disa skedare mungojnë:\n"
-#~ "%s\n"
-#~ "A dëshironi t'azhurnoni bazën e të dhënave urpmi"
-
-#~ msgid "Cancel"
-#~ msgstr "Anulo"
-
-#, fuzzy
-#~ msgid "Cannot write DUDF file.\n"
-#~ msgstr "i pa mundur shkrimi i skedares konfiguruese [%s]"
-
-#~ msgid ""
-#~ "  --sources      - give all source packages before downloading (root "
-#~ "only).\n"
-#~ msgstr ""
-#~ "  --sources      - jepi të gjitha burimet e pakove para se të shkarkohen "
-#~ "(vetëm root).\n"
-
-#, fuzzy
-#~ msgid "due to already installed %s"
-#~ msgstr "Gjdo gjë është veçse e instaluar"
-
-#~ msgid ""
-#~ "  --from         - use specified url for list of mirrors, the default is\n"
-#~ "                   %s\n"
-#~ msgstr ""
-#~ "  --from          - përdore url e specifikuar të pasqyreve me marrëvshje\n"
-#~ "                    është %s\n"
-
-#, fuzzy
-#~ msgid "examining %s file"
-#~ msgstr "kontrollim i skedares MD5SUM"
-
-#, fuzzy
-#~ msgid "found probed synthesis as %s"
-#~ msgstr "hdlista tesntuese është gjetur (ose sintezuar) sikur %s"
-
-#~ msgid "  --update       - create an update medium.\n"
-#~ msgstr "  --update       - krijo një burim azhurnimi.\n"
-
-#, fuzzy
-#~ msgid "malformed URL: [%s]"
-#~ msgstr "hyrje e çformuarë: [%s]"
-
-#, fuzzy
-#~ msgid "%d installation transaction failed"
-#~ msgid_plural "%d installation transactions failed"
-#~ msgstr[0] "Instalimi i transmetimit të %d dështio"
-#~ msgstr[1] "Instalimi i transmetimit të %d dështio"
-
-#, fuzzy
-#~ msgid "Package %s can not be installed"
-#~ msgstr "Gjdo gjë është veçse e instaluar"
-
-#~ msgid "Checking to remove the following packages"
-#~ msgstr "Verifikimi i zhdukjes së pakove të radhitura"
-
-#, fuzzy
-#~ msgid "%s database locked"
-#~ msgstr "baza e të dhënave urpmi është e mbyllur"
-
-#, fuzzy
-#~ msgid "Unknown option %s"
-#~ msgstr ""
-#~ "\n"
-#~ "opcione të pa njoftura '%s'\n"
-
-#~ msgid "too many mount points for removable medium \"%s\""
-#~ msgstr "shumë pika montuese për burimin tërheqës \"%s\""
-
-#~ msgid "using different removable device [%s] for \"%s\""
-#~ msgstr "përdorime të ndryshme të mjeteve tërheqëse [%s] për \"%s\""
-
-#~ msgid "unable to retrieve pathname for removable medium \"%s\""
-#~ msgstr "e pa mundur hyrja në shtegun e burimit tërheqës \"%s\""
-
-#, fuzzy
-#~ msgid "unable to mount the distribution medium"
-#~ msgstr "hyrja e pa mundur në burimin e parë instalues"
-
-#~ msgid ""
-#~ "unable to access medium \"%s\",\n"
-#~ "this could happen if you mounted manually the directory when creating the "
-#~ "medium."
-#~ msgstr ""
-#~ "blokon hyrjen në burimin \"%s\",\n"
-#~ "kjo mund të ndodhë nëse ju e montoni manualisht repetorin kur e krijoni "
-#~ "atë burim."
-
-#~ msgid "inconsistent medium \"%s\" marked removable but not really"
-#~ msgstr ""
-#~ "burim i ngatërruar \"%s\" është i shënuar si levizës, në të vërtet nuk "
-#~ "është"
-
-#~ msgid "  -c             - clean headers cache directory.\n"
-#~ msgstr "  -c             - pastrim i majave në repertort e fshehtë.\n"
-
-#~ msgid "virtual medium needs to be local"
-#~ msgstr "burimi virtuel duhet të jetë lokal"
-
-#, fuzzy
-#~ msgid "unable to parse synthesis file of \"%s\""
-#~ msgstr "analizimi i hdlist është i pa mundur të \"%s\""
-
-#, fuzzy
-#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
-#~ msgstr "llogaritja md5sum e burimit ekzistues në hdlist (ose sintezës)"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
-#~ "ignored"
-#~ msgstr ""
-#~ "burimi virtuel \"%s\" nuk duhet të posedoj hdlist të përcaktuar apo "
-#~ "skedaren list, burim i injoruar"
-
-#, fuzzy
-#~ msgid "invalid hdlist name"
-#~ msgstr "emri i skedares rpm është invalid [%s]"
-
-#~ msgid "unable to find list file for \"%s\", medium ignored"
-#~ msgstr "e pa mundur gjetja e skedares listës të \"%s\", burim i injoruar"
-
-#, fuzzy
-#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
-#~ msgstr "tento zgjedhjen e një burimi jo ekzistues \"%s\""
-
-#, fuzzy
-#~ msgid "\"synthesis\" should be set (medium \"%s\")"
-#~ msgstr "krijimi i skedares sintezë për burimin \"%s\""
-
-#, fuzzy
-#~ msgid "unable to access list file of \"%s\""
-#~ msgstr "analizimi i hdlist është i pa mundur të \"%s\""
-
-#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
-#~ msgstr ""
-#~ "burimi \"%s\" përpiqet të përdorë hdlist përdoruese, burim i injoruar"
-
-#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
-#~ msgstr ""
-#~ "burimi \"%s\" përpiqet ta përdorë listën përdoruese, burim i injoruar"
-
-#~ msgid "performing second pass to compute dependencies\n"
-#~ msgstr "ekzekutim i dytë për ti mbledhur mvarjet\n"
-
-#~ msgid "building hdlist [%s]"
-#~ msgstr "krijimi i hdlist [%s]"
-
-#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
-#~ msgstr ""
-#~ "problem gjatë leximit të skedares hdlist po sintezë të burimit \"%s\""
-
-#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
-#~ msgstr "llogaritja md5sum e kopjimit të burimit hdlist (ose sintezës)"
-
-#~ msgid "...retrieving failed: md5sum mismatch"
-#~ msgstr "...rikuperimi dështoi: mos pajtim i md5sum"
-
-#~ msgid "no rpm files found from [%s]"
-#~ msgstr "asnjë skedare rpm e gjetur nga [%s]"
-
-#~ msgid "unable to read rpm files from [%s]: %s"
-#~ msgstr "leximi i skedares rpm është i pa mundur nga [%s]: %s"
-
-#~ msgid "reading headers from medium \"%s\""
-#~ msgstr "leximi i majës nga burimi \"%s\""
-
-#, fuzzy
-#~ msgid "    --probe-synthesis - use synthesis file.\n"
-#~ msgstr ""
-#~ "  --probe-synthesis - tento në gjetjen dhe përdorimin e skedares "
-#~ "sintezë.\n"
-
-#, fuzzy
-#~ msgid "    --probe-hdlist - use hdlist file.\n"
-#~ msgstr ""
-#~ "  --probe-hdlist - tento në gjetjen dhe përdorimin e skedares hdlist.\n"
-
-#, fuzzy
-#~ msgid "  --probe-hdlist - use hdlist file.\n"
-#~ msgstr ""
-#~ "  --probe-hdlist - tento në gjetjen dhe përdorimin e skedares hdlist.\n"
-
-#~ msgid "unable to update medium \"%s\"\n"
-#~ msgstr "i pa mundur azhurnimi i burimit \"%s\"\n"
-
-#~ msgid "unable to create medium \"%s\"\n"
-#~ msgstr "i pa mundur krijimi i burimit \"%s\"\n"
-
-#~ msgid "there are multiple packages with the same rpm filename \"%s\""
-#~ msgstr "ekzistojnë pako të shumta me emër të njëjtë skedareje në rpm \"%s\""
-
-#~ msgid "unable to correctly parse [%s] on value \"%s\""
-#~ msgstr "nuk mund të analizohet në mënyrë korrekte [%s] në vlerën \"%s\""
-
-#~ msgid ""
-#~ "medium \"%s\" uses an invalid list file:\n"
-#~ "  mirror is probably not up-to-date, trying to use alternate method"
-#~ msgstr ""
-#~ "burimi \"%s\" përdore një listë skedaresh invalide:\n"
-#~ " pasqyra nuk mund të azhurnohet, provoni ta përdorni metodën altenative"
-
-#~ msgid "medium \"%s\" does not define any location for rpm files"
-#~ msgstr ""
-#~ "burimi \"%s\" nuk ka kurrëfar difinicioni për lokalizimin e skedareve rpm "
-
-#~ msgid "unrequested"
-#~ msgstr "i pa kërkuar"
-
-#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
-#~ msgstr "shtimi i pakove %s (id=%d, eid=%d, update=%d, file=%s)"
-
-#, fuzzy
-#~ msgid ""
-#~ "The following packages have bad signatures:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Do you want to continue installation ?"
-#~ msgstr ""
-#~ "Pakot e radhitura, posedojnë nënshkrime të pa pranuara:\n"
-#~ "\n"
-#~ "%s\n"
-#~ "\n"
-#~ "A dëshironi të vazhdoni?"
-
-#, fuzzy
-#~ msgid "You need to be root to use --use-distrib"
-#~ msgstr "Ju duhet të keni një autorizim që ti shpërndani repertorët"
-
-#~ msgid "unable to remove package %s"
-#~ msgstr "e pa mundur zhdukja e pakos %s"
-
-#, fuzzy
-#~ msgid "No filelist found\n"
-#~ msgstr "Asnjë mjet i gjetur"
-
-#~ msgid "medium \"%s\" is not selected"
-#~ msgstr "burimi \"%s\" nuk është i zgjedhur"
-
-#, fuzzy
-#~ msgid "Remove %d packages?"
-#~ msgstr "zhdukja e pakos %s"
-
-#~ msgid "  -f             - force generation of hdlist files.\n"
-#~ msgstr "  -f             - përfitim i forcuar në skedaret hdlist.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "  -P             - do not search in provides to find package (default).\n"
-#~ msgstr ""
-#~ "  -P             - mos hulumto në këto pajisje për ta gjetur pakon.\n"
-
-#~ msgid "  -R             - reverse search to what requires package.\n"
-#~ msgstr ""
-#~ "  -R             - lejon hulumtimet në pajisje për ta gjetur pakon.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "  -RR            - extended reverse search (includes virtual packages).\n"
-#~ msgstr ""
-#~ "  -R             - lejon hulumtimet në pajisje për ta gjetur pakon.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following package is going to be installed"
-#~ msgid_plural ""
-#~ "To satisfy dependencies, the following packages are going to be installed"
-#~ msgstr[0] "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
-#~ msgstr[1] "Për ta plotësuar mvarësin, pakotë me radhë do të zhduken (%d MB)"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed:\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "Me rastin e mbushjes së mvarësisë, pako(t) e radhitura duhet të\n"
-#~ "instalohen:\n"
-#~ "\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following packages are going to be installed"
-#~ msgid_plural ""
-#~ "To satisfy dependencies, the following package is going to be installed"
-#~ msgstr[0] ""
-#~ "Me rastin e mbushjes së mvarësisë, pako(t) e radhitura duhet të\n"
-#~ "instalohen:\n"
-#~ "\n"
-#~ msgstr[1] ""
-#~ "Me rastin e mbushjes së mvarësisë, pako(t) e radhitura duhet të\n"
-#~ "instalohen:\n"
-#~ "\n"
-
-#, fuzzy
-#~ msgid "Installing packages on nodes..."
-#~ msgstr "Instalimi i pakove `%s' (%s/%s)..."
-
-#, fuzzy
-#~ msgid "Propagating synthesis to %s..."
-#~ msgstr "kontrollimi i skedares sintezë [%s]"
-
-#, fuzzy
-#~ msgid "Distributing files to %s..."
-#~ msgstr "shpërndarje e %s"
-
-#, fuzzy
-#~ msgid "Performing install on %s..."
-#~ msgstr "Instalimi i pakos..."
-
-#, fuzzy
-#~ msgid "Preparing install on %s..."
-#~ msgstr "Instalimi i pakos..."
-
-#~ msgid "  --probe-synthesis - try to find and use synthesis file.\n"
-#~ msgstr ""
-#~ "  --probe-synthesis - tento në gjetjen dhe përdorimin e skedares "
-#~ "sintezë.\n"
-
-#~ msgid "  --probe-hdlist - try to find and use hdlist file.\n"
-#~ msgstr ""
-#~ "  --probe-hdlist - tento në gjetjen dhe përdorimin e skedares hdlist.\n"
-
-#~ msgid "`with' missing for network media\n"
-#~ msgstr "direktivë `me' mungon burimi i rrjetit\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "unknown options '%s'\n"
-#~ msgstr ""
-#~ "\n"
-#~ "opcione të pa njoftura '%s'\n"
-
-#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
-#~ msgstr "e pa mundur gjetja e skedarës hdlist të \"%s\", burim i injoruar"
-
-#~ msgid "inconsistent list file for \"%s\", medium ignored"
-#~ msgstr "skedare e listës së ngatërruar për \"%s\", burim i injoruar"
-
-#~ msgid "unable to inspect list file for \"%s\", medium ignored"
-#~ msgstr "i pa mundur konsultimi i skedares-list \"%s\", burim i injoruar"
-
-#~ msgid "virtual medium \"%s\" is not local, medium ignored"
-#~ msgstr "burimi virtuel\"%s\" nuk është lokal, burim i injoruar"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
-#~ "medium ignored"
-#~ msgstr ""
-#~ "burimi virtuel \"%s\" duhet të posedoj një burim hdlist apo sintezë, "
-#~ "burim i injoruar"
-
-#~ msgid "copying source hdlist (or synthesis) of \"%s\"..."
-#~ msgstr "kopjimi i burimit hdlist (ose sintezës) të \"%s\"..."
-
-#~ msgid "retrieval of source hdlist (or synthesis) failed"
-#~ msgstr "rikuperimi i burimit hdlist (ose sintezës) dështoi"
-
-#~ msgid "file [%s] already used in the same medium \"%s\""
-#~ msgstr "skedarja [%s] është në përdorim nga i njëjti burim \"%s\""
-
-#~ msgid "nothing written in list file for \"%s\""
-#~ msgstr "asgjë s'është shkruar në skedaren list \"%s\""
-
-#~ msgid "found %d headers in cache"
-#~ msgstr "gjetja e majës %d në fshehje"
-
-#~ msgid "removing %d obsolete headers in cache"
-#~ msgstr "zhdukja e majave absolute %d në fshehje"
-
-#~ msgid "using process %d for executing transaction"
-#~ msgstr "përdorimi i procesit %d për ekzekutimin e transakcionit"
-
-#, fuzzy
-#~ msgid "  --norebuild    - don't try to rebuild hdlist if not readable.\n"
-#~ msgstr "  --buildhost    - çfaqe etiketën buildhost: ndërtoje ftuesin.\n"
-
-#, fuzzy
-#~ msgid "The following package names were assumed: %s"
-#~ msgstr "Pakot e radhitura përmbajnë %s: %s"
-
-#~ msgid "copying hdlists file..."
-#~ msgstr "kopjimi i skedares hdlist..."
-
-#~ msgid "invalid hdlist description \"%s\" in hdlists file"
-#~ msgstr "përshkrimi \"%s\" i pa pranueshëm për skedaret hdlists"
-
-#~ msgid "Is this OK?"
-#~ msgstr "Është kjo në rregull?"
-
-#~ msgid ""
-#~ "  --version      - use specified distribution version, the default is "
-#~ "taken\n"
-#~ "                   from the version of the distribution told by the\n"
-#~ "                   installed mandriva-release package.\n"
-#~ msgstr ""
-#~ "  --version      - përdore versionin e specifikuar, me marrëveshje\n"
-#~ "                   pranohet nga versioni shpërndarës i treguar nga\n"
-#~ "                   versioni i pakove instaluese mandriva-release.\n"
-
-#~ msgid ""
-#~ "  --arch         - use specified architecture, the default is arch of\n"
-#~ "                   mandriva-release package installed.\n"
-#~ msgstr ""
-#~ "  --arch         - përdore arqitekturën e specifikuar, me marrëveshje "
-#~ "është\n"
-#~ "                   arqitektura e pakove instaluese mandriva-release.\n"
-
-#~ msgid ""
-#~ "  --headers      - extract headers for package listed from urpmi db to\n"
-#~ "                   stdout (root only).\n"
-#~ msgstr ""
-#~ "  --headers      - ekstrakto majat për pakot e radhitura nga baza e të "
-#~ "dhënave\n"
-#~ "                   të urpmi me dalje standarde (vetëm root).\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed (%d MB)"
-#~ msgstr ""
-#~ "Me rastin e mbushjes së mvarësisë, pako(t) e radhitura duhet të\n"
-#~ "instalohen:\n"
-#~ "\n"
-
-#~ msgid "installing %s\n"
-#~ msgstr "instalimi i %s\n"
-
-#~ msgid ""
-#~ "Automatic installation of packages...\n"
-#~ "You requested installation of package %s\n"
-#~ msgstr ""
-#~ "Instalim automatikë i pakove...\n"
-#~ "Ju keni kërkuar instalimin e pakove %s\n"
-
-#~ msgid "%s: command not found\n"
-#~ msgstr "%s: ky urdhër mungon\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "Some package requested cannot be installed:\n"
-#~ "%s\n"
-#~ "Continue?"
-#~ msgstr ""
-#~ "Disa nga pakot e kërkuara nuk mund të instalohen:\n"
-#~ "%s"
-
-#~ msgid "md5sum mismatch"
-#~ msgstr "mos pajtim i md5sum"
-
-#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
-#~ msgstr ""
-#~ "  --synthesis    - përdori skedaret e thëna sintezë në vend të bazës së "
-#~ "të dhënave urpmi.\n"
-
-#~ msgid ""
-#~ "  --quiet        - do not print tag name (default if no tag given on "
-#~ "command\n"
-#~ "                   line, incompatible with interactive mode).\n"
-#~ msgstr ""
-#~ "  --quiet        - mos çfaqë emrat e etiketave (marrëveshje nëse asnjë "
-#~ "etiketë s'është dhënë\n"
-#~ "                    në linjën komanduese, nuk përputhet me modin "
-#~ "interaktiv).\n"
-
-#~ msgid "  --uniq         - do not print identical lines.\n"
-#~ msgstr "  --uniq          - mos i çfaqë rreshtat e njëjtë.\n"
-
-#~ msgid "  --all          - print all tags.\n"
-#~ msgstr "  --all           - çfaqi të gjitha etiketat.\n"
-
-#~ msgid "  --summary      - print tag summary: summary.\n"
-#~ msgstr "  --summary        - çfaqe etiketën summary: përmbledhje.\n"
-
-#~ msgid "  --description  - print tag description: description.\n"
-#~ msgstr "  --description   - çfaqe etiketën description: përshkrimi.\n"
-
-#~ msgid "  --buildhost    - print tag buildhost: build host.\n"
-#~ msgstr "  --buildhost    - çfaqe etiketën buildhost: ndërtoje ftuesin.\n"
-
-#~ msgid "  --provides     - print tag provides: all provides.\n"
-#~ msgstr "  --provides      - çfaqe etiketën provides: gjitha pajisjet.\n"
-
-#~ msgid "  --requires     - print tag requires: all requires.\n"
-#~ msgstr "  --requires      - çfaqe etiketën requires: gjitha dëshiratë.\n"
-
-#~ msgid "  --files        - print tag files: all files.\n"
-#~ msgstr "  --files         - çfaqe etiketën files: gjitha skedaret.\n"
-
-#~ msgid "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
-#~ msgstr "  --obsoletes     - çfaqe etiketën obsoletes: gjitha absolutisht.\n"
-
-#~ msgid ""
-#~ "  --env          - use specific environment (typically a bug\n"
-#~ "                   report).\n"
-#~ msgstr ""
-#~ "  --env          - përdore mjedisin e veçantë (veçënarishtë një raport\n"
-#~ "                   bug(i).\n"
-
-#~ msgid "  -i             - ignore case distinctions in every pattern.\n"
-#~ msgstr "  -i             - injoroje rastin e ndryshëm në gjdo model.\n"
-
-#~ msgid ""
-#~ "  -a             - binary AND operator, true if both expression are "
-#~ "true.\n"
-#~ msgstr ""
-#~ "  -a             - operues AND binar, saktësi nëse të dy shprehjet janë "
-#~ "të sakta.\n"
-
-#~ msgid ""
-#~ "  -o             - binary OR operator, true if one expression is true.\n"
-#~ msgstr ""
-#~ "  -o             - operues OR binar, saktësi nëse njëra nga shprehjet "
-#~ "është e saktë.\n"
-
-#~ msgid "  !              - unary NOT, true if expression is false.\n"
-#~ msgstr ""
-#~ "  -!             - njëjsi NOT, saktësi nëse shprehja është e pa vërtet.\n"
-
-#~ msgid "  (              - left parenthesis to open group expression.\n"
-#~ msgstr "  (             - kllapë e majtë për ta hapur shprehjen e grupit.\n"
-
-#~ msgid "  )              - right parenthesis to close group expression.\n"
-#~ msgstr ""
-#~ "  )             - kllapë e djathtë për ta mbyllur shprehjen e grupit.\n"
-
-#~ msgid ""
-#~ "callback is:\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "thirrja e mbrapme është :\n"
-#~ "%s\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "Continue?"
-#~ msgstr "Vazhdo"
-
-#~ msgid ""
-#~ "Some package requested cannot be installed:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Disa nga pakot e kërkuara nuk mund të instalohen:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --keep         - keep existing packages if possible, reject requested\n"
-#~ "                   packages that leads to remove.\n"
-#~ msgstr ""
-#~ "  --keep\t  - nëse ka mundësi i mbanë pakot prezente, refuzon pakot\n"
-#~ "\t\t    e kërkuara me drejtim zhdukje.\n"
-
-#~ msgid ""
-#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
-#~ "                   distribution, XXX may be main, contrib, updates or\n"
-#~ "                   anything else that has been configured ;-)\n"
-#~ msgstr ""
-#~ "  --distrib-XXX  - krijo automatikisht një burim për pjesën XXX në\n"
-#~ "                   shpërndarjen, XXX e cila mund të jetë kryesore,\n"
-#~ "                   kontribuese, azhrunuese apo çfarë do çoftë mbasi\n"
-#~ "                   të jetë konfiguruar ;-)\n"
-
-#~ msgid "cannot add updates of a cooker distribution\n"
-#~ msgstr "nuk mund të shtoj azhurnime në shpërndarësinë cooker\n"
-
-#~ msgid "retrieving mirrors at %s ..."
-#~ msgstr "rikuperimi i pasqyreve në %s..."
+#: ../polkit/org.mageia.gurpmi2.policy.in.h:1
+msgid "Run Mageia Package Installer"
+msgstr ""
+
+#: ../polkit/org.mageia.gurpmi2.policy.in.h:2
+msgid "Authentication is required to run Mageia Package Installer"
+msgstr ""

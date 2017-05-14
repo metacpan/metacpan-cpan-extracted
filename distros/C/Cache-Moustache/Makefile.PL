@@ -4,44 +4,45 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "you'd have to be insane to use a module called Cache::Moustache, wouldn't you?",
-  "author"         => [
-                        "Toby Inkster <tobyink\@cpan.org>",
-                        "TOBYINK <tobyink\@cpan.org>",
-                      ],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Cache-Moustache",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { perl => 5.005 } },
-                        test => { requires => { "Test::More" => 0.61 } },
-                      },
-  "provides"       => {
-                        "Cache::Moustache" => { file => "lib/Cache/Moustache.pm", version => 0.005 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Cache-Moustache",
-                                        },
-                        homepage     => "https://metacpan.org/release/Cache-Moustache",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-cache-moustache.git",
-                                          web  => "https://github.com/tobyink/p5-cache-moustache",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Cache-Moustache/project",
-                      },
-  "version"        => 0.005,
+  "abstract"         => "you'd have to be insane to use a module called Cache::Moustache, wouldn't you?",
+  "author"           => [
+                          "Toby Inkster <tobyink\@cpan.org>",
+                          "TOBYINK <tobyink\@cpan.org>",
+                        ],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Cache-Moustache",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => { requires => { perl => 5.005 } },
+                          test => { requires => { "Test::More" => 0.61 } },
+                        },
+  "provides"         => {
+                          "Cache::Moustache" => { file => "lib/Cache/Moustache.pm", version => 0.006 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Cache-Moustache",
+                                          },
+                          homepage     => "https://metacpan.org/release/Cache-Moustache",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-cache-moustache.git",
+                                            web  => "https://github.com/tobyink/p5-cache-moustache",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Cache-Moustache/project",
+                        },
+  "version"          => 0.006,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;
